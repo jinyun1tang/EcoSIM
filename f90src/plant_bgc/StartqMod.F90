@@ -570,7 +570,7 @@ module StartqMod
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       LeafProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
-      PetioleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
+      PetoleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,NumOfCanopyLayers
         CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)=0._r8
@@ -600,7 +600,7 @@ module StartqMod
   NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
   ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  PetioleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyStalkC_pft(NZ,NY,NX)=0._r8
   StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8

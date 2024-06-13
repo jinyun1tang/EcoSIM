@@ -625,7 +625,7 @@ module grosubsMod
     PetoleStrutElms_brch          =>  plt_biom%PetoleStrutElms_brch      , &
     ShootStrutElms_pft            =>  plt_biom%ShootStrutElms_pft        , &
     LeafStrutElms_pft             =>  plt_biom%LeafStrutElms_pft         , &
-    PetioleStrutElms_pft          =>  plt_biom%PetioleStrutElms_pft      , &
+    PetoleStrutElms_pft          =>  plt_biom%PetoleStrutElms_pft      , &
     StalkStrutElms_pft            =>  plt_biom%StalkStrutElms_pft        , &
     CanopyStalkC_pft              =>  plt_biom%CanopyStalkC_pft          , &
     StalkRsrvElms_pft             =>  plt_biom%StalkRsrvElms_pft         , &
@@ -686,7 +686,7 @@ module grosubsMod
     CanopyNonstElms_pft(NE,NZ)=sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkRsrvElms_pft(NE,NZ)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))    
     ShootStrutElms_pft(NE,NZ)=sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    PetioleStrutElms_pft(NE,NZ)=sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    PetoleStrutElms_pft(NE,NZ)=sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkStrutElms_pft(NE,NZ)=sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     LeafStrutElms_pft(NE,NZ)=sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     HuskStrutElms_pft(NE,NZ)=sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -778,7 +778,7 @@ module grosubsMod
     plt_biom%CanopyNonstElms_pft(NE,NZ)=0._r8
     plt_biom%StalkRsrvElms_pft(NE,NZ)=0._r8
     plt_biom%ShootStrutElms_pft(NE,NZ)=0._r8
-    plt_biom%PetioleStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%PetoleStrutElms_pft(NE,NZ)=0._r8
     plt_biom%StalkStrutElms_pft(NE,NZ)=0._r8
     plt_biom%LeafStrutElms_pft(NE,NZ)=0._r8
     plt_biom%HuskStrutElms_pft(NE,NZ)=0._r8

@@ -715,7 +715,7 @@ module InitPlantMod
       plt_morph%InternodeHeightDying_brch(K,NB,NZ)=0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)=0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)=0._r8
-      plt_biom%PetioleProteinCNode_brch(K,NB,NZ)=0._r8
+      plt_biom%PetoleProteinCNode_brch(K,NB,NZ)=0._r8
       plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
       plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
       plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
@@ -748,7 +748,7 @@ module InitPlantMod
   plt_biom%NoduleNonstructCconc_pft(NZ)=0._r8
   plt_biom%ShootStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
-  plt_biom%PetioleStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+  plt_biom%PetoleStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
   plt_biom%CanopyStalkC_pft(NZ)=0._r8
   plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)=0._r8

@@ -815,7 +815,7 @@ implicit none
     LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch        , &
     HuskStrutElms_brch            => plt_biom%HuskStrutElms_brch            , &
     EarStrutElms_brch             => plt_biom%EarStrutElms_brch             , &
-    PetioleProteinCNode_brch      => plt_biom%PetioleProteinCNode_brch      , &
+    PetoleProteinCNode_brch      => plt_biom%PetoleProteinCNode_brch      , &
     LeafProteinCNode_brch         => plt_biom%LeafProteinCNode_brch         , &
     InternodeStrutElms_brch       => plt_biom%InternodeStrutElms_brch       , &
     PetioleElmntNode_brch         => plt_biom%PetioleElmntNode_brch         , &
@@ -863,7 +863,7 @@ implicit none
 !     LeafProteinCNode_brch=leaf protein mass
 !     LeafAreaLive_brch=branch leaf area
 !     WGLF,WGLFN,WGLFP,LeafProteinCNode_brch=node leaf C,N,P,protein mass
-!     PetioleElmntNode_brch,WGSHN,WGSHP,PetioleProteinCNode_brch=node petiole C,N,P,protein mass
+!     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinCNode_brch=node petiole C,N,P,protein mass
 !     InternodeStrutElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !
   ShootC4NonstC_brch(NB,NZ)=0._r8
@@ -898,7 +898,7 @@ implicit none
     InternodeHeightDying_brch(K,NB,NZ)=0._r8
     PetoleLensNode_brch(K,NB,NZ)=0._r8
     LeafProteinCNode_brch(K,NB,NZ)=0._r8
-    PetioleProteinCNode_brch(K,NB,NZ)=0._r8
+    PetoleProteinCNode_brch(K,NB,NZ)=0._r8
     LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8

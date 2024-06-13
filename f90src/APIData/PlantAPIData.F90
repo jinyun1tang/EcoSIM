@@ -477,7 +477,7 @@ implicit none
   real(r8), pointer :: LeafElmntNode_brch(:,:,:,:)            => null()    !leaf element, [g d-2]
   real(r8), pointer :: LeafProteinCNode_brch(:,:,:)           => null()    !layer leaf protein C, [g d-2]
   real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)         => null()  !sheath element , [g d-2]
-  real(r8), pointer :: PetioleProteinCNode_brch(:,:,:)        => null()    !layer sheath protein C, [g d-2]
+  real(r8), pointer :: PetoleProteinCNode_brch(:,:,:)        => null()    !layer sheath protein C, [g d-2]
   real(r8), pointer :: LeafChemElmByLayerNode_brch(:,:,:,:,:) => null()    !layer leaf element, [g d-2]
   real(r8), pointer :: tCanLeafC_cl(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)      => null()  !initial standing dead C, [g C m-2]
@@ -516,7 +516,7 @@ implicit none
   real(r8), pointer :: ShootElmsBeg_pft(:,:)         => null()
   real(r8), pointer :: CanopyStalkC_pft(:)       => null()   !canopy active stalk C, [g d-2
   real(r8), pointer :: LeafStrutElms_pft(:,:)     => null()   !canopy leaf elements, [g d-2]
-  real(r8), pointer :: PetioleStrutElms_pft(:,:)    => null()   !canopy sheath element , [g d-2]
+  real(r8), pointer :: PetoleStrutElms_pft(:,:)    => null()   !canopy sheath element , [g d-2]
   real(r8), pointer :: StalkRsrvElms_pft(:,:)    => null()   !canopy reserve element, [g d-2]
   real(r8), pointer :: HuskStrutElms_pft(:,:)    => null()   !canopy husk element, [g d-2]
   real(r8), pointer :: RootBiomCPerPlant_pft(:)       => null()   !root C per plant, [g p-1]
@@ -1292,7 +1292,7 @@ implicit none
   allocate(this%ShootElms_pft(NumPlantChemElms,JP1));this%ShootElms_pft=spval
   allocate(this%ShootElmsBeg_pft(NumPlantChemElms,JP1));this%ShootElmsBeg_pft=spval
   allocate(this%LeafProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafProteinCNode_brch=spval
-  allocate(this%PetioleProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetioleProteinCNode_brch=spval
+  allocate(this%PetoleProteinCNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetoleProteinCNode_brch=spval
   allocate(this%InternodeStrutElms_brch(NumPlantChemElms,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%InternodeStrutElms_brch=spval
   allocate(this%LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
@@ -1314,7 +1314,7 @@ implicit none
   allocate(this%CanopyLeafShethC_pft(JP1));this%CanopyLeafShethC_pft=spval
   allocate(this%StandDeadStrutElms_pft(NumPlantChemElms,JP1));this%StandDeadStrutElms_pft=spval
   allocate(this%RootBiomCPerPlant_pft(JP1));this%RootBiomCPerPlant_pft=spval
-  allocate(this%PetioleStrutElms_pft(NumPlantChemElms,JP1));this%PetioleStrutElms_pft=spval
+  allocate(this%PetoleStrutElms_pft(NumPlantChemElms,JP1));this%PetoleStrutElms_pft=spval
   allocate(this%StalkStrutElms_pft(NumPlantChemElms,JP1));this%StalkStrutElms_pft=spval
   allocate(this%StalkRsrvElms_pft(NumPlantChemElms,JP1));this%StalkRsrvElms_pft=spval
   allocate(this%GrainStrutElms_pft(NumPlantChemElms,JP1));this%GrainStrutElms_pft=spval
@@ -1369,7 +1369,7 @@ implicit none
 !  if(allocated(WVSTK))deallocate(WVSTK)
 !  if(allocated(LeafElmntNode_brch))deallocate(LeafElmntNode_brch)
 !  if(allocated(LeafProteinCNode_brch))deallocate(LeafProteinCNode_brch)
-!  if(allocated(PetioleProteinCNode_brch))deallocate(PetioleProteinCNode_brch)
+!  if(allocated(PetoleProteinCNode_brch))deallocate(PetoleProteinCNode_brch)
 !  if(allocated(LeafChemElmByLayerNode_brch))deallocate(LeafChemElmByLayerNode_brch)
 !  if(allocated(InternodeStrutElms_brch))deallocate(InternodeStrutElms_brch)
 !  if(allocated(PetioleElmntNode_brch))deallocate(PetioleElmntNode_brch)

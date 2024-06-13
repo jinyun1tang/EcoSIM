@@ -161,7 +161,7 @@ implicit none
     SeasonalNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%SeasonalNonstElms_pft(1:NumPlantChemElms,NZ)
     ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%ShootStrutElms_pft(1:NumPlantChemElms,NZ)
     LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)   =plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)
-    PetioleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%PetioleStrutElms_pft(1:NumPlantChemElms,NZ)
+    PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%PetoleStrutElms_pft(1:NumPlantChemElms,NZ)
     StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)
     StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)
     HuskStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)  =plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ)
@@ -407,7 +407,7 @@ implicit none
         LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)  =plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafProteinCNode_brch(K,NB,NZ,NY,NX)  =plt_biom%LeafProteinCNode_brch(K,NB,NZ)
         PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) =plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
-        PetioleProteinCNode_brch(K,NB,NZ,NY,NX) =plt_biom%PetioleProteinCNode_brch(K,NB,NZ)
+        PetoleProteinCNode_brch(K,NB,NZ,NY,NX) =plt_biom%PetoleProteinCNode_brch(K,NB,NZ)
       ENDDO
       DO  L=1,NumOfCanopyLayers
         DO N=1,NumOfLeafZenithSectors
@@ -983,7 +983,7 @@ implicit none
     plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ) =HuskStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ) =StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ) =StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
-    plt_biom%PetioleStrutElms_pft(1:NumPlantChemElms,NZ) =PetioleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
+    plt_biom%PetoleStrutElms_pft(1:NumPlantChemElms,NZ) =PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%GrainStrutElms_pft(1:NumPlantChemElms,NZ)=GrainStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_site%ElmBalanceCum_pft(1:NumPlantChemElms,NZ)  =ElmBalanceCum_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ)=CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)
@@ -1260,7 +1260,7 @@ implicit none
         plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   =LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafProteinCNode_brch(K,NB,NZ)   =LeafProteinCNode_brch(K,NB,NZ,NY,NX)
         plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)  =PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
-        plt_biom%PetioleProteinCNode_brch(K,NB,NZ)  =PetioleProteinCNode_brch(K,NB,NZ,NY,NX)
+        plt_biom%PetoleProteinCNode_brch(K,NB,NZ)  =PetoleProteinCNode_brch(K,NB,NZ,NY,NX)
       ENDDO
 
       DO K=0,MaxNodesPerBranch
