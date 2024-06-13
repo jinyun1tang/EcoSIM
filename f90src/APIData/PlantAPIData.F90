@@ -607,8 +607,8 @@ implicit none
   integer,  pointer :: iYearPlantHarvest_pft(:)     => null()  !year of harvest
   integer,  pointer :: iHarvstType_pft(:)    => null()  !type of harvest
   integer,  pointer :: jHarvst_pft(:)    => null()  !flag for stand replacing disturbance
-  real(r8), pointer :: FracBiomRMbyHVST(:,:,:)=> null()  !harvest efficiency, [-]
-  real(r8), pointer :: CutingHeightORFrac_pft(:)     => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+  real(r8), pointer :: FracBiomHarvsted(:,:,:)=> null()  !harvest efficiency, [-]
+  real(r8), pointer :: CutHeightORFrac_pft(:)     => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
   real(r8), pointer :: THIN_pft(:)     => null()  !thinning of plant population, [-]
   real(r8), pointer :: CH4ByFire_pft(:)    => null()  !plant CH4 emission from fire, [g d-2 ]
   real(r8), pointer :: CO2ByFire_pft(:)    => null()  !plant CO2 emission from fire, [g d-2 ]
@@ -1040,8 +1040,8 @@ implicit none
 
   allocate(this%iHarvestDay_pft(JP1)); this%iHarvestDay_pft=0
   allocate(this%O2ByFire_pft(JP1));this%O2ByFire_pft=spval
-  allocate(this%FracBiomRMbyHVST(1:2,1:4,JP1));this%FracBiomRMbyHVST=spval
-  allocate(this%CutingHeightORFrac_pft(JP1)); this%CutingHeightORFrac_pft=spval
+  allocate(this%FracBiomHarvsted(1:2,1:4,JP1));this%FracBiomHarvsted=spval
+  allocate(this%CutHeightORFrac_pft(JP1)); this%CutHeightORFrac_pft=spval
   allocate(this%iYearPlantHarvest_pft(JP1));this%iYearPlantHarvest_pft=0
   allocate(this%FERT(1:20));this%FERT=spval
   allocate(this%iYearPlanting_pft(JP1));this%iYearPlanting_pft=0
@@ -1071,7 +1071,7 @@ implicit none
 
 !  if(allocated(iHarvestDay_pft))deallocate(iHarvestDay_pft)
 !  if(allocated(O2ByFire_pft))deallocate(O2ByFire_pft)
-!  if(allocated(FracBiomRMbyHVST))deallocate(FracBiomRMbyHVST)
+!  if(allocated(FracBiomHarvsted))deallocate(FracBiomHarvsted)
 !  if(allocated(HVST))deallocate(HVST)
 !  if(allocated(iYearPlantHarvest_pft))deallocate(iYearPlantHarvest_pft)
 !  if(allocated(iDayPlanting_pft))deallocate(iDayPlanting_pft)

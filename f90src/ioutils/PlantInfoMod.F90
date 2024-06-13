@@ -130,16 +130,16 @@ implicit none
           DO M=1,366
             iHarvstType_pft(NZ,M,NY,NX)=-1
             jHarvst_pft(NZ,M,NY,NX)=0
-            CutingHeightORFrac_pft(NZ,M,NY,NX)=1.0E+06_r8
+            CutHeightORFrac_pft(NZ,M,NY,NX)=1.0E+06_r8
             THIN_pft(NZ,M,NY,NX)=-1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+            FracBiomHarvsted(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+            FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+            FracBiomHarvsted(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+            FracBiomHarvsted(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+            FracBiomHarvsted(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+            FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+            FracBiomHarvsted(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+            FracBiomHarvsted(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
           ENDDO
           PlantinDepz_pft(NZ,NY,NX)=ppmc
         ENDDO
@@ -253,16 +253,16 @@ implicit none
 
                 iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
                 jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
-                CutingHeightORFrac_pft(NZ,IDY,NY,NX)=HCUT
+                CutHeightORFrac_pft(NZ,IDY,NY,NX)=HCUT
                 THIN_pft(NZ,IDY,NY,NX)=PCUT
-                FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
-                FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
-                FracBiomRMbyHVST(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
-                FracBiomRMbyHVST(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
-                FracBiomRMbyHVST(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
-                FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
-                FracBiomRMbyHVST(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
-                FracBiomRMbyHVST(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
+                FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
+                FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
+                FracBiomHarvsted(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
+                FracBiomHarvsted(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
+                FracBiomHarvsted(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
+                FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
+                FracBiomHarvsted(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
+                FracBiomHarvsted(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
 
                 IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
                   !animal or insect biomass
@@ -272,16 +272,16 @@ implicit none
                     D580: DO IDYG=IDYS+1,IDYE-1
                       iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
                       jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
-                      CutingHeightORFrac_pft(NZ,IDYG,NY,NX)=HCUT
+                      CutHeightORFrac_pft(NZ,IDYG,NY,NX)=HCUT
                       THIN_pft(NZ,IDYG,NY,NX)=PCUT
-                      FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
-                      FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
-                      FracBiomRMbyHVST(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
-                      FracBiomRMbyHVST(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
-                      FracBiomRMbyHVST(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
-                      FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
-                      FracBiomRMbyHVST(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
-                      FracBiomRMbyHVST(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
+                      FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
+                      FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
+                      FracBiomHarvsted(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
+                      FracBiomHarvsted(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
+                      FracBiomHarvsted(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
+                      FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
+                      FracBiomHarvsted(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
+                      FracBiomHarvsted(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
                     ENDDO D580
                   endif
                   IDYS=IDY

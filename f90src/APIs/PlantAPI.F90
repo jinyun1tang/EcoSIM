@@ -291,7 +291,7 @@ implicit none
     ZERO4Uptk_pft(NZ,NY,NX)  =plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)  =plt_biom%ZERO4LeafVar_pft(NZ)
     iPlantThermoAdaptZone(NZ,NY,NX)   =plt_pheno%iPlantThermoAdaptZone(NZ)
-    CutingHeightORFrac_pft(NZ,I,NY,NX) =plt_distb%CutingHeightORFrac_pft(NZ)
+    CutHeightORFrac_pft(NZ,I,NY,NX) =plt_distb%CutHeightORFrac_pft(NZ)
     iHarvstType_pft(NZ,I,NY,NX)=plt_distb%iHarvstType_pft(NZ)
     jHarvst_pft(NZ,I,NY,NX)=plt_distb%jHarvst_pft(NZ)
     THIN_pft(NZ,I,NY,NX) =plt_distb%THIN_pft(NZ)
@@ -556,7 +556,7 @@ implicit none
       ENDDO
     ENDDO
 
-    FracBiomRMbyHVST(1:2,1:4,NZ,I,NY,NX)=plt_distb%FracBiomRMbyHVST(1:2,1:4,NZ)
+    FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)=plt_distb%FracBiomHarvsted(1:2,1:4,NZ)
 
 
     DO L=NU(NY,NX),MaxSoiL4Root_pft(NZ,NY,NX)
@@ -1011,7 +1011,7 @@ implicit none
     plt_photo%O2L(NZ)=O2L(NZ,NY,NX)
 
     plt_photo%aquCO2Intraleaf_pft(NZ)=aquCO2Intraleaf_pft(NZ,NY,NX)
-    plt_distb%FracBiomRMbyHVST(1:2,1:4,NZ)=FracBiomRMbyHVST(1:2,1:4,NZ,I,NY,NX)
+    plt_distb%FracBiomHarvsted(1:2,1:4,NZ)=FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)
 
     plt_pheno%iPlantState_pft(NZ)=iPlantState_pft(NZ,NY,NX)
     plt_distb%iYearPlanting_pft(NZ)=iYearPlanting_pft(NZ,NY,NX)
@@ -1062,7 +1062,7 @@ implicit none
     plt_distb%iDayPlantHarvest_pft(NZ)=iDayPlantHarvest_pft(NZ,NY,NX)
     plt_distb%iYearPlantHarvest_pft(NZ)=iYearPlantHarvest_pft(NZ,NY,NX)
 
-    plt_distb%CutingHeightORFrac_pft(NZ) =CutingHeightORFrac_pft(NZ,I,NY,NX)
+    plt_distb%CutHeightORFrac_pft(NZ) =CutHeightORFrac_pft(NZ,I,NY,NX)
     plt_distb%iHarvstType_pft(NZ)=iHarvstType_pft(NZ,I,NY,NX)
     plt_distb%jHarvst_pft(NZ)=jHarvst_pft(NZ,I,NY,NX)
     plt_distb%THIN_pft(NZ) =THIN_pft(NZ,I,NY,NX)

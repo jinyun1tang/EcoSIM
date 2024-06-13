@@ -2197,10 +2197,10 @@ module PlantBranchMod
     icwood                            => pltpar%icwood,                               &
     k_fine_litr                       => pltpar%k_fine_litr,                          &
     k_woody_litr                      => pltpar%k_woody_litr,                         &
-    FracBiomRMbyHVST                  => plt_distb%FracBiomRMbyHVST,                  &
+    FracBiomHarvsted                  => plt_distb%FracBiomHarvsted,                  &
     iYearPlantHarvest_pft             => plt_distb%iYearPlantHarvest_pft,             &
     THIN_pft                          => plt_distb%THIN_pft,                          &
-    CutingHeightORFrac_pft            => plt_distb%CutingHeightORFrac_pft,            &
+    CutHeightORFrac_pft            => plt_distb%CutHeightORFrac_pft,            &
     iHarvstType_pft                   => plt_distb%iHarvstType_pft,                   &
     jHarvst_pft                       => plt_distb%jHarvst_pft,                       &
     iDayPlanting_pft                  => plt_distb%iDayPlanting_pft,                  &
@@ -2503,9 +2503,9 @@ module PlantBranchMod
 !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
 !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
 !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
-!     FracBiomRMbyHVST(1,1,FracBiomRMbyHVST(1,2,FracBiomRMbyHVST(1,3,FracBiomRMbyHVST(1,4=fraction of
+!     FracBiomHarvsted(1,1,FracBiomHarvsted(1,2,FracBiomHarvsted(1,3,FracBiomHarvsted(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
-!     FracBiomRMbyHVST(2,1,FracBiomRMbyHVST(2,2,FracBiomRMbyHVST(2,3,FracBiomRMbyHVST(2,4=fraction of
+!     FracBiomHarvsted(2,1,FracBiomHarvsted(2,2,FracBiomHarvsted(2,3,FracBiomHarvsted(2,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from ecosystem
 !     iDayPlanting_pft,iYearPlanting_pft=day,year of planting
 !     doInitPlant_pft=PFT initialization flag:0=no,1=yes
@@ -2519,16 +2519,16 @@ module PlantBranchMod
         iYearPlantHarvest_pft(NZ)=iYearCurrent
         iHarvstType_pft(NZ)=1
         jHarvst_pft(NZ)=jharvtyp_tmareseed
-        CutingHeightORFrac_pft(NZ)=0._r8
+        CutHeightORFrac_pft(NZ)=0._r8
         THIN_pft(NZ)=0._r8
-        FracBiomRMbyHVST(1,iplthvst_leaf,NZ)=1.0_r8
-        FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ)=1.0_r8
-        FracBiomRMbyHVST(1,iplthvst_woody,NZ)=1.0_r8
-        FracBiomRMbyHVST(1,iplthvst_stdead,NZ)=1.0_r8
-        FracBiomRMbyHVST(2,iplthvst_leaf,NZ)=0._r8
-        FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ)=1.0_r8
-        FracBiomRMbyHVST(2,iplthvst_woody,NZ)=0._r8
-        FracBiomRMbyHVST(2,iplthvst_stdead,NZ)=0._r8
+        FracBiomHarvsted(1,iplthvst_leaf,NZ)=1.0_r8
+        FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)=1.0_r8
+        FracBiomHarvsted(1,iplthvst_woody,NZ)=1.0_r8
+        FracBiomHarvsted(1,iplthvst_stdead,NZ)=1.0_r8
+        FracBiomHarvsted(2,iplthvst_leaf,NZ)=0._r8
+        FracBiomHarvsted(2,iplthvst_finenonleaf,NZ)=1.0_r8
+        FracBiomHarvsted(2,iplthvst_woody,NZ)=0._r8
+        FracBiomHarvsted(2,iplthvst_stdead,NZ)=0._r8
         iDayPlanting_pft(NZ)=-1E+06
         iYearPlanting_pft(NZ)=-1E+06
         doInitPlant_pft(NZ)=itrue
