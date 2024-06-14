@@ -653,81 +653,38 @@ module PlantDisturbsMod
 !------------------------------------------------------------------------------------------
 
   subroutine RemoveBiomByTillage(I,J,NZ)
+  !
+  !Description
   !REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
   implicit none
   integer , intent(in) :: I,J,NZ
   integer :: L,K,M,N,NR,NE,NB,NTG
   real(r8) :: XHVST,XHVST1
   REAL(R8) :: APSILT
-  real(r8) :: FDM,VOLWPX
-  real(r8) :: WVPLT
 !     begin_execution
   associate(                                                              &
-    jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
-    iDayPlantHarvest_pft        => plt_distb%iDayPlantHarvest_pft,        &
     iDayPlanting_pft            => plt_distb%iDayPlanting_pft,            &
     iSoilDisturbType_col        => plt_distb%iSoilDisturbType_col,        &
     iYearPlanting_pft           => plt_distb%iYearPlanting_pft,           &
-    iYearPlantHarvest_pft       => plt_distb%iYearPlantHarvest_pft,       &
     XCORP                       => plt_distb%XCORP,                       &
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
     trcg_rootml_pvr             => plt_rbgc%trcg_rootml_pvr,              &
     trcs_rootml_pvr             => plt_rbgc%trcs_rootml_pvr,              &
-    UVOLO                       => plt_ew%UVOLO,                          &
-    CanopyWater_pft             => plt_ew%CanopyWater_pft,                &
-    VHeatCapCanP_pft            => plt_ew%VHeatCapCanP_pft,               &
-    PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
     PPX_pft                     => plt_site%PPX_pft,                      &
-    ShootC4NonstC_brch          => plt_biom%ShootC4NonstC_brch,           &
     RootMycoNonstElms_rpvr      => plt_biom%RootMycoNonstElms_rpvr,       &
     RootProteinC_pvr            => plt_biom%RootProteinC_pvr,             &
     PopuRootMycoC_pvr           => plt_biom% PopuRootMycoC_pvr,           &
     RootMycoActiveBiomC_pvr     => plt_biom%RootMycoActiveBiomC_pvr,      &
-    LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch,           &
-    GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch,          &
-    EarStrutElms_brch           => plt_biom%EarStrutElms_brch,            &
-    CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch,    &
-    CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch,         &
-    HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch,           &
-    StalkRsrvElms_brch          => plt_biom%StalkRsrvElms_brch,           &
-    CanopyNodulStrutElms_brch   => plt_biom%CanopyNodulStrutElms_brch,    &
-    ShootStrutElms_brch         => plt_biom%ShootStrutElms_brch,          &
-    StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,          &
-    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch,  &
-    PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,         &
-    LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,           &
-    LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &
-    SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch,     &
-    StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,           &
-    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,      &
-    PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,        &
     RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr,    &
-    LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
-    InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,      &
-    CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
     Root1stElm_raxs             => plt_biom%Root1stElm_raxs,              &
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft,        &
-    CanopyLeafShethC_pft        => plt_biom%CanopyLeafShethC_pft,         &
     RootMyco2ndStrutElms_rpvr   => plt_biom%RootMyco2ndStrutElms_rpvr,    &
     RootNodulNonstElms_pvr      => plt_biom%RootNodulNonstElms_pvr,       &
     RootNodulStrutElms_pvr      => plt_biom%RootNodulStrutElms_pvr,       &
-    GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch,     &
     FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
-    FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
-    FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
     FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr,       &
-    iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch,      &
-    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft,     &
-    iPlantState_pft             => plt_pheno%iPlantState_pft,             &
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,       &
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,   &
-    iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft,        &
-    iPlantRootState_pft         => plt_pheno%iPlantRootState_pft,         &
-    iPlantShootState_pft        => plt_pheno%iPlantShootState_pft,        &
-    CMassHCO3BundleSheath_node  => plt_photo%CMassHCO3BundleSheath_node,  &
-    CMassCO2BundleSheath_node   => plt_photo%CMassCO2BundleSheath_node,   &
-    CPOOL3_node                 => plt_photo%CPOOL3_node,                 &
-    CPOOL4_node                 => plt_photo%CPOOL4_node,                 &
     MaxNumRootLays              => plt_site%MaxNumRootLays,               &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft,          &
     iYearCurrent                => plt_site%iYearCurrent,                 &
@@ -736,18 +693,14 @@ module PlantDisturbsMod
     NU                          => plt_site%NU,                           &
     k_fine_litr                 => pltpar%k_fine_litr,                    &
     k_woody_litr                => pltpar%k_woody_litr,                   &
-    inonstruct                  => pltpar%inonstruct,                     &
-    ifoliar                     => pltpar%ifoliar,                        &
-    istalk                      => pltpar%istalk,                         &
+    inonstruct                  => pltpar%inonstruct,                     &    
     iroot                       => pltpar%iroot,                          &
-    inonfoliar                  => pltpar%inonfoliar,                     &
     icwood                      => pltpar%icwood,                         &
     RootGasLossDisturb_pft      => plt_bgcr%RootGasLossDisturb_pft,       &
     LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,         &
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr,             &
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr,           &
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr,           &
-    FracPARRadbyCanopy_pft      => plt_rad%FracPARRadbyCanopy_pft,        &
     Root1stLen_rpvr             => plt_morph%Root1stLen_rpvr,             &
     RootVH2O_pvr                => plt_morph%RootVH2O_pvr,                &
     RootAreaPerPlant_pvr        => plt_morph%RootAreaPerPlant_pvr,        &
@@ -761,13 +714,7 @@ module PlantDisturbsMod
     Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr,             &
     NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft,          &
     MY                          => plt_morph%MY,                          &
-    NumRootAxes_pft             => plt_morph%NumRootAxes_pft,             &
-    NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
-    LeafAreaNode_brch           => plt_morph%LeafAreaNode_brch,           &
-    LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch,           &
-    PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch,     &
-    SeedNumSet_brch             => plt_morph%SeedNumSet_brch,             &
-    CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft          &
+    NumRootAxes_pft             => plt_morph%NumRootAxes_pft              &
   )
 !     SolarNoonHour_col=hour of solar noon
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
@@ -776,9 +723,6 @@ module PlantDisturbsMod
 !     iYearCurrent=current year
 !     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     XHVST=fraction of PFT remaining after disturbance
-!     PPX,PP=PFT population per m2,grid cell
-!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
-!     VHeatCapCanP_pft=canopy heat capacity
 !
   IF(J.EQ.INT(SolarNoonHour_col) .AND. (iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
@@ -789,177 +733,10 @@ module PlantDisturbsMod
         XHVST=XCORP
         PPX_pft(NZ)=PPX_pft(NZ)*XHVST
         PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
-        FracPARRadbyCanopy_pft(NZ)=FracPARRadbyCanopy_pft(NZ)*XHVST
-        VHeatCapCanP_pft(NZ)=VHeatCapCanP_pft(NZ)*XHVST
-        CanopyLeafShethC_pft(NZ)=0._r8
-        CanopyStalkC_pft(NZ)=0._r8
-!
-!     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
-!
-!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-!     PP=PFT population
-!
-        D8975: DO NB=1,NumOfBranches_pft(NZ)
-          IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-            IF(PlantPopulation_pft(NZ).LE.0.0)then
-              iPlantBranchState_brch(NB,NZ)=iDead
-            endif
-!
-!     LitrFall FROM BRANCHES DURING TILLAGE
-!
-!     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
-!     XHVST=fraction of PFT remaining after disturbance
-!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
-!     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     ShootC4NonstC_brch=total C4 nonstructural C in branch
-!     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-!     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
-!     FWODB=C woody fraction in other organs:0=woody,1=non-woody
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-!     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
-!     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
-!     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
-!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
-!     WTRVC,WTRVN,WTRVP=storage C,N,P
-!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-!
-            XHVST1=1._r8-XHVST
-            D6380: DO M=1,jsken
-              LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
-                +XHVST1*(ElmAllocmat4Litr(ielmc,inonstruct,M,NZ)*(CanopyNonstElms_brch(ielmc,NB,NZ) &
-                +CanopyNodulNonstElms_brch(ielmc,NB,NZ) &
-                +ShootC4NonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)) &
-                +ElmAllocmat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracShootStalkElmAlloc2Litr(ielmc,k_fine_litr) &
-                +CanopyNodulStrutElms_brch(ielmc,NB,NZ)) &
-                +ElmAllocmat4Litr(ielmc,inonfoliar,M,NZ)*(PetoleStrutElms_brch(ielmc,NB,NZ)*FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) &
-                +HuskStrutElms_brch(ielmc,NB,NZ)+EarStrutElms_brch(ielmc,NB,NZ)))
+        XHVST1=1._r8-XHVST
 
-              DO NE=2,NumPlantChemElms
-                LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
-                  *(ElmAllocmat4Litr(NE,inonstruct,M,NZ)*(CanopyNonstElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)&
-                  +StalkRsrvElms_brch(NE,NB,NZ)) &
-                  +ElmAllocmat4Litr(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootStalkElmAlloc2Litr(NE,k_fine_litr) &
-                  +CanopyNodulStrutElms_brch(NE,NB,NZ)) &
-                  +ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*(PetoleStrutElms_brch(NE,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_fine_litr) &
-                  +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ)))
-              ENDDO
-            ENDDO D6380
+        call RemoveShootByTillage(I,J,NZ,XHVST,XHVST1)
 
-            DO M=1,jsken
-              DO NE=1,NumPlantChemElms
-                LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
-                  *ElmAllocmat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootStalkElmAlloc2Litr(NE,k_woody_litr) &
-                  +PetoleStrutElms_brch(NE,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_woody_litr))
-
-                IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
-                  SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XHVST1 &
-                    *ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
-                ELSE
-                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
-                    *ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
-                ENDIF
-                LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
-                  *ElmAllocmat4Litr(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
-
-                LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
-                  *ElmAllocmat4Litr(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
-              ENDDO
-            ENDDO
-!
-!     PLANT STATE VARIABLES REMAINING AFTER TILLAGE
-!
-
-            ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)*XHVST
-            StalkBiomassC_brch(NB,NZ)=StalkBiomassC_brch(NB,NZ)*XHVST
-            DO NE=1,NumPlantChemElms
-              CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)*XHVST
-              CanopyNodulNonstElms_brch(NE,NB,NZ)=CanopyNodulNonstElms_brch(NE,NB,NZ)*XHVST
-              ShootStrutElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ)*XHVST
-              StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)*XHVST
-              HuskStrutElms_brch(NE,NB,NZ)=HuskStrutElms_brch(NE,NB,NZ)*XHVST
-              EarStrutElms_brch(NE,NB,NZ)=EarStrutElms_brch(NE,NB,NZ)*XHVST
-              GrainStrutElms_brch(NE,NB,NZ)=GrainStrutElms_brch(NE,NB,NZ)*XHVST
-              LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)*XHVST
-              CanopyNodulStrutElms_brch(NE,NB,NZ)=CanopyNodulStrutElms_brch(NE,NB,NZ)*XHVST
-              PetoleStrutElms_brch(NE,NB,NZ)=PetoleStrutElms_brch(NE,NB,NZ)*XHVST
-              StalkStrutElms_brch(NE,NB,NZ)=StalkStrutElms_brch(NE,NB,NZ)*XHVST
-              SenecStalkStrutElms_brch(NE,NB,NZ)=SenecStalkStrutElms_brch(NE,NB,NZ)*XHVST
-            ENDDO
-
-            PotentialSeedSites_brch(NB,NZ)=PotentialSeedSites_brch(NB,NZ)*XHVST
-            SeedNumSet_brch(NB,NZ)=SeedNumSet_brch(NB,NZ)*XHVST
-            GrainSeedBiomCMean_brch(NB,NZ)=GrainSeedBiomCMean_brch(NB,NZ)*XHVST
-            LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)*XHVST
-            LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
-            CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
-
-            CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
-            D8970: DO K=0,MaxNodesPerBranch1
-              IF(K.NE.0)THEN
-                CPOOL3_node(K,NB,NZ)=CPOOL3_node(K,NB,NZ)*XHVST
-                CPOOL4_node(K,NB,NZ)=CPOOL4_node(K,NB,NZ)*XHVST
-                CMassCO2BundleSheath_node(K,NB,NZ)=CMassCO2BundleSheath_node(K,NB,NZ)*XHVST
-                CMassHCO3BundleSheath_node(K,NB,NZ)=CMassHCO3BundleSheath_node(K,NB,NZ)*XHVST
-              ENDIF
-              LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)*XHVST
-
-              LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*XHVST
-!     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
-
-              PetoleProteinCNode_brch(K,NB,NZ)=PetoleProteinCNode_brch(K,NB,NZ)*XHVST
-!     LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ)*XHVST
-!     InternodeHeightDying_brch(K,NB,NZ)=InternodeHeightDying_brch(K,NB,NZ)*XHVST
-              DO NE=1,NumPlantChemElms
-                InternodeStrutElms_brch(NE,K,NB,NZ)=InternodeStrutElms_brch(NE,K,NB,NZ)*XHVST
-                LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
-                PetioleElmntNode_brch(NE,K,NB,NZ)=PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
-                DO L=1,NumOfCanopyLayers1
-                  LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*XHVST
-                ENDDO
-              ENDDO
-              D8965: DO L=1,NumOfCanopyLayers1
-                CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)*XHVST
-              ENDDO D8965
-            ENDDO D8970
-          ENDIF
-        ENDDO D8975
-!
-!     PSICanopy_pft=canopy water potential
-!     CanopyWater_pft=water volume in canopy
-!     VOLWOU,UVOLO=accumulated water loss for water balance calculation
-!
-        VOLWPX=CanopyWater_pft(NZ)
-        WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
-
-        FDM=get_FDM(PSICanopy_pft(NZ))
-!        APSILT=ABS(PSICanopy_pft(NZ))
-!        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
-
-        CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
-        VOLWOU=VOLWOU+VOLWPX-CanopyWater_pft(NZ)
-        UVOLO=UVOLO+VOLWPX-CanopyWater_pft(NZ)
-!
-!     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
-!
-!     PP=PFT population
-!     IDTHR,iPlantShootState_pft=PFT root,shoot living flag: 0=alive,1=dead
-!     IDTH=PFT living flag: 0=alive,1=dead
-!     jHarvst_pft=terminate PFT:0=no,1=yes,2=yes,and reseed
-!     iDayPlantHarvest_pft,iYearPlantHarvest_pft=day,year of harvesting
-!     iYearCurrent=current year
-!
-        IF(PlantPopulation_pft(NZ).LE.0.0_r8)THEN
-          iPlantRootState_pft(NZ)=iDead
-          iPlantShootState_pft(NZ)=iDead
-          iPlantState_pft(NZ)=iDead
-          jHarvst_pft(NZ)=jharvtyp_terminate
-          iDayPlantHarvest_pft(NZ)=I
-          iYearPlantHarvest_pft(NZ)=iYearCurrent
-        ENDIF
 !
 !     LitrFall FROM ROOTS DURING TILLAGE
 !
@@ -2801,5 +2578,257 @@ module PlantDisturbsMod
     ENDIF
   end associate          
   end subroutine HarvstUpdateRootStateL
+!--------------------------------------------------------------------------------
+  subroutine RemoveShootByTillage(I,J,NZ,XHVST,XHVST1)        
+  implicit none
+  integer, intent(in) :: I,J,NZ
+  real(r8), intent(in) :: XHVST,XHVST1
+
+  real(r8) :: WVPLT
+  integer :: M,NB,NE,K,L
+  real(r8) :: FDM,VOLWPX  
+  associate(                                                             &
+    jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
+    UVOLO                       => plt_ew%UVOLO,                          &
+    inonstruct                  => pltpar%inonstruct,                     &
+    istalk                      => pltpar%istalk,                         &
+    inonfoliar                  => pltpar%inonfoliar,                     &
+    icwood                      => pltpar%icwood,                         &
+    ifoliar                     => pltpar%ifoliar,                        &
+    CanopyWater_pft             => plt_ew%CanopyWater_pft,                &
+    ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
+    iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft,        &
+    SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft,        &
+    PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
+    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft,     &
+    FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
+    FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
+    iPlantState_pft             => plt_pheno%iPlantState_pft,             &
+    iPlantRootState_pft         => plt_pheno%iPlantRootState_pft,         &
+    iPlantShootState_pft        => plt_pheno%iPlantShootState_pft,        &
+    CMassHCO3BundleSheath_node  => plt_photo%CMassHCO3BundleSheath_node,  &
+    CMassCO2BundleSheath_node   => plt_photo%CMassCO2BundleSheath_node,   &
+    FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
+    CPOOL3_node                 => plt_photo%CPOOL3_node,                 &
+    CPOOL4_node                 => plt_photo%CPOOL4_node,                 &
+    VOLWOU                      => plt_site%VOLWOU,                       &
+    k_fine_litr                 => pltpar%k_fine_litr,                    &
+    k_woody_litr                => pltpar%k_woody_litr,                   &
+    iYearCurrent                => plt_site%iYearCurrent,                 &
+    iDayPlantHarvest_pft        => plt_distb%iDayPlantHarvest_pft,        &
+    iYearPlantHarvest_pft       => plt_distb%iYearPlantHarvest_pft,       &
+    LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
+    InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,      &
+    CanopyLeafShethC_pft        => plt_biom%CanopyLeafShethC_pft,         &
+    FracPARRadbyCanopy_pft      => plt_rad%FracPARRadbyCanopy_pft,        &
+    CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
+    NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
+    iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch,      &
+    PlantPopulation_pft         => plt_site%PlantPopulation_pft,          &
+    LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,         &
+    CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch,    &
+    CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch,         &
+    ShootC4NonstC_brch          => plt_biom%ShootC4NonstC_brch,           &
+    VHeatCapCanP_pft            => plt_ew%VHeatCapCanP_pft,               &
+    LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch,           &
+    GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch,          &
+    EarStrutElms_brch           => plt_biom%EarStrutElms_brch,            &
+    HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch,           &
+    StalkRsrvElms_brch          => plt_biom%StalkRsrvElms_brch,           &
+    CanopyNodulStrutElms_brch   => plt_biom%CanopyNodulStrutElms_brch,    &
+    GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch,     &
+    ShootStrutElms_brch         => plt_biom%ShootStrutElms_brch,          &
+    StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,          &
+    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch,  &
+    PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,         &
+    LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,           &
+    LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &
+    SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch,     &
+    StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,           &
+    LeafAreaNode_brch           => plt_morph%LeafAreaNode_brch,           &
+    LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch,           &
+    PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch,     &
+    SeedNumSet_brch             => plt_morph%SeedNumSet_brch,             &
+    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,      &
+    PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,        &
+    CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft          &
+  )
+
+!     PPX,PP=PFT population per m2,grid cell
+!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     VHeatCapCanP_pft=canopy heat capacity
+
+  FracPARRadbyCanopy_pft(NZ)=FracPARRadbyCanopy_pft(NZ)*XHVST
+  VHeatCapCanP_pft(NZ)=VHeatCapCanP_pft(NZ)*XHVST
+  CanopyLeafShethC_pft(NZ)=0._r8
+  CanopyStalkC_pft(NZ)=0._r8
+!
+!     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
+!
+!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
+!     PP=PFT population
+!
+  D8975: DO NB=1,NumOfBranches_pft(NZ)
+    IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
+      IF(PlantPopulation_pft(NZ).LE.0.0)then
+        iPlantBranchState_brch(NB,NZ)=iDead
+      endif
+!
+!     LitrFall FROM BRANCHES DURING TILLAGE
+!
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
+!     XHVST=fraction of PFT remaining after disturbance
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
+!     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
+!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
+!     ShootC4NonstC_brch=total C4 nonstructural C in branch
+!     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
+!     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
+!     FWODB=C woody fraction in other organs:0=woody,1=non-woody
+!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
+!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
+!     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
+!     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
+!     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
+!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
+!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+!     WTRVC,WTRVN,WTRVP=storage C,N,P
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!
+    D6380: DO M=1,jsken
+      LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
+        +XHVST1*(ElmAllocmat4Litr(ielmc,inonstruct,M,NZ)*(CanopyNonstElms_brch(ielmc,NB,NZ) &
+        +CanopyNodulNonstElms_brch(ielmc,NB,NZ) &
+        +ShootC4NonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)) &
+        +ElmAllocmat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracShootStalkElmAlloc2Litr(ielmc,k_fine_litr) &
+        +CanopyNodulStrutElms_brch(ielmc,NB,NZ)) &
+        +ElmAllocmat4Litr(ielmc,inonfoliar,M,NZ)*(PetoleStrutElms_brch(ielmc,NB,NZ)*FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) &
+        +HuskStrutElms_brch(ielmc,NB,NZ)+EarStrutElms_brch(ielmc,NB,NZ)))
+
+      DO NE=2,NumPlantChemElms
+        LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+          *(ElmAllocmat4Litr(NE,inonstruct,M,NZ)*(CanopyNonstElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)&
+          +StalkRsrvElms_brch(NE,NB,NZ)) &
+          +ElmAllocmat4Litr(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootStalkElmAlloc2Litr(NE,k_fine_litr) &
+          +CanopyNodulStrutElms_brch(NE,NB,NZ)) &
+          +ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*(PetoleStrutElms_brch(NE,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_fine_litr) &
+          +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ)))
+      ENDDO
+    ENDDO D6380
+
+    DO M=1,jsken
+      DO NE=1,NumPlantChemElms
+        LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
+          *ElmAllocmat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootStalkElmAlloc2Litr(NE,k_woody_litr) &
+          +PetoleStrutElms_brch(NE,NB,NZ)*FracShootLeafElmAlloc2Litr(NE,k_woody_litr))
+
+        IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
+          SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XHVST1 &
+            *ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
+        ELSE
+          LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+            *ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
+        ENDIF
+        LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
+          *ElmAllocmat4Litr(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+
+        LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+          *ElmAllocmat4Litr(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+      ENDDO
+    ENDDO
+  !
+  !     PLANT STATE VARIABLES REMAINING AFTER TILLAGE
+  !
+
+    ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)*XHVST
+    StalkBiomassC_brch(NB,NZ)=StalkBiomassC_brch(NB,NZ)*XHVST
+    DO NE=1,NumPlantChemElms
+      CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)*XHVST
+      CanopyNodulNonstElms_brch(NE,NB,NZ)=CanopyNodulNonstElms_brch(NE,NB,NZ)*XHVST
+      ShootStrutElms_brch(NE,NB,NZ)=ShootStrutElms_brch(NE,NB,NZ)*XHVST
+      StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)*XHVST
+      HuskStrutElms_brch(NE,NB,NZ)=HuskStrutElms_brch(NE,NB,NZ)*XHVST
+      EarStrutElms_brch(NE,NB,NZ)=EarStrutElms_brch(NE,NB,NZ)*XHVST
+      GrainStrutElms_brch(NE,NB,NZ)=GrainStrutElms_brch(NE,NB,NZ)*XHVST
+      LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)*XHVST
+      CanopyNodulStrutElms_brch(NE,NB,NZ)=CanopyNodulStrutElms_brch(NE,NB,NZ)*XHVST
+      PetoleStrutElms_brch(NE,NB,NZ)=PetoleStrutElms_brch(NE,NB,NZ)*XHVST
+      StalkStrutElms_brch(NE,NB,NZ)=StalkStrutElms_brch(NE,NB,NZ)*XHVST
+      SenecStalkStrutElms_brch(NE,NB,NZ)=SenecStalkStrutElms_brch(NE,NB,NZ)*XHVST
+    ENDDO
+
+    PotentialSeedSites_brch(NB,NZ)=PotentialSeedSites_brch(NB,NZ)*XHVST
+    SeedNumSet_brch(NB,NZ)=SeedNumSet_brch(NB,NZ)*XHVST
+    GrainSeedBiomCMean_brch(NB,NZ)=GrainSeedBiomCMean_brch(NB,NZ)*XHVST
+    LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)*XHVST
+    LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
+    CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
+
+    CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
+    D8970: DO K=0,MaxNodesPerBranch1
+      IF(K.NE.0)THEN
+        CPOOL3_node(K,NB,NZ)=CPOOL3_node(K,NB,NZ)*XHVST
+        CPOOL4_node(K,NB,NZ)=CPOOL4_node(K,NB,NZ)*XHVST
+        CMassCO2BundleSheath_node(K,NB,NZ)=CMassCO2BundleSheath_node(K,NB,NZ)*XHVST
+        CMassHCO3BundleSheath_node(K,NB,NZ)=CMassHCO3BundleSheath_node(K,NB,NZ)*XHVST
+      ENDIF
+      LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)*XHVST
+
+      LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*XHVST
+  !     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
+
+      PetoleProteinCNode_brch(K,NB,NZ)=PetoleProteinCNode_brch(K,NB,NZ)*XHVST
+  !     LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ)*XHVST
+  !     InternodeHeightDying_brch(K,NB,NZ)=InternodeHeightDying_brch(K,NB,NZ)*XHVST
+      DO NE=1,NumPlantChemElms
+        InternodeStrutElms_brch(NE,K,NB,NZ)=InternodeStrutElms_brch(NE,K,NB,NZ)*XHVST
+        LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
+        PetioleElmntNode_brch(NE,K,NB,NZ)=PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
+        DO L=1,NumOfCanopyLayers1
+          LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*XHVST
+        ENDDO
+      ENDDO
+      D8965: DO L=1,NumOfCanopyLayers1
+        CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)*XHVST
+      ENDDO D8965
+    ENDDO D8970
+  ENDIF
+  ENDDO D8975
+!
+!     PSICanopy_pft=canopy water potential
+!     CanopyWater_pft=water volume in canopy
+!     VOLWOU,UVOLO=accumulated water loss for water balance calculation
+!
+  VOLWPX=CanopyWater_pft(NZ)
+  WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
+
+  FDM=get_FDM(PSICanopy_pft(NZ))
+!        APSILT=ABS(PSICanopy_pft(NZ))
+!        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
+
+  CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
+  VOLWOU=VOLWOU+VOLWPX-CanopyWater_pft(NZ)
+  UVOLO=UVOLO+VOLWPX-CanopyWater_pft(NZ)
+!
+!     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
+!
+!     PP=PFT population
+!     IDTHR,iPlantShootState_pft=PFT root,shoot living flag: 0=alive,1=dead
+!     IDTH=PFT living flag: 0=alive,1=dead
+!     jHarvst_pft=terminate PFT:0=no,1=yes,2=yes,and reseed
+!     iDayPlantHarvest_pft,iYearPlantHarvest_pft=day,year of harvesting
+!     iYearCurrent=current year
+!
+  IF(PlantPopulation_pft(NZ).LE.0.0_r8)THEN
+    iPlantRootState_pft(NZ)=iDead
+    iPlantShootState_pft(NZ)=iDead
+    iPlantState_pft(NZ)=iDead
+    jHarvst_pft(NZ)=jharvtyp_terminate
+    iDayPlantHarvest_pft(NZ)=I
+    iYearPlantHarvest_pft(NZ)=iYearCurrent
+  ENDIF
+  end associate
+  END subroutine RemoveShootByTillage      
 
 end module PlantDisturbsMod
