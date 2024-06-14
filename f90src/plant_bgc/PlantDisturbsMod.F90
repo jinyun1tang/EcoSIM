@@ -692,10 +692,9 @@ module PlantDisturbsMod
         PPX_pft(NZ)=PPX_pft(NZ)*XHVST
         PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
         XHVST1=1._r8-XHVST
-
+        
         call RemoveShootByTillage(I,J,NZ,XHVST,XHVST1)
 
-!
 !     LitrFall FROM ROOTS DURING TILLAGE
         call RemoveRootsByTillage(I,J,NZ,XHVST,XHVST1)
 
@@ -827,6 +826,10 @@ module PlantDisturbsMod
 
       DO NE=1,NumPlantChemElms
         RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*XHVST
+        if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8)then
+        print*,'rmtilRootMycoNonstElms_rpvr(NE,N,L,NZ)',RootMycoNonstElms_rpvr(NE,N,L,NZ),XHVST,N
+        stop
+        endif
       ENDDO
       RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*XHVST
       PopuRootMycoC_pvr(N,L,NZ)= PopuRootMycoC_pvr(N,L,NZ)*XHVST
@@ -907,6 +910,7 @@ module PlantDisturbsMod
   real(r8) :: WHVSHH
   real(r8) :: WHVSNP
   real(r8) :: WHVSNX
+  real(r8) :: dLitR
   integer :: NTG
 !     begin_execution
   associate(                                                                          &
@@ -1100,17 +1104,18 @@ module PlantDisturbsMod
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 
       IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
+        XHVST1=1._r8-FracLeftThin
         DO NE=1,NumPlantChemElms
           D3400: DO M=1,jsken
+            dLitR=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)
             LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
-              +(XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))&
-              *FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+              +dLitR*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
 
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=&
                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
-              +(XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))&
-              *FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+              +dLitR*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+
           ENDDO D3400
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*FracLeftThin
         ENDDO
@@ -2426,9 +2431,17 @@ module PlantDisturbsMod
   XHVST1=1._r8-FracLeftThin
   D3385: DO M=1,jsken
     DO NE=1,NumPlantChemElms
+      if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then     
+      print*,'bf myco',LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ),L
+      stop
+      endif
       FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
         +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+      if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then     
+      print*,'rootmyco',(1._r8-FFIRE(NE)),FrcLeafMassNotHarvst(NE),XHVST1,RootMycoNonstElms_rpvr(NE,N,L,NZ)      
+      stop
+      endif   
     ENDDO
 
     CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
@@ -2446,6 +2459,10 @@ module PlantDisturbsMod
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
           (1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+        if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then
+        print*,'xxrootrmval',LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ),(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+        stop
+        endif            
       ENDDO
       CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
       CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
@@ -2461,6 +2478,10 @@ module PlantDisturbsMod
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
           +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+        if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then
+        print*,'rootrmval',LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)
+        stop
+        endif  
       ENDDO
       CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
       CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
@@ -2486,7 +2507,7 @@ module PlantDisturbsMod
     trcs_rootml_pvr(NTG,N,L,NZ)=FracLeftThin*trcs_rootml_pvr(NTG,N,L,NZ)
   ENDDO
   end associate          
-  end subroutine RootMaterialRemovalL  
+  end subroutine RootMaterialRemovalL
 !--------------------------------------------------------------------------------
   subroutine HarvstUpdateRootStateL(I,J,N,L,NZ,FracLeftThin,XHVST1)            
   implicit none
@@ -2555,7 +2576,11 @@ module PlantDisturbsMod
     ENDDO D3960
 
     DO NE=1,NumPlantChemElms
-        RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*FracLeftThin
+      RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*FracLeftThin
+      if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8)then
+      print*,'RootMycoNonstElms_rpvr(NE,N,L,NZ)',RootMycoNonstElms_rpvr(NE,N,L,NZ),FracLeftThin,N
+      stop
+      endif
     ENDDO
     RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*FracLeftThin
       PopuRootMycoC_pvr(N,L,NZ)= PopuRootMycoC_pvr(N,L,NZ)*FracLeftThin

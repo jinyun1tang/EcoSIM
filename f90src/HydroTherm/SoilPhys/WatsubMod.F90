@@ -227,7 +227,7 @@ module WatsubMod
         VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
         VLiceMacP1(L,NY,NX)=VLiceMacP(L,NY,NX)
         
-        IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+        IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
           VLairMicP(L,NY,NX)=VLMicP1(L,NY,NX)-VLWatMicP1(L,NY,NX)-VLiceMicP1(L,NY,NX)
           VLairMicP1(L,NY,NX)=AZMAX1(VLairMicP(L,NY,NX))
         ELSE
@@ -239,7 +239,7 @@ module WatsubMod
         VLMacP1(L,NY,NX)=AZMAX1(VLMacP(L,NY,NX)-FVOLAH*CCLAY(L,NY,NX) &
           *(safe_adb(VLWatMicP1(L,NY,NX),VLSoilMicP(L,NY,NX))-WiltPoint(L,NY,NX))*VGeomLayer(L,NY,NX))
 
-        IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+        IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
           VLairMacP(L,NY,NX)=VLMacP1(L,NY,NX)-VLWatMacP1(L,NY,NX)-VLiceMacP1(L,NY,NX)
           VLairMacP1(L,NY,NX)=AZMAX1(VLairMacP(L,NY,NX))
         ELSE
@@ -790,7 +790,7 @@ module WatsubMod
 !           or the grid is a soil
             IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND. &
               (CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1).LE.CumSoilDeptht0(N2,N1) &
-              .OR. SoiBulkDensity(NUI(N2,N1),N2,N1).GT.ZERO))THEN
+              .OR. SoiBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
               IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RechargSurf,0._r8).OR. &
                 ABS(WatFlux4ErosionM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
@@ -1082,7 +1082,7 @@ module WatsubMod
             +TMLiceThawMacP(L,NY,NX)
           VLiceMacP1(L,NY,NX)=VLiceMacP1(L,NY,NX)-TMLiceThawMacP(L,NY,NX)/DENSICE
 
-          IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+          IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
             ! air-filled space
             VLairMicP(L,NY,NX)=VLMicP1(L,NY,NX)-VLWatMicP1(L,NY,NX)-VLiceMicP1(L,NY,NX)
             VLairMicP1(L,NY,NX)=AZMAX1(VLairMicP(L,NY,NX))
@@ -1135,7 +1135,7 @@ module WatsubMod
             write(*,*)TWatCharge2MicP(L,NY,NX),FWatExMacP2MicPi(L,NY,NX), &
               TMLiceThawMicP(L,NY,NX),FWatIrrigate2MicP1(L,NY,NX)
             write(*,*)'M, L=',M,L,NY,NX,NUM(NY,NX),VGeomLayer(L,NY,NX),ZEROS2(NY,NX),VLWatMicPX1(L,NY,NX)
-            write(*,*)'SoiBulkDensity(L,NY,NX)=',SoiBulkDensity(L,NY,NX),TKS(L,NY,NX),ZEROS(NY,NX)
+            write(*,*)'SoiBulkDensity_vr(L,NY,NX)=',SoiBulkDensity_vr(L,NY,NX),TKS(L,NY,NX),ZEROS(NY,NX)
             write(*,*)'VLHeatCapacity_col(L,NY,NX),TKSoi1(L,NY,NX),TKXX',L,VLHeatCapacity_col(L,NY,NX),TKSoi1(L,NY,NX),TKXX
             write(*,*)VLMicP1(L,NY,NX),VLMacP1(L,NY,NX)
             if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -1195,7 +1195,7 @@ module WatsubMod
       !       NUM=new surface layer number after CO2CompenPoint_nodeete lake evaporation
       !       LakeSurfFlowMicP,LakeSurfFlowMacP,LakeSurfHeatFlux=lake surface water flux, heat flux if lake surface disappears
 !
-      IF(SoiBulkDensity(NUM(NY,NX),NY,NX).LE.ZERO.AND.VLHeatCapacity_col(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
+      IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO.AND.VLHeatCapacity_col(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
         !the soil/water profile moves down        
         NUX=NUM(NY,NX)
         DO  LL=NUX+1,NL(NY,NX)
@@ -1426,7 +1426,7 @@ module WatsubMod
       DiffusivitySolutEff(M,L,NY,NX)=0.0_r8
     ENDIF
 
-    IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+    IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       THETWT=safe_adb(VLWatMicPM(M,L,NY,NX),VLSoilMicP(L,NY,NX))
       TortMicPM_vr(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-SoilFracAsMacP(L,NY,NX))
     ELSE
@@ -2049,7 +2049,7 @@ module WatsubMod
       IF(SoiDepthMidLay(N3,N2,N1).GE.ExtWaterTable(N2,N1)     &
         .AND.ActiveLayDepth(N2,N1).GT.ExtWaterTable(N2,N1)   &
         .AND.SoiDepthMidLay(N3,N2,N1).LT.ActiveLayDepth(N2,N1) &
-        .AND.(AirfMicP.GT.ZEROS2(N2,N1).OR.SoiBulkDensity(N3,N2,N1).LE.ZERO) &
+        .AND.(AirfMicP.GT.ZEROS2(N2,N1).OR.SoiBulkDensity_vr(N3,N2,N1).LE.ZERO) &
         .AND.VLairMicP(N3,N2,N1).GT.0.0_r8 &
         .AND.(.not.isclose(RechargRateWTBL,0._r8)))THEN
         PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
@@ -2059,7 +2059,7 @@ module WatsubMod
         FLWU=PSISUT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*&
           AREAU(N3,N2,N1)/(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
         !within a time step, the incoming flow cannot exceed avaiable air-filled pores   
-        IF(SoiBulkDensity(N3,N2,N1).GT.ZERO)THEN
+        IF(SoiBulkDensity_vr(N3,N2,N1).GT.ZERO)THEN
           FLWUL=AMIN1(FLWU,AirfMicP)
           FLWUX=AMIN1(FLWU,VOLPX2)
         ELSE

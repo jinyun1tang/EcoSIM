@@ -63,7 +63,7 @@ implicit none
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       POROS(L,NY,NX)=a_PORO(L,NY)
-      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
+      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)

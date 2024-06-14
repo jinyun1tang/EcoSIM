@@ -56,7 +56,7 @@ module ExtractsMod
    LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
    LitrfalStrutElms_vr       => plt_bgcr%LitrfalStrutElms_vr,       &
    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-   MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft,             &
+   MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,         &
    CanopyStemAareZ_col       => plt_morph%CanopyStemAareZ_col,      &
    CanopyLeafAareZ_col       => plt_morph%CanopyLeafAareZ_col,      &
    StemArea_col              => plt_morph%StemArea_col,             &
@@ -83,6 +83,10 @@ module ExtractsMod
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
             LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+            if(LitrfalStrutElms_pvr(NE,M,K,L,NZ)<0._r8)then
+            print*,'extract',LitrfalStrutElms_pvr(NE,M,K,L,NZ),M,K
+            stop
+            endif
           enddo
         ENDDO
       ENDDO
@@ -346,7 +350,7 @@ module ExtractsMod
     Transpiration_pft         => plt_ew%Transpiration_pft,           &
     PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft,      &
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,          &
-    WatByPCanopy_pft              => plt_ew%WatByPCanopy_pft,                &
+    WatByPCanopy_pft          => plt_ew%WatByPCanopy_pft,            &
     CanopyWater_pft           => plt_ew%CanopyWater_pft,             &
     Eco_Heat_Grnd_col         => plt_ew%Eco_Heat_Grnd_col,           &
     HeatXAir2PCan             => plt_ew%HeatXAir2PCan,               &
@@ -354,7 +358,7 @@ module ExtractsMod
     CanWat_col                => plt_ew%CanWat_col,                  &
     TKC                       => plt_ew%TKC,                         &
     TKS                       => plt_ew%TKS,                         &
-    ENGYX_pft                     => plt_ew%ENGYX_pft,                       &
+    ENGYX_pft                 => plt_ew%ENGYX_pft,                   &
     Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
     VapXAir2CanG              => plt_ew%VapXAir2CanG,                &
     TENGYC                    => plt_ew%TENGYC,                      &
@@ -369,7 +373,7 @@ module ExtractsMod
     NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft,            &
     StemArea_col              => plt_morph%StemArea_col,             &
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col,       &
-    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft,             &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,         &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft,       &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft,       &

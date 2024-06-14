@@ -420,9 +420,11 @@ implicit none
       SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(NE)
       SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(NE)      
     ENDDO
-
   endif
-
+  if(any(SolidOM_vr(:,2,2,L,NY,NX)<0._r8))then
+  print*,'micsoilb',SolidOM_vr(:,2,2,L,NY,NX)
+  stop
+  endif
   RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
   RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)
   RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)

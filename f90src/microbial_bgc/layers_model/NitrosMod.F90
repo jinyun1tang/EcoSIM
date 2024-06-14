@@ -197,6 +197,10 @@ module nitrosMod
           OSMXS=FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
           SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS
           SolidOM_vr(NE,M,K,LL,NY,NX)=SolidOM_vr(NE,M,K,LL,NY,NX)+OSMXS
+          if(SolidOM_vr(NE,M,K,LL,NY,NX)<0._r8 .or. SolidOM_vr(NE,M,K,L,NY,NX)<0._r8)then
+          print*,'mixing',SolidOM_vr(NE,M,K,L,NY,NX),SolidOM_vr(NE,M,K,LL,NY,NX)
+          stop
+          endif
         ENDDO
         OSAXS=FracLitrMix*AZMAX1(SolidOMAct_vr(M,K,L1,NY,NX))
         SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
@@ -248,7 +252,10 @@ module nitrosMod
       enddo
     enddo
   enddo
-
+  if(ORGM(ielmp)<0._r8)then
+    print*,'autor microbe'
+    stop    
+  endif
   DO K=1,jcplx1
     !add heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
@@ -261,6 +268,10 @@ module nitrosMod
         enddo
       enddo
     enddo
+    if(ORGM(ielmp)<0._r8)then
+      print*,'heter microbe'
+      stop      
+    endif
 
   !add microbial residual
     DO  M=1,ndbiomcp
@@ -269,18 +280,36 @@ module nitrosMod
       ENDDO    
     ENDDO
 
+    if(ORGM(ielmp)<0._r8)then
+      print*,'microb residu'
+      stop
+    endif
+
     !add dom
     DO NE=1,nelms
       ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
     ENDDO
+    if(ORGM(ielmp)<0._r8)then
+      print*,'sorbom'
+      stop
+    endif
+
     ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     !add solid organic matter
     DO  M=1,jsken
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+        if(SolidOM_vr(NE,M,K,L,NY,NX)<0._r8)then
+        print*,SolidOM_vr(1:NE,M,K,L,NY,NX),M,K
+        stop
+        endif
       ENDDO  
     ENDDO  
+    if(ORGM(ielmp)<0._r8)then
+      print*,'solidom'
+      stop
+    endif
   ENDDO    
 
   end subroutine sumORGMLayL

@@ -693,7 +693,7 @@ implicit none
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)     =AREA(3,L,NY,NX)
-    plt_soilchem%SoiBulkDensity(L)  =SoiBulkDensity(L,NY,NX)
+    plt_soilchem%SoiBulkDensity_vr(L)  =SoiBulkDensity_vr(L,NY,NX)
 
     plt_soilchem%trc_solcl_vr(ids_beg:ids_end,L) =trc_solcl_vr(ids_beg:ids_end,L,NY,NX)
 

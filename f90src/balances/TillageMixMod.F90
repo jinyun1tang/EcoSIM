@@ -284,7 +284,7 @@ module TillageMixMod
         TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
-        TBKDX=TBKDX+FI*SoiBulkDensityt0(L,NY,NX)
+        TBKDX=TBKDX+FI*SoiBulkDensityt0_vr(L,NY,NX)
         TFC=TFC+FI*FieldCapacity(L,NY,NX)
         TWP=TWP+FI*WiltPoint(L,NY,NX)
         TSatHydroCondVert=TSatHydroCondVert+FI*SatHydroCondVert(L,NY,NX)
@@ -394,8 +394,8 @@ module TillageMixMod
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TX=1.0_r8-TI
-        SoiBulkDensityt0(L,NY,NX) = TI*(SoiBulkDensityt0(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0(L,NY,NX))) &
-          +TX*SoiBulkDensityt0(L,NY,NX)
+        SoiBulkDensityt0_vr(L,NY,NX) = TI*(SoiBulkDensityt0_vr(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0_vr(L,NY,NX))) &
+          +TX*SoiBulkDensityt0_vr(L,NY,NX)
         FieldCapacity(L,NY,NX)    = TI*(FieldCapacity(L,NY,NX)+CORP*(TFC-FieldCapacity(L,NY,NX)))+TX*FieldCapacity(L,NY,NX)
         WiltPoint(L,NY,NX)        = TI*(WiltPoint(L,NY,NX)+CORP*(TWP-WiltPoint(L,NY,NX)))+TX*WiltPoint(L,NY,NX)
         SatHydroCondVert(L,NY,NX) = TI*(SatHydroCondVert(L,NY,NX)+CORP*(TSatHydroCondVert-SatHydroCondVert(L,NY,NX)))&

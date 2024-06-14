@@ -696,7 +696,7 @@ contains
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
-  IF(FracSurfSnoFree(NY,NX).GT.0.0_r8 .AND. (SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO.OR. &
+  IF(FracSurfSnoFree(NY,NX).GT.0.0_r8 .AND. (SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO.OR. &
     VLHeatCapacity_col(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
     !Ground partically covered by snow
      
@@ -794,7 +794,7 @@ contains
 ! CND1,CNDL=hydraulic conductivity of source,destination layer
 ! HydroCond3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
-  IF(SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !top layer is soil
     IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS2(NY,NX))THEN
       !surface litter holds water
@@ -1236,7 +1236,7 @@ contains
 ! PrecHeat2SoiNet=total convective heat flux to soil micropores, macropores
 ! XNPR=time step for litter water,heat flux calculations
 !
-  IF(SoiBulkDensity(NUM(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !soil bulk density significant
     FLQRS=AZMAX1(Prec2SoiMicP1(NY,NX)-VLairMicP1(NUM(NY,NX),NY,NX))
     FLQRH=AZMAX1(Prec2SoiMacP1(NY,NX)-VLairMacP1(NUM(NY,NX),NY,NX))

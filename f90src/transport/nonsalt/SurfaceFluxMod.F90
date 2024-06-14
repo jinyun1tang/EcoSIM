@@ -900,9 +900,9 @@ contains
   integer :: ngases
 !
 !     THETPM=air-filled porosity from watsub.f
-!     SoiBulkDensity=bulk density
+!     SoiBulkDensity_vr=bulk density
 !
-  IF(THETPM(M,NU(NY,NX),NY,NX).GT.THETX.AND.SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(THETPM(M,NU(NY,NX),NY,NX).GT.THETX.AND.SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
 !
     call SurfSoilDifFlux(M,NY,NX)
 

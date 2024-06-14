@@ -362,8 +362,18 @@ module grosubsMod
     ENDDO
 !
 !    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
+    IF(any(plt_biom%RootMycoNonstElms_rpvr(:,2,1,NZ)<0._R8))THEN
+    print*,'bfroot'
+    PRINT*,plt_biom%RootMycoNonstElms_rpvr(:,2,1,NZ)
+    stop
+    endif
     call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
       RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+    IF(any(plt_biom%RootMycoNonstElms_rpvr(:,2,1,NZ)<0._R8))THEN
+    print*,'afroot'
+    PRINT*,plt_biom%RootMycoNonstElms_rpvr(:,2,1,NZ)
+    stop
+    endif
 
     call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 !
@@ -573,21 +583,26 @@ module grosubsMod
   
   integer :: L,N
 !     begin_execution
-  associate(                                                             &
-    NU                             =>  plt_site%NU                     , &  
-    MY                             =>  plt_morph%MY                    , &        
-    MaxSoiL4Root_pft                   =>  plt_morph%MaxSoiL4Root_pft          , &    
-    NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft       , &
-    MaxNumRootLays                 =>  plt_site%MaxNumRootLays         , &        
-    RootMycoNonstElms_rpvr         =>  plt_biom%RootMycoNonstElms_rpvr , &
-    PopuRootMycoC_pvr              =>  plt_biom% PopuRootMycoC_pvr       &    
+  associate(                                                   &
+    NU                     => plt_site%NU,                     &
+    MY                     => plt_morph%MY,                    &
+    MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft,      &
+    NumRootAxes_pft        => plt_morph%NumRootAxes_pft,       &
+    MaxNumRootLays         => plt_site%MaxNumRootLays,         &
+    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
+    PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr      &
   )
 
   call SumPlantBiom(I,J,NZ,'computotb')
+
 ! add the nonstrucal components
   D3451: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+      if(any(RootMycoNonstElms_rpvr(:,N,L,NZ)<0._r8))then
+      print*,'grosub',RootMycoNonstElms_rpvr(:,N,L,NZ),N,L
+      stop
+      endif
     enddo
   ENDDO D3451
 

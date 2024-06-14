@@ -2740,22 +2740,22 @@ module PlantBranchMod
 
   associate(                                                          &
     PhotoPeriodSens_pft       => plt_pheno%PhotoPeriodSens_pft,       &
-    NU                        => plt_site%NU,                         &    
-    Hours2LeafOut_brch        => plt_pheno%Hours2LeafOut_brch,        &    
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &    
-    CriticPhotoPeriod_pft     => plt_pheno%CriticPhotoPeriod_pft,     &    
-    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &    
-    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,     &    
-    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &    
-    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,       &      
-    iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft,      &      
-    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,         &    
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,        &    
-    fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,         &    
-    iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft,   &    
-    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &    
-    iPlantPhotoperiodType_pft => plt_pheno%iPlantPhotoperiodType_pft, &    
-    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft  ,            &    
+    NU                        => plt_site%NU,                         &
+    Hours2LeafOut_brch        => plt_pheno%Hours2LeafOut_brch,        &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
+    CriticPhotoPeriod_pft     => plt_pheno%CriticPhotoPeriod_pft,     &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
+    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,     &
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,       &
+    iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft,      &
+    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,         &
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,        &
+    fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,         &
+    iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft,   &
+    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
+    iPlantPhotoperiodType_pft => plt_pheno%iPlantPhotoperiodType_pft, &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,          &
     DayLenthCurrent           => plt_site%DayLenthCurrent             &
   )  
 
@@ -2811,7 +2811,7 @@ module PlantBranchMod
       IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
         D50: DO L=NU,MaxSoiL4Root_pft(NZ)
           FXFC=AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))/TotPopuPlantRootC
-          RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)&
+          RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) &
               +FXFC*CH2OH*FXRT(iPlantPhenolPattern_pft(NZ))
         ENDDO D50
       ELSE
@@ -2916,15 +2916,24 @@ module PlantBranchMod
     D51: DO L=NU,MaxSoiL4Root_pft(NZ)
       FXFN=AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/TotalRootNonstElms(ielmc)
       DO NE=2,NumPlantChemElms
-        RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)&
+        RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) &
           +FXFN*NonstElm2RootMyco(NE)
-!            if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)stop            
+        if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
+        print*,'rootdevebranch',RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ), &
+          FXFN*NonstElm2RootMyco(NE)
+        stop            
+        endif
       ENDDO  
     ENDDO D51
   ELSE
     DO NE=2,NumPlantChemElms
       RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
         RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)
+      if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
+      print*,'rootdevebranch11',RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ),&
+        NonstElm2RootMyco(NE)
+      stop            
+      endif        
     ENDDO            
   ENDIF
   end associate

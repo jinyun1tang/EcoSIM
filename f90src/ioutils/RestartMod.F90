@@ -6057,16 +6057,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)        
-    call restartvar(ncid, flag, varname='SoiBulkDensityt0', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='SoiBulkDensityt0_vr', dim1name='column',dim2name='levsoi',&
        long_name='initial bulk density,0=water', units='Mg m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0_vr,datrc_2d) 
   else
-    !print*,'SoiBulkDensityt0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0,datrc_2d)   
+    !print*,'SoiBulkDensityt0_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensityt0_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ)     
-    call restartvar(ncid, flag, varname='SoiBulkDensityt0', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='SoiBulkDensityt0_vr', dim1name='column',dim2name='levsoi',&
        long_name='initial bulk density,0=water', units='Mg m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -6078,10 +6078,10 @@ implicit none
        long_name='soil bulk density,0=water', units='Mg m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity_vr,datrc_2d) 
   else
     !print*,'SoiBulkDensity'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='SoiBulkDensity', dim1name='column',dim2name='levsoi1',&
        long_name='soil bulk density,0=water', units='Mg m-3', &

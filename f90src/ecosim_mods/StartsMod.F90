@@ -244,7 +244,7 @@ module StartsMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
-      IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
         ExtWaterTablet0(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
         DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
       ELSE
@@ -415,11 +415,11 @@ module StartsMod
     RCH4PhysexchPrev_vr(L,NY,NX)=0.0_r8
 
     IF(L.GT.0)THEN
-      IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
         !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS) 
+        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/PTDS) 
       ELSE
         !for ponding water
         PTDS=0.0_r8
@@ -441,12 +441,12 @@ module StartsMod
       SAND(L,NY,NX)=CSAND(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
       SILT(L,NY,NX)=CSILT(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
-      IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
-        VORGC=CORGCM*ppmc*SoiBulkDensity(L,NY,NX)/PTDS
-        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity(L,NY,NX)/PTDS
-        VSAND=CSAND(L,NY,NX)*SoiBulkDensity(L,NY,NX)/PTDS
+        VORGC=CORGCM*ppmc*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
       ELSE
@@ -455,7 +455,7 @@ module StartsMod
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
 !
-      IF(ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0)THEN
+      IF(ISOIL(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_set)THEN
       ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0_r8)THEN
           THETW_vr(L,NY,NX)=POROS(L,NY,NX)
@@ -841,11 +841,11 @@ module StartsMod
   integer :: L
 
   DO  L=0,NL(NY,NX)
-    DLYRI(1,L,NY,NX)=DH(NY,NX)    !east-west direction
-    DLYRI(2,L,NY,NX)=DV(NY,NX)    !north-south direction
+    DLYRI(1,L,NY,NX)=DH(NY,NX)        !east-west direction
+    DLYRI(2,L,NY,NX)=DV(NY,NX)        !north-south direction
     DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
     DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
-    AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
+    AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)  !grid horizontal area
   ENDDO
   end subroutine InitHGrid
 !------------------------------------------------------------------------------------------
@@ -902,7 +902,7 @@ module StartsMod
 !     DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
 !     VOLT=total volume
 !     VOLX=total micropore volume
-      IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
+      IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
@@ -917,7 +917,7 @@ module StartsMod
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
-      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       totRootLenDens_vr(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)

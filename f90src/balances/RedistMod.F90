@@ -561,7 +561,8 @@ module RedistMod
   !
   ! INTERNAL SURFACE SEDIMENT TRANSPORT
   !
-  IF((iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros) &
+  
+  IF((iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
     .AND.ABS(tErosionSedmLoss(NY,NX)).GT.ZEROS(NY,NX))THEN
     TSED(NY,NX)=TSED(NY,NX)+tErosionSedmLoss(NY,NX)
     !
@@ -802,7 +803,7 @@ module RedistMod
     DVLiceMicP(L)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP(L,NY,NX)-VLiceMacP(L,NY,NX)
 
     !update water/ice-unfilled pores
-    IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+    IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX) &
         +VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
     ELSE
@@ -845,10 +846,10 @@ module RedistMod
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
 
 !      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity(L,NY,NX),&
-!        SoiBulkDensity(L,NY,NX),NU(NY,NX)
+!        SoiBulkDensity_vr(L,NY,NX),NU(NY,NX)
       if(TKS(L,NY,NX)>4.e2)then
         write(*,*)'weird temperature in redist',L,NY,NX,TKSpre,TKS(L,NY,NX)
-        write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity(L,NY,NX),ZEROS(NY,NX),SoiBulkDensity(L,NY,NX)
+        write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity(L,NY,NX),ZEROS(NY,NX),SoiBulkDensity_vr(L,NY,NX)
         write(*,*)'itemized',ENGY/VHeatCapacity(L,NY,NX),&
           THeatFlow2Soil(L,NY,NX)/VHeatCapacity(L,NY,NX),&
           THeatSoiThaw(L,NY,NX)/VHeatCapacity(L,NY,NX), &
@@ -910,6 +911,10 @@ module RedistMod
         SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
         DO NE=1,NumPlantChemElms
           SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)+LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
+          if(SolidOM_vr(NE,M,K,L,NY,NX)<0._r8)then
+          print*,'addlitr',SolidOM_vr(NE,M,K,L,NY,NX),LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
+          stop
+          endif
         ENDDO
       enddo
     ENDDO D8565
@@ -1328,7 +1333,7 @@ module RedistMod
   call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX))
   
   DO NE=1,NumPlantChemElms
-    if(SoilOrgM_vr(NE,L,NY,NX)<0._r8)write(*,*)'redist',NE,L,SoilOrgM_vr(NE,L,NY,NX)
+    if(SoilOrgM_vr(NE,L,NY,NX)<0._r8)write(*,*)'redist',NE,L,SoilOrgM_vr(1:NE,L,NY,NX)
     tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,L,NY,NX)
   ENDDO
 

@@ -529,7 +529,7 @@ module Hour1Mod
     !     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
     !     VOLT,VLSoilPoreMicP_vr,VLSoilMicP=layer volume including,excluding rock,macropores
     !
-    IF(SoiBulkDensity(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).LE.ZERO2)THEN
+    IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).LE.ZERO2)THEN
       VLWatMicP_vr(L,NY,NX)=0.0_r8
       VLiceMicP(L,NY,NX)=0.0_r8
     ENDIF
@@ -538,7 +538,7 @@ module Hour1Mod
     VGeomLayer(L,NY,NX)=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
 
     VLSoilPoreMicP_vr(L,NY,NX)=AMAX1(VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX),1.e-8_r8)
-    IF(SoiBulkDensity(L,NY,NX).LE.ZERO)THEN
+    IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO)THEN
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
     ENDIF
     !
@@ -558,7 +558,7 @@ module Hour1Mod
     !     FCL,LOGWiltPoint=log FC,WP
     !     FCD,PSD=FCL-LOGWiltPoint,log(POROS)-FCL
     !
-    SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
       CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
@@ -576,15 +576,15 @@ module Hour1Mod
       ParticleDens=1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
       IF(L.EQ.NU(NY,NX))THEN
 !surface layer
-        POROS(L,NY,NX)=AMAX1(POROS(L,NY,NX),1.0_r8-(SoiBulkDensity(L,NY,NX)/ParticleDens))
+        POROS(L,NY,NX)=AMAX1(POROS(L,NY,NX),1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/ParticleDens))
         !write(*,*) "l eq NU - POROS(L,NY,NX) = ", POROS(L,NY,NX)
       ELSE
 !  avoid float exception
-        if(SoiBulkDensity(L,NY,NX)>=ParticleDens)then
+        if(SoiBulkDensity_vr(L,NY,NX)>=ParticleDens)then
           POROS(L,NY,NX)=1.0_r8
           !write(*,*) "BKDSI gt particledens - POROS(L,NY,NX) = ", POROS(L,NY,NX)
         else
-          POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/ParticleDens)
+          POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/ParticleDens)
           !write(*,*) "BKDSI else - POROS(L,NY,NX) = ", POROS(L,NY,NX)
         endif
       ENDIF
@@ -599,7 +599,7 @@ module Hour1Mod
     !    2,VLWatMacP(L,NY,NX)+VLiceMacP(L,NY,NX))
     VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
-    IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+    IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
         +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
     ELSE
@@ -617,10 +617,10 @@ module Hour1Mod
 !     STC,DTC=weighted thermal conductivity of soil solid component
 !
     if(lverb)write(*,*)'setthermcond'
-    IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
-      VORGC=CORGCM*SoiBulkDensity(L,NY,NX)/ParticleDens
-      VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity(L,NY,NX)/ParticleDens
-      VSAND=CSAND(L,NY,NX)*SoiBulkDensity(L,NY,NX)/ParticleDens
+    IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+      VORGC=CORGCM*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
+      VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
+      VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
       NumerSolidThermCond(L,NY,NX)=(1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
         +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP(L,NY,NX) &
         +0.514_r8*ROCK(L,NY,NX)*1.056E-02_r8
@@ -669,7 +669,7 @@ module Hour1Mod
     DTBLY(NY,NX)=DTBLD(NY,NX)
   ENDIF
 
-  IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
     SoiSurfRoughnesst0(NY,NX)=0.020_r8
   ELSE
     SoiSurfRoughnesst0(NY,NX)=ZW
@@ -706,7 +706,7 @@ module Hour1Mod
   integer :: K,M
 !     begin_execution
 !     IFLGS=disturbance flag
-!     SoiBulkDensity,BKDSI=current,initial bulk density
+!     SoiBulkDensity_vr,BKDSI=current,initial bulk density
 !
 
   DO  NX=NHW,NHE

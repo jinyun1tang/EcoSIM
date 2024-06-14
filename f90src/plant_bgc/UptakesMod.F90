@@ -58,7 +58,7 @@ module UptakesMod
   real(r8) :: FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
-  real(r8) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake(JZ1)
+  real(r8) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake_vr(JZ1)
   real(r8) :: TKCX,CNDT,PrecHeatIntcptByCanP1,VHCPX
   real(r8) :: DIFF,PSILH,cumPRootH2OUptake,VFLXC
   real(r8) :: FDMP
@@ -105,7 +105,7 @@ module UptakesMod
     FracPARRadbyCanopy_pft => plt_rad%FracPARRadbyCanopy_pft  &
   )
 
-  call PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirPoreAvail4Fill,WatAvail4Uptake)
+  call PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirPoreAvail4Fill,WatAvail4Uptake_vr)
 !
 !     IF PLANT SPECIES EXISTS
 
@@ -180,7 +180,7 @@ module UptakesMod
         NN=CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanPMassC,&
           ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,&
           VFLXC,FDMP,SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,&
-          WatAvail4Uptake,TKCX,CNDT,VHCPX,PrecHeatIntcptByCanP1,PSILH,LayrHasRoot)
+          WatAvail4Uptake_vr,TKCX,CNDT,VHCPX,PrecHeatIntcptByCanP1,PSILH,LayrHasRoot)
 !
 !     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 !
@@ -225,38 +225,38 @@ module UptakesMod
   END subroutine uptakes
 !------------------------------------------------------------------------
 
-  subroutine PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirPoreAvail4Fill,WatAvail4Uptake)
+  subroutine PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirPoreAvail4Fill,WatAvail4Uptake_vr)
 !
 !     prepare for uptake calculation
   implicit none
   real(r8), intent(out) :: ElvAdjstedtSoiPSIMPa(JZ1)
   real(r8), intent(out) :: AllRootC_vr(JZ1)
   real(r8), intent(out) :: AirPoreAvail4Fill(JZ1)
-  real(r8), intent(out) :: WatAvail4Uptake(JZ1)
+  real(r8), intent(out) :: WatAvail4Uptake_vr(JZ1)
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                                                            &
-    ZERO                            => plt_site%ZERO                  , &
-    NP                              => plt_site%NP                    , &
-    MaxNumRootLays                  => plt_site%MaxNumRootLays        , &
-    VLWatMicPM                      => plt_site%VLWatMicPM            , &
-    ALT                             => plt_site%ALT                   , &
-    NU                              => plt_site%NU                    , &
-    NP0                             => plt_site%NP0                   , &
-    TotalSoilH2OPSIMPa              => plt_ew%TotalSoilH2OPSIMPa      , &
-    PopuRootMycoC_pvr               => plt_biom% PopuRootMycoC_pvr    , &
-    VLMicP_vr                       => plt_soilchem%VLMicP_vr         , &
-    VLiceMicP                       => plt_soilchem%VLiceMicP         , &
-    THETY_vr                        => plt_soilchem%THETY_vr          , &
-    SoiBulkDensity                  => plt_soilchem%SoiBulkDensity    , &
-    VLWatMicP_vr                    => plt_soilchem%VLWatMicP_vr      , &
-    VLSoilMicP                      => plt_soilchem%VLSoilMicP        , &
-    CanopyStemArea_pft              => plt_morph%CanopyStemArea_pft   , &
-    MY                              => plt_morph%MY                   , &
-    CanopyLeafArea_pft              => plt_morph%CanopyLeafArea_pft   , &
-    RadNet2Canopy_pft               => plt_rad%RadNet2Canopy_pft      , &
-    LWRadCanopy_pft                 => plt_rad%LWRadCanopy_pft          &
+  associate(                                              &
+    ZERO               => plt_site%ZERO,                  &
+    NP                 => plt_site%NP,                    &
+    MaxNumRootLays     => plt_site%MaxNumRootLays,        &
+    VLWatMicPM         => plt_site%VLWatMicPM,            &
+    ALT                => plt_site%ALT,                   &
+    NU                 => plt_site%NU,                    &
+    NP0                => plt_site%NP0,                   &
+    TotalSoilH2OPSIMPa => plt_ew%TotalSoilH2OPSIMPa,      &
+    PopuRootMycoC_pvr  => plt_biom% PopuRootMycoC_pvr,    &
+    VLMicP_vr          => plt_soilchem%VLMicP_vr,         &
+    VLiceMicP          => plt_soilchem%VLiceMicP,         &
+    THETY_vr           => plt_soilchem%THETY_vr,          &
+    SoiBulkDensity_vr  => plt_soilchem%SoiBulkDensity_vr, &
+    VLWatMicP_vr       => plt_soilchem%VLWatMicP_vr,      &
+    VLSoilMicP         => plt_soilchem%VLSoilMicP,        &
+    CanopyStemArea_pft => plt_morph%CanopyStemArea_pft,   &
+    MY                 => plt_morph%MY,                   &
+    CanopyLeafArea_pft => plt_morph%CanopyLeafArea_pft,   &
+    RadNet2Canopy_pft  => plt_rad%RadNet2Canopy_pft,      &
+    LWRadCanopy_pft    => plt_rad%LWRadCanopy_pft          &
   )
 !
 !     RESET TOTAL UPTAKE ARRAYS
@@ -299,18 +299,18 @@ module UptakesMod
 !
 !     ElvAdjstedtSoiPSIMPa=total soil water potential PSIST adjusted for surf elevn
 !     ALT=surface elevation
-!     WatAvail4Uptake,VLWatMicPM=water volume available for uptake,total water volume
+!     WatAvail4Uptake_vr,VLWatMicPM=water volume available for uptake,total water volume
 !     THETY,VLSoilPoreMicP_vr=hygroscopic SWC,soil volume
 !     AirPoreAvail4Fill=air volume, used to fill by water coming out from plant root/mycorrhizae
 !     AllRootC_vr=total biome root mass
 !
   D9000: DO L=NU,MaxNumRootLays
     ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAccelerat*ALT
-    IF(SoiBulkDensity(L).GT.ZERO)THEN
-      WatAvail4Uptake(L)=VLWatMicPM(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
+    IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
+      WatAvail4Uptake_vr(L)=VLWatMicPM(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
       AirPoreAvail4Fill(L)=AZMAX1(VLMicP_vr(L)-VLWatMicP_vr(L)-VLiceMicP(L))  !air volume
     ELSE
-      WatAvail4Uptake(L)=VLWatMicPM(NPH,L)
+      WatAvail4Uptake_vr(L)=VLWatMicPM(NPH,L)
       AirPoreAvail4Fill(L)=0.0_r8
     ENDIF
     AllRootC_vr(L)=0.0_r8
@@ -630,7 +630,7 @@ module UptakesMod
 !------------------------------------------------------------------------------
   function CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanPMassC,&
     ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,VFLXC,FDMP,&
-    SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,WatAvail4Uptake,TKCX,CNDT,&
+    SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,WatAvail4Uptake_vr,TKCX,CNDT,&
     VHCPX,PrecHeatIntcptByCanP1,PSILH,LayrHasRoot) result(NN)
   implicit none
   integer  , intent(in) :: I, J
@@ -638,7 +638,7 @@ module UptakesMod
   real(r8) , intent(in) :: FracGrndByPFT,CanPMassC,ElvAdjstedtSoiPSIMPa(JZ1)
   real(r8) , intent(in) :: SoiAddRootResist(jroots,JZ1)
   real(r8) , intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8) , intent(in) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake(JZ1)
+  real(r8) , intent(in) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake_vr(JZ1)
   real(r8) , intent(in) :: TKCX,CNDT,VHCPX,PrecHeatIntcptByCanP1,PSILH
   integer  , intent(in) :: LayrHasRoot(jroots,JZ1)
   real(r8) , intent(out):: HeatSensConductCanP,DIFF,cumPRootH2OUptake,VFLXC,FDMP
@@ -875,7 +875,7 @@ module UptakesMod
 !
 !     LayrHasRoot=rooted layer flag
 !     AllPlantRootH2OUptake_vr=root water uptake from soil layer > 0
-!     WatAvail4Uptake,AirPoreAvail4Fill=water volume available for uptake,air volume
+!     WatAvail4Uptake_vr,AirPoreAvail4Fill=water volume available for uptake,air volume
 !     FracPRoot4Uptake=PFT fraction of biome root mass
 !     PSILC=canopy water potential adjusted for canopy height
 !     ElvAdjstedtSoiPSIMPa=total soil water potential PSIST adjusted for surf elevn
@@ -886,7 +886,7 @@ module UptakesMod
       D4200: DO N=1,MY(NZ)
         D4201: DO L=NU,MaxSoiL4Root_pft(NZ)
           IF(LayrHasRoot(N,L).EQ.itrue)THEN
-            AllPlantRootH2OUptake_vr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake(L)*FracPRoot4Uptake(N,L,NZ)) &
+            AllPlantRootH2OUptake_vr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake(N,L,NZ)) &
               ,AMIN1((PSILC-ElvAdjstedtSoiPSIMPa(L))/SoiAddRootResist(N,L) &
               ,AirPoreAvail4Fill(L)*FracPRoot4Uptake(N,L,NZ)))
             IF(AllPlantRootH2OUptake_vr(N,L,NZ).GT.0.0_r8)THEN

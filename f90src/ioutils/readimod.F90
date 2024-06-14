@@ -348,6 +348,7 @@ module readiMod
   character(len=200) :: tline
   integer :: NM(JY,JX),ntp,ntopus
   real(r8) :: dat1(1:JZ)
+  real(r8) :: corrector
 ! begin_execution
   associate(                            &
   k_woody_litr => micpar%k_woody_litr , &
@@ -428,7 +429,7 @@ module readiMod
     NL(NV1,NH1)=NLI(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepth2LayerBottom(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'WP', ntp,WiltPoint(1:JZ,NV1,NH1))
@@ -538,13 +539,13 @@ module readiMod
 !     PHYSICAL PROPERTIES
 !
 !     CDPTH=depth to bottom (m) > 0
-!     SoiBulkDensityt0=initial bulk density (Mg m-3,0=water), it refers to solid matter
+!     SoiBulkDensityt0_vr=initial bulk density (Mg m-3,0=water), it refers to solid matter
 !
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
             CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NV1,NH1)
-            SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L,NV1,NH1)
+            SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NV1,NH1)
             FieldCapacity(L,NY,NX)=FieldCapacity(L,NV1,NH1)
             WiltPoint(L,NY,NX)=WiltPoint(L,NV1,NH1)
             SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NV1,NH1)
@@ -627,13 +628,13 @@ module readiMod
 !
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
-            IF(SoiBulkDensityt0(L+1,NY,NX).GT.0.025_r8)THEN
+            IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
               CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.01_r8
             ELSE
               CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
-              SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L+1,NY,NX)
+              SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L+1,NY,NX)
               FieldCapacity(L,NY,NX)=FieldCapacity(L+1,NY,NX)
               WiltPoint(L,NY,NX)=WiltPoint(L+1,NY,NX)
               SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L+1,NY,NX)
@@ -705,15 +706,17 @@ module readiMod
 !   CORGC,CORGR=SOC,POC converted to g Mg-1
 !   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
 !   CNH4...=solute concentrations converted to mol Mg-1
-!   SoiBulkDensityt0: initial bulk density
+!   SoiBulkDensityt0_vr: initial bulk density
 
         DO  L=1,NL(NY,NX)
   !   SoilFracAsMacP: macropore fraction
-  !     SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
-          SoiBulkDensity(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)
-          IF(isclose(SoiBulkDensity(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
+  !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
+          SoiBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
+          IF(isclose(SoiBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
           FracSoiAsMicP(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+  !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
+  !  both macropores and micropores    
   !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !
@@ -724,10 +727,11 @@ module readiMod
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
-  !
-          CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
-          CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
-          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
+  ! soil texture is reported based on mass basis soley for mineral component of the soil
+          corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
+          CSAND(L,NY,NX)=CSAND(L,NY,NX)*corrector
+          CSILT(L,NY,NX)=CSILT(L,NY,NX)*corrector
+          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*corrector
           CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
@@ -755,10 +759,12 @@ module readiMod
   !
           IF(CSoilOrgM_vr(ielmn,L,NY,NX).LT.0.0_r8)THEN
   !  default ORGN parameterization
-            CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
+            CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
+              8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
           IF(CSoilOrgM_vr(ielmp,L,NY,NX).LT.0.0_r8)THEN
-            CSoilOrgM_vr(ielmp,L,NY,NX)=AMIN1(0.0125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),1.2E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.52_r8)
+            CSoilOrgM_vr(ielmp,L,NY,NX)=AMIN1(0.0125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
+              1.2E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.52_r8)
           ENDIF
           IF(CEC(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
@@ -824,8 +830,8 @@ module readiMod
 
   write(*,*)'Depth to bottom of soil layer (m): CDPTH'
   write(*,*)(CumDepth2LayerBottom(L,NY,NX),L=NU,NM)
-  write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0'
-  write(*,*)(SoiBulkDensityt0(L,NY,NX),L=NU,NM)
+  write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0_vr'
+  write(*,*)(SoiBulkDensityt0_vr(L,NY,NX),L=NU,NM)
 !
 !     HYDROLOGIC PROPERTIES
 !

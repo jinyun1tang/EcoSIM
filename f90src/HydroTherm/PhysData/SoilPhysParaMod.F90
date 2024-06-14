@@ -104,7 +104,7 @@ implicit none
 
   DO L=NM+1,JZ
     CumDepth2LayerBottom(L,NY,NX)=2.0_r8*CumDepth2LayerBottom(L-1,NY,NX)-1.0_r8*CumDepth2LayerBottom(L-2,NY,NX)
-    SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L-1,NY,NX)
+    SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L-1,NY,NX)
     FieldCapacity(L,NY,NX)=FieldCapacity(L-1,NY,NX)
     WiltPoint(L,NY,NX)=WiltPoint(L-1,NY,NX)
     SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L-1,NY,NX)
@@ -182,7 +182,7 @@ implicit none
   real(r8) :: HeatDiffusByWat1,HeatDiffusByAir1,RYLXW1,RYLXA1,RYLNW1,RYLNA1
   REAL(R8) :: XNUSW1,XNUSA1,ThermalConducByWater,ThermalConducByAir,WTHET1
 
-  IF(SoiBulkDensity(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat(N3,N2,N1)+FracSoiPAsIce(N3,N2,N1).GT.ZERO)THEN
+  IF(SoiBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat(N3,N2,N1)+FracSoiPAsIce(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
     HeatDiffusByWat1=AZMAX1(FracSoiPAsWat(N3,N2,N1)-TRBW)**3._r8
     HeatDiffusByAir1=AZMAX1(FracSoiPAsAir(N3,N2,N1)-TRBA)**3._r8

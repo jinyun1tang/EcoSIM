@@ -372,7 +372,7 @@ implicit none
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEff(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: SoilResit4RootPentrate_vr(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
-  real(r8), pointer :: SoiBulkDensity(:)     => null()  !soil bulk density, [Mg m-3]
+  real(r8), pointer :: SoiBulkDensity_vr(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:) => null() !aqueous tracer concentration [g m-3]
   real(r8), pointer :: trc_gascl_vr(:,:) => null() !gaseous tracer concentration [g m-3]
 
@@ -1448,7 +1448,7 @@ implicit none
   allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
   allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
   allocate(this%SoilResit4RootPentrate_vr(JZ1));this%SoilResit4RootPentrate_vr=spval
-  allocate(this%SoiBulkDensity(0:JZ1));this%SoiBulkDensity=spval
+  allocate(this%SoiBulkDensity_vr(0:JZ1));this%SoiBulkDensity_vr=spval
   allocate(this%HydroCondMicP4RootUptake(JZ1));this%HydroCondMicP4RootUptake=spval
 
   end subroutine plt_soilchem_init
@@ -1503,7 +1503,7 @@ implicit none
 
 !  if(allocated(Z2SGL))deallocate(Z2SGL)
 !  if(allocated(ZHSGL))deallocate(ZHSGL)
-!  if(allocated(SoiBulkDensity))deallocate(SoiBulkDensity)
+!  if(allocated(SoiBulkDensity_vr))deallocate(SoiBulkDensity_vr)
 !  if(allocated(CO2G))deallocate(CO2G)
 !  if(allocated(CLSGL))deallocate(CLSGL)
 !  if(allocated(CQSGL))deallocate(CQSGL)
