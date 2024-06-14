@@ -215,7 +215,7 @@ implicit none
   real(r8), pointer :: ClumpFactorNow_pft(:)          => null() !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8), pointer :: RootBranchFreq_pft(:)         => null() !root brancing frequency, [m-1]
   real(r8), pointer :: HypoctoHeight_pft(:)        => null() !cotyledon height, [m]
-  integer,  pointer :: iPlantNfixType(:)        => null() !N2 fixation type
+  integer,  pointer :: iPlantNfixType_pft(:)        => null() !N2 fixation type
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
   real(r8), pointer :: CanPHeight4WatUptake(:)        => null() !canopy height, [m]
   real(r8), pointer :: CanopyHeightZ_col(:)  => null() !canopy layer height , [m]
@@ -1822,7 +1822,7 @@ implicit none
   allocate(this%Root1stLen_rpvr(jroots,JZ1,NumOfCanopyLayers1,JP1));this%Root1stLen_rpvr=spval
   allocate(this%Root2ndLen_pvr(jroots,JZ1,NumOfCanopyLayers1,JP1));this%Root2ndLen_pvr=spval
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,NumOfCanopyLayers1,JP1));this%Root2ndXNum_rpvr=spval
-  allocate(this%iPlantNfixType(JP1));this%iPlantNfixType=0
+  allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%MY(JP1));this%MY=0
   allocate(this%CanPHeight4WatUptake(JP1));this%CanPHeight4WatUptake=spval
   allocate(this%KLeafNumber_brch(MaxNumBranches,JP1));this%KLeafNumber_brch=0

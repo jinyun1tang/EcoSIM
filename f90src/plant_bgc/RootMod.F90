@@ -1707,7 +1707,7 @@ implicit none
     Root2ndXNum_rpvr              =>  plt_morph%Root2ndXNum_rpvr           , &
     Root1stDepz_pft               =>  plt_morph%Root1stDepz_pft            , &
     NGTopRootLayer_pft            =>  plt_morph%NGTopRootLayer_pft         , &
-    iPlantNfixType                =>  plt_morph%iPlantNfixType             , &
+    iPlantNfixType_pft                =>  plt_morph%iPlantNfixType_pft             , &
     MY                            =>  plt_morph%MY                         , &
     SeedDepth_pft                 =>  plt_morph%SeedDepth_pft              , &
     NIXBotRootLayer_rpft          =>  plt_morph%NIXBotRootLayer_rpft         &
@@ -1796,12 +1796,12 @@ implicit none
 !
 !     WITHDRAW C,N,P FROM ROOT NODULES IN LEGUMES
 !
-!     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
+!     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     FRTN=fraction of primary root sink strength in axis
 !     WTNDL,WTNDLN,WTNDLP=root bacterial C,N,P mass
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in root bacteria
 !
-      IF(is_root_N2fix(iPlantNfixType(NZ)))THEN
+      IF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
         DO NE=1,NumPlantChemElms
           XFRE(NE)=FRTN*RootNodulStrutElms_pvr(NE,LL,NZ)
           RootNodulStrutElms_pvr(NE,LL,NZ)=RootNodulStrutElms_pvr(NE,LL,NZ)-XFRE(NE)

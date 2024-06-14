@@ -60,7 +60,7 @@ module NoduleBGCMod
     AREA3                     => plt_site%AREA3,                     &
     k_fine_litr               => pltpar%k_fine_litr,                 &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    iPlantNfixType            => plt_morph%iPlantNfixType,           &
+    iPlantNfixType_pft            => plt_morph%iPlantNfixType_pft,           &
     fTCanopyGroth_pft                => plt_pheno%fTCanopyGroth_pft,               &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
     ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
@@ -80,9 +80,9 @@ module NoduleBGCMod
     ZERO4LeafVar_pft                     => plt_biom%ZERO4LeafVar_pft,                     &
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  &
   )
-!     iPlantNfixType=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
+!     iPlantNfixType_pft=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
-  IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
+  IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
 !
 !     INITIAL INFECTION
 !
@@ -375,8 +375,8 @@ module NoduleBGCMod
         ,CanopyNodulStrutElms_brch(ielmc,NB,NZ)))
       WTLSBT=WTLSB1+WTNDB1
       IF(WTLSBT.GT.ZERO4Groth_pft(NZ))THEN
-        FXRNX=FXRN(iPlantNfixType(NZ))/(1.0_r8+CCNDLB/CCNGB)
-!    2/(1.0+CCNDLB/(CCNGB*FXRN(iPlantNfixType(NZ))))
+        FXRNX=FXRN(iPlantNfixType_pft(NZ))/(1.0_r8+CCNDLB/CCNGB)
+!    2/(1.0+CCNDLB/(CCNGB*FXRN(iPlantNfixType_pft(NZ))))
         CPOOLD=(CanopyNonstElms_brch(ielmc,NB,NZ)*WTNDB1-CanopyNodulNonstElms_brch(ielmc,NB,NZ)*WTLSB1)/WTLSBT
         XFRE(ielmc)=FXRNX*CPOOLD
         CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
@@ -467,16 +467,16 @@ module NoduleBGCMod
     ZERO4LeafVar_pft                  => plt_biom%ZERO4LeafVar_pft,                  &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
     ElmAllocmat4Litr       => plt_soilchem%ElmAllocmat4Litr,   &
-    iPlantNfixType         => plt_morph%iPlantNfixType,        &
+    iPlantNfixType_pft         => plt_morph%iPlantNfixType_pft,        &
     NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    &
   )
-!     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
+!     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     NodulBiomCatInfection=initial bacterial mass at infection
 !     AREA=grid cell area
 !     CNND,NodulerPC_pft=bacterial N:C,P:C ratio from PFT file
 !
-  IF(is_root_N2fix(iPlantNfixType(NZ)))THEN
+  IF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
     D5400: DO L=NU,NIXBotRootLayer_pft(NZ)
       IF(PopuRootMycoC_pvr(ipltroot,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
 !
@@ -767,8 +767,8 @@ module NoduleBGCMod
           WTNDL1=AMIN1(PopuRootMycoC_pvr(ipltroot,L,NZ),AMAX1(NodulBiomCatInfection*AREA3(NU),RootNodulStrutElms_pvr(ielmc,L,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZERO4Groth_pft(NZ))THEN
-            FXRNX=FXRN(iPlantNfixType(NZ))/(1.0_r8+CCNDLR/CCNGR)
-!    2/(1.0+CCNDLR/(CCNGR*FXRN(iPlantNfixType(NZ))))
+            FXRNX=FXRN(iPlantNfixType_pft(NZ))/(1.0_r8+CCNDLR/CCNGR)
+!    2/(1.0+CCNDLR/(CCNGR*FXRN(iPlantNfixType_pft(NZ))))
             CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*WTNDL1-RootNodulNonstElms_pvr(ielmc,L,NZ)*WTRTD1)/WTRTDT
             XFRE(ielmc)=FXRNX*CPOOLD
             RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)

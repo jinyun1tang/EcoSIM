@@ -759,7 +759,7 @@ implicit none
     plt_pheno%iPlantTurnoverPattern_pft(NZ)=iPlantTurnoverPattern_pft(NZ,NY,NX)
     plt_pheno%PlantInitThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ,NY,NX)
     plt_morph%iPlantGrainType_pft(NZ)=iPlantGrainType_pft(NZ,NY,NX)
-    plt_morph%iPlantNfixType(NZ)=iPlantNfixType(NZ,NY,NX)
+    plt_morph%iPlantNfixType_pft(NZ)=iPlantNfixType_pft(NZ,NY,NX)
     plt_morph%MY(NZ)=MY(NZ,NY,NX)
     plt_photo%VmaxRubCarboxyRef_pft(NZ)=VmaxRubCarboxyRef_pft(NZ,NY,NX)
     plt_photo%VmaxRubOxyRef_pft(NZ)=VmaxRubOxyRef_pft(NZ,NY,NX)

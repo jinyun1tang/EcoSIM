@@ -179,7 +179,7 @@ module StartqMod
 !
 !     LEGUMES
 !
-  ELSEIF(iPlantNfixType(NZ,NY,NX).NE.0)THEN
+  ELSEIF(iPlantNfixType_pft(NZ,NY,NX).NE.0)THEN
     ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.16_r8
     ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.38_r8
     ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.34_r8

@@ -364,7 +364,7 @@ implicit none
     RootLenPerPlant_pvr          =>   plt_morph%RootLenPerPlant_pvr         , &
     Root1stLen_rpvr              =>   plt_morph%Root1stLen_rpvr             , &
     Root2ndLen_pvr               =>   plt_morph%Root2ndLen_pvr              , &
-    iPlantNfixType               =>   plt_morph%iPlantNfixType              , &
+    iPlantNfixType_pft               =>   plt_morph%iPlantNfixType_pft              , &
     Root2ndXNum_rpvr             =>   plt_morph%Root2ndXNum_rpvr            , &
     MY                           =>   plt_morph%MY                          , &
     NIXBotRootLayer_pft          =>   plt_morph%NIXBotRootLayer_pft         , &
@@ -482,14 +482,14 @@ implicit none
 !
 !     LitrFall AND STATE VARIABLES FROM DEAD NODULES
 !
-!     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
+!     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from decomposition and senescence
 !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
     DO N=1,MY(NZ)       
-      IF(is_plant_N2fix(iPlantNfixType(NZ)).AND.N.EQ.ipltroot)THEN
+      IF(is_plant_N2fix(iPlantNfixType_pft(NZ)).AND.N.EQ.ipltroot)THEN
         DO L=NU,MaxNumRootLays
           D6420: DO M=1,jsken
             DO NE=1,NumPlantChemElms            

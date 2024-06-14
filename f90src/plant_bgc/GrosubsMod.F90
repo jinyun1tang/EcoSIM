@@ -660,7 +660,7 @@ module grosubsMod
     SeedNumSet_brch               =>  plt_morph%SeedNumSet_brch          , &
     CanopyLeafArea_pft            =>  plt_morph%CanopyLeafArea_pft       , &
     CanopyStemAreaZ_pft           =>  plt_morph%CanopyStemAreaZ_pft      , &
-    iPlantNfixType                =>  plt_morph%iPlantNfixType           , &
+    iPlantNfixType_pft                =>  plt_morph%iPlantNfixType_pft           , &
     CanopySeedNum_pft             =>  plt_morph%CanopySeedNum_pft          &
   )
 !
@@ -716,12 +716,12 @@ module grosubsMod
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
 !
-!     iPlantNfixType=N2 fixation: 1,2,3=rapid to slow root symbiosis
+!     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !
-  IF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
-    IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
+  IF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
+    IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
       DO NE=1,NumPlantChemElms
         D7950: DO NB=1,NumOfBranches_pft(NZ)
           CanopyNodulNonstElms_pft(NE,NZ)=CanopyNodulNonstElms_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)
@@ -729,7 +729,7 @@ module grosubsMod
         CanopyNodulElms_pft(NE,NZ)=sum(CanopyNodulStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+ &
           sum(CanopyNodulNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
       ENDDO
-    ELSEIF(is_root_N2fix(iPlantNfixType(NZ)))THEN
+    ELSEIF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
       DO NE=1,NumPlantChemElms
         RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
           sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))

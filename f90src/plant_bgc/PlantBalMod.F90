@@ -129,7 +129,7 @@ implicit none
 !     begin_execution
   associate(                                                                &
     NU                             =>  plt_site%NU                        , &  
-    iPlantNfixType                 =>  plt_morph%iPlantNfixType           , &
+    iPlantNfixType_pft                 =>  plt_morph%iPlantNfixType_pft           , &
     NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft       , &    
     NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft        , &   
     MaxSoiL4Root_pft                   =>  plt_morph%MaxSoiL4Root_pft             , &    
@@ -162,8 +162,8 @@ implicit none
   ENDDO
 
   !add nodule, currently, a plant either has canopy or root N-fixing symbiosis, not both
-  IF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
-    IF(is_canopy_N2fix(iPlantNfixType(NZ)))THEN
+  IF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
+    IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
       DO NE=1,NumPlantChemElms
         ShootElms_pft(NE,NZ)=ShootElms_pft(NE,NZ)  &
           +sum(CanopyNodulStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)) &
@@ -324,7 +324,7 @@ implicit none
     MY                            =>  plt_morph%MY                           , &                  
     MaxNumRootLays                =>  plt_site%MaxNumRootLays                , &  
     MaxSoiL4Root_pft                  =>  plt_morph%MaxSoiL4Root_pft                 , &        
-    iPlantNfixType                =>  plt_morph%iPlantNfixType               , &    
+    iPlantNfixType_pft                =>  plt_morph%iPlantNfixType_pft               , &    
     NumRootAxes_pft               =>  plt_morph%NumRootAxes_pft              , &  
     RootNodulStrutElms_pvr        =>  plt_biom%RootNodulStrutElms_pvr        , &   
     RootNodulNonstElms_pvr        =>  plt_biom%RootNodulNonstElms_pvr        , &
@@ -346,7 +346,7 @@ implicit none
     massnonst1(NE)=sum(RootMycoNonstElms_pft(NE,1:MY(NZ),NZ))
     mass_roots(NE)=massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     !add reserve to struct
-    if(is_plant_N2fix(iPlantNfixType(NZ)) .and. is_root_N2fix(iPlantNfixType(NZ)))THEN
+    if(is_plant_N2fix(iPlantNfixType_pft(NZ)) .and. is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
       massnodul1(NE)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
           sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
       mass_roots(NE)=mass_roots(NE)+massnodul1(NE)    

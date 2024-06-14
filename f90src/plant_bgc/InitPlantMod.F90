@@ -179,7 +179,7 @@ module InitPlantMod
     MatureGroup_pft           => plt_pheno%MatureGroup_pft,           &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,       &
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft,        &
-    iPlantNfixType            => plt_morph%iPlantNfixType,            &
+    iPlantNfixType_pft            => plt_morph%iPlantNfixType_pft,            &
     NumCogrothNode_pft             => plt_morph%NumCogrothNode_pft              &
   )
 !
@@ -211,7 +211,7 @@ module InitPlantMod
 !
 !     LEGUMES
 !
-  ELSEIF(is_plant_N2fix(iPlantNfixType(NZ)))THEN
+  ELSEIF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
     ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)=0.16_r8
     ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ)=0.38_r8
     ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ)=0.34_r8

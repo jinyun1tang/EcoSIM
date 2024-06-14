@@ -653,7 +653,7 @@ module PlantDisturbsMod
 !------------------------------------------------------------------------------------------
 
   subroutine RemoveBiomByTillage(I,J,NZ)
-  use SurfLitterDataType, only : XCORP
+  !REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
   implicit none
   integer , intent(in) :: I,J,NZ
   integer :: L,K,M,N,NR,NE,NB,NTG
@@ -699,7 +699,7 @@ module PlantDisturbsMod
     LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &
     SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch,     &
     StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,           &
-    PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch,     &
+    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,      &
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,        &
     RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr,    &
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
@@ -754,7 +754,7 @@ module PlantDisturbsMod
     RootPoreVol_pvr             => plt_morph%RootPoreVol_pvr,             &
     RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr,     &
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr,            &
-    iPlantNfixType              => plt_morph%iPlantNfixType,              &
+    iPlantNfixType_pft          => plt_morph%iPlantNfixType_pft,          &
     RootLenPerPlant_pvr         => plt_morph%RootLenPerPlant_pvr,         &
     Root2ndXNum_rpvr            => plt_morph%Root2ndXNum_rpvr,            &
     Root2ndLen_pvr              => plt_morph%Root2ndLen_pvr,              &
@@ -780,12 +780,12 @@ module PlantDisturbsMod
 !     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
 !     VHeatCapCanP_pft=canopy heat capacity
 !
-  IF(J.EQ.INT(SolarNoonHour_col).AND.(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
-    .AND.(I.NE.iDayPlanting_pft(NZ) &
-    .OR.iYearCurrent.NE.iYearPlanting_pft(NZ)))THEN
-    IF(iSoilDisturbType_col.LE.10.OR.NZ.NE.1)THEN
-      IF(I.GT.iDayPlanting_pft(NZ).OR.iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
+  IF(J.EQ.INT(SolarNoonHour_col) .AND. (iPlantTurnoverPattern_pft(NZ).EQ.0 &
+    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
+    .AND. (I.NE.iDayPlanting_pft(NZ) .OR. iYearCurrent.NE.iYearPlanting_pft(NZ)))THEN
+
+    IF(iSoilDisturbType_col.LE.10 .OR. NZ.NE.1)THEN
+      IF(I.GT.iDayPlanting_pft(NZ) .OR. iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
         XHVST=XCORP
         PPX_pft(NZ)=PPX_pft(NZ)*XHVST
         PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
@@ -1057,7 +1057,7 @@ module PlantDisturbsMod
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-            IF(is_plant_N2fix(iPlantNfixType(NZ)).AND.N.EQ.ipltroot)THEN
+            IF(is_plant_N2fix(iPlantNfixType_pft(NZ)).AND.N.EQ.ipltroot)THEN
               DO NE=1,NumPlantChemElms
                 D6395: DO M=1,jsken
                   LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
@@ -1104,15 +1104,13 @@ module PlantDisturbsMod
   implicit none
   integer, intent(in) :: I,J,NZ
   integer :: L,K,M,NR,N,NB,NBX,NE
-  real(r8) :: compFracThin
-  real(r8) :: XHVST1(NumPlantChemElms)
+  real(r8) :: FracLeftThin
+  real(r8) :: XHVST1
   REAL(R8) :: LeafC_lbrch(NumOfCanopyLayers1,JP1,JP1)
   real(r8) :: ARLFY,ARLFR
   real(r8) :: APSILT
   real(r8) :: FHGT
   real(r8) :: FHVSH
-  real(r8) :: FFIRE(NumPlantChemElms)
-  real(r8) :: FrcLeafMassNotHarvst(NumPlantChemElms)
   real(r8) :: HvstedLeafC,HvstedShethC,HvstedEarC,HvstedGrainC,WHVSCP
   real(r8) :: HvstedStalkC,HvstedRsrvC
   real(r8) :: WHVSHH
@@ -1122,18 +1120,9 @@ module PlantDisturbsMod
 !     begin_execution
   associate(                                                                          &
     CutHeightORFrac_pft               => plt_distb%CutHeightORFrac_pft,               &
-    FracBiomHarvsted                  => plt_distb%FracBiomHarvsted,                  &
-    DCORP                             => plt_distb%DCORP,                             &
     THIN_pft                          => plt_distb%THIN_pft,                          &
-    iSoilDisturbType_col              => plt_distb%iSoilDisturbType_col,              &
     iHarvstType_pft                   => plt_distb%iHarvstType_pft,                   &
     jHarvst_pft                       => plt_distb%jHarvst_pft,                       &
-    PO4byFire_pft                     => plt_distb%PO4byFire_pft,                     &
-    N2ObyFire_pft                     => plt_distb%N2ObyFire_pft,                     &
-    NH3byFire_pft                     => plt_distb%NH3byFire_pft,                     &
-    O2ByFire_pft                      => plt_distb%O2ByFire_pft,                      &
-    CH4ByFire_pft                     => plt_distb%CH4ByFire_pft,                     &
-    CO2ByFire_pft                     => plt_distb%CO2ByFire_pft,                     &
     PlantPopulation_pft               => plt_site%PlantPopulation_pft,                &
     PPI_pft                           => plt_site%PPI_pft,                            &
     PPX_pft                           => plt_site%PPX_pft,                            &
@@ -1142,10 +1131,6 @@ module PlantDisturbsMod
     SolarNoonHour_col                 => plt_site%SolarNoonHour_col,                  &
     ZEROS                             => plt_site%ZEROS,                              &
     AREA3                             => plt_site%AREA3,                              &
-    RootMycoNonstElms_rpvr            => plt_biom%RootMycoNonstElms_rpvr,             &
-    RootProteinC_pvr                  => plt_biom%RootProteinC_pvr,                   &
-    PopuRootMycoC_pvr                 => plt_biom% PopuRootMycoC_pvr,                 &
-    RootMycoActiveBiomC_pvr           => plt_biom%RootMycoActiveBiomC_pvr,            &
     ShootC4NonstC_brch                => plt_biom%ShootC4NonstC_brch,                 &
     SeasonalNonstElms_pft             => plt_biom%SeasonalNonstElms_pft,              &
     CanopyStalkC_pft                  => plt_biom%CanopyStalkC_pft,                   &
@@ -1156,55 +1141,25 @@ module PlantDisturbsMod
     LeafPetolBiomassC_brch            => plt_biom%LeafPetolBiomassC_brch,             &
     LeafChemElmByLayerNode_brch       => plt_biom%LeafChemElmByLayerNode_brch,        &
     StalkStrutElms_pft                => plt_biom%StalkStrutElms_pft,                 &
-    RootMyco1stStrutElms_rpvr         => plt_biom%RootMyco1stStrutElms_rpvr,          &
-    Root1stElm_raxs                   => plt_biom%Root1stElm_raxs,                    &
-    RootMyco2ndStrutElms_rpvr         => plt_biom%RootMyco2ndStrutElms_rpvr,          &
-    RootNodulStrutElms_pvr            => plt_biom%RootNodulStrutElms_pvr,             &
-    RootNodulNonstElms_pvr            => plt_biom%RootNodulNonstElms_pvr,             &
-    FracRootElmAlloc2Litr             => plt_allom%FracRootElmAlloc2Litr,             &
     FracRootStalkElmAlloc2Litr        => plt_allom%FracRootStalkElmAlloc2Litr,        &
     iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft,           &
     iPlantPhenolType_pft              => plt_pheno%iPlantPhenolType_pft,              &
-    CSoilOrgM_vr                      => plt_soilchem%CSoilOrgM_vr,                   &
-    THETW_vr                          => plt_soilchem%THETW_vr,                       &
     ElmAllocmat4Litr                  => plt_soilchem%ElmAllocmat4Litr,               &
     inonstruct                        => pltpar%inonstruct,                           &
     ifoliar                           => pltpar%ifoliar,                              &
     istalk                            => pltpar%istalk,                               &
-    iroot                             => pltpar%iroot,                                &
     inonfoliar                        => pltpar%inonfoliar,                           &
     k_fine_litr                       => pltpar%k_fine_litr,                          &
     k_woody_litr                      => pltpar%k_woody_litr,                         &
-    icwood                            => pltpar%icwood,                               &
-    trcg_rootml_pvr                   => plt_rbgc%trcg_rootml_pvr,                    &
-    trcs_rootml_pvr                   => plt_rbgc%trcs_rootml_pvr,                    &
-    RootGasLossDisturb_pft            => plt_bgcr%RootGasLossDisturb_pft,             &
     LitrfalStrutElms_pvr              => plt_bgcr%LitrfalStrutElms_pvr,               &
-    Eco_NBP_col                       => plt_bgcr%Eco_NBP_col,                        &
-    CO2NetFix_pft                     => plt_bgcr%CO2NetFix_pft,                      &
-    RootCO2Autor_pvr                  => plt_rbgc%RootCO2Autor_pvr,                   &
-    RootRespPotent_pvr                => plt_rbgc%RootRespPotent_pvr,                 &
-    RootCO2EmisPot_pvr                => plt_rbgc%RootCO2EmisPot_pvr,                 &
-    Root2ndXNum_pvr                   => plt_morph%Root2ndXNum_pvr,                   &
-    Root2ndXNum_rpvr                  => plt_morph%Root2ndXNum_rpvr,                  &
-    RootLenPerPlant_pvr               => plt_morph%RootLenPerPlant_pvr,               &
-    RootAreaPerPlant_pvr              => plt_morph%RootAreaPerPlant_pvr,              &
-    RootPoreVol_pvr                   => plt_morph%RootPoreVol_pvr,                   &
     NGTopRootLayer_pft                => plt_morph%NGTopRootLayer_pft,                &
     MY                                => plt_morph%MY,                                &
-    RootVH2O_pvr                      => plt_morph%RootVH2O_pvr,                      &
-    RootLenDensPerPlant_pvr           => plt_morph%RootLenDensPerPlant_pvr,           &
-    iPlantNfixType                    => plt_morph%iPlantNfixType,                    &
     CanopyLeafAareZ_col               => plt_morph%CanopyLeafAareZ_col,               &
     CanopyHeightZ_col                 => plt_morph%CanopyHeightZ_col,                 &
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft,                 &
     CanopyStemArea_pft                => plt_morph%CanopyStemArea_pft,                &
-    Root1stXNumL_pvr                  => plt_morph%Root1stXNumL_pvr,                  &
-    Root2ndLen_pvr                    => plt_morph%Root2ndLen_pvr,                    &
-    Root1stLen_rpvr                   => plt_morph%Root1stLen_rpvr,                   &
     LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch,           &
     CanopyStalkArea_lbrch             => plt_morph%CanopyStalkArea_lbrch,             &
-    NumRootAxes_pft                   => plt_morph%NumRootAxes_pft,                   &
     ClumpFactor_pft                   => plt_morph%ClumpFactor_pft,                   &
     CanopyLeafArea_col                => plt_morph%CanopyLeafArea_col                 &
   )
@@ -1248,8 +1203,8 @@ module PlantDisturbsMod
         ARLFY=(1._r8-ABS(CutHeightORFrac_pft(NZ)))*CanopyLeafArea_col
         ARLFR=0._r8
         D9875: DO L=1,NumOfCanopyLayers1
-          IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1).AND.&
-            CanopyLeafAareZ_col(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+          IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1) &
+            .AND. CanopyLeafAareZ_col(L).GT.ZEROS .AND. ARLFR.LT.ARLFY)THEN
             IF(ARLFR+CanopyLeafAareZ_col(L).GT.ARLFY)THEN
               CutHeightORFrac_pft(NZ)=CanopyHeightZ_col(L-1)+((ARLFY-ARLFR)/CanopyLeafAareZ_col(L))&
                 *(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))
@@ -1300,18 +1255,18 @@ module PlantDisturbsMod
 
     CALL CutPlant(I,J,NZ,WHVSHH,WHVSCP,WHVSNP,HvstedShethC,HvstedGrainC,HvstedEarC,HvstedRsrvC,HvstedStalkC)
 
-      CanopyLeafShethC_pft(NZ)=0._r8
-      StalkStrutElms_pft(ielmc,NZ)=0._r8
-      CanopyStalkC_pft(NZ)=0._r8
-      CanopyStemArea_pft(NZ)=0._r8
-      D9840: DO NB=1,NumOfBranches_pft(NZ)
-        CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
-        StalkStrutElms_pft(ielmc,NZ)=StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
-        CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
-        D9830: DO L=1,NumOfCanopyLayers1
-          CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
-        ENDDO D9830
-      ENDDO D9840
+    CanopyLeafShethC_pft(NZ)=0._r8
+    StalkStrutElms_pft(ielmc,NZ)=0._r8
+    CanopyStalkC_pft(NZ)=0._r8
+    CanopyStemArea_pft(NZ)=0._r8
+    D9840: DO NB=1,NumOfBranches_pft(NZ)
+      CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
+      StalkStrutElms_pft(ielmc,NZ)=StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
+      CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
+      D9830: DO L=1,NumOfCanopyLayers1
+        CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
+      ENDDO D9830
+    ENDDO D9840
 !
 !     ROOT LitrFall FROM HARVESTING OR FIRE
 !
@@ -1335,152 +1290,15 @@ module PlantDisturbsMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-      IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-        compFracThin=1.0_r8-THIN_pft(NZ)
-        D3985: DO N=1,MY(NZ)
-          D3980: DO L=NU,MaxNumRootLays
-            IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
-              compFracThin=1.0_r8-THIN_pft(NZ)
-              FFIRE(1:NumPlantChemElms)=0._r8
-            ELSE
-              IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.22)THEN
-                compFracThin=1.0_r8
-                FFIRE(1:NumPlantChemElms)=0._r8
-              ELSE
-                compFracThin=1.0_r8-DCORP*FracBiomHarvsted(1,iplthvst_woody,NZ) &
-                  *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
-                FFIRE(ielmc)=FracBiomHarvsted(2,iplthvst_woody,NZ)
-                FFIRE(ielmn)=FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
-                FFIRE(ielmp)=FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
-              ENDIF
-            ENDIF
-            XHVST1=1._r8-compFracThin
-            D3385: DO M=1,jsken
-              DO NE=1,NumPlantChemElms
-                FrcLeafMassNotHarvst(NE)=XHVST1(NE)*ElmAllocmat4Litr(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
-                LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-                  +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-              ENDDO
-              CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-              CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-              O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667
-              NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
-              N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-              PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
-              CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-              Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-              DO NR=1,NumRootAxes_pft(NZ)
-                DO NE=1,NumPlantChemElms
-                  FrcLeafMassNotHarvst(NE)=XHVST1(NE)*ElmAllocmat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
-                    +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
-                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
-                    (1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-                ENDDO
-                CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-                CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-                O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667
-                NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
-                N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0
-                PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
-                CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-                Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+    IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
+      FracLeftThin=1.0_r8-THIN_pft(NZ)
 
-                DO NE=1,NumPlantChemElms
-                  FrcLeafMassNotHarvst(NE)=XHVST1(NE)*ElmAllocmat4Litr(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
-                    +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
-                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-                    +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-                ENDDO
-                CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-                CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-                O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
-                NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
-                N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-                PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
-                CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-                Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-              enddo
-            ENDDO D3385
-!
-!     RELEASE ROOT GAS CONTENTS DURING HARVESTING
-!
-!     CO2A,OXYA,CH4A,Z2OA,ZH3A,H2GA=root gaseous CO2,O2,CH4,N2O,NH3,H2
-!     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
-!     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
-!
-            DO NTG=idg_beg,idg_end-1
-              RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-XHVST1(ielmc) &
-                *(trcg_rootml_pvr(idg_CO2,N,L,NZ)+trcs_rootml_pvr(idg_CO2,N,L,NZ))
-              trcg_rootml_pvr(NTG,N,L,NZ)=compFracThin*trcg_rootml_pvr(NTG,N,L,NZ)
-              trcs_rootml_pvr(NTG,N,L,NZ)=compFracThin*trcs_rootml_pvr(NTG,N,L,NZ)
-            ENDDO
-
-!
-!     REDUCE ROOT STATE VARIABLES DURING HARVESTING
-!
-!     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
-!     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
-!     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
-!     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
-!     RTN2=number of secondary root axes
-!     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
-!     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
-!     RootProteinC_pvr=root protein C mass
-!     RTN1,Root2ndXNum_pvr=number of primary,secondary root axes
-!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
-!     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
-!     RootAreaPerPlant_pvr=root surface area per plant
-!     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
-!
-            D3960: DO NR=1,NumRootAxes_pft(NZ)
-              DO NE=1,NumPlantChemElms
-                RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*compFracThin
-                RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*compFracThin
-                Root1stElm_raxs(NE,N,NR,NZ)=Root1stElm_raxs(NE,N,NR,NZ)*compFracThin
-              ENDDO
-              Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*compFracThin
-              Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*compFracThin
-              Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*compFracThin
-            ENDDO D3960
-            DO NE=1,NumPlantChemElms
-               RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*compFracThin
-            ENDDO
-            RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*compFracThin
-             PopuRootMycoC_pvr(N,L,NZ)= PopuRootMycoC_pvr(N,L,NZ)*compFracThin
-            RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)*compFracThin
-            Root1stXNumL_pvr(N,L,NZ)=Root1stXNumL_pvr(N,L,NZ)*compFracThin
-            Root2ndXNum_pvr(N,L,NZ)=Root2ndXNum_pvr(N,L,NZ)*compFracThin
-            RootLenPerPlant_pvr(N,L,NZ)=RootLenPerPlant_pvr(N,L,NZ)*compFracThin
-            RootLenDensPerPlant_pvr(N,L,NZ)=RootLenDensPerPlant_pvr(N,L,NZ)*compFracThin
-            RootPoreVol_pvr(N,L,NZ)=RootPoreVol_pvr(N,L,NZ)*compFracThin
-            RootVH2O_pvr(N,L,NZ)=RootVH2O_pvr(N,L,NZ)*compFracThin
-            RootAreaPerPlant_pvr(N,L,NZ)=RootAreaPerPlant_pvr(N,L,NZ)*compFracThin
-            RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)*compFracThin
-            RootCO2EmisPot_pvr(N,L,NZ)=RootCO2EmisPot_pvr(N,L,NZ)*compFracThin
-            RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)*compFracThin
-!
-!     NODULE LitrFall AND STATE VARIABLES DURING HARVESTING
-!
-!     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
-!     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
-!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
-!     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
-!     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
-!
-            IF(is_plant_N2fix(iPlantNfixType(NZ)).AND.N.EQ.ipltroot)THEN
-              DO NE=1,NumPlantChemElms
-                D3395: DO M=1,jsken
-                  LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+ &
-                    XHVST1(NE)*(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
-                    +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
-                ENDDO D3395
-                RootNodulStrutElms_pvr(NE,L,NZ)=RootNodulStrutElms_pvr(NE,L,NZ)*compFracThin
-                RootNodulNonstElms_pvr(NE,L,NZ)=RootNodulNonstElms_pvr(NE,L,NZ)*compFracThin
-              ENDDO
-            ENDIF
-          ENDDO D3980
-        ENDDO D3985
+      D3985: DO N=1,MY(NZ)
+        D3980: DO L=NU,MaxNumRootLays
+          CALL RootMaterialRemovalL(I,J,N,L,NZ,FracLeftThin,XHVST1)
+          call HarvstUpdateRootStateL(I,J,N,L,NZ,FracLeftThin,XHVST1)
+        ENDDO D3980
+      ENDDO D3985
 !
 !     STORAGE LitrFall AND STATE VARIABLES DURING HARVESTING
 !
@@ -1489,21 +1307,23 @@ module PlantDisturbsMod
 !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
-!
-        IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
-          DO NE=1,NumPlantChemElms
-            D3400: DO M=1,jsken
-              LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
-                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
-                +(XHVST1(NE)*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
 
-              LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=&
-                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
-                +(XHVST1(NE)*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
-            ENDDO D3400
-            SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*compFracThin
-          ENDDO
-        ENDIF
+      IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
+        DO NE=1,NumPlantChemElms
+          D3400: DO M=1,jsken
+            LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
+                LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
+              +(XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))&
+              *FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+
+            LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)=&
+                LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
+              +(XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ))&
+              *FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+          ENDDO D3400
+          SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*FracLeftThin
+        ENDDO
+      ENDIF
     ENDIF
   ENDIF
   end associate
@@ -2750,4 +2570,236 @@ module PlantDisturbsMod
   ENDDO D9835
   end associate
   end subroutine CutPlant
+!--------------------------------------------------------------------------------
+
+  subroutine RootMaterialRemovalL(I,J,N,L,NZ,FracLeftThin,XHVST1)
+
+  implicit none
+  integer , intent(in) :: I,J,N,L,NZ
+  real(r8), intent(inout) :: FracLeftThin
+  real(r8), intent(out):: XHVST1
+  real(r8) :: FrcLeafMassNotHarvst(NumPlantChemElms)
+  real(r8) :: FFIRE(NumPlantChemElms)
+  integer  :: NR,NTG,M,NE
+
+  associate(                                                         &
+    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
+    Eco_NBP_col               => plt_bgcr%Eco_NBP_col,               &
+    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
+    RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,           &
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,           &
+    PO4byFire_pft             => plt_distb%PO4byFire_pft,            &
+    N2ObyFire_pft             => plt_distb%N2ObyFire_pft,            &
+    NH3byFire_pft             => plt_distb%NH3byFire_pft,            &
+    O2ByFire_pft              => plt_distb%O2ByFire_pft,             &
+    CH4ByFire_pft             => plt_distb%CH4ByFire_pft,            &
+    CO2ByFire_pft             => plt_distb%CO2ByFire_pft,            &
+    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
+    CSoilOrgM_vr              => plt_soilchem%CSoilOrgM_vr,          &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
+    THIN_pft                  => plt_distb%THIN_pft,                 &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
+    iSoilDisturbType_col      => plt_distb%iSoilDisturbType_col,     &
+    THETW_vr                  => plt_soilchem%THETW_vr,              &
+    DCORP                     => plt_distb%DCORP,                    &
+    FracBiomHarvsted          => plt_distb%FracBiomHarvsted,         &
+    FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,    &
+    k_fine_litr               => pltpar%k_fine_litr,                 &
+    k_woody_litr              => pltpar%k_woody_litr,                &
+    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
+    iroot                     => pltpar%iroot,                       &
+    inonstruct                => pltpar%inonstruct,                  &
+    icwood                    => pltpar%icwood,                      &
+    iHarvstType_pft           => plt_distb%iHarvstType_pft           &
+  )
+
+  IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
+    FracLeftThin=1.0_r8-THIN_pft(NZ)
+    FFIRE(1:NumPlantChemElms)=0._r8
+  ELSE
+    !fire
+    IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.22)THEN
+      FracLeftThin=1.0_r8
+      FFIRE(1:NumPlantChemElms)=0._r8
+    ELSE
+      FracLeftThin=1.0_r8-DCORP*FracBiomHarvsted(1,iplthvst_woody,NZ) &
+        *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
+      FFIRE(ielmc)=FracBiomHarvsted(2,iplthvst_woody,NZ)
+      FFIRE(ielmn)=FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
+      FFIRE(ielmp)=FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
+    ENDIF
+  ENDIF
+
+  XHVST1=1._r8-FracLeftThin
+  D3385: DO M=1,jsken
+    DO NE=1,NumPlantChemElms
+      FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
+      LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
+        +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+    ENDDO
+
+    CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+    CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+    O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
+    NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
+    N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
+    PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
+    CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+    Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+
+    DO NR=1,NumRootAxes_pft(NZ)
+      DO NE=1,NumPlantChemElms
+        FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+          +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
+        LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
+          (1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+      ENDDO
+      CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
+      NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
+      N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0
+      PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
+      CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+
+      DO NE=1,NumPlantChemElms
+        FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+          +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
+        LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
+          +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+      ENDDO
+      CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
+      NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
+      N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
+      PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
+      CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+    enddo
+  ENDDO D3385
+!
+!     RELEASE ROOT GAS CONTENTS DURING HARVESTING
+!
+!     CO2A,OXYA,CH4A,Z2OA,ZH3A,H2GA=root gaseous CO2,O2,CH4,N2O,NH3,H2
+!     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
+!     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
+!
+  DO NTG=idg_beg,idg_end-1
+    RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-XHVST1 &
+      *(trcg_rootml_pvr(idg_CO2,N,L,NZ)+trcs_rootml_pvr(idg_CO2,N,L,NZ))
+    trcg_rootml_pvr(NTG,N,L,NZ)=FracLeftThin*trcg_rootml_pvr(NTG,N,L,NZ)
+    trcs_rootml_pvr(NTG,N,L,NZ)=FracLeftThin*trcs_rootml_pvr(NTG,N,L,NZ)
+  ENDDO
+  end associate          
+  end subroutine RootMaterialRemovalL  
+!--------------------------------------------------------------------------------
+  subroutine HarvstUpdateRootStateL(I,J,N,L,NZ,FracLeftThin,XHVST1)            
+  implicit none
+  integer,  intent(in) :: I,J,N,L,NZ
+  real(r8), intent(in) :: FracLeftThin,XHVST1
+  integer :: NE,NR,M
+  associate(                                                         &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
+    inonstruct                => pltpar%inonstruct,                  &
+    iroot                     => pltpar%iroot,                       &
+    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
+    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
+    k_fine_litr               => pltpar%k_fine_litr,                 &
+    k_woody_litr              => pltpar%k_woody_litr,                &
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
+    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
+    Root1stElm_raxs           => plt_biom%Root1stElm_raxs,           &
+    Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
+    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
+    Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
+    RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
+    Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr,         &
+    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,          &
+    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,      &
+    RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr,  &
+    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr,          &
+    RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr,     &
+    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,        &
+    RootVH2O_pvr              => plt_morph%RootVH2O_pvr,             &
+    RootCO2Autor_pvr          => plt_rbgc%RootCO2Autor_pvr,          &
+    RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,        &
+    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,        &
+    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
+    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
+    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    &
+  )
+!
+!     REDUCE ROOT STATE VARIABLES DURING HARVESTING
+!
+!     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
+!     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
+!     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
+!     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
+!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
+!     RTN2=number of secondary root axes
+!     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
+!     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
+!     RootProteinC_pvr=root protein C mass
+!     RTN1,Root2ndXNum_pvr=number of primary,secondary root axes
+!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
+!     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
+!     RootAreaPerPlant_pvr=root surface area per plant
+!     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
+!
+    D3960: DO NR=1,NumRootAxes_pft(NZ)
+      DO NE=1,NumPlantChemElms
+        RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
+        RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
+        Root1stElm_raxs(NE,N,NR,NZ)=Root1stElm_raxs(NE,N,NR,NZ)*FracLeftThin
+      ENDDO
+      Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*FracLeftThin
+      Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*FracLeftThin
+      Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*FracLeftThin
+    ENDDO D3960
+
+    DO NE=1,NumPlantChemElms
+        RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*FracLeftThin
+    ENDDO
+    RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*FracLeftThin
+      PopuRootMycoC_pvr(N,L,NZ)= PopuRootMycoC_pvr(N,L,NZ)*FracLeftThin
+    RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)*FracLeftThin
+    Root1stXNumL_pvr(N,L,NZ)=Root1stXNumL_pvr(N,L,NZ)*FracLeftThin
+    Root2ndXNum_pvr(N,L,NZ)=Root2ndXNum_pvr(N,L,NZ)*FracLeftThin
+    RootLenPerPlant_pvr(N,L,NZ)=RootLenPerPlant_pvr(N,L,NZ)*FracLeftThin
+    RootLenDensPerPlant_pvr(N,L,NZ)=RootLenDensPerPlant_pvr(N,L,NZ)*FracLeftThin
+    RootPoreVol_pvr(N,L,NZ)=RootPoreVol_pvr(N,L,NZ)*FracLeftThin
+    RootVH2O_pvr(N,L,NZ)=RootVH2O_pvr(N,L,NZ)*FracLeftThin
+    RootAreaPerPlant_pvr(N,L,NZ)=RootAreaPerPlant_pvr(N,L,NZ)*FracLeftThin
+    RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)*FracLeftThin
+    RootCO2EmisPot_pvr(N,L,NZ)=RootCO2EmisPot_pvr(N,L,NZ)*FracLeftThin
+    RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)*FracLeftThin
+!
+!     NODULE LitrFall AND STATE VARIABLES DURING HARVESTING
+!
+!     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
+!     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
+!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
+!     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
+!     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
+!
+    IF(is_plant_N2fix(iPlantNfixType_pft(NZ)).AND.N.EQ.ipltroot)THEN
+      DO NE=1,NumPlantChemElms
+        D3395: DO M=1,jsken
+          LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+ &
+            XHVST1*(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
+            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
+        ENDDO D3395
+        RootNodulStrutElms_pvr(NE,L,NZ)=RootNodulStrutElms_pvr(NE,L,NZ)*FracLeftThin
+        RootNodulNonstElms_pvr(NE,L,NZ)=RootNodulNonstElms_pvr(NE,L,NZ)*FracLeftThin
+      ENDDO
+    ENDIF
+  end associate          
+  end subroutine HarvstUpdateRootStateL
+
 end module PlantDisturbsMod
