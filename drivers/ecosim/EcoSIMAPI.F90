@@ -235,7 +235,7 @@ contains
     write(iulog, *) '--------------------'
 
   endif
-  erosion_model=iErosionMode<0
+  erosion_model=iErosionMode>=0
   read(start_date,'(I4)')year0
   call etimer%Init(nml_buffer,year0=year0)
   if(do_bgcforc_write)then

@@ -170,9 +170,9 @@ implicit none
   REAL(R8),INTENT(IN) :: DVLiceMicP(JZ)        !change in ice volume, final - initial
   real(r8),intent(in) :: DORGC(JZ)             !change in SOM, initial - final
   real(r8), intent(out) :: CDPTHX(JZ)          !copy of the old depths of each layer
-  real(r8), intent(out) :: CDPTHY(0:JZ)      !
-  integer, intent(out) :: IFLGL(0:JZ,6)
-  real(r8) :: DDLYX(0:JZ,6)
+  real(r8), intent(out) :: CDPTHY(0:JZ)        !
+  integer , intent(out) :: IFLGL(0:JZ,6)       !flag of change type
+  real(r8) :: DDLYX(0:JZ,6)                    !six process
   real(r8) :: DDLYR(0:JZ,6)                    !new layer thickness
   integer :: LX,LY,LL,NN,L
   real(r8) :: DDLEqv_OrgC,DDLEqv_Erosion
