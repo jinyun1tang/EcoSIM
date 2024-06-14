@@ -67,7 +67,7 @@ implicit none
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
-  IF(iErosionMode < 0)return
+  IF(.not. erosion_model)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
   !
   IF(SoiBulkDensity(NU(NY,NX),NY,NX).LE.ZERO)THEN
