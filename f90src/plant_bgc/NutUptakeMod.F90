@@ -20,13 +20,13 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine PlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
+  subroutine PlantNutientO2Uptake(I,J,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
     PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
   !
   !DESCRIPTION
   !doing plant population level nutrient, and O2 uptake
   implicit none
-  integer, intent(in) :: I,NZ
+  integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: FDMP
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
@@ -37,7 +37,7 @@ module NutUptakeMod
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
-  call RootMycoO2NutrientUptake(I,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
+  call RootMycoO2NutrientUptake(I,J,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
   end subroutine PlantNutientO2Uptake
@@ -109,11 +109,11 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootMycoO2NutrientUptake(I,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
+  subroutine RootMycoO2NutrientUptake(I,J,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
   implicit none
-  integer, intent(in) :: I,NZ
+  integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8),  intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
@@ -161,7 +161,7 @@ module NutUptakeMod
 !
         RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
 
-        call RootSoilGasExchange(I,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
+        call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
           RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
         PopPlantO2Demand=PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)

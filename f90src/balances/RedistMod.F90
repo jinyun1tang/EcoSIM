@@ -673,10 +673,7 @@ module RedistMod
   call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
   
   call sumLitrOMLayL(0,NY,NX,litrOM)
-  if(litrOM(ielmc)<0._r8)then
-    print*,'redist negative litr'
-    stop
-  endif
+
   SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM
 
   DO NE=1,NumPlantChemElms
@@ -911,10 +908,6 @@ module RedistMod
         SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
         DO NE=1,NumPlantChemElms
           SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)+LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
-          if(SolidOM_vr(NE,M,K,L,NY,NX)<0._r8)then
-          print*,'addlitr',SolidOM_vr(NE,M,K,L,NY,NX),LitrfalStrutElms_vr(NE,M,K,L,NY,NX)
-          stop
-          endif
         ENDDO
       enddo
     ENDDO D8565

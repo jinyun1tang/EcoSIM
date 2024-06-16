@@ -540,7 +540,7 @@ implicit none
     DO NR=1,NumOfCanopyLayers
       NIXBotRootLayer_rpft(NR,NZ,NY,NX)=plt_morph%NIXBotRootLayer_rpft(NR,NZ)
       DO N=1,MY(NZ,NY,NX)
-        Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX) =plt_biom%Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)
+        RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX) =plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)
         Root1stDepz_pft(N,NR,NZ,NY,NX) =plt_morph%Root1stDepz_pft(N,NR,NZ)
       ENDDO
       DO L=1,NL(NY,NX)
@@ -1397,7 +1397,7 @@ implicit none
       enddo
       DO N=1,MY(NZ,NY,NX)
         plt_morph%Root1stDepz_pft(N,NR,NZ)=Root1stDepz_pft(N,NR,NZ,NY,NX)
-        plt_biom%Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)
+        plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)
       enddo
     enddo
     

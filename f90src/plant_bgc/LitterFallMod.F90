@@ -327,7 +327,7 @@ implicit none
 !     begin_execution
   associate(                                                                  &
     RootMyco2ndStrutElms_rpvr    =>   plt_biom%RootMyco2ndStrutElms_rpvr    , &
-    Root1stElm_raxs              =>   plt_biom%Root1stElm_raxs              , &
+    RootMyco1stElm_raxs              =>   plt_biom%RootMyco1stElm_raxs              , &
     RootMyco1stStrutElms_rpvr    =>   plt_biom%RootMyco1stStrutElms_rpvr    , &
      RootMycoNonstElms_rpvr      =>   plt_biom%RootMycoNonstElms_rpvr       , &
      PopuRootMycoC_pvr           =>   plt_biom% PopuRootMycoC_pvr           , &
@@ -457,7 +457,7 @@ implicit none
         ENDDO
       ENDDO    
       DO N=1,MY(NZ)        
-        Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8      
+        RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8      
       ENDDO    
     ENDDO D8870
 
@@ -734,7 +734,7 @@ implicit none
     RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr   , &
     CanopyNodulStrutElms_brch     => plt_biom%CanopyNodulStrutElms_brch   , &
     StalkStrutElms_brch           => plt_biom%StalkStrutElms_brch         , &
-    Root1stElm_raxs               => plt_biom%Root1stElm_raxs             , &
+    RootMyco1stElm_raxs               => plt_biom%RootMyco1stElm_raxs             , &
     MaxNumRootLays                => plt_site%MaxNumRootLays              , &
     NU                            => plt_site%NU                          , &
     iPlantState_pft               => plt_pheno%iPlantState_pft            , &
@@ -779,7 +779,7 @@ implicit none
       DO  NR=1,NumRootAxes_pft(NZ)
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
-        Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
+        RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
         Root1stLen_rpvr(N,L,NR,NZ)=0._r8
         Root2ndLen_pvr(N,L,NR,NZ)=0._r8
         Root2ndXNum_rpvr(N,L,NR,NZ)=0._r8

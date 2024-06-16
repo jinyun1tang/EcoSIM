@@ -83,10 +83,6 @@ module ExtractsMod
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
             LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
-            if(LitrfalStrutElms_pvr(NE,M,K,L,NZ)<0._r8)then
-            print*,'extract',LitrfalStrutElms_pvr(NE,M,K,L,NZ),M,K
-            stop
-            endif
           enddo
         ENDDO
       ENDDO

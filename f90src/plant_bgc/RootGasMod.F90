@@ -17,11 +17,11 @@ module RootGasMod
   contains
 !------------------------------------------------------------------------
 
-  subroutine RootSoilGasExchange(I,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
+  subroutine RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
     RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
   implicit none
-  integer , intent(in) :: I,N,L,NZ
+  integer , intent(in) :: I,J,N,L,NZ
   real(r8), intent(in) :: FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
@@ -213,8 +213,8 @@ module RootGasMod
 !     RootCO2Autor_pvr=root CO2 flux from grosub.f
 !
 
-    IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
-      .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
+      .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX=RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
       DIFOP=O2AquaDiffusvityP*RTARRX
       DO NTG=idg_beg,idg_end-1

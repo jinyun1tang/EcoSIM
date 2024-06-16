@@ -460,7 +460,7 @@ implicit none
   real(r8), pointer :: RootMycoNonstElms_pft(:,:,:)           => null()  
   real(r8), pointer :: RootMyco2ndStrutElms_rpvr(:,:,:,:,:)   => null()    !root layer element secondary axes, [g d-2]
   real(r8), pointer :: RootMyco1stStrutElms_rpvr(:,:,:,:,:)   => null()    !root layer element primary axes, [g d-2]
-  real(r8), pointer :: Root1stElm_raxs(:,:,:,:)               => null()    !root C primary axes, [g d-2]
+  real(r8), pointer :: RootMyco1stElm_raxs(:,:,:,:)               => null()    !root C primary axes, [g d-2]
   real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)          => null()    !standing dead element fraction, [g d-2]
   real(r8), pointer :: CanopyNonstElmConc_pft(:,:)            => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: CanopyNonstElms_pft(:,:)               => null()    !canopy nonstructural element concentration, [g d-2]
@@ -1338,7 +1338,7 @@ implicit none
   allocate(this%StalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%StalkStrutElms_brch=spval
   allocate(this%ShootStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%ShootStrutElms_brch=spval
   allocate(this%SenecStalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%SenecStalkStrutElms_brch=spval
-  allocate(this%Root1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP1));this%Root1stElm_raxs=spval
+  allocate(this%RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP1));this%RootMyco1stElm_raxs=spval
 
   end subroutine plt_biom_init
 !----------------------------------------------------------------------
@@ -1353,7 +1353,7 @@ implicit none
 !  if(allocated(RootNodulNonstElms_pvr))deallocate(RootNodulNonstElms_pvr)
 !  if(allocated(RootNodulStrutElms_pvr))deallocate(RootNodulStrutElms_pvr)
 !  if(allocated(CanopyLeafCLyr_pft))deallocate(CanopyLeafCLyr_pft)
-!  call destroy(Root1stElm_raxs)
+!  call destroy(RootMyco1stElm_raxs)
 !  if(allocated(RootMyco1stStrutElms_rpvr))deallocate(RootMyco1stStrutElms_rpvr)
 !  if(allocated(StandDeadKCompElms_pft))deallocate(StandDeadKCompElms_pft)
 !  if(allocated(RootMyco2ndStrutElms_rpvr))deallocate(RootMyco2ndStrutElms_rpvr)

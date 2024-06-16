@@ -3948,17 +3948,17 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrp_4d(1:npfts, 1:NumPlantChemElms, 1:pltpar%jroots,1:MaxNumRootAxes)
-    call restartvar(ncid, flag, varname='Root1stElm_raxs', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='RootMyco1stElm_raxs', dim1name='pft',dim2name='elmnts',&
      dim3name='rootyps',dim4name='rootaxs',long_name='elmnts in primary root axes', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stElm_raxs,datrp_4d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootMyco1stElm_raxs,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'Root1stElm_raxs'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,Root1stElm_raxs,datrp_4d,NumActivePlants=NumActivePlants,&
+    !print*,'RootMyco1stElm_raxs'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootMyco1stElm_raxs,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr4 => datrp_4d(1:npfts, 1:NumPlantChemElms, 1:pltpar%jroots,1:MaxNumRootAxes)
-    call restartvar(ncid, flag, varname='Root1stElm_raxs', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='RootMyco1stElm_raxs', dim1name='pft',dim2name='elmnts',&
      dim3name='rootyps',dim4name='rootaxs',long_name='elmnts in primary root axes', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
   endif  

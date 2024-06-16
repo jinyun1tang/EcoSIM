@@ -208,7 +208,7 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(I,J,NZ)
 
-      call PlantNutientO2Uptake(I,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
+      call PlantNutientO2Uptake(I,J,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
         PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
@@ -340,8 +340,8 @@ module UptakesMod
     KoppenClimZone            => plt_site%KoppenClimZone,             &
     BndlResistAboveCanG       => plt_ew%BndlResistAboveCanG,          &
     TairK                     => plt_ew%TairK,                        &
-    DeltaTKC_pft                  => plt_ew%DeltaTKC_pft,                     &
-    ZERO4PlantDisplace_col     => plt_ew%ZERO4PlantDisplace_col,        &
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
+    ZERO4PlantDisplace_col    => plt_ew%ZERO4PlantDisplace_col,       &
     RoughHeight               => plt_ew%RoughHeight,                  &
     RAZ                       => plt_ew%RAZ,                          &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
@@ -1073,12 +1073,12 @@ module UptakesMod
   D3880: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 &
-        .AND.VLWatMicPM(NPH,L).GT.ZEROS2 &
-        .AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND.HydroCondMicP4RootUptake(L).GT.ZERO &
-        .AND.Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
-        .AND.Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
-        .AND.THETW_vr(L).GT.ZERO)THEN
+        .AND. VLWatMicPM(NPH,L).GT.ZEROS2 &
+        .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
+        .AND. HydroCondMicP4RootUptake(L).GT.ZERO &
+        .AND. Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
+        .AND. Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
+        .AND. THETW_vr(L).GT.ZERO)THEN
         LayrHasRoot(N,L)=itrue
         !
         !     SOIL HYDRAULIC RESISTANCE FROM RADIAL UPTAKE GEOMETRY
@@ -1265,9 +1265,9 @@ module UptakesMod
     TKC                      => plt_ew%TKC,                        &
     TKS                      => plt_ew%TKS,                        &
     TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
-    WatByPCanopy_pft             => plt_ew%WatByPCanopy_pft,               &
+    WatByPCanopy_pft         => plt_ew%WatByPCanopy_pft,           &
     CanopyWater_pft          => plt_ew%CanopyWater_pft,            &
-    VHeatCapCanP_pft             => plt_ew%VHeatCapCanP_pft,               &
+    VHeatCapCanP_pft         => plt_ew%VHeatCapCanP_pft,           &
     HeatStorCanP             => plt_ew%HeatStorCanP,               &
     PrecIntcptByCanopy_pft   => plt_ew%PrecIntcptByCanopy_pft,     &
     Transpiration_pft        => plt_ew%Transpiration_pft,          &
@@ -1279,7 +1279,7 @@ module UptakesMod
     PSICanopy_pft            => plt_ew%PSICanopy_pft,              &
     RootNonstructElmConc_pvr => plt_biom%RootNonstructElmConc_pvr, &
     MY                       => plt_morph%MY,                      &
-    MaxSoiL4Root_pft             => plt_morph%MaxSoiL4Root_pft             &
+    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
   )
   !
   !     CANOPY SURFACE WATER STORAGE, SENSIBLE AND STORAGE HEAT FLUXES
@@ -1344,11 +1344,11 @@ module UptakesMod
     TempOffset_pft      => plt_pheno%TempOffset_pft,      &
     TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft,    &
     fTgrowRootP_vr      => plt_pheno%fTgrowRootP_vr,      &
-    TCGroth_pft                => plt_pheno%TCGroth_pft,                 &
-    TKGroth_pft                => plt_pheno%TKGroth_pft,                 &
+    TCGroth_pft         => plt_pheno%TCGroth_pft,         &
+    TKGroth_pft         => plt_pheno%TKGroth_pft,         &
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch, &
     fTCanopyGroth_pft   => plt_pheno%fTCanopyGroth_pft,   &
-    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft,        &
+    MaxSoiL4Root_pft    => plt_morph%MaxSoiL4Root_pft,    &
     MainBranchNum_pft   => plt_morph%MainBranchNum_pft    &
   )
   !

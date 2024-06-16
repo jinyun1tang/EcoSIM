@@ -986,7 +986,7 @@ module InitPlantMod
         plt_morph%Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)
         plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
         plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
-        plt_biom%Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
+        plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
       ENDDO D30
       IF(N.EQ.ipltroot)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
@@ -1018,7 +1018,7 @@ module InitPlantMod
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
     CNGR                      => plt_allom%CNGR,                      &
     CPGR                      => plt_allom%CPGR,                      &
-    Root1stElm_raxs           => plt_biom%Root1stElm_raxs,            &
+    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs,            &
     SeedCPlanted_pft          => plt_biom%SeedCPlanted_pft,           &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr,  &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,     &
@@ -1067,8 +1067,8 @@ module InitPlantMod
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  Root1stElm_raxs(ielmn,1,1,NZ)=CNGR(NZ)*Root1stElm_raxs(ielmc,1,1,NZ)
-  Root1stElm_raxs(ielmp,1,1,NZ)=CPGR(NZ)*Root1stElm_raxs(ielmc,1,1,NZ)
+  RootMyco1stElm_raxs(ielmn,1,1,NZ)=CNGR(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
+  RootMyco1stElm_raxs(ielmp,1,1,NZ)=CPGR(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)= &

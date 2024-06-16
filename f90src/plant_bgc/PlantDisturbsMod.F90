@@ -721,7 +721,7 @@ module PlantDisturbsMod
     PopuRootMycoC_pvr           => plt_biom% PopuRootMycoC_pvr,           &
     RootMycoActiveBiomC_pvr     => plt_biom%RootMycoActiveBiomC_pvr,      &
     RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr,    &
-    Root1stElm_raxs             => plt_biom%Root1stElm_raxs,              &
+    RootMyco1stElm_raxs             => plt_biom%RootMyco1stElm_raxs,              &
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft,        &
     RootMyco2ndStrutElms_rpvr   => plt_biom%RootMyco2ndStrutElms_rpvr,    &
     RootNodulNonstElms_pvr      => plt_biom%RootNodulNonstElms_pvr,       &
@@ -817,7 +817,7 @@ module PlantDisturbsMod
         DO NE=1,NumPlantChemElms
           RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
           RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
-          Root1stElm_raxs(NE,N,NR,NZ)=Root1stElm_raxs(NE,N,NR,NZ)*XHVST
+          RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)*XHVST
         ENDDO
         Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*XHVST
         Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*XHVST
@@ -826,10 +826,6 @@ module PlantDisturbsMod
 
       DO NE=1,NumPlantChemElms
         RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*XHVST
-        if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8)then
-        print*,'rmtilRootMycoNonstElms_rpvr(NE,N,L,NZ)',RootMycoNonstElms_rpvr(NE,N,L,NZ),XHVST,N
-        stop
-        endif
       ENDDO
       RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*XHVST
       PopuRootMycoC_pvr(N,L,NZ)= PopuRootMycoC_pvr(N,L,NZ)*XHVST
@@ -2431,17 +2427,9 @@ module PlantDisturbsMod
   XHVST1=1._r8-FracLeftThin
   D3385: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then     
-      print*,'bf myco',LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ),L
-      stop
-      endif
       FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
         +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-      if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then     
-      print*,'rootmyco',(1._r8-FFIRE(NE)),FrcLeafMassNotHarvst(NE),XHVST1,RootMycoNonstElms_rpvr(NE,N,L,NZ)      
-      stop
-      endif   
     ENDDO
 
     CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
@@ -2459,10 +2447,7 @@ module PlantDisturbsMod
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
           (1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-        if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then
-        print*,'xxrootrmval',LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ),(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-        stop
-        endif            
+       
       ENDDO
       CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
       CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
@@ -2478,10 +2463,7 @@ module PlantDisturbsMod
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
           +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-        if(LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)<0._r8)then
-        print*,'rootrmval',LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)
-        stop
-        endif  
+
       ENDDO
       CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
       CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
@@ -2524,7 +2506,7 @@ module PlantDisturbsMod
     k_woody_litr              => pltpar%k_woody_litr,                &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
-    Root1stElm_raxs           => plt_biom%Root1stElm_raxs,           &
+    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs,           &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
     Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
@@ -2568,7 +2550,7 @@ module PlantDisturbsMod
       DO NE=1,NumPlantChemElms
         RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
         RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
-        Root1stElm_raxs(NE,N,NR,NZ)=Root1stElm_raxs(NE,N,NR,NZ)*FracLeftThin
+        RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)*FracLeftThin
       ENDDO
       Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*FracLeftThin
       Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*FracLeftThin
@@ -2577,10 +2559,6 @@ module PlantDisturbsMod
 
     DO NE=1,NumPlantChemElms
       RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)*FracLeftThin
-      if(RootMycoNonstElms_rpvr(NE,N,L,NZ)<0._r8)then
-      print*,'RootMycoNonstElms_rpvr(NE,N,L,NZ)',RootMycoNonstElms_rpvr(NE,N,L,NZ),FracLeftThin,N
-      stop
-      endif
     ENDDO
     RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)*FracLeftThin
       PopuRootMycoC_pvr(N,L,NZ)= PopuRootMycoC_pvr(N,L,NZ)*FracLeftThin

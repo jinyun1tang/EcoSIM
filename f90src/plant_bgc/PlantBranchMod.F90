@@ -2918,22 +2918,13 @@ module PlantBranchMod
       DO NE=2,NumPlantChemElms
         RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) &
           +FXFN*NonstElm2RootMyco(NE)
-        if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
-        print*,'rootdevebranch',RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ), &
-          FXFN*NonstElm2RootMyco(NE)
-        stop            
-        endif
+
       ENDDO  
     ENDDO D51
   ELSE
     DO NE=2,NumPlantChemElms
       RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
-        RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)
-      if(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)<0._r8)then
-      print*,'rootdevebranch11',RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ),&
-        NonstElm2RootMyco(NE)
-      stop            
-      endif        
+        RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)   
     ENDDO            
   ENDIF
   end associate

@@ -780,7 +780,7 @@ module StartqMod
         Root2ndLen_pvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
         Root1stDepz_pft(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
-        Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
+        RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
 
       IF(N.EQ.1)THEN
@@ -844,8 +844,8 @@ module StartqMod
     CNGR(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
     CPGR(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  Root1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
-  Root1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &

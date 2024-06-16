@@ -329,7 +329,7 @@ module PlantNonstElmDynMod
     PopuRootMycoC_pvr                 => plt_biom% PopuRootMycoC_pvr,                 &
     FracShootLeafElmAlloc2Litr        => plt_allom%FracShootLeafElmAlloc2Litr,        &
     FracRootElmAlloc2Litr             => plt_allom%FracRootElmAlloc2Litr,             &
-    Root1stElm_raxs                   => plt_biom%Root1stElm_raxs,                    &
+    RootMyco1stElm_raxs                   => plt_biom%RootMyco1stElm_raxs,                    &
     RootMyco1stStrutElms_rpvr         => plt_biom%RootMyco1stStrutElms_rpvr,          &
     RootMycoNonstElms_rpvr            => plt_biom%RootMycoNonstElms_rpvr,             &
     LeafPetolBiomassC_brch            => plt_biom%LeafPetolBiomassC_brch,             &
@@ -377,7 +377,7 @@ module PlantNonstElmDynMod
 
     DO  NR=1,NumRootAxes_pft(NZ)
       RootMycoActiveBiomC_pvr(N,NIXBotRootLayer_rpft(NR,NZ),NZ)=RootMycoActiveBiomC_pvr(N,NIXBotRootLayer_rpft(NR,NZ),NZ)&
-        +Root1stElm_raxs(ielmc,N,NR,NZ)
+        +RootMyco1stElm_raxs(ielmc,N,NR,NZ)
     ENDDO
   ENDDO D5445
 
