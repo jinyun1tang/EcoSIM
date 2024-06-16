@@ -64,14 +64,14 @@ implicit none
 !     ROOT GROWTH
 !
 
-  call RootCheck(I,J,NZ)
+!  call RootCheck(I,J,NZ)
 
-!  PRINT*,'ROOTBGC',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)
+  PRINT*,'ROOTBGC'
   call SummarizeRootSink(I,J,NZ,RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
   call RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,&
       RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,fRootGrowPSISense_vr)
-!  PRINT*,'ROOTBchem',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)        
+  PRINT*,'ROOTBchem'
 !
 !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
 !     GERMINATION)
@@ -896,11 +896,12 @@ implicit none
 !   make sure current layer is no deeper than the lowest root layer
     IF(L.LE.NIXBotRootLayer_rpft(NR,NZ) .AND. NRX(N,NR).EQ.ifalse)THEN
 !
+     print*,'2ndroot'
      call Grow2ndRootAxes(I,J,L,NZ,N,NR,CNRTW,CPRTW,WFNR,WFNRG,DMRTD,fRootGrowPSISense,RootPrimeAxsNum,&
        TFN6_vr,RootSinkC_vr,Root2ndSink_pvr,litrflx2,RCO2flx2,Root2ndStrutRemob)
      TotRoot2ndLen=TotRoot2ndLen+Root2ndLen_pvr(N,L,NR,NZ)
      Root2ndC=Root2ndC+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
-
+     print*,'primroot',NR,L
 !
 !     PRIMARY ROOT EXTENSION
 !
@@ -1266,7 +1267,7 @@ implicit none
 !     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     Root2ndLen_pvr=secondary root length
-!
+      print*,'roothwithdra2nd'
       Root1stNetGrowthElms(:)=RootMycoNonst4Grow_Oltd(:)
 !      print*,'Root1stNetGrowthElms(:)',Root1stNetGrowthElms(:),Frac2Senes1
       if(Frac2Senes1>0._r8)then
@@ -1283,7 +1284,7 @@ implicit none
         call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflxt)
       ENDIF
 !      print*,'afdrwithdraw2ndroot',Root1stNetGrowthElms(:)
-!
+      print*,'rootext'
 !      print*,'primmRootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)',RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ),&
 !        RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
       call ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow_Oltd(ielmc),Root1stNetGrowthElms,&
@@ -1292,11 +1293,12 @@ implicit none
     ENDIF  
 
   !   call SumRootBiome(NZ,mass_finale)  
-!
-!    print*,'RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)',RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
+    print*,'primwithdraw'
+    print*,'RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)',RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ),&
+      L.EQ.NIXBotRootLayer_rpft(NR,NZ)
     if(RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)<0._r8)stop
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))THEN
-      !bottom root layer      
+      print*,'!bottom root layer'
       call WithdrawPrimeRoots(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr,Root1stSink_pvr &
         ,Root2ndSink_pvr,RootPrimeAxsNum)
     ENDIF
@@ -1304,12 +1306,14 @@ implicit none
 !     REMOVE ANY NEGATIVE ROOT MASS FROM NONSTRUCTURAL C
 !   what if nonstructural C is insufficient to meet the negative root mass
     IF(RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ).LT.0.0_r8)THEN
-!      print*,RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
+        print*,RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
         RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ) &
           +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
 
       RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)=0._r8
     ENDIF
+
+    print*,'backprim'
         if(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)<0._r8)then
         print*,'22growrootax',RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         stop
@@ -1849,11 +1853,13 @@ implicit none
   D5115: DO LL=L,NGTopRootLayer_pft(NZ)+1,-1
     RootDepzChk=Root1stDepz2Surf.LT.CumSoilThickness(LL-1) .OR. Root1stDepz2Surf.LT.SeedDepth_pft(NZ)
     IF(VLSoilPoreMicP_vr(LL-1).GT.ZEROS2 .AND. RootDepzChk)THEN
+      print*,'RootSinkC_vr(N,LL)',RootSinkC_vr(N,LL)
       IF(RootSinkC_vr(N,LL).GT.ZERO4Groth_pft(NZ))THEN
         FRTN=(Root1stSink_pvr(N,LL,NR)+Root2ndSink_pvr(N,LL,NR))/RootSinkC_vr(N,LL)
       ELSE
         FRTN=1.0_r8
       ENDIF
+      print*,'begd5110'
       D5110: DO NN=1,MY(NZ)
         Root1stLen_rpvr(NN,LL-1,NR,NZ)=Root1stLen_rpvr(NN,LL-1,NR,NZ)+Root1stLen_rpvr(NN,LL,NR,NZ)
         Root1stLen_rpvr(NN,LL,NR,NZ)=0._r8
@@ -1890,6 +1896,7 @@ implicit none
           trcs_rootml_pvr(NTG,NN,LL,NZ)=(1.0_r8-FRTN)*trcs_rootml_pvr(NTG,NN,LL,NZ)
         ENDDO
       ENDDO D5110
+      print*,'d5110'
 !
 !     RESET ROOT NUMBER AND PRIMARY ROOT LENGTH
 !

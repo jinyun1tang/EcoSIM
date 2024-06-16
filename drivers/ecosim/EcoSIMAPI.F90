@@ -311,7 +311,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
   call etimer%get_ymdhs(ymdhs)
 
-
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     if(lverb)WRITE(*,333)'STARTS'
     CALL STARTS(NHW,NHE,NVN,NVS)
