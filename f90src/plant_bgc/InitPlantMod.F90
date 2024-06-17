@@ -932,6 +932,12 @@ module InitPlantMod
   plt_rbgc%RootH2PO4Uptake_pft(NZ)=0._r8
   plt_rbgc%RootHPO4Uptake_pft(NZ)=0._r8
   plt_rbgc%RootN2Fix_pft(NZ)=0._r8
+  DO NR=1,MaxNumRootAxes
+    DO N=1,pltpar%jroots
+      plt_morph%Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)
+      plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8  
+    ENDDO
+  ENDDO      
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL
       plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0._r8
@@ -982,11 +988,9 @@ module InitPlantMod
       D30: DO NR=1,MaxNumRootAxes
         plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)=0._r8
         plt_morph%Root1stLen_rpvr(N,L,NR,NZ)=0._r8
-        plt_morph%Root2ndLen_pvr(N,L,NR,NZ)=0._r8
-        plt_morph%Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)
+        plt_morph%Root2ndLen_pvr(N,L,NR,NZ)=0._r8        
         plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
         plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)=0._r8
-        plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
       ENDDO D30
       IF(N.EQ.ipltroot)THEN
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs

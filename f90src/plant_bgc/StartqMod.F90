@@ -718,6 +718,13 @@ module StartqMod
   RootH2PO4Uptake_pft(NZ,NY,NX)=0._r8
   RootHPO4Uptake_pft(NZ,NY,NX)=0._r8
   RootN2Fix_pft(NZ,NY,NX)=0._r8
+
+  DO NR=1,MaxNumRootAxes
+    DO N=1,pltpar%jroots
+      Root1stDepz_pft(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
+      RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
+    ENDDO
+  ENDDO  
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
       AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
@@ -779,8 +786,6 @@ module StartqMod
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
         Root2ndLen_pvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
-        Root1stDepz_pft(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
-        RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
 
       IF(N.EQ.1)THEN
