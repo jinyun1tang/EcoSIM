@@ -191,7 +191,37 @@ if (ATS_ECOSIM)
     include_directories("${TPL_INSTALL_PREFIX}/include")
     #link_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib")
 
-    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -lm -lz -lzip -lxml2 -lcurl")
+    # Check for math library (libm)
+    find_library(M_LIBRARY m)
+    if (M_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${M_LIBRARY}")
+    endif()
+
+    # Check for zlib library
+    find_library(ZLIB_LIBRARY z)
+    if (ZLIB_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${ZLIB_LIBRARY}")
+    endif()
+
+    # Check for libzip library
+    find_library(ZIP_LIBRARY zip)
+    if (ZIP_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${ZIP_LIBRARY}")
+    endif()
+
+    # Check for libxml2 library
+    find_library(XML2_LIBRARY xml2)
+    if (XML2_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${XML2_LIBRARY}")
+    endif()
+
+    # Check for libcurl library
+    find_library(CURL_LIBRARY curl)
+    if (CURL_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${CURL_LIBRARY}")
+    endif()
+
+    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl")
 
 else()
     add_subdirectory(3rd-partylibs)
