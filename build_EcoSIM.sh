@@ -33,6 +33,12 @@ precision="double"
 prefix=""
 systype=""
 
+
+#Leave empty to just use the environment variable compiler
+CC=""
+CXX=""
+FC=""
+
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
 #be a directory up from the build dir hence setting
@@ -84,6 +90,21 @@ fi
 
 if [ $ATS_ECOSIM -eq 1 ]; then
     echo "Building ATS-EcoSIM"
+fi
+
+# Check if CC is set and not empty
+if [ -n "$CC" ]; then
+  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${CC}"
+fi
+
+# Check if CXX is set and not empty
+if [ -n "$CXX" ]; then
+  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${CXX}"
+fi
+
+# Check if FC is set and not empty
+if [ -n "$FC" ]; then
+  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${FC}"
 fi
 
 CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=$ATS_ECOSIM"
