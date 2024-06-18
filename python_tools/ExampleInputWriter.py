@@ -103,13 +103,13 @@ config_WarmTempOakTN_dict={
 
 config_SnodgrassTransect_dict={
 'case':'SnodgrassTransect',
-'mdir':'/Users/jinyuntang/work/ecosys_benchmark/Snodgrass_transect/',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/Snodgrass_transect/',
 'pftf':'pft_ert_p:pft_ert_g',
-'outdir':'/Users/jinyuntang/work/ecosim_benchmark/smallset/Snodgrass_transect/',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Snodgrass_transect/',    
 #'topf':'dlmtto',
 'ntopu':'6'
 }    
-case=4
+case=6
 
 if case==1:
     config_dict=config_Fen_StordIsland_dict
@@ -126,7 +126,7 @@ elif case==6:
 
 write_pft_mgmt(config_dict)
 
-
+quit()
 #write topgraphy and site data
 
 """
@@ -200,7 +200,7 @@ config_Fen_StordIsland_dict={
 'mdir':'/Users/jinyuntang/work/ecosys_benchmark/fenrun_shuai/',
 'sitef':'sdlsite',
 'topf':'sdltopo',
-'outdir':'/Users/jinyuntang/work/ecosim_benchmark/smallset/FenStordIsland/'        
+'outdir':'/Users/jinyuntang/work/ecosim_benchmark/smallset/FenStordIsland/',
 'ntopu':'1',
 'ncol':'1',
 'nrow':'1',

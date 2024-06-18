@@ -1,6 +1,7 @@
 module RootMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod  , only : safe_adb,AZMAX1,AZMIN1
+  use EcoSIMCtrlMod, only : lverb  
   use EcosimConst
   use GrosubPars
   use ElmIDMod
@@ -63,11 +64,12 @@ implicit none
   )
 !     ROOT GROWTH
 !
-
+  
 !  call RootCheck(I,J,NZ,'head')
-
+  if(lverb)write(*,*)'SummarizeRootSink'
   call SummarizeRootSink(I,J,NZ,RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
+  if(lverb)write(*,*)'RootBiochemistry'
   call RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,&
       RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,fRootGrowPSISense_vr)
  
@@ -206,7 +208,6 @@ implicit none
 !
 !     RESPIRATION AND GROWTH OF ROOT, MYCORRHIZAE IN EACH LAYER
 !
-!   call SumRootBiome(NZ,mass_inital)
 !  mass_inital(ielmc)=mass_inital(ielmc)+SeasonalNonstElms_pft(ielmc,NZ)
   litrflx=0._r8;RCO2flx=0._r8
   D5010: DO N=1,MY(NZ)
@@ -233,11 +234,11 @@ implicit none
         ELSE
           fRootGrowPSISense_vr(N,L)=EXP(0.10_r8*PSIRoot_pvr(N,L,NZ))
         ENDIF  
-
+        
         call GrowRootMycoAxes(I,J,N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&
           RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
           fRootGrowPSISense_vr(N,L),TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC,litrflxt,RCO2flxt)
-
+        
       !   call SumRootBiome(NZ,masst_finale)
         litrflx=litrflx+litrflxt
         RCO2flx=RCO2flx+RCO2flxt
@@ -1994,7 +1995,7 @@ implicit none
         RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+CUPRO
         RootCO2EmisPot_pvr(N,L,NZ)=RootCO2EmisPot_pvr(N,L,NZ)+CUPRC
 
-!        print*,'avoid negative C',RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RecoRootMycoC4Nup,N,L,NZ
+        if(abs(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))<1.e-10_r8)RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=0._r8
         if(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)<RecoRootMycoC4Nup)then
           rscal=RootMycoNonstElms_rpvr(ielmc,N,L,NZ)/RecoRootMycoC4Nup*0.99999_r8          
           do ntu=ids_nutb_beg+1,ids_nuts_end
