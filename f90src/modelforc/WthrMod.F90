@@ -226,18 +226,18 @@ module WthrMod
  !
       !     RADN=SW radiation at horizontal surface,MJ/m2/hour
       !     TCA,TairK=air temperature (oC,K)
-      !     VPK,VPS=ambient,saturated vapor pressure
-      !     UA=wind speed
+      !     VPK,VPS=ambient,saturated vapor pressure, KPa
+      !     UA=wind speed,  m/hr
       !     TSNOW=temperature below which precipitation is snow (oC)
-      !     PrecAsRain,PrecAsSnow=rainfall,snowfall
+      !     PrecAsRain,PrecAsSnow=rainfall,snowfall, m H2O /m2 /hr
 !
       RADN(NY,NX)=SWRad_hrly(J,I)  
       TCA(NY,NX)=TMP_hrly(J,I)
 
       TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
-      !elevation corrected saturated air vapor pressure
+      !elevation corrected saturated air vapor pressure, KPa
       VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
-      VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
+      VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))   
       WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
 
       !snowfall is determined by air tempeature
@@ -363,8 +363,8 @@ module WthrMod
       !     TairK=AIR TEMPERATURE (K)
       !     VPK=VAPOR PRESSURE (KPA)
       !     UA=WINDSPEED (M H-1)
-      !     PrecAsRain(NY,NX)=RAIN (M H-1)
-      !     PrecAsSnow(NY,NX)=SNOW (M H-1)
+      !     PrecAsRain(NY,NX)=RAIN (M H2O H-1 m-2)
+      !     PrecAsSnow(NY,NX)=SNOW (M H2O H-1 m-2)
       !     SineSunInclAngle_col=SOLAR ANGLE CURRENT HOUR (SINE)
       !     SineSunInclAnglNxtHour_col=SOLAR ANGLE NEXT HOUR (SINE)
       !     ENDIF
@@ -545,12 +545,12 @@ module WthrMod
     DO  NY=NVN,NVS
       IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RadSWDirect_col(NY,NX) &
         *SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
-      TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))
-      TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))
-      HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))
-      HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))
-      TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)
-      VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TairK(NY,NX)
+      TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))          !celcius
+      TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))          !celcius
+      HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))          !maximum humidity, vapor pressure, KPa
+      HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))          !minimum humidity, vapor pressure, KPa
+      TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)      !wind speed, m/hr
+      VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TairK(NY,NX)    !atmospheric vapor concentration, [m3 m-3], 2.173E-03_r8=18g/mol/(8.3142)
 !      PrecDaily_col(NY,NX)=PrecDaily_col(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
 !        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
 !
@@ -568,6 +568,10 @@ module WthrMod
       IrrigSurface_col(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       IrrigSubsurf_col(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PrecRainAndSurfirrig(NY,NX)=RainFalPrec(NY,NX)+IrrigSurface_col(NY,NX)
+      if(abs(PrecRainAndSurfirrig(NY,NX))>1.e20)then
+      print*,'PrecRainAndSurfirrig',i,J,PrecRainAndSurfirrig(NY,NX)
+      stop
+      endif
       PrecAtm_col(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
       LWRadSky(NY,NX)=SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 !      if(I<=1 .or. I>=365)print*,'SummaryClimateForc',SkyLonwRad_col(NY,NX)

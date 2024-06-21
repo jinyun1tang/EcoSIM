@@ -113,7 +113,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)                      !leaf growth stage counter, [-]
   real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)                        !rate of leaf initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  rLen2WidthLeaf(:,:,:)                        !leaf length:width ratio, [-]
-  real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
+  real(r8),target,allocatable ::  SLA1_pft(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
@@ -273,7 +273,7 @@ contains
   allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
   allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
   allocate(rLen2WidthLeaf(JP,JY,JX));     rLen2WidthLeaf=0._r8
-  allocate(SLA1(JP,JY,JX));     SLA1=0._r8
+  allocate(SLA1_pft(JP,JY,JX));     SLA1_pft=0._r8
   allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
   allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
   allocate(HourReq4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
@@ -430,7 +430,7 @@ contains
   call destroy(KHiestGroLeafNode_brch)
   call destroy(RefLeafAppearRate_pft)
   call destroy(rLen2WidthLeaf)
-  call destroy(SLA1)
+  call destroy(SLA1_pft)
   call destroy(TC4LeafOut_pft)
   call destroy(PetoLen2Mass_pft)
   call destroy(HourReq4LeafOut_brch)

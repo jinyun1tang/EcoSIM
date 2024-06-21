@@ -108,7 +108,7 @@ contains
 
       call PartionSurfaceFraction(NY,NX)
 
-      call PartitionPrecip(NY,NX)
+      call PartitionPrecip(I,J,NY,NX)
 
       call SurfaceRadiation(I,J,NY,NX)
 
@@ -320,7 +320,7 @@ contains
     !if there is plant
     BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(CanopyHeight_col(NY,NX)*EXP(ALFZ) &
       /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/CanopyHeight_col(NY,NX)) &
-      -EXP(-ALFZ*(ZERO4PlantDisplace_col(NY,NX)+RoughHeight(NY,NX))/CanopyHeight_col(NY,NX)))))
+      -EXP(-ALFZ*(ZERO4PlantDisplace_col(NY,NX)+RoughHeight_col(NY,NX))/CanopyHeight_col(NY,NX)))))
     WindSpeedGrnd=WindSpeedAtm(NY,NX)*EXP(-ALFZ)
   ELSE
     BndlResistCanG(NY,NX)=0.0_r8
@@ -1391,9 +1391,9 @@ contains
   end subroutine SurfaceRunoff
 !------------------------------------------------------------------------------------------
 
-  subroutine PartitionPrecip(NY,NX)
+  subroutine PartitionPrecip(I,J,NY,NX)
   implicit none
-  integer, intent(in) :: NY,NX
+  integer, intent(in) :: I,J,NY,NX
 
   real(r8) :: SnoFall,HeatByPrec
   real(r8) :: PrecThrufall2SoiMicP,PrecThrufall2SoiMacP,Rain4ToSno

@@ -302,34 +302,34 @@ module PlantBranchMod
   real(r8) :: CCE
   integer  :: NE
   
-  associate(                                                              &
-    StalkStrutElms_brch          =>  plt_biom%StalkStrutElms_brch       , &
-    StalkRsrvElms_brch           =>  plt_biom%StalkRsrvElms_brch        , &
-    HuskStrutElms_brch           =>  plt_biom%HuskStrutElms_brch        , &
-    EarStrutElms_brch            =>  plt_biom%EarStrutElms_brch         , &
-    PetoleStrutElms_brch         =>  plt_biom%PetoleStrutElms_brch      , &
-    LeafStrutElms_brch           =>  plt_biom%LeafStrutElms_brch        , &  
-    LeafPetoNonstElmConc_brch    =>  plt_biom%LeafPetoNonstElmConc_brch , &    
-    LeafBiomGrowthYield          =>  plt_allom%LeafBiomGrowthYield      , &
-    PetioleBiomGrowthYield       =>  plt_allom%PetioleBiomGrowthYield   , &
-    EarBiomGrowthYield           =>  plt_allom%EarBiomGrowthYield       , &
-    rNCEar_pft                   =>  plt_allom%rNCEar_pft               , &
-    rPCReserve_pft               =>  plt_allom%rPCReserve_pft           , &
-    rPCHusk_pft                  =>  plt_allom%rPCHusk_pft              , &
-    rPCStalk_pft                 =>  plt_allom%rPCStalk_pft             , &
-    rNCStalk_pft                 =>  plt_allom%rNCStalk_pft             , &
-    StalkBiomGrowthYield         =>  plt_allom%StalkBiomGrowthYield     , &
-    HuskBiomGrowthYield          =>  plt_allom%HuskBiomGrowthYield      , &
-    rNCHusk_pft                  =>  plt_allom%rNCHusk_pft              , &
-    rPCEar_pft                   =>  plt_allom%rPCEar_pft               , &
-    ReserveBiomGrowthYield       =>  plt_allom%ReserveBiomGrowthYield   , &
-    GrainBiomGrowthYield         =>  plt_allom%GrainBiomGrowthYield     , &
-    rCNNonstRemob_pft        =>  plt_allom%rCNNonstRemob_pft    , &
-    rCPNonstRemob_pft        =>  plt_allom%rCPNonstRemob_pft    , &
-    SeedDepth_pft                =>  plt_morph%SeedDepth_pft            , &    
-    HypoctoHeight_pft            =>  plt_morph%HypoctoHeight_pft        , &    
-    MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft        , &    
-    rNCReserve_pft               =>  plt_allom%rNCReserve_pft             &
+  associate(                                                         &
+    StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch,       &
+    StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch,        &
+    HuskStrutElms_brch        => plt_biom%HuskStrutElms_brch,        &
+    EarStrutElms_brch         => plt_biom%EarStrutElms_brch,         &
+    PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch,      &
+    LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch,        &
+    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch, &
+    LeafBiomGrowthYield       => plt_allom%LeafBiomGrowthYield,      &
+    PetioleBiomGrowthYield    => plt_allom%PetioleBiomGrowthYield,   &
+    EarBiomGrowthYield        => plt_allom%EarBiomGrowthYield,       &
+    rNCEar_pft                => plt_allom%rNCEar_pft,               &
+    rPCReserve_pft            => plt_allom%rPCReserve_pft,           &
+    rPCHusk_pft               => plt_allom%rPCHusk_pft,              &
+    rPCStalk_pft              => plt_allom%rPCStalk_pft,             &
+    rNCStalk_pft              => plt_allom%rNCStalk_pft,             &
+    StalkBiomGrowthYield      => plt_allom%StalkBiomGrowthYield,     &
+    HuskBiomGrowthYield       => plt_allom%HuskBiomGrowthYield,      &
+    rNCHusk_pft               => plt_allom%rNCHusk_pft,              &
+    rPCEar_pft                => plt_allom%rPCEar_pft,               &
+    ReserveBiomGrowthYield    => plt_allom%ReserveBiomGrowthYield,   &
+    GrainBiomGrowthYield      => plt_allom%GrainBiomGrowthYield,     &
+    rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft,        &
+    rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft,        &
+    SeedDepth_pft             => plt_morph%SeedDepth_pft,            &
+    HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft,        &
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft,        &
+    rNCReserve_pft            => plt_allom%rNCReserve_pft            &
   )
 !
 !   C,N,P GROWTH OF LEAF, SHEATH OR PETIOLE, STALK,
@@ -1619,7 +1619,7 @@ module PlantBranchMod
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,          &
     StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,          &
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,         &
-    PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch,    &
+    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,     &
     FracGroth2Node_pft          => plt_allom%FracGroth2Node_pft,         &
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,      &
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft,    &
@@ -1653,8 +1653,7 @@ module PlantBranchMod
 !
   KLowestGroLeafNode_brch(NB,NZ)=0
 
-  IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. &
-    LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
+  IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
     LeafLength=SQRT(1.0E+02_r8*LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
     HypoctoHeight_pft(NZ)=LeafLength+PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ) &
       +LiveInterNodeHight_brch(0,MainBranchNum_pft(NZ),NZ)
@@ -2200,7 +2199,7 @@ module PlantBranchMod
     FracBiomHarvsted                  => plt_distb%FracBiomHarvsted,                  &
     iYearPlantHarvest_pft             => plt_distb%iYearPlantHarvest_pft,             &
     THIN_pft                          => plt_distb%THIN_pft,                          &
-    CutHeightORFrac_pft            => plt_distb%CutHeightORFrac_pft,            &
+    CutHeightORFrac_pft               => plt_distb%CutHeightORFrac_pft,               &
     iHarvstType_pft                   => plt_distb%iHarvstType_pft,                   &
     jHarvst_pft                       => plt_distb%jHarvst_pft,                       &
     iDayPlanting_pft                  => plt_distb%iDayPlanting_pft,                  &
@@ -2215,7 +2214,7 @@ module PlantBranchMod
     PetoleStrutElms_brch              => plt_biom%PetoleStrutElms_brch,               &
     EarStrutElms_brch                 => plt_biom%EarStrutElms_brch,                  &
     LeafProteinCNode_brch             => plt_biom%LeafProteinCNode_brch,              &
-    PetoleProteinCNode_brch          => plt_biom%PetoleProteinCNode_brch,           &
+    PetoleProteinCNode_brch           => plt_biom%PetoleProteinCNode_brch,            &
     HuskStrutElms_brch                => plt_biom%HuskStrutElms_brch,                 &
     PetioleElmntNode_brch             => plt_biom%PetioleElmntNode_brch,              &
     LeafStrutElms_brch                => plt_biom%LeafStrutElms_brch,                 &
@@ -2244,7 +2243,7 @@ module PlantBranchMod
     Prep4Literfall_brch               => plt_pheno%Prep4Literfall_brch,               &
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch,                &
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft,                   &
-    HoursTooLowPsiCan_pft          => plt_pheno%HoursTooLowPsiCan_pft,          &
+    HoursTooLowPsiCan_pft             => plt_pheno%HoursTooLowPsiCan_pft,             &
     Hours4LiterfalAftMature_brch      => plt_pheno%Hours4LiterfalAftMature_brch,      &
     KHiestGroLeafNode_brch            => plt_pheno%KHiestGroLeafNode_brch,            &
     ElmAllocmat4Litr                  => plt_soilchem%ElmAllocmat4Litr,               &
@@ -3312,16 +3311,16 @@ module PlantBranchMod
   REAL(R8) :: GrowthChemElmt(NumPlantChemElms)
 
   associate(                                                    &
-    NumCogrothNode_pft          => plt_morph%NumCogrothNode_pft,          &
+    NumCogrothNode_pft     => plt_morph%NumCogrothNode_pft,     &
     LeafAreaNode_brch      => plt_morph%LeafAreaNode_brch,      &
     LeafAreaLive_brch      => plt_morph%LeafAreaLive_brch,      &
-    SLA1                   => plt_morph%SLA1,                   &
+    SLA1_pft               => plt_morph%SLA1_pft,               &
     LeafElmntNode_brch     => plt_biom%LeafElmntNode_brch,      &
     LeafProteinCNode_brch  => plt_biom%LeafProteinCNode_brch,   &
     KHiestGroLeafNode_brch => plt_pheno%KHiestGroLeafNode_brch, &
-    ZERO4LeafVar_pft                  => plt_biom%ZERO4LeafVar_pft,                   &
-    rCNNonstRemob_pft  => plt_allom%rCNNonstRemob_pft,  &
-    rCPNonstRemob_pft  => plt_allom%rCPNonstRemob_pft,  &
+    ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft,        &
+    rCNNonstRemob_pft      => plt_allom%rCNNonstRemob_pft,      &
+    rCPNonstRemob_pft      => plt_allom%rCPNonstRemob_pft,      &
     FracGroth2Node_pft     => plt_allom%FracGroth2Node_pft,     &
     PlantPopulation_pft    => plt_site%PlantPopulation_pft      &
   )
@@ -3358,7 +3357,7 @@ module PlantBranchMod
 !
 !         SpecAreaLeafGrowth=specific area of leaf growth
 !         ETOL=coefficient for etoliation effects on expansion,extension
-!         SLA1=growth in leaf area vs mass from PFT file
+!         SLA1_pft=growth in leaf area vs mass from PFT file
 !         SLA2=parameter for calculating leaf area expansion
 !         WGLF=leaf C mass
 !         PP=PFT population
@@ -3367,7 +3366,7 @@ module PlantBranchMod
 !         LeafAreaGrowth,GRO=leaf area,mass growth
 !         LeafAreaLive_brch,LeafAreaNode_brch=branch,node leaf area
 !
-      SpecAreaLeafGrowth=EtoliationCoeff*SLA1(NZ)*(AMAX1(ZERO4LeafVar_pft(NZ) &
+      SpecAreaLeafGrowth=EtoliationCoeff*SLA1_pft(NZ)*(AMAX1(ZERO4LeafVar_pft(NZ) &
         ,LeafElmntNode_brch(ielmc,K,NB,NZ))/(PlantPopulation_pft(NZ)*GrowthSLA))**SLA2*WFNS
       LeafAreaGrowth=GrowthChemElmt(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth

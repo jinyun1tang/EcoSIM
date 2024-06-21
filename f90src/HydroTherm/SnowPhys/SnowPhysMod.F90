@@ -849,7 +849,10 @@ contains
     TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK(NY,NX))  
   endif
 !  if(I>=138.and.I<=139)print*,'SnofallRain',SnofallRain,Rainfall,EVAPW2
-  if(abs(SnofallRain)>1.e10)call endrun(trim(mod_filename)//' at line',__LINE__)   
+  if(abs(SnofallRain)>1.e10)then
+  print*,'SnofallRain',SnofallRain,Rainfall,EVAPW2
+  call endrun(trim(mod_filename)//' at line',__LINE__)   
+  endif
   LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadSno1
 !     IF(NX.EQ.3.AND.NY.EQ.3)THEN
 !     WRITE(*,7759)'EVAP',I,J,M,MM,SnofallDry

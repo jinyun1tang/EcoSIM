@@ -583,7 +583,7 @@ module StartsMod
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
 ! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
-! ASP=aspect angle in degree
+! ASP_col=aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
     'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
@@ -593,39 +593,39 @@ module StartsMod
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GroundSurfAzimuth_col(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
+      GroundSurfAzimuth_col(NY,NX)=ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)=ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)=ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
 
-      IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
+      IF(ASP_col(NY,NX).GE.0.0_r8.AND.ASP_col(NY,NX).LT.90.0_r8)THEN
       ! along the northeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to south (thus -)
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to east
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP_col(NY,NX)*RadianPerDegree)    !to south (thus -)
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP_col(NY,NX)*RadianPerDegree)     !to east
         XGridRunoffFlag(1,1,NY,NX)=.true.    !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.false.
         XGridRunoffFlag(2,2,NY,NX)=.true.    !north
-      ELSEIF(ASP(NY,NX).GE.90.0_r8.AND.ASP(NY,NX).LT.180.0_r8)THEN
+      ELSEIF(ASP_col(NY,NX).GE.90.0_r8.AND.ASP_col(NY,NX).LT.180.0_r8)THEN
       ! along the southeast
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
         XGridRunoffFlag(1,1,NY,NX)=.false.
         XGridRunoffFlag(2,1,NY,NX)=.true.   !west to east
         XGridRunoffFlag(1,2,NY,NX)=.false.
         XGridRunoffFlag(2,2,NY,NX)=.true.   !north to south
-      ELSEIF(ASP(NY,NX).GE.180.0_r8.AND.ASP(NY,NX).LT.270.0_r8)THEN
+      ELSEIF(ASP_col(NY,NX).GE.180.0_r8.AND.ASP_col(NY,NX).LT.270.0_r8)THEN
       !along the southwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.false.
         XGridRunoffFlag(2,1,NY,NX)=.true.  !west
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
         XGridRunoffFlag(2,2,NY,NX)=.false.
-      ELSEIF(ASP(NY,NX).GE.270.0_r8.AND.ASP(NY,NX).LE.360.0_r8)THEN
+      ELSEIF(ASP_col(NY,NX).GE.270.0_r8.AND.ASP_col(NY,NX).LE.360.0_r8)THEN
       ! along the northwest
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.true.  !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
@@ -687,7 +687,7 @@ module StartsMod
         ALTY=MAX(ALTY,ALT(NY,NX))
       ENDIF
       WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
-        ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX) &
+        ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL(NY,NX) &
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)

@@ -164,9 +164,9 @@ implicit none
     call restartvar(ncid, flag, varname='RoughHeight', dim1name='column',&
        long_name='Roughness height', units='m', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
   else     
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight,datrc_1d)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
     datpr1 => datrc_1d
     call restartvar(ncid, flag, varname='RoughHeight', dim1name='column',&
        long_name='Roughness height', units='m', interpinic_flag='skip', &

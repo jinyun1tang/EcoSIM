@@ -660,7 +660,7 @@ implicit none
   plt_site%SolarNoonHour_col=SolarNoonHour_col(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
-  plt_ew%RoughHeight=RoughHeight(NY,NX)
+  plt_ew%RoughHeight=RoughHeight_col(NY,NX)
   plt_morph%CanopyHeight_col=CanopyHeight_col(NY,NX)
   plt_ew%ZERO4PlantDisplace_col=ZERO4PlantDisplace_col(NY,NX)
   plt_distb%DCORP=DCORP(I,NY,NX)
@@ -782,7 +782,7 @@ implicit none
     plt_morph%ShootNodeNumAtPlanting_pft(NZ)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     plt_pheno%CriticPhotoPeriod_pft(NZ)=CriticPhotoPeriod_pft(NZ,NY,NX)
     plt_pheno%PhotoPeriodSens_pft(NZ)=PhotoPeriodSens_pft(NZ,NY,NX)
-    plt_morph%SLA1(NZ)=SLA1(NZ,NY,NX)
+    plt_morph%SLA1_pft(NZ)=SLA1_pft(NZ,NY,NX)
     plt_morph%PetoLen2Mass_pft(NZ)=PetoLen2Mass_pft(NZ,NY,NX)
     plt_morph%NodeLenPergC(NZ)=NodeLenPergC(NZ,NY,NX)
     DO  N=1,NumOfLeafZenithSectors
@@ -1555,7 +1555,7 @@ implicit none
   integer :: N,M,NN,L,NZ,K,NB
 
   ZERO4PlantDisplace_col(NY,NX)=plt_ew%ZERO4PlantDisplace_col
-  RoughHeight(NY,NX)=plt_ew%RoughHeight
+  RoughHeight_col(NY,NX)=plt_ew%RoughHeight
   BndlResistAboveCanG(NY,NX)=plt_ew%BndlResistAboveCanG
   RIB(NY,NX)=plt_ew%RIB
   CanopyHeight_col(NY,NX)=plt_morph%CanopyHeight_col

@@ -255,7 +255,7 @@ implicit none
   real(r8), pointer :: CanopyStemAareZ_col(:)        => null() !total stem area, [m2 d-2]
   real(r8), pointer :: PetoLen2Mass_pft(:)         => null() !petiole length:mass during growth, [m gC-1]
   real(r8), pointer :: NodeLenPergC(:)         => null() !internode length:mass during growth, [m gC-1]
-  real(r8), pointer :: SLA1(:)         => null() !leaf area:mass during growth, [m2 gC-1]
+  real(r8), pointer :: SLA1_pft(:)         => null() !leaf area:mass during growth, [m2 gC-1]
   real(r8), pointer :: CanopyLeafAareZ_col(:)        => null() !total leaf area, [m2 d-2]
   real(r8), pointer :: LeafStalkArea_pft(:)        => null() !plant leaf+stem/stalk area, [m2 d-2]
   real(r8), pointer :: InternodeHeightDying_brch(:,:,:)   => null() !internode height, [m]
@@ -1867,7 +1867,7 @@ implicit none
   allocate(this%CanopyStemAareZ_col(NumOfCanopyLayers1));this%CanopyStemAareZ_col=spval
   allocate(this%PetoLen2Mass_pft(JP1));this%PetoLen2Mass_pft=spval
   allocate(this%NodeLenPergC(JP1));this%NodeLenPergC=spval
-  allocate(this%SLA1(JP1));this%SLA1=spval
+  allocate(this%SLA1_pft(JP1));this%SLA1_pft=spval
   allocate(this%CanopyLeafAareZ_col(NumOfCanopyLayers1));this%CanopyLeafAareZ_col=spval
   allocate(this%LeafStalkArea_pft(JP1));this%LeafStalkArea_pft=spval
   allocate(this%InternodeHeightDying_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%InternodeHeightDying_brch=spval

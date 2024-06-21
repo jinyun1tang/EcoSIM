@@ -54,7 +54,7 @@ implicit none
     AREA(3,2,NY,NX)=a_AREA3(0,NY)
 
 
-    ASP(NY,NX)=a_ASP(NY)
+    ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
     !CH4E(NY,NX)=atm_ch4

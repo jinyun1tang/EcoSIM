@@ -386,7 +386,7 @@ module readiMod
 !
 !     SURFACE SLOPES AND ASPECTS
 !
-        ASP(NY,NX)=ASPX
+        ASP_col(NY,NX)=ASPX
         SL(NY,NX)=SL0
         SnowDepth(NY,NX)=initSnowDepth
 !
@@ -394,8 +394,8 @@ module readiMod
 !
 !     what is geometric format mean? geographic format 0 is north, 90 east, 180 south,
 !     geometric format 0/360 is east, counting as counterclock wise
-        ASP(NY,NX)=450.0_r8-ASP(NY,NX)
-        IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
+        ASP_col(NY,NX)=450.0_r8-ASP_col(NY,NX)
+        IF(ASP_col(NY,NX).GE.360.0_r8)ASP_col(NY,NX)=ASP_col(NY,NX)-360.0_r8
       ENDDO
     ENDDO
 
@@ -799,7 +799,7 @@ module readiMod
   write(*,*)'Topographic characterization'
   write(*,'(40A)')('-',ll=1,40)
   write(*,*)'NY, NX =',NY,NX
-  write(*,*)'Aspect (o): ASPX',ASP(NY,NX)
+  write(*,*)'Aspect (o): ASPX',ASP_col(NY,NX)
   write(*,*)'Slope (o): SL0',SL(NY,NX)
   write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
