@@ -233,7 +233,7 @@ module VisualMod
           OUT(39)=-1000.0*ETCanopy_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(40)=-1000.0*ETCanopy_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(41)=-1000.0*ETCanopy_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(42)=1000.0*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(42)=1000.0*UEVAP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*URUN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*AnualH2OLoss_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

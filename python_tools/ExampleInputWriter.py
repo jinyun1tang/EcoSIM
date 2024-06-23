@@ -109,7 +109,16 @@ config_SnodgrassTransect_dict={
 #'topf':'dlmtto',
 'ntopu':'6'
 }    
-case=6
+
+
+config_Blodget_dict={
+'case':'Blodget',
+'mdir':'/Users/jinyuntang/work/github/Blodget/',
+'pftf':'pftUS_Blo_p_2:pftUS_Blo_g_2',
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Blodget/',    
+'ntopu':'1'
+}    
+case=7
 
 if case==1:
     config_dict=config_Fen_StordIsland_dict
@@ -123,10 +132,11 @@ elif case==5:
     config_dict=config_MeditPastureCA_dict
 elif case==6:
     config_dict=config_SnodgrassTransect_dict
-
+elif case==7:
+    config_dict=config_Blodget_dict
+    
 write_pft_mgmt(config_dict)
 
-quit()
 #write topgraphy and site data
 
 """
@@ -285,6 +295,20 @@ config_SnodgrassTransect_dict={
 'NVS':'1'
 }
 
+config_Blodget_dict={
+'case':'Blodget',
+'mdir':'/Users/jinyuntang/work/github/Blodget/',
+'sitef':'st_1980',
+'topf':'tpUS_Blo2',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Blodget/',    
+'ntopu':'1',
+'ncol':'1',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
+}
 
 from SiteTopoWriter import write_site_topo_data
 
@@ -300,4 +324,6 @@ elif case==5:
     config_dict=config_MeditPastureCA_dict
 elif case==6:
     config_dict=config_SnodgrassTransect_dict
+elif case==7:
+    config_dict=config_Blodget_dict
 write_site_topo_data(config_dict)

@@ -778,7 +778,7 @@ contains
   !     CdSnoEvap,CdSnoHSens=conductance for snowpack latent,sensible heat fluxes
   !     PAREW,PARSW=conductances for latent,sensible heat fluxes
   !     RZ=surface resistance
-  !     VPSno0,VPQ=vapor pressure at snowpack surface, canopy air
+  !     VPSno0,VPQ_col=vapor pressure at snowpack surface, canopy air
   !     MaxVapXAir2Sno,EVAPW2,EvapSublimation2=evaporation total, water,snow
   !     XNPS=1/NPS
   !     LatentHeatAir2Sno2=latent heat flux
@@ -789,11 +789,11 @@ contains
   CdSnoHSens=PARSW(NY,NX)/RAa    
   VPSno0=vapsat(TKSnow1(1,NY,NX))
 
-  MaxVapXAir2Sno=CdSnoEvap*(VPQ(NY,NX)-VPSno0)  
+  MaxVapXAir2Sno=CdSnoEvap*(VPQ_col(NY,NX)-VPSno0)  
   !first the loss is evaporation from snow held water
   EVAPW2=AMAX1(MaxVapXAir2Sno,-AZMAX1(VLWatSnow0M(1,NY,NX)*dts_sno))    
 !  if(I>=138.and.I<=139)print*,'EVAPW2',M,MaxVapXAir2Sno,VLWatSnow0M(1,NY,NX),&
-!    CdSnoEvap,VPQ(NY,NX),VPSno0,TKSnow1(1,NY,NX),TKSnow0(1,NY,NX),TKSnow(1,NY,NX)  
+!    CdSnoEvap,VPQ_col(NY,NX),VPSno0,TKSnow1(1,NY,NX),TKSnow0(1,NY,NX),TKSnow(1,NY,NX)  
   if(abs(EVAPW2)>1.e10)call endrun(trim(mod_filename)//' at line',__LINE__)   
   !then the loss is sublimation from dry snow
   EVAPX2=AZMIN1(MaxVapXAir2Sno-EVAPW2)
@@ -858,7 +858,7 @@ contains
 !     WRITE(*,7759)'EVAP',I,J,M,MM,SnofallDry
 !    2,SnoFall,EvapSublimation2,SnofallRain,Rainfall
 !    3,FracSurfAsSnow(NY,NX),Snofallice,IceFall,RadNet2Sno2,LatentHeatAir2Sno2
-!    4,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,RA,MaxVapXAir2Sno,EVAPX2,VPQ(NY,NX),VPSno0
+!    4,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,RA,MaxVapXAir2Sno,EVAPX2,VPQ_col(NY,NX),VPSno0
 !    5,VLWatSnow0M(1,NY,NX),VLDrySnoWE0M(1,NY,NX),VLIceSnow0M(1,NY,NX)
 !    6,HeatX2SnoLay(1,NY,NX),NetHeatAir2Snow,HWFLQ02,HeatNetFlx2Sno2,RadNet2Sno2,LatentHeatAir2Sno2
 !    7,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,TKSnow1(1,NY,NX),TKQ(NY,NX)

@@ -256,6 +256,7 @@ implicit none
               IF(IMO.EQ.1)then
                 IDY=IDX
               else
+                print*,tstr,IMO
                 IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
               endif
 

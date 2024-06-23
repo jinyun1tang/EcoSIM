@@ -283,8 +283,8 @@ module MicBGCMod
     k_humus                   => micpar%k_humus,                   &
     k_POM                     => micpar%k_POM,                     &
     is_activeMicrbFungrpAutor => micpar%is_activeMicrbFungrpAutor, &
-    mid_Facult_DenitBacter         => micpar%mid_Facult_DenitBacter,         &
-    mid_AmmoniaOxidBacter         => micpar%mid_AmmoniaOxidBacter,         &
+    mid_Facult_DenitBacter    => micpar%mid_Facult_DenitBacter,    &
+    mid_AmmoniaOxidBacter     => micpar%mid_AmmoniaOxidBacter,     &
     litrm                     => micfor%litrm,                     &
     VWatLitRHoldCapcity       => micfor%VWatLitRHoldCapcity,       &
     VLWatMicP                 => micfor%VLWatMicP,                 &

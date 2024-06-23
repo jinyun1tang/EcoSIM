@@ -362,7 +362,7 @@ implicit none
 ! TKW,TCSnow=snowpack layer temperature K,oC
 ! CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
 ! XPhaseChangeHeatL=latent heat flux from freeze-thaw from watsub.f
-! HEATIN=cumulative net surface heat transfer
+! HEATIN_lnd=cumulative net surface heat transfer
 ! VOLSS,VOLWS,VOLIS=total snow water equivalent, water, ice content of snowpack
 ! VOLS,SnowDepth=total snowpack volume, depth
 !
@@ -412,7 +412,7 @@ implicit none
         TKSnow(L,NY,NX)=TKSnow(L-1,NY,NX)
       ENDIF
       IF(VHCPWZ(L,NY,NX).GT.ZEROS(NY,NX))THEN
-        HEATIN=HEATIN+(TKSnow(L,NY,NX)-TKWX)*VLHeatCapSnow_col(L,NY,NX)
+        HEATIN_lnd=HEATIN_lnd+(TKSnow(L,NY,NX)-TKWX)*VLHeatCapSnow_col(L,NY,NX)
       ENDIF
     ENDIF
   ELSE

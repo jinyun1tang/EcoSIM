@@ -45,7 +45,7 @@ module ExecMod
 !      padr('CRUN',10),padr('CEVAP',10),padr('VOLWOU',10)/), &
 !      (/WaterStoreLandscape,CRAIN,CRUN,CEVAP,VOLWOU/))
 !    endif
-    TLH=HeatStoreLandscape-HEATIN+HEATOU
+    TLH=HeatStoreLandscape-HEATIN_lnd+HEATOU
     TLO=OXYGSO-OXYGIN+OXYGOU
     TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)
     TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn)-TORGN-Litrfall_lnds(ielmn)
@@ -57,7 +57,7 @@ module ExecMod
 !
   IF(etimer%its_time_to_diag())THEN
     DIFFQ=(WaterStoreLandscape-CRAIN+CRUN+CEVAP+VOLWOU-TLW)/TAREA
-    DIFFH=(HeatStoreLandscape-HEATIN+HEATOU-TLH)/TAREA
+    DIFFH=(HeatStoreLandscape-HEATIN_lnd+HEATOU-TLH)/TAREA
     DIFFO=(OXYGSO-OXYGIN+OXYGOU-TLO)/TAREA
     DIFFC=(LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-CO2GIN+TOMOU(ielmc)-TORGF-Litrfall_lnds(ielmc)-TLC)/TAREA
     DIFFN=(LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-ZN2GIN-TZIN+TOMOU(ielmn) &
@@ -107,7 +107,7 @@ module ExecMod
     IF(ABS(DIFFH).GT.ppmc)THEN
       WRITE(18,195)I,iYearCurrent
 195   FORMAT('THERMAL BALANCE LOST ON DAY, YEAR',2I4)
-      TLH=HeatStoreLandscape-HEATIN+HEATOU
+      TLH=HeatStoreLandscape-HEATIN_lnd+HEATOU
     ENDIF
     IF(ABS(DIFFO).GT.ppmc)THEN
       WRITE(18,196)I,iYearCurrent

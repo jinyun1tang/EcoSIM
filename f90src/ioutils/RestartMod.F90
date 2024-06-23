@@ -4164,9 +4164,9 @@ implicit none
        interpinic_flag='skip', data=TAREA, missing_value=spval, &
        fill_value=spval)
 
-  call restartvar(ncid, flag, varname='HEATIN', &
+  call restartvar(ncid, flag, varname='HEATIN_lnd', &
        long_name='total surface heat flux', units='MJ d-2', &
-       interpinic_flag='skip', data=HEATIN,missing_value=spval, &
+       interpinic_flag='skip', data=HEATIN_lnd,missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='OXYGIN', &
@@ -4897,16 +4897,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='UEVAP', dim1name='column',&
+    call restartvar(ncid, flag, varname='UEVAP_col', dim1name='column',&
        long_name='total evaporation', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP_col,datrc_1d) 
   else
-    !print*,'UEVAP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP,datrc_1d)   
+    !print*,'UEVAP_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UEVAP_col,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='UEVAP', dim1name='column',&
+    call restartvar(ncid, flag, varname='UEVAP_col', dim1name='column',&
        long_name='total evaporation', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5187,14 +5187,14 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='UDRAIN', dim1name='column',&
+    call restartvar(ncid, flag, varname='UDRAIN_col', dim1name='column',&
        long_name='total water drainage below root zone', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN_col,datrc_1d) 
   else
-    !print*,'UDRAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN,datrc_1d)   
+    !print*,'UDRAIN_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UDRAIN_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='UDRAIN', dim1name='column',&
        long_name='total water drainage below root zone', units='m3 d-2', &

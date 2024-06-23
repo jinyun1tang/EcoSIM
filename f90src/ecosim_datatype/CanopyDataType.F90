@@ -20,7 +20,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  RCS(:,:,:)                         !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)         !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  MinCanPStomaResistH2O_pft(:,:,:)      !canopy minimum stomatal resistance, [s m-1]
-  real(r8),target,allocatable ::  BndlResistCanG(:,:)                           !canopy boundary layer resistance, [m h-1]
+  real(r8),target,allocatable ::  BndlResistCanopy_col(:,:)                           !canopy boundary layer resistance, [m h-1]
   real(r8),target,allocatable ::  O2I(:,:,:)                         !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  LeafIntracellularCO2_pft(:,:,:)                        !leaf gaseous CO2 concentration, [umol m-3]
   real(r8),target,allocatable ::  AirConc_pft(:,:,:)                        !total gas concentration, [mol m-3]
@@ -174,7 +174,7 @@ module CanopyDataType
   allocate(RCS(JP,JY,JX));      RCS=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(MinCanPStomaResistH2O_pft(JP,JY,JX));     MinCanPStomaResistH2O_pft=0._r8
-  allocate(BndlResistCanG(JY,JX));         BndlResistCanG=0._r8
+  allocate(BndlResistCanopy_col(JY,JX));         BndlResistCanopy_col=0._r8
   allocate(O2I(JP,JY,JX));      O2I=0._r8
   allocate(LeafIntracellularCO2_pft(JP,JY,JX));     LeafIntracellularCO2_pft=0._r8
   allocate(AirConc_pft(JP,JY,JX));     AirConc_pft=0._r8
@@ -330,7 +330,7 @@ module CanopyDataType
   call destroy(RCS)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(MinCanPStomaResistH2O_pft)
-  call destroy(BndlResistCanG)
+  call destroy(BndlResistCanopy_col)
   call destroy(O2I)
   call destroy(LeafIntracellularCO2_pft)
   call destroy(AirConc_pft)

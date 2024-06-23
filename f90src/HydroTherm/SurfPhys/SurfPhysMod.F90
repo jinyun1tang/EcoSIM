@@ -220,10 +220,10 @@ contains
 
   !TLEX=total latent heat flux x boundary layer resistance, [MJ m-1]
   !TSHX=total sensible heat flux x boundary layer resistance, [MJ m-1]
-  !VPQ=vapor pressure in canopy air, 
+  !VPQ_col=vapor pressure in canopy air, 
   !TKQ=temperature in canopy air, Kelvin
 
-  !write(*,*) "For VPQ and TKQ calc:"
+  !write(*,*) "For VPQ_col and TKQ calc:"
   !write(*,*) "VPA(NY,NX) = ", VPA(NY,NX)
   !write(*,*) "TLEX(NY,NX) = ", TLEX(NY,NX)
   !write(*,*) "EvapLHTC = ", EvapLHTC
@@ -235,7 +235,7 @@ contains
   !write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
   !write(*,*) "SensHeatCondctance = ", SensHeatCondctance
 
-  VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
+  VPQ_col(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
   TKQ(NY,NX)=TairK(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
 
   end subroutine SetCanopyProperty
@@ -307,7 +307,7 @@ contains
 !     BndlResistAboveCanG,RAC=isothermal blr above canopy, canopy blr
 !     ZT,SoiSurfRoughnesst0=canopy, surface roughness heights
 !     UA,WindSpeedGrnd=windspeeds above,below canopy
-!     VPQ,VPA=vapor pressure within,above canopy
+!     VPQ_col,VPA=vapor pressure within,above canopy
 !     TKQ,TairK=temperature within,above canopy
 !     TLEX,TSHX=net latent,sensible heat fluxes x blrs from prev hour
 !     VAP=latent heat of evaporation
@@ -318,12 +318,12 @@ contains
   IF(BndlResistAboveCanG(NY,NX).GT.ZERO.AND.CanopyHeight_col(NY,NX).GT.SoiSurfRoughnesst0(NY,NX)&
     .AND.ALFZ.GT.ZERO)THEN
     !if there is plant
-    BndlResistCanG(NY,NX)=AMIN1(RACX,AZMAX1(CanopyHeight_col(NY,NX)*EXP(ALFZ) &
+    BndlResistCanopy_col(NY,NX)=AMIN1(RACX,AZMAX1(CanopyHeight_col(NY,NX)*EXP(ALFZ) &
       /(ALFZ/BndlResistAboveCanG(NY,NX))*AZMAX1(EXP(-ALFZ*SoiSurfRoughnesst0(NY,NX)/CanopyHeight_col(NY,NX)) &
       -EXP(-ALFZ*(ZERO4PlantDisplace_col(NY,NX)+RoughHeight_col(NY,NX))/CanopyHeight_col(NY,NX)))))
     WindSpeedGrnd=WindSpeedAtm(NY,NX)*EXP(-ALFZ)
   ELSE
-    BndlResistCanG(NY,NX)=0.0_r8
+    BndlResistCanopy_col(NY,NX)=0.0_r8
     WindSpeedGrnd=WindSpeedAtm(NY,NX)
   ENDIF
 !
@@ -356,7 +356,7 @@ contains
   !write(*,*) "DLYRR(NY,NX) = ", DLYRR(NY,NX)
   !write(*,*) "VaporDiffusivityLitR(NY,NX) = ", VaporDiffusivityLitR(NY,NX)
   VapDiffusResistanceLitR(NY,NX)=DLYRR(NY,NX)/VaporDiffusivityLitR(NY,NX)
-  RAG(NY,NX)=BndlResistCanG(NY,NX)+BndlResistAboveCanG(NY,NX)
+  RAG(NY,NX)=BndlResistCanopy_col(NY,NX)+BndlResistAboveCanG(NY,NX)
   RAGW(NY,NX)=RAG(NY,NX)
   RAGR(NY,NX)=RAG(NY,NX)+LitRSurfResistance
   RARG(NY,NX)=RAGR(NY,NX)
@@ -542,7 +542,7 @@ contains
 ! CdSoiEvap,CdSoiHSens=conductance for latent,sensible heat fluxes over soil
 ! PAREG,PARSG=conductances for latent,sensible heat fluxes
 ! RZ=minimum surface resistance
-! VaporSoi1,VPQ=vapor pressure at soil surface, canopy air
+! VaporSoi1,VPQ_col=vapor pressure at soil surface, canopy air
 ! VapXAir2TopLay=negative of evaporation, or water vapor transfer from canopy air to top layer soil/lake
 ! LatentHeatEvapAir2Grnd=latent heat flux
 ! XH=rate constant
@@ -572,7 +572,7 @@ contains
   VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
 
   !evaporation, no more than what is available, g H2O
-  VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol(NY,NX)*dts_wat))
+  VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol(NY,NX)*dts_wat))
   !latent heat
   LatentHeatEvapAir2Grnd=VapXAir2TopLay*EvapLHTC
   IF(VapXAir2TopLay.LT.0.0_r8)THEN
@@ -614,7 +614,7 @@ contains
   !write(*,*) "RAa:", RAa
   !write(*,*) "RZ:", RZ
   !write(*,*) "PARSG(NY,NX):", PARSG(NY,NX)
-  !write(*,*) "VPQ(NY,NX):", VPQ(NY,NX)
+  !write(*,*) "VPQ_col(NY,NX):", VPQ_col(NY,NX)
   !write(*,*) "PSISV1:", PSISV1
   !write(*,*) "RGAS:", RGAS
   !write(*,*) "EvapLHTC:", EvapLHTC
@@ -1154,7 +1154,7 @@ contains
 ! HeatConvSno2Soi=convective heat from snowpack to soil
 ! WatConvSno2LitR=water flux from snowpack to litter
 ! HeatConvSno2LitR=convective heat flux from snowpack to litter
-! HEATI,HeatEvapAir2Surf,HeatSensAir2Surf,HEATG=net radiation,latent,sensible,storage heat
+! HEATI,HeatEvapAir2Surf_col,HeatSensAir2Surf_col,HEATG=net radiation,latent,sensible,storage heat
 ! VapXAir2GSurf=total evaporation
 ! FLWM,WaterFlow2MacPM=water flux into soil micropore,macropore for use in TranspNoSalt.f
 ! VLWatMicPX1=VLWatMicP1 accounting for wetting front
@@ -1172,18 +1172,18 @@ contains
   WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+WatFLow2LitR_col(NY,NX)
   HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HeatFLoByWat2LitRi(NY,NX)
 
-  HeatByRadiation(NY,NX)=HeatByRadiation(NY,NX)+Radnet2LitGrnd+Radnet2Snow
-  HeatSensAir2Surf(NY,NX)=HeatSensAir2Surf(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow
-  HeatEvapAir2Surf(NY,NX)=HeatEvapAir2Surf(NY,NX)+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno
-  HeatSensVapAir2Surf(NY,NX)=HeatSensVapAir2Surf(NY,NX)+HeatSensVapAir2Soi+HeatSensEvap
-  HeatNet2Surf(NY,NX)=HeatNet2Surf(NY,NX)+Radnet2LitGrnd+Radnet2Snow &
+  HeatByRadiation_col(NY,NX)=HeatByRadiation_col(NY,NX)+Radnet2LitGrnd+Radnet2Snow
+  HeatSensAir2Surf_col(NY,NX)=HeatSensAir2Surf_col(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow
+  HeatEvapAir2Surf_col(NY,NX)=HeatEvapAir2Surf_col(NY,NX)+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno
+  HeatSensVapAir2Surf_col(NY,NX)=HeatSensVapAir2Surf_col(NY,NX)+HeatSensVapAir2Soi+HeatSensEvap
+  HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+Radnet2LitGrnd+Radnet2Snow &
     +HeatSensAir2Grnd+HeatSensAir2Snow+LatentHeatEvapAir2Grnd &
     +LatentHeatAir2Sno+HeatSensVapAir2Soi+HeatSensEvap
 
   !EVAPG=negative evaporation from ground/top soil layer
   !EVAPR=evaporation from litter layer   
   !EVAPSN=evaporation from snow, sublimation+evaporation
-  VapXAir2GSurf(NY,NX)=VapXAir2GSurf(NY,NX)+VapXAir2TopLay+VapXAir2LitR(NY,NX)+VapXAir2Sno(NY,NX)
+  VapXAir2GSurf(NY,NX)=VapXAir2GSurf(NY,NX)+VapXAir2TopLay+VapXAir2LitR(NY,NX)+VapXAir2Sno(NY,NX)   !>0 into ground
   WaterFlow2MicPM(M,3,NUM(NY,NX),NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)
   WaterFlow2MacPM(M,3,NUM(NY,NX),NY,NX)=ConvectWaterFlowMacP(3,NUM(NY,NX),NY,NX)
   end subroutine AccumWaterVaporHeatFluxes

@@ -721,7 +721,7 @@ module StartsMod
   !     INITIALIZE MASS BALANCE CHECKS
   !
   CRAIN=0.0_r8
-  HEATIN=0.0_r8
+  HEATIN_lnd=0.0_r8
   CO2GIN=0.0_r8
   OXYGIN=0.0_r8
   H2GIN=0.0_r8
@@ -784,7 +784,7 @@ module StartsMod
   FertNFlx_col(:,:)=0.0_r8
   FerPFlx_col(:,:)=0.0_r8
   AnualH2OLoss_col(:,:)=0.0_r8
-  UEVAP(:,:)=0.0_r8
+  UEVAP_col(:,:)=0.0_r8
   URUN(:,:)=0.0_r8
   USEDOU(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
@@ -804,7 +804,7 @@ module StartsMod
   LiterfalOrgM_col(ielmc,:,:)=0.0_r8
   LiterfalOrgM_col(ielmn,:,:)=0.0_r8
   LiterfalOrgM_col(ielmp,:,:)=0.0_r8
-  UDRAIN(:,:)=0.0_r8
+  UDRAIN_col(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8
   DPNH4(:,:)=0.0_r8

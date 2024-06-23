@@ -140,10 +140,10 @@ implicit none
     EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,TotHeatAir2LitR)
 
-  HeatByRadiation(NY,NX)=HeatByRadiation(NY,NX)+Radnet2LitR
-  HeatNet2Surf(NY,NX)=HeatNet2Surf(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
-  HeatEvapAir2Surf(NY,NX)=HeatEvapAir2Surf(NY,NX)+LatentHeatAir2LitR
-  HeatSensVapAir2Surf(NY,NX)=HeatSensVapAir2Surf(NY,NX)+HeatSensEvapAir2LitR
+  HeatByRadiation_col(NY,NX)=HeatByRadiation_col(NY,NX)+Radnet2LitR
+  HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
+  HeatEvapAir2Surf_col(NY,NX)=HeatEvapAir2Surf_col(NY,NX)+LatentHeatAir2LitR
+  HeatSensVapAir2Surf_col(NY,NX)=HeatSensVapAir2Surf_col(NY,NX)+HeatSensEvapAir2LitR
   LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadLitR
 
   end subroutine SRFLitterEnergyBalance
@@ -279,7 +279,7 @@ implicit none
 !
 !     VAPOR FLUX AT RESIDUE SURFACE
 !
-!     VapLitR,VaporSoi1,VPQ=vapor pressure in litter,soil,canopy air, m3/m-3
+!     VapLitR,VaporSoi1,VPQ_col=vapor pressure in litter,soil,canopy air, m3/m-3
 !     TKS1=soil temperature
 !     EVAPR2=negative of litter evaporation,<0 into atmosphere
 !     LatentHeatAir2LitR2=litter latent heat flux
@@ -295,8 +295,8 @@ implicit none
       endif
 
       VaporSoi1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGAS*TKS1))    !in soil,ton/m3
-      EVAPR2=AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ(NY,NX)-VapLitR)) ![ton hr/m]
-!      print*,'evapr2',EVAPR2,VPQ(NY,NX),VapLitR,VWatLitr2,TKR1,VLWatMicP1(0,NY,NX)
+      EVAPR2=AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton hr/m]
+!      print*,'evapr2',EVAPR2,VPQ_col(NY,NX),VapLitR,VWatLitr2,TKR1,VLWatMicP1(0,NY,NX)
       LatentHeatAir2LitR2=EVAPR2*EvapLHTC          !latent energy flux, kJ/kg *10^3 kg hr/m=MJ hr/m
       HeatSensEvapAir2LitR2=EVAPR2*cpw*TKR1        !mass energy flux
       !
@@ -432,16 +432,16 @@ implicit none
   end subroutine SurfLitterIterateNN
 
 !------------------------------------------------------------------------------------------
-  subroutine UpdateLitRPhys(NY,NX,WatInByRunoff,HeatInByRunoff,HeatStoreLandscape,HEATIN)
+  subroutine UpdateLitRPhys(NY,NX,WatInByRunoff,HEATIN_lndByRunoff,HeatStoreLandscape,HEATIN_lnd)
   !
   !Description
   !Update Litter physical variables
   implicit none
   integer,  intent(in) :: NY,NX
   real(r8), intent(in) :: WatInByRunoff
-  real(r8), intent(in) :: HeatInByRunoff
+  real(r8), intent(in) :: HEATIN_lndByRunoff
   real(r8), intent(inout) :: HeatStoreLandscape
-  real(r8), intent(inout) :: HEATIN
+  real(r8), intent(inout) :: HEATIN_lnd
 
   real(r8) :: VHeatCapacityLitrX  !old litr heat capacity
   real(r8) :: VHeatCapacityLitR   !current litr heat capacity
@@ -475,22 +475,22 @@ implicit none
     !when there are still significant heat capacity of the residual layer
     tkspre=TKS(0,NY,NX)
     TKS(0,NY,NX)=(ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HeatByLitrMassChange &
-      +HeatInByRunoff)/VHeatCapacity(0,NY,NX)
+      +HEATIN_lndByRunoff)/VHeatCapacity(0,NY,NX)
     if(TKS(0,NY,NX)<100._r8 .or. TKS(0,NY,NX)>400._r8)then
       write(*,*)mod_filename,NY,NX,TKS(0,NY,NX),tkspre
       write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2Litr(NY,NX),WatInByRunoff
       write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2Litr(NY,NX),TLitrIceFlxThaw(NY,NX),WatInByRunoff
       write(*,*)'ice',VLiceMicPr,VLiceMicP(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
-        HeatInByRunoff,VHeatCapacity(0,NY,NX)        
+        HEATIN_lndByRunoff,VHeatCapacity(0,NY,NX)        
       write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK(NY,NX),SoilOrgM_vr(ielmc,0,NY,NX)   
       write(*,*)'tengz',ENGYZ/VHeatCapacity(0,NY,NX),HeatFLo2LitrByWat(NY,NX)/VHeatCapacity(0,NY,NX),&
         TLitrIceHeatFlxFrez(NY,NX)/VHeatCapacity(0,NY,NX),HeatByLitrMassChange/VHeatCapacity(0,NY,NX), &
-        HeatInByRunoff/VHeatCapacity(0,NY,NX)
+        HEATIN_lndByRunoff/VHeatCapacity(0,NY,NX)
 
       call endrun(trim(mod_filename)//' at line',__LINE__)
     endif  
-    HEATIN=HEATIN+HeatByLitrMassChange
+    HEATIN_lnd=HEATIN_lnd+HeatByLitrMassChange
     Ls=NUM(NY,NX)
     !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
 !    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
@@ -498,7 +498,7 @@ implicit none
 !      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
 !    endif
   ELSE
-    HEATIN=HEATIN+HeatByLitrMassChange+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
+    HEATIN_lnd=HEATIN_lnd+HeatByLitrMassChange+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
     TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
   ENDIF
 
@@ -507,7 +507,7 @@ implicit none
   ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
 
   HeatStoreLandscape=HeatStoreLandscape+ENGYR
-  HEATIN=HEATIN+TLitrIceHeatFlxFrez(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+TLitrIceHeatFlxFrez(NY,NX)
 
   end subroutine UpdateLitRPhys
 

@@ -109,7 +109,7 @@ implicit none
   real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_P_col(:)       !StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
   real(r8),pointer   :: h1D_tPRECN_col(:)          !1000.0_r8*URAIN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ET_col(:)             !1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ET_col(:)             !1000.0_r8*UEVAP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
@@ -117,10 +117,10 @@ implicit none
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm(NY,NX)/secs1hour
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
-  real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_H_col(:)         !HeatSensAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_G_col(:)         !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
+  real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SOIL_H_col(:)         !HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SOIL_G_col(:)         !-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_Eco_Heat_col(:)          !Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -920,7 +920,7 @@ implicit none
 
   data1d_ptr => this%h1D_ECO_LE_col(beg_col:end_col)        
   call hist_addfld1d(fname='ECO_LE',units='W/m2',avgflag='A',&
-    long_name='ecosystem latent heat flux',ptr_col=data1d_ptr)      
+    long_name='ecosystem latent heat flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_Heat_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_H',units='W/m2',avgflag='A',&
@@ -948,7 +948,7 @@ implicit none
 
   data1d_ptr => this%h1D_CH4_FLX_col(beg_col:end_col)     
   call hist_addfld1d(fname='CH4_FLX',units='umol C/m2/s',avgflag='A',&
-    long_name='soil CH4 flux',ptr_col=data1d_ptr)      
+    long_name='soil CH4 flux (negative into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='O2_FLX',units='umol O2/m2/s',avgflag='A',&
@@ -1698,10 +1698,10 @@ implicit none
       
       this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/secs1hour
       this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_H_col(ncol)      = HeatSensAir2Surf(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_G_col(ncol)      =-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_H_col(ncol)      = HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_G_col(ncol)      =-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_RN_col(ncol)      = Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_LE_col(ncol)      = Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Eco_Heat_col(ncol)    = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)

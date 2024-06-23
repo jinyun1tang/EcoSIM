@@ -78,12 +78,12 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
-  real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
+  real(r8),target,allocatable ::  UEVAP_col(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  URAIN_col(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
   real(r8),target,allocatable ::  UVLWatMicP(:,:)                !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  AnualH2OLoss_col(:,:)                        !total subsurface water flux, [m3 d-2]
-  real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
+  real(r8),target,allocatable ::  UDRAIN_col(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
@@ -175,12 +175,12 @@ module SoilWaterDataType
   allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
   allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
-  allocate(UEVAP(JY,JX));       UEVAP=0._r8
+  allocate(UEVAP_col(JY,JX));       UEVAP_col=0._r8
   allocate(URAIN_col(JY,JX));       URAIN_col=0._r8
   allocate(URUN(JY,JX));        URUN=0._r8
   allocate(UVLWatMicP(JY,JX));       UVLWatMicP=0._r8
   allocate(AnualH2OLoss_col(JY,JX));       AnualH2OLoss_col=0._r8
-  allocate(UDRAIN(JY,JX));      UDRAIN=0._r8
+  allocate(UDRAIN_col(JY,JX));      UDRAIN_col=0._r8
   allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
   allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
   allocate(WQRH(JY,JX));        WQRH=0._r8
@@ -261,13 +261,13 @@ module SoilWaterDataType
   call destroy(THETY_vr)
   call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
-  call destroy(UEVAP)
+  call destroy(UEVAP_col)
   call destroy(EvapoTransp_col)
   call destroy(URAIN_col)
   call destroy(URUN)
   call destroy(UVLWatMicP)
   call destroy(AnualH2OLoss_col)
-  call destroy(UDRAIN)
+  call destroy(UDRAIN_col)
   call destroy(Wat2GridBySurfRunoff)
   call destroy(Heat2GridBySurfRunoff)
   call destroy(WQRH)

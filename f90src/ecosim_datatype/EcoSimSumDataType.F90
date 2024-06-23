@@ -24,7 +24,7 @@ module EcoSimSumDataType
   real(r8) :: TDisolPi_lnd    !total soil PO4 content	g d-2
   real(r8), pointer :: PlantElemntStoreLandscape(:)    !total plant element (C,N,P, etc) balance	g d-2
   real(r8) :: CRAIN    !total precipitation	m3 d-2
-  real(r8) :: HEATIN   !total surface heat flux	MJ d-2
+  real(r8) :: HEATIN_lnd   !total surface heat flux	MJ d-2
   real(r8) :: OXYGIN   !total surface O2 flux	g d-2
   real(r8) :: TORGF    !total organic C amendment	g d-2
   real(r8) :: TORGN    !total organic N amendment	g d-2

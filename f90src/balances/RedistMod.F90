@@ -162,12 +162,12 @@ module RedistMod
   real(r8) :: VLSoilPoreMicP_vrX,VOLTX
   integer  :: L
 
-  Eco_NetRad_col(NY,NX)=Eco_NetRad_col(NY,NX)+HeatByRadiation(NY,NX)
-  Eco_Heat_Latent_col(NY,NX)=Eco_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf(NY,NX)
-  Eco_Heat_Sens_col(NY,NX)=Eco_Heat_Sens_col(NY,NX)+HeatSensAir2Surf(NY,NX)
-  Eco_Heat_Grnd_col(NY,NX)=Eco_Heat_Grnd_col(NY,NX)-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))
-  Canopy_Heat_Latent_col(NY,NX)=Canopy_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
-  Canopy_Heat_Sens_col(NY,NX)=Canopy_Heat_Sens_col(NY,NX)+HeatSensAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
+  Eco_NetRad_col(NY,NX)=Eco_NetRad_col(NY,NX)+HeatByRadiation_col(NY,NX)
+  Eco_Heat_Latent_col(NY,NX)=Eco_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)
+  Eco_Heat_Sens_col(NY,NX)=Eco_Heat_Sens_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)
+  Eco_Heat_Grnd_col(NY,NX)=Eco_Heat_Grnd_col(NY,NX)-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))
+  Canopy_Heat_Latent_col(NY,NX)=Canopy_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*BndlResistCanopy_col(NY,NX)
+  Canopy_Heat_Sens_col(NY,NX)=Canopy_Heat_Sens_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*BndlResistCanopy_col(NY,NX)
   Eco_NEE_col(NY,NX)=Canopy_NEE_col(NY,NX)+SurfGasFlx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)=ECO_ER_col(NY,NX)+SurfGasFlx_col(idg_CO2,NY,NX)
   Eco_NPP_col(NY,NX)=Eco_GPP_col(NY,NX)+Eco_AutoR_col(NY,NX)
@@ -288,7 +288,7 @@ module RedistMod
 
   !
   call UpdateLitRPhys(NY,NX,TWat2GridBySurfRunoff(NY,NX),THeat2GridBySurfRunoff(NY,NX),&
-    HeatStoreLandscape,HEATIN)
+    HeatStoreLandscape,HEATIN_lnd)
 
   !     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP(0,NY,NX)*DENSICE
   !
@@ -297,21 +297,21 @@ module RedistMod
   WI=PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
   URAIN_col(NY,NX)=WI
-  WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
+  WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX)        !total outgoing water flux, > 0 into ground surface
   CEVAP=CEVAP-WO
-  UEVAP(NY,NX)=UEVAP(NY,NX)-WO
+  UEVAP_col(NY,NX)=UEVAP_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)=-WO
   VOLWOU=VOLWOU-IrrigSubsurf_col(NY,NX)
   FWatDischarge(NY,NX)=FWatDischarge(NY,NX)-IrrigSubsurf_col(NY,NX)
   AnualH2OLoss_col(NY,NX)=AnualH2OLoss_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  UDRAIN(NY,NX)=UDRAIN(NY,NX)+WaterFlowSoiMicP(3,NK(NY,NX),NY,NX)
+  UDRAIN_col(NY,NX)=UDRAIN_col(NY,NX)+WaterFlowSoiMicP(3,NK(NY,NX),NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN=HEATIN+cpw*TairK(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
-  HEATIN=HEATIN+HeatNet2Surf(NY,NX)+THFLXC(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+cpw*TairK(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
-    HEATIN=HEATIN+XPhaseChangeHeatL(L,NY,NX)
+    HEATIN_lnd=HEATIN_lnd+XPhaseChangeHeatL(L,NY,NX)
   ENDDO D5150
   HEATOU=HEATOU-cpw*TairK(NY,NX)*IrrigSubsurf_col(NY,NX)
 !
@@ -1026,7 +1026,7 @@ module RedistMod
     !
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
 !   watch out the following code for changes
-    HEATIN=HEATIN+THeatSoiThaw(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
+    HEATIN_lnd=HEATIN_lnd+THeatSoiThaw(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
     CIB=trcg_air2root_flx_vr(idg_CO2,L,NY,NX)
     CHB=trcg_air2root_flx_vr(idg_CH4,L,NY,NX)
     OIB=trcg_air2root_flx_vr(idg_O2,L,NY,NX)
@@ -1373,7 +1373,7 @@ module RedistMod
 !     ORGC=total SOC
 !     RAINR,HRAINR=water,heat in LitrFall
 !     FLWR,HFLWR=water,heat flux into litter
-!     HEATIN=cumulative net surface heat transfer
+!     HEATIN_lnd=cumulative net surface heat transfer
 !
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
@@ -1389,7 +1389,7 @@ module RedistMod
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR
 
       CRAIN=CRAIN+RAINR
-      HEATIN=HEATIN+HRAINR
+      HEATIN_lnd=HEATIN_lnd+HRAINR
     enddo
   ENDDO
 

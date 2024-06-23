@@ -228,7 +228,7 @@ module TillageMixMod
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VLWatMicP_vr(0,NY,NX)*CORP0
     HFLXD=cpo*SoilOrgM_vr(ielmc,0,NY,NX)*CORP0*TKS(0,NY,NX)
-    HEATIN=HEATIN-HFLXD
+    HEATIN_lnd=HEATIN_lnd-HFLXD
     HeatStoreLandscape=HeatStoreLandscape-HFLXD
     TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
 

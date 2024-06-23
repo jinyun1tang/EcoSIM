@@ -59,7 +59,7 @@ module UptakesMod
   real(r8) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake_vr(JZ1)
-  real(r8) :: TKCX,CNDT,PrecHeatIntcptByCanP1,VHCPX
+  real(r8) :: TKCX,CNDT,PrecHEATIN_lndtcptByCanP1,VHCPX
   real(r8) :: DIFF,PSILH,cumPRootH2OUptake,VFLXC
   real(r8) :: FDMP
   integer :: LayrHasRoot(jroots,JZ1)
@@ -142,7 +142,7 @@ module UptakesMod
 !     BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
 !
 !     PSICanopy_pft=initial estimate of total canopy water potential
-!     PrecIntcptByCanopy_pft,PrecHeatIntcptByCanP1=convective water,heat flux from precip to canopy
+!     PrecIntcptByCanopy_pft,PrecHEATIN_lndtcptByCanP1=convective water,heat flux from precip to canopy
 !     FTHRM,LWRad2CanP=LW emitted,absorbed by canopy
 !     FracGrndByPFT=fraction of ground area AREA occupied by PFT
 !     CCPOLT=total nonstructural canopy C,N,P concentration
@@ -157,7 +157,7 @@ module UptakesMod
         PSICanopy_pft(NZ)=AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
         Transpiration_pft(NZ)=0.0_r8
         VapXAir2Canopy_pft(NZ)=0.0_r8
-        PrecHeatIntcptByCanP1=PrecIntcptByCanopy_pft(NZ)*cpw*TairK
+        PrecHEATIN_lndtcptByCanP1=PrecIntcptByCanopy_pft(NZ)*cpw*TairK
 
         IF(LeafStalkArea_col.GT.ZEROS)THEN
           !the grid has significant canopy (leaf+steam) area
@@ -180,7 +180,7 @@ module UptakesMod
         NN=CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanPMassC,&
           ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,&
           VFLXC,FDMP,SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,&
-          WatAvail4Uptake_vr,TKCX,CNDT,VHCPX,PrecHeatIntcptByCanP1,PSILH,LayrHasRoot)
+          WatAvail4Uptake_vr,TKCX,CNDT,VHCPX,PrecHEATIN_lndtcptByCanP1,PSILH,LayrHasRoot)
 !
 !     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 !
@@ -198,7 +198,7 @@ module UptakesMod
         call HandlingDivergence(I,J,NN,NZ,ElvAdjstedtSoiPSIMPa,DIFF,FDMP)
 
         call UpdateCanopyWater(NZ,HeatSensConductCanP,ElvAdjstedtSoiPSIMPa,RootResist,SoiH2OResist,&
-          SoiAddRootResist,TKCX,VHCPX,PrecHeatIntcptByCanP1,cumPRootH2OUptake,VFLXC,LayrHasRoot)
+          SoiAddRootResist,TKCX,VHCPX,PrecHEATIN_lndtcptByCanP1,cumPRootH2OUptake,VFLXC,LayrHasRoot)
 !
 !     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
 !
@@ -631,7 +631,7 @@ module UptakesMod
   function CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanPMassC,&
     ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,VFLXC,FDMP,&
     SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,WatAvail4Uptake_vr,TKCX,CNDT,&
-    VHCPX,PrecHeatIntcptByCanP1,PSILH,LayrHasRoot) result(NN)
+    VHCPX,PrecHEATIN_lndtcptByCanP1,PSILH,LayrHasRoot) result(NN)
   implicit none
   integer  , intent(in) :: I, J
   integer  , intent(in) :: NZ
@@ -639,7 +639,7 @@ module UptakesMod
   real(r8) , intent(in) :: SoiAddRootResist(jroots,JZ1)
   real(r8) , intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8) , intent(in) :: AirPoreAvail4Fill(JZ1),WatAvail4Uptake_vr(JZ1)
-  real(r8) , intent(in) :: TKCX,CNDT,VHCPX,PrecHeatIntcptByCanP1,PSILH
+  real(r8) , intent(in) :: TKCX,CNDT,VHCPX,PrecHEATIN_lndtcptByCanP1,PSILH
   integer  , intent(in) :: LayrHasRoot(jroots,JZ1)
   real(r8) , intent(out):: HeatSensConductCanP,DIFF,cumPRootH2OUptake,VFLXC,FDMP
   real(r8) :: APSILT
@@ -822,9 +822,9 @@ module UptakesMod
 !     SENSIBLE + STORAGE HEAT FROM RN, LE AND CONVECTIVE HEAT FLUXES
 !
 !     HeatSenAddStore=initial estimate of sensible+storage heat flux
-!     PrecHeatIntcptByCanP1=convective heat flux from precip to canopy
+!     PrecHEATIN_lndtcptByCanP1=convective heat flux from precip to canopy
 !
-    HeatAdd2Can=RadNet2Canopy_pft(NZ)+EvapTransHeat_pft(NZ)+VFLXC+PrecHeatIntcptByCanP1
+    HeatAdd2Can=RadNet2Canopy_pft(NZ)+EvapTransHeat_pft(NZ)+VFLXC+PrecHEATIN_lndtcptByCanP1
 !
 !     SOLVE FOR CANOPY TEMPERATURE CAUSED BY SENSIBLE + STORAGE HEAT
 !
@@ -1243,7 +1243,7 @@ module UptakesMod
 !------------------------------------------------------------------------
 
   subroutine UpdateCanopyWater(NZ,HeatSensConductCanP,ElvAdjstedtSoiPSIMPa,RootResist,SoiH2OResist,&
-    SoiAddRootResist,TKCX,VHCPX,PrecHeatIntcptByCanP1,cumPRootH2OUptake,VFLXC,LayrHasRoot)
+    SoiAddRootResist,TKCX,VHCPX,PrecHEATIN_lndtcptByCanP1,cumPRootH2OUptake,VFLXC,LayrHasRoot)
 
   implicit none
   integer, intent(in) :: NZ
@@ -1252,7 +1252,7 @@ module UptakesMod
   real(r8), intent(in) :: RootResist(jroots,JZ1)
   real(r8), intent(in) :: SoiH2OResist(jroots,JZ1)
   real(r8), intent(in) :: SoiAddRootResist(jroots,JZ1)
-  real(r8), intent(in) :: TKCX,VHCPX,PrecHeatIntcptByCanP1,cumPRootH2OUptake,VFLXC
+  real(r8), intent(in) :: TKCX,VHCPX,PrecHEATIN_lndtcptByCanP1,cumPRootH2OUptake,VFLXC
   integer , intent(in) :: LayrHasRoot(jroots,JZ1)
   real(r8) :: CCPOLT
   real(r8) :: FDMR
@@ -1290,12 +1290,12 @@ module UptakesMod
   !     VHCPX,VHeatCapCanP_pft=previous,current canopy heat capacity
   !     HeatSensConductCanP=canopy sensible heat conductance
   !     VFLXC=convective heat flux from latent heat flux
-  !     PrecHeatIntcptByCanP1=convective heat flux from precip to canopy
+  !     PrecHEATIN_lndtcptByCanP1=convective heat flux from precip to canopy
   !
   CanopyWater_pft(NZ)=CanopyWater_pft(NZ)+Transpiration_pft(NZ)-cumPRootH2OUptake
   WatByPCanopy_pft(NZ)=WatByPCanopy_pft(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ)
   HeatXAir2PCan(NZ)=HeatSensConductCanP*(TairK-TKCanopy_pft(NZ))
-  HeatStorCanP(NZ)=TKCX*VHCPX-TKCanopy_pft(NZ)*VHeatCapCanP_pft(NZ)+VFLXC+PrecHeatIntcptByCanP1
+  HeatStorCanP(NZ)=TKCX*VHCPX-TKCanopy_pft(NZ)*VHeatCapCanP_pft(NZ)+VFLXC+PrecHEATIN_lndtcptByCanP1
   !
   !     ROOT TOTAL, OSMOTIC AND TURGOR WATER POTENTIALS
   !

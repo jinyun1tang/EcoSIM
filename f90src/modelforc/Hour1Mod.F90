@@ -762,11 +762,11 @@ module Hour1Mod
   HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
   TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
   TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
-  HeatByRadiation(NY,NX)                  = 0.0_r8
-  HeatSensAir2Surf(NY,NX)                 = 0.0_r8
-  HeatEvapAir2Surf(NY,NX)                 = 0.0_r8
-  HeatSensVapAir2Surf(NY,NX)              = 0.0_r8
-  HeatNet2Surf(NY,NX)                     = 0.0_r8
+  HeatByRadiation_col(NY,NX)                  = 0.0_r8
+  HeatSensAir2Surf_col(NY,NX)                 = 0.0_r8
+  HeatEvapAir2Surf_col(NY,NX)                 = 0.0_r8
+  HeatSensVapAir2Surf_col(NY,NX)              = 0.0_r8
+  HeatNet2Surf_col(NY,NX)                     = 0.0_r8
   VapXAir2GSurf(NY,NX)                    = 0.0_r8
 
   GasSfAtmFlx_col(idg_beg:idg_end,NY,NX) = 0._r8

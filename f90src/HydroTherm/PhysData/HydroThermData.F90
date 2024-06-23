@@ -22,7 +22,7 @@ implicit none
   real(r8),allocatable ::  VapXAir2Sno(:,:)                   ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
   real(r8),allocatable ::  SoilFracAsMacP1(:,:,:)                        !  
   real(r8),allocatable ::  HeatFall2Snowt(:,:)                        !  
-  real(r8),allocatable ::  VPQ(:,:)                           !  
+  real(r8),allocatable ::  VPQ_col(:,:)                           !  
   real(r8),allocatable ::  PARSW(:,:)                         !  
   real(r8),allocatable ::  Ice2Snowt(:,:)                         !  
   real(r8),allocatable ::  TKQ(:,:)                           !  
@@ -81,7 +81,7 @@ implicit none
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
   allocate(SoilFracAsMacP1(JZ,JY,JX));     SoilFracAsMacP1=0._r8  
   allocate(HeatFall2Snowt(JY,JX));      HeatFall2Snowt=0._r8  
-  allocate(VPQ(JY,JX));         VPQ=0._r8  
+  allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
   allocate(PARSW(JY,JX));       PARSW=0._r8
   allocate(Ice2Snowt(JY,JX));       Ice2Snowt=0._r8    
   allocate(TKQ(JY,JX));         TKQ=0._r8  
@@ -139,7 +139,7 @@ implicit none
   call destroy(VapXAir2Sno)  
   call destroy(SoilFracAsMacP1)  
   call destroy(HeatFall2Snowt)
-  call destroy(VPQ)    
+  call destroy(VPQ_col)    
   call destroy(PARSW)  
   call destroy(Ice2Snowt)
   call destroy(TKQ)
