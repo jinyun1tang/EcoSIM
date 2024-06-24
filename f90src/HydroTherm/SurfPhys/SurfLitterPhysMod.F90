@@ -98,7 +98,7 @@ implicit none
   ! CNVR,CNV1=litter,soil vapor conductivity
   ! THETPM=litter air concentration
   ! POROS,POROQ=litter porosity, tortuosity
-  ! VaporDiffusivityLitR,WVapDifusvitySoil_vr=litter,soil vapor diffusivity
+  ! VaporDiffusivityLitR_col,WVapDifusvitySoil_vr=litter,soil vapor diffusivity
   ! CVRD=litter cover fraction
   ! ATCNVR=litter-soil vapor conductance
   ! DLYRR,DLYR=litter,soil depths
@@ -109,7 +109,7 @@ implicit none
   ! TCNDR,TCND1=litter,soil thermal conductivity
   ! ATCNDR=litter-soil thermal conductance
   !
-  CNVR=VaporDiffusivityLitR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
+  CNVR=VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
   CNV1=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
     *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
 
@@ -144,7 +144,7 @@ implicit none
   HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
   HeatEvapAir2Surf_col(NY,NX)=HeatEvapAir2Surf_col(NY,NX)+LatentHeatAir2LitR
   HeatSensVapAir2Surf_col(NY,NX)=HeatSensVapAir2Surf_col(NY,NX)+HeatSensEvapAir2LitR
-  LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadLitR
+  LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)+LWRadLitR
 
   end subroutine SRFLitterEnergyBalance
 !------------------------------------------------------------------------------------------

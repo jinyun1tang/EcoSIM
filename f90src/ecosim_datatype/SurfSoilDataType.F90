@@ -10,7 +10,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  FracSurfAsSnow(:,:)                !fraction of snow cover
   real(r8),target,allocatable ::  FracSurfSnoFree(:,:)               !fraction of snow-free cover
   real(r8),target,allocatable ::  FracSurfAsBareSoi(:,:)             !fraction of exposed soil surface, [-]
-  real(r8),target,allocatable ::  LWRadBySurf(:,:)                         !longwave radiation emitted from ground surface, [MJ d-2 t-1]
+  real(r8),target,allocatable ::  LWRadBySurf_col(:,:)                         !longwave radiation emitted from ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatByRadiation_col(:,:)                 !total net radiation at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatEvapAir2Surf_col(:,:)              !total latent heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatSensAir2Surf_col(:,:)              !total sensible heat flux at ground surface, [MJ d-2 t-1]
@@ -35,7 +35,7 @@ contains
   implicit none
   allocate(FracSurfAsSnow(JY,JX));         FracSurfAsSnow=0._r8
   allocate(FracSurfSnoFree(JY,JX));        FracSurfSnoFree=0._r8
-  allocate(LWRadBySurf(JY,JX));             LWRadBySurf=0._r8
+  allocate(LWRadBySurf_col(JY,JX));             LWRadBySurf_col=0._r8
   allocate(HeatByRadiation_col(JY,JX));          HeatByRadiation_col=0._r8
   allocate(HeatEvapAir2Surf_col(JY,JX));       HeatEvapAir2Surf_col=0._r8
   allocate(HeatSensAir2Surf_col(JY,JX));       HeatSensAir2Surf_col=0._r8
@@ -61,7 +61,7 @@ contains
   implicit none
   call destroy(FracSurfAsSnow)
   call destroy(FracSurfSnoFree)
-  call destroy(LWRadBySurf)
+  call destroy(LWRadBySurf_col)
   call destroy(HeatByRadiation_col)
   call destroy(HeatEvapAir2Surf_col)
   call destroy(HeatSensAir2Surf_col)

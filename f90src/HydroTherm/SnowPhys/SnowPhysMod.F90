@@ -431,7 +431,7 @@ contains
           ! THETP*,FracSoiPAsWat,FracSoiPAsIce=litter air,water,ice concentration
           ! POROS,POROQ=litter porosity, tortuosity
           ! CVRD=litter cover fraction
-          ! VaporDiffusivityLitR=litter vapor diffusivity
+          ! VaporDiffusivityLitR_col=litter vapor diffusivity
           ! AvgVaporCondctSnowLitR,AvgVaporCondctSoilLitR=snowpack-litter,litter-soil vapor conductance
           ! DLYRR,SnowThickL_col0,DLYR=litter,snowpack,soil depths
           ! THETRR=dry litter concentration
@@ -577,7 +577,7 @@ contains
 !     ACCUMULATE SNOWPACK FLUXES TO LONGER TIME STEP FOR
 !     LITTER, SOIL FLUX CALCULATIONS
 !
-!     LWRadBySurf=total longwave emission
+!     LWRadBySurf_col=total longwave emission
 !     XFLWS,WatXfer2SnoLay,IceXfer2SnoLay=hourly accumulated snow,water,ice transfer
 !     HeatXfer2SnoLay=hourly convective heat flux from snow,water,ice transfer
 !     NetSno2LayL,NetWat2LayL,NetIce2LayL=net snow,water,ice transfer
@@ -853,7 +853,7 @@ contains
   print*,'SnofallRain',SnofallRain,Rainfall,EVAPW2
   call endrun(trim(mod_filename)//' at line',__LINE__)   
   endif
-  LWRadBySurf(NY,NX)=LWRadBySurf(NY,NX)+LWRadSno1
+  LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)+LWRadSno1
 !     IF(NX.EQ.3.AND.NY.EQ.3)THEN
 !     WRITE(*,7759)'EVAP',I,J,M,MM,SnofallDry
 !    2,SnoFall,EvapSublimation2,SnofallRain,Rainfall
@@ -1555,7 +1555,7 @@ contains
   TK0X=TKSnow1(L,NY,NX)
   TKXR=TKSoi1(0,NY,NX)
   TK1X=TKSoi1(NUM(NY,NX),NY,NX)
-  CNVR=safe_adb(VaporDiffusivityLitR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS(0,NY,NX))
+  CNVR=safe_adb(VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS(0,NY,NX))
 
   if(TKXR<0._r8)then
     write(*,*)'SnowSurLitterExch negative M, L, TKR',M,L,TKXR

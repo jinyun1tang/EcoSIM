@@ -209,10 +209,10 @@ module Hour1Mod
 !     RESET HOURLY INDICATORS
 !
       LWRadCanGPrev(NY,NX)=LWRadCanG(NY,NX)
-      LWRadGrnd(NY,NX)=LWRadBySurf(NY,NX)
+      LWRadGrnd(NY,NX)=LWRadBySurf_col(NY,NX)
       NetCO2Flx2Canopy_col(NY,NX)=Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       LWRadCanG(NY,NX)=0.0_r8
-      LWRadBySurf(NY,NX)=0.0_r8
+      LWRadBySurf_col(NY,NX)=0.0_r8
       TLEX(NY,NX)=Canopy_Heat_Latent_col(NY,NX)
       TSHX(NY,NX)=Canopy_Heat_Sens_col(NY,NX)
       Canopy_Heat_Latent_col(NY,NX)=0.0_r8
@@ -276,7 +276,7 @@ module Hour1Mod
     PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX) &
       ,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
     TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndSurfirrig(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX)
-    PrecIntcptByCanG(NY,NX)=PrecIntcptByCanG(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
+    PrecIntceptByCanopy_col(NY,NX)=PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
 
   end subroutine CanopyInterceptPrecp
@@ -775,7 +775,7 @@ module Hour1Mod
   CanWat_col(NY,NX)       = 0.0_r8
   CanH2OHeldVg(NY,NX)     = 0.0_r8
   TFLWCI(NY,NX)           = 0.0_r8
-  PrecIntcptByCanG(NY,NX) = 0.0_r8
+  PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
   TEVAPP(NY,NX)           = 0.0_r8
   VapXAir2CanG(NY,NX)     = 0.0_r8
   THFLXC(NY,NX)           = 0.0_r8
@@ -1151,13 +1151,13 @@ module Hour1Mod
     ROQAX(K,0,NY,NX)=0.0_r8
   ENDDO D5055
 !
-!     WVapDifusvityAir_col,VaporDiffusivityLitR,WGSGW=vapor diffusivity in air,litter,snowpack
+!     WVapDifusvityAir_col,VaporDiffusivityLitR_col,WGSGW=vapor diffusivity in air,litter,snowpack
 !
   TFACA=TEFGASDIF(TairK(NY,NX))
   WVapDifusvityAir_col(NY,NX)=WGSG*TFACA
   TFACR=TEFGASDIF(TKS(0,NY,NX))
-  VaporDiffusivityLitR(NY,NX)=WGSG*TFACR
-  !write(*,*) "VaporDiffusivityLitR(NY,NX) = ", VaporDiffusivityLitR(NY,NX)
+  VaporDiffusivityLitR_col(NY,NX)=WGSG*TFACR
+  !write(*,*) "VaporDiffusivityLitR_col(NY,NX) = ", VaporDiffusivityLitR_col(NY,NX)
   !write(*,*) "WGSG = ", WGSG
   !write(*,*) "TFACR = ", TFACR
   D5060: DO  L=1,JS

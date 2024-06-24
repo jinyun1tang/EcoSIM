@@ -4421,16 +4421,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='PrecIntcptByCanG', dim1name='column',&
+    call restartvar(ncid, flag, varname='PrecIntceptByCanopy_col', dim1name='column',&
        long_name='net water transfer to whole grid canopy', units='MJ d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntcptByCanG,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntceptByCanopy_col,datrc_1d)
   else
-    !print*,'PrecIntcptByCanG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntcptByCanG,datrc_1d)  
+    !print*,'PrecIntceptByCanopy_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntceptByCanopy_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='PrecIntcptByCanG', dim1name='column',&
+    call restartvar(ncid, flag, varname='PrecIntceptByCanopy_col', dim1name='column',&
        long_name='net water transfer to whole grid canopy', units='MJ d-2 t-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -4523,16 +4523,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='LWRadBySurf', dim1name='column',&
+    call restartvar(ncid, flag, varname='LWRadBySurf_col', dim1name='column',&
        long_name='longwave radiation emitted from ground surface (including snow and litter)', units='MJ d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf_col,datrc_1d)
   else
-    !print*,'LWRadBySurf'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)  
+    !print*,'LWRadBySurf_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='LWRadBySurf', dim1name='column',&
+    call restartvar(ncid, flag, varname='LWRadBySurf_col', dim1name='column',&
        long_name='longwave radiation emitted from ground surface  (including snow and litter)', units='MJ d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)

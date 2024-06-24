@@ -270,7 +270,7 @@ module CanopyCondsMod
     SoilAlbedo               => plt_rad%SoilAlbedo                   , &
     SurfAlbedo_col           => plt_rad%SurfAlbedo_col               , &
     CanopyPARalbedo_pft      => plt_rad%CanopyPARalbedo_pft          , &
-    FracSWRad2Grnd           => plt_rad%FracSWRad2Grnd               , &
+    FracSWRad2Grnd_col           => plt_rad%FracSWRad2Grnd_col               , &
     GroundSurfAzimuth_col    => plt_rad%GroundSurfAzimuth_col        , &
     CosineGrndSlope_col      => plt_rad%CosineGrndSlope_col          , &
     SineGrndSlope_col        => plt_rad%SineGrndSlope_col            , &
@@ -880,19 +880,19 @@ module CanopyCondsMod
   !
   !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
   !
-  !     FracSWRad2Grnd=fraction of radiation received by ground surface
+  !     FracSWRad2Grnd_col=fraction of radiation received by ground surface
   !     FRADP=fraction of radiation received by each PFT canopy
   !     LeafStalkArea_col,LeafStalkArea_pft=leaf+stalk area of all PFTs,each PFT
   !
-  FracSWRad2Grnd=1.0_r8
+  FracSWRad2Grnd_col=1.0_r8
   IF(LeafStalkArea_col.GT.ZEROS)THEN
     FRadPARbyLeafT=1.0_r8-EXP(-0.65_r8*LeafStalkArea_col/AREA3(NU))
     D145: DO NZ=1,NP
       FracPARRadbyCanopy_pft(NZ)=FRadPARbyLeafT*LeafStalkArea_pft(NZ)/LeafStalkArea_col
-      FracSWRad2Grnd=FracSWRad2Grnd-FracPARRadbyCanopy_pft(NZ)
+      FracSWRad2Grnd_col=FracSWRad2Grnd_col-FracPARRadbyCanopy_pft(NZ)
     ENDDO D145
   ELSE
-    FracSWRad2Grnd=1.0_r8
+    FracSWRad2Grnd_col=1.0_r8
     D146: DO NZ=1,NP
       FracPARRadbyCanopy_pft(NZ)=0.0_r8
     ENDDO D146

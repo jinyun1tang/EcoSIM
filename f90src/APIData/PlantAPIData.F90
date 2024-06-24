@@ -154,7 +154,7 @@ implicit none
   real(r8) :: RadPARDirect_col     !direct PAR, [umol m-2 s-1]
   real(r8) :: Eco_NetRad_col       !ecosystem net radiation, [MJ d-2 h-1]
   real(r8) :: RadSWSolarBeam_col      !shortwave radiation in solar beam, [MJ m-2 h-1]
-  real(r8) :: FracSWRad2Grnd     !fraction of radiation intercepted by ground surface, [-]
+  real(r8) :: FracSWRad2Grnd_col     !fraction of radiation intercepted by ground surface, [-]
   real(r8) :: RadSWGrnd_col      !radiation intercepted by ground surface, [MJ m-2 h-1]
   real(r8) :: SineGrndSlope_col      !sine of slope, [-]
   real(r8) :: GroundSurfAzimuth_col     !azimuth of slope, [-]

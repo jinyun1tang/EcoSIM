@@ -124,7 +124,7 @@ implicit none
   real(r8),pointer   :: h1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_Eco_Heat_col(:)          !Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_G_col(:)          !Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_Heat2G_col(:)          !Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_O2_LITR_col(:)       !trc_solcl_vr(idg_O2,0,NY,NX)
   real(r8),pointer   :: h1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   real(r8),pointer   :: h1D_SOIL_CO2_FLX_col(:)  !SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
@@ -405,7 +405,7 @@ implicit none
   allocate(this%h1D_ECO_RN_col(beg_col:end_col))          ;this%h1D_ECO_RN_col(:)=spval
   allocate(this%h1D_ECO_LE_col(beg_col:end_col))          ;this%h1D_ECO_LE_col(:)=spval
   allocate(this%h1D_Eco_Heat_col(beg_col:end_col))        ;this%h1D_Eco_Heat_col(:)=spval
-  allocate(this%h1D_ECO_G_col(beg_col:end_col))           ;this%h1D_ECO_G_col(:)=spval
+  allocate(this%h1D_ECO_Heat2G_col(beg_col:end_col))           ;this%h1D_ECO_Heat2G_col(:)=spval
   allocate(this%h1D_O2_LITR_col(beg_col:end_col))         ;this%h1D_O2_LITR_col(:)=spval
   allocate(this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc))         ;this%h1D_MIN_LWP_ptc(:)=spval
   allocate(this%h1D_SOIL_CO2_FLX_col(beg_col:end_col))    ;this%h1D_SOIL_CO2_FLX_col(:)=spval
@@ -912,23 +912,23 @@ implicit none
 
   data1d_ptr => this%h1D_SOIL_G_col(beg_col:end_col)  
   call hist_addfld1d(fname='SOIL_G',units='W/m2',avgflag='A',&
-    long_name='*total heat flux into ground surface',ptr_col=data1d_ptr)      
+    long_name='*total heat flux into ground surface (>0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_RN_col(beg_col:end_col)     
   call hist_addfld1d(fname='ECO_Radnet',units='W/m2',avgflag='A',&
-    long_name='ecosystem net radiation',ptr_col=data1d_ptr)      
+    long_name='ecosystem net radiation (>0 into ecosystem)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_LE_col(beg_col:end_col)        
   call hist_addfld1d(fname='ECO_LE',units='W/m2',avgflag='A',&
-    long_name='ecosystem latent heat flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+    long_name='ecosystem latent heat flux (>0 into surface)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_Heat_col(beg_col:end_col)  
-  call hist_addfld1d(fname='ECO_H',units='W/m2',avgflag='A',&
-    long_name='ecosystem sensible heat flux',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='ECO_HeatS',units='W/m2',avgflag='A',&
+    long_name='ecosystem sensible heat flux (>0 into surface)',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_ECO_G_col(beg_col:end_col)  
-  call hist_addfld1d(fname='ECO_G',units='W/m2',avgflag='A',&
-    long_name='ecosystem storage heat flux',ptr_col=data1d_ptr)      
+  data1d_ptr => this%h1D_ECO_Heat2G_col(beg_col:end_col)  
+  call hist_addfld1d(fname='ECO_Heat2G',units='W/m2',avgflag='A',&
+    long_name='ecosystem storage heat flux (>0 into surface)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_LITR_col(beg_col:end_col)      
   call hist_addfld1d(fname='O2_LITR',units='g/m3',avgflag='A',&
@@ -1705,7 +1705,7 @@ implicit none
       this%h1D_ECO_RN_col(ncol)      = Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_LE_col(ncol)      = Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Eco_Heat_col(ncol)    = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_G_col(ncol)       = Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_Heat2G_col(ncol)  = Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_O2_LITR_col(ncol)     = trc_solcl_vr(idg_O2,0,NY,NX)
       this%h1D_SOIL_CO2_FLX_col(ncol)= SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
       this%h1D_ECO_CO2_FLX_col(ncol) = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec

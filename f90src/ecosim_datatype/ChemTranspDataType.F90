@@ -21,7 +21,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  DOMdiffusivity_vr(:,:,:,:)                       !aqueous DOC diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WVapDifusvitySoil_vr(:,:,:)                       !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  H2OVapDifscSno(:,:,:)                       !water vapor diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  VaporDiffusivityLitR(:,:)                         !water vapor diffusivity, [m2 h-1]
+  real(r8),target,allocatable ::  VaporDiffusivityLitR_col(:,:)                         !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WVapDifusvityAir_col(:,:)                         !water vapor diffusivity, [m2 h-1]
 
   real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                !solubility of gases
@@ -67,7 +67,7 @@ module ChemTranspDataType
   allocate(DOMdiffusivity_vr(idom_beg:idom_end,0:JZ,JY,JX));  DOMdiffusivity_vr=0._r8
   allocate(WVapDifusvitySoil_vr(JZ,JY,JX));    WVapDifusvitySoil_vr=0._r8
   allocate(H2OVapDifscSno(JS,JY,JX));    H2OVapDifscSno=0._r8
-  allocate(VaporDiffusivityLitR(JY,JX));       VaporDiffusivityLitR=0._r8
+  allocate(VaporDiffusivityLitR_col(JY,JX));       VaporDiffusivityLitR_col=0._r8
   allocate(WVapDifusvityAir_col(JY,JX));       WVapDifusvityAir_col=0._r8
   allocate(GasSolbility_vr(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility_vr=0._r8
 
@@ -108,7 +108,7 @@ module ChemTranspDataType
   call destroy(DOMdiffusivity_vr)
   call destroy(WVapDifusvitySoil_vr)
   call destroy(H2OVapDifscSno)
-  call destroy(VaporDiffusivityLitR)
+  call destroy(VaporDiffusivityLitR_col)
   call destroy(WVapDifusvityAir_col)
 
   call destroy(trcn_2DFloXSurRunoff)

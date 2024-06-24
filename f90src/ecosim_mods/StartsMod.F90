@@ -811,8 +811,8 @@ module StartsMod
   DPNO3(:,:)=0.0_r8
   DPPO4(:,:)=0.0_r8
   trc_solml_vr(idg_O2,0,:,:)=0.0_r8
-  FracSWRad2Grnd(:,:)=1.0_r8
-  LWRadBySurf(:,:)=0.0_r8
+  FracSWRad2Grnd_col(:,:)=1.0_r8
+  LWRadBySurf_col(:,:)=0.0_r8
   LWRadCanG(:,:)=0.0_r8
   Eco_NetRad_col(:,:)=0.0_r8
   Eco_Heat_Latent_col(:,:)=0.0_r8
@@ -826,7 +826,7 @@ module StartsMod
   CanH2OHeldVg(:,:)=0.0_r8
   CanopyLeafArea_col(:,:)=0.0_r8
   StemArea_col(:,:)=0.0_r8
-  PrecIntcptByCanG(:,:)=0.0_r8
+  PrecIntceptByCanopy_col(:,:)=0.0_r8
   PlantPopu_col(:,:)=0.0_r8
   DayLenthCurrent(:,:)=12.0_r8
   SurfAlbedo_col(:,:)=SoilAlbedo(:,:)

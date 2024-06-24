@@ -1564,7 +1564,7 @@ implicit none
   RadPARDirect_col(NY,NX)=plt_rad%RadPARDirect_col
   RadPARDiffus_col(NY,NX)=plt_rad%RadPARDiffus_col
   RadSWGrnd_col(NY,NX)=plt_rad%RadSWGrnd_col
-  FracSWRad2Grnd(NY,NX)=plt_rad%FracSWRad2Grnd
+  FracSWRad2Grnd_col(NY,NX)=plt_rad%FracSWRad2Grnd_col
   RadSWSolarBeam_col(NY,NX)=plt_rad%RadSWSolarBeam_col
   RadPARSolarBeam_col(NY,NX)=plt_rad%RadPARSolarBeam_col
   DO L=0,NumOfCanopyLayers
