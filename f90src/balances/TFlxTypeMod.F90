@@ -48,7 +48,6 @@ implicit none
   real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
-  real(r8),allocatable ::  THeatFlow2Soil(:,:,:)                       !
   real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
 
   real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)                      !
@@ -132,7 +131,6 @@ implicit none
   allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
   allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
-  allocate(THeatFlow2Soil(JZ,JY,JX));    THeatFlow2Soil=0._r8
   allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
   allocate(WatIceThawMicP(JZ,JY,JX));    WatIceThawMicP=0._r8
   allocate(THeatSoiThaw(JZ,JY,JX));   THeatSoiThaw=0._r8
@@ -208,7 +206,6 @@ implicit none
   call destroy(tErosionSedmLoss)
   call destroy(TWatFlowCellMicP)
   call destroy(TWatFlowCellMicPX)
-  call destroy(THeatFlow2Soil)
   call destroy(TWaterFlowMacP)
   call destroy(WatIceThawMicP)
   call destroy(THeatSoiThaw)

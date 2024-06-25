@@ -453,7 +453,7 @@ implicit none
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
   !
-  VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)                          
+  VHeatCapacityLitrX=VHeatCapacity_col(0,NY,NX)                          
   VHeatCapacityLitR=cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX) 
   VLWatMicPr=VLWatMicP_vr(0,NY,NX)
   VLiceMicPr=VLiceMicP(0,NY,NX)
@@ -469,42 +469,42 @@ implicit none
   !update water, ice content and heat capacity of residue
   VLWatMicP_vr(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+WatInByRunoff)
   VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
-  VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
 
-  IF(VHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+  IF(VHeatCapacity_col(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
     tkspre=TKS(0,NY,NX)
     TKS(0,NY,NX)=(ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HeatByLitrMassChange &
-      +HEATIN_lndByRunoff)/VHeatCapacity(0,NY,NX)
+      +HEATIN_lndByRunoff)/VHeatCapacity_col(0,NY,NX)
     if(TKS(0,NY,NX)<100._r8 .or. TKS(0,NY,NX)>400._r8)then
       write(*,*)mod_filename,NY,NX,TKS(0,NY,NX),tkspre
       write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2Litr(NY,NX),WatInByRunoff
       write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2Litr(NY,NX),TLitrIceFlxThaw(NY,NX),WatInByRunoff
       write(*,*)'ice',VLiceMicPr,VLiceMicP(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
-        HEATIN_lndByRunoff,VHeatCapacity(0,NY,NX)        
+        HEATIN_lndByRunoff,VHeatCapacity_col(0,NY,NX)        
       write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK(NY,NX),SoilOrgM_vr(ielmc,0,NY,NX)   
-      write(*,*)'tengz',ENGYZ/VHeatCapacity(0,NY,NX),HeatFLo2LitrByWat(NY,NX)/VHeatCapacity(0,NY,NX),&
-        TLitrIceHeatFlxFrez(NY,NX)/VHeatCapacity(0,NY,NX),HeatByLitrMassChange/VHeatCapacity(0,NY,NX), &
-        HEATIN_lndByRunoff/VHeatCapacity(0,NY,NX)
+      write(*,*)'tengz',ENGYZ/VHeatCapacity_col(0,NY,NX),HeatFLo2LitrByWat(NY,NX)/VHeatCapacity_col(0,NY,NX),&
+        TLitrIceHeatFlxFrez(NY,NX)/VHeatCapacity_col(0,NY,NX),HeatByLitrMassChange/VHeatCapacity_col(0,NY,NX), &
+        HEATIN_lndByRunoff/VHeatCapacity_col(0,NY,NX)
 
       call endrun(trim(mod_filename)//' at line',__LINE__)
     endif  
     HEATIN_lnd=HEATIN_lnd+HeatByLitrMassChange
     Ls=NUM(NY,NX)
     !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
-!    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
+!    if(abs(VHeatCapacity_col(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
 !      abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
 !      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
 !    endif
   ELSE
-    HEATIN_lnd=HEATIN_lnd+HeatByLitrMassChange+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
+    HEATIN_lnd=HEATIN_lnd+HeatByLitrMassChange+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity_col(0,NY,NX)
     TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
   ENDIF
 
   TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
     
-  ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
+  ENGYR=VHeatCapacity_col(0,NY,NX)*TKS(0,NY,NX)
 
   HeatStoreLandscape=HeatStoreLandscape+ENGYR
   HEATIN_lnd=HEATIN_lnd+TLitrIceHeatFlxFrez(NY,NX)

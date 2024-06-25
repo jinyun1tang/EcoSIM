@@ -115,7 +115,7 @@ implicit none
     !air temperature above freezing, surface snow layer heat insignificant, so it is merged
     !to the surface layer, and all varaibles are reset
     ENGYS=TKSnow(1,NY,NX)*VLHeatCapSnow_col(1,NY,NX)
-    ENGY1=TKS(NUM(NY,NX),NY,NX)*VHeatCapacity(NUM(NY,NX),NY,NX)
+    ENGY1=TKS(NUM(NY,NX),NY,NX)*VHeatCapacity_col(NUM(NY,NX),NY,NX)
     FLWS=VLDrySnoWE_col(1,NY,NX)
     FLWW=VLWatSnow_col(1,NY,NX)
     FLWI=VLIceSnow_col(1,NY,NX)
@@ -142,14 +142,14 @@ implicit none
     VLWatMicP_vr(NUM(NY,NX),NY,NX)=VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
     VLiceMicP(NUM(NY,NX),NY,NX)=VLiceMicP(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE   
 
-    ENGY=VHeatCapacity(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
-    VHeatCapacity(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
+    ENGY=VHeatCapacity_col(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
+    VHeatCapacity_col(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
       +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP(NUM(NY,NX),NY,NX)) &
       +cpi*(VLiceMicP(NUM(NY,NX),NY,NX)+VLiceMacP(NUM(NY,NX),NY,NX))
 
-    IF(VHeatCapacity(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VHeatCapacity_col(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       TKSX=TKS(NUM(NY,NX),NY,NX)
-      TKS(NUM(NY,NX),NY,NX)=(ENGY+HeatFlo2Surface)/VHeatCapacity(NUM(NY,NX),NY,NX)
+      TKS(NUM(NY,NX),NY,NX)=(ENGY+HeatFlo2Surface)/VHeatCapacity_col(NUM(NY,NX),NY,NX)
 !      if(abs(TKS(NUM(NY,NX),NY,NX)/tksx-1._r8)>0.025_r8)then
 !        TKS(NUM(NY,NX),NY,NX)=TKSX
 !      endif

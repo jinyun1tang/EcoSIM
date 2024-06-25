@@ -54,7 +54,8 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DOP_FLX_col(:)    !HydroSubsDOPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_HeatFlx2G_col(:)      !
+  real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)      !
+
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
   real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -155,6 +156,7 @@ implicit none
   real(r8),pointer   :: h2D_tSOC_vr_col(:,:)        !SoilOrgM_vr(ielmc,1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: h2D_tSON_vr_col(:,:)
   real(r8),pointer   :: h2D_tSOP_vr_col(:,:)  
+  real(r8),pointer   :: h2D_VHeatCap_vr_col(:,:)  
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -271,6 +273,8 @@ implicit none
   real(r8),pointer   :: h2D_N2O_vr_col(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_NH3_vr_col(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_TEMP_vr_col(:,:)        !TCS(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_HeatUptk_vr_col(:,:)    !Heat uptake by root  
+  real(r8),pointer   :: h2D_HeatFlow_vr_col(:,:)    !
   real(r8),pointer   :: h2D_vWATER_vr_col(:,:)       !THETWZ(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_vICE_vr_col(:,:)         !THETIZ(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr_col(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
@@ -335,7 +339,7 @@ implicit none
   allocate(this%h1D_SUB_DOP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DOP_FLX_col(:)=spval 
   allocate(this%h1D_SUR_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUR_DIP_FLX_col(:)=spval
   allocate(this%h1D_SUB_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DIP_FLX_col(:)=spval
-  allocate(this%h1D_HeatFlx2G_col(beg_col:end_col))     ;this%h1D_HeatFlx2G_col(:)=spval
+  allocate(this%h1D_HeatFlx2Grnd_col(beg_col:end_col))     ;this%h1D_HeatFlx2Grnd_col(:)=spval
   allocate(this%h1D_Qinfl2soi_col(beg_col:end_col))     ;this%h1D_Qinfl2soi_col(:)=spval
   allocate(this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col)) ;this%h1D_tSALT_DISCHG_FLX_col(:)=spval
   allocate(this%h1D_SUR_DON_FLX_col(beg_col:end_col))    ;this%h1D_SUR_DON_FLX_col(:)=spval
@@ -543,6 +547,7 @@ implicit none
   allocate(this%h2D_tSOC_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSOC_vr_col(:,:)=spval
   allocate(this%h2D_tSON_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSON_vr_col(:,:)=spval
   allocate(this%h2D_tSOP_vr_col(beg_col:end_col,1:JZ))    ;this%h2D_tSOP_vr_col(:,:)=spval
+  allocate(this%h2D_VHeatCap_vr_col(beg_col:end_col,1:JZ));this%h2D_VHeatCap_vr_col(:,:)=spval
   allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
   allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc(:,:)=spval
   allocate(this%h2D_CO2_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_CO2_vr_col(:,:)=spval
@@ -551,6 +556,8 @@ implicit none
   allocate(this%h2D_N2O_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_N2O_vr_col(:,:)=spval
   allocate(this%h2D_NH3_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_NH3_vr_col(:,:)=spval
   allocate(this%h2D_TEMP_vr_col(beg_col:end_col,1:JZ))       ;this%h2D_TEMP_vr_col(:,:)=spval
+  allocate(this%h2D_HeatFlow_vr_col(beg_col:end_col,1:JZ))   ;this%h2D_HeatFlow_vr_col(:,:)=spval
+  allocate(this%h2D_HeatUptk_vr_col(beg_col:end_col,1:JZ))   ;this%h2D_HeatUptk_vr_col(:,:)=spval
   allocate(this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ))     ;this%h2D_vWATER_vr_col(:,:)=spval
   allocate(this%h2D_vICE_vr_col(beg_col:end_col,1:JZ))       ;this%h2D_vICE_vr_col(:,:)=spval
   allocate(this%h2D_PSI_vr_col(beg_col:end_col,1:JZ))        ;this%h2D_PSI_vr_col(:,:)=spval
@@ -703,8 +710,8 @@ implicit none
   call hist_addfld1d(fname='SUB_DIP_FLX',units='gP/m2/hr',avgflag='A',&
     long_name='total subsurface DIP flux',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_HeatFlx2G_col(beg_col:end_col)
-  call hist_addfld1d(fname='HeatFlx2G_col',units='MJ/m2/hr',avgflag='A',&
+  data1d_ptr => this%h1D_HeatFlx2Grnd_col(beg_col:end_col)
+  call hist_addfld1d(fname='HeatFlx2Grnd_col',units='MJ/m2/hr',avgflag='A',&
     long_name='Heat flux into the ground',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Qinfl2soi_col(beg_col:end_col)
@@ -1475,6 +1482,10 @@ implicit none
   call hist_addfld2d(fname='tSOP_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='*Vertically resolved total soil organic P',ptr_col=data2d_ptr)      
 
+  data2d_ptr => this%h2D_VHeatCap_vr_col(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='VHeatCap_vr',units='MJ/m3/K',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved Volumetric heat capacity',ptr_col=data2d_ptr)      
+
   data2d_ptr => this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   call hist_addfld2d(fname='LEAF_NODE_NO',units='none',type2d='nbranches',avgflag='I',&
     long_name='Leaf number',ptr_patch=data2d_ptr)      
@@ -1506,6 +1517,14 @@ implicit none
   data2d_ptr => this%h2D_TEMP_vr_col(beg_col:end_col,1:JZ)         !TCS(1:JZ,NY,NX)
   call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='levsoi',avgflag='A',&
     long_name='soil temperature profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr => this%h2D_HeatFlow_vr_col(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HeatFlow_vr',units='MJ m-3 hr-1',type2d='levsoi',avgflag='A',&
+    long_name='soil heat flow profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr => this%h2D_HeatUptk_vr_col(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HeatUptk_vr',units='MJ m-3 hr-1',type2d='levsoi',avgflag='A',&
+    long_name='soil heat flow by plant water uptake',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ)        !THETWZ(1:JZ,NY,NX)
   call hist_addfld2d(fname='vWATER_vr',units='m3/m3',type2d='levsoi',avgflag='A',&
@@ -1630,7 +1649,7 @@ implicit none
       this%h1D_SUB_DOP_FLX_col(ncol)      = HydroSubsDOPFlx_col(NY,NX)/TAREA
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DIP_FLX_col(ncol)      = HydroSubsDIPFlx_col(NY,NX)/TAREA  
-      this%h1D_HeatFlx2G_col(ncol)        = HeatFlx2G_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_HeatFlx2Grnd_col(ncol)     = HeatFlx2Grnd_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SUR_DON_FLX_col(ncol)      = HydroSufDONFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DON_FLX_col(ncol)      = HydroSubsDONFlx_col(NY,NX)/TAREA
@@ -1731,12 +1750,15 @@ implicit none
         this%h2D_tSOC_vr_col(ncol,L) =  SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_tSON_vr_col(ncol,L) =  SoilOrgM_vr(ielmn,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_tSOP_vr_col(ncol,L) =  SoilOrgM_vr(ielmp,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_VHeatCap_vr_col(ncol,L)=VHeatCapacity_col(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_CO2_vr_col(ncol,L)  =  trc_solcl_vr(idg_CO2,L,NY,NX)
         this%h2D_CH4_vr_col(ncol,L)  =  trc_solcl_vr(idg_CH4,L,NY,NX)
         this%h2D_O2_vr_col(ncol,L)   =  trc_solcl_vr(idg_O2,L,NY,NX)
         this%h2D_N2O_vr_col(ncol,L)  =  trc_solcl_vr(idg_N2O,L,NY,NX)
         this%h2D_NH3_vr_col(ncol,L)  =  trc_solcl_vr(idg_NH3,L,NY,NX)
         this%h2D_TEMP_vr_col(ncol,L) =  TCS(L,NY,NX)
+        this%h2D_HeatFlow_vr_col(ncol,L)=THeatFlow2Soil_col(L,NY,NX)
+        this%h2D_HeatUptk_vr_col(ncol,L)=THeatRootUptake_vr(L,NY,NX)
         this%h2D_vWATER_vr_col(ncol,L)=  THETWZ(L,NY,NX)
         this%h2D_vICE_vr_col(ncol,L)  =  THETIZ(L,NY,NX)
         this%h2D_PSI_vr_col(ncol,L)  =  PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)     
@@ -1744,6 +1766,7 @@ implicit none
         this%h2D_cNH4t_vr_col(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX)),&
                                                SoilMicPMassLayer(L,NY,NX))
+  
         this%h2D_cNO3t_vr_col(ncol,L)= safe_adb(trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX) &
                                                +trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX),&
                                                SoilMicPMassLayer(L,NY,NX))

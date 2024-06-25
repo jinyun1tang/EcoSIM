@@ -110,7 +110,7 @@ module RedistMod
 !
       call ModifyExWTBLByDisturbance(I,J,NY,NX)
 
-      call LateralTranspt(I,J,NY,NX,LG)
+      call XGridTranspt(I,J,NY,NX,LG)
 
       call SnowMassUpdate(I,J,NY,NX)
 
@@ -778,7 +778,7 @@ module RedistMod
   
   DO L=NU(NY,NX),NL(NY,NX)
     TKSX=TKS(L,NY,NX)
-    VHeatCapacityX=VHeatCapacity(L,NY,NX)
+    VHeatCapacityX=VHeatCapacity_col(L,NY,NX)
     VOLWXX=VLWatMicP_vr(L,NY,NX)
     VOLIXX=VLiceMicP(L,NY,NX)
     !micropore
@@ -811,10 +811,10 @@ module RedistMod
 !     VGeomLayer(L,NY,NX)=VLMicP_vr(L,NY,NX)
     ENDIF
     ENGY=VHeatCapacityX*TKSX
-    VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+    VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
       +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 
-    TVHeatCapacity=TVHeatCapacity+VHeatCapacity(L,NY,NX)
+    TVHeatCapacity=TVHeatCapacity+VHeatCapacity_col(L,NY,NX)
     TVHeatCapacitySoilM=TVHeatCapacitySoilM+VHeatCapacitySoilM(L,NY,NX)    
     TVOLW=TVOLW+VLWatMicP_vr(L,NY,NX)
     TVOLWH=TVOLWH+VLWatMacP(L,NY,NX)
@@ -826,35 +826,34 @@ module RedistMod
     !
     !     IF(NX.EQ.3.AND.NY.EQ.2.AND.L.GT.NU(NY,NX)
     !    3.AND.L.LE.17.AND.I.GE.152.AND.I.LE.304)THEN
-    !     THeatFlow2Soil(L,NY,NX)=THeatFlow2Soil(L,NY,NX)
-    !    2+(TKSZ(I,J,L)-TKS(L,NY,NX))*VHeatCapacity(L,NY,NX)
+    !     THeatFlow2Soil_col(L,NY,NX)=THeatFlow2Soil_col(L,NY,NX)
+    !    2+(TKSZ(I,J,L)-TKS(L,NY,NX))*VHeatCapacity_col(L,NY,NX)
     !     WRITE(*,3379)'TKSZ',I,J,NX,NY,L,TKSZ(I,J,L)
-    !    2,TKS(L,NY,NX),VHeatCapacity(L,NY,NX),THeatFlow2Soil(L,NY,NX)
+    !    2,TKS(L,NY,NX),VHeatCapacity_col(L,NY,NX),THeatFlow2Soil_col(L,NY,NX)
     !3379  FORMAT(A8,6I4,12E12.4)
     !     ENDIF
     !
     !     END ARTIFICIAL SOIL WARMING
     !
     TKSpre=TKS(L,NY,NX)
-    IF(VHeatCapacity(L,NY,NX).GT.ZEROS(NY,NX) &
-      .and.VHeatCapacity(L,NY,NX)/(VHeatCapacityX+VHeatCapacity(L,NY,NX))>0.05_r8)THEN
+    IF(VHeatCapacity_col(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_col(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_col(L,NY,NX))>0.05_r8)THEN
       TKS00=TKS(L,NY,NX)
-      TKS(L,NY,NX)=(ENGY+THeatFlow2Soil(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
-        +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity(L,NY,NX)
+      TKS(L,NY,NX)=(ENGY+THeatFlow2Soil_col(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
+        +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_col(L,NY,NX)
 
-!      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity(L,NY,NX),&
+!      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity_col(L,NY,NX),&
 !        SoiBulkDensity_vr(L,NY,NX),NU(NY,NX)
       if(TKS(L,NY,NX)>4.e2)then
         write(*,*)'weird temperature in redist',L,NY,NX,TKSpre,TKS(L,NY,NX)
-        write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity(L,NY,NX),ZEROS(NY,NX),SoiBulkDensity_vr(L,NY,NX)
-        write(*,*)'itemized',ENGY/VHeatCapacity(L,NY,NX),&
-          THeatFlow2Soil(L,NY,NX)/VHeatCapacity(L,NY,NX),&
-          THeatSoiThaw(L,NY,NX)/VHeatCapacity(L,NY,NX), &
-          THeatRootUptake_vr(L,NY,NX)/VHeatCapacity(L,NY,NX),&
-          HeatIrrigation(L,NY,NX)/VHeatCapacity(L,NY,NX)
+        write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity_col(L,NY,NX),ZEROS(NY,NX),SoiBulkDensity_vr(L,NY,NX)
+        write(*,*)'itemized',ENGY/VHeatCapacity_col(L,NY,NX),&
+          THeatFlow2Soil_col(L,NY,NX)/VHeatCapacity_col(L,NY,NX),&
+          THeatSoiThaw(L,NY,NX)/VHeatCapacity_col(L,NY,NX), &
+          THeatRootUptake_vr(L,NY,NX)/VHeatCapacity_col(L,NY,NX),&
+          HeatIrrigation(L,NY,NX)/VHeatCapacity_col(L,NY,NX)
         write(*,*)'wat',VLWatMicP_vr(L,NY,NX),VLWatMacP(L,NY,NX), &
           VLiceMicP(L,NY,NX),VLiceMacP(L,NY,NX)  
-        write(*,*)'heat',ENGY,THeatFlow2Soil(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
+        write(*,*)'heat',ENGY,THeatFlow2Soil_col(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
         call endrun()  
       endif
 
@@ -867,7 +866,7 @@ module RedistMod
     VOLISO=VOLISO+VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
 !    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    HeatStoreLandscape=HeatStoreLandscape+VHeatCapacity(L,NY,NX)*TKS(L,NY,NX)
+    HeatStoreLandscape=HeatStoreLandscape+VHeatCapacity_col(L,NY,NX)*TKS(L,NY,NX)
   ENDDO
   end subroutine update_physVar_Profile
 !------------------------------------------------------------------------------------------

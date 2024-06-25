@@ -266,12 +266,24 @@ module nitrosMod
     DO  M=1,ndbiomcp
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+        if(ORGM(NE)<0._r8)then
+        print*,'orgm3',ORGM
+        stop
+        endif
+
       ENDDO    
     ENDDO
 
     !add dom
     DO NE=1,nelms
+      if(abs(DOM_vr(NE,K,L,NY,NX))<1.e-12_r8)DOM_vr(NE,K,L,NY,NX)=0._r8
+      if(abs(SorbedOM_vr(NE,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(NE,K,L,NY,NX)=0._r8
       ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+        if(ORGM(NE)<0._r8)then
+        print*,'orgm2',NE,ORGM,DOM_vr(NE,K,L,NY,NX),DOM_MacP_vr(NE,K,L,NY,NX),SorbedOM_vr(NE,K,L,NY,NX)
+        stop
+        endif
+
     ENDDO
 
     ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
@@ -280,6 +292,11 @@ module nitrosMod
     DO  M=1,jsken
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+        if(ORGM(NE)<0._r8)then
+        print*,'orgm1',ORGM
+        stop
+        endif
+
       ENDDO  
     ENDDO  
   ENDDO    
@@ -318,6 +335,7 @@ module nitrosMod
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+
           ENDDO
         enddo
       enddo
@@ -340,7 +358,6 @@ module nitrosMod
     DO  M=1,jsken
       DO NE=1,NumPlantChemElms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
-
       ENDDO  
     ENDDO  
   ENDDO    

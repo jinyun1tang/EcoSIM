@@ -744,7 +744,7 @@ module Hour1Mod
 
   tRDOE2Die_col(1:NumPlantChemElms,NY,NX)  = 0._r8
   Qinflx2Soil_col(NY,NX)                  = 0._r8
-  HeatFlx2G_col(NY,NX)                    = 0._r8
+  HeatFlx2Grnd_col(NY,NX)                    = 0._r8
   DIC_mass_col(NY,NX)                     = 0.0_r8
   tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0.0_r8
   tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8

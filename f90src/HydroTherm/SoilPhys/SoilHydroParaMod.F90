@@ -360,7 +360,7 @@ contains
     VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
     VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
-    VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
+    VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
     THETWZ(L,NY,NX)=THETW_vr(L,NY,NX)
     THETIZ(L,NY,NX)=THETI(L,NY,NX)

@@ -335,10 +335,10 @@ module NitroDisturbMod
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
+!     VHeatCapacity_col(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
 !    2+1.9274*VLiceMicP(0,NY,NX)
 !     ELSE
-!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
+!     VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
 !     ENDIF
         IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN

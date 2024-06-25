@@ -121,7 +121,7 @@ module WatsubMod
 !   update states and fluxes
     DO NX=NHW,NHE
       DO  NY=NVN,NVS
-        HeatFlx2G_col(NY,NX)=HeatFlx2G_col(NY,NX)+Hinfl2Soil(NY,NX)
+        HeatFlx2Grnd_col(NY,NX)=HeatFlx2Grnd_col(NY,NX)+Hinfl2Soil(NY,NX)
         Qinflx2Soil_col(NY,NX)=Qinflx2Soil_col(NY,NX)+Qinfl2MicP(NY,NX)
       ENDDO
     ENDDO  
@@ -502,6 +502,7 @@ module WatsubMod
             IF(L.EQ.NL(NY,NX))THEN
               cycle
             ELSE
+              !destination is layer below
               N4=NX
               N5=NY
               N6=L+1
@@ -509,14 +510,14 @@ module WatsubMod
           ENDIF
 !
 !     SKIP NON-EXISTENT DESTINATION SOIL LAYERS
-!     identified by soil volume
+          ! identified by soil volume
           D1100: DO LL=N6,NL(NY,NX)
             IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
               N6=LL
               exit
             ENDIF
           ENDDO D1100
-! need to better understand the following line
+          ! need to better understand the following line
           IF(N3.EQ.NU(N2,N1))N6X(N2,N1)=N6
       !
       !     POROSITIES 'THETP*', WATER CONTENTS 'THETA*', AND POTENTIALS
@@ -954,10 +955,7 @@ module WatsubMod
               TConvectWaterFlowMacP(N3,N2,N1)=TConvectWaterFlowMacP(N3,N2,N1)+ConvectWaterFlowMacP(N,N3,N2,N1) &
                 -ConvectWaterFlowMacP(N,N6,N5,N4)
               THeatFlow2Soili(N3,N2,N1)=THeatFlow2Soili(N3,N2,N1)+HeatFlow2Soili(N,N3,N2,N1)-HeatFlow2Soili(N,N6,N5,N4)
-            !  if(N3==1.and.abs(THeatFlow2Soili(N3,N2,N1))>10._r8)then
-            !    write(*,*)'THeatFlow2Soili(N3,N2,N1)',THeatFlow2Soili(N3,N2,N1),&
-            !      HeatFlow2Soili(N,N3,N2,N1),HeatFlow2Soili(N,N6,N5,N4)
-            !  endif
+
             ELSE
               TWatCharge2MicP(N3,N2,N1)=0.0_r8
               TWatXChange2WatTableX(N3,N2,N1)=0.0_r8
@@ -1198,7 +1196,7 @@ module WatsubMod
       IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO.AND.VLHeatCapacity_col(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
         !the soil/water profile moves down        
         NUX=NUM(NY,NX)
-        DO  LL=NUX+1,NL(NY,NX)
+        D9970: DO  LL=NUX+1,NL(NY,NX)
           IF(VLSoilPoreMicP_vr(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
             NUM(NY,NX)=LL
             FLWNX(NY,NX) =WaterFlowSoiMicP(3,NUM(NY,NX),NY,NX)
@@ -1207,9 +1205,8 @@ module WatsubMod
             HFLWNX(NY,NX)=HeatFlow2Soil(3,NUM(NY,NX),NY,NX)
             exit
           ENDIF
-        ENDDO
+        ENDDO D9970
       ENDIF
-
     ENDDO D9790
   ENDDO D9795
 
@@ -1226,6 +1223,7 @@ module WatsubMod
   D9695: DO NX=NHW,NHE
     D9690: DO NY=NVN,NVS
       IF(NUM(NY,NX).EQ.NU(NY,NX))THEN
+        !top layer is the same
         LakeSurfFlowMicP(NY,NX)=WaterFlowSoiMicP(3,N6X(NY,NX),NY,NX)
         LakeSurfFlowMicPX(NY,NX)=WaterFlowSoiMicPX(3,N6X(NY,NX),NY,NX)
         LakeSurfFlowMacP(NY,NX)=WaterFlowMacP(3,N6X(NY,NX),NY,NX)
@@ -1795,7 +1793,6 @@ module WatsubMod
 
   call CalcSoilThermConductivity(N4,N5,N6,DTKX,ThermCondDst)
 
-  !if(I>=132 .and. J==19)print*,'atcndl',ThermCondSrc,DLYR(N,N6,N5,N4),ThermCondDst,DLYR(N,N3,N2,N1)
   ATCNDL=safe_adb(2.0_r8*ThermCondSrc*ThermCondDst,(ThermCondSrc*DLYR(N,N6,N5,N4)+ThermCondDst*DLYR(N,N3,N2,N1)))
 
   !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
@@ -1810,9 +1807,9 @@ module WatsubMod
   !     HeatCondSoi=source-destination conductive heat flux
   !     HFLWL=total conductive+convective source-destination heat flux
   !
-  !if(I>=132 .and. J==19)print*,'bftklx'
+  
   IF(VLHeatCapacity_col(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
-    IF(N3.EQ.NUM(NY,NX).AND.VLHeatCapSnow_col(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
+    IF(N3.EQ.NUM(NY,NX) .AND. VLHeatCapSnow_col(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       !surface layer, not significant snowpack
       TK1X=TKSoi1(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFluxAir2Soi)/VLHeatCapacity_col(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then
@@ -1842,6 +1839,7 @@ module WatsubMod
   ENDIF
   
   if(VLHeatCapacity_col(N3,N2,N1)+VLHeatCapacity_col(N6,N5,N4)>0._r8)then
+    !temperature at the interface between (N3,N2,N1) and (N6,N5,N4)
     TKY=(VLHeatCapacity_col(N3,N2,N1)*TK1X+VLHeatCapacity_col(N6,N5,N4)*TKLX)/(VLHeatCapacity_col(N3,N2,N1)&
       +VLHeatCapacity_col(N6,N5,N4))
   ELSE
@@ -1852,14 +1850,14 @@ module WatsubMod
   HFLWX=(TK1X-TKY)*VLHeatCapacity_col(N3,N2,N1)*dts_wat
   HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*dts_HeatWatTP
   IF(HFLWC.GE.0.0_r8)THEN
+    !from (N3,N2,N1) into (N6,N5,N4)
     HeatCondSoi=AZMAX1(AMIN1(HFLWX,HFLWC))
   ELSE
+    !from (N6,N5,N4) into (N3,N2,N1)
     HeatCondSoi=AZMIN1(AMAX1(HFLWX,HFLWC))
   ENDIF
   HeatFlow2Soili(N,N6,N5,N4)=HeatFlow2Soili(N,N6,N5,N4)+HeatCondSoi
-!  if(N6==1)then
-!    write(*,*)'HeatFlow2Soili(N,N6,N5,N4)==',HeatFlow2Soili(N,N6,N5,N4)
-!  endif
+
   end subroutine Solve4Heat  
 !------------------------------------------------------------------------------------------
   subroutine WaterTBLDrain(N,N1,N2,N3,M4,M5,M6,IFLGU,IFLGUH,RechargSubSurf,RechargRateWTBL,DPTHH,XN)
@@ -2151,11 +2149,10 @@ module WatsubMod
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
     TK1App=(ENGY1+THeatFlow2Soili(N3,N2,N1)+HeatIrrigation1(N3,N2,N1))/VLHeatCapacityX
-    IF((TK1App.LT.TFREEZ.AND.VLWatMicP1(N3,N2,N1).GT.ZERO*VGeomLayer(N3,N2,N1)) &
-      .OR.(TK1App.GT.TFREEZ.AND.VLiceMicP1(N3,N2,N1).GT.ZERO*VGeomLayer(N3,N2,N1)))THEN
+    IF((TK1App.LT.TFREEZ .AND. VLWatMicP1(N3,N2,N1).GT.ZERO*VGeomLayer(N3,N2,N1)) &
+      .OR.(TK1App.GT.TFREEZ .AND. VLiceMicP1(N3,N2,N1).GT.ZERO*VGeomLayer(N3,N2,N1)))THEN
       VLHeatCapacityAX=VHeatCapacitySoilM(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1(N3,N2,N1)
       MicPIceHeatFlxFrezPt=VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*TFREEZ)*(1.0_r8-0.10_r8*PSISMX))*dts_wat
-
       IF(MicPIceHeatFlxFrezPt.LT.0.0_r8)THEN
         !thaw
         MicPIceHeatFlxFrez=AMAX1(-LtHeatIceMelt*DENSICE*VLiceMicP1(N3,N2,N1)*dts_wat,MicPIceHeatFlxFrezPt)

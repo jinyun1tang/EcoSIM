@@ -265,7 +265,7 @@ module TillageMixMod
     ENDDO
 
     VLWatMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)*XCORP0
-    VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+    VHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
     VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
     VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
@@ -425,9 +425,9 @@ module TillageMixMod
 !     VLMacP(L,NY,NX)=XCORP(NY,NX)*VLMacP(L,NY,NX)
 !     SoilFracAsMacP(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
-        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+        VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
           +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
+        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity_col(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
 
         DO NTN=ifertn_beg,ifertn_end

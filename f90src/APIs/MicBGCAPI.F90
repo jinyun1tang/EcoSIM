@@ -442,7 +442,8 @@ implicit none
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
   do k=1,jcplx
   DO idom=idom_beg,idom_end
-  if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.E-10_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
+  if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.E-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
+  if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8
   enddo
   enddo
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
