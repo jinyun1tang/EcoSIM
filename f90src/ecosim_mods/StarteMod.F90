@@ -385,13 +385,13 @@ module StarteMod
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trc_gasml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_NH3,L,NY,NX)=AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP_col(L,NY,NX)
+    trc_gasml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP_col(L,NY,NX)
+    trc_gasml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP_col(L,NY,NX)
+    trc_gasml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP_col(L,NY,NX)
+    trc_gasml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP_col(L,NY,NX)
+    trc_gasml_vr(idg_NH3,L,NY,NX)=AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP_col(L,NY,NX)
+    trc_gasml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP_col(L,NY,NX)
 
 !   ExtWaterTablet0: external water table depth
     IF(CumDepth2LayerBottom(L-1,NY,NX).LT.ExtWaterTablet0(NY,NX))THEN

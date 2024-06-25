@@ -74,7 +74,7 @@ module SoluteMod
 !     FLWD=net vertical flow relative to area
 !
 !     IF(ROWI(I,NY,NX).GT.0.0)THEN
-  FLWD=0.5_r8*(WaterFlowSoiMicP(3,L,NY,NX)+WaterFlowSoiMicP(3,L+1,NY,NX))/AREA(3,L,NY,NX)
+  FLWD=0.5_r8*(WaterFlowSoiMicP_3D(3,L,NY,NX)+WaterFlowSoiMicP_3D(3,L+1,NY,NX))/AREA(3,L,NY,NX)
 !
 !     NH4 FERTILIZER BAND
 !

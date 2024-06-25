@@ -71,9 +71,9 @@ contains
       ELSE
         PSISoilMatricP_vr(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
-      FCX=FCI*THETI(L,NY,NX)
-      WPX=WPI*THETI(L,NY,NX)
+    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI_col(L,NY,NX)>ZEROS2(NY,NX))THEN
+      FCX=FCI*THETI_col(L,NY,NX)
+      WPX=WPI*THETI_col(L,NY,NX)
       FCLX=LOG(FCX)
       WPLX=LOG(WPX)
       PSDX=LOGPOROS(L,NY,NX)-FCLX
@@ -93,11 +93,11 @@ contains
 !
 !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
 !
-!     PSISM,PSISO,PSIGrav,PSIST=matric,osmotic,gravimetric,total water potential
+!     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
 !
     PSISoilOsmotic(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
-    PSIGrav(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
-    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSIGrav(L,NY,NX))
+    PSIGrav_vr(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
+    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSIGrav_vr(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -170,14 +170,14 @@ contains
   ENDIF
 
   if(lverb)write(*,*)'finish soilp set'
-  VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
-    +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
+  VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
+    +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP_col(L,NY,NX))
 
   IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
-    THETP(L,NY,NX)=VLsoiAirP(L,NY,NX)/VLSoilMicP(L,NY,NX)
+    ThetaAir_col(L,NY,NX)=VLsoiAirP_col(L,NY,NX)/VLSoilMicP(L,NY,NX)
   ELSE
-    THETP(L,NY,NX)=0.0_r8
+    ThetaAir_col(L,NY,NX)=0.0_r8
   ENDIF
 
   IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -345,25 +345,25 @@ contains
     ENDIF
 
     IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
-      THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+      THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
-      THETI(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+      THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(isclose(THI(L,NY,NX),0._r8))THEN
-      THETI(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+      THETI_col(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
-      THETI(L,NY,NX)=0.0_r8
+      THETI_col(L,NY,NX)=0.0_r8
     ENDIF
 
   !in a cold run, set it
     VLWatMicP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLWatMicPX(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
+    VLWatMicPX_col(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
-    VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
+    VLiceMicP(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
     VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
-      +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-    THETWZ(L,NY,NX)=THETW_vr(L,NY,NX)
-    THETIZ(L,NY,NX)=THETI(L,NY,NX)
+      +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+    ThetaH2OZ_col(L,NY,NX)=THETW_vr(L,NY,NX)
+    ThetaICEZ_col(L,NY,NX)=THETI_col(L,NY,NX)
   ENDIF
   end subroutine SetColdRunSoilProps
 !------------------------------------------------------------------------------------------  

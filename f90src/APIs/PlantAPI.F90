@@ -79,7 +79,7 @@ implicit none
   VapXAir2CanG(NY,NX)=plt_ew%VapXAir2CanG
   THFLXC(NY,NX)=plt_ew%THFLXC
   CanWat_col(NY,NX)=plt_ew%CanWat_col
-  TENGYC(NY,NX)=plt_ew%TENGYC
+  TEngyCanopy_col(NY,NX)=plt_ew%TENGYC
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)
   Canopy_NEE_col(NY,NX)=plt_bgcr%Canopy_NEE_col
 
@@ -90,7 +90,7 @@ implicit none
   FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs) =plt_allom%FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   FracShootLeafElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs) =plt_allom%FracShootLeafElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   FracShootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)=plt_allom%FracShootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
-  VOLWOU   =plt_site%VOLWOU
+  QH2OLoss_lnds   =plt_site%QH2OLoss_lnds
   DO L=1,NumOfCanopyLayers
     tCanLeafC_cl(L,NY,NX)=plt_biom%tCanLeafC_cl(L)
     CanopyStemAareZ_col(L,NY,NX)=plt_morph%CanopyStemAareZ_col(L)
@@ -777,7 +777,7 @@ implicit none
     plt_pheno%RefNodeInitRate_pft(NZ)=RefNodeInitRate_pft(NZ,NY,NX)
     plt_pheno%RefLeafAppearRate_pft(NZ)=RefLeafAppearRate_pft(NZ,NY,NX)
     plt_pheno%TCChill4Seed_pft(NZ)=TCChill4Seed_pft(NZ,NY,NX)
-    plt_morph%rLen2WidthLeaf(NZ)=rLen2WidthLeaf(NZ,NY,NX)
+    plt_morph%rLen2WidthLeaf_pft(NZ)=rLen2WidthLeaf_pft(NZ,NY,NX)
     plt_pheno%MinNonstC2InitBranch_pft(NZ)=MinNonstC2InitBranch_pft(NZ,NY,NX)
     plt_morph%ShootNodeNumAtPlanting_pft(NZ)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     plt_pheno%CriticPhotoPeriod_pft(NZ)=CriticPhotoPeriod_pft(NZ,NY,NX)
@@ -895,7 +895,7 @@ implicit none
 
 ! sent variables also modified
   plt_site%NumActivePlants=NumActivePlants(NY,NX)
-  plt_site%VOLWOU=VOLWOU
+  plt_site%QH2OLoss_lnds=QH2OLoss_lnds
   plt_site%PlantPopu_col=PlantPopu_col(NY,NX)
   plt_bgcr%ECO_ER_col=ECO_ER_col(NY,NX)
   plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)=StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)
@@ -919,7 +919,7 @@ implicit none
   plt_ew%THFLXC =THFLXC(NY,NX)
   plt_ew%LWRadCanG  =LWRadCanG(NY,NX)
   plt_ew%CanWat_col =CanWat_col(NY,NX)
-  plt_ew%TENGYC =TENGYC(NY,NX)
+  plt_ew%TENGYC =TEngyCanopy_col(NY,NX)
   plt_bgcr%Canopy_NEE_col=Canopy_NEE_col(NY,NX)
   plt_distb%FERT(1:20)=FERT(1:20,I1,NY,NX)
 

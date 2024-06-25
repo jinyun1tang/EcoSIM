@@ -271,7 +271,7 @@ implicit none
   micfor%VLWatMicPM(1:NPH)=VLWatMicPM(1:NPH,L,NY,NX)
   micfor%TortMicPM(1:NPH)=TortMicPM_vr(1:NPH,L,NY,NX)
   micfor%VLsoiAirPM(1:NPH)=VLsoiAirPM(1:NPH,L,NY,NX)
-  micfor%VLsoiAirP=VLsoiAirP(L,NY,NX)
+  micfor%VLsoiAirP=VLsoiAirP_col(L,NY,NX)
   micstt%EPOC=EPOC(L,NY,NX)
   micstt%EHUM=EHUM(L,NY,NX)
   micstt%ZNH4B=trc_solml_vr(ids_NH4B,L,NY,NX)

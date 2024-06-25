@@ -718,17 +718,17 @@ implicit none
 
   VLWatMicP_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)+FX*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP(L1,NY,NX)=VLiceMicP(L1,NY,NX)+FX*VLiceMicP(L0,NY,NX)
-  VLsoiAirP(L1,NY,NX)=VLsoiAirP(L1,NY,NX)+FX*VLsoiAirP(L0,NY,NX)
+  VLsoiAirP_col(L1,NY,NX)=VLsoiAirP_col(L1,NY,NX)+FX*VLsoiAirP_col(L0,NY,NX)
   VLMicP_vr(L1,NY,NX)=VLMicP_vr(L1,NY,NX)+FX*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FX*VLSoilMicP(L0,NY,NX)
-  VLWatMicPX(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)
+  VLWatMicPX_col(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)
   ENGY1=VHeatCapacity_col(L1,NY,NX)*TKS(L1,NY,NX)
   ENGY0=VHeatCapacity_col(L0,NY,NX)*TKS(L0,NY,NX)
   ENGY1=ENGY1+FX*ENGY0
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FX*VHeatCapacitySoilM(L0,NY,NX)
   VHeatCapacity_col(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
     +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP(L1,NY,NX)) &
-    +cpi*(VLiceMicP(L1,NY,NX)+VLiceMacP(L1,NY,NX))
+    +cpi*(VLiceMicP(L1,NY,NX)+VLiceMacP_col(L1,NY,NX))
 
   IF(VHeatCapacity_col(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS(L1,NY,NX)=ENGY1/VHeatCapacity_col(L1,NY,NX)
@@ -898,16 +898,16 @@ implicit none
 !     ENDIF
   VLWatMicP_vr(L0,NY,NX)=FY*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP(L0,NY,NX)=FY*VLiceMicP(L0,NY,NX)
-  VLsoiAirP(L0,NY,NX)=FY*VLsoiAirP(L0,NY,NX)
+  VLsoiAirP_col(L0,NY,NX)=FY*VLsoiAirP_col(L0,NY,NX)
   VLMicP_vr(L0,NY,NX)=FY*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L0,NY,NX)=FY*VLSoilMicP(L0,NY,NX)
-  VLWatMicPX(L0,NY,NX)=VLWatMicP_vr(L0,NY,NX)
+  VLWatMicPX_col(L0,NY,NX)=VLWatMicP_vr(L0,NY,NX)
   ENGY0=FY*ENGY0
   VHeatCapacitySoilM(L0,NY,NX)=FY*VHeatCapacitySoilM(L0,NY,NX)
   IF(L0.NE.0)THEN
     VHeatCapacity_col(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP(L0,NY,NX)) &
-      +cpi*(VLiceMicP(L0,NY,NX)+VLiceMacP(L0,NY,NX))
+      +cpi*(VLiceMicP(L0,NY,NX)+VLiceMacP_col(L0,NY,NX))
   ELSE
     VHeatCapacity_col(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP(L0,NY,NX)
   ENDIF
@@ -1597,9 +1597,9 @@ implicit none
     FXVOLWH=FHO*VLWatMacP(L0,NY,NX)
     VLWatMacP(L1,NY,NX)=VLWatMacP(L1,NY,NX)+FXVOLWH
     VLWatMacP(L0,NY,NX)=VLWatMacP(L0,NY,NX)-FXVOLWH
-    FXVOLIH=FHO*VLiceMacP(L0,NY,NX)
-    VLiceMacP(L1,NY,NX)=VLiceMacP(L1,NY,NX)+FXVOLIH
-    VLiceMacP(L0,NY,NX)=VLiceMacP(L0,NY,NX)-FXVOLIH
+    FXVOLIH=FHO*VLiceMacP_col(L0,NY,NX)
+    VLiceMacP_col(L1,NY,NX)=VLiceMacP_col(L1,NY,NX)+FXVOLIH
+    VLiceMacP_col(L0,NY,NX)=VLiceMacP_col(L0,NY,NX)-FXVOLIH
     FXVOLAH=FHO*VLMacP(L0,NY,NX)
     VLMacP(L1,NY,NX)=VLMacP(L1,NY,NX)+FXVOLAH
     VLMacP(L0,NY,NX)=VLMacP(L0,NY,NX)-FXVOLAH
@@ -1649,9 +1649,9 @@ implicit none
   FXVLSoilMicP=FWO*VLSoilMicP(L0,NY,NX)
   VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FXVLSoilMicP
   VLSoilMicP(L0,NY,NX)=VLSoilMicP(L0,NY,NX)-FXVLSoilMicP
-  FXVOLWX=FWO*VLWatMicPX(L0,NY,NX)
-  VLWatMicPX(L1,NY,NX)=VLWatMicPX(L1,NY,NX)+FXVOLWX
-  VLWatMicPX(L0,NY,NX)=VLWatMicPX(L0,NY,NX)-FXVOLWX
+  FXVOLWX=FWO*VLWatMicPX_col(L0,NY,NX)
+  VLWatMicPX_col(L1,NY,NX)=VLWatMicPX_col(L1,NY,NX)+FXVOLWX
+  VLWatMicPX_col(L0,NY,NX)=VLWatMicPX_col(L0,NY,NX)-FXVOLWX
   FXVHCM=FWO*VHeatCapacitySoilM(L0,NY,NX)
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FXVHCM
   VHeatCapacitySoilM(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)-FXVHCM

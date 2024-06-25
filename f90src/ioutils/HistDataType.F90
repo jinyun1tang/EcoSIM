@@ -109,8 +109,8 @@ implicit none
   real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)       !StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_P_col(:)       !StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-  real(r8),pointer   :: h1D_tPRECN_col(:)          !1000.0_r8*URAIN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ET_col(:)             !1000.0_r8*UEVAP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tPRECN_col(:)          !1000.0_r8*QRain_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ET_col(:)             !1000.0_r8*QEvap_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
@@ -133,14 +133,15 @@ implicit none
   real(r8),pointer   :: h1D_CH4_FLX_col(:)       !SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
   real(r8),pointer   :: h1D_O2_FLX_col(:)        !SurfGasFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
-  real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)         !-WQRH(NY,NX)*1000.0/TAREA, 
+  real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)         !-QRunSurf_col(NY,NX)*1000.0/TAREA, 
   real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
-  real(r8),pointer   :: h1D_tSWC_col(:)        !UVLWatMicP(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
-  real(r8),pointer   :: h1D_DISCHG_FLX_col(:)         !FWatDischarge(NY,NX)*1000.0/TAREA
+  real(r8),pointer   :: h1D_tSWC_col(:)        !WatMass_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
+  real(r8),pointer   :: h1D_tHeat_col(:) 
+  real(r8),pointer   :: h1D_DISCHG_FLX_col(:)         !QDischar_col(NY,NX)*1000.0/TAREA
   real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
-  real(r8),pointer   :: h1D_SURF_WTR_col(:)       !THETWZ(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ICE_col(:)       !THETIZ(0,NY,NX)
+  real(r8),pointer   :: h1D_SURF_WTR_col(:)       !ThetaH2OZ_col(0,NY,NX)
+  real(r8),pointer   :: h1D_SURF_ICE_col(:)       !ThetaICEZ_col(0,NY,NX)
   real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_sN2O_FLX_col(:)        !SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -275,8 +276,8 @@ implicit none
   real(r8),pointer   :: h2D_TEMP_vr_col(:,:)        !TCS(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_HeatUptk_vr_col(:,:)    !Heat uptake by root  
   real(r8),pointer   :: h2D_HeatFlow_vr_col(:,:)    !
-  real(r8),pointer   :: h2D_vWATER_vr_col(:,:)       !THETWZ(1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_vICE_vr_col(:,:)         !THETIZ(1:JZ,NY,NX)  
+  real(r8),pointer   :: h2D_vWATER_vr_col(:,:)       !ThetaH2OZ_col(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_vICE_vr_col(:,:)         !ThetaICEZ_col(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr_col(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_cNH4t_vr_col(:,:)       !(trc_solml_vr(ids_NH4,1:JZ,NY,NX)+trc_solml_vr(ids_NH4B,1:JZ,NY,NX) &
                                                                   !+14.0*(trcx_solml(idx_NH4,1:JZ,NY,NX)+trcx_solml(idx_NH4B,1:JZ,NY,NX)))/SoilMicPMassLayer(1:JZ,NY,NX)
@@ -421,6 +422,7 @@ implicit none
 
   allocate(this%h1D_PAR_col(beg_col:end_col))             ;this%h1D_PAR_col(:)=spval
   allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
+  allocate(this%h1D_tHeat_col(beg_col:end_col))           ;this%h1D_tHeat_col(:)=spval
   allocate(this%h1D_SNOWPACK_col(beg_col:end_col))        ;this%h1D_SNOWPACK_col(:)=spval
   allocate(this%h1D_SURF_WTR_col(beg_col:end_col))        ;this%h1D_SURF_WTR_col(:)=spval
   allocate(this%h1D_SURF_ICE_col(beg_col:end_col))        ;this%h1D_SURF_ICE_col(:)=spval
@@ -806,7 +808,7 @@ implicit none
     
   data1d_ptr => this%h1D_CO2_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='CO2_FLX',units='gC/m2/hr',avgflag='A',&
-    long_name='total soil CO2 flux',ptr_col=data1d_ptr)      
+    long_name='total soil CO2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_OMC_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='OMC_LITR',units='gC/m2',avgflag='A',&
@@ -971,7 +973,11 @@ implicit none
     
   data1d_ptr => this%h1D_tSWC_col(beg_col:end_col)  
   call hist_addfld1d(fname='tSWC',units='mmH2O/m2',avgflag='A', &
-    long_name='column integrated water content',ptr_col=data1d_ptr)        
+    long_name='column integrated water content (exclude snow)',ptr_col=data1d_ptr)        
+
+  data1d_ptr => this%h1D_tHeat_col(beg_col:end_col)
+  call hist_addfld1d(fname='tSHeat',units='MJ/m2',avgflag='A', &
+    long_name='column integrated heat content (exclude snow)',ptr_col=data1d_ptr)        
 
   data1d_ptr => this%h1D_SNOWPACK_col(beg_col:end_col)      
   call hist_addfld1d(fname='SNOWPACK',units='mmH2O/m2',&
@@ -1526,7 +1532,7 @@ implicit none
   call hist_addfld2d(fname='HeatUptk_vr',units='MJ m-3 hr-1',type2d='levsoi',avgflag='A',&
     long_name='soil heat flow by plant water uptake',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ)        !THETWZ(1:JZ,NY,NX)
+  data2d_ptr => this%h2D_vWATER_vr_col(beg_col:end_col,1:JZ)        !ThetaH2OZ_col(1:JZ,NY,NX)
   call hist_addfld2d(fname='vWATER_vr',units='m3/m3',type2d='levsoi',avgflag='A',&
     long_name='volumetric soil water content',ptr_col=data2d_ptr)      
 
@@ -1707,7 +1713,7 @@ implicit none
       this%h1D_tSTANDING_DEAD_C_col(ncol)    = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_N_col(ncol)    = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_P_col(ncol)    = StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)            
-      this%h1D_tPRECN_col(ncol)       = m2mm*URAIN_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPRECN_col(ncol)       = m2mm*QRain_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ET_col(ncol)          = m2mm*EvapoTransp_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
@@ -1731,14 +1737,15 @@ implicit none
       this%h1D_CH4_FLX_col(ncol)     = SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
       this%h1D_O2_FLX_col(ncol)      = SurfGasFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gO1hour2umol1sec
       this%h1D_CO2_LITR_col(ncol)    = trc_solcl_vr(idg_CO2,0,NY,NX)
-      this%h1D_EVAPN_col(ncol)        = VapXAir2GSurf(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RUNOFF_FLX_col(ncol)   = -WQRH(NY,NX)*m2mm/TAREA 
+      this%h1D_EVAPN_col(ncol)        = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RUNOFF_FLX_col(ncol)   = -QRunSurf_col(NY,NX)*m2mm/TAREA 
       this%h1D_SEDIMENT_FLX_col(ncol) = USEDOU(NY,NX)*m2mm/TAREA
-      this%h1D_tSWC_col(ncol)         = UVLWatMicP(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_DISCHG_FLX_col(ncol)   = FWatDischarge(NY,NX)*m2mm/TAREA
+      this%h1D_tSWC_col(ncol)         = WatMass_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tHeat_col(ncol)        = HeatStore_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_DISCHG_FLX_col(ncol)   = QDischar_col(NY,NX)*m2mm/TAREA
       this%h1D_SNOWPACK_col(ncol)     = AZMAX1((VcumSnowWE(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
-      this%h1D_SURF_WTR_col(ncol)    = THETWZ(0,NY,NX)
-      this%h1D_SURF_ICE_col(ncol)    = THETIZ(0,NY,NX)
+      this%h1D_SURF_WTR_col(ncol)    = ThetaH2OZ_col(0,NY,NX)
+      this%h1D_SURF_ICE_col(ncol)    = ThetaICEZ_col(0,NY,NX)
       this%h1D_ACTV_LYR_col(ncol)    = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
       this%h1D_WTR_TBL_col(ncol)     = -(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
       this%h1D_sN2O_FLX_col(ncol)     =  SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1759,8 +1766,8 @@ implicit none
         this%h2D_TEMP_vr_col(ncol,L) =  TCS(L,NY,NX)
         this%h2D_HeatFlow_vr_col(ncol,L)=THeatFlow2Soil_col(L,NY,NX)
         this%h2D_HeatUptk_vr_col(ncol,L)=THeatRootUptake_vr(L,NY,NX)
-        this%h2D_vWATER_vr_col(ncol,L)=  THETWZ(L,NY,NX)
-        this%h2D_vICE_vr_col(ncol,L)  =  THETIZ(L,NY,NX)
+        this%h2D_vWATER_vr_col(ncol,L)=  ThetaH2OZ_col(L,NY,NX)
+        this%h2D_vICE_vr_col(ncol,L)  =  ThetaICEZ_col(L,NY,NX)
         this%h2D_PSI_vr_col(ncol,L)  =  PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)     
         this%h2D_RootH2OUP_vr_col(ncol,L)=GridPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr_col(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &

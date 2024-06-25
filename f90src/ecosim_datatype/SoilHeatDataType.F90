@@ -17,10 +17,12 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  XPhaseChangeHeatL(:,:,:)           !hourly accumulated latent heat flux from freeze-thaw
   real(r8),target,allocatable ::  VHeatCapacity_col(:,:,:)               !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
+  real(r8),target,allocatable ::  HeatStore_col(:,:)                 !heat stored over the grid MJ d-2, including soil, litter and canopy
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
   real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model 
   real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:,:)              !hourly heat flux into soil layer  MJ m-3
+  real(r8),target,allocatable ::  tHeatUptk_col(:,:)
 !----------------------------------------------------------------------
 
 contains
@@ -30,6 +32,7 @@ contains
   allocate(TKSZ(366,24,JZ));    TKSZ=0._r8
   allocate(TKS(0:JZ,JY,JX));    TKS=0._r8
   allocate(HeatFlx2Grnd_col(JY,JX));   HeatFlx2Grnd_col=0._r8
+  allocate(HeatStore_col(JY,JX));  HeatStore_col=0._r8
   allocate(TLIceThawMicP(JZ,JY,JX));     TLIceThawMicP=0._r8
   allocate(TLPhaseChangeHeat2Soi(JZ,JY,JX));    TLPhaseChangeHeat2Soi=0._r8
   allocate(TLIceThawMacP(JZ,JY,JX));    TLIceThawMacP=0._r8
@@ -39,6 +42,7 @@ contains
   allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond=0._r8
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond=0._r8
   allocate(THeatFlow2Soil_col(JZ,JY,JX));    THeatFlow2Soil_col=0._r8  
+  allocate(tHeatUptk_col(JY,JX));   tHeatUptk_col=0._r8
   end subroutine InitSoilHeatData
 
 !----------------------------------------------------------------------
@@ -50,12 +54,14 @@ contains
   call destroy(TLIceThawMicP)
   call destroy(TLPhaseChangeHeat2Soi)
   call destroy(TLIceThawMacP)
+  call destroy(HeatStore_col)
   call destroy(XPhaseChangeHeatL)
   call destroy(VHeatCapacity_col)
   call destroy(TCS)
   call destroy(NumerSolidThermCond)
   call destroy(DenomSolidThermCond)
   call destroy(THeatFlow2Soil_col)  
+  call destroy(tHeatUptk_col)
   end subroutine DestructSoilHeatData
 
 end module SoilHeatDatatype

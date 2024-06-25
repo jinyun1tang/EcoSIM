@@ -257,7 +257,7 @@ module GeochemAPI
 !  solflx%TR_CaCO3_soil=trcSalt_TR(idsalt_CaCO3,L,NY,NX)
 !  solflx%TR_MgHCO3_soil=trcSalt_TR(idsalt_MgHCO3,L,NY,NX)
 !  solflx%TR_CaHCO3_soil=trcSalt_TR(idsalt_CaHCO3,L,NY,NX)
-!  solflx%TRHCO=trcSalt_TR(idsalt_HCO3,L,NY,NX)
+!  solflx%TR_HCO3=trcSalt_TR(idsalt_HCO3,L,NY,NX)
 !  solflx%TR_HCO3_sorbed_soil=TR_HCO3_sorbed_soil(L,NY,NX)
 !  solflx%TR_CaH4P2O8_soil=trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)
 !  solflx%TR_FeH2PO4_soil=trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)
@@ -344,7 +344,7 @@ module GeochemAPI
 !  solflx%TR_NH4_sorbed_soil =trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)
 !  solflx%TR_Na_sorbed_soil =TR_Na_sorbed_soil(L,NY,NX)
 !  solflx%TR_NH4_sorbed_band_soil =trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)
-!  solflx%TBCO2 =TBCO2(L,NY,NX)
+!  solflx%Txchem_CO2 =Txchem_CO2_vr_col(L,NY,NX)
 !  solflx%TBION =TBION(L,NY,NX)
 !  solflx%TRH2O =TRH2O(L,NY,NX)
 !  Integers
@@ -399,7 +399,7 @@ module GeochemAPI
     trcSalt_TR(idsalt_OH,L,NY,NX)=solflx%TR_OH_1e_soil
     trcSalt_TR(idsalt_SO4,L,NY,NX)=solflx%TR_SO4_2e_soil
     trcSalt_TR(idsalt_CO3,L,NY,NX)=solflx%TR_CO3_2e_soil
-    trcSalt_TR(idsalt_HCO3,L,NY,NX)=solflx%TRHCO
+    trcSalt_TR(idsalt_HCO3,L,NY,NX)=solflx%TR_HCO3
     trcSalt_TR(idsalt_AlOH,L,NY,NX)=solflx%TR_AlOH_soil
     trcSalt_TR(idsalt_AlOH2,L,NY,NX)=solflx%TR_AlO2H2_soil
     trcSalt_TR(idsalt_AlOH3,L,NY,NX)=solflx%TR_AlO3H3_soil
@@ -456,7 +456,7 @@ module GeochemAPI
   trcp_RChem_soil(idsp_CaSO4,L,NY,NX)=solflx%TR_CaSO4_precip_soil
   TRH2O(L,NY,NX)=solflx%TRH2O
   TBION(L,NY,NX)=solflx%TBION
-  TBCO2(L,NY,NX)=solflx%TBCO2
+  Txchem_CO2_vr_col(L,NY,NX)=solflx%Txchem_CO2
   end subroutine GeochemAPIRecv
 
 end module GeochemAPI

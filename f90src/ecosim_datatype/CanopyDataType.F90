@@ -89,7 +89,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyWater_pft(:,:,:)                       !canopy water content associated with dry matter, [m3 d-2]
   real(r8),target,allocatable ::  TEVAPP(:,:)                        !total canopy evaporation + transpiration, [m3 d-2]
   real(r8),target,allocatable ::  VapXAir2CanG(:,:)                        !total canopy evaporation, [m3 d-2]
-  real(r8),target,allocatable ::  TENGYC(:,:)                        !total canopy heat content, [MJ  d-2]
+  real(r8),target,allocatable ::  TEngyCanopy_col(:,:)                        !total canopy heat content, [MJ  d-2]
   real(r8),target,allocatable ::  THFLXC(:,:)                        !total canopy heat flux, [MJ  d-2]
   real(r8),target,allocatable ::  CanWat_col(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
   real(r8),target,allocatable ::  LWRadCanG(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
@@ -243,7 +243,7 @@ module CanopyDataType
   allocate(CanopyWater_pft(JP,JY,JX));    CanopyWater_pft=0._r8
   allocate(TEVAPP(JY,JX));      TEVAPP=0._r8
   allocate(VapXAir2CanG(JY,JX));      VapXAir2CanG=0._r8
-  allocate(TENGYC(JY,JX));      TENGYC=0._r8
+  allocate(TEngyCanopy_col(JY,JX));      TEngyCanopy_col=0._r8
   allocate(THFLXC(JY,JX));      THFLXC=0._r8
   allocate(CanWat_col(JY,JX));      CanWat_col=0._r8
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
@@ -399,7 +399,7 @@ module CanopyDataType
   call destroy(CanopyWater_pft)
   call destroy(TEVAPP)
   call destroy(VapXAir2CanG)
-  call destroy(TENGYC)
+  call destroy(TEngyCanopy_col)
   call destroy(THFLXC)
   call destroy(CanWat_col)
   call destroy(LWRadCanG)

@@ -728,7 +728,7 @@ module PlantDisturbsMod
     RootNodulStrutElms_pvr     => plt_biom%RootNodulStrutElms_pvr,      &
     FracRootStalkElmAlloc2Litr => plt_allom%FracRootStalkElmAlloc2Litr, &
     FracRootElmAlloc2Litr      => plt_allom%FracRootElmAlloc2Litr,      &
-    VOLWOU                     => plt_site%VOLWOU,                      &
+    QH2OLoss_lnds                     => plt_site%QH2OLoss_lnds,                      &
     NU                         => plt_site%NU,                          &
     k_fine_litr                => pltpar%k_fine_litr,                   &
     k_woody_litr               => pltpar%k_woody_litr,                  &
@@ -2284,7 +2284,7 @@ module PlantDisturbsMod
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,     &
     iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch,    &
-    VOLWOU                    => plt_site%VOLWOU,                     &
+    QH2OLoss_lnds                    => plt_site%QH2OLoss_lnds,                     &
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch,       &
     CutHeightORFrac_pft       => plt_distb%CutHeightORFrac_pft,       &
     PSICanopy_pft             => plt_ew%PSICanopy_pft,                &
@@ -2328,7 +2328,7 @@ module PlantDisturbsMod
 !     StalkBiomassC_brch=stalk sapwood mass
 !     PSICanopy_pft=canopy water potential
 !     CanopyWater_pft=water volume in canopy
-!     VOLWOU,UVOLO=accumulated water loss for water balance calculation
+!     QH2OLoss_lnds,UVOLO=accumulated water loss for water balance calculation
 !
     LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
@@ -2342,7 +2342,7 @@ module PlantDisturbsMod
 !        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
     CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
 
-    VOLWOU=VOLWOU+VOLWPX-CanopyWater_pft(NZ)
+    QH2OLoss_lnds=QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
     UVOLO=UVOLO+VOLWPX-CanopyWater_pft(NZ)
 !
 !     RESET PHENOLOGY, GROWTH STAGE IF STALKS ARE CUT
@@ -2646,7 +2646,7 @@ module PlantDisturbsMod
     FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
     CPOOL3_node                 => plt_photo%CPOOL3_node,                 &
     CPOOL4_node                 => plt_photo%CPOOL4_node,                 &
-    VOLWOU                      => plt_site%VOLWOU,                       &
+    QH2OLoss_lnds                      => plt_site%QH2OLoss_lnds,                       &
     k_fine_litr                 => pltpar%k_fine_litr,                    &
     k_woody_litr                => pltpar%k_woody_litr,                   &
     iYearCurrent                => plt_site%iYearCurrent,                 &
@@ -2833,7 +2833,7 @@ module PlantDisturbsMod
 !
 !     PSICanopy_pft=canopy water potential
 !     CanopyWater_pft=water volume in canopy
-!     VOLWOU,UVOLO=accumulated water loss for water balance calculation
+!     QH2OLoss_lnds,UVOLO=accumulated water loss for water balance calculation
 !
   VOLWPX=CanopyWater_pft(NZ)
   WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
@@ -2843,7 +2843,7 @@ module PlantDisturbsMod
 !        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
 
   CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
-  VOLWOU=VOLWOU+VOLWPX-CanopyWater_pft(NZ)
+  QH2OLoss_lnds=QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
   UVOLO=UVOLO+VOLWPX-CanopyWater_pft(NZ)
 !
 !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED

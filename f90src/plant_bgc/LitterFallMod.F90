@@ -37,7 +37,7 @@ implicit none
     iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,      &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,       &
     iYearCurrent             => plt_site%iYearCurrent,              &
-    VOLWOU                   => plt_site%VOLWOU,                    &
+    QH2OLoss_lnds                   => plt_site%QH2OLoss_lnds,                    &
     SolarNoonHour_col        => plt_site%SolarNoonHour_col,         &
     HypoctoHeight_pft        => plt_morph%HypoctoHeight_pft,        &
     NumOfBranches_pft        => plt_morph%NumOfBranches_pft,        &
@@ -88,7 +88,7 @@ implicit none
         NumOfBranches_pft(NZ)=0
       ENDIF
       HypoctoHeight_pft(NZ)=0._r8
-      VOLWOU=VOLWOU+CanopyWater_pft(NZ)
+      QH2OLoss_lnds=QH2OLoss_lnds+CanopyWater_pft(NZ)
       UVOLO=UVOLO+CanopyWater_pft(NZ)
       CanopyWater_pft(NZ)=0._r8
 !

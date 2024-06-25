@@ -1626,7 +1626,7 @@ module PlantBranchMod
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch,     &
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,  &
     KLowestGroLeafNode_brch     => plt_pheno%KLowestGroLeafNode_brch,    &
-    rLen2WidthLeaf              => plt_morph%rLen2WidthLeaf,             &
+    rLen2WidthLeaf_pft              => plt_morph%rLen2WidthLeaf_pft,             &
     SeedDepth_pft               => plt_morph%SeedDepth_pft,              &
     MainBranchNum_pft           => plt_morph%MainBranchNum_pft,          &
     CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft,        &
@@ -1717,7 +1717,7 @@ module PlantBranchMod
 !
       HeightStalk=HeightBranchBase+LiveInterNodeHight_brch(K,NB,NZ)
       HeightLeafNode=HeightStalk+PetoleLensNode_brch(K,NB,NZ)
-      LeafLength=AZMAX1(SQRT(rLen2WidthLeaf(NZ)*AZMAX1(LeafAreaNode_brch(K,NB,NZ)) &
+      LeafLength=AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafAreaNode_brch(K,NB,NZ)) &
         /(PlantPopulation_pft(NZ)*FracGroth2Node_pft(NZ))))
       TotLeafElevation=0._r8
       !

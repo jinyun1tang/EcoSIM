@@ -54,7 +54,7 @@ module AqueChemDatatype
 
   real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)     !total solute nutrient transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRHCO(:,:,:)                       !total solute HCO3 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_HCO3_col(:,:,:)                       !total solute HCO3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_CO2_aqu_soil_vr(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2O(:,:,:)                       !total solute H2O transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_FeO3H3_soil(:,:,:)                       !total solute FeOH3 transformation, [mol d-2 h-1]
@@ -70,7 +70,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TR_Fe_sorbed_soil(:,:,:)                       !total Fe adsorption
   real(r8),target,allocatable ::  TR_FeO2H2_sorbed_soil(:,:,:)                      !total FeOH2 adsorption
   real(r8),target,allocatable ::  trcx_TRSoilChem_vr(:,:,:,:)                   !total adsorbed OH- transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TBCO2(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
+  real(r8),target,allocatable ::  Txchem_CO2_vr_col(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBION(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3G(:,:,:)                       !total gaseous NH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcp_RChem_soil(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
@@ -132,7 +132,7 @@ module AqueChemDatatype
 
   allocate(trcx_TRSoilChem_vr(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TRSoilChem_vr=0._r8
 
-  allocate(TRHCO(JZ,JY,JX));    TRHCO=0._r8
+  allocate(TR_HCO3_col(JZ,JY,JX));    TR_HCO3_col=0._r8
   allocate(TR_CO2_aqu_soil_vr(JZ,JY,JX));    TR_CO2_aqu_soil_vr=0._r8
   allocate(TRH2O(0:JZ,JY,JX));  TRH2O=0._r8
   allocate(TR_FeO3H3_soil(JZ,JY,JX));    TR_FeO3H3_soil=0._r8
@@ -147,7 +147,7 @@ module AqueChemDatatype
   allocate(TR_KSO4_soil(JZ,JY,JX));    TR_KSO4_soil=0._r8
   allocate(TR_Fe_sorbed_soil(JZ,JY,JX));    TR_Fe_sorbed_soil=0._r8
   allocate(TR_FeO2H2_sorbed_soil(JZ,JY,JX));   TR_FeO2H2_sorbed_soil=0._r8
-  allocate(TBCO2(JZ,JY,JX));    TBCO2=0._r8
+  allocate(Txchem_CO2_vr_col(JZ,JY,JX));    Txchem_CO2_vr_col=0._r8
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
   allocate(TRN3G(0:JZ,JY,JX));  TRN3G=0._r8
   allocate(trcp_RChem_soil(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil=0._r8
@@ -210,7 +210,7 @@ module AqueChemDatatype
   call destroy(trcSalt_XFHS)
   call destroy(TR_NH3_soil_vr)
   call destroy(trcn_RChem_band_soil_vr)
-  call destroy(TRHCO)
+  call destroy(TR_HCO3_col)
   call destroy(TR_CO2_aqu_soil_vr)
   call destroy(TRH2O)
   call destroy(TR_FeO3H3_soil)
@@ -224,7 +224,7 @@ module AqueChemDatatype
   call destroy(TR_KSO4_soil)
   call destroy(TR_Fe_sorbed_soil)
   call destroy(TR_FeO2H2_sorbed_soil)
-  call destroy(TBCO2)
+  call destroy(Txchem_CO2_vr_col)
   call destroy(TBION)
   call destroy(TRN3G)
 

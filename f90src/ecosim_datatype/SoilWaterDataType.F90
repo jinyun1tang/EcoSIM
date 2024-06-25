@@ -8,20 +8,20 @@ module SoilWaterDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  THETP(:,:,:)                      !air concentration [m3 m-3]
-  real(r8),target,allocatable ::  VLsoiAirP(:,:,:)                       !soil air content [m3 d-2]
+  real(r8),target,allocatable ::  ThetaAir_col(:,:,:)                      !air concentration [m3 m-3]
+  real(r8),target,allocatable ::  VLsoiAirP_col(:,:,:)                       !soil air content [m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                      !volumetric water content [m3 m-3]
-  real(r8),target,allocatable ::  THETI(:,:,:)                      !volumetric ice content [m3 m-3]
-  real(r8),target,allocatable ::  THETWZ(:,:,:)                     !volumetric moblize water [m3 m-3]
-  real(r8),target,allocatable ::  THETIZ(:,:,:)                     !volumetric mobile ice [m3 m-3]
+  real(r8),target,allocatable ::  THETI_col(:,:,:)                      !volumetric ice content [m3 m-3]
+  real(r8),target,allocatable ::  ThetaH2OZ_col(:,:,:)                     !volumetric moblize water [m3 m-3]
+  real(r8),target,allocatable ::  ThetaICEZ_col(:,:,:)                     !volumetric mobile ice [m3 m-3]
   real(r8),target,allocatable ::  VLWatMicP_vr(:,:,:)                       !soil micropore water content [m3 d-2]
   real(r8),target,allocatable ::  VLiceMicP(:,:,:)                       !soil micropore ice content   [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacP(:,:,:)                      !soil macropore water content [m3 d-2]
   real(r8),target,allocatable ::  PSISoilMatricP_vr(:,:,:)             !soil micropore matric water potential [MPa]
   real(r8),target,allocatable ::  TotalSoilH2OPSIMPa(:,:,:)                      !soil micropore total water potential [MPa]
-  real(r8),target,allocatable ::  VLWatMicPX(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
+  real(r8),target,allocatable ::  VLWatMicPX_col(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
   real(r8),target,allocatable ::  FWatExMacP2MicP(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
-  real(r8),target,allocatable ::  VLiceMacP(:,:,:)                      !soil macropore ice content [m3 d-2]
+  real(r8),target,allocatable ::  VLiceMacP_col(:,:,:)                      !soil macropore ice content [m3 d-2]
   real(r8),target,allocatable ::  VLWatMicPM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM(:,:,:,:)                    !soil air content, [m3 d-2]
@@ -73,21 +73,21 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
-  real(r8),target,allocatable ::  PSIGrav(:,:,:)                      !gravimetric soil water potential , [Mpa]
+  real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                      !gravimetric soil water potential , [Mpa]
   real(r8),target,allocatable ::  THETY_vr(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
-  real(r8),target,allocatable ::  UEVAP_col(:,:)                        !total evaporation, [m3 d-2]
-  real(r8),target,allocatable ::  URAIN_col(:,:)                        !total precipitation, [m3 d-2]
-  real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
-  real(r8),target,allocatable ::  UVLWatMicP(:,:)                !total soil water content, [m3 d-2]
+  real(r8),target,allocatable ::  QEvap_col(:,:)                        !total evaporation, [m3 d-2]
+  real(r8),target,allocatable ::  QRain_col(:,:)                        !total precipitation, [m3 d-2]
+  real(r8),target,allocatable ::  Qrunoff_col(:,:)                         !total surface runoff, [m3 d-2]
+  real(r8),target,allocatable ::  WatMass_col(:,:)                !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  AnualH2OLoss_col(:,:)                        !total subsurface water flux, [m3 d-2]
-  real(r8),target,allocatable ::  UDRAIN_col(:,:)                       !total water drainage below root zone, [m3 d-2]
+  real(r8),target,allocatable ::  QDrain_col(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  FWatDischarge(:,:)                !water discharge, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QRunSurf_col(:,:)                         !runoff from surface water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QDischar_col(:,:)                !water discharge, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
   real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)
   private :: InitAllocate
@@ -106,20 +106,20 @@ module SoilWaterDataType
   implicit none
   allocate(EvapoTransp_col(JY,JX)); EvapoTransp_col=0._r8
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
-  allocate(THETP(0:JZ,JY,JX));  THETP=0._r8
-  allocate(VLsoiAirP(0:JZ,JY,JX));   VLsoiAirP=0._r8
+  allocate(ThetaAir_col(0:JZ,JY,JX));  ThetaAir_col=0._r8
+  allocate(VLsoiAirP_col(0:JZ,JY,JX));   VLsoiAirP_col=0._r8
   allocate(THETW_vr(0:JZ,JY,JX));  THETW_vr=0._r8
-  allocate(THETI(0:JZ,JY,JX));  THETI=0._r8
-  allocate(THETWZ(0:JZ,JY,JX)); THETWZ=0._r8
-  allocate(THETIZ(0:JZ,JY,JX)); THETIZ=0._r8
+  allocate(THETI_col(0:JZ,JY,JX));  THETI_col=0._r8
+  allocate(ThetaH2OZ_col(0:JZ,JY,JX)); ThetaH2OZ_col=0._r8
+  allocate(ThetaICEZ_col(0:JZ,JY,JX)); ThetaICEZ_col=0._r8
   allocate(VLWatMicP_vr(0:JZ,JY,JX));   VLWatMicP_vr=0._r8
   allocate(VLiceMicP(0:JZ,JY,JX));   VLiceMicP=0._r8
   allocate(VLWatMacP(JZ,JY,JX));    VLWatMacP=0._r8
   allocate(PSISoilMatricP_vr(0:JZ,JY,JX));  PSISoilMatricP_vr=0._r8
   allocate(TotalSoilH2OPSIMPa(0:JZ,JY,JX));  TotalSoilH2OPSIMPa=0._r8
-  allocate(VLWatMicPX(0:JZ,JY,JX));  VLWatMicPX=0._r8
+  allocate(VLWatMicPX_col(0:JZ,JY,JX));  VLWatMicPX_col=0._r8
   allocate(FWatExMacP2MicP(JZ,JY,JX));     FWatExMacP2MicP=0._r8
-  allocate(VLiceMacP(JZ,JY,JX));    VLiceMacP=0._r8
+  allocate(VLiceMacP_col(JZ,JY,JX));    VLiceMacP_col=0._r8
   allocate(VLWatMicPM(60,0:JZ,JY,JX));VLWatMicPM=0._r8
   allocate(VLWatMacPM(60,JZ,JY,JX));VLWatMacPM=0._r8
   allocate(VLsoiAirPM(60,0:JZ,JY,JX));VLsoiAirPM=0._r8
@@ -171,20 +171,20 @@ module SoilWaterDataType
   allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
-  allocate(PSIGrav(0:JZ,JY,JX));  PSIGrav=0._r8
+  allocate(PSIGrav_vr(0:JZ,JY,JX));  PSIGrav_vr=0._r8
   allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
   allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
-  allocate(UEVAP_col(JY,JX));       UEVAP_col=0._r8
-  allocate(URAIN_col(JY,JX));       URAIN_col=0._r8
-  allocate(URUN(JY,JX));        URUN=0._r8
-  allocate(UVLWatMicP(JY,JX));       UVLWatMicP=0._r8
+  allocate(QEvap_col(JY,JX));       QEvap_col=0._r8
+  allocate(QRain_col(JY,JX));       QRain_col=0._r8
+  allocate(Qrunoff_col(JY,JX));        Qrunoff_col=0._r8
+  allocate(WatMass_col(JY,JX));       WatMass_col=0._r8
   allocate(AnualH2OLoss_col(JY,JX));       AnualH2OLoss_col=0._r8
-  allocate(UDRAIN_col(JY,JX));      UDRAIN_col=0._r8
+  allocate(QDrain_col(JY,JX));      QDrain_col=0._r8
   allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
   allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
-  allocate(WQRH(JY,JX));        WQRH=0._r8
-  allocate(FWatDischarge(JY,JX));       FWatDischarge=0._r8
+  allocate(QRunSurf_col(JY,JX));        QRunSurf_col=0._r8
+  allocate(QDischar_col(JY,JX));       QDischar_col=0._r8
   allocate(QflxSurfRunoffM(60,2,2,JV,JH)); QflxSurfRunoffM=0._r8
   end subroutine InitAllocate
 
@@ -192,20 +192,20 @@ module SoilWaterDataType
   subroutine DestructSoilWater
   use abortutils, only : destroy
   implicit none
-  call destroy(THETP)
-  call destroy(VLsoiAirP)
+  call destroy(ThetaAir_col)
+  call destroy(VLsoiAirP_col)
   call destroy(THETW_vr)
-  call destroy(THETI)
-  call destroy(THETWZ)
-  call destroy(THETIZ)
+  call destroy(THETI_col)
+  call destroy(ThetaH2OZ_col)
+  call destroy(ThetaICEZ_col)
   call destroy(VLWatMicP_vr)
   call destroy(VLiceMicP)
   call destroy(VLWatMacP)
   call destroy(PSISoilMatricP_vr)
   call destroy(TotalSoilH2OPSIMPa)
-  call destroy(VLWatMicPX)
+  call destroy(VLWatMicPX_col)
   call destroy(FWatExMacP2MicP)
-  call destroy(VLiceMacP)
+  call destroy(VLiceMacP_col)
   call destroy(VLWatMicPM)
   call destroy(VLWatMacPM)
   call destroy(VLsoiAirPM)
@@ -257,21 +257,21 @@ module SoilWaterDataType
   call destroy(PSISE)
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic)
-  call destroy(PSIGrav)
+  call destroy(PSIGrav_vr)
   call destroy(THETY_vr)
   call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
-  call destroy(UEVAP_col)
+  call destroy(QEvap_col)
   call destroy(EvapoTransp_col)
-  call destroy(URAIN_col)
-  call destroy(URUN)
-  call destroy(UVLWatMicP)
+  call destroy(QRain_col)
+  call destroy(Qrunoff_col)
+  call destroy(WatMass_col)
   call destroy(AnualH2OLoss_col)
-  call destroy(UDRAIN_col)
+  call destroy(QDrain_col)
   call destroy(Wat2GridBySurfRunoff)
   call destroy(Heat2GridBySurfRunoff)
-  call destroy(WQRH)
-  call destroy(FWatDischarge)
+  call destroy(QRunSurf_col)
+  call destroy(QDischar_col)
   call destroy(QflxSurfRunoffM)
   call destroy(Qinflx2Soil_col)
   end subroutine DestructSoilWater

@@ -286,10 +286,10 @@ module Hour1Mod
 !     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
 !
   implicit none
-  WaterStoreLandscape=0.0_r8
-  HeatStoreLandscape=0.0_r8
-  OXYGSO=0.0_r8
-  TLH2G=0.0_r8
+  WatMassStore_lnd=0.0_r8
+  HeatStore_lnd=0.0_r8
+  TSoilO2G_lnd=0.0_r8
+  TSoilH2G_lnd=0.0_r8
   TSEDSO=0.0_r8
   LitRMStoreLndscap(:)=0.0_r8
 
@@ -425,10 +425,10 @@ module Hour1Mod
 !     BAND AND MACROPORE FLUXES
 !
       DO L=1,NL(NY,NX)+1
-        WaterFlowSoiMicP(1:3,L,NY,NX)=0.0_r8
+        WaterFlowSoiMicP_3D(1:3,L,NY,NX)=0.0_r8
         WaterFlowSoiMicPX(1:3,L,NY,NX)=0.0_r8
         WaterFlowMacP(1:3,L,NY,NX)=0.0_r8
-        HeatFlow2Soil(1:3,L,NY,NX)=0.0_r8
+        HeatFlow2Soil_3D(1:3,L,NY,NX)=0.0_r8
 
         trcs_3DTransp2MicP_vr(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
         Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
@@ -596,14 +596,14 @@ module Hour1Mod
     !     VLMicP_vr(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP(L,NY,NX))
     !     VLMacP(L,NY,NX)=AMAX1(SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
-    !    2,VLWatMacP(L,NY,NX)+VLiceMacP(L,NY,NX))
+    !    2,VLWatMacP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
     VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
-        +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
+      VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
+        +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP_col(L,NY,NX))
     ELSE
-      VLsoiAirP(L,NY,NX)=0.0_r8
+      VLsoiAirP_col(L,NY,NX)=0.0_r8
     ENDIF
     EHUM(L,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
     EPOC(L,NY,NX)=1.0_r8
@@ -742,13 +742,15 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)  = 0._r8
+  tRDOE2Die_col(1:NumPlantChemElms,NY,NX) = 0._r8
+  tHeatUptk_col(NY,NX)                    = 0._r8
   Qinflx2Soil_col(NY,NX)                  = 0._r8
-  HeatFlx2Grnd_col(NY,NX)                    = 0._r8
+  HeatFlx2Grnd_col(NY,NX)                 = 0._r8
   DIC_mass_col(NY,NX)                     = 0.0_r8
   tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0.0_r8
   tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  UVLWatMicP(NY,NX)                       = 0.0_r8
+  WatMass_col(NY,NX)                      = 0.0_r8
+  HeatStore_col(NY,NX)                    = 0._r8
   tLitrOM_col(1:NumPlantChemElms,NY,NX)   = 0.0_r8
   tHumOM_col(1:NumPlantChemElms,NY,NX)    = 0.0_r8
   tNH4_col(NY,NX)                         = 0.0_r8
@@ -756,20 +758,20 @@ module Hour1Mod
   tHxPO4_col(NY,NX)                       = 0.0_r8
   tXPO4_col(NY,NX)                        = 0.0_r8
   UION(NY,NX)                             = 0.0_r8
-  FWatDischarge(NY,NX)                    = 0.0_r8
+  QDischar_col(NY,NX)                    = 0.0_r8
   SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)   = 0.0_r8
   WatFLo2Litr(NY,NX)                      = 0.0_r8
   HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
   TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
   TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
-  HeatByRadiation_col(NY,NX)                  = 0.0_r8
-  HeatSensAir2Surf_col(NY,NX)                 = 0.0_r8
-  HeatEvapAir2Surf_col(NY,NX)                 = 0.0_r8
-  HeatSensVapAir2Surf_col(NY,NX)              = 0.0_r8
-  HeatNet2Surf_col(NY,NX)                     = 0.0_r8
-  VapXAir2GSurf(NY,NX)                    = 0.0_r8
+  HeatByRadiation_col(NY,NX)              = 0.0_r8
+  HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
+  HeatNet2Surf_col(NY,NX)                 = 0.0_r8
+  VapXAir2GSurf_col(NY,NX)                = 0.0_r8
 
-  GasSfAtmFlx_col(idg_beg:idg_end,NY,NX) = 0._r8
+  Gas_Flx_atmDif2soil_col(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX)=0.0_r8
 
   CanWat_col(NY,NX)       = 0.0_r8
@@ -779,7 +781,7 @@ module Hour1Mod
   TEVAPP(NY,NX)           = 0.0_r8
   VapXAir2CanG(NY,NX)     = 0.0_r8
   THFLXC(NY,NX)           = 0.0_r8
-  TENGYC(NY,NX)           = 0.0_r8
+  TEngyCanopy_col(NY,NX)           = 0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
   LitrFallStrutElms_col(:,NY,NX)=0.0_r8
@@ -1027,13 +1029,13 @@ module Hour1Mod
 !
     IF(FoundActiveLayer)exit
     !current layer
-    VLiceTot=VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
+    VLiceTot=VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX)
     VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacP(L,NY,NX)
 
     IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
       !significant ice and pore
       D5700: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-        VLiceTotL=VLiceMicP(LL,NY,NX)+VLiceMacP(LL,NY,NX)
+        VLiceTotL=VLiceMicP(LL,NY,NX)+VLiceMacP_col(LL,NY,NX)
         VOLWTL=VLWatMicP_vr(LL,NY,NX)+VLWatMacP(LL,NY,NX)
         VLPoreTotL=VLMicP_vr(LL,NY,NX)+VLMacP(LL,NY,NX)
         !defined as significant increase in ice content
@@ -1466,19 +1468,19 @@ module Hour1Mod
     VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
     SoilMicPMassLayer(0,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
     VLMicP_vr(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
-    VLsoiAirP(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP(0,NY,NX))
+    VLsoiAirP_col(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP(0,NY,NX))
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
       POROS(0,NY,NX)=VLMicP_vr(0,NY,NX)/VLitR(NY,NX)
       !write(*,*) "VLitR gt 0 - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VLitR(NY,NX)))
-      THETI(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
-      THETP(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP(0,NY,NX)/VLitR(NY,NX)))
+      THETI_col(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
+      ThetaAir_col(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP_col(0,NY,NX)/VLitR(NY,NX)))
     ELSE
       POROS(0,NY,NX)=1.0_r8
       !write(*,*) "VLitR else - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW_vr(0,NY,NX)=0.0_r8
-      THETI(0,NY,NX)=0.0_r8
-      THETP(0,NY,NX)=0.0_r8
+      THETI_col(0,NY,NX)=0.0_r8
+      ThetaAir_col(0,NY,NX)=0.0_r8
     ENDIF
     TVOLWI=VLWatMicP_vr(0,NY,NX)+VLiceMicP(0,NY,NX)
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
@@ -1505,9 +1507,9 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
       PSISoilOsmotic(0,NY,NX)=0.0_r8
-      PSIGrav(0,NY,NX)=mGravAccelerat*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
+      PSIGrav_vr(0,NY,NX)=mGravAccelerat*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
         +0.5_r8*DLYR(3,0,NY,NX))
-      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic(0,NY,NX)+PSIGrav(0,NY,NX))
+      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
@@ -1525,12 +1527,12 @@ module Hour1Mod
     VLSoilPoreMicP_vr(0,NY,NX)=0.0_r8
     SoilMicPMassLayer(0,NY,NX)=0.0_r8
     VLMicP_vr(0,NY,NX)=0.0_r8
-    VLsoiAirP(0,NY,NX)=0.0_r8
+    VLsoiAirP_col(0,NY,NX)=0.0_r8
     POROS(0,NY,NX)=1.0
     DLYR(3,0,NY,NX)=0.0_r8
     THETW_vr(0,NY,NX)=0.0_r8
-    THETI(0,NY,NX)=0.0_r8
-    THETP(0,NY,NX)=1.0
+    THETI_col(0,NY,NX)=0.0_r8
+    ThetaAir_col(0,NY,NX)=1.0
     VWatLitRHoldCapcity(NY,NX)=0.0_r8
     PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
 
@@ -2275,23 +2277,23 @@ module Hour1Mod
 
     IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW_vr(L,NY,NX)=POROS(L,NY,NX)
-      THETI(L,NY,NX)=0.0_r8
-      THETP(L,NY,NX)=0.0_r8
+      THETI_col(L,NY,NX)=0.0_r8
+      ThetaAir_col(L,NY,NX)=0.0_r8
     ELSE
       THETW_vr(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)))
-      THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLiceMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)))
-      THETP(L,NY,NX)=AZMAX1(VLsoiAirP(L,NY,NX)/VLSoilMicP(L,NY,NX))
+      THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLiceMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)))
+      ThetaAir_col(L,NY,NX)=AZMAX1(VLsoiAirP_col(L,NY,NX)/VLSoilMicP(L,NY,NX))
     ENDIF
-    THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW_vr(L,NY,NX)-THETI(L,NY,NX))
+    THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_col(L,NY,NX))
 !
 !     GAS CONCENTRATIONS
 !
 !     C*G=soil gas gaseous concentration
 !     C*S=soil gas aqueous concentration
 !
-    IF(THETP(L,NY,NX).GT.THETX)THEN
+    IF(ThetaAir_col(L,NY,NX).GT.THETX)THEN
       DO NTG=idg_beg,idg_end-1
-        trc_gascl_vr(NTG,L,NY,NX)=AZMAX1(trc_gasml_vr(NTG,L,NY,NX)/VLsoiAirP(L,NY,NX))
+        trc_gascl_vr(NTG,L,NY,NX)=AZMAX1(trc_gasml_vr(NTG,L,NY,NX)/VLsoiAirP_col(L,NY,NX))
       ENDDO
     ELSE
       trc_gascl_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
@@ -2337,7 +2339,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
     TR_CO2_aqu_soil_vr(L,NY,NX)=0.0_r8
-    TBCO2(L,NY,NX)=0.0_r8
+    Txchem_CO2_vr_col(L,NY,NX)=0.0_r8
 
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0.0_r8

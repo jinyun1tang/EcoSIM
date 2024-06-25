@@ -432,7 +432,7 @@ implicit none
   end subroutine SurfLitterIterateNN
 
 !------------------------------------------------------------------------------------------
-  subroutine UpdateLitRPhys(NY,NX,WatInByRunoff,HEATIN_lndByRunoff,HeatStoreLandscape,HEATIN_lnd)
+  subroutine UpdateLitRPhys(NY,NX,WatInByRunoff,HEATIN_lndByRunoff,HeatStore_lnd,HEATIN_lnd)
   !
   !Description
   !Update Litter physical variables
@@ -440,14 +440,14 @@ implicit none
   integer,  intent(in) :: NY,NX
   real(r8), intent(in) :: WatInByRunoff
   real(r8), intent(in) :: HEATIN_lndByRunoff
-  real(r8), intent(inout) :: HeatStoreLandscape
+  real(r8), intent(inout) :: HeatStore_lnd
   real(r8), intent(inout) :: HEATIN_lnd
 
   real(r8) :: VHeatCapacityLitrX  !old litr heat capacity
   real(r8) :: VHeatCapacityLitR   !current litr heat capacity
   real(r8) :: dVHeatCapacityLitr  !change in heat capacity
   real(r8) :: tkspre,ENGYR,VLWatMicPr,VLiceMicPr
-  real(r8) :: ENGYZ,HeatByLitrMassChange
+  real(r8) :: ENGYZ,HeatByLitrMassChange,HS
   integer :: LS
 
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
@@ -476,6 +476,9 @@ implicit none
     tkspre=TKS(0,NY,NX)
     TKS(0,NY,NX)=(ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HeatByLitrMassChange &
       +HEATIN_lndByRunoff)/VHeatCapacity_col(0,NY,NX)
+    HS=TKS(0,NY,NX)*VHeatCapacity_col(0,NY,NX)    
+    HeatStore_col(NY,NX)=HeatStore_col(NY,NX)+HS
+    HeatStore_lnd=HeatStore_lnd+HS
     if(TKS(0,NY,NX)<100._r8 .or. TKS(0,NY,NX)>400._r8)then
       write(*,*)mod_filename,NY,NX,TKS(0,NY,NX),tkspre
       write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2Litr(NY,NX),WatInByRunoff
@@ -506,7 +509,7 @@ implicit none
     
   ENGYR=VHeatCapacity_col(0,NY,NX)*TKS(0,NY,NX)
 
-  HeatStoreLandscape=HeatStoreLandscape+ENGYR
+  HeatStore_lnd=HeatStore_lnd+ENGYR
   HEATIN_lnd=HEATIN_lnd+TLitrIceHeatFlxFrez(NY,NX)
 
   end subroutine UpdateLitRPhys

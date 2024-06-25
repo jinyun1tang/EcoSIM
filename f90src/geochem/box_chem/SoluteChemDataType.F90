@@ -172,7 +172,7 @@ module SoluteChemDataType
     real(r8) :: TR_OH_1e_soil
     real(r8) :: TR_SO4_2e_soil
     real(r8) :: TR_CO3_2e_soil
-    real(r8) :: TRHCO
+    real(r8) :: TR_HCO3
     real(r8) :: TR_CO2_aqu_soil_vr
     real(r8) :: TR_AlOH_soil
     real(r8) :: TR_AlO2H2_soil
@@ -229,7 +229,7 @@ module SoluteChemDataType
     real(r8) :: TR_CaSO4_precip_soil
     real(r8) :: TRH2O
     real(r8) :: TBION
-    real(r8) :: TBCO2
+    real(r8) :: Txchem_CO2
   contains
     procedure, public :: SetZero
   end type solute_flx_type
@@ -412,7 +412,7 @@ contains
   solflx%TR_OH_1e_soil  = 0._r8
   solflx%TR_SO4_2e_soil = 0._r8
   solflx%TR_CO3_2e_soil = 0._r8
-  solflx%TRHCO = 0._r8
+  solflx%TR_HCO3 = 0._r8
   solflx%TR_CO2_aqu_soil_vr = 0._r8
   solflx%TR_AlOH_soil = 0._r8
   solflx%TR_AlO2H2_soil = 0._r8
@@ -469,7 +469,7 @@ contains
   solflx%TR_CaSO4_precip_soil= 0._r8
   solflx%TRH2O = 0._r8
   solflx%TBION = 0._r8
-  solflx%TBCO2 = 0._r8
+  solflx%Txchem_CO2 = 0._r8
 
   end subroutine SetZero
 end module SoluteChemDataType

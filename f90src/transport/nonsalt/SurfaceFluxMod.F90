@@ -1038,7 +1038,7 @@ contains
   real(r8) :: DLYR1,TORT1,VLWatMicPOA,VLWatMicPOB,VLWatMicPPA,VLWatMicPPB
   real(r8) :: DiffusivitySolutEff
   real(r8) :: trc_gsolc,trc_gsolc2
-  integer  :: K,ngas
+  integer  :: K,ngas,idom
 !
 !     SURFACE EXCHANGE OF AQUEOUS CO2, CH4, O2, N2, NH3
 !     THROUGH VOLATILIZATION-DISSOLUTION FROM AQUEOUS
@@ -1067,10 +1067,9 @@ contains
     TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
-      CDOM_MicP2(idom_doc,K)=AZMAX1(DOM_MicP2(idom_doc,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
-      CDOM_MicP2(idom_don,K)=AZMAX1(DOM_MicP2(idom_don,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
-      CDOM_MicP2(idom_dop,K)=AZMAX1(DOM_MicP2(idom_dop,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
-      CDOM_MicP2(idom_acetate,K)=AZMAX1(DOM_MicP2(idom_acetate,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
+      do idom=idom_beg,idom_end
+        CDOM_MicP2(idom,K)=AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
+      enddo
     ENDDO D8910
 
 !not include NH3 and NH3B
@@ -1160,7 +1159,7 @@ contains
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !   seven gas species plus aqueous NH3 in band
 
-      GasSfAtmFlx_col(ngas,NY,NX)=GasSfAtmFlx_col(ngas,NY,NX)+RGasSSVol(ngas,NY,NX)     !> 0. atmosphere into soil
+      Gas_Flx_atmDif2soil_col(ngas,NY,NX)=Gas_Flx_atmDif2soil_col(ngas,NY,NX)+RGasSSVol(ngas,NY,NX)     !> 0. atmosphere into soil
     ENDDO
 
   ELSE

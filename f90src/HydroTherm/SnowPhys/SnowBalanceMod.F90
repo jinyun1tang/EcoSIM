@@ -145,7 +145,7 @@ implicit none
     ENGY=VHeatCapacity_col(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
     VHeatCapacity_col(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
       +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP(NUM(NY,NX),NY,NX)) &
-      +cpi*(VLiceMicP(NUM(NY,NX),NY,NX)+VLiceMacP(NUM(NY,NX),NY,NX))
+      +cpi*(VLiceMicP(NUM(NY,NX),NY,NX)+VLiceMacP_col(NUM(NY,NX),NY,NX))
 
     IF(VHeatCapacity_col(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       TKSX=TKS(NUM(NY,NX),NY,NX)

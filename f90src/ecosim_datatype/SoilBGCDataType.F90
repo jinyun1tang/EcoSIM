@@ -88,9 +88,9 @@ implicit none
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
-  real(r8),target,allocatable ::  WaterFlowSoiMicP(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowMacP(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HeatFlow2Soil(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_3DTransp2MicP_vr(:,:,:,:,:)
   real(r8),target,allocatable ::  DOM_3DMicp_Transp_flx(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
@@ -194,9 +194,9 @@ implicit none
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
-  allocate(WaterFlowSoiMicP(3,JD,JV,JH));    WaterFlowSoiMicP=0._r8
+  allocate(WaterFlowSoiMicP_3D(3,JD,JV,JH));    WaterFlowSoiMicP_3D=0._r8
   allocate(WaterFlowMacP(3,JD,JV,JH));   WaterFlowMacP=0._r8
-  allocate(HeatFlow2Soil(3,JD,JV,JH));   HeatFlow2Soil=0._r8
+  allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
   allocate(trcs_3DTransp2MicP_vr(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP_vr=0._r8
   allocate(DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flx=0._r8
@@ -287,9 +287,9 @@ implicit none
   call destroy(RNO2DmndSoilChemo_vr)
   call destroy(RNO2DmndBandChemo_vr)
   call destroy(XZHYS)
-  call destroy(WaterFlowSoiMicP)
+  call destroy(WaterFlowSoiMicP_3D)
   call destroy(WaterFlowMacP)
-  call destroy(HeatFlow2Soil)
+  call destroy(HeatFlow2Soil_3D)
   call destroy(DOM_3DMicp_Transp_flx)
   call destroy(DOM_3DMacp_Transp_flx)
   call destroy(trcg_RMicbTransf_vr)

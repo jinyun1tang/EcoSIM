@@ -16,7 +16,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  HeatSensAir2Surf_col(:,:)              !total sensible heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatSensVapAir2Surf_col(:,:)           !total convective heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatNet2Surf_col(:,:)                  !total ground heat flux at ground surface, [MJ d-2 t-1]
-  real(r8),target,allocatable ::  VapXAir2GSurf(:,:)                 !negative of total evaporation at ground surface, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  VapXAir2GSurf_col(:,:)                 !negative of total evaporation at ground surface, [m3 d-2 t-1]
   real(r8),target,allocatable ::  VWatStoreCapSurf(:,:)                         !surface water storage capacity, [m3 d-2]
   real(r8),target,allocatable ::  MaxVLWatByLitR(:,:)                         !soil surface water retention capacity
   real(r8),target,allocatable ::  VHCPNX(:,:)                        !minimum heat capacities
@@ -41,7 +41,7 @@ contains
   allocate(HeatSensAir2Surf_col(JY,JX));       HeatSensAir2Surf_col=0._r8
   allocate(HeatSensVapAir2Surf_col(JY,JX));    HeatSensVapAir2Surf_col=0._r8
   allocate(HeatNet2Surf_col(JY,JX));           HeatNet2Surf_col=0._r8
-  allocate(VapXAir2GSurf(JY,JX));          VapXAir2GSurf=0._r8
+  allocate(VapXAir2GSurf_col(JY,JX));          VapXAir2GSurf_col=0._r8
   allocate(FracSurfAsBareSoi(JY,JX));      FracSurfAsBareSoi=0._r8
   allocate(VWatStoreCapSurf(JY,JX));       VWatStoreCapSurf=0._r8
   allocate(MaxVLWatByLitR(JY,JX));       MaxVLWatByLitR=0._r8
@@ -67,7 +67,7 @@ contains
   call destroy(HeatSensAir2Surf_col)
   call destroy(HeatSensVapAir2Surf_col)
   call destroy(HeatNet2Surf_col)
-  call destroy(VapXAir2GSurf)
+  call destroy(VapXAir2GSurf_col)
   call destroy(FracSurfAsBareSoi)
   call destroy(VWatStoreCapSurf)
   call destroy(MaxVLWatByLitR)

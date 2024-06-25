@@ -63,7 +63,7 @@ implicit none
   integer :: LYRC       !number of days in current year
   integer :: iYearCurrent       !current year
 
-  real(r8) :: VOLWOU    !total subsurface water flux	m3 d-2
+  real(r8) :: QH2OLoss_lnds    !total subsurface water flux	m3 d-2
   real(r8), pointer :: AtmGasc(:)  => null()  !atmospheric gas concentrations
   character(len=16), pointer :: DATAP(:) => null()   !parameter file name
   CHARACTER(len=16), pointer :: DATA(:)  => null()   !pft file
@@ -273,7 +273,7 @@ implicit none
   integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground)
   real(r8), pointer :: MaxPotentSeedNumber_pft(:)         => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)         => null() !maximum grain number per node , [-]
-  real(r8), pointer :: rLen2WidthLeaf(:)         => null() !leaf length:width ratio, [-]
+  real(r8), pointer :: rLen2WidthLeaf_pft(:)         => null() !leaf length:width ratio, [-]
   real(r8), pointer :: MaxSeedCMass(:)         => null() !maximum grain size   , [g]
   real(r8), pointer :: Root1stRadius_pvr(:,:,:)    => null() !root layer diameter primary axes, [m ]
   real(r8), pointer :: Root2ndRadius_pvr(:,:,:)    => null() !root layer diameter secondary axes, [m ]
@@ -1802,7 +1802,7 @@ implicit none
   allocate(this%ClumpFactorNow_pft(JP1));this%ClumpFactorNow_pft=spval
   allocate(this%HypoctoHeight_pft(JP1));this%HypoctoHeight_pft=spval
   allocate(this%RootPoreTortu4Gas(jroots,JP1));this%RootPoreTortu4Gas=spval
-  allocate(this%rLen2WidthLeaf(JP1));this%rLen2WidthLeaf=spval
+  allocate(this%rLen2WidthLeaf_pft(JP1));this%rLen2WidthLeaf_pft=spval
   allocate(this%MaxSeedNumPerSite_pft(JP1));this%MaxSeedNumPerSite_pft=spval
   allocate(this%MaxPotentSeedNumber_pft(JP1));this%MaxPotentSeedNumber_pft=spval
   allocate(this%MaxSeedCMass(JP1));this%MaxSeedCMass=spval

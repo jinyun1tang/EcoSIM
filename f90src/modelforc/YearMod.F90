@@ -47,9 +47,9 @@
   LiterfalOrgM_col(ielmc,NY,NX)=0._r8
   UCOP(NY,NX)=0._r8
   Eco_NBP_col(NY,NX)=0._r8
-  URAIN_col(NY,NX)=0._r8
-  UEVAP_col(NY,NX)=0._r8
-  URUN(NY,NX)=0._r8
+  QRain_col(NY,NX)=0._r8
+  QEvap_col(NY,NX)=0._r8
+  Qrunoff_col(NY,NX)=0._r8
   USEDOU(NY,NX)=0._r8
   AnualH2OLoss_col(NY,NX)=0._r8
   HydroIonFlx_col(NY,NX)=0._r8

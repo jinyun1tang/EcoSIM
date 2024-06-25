@@ -6,7 +6,7 @@ module EcoSimSumDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  real(r8) :: TLH2G    !total soil N2	g d-2
+  real(r8) :: TSoilH2G_lnd    !total soil N2	g d-2
   real(r8) :: H2GIN    !total soil H2 g d-2
   real(r8) :: H2GOU    !cumulative H2 loss through lateral and lower boundaries
   real(r8) :: TION     !total soil ion content	mol d-2
@@ -14,9 +14,9 @@ module EcoSimSumDataType
   real(r8) :: TIONOU   !total subsurface ion flux	mol d-2
   real(r8) :: TSEDSO   !total soil sediment	Mg d-2
   real(r8) :: TSEDOU   !total sediment subsurface flux	Mg d-2
-  real(r8) :: WaterStoreLandscape   !total soil water content	m3 d-2
-  real(r8) :: HeatStoreLandscape   !total soil heat content	MJ d-2
-  real(r8) :: OXYGSO   !total soil O2 content	g d-2
+  real(r8) :: WatMassStore_lnd   !total soil water content	m3 d-2
+  real(r8) :: HeatStore_lnd   !total soil heat content	MJ d-2
+  real(r8) :: TSoilO2G_lnd   !total soil O2 content	g d-2
   real(r8) :: LitRMStoreLndscap(1:NumPlantChemElms)   !total soil litter OM content	g d-2
   real(r8) :: POMHumStoreLndscap(NumPlantChemElms)   !total soil POM + humus C content	g d-2
   real(r8) :: TDisolNH4_lnd    !total soil NH4 content	g d-2
@@ -31,12 +31,12 @@ module EcoSimSumDataType
   real(r8) :: TORGP    !total organic P amendment	g d-2
   real(r8) :: CO2GIN   !total surface CO2 flux	g d-2
   real(r8) :: ZN2GIN   !total surface N2 flux	g d-2
-  real(r8) :: VOLWOU   !total subsurface water flux	m3 d-2
+  real(r8) :: QH2OLoss_lnds   !total subsurface water flux	m3 d-2
   real(r8) :: CEVAP    !total evaporation	m3 d-2
   real(r8) :: CRUN     !total surface runoff	m3 d-2
-  real(r8) :: HEATOU   !total subsurface heat flux	MJ d-2
+  real(r8) :: HeatOut_lnds   !total subsurface heat flux	MJ d-2
   real(r8) :: OXYGOU   !total subsurface O2 flux	g d-2
-  real(r8) :: TOMOU(NumPlantChemElms)     !total subsurface C flux	g d-2
+  real(r8) :: TOMOU_lnds(NumPlantChemElms)     !total subsurface C flux	g d-2
   real(r8) :: TZIN     !total surface N flux	g d-2
   real(r8) :: TPIN     !total surface P flux	g d-2
   real(r8) :: Litrfall_lnds(NumPlantChemElms)     !total LitrFall C	g d-2

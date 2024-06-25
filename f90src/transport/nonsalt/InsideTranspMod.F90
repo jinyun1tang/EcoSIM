@@ -250,7 +250,7 @@ module InsideTranspMod
 !
   iFlagEbu=0
   D125: DO L=1,NL(NY,NX)
-    N1=NX;N2=NY;N3=L
+    N1=NX;N2=NY;N3=L    
 !
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !

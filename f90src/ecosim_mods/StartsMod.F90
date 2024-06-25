@@ -469,28 +469,28 @@ module StartsMod
           THETW_vr(L,NY,NX)=THW(L,NY,NX)
         ENDIF
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
-          THETI(L,NY,NX)=0.0_r8
+          THETI_col(L,NY,NX)=0.0_r8
         ELSE
-          THETI(L,NY,NX)=THI(L,NY,NX)
+          THETI_col(L,NY,NX)=THI(L,NY,NX)
         ENDIF
         VLWatMicP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLWatMicPX(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
+        VLWatMicPX_col(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
         VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
-        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
+        VLiceMicP(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+        VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
-          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
+        VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
+          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP_col(L,NY,NX))
         VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
-          +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-        THETWZ(L,NY,NX)=THETW_vr(L,NY,NX)
-        THETIZ(L,NY,NX)=THETI(L,NY,NX)
+          +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+        ThetaH2OZ_col(L,NY,NX)=THETW_vr(L,NY,NX)
+        ThetaICEZ_col(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF
     ENDIF
     TKS(L,NY,NX)=ATKS(NY,NX)
@@ -731,16 +731,16 @@ module StartsMod
   TORGF=0.0_r8
   TORGN=0.0_r8
   TORGP=0.0_r8
-  VOLWOU=0.0_r8
+  QH2OLoss_lnds=0.0_r8
   CEVAP=0.0_r8
   CRUN=0.0_r8
-  HEATOU=0.0_r8
+  HeatOut_lnds=0.0_r8
   OXYGOU=0.0_r8
   H2GOU=0.0_r8
   TSEDOU=0.0_r8
-  TOMOU(ielmc)=0.0_r8
-  TOMOU(ielmn)=0.0_r8
-  TOMOU(ielmp)=0.0_r8
+  TOMOU_lnds(ielmc)=0.0_r8
+  TOMOU_lnds(ielmn)=0.0_r8
+  TOMOU_lnds(ielmp)=0.0_r8
   Litrfall_lnds(ielmc)=0.0_r8
   Litrfall_lnds(ielmn)=0.0_r8
   Litrfall_lnds(ielmp)=0.0_r8
@@ -772,7 +772,7 @@ module StartsMod
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
-  URAIN_col(:,:)=0.0_r8
+  QRain_col(:,:)=0.0_r8
 
   CO2byFire_col(:,:)=0.0_r8
   CH4byFire_col(:,:)=0.0_r8
@@ -784,8 +784,8 @@ module StartsMod
   FertNFlx_col(:,:)=0.0_r8
   FerPFlx_col(:,:)=0.0_r8
   AnualH2OLoss_col(:,:)=0.0_r8
-  UEVAP_col(:,:)=0.0_r8
-  URUN(:,:)=0.0_r8
+  QEvap_col(:,:)=0.0_r8
+  Qrunoff_col(:,:)=0.0_r8
   USEDOU(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
   HydroSufDOCFlx_col(:,:)=0.0_r8
@@ -804,7 +804,7 @@ module StartsMod
   LiterfalOrgM_col(ielmc,:,:)=0.0_r8
   LiterfalOrgM_col(ielmn,:,:)=0.0_r8
   LiterfalOrgM_col(ielmp,:,:)=0.0_r8
-  UDRAIN_col(:,:)=0.0_r8
+  QDrain_col(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8
   DPNH4(:,:)=0.0_r8

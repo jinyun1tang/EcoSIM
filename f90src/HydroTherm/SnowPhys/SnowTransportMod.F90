@@ -182,13 +182,13 @@ implicit none
   DO  L=1,JS
     WS=VLDrySnoWE_col(L,NY,NX)+VLWatSnow_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
 
-    WaterStoreLandscape=WaterStoreLandscape+WS
-    UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
+    WatMassStore_lnd=WatMassStore_lnd+WS
+    WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
     ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow(L,NY,NX)
-    HeatStoreLandscape=HeatStoreLandscape+ENGYW
+    HeatStore_lnd=HeatStore_lnd+ENGYW
     TGasC_lnd=TGasC_lnd+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
     DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
+    TSoilO2G_lnd=TSoilO2G_lnd+trcg_solsml(idg_O2,L,NY,NX)
     TGasN_lnd=TGasN_lnd+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
     TDisolNH4_lnd=TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
     tNO3_lnd=tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)

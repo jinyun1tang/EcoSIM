@@ -516,19 +516,11 @@ module PlantPhenolMod
 ! VHeatCapCanP_pft,WTSHT,WatByPCanopy_pft=canopy heat capacity,mass,water content
 !
   ShootArea=0._r8
-!  if(NZ==1)write(211,*)I+J/24.,MainBranchNum_pft(NZ) &
-!    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
+
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk=(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc)
-!    if(NZ==1)THEN
-!    write(111,*)'tree emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-!      ShootArea,ZERO4LeafVar_pft(NZ)
-!    ELSEIF(NZ==2)then
-!    write(112,*)'grass emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-!      ShootArea,ZERO4LeafVar_pft(NZ)    
-!    endif
 
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
@@ -994,17 +986,6 @@ module PlantPhenolMod
     !iPlantPhenolType_pft should be set according to koppen climate zone.  
     PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
     
-!    if(NZ==1)THEN
-!      WRITE(103,*)'chk1',I+J/24.,ShootNodeNum_brch(NB,NZ) &
-!        , MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ) &
-!        , NodeNumChk,(LeafOutChk.OR.PlantDayChk) &
-!        ,(PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk
-!    ELSE
-!      WRITE(104,*)'chk1',I+J/24.,ShootNodeNum_brch(NB,NZ) &
-!        , MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ) &
-!        , NodeNumChk,(LeafOutChk.OR.PlantDayChk) &
-!        ,(PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk
-!    ENDIF
     IF((NodeNumChk .AND. (LeafOutChk.OR.PlantDayChk)) .OR. &
       ((PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk))THEN
 !
