@@ -372,29 +372,29 @@ contains
   ENDDO
 
   do ntg=idg_beg,idg_NH3
-    trcs_3DTransp2MicP_vr(ntg,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
+    trcs_3DTransp2MicP_3D(ntg,3,0,NY,NX)=trcs_3DTransp2MicP_3D(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
   ENDDO
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_3DTransp2MicP_vr(nts,3,0,NY,NX)=trcs_3DTransp2MicP_vr(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
+    trcs_3DTransp2MicP_3D(nts,3,0,NY,NX)=trcs_3DTransp2MicP_3D(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
   enddo
-  trcs_3DTransp2MicP_vr(idg_NH3,3,0,NY,NX)=trcs_3DTransp2MicP_vr(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
-  trcs_3DTransp2MicP_vr(ids_NH4,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  trcs_3DTransp2MicP_vr(ids_NO3,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
-  trcs_3DTransp2MicP_vr(ids_NO2,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
-  trcs_3DTransp2MicP_vr(ids_H1PO4,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  trcs_3DTransp2MicP_vr(ids_H2PO4,3,0,NY,NX)=trcs_3DTransp2MicP_vr(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  trcs_3DTransp2MicP_3D(idg_NH3,3,0,NY,NX)=trcs_3DTransp2MicP_3D(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
+  trcs_3DTransp2MicP_3D(ids_NH4,3,0,NY,NX)=trcs_3DTransp2MicP_3D(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
+  trcs_3DTransp2MicP_3D(ids_NO3,3,0,NY,NX)=trcs_3DTransp2MicP_3D(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
+  trcs_3DTransp2MicP_3D(ids_NO2,3,0,NY,NX)=trcs_3DTransp2MicP_3D(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
+  trcs_3DTransp2MicP_3D(ids_H1PO4,3,0,NY,NX)=trcs_3DTransp2MicP_3D(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  trcs_3DTransp2MicP_3D(ids_H2PO4,3,0,NY,NX)=trcs_3DTransp2MicP_3D(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
   do ntg=idg_beg,idg_NH3
-    trcs_3DTransp2MicP_vr(ntg,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_vr(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
+    trcs_3DTransp2MicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_3D(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
   enddo
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    trcs_3DTransp2MicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
   enddo
 
   do nts=ids_nutb_beg,ids_nutb_end
-    trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_vr(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    trcs_3DTransp2MicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_3DTransp2MicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
   enddo
   end subroutine TotalPoreFluxAdjacentCell
 !------------------------------------------------------------------------------------------
@@ -803,7 +803,7 @@ contains
         if(.not.isclose(VFLW,0._r8))then
           DO ngas=idg_beg,idg_NH3
             trcg_2DSnowDrift(ngas,N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(ngas,1,N5,N4))
-            trcg_FloXSnow(ngas,N,N5,N4)=trcg_FloXSnow(ngas,N,N5,N4)+trcg_2DSnowDrift(ngas,N,N5,N4)
+            trcg_FloXSnow_2DH(ngas,N,N5,N4)=trcg_FloXSnow_2DH(ngas,N,N5,N4)+trcg_2DSnowDrift(ngas,N,N5,N4)
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end

@@ -45,8 +45,8 @@ module SnowDataType
   real(r8),target, allocatable ::  DrysnoBySnowRedistrib(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
   real(r8),target, allocatable ::  WatBySnowRedistrib(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
   real(r8),target, allocatable ::  IceBySnowRedistrib(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
-  real(r8),target, allocatable ::  HeatBySnowRedistribution(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
-  real(r8),target, allocatable ::  trcg_FloXSnow(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
+  real(r8),target, allocatable ::  HeatBySnowRedistrib_2DH(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
+  real(r8),target, allocatable ::  trcg_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  trcn_FloXSnow(:,:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
 
   real(r8),target, allocatable ::  trcg_solsml(:,:,:,:)               ! snowpack dual phase disolved tracers
@@ -97,8 +97,8 @@ contains
   allocate(DrysnoBySnowRedistrib(2,JV,JH));        DrysnoBySnowRedistrib=0._r8
   allocate(WatBySnowRedistrib(2,JV,JH));        WatBySnowRedistrib=0._r8
   allocate(IceBySnowRedistrib(2,JV,JH));        IceBySnowRedistrib=0._r8
-  allocate(HeatBySnowRedistribution(2,JV,JH));       HeatBySnowRedistribution=0._r8
-  allocate(trcg_FloXSnow(idg_beg:idg_NH3,2,JV,JH));    trcg_FloXSnow=0._r8
+  allocate(HeatBySnowRedistrib_2DH(2,JV,JH));       HeatBySnowRedistrib_2DH=0._r8
+  allocate(trcg_FloXSnow_2DH(idg_beg:idg_NH3,2,JV,JH));    trcg_FloXSnow_2DH=0._r8
 
   allocate(trcn_FloXSnow(ids_nut_beg:ids_nuts_end,2,JV,JH));    trcn_FloXSnow=0._r8
 
@@ -156,8 +156,8 @@ contains
   call destroy(DrysnoBySnowRedistrib)
   call destroy(WatBySnowRedistrib)
   call destroy(IceBySnowRedistrib)
-  call destroy(HeatBySnowRedistribution)
-  call destroy(trcg_FloXSnow)
+  call destroy(HeatBySnowRedistrib_2DH)
+  call destroy(trcg_FloXSnow_2DH)
   call destroy(trcn_FloXSnow)
   if(salt_model)then
     call destroy(trcSalt_XQS)

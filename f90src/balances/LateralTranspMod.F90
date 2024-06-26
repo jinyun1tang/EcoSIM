@@ -90,7 +90,7 @@ implicit none
     !make a copy of soil water/ice in micro- and macropores
     VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
-    VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
+    VLWatMacP1_vr(L,NY,NX)=VLWatMacP(L,NY,NX)
     VLiceMacP1(L,NY,NX)=VLiceMacP_col(L,NY,NX)
 
 !
@@ -213,7 +213,7 @@ implicit none
   DO  L=NU(NY,NX),NL(NY,NX)
     TWatFlowCellMicP(L,NY,NX)=0.0_r8
     TWatFlowCellMicPX(L,NY,NX)=0.0_r8
-    TWaterFlowMacP(L,NY,NX)=0.0_r8
+    TWaterFlowMacP_vr(L,NY,NX)=0.0_r8
     THeatFlow2Soil_col(L,NY,NX)=0.0_r8
     WatIceThawMicP(L,NY,NX)=0.0_r8
     WatIceThawMacP(L,NY,NX)=0.0_r8
@@ -570,7 +570,7 @@ implicit none
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
   !     GRID CELLS
   !
-  !     TFLW,TWaterFlowMacP,TWaterFlowMacP=net micropore,macropore water flux, heat flux
+  !     TFLW,TWaterFlowMacP_vr,TWaterFlowMacP_vr=net micropore,macropore water flux, heat flux
   !     FLW,FLWH,HFLW=micropore,macropore water flux, heat flux from watsub.f
   !     LakeSurfFlowMicP,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
   !when FlowDirIndicator /=3, it means lateral exchange is consdiered
@@ -593,7 +593,7 @@ implicit none
         !vertical direction, source is at soil surface
         TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP(N5,N4)
         TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-LakeSurfFlowMicPX(N5,N4)
-        TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-LakeSurfFlowMacP(N5,N4)
+        TWaterFlowMacP_vr(N3,N2,N1)=TWaterFlowMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP(N5,N4)
         THeatFlow2Soil_col(N3,N2,N1)=THeatFlow2Soil_col(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)
 
         if(THeatFlow2Soil_col(N3,N2,N1)<-1.e10)then
@@ -605,7 +605,7 @@ implicit none
       ELSE
         TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
         TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-WaterFlowSoiMicPX(N,N6,N5,N4)
-        TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-WaterFlowMacP(N,N6,N5,N4)
+        TWaterFlowMacP_vr(N3,N2,N1)=TWaterFlowMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-WaterFlowMacP_3D(N,N6,N5,N4)
         THeatFlow2Soil_col(N3,N2,N1)=THeatFlow2Soil_col(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
 
         if(THeatFlow2Soil_col(N3,N2,N1)<-1.e10)then
@@ -643,7 +643,7 @@ implicit none
 
       DO NTS=ids_beg,ids_end
         trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MicP_vr(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP_vr(NTS,N,N6,N5,N4)
+          +trcs_3DTransp2MicP_3D(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP_3D(NTS,N,N6,N5,N4)
         trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
           +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
       ENDDO
@@ -685,7 +685,7 @@ implicit none
     ELSE
       TWatFlowCellMicP(N3,N2,N1)=0.0_r8
       TWatFlowCellMicPX(N3,N2,N1)=0.0_r8
-      TWaterFlowMacP(N3,N2,N1)=0.0_r8
+      TWaterFlowMacP_vr(N3,N2,N1)=0.0_r8
       THeatFlow2Soil_col(N3,N2,N1)=0.0_r8
       WatIceThawMicP(N3,N2,N1)=0.0_r8
       WatIceThawMacP(N3,N2,N1)=0.0_r8

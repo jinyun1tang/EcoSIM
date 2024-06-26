@@ -101,23 +101,23 @@ implicit none
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
-            -trcs_3DTransp2MicP_vr(NTG,3,0,N2,N1)-trcs_3DTransp2MicP_vr(NTG,3,NUM(N2,N1),N2,N1) &
+            -trcs_3DTransp2MicP_3D(NTG,3,0,N2,N1)-trcs_3DTransp2MicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
             -trcs_3DTransp2MacP(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
-            -trcs_3DTransp2MicP_vr(NTN,3,0,N2,N1)-trcs_3DTransp2MicP_vr(NTN,3,NUM(N2,N1),N2,N1) &
+            -trcs_3DTransp2MicP_3D(NTN,3,0,N2,N1)-trcs_3DTransp2MicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
             -trcs_3DTransp2MacP(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         !add band flux
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -trcs_3DTransp2MicP_vr(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -trcs_3DTransp2MicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
         DO NTS=0,ids_nuts
           trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
-            -trcs_3DTransp2MicP_vr(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
+            -trcs_3DTransp2MicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         IF(salt_model)THEN
@@ -240,7 +240,7 @@ implicit none
     -DrysnoBySnowRedistrib(N,N5,N4)
   TWatBySnowRedist(N2,N1)=TWatBySnowRedist(N2,N1)+WatBySnowRedistrib(N,N2,N1)-WatBySnowRedistrib(N,N5,N4)
   TIceBySnowRedist(N2,N1)=TIceBySnowRedist(N2,N1)+IceBySnowRedistrib(N,N2,N1)-IceBySnowRedistrib(N,N5,N4)
-  THeatBySnowRedist(N2,N1)=THeatBySnowRedist(N2,N1)+HeatBySnowRedistribution(N,N2,N1)-HeatBySnowRedistribution(N,N5,N4)
+  THeatBySnowRedist(N2,N1)=THeatBySnowRedist(N2,N1)+HeatBySnowRedistrib_2DH(N,N2,N1)-HeatBySnowRedistrib_2DH(N,N5,N4)
 
 
   D1202: DO NN=1,2
@@ -287,12 +287,12 @@ implicit none
   !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
   !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
   !
-  trcg_QSS(idg_CO2,N2,N1)=trcg_QSS(idg_CO2,N2,N1)+trcg_FloXSnow(idg_CO2,N,N2,N1)-trcg_FloXSnow(idg_CO2,N,N5,N4)
-  trcg_QSS(idg_CH4,N2,N1)=trcg_QSS(idg_CH4,N2,N1)+trcg_FloXSnow(idg_CH4,N,N2,N1)-trcg_FloXSnow(idg_CH4,N,N5,N4)
-  trcg_QSS(idg_O2,N2,N1)=trcg_QSS(idg_O2,N2,N1)+trcg_FloXSnow(idg_O2,N,N2,N1)-trcg_FloXSnow(idg_O2,N,N5,N4)
-  trcg_QSS(idg_N2,N2,N1)=trcg_QSS(idg_N2,N2,N1)+trcg_FloXSnow(idg_N2,N,N2,N1)-trcg_FloXSnow(idg_N2,N,N5,N4)
-  trcg_QSS(idg_N2O,N2,N1)=trcg_QSS(idg_N2O,N2,N1)+trcg_FloXSnow(idg_N2O,N,N2,N1)-trcg_FloXSnow(idg_N2O,N,N5,N4)
-  trcg_QSS(idg_NH3,N2,N1)=trcg_QSS(idg_NH3,N2,N1)+trcg_FloXSnow(idg_NH3,N,N2,N1)-trcg_FloXSnow(idg_NH3,N,N5,N4)
+  trcg_QSS(idg_CO2,N2,N1)=trcg_QSS(idg_CO2,N2,N1)+trcg_FloXSnow_2DH(idg_CO2,N,N2,N1)-trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)
+  trcg_QSS(idg_CH4,N2,N1)=trcg_QSS(idg_CH4,N2,N1)+trcg_FloXSnow_2DH(idg_CH4,N,N2,N1)-trcg_FloXSnow_2DH(idg_CH4,N,N5,N4)
+  trcg_QSS(idg_O2,N2,N1)=trcg_QSS(idg_O2,N2,N1)+trcg_FloXSnow_2DH(idg_O2,N,N2,N1)-trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
+  trcg_QSS(idg_N2,N2,N1)=trcg_QSS(idg_N2,N2,N1)+trcg_FloXSnow_2DH(idg_N2,N,N2,N1)-trcg_FloXSnow_2DH(idg_N2,N,N5,N4)
+  trcg_QSS(idg_N2O,N2,N1)=trcg_QSS(idg_N2O,N2,N1)+trcg_FloXSnow_2DH(idg_N2O,N,N2,N1)-trcg_FloXSnow_2DH(idg_N2O,N,N5,N4)
+  trcg_QSS(idg_NH3,N2,N1)=trcg_QSS(idg_NH3,N2,N1)+trcg_FloXSnow_2DH(idg_NH3,N,N2,N1)-trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)
 
   trcn_QSS(ids_NH4,N2,N1)=trcn_QSS(ids_NH4,N2,N1)+trcn_FloXSnow(ids_NH4,N,N2,N1)-trcn_FloXSnow(ids_NH4,N,N5,N4)
   trcn_QSS(ids_NO3,N2,N1)=trcn_QSS(ids_NO3,N2,N1)+trcn_FloXSnow(ids_NO3,N,N2,N1)-trcn_FloXSnow(ids_NO3,N,N5,N4)

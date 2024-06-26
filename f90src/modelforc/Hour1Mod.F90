@@ -398,14 +398,10 @@ module Hour1Mod
       DrysnoBySnowRedistrib(1:2,NY,NX)=0.0_r8
       WatBySnowRedistrib(1:2,NY,NX)=0.0_r8
       IceBySnowRedistrib(1:2,NY,NX)=0.0_r8
-      HeatBySnowRedistribution(1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow(idg_CO2,1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow(idg_CH4,1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow(idg_O2,1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow(idg_N2,1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow(idg_N2O,1:2,NY,NX)=0.0_r8
+      HeatBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
+      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,NY,NX)=0.0_r8
+
       trcn_FloXSnow(ids_NH4,1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow(idg_NH3,1:2,NY,NX)=0.0_r8
       trcn_FloXSnow(ids_NO3,1:2,NY,NX)=0.0_r8
       trcn_FloXSnow(ids_H1PO4,1:2,NY,NX)=0.0_r8
       trcn_FloXSnow(ids_H2PO4,1:2,NY,NX)=0.0_r8
@@ -415,9 +411,7 @@ module Hour1Mod
 !
       DO  L=0,NL(NY,NX)+1
 
-        trcs_3DTransp2MicP_vr(idg_beg:idg_end-1,1:3,L,NY,NX)=0.0_r8
-
-        trcs_3DTransp2MicP_vr(ids_nut_beg:ids_nuts_end,1:3,L,NY,NX)=0.0_r8
+        trcs_3DTransp2MicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
 
         DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
       ENDDO
@@ -427,10 +421,10 @@ module Hour1Mod
       DO L=1,NL(NY,NX)+1
         WaterFlowSoiMicP_3D(1:3,L,NY,NX)=0.0_r8
         WaterFlowSoiMicPX(1:3,L,NY,NX)=0.0_r8
-        WaterFlowMacP(1:3,L,NY,NX)=0.0_r8
+        WaterFlowMacP_3D(1:3,L,NY,NX)=0.0_r8
         HeatFlow2Soil_3D(1:3,L,NY,NX)=0.0_r8
 
-        trcs_3DTransp2MicP_vr(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
+        trcs_3DTransp2MicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
         Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
 
         DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
@@ -2339,7 +2333,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
     TR_CO2_aqu_soil_vr(L,NY,NX)=0.0_r8
-    Txchem_CO2_vr_col(L,NY,NX)=0.0_r8
+    Txchem_CO2_vr(L,NY,NX)=0.0_r8
 
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0.0_r8

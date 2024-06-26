@@ -70,7 +70,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TR_Fe_sorbed_soil(:,:,:)                       !total Fe adsorption
   real(r8),target,allocatable ::  TR_FeO2H2_sorbed_soil(:,:,:)                      !total FeOH2 adsorption
   real(r8),target,allocatable ::  trcx_TRSoilChem_vr(:,:,:,:)                   !total adsorbed OH- transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  Txchem_CO2_vr_col(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
+  real(r8),target,allocatable ::  Txchem_CO2_vr(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBION(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3G(:,:,:)                       !total gaseous NH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcp_RChem_soil(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
@@ -147,7 +147,7 @@ module AqueChemDatatype
   allocate(TR_KSO4_soil(JZ,JY,JX));    TR_KSO4_soil=0._r8
   allocate(TR_Fe_sorbed_soil(JZ,JY,JX));    TR_Fe_sorbed_soil=0._r8
   allocate(TR_FeO2H2_sorbed_soil(JZ,JY,JX));   TR_FeO2H2_sorbed_soil=0._r8
-  allocate(Txchem_CO2_vr_col(JZ,JY,JX));    Txchem_CO2_vr_col=0._r8
+  allocate(Txchem_CO2_vr(JZ,JY,JX));    Txchem_CO2_vr=0._r8
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
   allocate(TRN3G(0:JZ,JY,JX));  TRN3G=0._r8
   allocate(trcp_RChem_soil(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil=0._r8
@@ -224,7 +224,7 @@ module AqueChemDatatype
   call destroy(TR_KSO4_soil)
   call destroy(TR_Fe_sorbed_soil)
   call destroy(TR_FeO2H2_sorbed_soil)
-  call destroy(Txchem_CO2_vr_col)
+  call destroy(Txchem_CO2_vr)
   call destroy(TBION)
   call destroy(TRN3G)
 

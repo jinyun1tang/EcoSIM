@@ -65,17 +65,17 @@ implicit none
     !     FCI,WPI=ice field capacity,wilting point
     !     PSISoilMatric=matric water potential
     !
-  ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1).and.FracSoiPAsIce(N3,N2,N1)>ZEROS2(N2,N1))THEN
-    FCX=FCI*FracSoiPAsIce(N3,N2,N1)
-    WPX=WPI*FracSoiPAsIce(N3,N2,N1)
+  ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1).and.FracSoiPAsIce_vr(N3,N2,N1)>ZEROS2(N2,N1))THEN
+    FCX=FCI*FracSoiPAsIce_vr(N3,N2,N1)
+    WPX=WPI*FracSoiPAsIce_vr(N3,N2,N1)
     FCLX=LOG(FCX)
     WPLX=LOG(WPX)
     PSDX=LOGPOROS(N3,N2,N1)-FCLX
     FCDX=FCLX-WPLX
-    IF(FracSoiPAsWat(N3,N2,N1).LT.FCX)THEN
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((FCLX-LOG(FracSoiPAsWat(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
-    ELSEIF(FracSoiPAsWat(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(FracSoiPAsWat(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
+    IF(FracSoiPAsWat_vr(N3,N2,N1).LT.FCX)THEN
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((FCLX-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
+    ELSEIF(FracSoiPAsWat_vr(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
     ELSE
       !saturated
       THETA1=POROS(N3,N2,N1)
@@ -182,10 +182,10 @@ implicit none
   real(r8) :: HeatDiffusByWat1,HeatDiffusByAir1,RYLXW1,RYLXA1,RYLNW1,RYLNA1
   REAL(R8) :: XNUSW1,XNUSA1,ThermalConducByWater,ThermalConducByAir,WTHET1
 
-  IF(SoiBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat(N3,N2,N1)+FracSoiPAsIce(N3,N2,N1).GT.ZERO)THEN
+  IF(SoiBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
-    HeatDiffusByWat1=AZMAX1(FracSoiPAsWat(N3,N2,N1)-TRBW)**3._r8
-    HeatDiffusByAir1=AZMAX1(FracSoiPAsAir(N3,N2,N1)-TRBA)**3._r8
+    HeatDiffusByWat1=AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3._r8
+    HeatDiffusByAir1=AZMAX1(FracSoiPAsAir_vr(N3,N2,N1)-TRBA)**3._r8
     RYLXW1=DTKX*HeatDiffusByWat1
     RYLXA1=DTKX*HeatDiffusByAir1
     RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
@@ -195,11 +195,11 @@ implicit none
     ThermalConducByWater=2.067E-03_r8*XNUSW1
     ThermalConducByAir=9.050E-05_r8*XNUSA1
     WTHET1=1.467_r8-0.467_r8*FracSoilAsAirt(N3,N2,N1)
-    TCND1=(NumerSolidThermCond(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)*ThermalConducByWater &
-      +0.611_r8*FracSoiPAsIce(N3,N2,N1)*7.844E-03_r8 &
-      +WTHET1*FracSoiPAsAir(N3,N2,N1)*ThermalConducByAir) &
-      /(DenomSolidThermCond(N3,N2,N1)+FracSoiPAsWat(N3,N2,N1)+0.611_r8*FracSoiPAsIce(N3,N2,N1) &
-      +WTHET1*FracSoiPAsAir(N3,N2,N1))
+    TCND1=(NumerSolidThermCond(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)*ThermalConducByWater &
+      +0.611_r8*FracSoiPAsIce_vr(N3,N2,N1)*7.844E-03_r8 &
+      +WTHET1*FracSoiPAsAir_vr(N3,N2,N1)*ThermalConducByAir) &
+      /(DenomSolidThermCond(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)+0.611_r8*FracSoiPAsIce_vr(N3,N2,N1) &
+      +WTHET1*FracSoiPAsAir_vr(N3,N2,N1))
   ELSE
     TCND1=0.0_r8
   ENDIF

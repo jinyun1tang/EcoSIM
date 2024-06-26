@@ -75,12 +75,12 @@ module UptakesMod
     PSICanopy_pft          => plt_ew%PSICanopy_pft,           &
     HeatXAir2PCan          => plt_ew%HeatXAir2PCan,           &
     Canopy_Heat_Sens_col   => plt_ew%Canopy_Heat_Sens_col,    &
-    DeltaTKC_pft               => plt_ew%DeltaTKC_pft,                &
+    DeltaTKC_pft           => plt_ew%DeltaTKC_pft,            &
     VapXAir2Canopy_pft     => plt_ew%VapXAir2Canopy_pft,      &
     TairK                  => plt_ew%TairK,                   &
     Canopy_Heat_Latent_col => plt_ew%Canopy_Heat_Latent_col,  &
     Transpiration_pft      => plt_ew%Transpiration_pft,       &
-    WatByPCanopy_pft           => plt_ew%WatByPCanopy_pft,            &
+    WatByPCanopy_pft       => plt_ew%WatByPCanopy_pft,        &
     CumSoilThickness       => plt_site%CumSoilThickness,      &
     PlantPopu_col          => plt_site%PlantPopu_col,         &
     NP                     => plt_site%NP,                    &
@@ -94,7 +94,7 @@ module UptakesMod
     CanopyLeafShethC_pft   => plt_biom%CanopyLeafShethC_pft,  &
     CanopyStalkC_pft       => plt_biom%CanopyStalkC_pft,      &
     iPlantCalendar_brch    => plt_pheno%iPlantCalendar_brch,  &
-    PlantO2Stress_pft          => plt_pheno%PlantO2Stress_pft,        &
+    PlantO2Stress_pft      => plt_pheno%PlantO2Stress_pft,    &
     IsPlantActive_pft      => plt_pheno%IsPlantActive_pft,    &
     CanopyLeafArea_col     => plt_morph%CanopyLeafArea_col,   &
     Root1stDepz_pft        => plt_morph%Root1stDepz_pft,      &

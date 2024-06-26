@@ -402,7 +402,7 @@ module BoundaryTranspMod
   enddo
 
   DO ids=ids_beg,ids_end
-    trcs_3DTransp2MicP_vr(ids,N,M6,M5,M4)=trcs_3DTransp2MicP_vr(ids,N,M6,M5,M4)+R3PoreSolFlx_vr(ids,N,M6,M5,M4)
+    trcs_3DTransp2MicP_3D(ids,N,M6,M5,M4)=trcs_3DTransp2MicP_3D(ids,N,M6,M5,M4)+R3PoreSolFlx_vr(ids,N,M6,M5,M4)
     trcs_3DTransp2MacP(ids,N,M6,M5,M4)=trcs_3DTransp2MacP(ids,N,M6,M5,M4)+R3PoreSoHFlx(ids,N,M6,M5,M4)
   ENDDO
 

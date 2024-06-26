@@ -48,7 +48,7 @@ implicit none
   real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
-  real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
+  real(r8),allocatable ::  TWaterFlowMacP_vr(:,:,:)                       !
 
   real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)                      !
 
@@ -57,7 +57,7 @@ implicit none
   real(r8),allocatable ::  WatIceThawMacP(:,:,:)                      !
   real(r8),allocatable ::  VLWatMicP1(:,:,:)                       !
   real(r8),allocatable ::  VLiceMicP1(:,:,:)                       !
-  real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
   real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
 
   real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
@@ -131,13 +131,13 @@ implicit none
   allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
   allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
-  allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
+  allocate(TWaterFlowMacP_vr(JZ,JY,JX));    TWaterFlowMacP_vr=0._r8
   allocate(WatIceThawMicP(JZ,JY,JX));    WatIceThawMicP=0._r8
   allocate(THeatSoiThaw(JZ,JY,JX));   THeatSoiThaw=0._r8
   allocate(WatIceThawMacP(JZ,JY,JX));   WatIceThawMacP=0._r8
   allocate(VLWatMicP1(JZ,JY,JX));    VLWatMicP1=0._r8
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
-  allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
+  allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
   allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
@@ -206,13 +206,13 @@ implicit none
   call destroy(tErosionSedmLoss)
   call destroy(TWatFlowCellMicP)
   call destroy(TWatFlowCellMicPX)
-  call destroy(TWaterFlowMacP)
+  call destroy(TWaterFlowMacP_vr)
   call destroy(WatIceThawMicP)
   call destroy(THeatSoiThaw)
   call destroy(WatIceThawMacP)
   call destroy(VLWatMicP1)
   call destroy(VLiceMicP1)
-  call destroy(VLWatMacP1)
+  call destroy(VLWatMacP1_vr)
   call destroy(VLiceMacP1)
   call destroy(DOM_Transp2Micp_flx)
   call destroy(DOM_Transp2Macp_flx)

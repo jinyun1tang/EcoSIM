@@ -487,7 +487,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
     category = 'state'
     name = 'liquid soil water (m^3 m^-3)'
-    datv=THETWZ(1:12,NY,NX)
+    datv=ThetaH2OZ_col(1:12,NY,NX)
     call regression%writedata(category,name,datv)
 
     category = 'state'

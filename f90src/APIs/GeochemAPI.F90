@@ -344,7 +344,7 @@ module GeochemAPI
 !  solflx%TR_NH4_sorbed_soil =trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)
 !  solflx%TR_Na_sorbed_soil =TR_Na_sorbed_soil(L,NY,NX)
 !  solflx%TR_NH4_sorbed_band_soil =trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)
-!  solflx%Txchem_CO2 =Txchem_CO2_vr_col(L,NY,NX)
+!  solflx%Txchem_CO2 =Txchem_CO2_vr(L,NY,NX)
 !  solflx%TBION =TBION(L,NY,NX)
 !  solflx%TRH2O =TRH2O(L,NY,NX)
 !  Integers
@@ -456,7 +456,7 @@ module GeochemAPI
   trcp_RChem_soil(idsp_CaSO4,L,NY,NX)=solflx%TR_CaSO4_precip_soil
   TRH2O(L,NY,NX)=solflx%TRH2O
   TBION(L,NY,NX)=solflx%TBION
-  Txchem_CO2_vr_col(L,NY,NX)=solflx%Txchem_CO2
+  Txchem_CO2_vr(L,NY,NX)=solflx%Txchem_CO2
   end subroutine GeochemAPIRecv
 
 end module GeochemAPI

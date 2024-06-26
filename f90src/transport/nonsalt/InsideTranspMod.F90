@@ -432,7 +432,7 @@ module InsideTranspMod
   integer , intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8), intent(in) :: THETW1(JZ,JY,JX)
   real(r8) :: VLWatMicPOA,VLWatMicPOB,VLWatMicPPA,VLWatMicPPB
-  real(r8) :: VLWatMicP2A,VLWatMicP2B,VLWatMicP3A,VLWatMicP3B,VLWatMicP4A,VLWatMicP4B
+  real(r8) :: VLWatMicP2_vrA,VLWatMicP2_vrB,VLWatMicP3A,VLWatMicP3B,VLWatMicP4A,VLWatMicP4B
   real(r8) :: trcsolc1(ids_beg:ids_end)
   real(r8) :: trcsolc2(ids_beg:ids_end)
 
@@ -444,8 +444,8 @@ module InsideTranspMod
   IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1).AND.THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
     .AND.VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1).AND.VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
-      VLWatMicP2A=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
-      VLWatMicP2B=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+      VLWatMicP2_vrA=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+      VLWatMicP2_vrB=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
       VLWatMicP3A=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3,N3,N2,N1)
       VLWatMicP3B=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3B,N3,N2,N1)
       VLWatMicP4A=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4,N3,N2,N1)
@@ -497,9 +497,9 @@ module InsideTranspMod
       trcsolc1(ids_NO3)=0.0_r8
       trcsolc1(ids_NO2)=0.0_r8
     ENDIF
-    IF(VLWatMicP2A.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml_vr2(ids_H1PO4,N3,N2,N1)/VLWatMicP2A)
-      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml_vr2(ids_H2PO4,N3,N2,N1)/VLWatMicP2A)
+    IF(VLWatMicP2_vrA.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml_vr2(ids_H1PO4,N3,N2,N1)/VLWatMicP2_vrA)
+      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml_vr2(ids_H2PO4,N3,N2,N1)/VLWatMicP2_vrA)
     ELSE
       trcsolc1(ids_H1PO4)=0.0_r8
       trcsolc1(ids_H2PO4)=0.0_r8
@@ -518,9 +518,9 @@ module InsideTranspMod
       trcsolc1(ids_NO3B)=trcsolc1(ids_NO3)
       trcsolc1(ids_NO2B)=trcsolc1(ids_NO2)
     ENDIF
-    IF(VLWatMicP2B.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml_vr2(ids_H1PO4B,N3,N2,N1)/VLWatMicP2B)
-      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml_vr2(ids_H2PO4B,N3,N2,N1)/VLWatMicP2B)
+    IF(VLWatMicP2_vrB.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml_vr2(ids_H1PO4B,N3,N2,N1)/VLWatMicP2_vrB)
+      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml_vr2(ids_H2PO4B,N3,N2,N1)/VLWatMicP2_vrB)
     ELSE
       trcsolc1(ids_H1PO4B)=trcsolc1(ids_H1PO4)
       trcsolc1(ids_H2PO4B)=trcsolc1(ids_H2PO4)
@@ -1040,7 +1040,7 @@ module InsideTranspMod
   ENDDO D9755
 
   DO nsolutes=ids_beg,ids_end
-    trcs_3DTransp2MicP_vr(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MicP_vr(nsolutes,N,N6,N5,N4) &
+    trcs_3DTransp2MicP_3D(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MicP_3D(nsolutes,N,N6,N5,N4) &
       +R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)
     trcs_3DTransp2MacP(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MacP(nsolutes,N,N6,N5,N4) &
       +R3PoreSoHFlx(nsolutes,N,N6,N5,N4)
