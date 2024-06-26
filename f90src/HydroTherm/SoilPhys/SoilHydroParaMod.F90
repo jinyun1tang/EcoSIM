@@ -95,9 +95,9 @@ contains
 !
 !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
 !
-    PSISoilOsmotic(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
+    PSISoilOsmotic_vr(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
     PSIGrav_vr(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
-    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSIGrav_vr(L,NY,NX))
+    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -362,8 +362,8 @@ contains
     VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
     VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP(L,NY,NX))+Cpi*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
-    ThetaH2OZ_col(L,NY,NX)=THETW_vr(L,NY,NX)
-    ThetaICEZ_col(L,NY,NX)=THETI_col(L,NY,NX)
+    ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
+    ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
   ENDIF
   end subroutine SetColdRunSoilProps
 !------------------------------------------------------------------------------------------  

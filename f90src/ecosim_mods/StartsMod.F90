@@ -489,8 +489,8 @@ module StartsMod
           +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP_col(L,NY,NX))
         VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
-        ThetaH2OZ_col(L,NY,NX)=THETW_vr(L,NY,NX)
-        ThetaICEZ_col(L,NY,NX)=THETI_col(L,NY,NX)
+        ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
+        ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF
     ENDIF
     TKS(L,NY,NX)=ATKS(NY,NX)

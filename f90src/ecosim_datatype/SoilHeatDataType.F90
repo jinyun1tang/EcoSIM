@@ -21,7 +21,7 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
   real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model 
-  real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:,:)              !hourly heat flux into soil layer  MJ m-3
+  real(r8),target,allocatable ::  THeatFlow2Soil_vr(:,:,:)              !hourly heat flux into soil layer  MJ m-3
   real(r8),target,allocatable ::  tHeatUptk_col(:,:)
 !----------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ contains
   allocate(TCS(0:JZ,JY,JX));    TCS=0._r8
   allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond=0._r8
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond=0._r8
-  allocate(THeatFlow2Soil_col(JZ,JY,JX));    THeatFlow2Soil_col=0._r8  
+  allocate(THeatFlow2Soil_vr(JZ,JY,JX));    THeatFlow2Soil_vr=0._r8  
   allocate(tHeatUptk_col(JY,JX));   tHeatUptk_col=0._r8
   end subroutine InitSoilHeatData
 
@@ -60,7 +60,7 @@ contains
   call destroy(TCS)
   call destroy(NumerSolidThermCond)
   call destroy(DenomSolidThermCond)
-  call destroy(THeatFlow2Soil_col)  
+  call destroy(THeatFlow2Soil_vr)  
   call destroy(tHeatUptk_col)
   end subroutine DestructSoilHeatData
 

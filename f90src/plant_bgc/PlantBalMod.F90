@@ -48,7 +48,7 @@ implicit none
     LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr,      &
     RootMycoExudElms_pft     => plt_rbgc%RootMycoExudElms_pft,      &
     MY                       => plt_morph%MY,                       &
-    MaxSoiL4Root_pft             => plt_morph%MaxSoiL4Root_pft,             &
+    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft,         &
     NumRootAxes_pft          => plt_morph%NumRootAxes_pft,          &
     MaxNumRootLays           => plt_site%MaxNumRootLays,            &
     SeasonalNonstElms_pft    => plt_biom%SeasonalNonstElms_pft,     &
@@ -63,7 +63,10 @@ implicit none
 
   CALL SumPlantBiomStates(I,J,NZ,header)
   
-  if(RootElms_pft(ielmc,NZ)>1.e16 .or. ShootElms_pft(ielmc,NZ)>1.e16)stop
+  if(RootElms_pft(ielmc,NZ)>1.e16 .or. ShootElms_pft(ielmc,NZ)>1.e16)then
+  write(*,*)'rootshoot',RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ)
+  stop
+  endif
 
   !sum fluxes
 !     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
@@ -127,29 +130,29 @@ implicit none
   real(r8) :: balc
 
 !     begin_execution
-  associate(                                                                &
-    NU                             =>  plt_site%NU                        , &  
-    iPlantNfixType_pft                 =>  plt_morph%iPlantNfixType_pft           , &
-    NodulInfectElms_pft            =>  plt_bgcr%NodulInfectElms_pft       , &    
-    NumOfBranches_pft              =>  plt_morph%NumOfBranches_pft        , &   
-    MaxSoiL4Root_pft                   =>  plt_morph%MaxSoiL4Root_pft             , &    
-    NumRootAxes_pft                =>  plt_morph%NumRootAxes_pft          , &
-    MaxNumRootLays                 =>  plt_site%MaxNumRootLays            , &  
-    SeasonalNonstElms_pft          =>  plt_biom%SeasonalNonstElms_pft     , &    
-    RootElmsBeg_pft                =>  plt_biom%RootElmsBeg_pft           , &
-    ShootElmsBeg_pft               =>  plt_biom%ShootElmsBeg_pft          , &
-    RootMyco1stStrutElms_rpvr      =>  plt_biom%RootMyco1stStrutElms_rpvr , &
-    RootMyco2ndStrutElms_rpvr      =>  plt_biom%RootMyco2ndStrutElms_rpvr , &    
-    RootMycoNonstElms_rpvr         =>  plt_biom%RootMycoNonstElms_rpvr    , &
-    RootNodulStrutElms_pvr         =>  plt_biom%RootNodulStrutElms_pvr    , &
-    RootNodulNonstElms_pvr         =>  plt_biom%RootNodulNonstElms_pvr    , &    
-    CanopyNodulNonstElms_brch      =>  plt_biom%CanopyNodulNonstElms_brch , &
-    CanopyNodulStrutElms_brch      =>  plt_biom%CanopyNodulStrutElms_brch , &
-    StandDeadStrutElms_pft         =>  plt_biom%StandDeadStrutElms_pft    , & 
-    StandDeadKCompElms_pft         =>  plt_biom%StandDeadKCompElms_pft    , &       
-    RootElms_pft                   =>  plt_biom%RootElms_pft              , &    
-    ShootElms_brch                 =>  plt_biom%ShootElms_brch            , &
-    ShootElms_pft                  =>  plt_biom%ShootElms_pft               &
+  associate(                                                         &
+    NU                        => plt_site%NU,                        &
+    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
+    NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,         &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
+    MaxNumRootLays            => plt_site%MaxNumRootLays,            &
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,     &
+    RootElmsBeg_pft           => plt_biom%RootElmsBeg_pft,           &
+    ShootElmsBeg_pft          => plt_biom%ShootElmsBeg_pft,          &
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
+    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
+    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
+    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
+    CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch, &
+    StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
+    StandDeadKCompElms_pft    => plt_biom%StandDeadKCompElms_pft,    &
+    RootElms_pft              => plt_biom%RootElms_pft,              &
+    ShootElms_brch            => plt_biom%ShootElms_brch,            &
+    ShootElms_pft             => plt_biom%ShootElms_pft              &
   )
   
   !shoots
@@ -159,6 +162,10 @@ implicit none
 
   DO NE=1,NumPlantChemElms
     ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
+    if(ShootElms_pft(NE,NZ)>1.e20)then
+    write(*,*)'sumplantstates',SeasonalNonstElms_pft(NE,NZ)
+    stop
+    endif
   ENDDO
 
   !add nodule, currently, a plant either has canopy or root N-fixing symbiosis, not both
@@ -168,6 +175,10 @@ implicit none
         ShootElms_pft(NE,NZ)=ShootElms_pft(NE,NZ)  &
           +sum(CanopyNodulStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)) &
           +sum(CanopyNodulNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+        if(ShootElms_pft(NE,NZ)>1.e20)then
+          write(*,*)'sum2plantstates'
+          stop
+        endif
       ENDDO
     ENDIF
   ENDIF
@@ -179,6 +190,11 @@ implicit none
   DO NE=1,NumPlantChemElms
     StandDeadStrutElms_pft(NE,NZ)=sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
     ShootElms_pft(NE,NZ)=ShootElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)
+        if(ShootElms_pft(NE,NZ)>1.e20)then
+          write(*,*)'sum3plantstates',StandDeadStrutElms_pft(NE,NZ)
+          stop
+        endif
+
   ENDDO
 
   call SumRootBiome(NZ,RootElms_pft(:,NZ))

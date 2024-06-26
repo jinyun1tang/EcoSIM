@@ -234,11 +234,9 @@ module TillageMixMod
 
     call sumLitrOMLayL(0,NY,NX,litrOM)
 
-    SoilOrgM_vr(ielmc,0,NY,NX)=litrOM(ielmc)
-    SoilOrgM_vr(ielmn,0,NY,NX)=litrOM(ielmn)
-    SoilOrgM_vr(ielmp,0,NY,NX)=litrOM(ielmp)
-    OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
+    SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM(1:NumPlantChemElms)
 
+    OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
 
     DO NTS=ids_beg,idg_NH3
       trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0

@@ -195,14 +195,14 @@ module RedistMod
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
   !
-  ThetaH2OZ_col(0,NY,NX)=AZMAX1((VLWatMicP_vr(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
-  ThetaICEZ_col(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))/AREA(3,0,NY,NX))
+  ThetaH2OZ_vr(0,NY,NX)=AZMAX1((VLWatMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))/AREA(3,0,NY,NX))
+  ThetaICEZ_vr(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))/AREA(3,0,NY,NX))
   
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
     VLSoilPoreMicP_vrX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
     VOLTX=VLSoilPoreMicP_vrX+VLMacP(L,NY,NX)
-    ThetaH2OZ_col(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP(L,NY,NX)),VOLTX)
-    ThetaICEZ_col(L,NY,NX)=safe_adb(VLiceMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLiceMacP_col(L,NY,NX)),VOLTX)
+    ThetaH2OZ_vr(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP(L,NY,NX)),VOLTX)
+    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLiceMacP_col(L,NY,NX)),VOLTX)
   ENDDO D9945
   end subroutine UpdateOutputVars
 
@@ -780,18 +780,18 @@ module RedistMod
     VOLWXX=VLWatMicP_vr(L,NY,NX)
     VOLIXX=VLiceMicP(L,NY,NX)
     !micropore
-    VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
-      +WatIceThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
-    VLWatMicPX_col(L,NY,NX)=VLWatMicPX_col(L,NY,NX)+TWatFlowCellMicPX(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
-      +WatIceThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
+    VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
+      +WatIceThawMicP_vr(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
+    VLWatMicPX_col(L,NY,NX)=VLWatMicPX_col(L,NY,NX)+TWatFlowCellMicPX_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
+      +WatIceThawMicP_vr(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
 
     !do a numerical correction
     VLWatMicPX_col(L,NY,NX)=AMIN1(VLWatMicP_vr(L,NY,NX),VLWatMicPX_col(L,NY,NX)+0.01_r8*(VLWatMicP_vr(L,NY,NX)-VLWatMicPX_col(L,NY,NX)))
-    VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)-WatIceThawMicP(L,NY,NX)/DENSICE
+    VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)-WatIceThawMicP_vr(L,NY,NX)/DENSICE
 
     !micropore
-    VLWatMacP(L,NY,NX)=VLWatMacP(L,NY,NX)+TWaterFlowMacP_vr(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP(L,NY,NX)
-    VLiceMacP_col(L,NY,NX)=VLiceMacP_col(L,NY,NX)-WatIceThawMacP(L,NY,NX)/DENSICE
+    VLWatMacP(L,NY,NX)=VLWatMacP(L,NY,NX)+TWaterFlowMacP_vr(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
+    VLiceMacP_col(L,NY,NX)=VLiceMacP_col(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
 
     !volume change
     DVLWatMicP_vr(L,NY,NX)=VLWatMicP1(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP(L,NY,NX)
@@ -824,10 +824,10 @@ module RedistMod
     !
     !     IF(NX.EQ.3.AND.NY.EQ.2.AND.L.GT.NU(NY,NX)
     !    3.AND.L.LE.17.AND.I.GE.152.AND.I.LE.304)THEN
-    !     THeatFlow2Soil_col(L,NY,NX)=THeatFlow2Soil_col(L,NY,NX)
+    !     THeatFlow2Soil_vr(L,NY,NX)=THeatFlow2Soil_vr(L,NY,NX)
     !    2+(TKSZ(I,J,L)-TKS(L,NY,NX))*VHeatCapacity_col(L,NY,NX)
     !     WRITE(*,3379)'TKSZ',I,J,NX,NY,L,TKSZ(I,J,L)
-    !    2,TKS(L,NY,NX),VHeatCapacity_col(L,NY,NX),THeatFlow2Soil_col(L,NY,NX)
+    !    2,TKS(L,NY,NX),VHeatCapacity_col(L,NY,NX),THeatFlow2Soil_vr(L,NY,NX)
     !3379  FORMAT(A8,6I4,12E12.4)
     !     ENDIF
     !
@@ -836,7 +836,7 @@ module RedistMod
     TKSpre=TKS(L,NY,NX)
     IF(VHeatCapacity_col(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_col(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_col(L,NY,NX))>0.05_r8)THEN
       TKS00=TKS(L,NY,NX)
-      TKS(L,NY,NX)=(ENGY+THeatFlow2Soil_col(L,NY,NX)+THeatSoiThaw(L,NY,NX) &
+      TKS(L,NY,NX)=(ENGY+THeatFlow2Soil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_col(L,NY,NX)
       tHeatUptk_col(NY,NX)=tHeatUptk_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)      
 !      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity_col(L,NY,NX),&
@@ -845,13 +845,13 @@ module RedistMod
         write(*,*)'weird temperature in redist',L,NY,NX,TKSpre,TKS(L,NY,NX)
         write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity_col(L,NY,NX),ZEROS(NY,NX),SoiBulkDensity_vr(L,NY,NX)
         write(*,*)'itemized',ENGY/VHeatCapacity_col(L,NY,NX),&
-          THeatFlow2Soil_col(L,NY,NX)/VHeatCapacity_col(L,NY,NX),&
-          THeatSoiThaw(L,NY,NX)/VHeatCapacity_col(L,NY,NX), &
+          THeatFlow2Soil_vr(L,NY,NX)/VHeatCapacity_col(L,NY,NX),&
+          THeatSoiThaw_vr(L,NY,NX)/VHeatCapacity_col(L,NY,NX), &
           THeatRootUptake_vr(L,NY,NX)/VHeatCapacity_col(L,NY,NX),&
           HeatIrrigation(L,NY,NX)/VHeatCapacity_col(L,NY,NX)
         write(*,*)'wat',VLWatMicP_vr(L,NY,NX),VLWatMacP(L,NY,NX), &
           VLiceMicP(L,NY,NX),VLiceMacP_col(L,NY,NX)  
-        write(*,*)'heat',ENGY,THeatFlow2Soil_col(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
+        write(*,*)'heat',ENGY,THeatFlow2Soil_vr(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
         call endrun()  
       endif
 
@@ -1025,7 +1025,7 @@ module RedistMod
     !
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
 !   watch out the following code for changes
-    HEATIN_lnd=HEATIN_lnd+THeatSoiThaw(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
+    HEATIN_lnd=HEATIN_lnd+THeatSoiThaw_vr(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
     CIB=trcg_air2root_flx_vr(idg_CO2,L,NY,NX)
     CHB=trcg_air2root_flx_vr(idg_CH4,L,NY,NX)
     OIB=trcg_air2root_flx_vr(idg_O2,L,NY,NX)

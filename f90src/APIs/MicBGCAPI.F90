@@ -178,7 +178,7 @@ implicit none
   micfor%Rain2LitRSurf =Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset=TempOffset_col(NY,NX)
   micfor%VLitR  =VLitR(NY,NX)
-  micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity(NY,NX)
+  micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity_col(NY,NX)
   micfor%ZEROS2=ZEROS2(NY,NX)
   micfor%ZEROS =ZEROS(NY,NX)
   micfor%VLSoilMicP  =VLSoilMicP(L,NY,NX)

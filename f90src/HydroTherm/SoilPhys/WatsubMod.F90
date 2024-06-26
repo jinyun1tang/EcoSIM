@@ -793,7 +793,7 @@ module WatsubMod
               .OR. SoiBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
               IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RechargSurf,0._r8).OR. &
-                ABS(WatFlux4ErosionM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+                ABS(WatFlux4ErosionM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
                 !no runoff
                 WatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
                 HeatFlx2LitRByRunoff(N,NN,M5,M4)=0.0_r8
@@ -1555,11 +1555,11 @@ module WatsubMod
   !
   !     PSISM1,PSISH,PSISO=soil matric,gravitational,osmotic potentials
   !src
-  PSIST1=PSISM1(N3,N2,N1)+PSIGrav_vr(N3,N2,N1)+PSISoilOsmotic(N3,N2,N1)
-  PSISV1=PSISM1(N3,N2,N1)+PSISoilOsmotic(N3,N2,N1)
+  PSIST1=PSISM1(N3,N2,N1)+PSIGrav_vr(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
+  PSISV1=PSISM1(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
   !dest
-  PSISTL=PSISM1(N6,N5,N4)+PSIGrav_vr(N6,N5,N4)+PSISoilOsmotic(N6,N5,N4)
-  PSISVL=PSISM1(N6,N5,N4)+PSISoilOsmotic(N6,N5,N4)
+  PSISTL=PSISM1(N6,N5,N4)+PSIGrav_vr(N6,N5,N4)+PSISoilOsmotic_vr(N6,N5,N4)
+  PSISVL=PSISM1(N6,N5,N4)+PSISoilOsmotic_vr(N6,N5,N4)
   !
   !     HYDRAULIC CONDUCTIVITY FROM CURRENT WATER CONTENT
   !     AND LOOKUP ARRAY GENERATED IN 'HOUR1'
@@ -1885,7 +1885,7 @@ module WatsubMod
 !
   IF(IFLGU.EQ.0 .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
-    PSISWT=AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic(N3,N2,N1) &
+    PSISWT=AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
       +mGravAccelerat*(SoiDepthMidLay(N3,N2,N1)-ExtWaterTable(N2,N1)) &
       -mGravAccelerat*AZMAX1(SoiDepthMidLay(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
@@ -1924,7 +1924,7 @@ module WatsubMod
 !
   IF(IFLGUH.EQ.0 .AND. (.not.isclose(RechargRateWTBL,0._r8)).AND.VLMacP1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
-    PSISWTH=-0.03_r8*PSISoilOsmotic(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable(N2,N1)) &
+    PSISWTH=-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable(N2,N1)) &
       -mGravAccelerat*AZMAX1(DPTHH-DepthInternalWTBL(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
     FLWTH=PSISWTH*HydroCondMacP1(N3,N2,N1)*AREA(N,N3,N2,N1) &
@@ -1964,7 +1964,7 @@ module WatsubMod
 !
   IF(IFLGD.EQ.0.AND.(.not.isclose(RechargRateWTBL,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
-    PSISWT=AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic(N3,N2,N1) &
+    PSISWT=AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
       +mGravAccelerat*(SoiDepthMidLay(N3,N2,N1)-DTBLY(N2,N1)) &
       -mGravAccelerat*AZMAX1(SoiDepthMidLay(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
 
@@ -1997,7 +1997,7 @@ module WatsubMod
 !
   IF(IFLGDH.EQ.0.AND.(.not.isclose(RechargRateWTBL,0._r8)).AND.VLMacP1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
-    PSISWTH=-0.03_r8*PSISoilOsmotic(N3,N2,N1)+mGravAccelerat*(DPTHH-DTBLY(N2,N1)) &
+    PSISWTH=-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-DTBLY(N2,N1)) &
       -mGravAccelerat*AZMAX1(DPTHH-DepthInternalWTBL(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
 
@@ -2048,7 +2048,7 @@ module WatsubMod
         .AND.VLairMicP(N3,N2,N1).GT.0.0_r8 &
         .AND.(.not.isclose(RechargRateWTBL,0._r8)))THEN
         PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
-        PSISUT=AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic(N3,N2,N1)+&
+        PSISUT=AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
           mGravAccelerat*(SoiDepthMidLay(N3,N2,N1)-ExtWaterTable(N2,N1)))
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
         FLWU=PSISUT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*&
@@ -2095,7 +2095,7 @@ module WatsubMod
         .AND.AirfMacP.GT.ZEROS2(NY,NX)                         & !macropore has air-filled fraction
         .AND.(.not.isclose(RechargRateWTBL,0.0_r8)))THEN         !recharge is on
         PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
-        PSISUTH=-0.03_r8*PSISoilOsmotic(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable(N2,N1))
+        PSISUTH=-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable(N2,N1))
         IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD
         FLWUH=PSISUTH*HydroCondMacP1(N3,N2,N1)*AREA(N,N3,N2,N1)*&
           AREAU(N3,N2,N1)/(RechargSubSurf+1.0_r8)*RechargRateWTBL*dts_HeatWatTP
@@ -2136,7 +2136,7 @@ module WatsubMod
 !     MacPIceHeatFlxFrezPt,SoiPLIceHeatFlxFrez=latent heat from macro freeze-thaw unltd,ltd by water,ice
 !     FIceThawMacP=soil water flux from macropore freeze-thaw
 !
-  PSISMX=PSISoilMatricPtmp_vr(N3,N2,N1)+PSISoilOsmotic(N3,N2,N1)
+  PSISMX=PSISoilMatricPtmp_vr(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
   TFREEZ=-9.0959E+04_r8/(PSISMX-LtHeatIceMelt)
   VLWatMicP1X=VLWatMicP1(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatExMacP2MicPi(N3,N2,N1)+FWatIrrigate2MicP1(N3,N2,N1)
   VLWatMacP1X=VLWatMacP1_vr(N3,N2,N1)+TConvWaterFlowMacP_3D_vr(N3,N2,N1)-FWatExMacP2MicPi(N3,N2,N1)

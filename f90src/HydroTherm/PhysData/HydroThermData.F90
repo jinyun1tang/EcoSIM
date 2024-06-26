@@ -7,7 +7,7 @@ implicit none
   real(r8),allocatable ::  FracSoiPAsWat_vr(:,:,:)                      !
   real(r8),allocatable ::  PSISM1(:,:,:)                      !  
   real(r8),allocatable ::  TKSoi1(:,:,:)                         !  
-  real(r8),allocatable ::  DLYRR(:,:)                         !  
+  real(r8),allocatable ::  DLYRR_COL(:,:)                         !  
   real(r8),allocatable ::  FracSoiPAsIce_vr(:,:,:)               !  
   real(r8),allocatable ::  FracSoiPAsAir_vr(:,:,:)               !  
   real(r8),allocatable ::  VLHeatCapacity_vr(:,:,:)              !whole layer heat capacity (not snow)
@@ -66,7 +66,7 @@ implicit none
   allocate(FracSoiPAsWat_vr(0:JZ,JY,JX)); FracSoiPAsWat_vr=0._r8
   allocate(PSISM1(0:JZ,JY,JX)); PSISM1=0._r8
   allocate(TKSoi1(0:JZ,JY,JX));    TKSoi1=0._r8    
-  allocate(DLYRR(JY,JX));       DLYRR=0._r8  
+  allocate(DLYRR_COL(JY,JX));       DLYRR_col=0._r8  
   allocate(FracSoiPAsIce_vr(0:JZ,JY,JX)); FracSoiPAsIce_vr=0._r8 
   allocate(FracSoiPAsAir_vr(0:JZ,JY,JX)); FracSoiPAsAir_vr=0._r8   
   allocate(VLHeatCapacity_vr(0:JZ,JY,JX));  VLHeatCapacity_vr=0._r8  
@@ -124,7 +124,7 @@ implicit none
   call destroy(FracSoiPAsWat_vr)
   call destroy(PSISM1)  
   call destroy(TKSoi1)  
-  call destroy(DLYRR)  
+  call destroy(DLYRR_COL)  
   call destroy(FracSoiPAsIce_vr)  
   call destroy(FracSoiPAsAir_vr)  
   call destroy(VLHeatCapacity_vr)  

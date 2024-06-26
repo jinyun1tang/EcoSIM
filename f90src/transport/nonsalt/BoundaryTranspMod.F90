@@ -201,7 +201,7 @@ module BoundaryTranspMod
   real(r8) :: FQRM
   integer :: K,idg,NTN,ids
 
-  IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+  IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
       dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
       dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
@@ -217,7 +217,7 @@ module BoundaryTranspMod
 !
     IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
+      FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
       DO  K=1,jcplx
         dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOC,K,N2,N1)*FQRM
         dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DON,K,N2,N1)*FQRM
@@ -322,11 +322,11 @@ module BoundaryTranspMod
     enddo
     !does not include NH3 and NH3B
     DO idg=idg_beg,idg_end-2
-      R3PoreSolFlx_vr(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(idg,M3,M2,M1))
+      R3PoreSolFlx_vr(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(idg,M3,M2,M1))
     ENDDo
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx_vr(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+      R3PoreSolFlx_vr(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
@@ -471,7 +471,7 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
       DO idg=idg_beg,idg_NH3
-        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml_vr2(idg,M3,M2,M1))
+        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
         Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)=Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+R3GasADFlx(idg,N,M6,M5,M4)
       ENDDO
 

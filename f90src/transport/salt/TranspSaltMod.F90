@@ -487,7 +487,7 @@ module TranspSaltMod
   integer :: nsalts
 !     begin_execution
 
-  FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
+  FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
 
   DO nsalts=idsalt_beg,idsalt_end
     trcSalt_RQR(nsalts,N,NN,M5,M4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
@@ -916,7 +916,7 @@ module TranspSaltMod
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
               IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8) &
-                .OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+                .OR.WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
                 call ZeroRechargeSoluteFlux(N,NN,M5,M4)
               ELSE
 !

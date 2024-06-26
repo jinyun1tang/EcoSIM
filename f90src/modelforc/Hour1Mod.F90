@@ -383,7 +383,7 @@ module Hour1Mod
       HydroSubsDINFlx_col(NY,NX)=0._r8
       HydroSubsDOPFlx_col(NY,NX)=0._r8
       HydroSubsDIPFlx_col(NY,NX)=0._r8      
-      WatFlux4ErosionM(:,NY,NX)=0._r8
+      WatFlux4ErosionM_2DH(:,NY,NX)=0._r8
       Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
       Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
 
@@ -1456,7 +1456,7 @@ module Hour1Mod
 ! PSISM,PSISE=litter matric,saturation water potential
 !
   !write(*,*) "In GetSurfResidualProperties: "
-  VxcessWatLitR=AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity(NY,NX))
+  VxcessWatLitR=AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))
   VGeomLayer(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
@@ -1478,8 +1478,8 @@ module Hour1Mod
     ENDIF
     TVOLWI=VLWatMicP_vr(0,NY,NX)+VLiceMicP(0,NY,NX)
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
-      VWatLitrZ=VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity(NY,NX)
-      VOLIRZ=VLiceMicP(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity(NY,NX)
+      VWatLitrZ=VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
+      VOLIRZ=VLiceMicP(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
       XVOLW0=AZMAX1(VLWatMicP_vr(0,NY,NX)-VWatLitrZ)/AREA(3,NU(NY,NX),NY,NX)
       XVOLI0=AZMAX1(VLiceMicP(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
     ELSE
@@ -1489,8 +1489,8 @@ module Hour1Mod
     DPTH0(NY,NX)=XVOLW0+XVOLI0
 
     DLYR(3,0,NY,NX)=VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
-    IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      ThetaWLitR=AMIN1(VWatLitRHoldCapcity(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR(NY,NX)
+    IF(VLitR(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR(NY,NX)
       IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
         PSISoilMatricP_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR)) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
@@ -1500,10 +1500,10 @@ module Hour1Mod
       ELSE
         PSISoilMatricP_vr(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
-      PSISoilOsmotic(0,NY,NX)=0.0_r8
+      PSISoilOsmotic_vr(0,NY,NX)=0.0_r8
       PSIGrav_vr(0,NY,NX)=mGravAccelerat*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
         +0.5_r8*DLYR(3,0,NY,NX))
-      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic(0,NY,NX)+PSIGrav_vr(0,NY,NX))
+      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
@@ -1527,7 +1527,7 @@ module Hour1Mod
     THETW_vr(0,NY,NX)=0.0_r8
     THETI_col(0,NY,NX)=0.0_r8
     ThetaAir_col(0,NY,NX)=1.0
-    VWatLitRHoldCapcity(NY,NX)=0.0_r8
+    VWatLitRHoldCapcity_col(NY,NX)=0.0_r8
     PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
 
     trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
@@ -2421,11 +2421,11 @@ module Hour1Mod
         VLitR0=VLitR0+RC0(K,NY,NX)/BulkDensLitR(K)
       ENDDO
 
-      VWatLitRHoldCapcity(NY,NX)=AZMAX1(VWatLitRHoldCapcity0)
+      VWatLitRHoldCapcity_col(NY,NX)=AZMAX1(VWatLitRHoldCapcity0)
       VLitR(NY,NX)=AZMAX1(VLitR0*ppmc)
 
       IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-        FVLitR=VWatLitRHoldCapcity(NY,NX)/VLitR(NY,NX)
+        FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR(NY,NX)
       ELSE
         FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
       ENDIF

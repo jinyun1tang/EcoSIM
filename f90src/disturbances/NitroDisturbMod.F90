@@ -198,7 +198,7 @@ module NitroDisturbMod
 !     REMOVE DOC, DON, DOP
 !
             DO idom=idom_beg,idom_end
-              rmDOM(idom)=DCORPC*DOM_vr(idom_doc,K,L,NY,NX)
+              rmDOM(idom)=DCORPC*DOM_vr(idom,K,L,NY,NX)
             enddo
 
             ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
@@ -327,9 +327,7 @@ module NitroDisturbMod
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
-        SoilOrgM_vr(ielmc,L,NY,NX)=dOMelm(ielmc)
-        SoilOrgM_vr(ielmn,L,NY,NX)=dOMelm(ielmn)
-        SoilOrgM_vr(ielmp,L,NY,NX)=dOMelm(ielmp)
+        SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=dOMelm(1:NumPlantChemElms)
         IF(L.EQ.0)THEN
           HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS(L,NY,NX)
           HeatOut_lnds=HeatOut_lnds+HFLXD

@@ -145,14 +145,14 @@ implicit none
 !
 !     NET FREEZE-THAW
 !
-!     WatIceThawMicP,WatIceThawMacP=net freeze-thaw flux in micropores,macropores
+!     WatIceThawMicP,WatIceThawMacP_vr=net freeze-thaw flux in micropores,macropores
 !     THeatSoiThaw=net freeze-thaw latent heat flux
 !     THAW,TLIceThawMacP=freeze-thaw flux in micropores,macropores from watsub.f
 !     TLPhaseChangeHeat2Soi=freeze-thaw latent heat flux from watsub.f
   !
-    WatIceThawMicP(N3,N2,N1)=WatIceThawMicP(N3,N2,N1)+TLIceThawMicP(N3,N2,N1)
-    WatIceThawMacP(N3,N2,N1)=WatIceThawMacP(N3,N2,N1)+TLIceThawMacP(N3,N2,N1)
-    THeatSoiThaw(N3,N2,N1)=THeatSoiThaw(N3,N2,N1)+TLPhaseChangeHeat2Soi(N3,N2,N1)
+    WatIceThawMicP_vr(N3,N2,N1)=WatIceThawMicP_vr(N3,N2,N1)+TLIceThawMicP(N3,N2,N1)
+    WatIceThawMacP_vr(N3,N2,N1)=WatIceThawMacP_vr(N3,N2,N1)+TLIceThawMacP(N3,N2,N1)
+    THeatSoiThaw_vr(N3,N2,N1)=THeatSoiThaw_vr(N3,N2,N1)+TLPhaseChangeHeat2Soi(N3,N2,N1)
   ENDDO D8575
   end subroutine XGridTranspt
 
@@ -171,10 +171,7 @@ implicit none
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
   D9960: DO K=1,micpar%NumOfLitrCmplxs
-    TOMQRS(idom_doc,K,NY,NX)=0.0_r8
-    TOMQRS(idom_don,K,NY,NX)=0.0_r8
-    TOMQRS(idom_dop,K,NY,NX)=0.0_r8
-    TOMQRS(idom_acetate,K,NY,NX)=0.0_r8
+    TOMQRS(idom_beg:idom_end,K,NY,NX)=0.0_r8
   ENDDO D9960
   end subroutine ZeroRunoffArray
 
@@ -211,13 +208,13 @@ implicit none
 !     INITIALIZE WATER AND HEAT NET FLUX ACCUMULATORS WITHIN SOIL
 !
   DO  L=NU(NY,NX),NL(NY,NX)
-    TWatFlowCellMicP(L,NY,NX)=0.0_r8
-    TWatFlowCellMicPX(L,NY,NX)=0.0_r8
+    TWatFlowCellMicP_vr(L,NY,NX)=0.0_r8
+    TWatFlowCellMicPX_vr(L,NY,NX)=0.0_r8
     TWaterFlowMacP_vr(L,NY,NX)=0.0_r8
-    THeatFlow2Soil_col(L,NY,NX)=0.0_r8
-    WatIceThawMicP(L,NY,NX)=0.0_r8
-    WatIceThawMacP(L,NY,NX)=0.0_r8
-    THeatSoiThaw(L,NY,NX)=0.0_r8
+    THeatFlow2Soil_vr(L,NY,NX)=0.0_r8
+    WatIceThawMicP_vr(L,NY,NX)=0.0_r8
+    WatIceThawMacP_vr(L,NY,NX)=0.0_r8
+    THeatSoiThaw_vr(L,NY,NX)=0.0_r8
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
@@ -307,7 +304,7 @@ implicit none
     integer, intent(in) :: N   !direction of calculation
     integer, intent(in) :: N1,N2,N4,N5,N4B,N5B,NY,NX
 
-    integer :: M,K,NO,NN,NGL,NTX,NTP,MID
+    integer :: M,K,NO,NN,NGL,NTX,NTP,MID,NE,idom
 !     begin_execution
 !
 !     T*ER=net sediment flux
@@ -363,12 +360,9 @@ implicit none
             DO NGL=JGnio(NO),JGnfo(NO)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                TOMEERhetr(ielmc,MID,K,N2,N1)=TOMEERhetr(ielmc,MID,K,N2,N1) &
-                  +OMEERhetr(ielmc,MID,K,N,NN,N2,N1)
-                TOMEERhetr(ielmn,MID,K,N2,N1)=TOMEERhetr(ielmn,MID,K,N2,N1) &
-                  +OMEERhetr(ielmn,MID,K,N,NN,N2,N1)
-                TOMEERhetr(ielmp,MID,K,N2,N1)=TOMEERhetr(ielmp,MID,K,N2,N1) &
-                  +OMEERhetr(ielmp,MID,K,N,NN,N2,N1)
+                DO NE=1,NumPlantChemElms
+                  TOMEERhetr(NE,MID,K,N2,N1)=TOMEERhetr(NE,MID,K,N2,N1)+OMEERhetr(NE,MID,K,N,NN,N2,N1)
+                ENDDO  
               enddo
             enddo
           enddo
@@ -378,12 +372,9 @@ implicit none
           DO NGL=JGniA(NO),JGnfA(NO)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
-              TOMEERauto(ielmc,MID,N2,N1)=TOMEERauto(ielmc,MID,N2,N1) &
-                +OMEERauto(ielmc,MID,N,NN,N2,N1)
-              TOMEERauto(ielmn,MID,N2,N1)=TOMEERauto(ielmn,MID,N2,N1) &
-                +OMEERauto(ielmn,MID,N,NN,N2,N1)
-              TOMEERauto(ielmp,MID,N2,N1)=TOMEERauto(ielmp,MID,N2,N1) &
-                +OMEERauto(ielmp,MID,N,NN,N2,N1)
+              DO NE=1,NumPlantChemElms
+                TOMEERauto(NE,MID,N2,N1)=TOMEERauto(NE,MID,N2,N1)+OMEERauto(NE,MID,N,NN,N2,N1)
+              ENDDO  
             enddo
           enddo
         enddo
@@ -391,19 +382,18 @@ implicit none
 
         D9375: DO K=1,jcplx
           D9370: DO M=1,ndbiomcp
-            TORMER(ielmc,M,K,N2,N1)=TORMER(ielmc,M,K,N2,N1)+ORMER(ielmc,M,K,N,NN,N2,N1)
-            TORMER(ielmn,M,K,N2,N1)=TORMER(ielmn,M,K,N2,N1)+ORMER(ielmn,M,K,N,NN,N2,N1)
-            TORMER(ielmp,M,K,N2,N1)=TORMER(ielmp,M,K,N2,N1)+ORMER(ielmp,M,K,N,NN,N2,N1)
+            DO NE=1,NumPlantChemElms
+              TORMER(NE,M,K,N2,N1)=TORMER(NE,M,K,N2,N1)+ORMER(NE,M,K,N,NN,N2,N1)
+            ENDDO
           ENDDO D9370
-          TOHMER(idom_doc,K,N2,N1)=TOHMER(idom_doc,K,N2,N1)+OHMER(idom_doc,K,N,NN,N2,N1)
-          TOHMER(idom_don,K,N2,N1)=TOHMER(idom_don,K,N2,N1)+OHMER(idom_don,K,N,NN,N2,N1)
-          TOHMER(idom_dop,K,N2,N1)=TOHMER(idom_dop,K,N2,N1)+OHMER(idom_dop,K,N,NN,N2,N1)
-          TOHMER(idom_acetate,K,N2,N1)=TOHMER(idom_acetate,K,N2,N1)+OHMER(idom_acetate,K,N,NN,N2,N1)
+          DO idom=idom_beg,idom_end
+            TOHMER(idom,K,N2,N1)=TOHMER(idom,K,N2,N1)+OHMER(idom,K,N,NN,N2,N1)
+          ENDDO
           D9365: DO M=1,jsken
-            TOSMER(ielmc,M,K,N2,N1)=TOSMER(ielmc,M,K,N2,N1)+OSMER(ielmc,M,K,N,NN,N2,N1)
             TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)+OSAER(M,K,N,NN,N2,N1)
-            TOSMER(ielmn,M,K,N2,N1)=TOSMER(ielmn,M,K,N2,N1)+OSMER(ielmn,M,K,N,NN,N2,N1)
-            TOSMER(ielmp,M,K,N2,N1)=TOSMER(ielmp,M,K,N2,N1)+OSMER(ielmp,M,K,N,NN,N2,N1)
+            DO NE=1,NumPlantChemElms
+              TOSMER(NE,M,K,N2,N1)=TOSMER(NE,M,K,N2,N1)+OSMER(NE,M,K,N,NN,N2,N1) 
+            ENDDO
           ENDDO D9365
         ENDDO D9375
 
@@ -435,12 +425,9 @@ implicit none
             DO NGL=JGnio(NO),JGnfo(NO)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
-                TOMEERhetr(ielmc,MID,K,N2,N1)=TOMEERhetr(ielmc,MID,K,N2,N1) &
-                  -OMEERhetr(ielmc,MID,K,N,NN,N5,N4)
-                TOMEERhetr(ielmn,MID,K,N2,N1)=TOMEERhetr(ielmn,MID,K,N2,N1) &
-                  -OMEERhetr(ielmn,MID,K,N,NN,N5,N4)
-                TOMEERhetr(ielmp,MID,K,N2,N1)=TOMEERhetr(ielmp,MID,K,N2,N1) &
-                  -OMEERhetr(ielmp,MID,K,N,NN,N5,N4)
+                DO NE=1,NumPlantChemElms
+                  TOMEERhetr(NE,MID,K,N2,N1)=TOMEERhetr(NE,MID,K,N2,N1)-OMEERhetr(NE,MID,K,N,NN,N5,N4)
+                ENDDO  
               enddo
             enddo
           enddo
@@ -450,32 +437,28 @@ implicit none
         DO  NO=1,NumMicbFunGrupsPerCmplx
           DO  M=1,nlbiomcp
             DO NGL=JGniA(NO),JGnfA(NO)
-              MID=micpar%get_micb_id(M,NGL)            
-              TOMEERauto(ielmc,MID,N2,N1)=TOMEERauto(ielmc,MID,N2,N1) &
-                -OMEERauto(ielmc,MID,N,NN,N5,N4)
-              TOMEERauto(ielmn,MID,N2,N1)=TOMEERauto(ielmn,MID,N2,N1) &
-                -OMEERauto(ielmn,MID,N,NN,N5,N4)
-              TOMEERauto(ielmp,MID,N2,N1)=TOMEERauto(ielmp,MID,N2,N1) &
-                -OMEERauto(ielmp,MID,N,NN,N5,N4)
+              MID=micpar%get_micb_id(M,NGL)   
+              DO NE=1,NumPlantChemElms         
+                TOMEERauto(NE,MID,N2,N1)=TOMEERauto(NE,MID,N2,N1)-OMEERauto(NE,MID,N,NN,N5,N4)
+              ENDDO  
             enddo
           enddo
         enddo
 
         D7375: DO K=1,jcplx
           D7370: DO M=1,ndbiomcp
-            TORMER(ielmc,M,K,N2,N1)=TORMER(ielmc,M,K,N2,N1)-ORMER(ielmc,M,K,N,NN,N5,N4)
-            TORMER(ielmn,M,K,N2,N1)=TORMER(ielmn,M,K,N2,N1)-ORMER(ielmn,M,K,N,NN,N5,N4)
-            TORMER(ielmp,M,K,N2,N1)=TORMER(ielmp,M,K,N2,N1)-ORMER(ielmp,M,K,N,NN,N5,N4)
+            DO NE=1,NumPlantChemElms
+              TORMER(NE,M,K,N2,N1)=TORMER(NE,M,K,N2,N1)-ORMER(NE,M,K,N,NN,N5,N4)
+            ENDDO
           ENDDO D7370
-          TOHMER(idom_doc,K,N2,N1)=TOHMER(idom_doc,K,N2,N1)-OHMER(idom_doc,K,N,NN,N5,N4)
-          TOHMER(idom_don,K,N2,N1)=TOHMER(idom_don,K,N2,N1)-OHMER(idom_don,K,N,NN,N5,N4)
-          TOHMER(idom_dop,K,N2,N1)=TOHMER(idom_dop,K,N2,N1)-OHMER(idom_dop,K,N,NN,N5,N4)
-          TOHMER(idom_acetate,K,N2,N1)=TOHMER(idom_acetate,K,N2,N1)-OHMER(idom_acetate,K,N,NN,N5,N4)
+          DO idom=idom_beg,idom_end
+            TOHMER(idom,K,N2,N1)=TOHMER(idom,K,N2,N1)-OHMER(idom,K,N,NN,N5,N4)
+          ENDDO
           D7365: DO M=1,jsken
-            TOSMER(ielmc,M,K,N2,N1)=TOSMER(ielmc,M,K,N2,N1)-OSMER(ielmc,M,K,N,NN,N5,N4)
-            TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)-OSAER(M,K,N,NN,N5,N4)
-            TOSMER(ielmn,M,K,N2,N1)=TOSMER(ielmn,M,K,N2,N1)-OSMER(ielmn,M,K,N,NN,N5,N4)
-            TOSMER(ielmp,M,K,N2,N1)=TOSMER(ielmp,M,K,N2,N1)-OSMER(ielmp,M,K,N,NN,N5,N4)
+            TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)-OSAER(M,K,N,NN,N5,N4)   
+            DO NE=1,NumPlantChemElms       
+              TOSMER(NE,M,K,N2,N1)=TOSMER(NE,M,K,N2,N1)-OSMER(NE,M,K,N,NN,N5,N4)
+            ENDDO
           ENDDO D7365
         ENDDO D7375
 !     ENDIF
@@ -507,13 +490,10 @@ implicit none
             DO  NO=1,NumMicbFunGrupsPerCmplx
               DO NGL=JGnio(NO),JGnfo(NO)
                 DO  M=1,nlbiomcp
-                  MID=micpar%get_micb_id(M,NGL)                
-                  TOMEERhetr(ielmc,MID,K,N2,N1)=TOMEERhetr(ielmc,MID,K,N2,N1) &
-                    -OMEERhetr(ielmc,MID,K,N,NN,N5B,N4B)
-                  TOMEERhetr(ielmn,MID,K,N2,N1)=TOMEERhetr(ielmn,MID,K,N2,N1) &
-                    -OMEERhetr(ielmn,MID,K,N,NN,N5B,N4B)
-                  TOMEERhetr(ielmp,MID,K,N2,N1)=TOMEERhetr(ielmp,MID,K,N2,N1) &
-                    -OMEERhetr(ielmp,MID,K,N,NN,N5B,N4B)
+                  MID=micpar%get_micb_id(M,NGL)    
+                  DO NE=1,NumPlantChemElms            
+                    TOMEERhetr(NE,MID,K,N2,N1)=TOMEERhetr(NE,MID,K,N2,N1)-OMEERhetr(NE,MID,K,N,NN,N5B,N4B)
+                  ENDDO  
                 enddo
               enddo
             enddo
@@ -522,32 +502,28 @@ implicit none
           DO  NO=1,NumMicbFunGrupsPerCmplx
             DO NGL=JGniA(NO),JGnfA(NO)
               DO  M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)              
-                TOMEERauto(ielmc,MID,N2,N1)=TOMEERauto(ielmc,MID,N2,N1) &
-                  -OMEERauto(ielmc,MID,N,NN,N5B,N4B)
-                TOMEERauto(ielmn,MID,N2,N1)=TOMEERauto(ielmn,MID,N2,N1) &
-                  -OMEERauto(ielmn,MID,N,NN,N5B,N4B)
-                TOMEERauto(ielmp,MID,N2,N1)=TOMEERauto(ielmp,MID,N2,N1) &
-                  -OMEERauto(ielmp,MID,N,NN,N5B,N4B)
+                MID=micpar%get_micb_id(M,NGL)      
+                DO NE=1,NumPlantChemElms        
+                  TOMEERauto(NE,MID,N2,N1)=TOMEERauto(NE,MID,N2,N1)-OMEERauto(NE,MID,N,NN,N5B,N4B)
+                ENDDO  
               enddo
             enddo
           enddo
 
           D8375: DO K=1,jcplx
             D8370: DO M=1,ndbiomcp
-              TORMER(ielmc,M,K,N2,N1)=TORMER(ielmc,M,K,N2,N1)-ORMER(ielmc,M,K,N,NN,N5B,N4B)
-              TORMER(ielmn,M,K,N2,N1)=TORMER(ielmn,M,K,N2,N1)-ORMER(ielmn,M,K,N,NN,N5B,N4B)
-              TORMER(ielmp,M,K,N2,N1)=TORMER(ielmp,M,K,N2,N1)-ORMER(ielmp,M,K,N,NN,N5B,N4B)
+              DO NE=1,NumPlantChemElms
+                TORMER(NE,M,K,N2,N1)=TORMER(NE,M,K,N2,N1)-ORMER(NE,M,K,N,NN,N5B,N4B)
+              ENDDO
             ENDDO D8370
-            TOHMER(idom_doc,K,N2,N1)=TOHMER(idom_doc,K,N2,N1)-OHMER(idom_doc,K,N,NN,N5B,N4B)
-            TOHMER(idom_don,K,N2,N1)=TOHMER(idom_don,K,N2,N1)-OHMER(idom_don,K,N,NN,N5B,N4B)
-            TOHMER(idom_dop,K,N2,N1)=TOHMER(idom_dop,K,N2,N1)-OHMER(idom_dop,K,N,NN,N5B,N4B)
-            TOHMER(idom_acetate,K,N2,N1)=TOHMER(idom_acetate,K,N2,N1)-OHMER(idom_acetate,K,N,NN,N5B,N4B)
+            DO idom=idom_beg,idom_end
+              TOHMER(idom,K,N2,N1)=TOHMER(idom,K,N2,N1)-OHMER(idom,K,N,NN,N5B,N4B)
+            ENDDO
             D8365: DO M=1,jsken
-              TOSMER(ielmc,M,K,N2,N1)=TOSMER(ielmc,M,K,N2,N1)-OSMER(ielmc,M,K,N,NN,N5B,N4B)
-              TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)-OSAER(M,K,N,NN,N5B,N4B)
-              TOSMER(ielmn,M,K,N2,N1)=TOSMER(ielmn,M,K,N2,N1)-OSMER(ielmn,M,K,N,NN,N5B,N4B)
-              TOSMER(ielmp,M,K,N2,N1)=TOSMER(ielmp,M,K,N2,N1)-OSMER(ielmp,M,K,N,NN,N5B,N4B)
+              TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)-OSAER(M,K,N,NN,N5B,N4B)          
+              DO NE=1,NumPlantChemElms  
+                TOSMER(NE,M,K,N2,N1)=TOSMER(NE,M,K,N2,N1)-OSMER(NE,M,K,N,NN,N5B,N4B)
+              ENDDO
             ENDDO D8365
           ENDDO D8375
         ENDIF
@@ -591,34 +567,34 @@ implicit none
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(N3.EQ.NU(N2,N1) .AND. N.EQ.3)THEN      
         !vertical direction, source is at soil surface
-        TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP(N5,N4)
-        TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-LakeSurfFlowMicPX(N5,N4)
+        TWatFlowCellMicP_vr(N3,N2,N1)=TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP(N5,N4)
+        TWatFlowCellMicPX_vr(N3,N2,N1)=TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-LakeSurfFlowMicPX(N5,N4)
         TWaterFlowMacP_vr(N3,N2,N1)=TWaterFlowMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP(N5,N4)
-        THeatFlow2Soil_col(N3,N2,N1)=THeatFlow2Soil_col(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)
+        THeatFlow2Soil_vr(N3,N2,N1)=THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)
 
-        if(THeatFlow2Soil_col(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlow2Soil_col(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)',&
-            THeatFlow2Soil_col(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),LakeSurfHeatFlux(N5,N4)
+        if(THeatFlow2Soil_vr(N3,N2,N1)<-1.e10)then
+          write(*,*)'THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)',&
+            THeatFlow2Soil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),LakeSurfHeatFlux(N5,N4)
           write(*,*)'Ns=',N1,n2,n3,n4,n5
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ELSE
-        TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
-        TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-WaterFlowSoiMicPX(N,N6,N5,N4)
+        TWatFlowCellMicP_vr(N3,N2,N1)=TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
+        TWatFlowCellMicPX_vr(N3,N2,N1)=TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-WaterFlowSoiMicPX(N,N6,N5,N4)
         TWaterFlowMacP_vr(N3,N2,N1)=TWaterFlowMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-WaterFlowMacP_3D(N,N6,N5,N4)
-        THeatFlow2Soil_col(N3,N2,N1)=THeatFlow2Soil_col(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
+        THeatFlow2Soil_vr(N3,N2,N1)=THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
 
-        if(THeatFlow2Soil_col(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlow2Soil_col(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)',&
-            THeatFlow2Soil_col(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
+        if(THeatFlow2Soil_vr(N3,N2,N1)<-1.e10)then
+          write(*,*)'THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)',&
+            THeatFlow2Soil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
           write(*,*)'Ns=',N,N1,n2,n3,n4,n5,n6
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDIF
       !     IF(N1.EQ.1.AND.N3.EQ.1)THEN
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
-      !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP_3D(N,N3,N2,N1),WaterFlowSoiMicP_3D(N,N6,N5,N4),LakeSurfFlowMicP(N5,N4)
-      !    3,THeatFlow2Soil_col(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
+      !    2,TWatFlowCellMicP_vr(N3,N2,N1),WaterFlowSoiMicP_3D(N,N3,N2,N1),WaterFlowSoiMicP_3D(N,N6,N5,N4),LakeSurfFlowMicP(N5,N4)
+      !    3,THeatFlow2Soil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
       !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP_vr(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
@@ -683,13 +659,13 @@ implicit none
         ENDDO
       ENDIF
     ELSE
-      TWatFlowCellMicP(N3,N2,N1)=0.0_r8
-      TWatFlowCellMicPX(N3,N2,N1)=0.0_r8
+      TWatFlowCellMicP_vr(N3,N2,N1)=0.0_r8
+      TWatFlowCellMicPX_vr(N3,N2,N1)=0.0_r8
       TWaterFlowMacP_vr(N3,N2,N1)=0.0_r8
-      THeatFlow2Soil_col(N3,N2,N1)=0.0_r8
-      WatIceThawMicP(N3,N2,N1)=0.0_r8
-      WatIceThawMacP(N3,N2,N1)=0.0_r8
-      THeatSoiThaw(N3,N2,N1)=0.0_r8
+      THeatFlow2Soil_vr(N3,N2,N1)=0.0_r8
+      WatIceThawMicP_vr(N3,N2,N1)=0.0_r8
+      WatIceThawMacP_vr(N3,N2,N1)=0.0_r8
+      THeatSoiThaw_vr(N3,N2,N1)=0.0_r8
 
       D8596: DO K=1,jcplx
         DOM_Transp2Micp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8

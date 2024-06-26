@@ -12,8 +12,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLsoiAirP_col(:,:,:)                       !soil air content [m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                      !volumetric water content [m3 m-3]
   real(r8),target,allocatable ::  THETI_col(:,:,:)                      !volumetric ice content [m3 m-3]
-  real(r8),target,allocatable ::  ThetaH2OZ_col(:,:,:)                     !volumetric moblize water [m3 m-3]
-  real(r8),target,allocatable ::  ThetaICEZ_col(:,:,:)                     !volumetric mobile ice [m3 m-3]
+  real(r8),target,allocatable ::  ThetaH2OZ_vr(:,:,:)                     !volumetric moblize water [m3 m-3]
+  real(r8),target,allocatable ::  ThetaICEZ_vr(:,:,:)                     !volumetric mobile ice [m3 m-3]
   real(r8),target,allocatable ::  VLWatMicP_vr(:,:,:)                       !soil micropore water content [m3 d-2]
   real(r8),target,allocatable ::  VLiceMicP(:,:,:)                       !soil micropore ice content   [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacP(:,:,:)                      !soil macropore water content [m3 d-2]
@@ -41,7 +41,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
-  real(r8),target,allocatable ::  WatFlux4ErosionM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  WatFlux4ErosionM_2DH(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  RunoffVelocity(:,:,:)                        !runoff velocity, [m t-1]
   integer,target,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
   logical,target,allocatable ::  XGridRunoffFlag(:,:,:,:)           !enables or disables boundary water flux depending on aspect, [-]
@@ -72,7 +72,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
   real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
-  real(r8),target,allocatable ::  PSISoilOsmotic(:,:,:)                      !osmotic soil water potential , [Mpa]
+  real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                      !osmotic soil water potential , [Mpa]
   real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                      !gravimetric soil water potential , [Mpa]
   real(r8),target,allocatable ::  THETY_vr(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
@@ -110,8 +110,8 @@ module SoilWaterDataType
   allocate(VLsoiAirP_col(0:JZ,JY,JX));   VLsoiAirP_col=0._r8
   allocate(THETW_vr(0:JZ,JY,JX));  THETW_vr=0._r8
   allocate(THETI_col(0:JZ,JY,JX));  THETI_col=0._r8
-  allocate(ThetaH2OZ_col(0:JZ,JY,JX)); ThetaH2OZ_col=0._r8
-  allocate(ThetaICEZ_col(0:JZ,JY,JX)); ThetaICEZ_col=0._r8
+  allocate(ThetaH2OZ_vr(0:JZ,JY,JX)); ThetaH2OZ_vr=0._r8
+  allocate(ThetaICEZ_vr(0:JZ,JY,JX)); ThetaICEZ_vr=0._r8
   allocate(VLWatMicP_vr(0:JZ,JY,JX));   VLWatMicP_vr=0._r8
   allocate(VLiceMicP(0:JZ,JY,JX));   VLiceMicP=0._r8
   allocate(VLWatMacP(JZ,JY,JX));    VLWatMacP=0._r8
@@ -139,7 +139,7 @@ module SoilWaterDataType
   allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
   allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
   allocate(HydroCondMicP4RootUptake(JZ,JY,JX));     HydroCondMicP4RootUptake=0._r8
-  allocate(WatFlux4ErosionM(60,JV,JH));      WatFlux4ErosionM=0._r8
+  allocate(WatFlux4ErosionM_2DH(60,JV,JH));      WatFlux4ErosionM_2DH=0._r8
   allocate(RunoffVelocity(60,JY,JX));      RunoffVelocity=0._r8
   allocate(IFLBM(60,2,2,JY,JX));IFLBM=0
   allocate(XGridRunoffFlag(2,2,JY,JX));   XGridRunoffFlag=.false.
@@ -170,7 +170,7 @@ module SoilWaterDataType
   allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
   allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
-  allocate(PSISoilOsmotic(0:JZ,JY,JX));  PSISoilOsmotic=0._r8
+  allocate(PSISoilOsmotic_vr(0:JZ,JY,JX));  PSISoilOsmotic_vr=0._r8
   allocate(PSIGrav_vr(0:JZ,JY,JX));  PSIGrav_vr=0._r8
   allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
   allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
@@ -196,8 +196,8 @@ module SoilWaterDataType
   call destroy(VLsoiAirP_col)
   call destroy(THETW_vr)
   call destroy(THETI_col)
-  call destroy(ThetaH2OZ_col)
-  call destroy(ThetaICEZ_col)
+  call destroy(ThetaH2OZ_vr)
+  call destroy(ThetaICEZ_vr)
   call destroy(VLWatMicP_vr)
   call destroy(VLiceMicP)
   call destroy(VLWatMacP)
@@ -225,7 +225,7 @@ module SoilWaterDataType
   call destroy(HydroCond3D)
   call destroy(HydroCondMacP)
   call destroy(HydroCondMicP4RootUptake)
-  call destroy(WatFlux4ErosionM)
+  call destroy(WatFlux4ErosionM_2DH)
   call destroy(RunoffVelocity)
   call destroy(IFLBM)
   call destroy(XGridRunoffFlag)
@@ -256,7 +256,7 @@ module SoilWaterDataType
   call destroy(SoilResit4RootPentrate_vr)
   call destroy(PSISE)
   call destroy(PSISoilAirEntry)
-  call destroy(PSISoilOsmotic)
+  call destroy(PSISoilOsmotic_vr)
   call destroy(PSIGrav_vr)
   call destroy(THETY_vr)
   call destroy(Theta_sat)

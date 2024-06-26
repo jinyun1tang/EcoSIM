@@ -373,8 +373,8 @@ module grosubsMod
 
     if(lverb)write(*,*)'PlantNonstElmTransfer'
     call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
-!    PRINT*,'elmtransfer',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)    
-!
+
+    if(lverb)write(*,*)'ComputeTotalBiom'
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
 !
@@ -597,7 +597,7 @@ module grosubsMod
 
   call SumPlantBiom(I,J,NZ,'computotb')
 
-! add the nonstrucal components
+  if(lverb)write(*,*)'add the nonstrucal components'
   D3451: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)

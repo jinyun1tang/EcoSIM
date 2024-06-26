@@ -982,8 +982,8 @@ module SoluteMod
 !     RSNUAA=rate of broadcast urea fertr dissoln
 !     RSNOAA=rate of broadcast NO3 fertilizer dissoln
 !
-    IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
-      ThetaWLitR=AMIN1(1.0,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
+    IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS(NY,NX))THEN
+      ThetaWLitR=AMIN1(1.0,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity_col(NY,NX))
     ELSE
       ThetaWLitR=1._r8
     ENDIF

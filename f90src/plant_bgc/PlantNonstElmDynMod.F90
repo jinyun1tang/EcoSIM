@@ -525,12 +525,6 @@ module PlantNonstElmDynMod
     NumOfBranches_pft       => plt_morph%NumOfBranches_pft        &
   )
 
-!  if(NZ==1)THEN
-!  WRITE(117,*)I+J/24.,'treexfer',plt_biom%CanopyNonstElms_brch(:,1,NZ),BegRemoblize.EQ.itrue
-!  ELSEIF(NZ==2)THEN
-!  WRITE(118,*)I+J/24.,'grassxfer',plt_biom%CanopyNonstElms_brch(:,1,NZ),BegRemoblize.EQ.itrue
-!  ENDIF
-
 
   IF(NumOfBranches_pft(NZ).GT.1)THEN
     call WithinBranchElmTransfer(I,J,NZ)
@@ -547,18 +541,8 @@ module PlantNonstElmDynMod
     call SeasonStoreRootNonstTransfer(I,J,NZ)
   ENDIF
 
-!  if(NZ==1)THEN
-!  WRITE(117,*)I+J/24.,'bftreexfer',plt_biom%CanopyNonstElms_brch(:,1,NZ)
-!  ELSEIF(NZ==2)THEN
-!  WRITE(118,*)I+J/24.,'bfgrassxfer',plt_biom%CanopyNonstElms_brch(:,1,NZ)
-!  ENDIF
 
   call ShootRootElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
-!  if(NZ==1)THEN
-!  WRITE(117,*)I+J/24.,'aftreexfer',plt_biom%CanopyNonstElms_brch(:,1,NZ)
-!  ELSEIF(NZ==2)THEN
-!  WRITE(118,*)I+J/24.,'afgrassxfer',plt_biom%CanopyNonstElms_brch(:,1,NZ)
-!  ENDIF
 
   end associate
   end subroutine PlantNonstElmTransfer

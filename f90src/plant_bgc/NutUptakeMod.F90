@@ -144,8 +144,8 @@ module NutUptakeMod
 
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,MaxSoiL4Root_pft(NZ)
-      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2.AND.RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.THETW_vr(L).GT.ZERO)THEN
+      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
+        .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
         call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
@@ -193,10 +193,16 @@ module NutUptakeMod
 
       ENDIF
 
-      call SumNutrientUptake(N,L,NZ)
+
 
     ENDDO D950
   ENDDO D955
+
+  D9501: DO L=NU,MaxSoiL4Root_pft(NZ)
+    IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO)THEN
+    call SumNutrientUptake(L,NZ)
+    endif
+  ENDDO  D9501
   end associate
   end subroutine RootMycoO2NutrientUptake
 !------------------------------------------------------------------------
@@ -1227,7 +1233,7 @@ module NutUptakeMod
   !     begin_execution
   associate(                                                   &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft,                  &
+    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft,         &
     ZEROS                  => plt_site%ZEROS,                  &
     ZEROS2                 => plt_site%ZEROS2,                 &
     VLWatMicPM             => plt_site%VLWatMicPM,             &
@@ -1262,7 +1268,7 @@ module NutUptakeMod
       XFRE(ielmc)=(DOM_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, positive into plants
       RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
-      IF(DOM_vr(idom_doc,K,L).GT.ZEROS.AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      IF(DOM_vr(idom_doc,K,L).GT.ZEROS .AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
         CPOOLT=DOM_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
@@ -1288,37 +1294,41 @@ module NutUptakeMod
     ENDDO
 
     if(RootExudE<0._r8)then
-       if(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootExudE<0._r8)then
-         scal=RootMycoNonstElms_rpvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
-         DO K=1,jcplx
-           RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ)*scal
-         ENDDO
-       endif
+      if(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootExudE<0._r8)then
+        scal=RootMycoNonstElms_rpvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
+        DO K=1,jcplx
+          RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ)*scal
+        ENDDO
+      endif
     endif
+    
   ENDDO      
   
   end associate
   end subroutine RootExudates
 !------------------------------------------------------------------------
 
-  subroutine SumNutrientUptake(N,L,NZ)
+  subroutine SumNutrientUptake(L,NZ)
 
   implicit none
-  integer, intent(in) :: N, L
+  integer, intent(in) :: L
   integer, intent(in) :: NZ
-
-  integer :: K,NE
+  real(r8) :: DOM_uptk(1:NumPlantChemElms)
+  real(r8) :: scal
+  integer :: K,NE,N
   !     begin_execution
-  associate(                                                      &
-    REcoDOMUptk_vr          =>  plt_bgcr%REcoDOMUptk_vr         , &
-    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr  , &    
-    RootMycoExudElm_pvr     =>  plt_rbgc%RootMycoExudElm_pvr    , &
-    RootMycoExudElms_pft    =>  plt_rbgc%RootMycoExudElms_pft   , &
-    RootHPO4Uptake_pft      =>  plt_rbgc%RootHPO4Uptake_pft     , &
-    RootH2PO4Uptake_pft     =>  plt_rbgc%RootH2PO4Uptake_pft    , &
-    RootNH4Uptake_pft       =>  plt_rbgc%RootNH4Uptake_pft      , &
-    RootNO3Uptake_pft       =>  plt_rbgc%RootNO3Uptake_pft      , &
-    RootNutUptake_pvr       =>  plt_rbgc%RootNutUptake_pvr        &
+  associate(                                                   &
+    REcoDOMUptk_vr         => plt_bgcr%REcoDOMUptk_vr,         &
+    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
+    RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
+    RootMycoExudElms_pft   => plt_rbgc%RootMycoExudElms_pft,   &
+    RootHPO4Uptake_pft     => plt_rbgc%RootHPO4Uptake_pft,     &
+    RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft,    &
+    RootNH4Uptake_pft      => plt_rbgc%RootNH4Uptake_pft,      &
+    RootNO3Uptake_pft      => plt_rbgc%RootNO3Uptake_pft,      &
+    DOM_vr                 => plt_soilchem%DOM_vr,             &
+    MY                     => plt_morph%MY,                    &    
+    RootNutUptake_pvr      => plt_rbgc%RootNutUptake_pvr       &
   )
   !
   !     TOTAL C,N,P EXCHANGE BETWEEN ROOTS AND SOIL
@@ -1330,30 +1340,47 @@ module NutUptakeMod
   !     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   D295: DO K=1,jcplx
-    DO NE=1,NumPlantChemElms
-      RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
-    ENDDO
+    DOM_uptk=0._r8
+    DO N=1,MY(NZ)
     !negative means uptake
-    REcoDOMUptk_vr(idom_doc,K,L)=REcoDOMUptk_vr(idom_doc,K,L)-RootMycoExudElm_pvr(ielmc,N,K,L,NZ)
-    REcoDOMUptk_vr(idom_don,K,L)=REcoDOMUptk_vr(idom_don,K,L)-RootMycoExudElm_pvr(ielmn,N,K,L,NZ)
-    REcoDOMUptk_vr(idom_dop,K,L)=REcoDOMUptk_vr(idom_dop,K,L)-RootMycoExudElm_pvr(ielmp,N,K,L,NZ)
+      DO NE=1,NumPlantChemElms
+        DOM_uptk(NE)=DOM_uptk(NE)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+      ENDDO
+    ENDDO
+    if(any(DOM_uptk/=0._r8))then
+      DO NE=1,NumPlantChemElms
+        if(DOM_uptk(NE)>DOM_vr(NE,K,L))then
+          scal=DOM_uptk(NE)/DOM_vr(NE,K,L)
+          DO N=1,MY(NZ)
+            RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ)*scal
+          ENDDO
+          DOM_uptk(NE)=DOM_uptk(NE)*scal
+        endif
+      ENDDO
+
+      DO NE=1,NumPlantChemElms
+        REcoDOMUptk_vr(NE,K,L)=REcoDOMUptk_vr(NE,K,L)-DOM_uptk(NE)
+      ENDDO
+
+      DO N=1,MY(NZ)
+        DO NE=1,NumPlantChemElms
+          RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)        
+          RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+        ENDDO
+      ENDDO
+    endif
   ENDDO D295
   
-  RootNH4Uptake_pft(NZ)=RootNH4Uptake_pft(NZ) &
-    +(RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ))
-  RootNO3Uptake_pft(NZ)=RootNO3Uptake_pft(NZ) &
-    +(RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ))
-  RootH2PO4Uptake_pft(NZ)=RootH2PO4Uptake_pft(NZ) &
-    +(RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ))
-  RootHPO4Uptake_pft(NZ)=RootHPO4Uptake_pft(NZ) &
-    +(RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))
-    
-  D195: DO K=1,jcplx
-    DO NE=1,NumPlantChemElms
-      RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
-    ENDDO
-  ENDDO D195
-    
+  DO N=1,MY(NZ)
+    RootNH4Uptake_pft(NZ)=RootNH4Uptake_pft(NZ) &
+      +(RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ))
+    RootNO3Uptake_pft(NZ)=RootNO3Uptake_pft(NZ) &
+      +(RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ))
+    RootH2PO4Uptake_pft(NZ)=RootH2PO4Uptake_pft(NZ) &
+      +(RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ))
+    RootHPO4Uptake_pft(NZ)=RootHPO4Uptake_pft(NZ) &
+      +(RootNutUptake_pvr(ids_H1PO4,N,L,NZ)+RootNutUptake_pvr(ids_H1PO4B,N,L,NZ))
+  ENDDO        
   end associate
   end subroutine SumNutrientUptake
 

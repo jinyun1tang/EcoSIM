@@ -257,6 +257,7 @@ implicit none
        dim3name='elmnts',long_name='standing dead element fraction', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
     call cppft(flag,NHW,NHE,NVN,NVS,NP,StandDeadKCompElms_pft,datrp_3d)
+
   else
     !print*,'StandDeadKCompElms_pft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StandDeadKCompElms_pft,datrp_3d)
@@ -5196,7 +5197,7 @@ implicit none
     !print*,'QDrain_col'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,QDrain_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='UDRAIN', dim1name='column',&
+    call restartvar(ncid, flag, varname='QDrain_col', dim1name='column',&
        long_name='total water drainage below root zone', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -8004,17 +8005,17 @@ implicit none
     datpr3 => datrc_3d(1:ncols,1:NumPlantChemElms,1:JZ+1)    
     call restartvar(ncid, flag, varname='SoilOrgM_vr', dim1name='column',dim2name='elmnts',dim3name='levsoi1',&
       long_name='total soil organic matter', units='g d-2', interpinic_flag='skip',&
-      data=datpr3, missing_value=spval, &
-      fill_value=spval)      
+      data=datpr3, missing_value=spval, fill_value=spval)      
+
     call cpcol(flag,NHW,NHE,NVN,NVS,SoilOrgM_vr,datrc_3d)
+
   else
     !print*,'ORGC'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilOrgM_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:NumPlantChemElms,1:JZ+1)   
     call restartvar(ncid, flag, varname='SoilOrgM_vr', dim1name='column',dim2name='elmnts',dim3name='levsoi1',&
       long_name='total soil organic matter', units='g d-2', interpinic_flag='skip',&
-      data=datpr3, missing_value=spval, &
-      fill_value=spval)      
+      data=datpr3, missing_value=spval, fill_value=spval)      
   endif  
 
   if(flag=='read')then

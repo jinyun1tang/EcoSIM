@@ -249,9 +249,9 @@ module nitrosMod
     enddo
   enddo
 
-  DO K=1,jcplx1
+  DK100: DO K=1,jcplx1
     !add heterotrophic microbes
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DC100: DO  N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGnio(N),JGnfo(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -260,9 +260,9 @@ module nitrosMod
           ENDDO
         enddo
       enddo
-    enddo
+    enddo DC100
 
-  !add microbial residual
+    !add microbial residual
     DO  M=1,ndbiomcp
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
@@ -287,19 +287,21 @@ module nitrosMod
     ENDDO
 
     ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
-
+    if(ORGM(ielmc)<0._r8)then
+    print*,'orgmxxx',ORGM,DOM_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    stop
+    endif
     !add solid organic matter
     DO  M=1,jsken
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
         if(ORGM(NE)<0._r8)then
-        print*,'orgm1',ORGM
+        print*,'orgm1',ORGM,SolidOM_vr(:,M,K,L,NY,NX)
         stop
         endif
-
       ENDDO  
     ENDDO  
-  ENDDO    
+  ENDDO DK100   
 
   end subroutine sumORGMLayL
 !------------------------------------------------------------------------------------------
