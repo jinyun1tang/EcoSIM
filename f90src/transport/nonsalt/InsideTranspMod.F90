@@ -144,7 +144,7 @@ module InsideTranspMod
       dom_TFloXSurRunoff(idom_beg:idom_end,K,NY,NX)=0.0_r8
 
       do idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)-RDOM_micb_cumflx(idom,K,0,NY,NX)
+        DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)-RDOM_CumEcoProd_vr(idom,K,0,NY,NX)
       enddo
     ENDDO
 
@@ -187,7 +187,7 @@ module InsideTranspMod
         DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
         do idom=idom_beg,idom_end
-          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_micb_cumflx(idom,K,L,NY,NX)
+          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_CumEcoProd_vr(idom,K,L,NY,NX)
         enddo
       ENDDO
       R3PorTSolFlx(ids_beg:ids_end,L,NY,NX)=0.0_r8
@@ -474,7 +474,9 @@ module InsideTranspMod
 !
     D9810: DO K=1,jcplx
       do idom=idom_beg,idom_end
+        !source
         CDOM_MicP1(idom,K)=AZMAX1(DOM_MicP2(idom,K,N3,N2,N1)/VLWatMicPM(M,N3,N2,N1))
+        !dest
         CDOM_MicP2(idom,K)=AZMAX1(DOM_MicP2(idom,K,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4))
       enddo
     ENDDO D9810

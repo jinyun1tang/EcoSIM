@@ -4,6 +4,7 @@ module TranspNoSaltMod
 !
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : destroy
+  USE MiniMathMod, ONLY : AZMAX1  
   use SOMDataType
   use ChemTranspDataType
   use GridConsts
@@ -86,7 +87,7 @@ module TranspNoSaltMod
 !
 
   WaterFlow2Soil(:,:,:,:)=0._r8
-  call InitFluxandStateVariables(I,NHW,NHE,NVN,NVS)
+  call InitFluxandStateVariables(I,J,NHW,NHE,NVN,NVS)
 
 !
 ! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
@@ -116,10 +117,10 @@ module TranspNoSaltMod
   END subroutine TranspNoSalt
 !------------------------------------------------------------------------------------------
 
-  subroutine InitFluxandStateVariables(I,NHW,NHE,NVN,NVS)
+  subroutine InitFluxandStateVariables(I,J,NHW,NHE,NVN,NVS)
   implicit none
 
-  integer, intent(in) :: I, NHW,NHE,NVN,NVS
+  integer, intent(in) :: I, J,NHW,NHE,NVN,NVS
 
   integer :: NX,NY
   DO  NX=NHW,NHE
@@ -454,7 +455,7 @@ module TranspNoSaltMod
 
   DO  K=1,jcplx
     DO idom=idom_beg,idom_end
-      RDOM_micb_cumflx(idom,K,0,NY,NX)=-REcoDOMUptk_vr(idom,K,0,NY,NX)*dts_HeatWatTP
+      RDOM_CumEcoProd_vr(idom,K,0,NY,NX)=-REcoDOMProd_vr(idom,K,0,NY,NX)*dts_HeatWatTP
     ENDDO
   ENDDO
   RBGCSinkS_vr(ids_NH4,0,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,0,NY,NX)-trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
@@ -478,10 +479,10 @@ module TranspNoSaltMod
   DO NTG=idg_beg,idg_end-1
     trc_solml2_vr(NTG,0,NY,NX)=trc_solml_vr(NTG,0,NY,NX)
   ENDDO
-
+  !reset DOM to value before the iteration
   D9979: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-    DOM_MicP2(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)-REcoDOMUptk_vr(idom,K,0,NY,NX)
+      DOM_MicP2(idom,K,0,NY,NX)=AZMAX1(DOM_vr(idom,K,0,NY,NX)-RDOMMicProd_vr(idom,K,0,NY,NX))      
     ENDDO
   ENDDO D9979
 
@@ -698,6 +699,7 @@ module TranspNoSaltMod
 !------------------------------------------------------------------------------------------
 
   subroutine ImportFluxFromOutsideModules(I,NY,NX)
+
   implicit none
 
   integer, intent(in) ::  I,NY, NX
@@ -717,7 +719,7 @@ module TranspNoSaltMod
 
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        RDOM_micb_cumflx(idom,K,L,NY,NX)=-REcoDOMUptk_vr(idom,K,L,NY,NX)*dts_HeatWatTP
+        RDOM_CumEcoProd_vr(idom,K,L,NY,NX)=-REcoDOMProd_vr(idom,K,L,NY,NX)*dts_HeatWatTP
       enddo
     ENDDO
 
@@ -783,10 +785,9 @@ module TranspNoSaltMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    DOMdiffusivity2_vr(idom_doc,L,NY,NX)=DOMdiffusivity_vr(idom_doc,L,NY,NX)*dts_HeatWatTP
-    DOMdiffusivity2_vr(idom_don,L,NY,NX)=DOMdiffusivity_vr(idom_don,L,NY,NX)*dts_HeatWatTP
-    DOMdiffusivity2_vr(idom_dop,L,NY,NX)=DOMdiffusivity_vr(idom_dop,L,NY,NX)*dts_HeatWatTP
-    DOMdiffusivity2_vr(idom_acetate,L,NY,NX)=DOMdiffusivity_vr(idom_acetate,L,NY,NX)*dts_HeatWatTP
+    DO idom=idom_beg,idom_end
+      DOMdiffusivity2_vr(idom,L,NY,NX)=DOMdiffusivity_vr(idom,L,NY,NX)*dts_HeatWatTP
+    enddo
 
     DO NTS=ids_beg,ids_end
       SoluteDifusvty_vrc(NTS,L,NY,NX)=SoluteDifusvty_vr(NTS,L,NY,NX)*dts_HeatWatTP
@@ -814,9 +815,15 @@ module TranspNoSaltMod
       trc_gasml2_vr(NTG,L,NY,NX)=trc_gasml_vr(NTG,L,NY,NX)
     ENDDO
 
+    !reset DOM to value before the iteration
+    !Concern: RDOMMicProd_vr includes microbial modification of DOM
+    !it does not include exchange among different complexes (as one kind of microbial priming). 
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)-REcoDOMUptk_vr(idom,K,L,NY,NX)
+        DOM_MicP2(idom,K,L,NY,NX)=AZMAX1(DOM_vr(idom,K,L,NY,NX)-RDOMMicProd_vr(idom,K,L,NY,NX))
+        if(DOM_MicP2(idom,K,L,NY,NX)<0._r8)then
+        print*,'nosaltmode',DOM_MicP2(idom,K,L,NY,NX),RDOMMicProd_vr(idom,K,L,NY,NX)
+        endif
         DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
       ENDDO
     enddo

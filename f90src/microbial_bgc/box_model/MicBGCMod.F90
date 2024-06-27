@@ -1732,7 +1732,7 @@ module MicBGCMod
     D570: DO N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGnio(N),JGnfo(N)
         DOM(idom_doc,K)=DOM(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
-        DOM(idom_don,K)=DOM(idom_don,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
+        DOM(idom_don,K)=DOM(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)
         DOM(idom_dop,K)=DOM(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
         DOM(idom_acetate,K)=DOM(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
 !
@@ -2076,7 +2076,7 @@ module MicBGCMod
     RNO2MicbTransfSoil        => micflx%RNO2MicbTransfSoil,        &
     RNO3MicbTransfBand        => micflx%RNO3MicbTransfBand,        &
     RNO3MicbTransfSoil        => micflx%RNO3MicbTransfSoil,        &
-    REcoDOMUptk               => micflx%REcoDOMUptk                &
+    REcoDOMProd               => micflx%REcoDOMProd                &
   )
   D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
@@ -2193,31 +2193,31 @@ module MicBGCMod
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)+RDcmpProdDOM(NE,M,K)
+        REcoDOMProd(NE,K)=REcoDOMProd(NE,K)+RDcmpProdDOM(NE,M,K)
       ENDDO
     ENDDO D660
 
     D665: DO M=1,ndbiomcp
       DO NE=1,NumPlantChemElms
-        REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)+RHydlysBioResduOM(NE,M,K)
+        REcoDOMProd(NE,K)=REcoDOMProd(NE,K)+RHydlysBioResduOM(NE,M,K)
       ENDDO
     ENDDO D665
     DO NE=1,NumPlantChemElms
-      REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)+RHydlysSorptOM(NE,K)
+      REcoDOMProd(NE,K)=REcoDOMProd(NE,K)+RHydlysSorptOM(NE,K)
     ENDDO
-    REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)+RHydlysSorptOM(idom_acetate,K)
+    REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)+RHydlysSorptOM(idom_acetate,K)
     D670: DO N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGnio(N),JGnfo(N)
-        REcoDOMUptk(idom_doc,K)=REcoDOMUptk(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
-        REcoDOMUptk(idom_don,K)=REcoDOMUptk(idom_don,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
-        REcoDOMUptk(idom_dop,K)=REcoDOMUptk(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
-        REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
+        REcoDOMProd(idom_doc,K)=REcoDOMProd(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
+        REcoDOMProd(idom_don,K)=REcoDOMProd(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)
+        REcoDOMProd(idom_dop,K)=REcoDOMProd(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
+        REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
       ENDDO
     ENDDO D670
     DO NE=1,NumPlantChemElms
-      REcoDOMUptk(NE,K)=REcoDOMUptk(NE,K)-RDOMSorp(NE,K)
+      REcoDOMProd(NE,K)=REcoDOMProd(NE,K)-RDOMSorp(NE,K)
     ENDDO
-    REcoDOMUptk(idom_acetate,K)=REcoDOMUptk(idom_acetate,K)-RDOMSorp(idom_acetate,K)
+    REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)-RDOMSorp(idom_acetate,K)
   ENDDO D655
 !
 !     RNH4MicbTransfSoil,RNH4MicbTransfBand=net change in NH4 in band,non-band

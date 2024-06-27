@@ -129,7 +129,7 @@ module RedistMod
 !
       call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
 
-      call UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
+      call UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,TXCO2,DORGE)
 !
 !     SNOWPACK LAYERING
 
@@ -865,10 +865,11 @@ module RedistMod
   ENDDO
   end subroutine update_physVar_Profile
 !------------------------------------------------------------------------------------------
-  subroutine UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
+  subroutine UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,TXCO2,DORGE)
   !
 
   implicit none
+  integer,  intent(in) :: I,J
   integer,  intent(in) :: NY,NX,LG
   real(r8), intent(in) :: DORGE(JY,JX)
   real(r8), intent(inout) :: TXCO2(JY,JX)
@@ -910,13 +911,13 @@ module RedistMod
 !
     D8560: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX) &
-          +DOM_PoreTranspFlx(idom,K,L,NY,NX)
+        DOM_vr(idom,K,L,NY,NX)=AZMAX1(DOM_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX) &
+          +DOM_PoreTranspFlx(idom,K,L,NY,NX))
           
         DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
           -DOM_PoreTranspFlx(idom,K,L,NY,NX)
-        if(DOM_vr(idom,K,L,NY,NX)<0._r8)print*,'literf923',L,DOM_Transp2Micp_vr(idom,K,L,NY,NX) &
-          ,DOM_PoreTranspFlx(idom,K,L,NY,NX)
+
+
       enddo
     ENDDO D8560
     !

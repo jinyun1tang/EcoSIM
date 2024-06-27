@@ -99,7 +99,7 @@ implicit none
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=1,jcplx
       DO NE=1,NumPlantChemElms
-        REcoDOMUptk_vr(NE,K,L,NY,NX)=plt_bgcr%REcoDOMUptk_vr(NE,K,L)
+        REcoDOMProd_vr(NE,K,L,NY,NX)=plt_bgcr%REcoDOMProd_vr(NE,K,L)
       ENDDO
     ENDDO
     DO M=1,NPH
@@ -937,7 +937,7 @@ implicit none
   DO L=0,NL(NY,NX)
     DO K=1,jcplx
       DO NE=1,NumPlantChemElms
-        plt_bgcr%REcoDOMUptk_vr(NE,K,L)=REcoDOMUptk_vr(NE,K,L,NY,NX)
+        plt_bgcr%REcoDOMProd_vr(NE,K,L)=REcoDOMProd_vr(NE,K,L,NY,NX)
       ENDDO
     ENDDO
   ENDDO

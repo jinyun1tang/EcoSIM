@@ -199,14 +199,11 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
-  integer :: K,idg,NTN,ids
+  integer :: K,idg,NTN,ids,idom
 
   IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
-      dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
-      dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
-      dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
-      dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
+      dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
     ENDDO
     trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
     trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
@@ -219,10 +216,9 @@ module BoundaryTranspMod
       .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
       DO  K=1,jcplx
-        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOC,K,N2,N1)*FQRM
-        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DON,K,N2,N1)*FQRM
-        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOP,K,N2,N1)*FQRM
-        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_acetate,K,N2,N1)*FQRM
+        DO idom=idom_beg,idom_end
+          dom_2DFloXSurRunoffM(idom,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
+        ENDDO
       enddo
 
       DO idg=idg_beg,idg_NH3
@@ -239,10 +235,9 @@ module BoundaryTranspMod
 !     RQR*=solute in runoff
 !
       DO  K=1,jcplx
-        dom_2DFloXSurRunoff(idom_doc,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_doc,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)
-        dom_2DFloXSurRunoff(idom_don,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_don,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)
-        dom_2DFloXSurRunoff(idom_dop,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_dop,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)
-        dom_2DFloXSurRunoff(idom_acetate,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_acetate,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)
+        do idom=idom_beg,idom_end
+          dom_2DFloXSurRunoff(idom,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom,K,N,NN,M5,M4)
+        enddo
       enddo
       DO idg=idg_beg,idg_NH3
         trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)=trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)+trcg_2DFloXSurRunoffM(idg,N,NN,M5,M4)
@@ -258,10 +253,7 @@ module BoundaryTranspMod
     ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
-        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
 
       trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCOU
@@ -279,10 +271,7 @@ module BoundaryTranspMod
       ENDDO
     ELSE
       DO  K=1,jcplx
-        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
       trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
       trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8

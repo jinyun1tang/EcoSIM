@@ -26,7 +26,7 @@ implicit none
   real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:)
   real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:)
   real(r8), allocatable :: DOM_Transp2Micp_vr(:,:,:,:,:)
-  real(r8), allocatable :: RDOM_micb_cumflx(:,:,:,:,:)
+  real(r8), allocatable :: RDOM_CumEcoProd_vr(:,:,:,:,:)
 
   real(r8), allocatable :: dom_FloXSurRunoff(:,:,:,:)
   real(r8), allocatable :: RBGCSinkG_vr(:,:,:,:)   !BGC sink for gaseous tracers
@@ -118,10 +118,10 @@ contains
 
   allocate(dom_FloXSurRunoff(idom_beg:idom_end,1:jcplx,JV,JH));    dom_FloXSurRunoff=0._r8
   allocate(DOM_MicP2(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));    DOM_MicP2=0._r8
-  allocate(RDOM_micb_cumflx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_micb_cumflx=0._r8
+  allocate(RDOM_CumEcoProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_CumEcoProd_vr=0._r8
   allocate(DOM_MicpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTranspFlxM_3D=0._r8
   allocate(DOM_MacpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_MacpTranspFlxM_3D=0._r8
-  allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_flx=0._r8
+  allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_vr=0._r8
 
   allocate(trcg_RBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_RBLS=0._r8
   allocate(trcn_RBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));   trcn_RBLS=0._r8
@@ -227,7 +227,7 @@ contains
   call destroy(DOM_MicP2)
   call destroy(CDOM_MicP1)
   call destroy(CDOM_MicP2)
-  call destroy(RDOM_micb_cumflx)
+  call destroy(RDOM_CumEcoProd_vr)
   call destroy(DOM_MicpTranspFlxM_3D)
   call destroy(DOM_MacpTranspFlxM_3D)
   call destroy(RBGCSinkS_vr)
@@ -301,7 +301,7 @@ contains
   call destroy(DOM_Adv2MicP_flx)
   call destroy(DOM_Adv2MacP_flx)
   call destroy(DOM_Transp2Macp_flx)
-  call destroy(DOM_Transp2Micp_flx)
+  call destroy(DOM_Transp2Micp_vr)
   end subroutine DestructTransfrData
 
 end module TranspNoSaltDataMod

@@ -1318,7 +1318,7 @@ module NutUptakeMod
   integer :: K,NE,N
   !     begin_execution
   associate(                                                   &
-    REcoDOMUptk_vr         => plt_bgcr%REcoDOMUptk_vr,         &
+    REcoDOMProd_vr         => plt_bgcr%REcoDOMProd_vr,         &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
     RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
     RootMycoExudElms_pft   => plt_rbgc%RootMycoExudElms_pft,   &
@@ -1342,7 +1342,7 @@ module NutUptakeMod
   D295: DO K=1,jcplx
     DOM_uptk=0._r8
     DO N=1,MY(NZ)
-    !negative means uptake
+      !positve means uptake from soil
       DO NE=1,NumPlantChemElms
         DOM_uptk(NE)=DOM_uptk(NE)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
       ENDDO
@@ -1359,7 +1359,7 @@ module NutUptakeMod
       ENDDO
 
       DO NE=1,NumPlantChemElms
-        REcoDOMUptk_vr(NE,K,L)=REcoDOMUptk_vr(NE,K,L)-DOM_uptk(NE)
+        REcoDOMProd_vr(NE,K,L)=REcoDOMProd_vr(NE,K,L)-DOM_uptk(NE)
       ENDDO
 
       DO N=1,MY(NZ)

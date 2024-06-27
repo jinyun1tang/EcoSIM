@@ -374,11 +374,12 @@ implicit none
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo
-  NetNH4Mineralize_col(NY,NX)=NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
-  NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
+  NetNH4Mineralize_col(NY,NX)           = NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
+  NetPO4Mineralize_col(NY,NX)           = NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
   DO idom=idom_beg,idom_end
-    REcoDOMUptk_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMUptk(idom,1:jcplx)
+    REcoDOMProd_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMProd(idom,1:jcplx)    
   ENDDO
+  RDOMMicProd_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
  
   RO2DmndAutort_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)
   RNH3OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutor(1:NumMicrobAutrophCmplx)
