@@ -207,7 +207,7 @@ module nitrosMod
   end subroutine ApplyVerticalMix
 
 !------------------------------------------------------------------------------------------
-  subroutine sumORGMLayL(L,NY,NX,ORGM,conly)
+  subroutine sumORGMLayL(L,NY,NX,ORGM,conly,info)
   !
   !sum up organic matter in layer L
   !including live microbial biomass, microbial residue, sorbed dom+acetate, and solid SOM
@@ -216,7 +216,8 @@ module nitrosMod
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
   logical, optional, intent(in) :: conly
-  integer :: K,N,NGL,M,MID,NE,jcplx1,nelms
+  character(len=*), optional, intent(in) :: info
+  integer :: K,N,NGL,M,MID,NE,jcplx1,nelms,idom
   logical :: conly_loc
 
   if(present(conly))then
@@ -275,20 +276,24 @@ module nitrosMod
     ENDDO
 
     !add dom
-    DO NE=1,nelms
-      if(abs(DOM_vr(NE,K,L,NY,NX))<1.e-12_r8)DOM_vr(NE,K,L,NY,NX)=0._r8
-      if(abs(SorbedOM_vr(NE,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(NE,K,L,NY,NX)=0._r8
+    DO idom=idom_beg,idom_end
+      if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8    
+      if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
+      if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
+    ENDDO  
+    DO NE=1,nelms      
       ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
         if(ORGM(NE)<0._r8)then
         print*,'orgm2',NE,ORGM,DOM_vr(NE,K,L,NY,NX),DOM_MacP_vr(NE,K,L,NY,NX),SorbedOM_vr(NE,K,L,NY,NX)
         stop
         endif
-
     ENDDO
 
     ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
     if(ORGM(ielmc)<0._r8)then
     print*,'orgmxxx',ORGM,DOM_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    print*,'L=',L
+    if(present(info))print*,info
     stop
     endif
     !add solid organic matter

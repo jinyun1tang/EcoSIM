@@ -513,7 +513,7 @@ implicit none
 
       D450: DO K=1,jcplx
         DO idom=idom_beg,idom_end
-          MOD(idom)=MOD(idom)+XN*(DOM_3DMicp_Transp_flx(idom,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4))
+          MOD(idom)=MOD(idom)+XN*(DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4))
         ENDDO
       ENDDO D450
       MXD(ielmc)=XN*(trcs_3DTransp2MicP_3D(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &

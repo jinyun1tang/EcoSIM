@@ -83,7 +83,7 @@ module RedistMod
   real(r8) :: DORGC(JZ),DVLiceMicP(JZ)
   real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
   real(r8) :: VOLISO,VOLPT,VOLTT
-  real(r8) :: TFLWT
+  real(r8) :: TFLWT,orgm(1:NumPlantChemElms)
 !     execution begins here
   curday=I
   curhour=J
@@ -97,6 +97,8 @@ module RedistMod
       TXCO2(NY,NX)=0.0_r8
       DORGE(NY,NX)=0.0_r8
       QRunSurf_col(NY,NX)=0.0_r8
+
+      call sumORGMLayL(2,NY,NX,orgm(1:NumPlantChemElms),info='redist11')
 !
       call AddFlux2SurfaceResidue(NY,NX)
 !
@@ -136,15 +138,8 @@ module RedistMod
       call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP)
 
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
-!
-!     CHECK MATERIAL BALANCES
-!
-!      IF(I.EQ.365.AND.J.EQ.24)THEN
-!        WRITE(19,2221)'ORGC',I,J,iYearCurrent,NX,NY,(SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
-!        WRITE(20,2221)'ORGN',I,J,iYearCurrent,NX,NY,(SoilOrgM_vr(ielmn,L,NY,NX)/AREA(3,L,NY,NX),L=0,NL(NY,NX))
-2221    FORMAT(A8,5I6,21E14.6)
-!      ENDIF
 
+      call sumORGMLayL(2,NY,NX,orgm(1:NumPlantChemElms),info='redist4444')
     ENDDO D9990
   ENDDO D9995
   RETURN
@@ -465,7 +460,7 @@ module RedistMod
   !
   D9680: DO K=1,micpar%NumOfLitrCmplxs 
     do idom=idom_beg,idom_end   
-      DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+DOM_3DMicp_Transp_flx(idom,K,3,0,NY,NX)
+      DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+DOM_MicpTransp_3D(idom,K,3,0,NY,NX)
     enddo
   ENDDO D9680
 
@@ -915,12 +910,13 @@ module RedistMod
 !
     D8560: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX) &
+        DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX) &
           +DOM_PoreTranspFlx(idom,K,L,NY,NX)
           
         DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
           -DOM_PoreTranspFlx(idom,K,L,NY,NX)
-
+        if(DOM_vr(idom,K,L,NY,NX)<0._r8)print*,'literf923',L,DOM_Transp2Micp_vr(idom,K,L,NY,NX) &
+          ,DOM_PoreTranspFlx(idom,K,L,NY,NX)
       enddo
     ENDDO D8560
     !
@@ -929,6 +925,7 @@ module RedistMod
     D195: DO K=1,jcplx
       DO NE=1,NumPlantChemElms
         DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)+tRootMycoExud2Soil_vr(NE,K,L,NY,NX)
+        if(DOM_vr(NE,K,L,NY,NX)<0._r8)print*,'933rootx',L,tRootMycoExud2Soil_vr(NE,K,L,NY,NX)
       ENDDO
     ENDDO D195
     !
@@ -1322,7 +1319,7 @@ module RedistMod
     tMicBiome_col(NE,NY,NX)=tMicBiome_col(NE,NY,NX)+ORGM(NE)
   ENDDO
     
-  call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX))
+  call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX),info='redist')
   
   DO NE=1,NumPlantChemElms
     if(SoilOrgM_vr(NE,L,NY,NX)<0._r8)write(*,*)'redist',NE,L,SoilOrgM_vr(1:NE,L,NY,NX)

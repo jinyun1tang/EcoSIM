@@ -64,7 +64,7 @@ implicit none
 
   real(r8),allocatable :: TOMEERauto(:,:,:,:)
  
-  real(r8),allocatable ::  DOM_Transp2Micp_flx(:,:,:,:,:)
+  real(r8),allocatable ::  DOM_Transp2Micp_vr(:,:,:,:,:)
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
   real(r8),allocatable ::  TOMQRS(:,:,:,:)
   real(r8),allocatable ::  TORMER(:,:,:,:,:)
@@ -143,7 +143,7 @@ implicit none
 
   allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
 
-  allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
+  allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_vr=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
   allocate(TOMQRS(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS=0._r8
   allocate(TORMER(NumPlantChemElms,ndbiomcp,1:jcplx,JY,JX));TORMER=0._r8
@@ -214,7 +214,7 @@ implicit none
   call destroy(VLiceMicP1)
   call destroy(VLWatMacP1_vr)
   call destroy(VLiceMacP1)
-  call destroy(DOM_Transp2Micp_flx)
+  call destroy(DOM_Transp2Micp_vr)
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)
   call destroy(Gas_AdvDif_Flx_vr)

@@ -387,10 +387,7 @@ module Hour1Mod
       Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
       Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
 
-      dom_2DFloXSurRunoff(idom_doc,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
-      dom_2DFloXSurRunoff(idom_don,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
-      dom_2DFloXSurRunoff(idom_dop,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
-      dom_2DFloXSurRunoff(idom_acetate,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      dom_2DFloXSurRunoff(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
 
       trcg_2DFloXSurRunoff(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0.0_r8
       trcn_2DFloXSurRunoff(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
@@ -413,7 +410,7 @@ module Hour1Mod
 
         trcs_3DTransp2MicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
 
-        DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
+        DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
@@ -457,16 +454,10 @@ module Hour1Mod
         OMEERhetr(:,:,:,1:2,1:2,NY,NX)=0.0_r8
         OMEERauto(:,:,1:2,1:2,NY,NX)=0.0_r8
 
-        ORMER(ielmc,:,:,1:2,1:2,NY,NX)=0.0_r8
-        ORMER(ielmn,:,:,1:2,1:2,NY,NX)=0.0_r8
-        ORMER(ielmp,:,:,1:2,1:2,NY,NX)=0.0_r8
-        OHMER(idom_doc,:,1:2,1:2,NY,NX)=0.0_r8
-        OHMER(idom_don,:,1:2,1:2,NY,NX)=0.0_r8
-        OHMER(idom_dop,:,1:2,1:2,NY,NX)=0.0_r8
-        OSMER(ielmc,:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX)=0.0_r8
         OSAER(:,:,1:2,1:2,NY,NX)=0.0_r8
-        OSMER(ielmn,:,:,1:2,1:2,NY,NX)=0.0_r8
-        OSMER(ielmp,:,:,1:2,1:2,NY,NX)=0.0_r8
+        OHMER(1:NumPlantChemElms,:,1:2,1:2,NY,NX)=0.0_r8
+        OSMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX)=0.0_r8
       ENDDO
     ENDDO
   ENDIF
@@ -1837,6 +1828,7 @@ module Hour1Mod
       OQC1=AMIN1(0.1_r8*OSCX,OSCI-OSCX)
       OQN1=AMIN1(0.1_r8*OSNX,OSNI-OSNX)
       OQP1=AMIN1(0.1_r8*OSPX,OSPI-OSPX)
+
       DOM_vr(idom_doc,K,LFDPTH,NY,NX)=DOM_vr(idom_doc,K,LFDPTH,NY,NX)+OQC1
       DOM_vr(idom_don,K,LFDPTH,NY,NX)=DOM_vr(idom_don,K,LFDPTH,NY,NX)+OQN1
       DOM_vr(idom_dop,K,LFDPTH,NY,NX)=DOM_vr(idom_dop,K,LFDPTH,NY,NX)+OQP1
@@ -2362,10 +2354,7 @@ module Hour1Mod
     ENDDO
 
     DO  K=1,jcplx
-      DOM_PoreTranspFlx(idom_doc,K,L,NY,NX)=0.0_r8
-      DOM_PoreTranspFlx(idom_don,K,L,NY,NX)=0.0_r8
-      DOM_PoreTranspFlx(idom_dop,K,L,NY,NX)=0.0_r8
-      DOM_PoreTranspFlx(idom_acetate,K,L,NY,NX)=0.0_r8
+      DOM_PoreTranspFlx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
     ENDDO
     TLIceThawMicP(L,NY,NX)=0.0_r8
     TLIceThawMacP(L,NY,NX)=0.0_r8

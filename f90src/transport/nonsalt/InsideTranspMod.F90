@@ -184,7 +184,7 @@ module InsideTranspMod
   DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
       DO  K=1,jcplx
-        DOM_Transp2Micp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
         do idom=idom_beg,idom_end
           DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_micb_cumflx(idom,K,L,NY,NX)
@@ -597,10 +597,9 @@ module InsideTranspMod
     TORTL=(TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
-    DIFOM(idom_doc)=(DOMdiffusivity2_vr(idom_doc,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_don)=(DOMdiffusivity2_vr(idom_don,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_dop)=(DOMdiffusivity2_vr(idom_dop,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_acetate)=(DOMdiffusivity2_vr(idom_acetate,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DO idom=idom_beg,idom_end
+      DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    ENDDO
 
     DO nsolutes=ids_beg,ids_end
       SDifc(nsolutes)=(SoluteDifusvty_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -930,10 +929,9 @@ module InsideTranspMod
     TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
-    DIFOM(idom_doc)=(DOMdiffusivity2_vr(idom_doc,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_don)=(DOMdiffusivity2_vr(idom_don,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_dop)=(DOMdiffusivity2_vr(idom_dop,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
-    DIFOM(idom_acetate)=(DOMdiffusivity2_vr(idom_acetate,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DO idom=idom_beg,idom_end
+      DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    ENDDO
 
     DO nsolutes=ids_beg,ids_end
       SDifc(nsolutes)=(SoluteDifusvty_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1013,8 +1011,8 @@ module InsideTranspMod
 !
   D9765: DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_3DMicp_Transp_flxM(idom,K,N,N6,N5,N4)=DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
-      DOM_3DMacp_Transp_flxM(idom,K,N,N6,N5,N4)=DOM_Adv2MacP_flx(idom,K)+Difus_Macp_flx_DOM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)=DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+      DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)=DOM_Adv2MacP_flx(idom,K)+Difus_Macp_flx_DOM(idom,K)
     enddo
   ENDDO D9765
 
@@ -1032,10 +1030,10 @@ module InsideTranspMod
 !
   D9755: DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_3DMicp_Transp_flx(idom,K,N,N6,N5,N4)=DOM_3DMicp_Transp_flx(idom,K,N,N6,N5,N4) &
-        +DOM_3DMicp_Transp_flxM(idom,K,N,N6,N5,N4)
+      DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)=DOM_MicpTransp_3D(idom,K,N,N6,N5,N4) &
+        +DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)
       DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4)=DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4) &
-        +DOM_3DMacp_Transp_flxM(idom,K,N,N6,N5,N4)
+        +DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
     enddo
   ENDDO D9755
 
@@ -1573,8 +1571,8 @@ module InsideTranspMod
   DifuscG_vr(idg_beg:idg_end,N,N6,N5,N4) = 0._r8
 
   D9750: DO K=1,jcplx
-    DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
-    DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
+    DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
+    DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
   ENDDO D9750
 
   R3PoreSolFlx_vr(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
@@ -1595,8 +1593,8 @@ module InsideTranspMod
   DifuscG_vr(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
 
   D9751: DO K=1,jcplx
-    DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
-    DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
+    DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
+    DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
   ENDDO D9751
 
   R3PoreSolFlx_vr(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8

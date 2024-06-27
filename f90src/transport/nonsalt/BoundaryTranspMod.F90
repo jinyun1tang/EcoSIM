@@ -317,7 +317,7 @@ module BoundaryTranspMod
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_3DMicp_Transp_flxM(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
+        DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
       enddo
     enddo
     !does not include NH3 and NH3B
@@ -333,7 +333,7 @@ module BoundaryTranspMod
 !
   ELSE
     DO  K=1,jcplx
-      DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+      DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSolFlx_vr(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
 
@@ -364,7 +364,7 @@ module BoundaryTranspMod
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_3DMacp_Transp_flxM(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
+        DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
       enddo
     enddo
 
@@ -380,7 +380,7 @@ module BoundaryTranspMod
 !
   ELSE
     DO  K=1,jcplx
-      DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+      DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
   ENDIF
@@ -394,10 +394,10 @@ module BoundaryTranspMod
 !
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_3DMicp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMicp_Transp_flx(idom,K,N,M6,M5,M4) &
-        +DOM_3DMicp_Transp_flxM(idom,K,N,M6,M5,M4)
+      DOM_MicpTransp_3D(idom,K,N,M6,M5,M4)=DOM_MicpTransp_3D(idom,K,N,M6,M5,M4) &
+        +DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)
       DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4) &
-        +DOM_3DMacp_Transp_flxM(idom,K,N,M6,M5,M4)
+        +DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)
     enddo
   enddo
 
@@ -480,7 +480,7 @@ module BoundaryTranspMod
     ENDIF
   ELSE
       DO  K=1,jcplx
-        DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+        DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
       enddo
       R3PoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
       R3GasADFlx(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
@@ -665,10 +665,10 @@ module BoundaryTranspMod
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
-          DOM_Transp2Micp_flx(idom,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom,K,N3,N2,N1) &
-            +DOM_3DMicp_Transp_flxM(idom,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flxM(idom,K,N,N6,N5,N4)
+          DOM_Transp2Micp_vr(idom,K,N3,N2,N1)=DOM_Transp2Micp_vr(idom,K,N3,N2,N1) &
+            +DOM_MicpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)
           DOM_Transp2Macp_flx(idom,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom,K,N3,N2,N1) &
-            +DOM_3DMacp_Transp_flxM(idom,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flxM(idom,K,N,N6,N5,N4)
+            +DOM_MacpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
         enddo
       enddo
       DO ids=ids_beg,ids_end
@@ -680,7 +680,7 @@ module BoundaryTranspMod
 
     ELSE
       DO  K=1,jcplx
-        DOM_Transp2Micp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
       enddo
       R3PorTSolFlx(ids_beg:ids_end,N3,N2,N1)=0.0_r8

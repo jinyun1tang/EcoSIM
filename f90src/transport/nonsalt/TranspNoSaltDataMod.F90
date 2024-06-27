@@ -12,10 +12,10 @@ implicit none
   real(r8), allocatable :: trcg_VFloSnow(:)
   real(r8), allocatable :: trcn_band_VFloSnow(:)
   real(r8), allocatable :: trcn_soil_VFloSnow(:)
-  real(r8),allocatable :: DOM_Adv2MacP_flx(:,:)
-
-  real(r8),allocatable :: CDOM_MacP1(:,:)
-  real(r8),allocatable :: CDOM_MacP2(:,:)
+  real(r8), allocatable :: DOM_Adv2MacP_flx(:,:)
+  real(r8), allocatable :: RXR_gas(:)
+  real(r8), allocatable :: CDOM_MacP1(:,:)
+  real(r8), allocatable :: CDOM_MacP2(:,:)
   
   real(r8), allocatable :: DOM_Adv2MicP_flx(:,:)
   real(r8), allocatable :: Difus_Micp_flx_DOM(:,:)
@@ -23,9 +23,9 @@ implicit none
   real(r8), allocatable :: CDOM_MicP1(:,:)
   real(r8), allocatable :: CDOM_MicP2(:,:)
   real(r8), allocatable :: DOM_MicP2(:,:,:,:,:)
-  real(r8), allocatable :: DOM_3DMicp_Transp_flxM(:,:,:,:,:,:)
-  real(r8), allocatable :: DOM_3DMacp_Transp_flxM(:,:,:,:,:,:)
-  real(r8), allocatable :: DOM_Transp2Micp_flx(:,:,:,:,:)
+  real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:)
+  real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:)
+  real(r8), allocatable :: DOM_Transp2Micp_vr(:,:,:,:,:)
   real(r8), allocatable :: RDOM_micb_cumflx(:,:,:,:,:)
 
   real(r8), allocatable :: dom_FloXSurRunoff(:,:,:,:)
@@ -111,15 +111,17 @@ contains
   implicit none
   integer :: NumOfLitrCmplxs
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
+
+  allocate(RXR_gas(idg_beg:idg_end-1)); RXR_gas=0._r8
   allocate(CDOM_MacP1(idom_beg:idom_end,1:jcplx));CDOM_MacP1=0._r8
   allocate(CDOM_MacP2(idom_beg:idom_end,1:jcplx));CDOM_MacP2=0._r8
 
   allocate(dom_FloXSurRunoff(idom_beg:idom_end,1:jcplx,JV,JH));    dom_FloXSurRunoff=0._r8
   allocate(DOM_MicP2(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));    DOM_MicP2=0._r8
   allocate(RDOM_micb_cumflx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_micb_cumflx=0._r8
-  allocate(DOM_3DMicp_Transp_flxM(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flxM=0._r8
-  allocate(DOM_3DMacp_Transp_flxM(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_3DMacp_Transp_flxM=0._r8
-  allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_flx=0._r8
+  allocate(DOM_MicpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTranspFlxM_3D=0._r8
+  allocate(DOM_MacpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_MacpTranspFlxM_3D=0._r8
+  allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_flx=0._r8
 
   allocate(trcg_RBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_RBLS=0._r8
   allocate(trcn_RBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));   trcn_RBLS=0._r8
@@ -226,8 +228,8 @@ contains
   call destroy(CDOM_MicP1)
   call destroy(CDOM_MicP2)
   call destroy(RDOM_micb_cumflx)
-  call destroy(DOM_3DMicp_Transp_flxM)
-  call destroy(DOM_3DMacp_Transp_flxM)
+  call destroy(DOM_MicpTranspFlxM_3D)
+  call destroy(DOM_MacpTranspFlxM_3D)
   call destroy(RBGCSinkS_vr)
   call destroy(dom_FloXSurRunoff)
   call destroy(dom_2DFloXSurRunoffM)
@@ -264,6 +266,7 @@ contains
   call destroy(VLWatMicPXA)
   call destroy(VLWatMicPXB)
   call destroy(PARG_cef)
+  call destroy(RXR_gas)
 
   call destroy(DOMdiffusivity2_vr)
   call destroy(R3GasADFlx)

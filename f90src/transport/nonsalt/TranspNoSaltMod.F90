@@ -326,7 +326,7 @@ module TranspNoSaltMod
 !
   DO  K=1,jcplx
     DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+DOM_3DMicp_Transp_flxM(idom,K,3,0,NY,NX)
+      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)
     ENDDO
   ENDDO
 !exclude NH3B
@@ -398,7 +398,7 @@ module TranspNoSaltMod
 
         DO  K=1,jcplx
           DO idom=idom_beg,idom_end
-            DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)+DOM_Transp2Micp_flx(idom,K,L,NY,NX)+DOM_XPoreTransp_flx(idom,K,L,NY,NX)
+            DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX)+DOM_XPoreTransp_flx(idom,K,L,NY,NX)
             DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP2(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_XPoreTransp_flx(idom,K,L,NY,NX)
           ENDDO
         ENDDO
@@ -508,9 +508,9 @@ module TranspNoSaltMod
 
   D8855: DO K=1,jcplx
     IF(K.LE.micpar%NumOfPlantLitrCmplxs)THEN
-      DOM_3DMicp_Transp_flx(idom_beg:idom_end,K,3,0,NY,NX)=0.0_r8
+      DOM_MicpTransp_3D(idom_beg:idom_end,K,3,0,NY,NX)=0.0_r8
     ENDIF
-    DOM_3DMicp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
+    DOM_MicpTransp_3D(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
     DOM_3DMacp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
   ENDDO D8855
   end subroutine SurfaceSolutefromAtms
@@ -638,8 +638,8 @@ module TranspNoSaltMod
 
   DO  K=1,micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      RDOMFL0(idom,K,NY,NX)=DOM_3DMicp_Transp_flx(idom,K,3,0,NY,NX)*dts_HeatWatTP    
-      RDOMFL1(idom,K,NY,NX)=DOM_3DMicp_Transp_flx(idom,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+      RDOMFL0(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,0,NY,NX)*dts_HeatWatTP    
+      RDOMFL1(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
     ENDDO
   enddo
 

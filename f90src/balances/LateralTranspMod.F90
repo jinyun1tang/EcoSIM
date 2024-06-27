@@ -219,7 +219,7 @@ implicit none
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
     D8595: DO K=1,jcplx
-      DOM_Transp2Micp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8      
+      DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8      
       DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
     ENDDO D8595
 
@@ -610,8 +610,8 @@ implicit none
       !
       D8585: DO K=1,jcplx
         do idom=idom_beg,idom_end
-          DOM_Transp2Micp_flx(idom,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom,K,N3,N2,N1) &
-            +DOM_3DMicp_Transp_flx(idom,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flx(idom,K,N,N6,N5,N4)
+          DOM_Transp2Micp_vr(idom,K,N3,N2,N1)=DOM_Transp2Micp_vr(idom,K,N3,N2,N1) &
+            +DOM_MicpTransp_3D(idom,K,N,N3,N2,N1)-DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)
           DOM_Transp2Macp_flx(idom,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom,K,N3,N2,N1) &
             +DOM_3DMacp_Transp_flx(idom,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4)
         enddo
@@ -668,7 +668,7 @@ implicit none
       THeatSoiThaw_vr(N3,N2,N1)=0.0_r8
 
       D8596: DO K=1,jcplx
-        DOM_Transp2Micp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
       ENDDO D8596
 
