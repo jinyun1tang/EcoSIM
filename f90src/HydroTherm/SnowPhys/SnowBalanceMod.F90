@@ -88,6 +88,15 @@ implicit none
   VcumSnoDWI(NY,NX)=sum(VLSnoDWIprev_col(1:JS,NY,NX))
   SnowDepth(NY,NX)=sum(SnowThickL_col(1:JS,NY,NX))
   VcumSnowWE(NY,NX)=VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX) 
+
+  write(*,*) "----- SNOW Parameters -----"
+  write(*,*) "Number of Snow Layers: ", JS
+  write(*,*) "Snow Depth: ",SnowDepth(NY,NX)
+  write(*,*) "TKSnow: ", TKSnow (1,NY,NX)
+  write(*,*) "Dry SWE: ", VcumDrySnoWE_col(NY,NX)
+  write(*,*) "Ice SWE: ", VcumIceSnow_col(NY,NX)
+  write(*,*) "Wat SWE: ", VcumWatSnow_col(NY,NX)
+  write(*,*) "---------------------------"
 !
 ! IF SNOWPACK DISAPPEARS
 

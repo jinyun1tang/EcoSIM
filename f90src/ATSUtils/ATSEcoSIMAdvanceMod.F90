@@ -109,6 +109,7 @@ implicit none
     write(*,*) "ATS true E source: ", Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     !for every column send the top layer to the transfer var
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
+    surf_w_source(NY) = Qinfl2MicP(NY,1)
     !surf_e_source(NY) = 1.0e-5
     write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
   ENDDO

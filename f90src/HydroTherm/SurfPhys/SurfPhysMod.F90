@@ -30,6 +30,7 @@ module SurfPhysMod
   use EcoSIMSolverPar
   use EcoSIMCtrlMod
   use SoilPhysParaMod
+  use SnowBalanceMod
 implicit none
   private
   character(len=*), parameter :: mod_filename=&
@@ -1622,6 +1623,10 @@ contains
       if(.not.ATS_cpl_mode)call LateralHydroExchange(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
 
       if(snowRedist_model)call SnowRedistribution(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
+
+    ! Implementing first snow modules
+      call SnowMassUpdate(I,J,NY,NX)
+      call SnowpackLayering(I,J,NY,NX)
 
       call AccumWaterVaporHeatFluxes(M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,&
         Radnet2Snow,VapXAir2TopLay)
