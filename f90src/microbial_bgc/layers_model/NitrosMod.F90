@@ -38,6 +38,8 @@ module nitrosMod
   public :: sumSurfOMCK
   public :: sumMicBiomLayL
   public :: sumHumOMLayL
+  public :: SumMicbGroup
+  public :: sumDOML
   contains
 
 !------------------------------------------------------------------------------------------
@@ -493,9 +495,8 @@ module nitrosMod
     do NGL=JGniA(n),JGnfA(n)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
-        DO NE=1,ielmc
-          SOMAutor=SOMAutor+mBiomeAutor_vr(NE,MID,L,NY,NX)
-        ENDDO
+        NE=ielmc
+        SOMAutor=SOMAutor+mBiomeAutor_vr(NE,MID,L,NY,NX)        
       ENDDO
     ENDDO
   enddo
@@ -505,32 +506,108 @@ module nitrosMod
       do NGL=JGnio(n),JGnfo(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,ielmc
-            SOMHeterK(K)=SOMHeterK(K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
-          ENDDO
+          NE=ielmc
+          SOMHeterK(K)=SOMHeterK(K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)          
         enddo
       enddo  
     enddo    
 
     DO  M=1,ndbiomcp
-      DO NE=1,ielmc
-        SOMHeterK(K)=SOMHeterK(K)+OMBioResdu_vr(NE,M,K,L,NY,NX)        
-      ENDDO
+      NE=ielmc
+      SOMHeterK(K)=SOMHeterK(K)+OMBioResdu_vr(NE,M,K,L,NY,NX)              
     ENDDO  
 
     !add dom
-    DO NE=1,ielmc
-      SOMHeterK(K)=SOMHeterK(K)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
-    ENDDO
+    NE=ielmc
+    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    
     !add acetate
     SOMHeterK(K)=SOMHeterK(K)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     DO M=1,jsken
-      DO NE=1,ielmc
-        SOMHeterK(K)=SOMHeterK(K)+SolidOM_vr(NE,M,K,L,NY,NX)
-      ENDDO
+      NE=ielmc
+      SOMHeterK(K)=SOMHeterK(K)+SolidOM_vr(NE,M,K,L,NY,NX)      
     ENDDO  
   ENDDO
   
   end subroutine sumSurfOMCK
+!------------------------------------------------------------------------------------------
+
+  subroutine SumMicbGroup(L,NY,NX,igroup,MicbE,isauto)
+  !
+  !Description
+  !
+  implicit none
+  integer,  intent(in) :: L,NY,NX
+  integer,  intent(in) :: igroup
+  real(r8), intent(out):: MicbE(1:NumPlantChemElms)
+  logical, optional, intent(in) :: isauto
+  logical :: isauto_loc
+  integer :: K,NE,M,MID,NGL
+  if(present(isauto))then
+    isauto_loc=isauto
+  else
+    isauto_loc=.false.
+  endif  
+
+  micBE=0._r8
+  if(isauto_loc)then
+    if(igroup /= micpar%mid_AmmoniaOxidBacter        .and. &
+       igroup /= micpar%mid_NitriteOxidBacter        .and. & 
+       igroup /= micpar%mid_AerobicMethanotrofBacter .and. &
+       igroup /= micpar%mid_H2GenoMethanogArchea) then
+      call endrun('undefined autotroph group in '//trim(mod_filename),__LINE__)
+    endif
+
+    do NGL=JGniA(igroup),JGnfA(igroup)
+      DO  M=1,nlbiomcp
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          micBE(NE)=micBE(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+        ENDDO
+      ENDDO
+    ENDDO
+
+  else
+    if(igroup /= micpar%mid_Aerob_HeteroBacter  .and. &
+       igroup /= micpar%mid_Facult_DenitBacter  .and. &
+       igroup /= micpar%mid_Aerob_Fungi         .and. &
+       igroup /= micpar%mid_fermentor           .and. &
+       igroup /= micpar%mid_AcetoMethanogArchea .and. &
+       igroup /= micpar%mid_aerob_N2Fixer       .and. &
+       igroup /= micpar%mid_Anaerob_N2Fixer) then
+      call endrun('undefined heterotroph group in '//trim(mod_filename),__LINE__)
+    endif
+    
+    DO K=1,micpar%NumOfLitrCmplxs    
+      do NGL=JGnio(igroup),JGnfo(igroup)
+        DO  M=1,nlbiomcp
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            micBE(NE)=micBE(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+          ENDDO
+        enddo
+      enddo  
+    enddo    
+
+  endif
+  end subroutine SumMicbGroup
+
+!------------------------------------------------------------------------------------------
+  subroutine sumDOML(L,NY,NX,DOM)
+
+  implicit none
+  integer,  intent(in) :: L,NY,NX
+  real(r8), intent(out):: DOM(idom_beg:idom_end)
+
+  integer :: idom, K
+
+  DOM=0._r8
+  DO K=1,micpar%NumOfLitrCmplxs
+    DO idom=idom_beg,idom_end
+      DOM(idom)=DOM(idom)+DOM_vr(idom,K,L,NY,NX)+DOM_MacP_vr(idom,K,L,NY,NX)
+    ENDDO
+  ENDDO
+
+  end subroutine sumDOML
 end module nitrosMod

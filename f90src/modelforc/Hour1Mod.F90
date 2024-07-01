@@ -2003,18 +2003,18 @@ module Hour1Mod
       ROWN(NY,NX)=ROWI(I,NY,NX)
       D50: DO L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
-          DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
-          WDNHB(L,NY,NX)=0.0_r8
+          BandDepthNH4_vr(L,NY,NX)=DLYR(3,L,NY,NX)
+          BandWidthNH4_vr(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          DPNHB(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CumDepth2LayerBottom(L-1,NY,NX))
-          WDNHB(L,NY,NX)=AMIN1(0.025_r8,ROWN(NY,NX))
+          BandDepthNH4_vr(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CumDepth2LayerBottom(L-1,NY,NX))
+          BandWidthNH4_vr(L,NY,NX)=AMIN1(0.025_r8,ROWN(NY,NX))
         ELSE
-          DPNHB(L,NY,NX)=0.0_r8
-          WDNHB(L,NY,NX)=0.0_r8
+          BandDepthNH4_vr(L,NY,NX)=0.0_r8
+          BandWidthNH4_vr(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-          trcs_VLN_vr(ids_NH4B,L,NY,NX)=AMIN1(0.999_r8,WDNHB(L,NY,NX)/ROWN(NY,NX) &
-            *DPNHB(L,NY,NX)/DLYR(3,L,NY,NX))
+          trcs_VLN_vr(ids_NH4B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNH4_vr(L,NY,NX)/ROWN(NY,NX) &
+            *BandDepthNH4_vr(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
           trcs_VLN_vr(ids_NH4B,L,NY,NX)=0.0_r8
         ENDIF
@@ -2031,7 +2031,7 @@ module Hour1Mod
         trcx_solml(idx_NH4,L,NY,NX)=XN4T*trcs_VLN_vr(ids_NH4,L,NY,NX)
         trcx_solml(idx_NH4B,L,NY,NX)=XN4T*trcs_VLN_vr(ids_NH4B,L,NY,NX)
       ENDDO D50
-      DPNH4(NY,NX)=DPNHB(LFDPTH,NY,NX)+CumDepth2LayerBottom(LFDPTH-1,NY,NX)
+      DPNH4(NY,NX)=BandDepthNH4_vr(LFDPTH,NY,NX)+CumDepth2LayerBottom(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     RESET WIDTH AND DEPTH OF NO3 FERTILIZER BAND IF NEW BAND

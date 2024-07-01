@@ -1479,23 +1479,23 @@ implicit none
 !
     IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
       IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
-        WDNHBDL=WDNHB(L,NY,NX)*DLYR(3,L,NY,NX)
-        WDNHBD0=WDNHB(L0,NY,NX)*DLYR(3,L0,NY,NX)
-        WDNHBD1=WDNHB(L1,NY,NX)*DLYR(3,L1,NY,NX)
+        WDNHBDL=BandWidthNH4_vr(L,NY,NX)*DLYR(3,L,NY,NX)
+        WDNHBD0=BandWidthNH4_vr(L0,NY,NX)*DLYR(3,L0,NY,NX)
+        WDNHBD1=BandWidthNH4_vr(L1,NY,NX)*DLYR(3,L1,NY,NX)
         FXWDNHB=AMIN1(FX*WDNHBDL,WDNHBD0)
         WDNHBD1=WDNHBD1+FXWDNHB
         WDNHBD0=WDNHBD0-FXWDNHB
-        WDNHB(L1,NY,NX)=WDNHBD1/DLYR(3,L1,NY,NX)
-        WDNHB(L0,NY,NX)=WDNHBD0/DLYR(3,L0,NY,NX)
+        BandWidthNH4_vr(L1,NY,NX)=WDNHBD1/DLYR(3,L1,NY,NX)
+        BandWidthNH4_vr(L0,NY,NX)=WDNHBD0/DLYR(3,L0,NY,NX)
         IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNH4(NY,NX))THEN
-          FXDPNHB=AMIN1(FX*DPNHB(L,NY,NX),DPNHB(L0,NY,NX))
-          DPNHB(L1,NY,NX)=DPNHB(L1,NY,NX)+FXDPNHB
-          DPNHB(L0,NY,NX)=DPNHB(L0,NY,NX)-FXDPNHB
+          FXDPNHB=AMIN1(FX*BandDepthNH4_vr(L,NY,NX),BandDepthNH4_vr(L0,NY,NX))
+          BandDepthNH4_vr(L1,NY,NX)=BandDepthNH4_vr(L1,NY,NX)+FXDPNHB
+          BandDepthNH4_vr(L0,NY,NX)=BandDepthNH4_vr(L0,NY,NX)-FXDPNHB
         ENDIF
-        trcs_VLN_vr(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L1,NY,NX) &
-          /ROWN(NY,NX)*DPNHB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN_vr(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L0,NY,NX) &
-          /ROWN(NY,NX)*DPNHB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
+        trcs_VLN_vr(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNH4_vr(L1,NY,NX) &
+          /ROWN(NY,NX)*BandDepthNH4_vr(L1,NY,NX)/DLYR(3,L1,NY,NX)))
+        trcs_VLN_vr(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNH4_vr(L0,NY,NX) &
+          /ROWN(NY,NX)*BandDepthNH4_vr(L0,NY,NX)/DLYR(3,L0,NY,NX)))
         trcs_VLN_vr(ids_NH4,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NH4B,L1,NY,NX)
         trcs_VLN_vr(ids_NH4,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NH4B,L0,NY,NX)
 

@@ -214,15 +214,8 @@ module readiMod
   call ncd_getvar(grid_nfid,'ALTIG',loc,ALTIG)
   call ncd_getvar(grid_nfid,'ATCAG',loc,ATCAG)
   call ncd_getvar(grid_nfid,'IDTBLG',loc,iWaterTabelMode)
-!  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
-!  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
-!  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
-!  call ncd_getvar(grid_nfid,'CH4EG',loc,CH4EG)
-!  call ncd_getvar(grid_nfid,'Z2OEG',loc,Z2OEG)
-!  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
-!  call ncd_getvar(grid_nfid,'NCNG',loc,NCNG)
   call ncd_getvar(grid_nfid,'DTBLIG',loc,DTBLIG)
   call ncd_getvar(grid_nfid,'DTBLDIG',loc,DTBLDIG)
   call ncd_getvar(grid_nfid,'DTBLGG',loc,DTBLGG)
@@ -251,16 +244,10 @@ module readiMod
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
     write(*,'(40A)')('-',ll=1,40)
-    write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
-    write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
-!    write(*,*)'atmospheric CO2 (ppm): CO2EIG',CO2EIG
-!    write(*,*)'atmospheric CH4 (ppm): CH4EG',CH4EG
-!    write(*,*)'atmospheric N2O (ppm): Z2OEG',Z2OEG
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
-!    write(*,*)'flag for lateral connections between grid cells (1),'// &
-!      ' no connections (3): NCNG',GridConectionMode(NCNG)
+
     write(*,*)'depth of natural water table: DTBLIG',DTBLIG
     write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
     write(*,*)'slope of natural water table relative to landscape '// &

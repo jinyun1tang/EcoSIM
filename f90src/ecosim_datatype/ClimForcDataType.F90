@@ -61,7 +61,7 @@ implicit none
   real(r8),target,allocatable ::  TairK(:,:)                           !air temperature, [K]
   real(r8),target,allocatable ::  WindSpeedAtm(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
-  real(r8),target,allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
+  real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
   real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
   real(r8),target,allocatable ::  DayLenthCurrent(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DayLenthPrev(:,:)                          !daylength of previous day, [h]
@@ -190,7 +190,7 @@ implicit none
   allocate(TairK(JY,JX));         TairK=0._r8
   allocate(WindSpeedAtm(JY,JX));          WindSpeedAtm=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
-  allocate(VPK(JY,JX));         VPK=0._r8
+  allocate(VPK_col(JY,JX));         VPK_col=0._r8
   allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
   allocate(DayLenthCurrent(JY,JX));        DayLenthCurrent=0._r8
   allocate(DayLenthPrev(JY,JX));        DayLenthPrev=0._r8
@@ -320,7 +320,7 @@ implicit none
   call destroy(TairK)
   call destroy(WindSpeedAtm)
   call destroy(VPA)
-  call destroy(VPK)
+  call destroy(VPK_col)
   call destroy(PBOT)
   call destroy(DayLenthCurrent)
   call destroy(DayLenthPrev)

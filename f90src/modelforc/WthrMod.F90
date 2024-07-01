@@ -172,18 +172,18 @@ module WthrMod
       !      ALTI=altitude
       !
       IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
-        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
+        VPK_col(NY,NX)=VAVG1+VMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
           /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
       ELSEIF(J.GT.SolarNoonHour_col(NY,NX)+3)THEN
-        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
+        VPK_col(NY,NX)=VAVG3+VMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
           /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
       ELSE
-        VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
+        VPK_col(NY,NX)=VAVG2+VMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
           -DayLenthCurrent(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK(NY,NX))) &
       VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
-      VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX))
+      VPK_col(NY,NX)=AMIN1(VPS(NY,NX),VPK_col(NY,NX))
 !
       !     UA=wind speed
 !
@@ -237,7 +237,7 @@ module WthrMod
       TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
       !elevation corrected saturated air vapor pressure, KPa
       VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
-      VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))   
+      VPK_col(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))   
       WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
 
       !snowfall is determined by air tempeature
@@ -320,7 +320,7 @@ module WthrMod
         ELSE
           CLD=0.2_r8
         ENDIF
-        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK(NY,NX)/TairK(NY,NX))**0.131_r8)
+        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK_col(NY,NX)/TairK(NY,NX))**0.131_r8)
         EMM=EMM*(1.0_r8+0.242_r8*CLD**0.583_r8)
         !
         !     IF PHYTOTRON
@@ -499,7 +499,7 @@ module WthrMod
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK(NY,NX))) &
           vps(ny,ny)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
-          VPK(NY,NX)=VPK(NY,NX)*VPS(NY,NX)/VPX
+          VPK_col(NY,NX)=VPK_col(NY,NX)*VPS(NY,NX)/VPX
         ENDIF
       ENDIF
 !
@@ -515,7 +515,7 @@ module WthrMod
       RadPARDirect_col(NY,NX)=RadPARDirect_col(NY,NX)*TDRAD(N,NY,NX)
       RadPARDiffus_col(NY,NX)=RadPARDiffus_col(NY,NX)*TDRAD(N,NY,NX)
       WindSpeedAtm(NY,NX)=WindSpeedAtm(NY,NX)*TDWND(N,NY,NX)
-      VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX)*TDHUM(N,NY,NX))
+      VPK_col(NY,NX)=AMIN1(VPS(NY,NX),VPK_col(NY,NX)*TDHUM(N,NY,NX))
       PrecAsRain(NY,NX)=PrecAsRain(NY,NX)*TDPRC(N,NY,NX)
       PrecAsSnow(NY,NX)=PrecAsSnow(NY,NX)*TDPRC(N,NY,NX)
       PRECII(NY,NX)=PRECII(NY,NX)*TDIRI(N,NY,NX)
@@ -543,14 +543,13 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RadSWDirect_col(NY,NX) &
-        *SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
+
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))          !celcius
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))          !celcius
-      HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))          !maximum humidity, vapor pressure, KPa
-      HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))          !minimum humidity, vapor pressure, KPa
+      HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, KPa
+      HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, KPa
       TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)      !wind speed, m/hr
-      VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TairK(NY,NX)    !atmospheric vapor concentration, [m3 m-3], 2.173E-03_r8=18g/mol/(8.3142)
+      VPA(NY,NX)=VPK_col(NY,NX)*2.173E-03_r8/TairK(NY,NX)    !atmospheric vapor concentration, [m3 m-3], 2.173E-03_r8=18g/mol/(8.3142)
 !      PrecDaily_col(NY,NX)=PrecDaily_col(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
 !        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
 !

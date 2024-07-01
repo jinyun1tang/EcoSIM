@@ -160,7 +160,7 @@ contains
   call this%Initallocate()
 
 !set up functional group ids
-!five om-complexes
+! five om-complexes
   this%mid_Aerob_HeteroBacter=1
   this%mid_Facult_DenitBacter=2
   this%mid_Aerob_Fungi=3
@@ -176,7 +176,7 @@ contains
 
   this%is_anerobic_hetr(this%mid_fermentor)=.true.
   this%is_anerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
-!the abstract complex
+!the autotrophic complex
   this%mid_AmmoniaOxidBacter=1
   this%mid_NitriteOxidBacter=2
   this%mid_AerobicMethanotrofBacter=3
@@ -202,27 +202,27 @@ contains
   real(r8) :: COMCI(NumLiveMicrbCompts,1:this%jcplx)
   real(r8) :: OMCI1(NumLiveMicrbCompts,1:this%jcplx)  !allocation of biomass to kinetic components
   integer :: K,M,NGL,N
-  associate(                    &
-    OHCK     => this%OHCK     , &
-    OMCK     => this%OMCK     , &
-    ORCK     => this%ORCK     , &
-    OQCK     => this%OQCK     , &
-    ORCI     => this%ORCI     , &
-    OMCI     => this%OMCI     , &
-    CNOFC    => this%CNOFC    , &
-    CPOFC    => this%CPOFC    , &
-    rNCOMC    => this%rNCOMC    , &
-    rPCOMC    => this%rPCOMC    , &
-    rNCOMCAutor  => this%rNCOMCAutor  , &
-    rPCOMCAutor  => this%rPCOMCAutor  , &
-    FL       => this%FL       , &
-    DOSA     => this%DOSA     , &
-    SPOSC    => this%SPOSC    , &
-    CNRH     => this%CNRH     , &
-    CPRH     => this%CPRH     , &
-    OMCF     => this%OMCF     , &
-    OMCA     => this%OMCA     , &
-    JG       => this%jguilds    &
+  associate(                         &
+    OHCK        => this%OHCK,        &
+    OMCK        => this%OMCK,        &
+    ORCK        => this%ORCK,        &
+    OQCK        => this%OQCK,        &
+    ORCI        => this%ORCI,        &
+    OMCI        => this%OMCI,        &
+    CNOFC       => this%CNOFC,       &
+    CPOFC       => this%CPOFC,       &
+    rNCOMC      => this%rNCOMC,      &
+    rPCOMC      => this%rPCOMC,      &
+    rNCOMCAutor => this%rNCOMCAutor, &
+    rPCOMCAutor => this%rPCOMCAutor, &
+    FL          => this%FL,          &
+    DOSA        => this%DOSA,        &
+    SPOSC       => this%SPOSC,       &
+    CNRH        => this%CNRH,        &
+    CPRH        => this%CPRH,        &
+    OMCF        => this%OMCF,        &
+    OMCA        => this%OMCA,        &
+    JG          => this%jguilds      &
   )
   OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
   OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)

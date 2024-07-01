@@ -108,7 +108,6 @@
         call SetAnnualAccumlators(NY,NX)
       ENDIF
 
-      TRAD(NY,NX)=0._r8
       TAMX(NY,NX)=-100.0_r8
       TAMN(NY,NX)=100.0_r8
       HUDX(NY,NX)=0._r8

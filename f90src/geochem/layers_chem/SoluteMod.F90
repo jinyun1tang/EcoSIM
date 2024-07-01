@@ -495,7 +495,7 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWNH4=0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
+      BandWidthNH4_vr(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,BandWidthNH4_vr(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
 !
@@ -505,15 +505,15 @@ module SoluteMod
       IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNH4(NY,NX))THEN
         DPFLW=FLWD+DWNH4
         DPNH4(NY,NX)=DPNH4(NY,NX)+DPFLW
-        DPNHB(L,NY,NX)=DPNHB(L,NY,NX)+DPFLW
-        IF(DPNHB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-          DPNHB(L+1,NY,NX)=DPNHB(L+1,NY,NX)+(DPNHB(L,NY,NX)-DLYR(3,L,NY,NX))
-          WDNHB(L+1,NY,NX)=WDNHB(L,NY,NX)
-          DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
-        ELSEIF(DPNHB(L,NY,NX).LT.0.0)THEN
-          DPNHB(L-1,NY,NX)=DPNHB(L-1,NY,NX)+DPNHB(L,NY,NX)
-          DPNHB(L,NY,NX)=0._r8
-          WDNHB(L,NY,NX)=0._r8
+        BandDepthNH4_vr(L,NY,NX)=BandDepthNH4_vr(L,NY,NX)+DPFLW
+        IF(BandDepthNH4_vr(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+          BandDepthNH4_vr(L+1,NY,NX)=BandDepthNH4_vr(L+1,NY,NX)+(BandDepthNH4_vr(L,NY,NX)-DLYR(3,L,NY,NX))
+          BandWidthNH4_vr(L+1,NY,NX)=BandWidthNH4_vr(L,NY,NX)
+          BandDepthNH4_vr(L,NY,NX)=DLYR(3,L,NY,NX)
+        ELSEIF(BandDepthNH4_vr(L,NY,NX).LT.0.0)THEN
+          BandDepthNH4_vr(L-1,NY,NX)=BandDepthNH4_vr(L-1,NY,NX)+BandDepthNH4_vr(L,NY,NX)
+          BandDepthNH4_vr(L,NY,NX)=0._r8
+          BandWidthNH4_vr(L,NY,NX)=0._r8
         ENDIF
       ENDIF
 !
@@ -526,8 +526,8 @@ module SoluteMod
 !
       XVLNH4=trcs_VLN_vr(ids_NH4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        trcs_VLN_vr(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNHB(L,NY,NX) &
-          /ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
+        trcs_VLN_vr(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNH4_vr(L,NY,NX) &
+          /ROWN(NY,NX)*BandDepthNH4_vr(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_NH4B,L,NY,NX)=0._r8
       ENDIF
@@ -554,8 +554,8 @@ module SoluteMod
 !
 !     AMALGAMATE NH4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPNHB(L,NY,NX)=0._r8
-      WDNHB(L,NY,NX)=0._r8
+      BandDepthNH4_vr(L,NY,NX)=0._r8
+      BandWidthNH4_vr(L,NY,NX)=0._r8
       trcs_VLN_vr(ids_NH4,L,NY,NX)=1._r8
       trcs_VLN_vr(ids_NH4B,L,NY,NX)=0._r8
       trcs_VLN_vr(idg_NH3,L,NY,NX)=trcs_VLN_vr(ids_NH4,L,NY,NX)

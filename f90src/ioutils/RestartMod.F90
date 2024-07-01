@@ -8070,10 +8070,10 @@ implicit none
     call restartvar(ncid, flag, varname='WDNHB', dim1name='column', &
       dim2name='levsoi',long_name='width of NH4 band', units='m', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,WDNHB,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,BandWidthNH4_vr,datrc_2d)
   else
     !print*,'WDNHB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WDNHB,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,BandWidthNH4_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='WDNHB', dim1name='column', &
       dim2name='levsoi',long_name='width of NH4 band', units='m', interpinic_flag='skip',&
@@ -8141,10 +8141,10 @@ implicit none
     call restartvar(ncid, flag, varname='DPNHB', dim1name='column', &
       dim2name='levsoi',long_name='depth of NH4 band', units='m', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,DPNHB,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,BandDepthNH4_vr,datrc_2d)
   else
     !print*,'DPNHB'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DPNHB,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,BandDepthNH4_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='DPNHB', dim1name='column', &
       dim2name='levsoi',long_name='depth of NH4 band', units='m', interpinic_flag='skip',&

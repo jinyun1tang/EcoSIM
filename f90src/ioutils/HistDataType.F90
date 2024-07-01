@@ -4,12 +4,13 @@ module HistDataType
 ! when output is done with netcdf, no id is needed.
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
+  use nitrosMod, only : SumMicbGroup,sumDOML
   use GridConsts
   use GridMod
   use HistFileMod
   use MiniMathMod, only : safe_adb,AZMAX1
   use ElmIDMod
-  use EcoSiMParDataMod, only : pltpar
+  use EcoSiMParDataMod, only : pltpar, micpar
   use GridDataType
   use EcoSIMCtrlDataType
   use EcosimConst
@@ -54,7 +55,7 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DOP_FLX_col(:)    !HydroSubsDOPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)      !
+  real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)   !
 
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
   real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -67,7 +68,6 @@ implicit none
   real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_P_col(:)     !EcoHavstElmnt_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_RADN_col(:)           !TRAD(NY,NX)
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
@@ -116,7 +116,7 @@ implicit none
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
   real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA(NY,NX)
-  real(r8),pointer   :: h1D_HUM_col(:)            !VPK(NY,NX)
+  real(r8),pointer   :: h1D_HUM_col(:)            !VPK_col(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm(NY,NX)/secs1hour
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
@@ -159,6 +159,14 @@ implicit none
   real(r8),pointer   :: h2D_tSON_vr(:,:)
   real(r8),pointer   :: h2D_tSOP_vr(:,:)  
   real(r8),pointer   :: h2D_VHeatCap_vr(:,:)  
+  real(r8),pointer   :: h2D_DOC_vr(:,:)
+  real(r8),pointer   :: h2D_DON_vr(:,:)
+  real(r8),pointer   :: h2D_DOP_vr(:,:)
+  real(r8),pointer   :: h2D_acetate_vr(:,:)
+  real(r8),pointer   :: h1D_DOC_litr_col(:)
+  real(r8),pointer   :: h1D_DON_litr_col(:)
+  real(r8),pointer   :: h1D_DOP_litr_col(:)
+  real(r8),pointer   :: h1D_acetate_litr_col(:)
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -269,6 +277,67 @@ implicit none
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)       !
+
+  real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)     !aerobic heterotropic bacteria
+  real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   !aerobic heterotropic fungi
+  real(r8),pointer   :: h2D_faculDenitC_vr(:,:)   !facultative denitrifier
+  real(r8),pointer   :: h2D_fermentorC_vr(:,:)  !fermentor
+  real(r8),pointer   :: h2D_acetometgC_vr(:,:)  !acetogenic methanogen
+  real(r8),pointer   :: h2D_aeroN2fixC_vr(:,:)  !aerobic N2 fixer
+  real(r8),pointer   :: h2D_anaeN2FixC_vr(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_NH3OxiBactC_vr(:,:)
+  real(r8),pointer   :: h2D_NO2OxiBactC_vr(:,:)
+  real(r8),pointer   :: h2D_CH4AeroOxiC_vr(:,:)
+  real(r8),pointer   :: h2D_H2MethogenC_vr(:,:)
+
+  real(r8),pointer   :: h2D_RCH4Prod_vr(:,:)
+  real(r8),pointer   :: h2D_RCH4Oxi_aero_vr(:,:)
+  real(r8),pointer   :: h2D_RFermen_vr(:,:)
+  real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
+  real(r8),pointer   :: h2o_n2oprod_vr(:,:)
+
+  real(r8),pointer   :: h1D_RCH4Prod_litr_col(:)
+  real(r8),pointer   :: h1D_RCH4Oxi_aero_litr_col(:)
+  real(r8),pointer   :: h1D_RFermen_litr_col(:)
+  real(r8),pointer   :: h1D_nh3oxi_litr_col(:)
+  real(r8),pointer   :: h1o_n2oprod_litr_col(:)
+
+  real(r8),pointer   :: h2D_AeroHrBactN_vr(:,:)     !aerobic heterotropic bacteria
+  real(r8),pointer   :: h2D_AeroHrFungN_vr(:,:)   !aerobic heterotropic fungi
+  real(r8),pointer   :: h2D_faculDenitN_vr(:,:)   !facultative denitrifier
+  real(r8),pointer   :: h2D_fermentorN_vr(:,:)  !fermentor
+  real(r8),pointer   :: h2D_acetometgN_vr(:,:)  !acetogenic methanogen
+  real(r8),pointer   :: h2D_aeroN2fixN_vr(:,:)  !aerobic N2 fixer
+  real(r8),pointer   :: h2D_anaeN2FixN_vr(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_NH3OxiBactN_vr(:,:)
+  real(r8),pointer   :: h2D_NO2OxiBactN_vr(:,:)
+  real(r8),pointer   :: h2D_CH4AeroOxiN_vr(:,:)
+  real(r8),pointer   :: h2D_H2MethogenN_vr(:,:)
+
+  real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)     !aerobic heterotropic bacteria
+  real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   !aerobic heterotropic fungi
+  real(r8),pointer   :: h2D_faculDenitP_vr(:,:)   !facultative denitrifier
+  real(r8),pointer   :: h2D_fermentorP_vr(:,:)  !fermentor
+  real(r8),pointer   :: h2D_acetometgP_vr(:,:)  !acetogenic methanogen
+  real(r8),pointer   :: h2D_aeroN2fixP_vr(:,:)  !aerobic N2 fixer
+  real(r8),pointer   :: h2D_anaeN2FixP_vr(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_NH3OxiBactP_vr(:,:)
+  real(r8),pointer   :: h2D_NO2OxiBactP_vr(:,:)
+  real(r8),pointer   :: h2D_CH4AeroOxiP_vr(:,:)
+  real(r8),pointer   :: h2D_H2MethogenP_vr(:,:)
+
+  real(r8),pointer   :: h2D_AeroHrBactE_litr_col(:,:)     !aerobic heterotropic bacteria
+  real(r8),pointer   :: h2D_AeroHrFungE_litr_col(:,:)   !aerobic heterotropic fungi
+  real(r8),pointer   :: h2D_faculDenitE_litr_col(:,:)   !facultative denitrifier
+  real(r8),pointer   :: h2D_fermentorE_litr_col(:,:)  !fermentor
+  real(r8),pointer   :: h2D_acetometgE_litr_col(:,:)  !acetogenic methanogen
+  real(r8),pointer   :: h2D_aeroN2fixE_litr_col(:,:)  !aerobic N2 fixer
+  real(r8),pointer   :: h2D_anaeN2FixE_litr_col(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_NH3OxiBactE_litr_col(:,:)
+  real(r8),pointer   :: h2D_NO2OxiBactE_litr_col(:,:)
+  real(r8),pointer   :: h2D_CH4AeroOxiE_litr_col(:,:)
+  real(r8),pointer   :: h2D_H2MethogenE_litr_col(:,:)
+
   real(r8),pointer   :: h2D_CO2_vr(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_CH4_vr(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
@@ -359,7 +428,6 @@ implicit none
   allocate(this%h1D_cPO4_LITR_col(beg_col:end_col))      ;this%h1D_cPO4_LITR_col(:)=spval
   allocate(this%h1D_cEXCH_P_LITR_col(beg_col:end_col))   ;this%h1D_cEXCH_P_LITR_col(:)=spval
   allocate(this%h1D_NET_P_MIN_col(beg_col:end_col))      ;this%h1D_NET_P_MIN_col(:)=spval
-  allocate(this%h1D_RADN_col(beg_col:end_col))           ;this%h1D_RADN_col(:)=spval
 
   allocate(this%h1D_PSI_SURF_col(beg_col:end_col))       ;this%h1D_PSI_SURF_col(:)=spval
   allocate(this%h1D_SURF_ELEV_col(beg_col:end_col))      ;this%h1D_SURF_ELEV_col(:)=spval
@@ -560,6 +628,77 @@ implicit none
   allocate(this%h2D_N2O_vr(beg_col:end_col,1:JZ))        ;this%h2D_N2O_vr(:,:)=spval
   allocate(this%h2D_NH3_vr(beg_col:end_col,1:JZ))        ;this%h2D_NH3_vr(:,:)=spval
   allocate(this%h2D_TEMP_vr(beg_col:end_col,1:JZ))       ;this%h2D_TEMP_vr(:,:)=spval
+
+  allocate(this%h2D_DOC_vr(beg_col:end_col,1:JZ)); this%h2D_DOC_vr(:,:)=spval
+  allocate(this%h2D_DON_vr(beg_col:end_col,1:JZ)); this%h2D_DON_vr(:,:)=spval
+  allocate(this%h2D_DOP_vr(beg_col:end_col,1:JZ)); this%h2D_DOP_vr(:,:)=spval
+  allocate(this%h2D_acetate_vr(beg_col:end_col,1:JZ)); this%h2D_acetate_vr(:,:)=spval
+  allocate(this%h1D_DOC_litr_col(beg_col:end_col));  this%h1D_DOC_litr_col(:)=spval
+  allocate(this%h1D_DON_litr_col(beg_col:end_col)); this%h1D_DON_litr_col(:)=spval
+  allocate(this%h1D_DOP_litr_col(beg_col:end_col)); this%h1D_DOP_litr_col(:)=spval
+  allocate(this%h1D_acetate_litr_col(beg_col:end_col)); this%h1D_acetate_litr_col(:)=spval
+
+  allocate(this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactC_vr(:,:)=spval
+  allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
+  allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
+  allocate(this%h2D_fermentorC_vr(beg_col:end_col,1:JZ));  this%h2D_fermentorC_vr(:,:)=spval
+  allocate(this%h2D_acetometgC_vr(beg_col:end_col,1:JZ));  this%h2D_acetometgC_vr(:,:)=spval
+  allocate(this%h2D_aeroN2fixC_vr(beg_col:end_col,1:JZ));  this%h2D_aeroN2fixC_vr(:,:)=spval
+  allocate(this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ));  this%h2D_anaeN2FixC_vr(:,:)=spval
+  allocate(this%h2D_NH3OxiBactC_vr(beg_col:end_col,1:JZ)); this%h2D_NH3OxiBactC_vr(:,:)=spval
+  allocate(this%h2D_NO2OxiBactC_vr(beg_col:end_col,1:JZ)); this%h2D_NO2OxiBactC_vr(:,:)=spval
+  allocate(this%h2D_CH4AeroOxiC_vr(beg_col:end_col,1:JZ)); this%h2D_CH4AeroOxiC_vr(:,:)=spval
+  allocate(this%h2D_H2MethogenC_vr(beg_col:end_col,1:JZ)); this%h2D_H2MethogenC_vr(:,:)=spval
+
+  allocate(this%h2D_RCH4Prod_vr(beg_col:end_col,1:JZ));   this%h2D_RCH4Prod_vr(:,:)=spval
+  allocate(this%h2D_RCH4Oxi_aero_vr(beg_col:end_col,1:JZ)); this%h2D_RCH4Oxi_aero_vr(:,:)=spval
+  allocate(this%h2D_RFermen_vr(beg_col:end_col,1:JZ)); this%h2D_RFermen_vr(:,:)=spval
+  allocate(this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ));  this%h2D_nh3oxi_vr(:,:)=spval
+  allocate(this%h2o_n2oprod_vr(beg_col:end_col,1:JZ));  this%h2o_n2oprod_vr(:,:)=spval
+
+  allocate(this%h1D_RCH4Prod_litr_col(beg_col:end_col));  this%h1D_RCH4Prod_litr_col(:)=spval
+  allocate(this%h1D_RCH4Oxi_aero_litr_col(beg_col:end_col)); this%h1D_RCH4Oxi_aero_litr_col(:)=spval
+  allocate(this%h1D_RFermen_litr_col(beg_col:end_col));  this%h1D_RFermen_litr_col(:)=spval
+  allocate(this%h1D_nh3oxi_litr_col(beg_col:end_col)); this%h1D_nh3oxi_litr_col(:)=spval
+  allocate(this%h1o_n2oprod_litr_col(beg_col:end_col));  this%h1o_n2oprod_litr_col(:)=spval
+
+  allocate(this%h2D_AeroHrBactN_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactN_vr(:,:)=spval
+  allocate(this%h2D_AeroHrFungN_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungN_vr(:,:)=spval
+  allocate(this%h2D_faculDenitN_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitN_vr(:,:)=spval
+  allocate(this%h2D_fermentorN_vr(beg_col:end_col,1:JZ));  this%h2D_fermentorN_vr(:,:)=spval
+  allocate(this%h2D_acetometgN_vr(beg_col:end_col,1:JZ));  this%h2D_acetometgN_vr(:,:)=spval
+  allocate(this%h2D_aeroN2fixN_vr(beg_col:end_col,1:JZ));  this%h2D_aeroN2fixN_vr(:,:)=spval
+  allocate(this%h2D_anaeN2FixN_vr(beg_col:end_col,1:JZ));  this%h2D_anaeN2FixN_vr(:,:)=spval
+  allocate(this%h2D_NH3OxiBactN_vr(beg_col:end_col,1:JZ)); this%h2D_NH3OxiBactN_vr(:,:)=spval
+  allocate(this%h2D_NO2OxiBactN_vr(beg_col:end_col,1:JZ)); this%h2D_NO2OxiBactN_vr(:,:)=spval
+  allocate(this%h2D_CH4AeroOxiN_vr(beg_col:end_col,1:JZ)); this%h2D_CH4AeroOxiN_vr(:,:)=spval
+  allocate(this%h2D_H2MethogenN_vr(beg_col:end_col,1:JZ)); this%h2D_H2MethogenN_vr(:,:)=spval
+
+  allocate(this%h2D_AeroHrBactP_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactP_vr(:,:)=spval
+  allocate(this%h2D_AeroHrFungP_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungP_vr(:,:)=spval
+  allocate(this%h2D_faculDenitP_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitP_vr(:,:)=spval
+  allocate(this%h2D_fermentorP_vr(beg_col:end_col,1:JZ));  this%h2D_fermentorP_vr(:,:)=spval
+  allocate(this%h2D_acetometgP_vr(beg_col:end_col,1:JZ));  this%h2D_acetometgP_vr(:,:)=spval
+  allocate(this%h2D_aeroN2fixP_vr(beg_col:end_col,1:JZ));  this%h2D_aeroN2fixP_vr(:,:)=spval
+  allocate(this%h2D_anaeN2FixP_vr(beg_col:end_col,1:JZ));  this%h2D_anaeN2FixP_vr(:,:)=spval
+  allocate(this%h2D_NH3OxiBactP_vr(beg_col:end_col,1:JZ)); this%h2D_NH3OxiBactP_vr(:,:)=spval
+  allocate(this%h2D_NO2OxiBactP_vr(beg_col:end_col,1:JZ)); this%h2D_NO2OxiBactP_vr(:,:)=spval
+  allocate(this%h2D_CH4AeroOxiP_vr(beg_col:end_col,1:JZ)); this%h2D_CH4AeroOxiP_vr(:,:)=spval
+  allocate(this%h2D_H2MethogenP_vr(beg_col:end_col,1:JZ)); this%h2D_H2MethogenP_vr(:,:)=spval
+
+  allocate(this%h2D_AeroHrBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_AeroHrBactE_litr_col(:,:)=spval
+  allocate(this%h2D_AeroHrFungE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_AeroHrFungE_litr_col(:,:)=spval
+  allocate(this%h2D_faculDenitE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_faculDenitE_litr_col(:,:)=spval
+  allocate(this%h2D_fermentorE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_fermentorE_litr_col(:,:)=spval
+  allocate(this%h2D_acetometgE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_acetometgE_litr_col(:,:)=spval
+  allocate(this%h2D_aeroN2fixE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_aeroN2fixE_litr_col(:,:)=spval
+  allocate(this%h2D_anaeN2FixE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_anaeN2FixE_litr_col(:,:)=spval
+  allocate(this%h2D_NH3OxiBactE_litr_col(beg_col:end_col,1:NumPlantChemElms));this%h2D_NH3OxiBactE_litr_col(:,:)=spval
+  allocate(this%h2D_NO2OxiBactE_litr_col(beg_col:end_col,1:NumPlantChemElms));this%h2D_NO2OxiBactE_litr_col(:,:)=spval
+  allocate(this%h2D_CH4AeroOxiE_litr_col(beg_col:end_col,1:NumPlantChemElms));this%h2D_CH4AeroOxiE_litr_col(:,:)=spval
+  allocate(this%h2D_H2MethogenE_litr_col(beg_col:end_col,1:NumPlantChemElms));this%h2D_H2MethogenE_litr_col(:,:)=spval
+
+
   allocate(this%h2D_HeatFlow_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatFlow_vr(:,:)=spval
   allocate(this%h2D_HeatUptk_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatUptk_vr(:,:)=spval
   allocate(this%h2D_vWATER_vr(beg_col:end_col,1:JZ))     ;this%h2D_vWATER_vr(:,:)=spval
@@ -772,10 +911,6 @@ implicit none
   call hist_addfld1d(fname='NET_P_MIN',units='gP/m2/hr',avgflag='A',&
     long_name='total inorganic P net mineralization (-ve) or immobilization (+ve)',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_RADN_col(beg_col:end_col)         
-  call hist_addfld1d(fname='RADN',units='MJ/day',avgflag='A',&
-    long_name='*total daily solar radiation',ptr_col=data1d_ptr)      
-
   data1d_ptr => this%h1D_HUM_col(beg_col:end_col)       
   call hist_addfld1d(fname='HMAX_AIR',units='kPa',avgflag='X',&
     long_name='daily maximum vapor pressure',ptr_col=data1d_ptr)      
@@ -889,7 +1024,7 @@ implicit none
     long_name='NH3 solute concentration in soil micropres',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOL_RADN_col(beg_col:end_col)      
-  call hist_addfld1d(fname='SOL_RADN',units='W/m2',avgflag='A',&
+  call hist_addfld1d(fname='SOL_RADN',units='MJ/m2/day',avgflag='A',&
     long_name='shortwave radiation in solar beam',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_AIR_TEMP_col(beg_col:end_col)      
@@ -905,7 +1040,7 @@ implicit none
     long_name='wind speed',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_PREC_col(beg_col:end_col)   
-  call hist_addfld1d(fname='PREC',units='mm H2O/m2',avgflag='A',&
+  call hist_addfld1d(fname='PREC',units='mm H2O/m2/hr',avgflag='A',&
     long_name='Total precipitation, excluding irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOIL_RN_col(beg_col:end_col)   
@@ -1524,6 +1659,218 @@ implicit none
   data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)         !TCS(1:JZ,NY,NX)
   call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='levsoi',avgflag='A',&
     long_name='soil temperature profile',ptr_col=data2d_ptr)      
+!-----
+  data2d_ptr =>  this%h2D_DOC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='DOC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='DOC profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_DON_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='DON_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='DON profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_DOP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='DOP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='DOP profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_acetate_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='acetate_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Acetate profile',ptr_col=data2d_ptr)      
+
+  data1d_ptr => this%h1D_DOC_LITR_col(beg_col:end_col)    
+  call hist_addfld1d(fname='DOC_litr',units='gC/m2',avgflag='A',&
+    long_name='DOC in litter',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_DON_LITR_col(beg_col:end_col)    
+  call hist_addfld1d(fname='DON_litr',units='gN/m2',avgflag='A',&
+    long_name='DON in litter',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_DOP_LITR_col(beg_col:end_col)    
+  call hist_addfld1d(fname='DOP_litr',units='gP/m2',avgflag='A',&
+    long_name='DOP in litter',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_acetate_LITR_col(beg_col:end_col)    
+  call hist_addfld1d(fname='Acetate_litr',units='gC/m2',avgflag='A',&
+    long_name='Acetate in litter',ptr_col=data1d_ptr)      
+
+!------
+  data2d_ptr =>  this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_HetrBacterC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic bacteria C profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_HetrFungiC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic fungi C profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Facult_denitrifierC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Facultative denitrifier C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_fermentorN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='FermentorC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Fermentor C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_acetometgC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Acetic_methanogenC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aceticlastic methanogen C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_aeroN2fixC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_N2fixerC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic N2 fixer C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Anaerobic_N2fixerC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Anaerobic N2 fixer C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NH3OxiBactC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Ammonia_OxidizerBactC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Ammonia oxidize bacteria C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NO2OxiBactC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Nitrie_OxidizerBactC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Nitrite oxidize bacteria C profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CH4AeroOxiC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_methanotrophC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic methanotroph C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_H2MethogenC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Hygrogen_methanogenC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+    long_name='Hydrogenotrophic methanogen C biomass profile',ptr_col=data2d_ptr)      
+
+!------
+  data2d_ptr =>  this%h2D_AeroHrBactN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_HetrBacterN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic bacteria N profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_AeroHrFungN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_HetrFungiN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic fungi N profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_faculDenitN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Facult_denitrifierN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Facultative denitrifier N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_fermentorN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='FermentorN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Fermentor N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_acetometgN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Acetic_methanogenN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aceticlastic methanogen N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_aeroN2fixN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_N2fixerN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic N2 fixer N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_anaeN2FixN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Anaerobic_N2fixerN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Anaerobic N2 fixer N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NH3OxiBactN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Ammonia_OxidizerBactN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Ammonia oxidize bacteria N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NO2OxiBactN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Nitrie_OxidizerBactN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Nitrite oxidize bacteria N profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CH4AeroOxiN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_methanotrophN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic methanotroph N biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_H2MethogenN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Hygrogen_methanogenN_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+    long_name='Hydrogenotrophic methanogen N biomass profile',ptr_col=data2d_ptr)      
+
+!------
+  data2d_ptr =>  this%h2D_AeroHrBactP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_HetrBacterP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_AeroHrFungP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_HetrFungiP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic fungi P profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_faculDenitP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Facult_denitrifierP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Facultative denitrifier P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_fermentorP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='FermentorP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Fermentor P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_acetometgP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Acetic_methanogenP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aceticlastic methanogen P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_aeroN2fixP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_N2fixerP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic N2 fixer P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_anaeN2FixP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Anaerobic_N2fixerP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Anaerobic N2 fixer P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NH3OxiBactP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Ammonia_OxidizerBactP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Ammonia oxidize bacteria P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NO2OxiBactP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Nitrie_OxidizerBactP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Nitrite oxidize bacteria P profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CH4AeroOxiP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Aerobic_methanotrophP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Aerobic methanotroph P biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_H2MethogenP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Hygrogen_methanogenP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+    long_name='Hydrogenotrophic methanogen P biomass profile',ptr_col=data2d_ptr)      
+!---
+
+  data2d_ptr =>  this%h2D_AeroHrBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Aerobic_HetrBacterE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Aerobic elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_AeroHrFungE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Aerobic_HetrFungiE_litr',units='gP/m2',type2d='elements',avgflag='A',&
+    long_name='Aerobic fungi elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_faculDenitE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Facult_denitrifierE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Facultative denitrifier elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_fermentorE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='FermentorE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Fermentor elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_acetometgE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Acetic_methanogenE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Aceticlastic methanogen elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_aeroN2fixE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Aerobic_N2fixerE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Aerobic N2 fixer elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_anaeN2FixE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Anaerobic_N2fixerE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Anaerobic N2 fixer elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NH3OxiBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Ammonia_OxidizerBactE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Ammonia oxidize bacteria elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_NO2OxiBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Nitrie_OxidizerBactE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Nitrite oxidize bacteria elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CH4AeroOxiE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Aerobic_methanotrophE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Aerobic methanotroph elemental biomass in litter',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_H2MethogenE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='Hygrogen_methanogenE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Hydrogenotrophic methanogen elemental biomass in litter',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_HeatFlow_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HeatFlow_vr',units='MJ m-3 hr-1',type2d='levsoi',avgflag='A',&
@@ -1622,6 +1969,8 @@ implicit none
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
   integer :: L,NZ,NY,NX,KN,NB
+  real(r8) :: micBE(1:NumPlantChemElms)
+  real(r8) :: DOM(idom_beg:idom_end)
   real(r8),parameter :: secs1hour=3600._r8
   real(r8),parameter :: MJ2W=1.e6_r8/secs1hour
   real(r8),parameter :: m2mm=1000._r8
@@ -1676,7 +2025,6 @@ implicit none
         trcx_solml(idx_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX))
       this%h1D_ECO_HVST_P_col(ncol)       = EcoHavstElmnt_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)        =  -NetPO4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RADN_col(ncol)             = TRAD(NY,NX)
       this%h1D_PSI_SURF_col(ncol)         = PSISoilMatricP_vr(0,NY,NX)
       this%h1D_SURF_ELEV_col(ncol)        = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol) = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1718,9 +2066,9 @@ implicit none
       this%h1D_ET_col(ncol)          = m2mm*EvapoTransp_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
-      this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W
+      this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W*86400.e-6_r8
       this%h1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
-      this%h1D_HUM_col(ncol)         = VPK(NY,NX)
+      this%h1D_HUM_col(ncol)         = VPK_col(NY,NX)
       
       this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/secs1hour
       this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
@@ -1754,7 +2102,52 @@ implicit none
       this%h1D_sNH3_FLX_col(ncol)     =  SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PAR_col(ncol)          =  RadPARSolarBeam_col(NY,NX)
 
+      call SumMicbGroup(0,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
+      this%h2D_AeroHrBactE_litr_col(ncol,1:NumPlantChemElms) =micBE/AREA(3,NU(NY,NX),NY,NX)     !aerobic heterotropic bacteria
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_Aerob_Fungi,MicbE)
+      this%h2D_AeroHrFungE_litr_col(ncol,1:NumPlantChemElms) = micBE/AREA(3,NU(NY,NX),NY,NX)   !aerobic heterotropic fungi
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_Facult_DenitBacter,MicbE)
+      this%h2D_faculDenitE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)  !facultative denitrifier
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_fermentor,MicbE)
+      this%h2D_fermentorE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)  !fermentor
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_AcetoMethanogArchea,MicbE)
+      this%h2D_acetometgE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)  !acetogenic methanogen
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_aerob_N2Fixer,MicbE)
+      this%h2D_aeroN2fixE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)  !aerobic N2 fixer
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)
+      this%h2D_anaeN2FixE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)  !anaerobic N2 fixer
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_AmmoniaOxidBacter,MicbE,isauto=.true.)     
+      this%h2D_NH3OxiBactE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_NitriteOxidBacter,MicbE,isauto=.true.)     
+      this%h2D_NO2OxiBactE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_AerobicMethanotrofBacter,MicbE,isauto=.true.)     
+      this%h2D_CH4AeroOxiE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)
+
+      call SumMicbGroup(0,NY,NX,micpar%mid_H2GenoMethanogArchea,MicbE,isauto=.true.)     
+      this%h2D_H2MethogenE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)
+
+      call sumDOML(L,NY,NX,DOM)
+      this%h1D_DOC_LITR_col(ncol)=DOM(idom_doc)
+      this%h1D_DON_LITR_col(ncol)=DOM(idom_don)
+      this%h1D_DOP_LITR_col(ncol)=DOM(idom_dop)
+      this%h1D_acetate_LITR_col(ncol)=DOM(idom_acetate)
+
       DO L=1,JZ
+        call sumDOML(L,NY,NX,DOM)
+        this%h2D_DOC_vr(ncol,L) = DOM(idom_doc)
+        this%h2D_DON_vr(ncol,L) = DOM(idom_don)
+        this%h2D_DOP_vr(ncol,L) = DOM(idom_dop)
+        this%h2D_acetate_vr(ncol,L) = DOM(idom_acetate)
+
         this%h2D_tSOC_vr(ncol,L) =  SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_tSON_vr(ncol,L) =  SoilOrgM_vr(ielmn,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_tSOP_vr(ncol,L) =  SoilOrgM_vr(ielmp,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1785,6 +2178,75 @@ implicit none
                                                +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX),&
                                                SoilMicPMassLayer(L,NY,NX))
         this%h2D_ECND_vr(ncol,L)     = ECND(L,NY,NX)
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
+        this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)    !aerobic heterotropic bacteria
+        this%h2D_AeroHrBactN_vr(ncol,L) = MicbE(ielmn)    !aerobic heterotropic bacteria
+        this%h2D_AeroHrBactP_vr(ncol,L) = MicbE(ielmp)    !aerobic heterotropic bacteria
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_Facult_DenitBacter,MicbE)
+        this%h2D_faculDenitC_vr(ncol,L) = micBE(ielmc)  !facultative denitrifier
+        this%h2D_faculDenitN_vr(ncol,L) = micBE(ielmn)  !facultative denitrifier
+        this%h2D_faculDenitP_vr(ncol,L) = micBE(ielmp)  !facultative denitrifier
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_Fungi,MicbE)
+        this%h2D_AeroHrFungC_vr(ncol,L) = micBE(ielmc)   !aerobic heterotropic fungi
+        this%h2D_AeroHrFungN_vr(ncol,L) = micBE(ielmn)   !aerobic heterotropic fungi
+        this%h2D_AeroHrFungP_vr(ncol,L) = micBE(ielmp)   !aerobic heterotropic fungi
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_fermentor,MicbE)
+        this%h2D_fermentorC_vr(ncol,L) = micBE(ielmc)  !fermentor
+        this%h2D_fermentorN_vr(ncol,L) = micBE(ielmn)  !fermentor
+        this%h2D_fermentorP_vr(ncol,L) = micBE(ielmp)  !fermentor        
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_AcetoMethanogArchea,MicbE)
+        this%h2D_acetometgC_vr(ncol,L) = micBE(ielmc)  !acetogenic methanogen
+        this%h2D_acetometgN_vr(ncol,L) = micBE(ielmn)  !acetogenic methanogen
+        this%h2D_acetometgP_vr(ncol,L) = micBE(ielmp)  !acetogenic methanogen
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_aerob_N2Fixer,MicbE)
+        this%h2D_aeroN2fixC_vr(ncol,L) = micBE(ielmc)  !aerobic N2 fixer
+        this%h2D_aeroN2fixN_vr(ncol,L) = micBE(ielmn)  !aerobic N2 fixer
+        this%h2D_aeroN2fixP_vr(ncol,L) = micBE(ielmp)  !aerobic N2 fixer
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)
+        this%h2D_anaeN2FixC_vr(ncol,L) = micBE(ielmc) !anaerobic N2 fixer
+        this%h2D_anaeN2FixN_vr(ncol,L) = micBE(ielmn) !anaerobic N2 fixer
+        this%h2D_anaeN2FixP_vr(ncol,L) = micBE(ielmp) !anaerobic N2 fixer
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_AmmoniaOxidBacter,MicbE,isauto=.true.)
+        this%h2D_NH3OxiBactC_vr(ncol,L) = micBE(ielmc)
+        this%h2D_NH3OxiBactN_vr(ncol,L) = micBE(ielmn)
+        this%h2D_NH3OxiBactP_vr(ncol,L) = micBE(ielmp)
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_NitriteOxidBacter,MicbE,isauto=.true.)
+        this%h2D_NO2OxiBactC_vr(ncol,L) = micBE(ielmc)
+        this%h2D_NO2OxiBactN_vr(ncol,L) = micBE(ielmn)
+        this%h2D_NO2OxiBactP_vr(ncol,L) = micBE(ielmp)
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_AerobicMethanotrofBacter,MicbE,isauto=.true.)
+        this%h2D_CH4AeroOxiC_vr(ncol,L) = micBE(ielmc)
+        this%h2D_CH4AeroOxiN_vr(ncol,L) = micBE(ielmn)
+        this%h2D_CH4AeroOxiP_vr(ncol,L) = micBE(ielmp)
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_H2GenoMethanogArchea,MicbE,isauto=.true.)
+        this%h2D_H2MethogenC_vr(ncol,L) = micBE(ielmc)
+        this%h2D_H2MethogenN_vr(ncol,L) = micBE(ielmn)
+        this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)
+
+
+!  real(r8),pointer   :: h2D_RCH4Prod_vr(:,:)
+!  real(r8),pointer   :: h2D_RCH4Oxi_aero_vr(:,:)
+!  real(r8),pointer   :: h2D_RFermen_vr(:,:)
+!  real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
+!  real(r8),pointer   :: h2o_n2oprod_vr(:,:)
+
+!  real(r8),pointer   :: h1D_RCH4Prod_litr_col(:)
+!  real(r8),pointer   :: h1D_RCH4Oxi_aero_litr_col(:)
+!  real(r8),pointer   :: h1D_RFermen_litr_col(:)
+!  real(r8),pointer   :: h1D_nh3oxi_litr_col(:)
+!  real(r8),pointer   :: h1o_n2oprod_litr_col(:)
+
       ENDDO
 
       DO NZ=1,NP0(NY,NX)

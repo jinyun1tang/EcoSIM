@@ -552,8 +552,8 @@ module StartsMod
   ZNFNI(0:L2,NY,NX)=0.0_r8
   ZNFN0(0:L2,NY,NX)=0.0_r8
 
-  WDNHB(1:L2,NY,NX)=0.0_r8
-  DPNHB(1:L2,NY,NX)=0.0_r8
+  BandWidthNH4_vr(1:L2,NY,NX)=0.0_r8
+  BandDepthNH4_vr(1:L2,NY,NX)=0.0_r8
   WDNOB(1:L2,NY,NX)=0.0_r8
   DPNOB(1:L2,NY,NX)=0.0_r8
   WDPOB(1:L2,NY,NX)=0.0_r8
