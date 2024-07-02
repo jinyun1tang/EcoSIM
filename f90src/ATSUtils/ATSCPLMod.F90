@@ -76,17 +76,9 @@ contains
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_TEMP=data2D(:,:)
 
-  !do i = 1, size_col
-  !   write(*,*) "a_TEMP = ", a_TEMP(i, 1)   
-  !end do
-
   call c_f_pointer(state%bulk_density%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
   a_BKDSI=data2D(:,:)
-  
-  !do i = 1, size_col
-  !   write(*,*) "a_BKDSI = ", a_BKDSI(i, 1)   
-  !end do  
 
   call c_f_pointer(state%matric_pressure%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
@@ -94,7 +86,6 @@ contains
 
   do i = 1, size_col
      a_MATP(i, 1) = 100.0 
-     !a_AreaZ(i,1) = 1.0 
   end do
 
   call c_f_pointer(state%porosity%data, cptr_temp)
@@ -141,7 +132,10 @@ contains
   uwind = data(:)
 
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-  prec = data(:)
+  p_rain = data(:)
+
+  call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
+  p_snow = data(:)
 
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
