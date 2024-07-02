@@ -59,7 +59,7 @@ implicit none
   real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical,  pointer :: is_activeMicrbFungrpAutor(:)
   logical,  pointer :: is_aerobic_hetr(:)
-  logical,  pointer :: is_anerobic_hetr(:)
+  logical,  pointer :: is_anaerobic_hetr(:)
   logical,  pointer :: is_litter(:)
   logical,  pointer :: is_finelitter(:)
   logical,  pointer :: is_CO2_autotroph(:)
@@ -174,8 +174,8 @@ contains
   this%is_aerobic_hetr(this%mid_Aerob_Fungi)=.true.
   this%is_aerobic_hetr(this%mid_aerob_N2Fixer)=.true.
 
-  this%is_anerobic_hetr(this%mid_fermentor)=.true.
-  this%is_anerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
+  this%is_anaerobic_hetr(this%mid_fermentor)=.true.
+  this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
 !the autotrophic complex
   this%mid_AmmoniaOxidBacter=1
   this%mid_NitriteOxidBacter=2
@@ -395,7 +395,7 @@ contains
   allocate(this%is_activeMicrbFungrpAutor(NumMicbFunGrupsPerCmplx)); this%is_activeMicrbFungrpAutor=.false.
   allocate(this%is_CO2_autotroph(NumMicbFunGrupsPerCmplx)); this%is_CO2_autotroph=.false.
   allocate(this%is_aerobic_hetr(NumMicbFunGrupsPerCmplx)); this%is_aerobic_hetr=.false.
-  allocate(this%is_anerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anerobic_hetr=.false.
+  allocate(this%is_anaerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anaerobic_hetr=.false.
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -428,7 +428,7 @@ contains
   call destroy(this%is_activeMicrbFungrpAutor)
   call destroy(this%is_CO2_autotroph)
   call destroy(this%is_aerobic_hetr)
-  call destroy(this%is_anerobic_hetr)
+  call destroy(this%is_anaerobic_hetr)
   end subroutine DestructMicBGCPar
 
 !------------------------------------------------------------------------------------------

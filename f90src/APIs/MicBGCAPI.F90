@@ -1,13 +1,16 @@
 module MicBGCAPI
 
-  use data_kind_mod  , only : r8 => DAT_KIND_R8
-  use NitrosMod      , only : DownwardMixOM,sumMicBiomLayL
-  use NitroDisturbMod, only : SOMRemovalByDisturbance
-  use EcoSIMSolverPar
-  use MicFLuxTypeMod, only : micfluxtype
-  use MicStateTraitTypeMod, only : micsttype
-  use MicForcTypeMod , only : micforctype
-  use minimathmod    , only : AZMAX1
+  use data_kind_mod,        only: r8 => DAT_KIND_R8
+  use NitrosMod,            only: DownwardMixOM, sumMicBiomLayL
+  use NitroDisturbMod,      only: SOMRemovalByDisturbance
+  use MicFLuxTypeMod,       only: micfluxtype
+  use MicStateTraitTypeMod, only: micsttype
+  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type
+  use MicForcTypeMod,       only: micforctype
+  use minimathmod,          only: AZMAX1
+  use EcoSiMParDataMod,     only: micpar
+  use MicBGCMod,            only: SoilBGCOneLayer
+  use EcoSIMSolverPar  
   use TracerIDMod
   use SoilBGCDataType
   USE PlantDataRateType
@@ -24,8 +27,6 @@ module MicBGCAPI
   use MicrobialDataType
   use IrrigationDataType
   use SoilHeatDataType
-  use EcoSiMParDataMod, only : micpar
-  use MicBGCMod, only : SoilBGCOneLayer
 implicit none
   save
   private
@@ -137,14 +138,15 @@ implicit none
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-
+  type(Cumlate_Flux_Diag_type) :: naqfdiag
+  
   call micflx%ZeroOut()
 
   call MicAPISend(L,NY,NX,micfor,micstt,micflx)
 
-  call SoilBGCOneLayer(micfor,micstt,micflx)
+  call SoilBGCOneLayer(micfor,micstt,micflx,naqfdiag)
 
-  call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx)
+  call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag)
 
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
@@ -342,18 +344,31 @@ implicit none
 !------------------------------------------------------------------------------------------
 
 
-  subroutine MicAPIRecv(L,NY,NX,litrM,micstt,micflx)
+  subroutine MicAPIRecv(L,NY,NX,litrM,micstt,micflx,naqfdiag)
   implicit none
   integer, intent(in) :: L,NY,NX
   logical, intent(in) :: litrM
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
+  type(Cumlate_Flux_Diag_type), intent(in) :: naqfdiag
+
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
   integer :: NE,idom,K
   
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
+
+
+  RCH4ProdHydrog_vr(L,NY,NX) = naqfdiag%tCH4ProdAceto
+  RCH4ProdAcetcl_vr(L,NY,NX) = naqfdiag%tCH4ProdH2
+  RCH4Oxi_aero_vr(L,NY,NX)   = naqfdiag%tCH4OxiAero
+  RFermen_vr(L,NY,NX)        = naqfdiag%tCResp4H2Prod
+  RNH3oxi_vr(L,NY,NX)        = naqfdiag%tRNH3Oxi
+  RN2ODeniProd_vr(L,NY,NX)   = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
+  RN2OChemoProd_vr(L,NY,NX)  = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
+  RN2ONitProd_vr(L,NY,NX)    = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band  
+  RN2ORedux_vr(L,NY,NX)      = naqfdiag%TReduxN2O
 
   trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
   trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor

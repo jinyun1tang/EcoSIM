@@ -55,14 +55,14 @@ module MicAutoCPLXMod
   real(r8) :: RGOCP
   real(r8) :: RGOMP
   real(r8) :: RVOXP
-  real(r8) :: RVOXPA
-  real(r8) :: RVOXPB
+  real(r8) :: RVOXPA    !oxidation in soil, for NH3, NO2 and CH4
+  real(r8) :: RVOXPB    !oxidation in band, specifically for NH3 and NO2
   real(r8) :: RGrowthRespAutor
   real(r8) :: RMaintDefcitcitAutor
   real(r8) :: RMaintRespAutor
 
 ! begin_execution
-  associate(                                                     &
+  associate(                                                             &
     FracOMActAutor               => nmics%FracOMActAutor,                &
     FracNO2ReduxAutor            => nmics%FracNO2ReduxAutor,             &
     FracAutorBiomOfActK          => nmics%FracAutorBiomOfActK,           &
@@ -88,7 +88,7 @@ module MicAutoCPLXMod
     SoilMicPMassLayer            => micfor%SoilMicPMassLayer,            &
     litrm                        => micfor%litrm,                        &
     VLSoilPoreMicP               => micfor%VLSoilPoreMicP,               &
-    RO2DmndAutort                => micflx%RO2DmndAutort             &
+    RO2DmndAutort                => micflx%RO2DmndAutort                 &
   )
 ! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
 
@@ -170,8 +170,7 @@ module MicAutoCPLXMod
   RO2UptkAutor(NGL)=0.0_r8
 
   if (N.eq.mid_AmmoniaOxidBacter .or. N.eq.mid_NitriteOxidBacter .or. N.eq.mid_AerobicMethanotrofBacter)then
-    call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
-      micfor,micstt,nmicf,nmics,micflx)
+    call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.mid_H2GenoMethanogArchea)then
     RespGrossAutor(NGL)=RGOMP
     RCO2ProdAutor(NGL)=0.0_r8

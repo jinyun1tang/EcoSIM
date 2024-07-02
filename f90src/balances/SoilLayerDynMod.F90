@@ -1478,7 +1478,7 @@ implicit none
 !     SOIL FERTILIZER BANDS
 !
     IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
+      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
         WDNHBDL=BandWidthNH4_vr(L,NY,NX)*DLYR(3,L,NY,NX)
         WDNHBD0=BandWidthNH4_vr(L0,NY,NX)*DLYR(3,L0,NY,NX)
         WDNHBD1=BandWidthNH4_vr(L1,NY,NX)*DLYR(3,L1,NY,NX)
@@ -1487,15 +1487,15 @@ implicit none
         WDNHBD0=WDNHBD0-FXWDNHB
         BandWidthNH4_vr(L1,NY,NX)=WDNHBD1/DLYR(3,L1,NY,NX)
         BandWidthNH4_vr(L0,NY,NX)=WDNHBD0/DLYR(3,L0,NY,NX)
-        IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNH4(NY,NX))THEN
-          FXDPNHB=AMIN1(FX*BandDepthNH4_vr(L,NY,NX),BandDepthNH4_vr(L0,NY,NX))
-          BandDepthNH4_vr(L1,NY,NX)=BandDepthNH4_vr(L1,NY,NX)+FXDPNHB
-          BandDepthNH4_vr(L0,NY,NX)=BandDepthNH4_vr(L0,NY,NX)-FXDPNHB
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
+          FXDPNHB=AMIN1(FX*BandThicknessNH4_vr(L,NY,NX),BandThicknessNH4_vr(L0,NY,NX))
+          BandThicknessNH4_vr(L1,NY,NX)=BandThicknessNH4_vr(L1,NY,NX)+FXDPNHB
+          BandThicknessNH4_vr(L0,NY,NX)=BandThicknessNH4_vr(L0,NY,NX)-FXDPNHB
         ENDIF
         trcs_VLN_vr(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNH4_vr(L1,NY,NX) &
-          /ROWN(NY,NX)*BandDepthNH4_vr(L1,NY,NX)/DLYR(3,L1,NY,NX)))
+          /ROWN(NY,NX)*BandThicknessNH4_vr(L1,NY,NX)/DLYR(3,L1,NY,NX)))
         trcs_VLN_vr(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNH4_vr(L0,NY,NX) &
-          /ROWN(NY,NX)*BandDepthNH4_vr(L0,NY,NX)/DLYR(3,L0,NY,NX)))
+          /ROWN(NY,NX)*BandThicknessNH4_vr(L0,NY,NX)/DLYR(3,L0,NY,NX)))
         trcs_VLN_vr(ids_NH4,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NH4B,L1,NY,NX)
         trcs_VLN_vr(ids_NH4,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NH4B,L0,NY,NX)
 
@@ -1506,24 +1506,24 @@ implicit none
       ENDIF
     ENDIF
     IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
-        WDNOBDL=WDNOB(L,NY,NX)*DLYR(3,L,NY,NX)
-        WDNOBD0=WDNOB(L0,NY,NX)*DLYR(3,L0,NY,NX)
-        WDNOBD1=WDNOB(L1,NY,NX)*DLYR(3,L1,NY,NX)
+      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
+        WDNOBDL=BandWidthNO3_vr(L,NY,NX)*DLYR(3,L,NY,NX)
+        WDNOBD0=BandWidthNO3_vr(L0,NY,NX)*DLYR(3,L0,NY,NX)
+        WDNOBD1=BandWidthNO3_vr(L1,NY,NX)*DLYR(3,L1,NY,NX)
         FXWDNOB=AMIN1(FX*WDNOBDL,WDNOBD0)
         WDNOBD1=WDNOBD1+FXWDNOB
         WDNOBD0=WDNOBD0-FXWDNOB
-        WDNOB(L1,NY,NX)=WDNOBD1/DLYR(3,L1,NY,NX)
-        WDNOB(L0,NY,NX)=WDNOBD0/DLYR(3,L0,NY,NX)
-        IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNO3(NY,NX))THEN
-          FXDPNOB=AMIN1(FX*DPNOB(L,NY,NX),DPNOB(L0,NY,NX))
-          DPNOB(L1,NY,NX)=DPNOB(L1,NY,NX)+FXDPNOB
-          DPNOB(L0,NY,NX)=DPNOB(L0,NY,NX)-FXDPNOB
+        BandWidthNO3_vr(L1,NY,NX)=WDNOBD1/DLYR(3,L1,NY,NX)
+        BandWidthNO3_vr(L0,NY,NX)=WDNOBD0/DLYR(3,L0,NY,NX)
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
+          FXDPNOB=AMIN1(FX*BandThicknessNO3_vr(L,NY,NX),BandThicknessNO3_vr(L0,NY,NX))
+          BandThicknessNO3_vr(L1,NY,NX)=BandThicknessNO3_vr(L1,NY,NX)+FXDPNOB
+          BandThicknessNO3_vr(L0,NY,NX)=BandThicknessNO3_vr(L0,NY,NX)-FXDPNOB
         ENDIF
-        trcs_VLN_vr(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L1,NY,NX) &
-          /ROWO(NY,NX)*DPNOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN_vr(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L0,NY,NX) &
-          /ROWO(NY,NX)*DPNOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
+        trcs_VLN_vr(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNO3_vr(L1,NY,NX) &
+          /ROWO(NY,NX)*BandThicknessNO3_vr(L1,NY,NX)/DLYR(3,L1,NY,NX)))
+        trcs_VLN_vr(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNO3_vr(L0,NY,NX) &
+          /ROWO(NY,NX)*BandThicknessNO3_vr(L0,NY,NX)/DLYR(3,L0,NY,NX)))
         trcs_VLN_vr(ids_NO3,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L1,NY,NX)
         trcs_VLN_vr(ids_NO3,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L0,NY,NX)
 
@@ -1534,24 +1534,24 @@ implicit none
       ENDIF
     ENDIF
     IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
-        WDPOBDL=WDPOB(L,NY,NX)*DLYR(3,L,NY,NX)
-        WDPOBD0=WDPOB(L0,NY,NX)*DLYR(3,L0,NY,NX)
-        WDPOBD1=WDPOB(L1,NY,NX)*DLYR(3,L1,NY,NX)
+      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
+        WDPOBDL=BandWidthPO4_vr(L,NY,NX)*DLYR(3,L,NY,NX)
+        WDPOBD0=BandWidthPO4_vr(L0,NY,NX)*DLYR(3,L0,NY,NX)
+        WDPOBD1=BandWidthPO4_vr(L1,NY,NX)*DLYR(3,L1,NY,NX)
         FXWDPOB=AMIN1(FX*WDPOBDL,WDPOBD0)
         WDPOBD1=WDPOBD1+FXWDPOB
         WDPOBD0=WDPOBD0-FXWDPOB
-        WDPOB(L1,NY,NX)=WDPOBD1/DLYR(3,L1,NY,NX)
-        WDPOB(L0,NY,NX)=WDPOBD0/DLYR(3,L0,NY,NX)
-        IF(CumDepth2LayerBottom(L,NY,NX).GE.DPPO4(NY,NX))THEN
-          FXDPPOB=AMIN1(FX*DPPOB(L,NY,NX),DPPOB(L0,NY,NX))
-          DPPOB(L1,NY,NX)=DPPOB(L1,NY,NX)+FXDPPOB
-          DPPOB(L0,NY,NX)=DPPOB(L0,NY,NX)-FXDPPOB
+        BandWidthPO4_vr(L1,NY,NX)=WDPOBD1/DLYR(3,L1,NY,NX)
+        BandWidthPO4_vr(L0,NY,NX)=WDPOBD0/DLYR(3,L0,NY,NX)
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
+          FXDPPOB=AMIN1(FX*BandThicknessPO4_vr(L,NY,NX),BandThicknessPO4_vr(L0,NY,NX))
+          BandThicknessPO4_vr(L1,NY,NX)=BandThicknessPO4_vr(L1,NY,NX)+FXDPPOB
+          BandThicknessPO4_vr(L0,NY,NX)=BandThicknessPO4_vr(L0,NY,NX)-FXDPPOB
         ENDIF
-        trcs_VLN_vr(ids_H1PO4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L1,NY,NX) &
-          /ROWP(NY,NX)*DPPOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN_vr(ids_H1PO4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L0,NY,NX) &
-          /ROWP(NY,NX)*DPPOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
+        trcs_VLN_vr(ids_H1PO4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthPO4_vr(L1,NY,NX) &
+          /ROWP(NY,NX)*BandThicknessPO4_vr(L1,NY,NX)/DLYR(3,L1,NY,NX)))
+        trcs_VLN_vr(ids_H1PO4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthPO4_vr(L0,NY,NX) &
+          /ROWP(NY,NX)*BandThicknessPO4_vr(L0,NY,NX)/DLYR(3,L0,NY,NX)))
         trcs_VLN_vr(ids_H1PO4,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_H1PO4B,L1,NY,NX)
         trcs_VLN_vr(ids_H1PO4,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_H1PO4B,L0,NY,NX)
 

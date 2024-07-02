@@ -69,21 +69,21 @@ implicit none
   real(r8),target,allocatable ::  VWatMicrobAct_vr(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
-  real(r8),target,allocatable :: trcs_VLN_vr(:,:,:,:)
-  real(r8),target,allocatable :: tRDOE2Die_col(:,:,:)
+  real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)
+  real(r8),target,allocatable ::  tRDOE2Die_col(:,:,:)
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
   real(r8),target,allocatable ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
   real(r8),target,allocatable ::  BandWidthNH4_vr(:,:,:)                       !width of NH4 band, [m]
-  real(r8),target,allocatable ::  BandDepthNH4_vr(:,:,:)                       !depth of NH4 band, [m]
-  real(r8),target,allocatable ::  WDNOB(:,:,:)                       !width of NO3 band, [m]
-  real(r8),target,allocatable ::  DPNOB(:,:,:)                       !depth of NO4 band, [m]
-  real(r8),target,allocatable ::  WDPOB(:,:,:)                       !width of PO4 band, [m]
-  real(r8),target,allocatable ::  DPPOB(:,:,:)                       !depth of PO4 band, [m]
-  real(r8),target,allocatable ::  DPNH4(:,:)                         !total depth of NH4 band, [m]
-  real(r8),target,allocatable ::  DPNO3(:,:)                         !total depth of NO3 band, [m]
-  real(r8),target,allocatable ::  DPPO4(:,:)                         !total depth of PO4 band, [m]
+  real(r8),target,allocatable ::  BandThicknessNH4_vr(:,:,:)                       !depth of NH4 band, [m]
+  real(r8),target,allocatable ::  BandWidthNO3_vr(:,:,:)                       !width of NO3 band, [m]
+  real(r8),target,allocatable ::  BandThicknessNO3_vr(:,:,:)                       !depth of NO4 band, [m]
+  real(r8),target,allocatable ::  BandWidthPO4_vr(:,:,:)                       !width of PO4 band, [m]
+  real(r8),target,allocatable ::  BandThicknessPO4_vr(:,:,:)                       !depth of PO4 band, [m]
+  real(r8),target,allocatable ::  BandDepthNH4_col(:,:)                         !total depth of NH4 band, [m]
+  real(r8),target,allocatable ::  BandDepthNO3_col(:,:)                         !total depth of NO3 band, [m]
+  real(r8),target,allocatable ::  BandDepthPO4_col(:,:)                         !total depth of PO4 band, [m]
   real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
@@ -100,12 +100,15 @@ implicit none
   real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
-  real(r8),target,allocatable :: RCH4Prod_vr(:,:,:)
+  real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)
+  real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)
   real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)
   real(r8),target,allocatable :: RFermen_vr(:,:,:)
   real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)
-  real(r8),target,allocatable :: RN2OProd_vr(:,:,:)
-
+  real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)    !denitrification N2O production
+  real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)
+  real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)    !chemo N2O production
+  real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)     !N2O reduction into N2
   private :: InitAllocate
   contains
 
@@ -140,13 +143,15 @@ implicit none
   allocate(ZNHU0(0:JZ,JY,JX));  ZNHU0=0._r8
   allocate(CPO4B(0:JZ,JY,JX));CPO4B(0:JZ,JY,JX)=0._r8
 
-  allocate(RCH4Prod_vr(0:JZ,JY,JX)); RCH4Prod_vr=0._r8
+  allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
+  allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
   allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
   allocate(RFermen_vr(0:JZ,JY,JX)); RFermen_vr=0._r8
   allocate(RNH3oxi_vr(0:JZ,JY,JX)); RNH3oxi_vr=0._r8
-  allocate(RN2OProd_vr(0:JZ,JY,JX)); RN2OProd_vr=0._r8
-
-
+  allocate(RN2ODeniProd_vr(0:JZ,JY,JX)); RN2ODeniProd_vr=0._r8
+  allocate(RN2ONitProd_vr(0:JZ,JY,JX)); RN2ONitProd_vr=0._r8
+  allocate(RN2OChemoProd_vr(0:JZ,JY,JX)); RN2OChemoProd_vr=0._r8
+  allocate(RN2ORedux_vr(0:JZ,JY,JX));RN2ORedux_vr=0._r8
   allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
   allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
   allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
@@ -196,14 +201,14 @@ implicit none
   allocate(VLPO4(0:JZ,JY,JX));  VLPO4=0._r8
   allocate(VLPOB(0:JZ,JY,JX));  VLPOB=0._r8
   allocate(BandWidthNH4_vr(JZ,JY,JX));    BandWidthNH4_vr=0._r8
-  allocate(BandDepthNH4_vr(JZ,JY,JX));    BandDepthNH4_vr=0._r8
-  allocate(WDNOB(JZ,JY,JX));    WDNOB=0._r8
-  allocate(DPNOB(JZ,JY,JX));    DPNOB=0._r8
-  allocate(WDPOB(JZ,JY,JX));    WDPOB=0._r8
-  allocate(DPPOB(JZ,JY,JX));    DPPOB=0._r8
-  allocate(DPNH4(JY,JX));       DPNH4=0._r8
-  allocate(DPNO3(JY,JX));       DPNO3=0._r8
-  allocate(DPPO4(JY,JX));       DPPO4=0._r8
+  allocate(BandThicknessNH4_vr(JZ,JY,JX));    BandThicknessNH4_vr=0._r8
+  allocate(BandWidthNO3_vr(JZ,JY,JX));    BandWidthNO3_vr=0._r8
+  allocate(BandThicknessNO3_vr(JZ,JY,JX));    BandThicknessNO3_vr=0._r8
+  allocate(BandWidthPO4_vr(JZ,JY,JX));    BandWidthPO4_vr=0._r8
+  allocate(BandThicknessPO4_vr(JZ,JY,JX));    BandThicknessPO4_vr=0._r8
+  allocate(BandDepthNH4_col(JY,JX));       BandDepthNH4_col=0._r8
+  allocate(BandDepthNO3_col(JY,JX));       BandDepthNO3_col=0._r8
+  allocate(BandDepthPO4_col(JY,JX));       BandDepthPO4_col=0._r8
   allocate(RNO2DmndSoilChemo_vr(0:JZ,JY,JX));  RNO2DmndSoilChemo_vr=0._r8
   allocate(RNO2DmndBandChemo_vr(0:JZ,JY,JX));  RNO2DmndBandChemo_vr=0._r8
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
@@ -234,12 +239,15 @@ implicit none
   call destroy(CNO3)
   call destroy(CPO4)
 
-  call destroy(RCH4Prod_vr)
+  call destroy(RCH4ProdAcetcl_vr)
+  call destroy(RCH4ProdHydrog_vr)
   call destroy(RCH4Oxi_aero_vr)
   call destroy(RFermen_vr)
   call destroy(RNH3oxi_vr)
-  call destroy(RN2OProd_vr)
-
+  call destroy(RN2ONitProd_vr)  
+  call destroy(RN2ODeniProd_vr)
+  call destroy(RN2OChemoProd_vr)
+  call destroy(RN2ORedux_vr)
   call destroy(trc_gasml_vr)
   call destroy(CPO4B)
 
@@ -298,14 +306,14 @@ implicit none
   call destroy(VLPO4)
   call destroy(VLPOB)
   call destroy(BandWidthNH4_vr)
-  call destroy(BandDepthNH4_vr)
-  call destroy(WDNOB)
-  call destroy(DPNOB)
-  call destroy(WDPOB)
-  call destroy(DPPOB)
-  call destroy(DPNH4)
-  call destroy(DPNO3)
-  call destroy(DPPO4)
+  call destroy(BandThicknessNH4_vr)
+  call destroy(BandWidthNO3_vr)
+  call destroy(BandThicknessNO3_vr)
+  call destroy(BandWidthPO4_vr)
+  call destroy(BandThicknessPO4_vr)
+  call destroy(BandDepthNH4_col)
+  call destroy(BandDepthNO3_col)
+  call destroy(BandDepthPO4_col)
   call destroy(RNO2DmndSoilChemo_vr)
   call destroy(RNO2DmndBandChemo_vr)
   call destroy(XZHYS)

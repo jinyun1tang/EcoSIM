@@ -917,7 +917,6 @@ module RedistMod
         DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
           -DOM_PoreTranspFlx(idom,K,L,NY,NX)
 
-
       enddo
     ENDDO D8560
     !

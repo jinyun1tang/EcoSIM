@@ -553,11 +553,11 @@ module StartsMod
   ZNFN0(0:L2,NY,NX)=0.0_r8
 
   BandWidthNH4_vr(1:L2,NY,NX)=0.0_r8
-  BandDepthNH4_vr(1:L2,NY,NX)=0.0_r8
-  WDNOB(1:L2,NY,NX)=0.0_r8
-  DPNOB(1:L2,NY,NX)=0.0_r8
-  WDPOB(1:L2,NY,NX)=0.0_r8
-  DPPOB(1:L2,NY,NX)=0.0_r8
+  BandThicknessNH4_vr(1:L2,NY,NX)=0.0_r8
+  BandWidthNO3_vr(1:L2,NY,NX)=0.0_r8
+  BandThicknessNO3_vr(1:L2,NY,NX)=0.0_r8
+  BandWidthPO4_vr(1:L2,NY,NX)=0.0_r8
+  BandThicknessPO4_vr(1:L2,NY,NX)=0.0_r8
   COCU(1:jcplx,1:L2,NY,NX)=0.0_r8
   CONU(1:jcplx,1:L2,NY,NX)=0.0_r8
   COPU(1:jcplx,1:L2,NY,NX)=0.0_r8
@@ -807,9 +807,9 @@ module StartsMod
   QDrain_col(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8
-  DPNH4(:,:)=0.0_r8
-  DPNO3(:,:)=0.0_r8
-  DPPO4(:,:)=0.0_r8
+  BandDepthNH4_col(:,:)=0.0_r8
+  BandDepthNO3_col(:,:)=0.0_r8
+  BandDepthPO4_col(:,:)=0.0_r8
   trc_solml_vr(idg_O2,0,:,:)=0.0_r8
   FracSWRad2Grnd_col(:,:)=1.0_r8
   LWRadBySurf_col(:,:)=0.0_r8
