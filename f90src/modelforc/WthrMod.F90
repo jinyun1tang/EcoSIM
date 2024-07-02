@@ -162,9 +162,9 @@ module WthrMod
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
           -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
-      if(abs(TairK(NY,NX))>400._r8)then
-        print*,'air temperature problematic',TairK(NY,NX),TCA(NY,NX)
+      TairK_col(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      if(abs(TairK_col(NY,NX))>400._r8)then
+        print*,'air temperature problematic',TairK_col(NY,NX),TCA(NY,NX)
       endif
       !
       !     VPK,VPS=ambient,saturated vapor pressure
@@ -181,8 +181,8 @@ module WthrMod
         VPK_col(NY,NX)=VAVG2+VMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
           -DayLenthCurrent(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK(NY,NX))) &
-      VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK_col(NY,NX))) &
+      VPS(NY,NX)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK_col(NY,NX)=AMIN1(VPS(NY,NX),VPK_col(NY,NX))
 !
       !     UA=wind speed
@@ -234,9 +234,9 @@ module WthrMod
       RADN(NY,NX)=SWRad_hrly(J,I)  
       TCA(NY,NX)=TMP_hrly(J,I)
 
-      TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      TairK_col(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
       !elevation corrected saturated air vapor pressure, KPa
-      VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      VPS(NY,NX)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK_col(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))   
       WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
 
@@ -320,7 +320,7 @@ module WthrMod
         ELSE
           CLD=0.2_r8
         ENDIF
-        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK_col(NY,NX)/TairK(NY,NX))**0.131_r8)
+        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK_col(NY,NX)/TairK_col(NY,NX))**0.131_r8)
         EMM=EMM*(1.0_r8+0.242_r8*CLD**0.583_r8)
         !
         !     IF PHYTOTRON
@@ -343,13 +343,13 @@ module WthrMod
       !     atmospheric properties
 !
       IF(RadLWClm(J,I).GT.0.0_r8)THEN
-        !     SkyLonwRad_col(NY,NX)=EMM*(stefboltz_const*TairK(NY,NX)**4)
+        !     SkyLonwRad_col(NY,NX)=EMM*(stefboltz_const*TairK_col(NY,NX)**4)
         !     SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
         SkyLonwRad_col(NY,NX)=RadLWClm(J,I)
       ELSE
-        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK(NY,NX)**4._r8 
+        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8 
       ENDIF
-!      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK(NY,NX),TCA(NY,NX)
+!      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK_col(NY,NX),TCA(NY,NX)
 !
       !     INSERT CESM WEATHER HERE
       !
@@ -457,7 +457,7 @@ module WthrMod
         AMP=0.5_r8*(TDTPX(N,NY,NX)-TDTPN(N,NY,NX))
         DHR=SIN(0.2618_r8*(J-(SolarNoonHour_col(NY,NX)+3.0_r8))+PICON2h)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
-        TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+        TairK_col(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
 !
         !     ACCLIMATION TO GRADUAL CLIMATE CHANGE
         !
@@ -497,8 +497,8 @@ module WthrMod
 !
         IF(isclose(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
-          !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK(NY,NX))) &
-          vps(ny,ny)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
+          !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK_col(NY,NX))) &
+          vps(ny,ny)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
           VPK_col(NY,NX)=VPK_col(NY,NX)*VPS(NY,NX)/VPX
         ENDIF
       ENDIF
@@ -549,7 +549,7 @@ module WthrMod
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, KPa
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, KPa
       TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)      !wind speed, m/hr
-      VPA(NY,NX)=VPK_col(NY,NX)*2.173E-03_r8/TairK(NY,NX)    !atmospheric vapor concentration, [m3 m-3], 2.173E-03_r8=18g/mol/(8.3142)
+      VPA(NY,NX)=VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)    !atmospheric vapor concentration, [m3 m-3], 2.173E-03_r8=18g/mol/(8.3142)
 !      PrecDaily_col(NY,NX)=PrecDaily_col(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
 !        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
 !

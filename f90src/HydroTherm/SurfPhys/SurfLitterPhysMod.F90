@@ -426,7 +426,7 @@ implicit none
 !      TKR1=TKSoi1(0,NY,NX)
 !    endif
     TKS1=TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
-!    print*,'tkr1',NN,TKR1,TKS1,TKQ(NY,NX),TairK(NY,NX),TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
+!    print*,'tkr1',NN,TKR1,TKS1,TKQ(NY,NX),TairK_col(NY,NX),TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
 !    print*,'cplitr',NN,VLHeatCapcityLitR2,SoilOrgM_vr(ielmc,0,NY,NX),VWatLitr2,VLiceMicP1(0,NY,NX)
   ENDDO D5000
   end subroutine SurfLitterIterateNN
@@ -463,7 +463,7 @@ implicit none
   endif
   dVHeatCapacityLitr=VHeatCapacityLitR-VHeatCapacityLitrX            
   !TairK: air temperature in kelvin, HeatByLitrMassChange represents increase heat in litr
-  HeatByLitrMassChange=dVHeatCapacityLitr*TairK(NY,NX)
+  HeatByLitrMassChange=dVHeatCapacityLitr*TairK_col(NY,NX)
   ENGYZ=VHeatCapacityLitrX*TKS(0,NY,NX)
 
   !update water, ice content and heat capacity of residue
@@ -486,7 +486,7 @@ implicit none
       write(*,*)'ice',VLiceMicPr,VLiceMicP(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
         HEATIN_lndByRunoff,VHeatCapacity_col(0,NY,NX)        
-      write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK(NY,NX),SoilOrgM_vr(ielmc,0,NY,NX)   
+      write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK_col(NY,NX),SoilOrgM_vr(ielmc,0,NY,NX)   
       write(*,*)'tengz',ENGYZ/VHeatCapacity_col(0,NY,NX),HeatFLo2LitrByWat(NY,NX)/VHeatCapacity_col(0,NY,NX),&
         TLitrIceHeatFlxFrez(NY,NX)/VHeatCapacity_col(0,NY,NX),HeatByLitrMassChange/VHeatCapacity_col(0,NY,NX), &
         HEATIN_lndByRunoff/VHeatCapacity_col(0,NY,NX)

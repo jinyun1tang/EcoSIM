@@ -10,7 +10,7 @@ module ATSEcoSIMAdvanceMod
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
-  use ClimForcDataType, only : LWRadSky, TairK, &
+  use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm, RainH  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
@@ -63,7 +63,7 @@ implicit none
     !Z2OE(NY,NX)=atm_n2o
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc(NY)
+    TairK_col(NY,NX)=tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)

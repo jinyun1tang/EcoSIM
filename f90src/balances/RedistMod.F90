@@ -300,12 +300,12 @@ module RedistMod
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN_lnd=HEATIN_lnd+cpw*TairK(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec(NY,NX)
   HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
     HEATIN_lnd=HEATIN_lnd+XPhaseChangeHeatL(L,NY,NX)
   ENDDO D5150
-  HeatOut_lnds=HeatOut_lnds-cpw*TairK(NY,NX)*IrrigSubsurf_col(NY,NX)
+  HeatOut_lnds=HeatOut_lnds-cpw*TairK_col(NY,NX)*IrrigSubsurf_col(NY,NX)
 !
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
 ! XCODFS: surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve)
@@ -1380,7 +1380,7 @@ module RedistMod
 
       SoilOrgM_vr(ielmc,0,NY,NX)=SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       RAINR=LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
-      HRAINR=RAINR*cpw*TairK(NY,NX)
+      HRAINR=RAINR*cpw*TairK_col(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR
 

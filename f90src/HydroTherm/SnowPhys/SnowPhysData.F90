@@ -20,7 +20,7 @@ module SnowPhysData
   real(r8),allocatable ::  trcg_TFloXSurRunoff(:,:,:)                        !
   real(r8),allocatable ::  XSnowThawMassL(:,:,:)              !hourly convective heat flux from snow transfer
   real(r8),allocatable ::  XIceThawMassL(:,:,:)                      !hourly convective heat flux from ice transfer  
-  real(r8),allocatable ::  THeatBySnowRedist(:,:)                          !
+  real(r8),allocatable ::  THeatBySnowRedist_col(:,:)                          !
   real(r8),allocatable ::  TIceBySnowRedist(:,:)                           !
   real(r8),allocatable ::  TWatBySnowRedist(:,:)                           !
   real(r8),allocatable ::  cumWatFlx2LitRByRunoff(:,:)                          !
@@ -75,7 +75,7 @@ module SnowPhysData
   allocate(TIceBySnowRedist(JY,JX));         TIceBySnowRedist=0._r8
   allocate(TWatBySnowRedist(JY,JX));         TWatBySnowRedist=0._r8
   allocate(TDrysnoBySnowRedist(JY,JX));         TDrysnoBySnowRedist=0._r8
-  allocate(THeatBySnowRedist(JY,JX));        THeatBySnowRedist=0._r8
+  allocate(THeatBySnowRedist_col(JY,JX));        THeatBySnowRedist_col=0._r8
   allocate(TKSnow1(JS,JY,JX));     TKSnow1=0._r8
   allocate(cumHeatFlx2LitRByRunoff(JY,JX));       cumHeatFlx2LitRByRunoff=0._r8
   allocate(cumHeatFlxBySnowRedistribut(JY,JX));       cumHeatFlxBySnowRedistribut=0._r8
@@ -131,7 +131,7 @@ module SnowPhysData
   call destroy(cumWatFlxBySnowRedistribut)
   call destroy(cumIceFlxBySnowRedistribut)
   call destroy(TIceBySnowRedist)  
-  call destroy(THeatBySnowRedist)  
+  call destroy(THeatBySnowRedist_col)  
   call destroy(cumHeatFlxBySnowRedistribut)
   call destroy(TKSnow1)  
   call destroy(VLHeatCapSnowM1)

@@ -74,14 +74,19 @@ implicit none
   VLHeatCapSnow_col(1,NY,NX)=cps*VLDrySnoWE_col(1,NY,NX)+cpw*VLWatSnow_col(1,NY,NX)+cpi*VLIceSnow_col(1,NY,NX)
 
   IF(VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-!    if(I>=138.and.I<=139)print*,I+J/24.,'revi',TKSnow(1,NY,NX),ENGYW,THeatBySnowRedist(NY,NX),VLHeatCapSnow_col(1,NY,NX)    
-    TKSnow(1,NY,NX)=(ENGYW+THeatBySnowRedist(NY,NX))/VLHeatCapSnow_col(1,NY,NX)    
+!    if(I>=138.and.I<=139)print*,I+J/24.,'revi',TKSnow(1,NY,NX),ENGYW,THeatBySnowRedist_col(NY,NX),VLHeatCapSnow_col(1,NY,NX)    
+    TKSnow(1,NY,NX)=(ENGYW+THeatBySnowRedist_col(NY,NX))/VLHeatCapSnow_col(1,NY,NX)    
+    if(TKSnow(1,NY,NX)<0._r8)then
+      write(*,*)'TKSnow(1,NY,NX)',TKSnow(1,NY,NX),VLDrySnoWE_col(1,NY,NX), &
+        VLWatSnow_col(1,NY,NX),VLIceSnow_col(1,NY,NX),TairK_col(NY,NX),&
+        ENGYW,THeatBySnowRedist_col(NY,NX)
+      call endrun(trim(mod_filename)//' at line',__LINE__)   
+    endif
+
   ELSE
-    TKSnow(1,NY,NX)=TairK(NY,NX)
+    TKSnow(1,NY,NX)=TairK_col(NY,NX)
   ENDIF
-!  if(I>=138.and.I<=139)print*,'tairk',TKSnow(1,NY,NX),TairK(NY,NX)
-  if(TKSnow(1,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)   
-!  write(133,*)I+J/24.,'snow',VcumSnowWE(NY,NX),TKSnow(1,NY,NX),TairK(NY,NX),THeatBySnowRedist(NY,NX)
+
   VcumDrySnoWE_col(NY,NX)=sum(VLDrySnoWE_col(1:JS,NY,NX))
   VcumWatSnow_col(NY,NX)=sum(VLWatSnow_col(1:JS,NY,NX))
   VcumIceSnow_col(NY,NX)=sum(VLIceSnow_col(1:JS,NY,NX))
@@ -111,7 +116,7 @@ implicit none
 !
 
   IF(VLHeatCapSnow_col(1,NY,NX).GT.0.0_r8 .AND. VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) &
-    .AND. TairK(NY,NX).GT.TFICE)THEN
+    .AND. TairK_col(NY,NX).GT.TFICE)THEN
     !air temperature above freezing, surface snow layer heat insignificant, so it is merged
     !to the surface layer, and all varaibles are reset
     ENGYS=TKSnow(1,NY,NX)*VLHeatCapSnow_col(1,NY,NX)
@@ -154,7 +159,7 @@ implicit none
 !        TKS(NUM(NY,NX),NY,NX)=TKSX
 !      endif
     ELSE
-      TKS(NUM(NY,NX),NY,NX)=TairK(NY,NX)
+      TKS(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
     ENDIF
 
   ENDIF
@@ -291,7 +296,7 @@ implicit none
 
   !the line below is a hack, and likely a better snow layering scheme is needed.
   if(L.eq.1.and.isclose(TCSnow(1,NY,NX),spval))then
-    TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK(NY,NX))    
+    TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK_col(NY,NX))    
   endif
 !
 ! ADD CHANGES IN SNOW, WATER AND ICE
@@ -406,7 +411,7 @@ implicit none
       !there is no significant snow mass      
       IF(L.EQ.1)THEN
         !if current layer is top layer
-        TKSnow(L,NY,NX)=TairK(NY,NX)
+        TKSnow(L,NY,NX)=TairK_col(NY,NX)
       ELSE
         !if it is not the top layer
         TKSnow(L,NY,NX)=TKSnow(L-1,NY,NX)
@@ -424,7 +429,7 @@ implicit none
     SnowThickL_col(L,NY,NX)=0.0_r8
     cumSnowDepz_col(L,NY,NX)=cumSnowDepz_col(L-1,NY,NX)
     IF(L.EQ.1)THEN
-      TKSnow(L,NY,NX)=TairK(NY,NX)
+      TKSnow(L,NY,NX)=TairK_col(NY,NX)
     ELSE
       TKSnow(L,NY,NX)=TKSnow(L-1,NY,NX)
     ENDIF
@@ -651,7 +656,7 @@ implicit none
       if(L>1)then
         TKSnow(L,NY,NX)=spval        
       else
-        TKSnow(L,NY,NX)=TairK(NY,NX) 
+        TKSnow(L,NY,NX)=TairK_col(NY,NX) 
       endif  
     endif  
     !move up to handel loss of surface layer, this should rarely occur, but round off error may trigger it
@@ -685,7 +690,7 @@ implicit none
   TDrysnoBySnowRedist(NY,NX)=0.0_r8
   TWatBySnowRedist(NY,NX)=0.0_r8
   TIceBySnowRedist(NY,NX)=0.0_r8
-  THeatBySnowRedist(NY,NX)=0.0_r8
+  THeatBySnowRedist_col(NY,NX)=0.0_r8
 
   trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
   trcg_QSS(idg_beg:idg_end-1,NY,NX)=0.0_r8  

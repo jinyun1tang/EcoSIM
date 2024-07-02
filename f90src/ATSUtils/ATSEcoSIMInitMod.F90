@@ -10,7 +10,7 @@ module ATSEcoSIMInitMod
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
-  use ClimForcDataType, only : LWRadSky, TairK, &
+  use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm, RainH
   use SoilPropertyDataType
 implicit none
@@ -56,7 +56,7 @@ implicit none
     !Z2OE(NY,NX)=atm_n2o
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc(NY) !it's already in K??
+    TairK_col(NY,NX)=tairc(NY) !it's already in K??
     VPA(NY,NX) = vpair(NY)
     WindSpeedAtm(NY,NX) = uwind(NY)  
     DO L=NU(NY,NX),NL(NY,NX)

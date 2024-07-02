@@ -652,7 +652,7 @@ implicit none
   plt_rad%SineSunInclAnglNxtHour_col=SineSunInclAnglNxtHour_col(NY,NX)
   plt_rad%SineSunInclAngle_col=SineSunInclAngle_col(NY,NX)
   plt_ew%TKSnow=TKSnow(1,NY,NX)  !surface layer snow temperature
-  plt_ew%TairK=TairK(NY,NX)
+  plt_ew%TairK=TairK_col(NY,NX)
   plt_rad%LWRadGrnd=LWRadGrnd(NY,NX)
   plt_rad%LWRadSky=LWRadSky(NY,NX)
   plt_ew%VPA=VPA(NY,NX)
@@ -1450,7 +1450,7 @@ implicit none
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_site%ZERO  =ZERO
   plt_ew%SnowDepth   =SnowDepth(NY,NX)
-  plt_ew%TairK     =TairK(NY,NX)
+  plt_ew%TairK     =TairK_col(NY,NX)
   plt_morph%CanopyHeight_col   =CanopyHeight_col(NY,NX)
   plt_site%WindMesHeight=WindMesHeight(NY,NX)
   plt_ew%ZERO4PlantDisplace_col=ZERO4PlantDisplace_col(NY,NX)

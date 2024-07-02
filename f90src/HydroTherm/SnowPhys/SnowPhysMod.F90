@@ -726,7 +726,7 @@ contains
       IF(VLHeatCapSnowM1(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         TKSnow1(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
-        TKSnow1(L,NY,NX)=TairK(NY,NX)
+        TKSnow1(L,NY,NX)=TairK_col(NY,NX)
       ELSE
         TKSnow1(L,NY,NX)=TKSnow1(L-1,NY,NX)
       ENDIF
@@ -846,7 +846,7 @@ contains
   HeatX2SnoLay(1,NY,NX)=NetHeatAir2Snow
   WatFlowInSnowM(M,1,NY,NX)=WatFlowInSnowM(M,1,NY,NX)+SnoFall+IceFall+Rainfall  
   if(WatFlowInSnowM(M,1,NY,NX)>0._r8 .and. isclose(TCSnow(1,NY,NX),spval))then
-    TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK(NY,NX))  
+    TCSnow(1,NY,NX)=units%Kelvin2Celcius(TairK_col(NY,NX))  
   endif
 !  if(I>=138.and.I<=139)print*,'SnofallRain',SnofallRain,Rainfall,EVAPW2
   if(abs(SnofallRain)>1.e10)then
@@ -931,7 +931,7 @@ contains
 !        ENGY0,CumHeat2SnowLayM(L,NY,NX)+XPhaseChangeHeatLM(L,NY,NX),VLSnowHeatCapM(M+1,L,NY,NX) &
 !        ,TKSnow0(L,NY,NX)
     ELSEIF(L.EQ.1)THEN
-      TKSnow0(L,NY,NX)=TairK(NY,NX)
+      TKSnow0(L,NY,NX)=TairK_col(NY,NX)
     ELSE
       TKSnow0(L,NY,NX)=TKSnow0(L-1,NY,NX)
     ENDIF
@@ -1009,7 +1009,7 @@ contains
   IF(VLSnowHeatCapM(M+1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     TKSnow0(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLSnowHeatCapM(M+1,1,NY,NX)
   ELSE
-    TKSnow0(1,NY,NX)=TairK(NY,NX)
+    TKSnow0(1,NY,NX)=TairK_col(NY,NX)
   ENDIF
 
   
@@ -1024,7 +1024,7 @@ contains
     !     VLHeatCapacity_vr,VLHeatCapacityA,VLHeatCapacityP=total soil,soil+micropore,macropore heat capacity
     !     TK1=soil surface temperature, why not to litter layer
     !
-  IF(VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .AND. TairK(NY,NX).GT.TFice)THEN
+  IF(VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .AND. TairK_col(NY,NX).GT.TFice)THEN
     FLWS=VLDrySnoWE0(1,NY,NX)
     FLWW=VLWatSnow0(1,NY,NX)
     FLWI=VLIceSnow0(1,NY,NX)
@@ -1049,10 +1049,10 @@ contains
       tk1pres=TKSoi1(NUM(NY,NX),NY,NX)
       TKSoi1(NUM(NY,NX),NY,NX)=(ENGY1+HFLWS)/VLHeatCapacity_vr(NUM(NY,NX),NY,NX)
 !      if(abs(tk1pres/TKSoi1(NUM(NY,NX),NY,NX)-1._r8)>0.025_r8)then
-!        TKSoi1(NUM(NY,NX),NY,NX)=TairK(NY,NX)
+!        TKSoi1(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
 !      endif
     ELSE
-      TKSoi1(NUM(NY,NX),NY,NX)=TairK(NY,NX)
+      TKSoi1(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
     ENDIF
   ENDIF
 !  if(M>=28 .and. NY==3)write(*,*)'UpdateSnowAtM222 NY,NX ',NY,NX,M,VLWatSnow0(1,NY,NX)  

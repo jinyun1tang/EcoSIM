@@ -290,17 +290,19 @@ implicit none
   real(r8),pointer   :: h2D_CH4AeroOxiC_vr(:,:)
   real(r8),pointer   :: h2D_H2MethogenC_vr(:,:)
 
-  real(r8),pointer   :: h2D_RCH4Prod_vr(:,:)
+  real(r8),pointer   :: h2D_RCH4ProdHydrog_vr(:,:)
+  real(r8),pointer   :: h2D_RCH4ProdAcetcl_vr(:,:)
   real(r8),pointer   :: h2D_RCH4Oxi_aero_vr(:,:)
   real(r8),pointer   :: h2D_RFermen_vr(:,:)
   real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
-  real(r8),pointer   :: h2o_n2oprod_vr(:,:)
+  real(r8),pointer   :: h2D_n2oprod_vr(:,:)
 
-  real(r8),pointer   :: h1D_RCH4Prod_litr_col(:)
+  real(r8),pointer   :: h1D_RCH4ProdHydrog_litr_col(:)
+  real(r8),pointer   :: h1D_RCH4ProdAcetcl_litr_col(:)  
   real(r8),pointer   :: h1D_RCH4Oxi_aero_litr_col(:)
   real(r8),pointer   :: h1D_RFermen_litr_col(:)
-  real(r8),pointer   :: h1D_nh3oxi_litr_col(:)
-  real(r8),pointer   :: h1o_n2oprod_litr_col(:)
+  real(r8),pointer   :: h1D_NH3oxi_litr_col(:)
+  real(r8),pointer   :: h1D_N2oprod_litr_col(:)
 
   real(r8),pointer   :: h2D_AeroHrBactN_vr(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungN_vr(:,:)   !aerobic heterotropic fungi
@@ -650,17 +652,19 @@ implicit none
   allocate(this%h2D_CH4AeroOxiC_vr(beg_col:end_col,1:JZ)); this%h2D_CH4AeroOxiC_vr(:,:)=spval
   allocate(this%h2D_H2MethogenC_vr(beg_col:end_col,1:JZ)); this%h2D_H2MethogenC_vr(:,:)=spval
 
-  allocate(this%h2D_RCH4Prod_vr(beg_col:end_col,1:JZ));   this%h2D_RCH4Prod_vr(:,:)=spval
+  allocate(this%h2D_RCH4ProdHydrog_vr(beg_col:end_col,1:JZ));   this%h2D_RCH4ProdHydrog_vr(:,:)=spval
+  allocate(this%h2D_RCH4ProdAcetcl_vr(beg_col:end_col,1:JZ));   this%h2D_RCH4ProdAcetcl_vr(:,:)=spval
   allocate(this%h2D_RCH4Oxi_aero_vr(beg_col:end_col,1:JZ)); this%h2D_RCH4Oxi_aero_vr(:,:)=spval
   allocate(this%h2D_RFermen_vr(beg_col:end_col,1:JZ)); this%h2D_RFermen_vr(:,:)=spval
   allocate(this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ));  this%h2D_nh3oxi_vr(:,:)=spval
-  allocate(this%h2o_n2oprod_vr(beg_col:end_col,1:JZ));  this%h2o_n2oprod_vr(:,:)=spval
+  allocate(this%h2D_n2oprod_vr(beg_col:end_col,1:JZ));  this%h2D_n2oprod_vr(:,:)=spval
 
-  allocate(this%h1D_RCH4Prod_litr_col(beg_col:end_col));  this%h1D_RCH4Prod_litr_col(:)=spval
+  allocate(this%h1D_RCH4ProdHydrog_litr_col(beg_col:end_col));  this%h1D_RCH4ProdHydrog_litr_col(:)=spval
+  allocate(this%h1D_RCH4ProdAcetcl_litr_col(beg_col:end_col));  this%h1D_RCH4ProdAcetcl_litr_col(:)=spval
   allocate(this%h1D_RCH4Oxi_aero_litr_col(beg_col:end_col)); this%h1D_RCH4Oxi_aero_litr_col(:)=spval
   allocate(this%h1D_RFermen_litr_col(beg_col:end_col));  this%h1D_RFermen_litr_col(:)=spval
   allocate(this%h1D_nh3oxi_litr_col(beg_col:end_col)); this%h1D_nh3oxi_litr_col(:)=spval
-  allocate(this%h1o_n2oprod_litr_col(beg_col:end_col));  this%h1o_n2oprod_litr_col(:)=spval
+  allocate(this%h1D_n2oprod_litr_col(beg_col:end_col));  this%h1D_n2oprod_litr_col(:)=spval
 
   allocate(this%h2D_AeroHrBactN_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactN_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungN_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungN_vr(:,:)=spval
@@ -2135,11 +2139,20 @@ implicit none
       call SumMicbGroup(0,NY,NX,micpar%mid_H2GenoMethanogArchea,MicbE,isauto=.true.)     
       this%h2D_H2MethogenE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)
 
-      call sumDOML(L,NY,NX,DOM)
+      call sumDOML(0,NY,NX,DOM)
       this%h1D_DOC_LITR_col(ncol)=DOM(idom_doc)
       this%h1D_DON_LITR_col(ncol)=DOM(idom_don)
       this%h1D_DOP_LITR_col(ncol)=DOM(idom_dop)
       this%h1D_acetate_LITR_col(ncol)=DOM(idom_acetate)
+
+      this%h1D_RCH4ProdHydrog_litr_col(ncol) = RCH4ProdHydrog_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RCH4Oxi_aero_litr_col(ncol)=RCH4Oxi_aero_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RFermen_litr_col(ncol)=RFermen_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_nh3oxi_litr_col(ncol)=RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_n2oprod_litr_col(ncol)= (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
+                               +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+
 
       DO L=1,JZ
         call sumDOML(L,NY,NX,DOM)
@@ -2180,72 +2193,68 @@ implicit none
         this%h2D_ECND_vr(ncol,L)     = ECND(L,NY,NX)
 
         call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
-        this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)    !aerobic heterotropic bacteria
-        this%h2D_AeroHrBactN_vr(ncol,L) = MicbE(ielmn)    !aerobic heterotropic bacteria
-        this%h2D_AeroHrBactP_vr(ncol,L) = MicbE(ielmp)    !aerobic heterotropic bacteria
+        this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)/AREA(3,NU(NY,NX),NY,NX)    !aerobic heterotropic bacteria
+        this%h2D_AeroHrBactN_vr(ncol,L) = MicbE(ielmn)/AREA(3,NU(NY,NX),NY,NX)    !aerobic heterotropic bacteria
+        this%h2D_AeroHrBactP_vr(ncol,L) = MicbE(ielmp)/AREA(3,NU(NY,NX),NY,NX)    !aerobic heterotropic bacteria
 
         call SumMicbGroup(L,NY,NX,micpar%mid_Facult_DenitBacter,MicbE)
-        this%h2D_faculDenitC_vr(ncol,L) = micBE(ielmc)  !facultative denitrifier
-        this%h2D_faculDenitN_vr(ncol,L) = micBE(ielmn)  !facultative denitrifier
-        this%h2D_faculDenitP_vr(ncol,L) = micBE(ielmp)  !facultative denitrifier
+        this%h2D_faculDenitC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)  !facultative denitrifier
+        this%h2D_faculDenitN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)  !facultative denitrifier
+        this%h2D_faculDenitP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)  !facultative denitrifier
 
         call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_Fungi,MicbE)
-        this%h2D_AeroHrFungC_vr(ncol,L) = micBE(ielmc)   !aerobic heterotropic fungi
-        this%h2D_AeroHrFungN_vr(ncol,L) = micBE(ielmn)   !aerobic heterotropic fungi
-        this%h2D_AeroHrFungP_vr(ncol,L) = micBE(ielmp)   !aerobic heterotropic fungi
+        this%h2D_AeroHrFungC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)   !aerobic heterotropic fungi
+        this%h2D_AeroHrFungN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)   !aerobic heterotropic fungi
+        this%h2D_AeroHrFungP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)   !aerobic heterotropic fungi
 
         call SumMicbGroup(L,NY,NX,micpar%mid_fermentor,MicbE)
-        this%h2D_fermentorC_vr(ncol,L) = micBE(ielmc)  !fermentor
-        this%h2D_fermentorN_vr(ncol,L) = micBE(ielmn)  !fermentor
-        this%h2D_fermentorP_vr(ncol,L) = micBE(ielmp)  !fermentor        
+        this%h2D_fermentorC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)  !fermentor
+        this%h2D_fermentorN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)  !fermentor
+        this%h2D_fermentorP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)  !fermentor        
 
         call SumMicbGroup(L,NY,NX,micpar%mid_AcetoMethanogArchea,MicbE)
-        this%h2D_acetometgC_vr(ncol,L) = micBE(ielmc)  !acetogenic methanogen
-        this%h2D_acetometgN_vr(ncol,L) = micBE(ielmn)  !acetogenic methanogen
-        this%h2D_acetometgP_vr(ncol,L) = micBE(ielmp)  !acetogenic methanogen
+        this%h2D_acetometgC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)  !acetogenic methanogen
+        this%h2D_acetometgN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)  !acetogenic methanogen
+        this%h2D_acetometgP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)  !acetogenic methanogen
 
         call SumMicbGroup(L,NY,NX,micpar%mid_aerob_N2Fixer,MicbE)
-        this%h2D_aeroN2fixC_vr(ncol,L) = micBE(ielmc)  !aerobic N2 fixer
-        this%h2D_aeroN2fixN_vr(ncol,L) = micBE(ielmn)  !aerobic N2 fixer
-        this%h2D_aeroN2fixP_vr(ncol,L) = micBE(ielmp)  !aerobic N2 fixer
+        this%h2D_aeroN2fixC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)  !aerobic N2 fixer
+        this%h2D_aeroN2fixN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)  !aerobic N2 fixer
+        this%h2D_aeroN2fixP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)  !aerobic N2 fixer
 
         call SumMicbGroup(L,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)
-        this%h2D_anaeN2FixC_vr(ncol,L) = micBE(ielmc) !anaerobic N2 fixer
-        this%h2D_anaeN2FixN_vr(ncol,L) = micBE(ielmn) !anaerobic N2 fixer
-        this%h2D_anaeN2FixP_vr(ncol,L) = micBE(ielmp) !anaerobic N2 fixer
+        this%h2D_anaeN2FixC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX) !anaerobic N2 fixer
+        this%h2D_anaeN2FixN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX) !anaerobic N2 fixer
+        this%h2D_anaeN2FixP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX) !anaerobic N2 fixer
 
         call SumMicbGroup(L,NY,NX,micpar%mid_AmmoniaOxidBacter,MicbE,isauto=.true.)
-        this%h2D_NH3OxiBactC_vr(ncol,L) = micBE(ielmc)
-        this%h2D_NH3OxiBactN_vr(ncol,L) = micBE(ielmn)
-        this%h2D_NH3OxiBactP_vr(ncol,L) = micBE(ielmp)
+        this%h2D_NH3OxiBactC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_NH3OxiBactN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_NH3OxiBactP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)
 
         call SumMicbGroup(L,NY,NX,micpar%mid_NitriteOxidBacter,MicbE,isauto=.true.)
-        this%h2D_NO2OxiBactC_vr(ncol,L) = micBE(ielmc)
-        this%h2D_NO2OxiBactN_vr(ncol,L) = micBE(ielmn)
-        this%h2D_NO2OxiBactP_vr(ncol,L) = micBE(ielmp)
+        this%h2D_NO2OxiBactC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_NO2OxiBactN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_NO2OxiBactP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)
 
         call SumMicbGroup(L,NY,NX,micpar%mid_AerobicMethanotrofBacter,MicbE,isauto=.true.)
-        this%h2D_CH4AeroOxiC_vr(ncol,L) = micBE(ielmc)
-        this%h2D_CH4AeroOxiN_vr(ncol,L) = micBE(ielmn)
-        this%h2D_CH4AeroOxiP_vr(ncol,L) = micBE(ielmp)
+        this%h2D_CH4AeroOxiC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_CH4AeroOxiN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_CH4AeroOxiP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)
 
         call SumMicbGroup(L,NY,NX,micpar%mid_H2GenoMethanogArchea,MicbE,isauto=.true.)
-        this%h2D_H2MethogenC_vr(ncol,L) = micBE(ielmc)
-        this%h2D_H2MethogenN_vr(ncol,L) = micBE(ielmn)
-        this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)
+        this%h2D_H2MethogenC_vr(ncol,L) = micBE(ielmc)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_H2MethogenN_vr(ncol,L) = micBE(ielmn)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)/AREA(3,NU(NY,NX),NY,NX)
 
 
-!  real(r8),pointer   :: h2D_RCH4Prod_vr(:,:)
-!  real(r8),pointer   :: h2D_RCH4Oxi_aero_vr(:,:)
-!  real(r8),pointer   :: h2D_RFermen_vr(:,:)
-!  real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
-!  real(r8),pointer   :: h2o_n2oprod_vr(:,:)
-
-!  real(r8),pointer   :: h1D_RCH4Prod_litr_col(:)
-!  real(r8),pointer   :: h1D_RCH4Oxi_aero_litr_col(:)
-!  real(r8),pointer   :: h1D_RFermen_litr_col(:)
-!  real(r8),pointer   :: h1D_nh3oxi_litr_col(:)
-!  real(r8),pointer   :: h1o_n2oprod_litr_col(:)
+        this%h2D_RCH4ProdAcetcl_vr(ncol,L) = RCH4ProdAcetcl_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RCH4ProdHydrog_vr(ncol,L) = RCH4ProdHydrog_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RCH4Oxi_aero_vr(ncol,L)   = RCH4Oxi_aero_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RFermen_vr(ncol,L)        = RFermen_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_nh3oxi_vr(ncol,L)         = RNH3oxi_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_n2oprod_vr(ncol,L)        = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
+                               +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
 
       ENDDO
 

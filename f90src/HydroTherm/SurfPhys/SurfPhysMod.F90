@@ -231,12 +231,12 @@ contains
   !write(*,*) "NX = ", NX
   !write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
   !write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
-  !write(*,*) "TairK(NY,NX) = ", TairK(NY,NX)
+  !write(*,*) "TairK_col(NY,NX) = ", TairK_col(NY,NX)
   !write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
   !write(*,*) "SensHeatCondctance = ", SensHeatCondctance
 
   VPQ_col(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
-  TKQ(NY,NX)=TairK(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
+  TKQ(NY,NX)=TairK_col(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
 
   end subroutine SetCanopyProperty
 !------------------------------------------------------------------------------------------
@@ -1243,7 +1243,7 @@ contains
     !soil bulk density significant
     FLQRS=AZMAX1(Prec2SoiMicP1(NY,NX)-VLairMicP1_vr(NUM(NY,NX),NY,NX))
     FLQRH=AZMAX1(Prec2SoiMacP1(NY,NX)-VLairMacP1(NUM(NY,NX),NY,NX))
-    HFLQR1=cpw*TairK(NY,NX)*(FLQRS+FLQRH)
+    HFLQR1=cpw*TairK_col(NY,NX)*(FLQRS+FLQRH)
     PrecAir2LitR=Prec2LitR1(NY,NX)+FLQRS+FLQRH
     PrecHeatAir2LitR=PrecHeat2LitR1(NY,NX)+HFLQR1
     PrecNet2SoiMicP=Prec2SoiMicP1(NY,NX)-FLQRS
@@ -1439,24 +1439,24 @@ contains
   ! there is precipitation
     Rain4ToSno=(PrecRainAndSurfirrig(NY,NX)-PrecIntceptByCanopy_col(NY,NX))*FracSurfAsSnow(NY,NX)
     SnoFall=SnoFalPrec(NY,NX)                                                        !snowfall
-    HeatByPrec=cps*TairK(NY,NX)*SnoFall+cpw*TairK(NY,NX)*Rain4ToSno                  !incoming heat flux from precipitations to snow-covered surface
+    HeatByPrec=cps*TairK_col(NY,NX)*SnoFall+cpw*TairK_col(NY,NX)*Rain4ToSno                  !incoming heat flux from precipitations to snow-covered surface
     PrecThruFall=(PrecRainAndSurfirrig(NY,NX)-PrecIntceptByCanopy_col(NY,NX))*FracSurfSnoFree(NY,NX)       !incoming precipitation to snow-free surface
     PrecThrufall2LitR=PrecThruFall*FracSurfByLitR(NY,NX)                             !water flux to snow-free coverd by litter
-    PrecHeat2LitR=cpw*TairK(NY,NX)*PrecThrufall2LitR                                 !heat flux to snow-free surface covered by litter
+    PrecHeat2LitR=cpw*TairK_col(NY,NX)*PrecThrufall2LitR                                 !heat flux to snow-free surface covered by litter
     PrecThrufall2Soil=PrecThruFall*FracSurfAsBareSoi(NY,NX)                          !heat flux to snow-free surface not covered by litter
-    PrecHeat2Soil=cpw*TairK(NY,NX)*PrecThrufall2Soil
+    PrecHeat2Soil=cpw*TairK_col(NY,NX)*PrecThrufall2Soil
     PrecThrufall2SoiMicP=PrecThrufall2Soil*SoilFracAsMicP(NUM(NY,NX),NY,NX)          !water flux to micropore
     PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1(NUM(NY,NX),NY,NX)         !water flux to macropore
   ELSE
   ! no precipitation
     Rain4ToSno=-PrecIntceptByCanopy_col(NY,NX)*FracSurfAsSnow(NY,NX)                   !
     SnoFall=0.0_r8
-    HeatByPrec=cpw*TairK(NY,NX)*Rain4ToSno
+    HeatByPrec=cpw*TairK_col(NY,NX)*Rain4ToSno
     PrecThruFall=-PrecIntceptByCanopy_col(NY,NX)*FracSurfSnoFree(NY,NX)
     PrecThrufall2LitR=PrecThruFall*FracSurfByLitR(NY,NX)
-    PrecHeat2LitR=cpw*TairK(NY,NX)*PrecThrufall2LitR
+    PrecHeat2LitR=cpw*TairK_col(NY,NX)*PrecThrufall2LitR
     PrecThrufall2Soil=PrecThruFall*FracSurfAsBareSoi(NY,NX)
-    PrecHeat2Soil=cpw*TairK(NY,NX)*PrecThrufall2Soil
+    PrecHeat2Soil=cpw*TairK_col(NY,NX)*PrecThrufall2Soil
     PrecThrufall2SoiMicP=PrecThrufall2Soil*SoilFracAsMicP(NUM(NY,NX),NY,NX)
     PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1(NUM(NY,NX),NY,NX)
   ENDIF
