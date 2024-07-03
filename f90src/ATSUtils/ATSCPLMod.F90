@@ -134,8 +134,8 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   p_rain = data(:)
 
-  call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
-  p_snow = data(:)
+  !call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
+  !p_snow = data(:)
 
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
