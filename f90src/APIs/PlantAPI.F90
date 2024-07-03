@@ -453,6 +453,11 @@ implicit none
     ENDDO
 
     DO  L=1,NL(NY,NX)
+
+      DO K=1,jcplx      
+        DOM_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L)
+      ENDDO
+
       DO N=1,pltpar%jroots
         RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)
         RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=plt_biom%RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ)
@@ -742,9 +747,7 @@ implicit none
     plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
     DO K=1,jcplx
       plt_soilchem%FracBulkSOMC_vr(K,L)=FracBulkSOMC_vr(K,L,NY,NX)
-      plt_soilchem%DOM_vr(idom_doc,K,L)=DOM_vr(idom_doc,K,L,NY,NX)
-      plt_soilchem%DOM_vr(idom_don,K,L)=DOM_vr(idom_don,K,L,NY,NX)
-      plt_soilchem%DOM_vr(idom_dop,K,L)=DOM_vr(idom_dop,K,L,NY,NX)
+      plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L)=DOM_vr(idom_doc:idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 

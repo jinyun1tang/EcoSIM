@@ -143,9 +143,9 @@ module InsideTranspMod
 
       dom_TFloXSurRunoff(idom_beg:idom_end,K,NY,NX)=0.0_r8
 
-      do idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)-RDOM_CumEcoProd_vr(idom,K,0,NY,NX)
-      enddo
+!      do idom=idom_beg,idom_end
+!        DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)-RDOM_CumEcoProd_vr(idom,K,0,NY,NX)
+!      enddo
     ENDDO
 
     trcg_TFloXSurRunoff(idg_beg:idg_NH3,NY,NX)=0.0_r8
@@ -186,9 +186,9 @@ module InsideTranspMod
       DO  K=1,jcplx
         DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
-        do idom=idom_beg,idom_end
-          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_CumEcoProd_vr(idom,K,L,NY,NX)
-        enddo
+!        do idom=idom_beg,idom_end
+!          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_CumEcoProd_vr(idom,K,L,NY,NX)
+!        enddo
       ENDDO
       R3PorTSolFlx(ids_beg:ids_end,L,NY,NX)=0.0_r8
       R3PorTSoHFlx(ids_beg:ids_end,L,NY,NX)=0._r8

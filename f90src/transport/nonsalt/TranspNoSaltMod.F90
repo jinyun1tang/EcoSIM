@@ -453,11 +453,11 @@ module TranspNoSaltMod
   RBGCSinkG_vr(idg_H2,0,NY,NX)=trcg_RMicbTransf_vr(idg_H2,0,NY,NX)*dts_gas
   RBGCSinkG_vr(idg_NH3,0,NY,NX)=0.0_r8
 
-  DO  K=1,jcplx
-    DO idom=idom_beg,idom_end
-      RDOM_CumEcoProd_vr(idom,K,0,NY,NX)=-REcoDOMProd_vr(idom,K,0,NY,NX)*dts_HeatWatTP
-    ENDDO
-  ENDDO
+!  DO  K=1,jcplx
+!    DO idom=idom_beg,idom_end
+!      RDOM_CumEcoProd_vr(idom,K,0,NY,NX)=-REcoDOMProd_vr(idom,K,0,NY,NX)*dts_HeatWatTP
+!    ENDDO
+!  ENDDO
   RBGCSinkS_vr(ids_NH4,0,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,0,NY,NX)-trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
   RBGCSinkS_vr(idg_NH3,0,NY,NX)=-TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
   RBGCSinkS_vr(ids_NO3,0,NY,NX)=(-RNutMicbTransf_vr(ids_NO3,0,NY,NX)-trcn_RChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
@@ -482,7 +482,8 @@ module TranspNoSaltMod
   !reset DOM to value before the iteration
   D9979: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=AZMAX1(DOM_vr(idom,K,0,NY,NX)-RDOMMicProd_vr(idom,K,0,NY,NX))      
+!      DOM_MicP2(idom,K,0,NY,NX)=AZMAX1(DOM_vr(idom,K,0,NY,NX)-RDOMMicProd_vr(idom,K,0,NY,NX))      
+      DOM_MicP2(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)
     ENDDO
   ENDDO D9979
 
@@ -717,11 +718,11 @@ module TranspNoSaltMod
     RBGCSinkG_vr(idg_H2,L,NY,NX)=(trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
     RBGCSinkG_vr(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*dts_gas
 
-    DO  K=1,jcplx
-      DO idom=idom_beg,idom_end
-        RDOM_CumEcoProd_vr(idom,K,L,NY,NX)=-REcoDOMProd_vr(idom,K,L,NY,NX)*dts_HeatWatTP
-      enddo
-    ENDDO
+!    DO  K=1,jcplx
+!      DO idom=idom_beg,idom_end
+!        RDOM_CumEcoProd_vr(idom,K,L,NY,NX)=-REcoDOMProd_vr(idom,K,L,NY,NX)*dts_HeatWatTP
+!      enddo
+!    ENDDO
 
     RBGCSinkS_vr(ids_NH4,L,NY,NX)=(-RNutMicbTransf_vr(ids_NH4,L,NY,NX)-trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
     RBGCSinkS_vr(idg_NH3,L,NY,NX)=(-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
@@ -820,7 +821,8 @@ module TranspNoSaltMod
     !it does not include exchange among different complexes (as one kind of microbial priming). 
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,L,NY,NX)=AZMAX1(DOM_vr(idom,K,L,NY,NX)-RDOMMicProd_vr(idom,K,L,NY,NX))
+        DOM_MicP2(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)
+        !DOM_MicP2(idom,K,L,NY,NX)=AZMAX1(DOM_vr(idom,K,L,NY,NX)-RDOMMicProd_vr(idom,K,L,NY,NX))
         if(DOM_MicP2(idom,K,L,NY,NX)<0._r8)then
         print*,'nosaltmode',DOM_MicP2(idom,K,L,NY,NX),RDOMMicProd_vr(idom,K,L,NY,NX)
         endif

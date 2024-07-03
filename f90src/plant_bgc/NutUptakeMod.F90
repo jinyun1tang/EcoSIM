@@ -1356,6 +1356,7 @@ module NutUptakeMod
           ENDDO
           DOM_uptk(NE)=DOM_uptk(NE)*scal
         endif
+        DOM_vr(NE,K,L)=DOM_vr(NE,K,L)-DOM_uptk(NE)
       ENDDO
 
       DO NE=1,NumPlantChemElms
