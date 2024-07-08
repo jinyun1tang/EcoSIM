@@ -220,7 +220,9 @@ module WthrMod
   real(r8), intent(out) :: VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
-  
+
+  write(*,*) "In HourlyWeather: "  
+  write(*,*) "TSNOW: ", TSNOW
   DO  NX=NHW,NHE
     DO NY=NVN,NVS
  !
@@ -240,11 +242,18 @@ module WthrMod
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
       WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
 
+      write(*,*) "For column: ", NY, ", ", NX
+      write(*,*) "air temp: ", TCA(NY,NX), " C"
+      write(*,*) "air temp: ", TairK(NY,NX), " K"
+      write(*,*) "precipitation: ", RAINH(J,I)
+
       !snowfall is determined by air tempeature
       IF(TCA(NY,NX).GT.TSNOW)THEN
+        write(*,*) "Temp is lower than snow-limit converting to snow" 
         PrecAsRain(NY,NX)=RAINH(J,I)
         PrecAsSnow(NY,NX)=0.0_r8
       ELSE
+        write(*,*) "Temp is higher than snow, keeping as rain"
         PrecAsRain(NY,NX)=0.0_r8
         PrecAsSnow(NY,NX)=RAINH(J,I)
       ENDIF
