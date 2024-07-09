@@ -2164,7 +2164,7 @@ implicit none
         this%h2D_tSOC_vr(ncol,L) =  SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_tSON_vr(ncol,L) =  SoilOrgM_vr(ielmn,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_tSOP_vr(ncol,L) =  SoilOrgM_vr(ielmp,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_VHeatCap_vr(ncol,L)=VHeatCapacity_col(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_VHeatCap_vr(ncol,L)=VHeatCapacity_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_CO2_vr(ncol,L)  =  trc_solcl_vr(idg_CO2,L,NY,NX)
         this%h2D_CH4_vr(ncol,L)  =  trc_solcl_vr(idg_CH4,L,NY,NX)
         this%h2D_O2_vr(ncol,L)   =  trc_solcl_vr(idg_O2,L,NY,NX)

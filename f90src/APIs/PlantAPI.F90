@@ -726,7 +726,7 @@ implicit none
     plt_bgcr%RCO2GasFlxPrev_vr(L)     =RCO2GasFlxPrev_vr(L,NY,NX)
     plt_bgcr%RO2AquaXchangePrev_vr(L)     =RO2AquaXchangePrev_vr(L,NY,NX)
     plt_bgcr%RO2EcoDmndPrev_vr(L)     =RO2EcoDmndPrev_vr(L,NY,NX)
-    plt_ew%TKS(L)         =TKS(L,NY,NX)
+    plt_ew%TKS_vr(L)         =TKS_vr(L,NY,NX)
 
 
     plt_soilchem%THETW_vr(L) =THETW_vr(L,NY,NX)

@@ -182,7 +182,7 @@ contains
   ENDIF
   THETPM(1,0,NY,NX)=FracSoiPAsAir_vr(0,NY,NX)
   PSISM1(0,NY,NX)=PSISoilMatricP_vr(0,NY,NX)
-  TKSoi1(0,NY,NX)=TKS(0,NY,NX)
+  TKSoi1(0,NY,NX)=TKS_vr(0,NY,NX)
 
   end subroutine CopySurfaceVars
 
@@ -350,7 +350,7 @@ contains
 !       ATS coupler. However the calculation is simple so I'm just reproducing it
 !       here. This depends on the temperature of the liter (TKS) which is the same
 !       as TKSoi1 at the surface
-  TFACR = TEFGASDIF(TKS(0,NY,NX))
+  TFACR = TEFGASDIF(TKS_vr(0,NY,NX))
   VaporDiffusivityLitR_col(NY,NX) = TFACR*7.70E-02_r8
   !write(*,*) "for VapDiffusResistanceLitR(NY,NX): "
   !write(*,*) "DLYRR_COL(NY,NX) = ", DLYRR_COL(NY,NX)
@@ -1612,7 +1612,7 @@ contains
 
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
-!      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS(0,NY,NX)
+!      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS_vr(0,NY,NX)
 
       call SurfaceEnergyModel(I,J,M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&

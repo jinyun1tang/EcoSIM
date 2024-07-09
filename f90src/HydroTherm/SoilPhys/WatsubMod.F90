@@ -280,7 +280,7 @@ module WatsubMod
     !
     !   FMAC,SoilFracAsMicP=macropore,micropore volume fractions
     !   CNDH*=macropore hydraulic conductivity
-    !   TKS,TK1=soil temperature
+    !   TKS_vr,TK1=soil temperature
     !   FLU,HeatIrrigation=subsurface water,convective heat fluxes
     !   AREAU,AREAD=fractions of layer below natural,artifl water table
     !
@@ -292,9 +292,9 @@ module WatsubMod
           HydroCondMacP1(L,NY,NX)=0.0_r8
         ENDIF
         SoilFracAsMicP(L,NY,NX)=1.0_r8-SoilFracAsMacP1(L,NY,NX)
-        TKSoi1(L,NY,NX)=TKS(L,NY,NX)
+        TKSoi1(L,NY,NX)=TKS_vr(L,NY,NX)
         if(TKSoi1(L,NY,NX)>400._r8)then
-          write(*,*)'TKS(L,NY,NX)',L,TKS(L,NY,NX)
+          write(*,*)'TKS_vr(L,NY,NX)',L,TKS_vr(L,NY,NX)
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
         !LyrIrrig=layer number where irrigation is applied
@@ -1131,7 +1131,7 @@ module WatsubMod
             write(*,*)TWatCharge2MicP(L,NY,NX),FWatExMacP2MicPi(L,NY,NX), &
               TMLiceThawMicP(L,NY,NX),FWatIrrigate2MicP1(L,NY,NX)
             write(*,*)'M, L=',M,L,NY,NX,NUM(NY,NX),VGeomLayer(L,NY,NX),ZEROS2(NY,NX),VLWatMicPX1(L,NY,NX)
-            write(*,*)'SoiBulkDensity_vr(L,NY,NX)=',SoiBulkDensity_vr(L,NY,NX),TKS(L,NY,NX),ZEROS(NY,NX)
+            write(*,*)'SoiBulkDensity_vr(L,NY,NX)=',SoiBulkDensity_vr(L,NY,NX),TKS_vr(L,NY,NX),ZEROS(NY,NX)
             write(*,*)'VLHeatCapacity_vr(L,NY,NX),TKSoi1(L,NY,NX),TKXX',L,VLHeatCapacity_vr(L,NY,NX),TKSoi1(L,NY,NX),TKXX
             write(*,*)VLMicP1(L,NY,NX),VLMacP1(L,NY,NX)
             if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -1755,7 +1755,7 @@ module WatsubMod
     ENDIF
  !   if((ConvectHeatFluxMicP>1.e10_r8 .or.curday>=282).and. max(N3,N6)<=3)then
  !     print*,'high ConvectHeatFluxMicP',ConvectHeatFluxMicP,VP1,VPL,VPY,ATCNVL
- !     print*,'TK',TK11,TKS(N3,N2,N1),TK12,TKS(N6,N5,N4)
+ !     print*,'TK',TK11,TKS_vr(N3,N2,N1),TK12,TKS_vr(N6,N5,N4)
  !     print*,N3,N2,N1,N6,N5,N4
  !   endif
   ELSE

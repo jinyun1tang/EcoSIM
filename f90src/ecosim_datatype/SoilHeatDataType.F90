@@ -10,12 +10,12 @@ module SoilHeatDatatype
   __FILE__
 
   real(r8),target,allocatable ::  TKSZ(:,:,:)                        !
-  real(r8),target,allocatable ::  TKS(:,:,:)                         !
+  real(r8),target,allocatable ::  TKS_vr(:,:,:)                         !
   real(r8),target,allocatable ::  TLIceThawMicP(:,:,:)               !hourly accumulated freeze-thaw flux in micropores
   real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi(:,:,:)        !hourly accumulated freeze-thaw latent heat flux
   real(r8),target,allocatable ::  TLIceThawMacP(:,:,:)               !hourly accumulated freeze-thaw flux in macropores
   real(r8),target,allocatable ::  XPhaseChangeHeatL(:,:,:)           !hourly accumulated latent heat flux from freeze-thaw
-  real(r8),target,allocatable ::  VHeatCapacity_col(:,:,:)               !soil heat capacity [MJ m-3 K-1]
+  real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)               !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
   real(r8),target,allocatable ::  HeatStore_col(:,:)                 !heat stored over the grid MJ d-2, including soil, litter and canopy
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
@@ -30,14 +30,14 @@ contains
 
   implicit none
   allocate(TKSZ(366,24,JZ));    TKSZ=0._r8
-  allocate(TKS(0:JZ,JY,JX));    TKS=0._r8
+  allocate(TKS_vr(0:JZ,JY,JX));    TKS_vr=0._r8
   allocate(HeatFlx2Grnd_col(JY,JX));   HeatFlx2Grnd_col=0._r8
   allocate(HeatStore_col(JY,JX));  HeatStore_col=0._r8
   allocate(TLIceThawMicP(JZ,JY,JX));     TLIceThawMicP=0._r8
   allocate(TLPhaseChangeHeat2Soi(JZ,JY,JX));    TLPhaseChangeHeat2Soi=0._r8
   allocate(TLIceThawMacP(JZ,JY,JX));    TLIceThawMacP=0._r8
   allocate(XPhaseChangeHeatL(JS,JY,JX));   XPhaseChangeHeatL=0._r8
-  allocate(VHeatCapacity_col(0:JZ,JY,JX));   VHeatCapacity_col=0._r8
+  allocate(VHeatCapacity_vr(0:JZ,JY,JX));   VHeatCapacity_vr=0._r8
   allocate(TCS(0:JZ,JY,JX));    TCS=0._r8
   allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond=0._r8
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond=0._r8
@@ -50,13 +50,13 @@ contains
   use abortutils, only : destroy
   implicit none
   call destroy(TKSZ)
-  call destroy(TKS)
+  call destroy(TKS_vr)
   call destroy(TLIceThawMicP)
   call destroy(TLPhaseChangeHeat2Soi)
   call destroy(TLIceThawMacP)
   call destroy(HeatStore_col)
   call destroy(XPhaseChangeHeatL)
-  call destroy(VHeatCapacity_col)
+  call destroy(VHeatCapacity_vr)
   call destroy(TCS)
   call destroy(NumerSolidThermCond)
   call destroy(DenomSolidThermCond)

@@ -120,7 +120,7 @@ contains
       SnoDensL(L,NY,NX)=NewSnowDens(NY,NX)
       VLSnoDWIprev_col(L,NY,NX)=0._r8
       cumSnowDepz_col(L,NY,NX)=cumSnowDepz_col(L-1,NY,NX)+SnowThickL_col(L,NY,NX)
-      TKSnow(L,NY,NX)=TKS(0,NY,NX)
+      TKSnow(L,NY,NX)=TKS_vr(0,NY,NX)
       TCSnow(L,NY,NX)=TKSnow(L,NY,NX)-Tref
       VLHeatCapSnow_col(L,NY,NX)=0._r8
     ENDIF
@@ -1451,7 +1451,7 @@ contains
 ! VLSnowHeatCapM,VHCPW=snowpack heat capacity
 ! TK0,TKW=snowpack temperature
 !
-!  print*,'TKS(0,NY,NX)=',TKS(0,NY,NX)
+!  print*,'TKS_vr(0,NY,NX)=',TKS_vr(0,NY,NX)
   D60: DO L=1,JS
     VLDrySnoWE0(L,NY,NX)=VLDrySnoWE_col(L,NY,NX)
     VLIceSnow0(L,NY,NX)=VLIceSnow_col(L,NY,NX)

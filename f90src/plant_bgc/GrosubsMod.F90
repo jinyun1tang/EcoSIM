@@ -407,7 +407,7 @@ module grosubsMod
 
   associate(                                                              &
     TKC                         => plt_ew%TKC,                            &
-    TKS                         => plt_ew%TKS,                            &
+    TKS_vr                      => plt_ew%TKS_vr,                            &
     PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft,              &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft,          &
@@ -527,7 +527,7 @@ module grosubsMod
 !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
 !
 !     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
-!     TKS,TKSM=soil temperature,soil temp used in Arrhenius eqn
+!     TKS_vr,TKSM=soil temperature,soil temp used in Arrhenius eqn
 !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
 !     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
 !     8.3143,710.0=gas constant,enthalpy
@@ -537,7 +537,7 @@ module grosubsMod
 
   TFN5=calc_plant_maint_tempf(TKCM)  
   D7: DO L=NU,MaxNumRootLays
-    TKSM=TKS(L)+TempOffset_pft(NZ)
+    TKSM=TKS_vr(L)+TempOffset_pft(NZ)
     TFN6_vr(L)=calc_plant_maint_tempf(TKSM)  
   ENDDO D7
 !

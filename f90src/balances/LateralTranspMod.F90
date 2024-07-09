@@ -75,7 +75,7 @@ implicit none
     trcg_VOLG(idg_NH3)=trc_gasml_vr(idg_NH3,L,NY,NX)/natomw
     trcg_VOLG(idg_H2)=trc_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
 
-    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_col(L,NY,NX)/TKS(L,NY,NX))
+    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_col(L,NY,NX)/TKS_vr(L,NY,NX))
 !   NH3B does not have explicit gas species, so there is an inconsistency
 !   with respect to the actual ebullition calculation, which involves
 !   NH3B

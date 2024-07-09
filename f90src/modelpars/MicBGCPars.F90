@@ -435,6 +435,7 @@ contains
   pure function get_micb_id(this,M,NGL)result(id)
   !return the id of biomass component M for
   !hetetroph guild NGL
+  !1,2,3: labile, recalcitrant, reserve
   implicit none
   class(MicParType), intent(in) :: this
   integer, intent(in) :: M   !biomass component

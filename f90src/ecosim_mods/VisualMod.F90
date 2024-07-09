@@ -227,7 +227,7 @@ module VisualMod
 
           L=1
           D61: DO N=28,38
-            OUT(N)=TKS(L,NY,NX)
+            OUT(N)=TKS_vr(L,NY,NX)
             L=L+1
           ENDDO D61
           OUT(39)=-1000.0*ETCanopy_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

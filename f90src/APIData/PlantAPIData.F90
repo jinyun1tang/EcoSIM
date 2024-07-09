@@ -562,7 +562,7 @@ implicit none
   real(r8), pointer :: HeatStorCanP(:)  => null()    !canopy storage heat flux, [MJ d-2 h-1]
   real(r8), pointer :: EvapTransHeat_pft(:)  => null()    !canopy latent heat flux, [MJ d-2 h-1]
   real(r8), pointer :: RAZ(:)    => null()    !canopy roughness height, [m]
-  real(r8), pointer :: TKS(:)    => null()    !mean annual soil temperature, [K]
+  real(r8), pointer :: TKS_vr(:)    => null()    !mean annual soil temperature, [K]
   real(r8), pointer :: PSICanPDailyMin(:)  => null()    !minimum daily canopy water potential, [MPa]
   real(r8), pointer :: TCelciusCanopy_pft(:)    => null()    !canopy temperature, [oC]
   real(r8), pointer :: DeltaTKC_pft(:)   => null()    !change in canopy temperature, [K]
@@ -1112,7 +1112,7 @@ implicit none
   allocate(this%GridPlantRootH2OUptake_vr(0:JZ1));this%GridPlantRootH2OUptake_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
-  allocate(this%TKS(0:JZ1));this%TKS=spval
+  allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
   allocate(this%CanOsmoPsi0pt_pft(JP1));this%CanOsmoPsi0pt_pft=spval
   allocate(this%RAZ(JP1));this%RAZ=spval
   allocate(this%DeltaTKC_pft(JP1));this%DeltaTKC_pft=spval

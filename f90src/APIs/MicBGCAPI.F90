@@ -187,7 +187,7 @@ implicit none
   micfor%THETY =THETY_vr(L,NY,NX)
   micfor%POROS =POROS(L,NY,NX)
   micfor%FieldCapacity    =FieldCapacity(L,NY,NX)
-  micfor%TKS   =TKS(L,NY,NX)
+  micfor%TKS   =TKS_vr(L,NY,NX)
   micfor%THETW =THETW_vr(L,NY,NX)
   micfor%PH    =PH(L,NY,NX)
   micfor%SoilMicPMassLayer  =SoilMicPMassLayer(L,NY,NX)

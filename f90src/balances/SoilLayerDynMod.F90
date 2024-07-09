@@ -627,7 +627,7 @@ implicit none
 !
   ELSEIF(NN.EQ.2)THEN
     IF((L.EQ.NU(NY,NX).AND.SoiBulkDensity_vr(NU(NY,NX),NY,NX).LE.ZERO) &
-      .AND.(VHeatCapacity_col(NU(NY,NX),NY,NX).LE.VHCPNX(NY,NX) &
+      .AND.(VHeatCapacity_vr(NU(NY,NX),NY,NX).LE.VHCPNX(NY,NX) &
       .OR.NUM(NY,NX).GT.NU(NY,NX)))THEN
       
       NUX=NU(NY,NX)
@@ -722,20 +722,20 @@ implicit none
   VLMicP_vr(L1,NY,NX)=VLMicP_vr(L1,NY,NX)+FX*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FX*VLSoilMicP(L0,NY,NX)
   VLWatMicPX_col(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)
-  ENGY1=VHeatCapacity_col(L1,NY,NX)*TKS(L1,NY,NX)
-  ENGY0=VHeatCapacity_col(L0,NY,NX)*TKS(L0,NY,NX)
+  ENGY1=VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)
+  ENGY0=VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)
   ENGY1=ENGY1+FX*ENGY0
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FX*VHeatCapacitySoilM(L0,NY,NX)
-  VHeatCapacity_col(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
+  VHeatCapacity_vr(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
     +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP(L1,NY,NX)) &
     +cpi*(VLiceMicP(L1,NY,NX)+VLiceMacP_col(L1,NY,NX))
 
-  IF(VHeatCapacity_col(L1,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L1,NY,NX)=ENGY1/VHeatCapacity_col(L1,NY,NX)
+  IF(VHeatCapacity_vr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS_vr(L1,NY,NX)=ENGY1/VHeatCapacity_vr(L1,NY,NX)
   ELSE
-    TKS(L1,NY,NX)=TKS(L0,NY,NX)
+    TKS_vr(L1,NY,NX)=TKS_vr(L0,NY,NX)
   ENDIF
-  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
+  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FX*FertN_soil_vr(NTF,L0,NY,NX)
@@ -905,18 +905,18 @@ implicit none
   ENGY0=FY*ENGY0
   VHeatCapacitySoilM(L0,NY,NX)=FY*VHeatCapacitySoilM(L0,NY,NX)
   IF(L0.NE.0)THEN
-    VHeatCapacity_col(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
+    VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP(L0,NY,NX)) &
       +cpi*(VLiceMicP(L0,NY,NX)+VLiceMacP_col(L0,NY,NX))
   ELSE
-    VHeatCapacity_col(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP(L0,NY,NX)
+    VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP(L0,NY,NX)
   ENDIF
-  IF(VHeatCapacity_col(L0,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L0,NY,NX)=ENGY0/VHeatCapacity_col(L0,NY,NX)
+  IF(VHeatCapacity_vr(L0,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS_vr(L0,NY,NX)=ENGY0/VHeatCapacity_vr(L0,NY,NX)
   ELSE
-    TKS(L0,NY,NX)=TKS(L1,NY,NX)
+    TKS_vr(L0,NY,NX)=TKS_vr(L1,NY,NX)
   ENDIF
-  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS(L0,NY,NX))
+  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil_vr(NTF,L0,NY,NX)=FY*FertN_soil_vr(NTF,L0,NY,NX)
@@ -1655,23 +1655,23 @@ implicit none
   FXVHCM=FWO*VHeatCapacitySoilM(L0,NY,NX)
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FXVHCM
   VHeatCapacitySoilM(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)-FXVHCM
-  FXENGY=TKS(L0,NY,NX)*(FXVHCM+cpw*FXVOLW+cpi*FXVOLI)
-  ENGY1=VHeatCapacity_col(L1,NY,NX)*TKS(L1,NY,NX)+FXENGY
-  ENGY0=VHeatCapacity_col(L0,NY,NX)*TKS(L0,NY,NX)-FXENGY
-  VHeatCapacity_col(L1,NY,NX)=VHeatCapacity_col(L1,NY,NX)+FXVHCM+cpw*FXVOLW+cpi*FXVOLI
-  VHeatCapacity_col(L0,NY,NX)=VHeatCapacity_col(L0,NY,NX)-FXVHCM-cpw*FXVOLW-cpi*FXVOLI
-  IF(VHeatCapacity_col(L1,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L1,NY,NX)=ENGY1/VHeatCapacity_col(L1,NY,NX)
+  FXENGY=TKS_vr(L0,NY,NX)*(FXVHCM+cpw*FXVOLW+cpi*FXVOLI)
+  ENGY1=VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)+FXENGY
+  ENGY0=VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)-FXENGY
+  VHeatCapacity_vr(L1,NY,NX)=VHeatCapacity_vr(L1,NY,NX)+FXVHCM+cpw*FXVOLW+cpi*FXVOLI
+  VHeatCapacity_vr(L0,NY,NX)=VHeatCapacity_vr(L0,NY,NX)-FXVHCM-cpw*FXVOLW-cpi*FXVOLI
+  IF(VHeatCapacity_vr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS_vr(L1,NY,NX)=ENGY1/VHeatCapacity_vr(L1,NY,NX)
   ELSE
-    TKS(L1,NY,NX)=TKS(L,NY,NX)
+    TKS_vr(L1,NY,NX)=TKS_vr(L,NY,NX)
   ENDIF
-  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
-  IF(VHeatCapacity_col(L0,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L0,NY,NX)=ENGY0/VHeatCapacity_col(L0,NY,NX)
+  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
+  IF(VHeatCapacity_vr(L0,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS_vr(L0,NY,NX)=ENGY0/VHeatCapacity_vr(L0,NY,NX)
   ELSE
-    TKS(L0,NY,NX)=TKS(L,NY,NX)
+    TKS_vr(L0,NY,NX)=TKS_vr(L,NY,NX)
   ENDIF
-  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS(L0,NY,NX))
+  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
   end subroutine MoveHeatWat
 
 end module SoilLayerDynMod

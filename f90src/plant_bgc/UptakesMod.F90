@@ -558,7 +558,7 @@ module UptakesMod
    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
    TKC                       => plt_ew%TKC,                          &
    TairK                     => plt_ew%TairK,                        &
-   TKS                       => plt_ew%TKS,                          &
+   TKS_vr                       => plt_ew%TKS_vr,                          &
    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
    AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
@@ -617,7 +617,7 @@ module UptakesMod
         DO  L=NU,MaxSoiL4Root_pft(NZ)
           PSIRoot_pvr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
           CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
-          CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS(L),&
+          CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
           AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
@@ -677,7 +677,7 @@ module UptakesMod
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     RAZ                       => plt_ew%RAZ,                          &
     VPA                       => plt_ew%VPA,                          &
-    TKS                       => plt_ew%TKS,                          &
+    TKS_vr                       => plt_ew%TKS_vr,                          &
     TairK                     => plt_ew%TairK,                        &
     RIB                       => plt_ew%RIB,                          &
     Transpiration_pft         => plt_ew%Transpiration_pft,            &
@@ -897,7 +897,7 @@ module UptakesMod
               !cumRootHeatUptake=cumRootHeatUptake+AllPlantRootH2OUptake_vr(N,L,NZ)*TKC1
             else  
               !plant/myco gain water from soil
-              cumRootHeatUptake=cumRootHeatUptake+AllPlantRootH2OUptake_vr(N,L,NZ)*TKS(L)
+              cumRootHeatUptake=cumRootHeatUptake+AllPlantRootH2OUptake_vr(N,L,NZ)*TKS_vr(L)
             ENDIF
             cumPRootH2OUptake=cumPRootH2OUptake+AllPlantRootH2OUptake_vr(N,L,NZ)
           ELSE
@@ -1163,7 +1163,7 @@ module UptakesMod
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKSnow                    => plt_ew%TKSnow,                       &
     TKC                       => plt_ew%TKC,                          &
-    TKS                       => plt_ew%TKS,                          &
+    TKS_vr                       => plt_ew%TKS_vr,                          &
     TairK                     => plt_ew%TairK,                        &
     SnowDepth                 => plt_ew%SnowDepth,                    &
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
@@ -1232,7 +1232,7 @@ module UptakesMod
       PSIRoot_pvr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)      
       CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
 
-      call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS(L),&
+      call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
       AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
@@ -1263,7 +1263,7 @@ module UptakesMod
     CanOsmoPsi0pt_pft        => plt_ew%CanOsmoPsi0pt_pft,          &
     TairK                    => plt_ew%TairK,                      &
     TKC                      => plt_ew%TKC,                        &
-    TKS                      => plt_ew%TKS,                        &
+    TKS_vr                   => plt_ew%TKS_vr,                     &
     TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
     WatByPCanopy_pft         => plt_ew%WatByPCanopy_pft,           &
     CanopyWater_pft          => plt_ew%CanopyWater_pft,            &
@@ -1317,7 +1317,7 @@ module UptakesMod
       ENDIF           
       CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
 
-      CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS(L),&
+      CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
     ENDDO D4510
@@ -1336,7 +1336,7 @@ module UptakesMod
     TCelciusCanopy_pft  => plt_ew%TCelciusCanopy_pft,     &
     TairK               => plt_ew%TairK,                  &
     TKC                 => plt_ew%TKC,                    &
-    TKS                 => plt_ew%TKS,                    &
+    TKS_vr                => plt_ew%TKS_vr,                    &
     PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &
@@ -1357,10 +1357,10 @@ module UptakesMod
   !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     !before seed emergence
-    TKGroth_pft(NZ)=TKS(NU)
+    TKGroth_pft(NZ)=TKS_vr(NU)
     !     ELSEIF((iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)
     !    2.AND.iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
-    !     TKGroth_pft(NZ)=TKS(NU)
+    !     TKGroth_pft(NZ)=TKS_vr(NU)
   ELSE
     TKGroth_pft(NZ)=TKC(NZ)
   ENDIF
@@ -1370,7 +1370,7 @@ module UptakesMod
   !     FOR ZONE OF THERMAL ADAPTATION ENTERED IN 'READQ'
   !
   !     TKGroth_pft,TKGO=canopy temperature,canopy temp used in Arrhenius eqn
-  !     TKS,TKSO=soil temperature,soil temp used in Arrhenius eqn
+  !     TKS_vr,TKSO=soil temperature,soil temp used in Arrhenius eqn
   !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
   !     fTCanopyGroth_pft,fTgrowRootP_vr=temperature function for canopy,root growth (25 oC =1)
   !     RGAS,710.0=gas constant,enthalpy
@@ -1380,14 +1380,14 @@ module UptakesMod
   TKGO=TKGroth_pft(NZ)+TempOffset_pft(NZ)
   fTCanopyGroth_pft(NZ)=calc_canopy_grow_tempf(TKGO)
 !  if(NZ==1)THEN
-!  write(123,*)I+J/24.,'tree',TKGO,TairK,TKC(NZ),TKS(NU),TKGroth_pft(NZ) &
+!  write(123,*)I+J/24.,'tree',TKGO,TairK,TKC(NZ),TKS_vr(NU),TKGroth_pft(NZ) &
 !    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0
 !  ELSEIF(NZ==2)THEN
-!  write(124,*)I+J/24.,'gras',TKGO,TairK,TKC(NZ),TKS(NU),TKGroth_pft(NZ) &
+!  write(124,*)I+J/24.,'gras',TKGO,TairK,TKC(NZ),TKS_vr(NU),TKGroth_pft(NZ) &
 !    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0  
 !  ENDIF
   D100: DO L=NU,MaxSoiL4Root_pft(NZ)
-    TKSO=TKS(L)+TempOffset_pft(NZ)
+    TKSO=TKS_vr(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ)=calc_root_grow_tempf(TKSO)
   ENDDO D100
   PSICanPDailyMin(NZ)=AMIN1(PSICanPDailyMin(NZ),PSICanopy_pft(NZ))

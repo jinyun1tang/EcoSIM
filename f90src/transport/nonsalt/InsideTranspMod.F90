@@ -1313,7 +1313,7 @@ module InsideTranspMod
 !     VTATM=molar gas concentration at atmospheric pressure
 !     VTGAS=total molar gas concentration
 !
-      VTATM=AZMAX1(1.2194E+04_r8*VLWatMicPM(M,N3,N2,N1)/TKS(N3,N2,N1))
+      VTATM=AZMAX1(1.2194E+04_r8*VLWatMicPM(M,N3,N2,N1)/TKS_vr(N3,N2,N1))
 
       VTGAS=sum(trcg_VOLG(idg_beg:idg_end))
 !

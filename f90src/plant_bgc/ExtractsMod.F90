@@ -173,7 +173,7 @@ module ExtractsMod
     tRootCO2Emis_vr           => plt_bgcr%tRootCO2Emis_vr,          &
     REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr,     &
-    TKS                       => plt_ew%TKS,                        &
+    TKS_vr                       => plt_ew%TKS_vr,                        &
     THeatRootUptake_vr           => plt_ew%THeatRootUptake_vr,            &
     GridPlantRootH2OUptake_vr => plt_ew%GridPlantRootH2OUptake_vr,  &
     AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,   &
@@ -206,7 +206,7 @@ module ExtractsMod
 !     TOTAL WATER UPTAKE
 !
       GridPlantRootH2OUptake_vr(L)=GridPlantRootH2OUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)
-      THeatRootUptake_vr(L)=THeatRootUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS(L)
+      THeatRootUptake_vr(L)=THeatRootUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS_vr(L)
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !
@@ -353,7 +353,7 @@ module ExtractsMod
     EvapTransHeat_pft         => plt_ew%EvapTransHeat_pft,           &
     CanWat_col                => plt_ew%CanWat_col,                  &
     TKC                       => plt_ew%TKC,                         &
-    TKS                       => plt_ew%TKS,                         &
+    TKS_vr                       => plt_ew%TKS_vr,                         &
     ENGYX_pft                 => plt_ew%ENGYX_pft,                   &
     Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
     VapXAir2CanG              => plt_ew%VapXAir2CanG,                &

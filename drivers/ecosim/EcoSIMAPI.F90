@@ -21,7 +21,7 @@ implicit none
 contains
 
   subroutine Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-  USE SoilHeatDataType, ONLY : TKS
+
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1

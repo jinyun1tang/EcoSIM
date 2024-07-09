@@ -93,7 +93,7 @@ module NitroDisturbMod
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
 !     QH2OLoss_lnds=QH2OLoss_lnds+DCORPC*VLWatMicP_vr(L,NY,NX)
-!     HeatOut_lnds=HeatOut_lnds+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
+!     HeatOut_lnds=HeatOut_lnds+DCORPC*4.19*TKS_vr(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
 !     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)-DCORPC*VLWatMicP_vr(L,NY,NX)
         OMelm=0._r8
         dOMelm=0._r8
@@ -329,14 +329,14 @@ module NitroDisturbMod
         ENDIF
         SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=dOMelm(1:NumPlantChemElms)
         IF(L.EQ.0)THEN
-          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS(L,NY,NX)
+          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS_vr(L,NY,NX)
           HeatOut_lnds=HeatOut_lnds+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity_col(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
+!     VHeatCapacity_vr(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
 !    2+1.9274*VLiceMicP(0,NY,NX)
 !     ELSE
-!     VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
+!     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
 !    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
 !     ENDIF
         IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN

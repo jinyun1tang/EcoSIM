@@ -1058,17 +1058,17 @@ module Hour1Mod
 !
 !     C*G=soil gas gaseous concentration
 !     *E=atmospheric concentration
-!     TKS,TCS=litter temperature (K,C)
+!     TKS_vr,TCS=litter temperature (K,C)
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  trc_gascl_vr(idg_CO2,0,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKS(0,NY,NX)
-  trc_gascl_vr(idg_CH4,0,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKS(0,NY,NX)
-  trc_gascl_vr(idg_O2,0,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKS(0,NY,NX)
-  trc_gascl_vr(idg_N2,0,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS(0,NY,NX)
-  trc_gascl_vr(idg_N2O,0,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS(0,NY,NX)
-  trc_gascl_vr(idg_NH3,0,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS(0,NY,NX)
-  trc_gascl_vr(idg_H2,0,NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKS(0,NY,NX)
+  trc_gascl_vr(idg_CO2,0,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CH4,0,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_O2,0,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_N2,0,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_N2O,0,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_NH3,0,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_H2,0,NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
 
 ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0.0_r8
@@ -1085,7 +1085,7 @@ module Hour1Mod
 !     *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 !     *SG PARAMETER statement above
 !
-  TFACL=TEFAQUDIF(TKS(0,NY,NX))
+  TFACL=TEFAQUDIF(TKS_vr(0,NY,NX))
   TScal4Difsvity_vr(0,NY,NX)=TFACL
 
   SoluteDifusvty_vr(idg_CO2,0,NY,NX)=CLSG*TFACL
@@ -1142,7 +1142,7 @@ module Hour1Mod
 !
   TFACA=TEFGASDIF(TairK_col(NY,NX))
   WVapDifusvityAir_col(NY,NX)=WGSG*TFACA
-  TFACR=TEFGASDIF(TKS(0,NY,NX))
+  TFACR=TEFGASDIF(TKS_vr(0,NY,NX))
   VaporDiffusivityLitR_col(NY,NX)=WGSG*TFACR
   !write(*,*) "VaporDiffusivityLitR_col(NY,NX) = ", VaporDiffusivityLitR_col(NY,NX)
   !write(*,*) "WGSG = ", WGSG
@@ -1310,8 +1310,8 @@ module Hour1Mod
 ! *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 ! *SG PARAMETER statement above
 !
-    TFACG=TEFGASDIF(TKS(L,NY,NX))
-    TFACL=TEFAQUDIF(TKS(L,NY,NX))
+    TFACG=TEFGASDIF(TKS_vr(L,NY,NX))
+    TFACL=TEFAQUDIF(TKS_vr(L,NY,NX))
     TScal4Difsvity_vr(L,NY,NX)=TFACL
 
     GasDifc_vr(idg_CO2,L,NY,NX)=CGSG*TFACG

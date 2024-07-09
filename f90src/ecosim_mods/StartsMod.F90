@@ -177,7 +177,7 @@ module StartsMod
 
       SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
-      TKS(0,NY,NX)=ATKS(NY,NX)
+      TKS_vr(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
     ENDDO
@@ -317,9 +317,9 @@ module StartsMod
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
       IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-        VHeatCapacity_col(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+        VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
       else
-        VHeatCapacity_col(0,NY,NX)=0._r8
+        VHeatCapacity_vr(0,NY,NX)=0._r8
       endif
       VHeatCapacitySoilM(0,NY,NX)=0.0_r8
       VLMicPt0_col(0,NY,NX)=0.0_r8      
@@ -435,7 +435,7 @@ module StartsMod
       !     SAND,SILT,CLAY=sand,silt,clay mass (Mg)
       !     VORGC,VMINL,VSAND=volumetric fractions of SOC,non-sand,sand
       !     VHCM,VHCP=volumetric dry,wet soil heat capacity (MJ m-3 K-1)
-      !     TKS,TCS=soil temperature (oC,K)
+      !     TKS_vr,TCS=soil temperature (oC,K)
       !     THETW,THETI,THETP=micropore water,ice,air concentration (m3 m-3)
 !
       SAND(L,NY,NX)=CSAND(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
@@ -487,13 +487,13 @@ module StartsMod
 !       total air-filled porosity, micropores + macropores
         VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
           +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP_col(L,NY,NX))
-        VHeatCapacity_col(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
+        VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
           +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
         ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
         ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF
     ENDIF
-    TKS(L,NY,NX)=ATKS(NY,NX)
+    TKS_vr(L,NY,NX)=ATKS(NY,NX)
     TCS(L,NY,NX)=ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
@@ -1082,7 +1082,7 @@ module StartsMod
 
       SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
-      TKS(0,NY,NX)=ATKS(NY,NX)
+      TKS_vr(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
     ENDDO
