@@ -221,9 +221,9 @@ module WatsubMod
         PSISM1(L,NY,NX)=PSISoilMatricP_vr(L,NY,NX)
         VLMicP1(L,NY,NX)=VLMicP_vr(L,NY,NX)
         VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-        VLWatMicPX1(L,NY,NX)=VLWatMicPX_col(L,NY,NX)
-        VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
-        VLWatMacP1_vr(L,NY,NX)=VLWatMacP(L,NY,NX)
+        VLWatMicPX1(L,NY,NX)=VLWatMicPX_vr(L,NY,NX)
+        VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)
+        VLWatMacP1_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)
         VLiceMacP1(L,NY,NX)=VLiceMacP_col(L,NY,NX)
         
         IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN

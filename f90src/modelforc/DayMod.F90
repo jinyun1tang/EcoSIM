@@ -285,7 +285,7 @@
               FZ=AMIN1(POROS(L,NY,NX),WiltPoint(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity(L,NY,NX)-WiltPoint(L,NY,NX)))
               TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
               TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-              TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP(L,NY,NX))
+              TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
             ENDIF
           ENDDO D165
 

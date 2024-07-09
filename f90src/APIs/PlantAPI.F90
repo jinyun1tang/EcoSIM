@@ -656,7 +656,7 @@ implicit none
   plt_ew%RIB=RIB(NY,NX)
   plt_rad%SineSunInclAnglNxtHour_col=SineSunInclAnglNxtHour_col(NY,NX)
   plt_rad%SineSunInclAngle_col=SineSunInclAngle_col(NY,NX)
-  plt_ew%TKSnow=TKSnow(1,NY,NX)  !surface layer snow temperature
+  plt_ew%TKSnow=TKSnow_snvr(1,NY,NX)  !surface layer snow temperature
   plt_ew%TairK=TairK_col(NY,NX)
   plt_rad%LWRadGrnd=LWRadGrnd(NY,NX)
   plt_rad%LWRadSky=LWRadSky(NY,NX)
@@ -737,7 +737,7 @@ implicit none
     plt_soilchem%trcs_VLN_vr(ids_NO3,L) =trcs_VLN_vr(ids_NO3,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_H1PO4,L) =trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     plt_soilchem%VLSoilMicP(L)  =VLSoilMicP(L,NY,NX)
-    plt_soilchem%VLiceMicP(L)  =VLiceMicP(L,NY,NX)
+    plt_soilchem%VLiceMicP_vr(L)  =VLiceMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)  =VLWatMicP_vr(L,NY,NX)
     plt_soilchem%VLMicP_vr(L)  =VLMicP_vr(L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NO3B,L) =trcs_VLN_vr(ids_NO3B,L,NY,NX)

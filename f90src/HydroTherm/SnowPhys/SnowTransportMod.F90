@@ -180,11 +180,11 @@ implicit none
   !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
   !
   DO  L=1,JS
-    WS=VLDrySnoWE_col(L,NY,NX)+VLWatSnow_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
+    WS=VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
 
     WatMassStore_lnd=WatMassStore_lnd+WS
     WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
-    ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow(L,NY,NX)
+    ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow_snvr(L,NY,NX)
     HeatStore_lnd=HeatStore_lnd+ENGYW
     TGasC_lnd=TGasC_lnd+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
     DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)

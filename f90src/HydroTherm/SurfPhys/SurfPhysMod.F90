@@ -149,10 +149,10 @@ contains
 !     PSISM*=litter matric water potential
 !
   LWRadBySurf_col(NY,NX)=0.0_r8
-  VLHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VLHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   VLPoreLitR(NY,NX)=VLMicP_vr(0,NY,NX)
   VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
-  VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX))
+  VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP_vr(0,NY,NX))
   VLairMicP1_vr(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
   VLWatMicPM(1,0,NY,NX)=VLWatMicP1(0,NY,NX)
   VLsoiAirPM(1,0,NY,NX)=VLairMicP1_vr(0,NY,NX)
@@ -162,14 +162,14 @@ contains
     VWatLitrZ=VLWatMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     VOLIRZ=VLiceMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     XVLMobileWatMicP(NY,NX)=AZMAX1(VLWatMicP1(0,NY,NX)-VWatLitrZ)
-    XVLiceMicP(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
+    XVLiceMicP_col(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
   ELSE
     XVLMobileWatMicP(NY,NX)=0.0_r8
-    XVLiceMicP(NY,NX)=0.0_r8
+    XVLiceMicP_col(NY,NX)=0.0_r8
   ENDIF
   XVLMobileWaterLitRM(1,NY,NX)=XVLMobileWaterLitR(NY,NX)
   XVLMobileWatMicPM(1,NY,NX)=XVLMobileWatMicP(NY,NX)
-  XVLiceMicPM(1,NY,NX)=XVLiceMicP(NY,NX)
+  XVLiceMicPM(1,NY,NX)=XVLiceMicP_col(NY,NX)
   IF(VLitR(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1(0,NY,NX)/VLitR(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1(0,NY,NX)/VLitR(NY,NX))

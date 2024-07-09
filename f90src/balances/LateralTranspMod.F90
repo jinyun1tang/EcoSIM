@@ -89,8 +89,8 @@ implicit none
     IF(ThetaAir_col(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
     VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-    VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
-    VLWatMacP1_vr(L,NY,NX)=VLWatMacP(L,NY,NX)
+    VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)
+    VLWatMacP1_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)
     VLiceMacP1(L,NY,NX)=VLiceMacP_col(L,NY,NX)
 
 !

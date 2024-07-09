@@ -317,7 +317,7 @@ module StartsMod
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
       IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-        VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+        VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
       else
         VHeatCapacity_vr(0,NY,NX)=0._r8
       endif
@@ -480,15 +480,15 @@ module StartsMod
           THETI_col(L,NY,NX)=THI(L,NY,NX)
         ENDIF
         VLWatMicP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLWatMicPX_col(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-        VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
-        VLiceMicP(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+        VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
+        VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
+        VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
-          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+        VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
+          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
-          +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+          +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
         ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
         ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF

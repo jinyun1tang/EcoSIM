@@ -454,11 +454,11 @@ implicit none
   ! IN HEAT STORAGE
   !
   VHeatCapacityLitrX=VHeatCapacity_vr(0,NY,NX)                          
-  VHeatCapacityLitR=cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX) 
+  VHeatCapacityLitR=cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX) 
   VLWatMicPr=VLWatMicP_vr(0,NY,NX)
-  VLiceMicPr=VLiceMicP(0,NY,NX)
-  if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
-    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP(0,NY,NX),VHeatCapacityLitR,SoilOrgM_vr(ielmc,0,NY,NX) 
+  VLiceMicPr=VLiceMicP_vr(0,NY,NX)
+  if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP_vr(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
+    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP_vr(0,NY,NX),VHeatCapacityLitR,SoilOrgM_vr(ielmc,0,NY,NX) 
     call endrun(trim(mod_filename)//' at line',__LINE__)    
   endif
   dVHeatCapacityLitr=VHeatCapacityLitR-VHeatCapacityLitrX            
@@ -468,8 +468,8 @@ implicit none
 
   !update water, ice content and heat capacity of residue
   VLWatMicP_vr(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+WatInByRunoff)
-  VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
-  VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+  VLiceMicP_vr(0,NY,NX)=AZMAX1(VLiceMicP_vr(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
+  VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
 
   IF(VHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
@@ -483,7 +483,7 @@ implicit none
       write(*,*)mod_filename,NY,NX,TKS_vr(0,NY,NX),tkspre
       write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2Litr(NY,NX),WatInByRunoff
       write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2Litr(NY,NX),TLitrIceFlxThaw(NY,NX),WatInByRunoff
-      write(*,*)'ice',VLiceMicPr,VLiceMicP(0,NY,NX)
+      write(*,*)'ice',VLiceMicPr,VLiceMicP_vr(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez(NY,NX),HeatByLitrMassChange, &
         HEATIN_lndByRunoff,VHeatCapacity_vr(0,NY,NX)        
       write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK_col(NY,NX),SoilOrgM_vr(ielmc,0,NY,NX)   
@@ -550,14 +550,14 @@ implicit none
     VWatLitrZ=VLWatMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     VOLIRZ=VLiceMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     XVLMobileWatMicP(NY,NX)=AZMAX1(VLWatMicP1(0,NY,NX)-VWatLitrZ)
-    XVLiceMicP(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
+    XVLiceMicP_col(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
   ELSE
     XVLMobileWatMicP(NY,NX)=0.0_r8
-    XVLiceMicP(NY,NX)=0.0_r8
+    XVLiceMicP_col(NY,NX)=0.0_r8
   ENDIF
   XVLMobileWaterLitRM(M+1,NY,NX)=XVLMobileWaterLitR(NY,NX)
   XVLMobileWatMicPM(M+1,NY,NX)=XVLMobileWatMicP(NY,NX)
-  XVLiceMicPM(M+1,NY,NX)=XVLiceMicP(NY,NX)
+  XVLiceMicPM(M+1,NY,NX)=XVLiceMicP_col(NY,NX)
   IF(VLitR(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1(0,NY,NX)/VLitR(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1(0,NY,NX)/VLitR(NY,NX))
@@ -638,14 +638,14 @@ implicit none
     VWatLitrZ=VLWatMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     VOLIRZ=VLiceMicP1(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     XVLMobileWatMicP(NY,NX)=AZMAX1(VLWatMicP1(0,NY,NX)-VWatLitrZ)
-    XVLiceMicP(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
+    XVLiceMicP_col(NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-VOLIRZ)
   ELSE
     XVLMobileWatMicP(NY,NX)=0.0_r8
-    XVLiceMicP(NY,NX)=0.0_r8
+    XVLiceMicP_col(NY,NX)=0.0_r8
   ENDIF
   XVLMobileWaterLitRM(M+1,NY,NX)=XVLMobileWaterLitR(NY,NX)
   XVLMobileWatMicPM(M+1,NY,NX)=XVLMobileWatMicP(NY,NX)
-  XVLiceMicPM(M+1,NY,NX)=XVLiceMicP(NY,NX)
+  XVLiceMicPM(M+1,NY,NX)=XVLiceMicP_col(NY,NX)
   IF(VLitR(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1(0,NY,NX)/VLitR(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1(0,NY,NX)/VLitR(NY,NX))

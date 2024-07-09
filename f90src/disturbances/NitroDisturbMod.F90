@@ -334,10 +334,10 @@ module NitroDisturbMod
         ENDIF
 !     IF(L.EQ.0)THEN
 !     VHeatCapacity_vr(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
-!    2+1.9274*VLiceMicP(0,NY,NX)
+!    2+1.9274*VLiceMicP_vr(0,NY,NX)
 !     ELSE
-!     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
-!    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+!     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
+!    2+1.9274*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
 !     ENDIF
         IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
           DO NE=1,NumPlantChemElms

@@ -15,11 +15,11 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  ThetaH2OZ_vr(:,:,:)                     !volumetric moblize water [m3 m-3]
   real(r8),target,allocatable ::  ThetaICEZ_vr(:,:,:)                     !volumetric mobile ice [m3 m-3]
   real(r8),target,allocatable ::  VLWatMicP_vr(:,:,:)                       !soil micropore water content [m3 d-2]
-  real(r8),target,allocatable ::  VLiceMicP(:,:,:)                       !soil micropore ice content   [m3 d-2]
-  real(r8),target,allocatable ::  VLWatMacP(:,:,:)                      !soil macropore water content [m3 d-2]
+  real(r8),target,allocatable ::  VLiceMicP_vr(:,:,:)                       !soil micropore ice content   [m3 d-2]
+  real(r8),target,allocatable ::  VLWatMacP_vr(:,:,:)                      !soil macropore water content [m3 d-2]
   real(r8),target,allocatable ::  PSISoilMatricP_vr(:,:,:)             !soil micropore matric water potential [MPa]
   real(r8),target,allocatable ::  TotalSoilH2OPSIMPa(:,:,:)                      !soil micropore total water potential [MPa]
-  real(r8),target,allocatable ::  VLWatMicPX_col(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
+  real(r8),target,allocatable ::  VLWatMicPX_vr(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
   real(r8),target,allocatable ::  FWatExMacP2MicP(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
   real(r8),target,allocatable ::  VLiceMacP_col(:,:,:)                      !soil macropore ice content [m3 d-2]
   real(r8),target,allocatable ::  VLWatMicPM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
@@ -113,11 +113,11 @@ module SoilWaterDataType
   allocate(ThetaH2OZ_vr(0:JZ,JY,JX)); ThetaH2OZ_vr=0._r8
   allocate(ThetaICEZ_vr(0:JZ,JY,JX)); ThetaICEZ_vr=0._r8
   allocate(VLWatMicP_vr(0:JZ,JY,JX));   VLWatMicP_vr=0._r8
-  allocate(VLiceMicP(0:JZ,JY,JX));   VLiceMicP=0._r8
-  allocate(VLWatMacP(JZ,JY,JX));    VLWatMacP=0._r8
+  allocate(VLiceMicP_vr(0:JZ,JY,JX));   VLiceMicP_vr=0._r8
+  allocate(VLWatMacP_vr(JZ,JY,JX));    VLWatMacP_vr=0._r8
   allocate(PSISoilMatricP_vr(0:JZ,JY,JX));  PSISoilMatricP_vr=0._r8
   allocate(TotalSoilH2OPSIMPa(0:JZ,JY,JX));  TotalSoilH2OPSIMPa=0._r8
-  allocate(VLWatMicPX_col(0:JZ,JY,JX));  VLWatMicPX_col=0._r8
+  allocate(VLWatMicPX_vr(0:JZ,JY,JX));  VLWatMicPX_vr=0._r8
   allocate(FWatExMacP2MicP(JZ,JY,JX));     FWatExMacP2MicP=0._r8
   allocate(VLiceMacP_col(JZ,JY,JX));    VLiceMacP_col=0._r8
   allocate(VLWatMicPM(60,0:JZ,JY,JX));VLWatMicPM=0._r8
@@ -199,11 +199,11 @@ module SoilWaterDataType
   call destroy(ThetaH2OZ_vr)
   call destroy(ThetaICEZ_vr)
   call destroy(VLWatMicP_vr)
-  call destroy(VLiceMicP)
-  call destroy(VLWatMacP)
+  call destroy(VLiceMicP_vr)
+  call destroy(VLWatMacP_vr)
   call destroy(PSISoilMatricP_vr)
   call destroy(TotalSoilH2OPSIMPa)
-  call destroy(VLWatMicPX_col)
+  call destroy(VLWatMicPX_vr)
   call destroy(FWatExMacP2MicP)
   call destroy(VLiceMacP_col)
   call destroy(VLWatMicPM)

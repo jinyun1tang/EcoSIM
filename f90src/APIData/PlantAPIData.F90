@@ -393,7 +393,7 @@ implicit none
   real(r8), pointer :: trcs_VLN_vr(:,:)=> null()
 
   real(r8), pointer :: VLSoilMicP(:)     => null()  !total micropore volume in layer [m3 d-2]
-  real(r8), pointer :: VLiceMicP(:)     => null()  !soil micropore ice content   [m3 d-2]
+  real(r8), pointer :: VLiceMicP_vr(:)     => null()  !soil micropore ice content   [m3 d-2]
   real(r8), pointer :: VLWatMicP_vr(:)     => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VLMicP_vr(:)     => null()  !total volume in micropores [m3 d-2]
 
@@ -1427,7 +1427,7 @@ implicit none
   allocate(this%THETPM(60,0:JZ1));this%THETPM=spval
   allocate(this%DiffusivitySolutEff(60,0:JZ1));this%DiffusivitySolutEff=spval
   allocate(this%VLSoilMicP(0:JZ1));this%VLSoilMicP=spval
-  allocate(this%VLiceMicP(0:JZ1));this%VLiceMicP=spval
+  allocate(this%VLiceMicP_vr(0:JZ1));this%VLiceMicP_vr=spval
   allocate(this%VLWatMicP_vr(0:JZ1));this%VLWatMicP_vr=spval
   allocate(this%VLMicP_vr(0:JZ1));this%VLMicP_vr=spval
   allocate(this%trcs_VLN_vr(ids_nuts_beg:ids_nuts_end,0:JZ1));this%trcs_VLN_vr=spval
