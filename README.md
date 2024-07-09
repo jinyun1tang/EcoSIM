@@ -14,9 +14,9 @@ make install CC=icc CXX=icpc FC=ifort
 
 Find the executable under ./local/bin/ecosim.f90.x
 
-make test CC=icc CXX=icpc FC=ifort F90=1
+make test CC=icc CXX=icpc FC=ifort 
 
-will check if the code is downloaded properly.  (Hower, because compiler difference, tests may fail.)
+will do regression test to check if the code is downloaded properly.  (Hower, because compiler difference, tests may fail.)
 
 For gnu compilers, change icc, icpc and ifort into gcc, g++ and gfortran, respectively.
 
@@ -60,3 +60,6 @@ To run the example, for instance, dryland, goes to dryland, then type
 ../../../local/bin/ecosim.f90.x dryland.namelist
 
 and output can be found at dryland_maize_outputs.
+
+
+

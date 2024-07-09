@@ -1,7 +1,7 @@
 &regression_test
  cells   =           0
 /
-Qy!pgub4jos3x5h-1wecva
+
 &ecosim
 case_name='dryland_maize'
 prefix='../../inputs/dryland_maize/'

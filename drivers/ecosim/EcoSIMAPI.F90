@@ -509,7 +509,7 @@ end subroutine regressiontest
 
   if(disp_modelconfig)then
     nu_cfg=getavu()
-    write(fnm_loc,'(A,I4,A)')'ecosim.cfg'
+    write(fnm_loc,'(A,I4,A)')'ecosim.setup'
     call opnfil(fnm_loc,nu_cfg,'f')    
 
     write(nu_cfg,*)'microbial_model=',microbial_model
