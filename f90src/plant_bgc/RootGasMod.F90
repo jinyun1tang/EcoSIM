@@ -68,7 +68,7 @@ module RootGasMod
     AtmGasc                  => plt_site%AtmGasc,                  &
     ZEROS                    => plt_site%ZEROS,                    &
     ZERO                     => plt_site%ZERO,                     &
-    VLWatMicPM               => plt_site%VLWatMicPM,               &
+    VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,            &
     VLsoiAirPM               => plt_site%VLsoiAirPM,               &
     TortMicPM_vr             => plt_site%TortMicPM_vr,             &
     FILM                     => plt_site%FILM,                     &
@@ -255,15 +255,15 @@ module RootGasMod
 !     C*G=soil gaseous concentration
 !     VOLW*,VOLP*=VLWatMicPMM,VLsoiAirPMM*gas solubility
 !
-      VLWatMicPMO=VLWatMicPM(M,L)*FOXYX
-      VLWatMicPMM=VLWatMicPM(M,L)*FracPRoot4Uptake(N,L,NZ)
+      VLWatMicPMO=VLWatMicPM_vr(M,L)*FOXYX
+      VLWatMicPMM=VLWatMicPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
       VLsoiAirPMM=VLsoiAirPM(M,L)*FracPRoot4Uptake(N,L,NZ)
       VOLWSP=RootVH2O_pvr(N,L,NZ)+VLWatMicPMM
       VLWatMicPMA=VLWatMicPMM*trcs_VLN_vr(ids_NH4,L)
       VLWatMicPMB=VLWatMicPMM*trcs_VLN_vr(ids_NH4B,L)
       VOLWSA=RTVLWA+VLWatMicPMA
       VOLWSB=RTVLWB+VLWatMicPMB
-      THETW1=AZMAX1(VLWatMicPM(M,L)/VLSoilMicP(L))
+      THETW1=AZMAX1(VLWatMicPM_vr(M,L)/VLSoilMicP(L))
 
       IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
         THETM=TortMicPM_vr(M,L)*THETW1

@@ -297,7 +297,7 @@ module TillageMixMod
         TGKCK=TGKCK+FI*GKCK(L,NY,NX)
         TVOLW=TVOLW+TI*VLWatMicP_vr(L,NY,NX)
         TVOLI=TVOLI+TI*VLiceMicP_vr(L,NY,NX)
-!     TVOLP=TVOLP+TI*VLsoiAirP_col(L,NY,NX)
+!     TVOLP=TVOLP+TI*VLsoiAirP_vr(L,NY,NX)
 !     TVOLA=TVOLA+TI*VLMicP_vr(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)

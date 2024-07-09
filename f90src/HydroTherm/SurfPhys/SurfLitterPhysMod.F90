@@ -542,7 +542,7 @@ implicit none
 !  print*,I+J/24.,'vlwat',VLWatMicP10,VLWatMicP1(0,NY,NX),WatFLow2LitR_col(NY,NX),LitrIceFlxThaw(NY,NX)
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP1(0,NY,NX)-LitrIceFlxThaw(NY,NX)/DENSICE)
   VLairMicP1_vr(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
-  VLWatMicPM(M+1,0,NY,NX)=VLWatMicP1(0,NY,NX)
+  VLWatMicPM_vr(M+1,0,NY,NX)=VLWatMicP1(0,NY,NX)
   VLsoiAirPM(M+1,0,NY,NX)=VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR=VLWatMicP1(0,NY,NX)+VLiceMicP1(0,NY,NX)
   XVLMobileWaterLitR(NY,NX)=AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
@@ -630,7 +630,7 @@ implicit none
   VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP1(0,NY,NX)+cumWatFlx2LitRByRunoff(NY,NX))
 
   VLairMicP1_vr(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
-  VLWatMicPM(M+1,0,NY,NX)=VLWatMicP1(0,NY,NX)
+  VLWatMicPM_vr(M+1,0,NY,NX)=VLWatMicP1(0,NY,NX)
   VLsoiAirPM(M+1,0,NY,NX)=VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR=VLWatMicP1(0,NY,NX)+VLiceMicP1(0,NY,NX)
   XVLMobileWaterLitR(NY,NX)=AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))

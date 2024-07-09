@@ -121,7 +121,7 @@ module ErosionMod
 !     KINETIC ENERGY AND FROM DETACHMENT COEFFICIENT IN 'HOUR1'
 !     ATTENUATED BY DEPTH OF SURFACE WATER
 !
-        DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
+        DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM_vr(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
         SoilDetachRate=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
           ,DETW*EnergyImpact4ErosionM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
           *FracSoiAsMicP(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))

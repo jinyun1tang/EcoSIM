@@ -8,8 +8,8 @@ module SoilWaterDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  ThetaAir_col(:,:,:)                      !air concentration [m3 m-3]
-  real(r8),target,allocatable ::  VLsoiAirP_col(:,:,:)                       !soil air content [m3 d-2]
+  real(r8),target,allocatable ::  ThetaAir_vr(:,:,:)                      !air concentration [m3 m-3]
+  real(r8),target,allocatable ::  VLsoiAirP_vr(:,:,:)                       !soil air content [m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                      !volumetric water content [m3 m-3]
   real(r8),target,allocatable ::  THETI_col(:,:,:)                      !volumetric ice content [m3 m-3]
   real(r8),target,allocatable ::  ThetaH2OZ_vr(:,:,:)                     !volumetric moblize water [m3 m-3]
@@ -18,11 +18,11 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLiceMicP_vr(:,:,:)                       !soil micropore ice content   [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacP_vr(:,:,:)                      !soil macropore water content [m3 d-2]
   real(r8),target,allocatable ::  PSISoilMatricP_vr(:,:,:)             !soil micropore matric water potential [MPa]
-  real(r8),target,allocatable ::  TotalSoilH2OPSIMPa(:,:,:)                      !soil micropore total water potential [MPa]
+  real(r8),target,allocatable ::  TotalSoilH2OPSIMPa_vr(:,:,:)                      !soil micropore total water potential [MPa]
   real(r8),target,allocatable ::  VLWatMicPX_vr(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
   real(r8),target,allocatable ::  FWatExMacP2MicP(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
   real(r8),target,allocatable ::  VLiceMacP_col(:,:,:)                      !soil macropore ice content [m3 d-2]
-  real(r8),target,allocatable ::  VLWatMicPM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
+  real(r8),target,allocatable ::  VLWatMicPM_vr(:,:,:,:)                    !soil micropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
@@ -33,7 +33,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  DepthInternalWTBL(:,:)            !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  ExtWaterTable(:,:)                !current external water table depth, elevation corrected [m]
-  real(r8),target,allocatable ::  DTBLI(:,:)                        !external water table depth, [m]
+  real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                        !external water table depth, [m]
   real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)                     !total energy impact for erosion
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                     !excess water+ice
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                     !excess water
@@ -106,8 +106,8 @@ module SoilWaterDataType
   implicit none
   allocate(EvapoTransp_col(JY,JX)); EvapoTransp_col=0._r8
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
-  allocate(ThetaAir_col(0:JZ,JY,JX));  ThetaAir_col=0._r8
-  allocate(VLsoiAirP_col(0:JZ,JY,JX));   VLsoiAirP_col=0._r8
+  allocate(ThetaAir_vr(0:JZ,JY,JX));  ThetaAir_vr=0._r8
+  allocate(VLsoiAirP_vr(0:JZ,JY,JX));   VLsoiAirP_vr=0._r8
   allocate(THETW_vr(0:JZ,JY,JX));  THETW_vr=0._r8
   allocate(THETI_col(0:JZ,JY,JX));  THETI_col=0._r8
   allocate(ThetaH2OZ_vr(0:JZ,JY,JX)); ThetaH2OZ_vr=0._r8
@@ -116,11 +116,11 @@ module SoilWaterDataType
   allocate(VLiceMicP_vr(0:JZ,JY,JX));   VLiceMicP_vr=0._r8
   allocate(VLWatMacP_vr(JZ,JY,JX));    VLWatMacP_vr=0._r8
   allocate(PSISoilMatricP_vr(0:JZ,JY,JX));  PSISoilMatricP_vr=0._r8
-  allocate(TotalSoilH2OPSIMPa(0:JZ,JY,JX));  TotalSoilH2OPSIMPa=0._r8
+  allocate(TotalSoilH2OPSIMPa_vr(0:JZ,JY,JX));  TotalSoilH2OPSIMPa_vr=0._r8
   allocate(VLWatMicPX_vr(0:JZ,JY,JX));  VLWatMicPX_vr=0._r8
   allocate(FWatExMacP2MicP(JZ,JY,JX));     FWatExMacP2MicP=0._r8
   allocate(VLiceMacP_col(JZ,JY,JX));    VLiceMacP_col=0._r8
-  allocate(VLWatMicPM(60,0:JZ,JY,JX));VLWatMicPM=0._r8
+  allocate(VLWatMicPM_vr(60,0:JZ,JY,JX));VLWatMicPM_vr=0._r8
   allocate(VLWatMacPM(60,JZ,JY,JX));VLWatMacPM=0._r8
   allocate(VLsoiAirPM(60,0:JZ,JY,JX));VLsoiAirPM=0._r8
   allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
@@ -131,7 +131,7 @@ module SoilWaterDataType
   allocate(DepthInternalWTBL(JY,JX));       DepthInternalWTBL=0._r8
   allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
   allocate(ExtWaterTable(JY,JX));       ExtWaterTable=0._r8
-  allocate(DTBLI(JY,JX));       DTBLI=0._r8
+  allocate(NatWtblDepz_col(JY,JX));       NatWtblDepz_col=0._r8
   allocate(EnergyImpact4ErosionM(60,JY,JX));   EnergyImpact4ErosionM=0._r8
   allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
   allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
@@ -192,8 +192,8 @@ module SoilWaterDataType
   subroutine DestructSoilWater
   use abortutils, only : destroy
   implicit none
-  call destroy(ThetaAir_col)
-  call destroy(VLsoiAirP_col)
+  call destroy(ThetaAir_vr)
+  call destroy(VLsoiAirP_vr)
   call destroy(THETW_vr)
   call destroy(THETI_col)
   call destroy(ThetaH2OZ_vr)
@@ -202,11 +202,11 @@ module SoilWaterDataType
   call destroy(VLiceMicP_vr)
   call destroy(VLWatMacP_vr)
   call destroy(PSISoilMatricP_vr)
-  call destroy(TotalSoilH2OPSIMPa)
+  call destroy(TotalSoilH2OPSIMPa_vr)
   call destroy(VLWatMicPX_vr)
   call destroy(FWatExMacP2MicP)
   call destroy(VLiceMacP_col)
-  call destroy(VLWatMicPM)
+  call destroy(VLWatMicPM_vr)
   call destroy(VLWatMacPM)
   call destroy(VLsoiAirPM)
   call destroy(FILM)
@@ -217,7 +217,7 @@ module SoilWaterDataType
   call destroy(DepthInternalWTBL)
   call destroy(ExtWaterTablet0)
   call destroy(ExtWaterTable)
-  call destroy(DTBLI)
+  call destroy(NatWtblDepz_col)
   call destroy(EnergyImpact4ErosionM)
   call destroy(XVLMobileWaterLitRM)
   call destroy(XVLMobileWatMicPM)

@@ -2219,10 +2219,9 @@ module MicBGCMod
         REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
       ENDDO
     ENDDO D670
-    DO NE=1,NumPlantChemElms
+    DO NE=idom_beg,idom_end
       REcoDOMProd(NE,K)=REcoDOMProd(NE,K)-RDOMSorp(NE,K)
     ENDDO
-    REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)-RDOMSorp(idom_acetate,K)
   ENDDO D655
 !
 !     RNH4MicbTransfSoil,RNH4MicbTransfBand=net change in NH4 in band,non-band

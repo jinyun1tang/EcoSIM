@@ -97,7 +97,7 @@ contains
 !
     PSISoilOsmotic_vr(L,NY,NX)=-RGAS*1.E-6_r8*TKS_vr(L,NY,NX)*CION(L,NY,NX)
     PSIGrav_vr(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
-    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
+    TotalSoilH2OPSIMPa_vr(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -170,14 +170,14 @@ contains
   ENDIF
 
   if(lverb)write(*,*)'finish soilp set'
-  VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
+  VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
     +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
 
   IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
-    ThetaAir_col(L,NY,NX)=VLsoiAirP_col(L,NY,NX)/VLSoilMicP(L,NY,NX)
+    ThetaAir_vr(L,NY,NX)=VLsoiAirP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)
   ELSE
-    ThetaAir_col(L,NY,NX)=0.0_r8
+    ThetaAir_vr(L,NY,NX)=0.0_r8
   ENDIF
 
   IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN

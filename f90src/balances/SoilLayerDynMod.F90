@@ -718,7 +718,7 @@ implicit none
 
   VLWatMicP_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)+FX*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP_vr(L1,NY,NX)=VLiceMicP_vr(L1,NY,NX)+FX*VLiceMicP_vr(L0,NY,NX)
-  VLsoiAirP_col(L1,NY,NX)=VLsoiAirP_col(L1,NY,NX)+FX*VLsoiAirP_col(L0,NY,NX)
+  VLsoiAirP_vr(L1,NY,NX)=VLsoiAirP_vr(L1,NY,NX)+FX*VLsoiAirP_vr(L0,NY,NX)
   VLMicP_vr(L1,NY,NX)=VLMicP_vr(L1,NY,NX)+FX*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FX*VLSoilMicP(L0,NY,NX)
   VLWatMicPX_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)
@@ -898,7 +898,7 @@ implicit none
 !     ENDIF
   VLWatMicP_vr(L0,NY,NX)=FY*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP_vr(L0,NY,NX)=FY*VLiceMicP_vr(L0,NY,NX)
-  VLsoiAirP_col(L0,NY,NX)=FY*VLsoiAirP_col(L0,NY,NX)
+  VLsoiAirP_vr(L0,NY,NX)=FY*VLsoiAirP_vr(L0,NY,NX)
   VLMicP_vr(L0,NY,NX)=FY*VLMicP_vr(L0,NY,NX)
   VLSoilMicP(L0,NY,NX)=FY*VLSoilMicP(L0,NY,NX)
   VLWatMicPX_vr(L0,NY,NX)=VLWatMicP_vr(L0,NY,NX)

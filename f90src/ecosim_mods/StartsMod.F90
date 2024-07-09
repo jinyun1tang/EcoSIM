@@ -245,7 +245,7 @@ module StartsMod
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
       IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
+        ExtWaterTablet0(NY,NX)=NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
         DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
       ELSE
         ExtWaterTablet0(NY,NX)=0.0_r8
@@ -485,7 +485,7 @@ module StartsMod
         VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
+        VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
           +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
           +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))

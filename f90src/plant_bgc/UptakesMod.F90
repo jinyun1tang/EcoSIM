@@ -240,11 +240,11 @@ module UptakesMod
     ZERO               => plt_site%ZERO,                  &
     NP                 => plt_site%NP,                    &
     MaxNumRootLays     => plt_site%MaxNumRootLays,        &
-    VLWatMicPM         => plt_site%VLWatMicPM,            &
+    VLWatMicPM_vr      => plt_site%VLWatMicPM_vr,         &
     ALT                => plt_site%ALT,                   &
     NU                 => plt_site%NU,                    &
     NP0                => plt_site%NP0,                   &
-    TotalSoilH2OPSIMPa => plt_ew%TotalSoilH2OPSIMPa,      &
+    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,      &
     PopuRootMycoC_pvr  => plt_biom% PopuRootMycoC_pvr,    &
     VLMicP_vr          => plt_soilchem%VLMicP_vr,         &
     VLiceMicP_vr       => plt_soilchem%VLiceMicP_vr,      &
@@ -305,12 +305,12 @@ module UptakesMod
 !     AllRootC_vr=total biome root mass
 !
   D9000: DO L=NU,MaxNumRootLays
-    ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAccelerat*ALT
+    ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
     IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
-      WatAvail4Uptake_vr(L)=VLWatMicPM(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
+      WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
       AirPoreAvail4Fill(L)=AZMAX1(VLMicP_vr(L)-VLWatMicP_vr(L)-VLiceMicP_vr(L))  !air volume
     ELSE
-      WatAvail4Uptake_vr(L)=VLWatMicPM(NPH,L)
+      WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)
       AirPoreAvail4Fill(L)=0.0_r8
     ENDIF
     AllRootC_vr(L)=0.0_r8
@@ -1021,7 +1021,7 @@ module UptakesMod
   associate(                                                           &
     DPTHZ                    => plt_site%DPTHZ,                        &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,          &
-    VLWatMicPM               => plt_site%VLWatMicPM,                   &
+    VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,                &
     ZERO                     => plt_site%ZERO,                         &
     ZEROS2                   => plt_site%ZEROS2,                       &
     NU                       => plt_site%NU,                           &
@@ -1073,7 +1073,7 @@ module UptakesMod
   D3880: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 &
-        .AND. VLWatMicPM(NPH,L).GT.ZEROS2 &
+        .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2 &
         .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND. HydroCondMicP4RootUptake(L).GT.ZERO &
         .AND. Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
@@ -1102,7 +1102,7 @@ module UptakesMod
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !
         RTAR2=TwoPiCON*Root2ndRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
-        RootResistSoi(N,L)=RoottRadialResist_pft(N,NZ)/RTAR2*VLMicP_vr(L)/VLWatMicPM(NPH,L)
+        RootResistSoi(N,L)=RoottRadialResist_pft(N,NZ)/RTAR2*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'

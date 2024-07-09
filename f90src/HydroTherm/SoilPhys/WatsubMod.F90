@@ -245,7 +245,7 @@ module WatsubMod
           VLairMacP(L,NY,NX)=0.0_r8
           VLairMacP1(L,NY,NX)=0.0_r8
         ENDIF        
-        VLWatMicPM(1,L,NY,NX)=VLWatMicP1(L,NY,NX)
+        VLWatMicPM_vr(1,L,NY,NX)=VLWatMicP1(L,NY,NX)
         VLWatMacPM(1,L,NY,NX)=VLWatMacP1_vr(L,NY,NX)
         VLsoiAirPM(1,L,NY,NX)=VLairMicP1_vr(L,NY,NX)+VLairMacP1(L,NY,NX)+THETPI*(VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX))
         
@@ -813,7 +813,7 @@ module WatsubMod
                   WatFlxBySnowRedistribut(N,M5,M4)=0.0_r8
                   IceFlxBySnowRedistribut(N,M5,M4)=0.0_r8
                   HeatFlxBySnowRedistribut(N,M5,M4)=0.0_r8
-                  DrySnoFlxBySnoRedistM(M,N,M5,M4)=DrySnoFlxBySnowRedistribut(N,M5,M4)
+                  DrySnoFlxBySnoRedistM_2DH(M,N,M5,M4)=DrySnoFlxBySnowRedistribut(N,M5,M4)
                 ENDIF
               ENDIF
             ELSE
@@ -1096,7 +1096,7 @@ module WatsubMod
           ENDIF
 
           !record intermediate variables for bgc calculation
-          VLWatMicPM(M+1,L,NY,NX)=VLWatMicP1(L,NY,NX)
+          VLWatMicPM_vr(M+1,L,NY,NX)=VLWatMicP1(L,NY,NX)
           VLWatMacPM(M+1,L,NY,NX)=VLWatMacP1_vr(L,NY,NX)
           VLsoiAirPM(M+1,L,NY,NX)=VLairMicP1_vr(L,NY,NX)+VLairMacP1(L,NY,NX) &
             +THETPI*(VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX))
@@ -1165,7 +1165,7 @@ module WatsubMod
               write(*,*)'TKSoi1(L,NY,NX)',M,L,TKSoi1(L,NY,NX),tk1l,VLHeatCapacityPre,VLHeatCapacity_vr(L,NY,NX)
               write(*,*)ENGY1/VLHeatCapacity_vr(L,NY,NX),THeatFlow2Soili_vr(L,NY,NX)/VLHeatCapacity_vr(L,NY,NX),&
                TLPhaseChangeHeat2Soi1(L,NY,NX)/VLHeatCapacity_vr(L,NY,NX),HeatIrrigation1(L,NY,NX)/VLHeatCapacity_vr(L,NY,NX)
-              write(*,*)VLWatMicPM(M,L,NY,NX),VLWatMicPM(M+1,L,NY,NX),THeatFlow2Soili_vr(L,NY,NX)/VLHeatCapacity_vr(L,NY,NX)
+              write(*,*)VLWatMicPM_vr(M,L,NY,NX),VLWatMicPM_vr(M+1,L,NY,NX),THeatFlow2Soili_vr(L,NY,NX)/VLHeatCapacity_vr(L,NY,NX)
               call endrun()
             endif
           ELSEIF(L.EQ.1)THEN
@@ -1175,7 +1175,7 @@ module WatsubMod
           ENDIF
         ELSE
           !layer L disappears
-          VLWatMicPM(M+1,L,NY,NX)=0.0_r8
+          VLWatMicPM_vr(M+1,L,NY,NX)=0.0_r8
           VLWatMacPM(M+1,L,NY,NX)=0.0_r8
           VLsoiAirPM(M+1,L,NY,NX)=0.0_r8
           ReductVLsoiAirPM(M,L,NY,NX)=VLsoiAirPM(M,L,NY,NX)
@@ -1424,7 +1424,7 @@ module WatsubMod
     ENDIF
 
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      THETWT=safe_adb(VLWatMicPM(M,L,NY,NX),VLSoilMicP(L,NY,NX))
+      THETWT=safe_adb(VLWatMicPM_vr(M,L,NY,NX),VLSoilMicP(L,NY,NX))
       TortMicPM_vr(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-SoilFracAsMacP(L,NY,NX))
     ELSE
 !   standing water has tortuosity 0.7?

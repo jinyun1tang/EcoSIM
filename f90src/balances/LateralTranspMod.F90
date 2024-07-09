@@ -75,7 +75,7 @@ implicit none
     trcg_VOLG(idg_NH3)=trc_gasml_vr(idg_NH3,L,NY,NX)/natomw
     trcg_VOLG(idg_H2)=trc_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
 
-    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_col(L,NY,NX)/TKS_vr(L,NY,NX))
+    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_vr(L,NY,NX)/TKS_vr(L,NY,NX))
 !   NH3B does not have explicit gas species, so there is an inconsistency
 !   with respect to the actual ebullition calculation, which involves
 !   NH3B
@@ -84,9 +84,9 @@ implicit none
 
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
-    IF(ThetaAir_col(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
+    IF(ThetaAir_vr(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
 
-    IF(ThetaAir_col(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
+    IF(ThetaAir_vr(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
     VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)

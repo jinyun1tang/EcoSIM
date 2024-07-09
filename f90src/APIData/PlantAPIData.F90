@@ -78,7 +78,7 @@ implicit none
   real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FracSoiAsMicP(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
-  real(r8), pointer :: VLWatMicPM(:,:) => null()    !soil micropore water content, [m3 d-2]
+  real(r8), pointer :: VLWatMicPM_vr(:,:) => null()    !soil micropore water content, [m3 d-2]
   real(r8), pointer :: VLsoiAirPM(:,:) => null()    !soil air content, [m3 d-2]
   real(r8), pointer :: TortMicPM_vr(:,:)  => null()    !micropore soil tortuosity, []
   real(r8), pointer :: FILM(:,:)  => null()    !soil water film thickness , [m]
@@ -581,7 +581,7 @@ implicit none
   real(r8), pointer :: WatByPCanopy_pft(:)     => null()  !canopy surface water content, [m3 d-2]
   real(r8), pointer :: CanopyWater_pft(:)     => null()  !canopy water content, [m3 d-2]
   real(r8), pointer :: VHeatCapCanP_pft(:)     => null()  !canopy heat capacity, [MJ d-2 K-1]
-  real(r8), pointer :: TotalSoilH2OPSIMPa(:)     => null()  !soil micropore total water potential [MPa]
+  real(r8), pointer :: TotalSoilH2OPSIMPa_vr(:)     => null()  !soil micropore total water potential [MPa]
   real(r8), pointer :: ETCanopy_pft(:)     =>  null()  !total transpiration, [m H2O d-2]
   contains
     procedure, public :: Init => plt_ew_init
@@ -928,7 +928,7 @@ implicit none
   allocate(this%PPX_pft(JP1));this%PPX_pft=spval
   allocate(this%PlantPopulation_pft(JP1));this%PlantPopulation_pft=spval
   allocate(this%flag_pft_active(JP1));  this%flag_pft_active=.false.
-  allocate(this%VLWatMicPM(60,0:JZ1));this%VLWatMicPM=spval
+  allocate(this%VLWatMicPM_vr(60,0:JZ1));this%VLWatMicPM_vr=spval
   allocate(this%VLsoiAirPM(60,0:JZ1));this%VLsoiAirPM=spval
   allocate(this%TortMicPM_vr(60,0:JZ1));this%TortMicPM_vr=spval
   allocate(this%FILM(60,0:JZ1)); this%FILM=spval
@@ -1092,7 +1092,7 @@ implicit none
   class(plant_ew_type) :: this
 
   allocate(this%ETCanopy_pft(JP1));this%ETCanopy_pft=spval
-  allocate(this%TotalSoilH2OPSIMPa(0:JZ1));this%TotalSoilH2OPSIMPa=spval
+  allocate(this%TotalSoilH2OPSIMPa_vr(0:JZ1));this%TotalSoilH2OPSIMPa_vr=spval
   allocate(this%THeatRootUptake_vr(0:JZ1));this%THeatRootUptake_vr=spval
   allocate(this%TKCanopy_pft(JP1));this%TKCanopy_pft=spval
   allocate(this%HeatXAir2PCan(JP1));this%HeatXAir2PCan=spval

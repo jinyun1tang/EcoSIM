@@ -11,7 +11,7 @@ module SnowDataType
 
   real(r8),target, allocatable ::  VLSnowHeatCapM_snvr(:,:,:,:)            !volumetric heat capacity of snowpack
   real(r8),target, allocatable ::  WatFlowInSnowM_snvr(:,:,:,:)            !snowpack water flux
-  real(r8),target, allocatable ::  DrySnoFlxBySnoRedistM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
+  real(r8),target, allocatable ::  DrySnoFlxBySnoRedistM_2DH(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  SoilAlbedo_col(:,:)                          !snowpack albedo
   real(r8),target, allocatable ::  NewSnowDens_col(:,:)                   !new snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  TCSnow_snvr(:,:,:)                         !snow temperature, [oC]
@@ -63,7 +63,7 @@ contains
   implicit none
   allocate(VLSnowHeatCapM_snvr(60,JS,JY,JX));VLSnowHeatCapM_snvr=0._r8
   allocate(WatFlowInSnowM_snvr(60,JS,JY,JX)); WatFlowInSnowM_snvr=0._r8
-  allocate(DrySnoFlxBySnoRedistM(60,2,JV,JH));    DrySnoFlxBySnoRedistM=0._r8
+  allocate(DrySnoFlxBySnoRedistM_2DH(60,2,JV,JH));    DrySnoFlxBySnoRedistM_2DH=0._r8
   allocate(SoilAlbedo_col(JY,JX));        SoilAlbedo_col=0._r8
   allocate(NewSnowDens_col(JY,JX));       NewSnowDens_col=0._r8
   allocate(TCSnow_snvr(JS,JY,JX));      TCSnow_snvr=0._r8
@@ -122,7 +122,7 @@ contains
   endif
   call destroy(VLSnowHeatCapM_snvr)
   call destroy(WatFlowInSnowM_snvr)
-  call destroy(DrySnoFlxBySnoRedistM)
+  call destroy(DrySnoFlxBySnoRedistM_2DH)
   call destroy(SoilAlbedo_col)
   call destroy(NewSnowDens_col)
   call destroy(TCSnow_snvr)

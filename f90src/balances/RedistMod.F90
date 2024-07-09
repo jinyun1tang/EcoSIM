@@ -225,8 +225,8 @@ module RedistMod
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
     ! drainage is on
     DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
-    DTBLI(NY,NX)=DCORPW
-    ExtWaterTablet0(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
+    NatWtblDepz_col(NY,NX)=DCORPW
+    ExtWaterTablet0(NY,NX)=NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
     ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
 
@@ -794,10 +794,10 @@ module RedistMod
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX) &
+      VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX) &
         +VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
     ELSE
-      VLsoiAirP_col(L,NY,NX)=0.0_r8
+      VLsoiAirP_vr(L,NY,NX)=0.0_r8
 !     VLMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX)
 !    2+DVLWatMicP_vr(L,NY,NX)+DVLiceMicP_vr(L,NY,NX)
 !     VLSoilPoreMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)

@@ -288,7 +288,7 @@ module readiMod
       ZNH3E(NY,NX)=ZNH3EG
       KoppenClimZone(NY,NX)=IETYPG
       FlowDirIndicator(NY,NX)=grid_mode
-      DTBLI(NY,NX)=DTBLIG
+      NatWtblDepz_col(NY,NX)=DTBLIG
       DTBLDI(NY,NX)=DTBLDIG
       WaterTBLSlope(NY,NX)=DTBLGG
       RechargNorthSurf(NY,NX)=RCHQNG

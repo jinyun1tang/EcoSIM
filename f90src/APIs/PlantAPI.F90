@@ -713,7 +713,7 @@ implicit none
 
     plt_soilchem%GasSolbility_vr(idg_beg:idg_end-1,L) =GasSolbility_vr(idg_beg:idg_end-1,L,NY,NX)
 
-    plt_ew%TotalSoilH2OPSIMPa(L)       =TotalSoilH2OPSIMPa(L,NY,NX)
+    plt_ew%TotalSoilH2OPSIMPa_vr(L)       =TotalSoilH2OPSIMPa_vr(L,NY,NX)
     plt_bgcr%RH2PO4EcoDmndSoilPrev_vr(L)     =RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)
     plt_bgcr%RH2PO4EcoDmndBandPrev_vr(L)     =RH2PO4EcoDmndBandPrev_vr(L,NY,NX)
     plt_bgcr%RH1PO4EcoDmndSoilPrev_vr(L)     =RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)
@@ -888,7 +888,7 @@ implicit none
 
   DO L=1,NL(NY,NX)
     DO M=1,NPH
-      plt_site%VLWatMicPM(M,L)=VLWatMicPM(M,L,NY,NX)
+      plt_site%VLWatMicPM_vr(M,L)=VLWatMicPM_vr(M,L,NY,NX)
       plt_site%VLsoiAirPM(M,L)=VLsoiAirPM(M,L,NY,NX)
       plt_site%TortMicPM_vr(M,L)=TortMicPM_vr(M,L,NY,NX)
       plt_site%FILM(M,L)=FILM(M,L,NY,NX)

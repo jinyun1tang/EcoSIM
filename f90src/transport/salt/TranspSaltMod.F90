@@ -551,9 +551,9 @@ module TranspSaltMod
   integer :: nsalts,ids
 !     begin_execution
 
-  IF(VLWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+  IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
     VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4) &
-      /VLWatMicPM(M,M3,M2,M1)))
+      /VLWatMicPM_vr(M,M3,M2,M1)))
   ELSE
     VFLW=0.0_r8
   ENDIF

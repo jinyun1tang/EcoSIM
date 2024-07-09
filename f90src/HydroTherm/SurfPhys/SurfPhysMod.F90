@@ -154,7 +154,7 @@ contains
   VLWatMicP1(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
   VLiceMicP1(0,NY,NX)=AZMAX1(VLiceMicP_vr(0,NY,NX))
   VLairMicP1_vr(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1(0,NY,NX)-VLiceMicP1(0,NY,NX))
-  VLWatMicPM(1,0,NY,NX)=VLWatMicP1(0,NY,NX)
+  VLWatMicPM_vr(1,0,NY,NX)=VLWatMicP1(0,NY,NX)
   VLsoiAirPM(1,0,NY,NX)=VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR=VLWatMicP1(0,NY,NX)+VLiceMicP1(0,NY,NX)
   XVLMobileWaterLitR(NY,NX)=AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))

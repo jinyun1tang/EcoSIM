@@ -823,9 +823,9 @@ module TranspNoSaltMod
       DO idom=idom_beg,idom_end
         DOM_MicP2(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)
         !DOM_MicP2(idom,K,L,NY,NX)=AZMAX1(DOM_vr(idom,K,L,NY,NX)-RDOMMicProd_vr(idom,K,L,NY,NX))
-        if(DOM_MicP2(idom,K,L,NY,NX)<0._r8)then
-        print*,'nosaltmode',DOM_MicP2(idom,K,L,NY,NX),RDOMMicProd_vr(idom,K,L,NY,NX)
-        endif
+!        if(DOM_MicP2(idom,K,L,NY,NX)<0._r8)then
+!        print*,'nosaltmode',DOM_MicP2(idom,K,L,NY,NX),RDOMMicProd_vr(idom,K,L,NY,NX)
+!        endif
         DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
       ENDDO
     enddo

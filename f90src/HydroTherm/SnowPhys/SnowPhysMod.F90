@@ -1146,7 +1146,7 @@ contains
         WatBySnowRedistrib_2DH(N,N5,N4)=WatBySnowRedistrib_2DH(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
         IceBySnowRedistrib_2DH(N,N5,N4)=IceBySnowRedistrib_2DH(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
         HeatBySnowRedistrib_2DH(N,N5,N4)=HeatBySnowRedistrib_2DH(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
-        DrySnoFlxBySnoRedistM(M,N,N5,N4)=DrySnoFlxBySnowRedistribut(N,N5,N4)
+        DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)=DrySnoFlxBySnowRedistribut(N,N5,N4)
       ENDIF
 
       !add west and south

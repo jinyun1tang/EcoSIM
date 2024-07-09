@@ -1236,7 +1236,7 @@ module NutUptakeMod
     ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft,         &
     ZEROS                  => plt_site%ZEROS,                  &
     ZEROS2                 => plt_site%ZEROS2,                 &
-    VLWatMicPM             => plt_site%VLWatMicPM,             &
+    VLWatMicPM_vr          => plt_site%VLWatMicPM_vr,          &
     RootVH2O_pvr           => plt_morph%RootVH2O_pvr,          &
     RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
     FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr,    &
@@ -1261,7 +1261,7 @@ module NutUptakeMod
   !     OSTR=O2 stress indicator
   !
   D195: DO K=1,jcplx
-    VLWatMicPK=VLWatMicPM(NPH,L)*FracBulkSOMC_vr(K,L)
+    VLWatMicPK=VLWatMicPM_vr(NPH,L)*FracBulkSOMC_vr(K,L)
     IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))

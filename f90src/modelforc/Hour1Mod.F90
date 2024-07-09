@@ -585,10 +585,10 @@ module Hour1Mod
     VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      VLsoiAirP_col(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
+      VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
         +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
     ELSE
-      VLsoiAirP_col(L,NY,NX)=0.0_r8
+      VLsoiAirP_vr(L,NY,NX)=0.0_r8
     ENDIF
     EHUM(L,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
     EPOC(L,NY,NX)=1.0_r8
@@ -1453,19 +1453,19 @@ module Hour1Mod
     VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
     SoilMicPMassLayer(0,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
     VLMicP_vr(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
-    VLsoiAirP_col(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
+    VLsoiAirP_vr(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
     IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
       POROS(0,NY,NX)=VLMicP_vr(0,NY,NX)/VLitR(NY,NX)
       !write(*,*) "VLitR gt 0 - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VLitR(NY,NX)))
       THETI_col(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP_vr(0,NY,NX)/VLitR(NY,NX)))
-      ThetaAir_col(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP_col(0,NY,NX)/VLitR(NY,NX)))
+      ThetaAir_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP_vr(0,NY,NX)/VLitR(NY,NX)))
     ELSE
       POROS(0,NY,NX)=1.0_r8
       !write(*,*) "VLitR else - POROS(0,NY,NX) = ", POROS(0,NY,NX)
       THETW_vr(0,NY,NX)=0.0_r8
       THETI_col(0,NY,NX)=0.0_r8
-      ThetaAir_col(0,NY,NX)=0.0_r8
+      ThetaAir_vr(0,NY,NX)=0.0_r8
     ENDIF
     TVOLWI=VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
@@ -1494,7 +1494,7 @@ module Hour1Mod
       PSISoilOsmotic_vr(0,NY,NX)=0.0_r8
       PSIGrav_vr(0,NY,NX)=mGravAccelerat*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
         +0.5_r8*DLYR(3,0,NY,NX))
-      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
+      TotalSoilH2OPSIMPa_vr(0,NY,NX)=AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
@@ -1512,12 +1512,12 @@ module Hour1Mod
     VLSoilPoreMicP_vr(0,NY,NX)=0.0_r8
     SoilMicPMassLayer(0,NY,NX)=0.0_r8
     VLMicP_vr(0,NY,NX)=0.0_r8
-    VLsoiAirP_col(0,NY,NX)=0.0_r8
+    VLsoiAirP_vr(0,NY,NX)=0.0_r8
     POROS(0,NY,NX)=1.0
     DLYR(3,0,NY,NX)=0.0_r8
     THETW_vr(0,NY,NX)=0.0_r8
     THETI_col(0,NY,NX)=0.0_r8
-    ThetaAir_col(0,NY,NX)=1.0
+    ThetaAir_vr(0,NY,NX)=1.0
     VWatLitRHoldCapcity_col(NY,NX)=0.0_r8
     PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
 
@@ -2264,11 +2264,11 @@ module Hour1Mod
     IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW_vr(L,NY,NX)=POROS(L,NY,NX)
       THETI_col(L,NY,NX)=0.0_r8
-      ThetaAir_col(L,NY,NX)=0.0_r8
+      ThetaAir_vr(L,NY,NX)=0.0_r8
     ELSE
       THETW_vr(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)))
       THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)))
-      ThetaAir_col(L,NY,NX)=AZMAX1(VLsoiAirP_col(L,NY,NX)/VLSoilMicP(L,NY,NX))
+      ThetaAir_vr(L,NY,NX)=AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX))
     ENDIF
     THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_col(L,NY,NX))
 !
@@ -2277,9 +2277,9 @@ module Hour1Mod
 !     C*G=soil gas gaseous concentration
 !     C*S=soil gas aqueous concentration
 !
-    IF(ThetaAir_col(L,NY,NX).GT.THETX)THEN
+    IF(ThetaAir_vr(L,NY,NX).GT.THETX)THEN
       DO NTG=idg_beg,idg_end-1
-        trc_gascl_vr(NTG,L,NY,NX)=AZMAX1(trc_gasml_vr(NTG,L,NY,NX)/VLsoiAirP_col(L,NY,NX))
+        trc_gascl_vr(NTG,L,NY,NX)=AZMAX1(trc_gasml_vr(NTG,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
       ENDDO
     ELSE
       trc_gascl_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8

@@ -93,7 +93,7 @@ module GeochemAPI
   DO   NX=NHW,NHE
     DO   NY=NVN,NVS
       DO   L=NU(NY,NX),NL(NY,NX)
-        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
 !
 !     WATER VOLUME IN NON-BAND AND BAND SOIL ZONES
 !
@@ -103,12 +103,12 @@ module GeochemAPI
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
 !     SoilMicPMassLayer=soil mass
 !
-          chemvar%VLWatMicPNH=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-          chemvar%VLWatMicPNB=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-          chemvar%VLWatMicPNO=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
-          chemvar%VLWatMicPNZ=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
-          chemvar%VLWatMicPPO=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-          chemvar%VLWatMicPPB=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          chemvar%VLWatMicPNH=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+          chemvar%VLWatMicPNB=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
+          chemvar%VLWatMicPNO=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
+          chemvar%VLWatMicPNZ=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
+          chemvar%VLWatMicPPO=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          chemvar%VLWatMicPPB=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
           IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
             chemvar%SoilMicPMassLayerX=SoilMicPMassLayer(L,NY,NX)
             chemvar%BKVLNH=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
@@ -160,7 +160,7 @@ module GeochemAPI
   chemvar%PH=PH(L,NY,NX)
   chemvar%CAL=CAL(L,NY,NX)
   chemvar%CFE=CFE(L,NY,NX)
-  chemvar%VLWatMicPM=VLWatMicPM(NPH,L,NY,NX)
+  chemvar%VLWatMicPM=VLWatMicPM_vr(NPH,L,NY,NX)
   if(salt_model)then
     chemvar%ZMG=trcSalt_solml(idsalt_Mg,L,NY,NX)
     chemvar%ZNA=trcSalt_solml(idsalt_Na,L,NY,NX)
