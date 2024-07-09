@@ -22,10 +22,12 @@ implicit none
   integer, parameter :: ivertdir=3   !vertical direction
 
 ! soil properties
-  integer, parameter :: isoi_fc=1
-  integer, parameter :: isoi_wp=2
-  integer, parameter :: isoi_scnv=3
-  integer, parameter :: isoi_scnh=4
+  integer, parameter :: isoi_fc=1   !field capacity
+  integer, parameter :: isoi_wp=2   !wilting point
+  integer, parameter :: isoi_scnv=3  !vertical hydraulic conductivity
+  integer, parameter :: isoi_scnh=4  !horizontal hydraulic conductivity
+  integer, parameter :: isoi_set=0
+  integer, parameter :: isoi_unset=1
 ! plant harvest
   integer, parameter :: iplthvst_leaf=1 !leaf
   integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf

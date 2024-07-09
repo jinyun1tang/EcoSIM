@@ -163,7 +163,7 @@ implicit none
   fid_TR_CaCO3_soil    =addone(itemp)
   fid_TR_MgHCO3_soil    =addone(itemp)
   fid_TR_CaHCO3_soil    =addone(itemp)
-  fid_TRHCO    =addone(itemp)
+  fid_TR_HCO3    =addone(itemp)
   fid_TR_HCO3_sorbed_soil    =addone(itemp)
   fid_TR_CaH4P2O8_soil    =addone(itemp)
   fid_TR_FeH2PO4_soil    =addone(itemp)
@@ -233,7 +233,7 @@ implicit none
   fid_TR_Mg_sorbed_soil   =addone(itemp)
   fid_TR_NH4_sorbed_soil   =addone(itemp)
   fid_TR_Na_sorbed_soil   =addone(itemp)
-  fid_TBCO2   =addone(itemp)
+  fid_Txchem_CO2   =addone(itemp)
   fid_TBION   =addone(itemp)
   fid_TRH2O   =addone(itemp)
 
@@ -578,8 +578,8 @@ implicit none
   varl(fid_TR_CaHCO3_soil)='TR_CaHCO3_soil';varlnml(fid_TR_CaHCO3_soil)='total solute CaHCO3 transformation'
   unitl(fid_TR_CaHCO3_soil)='mol d-2 h-1';vartypes(fid_TR_CaHCO3_soil)=var_flux_type
 
-  varl(fid_TRHCO)='TRHCO';varlnml(fid_TRHCO)='total solute HCO3 transformation'
-  unitl(fid_TRHCO)='mol d-2 h-1';vartypes(fid_TRHCO)=var_flux_type
+  varl(fid_TR_HCO3)='TR_HCO3';varlnml(fid_TR_HCO3)='total solute HCO3 transformation'
+  unitl(fid_TR_HCO3)='mol d-2 h-1';vartypes(fid_TR_HCO3)=var_flux_type
 
   varl(fid_TR_HCO3_sorbed_soil)='TR_HCO3_sorbed_soil';varlnml(fid_TR_HCO3_sorbed_soil)='total adsorbed COOH transformation'
   unitl(fid_TR_HCO3_sorbed_soil)='mol d-2 h-1';vartypes(fid_TR_HCO3_sorbed_soil)=var_flux_type
@@ -786,8 +786,8 @@ implicit none
   varl(fid_TR_Na_sorbed_soil)='TR_Na_sorbed_soil';varlnml(fid_TR_Na_sorbed_soil)='total adsorbed Na transformation'
   unitl(fid_TR_Na_sorbed_soil)='mol d-2 h-1';vartypes(fid_TR_Na_sorbed_soil)=var_flux_type
 
-  varl(fid_TBCO2)='TBCO2';varlnml(fid_TBCO2)='total solute CO2 transformation'
-  unitl(fid_TBCO2)='mol d-2 h-1';vartypes(fid_TBCO2)=var_flux_type
+  varl(fid_Txchem_CO2)='Txchem_CO2';varlnml(fid_Txchem_CO2)='total solute CO2 transformation'
+  unitl(fid_Txchem_CO2)='mol d-2 h-1';vartypes(fid_Txchem_CO2)=var_flux_type
 
   varl(fid_TBION)='TBION';varlnml(fid_TBION)='total solute ion transformation'
   unitl(fid_TBION)='mol d-2 h-1';vartypes(fid_TBION)=var_flux_type

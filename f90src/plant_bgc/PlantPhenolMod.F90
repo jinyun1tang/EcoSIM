@@ -73,15 +73,11 @@ module PlantPhenolMod
 !         1 = ALIVE, 0 = NOT ALIVE
 !         DATAP=PFT file name
 !
-!      IF(NZ==1)write(199,*)I+J/24.,'bf set needle',IsPlantActive_pft(NZ).EQ.iActive,&
 !        plt_pheno%iPlantState_pft(NZ),iLive
       call set_plant_flags(I,J,NZ)
-
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
-!      IF(NZ==1)write(199,*)I+J/24.,'af set needle',IsPlantActive_pft(NZ).EQ.iActive,&
-!        plt_pheno%iPlantState_pft(NZ),iLive
       IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
 
         call FindMainBranchNumber(NZ)
@@ -97,7 +93,7 @@ module PlantPhenolMod
 !           doInitLeafOut_brch,doPlantLeafOut_brch=flags for initializing leafout,leafoff
 !           Hours4Leafout_brch=leafout hours
 !
-        IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR.doInitPlant_pft(NZ).EQ.itrue)THEN
+        IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR.doInitPlant_pft(NZ).EQ.itrue)THEN          
           call Emerged_plant_Phenology(I,J,NZ)
         ENDIF
       ENDIF
@@ -112,17 +108,17 @@ module PlantPhenolMod
   integer, intent(in) :: I,J,NZ
   integer :: NB
   integer :: LeafNumberGrowing
-  associate(                                                                       &
-    iPlantBranchState_brch           =>  plt_pheno%iPlantBranchState_brch        , &
-    LeafNumberAtFloralInit_brch      =>  plt_pheno%LeafNumberAtFloralInit_brch   , &    
-    HoursTooLowPsiCan_pft         =>  plt_pheno%HoursTooLowPsiCan_pft      , &    
-    PSICanopy_pft                    =>  plt_ew%PSICanopy_pft                    , &    
-    NumOfLeaves_brch                 =>  plt_morph%NumOfLeaves_brch              , &    
-    doRemobilization_brch            =>  plt_pheno%doRemobilization_brch         , &    
-    NumOfBranches_pft                =>  plt_morph%NumOfBranches_pft             , &    
-    iPlantRootProfile_pft            =>  plt_pheno%iPlantRootProfile_pft         , &    
-    KLeafNumber_brch                 =>  plt_morph%KLeafNumber_brch              , &    
-    KHiestGroLeafNode_brch           =>  plt_pheno%KHiestGroLeafNode_brch          &    
+  associate(                                                              &
+    iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch,      &
+    LeafNumberAtFloralInit_brch => plt_pheno%LeafNumberAtFloralInit_brch, &
+    HoursTooLowPsiCan_pft       => plt_pheno%HoursTooLowPsiCan_pft,       &
+    PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
+    NumOfLeaves_brch            => plt_morph%NumOfLeaves_brch,            &
+    doRemobilization_brch       => plt_pheno%doRemobilization_brch,       &
+    NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
+    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,       &
+    KLeafNumber_brch            => plt_morph%KLeafNumber_brch,            &
+    KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch       &
   )
 
   D2010: DO NB=1,NumOfBranches_pft(NZ)
@@ -188,22 +184,21 @@ module PlantPhenolMod
   !first hour of day
   IF(J.EQ.1)THEN
     HarvestChk=iDayPlanting_pft(NZ).LE.iDayPlantHarvest_pft(NZ) &
-      .OR.iYearPlanting_pft(NZ).LT.iYearPlantHarvest_pft(NZ)
-!    IF(NZ==1)write(199,*)'harvest',iDayPlanting_pft(NZ),iDayPlantHarvest_pft(NZ), &
-!      iYearPlanting_pft(NZ),iYearPlantHarvest_pft(NZ)
+      .OR. iYearPlanting_pft(NZ).LT.iYearPlantHarvest_pft(NZ)
+
     !Before harvest  
     IF(HarvestChk)THEN
+
       !planting is feasible
-      IF(I.GE.iDayPlanting_pft(NZ).OR.iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
+      IF(I.GE.iDayPlanting_pft(NZ) .OR. iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
         !planted 
-        IF(I.GT.iDayPlantHarvest_pft(NZ).AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ) &
-          .AND.iPlantState_pft(NZ).EQ.iDead)THEN
+        IF(I.GT.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ) &
+          .AND. iPlantState_pft(NZ).EQ.iDead)THEN
           !post harvest
- !         if(NZ==1)write(199,*)'postharvst'
           IsPlantActive_pft(NZ)=iDormant
         ELSE
           IF(I.EQ.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
-!             if(NZ==1)write(199,*)'startplants'
+
             !planting day of year
             IsPlantActive_pft(NZ)=iDormant
             iPlantState_pft(NZ)=iLive
@@ -220,17 +215,15 @@ module PlantPhenolMod
       ENDIF
       !After harvest
     ELSE
-      HarvestChk=I.LT.iDayPlanting_pft(NZ).AND.I.GT.iDayPlantHarvest_pft(NZ) &
-        .AND.iYearCurrent.GE.iYearPlantHarvest_pft(NZ)
+      HarvestChk=I.LT.iDayPlanting_pft(NZ) .AND. I.GT.iDayPlantHarvest_pft(NZ) &
+        .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ)
       PlantingChk=I.LT.iDayPlanting_pft(NZ) .AND. iYearPlanting_pft(NZ).GT.iYearPlantHarvest_pft(NZ)  
       !not planted
-      IF((HarvestChk.AND.iPlantState_pft(NZ).EQ.iDead) .OR. PlantingChk)THEN
-!        if(NZ==1)write(199,*)'iplantcheck'
+      IF((HarvestChk .AND. iPlantState_pft(NZ).EQ.iDead) .OR. PlantingChk)THEN
         IsPlantActive_pft(NZ)=iDormant
       ELSE
         !planting
-        IF(I.EQ.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
-!          if(NZ==1)write(199,*)'iplanting'
+        IF(I.EQ.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
           IsPlantActive_pft(NZ)=iDormant
           iPlantState_pft(NZ)=iLive
           CALL StartPlants(NZ,NZ)
@@ -254,33 +247,33 @@ module PlantPhenolMod
   integer, intent(in) :: I,J,NZ
   integer :: NB
 ! begin_execution
-  associate(                                                                     &
-    CanopyNonstElmConc_pft          =>   plt_biom%CanopyNonstElmConc_pft       , &
-    SeasonalNonstElms_pft           =>   plt_biom%SeasonalNonstElms_pft        , &
-    MatureGroup_brch                =>   plt_pheno%MatureGroup_brch            , &
-    iPlantCalendar_brch             =>   plt_pheno%iPlantCalendar_brch         , &
-    doInitPlant_pft                 =>   plt_pheno%doInitPlant_pft             , &
-    iPlantRootState_pft             =>   plt_pheno%iPlantRootState_pft         , &
-    iPlantPhenolPattern_pft         =>   plt_pheno%iPlantPhenolPattern_pft     , &
-    iPlantBranchState_brch          =>   plt_pheno%iPlantBranchState_brch      , &
-    iPlantShootState_pft            =>   plt_pheno%iPlantShootState_pft        , &
-    iPlantTurnoverPattern_pft       =>   plt_pheno%iPlantTurnoverPattern_pft   , &
-    MinNonstC2InitRoot_pft          =>   plt_pheno%MinNonstC2InitRoot_pft      , &
-    MatureGroup_pft                 =>   plt_pheno%MatureGroup_pft             , &
-    MinNonstC2InitBranch_pft        =>   plt_pheno%MinNonstC2InitBranch_pft    , &
-    PlantPopulation_pft             =>   plt_site%PlantPopulation_pft          , &
-    Hours4Leafout_brch              =>   plt_pheno%Hours4Leafout_brch          , &
-    PSIRootTurg_vr                  =>   plt_ew%PSIRootTurg_vr                 , &
-    FracGroth2Node_pft              =>   plt_allom%FracGroth2Node_pft          , &
-    NumRootAxes_pft                 =>   plt_morph%NumRootAxes_pft             , &
-    MainBranchNum_pft               =>   plt_morph%MainBranchNum_pft           , &
-    NumOfBranches_pft               =>   plt_morph%NumOfBranches_pft           , &
-    NumCogrothNode_pft                   =>   plt_morph%NumCogrothNode_pft               , &
-    BranchNumber_pft                =>   plt_morph%BranchNumber_pft            , &
-    BranchNumber_brch               =>   plt_morph%BranchNumber_brch           , &
-    NGTopRootLayer_pft              =>   plt_morph%NGTopRootLayer_pft          , &
-    ShootNodeNumAtPlanting_pft      =>   plt_morph%ShootNodeNumAtPlanting_pft  , &
-    ShootNodeNum_brch               =>   plt_morph%ShootNodeNum_brch             &
+  associate(                                                            &
+    CanopyNonstElmConc_pft     => plt_biom%CanopyNonstElmConc_pft,      &
+    SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft,       &
+    MatureGroup_brch           => plt_pheno%MatureGroup_brch,           &
+    iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch,        &
+    doInitPlant_pft            => plt_pheno%doInitPlant_pft,            &
+    iPlantRootState_pft        => plt_pheno%iPlantRootState_pft,        &
+    iPlantPhenolPattern_pft    => plt_pheno%iPlantPhenolPattern_pft,    &
+    iPlantBranchState_brch     => plt_pheno%iPlantBranchState_brch,     &
+    iPlantShootState_pft       => plt_pheno%iPlantShootState_pft,       &
+    iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft,  &
+    MinNonstC2InitRoot_pft     => plt_pheno%MinNonstC2InitRoot_pft,     &
+    MatureGroup_pft            => plt_pheno%MatureGroup_pft,            &
+    MinNonstC2InitBranch_pft   => plt_pheno%MinNonstC2InitBranch_pft,   &
+    PlantPopulation_pft        => plt_site%PlantPopulation_pft,         &
+    Hours4Leafout_brch         => plt_pheno%Hours4Leafout_brch,         &
+    PSIRootTurg_vr             => plt_ew%PSIRootTurg_vr,                &
+    FracGroth2Node_pft         => plt_allom%FracGroth2Node_pft,         &
+    NumRootAxes_pft            => plt_morph%NumRootAxes_pft,            &
+    MainBranchNum_pft          => plt_morph%MainBranchNum_pft,          &
+    NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
+    NumCogrothNode_pft         => plt_morph%NumCogrothNode_pft,         &
+    BranchNumber_pft           => plt_morph%BranchNumber_pft,           &
+    BranchNumber_brch          => plt_morph%BranchNumber_brch,          &
+    NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft,         &
+    ShootNodeNumAtPlanting_pft => plt_morph%ShootNodeNumAtPlanting_pft, &
+    ShootNodeNum_brch          => plt_morph%ShootNodeNum_brch           &
   )
 
 !
@@ -420,7 +413,7 @@ module PlantPhenolMod
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
     NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft,      &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
-    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft              &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          &
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
@@ -499,18 +492,18 @@ module PlantPhenolMod
   real(r8):: ShootArea
   logical :: CanopyChk,RootChk
 
-  associate(                                                         &
-    MainBranchNum_pft         => plt_morph%MainBranchNum_pft,        &  
-    CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft,       &    
-    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft,        &    
-    HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft,        &    
-    WatByPCanopy              => plt_ew%WatByPCanopy,                &    
-    Root1stDepz_pft           => plt_morph%Root1stDepz_pft,          &    
-    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &    
-    VHeatCapCanP              => plt_ew%VHeatCapCanP,                &    
-    CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft,       &    
-    SeedDepth_pft             => plt_morph%SeedDepth_pft,            &    
-    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch       &
+  associate(                                             &
+    MainBranchNum_pft   => plt_morph%MainBranchNum_pft,  &
+    CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft, &
+    ShootStrutElms_pft  => plt_biom%ShootStrutElms_pft,  &
+    HypoctoHeight_pft   => plt_morph%HypoctoHeight_pft,  &
+    VHeatCapCanP_pft    => plt_ew%VHeatCapCanP_pft,      &
+    Root1stDepz_pft     => plt_morph%Root1stDepz_pft,    &
+    ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft,    &
+    WatByPCanopy_pft    => plt_ew%WatByPCanopy_pft,      &
+    CanopyStemArea_pft  => plt_morph%CanopyStemArea_pft, &
+    SeedDepth_pft       => plt_morph%SeedDepth_pft,      &
+    iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch &
   )
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
@@ -520,26 +513,18 @@ module PlantPhenolMod
 ! HypoctoHeight_pft=hypocotyledon height
 ! SeedDepth_pft=seeding depth
 ! Root1stDepz_pft=primary root depth
-! VHeatCapCanP,WTSHT,WatByPCanopy=canopy heat capacity,mass,water content
+! VHeatCapCanP_pft,WTSHT,WatByPCanopy_pft=canopy heat capacity,mass,water content
 !
   ShootArea=0._r8
-!  if(NZ==1)write(211,*)I+J/24.,MainBranchNum_pft(NZ) &
-!    ,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
+
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea=CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk=(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk=(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+ppmc)
-!    if(NZ==1)THEN
-!    write(111,*)'tree emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-!      ShootArea,ZERO4LeafVar_pft(NZ)
-!    ELSEIF(NZ==2)then
-!    write(112,*)'grass emerg chk',I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),&
-!      ShootArea,ZERO4LeafVar_pft(NZ)    
-!    endif
 
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
-      VHeatCapCanP(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy(NZ))
+      VHeatCapCanP_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy_pft(NZ))
     ENDIF
   ENDIF
   end associate
@@ -549,30 +534,30 @@ module PlantPhenolMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ
 
-  associate(                                                                       &
-    PSICanopy_pft                   =>  plt_ew%PSICanopy_pft                     , &
-    PSICanopyTurg_pft               =>  plt_ew%PSICanopyTurg_pft                 , &
-    DayLenthCurrent                 =>  plt_site%DayLenthCurrent                 , &
-    DayLenthPrev                    =>  plt_site%DayLenthPrev                    , &
-    DayLenthMax                     =>  plt_site%DayLenthMax                     , &
-    ALAT                            =>  plt_site%ALAT                            , &
-    doPlantLeafOut_brch             =>  plt_pheno%doPlantLeafOut_brch            , &
-    iPlantCalendar_brch             =>  plt_pheno%iPlantCalendar_brch            , &
-    iPlantRootProfile_pft           =>  plt_pheno%iPlantRootProfile_pft          , &
-    Hours4ShortenPhotoPeriod_brch   =>  plt_pheno%Hours4ShortenPhotoPeriod_brch  , &
-    Hours4Leafout_brch              =>  plt_pheno%Hours4Leafout_brch             , &
-    HourReq4LeafOut_brch            =>  plt_pheno%HourReq4LeafOut_brch           , &
-    iPlantPhenolType_pft            =>  plt_pheno%iPlantPhenolType_pft           , &
-    TC4LeafOut_pft                  =>  plt_pheno%TC4LeafOut_pft                 , &
-    Hours4LenthenPhotoPeriod_brch   =>  plt_pheno%Hours4LenthenPhotoPeriod_brch  , &
-    TCG                             =>  plt_pheno%TCG                            , &
-    doInitPlant_pft                 =>  plt_pheno%doInitPlant_pft                , &
-    iPlantBranchState_brch          =>  plt_pheno%iPlantBranchState_brch         , &
-    TCChill4Seed_pft                =>  plt_pheno%TCChill4Seed_pft               , &
-    TC4LeafOff_pft                  =>  plt_pheno%TC4LeafOff_pft                 , &
-    Hours4LeafOff_brch              =>  plt_pheno%Hours4LeafOff_brch             , &
-    HourReq4LeafOff_brch            =>  plt_pheno%HourReq4LeafOff_brch           , &
-    doPlantLeaveOff_brch            =>  plt_pheno%doPlantLeaveOff_brch             &
+  associate(                                                                  &
+    PSICanopy_pft                 => plt_ew%PSICanopy_pft,                    &
+    PSICanopyTurg_pft             => plt_ew%PSICanopyTurg_pft,                &
+    DayLenthCurrent               => plt_site%DayLenthCurrent,                &
+    DayLenthPrev                  => plt_site%DayLenthPrev,                   &
+    DayLenthMax                   => plt_site%DayLenthMax,                    &
+    ALAT                          => plt_site%ALAT,                           &
+    doPlantLeafOut_brch           => plt_pheno%doPlantLeafOut_brch,           &
+    iPlantCalendar_brch           => plt_pheno%iPlantCalendar_brch,           &
+    iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft,         &
+    Hours4ShortenPhotoPeriod_brch => plt_pheno%Hours4ShortenPhotoPeriod_brch, &
+    Hours4Leafout_brch            => plt_pheno%Hours4Leafout_brch,            &
+    HourReq4LeafOut_brch          => plt_pheno%HourReq4LeafOut_brch,          &
+    iPlantPhenolType_pft          => plt_pheno%iPlantPhenolType_pft,          &
+    TC4LeafOut_pft                => plt_pheno%TC4LeafOut_pft,                &
+    Hours4LenthenPhotoPeriod_brch => plt_pheno%Hours4LenthenPhotoPeriod_brch, &
+    TCGroth_pft                   => plt_pheno%TCGroth_pft,                   &
+    doInitPlant_pft               => plt_pheno%doInitPlant_pft,               &
+    iPlantBranchState_brch        => plt_pheno%iPlantBranchState_brch,        &
+    TCChill4Seed_pft              => plt_pheno%TCChill4Seed_pft,              &
+    TC4LeafOff_pft                => plt_pheno%TC4LeafOff_pft,                &
+    Hours4LeafOff_brch            => plt_pheno%Hours4LeafOff_brch,            &
+    HourReq4LeafOff_brch          => plt_pheno%HourReq4LeafOff_brch,          &
+    doPlantLeaveOff_brch          => plt_pheno%doPlantLeaveOff_brch           &
   )
 
 !               PHENOLOGY
@@ -635,7 +620,7 @@ module PlantPhenolMod
   !   Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
   !   Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
   !   doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
-  !   TCG,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
+  !   TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
   !   ALAT=latitude
   !   iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
   !
@@ -645,13 +630,13 @@ module PlantPhenolMod
         Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))) &
         .AND.doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
         !favorable temperature for leafout
-        IF(TCG(NZ).GE.TC4LeafOut_pft(NZ))THEN
+        IF(TCGroth_pft(NZ).GE.TC4LeafOut_pft(NZ))THEN
           Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
         ENDIF
         !not sufficient leafout hour
         IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
           !unfavorable cold temperature
-          IF(TCG(NZ).LT.TCChill4Seed_pft(NZ))THEN
+          IF(TCGroth_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
             Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.0_r8)
           ENDIF
         ENDIF
@@ -675,13 +660,13 @@ module PlantPhenolMod
   !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
   !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
   !     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
-  !     TCG,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
+  !     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
   !     ALAT=latitude
   !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
   !
       IF(DayLenthCurrent.LT.DayLenthPrev.AND.doPlantLeaveOff_brch(NB,NZ).EQ.iEnable &
         .AND.iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
-        IF(TCG(NZ).LE.TC4LeafOff_pft(NZ))THEN
+        IF(TCGroth_pft(NZ).LE.TC4LeafOff_pft(NZ))THEN
           Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8
         ENDIF
         IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ).AND.&
@@ -769,18 +754,18 @@ module PlantPhenolMod
   !     PSICanopy_pft=canopy total water potential
   !     PSIMin4LeafOut,PSIMin4LeafOff=minimum canopy water potential for leafout,leafoff
   !     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
-  !     TCG,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
+  !     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
   !     ALAT=latitude
   !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
   !
       ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)THEN
         IF((DayLenthCurrent.GE.DayLenthPrev .OR. DayLenthCurrent.GE.DayLenthMax-2.0_r8) &
           .AND. doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
-          IF(TCG(NZ).GE.TC4LeafOut_pft(NZ) .AND. PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN
+          IF(TCGroth_pft(NZ).GE.TC4LeafOut_pft(NZ) .AND. PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN
             Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
           ENDIF
           IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
-            IF(TCG(NZ).LT.TCChill4Seed_pft(NZ).OR.PSICanopyTurg_pft(NZ).LT.PSIMin4LeafExpansion)THEN
+            IF(TCGroth_pft(NZ).LT.TCChill4Seed_pft(NZ).OR.PSICanopyTurg_pft(NZ).LT.PSIMin4LeafExpansion)THEN
               Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.5_r8)
             ENDIF
           ENDIF
@@ -799,7 +784,7 @@ module PlantPhenolMod
   !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
   !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
   !     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
-  !     TCG,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
+  !     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
   !     PSICanopy_pft=canopy total water potential
   !     PSIMin4LeafOut,PSIMin4LeafOff=minimum canopy water potential for leafout,leafoff
   !     ALAT=latitude
@@ -809,7 +794,7 @@ module PlantPhenolMod
           .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
           .AND. doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
 
-          IF(TCG(NZ).LE.TC4LeafOff_pft(NZ) &
+          IF(TCGroth_pft(NZ).LE.TC4LeafOff_pft(NZ) &
             .OR. PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
             Hours4LeafOff_brch(NB,NZ)=Hours4LeafOff_brch(NB,NZ)+1.0_r8
           ENDIF
@@ -840,49 +825,49 @@ module PlantPhenolMod
   logical :: NodeNumChk,PlantDayChk,LeafOutChk,LeafOffChk,CalChk
   logical :: DayLenChk,CanHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
 ! begin_execution
-  associate(                                                                              &
-    iYearPlanting_pft                    =>  plt_distb%iYearPlanting_pft                , &
-    iDayPlanting_pft                     =>  plt_distb%iDayPlanting_pft                 , &
-    SnowDepth                            =>  plt_ew%SnowDepth                           , &
-    PSICanopy_pft                        =>  plt_ew%PSICanopy_pft                       , &
-    ZERO                                 =>  plt_site%ZERO                              , &
-    DayLenthCurrent                      =>  plt_site%DayLenthCurrent                   , &
-    iYearCurrent                         =>  plt_site%iYearCurrent                      , &
-    DayLenthPrev                         =>  plt_site%DayLenthPrev                      , &
-    TKG                                  =>  plt_pheno%TKG                              , &
-    iPlantCalendar_brch                  =>  plt_pheno%iPlantCalendar_brch              , &
-    RefLeafAppearRate_pft                =>  plt_pheno%RefLeafAppearRate_pft            , &
-    ReprodNodeNumNormByMatrgrp_brch      =>  plt_pheno%ReprodNodeNumNormByMatrgrp_brch  , &
-    TempOffset_pft                       =>  plt_pheno%TempOffset_pft                   , &
-    iPlantPhenolPattern_pft              =>  plt_pheno%iPlantPhenolPattern_pft          , &
-    doPlantLeafOut_brch                  =>  plt_pheno%doPlantLeafOut_brch              , &
-    NumOfLeaves_brch                     =>  plt_morph%NumOfLeaves_brch                 , &
-    NodeNumNormByMatgrp_brch             =>  plt_pheno%NodeNumNormByMatgrp_brch         , &
-    dReproNodeNumNormByMatG_brch         =>  plt_pheno%dReproNodeNumNormByMatG_brch     , &
-    doSenescence_brch                    =>  plt_pheno%doSenescence_brch                , &
-    LeafNumberAtFloralInit_brch          =>  plt_pheno%LeafNumberAtFloralInit_brch      , &
-    iPlantDevelopPattern_pft             =>  plt_pheno%iPlantDevelopPattern_pft         , &
-    TotReproNodeNumNormByMatrgrp_brch    =>  plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
-    CriticPhotoPeriod_pft                =>  plt_pheno%CriticPhotoPeriod_pft            , &
-    HourlyNodeNumNormByMatgrp_brch       =>  plt_pheno%HourlyNodeNumNormByMatgrp_brch   , &
-    PhotoPeriodSens_pft                  =>  plt_pheno%PhotoPeriodSens_pft              , &
-    TotalNodeNumNormByMatgrp_brch        =>  plt_pheno%TotalNodeNumNormByMatgrp_brch    , &
-    MatureGroup_brch                     =>  plt_pheno%MatureGroup_brch                 , &
-    iPlantPhenolType_pft                 =>  plt_pheno%iPlantPhenolType_pft             , &
-    HourReq4LeafOut_brch                 =>  plt_pheno%HourReq4LeafOut_brch             , &
-    iPlantPhotoperiodType_pft            =>  plt_pheno%iPlantPhotoperiodType_pft        , &
-    doInitLeafOut_brch                   =>  plt_pheno%doInitLeafOut_brch               , &
-    MatureGroup_pft                      =>  plt_pheno%MatureGroup_pft                  , &
-    PlantO2Stress_pft                        =>  plt_pheno%PlantO2Stress_pft                    , &
-    Hours4Leafout_brch                   =>  plt_pheno%Hours4Leafout_brch               , &
-    Hours4LeafOff_brch                   =>  plt_pheno%Hours4LeafOff_brch               , &
-    HourReq4LeafOff_brch                 =>  plt_pheno%HourReq4LeafOff_brch             , &
-    RefNodeInitRate_pft                  =>  plt_pheno%RefNodeInitRate_pft              , &
-    CanopyHeight_pft                     =>  plt_morph%CanopyHeight_pft                 , &
-    ShootNodeNum_brch                    =>  plt_morph%ShootNodeNum_brch                , &
-    NodeNum2InitFloral_brch              =>  plt_morph%NodeNum2InitFloral_brch          , &
-    NodeNumberAtAnthesis_brch            =>  plt_morph%NodeNumberAtAnthesis_brch        , &
-    MainBranchNum_pft                    =>  plt_morph%MainBranchNum_pft                  &
+  associate(                                                                          &
+    iYearPlanting_pft                 => plt_distb%iYearPlanting_pft,                 &
+    iDayPlanting_pft                  => plt_distb%iDayPlanting_pft,                  &
+    SnowDepth                         => plt_ew%SnowDepth,                            &
+    PSICanopy_pft                     => plt_ew%PSICanopy_pft,                        &
+    ZERO                              => plt_site%ZERO,                               &
+    DayLenthCurrent                   => plt_site%DayLenthCurrent,                    &
+    iYearCurrent                      => plt_site%iYearCurrent,                       &
+    DayLenthPrev                      => plt_site%DayLenthPrev,                       &
+    TKGroth_pft                       => plt_pheno%TKGroth_pft,                       &
+    iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch,               &
+    RefLeafAppearRate_pft             => plt_pheno%RefLeafAppearRate_pft,             &
+    ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch,   &
+    TempOffset_pft                    => plt_pheno%TempOffset_pft,                    &
+    iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft,           &
+    doPlantLeafOut_brch               => plt_pheno%doPlantLeafOut_brch,               &
+    NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch,                  &
+    NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch,          &
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch,      &
+    doSenescence_brch                 => plt_pheno%doSenescence_brch,                 &
+    LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch,       &
+    iPlantDevelopPattern_pft          => plt_pheno%iPlantDevelopPattern_pft,          &
+    TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
+    CriticPhotoPeriod_pft             => plt_pheno%CriticPhotoPeriod_pft,             &
+    HourlyNodeNumNormByMatgrp_brch    => plt_pheno%HourlyNodeNumNormByMatgrp_brch,    &
+    PhotoPeriodSens_pft               => plt_pheno%PhotoPeriodSens_pft,               &
+    TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch,     &
+    MatureGroup_brch                  => plt_pheno%MatureGroup_brch,                  &
+    iPlantPhenolType_pft              => plt_pheno%iPlantPhenolType_pft,              &
+    HourReq4LeafOut_brch              => plt_pheno%HourReq4LeafOut_brch,              &
+    iPlantPhotoperiodType_pft         => plt_pheno%iPlantPhotoperiodType_pft,         &
+    doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch,                &
+    MatureGroup_pft                   => plt_pheno%MatureGroup_pft,                   &
+    PlantO2Stress_pft                 => plt_pheno%PlantO2Stress_pft,                 &
+    Hours4Leafout_brch                => plt_pheno%Hours4Leafout_brch,                &
+    Hours4LeafOff_brch                => plt_pheno%Hours4LeafOff_brch,                &
+    HourReq4LeafOff_brch              => plt_pheno%HourReq4LeafOff_brch,              &
+    RefNodeInitRate_pft               => plt_pheno%RefNodeInitRate_pft,               &
+    CanopyHeight_pft                  => plt_morph%CanopyHeight_pft,                  &
+    ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch,                 &
+    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch,           &
+    NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch,         &
+    MainBranchNum_pft                 => plt_morph%MainBranchNum_pft                  &
   )
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).EQ.0)THEN
     !plant emergence
@@ -898,7 +883,7 @@ module PlantPhenolMod
 !
 ! iPlantPhenolType_pft=phenology type from PFT file, 0=evergreen,1=cold deciduous, 2=drought deciduous,3=1+2
 ! Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-! TKG,TKCO=canopy temperature,canopy temp used in Arrhenius eqn
+! TKGroth_pft,TKCO=canopy temperature,canopy temp used in Arrhenius eqn
 ! TempOffset_pft=shift in Arrhenius curve for thermal adaptation
 ! TFNP=temperature function for phenology (25 oC =1 )
 ! 8.313,710.0=gas constant,enthalpy
@@ -908,7 +893,7 @@ module PlantPhenolMod
 !
   IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
     .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
-    TKCO=TKG(NZ)+TempOffset_pft(NZ)
+    TKCO=TKGroth_pft(NZ)+TempOffset_pft(NZ)
     TFNP=calc_leave_grow_tempf(TKCO)    
     NodeInitRate=AZMAX1(RefNodeInitRate_pft(NZ)*TFNP)
     LeafAppearRate=AZMAX1(RefLeafAppearRate_pft(NZ)*TFNP)
@@ -990,11 +975,10 @@ module PlantPhenolMod
 ! ZC,SnowDepth=canopy height,snowpack depth
 !
   DayLenChk=DayLenthCurrent.LT.DayLenthPrev
-  IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
-    
+  IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN    
     NodeNumChk=ShootNodeNum_brch(NB,NZ).GT.MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ)
     LeafOutChk=Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
-    PlantDayChk=I.GE.iDayPlanting_pft(NZ).AND.iYearCurrent.EQ.iYearPlanting_pft(NZ).AND.DayLenthCurrent.GT.DayLenthPrev
+    PlantDayChk=I.GE.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ) .AND. DayLenthCurrent.GT.DayLenthPrev
     CanHeightChk=CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
     PhenoChk1=iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
       (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid.OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
@@ -1002,17 +986,6 @@ module PlantPhenolMod
     !iPlantPhenolType_pft should be set according to koppen climate zone.  
     PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
     
-!    if(NZ==1)THEN
-!      WRITE(103,*)'chk1',I+J/24.,ShootNodeNum_brch(NB,NZ) &
-!        , MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ) &
-!        , NodeNumChk,(LeafOutChk.OR.PlantDayChk) &
-!        ,(PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk
-!    ELSE
-!      WRITE(104,*)'chk1',I+J/24.,ShootNodeNum_brch(NB,NZ) &
-!        , MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ) &
-!        , NodeNumChk,(LeafOutChk.OR.PlantDayChk) &
-!        ,(PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk
-!    ENDIF
     IF((NodeNumChk .AND. (LeafOutChk.OR.PlantDayChk)) .OR. &
       ((PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk))THEN
 !

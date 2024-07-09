@@ -37,7 +37,7 @@ implicit none
   use InitSoluteMod       , only : InitSoluteProperty
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
-
+  use EcoSIMCtrlMod       , only : plant_model
   use PlantTraitDataType   , only : InitPlantTraits
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
@@ -65,7 +65,7 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(NumGrowthStages,MaxNumRootAxes)
+  if(plant_model)call InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
   write(*,*) "JX = ", JX, "  JY = ", JY, "JZ = ", JZ
   write(*,*) "Just explixitly setting"

@@ -85,7 +85,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootMycoActiveBiomC_pvr(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::   RootMycoNonstElms_rpvr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootNonstructElmConc_pvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
-  real(r8),target,allocatable ::  Root1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
+  real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_pvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
 !----------------------------------------------------------------------
 
@@ -170,7 +170,7 @@ contains
   allocate(RootMycoActiveBiomC_pvr(jroots,JZ,JP,JY,JX));RootMycoActiveBiomC_pvr=0._r8
   allocate(RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstElms_rpvr=0._r8
   allocate(RootNonstructElmConc_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_pvr=0._r8
-  allocate(Root1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));Root1stElm_raxs=0._r8
+  allocate(RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));RootMyco1stElm_raxs=0._r8
   allocate(RootProteinConc_pvr(jroots,JZ,JP,JY,JX));RootProteinConc_pvr=0._r8
   end subroutine InitRootData
 
@@ -253,7 +253,7 @@ contains
   call destroy(RootMycoActiveBiomC_pvr)
   call destroy(RootMycoNonstElms_rpvr)
   call destroy(RootNonstructElmConc_pvr)
-  call destroy(Root1stElm_raxs)
+  call destroy(RootMyco1stElm_raxs)
   call destroy(RootProteinConc_pvr)
   end subroutine DestructRootData
 
