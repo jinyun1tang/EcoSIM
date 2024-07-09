@@ -7,10 +7,10 @@ module ATSEcoSIMInitMod
   USE SoilPhysDataType
   use LandSurfDataType
   use EcoSIMCtrlMod
-  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_col, &
+  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
-  use ClimForcDataType, only : LWRadSky, TairK, &
+  use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm, RainH
   use SoilPropertyDataType
 implicit none
@@ -47,7 +47,7 @@ implicit none
     NL(NY,NX)=a_NL(NY)
     AREA(3,0,NY,NX)=a_AREA3(0,NY)
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
-    ASP(NY,NX)=a_ASP(NY)
+    ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
     !CH4E(NY,NX)=atm_ch4
@@ -56,14 +56,14 @@ implicit none
     !Z2OE(NY,NX)=atm_n2o
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc(NY) !it's already in K??
+    TairK_col(NY,NX)=tairc(NY) !it's already in K??
     VPA(NY,NX) = vpair(NY)
     WindSpeedAtm(NY,NX) = uwind(NY)  
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       POROS(L,NY,NX)=a_PORO(L,NY)
-      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
+      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)

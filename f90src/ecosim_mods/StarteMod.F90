@@ -385,13 +385,13 @@ module StarteMod
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trc_gasml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_NH3,L,NY,NX)=AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP(L,NY,NX)
-    trc_gasml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trc_gasml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trc_gasml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trc_gasml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trc_gasml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trc_gasml_vr(idg_NH3,L,NY,NX)=AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trc_gasml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
 
 !   ExtWaterTablet0: external water table depth
     IF(CumDepth2LayerBottom(L-1,NY,NX).LT.ExtWaterTablet0(NY,NX))THEN
@@ -545,7 +545,7 @@ module StarteMod
 !
     D9985: DO L=1,JS
       IF(VLHeatCapSnow_col(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        VOLWW=VLWatSnow_col(L,NY,NX)+VLDrySnoWE_col(L,NY,NX)+VLIceSnow_col(L,NY,NX)*DENSICE
+        VOLWW=VLWatSnow_snvr(L,NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
         trcg_solsml(idg_CO2,L,NY,NX)=VOLWW*CO2_rain_conc(NY,NX)
         trcg_solsml(idg_CH4,L,NY,NX)=VOLWW*CH4_rain_conc(NY,NX)
         trcg_solsml(idg_O2,L,NY,NX)=VOLWW*O2_rain_conc(NY,NX)

@@ -69,8 +69,8 @@ module IngridTranspMod
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !
-      IF((VGeomLayer(0,NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
-        .AND.(VLWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
+      IF((VGeomLayer(0,NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
+        .AND.(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 
         call TopsoilResidueSolutedifusExch(M,NY,NX,FLWRM1,trcSalt_flx_diffus)
       ELSE
@@ -228,11 +228,11 @@ module IngridTranspMod
   ICHKL=0
   DO L=1,JS
     !
-    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow_col(L,NY,NX)))
+      IF(L.LT.JS.AND.VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+        IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF
@@ -261,9 +261,9 @@ module IngridTranspMod
 !
         IF(ICHKL.EQ.0)THEN
           !flow into soil
-          IF(VLWatSnow_col(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow_col(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_col(L,NY,NX)))
+          IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_snvr(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)
@@ -329,8 +329,8 @@ module IngridTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-  IF(VLWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VLWatMicPM(M,0,NY,NX)))
+  IF(VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VLWatMicPM_vr(M,0,NY,NX)))
   ELSE
     VFLW=VFLWX
   ENDIF
@@ -381,8 +381,8 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-  IF(VLWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VLWatMicPM(M,NU(NY,NX),NY,NX)))
+  IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=-VFLWX
   ENDIF
@@ -415,15 +415,15 @@ module IngridTranspMod
 !     C*1,C*2=solute concentration in litter, soil
 !     Z*1,Z*2=solute content in litter, soil
 !
-  VOLWPA=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-  VOLWPB=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
+  VOLWPA=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+  VOLWPB=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
   DO nsalts=idsalt_beg,idsalt_end
-    trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_solml2(nsalts,0,NY,NX)/VLWatMicPM(M,0,NY,NX))
+    trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_solml2(nsalts,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
   ENDDO
 
   DO nsalts=idsalt_beg,idsalt_KSO4
-    trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
+    trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
   ENDDO
 
   IF(VOLWPA.GT.ZEROS2(NY,NX))THEN
@@ -654,8 +654,8 @@ module IngridTranspMod
   integer :: nsalts
   real(r8) :: VFLW
 !     begin_execution
-  IF(VLWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX)))
+  IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=-VFLWX
   ENDIF
@@ -709,9 +709,9 @@ module IngridTranspMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
-  VLWatMicPMNU=VLWatMicPM(M,NU(NY,NX),NY,NX)
+  VLWatMicPMNU=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
   VOLWHS=AMIN1(XFRS*VGeomLayer(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
-  VOLWT=VLWatMicPM(M,NU(NY,NX),NY,NX)+VOLWHS
+  VOLWT=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VOLWHS
 
   DO nsalts=idsalt_beg,idsalt_KSO4
     trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,NU(NY,NX),NY,NX))*VLWatMicPMNU &
@@ -790,9 +790,9 @@ module IngridTranspMod
   INTEGER :: nsalts
 !     begin_execution
 
-  IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
-    IF(VLWatMicPM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,WatFlux4ErosionM(M,N2,N1)/VLWatMicPM(M,0,N2,N1))
+  IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+    IF(VLWatMicPM_vr(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AMIN1(VFLWX,WatFlux4ErosionM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -856,9 +856,9 @@ module IngridTranspMod
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
+          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
 
           DO nsalts=idsalt_beg,idsalt_end
             trcSalt_RQR(nsalts,N,2,N5,N4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
@@ -880,7 +880,7 @@ module IngridTranspMod
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
+            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
             DO nsalts=idsalt_beg,idsalt_end
               trcSalt_RQR(nsalts,N,1,N5B,N4B)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
             ENDDO
@@ -926,14 +926,14 @@ module IngridTranspMod
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
-        IF(ABS(DrySnoFlxBySnoRedistM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
+        IF(ABS(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
           trcSalt_RQ(idsalt_beg:idsaltb_end,N,N5,N4)=0.0_r8
 !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).GT.0.0)THEN
-          IF(VcumSnoDWI(N2,N1).GT.ZEROS2(NY,NX))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
+        ELSEIF(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4).GT.0.0)THEN
+          IF(VcumSnoDWI_col(N2,N1).GT.ZEROS2(NY,NX))THEN
+            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)/VcumSnoDWI_col(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -944,9 +944,9 @@ module IngridTranspMod
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
-        ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
-          IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
+        ELSEIF(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
+          IF(VcumSnoDWI_col(N5,N4).GT.ZEROS2(N5,N4))THEN
+            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)/VcumSnoDWI_col(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF
@@ -1002,8 +1002,8 @@ module IngridTranspMod
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN CURRENT GRID CELL
 !
-    IF(VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM(M,N3,N2,N1)))
+    IF(VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1026,8 +1026,8 @@ module IngridTranspMod
 !     IN ADJACENT GRID CELL
 !
   ELSE
-    IF(VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
+    IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1068,8 +1068,8 @@ module IngridTranspMod
 !
   IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1) &
     .AND.THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
-    .AND.VLWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
-    .AND.VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+    .AND.VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
+    .AND.VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 !
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     THETW=volumetric water content
@@ -1090,13 +1090,13 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     *S2,*B2=soil solute content in non-band,band
 !
-    VLWPA1=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
-    VLWPB1=VLWatMicPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
-    VLWPA2=VLWatMicPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
-    VLWPB2=VLWatMicPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+    VLWPA1=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+    VLWPB1=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+    VLWPA2=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+    VLWPB2=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
 
     DO nsalts=idsalt_beg,idsalt_KSO4
-      trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1)/VLWatMicPM(M,N3,N2,N1))
+      trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N3,N2,N1)/VLWatMicPM_vr(M,N3,N2,N1))
     ENDDO
 
     IF(VLWPA1.GT.ZEROS(N2,N1))THEN
@@ -1118,19 +1118,19 @@ module IngridTranspMod
     ENDIF
 
     DO nsalts=idsalt_beg,idsalt_KSO4
-      trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4))
+      trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
     ENDDO
 
     IF(VLWPA2.GT.ZEROS(N5,N4))THEN
       DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-        trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4))
+        trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
       ENDDO
     ELSE
       trcSalt_conc_dest(idsalt_psoil_beg:idsalt_psoil_end)=0.0_r8
     ENDIF
     IF(VLWPB2.GT.ZEROS(N5,N4))THEN
       DO nsalts=idsalt_pband_beg,idsalt_pband_end
-        trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4))
+        trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
       ENDDO
     ELSE
       DO nsalts=0,idsalt_nuts
@@ -1516,8 +1516,8 @@ module IngridTranspMod
 !     MICROPORE TO MACROPORE TRANSFER
 !
   ELSEIF(FWatExMacP2MicPM(M,N6,N5,N4).LT.0.0)THEN
-    IF(VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
+    IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1569,19 +1569,19 @@ module IngridTranspMod
 !
   IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
     VOLWHS=AMIN1(XFRS*VGeomLayer(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
-    VOLWT=VLWatMicPM(M,N6,N5,N4)+VOLWHS
+    VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VOLWHS
     DO nsalts=idsalt_beg,idsalt_KSO4
-      trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
         -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT
     ENDDO
 
     DO nsalts=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
         -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO nsalts=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
         -AZMAX1(trcSalt_solml2(nsalts,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
@@ -1761,8 +1761,8 @@ module IngridTranspMod
 !
       IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
-          THETW1(N3,N2,N1)=AZMAX1(VLWatMicPM(M,N3,N2,N1)/VLSoilMicP(N3,N2,N1))
-          THETW1(N6,N5,N4)=AZMAX1(VLWatMicPM(M,N6,N5,N4)/VLSoilMicP(N6,N5,N4))
+          THETW1(N3,N2,N1)=AZMAX1(VLWatMicPM_vr(M,N3,N2,N1)/VLSoilMicP(N3,N2,N1))
+          THETW1(N6,N5,N4)=AZMAX1(VLWatMicPM_vr(M,N6,N5,N4)/VLSoilMicP(N6,N5,N4))
 !
           call SoluteAdvDifsMicMacpore(M,N,N1,N2,N3,N4,N5,N6,THETW1)
 

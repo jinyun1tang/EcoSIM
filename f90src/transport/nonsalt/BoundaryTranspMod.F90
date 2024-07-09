@@ -199,14 +199,11 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
-  integer :: K,idg,NTN,ids
+  integer :: K,idg,NTN,ids,idom
 
-  IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+  IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
-      dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
-      dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
-      dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
-      dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
+      dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
     ENDDO
     trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
     trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
@@ -217,12 +214,11 @@ module BoundaryTranspMod
 !
     IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
+      FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
       DO  K=1,jcplx
-        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOC,K,N2,N1)*FQRM
-        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DON,K,N2,N1)*FQRM
-        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_DOP,K,N2,N1)*FQRM
-        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom_acetate,K,N2,N1)*FQRM
+        DO idom=idom_beg,idom_end
+          dom_2DFloXSurRunoffM(idom,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
+        ENDDO
       enddo
 
       DO idg=idg_beg,idg_NH3
@@ -239,10 +235,9 @@ module BoundaryTranspMod
 !     RQR*=solute in runoff
 !
       DO  K=1,jcplx
-        dom_2DFloXSurRunoff(idom_doc,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_doc,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)
-        dom_2DFloXSurRunoff(idom_don,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_don,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)
-        dom_2DFloXSurRunoff(idom_dop,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_dop,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)
-        dom_2DFloXSurRunoff(idom_acetate,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom_acetate,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)
+        do idom=idom_beg,idom_end
+          dom_2DFloXSurRunoff(idom,K,N,NN,M5,M4)=dom_2DFloXSurRunoff(idom,K,N,NN,M5,M4)+dom_2DFloXSurRunoffM(idom,K,N,NN,M5,M4)
+        enddo
       enddo
       DO idg=idg_beg,idg_NH3
         trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)=trcg_2DFloXSurRunoff(idg,N,NN,M5,M4)+trcg_2DFloXSurRunoffM(idg,N,NN,M5,M4)
@@ -258,10 +253,7 @@ module BoundaryTranspMod
     ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
-        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
 
       trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCOU
@@ -279,10 +271,7 @@ module BoundaryTranspMod
       ENDDO
     ELSE
       DO  K=1,jcplx
-        dom_2DFloXSurRunoffM(idom_DOC,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DON,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_DOP,K,N,NN,M5,M4)=0.0_r8
-        dom_2DFloXSurRunoffM(idom_acetate,K,N,NN,M5,M4)=0.0_r8
+        dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
       trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
       trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
@@ -310,30 +299,30 @@ module BoundaryTranspMod
 
   IF(NN.EQ.1.AND.WaterFlow2MicPM(M,N,M6,M5,M4).GT.0.0_r8 &
     .OR.NN.EQ.2.AND.WaterFlow2MicPM(M,N,M6,M5,M4).LT.0.0_r8)THEN
-    IF(VLWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4)/VLWatMicPM(M,M3,M2,M1)))
+    IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_3DMicp_Transp_flxM(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
+        DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
       enddo
     enddo
     !does not include NH3 and NH3B
     DO idg=idg_beg,idg_end-2
-      R3PoreSolFlx_vr(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(idg,M3,M2,M1))
+      R3PoreSolFlx_vr(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(idg,M3,M2,M1))
     ENDDo
 
     DO NTN=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx_vr(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml_vr2(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+      R3PoreSolFlx_vr(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
 !
   ELSE
     DO  K=1,jcplx
-      DOM_3DMicp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+      DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSolFlx_vr(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
 
@@ -364,7 +353,7 @@ module BoundaryTranspMod
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_3DMacp_Transp_flxM(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
+        DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
       enddo
     enddo
 
@@ -380,7 +369,7 @@ module BoundaryTranspMod
 !
   ELSE
     DO  K=1,jcplx
-      DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+      DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
   ENDIF
@@ -394,15 +383,15 @@ module BoundaryTranspMod
 !
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_3DMicp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMicp_Transp_flx(idom,K,N,M6,M5,M4) &
-        +DOM_3DMicp_Transp_flxM(idom,K,N,M6,M5,M4)
+      DOM_MicpTransp_3D(idom,K,N,M6,M5,M4)=DOM_MicpTransp_3D(idom,K,N,M6,M5,M4) &
+        +DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)
       DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4) &
-        +DOM_3DMacp_Transp_flxM(idom,K,N,M6,M5,M4)
+        +DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)
     enddo
   enddo
 
   DO ids=ids_beg,ids_end
-    trcs_3DTransp2MicP_vr(ids,N,M6,M5,M4)=trcs_3DTransp2MicP_vr(ids,N,M6,M5,M4)+R3PoreSolFlx_vr(ids,N,M6,M5,M4)
+    trcs_3DTransp2MicP_3D(ids,N,M6,M5,M4)=trcs_3DTransp2MicP_3D(ids,N,M6,M5,M4)+R3PoreSolFlx_vr(ids,N,M6,M5,M4)
     trcs_3DTransp2MacP(ids,N,M6,M5,M4)=trcs_3DTransp2MacP(ids,N,M6,M5,M4)+R3PoreSoHFlx(ids,N,M6,M5,M4)
   ENDDO
 
@@ -471,7 +460,7 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
       DO idg=idg_beg,idg_NH3
-        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml_vr2(idg,M3,M2,M1))
+        R3GasADFlx(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
         Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)=Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+R3GasADFlx(idg,N,M6,M5,M4)
       ENDDO
 
@@ -480,7 +469,7 @@ module BoundaryTranspMod
     ENDIF
   ELSE
       DO  K=1,jcplx
-        DOM_3DMacp_Transp_flxM(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+        DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
       enddo
       R3PoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
       R3GasADFlx(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
@@ -601,12 +590,12 @@ module BoundaryTranspMod
   integer :: idg,NTN
 
   DO  LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLSnowHeatCapM_snvr(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idg=idg_beg,idg_NH3
           trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1) &
             +trcg_RBLS(idg,LS,N2,N1)-trcg_RBLS(idg,LS2,N2,N1)
@@ -665,10 +654,10 @@ module BoundaryTranspMod
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
-          DOM_Transp2Micp_flx(idom,K,N3,N2,N1)=DOM_Transp2Micp_flx(idom,K,N3,N2,N1) &
-            +DOM_3DMicp_Transp_flxM(idom,K,N,N3,N2,N1)-DOM_3DMicp_Transp_flxM(idom,K,N,N6,N5,N4)
+          DOM_Transp2Micp_vr(idom,K,N3,N2,N1)=DOM_Transp2Micp_vr(idom,K,N3,N2,N1) &
+            +DOM_MicpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)
           DOM_Transp2Macp_flx(idom,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom,K,N3,N2,N1) &
-            +DOM_3DMacp_Transp_flxM(idom,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flxM(idom,K,N,N6,N5,N4)
+            +DOM_MacpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
         enddo
       enddo
       DO ids=ids_beg,ids_end
@@ -680,7 +669,7 @@ module BoundaryTranspMod
 
     ELSE
       DO  K=1,jcplx
-        DOM_Transp2Micp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
       enddo
       R3PorTSolFlx(ids_beg:ids_end,N3,N2,N1)=0.0_r8

@@ -17,11 +17,11 @@ module RootGasMod
   contains
 !------------------------------------------------------------------------
 
-  subroutine RootSoilGasExchange(I,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
+  subroutine RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
     RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
   implicit none
-  integer , intent(in) :: I,N,L,NZ
+  integer , intent(in) :: I,J,N,L,NZ
   real(r8), intent(in) :: FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
@@ -68,7 +68,7 @@ module RootGasMod
     AtmGasc                  => plt_site%AtmGasc,                  &
     ZEROS                    => plt_site%ZEROS,                    &
     ZERO                     => plt_site%ZERO,                     &
-    VLWatMicPM               => plt_site%VLWatMicPM,               &
+    VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,            &
     VLsoiAirPM               => plt_site%VLsoiAirPM,               &
     TortMicPM_vr             => plt_site%TortMicPM_vr,             &
     FILM                     => plt_site%FILM,                     &
@@ -213,8 +213,8 @@ module RootGasMod
 !     RootCO2Autor_pvr=root CO2 flux from grosub.f
 !
 
-    IF(N.EQ.ipltroot.AND.iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
-      .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
+      .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX=RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
       DIFOP=O2AquaDiffusvityP*RTARRX
       DO NTG=idg_beg,idg_end-1
@@ -255,15 +255,15 @@ module RootGasMod
 !     C*G=soil gaseous concentration
 !     VOLW*,VOLP*=VLWatMicPMM,VLsoiAirPMM*gas solubility
 !
-      VLWatMicPMO=VLWatMicPM(M,L)*FOXYX
-      VLWatMicPMM=VLWatMicPM(M,L)*FracPRoot4Uptake(N,L,NZ)
+      VLWatMicPMO=VLWatMicPM_vr(M,L)*FOXYX
+      VLWatMicPMM=VLWatMicPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
       VLsoiAirPMM=VLsoiAirPM(M,L)*FracPRoot4Uptake(N,L,NZ)
       VOLWSP=RootVH2O_pvr(N,L,NZ)+VLWatMicPMM
       VLWatMicPMA=VLWatMicPMM*trcs_VLN_vr(ids_NH4,L)
       VLWatMicPMB=VLWatMicPMM*trcs_VLN_vr(ids_NH4B,L)
       VOLWSA=RTVLWA+VLWatMicPMA
       VOLWSB=RTVLWB+VLWatMicPMB
-      THETW1=AZMAX1(VLWatMicPM(M,L)/VLSoilMicP(L))
+      THETW1=AZMAX1(VLWatMicPM_vr(M,L)/VLSoilMicP(L))
 
       IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
         THETM=TortMicPM_vr(M,L)*THETW1

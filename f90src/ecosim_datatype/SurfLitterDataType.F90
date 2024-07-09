@@ -18,7 +18,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   HeatFLo2LitrByWat(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   VLitR(:,:)                       !surface litter volume, [m3 d-2]
   real(r8) ,target,allocatable ::   VHeatCapLitR(:,:)                !threshold surface litter heat capacity, [MJ d-2 K-1]
-  real(r8) ,target,allocatable ::   VWatLitRHoldCapcity(:,:)                   !surface litter water holding capacity, [m3 d-2]
+  real(r8) ,target,allocatable ::   VWatLitRHoldCapcity_col(:,:)                   !surface litter water holding capacity, [m3 d-2]
   real(r8) ,target,allocatable ::   WatFLo2Litr(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   TLitrIceFlxThaw(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
@@ -56,7 +56,7 @@ module SurfLitterDataType
   allocate(HeatFLo2LitrByWat(JY,JX));        HeatFLo2LitrByWat=0._r8
   allocate(VLitR(JY,JX));         VLitR=0._r8
   allocate(VHeatCapLitR(JY,JX));       VHeatCapLitR=0._r8
-  allocate(VWatLitRHoldCapcity(JY,JX));       VWatLitRHoldCapcity=0._r8
+  allocate(VWatLitRHoldCapcity_col(JY,JX));       VWatLitRHoldCapcity_col=0._r8
   allocate(WatFLo2Litr(JY,JX));         WatFLo2Litr=0._r8
   allocate(TLitrIceFlxThaw(JY,JX));        TLitrIceFlxThaw=0._r8
   allocate(TLitrIceHeatFlxFrez(JY,JX));       TLitrIceHeatFlxFrez=0._r8
@@ -82,7 +82,7 @@ module SurfLitterDataType
   call destroy(HeatFLo2LitrByWat)
   call destroy(VLitR)
   call destroy(VHeatCapLitR)
-  call destroy(VWatLitRHoldCapcity)
+  call destroy(VWatLitRHoldCapcity_col)
   call destroy(WatFLo2Litr)
   call destroy(TLitrIceFlxThaw)
   call destroy(TLitrIceHeatFlxFrez)

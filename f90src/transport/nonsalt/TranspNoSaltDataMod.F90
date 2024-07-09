@@ -12,10 +12,10 @@ implicit none
   real(r8), allocatable :: trcg_VFloSnow(:)
   real(r8), allocatable :: trcn_band_VFloSnow(:)
   real(r8), allocatable :: trcn_soil_VFloSnow(:)
-  real(r8),allocatable :: DOM_Adv2MacP_flx(:,:)
-
-  real(r8),allocatable :: CDOM_MacP1(:,:)
-  real(r8),allocatable :: CDOM_MacP2(:,:)
+  real(r8), allocatable :: DOM_Adv2MacP_flx(:,:)
+  real(r8), allocatable :: RXR_gas(:)
+  real(r8), allocatable :: CDOM_MacP1(:,:)
+  real(r8), allocatable :: CDOM_MacP2(:,:)
   
   real(r8), allocatable :: DOM_Adv2MicP_flx(:,:)
   real(r8), allocatable :: Difus_Micp_flx_DOM(:,:)
@@ -23,14 +23,14 @@ implicit none
   real(r8), allocatable :: CDOM_MicP1(:,:)
   real(r8), allocatable :: CDOM_MicP2(:,:)
   real(r8), allocatable :: DOM_MicP2(:,:,:,:,:)
-  real(r8), allocatable :: DOM_3DMicp_Transp_flxM(:,:,:,:,:,:)
-  real(r8), allocatable :: DOM_3DMacp_Transp_flxM(:,:,:,:,:,:)
-  real(r8), allocatable :: DOM_Transp2Micp_flx(:,:,:,:,:)
-  real(r8), allocatable :: RDOM_micb_cumflx(:,:,:,:,:)
+  real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:)
+  real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:)
+  real(r8), allocatable :: DOM_Transp2Micp_vr(:,:,:,:,:)
+  real(r8), allocatable :: RDOM_CumEcoProd_vr(:,:,:,:,:)
 
   real(r8), allocatable :: dom_FloXSurRunoff(:,:,:,:)
   real(r8), allocatable :: RBGCSinkG_vr(:,:,:,:)   !BGC sink for gaseous tracers
-  real(r8), allocatable :: RBGCSinkS(:,:,:,:)   !BGC sink for solute tracers
+  real(r8), allocatable :: RBGCSinkS_vr(:,:,:,:)   !BGC sink for solute tracers
   real(r8), allocatable :: trcg_RBLS(:,:,:,:)                      !
   real(r8), allocatable :: trcn_RBLS(:,:,:,:)                      !
   real(r8), allocatable :: RDOMFL0(:,:,:,:)                      !
@@ -87,8 +87,8 @@ implicit none
 
   real(r8), allocatable ::  RDFR_gas(:,:,:)                        !
 
-  real(r8), allocatable :: trc_gasml_vr2(:,:,:,:)
-  real(r8), allocatable :: trc_solml_vr2(:,:,:,:)
+  real(r8), allocatable :: trc_gasml2_vr(:,:,:,:)
+  real(r8), allocatable :: trc_solml2_vr(:,:,:,:)
   real(r8), allocatable :: trc_soHml2_vr(:,:,:,:)
 
   real(r8), allocatable ::  trcn_2DSnowDrift(:,:,:,:)                      !
@@ -111,15 +111,17 @@ contains
   implicit none
   integer :: NumOfLitrCmplxs
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
+
+  allocate(RXR_gas(idg_beg:idg_end-1)); RXR_gas=0._r8
   allocate(CDOM_MacP1(idom_beg:idom_end,1:jcplx));CDOM_MacP1=0._r8
   allocate(CDOM_MacP2(idom_beg:idom_end,1:jcplx));CDOM_MacP2=0._r8
 
   allocate(dom_FloXSurRunoff(idom_beg:idom_end,1:jcplx,JV,JH));    dom_FloXSurRunoff=0._r8
   allocate(DOM_MicP2(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));    DOM_MicP2=0._r8
-  allocate(RDOM_micb_cumflx(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_micb_cumflx=0._r8
-  allocate(DOM_3DMicp_Transp_flxM(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flxM=0._r8
-  allocate(DOM_3DMacp_Transp_flxM(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_3DMacp_Transp_flxM=0._r8
-  allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_flx=0._r8
+  allocate(RDOM_CumEcoProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_CumEcoProd_vr=0._r8
+  allocate(DOM_MicpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTranspFlxM_3D=0._r8
+  allocate(DOM_MacpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_MacpTranspFlxM_3D=0._r8
+  allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_vr=0._r8
 
   allocate(trcg_RBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_RBLS=0._r8
   allocate(trcn_RBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));   trcn_RBLS=0._r8
@@ -143,7 +145,7 @@ contains
   allocate(CDOM_MicP1(idom_beg:idom_end,1:jcplx)); CDOM_MicP1=0._r8
   allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
 
-  allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX))
+  allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX)); GasDifc_vrc=0._r8
   allocate(SoluteDifusvty_vrc(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvty_vrc=0._r8
   allocate(DifuscG_vr(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG_vr=0._r8
 
@@ -163,7 +165,7 @@ contains
   allocate(PARG_cef(idg_beg:idg_NH3,JY,JX));      PARG_cef=0._r8
 
   allocate(RBGCSinkG_vr(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG_vr=0._r8
-  allocate(RBGCSinkS(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkS=0._r8
+  allocate(RBGCSinkS_vr(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkS_vr=0._r8
 
   allocate(trcg_Ebu_vr(idg_beg:idg_end,JZ,JY,JX));   trcg_Ebu_vr=0._r8
   allocate(trcg_FloXSurRunoff(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff=0._r8
@@ -184,8 +186,8 @@ contains
 
   allocate(RDFR_gas(idg_beg:idg_NH3,JY,JX));      RDFR_gas=0._r8
 
-  allocate(trc_gasml_vr2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml_vr2(:,:,:,:) = 0._r8
-  allocate(trc_solml_vr2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr2(:,:,:,:) = 0._r8
+  allocate(trc_gasml2_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2_vr(:,:,:,:) = 0._r8
+  allocate(trc_solml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2_vr(:,:,:,:) = 0._r8
   allocate(trc_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2_vr(:,:,:,:)       = 0._r8
 
   allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift                    = 0._r8
@@ -209,8 +211,8 @@ contains
   allocate(trcg_VFloSnow(idg_beg:idg_end));trcg_VFloSnow                     = 0._r8
   allocate(trcn_band_VFloSnow(ids_nutb_beg:ids_nutb_end));trcn_band_VFloSnow = 0._r8
   allocate(trcn_soil_VFloSnow(ids_nut_beg:ids_nuts_end));trcn_soil_VFloSnow  = 0._r8
-  allocate(DOM_Adv2MacP_flx(idom_beg:idom_end,1:jcplx));
-  allocate(Difus_Micp_flx_DOM(idom_beg:idom_end,1:jcplx));
+  allocate(DOM_Adv2MacP_flx(idom_beg:idom_end,1:jcplx)); DOM_Adv2MacP_flx=0._r8
+  allocate(Difus_Micp_flx_DOM(idom_beg:idom_end,1:jcplx)); Difus_Micp_flx_DOM=0._r8
 
   end subroutine InitTransfrData
 
@@ -219,35 +221,39 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(GasDifc_vrc)
+  call destroy(DifuscG_vr)
+  call destroy(SoluteDifusvty_vrc)
   call destroy(DOM_MicP2)
   call destroy(CDOM_MicP1)
   call destroy(CDOM_MicP2)
-  call destroy(RDOM_micb_cumflx)
-  call destroy(DOM_3DMicp_Transp_flxM)
-  call destroy(DOM_3DMacp_Transp_flxM)
-
+  call destroy(RDOM_CumEcoProd_vr)
+  call destroy(DOM_MicpTranspFlxM_3D)
+  call destroy(DOM_MacpTranspFlxM_3D)
+  call destroy(RBGCSinkS_vr)
   call destroy(dom_FloXSurRunoff)
   call destroy(dom_2DFloXSurRunoffM)
   call destroy(RDOMFL0)
   call destroy(RDOMFL1)
-
+  call destroy(trcg_VFloSnow)
   call destroy(trcs_RFL1)
-
+  call destroy(trcn_RFL0)
   call destroy(DOM_XPoreTransp_flx)
-
+  call destroy(trcg_RBLS)
+  call destroy(trcn_RBLS)
   call destroy(trcg_Ebu_vr)
-
+  call destroy(RBGCSinkG_vr)
   call destroy(POSGL2)
   call destroy(O2AquaDiffusvity2)
-
+  call destroy(trcg_FloXSurRunoff)
   call destroy(dom_TFloXSurRunoff)
   call destroy(trcg_TFloXSurRunoff)
   call destroy(trcn_TFloXSurRunoff)
   call destroy(trcg_SnowDrift)
   call destroy(trcn_SnowDrift)
-
+  call destroy(R3PorTSolFlx)
   call destroy(trcg_VLWatMicP)
-
+  call destroy(trcn_FloXSurRunoff)
   call destroy(DH2GG)
   call destroy(RHGFXS)
   call destroy(THGFLG)
@@ -260,32 +266,33 @@ contains
   call destroy(VLWatMicPXA)
   call destroy(VLWatMicPXB)
   call destroy(PARG_cef)
+  call destroy(RXR_gas)
 
   call destroy(DOMdiffusivity2_vr)
-
+  call destroy(R3GasADFlx)
   call destroy(trcg_solsml2)
   call destroy(trcn_solsml2)
-
+  call destroy(trcn_2DFloXSurRunoffM)
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
   call destroy(trcg_RFL0)
   call destroy(trcg_2DSnowDrift)
   call destroy(Difus_Micp_flx_DOM)
   call destroy(Difus_Macp_flx_DOM)
-
+  call destroy(R3PorTSoHFlx)
 
   call destroy(RDFR_gas)
   call destroy(DOM_MacP2)
-
-  call destroy(trc_gasml_vr2)
-  call destroy(trc_solml_vr2)
+  call destroy(Gas_AdvDif_Flx_vr)
+  call destroy(trc_gasml2_vr)
+  call destroy(trc_solml2_vr)
   call destroy(trc_soHml2_vr)
   call destroy(trcn_band_VFloSnow)
   call destroy(trcn_soil_VFloSnow)
-
+  call destroy(trcg_2DFloXSurRunoffM)
   call destroy(RGasDSFlx)
   call destroy(trcn_2DSnowDrift)
-
+  call destroy(RGasSSVol)
   call destroy(R3PoreSoHFlx)
   call destroy(R3PoreSolFlx_vr)
   call destroy(RporeSoXFlx)
@@ -294,7 +301,7 @@ contains
   call destroy(DOM_Adv2MicP_flx)
   call destroy(DOM_Adv2MacP_flx)
   call destroy(DOM_Transp2Macp_flx)
-  call destroy(DOM_Transp2Micp_flx)
+  call destroy(DOM_Transp2Micp_vr)
   end subroutine DestructTransfrData
 
 end module TranspNoSaltDataMod
