@@ -238,7 +238,7 @@ module VisualMod
           OUT(44)=1000.0*Qrunoff_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*AnualH2OLoss_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-          OUT(47)=SnowDepth(NY,NX)
+          OUT(47)=SnowDepth_col(NY,NX)
           OUT(48)=CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(49)=1.E-3_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(50)=1.E-3_r8*LeafStrutElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -280,7 +280,7 @@ module VisualMod
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN
-      WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth(NY,NX) &
+      WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth_col(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &

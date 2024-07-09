@@ -773,11 +773,11 @@ module Hour1Mod
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
   PlantPopu_col(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
-  WatConvSno2MicP(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
   WatConvSno2MacP(1:JS,NY,NX)   = 0.0_r8
-  HeatConvSno2Soi(1:JS,NY,NX)   = 0.0_r8
-  WatConvSno2LitR(1:JS,NY,NX)   = 0.0_r8
-  HeatConvSno2LitR(1:JS,NY,NX)  = 0.0_r8
+  HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8
   SnoXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
   WatXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
   IceXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8

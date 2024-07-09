@@ -5749,16 +5749,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='VcumSnoDWI', dim1name='column',&
+    call restartvar(ncid, flag, varname='VcumSnoDWI_col', dim1name='column',&
        long_name='total snowpack volume', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI_col,datrc_1d) 
   else
-    !print*,'VcumSnoDWI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI,datrc_1d) 
+    !print*,'VcumSnoDWI_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VcumSnoDWI_col,datrc_1d) 
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='VcumSnoDWI', dim1name='column',&
+    call restartvar(ncid, flag, varname='VcumSnoDWI_col', dim1name='column',&
        long_name='total snowpack volume', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5770,10 +5770,10 @@ implicit none
        long_name='snowpack depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth_col,datrc_1d) 
   else
     !print*,'SnowDepth'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth,datrc_1d) 
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowDepth_col,datrc_1d) 
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='SnowDepth', dim1name='column',&
        long_name='snowpack depth', units='m', &
@@ -5872,10 +5872,10 @@ implicit none
        long_name='snowpack density', units='Mg m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SnoDensL(:,1:JY0,1:JX0),datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SnoDens_snvr(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'SnoDensL'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnoDensL(:,1:JY0,1:JX0),datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnoDens_snvr(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
     call restartvar(ncid, flag, varname='SnoDensL', dim1name='column',dim2name='levsno',&
        long_name='snowpack density', units='Mg m-3', &

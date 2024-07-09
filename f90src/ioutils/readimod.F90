@@ -375,7 +375,7 @@ module readiMod
 !
         ASP_col(NY,NX)=ASPX
         SL(NY,NX)=SL0
-        SnowDepth(NY,NX)=initSnowDepth
+        SnowDepth_col(NY,NX)=initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
@@ -788,7 +788,7 @@ module readiMod
   write(*,*)'NY, NX =',NY,NX
   write(*,*)'Aspect (o): ASPX',ASP_col(NY,NX)
   write(*,*)'Slope (o): SL0',SL(NY,NX)
-  write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth(NY,NX)
+  write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth_col(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 
   write(*,*)''

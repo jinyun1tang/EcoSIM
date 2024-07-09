@@ -765,8 +765,8 @@ contains
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
         ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
-          IF(VcumSnoDWI(N2,N1).GT.ZEROS2(N2,N1))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
+          IF(VcumSnoDWI_col(N2,N1).GT.ZEROS2(N2,N1))THEN
+            VFLW=AZMAX1(AMIN1(VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI_col(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -774,8 +774,8 @@ contains
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
         ELSEIF(DrySnoFlxBySnoRedistM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
-          IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
+          IF(VcumSnoDWI_col(N5,N4).GT.ZEROS2(N5,N4))THEN
+            VFLW=AZMIN1(AMAX1(-VFLWX,DrySnoFlxBySnoRedistM(M,N,N5,N4)/VcumSnoDWI_col(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF

@@ -2037,7 +2037,7 @@ implicit none
       this%h1D_tNO3_col(ncol)             = tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
-      if(VcumSnowWE(NY,NX)<=ZEROS(NY,NX))then
+      if(VcumSnowWE_col(NY,NX)<=ZEROS(NY,NX))then
         this%h1D_TEMP_SNOW_col(ncol)   = spval
       else
         this%h1D_TEMP_SNOW_col(ncol)   = TCSnow_snvr(1,NY,NX)
@@ -2096,7 +2096,7 @@ implicit none
       this%h1D_tSWC_col(ncol)         = WatMass_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tHeat_col(ncol)        = HeatStore_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_DISCHG_FLX_col(ncol)   = QDischar_col(NY,NX)*m2mm/TAREA
-      this%h1D_SNOWPACK_col(ncol)     = AZMAX1((VcumSnowWE(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
+      this%h1D_SNOWPACK_col(ncol)     = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
       this%h1D_SURF_WTR_col(ncol)    = ThetaH2OZ_vr(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)    = ThetaICEZ_vr(0,NY,NX)
       this%h1D_ACTV_LYR_col(ncol)    = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))

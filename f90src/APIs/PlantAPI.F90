@@ -642,7 +642,7 @@ implicit none
   plt_site%AtmGasc(idg_beg:idg_end-1)=AtmGasCgperm3(idg_beg:idg_end-1,NY,NX)
   plt_site%DayLenthPrev=DayLenthPrev(NY,NX)
   plt_site%DayLenthCurrent=DayLenthCurrent(NY,NX)
-  plt_ew%SnowDepth=SnowDepth(NY,NX)
+  plt_ew%SnowDepth=SnowDepth_col(NY,NX)
   plt_site%DayLenthMax=DayLenthMax(NY,NX)
   plt_site%KoppenClimZone=KoppenClimZone(NY,NX)
   plt_site%iYearCurrent=iYearCurrent
@@ -1452,7 +1452,7 @@ implicit none
   plt_morph%CanopyLeafArea_col=CanopyLeafArea_col(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_site%ZERO  =ZERO
-  plt_ew%SnowDepth   =SnowDepth(NY,NX)
+  plt_ew%SnowDepth   =SnowDepth_col(NY,NX)
   plt_ew%TairK     =TairK_col(NY,NX)
   plt_morph%CanopyHeight_col   =CanopyHeight_col(NY,NX)
   plt_site%WindMesHeight=WindMesHeight(NY,NX)

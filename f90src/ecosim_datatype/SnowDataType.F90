@@ -21,7 +21,7 @@ module SnowDataType
   real(r8),target, allocatable ::  VLWatSnow_snvr(:,:,:)                      !snow water volume in snowpack layer
   real(r8),target, allocatable ::  VLIceSnow_snvr(:,:,:)                      !snow ice volume in snowpack layer
   real(r8),target, allocatable ::  VLSnoDWIprev_snvr(:,:,:)                       !snow volume in snowpack layer
-  real(r8),target, allocatable ::  SnoDensL(:,:,:)                       !snowpack density, [Mg m-3]
+  real(r8),target, allocatable ::  SnoDens_snvr(:,:,:)                       !snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  SnowThickL_snvr(:,:,:)                 !snowpack layer thickness
   real(r8),target, allocatable ::  WatXfer2SnoLay(:,:,:)                       !hourly snow water transfer
   real(r8),target, allocatable ::  SnoXfer2SnoLay(:,:,:)                       !hourly snow transfer
@@ -30,18 +30,18 @@ module SnowDataType
   integer ,target, allocatable ::  nsnol_col(:,:)                     !number of snow layers in column
   real(r8),target, allocatable ::  cumSnowDepz_col(:,:,:)                !cumulative depth to bottom of snowpack layer
   real(r8),target, allocatable ::  VLSnoDWIMax_col(:,:,:)                    !Initial snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  SnowDepth(:,:)                     !snowpack depth, [m]
+  real(r8),target, allocatable ::  SnowDepth_col(:,:)                     !snowpack depth, [m]
   real(r8),target, allocatable ::  VcumDrySnoWE_col(:,:)                  !snow volume in snowpack (water equivalent), [m3 d-2]
   real(r8),target, allocatable ::  VcumWatSnow_col(:,:)                   !water volume in snowpack, [m3 d-2]
   real(r8),target, allocatable ::  VcumIceSnow_col(:,:)                   !ice volume in snowpack, [m3 d-2]
-  real(r8),target, allocatable ::  VcumSnoDWI(:,:)                    !snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  VcumSnowWE(:,:)                    !water equivalent snowpack [m3 d-2]
+  real(r8),target, allocatable ::  VcumSnoDWI_col(:,:)                    !snowpack volume, [m3 d-2]
+  real(r8),target, allocatable ::  VcumSnowWE_col(:,:)                    !water equivalent snowpack [m3 d-2]
   real(r8),target, allocatable ::  VLHeatCapSnowMin_col(:,:)              !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
-  real(r8),target, allocatable ::  WatConvSno2MicP(:,:,:)                        !water from snowpack to soil micropores
+  real(r8),target, allocatable ::  WatConvSno2MicP_snvr(:,:,:)                        !water from snowpack to soil micropores
   real(r8),target, allocatable ::  WatConvSno2MacP(:,:,:)             !water from snowpack to soil macropores
-  real(r8),target, allocatable ::  HeatConvSno2Soi(:,:,:)                       !convective heat from snowpack to soil
-  real(r8),target, allocatable ::  WatConvSno2LitR(:,:,:)                       !water flux from snowpack to litter
-  real(r8),target, allocatable ::  HeatConvSno2LitR(:,:,:)                      !convective heat flux from snowpack to litter
+  real(r8),target, allocatable ::  HeatConvSno2Soi_snvr(:,:,:)                       !convective heat from snowpack to soil
+  real(r8),target, allocatable ::  WatConvSno2LitR_snvr(:,:,:)                       !water flux from snowpack to litter
+  real(r8),target, allocatable ::  HeatConvSno2LitR_snvr(:,:,:)                      !convective heat flux from snowpack to litter
   real(r8),target, allocatable ::  DrysnoBySnowRedistrib(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
   real(r8),target, allocatable ::  WatBySnowRedistrib(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
   real(r8),target, allocatable ::  IceBySnowRedistrib(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
@@ -73,7 +73,7 @@ contains
   allocate(VLWatSnow_snvr(JS,JY,JX));   VLWatSnow_snvr=0._r8
   allocate(VLIceSnow_snvr(JS,JY,JX));   VLIceSnow_snvr=0._r8
   allocate(VLSnoDWIprev_snvr(JS,JY,JX));    VLSnoDWIprev_snvr=0._r8
-  allocate(SnoDensL(JS,JY,JX));    SnoDensL=0._r8
+  allocate(SnoDens_snvr(JS,JY,JX));    SnoDens_snvr=0._r8
   allocate(SnowThickL_snvr(JS,JY,JX));    SnowThickL_snvr=0._r8
   allocate(WatXfer2SnoLay(JS,JY,JX));    WatXfer2SnoLay=0._r8
   allocate(SnoXfer2SnoLay(JS,JY,JX));    SnoXfer2SnoLay=0._r8
@@ -82,18 +82,18 @@ contains
   allocate(nsnol_col(JY,JX)); nsnol_col=0
   allocate(cumSnowDepz_col(0:JS,JY,JX)); cumSnowDepz_col=0._r8
   allocate(VLSnoDWIMax_col(JS,JY,JX));    VLSnoDWIMax_col=0._r8
-  allocate(SnowDepth(JY,JX));       SnowDepth=0._r8
-  allocate(VcumSnowWE(JY,JX));   VcumSnowWE=0._r8
+  allocate(SnowDepth_col(JY,JX));       SnowDepth_col=0._r8
+  allocate(VcumSnowWE_col(JY,JX));   VcumSnowWE_col=0._r8
   allocate(VcumDrySnoWE_col(JY,JX));       VcumDrySnoWE_col=0._r8
   allocate(VcumWatSnow_col(JY,JX));       VcumWatSnow_col=0._r8
   allocate(VcumIceSnow_col(JY,JX));       VcumIceSnow_col=0._r8
-  allocate(VcumSnoDWI(JY,JX));        VcumSnoDWI=0._r8
+  allocate(VcumSnoDWI_col(JY,JX));        VcumSnoDWI_col=0._r8
   allocate(VLHeatCapSnowMin_col(JY,JX));      VLHeatCapSnowMin_col=0._r8
-  allocate(WatConvSno2MicP(JS,JY,JX));     WatConvSno2MicP=0._r8
+  allocate(WatConvSno2MicP_snvr(JS,JY,JX));     WatConvSno2MicP_snvr=0._r8
   allocate(WatConvSno2MacP(JS,JY,JX));    WatConvSno2MacP=0._r8
-  allocate(HeatConvSno2Soi(JS,JY,JX));    HeatConvSno2Soi=0._r8
-  allocate(WatConvSno2LitR(JS,JY,JX));    WatConvSno2LitR=0._r8
-  allocate(HeatConvSno2LitR(JS,JY,JX));   HeatConvSno2LitR=0._r8
+  allocate(HeatConvSno2Soi_snvr(JS,JY,JX));    HeatConvSno2Soi_snvr=0._r8
+  allocate(WatConvSno2LitR_snvr(JS,JY,JX));    WatConvSno2LitR_snvr=0._r8
+  allocate(HeatConvSno2LitR_snvr(JS,JY,JX));   HeatConvSno2LitR_snvr=0._r8
   allocate(DrysnoBySnowRedistrib(2,JV,JH));        DrysnoBySnowRedistrib=0._r8
   allocate(WatBySnowRedistrib(2,JV,JH));        WatBySnowRedistrib=0._r8
   allocate(IceBySnowRedistrib(2,JV,JH));        IceBySnowRedistrib=0._r8
@@ -132,7 +132,7 @@ contains
   call destroy(VLWatSnow_snvr)
   call destroy(VLIceSnow_snvr)
   call destroy(VLSnoDWIprev_snvr)
-  call destroy(SnoDensL)
+  call destroy(SnoDens_snvr)
   call destroy(SnowThickL_snvr)
   call destroy(WatXfer2SnoLay)
   call destroy(SnoXfer2SnoLay)
@@ -141,18 +141,18 @@ contains
   call destroy(nsnol_col)
   call destroy(cumSnowDepz_col)
   call destroy(VLSnoDWIMax_col)
-  call destroy(SnowDepth)
-  call destroy(VcumSnowWE)
+  call destroy(SnowDepth_col)
+  call destroy(VcumSnowWE_col)
   call destroy(VcumDrySnoWE_col)
   call destroy(VcumWatSnow_col)
   call destroy(VcumIceSnow_col)
-  call destroy(VcumSnoDWI)
+  call destroy(VcumSnoDWI_col)
   call destroy(VLHeatCapSnowMin_col)
-  call destroy(WatConvSno2MicP)
+  call destroy(WatConvSno2MicP_snvr)
   call destroy(WatConvSno2MacP)
-  call destroy(HeatConvSno2Soi)
-  call destroy(WatConvSno2LitR)
-  call destroy(HeatConvSno2LitR)
+  call destroy(HeatConvSno2Soi_snvr)
+  call destroy(WatConvSno2LitR_snvr)
+  call destroy(HeatConvSno2LitR_snvr)
   call destroy(DrysnoBySnowRedistrib)
   call destroy(WatBySnowRedistrib)
   call destroy(IceBySnowRedistrib)
