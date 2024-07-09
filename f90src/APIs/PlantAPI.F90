@@ -1490,7 +1490,7 @@ implicit none
   plt_ew%VcumIceSnow_col=VcumIceSnow_col(NY,NX)
   plt_ew%VcumDrySnoWE_col=VcumDrySnoWE_col(NY,NX)
   plt_rad%TotSineSkyAngles_grd  =TotSineSkyAngles_grd
-  plt_rad%SoilAlbedo   =SoilAlbedo(NY,NX)
+  plt_rad%SoilAlbedo   =SoilAlbedo_col(NY,NX)
   plt_rad%SurfAlbedo_col   =SurfAlbedo_col(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
   plt_site%POROS1=POROS(NU(NY,NX),NY,NX)

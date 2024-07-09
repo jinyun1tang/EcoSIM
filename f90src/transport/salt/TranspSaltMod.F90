@@ -399,7 +399,7 @@ module TranspSaltMod
 !
 !
       IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
+        .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
   !     there is snowpack
 
         call AtmosSoluteFluxToSnowpack(I,NY,NX)
@@ -409,7 +409,7 @@ module TranspSaltMod
   !     ENTERED IN WEATHER AND IRRIGATION FILES
   !
       ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface_col(NY,NX).GT.0.0_r8) &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
+        .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
   !     there is no significant snowpack, but precipitation
         call AtmosSoluteFluxToTopsoil(I,NY,NX)
   !
@@ -691,12 +691,12 @@ module TranspSaltMod
 !     begin_execution
 
   D1205: DO LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLSnowHeatCapM_snvr(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO nsalts=idsalt_beg,idsalt_end
           trcSalt_TBLS(nsalts,LS,NY,NX)=trcSalt_TBLS(nsalts,LS,NY,NX) &
             +trcSaltAdv2SowLay(nsalts,LS,NY,NX)-trcSaltAdv2SowLay(nsalts,LS2,NY,NX)

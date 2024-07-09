@@ -524,7 +524,7 @@ module TranspNoSaltMod
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
 
-  IF(SnoFalPrec(NY,NX).GT.0.0_r8 .OR. (RainFalPrec(NY,NX).GT.0.0_r8 .AND. VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
+  IF(SnoFalPrec(NY,NX).GT.0.0_r8 .OR. (RainFalPrec(NY,NX).GT.0.0_r8 .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     trcg_Xbndl_flx(idg_CO2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CO2_irrig_conc(NY,NX)
     trcg_Xbndl_flx(idg_CH4,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CH4_irrig_conc(NY,NX)
     trcg_Xbndl_flx(idg_O2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*O2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*O2_irrig_conc(NY,NX)
@@ -550,7 +550,7 @@ module TranspNoSaltMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
   ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface_col(NY,NX).GT.0.0_r8) &
-    .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
+    .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT

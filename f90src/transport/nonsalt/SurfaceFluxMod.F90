@@ -789,7 +789,7 @@ contains
 
           DO nnut=ids_nut_beg,ids_nuts_end
             trcn_2DSnowDrift(nnut,N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(nnut,1,N5,N4))
-            trcn_FloXSnow(nnut,N,N5,N4)=trcn_FloXSnow(nnut,N,N5,N4)+trcn_2DSnowDrift(nnut,N,N5,N4)
+            trcn_FloXSnow_2DH(nnut,N,N5,N4)=trcn_FloXSnow_2DH(nnut,N,N5,N4)+trcn_2DSnowDrift(nnut,N,N5,N4)
           ENDDO
         endif  
 
@@ -1158,11 +1158,11 @@ contains
 !
   ICHKL=0
   DO  L=1,JS
-    IF(VLSnowHeatCapM(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+      IF(L.LT.JS.AND.VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
+          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF

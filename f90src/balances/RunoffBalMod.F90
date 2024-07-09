@@ -713,16 +713,16 @@ implicit none
 
   !check for it is at surface for lateral flow
   IF(N.NE.3 .AND. L.EQ.NU(NY,NX))THEN
-    WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib(N,N5,N4)+IceBySnowRedistrib(N,N5,N4))
+    WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
       Qrunoff_col(NY,NX)=Qrunoff_col(NY,NX)-WQRS
       HQRS=XN*HeatBySnowRedistrib_2DH(N,N5,N4)
       HeatOut_lnds=HeatOut_lnds-HQRS
       CXS=XN*(trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,N5,N4))
-      ZXS=XN*(trcn_FloXSnow(ids_NH4,N,N5,N4)+trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)+trcn_FloXSnow(ids_NO3,N,N5,N4))
+      ZXS=XN*(trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)+trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)+trcn_FloXSnow_2DH(ids_NO3,N,N5,N4))
       ZGS=XN*(trcg_FloXSnow_2DH(idg_N2O,N,N5,N4)+trcg_FloXSnow_2DH(idg_N2,N,N5,N4))
-      PXS=XN*(trcn_FloXSnow(ids_H2PO4,N,N5,N4)+trcn_FloXSnow(ids_H1PO4,N,N5,N4))
+      PXS=XN*(trcn_FloXSnow_2DH(ids_H2PO4,N,N5,N4)+trcn_FloXSnow_2DH(ids_H1PO4,N,N5,N4))
       TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-CXS
       TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZXS-ZGS
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXS

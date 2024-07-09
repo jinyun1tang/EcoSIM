@@ -590,12 +590,12 @@ module BoundaryTranspMod
   integer :: idg,NTN
 
   DO  LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLSnowHeatCapM_snvr(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idg=idg_beg,idg_NH3
           trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1) &
             +trcg_RBLS(idg,LS,N2,N1)-trcg_RBLS(idg,LS2,N2,N1)

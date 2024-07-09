@@ -393,15 +393,15 @@ module Hour1Mod
       trcn_2DFloXSurRunoff(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
 
       DrysnoBySnowRedistrib(1:2,NY,NX)=0.0_r8
-      WatBySnowRedistrib(1:2,NY,NX)=0.0_r8
-      IceBySnowRedistrib(1:2,NY,NX)=0.0_r8
+      WatBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
+      IceBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
       HeatBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
       trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,NY,NX)=0.0_r8
 
-      trcn_FloXSnow(ids_NH4,1:2,NY,NX)=0.0_r8
-      trcn_FloXSnow(ids_NO3,1:2,NY,NX)=0.0_r8
-      trcn_FloXSnow(ids_H1PO4,1:2,NY,NX)=0.0_r8
-      trcn_FloXSnow(ids_H2PO4,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow_2DH(ids_NH4,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow_2DH(ids_NO3,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow_2DH(ids_H1PO4,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow_2DH(ids_H2PO4,1:2,NY,NX)=0.0_r8
 !
 !
 !     GAS AND SOLUTE FLUXES
@@ -774,7 +774,7 @@ module Hour1Mod
   PlantPopu_col(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
-  WatConvSno2MacP(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MacP_snvr(1:JS,NY,NX)   = 0.0_r8
   HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
   WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
   HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8

@@ -450,11 +450,11 @@ contains
     !top soil has water or ice
     !ice albedo seems too low.
     !write(*,*) "Albedo recomputed"
-    AlbedoGrnd=(SoilAlbedo(NY,NX)*SoilMicPMassLayer(NUM(NY,NX),NY,NX)+0.06_r8*VLWatGrnd &
+    AlbedoGrnd=(SoilAlbedo_col(NY,NX)*SoilMicPMassLayer(NUM(NY,NX),NY,NX)+0.06_r8*VLWatGrnd &
       +0.30_r8*VLIceGrnd)/(SoilMicPMassLayer(NUM(NY,NX),NY,NX)+VLWatGrnd+VLIceGrnd)
   ELSE
     !write(*,*) "Albedo from soil"
-    AlbedoGrnd=SoilAlbedo(NY,NX)
+    AlbedoGrnd=SoilAlbedo_col(NY,NX)
   ENDIF
   !absorbed radiation
   !Radnet2LitGrnd=net radiation, after taking out outgoing surface layer radiation  
@@ -685,7 +685,7 @@ contains
   HeatFluxAir2Soi1=0._r8
 
   !solve if there is significant snow layer 
-  IF(VLSnowHeatCapM(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+  IF(VLSnowHeatCapM_snvr(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !    print*,'SolveSnowpack'
 !   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
     call SolveSnowpack(I,J,M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvap,HeatSensAir2Snow,&

@@ -139,7 +139,7 @@ implicit none
     SnowDepth_col(NY,NX)=0.0_r8    
     VcumSnowWE_col(NY,NX)=0._r8
     D9770: DO L=1,JS
-      SnoDens_snvr(L,NY,NX)=NewSnowDens(NY,NX)
+      SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
       if(L/=1)TKSnow_snvr(L,NY,NX)=spval
     ENDDO D9770
 
@@ -663,7 +663,7 @@ implicit none
       VLWatSnow_snvr(L,NY,NX)=0._r8
       VLIceSnow_snvr(L,NY,NX)=0._r8
       VLHeatCapSnow_col(L,NY,NX)=0._r8
-      SnoDens_snvr(L,NY,NX)=NewSnowDens(NY,NX)
+      SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
     endif
     if(VLHeatCapSnow_col(L,NY,NX)<ZEROS(NY,NX))then
       if(L>1)then
@@ -687,7 +687,7 @@ implicit none
         VLIceSnow_snvr(L,NY,NX)=0._r8
         VLHeatCapSnow_col(L,NY,NX)=0._r8
         TKSnow_snvr(L,NY,NX)=spval
-        SnoDens_snvr(L,NY,NX)=NewSnowDens(NY,NX)
+        SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
       endif
     endif 
   ENDDO  
