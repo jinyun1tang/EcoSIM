@@ -52,10 +52,10 @@ implicit none
 
     IF(VLHeatCapSnow_col(L,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .and. L.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay(L,NY,NX))>0._r8)THEN
-        CumSno2SnowLay(L,NY,NX)=CumSno2SnowLay(L,NY,NX)+SnoXfer2SnoLay(L,NY,NX)
-        CumWat2SnowLay(L,NY,NX)=CumWat2SnowLay(L,NY,NX)+WatXfer2SnoLay(L,NY,NX)
-        CumIce2SnowLay(L,NY,NX)=CumIce2SnowLay(L,NY,NX)+IceXfer2SnoLay(L,NY,NX)
-        CumHeat2SnowLay(L,NY,NX)=CumHeat2SnowLay(L,NY,NX)+HeatXfer2SnoLay(L,NY,NX)
+        CumSno2SnowL_snvr(L,NY,NX)=CumSno2SnowL_snvr(L,NY,NX)+SnoXfer2SnoLay(L,NY,NX)
+        CumWat2SnowL_snvr(L,NY,NX)=CumWat2SnowL_snvr(L,NY,NX)+WatXfer2SnoLay(L,NY,NX)
+        CumIce2SnowL_snvr(L,NY,NX)=CumIce2SnowL_snvr(L,NY,NX)+IceXfer2SnoLay(L,NY,NX)
+        CumHeat2SnowL_snvr(L,NY,NX)=CumHeat2SnowL_snvr(L,NY,NX)+HeatXfer2SnoLay(L,NY,NX)
       ENDIF  
     ENDIF
     
@@ -243,16 +243,16 @@ implicit none
 
   !thaw all ice + snow, absorb heat/cooling (<0)
 !  if(I>=138.and.I<=139)write(149,*)'neg',I+J/24.,VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX),&
-!    TKSnow_snvr(L,NY,NX),(CumHeat2SnowLay(L,NY,NX)+XPhaseChangeHeatL(L,NY,NX)+ENGYW)/(cpi*TFICE)
+!    TKSnow_snvr(L,NY,NX),(CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)+ENGYW)/(cpi*TFICE)
   dHPhaseChange=-LtHeatIceMelt*(VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE)
   
   vlheatnew=cpw*SnoWEtot
   !compute potential temperature
-  tkNew=(ENGYW+CumHeat2SnowLay(L,NY,NX)+XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange)/vlheatnew
+  tkNew=(ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)+dHPhaseChange)/vlheatnew
 
   if(tkNew>TFICE)then
     !all ice & snow are melt
-    XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange
+    XPhaseChangeHeatL_snvr(L,NY,NX)=XPhaseChangeHeatL_snvr(L,NY,NX)+dHPhaseChange
     VLWatSnow_snvr(L,NY,NX)=SnoWEtot
     VLDrySnoWE_snvr(L,NY,NX)=0._r8
     VLIceSnow_snvr(L,NY,NX)=0._r8
@@ -280,7 +280,7 @@ implicit none
         dHPhaseChange=dIce*LtHeatIceMelt
       endif
 
-      XPhaseChangeHeatL(L,NY,NX)=XPhaseChangeHeatL(L,NY,NX)+dHPhaseChange
+      XPhaseChangeHeatL_snvr(L,NY,NX)=XPhaseChangeHeatL_snvr(L,NY,NX)+dHPhaseChange
     else
       !negative water is made by ice, no phase change, but there is conversion
       dVLDrySnoWEtmp=SnoWEtot/VLDrySnoWEtmp
@@ -320,11 +320,17 @@ implicit none
 !
 !
   vwat=VLWatSnow_snvr(L,NY,NX);vice=VLIceSnow_snvr(L,NY,NX);vdry=VLDrySnoWE_snvr(L,NY,NX)
-  VLDrySnoWE_snvr(L,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)+CumSno2SnowLay(L,NY,NX)-XSnowThawMassL(L,NY,NX)
-  VLWatSnow_snvr(L,NY,NX)=VLWatSnow_snvr(L,NY,NX)+CumWat2SnowLay(L,NY,NX)+XSnowThawMassL(L,NY,NX)+XIceThawMassL(L,NY,NX)
-  VLIceSnow_snvr(L,NY,NX)=VLIceSnow_snvr(L,NY,NX)+CumIce2SnowLay(L,NY,NX)-XIceThawMassL(L,NY,NX)/DENSICE
+  VLDrySnoWE_snvr(L,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)+CumSno2SnowL_snvr(L,NY,NX)-XSnowThawMassL_snvr(L,NY,NX)
+  VLWatSnow_snvr(L,NY,NX)=VLWatSnow_snvr(L,NY,NX)+CumWat2SnowL_snvr(L,NY,NX)+XSnowThawMassL_snvr(L,NY,NX)+XIceThawMassL_snvr(L,NY,NX)
+  VLIceSnow_snvr(L,NY,NX)=VLIceSnow_snvr(L,NY,NX)+CumIce2SnowL_snvr(L,NY,NX)-XIceThawMassL_snvr(L,NY,NX)/DENSICE
 
-  if(any((/VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)/)<0._r8))then    
+  if(I>=323 .and. L==1)then
+  write(*,*)'----'
+  write(*,*)J,'snow',vwat,vice,vdry
+  write(*,*)J,'upsno',VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX)
+  write(*,*)J,'flxsno',CumWat2SnowL_snvr(L,NY,NX),XSnowThawMassL_snvr(L,NY,NX),XIceThawMassL_snvr(L,NY,NX)
+  endif
+  if(any((/VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)/)<0._r8))then      
     call DealNegativeSnowMass(I,J,L,NY,NX)
   endif
 !
@@ -416,8 +422,8 @@ implicit none
     VLHeatCapSnow_col(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)    
     IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX) .AND. VLHeatCapSnow_col(L,NY,NX).GT.ZEROS(NY,NX))THEN
       !there is significant snow layer mass
-!      if(I>=138.and.I<=139)write(149,*)'rest',L,ENGYW,CumHeat2SnowLay(L,NY,NX),XPhaseChangeHeatL(L,NY,NX),VLHeatCapSnow_col(L,NY,NX)
-      TKSnow_snvr(L,NY,NX)=(ENGYW+CumHeat2SnowLay(L,NY,NX)+XPhaseChangeHeatL(L,NY,NX))/VLHeatCapSnow_col(L,NY,NX)
+!      if(I>=138.and.I<=139)write(149,*)'rest',L,ENGYW,CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX),VLHeatCapSnow_col(L,NY,NX)
+      TKSnow_snvr(L,NY,NX)=(ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX))/VLHeatCapSnow_col(L,NY,NX)
 
       if(TKSnow_snvr(L,NY,NX)>280._r8)call DealHighTempSnow(I,J,L,NY,NX)
     ELSE
