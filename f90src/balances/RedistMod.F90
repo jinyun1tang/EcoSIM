@@ -303,7 +303,7 @@ module RedistMod
   HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec(NY,NX)
   HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
-    HEATIN_lnd=HEATIN_lnd+XPhaseChangeHeatL(L,NY,NX)
+    HEATIN_lnd=HEATIN_lnd+XPhaseChangeHeatL_snvr(L,NY,NX)
   ENDDO D5150
   HeatOut_lnds=HeatOut_lnds-cpw*TairK_col(NY,NX)*IrrigSubsurf_col(NY,NX)
 !
