@@ -9,7 +9,7 @@ module SurfSoilDataType
   __FILE__
   real(r8),target,allocatable ::  FracSurfAsSnow(:,:)                !fraction of snow cover
   real(r8),target,allocatable ::  FracSurfSnoFree(:,:)               !fraction of snow-free cover
-  real(r8),target,allocatable ::  FracSurfAsBareSoi(:,:)             !fraction of exposed soil surface, [-]
+  real(r8),target,allocatable ::  FracSurfBareSoil_col(:,:)             !fraction of exposed soil surface, [-]
   real(r8),target,allocatable ::  LWRadBySurf_col(:,:)                         !longwave radiation emitted from ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatByRadiation_col(:,:)                 !total net radiation at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatEvapAir2Surf_col(:,:)              !total latent heat flux at ground surface, [MJ d-2 t-1]
@@ -42,7 +42,7 @@ contains
   allocate(HeatSensVapAir2Surf_col(JY,JX));    HeatSensVapAir2Surf_col=0._r8
   allocate(HeatNet2Surf_col(JY,JX));           HeatNet2Surf_col=0._r8
   allocate(VapXAir2GSurf_col(JY,JX));          VapXAir2GSurf_col=0._r8
-  allocate(FracSurfAsBareSoi(JY,JX));      FracSurfAsBareSoi=0._r8
+  allocate(FracSurfBareSoil_col(JY,JX));      FracSurfBareSoil_col=0._r8
   allocate(VWatStoreCapSurf(JY,JX));       VWatStoreCapSurf=0._r8
   allocate(MaxVLWatByLitR(JY,JX));       MaxVLWatByLitR=0._r8
   allocate(VHCPNX(JY,JX));      VHCPNX=0._r8
@@ -68,7 +68,7 @@ contains
   call destroy(HeatSensVapAir2Surf_col)
   call destroy(HeatNet2Surf_col)
   call destroy(VapXAir2GSurf_col)
-  call destroy(FracSurfAsBareSoi)
+  call destroy(FracSurfBareSoil_col)
   call destroy(VWatStoreCapSurf)
   call destroy(MaxVLWatByLitR)
   call destroy(VHCPNX)

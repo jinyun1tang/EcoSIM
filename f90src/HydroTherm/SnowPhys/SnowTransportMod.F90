@@ -139,7 +139,7 @@ implicit none
 !     WATER,GAS,SOLUTE,SALT FLUXES INTO SNOWPACK SURFACE
 !
     ELSEIF(LS.EQ.1)THEN
-      IF(abs(SnoXfer2SnoLay(LS,N2,N1))>0._r8)THEN
+      IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1)
