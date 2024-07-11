@@ -9,10 +9,10 @@ implicit none
   real(r8),allocatable ::  XVLMobileWaterLitR(:,:)                         !
   real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP_col(:,:)                         !
-  real(r8),allocatable ::  LWEmscefLitR(:,:)                         !
+  real(r8),allocatable ::  LWEmscefLitR_col(:,:)                         !
   real(r8),allocatable ::  VLPoreLitR(:,:)                        !
   real(r8),allocatable ::  LWRad2LitR(:,:)                         !
-  real(r8),allocatable ::  LWEmscefSoil(:,:)                         !
+  real(r8),allocatable ::  LWEmscefSoil_col(:,:)                         !
   real(r8),allocatable ::  RadSWonLitR(:,:)                         !
   real(r8),allocatable ::  LWRad2Grnd(:,:)                         !
   real(r8),allocatable ::  RadSWonSoi(:,:)                         !
@@ -57,10 +57,10 @@ implicit none
   allocate(XVLMobileWaterLitR(JY,JX));       XVLMobileWaterLitR=0._r8
   allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
   allocate(XVLiceMicP_col(JY,JX));       XVLiceMicP_col=0._r8
-  allocate(LWEmscefLitR(JY,JX));       LWEmscefLitR=0._r8
+  allocate(LWEmscefLitR_col(JY,JX));       LWEmscefLitR_col=0._r8
   allocate(VLPoreLitR(JY,JX));      VLPoreLitR=0._r8
   allocate(LWRad2LitR(JY,JX));       LWRad2LitR=0._r8
-  allocate(LWEmscefSoil(JY,JX));       LWEmscefSoil=0._r8
+  allocate(LWEmscefSoil_col(JY,JX));       LWEmscefSoil_col=0._r8
   allocate(RadSWonLitR(JY,JX));       RadSWonLitR=0._r8    
   allocate(LWRad2Grnd(JY,JX));       LWRad2Grnd=0._r8
   allocate(RadSWonSoi(JY,JX));       RadSWonSoi=0._r8
@@ -97,10 +97,10 @@ implicit none
   call destroy(XVLMobileWaterLitR)
   call destroy(XVLMobileWatMicP)
   call destroy(XVLiceMicP_col)
-  call destroy(LWEmscefLitR)
+  call destroy(LWEmscefLitR_col)
   call destroy(VLPoreLitR)
   call destroy(LWRad2LitR)
-  call destroy(LWEmscefSoil)
+  call destroy(LWEmscefSoil_col)
   call destroy(RadSWonLitR)  
   call destroy(LWRad2Grnd)
   call destroy(RadSWonSoi)

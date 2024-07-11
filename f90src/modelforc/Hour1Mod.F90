@@ -778,10 +778,10 @@ module Hour1Mod
   HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
   WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
   HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8
-  SnoXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
-  WatXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
-  IceXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
-  HeatXfer2SnoLay(1:JS,NY,NX)   = 0.0_r8
+  SnoXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay_snvr(1:JS,NY,NX)   = 0.0_r8
   XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0.0_r8
 
   trcg_Xbndl_flx(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8

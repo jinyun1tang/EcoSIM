@@ -38,7 +38,8 @@ implicit none
 !!
 ! Description:
   implicit none
-  integer , intent(in) :: M,NY,NX
+  integer , intent(in) :: M       !soil heat-water iteration id
+  integer , intent(in) :: NY,NX
   real(r8), intent(in) :: PSISV1
   real(r8), intent(in) :: Prec2LitR2,PrecHeat2LitR2
   real(r8), intent(out) :: HeatSensLitR2Soi1
@@ -188,7 +189,8 @@ implicit none
     LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,TotHeatAir2LitR)
 
   implicit none
-  integer, intent(in) :: M,NY,NX
+  integer, intent(in) :: M     !soil heat-flow iteration id
+  integer, intent(in) :: NY,NX
   real(r8),intent(in) :: ATCNDR,ATCNVR,PSISV1,Radt2LitR
   real(r8), intent(in):: Prec2LitR2,PrecHeat2LitR2
   real(r8), intent(inout) :: EvapLitR2Soi1
@@ -211,7 +213,7 @@ implicit none
   real(r8) :: VLHeatCapcityLitR2,VLHeatCapacity2
   real(r8) :: VLWatMicP12,VWatLitr2
   real(r8) :: TKR1,TKS1
-
+  real(r8) :: dt_litrHeat
 ! begin_execution
 
   VWatLitr2=VLWatMicP1(0,NY,NX)
@@ -221,6 +223,8 @@ implicit none
   TKR1=TKSoi1(0,NY,NX)
   TKS1=TKSoi1(NUM(NY,NX),NY,NX)
 
+  !embedded iteration, local time step size
+  dt_litrHeat=dts_HeatWatTP/real(NPR,kind=r8)      !time step for litter flux calculation
   D5000: DO NN=1,NPR
 !    write(*,*)'TotHeatAir2LitR  x',NN,TotHeatAir2LitR
     IF(VLHeatCapcityLitR2.GT.VHeatCapLitR(NY,NX))THEN
@@ -251,9 +255,9 @@ implicit none
 !     VWatLitRHoldCapcity=maximum water retention by litter
 !     PSISM1=litter matric water potential
 !
-      LWRadLitR2=LWEmscefLitR(NY,NX)*TKR1**4._r8
+      LWRadLitR2=LWEmscefLitR_col(NY,NX)*TKR1**4._r8/real(NPR,kind=r8)
       Radnet2LitR2=Radt2LitR-LWRadLitR2
-!      write(*,*)'Radnet2LitR2',Radt2LitR,LWEmscefLitR(NY,NX),TKR1
+!      write(*,*)'Radnet2LitR2',Radt2LitR,LWEmscefLitR_col(NY,NX),TKR1
       IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
         ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VWatLitr2)/VLitR(NY,NX)
       ELSE
@@ -303,7 +307,7 @@ implicit none
       ! SOLVE FOR RESIDUE TO SOIL SURFACE HEAT FLUXES
       !
       ! FLVC,FLVX=vapor unconstrained,vapor constrained vapor flux
-      ! dts_litrhtwtp=time step for litter flux calculations
+      ! dt_litrHeat=time step for litter flux calculations
       ! VPY=equilibrium vapor concentration
       ! VsoiPM=litter,soil air filled porosity
       ! EvapLitR2Soi2=litter soil vapor flux
@@ -315,7 +319,7 @@ implicit none
       ! THETPM: air-filled porosity
 
       IF(THETPM(M,0,NY,NX).GT.THETX.AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
-        FLVC=ATCNVR*(VapLitR-VaporSoi1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*dts_litrhtwtp
+        FLVC=ATCNVR*(VapLitR-VaporSoi1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*dt_litrHeat
         if(abs(FLVC)>1.e20_r8)then
           write(*,*)'ATCNVR*(VapLitR-VaporSoi1)=',ATCNVR,VapLitR,VaporSoi1
           write(*,*)'FracSurfSnoFree(NY,NX),FracSurfByLitR(NY,NX)=',FracSurfSnoFree(NY,NX),FracSurfByLitR(NY,NX)
@@ -356,7 +360,7 @@ implicit none
       TK1X=TKS1+HeatSensVapLitR2Soi2/VLHeatCapacity2            !update soil layer temperature
       TKY=(TKXR*VLHeatCapcityLitR2+TK1X*VLHeatCapacity2)/(VLHeatCapcityLitR2+VLHeatCapacity2)   !equilibrium temperature
       HFLWX=(TKXR-TKY)*VLHeatCapcityLitR2*XNPB                  !sensible heat flux
-      HFLWC=ATCNDR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*dts_litrhtwtp
+      HFLWC=ATCNDR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*FracSurfByLitR(NY,NX)*dt_litrHeat
       IF(HFLWC.GE.0.0_r8)THEN
         HeatSensLitR2Soi2=AZMAX1(AMIN1(HFLWX,HFLWC))
       ELSE

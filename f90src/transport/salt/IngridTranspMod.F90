@@ -266,7 +266,7 @@ module IngridTranspMod
             VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_snvr(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
-            VFLWS=FracSurfAsBareSoi(NY,NX)
+            VFLWS=FracSurfBareSoil_col(NY,NX)
           ENDIF
           VFLWPO4=VFLWS*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
           VFLWPOB=VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
