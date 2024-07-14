@@ -13,7 +13,7 @@ module EcoSimSumDataType
   real(r8) :: TIONIN   !total surface ion flux	mol d-2
   real(r8) :: TIONOU   !total subsurface ion flux	mol d-2
   real(r8) :: TSEDSO   !total soil sediment	Mg d-2
-  real(r8) :: TSEDOU   !total sediment subsurface flux	Mg d-2
+  real(r8) :: TSedmErossLoss_lnds   !total sediment subsurface flux	Mg d-2
   real(r8) :: WatMassStore_lnd   !total soil water content	m3 d-2
   real(r8) :: HeatStore_lnd   !total soil heat content	MJ d-2
   real(r8) :: TSoilO2G_lnd   !total soil O2 content	g d-2

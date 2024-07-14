@@ -737,7 +737,7 @@ module StartsMod
   HeatOut_lnds=0.0_r8
   OXYGOU=0.0_r8
   H2GOU=0.0_r8
-  TSEDOU=0.0_r8
+  TSedmErossLoss_lnds=0.0_r8
   TOMOU_lnds(ielmc)=0.0_r8
   TOMOU_lnds(ielmn)=0.0_r8
   TOMOU_lnds(ielmp)=0.0_r8
@@ -786,7 +786,7 @@ module StartsMod
   AnualH2OLoss_col(:,:)=0.0_r8
   QEvap_col(:,:)=0.0_r8
   Qrunoff_col(:,:)=0.0_r8
-  USEDOU(:,:)=0.0_r8
+  SedmErossLoss_col(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
   HydroSufDOCFlx_col(:,:)=0.0_r8
   HydroSubsDOCFlx_col(:,:)=0.0_r8

@@ -238,6 +238,7 @@ type, public :: Cumlate_Flux_Diag_type
   end type OMCplx_Flux_type
 
   type, public :: OMCplx_State_type
+    real(r8),allocatable :: TOMEAutoK(:)
     real(r8),allocatable :: BulkSOMC(:)
     real(r8),allocatable :: TOMK(:)
     real(r8),allocatable :: TONK(:)
@@ -799,6 +800,7 @@ type, public :: Cumlate_Flux_Diag_type
 
   ncplx=micpar%jcplx
   allocate(this%BulkSOMC(1:ncplx));this%BulkSOMC=spval
+  allocate(this%TOMEAutoK(1:NumPlantChemElms)); this%TOMEAutoK=spval
   allocate(this%TOMK(1:ncplx+1));this%TOMK=spval
   allocate(this%TONK(1:ncplx+1));this%TONK=spval
   allocate(this%TOPK(1:ncplx+1));this%TOPK=spval

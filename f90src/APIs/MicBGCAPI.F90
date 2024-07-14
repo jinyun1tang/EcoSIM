@@ -144,7 +144,7 @@ implicit none
 
   call MicAPISend(L,NY,NX,micfor,micstt,micflx)
 
-  call SoilBGCOneLayer(micfor,micstt,micflx,naqfdiag)
+  call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag)
 
   call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag)
 
@@ -171,6 +171,7 @@ implicit none
   k_humus  = micpar%k_humus
   k_POM    = micpar%k_POM
 
+  micfor%VOLW0 =VLWatMicP_vr(0,NY,NX)
   micfor%ZERO  =ZERO
   micfor%CCH4E =AtmGasCgperm3(idg_CH4,NY,NX)
   micfor%COXYE =AtmGasCgperm3(idg_O2,NY,NX)

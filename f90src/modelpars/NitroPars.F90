@@ -198,7 +198,7 @@ module NitroPars
   implicit none
 
   ORAD=ppmc
-  BIOS=ppmc/(4.19*ORAD**3)
+  BIOS=ppmc/(4.19_r8*ORAD**3)
   BIOA=BIOS*12.57_r8*ORAD**2
   DCKI=2.5_r8
   RCCX=0.833_r8

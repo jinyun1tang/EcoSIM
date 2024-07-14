@@ -4155,9 +4155,9 @@ implicit none
        interpinic_flag='skip', data=CRAIN, missing_value=spval, &
        fill_value=spval)
 
-  call restartvar(ncid, flag, varname='TSEDOU', &
+  call restartvar(ncid, flag, varname='TSedmErossLoss_lnds', &
        long_name='total sediment subsurface flux', units='Mg d-2', &
-       interpinic_flag='skip', data=TSEDOU, missing_value=spval, &
+       interpinic_flag='skip', data=TSedmErossLoss_lnds, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TAREA', &
@@ -5358,16 +5358,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='USEDOU', dim1name='column',&
+    call restartvar(ncid, flag, varname='SedmErossLoss_col', dim1name='column',&
        long_name='total sediment subsurface flux', units='Mg d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,USEDOU,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SedmErossLoss_col,datrc_1d) 
   else
-    !print*,'USEDOU'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,USEDOU,datrc_1d)   
+    !print*,'SedmErossLoss_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SedmErossLoss_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='USEDOU', dim1name='column',&
+    call restartvar(ncid, flag, varname='SedmErossLoss_col', dim1name='column',&
        long_name='total sediment subsurface flux', units='Mg d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

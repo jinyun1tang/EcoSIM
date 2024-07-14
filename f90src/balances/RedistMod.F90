@@ -663,7 +663,7 @@ module RedistMod
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
 
   call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
-  
+
   call sumLitrOMLayL(0,NY,NX,litrOM)
 
   SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM

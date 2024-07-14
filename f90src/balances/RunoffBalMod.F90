@@ -301,13 +301,13 @@ implicit none
 !     iErosionMode=erosion flag
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
-!     TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
+!     TSedmErossLoss_lnds,SedmErossLoss_col=cumulative sediment loss through lateral and lower boundaries
 !
       IF(N.NE.3.AND.iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
         IF(ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
           ER=XN*cumSedErosion(N,NN,N5,N4)
-          TSEDOU=TSEDOU-ER
-          USEDOU(NY,NX)=USEDOU(NY,NX)-ER
+          TSedmErossLoss_lnds=TSedmErossLoss_lnds-ER
+          SedmErossLoss_col(NY,NX)=SedmErossLoss_col(NY,NX)-ER
 !
 !
 !         RUNOFF BOUNDARY FLUXES OF ORGANIC MATTER FROM EROSION
@@ -315,7 +315,7 @@ implicit none
 !         *ER=sediment flux from erosion.f
 !         sediment code:OMC,OMN,OMP=microbial C,N,P; ORC=microbial residue C,N,P
 !                      :OHC,OHN,OHP=adsorbed C,N,P; OSC,OSN,OSP=humus C,N,P
-!         TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
+!         TSedmErossLoss_lnds,SedmErossLoss_col=cumulative sediment loss through lateral and lower boundaries
 !         HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through lateral and lower boundaries
 !         HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through lateral and lower boundaries
 !         HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
@@ -336,6 +336,7 @@ implicit none
             +2.0_r8*(trcp_ER(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_ER(idsp_CaH4P2O8B,N,NN,N5,N4)) &
             +3.0_r8*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4)))
           MOE(:)=0.0_r8
+          
           D3580: DO K=1,jcplx
             DO NO=1,NumMicbFunGrupsPerCmplx
               DO M=1,nlbiomcp
