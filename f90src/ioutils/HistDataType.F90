@@ -2,9 +2,9 @@ module HistDataType
 !
 ! this module is an intermediate step to support ascii output
 ! when output is done with netcdf, no id is needed.
-  use data_kind_mod , only : r8 => DAT_KIND_R8
-  use data_const_mod, only : spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
-  use nitrosMod, only : SumMicbGroup,sumDOML
+  use data_kind_mod,  only: r8 => DAT_KIND_R8
+  use data_const_mod, only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
+  use nitrosMod,      only: SumMicbGroup, sumDOML, sumMicBiomLayL
   use GridConsts
   use GridMod
   use HistFileMod
@@ -136,7 +136,7 @@ implicit none
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
   real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)         !-QRunSurf_col(NY,NX)*1000.0/TAREA, 
-  real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
+  real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !SedmErossLoss_col(NY,NX)*1000.0/TAREA, soil mass 
   real(r8),pointer   :: h1D_tSWC_col(:)        !WatMass_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
   real(r8),pointer   :: h1D_tHeat_col(:) 
   real(r8),pointer   :: h1D_DISCHG_FLX_col(:)         !QDischar_col(NY,NX)*1000.0/TAREA
@@ -327,7 +327,7 @@ implicit none
   real(r8),pointer   :: h2D_NO2OxiBactP_vr(:,:)
   real(r8),pointer   :: h2D_CH4AeroOxiP_vr(:,:)
   real(r8),pointer   :: h2D_H2MethogenP_vr(:,:)
-
+  real(r8),pointer   :: h2D_MicroBiomeE_litr_col(:,:)   !total microbial biomass in litr
   real(r8),pointer   :: h2D_AeroHrBactE_litr_col(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungE_litr_col(:,:)   !aerobic heterotropic fungi
   real(r8),pointer   :: h2D_faculDenitE_litr_col(:,:)   !facultative denitrifier
@@ -690,6 +690,7 @@ implicit none
   allocate(this%h2D_CH4AeroOxiP_vr(beg_col:end_col,1:JZ)); this%h2D_CH4AeroOxiP_vr(:,:)=spval
   allocate(this%h2D_H2MethogenP_vr(beg_col:end_col,1:JZ)); this%h2D_H2MethogenP_vr(:,:)=spval
 
+  allocate(this%h2D_MicroBiomeE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_MicroBiomeE_litr_col(:,:)=spval
   allocate(this%h2D_AeroHrBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_AeroHrBactE_litr_col(:,:)=spval
   allocate(this%h2D_AeroHrFungE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_AeroHrFungE_litr_col(:,:)=spval
   allocate(this%h2D_faculDenitE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_faculDenitE_litr_col(:,:)=spval
@@ -1832,6 +1833,11 @@ implicit none
     long_name='Hydrogenotrophic methanogen P biomass profile',ptr_col=data2d_ptr)      
 !---
 
+  data2d_ptr =>  this%h2D_MicroBiomeE_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='MicroBiomE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Total micorobial elemental biomass in litter',ptr_col=data2d_ptr)      
+
+
   data2d_ptr =>  this%h2D_AeroHrBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)
   call hist_addfld2d(fname='Aerobic_HetrBacterE_litr',units='g/m2',type2d='elements',avgflag='A',&
     long_name='Aerobic elemental biomass in litter',ptr_col=data2d_ptr)      
@@ -2074,37 +2080,41 @@ implicit none
       this%h1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
       this%h1D_HUM_col(ncol)         = VPK_col(NY,NX)
       
-      this%h1D_WIND_col(ncol)        = WindSpeedAtm(NY,NX)/secs1hour
-      this%h1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_RN_col(ncol)     = HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_H_col(ncol)      = HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SOIL_G_col(ncol)      =-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_RN_col(ncol)      = Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_LE_col(ncol)      = Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_Eco_HeatSen_col(ncol)    = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_Heat2G_col(ncol)  = Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_O2_LITR_col(ncol)     = trc_solcl_vr(idg_O2,0,NY,NX)
-      this%h1D_SOIL_CO2_FLX_col(ncol)= SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_ECO_CO2_FLX_col(ncol) = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_CH4_FLX_col(ncol)     = SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_O2_FLX_col(ncol)      = SurfGasFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gO1hour2umol1sec
-      this%h1D_CO2_LITR_col(ncol)    = trc_solcl_vr(idg_CO2,0,NY,NX)
+      this%h1D_WIND_col(ncol)         = WindSpeedAtm(NY,NX)/secs1hour
+      this%h1D_PREC_col(ncol)         = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_RN_col(ncol)      = HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_LE_col(ncol)      = HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_H_col(ncol)       = HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_SOIL_G_col(ncol)       = -(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_RN_col(ncol)       = Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_LE_col(ncol)       = Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_HeatSen_col(ncol)  = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_Heat2G_col(ncol)   = Eco_Heat_Grnd_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_O2_LITR_col(ncol)      = trc_solcl_vr(idg_O2,0,NY,NX)
+      this%h1D_SOIL_CO2_FLX_col(ncol) = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+      this%h1D_ECO_CO2_FLX_col(ncol)  = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+      this%h1D_CH4_FLX_col(ncol)      = SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+      this%h1D_O2_FLX_col(ncol)       = SurfGasFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gO1hour2umol1sec
+      this%h1D_CO2_LITR_col(ncol)     = trc_solcl_vr(idg_CO2,0,NY,NX)
       this%h1D_EVAPN_col(ncol)        = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RUNOFF_FLX_col(ncol)   = -QRunSurf_col(NY,NX)*m2mm/TAREA 
-      this%h1D_SEDIMENT_FLX_col(ncol) = USEDOU(NY,NX)*m2mm/TAREA
+      this%h1D_RUNOFF_FLX_col(ncol)   = -QRunSurf_col(NY,NX)*m2mm/TAREA
+      this%h1D_SEDIMENT_FLX_col(ncol) = SedmErossLoss_col(NY,NX)*m2mm/TAREA
       this%h1D_tSWC_col(ncol)         = WatMass_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tHeat_col(ncol)        = HeatStore_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_DISCHG_FLX_col(ncol)   = QDischar_col(NY,NX)*m2mm/TAREA
       this%h1D_SNOWPACK_col(ncol)     = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
-      this%h1D_SURF_WTR_col(ncol)    = ThetaH2OZ_vr(0,NY,NX)
-      this%h1D_SURF_ICE_col(ncol)    = ThetaICEZ_vr(0,NY,NX)
-      this%h1D_ACTV_LYR_col(ncol)    = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-      this%h1D_WTR_TBL_col(ncol)     = -(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-      this%h1D_sN2O_FLX_col(ncol)     =  SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_sN2G_FLX_col(ncol)     =  SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_sNH3_FLX_col(ncol)     =  SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_PAR_col(ncol)          =  RadPARSolarBeam_col(NY,NX)
+      this%h1D_SURF_WTR_col(ncol)     = ThetaH2OZ_vr(0,NY,NX)
+      this%h1D_SURF_ICE_col(ncol)     = ThetaICEZ_vr(0,NY,NX)
+      this%h1D_ACTV_LYR_col(ncol)     = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+      this%h1D_WTR_TBL_col(ncol)      = -(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+      this%h1D_sN2O_FLX_col(ncol)     = SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_sN2G_FLX_col(ncol)     = SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_sNH3_FLX_col(ncol)     = SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_PAR_col(ncol)          = RadPARSolarBeam_col(NY,NX)
+
+
+      call sumMicBiomLayL(0,NY,NX,micBE)      
+      this%h2D_MicroBiomeE_litr_col(ncol,1:NumPlantChemElms) =micBE/AREA(3,NU(NY,NX),NY,NX)  
 
       call SumMicbGroup(0,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
       this%h2D_AeroHrBactE_litr_col(ncol,1:NumPlantChemElms) =micBE/AREA(3,NU(NY,NX),NY,NX)     !aerobic heterotropic bacteria

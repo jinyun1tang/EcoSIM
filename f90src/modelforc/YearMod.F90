@@ -50,7 +50,7 @@
   QRain_col(NY,NX)=0._r8
   QEvap_col(NY,NX)=0._r8
   Qrunoff_col(NY,NX)=0._r8
-  USEDOU(NY,NX)=0._r8
+  SedmErossLoss_col(NY,NX)=0._r8
   AnualH2OLoss_col(NY,NX)=0._r8
   HydroIonFlx_col(NY,NX)=0._r8
   FertNFlx_col(NY,NX)=0._r8

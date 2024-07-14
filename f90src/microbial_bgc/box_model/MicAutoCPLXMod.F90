@@ -44,7 +44,7 @@ module MicAutoCPLXMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout) :: ncplxs
-  integer  :: M,K
+  integer  :: M
   real(r8) :: COMC
   real(r8) :: ECHZ
   real(r8) :: FOXYX
@@ -78,7 +78,7 @@ module MicAutoCPLXMod
     RNOxReduxRespAutorLim        => nmicf%RNOxReduxRespAutorLim,         &
     RCO2ProdAutor                => nmicf%RCO2ProdAutor,                 &
     RCH4ProdAutor                => nmicf%RCH4ProdAutor,                 &
-    TOMK                         => ncplxs%TOMK,                         &
+    TOMEAutoK                    => ncplxs%TOMEAutoK,                    &
     jcplx                        => micpar%jcplx,                        &
     mid_AmmoniaOxidBacter        => micpar%mid_AmmoniaOxidBacter,        &
     mid_NitriteOxidBacter        => micpar%mid_NitriteOxidBacter,        &
@@ -104,9 +104,8 @@ module MicAutoCPLXMod
     FracNO2ReduxAutor(NGL)=1.0_r8
   ENDIF
 
-  K=micpar%jcplx
-  IF(TOMK(K).GT.ZEROS)THEN
-    FracAutorBiomOfActK(NGL)=OMActAutor(NGL)/TOMK(K)
+  IF(TOMEAutoK(ielmc).GT.ZEROS)THEN
+    FracAutorBiomOfActK(NGL)=OMActAutor(NGL)/TOMEAutoK(ielmc)
   ELSE
     FracAutorBiomOfActK(NGL)=1.0_r8
   ENDIF
