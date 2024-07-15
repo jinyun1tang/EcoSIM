@@ -99,16 +99,8 @@ implicit none
 
             trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
 
-            RNutMicbTransf_vr(ids_NH4,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_NO3,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_NO2,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_NH4B,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_NO3B,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_NO2B,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
-            RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
+            RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX)=0.0_r8
+
             Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
@@ -117,9 +109,7 @@ implicit none
 
         ELSE
           trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
-
-          RNutMicbTransf_vr(ids_NH4B:ids_nutb_end,L,NY,NX)=0.0_r8
+          RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX)=0.0_r8
           Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
         ENDIF
       ENDDO D998

@@ -2194,6 +2194,12 @@ implicit none
         this%h2D_cNO3t_vr(ncol,L)= safe_adb(trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX) &
                                                +trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX),&
                                                SoilMicPMassLayer(L,NY,NX))
+        if(abs(trc_solml_vr(ids_NO2,L,NY,NX))>1.e10)then
+          write(*,*)I+J/24.,L,trc_solml_vr(ids_NO3,L,NY,NX),trc_solml_vr(ids_NO3B,L,NY,NX), &
+                  trc_solml_vr(ids_NO2,L,NY,NX),trc_solml_vr(ids_NO2B,L,NY,NX),&
+                  SoilMicPMassLayer(L,NY,NX)
+          stop           
+        endif          
         this%h2D_cPO4_vr(ncol,L) = safe_adb(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX) &
                                                +trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX),&
                                                VLWatMicP_vr(L,NY,NX))
