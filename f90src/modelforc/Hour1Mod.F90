@@ -804,16 +804,12 @@ module Hour1Mod
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
 
   XZHYS(0:NL(NY,NX),NY,NX)=0.0_r8
-  trcn_RChem_soil_vr(ids_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcn_RChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)=0.0_r8
+
   TR_NH3_soil_vr(0:NL(NY,NX),NY,NX)=0.0_r8
   TRN3G(0:NL(NY,NX),NY,NX)=0.0_r8
-  trcn_RChem_soil_vr(ids_NO3,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcn_RChem_soil_vr(ids_NO2,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcn_RChem_soil_vr(ids_H1PO4,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcn_RChem_soil_vr(ids_H2PO4,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  trcx_TRSoilChem_vr(idx_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcx_TRSoilChem_vr(idx_AEC+1:idx_anion_soil_end,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
   trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
