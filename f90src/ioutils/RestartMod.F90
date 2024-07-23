@@ -5613,16 +5613,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='DayLenthCurrent', dim1name='column',&
+    call restartvar(ncid, flag, varname='DayLensCurr_col', dim1name='column',&
        long_name='daylength', units='h', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthCurrent,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,DayLensCurr_col,datrc_1d) 
   else
-    !print*,'DayLenthCurrent'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthCurrent,datrc_1d)   
+    !print*,'DayLensCurr_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DayLensCurr_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='DayLenthCurrent', dim1name='column',&
+    call restartvar(ncid, flag, varname='DayLensCurr_col', dim1name='column',&
        long_name='daylength', units='h', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5630,16 +5630,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='DayLenthPrev', dim1name='column',&
+    call restartvar(ncid, flag, varname='DayLenthPrev_col', dim1name='column',&
        long_name='daylength of previous day', units='h', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev_col,datrc_1d) 
   else
-    !print*,'DayLenthPrev'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev,datrc_1d)   
+    !print*,'DayLenthPrev_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DayLenthPrev_col,datrc_1d)   
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='DayLenthPrev', dim1name='column',&
+    call restartvar(ncid, flag, varname='DayLenthPrev_col', dim1name='column',&
        long_name='daylength of previous day', units='h', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

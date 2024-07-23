@@ -137,7 +137,7 @@ contains
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
-    clm_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
+    clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
@@ -199,7 +199,8 @@ contains
   pft_file_in=''
   grid_file_in=''
   pft_mgmt_in=''
-  clm_file_in=''
+  clm_hour_file_in=''
+  clm_day_file_in=''
   soil_mgmt_in=''
   atm_ghg_in=''
   aco2_ppm  = 280._r8

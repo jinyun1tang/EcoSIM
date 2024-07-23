@@ -341,7 +341,7 @@ implicit none
 !
     IF(SnoXfer2SnoLay_snvr(L,NY,NX).GT.0.0_r8)THEN
       DENSX=SnoDens_snvr(L,NY,NX)
-      TCASF=AMAX1(-15.0_r8,AMIN1(2.0_r8,TCA(NY,NX)))
+      TCASF=AMAX1(-15.0_r8,AMIN1(2.0_r8,TCA_col(NY,NX)))
       !fresh snow density
       DENSF=0.05_r8+1.7E-03_r8*(TCASF+15.0_r8)**1.5_r8
       VOLSF=AMIN1(SnoXfer2SnoLay_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX))/DENSF + &

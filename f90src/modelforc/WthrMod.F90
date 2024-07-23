@@ -74,11 +74,9 @@ module WthrMod
   !     IWTHR=weather data type in first(1) or second(2) scene
   !     ITYPE=weather data type:1=daily,2=hourly
   !
-  IF(is_first_year.OR.I.LE.ILAST)THEN
-    ITYPE=IWTHR(1)
-  ELSE
-    ITYPE=IWTHR(2)
-  ENDIF
+  
+  ITYPE=IWTHR
+
   !
   !     CALCULATE HOURLY TEMPERATURE, RADIATION, WINDSPEED, VAPOR PRESSURE
   !     AND PRECIPITATION FROM DAILY WEATHER ARRAYS LOADED IN 'READS'
@@ -134,13 +132,13 @@ module WthrMod
       !     RADN=hourky SW radiation
       !     RMAX=maximum hourly radiation
       !     SolarNoonHour_col=time of solar noon
-      !     DayLenthCurrent=daylength
+      !     DayLensCurr_col=current daylength
 !
       IF(KoppenClimZone(NY,NX).NE.-2)THEN
 !       not phytotron
-        IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
+        IF(DayLensCurr_col(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(SolarNoonHour_col(NY,NX) &
-            -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/DayLenthCurrent(NY,NX)))
+            -DayLensCurr_col(NY,NX)/2.0_r8))*PICON/DayLensCurr_col(NY,NX)))
         ELSE
           RADN(NY,NX)=0.0_r8
         ENDIF
@@ -152,34 +150,34 @@ module WthrMod
       !     TCA,TairK=air temperature (oC,K)
       !     TAVG*,AMP*=daily averages, amplitudes from day.f
       !
-      IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
-        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0)*PICON &
-          /(SolarNoonHour_col(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
+      IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLensCurr_col(NY,NX)*0.5_r8))THEN
+        TCA_col(NY,NX)=TAVG1+AMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0)*PICON &
+          /(SolarNoonHour_col(NY,NX)+9.0-DayLensCurr_col(NY,NX)/2.0))+PICON2h)
       ELSEIF(J.GT.SolarNoonHour_col(NY,NX)+3)THEN
-        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0)*PICON &
-          /(SolarNoonHour_col(NY,NX)+9.0-DayLenthCurrent(NY,NX)/2.0))+PICON2h)
+        TCA_col(NY,NX)=TAVG3+AMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0)*PICON &
+          /(SolarNoonHour_col(NY,NX)+9.0-DayLensCurr_col(NY,NX)/2.0))+PICON2h)
       ELSE
-        TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
-          -DayLenthCurrent(NY,NX)/2.0_r8))*PICON/(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
+        TCA_col(NY,NX)=TAVG2+AMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
+          -DayLensCurr_col(NY,NX)/2.0_r8))*PICON/(3.0_r8+DayLensCurr_col(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      TairK_col(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      TairK_col(NY,NX)=units%Celcius2Kelvin(TCA_col(NY,NX))
       if(abs(TairK_col(NY,NX))>400._r8)then
-        print*,'air temperature problematic',TairK_col(NY,NX),TCA(NY,NX)
+        print*,'air temperature problematic',TairK_col(NY,NX),TCA_col(NY,NX)
       endif
       !
       !     VPK,VPS=ambient,saturated vapor pressure
       !     VAVG*,VAMP*=daily averages, amplitudes from day.f
       !      ALTI=altitude
       !
-      IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLenthCurrent(NY,NX)/2))THEN
+      IF(J.LT.(SolarNoonHour_col(NY,NX)-DayLensCurr_col(NY,NX)/2))THEN
         VPK_col(NY,NX)=VAVG1+VMP1*SIN(((J+SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
-          /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
+          /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLensCurr_col(NY,NX)/2.0_r8))+PICON2h)
       ELSEIF(J.GT.SolarNoonHour_col(NY,NX)+3)THEN
         VPK_col(NY,NX)=VAVG3+VMP3*SIN(((J-SolarNoonHour_col(NY,NX)-3.0_r8)*PICON &
-          /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLenthCurrent(NY,NX)/2.0_r8))+PICON2h)
+          /(SolarNoonHour_col(NY,NX)+9.0_r8-DayLensCurr_col(NY,NX)/2.0_r8))+PICON2h)
       ELSE
         VPK_col(NY,NX)=VAVG2+VMP2*SIN(((J-(SolarNoonHour_col(NY,NX) &
-          -DayLenthCurrent(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLenthCurrent(NY,NX)/2.0_r8))-PICON2h)
+          -DayLensCurr_col(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLensCurr_col(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK_col(NY,NX))) &
       VPS(NY,NX)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
@@ -193,7 +191,7 @@ module WthrMod
 !     PrecAsRain,PrecAsSnow=rainfall,snowfall
 !
       IF(J.GE.13.AND.J.LE.24)THEN
-        IF(TCA(NY,NX).GT.TSNOW)THEN
+        IF(TCA_col(NY,NX).GT.TSNOW)THEN
           PrecAsRain(NY,NX)=RAIN(I)/12.0_r8   !rainfall
           PrecAsSnow(NY,NX)=0.0_r8   !snow fall
         ELSE
@@ -232,16 +230,16 @@ module WthrMod
       !     PrecAsRain,PrecAsSnow=rainfall,snowfall, m H2O /m2 /hr
 !
       RADN(NY,NX)=SWRad_hrly(J,I)  
-      TCA(NY,NX)=TMP_hrly(J,I)
+      TCA_col(NY,NX)=TMP_hrly(J,I)
 
-      TairK_col(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      TairK_col(NY,NX)=units%Celcius2Kelvin(TCA_col(NY,NX))
       !elevation corrected saturated air vapor pressure, KPa
       VPS(NY,NX)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK_col(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))   
       WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
 
       !snowfall is determined by air tempeature
-      IF(TCA(NY,NX).GT.TSNOW)THEN
+      IF(TCA_col(NY,NX).GT.TSNOW)THEN
         PrecAsRain(NY,NX)=RAINH(J,I)
         PrecAsSnow(NY,NX)=0.0_r8
       ELSE
@@ -349,7 +347,7 @@ module WthrMod
       ELSE
         SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8 
       ENDIF
-!      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK_col(NY,NX),TCA(NY,NX)
+!      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK_col(NY,NX),TCA_col(NY,NX)
 !
       !     INSERT CESM WEATHER HERE
       !
@@ -456,8 +454,8 @@ module WthrMod
         DTA=0.5_r8*(TDTPX(N,NY,NX)+TDTPN(N,NY,NX))
         AMP=0.5_r8*(TDTPX(N,NY,NX)-TDTPN(N,NY,NX))
         DHR=SIN(0.2618_r8*(J-(SolarNoonHour_col(NY,NX)+3.0_r8))+PICON2h)
-        TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
-        TairK_col(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+        TCA_col(NY,NX)=TCA_col(NY,NX)+DTA+AMP*DHR
+        TairK_col(NY,NX)=units%Celcius2Kelvin(TCA_col(NY,NX))
 !
         !     ACCLIMATION TO GRADUAL CLIMATE CHANGE
         !
@@ -544,8 +542,8 @@ module WthrMod
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))          !celcius
-      TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))          !celcius
+      TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA_col(NY,NX))          !celcius
+      TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA_col(NY,NX))          !celcius
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, KPa
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, KPa
       TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)      !wind speed, m/hr

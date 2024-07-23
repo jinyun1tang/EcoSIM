@@ -828,7 +828,7 @@ module StartsMod
   StemArea_col(:,:)=0.0_r8
   PrecIntceptByCanopy_col(:,:)=0.0_r8
   PlantPopu_col(:,:)=0.0_r8
-  DayLenthCurrent(:,:)=12.0_r8
+  DayLensCurr_col(:,:)=12.0_r8
   SurfAlbedo_col(:,:)=SoilAlbedo_col(:,:)
   EcoHavstElmnt_col(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8

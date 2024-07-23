@@ -25,8 +25,7 @@ module PlantBranchMod
   integer, parameter :: ibrch_husk=5
   integer, parameter :: ibrch_ear=6
   integer, parameter :: ibrch_grain=7
-  logical, save :: ffirst(2)=.true.
-  logical, save :: F2FIRST(2)=.true.
+
   integer :: II,JJ
   contains
 !------------------------------------------------------------------------------------------
@@ -231,7 +230,7 @@ module PlantBranchMod
 !   CANOPY N2 FIXATION (CYANOBACTERIA)
 !
     call CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WaterStress4Groth,CanopyN2Fix_pft)
-    ffirst(NZ)=.false.
+    
   ENDIF
   end associate
   end subroutine GrowOneBranch

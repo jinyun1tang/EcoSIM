@@ -9,7 +9,7 @@ implicit none
   __FILE__
   integer  ::  ICLM                                !changes to weather data (0=none,1=step,2=transient)
   integer  ::  IMNG                                !flag for land management
-  integer  ::  IWTHR(2)                            !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
+  integer  ::  IWTHR                               !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
 
   integer,target,allocatable ::  IYTYP(:,:,:,:)                      !fertilizer release type from fertilizer input file
   integer,target,allocatable ::  iSoilDisturbType_col(:,:,:)                        !soil disturbance type, [-]
