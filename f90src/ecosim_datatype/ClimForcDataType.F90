@@ -57,14 +57,14 @@ implicit none
   real(r8),target,allocatable ::  TDWND(:,:,:)                       !accumulated change  for wind speed, [-]
   real(r8),target,allocatable ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
-  real(r8),target,allocatable ::  TCA(:,:)                           !air temperature, [oC]
+  real(r8),target,allocatable ::  TCA_col(:,:)                           !air temperature, [oC]
   real(r8),target,allocatable ::  TairK_col(:,:)                           !air temperature, [K]
   real(r8),target,allocatable ::  WindSpeedAtm(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
   real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
-  real(r8),target,allocatable ::  DayLenthCurrent(:,:)                          !daylength, [h]
-  real(r8),target,allocatable ::  DayLenthPrev(:,:)                          !daylength of previous day, [h]
+  real(r8),target,allocatable ::  DayLensCurr_col(:,:)                          !daylength, [h]
+  real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
   real(r8),target,allocatable ::  LWRadSky(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
@@ -186,14 +186,14 @@ implicit none
   allocate(TDWND(12,JY,JX));    TDWND=0._r8
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
-  allocate(TCA(JY,JX));         TCA=0._r8
+  allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
   allocate(WindSpeedAtm(JY,JX));          WindSpeedAtm=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK_col(JY,JX));         VPK_col=0._r8
   allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
-  allocate(DayLenthCurrent(JY,JX));        DayLenthCurrent=0._r8
-  allocate(DayLenthPrev(JY,JX));        DayLenthPrev=0._r8
+  allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
+  allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
   allocate(OMEGAG(NumOfSkyAzimuSects,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
@@ -316,14 +316,14 @@ implicit none
   call destroy(TDWND)
   call destroy(TDCN4)
   call destroy(TDCNO)
-  call destroy(TCA)
+  call destroy(TCA_col)
   call destroy(TairK_col)
   call destroy(WindSpeedAtm)
   call destroy(VPA)
   call destroy(VPK_col)
   call destroy(PBOT)
-  call destroy(DayLenthCurrent)
-  call destroy(DayLenthPrev)
+  call destroy(DayLensCurr_col)
+  call destroy(DayLenthPrev_col)
   call destroy(DayLenthMax)
   call destroy(OMEGAG)
   call destroy(LWRadSky)

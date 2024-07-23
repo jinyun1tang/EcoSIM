@@ -115,7 +115,7 @@ implicit none
   real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
-  real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA(NY,NX)
+  real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA_col(NY,NX)
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK_col(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm(NY,NX)/secs1hour
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
@@ -2077,7 +2077,7 @@ implicit none
       this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
       this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W*86400.e-6_r8
-      this%h1D_AIR_TEMP_col(ncol)    = TCA(NY,NX)
+      this%h1D_AIR_TEMP_col(ncol)    = TCA_col(NY,NX)
       this%h1D_HUM_col(ncol)         = VPK_col(NY,NX)
       
       this%h1D_WIND_col(ncol)         = WindSpeedAtm(NY,NX)/secs1hour

@@ -42,7 +42,7 @@ implicit none
     real(r8) :: CCLRG
   end type atm_forc_type
   public :: ReadClim
-  public :: ReadClimNC
+  public :: ReadClimNC    !read climate data
   public :: GetAtmGts
   contains
 
@@ -98,7 +98,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine readhourweather(idat,DAT,IYEAR,I,J,L,IH,go60,NN,NI,TTYPE)
+  subroutine readhourweather(idat,DAT,IYEAR,I,J,IH,go60,NN,NI,TTYPE)
 
 !     read hourly weather data, from ascii file
 !
@@ -110,7 +110,6 @@ implicit none
   integer, intent(inout) :: I      !julian day
   integer, intent(inout) :: J      !hour
   integer, intent(inout) :: IH
-  integer, intent(in) :: L
   integer, intent(in) :: NN,NI,iyear
   character(len=1),intent(in) :: TTYPE
   logical, intent(out) :: go60
@@ -157,6 +156,7 @@ implicit none
   ENDIF
 
   IF(J.GT.24.AND.(J/100)*100.NE.J)THEN
+  !time information given as long hour
     D80: DO K=1,NN
       DATK(K)=DATK(K)+DAT(K)
     ENDDO D80
@@ -183,13 +183,7 @@ implicit none
     IFLG3=1
   ENDIF
 
-  IF(L.NE.1)THEN
-    IF(I.LE.ILAST)then
-      GO60=.true.
-      return
-    endif
-  ENDIF
-  RadLWClm(J,I)=0.0
+  RadLWClm(J,I)=0.0_r8
 !
 !     CONVERT HOURLY WEATHER VARIABLES TO MODEL UNITS
 !     AND ENTER INTO MODEL ARRAYS
@@ -219,20 +213,22 @@ implicit none
 !         SOLAR RADIATION
 !
     ELSEIF(VAR(K).EQ.'R')THEN
-! shortwave radiation
+      !input is W m-2, to MJ m-2 per hour (3600 seconds per hour * 1.e-6)
       IF(TYP(K).EQ.'W')THEN
-! W m-2 to MJ m-2 per hour (3600 seconds per hour * 1.e-6)
         SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8)
+      !input is 1.e4 J m-2/hour        
       ELSEIF(TYP(K).EQ.'J')THEN
-! 1.e4 J m-2
         SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01_r8)
+      ! input is kJ m-2 per hour  
       ELSEIF(TYP(K).EQ.'K')THEN
-! kJ m-2 per hour
         SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001_r8)
+      !input is Roentgen, which is 0.457 milligray, be careful for this  
       ELSEIF(TYP(K).EQ.'P')THEN
         SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8*0.457_r8)
+      !input is   
 !     ELSEIF(TYP(K).EQ.'M')THEN
 !     SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*3.6*0.457)
+      !input is MJ/hour
       ELSE
         SWRad_hrly(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
       ENDIF
@@ -240,15 +236,16 @@ implicit none
 !     WIND SPEED
 !
     ELSEIF(VAR(K).EQ.'W')THEN
+      ! input is m s-1, into m per hour
       IF(TYP(K).EQ.'S')THEN
-! given as m s-1, into m per hour
         WINDH(J,I)=(DAT(K)+DATK(K))/IH*3600.0_r8
+      ! input is km per hour into m per hour
       ELSEIF(TYP(K).EQ.'H')THEN
-! km per hour into m per hour
         WINDH(J,I)=(DAT(K)+DATK(K))/IH*1000.0_r8
+      ! input is mile per hour into m per hour, it should be 1609.34 though        
       ELSEIF(TYP(K).EQ.'M')THEN
-! mile per hour into m per hour, it should be 1609.34 though
-        WINDH(J,I)=(DAT(K)+DATK(K))/IH*1600.0_r8
+        WINDH(J,I)=(DAT(K)+DATK(K))/IH*1609.34_r8
+      !input is m/hour  
       ELSE
         WINDH(J,I)=(DAT(K)+DATK(K))/IH
       ENDIF
@@ -256,34 +253,35 @@ implicit none
 !
 !       VAPOR PRESSURE
 !
+      ! input is celcius degree of dew point
       IF(TYP(K).EQ.'D')THEN
-! given as celcius degree
         tempK=units%Celcius2Kelvin((DAT(K)+DATK(K))/IH)
         DWPTH(J,I)=vapsat0(tempK)
-      ELSEIF(TYP(K).EQ.'F')THEN
-! given as Fahrenheit
+      ! input is Fahrenheit dew point
+      ELSEIF(TYP(K).EQ.'F')THEN       
         DAT(K)=(DAT(K)-32.0_r8)*0.556_r8
         tempK=units%Celcius2Kelvin((DAT(K)+DATK(K))/IH)
         DWPTH(J,I)=vapsat0(tempK)
+      ! input is relative humidity, [0, 1], return value kPa
       ELSEIF(TYP(K).EQ.'H')THEN
-! given as relative humidity, [0, 1], return value kPa
         tempK=units%Celcius2Kelvin(TMP_hrly(J,I))
         DWPTH(J,I)=vapsat0(tempK)*AZMAX1(AMIN1(1.0_r8,(DAT(K)+DATK(K))/IH))
-      ELSEIF(TYP(K).EQ.'R')THEN
-! given as relative humidity [0, 100],return value kPa
+      ! input is relative humidity [0, 100],return value kPa        
+      ELSEIF(TYP(K).EQ.'R')THEN     
         tempK=units%Celcius2Kelvin(TMP_hrly(J,I))
         DWPTH(J,I)=vapsat0(tempK)*AZMAX1(AMIN1(1._r8,0.01_r8*(DAT(K)+DATK(K))/IH))
+      ! input is molar mixing ratio? [0,100]        
       ELSEIF(TYP(K).EQ.'S')THEN
-! molar mixing ratio? [0,100]
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*0.0289_r8/18.0_r8*101.325_r8 &
           *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMP_hrly(J,I))
+      !input is molar mixing ratio [0, 1] ALTIG is doing altitude correction,          
       ELSEIF(TYP(K).EQ.'G')THEN
-! molar mixing ratio [0, 1] ALTIG is doing altitude correction,
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*28.9_r8/18.0_r8*101.325_r8 &
           *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMP_hrly(J,I))
+      !input is hPa          
       ELSEIF(TYP(K).EQ.'M')THEN
-! given as hPa
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.1_r8)
+      !input is kPa  
       ELSE
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
       ENDIF
@@ -291,24 +289,29 @@ implicit none
 !       PRECIPITATION, [m h-1]
 !
   ELSEIF(VAR(K).EQ.'P')THEN
+    !input is mm/m2/hour
     IF(TYP(K).EQ.'M')THEN
-!   [mm m-2] (mm to m, 1.e-3)
+    !   [mm m-2] (mm to m, 1.e-3)
       RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))/1.0E+03_r8
+    !input is cm/m2/hour   
     ELSEIF(TYP(K).EQ.'C')THEN
-!   [cm m-2]
+      !   [cm m-2]
       RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))/1.0E+02_r8
+    !input is inch/m2/hour  
     ELSEIF(TYP(K).EQ.'I')THEN
-!  [inch m-2] -> [m m-2]
+    !  [inch m-2] -> [m m-2]
       RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*0.0254_r8
+    !input is m/m2/second  
     ELSEIF(TYP(K).EQ.'S')THEN
-!  [second m-2]
+     !  [second m-2]
       IF(TTYPE.EQ.'H')THEN
-! given in hour
+        ! given in hour
         RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*3.6_r8
       ELSE
-! given in half hour, 
+        ! given in half hour, 
         RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*1.8_r8
       ENDIF
+    !input is m/  
     ELSE
       RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))
     ENDIF
@@ -333,7 +336,7 @@ implicit none
   end subroutine readhourweather
 !------------------------------------------------------------------------------------------
 
-  subroutine readdayweather(idat,dat,IYEAR,I,L,go110,go60,NTX,NFX,NN,NI,IX)
+  subroutine readdayweather(idat,dat,IYEAR,I,go110,go60,NTX,NFX,NN,NI,IX)
 !     read daily weather data
 !
 !     DERIVE DAY I FROM TIME VARIABLES IVAR
@@ -343,7 +346,7 @@ implicit none
   implicit none
   integer, intent(in) :: idat(:)
   real(r8),intent(inout) :: dat(:)
-  integer, intent(in) :: NTX,NFX,NN,NI,IYEAR,L
+  integer, intent(in) :: NTX,NFX,NN,NI,IYEAR
   integer, intent(out) :: I
   logical, intent(out) :: go110, go60
   INTEGER, INTENT(OUT) :: IX
@@ -397,11 +400,6 @@ implicit none
     ISTART=MAX(ISTART,IBEGIN)
     IFLG3=1
   ENDIF
-  IF(L.NE.1)THEN
-    IF(I.LE.ILAST)THEN
-      GO60=.TRUE.
-    ENDIF
-  ENDIF
 !
 ! CONVERT DAILY WEATHER VARIABLES TO MODEL UNITS
 ! AND ENTER INTO MODEL ARRAYS
@@ -415,20 +413,27 @@ implicit none
   D65: DO K=1,NN
 !
 !   MAX,MIN REMPERATURE
-!
+!   maximum temperature
     IF(VAR(K).EQ.'M')THEN
+      !input is Fahrenheit
       IF(TYP(K).EQ.'F')THEN
         TMPX(I)=(DAT(K)-32.0_r8)*0.556_r8
+      !input is kelvin  
       ELSEIF(TYP(K).EQ.'K')THEN
-        TMPX(I)=DAT(K)-273.16_r8
+        TMPX(I)=DAT(K)-273.15_r8
+      !input is celcius  
       ELSE
         TMPX(I)=DAT(K)
       ENDIF
+    !minimum temperature  
     ELSEIF(VAR(K).EQ.'N')THEN
+      !input is Fahrenheit
       IF(TYP(K).EQ.'F')THEN
         TMPN(I)=(DAT(K)-32.0_r8)*0.556_r8
+      !input is kelvin
       ELSEIF(TYP(K).EQ.'K')THEN
         TMPN(I)=DAT(K)-273.16_r8
+      !input is celcius  
       ELSE
         TMPN(I)=DAT(K)
       ENDIF
@@ -436,10 +441,13 @@ implicit none
 !     SOLAR RADIATION
 !
     ELSEIF(VAR(K).EQ.'R')THEN
+      !input is 1.e4 Calories/day
       IF(TYP(K).EQ.'L')THEN
         SRAD(I)=AZMAX1(DAT(K)/23.87_r8)
+      !input is 1.e4 Joule/day  
       ELSEIF(TYP(K).EQ.'J')THEN
         SRAD(I)=AZMAX1(DAT(K)*0.01_r8)
+      !input is MJ/day 
       ELSE
         SRAD(I)=AZMAX1(DAT(K))
       ENDIF
@@ -447,49 +455,62 @@ implicit none
 !     WIND SPEED
 !
     ELSEIF(VAR(K).EQ.'W')THEN
+      !input is m/s
       IF(TYP(K).EQ.'S')THEN
         WIND(I)=ABS(DAT(K))*3600.0_r8
+      !input is km/hour  
       ELSEIF(TYP(K).EQ.'H')THEN
         WIND(I)=ABS(DAT(K))*1000.0_r8
+      !input is km/day  
       ELSEIF(TYP(K).EQ.'D')THEN
         WIND(I)=ABS(DAT(K))*1000.0_r8/24.0_r8
+      !input is mile/hour  
       ELSEIF(TYP(K).EQ.'M')THEN
-        WIND(I)=ABS(DAT(K))*1600.0_r8
+        WIND(I)=ABS(DAT(K))*1609.34_r8
+      !input is m/day  
       ELSE
         WIND(I)=ABS(DAT(K))
       ENDIF
 !
-!     VAPOR PRESSURE
+!     VAPOR PRESSURE (dew point)
 !
     ELSEIF(VAR(K).EQ.'H')THEN
+      !input is degree
       IF(TYP(K).EQ.'D')THEN
         DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
         DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
+      !input is Fahrenheit  
       ELSEIF(TYP(K).EQ.'F')THEN
         DAT(K)=(DAT(K)-32.0_r8)*0.556_r8
         DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
         DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
+      !input is relative humidity reported in absolute value
       ELSEIF(TYP(K).EQ.'H')THEN
         DAT(K)=AZMAX1(AMIN1(1.0_r8,DAT(K)))
         DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)))*DAT(K)
         DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(TMPN(I))))
+      !input is relative humidity  
       ELSEIF(TYP(K).EQ.'R')THEN
         DAT(K)=AZMAX1(AMIN1(100.0_r8,DAT(K)))
         DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)))*DAT(K)*0.01_r8
         DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(TMPN(I))))
+     !input is specific humidity kg/kg   
       ELSEIF(TYP(K).EQ.'S')THEN
         DWPT(1,I)=AZMAX1(DAT(K))*0.0289_r8/18.0_r8*101.325_r8 &
           *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)
         DWPT(2,I)=AZMAX1(DAT(K))*0.0289_r8/18.0_r8*101.325_r8 &
           *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPN(I))
+      !input is specific humidity g/g    
       ELSEIF(TYP(K).EQ.'G')THEN
         DWPT(1,I)=AZMAX1(DAT(K))*28.9_r8/18.0_r8*101.325_r8 &
           *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)
         DWPT(2,I)=AZMAX1(DAT(K))*28.9_r8/18.0_r8*101.325_r8 &
           *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPN(I))
+      !input is hPa, -> kPa    
       ELSEIF(TYP(K).EQ.'M')THEN
         DWPT(1,I)=AZMAX1(DAT(K)*0.1_r8)
         DWPT(2,I)=AZMAX1(DAT(K)*0.1_r8)
+      !input is kPa  
       ELSE
         DWPT(1,I)=AZMAX1(DAT(K))
         DWPT(2,I)=AZMAX1(DAT(K))
@@ -498,12 +519,16 @@ implicit none
 !     PRECIPITATION
 !
     ELSEIF(VAR(K).EQ.'P')THEN
+      !input is mm /day
       IF(TYP(K).EQ.'M')THEN
         RAIN(I)=AZMAX1(DAT(K))/1.0E+03_r8
+      !input is cm/day  
       ELSEIF(TYP(K).EQ.'C')THEN
         RAIN(I)=AZMAX1(DAT(K))/1.0E+02_r8
+      !input is inch/day  
       ELSEIF(TYP(K).EQ.'I')THEN
         RAIN(I)=AZMAX1(DAT(K))*0.0254_r8
+      !input is m/day  
       ELSE
         RAIN(I)=AZMAX1(DAT(K))
       ENDIF
@@ -553,13 +578,13 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadClim(iyear,clmfile,NTX,NFX,L,I,IX,TTYPE,atmf)
+  subroutine ReadClim(iyear,clmfile,NTX,NFX,I,IX,TTYPE,atmf)
   !
   !read climate/weather data, 
   implicit none
   character(len=*), intent(in) :: clmfile
   integer, intent(in) :: iyear
-  integer, intent(in) :: NTX,NFX,L
+  integer, intent(in) :: NTX,NFX
   integer, intent(out) :: I,IX
   CHARACTER(len=1),intent(out) :: TTYPE
   type(atm_forc_type), intent(out) :: atmf
@@ -631,16 +656,16 @@ implicit none
     IF(TTYPE.EQ.'D')THEN
 !   READ DAILY WEATHER DATA AND CONVERT TO MODEL UNITS
       if(lverb)write(*,*)'read daily weather file'
-      IWTHR(L)=1
-      call readdayweather(idat,dat,iyear,I,L,GO110,GO60,NTX,NFX,NN,NI,IX)
+      IWTHR=1
+      call readdayweather(idat,dat,iyear,I,GO110,GO60,NTX,NFX,NN,NI,IX)
       IF(GO60)cycle  !year mismatch, read the next line
       IF(GO110)EXIT
 !!
     ELSE
 !     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
-      IWTHR(L)=2
+      IWTHR=2
       if(lverb)write(*,*)'read hourly weather file'
-      call readhourweather(idat,dat,iyear,I,J,L,IH,go60,NN,NI,TTYPE)
+      call readhourweather(idat,dat,iyear,I,J,IH,go60,NN,NI,TTYPE)
       IF(GO60)cycle  !year mismatch,read the next year
       IH=1
       IX=I
@@ -667,8 +692,8 @@ implicit none
   !
   !DESCRIPTION
   !read climate data from netcdf files
-  use EcoSIMCtrlMod, only : clm_file_in
-  use fileUtil, only : file_exists
+  use EcoSIMCtrlMod, only : clm_hour_file_in
+  use EcoSIMCtrlMod, only : clm_day_file_in
   use abortutils, only : endrun
   implicit none
   integer, intent(in) :: yearc  ! current year of simulation
@@ -685,91 +710,92 @@ implicit none
   real(r8), allocatable ::fdatav(:)
   integer :: year,J,II,JJ,I,irec
 
-  IWTHR(L)=2
-  LYR=0
-  if(.not.file_exists(clm_file_in))then
-    call endrun("Do not find clm_file_in file "//trim(clm_file_in)//" in "//mod_filename, __LINE__)
-  endif
+  IWTHR=get_forc_step_type(yeari)
 
-  call ncd_pio_openfile(clm_nfid, clm_file_in, ncd_nowrite)
+  if(IWTHR==1)then
 
-  nyears=get_dim_len(clm_nfid, 'year')
-  do irec=1,nyears
-    call ncd_getvar(clm_nfid,'year',irec,year)
-    if(year==yeari)exit
-  enddo
+  elseif(IWTHR==2)then
+    LYR=0
 
-! while the climate data may be for multiple grid, only the first grid of the data
-! read is assigned to current climate arrays
-  ngrid=get_dim_len(clm_nfid,'ngrid')
+    call ncd_pio_openfile(clm_nfid, clm_hour_file_in, ncd_nowrite)
 
-  allocate(fdatam(ngrid,24,366))
-  allocate(idatav(ngrid))
-  allocate(fdatav(ngrid))
-  I=365
-  if(isleap(yeari))I=366
-  print*,size(fdatam,1),size(fdatam,2),size(fdatam,3),irec
-  call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMP_hrly,fdatam)
-  call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
-  call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
-  call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
-  call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SWRad_hrly,fdatam)
-
-  call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
-  call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
-  call ncd_getvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CN4RIG',irec,fdatav); atmf%CN4RIG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CNORIG',irec,fdatav); atmf%CNORIG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CPORG',irec,fdatav); atmf%CPORG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CALRG',irec,fdatav); atmf%CALRG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CFERG',irec,fdatav); atmf%CFERG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CCARG',irec,fdatav); atmf%CCARG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CMGRG',irec,fdatav); atmf%CMGRG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CNARG',irec,fdatav); atmf%CNARG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
-  call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
-  call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
-
-  call check_var(clm_nfid, 'XRADH', vardesc, readvar,print_err=.false.)
-  if(readvar)then
-    call ncd_getvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(RadLWClm,fdatam)
-  else
-    RadLWClm=0._r8
-  endif
-
-  if (.not. isLeap(yeari))then
-    I=365
-    DO J=1,24
-      TMP_hrly(J,I+1) = TMP_hrly(J,I)
-      WINDH(J,I+1)= WINDH(J,I)
-      DWPTH(J,I+1)= DWPTH(J,I)
-      RAINH(J,I+1)= RAINH(J,I)
-      SWRad_hrly(J,I+1)= SWRad_hrly(J,I)
-      RadLWClm(J,I+1)= RadLWClm(J,I)
-    ENDDO
-  endif
-
-  if(isleap(yearc))LYR=1
-  DO II=1,366
-    DO JJ=1,24
-      SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
-      WINDH(JJ,II)=WINDH(JJ,II)*3600._r8        !convert from m/s to m/hour
-      RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
+    nyears=get_dim_len(clm_nfid, 'year')
+    do irec=1,nyears
+      call ncd_getvar(clm_nfid,'year',irec,year)
+      if(year==yeari)exit
     enddo
-  ENDDO
 
-  if(lverb)then
-  DO II=1,365+LYR
-    DO JJ=1,24
-      print*,TMP_hrly(JJ,II),SWRad_hrly(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
+    ! while the climate data may be for multiple grid, only the first grid of the data
+    ! read is assigned to current climate arrays
+    ngrid=get_dim_len(clm_nfid,'ngrid')
+
+    allocate(fdatam(ngrid,24,366))
+    allocate(idatav(ngrid))
+    allocate(fdatav(ngrid))
+    I=365
+    if(isleap(yeari))I=366
+    print*,size(fdatam,1),size(fdatam,2),size(fdatam,3),irec
+    call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMP_hrly,fdatam)
+    call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
+    call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
+    call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
+    call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SWRad_hrly,fdatam)
+
+    call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
+    call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
+    call ncd_getvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CN4RIG',irec,fdatav); atmf%CN4RIG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CNORIG',irec,fdatav); atmf%CNORIG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CPORG',irec,fdatav); atmf%CPORG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CALRG',irec,fdatav); atmf%CALRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CFERG',irec,fdatav); atmf%CFERG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CCARG',irec,fdatav); atmf%CCARG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CMGRG',irec,fdatav); atmf%CMGRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CNARG',irec,fdatav); atmf%CNARG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
+
+    call check_var(clm_nfid, 'XRADH', vardesc, readvar,print_err=.false.)
+    if(readvar)then
+      call ncd_getvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(RadLWClm,fdatam)
+    else
+      RadLWClm=0._r8
+    endif
+
+    if (.not. isLeap(yeari))then
+      I=365
+      DO J=1,24
+        TMP_hrly(J,I+1) = TMP_hrly(J,I)
+        WINDH(J,I+1)= WINDH(J,I)
+        DWPTH(J,I+1)= DWPTH(J,I)
+        RAINH(J,I+1)= RAINH(J,I)
+        SWRad_hrly(J,I+1)= SWRad_hrly(J,I)
+        RadLWClm(J,I+1)= RadLWClm(J,I)
+      ENDDO
+    endif
+
+    if(isleap(yearc))LYR=1
+    DO II=1,366
+      DO JJ=1,24
+        SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
+        WINDH(JJ,II)=WINDH(JJ,II)*3600._r8        !convert from m/s to m/hour
+        RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
+      enddo
     ENDDO
-  ENDDO
-  endif
-  deallocate(fdatam)
-  deallocate(fdatav)
-  deallocate(idatav)
 
+    if(lverb)then
+    DO II=1,365+LYR
+      DO JJ=1,24
+        print*,TMP_hrly(JJ,II),SWRad_hrly(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
+      ENDDO
+    ENDDO
+    endif
+    deallocate(fdatam)
+    deallocate(fdatav)
+    deallocate(idatav)
+  endif
   call ncd_pio_closefile(clm_nfid)
   end subroutine ReadClimNC
 !----------------------------------------------------------------------
@@ -845,4 +871,68 @@ implicit none
   ENDDO
   end subroutine GetAtmGts
 
+
+!-----------------------------------------------------------------------
+  subroutine get_clm_years()
+  !Description  
+  !obtain the forcing year
+  use EcoSIMCtrlMod, only : clm_hour_file_in      !file for hourly climate forcing
+  use EcoSIMCtrlMod, only : clm_day_file_in       !file for daily climate forcing
+  use EcoSIMCtrlMod, only : yearf1,yearf2, nyeardal1             
+  use fileUtil, only : file_exists  
+  implicit none
+  type(file_desc_t) :: clm_nfid
+
+  yearf1=-999;nyeardal1=0
+  if(len_trim(clm_day_file_in)/=0)then
+    if(.not.file_exists(clm_day_file_in))then
+      call endrun("Do not find clm_day_file_in file "//trim(clm_day_file_in)//" in "//mod_filename, __LINE__)
+    endif
+
+    call ncd_pio_openfile(clm_nfid, clm_day_file_in, ncd_nowrite)
+    nyeardal1=get_dim_len(clm_nfid, 'year')
+    
+    call ncd_getvar(clm_nfid,'year',1,yearf1)        
+    call ncd_pio_closefile(clm_nfid)
+  endif
+
+  yearf2=-999
+  if(len_trim(clm_hour_file_in)/=0)then
+    if(.not.file_exists(clm_hour_file_in))then
+      call endrun("Do not find clm_hour_file_in file "//trim(clm_hour_file_in)//" in "//mod_filename, __LINE__)
+    endif
+
+    call ncd_pio_openfile(clm_nfid, clm_hour_file_in, ncd_nowrite)
+    
+    call ncd_getvar(clm_nfid,'year',1,yearf2)        
+
+    call ncd_pio_closefile(clm_nfid)
+  endif
+  end subroutine get_clm_years
+!-----------------------------------------------------------------------
+  function get_forc_step_type(yeari)result(iclmtype)
+!  yearf1<=year<yearf2, daily climate forcing
+!  yearf2<year, hourly climate forcing
+  implicit none
+  integer, intent(in) :: yeari  ! current year of forcing data
+  integer :: iclmtype
+
+  iclmtype=2
+  if(nyeardal1>0)then
+    !there is daily data provided
+    if(yeari<yearf1)then
+      call endrun("Do not find requested daily climate data in "//mod_filename, __LINE__)
+    elseif(yeari<yearf2)then
+      iclmtype=1
+    else
+      iclmtype=2
+    endif  
+    return
+  endif
+
+  if(yeari<yearf2)then
+    call endrun("Do not find requested hourly climate data in "//mod_filename, __LINE__)
+  endif
+  return
+  end function get_forc_step_type
 end module ClimReadMod

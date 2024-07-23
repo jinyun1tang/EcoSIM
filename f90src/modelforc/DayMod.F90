@@ -121,20 +121,15 @@
 !     DayLenthPrev,DLYN=daylength of previous,current day
 !     ALAT=latitude
 !
-      DayLenthPrev(NY,NX)=DayLenthCurrent(NY,NX)
+      DayLenthPrev_col(NY,NX)=DayLensCurr_col(NY,NX)
 
-      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),I)
+      DayLensCurr_col(NY,NX)=GetDayLength(ALAT(NY,NX),I)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
 !
-      IF(is_first_year)THEN
-      !weather input is in daily format
-        ITYPE=IWTHR(1)
-      ELSE
-      !weather input is in hourly format
-        ITYPE=IWTHR(2)
-      ENDIF
+      ITYPE=IWTHR
+
 
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
@@ -151,8 +146,8 @@
 
       IF(ITYPE.EQ.1)THEN
         IF(KoppenClimZone(NY,NX).GE.-1)THEN
-          IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
-            RMAX=SRAD(I)/(DayLenthCurrent(NY,NX)*0.658_r8)
+          IF(DayLensCurr_col(NY,NX).GT.ZERO)THEN
+            RMAX=SRAD(I)/(DayLensCurr_col(NY,NX)*0.658_r8)
           ELSE
             RMAX=0._r8
           ENDIF

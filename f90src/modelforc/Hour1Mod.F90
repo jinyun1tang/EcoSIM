@@ -331,26 +331,26 @@ module Hour1Mod
       AtmGasCgperm3(idg_H2 ,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3
       AtmGasCgperm3(idg_NH3B,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
 
-      CO2_rain_conc(NY,NX)=AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA(NY,NX)) &
+      CO2_rain_conc(NY,NX)=AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA_col(NY,NX)) &
          /(EXP(ACTCG(idg_CO2)*CSTRR(NY,NX)))
-      CH4_rain_conc(NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA(NY,NX)) &
+      CH4_rain_conc(NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_CH4)*CSTRR(NY,NX)))
-      O2_rain_conc(NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
+      O2_rain_conc(NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*CSTRR(NY,NX)))
-      N2_rain_conc(NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
+      N2_rain_conc(NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2)*CSTRR(NY,NX)))
-      N2O_rain_conc(NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
+      N2O_rain_conc(NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRR(NY,NX)))
 
-      CO2_irrig_conc(NY,NX)=AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA(NY,NX)) &
+      CO2_irrig_conc(NY,NX)=AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_CO2)*CSTRQ(I,NY,NX)))
-      CH4_irrig_conc(NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA(NY,NX)) &
+      CH4_irrig_conc(NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_CH4)*CSTRQ(I,NY,NX)))
-      O2_irrig_conc(NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
+      O2_irrig_conc(NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*CSTRQ(I,NY,NX)))
-      N2_irrig_conc(NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
+      N2_irrig_conc(NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2)*CSTRQ(I,NY,NX)))
-      N2O_irrig_conc(NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
+      N2O_irrig_conc(NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRQ(I,NY,NX)))
 
     ENDDO
