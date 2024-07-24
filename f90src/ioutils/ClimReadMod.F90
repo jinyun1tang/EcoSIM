@@ -706,16 +706,71 @@ implicit none
   type(Var_desc_t) :: vardesc
   logical :: readvar
   real(r8), allocatable :: fdatam(:,:,:)
+  real(r8), allocatable :: fdatam1(:,:)
   integer , allocatable :: idatav(:)
   real(r8), allocatable ::fdatav(:)
   integer :: year,J,II,JJ,I,irec
 
   IWTHR=get_forc_step_type(yeari)
+  LYR=0
 
   if(IWTHR==1)then
+   !open file
+    call ncd_pio_openfile(clm_nfid, clm_day_file_in, ncd_nowrite)
+
+    nyears=get_dim_len(clm_nfid, 'year')
+
+    do irec=1,nyears
+      call ncd_getvar(clm_nfid,'year',irec,year)
+      if(year==yeari)exit
+    enddo
+    ngrid=get_dim_len(clm_nfid,'ngrid')
+
+    allocate(idatav(ngrid))
+    allocate(fdatav(ngrid))
+    allocate(fdatam1(ngrid,366))
+    I=365
+    if(isleap(yeari))I=366
+    !there is only grid
+    call ncd_getvar(clm_nfid,'TMPX',irec,fdatam1); call reshape1(TMPX,fdatam1)
+    call ncd_getvar(clm_nfid,'TMPN',irec,fdatam1); call reshape1(TMPN,fdatam1)
+    call ncd_getvar(clm_nfid,'WIND',irec,fdatam1); call reshape1(WIND,fdatam1)    
+    call ncd_getvar(clm_nfid,'RAIN',irec,fdatam1); call reshape1(RAIN,fdatam1)
+    call ncd_getvar(clm_nfid,'SRAD',irec,fdatam1); call reshape1(SRAD,fdatam1)
+    call ncd_getvar(clm_nfid,'DWPT',irec,fdatam1); DWPT(1,:)=fdatam1(1,:);DWPT(2,:)=DWPT(1,:)
+
+    call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
+    call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
+    call ncd_getvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CN4RIG',irec,fdatav); atmf%CN4RIG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CNORIG',irec,fdatav); atmf%CNORIG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CPORG',irec,fdatav); atmf%CPORG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CALRG',irec,fdatav); atmf%CALRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CFERG',irec,fdatav); atmf%CFERG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CCARG',irec,fdatav); atmf%CCARG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CMGRG',irec,fdatav); atmf%CMGRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CNARG',irec,fdatav); atmf%CNARG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
+    call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
+    call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
+
+    !fill in day 366
+    if (.not. isLeap(yeari))then
+      I=365
+      TMPX(I+1)=TMPX(I)
+      TMPN(I+1)=TMPN(I)
+      WIND(I+1)=WIND(I)
+      RAIN(I+1)=RAIN(I)
+      SRAD(I+1)=SRAD(I)
+      DWPT(:,I+1)=DWPT(:,I)
+    endif
+
+    deallocate(fdatam1)
+    deallocate(fdatav)
+    deallocate(idatav)
 
   elseif(IWTHR==2)then
-    LYR=0
 
     call ncd_pio_openfile(clm_nfid, clm_hour_file_in, ncd_nowrite)
 
@@ -734,7 +789,7 @@ implicit none
     allocate(fdatav(ngrid))
     I=365
     if(isleap(yeari))I=366
-    print*,size(fdatam,1),size(fdatam,2),size(fdatam,3),irec
+
     call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMP_hrly,fdatam)
     call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
     call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
@@ -812,6 +867,19 @@ implicit none
     ENDDO
   ENDDO
   end subroutine reshape2
+!----------------------------------------------------------------------
+
+  subroutine reshape1(arr1d,arr2d)
+  implicit none
+  real(r8), dimension(:), intent(OUT) :: arr1d
+  real(r8), dimension(:,:),intent(IN) :: arr2d
+
+  integer :: ii
+  DO ii=1,366
+    arr1d(ii)=arr2d(1,ii)
+  ENDDO
+  end subroutine reshape1
+
 
 !----------------------------------------------------------------------
 
