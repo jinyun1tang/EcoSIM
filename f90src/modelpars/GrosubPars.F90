@@ -149,7 +149,7 @@ module GrosubPars
   real(r8) :: HourReq2InitSStor4LeafOut(0:1)
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
-  character(len=6), allocatable :: pftss(:)
+  character(len=10), allocatable :: pftss(:)
   character(len=40),allocatable :: pft_long(:)
   character(len=4), allocatable :: pft_short(:)
   character(len=2), allocatable :: koppen_clim_no(:)
@@ -335,17 +335,19 @@ module GrosubPars
 !!DESCRIPTION
 ! return the id of pft to be read
   implicit none
-  character(len=6), intent(in) :: pft_name
+  character(len=*), intent(in) :: pft_name
   character(len=40),intent(out):: pft_lname
   character(len=64),intent(out):: koppen_climl
   character(len=3), intent(out):: koppen_clims
-  integer :: loc,loc1
+  integer :: loc,loc1,len
 
+  len=len_trim(pft_name)
   loc=1
   DO
-    if(pftss(loc)==pft_name)exit
+    if(pftss(loc)(1:len)==pft_name(1:len))exit
     loc=loc+1
   enddo
+
   loc1=1
   do 
     if(pft_name(1:4)==pft_short(loc1))exit

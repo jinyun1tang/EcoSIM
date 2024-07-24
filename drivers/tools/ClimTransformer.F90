@@ -259,12 +259,13 @@ contains
     ENDDO
   ENDDO
   end subroutine reshape1
+!----------------------------------------------------------------------
 
   subroutine reshape2(arr1d,arr2d)
   implicit none
   real(r8), dimension(:), intent(in) :: arr1d
   real(r8), dimension(:,:),intent(out) :: arr2d
-
+  integer :: ii
   DO ii=1,366
     arr2d(1,ii)=arr1d(ii)
   ENDDO
