@@ -145,7 +145,7 @@
 !     KoppenClimZone=Koppen climate zone
 
       IF(ITYPE.EQ.1)THEN
-        IF(KoppenClimZone(NY,NX).GE.-1)THEN
+        IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
           IF(DayLensCurr_col(NY,NX).GT.ZERO)THEN
             RMAX=SRAD(I)/(DayLensCurr_col(NY,NX)*0.658_r8)
           ELSE

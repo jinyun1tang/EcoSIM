@@ -1118,10 +1118,14 @@ implicit none
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
                 flag_pft_active(NZ,NY,NX)=.true.
-                IF(KoppenClimZone(NY,NX).GT.0)THEN
-                  WRITE(CLIMATE,'(I2)')KoppenClimZone(NY,NX)
+                !modify pft name 
+                IF(KoppenClimZone_col(NY,NX).GT.0)THEN
+                  WRITE(CLIMATE,'(I2)')KoppenClimZone_col(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
                   DATAX_pft(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
+                !consider cases when koppen climate zone is zero  
+                elseif(KoppenClimZone_col(NY,NX)==0)then
+                  DATAX_pft(NZ)=pft_gtype(NZ)
                 ENDIF
               ENDDO D4965
               if(first_pft)then
@@ -1133,26 +1137,19 @@ implicit none
           ENDDO D4975
         ENDIF
 
-!        IF(.not. is_restart())THEN
-    ! there was no chechk point file read in, so update pft info
-    ! from input file
-          D8995: DO NX=NH1,NH2
-            D8990: DO NY=NV1,NV2
-              NP(NY,NX)=NS
-    !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
-              D100: DO NZ=1,NP(NY,NX)
-                DATAP(NZ,NY,NX)=DATAX_pft(NZ)
-              ENDDO D100
+        D8995: DO NX=NH1,NH2
+          D8990: DO NY=NV1,NV2
+            NP(NY,NX)=NS
+            !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
+            D100: DO NZ=1,NP(NY,NX)
+              DATAP(NZ,NY,NX)=DATAX_pft(NZ)
+            ENDDO D100
 
-              D101: DO NZ=NP(NY,NX)+1,JP
-                DATAP(NZ,NY,NX)='NO'
-              ENDDO D101
-            ENDDO D8990
-          ENDDO D8995
-!        ELSE
-!read from chck point file, i.e. datap and datam
-!          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
-!        ENDIF
+            D101: DO NZ=NP(NY,NX)+1,JP
+              DATAP(NZ,NY,NX)='NO'
+            ENDDO D101
+          ENDDO D8990
+        ENDDO D8995
       ENDDO
     ENDIF 
     call ncd_pio_closefile(pftinfo_nfid)

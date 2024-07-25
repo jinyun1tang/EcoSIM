@@ -352,9 +352,16 @@ module GrosubPars
   do 
     if(pft_name(1:4)==pft_short(loc1))exit
     loc1=loc1+1
+    if(loc1 > size(pft_short))then
+      exit      
+    endif
   enddo
-  pft_lname=pft_long(loc1)
-
+  if(loc1 <=  size(pft_short))then
+    pft_lname=pft_long(loc1)
+  else
+    pft_lname=pft_name
+  endif
+  
   loc1=1
   do
     if(koppen_clim_no(loc1)==pft_name(5:6))exit

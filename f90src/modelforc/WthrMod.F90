@@ -134,7 +134,7 @@ module WthrMod
       !     SolarNoonHour_col=time of solar noon
       !     DayLensCurr_col=current daylength
 !
-      IF(KoppenClimZone(NY,NX).NE.-2)THEN
+      IF(KoppenClimZone_col(NY,NX).NE.-2)THEN
 !       not phytotron
         IF(DayLensCurr_col(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(SolarNoonHour_col(NY,NX) &
@@ -280,7 +280,7 @@ module WthrMod
 !     RADX=solar constant at horizontal surface
 !     RADN=SW radiation at horizontal surface, MJ/
 !     IETYP: koppen climate zone
-      IF(KoppenClimZone(NY,NX).GE.-1)THEN
+      IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
         AZI=SIN(ALAT(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
         DEC=COS(ALAT(NY,NX)*RadianPerDegree)*COS(DECLIN*RadianPerDegree)
         !check eq.(11.1) in Campbell and Norman, 1998, p168.
