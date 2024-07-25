@@ -642,7 +642,7 @@ implicit none
   plt_site%DayLenthCurrent=DayLensCurr_col(NY,NX)
   plt_ew%SnowDepth=SnowDepth_col(NY,NX)
   plt_site%DayLenthMax=DayLenthMax(NY,NX)
-  plt_site%KoppenClimZone=KoppenClimZone(NY,NX)
+  plt_site%KoppenClimZone=KoppenClimZone_col(NY,NX)
   plt_site%iYearCurrent=iYearCurrent
   plt_site%NL=NL(NY,NX)
   plt_site%NP0=NP0(NY,NX)
@@ -1443,7 +1443,7 @@ implicit none
 
   integer :: L,N,M,NN,NZ,K,NB
 !  Integers
-  plt_site%KoppenClimZone=KoppenClimZone(NY,NX)
+  plt_site%KoppenClimZone=KoppenClimZone_col(NY,NX)
   plt_site%NP=NP(NY,NX)
   plt_site%NU=NU(NY,NX)
   plt_morph%StemArea_col=StemArea_col(NY,NX)

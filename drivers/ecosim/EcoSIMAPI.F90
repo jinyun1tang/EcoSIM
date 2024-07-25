@@ -195,13 +195,13 @@ contains
   bgc_fname='bbforc.nc'
   do_instequil=.false.
 
-  clm_factor_in=''
+  clm_factor_in='NO'
   pft_file_in=''
   grid_file_in=''
-  pft_mgmt_in=''
+  pft_mgmt_in='NO'
   clm_hour_file_in=''
   clm_day_file_in=''
-  soil_mgmt_in=''
+  soil_mgmt_in='NO'
   atm_ghg_in=''
   aco2_ppm  = 280._r8
   ach4_ppm  = 1.144_r8
@@ -408,6 +408,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       if(rstwr)then
         call restFile(flag='write')
       endif
+      if(lverb)write(*,*)'end?',nlend
       if(nlend)exit
     END DO
 

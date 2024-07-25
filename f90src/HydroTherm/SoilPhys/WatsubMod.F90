@@ -895,7 +895,7 @@ module WatsubMod
         !     TCNDG=thermal conductivity below lower boundary
         !     SoilHeatSrcDepth,CDPTH=depth of thermal sink/source, lower boundary
         !     KoppenClimZone=Koppen climate zone
-                IF(N.EQ.ivertdir .AND. KoppenClimZone(N2,N1).NE.-2)THEN
+                IF(N.EQ.ivertdir .AND. KoppenClimZone_col(N2,N1).NE.-2)THEN
                   HeatFlow2Soili(N,M6,M5,M4)=HeatFlow2Soili(N,M6,M5,M4)+(TKSoi1(N3,N2,N1)-TKSD(N2,N1))* &
                     TCNDG/(SoilHeatSrcDepth(N2,N1)-CumDepth2LayerBottom(N3,N2,N1)) &
                     *AREA(N,N3,N2,N1)*dts_HeatWatTP

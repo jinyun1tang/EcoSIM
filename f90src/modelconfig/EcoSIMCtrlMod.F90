@@ -3,6 +3,7 @@ module EcoSIMCtrlMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only : ecosim_time_type
   use fileUtil, only :   datestrlen  
+  use abortutils, only : endrun
 implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
@@ -103,6 +104,9 @@ implicit none
     id=nn1*3+1
     get_sim_len=get_sim_len+(forc_periods(id+1)-forc_periods(id)+1)*forc_periods(id+2)
   enddo
+  if(get_sim_len<0)then
+  call endrun('Negative simulation length, check forc_periods set up in '//mod_filename,__LINE__)
+  endif
   end function get_sim_len  
 
 end module EcoSIMCtrlMod
