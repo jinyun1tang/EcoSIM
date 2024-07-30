@@ -90,15 +90,15 @@ implicit none
 !
 ! exclude banded nutrients
       DO NTX=idx_CEC,idx_cation_soil_end
-        FSNX=FSINK*trcx_solml(NTX,L,NY,NX)
-        trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)-FSNX
-        trcx_solml(NTX,LL,NY,NX)=trcx_solml(NTX,LL,NY,NX)+FSNX
+        FSNX=FSINK*trcx_solml_vr(NTX,L,NY,NX)
+        trcx_solml_vr(NTX,L,NY,NX)=trcx_solml_vr(NTX,L,NY,NX)-FSNX
+        trcx_solml_vr(NTX,LL,NY,NX)=trcx_solml_vr(NTX,LL,NY,NX)+FSNX
       ENDDO
 
       DO NTX=idx_AEC,idx_anion_soil_end
-        FSNX=FSINK*trcx_solml(NTX,L,NY,NX)
-        trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)-FSNX
-        trcx_solml(NTX,LL,NY,NX)=trcx_solml(NTX,LL,NY,NX)+FSNX
+        FSNX=FSINK*trcx_solml_vr(NTX,L,NY,NX)
+        trcx_solml_vr(NTX,L,NY,NX)=trcx_solml_vr(NTX,L,NY,NX)-FSNX
+        trcx_solml_vr(NTX,LL,NY,NX)=trcx_solml_vr(NTX,LL,NY,NX)+FSNX
       ENDDO
 
 !
@@ -112,9 +112,9 @@ implicit none
 !
 ! only for non-banded precipitates
       DO NTP=idsp_beg,idsp_beg_band-1
-        FPX=FSINK*trcp_salml(NTP,L,NY,NX)
-        trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)-FPX
-        trcp_salml(NTP,LL,NY,NX)=trcp_salml(NTP,LL,NY,NX)+FPX
+        FPX=FSINK*trcp_saltpml_vr(NTP,L,NY,NX)
+        trcp_saltpml_vr(NTP,L,NY,NX)=trcp_saltpml_vr(NTP,L,NY,NX)-FPX
+        trcp_saltpml_vr(NTP,LL,NY,NX)=trcp_saltpml_vr(NTP,LL,NY,NX)+FPX
       ENDDO
 
 !     MICROBIAL C,N,P

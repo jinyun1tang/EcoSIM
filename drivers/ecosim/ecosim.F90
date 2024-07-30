@@ -17,6 +17,7 @@ PROGRAM main
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
   use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
+  use ClimReadMod       , only : get_clm_years
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
@@ -110,7 +111,9 @@ PROGRAM main
   endif
 
   call hist_htapes_build()
-
+  
+  !prepare climate forcing
+  call get_clm_years()
   IGO=0
 
 !  print*,frectyp%ymdhs0,yeari

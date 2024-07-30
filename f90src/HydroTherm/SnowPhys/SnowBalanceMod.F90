@@ -1,8 +1,9 @@
 module SnowBalanceMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use data_const_mod, only : spval => DAT_CONST_SPVAL
-  use abortutils, only : endrun
-  use minimathmod, only : AZMAX1,isclose,AZMIN1  
+  use data_kind_mod,  only: r8 => DAT_KIND_R8
+  use data_const_mod, only: spval => DAT_CONST_SPVAL
+  use abortutils,     only: endrun
+  use EcoSIMCtrlMod,  only: lverb
+  use minimathmod,    only: AZMAX1, isclose, AZMIN1
   USE SnowDataType
   use GridConsts
   use GridDataType
@@ -44,7 +45,7 @@ implicit none
       !     CALCULATE SNOWPACK TEMPERATURE FROM ITS CHANGE
       !     IN HEAT STORAGE
       !
-
+  if(lverb)write(*,*)'SnowMassUpdate'
   VOLSWI=0.0_r8
   !update snow layer from top to bottom
   
@@ -460,7 +461,7 @@ implicit none
   !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
   !
   DO NTG=idg_beg,idg_end-1
-    trcg_solsml(NTG,L,NY,NX)=trcg_solsml(NTG,L,NY,NX)+trcg_TBLS(NTG,L,NY,NX)
+    trcg_solsml_snvr(NTG,L,NY,NX)=trcg_solsml_snvr(NTG,L,NY,NX)+trcg_TBLS(NTG,L,NY,NX)
   ENDDO
 
   DO NTN =ids_nut_beg,ids_nuts_end
@@ -508,6 +509,7 @@ implicit none
 ! from surface to bottom, and modify the bottom layer
 ! there is snow
 
+  if(lverb)write(*,*)'SnowpackLayering'
 !  if(I>=138.and.I<=139)print*,I+J/24.,'bflay',TKSnow_snvr(1:JS,NY,NX)
   IF(VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     D325: DO L=1,JS-1
@@ -596,7 +598,7 @@ implicit none
 !          chemicals
           !gas
           DO NTG=idg_beg,idg_end-1
-            trcg_solsml(NTG,L1,NY,NX)=trcg_solsml(NTG,L1,NY,NX)+FX*trcg_solsml(NTG,L0,NY,NX)
+            trcg_solsml_snvr(NTG,L1,NY,NX)=trcg_solsml_snvr(NTG,L1,NY,NX)+FX*trcg_solsml_snvr(NTG,L0,NY,NX)
           ENDDO
 
           !nutrients
@@ -627,7 +629,7 @@ implicit none
           TCSnow_snvr(L0,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L0,NY,NX))
 !     chemicals
           DO NTG=idg_beg,idg_end-1
-            trcg_solsml(NTG,L0,NY,NX)=FY*trcg_solsml(NTG,L0,NY,NX)
+            trcg_solsml_snvr(NTG,L0,NY,NX)=FY*trcg_solsml_snvr(NTG,L0,NY,NX)
           ENDDO
           DO NTU=ids_nut_beg,ids_nuts_end
             trcn_solsml(NTU,L0,NY,NX)=FY*trcn_solsml(NTU,L0,NY,NX)
@@ -699,7 +701,7 @@ implicit none
   TIceBySnowRedist(NY,NX)=0.0_r8
   THeatBySnowRedist_col(NY,NX)=0.0_r8
 
-  trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
+  trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
   trcg_QSS(idg_beg:idg_end-1,NY,NX)=0.0_r8  
   trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
   trcg_TFloXSurRunoff(idg_beg:idg_end-1,NY,NX)=0.0_r8

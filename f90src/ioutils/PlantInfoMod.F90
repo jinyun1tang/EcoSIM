@@ -94,7 +94,7 @@ implicit none
   ENDDO D9995
 
   if(disp_planttrait)call relavu(nu_plt)
-  print*,'yearc',yearc,yeari
+
   call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
   RETURN
   END SUBROUTINE readq
@@ -256,7 +256,6 @@ implicit none
               IF(IMO.EQ.1)then
                 IDY=IDX
               else
-                print*,tstr,IMO
                 IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
               endif
 
@@ -443,7 +442,7 @@ implicit none
   character(len=3) :: koppen_clims
   integer :: loc,N
 
-  loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
+  loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
@@ -740,18 +739,19 @@ implicit none
 
   select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
   case (ithermozone_arcboreal)
-    strval='Arctic, boreal'
+    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_cooltempr)
-    strval='Cool temperate'
+    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_warmtempr)
-    strval='Warm temperate'
+    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_subtropic)
-    strval='Subtropical'
+    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_tropical)
-    strval='Tropical'
+    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone(NZ,NY,NX)
   case default
-    strval='Not defined'
+    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone(NZ,NY,NX)
   end select
+  
   call writefixsl(nu_plt,'Thermal adaptation zone',strval,40)
   end subroutine pft_display
 

@@ -171,7 +171,7 @@ contains
 
   if(lverb)write(*,*)'finish soilp set'
   VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-    +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+    +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
 
   IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
@@ -270,7 +270,7 @@ contains
 !     CNDH=macropore hydraulic conductivity
 !
   MacPRadius(L,NY,NX)=0.5E-03_r8
-  MacPNumLayer(L,NY,NX)=INT(VLMacP(L,NY,NX)/(PICON*MacPRadius(L,NY,NX)**2._r8*VGeomLayert0(L,NY,NX)))
+  MacPNumLayer(L,NY,NX)=INT(VLMacP_vr(L,NY,NX)/(PICON*MacPRadius(L,NY,NX)**2._r8*VGeomLayert0(L,NY,NX)))
 
   IF(MacPNumLayer(L,NY,NX).GT.0.0_r8)THEN
     PathLenMacP(L,NY,NX)=1.0_r8/(SQRT(PICON*MacPNumLayer(L,NY,NX)))
@@ -357,9 +357,9 @@ contains
   !in a cold run, set it
     VLWatMicP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-    VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
+    VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
     VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
+    VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
     ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)

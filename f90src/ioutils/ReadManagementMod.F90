@@ -318,7 +318,12 @@ implicit none
       ,ROWX,IR0,IR1,IR2
 
     LPY=0
-    read(fertf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
+    IDY1=INT(DY/1.0E+06_r8)
+    !return for bad fertilization data
+    if(IDY1==0)return
+    IDY2=INT(DY/1.0E+04_r8-IDY1*1.0E+02_r8)
+    IDY3=INT(DY-(IDY1*1.0E+06_r8+IDY2*1.0E+04_r8))       
+     
     IF(LVERB)then
       print*,fertf(kk)
       PRINT*,IDY1,IDY2,IDY3,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &

@@ -33,10 +33,12 @@ module NutUptakeMod
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
 
+!  if(I>176)print*,'canopynh3'
   call CanopyNH3Flux(NZ,FDMP)
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
+!  if(I>176)print*,'rootmyco'
   call RootMycoO2NutrientUptake(I,J,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
@@ -147,6 +149,7 @@ module NutUptakeMod
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
+!        if(I>176)print*,'getuptkcp',L
         call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
@@ -160,14 +163,14 @@ module NutUptakeMod
 !     FOXYX=fraction of total O2 demand from previous hour
 !
         RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
-
+!        if(I>176)print*,'rootsoigas'
         call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
           RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
         PopPlantO2Demand=PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
         PopPlantO2Uptake=PopPlantO2Uptake+PopPlantO2Uptake_vr
-
-        call RootExudates(N,L,NZ)
+!        if(I>176)print*,'rootexud'
+        call RootExudates(I,J,N,L,NZ)
 !
 !     NUTRIENT UPTAKE
 !
@@ -176,16 +179,18 @@ module NutUptakeMod
 !     FWSRT=protein concentration relative to 5%
 !     RootLenPerPlant_pvr=root,myco length per plant
 !
-        IF(RAutoRootO2Limter_pvr(N,L,NZ).GT.ZERO.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO &
-          .AND.RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+        IF(RAutoRootO2Limter_pvr(N,L,NZ).GT.ZERO .AND. FCUP.GT.ZERO .AND. FWSRT.GT.ZERO &
+          .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
-!
-          call UptakeMineralNitrogen(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
+!         
+!          if(I>176)print*,'uptakemin'
+          call UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
             RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 !
 !     FPUP=limitn to active uptake respiration from CPPOLR
-!
+!         
+!          if(I>176)print*,'uptakeppp'
           call UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
             RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
         ENDIF
@@ -346,10 +351,11 @@ module NutUptakeMod
   end subroutine UptakeMineralPhosporhus
 !------------------------------------------------------------------------
 
-  subroutine UptakeNO3(N,L,NZ,FNO3X,FNOBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,&
+  subroutine UptakeNO3(I,J,N,L,NZ,FNO3X,FNOBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,&
     FWSRT,PerPlantRootH2OUptake)
 
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
   real(r8), intent(in):: FNO3X,FNOBX,PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),RootAreaDivRadius_vr(jroots,JZ1)
@@ -362,6 +368,7 @@ module NutUptakeMod
   real(r8) :: UPMX,UPMXP
   real(r8) :: ZOSGX,ZNO3M,ZNO3X,ZNOBM,ZNOBX
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
+  logical :: ldebug
 
 ! begin_execution
   associate(                                                 &
@@ -385,6 +392,7 @@ module NutUptakeMod
     trc_solcl_vr          => plt_soilchem%trc_solcl_vr,      &
     VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr       &
   )
+  ldebug=.false.
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
 ! FROM SOIL TO ROOT
@@ -454,9 +462,11 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNO3Root_pft(N,NZ)
-
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndSoil_pvr(N,L,NZ),RootNutUptake_pvr(ids_NO3,N,L,NZ),&
-      RootNutUptake_pvr(ids_NO3B,N,L,NZ),RootCUlmNutUptake_pvr(ids_NO3,N,L,NZ))
+    !if(I>176)print*,'uptakeno3byrot',L,RootNO3DmndSoil_pvr(N,L,NZ),RootNutUptake_pvr(ids_NO3,N,L,NZ),&
+    !  RootNutUptake_pvr(ids_NO3,N,L,NZ),RootCUlmNutUptake_pvr(ids_NO3,N,L,NZ)
+    !if(I>176)ldebug=.true.  
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3,N,L,NZ),&
+      RootNutUptake_pvr(ids_NO3,N,L,NZ),RootCUlmNutUptake_pvr(ids_NO3,N,L,NZ),ldebug)
 
   ENDIF
   !
@@ -515,7 +525,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%CAvailStress=FCUP
     PlantSoluteUptakeConfig%PlantPopulation= PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM=KmNO3Root_pft(N,NZ)
-
+  !  if(I>176)print*,'uptakeno3b'
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3B,N,L,NZ),&
       RootNutUptake_pvr(ids_NO3B,N,L,NZ),RootCUlmNutUptake_pvr(ids_NO3B,N,L,NZ))
 
@@ -1019,10 +1029,11 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine UptakeMineralNitrogen(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
+  subroutine UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
     MinFracPRoot4Uptake_vr,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
+  integer , intent(in) :: I,J
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
@@ -1050,7 +1061,6 @@ module NutUptakeMod
   TFNO3X=0.0_r8
   TFNOBX=0.0_r8
 
-
   IF(RNH4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
     FNH4X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
   ELSE
@@ -1077,16 +1087,17 @@ module NutUptakeMod
   TFNO3X=TFNO3X+FNO3X
   TFNHBX=TFNHBX+FNHBX
   TFNOBX=TFNOBX+FNOBX
-
+  
   IF(FZUP.GT.ZERO2)THEN
 !
     !     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NH4,NO3
     !     FROM SOIL TO ROOT
     !
+!    if(I>176)print*,'uptakenh4'
     call UptakeNH4(N,L,NZ,FNH4X,FNHBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
       PerPlantRootH2OUptake)
-
-    call UptakeNO3(N,L,NZ,FNO3X,FNOBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
+!    if(I>176)print*,'uptakeno3'
+    call UptakeNO3(I,J,N,L,NZ,FNO3X,FNOBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
       PerPlantRootH2OUptake)
 
   ENDIF
@@ -1218,9 +1229,10 @@ module NutUptakeMod
   end subroutine GetUptakeCapcity
 !------------------------------------------------------------------------
 
-  subroutine RootExudates(N,L,NZ)
+  subroutine RootExudates(I,J,N,L,NZ)
 
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
 
@@ -1285,7 +1297,7 @@ module NutUptakeMod
     ENDIF
 
   ENDDO D195
-  
+!  if(I>176)print*,'rootexudd195',L
   !avoid excessive exudation 
   DO NE=1,NumPlantChemElms
     RootExudE=0._r8
@@ -1303,7 +1315,7 @@ module NutUptakeMod
     endif
     
   ENDDO      
-  
+!  if(I>176)print*,'exexud'
   end associate
   end subroutine RootExudates
 !------------------------------------------------------------------------

@@ -9,6 +9,8 @@ module EcoSIMAPI
   use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TranspNoSaltMod , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
+  use SoilBGCDataType , only : trc_soHml_vr
+  use TracerIDMod     , only : ids_NO2B,ids_NO2
   use EcoSIMCtrlMod  
   use WatsubMod    , only : watsub
 implicit none
@@ -39,7 +41,7 @@ contains
   call end_timer('WAT',t1)
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
-  !
+  !     
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     call start_timer(t1)
@@ -57,7 +59,6 @@ contains
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
   !
-
   if(soichem_model)then
     if(lverb)WRITE(*,334)'SOL'
     call start_timer(t1)
@@ -97,11 +98,10 @@ contains
   if(lverb)WRITE(*,334)'RED'
 
 
-  call start_timer(t1)
-
+  call start_timer(t1)    
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   call end_timer('RED',t1)
-
+  
 334   FORMAT(A8)
 
   end subroutine Run_EcoSIM_one_step

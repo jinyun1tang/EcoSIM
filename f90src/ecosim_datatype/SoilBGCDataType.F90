@@ -93,10 +93,10 @@ implicit none
   real(r8),target,allocatable ::  WaterFlowMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_3DTransp2MicP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_Transp2MicP_3D(:,:,:,:,:)
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_3DTransp2MacP(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_Transp2MacP_3D(:,:,:,:,:)
   real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
@@ -218,10 +218,10 @@ implicit none
   allocate(WaterFlowMacP_3D(3,JD,JV,JH));   WaterFlowMacP_3D=0._r8
   allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
-  allocate(trcs_3DTransp2MicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP_3D=0._r8
+  allocate(trcs_Transp2MicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_Transp2MicP_3D=0._r8
   allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,3,JD,JV,JH));Gas_3DAdvDif_Flx_vr=0._r8
-  allocate(trcs_3DTransp2MacP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MacP=0._r8
+  allocate(trcs_Transp2MacP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_Transp2MacP_3D=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
   allocate(DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));DOM_3DMacp_Transp_flx=0._r8
 

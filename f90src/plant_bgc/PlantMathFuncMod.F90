@@ -146,7 +146,7 @@ contains
 !--------------------------------------------------------------------------------
 
   subroutine SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig, PltUptake_Ol, &
-    PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl)
+    PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl,ldebug)
   !
   !DESCRIPTION
   !solve for substrate uptake rate as a function of solute concentration
@@ -164,10 +164,11 @@ contains
   real(r8), intent(out) :: PltUptake_Sl
   real(r8), intent(out) :: PltUptake_OSl  
   real(r8), intent(out) :: PltUptake_OSCl
+  logical, optional, intent(in) :: ldebug
   real(r8) :: UptakeRateMax_Ol   !oxygen limited maximum uptake rate
-  real(r8) :: X, Y, B, C, BP, CP 
+  real(r8) :: X, Y, B, C, BP, CP, delta
   real(r8) :: Uptake, Uptake_Ol
-
+  logical :: lldebug
   associate(                                                    &
   SolAdvFlx       => PlantSoluteUptakeConfig%SolAdvFlx        , &
   SolDifusFlx     => PlantSoluteUptakeConfig%SolDifusFlx      , &
@@ -180,21 +181,28 @@ contains
   SoluteKM        => PlantSoluteUptakeConfig%SoluteKM         , &
   SoluteConcMin   => PlantSoluteUptakeConfig%SoluteConcMin      &
   )
+  lldebug=.false.
+  if(present(ldebug))lldebug=ldebug
 
   UptakeRateMax_Ol=UptakeRateMax*O2Stress  
+
 
   X=(SolDifusFlx+SolAdvFlx)*SoluteConc
   Y=SolDifusFlx*SoluteConcMin
 
   !Oxygen limited but not solute or carbon limited uptake
+  ! u^2+Bu+C=0., it requires when C=0, delta=1, u=0
   B=-UptakeRateMax_Ol-SolDifusFlx*SoluteKM-X+Y
   C=(X-Y)*UptakeRateMax_Ol
-  Uptake_Ol=(-B-SQRT(B*B-4.0_r8*C))/2.0_r8
-
+  delta=AZMAX1(1._r8-4.0_r8*C/(B*B))
+  Uptake_Ol=(-1._r8+SQRT(delta))*B/2.0_r8
+  
   !Oxygen, solute and carbon unlimited solute uptake
   BP=-UptakeRateMax-SolDifusFlx*SoluteKM-X+Y
   CP=(X-Y)*UptakeRateMax
-  Uptake=(-BP-SQRT(BP*BP-4.0_r8*CP))/2.0_r8
+  delta=AZMAX1(1._r8-4.0_r8*CP/(BP*BP))
+  
+  Uptake=(-1._r8+SQRT(delta))*BP/2.0_r8
 
   !oxygen limited but solute or carbon unlimited
   PltUptake_Ol=AZMAX1(Uptake_Ol*PlantPopulation)

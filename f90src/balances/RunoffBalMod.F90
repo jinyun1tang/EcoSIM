@@ -185,11 +185,11 @@ implicit none
 !     HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through runoff
 !     HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through runoff
 !
-      CXR=XN*(trcg_2DFloXSurRunoff(idg_CO2,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_CH4,N,NN,N5,N4))
-      ZXR=XN*(trcn_2DFloXSurRunoff(ids_NH4,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_NH3,N,NN,N5,N4) &
-        +trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_NO2,N,NN,N5,N4))
-      ZGR=XN*(trcg_2DFloXSurRunoff(idg_N2O,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_N2,N,NN,N5,N4))
-      PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
+      CXR=XN*(trcg_FloXSurRunoff_2D(idg_CO2,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_CH4,N,NN,N5,N4))
+      ZXR=XN*(trcn_FloXSurRunoff_2D(ids_NH4,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_NH3,N,NN,N5,N4) &
+        +trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_NO2,N,NN,N5,N4))
+      ZGR=XN*(trcg_FloXSurRunoff_2D(idg_N2O,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_N2,N,NN,N5,N4))
+      PXR=XN*(trcn_FloXSurRunoff_2D(ids_H2PO4,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_H1PO4,N,NN,N5,N4))
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
         DO idom=idom_beg,idom_end
@@ -205,9 +205,9 @@ implicit none
       HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
       HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
       HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
-      OXR=XN*trcg_2DFloXSurRunoff(idg_O2,N,NN,N5,N4)
+      OXR=XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
-      HGR=XN*trcg_2DFloXSurRunoff(idg_H2,N,NN,N5,N4)
+      HGR=XN*trcg_FloXSurRunoff_2D(idg_H2,N,NN,N5,N4)
       H2GOU=H2GOU+HGR
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
@@ -287,7 +287,7 @@ implicit none
           ECHC=0.044_r8*AZMAX1(trc_salt_rof_bounds(idsalt_HCO3,N,NN,N5,N4)/WX)
           ECSO=0.080_r8*AZMAX1(trc_salt_rof_bounds(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
           ECCL=0.076_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Cl,N,NN,N5,N4)/WX)
-          ECNO=0.071_r8*AZMAX1(trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)/(WX*natomw))
+          ECNO=0.071_r8*AZMAX1(trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)/(WX*natomw))
           ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',iYearCurrent,I,J,N4,N5,N,NN,WX,ECNDQ
 !9991  FORMAT(A8,7I4,2E12.4)
@@ -517,29 +517,30 @@ implicit none
           MOD(idom)=MOD(idom)+XN*(DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4))
         ENDDO
       ENDDO D450
-      MXD(ielmc)=XN*(trcs_3DTransp2MicP_3D(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
-        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(idg_CH4,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
-      MXD(ielmn)=XN*(trcs_3DTransp2MicP_3D(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(idg_NH3,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_NO3,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(idg_NH3B,N,N6,N5,N4)&
-        +trcs_3DTransp2MicP_3D(ids_NO3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(ids_NO2B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NO3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_3DTransp2MicP_3D(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_N2,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_N2O,N,N6,N5,N4) &
+
+      MXD(ielmc)=XN*(trcs_Transp2MicP_3D(idg_CO2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_CO2,N,N6,N5,N4) &
+        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_CH4,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
+      MXD(ielmn)=XN*(trcs_Transp2MicP_3D(ids_NH4,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_NH3,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_NO3,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_NH4B,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_NH3B,N,N6,N5,N4)&
+        +trcs_Transp2MicP_3D(ids_NO3B,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_NO2,N,N6,N5,N4)+trcs_Transp2MicP_3D(ids_NO2B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NH4,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_NH3,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NO3,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NH4B,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_NH3B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NO3B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NO2,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_NO2B,N,N6,N5,N4))
+      ZGD=XN*(trcs_Transp2MicP_3D(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(idg_N2,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(idg_N2O,N,N6,N5,N4) &
         +Gas_3DAdvDif_Flx_vr(idg_NH3,N,N6,N5,N4))
-      MXD(ielmp)=XN*(trcs_3DTransp2MicP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(ids_H2PO4B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H2PO4B,N,N6,N5,N4)&
-        +trcs_3DTransp2MicP_3D(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_H1PO4B,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_H1PO4B,N,N6,N5,N4))
+      MXD(ielmp)=XN*(trcs_Transp2MicP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_Transp2MicP_3D(ids_H2PO4B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_H2PO4B,N,N6,N5,N4)&
+        +trcs_Transp2MicP_3D(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_H1PO4B,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_H1PO4B,N,N6,N5,N4))
 
       TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-MOD(ielmc)-MOD(idom_acetate)-MXD(ielmc)
       TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-MOD(ielmn)-MXD(ielmn)-ZGD
@@ -557,9 +558,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(trcs_3DTransp2MicP_3D(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_Transp2MicP_3D(idg_O2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(trcs_3DTransp2MicP_3D(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_Transp2MicP_3D(idg_H2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -688,13 +689,13 @@ implicit none
           ECHC=0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
           ECSO=0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
           ECCL=0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((trcs_3DTransp2MicP_3D(ids_NO3,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4))/(WX*natomw))
+          ECNO=0.071*AZMAX1((trcs_Transp2MicP_3D(ids_NO3,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_NO3,N,N6,N5,N4))/(WX*natomw))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
         ELSE
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_3DTransp2MicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_Transp2MicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfXBoundaryFlow

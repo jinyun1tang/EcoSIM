@@ -490,7 +490,7 @@ module ErosionMod
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
               DO NTX=idx_beg,idx_end
-                trcx_XER(NTX,N,2,N5,N4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                trcx_XER(NTX,N,2,N5,N4)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     PRECIPITATES
@@ -504,7 +504,7 @@ module ErosionMod
 !       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
               DO NTP=idsp_beg,idsp_end
-                trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     ORGANIC MATTER
@@ -650,7 +650,7 @@ module ErosionMod
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
                 DO NTX=idx_beg,idx_end
-                  trcx_XER(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                  trcx_XER(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
                 ENDDO
 !
 !     PRECIPITATES
@@ -664,7 +664,7 @@ module ErosionMod
 !       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
                 DO NTP=idsp_beg,idsp_end
-                  trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                  trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
                 ENDDO
 !
 !     ORGANIC MATTER
@@ -947,13 +947,13 @@ module ErosionMod
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
               DO NTX=idx_beg,idx_end
-                trcx_XER(NTX,N,NN,M5,M4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                trcx_XER(NTX,N,NN,M5,M4)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     PRECIPITATES
 !
               DO NTP=idsp_beg,idsp_end
-                trcp_ER(NTP,N,NN,M5,M4)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                trcp_ER(NTP,N,NN,M5,M4)=FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     ORGANIC MATTER

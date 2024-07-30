@@ -44,6 +44,7 @@ implicit none
   public :: ReadClim
   public :: ReadClimNC    !read climate data
   public :: GetAtmGts
+  public :: get_clm_years
   contains
 
 !------------------------------------------------------------------------------------------
@@ -712,6 +713,7 @@ implicit none
   integer :: year,J,II,JJ,I,irec
 
   IWTHR=get_forc_step_type(yeari)
+  
   LYR=0
 
   if(IWTHR==1)then

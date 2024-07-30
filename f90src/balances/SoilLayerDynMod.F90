@@ -67,6 +67,7 @@ implicit none
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
+  if(lverb)write(*,*)'RelayerSoilProfile'
   IF(.not. erosion_model)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
 
@@ -710,10 +711,10 @@ implicit none
     SAND(L1,NY,NX)=SAND(L1,NY,NX)+FX*SAND(L0,NY,NX)
     SILT(L1,NY,NX)=SILT(L1,NY,NX)+FX*SILT(L0,NY,NX)
     CLAY(L1,NY,NX)=CLAY(L1,NY,NX)+FX*CLAY(L0,NY,NX)
-    trcx_solml(idx_CEC,L1,NY,NX)=trcx_solml(idx_CEC,L1,NY,NX) &
-      +FX*trcx_solml(idx_CEC,L0,NY,NX)
-    trcx_solml(idx_AEC,L1,NY,NX)=trcx_solml(idx_AEC,L1,NY,NX) &
-      +FX*trcx_solml(idx_AEC,L0,NY,NX)
+    trcx_solml_vr(idx_CEC,L1,NY,NX)=trcx_solml_vr(idx_CEC,L1,NY,NX) &
+      +FX*trcx_solml_vr(idx_CEC,L0,NY,NX)
+    trcx_solml_vr(idx_AEC,L1,NY,NX)=trcx_solml_vr(idx_AEC,L1,NY,NX) &
+      +FX*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
 
   VLWatMicP_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)+FX*VLWatMicP_vr(L0,NY,NX)
@@ -753,8 +754,8 @@ implicit none
 
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)&
-        +FX*trcSalt_solml(NTSA,L0,NY,NX)
+      trcSalt_solml_vr(NTSA,L1,NY,NX)=trcSalt_solml_vr(NTSA,L1,NY,NX)&
+        +FX*trcSalt_solml_vr(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
 
@@ -766,20 +767,20 @@ implicit none
 
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
-        trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FX*trcSalt_solml(NTSAB,L0,NY,NX)
+        trcSalt_solml_vr(NTSAB,L1,NY,NX)=trcSalt_solml_vr(NTSAB,L1,NY,NX)+FX*trcSalt_solml_vr(NTSAB,L0,NY,NX)
       ENDDO
     ENDIF
 
     DO NTX=idx_beg+1,idx_cation_end
-      trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FX*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FX*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
 
     DO NTX=idx_AEC+1,idx_end
-      trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FX*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FX*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
 
     DO NTP=idsp_beg,idsp_end
-      trcp_salml(NTP,L1,NY,NX)=trcp_salml(NTP,L1,NY,NX)+FX*trcp_salml(NTP,L0,NY,NX)
+      trcp_saltpml_vr(NTP,L1,NY,NX)=trcp_saltpml_vr(NTP,L1,NY,NX)+FX*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
     DO NTG=idg_beg,idg_end-1
@@ -889,8 +890,8 @@ implicit none
     SAND(L0,NY,NX)=FY*SAND(L0,NY,NX)
     SILT(L0,NY,NX)=FY*SILT(L0,NY,NX)
     CLAY(L0,NY,NX)=FY*CLAY(L0,NY,NX)
-    trcx_solml(idx_CEC,L0,NY,NX)=FY*trcx_solml(idx_CEC,L0,NY,NX)
-    trcx_solml(idx_AEC,L0,NY,NX)=FY*trcx_solml(idx_AEC,L0,NY,NX)
+    trcx_solml_vr(idx_CEC,L0,NY,NX)=FY*trcx_solml_vr(idx_CEC,L0,NY,NX)
+    trcx_solml_vr(idx_AEC,L0,NY,NX)=FY*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
 !     IF(SoiBulkDensity_vr(L0,NY,NX).LE.ZERO)THEN
 !     VGeomLayer(L0,NY,NX)=FY*VGeomLayer(L0,NY,NX)
@@ -933,7 +934,7 @@ implicit none
   ENDDO
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,L0,NY,NX)=FY*trcSalt_solml(NTSA,L0,NY,NX)
+      trcSalt_solml_vr(NTSA,L0,NY,NX)=FY*trcSalt_solml_vr(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
   IF(L0.NE.0)THEN
@@ -941,19 +942,19 @@ implicit none
     trc_solml_vr(ids_H2PO4B,L0,NY,NX)=FY*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
-        trcSalt_solml(NTSAB,L0,NY,NX)=FY*trcSalt_solml(NTSAB,L0,NY,NX)
+        trcSalt_solml_vr(NTSAB,L0,NY,NX)=FY*trcSalt_solml_vr(NTSAB,L0,NY,NX)
       ENDDO
     ENDIF
 
     DO NTX=idx_beg+1,idx_cation_end
-      trcx_solml(NTX,L0,NY,NX)=FY*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L0,NY,NX)=FY*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
     DO NTX=idx_AEC+1,idx_end
-      trcx_solml(NTX,L0,NY,NX)=FY*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L0,NY,NX)=FY*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
 
     DO NTP=idsp_beg,idsp_end
-      trcp_salml(NTP,L0,NY,NX)=FY*trcp_salml(NTP,L0,NY,NX)
+      trcp_saltpml_vr(NTP,L0,NY,NX)=FY*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
     DO NTG=idg_beg,idg_end-1
@@ -1309,9 +1310,9 @@ implicit none
 !
     IF(salt_model)THEN
       DO NTSA=idsalt_beg,idsaltb_end
-        FXH=FHO*trcSalt_soHml(NTSA,L0,NY,NX)
-        trcSalt_soHml(NTSA,L1,NY,NX)=trcSalt_soHml(NTSA,L1,NY,NX)+FXH
-        trcSalt_soHml(NTSA,L0,NY,NX)=trcSalt_soHml(NTSA,L0,NY,NX)-FXH
+        FXH=FHO*trcSalt_soHml_vr(NTSA,L0,NY,NX)
+        trcSalt_soHml_vr(NTSA,L1,NY,NX)=trcSalt_soHml_vr(NTSA,L1,NY,NX)+FXH
+        trcSalt_soHml_vr(NTSA,L0,NY,NX)=trcSalt_soHml_vr(NTSA,L0,NY,NX)-FXH
       ENDDO
     ENDIF
 !
@@ -1340,9 +1341,9 @@ implicit none
 
   IF(salt_model)THEN
     DO NTSAB=idsaltb_beg,idsaltb_end
-      FXB=FWO*trcSalt_solml(NTSAB,L0,NY,NX)
-      trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FXB
-      trcSalt_solml(NTSAB,L0,NY,NX)=trcSalt_solml(NTSAB,L0,NY,NX)-FXB
+      FXB=FWO*trcSalt_solml_vr(NTSAB,L0,NY,NX)
+      trcSalt_solml_vr(NTSAB,L1,NY,NX)=trcSalt_solml_vr(NTSAB,L1,NY,NX)+FXB
+      trcSalt_solml_vr(NTSAB,L0,NY,NX)=trcSalt_solml_vr(NTSAB,L0,NY,NX)-FXB
     ENDDO
   ENDIF
 !
@@ -1354,9 +1355,9 @@ implicit none
     FCO=AMIN1(0.5_r8,FO*CEC(L1,NY,NX)/CEC(L0,NY,NX))
   ENDIF
   DO NTX=idx_beg,idx_cation_end
-    FXXC=FCO*trcx_solml(NTX,L0,NY,NX)
-    trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FXXC
-    trcx_solml(NTX,L0,NY,NX)=trcx_solml(NTX,L0,NY,NX)-FXXC
+    FXXC=FCO*trcx_solml_vr(NTX,L0,NY,NX)
+    trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FXXC
+    trcx_solml_vr(NTX,L0,NY,NX)=trcx_solml_vr(NTX,L0,NY,NX)-FXXC
   ENDDO
 !
 !     SOIL ADSORBED ANIONS IN BAND, NON-BAND
@@ -1368,17 +1369,17 @@ implicit none
   ENDIF
 
   DO NTX=idx_cation_end+1,idx_end
-    FXXA=FAO*trcx_solml(NTX,L0,NY,NX)
-    trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FXXA
-    trcx_solml(NTX,L0,NY,NX)=trcx_solml(NTX,L0,NY,NX)-FXXA
+    FXXA=FAO*trcx_solml_vr(NTX,L0,NY,NX)
+    trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FXXA
+    trcx_solml_vr(NTX,L0,NY,NX)=trcx_solml_vr(NTX,L0,NY,NX)-FXXA
   ENDDo
 !
 !     SOIL PRECIPITATES IN BAND, NON-BAND
 !
   DO NTP=idsp_beg,idsp_end
-    FXP=AMIN1(FX*trcp_salml(NTP,L,NY,NX),trcp_salml(NTP,L0,NY,NX))
-    trcp_salml(NTP,L1,NY,NX)=trcp_salml(NTP,L1,NY,NX)+FXP
-    trcp_salml(NTP,L0,NY,NX)=trcp_salml(NTP,L0,NY,NX)-FXP
+    FXP=AMIN1(FX*trcp_saltpml_vr(NTP,L,NY,NX),trcp_saltpml_vr(NTP,L0,NY,NX))
+    trcp_saltpml_vr(NTP,L1,NY,NX)=trcp_saltpml_vr(NTP,L1,NY,NX)+FXP
+    trcp_saltpml_vr(NTP,L0,NY,NX)=trcp_saltpml_vr(NTP,L0,NY,NX)-FXP
   ENDDO
 
   end subroutine MoveBandSolute
@@ -1454,9 +1455,9 @@ implicit none
 !
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      FXZ=FWO*trcSalt_solml(NTSA,L0,NY,NX)
-      trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)+FXZ
-      trcSalt_solml(NTSA,L0,NY,NX)=trcSalt_solml(NTSA,L0,NY,NX)-FXZ
+      FXZ=FWO*trcSalt_solml_vr(NTSA,L0,NY,NX)
+      trcSalt_solml_vr(NTSA,L1,NY,NX)=trcSalt_solml_vr(NTSA,L1,NY,NX)+FXZ
+      trcSalt_solml_vr(NTSA,L0,NY,NX)=trcSalt_solml_vr(NTSA,L0,NY,NX)-FXZ
     ENDDO
   ENDIF
   end subroutine MoveFertSalt
@@ -1600,9 +1601,9 @@ implicit none
     FXVOLIH=FHO*VLiceMacP_col(L0,NY,NX)
     VLiceMacP_col(L1,NY,NX)=VLiceMacP_col(L1,NY,NX)+FXVOLIH
     VLiceMacP_col(L0,NY,NX)=VLiceMacP_col(L0,NY,NX)-FXVOLIH
-    FXVOLAH=FHO*VLMacP(L0,NY,NX)
-    VLMacP(L1,NY,NX)=VLMacP(L1,NY,NX)+FXVOLAH
-    VLMacP(L0,NY,NX)=VLMacP(L0,NY,NX)-FXVOLAH
+    FXVOLAH=FHO*VLMacP_vr(L0,NY,NX)
+    VLMacP_vr(L1,NY,NX)=VLMacP_vr(L1,NY,NX)+FXVOLAH
+    VLMacP_vr(L0,NY,NX)=VLMacP_vr(L0,NY,NX)-FXVOLAH
   ENDIF
   end subroutine MoveFertMinerals
 

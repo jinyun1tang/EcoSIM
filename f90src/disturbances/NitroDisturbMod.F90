@@ -316,12 +316,12 @@ module NitroDisturbMod
           do ids=ids_nut_beg,ids_nuts_end
             trc_solml_vr(ids,L,NY,NX)=DCORPC1*trc_solml_vr(ids,L,NY,NX)
           enddo
-          trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
-          trcp_salml(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
-          trcp_salml(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
-          trcp_salml(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
-          trcp_salml(idsp_HA,L,NY,NX)       = DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
-          trcp_salml(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
+          trcx_solml_vr(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml_vr(idx_NH4,L,NY,NX)
+          trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)
+          trcp_saltpml_vr(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_FePO4,L,NY,NX)
+          trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)
+          trcp_saltpml_vr(idsp_HA,L,NY,NX)       = DCORPC1*trcp_saltpml_vr(idsp_HA,L,NY,NX)
+          trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)

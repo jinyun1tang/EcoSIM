@@ -302,7 +302,7 @@ module nitrosMod
     DO  M=1,jsken
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
-        if(ORGM(NE)<0._r8)then
+        if(ORGM(NE)<-1.e-6_r8)then
         print*,'orgm1',ORGM,SolidOM_vr(:,M,K,L,NY,NX)
         stop
         endif

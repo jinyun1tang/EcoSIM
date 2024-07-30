@@ -235,7 +235,7 @@ module WatsubMod
         ENDIF
 
         !FVOLAH accounts for clay swelling effect due to change in micropore water, but it is set to zero
-        VLMacP1(L,NY,NX)=AZMAX1(VLMacP(L,NY,NX)-FVOLAH*CCLAY(L,NY,NX) &
+        VLMacP1(L,NY,NX)=AZMAX1(VLMacP_vr(L,NY,NX)-FVOLAH*CCLAY(L,NY,NX) &
           *(safe_adb(VLWatMicP1(L,NY,NX),VLSoilMicP(L,NY,NX))-WiltPoint(L,NY,NX))*VGeomLayer(L,NY,NX))
 
         IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -285,8 +285,8 @@ module WatsubMod
     !   AREAU,AREAD=fractions of layer below natural,artifl water table
     !
         IF(VLMacP1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP(L,NY,NX)
-          HydroCondMacP1(L,NY,NX)=HydroCondMacP(L,NY,NX)*(VLMacP1(L,NY,NX)/VLMacP(L,NY,NX))**2._r8
+          SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX)
+          HydroCondMacP1(L,NY,NX)=HydroCondMacP(L,NY,NX)*(VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX))**2._r8
         ELSE
           SoilFracAsMacP1(L,NY,NX)=0.0_r8
           HydroCondMacP1(L,NY,NX)=0.0_r8
@@ -299,14 +299,14 @@ module WatsubMod
         endif
         !LyrIrrig=layer number where irrigation is applied
         IF(L.EQ.LyrIrrig)THEN
-          FWatIrrigate2MicP(L,NY,NX)=IrrigSubsurf_col(NY,NX)
+          FWatIrrigate2MicP_vr(L,NY,NX)=IrrigSubsurf_col(NY,NX)
           HeatIrrigation(L,NY,NX)=cpw*TairK_col(NY,NX)*IrrigSubsurf_col(NY,NX)
-          FWatIrrigate2MicP1(L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*dts_HeatWatTP
+          FWatIrrigate2MicP1_vr(L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*dts_HeatWatTP
           HeatIrrigation1(L,NY,NX)=HeatIrrigation(L,NY,NX)*dts_HeatWatTP
         ELSE
-          FWatIrrigate2MicP(L,NY,NX)=0.0_r8
+          FWatIrrigate2MicP_vr(L,NY,NX)=0.0_r8
           HeatIrrigation(L,NY,NX)=0.0_r8
-          FWatIrrigate2MicP1(L,NY,NX)=0.0_r8
+          FWatIrrigate2MicP1_vr(L,NY,NX)=0.0_r8
           HeatIrrigation1(L,NY,NX)=0.0_r8
         ENDIF
         IF(CumDepth2LayerBottom(L,NY,NX).GE.ExtWaterTable(NY,NX))THEN
@@ -981,7 +981,7 @@ module WatsubMod
           FINHX=TwoPiCON*HydroCond3D(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
             *(PSISE(N3,N2,N1)-PSISoilMatricPtmp_vr(N3,N2,N1)) &
             /LOG(PathLenMacP(N3,N2,N1)/MacPRadius(N3,N2,N1))*dts_HeatWatTP
-          VLWatMicP1X=VLWatMicP1(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatIrrigate2MicP1(N3,N2,N1)
+          VLWatMicP1X=VLWatMicP1(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)
           VOLP1X=AZMAX1(VLMicP1(N3,N2,N1)-VLWatMicP1X-VLiceMicP1(N3,N2,N1))
           VLWatMacP1X=VLWatMacP1_vr(N3,N2,N1)+TConvWaterFlowMacP_3D_vr(N3,N2,N1)
           VOLPH1X=AZMAX1(VLMacP1(N3,N2,N1)-VLWatMacP1X-VLiceMacP1(N3,N2,N1))
@@ -1058,19 +1058,19 @@ module WatsubMod
         IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VLWMicPre=VLWatMicP1(L,NY,NX)
           VLWatMicP1(L,NY,NX)=VLWatMicP1(L,NY,NX)+TWatCharge2MicP(L,NY,NX)+FWatExMacP2MicPi(L,NY,NX) &
-            +TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1(L,NY,NX)
+            +TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)
           
           if(abs(VLWatMicP1(L,NY,NX))>1.e20_r8)then
             write(*,*)'VLWatMicP1(L,NY,NX)=',VLWatMicP1(L,NY,NX),L
             write(*,*)'TFLWL=',TWatCharge2MicP(L,NY,NX)
             write(*,*)'FWatExMacP2MicPi=',FWatExMacP2MicPi(L,NY,NX)
-            write(*,*)'TMLiceThawMicP=',TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1(L,NY,NX)
+            write(*,*)'TMLiceThawMicP=',TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)
             write(*,*)'at line',__LINE__
             call endrun(trim(mod_filename)//'at line',__LINE__)
           endif
 
           VLWatMicPX1(L,NY,NX)=VLWatMicPX1(L,NY,NX)+TWatXChange2WatTableX(L,NY,NX)+FWatExMacP2MicPi(L,NY,NX) &
-             +TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1(L,NY,NX)
+             +TMLiceThawMicP(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)
           VLWatMicPX1(L,NY,NX)=AMIN1(VLWatMicP1(L,NY,NX),VLWatMicPX1(L,NY,NX))
           VLiceMicP1(L,NY,NX)=VLiceMicP1(L,NY,NX)-TMLiceThawMicP(L,NY,NX)/DENSICE
 
@@ -1084,7 +1084,7 @@ module WatsubMod
             VLairMicP1_vr(L,NY,NX)=AZMAX1(VLairMicP(L,NY,NX))
             VLairMacP(L,NY,NX)=VLMacP1(L,NY,NX)-VLWatMacP1_vr(L,NY,NX)-VLiceMacP1(L,NY,NX)
             VLairMacP1(L,NY,NX)=AZMAX1(VLairMacP(L,NY,NX))
-            VLMacP1(L,NY,NX)=AZMAX1(VLMacP(L,NY,NX)-FVOLAH*CCLAY(L,NY,NX) &
+            VLMacP1(L,NY,NX)=AZMAX1(VLMacP_vr(L,NY,NX)-FVOLAH*CCLAY(L,NY,NX) &
               *(safe_adb(VLWatMicP1(L,NY,NX),VLSoilMicP(L,NY,NX))-WiltPoint(L,NY,NX))*VGeomLayer(L,NY,NX))
           ELSE
             VLairMicP(L,NY,NX)=0.0_r8
@@ -1114,8 +1114,8 @@ module WatsubMod
             FracSoilAsAirt(L,NY,NX)=0.0_r8
           ENDIF
           IF(VLMacP1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP(L,NY,NX)
-            HydroCondMacP1(L,NY,NX)=HydroCondMacP(L,NY,NX)*(VLMacP1(L,NY,NX)/VLMacP(L,NY,NX))**2
+            SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX)
+            HydroCondMacP1(L,NY,NX)=HydroCondMacP(L,NY,NX)*(VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX))**2
           ELSE
             SoilFracAsMacP1(L,NY,NX)=0.0_r8
             HydroCondMacP1(L,NY,NX)=0.0_r8
@@ -1129,7 +1129,7 @@ module WatsubMod
             write(*,*)'VLWatMicP1(L,NY,NX)=',VLWMicPre,VLWatMicP1(L,NY,NX),L,VLairMicP(L,NY,NX),&
               VLiceMicP1(L,NY,NX)
             write(*,*)TWatCharge2MicP(L,NY,NX),FWatExMacP2MicPi(L,NY,NX), &
-              TMLiceThawMicP(L,NY,NX),FWatIrrigate2MicP1(L,NY,NX)
+              TMLiceThawMicP(L,NY,NX),FWatIrrigate2MicP1_vr(L,NY,NX)
             write(*,*)'M, L=',M,L,NY,NX,NUM(NY,NX),VGeomLayer(L,NY,NX),ZEROS2(NY,NX),VLWatMicPX1(L,NY,NX)
             write(*,*)'SoiBulkDensity_vr(L,NY,NX)=',SoiBulkDensity_vr(L,NY,NX),TKS_vr(L,NY,NX),ZEROS(NY,NX)
             write(*,*)'VLHeatCapacity_vr(L,NY,NX),TKSoi1(L,NY,NX),TKXX',L,VLHeatCapacity_vr(L,NY,NX),TKSoi1(L,NY,NX),TKXX
@@ -2138,7 +2138,7 @@ module WatsubMod
 !
   PSISMX=PSISoilMatricPtmp_vr(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
   TFREEZ=-9.0959E+04_r8/(PSISMX-LtHeatIceMelt)
-  VLWatMicP1X=VLWatMicP1(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatExMacP2MicPi(N3,N2,N1)+FWatIrrigate2MicP1(N3,N2,N1)
+  VLWatMicP1X=VLWatMicP1(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatExMacP2MicPi(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)
   VLWatMacP1X=VLWatMacP1_vr(N3,N2,N1)+TConvWaterFlowMacP_3D_vr(N3,N2,N1)-FWatExMacP2MicPi(N3,N2,N1)
   ENGY1=VLHeatCapacity_vr(N3,N2,N1)*TKSoi1(N3,N2,N1)
   VLHeatCapacityX=VHeatCapacitySoilM(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X) &
