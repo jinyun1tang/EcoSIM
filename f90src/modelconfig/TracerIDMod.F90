@@ -15,6 +15,7 @@ implicit none
   integer, parameter :: idg_N2O=5
   integer, parameter :: idg_H2 =6
   integer, parameter :: idg_NH3=7
+
   integer  :: idg_NH3B
   integer :: ids_NH4,ids_NH4B
   integer :: ids_NO3,ids_NO3B
@@ -166,7 +167,7 @@ implicit none
   ifertn_beg=ifert_nh4;ifertn_end=ifert_no3
   ifertnb_beg=ifert_nh4_band;ifertnb_end=ifert_no3_band
 
-  idg_beg=1; ids_beg=1
+  idg_beg=idg_CO2; ids_beg=idg_beg
 ! for better array manipulation of land-atmosphere exchange,
 ! banded NH3 is considered as (potential) gas too. However, there
 ! is no banded gas NH3 concentration.
@@ -275,6 +276,7 @@ implicit none
   idsp_CaCO3=addone(idsp_end)     !Ca(2+)+CO3(2-)
   idsp_CaSO4=addone(idsp_end)     !Ca(2+)+SO4(2-)
 
+  !precipitate
   idsp_HA   =addone(idsp_end)     !hydroxyapatite
   idsp_AlPO4=addone(idsp_end)     !Al(3+)+PO4(3-)
   idsp_FePO4=addone(idsp_end)     !Fe(3+)+PO4(3-)
@@ -294,6 +296,7 @@ implicit none
   idx_beg=1
   idx_end=0
 
+  !cations
   idx_CEC=addone(idx_end)    ! XCEC,  cation exchange capacity, [mol d-2]
   idx_NH4=addone(idx_end)    ! XN4, exchangeable NH4 non-band, [mol d-2], X-NH4
   idx_Hp =addone(idx_end)    ! XHY, exchangeable H , [mol d-2], X-H
@@ -304,18 +307,21 @@ implicit none
   idx_Na =addone(idx_end)    ! XNA, exchangeable Na, [mol d-2], X-Na
   idx_K  =addone(idx_end)    ! XKA, exchangeable K, [mol d-2], X-K
   idx_COOH  =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2], X-COOH
-  idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2], X-Al(OH)2
+  idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2], X-Al(OH)2  
   idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2], X-Fe(OH)2
+
   idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
   idx_cation_end=idx_NH4B
   idx_cation_soil_end=idx_FeOH2
 
+  !anions
   idx_AEC =addone(idx_end)   ! XAEC, anion exchange capacity, [mol d-2]
   idx_OHe =addone(idx_end)   ! XOH0, exchangeable OH- non-band, [mol d-2], X-O(-)
   idx_OH  =addone(idx_end)   ! XOH1, exchangeable OH  non-band, [mol d-2], X-OH
   idx_OHp =addone(idx_end)   ! XOH2, exchangeable OH2  non-band, [mol d-2], X-OH2(+)
   idx_HPO4 =addone(idx_end)  ! XH1P, exchangeable HPO4  non-band, [mol d-2],X-HPO4(-)
   idx_H2PO4 =addone(idx_end) ! XH2P, exchangeable H2PO4  non-band, [mol d-2],X-H2PO4
+
   idx_OHeB  =addone(idx_end) ! XOH0B, exchangeable OH- band, [mol d-2],
   idx_OHB  =addone(idx_end)  ! XOH1B, exchangeable OH  band, [mol d-2]
   idx_OHpB  =addone(idx_end) ! XOH2B, exchangeable OH2  band, [mol d-2]
@@ -323,7 +329,6 @@ implicit none
   idx_H2PO4B =addone(idx_end)! XH2PB, exchangeable H2PO4  band, [mol d-2]
   idx_end=idx_H2PO4B
   idx_anion_soil_end=idx_H2PO4
-
 
   trc_confs%NGasTracers=idg_end-idg_beg
   trc_confs%NSolutTracers=ids_end-ids_beg+1
@@ -334,6 +339,33 @@ implicit none
   trc_confs%NFertNitro    = ifertn_end-ifertn_beg+1
   trc_confs%NFertNitrob   = ifertnb_end-ifertnb_beg+1
   trc_confs%NDOMS         = idom_end-idom_beg+1
+
+  return
+  write(104,*)'ids_beg=',ids_beg,'ids_end=',ids_end
+  write(104,*)'idg_CO2   =',idg_CO2
+  write(104,*)'idg_CH4   =',idg_CH4
+  write(104,*)'idg_O2    =',idg_O2
+  write(104,*)'idg_N2    =',idg_N2
+  write(104,*)'idg_N2O   =',idg_N2O
+  write(104,*)'idg_H2    =',idg_H2
+  write(104,*)'idg_NH3   =',idg_NH3
+
+  write(104,*)'idg_NH3B  =',idg_NH3B
+  write(104,*)'ids_NH4B  =',ids_NH4B
+  write(104,*)'ids_NO3B  =',ids_NO3B
+  write(104,*)'ids_NO2B  =',ids_NO2B
+  write(104,*)'ids_H1PO4B=',ids_H1PO4B
+  write(104,*)'ids_H2PO4B=',ids_H2PO4B
+
+  write(104,*)'ids_NH4   =',ids_NH4
+  write(104,*)'ids_NO3   =',ids_NO3
+  write(104,*)'ids_NO2   =',ids_NO2
+  write(104,*)'ids_H1PO4 =',ids_H1PO4
+  write(104,*)'ids_H2PO4 =',ids_H2PO4
+
+  write(104,*)'ids_nuts_beg=',ids_nuts_beg,'ids_nuts_beg=',ids_nuts_end
+
+  stop
   end subroutine InitTracerIDs
 end module TracerIDMod
 

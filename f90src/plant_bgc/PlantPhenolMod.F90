@@ -79,13 +79,16 @@ module PlantPhenolMod
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
       IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
-
+        !   if(I>176)print*,'findmainb'
         call FindMainBranchNumber(NZ)
 
+        !   if(I>176)print*,'stageplant'
         call stage_plant_phenology(I,J,NZ)
 
+        !   if(I>176)print*,'testplantem'
         call TestPlantEmergence(I,J,NZ)
 
+        !   if(I>176)print*,'rootshoot'
         call root_shoot_branching(I,J,NZ)
 !
 !           THE REST OF THE subroutine MODELS THE PHENOLOGY OF EACH BRANCH
@@ -93,7 +96,10 @@ module PlantPhenolMod
 !           doInitLeafOut_brch,doPlantLeafOut_brch=flags for initializing leafout,leafoff
 !           Hours4Leafout_brch=leafout hours
 !
-        IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR.doInitPlant_pft(NZ).EQ.itrue)THEN          
+        !   if(I>176)print*,'mainbr',j,MainBranchNum_pft(NZ)
+        !   if(I>176)print*,J,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
+        IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR. doInitPlant_pft(NZ).EQ.itrue)THEN          
+          !   if(I>176)print*,'emerged'
           call Emerged_plant_Phenology(I,J,NZ)
         ENDIF
       ENDIF
@@ -293,11 +299,13 @@ module PlantPhenolMod
 ! NumCogrothNode_pft=number of concurrently growing nodes
 ! ShootNodeNumAtPlanting_pft,GROUP=node number at planting,floral initiation
 ! IBTYP: setup for phenologically-driven above-ground turnover
-
+  !   if(I>176)print*,doInitPlant_pft(NZ),ifalse
   IF(doInitPlant_pft(NZ).EQ.ifalse)THEN
     !plant initialized
+    !   if(I>176)print*,'plantinit',PlantPopulation_pft(NZ),J
     IF(J.EQ.1 .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
       !first hour of the day, population > 0
+      !   if(I>176)print*,'firsth'
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual.OR. &
           iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
@@ -305,7 +313,7 @@ module PlantPhenolMod
           IF((NumOfBranches_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstElmConc_pft(ielmc,NZ).GT.MinNonstC2InitBranch_pft(NZ) &
             .AND.MinNonstC2InitBranch_pft(NZ).GT.0.0_r8))THEN
-
+            !   if(I>176)print*,'d120'
             D120: DO NB=1,MaxNumBranches
               IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
                 IF(NB.EQ.MainBranchNum_pft(NZ) .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
@@ -342,6 +350,7 @@ module PlantPhenolMod
 !     PSIRootTurg_vr: root turgor pressure
 !     SeasonalNonstElms_pft: non-structural carbon
 !     root axis initialization
+      !   if(I>176)print*,'rootaxis'
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(NumRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
           .GT.NumRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN

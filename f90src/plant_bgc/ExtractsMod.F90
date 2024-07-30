@@ -173,8 +173,8 @@ module ExtractsMod
     tRootCO2Emis_vr           => plt_bgcr%tRootCO2Emis_vr,          &
     REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr,     &
-    TKS_vr                       => plt_ew%TKS_vr,                        &
-    THeatRootUptake_vr           => plt_ew%THeatRootUptake_vr,            &
+    TKS_vr                    => plt_ew%TKS_vr,                     &
+    THeatRootUptake_vr        => plt_ew%THeatRootUptake_vr,         &
     GridPlantRootH2OUptake_vr => plt_ew%GridPlantRootH2OUptake_vr,  &
     AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,   &
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,          &
@@ -182,7 +182,7 @@ module ExtractsMod
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr, &
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr,       &
     MY                        => plt_morph%MY,                      &
-    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft             &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft             &
   )
 
   trcs_plant_uptake_vr=0._r8

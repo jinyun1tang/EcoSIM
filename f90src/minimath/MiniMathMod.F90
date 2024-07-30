@@ -19,6 +19,8 @@ module minimathmod
   public :: AZMAX1,AZMIN1,AZMAX1t
   public :: GetMolAirPerm3
   public :: fSiLU
+  public :: fixnegmass
+  public :: fixEXflux
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -255,4 +257,39 @@ module minimathmod
   ans=x/(1._r8+exp(-b_loc*x))
   
   end function fSiLU
+! ----------------------------------------------------------------------
+  function fixnegmass(val,refcon)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), optional, intent(in) :: refcon
+  real(r8) :: ans
+
+  ans=val
+
+  if(present(refcon))then
+    if(val<0._r8 .and. val>AMIN1(-refcon*1.e-3_r8,-1.e-5))ans=0._r8
+  else
+    if(val<0._r8 .and. val >-1.e-5_r8)ans=0._r8
+  endif
+
+  end function fixnegmass
+! ----------------------------------------------------------------------
+
+  subroutine fixEXflux(mass,consum_flux,ldebug)
+  implicit none
+  real(r8), intent(inout) :: mass
+  real(r8), intent(inout) :: consum_flux
+  logical, optional, intent(in) :: ldebug
+  logical :: lldebug
+
+  lldebug=.false.
+  if(present(ldebug))lldebug=ldebug
+  if(lldebug)write(116,*)'mass<consum_flux',mass,consum_flux
+  if(mass<consum_flux)then
+    consum_flux=mass
+    mass=0._r8
+  else
+    mass=mass-consum_flux  
+  endif
+  end subroutine fixEXflux
 end module minimathmod

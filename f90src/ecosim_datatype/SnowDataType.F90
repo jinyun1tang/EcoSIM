@@ -49,7 +49,7 @@ module SnowDataType
   real(r8),target, allocatable ::  trcg_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  trcn_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
 
-  real(r8),target, allocatable ::  trcg_solsml(:,:,:,:)               ! snowpack dual phase disolved tracers
+  real(r8),target, allocatable ::  trcg_solsml_snvr(:,:,:,:)               ! snowpack dual phase disolved tracers
   real(r8),target, allocatable ::  trcn_solsml(:,:,:,:)               ! snowpack nutrient dissolved tracers
   real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
 
@@ -103,7 +103,7 @@ contains
   allocate(trcn_FloXSnow_2DH(ids_nut_beg:ids_nuts_end,2,JV,JH));    trcn_FloXSnow_2DH=0._r8
 
 ! exclude NH3B
-  allocate(trcg_solsml(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml=0._r8
+  allocate(trcg_solsml_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml_snvr=0._r8
   allocate(trcn_solsml(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml=0._r8
   if(salt_model)then
     allocate(trcs_solsml(idsalt_beg:idsalt_end,JS,JY,JX)); trcs_solsml=0._r8
@@ -125,6 +125,7 @@ contains
   call destroy(DrySnoFlxBySnoRedistM_2DH)
   call destroy(SoilAlbedo_col)
   call destroy(NewSnowDens_col)
+  call destroy(trcg_solsml_snvr)
   call destroy(TCSnow_snvr)
   call destroy(TKSnow_snvr)
   call destroy(VLHeatCapSnow_col)

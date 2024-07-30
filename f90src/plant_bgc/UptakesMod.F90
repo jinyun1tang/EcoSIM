@@ -112,8 +112,8 @@ module UptakesMod
   DO NZ=1,NP
     PopPlantO2Uptake=0.0_r8
     PopPlantO2Demand=0.0_r8
-
-    IF(IsPlantActive_pft(NZ).EQ.iActive.AND.PlantPopulation_pft(NZ).GT.0.0_r8)THEN
+!    if(I>176)print*,'uptake',nz
+    IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -135,6 +135,7 @@ module UptakesMod
         .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
 !
+!        if(I>176)print*,'calcreist'
         call CalcResistance(NZ,PATH,FineRootRadius,RootAreaDivRadius_vr,RootResist,RootResistSoi,&
           RootResistRadial,RootResistAxial,SoiH2OResist,SoiAddRootResist,CNDT,PSILH,LayrHasRoot)
 !
@@ -177,6 +178,7 @@ module UptakesMod
 !
 !     CONVERGENCE SOLUTION
 !
+!        if(I>176)print*,'canenergy'
         NN=CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanPMassC,&
           ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,&
           VFLXC,FDMP,SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,&
@@ -197,6 +199,7 @@ module UptakesMod
 !
         call HandlingDivergence(I,J,NN,NZ,ElvAdjstedtSoiPSIMPa,DIFF,FDMP)
 
+!        if(I>176)print*,'canwaterup'
         call UpdateCanopyWater(NZ,HeatSensConductCanP,ElvAdjstedtSoiPSIMPa,RootResist,SoiH2OResist,&
           SoiAddRootResist,TKCX,VHCPX,PrecHEATIN_lndtcptByCanP1,cumPRootH2OUptake,VFLXC,LayrHasRoot)
 !
@@ -208,9 +211,10 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(I,J,NZ)
 
+!      if(I>176)print*,'plant nut'
       call PlantNutientO2Uptake(I,J,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
         PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
-
+!      if(I>176)print*,'plant nutfini'
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Canopy_Heat_Sens_col=Canopy_Heat_Sens_col+HeatXAir2PCan(NZ)*CanopyBndlResist_pft(NZ)
       IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN

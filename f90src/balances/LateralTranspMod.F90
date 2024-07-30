@@ -48,6 +48,7 @@ implicit none
   real(r8) :: trcg_VOLG(idg_beg:idg_end)
   
 ! begin_execution
+  if(lverb)write(*,*)'XGridTranspt'
   call ZeroFluxArrays(NY,NX)
 
   call ZeroFluxAccumulators(NY,NX)
@@ -140,7 +141,7 @@ implicit none
         call TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
       ENDIF
 !
-      call FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
+      call FluxThruGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
     ENDDO D8580
 !
 !     NET FREEZE-THAW
@@ -533,9 +534,10 @@ implicit none
   end subroutine TotalFluxFromSedmentTransp
 !------------------------------------------------------------------------------------------
 
-  subroutine FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
+  subroutine FluxThruGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
   implicit none
-  integer, intent(in) :: N          !exchagne along direction
+  integer, intent(in) :: I,J
+  integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
   integer, intent(in) :: NY,NX      !geophysical location
   integer, intent(in) :: N1,N2,N3   !source grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
@@ -619,9 +621,10 @@ implicit none
 
       DO NTS=ids_beg,ids_end
         trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MicP_3D(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP_3D(NTS,N,N6,N5,N4)
+          +trcs_Transp2MicP_3D(NTS,N,N3,N2,N1)-trcs_Transp2MicP_3D(NTS,N,N6,N5,N4)
         trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
+          +trcs_Transp2MacP_3D(NTS,N,N3,N2,N1)-trcs_Transp2MacP_3D(NTS,N,N6,N5,N4)
+
       ENDDO
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS

@@ -13,7 +13,7 @@ module SnowPhysData
   real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)                      !
   real(r8),allocatable ::  TDrysnoBySnowRedist(:,:)                           !
   real(r8),allocatable ::  trcSalt_TQS(:,:,:)  
-  real(r8),allocatable ::  trcn_TFloXSurRunoff(:,:,:)                        !
+  real(r8),allocatable ::  trcn_TFloXSurRunoff_2D(:,:,:)                        !
   real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
   real(r8),allocatable ::  trcg_QSS(:,:,:)
   real(r8),allocatable ::  trcn_QSS(:,:,:)
@@ -66,7 +66,7 @@ module SnowPhysData
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
   allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX));       trcSalt_TBLS=0._r8  
   allocate(trcSalt_TQS(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQS=0._r8  
-  allocate(trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_TFloXSurRunoff=0._r8  
+  allocate(trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_TFloXSurRunoff_2D=0._r8  
   allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQR=0._r8  
   allocate(trcg_QSS(idg_beg:idg_end-1,JY,JX));            trcg_QSS=0._r8
   allocate(trcn_QSS(ids_nut_beg:ids_nuts_end,JY,JX));trcn_QSS=0._r8
@@ -120,7 +120,7 @@ module SnowPhysData
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
   call destroy(trcSalt_TBLS)
-  call destroy(trcn_TFloXSurRunoff)  
+  call destroy(trcn_TFloXSurRunoff_2D)  
   call destroy(trcSalt_TQR)
   call destroy(trcg_QSS)
   call destroy(trcn_QSS)  

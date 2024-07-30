@@ -1264,7 +1264,7 @@ module IngridTranspMod
 !
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE IN VERTICAL FLUX
 !
-    IF(N.EQ.3.AND.VLMacP(N6,N5,N4).GT.VLWatMacPM(M,N6,N5,N4))THEN
+    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM(M,N6,N5,N4))THEN
       DO nsalts=idsalt_beg,idsalt_KSO4
         trcSalt_RFH(nsalts)=VFLW*AZMAX1((trcSalt_soHml2(nsalts,N3,N2,N1) &
           -AZMIN1(trcSalt_RFXS(nsalts,NU(N2,N1),N2,N1))))
@@ -1358,8 +1358,8 @@ module IngridTranspMod
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 
-  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP(N3,N2,N1) &
-    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP(N6,N5,N4))THEN
+  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
+    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !

@@ -41,17 +41,20 @@ implicit none
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !     zero out plant hourly fluxes
       call ZeroGrosub()  
-    if(lverb)WRITE(*,333)'HFUNC'
+
+      if(lverb)WRITE(*,333)'HFUNC'
       !phenological update, determine living/active branches
-!      DO NZ=1,NP(NY,NX)
-!        call SumPlantBiom(I,J,NZ,'bfHFUNCS')
-!      ENDDO
+!     DO NZ=1,NP(NY,NX)
+!       call SumPlantBiom(I,J,NZ,'bfHFUNCS')
+!     ENDDO
+      
       CALL HFUNCs(I,J)
 
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
 !      ENDDO
       !predict uptake fluxes of nutrients and O2
+      if(lverb)write(*,*)'uptake'
       CALL UPTAKES(I,J)
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')

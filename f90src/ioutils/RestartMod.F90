@@ -5894,7 +5894,7 @@ implicit none
     !print*,'SnowThickL_snvr'
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SnowThickL_snvr(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='SnowThickL_col', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='SnowThickL_snvr', dim1name='column',dim2name='levsno',&
        long_name='snowpack layer depth', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -5957,10 +5957,10 @@ implicit none
        dim3name='levsno',long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml(:,:,1:JY0,1:JX0),datrc_3d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml_snvr(:,:,1:JY0,1:JX0),datrc_3d) 
   else
     !print*,'trcg_solsml'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml(:,:,1:JY0,1:JX0),datrc_3d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcg_solsml_snvr(:,:,1:JY0,1:JX0),datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JS)        
     call restartvar(ncid, flag, varname='trcg_solsml', dim1name='column',dim2name='gastrcs',&
        dim3name='levsno',long_name='snow temperature', units='oC', &
@@ -6447,16 +6447,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%nxtracers, 1:JZ+1)    
-    call restartvar(ncid, flag, varname='trcx_solml', dim1name='column',dim2name='xtracers',&
+    call restartvar(ncid, flag, varname='trcx_solml_vr', dim1name='column',dim2name='xtracers',&
        dim3name='levsoi1',long_name='exchangeable tracers', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml_vr,datrc_3d)     
   else
     !print*,'trcx_solml'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml,datrc_3d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcx_solml_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%nxtracers, 1:JZ+1)        
-    call restartvar(ncid, flag, varname='trcx_solml', dim1name='column',dim2name='xtracers',&
+    call restartvar(ncid, flag, varname='trcx_solml_vr', dim1name='column',dim2name='xtracers',&
        dim3name='levsoi1',long_name='exchangeable tracers', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)      
@@ -6959,16 +6959,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)                
-    call restartvar(ncid, flag, varname='VLMacP', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP_vr,datrc_2d)      
   else
     !print*,'VLMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ)                    
-    call restartvar(ncid, flag, varname='VLMacP', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
@@ -7110,16 +7110,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NPrecipTracers,1:JZ+1)    
-    call restartvar(ncid, flag, varname='trcp_salml', dim1name='column',dim2name='ptracers',&
+    call restartvar(ncid, flag, varname='trcp_saltpml_vr', dim1name='column',dim2name='ptracers',&
        dim3name='levsoi1',long_name='salt precipitate in micropore', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,trcp_salml,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcp_saltpml_vr,datrc_3d)      
   else
     !print*,'trcp_salml'
-    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,trcp_salml,datrc_3d)        
+    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,trcp_saltpml_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NPrecipTracers,1:JZ+1)        
-    call restartvar(ncid, flag, varname='trcp_salml', dim1name='column',dim2name='ptracers',&
+    call restartvar(ncid, flag, varname='trcp_saltpml_vr', dim1name='column',dim2name='ptracers',&
        dim3name='levsoi1',long_name='salt precipitate in micropore', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
@@ -7147,16 +7147,16 @@ implicit none
 
     if(flag=='read')then
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ+1)           
-      call restartvar(ncid, flag, varname='trcSalt_solml', dim1name='column',dim2name='satracers',&
+      call restartvar(ncid, flag, varname='trcSalt_solml_vr', dim1name='column',dim2name='satracers',&
         dim3name='levsoi1',long_name='soil aqueous salt content micropre', units='mol d-2', &
         interpinic_flag='skip', data=datpr3, missing_value=spval, &
         fill_value=spval)  
-      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml,datrc_3d)      
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml_vr,datrc_3d)      
     else
       !print*,'trcSalt_solml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml,datrc_3d)        
+      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_solml_vr,datrc_3d)        
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ+1)               
-      call restartvar(ncid, flag, varname='trcSalt_solml', dim1name='column',dim2name='satracers',&
+      call restartvar(ncid, flag, varname='trcSalt_solml_vr', dim1name='column',dim2name='satracers',&
         dim3name='levsoi1',long_name='soil aqueous salt content micropre', units='mol d-2', &
         interpinic_flag='skip', data=datpr3, missing_value=spval, &
         fill_value=spval)  
@@ -7182,16 +7182,16 @@ implicit none
 
     if(flag=='read')then
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ)    
-      call restartvar(ncid, flag, varname='trcSalt_soHml', dim1name='column',dim2name='satracers',&
+      call restartvar(ncid, flag, varname='trcSalt_soHml_vr', dim1name='column',dim2name='satracers',&
         dim3name='levsoi',long_name='soil macropore aqueous salt dissolved tracers', units='mol d-2', &
         interpinic_flag='skip', data=datpr3, missing_value=spval, &
         fill_value=spval)  
-      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml,datrc_3d)      
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml_vr,datrc_3d)      
     else
       !print*,'trcSalt_soHml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml,datrc_3d)          
+      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_soHml_vr,datrc_3d)          
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ)    
-      call restartvar(ncid, flag, varname='trcSalt_soHml', dim1name='column',dim2name='satracers',&
+      call restartvar(ncid, flag, varname='trcSalt_soHml_vr', dim1name='column',dim2name='satracers',&
         dim3name='levsoi',long_name='soil macropore aqueous salt dissolved tracers', units='mol d-2', &
         interpinic_flag='skip', data=datpr3, missing_value=spval, &
         fill_value=spval)
