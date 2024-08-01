@@ -689,47 +689,73 @@ module PlantDisturbsMod
 !
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_fire)THEN
 
-    NonstructElmnt2Litr(ielmc)=NonstructElmntRemoval(ielmc)*EHVST21
-    NonstructElmnt2Litr(ielmn)=NonstructElmntRemoval(ielmn)*&
-      (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-    NonstructElmnt2Litr(ielmp)=NonstructElmntRemoval(ielmp)*&
-      (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-    NonstructElmntOffEcosystem(ielmn)=NonstructElmntRemoval(ielmn)*EHVST21
-    NonstructElmntOffEcosystem(ielmp)=NonstructElmntRemoval(ielmp)*EHVST21
+    call ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
+      NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
+      LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
+      StandeadElmntOffEcosystem)
 
-    LeafElmnt2Litr(ielmc)=LeafElmntRemoval(ielmc)*EHVST21
-    LeafElmnt2Litr(ielmn)=LeafElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-    LeafElmnt2Litr(ielmp)=LeafElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-    LeafElmntOffEcosystem(ielmn)=LeafElmntRemoval(ielmn)*EHVST21
-    LeafElmntOffEcosystem(ielmp)=LeafElmntRemoval(ielmp)*EHVST21
-
-    FineNonleafElmnt2Litr(ielmc)=FineNonleafElmntRemoval(ielmc)*EHVST22
-    FineNonleafElmnt2Litr(ielmn)=FineNonleafElmntRemoval(ielmn)*&
-      (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_finenonleaf,NZ))
-    FineNonleafElmnt2Litr(ielmp)=FineNonleafElmntRemoval(ielmp)*&
-      (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_finenonleaf,NZ))
-    FineNonleafElmOffEcosystem(ielmn)=FineNonleafElmntRemoval(ielmn)*EHVST22
-    FineNonleafElmOffEcosystem(ielmp)=FineNonleafElmntRemoval(ielmp)*EHVST22
-
-    WoodyElmnt2Litr(ielmc)=WoodyElmntRemoval(ielmc)*EHVST23
-    WoodyElmnt2Litr(ielmn)=WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
-    WoodyElmnt2Litr(ielmp)=WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
-    WoodyElmntOffEcosystem(ielmn)=WoodyElmntRemoval(ielmn)*EHVST23
-    WoodyElmntOffEcosystem(ielmp)=WoodyElmntRemoval(ielmp)*EHVST23
-
-    StandeadElmnt2Litr(ielmc)=StandeadElmntRemoval(ielmc)*EHVST24
-    StandeadElmnt2Litr(ielmn)=StandeadElmntRemoval(ielmn)*&
-      (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_stdead,NZ))
-    StandeadElmnt2Litr(ielmp)=StandeadElmntRemoval(ielmp)*&
-      (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_stdead,NZ))
-    StandeadElmntOffEcosystem(ielmn)=StandeadElmntRemoval(ielmn)*EHVST24
-    StandeadElmntOffEcosystem(ielmp)=StandeadElmntRemoval(ielmp)*EHVST24
   ENDIF
   end associate
   end subroutine ApplyDisturbanceBiomRemoval
 
 !------------------------------------------------------------------------------------------
+  subroutine ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
+    NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
+    LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
+    StandeadElmntOffEcosystem)
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NZ
+  real(r8), intent(in) :: EHVST21,EHVST22, EHVST23, EHVST24
+  real(r8), intent(out) :: NonstructElmnt2Litr(NumPlantChemElms)
+  real(r8), intent(out) :: NonstructElmntOffEcosystem(NumPlantChemElms)
+  real(r8), intent(out) :: LeafElmntOffEcosystem(NumPlantChemElms)
+  real(r8), intent(out) :: FineNonleafElmOffEcosystem(NumPlantChemElms)
+  real(r8), intent(out) :: WoodyElmntOffEcosystem(NumPlantChemElms)
+  real(r8), intent(out) :: StandeadElmntOffEcosystem(NumPlantChemElms)
 
+  associate(                                       &
+    iHarvstType_pft  => plt_distb%iHarvstType_pft, &
+    FracBiomHarvsted => plt_distb%FracBiomHarvsted &
+  )
+  NonstructElmnt2Litr(ielmc)=NonstructElmntRemoval(ielmc)*EHVST21
+  NonstructElmnt2Litr(ielmn)=NonstructElmntRemoval(ielmn)*&
+    (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
+  NonstructElmnt2Litr(ielmp)=NonstructElmntRemoval(ielmp)*&
+    (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
+  NonstructElmntOffEcosystem(ielmn)=NonstructElmntRemoval(ielmn)*EHVST21
+  NonstructElmntOffEcosystem(ielmp)=NonstructElmntRemoval(ielmp)*EHVST21
+
+  LeafElmnt2Litr(ielmc)=LeafElmntRemoval(ielmc)*EHVST21
+  LeafElmnt2Litr(ielmn)=LeafElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
+  LeafElmnt2Litr(ielmp)=LeafElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
+  LeafElmntOffEcosystem(ielmn)=LeafElmntRemoval(ielmn)*EHVST21
+  LeafElmntOffEcosystem(ielmp)=LeafElmntRemoval(ielmp)*EHVST21
+
+  FineNonleafElmnt2Litr(ielmc)=FineNonleafElmntRemoval(ielmc)*EHVST22
+  FineNonleafElmnt2Litr(ielmn)=FineNonleafElmntRemoval(ielmn)*&
+    (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_finenonleaf,NZ))
+  FineNonleafElmnt2Litr(ielmp)=FineNonleafElmntRemoval(ielmp)*&
+    (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_finenonleaf,NZ))
+  FineNonleafElmOffEcosystem(ielmn)=FineNonleafElmntRemoval(ielmn)*EHVST22
+  FineNonleafElmOffEcosystem(ielmp)=FineNonleafElmntRemoval(ielmp)*EHVST22
+
+  WoodyElmnt2Litr(ielmc)=WoodyElmntRemoval(ielmc)*EHVST23
+  WoodyElmnt2Litr(ielmn)=WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
+  WoodyElmnt2Litr(ielmp)=WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
+  WoodyElmntOffEcosystem(ielmn)=WoodyElmntRemoval(ielmn)*EHVST23
+  WoodyElmntOffEcosystem(ielmp)=WoodyElmntRemoval(ielmp)*EHVST23
+
+  StandeadElmnt2Litr(ielmc)=StandeadElmntRemoval(ielmc)*EHVST24
+  StandeadElmnt2Litr(ielmn)=StandeadElmntRemoval(ielmn)*&
+    (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_stdead,NZ))
+  StandeadElmnt2Litr(ielmp)=StandeadElmntRemoval(ielmp)*&
+    (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_stdead,NZ))
+  StandeadElmntOffEcosystem(ielmn)=StandeadElmntRemoval(ielmn)*EHVST24
+  StandeadElmntOffEcosystem(ielmp)=StandeadElmntRemoval(ielmp)*EHVST24
+  end associate
+  end subroutine ApplyBiomRemovalByFire
+!------------------------------------------------------------------------------------------    
   subroutine RemoveBiomByTillage(I,J,NZ)
   !
   !Description
@@ -1789,7 +1815,7 @@ module PlantDisturbsMod
   integer :: K,NE
 
   associate(                                                            &
-    PetoleStrutElms_pft       => plt_biom%PetoleStrutElms_pft,        &
+    PetoleStrutElms_pft        => plt_biom%PetoleStrutElms_pft,         &
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch,        &
     ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft,              &
     PetioleElmntNode_brch      => plt_biom%PetioleElmntNode_brch,       &
@@ -2362,7 +2388,7 @@ module PlantDisturbsMod
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,     &
     iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch,    &
-    QH2OLoss_lnds                    => plt_site%QH2OLoss_lnds,                     &
+    QH2OLoss_lnds             => plt_site%QH2OLoss_lnds,              &
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch,       &
     CutHeightORFrac_pft       => plt_distb%CutHeightORFrac_pft,       &
     PSICanopy_pft             => plt_ew%PSICanopy_pft,                &
@@ -2460,14 +2486,42 @@ module PlantDisturbsMod
   end associate
   end subroutine CutPlant
 !--------------------------------------------------------------------------------
+  subroutine RootRemovalByFire(I,J,NZ,L,FFIRE,DCORP,FracLeftThin)
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NZ
+  integer, intent(in) :: L
+  real(r8), intent(in):: DCORP
+  real(r8),intent(out) :: FFIRE(NumPlantChemElms)
+  real(r8), intent(out):: FracLeftThin
 
+  associate(                                                &
+    iSoilDisturbType_col => plt_distb%iSoilDisturbType_col, &
+    CSoilOrgM_vr         => plt_soilchem%CSoilOrgM_vr,      &
+    FracBiomHarvsted     => plt_distb%FracBiomHarvsted,     &
+    iHarvstType_pft      => plt_distb%iHarvstType_pft,      &
+    THETW_vr             => plt_soilchem%THETW_vr           &
+  )
+  IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.22)THEN
+    FracLeftThin=1.0_r8
+    FFIRE(1:NumPlantChemElms)=0._r8
+  ELSE
+    FracLeftThin=1.0_r8-DCORP*FracBiomHarvsted(1,iplthvst_woody,NZ) &
+      *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
+    FFIRE(ielmc)=FracBiomHarvsted(2,iplthvst_woody,NZ)
+    FFIRE(ielmn)=FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
+    FFIRE(ielmp)=FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
+  ENDIF
+  end associate
+  end subroutine RootRemovalByFire
+!--------------------------------------------------------------------------------
   subroutine RootMaterialRemovalL(I,J,N,L,NZ,FracLeftThin,XHVST1)
 
   implicit none
   integer , intent(in) :: I,J,N,L,NZ
-  real(r8), intent(inout) :: FracLeftThin
+  real(r8), intent(out) :: FracLeftThin
   real(r8), intent(out):: XHVST1
-  real(r8) :: FrcLeafMassNotHarvst(NumPlantChemElms)
+  real(r8) :: FrcMassNotHarvst(NumPlantChemElms)
   real(r8) :: FFIRE(NumPlantChemElms)
   integer  :: NR,NTG,M,NE
 
@@ -2478,18 +2532,9 @@ module PlantDisturbsMod
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,           &
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,           &
-    PO4byFire_pft             => plt_distb%PO4byFire_pft,            &
-    N2ObyFire_pft             => plt_distb%N2ObyFire_pft,            &
-    NH3byFire_pft             => plt_distb%NH3byFire_pft,            &
-    O2ByFire_pft              => plt_distb%O2ByFire_pft,             &
-    CH4ByFire_pft             => plt_distb%CH4ByFire_pft,            &
-    CO2ByFire_pft             => plt_distb%CO2ByFire_pft,            &
-    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
-    CSoilOrgM_vr              => plt_soilchem%CSoilOrgM_vr,          &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     THIN_pft                  => plt_distb%THIN_pft,                 &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
-    iSoilDisturbType_col      => plt_distb%iSoilDisturbType_col,     &
     THETW_vr                  => plt_soilchem%THETW_vr,              &
     DCORP                     => plt_distb%DCORP,                    &
     FracBiomHarvsted          => plt_distb%FracBiomHarvsted,         &
@@ -2509,67 +2554,37 @@ module PlantDisturbsMod
     FFIRE(1:NumPlantChemElms)=0._r8
   ELSE
     !fire
-    IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.22)THEN
-      FracLeftThin=1.0_r8
-      FFIRE(1:NumPlantChemElms)=0._r8
-    ELSE
-      FracLeftThin=1.0_r8-DCORP*FracBiomHarvsted(1,iplthvst_woody,NZ) &
-        *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
-      FFIRE(ielmc)=FracBiomHarvsted(2,iplthvst_woody,NZ)
-      FFIRE(ielmn)=FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
-      FFIRE(ielmp)=FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
-    ENDIF
+    call RootRemovalByFire(I,J,NZ,L,FFIRE,DCORP,FracLeftThin)
   ENDIF
 
   XHVST1=1._r8-FracLeftThin
   D3385: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
+      FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-        +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
+        +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
     ENDDO
 
-    CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-    CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-    O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
-    NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
-    N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-    PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
-    CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-    Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+    call RemoveNonstRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
     DO NR=1,NumRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms
-        FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+        FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
-          (1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-       
+          (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
       ENDDO
-      CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-      CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-      O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
-      NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
-      N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0
-      PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
-      CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-      Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      call RemoveWoodyRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+
 
       DO NE=1,NumPlantChemElms
-        FrcLeafMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+        FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-          +(1._r8-FFIRE(NE))*FrcLeafMassNotHarvst(NE)
-
+          +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
       ENDDO
-      CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-      CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-      O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)*2.667_r8
-      NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcLeafMassNotHarvst(ielmn)
-      N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-      PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcLeafMassNotHarvst(ielmp)
-      CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
-      Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcLeafMassNotHarvst(ielmc)
+      CALL RemoveFineRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+
     enddo
   ENDDO D3385
 !
@@ -2587,6 +2602,95 @@ module PlantDisturbsMod
   ENDDO
   end associate          
   end subroutine RootMaterialRemovalL
+!--------------------------------------------------------------------------------
+
+  subroutine RemoveNonstRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NZ
+  real(r8), INTENT(IN) :: FrcMassNotHarvst(NumPlantChemElms)
+  real(r8), intent(in) :: FFIRE(NumPlantChemElms)
+  associate(                                      &
+    iHarvstType_pft => plt_distb%iHarvstType_pft, &
+    CO2NetFix_pft   => plt_bgcr%CO2NetFix_pft,    &
+    PO4byFire_pft   => plt_distb%PO4byFire_pft,   &
+    N2ObyFire_pft   => plt_distb%N2ObyFire_pft,   &
+    NH3byFire_pft   => plt_distb%NH3byFire_pft,   &
+    O2ByFire_pft    => plt_distb%O2ByFire_pft,    &
+    CH4ByFire_pft   => plt_distb%CH4ByFire_pft,   &
+    CO2ByFire_pft   => plt_distb%CO2ByFire_pft,   &
+    Eco_NBP_col     => plt_bgcr%Eco_NBP_col       &
+  )
+
+  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
+  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  end associate
+  end subroutine RemoveNonstRootByFire
+
+!--------------------------------------------------------------------------------
+  SUBROUTINE RemoveWoodyRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NZ
+  real(r8), INTENT(IN) :: FrcMassNotHarvst(NumPlantChemElms)
+  real(r8), intent(in) :: FFIRE(NumPlantChemElms)
+  associate(                                      &
+    iHarvstType_pft => plt_distb%iHarvstType_pft, &
+    CO2NetFix_pft   => plt_bgcr%CO2NetFix_pft,    &
+    PO4byFire_pft   => plt_distb%PO4byFire_pft,   &
+    N2ObyFire_pft   => plt_distb%N2ObyFire_pft,   &
+    NH3byFire_pft   => plt_distb%NH3byFire_pft,   &
+    O2ByFire_pft    => plt_distb%O2ByFire_pft,    &
+    CH4ByFire_pft   => plt_distb%CH4ByFire_pft,   &
+    CO2ByFire_pft   => plt_distb%CO2ByFire_pft,   &
+    Eco_NBP_col     => plt_bgcr%Eco_NBP_col       &
+  )
+
+  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0
+  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  end associate
+  end subroutine RemoveWoodyRootByFire
+!--------------------------------------------------------------------------------
+  subroutine RemoveFineRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NZ
+  real(r8), INTENT(IN) :: FrcMassNotHarvst(NumPlantChemElms)
+  real(r8), intent(in) :: FFIRE(NumPlantChemElms)
+  associate(                                      &
+    iHarvstType_pft => plt_distb%iHarvstType_pft, &
+    CO2NetFix_pft   => plt_bgcr%CO2NetFix_pft,    &
+    PO4byFire_pft   => plt_distb%PO4byFire_pft,   &
+    N2ObyFire_pft   => plt_distb%N2ObyFire_pft,   &
+    NH3byFire_pft   => plt_distb%NH3byFire_pft,   &
+    O2ByFire_pft    => plt_distb%O2ByFire_pft,    &
+    CH4ByFire_pft   => plt_distb%CH4ByFire_pft,   &
+    CO2ByFire_pft   => plt_distb%CO2ByFire_pft,   &
+    Eco_NBP_col     => plt_bgcr%Eco_NBP_col       &
+  )
+
+  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
+  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  end associate
+  end subroutine RemoveFineRootByFire
+
 !--------------------------------------------------------------------------------
   subroutine HarvstUpdateRootStateL(I,J,N,L,NZ,FracLeftThin,XHVST1)            
   implicit none
@@ -2724,7 +2828,7 @@ module PlantDisturbsMod
     FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
     CPOOL3_node                 => plt_photo%CPOOL3_node,                 &
     CPOOL4_node                 => plt_photo%CPOOL4_node,                 &
-    QH2OLoss_lnds                      => plt_site%QH2OLoss_lnds,                       &
+    QH2OLoss_lnds               => plt_site%QH2OLoss_lnds,                &
     k_fine_litr                 => pltpar%k_fine_litr,                    &
     k_woody_litr                => pltpar%k_woody_litr,                   &
     iYearCurrent                => plt_site%iYearCurrent,                 &

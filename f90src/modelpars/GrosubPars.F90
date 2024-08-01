@@ -229,12 +229,12 @@ module GrosubPars
       call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
     endif
   endif  
-  pltpar%inonstruct=0
-  pltpar%ifoliar=1
-  pltpar%inonfoliar=2
-  pltpar%istalk=3
-  pltpar%iroot=4
-  pltpar%icwood=5
+  pltpar%inonstruct = 0
+  pltpar%ifoliar    = 1
+  pltpar%inonfoliar = 2
+  pltpar%istalk     = 3
+  pltpar%iroot      = 4
+  pltpar%icwood     = 5
 
   pltpar%jroots=2
 
