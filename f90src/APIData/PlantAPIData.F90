@@ -482,8 +482,9 @@ implicit none
   real(r8), pointer :: tCanLeafC_cl(:)                        => null()  !total leaf mass,                              [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)               => null()  !initial standing dead C,                      [g C m-2]
   real(r8), pointer :: RootNodulElms_pft(:,:)                 => null()
-  real(r8), pointer :: RootElms_pft(:,:)                      => null()  !plant root element,                           [gC d-2]
-  real(r8), pointer :: RootElmsBeg_pft(:,:)                   => null()  !plant root element,                           [gC d-2]
+  real(r8), pointer :: RootElms_pft(:,:)                      => null()  !plant root element,                           [gE d-2]
+  real(r8), pointer :: RootElmsBeg_pft(:,:)                   => null()  !plant root element,                           [gE d-2]
+  real(r8), pointer :: StandDeadStrutElmsBeg_pft(:,:)         => null()  !standing dead element,                        [gE d-2]
   real(r8), pointer :: CanopyNodulElms_pft(:,:)               => null()
   real(r8), pointer :: RootStrutElms_pft(:,:)                 => null()  !plant root structural element,                [gC d-2]
   real(r8), pointer :: SeedCPlanted_pft(:)                    => null()  !plant stored nonstructural C at planting,     [gC d-2]
@@ -1306,6 +1307,7 @@ implicit none
   allocate(this%LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstElmConc_brch=spval
   allocate(this%RootStrutElms_pft(NumPlantChemElms,JP1));this%RootStrutElms_pft=spval
   allocate(this%CanopyNodulElms_pft(NumPlantChemElms,JP1));this%CanopyNodulElms_pft=spval
+  allocate(this%StandDeadStrutElmsBeg_pft(NumPlantChemElms,JP1));this%StandDeadStrutElmsBeg_pft=spval
   allocate(this%tCanLeafC_cl(NumOfCanopyLayers1));this%tCanLeafC_cl=spval
   allocate(this%RootElms_pft(NumPlantChemElms,JP1));this%RootElms_pft=spval
   allocate(this%RootElmsBeg_pft(NumPlantChemElms,JP1));this%RootElmsBeg_pft=spval

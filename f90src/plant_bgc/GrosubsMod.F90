@@ -242,7 +242,11 @@ module grosubsMod
 !     AUTOTROPHIC RESPIRATION + TOTAL LitrFall - TOTAL EXUDATION
 !     - TOTAL CO2 FIXATION
 !
-!     BALC=PFT C balance
+!     BALC=PFT C balance, dplant/dt=input-output
+!     starting from time zero, plant(t)-plant(t0)=input-output
+!     input: net carbon fixation, 
+!     output: litterfal, exudation, harvest, mortality
+!
 !     WTSHT,WTRT,WTND,WTRVC,WTSTG=PFT shoot,root,bacteria,storage,standing dead C
 !     NetPrimProduct_pft=cumulative PFT NPP
 !     TCSNC=cumulative PFT C LitrFall
@@ -251,17 +255,19 @@ module grosubsMod
 !     THVSTC=cumulative PFT C removed from ecosystem from previous year
 !     HVSTC=total PFT C removed from ecosystem in current year
 !     CO2ByFire_pft,CH4ByFire_pft=CO2,CH4 emission from disturbance
-!
+!     LitrfalStrutElmsCum_pft= >0 to the environment (soil + surface)
+!   GrossResp_pft < 0 respired into atmosphere
     NetPrimProduct_pft(NZ)=GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       !check for living plant
       DO NE=1,NumPlantChemElms
         ElmBalanceCum_pft(NE,NZ)=ShootStrutElms_pft(NE,NZ)+RootElms_pft(NE,NZ)+NodulStrutElms_pft(NE,NZ) &
-          +SeasonalNonstElms_pft(NE,NZ)+LitrfalStrutElmsCum_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &
-          -NetCumElmntFlx2Plant_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)&
-          +EcoHavstElmnt_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
+          +SeasonalNonstElms_pft(NE,NZ) +StandDeadStrutElms_pft(NE,NZ)   &   !add biomass by components  
+          -LitrfalStrutElmsCum_pft(NE,NZ)-PlantExudChemElmCum_pft(NE,NZ) &   !add fluxes
+          -NetCumElmntFlx2Plant_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
+      !add more fluxes
       ElmBalanceCum_pft(ielmc,NZ)=ElmBalanceCum_pft(ielmc,NZ)-NetPrimProduct_pft(NZ) &
         -CO2ByFire_pft(NZ)-CH4ByFire_pft(NZ)
 !
@@ -756,7 +762,7 @@ module grosubsMod
 !     RootN2Fix_pft=PFT N2 fixation
 !     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     PlantN2FixCum_pft=cumulative PFT N2 fixation
-!
+!     PlantRootSoilElmNetX_pft= > 0 taking from soil 
   PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
 
   PlantRootSoilElmNetX_pft(ielmn,NZ)=PlantRootSoilElmNetX_pft(ielmn,NZ)+&

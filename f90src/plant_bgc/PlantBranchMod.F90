@@ -65,7 +65,7 @@ module PlantBranchMod
   real(r8) :: CNLFX,CPLFX,CNSHX,CPSHX
   real(r8) :: NonstC4Groth_brch
   real(r8) :: RCO2NonstC4Nassim_brch
-  real(r8) :: ShootStructE(1:NumPlantChemElms)
+  real(r8) :: ShootStructE_brch(1:NumPlantChemElms)
   real(r8) :: DMLFB
   real(r8) :: DMSHB
   real(r8) :: CNLFB
@@ -104,13 +104,13 @@ module PlantBranchMod
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
 
     call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
-      CPRTW,CPSHW,ShootStructE,DMSHD,CNLFM,CPLFM,&
+      CPRTW,CPSHW,ShootStructE_brch,DMSHD,CNLFM,CPLFM,&
       CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
 !
 !   GROSS PRIMARY PRODUCTIVITY
 !
     call UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX &
-      ,CNLFX,CPLFX,ShootStructE(ielmn),TFN5,WaterStress4Groth,Stomata_Stress,CanTurgPSIFun4Expans,CH2O3,CH2O4,CNPG &
+      ,CNLFX,CPLFX,ShootStructE_brch(ielmn),TFN5,WaterStress4Groth,Stomata_Stress,CanTurgPSIFun4Expans,CH2O3,CH2O4,CNPG &
       ,RCO2NonstC_brch,RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
 !
 !
@@ -405,13 +405,13 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
-    CPRTW,CPSHW,ShootStructE,DMSHD,CNLFM,CPLFM,&
+    CPRTW,CPSHW,ShootStructE_brch,DMSHD,CNLFM,CPLFM,&
     CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: CNLFW,CNRTW,CNSHW,CPLFW,CPRTW,CPSHW
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
-  real(r8), intent(out) :: ShootStructE(NumPlantChemElms)    
+  real(r8), intent(out) :: ShootStructE_brch(NumPlantChemElms)    
   real(r8), intent(out) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(out) :: DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB
 
@@ -498,25 +498,25 @@ module PlantBranchMod
 !
 !   TOTAL SHOOT STRUCTURAL N MASS FOR MAINTENANCE RESPIRATION
 !
-!   ShootStructE(ielmn)=shoot structural N mass
+!   ShootStructE_brch(ielmn)=shoot structural N mass
 !   WTLFBN,WTSHBN,WTHSBN,WTEARN,WTFRBN=leaf,petiole,husk,ear,grain N mass
 !   rNCStalk_pft,StalkBiomassC_brch=stalk N:C,sapwood mass
 !   iPlantCalendar_brch(10=date of physiological maturity
 !
-  ShootStructE(ielmc)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ) &
+  ShootStructE_brch(ielmc)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ) &
     +StalkBiomassC_brch(NB,NZ))
 
-  ShootStructE(ielmn)=AZMAX1(LeafStrutElms_brch(ielmn,NB,NZ)+PetoleStrutElms_brch(ielmn,NB,NZ) &
+  ShootStructE_brch(ielmn)=AZMAX1(LeafStrutElms_brch(ielmn,NB,NZ)+PetoleStrutElms_brch(ielmn,NB,NZ) &
     +rNCStalk_pft(NZ)*StalkBiomassC_brch(NB,NZ))
 
-  ShootStructE(ielmp)=AZMAX1(LeafStrutElms_brch(ielmp,NB,NZ)+PetoleStrutElms_brch(ielmp,NB,NZ) &
+  ShootStructE_brch(ielmp)=AZMAX1(LeafStrutElms_brch(ielmp,NB,NZ)+PetoleStrutElms_brch(ielmp,NB,NZ) &
     +rPCStalk_pft(NZ)*StalkBiomassC_brch(NB,NZ))
 
   IF(iPlantCalendar_brch(ipltcal_EndSeedFill,NB,NZ).EQ.0)THEN
-    ShootStructE(ielmn)=ShootStructE(ielmn)+AZMAX1(HuskStrutElms_brch(ielmn,NB,NZ) &
+    ShootStructE_brch(ielmn)=ShootStructE_brch(ielmn)+AZMAX1(HuskStrutElms_brch(ielmn,NB,NZ) &
       +EarStrutElms_brch(ielmn,NB,NZ)+GrainStrutElms_brch(ielmn,NB,NZ))
 
-    ShootStructE(ielmp)=ShootStructE(ielmp)+AZMAX1(HuskStrutElms_brch(ielmp,NB,NZ) &
+    ShootStructE_brch(ielmp)=ShootStructE_brch(ielmp)+AZMAX1(HuskStrutElms_brch(ielmp,NB,NZ) &
       +EarStrutElms_brch(ielmp,NB,NZ)+GrainStrutElms_brch(ielmp,NB,NZ))      
   ENDIF
   end associate
@@ -976,7 +976,7 @@ module PlantBranchMod
     icwood                      => pltpar%icwood,                         &
     ifoliar                     => pltpar%ifoliar,                        &
     FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
-    PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch,     &
+    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,      &
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
     FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch,           &
@@ -986,8 +986,8 @@ module PlantBranchMod
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,         &
     PetoleLensNode_brch         => plt_morph%PetoleLensNode_brch,         &
-    rCNNonstRemob_pft       => plt_allom%rCNNonstRemob_pft,       &
-    rCPNonstRemob_pft       => plt_allom%rCPNonstRemob_pft,       &
+    rCNNonstRemob_pft           => plt_allom%rCNNonstRemob_pft,           &
+    rCPNonstRemob_pft           => plt_allom%rCPNonstRemob_pft,           &
     k_fine_litr                 => pltpar%k_fine_litr,                    &
     k_woody_litr                => pltpar%k_woody_litr,                   &
     ZERO4LeafVar_pft            => plt_biom%ZERO4LeafVar_pft,             &
@@ -3003,13 +3003,13 @@ module PlantBranchMod
 !
 ! RCO2Maint_brch=maintenance respiration
 ! TFN5=temperature function for canopy maintenance respiration
-! ShootStructE(ielmn)=shoot structural N mass
+! ShootStructE_brch(ielmn)=shoot structural N mass
 ! iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WaterStress4Groth=growth function of canopy water potential
 !
   RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN5*ShootStructN)
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)).OR.&
+  IF(is_root_shallow(iPlantRootProfile_pft(NZ)) .OR. &
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WaterStress4Groth
   ENDIF
@@ -3044,13 +3044,6 @@ module PlantBranchMod
     PPOOLB=AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
     RgroCO2_ltd=AMIN1(RCO2Y,ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
       ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
-    if(NZ==1)THEN
-!    write(113,*)I+J/24.,RgroCO2_ltd,RCO2Maint_brch/RCO2NonstC_brch,RCO2Y,CanTurgPSIFun4Expans,fTCanopyGroth_pft(NZ)
-!    write(113,*)I+J/24.,NB,CanopyNonstElms_brch(:,NB,NZ)
-    ELSEif(NZ==2)then
-!    write(114,*)I+J/24.,RgroCO2_ltd,RCO2Maint_brch/RCO2NonstC_brch,RCO2Y,CanTurgPSIFun4Expans,fTCanopyGroth_pft(NZ)
-!    write(114,*)I+J/24.,NB,CanopyNonstElms_brch(:,NB,NZ)
-    ENDIF
   ELSE
     RgroCO2_ltd=0._r8
   ENDIF
@@ -3189,7 +3182,7 @@ module PlantBranchMod
 !
 ! RCO2Maint_brch=maintenance respiration
 ! TFN6_vr=temperature function for root maintenance respiration
-! ShootStructE(ielmn)=shoot structural N mass
+! ShootStructE_brch(ielmn)=shoot structural N mass
 ! iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WaterStress4Groth=growth function of canopy water potential
@@ -3572,7 +3565,7 @@ module PlantBranchMod
     CanopyNonstElms_brch      =>  plt_biom%CanopyNonstElms_brch         , &   
     LeafPetolBiomassC_brch    =>  plt_biom%LeafPetolBiomassC_brch       , &        
     StalkRsrvElms_brch        =>  plt_biom%StalkRsrvElms_brch           , &      
-    ZERO4Groth_pft                     =>  plt_biom%ZERO4Groth_pft                          &  
+    ZERO4Groth_pft            =>  plt_biom%ZERO4Groth_pft                 &  
   ) 
   !     REMOBILIZATION OF STALK RESERVE C,N,P IF GROWTH RESPIRATION < 0
 

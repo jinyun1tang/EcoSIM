@@ -1090,7 +1090,7 @@ implicit none
 
   data1d_ptr => this%h1D_SOIL_CO2_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SOIL_CO2_FLX',units='umol C/m2/s',avgflag='A',&
-    long_name='soil CO2 flux',ptr_col=data1d_ptr)      
+    long_name='soil CO2 flux (< 0 int atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_CO2_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_NEE_CO2',units='umol C/m2/s',avgflag='A',&
@@ -1098,11 +1098,11 @@ implicit none
 
   data1d_ptr => this%h1D_CH4_FLX_col(beg_col:end_col)     
   call hist_addfld1d(fname='CH4_FLX',units='umol C/m2/s',avgflag='A',&
-    long_name='soil CH4 flux (negative into atmosphere)',ptr_col=data1d_ptr)      
+    long_name='soil CH4 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='O2_FLX',units='umol O2/m2/s',avgflag='A',&
-    long_name='soil O2 flux',ptr_col=data1d_ptr)      
+    long_name='soil O2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_LITR_col(beg_col:end_col)      
   call hist_addfld1d(fname='CO2_LITR',units='gC/m3',avgflag='A',&
@@ -1411,7 +1411,7 @@ implicit none
 
   data1d_ptr => this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PLANT_BALANCE_C',units='gC/m2',avgflag='A',&
-    long_name='plant C balance',ptr_patch=data1d_ptr)      
+    long_name='plant C balance?',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STANDING_DEAD_C',units='gC/m2',avgflag='A',&
@@ -1516,7 +1516,7 @@ implicit none
 
   data1d_ptr => this%h1D_PLANT_BALANCE_N_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PLANT_BALANCE_N',units='gC/m2',avgflag='A',&
-    long_name='plant N balance',ptr_patch=data1d_ptr)      
+    long_name='plant N balance?',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_STANDING_DEAD_N_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STANDING_DEAD_N',units='gN/m2',avgflag='A',&
@@ -1588,7 +1588,7 @@ implicit none
 
   data1d_ptr => this%h1D_PLANT_BALANCE_P_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='PLANT_BALANCE_P',units='gP/m2',avgflag='A',&
-    long_name='plant P balance',ptr_patch=data1d_ptr)      
+    long_name='plant P balance?',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_STANDING_DEAD_P_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='STANDING_DEAD_P',units='gP/m2',avgflag='A',&
