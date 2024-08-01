@@ -1248,9 +1248,6 @@ module MicBGCMod
   real(r8) :: VLSoilPoreMicPW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
   associate(                                            &
-    DOMuptk4GrothHeter   => nmicf%DOMuptk4GrothHeter,   &
-    RAnabolDOCUptkHeter  => nmicf%RAnabolDOCUptkHeter,  &
-    RAnabolAcetUptkHeter => nmicf%RAnabolAcetUptkHeter, &
     RDOMSorp             => ncplxf%RDOMSorp,            &
     TDOMUptkHeter        => ncplxf%TDOMUptkHeter,       &
     BulkSOMC             => ncplxs%BulkSOMC,            &
@@ -3896,13 +3893,12 @@ module MicBGCMod
   D745: DO M=1,2
     NonstX2stBiomHeter(ielmc,M,NGL,K)=FL(M)*CGOMZ
     IF(mBiomeHeter(ielmc,MID3,K).GT.ZEROS)THEN
-      NonstX2stBiomHeter(ielmn,M,NGL,K)=AMIN1(FL(M)*AZMAX1(mBiomeHeter(ielmn,MID3,K)) &
-        ,NonstX2stBiomHeter(ielmc,M,NGL,K)*mBiomeHeter(ielmn,MID3,K)/mBiomeHeter(ielmc,MID3,K))
-      NonstX2stBiomHeter(ielmp,M,NGL,K)=AMIN1(FL(M)*AZMAX1(mBiomeHeter(ielmp,MID3,K)) &
-        ,NonstX2stBiomHeter(ielmc,M,NGL,K)*mBiomeHeter(ielmp,MID3,K)/mBiomeHeter(ielmc,MID3,K))
+      Do NE=2,NumPlantChemElms
+        NonstX2stBiomHeter(NE,M,NGL,K)=AMIN1(FL(M)*AZMAX1(mBiomeHeter(NE,MID3,K)) &
+          ,NonstX2stBiomHeter(ielmc,M,NGL,K)*mBiomeHeter(NE,MID3,K)/mBiomeHeter(ielmc,MID3,K))
+      ENDDO  
     ELSE
-      NonstX2stBiomHeter(ielmn,M,NGL,K)=0.0_r8
-      NonstX2stBiomHeter(ielmp,M,NGL,K)=0.0_r8
+      NonstX2stBiomHeter(2:NumPlantChemElms,M,NGL,K)=0.0_r8
     ENDIF
 !
 !     MICROBIAL DECOMPOSITION FROM BIOMASS, SPECIFIC DECOMPOSITION

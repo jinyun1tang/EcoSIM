@@ -106,7 +106,6 @@ module CanopyDataType
   real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                       !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                 !
-  real(r8),target,allocatable ::  ShootElmsbeg_pft(:,:,:,:)           !shoot biomass for each pft
   real(r8),target,allocatable ::  ShootElms_brch(:,:,:,:,:)           !shoot biomass for each branch, struct + nonstructual, g/d2
   real(r8),target,allocatable ::  ShootC4NonstC_brch(:,:,:,:)
   real(r8),target,allocatable ::  ShootStrutElms_pft(:,:,:,:)                    !canopy shoot element, [g d-2]
@@ -259,7 +258,6 @@ module CanopyDataType
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
   allocate(tCanLeafC_cl(NumOfCanopyLayers,JY,JX));    tCanLeafC_cl=0._r8
   allocate(ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));ElmAllocmat4Litr=0._r8
-  allocate(ShootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); ShootElmsbeg_pft=0._r8
   allocate(ShootStrutElms_pft(NumPlantChemElms,JP,JY,JX)); ShootStrutElms_pft=0._r8
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
   allocate(PetoleStrutElms_pft(NumPlantChemElms,JP,JY,JX)); PetoleStrutElms_pft=0._r8
@@ -416,7 +414,6 @@ module CanopyDataType
   call destroy(NetCumElmntFlx2Plant_pft)
   call destroy(tCanLeafC_cl)
   call destroy(ElmAllocmat4Litr)
-  call destroy(ShootElmsbeg_pft)
   call destroy(ShootStrutElms_pft)
   call destroy(LeafStrutElms_pft)
   call destroy(PetoleStrutElms_pft)

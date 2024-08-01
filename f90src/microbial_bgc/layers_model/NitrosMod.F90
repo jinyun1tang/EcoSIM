@@ -283,6 +283,7 @@ module nitrosMod
       if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
       if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
     ENDDO  
+
     DO NE=1,nelms      
       ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
         if(ORGM(NE)<0._r8)then
@@ -292,13 +293,15 @@ module nitrosMod
     ENDDO
 
     ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
     if(ORGM(ielmc)<0._r8)then
     print*,'orgmxxx',ORGM,DOM_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
     print*,'L=',L
     if(present(info))print*,info
     stop
     endif
-    !add solid organic matter
+
+    !add solid organic matter, litter, manure etc
     DO  M=1,jsken
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)

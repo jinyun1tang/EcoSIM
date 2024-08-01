@@ -38,6 +38,9 @@ implicit none
     DO NY=NVN,NVS
 !
       call  PlantAPISend(I,J,NY,NX)
+
+      call EnterPlantBalance(I,J,NP(NY,NX))
+
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !     zero out plant hourly fluxes
       call ZeroGrosub()  
@@ -65,6 +68,8 @@ implicit none
       if(lverb)write(*,*)'EXTRACT'
       !aggregate varaibles
       CALL EXTRACTs(I,J)
+
+      call ExitPlantBalance(I,J,NP(NY,NX))
 
       call PlantAPIRecv(I,J,NY,NX)
     ENDDO

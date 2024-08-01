@@ -80,6 +80,7 @@
     DO NE=1,NumPlantChemElms
       NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &
         +PlantExudChemElmCum_pft(NE,NZ,NY,NX)-LitrfalStrutElmsCum_pft(NE,NZ,NY,NX)
+        
       EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_pft(NE,NZ,NY,NX)
       NodulInfectElmsCum_pft(NE,NZ,NY,NX)=0._r8
     ENDDO
