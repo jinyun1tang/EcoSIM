@@ -36,9 +36,9 @@ implicit none
 
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  AmendCFlx_col(:,:)                         !total C amendment, [g d-2]
-  real(r8),target,allocatable ::  FertNFlx_col(:,:)                        !total fertilizer N amendment, [g d-2]
-  real(r8),target,allocatable ::  FerPFlx_col(:,:)                        !total fertilizer P amendment, [g d-2]
+  real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)                         !total C amendment, [g d-2]
+  real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)                        !total fertilizer N amendment, [g d-2]
+  real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)                        !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)                         !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)                         !total subsurface DOC flux, [g d-2]
   real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total LitrFall C, [g d-2]
@@ -48,7 +48,7 @@ implicit none
   real(r8),target,allocatable ::  HydroSubsDOPFlx_col(:,:)                         !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  tXPO4_col(:,:)                          !total soil precipited P, [g d-2]
   real(r8),target,allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
-  real(r8),target,allocatable ::  SedmErossLoss_col(:,:)                        !total sediment subsurface flux, [Mg d-2]
+  real(r8),target,allocatable ::  SedmErossLoss_CumYr_col(:,:)                        !total sediment subsurface flux, [Mg d-2]
   real(r8),target,allocatable ::  HydroSufDICFlx_col(:,:)                         !total surface DIC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDICFlx_col(:,:)                         !total subsurface DIC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDINFlx_col(:,:)                         !total surface DIN flux, [g d-2]
@@ -158,9 +158,9 @@ implicit none
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
   allocate(SurfGasFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasFlx_col=0._r8
-  allocate(AmendCFlx_col(JY,JX));       AmendCFlx_col=0._r8
-  allocate(FertNFlx_col(JY,JX));      FertNFlx_col=0._r8
-  allocate(FerPFlx_col(JY,JX));      FerPFlx_col=0._r8
+  allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
+  allocate(FertNFlx_CumYr_col(JY,JX));      FertNFlx_CumYr_col=0._r8
+  allocate(FerPFlx_CumYr_col(JY,JX));      FerPFlx_CumYr_col=0._r8
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
   allocate(LiterfalOrgM_col(NumPlantChemElms,JY,JX));       LiterfalOrgM_col=0._r8
@@ -171,7 +171,7 @@ implicit none
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
 
   allocate(UCOP(JY,JX));        UCOP=0._r8
-  allocate(SedmErossLoss_col(JY,JX));      SedmErossLoss_col=0._r8
+  allocate(SedmErossLoss_CumYr_col(JY,JX));      SedmErossLoss_CumYr_col=0._r8
   allocate(HydroSufDICFlx_col(JY,JX));       HydroSufDICFlx_col=0._r8
   allocate(HydroSubsDICFlx_col(JY,JX));       HydroSubsDICFlx_col=0._r8
   allocate(HydroSufDINFlx_col(JY,JX));       HydroSufDINFlx_col=0._r8
@@ -264,9 +264,9 @@ implicit none
   call destroy(AEC)
   call destroy(CPO4S)
   call destroy(RO2UptkSoilM_vr)
-  call destroy(AmendCFlx_col)
-  call destroy(FertNFlx_col)
-  call destroy(FerPFlx_col)
+  call destroy(AmendCFlx_CumYr_col)
+  call destroy(FertNFlx_CumYr_col)
+  call destroy(FerPFlx_CumYr_col)
   call destroy(HydroSufDOCFlx_col)
   call destroy(HydroSubsDOCFlx_col)
   call destroy(LiterfalOrgM_col)
@@ -276,7 +276,7 @@ implicit none
   call destroy(HydroSubsDOPFlx_col)
   call destroy(tXPO4_col)
   call destroy(UCOP)
-  call destroy(SedmErossLoss_col)
+  call destroy(SedmErossLoss_CumYr_col)
   call destroy(HydroSufDICFlx_col)
   call destroy(HydroSubsDICFlx_col)
   call destroy(HydroSufDINFlx_col)

@@ -332,13 +332,13 @@ module ExtractsMod
   associate(                                                         &
     PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape, &
     ElmBalanceCum_pft         => plt_site%ElmBalanceCum_pft,         &
-    NH3EmisCum_pft            => plt_bgcr%NH3EmisCum_pft,            &
+    NH3Emis_CumYr_pft            => plt_bgcr%NH3Emis_CumYr_pft,            &
     Canopy_NEE_col            => plt_bgcr%Canopy_NEE_col,            &
     LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
-    ETCanopy_pft              => plt_ew%ETCanopy_pft,                &
+    ETCanopy_CumYr_pft              => plt_ew%ETCanopy_CumYr_pft,                &
     TH2GZ                     => plt_bgcr%TH2GZ,                     &
     trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,      &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
@@ -413,7 +413,7 @@ module ExtractsMod
   Eco_Heat_Sens_col   = Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
   Eco_Heat_Grnd_col   = Eco_Heat_Grnd_col+HeatStorCanP(NZ)
   Canopy_NEE_col      = Canopy_NEE_col+CO2NetFix_pft(NZ)
-  ETCanopy_pft(NZ)    = ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  ETCanopy_CumYr_pft(NZ)    = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanWat_col          = CanWat_col+CanopyWater_pft(NZ)
   CanH2OHeldVg        = CanH2OHeldVg+WatByPCanopy_pft(NZ)
   TEVAPP              = TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
@@ -437,10 +437,10 @@ module ExtractsMod
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
-!     NH3EmisCum_pft=total NH3 flux between atmosphere and canopy
+!     NH3Emis_CumYr_pft=total NH3 flux between atmosphere and canopy
 !
     
-  NH3EmisCum_pft(NZ)=NH3EmisCum_pft(NZ)+NH3Dep2Can_pft(NZ)
+  NH3Emis_CumYr_pft(NZ)=NH3Emis_CumYr_pft(NZ)+NH3Dep2Can_pft(NZ)
 
   end associate
   end subroutine CanopyFluxesandFixation

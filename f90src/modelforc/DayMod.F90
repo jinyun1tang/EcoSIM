@@ -104,7 +104,7 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
+      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
         call SetAnnualAccumlators(NY,NX)
       ENDIF
 

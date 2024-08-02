@@ -238,8 +238,8 @@ module PlantDisturbsMod
     FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr, &
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,        &
     LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,        &
-    LitrfalStrutElmsCum_pft     => plt_bgcr%LitrfalStrutElmsCum_pft,     &
-    SurfLitrfalStrutElmsCum_pft => plt_bgcr%SurfLitrfalStrutElmsCum_pft, &
+    LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft,     &
+    SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft, &
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,  &
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft       &
   )
@@ -301,8 +301,8 @@ module PlantDisturbsMod
 !     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
-      LitrfalStrutElmsCum_pft(NE,NZ)=LitrfalStrutElmsCum_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
-      SurfLitrfalStrutElmsCum_pft(NE,NZ)=SurfLitrfalStrutElmsCum_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
+      LitrfalStrutElms_CumYr_pft(NE,NZ)=LitrfalStrutElms_CumYr_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
+      SurfLitrfalStrutElms_CumYr_pft(NE,NZ)=SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
     ENDDO
   ENDIF
   end associate
@@ -321,14 +321,14 @@ module PlantDisturbsMod
     iHarvstType_pft       => plt_distb%iHarvstType_pft,      &
     jHarvst_pft           => plt_distb%jHarvst_pft,          &
     SeasonalNonstElms_pft => plt_biom%SeasonalNonstElms_pft, &
-    EcoHavstElmnt_pft     => plt_distb%EcoHavstElmnt_pft,    &
+    EcoHavstElmnt_CumYr_pft     => plt_distb%EcoHavstElmnt_CumYr_pft,    &
     EcoHavstElmnt_col     => plt_distb%EcoHavstElmnt_col,    &
     CO2NetFix_pft         => plt_bgcr%CO2NetFix_pft,         &
-    Eco_NBP_col           => plt_bgcr%Eco_NBP_col            &
+    Eco_NBP_CumYr_col           => plt_bgcr%Eco_NBP_CumYr_col            &
   )
 !
-!     TotalElmntRemoval(ielmc),TotalElmntRemoval(ielmn),TotalElmntRemoval(ielmp)=total C,N,P removed
-!     TotalElmnt2Litr(ielmc),TotalElmnt2Litr(ielmn),TotalElmnt2Litr(ielmp)=total C,N,P to litter
+!     TotalElmntRemoval=total C,N,P removed
+!     TotalElmnt2Litr=total C,N,P to litter
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     jHarvst_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
@@ -349,10 +349,10 @@ module PlantDisturbsMod
       !is not terminate and reseed
       IF(jHarvst_pft(NZ).NE.jharvtyp_tmareseed)THEN
         DO NE=1,NumPlantChemElms
-          EcoHavstElmnt_pft(NE,NZ)=EcoHavstElmnt_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
+          EcoHavstElmnt_CumYr_pft(NE,NZ)=EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
           EcoHavstElmnt_col(NE)=EcoHavstElmnt_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
-        Eco_NBP_col=Eco_NBP_col+TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc)
+        Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc)
       !terminate and reseed
       ELSE
         DO NE=1,NumPlantChemElms
@@ -362,9 +362,9 @@ module PlantDisturbsMod
 !
 !     C,N,P LOST AS GAS IF FIRE
 !
-!     CO2ByFire_pft,CH4ByFire_pft,O2ByFire_pft,NH3byFire_pft,N2ObyFire_pft,PO4byFire_pft=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
+!     CO2ByFire_CumYr_pft,CH4ByFire_CumYr_pft,O2ByFire_CumYr_pft,NH3byFire_CumYr_pft,N2ObyFire_CumYr_pft,PO4byFire_CumYr_pft=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     Eco_NBP_col=total net biome productivity
+!     Eco_NBP_CumYr_col=total net biome productivity
 !
     ELSE
       call TotBiomRemovByFire(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
@@ -657,9 +657,9 @@ module PlantDisturbsMod
 !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
-!     CO2ByFire_pft,CH4ByFire_pft,O2ByFire_pft,NH3byFire_pft,N2ObyFire_pft,PO4byFire_pft=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
+!     CO2ByFire_CumYr_pft,CH4ByFire_CumYr_pft,O2ByFire_CumYr_pft,NH3byFire_CumYr_pft,N2ObyFire_CumYr_pft,PO4byFire_CumYr_pft=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     Eco_NBP_col=total net biome productivity
+!     Eco_NBP_CumYr_col=total net biome productivity
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
@@ -872,8 +872,8 @@ module PlantDisturbsMod
     !
 !     HARVESTED STALK C,N,P
 !
-!     WoodyElmntRemoval(ielmc),WoodyElmntRemoval(ielmn),WoodyElmntRemoval(ielmp)=harvested stalk C,N,P
-!     WoodyElmntHarv2Litr(ielmc),WoodyElmntHarv2Litr(ielmn),WoodyElmntHarv2Litr(ielmp)=harvested stalk C,N,P to litter
+!     WoodyElmntRemoval=harvested stalk C,N,P
+!     WoodyElmntHarv2Litr=harvested stalk C,N,P to litter
 !     WTSTKB,WTSTBN,WTSTBP=C,N,P mass remaining in harvested stalk
 !
   DO NE=1,NumPlantChemElms
@@ -968,8 +968,8 @@ module PlantDisturbsMod
 !
 !     HARVESTED STALK RESERVE C,N,P
 !
-!     WoodyElmntRemoval(ielmc),WoodyElmntRemoval(ielmn),WoodyElmntRemoval(ielmp)=harvested stalk C,N,P
-!     WoodyElmntHarv2Litr(ielmc),WoodyElmntHarv2Litr(ielmn),WoodyElmntHarv2Litr(ielmp)=harvested stalk C,N,P to litter
+!     WoodyElmntRemoval=harvested stalk C,N,P
+!     WoodyElmntHarv2Litr=harvested stalk C,N,P to litter
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !
   DO NE=1,NumPlantChemElms
@@ -1069,7 +1069,7 @@ module PlantDisturbsMod
 !
 !     HARVESTED REPRODUCTIVE C,N,P
 !
-!     FineNonleafElmntRemoval(ielmc),FineNonleafElmntRemoval(ielmn),FineNonleafElmntRemoval(ielmp)=reproductive C,N,P removed
+!     FineNonleafElmntRemoval=reproductive C,N,P removed
 !     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
@@ -1147,6 +1147,7 @@ module PlantDisturbsMod
     CanopyNonstElmCopy(NE)=AZMAX1(CanopyNonstElms_brch(NE,NB,NZ))
     CanopyNodulNonstElmCopy(NE)=AZMAX1(CanopyNodulNonstElms_brch(NE,NB,NZ))
   ENDDO
+
   IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
     IF(WGLFGY+WGSHGY.GT.ZERO4Groth_pft(NZ))THEN
       FrcLeafMassLeft=AZMAX1(AMIN1(1.0_r8,(WGLFGX+WGSHGX)/(WGLFGY+WGSHGY)))
@@ -1197,7 +1198,7 @@ module PlantDisturbsMod
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
 !
-  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.CanopyNonstElmCopy(ielmc).GT.ZERO4Groth_pft(NZ))THEN
+  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo .AND. CanopyNonstElmCopy(ielmc).GT.ZERO4Groth_pft(NZ))THEN
     FHVST4=CanopyNonstElmAfhvst(ielmc)/CanopyNonstElmCopy(ielmc)
     dFHVST4=1._r8-FHVST4
     D9810: DO K=1,MaxNodesPerBranch1
@@ -1268,8 +1269,8 @@ module PlantDisturbsMod
 !     WHVSBS=branch petiole C mass removed
 !     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinCNode_brch=node petiole C,N,P,protein mass
 !     FHVSETK=fraction of internode layer mass not harvested
-!     FineNonleafElmntRemoval(ielmc),FineNonleafElmntRemoval(ielmn),FineNonleafElmntRemoval(ielmp)=harvested petiole C,N,P
-!     PetioleElmntHarv2Litr(ielmc),PetioleElmntHarv2Litr(ielmn),PetioleElmntHarv2Litr(ielmp)=harvested petiole C,N,P to litter
+!     FineNonleafElmntRemoval=harvested petiole C,N,P
+!     PetioleElmntHarv2Litr=harvested petiole C,N,P to litter
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !     PetoleLensNode_brch,LiveInterNodeHight_brch=petiole,internode length
@@ -1724,7 +1725,7 @@ module PlantDisturbsMod
 
   associate(                                                         &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    Eco_NBP_col               => plt_bgcr%Eco_NBP_col,               &
+    Eco_NBP_CumYr_col               => plt_bgcr%Eco_NBP_CumYr_col,               &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,           &

@@ -194,8 +194,8 @@ module RedistMod
   Canopy_Heat_Sens_col(NY,NX)=Canopy_Heat_Sens_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*BndlResistCanopy_col(NY,NX)
   Eco_NEE_col(NY,NX)=Canopy_NEE_col(NY,NX)+SurfGasFlx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)=ECO_ER_col(NY,NX)+SurfGasFlx_col(idg_CO2,NY,NX)
-  Eco_NPP_col(NY,NX)=Eco_GPP_col(NY,NX)+Eco_AutoR_col(NY,NX)
-  Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)+Canopy_NEE_col(NY,NX) &
+  Eco_NPP_CumYr_col(NY,NX)=Eco_GPP_CumYr_col(NY,NX)+Eco_AutoR_CumYr_col(NY,NX)
+  Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)+Canopy_NEE_col(NY,NX) &
     +SurfGasFlx_col(idg_CO2,NY,NX)+SurfGasFlx_col(idg_CH4,NY,NX) &
     +TXCO2(NY,NX)-HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX)-HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
     
@@ -329,7 +329,7 @@ module RedistMod
   EvapoTransp_col(NY,NX)=-WO
   QH2OLoss_lnds=QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   QDischar_col(NY,NX)=QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  AnualH2OLoss_col(NY,NX)=AnualH2OLoss_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  H2OLoss_CumYr_col(NY,NX)=H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
   QDrain_col(NY,NX)=QDrain_col(NY,NX)+WaterFlowSoiMicP_3D(3,NK(NY,NX),NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
@@ -548,7 +548,7 @@ module RedistMod
     trc_solml_vr(NTG,NU(NY,NX),NY,NX)=fixnegmass(trc_solml_vr(NTG,NU(NY,NX),NY,NX))
   ENDDO
 
-  Eco_HR_col(NY,NX)=Eco_HR_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,0,NY,NX)
+  Eco_HR_CumYr_col(NY,NX)=Eco_HR_CumYr_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,0,NY,NX)
   SurfGasFlx_col(idg_N2,NY,NX)=SurfGasFlx_col(idg_N2,NY,NX)+trcg_RMicbTransf_vr(idg_N2,0,NY,NX)
 
   RO2GasXchangePrev_vr(0,NY,NX)=Gas_Disol_Flx_vr(idg_O2,0,NY,NX)
@@ -1075,7 +1075,7 @@ module RedistMod
 
     enddo
 
-    Eco_HR_col(NY,NX)=Eco_HR_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) &
+    Eco_HR_CumYr_col(NY,NX)=Eco_HR_CumYr_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) &
       +trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
     SurfGasFlx_col(idg_N2,NY,NX)=SurfGasFlx_col(idg_N2,NY,NX)+trcg_RMicbTransf_vr(idg_N2,L,NY,NX)
     !

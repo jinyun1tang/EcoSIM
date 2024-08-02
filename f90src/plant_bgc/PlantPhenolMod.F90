@@ -182,7 +182,7 @@ module PlantPhenolMod
     DATAP                    =>  plt_site%DATAP                   , &
     iYearCurrent             =>  plt_site%iYearCurrent            , &
     NumActivePlants          =>  plt_site%NumActivePlants         , &
-    Eco_NBP_col              =>  plt_bgcr%Eco_NBP_col             , &
+    Eco_NBP_CumYr_col              =>  plt_bgcr%Eco_NBP_CumYr_col             , &
     SeedCPlanted_pft         =>  plt_biom%SeedCPlanted_pft        , &
     iPlantState_pft          =>  plt_pheno%iPlantState_pft        , &
     IsPlantActive_pft        =>  plt_pheno%IsPlantActive_pft        &
@@ -209,7 +209,7 @@ module PlantPhenolMod
             IsPlantActive_pft(NZ)=iDormant
             iPlantState_pft(NZ)=iLive
             CALL StartPlants(NZ,NZ)
-            Eco_NBP_col=Eco_NBP_col+SeedCPlanted_pft(NZ)
+            Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+SeedCPlanted_pft(NZ)
           ENDIF
           !the living plant has actual properties set
           IF(DATAP(NZ).NE.'NO'.AND.iPlantState_pft(NZ).EQ.iLive)then
@@ -233,7 +233,7 @@ module PlantPhenolMod
           IsPlantActive_pft(NZ)=iDormant
           iPlantState_pft(NZ)=iLive
           CALL StartPlants(NZ,NZ)
-          Eco_NBP_col=Eco_NBP_col+SeedCPlanted_pft(NZ)
+          Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+SeedCPlanted_pft(NZ)
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.iPlantState_pft(NZ).EQ.iLive)then
           IsPlantActive_pft(NZ)=iActive

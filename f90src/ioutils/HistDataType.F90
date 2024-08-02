@@ -38,8 +38,8 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   type, public :: histdata_type
-  real(r8),pointer   :: h1D_tFIRE_CO2_col(:)     !CO2byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tFIRE_CH4_col(:)     !CH4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tFIRE_CO2_col(:)     !CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tFIRE_CH4_col(:)     !CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_cNH4_LITR_col(:)     !(trc_solml_vr(ids_NH4,0,NY,NX)+14.0*trcx_solml_vr(idx_NH4,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)
   real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)                            
   real(r8),pointer   :: h1D_ECO_HVST_N_col(:)     !EcoHavstElmnt_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -48,7 +48,7 @@ implicit none
   real(r8),pointer   :: h1D_HUMUS_C_col(:)        !tHumOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HUMUS_N_col(:)        !tHumOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_HUMUS_P_col(:)        !tHumOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_AMENDED_P_col(:)       !FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_AMENDED_P_col(:)       !FerPFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_P_FLX_col(:)   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tEXCH_PO4_col(:)       !tHxPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
   real(r8),pointer   :: h1D_SUR_DOP_FLX_col(:)    !HydroSufDOPFlx_col(NY,NX)/TAREA
@@ -63,7 +63,7 @@ implicit none
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
   real(r8),pointer   :: h1D_tSoilOrgP_col(:)
-  real(r8),pointer   :: h1D_PO4_FIRE_col(:)       !PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_PO4_FIRE_col(:)       !PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trc_solml_vr(ids_H2PO4,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
   real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml_vr(idx_HPO4,0,NY,NX)+trcx_solml_vr(idx_H2PO4,0,NY,NX))/SoilMicPMassLayer(0,NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_P_col(:)     !EcoHavstElmnt_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -74,7 +74,7 @@ implicit none
   real(r8),pointer   :: h1D_tLITR_N_col(:)      !tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   real(r8),pointer   :: h1D_tHeatUptk_col(:)
-  real(r8),pointer   :: h1D_AMENDED_N_col(:)       !FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_AMENDED_N_col(:)       !FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_N_FLX_col(:)  !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_C_FLX_col(:)  !LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tNH4X_col(:)           !tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NH3+NH4 content
@@ -87,7 +87,7 @@ implicit none
   real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS(0,NY,NX)
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
   real(r8),pointer   :: h1D_tLITR_C_col(:)      !tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_AMENDED_C_col(:)      !AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_AMENDED_C_col(:)      !AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CO2_FLX_col(:)        !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_C_col(:)        !tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_OMC_LITR_col(:)       !SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
@@ -99,13 +99,13 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DIC_FLX_col(:)    !HydroSubsDICFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_ATM_CO2_col(:)        !CO2E(NY,NX)
   real(r8),pointer   :: h1D_ATM_CH4_col(:)        !CH4E
-  real(r8),pointer   :: h1D_NBP_col(:)            !Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_NBP_col(:)            !Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_C_col(:)     !EcoHavstElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_LAI_col(:)        !CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_GPP_col(:)        !Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_RA_col(:)         !Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_NPP_col(:)        !Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_HR_col(:)         !Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Eco_GPP_CumYr_col(:)        !Eco_GPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_RA_col(:)         !Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Eco_NPP_CumYr_col(:)        !Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Eco_HR_CumYr_col(:)         !Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tDIC_col(:)        !DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
   real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)       !StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -136,7 +136,7 @@ implicit none
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
   real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)         !-QRunSurf_col(NY,NX)*1000.0/TAREA, 
-  real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !SedmErossLoss_col(NY,NX)*1000.0/TAREA, soil mass 
+  real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !SedmErossLoss_CumYr_col(NY,NX)*1000.0/TAREA, soil mass 
   real(r8),pointer   :: h1D_tSWC_col(:)        !WatMass_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
   real(r8),pointer   :: h1D_tHeat_col(:) 
   real(r8),pointer   :: h1D_DISCHG_FLX_col(:)         !QDischar_col(NY,NX)*1000.0/TAREA
@@ -175,7 +175,7 @@ implicit none
   real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTCanopyGroth_pft(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),  gross CO2 fixation, gC m-2/hr
-  real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
+  real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyRespC_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
   real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
   real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
   real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
@@ -215,20 +215,20 @@ implicit none
   real(r8),pointer   :: h1D_STORED_C_ptc(:)      !NonStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_GRAIN_NO_ptc(:)      !CanopySeedNum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LAIb_ptc(:)          !CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
-  real(r8),pointer   :: h1D_EXUD_C_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_EXUD_C_FLX_ptc(:)        !PlantExudElm_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LITRf_C_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LITRf_P_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_C_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)     !GrossResp_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)        !EcoHavstElmnt_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:)     !ElmBalanceCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:)    !StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)     !CO2ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
-  real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)     !CH4ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)     !CO2ByFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
+  real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)     !CH4ByFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NPP_ptc(:)           !NetPrimProduct_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_HT_ptc(:)        !CanopyHeight_pft(NZ,NY,NX), canopy height, m
   real(r8),pointer   :: h1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
-  real(r8),pointer   :: h1D_tTRANSPN_ptc(:)      !-ETCanopy_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
+  real(r8),pointer   :: h1D_tTRANSPN_ptc(:)      !-ETCanopy_CumYr_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   real(r8),pointer   :: h1D_WTR_STRESS_ptc(:)    !HoursTooLowPsiCan_pft(NZ,NY,NX)
   real(r8),pointer   :: h1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
   real(r8),pointer   :: h1D_SHOOT_N_ptc(:)       !ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -241,14 +241,14 @@ implicit none
   real(r8),pointer   :: h1D_ROOT_N_ptc(:)        !RootElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_N_ptc(:)         !NodulStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STORED_N_ptc(:)      !NonStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)        !PlantExudElm_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant LitrFall N
-  real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:)    !PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
-  real(r8),pointer   :: h1D_HVST_N_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)    !NH3EmisCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:)    !PlantN2Fix_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
+  real(r8),pointer   :: h1D_HVST_N_FLX_ptc(:)        !EcoHavstElmnt_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)    !NH3Emis_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PLANT_BALANCE_N_ptc(:)     !ElmBalanceCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)    !StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)        !NH3byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant N emission from fire
+  real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)        !NH3byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant N emission from fire
   real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:)   !SurfLitrfalStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), surface litter fall
   real(r8),pointer   :: h1D_SHOOT_P_ptc(:)       !ShootStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LEAF_P_ptc(:)        !LeafStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -260,12 +260,12 @@ implicit none
   real(r8),pointer   :: h1D_ROOT_P_ptc(:)        !RootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NODULE_P_ptc(:)         !NodulStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STORED_P_ptc(:)      !NonStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_EXUD_P_FLX_ptc(:)        !PlantExudChemElmCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_EXUD_P_FLX_ptc(:)        !PlantExudElm_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_LITTERf_P_ptc(:)     !LitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HVST_P_FLX_ptc(:)        !EcoHavstElmnt_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_HVST_P_FLX_ptc(:)        !EcoHavstElmnt_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PLANT_BALANCE_P_ptc(:)     !ElmBalanceCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_STANDING_DEAD_P_ptc(:)    !StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:)   !CanopyNonstElms_pft(ielmc,NY,NX)
@@ -458,10 +458,10 @@ implicit none
   allocate(this%h1D_NBP_col(beg_col:end_col))             ;this%h1D_NBP_col(:)=spval
 
   allocate(this%h1D_ECO_LAI_col(beg_col:end_col))         ;this%h1D_ECO_LAI_col(:)=spval
-  allocate(this%h1D_ECO_GPP_col(beg_col:end_col))         ;this%h1D_ECO_GPP_col(:)=spval
+  allocate(this%h1D_Eco_GPP_CumYr_col(beg_col:end_col))         ;this%h1D_Eco_GPP_CumYr_col(:)=spval
   allocate(this%h1D_ECO_RA_col(beg_col:end_col))          ;this%h1D_ECO_RA_col(:)=spval
-  allocate(this%h1D_ECO_NPP_col(beg_col:end_col))         ;this%h1D_ECO_NPP_col(:)=spval
-  allocate(this%h1D_ECO_HR_col(beg_col:end_col))          ;this%h1D_ECO_HR_col(:)=spval
+  allocate(this%h1D_Eco_NPP_CumYr_col(beg_col:end_col))         ;this%h1D_Eco_NPP_CumYr_col(:)=spval
+  allocate(this%h1D_Eco_HR_CumYr_col(beg_col:end_col))          ;this%h1D_Eco_HR_CumYr_col(:)=spval
   allocate(this%h1D_tDIC_col(beg_col:end_col))            ;this%h1D_tDIC_col=spval
   allocate(this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_C_col=spval 
   allocate(this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_N_col=spval  
@@ -980,7 +980,7 @@ implicit none
   call hist_addfld1d(fname='ECO_LAI',units='m2/m2',avgflag='A',&
     long_name='ecosystem LAI',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_ECO_GPP_col(beg_col:end_col)       
+  data1d_ptr => this%h1D_Eco_GPP_CumYr_col(beg_col:end_col)       
   call hist_addfld1d(fname='ECO_GPP',units='gC/m2/hr',avgflag='A',&
     long_name='cumulative ecosystem GPP',ptr_col=data1d_ptr)      
 
@@ -988,11 +988,11 @@ implicit none
   call hist_addfld1d(fname='ECO_RA',units='gC/m2/hr',avgflag='A',&
     long_name='cumulative ecosystem autotrophic respiration',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_ECO_NPP_col(beg_col:end_col)      
+  data1d_ptr => this%h1D_Eco_NPP_CumYr_col(beg_col:end_col)      
   call hist_addfld1d(fname='ECO_NPP',units='gC/m2/hr',avgflag='A',&
     long_name='cumulative ecosystem NPP',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_ECO_HR_col(beg_col:end_col)      
+  data1d_ptr => this%h1D_Eco_HR_CumYr_col(beg_col:end_col)      
   call hist_addfld1d(fname='ECO_RH',units='gC/m2/hr',avgflag='A',&
     long_name='cumulative ecosystem heterotrophic respiration',ptr_col=data1d_ptr)      
 
@@ -1995,8 +1995,8 @@ implicit none
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
-      this%h1D_tFIRE_CO2_col(ncol)        =  CO2byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tFIRE_CH4_col(ncol)        =  CH4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tFIRE_CO2_col(ncol)        =  CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tFIRE_CH4_col(ncol)        =  CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cNH4_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+&
         natomw*trcx_solml_vr(idx_NH4,0,NY,NX),SoilMicPMassLayer(0,NY,NX)*million)
       this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
@@ -2015,7 +2015,7 @@ implicit none
       this%h1D_HUMUS_C_col(ncol)          = tHumOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_HUMUS_N_col(ncol)          = tHumOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_HUMUS_P_col(ncol)          = tHumOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_AMENDED_P_col(ncol)        = FerPFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_AMENDED_P_col(ncol)        = FerPFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_C_FLX_col(ncol)     = LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_N_FLX_col(ncol)     = LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_P_FLX_col(ncol)     = LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2038,7 +2038,7 @@ implicit none
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
       this%h1D_tPRECIP_P_col(ncol)        = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX)*million)
       this%h1D_cEXCH_P_LITR_col(ncol)     =  patomw*safe_adb(trcx_solml_vr(idx_HPO4,0,NY,NX)+&
         trcx_solml_vr(idx_H2PO4,0,NY,NX),SoilMicPMassLayer(0,NY,NX)*million)
@@ -2047,7 +2047,7 @@ implicit none
       this%h1D_PSI_SURF_col(ncol)         = PSISoilMatricP_vr(0,NY,NX)
       this%h1D_SURF_ELEV_col(ncol)        = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol) = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_AMENDED_N_col(ncol)        = FertNFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_AMENDED_N_col(ncol)        = FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)            = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNO3_col(ncol)             = tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       if(this%h1D_tNH4X_col(ncol)<0._r8)then
@@ -2063,7 +2063,7 @@ implicit none
       endif
       this%h1D_tLITR_C_col(ncol)   = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
-      this%h1D_AMENDED_C_col(ncol)   = AmendCFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_AMENDED_C_col(ncol)   = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_FLX_col(ncol)     = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)    = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgC_col(ncol)   = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2074,13 +2074,13 @@ implicit none
       this%h1D_OMP_LITR_col(ncol)    = SoilOrgM_vr(ielmp,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
       this%h1D_ATM_CH4_col(ncol)     = CH4E(NY,NX)
-      this%h1D_NBP_col(ncol)         = Eco_NBP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_NBP_col(ncol)         = Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_HVST_C_col(ncol)  = EcoHavstElmnt_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_LAI_col(ncol)     = CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_GPP_col(ncol)     = Eco_GPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_RA_col(ncol)      = Eco_AutoR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_NPP_col(ncol)     = Eco_NPP_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_HR_col(ncol)      = Eco_HR_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_GPP_CumYr_col(ncol)     = Eco_GPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_RA_col(ncol)      = Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_NPP_CumYr_col(ncol)     = Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_HR_CumYr_col(ncol)      = Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tDIC_col(ncol)     = DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_C_col(ncol)    = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_N_col(ncol)    = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2111,7 +2111,7 @@ implicit none
       this%h1D_CO2_LITR_col(ncol)     = trc_solcl_vr(idg_CO2,0,NY,NX)
       this%h1D_EVAPN_col(ncol)        = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RUNOFF_FLX_col(ncol)   = -QRunSurf_col(NY,NX)*m2mm/TAREA
-      this%h1D_SEDIMENT_FLX_col(ncol) = SedmErossLoss_col(NY,NX)*m2mm/TAREA
+      this%h1D_SEDIMENT_FLX_col(ncol) = SedmErossLoss_CumYr_col(NY,NX)*m2mm/TAREA
       this%h1D_tSWC_col(ncol)         = WatMass_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tHeat_col(ncol)        = HeatStore_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_DISCHG_FLX_col(ncol)   = QDischar_col(NY,NX)*m2mm/TAREA
@@ -2302,7 +2302,7 @@ implicit none
         this%h1D_CAN_TEMPFN_ptc(nptc)    = fTCanopyGroth_pft(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
         this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_RA_ptc(nptc)        = CanopyRespC_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_RA_ptc(nptc)        = CanopyRespC_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cTNC_ptc(nptc)          = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
         this%h1D_cTNN_ptc(nptc)          = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
         this%h1D_cTNP_ptc(nptc)          = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
@@ -2342,23 +2342,23 @@ implicit none
         this%h1D_STORED_C_ptc(nptc)      = SeasonalNonstElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_NO_ptc(nptc)      = CanopySeedNum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_LAIb_ptc(nptc)          = CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_EXUD_C_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_LITRf_C_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_SURF_LITRf_C_FLX_ptc(nptc) = SurfLitrfalStrutElmsCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_EXUD_C_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_LITRf_C_FLX_ptc(nptc)      = LitrfalStrutElms_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_SURF_LITRf_C_FLX_ptc(nptc) = SurfLitrfalStrutElms_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_AUTO_RESP_FLX_ptc(nptc)   = GrossResp_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_HVST_C_FLX_ptc(nptc)      = EcoHavstElmnt_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_HVST_N_FLX_ptc(nptc)      = EcoHavstElmnt_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_HVST_P_FLX_ptc(nptc)      = EcoHavstElmnt_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_HVST_C_FLX_ptc(nptc)      = EcoHavstElmnt_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_HVST_N_FLX_ptc(nptc)      = EcoHavstElmnt_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_HVST_P_FLX_ptc(nptc)      = EcoHavstElmnt_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PLANT_BALANCE_C_ptc(nptc) = ElmBalanceCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PLANT_BALANCE_N_ptc(nptc) = ElmBalanceCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PLANT_BALANCE_P_ptc(nptc) = ElmBalanceCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_C_ptc(nptc) = StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_FIREp_CO2_FLX_ptc(nptc)   = CO2ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_FIREp_CH4_FLX_ptc(nptc)   = CH4ByFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_FIREp_CO2_FLX_ptc(nptc)   = CO2ByFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_FIREp_CH4_FLX_ptc(nptc)   = CH4ByFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NPP_ptc(nptc)          = NetPrimProduct_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_HT_ptc(nptc)       = CanopyHeight_pft(NZ,NY,NX)
         this%h1D_POPN_ptc(nptc)         = PlantPopulation_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_tTRANSPN_ptc(nptc)     =-ETCanopy_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_tTRANSPN_ptc(nptc)     =-ETCanopy_CumYr_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_WTR_STRESS_ptc(nptc)   = HoursTooLowPsiCan_pft(NZ,NY,NX)
                 
         this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress_pft(NZ,NY,NX)
@@ -2376,13 +2376,13 @@ implicit none
         this%h1D_ROOT_N_ptc(nptc)       = RootElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_N_ptc(nptc)     = NodulStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STORED_N_ptc(nptc)     = SeasonalNonstElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_LITRf_N_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_TL_N_FIXED_FLX_ptc(nptc)   = PlantN2FixCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NH3can_FLX_ptc(nptc)   = NH3EmisCum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_LITRf_N_FLX_ptc(nptc)      = LitrfalStrutElms_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_TL_N_FIXED_FLX_ptc(nptc)   = PlantN2Fix_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NH3can_FLX_ptc(nptc)   = NH3Emis_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_N_ptc(nptc)   = StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_FIREp_N_FLX_ptc(nptc)       = NH3byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_SURF_LITRf_N_FLX_ptc(nptc)  = SurfLitrfalStrutElmsCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_FIREp_N_FLX_ptc(nptc)       = NH3byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_SURF_LITRf_N_FLX_ptc(nptc)  = SurfLitrfalStrutElms_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SHOOTST_P_ptc(nptc)      = ShootStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SHOOT_P_ptc(nptc)      = ShootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_Plant_P_ptc(nptc)      = (ShootElms_pft(ielmp,NZ,NY,NX) &
@@ -2397,11 +2397,11 @@ implicit none
         this%h1D_ROOT_P_ptc(nptc)           = RootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NODULE_P_ptc(nptc)         = NodulStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STORED_P_ptc(nptc)         = SeasonalNonstElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_EXUD_P_FLX_ptc(nptc)       = PlantExudChemElmCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_LITRf_P_FLX_ptc(nptc)      = LitrfalStrutElmsCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_EXUD_P_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_LITRf_P_FLX_ptc(nptc)      = LitrfalStrutElms_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_P_ptc(nptc)   = StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_FIREp_P_FLX_ptc(nptc)       = PO4byFire_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_SURF_LITRf_P_FLX_ptc(nptc) = SurfLitrfalStrutElmsCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_FIREp_P_FLX_ptc(nptc)       = PO4byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_SURF_LITRf_P_FLX_ptc(nptc) = SurfLitrfalStrutElms_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_BRANCH_NO_ptc(nptc)    = NumOfBranches_pft(NZ,NY,NX)
 
         this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX),&
