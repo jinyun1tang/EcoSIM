@@ -1,6 +1,7 @@
 set(PLANT_BGC_SOURCES
   PlantMathFuncMod.F90
   PlantDisturbByFireMod.F90
+  PlantDisturbByTillageMod.F90 
   InitVegBGC.F90
   RootGasMod.F90
   PlantBalMod.F90
