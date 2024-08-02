@@ -2198,7 +2198,7 @@ module PlantBranchMod
     FracBiomHarvsted                  => plt_distb%FracBiomHarvsted,                  &
     iYearPlantHarvest_pft             => plt_distb%iYearPlantHarvest_pft,             &
     THIN_pft                          => plt_distb%THIN_pft,                          &
-    CutHeightORFrac_pft               => plt_distb%CutHeightORFrac_pft,               &
+    FracCanopyHeightCut_pft               => plt_distb%FracCanopyHeightCut_pft,               &
     iHarvstType_pft                   => plt_distb%iHarvstType_pft,                   &
     jHarvst_pft                       => plt_distb%jHarvst_pft,                       &
     iDayPlanting_pft                  => plt_distb%iDayPlanting_pft,                  &
@@ -2517,7 +2517,7 @@ module PlantBranchMod
         iYearPlantHarvest_pft(NZ)=iYearCurrent
         iHarvstType_pft(NZ)=1
         jHarvst_pft(NZ)=jharvtyp_tmareseed
-        CutHeightORFrac_pft(NZ)=0._r8
+        FracCanopyHeightCut_pft(NZ)=0._r8
         THIN_pft(NZ)=0._r8
         FracBiomHarvsted(1,iplthvst_leaf,NZ)=1.0_r8
         FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)=1.0_r8
