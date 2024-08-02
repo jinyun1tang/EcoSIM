@@ -85,8 +85,8 @@ module StartqMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP(NY,NX)+1,JP
-        SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
-        LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+        SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
+        LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
         StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
@@ -595,26 +595,26 @@ module StartqMod
     CanopyLeafCLyr_pft(L,NZ,NY,NX)=0._r8
     CanopyStemAreaZ_pft(L,NZ,NY,NX)=0._r8
   ENDDO D35
-  CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
-  ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  CanopyStalkC_pft(NZ,NY,NX)=0._r8
-  StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  HuskStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  EarStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  GrainStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  RootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  NodulStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  CanopyLeafShethC_pft(NZ,NY,NX)=0._r8
+  CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
+  CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
+  NoduleNonstructCconc_pft(NZ,NY,NX)                  = 0._r8
+  ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+  LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
+  PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
+  StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+  CanopyStalkC_pft(NZ,NY,NX)                          = 0._r8
+  StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
+  HuskStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
+  EarStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)       = 0._r8
+  GrainStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+  RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)           = 0._r8
+  RootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
+  NodulStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+  CanopyLeafShethC_pft(NZ,NY,NX)                      = 0._r8
 
-  CanopyLeafArea_pft(NZ,NY,NX)=0._r8
-  RootBiomCPerPlant_pft(NZ,NY,NX)=0._r8
-  CanopyStemArea_pft(NZ,NY,NX)=0._r8
+  CanopyLeafArea_pft(NZ,NY,NX)    = 0._r8
+  RootBiomCPerPlant_pft(NZ,NY,NX) = 0._r8
+  CanopyStemArea_pft(NZ,NY,NX)    = 0._r8
 
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
@@ -633,24 +633,24 @@ module StartqMod
 !
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ,NY,NX)                                = 0._r8
-    SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
+    SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
     GrossResp_pft(NZ,NY,NX)                                  = 0._r8
-    CanopyRespC_pft(NZ,NY,NX)                                = 0._r8
-    PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
-    LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
-    PlantN2FixCum_pft(NZ,NY,NX)                              = 0._r8
+    CanopyRespC_CumYr_pft(NZ,NY,NX)                                = 0._r8
+    PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+    LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+    PlantN2Fix_CumYr_pft(NZ,NY,NX)                              = 0._r8
     NH3Dep2Can_pft(NZ,NY,NX)                                 = 0._r8
-    NH3EmisCum_pft(NZ,NY,NX)                                 = 0._r8
-    CO2ByFire_pft(NZ,NY,NX)                                  = 0._r8
-    CH4ByFire_pft(NZ,NY,NX)                                  = 0._r8
-    O2ByFire_pft(NZ,NY,NX)                                   = 0._r8
-    NH3byFire_pft(NZ,NY,NX)                                  = 0._r8
-    N2ObyFire_pft(NZ,NY,NX)                                  = 0._r8
-    PO4byFire_pft(NZ,NY,NX)                                  = 0._r8
+    NH3Emis_CumYr_pft(NZ,NY,NX)                                 = 0._r8
+    CO2ByFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
+    CH4ByFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
+    O2ByFire_CumYr_pft(NZ,NY,NX)                                   = 0._r8
+    NH3byFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
+    N2ObyFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
+    PO4byFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
     EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ,NY,NX)        = 0._r8
-    EcoHavstElmnt_pft(1:NumPlantChemElms,NZ,NY,NX)           = 0._r8
+    EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)           = 0._r8
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
-    ETCanopy_pft(NZ,NY,NX)                                   = 0._r8
+    ETCanopy_CumYr_pft(NZ,NY,NX)                                   = 0._r8
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
     WTSTDX=StandingDeadInitC_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc

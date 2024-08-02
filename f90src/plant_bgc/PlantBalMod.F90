@@ -266,7 +266,7 @@ implicit none
     MaxSoiL4Root_pft     => plt_morph%MaxSoiL4Root_pft,    &
     MaxNumRootLays       => plt_site%MaxNumRootLays,       &
     CO2NetFix_pft        => plt_bgcr%CO2NetFix_pft,        &
-    CanopyRespC_pft      => plt_bgcr%CanopyRespC_pft,      &
+    CanopyRespC_CumYr_pft      => plt_bgcr%CanopyRespC_CumYr_pft,      &
     LitrfalStrutElms_pft => plt_bgcr%LitrfalStrutElms_pft, &
     NodulInfectElms_pft  => plt_bgcr%NodulInfectElms_pft,  &
     RootMycoExudElms_pft => plt_rbgc%RootMycoExudElms_pft, &
@@ -394,7 +394,7 @@ implicit none
     NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &  !>0 add to plant
     LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft,      &  !>0 off plant
     RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft,      &  !>0 add to plant
-    EcoHavstElmnt_pft         => plt_distb%EcoHavstElmnt_pft,        &
+    EcoHavstElmnt_CumYr_pft         => plt_distb%EcoHavstElmnt_CumYr_pft,        &
     RootElmsBeg_pft           => plt_biom%RootElmsBeg_pft,           &
     RootElms_pft              => plt_biom%RootElms_pft,              &
     StandDeadStrutElmsBeg_pft => plt_biom%StandDeadStrutElmsBeg_pft, &

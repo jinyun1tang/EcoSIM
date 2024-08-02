@@ -28,12 +28,12 @@ contains
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)  
   integer :: NE
   associate(                                              &
-    Eco_AutoR_col         => plt_bgcr%Eco_AutoR_col,      &  
-    CanopyRespC_pft       => plt_bgcr%CanopyRespC_pft,    &    
+    Eco_AutoR_CumYr_col         => plt_bgcr%Eco_AutoR_CumYr_col,      &  
+    CanopyRespC_CumYr_pft       => plt_bgcr%CanopyRespC_CumYr_pft,    &    
     ECO_ER_col            => plt_bgcr%ECO_ER_col,         &
     GrossResp_pft         => plt_bgcr%GrossResp_pft,      &      
     EcoHavstElmnt_col     => plt_distb%EcoHavstElmnt_col, &  
-    EcoHavstElmnt_pft     => plt_distb%EcoHavstElmnt_pft  &
+    EcoHavstElmnt_CumYr_pft     => plt_distb%EcoHavstElmnt_CumYr_pft  &
   )
 !     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
 !     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
@@ -41,21 +41,21 @@ contains
 !     TotalElmntRemoval(ielmc),TotalElmntRemoval(ielmn),TotalElmntRemoval(ielmp)=total C,N,P removed
 !     TotalElmnt2Litr(ielmc),TotalElmnt2Litr(ielmn),TotalElmnt2Litr(ielmp)=total C,N,P to litter
 !     ECO_ER_col=ecosystem respiration
-!     Eco_AutoR_col=total autotrophic respiration
+!     Eco_AutoR_CumYr_col=total autotrophic respiration
 
-  EcoHavstElmnt_pft(ielmc,NZ)=EcoHavstElmnt_pft(ielmc,NZ)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  EcoHavstElmnt_CumYr_pft(ielmc,NZ)=EcoHavstElmnt_CumYr_pft(ielmc,NZ)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   EcoHavstElmnt_col(ielmc)=EcoHavstElmnt_col(ielmc)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
 
   DO NE=2,NumPlantChemElms
-    EcoHavstElmnt_pft(NE,NZ)=EcoHavstElmnt_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
+    EcoHavstElmnt_CumYr_pft(NE,NZ)=EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
     EcoHavstElmnt_col(NE)=EcoHavstElmnt_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
   ENDDO
   GrossResp_pft(NZ)=GrossResp_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-!     Eco_NBP_col=Eco_NBP_col+GY*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
+  CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+!     Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+GY*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+GZ*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
   ECO_ER_col=ECO_ER_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  Eco_AutoR_col=Eco_AutoR_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   end associate
   end subroutine TotalBiomRemovalByGrazing
 
@@ -124,11 +124,11 @@ contains
   EHVST23h=1._r8-FracBiomHarvsted(2,iplthvst_woody,NZ)*0.5_r8
   EHVST24h=1._r8-FracBiomHarvsted(2,iplthvst_stdead,NZ)*0.5_r8
 
-  NonstructElmnt2Litr(ielmc)=NonstructElmntRemoval(ielmc)*EHVST21
-  LeafElmnt2Litr(ielmc)=LeafElmntRemoval(ielmc)*EHVST21
-  FineNonleafElmnt2Litr(ielmc)=FineNonleafElmntRemoval(ielmc)*EHVST22
-  WoodyElmnt2Litr(ielmc)=WoodyElmntRemoval(ielmc)*EHVST23
-  StandeadElmnt2Litr(ielmc)=StandeadElmntRemoval(ielmc)*EHVST24
+  NonstructElmnt2Litr(ielmc)   = NonstructElmntRemoval(ielmc)*EHVST21
+  LeafElmnt2Litr(ielmc)        = LeafElmntRemoval(ielmc)*EHVST21
+  FineNonleafElmnt2Litr(ielmc) = FineNonleafElmntRemoval(ielmc)*EHVST22
+  WoodyElmnt2Litr(ielmc)       = WoodyElmntRemoval(ielmc)*EHVST23
+  StandeadElmnt2Litr(ielmc)    = StandeadElmntRemoval(ielmc)*EHVST24
 
   DO NE=2,NumPlantChemElms
     NonstructElmnt2Litr(NE)=NonstructElmntRemoval(NE)*EHVST21h
@@ -146,7 +146,7 @@ contains
   FERT(17)=FERT(17)+(NonstructElmnt2Litr(ielmc)+LeafElmnt2Litr(ielmc)+&
     FineNonleafElmnt2Litr(ielmc)+WoodyElmnt2Litr(ielmc)+StandeadElmnt2Litr(ielmc))/AREA3(NU)
   FERT(18)=FERT(18)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
-    FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8
+    FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8    
   FERT(3)=FERT(3)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
     FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8
   FERT(19)=FERT(19)+(NonstructElmnt2Litr(ielmp)+LeafElmnt2Litr(ielmp)+&

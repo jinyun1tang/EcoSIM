@@ -82,7 +82,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  QRain_col(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  Qrunoff_col(:,:)                         !total surface runoff, [m3 d-2]
   real(r8),target,allocatable ::  WatMass_col(:,:)                !total soil water content, [m3 d-2]
-  real(r8),target,allocatable ::  AnualH2OLoss_col(:,:)                        !total subsurface water flux, [m3 d-2]
+  real(r8),target,allocatable ::  H2OLoss_CumYr_col(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  QDrain_col(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
@@ -179,7 +179,7 @@ module SoilWaterDataType
   allocate(QRain_col(JY,JX));       QRain_col=0._r8
   allocate(Qrunoff_col(JY,JX));        Qrunoff_col=0._r8
   allocate(WatMass_col(JY,JX));       WatMass_col=0._r8
-  allocate(AnualH2OLoss_col(JY,JX));       AnualH2OLoss_col=0._r8
+  allocate(H2OLoss_CumYr_col(JY,JX));       H2OLoss_CumYr_col=0._r8
   allocate(QDrain_col(JY,JX));      QDrain_col=0._r8
   allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
   allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
@@ -266,7 +266,7 @@ module SoilWaterDataType
   call destroy(QRain_col)
   call destroy(Qrunoff_col)
   call destroy(WatMass_col)
-  call destroy(AnualH2OLoss_col)
+  call destroy(H2OLoss_CumYr_col)
   call destroy(QDrain_col)
   call destroy(Wat2GridBySurfRunoff)
   call destroy(Heat2GridBySurfRunoff)

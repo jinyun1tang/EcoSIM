@@ -71,23 +71,23 @@ contains
   associate(                                      &
     iHarvstType_pft => plt_distb%iHarvstType_pft, &
     CO2NetFix_pft   => plt_bgcr%CO2NetFix_pft,    &
-    PO4byFire_pft   => plt_distb%PO4byFire_pft,   &
-    N2ObyFire_pft   => plt_distb%N2ObyFire_pft,   &
-    NH3byFire_pft   => plt_distb%NH3byFire_pft,   &
-    O2ByFire_pft    => plt_distb%O2ByFire_pft,    &
-    CH4ByFire_pft   => plt_distb%CH4ByFire_pft,   &
-    CO2ByFire_pft   => plt_distb%CO2ByFire_pft,   &
-    Eco_NBP_col     => plt_bgcr%Eco_NBP_col       &
+    PO4byFire_CumYr_pft   => plt_distb%PO4byFire_CumYr_pft,   &
+    N2ObyFire_CumYr_pft   => plt_distb%N2ObyFire_CumYr_pft,   &
+    NH3byFire_CumYr_pft   => plt_distb%NH3byFire_CumYr_pft,   &
+    O2ByFire_CumYr_pft    => plt_distb%O2ByFire_CumYr_pft,    &
+    CH4ByFire_CumYr_pft   => plt_distb%CH4ByFire_CumYr_pft,   &
+    CO2ByFire_CumYr_pft   => plt_distb%CO2ByFire_CumYr_pft,   &
+    Eco_NBP_CumYr_col     => plt_bgcr%Eco_NBP_CumYr_col       &
   )
 
-  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
-  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
-  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2ByFire_CumYr_pft(NZ)=CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_CumYr_pft(NZ)=CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_CumYr_pft(NZ)=O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_CumYr_pft(NZ)=NH3byFire_CumYr_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_CumYr_pft(NZ)=N2ObyFire_CumYr_pft(NZ)-0.0_r8
+  PO4byFire_CumYr_pft(NZ)=PO4byFire_CumYr_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
   end associate
   end subroutine RemoveNonstRootByFire
 
@@ -101,23 +101,23 @@ contains
   associate(                                      &
     iHarvstType_pft => plt_distb%iHarvstType_pft, &
     CO2NetFix_pft   => plt_bgcr%CO2NetFix_pft,    &
-    PO4byFire_pft   => plt_distb%PO4byFire_pft,   &
-    N2ObyFire_pft   => plt_distb%N2ObyFire_pft,   &
-    NH3byFire_pft   => plt_distb%NH3byFire_pft,   &
-    O2ByFire_pft    => plt_distb%O2ByFire_pft,    &
-    CH4ByFire_pft   => plt_distb%CH4ByFire_pft,   &
-    CO2ByFire_pft   => plt_distb%CO2ByFire_pft,   &
-    Eco_NBP_col     => plt_bgcr%Eco_NBP_col       &
+    PO4byFire_CumYr_pft   => plt_distb%PO4byFire_CumYr_pft,   &
+    N2ObyFire_CumYr_pft   => plt_distb%N2ObyFire_CumYr_pft,   &
+    NH3byFire_CumYr_pft   => plt_distb%NH3byFire_CumYr_pft,   &
+    O2ByFire_CumYr_pft    => plt_distb%O2ByFire_CumYr_pft,    &
+    CH4ByFire_CumYr_pft   => plt_distb%CH4ByFire_CumYr_pft,   &
+    CO2ByFire_CumYr_pft   => plt_distb%CO2ByFire_CumYr_pft,   &
+    Eco_NBP_CumYr_col     => plt_bgcr%Eco_NBP_CumYr_col       &
   )
 
-  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
-  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
-  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0
-  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2ByFire_CumYr_pft(NZ)=CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_CumYr_pft(NZ)=CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_CumYr_pft(NZ)=O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_CumYr_pft(NZ)=NH3byFire_CumYr_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_CumYr_pft(NZ)=N2ObyFire_CumYr_pft(NZ)-0.0
+  PO4byFire_CumYr_pft(NZ)=PO4byFire_CumYr_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
   end associate
   end subroutine RemoveWoodyRootByFire
 !--------------------------------------------------------------------------------
@@ -130,23 +130,23 @@ contains
   associate(                                      &
     iHarvstType_pft => plt_distb%iHarvstType_pft, &
     CO2NetFix_pft   => plt_bgcr%CO2NetFix_pft,    &
-    PO4byFire_pft   => plt_distb%PO4byFire_pft,   &
-    N2ObyFire_pft   => plt_distb%N2ObyFire_pft,   &
-    NH3byFire_pft   => plt_distb%NH3byFire_pft,   &
-    O2ByFire_pft    => plt_distb%O2ByFire_pft,    &
-    CH4ByFire_pft   => plt_distb%CH4ByFire_pft,   &
-    CO2ByFire_pft   => plt_distb%CO2ByFire_pft,   &
-    Eco_NBP_col     => plt_bgcr%Eco_NBP_col       &
+    PO4byFire_CumYr_pft   => plt_distb%PO4byFire_CumYr_pft,   &
+    N2ObyFire_CumYr_pft   => plt_distb%N2ObyFire_CumYr_pft,   &
+    NH3byFire_CumYr_pft   => plt_distb%NH3byFire_CumYr_pft,   &
+    O2ByFire_CumYr_pft    => plt_distb%O2ByFire_CumYr_pft,    &
+    CH4ByFire_CumYr_pft   => plt_distb%CH4ByFire_CumYr_pft,   &
+    CO2ByFire_CumYr_pft   => plt_distb%CO2ByFire_CumYr_pft,   &
+    Eco_NBP_CumYr_col     => plt_bgcr%Eco_NBP_CumYr_col       &
   )
 
-  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
-  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
-  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2ByFire_CumYr_pft(NZ)=CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_CumYr_pft(NZ)=CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_CumYr_pft(NZ)=O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_CumYr_pft(NZ)=NH3byFire_CumYr_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_CumYr_pft(NZ)=N2ObyFire_CumYr_pft(NZ)-0.0_r8
+  PO4byFire_CumYr_pft(NZ)=PO4byFire_CumYr_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
   end associate
   end subroutine RemoveFineRootByFire
 
@@ -296,23 +296,23 @@ contains
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)
 
   associate(                                  &
-    Eco_NBP_col   => plt_bgcr%Eco_NBP_col,    &
+    Eco_NBP_CumYr_col   => plt_bgcr%Eco_NBP_CumYr_col,    &
     CO2NetFix_pft => plt_bgcr%CO2NetFix_pft,  &
-    NH3byFire_pft => plt_distb%NH3byFire_pft, &
-    PO4byFire_pft => plt_distb%PO4byFire_pft, &
-    CH4ByFire_pft => plt_distb%CH4ByFire_pft, &
-    O2ByFire_pft  => plt_distb%O2ByFire_pft,  &
-    N2ObyFire_pft => plt_distb%N2ObyFire_pft, &
-    CO2ByFire_pft => plt_distb%CO2ByFire_pft  &
+    NH3byFire_CumYr_pft => plt_distb%NH3byFire_CumYr_pft, &
+    PO4byFire_CumYr_pft => plt_distb%PO4byFire_CumYr_pft, &
+    CH4ByFire_CumYr_pft => plt_distb%CH4ByFire_CumYr_pft, &
+    O2ByFire_CumYr_pft  => plt_distb%O2ByFire_CumYr_pft,  &
+    N2ObyFire_CumYr_pft => plt_distb%N2ObyFire_CumYr_pft, &
+    CO2ByFire_CumYr_pft => plt_distb%CO2ByFire_CumYr_pft  &
   )
-  CO2ByFire_pft(NZ)=CO2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  CH4ByFire_pft(NZ)=CH4ByFire_pft(NZ)-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  O2ByFire_pft(NZ)=O2ByFire_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))*2.667_r8
-  NH3byFire_pft(NZ)=NH3byFire_pft(NZ)-TotalElmntRemoval(ielmn)+TotalElmnt2Litr(ielmn)
-  N2ObyFire_pft(NZ)=N2ObyFire_pft(NZ)-0.0_r8
-  PO4byFire_pft(NZ)=PO4byFire_pft(NZ)-TotalElmntRemoval(ielmp)+TotalElmnt2Litr(ielmp)
+  CO2ByFire_CumYr_pft(NZ)=CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  CH4ByFire_CumYr_pft(NZ)=CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  O2ByFire_CumYr_pft(NZ)=O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))*2.667_r8
+  NH3byFire_CumYr_pft(NZ)=NH3byFire_CumYr_pft(NZ)-TotalElmntRemoval(ielmn)+TotalElmnt2Litr(ielmn)
+  N2ObyFire_CumYr_pft(NZ)=N2ObyFire_CumYr_pft(NZ)-0.0_r8
+  PO4byFire_CumYr_pft(NZ)=PO4byFire_CumYr_pft(NZ)-TotalElmntRemoval(ielmp)+TotalElmnt2Litr(ielmp)
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  Eco_NBP_col=Eco_NBP_col-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   end associate
   end subroutine TotBiomRemovByFire
 

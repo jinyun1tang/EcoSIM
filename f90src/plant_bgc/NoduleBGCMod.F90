@@ -64,8 +64,8 @@ module NoduleBGCMod
     fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,        &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
     ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
-    CanopyRespC_pft           => plt_bgcr%CanopyRespC_pft,           &
-    Eco_AutoR_col             => plt_bgcr%Eco_AutoR_col,             &
+    CanopyRespC_CumYr_pft           => plt_bgcr%CanopyRespC_CumYr_pft,           &
+    Eco_AutoR_CumYr_col             => plt_bgcr%Eco_AutoR_CumYr_col,             &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
     NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &
@@ -295,17 +295,17 @@ module NoduleBGCMod
 !     RespNonst_Oltd=respiration from non-structural C
 !     NoduleCResp=bacterial respiration for growth and N2 fixation
 !     NodulELmSenes2Recyc(ielmc)=bacterial C senescence to recycling
-!     CanopyGrosRCO2_pft,CanopyRespC_pft=total,above-ground PFT respiration
+!     CanopyGrosRCO2_pft,CanopyRespC_CumYr_pft=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     ECO_ER_col=ecosystem respiration
-!     Eco_AutoR_col=total autotrophic respiration
+!     Eco_AutoR_CumYr_col=total autotrophic respiration
 !
     RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
     CanopyGrosRCO2_pft(NZ)=CanopyGrosRCO2_pft(NZ)-RCO2T
-    CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ)-RCO2T
+    CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-RCO2T
     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
     ECO_ER_col=ECO_ER_col-RCO2T
-    Eco_AutoR_col=Eco_AutoR_col-RCO2T
+    Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-RCO2T
 !
 !     NODULE LitrFall CAUSED BY REMOBILIZATION
 !
@@ -685,7 +685,7 @@ module NoduleBGCMod
 !     TOTAL NODULE RESPIRATION
 !
 !     RCO2TM,RCO2T=total C respiration unlimited,limited by O2
-!     GrossResp_pft,CanopyRespC_pft=total,above-ground PFT respiration
+!     GrossResp_pft,CanopyRespC_CumYr_pft=total,above-ground PFT respiration
 !     Rmaint=bacterial maintenance respiration
 !     RespNonst_Oltd=respiration from non-structural C
 !     NoduleCResp=bacterial respiration for growth and N2 fixation

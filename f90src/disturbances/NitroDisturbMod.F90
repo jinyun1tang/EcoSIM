@@ -348,7 +348,7 @@ module NitroDisturbMod
           HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+OMelm(ielmn)
           HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
           
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
+          Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
           CO2GIN=CO2GIN-OMelm(ielmc)
           OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
@@ -356,13 +356,13 @@ module NitroDisturbMod
 
           TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)+OMelm(ielmn)
           TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)+OMelm(ielmp)
-          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
-          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
-          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
-          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-OMelm(ielmn)
-          N2ObyFire_col(NY,NX)=N2ObyFire_col(NY,NX)-0.0_r8
-          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OMelm(ielmp)
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
+          CO2byFire_CumYr_col(NY,NX)=CO2byFire_CumYr_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
+          CH4byFire_CumYr_col(NY,NX)=CH4byFire_CumYr_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
+          O2byFire_CumYr_col(NY,NX)=O2byFire_CumYr_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
+          NH3byFire_CumYr_col(NY,NX)=NH3byFire_CumYr_col(NY,NX)-OMelm(ielmn)
+          N2ObyFire_CumYr_col(NY,NX)=N2ObyFire_CumYr_col(NY,NX)-0.0_r8
+          PO4byFire_CumYr_col(NY,NX)=PO4byFire_CumYr_col(NY,NX)-OMelm(ielmp)
+          Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ENDIF
       ENDIF
     ENDDO D2950

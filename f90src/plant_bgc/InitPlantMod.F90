@@ -87,8 +87,8 @@ module InitPlantMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP+1,JP1
-        plt_bgcr%SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
-        plt_bgcr%LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
         plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
@@ -776,22 +776,22 @@ module InitPlantMod
     NU                          => plt_site%NU,                          &
     AREA3                       => plt_site%AREA3,                       &
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,        &
-    ETCanopy_pft                => plt_ew%ETCanopy_pft,                  &
+    ETCanopy_CumYr_pft                => plt_ew%ETCanopy_CumYr_pft,                  &
     StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft,      &
     StandDeadStrutElms_pft      => plt_biom%StandDeadStrutElms_pft,      &
     StandingDeadInitC_pft       => plt_biom%StandingDeadInitC_pft,       &
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft,       &
     rNCStalk_pft                => plt_allom%rNCStalk_pft,               &
     rPCStalk_pft                => plt_allom%rPCStalk_pft,               &
-    PlantExudChemElmCum_pft     => plt_rbgc%PlantExudChemElmCum_pft,     &
-    NH3EmisCum_pft              => plt_bgcr%NH3EmisCum_pft,              &
+    PlantExudElm_CumYr_pft     => plt_rbgc%PlantExudElm_CumYr_pft,     &
+    NH3Emis_CumYr_pft              => plt_bgcr%NH3Emis_CumYr_pft,              &
     NH3Dep2Can_pft              => plt_bgcr%NH3Dep2Can_pft,              &
-    SurfLitrfalStrutElmsCum_pft => plt_bgcr%SurfLitrfalStrutElmsCum_pft, &
+    SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft, &
     GrossCO2Fix_pft             => plt_bgcr%GrossCO2Fix_pft,             &
-    CanopyRespC_pft             => plt_bgcr%CanopyRespC_pft,             &
+    CanopyRespC_CumYr_pft             => plt_bgcr%CanopyRespC_CumYr_pft,             &
     GrossResp_pft               => plt_bgcr%GrossResp_pft,               &
-    PlantN2FixCum_pft           => plt_bgcr%PlantN2FixCum_pft,           &
-    LitrfalStrutElmsCum_pft     => plt_bgcr%LitrfalStrutElmsCum_pft,     &
+    PlantN2Fix_CumYr_pft           => plt_bgcr%PlantN2Fix_CumYr_pft,           &
+    LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft,     &
     CanopyStemArea_pft          => plt_morph%CanopyStemArea_pft,         &
     icwood                      => pltpar%icwood,                        &
     NetCumElmntFlx2Plant_pft    => plt_pheno%NetCumElmntFlx2Plant_pft    &
@@ -802,25 +802,25 @@ module InitPlantMod
 !
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ)=0._r8
-    SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
+    SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
     GrossResp_pft(NZ)=0._r8
-    CanopyRespC_pft(NZ)=0._r8
-    PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)=0._r8
-    LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
+    CanopyRespC_CumYr_pft(NZ)=0._r8
+    PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
+    LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
 
-    PlantN2FixCum_pft(NZ)=0._r8
+    PlantN2Fix_CumYr_pft(NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8
-    NH3EmisCum_pft(NZ)=0._r8
-    plt_distb%CO2ByFire_pft(NZ)=0._r8
-    plt_distb%CH4ByFire_pft(NZ)=0._r8
-    plt_distb%O2ByFire_pft(NZ)=0._r8
-    plt_distb%NH3byFire_pft(NZ)=0._r8
-    plt_distb%N2ObyFire_pft(NZ)=0._r8
-    plt_distb%PO4byFire_pft(NZ)=0._r8
+    NH3Emis_CumYr_pft(NZ)=0._r8
+    plt_distb%CO2ByFire_CumYr_pft(NZ)=0._r8
+    plt_distb%CH4ByFire_CumYr_pft(NZ)=0._r8
+    plt_distb%O2ByFire_CumYr_pft(NZ)=0._r8
+    plt_distb%NH3byFire_CumYr_pft(NZ)=0._r8
+    plt_distb%N2ObyFire_CumYr_pft(NZ)=0._r8
+    plt_distb%PO4byFire_CumYr_pft(NZ)=0._r8
     plt_distb%EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ)=0._r8
-    plt_distb%EcoHavstElmnt_pft(1:NumPlantChemElms,NZ)=0._r8
+    plt_distb%EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)=0._r8
-    ETCanopy_pft(NZ)=0._r8
+    ETCanopy_CumYr_pft(NZ)=0._r8
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
     WTSTDX=StandingDeadInitC_pft(NZ)*AREA3(NU)
     D155: DO M=1,jsken

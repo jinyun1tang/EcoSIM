@@ -1569,15 +1569,16 @@ module Hour1Mod
 !     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
 !
-  IF(FERT(3,I,NY,NX).GT.0.0_r8.OR.FERT(7,I,NY,NX).GT.0.0_r8)THEN
+  IF(FERT(3,I,NY,NX).GT.0.0_r8 .OR. FERT(7,I,NY,NX).GT.0.0_r8)THEN
     IF(IYTYP(0,I,NY,NX).EQ.0)THEN
       IUTYP(NY,NX)=0
-    ELSEIF(IYTYP(0,I,NY,NX).EQ.1.OR.IYTYP(0,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(0,I,NY,NX).EQ.1 .OR. IYTYP(0,I,NY,NX).EQ.3)THEN
       IUTYP(NY,NX)=1
     ELSE
       !urea hydrolysis is on
       IUTYP(NY,NX)=2
     ENDIF
+
     D9964: DO L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN
         ZNHU0(L,NY,NX)=1.0_r8
@@ -1588,7 +1589,7 @@ module Hour1Mod
       ENDIF
     ENDDO D9964
   ENDIF
-  IF(IYTYP(0,I,NY,NX).EQ.3.OR.IYTYP(0,I,NY,NX).EQ.4)THEN
+  IF(IYTYP(0,I,NY,NX).EQ.3 .OR. IYTYP(0,I,NY,NX).EQ.4)THEN
     D9965: DO L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN
         ZNFN0(L,NY,NX)=1.0_r8
@@ -1834,8 +1835,8 @@ module Hour1Mod
 !
 !     OSC,OSN,OSP,OSA=SOC,SON,SOP,colonized SOC in litter
 !     VOLT=litter volume
-!     AmendCFlx_col,FertNFlx_col,FerPFlx_col=accumulated litter C,N,P application
-!     Eco_NBP_col=accumulated net biome productivity
+!     AmendCFlx_CumYr_col,FertNFlx_CumYr_col,FerPFlx_CumYr_col=accumulated litter C,N,P application
+!     Eco_NBP_CumYr_col=accumulated net biome productivity
 !
       OSCX=OSCX+OQC1
       OSNX=OSNX+OQN1
@@ -1886,11 +1887,11 @@ module Hour1Mod
       TORGF=TORGF+OSCI
       TORGN=TORGN+OSNI
       TORGP=TORGP+OSPI
-      AmendCFlx_col(NY,NX)=AmendCFlx_col(NY,NX)+OSCI
-      FertNFlx_col(NY,NX)=FertNFlx_col(NY,NX)+OSNI
-      FerPFlx_col(NY,NX)=FerPFlx_col(NY,NX)+OSPI
+      AmendCFlx_CumYr_col(NY,NX)=AmendCFlx_CumYr_col(NY,NX)+OSCI
+      FertNFlx_CumYr_col(NY,NX)=FertNFlx_CumYr_col(NY,NX)+OSNI
+      FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+OSPI
       IF(IYTYP(2,I,NY,NX).LT.3)THEN
-        Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)+OSCI
+        Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)+OSCI
       ENDIF
     ENDDO D2965
   ENDIF
@@ -2237,8 +2238,8 @@ module Hour1Mod
     TZIN=TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
     TPIN=TPIN+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
     TIONIN=TIONIN+2.0_r8*(CACX+CASX)
-    FertNFlx_col(NY,NX)=FertNFlx_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
-    FerPFlx_col(NY,NX)=FerPFlx_col(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
+    FertNFlx_CumYr_col(NY,NX)=FertNFlx_CumYr_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
+    FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
   ENDIF
   end subroutine ApplyMineralFertilizer
 !------------------------------------------------------------------------------------------
