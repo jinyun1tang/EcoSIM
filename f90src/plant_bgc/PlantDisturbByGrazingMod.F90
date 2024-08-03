@@ -11,10 +11,10 @@ implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 ! end_include_section
-  public :: TotalBiomRemovalByGrazing
+  public :: AbvgBiomRemovalByGrazing
   public :: RemoveStandDeadByGrazing
   public :: ApplyBiomRemovalByGrazing
-  public :: BranchCutNonstalByGrazing
+  public :: CutBranchNonstalByGrazing
   public :: GrazingPlant
 
 !     GY,GZ=partitioning of grazed material to removal,respiration
@@ -23,7 +23,7 @@ implicit none
 contains
 !------------------------------------------------------------------------------------------
 
-  subroutine TotalBiomRemovalByGrazing(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
+  subroutine AbvgBiomRemovalByGrazing(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
   
   implicit none
   integer, intent(in) :: I,J
@@ -37,7 +37,7 @@ contains
     CanopyRespC_CumYr_pft   => plt_bgcr%CanopyRespC_CumYr_pft,    &
     ECO_ER_col              => plt_bgcr%ECO_ER_col,               &
     GrossResp_pft           => plt_bgcr%GrossResp_pft,            &
-    EcoHavstElmnt_col       => plt_distb%EcoHavstElmnt_col,       &
+    EcoHavstElmnt_CumYr_col => plt_distb%EcoHavstElmnt_CumYr_col, &
     EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft  &
   )
 !     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
@@ -49,11 +49,11 @@ contains
 !     Eco_AutoR_CumYr_col=total autotrophic respiration
 
   EcoHavstElmnt_CumYr_pft(ielmc,NZ)=EcoHavstElmnt_CumYr_pft(ielmc,NZ)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  EcoHavstElmnt_col(ielmc)=EcoHavstElmnt_col(ielmc)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  EcoHavstElmnt_CumYr_col(ielmc)=EcoHavstElmnt_CumYr_col(ielmc)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
 
   DO NE=2,NumPlantChemElms
     EcoHavstElmnt_CumYr_pft(NE,NZ)=EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
-    EcoHavstElmnt_col(NE)=EcoHavstElmnt_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
+    EcoHavstElmnt_CumYr_col(NE)=EcoHavstElmnt_CumYr_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
   ENDDO
   !GZ : fraction of removal into respiration by herbivory/grazing
   dRespC=GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
@@ -64,7 +64,7 @@ contains
   ECO_ER_col=ECO_ER_col-dRespC
   Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-dRespC
   end associate
-  end subroutine TotalBiomRemovalByGrazing
+  end subroutine AbvgBiomRemovalByGrazing
 
 !------------------------------------------------------------------------------------------
 
@@ -180,9 +180,9 @@ contains
   real(r8), intent(out) :: WHVSNP  
   REAL(R8), intent(out) :: LeafC_lbrch(NumOfCanopyLayers1,JP1,JP1)  
   real(r8) :: totShootC,TotPhytomassRemoval
-  real(r8) :: WHVSLX,WHVSLY,WHVSCL,WHVSNL,WHVXXX,WHVSSX
+  real(r8) :: WHVSLX,WHVSLY,WHVSCL,WHVSNL,CGrazedDeficit,WHVSSX
   real(r8) :: WHVSTY  
-  real(r8) :: WTSTKT  
+  real(r8) :: TotStalkC  
   real(r8) :: WHVSHY,WHVSCS,WHVSNS,WHVEAX,WHVEAY,WHVGRX,WHVGRY  
   real(r8) :: WHVSHX,WHVHSX,WHVHSY,WHVRVX,WHVRVY,WHVSKX,WHVSTX
   real(r8) :: CCPOLX  
@@ -191,7 +191,7 @@ contains
 
   associate(                                                             &
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft,          &
-    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch, &
+    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,              &
     FracCanopyHeightCut_pft     => plt_distb%FracCanopyHeightCut_pft,    &
     iHarvstType_pft             => plt_distb%iHarvstType_pft,            &
@@ -223,13 +223,14 @@ contains
 !     fTCanopyGroth_pft=temperature function for canopy growth
 !     CCPOLP=nonstructural C concentration in canopy
 !     NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
-!
+! 24. has unit of hour
   IF(AvgCanopyBiomC2Graze_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     TotPhytomassRemoval=FracCanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
       *AREA3(NU)*ShootStrutElms_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)
   ELSE
     TotPhytomassRemoval=0._r8
   ENDIF
+  !herbivory, means fauna/insect cutting?
   IF(iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
     TotPhytomassRemoval=TotPhytomassRemoval*fTCanopyGroth_pft(NZ)
   ENDIF
@@ -244,14 +245,15 @@ contains
 !           leaf,non-foliar,woody, standing dead removed from ecosyst
 !     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
 !     WTLF=PFT leaf C mass
-!     WHVXXX=grazing requirement unmet by leaf
-!
+!     CGrazedDeficit=grazing requirement unmet by leaf
+! grazing from leaf, 
   WHVSLX=TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_leaf,NZ)
   WHVSLY=AMIN1(LeafStrutElms_pft(ielmc,NZ),WHVSLX)
   HvstedLeafC=WHVSLY*(1._r8-CCPOLX)
+  
   WHVSCL=WHVSLY*CCPOLX
   WHVSNL=WHVSLY*CCPLNX
-  WHVXXX=AZMAX1(WHVSLX-WHVSLY)
+  CGrazedDeficit=AZMAX1(WHVSLX-WHVSLY)
   WHVSSX=TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)
 !
 !     OTHER NON-FOLIAR GRAZED,REMOVED
@@ -259,29 +261,32 @@ contains
 !     WTSHE,WTHSK,WTEAR,WTGR=PFT petiole,husk,ear,grain C mass
 !     WHVSH*,WHVHS*,WHVEA*,WHVGR*,WHVSC*=
 !            petiole,husk,ear,grain,nonstructural C removed
-!     WHVXXX=grazing requirement unmet by non-foliar removal
+!     CGrazedDeficit=grazing requirement unmet by non-foliar removal
 !
-  totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ)+EarStrutElms_pft(ielmc,NZ)+&
-    GrainStrutElms_pft(ielmc,NZ)
+  totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ) &
+    +EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
   IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-    WHVSHX=WHVSSX*PetoleStrutElms_pft(ielmc,NZ)/totShootC+WHVXXX
+    WHVSHX=WHVSSX*PetoleStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
     WHVSHY=AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
     WHVSHH=WHVSHY*(1._r8-CCPOLX)
     WHVSCS=WHVSHY*CCPOLX
     WHVSNS=WHVSHY*CCPLNX
-    WHVXXX=AZMAX1(WHVSHX-WHVSHY)
-    WHVHSX=WHVSSX*HuskStrutElms_pft(ielmc,NZ)/totShootC+WHVXXX
+
+    CGrazedDeficit=AZMAX1(WHVSHX-WHVSHY)
+    WHVHSX=WHVSSX*HuskStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
     WHVHSY=AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
     HvstedShethC=WHVHSY
-    WHVXXX=AZMAX1(WHVHSX-WHVHSY)
-    WHVEAX=WHVSSX*EarStrutElms_pft(ielmc,NZ)/totShootC+WHVXXX
+
+    CGrazedDeficit=AZMAX1(WHVHSX-WHVHSY)
+    WHVEAX=WHVSSX*EarStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
     WHVEAY=AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
     HvstedEarC=WHVEAY
-    WHVXXX=AZMAX1(WHVEAX-WHVEAY)
-    WHVGRX=WHVSSX*GrainStrutElms_pft(ielmc,NZ)/totShootC+WHVXXX
+
+    CGrazedDeficit=AZMAX1(WHVEAX-WHVEAY)
+    WHVGRX=WHVSSX*GrainStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
     WHVGRY=AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
     HvstedGrainC=WHVGRY
-    WHVXXX=AZMAX1(WHVGRX-WHVGRY)
+    CGrazedDeficit=AZMAX1(WHVGRX-WHVGRY)
   ELSE
     WHVSHH=0._r8
     WHVSCS=0._r8
@@ -289,7 +294,7 @@ contains
     HvstedShethC=0._r8
     HvstedEarC=0._r8
     HvstedGrainC=0._r8
-    WHVXXX=WHVXXX+WHVSSX
+    CGrazedDeficit=CGrazedDeficit+WHVSSX
   ENDIF
   WHVSCP=WHVSCL+WHVSCS
   WHVSNP=WHVSNL+WHVSNS
@@ -299,22 +304,23 @@ contains
 !
 !     WTSTK,WTRSV=stalk,reserve C mass
 !     WHVST*,WHVRV*=stalk,reserve C removed
-!     WHVXXX=grazing requirement unmet by stalk,reserve
+!     CGrazedDeficit=grazing requirement unmet by stalk,reserve
 !
-  WTSTKT=StalkStrutElms_pft(ielmc,NZ)+StalkRsrvElms_pft(ielmc,NZ)
-  IF(WTSTKT.GT.WHVSKX+WHVXXX)THEN
-    WHVSTX=WHVSKX*StalkStrutElms_pft(ielmc,NZ)/WTSTKT+WHVXXX
+  TotStalkC=StalkStrutElms_pft(ielmc,NZ)+StalkRsrvElms_pft(ielmc,NZ)
+  IF(TotStalkC.GT.WHVSKX+CGrazedDeficit)THEN
+    WHVSTX=WHVSKX*StalkStrutElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
     WHVSTY=AMIN1(StalkStrutElms_pft(ielmc,NZ),WHVSTX)
     HvstedStalkC=WHVSTY
-    WHVXXX=AZMAX1(WHVSTX-WHVSTY)
-    WHVRVX=WHVSKX*StalkRsrvElms_pft(ielmc,NZ)/WTSTKT+WHVXXX
+
+    CGrazedDeficit=AZMAX1(WHVSTX-WHVSTY)
+    WHVRVX=WHVSKX*StalkRsrvElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
     WHVRVY=AMIN1(StalkRsrvElms_pft(ielmc,NZ),WHVRVX)
     HvstedRsrvC=WHVRVY
-    WHVXXX=AZMAX1(WHVRVX-WHVRVY)
+    CGrazedDeficit=AZMAX1(WHVRVX-WHVRVY)
   ELSE
     HvstedStalkC=0._r8
     HvstedRsrvC=0._r8
-    WHVXXX=AZMAX1(WHVSKX)
+    CGrazedDeficit=AZMAX1(WHVSKX)
 !
 !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PETIOLE,HUSK
 !     EAR,GRAIN
@@ -323,31 +329,37 @@ contains
 !     WHVSH*,WHVHS,WHVEA,WHVGR,WHVSC=
 !            petiole,husk,ear,grain,nonstructural C removed
 !
-    IF(WHVXXX.GT.0.0_r8)THEN
-      WHVSLY=AMIN1(LeafStrutElms_pft(ielmc,NZ)-HvstedLeafC-WHVSCL,WHVXXX)
+    IF(CGrazedDeficit.GT.0.0_r8)THEN
+      WHVSLY=AMIN1(LeafStrutElms_pft(ielmc,NZ)-HvstedLeafC-WHVSCL,CGrazedDeficit)
       HvstedLeafC=HvstedLeafC+WHVSLY*(1._r8-CCPOLX)
+
       WHVSCL=WHVSCL+WHVSLY*CCPOLX
       WHVSNL=WHVSNL+WHVSLY*CCPLNX
-      WHVXXX=AZMAX1(WHVXXX-WHVSLY)
+
+      CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVSLY)
       IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-        WHVSHX=WHVXXX*PetoleStrutElms_pft(ielmc,NZ)/totShootC
+        WHVSHX=CGrazedDeficit*PetoleStrutElms_pft(ielmc,NZ)/totShootC
         WHVSHY=AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
         WHVSHH=WHVSHH+WHVSHY*(1._r8-CCPOLX)
         WHVSCS=WHVSCS+WHVSHY*CCPOLX
         WHVSNS=WHVSNS+WHVSHY*CCPLNX
-        WHVXXX=AZMAX1(WHVXXX-WHVSHY)
-        WHVHSX=WHVXXX*HuskStrutElms_pft(ielmc,NZ)/totShootC
+
+        CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVSHY)
+        WHVHSX=CGrazedDeficit*HuskStrutElms_pft(ielmc,NZ)/totShootC
         WHVHSY=AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
         HvstedShethC=HvstedShethC+WHVHSY
-        WHVXXX=AZMAX1(WHVXXX-WHVHSY)
-        WHVEAX=WHVXXX*EarStrutElms_pft(ielmc,NZ)/totShootC
+
+        CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVHSY)
+        WHVEAX=CGrazedDeficit*EarStrutElms_pft(ielmc,NZ)/totShootC
         WHVEAY=AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
         HvstedEarC=HvstedEarC+WHVEAY
-        WHVXXX=AZMAX1(WHVEAX-WHVEAY)
-        WHVGRX=WHVXXX*GrainStrutElms_pft(ielmc,NZ)/totShootC
+
+        CGrazedDeficit=AZMAX1(WHVEAX-WHVEAY)
+        WHVGRX=CGrazedDeficit*GrainStrutElms_pft(ielmc,NZ)/totShootC
         WHVGRY=AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
         HvstedGrainC=HvstedGrainC+WHVGRY
-        WHVXXX=AZMAX1(WHVGRX-WHVGRY)
+        
+        CGrazedDeficit=AZMAX1(WHVGRX-WHVGRY)
       ENDIF
     ENDIF
   ENDIF
@@ -367,7 +379,7 @@ contains
   D9870: DO NB=1,NumOfBranches_pft(NZ)
     DO  L=1,NumOfCanopyLayers1
       DO  K=0,MaxNodesPerBranch1
-        LeafC_lbrch(L,NB,NZ)=LeafC_lbrch(L,NB,NZ)+LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
+        LeafC_lbrch(L,NB,NZ)=LeafC_lbrch(L,NB,NZ)+LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
       enddo
     enddo
   ENDDO D9870
@@ -376,7 +388,7 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  subroutine BranchCutNonstalByGrazing(I,J,NB,NZ,WHVSCP,CanopyNonstElmCopy,&
+  subroutine CutBranchNonstalByGrazing(I,J,NB,NZ,WHVSCP,CanopyNonstElmCopy,&
     WHVSNP,CanopyNodulNonstElmCopy,CanopyNonstElmAfhvst,CanopyNodulNonstElmAfhvst,&
     CanopyNodulStrutElmAfhvst)
   implicit none
@@ -408,16 +420,19 @@ contains
       WHVSCX=AZMAX1(WHVSCP)*WTLSBX/CanopyLeafShethC_pft(NZ)
       CanopyNonstElmAfhvst(ielmc)=AZMAX1(CanopyNonstElmCopy(ielmc)-WHVSCX)
       DO NE=2,NumPlantChemElms
-        CanopyNonstElmAfhvst(NE)=AZMAX1(CanopyNonstElmCopy(NE)-WHVSCX*CanopyNonstElmCopy(NE)/CanopyNonstElms_brch(ielmc,NB,NZ))
+        CanopyNonstElmAfhvst(NE)=AZMAX1(CanopyNonstElmCopy(NE) &
+          -WHVSCX*CanopyNonstElmCopy(NE)/CanopyNonstElms_brch(ielmc,NB,NZ))
       ENDDO
     ELSE
       CanopyNonstElmAfhvst(:)=0._r8
     ENDIF
+
     IF(CanopyNodulNonstElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       WHVSNX=AZMAX1(WHVSNP)*WTLSBX/CanopyLeafShethC_pft(NZ)
       CanopyNodulNonstElmAfhvst(ielmc)=AZMAX1(CanopyNodulNonstElmCopy(ielmc)-WHVSNX)
       DO NE=2,NumPlantChemElms
-        CanopyNodulNonstElmAfhvst(NE)=AZMAX1(CanopyNodulNonstElmCopy(NE)-WHVSNX*CanopyNodulNonstElmCopy(NE)/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
+        CanopyNodulNonstElmAfhvst(NE)=AZMAX1(CanopyNodulNonstElmCopy(NE) &
+          -WHVSNX*CanopyNodulNonstElmCopy(NE)/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
       ENDDO
 
       DO NE=1,NumPlantChemElms
@@ -433,5 +448,5 @@ contains
     CanopyNodulStrutElmAfhvst(:)=0._r8
   ENDIF
   end associate
-  end subroutine BranchCutNonstalByGrazing
+  end subroutine CutBranchNonstalByGrazing
 end module PlantDisturbByGrazingMod

@@ -42,16 +42,16 @@ implicit none
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)                         !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)                         !total subsurface DOC flux, [g d-2]
   real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total LitrFall C, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDONFlx_col(:,:)                         !total surface DON flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDONFlx_CumYr_col(:,:)                         !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)                         !total subsurface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOPFlx_col(:,:)                         !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  tXPO4_col(:,:)                          !total soil precipited P, [g d-2]
-  real(r8),target,allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
+  real(r8),target,allocatable ::  RootResp_CumYr_col(:,:)                          !total soil autotrophic respiration, [g d-2]
   real(r8),target,allocatable ::  SedmErossLoss_CumYr_col(:,:)                        !total sediment subsurface flux, [Mg d-2]
   real(r8),target,allocatable ::  HydroSufDICFlx_col(:,:)                         !total surface DIC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDICFlx_col(:,:)                         !total subsurface DIC flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDINFlx_col(:,:)                         !total surface DIN flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDINFlx_CumYr_col(:,:)                         !total surface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)                         !total subsurface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDIPFlx_col(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)                         !total subsurface DIP flux, [g d-2]
@@ -59,7 +59,7 @@ implicit none
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
-  real(r8),target,allocatable ::  HydroIonFlx_col(:,:)                        !total subsurface ion flux, [mol d-2]
+  real(r8),target,allocatable ::  HydroIonFlx_CumYr_col(:,:)                        !total subsurface ion flux, [mol d-2]
   real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
@@ -164,17 +164,17 @@ implicit none
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
   allocate(LiterfalOrgM_col(NumPlantChemElms,JY,JX));       LiterfalOrgM_col=0._r8
-  allocate(HydroSufDONFlx_col(JY,JX));       HydroSufDONFlx_col=0._r8
+  allocate(HydroSufDONFlx_CumYr_col(JY,JX));       HydroSufDONFlx_CumYr_col=0._r8
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
   allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
 
-  allocate(UCOP(JY,JX));        UCOP=0._r8
+  allocate(RootResp_CumYr_col(JY,JX));        RootResp_CumYr_col=0._r8
   allocate(SedmErossLoss_CumYr_col(JY,JX));      SedmErossLoss_CumYr_col=0._r8
   allocate(HydroSufDICFlx_col(JY,JX));       HydroSufDICFlx_col=0._r8
   allocate(HydroSubsDICFlx_col(JY,JX));       HydroSubsDICFlx_col=0._r8
-  allocate(HydroSufDINFlx_col(JY,JX));       HydroSufDINFlx_col=0._r8
+  allocate(HydroSufDINFlx_CumYr_col(JY,JX));       HydroSufDINFlx_CumYr_col=0._r8
   allocate(HydroSubsDINFlx_col(JY,JX));       HydroSubsDINFlx_col=0._r8
   allocate(HydroSufDIPFlx_col(JY,JX));       HydroSufDIPFlx_col=0._r8
   allocate(HydroSubsDIPFlx_col(JY,JX));       HydroSubsDIPFlx_col=0._r8
@@ -182,7 +182,7 @@ implicit none
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
-  allocate(HydroIonFlx_col(JY,JX));      HydroIonFlx_col=0._r8
+  allocate(HydroIonFlx_CumYr_col(JY,JX));      HydroIonFlx_CumYr_col=0._r8
   allocate(RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNutMicbTransf_vr=0._r8
   allocate(trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcg_RMicbTransf_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
@@ -270,16 +270,16 @@ implicit none
   call destroy(HydroSufDOCFlx_col)
   call destroy(HydroSubsDOCFlx_col)
   call destroy(LiterfalOrgM_col)
-  call destroy(HydroSufDONFlx_col)
+  call destroy(HydroSufDONFlx_CumYr_col)
   call destroy(HydroSubsDONFlx_col)
   call destroy(HydroSufDOPFlx_col)
   call destroy(HydroSubsDOPFlx_col)
   call destroy(tXPO4_col)
-  call destroy(UCOP)
+  call destroy(RootResp_CumYr_col)
   call destroy(SedmErossLoss_CumYr_col)
   call destroy(HydroSufDICFlx_col)
   call destroy(HydroSubsDICFlx_col)
-  call destroy(HydroSufDINFlx_col)
+  call destroy(HydroSufDINFlx_CumYr_col)
   call destroy(HydroSubsDINFlx_col)
   call destroy(HydroSufDIPFlx_col)
   call destroy(HydroSubsDIPFlx_col)
@@ -287,7 +287,7 @@ implicit none
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)
-  call destroy(HydroIonFlx_col)
+  call destroy(HydroIonFlx_CumYr_col)
   call destroy(Micb_N2Fixation_vr)
   call destroy(RNutMicbTransf_vr)
   call destroy(REcoDOMProd_vr)

@@ -1613,7 +1613,7 @@ module PlantBranchMod
   real(r8) :: TotLeafElevation
 ! begin_execution
   associate(                                                             &
-    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch, &
+    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,          &
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,          &
     StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,          &
@@ -1666,7 +1666,7 @@ module PlantBranchMod
     D540: DO K=0,MaxNodesPerBranch1
       DO  L=1,NumOfCanopyLayers1
         CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
-        LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+        LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       enddo
     ENDDO D540
     D535: DO L=1,NumOfCanopyLayers1
@@ -1772,7 +1772,7 @@ module PlantBranchMod
     !
           CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)+YLeafArea_brch
           DO NE=1,NumPlantChemElms
-            LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)+YLeafElmntNode_brch(NE)
+            LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)=LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)+YLeafElmntNode_brch(NE)
           ENDDO
           CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)+YLeafArea_brch
           CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)+YLeafElmntNode_brch(ielmc)

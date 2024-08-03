@@ -3146,17 +3146,17 @@ implicit none
 
   if(flag=='read')then 
     datpr5 => datrp_5d(1:npfts,1:NumPlantChemElms,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='LeafChemElmByLayerNode_brch', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='LeafElmsByLayerNode_brch', dim1name='pft',dim2name='elmnts',&
      dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='layer leaf element',&
      units='g d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmByLayerNode_brch,datrp_5d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafElmsByLayerNode_brch,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'LeafChemElmByLayerNode_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafChemElmByLayerNode_brch,datrp_5d,NumActivePlants=NumActivePlants,&
+    !print*,'LeafElmsByLayerNode_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafElmsByLayerNode_brch,datrp_5d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr5 => datrp_5d(1:npfts,1:NumPlantChemElms,1:NumOfCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='LeafChemElmByLayerNode_brch', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='LeafElmsByLayerNode_brch', dim1name='pft',dim2name='elmnts',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='layer leaf element',&
       units='g d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
   endif  
@@ -4966,16 +4966,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='HydroSufDONFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDONFlx_CumYr_col', dim1name='column',&
        long_name='total surface DON flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_CumYr_col,datrc_1d) 
   else
-    !print*,'HydroSufDONFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
+    !print*,'HydroSufDONFlx_CumYr_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_CumYr_col,datrc_1d) 
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='HydroSufDONFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDONFlx_CumYr_col', dim1name='column',&
        long_name='total surface DON flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5069,16 +5069,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='HydroSufDINFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDINFlx_CumYr_col', dim1name='column',&
        long_name='total surface DIN flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_CumYr_col,datrc_1d) 
   else
-    !print*,'HydroSufDINFlx_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_col,datrc_1d)   
+    !print*,'HydroSufDINFlx_CumYr_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDINFlx_CumYr_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='HydroSufDINFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDINFlx_CumYr_col', dim1name='column',&
        long_name='total surface DIN flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5154,16 +5154,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumPlantChemElms)            
-    call restartvar(ncid, flag, varname='EcoHavstElmnt_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='EcoHavstElmnt_CumYr_col', dim1name='column',&
        dim2name='elmnts',long_name='total harvested organic matter', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,EcoHavstElmnt_col(:,1:JY0,1:JX0),datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,EcoHavstElmnt_CumYr_col(:,1:JY0,1:JX0),datrc_2d) 
   else
 !    print*,'LiterfalOrgC_col',size(LiterfalOrgM_col,1),size(LiterfalOrgM_col,2)
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,EcoHavstElmnt_col(:,1:JY0,1:JX0),datrc_2d)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,EcoHavstElmnt_CumYr_col(:,1:JY0,1:JX0),datrc_2d)
     datpr2 => datrc_2d(1:ncols,1:NumPlantChemElms)
-    call restartvar(ncid, flag, varname='EcoHavstElmnt_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='EcoHavstElmnt_CumYr_col', dim1name='column',&
        dim2name='elmnts',long_name='total harvested organic matter', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -5171,16 +5171,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='UCOP', dim1name='column',&
+    call restartvar(ncid, flag, varname='RootResp_CumYr_col', dim1name='column',&
        long_name='total soil autotrophic respiration', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,UCOP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,RootResp_CumYr_col,datrc_1d) 
   else
-    !print*,'UCOP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,UCOP,datrc_1d)   
+    !print*,'RootResp_CumYr_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RootResp_CumYr_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='UCOP', dim1name='column',&
+    call restartvar(ncid, flag, varname='RootResp_CumYr_col', dim1name='column',&
        long_name='total soil autotrophic respiration', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

@@ -574,7 +574,7 @@ module StartqMod
 
       D55: DO L=1,NumOfCanopyLayers
         CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)=0._r8
-        LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)=0._r8
+        LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
 
       IF(K.NE.0)THEN

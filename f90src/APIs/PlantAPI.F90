@@ -63,7 +63,7 @@ implicit none
   Canopy_Heat_Sens_col(NY,NX)                         = plt_ew%Canopy_Heat_Sens_col
   Eco_AutoR_CumYr_col(NY,NX)                                = plt_bgcr%Eco_AutoR_CumYr_col
   LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)     = plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)
-  EcoHavstElmnt_col(1:NumPlantChemElms,NY,NX)         = plt_distb%EcoHavstElmnt_col(1:NumPlantChemElms)
+  EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)         = plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)
   CanH2OHeldVg(NY,NX)                                 = plt_ew%CanH2OHeldVg
   Eco_Heat_Sens_col(NY,NX)                            = plt_ew%Eco_Heat_Sens_col
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)
@@ -416,8 +416,8 @@ implicit none
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers
           CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX) =plt_morph%CanopyLeafArea_lpft(L,K,NB,NZ)
-          LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX) =&
-            plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)
+          LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX) =&
+            plt_biom%LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)
         ENDDO
       ENDDO
       DO M=1,pltpar%NumGrowthStages
@@ -910,7 +910,7 @@ implicit none
   plt_ew%Canopy_Heat_Sens_col=Canopy_Heat_Sens_col(NY,NX)
   plt_bgcr%Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col(NY,NX)
   plt_ew%UVOLO    =H2OLoss_CumYr_col(NY,NX)
-  plt_distb%EcoHavstElmnt_col(1:NumPlantChemElms)=EcoHavstElmnt_col(1:NumPlantChemElms,NY,NX)
+  plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)=EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)
   plt_rad%Eco_NetRad_col     =Eco_NetRad_col(NY,NX)
   plt_ew%VapXAir2CanG=VapXAir2CanG(NY,NX)
   plt_ew%Eco_Heat_Latent_col=Eco_Heat_Latent_col(NY,NX)
@@ -1264,8 +1264,8 @@ implicit none
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers                    
           plt_morph%CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)
-          plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) =&
-            LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)
+          plt_biom%LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) =&
+            LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)
         ENDDO
       ENDDO
       DO  L=1,NumOfCanopyLayers

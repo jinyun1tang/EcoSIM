@@ -14,7 +14,7 @@ module PlantDisturbByFireMod
   public :: StageRootRemovalByFire
   public :: RemoveRootByFire
   public :: AbvGrndLiterFallByFire
-  public :: TotBiomRemovByFire
+  public :: AbvgBiomRemovalByFire
   public :: ApplyBiomRemovalByFire
   public :: InitPlantFireMod
 
@@ -215,7 +215,7 @@ contains
   end subroutine AbvGrndLiterFallByFire
 
 !------------------------------------------------------------------------------------------
-  subroutine TotBiomRemovByFire(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
+  subroutine AbvgBiomRemovalByFire(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NZ
@@ -241,7 +241,7 @@ contains
   CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   end associate
-  end subroutine TotBiomRemovByFire
+  end subroutine AbvgBiomRemovalByFire
 
 !------------------------------------------------------------------------------------------
   subroutine ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
