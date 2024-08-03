@@ -31,7 +31,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  GrossCO2Fix_CumYr_pft(:,:,:)
   real(r8),target,allocatable ::  LitrfalStrutElms_pft(:,:,:,:)                     !total plant element LitrFall , [g d-2 ]
   real(r8),target,allocatable ::  PlantN2Fix_CumYr_pft(:,:,:)                      !total plant N2 fixation, [g d-2 ]
-  real(r8),target,allocatable ::  GrossResp_CumYr_pft(:,:,:)                       !total plant respiration, [g d-2 ]
+  real(r8),target,allocatable ::  GrossRespC_CumYr_pft(:,:,:)                       !total plant respiration, [g d-2 ]
   real(r8),target,allocatable ::  GrossResp_pft(:,:,:)
   real(r8),target,allocatable ::  ElmBalanceCum_pft(:,:,:,:)                      !plant element balance, [g d-2]
   real(r8),target,allocatable ::  LitrfalStrutElms_CumYr_pft(:,:,:,:)                     !plant element LitrFall, [g d-2 h-1]
@@ -145,7 +145,7 @@ module PlantDataRateType
   allocate(LitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_CumYr_pft=0._r8
   allocate(PlantN2Fix_CumYr_pft(JP,JY,JX));   PlantN2Fix_CumYr_pft=0._r8
   allocate(GrossResp_pft(JP,JY,JX));    GrossResp_pft=0._r8
-  allocate(GrossResp_CumYr_pft(JP,JY,JX)); GrossResp_CumYr_pft=0._r8
+  allocate(GrossRespC_CumYr_pft(JP,JY,JX)); GrossRespC_CumYr_pft=0._r8
   allocate(ElmBalanceCum_pft(NumPlantChemElms,JP,JY,JX));     ElmBalanceCum_pft=0._r8
   allocate(LitrfalStrutElms_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_pft=0._r8
   allocate(LitrfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfalStrutElms_pvr=0._r8
@@ -246,7 +246,7 @@ module PlantDataRateType
   call destroy(LitrfalStrutElms_CumYr_pft)
   call destroy(PlantN2Fix_CumYr_pft)
   call destroy(GrossResp_pft)
-  call destroy(GrossResp_CumYr_pft)
+  call destroy(GrossRespC_CumYr_pft)
   call destroy(ElmBalanceCum_pft)
   call destroy(LitrfalStrutElms_pft)
   call destroy(LitrfalStrutElms_pvr)

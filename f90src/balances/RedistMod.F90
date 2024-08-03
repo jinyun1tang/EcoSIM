@@ -322,10 +322,10 @@ module RedistMod
   !
   WI=PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
-  QRain_col(NY,NX)=WI
+  QRain_CumYr_col(NY,NX)=WI
   WO=VapXAir2GSurf_col(NY,NX)+TEVAPP(NY,NX)        !total outgoing water flux, > 0 into ground surface
   CEVAP=CEVAP-WO
-  QEvap_col(NY,NX)=QEvap_col(NY,NX)-WO         !>0 into atmosphere
+  QEvap_CumYr_col(NY,NX)=QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)=-WO
   QH2OLoss_lnds=QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   QDischar_col(NY,NX)=QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)

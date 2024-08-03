@@ -250,7 +250,7 @@ implicit none
     SeedDepth_pft(NZ,NY,NX)                          = plt_morph%SeedDepth_pft(NZ)
     HeatXAir2PCan(NZ,NY,NX)                          = plt_ew%HeatXAir2PCan(NZ)
     GrossResp_pft(NZ,NY,NX)                          = plt_bgcr%GrossResp_pft(NZ)
-    GrossResp_CumYr_pft(NZ,NY,NX)                       = GrossResp_CumYr_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX)
+    GrossRespC_CumYr_pft(NZ,NY,NX)                       = GrossRespC_CumYr_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX)
     CanopyRespC_CumYr_pft(NZ,NY,NX)                        = plt_bgcr%CanopyRespC_CumYr_pft(NZ)
     TC4LeafOut_pft(NZ,NY,NX)                         = plt_pheno%TC4LeafOut_pft(NZ)
     TC4LeafOff_pft(NZ,NY,NX)                         = plt_pheno%TC4LeafOff_pft(NZ)

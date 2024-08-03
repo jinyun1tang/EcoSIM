@@ -42,7 +42,6 @@ module GrosubPars
 !
 !     ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
 !     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
-!     GY,GZ=partitioning of grazed material to removal,respiration
 !     FSTK=fraction of stalk area contributing to water,heat flow
 !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
 !     FRTX=fraction used to calculate woody faction of stalk,root
@@ -105,8 +104,6 @@ module GrosubPars
   real(r8) :: ZPLFD
   real(r8) :: ZPGRM
   real(r8) :: ZPGRD
-  real(r8) :: GY
-  real(r8) :: GZ
   real(r8) :: FSTK
   real(r8) :: ZSTX
   real(r8) :: DSTK
@@ -274,8 +271,7 @@ module GrosubPars
   ZPLFD=1.0_r8-ZPLFM
   ZPGRM=0.75_r8
   ZPGRD=1.0_r8-ZPGRM
-  GY=1.0_r8
-  GZ=1.0_r8-GY
+
   FSTK=0.05_r8
   ZSTX=1.0E-03_r8
   DSTK=0.225_r8

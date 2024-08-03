@@ -197,7 +197,7 @@ module PlantDisturbsMod
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
 !
 !     TOTAL C,N,P REMOVAL FROM DISTURBANCE
-  call TotalBiomRemovalByDisturbance(I,J,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
+  call AbvgBiomRemovalByDisturb(I,J,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
 !
 !     ABOVE-GROUND LitrFall FROM HARVESTING
 !
@@ -223,25 +223,25 @@ module PlantDisturbsMod
   real(r8), intent(in) :: StandeadElmntOffEcosystem(NumPlantChemElms)
   integer :: M,NE
 !     begin_execution
-  associate(                                                             &
-    ilignin                     => pltpar%ilignin,                       &
-    inonstruct                  => pltpar%inonstruct,                    &
-    k_fine_litr                 => pltpar%k_fine_litr,                   &
-    k_woody_litr                => pltpar%k_woody_litr,                  &
-    ifoliar                     => pltpar%ifoliar,                       &
-    inonfoliar                  => pltpar%inonfoliar,                    &
-    istalk                      => pltpar%istalk,                        &
-    iroot                       => pltpar%iroot,                         &
-    icwood                      => pltpar%icwood,                        &
-    StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft,      &
-    iHarvstType_pft             => plt_distb%iHarvstType_pft,            &
-    FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr, &
-    ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,        &
-    LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,        &
+  associate(                                                                   &
+    ilignin                        => pltpar%ilignin,                          &
+    inonstruct                     => pltpar%inonstruct,                       &
+    k_fine_litr                    => pltpar%k_fine_litr,                      &
+    k_woody_litr                   => pltpar%k_woody_litr,                     &
+    ifoliar                        => pltpar%ifoliar,                          &
+    inonfoliar                     => pltpar%inonfoliar,                       &
+    istalk                         => pltpar%istalk,                           &
+    iroot                          => pltpar%iroot,                            &
+    icwood                         => pltpar%icwood,                           &
+    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft,         &
+    iHarvstType_pft                => plt_distb%iHarvstType_pft,               &
+    FracRootStalkElmAlloc2Litr     => plt_allom%FracRootStalkElmAlloc2Litr,    &
+    ElmAllocmat4Litr               => plt_soilchem%ElmAllocmat4Litr,           &
+    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr,           &
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft,     &
     SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft, &
-    iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,  &
-    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft       &
+    iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft,     &
+    iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft          &
   )
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
@@ -308,7 +308,7 @@ module PlantDisturbsMod
   end associate
   end subroutine LiterfallByDisturbance
 !------------------------------------------------------------------------------------------
-  subroutine TotalBiomRemovalByDisturbance(I,J,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
+  subroutine AbvgBiomRemovalByDisturb(I,J,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
   implicit none
   integer , intent(in)  :: I,J,NZ
   real(r8), intent(in)  :: NonstructElmnt2Litr(NumPlantChemElms)
@@ -317,14 +317,14 @@ module PlantDisturbsMod
   real(r8) :: TotalElmntRemoval(NumPlantChemElms)
   integer :: NE
 !     begin_execution
-  associate(                                                 &
-    iHarvstType_pft       => plt_distb%iHarvstType_pft,      &
-    jHarvst_pft           => plt_distb%jHarvst_pft,          &
-    SeasonalNonstElms_pft => plt_biom%SeasonalNonstElms_pft, &
-    EcoHavstElmnt_CumYr_pft     => plt_distb%EcoHavstElmnt_CumYr_pft,    &
-    EcoHavstElmnt_col     => plt_distb%EcoHavstElmnt_col,    &
-    CO2NetFix_pft         => plt_bgcr%CO2NetFix_pft,         &
-    Eco_NBP_CumYr_col           => plt_bgcr%Eco_NBP_CumYr_col            &
+  associate(                                                      &
+    iHarvstType_pft         => plt_distb%iHarvstType_pft,         &
+    jHarvst_pft             => plt_distb%jHarvst_pft,             &
+    SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft,    &
+    EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft, &
+    EcoHavstElmnt_col       => plt_distb%EcoHavstElmnt_col,       &
+    CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft,            &
+    Eco_NBP_CumYr_col       => plt_bgcr%Eco_NBP_CumYr_col         &
   )
 !
 !     TotalElmntRemoval=total C,N,P removed
@@ -378,7 +378,7 @@ module PlantDisturbsMod
 
   ENDIF
   end associate
-  end subroutine TotalBiomRemovalByDisturbance
+  end subroutine AbvgBiomRemovalByDisturb
 
 !------------------------------------------------------------------------------------------
   subroutine ApplyDisturbanceBiomRemoval(I,J,NZ,NonstructElmnt2Litr,&
@@ -1725,7 +1725,7 @@ module PlantDisturbsMod
 
   associate(                                                         &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    Eco_NBP_CumYr_col               => plt_bgcr%Eco_NBP_CumYr_col,               &
+    Eco_NBP_CumYr_col         => plt_bgcr%Eco_NBP_CumYr_col,         &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,           &
@@ -1752,7 +1752,7 @@ module PlantDisturbsMod
     FFIRE(1:NumPlantChemElms)=0._r8
   ELSE
     !fire
-    call RootRemovalByFire(I,J,NZ,L,FFIRE,DCORP,FracLeftThin)
+    call StageRootRemovalByFire(I,J,NZ,L,FFIRE,DCORP,FracLeftThin)
   ENDIF
 
   XHVST1=1._r8-FracLeftThin
@@ -1762,8 +1762,8 @@ module PlantDisturbsMod
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
         +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
     ENDDO
-
-    call RemoveNonstRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+    !nonstructural root biomass
+    call RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
     DO NR=1,NumRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms
@@ -1772,7 +1772,8 @@ module PlantDisturbsMod
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
           (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
       ENDDO
-      call RemoveWoodyRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+      !woody roots
+      call RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
 
       DO NE=1,NumPlantChemElms
@@ -1781,7 +1782,8 @@ module PlantDisturbsMod
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
           +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
       ENDDO
-      CALL RemoveFineRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+      !fine roots
+      CALL RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
     enddo
   ENDDO D3385

@@ -1543,7 +1543,7 @@ module Hour1Mod
 !
 !     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
 !
-        call ApplyPlantAnimalResidue(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
+        call ApplyManure(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
 !
 !     FERTILIZER UREA, NITRIFICATION INHIBITORS
         call ApplyUreaNitrifierInhibitor(I,J,NY,NX,LFDPTH)
@@ -1603,7 +1603,7 @@ module Hour1Mod
   end subroutine ApplyUreaNitrifierInhibitor
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyPlantAnimalResidue(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
+  subroutine ApplyManure(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
   implicit none
   integer, intent(in) :: I,J,NY,NX
   integer, intent(inout) :: LFDPTH
@@ -1896,7 +1896,7 @@ module Hour1Mod
     ENDDO D2965
   ENDIF
   end associate
-  end subroutine ApplyPlantAnimalResidue
+  end subroutine ApplyManure
 !------------------------------------------------------------------------------------------
 
   subroutine ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
