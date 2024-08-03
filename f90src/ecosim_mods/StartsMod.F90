@@ -787,20 +787,20 @@ module StartsMod
   QEvap_CumYr_col(:,:)=0.0_r8
   Qrunoff_CumYr_col(:,:)=0.0_r8
   SedmErossLoss_CumYr_col(:,:)=0.0_r8
-  UCOP(:,:)=0.0_r8
+  RootResp_CumYr_col(:,:)=0.0_r8
   HydroSufDOCFlx_col(:,:)=0.0_r8
   HydroSubsDOCFlx_col(:,:)=0.0_r8
-  HydroSufDONFlx_col(:,:)=0.0_r8
+  HydroSufDONFlx_CumYr_col(:,:)=0.0_r8
   HydroSubsDONFlx_col(:,:)=0.0_r8
   HydroSufDOPFlx_col(:,:)=0.0_r8
   HydroSubsDOPFlx_col(:,:)=0.0_r8
   HydroSufDICFlx_col(:,:)=0.0_r8
   HydroSubsDICFlx_col(:,:)=0.0_r8
-  HydroSufDINFlx_col(:,:)=0.0_r8
+  HydroSufDINFlx_CumYr_col(:,:)=0.0_r8
   HydroSubsDINFlx_col(:,:)=0.0_r8
   HydroSufDIPFlx_col(:,:)=0.0_r8
   HydroSubsDIPFlx_col(:,:)=0.0_r8
-  HydroIonFlx_col(:,:)=0.0_r8
+  HydroIonFlx_CumYr_col(:,:)=0.0_r8
   LiterfalOrgM_col(ielmc,:,:)=0.0_r8
   LiterfalOrgM_col(ielmn,:,:)=0.0_r8
   LiterfalOrgM_col(ielmp,:,:)=0.0_r8
@@ -830,7 +830,7 @@ module StartsMod
   PlantPopu_col(:,:)=0.0_r8
   DayLensCurr_col(:,:)=12.0_r8
   SurfAlbedo_col(:,:)=SoilAlbedo_col(:,:)
-  EcoHavstElmnt_col(:,:,:)=0.0_r8
+  EcoHavstElmnt_CumYr_col(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8
   end subroutine InitAccumulators
 

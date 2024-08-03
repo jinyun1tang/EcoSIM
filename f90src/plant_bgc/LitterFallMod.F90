@@ -833,7 +833,7 @@ implicit none
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,       &
     InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,     &
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,       &
-    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch, &
+    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,          &
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,        &
     CPOOL3_node                 => plt_photo%CPOOL3_node,                &
@@ -918,9 +918,9 @@ implicit none
     InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     D8865: DO L=1,NumOfCanopyLayers1
       CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)-CanopyLeafArea_lpft(L,K,NB,NZ)
-      CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)-LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
+      CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)-LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
       CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
-      LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+      LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,NumOfLeafZenithSectors1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8

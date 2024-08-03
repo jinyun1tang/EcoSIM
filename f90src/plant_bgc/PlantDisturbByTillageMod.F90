@@ -72,7 +72,7 @@ contains
     GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch,     &
     ShootStrutElms_brch         => plt_biom%ShootStrutElms_brch,          &
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,          &
-    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch,  &
+    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch,  &
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,         &
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,           &
     LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &
@@ -219,7 +219,7 @@ contains
         LeafElmntNode_brch(NE,K,NB,NZ)      = LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
         PetioleElmntNode_brch(NE,K,NB,NZ)   = PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
         DO L=1,NumOfCanopyLayers1
-          LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)=LeafChemElmByLayerNode_brch(NE,L,K,NB,NZ)*XHVST
+          LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)=LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)*XHVST
         ENDDO
       ENDDO
       D8965: DO L=1,NumOfCanopyLayers1

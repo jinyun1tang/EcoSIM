@@ -478,7 +478,7 @@ implicit none
   real(r8), pointer :: LeafProteinCNode_brch(:,:,:)           => null()    !layer leaf protein C,                       [g d-2]
   real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)         => null()  !sheath element,                               [g d-2]
   real(r8), pointer :: PetoleProteinCNode_brch(:,:,:)         => null()    !layer sheath protein C,                     [g d-2]
-  real(r8), pointer :: LeafChemElmByLayerNode_brch(:,:,:,:,:) => null()    !layer leaf element,                         [g d-2]
+  real(r8), pointer :: LeafElmsByLayerNode_brch(:,:,:,:,:) => null()    !layer leaf element,                         [g d-2]
   real(r8), pointer :: tCanLeafC_cl(:)                        => null()  !total leaf mass,                              [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)               => null()  !initial standing dead C,                      [g C m-2]
   real(r8), pointer :: RootNodulElms_pft(:,:)                 => null()
@@ -595,7 +595,7 @@ implicit none
   integer  :: IYTYP      !fertilizer release type from fertilizer input file
   real(r8) :: DCORP      !soil mixing fraction with tillage, [-]
   integer  :: iSoilDisturbType_col      !soil disturbance type, [-]
-  real(r8), pointer :: EcoHavstElmnt_col(:)   => null()  !ecosystem harvest element, [gC d-2]
+  real(r8), pointer :: EcoHavstElmnt_CumYr_col(:)   => null()  !ecosystem harvest element, [gC d-2]
   real(r8), pointer :: O2ByFire_CumYr_pft(:)    => null()  !plant O2 uptake from fire, [g d-2 ]
   integer,  pointer :: iHarvestDay_pft(:)    => null()  !alternate day of harvest, [-]
   real(r8), pointer :: FERT(:)     => null()  !fertilizer application, [g m-2]
@@ -1030,7 +1030,7 @@ implicit none
   class(plant_disturb_type) :: this
 
   allocate(this%THIN_pft(JP1));this%THIN_pft=spval
-  allocate(this%EcoHavstElmnt_col(NumPlantChemElms));this%EcoHavstElmnt_col=spval
+  allocate(this%EcoHavstElmnt_CumYr_col(NumPlantChemElms));this%EcoHavstElmnt_CumYr_col=spval
   allocate(this%EcoHavstElmntCum_pft(NumPlantChemElms,JP1));this%EcoHavstElmntCum_pft=spval
   allocate(this%EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP1));this%EcoHavstElmnt_CumYr_pft=spval
   allocate(this%CH4ByFire_CumYr_pft(JP1));this%CH4ByFire_CumYr_pft=spval
@@ -1300,8 +1300,8 @@ implicit none
   this%LeafElmntNode_brch=spval
   allocate(this%PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%PetioleElmntNode_brch=spval
-  allocate(this%LeafChemElmByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
-  this%LeafChemElmByLayerNode_brch=spval
+  allocate(this%LeafElmsByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
+  this%LeafElmsByLayerNode_brch=spval
   allocate(this%StalkBiomassC_brch(MaxNumBranches,JP1));this%StalkBiomassC_brch=spval
   allocate(this%CanopyNodulNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNodulNonstElms_brch=spval
   allocate(this%LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstElmConc_brch=spval
@@ -1372,7 +1372,7 @@ implicit none
 !  if(allocated(LeafElmntNode_brch))deallocate(LeafElmntNode_brch)
 !  if(allocated(LeafProteinCNode_brch))deallocate(LeafProteinCNode_brch)
 !  if(allocated(PetoleProteinCNode_brch))deallocate(PetoleProteinCNode_brch)
-!  if(allocated(LeafChemElmByLayerNode_brch))deallocate(LeafChemElmByLayerNode_brch)
+!  if(allocated(LeafElmsByLayerNode_brch))deallocate(LeafElmsByLayerNode_brch)
 !  if(allocated(InternodeStrutElms_brch))deallocate(InternodeStrutElms_brch)
 !  if(allocated(PetioleElmntNode_brch))deallocate(PetioleElmntNode_brch)
 !  if(allocated(StalkBiomassC_brch))deallocate(StalkBiomassC_brch)

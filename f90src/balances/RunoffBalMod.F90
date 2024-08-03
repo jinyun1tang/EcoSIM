@@ -182,7 +182,7 @@ implicit none
 !     XN=direction indicator
 !     TOMOU_lnds(ielmc),OXYGOU,H2GOU,TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)=cumulative C,O2,H2,N,P loss through lateral and lower boundaries
 !     HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through runoff
-!     HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through runoff
+!     HydroSufDONFlx_CumYr_col,HydroSufDINFlx_CumYr_col=dissolved organic,inorganic N loss through runoff
 !     HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through runoff
 !
       CXR=XN*(trcg_FloXSurRunoff_2D(idg_CO2,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_CH4,N,NN,N5,N4))
@@ -201,8 +201,8 @@ implicit none
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
       HydroSufDOCFlx_col(NY,NX)=-OMRof(ielmc)-OMRof(idom_acetate)
       HydroSufDICFlx_col(NY,NX)=-CXR
-      HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)-OMRof(ielmn)
-      HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
+      HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
+      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
       HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
       HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
       OXR=XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
@@ -262,7 +262,7 @@ implicit none
         TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
-        HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SSR
+        HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR
 !     WRITE(20,3336)'SSR',I,J,N,N5,N4,SSR,SS1,SS2,SS3,SS4,TIONOU
 !3336  FORMAT(A8,5I6,20F16.9)
 !
@@ -317,7 +317,7 @@ implicit none
 !                      :OHC,OHN,OHP=adsorbed C,N,P; OSC,OSN,OSP=humus C,N,P
 !         TSedmErossLoss_lnds,SedmErossLoss_CumYr_col=cumulative sediment loss through lateral and lower boundaries
 !         HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through lateral and lower boundaries
-!         HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through lateral and lower boundaries
+!         HydroSufDONFlx_CumYr_col,HydroSufDINFlx_CumYr_col=dissolved organic,inorganic N loss through lateral and lower boundaries
 !         HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
 !         TOMOU_lnds(ielmc),TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)=total C,N,P loss through lateral and lower boundaries
 
@@ -390,11 +390,11 @@ implicit none
           TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PPE          
 
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
-          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)-MOE(ielmn)
+          HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
           HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-MOE(ielmp)
                     
           HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-MXE(ielmc)          
-          HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-MXE(ielmn)-ZPE          
+          HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE          
           HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-MXE(ielmp)-PPE
 !     WRITE(*,6635)'MOE(ielmp)',I,J,N4,N5,N,NN
 !    2,MOE(ielmc),MXE(ielmc),MOE(ielmn),MXE(ielmn),ZPE
@@ -421,7 +421,7 @@ implicit none
 !           :PALPB,PFEPB=precip AlPO4,FEPO4 in band
 !           :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
 !           :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
-!         TIONOU,HydroIonFlx_col=total salt loss through lateral and lower boundaries
+!         TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
             SEF=XN*(XNH3ER(N,NN,N5,N4)+XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4) &
@@ -446,7 +446,7 @@ implicit none
               +XN*9.0*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4))
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
-            HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SET
+            HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SET
 !     WRITE(*,3342)'SET',I,J,N4,N5,NN,N,SET,SEF,SEX,SEP,TIONOU
 !3342  FORMAT(A8,6I4,12F18.6)
           ENDIF
@@ -569,7 +569,7 @@ implicit none
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from TranspSalt.f
 !     X*FHS=hourly convective + diffusive solute flux through macropores from TranspSalt.f
 !     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from TranspSalt.f
-!     TIONOU,HydroIonFlx_col=total salt loss through lateral and lower boundaries
+!     TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
         PQD=XN*patomw*(trcSalt3DFlo2Cell(idsalt_H0PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_H0PO4B,N,N6,N5,N4) &
@@ -663,7 +663,7 @@ implicit none
 
         SO=SSD+SHD
         TIONOU=TIONOU-SO
-        HydroIonFlx_col(N2,N1)=HydroIonFlx_col(N2,N1)-SO
+        HydroIonFlx_CumYr_col(N2,N1)=HydroIonFlx_CumYr_col(N2,N1)-SO
 
 !
 !     SUBSURFACE FLUX ELECTRICAL CONDUCTIVITY
@@ -729,7 +729,7 @@ implicit none
       TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZXS-ZGS
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXS
       HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-CXR
-      HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
+      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
       HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
       OXS=XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
       OXYGOU=OXYGOU-OXS
@@ -763,7 +763,7 @@ implicit none
           +XN*5.0*(trcSalt_XQS(idsalt_AlOH4,N,N5,N4)+trcSalt_XQS(idsalt_FeOH4,N,N5,N4))
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
-        HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SSR
+        HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR
       ENDIF
     ENDIF
   ENDIF
