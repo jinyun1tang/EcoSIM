@@ -772,7 +772,7 @@ module StartsMod
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
-  QRain_col(:,:)=0.0_r8
+  QRain_CumYr_col(:,:)=0.0_r8
 
   CO2byFire_CumYr_col(:,:)=0.0_r8
   CH4byFire_CumYr_col(:,:)=0.0_r8
@@ -784,8 +784,8 @@ module StartsMod
   FertNFlx_CumYr_col(:,:)=0.0_r8
   FerPFlx_CumYr_col(:,:)=0.0_r8
   H2OLoss_CumYr_col(:,:)=0.0_r8
-  QEvap_col(:,:)=0.0_r8
-  Qrunoff_col(:,:)=0.0_r8
+  QEvap_CumYr_col(:,:)=0.0_r8
+  Qrunoff_CumYr_col(:,:)=0.0_r8
   SedmErossLoss_CumYr_col(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
   HydroSufDOCFlx_col(:,:)=0.0_r8

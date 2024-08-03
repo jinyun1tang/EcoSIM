@@ -159,7 +159,7 @@ implicit none
 !
 !     QR,QS,WatBySnowRedistrib,IceBySnowRedistrib=runoff from surface water, 
 !     snowpack snow,water,ice from watsub.f
-!     CRUN,Qrunoff_col=cumulative water and snow runoff
+!     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
 !
   IF(N.NE.ivertdir.AND.L.EQ.NU(NY,NX))THEN
@@ -168,7 +168,7 @@ implicit none
     QRunSurf_col(N2,N1)=QRunSurf_col(N2,N1)+WQRN
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRN
-      Qrunoff_col(NY,NX)=Qrunoff_col(NY,NX)-WQRN
+      Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRN
       HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
       HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
       HeatOut_lnds=HeatOut_lnds-HQRN
@@ -718,7 +718,7 @@ implicit none
     WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
-      Qrunoff_col(NY,NX)=Qrunoff_col(NY,NX)-WQRS
+      Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRS
       HQRS=XN*HeatBySnowRedistrib_2DH(N,N5,N4)
       HeatOut_lnds=HeatOut_lnds-HQRS
       CXS=XN*(trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,N5,N4))

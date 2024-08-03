@@ -47,9 +47,9 @@
   LiterfalOrgM_col(:,NY,NX)      = 0._r8
   UCOP(NY,NX)                    = 0._r8
   Eco_NBP_CumYr_col(NY,NX)       = 0._r8
-  QRain_col(NY,NX)               = 0._r8
-  QEvap_col(NY,NX)               = 0._r8
-  Qrunoff_col(NY,NX)             = 0._r8
+  QRain_CumYr_col(NY,NX)         = 0._r8
+  QEvap_CumYr_col(NY,NX)         = 0._r8
+  Qrunoff_CumYr_col(NY,NX)       = 0._r8
   SedmErossLoss_CumYr_col(NY,NX) = 0._r8
   H2OLoss_CumYr_col(NY,NX)       = 0._r8
   HydroIonFlx_col(NY,NX)         = 0._r8
@@ -83,7 +83,7 @@
       NodulInfectElmsCum_pft(NE,NZ,NY,NX)=0._r8
     ENDDO
     NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX) &
-      +GrossCO2Fix_CumYr_pft(NZ,NY,NX)+GrossResp_CumYr_pft(NZ,NY,NX) &
+      +GrossCO2Fix_CumYr_pft(NZ,NY,NX)+GrossRespC_CumYr_pft(NZ,NY,NX) &
       -CO2ByFire_CumYr_pft(NZ,NY,NX)-CH4ByFire_CumYr_pft(NZ,NY,NX)
     NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX) &
       +NH3Emis_CumYr_pft(NZ,NY,NX)+PlantN2Fix_CumYr_pft(NZ,NY,NX) &
@@ -93,7 +93,7 @@
 
     GrossCO2Fix_CumYr_pft(NZ,NY,NX)            = 0._r8
     PlantExudElm_CumYr_pft(:,NZ,NY,NX)         = 0._r8
-    GrossResp_CumYr_pft(NZ,NY,NX)              = 0._r8
+    GrossRespC_CumYr_pft(NZ,NY,NX)             = 0._r8
     CanopyRespC_CumYr_pft(NZ,NY,NX)            = 0._r8
     ETCanopy_CumYr_pft(NZ,NY,NX)               = 0._r8
     PlantN2Fix_CumYr_pft(NZ,NY,NX)             = 0._r8

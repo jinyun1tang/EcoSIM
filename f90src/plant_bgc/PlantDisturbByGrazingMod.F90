@@ -16,6 +16,10 @@ implicit none
   public :: ApplyBiomRemovalByGrazing
   public :: BranchCutNonstalByGrazing
   public :: GrazingPlant
+
+!     GY,GZ=partitioning of grazed material to removal,respiration
+  real(r8),PARAMETER :: GY=1._r8
+  real(r8),parameter :: GZ=1._r8-GY
 contains
 !------------------------------------------------------------------------------------------
 
@@ -27,13 +31,14 @@ contains
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)  
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)  
   integer :: NE
-  associate(                                              &
-    Eco_AutoR_CumYr_col         => plt_bgcr%Eco_AutoR_CumYr_col,      &  
-    CanopyRespC_CumYr_pft       => plt_bgcr%CanopyRespC_CumYr_pft,    &    
-    ECO_ER_col            => plt_bgcr%ECO_ER_col,         &
-    GrossResp_pft         => plt_bgcr%GrossResp_pft,      &      
-    EcoHavstElmnt_col     => plt_distb%EcoHavstElmnt_col, &  
-    EcoHavstElmnt_CumYr_pft     => plt_distb%EcoHavstElmnt_CumYr_pft  &
+  real(r8) :: dRespC
+  associate(                                                      &
+    Eco_AutoR_CumYr_col     => plt_bgcr%Eco_AutoR_CumYr_col,      &
+    CanopyRespC_CumYr_pft   => plt_bgcr%CanopyRespC_CumYr_pft,    &
+    ECO_ER_col              => plt_bgcr%ECO_ER_col,               &
+    GrossResp_pft           => plt_bgcr%GrossResp_pft,            &
+    EcoHavstElmnt_col       => plt_distb%EcoHavstElmnt_col,       &
+    EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft  &
   )
 !     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
 !     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
@@ -50,12 +55,14 @@ contains
     EcoHavstElmnt_CumYr_pft(NE,NZ)=EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
     EcoHavstElmnt_col(NE)=EcoHavstElmnt_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
   ENDDO
-  GrossResp_pft(NZ)=GrossResp_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  !GZ : fraction of removal into respiration by herbivory/grazing
+  dRespC=GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  GrossResp_pft(NZ)=GrossResp_pft(NZ)-dRespC
+  CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-dRespC
 !     Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+GY*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
-!     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)+GZ*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
-  ECO_ER_col=ECO_ER_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+!     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-dRespC
+  ECO_ER_col=ECO_ER_col-dRespC
+  Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-dRespC
   end associate
   end subroutine TotalBiomRemovalByGrazing
 
@@ -70,13 +77,13 @@ contains
   real(r8) :: WHVSTD
 
   associate(   &
-    FracCanopyHeightCut_pft    => plt_distb%FracCanopyHeightCut_pft,   &  
-    NU                     => plt_site%NU,                     &    
-    AREA3                  => plt_site%AREA3,                  &
-    StandDeadStrutElms_pft => plt_biom%StandDeadStrutElms_pft, &    
-    FracBiomHarvsted       => plt_distb%FracBiomHarvsted,      &
-    THIN_pft               => plt_distb%THIN_pft,              &        
-    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft          &
+    FracCanopyHeightCut_pft => plt_distb%FracCanopyHeightCut_pft, &
+    NU                      => plt_site%NU,                       &
+    AREA3                   => plt_site%AREA3,                    &
+    StandDeadStrutElms_pft  => plt_biom%StandDeadStrutElms_pft,   &
+    FracBiomHarvsted        => plt_distb%FracBiomHarvsted,        &
+    THIN_pft                => plt_distb%THIN_pft,                &
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            &
     )
   IF(StandDeadStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
     WHVSTD=FracCanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*FracBiomHarvsted(1,4,NZ)

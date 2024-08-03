@@ -632,27 +632,27 @@ module StartqMod
 !     INITIALIZE MASS BALANCE CHECKS
 !
   IF(.not.is_restart().AND.is_first_year)THEN
-    GrossCO2Fix_pft(NZ,NY,NX)                                = 0._r8
+    GrossCO2Fix_pft(NZ,NY,NX)                                   = 0._r8
     SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
-    GrossResp_pft(NZ,NY,NX)                                  = 0._r8
-    CanopyRespC_CumYr_pft(NZ,NY,NX)                                = 0._r8
-    PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
+    GrossResp_pft(NZ,NY,NX)                                     = 0._r8
+    CanopyRespC_CumYr_pft(NZ,NY,NX)                             = 0._r8
+    PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8
     LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
     PlantN2Fix_CumYr_pft(NZ,NY,NX)                              = 0._r8
-    NH3Dep2Can_pft(NZ,NY,NX)                                 = 0._r8
+    NH3Dep2Can_pft(NZ,NY,NX)                                    = 0._r8
     NH3Emis_CumYr_pft(NZ,NY,NX)                                 = 0._r8
-    CO2ByFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
-    CH4ByFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
-    O2ByFire_CumYr_pft(NZ,NY,NX)                                   = 0._r8
-    NH3byFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
-    N2ObyFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
-    PO4byFire_CumYr_pft(NZ,NY,NX)                                  = 0._r8
-    EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ,NY,NX)        = 0._r8
-    EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)           = 0._r8
-    NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
-    ETCanopy_CumYr_pft(NZ,NY,NX)                                   = 0._r8
-    StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
-    WTSTDX=StandingDeadInitC_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    CO2ByFire_CumYr_pft(NZ,NY,NX)                               = 0._r8
+    CH4ByFire_CumYr_pft(NZ,NY,NX)                               = 0._r8
+    O2ByFire_CumYr_pft(NZ,NY,NX)                                = 0._r8
+    NH3byFire_CumYr_pft(NZ,NY,NX)                               = 0._r8
+    N2ObyFire_CumYr_pft(NZ,NY,NX)                               = 0._r8
+    PO4byFire_CumYr_pft(NZ,NY,NX)                               = 0._r8
+    EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ,NY,NX)           = 0._r8
+    EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)        = 0._r8
+    NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)       = 0._r8
+    ETCanopy_CumYr_pft(NZ,NY,NX)                                = 0._r8
+    StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8
+    WTSTDX                                                      = StandingDeadInitC_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jskenc
       StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*ElmAllocMat4Litr(ielmc,icwood,M,NZ,NY,NX)
       StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*ElmAllocMat4Litr(ielmn,icwood,M,NZ,NY,NX)
