@@ -1,4 +1,4 @@
-module NitroDisturbMod
+module SoilDisturbMod
 
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
@@ -371,4 +371,4 @@ module NitroDisturbMod
 !------------------------------------------------------------------------------------------
 
 
-end module NitroDisturbMod
+end module SoilDisturbMod

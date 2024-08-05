@@ -1,8 +1,8 @@
 module MicBGCAPI
 
   use data_kind_mod,        only: r8 => DAT_KIND_R8
-  use NitrosMod,            only: DownwardMixOM, sumMicBiomLayL
-  use NitroDisturbMod,      only: SOMRemovalByDisturbance
+  use SoilBGCNLayMod,            only: DownwardMixOM, sumMicBiomLayL
+  use SoilDisturbMod,      only: SOMRemovalByDisturbance
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type
