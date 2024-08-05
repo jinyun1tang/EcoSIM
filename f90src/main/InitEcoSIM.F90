@@ -16,7 +16,7 @@ module InitEcoSIM
   use PlantDisturbsMod     , only : InitPlantDisturbance
   use UptakesMod           , only : InitUptake
   use WatsubMod            , only : initWatsub
-  use NitrosMod            , only : InitNitro
+  use SoilBGCNLayMod            , only : InitNitro
   use RedistMod            , only : InitRedist
   use ErosionMod           , only : InitErosion
   use Hour1Mod             , only : InitHour1

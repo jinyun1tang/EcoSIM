@@ -14,7 +14,7 @@ module InitSOMBGCMOD
   use SoilPropertyDataType
   use GridDataType
   use EcoSiMParDataMod, only : micpar
-  use nitrosMod, only : sumorgmlayl,sumLitrOMLayL
+  use SoilBGCNLayMod, only : sumorgmlayl,sumLitrOMLayL
   implicit none
 
   private

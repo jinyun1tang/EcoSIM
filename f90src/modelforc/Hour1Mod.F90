@@ -45,7 +45,7 @@ module Hour1Mod
   use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
-  use nitrosMod, only : sumORGMLayL
+  use SoilBGCNLayMod, only : sumORGMLayL
   implicit none
 
   private

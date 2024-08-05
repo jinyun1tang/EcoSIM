@@ -1,4 +1,4 @@
-module nitrosMod
+module SoilBGCNLayMod
 !!
 ! DESCRIPTION:
 ! codes to do soil biological transformations
@@ -14,7 +14,7 @@ module nitrosMod
   use ChemTranspDataType
   use FertilizerDataType
   use MicrobeDiagTypes
-  use NitroDisturbMod
+  use SoilDisturbMod
   use GridConsts
   use SoilBGCDataType
   use EcoSIMCtrlDataType
@@ -613,4 +613,4 @@ module nitrosMod
   ENDDO
 
   end subroutine sumDOML
-end module nitrosMod
+end module SoilBGCNLayMod

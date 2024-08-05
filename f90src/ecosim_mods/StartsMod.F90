@@ -42,7 +42,7 @@ module StartsMod
   use SedimentDataType
   use GridDataType
   use MiniFuncMod
-  use nitrosMod, only : sumSurfOMCK
+  use SoilBGCNLayMod, only : sumSurfOMCK
   use UnitMod, only : units
   implicit none
 

@@ -4,7 +4,7 @@ module RedistMod
   use minimathmod,       only: safe_adb, AZMAX1, fixEXflux, fixnegmass
   use EcoSiMParDataMod,  only: micpar
   use SurfLitterPhysMod, only: UpdateLitRPhys
-  use nitrosMod  
+  use SoilBGCNLayMod  
   use ElmIDMod
   use EcosimConst
   use FlagDataType

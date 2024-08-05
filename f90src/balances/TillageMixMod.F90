@@ -20,7 +20,7 @@ module TillageMixMod
   USE EcoSimSumDataType
   use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts
   use UnitMod, only : units
-  use nitrosMod, only : sumLitrOMLayL,sumORGMLayL
+  use SoilBGCNLayMod, only : sumLitrOMLayL,sumORGMLayL
   implicit none
   character(len=*),private, parameter :: mod_filename =&
      __FILE__
