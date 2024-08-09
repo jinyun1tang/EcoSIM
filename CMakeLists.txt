@@ -221,7 +221,7 @@ if (ATS_ECOSIM)
         set(ECOSIM_TPLS "${ECOSIM_TPLS} ${CURL_LIBRARY}")
     endif()
 
-    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl")
+    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -ldl -lz -lcurl -lhdf5 -lnetcdf -lnetcdff -fPIC")
 
 else()
     add_subdirectory(3rd-partylibs)

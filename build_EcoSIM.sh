@@ -35,9 +35,9 @@ systype=""
 
 
 #Leave empty to just use the environment variable compiler
-CC=""
-CXX=""
-FC=""
+CC="/global/software/rocky-8.x86_64/gcc/linux-rocky8-x86_64/gcc-11.4.0/openmpi-4.1.6-kk4tbvrqcaj7su6jdcofpa5bprjbb7nm/bin/mpicc"
+CXX="/global/software/rocky-8.x86_64/gcc/linux-rocky8-x86_64/gcc-11.4.0/openmpi-4.1.6-kk4tbvrqcaj7su6jdcofpa5bprjbb7nm/bin/mpicxx"
+FC="/global/software/rocky-8.x86_64/gcc/linux-rocky8-x86_64/gcc-11.4.0/openmpi-4.1.6-kk4tbvrqcaj7su6jdcofpa5bprjbb7nm/bin/mpif90"
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
