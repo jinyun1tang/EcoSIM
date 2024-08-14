@@ -8,8 +8,6 @@ set (ECOSIM_MINOR_VERSION 1)
 set (ECOSIM_PATCH_VERSION 0)
 set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PATCH_VERSION}")
 
-message("We are in the EcoSIM top-level CMakeLists")
-
 set(TPL_INSTALL_PREFIX $ENV{AMANZI_TPLS_DIR})
 
 # Adjust CMake's module path.
@@ -38,6 +36,21 @@ math(EXPR NUM_BUILD_THREADS "${NUMBER_OF_CORES} + 1")
 
 include(set_up_platform)
 include(set_up_compilers)
+
+message("Before checking for cmake compiler: ")
+message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+message("CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
+message("CMAKE_Fortran_COMPILER: ${CMAKE_Fortran_COMPILER}")
+
+message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+message("CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message("CMAKE_Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
+
+message("Now the ENV variables: ")
+message("$ENV{CC}")
+message("$ENV{CXX}")
+message("$ENV{FC}")
+
 
 # Make sure compilers are set. This must be done before enabling languages.
 if (NOT CMAKE_C_COMPILER)

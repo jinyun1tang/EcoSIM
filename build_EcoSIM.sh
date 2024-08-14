@@ -88,26 +88,47 @@ if [ "$sanitize" -eq 1 ]; then
     CONFIG_FLAGS="${CONFIG_FLAGS} -DADDRESS_SANITIZER=1"
 fi
 
-if [ $ATS_ECOSIM -eq 1 ]; then
+if [ "$ATS_ECOSIM" -eq 1 ]; then
     echo "Building ATS-EcoSIM"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=1" 
+    #Having this automatically set to use mpi compilers
+    if [ "$mpi" -eq 0 ]; then
+    	mpi=1
+    fi
 fi
 
-# Check if CC is set and not empty
-if [ -n "$CC" ]; then
-  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${CC}"
+#if mpi is set use the mpi compilers, if not use default
+if [ "$mpi" -eq 1 ]; then
+  # Use MPI versions of the compilers
+  if [ -n "$MPICC" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${MPICC}}"
+  fi
+
+  if [ -n "$MPICXX" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${MPICXX}"
+  fi
+
+  if [ -n "$MPIF90" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${MPIF90}"
+  fi
+else
+  # Use non-MPI versions of the compilers
+  if [ -n "$CC" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${CC}"
+  fi
+
+  if [ -n "$CXX" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${CXX}"
+  fi
+
+  if [ -n "$FC" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${FC}"
+  fi
 fi
 
-# Check if CXX is set and not empty
-if [ -n "$CXX" ]; then
-  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${CXX}"
-fi
 
-# Check if FC is set and not empty
-if [ -n "$FC" ]; then
-  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${FC}"
-fi
-
-CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=$ATS_ECOSIM"
+#Shouldn't need this anymore
+#CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=$ATS_ECOSIM"
 
 echo "Config Flags: "
 echo "${CONFIG_FLAGS}"
@@ -115,7 +136,6 @@ echo "${CONFIG_FLAGS}"
 cmd_configure="${cmake_binary} \
   ${CONFIG_FLAGS}
   ${ecosim_source_dir}"
-
 
 # Check if the build exists
 if [ ! -d "$ecosim_build_dir" ]; then
@@ -129,8 +149,8 @@ fi
 # Note: many of the options that used to be in the CMakeLists.txt file
 # have been moved here to remove redundancies
 
-ATS_ECOSIM=$ATS_ECOSIM
-echo $ATS_ECOSIM
+#Do I need this?
+#ATS_ECOSIM=$ATS_ECOSIM
 
 echo "cmd_configure: $cmd_configure"
 echo "building in: $ecosim_build_dir"
@@ -138,22 +158,9 @@ echo "building in: $ecosim_build_dir"
 #cd ${ecosim_build_dir}
 #${cmd_configure}
 cd build
-#pwd
-#cmake ../ -DATS_ECOSIM=$ATS_ECOSIM
 ${cmd_configure}
 
 #This does the build
 make -j ${parallel_jobs}
-#if [ $? -ne 0 ]; then
-#    error_message "Failed to build EcoSIM"
-#    exit_now 50
-#fi
-#status_message "EcoSIM build complete"
-
 #Does the install
 make install
-#if [ $? -ne 0 ]; then
-#  error_message "Failed to install EcoSIM"
-#  exit_now 50
-#fi
-#status_message "EcoSIM install complete"
