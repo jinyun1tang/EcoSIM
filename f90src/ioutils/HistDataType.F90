@@ -56,7 +56,7 @@ implicit none
   real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)   !
-
+  
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
   real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -150,15 +150,18 @@ implicit none
   real(r8),pointer   :: h1D_sN2G_FLX_col(:)        !SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sNH3_FLX_col(:)        !SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
-  real(r8),pointer   :: h1D_PAR_CAN_ptc(:)    !PAR absorbed by Canopy, umol /m2/s
+  real(r8),pointer   :: h1D_PAR_CAN_ptc(:)        !PAR absorbed by Canopy, umol /m2/s
   real(r8),pointer   :: h1D_PAR_col(:)            !incoming PAR, umol/s
   real(r8),pointer   :: h1D_Plant_C_ptc(:)        !whole plant C  
   real(r8),pointer   :: h1D_Plant_N_ptc(:)        !whole plant N  
   real(r8),pointer   :: h1D_Plant_P_ptc(:)        !whole plant P  
+  real(r8),pointer   :: h1D_stomatal_stress_ptc(:)
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: h2D_tSOC_vr(:,:)        !SoilOrgM_vr(ielmc,1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: h2D_tSON_vr(:,:)
   real(r8),pointer   :: h2D_tSOP_vr(:,:)  
+  real(r8),pointer   :: h2D_NO3_vr(:,:)
+  real(r8),pointer   :: h2D_NH4_vr(:,:)
   real(r8),pointer   :: h2D_VHeatCap_vr(:,:)  
   real(r8),pointer   :: h2D_DOC_vr(:,:)
   real(r8),pointer   :: h2D_DON_vr(:,:)
@@ -596,6 +599,7 @@ implicit none
   allocate(this%h1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_N_FLX_ptc(:)=spval
   allocate(this%h1D_SHOOT_P_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_P_ptc(:)=spval
   allocate(this%h1D_Plant_P_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_P_ptc(:)=spval
+  allocate(this%h1D_stomatal_stress_ptc(beg_ptc:end_ptc)) ;this%h1D_stomatal_stress_ptc(:)=spval
   allocate(this%h1D_LEAF_P_ptc(beg_ptc:end_ptc))          ;this%h1D_LEAF_P_ptc(:)=spval
   allocate(this%h1D_Petole_P_ptc(beg_ptc:end_ptc))        ;this%h1D_Petole_P_ptc(:)=spval
   allocate(this%h1D_STALK_P_ptc(beg_ptc:end_ptc))         ;this%h1D_STALK_P_ptc(:)=spval
@@ -1176,7 +1180,7 @@ implicit none
     long_name='landscape water discharge',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc)       
-  call hist_addfld1d(fname='LEAF_PC',units='gP/gC',avgflag='I',&
+  call hist_addfld1d(fname='LEAF_rPC',units='gP/gC',avgflag='I',&
     long_name='mass based leaf PC ratio',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_RN_ptc(beg_ptc:end_ptc)     
@@ -1544,6 +1548,10 @@ implicit none
   call hist_addfld1d(fname='PLANT_P',units='gP/m2',avgflag='A',&
     long_name='plant P',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%h1D_stomatal_stress_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='stomatal_stress',units='none',avgflag='A',&
+    long_name='stomatal stress from root turogr [0-1 no stress]',ptr_patch=data1d_ptr)      
+
   data1d_ptr => this%h1D_LEAF_P_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='LEAF_P',units='gP/m2',avgflag='A',&
     long_name='Canopy leaf P',ptr_patch=data1d_ptr)      
@@ -1620,7 +1628,7 @@ implicit none
     ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LEAF_NC_ptc(beg_ptc:end_ptc)            
-  call hist_addfld1d(fname='LEAF_NC',units='gN/gC',avgflag='A',&
+  call hist_addfld1d(fname='LEAF_rNC',units='gN/gC',avgflag='A',&
     long_name='mass based plant leaf NC ratio',ptr_patch=data1d_ptr)      
 
   data2d_ptr => this%h2D_tSOC_vr(beg_col:end_col,1:JZ)       
@@ -2291,14 +2299,14 @@ implicit none
 
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
-        this%h1D_ROOT_NONSTC_ptc(nptc)   = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
-        this%h1D_ROOT_NONSTN_ptc(nptc)   = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
-        this%h1D_ROOT_NONSTP_ptc(nptc)   = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)                
-        this%h1D_SHOOT_NONSTC_ptc(nptc)   = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
-        this%h1D_SHOOT_NONSTN_ptc(nptc)   = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
-        this%h1D_SHOOT_NONSTP_ptc(nptc)   = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
-        this%h1D_CAN_TEMPK_ptc(nptc)     = TKCanopy_pft(NZ,NY,NX)
-        this%h1D_MIN_LWP_ptc(nptc)       = PSICanPDailyMin(NZ,NY,NX)
+        this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
+        this%h1D_ROOT_NONSTN_ptc(nptc)  = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
+        this%h1D_ROOT_NONSTP_ptc(nptc)  = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)
+        this%h1D_SHOOT_NONSTC_ptc(nptc) = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
+        this%h1D_SHOOT_NONSTN_ptc(nptc) = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
+        this%h1D_SHOOT_NONSTP_ptc(nptc) = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
+        this%h1D_CAN_TEMPK_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
+        this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)        = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2394,6 +2402,7 @@ implicit none
         this%h1D_SHOOT_P_ptc(nptc)      = ShootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_Plant_P_ptc(nptc)      = (ShootElms_pft(ielmp,NZ,NY,NX) &
           +RootElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)        
+        this%h1D_stomatal_stress_ptc(nptc) =StomatalStress_pft(NZ,NY,NX) 
         this%h1D_LEAF_P_ptc(nptc)       = LeafStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_Petole_P_ptc(nptc)    = PetoleStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_P_ptc(nptc)      = StalkStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

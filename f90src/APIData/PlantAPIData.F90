@@ -451,6 +451,7 @@ implicit none
   end type plant_allometry_type
 
   type, public :: plant_biom_type
+  real(r8), pointer :: StomatalStress_pft(:)  => null()   !stomatal stress from root turgor [0-1]  
   real(r8), pointer :: StandingDeadStrutElms_col(:)           => null()    !total standing dead element,                [g d-2]
   real(r8), pointer :: ZERO4LeafVar_pft(:)                    => null()    !threshold zero for leaf calculation
   real(r8), pointer :: ZERO4Groth_pft(:)                      => null()    !threshold zero for p calculation
@@ -1263,6 +1264,7 @@ implicit none
   implicit none
   class(plant_biom_type) :: this
 
+  allocate(this%StomatalStress_pft(JP1));  this%StomatalStress_pft=spval
   allocate(this%ZERO4LeafVar_pft(JP1));this%ZERO4LeafVar_pft=spval
   allocate(this%ZERO4Groth_pft(JP1));this%ZERO4Groth_pft=spval
   allocate(this%StandingDeadStrutElms_col(NumPlantChemElms));this%StandingDeadStrutElms_col=spval

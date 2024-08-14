@@ -104,16 +104,16 @@ implicit none
 !             CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2 from stomate.f
 !             RubiscoActivity_brch=N,P feedback inhibition on C4 CO2 fixation
 !
-                PARX=QNTM*PAR_zsec
-                PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
-                ETLF=(PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
-                EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
-                VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
+                PARX = QNTM*PAR_zsec
+                PARJ = PARX+LigthSatCarboxyRate_node(K,NB,NZ)
+                ETLF = (PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
+                EGRO = ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
+                VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
                 !turn off the limiter of rubisco acitivity
-                VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)
+                VL = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)
                 !the tow lines below are for diagnostics
-                CH2OClmK=CH2OClmK+CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)
-                CH2OLlmK=CH2OLlmK+EGRO
+                CH2OClmK = CH2OClmK+CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)
+                CH2OLlmK = CH2OLlmK+EGRO
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -208,7 +208,8 @@ implicit none
   subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K)
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
-  real(r8), intent(in):: PsiCan4Photosyns,Stomata_Stress
+  real(r8), intent(in):: PsiCan4Photosyns
+  real(r8), intent(in) :: Stomata_Stress
   real(r8), intent(out) :: CH2O3K
   real(r8), intent(out) :: CH2O4K
   integer :: L,NN,M,N,LP

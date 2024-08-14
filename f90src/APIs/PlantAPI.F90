@@ -1556,6 +1556,7 @@ implicit none
   RoughHeight_col(NY,NX)=plt_ew%RoughHeight
   BndlResistAboveCanG(NY,NX)=plt_ew%BndlResistAboveCanG
   RIB(NY,NX)=plt_ew%RIB
+  
   CanopyHeight_col(NY,NX)=plt_morph%CanopyHeight_col
   RadSWDirect_col(NY,NX)=plt_rad%RadSWDirect_col
   RadSWDiffus_col(NY,NX)=plt_rad%RadSWDiffus_col
@@ -1579,7 +1580,7 @@ implicit none
     RadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%RadPARbyCanopy_pft(NZ)
     ClumpFactorNow_pft(NZ,NY,NX)  =plt_morph%ClumpFactorNow_pft(NZ)
     FracPARRadbyCanopy_pft(NZ,NY,NX)=plt_rad%FracPARRadbyCanopy_pft(NZ)
-
+    StomatalStress_pft(NZ,NY,NX)=plt_biom%StomatalStress_pft(NZ)
     DO L=1,NumOfCanopyLayers
       DO M=1,NumOfSkyAzimuSects
         DO  N=1,NumOfLeafZenithSectors

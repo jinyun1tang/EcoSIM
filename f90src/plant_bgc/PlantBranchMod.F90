@@ -3277,11 +3277,11 @@ module PlantBranchMod
 ! RootCO2Autor_pvr=total root respiration
 ! RootRespPotent_pvr,RootCO2EmisPot_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !
-  RCO2TM=RCO2Maint_brch+RCO2GM+SenesMaxByMaintDefcit+RCO2NonstC4NassimOUltd
-  Rauto_brch=RCO2Maint_brch+RgroCO2_ltd+RMxess_brch+RCO2NonstC4Nassim_brch
-  RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RCO2TM
-  RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+Rauto_brch
-  RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)-Rauto_brch
+  RCO2TM     = RCO2Maint_brch+RCO2GM+SenesMaxByMaintDefcit+RCO2NonstC4NassimOUltd
+  Rauto_brch = RCO2Maint_brch+RgroCO2_ltd+RMxess_brch+RCO2NonstC4Nassim_brch
+  RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RCO2TM
+  RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+Rauto_brch
+  RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)   = RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)-Rauto_brch
 !  write(111,*)NZ,I,Rauto_brch,CanopyNonstElms_brch(ielmc,NB,NZ),RAutoRootO2Limter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
   end associate
   end subroutine ComputRAutoB4Emergence
@@ -3380,20 +3380,20 @@ module PlantBranchMod
   REAL(R8) :: GrowthChemElmt(NumPlantChemElms)
   REAL(R8) :: SSL
   
-  associate(                                                       &
-    NumCogrothNode_pft            => plt_morph%NumCogrothNode_pft,           &
-    PetoleLensNode_brch      => plt_morph%PetoleLensNode_brch,     &
-    PetoLen2Mass_pft         => plt_morph%PetoLen2Mass_pft,        &
-    SinePetioleAngle_pft     => plt_morph%SinePetioleAngle_pft,    &
-    PetioleElmntNode_brch    => plt_biom%PetioleElmntNode_brch,    &
+  associate(                                                     &
+    NumCogrothNode_pft      => plt_morph%NumCogrothNode_pft,     &
+    PetoleLensNode_brch     => plt_morph%PetoleLensNode_brch,    &
+    PetoLen2Mass_pft        => plt_morph%PetoLen2Mass_pft,       &
+    SinePetioleAngle_pft    => plt_morph%SinePetioleAngle_pft,   &
+    PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch,   &
     PetoleProteinCNode_brch => plt_biom%PetoleProteinCNode_brch, &
-    LeafElmntNode_brch       => plt_biom%LeafElmntNode_brch,       &
-    ZERO4LeafVar_pft                    => plt_biom%ZERO4LeafVar_pft,                    &
-    rCNNonstRemob_pft    => plt_allom%rCNNonstRemob_pft,   &
-    rCPNonstRemob_pft    => plt_allom%rCPNonstRemob_pft,   &
-    FracGroth2Node_pft       => plt_allom%FracGroth2Node_pft,      &
-    PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
-    KHiestGroLeafNode_brch   => plt_pheno%KHiestGroLeafNode_brch   &
+    LeafElmntNode_brch      => plt_biom%LeafElmntNode_brch,      &
+    ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft,        &
+    rCNNonstRemob_pft       => plt_allom%rCNNonstRemob_pft,      &
+    rCPNonstRemob_pft       => plt_allom%rCPNonstRemob_pft,      &
+    FracGroth2Node_pft      => plt_allom%FracGroth2Node_pft,     &
+    PlantPopulation_pft     => plt_site%PlantPopulation_pft,     &
+    KHiestGroLeafNode_brch  => plt_pheno%KHiestGroLeafNode_brch  &
   )
 
   IF(GrowthPetiole(ielmc).GT.0.0_r8)THEN
@@ -3459,17 +3459,17 @@ module PlantBranchMod
   REAL(R8) :: ALLOCN,GNOD,SpecLenStalkGrowth
   real(r8) :: StalkLenGrowth,StalkAveStrutC_brch
 
-  associate(                                                                &
-    NumCogrothNode_pft                =>   plt_morph%NumCogrothNode_pft             , &  
-    NodeLenPergC                 =>   plt_morph%NodeLenPergC              , &      
-    SineBranchAngle_pft          =>   plt_morph%SineBranchAngle_pft       , &    
-    InternodeHeightDying_brch    =>   plt_morph%InternodeHeightDying_brch , &
-    LiveInterNodeHight_brch      =>   plt_morph%LiveInterNodeHight_brch   , &    
-    InternodeStrutElms_brch      =>   plt_biom%InternodeStrutElms_brch    , &    
-    StalkStrutElms_brch          =>   plt_biom%StalkStrutElms_brch        , &
-    PlantPopulation_pft          =>   plt_site%PlantPopulation_pft        , &          
-    iPlantCalendar_brch          =>   plt_pheno%iPlantCalendar_brch       , &              
-    KHiestGroLeafNode_brch       =>   plt_pheno%KHiestGroLeafNode_brch      &        
+  associate(                                                          &
+    NumCogrothNode_pft        => plt_morph%NumCogrothNode_pft,        &
+    NodeLenPergC              => plt_morph%NodeLenPergC,              &
+    SineBranchAngle_pft       => plt_morph%SineBranchAngle_pft,       &
+    InternodeHeightDying_brch => plt_morph%InternodeHeightDying_brch, &
+    LiveInterNodeHight_brch   => plt_morph%LiveInterNodeHight_brch,   &
+    InternodeStrutElms_brch   => plt_biom%InternodeStrutElms_brch,    &
+    StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch,        &
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
+    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch,       &
+    KHiestGroLeafNode_brch    => plt_pheno%KHiestGroLeafNode_brch     &
   )
 
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).EQ.0)THEN

@@ -405,7 +405,10 @@ module grosubsMod
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8), intent(out) :: RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress
+  real(r8), intent(out) :: RootPrimeAxsNum
+  real(r8), intent(out) :: TFN5
+  real(r8), intent(out) :: WFNG
+  real(r8), intent(out) :: Stomata_Stress
   real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
@@ -413,7 +416,7 @@ module grosubsMod
 
   associate(                                                              &
     TKC                         => plt_ew%TKC,                            &
-    TKS_vr                      => plt_ew%TKS_vr,                            &
+    TKS_vr                      => plt_ew%TKS_vr,                         &
     PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft,              &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft,          &
@@ -581,6 +584,7 @@ module grosubsMod
     WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
     CanTurgPSIFun4Expans=WFNS**0.25_r8
   ENDIF
+  plt_biom%StomatalStress_pft(NZ)=Stomata_Stress
   end associate
   end subroutine StagePlantForGrowth
 !------------------------------------------------------------------------------------------
