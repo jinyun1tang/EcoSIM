@@ -28,21 +28,42 @@ implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
   integer, intent(in) :: NYS
   real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8) :: DORGC(JZ),DVLiceMicP(JZ)
+  real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
+  real(r8) :: VOLISO,VOLPT,VOLTT
+  real(r8) :: TFLWT
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
+  !Setting some variables
+  !That ecosim needs to recognize that it is running in coupled mode
+  !with ATS and to turn off features unsupported in the coupler
+  ATS_cpl_mode=.true.
+  plant_model=.false.
+  microbial_model=.false.
+  soichem_model=.false.
+  snowRedist_model=.false.
+  disp_planttrait=.false.
+  disp_modelconfig=.false.
 
+  !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
   call set_ecosim_solver(1, 1, 1, 1)
   call InitAlloc(NOMicrobeGuilds=1)
 
-  !Setting some variables by hand as they are set to bad
-  !Values by default in InitAlloc, should this change?
+  !setting a few variables 
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays = 1 !Is the number of layers down the roots go
   NX=1
-  ATS_cpl_mode=.true.
 
+  VOLISO=0.0_r8
+  TFLWT=0.0_r8
+  VOLPT=0.0_r8
+  VOLTT=0.0_r8
+ 
   do NY=1,NYS
+    TXCO2(NY,NX)=0.0_r8
+    DORGE(NY,NX)=0.0_r8
+    WQRH(NY,NX)=0.0_r8
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
     AREA(3,0,NY,NX)=a_AREA3(0,NY)

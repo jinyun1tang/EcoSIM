@@ -70,7 +70,7 @@ implicit none
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
-    !RainH(NY,NX) = prec
+    RainH(NY,NX) = p_rain(NY)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
@@ -109,7 +109,7 @@ implicit none
     write(*,*) "ATS true E source: ", Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     !for every column send the top layer to the transfer var
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
-    !surf_e_source(NY) = 1.0e-5
+    surf_w_source(NY) = Qinfl2MicP(NY,1)
     write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
   ENDDO
 

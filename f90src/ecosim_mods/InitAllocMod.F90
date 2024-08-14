@@ -65,13 +65,11 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(NumGrowthStages,MaxNumRootAxes)
+  !putting in the if statement to avoid PFT file load error
 
-  write(*,*) "JX = ", JX, "  JY = ", JY, "JZ = ", JZ
-  write(*,*) "Just explixitly setting"
-!  JX=1
-!  JY=1
-!  JZ=100
+  write(*,*) "plant_model: ", plant_model
+  if(plant_model)call InitGrosub(NumGrowthStages,MaxNumRootAxes)
+
   call InitGridData
 
   call InitTracerIDs(salt_model)

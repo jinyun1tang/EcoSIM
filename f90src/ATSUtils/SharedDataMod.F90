@@ -45,7 +45,8 @@ Module SharedDataMod
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
-  real(r8), allocatable :: prec(:)        !precipitation, mm H2O/hr
+  real(r8), allocatable :: p_rain(:)      !precipitation, mm H2O/hr
+  real(r8), allocatable :: p_snow(:)      !precipitation snow, mm H2O/hr 
   real(r8), allocatable :: sunrad(:)      !solar radiation,
   real(r8), allocatable :: swrad(:)       !shortwave radiation,
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
@@ -128,7 +129,8 @@ Module SharedDataMod
   call destroy(a_ALT)
   call destroy(tairc)
   call destroy(uwind)
-  call destroy(prec)
+  call destroy(p_rain)
+  call destroy(p_snow)
   call destroy(sunrad)
   call destroy(swrad)
   call destroy(vpair)
