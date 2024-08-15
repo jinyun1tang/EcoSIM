@@ -45,7 +45,7 @@
 
   AmendCFlx_CumYr_col(NY,NX)       = 0._r8
   LiterfalOrgM_col(:,NY,NX)        = 0._r8
-  RootResp_CumYr_col(NY,NX)                      = 0._r8
+  RootResp_CumYr_col(NY,NX)        = 0._r8
   Eco_NBP_CumYr_col(NY,NX)         = 0._r8
   QRain_CumYr_col(NY,NX)           = 0._r8
   QEvap_CumYr_col(NY,NX)           = 0._r8
@@ -57,8 +57,8 @@
   HydroSufDONFlx_CumYr_col(NY,NX)  = 0._r8
   HydroSufDINFlx_CumYr_col(NY,NX)  = 0._r8
   FerPFlx_CumYr_col(NY,NX)         = 0._r8
-  HydroSufDOPFlx_col(NY,NX)        = 0._r8
-  HydroSufDIPFlx_col(NY,NX)        = 0._r8
+  HydroSufDOPFlx_CumYr_col(NY,NX)  = 0._r8
+  HydroSufDIPFlx_CumYr_col(NY,NX)  = 0._r8
   CO2byFire_CumYr_col(NY,NX)       = 0._r8
   CH4byFire_CumYr_col(NY,NX)       = 0._r8
   O2byFire_CumYr_col(NY,NX)        = 0._r8

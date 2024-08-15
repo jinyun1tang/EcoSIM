@@ -160,10 +160,10 @@ contains
 
   implicit none
   type(PlantSoluteUptakeConfig_type), intent(in) :: PlantSoluteUptakeConfig
-  real(r8), intent(out) :: PltUptake_Ol
-  real(r8), intent(out) :: PltUptake_Sl
-  real(r8), intent(out) :: PltUptake_OSl  
-  real(r8), intent(out) :: PltUptake_OSCl
+  real(r8), intent(out) :: PltUptake_Ol     !oxygen limited but solute or carbon unlimited
+  real(r8), intent(out) :: PltUptake_Sl     !oxygen and carbon unlimited but solute limited uptake
+  real(r8), intent(out) :: PltUptake_OSl    !oxygen and solute limited, but not carbon limited
+  real(r8), intent(out) :: PltUptake_OSCl   !oxygen, solute and carbon limited uptake
   logical, optional, intent(in) :: ldebug
   real(r8) :: UptakeRateMax_Ol   !oxygen limited maximum uptake rate
   real(r8) :: X, Y, B, C, BP, CP, delta
@@ -192,19 +192,32 @@ contains
 
   !Oxygen limited but not solute or carbon limited uptake
   ! u^2+Bu+C=0., it requires when C=0, delta=1, u=0
-  B=-UptakeRateMax_Ol-SolDifusFlx*SoluteKM-X+Y
-  C=(X-Y)*UptakeRateMax_Ol
-  delta=AZMAX1(1._r8-4.0_r8*C/(B*B))
-  Uptake_Ol=(-1._r8+SQRT(delta))*B/2.0_r8
-  
-  !Oxygen, solute and carbon unlimited solute uptake
-  BP=-UptakeRateMax-SolDifusFlx*SoluteKM-X+Y
-  CP=(X-Y)*UptakeRateMax
-  delta=AZMAX1(1._r8-4.0_r8*CP/(BP*BP))
-  
-  Uptake=(-1._r8+SQRT(delta))*BP/2.0_r8
+  B=-(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
+  C=AZMAX1(X-Y)*UptakeRateMax_Ol
 
-  !oxygen limited but solute or carbon unlimited
+  delta=B*B-4.0_r8*C
+  if(delta<0._r8)then
+    Uptake_Ol=0._r8
+  else
+    Uptake_Ol=AZMAX1(-B-SQRT(delta))/2.0_r8
+  endif
+  if(lldebug)then
+  write(115,*)'X-Y',SolDifusFlx,SolAdvFlx,X-Y,SoluteConc-SoluteConcMin
+  write(115,*)'delta1',delta,Uptake_Ol,'B=',B,C
+  endif
+
+  !Oxygen, and carbon unlimited solute uptake
+  BP=-(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
+  CP=AZMAX1(X-Y)*UptakeRateMax
+  delta=BP*BP-4.0_r8*CP
+  if(delta<0._r8)then
+    Uptake=0._r8
+  else
+    Uptake=AZMAX1(-BP-SQRT(delta))/2.0_r8
+  endif
+  if(lldebug)write(115,*)'delta2',delta,Uptake,'BP=',BP,CP
+
+  !oxygen and solute limited but carbon unlimited
   PltUptake_Ol=AZMAX1(Uptake_Ol*PlantPopulation)
 
   !oxygen and solute limited, but not carbon limited

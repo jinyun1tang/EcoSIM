@@ -245,7 +245,7 @@ contains
   OMCF=(/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
   OMCA=(/0.06_r8,0.02_r8,0.01_r8,0.0_r8,0.01_r8,0.0_r8,0.0_r8/)
 
-  OMCI(1:3,:)=OMCI1
+  OMCI(1:NumLiveMicrbCompts,:)=OMCI1
 
 !  if(this%jguilds.GT.1)then
 !    COMCI=OMCI(1:NumLiveMicrbCompts,:)

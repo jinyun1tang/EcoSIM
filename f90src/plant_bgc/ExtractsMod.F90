@@ -38,6 +38,7 @@ module ExtractsMod
 
     ENDIF
   ENDDO
+
   RETURN
   END subroutine extracts
 !------------------------------------------------------------------------------------------
@@ -182,7 +183,7 @@ module ExtractsMod
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr, &
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr,       &
     MY                        => plt_morph%MY,                      &
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft             &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft         &
   )
 
   trcs_plant_uptake_vr=0._r8
@@ -332,13 +333,13 @@ module ExtractsMod
   associate(                                                         &
     PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape, &
     ElmBalanceCum_pft         => plt_site%ElmBalanceCum_pft,         &
-    NH3Emis_CumYr_pft            => plt_bgcr%NH3Emis_CumYr_pft,            &
+    NH3Emis_CumYr_pft         => plt_bgcr%NH3Emis_CumYr_pft,         &
     Canopy_NEE_col            => plt_bgcr%Canopy_NEE_col,            &
     LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
-    ETCanopy_CumYr_pft              => plt_ew%ETCanopy_CumYr_pft,                &
+    ETCanopy_CumYr_pft        => plt_ew%ETCanopy_CumYr_pft,          &
     TH2GZ                     => plt_bgcr%TH2GZ,                     &
     trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,      &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
@@ -353,7 +354,7 @@ module ExtractsMod
     EvapTransHeat_pft         => plt_ew%EvapTransHeat_pft,           &
     CanWat_col                => plt_ew%CanWat_col,                  &
     TKC                       => plt_ew%TKC,                         &
-    TKS_vr                       => plt_ew%TKS_vr,                         &
+    TKS_vr                    => plt_ew%TKS_vr,                      &
     ENGYX_pft                 => plt_ew%ENGYX_pft,                   &
     Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
     VapXAir2CanG              => plt_ew%VapXAir2CanG,                &

@@ -959,7 +959,7 @@ module RedistMod
   real(r8) :: SNM,SPM,SSB,SD
 
   real(r8) :: WX,ZG,Z4S,Z4X,Z4F,ZOS,ZOF
-  real(r8) :: ZGB,Z2B,ZHB,dval
+  real(r8) :: ZGB,Z2B,ZHB,dval,dval0,pval
   integer  :: idg,idom,ids,NE
 
   !     begin_execution
@@ -1019,19 +1019,31 @@ module RedistMod
       dval=trc_solml_vr(idg,L,NY,NX)
       trc_solml_vr(idg,L,NY,NX)=trc_solml_vr(idg,L,NY,NX) &
         +trcs_Transp2MicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX) &
-        -trcs_plant_uptake_vr(idg,L,NY,NX) &
         +trcs_Irrig_vr(idg,L,NY,NX)+trcs_PoreTranspFlx_vr(idg,L,NY,NX) &
         +trcg_ebu_flx_vr(idg,L,NY,NX)
 
        trc_solml_vr(idg,L,NY,NX)=fixnegmass(trc_solml_vr(idg,L,NY,NX))       
-       call fixEXflux(trc_solml_vr(idg,L,NY,NX),trcg_RMicbTransf_vr(idg,L,NY,NX))
+       if(trcg_RMicbTransf_vr(idg,L,NY,NX)<=0._r8)then
+         !production
+         trc_solml_vr(idg,L,NY,NX)=trc_solml_vr(idg,L,NY,NX)-trcg_RMicbTransf_vr(idg,L,NY,NX)
+         call fixEXflux(trc_solml_vr(idg,L,NY,NX),trcs_plant_uptake_vr(idg,L,NY,NX))
+       else
+         dval0=trcs_plant_uptake_vr(idg,L,NY,NX) + trcg_RMicbTransf_vr(idg,L,NY,NX)
+         dval=dval0
+         call fixEXflux(trc_solml_vr(idg,L,NY,NX),dval)
+         if(dval<dval0)then
+           pval=dval/dval0
+           trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
+           trcg_RMicbTransf_vr(idg,L,NY,NX)  = trcg_RMicbTransf_vr(idg,L,NY,NX)*pval
+         endif
+       endif
 
       if(trc_solml_vr(idg,L,NY,NX)<0._r8)then
-      print*,idg,'xxx',L,dval,trc_solml_vr(idg,L,NY,NX)
-      print*,trcs_Transp2MicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX), &
-        -trcg_RMicbTransf_vr(idg,L,NY,NX),-trcs_plant_uptake_vr(idg,L,NY,NX), &
-        +trcs_Irrig_vr(idg,L,NY,NX)+trcs_PoreTranspFlx_vr(idg,L,NY,NX) &
-        +trcg_ebu_flx_vr(idg,L,NY,NX)
+        print*,idg,'xxx',L,dval,trc_solml_vr(idg,L,NY,NX)
+        print*,trcs_Transp2MicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX), &
+          -trcg_RMicbTransf_vr(idg,L,NY,NX),-trcs_plant_uptake_vr(idg,L,NY,NX), &
+          +trcs_Irrig_vr(idg,L,NY,NX)+trcs_PoreTranspFlx_vr(idg,L,NY,NX) &
+          +trcg_ebu_flx_vr(idg,L,NY,NX)
       endif  
     enddo
 
@@ -1056,23 +1068,46 @@ module RedistMod
 
    DO ids=ids_nut_beg,ids_nuts_end
       trc_solml_vr(ids,L,NY,NX)=trc_solml_vr(ids,L,NY,NX) &
-        +trcs_Transp2MicP_vr(ids,L,NY,NX)+RNutMicbTransf_vr(ids,L,NY,NX) &
+        +trcs_Transp2MicP_vr(ids,L,NY,NX)  &
         +trcn_RChem_soil_vr(ids,L,NY,NX) &
-        +trcs_Irrig_vr(ids,L,NY,NX)+trcs_PoreTranspFlx_vr(ids,L,NY,NX)
-
+        +trcs_Irrig_vr(ids,L,NY,NX)+trcs_PoreTranspFlx_vr(ids,L,NY,NX)     
       trc_solml_vr(ids,L,NY,NX)=fixnegmass(trc_solml_vr(ids,L,NY,NX))
-      call fixEXflux(trc_solml_vr(ids,L,NY,NX),trcs_plant_uptake_vr(ids,L,NY,NX))
+
+      if(RNutMicbTransf_vr(ids,L,NY,NX)>=0._r8)then
+        trc_solml_vr(ids,L,NY,NX)=trc_solml_vr(ids,L,NY,NX)+RNutMicbTransf_vr(ids,L,NY,NX)
+        call fixEXflux(trc_solml_vr(ids,L,NY,NX),trcs_plant_uptake_vr(ids,L,NY,NX))
+      else
+        dval0=-RNutMicbTransf_vr(ids,L,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX)
+        dval=dval0
+        call fixEXflux(trc_solml_vr(ids,L,NY,NX),dval)
+        if(dval<dval0)then
+          pval=dval/dval0
+          RNutMicbTransf_vr(ids,L,NY,NX)    = RNutMicbTransf_vr(ids,L,NY,NX)*pval
+          trcs_plant_uptake_vr(ids,L,NY,NX) = trcs_plant_uptake_vr(ids,L,NY,NX)*pval
+        endif
+      endif
     ENDDO
  
     do ids=ids_NH4B,ids_nutb_end
       trc_solml_vr(ids,L,NY,NX)=trc_solml_vr(ids,L,NY,NX) &
-        +trcs_Transp2MicP_vr(ids,L,NY,NX)+RNutMicbTransf_vr(ids,L,NY,NX) &
+        +trcs_Transp2MicP_vr(ids,L,NY,NX) &
         +trcn_RChem_band_soil_vr(ids,L,NY,NX) &
         +trcs_Irrig_vr(ids,L,NY,NX)+trcs_PoreTranspFlx_vr(ids,L,NY,NX)
-    trc_solml_vr(ids,L,NY,NX)=fixnegmass(trc_solml_vr(ids,L,NY,NX))
+      trc_solml_vr(ids,L,NY,NX)=fixnegmass(trc_solml_vr(ids,L,NY,NX))
     
-    call fixEXflux(trc_solml_vr(ids,L,NY,NX),trcs_plant_uptake_vr(ids,L,NY,NX))
-
+      if(RNutMicbTransf_vr(ids,L,NY,NX)>=0._r8)then
+        trc_solml_vr(ids,L,NY,NX)=trc_solml_vr(ids,L,NY,NX)+RNutMicbTransf_vr(ids,L,NY,NX)
+        call fixEXflux(trc_solml_vr(ids,L,NY,NX),trcs_plant_uptake_vr(ids,L,NY,NX))
+      else
+        dval0=-RNutMicbTransf_vr(ids,L,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX)
+        dval=dval0
+        call fixEXflux(trc_solml_vr(ids,L,NY,NX),dval)
+        if(dval<dval0)then
+          pval=dval/dval0
+          RNutMicbTransf_vr(ids,L,NY,NX)    = RNutMicbTransf_vr(ids,L,NY,NX)*pval
+          trcs_plant_uptake_vr(ids,L,NY,NX) = trcs_plant_uptake_vr(ids,L,NY,NX)*pval
+        endif
+      endif  
     enddo
 
     Eco_HR_CumYr_col(NY,NX)=Eco_HR_CumYr_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX) &

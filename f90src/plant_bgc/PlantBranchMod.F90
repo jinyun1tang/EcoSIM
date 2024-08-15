@@ -2952,22 +2952,22 @@ module PlantBranchMod
   real(r8) :: Rauto_brch,RCO2CM
   real(r8) :: CNG,CPG
 ! begin_execution
-  associate(                                                                    &
-    CO2NetFix_pft                      =>  plt_bgcr%CO2NetFix_pft             , &
-    CanopyGrosRCO2_pft                 =>  plt_bgcr%CanopyGrosRCO2_pft        , &
-    Eco_AutoR_CumYr_col                      =>  plt_bgcr%Eco_AutoR_CumYr_col             , &
-    ECO_ER_col                         =>  plt_bgcr%ECO_ER_col                , &
-    Eco_GPP_CumYr_col                        =>  plt_bgcr%Eco_GPP_CumYr_col               , &
-    GrossCO2Fix_pft                    =>  plt_bgcr%GrossCO2Fix_pft           , &
-    CanopyRespC_CumYr_pft                    =>  plt_bgcr%CanopyRespC_CumYr_pft           , &
-    CanopyNonstElms_brch               =>  plt_biom%CanopyNonstElms_brch      , &
-    LeafPetoNonstElmConc_brch          =>  plt_biom%LeafPetoNonstElmConc_brch , &
-    LeafAreaLive_brch                  =>  plt_morph%LeafAreaLive_brch        , &        
-    ZERO                               =>  plt_site%ZERO                      , &
-    iPlantRootProfile_pft              =>  plt_pheno%iPlantRootProfile_pft    , &
-    fTCanopyGroth_pft                  =>  plt_pheno%fTCanopyGroth_pft        , &
-    iPlantPhenolType_pft               =>  plt_pheno%iPlantPhenolType_pft     , &
-    C4PhotosynDowreg_brch              =>  plt_photo%C4PhotosynDowreg_brch      &
+  associate(                                                         &
+    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
+    CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
+    Eco_AutoR_CumYr_col       => plt_bgcr%Eco_AutoR_CumYr_col,       &
+    ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
+    Eco_GPP_CumYr_col         => plt_bgcr%Eco_GPP_CumYr_col,         &
+    GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft,           &
+    CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft,     &
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
+    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch, &
+    LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch,        &
+    ZERO                      => plt_site%ZERO,                      &
+    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,    &
+    fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,        &
+    iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft,     &
+    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch      &
   )
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !

@@ -126,7 +126,7 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP,XFRE
 !     begin_execution
 
-  associate(                                                                 &
+  associate(                                                                   &
     k_fine_litr                    => pltpar%k_fine_litr,                      &
     k_woody_litr                   => pltpar%k_woody_litr,                     &
     iDayPlanting_pft               => plt_distb%iDayPlanting_pft,              &
@@ -169,7 +169,7 @@ module grosubsMod
     PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft,         &
     CumSoilThickness               => plt_site%CumSoilThickness,               &
     PlantinDepz_pft                => plt_morph%PlantinDepz_pft,               &
-    NumOfBranches_pft              => plt_morph%NumOfBranches_pft            &
+    NumOfBranches_pft              => plt_morph%NumOfBranches_pft              &
   )
   D9975: DO NZ=1,NP0
 !

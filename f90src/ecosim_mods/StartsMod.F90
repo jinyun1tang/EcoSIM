@@ -792,13 +792,13 @@ module StartsMod
   HydroSubsDOCFlx_col(:,:)=0.0_r8
   HydroSufDONFlx_CumYr_col(:,:)=0.0_r8
   HydroSubsDONFlx_col(:,:)=0.0_r8
-  HydroSufDOPFlx_col(:,:)=0.0_r8
+  HydroSufDOPFlx_CumYr_col(:,:)=0.0_r8
   HydroSubsDOPFlx_col(:,:)=0.0_r8
   HydroSufDICFlx_col(:,:)=0.0_r8
   HydroSubsDICFlx_col(:,:)=0.0_r8
   HydroSufDINFlx_CumYr_col(:,:)=0.0_r8
   HydroSubsDINFlx_col(:,:)=0.0_r8
-  HydroSufDIPFlx_col(:,:)=0.0_r8
+  HydroSufDIPFlx_CumYr_col(:,:)=0.0_r8
   HydroSubsDIPFlx_col(:,:)=0.0_r8
   HydroIonFlx_CumYr_col(:,:)=0.0_r8
   LiterfalOrgM_col(ielmc,:,:)=0.0_r8

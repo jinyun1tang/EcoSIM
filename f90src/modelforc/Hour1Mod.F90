@@ -375,33 +375,33 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      HydroSufDOCFlx_col(NY,NX)=0._r8
-      HydroSubsDOCFlx_col(NY,NX)=0._r8
-      HydroSufDICFlx_col(NY,NX)=0._r8
-      HydroSubsDICFlx_col(NY,NX)=0._r8
-      HydroSubsDONFlx_col(NY,NX)=0._r8
-      HydroSubsDINFlx_col(NY,NX)=0._r8
-      HydroSubsDOPFlx_col(NY,NX)=0._r8
-      HydroSubsDIPFlx_col(NY,NX)=0._r8      
-      WatFlux4ErosionM_2DH(:,NY,NX)=0._r8
-      Wat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
-      Heat2GridBySurfRunoff(1:2,1:2,NY,NX)=0.0_r8
+      HydroSufDOCFlx_col(NY,NX)            = 0._r8
+      HydroSubsDOCFlx_col(NY,NX)           = 0._r8
+      HydroSufDICFlx_col(NY,NX)            = 0._r8
+      HydroSubsDICFlx_col(NY,NX)           = 0._r8
+      HydroSubsDONFlx_col(NY,NX)           = 0._r8
+      HydroSubsDINFlx_col(NY,NX)           = 0._r8
+      HydroSubsDOPFlx_col(NY,NX)           = 0._r8
+      HydroSubsDIPFlx_col(NY,NX)           = 0._r8
+      WatFlux4ErosionM_2DH(:,NY,NX)        = 0._r8
+      Wat2GridBySurfRunoff(1:2,1:2,NY,NX)  = 0.0_r8
+      Heat2GridBySurfRunoff(1:2,1:2,NY,NX) = 0.0_r8
 
       dom_2DFloXSurRunoff(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
 
       trcg_FloXSurRunoff_2D(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0.0_r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
 
-      DrysnoBySnowRedistrib(1:2,NY,NX)=0.0_r8
-      WatBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
-      IceBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
-      HeatBySnowRedistrib_2DH(1:2,NY,NX)=0.0_r8
-      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,NY,NX)=0.0_r8
+      DrysnoBySnowRedistrib(1:2,NY,NX)             = 0.0_r8
+      WatBySnowRedistrib_2DH(1:2,NY,NX)            = 0.0_r8
+      IceBySnowRedistrib_2DH(1:2,NY,NX)            = 0.0_r8
+      HeatBySnowRedistrib_2DH(1:2,NY,NX)           = 0.0_r8
+      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,NY,NX) = 0.0_r8
 
-      trcn_FloXSnow_2DH(ids_NH4,1:2,NY,NX)=0.0_r8
-      trcn_FloXSnow_2DH(ids_NO3,1:2,NY,NX)=0.0_r8
-      trcn_FloXSnow_2DH(ids_H1PO4,1:2,NY,NX)=0.0_r8
-      trcn_FloXSnow_2DH(ids_H2PO4,1:2,NY,NX)=0.0_r8
+      trcn_FloXSnow_2DH(ids_NH4,1:2,NY,NX)   = 0.0_r8
+      trcn_FloXSnow_2DH(ids_NO3,1:2,NY,NX)   = 0.0_r8
+      trcn_FloXSnow_2DH(ids_H1PO4,1:2,NY,NX) = 0.0_r8
+      trcn_FloXSnow_2DH(ids_H2PO4,1:2,NY,NX) = 0.0_r8
 !
 !
 !     GAS AND SOLUTE FLUXES

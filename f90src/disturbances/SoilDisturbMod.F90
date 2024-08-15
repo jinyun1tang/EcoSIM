@@ -346,7 +346,7 @@ module SoilDisturbMod
 
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
           HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)+OMelm(ielmn)
-          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
+          HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)+OMelm(ielmp)
           
           Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN

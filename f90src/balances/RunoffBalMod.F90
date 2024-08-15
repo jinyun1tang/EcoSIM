@@ -183,7 +183,7 @@ implicit none
 !     TOMOU_lnds(ielmc),OXYGOU,H2GOU,TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)=cumulative C,O2,H2,N,P loss through lateral and lower boundaries
 !     HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through runoff
 !     HydroSufDONFlx_CumYr_col,HydroSufDINFlx_CumYr_col=dissolved organic,inorganic N loss through runoff
-!     HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through runoff
+!     HydroSufDOPFlx_CumYr_col,HydroSufDIPFlx_CumYr_col=dissolved organic,inorganic P loss through runoff
 !
       CXR=XN*(trcg_FloXSurRunoff_2D(idg_CO2,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_CH4,N,NN,N5,N4))
       ZXR=XN*(trcn_FloXSurRunoff_2D(ids_NH4,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_NH3,N,NN,N5,N4) &
@@ -203,8 +203,8 @@ implicit none
       HydroSufDICFlx_col(NY,NX)=-CXR
       HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
       HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
-      HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
+      HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
+      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXR=XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
       HGR=XN*trcg_FloXSurRunoff_2D(idg_H2,N,NN,N5,N4)
@@ -318,7 +318,7 @@ implicit none
 !         TSedmErossLoss_lnds,SedmErossLoss_CumYr_col=cumulative sediment loss through lateral and lower boundaries
 !         HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through lateral and lower boundaries
 !         HydroSufDONFlx_CumYr_col,HydroSufDINFlx_CumYr_col=dissolved organic,inorganic N loss through lateral and lower boundaries
-!         HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
+!         HydroSufDOPFlx_CumYr_col,HydroSufDIPFlx_CumYr_col=dissolved organic,inorganic P loss through lateral and lower boundaries
 !         TOMOU_lnds(ielmc),TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)=total C,N,P loss through lateral and lower boundaries
 
 !         MICROBIAL C IN RUNOFF SEDIMENT
@@ -391,11 +391,11 @@ implicit none
 
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
           HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
-          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-MOE(ielmp)
+          HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
                     
           HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-MXE(ielmc)          
           HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE          
-          HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-MXE(ielmp)-PPE
+          HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
 !     WRITE(*,6635)'MOE(ielmp)',I,J,N4,N5,N,NN
 !    2,MOE(ielmc),MXE(ielmc),MOE(ielmn),MXE(ielmn),ZPE
 !    3,MOE(ielmp),MXE(ielmp),PPE,TOMOU_lnds(ielmp),cumSedErosion(N,NN,N5,N4)
@@ -730,7 +730,7 @@ implicit none
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXS
       HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-CXR
       HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
+      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXS=XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(salt_model)THEN

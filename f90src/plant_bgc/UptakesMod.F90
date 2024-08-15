@@ -240,27 +240,27 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                                              &
-    ZERO               => plt_site%ZERO,                  &
-    NP                 => plt_site%NP,                    &
-    MaxNumRootLays     => plt_site%MaxNumRootLays,        &
-    VLWatMicPM_vr      => plt_site%VLWatMicPM_vr,         &
-    ALT                => plt_site%ALT,                   &
-    NU                 => plt_site%NU,                    &
-    NP0                => plt_site%NP0,                   &
-    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,      &
-    PopuRootMycoC_pvr  => plt_biom% PopuRootMycoC_pvr,    &
-    VLMicP_vr          => plt_soilchem%VLMicP_vr,         &
-    VLiceMicP_vr       => plt_soilchem%VLiceMicP_vr,      &
-    THETY_vr           => plt_soilchem%THETY_vr,          &
-    SoiBulkDensity_vr  => plt_soilchem%SoiBulkDensity_vr, &
-    VLWatMicP_vr       => plt_soilchem%VLWatMicP_vr,      &
-    VLSoilMicP         => plt_soilchem%VLSoilMicP,        &
-    CanopyStemArea_pft => plt_morph%CanopyStemArea_pft,   &
-    MY                 => plt_morph%MY,                   &
-    CanopyLeafArea_pft => plt_morph%CanopyLeafArea_pft,   &
-    RadNet2Canopy_pft  => plt_rad%RadNet2Canopy_pft,      &
-    LWRadCanopy_pft    => plt_rad%LWRadCanopy_pft          &
+  associate(                                                 &
+    ZERO                  => plt_site%ZERO,                  &
+    NP                    => plt_site%NP,                    &
+    MaxNumRootLays        => plt_site%MaxNumRootLays,        &
+    VLWatMicPM_vr         => plt_site%VLWatMicPM_vr,         &
+    ALT                   => plt_site%ALT,                   &
+    NU                    => plt_site%NU,                    &
+    NP0                   => plt_site%NP0,                   &
+    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,   &
+    PopuRootMycoC_pvr     => plt_biom% PopuRootMycoC_pvr,    &
+    VLMicP_vr             => plt_soilchem%VLMicP_vr,         &
+    VLiceMicP_vr          => plt_soilchem%VLiceMicP_vr,      &
+    THETY_vr              => plt_soilchem%THETY_vr,          &
+    SoiBulkDensity_vr     => plt_soilchem%SoiBulkDensity_vr, &
+    VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr,      &
+    VLSoilMicP            => plt_soilchem%VLSoilMicP,        &
+    CanopyStemArea_pft    => plt_morph%CanopyStemArea_pft,   &
+    MY                    => plt_morph%MY,                   &
+    CanopyLeafArea_pft    => plt_morph%CanopyLeafArea_pft,   &
+    RadNet2Canopy_pft     => plt_rad%RadNet2Canopy_pft,      &
+    LWRadCanopy_pft       => plt_rad%LWRadCanopy_pft          &
   )
 !
 !     RESET TOTAL UPTAKE ARRAYS
@@ -273,30 +273,30 @@ module UptakesMod
 !     TKC(NZ)=TairK+DeltaTKC_pft(NZ)
 !     TCelciusCanopy_pft(NZ)=TKC(NZ)-TC2K
     ARLSC=ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-    RadNet2Canopy_pft(NZ)=0.0_r8
-    plt_ew%EvapTransHeat_pft(NZ)=0.0_r8
-    plt_ew%HeatXAir2PCan(NZ)=0.0_r8
-    plt_ew%HeatStorCanP(NZ)=0.0_r8
-    LWRadCanopy_pft(NZ)=0.0_r8
-    plt_ew%Transpiration_pft(NZ)=0.0_r8
-    plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-    plt_rbgc%RootMycoExudElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
-    plt_rbgc%RootNH4Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootNO3Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootH2PO4Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootHPO4Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootN2Fix_pft(NZ)=0.0_r8
+    RadNet2Canopy_pft(NZ)                                = 0.0_r8
+    plt_ew%EvapTransHeat_pft(NZ)                         = 0.0_r8
+    plt_ew%HeatXAir2PCan(NZ)                             = 0.0_r8
+    plt_ew%HeatStorCanP(NZ)                              = 0.0_r8
+    LWRadCanopy_pft(NZ)                                  = 0.0_r8
+    plt_ew%Transpiration_pft(NZ)                         = 0.0_r8
+    plt_ew%VapXAir2Canopy_pft(NZ)                        = 0.0_r8
+    plt_rbgc%RootMycoExudElms_pft(1:NumPlantChemElms,NZ) = 0.0_r8
+    plt_rbgc%RootNH4Uptake_pft(NZ)                       = 0.0_r8
+    plt_rbgc%RootNO3Uptake_pft(NZ)                       = 0.0_r8
+    plt_rbgc%RootH2PO4Uptake_pft(NZ)                     = 0.0_r8
+    plt_rbgc%RootHPO4Uptake_pft(NZ)                      = 0.0_r8
+    plt_rbgc%RootN2Fix_pft(NZ)                           = 0.0_r8
 !
 !     RESET UPTAKE ARRAYS
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
-        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
-        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)=0.0_r8
-        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,N,L,NZ)=0.0_r8
-        plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
-        plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
+        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)                     = 0.0_r8
+        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                            = 0.0_r8
+        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                             = 0.0_r8
+        plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,N,L,NZ)               = 0.0_r8
+        plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ)   = 0.0_r8
+        plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ) = 0.0_r8
       enddo
     enddo
   ENDDO D9984
@@ -478,7 +478,7 @@ module UptakesMod
     RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr              , &
     Root2ndMaxRadius_pft     =>  plt_morph%Root2ndMaxRadius_pft      , &
     SeedDepth_pft            =>  plt_morph%SeedDepth_pft             , &
-    MaxSoiL4Root_pft             =>  plt_morph%MaxSoiL4Root_pft                &
+    MaxSoiL4Root_pft             =>  plt_morph%MaxSoiL4Root_pft        &
   )
 !     RootDepZ,Root1stDepz_pft=primary root depth
 !     FracSoiLayByPrimRoot=fraction of each soil layer with primary root
@@ -557,12 +557,12 @@ module UptakesMod
 ! begin_execution
   associate(                                                         &
    RAZ                       => plt_ew%RAZ,                          &
-   DeltaTKC_pft                  => plt_ew%DeltaTKC_pft,                     &
+   DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
    TKC                       => plt_ew%TKC,                          &
    TairK                     => plt_ew%TairK,                        &
-   TKS_vr                       => plt_ew%TKS_vr,                          &
+   TKS_vr                    => plt_ew%TKS_vr,                       &
    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
    AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
@@ -681,7 +681,7 @@ module UptakesMod
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     RAZ                       => plt_ew%RAZ,                          &
     VPA                       => plt_ew%VPA,                          &
-    TKS_vr                       => plt_ew%TKS_vr,                          &
+    TKS_vr                    => plt_ew%TKS_vr,                       &
     TairK                     => plt_ew%TairK,                        &
     RIB                       => plt_ew%RIB,                          &
     Transpiration_pft         => plt_ew%Transpiration_pft,            &
@@ -1167,7 +1167,7 @@ module UptakesMod
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKSnow                    => plt_ew%TKSnow,                       &
     TKC                       => plt_ew%TKC,                          &
-    TKS_vr                       => plt_ew%TKS_vr,                          &
+    TKS_vr                    => plt_ew%TKS_vr,                       &
     TairK                     => plt_ew%TairK,                        &
     SnowDepth                 => plt_ew%SnowDepth,                    &
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
@@ -1340,7 +1340,7 @@ module UptakesMod
     TCelciusCanopy_pft  => plt_ew%TCelciusCanopy_pft,     &
     TairK               => plt_ew%TairK,                  &
     TKC                 => plt_ew%TKC,                    &
-    TKS_vr                => plt_ew%TKS_vr,                    &
+    TKS_vr              => plt_ew%TKS_vr,                 &
     PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &

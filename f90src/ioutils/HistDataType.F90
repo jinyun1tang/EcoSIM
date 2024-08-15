@@ -51,9 +51,9 @@ implicit none
   real(r8),pointer   :: h1D_AMENDED_P_col(:)       !FerPFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_P_FLX_col(:)   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tEXCH_PO4_col(:)       !tHxPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
-  real(r8),pointer   :: h1D_SUR_DOP_FLX_col(:)    !HydroSufDOPFlx_col(NY,NX)/TAREA
+  real(r8),pointer   :: h1D_SUR_DOP_FLX_col(:)    !HydroSufDOPFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DOP_FLX_col(:)    !HydroSubsDOPFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_col(NY,NX)/TAREA
+  real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)   !
   
@@ -821,12 +821,12 @@ implicit none
     long_name='total surface DOC flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUR_DON_FLX_col(beg_col:end_col)  
-  call hist_addfld1d(fname='SUR_DON_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='total surface DON flux',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='SUR_DON_FLX',units='gN/m2',avgflag='A',&
+    long_name='cumulative surface DON flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUR_DOP_FLX_col(beg_col:end_col) 
-  call hist_addfld1d(fname='SUR_DOP_FLX',units='gP/m2/hr',avgflag='A',&
-    long_name='total surface DOP flux',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='SUR_DOP_FLX',units='gP/m2',avgflag='A',&
+    long_name='Cumulative surface DOP flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUB_DOC_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='SUB_DOC_FLX',units='gC/m2/hr',avgflag='A',&
@@ -845,12 +845,12 @@ implicit none
     long_name='total surface DIC flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUR_DIN_FLX_col(beg_col:end_col)   
-  call hist_addfld1d(fname='SUR_DIN_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='total surface DIN flux',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='SUR_DIN_FLX',units='gN/m2',avgflag='A',&
+    long_name='cumulative total surface DIN flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUR_DIP_FLX_col(beg_col:end_col)     
-  call hist_addfld1d(fname='SUR_DIP_FLX',units='gP/m2/hr',avgflag='A',&
-    long_name='total surface DIP flux',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='SUR_DIP_FLX',units='gP/m2',avgflag='A',&
+    long_name='Cumulative surface DIP flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUB_DIC_FLX_col(beg_col:end_col)   
   call hist_addfld1d(fname='SUB_DIC_FLX',units='gC/m2/hr',avgflag='A',&
@@ -907,8 +907,8 @@ implicit none
     long_name='total micriobial P',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_PO4_FIRE_col(beg_col:end_col)  
-  call hist_addfld1d(fname='PO4_FIRE',units='gP/m2/hr',avgflag='A',&
-    long_name='total PO4 flux from fire',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='PO4_FIRE',units='gP/m2',avgflag='A',&
+    long_name='cumulative PO4 flux from fire',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_cPO4_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='cPO4_LITR',units='gP/g litr',avgflag='A',&
@@ -987,19 +987,19 @@ implicit none
     long_name='ecosystem LAI',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_GPP_CumYr_col(beg_col:end_col)       
-  call hist_addfld1d(fname='ECO_GPP',units='gC/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='ECO_GPP',units='gC/m2',avgflag='A',&
     long_name='cumulative ecosystem GPP',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_RA_col(beg_col:end_col)       
-  call hist_addfld1d(fname='ECO_RA',units='gC/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='ECO_RA',units='gC/m2',avgflag='A',&
     long_name='cumulative ecosystem autotrophic respiration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_NPP_CumYr_col(beg_col:end_col)      
-  call hist_addfld1d(fname='ECO_NPP',units='gC/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='ECO_NPP',units='gC/m2',avgflag='A',&
     long_name='cumulative ecosystem NPP',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_HR_CumYr_col(beg_col:end_col)      
-  call hist_addfld1d(fname='ECO_RH',units='gC/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='ECO_RH',units='gC/m2',avgflag='A',&
     long_name='cumulative ecosystem heterotrophic respiration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tDIC_col(beg_col:end_col)       
@@ -1020,7 +1020,7 @@ implicit none
 
   data1d_ptr => this%h1D_tPRECN_col(beg_col:end_col)      
   call hist_addfld1d(fname='tPRECN',units='mm/m2',avgflag='A',&
-    long_name='total precipitation, including irrigation',ptr_col=data1d_ptr)      
+    long_name='cumulative precipitation, including irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ET_col(beg_col:end_col)  
   call hist_addfld1d(fname='ET',units='mm H2O/m2/hr',avgflag='A',&
@@ -1272,11 +1272,11 @@ implicit none
     long_name='canopy transpiration',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc)     
-  call hist_addfld1d(fname='NH4_UPTK_FLX',units='gN/m2/hr',&
+  call hist_addfld1d(fname='UPTK_NH4_FLX',units='gN/m2/hr',&
     avgflag='A',long_name='total root uptake of NH4',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='NO3_UPTK_FLX',units='gN/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='UPTK_NO3_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='total root uptake of NO3',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc)    
@@ -1288,7 +1288,7 @@ implicit none
     long_name='*canopy NH3 flux',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='PO4_UPTK_FLX',units='gP/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='UPTK_PO4_FLX',units='gP/m2/hr',avgflag='A',&
     long_name='total root uptake of PO4',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc)     
@@ -1312,7 +1312,7 @@ implicit none
     long_name='fraction of PAR absorbed by plant',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_PAR_CAN_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='Canopy_PAR',units='umol m-2 s-1',avgflag='A',&
+  call hist_addfld1d(fname='CANOPY_PAR',units='umol m-2 s-1',avgflag='A',&
     long_name='PAR absorbed by plant canopy',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_Plant_C_ptc(beg_ptc:end_ptc)     
@@ -1550,7 +1550,7 @@ implicit none
 
   data1d_ptr => this%h1D_stomatal_stress_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='stomatal_stress',units='none',avgflag='A',&
-    long_name='stomatal stress from root turogr [0-1 no stress]',ptr_patch=data1d_ptr)      
+    long_name='stomatal stress from root turogr [0-1 stress]',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LEAF_P_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='LEAF_P',units='gP/m2',avgflag='A',&
@@ -2016,13 +2016,13 @@ implicit none
       this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
         trc_solml_vr(ids_NO2,0,NY,NX),SoilMicPMassLayer(0,NY,NX)*million)
       
-      if(this%h1D_cNO3_LITR_col(ncol)>1.e7*SoilMicPMassLayer(0,NY,NX))then                  
-        write(112,*)I+J/24.,NY,NX,trc_solml_vr(idg_NH3,0,NY,NX),trc_solml_vr(ids_NO3,0,NY,NX),trc_solml_vr(ids_NO2,0,NY,NX),&
-          SoilMicPMassLayer(0,NY,NX)*million
-      endif
-      if(this%h1D_cNO3_LITR_col(ncol)>1.e8*SoilMicPMassLayer(0,NY,NX))then                  
-        stop
-      endif  
+!      if(this%h1D_cNO3_LITR_col(ncol)>1.e7*SoilMicPMassLayer(0,NY,NX))then                  
+!        write(112,*)I+J/24.,NY,NX,trc_solml_vr(idg_NH3,0,NY,NX),trc_solml_vr(ids_NO3,0,NY,NX),trc_solml_vr(ids_NO2,0,NY,NX),&
+!          SoilMicPMassLayer(0,NY,NX)*million
+!      endif
+!      if(this%h1D_cNO3_LITR_col(ncol)>1.e8*SoilMicPMassLayer(0,NY,NX))then                  
+!        stop
+!      endif  
       this%h1D_ECO_HVST_N_col(ncol)       =  EcoHavstElmnt_CumYr_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_N_MIN_col(ncol)        = -NetNH4Mineralize_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITR_P_col(ncol) =  tLitrOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2034,9 +2034,9 @@ implicit none
       this%h1D_tLITRf_N_FLX_col(ncol)     = LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tLITRf_P_FLX_col(ncol)     = LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tEXCH_PO4_col(ncol)        = tHxPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_SUR_DOP_FLX_col(ncol)      = HydroSufDOPFlx_col(NY,NX)/TAREA
+      this%h1D_SUR_DOP_FLX_col(ncol)      = HydroSufDOPFlx_CumYr_col(NY,NX)/TAREA
       this%h1D_SUB_DOP_FLX_col(ncol)      = HydroSubsDOPFlx_col(NY,NX)/TAREA
-      this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
+      this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_CumYr_col(NY,NX)/TAREA
       this%h1D_SUB_DIP_FLX_col(ncol)      = HydroSubsDIPFlx_col(NY,NX)/TAREA  
       this%h1D_HeatFlx2Grnd_col(ncol)     = HeatFlx2Grnd_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2049,7 +2049,7 @@ implicit none
       this%h1D_SUB_DOC_FLX_col(ncol)      = HydroSubsDOCFlx_col(NY,NX)/TAREA
       this%h1D_SUR_DIC_FLX_col(ncol)      = HydroSufDICFlx_col(NY,NX)/TAREA
       this%h1D_SUB_DIC_FLX_col(ncol)      = HydroSubsDICFlx_col(NY,NX)/TAREA
-      this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_col(NY,NX)/TAREA
+      this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_CumYr_col(NY,NX)/TAREA
       this%h1D_tPRECIP_P_col(ncol)        = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2331,7 +2331,7 @@ implicit none
         this%h1D_BLYR_RSC_H2O_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*secs1hour
         this%h1D_TRANSPN_ptc(nptc)       = Transpiration_pft(NZ,NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_NH4_UPTK_FLX_ptc(nptc)  = RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

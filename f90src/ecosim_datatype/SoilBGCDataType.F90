@@ -44,7 +44,7 @@ implicit none
   real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total LitrFall C, [g d-2]
   real(r8),target,allocatable ::  HydroSufDONFlx_CumYr_col(:,:)                         !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)                         !total subsurface DON flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDOPFlx_CumYr_col(:,:)                         !total surface DOP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOPFlx_col(:,:)                         !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  tXPO4_col(:,:)                          !total soil precipited P, [g d-2]
   real(r8),target,allocatable ::  RootResp_CumYr_col(:,:)                          !total soil autotrophic respiration, [g d-2]
@@ -53,7 +53,7 @@ implicit none
   real(r8),target,allocatable ::  HydroSubsDICFlx_col(:,:)                         !total subsurface DIC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSufDINFlx_CumYr_col(:,:)                         !total surface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)                         !total subsurface DIN flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDIPFlx_col(:,:)                         !total surface DIP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDIPFlx_CumYr_col(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)                         !total subsurface DIP flux, [g d-2]
   real(r8),target,allocatable ::  StandingDeadStrutElms_col(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
@@ -166,7 +166,7 @@ implicit none
   allocate(LiterfalOrgM_col(NumPlantChemElms,JY,JX));       LiterfalOrgM_col=0._r8
   allocate(HydroSufDONFlx_CumYr_col(JY,JX));       HydroSufDONFlx_CumYr_col=0._r8
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
-  allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
+  allocate(HydroSufDOPFlx_CumYr_col(JY,JX));       HydroSufDOPFlx_CumYr_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
 
@@ -176,7 +176,7 @@ implicit none
   allocate(HydroSubsDICFlx_col(JY,JX));       HydroSubsDICFlx_col=0._r8
   allocate(HydroSufDINFlx_CumYr_col(JY,JX));       HydroSufDINFlx_CumYr_col=0._r8
   allocate(HydroSubsDINFlx_col(JY,JX));       HydroSubsDINFlx_col=0._r8
-  allocate(HydroSufDIPFlx_col(JY,JX));       HydroSufDIPFlx_col=0._r8
+  allocate(HydroSufDIPFlx_CumYr_col(JY,JX));       HydroSufDIPFlx_CumYr_col=0._r8
   allocate(HydroSubsDIPFlx_col(JY,JX));       HydroSubsDIPFlx_col=0._r8
   allocate(StandingDeadStrutElms_col(NumPlantChemElms,JY,JX));      StandingDeadStrutElms_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
@@ -272,7 +272,7 @@ implicit none
   call destroy(LiterfalOrgM_col)
   call destroy(HydroSufDONFlx_CumYr_col)
   call destroy(HydroSubsDONFlx_col)
-  call destroy(HydroSufDOPFlx_col)
+  call destroy(HydroSufDOPFlx_CumYr_col)
   call destroy(HydroSubsDOPFlx_col)
   call destroy(tXPO4_col)
   call destroy(RootResp_CumYr_col)
@@ -281,7 +281,7 @@ implicit none
   call destroy(HydroSubsDICFlx_col)
   call destroy(HydroSufDINFlx_CumYr_col)
   call destroy(HydroSubsDINFlx_col)
-  call destroy(HydroSufDIPFlx_col)
+  call destroy(HydroSufDIPFlx_CumYr_col)
   call destroy(HydroSubsDIPFlx_col)
   call destroy(StandingDeadStrutElms_col)
   call destroy(ZDRAIN)
