@@ -88,7 +88,10 @@ if [ "$sanitize" -eq 1 ]; then
     CONFIG_FLAGS="${CONFIG_FLAGS} -DADDRESS_SANITIZER=1"
 fi
 
-if [ "$ATS_ECOSIM" -eq 1 ]; then
+echo "ATS_ECOSIM: ${ATS_ECOSIM}"
+
+
+if [ -n $ATS_ECOSIM ]; then
     echo "Building ATS-EcoSIM"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=1" 
     #Having this automatically set to use mpi compilers
@@ -101,7 +104,7 @@ fi
 if [ "$mpi" -eq 1 ]; then
   # Use MPI versions of the compilers
   if [ -n "$MPICC" ]; then
-    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${MPICC}}"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${MPICC}"
   fi
 
   if [ -n "$MPICXX" ]; then
