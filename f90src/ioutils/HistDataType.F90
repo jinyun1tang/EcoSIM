@@ -1096,7 +1096,7 @@ implicit none
 
   data1d_ptr => this%h1D_SOIL_CO2_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SOIL_CO2_FLX',units='umol C/m2/s',avgflag='A',&
-    long_name='soil CO2 flux (< 0 int atmosphere)',ptr_col=data1d_ptr)      
+    long_name='soil CO2 flux (< 0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_CO2_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_NEE_CO2',units='umol C/m2/s',avgflag='A',&
@@ -1152,7 +1152,7 @@ implicit none
 
   data1d_ptr => this%h1D_sN2O_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='sN2O_FLX',units='g/m2/hr',avgflag='A',&
-    long_name='*soil N2O flux',ptr_col=data1d_ptr)      
+    long_name='soil N2O flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_PAR_col(beg_col:end_col)
   call hist_addfld1d(fname='PAR',units='umol m-2 s-1',avgflag='A',&
@@ -1161,11 +1161,11 @@ implicit none
 
   data1d_ptr => this%h1D_sN2G_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='sN2G_FLX',units='g/m2/hr',&
-    avgflag='A',long_name='soil N2 flux',ptr_col=data1d_ptr)      
+    avgflag='A',long_name='soil N2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_sNH3_FLX_col(beg_col:end_col)       
   call hist_addfld1d(fname='sNH3_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='soil NH3 flux',ptr_col=data1d_ptr)      
+    long_name='soil NH3 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_RUNOFF_FLX_col(beg_col:end_col)   
   call hist_addfld1d(fname='RUNOFF_FLX',units='mmH2O/m2/hr',avgflag='A',&
@@ -1494,7 +1494,7 @@ implicit none
 
   data1d_ptr => this%h1D_ROOT_N_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='ROOT_N',units='gN/m2',avgflag='A',&
-    long_name='gN/m2',ptr_patch=data1d_ptr)      
+    long_name='Root nitrogen',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_NODULE_N_ptc(beg_ptc:end_ptc)        
   call hist_addfld1d(fname='NODULE_N',units='gN/m2',avgflag='A',&
@@ -1505,7 +1505,7 @@ implicit none
     long_name='plant seasonal storage of nonstructural N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='EXUD_N_FLX',units='gN/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='UPTK_N_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='total net root N uptake (+ve) - exudation',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LITRf_N_FLX_ptc(beg_ptc:end_ptc)    
@@ -1589,7 +1589,7 @@ implicit none
     long_name='plant seasonal storage of nonstructural P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_EXUD_P_FLX_ptc(beg_ptc:end_ptc)     
-  call hist_addfld1d(fname='EXUD_P_FLX',units='gP/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='UPTK_P_FLX',units='gP/m2/hr',avgflag='A',&
     long_name='total net root P uptake (+ve) - exudation',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc)     

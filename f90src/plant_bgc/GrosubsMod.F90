@@ -660,7 +660,7 @@ module grosubsMod
     CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft,       &
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
     RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
-    PlantN2Fix_CumYr_pft         => plt_bgcr%PlantN2Fix_CumYr_pft,         &
+    PlantN2Fix_CumYr_pft     => plt_bgcr%PlantN2Fix_CumYr_pft,       &
     PlantExudElm_CumYr_pft   => plt_rbgc%PlantExudElm_CumYr_pft,   &
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft,        &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &

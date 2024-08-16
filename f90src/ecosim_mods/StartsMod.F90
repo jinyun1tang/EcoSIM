@@ -393,7 +393,7 @@ module StartsMod
       TORGLL=TORGL(L)
     endif
 
-    call InitSOMProfile(L,NY,NX,HCX,LandScape1stSoiLayDepth,TORGLL,CORGCM,FCX)
+    call InitSOMProfile(L,NY,NX,HCX,TORGLL,LandScape1stSoiLayDepth,CORGCM,FCX)
     !
     !     LAYER WATER, ICE, AIR CONTENTS
     !
@@ -500,6 +500,7 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     !
   ENDDO D1200
+  
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
 
   POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing

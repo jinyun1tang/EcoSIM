@@ -224,7 +224,7 @@ contains
   PltUptake_OSl=AMIN1(SoluteMassMax,PltUptake_Ol)
 
   !oxygen and carbon unlimited but solute limited uptake
-  PltUptake_Sl=AMIN1(SoluteMassMax,AZMAX1(Uptake*PlantPopulation))
+  PltUptake_Sl=AMIN1(SoluteMassMax,Uptake*PlantPopulation)
 
   !oxygen, solute and carbon limited uptake
   PltUptake_OSCl=PltUptake_OSl/CAvailStress
