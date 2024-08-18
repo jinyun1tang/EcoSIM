@@ -405,7 +405,7 @@ module InitPlantMod
     TC4LeafOut_pft           => plt_pheno%TC4LeafOut_pft,           &
     TempOffset_pft           => plt_pheno%TempOffset_pft,           &
     PlantInitThermoAdaptZone => plt_pheno%PlantInitThermoAdaptZone, &
-    iPlantThermoAdaptZone    => plt_pheno%iPlantThermoAdaptZone,    &
+    iPlantThermoAdaptZone_pft    => plt_pheno%iPlantThermoAdaptZone_pft,    &
     SeedTempSens_pft         => plt_pheno%SeedTempSens_pft          &
   )
 !
@@ -417,20 +417,20 @@ module InitPlantMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  iPlantThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ)
-  TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
+  iPlantThermoAdaptZone_pft(NZ)=PlantInitThermoAdaptZone(NZ)
+  TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone_pft(NZ))
   TC4LeafOut_pft(NZ)=TCZD-TempOffset_pft(NZ)
   TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
-      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8
     ELSE
-      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8
     ENDIF
   ELSE
-    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
     SeedTempSens_pft(NZ)=0.005_r8
   ENDIF
   end associate

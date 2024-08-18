@@ -2512,7 +2512,7 @@ module MicBGCMod
     ZERO                 => micfor%ZERO,                &
     TKS                  => micfor%TKS                  &
   )
-  GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
+  GOMX=RGASC*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
   GOMM=GOMX/24.0_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GC4X+GOMM))/EOMH)))
 !
@@ -2715,9 +2715,9 @@ module MicBGCMod
     mid_fermentor        => micpar%mid_fermentor,       &
     CDOM                 => ncplxs%CDOM                 &
   )
-  GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
+  GH2X=RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
   GH2F=GH2X/GlucoseC    !
-  GOAX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI)**2)
+  GOAX=RGASC*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI)**2)
   GOAF=GOAX/GlucoseC
   GHAX=GH2F+GOAF
   IF(N.EQ.mid_fermentor)THEN

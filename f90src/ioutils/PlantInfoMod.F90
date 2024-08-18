@@ -690,7 +690,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photoperiod',strval,40)
+  call writefixsl(nu_plt,'Photoperiod IPTYP',strval,40)
 
   if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -715,7 +715,7 @@ implicit none
       strval='Undefined herbaceous pattern'
     end select
   endif
-  call writefixsl(nu_plt,'Biome turnover pattern',strval,40)
+  call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,40)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
@@ -725,7 +725,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Storage organ',strval,40)
+  call writefixsl(nu_plt,'Storage organ IRTYP',strval,40)
 
   select case(MY(NZ,NY,NX))
   case (1)
@@ -735,7 +735,7 @@ implicit none
   case default
     strval='Wrong option'
   end select
-  call writefixsl(nu_plt,'Mycorrhizal association',strval,40)
+  call writefixsl(nu_plt,'Mycorrhizal association MY',strval,40)
 
   select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
   case (ithermozone_arcboreal)
@@ -752,7 +752,7 @@ implicit none
     write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone(NZ,NY,NX)
   end select
   
-  call writefixsl(nu_plt,'Thermal adaptation zone',strval,40)
+  call writefixsl(nu_plt,'Thermal adaptation zone ZTYPI',strval,40)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------

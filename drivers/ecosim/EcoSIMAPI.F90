@@ -272,6 +272,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   use RestartMod   , only : restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : ReadClimSoilForcing
+  use YearMod, only : SetAnnualAccumlators  
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use EcoSIMCtrlMod
   use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
@@ -357,7 +358,9 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     !
     if(lverb)WRITE(*,333)'DAY'
     CALL DAY(I,NHW,NHE,NVN,NVS)
-
+    
+    call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
+    
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
       
@@ -365,6 +368,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
         frectyp%lskip_loop=.false.        
         if(is_restart())then
           call restFile(flag='read')
+          if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
         endif
       endif
       if(frectyp%lskip_loop)then

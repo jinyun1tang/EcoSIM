@@ -67,7 +67,6 @@ module UptakesMod
   associate(                                                  &
     CanopyBndlResist_pft   => plt_photo%CanopyBndlResist_pft, &
     CanopyWater_pft        => plt_ew%CanopyWater_pft,         &
-    TCelciusCanopy_pft     => plt_ew%TCelciusCanopy_pft,      &
     TKCanopy_pft           => plt_ew%TKCanopy_pft,            &
     PrecIntcptByCanopy_pft => plt_ew%PrecIntcptByCanopy_pft,  &
     EvapTransHeat_pft      => plt_ew%EvapTransHeat_pft,       &
@@ -75,7 +74,6 @@ module UptakesMod
     PSICanopy_pft          => plt_ew%PSICanopy_pft,           &
     HeatXAir2PCan          => plt_ew%HeatXAir2PCan,           &
     Canopy_Heat_Sens_col   => plt_ew%Canopy_Heat_Sens_col,    &
-    DeltaTKC_pft           => plt_ew%DeltaTKC_pft,            &
     VapXAir2Canopy_pft     => plt_ew%VapXAir2Canopy_pft,      &
     TairK                  => plt_ew%TairK,                   &
     Canopy_Heat_Latent_col => plt_ew%Canopy_Heat_Latent_col,  &
@@ -183,16 +181,6 @@ module UptakesMod
           ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,&
           VFLXC,FDMP,SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,&
           WatAvail4Uptake_vr,TKCX,CNDT,VHCPX,PrecHEATIN_lndtcptByCanP1,PSILH,LayrHasRoot)
-!
-!     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
-!
-!     TKC=final estimate of canopy temperature TKCanopy_pft
-!     TairK=current air temperature
-!     DeltaTKC_pft=TKC-TairK for next hour
-!
-        TKC(NZ)=TKCanopy_pft(NZ)
-        TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-        DeltaTKC_pft(NZ)=TKC(NZ)-TairK
 !
 !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
 !     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
@@ -677,8 +665,11 @@ module UptakesMod
   associate(                                                          &
     NU                        => plt_site%NU,                         &
     AREA3                     => plt_site%AREA3,                      &
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
+    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
     PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
+    TKC                       => plt_ew%TKC,                          &
     RAZ                       => plt_ew%RAZ,                          &
     VPA                       => plt_ew%VPA,                          &
     TKS_vr                    => plt_ew%TKS_vr,                       &
@@ -802,7 +793,7 @@ module UptakesMod
 !     VAP=latent heat of evaporation
 !     HeatLatentConductCanP=aerodynamic conductance
 
-    VPC=vapsat(tkc1)*EXP(18.0_r8*PSICanopy_pft(NZ)/(RGAS*TKC1))
+    VPC=vapsat(tkc1)*EXP(18.0_r8*PSICanopy_pft(NZ)/(RGASC*TKC1))
     EX=HeatLatentConductCanP*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3]=[ton H2O/(h*m2)]
     
     IF(EX.GT.0.0_r8)THEN
@@ -849,8 +840,7 @@ module UptakesMod
 !
 !     XC,IC=magnitude,direction of change in canopy temp for next cycle
 !
-    IF((IC.EQ.0 .AND. TKCY.GT.TKC1)&
-      .OR.(IC.EQ.1 .AND. TKCY.LT.TKC1))THEN
+    IF((IC.EQ.0 .AND. TKCY.GT.TKC1) .OR. (IC.EQ.1 .AND. TKCY.LT.TKC1))THEN
       XC=0.5_r8*XC
     ENDIF
     !0.1 is the learning/updating rate
@@ -1002,6 +992,18 @@ module UptakesMod
       ENDIF
     ENDIF
   ENDDO D4000
+
+!
+!     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
+!
+!     TKC=final estimate of canopy temperature TKCanopy_pft
+!     TairK=current air temperature
+!     DeltaTKC_pft=TKC-TairK for next hour
+!
+  TKC(NZ)=TKCanopy_pft(NZ)
+  TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
+  DeltaTKC_pft(NZ)=TKC(NZ)-TairK
+
   end associate
   end function CanopyEnergyH2OIteration
 !------------------------------------------------------------------------

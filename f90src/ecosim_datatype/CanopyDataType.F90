@@ -159,12 +159,16 @@ module CanopyDataType
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)                      !landscape average canopy shoot C, [g d-2]
+  real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)
+  real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)
   contains
 !----------------------------------------------------------------------
 
   subroutine InitCanopyData
 
   implicit none
+  allocate(CO2FixCL_pft(JP,JY,JX)); CO2FixCL_pft=spval
+  allocate(CO2FixLL_pft(JP,JY,JX)); CO2FixLL_pft=spval
   allocate(StomatalStress_pft(JP,JY,JX)); StomatalStress_pft=spval     !no stress when equals to one
   allocate(CanopyPARalbedo_pft(JP,JY,JX));     CanopyPARalbedo_pft=0._r8
   allocate(RadPARLeafTransmis_pft(JP,JY,JX));     RadPARLeafTransmis_pft=0._r8
@@ -320,6 +324,8 @@ module CanopyDataType
   subroutine DestructCanopyData
   use abortutils, only : destroy
   implicit none
+  call destroy(CO2FixCL_pft)
+  call destroy(CO2FixLL_pft)
   call destroy(StomatalStress_pft)
   call destroy(CanopyPARalbedo_pft)
   call destroy(RadPARLeafTransmis_pft)

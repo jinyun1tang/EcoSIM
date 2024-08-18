@@ -570,7 +570,7 @@ contains
   write(*,*)'TKX1=',TKX1
   call endrun("Negative temperature in "//trim(mod_filename),__LINE__)
   endif
-  VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
+  VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGASC*TKX1))
 
   !evaporation, no more than what is available, g H2O
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol(NY,NX)*dts_wat))
@@ -617,7 +617,7 @@ contains
   !write(*,*) "PARSG(NY,NX):", PARSG(NY,NX)
   !write(*,*) "VPQ_col(NY,NX):", VPQ_col(NY,NX)
   !write(*,*) "PSISV1:", PSISV1
-  !write(*,*) "RGAS:", RGAS
+  !write(*,*) "RGASC:", RGASC
   !write(*,*) "EvapLHTC:", EvapLHTC
   !write(*,*) "cpw:", cpw
   !write(*,*) "TKQ(NY,NX):", TKQ(NY,NX)

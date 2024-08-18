@@ -95,7 +95,7 @@ contains
 !
 !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
 !
-    PSISoilOsmotic_vr(L,NY,NX)=-RGAS*1.E-6_r8*TKS_vr(L,NY,NX)*CION(L,NY,NX)
+    PSISoilOsmotic_vr(L,NY,NX)=-RGASC*1.E-6_r8*TKS_vr(L,NY,NX)*CION(L,NY,NX)
     PSIGrav_vr(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
     TotalSoilH2OPSIMPa_vr(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
 

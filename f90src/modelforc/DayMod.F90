@@ -68,18 +68,14 @@
 
 !  leap year February.
     IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
-      IF(I.LE.N)THEN
-        N1=I-NN
-        N2=M
-        N3=iYearCurrent
-        WRITE(CHARN1,'(I3)')N1+100
-        WRITE(CHARN2,'(I3)')N2+100
-        WRITE(CHARN3,'(I4)')N3
-        WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-        call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
-        exit
-      ENDIF
-      NN=N
+    IF(I.LE.N)THEN
+      N1=I-NN
+      N2=M
+      N3=iYearCurrent
+      call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
+      exit
+    ENDIF
+    NN=N
   ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
@@ -91,7 +87,6 @@
   subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
-  use YearMod, only : SetAnnualAccumlators
   implicit none
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
@@ -104,9 +99,7 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
-        call SetAnnualAccumlators(NY,NX)
-      ENDIF
+
 
       TAMX(NY,NX)=-100.0_r8
       TAMN(NY,NX)=100.0_r8

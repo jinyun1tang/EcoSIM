@@ -259,23 +259,25 @@ implicit none
   implicit none
   integer :: NZ,K,L,M,NE
 
-  associate(                                               &
-    NP0                  => plt_site%NP0,                  &
-    MY                   => plt_morph%MY,                  &
-    NU                   => plt_site%NU,                   &
-    MaxSoiL4Root_pft     => plt_morph%MaxSoiL4Root_pft,    &
-    MaxNumRootLays       => plt_site%MaxNumRootLays,       &
-    CO2NetFix_pft        => plt_bgcr%CO2NetFix_pft,        &
-    CanopyRespC_CumYr_pft      => plt_bgcr%CanopyRespC_CumYr_pft,      &
-    LitrfalStrutElms_pft => plt_bgcr%LitrfalStrutElms_pft, &
-    NodulInfectElms_pft  => plt_bgcr%NodulInfectElms_pft,  &
-    RootMycoExudElms_pft => plt_rbgc%RootMycoExudElms_pft, &
-    NH3Dep2Can_pft       => plt_bgcr%NH3Dep2Can_pft,       &
-    GrossResp_pft        => plt_bgcr%GrossResp_pft,        &
-    GrossCO2Fix_pft      => plt_bgcr%GrossCO2Fix_pft,      &
-    CanopyGrosRCO2_pft   => plt_bgcr%CanopyGrosRCO2_pft,   &
-    RootCO2Autor_pvr     => plt_rbgc%RootCO2Autor_pvr,     &
-    LitrfalStrutElms_pvr => plt_bgcr%LitrfalStrutElms_pvr  &
+  associate(                                                 &
+    NP0                   => plt_site%NP0,                   &
+    MY                    => plt_morph%MY,                   &
+    NU                    => plt_site%NU,                    &
+    MaxSoiL4Root_pft      => plt_morph%MaxSoiL4Root_pft,     &
+    MaxNumRootLays        => plt_site%MaxNumRootLays,        &
+    CO2NetFix_pft         => plt_bgcr%CO2NetFix_pft,         &
+    CanopyRespC_CumYr_pft => plt_bgcr%CanopyRespC_CumYr_pft, &
+    LitrfalStrutElms_pft  => plt_bgcr%LitrfalStrutElms_pft,  &
+    NodulInfectElms_pft   => plt_bgcr%NodulInfectElms_pft,   &
+    RootMycoExudElms_pft  => plt_rbgc%RootMycoExudElms_pft,  &
+    NH3Dep2Can_pft        => plt_bgcr%NH3Dep2Can_pft,        &
+    GrossResp_pft         => plt_bgcr%GrossResp_pft,         &
+    GrossCO2Fix_pft       => plt_bgcr%GrossCO2Fix_pft,       &
+    CO2FixCL_pft          => plt_rbgc%CO2FixCL_pft,          &
+    CO2FixLL_pft          => plt_rbgc%CO2FixLL_pft,          &
+    CanopyGrosRCO2_pft    => plt_bgcr%CanopyGrosRCO2_pft,    &
+    RootCO2Autor_pvr      => plt_rbgc%RootCO2Autor_pvr,      &
+    LitrfalStrutElms_pvr  => plt_bgcr%LitrfalStrutElms_pvr   &
   )  
   
   D9980: DO NZ=1,NP0
@@ -296,6 +298,9 @@ implicit none
     CanopyGrosRCO2_pft(NZ)                                = 0._r8
     RootMycoExudElms_pft(1:NumPlantChemElms,NZ)           = 0._r8
     NodulInfectElms_pft(1:NumPlantChemElms,NZ)            = 0._r8
+    CO2FixCL_pft(NZ)                                      = 0._r8
+    CO2FixLL_pft(NZ)                                      = 0._r8
+
   ENDDO D9980
   end associate
   end subroutine ZeroGrosub
@@ -405,14 +410,16 @@ implicit none
 
   DO NZ=1,NP
 
-  balE(NZ)=RootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)  &
+    balE(NZ)=RootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)  &
       +ShootElms_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)   &
       +StandDeadStrutElms_pft(ielmc,NZ)-StandDeadStrutElmsBeg_pft(ielmc,NZ)  &
       -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   &
       -NodulInfectElms_pft(ielmc,NZ)  &      
       -RootMycoExudElms_pft(ielmc,NZ) &
       +LitrfalStrutElms_pft(ielmc,NZ) 
-
+!    if(plt_rad%RadPARbyCanopy_pft(NZ)>0._r8)then
+!      write(123,*)I+J/24.,GrossCO2Fix_pft(NZ)/plt_rad%RadPARbyCanopy_pft(NZ),plt_rad%RadPARbyCanopy_pft(NZ)
+!    endif
   ENDDO
   end associate
 

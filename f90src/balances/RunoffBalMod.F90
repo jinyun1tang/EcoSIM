@@ -479,7 +479,7 @@ implicit none
 !
 !     FLW,WaterFlowMacP,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
-!     UVOLO,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
+!     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
   IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.ivertdir)THEN
     HeatOut_lnds=HeatOut_lnds-XN*HeatFlow2Soil_3D(N,N6,N5,N4)

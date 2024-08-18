@@ -1312,7 +1312,7 @@ contains
     ! HFLVRSX=convective heat flux from snow-litter vapor flux
     !
     !residue vapor pressure
-    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKXR))
+    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGASC*TKXR))
     if(abs(VPR)>1.e20_r8)then
       write(*,*)'TKXR=',TKXR,TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX),NN
       write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
@@ -1372,7 +1372,7 @@ contains
 !
     !both litter layer and topsoil are not-saturated
     IF(VLsoiAirPM(M,0,NY,NX).GT.ZEROS(NY,NX).AND.VLsoiAirPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-      VP1=vapsat(TK1X)*EXP(18.0_r8*PSISV1/(RGAS*TK1X))
+      VP1=vapsat(TK1X)*EXP(18.0_r8*PSISV1/(RGASC*TK1X))
       H2OVapFlx=AvgVaporCondctSoilLitR*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*FracSurfByLitR(NY,NX)*dts_litrvapht
 
       if(abs(H2OVapFlx)>1.e20_r8)then
@@ -1665,7 +1665,7 @@ contains
   IF(VLairSno1.GT.ZEROS2(NY,NX).AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
     VapCond2=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
       *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
-    VapSoiDest=vapsat(TKSoi1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGAS*TKSoi1(NUM(NY,NX),NY,NX)))
+    VapSoiDest=vapsat(TKSoi1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoi1(NUM(NY,NX),NY,NX)))
     AvgVaporCondctSoilLitR=2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR(3,NUM(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
     H2OVapFlx=AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)&
       *FracSurfBareSoil_col(NY,NX)*dt_SnoHeat

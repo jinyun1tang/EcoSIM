@@ -22,7 +22,7 @@ contains
   real(r8) :: FDM,VOLWPX  
   associate(                                                             &
     jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
-    UVOLO                       => plt_ew%UVOLO,                          &
+    H2OLoss_CumYr_col                       => plt_ew%H2OLoss_CumYr_col,                          &
     inonstruct                  => pltpar%inonstruct,                     &
     istalk                      => pltpar%istalk,                         &
     inonfoliar                  => pltpar%inonfoliar,                     &
@@ -231,7 +231,7 @@ contains
 !
 !     PSICanopy_pft=canopy water potential
 !     CanopyWater_pft=water volume in canopy
-!     QH2OLoss_lnds,UVOLO=accumulated water loss for water balance calculation
+!     QH2OLoss_lnds,H2OLoss_CumYr_col=accumulated water loss for water balance calculation
 !
   VOLWPX=CanopyWater_pft(NZ)
   WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
@@ -242,7 +242,7 @@ contains
 
   CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
   QH2OLoss_lnds=QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
-  UVOLO=UVOLO+VOLWPX-CanopyWater_pft(NZ)
+  H2OLoss_CumYr_col=H2OLoss_CumYr_col+VOLWPX-CanopyWater_pft(NZ)
 !
 !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
 !

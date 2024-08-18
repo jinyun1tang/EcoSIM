@@ -291,14 +291,14 @@ implicit none
 !     HeatSensEvapAir2LitR2=convective heat of evaporation flux
 !
 !     in litter      
-      VapLitR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKR1))   
+      VapLitR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGASC*TKR1))   
       if(abs(VapLitR)>1.e20_r8)then
         write(*,*)'TKR1=',TKR1,TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX)
         write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
 
-      VaporSoi1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGAS*TKS1))    !in soil,ton/m3
+      VaporSoi1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !in soil,ton/m3
       EVAPR2=AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton hr/m]
 !      print*,'evapr2',EVAPR2,VPQ_col(NY,NX),VapLitR,VWatLitr2,TKR1,VLWatMicP1(0,NY,NX)
       LatentHeatAir2LitR2=EVAPR2*EvapLHTC          !latent energy flux, kJ/kg *10^3 kg hr/m=MJ hr/m

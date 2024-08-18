@@ -59,7 +59,7 @@ contains
   FDMP=get_FDM(PSIO)
   if(present(fdmp1))FDMP1=FDMP
   OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
-  PSIOsmo=FDMP/0.16_r8*OSMO-RGAS*TKP*FDMP*CCPOLT/OSWT
+  PSIOsmo=FDMP/0.16_r8*OSMO-RGASC*TKP*FDMP*CCPOLT/OSWT
   PSITurg=AZMAX1(PSIO-PSIOsmo)
 
   end subroutine update_osmo_turg_pressure
@@ -92,7 +92,7 @@ contains
   real(r8) :: fT_root
   real(r8) :: RTK,STK,ACTV
 
-  RTK=RGAS*TKSO
+  RTK=RGASC*TKSO
   STK=710.0_r8*TKSO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
   FT_ROOT=EXP(25.229_r8-62500._r8/RTK)/ACTV
@@ -108,7 +108,7 @@ contains
   real(r8) :: fT_canp
   real(r8) :: RTK,STK,ACTV
 
-  RTK=RGAS*TKGO
+  RTK=RGASC*TKGO
   STK=710.0_r8*TKGO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
   FT_canp=EXP(25.229_r8-62500._r8/RTK)/ACTV
@@ -124,7 +124,7 @@ contains
   real(r8) :: TFNP
   real(r8) :: RTK,STK,ACTV
   
-  RTK=RGAS*TKCO
+  RTK=RGASC*TKCO
   STK=710.0_r8*TKCO
   ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
   TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
@@ -138,7 +138,7 @@ contains
   real(r8) :: TFN5
   real(r8) :: RTK,STK,ACTVM
 
-  RTK=RGAS*TKCM
+  RTK=RGASC*TKCM
   STK=710.0_r8*TKCM
   ACTVM=1._r8+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
   TFN5=EXP(25.214_r8-62500._r8/RTK)/ACTVM

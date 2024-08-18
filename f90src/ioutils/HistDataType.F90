@@ -275,6 +275,7 @@ implicit none
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:)   !CanopyNonstElms_pft(ielmc,NY,NX)
   real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)   !
   real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)   !
+  real(r8),pointer   :: h1D_CFIX_lmtf_pft(:)
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer    :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
@@ -621,6 +622,7 @@ implicit none
   allocate(this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTP_ptc(:)=spval
+  allocate(this%h1D_CFIX_lmtf_pft(beg_ptc:end_ptc))        ;this%h1D_CFIX_lmtf_pft(:)=spval
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
@@ -1391,6 +1393,11 @@ implicit none
   call hist_addfld1d(fname='SHOOT_NONSTP',units='gP/m2',avgflag='A',&
     long_name='plant leaf storage of nonstructural P',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%h1D_CFIX_lmtf_pft(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='CFIX_rC2L_pft',units='gP/m2',avgflag='A',&
+    long_name='plant rubisco to light limiting ratio (>1 light-limited)',ptr_patch=data1d_ptr)      
+
+
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='GRAIN_NO',units='1/m2',avgflag='A',&
     long_name='canopy grain number',ptr_patch=data1d_ptr)      
@@ -1436,8 +1443,8 @@ implicit none
     long_name='plant CH4 emission from fire',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_NPP_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='NPP',units='gC/m2',avgflag='A',&
-    long_name='Net primary productivity',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='NPP_pft',units='gC/m2/hr',avgflag='A',&
+    long_name='Plant net primary productivity',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_HT_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_HT',units='m',avgflag='A',&
@@ -2305,6 +2312,9 @@ implicit none
         this%h1D_SHOOT_NONSTC_ptc(nptc) = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
         this%h1D_SHOOT_NONSTN_ptc(nptc) = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
         this%h1D_SHOOT_NONSTP_ptc(nptc) = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
+        if(CO2FixLL_pft(NZ,NY,NX)/=spval)then
+          if(CO2FixLL_pft(NZ,NY,NX)>0._r8)this%h1D_CFIX_lmtf_pft(nptc)  = CO2FixCL_pft(NZ,NY,NX)/CO2FixLL_pft(NZ,NY,NX)
+        endif
         this%h1D_CAN_TEMPK_ptc(nptc)    = TKCanopy_pft(NZ,NY,NX)
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &

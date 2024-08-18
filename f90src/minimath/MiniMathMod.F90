@@ -232,9 +232,9 @@ module minimathmod
   real(r8) :: ans
 
   if(present(Patm_Pa))then
-    ans = Patm_Pa/(TKair*RGAS)
+    ans = Patm_Pa/(TKair*RGASC)
   else
-    ans= 1.01325E5_r8/(TKair*RGAS)
+    ans= 1.01325E5_r8/(TKair*RGASC)
   endif
 
   end function GetMolAirPerm3

@@ -1629,7 +1629,7 @@ module PlantDisturbsMod
     CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft,           &
     CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,       &
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch,         &
-    UVOLO                     => plt_ew%UVOLO,                        &
+    H2OLoss_CumYr_col                     => plt_ew%H2OLoss_CumYr_col,                        &
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft,          &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,         &
     iHarvstType_pft           => plt_distb%iHarvstType_pft            &
@@ -1667,7 +1667,7 @@ module PlantDisturbsMod
 !     StalkBiomassC_brch=stalk sapwood mass
 !     PSICanopy_pft=canopy water potential
 !     CanopyWater_pft=water volume in canopy
-!     QH2OLoss_lnds,UVOLO=accumulated water loss for water balance calculation
+!     QH2OLoss_lnds,H2OLoss_CumYr_col=accumulated water loss for water balance calculation
 !
     LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
@@ -1682,7 +1682,7 @@ module PlantDisturbsMod
     CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
 
     QH2OLoss_lnds=QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
-    UVOLO=UVOLO+VOLWPX-CanopyWater_pft(NZ)
+    H2OLoss_CumYr_col=H2OLoss_CumYr_col+VOLWPX-CanopyWater_pft(NZ)
 !
 !     RESET PHENOLOGY, GROWTH STAGE IF STALKS ARE CUT
 !

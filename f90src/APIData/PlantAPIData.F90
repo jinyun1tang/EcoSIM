@@ -311,7 +311,7 @@ implicit none
   real(r8), pointer :: fTCanopyGroth_pft(:)    => null()     !canopy temperature growth function, [-]
   real(r8), pointer :: HoursTooLowPsiCan_pft(:)    => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY, []
   real(r8), pointer :: TCChill4Seed_pft(:)     => null()     !temperature below which seed set is adversely affected, [oC]
-  real(r8), pointer :: iPlantThermoAdaptZone(:)    => null()     !plant thermal adaptation zone, [-]
+  real(r8), pointer :: iPlantThermoAdaptZone_pft(:)    => null()     !plant thermal adaptation zone, [-]
   real(r8), pointer :: PlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone, [-]
   real(r8), pointer :: HighTempLimitSeed_pft(:)     => null()     !temperature above which seed set is adversely affected, [oC]
   real(r8), pointer :: SeedTempSens_pft(:)    => null()     !sensitivity to HTC (seeds oC-1 above HTC)
@@ -541,7 +541,7 @@ implicit none
   real(r8) :: TEVAPP    !total canopy evaporation + transpiration, [m3 d-2]
   real(r8) :: VapXAir2CanG    !grid canopy evaporation, [m3 d-2]
   real(r8) :: THFLXC    !total canopy heat flux, [MJ  d-2]
-  real(r8) :: UVOLO     !total subsurface water flux, [m3 d-2]
+  real(r8) :: H2OLoss_CumYr_col     !total subsurface water flux, [m3 d-2]
   real(r8) :: VPA       !vapor concentration, [m3 m-3]
   real(r8) :: TairK       !air temperature, [K]
   real(r8) :: CanWat_col    !total canopy water content stored with dry matter, [m3 d-2]
@@ -733,7 +733,8 @@ implicit none
   real(r8), pointer :: PlantExudElm_CumYr_pft(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve),          [gC d-2 ]
   real(r8), pointer :: trcg_root_vr(:,:)                 => null()   !total root internal gas flux,                                  [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx_vr(:,:)         => null()   !total internal root gas flux,                                  [gC d-2 h-1]
-
+  real(r8), pointer :: CO2FixCL_pft(:)                   => null()   !Rubisco-limited CO2 fixation
+  real(r8), pointer :: CO2FixLL_pft(:)                   => null()   !Light-limited CO2 fixation
   contains
     procedure, public :: Init => plt_rootbgc_init
     procedure, public :: Destroy  => plt_rootbgc_destroy
@@ -781,7 +782,8 @@ implicit none
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval
   allocate(this%RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootCUlmNutUptake_pvr=spval
   allocate(this%NH3Dep2Can_brch(MaxNumBranches,JP1));this%NH3Dep2Can_brch=spval
-
+  allocate(this%CO2FixCL_pft(JP1)); this%CO2FixCL_pft=spval
+  allocate(this%CO2FixLL_pft(JP1)); this%CO2FixLL_pft=spval
   allocate(this%trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ1));this%trcg_air2root_flx_vr=spval
   allocate(this%trcg_root_vr(idg_beg:idg_end-1,JZ1));this%trcg_root_vr=spval
 
@@ -1732,7 +1734,7 @@ implicit none
   allocate(this%SeedTempSens_pft(JP1));this%SeedTempSens_pft=spval
   allocate(this%HighTempLimitSeed_pft(JP1));this%HighTempLimitSeed_pft=spval
   allocate(this%PlantInitThermoAdaptZone(JP1));this%PlantInitThermoAdaptZone=spval
-  allocate(this%iPlantThermoAdaptZone(JP1));this%iPlantThermoAdaptZone=0
+  allocate(this%iPlantThermoAdaptZone_pft(JP1));this%iPlantThermoAdaptZone_pft=0
   allocate(this%IsPlantActive_pft(JP1));this%IsPlantActive_pft=0
   allocate(this%iPlantState_pft(JP1));this%iPlantState_pft=0
   allocate(this%NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP1));this%NetCumElmntFlx2Plant_pft=spval
