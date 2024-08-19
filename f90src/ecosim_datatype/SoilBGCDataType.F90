@@ -87,7 +87,9 @@ implicit none
   real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !gas bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_col(:,:,:)
+  real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
   real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
@@ -213,6 +215,9 @@ implicit none
   allocate(RNO2DmndBandChemo_vr(0:JZ,JY,JX));  RNO2DmndBandChemo_vr=0._r8
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
+  allocate(trcg_ebu_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_ebu_flx_col=0._r8
+  allocate(trcg_pltroot_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_pltroot_flx_col=0._r8
+
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
   allocate(WaterFlowSoiMicP_3D(3,JD,JV,JH));    WaterFlowSoiMicP_3D=0._r8
   allocate(WaterFlowMacP_3D(3,JD,JV,JH));   WaterFlowMacP_3D=0._r8
@@ -233,6 +238,9 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
+  
+  call destroy(trcg_ebu_flx_col)
+  call destroy(trcg_pltroot_flx_col)
 
   call destroy(tRDOE2Die_col)
   call destroy(CNH4)

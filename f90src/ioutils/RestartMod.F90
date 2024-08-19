@@ -4170,9 +4170,9 @@ implicit none
        interpinic_flag='skip', data=HEATIN_lnd,missing_value=spval, &
        fill_value=spval)
 
-  call restartvar(ncid, flag, varname='OXYGIN', &
+  call restartvar(ncid, flag, varname='SurfGas_O2_lnd', &
        long_name='total surface O2 flux', units='g d-2', &
-       interpinic_flag='skip', data=OXYGIN, missing_value=spval, &
+       interpinic_flag='skip', data=SurfGas_O2_lnd, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TORGF', &
@@ -4190,14 +4190,14 @@ implicit none
        interpinic_flag='skip', data=TORGP, missing_value=spval, &
        fill_value=spval)
 
-  call restartvar(ncid, flag, varname='ZN2GIN', &
+  call restartvar(ncid, flag, varname='SurfGas_N2_lnd', &
        long_name='total surface N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=ZN2GIN, missing_value=spval, &
+       interpinic_flag='skip', data=SurfGas_N2_lnd, missing_value=spval, &
        fill_value=spval)
 
-  call restartvar(ncid, flag, varname='CO2GIN', &
+  call restartvar(ncid, flag, varname='SurfGas_CO2_lnd', &
        long_name='total surface CO2 flux', units='g d-2', &
-       interpinic_flag='skip', data=CO2GIN, missing_value=spval, &
+       interpinic_flag='skip', data=SurfGas_CO2_lnd, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='QH2OLoss_lnds', &

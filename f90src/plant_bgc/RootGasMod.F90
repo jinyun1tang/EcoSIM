@@ -545,7 +545,7 @@ module RootGasMod
               trcg_Root2Soil_flx(NTG)=AMAX1(-GasPX(NTG),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_gmas_loc(NTG)) &
                 *DisolvedGasVolume(NTG)-GasPX(NTG)*RootPoreVol_pvr(N,L,NZ)) &
                 /(DisolvedGasVolume(NTG)+RootPoreVol_pvr(N,L,NZ)))
-              !positive into root
+              !positive into root, negative into atmosphere, assuming specific rate 1/hr
               trcg_air2root_flx1(NTG)=AMIN1(DFAGas(NTG),RootPoreVol_pvr(N,L,NZ)) &
                 *(AtmGasc(NTG)-trcg_gcon_loc(NTG))
             enddo

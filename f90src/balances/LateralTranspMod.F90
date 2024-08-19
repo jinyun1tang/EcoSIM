@@ -68,13 +68,13 @@ implicit none
     !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
     !             :*ZN3*=NH3,*H2G*=H2
 !
-    trcg_VOLG(idg_CO2)=trc_gasml_vr(idg_CO2,L,NY,NX)/catomw
-    trcg_VOLG(idg_CH4)=trc_gasml_vr(idg_CH4,L,NY,NX)/catomw
-    trcg_VOLG(idg_O2)=trc_gasml_vr(idg_O2,L,NY,NX)/32.0_r8
-    trcg_VOLG(idg_N2)=trc_gasml_vr(idg_N2,L,NY,NX)/28.0_r8
-    trcg_VOLG(idg_N2O)=trc_gasml_vr(idg_N2O,L,NY,NX)/28.0_r8
-    trcg_VOLG(idg_NH3)=trc_gasml_vr(idg_NH3,L,NY,NX)/natomw
-    trcg_VOLG(idg_H2)=trc_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
+    trcg_VOLG(idg_CO2) = trc_gasml_vr(idg_CO2,L,NY,NX)/catomw
+    trcg_VOLG(idg_CH4) = trc_gasml_vr(idg_CH4,L,NY,NX)/catomw
+    trcg_VOLG(idg_O2)  = trc_gasml_vr(idg_O2,L,NY,NX)/32.0_r8
+    trcg_VOLG(idg_N2)  = trc_gasml_vr(idg_N2,L,NY,NX)/28.0_r8
+    trcg_VOLG(idg_N2O) = trc_gasml_vr(idg_N2O,L,NY,NX)/28.0_r8
+    trcg_VOLG(idg_NH3) = trc_gasml_vr(idg_NH3,L,NY,NX)/natomw
+    trcg_VOLG(idg_H2)  = trc_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
 
     VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_vr(L,NY,NX)/TKS_vr(L,NY,NX))
 !   NH3B does not have explicit gas species, so there is an inconsistency
@@ -85,9 +85,10 @@ implicit none
 
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
-    IF(ThetaAir_vr(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
+    !THETX minimum air-filled porosity
+    IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)LX=1
 
-    IF(ThetaAir_vr(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
+    IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
     VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)

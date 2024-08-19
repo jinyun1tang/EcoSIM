@@ -368,7 +368,7 @@ module RedistMod
   CX=-IrrigSubsurf_col(NY,NX)*CH4_irrig_conc(NY,NX)
   SurfGasFlx_col(idg_CO2,NY,NX)=SurfGasFlx_col(idg_CO2,NY,NX)+CI
   SurfGasFlx_col(idg_CH4,NY,NX)=SurfGasFlx_col(idg_CH4,NY,NX)+CH
-  CO2GIN=CO2GIN+CI+CH
+  SurfGas_CO2_lnd=SurfGas_CO2_lnd+CI+CH
   TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)+CO+CX
   !
   !     SURFACE BOUNDARY O2 FLUXES
@@ -378,14 +378,14 @@ module RedistMod
     +(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*O2_rain_conc(NY,NX) &
     +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*O2_irrig_conc(NY,NX) &
     +Gas_Disol_Flx_vr(idg_O2,0,NY,NX)+trcg_surf_disevap_flx(idg_O2,NY,NX)
-  OXYGIN=OXYGIN+OI
+  SurfGas_O2_lnd=SurfGas_O2_lnd+OI
   OO=trcg_RMicbTransf_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*O2_irrig_conc(NY,NX)
   OXYGOU=OXYGOU+OO
   SurfGasFlx_col(idg_O2,NY,NX)=SurfGasFlx_col(idg_O2,NY,NX)+OI
   HI=Gas_Flx_atmDif2soil_col(idg_H2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_H2,3,NU(NY,NX),NY,NX) &
     +TRootGasLossDisturb_pft(idg_H2,NY,NX) &
     +Gas_Disol_Flx_vr(idg_H2,0,NY,NX)+trcg_surf_disevap_flx(idg_H2,NY,NX)
-  H2GIN=H2GIN+HI
+  SurfGas_H2_lnd=SurfGas_H2_lnd+HI
   HO=trcg_RMicbTransf_vr(idg_H2,0,NY,NX)
   H2GOU=H2GOU+HO
   !
@@ -408,7 +408,7 @@ module RedistMod
       +Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX)+Gas_Disol_Flx_vr(idg_NH3,0,NY,NX) &
       +trcg_surf_disevap_flx(idg_N2,NY,NX)+trcg_surf_disevap_flx(idg_N2O,NY,NX) &
       +trcg_surf_disevap_flx(idg_NH3,NY,NX)
-  ZN2GIN=ZN2GIN+ZGI
+  SurfGas_N2_lnd=SurfGas_N2_lnd+ZGI
   ZDRAIN(NY,NX)=ZDRAIN(NY,NX)+trcs_Transp2MicP_3D(ids_NH4,3,NK(NY,NX),NY,NX) &
       +trcs_Transp2MicP_3D(idg_NH3,3,NK(NY,NX),NY,NX)+trcs_Transp2MicP_3D(ids_NO3,3,NK(NY,NX),NY,NX) &
       +trcs_Transp2MicP_3D(ids_NO2,3,NK(NY,NX),NY,NX)+trcs_Transp2MicP_3D(ids_NH4B,3,NK(NY,NX),NY,NX) &
@@ -466,13 +466,11 @@ module RedistMod
   !
   DO NE=1,NumPlantChemElms
     Litrfall_lnds(NE)=Litrfall_lnds(NE)+LitrFallStrutElms_col(NE,NY,NX)
-  
     LiterfalOrgM_col(NE,NY,NX)=LiterfalOrgM_col(NE,NY,NX)+LitrFallStrutElms_col(NE,NY,NX)
   ENDDO
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
-
   IF(salt_model)THEN
     SIR=0._r8
     SII=0._r8
@@ -1166,6 +1164,9 @@ module RedistMod
     ZGB=trcg_air2root_flx_vr(idg_N2,L,NY,NX)
     Z2B=trcg_air2root_flx_vr(idg_N2O,L,NY,NX)
     ZHB=trcg_air2root_flx_vr(idg_NH3,L,NY,NX)
+
+    trcg_pltroot_flx_col(idg_beg:idg_NH3,NY,NX)=trcg_pltroot_flx_col(idg_beg:idg_NH3,NY,NX)+trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
+
 !
 !     GRID CELL BOUNDARY FLUXES BUBBLING
 !
@@ -1178,6 +1179,10 @@ module RedistMod
       Z2B=Z2B+trcg_ebu_flx_vr(idg_N2O,L,NY,NX)
       ZHB=ZHB+trcg_ebu_flx_vr(idg_NH3,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3B,L,NY,NX)
       HGB=HGB+trcg_ebu_flx_vr(idg_H2,L,NY,NX)
+
+      trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)=trcg_ebu_flx_vr(idg_beg:idg_NH3,L,NY,NX)
+      trcg_ebu_flx_col(idg_NH3,NY,NX)=trcg_ebu_flx_col(idg_NH3,NY,NX)+trcg_ebu_flx_vr(idg_NH3B,L,NY,NX)
+
     ELSE
       LL=MIN(L,LG)
       DO NTG=idg_beg,idg_NH3
@@ -1194,26 +1199,28 @@ module RedistMod
         TSoilH2G_lnd=TSoilH2G_lnd-trcg_ebu_flx_vr(idg_H2,L,NY,NX)
       ENDIF
     ENDIF
-    CO2GIN=CO2GIN+CIB+CHB
+    SurfGas_CO2_lnd=SurfGas_CO2_lnd+CIB+CHB
     COB=tRootCO2Emis_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_aqu_soil_vr(L,NY,NX)
     TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)+COB
-    SurfGasFlx_col(idg_CO2,NY,NX)=SurfGasFlx_col(idg_CO2,NY,NX)+CIB
-    SurfGasFlx_col(idg_CH4,NY,NX)=SurfGasFlx_col(idg_CH4,NY,NX)+CHB
+
     RootResp_CumYr_col(NY,NX)=RootResp_CumYr_col(NY,NX)+tRootCO2Emis_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
     HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX)-catomw*Txchem_CO2_vr(L,NY,NX)
     TXCO2(NY,NX)=TXCO2(NY,NX)+catomw*Txchem_CO2_vr(L,NY,NX)
-    OXYGIN=OXYGIN+OIB
+    SurfGas_O2_lnd=SurfGas_O2_lnd+OIB
     OOB=trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+tRO2MicrbUptk_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
     OXYGOU=OXYGOU+OOB
-    H2GIN=H2GIN+HGB
+    SurfGas_H2_lnd=SurfGas_H2_lnd+HGB
     HOB=trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX)
     H2GOU=H2GOU+HOB
-    ZN2GIN=ZN2GIN+ZGB+Z2B+ZHB
-    SurfGasFlx_col(idg_O2,NY,NX)=SurfGasFlx_col(idg_O2,NY,NX)+OIB
-    SurfGasFlx_col(idg_N2,NY,NX)=SurfGasFlx_col(idg_N2,NY,NX)+ZGB
-    SurfGasFlx_col(idg_N2O,NY,NX)=SurfGasFlx_col(idg_N2O,NY,NX)+Z2B
-    SurfGasFlx_col(idg_NH3,NY,NX)=SurfGasFlx_col(idg_NH3,NY,NX)+ZHB
-    SurfGasFlx_col(idg_H2,NY,NX)=SurfGasFlx_col(idg_H2,NY,NX)+HGB
+    SurfGas_N2_lnd=SurfGas_N2_lnd+ZGB+Z2B+ZHB
+    
+    SurfGasFlx_col(idg_CO2,NY,NX) = SurfGasFlx_col(idg_CO2,NY,NX)+CIB
+    SurfGasFlx_col(idg_CH4,NY,NX) = SurfGasFlx_col(idg_CH4,NY,NX)+CHB
+    SurfGasFlx_col(idg_O2,NY,NX)  = SurfGasFlx_col(idg_O2,NY,NX)+OIB
+    SurfGasFlx_col(idg_N2,NY,NX)  = SurfGasFlx_col(idg_N2,NY,NX)+ZGB
+    SurfGasFlx_col(idg_N2O,NY,NX) = SurfGasFlx_col(idg_N2O,NY,NX)+Z2B
+    SurfGasFlx_col(idg_NH3,NY,NX) = SurfGasFlx_col(idg_NH3,NY,NX)+ZHB
+    SurfGasFlx_col(idg_H2,NY,NX)  = SurfGasFlx_col(idg_H2,NY,NX)+HGB
     !
     !     GRID CELL BOUNDARY FLUXES FROM EQUILIBRIUM REACTIONS
 !

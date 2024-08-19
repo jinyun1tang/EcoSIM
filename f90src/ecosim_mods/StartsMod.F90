@@ -723,11 +723,11 @@ module StartsMod
   !
   CRAIN=0.0_r8
   HEATIN_lnd=0.0_r8
-  CO2GIN=0.0_r8
-  OXYGIN=0.0_r8
-  H2GIN=0.0_r8
+  SurfGas_CO2_lnd=0.0_r8
+  SurfGas_O2_lnd=0.0_r8
+  SurfGas_H2_lnd=0.0_r8
   TZIN=0.0_r8
-  ZN2GIN=0.0_r8
+  SurfGas_N2_lnd=0.0_r8
   TPIN=0.0_r8
   TORGF=0.0_r8
   TORGN=0.0_r8

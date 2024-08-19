@@ -350,8 +350,8 @@ module SoilDisturbMod
           
           Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
-          CO2GIN=CO2GIN-OMelm(ielmc)
-          OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
+          SurfGas_CO2_lnd=SurfGas_CO2_lnd-OMelm(ielmc)
+          SurfGas_O2_lnd=SurfGas_O2_lnd+2.667_r8*OMelm(ielmc)
           OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)
 
           TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)+OMelm(ielmn)

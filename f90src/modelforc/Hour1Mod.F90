@@ -2359,7 +2359,10 @@ module Hour1Mod
     TLPhaseChangeHeat2Soi(L,NY,NX)=0.0_r8
     trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX)=0.0_r8
     totRootLenDens_vr(L,NY,NX)=0.0_r8
+
   ENDDO
+  trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
+  trcg_pltroot_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
   end subroutine ZeroHourlyArrays
 
 !------------------------------------------------------------------------------------------
