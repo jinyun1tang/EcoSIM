@@ -93,7 +93,7 @@ module GeochemAPI
   DO   NX=NHW,NHE
     DO   NY=NVN,NVS
       DO   L=NU(NY,NX),NL(NY,NX)
-        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
 !
 !     WATER VOLUME IN NON-BAND AND BAND SOIL ZONES
 !
@@ -103,12 +103,12 @@ module GeochemAPI
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
 !     SoilMicPMassLayer=soil mass
 !
-          chemvar%VLWatMicPNH=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-          chemvar%VLWatMicPNB=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-          chemvar%VLWatMicPNO=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
-          chemvar%VLWatMicPNZ=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
-          chemvar%VLWatMicPPO=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-          chemvar%VLWatMicPPB=VLWatMicPM(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          chemvar%VLWatMicPNH=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+          chemvar%VLWatMicPNB=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
+          chemvar%VLWatMicPNO=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
+          chemvar%VLWatMicPNZ=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
+          chemvar%VLWatMicPPO=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+          chemvar%VLWatMicPPB=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
           IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
             chemvar%SoilMicPMassLayerX=SoilMicPMassLayer(L,NY,NX)
             chemvar%BKVLNH=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
@@ -160,7 +160,7 @@ module GeochemAPI
   chemvar%PH=PH(L,NY,NX)
   chemvar%CAL=CAL(L,NY,NX)
   chemvar%CFE=CFE(L,NY,NX)
-  chemvar%VLWatMicPM=VLWatMicPM(NPH,L,NY,NX)
+  chemvar%VLWatMicPM=VLWatMicPM_vr(NPH,L,NY,NX)
   if(salt_model)then
     chemvar%ZMG=trcSalt_solml(idsalt_Mg,L,NY,NX)
     chemvar%ZNA=trcSalt_solml(idsalt_Na,L,NY,NX)
@@ -257,7 +257,7 @@ module GeochemAPI
 !  solflx%TR_CaCO3_soil=trcSalt_TR(idsalt_CaCO3,L,NY,NX)
 !  solflx%TR_MgHCO3_soil=trcSalt_TR(idsalt_MgHCO3,L,NY,NX)
 !  solflx%TR_CaHCO3_soil=trcSalt_TR(idsalt_CaHCO3,L,NY,NX)
-!  solflx%TRHCO=trcSalt_TR(idsalt_HCO3,L,NY,NX)
+!  solflx%TR_HCO3=trcSalt_TR(idsalt_HCO3,L,NY,NX)
 !  solflx%TR_HCO3_sorbed_soil=TR_HCO3_sorbed_soil(L,NY,NX)
 !  solflx%TR_CaH4P2O8_soil=trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)
 !  solflx%TR_FeH2PO4_soil=trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)
@@ -344,7 +344,7 @@ module GeochemAPI
 !  solflx%TR_NH4_sorbed_soil =trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)
 !  solflx%TR_Na_sorbed_soil =TR_Na_sorbed_soil(L,NY,NX)
 !  solflx%TR_NH4_sorbed_band_soil =trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)
-!  solflx%TBCO2 =TBCO2(L,NY,NX)
+!  solflx%Txchem_CO2 =Txchem_CO2_vr(L,NY,NX)
 !  solflx%TBION =TBION(L,NY,NX)
 !  solflx%TRH2O =TRH2O(L,NY,NX)
 !  Integers
@@ -399,7 +399,7 @@ module GeochemAPI
     trcSalt_TR(idsalt_OH,L,NY,NX)=solflx%TR_OH_1e_soil
     trcSalt_TR(idsalt_SO4,L,NY,NX)=solflx%TR_SO4_2e_soil
     trcSalt_TR(idsalt_CO3,L,NY,NX)=solflx%TR_CO3_2e_soil
-    trcSalt_TR(idsalt_HCO3,L,NY,NX)=solflx%TRHCO
+    trcSalt_TR(idsalt_HCO3,L,NY,NX)=solflx%TR_HCO3
     trcSalt_TR(idsalt_AlOH,L,NY,NX)=solflx%TR_AlOH_soil
     trcSalt_TR(idsalt_AlOH2,L,NY,NX)=solflx%TR_AlO2H2_soil
     trcSalt_TR(idsalt_AlOH3,L,NY,NX)=solflx%TR_AlO3H3_soil
@@ -456,7 +456,7 @@ module GeochemAPI
   trcp_RChem_soil(idsp_CaSO4,L,NY,NX)=solflx%TR_CaSO4_precip_soil
   TRH2O(L,NY,NX)=solflx%TRH2O
   TBION(L,NY,NX)=solflx%TBION
-  TBCO2(L,NY,NX)=solflx%TBCO2
+  Txchem_CO2_vr(L,NY,NX)=solflx%Txchem_CO2
   end subroutine GeochemAPIRecv
 
 end module GeochemAPI

@@ -114,14 +114,14 @@ module ErosionMod
 !
 !     DETACHMENT BY RAINFALL WHEN SURFACE WATER IS PRESENT
 !
-      IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO.AND.EnergyImpact4ErosionM(M,NY,NX).GT.0.0_r8 &
+      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.EnergyImpact4ErosionM(M,NY,NX).GT.0.0_r8 &
         .AND.XVLMobileWatMicPM(M,NY,NX).GT.ZEROS(NY,NX))THEN
 !
 !     DETACHMENT OF SEDIMENT FROM SURFACE SOIL DEPENDS ON RAINFALL
 !     KINETIC ENERGY AND FROM DETACHMENT COEFFICIENT IN 'HOUR1'
 !     ATTENUATED BY DEPTH OF SURFACE WATER
 !
-        DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
+        DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM_vr(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
         SoilDetachRate=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
           ,DETW*EnergyImpact4ErosionM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
           *FracSoiAsMicP(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
@@ -131,7 +131,7 @@ module ErosionMod
 !     DEPOSITION OF SEDIMENT TO SOIL SURFACE FROM IMMOBILE SURFACE WATER
 !
 
-      IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO.AND.FracVol4Erosion(NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.FracVol4Erosion(NY,NX).GT.ZERO)THEN
 
         SEDX=SED(NY,NX)+RDTSED(NY,NX)
         IF(XVLMobileWaterLitRM(M,NY,NX).LE.VWatStoreCapSurf(NY,NX))THEN
@@ -189,13 +189,13 @@ module ErosionMod
   N1=NX
   N2=NY
 !     SEDX=SED(N2,N1)
-  IF(WatFlux4ErosionM(M,N2,N1).LE.0.0_r8.OR.SoiBulkDensity(NU(N2,N1),N2,N1).LE.ZERO)THEN
+  IF(WatFlux4ErosionM_2DH(M,N2,N1).LE.0.0_r8.OR.SoiBulkDensity_vr(NU(N2,N1),N2,N1).LE.ZERO)THEN
     BaseErosionRate(N2,N1)=0._r8
   ELSE
     IF(XVLMobileWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
       SEDX=SED(N2,N1)+RDTSED(N2,N1)
       CSEDE=AZMAX1(SEDX/XVLMobileWatMicPM(M,N2,N1))
-       BaseErosionRate(N2,N1)=AMIN1(SEDX,CSEDE*WatFlux4ErosionM(M,N2,N1)*(1.0_r8-FVOLIM(N2,N1)))
+       BaseErosionRate(N2,N1)=AMIN1(SEDX,CSEDE*WatFlux4ErosionM_2DH(M,N2,N1)*(1.0_r8-FVOLIM(N2,N1)))
     ELSE
       BaseErosionRate(N2,N1)=0._r8
     ENDIF
@@ -230,7 +230,7 @@ module ErosionMod
         IF(BaseErosionRate(N2,N1).GT.ZEROS(N2,N1))THEN
           IF(NN.EQ.1)THEN
             !well-defined dest grid          
-            FERM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM(M,N2,N1)
+            FERM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
             SedErosionM(N,2,N5,N4)=BaseErosionRate(N2,N1)*FERM
             cumSedErosion(N,2,N5,N4)=cumSedErosion(N,2,N5,N4)+SedErosionM(N,2,N5,N4)
           ELSE
@@ -240,7 +240,7 @@ module ErosionMod
           IF(NN.EQ.2)THEN
             IF(N4B.GT.0.AND.N5B.GT.0)THEN
               !well-defined dest grid
-              FERM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM(M,N2,N1)
+              FERM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
               SedErosionM(N,1,N5B,N4B)=BaseErosionRate(N2,N1)*FERM
               cumSedErosion(N,1,N5B,N4B)=cumSedErosion(N,1,N5B,N4B)+SedErosionM(N,1,N5B,N4B)
             ELSE
@@ -280,13 +280,13 @@ module ErosionMod
       call OverLandFlowSedTransp(M,NY,NX,NHW,NHE,NVN,NVS)
       N1=NX
       N2=NY
-      IF(WatFlux4ErosionM(M,N2,N1).LE.0.0.OR.SoiBulkDensity(NU(N2,N1),N2,N1).LE.ZERO)THEN
+      IF(WatFlux4ErosionM_2DH(M,N2,N1).LE.0.0.OR.SoiBulkDensity_vr(NU(N2,N1),N2,N1).LE.ZERO)THEN
         BaseErosionRate(N2,N1)=0._r8
       ELSE
         IF(XVLMobileWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
           SEDX=SED(NY,NX)+RDTSED(NY,NX)
           CSEDE=AZMAX1(SEDX/XVLMobileWatMicPM(M,N2,N1))
-          BaseErosionRate(N2,N1)=AMIN1(SEDX,CSEDE*WatFlux4ErosionM(M,N2,N1))
+          BaseErosionRate(N2,N1)=AMIN1(SEDX,CSEDE*WatFlux4ErosionM_2DH(M,N2,N1))
         ELSE
           BaseErosionRate(N2,N1)=0._r8
         ENDIF
@@ -380,10 +380,10 @@ module ErosionMod
         .OR.BaseErosionRate(N2,N1).LE.ZEROS(N2,N1))THEN
         SedErosionM(N,NN,M5,M4)=0._r8
       ELSE
-        IF(WatFlux4ErosionM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+        IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
           IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
             .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-            FERM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
+            FERM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
             SedErosionM(N,NN,M5,M4)=BaseErosionRate(N2,N1)*FERM
             cumSedErosion(N,NN,M5,M4)=cumSedErosion(N,NN,M5,M4)+SedErosionM(N,NN,M5,M4)
           ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
@@ -798,7 +798,7 @@ module ErosionMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
         N1=NX
         N2=NY
         D8980: DO  N=1,2

@@ -59,7 +59,7 @@ implicit none
   real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical,  pointer :: is_activeMicrbFungrpAutor(:)
   logical,  pointer :: is_aerobic_hetr(:)
-  logical,  pointer :: is_anerobic_hetr(:)
+  logical,  pointer :: is_anaerobic_hetr(:)
   logical,  pointer :: is_litter(:)
   logical,  pointer :: is_finelitter(:)
   logical,  pointer :: is_CO2_autotroph(:)
@@ -160,7 +160,7 @@ contains
   call this%Initallocate()
 
 !set up functional group ids
-!five om-complexes
+! five om-complexes
   this%mid_Aerob_HeteroBacter=1
   this%mid_Facult_DenitBacter=2
   this%mid_Aerob_Fungi=3
@@ -174,9 +174,9 @@ contains
   this%is_aerobic_hetr(this%mid_Aerob_Fungi)=.true.
   this%is_aerobic_hetr(this%mid_aerob_N2Fixer)=.true.
 
-  this%is_anerobic_hetr(this%mid_fermentor)=.true.
-  this%is_anerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
-!the abstract complex
+  this%is_anaerobic_hetr(this%mid_fermentor)=.true.
+  this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
+!the autotrophic complex
   this%mid_AmmoniaOxidBacter=1
   this%mid_NitriteOxidBacter=2
   this%mid_AerobicMethanotrofBacter=3
@@ -202,27 +202,27 @@ contains
   real(r8) :: COMCI(NumLiveMicrbCompts,1:this%jcplx)
   real(r8) :: OMCI1(NumLiveMicrbCompts,1:this%jcplx)  !allocation of biomass to kinetic components
   integer :: K,M,NGL,N
-  associate(                    &
-    OHCK     => this%OHCK     , &
-    OMCK     => this%OMCK     , &
-    ORCK     => this%ORCK     , &
-    OQCK     => this%OQCK     , &
-    ORCI     => this%ORCI     , &
-    OMCI     => this%OMCI     , &
-    CNOFC    => this%CNOFC    , &
-    CPOFC    => this%CPOFC    , &
-    rNCOMC    => this%rNCOMC    , &
-    rPCOMC    => this%rPCOMC    , &
-    rNCOMCAutor  => this%rNCOMCAutor  , &
-    rPCOMCAutor  => this%rPCOMCAutor  , &
-    FL       => this%FL       , &
-    DOSA     => this%DOSA     , &
-    SPOSC    => this%SPOSC    , &
-    CNRH     => this%CNRH     , &
-    CPRH     => this%CPRH     , &
-    OMCF     => this%OMCF     , &
-    OMCA     => this%OMCA     , &
-    JG       => this%jguilds    &
+  associate(                         &
+    OHCK        => this%OHCK,        &
+    OMCK        => this%OMCK,        &
+    ORCK        => this%ORCK,        &
+    OQCK        => this%OQCK,        &
+    ORCI        => this%ORCI,        &
+    OMCI        => this%OMCI,        &
+    CNOFC       => this%CNOFC,       &
+    CPOFC       => this%CPOFC,       &
+    rNCOMC      => this%rNCOMC,      &
+    rPCOMC      => this%rPCOMC,      &
+    rNCOMCAutor => this%rNCOMCAutor, &
+    rPCOMCAutor => this%rPCOMCAutor, &
+    FL          => this%FL,          &
+    DOSA        => this%DOSA,        &
+    SPOSC       => this%SPOSC,       &
+    CNRH        => this%CNRH,        &
+    CPRH        => this%CPRH,        &
+    OMCF        => this%OMCF,        &
+    OMCA        => this%OMCA,        &
+    JG          => this%jguilds      &
   )
   OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
   OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
@@ -395,7 +395,7 @@ contains
   allocate(this%is_activeMicrbFungrpAutor(NumMicbFunGrupsPerCmplx)); this%is_activeMicrbFungrpAutor=.false.
   allocate(this%is_CO2_autotroph(NumMicbFunGrupsPerCmplx)); this%is_CO2_autotroph=.false.
   allocate(this%is_aerobic_hetr(NumMicbFunGrupsPerCmplx)); this%is_aerobic_hetr=.false.
-  allocate(this%is_anerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anerobic_hetr=.false.
+  allocate(this%is_anaerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anaerobic_hetr=.false.
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -428,13 +428,14 @@ contains
   call destroy(this%is_activeMicrbFungrpAutor)
   call destroy(this%is_CO2_autotroph)
   call destroy(this%is_aerobic_hetr)
-  call destroy(this%is_anerobic_hetr)
+  call destroy(this%is_anaerobic_hetr)
   end subroutine DestructMicBGCPar
 
 !------------------------------------------------------------------------------------------
   pure function get_micb_id(this,M,NGL)result(id)
   !return the id of biomass component M for
   !hetetroph guild NGL
+  !1,2,3: labile, recalcitrant, reserve
   implicit none
   class(MicParType), intent(in) :: this
   integer, intent(in) :: M   !biomass component

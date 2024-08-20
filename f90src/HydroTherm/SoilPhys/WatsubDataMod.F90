@@ -18,9 +18,8 @@ implicit none
   real(r8),allocatable ::  FWatExMacP2MicPi(:,:,:)             !pressure-driven water flow from macpore to micpore
 
   real(r8),allocatable ::  TWatCharge2MicP(:,:,:)                       !
-  real(r8),allocatable ::  TConvectWaterFlowMacP(:,:,:)                      !
-  real(r8),allocatable ::  THeatFlow2Soili(:,:,:)                      !
-  real(r8),allocatable ::  THeatFlow2Soilis(:,:,:)                      !
+  real(r8),allocatable ::  TConvWaterFlowMacP_3D_vr(:,:,:)                      !
+  real(r8),allocatable ::  THeatFlow2Soili_vr(:,:,:)                      !
   real(r8),allocatable ::  FIceThawMicP(:,:,:)                       !
   real(r8),allocatable ::  SoiPLIceHeatFlxFrez(:,:,:)                       !
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
@@ -35,11 +34,11 @@ implicit none
   real(r8),allocatable ::  VLMicP1(:,:,:)                       !
   real(r8),allocatable ::  VLMacP1(:,:,:)                      !
 
-  real(r8),allocatable ::  FLWNX(:,:)                         !
-  real(r8),allocatable ::  FLWXNX(:,:)                        !
-  real(r8),allocatable ::  FLWHNX(:,:)                        !
-  real(r8),allocatable ::  HFLWNX(:,:)                        !
-  real(r8),allocatable ::  PSISoilMatricPtmp(:,:,:)                      !
+  real(r8),allocatable ::  H2OFlow2TopSoiMicP_col(:,:)                         !
+  real(r8),allocatable ::  H2OFlow2TopSoiMicPX_col(:,:)                        !
+  real(r8),allocatable ::  H2OFlow2TopSoiMacP_col(:,:)                        !
+  real(r8),allocatable ::  HeatFlow2TopSoi_col(:,:)                        !
+  real(r8),allocatable ::  PSISoilMatricPtmp_vr(:,:,:)                      !
 
 
   integer, allocatable ::  N6X(:,:)
@@ -68,9 +67,8 @@ contains
   allocate(FWatExMacP2MicPi(JZ,JY,JX));    FWatExMacP2MicPi=0._r8
 
   allocate(TWatCharge2MicP(JZ,JY,JX));    TWatCharge2MicP=0._r8
-  allocate(TConvectWaterFlowMacP(JZ,JY,JX));   TConvectWaterFlowMacP=0._r8
-  allocate(THeatFlow2Soili(JZ,JY,JX));   THeatFlow2Soili=0._r8
-  allocate(THeatFlow2Soilis(JZ,JY,JX));   THeatFlow2Soilis=0._r8  
+  allocate(TConvWaterFlowMacP_3D_vr(JZ,JY,JX));   TConvWaterFlowMacP_3D_vr=0._r8
+  allocate(THeatFlow2Soili_vr(JZ,JY,JX));   THeatFlow2Soili_vr=0._r8
   allocate(FIceThawMicP(JZ,JY,JX));    FIceThawMicP=0._r8
   allocate(SoiPLIceHeatFlxFrez(JZ,JY,JX));    SoiPLIceHeatFlxFrez=0._r8
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
@@ -86,11 +84,11 @@ contains
   allocate(VLMacP1(JZ,JY,JX));   VLMacP1=0._r8
 
 
-  allocate(FLWNX(JY,JX));       FLWNX=0._r8
-  allocate(FLWXNX(JY,JX));      FLWXNX=0._r8
-  allocate(FLWHNX(JY,JX));      FLWHNX=0._r8
-  allocate(HFLWNX(JY,JX));      HFLWNX=0._r8
-  allocate(PSISoilMatricPtmp(JZ,JY,JX));   PSISoilMatricPtmp=0._r8
+  allocate(H2OFlow2TopSoiMicP_col(JY,JX));       H2OFlow2TopSoiMicP_col=0._r8
+  allocate(H2OFlow2TopSoiMicPX_col(JY,JX));      H2OFlow2TopSoiMicPX_col=0._r8
+  allocate(H2OFlow2TopSoiMacP_col(JY,JX));      H2OFlow2TopSoiMacP_col=0._r8
+  allocate(HeatFlow2TopSoi_col(JY,JX));      HeatFlow2TopSoi_col=0._r8
+  allocate(PSISoilMatricPtmp_vr(JZ,JY,JX));   PSISoilMatricPtmp_vr=0._r8
 
   end subroutine InitWatSubData
 
@@ -115,9 +113,8 @@ contains
   call destroy(FWatExMacP2MicPi)
 
   call destroy(TWatCharge2MicP)
-  call destroy(TConvectWaterFlowMacP)
-  call destroy(THeatFlow2Soili)
-  call destroy(THeatFlow2Soilis)  
+  call destroy(TConvWaterFlowMacP_3D_vr)
+  call destroy(THeatFlow2Soili_vr)
   call destroy(FIceThawMicP)
   call destroy(SoiPLIceHeatFlxFrez)
   call destroy(AVCNHL)
@@ -133,11 +130,11 @@ contains
 
   call destroy(VLMacP1)
 
-  call destroy(FLWNX)
-  call destroy(FLWXNX)
-  call destroy(FLWHNX)
-  call destroy(HFLWNX)
-  call destroy(PSISoilMatricPtmp)
+  call destroy(H2OFlow2TopSoiMicP_col)
+  call destroy(H2OFlow2TopSoiMicPX_col)
+  call destroy(H2OFlow2TopSoiMacP_col)
+  call destroy(HeatFlow2TopSoi_col)
+  call destroy(PSISoilMatricPtmp_vr)
 
   end subroutine DestructWatSubData
 

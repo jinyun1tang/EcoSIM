@@ -48,26 +48,26 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
-  associate(                                               &
-    WindSpeedAtm          => plt_site%WindSpeedAtm,        &
-    ZERO                  => plt_site%ZERO,                &
-    AREA3                 => plt_site%AREA3,               &
-    KoppenClimZone        => plt_site%KoppenClimZone,      &
-    SoiSurfRoughnesst0    => plt_site%SoiSurfRoughnesst0,  &
-    WindMesHeight         => plt_site%WindMesHeight,       &
-    ZEROS                 => plt_site%ZEROS,               &
-    NU                    => plt_site%NU,                  &
-    BndlResistAboveCanG   => plt_ew%BndlResistAboveCanG,   &
+  associate(                                                 &
+    WindSpeedAtm           => plt_site%WindSpeedAtm,         &
+    ZERO                   => plt_site%ZERO,                 &
+    AREA3                  => plt_site%AREA3,                &
+    KoppenClimZone         => plt_site%KoppenClimZone,       &
+    SoiSurfRoughnesst0     => plt_site%SoiSurfRoughnesst0,   &
+    WindMesHeight          => plt_site%WindMesHeight,        &
+    ZEROS                  => plt_site%ZEROS,                &
+    NU                     => plt_site%NU,                   &
+    BndlResistAboveCanG    => plt_ew%BndlResistAboveCanG,    &
     ZERO4PlantDisplace_col => plt_ew%ZERO4PlantDisplace_col, &
-    RoughHeight           => plt_ew%RoughHeight,           &
-    RIB                   => plt_ew%RIB,                   &
-    TairK                 => plt_ew%TairK,                 &
-    VLHeatCapSnowMin_col  => plt_ew%VLHeatCapSnowMin_col,  &
-    SnowDepth             => plt_ew%SnowDepth,             &
-    VLHeatCapSurfSnow_col => plt_ew%VLHeatCapSurfSnow_col, &
-    CanopyHeight_col      => plt_morph%CanopyHeight_col,   &
-    StemArea_col          => plt_morph%StemArea_col,       &
-    CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col  &
+    RoughHeight            => plt_ew%RoughHeight,            &
+    RIB                    => plt_ew%RIB,                    &
+    TairK                  => plt_ew%TairK,                  &
+    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col,   &
+    SnowDepth              => plt_ew%SnowDepth,              &
+    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,  &
+    CanopyHeight_col       => plt_morph%CanopyHeight_col,    &
+    StemArea_col           => plt_morph%StemArea_col,        &
+    CanopyLeafArea_col     => plt_morph%CanopyLeafArea_col  &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -259,69 +259,69 @@ module CanopyCondsMod
   !     RadSWbyCanopy_pft,RADP=total SW,PAR absorbed by canopy
   !     ClumpFactorNow_pft=clumping factor for self-shading
   !
-  associate(                                                           &
-    VLHeatCapSurfSnow_col    => plt_ew%VLHeatCapSurfSnow_col         , &
-    VcumIceSnow_col          => plt_ew%VcumIceSnow_col               , &
-    VcumDrySnoWE_col         => plt_ew%VcumDrySnoWE_col              , &
-    VcumWatSnow_col          => plt_ew%VcumWatSnow_col               , &
-    VLHeatCapSnowMin_col     => plt_ew%VLHeatCapSnowMin_col          , &
-    SnowDepth                => plt_ew%SnowDepth                     , &
-    RadSWLeafAlbedo_pft      => plt_rad%RadSWLeafAlbedo_pft          , &
-    SoilAlbedo               => plt_rad%SoilAlbedo                   , &
-    SurfAlbedo_col           => plt_rad%SurfAlbedo_col               , &
-    CanopyPARalbedo_pft      => plt_rad%CanopyPARalbedo_pft          , &
-    FracSWRad2Grnd           => plt_rad%FracSWRad2Grnd               , &
-    GroundSurfAzimuth_col    => plt_rad%GroundSurfAzimuth_col        , &
-    CosineGrndSlope_col      => plt_rad%CosineGrndSlope_col          , &
-    SineGrndSlope_col        => plt_rad%SineGrndSlope_col            , &
-    iScatteringDiffus        => plt_rad%iScatteringDiffus            , &
-    OMEGA                    => plt_rad%OMEGA                        , &
-    FracPARRadbyCanopy_pft   => plt_rad%FracPARRadbyCanopy_pft       , &
-    RadPAR_zsec              => plt_rad%RadPAR_zsec                  , &
-    RadDifPAR_zsec           => plt_rad%RadDifPAR_zsec               , &
-    OMEGAG                   => plt_rad%OMEGAG                       , &
-    OMEGX                    => plt_rad%OMEGX                        , &
-    RadSWSolarBeam_col       => plt_rad%RadSWSolarBeam_col           , &  !MJ/hour/m2
-    RadSWGrnd_col            => plt_rad%RadSWGrnd_col                , &
-    RadSWDirect_col          => plt_rad%RadSWDirect_col              , &  !incident direct sw radiation, MJ/hour/m2
-    RadSWDiffus_col          => plt_rad%RadSWDiffus_col              , &  !incident diffuse sw radiation, MJ/hour/m2
-    RadPARSolarBeam_col      => plt_rad%RadPARSolarBeam_col          , &
-    RadSWbyCanopy_pft        => plt_rad%RadSWbyCanopy_pft            , &
-    RadPARDiffus_col         => plt_rad%RadPARDiffus_col             , & !umol /m2/s
-    RadPARDirect_col         => plt_rad%RadPARDirect_col             , & !umol /m2/s
-    SineSunInclAngle_col     => plt_rad%SineSunInclAngle_col         , &
-    TotSineSkyAngles_grd     => plt_rad%TotSineSkyAngles_grd         , &
-    TAU_RadThru              => plt_rad%TAU_RadThru                  , &
-    TAU_DirRadTransm         => plt_rad%TAU_DirRadTransm             , &
-    SineLeafAngle            => plt_rad%SineLeafAngle                , &
-    LeafPARabsorpty_pft      => plt_rad%LeafPARabsorpty_pft          , &
-    LeafSWabsorpty_pft       => plt_rad%LeafSWabsorpty_pft           , &
-    RadPARLeafTransmis_pft   => plt_rad%RadPARLeafTransmis_pft       , &
-    RadSWLeafTransmis_pft    => plt_rad%RadSWLeafTransmis_pft        , &
-    RadPARbyCanopy_pft       => plt_rad%RadPARbyCanopy_pft           , &
-    CosineLeafAngle          => plt_rad%CosineLeafAngle              , &
-    ZEROS                    => plt_site%ZEROS                       , &
-    NU                       => plt_site%NU                          , &
-    AREA3                    => plt_site%AREA3                       , &
-    NP                       => plt_site%NP                          , &
-    ZERO                     => plt_site%ZERO                        , &
-    ZEROS2                   => plt_site%ZEROS2                      , &
-    POROS1                   => plt_site%POROS1                      , &
-    SolarNoonHour_col        => plt_site%SolarNoonHour_col           , &
-    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr       , &
-    VLSoilMicP               => plt_soilchem%VLSoilMicP              , &
-    VLWatMicP_vr             => plt_soilchem%VLWatMicP_vr            , &
-    ClumpFactorNow_pft       => plt_morph%ClumpFactorNow_pft         , &
-    CanopyHeightZ_col        => plt_morph%CanopyHeightZ_col          , &
-    NumOfBranches_pft        => plt_morph%NumOfBranches_pft          , &
-    LeafAreaZsec_brch        => plt_morph%LeafAreaZsec_brch          , &
-    StemAreaZsec_brch        => plt_morph%StemAreaZsec_brch          , &
-    CanopyLeafArea_pft       => plt_morph%CanopyLeafArea_pft         , &
-    CanopyLeafArea_lpft      => plt_morph%CanopyLeafArea_lpft        , &
-    CanopyStalkArea_lbrch    => plt_morph%CanopyStalkArea_lbrch      , &
-    LeafStalkArea_pft        => plt_morph%LeafStalkArea_pft          , &
-    ClumpFactor_pft          => plt_morph%ClumpFactor_pft            , &
-    LeafStalkArea_col        => plt_morph%LeafStalkArea_col            &
+  associate(                                                   &
+    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,    &
+    VcumIceSnow_col        => plt_ew%VcumIceSnow_col,          &
+    VcumDrySnoWE_col       => plt_ew%VcumDrySnoWE_col,         &
+    VcumWatSnow_col        => plt_ew%VcumWatSnow_col,          &
+    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col,     &
+    SnowDepth              => plt_ew%SnowDepth,                &
+    RadSWLeafAlbedo_pft    => plt_rad%RadSWLeafAlbedo_pft,     &
+    SoilAlbedo             => plt_rad%SoilAlbedo,              &
+    SurfAlbedo_col         => plt_rad%SurfAlbedo_col,          &
+    CanopyPARalbedo_pft    => plt_rad%CanopyPARalbedo_pft,     &
+    FracSWRad2Grnd_col     => plt_rad%FracSWRad2Grnd_col,      &
+    GroundSurfAzimuth_col  => plt_rad%GroundSurfAzimuth_col,   &
+    CosineGrndSlope_col    => plt_rad%CosineGrndSlope_col,     &
+    SineGrndSlope_col      => plt_rad%SineGrndSlope_col,       &
+    iScatteringDiffus      => plt_rad%iScatteringDiffus,       &
+    OMEGA                  => plt_rad%OMEGA,                   &
+    FracPARRadbyCanopy_pft => plt_rad%FracPARRadbyCanopy_pft,  &
+    RadPAR_zsec            => plt_rad%RadPAR_zsec,             &
+    RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec,          &
+    OMEGAG                 => plt_rad%OMEGAG,                  &
+    OMEGX                  => plt_rad%OMEGX,                   &
+    RadSWSolarBeam_col     => plt_rad%RadSWSolarBeam_col,      &  !MJ/hour/m2
+    RadSWGrnd_col          => plt_rad%RadSWGrnd_col,           &
+    RadSWDirect_col        => plt_rad%RadSWDirect_col,         &  !incident direct sw radiation,  MJ/hour/m2
+    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,         &  !incident diffuse sw radiation, MJ/hour/m2
+    RadPARSolarBeam_col    => plt_rad%RadPARSolarBeam_col,     &
+    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,       &
+    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,        & !umol /m2/s
+    RadPARDirect_col       => plt_rad%RadPARDirect_col,        & !umol /m2/s
+    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    &
+    TotSineSkyAngles_grd   => plt_rad%TotSineSkyAngles_grd,    &
+    TAU_RadThru            => plt_rad%TAU_RadThru,             &
+    TAU_DirRadTransm       => plt_rad%TAU_DirRadTransm,        &
+    SineLeafAngle          => plt_rad%SineLeafAngle,           &
+    LeafPARabsorpty_pft    => plt_rad%LeafPARabsorpty_pft,     &
+    LeafSWabsorpty_pft     => plt_rad%LeafSWabsorpty_pft,      &
+    RadPARLeafTransmis_pft => plt_rad%RadPARLeafTransmis_pft,  &
+    RadSWLeafTransmis_pft  => plt_rad%RadSWLeafTransmis_pft,   &
+    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,      &
+    CosineLeafAngle        => plt_rad%CosineLeafAngle,         &
+    ZEROS                  => plt_site%ZEROS,                  &
+    NU                     => plt_site%NU,                     &
+    AREA3                  => plt_site%AREA3,                  &
+    NP                     => plt_site%NP,                     &
+    ZERO                   => plt_site%ZERO,                   &
+    ZEROS2                 => plt_site%ZEROS2,                 &
+    POROS1                 => plt_site%POROS1,                 &
+    SolarNoonHour_col      => plt_site%SolarNoonHour_col,      &
+    VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr,  &
+    VLSoilMicP             => plt_soilchem%VLSoilMicP,         &
+    VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
+    ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &
+    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,     &
+    NumOfBranches_pft      => plt_morph%NumOfBranches_pft,     &
+    LeafAreaZsec_brch      => plt_morph%LeafAreaZsec_brch,     &
+    StemAreaZsec_brch      => plt_morph%StemAreaZsec_brch,     &
+    CanopyLeafArea_pft     => plt_morph%CanopyLeafArea_pft,    &
+    CanopyLeafArea_lpft    => plt_morph%CanopyLeafArea_lpft,   &
+    CanopyStalkArea_lbrch  => plt_morph%CanopyStalkArea_lbrch, &
+    LeafStalkArea_pft      => plt_morph%LeafStalkArea_pft,     &
+    ClumpFactor_pft        => plt_morph%ClumpFactor_pft,       &
+    LeafStalkArea_col      => plt_morph%LeafStalkArea_col      &
   )
 
   LeafStalkArea_col=0.0_r8
@@ -880,19 +880,19 @@ module CanopyCondsMod
   !
   !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
   !
-  !     FracSWRad2Grnd=fraction of radiation received by ground surface
+  !     FracSWRad2Grnd_col=fraction of radiation received by ground surface
   !     FRADP=fraction of radiation received by each PFT canopy
   !     LeafStalkArea_col,LeafStalkArea_pft=leaf+stalk area of all PFTs,each PFT
   !
-  FracSWRad2Grnd=1.0_r8
+  FracSWRad2Grnd_col=1.0_r8
   IF(LeafStalkArea_col.GT.ZEROS)THEN
     FRadPARbyLeafT=1.0_r8-EXP(-0.65_r8*LeafStalkArea_col/AREA3(NU))
     D145: DO NZ=1,NP
       FracPARRadbyCanopy_pft(NZ)=FRadPARbyLeafT*LeafStalkArea_pft(NZ)/LeafStalkArea_col
-      FracSWRad2Grnd=FracSWRad2Grnd-FracPARRadbyCanopy_pft(NZ)
+      FracSWRad2Grnd_col=FracSWRad2Grnd_col-FracPARRadbyCanopy_pft(NZ)
     ENDDO D145
   ELSE
-    FracSWRad2Grnd=1.0_r8
+    FracSWRad2Grnd_col=1.0_r8
     D146: DO NZ=1,NP
       FracPARRadbyCanopy_pft(NZ)=0.0_r8
     ENDDO D146

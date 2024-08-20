@@ -58,13 +58,13 @@ module readiMod
   public :: GridConectionMode
   contains
 
-  SUBROUTINE readi(NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readi(NHW,NHE,NVN,NVS)
 !!
 ! Description:
 ! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 !
   implicit none
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: jj,NX,NY
   integer :: ierr
   character(len=200) :: tline
@@ -214,15 +214,8 @@ module readiMod
   call ncd_getvar(grid_nfid,'ALTIG',loc,ALTIG)
   call ncd_getvar(grid_nfid,'ATCAG',loc,ATCAG)
   call ncd_getvar(grid_nfid,'IDTBLG',loc,iWaterTabelMode)
-!  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
-!  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
-!  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
-!  call ncd_getvar(grid_nfid,'CH4EG',loc,CH4EG)
-!  call ncd_getvar(grid_nfid,'Z2OEG',loc,Z2OEG)
-!  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
-!  call ncd_getvar(grid_nfid,'NCNG',loc,NCNG)
   call ncd_getvar(grid_nfid,'DTBLIG',loc,DTBLIG)
   call ncd_getvar(grid_nfid,'DTBLDIG',loc,DTBLDIG)
   call ncd_getvar(grid_nfid,'DTBLGG',loc,DTBLGG)
@@ -251,16 +244,10 @@ module readiMod
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
     write(*,'(40A)')('-',ll=1,40)
-    write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
-    write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
-!    write(*,*)'atmospheric CO2 (ppm): CO2EIG',CO2EIG
-!    write(*,*)'atmospheric CH4 (ppm): CH4EG',CH4EG
-!    write(*,*)'atmospheric N2O (ppm): Z2OEG',Z2OEG
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
-!    write(*,*)'flag for lateral connections between grid cells (1),'// &
-!      ' no connections (3): NCNG',GridConectionMode(NCNG)
+
     write(*,*)'depth of natural water table: DTBLIG',DTBLIG
     write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
     write(*,*)'slope of natural water table relative to landscape '// &
@@ -301,7 +288,7 @@ module readiMod
       ZNH3E(NY,NX)=ZNH3EG
       KoppenClimZone(NY,NX)=IETYPG
       FlowDirIndicator(NY,NX)=grid_mode
-      DTBLI(NY,NX)=DTBLIG
+      NatWtblDepz_col(NY,NX)=DTBLIG
       DTBLDI(NY,NX)=DTBLDIG
       WaterTBLSlope(NY,NX)=DTBLGG
       RechargNorthSurf(NY,NX)=RCHQNG
@@ -348,6 +335,7 @@ module readiMod
   character(len=200) :: tline
   integer :: NM(JY,JX),ntp,ntopus
   real(r8) :: dat1(1:JZ)
+  real(r8) :: corrector
 ! begin_execution
   associate(                            &
   k_woody_litr => micpar%k_woody_litr , &
@@ -385,22 +373,22 @@ module readiMod
 !
 !     SURFACE SLOPES AND ASPECTS
 !
-        ASP(NY,NX)=ASPX
+        ASP_col(NY,NX)=ASPX
         SL(NY,NX)=SL0
-        SnowDepth(NY,NX)=initSnowDepth
+        SnowDepth_col(NY,NX)=initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
 !     what is geometric format mean? geographic format 0 is north, 90 east, 180 south,
 !     geometric format 0/360 is east, counting as counterclock wise
-        ASP(NY,NX)=450.0_r8-ASP(NY,NX)
-        IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
+        ASP_col(NY,NX)=450.0_r8-ASP_col(NY,NX)
+        IF(ASP_col(NY,NX).GE.360.0_r8)ASP_col(NY,NX)=ASP_col(NY,NX)-360.0_r8
       ENDDO
     ENDDO
 
     call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'ALBS',  ntp,SoilAlbedo(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'ALBS',  ntp,SoilAlbedo_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PH0',   ntp,PH(0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC(k_fine_litr,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSNf',  ntp,RSN(k_fine_litr,0,NV1,NH1))
@@ -428,7 +416,7 @@ module readiMod
     NL(NV1,NH1)=NLI(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepth2LayerBottom(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'WP', ntp,WiltPoint(1:JZ,NV1,NH1))
@@ -510,7 +498,7 @@ module readiMod
 !
           PSIAtFldCapacity(NY,NX)=PSIAtFldCapacity(NV1,NH1)
           PSIAtWiltPoint(NY,NX)=PSIAtWiltPoint(NV1,NH1)
-          SoilAlbedo(NY,NX) =SoilAlbedo(NV1,NH1)
+          SoilAlbedo_col(NY,NX) =SoilAlbedo_col(NV1,NH1)
           PH(0,NY,NX) =PH(0,NV1,NH1)
           RSC(k_fine_litr,0,NY,NX) =RSC(k_fine_litr,0,NV1,NH1)
           RSN(k_fine_litr,0,NY,NX) =RSN(k_fine_litr,0,NV1,NH1)
@@ -538,13 +526,13 @@ module readiMod
 !     PHYSICAL PROPERTIES
 !
 !     CDPTH=depth to bottom (m) > 0
-!     SoiBulkDensityt0=initial bulk density (Mg m-3,0=water), it refers to solid matter
+!     SoiBulkDensityt0_vr=initial bulk density (Mg m-3,0=water), it refers to solid matter
 !
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
             CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NV1,NH1)
-            SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L,NV1,NH1)
+            SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NV1,NH1)
             FieldCapacity(L,NY,NX)=FieldCapacity(L,NV1,NH1)
             WiltPoint(L,NY,NX)=WiltPoint(L,NV1,NH1)
             SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NV1,NH1)
@@ -627,13 +615,13 @@ module readiMod
 !
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
-            IF(SoiBulkDensityt0(L+1,NY,NX).GT.0.025_r8)THEN
+            IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
               CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.01_r8
             ELSE
               CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
-              SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L+1,NY,NX)
+              SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L+1,NY,NX)
               FieldCapacity(L,NY,NX)=FieldCapacity(L+1,NY,NX)
               WiltPoint(L,NY,NX)=WiltPoint(L+1,NY,NX)
               SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L+1,NY,NX)
@@ -705,15 +693,17 @@ module readiMod
 !   CORGC,CORGR=SOC,POC converted to g Mg-1
 !   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
 !   CNH4...=solute concentrations converted to mol Mg-1
-!   SoiBulkDensityt0: initial bulk density
+!   SoiBulkDensityt0_vr: initial bulk density
 
         DO  L=1,NL(NY,NX)
   !   SoilFracAsMacP: macropore fraction
-  !     SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
-          SoiBulkDensity(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)
-          IF(isclose(SoiBulkDensity(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
+  !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
+          SoiBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
+          IF(isclose(SoiBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
           FracSoiAsMicP(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+  !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
+  !  both macropores and micropores    
   !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !
@@ -724,10 +714,11 @@ module readiMod
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
-  !
-          CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
-          CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
-          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
+  ! soil texture is reported based on mass basis soley for mineral component of the soil
+          corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
+          CSAND(L,NY,NX)=CSAND(L,NY,NX)*corrector
+          CSILT(L,NY,NX)=CSILT(L,NY,NX)*corrector
+          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*corrector
           CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
@@ -755,10 +746,12 @@ module readiMod
   !
           IF(CSoilOrgM_vr(ielmn,L,NY,NX).LT.0.0_r8)THEN
   !  default ORGN parameterization
-            CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
+            CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
+              8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
           IF(CSoilOrgM_vr(ielmp,L,NY,NX).LT.0.0_r8)THEN
-            CSoilOrgM_vr(ielmp,L,NY,NX)=AMIN1(0.0125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),1.2E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.52_r8)
+            CSoilOrgM_vr(ielmp,L,NY,NX)=AMIN1(0.0125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
+              1.2E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.52_r8)
           ENDIF
           IF(CEC(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
@@ -793,16 +786,16 @@ module readiMod
   write(*,*)'Topographic characterization'
   write(*,'(40A)')('-',ll=1,40)
   write(*,*)'NY, NX =',NY,NX
-  write(*,*)'Aspect (o): ASPX',ASP(NY,NX)
+  write(*,*)'Aspect (o): ASPX',ASP_col(NY,NX)
   write(*,*)'Slope (o): SL0',SL(NY,NX)
-  write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth(NY,NX)
+  write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth_col(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 
   write(*,*)''
   write(*,*)'NY,NX=',NY,NX
   write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity(NY,NX)
   write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint(NY,NX)
-  write(*,*)'Wet soil albedo',SoilAlbedo(NY,NX)
+  write(*,*)'Wet soil albedo',SoilAlbedo_col(NY,NX)
 
   write(*,*)'Litter pH',PH(0,NY,NX)
   write(*,*)'C in surface fine litter (g m-2)',RSC(k_fine_litr,0,NY,NX)
@@ -824,8 +817,8 @@ module readiMod
 
   write(*,*)'Depth to bottom of soil layer (m): CDPTH'
   write(*,*)(CumDepth2LayerBottom(L,NY,NX),L=NU,NM)
-  write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0'
-  write(*,*)(SoiBulkDensityt0(L,NY,NX),L=NU,NM)
+  write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0_vr'
+  write(*,*)(SoiBulkDensityt0_vr(L,NY,NX),L=NU,NM)
 !
 !     HYDROLOGIC PROPERTIES
 !

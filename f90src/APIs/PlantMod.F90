@@ -5,6 +5,7 @@ module PlantMod
   use UptakesMod      , only : uptakes  
   use PlantDisturbMod , only : PrepLandscapeGrazing
   use EcoSimSumDataType
+  use EcoSIMCtrlMod, only : lverb
   use PlantAPIData  
   use PlantAPI
   use ExtractsMod
@@ -40,7 +41,7 @@ implicit none
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !     zero out plant hourly fluxes
       call ZeroGrosub()  
-    !if(lverb)WRITE(*,333)'HFUNC'
+    if(lverb)WRITE(*,333)'HFUNC'
       !phenological update, determine living/active branches
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfHFUNCS')
@@ -56,8 +57,9 @@ implicit none
 !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
 !      ENDDO
       !do growth of active branches
+      if(lverb)write(*,*)'grosub'
       CALL GROSUBs(I,J)
-
+      if(lverb)write(*,*)'EXTRACT'
       !aggregate varaibles
       CALL EXTRACTs(I,J)
 

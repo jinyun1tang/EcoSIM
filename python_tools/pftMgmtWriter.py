@@ -88,7 +88,7 @@ def write_pft_mgmt(config_dict):
   years=[]
   pft_dflag=-1  #no pft data
   if len(pfts)==2:
-    pft_dflag=0  #constant pft managment data, only plantation
+    pft_dflag=0  #constant pft managment data 
   elif len(pfts)>2:
     pft_dflag=1  #transient pft managment data, including multiple
   if pft_dflag==1:

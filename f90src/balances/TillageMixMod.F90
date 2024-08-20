@@ -227,18 +227,16 @@ module TillageMixMod
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VLWatMicP_vr(0,NY,NX)*CORP0
-    HFLXD=cpo*SoilOrgM_vr(ielmc,0,NY,NX)*CORP0*TKS(0,NY,NX)
-    HEATIN=HEATIN-HFLXD
-    HeatStoreLandscape=HeatStoreLandscape-HFLXD
-    TENGYR=cpw*TVOLWR*TKS(0,NY,NX)
+    HFLXD=cpo*SoilOrgM_vr(ielmc,0,NY,NX)*CORP0*TKS_vr(0,NY,NX)
+    HEATIN_lnd=HEATIN_lnd-HFLXD
+    HeatStore_lnd=HeatStore_lnd-HFLXD
+    TENGYR=cpw*TVOLWR*TKS_vr(0,NY,NX)
 
     call sumLitrOMLayL(0,NY,NX,litrOM)
 
-    SoilOrgM_vr(ielmc,0,NY,NX)=litrOM(ielmc)
-    SoilOrgM_vr(ielmn,0,NY,NX)=litrOM(ielmn)
-    SoilOrgM_vr(ielmp,0,NY,NX)=litrOM(ielmp)
-    OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
+    SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM(1:NumPlantChemElms)
 
+    OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
 
     DO NTS=ids_beg,idg_NH3
       trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
@@ -265,7 +263,7 @@ module TillageMixMod
     ENDDO
 
     VLWatMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)*XCORP0
-    VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+    VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
     VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
     VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
@@ -284,7 +282,7 @@ module TillageMixMod
         TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
-        TBKDX=TBKDX+FI*SoiBulkDensityt0(L,NY,NX)
+        TBKDX=TBKDX+FI*SoiBulkDensityt0_vr(L,NY,NX)
         TFC=TFC+FI*FieldCapacity(L,NY,NX)
         TWP=TWP+FI*WiltPoint(L,NY,NX)
         TSatHydroCondVert=TSatHydroCondVert+FI*SatHydroCondVert(L,NY,NX)
@@ -298,11 +296,11 @@ module TillageMixMod
         TGKCN=TGKCN+FI*GKCN(L,NY,NX)
         TGKCK=TGKCK+FI*GKCK(L,NY,NX)
         TVOLW=TVOLW+TI*VLWatMicP_vr(L,NY,NX)
-        TVOLI=TVOLI+TI*VLiceMicP(L,NY,NX)
-!     TVOLP=TVOLP+TI*VLsoiAirP(L,NY,NX)
+        TVOLI=TVOLI+TI*VLiceMicP_vr(L,NY,NX)
+!     TVOLP=TVOLP+TI*VLsoiAirP_vr(L,NY,NX)
 !     TVOLA=TVOLA+TI*VLMicP_vr(L,NY,NX)
-        TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
-          +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
+        TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
           TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil_vr(NTN,L,NY,NX)
         ENDDO
@@ -394,8 +392,8 @@ module TillageMixMod
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TX=1.0_r8-TI
-        SoiBulkDensityt0(L,NY,NX) = TI*(SoiBulkDensityt0(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0(L,NY,NX))) &
-          +TX*SoiBulkDensityt0(L,NY,NX)
+        SoiBulkDensityt0_vr(L,NY,NX) = TI*(SoiBulkDensityt0_vr(L,NY,NX)+CORP*(TBKDX-SoiBulkDensityt0_vr(L,NY,NX))) &
+          +TX*SoiBulkDensityt0_vr(L,NY,NX)
         FieldCapacity(L,NY,NX)    = TI*(FieldCapacity(L,NY,NX)+CORP*(TFC-FieldCapacity(L,NY,NX)))+TX*FieldCapacity(L,NY,NX)
         WiltPoint(L,NY,NX)        = TI*(WiltPoint(L,NY,NX)+CORP*(TWP-WiltPoint(L,NY,NX)))+TX*WiltPoint(L,NY,NX)
         SatHydroCondVert(L,NY,NX) = TI*(SatHydroCondVert(L,NY,NX)+CORP*(TSatHydroCondVert-SatHydroCondVert(L,NY,NX)))&
@@ -412,23 +410,23 @@ module TillageMixMod
         GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
         
-        ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS(L,NY,NX)
-        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)))*TKS(L,NY,NX)
+        ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS_vr(L,NY,NX)
+        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)
         VLWatMicP_vr(L,NY,NX)=TI*VLWatMicP_vr(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP_vr(L,NY,NX))+TX*VLWatMicP_vr(L,NY,NX)+FI*TVOLWR
-        VLiceMicP(L,NY,NX)=TI*VLiceMicP(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP(L,NY,NX))+TX*VLiceMicP(L,NY,NX)
-        VLWatMicPX(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+CORP*VLWatMacP(L,NY,NX)
-!     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)+CORP*VLiceMacP(L,NY,NX)
+        VLiceMicP_vr(L,NY,NX)=TI*VLiceMicP_vr(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP_vr(L,NY,NX))+TX*VLiceMicP_vr(L,NY,NX)
+        VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
+!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+CORP*VLWatMacP_vr(L,NY,NX)
+!     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)+CORP*VLiceMacP_col(L,NY,NX)
 !     VLMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)+CORP*VLMacP(L,NY,NX)
-!     VLWatMacP(L,NY,NX)=XCORP(NY,NX)*VLWatMacP(L,NY,NX)
-!     VLiceMacP(L,NY,NX)=XCORP(NY,NX)*VLiceMacP(L,NY,NX)
+!     VLWatMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLWatMacP_vr(L,NY,NX)
+!     VLiceMacP_col(L,NY,NX)=XCORP(NY,NX)*VLiceMacP_col(L,NY,NX)
 !     VLMacP(L,NY,NX)=XCORP(NY,NX)*VLMacP(L,NY,NX)
 !     SoilFracAsMacP(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
-        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX)) &
-          +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
-        TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
+        VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+        TKS_vr(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity_vr(L,NY,NX)
+        TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))
 
         DO NTN=ifertn_beg,ifertn_end
           FertN_soil_vr(NTN,L,NY,NX)=TI*FertN_soil_vr(NTN,L,NY,NX) &

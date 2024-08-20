@@ -399,7 +399,7 @@ module TranspSaltMod
 !
 !
       IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
+        .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
   !     there is snowpack
 
         call AtmosSoluteFluxToSnowpack(I,NY,NX)
@@ -409,7 +409,7 @@ module TranspSaltMod
   !     ENTERED IN WEATHER AND IRRIGATION FILES
   !
       ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface_col(NY,NX).GT.0.0_r8) &
-        .AND.VLSnowHeatCapM(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
+        .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
   !     there is no significant snowpack, but precipitation
         call AtmosSoluteFluxToTopsoil(I,NY,NX)
   !
@@ -487,7 +487,7 @@ module TranspSaltMod
   integer :: nsalts
 !     begin_execution
 
-  FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM(M,N2,N1)
+  FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
 
   DO nsalts=idsalt_beg,idsalt_end
     trcSalt_RQR(nsalts,N,NN,M5,M4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
@@ -551,9 +551,9 @@ module TranspSaltMod
   integer :: nsalts,ids
 !     begin_execution
 
-  IF(VLWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+  IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
     VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4) &
-      /VLWatMicPM(M,M3,M2,M1)))
+      /VLWatMicPM_vr(M,M3,M2,M1)))
   ELSE
     VFLW=0.0_r8
   ENDIF
@@ -691,12 +691,12 @@ module TranspSaltMod
 !     begin_execution
 
   D1205: DO LS=1,JS
-    IF(VLSnowHeatCapM(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLSnowHeatCapM_snvr(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-      IF(LS.LT.JS.AND.VLSnowHeatCapM(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
+      IF(LS.LT.JS.AND.VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO nsalts=idsalt_beg,idsalt_end
           trcSalt_TBLS(nsalts,LS,NY,NX)=trcSalt_TBLS(nsalts,LS,NY,NX) &
             +trcSaltAdv2SowLay(nsalts,LS,NY,NX)-trcSaltAdv2SowLay(nsalts,LS2,NY,NX)
@@ -916,7 +916,7 @@ module TranspSaltMod
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
               IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8) &
-                .OR.WatFlux4ErosionM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+                .OR.WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
                 call ZeroRechargeSoluteFlux(N,NN,M5,M4)
               ELSE
 !

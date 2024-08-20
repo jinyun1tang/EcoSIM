@@ -36,7 +36,7 @@ implicit none
   real(r8) :: NetNH4Mineralize
   real(r8) :: NetPO4Mineralize
   real(r8) :: TRDOE2DIE(1:NumPlantChemElms)              !cumulative conversion of organic element to inorganic element  
-  real(r8), allocatable :: REcoDOMUptk(:,:)
+  real(r8), allocatable :: REcoDOMProd(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
   real(r8), allocatable :: RNH3OxidAutor(:)
   real(r8), allocatable :: RNH3OxidAutorBand(:)
@@ -97,7 +97,7 @@ implicit none
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
   allocate(this%RO2UptkSoilM(NPH));this%RO2UptkSoilM = spval
-  allocate(this%REcoDOMUptk(idom_beg:idom_end,1:jcplx));this%REcoDOMUptk=spval
+  allocate(this%REcoDOMProd(idom_beg:idom_end,1:jcplx));this%REcoDOMProd=spval
   allocate(this%RO2DmndHetert(NumHetetrMicCmplx,1:jcplx));this%RO2DmndHetert=spval
   allocate(this%RDOCUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RDOCUptkHeter=spval
   allocate(this%RAcetateUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAcetateUptkHeter=spval
@@ -146,7 +146,7 @@ implicit none
 
   this%TRDOE2DIE =0._r8
   this%RO2UptkSoilM = 0._r8
-  this%REcoDOMUptk=0._r8
+  this%REcoDOMProd=0._r8
   this%RO2DmndHetert=0._r8
   this%RDOCUptkHeter=0._r8
   this%RAcetateUptkHeter=0._r8
@@ -192,7 +192,7 @@ implicit none
   implicit none
   class(micfluxtype) :: this
 
-  call destroy(this%REcoDOMUptk)
+  call destroy(this%REcoDOMProd)
   call destroy(this%RNH3OxidAutor)
   call destroy(this%RNH3OxidAutorBand)
   call destroy(this%RNO2OxidAutor)

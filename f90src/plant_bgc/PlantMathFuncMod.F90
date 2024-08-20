@@ -254,33 +254,33 @@ contains
   if(c==0 .and. a/=0)c=b
   end function pMOD
 !--------------------------------------------------------------------------------
-  pure function is_root_N2fix(iPlantNfixType)result(yesno)
+  pure function is_root_N2fix(iPlantNfixType_pft)result(yesno)
   implicit none
-  integer, intent(in) :: iPlantNfixType
+  integer, intent(in) :: iPlantNfixType_pft
 
   logical :: yesno
 
-  yesno=iPlantNfixType.GE.in2fixtyp_root_fast.AND.iPlantNfixType.LE.in2fixtyp_root_slow
+  yesno=iPlantNfixType_pft.GE.in2fixtyp_root_fast.AND.iPlantNfixType_pft.LE.in2fixtyp_root_slow
 
   end function is_root_N2fix
 !--------------------------------------------------------------------------------
-  pure function is_canopy_N2fix(iPlantNfixType)result(yesno)
+  pure function is_canopy_N2fix(iPlantNfixType_pft)result(yesno)
   implicit none
-  integer, intent(in) :: iPlantNfixType
+  integer, intent(in) :: iPlantNfixType_pft
 
   logical :: yesno
 
-  yesno=iPlantNfixType.GE.in2fixtyp_canopy_fast.AND.iPlantNfixType.LE.in2fixtyp_canopy_slow
+  yesno=iPlantNfixType_pft.GE.in2fixtyp_canopy_fast.AND.iPlantNfixType_pft.LE.in2fixtyp_canopy_slow
 
   end function is_canopy_N2fix
 !--------------------------------------------------------------------------------
-  pure function is_plant_N2fix(iPlantNfixType)result(yesno)
+  pure function is_plant_N2fix(iPlantNfixType_pft)result(yesno)
   implicit none
-  integer, intent(in) :: iPlantNfixType
+  integer, intent(in) :: iPlantNfixType_pft
 
   logical :: yesno
 
-  yesno=iPlantNfixType.NE.iN2fixtyp_none
+  yesno=iPlantNfixType_pft.NE.iN2fixtyp_none
 
   end function is_plant_N2fix
 

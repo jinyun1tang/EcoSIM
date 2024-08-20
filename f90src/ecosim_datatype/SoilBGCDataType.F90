@@ -63,42 +63,52 @@ implicit none
   real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  REcoDOMUptk_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
+  real(r8),target,allocatable ::  REcoDOMProd_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
+  real(r8),target,allocatable ::  RDOMMicProd_vr(:,:,:,:,:)          !microbial dom flux, > 0 into soil [g d-2 h-1]
   real(r8),target,allocatable ::  TMicHeterAct_vr(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VWatMicrobAct_vr(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
-  real(r8),target,allocatable :: trcs_VLN_vr(:,:,:,:)
-  real(r8),target,allocatable :: tRDOE2Die_col(:,:,:)
+  real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)
+  real(r8),target,allocatable ::  tRDOE2Die_col(:,:,:)
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
   real(r8),target,allocatable ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
-  real(r8),target,allocatable ::  WDNHB(:,:,:)                       !width of NH4 band, [m]
-  real(r8),target,allocatable ::  DPNHB(:,:,:)                       !depth of NH4 band, [m]
-  real(r8),target,allocatable ::  WDNOB(:,:,:)                       !width of NO3 band, [m]
-  real(r8),target,allocatable ::  DPNOB(:,:,:)                       !depth of NO4 band, [m]
-  real(r8),target,allocatable ::  WDPOB(:,:,:)                       !width of PO4 band, [m]
-  real(r8),target,allocatable ::  DPPOB(:,:,:)                       !depth of PO4 band, [m]
-  real(r8),target,allocatable ::  DPNH4(:,:)                         !total depth of NH4 band, [m]
-  real(r8),target,allocatable ::  DPNO3(:,:)                         !total depth of NO3 band, [m]
-  real(r8),target,allocatable ::  DPPO4(:,:)                         !total depth of PO4 band, [m]
+  real(r8),target,allocatable ::  BandWidthNH4_vr(:,:,:)                       !width of NH4 band, [m]
+  real(r8),target,allocatable ::  BandThicknessNH4_vr(:,:,:)                       !depth of NH4 band, [m]
+  real(r8),target,allocatable ::  BandWidthNO3_vr(:,:,:)                       !width of NO3 band, [m]
+  real(r8),target,allocatable ::  BandThicknessNO3_vr(:,:,:)                       !depth of NO4 band, [m]
+  real(r8),target,allocatable ::  BandWidthPO4_vr(:,:,:)                       !width of PO4 band, [m]
+  real(r8),target,allocatable ::  BandThicknessPO4_vr(:,:,:)                       !depth of PO4 band, [m]
+  real(r8),target,allocatable ::  BandDepthNH4_col(:,:)                         !total depth of NH4 band, [m]
+  real(r8),target,allocatable ::  BandDepthNO3_col(:,:)                         !total depth of NO3 band, [m]
+  real(r8),target,allocatable ::  BandDepthPO4_col(:,:)                         !total depth of PO4 band, [m]
   real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
-  real(r8),target,allocatable ::  WaterFlowSoiMicP(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  WaterFlowMacP(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HeatFlow2Soil(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_3DTransp2MicP_vr(:,:,:,:,:)
-  real(r8),target,allocatable ::  DOM_3DMicp_Transp_flx(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_3DTransp2MicP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_3DTransp2MacP(:,:,:,:,:)
   real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
+  real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)
+  real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)
+  real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)
+  real(r8),target,allocatable :: RFermen_vr(:,:,:)
+  real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)
+  real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)    !denitrification N2O production
+  real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)
+  real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)    !chemo N2O production
+  real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)     !N2O reduction into N2
   private :: InitAllocate
   contains
 
@@ -133,6 +143,15 @@ implicit none
   allocate(ZNHU0(0:JZ,JY,JX));  ZNHU0=0._r8
   allocate(CPO4B(0:JZ,JY,JX));CPO4B(0:JZ,JY,JX)=0._r8
 
+  allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
+  allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
+  allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
+  allocate(RFermen_vr(0:JZ,JY,JX)); RFermen_vr=0._r8
+  allocate(RNH3oxi_vr(0:JZ,JY,JX)); RNH3oxi_vr=0._r8
+  allocate(RN2ODeniProd_vr(0:JZ,JY,JX)); RN2ODeniProd_vr=0._r8
+  allocate(RN2ONitProd_vr(0:JZ,JY,JX)); RN2ONitProd_vr=0._r8
+  allocate(RN2OChemoProd_vr(0:JZ,JY,JX)); RN2OChemoProd_vr=0._r8
+  allocate(RN2ORedux_vr(0:JZ,JY,JX));RN2ORedux_vr=0._r8
   allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
   allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
   allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
@@ -168,7 +187,8 @@ implicit none
   allocate(trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcg_RMicbTransf_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
 
-  allocate(REcoDOMUptk_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));REcoDOMUptk_vr=0._r8
+  allocate(REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));REcoDOMProd_vr=0._r8
+  allocate(RDOMMicProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RDOMMicProd_vr=0._r8
   allocate(TMicHeterAct_vr(0:JZ,JY,JX));  TMicHeterAct_vr=0._r8
   allocate(VWatMicrobAct_vr(0:JZ,JY,JX));   VWatMicrobAct_vr=0._r8
   allocate(TSens4MicbGrwoth_vr(0:JZ,JY,JX));   TSens4MicbGrwoth_vr=0._r8
@@ -180,26 +200,26 @@ implicit none
   allocate(VLNOB(0:JZ,JY,JX));  VLNOB=0._r8
   allocate(VLPO4(0:JZ,JY,JX));  VLPO4=0._r8
   allocate(VLPOB(0:JZ,JY,JX));  VLPOB=0._r8
-  allocate(WDNHB(JZ,JY,JX));    WDNHB=0._r8
-  allocate(DPNHB(JZ,JY,JX));    DPNHB=0._r8
-  allocate(WDNOB(JZ,JY,JX));    WDNOB=0._r8
-  allocate(DPNOB(JZ,JY,JX));    DPNOB=0._r8
-  allocate(WDPOB(JZ,JY,JX));    WDPOB=0._r8
-  allocate(DPPOB(JZ,JY,JX));    DPPOB=0._r8
-  allocate(DPNH4(JY,JX));       DPNH4=0._r8
-  allocate(DPNO3(JY,JX));       DPNO3=0._r8
-  allocate(DPPO4(JY,JX));       DPPO4=0._r8
+  allocate(BandWidthNH4_vr(JZ,JY,JX));    BandWidthNH4_vr=0._r8
+  allocate(BandThicknessNH4_vr(JZ,JY,JX));    BandThicknessNH4_vr=0._r8
+  allocate(BandWidthNO3_vr(JZ,JY,JX));    BandWidthNO3_vr=0._r8
+  allocate(BandThicknessNO3_vr(JZ,JY,JX));    BandThicknessNO3_vr=0._r8
+  allocate(BandWidthPO4_vr(JZ,JY,JX));    BandWidthPO4_vr=0._r8
+  allocate(BandThicknessPO4_vr(JZ,JY,JX));    BandThicknessPO4_vr=0._r8
+  allocate(BandDepthNH4_col(JY,JX));       BandDepthNH4_col=0._r8
+  allocate(BandDepthNO3_col(JY,JX));       BandDepthNO3_col=0._r8
+  allocate(BandDepthPO4_col(JY,JX));       BandDepthPO4_col=0._r8
   allocate(RNO2DmndSoilChemo_vr(0:JZ,JY,JX));  RNO2DmndSoilChemo_vr=0._r8
   allocate(RNO2DmndBandChemo_vr(0:JZ,JY,JX));  RNO2DmndBandChemo_vr=0._r8
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
-  allocate(WaterFlowSoiMicP(3,JD,JV,JH));    WaterFlowSoiMicP=0._r8
-  allocate(WaterFlowMacP(3,JD,JV,JH));   WaterFlowMacP=0._r8
-  allocate(HeatFlow2Soil(3,JD,JV,JH));   HeatFlow2Soil=0._r8
+  allocate(WaterFlowSoiMicP_3D(3,JD,JV,JH));    WaterFlowSoiMicP_3D=0._r8
+  allocate(WaterFlowMacP_3D(3,JD,JV,JH));   WaterFlowMacP_3D=0._r8
+  allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
-  allocate(trcs_3DTransp2MicP_vr(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP_vr=0._r8
-  allocate(DOM_3DMicp_Transp_flx(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_3DMicp_Transp_flx=0._r8
+  allocate(trcs_3DTransp2MicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP_3D=0._r8
+  allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,3,JD,JV,JH));Gas_3DAdvDif_Flx_vr=0._r8
   allocate(trcs_3DTransp2MacP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MacP=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
@@ -219,6 +239,15 @@ implicit none
   call destroy(CNO3)
   call destroy(CPO4)
 
+  call destroy(RCH4ProdAcetcl_vr)
+  call destroy(RCH4ProdHydrog_vr)
+  call destroy(RCH4Oxi_aero_vr)
+  call destroy(RFermen_vr)
+  call destroy(RNH3oxi_vr)
+  call destroy(RN2ONitProd_vr)  
+  call destroy(RN2ODeniProd_vr)
+  call destroy(RN2OChemoProd_vr)
+  call destroy(RN2ORedux_vr)
   call destroy(trc_gasml_vr)
   call destroy(CPO4B)
 
@@ -261,7 +290,8 @@ implicit none
   call destroy(HydroIonFlx_col)
   call destroy(Micb_N2Fixation_vr)
   call destroy(RNutMicbTransf_vr)
-  call destroy(REcoDOMUptk_vr)
+  call destroy(REcoDOMProd_vr)
+  call destroy(RDOMMicProd_vr)
   call destroy(TMicHeterAct_vr)
   call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)
@@ -275,22 +305,22 @@ implicit none
   call destroy(VLNOB)
   call destroy(VLPO4)
   call destroy(VLPOB)
-  call destroy(WDNHB)
-  call destroy(DPNHB)
-  call destroy(WDNOB)
-  call destroy(DPNOB)
-  call destroy(WDPOB)
-  call destroy(DPPOB)
-  call destroy(DPNH4)
-  call destroy(DPNO3)
-  call destroy(DPPO4)
+  call destroy(BandWidthNH4_vr)
+  call destroy(BandThicknessNH4_vr)
+  call destroy(BandWidthNO3_vr)
+  call destroy(BandThicknessNO3_vr)
+  call destroy(BandWidthPO4_vr)
+  call destroy(BandThicknessPO4_vr)
+  call destroy(BandDepthNH4_col)
+  call destroy(BandDepthNO3_col)
+  call destroy(BandDepthPO4_col)
   call destroy(RNO2DmndSoilChemo_vr)
   call destroy(RNO2DmndBandChemo_vr)
   call destroy(XZHYS)
-  call destroy(WaterFlowSoiMicP)
-  call destroy(WaterFlowMacP)
-  call destroy(HeatFlow2Soil)
-  call destroy(DOM_3DMicp_Transp_flx)
+  call destroy(WaterFlowSoiMicP_3D)
+  call destroy(WaterFlowMacP_3D)
+  call destroy(HeatFlow2Soil_3D)
+  call destroy(DOM_MicpTransp_3D)
   call destroy(DOM_3DMacp_Transp_flx)
   call destroy(trcg_RMicbTransf_vr)
   end subroutine DestructSoilBGCData

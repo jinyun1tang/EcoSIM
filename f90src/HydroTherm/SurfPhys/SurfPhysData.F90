@@ -8,7 +8,7 @@ implicit none
 
   real(r8),allocatable ::  XVLMobileWaterLitR(:,:)                         !
   real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
-  real(r8),allocatable ::  XVLiceMicP(:,:)                         !
+  real(r8),allocatable ::  XVLiceMicP_col(:,:)                         !
   real(r8),allocatable ::  LWEmscefLitR(:,:)                         !
   real(r8),allocatable ::  VLPoreLitR(:,:)                        !
   real(r8),allocatable ::  LWRad2LitR(:,:)                         !
@@ -56,7 +56,7 @@ implicit none
 
   allocate(XVLMobileWaterLitR(JY,JX));       XVLMobileWaterLitR=0._r8
   allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
-  allocate(XVLiceMicP(JY,JX));       XVLiceMicP=0._r8
+  allocate(XVLiceMicP_col(JY,JX));       XVLiceMicP_col=0._r8
   allocate(LWEmscefLitR(JY,JX));       LWEmscefLitR=0._r8
   allocate(VLPoreLitR(JY,JX));      VLPoreLitR=0._r8
   allocate(LWRad2LitR(JY,JX));       LWRad2LitR=0._r8
@@ -96,7 +96,7 @@ implicit none
 
   call destroy(XVLMobileWaterLitR)
   call destroy(XVLMobileWatMicP)
-  call destroy(XVLiceMicP)
+  call destroy(XVLiceMicP_col)
   call destroy(LWEmscefLitR)
   call destroy(VLPoreLitR)
   call destroy(LWRad2LitR)

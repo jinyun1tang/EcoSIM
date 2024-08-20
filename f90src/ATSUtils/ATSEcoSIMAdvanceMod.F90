@@ -10,10 +10,10 @@ module ATSEcoSIMAdvanceMod
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
-  use ClimForcDataType, only : LWRadSky, TairK, &
+  use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm, RainH  
   use SoilPropertyDataType
-  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_col, &
+  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
 implicit none
@@ -53,7 +53,7 @@ implicit none
     AREA(3,2,NY,NX)=a_AREA3(0,NY)
 
 
-    ASP(NY,NX)=a_ASP(NY)
+    ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
     !CH4E(NY,NX)=atm_ch4
@@ -62,7 +62,7 @@ implicit none
     !Z2OE(NY,NX)=atm_n2o
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc(NY)
+    TairK_col(NY,NX)=tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
@@ -74,14 +74,14 @@ implicit none
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
-      SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
+      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
       VLWatMicP1(L,NY,NX)=a_WC(L,NY)
       VLiceMicP1(L,NY,NX)=0.0
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      VLHeatCapacity_col(L,NY,NX) = heat_capacity
+      VLHeatCapacity_vr(L,NY,NX) = heat_capacity
       SoilFracAsMicP(L,NY,NX) = 1.0
       PSISM1(L,NY,NX) = a_MATP(L,NY)
       POROS(L,NY,NX) = a_PORO(L,NY)

@@ -177,7 +177,7 @@ module StartsMod
 
       SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
-      TKS(0,NY,NX)=ATKS(NY,NX)
+      TKS_vr(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
     ENDDO
@@ -244,8 +244,8 @@ module StartsMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
-      IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
+      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+        ExtWaterTablet0(NY,NX)=NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
         DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
       ELSE
         ExtWaterTablet0(NY,NX)=0.0_r8
@@ -317,9 +317,9 @@ module StartsMod
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
       IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-        VHeatCapacity(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+        VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
       else
-        VHeatCapacity(0,NY,NX)=0._r8
+        VHeatCapacity_vr(0,NY,NX)=0._r8
       endif
       VHeatCapacitySoilM(0,NY,NX)=0.0_r8
       VLMicPt0_col(0,NY,NX)=0.0_r8      
@@ -415,11 +415,11 @@ module StartsMod
     RCH4PhysexchPrev_vr(L,NY,NX)=0.0_r8
 
     IF(L.GT.0)THEN
-      IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
         !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS) 
+        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/PTDS) 
       ELSE
         !for ponding water
         PTDS=0.0_r8
@@ -435,18 +435,18 @@ module StartsMod
       !     SAND,SILT,CLAY=sand,silt,clay mass (Mg)
       !     VORGC,VMINL,VSAND=volumetric fractions of SOC,non-sand,sand
       !     VHCM,VHCP=volumetric dry,wet soil heat capacity (MJ m-3 K-1)
-      !     TKS,TCS=soil temperature (oC,K)
+      !     TKS_vr,TCS=soil temperature (oC,K)
       !     THETW,THETI,THETP=micropore water,ice,air concentration (m3 m-3)
 !
       SAND(L,NY,NX)=CSAND(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
       SILT(L,NY,NX)=CSILT(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
-      IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
-        VORGC=CORGCM*ppmc*SoiBulkDensity(L,NY,NX)/PTDS
-        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity(L,NY,NX)/PTDS
-        VSAND=CSAND(L,NY,NX)*SoiBulkDensity(L,NY,NX)/PTDS
+        VORGC=CORGCM*ppmc*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
       ELSE
@@ -455,7 +455,7 @@ module StartsMod
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
 !
-      IF(ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0)THEN
+      IF(ISOIL(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_set)THEN
       ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0_r8)THEN
           THETW_vr(L,NY,NX)=POROS(L,NY,NX)
@@ -469,31 +469,31 @@ module StartsMod
           THETW_vr(L,NY,NX)=THW(L,NY,NX)
         ENDIF
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
-          THETI(L,NY,NX)=0.0_r8
+          THETI_col(L,NY,NX)=0.0_r8
         ELSE
-          THETI(L,NY,NX)=THI(L,NY,NX)
+          THETI_col(L,NY,NX)=THI(L,NY,NX)
         ENDIF
         VLWatMicP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLWatMicPX(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-        VLWatMacP(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
-        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
+        VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
+        VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP(L,NY,NX)
+        VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+        VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP(L,NY,NX)) &
-          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
-        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
-          +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
-        THETWZ(L,NY,NX)=THETW_vr(L,NY,NX)
-        THETIZ(L,NY,NX)=THETI(L,NY,NX)
+        VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
+          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+        VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
+          +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+        ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
+        ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF
     ENDIF
-    TKS(L,NY,NX)=ATKS(NY,NX)
+    TKS_vr(L,NY,NX)=ATKS(NY,NX)
     TCS(L,NY,NX)=ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
@@ -552,12 +552,12 @@ module StartsMod
   ZNFNI(0:L2,NY,NX)=0.0_r8
   ZNFN0(0:L2,NY,NX)=0.0_r8
 
-  WDNHB(1:L2,NY,NX)=0.0_r8
-  DPNHB(1:L2,NY,NX)=0.0_r8
-  WDNOB(1:L2,NY,NX)=0.0_r8
-  DPNOB(1:L2,NY,NX)=0.0_r8
-  WDPOB(1:L2,NY,NX)=0.0_r8
-  DPPOB(1:L2,NY,NX)=0.0_r8
+  BandWidthNH4_vr(1:L2,NY,NX)=0.0_r8
+  BandThicknessNH4_vr(1:L2,NY,NX)=0.0_r8
+  BandWidthNO3_vr(1:L2,NY,NX)=0.0_r8
+  BandThicknessNO3_vr(1:L2,NY,NX)=0.0_r8
+  BandWidthPO4_vr(1:L2,NY,NX)=0.0_r8
+  BandThicknessPO4_vr(1:L2,NY,NX)=0.0_r8
   COCU(1:jcplx,1:L2,NY,NX)=0.0_r8
   CONU(1:jcplx,1:L2,NY,NX)=0.0_r8
   COPU(1:jcplx,1:L2,NY,NX)=0.0_r8
@@ -583,7 +583,7 @@ module StartsMod
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
 ! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
-! ASP=aspect angle in degree
+! ASP_col=aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
     'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
@@ -593,39 +593,39 @@ module StartsMod
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GroundSurfAzimuth_col(NY,NX)=ASP(NY,NX)*RadianPerDegree   !radian
+      GroundSurfAzimuth_col(NY,NX)=ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)=ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)=ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
 
-      IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
+      IF(ASP_col(NY,NX).GE.0.0_r8.AND.ASP_col(NY,NX).LT.90.0_r8)THEN
       ! along the northeast
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)*RadianPerDegree)    !to south (thus -)
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)*RadianPerDegree)     !to east
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP_col(NY,NX)*RadianPerDegree)    !to south (thus -)
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP_col(NY,NX)*RadianPerDegree)     !to east
         XGridRunoffFlag(1,1,NY,NX)=.true.    !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.false.
         XGridRunoffFlag(2,2,NY,NX)=.true.    !north
-      ELSEIF(ASP(NY,NX).GE.90.0_r8.AND.ASP(NY,NX).LT.180.0_r8)THEN
+      ELSEIF(ASP_col(NY,NX).GE.90.0_r8.AND.ASP_col(NY,NX).LT.180.0_r8)THEN
       ! along the southeast
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
         XGridRunoffFlag(1,1,NY,NX)=.false.
         XGridRunoffFlag(2,1,NY,NX)=.true.   !west to east
         XGridRunoffFlag(1,2,NY,NX)=.false.
         XGridRunoffFlag(2,2,NY,NX)=.true.   !north to south
-      ELSEIF(ASP(NY,NX).GE.180.0_r8.AND.ASP(NY,NX).LT.270.0_r8)THEN
+      ELSEIF(ASP_col(NY,NX).GE.180.0_r8.AND.ASP_col(NY,NX).LT.270.0_r8)THEN
       !along the southwest
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.false.
         XGridRunoffFlag(2,1,NY,NX)=.true.  !west
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
         XGridRunoffFlag(2,2,NY,NX)=.false.
-      ELSEIF(ASP(NY,NX).GE.270.0_r8.AND.ASP(NY,NX).LE.360.0_r8)THEN
+      ELSEIF(ASP_col(NY,NX).GE.270.0_r8.AND.ASP_col(NY,NX).LE.360.0_r8)THEN
       ! along the northwest
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
         XGridRunoffFlag(1,1,NY,NX)=.true.  !east
         XGridRunoffFlag(2,1,NY,NX)=.false.
         XGridRunoffFlag(1,2,NY,NX)=.true.  !south
@@ -687,7 +687,7 @@ module StartsMod
         ALTY=MAX(ALTY,ALT(NY,NX))
       ENDIF
       WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
-        ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX) &
+        ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL(NY,NX) &
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
@@ -721,7 +721,7 @@ module StartsMod
   !     INITIALIZE MASS BALANCE CHECKS
   !
   CRAIN=0.0_r8
-  HEATIN=0.0_r8
+  HEATIN_lnd=0.0_r8
   CO2GIN=0.0_r8
   OXYGIN=0.0_r8
   H2GIN=0.0_r8
@@ -731,16 +731,16 @@ module StartsMod
   TORGF=0.0_r8
   TORGN=0.0_r8
   TORGP=0.0_r8
-  VOLWOU=0.0_r8
+  QH2OLoss_lnds=0.0_r8
   CEVAP=0.0_r8
   CRUN=0.0_r8
-  HEATOU=0.0_r8
+  HeatOut_lnds=0.0_r8
   OXYGOU=0.0_r8
   H2GOU=0.0_r8
   TSEDOU=0.0_r8
-  TOMOU(ielmc)=0.0_r8
-  TOMOU(ielmn)=0.0_r8
-  TOMOU(ielmp)=0.0_r8
+  TOMOU_lnds(ielmc)=0.0_r8
+  TOMOU_lnds(ielmn)=0.0_r8
+  TOMOU_lnds(ielmp)=0.0_r8
   Litrfall_lnds(ielmc)=0.0_r8
   Litrfall_lnds(ielmn)=0.0_r8
   Litrfall_lnds(ielmp)=0.0_r8
@@ -772,7 +772,7 @@ module StartsMod
   ATCS(:,:)=ATCAI(:,:)
   TairKClimMean(:,:)=units%Celcius2Kelvin(ATCA)
   ATKS(:,:)=units%Celcius2Kelvin(ATCS)
-  URAIN_col(:,:)=0.0_r8
+  QRain_col(:,:)=0.0_r8
 
   CO2byFire_col(:,:)=0.0_r8
   CH4byFire_col(:,:)=0.0_r8
@@ -784,8 +784,8 @@ module StartsMod
   FertNFlx_col(:,:)=0.0_r8
   FerPFlx_col(:,:)=0.0_r8
   AnualH2OLoss_col(:,:)=0.0_r8
-  UEVAP(:,:)=0.0_r8
-  URUN(:,:)=0.0_r8
+  QEvap_col(:,:)=0.0_r8
+  Qrunoff_col(:,:)=0.0_r8
   USEDOU(:,:)=0.0_r8
   UCOP(:,:)=0.0_r8
   HydroSufDOCFlx_col(:,:)=0.0_r8
@@ -804,15 +804,15 @@ module StartsMod
   LiterfalOrgM_col(ielmc,:,:)=0.0_r8
   LiterfalOrgM_col(ielmn,:,:)=0.0_r8
   LiterfalOrgM_col(ielmp,:,:)=0.0_r8
-  UDRAIN(:,:)=0.0_r8
+  QDrain_col(:,:)=0.0_r8
   ZDRAIN(:,:)=0.0_r8
   PDRAIN(:,:)=0.0_r8
-  DPNH4(:,:)=0.0_r8
-  DPNO3(:,:)=0.0_r8
-  DPPO4(:,:)=0.0_r8
+  BandDepthNH4_col(:,:)=0.0_r8
+  BandDepthNO3_col(:,:)=0.0_r8
+  BandDepthPO4_col(:,:)=0.0_r8
   trc_solml_vr(idg_O2,0,:,:)=0.0_r8
-  FracSWRad2Grnd(:,:)=1.0_r8
-  LWRadBySurf(:,:)=0.0_r8
+  FracSWRad2Grnd_col(:,:)=1.0_r8
+  LWRadBySurf_col(:,:)=0.0_r8
   LWRadCanG(:,:)=0.0_r8
   Eco_NetRad_col(:,:)=0.0_r8
   Eco_Heat_Latent_col(:,:)=0.0_r8
@@ -826,10 +826,10 @@ module StartsMod
   CanH2OHeldVg(:,:)=0.0_r8
   CanopyLeafArea_col(:,:)=0.0_r8
   StemArea_col(:,:)=0.0_r8
-  PrecIntcptByCanG(:,:)=0.0_r8
+  PrecIntceptByCanopy_col(:,:)=0.0_r8
   PlantPopu_col(:,:)=0.0_r8
   DayLenthCurrent(:,:)=12.0_r8
-  SurfAlbedo_col(:,:)=SoilAlbedo(:,:)
+  SurfAlbedo_col(:,:)=SoilAlbedo_col(:,:)
   EcoHavstElmnt_col(:,:,:)=0.0_r8
   EnergyImpact4Erosion(:,:)=0.0_r8
   end subroutine InitAccumulators
@@ -841,11 +841,11 @@ module StartsMod
   integer :: L
 
   DO  L=0,NL(NY,NX)
-    DLYRI(1,L,NY,NX)=DH(NY,NX)    !east-west direction
-    DLYRI(2,L,NY,NX)=DV(NY,NX)    !north-south direction
+    DLYRI(1,L,NY,NX)=DH(NY,NX)        !east-west direction
+    DLYRI(2,L,NY,NX)=DV(NY,NX)        !north-south direction
     DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
     DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
-    AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
+    AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)  !grid horizontal area
   ENDDO
   end subroutine InitHGrid
 !------------------------------------------------------------------------------------------
@@ -902,7 +902,7 @@ module StartsMod
 !     DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
 !     VOLT=total volume
 !     VOLX=total micropore volume
-      IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
+      IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
@@ -917,7 +917,7 @@ module StartsMod
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
-      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       totRootLenDens_vr(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
@@ -1082,7 +1082,7 @@ module StartsMod
 
       SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
-      TKS(0,NY,NX)=ATKS(NY,NX)
+      TKS_vr(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
     ENDDO
