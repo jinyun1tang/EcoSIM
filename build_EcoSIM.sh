@@ -88,9 +88,6 @@ if [ "$sanitize" -eq 1 ]; then
     CONFIG_FLAGS="${CONFIG_FLAGS} -DADDRESS_SANITIZER=1"
 fi
 
-echo "ATS_ECOSIM: ${ATS_ECOSIM}"
-
-
 if [ -n $ATS_ECOSIM ]; then
     echo "Building ATS-EcoSIM"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=1" 
@@ -129,13 +126,6 @@ else
   fi
 fi
 
-
-#Shouldn't need this anymore
-#CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=$ATS_ECOSIM"
-
-echo "Config Flags: "
-echo "${CONFIG_FLAGS}"
-
 cmd_configure="${cmake_binary} \
   ${CONFIG_FLAGS}
   ${ecosim_source_dir}"
@@ -151,9 +141,6 @@ fi
 # Configure the EcoSIM build
 # Note: many of the options that used to be in the CMakeLists.txt file
 # have been moved here to remove redundancies
-
-#Do I need this?
-#ATS_ECOSIM=$ATS_ECOSIM
 
 echo "cmd_configure: $cmd_configure"
 echo "building in: $ecosim_build_dir"

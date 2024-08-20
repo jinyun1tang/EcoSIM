@@ -37,21 +37,6 @@ math(EXPR NUM_BUILD_THREADS "${NUMBER_OF_CORES} + 1")
 include(set_up_platform)
 include(set_up_compilers)
 
-message("Before checking for cmake compiler: ")
-message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
-message("CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
-message("CMAKE_Fortran_COMPILER: ${CMAKE_Fortran_COMPILER}")
-
-message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
-message("CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-message("CMAKE_Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
-
-message("Now the ENV variables: ")
-message("$ENV{CC}")
-message("$ENV{CXX}")
-message("$ENV{FC}")
-
-
 # Make sure compilers are set. This must be done before enabling languages.
 if (NOT CMAKE_C_COMPILER)
   if (NOT $ENV{CC} STREQUAL "")
@@ -174,16 +159,8 @@ else()
   message(STATUS "ATS_ECOSIM NOT set")
 endif()
 
-
-message(STATUS "ATS_ECOSIM: ${ATS_ECOSIM}")
-message(STATUS "ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
-message(STATUS "BGC: ${BGC}")
-message(STATUS "ECOSIM_BGC: ${ECOSIM_BGC}")
-message(STATUS "ECOSIM: ${ECOSIM}")
-
 if (ATS_ECOSIM)
-    message(STATUS "In if statement")
-    message(STATUS "CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+    message(STATUS "Compiling ATS:")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
     set(NETCDF_FFLAGS "-I${TPL_INSTALL_PREFIX}/include")
     set(NETCDF_FLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5")
@@ -197,8 +174,8 @@ if (ATS_ECOSIM)
     set(NETCDF_CLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdf")
     #Needed to share with ATS (probably an easier way to do this)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS}")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS}")
 
     #What were these even for? are they neccesary?
     include_directories("${TPL_INSTALL_PREFIX}/include")
@@ -240,15 +217,7 @@ else()
     add_subdirectory(3rd-partylibs)
 endif()
 
-message("After ATS-EcoSIM loop:")
-message(STATUS "ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
-message(STATUS "ECOSIM_TPLS: ${ECOSIM_TPLS}")
-
-#add_subdirectory(3rd-partylibs)
-
 if (NOT ECOSIM_HAVE_NETCDF)
-  message("not ecosim have netcdf")
-  message(("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}"))
   list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
   list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
 endif()
