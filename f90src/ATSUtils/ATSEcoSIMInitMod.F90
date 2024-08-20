@@ -63,7 +63,7 @@ implicit none
   do NY=1,NYS
     TXCO2(NY,NX)=0.0_r8
     DORGE(NY,NX)=0.0_r8
-    WQRH(NY,NX)=0.0_r8
+    QRunSurf_col(NY,NX)=0.0_r8
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
     AREA(3,0,NY,NX)=a_AREA3(0,NY)
@@ -77,7 +77,7 @@ implicit none
     !Z2OE(NY,NX)=atm_n2o
     !ZNH3E(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
-    TairK(NY,NX)=tairc(NY) !it's already in K??
+    TairK_col(NY,NX)=tairc(NY) !it's already in K??
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
