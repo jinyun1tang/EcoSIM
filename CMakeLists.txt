@@ -174,8 +174,8 @@ if (ATS_ECOSIM)
     set(NETCDF_CLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdf")
     #Needed to share with ATS (probably an easier way to do this)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS}")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC")
 
     #What were these even for? are they neccesary?
     include_directories("${TPL_INSTALL_PREFIX}/include")
