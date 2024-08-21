@@ -348,6 +348,7 @@ def write_plant_traits(pftnames,pft_path,gfname):
 
     for j in range(npfts):
         pfile=pft_path+pft_names[j]
+#        print('read file %s'%pfile)
         with open(pfile,"r") as pftfile:
             line=pftfile.readline()
 
@@ -817,6 +818,7 @@ def write_plant_traits(pftnames,pft_path,gfname):
 
 pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/spruce_PQ_3PFT_s1/pfts/'
 pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/Blodget/pfts/'
+pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/pfts/'
 pft_names=os.listdir(pft_path)
 
 write_plant_traits(pft_names,pft_path,'blodget')

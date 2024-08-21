@@ -145,7 +145,17 @@ config_spruces1_dict={
 'ntopu':'1'
 }    
 
-case=10
+config_sorghum_dict={
+'case':'Sorghum',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/',
+'pftf':'mexxxxp',
+'year':'2002-2007',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Sorghum/',    
+'ntopu':'1'
+}    
+
+
+case=11
 
 if case==1:
     config_dict=config_Fen_StordIsland_dict
@@ -167,6 +177,8 @@ elif case==9:
     config_dict=config_Morrow4_dict
 elif case==10:
     config_dict=config_spruces1_dict
+elif case==11:
+    config_dict=config_sorghum_dict
     
 write_pft_mgmt(config_dict)
 
@@ -388,6 +400,21 @@ config_spruces1_dict={
 'NVS':'1'
 }
 
+config_sorghum_dict={
+'case':'Sorghum',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/',
+'sitef':'mesite',
+'topf':'metopo',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Sorghum/',    
+'ntopu':'1',
+'ncol':'1',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
+}
+
 from SiteTopoWriter import write_site_topo_data
 
 if case==1:
@@ -410,4 +437,6 @@ elif case==9:
     config_dict=config_Morrow4_dict    
 elif case==10:
     config_dict=config_spruces1_dict
+elif case==11:
+    config_dict=config_sorghum_dict
 write_site_topo_data(config_dict)

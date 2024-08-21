@@ -56,7 +56,21 @@ config_morrow4_dict={
 'NV2':[1],
 'ntopu':'1'    
 }
-config_dict=config_morrow4_dict
+
+config_sorghum_dict={
+'case':'Sorghum',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/',
+'mefile':'mexxxxm',
+'years':'2002-2007',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Sorghum/',    
+'NH1':[1],
+'NV1':[1],
+'NH2':[1],
+'NV2':[1],
+'ntopu':'1'    
+}
+
+config_dict=config_sorghum_dict
 
 
 def read_fert_file(ifile,mfname,nc_fid):
