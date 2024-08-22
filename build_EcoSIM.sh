@@ -152,5 +152,8 @@ ${cmd_configure}
 
 #This does the build
 make -j ${parallel_jobs}
+
+make test
+
 #Does the install
 make install
