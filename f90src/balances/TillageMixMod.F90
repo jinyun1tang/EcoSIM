@@ -80,7 +80,8 @@ module TillageMixMod
 !
   !DCORP=soil mixing fraction with tillage
   !XCORP=factor for surface litter incorporation and soil mixing
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0_r8)THEN
+  
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. XCORP(NY,NX).LT.1.0 .AND. DCORP(I,NY,NX).GT.0.0_r8)THEN
 !
 !     EXTENT OF MIXING
 !

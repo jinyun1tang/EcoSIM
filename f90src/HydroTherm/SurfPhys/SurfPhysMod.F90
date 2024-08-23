@@ -574,7 +574,7 @@ contains
 
   !evaporation, no more than what is available, g H2O
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol(NY,NX)*dts_wat))
-  !latent heat
+  !latent heat > 0 into soil/ground
   LatentHeatEvapAir2Grnd=VapXAir2TopLay*EvapLHTC
   IF(VapXAir2TopLay.LT.0.0_r8)THEN
     !evaporation (<0 into atmosphere)
@@ -677,15 +677,19 @@ contains
   real(r8) :: NetWatFlx2SoiMicP
   integer  :: L
 ! begin_execution
-  VapXAir2TopLay=0._r8;CumWatXFlx2SoiMicP=0._r8
-  CumWatFLow2LitR=0._r8;CumHeatFlow2LitR=0._r8
-  CumWatFlx2SoiMicP=0._r8;CumWatFlx2SoiMacP=0._r8
-  HeatSensEvap=0._r8;HeatNetFlx2Snow=0._r8
-  LatentHeatAir2Sno=0._r8
-  HeatSensAir2Snow=0._r8
-  Radnet2Snow=0._r8
-  cumHeatFlowSno2Soi=0._r8
-  HeatFluxAir2Soi1=0._r8
+  VapXAir2TopLay     = 0._r8
+  CumWatXFlx2SoiMicP = 0._r8
+  CumWatFLow2LitR    = 0._r8
+  CumHeatFlow2LitR   = 0._r8
+  CumWatFlx2SoiMicP  = 0._r8
+  CumWatFlx2SoiMacP  = 0._r8
+  HeatSensEvap       = 0._r8
+  HeatNetFlx2Snow    = 0._r8
+  LatentHeatAir2Sno  = 0._r8
+  HeatSensAir2Snow   = 0._r8
+  Radnet2Snow        = 0._r8
+  cumHeatFlowSno2Soi = 0._r8
+  HeatFluxAir2Soi1   = 0._r8
 
   !solve if there is significant snow layer 
   IF(VLSnowHeatCapM_snvr(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
@@ -748,18 +752,18 @@ contains
   integer, intent(in) :: NY,NX
   real(r8),intent(out):: NetWatFlx2SoiMicP
 ! begin_execution
-  Radnet2LitGrnd=0.0_r8           !net radiation into soil
-  LatentHeatEvapAir2Grnd=0.0_r8   !latent heat flux from air and topsoil
-  HeatSensVapAir2Soi=0.0_r8       !convective heat flux from air and topsoil
-  HeatSensAir2Grnd=0.0_r8         !sensible heat flux from air to topsoil
+  Radnet2LitGrnd         = 0.0_r8           !net radiation into soil
+  LatentHeatEvapAir2Grnd = 0.0_r8   !latent heat flux from air and topsoil
+  HeatSensVapAir2Soi     = 0.0_r8       !convective heat flux from air and topsoil
+  HeatSensAir2Grnd       = 0.0_r8         !sensible heat flux from air to topsoil
 
-  WatNetFlo2TopSoiMicP=0.0_r8     !total water flux from air into top soil
-  NetWatFlx2SoiMicP=0.0_r8        !total water flux from air into soil micropores
-  NetWatFlx2SoiMacP=0.0_r8        !total water flux from air into macropores
-  cumHeatSensAir2Soil=0.0_r8      !total water associated heat flux from air into soil
-  NetWatFlx2LitR=0.0_r8            !total water flux from air to litter
-  CumHeatSensAir2LitR=0.0_r8       !total water associated heat flux from air to litter
-  VapXAir2LitR(NY,NX)=0.0_r8  !evaporative flux from air into litter
+  WatNetFlo2TopSoiMicP = 0.0_r8     !total water flux from air into top soil
+  NetWatFlx2SoiMicP    = 0.0_r8        !total water flux from air into soil micropores
+  NetWatFlx2SoiMacP    = 0.0_r8        !total water flux from air into macropores
+  cumHeatSensAir2Soil  = 0.0_r8      !total water associated heat flux from air into soil
+  NetWatFlx2LitR       = 0.0_r8            !total water flux from air to litter
+  CumHeatSensAir2LitR  = 0.0_r8       !total water associated heat flux from air to litter
+  VapXAir2LitR(NY,NX)  = 0.0_r8  !evaporative flux from air into litter
   end subroutine SnowCoveredTopSoilFlux  
 !------------------------------------------------------------------------------------------
 
@@ -1183,8 +1187,8 @@ contains
   HeatSensVapAir2Surf_col(NY,NX)=HeatSensVapAir2Surf_col(NY,NX)+HeatSensVapAir2Soi+HeatSensEvap
   !HeatNet2Surf_col > 0. into grnd
   HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+Radnet2LitGrnd+Radnet2Snow &
-    +HeatSensAir2Grnd+HeatSensAir2Snow+LatentHeatEvapAir2Grnd &
-    +LatentHeatAir2Sno+HeatSensVapAir2Soi+HeatSensEvap
+    +HeatSensAir2Grnd+HeatSensAir2Snow+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno &
+    +HeatSensVapAir2Soi+HeatSensEvap
 
   !EVAPG=negative evaporation from ground/top soil layer
   !EVAPR=evaporation from litter layer   

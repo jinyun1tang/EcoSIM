@@ -387,7 +387,7 @@ implicit none
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft,     &
     SeedDepth_pft             => plt_morph%SeedDepth_pft,            &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft               &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           &
   )
 !     IDTHR=PFT root living flag: 0=alive,1=dead
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
@@ -529,7 +529,7 @@ implicit none
 !     NIXBotRootLayer_rpft=deepest root layer
 !     RTDP1=primary root depth from soil surface
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!
+!   
     D8795: DO NR=1,NumRootAxes_pft(NZ)
       NIXBotRootLayer_rpft(NR,NZ)=NGTopRootLayer_pft(NZ)
       D8790: DO N=1,MY(NZ)

@@ -171,12 +171,14 @@ implicit none
   real(r8),target,allocatable ::  O2_rain_conc(:,:)                          !precipitation  O2 concentration, [g m-3]
   real(r8),target,allocatable ::  N2_rain_conc(:,:)                          !precipitation  N2 concentration, [g m-3]
   real(r8),target,allocatable ::  N2O_rain_conc(:,:)                          !precipitation  N2O concentration, [g m-3]
+  real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
   contains
 !----------------------------------------------------------------------
 
   subroutine InitClimForcData
   use TracerIDMod
   implicit none
+  allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
   allocate(TDTPN(12,JY,JX));    TDTPN=0._r8

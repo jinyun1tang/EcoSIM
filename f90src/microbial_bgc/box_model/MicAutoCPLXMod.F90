@@ -171,11 +171,11 @@ module MicAutoCPLXMod
   if (N.eq.mid_AmmoniaOxidBacter .or. N.eq.mid_NitriteOxidBacter .or. N.eq.mid_AerobicMethanotrofBacter)then
     call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.mid_H2GenoMethanogArchea)then
-    RespGrossAutor(NGL)=RGOMP
-    RCO2ProdAutor(NGL)=0.0_r8
-    RCH4ProdAutor(NGL)=RespGrossAutor(NGL)
-    RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)
-    RH2UptkAutor=0.667_r8*RespGrossAutor(NGL)
+    RespGrossAutor(NGL)    = RGOMP
+    RCO2ProdAutor(NGL)     = 0.0_r8
+    RCH4ProdAutor(NGL)     = RespGrossAutor(NGL)
+    RO2Uptk4RespAutor(NGL) = RO2Dmnd4RespAutor(NGL)
+    RH2UptkAutor           = 0.667_r8*RespGrossAutor(NGL)
   ENDIF
 !
 !     AUTOTROPHIC DENITRIFICATION
@@ -184,10 +184,10 @@ module MicAutoCPLXMod
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
-    RNO3UptkAutor(NGL)=0.0_r8
-    RNO2ReduxAutorSoil(NGL)=0.0_r8
-    RNO2ReduxAutorBand(NGL)=0.0_r8
-    RNOxReduxRespAutorLim(NGL)=0.0_r8
+    RNO3UptkAutor(NGL)         = 0.0_r8
+    RNO2ReduxAutorSoil(NGL)    = 0.0_r8
+    RNO2ReduxAutorBand(NGL)    = 0.0_r8
+    RNOxReduxRespAutorLim(NGL) = 0.0_r8
   ENDIF
 !
 !     BIOMASS DECOMPOSITION AND MINERALIZATION

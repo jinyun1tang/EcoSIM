@@ -94,11 +94,6 @@ module PlantBranchMod
   II=I;JJ=J
   LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
-!  if(NZ==1)then
-!  WRITE(113,*)I+J/24.,NB,iPlantBranchState_brch(NB,NZ).EQ.iLive
-!  elseif(NZ==2)then
-!  WRITE(114,*)I+J/24.,NB,iPlantBranchState_brch(NB,NZ).EQ.iLive
-!  endif
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
@@ -830,7 +825,7 @@ module PlantBranchMod
 !
   ELSE
     CH2O=0._r8
-    call ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
+    call ComputRAutoB4Emergence(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
       WaterStress4Groth,CanTurgPSIFun4Expans,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
       RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   ENDIF
@@ -3106,11 +3101,11 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputRAutoB4Emergence(I,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
+  subroutine ComputRAutoB4Emergence(I,J,NB,NZ,TFN6_vr,DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,&
     CNLFX,CPLFX,ShootStructN,WaterStress4Groth,CanTurgPSIFun4Expans,CanopyNonstElm4Gros,CNPG,RCO2NonstC_brch,&
     RCO2Maint_brch,RMxess_brch,NonstC4Groth_brch,RCO2NonstC4Nassim_brch)
   implicit none
-  integer, intent(in) :: I,NB,NZ
+  integer, intent(in) :: I,J,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN,WaterStress4Groth
@@ -3178,7 +3173,7 @@ module PlantBranchMod
 !
   RCO2CM=AZMAX1(VMXC*CanopyNonstElms_brch(ielmc,NB,NZ) &
     *fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ))*WaterStress4Groth*CNPG*C4PhotosynDowreg_brch(NB,NZ)
-  RCO2NonstC_brch=RCO2CM*RAutoRootO2Limter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
+  RCO2NonstC_brch=RCO2CM*RAutoRootO2Limter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)  
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
 !

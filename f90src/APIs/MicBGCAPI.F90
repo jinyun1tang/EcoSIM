@@ -381,8 +381,8 @@ implicit none
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo
-  NetNH4Mineralize_col(NY,NX)           = NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
-  NetPO4Mineralize_col(NY,NX)           = NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
+  NetNH4Mineralize_CumYr_col(NY,NX)     = NetNH4Mineralize_CumYr_col(NY,NX)+micflx%NetNH4Mineralize
+  NetPO4Mineralize_CumYr_col(NY,NX)     = NetPO4Mineralize_CumYr_col(NY,NX)+micflx%NetPO4Mineralize
   DO idom=idom_beg,idom_end
     REcoDOMProd_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMProd(idom,1:jcplx)    
   ENDDO

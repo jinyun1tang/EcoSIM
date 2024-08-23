@@ -758,7 +758,8 @@ contains
   real(r8):: Raa,CdSnoEvap,CdSnoHSens
   real(r8) :: VPSno0,EVAPW2,EVAPX2,HeatSensAir2Sno2
   real(r8) :: LatentHeatAir2Sno2,EvapSublimation2,MaxVapXAir2Sno
-  real(r8) :: HeatNetFlx2Sno1,HeatNetFlx2Sno2,HeatSensAir2SnoByEvap2
+  real(r8) :: HeatNetFlx2Sno1,HeatNetFlx2Sno2
+  real(r8) :: HeatAdvAir2SnoByEvap2  !convective heat flux
   real(r8) :: NetHeatAir2Snow,SnofallRain
   real(r8) :: HeatSnofall2Snow,SnofallDry,Snofallice
   real(r8) :: IceFall,SnoFall,Rainfall
@@ -795,7 +796,7 @@ contains
   !     XNPS=1/NPS
   !     LatentHeatAir2Sno2=latent heat flux
   !     VAP,VAPS=latent heat of evaporation,sublimation
-  !     HeatSensAir2SnoByEvap2=convective heat of evaporation flux
+  !     HeatAdvAir2SnoByEvap2=convective heat of evaporation flux
   !
   CdSnoEvap=PAREW(NY,NX)/(RAa+RZ)
   CdSnoHSens=PARSW(NY,NX)/RAa    
@@ -814,10 +815,10 @@ contains
 
   IF(MaxVapXAir2Sno.LT.0.0_r8)THEN
     !snow is losing water/heat
-    HeatSensAir2SnoByEvap2=(EVAPW2*cpw+EvapSublimation2*cps)*TKSnow1_snvr(1,NY,NX)
+    HeatAdvAir2SnoByEvap2=(EVAPW2*cpw+EvapSublimation2*cps)*TKSnow1_snvr(1,NY,NX)
   ELSE
     !snow is gaining water/heat, condensation/deposition
-    HeatSensAir2SnoByEvap2=(EVAPW2*cpw+EvapSublimation2*cps)*TKQ(NY,NX)
+    HeatAdvAir2SnoByEvap2=(EVAPW2*cpw+EvapSublimation2*cps)*TKQ(NY,NX)
   ENDIF
 !
 !     SOLVE FOR SNOWPACK SURFACE TEMPERATURE AT WHICH ENERGY
@@ -825,20 +826,20 @@ contains
 !     STORAGE HEAT FLUXES AND EVAPORATION
 !
 !     HeatSensAir2Sno2,LatentHeatAir2Sno2,RadNet2Sno2=sensible,latent heat fluxes, net radiation
-!     HeatSensAir2SnoByEvap2=convective heat flux from LatentHeatAir2Sno2
+!     HeatAdvAir2SnoByEvap2=convective heat flux from LatentHeatAir2Sno2
 !     HeatNetFlx2Sno1=storage heat flux
 !     SnoFall,Rainfall,IceFall=snow,water,ice input to snowpack
 !     HeatSnofall2Snow=convective heat from snow,water,ice input to snowpack
 !  
-  HeatSensAir2Sno2=CdSnoHSens*(TKQ(NY,NX)-TKSnow1_snvr(1,NY,NX))
+  HeatSensAir2Sno2 = CdSnoHSens*(TKQ(NY,NX)-TKSnow1_snvr(1,NY,NX))
   !occasionally, RadNet2Sno2 and HeatSensAir2Sno2 go to infinity
-  HeatNetFlx2Sno1=RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2   
-  HeatNetFlx2Sno2=HeatNetFlx2Sno1+HeatSensAir2SnoByEvap2
-  Radnet2Snow=Radnet2Snow+RadNet2Sno2
-  LatentHeatAir2Sno=LatentHeatAir2Sno+LatentHeatAir2Sno2
-  HeatSensEvap=HeatSensEvap+HeatSensAir2SnoByEvap2
-  HeatSensAir2Snow=HeatSensAir2Snow+HeatSensAir2Sno2
-  HeatNetFlx2Snow=HeatNetFlx2Snow+HeatNetFlx2Sno2
+  HeatNetFlx2Sno1   = RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2
+  HeatNetFlx2Sno2   = HeatNetFlx2Sno1+HeatAdvAir2SnoByEvap2
+  Radnet2Snow       = Radnet2Snow+RadNet2Sno2
+  LatentHeatAir2Sno = LatentHeatAir2Sno+LatentHeatAir2Sno2
+  HeatSensEvap      = HeatSensEvap+HeatAdvAir2SnoByEvap2
+  HeatSensAir2Snow  = HeatSensAir2Snow+HeatSensAir2Sno2
+  HeatNetFlx2Snow   = HeatNetFlx2Snow+HeatNetFlx2Sno2
 
   EVAPS(NY,NX)=EVAPS(NY,NX)+EvapSublimation2
   EVAPW(NY,NX)=EVAPW(NY,NX)+EVAPW2
@@ -869,10 +870,10 @@ contains
 !     WRITE(*,7759)'EVAP',I,J,M,MM,SnofallDry
 !    2,SnoFall,EvapSublimation2,SnofallRain,Rainfall
 !    3,FracSurfAsSnow(NY,NX),Snofallice,IceFall,RadNet2Sno2,LatentHeatAir2Sno2
-!    4,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,RA,MaxVapXAir2Sno,EVAPX2,VPQ_col(NY,NX),VPSno0
+!    4,HeatSensAir2Sno2,HeatAdvAir2SnoByEvap2,RA,MaxVapXAir2Sno,EVAPX2,VPQ_col(NY,NX),VPSno0
 !    5,VLWatSnow0M_snvr(1,NY,NX),VLDrySnoWE0M_snvr(1,NY,NX),VLIceSnow0M_snvr(1,NY,NX)
 !    6,HeatX2SnoLay_snvr(1,NY,NX),NetHeatAir2Snow,HWFLQ02,HeatNetFlx2Sno2,RadNet2Sno2,LatentHeatAir2Sno2
-!    7,HeatSensAir2Sno2,HeatSensAir2SnoByEvap2,TKSnow1_snvr(1,NY,NX),TKQ(NY,NX)
+!    7,HeatSensAir2Sno2,HeatAdvAir2SnoByEvap2,TKSnow1_snvr(1,NY,NX),TKQ(NY,NX)
 !    8,CdSnoEvap,RA,RZ,EvapSublimation2,EVAPW2,MaxVapXAir2Sno
 !7759  FORMAT(A8,4I4,40E14.6)
 !     ENDIF

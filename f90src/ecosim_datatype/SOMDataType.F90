@@ -31,6 +31,7 @@ module SOMDataType
   real(r8),target,allocatable :: tMicBiome_col(:,:,:)                         !total micriobial C, [g d-2]
   real(r8),target,allocatable :: tSoilOrgM_col(:,:,:)                  !total soil organic matter, include everything organic (exclude live roots) [g d-2]
   real(r8),target,allocatable :: tLitrOM_col(:,:,:)                        !total litter C, [g d-2]
+  real(r8),target,allocatable :: litrOM_vr(:,:,:,:)
   real(r8),target,allocatable :: tHumOM_col(:,:,:)                        !total humus C, [g d-2]
   real(r8),target,allocatable :: EPOC(:,:,:)                       !partitioning coefficient between POC and litter, []
   real(r8),target,allocatable :: EHUM(:,:,:)                       !partitioning coefficient between humus and microbial residue, []
@@ -79,6 +80,7 @@ module SOMDataType
   allocate(tMicBiome_col(NumPlantChemElms,JY,JX));        tMicBiome_col=0._r8
   allocate(tSoilOrgM_col(NumPlantChemElms,JY,JX)); tSoilOrgM_col=0._r8
   allocate(tLitrOM_col(NumPlantChemElms,JY,JX));       tLitrOM_col=0._r8
+  allocate(litrOM_vr(NumPlantChemElms,0:JZ,JY,JX)); litrOM_vr=0._r8
   allocate(tHumOM_col(NumPlantChemElms,JY,JX));       tHumOM_col=0._r8
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
   allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
@@ -97,6 +99,7 @@ module SOMDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(litrOM_vr)
   call destroy(RSC)
   call destroy(RSN)
   call destroy(RSP)

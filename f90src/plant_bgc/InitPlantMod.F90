@@ -927,11 +927,11 @@ module InitPlantMod
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
   NumRootAxes_pft(NZ)=0
-  plt_rbgc%RootNH4Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootNO3Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootH2PO4Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootHPO4Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootN2Fix_pft(NZ)=0._r8
+  plt_rbgc%RootNH4Uptake_pft(NZ)   = 0._r8
+  plt_rbgc%RootNO3Uptake_pft(NZ)   = 0._r8
+  plt_rbgc%RootH2PO4Uptake_pft(NZ) = 0._r8
+  plt_rbgc%RootHPO4Uptake_pft(NZ)  = 0._r8
+  plt_rbgc%RootN2Fix_pft(NZ)       = 0._r8
   DO NR=1,MaxNumRootAxes
     DO N=1,pltpar%jroots
       plt_morph%Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)

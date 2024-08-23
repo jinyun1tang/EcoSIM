@@ -20,8 +20,8 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  Eco_NPP_CumYr_col(:,:)                          !ecosystem NPP, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_HR_CumYr_col(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_col(:,:,:)                      !ecosystem harvest , [g d-2]
-  real(r8),target,allocatable ::  NetNH4Mineralize_col(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),target,allocatable ::  NetPO4Mineralize_col(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  NetNH4Mineralize_CumYr_col(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  NetPO4Mineralize_CumYr_col(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
   real(r8),target,allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
   real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                         !total net CO2 fixation
   real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                       !total LitrFall element, [g d-2 h-1]
@@ -46,8 +46,8 @@ contains
   allocate(Eco_NPP_CumYr_col(JY,JX));        Eco_NPP_CumYr_col=0._r8
   allocate(Eco_HR_CumYr_col(JY,JX));        Eco_HR_CumYr_col=0._r8
   allocate(EcoHavstElmnt_CumYr_col(NumPlantChemElms,JY,JX));      EcoHavstElmnt_CumYr_col=0._r8
-  allocate(NetNH4Mineralize_col(JY,JX));      NetNH4Mineralize_col=0._r8
-  allocate(NetPO4Mineralize_col(JY,JX));      NetPO4Mineralize_col=0._r8
+  allocate(NetNH4Mineralize_CumYr_col(JY,JX));      NetNH4Mineralize_CumYr_col=0._r8
+  allocate(NetPO4Mineralize_CumYr_col(JY,JX));      NetPO4Mineralize_CumYr_col=0._r8
   allocate(GPP(JY,JX));         GPP=0._r8
   allocate(Canopy_NEE_col(JY,JX));       Canopy_NEE_col=0._r8
   allocate(LitrFallStrutElms_col(NumPlantChemElms,JY,JX));       LitrFallStrutElms_col=0._r8
@@ -72,8 +72,8 @@ contains
   call destroy(Eco_NPP_CumYr_col)
   call destroy(Eco_HR_CumYr_col)
   call destroy(EcoHavstElmnt_CumYr_col)
-  call destroy(NetNH4Mineralize_col)
-  call destroy(NetPO4Mineralize_col)
+  call destroy(NetNH4Mineralize_CumYr_col)
+  call destroy(NetPO4Mineralize_CumYr_col)
   call destroy(GPP)
   call destroy(Canopy_NEE_col)
   call destroy(LitrFallStrutElms_col)

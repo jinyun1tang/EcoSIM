@@ -356,7 +356,7 @@ module BoundaryTranspMod
         DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
       enddo
     enddo
-
+   !exclude NH3
     DO idg=idg_beg,idg_end-2
       R3PoreSoHFlx_3D(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(idg,M3,M2,M1))
     ENDDO

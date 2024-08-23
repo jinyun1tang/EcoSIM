@@ -799,10 +799,10 @@ module MicBGCMod
 
       call GetMicrobDensFactorAutor(N,micfor, micstt, ORGCL,SPOMK,RMOMK)
       DO NGL=JGniA(N),JGnfA(N)
-        WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
-        OXKX=OXKA
-        GrowthEnvScalAutor(NGL)=TSensGrowth*WatStressMicb
-        TSensMaintRAutor(NGL)=TSensMaintR
+        WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
+        OXKX                    = OXKA
+        GrowthEnvScalAutor(NGL) = TSensGrowth*WatStressMicb
+        TSensMaintRAutor(NGL)   = TSensMaintR
         IF(OMActAutor(NGL).GT.0.0_r8)THEN
           call ActiveMicrobAutotrophs(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
             OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
@@ -1903,6 +1903,7 @@ module MicBGCMod
           mBiomeHeter(ielmn,MID3,K)=mBiomeHeter(ielmn,MID3,K)+DOMuptk4GrothHeter(ielmn,NGL,K) &
             +RNH4TransfSoilHeter(NGL,K)+RNH4TransfBandHeter(NGL,K)+RNO3TransfSoilHeter(NGL,K) &
             +RNO3TransfBandHeter(NGL,K)+RN2FixHeter(NGL,K)
+          !fix negative microbial N  by immobilization
           if(mBiomeHeter(ielmn,MID3,K)<0._r8)then
             RNH4TransfSoilHeter(NGL,K)=RNH4TransfSoilHeter(NGL,K)-mBiomeHeter(ielmn,MID3,K)
             NetNH4Mineralize=NetNH4Mineralize-mBiomeHeter(ielmn,MID3,K)
@@ -1911,8 +1912,9 @@ module MicBGCMod
           mBiomeHeter(ielmp,MID3,K)=mBiomeHeter(ielmp,MID3,K)+DOMuptk4GrothHeter(ielmp,NGL,K) &
             +RH2PO4TransfSoilHeter(NGL,K)+RH2PO4TransfBandHeter(NGL,K)+RH1PO4TransfSoilHeter(NGL,K) &
             +RH1PO4TransfBandHeter(NGL,K)
+          !fix negative P biomass by immobilization
           if(mBiomeHeter(ielmp,MID3,K)<0._r8)then
-            RH2PO4TransfSoilHeter(NGL,K)=RH2PO4TransfSoilHeter(NGL,K)-mBiomeHeter(ielmp,MID3,K)
+            RH2PO4TransfSoilHeter(NGL,K)=RH2PO4TransfSoilHeter(NGL,K)-mBiomeHeter(ielmp,MID3,K)            
             NetPO4Mineralize=NetPO4Mineralize-mBiomeHeter(ielmp,MID3,K)
             mBiomeHeter(ielmp,MID3,K)=0._r8
           endif  
@@ -3378,21 +3380,23 @@ module MicBGCMod
   FNHBS=VLNHB
   MID3=micpar%get_micb_id(3,NGL)
   RINHP=(mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-mBiomeHeter(ielmn,MID3,K))
+  !immobilization
   IF(RINHP.GT.0.0_r8)THEN
-    CNH4X=AZMAX1(CNH4S-Z4MN)
-    CNH4Y=AZMAX1(CNH4B-Z4MN)
-    RINHX=AMIN1(RINHP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*Z4MX)
-    RNH4DmndSoilHeter(NGL,K)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
-    RNH4DmndBandHeter(NGL,K)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
-    ZNH4M=Z4MN*VOLWU*FNH4S
-    ZNHBM=Z4MN*VOLWU*FNHBS
-    RNH4TransfSoilHeter(NGL,K)=AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4DmndSoilHeter(NGL,K))
-    RNH4TransfBandHeter(NGL,K)=AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4DmndBandHeter(NGL,K))
+    CNH4X                      = AZMAX1(CNH4S-Z4MN)
+    CNH4Y                      = AZMAX1(CNH4B-Z4MN)
+    RINHX                      = AMIN1(RINHP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*Z4MX)
+    RNH4DmndSoilHeter(NGL,K)   = FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
+    RNH4DmndBandHeter(NGL,K)   = FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
+    ZNH4M                      = Z4MN*VOLWU*FNH4S
+    ZNHBM                      = Z4MN*VOLWU*FNHBS
+    RNH4TransfSoilHeter(NGL,K) = AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4DmndSoilHeter(NGL,K))
+    RNH4TransfBandHeter(NGL,K) = AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4DmndBandHeter(NGL,K))
+    !mineralization  
   ELSE
-    RNH4DmndSoilHeter(NGL,K)=0.0_r8
-    RNH4DmndBandHeter(NGL,K)=0.0_r8
-    RNH4TransfSoilHeter(NGL,K)=RINHP*FNH4S
-    RNH4TransfBandHeter(NGL,K)=RINHP*FNHBS
+    RNH4DmndSoilHeter(NGL,K)   = 0.0_r8
+    RNH4DmndBandHeter(NGL,K)   = 0.0_r8
+    RNH4TransfSoilHeter(NGL,K) = RINHP*FNH4S
+    RNH4TransfBandHeter(NGL,K) = RINHP*FNHBS
   ENDIF
   NetNH4Mineralize=NetNH4Mineralize+(RNH4TransfSoilHeter(NGL,K)+RNH4TransfBandHeter(NGL,K))
 !
@@ -3417,21 +3421,23 @@ module MicBGCMod
   FNO3S=VLNO3
   FNO3B=VLNOB
   RINOP=AZMAX1(RINHP-RNH4TransfSoilHeter(NGL,K)-RNH4TransfBandHeter(NGL,K))
+  !immobilization
   IF(RINOP.GT.0.0_r8)THEN
-    CNO3X=AZMAX1(CNO3S-ZOMN)
-    CNO3Y=AZMAX1(CNO3B-ZOMN)
-    RINOX=AMIN1(RINOP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*ZOMX)
-    RNO3DmndSoilHeter(NGL,K)=FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
-    RNO3DmndBandHeter(NGL,K)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
-    ZNO3M=ZOMN*VOLWU*FNO3S
-    ZNOBM=ZOMN*VOLWU*FNO3B
-    RNO3TransfSoilHeter(NGL,K)=AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)),RNO3DmndSoilHeter(NGL,K))
-    RNO3TransfBandHeter(NGL,K)=AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)),RNO3DmndBandHeter(NGL,K))
+    CNO3X                      = AZMAX1(CNO3S-ZOMN)
+    CNO3Y                      = AZMAX1(CNO3B-ZOMN)
+    RINOX                      = AMIN1(RINOP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*ZOMX)
+    RNO3DmndSoilHeter(NGL,K)   = FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
+    RNO3DmndBandHeter(NGL,K)   = FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
+    ZNO3M                      = ZOMN*VOLWU*FNO3S
+    ZNOBM                      = ZOMN*VOLWU*FNO3B
+    RNO3TransfSoilHeter(NGL,K) = AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)),RNO3DmndSoilHeter(NGL,K))
+    RNO3TransfBandHeter(NGL,K) = AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)),RNO3DmndBandHeter(NGL,K))
+    !mineralization, 
   ELSE
-    RNO3DmndSoilHeter(NGL,K)=0.0_r8
-    RNO3DmndBandHeter(NGL,K)=0.0_r8
-    RNO3TransfSoilHeter(NGL,K)=RINOP*FNO3S
-    RNO3TransfBandHeter(NGL,K)=RINOP*FNO3B
+    RNO3DmndSoilHeter(NGL,K)   = 0.0_r8
+    RNO3DmndBandHeter(NGL,K)   = 0.0_r8
+    RNO3TransfSoilHeter(NGL,K) = 0.0_r8
+    RNO3TransfBandHeter(NGL,K) = 0.0_r8
   ENDIF
   NetNH4Mineralize=NetNH4Mineralize+(RNO3TransfSoilHeter(NGL,K)+RNO3TransfBandHeter(NGL,K))
 !
@@ -3459,21 +3465,23 @@ module MicBGCMod
   FH2PB=VLPOB
   MID3=micpar%get_micb_id(3,NGL)
   RIPOP=(mBiomeHeter(ielmc,MID3,K)*rPCOMC(3,NGL,K)-mBiomeHeter(ielmp,MID3,K))
+  !immobilization
   IF(RIPOP.GT.0.0_r8)THEN
-    CH2PX=AZMAX1(CH2P4-HPMN)
-    CH2PY=AZMAX1(CH2P4B-HPMN)
-    RIPOX=AMIN1(RIPOP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*HPMX)
-    RH2PO4DmndSoilHeter(NGL,K)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
-    RH2PO4DmndBandHeter(NGL,K)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
-    H2POM=HPMN*VLWatMicP*FH2PS
-    H2PBM=HPMN*VLWatMicP*FH2PB
-    RH2PO4TransfSoilHeter(NGL,K)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RH2PO4DmndSoilHeter(NGL,K))
-    RH2PO4TransfBandHeter(NGL,K)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RH2PO4DmndBandHeter(NGL,K))
+    CH2PX                        = AZMAX1(CH2P4-HPMN)
+    CH2PY                        = AZMAX1(CH2P4B-HPMN)
+    RIPOX                        = AMIN1(RIPOP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*HPMX)
+    RH2PO4DmndSoilHeter(NGL,K)   = FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
+    RH2PO4DmndBandHeter(NGL,K)   = FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
+    H2POM                        = HPMN*VLWatMicP*FH2PS
+    H2PBM                        = HPMN*VLWatMicP*FH2PB
+    RH2PO4TransfSoilHeter(NGL,K) = AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RH2PO4DmndSoilHeter(NGL,K))
+    RH2PO4TransfBandHeter(NGL,K) = AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RH2PO4DmndBandHeter(NGL,K))
+  !mineralization  
   ELSE
-    RH2PO4DmndSoilHeter(NGL,K)=0.0_r8
-    RH2PO4DmndBandHeter(NGL,K)=0.0_r8
-    RH2PO4TransfSoilHeter(NGL,K)=RIPOP*FH2PS
-    RH2PO4TransfBandHeter(NGL,K)=RIPOP*FH2PB
+    RH2PO4DmndSoilHeter(NGL,K)   = 0.0_r8
+    RH2PO4DmndBandHeter(NGL,K)   = 0.0_r8
+    RH2PO4TransfSoilHeter(NGL,K) = RIPOP*FH2PS
+    RH2PO4TransfBandHeter(NGL,K) = RIPOP*FH2PB
   ENDIF
   NetPO4Mineralize=NetPO4Mineralize+(RH2PO4TransfSoilHeter(NGL,K)+RH2PO4TransfBandHeter(NGL,K))
 !
@@ -3497,7 +3505,9 @@ module MicBGCMod
 !
   FH1PS=VLPO4
   FH1PB=VLPOB
+! why 0.1 here?  
   RIP1P=0.1_r8*AZMAX1(RIPOP-RH2PO4TransfSoilHeter(NGL,K)-RH2PO4TransfBandHeter(NGL,K))
+  !immobilization
   IF(RIP1P.GT.0.0_r8)THEN
     CH1PX=AZMAX1(CH1P4-HPMN)
     CH1PY=AZMAX1(CH1P4B-HPMN)
@@ -3508,11 +3518,12 @@ module MicBGCMod
     H1PBM=HPMN*VLWatMicP*FH1PB
     RH1PO4TransfSoilHeter(NGL,K)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)),RH1PO4DmndSoilHeter(NGL,K))
     RH1PO4TransfBandHeter(NGL,K)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)),RH1PO4DmndBandHeter(NGL,K))
+  !mineralization  
   ELSE
-    RH1PO4DmndSoilHeter(NGL,K)=0.0_r8
-    RH1PO4DmndBandHeter(NGL,K)=0.0_r8
-    RH1PO4TransfSoilHeter(NGL,K)=RIP1P*FH1PS
-    RH1PO4TransfBandHeter(NGL,K)=RIP1P*FH1PB
+    RH1PO4DmndSoilHeter(NGL,K)   = 0.0_r8
+    RH1PO4DmndBandHeter(NGL,K)   = 0.0_r8
+    RH1PO4TransfSoilHeter(NGL,K) = 0.0_r8
+    RH1PO4TransfBandHeter(NGL,K) = 0.0_r8
   ENDIF
   NetPO4Mineralize=NetPO4Mineralize+(RH1PO4TransfSoilHeter(NGL,K)+RH1PO4TransfBandHeter(NGL,K))
 !
@@ -3537,6 +3548,7 @@ module MicBGCMod
 !
   IF(litrm)THEN
     RINHPR=RINHP-RNH4TransfSoilHeter(NGL,K)-RNO3TransfSoilHeter(NGL,K)
+    !immobilization by tap into the top soil layer
     IF(RINHPR.GT.0.0_r8)THEN
       CNH4X=AZMAX1(CNH4SU-Z4MN)
       CNH4Y=AZMAX1(CNH4BU-Z4MN)
@@ -3571,6 +3583,7 @@ module MicBGCMod
 !     NetNH4Mineralize=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
     RINOPR=AZMAX1(RINHPR-RNH4TransfLitrHeter(NGL,K))
+    !immobilization by tapping into the top soil layer
     IF(RINOPR.GT.0.0_r8)THEN
       CNO3X=AZMAX1(CNO3SU-ZOMN)
       CNO3Y=AZMAX1(CNO3BU-ZOMN)
@@ -3579,8 +3592,8 @@ module MicBGCMod
       ZNO3M=ZOMN*VLWatMicP
       RNO3TransfLitrHeter(NGL,K)=AMIN1(AttenfNO3Heter(NGL,K)*AZMAX1((ZNO3TU-ZNO3M)),RNO3DmndLitrHeter(NGL,K))
     ELSE
-      RNO3DmndLitrHeter(NGL,K)=0.0_r8
-      RNO3TransfLitrHeter(NGL,K)=RINOPR
+      RNO3DmndLitrHeter(NGL,K)   = 0._r8
+      RNO3TransfLitrHeter(NGL,K) = 0._r8
     ENDIF
     NetNH4Mineralize=NetNH4Mineralize+RNO3TransfLitrHeter(NGL,K)
 !
@@ -3605,6 +3618,7 @@ module MicBGCMod
 !     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RIPOPR=RIPOP-RH2PO4TransfSoilHeter(NGL,K)
+    !immobilization by tapping into top soil layer
     IF(RIPOPR.GT.0.0_r8)THEN
       CH2PX=AZMAX1(CH2P4U-HPMN)
       CH2PY=AZMAX1(CH2P4BU-HPMN)
@@ -3641,6 +3655,7 @@ module MicBGCMod
     FH1PS=VLPO4
     FH1PB=VLPOB
     RIP1PR=0.1_r8*AZMAX1(RIPOPR-RH2PO4TransfLitrHeter(NGL,K))
+    !immobilization
     IF(RIP1PR.GT.0.0_r8)THEN
       CH1PX=AZMAX1(CH1P4U-HPMN)
       CH1PY=AZMAX1(CH1P4BU-HPMN)
@@ -3649,8 +3664,8 @@ module MicBGCMod
       H1P4M=HPMN*VOLWU
       RH1PO4TransfLitrHeter(NGL,K)=AMIN1(AttenfH1PO4Heter(NGL,K)*AZMAX1((H1P4TU-H1P4M)),RH1PO4DmndLitrHeter(NGL,K))
     ELSE
-      RH1PO4DmndLitrHeter(NGL,K)=0.0_r8
-      RH1PO4TransfLitrHeter(NGL,K)=RIP1PR
+      RH1PO4DmndLitrHeter(NGL,K)   = 0.0_r8
+      RH1PO4TransfLitrHeter(NGL,K) = 0._r8
     ENDIF
     NetPO4Mineralize=NetPO4Mineralize+RH1PO4TransfLitrHeter(NGL,K)
   ENDIF

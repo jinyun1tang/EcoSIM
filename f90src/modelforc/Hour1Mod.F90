@@ -352,7 +352,7 @@ module Hour1Mod
         /(EXP(ACTCG(idg_N2)*CSTRQ(I,NY,NX)))
       N2O_irrig_conc(NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRQ(I,NY,NX)))
-
+      GDD_col(NY,NX)=GDD_col(NY,NX)+TCA_col(NY,NX)/24._r8
     ENDDO
   ENDDO
   end subroutine SetAtmosTracerConcentration
@@ -1568,8 +1568,8 @@ module Hour1Mod
 !     IUTYP=urea hydrolysis inhibitor type (1=no,2=yes)
 !     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
-!
-  IF(FERT(3,I,NY,NX).GT.0.0_r8 .OR. FERT(7,I,NY,NX).GT.0.0_r8)THEN
+! urea application
+  IF(FERT(ifert_urea,I,NY,NX).GT.0.0_r8 .OR. FERT(ifert_urea_band,I,NY,NX).GT.0.0_r8)THEN  
     IF(IYTYP(0,I,NY,NX).EQ.0)THEN
       IUTYP(NY,NX)=0
     ELSEIF(IYTYP(0,I,NY,NX).EQ.1 .OR. IYTYP(0,I,NY,NX).EQ.3)THEN
@@ -1589,6 +1589,7 @@ module Hour1Mod
       ENDIF
     ENDDO D9964
   ENDIF
+
   IF(IYTYP(0,I,NY,NX).EQ.3 .OR. IYTYP(0,I,NY,NX).EQ.4)THEN
     D9965: DO L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN

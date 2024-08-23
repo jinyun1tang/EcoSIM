@@ -593,7 +593,7 @@ implicit none
   integer :: IDAT(20)
 
   integer :: K, KK, IH, NI, NN, J
-  integer :: LL
+  integer :: LL,iostat
   LOGICAL :: GO110,GO60
   character(len=100):: line
 
@@ -609,9 +609,12 @@ implicit none
 
 !  fourth line in the weather file
   read(3, '(A)') line
-  READ(line,*)atmf%PHRG,atmf%CN4RIG,atmf%CNORIG,atmf%CPORG,atmf%CALRG,&
+  READ(line,*,iostat=iostat)atmf%PHRG,atmf%CN4RIG,atmf%CNORIG,atmf%CPORG,atmf%CALRG,&
     atmf%CFERG,atmf%CCARG,atmf%CMGRG,atmf%CNARG,atmf%CKARG,atmf%CSORG,atmf%CCLRG
-
+  if(iostat/=0)then
+    print*,line
+    call endrun("Error reading rainfall chem composition data in "//mod_filename, __LINE__)
+  endif
   if(lverb)then
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'read weather file head from ',clmfile

@@ -15,7 +15,7 @@ implicit none
   integer, parameter :: idg_N2O=5
   integer, parameter :: idg_H2 =6
   integer, parameter :: idg_NH3=7
-
+  character(len=10), allocatable :: trcs_names(:)
   integer  :: idg_NH3B
   integer :: ids_NH4,ids_NH4B
   integer :: ids_NO3,ids_NO3B
@@ -194,6 +194,17 @@ implicit none
 
   ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
+
+  allocate(trcs_names(ids_beg:ids_end))
+  trcs_names(idg_CO2)    = 'CO2';trcs_names(idg_CH4)     = 'CH4'
+  trcs_names(idg_O2)     = 'O2'; trcs_names(idg_N2)      = 'N2'
+  trcs_names(idg_N2O)    = 'N2O';trcs_names(idg_H2)      = 'H2'
+  trcs_names(idg_NH3)    = 'NH3';trcs_names(idg_NH3B)    = 'NH3B'
+  trcs_names(ids_NH4B)   = 'NH4B';trcs_names(ids_NO3B)   = 'NO3B'
+  trcs_names(ids_NO2B)   = 'NO2B';trcs_names(ids_H1PO4B) = 'H1PO4B'
+  trcs_names(ids_H2PO4B) = 'H2PO4B';trcs_names(ids_NH4)  = 'NH4'
+  trcs_names(ids_NO3)    = 'NO3';trcs_names(ids_NO2)     = 'NO2'
+  trcs_names(ids_H1PO4)  = 'H1PO4';trcs_names(ids_H2PO4) = 'H2PO4'
 
   
   idom_beg=1;idom_end=0

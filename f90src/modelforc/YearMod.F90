@@ -51,36 +51,37 @@
 !
 
       IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
-
-        AmendCFlx_CumYr_col(NY,NX)       = 0._r8
-        LiterfalOrgM_col(:,NY,NX)        = 0._r8
-        RootResp_CumYr_col(NY,NX)        = 0._r8
-        Eco_NBP_CumYr_col(NY,NX)         = 0._r8
-        QRain_CumYr_col(NY,NX)           = 0._r8
-        QEvap_CumYr_col(NY,NX)           = 0._r8
-        Qrunoff_CumYr_col(NY,NX)         = 0._r8
-        SedmErossLoss_CumYr_col(NY,NX)   = 0._r8
-        H2OLoss_CumYr_col(NY,NX)         = 0._r8
-        HydroIonFlx_CumYr_col(NY,NX)     = 0._r8
-        FertNFlx_CumYr_col(NY,NX)        = 0._r8
-        HydroSufDONFlx_CumYr_col(NY,NX)  = 0._r8
-        HydroSufDINFlx_CumYr_col(NY,NX)  = 0._r8
-        FerPFlx_CumYr_col(NY,NX)         = 0._r8
-        HydroSufDOPFlx_CumYr_col(NY,NX)  = 0._r8
-        HydroSufDIPFlx_CumYr_col(NY,NX)  = 0._r8
-        CO2byFire_CumYr_col(NY,NX)       = 0._r8
-        CH4byFire_CumYr_col(NY,NX)       = 0._r8
-        O2byFire_CumYr_col(NY,NX)        = 0._r8
-        N2ObyFire_CumYr_col(NY,NX)       = 0._r8
-        NH3byFire_CumYr_col(NY,NX)       = 0._r8
-        PO4byFire_CumYr_col(NY,NX)       = 0._r8
-        Eco_HR_CumYr_col(NY,NX)          = 0._r8
-        Eco_GPP_CumYr_col(NY,NX)         = 0._r8
-        Eco_NPP_CumYr_col(NY,NX)         = 0._r8
-        Eco_AutoR_CumYr_col(NY,NX)       = 0._r8
-        EcoHavstElmnt_CumYr_col(:,NY,NX) = 0._r8
-        NetNH4Mineralize_col(NY,NX)      = 0._r8
-        NetPO4Mineralize_col(NY,NX)      = 0._r8
+        !to be revised for GDD 
+        GDD_col(NY,NX)                    = 0._r8
+        AmendCFlx_CumYr_col(NY,NX)        = 0._r8
+        LiterfalOrgM_col(:,NY,NX)         = 0._r8
+        RootResp_CumYr_col(NY,NX)         = 0._r8
+        Eco_NBP_CumYr_col(NY,NX)          = 0._r8
+        QRain_CumYr_col(NY,NX)            = 0._r8
+        QEvap_CumYr_col(NY,NX)            = 0._r8
+        Qrunoff_CumYr_col(NY,NX)          = 0._r8
+        SedmErossLoss_CumYr_col(NY,NX)    = 0._r8
+        H2OLoss_CumYr_col(NY,NX)          = 0._r8
+        HydroIonFlx_CumYr_col(NY,NX)      = 0._r8
+        FertNFlx_CumYr_col(NY,NX)         = 0._r8
+        HydroSufDONFlx_CumYr_col(NY,NX)   = 0._r8
+        HydroSufDINFlx_CumYr_col(NY,NX)   = 0._r8
+        FerPFlx_CumYr_col(NY,NX)          = 0._r8
+        HydroSufDOPFlx_CumYr_col(NY,NX)   = 0._r8
+        HydroSufDIPFlx_CumYr_col(NY,NX)   = 0._r8
+        CO2byFire_CumYr_col(NY,NX)        = 0._r8
+        CH4byFire_CumYr_col(NY,NX)        = 0._r8
+        O2byFire_CumYr_col(NY,NX)         = 0._r8
+        N2ObyFire_CumYr_col(NY,NX)        = 0._r8
+        NH3byFire_CumYr_col(NY,NX)        = 0._r8
+        PO4byFire_CumYr_col(NY,NX)        = 0._r8
+        Eco_HR_CumYr_col(NY,NX)           = 0._r8
+        Eco_GPP_CumYr_col(NY,NX)          = 0._r8
+        Eco_NPP_CumYr_col(NY,NX)          = 0._r8
+        Eco_AutoR_CumYr_col(NY,NX)        = 0._r8
+        EcoHavstElmnt_CumYr_col(:,NY,NX)  = 0._r8
+        NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
+        NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
 
         D960: DO NZ=1,NP0(NY,NX)
           !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set

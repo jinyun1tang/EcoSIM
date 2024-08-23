@@ -207,7 +207,8 @@ implicit none
   real(r8) :: RAa,VaporSoi1,VapLitR,VPY
   real(r8) :: TKXR,TK1X,TKY
   real(r8) :: FLVC,FLVX,ENGYR
-  real(r8) :: HFLWC,HFLWX,EVAPR2,LatentHeatAir2LitR2,HeatSensEvapAir2LitR2
+  real(r8) :: HFLWC,HFLWX,EVAPR2,LatentHeatAir2LitR2
+  real(r8) :: HeatSensEvapAir2LitR2
   real(r8) :: NetHeatAir2LitR2,LWRadLitR2,ThetaWLitR,HeatSensAir2LitR2,EvapLitR2Soi2,HeatSensVapLitR2Soi2
   real(r8) :: CdLitREvap,CdLitRHSens,RAGX,RI,Radnet2LitR2,TotHeatAir2LitR2,HeatSensLitR2Soi2
   real(r8) :: VLHeatCapcityLitR2,VLHeatCapacity2
@@ -298,11 +299,10 @@ implicit none
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
 
-      VaporSoi1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !in soil,ton/m3
-      EVAPR2=AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton hr/m]
-!      print*,'evapr2',EVAPR2,VPQ_col(NY,NX),VapLitR,VWatLitr2,TKR1,VLWatMicP1(0,NY,NX)
-      LatentHeatAir2LitR2=EVAPR2*EvapLHTC          !latent energy flux, kJ/kg *10^3 kg hr/m=MJ hr/m
-      HeatSensEvapAir2LitR2=EVAPR2*cpw*TKR1        !mass energy flux
+      VaporSoi1 = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !in soil, ton/m3
+      EVAPR2    = AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton hr/m]
+      LatentHeatAir2LitR2   = EVAPR2*EvapLHTC          !latent energy flux, kJ/kg *10^3 kg hr/m = MJ hr/m
+      HeatSensEvapAir2LitR2 = EVAPR2*cpw*TKR1        !mass energy flux
       !
       ! SOLVE FOR RESIDUE TO SOIL SURFACE HEAT FLUXES
       !
@@ -403,16 +403,16 @@ implicit none
       LWRadLitR=LWRadLitR+LWRadLitR2
     ELSE
       !not significant litter layer heat capacity
-      EVAPR2=0.0_r8
-      Radnet2LitR2=0.0_r8
-      LatentHeatAir2LitR2=0.0_r8
-      HeatSensEvapAir2LitR2=0.0_r8
-      HeatSensAir2LitR2=0.0_r8
-      TotHeatAir2LitR2=0.0_r8
-      EvapLitR2Soi2=0.0_r8
-      HeatSensVapLitR2Soi2=0.0_r8
-      HeatSensLitR2Soi2=0.0_r8
-      LWRadLitR2=0.0_r8
+      EVAPR2                = 0.0_r8
+      Radnet2LitR2          = 0.0_r8
+      LatentHeatAir2LitR2   = 0.0_r8
+      HeatSensEvapAir2LitR2 = 0.0_r8
+      HeatSensAir2LitR2     = 0.0_r8
+      TotHeatAir2LitR2      = 0.0_r8
+      EvapLitR2Soi2         = 0.0_r8
+      HeatSensVapLitR2Soi2  = 0.0_r8
+      HeatSensLitR2Soi2     = 0.0_r8
+      LWRadLitR2            = 0.0_r8
     ENDIF
     !VWatLitr2,VLWatMicP12=water in litter, topsoil layer 
     VWatLitr2=VWatLitr2+Prec2LitR2+EVAPR2-EvapLitR2Soi2

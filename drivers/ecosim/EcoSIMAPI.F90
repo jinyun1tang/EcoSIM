@@ -95,8 +95,7 @@ contains
   !   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
-  if(lverb)WRITE(*,334)'RED'
-
+  if(lverb)WRITE(*,334)'REDIST'
 
   call start_timer(t1)    
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
@@ -385,18 +384,10 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-  !
-  !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
-  !
-      IF(visual_out)THEN
-        IF((J/JOUT)*JOUT.EQ.J)THEN
-          if(lverb)WRITE(*,333)'VIS'
-          CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
-        ENDIF
-      ENDIF
-
+  
       call end_timer_loop()
-
+      
+      if(lverb)write(*,*)'hist_update'
       call hist_ecosim%hist_update(I,J,bounds)
 
       call hist_update_hbuf(bounds)

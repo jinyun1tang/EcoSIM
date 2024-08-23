@@ -664,7 +664,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'N-fixation symbiosis',strval,40)
+  call writefixsl(nu_plt,'N-fixation symbiosis INTYP',strval,40)
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
