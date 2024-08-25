@@ -365,7 +365,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       
       if(ymdhs==frectyp%ymdhs0)then
         frectyp%lskip_loop=.false.        
-        if(is_restart())then
+        if(is_restart() .or. is_branch())then
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
         endif

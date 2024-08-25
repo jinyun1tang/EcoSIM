@@ -39,6 +39,7 @@ implicit none
   integer, public, parameter :: nsrStartup  = 0        ! Startup from initial conditions
   integer, public, parameter :: nsrContinue = 1        ! Continue from restart files
   public :: is_restart,   &
+            is_branch,    &
             set_sim_type, &
             cold_run
 contains
@@ -54,6 +55,20 @@ contains
     is_restart = .false.
   end if
   end function is_restart
+!-----------------------------------------------------------------------
+
+  logical function is_branch( )
+  !
+  ! Determine if it is branch run
+  implicit none
+  
+  if (nsrest == nsrBranch) then
+    is_branch = .true.
+  else
+    is_branch = .false.
+  end if
+  end function is_branch
+
 !-----------------------------------------------------------------------
 
   subroutine set_sim_type()

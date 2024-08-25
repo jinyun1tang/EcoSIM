@@ -819,7 +819,7 @@ module ncdio_pio
 
     call check_var(ncid, trim(varname), vardesc, readvar)
 
-    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,start=(/rec/)),trim(sub))
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,start=(/1,rec/)),trim(sub))
 
   end subroutine ncd_putvar_string_1d
 !----------------------------------------------------------------------

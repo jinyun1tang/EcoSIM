@@ -7,7 +7,7 @@ module RestartMod
   use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
   use EcoSIMConfig      , only : jcplx=> jcplxc, NumMicbFunGrupsPerCmplx=> NumMicbFunGrupsPerCmplx,nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig      , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc, cold_run
-  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle
+  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle, finidat
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use EcoSiMParDataMod  , only : micpar,pltpar
   use TracerIDMod       , only : trc_confs
@@ -8571,19 +8571,17 @@ implicit none
     if (nsrest==nsrContinue) then
        call restFile_read_pfile( path )
        call getfil( path, file, 0 )
-    end if
-
+    
     ! Branch run: 
     ! Restart file pathname is obtained from namelist "restartFileFullPath"
     ! Check case name consistency (case name must be different for branch run, 
     ! unless namelist specification states otherwise)
-
-    if (nsrest==nsrBranch) then
-       length = len_trim(restartFileFullPath)
-       if (restartFileFullPath(length-2:length) == '.nc') then
-          path = trim(restartFileFullPath) 
+    elseif (nsrest==nsrBranch) then
+       length = len_trim(finidat)
+       if (finidat(length-2:length) == '.nc') then
+          path = trim(finidat) 
        else
-          path = trim(restartFileFullPath) // '.nc'
+          path = trim(finidat) // '.nc'
        end if
        call getfil( path, file, 0 )
 
@@ -8925,8 +8923,8 @@ implicit none
     ! Define restart file variables
 
     call timemgr_restart_io(ncid, flag='define')
-
-    if (present(rdate)) then 
+    
+    if (present(rdate)) then       
       call hist_restart_ncd (bounds, ncid, flag='define', rdate=rdate )
     end if
 
