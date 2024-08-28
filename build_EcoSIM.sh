@@ -28,6 +28,7 @@ shared=0
 verbose=0
 sanitize=0
 travis=0
+regression_test=1
 
 precision="double"
 prefix=""
@@ -35,9 +36,9 @@ systype=""
 
 
 #Leave empty to just use the environment variable compiler
-CC=""
-CXX=""
-FC=""
+CC="/opt/homebrew/bin/gcc-12"
+CXX="/opt/homebrew/bin/g++-12"
+FC="/opt/homebrew/bin/gfortran-12"
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
@@ -88,7 +89,7 @@ if [ "$sanitize" -eq 1 ]; then
     CONFIG_FLAGS="${CONFIG_FLAGS} -DADDRESS_SANITIZER=1"
 fi
 
-if [ -n $ATS_ECOSIM ]; then
+if [ -n "$ATS_ECOSIM" ]; then
     echo "Building ATS-EcoSIM"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=1" 
     #Having this automatically set to use mpi compilers
@@ -153,7 +154,11 @@ ${cmd_configure}
 #This does the build
 make -j ${parallel_jobs}
 
-make test
+echo "rtest: $regression_test"
+if [ "$regression_test" -eq 1 ]; then
+  pwd
+  make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gcc;
+fi
 
 #Does the install
 make install

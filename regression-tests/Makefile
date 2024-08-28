@@ -2,9 +2,9 @@
 # switch to some sort of cmake-ified out of source tests.
 compiler   = not-set
 
-ECOSIM = ../local/bin/ecosim.f90.x
+ECOSIM = ../build/bin/ecosim.f90.x
 ifeq ($(compiler), not-set)
-COMPILER=intel
+COMPILER=gcc
 else
 COMPILER=$(compiler)
 endif
@@ -37,8 +37,8 @@ mtest : FORCE
 # isn't in the system packages, run 'make env'.
 test-coverage : FORCE
 	coverage erase
-	PATH="${PATH}:../local/bin" COVERAGE_FILE=.coverage.unit coverage run $(COVERAGE_RUN_FLAGS) mtest/unit
-	PATH="${PATH}:../local/bin" COVERAGE_FILE=.coverage.xfail coverage run $(COVERAGE_RUN_FLAGS) mtest/xfail
+	PATH="${PATH}:../build/bin" COVERAGE_FILE=.coverage.unit coverage run $(COVERAGE_RUN_FLAGS) mtest/unit
+	PATH="${PATH}:../build/bin" COVERAGE_FILE=.coverage.xfail coverage run $(COVERAGE_RUN_FLAGS) mtest/xfail
 	coverage combine $(COVERAGERC)
 	coverage html $(COVERAGERC)
 	coverage report $(COVERAGERC)
