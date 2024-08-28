@@ -240,6 +240,7 @@ module SoilBGCNLayMod
   else
     nelms=NumPlantChemElms
   endif  
+  
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)

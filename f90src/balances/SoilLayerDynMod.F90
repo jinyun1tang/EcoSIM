@@ -339,7 +339,7 @@ implicit none
       ! SoiBulkDensityt0_vr: initial bulk density,
       IF((iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)&
         .AND.ABS(DORGC(LX)).GT.ZEROS(NY,NX))THEN
-        DDLEqv_OrgC=MWC2Soil*DORGC(LX)/((1.0_r8-SoilFracAsMacP(LX,NY,NX)) &
+        DDLEqv_OrgC=MWC2Soil*DORGC(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX)) &
           *SoiBulkDensityt0_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
 
         ! obtain diagnostics only for NX==1
@@ -640,7 +640,7 @@ implicit none
           DLYR(3,NUX,NY,NX)=0.0_r8
           IF(SoiBulkDensity_vr(NUX,NY,NX).LE.ZERO)THEN
             VGeomLayer(NUX,NY,NX)=AREA(3,NUX,NY,NX)*DLYR(3,NUX,NY,NX)
-            VLSoilPoreMicP_vr(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FracSoiAsMicP(NUX,NY,NX)
+            VLSoilPoreMicP_vr(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FracSoiAsMicP_vr(NUX,NY,NX)
           ENDIF
           exit
         ENDIF
@@ -729,7 +729,7 @@ implicit none
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FX*VHeatCapacitySoilM(L0,NY,NX)
   VHeatCapacity_vr(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
     +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP_vr(L1,NY,NX)) &
-    +cpi*(VLiceMicP_vr(L1,NY,NX)+VLiceMacP_col(L1,NY,NX))
+    +cpi*(VLiceMicP_vr(L1,NY,NX)+VLiceMacP_vr(L1,NY,NX))
 
   IF(VHeatCapacity_vr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS_vr(L1,NY,NX)=ENGY1/VHeatCapacity_vr(L1,NY,NX)
@@ -908,7 +908,7 @@ implicit none
   IF(L0.NE.0)THEN
     VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP_vr(L0,NY,NX)) &
-      +cpi*(VLiceMicP_vr(L0,NY,NX)+VLiceMacP_col(L0,NY,NX))
+      +cpi*(VLiceMicP_vr(L0,NY,NX)+VLiceMacP_vr(L0,NY,NX))
   ELSE
     VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP_vr(L0,NY,NX)
   ENDIF
@@ -1141,7 +1141,7 @@ implicit none
         DOM_vr(idom,K,L0,NY,NX)=DOM_vr(idom,K,L0,NY,NX)-FXOQC
       enddo
 
-      IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
+      IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
         DO idom=idom_beg,idom_end
           FXOQCH=FXO*DOM_MacP_vr(idom,K,L0,NY,NX)
           DOM_MacP_vr(idom,K,L1,NY,NX)=DOM_MacP_vr(idom,K,L1,NY,NX)+FXOQCH
@@ -1297,7 +1297,7 @@ implicit none
 !
 !     SOIL MACROPORE N,P SOLUTES
 !
-  IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
+  IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
 
     DO NTS=ids_beg,ids_end
       FXSH=FHO*trc_soHml_vr(NTS,L0,NY,NX)
@@ -1588,19 +1588,19 @@ implicit none
 !
 !     SOIL WATER AND HEAT
 !
-  IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
-    IF(L0.EQ.L.OR.SoilFracAsMacPt0(L0,NY,NX).LE.ZERO)THEN
+  IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
+    IF(L0.EQ.L.OR.SoilFracAsMacPt0_vr(L0,NY,NX).LE.ZERO)THEN
       FHO=FO
     ELSE
-      FHO=AMIN1(0.5_r8,FO*SoilFracAsMacPt0(L1,NY,NX)/SoilFracAsMacPt0(L0,NY,NX))
+      FHO=AMIN1(0.5_r8,FO*SoilFracAsMacPt0_vr(L1,NY,NX)/SoilFracAsMacPt0_vr(L0,NY,NX))
     ENDIF
-    SoilFracAsMacP(L1,NY,NX)=(1.0_r8-FO)*SoilFracAsMacP(L1,NY,NX)+FO*SoilFracAsMacP(L0,NY,NX)
+    SoilFracAsMacP_vr(L1,NY,NX)=(1.0_r8-FO)*SoilFracAsMacP_vr(L1,NY,NX)+FO*SoilFracAsMacP_vr(L0,NY,NX)
     FXVOLWH=FHO*VLWatMacP_vr(L0,NY,NX)
     VLWatMacP_vr(L1,NY,NX)=VLWatMacP_vr(L1,NY,NX)+FXVOLWH
     VLWatMacP_vr(L0,NY,NX)=VLWatMacP_vr(L0,NY,NX)-FXVOLWH
-    FXVOLIH=FHO*VLiceMacP_col(L0,NY,NX)
-    VLiceMacP_col(L1,NY,NX)=VLiceMacP_col(L1,NY,NX)+FXVOLIH
-    VLiceMacP_col(L0,NY,NX)=VLiceMacP_col(L0,NY,NX)-FXVOLIH
+    FXVOLIH=FHO*VLiceMacP_vr(L0,NY,NX)
+    VLiceMacP_vr(L1,NY,NX)=VLiceMacP_vr(L1,NY,NX)+FXVOLIH
+    VLiceMacP_vr(L0,NY,NX)=VLiceMacP_vr(L0,NY,NX)-FXVOLIH
     FXVOLAH=FHO*VLMacP_vr(L0,NY,NX)
     VLMacP_vr(L1,NY,NX)=VLMacP_vr(L1,NY,NX)+FXVOLAH
     VLMacP_vr(L0,NY,NX)=VLMacP_vr(L0,NY,NX)-FXVOLAH

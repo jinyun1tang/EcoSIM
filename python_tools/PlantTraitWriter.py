@@ -821,4 +821,4 @@ pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/Blodget/pfts/'
 pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/pfts/'
 pft_names=os.listdir(pft_path)
 
-write_plant_traits(pft_names,pft_path,'blodget')
+write_plant_traits(pft_names,pft_path,'sorghum')

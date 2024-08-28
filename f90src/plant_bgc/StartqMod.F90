@@ -637,6 +637,8 @@ module StartqMod
     GrossResp_pft(NZ,NY,NX)                                     = 0._r8
     CanopyRespC_CumYr_pft(NZ,NY,NX)                             = 0._r8
     PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8
+    RootUptk_N_CumYr_pft(NZ,NY,NX)                              = 0._r8
+    RootUptk_P_CumYr_pft(NZ,NY,NX)                              = 0._r8
     LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
     PlantN2Fix_CumYr_pft(NZ,NY,NX)                              = 0._r8
     NH3Dep2Can_pft(NZ,NY,NX)                                    = 0._r8

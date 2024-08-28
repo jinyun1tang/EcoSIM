@@ -97,10 +97,13 @@
             -CO2ByFire_CumYr_pft(NZ,NY,NX)-CH4ByFire_CumYr_pft(NZ,NY,NX)
           NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmn,NZ,NY,NX) &
             +NH3Emis_CumYr_pft(NZ,NY,NX)+PlantN2Fix_CumYr_pft(NZ,NY,NX) &
-            -NH3byFire_CumYr_pft(NZ,NY,NX)-N2ObyFire_CumYr_pft(NZ,NY,NX)
+            -NH3byFire_CumYr_pft(NZ,NY,NX)-N2ObyFire_CumYr_pft(NZ,NY,NX) &
+            +RootUptk_N_CumYr_pft(NZ,NY,NX)
           NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX) &
-            -PO4byFire_CumYr_pft(NZ,NY,NX)
+            -PO4byFire_CumYr_pft(NZ,NY,NX)+RootUptk_P_CumYr_pft(NZ,NY,NX)
 
+          RootUptk_N_CumYr_pft(NZ,NY,NX)             = 0._r8
+          RootUptk_P_CumYr_pft(NZ,NY,NX)             = 0._r8
           GrossCO2Fix_CumYr_pft(NZ,NY,NX)            = 0._r8
           PlantExudElm_CumYr_pft(:,NZ,NY,NX)         = 0._r8
           GrossRespC_CumYr_pft(NZ,NY,NX)             = 0._r8

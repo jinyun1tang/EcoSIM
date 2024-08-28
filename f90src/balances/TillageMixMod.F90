@@ -301,7 +301,7 @@ module TillageMixMod
 !     TVOLP=TVOLP+TI*VLsoiAirP_vr(L,NY,NX)
 !     TVOLA=TVOLA+TI*VLMicP_vr(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
           TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil_vr(NTN,L,NY,NX)
         ENDDO
@@ -412,20 +412,20 @@ module TillageMixMod
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
         
         ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS_vr(L,NY,NX)
-        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)
+        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
         VLWatMicP_vr(L,NY,NX)=TI*VLWatMicP_vr(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP_vr(L,NY,NX))+TX*VLWatMicP_vr(L,NY,NX)+FI*TVOLWR
         VLiceMicP_vr(L,NY,NX)=TI*VLiceMicP_vr(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP_vr(L,NY,NX))+TX*VLiceMicP_vr(L,NY,NX)
         VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
 !     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+CORP*VLWatMacP_vr(L,NY,NX)
-!     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)+CORP*VLiceMacP_col(L,NY,NX)
+!     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)+CORP*VLiceMacP_vr(L,NY,NX)
 !     VLMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)+CORP*VLMacP_vr(L,NY,NX)
 !     VLWatMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLWatMacP_vr(L,NY,NX)
-!     VLiceMacP_col(L,NY,NX)=XCORP(NY,NX)*VLiceMacP_col(L,NY,NX)
+!     VLiceMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLiceMacP_vr(L,NY,NX)
 !     VLMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLMacP_vr(L,NY,NX)
-!     SoilFracAsMacP(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP(L,NY,NX)
+!     SoilFracAsMacP_vr(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
         TKS_vr(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity_vr(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))
 

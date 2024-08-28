@@ -113,12 +113,12 @@ contains
   allocate(this%is_litter(1:this%jcplx));this%is_litter(:)=.false.
   allocate(this%is_finelitter(1:this%jcplx));this%is_finelitter(:)=.false.
 
-  this%k_woody_litr=1;     this%is_litter(this%k_woody_litr)=.true.
-  this%k_fine_litr=this%k_woody_litr+1; this%is_litter(this%k_fine_litr)=.true.
-  this%NumOfPlantLitrCmplxs=this%k_fine_litr
-  this%k_manure=this%k_fine_litr+1;   this%is_litter(this%k_manure)=.true.
-  this%is_litter(this%k_fine_litr)=.true.
-  this%is_litter(this%k_manure)=.true.
+  this%k_woody_litr                = 1;                   this%is_litter(this%k_woody_litr) = .true.
+  this%k_fine_litr                 = this%k_woody_litr+1; this%is_litter(this%k_fine_litr) = .true.
+  this%NumOfPlantLitrCmplxs        = this%k_fine_litr
+  this%k_manure                    = this%k_fine_litr+1;   this%is_litter(this%k_manure)   = .true.
+  this%is_litter(this%k_fine_litr) = .true.
+  this%is_litter(this%k_manure)    = .true.
 
   this%iprotein =1
   this%icarbhyro=2
@@ -128,6 +128,7 @@ contains
   this%NumOfLitrCmplxs=this%k_manure
   this%k_POM=this%k_manure+1
   this%k_humus=this%k_POM+1
+  
   this%kiname(0)='protein'
   this%kiname(1)='carbhydro'
   this%kiname(2)='cellulose'

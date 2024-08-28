@@ -112,7 +112,7 @@ implicit none
     CSAND(L,NY,NX)=CSAND(L-1,NY,NX)
     CSILT(L,NY,NX)=CSILT(L-1,NY,NX)
     CCLAY(L,NY,NX)=CCLAY(L-1,NY,NX)
-    SoilFracAsMacP(L,NY,NX)=SoilFracAsMacP(L-1,NY,NX)
+    SoilFracAsMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L-1,NY,NX)
     ROCK(L,NY,NX)=ROCK(L-1,NY,NX)
     PH(L,NY,NX)=PH(L-1,NY,NX)
     CEC(L,NY,NX)=CEC(L-1,NY,NX)

@@ -223,10 +223,10 @@ module RedistMod
   ThetaICEZ_vr(0,NY,NX)=AZMAX1((VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))/AREA(3,0,NY,NX))
   
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
-    VLSoilPoreMicP_vrX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+    VLSoilPoreMicP_vrX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     VOLTX=VLSoilPoreMicP_vrX+VLMacP_vr(L,NY,NX)
     ThetaH2OZ_vr(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX)
-    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_col(L,NY,NX)),VOLTX)
+    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX)
   ENDDO D9945
   end subroutine UpdateOutputVars
 
@@ -861,16 +861,16 @@ module RedistMod
 
     !micropore
     VLWatMacP_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)+TWaterFlowMacP_vr(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
-    VLiceMacP_col(L,NY,NX)=VLiceMacP_col(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
+    VLiceMacP_vr(L,NY,NX)=VLiceMacP_vr(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
 
     !volume change
     DVLWatMicP_vr(L,NY,NX)=VLWatMicP1(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
-    DVLiceMicP_vr(L)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX)
+    DVLiceMicP_vr(L)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX) &
-        +VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+        +VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0.0_r8
 !     VLMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX)
@@ -880,14 +880,14 @@ module RedistMod
     ENDIF
     ENGY=VHeatCapacityX*TKSX
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-      +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+      +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
 
     TVHeatCapacity=TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
     TVHeatCapacitySoilM=TVHeatCapacitySoilM+VHeatCapacitySoilM(L,NY,NX)    
     TVOLW=TVOLW+VLWatMicP_vr(L,NY,NX)
     TVOLWH=TVOLWH+VLWatMacP_vr(L,NY,NX)
     TVOLI=TVOLI+VLiceMicP_vr(L,NY,NX)
-    TVOLIH=TVOLIH+VLiceMacP_col(L,NY,NX)
+    TVOLIH=TVOLIH+VLiceMacP_vr(L,NY,NX)
     TENGY=TENGY+ENGY
     !
     !     ARTIFICIAL SOIL WARMING
@@ -920,7 +920,7 @@ module RedistMod
           THeatRootUptake_vr(L,NY,NX)/VHeatCapacity_vr(L,NY,NX),&
           HeatIrrigation(L,NY,NX)/VHeatCapacity_vr(L,NY,NX)
         write(*,*)'wat',VLWatMicP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX), &
-          VLiceMicP_vr(L,NY,NX),VLiceMacP_col(L,NY,NX)  
+          VLiceMicP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)  
         write(*,*)'heat',ENGY,THeatFlow2Soil_vr(L,NY,NX),VHeatCapacitySoilM(L,NY,NX)  
         call endrun()  
       endif
@@ -929,10 +929,10 @@ module RedistMod
       TKS_vr(L,NY,NX)=TKS_vr(NUM(NY,NX),NY,NX)
     ENDIF
     TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))
-    WS=VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))*DENSICE
+    WS=VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
     HS=VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
     WatMassStore_lnd=WatMassStore_lnd+WS
-    VOLISO=VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)
+    VOLISO=VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
     WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
     HeatStore_col(NY,NX)=HeatStore_col(NY,NX)+HS
 !    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
@@ -1006,7 +1006,7 @@ module RedistMod
 
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
-    if(SoilFracAsMacP(L,NY,NX)>0._r8)then
+    if(SoilFracAsMacP_vr(L,NY,NX)>0._r8)then
       DO NTS=ids_beg,ids_end
         dval0=-trcs_Transp2MacP_vr(NTS,L,NY,NX)      
         if(dval0<0._r8)then
@@ -1309,7 +1309,7 @@ module RedistMod
     POS=trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX) &
       +trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX)
 
-    if(SoilFracAsMacP(L,NY,NX)>0._r8)then
+    if(SoilFracAsMacP_vr(L,NY,NX)>0._r8)then
     CS=CS+trc_soHml_vr(idg_CO2,L,NY,NX)+trc_soHml_vr(idg_CH4,L,NY,NX)
 
     HS=HS+trc_soHml_vr(idg_H2,L,NY,NX)
@@ -1501,7 +1501,7 @@ module RedistMod
   DO NE=1,NumPlantChemElms
     tMicBiome_col(NE,NY,NX)=tMicBiome_col(NE,NY,NX)+ORGM(NE)
   ENDDO
-    
+  !total organic matter, litter + POM/humus, exclude living microbial biomass  
   call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX),info='redist')
   
   DO NE=1,NumPlantChemElms

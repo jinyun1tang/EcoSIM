@@ -522,7 +522,7 @@ module Hour1Mod
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
     VGeomLayer(L,NY,NX)=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
 
-    VLSoilPoreMicP_vr(L,NY,NX)=AMAX1(VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX),1.e-8_r8)
+    VLSoilPoreMicP_vr(L,NY,NX)=AMAX1(VGeomLayer(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX),1.e-8_r8)
     IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO)THEN
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
     ENDIF
@@ -580,13 +580,13 @@ module Hour1Mod
     ENDIF
     !     VLMicP_vr(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
-    !     VLMacP_vr(L,NY,NX)=AMAX1(SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
-    !    2,VLWatMacP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+    !     VLMacP_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer(L,NY,NX)
+    !    2,VLWatMacP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
     VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
-    VLMacP_vr(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayer(L,NY,NX)
+    VLMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer(L,NY,NX)
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-        +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+        +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0.0_r8
     ENDIF
@@ -607,10 +607,10 @@ module Hour1Mod
       VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
       VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
       NumerSolidThermCond(L,NY,NX)=(1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
-        +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP(L,NY,NX) &
+        +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP_vr(L,NY,NX) &
         +0.514_r8*ROCK(L,NY,NX)*1.056E-02_r8
       DenomSolidThermCond(L,NY,NX)=(1.253_r8*VORGC+0.514_r8*VMINL+0.386_r8*VSAND) &
-        *FracSoiAsMicP(L,NY,NX)+0.514_r8*ROCK(L,NY,NX)
+        *FracSoiAsMicP_vr(L,NY,NX)+0.514_r8*ROCK(L,NY,NX)
     ELSE
       NumerSolidThermCond(L,NY,NX)=0.0_r8
       DenomSolidThermCond(L,NY,NX)=0.0_r8
@@ -1011,13 +1011,13 @@ module Hour1Mod
 !
     IF(FoundActiveLayer)exit
     !current layer
-    VLiceTot=VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)
+    VLiceTot=VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
     VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacP_vr(L,NY,NX)
 
     IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
       !significant ice and pore
       D5700: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-        VLiceTotL=VLiceMicP_vr(LL,NY,NX)+VLiceMacP_col(LL,NY,NX)
+        VLiceTotL=VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
         VOLWTL=VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
         VLPoreTotL=VLMicP_vr(LL,NY,NX)+VLMacP_vr(LL,NY,NX)
         !defined as significant increase in ice content

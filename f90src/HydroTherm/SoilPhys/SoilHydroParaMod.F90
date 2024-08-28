@@ -171,7 +171,7 @@ contains
 
   if(lverb)write(*,*)'finish soilp set'
   VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-    +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+    +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
 
   IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
@@ -199,7 +199,7 @@ contains
       SatHydroCondVert(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2
     ELSE
       SatHydroCondVert(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
-      SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+      SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -211,7 +211,7 @@ contains
       SatHydroCondHrzn(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2._r8
     ELSE
       SatHydroCondHrzn(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
-      SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+      SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -270,7 +270,7 @@ contains
 !     CNDH=macropore hydraulic conductivity
 !
   MacPRadius(L,NY,NX)=0.5E-03_r8
-  MacPNumLayer(L,NY,NX)=INT(VLMacP_vr(L,NY,NX)/(PICON*MacPRadius(L,NY,NX)**2._r8*VGeomLayert0(L,NY,NX)))
+  MacPNumLayer(L,NY,NX)=INT(VLMacP_vr(L,NY,NX)/(PICON*MacPRadius(L,NY,NX)**2._r8*VGeomLayert0_vr(L,NY,NX)))
 
   IF(MacPNumLayer(L,NY,NX).GT.0.0_r8)THEN
     PathLenMacP(L,NY,NX)=1.0_r8/(SQRT(PICON*MacPNumLayer(L,NY,NX)))
@@ -301,7 +301,7 @@ contains
         FieldCapacity(L,NY,NX)=0.71_r8
       ENDIF
     ENDIF
-    FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
+    FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
     FieldCapacity(L,NY,NX)=AMIN1(0.75_r8*POROS(L,NY,NX),FieldCapacity(L,NY,NX))
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       WiltPoint(L,NY,NX)=0.0260_r8+0.50_r8*CCLAY(L,NY,NX)+0.32E-06_r8*CSoilOrgM_vr(ielmc,L,NY,NX)
@@ -314,7 +314,7 @@ contains
         WiltPoint(L,NY,NX)=0.22_r8
       ENDIF
     ENDIF
-    WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
+    WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
     WiltPoint(L,NY,NX)=AMIN1(0.75_r8*FieldCapacity(L,NY,NX),WiltPoint(L,NY,NX))
   ENDIF
   LOGFldCapacity(L,NY,NX)=LOG(FieldCapacity(L,NY,NX))
@@ -359,9 +359,9 @@ contains
     VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
     VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLiceMacP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
-      +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+      +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
     ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
     ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
   ENDIF

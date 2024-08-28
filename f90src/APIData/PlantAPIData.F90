@@ -76,7 +76,7 @@ implicit none
   logical , pointer :: flag_pft_active(:)          => null()
   real(r8), pointer :: PlantPopulation_pft(:)      => null()    !plant population, [d-2]
   real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
-  real(r8), pointer :: FracSoiAsMicP(:)    => null()    !micropore fraction
+  real(r8), pointer :: FracSoiAsMicP_vr(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
   real(r8), pointer :: VLWatMicPM_vr(:,:) => null()    !soil micropore water content, [m3 d-2]
   real(r8), pointer :: VLsoiAirPM(:,:) => null()    !soil air content, [m3 d-2]
@@ -735,6 +735,8 @@ implicit none
   real(r8), pointer :: trcg_air2root_flx_vr(:,:)         => null()   !total internal root gas flux,                                  [gC d-2 h-1]
   real(r8), pointer :: CO2FixCL_pft(:)                   => null()   !Rubisco-limited CO2 fixation
   real(r8), pointer :: CO2FixLL_pft(:)                   => null()   !Light-limited CO2 fixation
+  real(r8), pointer :: RootUptk_N_CumYr_pft(:)           => null()
+  real(r8), pointer :: RootUptk_P_CumYr_pft(:)           => null()
   contains
     procedure, public :: Init => plt_rootbgc_init
     procedure, public :: Destroy  => plt_rootbgc_destroy
@@ -767,6 +769,8 @@ implicit none
   allocate(this%RootMycoExudElm_pvr(NumPlantChemElms,2,1:jcplx,0:JZ1,JP1));this%RootMycoExudElm_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
   allocate(this%PlantExudElm_CumYr_pft(NumPlantChemElms,JP1));this%PlantExudElm_CumYr_pft=spval
+  allocate(this%RootUptk_N_CumYr_pft(JP1)); this%RootUptk_N_CumYr_pft=spval
+  allocate(this%RootUptk_P_CumYr_pft(JP1)); this%RootUptk_P_CumYr_pft=spval  
   allocate(this%RootMycoExudElms_pft(NumPlantChemElms,JP1));this%RootMycoExudElms_pft=spval
   allocate(this%RootN2Fix_pft(JP1)); this%RootN2Fix_pft=spval
   allocate(this%RootNO3Uptake_pft(JP1)); this%RootNO3Uptake_pft=spval
@@ -918,7 +922,7 @@ implicit none
   class(plant_siteinfo_type) :: this
 
   allocate(this%PlantElemntStoreLandscape(NumPlantChemElms));this%PlantElemntStoreLandscape=spval
-  allocate(this%FracSoiAsMicP(0:JZ1));this%FracSoiAsMicP=spval
+  allocate(this%FracSoiAsMicP_vr(0:JZ1));this%FracSoiAsMicP_vr=spval
   allocate(this%AtmGasc(idg_beg:idg_end-1));this%AtmGasc=spval
   allocate(this%DATAP(JP1)); this%DATAP=''
   allocate(this%DATA(30)); this%DATA=''
@@ -944,7 +948,7 @@ implicit none
   class(plant_siteinfo_type) :: this
 
 !  if(allocated(DLYR3))deallocate(DLYR3)
-!  if(allocated(FracSoiAsMicP))deallocate(FracSoiAsMicP)
+!  if(allocated(FracSoiAsMicP_vr))deallocate(FracSoiAsMicP_vr)
 !  if(allocated(TortMicPM_vr))deallocate(TortMicPM_vr)
 !  if(allocated(FILM))deallocate(FILM)
 !  if(allocated(DATAP))deallocate(DATAP)

@@ -224,7 +224,7 @@ module WatsubMod
         VLWatMicPX1(L,NY,NX)=VLWatMicPX_vr(L,NY,NX)
         VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)
         VLWatMacP1_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)
-        VLiceMacP1(L,NY,NX)=VLiceMacP_col(L,NY,NX)
+        VLiceMacP1(L,NY,NX)=VLiceMacP_vr(L,NY,NX)
         
         IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
           VLairMicP(L,NY,NX)=VLMicP1(L,NY,NX)-VLWatMicP1(L,NY,NX)-VLiceMicP1(L,NY,NX)
@@ -285,7 +285,7 @@ module WatsubMod
     !   AREAU,AREAD=fractions of layer below natural,artifl water table
     !
         IF(VLMacP1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX)
+          SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX)
           HydroCondMacP1(L,NY,NX)=HydroCondMacP(L,NY,NX)*(VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX))**2._r8
         ELSE
           SoilFracAsMacP1(L,NY,NX)=0.0_r8
@@ -1114,7 +1114,7 @@ module WatsubMod
             FracSoilAsAirt(L,NY,NX)=0.0_r8
           ENDIF
           IF(VLMacP1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX)
+            SoilFracAsMacP1(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)*VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX)
             HydroCondMacP1(L,NY,NX)=HydroCondMacP(L,NY,NX)*(VLMacP1(L,NY,NX)/VLMacP_vr(L,NY,NX))**2
           ELSE
             SoilFracAsMacP1(L,NY,NX)=0.0_r8
@@ -1425,14 +1425,14 @@ module WatsubMod
 
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       THETWT=safe_adb(VLWatMicPM_vr(M,L,NY,NX),VLSoilMicP(L,NY,NX))
-      TortMicPM_vr(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+      TortMicPM_vr(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
     ELSE
 !   standing water has tortuosity 0.7?
       TortMicPM_vr(M,L,NY,NX)=0.7_r8
     ENDIF
     IF(VLMacP1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWH=VLWatMacPM(M,L,NY,NX)/VLMacP1(L,NY,NX)
-      TortMacPM(M,L,NY,NX)=TortMacporew(THETWH)*SoilFracAsMacP(L,NY,NX)
+      TortMacPM(M,L,NY,NX)=TortMacporew(THETWH)*SoilFracAsMacP_vr(L,NY,NX)
     ELSE
       TortMacPM(M,L,NY,NX)=0.0_r8
     ENDIF

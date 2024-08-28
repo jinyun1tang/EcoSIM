@@ -425,10 +425,10 @@ module StartsMod
         PTDS=0.0_r8
         POROS(L,NY,NX)=1.0_r8
       ENDIF
-      POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+      POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       VLMicPt0_col(L,NY,NX)=VLMicP_vr(L,NY,NX)
-      VLMacP_vr(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayert0(L,NY,NX)
+      VLMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)*VGeomLayert0_vr(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
       !
@@ -448,7 +448,7 @@ module StartsMod
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
-          *FracSoiAsMicP(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
+          *FracSoiAsMicP_vr(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
       ELSE
         VHeatCapacitySoilM(L,NY,NX)=0.0_r8
       ENDIF
@@ -483,12 +483,12 @@ module StartsMod
         VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
         VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
         VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLiceMacP_col(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
+        VLiceMacP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
         VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-          +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_col(L,NY,NX))
+          +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
-          +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+          +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
         ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
         ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF
@@ -890,7 +890,7 @@ module StartsMod
       VGeomLayer(L,NY,NX)=VLitR(NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
-      VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
+      VGeomLayert0_vr(L,NY,NX)=VGeomLayer(L,NY,NX)
       SoilMicPMassLayer(L,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
       DLYRI(3,L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)  
@@ -899,11 +899,11 @@ module StartsMod
 !     if it is a standing water, no macropore fraction
 !     DPTH=depth of layer middle
 !     CumSoilThickness=soil thickness from surface to bottom of layer L, [m]
-!     FracSoiAsMicP=micropore fraction
+!     FracSoiAsMicP_vr=micropore fraction
 !     DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
 !     VOLT=total volume
 !     VOLX=total micropore volume
-      IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
+      IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
@@ -913,9 +913,9 @@ module StartsMod
       CumSoilThickness(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CumSoilThickness(L,NY,NX)+CumSoilThickness(L-1,NY,NX))
       VGeomLayer(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-      VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+      VLSoilPoreMicP_vr(L,NY,NX)=VGeomLayer(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
-      VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
+      VGeomLayert0_vr(L,NY,NX)=VGeomLayer(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
       SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)

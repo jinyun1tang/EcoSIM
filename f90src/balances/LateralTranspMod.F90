@@ -93,7 +93,7 @@ implicit none
     VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)
     VLWatMacP1_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)
-    VLiceMacP1(L,NY,NX)=VLiceMacP_col(L,NY,NX)
+    VLiceMacP1(L,NY,NX)=VLiceMacP_vr(L,NY,NX)
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX

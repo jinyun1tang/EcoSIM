@@ -152,7 +152,7 @@ implicit none
     ENGY=VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
     VHeatCapacity_vr(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
       +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
-      +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_col(NUM(NY,NX),NY,NX))
+      +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
 
     IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       TKSX=TKS_vr(NUM(NY,NX),NY,NX)
