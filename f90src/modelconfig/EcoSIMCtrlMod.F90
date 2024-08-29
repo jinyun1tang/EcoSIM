@@ -102,7 +102,7 @@ implicit none
   get_sim_len=0
   DO nn1=0,2
     id=nn1*3+1
-    get_sim_len=get_sim_len+(forc_periods(id+1)-forc_periods(id)+1)*forc_periods(id+2)
+    get_sim_len=get_sim_len+(abs(forc_periods(id+1)-forc_periods(id))+1)*forc_periods(id+2)
   enddo
   if(get_sim_len<0)then
   call endrun('Negative simulation length, check forc_periods set up in '//mod_filename,__LINE__)

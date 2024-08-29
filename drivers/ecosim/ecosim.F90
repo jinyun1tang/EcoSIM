@@ -40,6 +40,7 @@ PROGRAM main
   logical :: is_dos,nlend
   character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
+  integer :: idy
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
 !!
@@ -128,7 +129,9 @@ PROGRAM main
 
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
-      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2)
+      idy=1
+      if(forc_periods(nn3+1)>forc_periods(nn3+2))idy=-1
+      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2),idy
 
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()

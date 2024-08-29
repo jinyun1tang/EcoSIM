@@ -581,17 +581,17 @@ module UptakesMod
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
 
     IF(DIFF.GT.0.5_r8)THEN
-      plt_rad%RadNet2Canopy_pft(NZ)=0.0_r8
-      plt_ew%EvapTransHeat_pft(NZ)=0.0_r8
-      plt_ew%HeatXAir2PCan(NZ)=0.0_r8
-      plt_ew%HeatStorCanP(NZ)=0.0_r8
-      plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-      plt_ew%Transpiration_pft(NZ)=0.0_r8
-      TKC(NZ)=TairK+DeltaTKC_pft(NZ)
-      TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-      FTHRM=EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
-      LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
-      PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))     
+      plt_rad%RadNet2Canopy_pft(NZ) = 0.0_r8
+      plt_ew%EvapTransHeat_pft(NZ)  = 0.0_r8
+      plt_ew%HeatXAir2PCan(NZ)      = 0.0_r8
+      plt_ew%HeatStorCanP(NZ)       = 0.0_r8
+      plt_ew%VapXAir2Canopy_pft(NZ) = 0.0_r8
+      plt_ew%Transpiration_pft(NZ)  = 0.0_r8
+      TKC(NZ)                       = TairK+DeltaTKC_pft(NZ)
+      TCelciusCanopy_pft(NZ)        = units%Kelvin2Celcius(TKC(NZ))
+      FTHRM                         = EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
+      LWRadCanopy_pft(NZ)           = FTHRM*TKC(NZ)**4._r8
+      PSICanopy_pft(NZ)             = ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
 
       CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
         +CanopyNonstElmConc_pft(ielmp,NZ)

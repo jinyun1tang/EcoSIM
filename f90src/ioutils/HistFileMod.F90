@@ -2406,7 +2406,7 @@ implicit none
        !
        
        do t = 1,ntapes
-          write(*,*)'writeflag',t
+          
           call ncd_io(varname='fincl', data=fincl(:,t), ncid=ncid_hist(t), flag='write')
 
           call ncd_io(varname='fexcl', data=fexcl(:,t), ncid=ncid_hist(t), flag='write')
@@ -2441,7 +2441,6 @@ implicit none
              tmpstr(f,2) = tape(t)%hlist(f)%field%type1d_out
              tmpstr(f,3) = tape(t)%hlist(f)%field%type2d
              tavgflag(f) = tape(t)%hlist(f)%avgflag
-             write(*,*)'t=',t,f,tname(f)
           end do
           call ncd_io( 'name', tname, 'write',ncid_hist(t))
           call ncd_io('long_name', tlongname, 'write', ncid_hist(t))

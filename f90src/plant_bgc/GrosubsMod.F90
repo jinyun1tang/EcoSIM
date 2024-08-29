@@ -625,7 +625,7 @@ module grosubsMod
   integer, intent(in) :: I,J,NZ
   real(r8), optional, intent(in) :: CanopyN2Fix_pft(JP1)
   integer :: L,NR,N,NE,NB
-  real(r8) :: root1st, root2nd
+
 !     begin_execution
   associate(                                                         &
     RootUptk_N_CumYr_pft      => plt_rbgc%RootUptk_N_CumYr_pft,      &
