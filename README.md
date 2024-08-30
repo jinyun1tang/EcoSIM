@@ -20,7 +20,7 @@ This should build and link all the required tpls
 
 The executable will be found in ./build/bin/ecosim.f90.x
 
-This has been tested with gcc on multiple systems, have not tried intel yet.
+This has been tested with gcc on multiple systems, but not intel compilers
 
 ## additional options
 
@@ -44,6 +44,10 @@ FC=""
 
 You can also set options via the command line, for example:
 
-sh build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran debug=1 regression_test=1
+./build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran --debug --regression_test
 
+run
 
+./build_EcoSIM.sh --help 
+
+for a full list of optional arguments

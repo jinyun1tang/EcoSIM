@@ -32,49 +32,59 @@ precision="double"
 prefix=""
 systype=""
 
+print_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  --CC=<compiler>        Set C compiler"
+    echo "  --CXX=<compiler>       Set C++ compiler"
+    echo "  --FC=<compiler>        Set Fortran compiler"
+    echo "  --regression-test      Enable regression test"
+    echo "  --debug                Enable debug mode"
+    echo "  --mpi                  Enable MPI"
+    echo "  --shared               Enable shared libraries"
+    echo "  --verbose              Enable verbose output"
+    echo "  --sanitize             Enable sanitizer"
+    echo "  --help                 Display this help message"
+    exit 0
+}
+
+
 #Using command-line arguments
 for arg in "$@"
 do
   case $arg in
-    CC=*)
+    --help|--h)
+      print_help
+      ;; 
+    CC=*|--CC=*)
       CC="${arg#CC=}" 
       ;;
-    CXX=*)
+    CXX=*|--CXX=*)
       CXX="${arg#CXX=}"
       ;;
-    FC=*)
+    FC=*|--FC=*)
       FC="${arg#FC=}"   
       ;;
-    regression_test=*)
-      regression_test="${arg#regression_test=}"
+    --regression_test)
+      regression_test=1
       ;;
-    debug=*)
-      debug="${arg#debug=}"
+    --debug)
+      debug=1
       ;;
-    mpi=*)
-      mpi="${arg#mpi=}"
+    --mpi)
+      mpi=1
       ;;
-    shared=*)
-      shared="${arg#shared=}"
+    --shared)
+      shared=1
       ;;
-    verbose=*)
-      verbose="${arg#verbose=}"
+    --verbose)
+      verbose=1
       ;;                
-    sanitize=*)
-      sanitize="${arg#sanitize=}"
-      ;;    
+    --sanitize)
+      sanitize=1
+      ;; 
   esac
 done
-
-echo "CC: $CC"
-echo "CXX: $CXX"
-echo "FC: $FC"
-echo "regression_test: $regression_test"
-echo "debug: $debug"
-echo "mpi: $mpi"
-echo "shared: $shared"
-echo "verbose: $verbose"
-echo "sanitize: $sanitize"
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
