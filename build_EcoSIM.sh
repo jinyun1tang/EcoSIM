@@ -34,11 +34,31 @@ precision="double"
 prefix=""
 systype=""
 
-
 #Leave empty to just use the environment variable compiler
-CC="/opt/homebrew/bin/gcc-12"
-CXX="/opt/homebrew/bin/g++-12"
-FC="/opt/homebrew/bin/gfortran-12"
+#CC=${CC:-${CC}}
+#CXX=${CXX:-${CXX}}
+#FC=${FC:-${FC}}
+
+#echo "compilers set"
+#echo "$CC"
+#echo "$CXX"
+#echo "$FC"
+
+#Using command-line arguments
+for arg in "$@"
+do
+  case $arg in
+        CC=*)
+                CC="${arg#CC=}" 
+                ;;
+        CXX=*)
+                CXX="${arg#CXX=}"
+                ;;
+        FC=*)
+                FC="${arg#FC=}"   
+                ;;    
+  esac
+done
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
@@ -154,9 +174,7 @@ ${cmd_configure}
 #This does the build
 make -j ${parallel_jobs}
 
-echo "rtest: $regression_test"
 if [ "$regression_test" -eq 1 ]; then
-  pwd
   make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gcc;
 fi
 
