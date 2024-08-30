@@ -31,7 +31,7 @@ mpi=0
 shared=0
 verbose=0
 sanitize=0
-travis=0
+regression_test=0
 
 precision="double"
 prefix=""
@@ -42,8 +42,8 @@ CC=""
 CXX=""
 FC=""
 
-You can also set the compilers via the command line, for example:
+You can also set options via the command line, for example:
 
-sh build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran
+sh build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran debug=1 regression_test=1
 
 

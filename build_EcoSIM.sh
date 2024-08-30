@@ -21,44 +21,60 @@ function status_message()
 
 ############# EDIT THESE! ##################
 
-
 debug=0
 mpi=0
 shared=0
 verbose=0
 sanitize=0
-travis=0
-regression_test=1
+regression_test=0
 
 precision="double"
 prefix=""
 systype=""
 
-#Leave empty to just use the environment variable compiler
-#CC=${CC:-${CC}}
-#CXX=${CXX:-${CXX}}
-#FC=${FC:-${FC}}
-
-#echo "compilers set"
-#echo "$CC"
-#echo "$CXX"
-#echo "$FC"
-
 #Using command-line arguments
 for arg in "$@"
 do
   case $arg in
-        CC=*)
-                CC="${arg#CC=}" 
-                ;;
-        CXX=*)
-                CXX="${arg#CXX=}"
-                ;;
-        FC=*)
-                FC="${arg#FC=}"   
-                ;;    
+    CC=*)
+      CC="${arg#CC=}" 
+      ;;
+    CXX=*)
+      CXX="${arg#CXX=}"
+      ;;
+    FC=*)
+      FC="${arg#FC=}"   
+      ;;
+    regression_test=*)
+      regression_test="${arg#regression_test=}"
+      ;;
+    debug=*)
+      debug="${arg#debug=}"
+      ;;
+    mpi=*)
+      mpi="${arg#mpi=}"
+      ;;
+    shared=*)
+      shared="${arg#shared=}"
+      ;;
+    verbose=*)
+      verbose="${arg#verbose=}"
+      ;;                
+    sanitize=*)
+      sanitize="${arg#sanitize=}"
+      ;;    
   esac
 done
+
+echo "CC: $CC"
+echo "CXX: $CXX"
+echo "FC: $FC"
+echo "regression_test: $regression_test"
+echo "debug: $debug"
+echo "mpi: $mpi"
+echo "shared: $shared"
+echo "verbose: $verbose"
+echo "sanitize: $sanitize"
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
