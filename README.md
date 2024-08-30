@@ -8,9 +8,13 @@ git clone --recursive git@github.com:jinyun1tang/EcoSIM.git
 
 ## Building
 
-use the shell script to build the code:
+use the script to build the code:
 
 sh build_EcoSIM.sh
+
+you can also run as a bash script:
+
+./build_EcoSIM.sh
 
 This should build and link all the required tpls
 
@@ -33,13 +37,13 @@ precision="double"
 prefix=""
 systype=""
 
-
 #Leave empty to just use the environment variable compiler
 CC=""
 CXX=""
 FC=""
 
-You shouldn't have to modify any of these, but they are there if you need them.
+You can also set the compilers via the command line, for example:
 
+sh build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran
 
 
