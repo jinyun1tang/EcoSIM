@@ -98,9 +98,6 @@ implicit none
   ELSE
     TKSnow_snvr(1,NY,NX)=TairK_col(NY,NX)
   ENDIF
-!  if(I>=138.and.I<=139)print*,'tairk',TKSnow(1,NY,NX),TairK(NY,NX)
-  if(TKSnow(1,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)   
-!  write(133,*)I+J/24.,'snow',VcumSnowWE(NY,NX),TKSnow(1,NY,NX),TairK(NY,NX),THeatBySnowRedist(NY,NX)
 
   VcumDrySnoWE_col(NY,NX)=sum(VLDrySnoWE_snvr(1:JS,NY,NX))
   VcumWatSnow_col(NY,NX)=sum(VLWatSnow_snvr(1:JS,NY,NX))
