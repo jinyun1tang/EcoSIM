@@ -10,12 +10,12 @@ module ATSEcoSIMAdvanceMod
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
-  use ClimForcDataType, only : LWRadSky, TairK, &
-      VPA, WindSpeedAtm, RainH  
+  use ClimForcDataType 
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_col, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
+  use UnitMod    , only : units
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -37,6 +37,9 @@ implicit none
   real(r8) :: TopLayWatVol(JY,JX)
   real(r8) :: Qinfl2MicP(JY,JX)
   real(r8) :: HInfl2Soil(JY,JX)
+  real(r8) :: PrecAsRain(JY,JX)
+  real(r8) :: PrecAsSnow(JY,JX)
+  real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
@@ -52,8 +55,7 @@ implicit none
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
     AREA(3,2,NY,NX)=a_AREA3(0,NY)
 
-
-    ASP(NY,NX)=a_ASP(NY)
+    ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
     !CH4E(NY,NX)=atm_ch4
@@ -71,6 +73,25 @@ implicit none
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
     RainH(NY,NX) = p_rain(NY)
+    TCA(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
+    write(*,*) "p_rain: ", p_rain(NY)
+    write(*,*) "TSNOW: ", TSNOW
+    write(*,*) "TCA: ", TCA(NY,NX)
+    write(*,*) "TairK_col: ", TairK_col(NY,NX)
+    IF(TCA(NY,NX).GT.TSNOW)THEN
+      PrecAsRain(NY,NX)=RAINH(NY,NX)
+      PrecAsSnow(NY,NX)=0.0_r8
+    ELSE
+      PrecAsRain(NY,NX)=0.0_r8
+      PrecAsSnow(NY,NX)=RAINH(NY,NX)
+    ENDIF
+    RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    write(*,*) "PrecAsRain: ", PrecAsRain(NY,NX)
+    write(*,*) "PrecAsSnow: ", PrecAsSnow(NY,NX)
+    write(*,*) "RainFalPrec: ", RainFalPrec(NY,NX)
+    write(*,*) "SnoFalPrec: ", SnoFalPrec(NY,NX)
+    write(*,*) "AREA: ", AREA(3,NU(NY,NX),NY,NX)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
