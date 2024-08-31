@@ -74,7 +74,7 @@ module SoluteMod
 !     FLWD=net vertical flow relative to area
 !
 !     IF(ROWI(I,NY,NX).GT.0.0)THEN
-  FLWD=0.5_r8*(WaterFlowSoiMicP(3,L,NY,NX)+WaterFlowSoiMicP(3,L+1,NY,NX))/AREA(3,L,NY,NX)
+  FLWD=0.5_r8*(WaterFlowSoiMicP_3D(3,L,NY,NX)+WaterFlowSoiMicP_3D(3,L+1,NY,NX))/AREA(3,L,NY,NX)
 !
 !     NH4 FERTILIZER BAND
 !
@@ -485,7 +485,7 @@ module SoluteMod
 !     DPNH4=NH4 fertilizer band depth
 !
   IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
 !
@@ -495,25 +495,25 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWNH4=0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
+      BandWidthNH4_vr(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,BandWidthNH4_vr(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
 !
 !     DPFLW=change in NH4 fertilizer band depth
 !     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
 !
-      IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNH4(NY,NX))THEN
+      IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
         DPFLW=FLWD+DWNH4
-        DPNH4(NY,NX)=DPNH4(NY,NX)+DPFLW
-        DPNHB(L,NY,NX)=DPNHB(L,NY,NX)+DPFLW
-        IF(DPNHB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-          DPNHB(L+1,NY,NX)=DPNHB(L+1,NY,NX)+(DPNHB(L,NY,NX)-DLYR(3,L,NY,NX))
-          WDNHB(L+1,NY,NX)=WDNHB(L,NY,NX)
-          DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
-        ELSEIF(DPNHB(L,NY,NX).LT.0.0)THEN
-          DPNHB(L-1,NY,NX)=DPNHB(L-1,NY,NX)+DPNHB(L,NY,NX)
-          DPNHB(L,NY,NX)=0._r8
-          WDNHB(L,NY,NX)=0._r8
+        BandDepthNH4_col(NY,NX)=BandDepthNH4_col(NY,NX)+DPFLW
+        BandThicknessNH4_vr(L,NY,NX)=BandThicknessNH4_vr(L,NY,NX)+DPFLW
+        IF(BandThicknessNH4_vr(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+          BandThicknessNH4_vr(L+1,NY,NX)=BandThicknessNH4_vr(L+1,NY,NX)+(BandThicknessNH4_vr(L,NY,NX)-DLYR(3,L,NY,NX))
+          BandWidthNH4_vr(L+1,NY,NX)=BandWidthNH4_vr(L,NY,NX)
+          BandThicknessNH4_vr(L,NY,NX)=DLYR(3,L,NY,NX)
+        ELSEIF(BandThicknessNH4_vr(L,NY,NX).LT.0.0)THEN
+          BandThicknessNH4_vr(L-1,NY,NX)=BandThicknessNH4_vr(L-1,NY,NX)+BandThicknessNH4_vr(L,NY,NX)
+          BandThicknessNH4_vr(L,NY,NX)=0._r8
+          BandWidthNH4_vr(L,NY,NX)=0._r8
         ENDIF
       ENDIF
 !
@@ -526,8 +526,8 @@ module SoluteMod
 !
       XVLNH4=trcs_VLN_vr(ids_NH4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        trcs_VLN_vr(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNHB(L,NY,NX) &
-          /ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
+        trcs_VLN_vr(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNH4_vr(L,NY,NX) &
+          /ROWN(NY,NX)*BandThicknessNH4_vr(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_NH4B,L,NY,NX)=0._r8
       ENDIF
@@ -554,8 +554,8 @@ module SoluteMod
 !
 !     AMALGAMATE NH4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPNHB(L,NY,NX)=0._r8
-      WDNHB(L,NY,NX)=0._r8
+      BandThicknessNH4_vr(L,NY,NX)=0._r8
+      BandWidthNH4_vr(L,NY,NX)=0._r8
       trcs_VLN_vr(ids_NH4,L,NY,NX)=1._r8
       trcs_VLN_vr(ids_NH4B,L,NY,NX)=0._r8
       trcs_VLN_vr(idg_NH3,L,NY,NX)=trcs_VLN_vr(ids_NH4,L,NY,NX)
@@ -588,7 +588,7 @@ module SoluteMod
 !     DPPO4=H2PO4 fertilizer band depth
 !
   IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
 !
 !     PO4 BAND WIDTH
 !     DWPO4=change in H2PO4 fertilizer band width
@@ -597,25 +597,25 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWPO4=0.5*SQRT(SoluteDifusvty_vr(ids_H1PO4,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
+      BandWidthPO4_vr(L,NY,NX)=AMIN1(ROWP(NY,NX),BandWidthPO4_vr(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
 !
 !     DPFLW=change in H2PO4 fertilizer band depth
 !     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
 !
-      IF(CumDepth2LayerBottom(L,NY,NX).GE.DPPO4(NY,NX))THEN
+      IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
         DPFLW=FLWD+DWPO4
-        DPPO4(NY,NX)=DPPO4(NY,NX)+DPFLW
-        DPPOB(L,NY,NX)=DPPOB(L,NY,NX)+DPFLW
-        IF(DPPOB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-          DPPOB(L+1,NY,NX)=DPPOB(L+1,NY,NX)+(DPPOB(L,NY,NX)-DLYR(3,L,NY,NX))
-          WDPOB(L+1,NY,NX)=WDPOB(L,NY,NX)
-          DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
-        ELSEIF(DPPOB(L,NY,NX).LT.0.0)THEN
-          DPPOB(L-1,NY,NX)=DPPOB(L-1,NY,NX)+DPPOB(L,NY,NX)
-          DPPOB(L,NY,NX)=0._r8
-          WDPOB(L,NY,NX)=0._r8
+        BandDepthPO4_col(NY,NX)=BandDepthPO4_col(NY,NX)+DPFLW
+        BandThicknessPO4_vr(L,NY,NX)=BandThicknessPO4_vr(L,NY,NX)+DPFLW
+        IF(BandThicknessPO4_vr(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+          BandThicknessPO4_vr(L+1,NY,NX)=BandThicknessPO4_vr(L+1,NY,NX)+(BandThicknessPO4_vr(L,NY,NX)-DLYR(3,L,NY,NX))
+          BandWidthPO4_vr(L+1,NY,NX)=BandWidthPO4_vr(L,NY,NX)
+          BandThicknessPO4_vr(L,NY,NX)=DLYR(3,L,NY,NX)
+        ELSEIF(BandThicknessPO4_vr(L,NY,NX).LT.0.0)THEN
+          BandThicknessPO4_vr(L-1,NY,NX)=BandThicknessPO4_vr(L-1,NY,NX)+BandThicknessPO4_vr(L,NY,NX)
+          BandThicknessPO4_vr(L,NY,NX)=0._r8
+          BandWidthPO4_vr(L,NY,NX)=0._r8
         ENDIF
       ENDIF
 !
@@ -628,8 +628,8 @@ module SoluteMod
 !
       XVLPO4=trcs_VLN_vr(ids_H1PO4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L,NY,NX) &
-          /ROWP(NY,NX)*DPPOB(L,NY,NX)/DLYR(3,L,NY,NX)))
+        trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthPO4_vr(L,NY,NX) &
+          /ROWP(NY,NX)*BandThicknessPO4_vr(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=0._r8
       ENDIF
@@ -747,8 +747,8 @@ module SoluteMod
 !
 !     AMALGAMATE PO4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPPOB(L,NY,NX)=0._r8
-      WDPOB(L,NY,NX)=0._r8
+      BandThicknessPO4_vr(L,NY,NX)=0._r8
+      BandWidthPO4_vr(L,NY,NX)=0._r8
       trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=0._r8
       trcs_VLN_vr(ids_H1PO4,L,NY,NX)=1._r8
       trcs_VLN_vr(ids_H2PO4B,L,NY,NX)=trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
@@ -816,7 +816,7 @@ module SoluteMod
 !
   IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
 
-    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
 !
 !     NO3 BAND WIDTH
 !
@@ -826,25 +826,25 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWNO3=0.5_r8*SQRT(SoluteDifusvty_vr(ids_NO3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
+      BandWidthNO3_vr(L,NY,NX)=AMIN1(ROWO(NY,NX),BandWidthNO3_vr(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH
 !
 !     DPFLW=change in NO3 fertilizer band depth
-!     DPNO3,DPNOB=total,layer NO3 fertilizer band depth
+!     BandDepthNO3_col,DPNOB=total,layer NO3 fertilizer band depth
 !
-      IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNO3(NY,NX))THEN
+      IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
         DPFLW=FLWD+DWNO3
-        DPNO3(NY,NX)=DPNO3(NY,NX)+DPFLW
-        DPNOB(L,NY,NX)=DPNOB(L,NY,NX)+DPFLW
-        IF(DPNOB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-          DPNOB(L+1,NY,NX)=DPNOB(L+1,NY,NX)+(DPNOB(L,NY,NX)-DLYR(3,L,NY,NX))
-          WDNOB(L+1,NY,NX)=WDNOB(L,NY,NX)
-          DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
-        ELSEIF(DPNOB(L,NY,NX).LT.0.0)THEN
-          DPNOB(L-1,NY,NX)=DPNOB(L-1,NY,NX)+DPNOB(L,NY,NX)
-          DPNOB(L,NY,NX)=0._r8
-          WDNOB(L,NY,NX)=0._r8
+        BandDepthNO3_col(NY,NX)=BandDepthNO3_col(NY,NX)+DPFLW
+        BandThicknessNO3_vr(L,NY,NX)=BandThicknessNO3_vr(L,NY,NX)+DPFLW
+        IF(BandThicknessNO3_vr(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+          BandThicknessNO3_vr(L+1,NY,NX)=BandThicknessNO3_vr(L+1,NY,NX)+(BandThicknessNO3_vr(L,NY,NX)-DLYR(3,L,NY,NX))
+          BandWidthNO3_vr(L+1,NY,NX)=BandWidthNO3_vr(L,NY,NX)
+          BandThicknessNO3_vr(L,NY,NX)=DLYR(3,L,NY,NX)
+        ELSEIF(BandThicknessNO3_vr(L,NY,NX).LT.0.0)THEN
+          BandThicknessNO3_vr(L-1,NY,NX)=BandThicknessNO3_vr(L-1,NY,NX)+BandThicknessNO3_vr(L,NY,NX)
+          BandThicknessNO3_vr(L,NY,NX)=0._r8
+          BandWidthNO3_vr(L,NY,NX)=0._r8
         ENDIF
       ENDIF
 !
@@ -857,8 +857,8 @@ module SoluteMod
 !
       XVLNO3=trcs_VLN_vr(ids_NO3,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        trcs_VLN_vr(ids_NO3B,L,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L,NY,NX) &
-          /ROWO(NY,NX)*DPNOB(L,NY,NX)/DLYR(3,L,NY,NX)))
+        trcs_VLN_vr(ids_NO3B,L,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNO3_vr(L,NY,NX) &
+          /ROWO(NY,NX)*BandThicknessNO3_vr(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_NO3B,L,NY,NX)=0._r8
       ENDIF
@@ -883,8 +883,8 @@ module SoluteMod
 !
 !     AMALGAMATE NO3 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPNOB(L,NY,NX)=0._r8
-      WDNOB(L,NY,NX)=0._r8
+      BandThicknessNO3_vr(L,NY,NX)=0._r8
+      BandWidthNO3_vr(L,NY,NX)=0._r8
       trcs_VLN_vr(ids_NO3,L,NY,NX)=1._r8
       trcs_VLN_vr(ids_NO3B,L,NY,NX)=0._r8
       trcs_VLN_vr(ids_NO2,L,NY,NX)=trcs_VLN_vr(ids_NO3,L,NY,NX)
@@ -923,7 +923,7 @@ module SoluteMod
 !     begin_execution
 !     BKVL=litter mass
 !
-  IF(VLWatMicPM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VLWatMicPM_vr(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     BulkSoilMass=SoilMicPMassLayer(0,NY,NX)
 !
 !     UREA HYDROLYSIS IN SURFACE RESIDUE
@@ -982,8 +982,8 @@ module SoluteMod
 !     RSNUAA=rate of broadcast urea fertr dissoln
 !     RSNOAA=rate of broadcast NO3 fertilizer dissoln
 !
-    IF(VWatLitRHoldCapcity(NY,NX).GT.ZEROS(NY,NX))THEN
-      ThetaWLitR=AMIN1(1.0,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity(NY,NX))
+    IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS(NY,NX))THEN
+      ThetaWLitR=AMIN1(1.0,VLWatMicP_vr(0,NY,NX)/VWatLitRHoldCapcity_col(NY,NX))
     ELSE
       ThetaWLitR=1._r8
     ENDIF
@@ -1000,8 +1000,8 @@ module SoluteMod
 !     NH4_1p_conc,NH3_aqu_conc=total NH4,NH3 concentration
 !     XNH4_conc=adsorbed NH4 concentration
 !
-    IF(VLWatMicPM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VLWatMicPMX=natomw*VLWatMicPM(NPH,0,NY,NX)
+    IF(VLWatMicPM_vr(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      VLWatMicPMX=natomw*VLWatMicPM_vr(NPH,0,NY,NX)
       RN4X=(RNutMicbTransf_vr(ids_NH4,0,NY,NX)+natomw*RSN4AA)/VLWatMicPMX
       RN3X=natomw*RSNUAA/VLWatMicPMX
       NH4_1p_conc=AMAX1(ZERO,trc_solml_vr(ids_NH4,0,NY,NX)/VLWatMicPMX+RN4X)
@@ -1019,7 +1019,7 @@ module SoluteMod
 !     RH1PO4MicbTransfSoil_vr=net change in HPO4 from nitro.f
 !     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations
 !
-      VLWatMicPMP=patomw*VLWatMicPM(NPH,0,NY,NX)
+      VLWatMicPMP=patomw*VLWatMicPM_vr(NPH,0,NY,NX)
       RH1PX=RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP
       RH2PX=RNutMicbTransf_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP
       H1PO4_2e_conc=AZMAX1(trc_solml_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
@@ -1219,16 +1219,16 @@ module SoluteMod
 !     TR_AlPO4_precip_soil,TR_FePO4_precip_soil,TR_CaHPO4_precip_soil,TR_apatite_precip_soil,TR_CaH4P2O8_precip_soil
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
 !
-      trcn_RChem_soil_vr(ids_NH4,0,NY,NX)=trcn_RChem_soil_vr(ids_NH4,0,NY,NX)+RN4S*VLWatMicPM(NPH,0,NY,NX)
-      TR_NH3_soil_vr(0,NY,NX)=TR_NH3_soil_vr(0,NY,NX)+RN3S*VLWatMicPM(NPH,0,NY,NX)
-      trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)=trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)+RHP1*VLWatMicPM(NPH,0,NY,NX)
-      trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)=trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)+RHP2*VLWatMicPM(NPH,0,NY,NX)
-      trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)=trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)+RXN4*VLWatMicPM(NPH,0,NY,NX)
-      trcp_RChem_soil(idsp_AlPO4,0,NY,NX)=trcp_RChem_soil(idsp_AlPO4,0,NY,NX)+H2PO4_1e_AlPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_RChem_soil(idsp_FePO4,0,NY,NX)=trcp_RChem_soil(idsp_FePO4,0,NY,NX)+H2PO4_1e_FePO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_RChem_soil(idsp_CaHPO4,0,NY,NX)=trcp_RChem_soil(idsp_CaHPO4,0,NY,NX)+H2PO4_1e_CaHPO4_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_RChem_soil(idsp_HA,0,NY,NX)=trcp_RChem_soil(idsp_HA,0,NY,NX)+H2PO4_1e_apatite_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
-      trcp_RChem_soil(idsp_CaH4P2O8,0,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8,0,NY,NX)+H2PO4_1e_CaH4P2O8_dissol_flx*VLWatMicPM(NPH,0,NY,NX)
+      trcn_RChem_soil_vr(ids_NH4,0,NY,NX)=trcn_RChem_soil_vr(ids_NH4,0,NY,NX)+RN4S*VLWatMicPM_vr(NPH,0,NY,NX)
+      TR_NH3_soil_vr(0,NY,NX)=TR_NH3_soil_vr(0,NY,NX)+RN3S*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)=trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)+RHP1*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)=trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)+RHP2*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)=trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)+RXN4*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_AlPO4,0,NY,NX)=trcp_RChem_soil(idsp_AlPO4,0,NY,NX)+H2PO4_1e_AlPO4_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_FePO4,0,NY,NX)=trcp_RChem_soil(idsp_FePO4,0,NY,NX)+H2PO4_1e_FePO4_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_CaHPO4,0,NY,NX)=trcp_RChem_soil(idsp_CaHPO4,0,NY,NX)+H2PO4_1e_CaHPO4_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_HA,0,NY,NX)=trcp_RChem_soil(idsp_HA,0,NY,NX)+H2PO4_1e_apatite_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcp_RChem_soil(idsp_CaH4P2O8,0,NY,NX)=trcp_RChem_soil(idsp_CaH4P2O8,0,NY,NX)+H2PO4_1e_CaH4P2O8_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
       FertN_soil_vr(ifert_nh4,0,NY,NX)=FertN_soil_vr(ifert_nh4,0,NY,NX)-RSN4AA
       FertN_soil_vr(ifert_nh3,0,NY,NX)=FertN_soil_vr(ifert_nh3,0,NY,NX)-RSN3AA
       FertN_soil_vr(ifert_urea,0,NY,NX)=FertN_soil_vr(ifert_urea,0,NY,NX)-RSNUAA
@@ -1242,7 +1242,7 @@ module SoluteMod
       trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)=trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)*patomw
       trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)=trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)*patomw
 !     WRITE(*,9989)'TR_NH4_soil',I,J,trcn_RChem_soil_vr(ids_NH4,0,NY,NX)
-!    2,RN4S,RNH4,RXN4,RSN4AA,VLWatMicPM(NPH,0,NY,NX)
+!    2,RN4S,RNH4,RXN4,RSN4AA,VLWatMicPM_vr(NPH,0,NY,NX)
 !    3,SPNH4,FertN_soil_vr(ifert_nh4,0,NY,NX),ThetaWLitR
 !9989  FORMAT(A8,2I4,12E12.4)
   end subroutine UpdateSoluteinSurfaceResidue

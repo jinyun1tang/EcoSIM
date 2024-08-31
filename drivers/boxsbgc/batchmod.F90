@@ -519,22 +519,22 @@ contains
   real(r8), intent(inout) :: ystatesfl(nvars)
 
   integer :: K,N,NGL,M
-  associate(                                                 &
-    jcplx                  => micpar%jcplx,                  &
-    NumMicbFunGrupsPerCmplx       => micpar%NumMicbFunGrupsPerCmplx,       &
-    jsken                  => micpar%jsken,                  &
-    k_humus                => micpar%k_humus,                &
-    k_POM                  => micpar%k_POM,                  &
-    iprotein               => micpar%iprotein,               &
-    icarbhyro              => micpar%icarbhyro,              &
-    nlbiomcp               => micpar%nlbiomcp,               &
-    ndbiomcp               => micpar%ndbiomcp,               &
-    is_litter              => micpar%is_litter,              &
-    NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
-    NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
-    NumHetetrMicCmplx => micpar%NumHetetrMicCmplx, &
-    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
-    VLWatMicP              => micfor%VLWatMicP               &
+  associate(                                                   &
+    jcplx                   => micpar%jcplx,                   &
+    NumMicbFunGrupsPerCmplx => micpar%NumMicbFunGrupsPerCmplx, &
+    jsken                   => micpar%jsken,                   &
+    k_humus                 => micpar%k_humus,                 &
+    k_POM                   => micpar%k_POM,                   &
+    iprotein                => micpar%iprotein,                &
+    icarbhyro               => micpar%icarbhyro,               &
+    nlbiomcp                => micpar%nlbiomcp,                &
+    ndbiomcp                => micpar%ndbiomcp,                &
+    is_litter               => micpar%is_litter,               &
+    NumLiveAutoBioms        => micpar%NumLiveAutoBioms,        &
+    NumLiveHeterBioms       => micpar%NumLiveHeterBioms,       &
+    NumHetetrMicCmplx       => micpar%NumHetetrMicCmplx,       &
+    NumMicrobAutrophCmplx   => micpar%NumMicrobAutrophCmplx,   &
+    VLWatMicP               => micfor%VLWatMicP                &
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
@@ -1247,6 +1247,7 @@ contains
 !
   use ChemMod
   use MicBGCMod           , only : SoilBGCOneLayer
+  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(in) :: ystates0l(nvars)
@@ -1256,13 +1257,14 @@ contains
   type(micsttype)  , intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
   type(model_status_type), intent(out) :: err_status
+  type(Cumlate_Flux_Diag_type)  :: naqfdiag
 
   call err_status%reset()
 
   ystatesfl=0._r8
   if(.not.forc%disvolonly)then
 !    print*,'SoilBGCOneLayer'
-    call SoilBGCOneLayer(micfor,micstt,micflx)
+    call SoilBGCOneLayer(micfor,micstt,micflx,naqfdiag)
 !    print*,'RunModel_nosalt'
     call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
   endif

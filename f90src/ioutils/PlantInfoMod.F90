@@ -5,6 +5,9 @@ module PlantInfoMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use fileUtil, only : open_safe, check_read,int2str,getavu, relavu, opnfil
   use minimathmod, only : isLeap
+  use abortutils, only : endrun  
+  use netcdf
+  use ncdio_pio  
   use GridConsts
   use FlagDataType
   use EcoSIMCtrlDataType
@@ -26,47 +29,46 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,NumOfCanopyLayersUT,LPY
+  integer :: NumOfCanopyLayersUT
 
   public :: ReadPlantInfo
   contains
 
-  subroutine ReadPlantInfo(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantInfo(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 ! DESCRIPTION
 !
 
   implicit none
   integer, intent(in) :: yearc, yeari
-  integer, intent(in) :: NE   !
-  integer, intent(in) :: NEX  !
   integer, intent(in) :: NHW,NHE,NVN,NVS     !simulation domain specification
 
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
   if(lverb)WRITE(*,333)'ROUTQ'
-  CALL ROUTQ(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL ROUTQ(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
 !
   if(lverb)WRITE(*,333)'READQ'
-  CALL READQ(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL READQ(yearc,yeari,NHW,NHE,NVN,NVS)
 
 333   FORMAT(A8)
 
   end subroutine ReadPlantInfo
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE readq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readq(yearc,yeari,NHW,NHE,NVN,NVS)
 !!
 ! Description
 ! THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
 !     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 !
   implicit none
-  integer, intent(in) :: yearc,yeari,NEX
-  integer, intent(in) :: NE,NHW,NHE,NVN,NVS
+  integer, intent(in) :: yearc   !current model year
+  integer, intent(in) :: yeari   !current forcing year 
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nu_plt
   character(len=128) :: fnm_loc
 
@@ -92,211 +94,270 @@ implicit none
   ENDDO D9995
 
   if(disp_planttrait)call relavu(nu_plt)
+  print*,'yearc',yearc,yeari
   call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
+  subroutine readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+  !
+  !read planting information
+  implicit none
+  type(file_desc_t), intent(in) :: pftinfo_nfid
+  integer, intent(in) :: ntopou
+  integer, intent(in) :: iyear,yearc
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  logical  :: readvar
+  integer  :: NH1,NV1,NH2,NV2,NS
+  integer :: NTOPO,NY,NX,NZ
+  real(r8) :: DY
+  type(Var_desc_t) :: vardesc
+  character(len=128) :: pft_pltinfo(JP),tstr
+  integer :: LPY,IDX,IMO,IYR,IDY
+
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      DO NZ=1,NP(NY,NX)
+        PlantinDepz_pft(NZ,NY,NX)=ppmc
+      ENDDO
+    ENDDO
+  ENDDO
+
+  DO NTOPO=1,ntopou
+    call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
+    call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
+    call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
+    call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
+    call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+
+    !planting information
+    call check_var(pftinfo_nfid, 'pft_pltinfo', vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find pft_pltinfo in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_pltinfo, &
+      start = (/1,1,NTOPO,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),&
+      trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
+
+    DO NX=NH1,NH2
+      DO NY=NV1,NV2
+        DO NZ=1,MIN(NS,NP(NY,NX))
+          tstr=trim(pft_pltinfo(NZ))
+          read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+          read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
+
+          LPY=0
+          if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+          !obtain the ordinal day
+          IF(IMO.EQ.1)then
+            IDY=IDX
+          else
+            IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+          endif
+          IF(IDY.GT.0.AND.IYR.GT.0)THEN
+            iDayPlanting_pft(NZ,NY,NX)=IDY
+            IYR=yearc
+            iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
+            iPlantingDay_pft(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
+            iPlantingYear_pft(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
+            PPatSeeding_pft(NZ,NY,NX)=PPI_pft(NZ,NY,NX)     !population density
+          ENDIF          
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO  
+  end subroutine readplantinginfo  
+
+!------------------------------------------------------------------------------------------
+  subroutine readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+  !
+  !read plant management information
+  implicit none
+  type(file_desc_t), intent(in) :: pftinfo_nfid
+  integer, intent(in) :: ntopou
+  integer, intent(in) :: iyear,yearc
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+
+  logical  :: readvar
+  real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
+  real(r8) :: ECUT24,HCUT,PCUT
+  integer  :: pft_nmgnt(JP)
+  integer  :: NH1,NV1,NH2,NV2,NS
+  type(Var_desc_t) :: vardesc
+  integer :: NTOPO,NY,NX,NZ
+  character(len=128) :: pft_pltinfo(JP),tstr  
+  character(len=128) :: pft_mgmtinfo(24,JP)
+  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS
+  integer :: M,NN,N,nn1
+
+! initialize the disturbance arrays
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      DO NZ=1,NP(NY,NX)
+        DO M=1,366
+          iHarvstType_pft(NZ,M,NY,NX)=-1
+          jHarvst_pft(NZ,M,NY,NX)=0
+          CutHeightORFrac_pft(NZ,M,NY,NX)=1.0E+06_r8
+          THIN_pft(NZ,M,NY,NX)=-1.0_r8
+          FracBiomHarvsted(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+          FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+          FracBiomHarvsted(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+
+  DO NTOPO=1,ntopou
+    call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
+    call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
+    call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
+    call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
+    call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+
+    call check_var(pftinfo_nfid, 'nmgnts', vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find pft_type in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_nmgnt, &
+      start = (/1,NTOPO,iyear/),count = (/JP,1,1/)),trim(mod_filename)// &
+      '::at line '//trim(int2str(__LINE__)))
+
+    if(any(pft_nmgnt(1:NS)>0))then
+      call check_var(pftinfo_nfid, 'pft_mgmt', vardesc, readvar)
+      if(.not. readvar)then
+        call endrun('fail to find pft_mgmt in '//trim(mod_filename), __LINE__)
+      endif
+
+      call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_mgmtinfo, &
+        start = (/1,1,1,NTOPO,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
+        trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
+    endif
+
+    DO NX=NH1,NH2
+      DO NY=NV1,NV2
+        DO NZ=1,MIN(NS,NP(NY,NX))
+          if(pft_nmgnt(NZ)>0)then
+            NN=0
+            DO nn1=1,pft_nmgnt(NZ)
+              tstr=trim(pft_mgmtinfo(NN1,NZ))
+              read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+              READ(TSTR,*)DY,ICUT,NumOfCanopyLayersUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
+                  ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+
+              if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+              !obtain the ordinal day
+              IF(IMO.EQ.1)then
+                IDY=IDX
+              else
+                print*,tstr,IMO
+                IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+              endif
+
+              IF(IDY.GT.0.AND.NumOfCanopyLayersUT.EQ.1)THEN
+                iDayPlantHarvest_pft(NZ,NY,NX)=IDY
+                IYR=yearc
+                iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
+              ENDIF
+
+              iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
+              jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
+              CutHeightORFrac_pft(NZ,IDY,NY,NX)=HCUT
+              THIN_pft(NZ,IDY,NY,NX)=PCUT
+              FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
+              FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
+              FracBiomHarvsted(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
+              FracBiomHarvsted(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
+              FracBiomHarvsted(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
+              FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
+              FracBiomHarvsted(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
+              FracBiomHarvsted(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
+
+              IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
+                !animal or insect biomass
+                NN=NN+1
+                if(mod(nn,2)==0)then
+                  IDYE=IDY
+                  D580: DO IDYG=IDYS+1,IDYE-1
+                    iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
+                    jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
+                    CutHeightORFrac_pft(NZ,IDYG,NY,NX)=HCUT
+                    THIN_pft(NZ,IDYG,NY,NX)=PCUT
+                    FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
+                    FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
+                    FracBiomHarvsted(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
+                    FracBiomHarvsted(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
+                    FracBiomHarvsted(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
+                    FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
+                    FracBiomHarvsted(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
+                    FracBiomHarvsted(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
+                  ENDDO D580
+                endif
+                IDYS=IDY
+              ENDIF
+            ENDDO
+          endif
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO        
+  end subroutine readplantmgmtinfo
+!------------------------------------------------------------------------------------------
 
   subroutine ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
-
-  use netcdf
-  use ncdio_pio
-  use abortutils, only : endrun
+  !
+  !
   implicit none
-  integer, intent(in) :: NHW,NHE,NVN,NVS,yeari,yearc
-  integer :: NY,NX,NZ
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer, intent(in) :: yeari   !forcing data year
+  integer, intent(in) :: yearc   !current model year
 
   type(file_desc_t) :: pftinfo_nfid
   type(Var_desc_t) :: vardesc
   logical :: readvar
   integer :: pft_dflag
-  integer :: iyear,nyears,year
-  integer :: NTOPO,ntopou
-  integer :: M,NN,N,nn1
-  real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
-  real(r8) :: ECUT24,HCUT,PCUT
-  integer :: pft_nmgnt(JP)
-  integer :: NH1,NV1,NH2,NV2,NS
-  character(len=128) :: pft_pltinfo(JP),tstr
-  character(len=128) :: pft_mgmtinfo(24,JP)
+  integer :: iyear,year
+  integer :: ntopou,NY,NX,NZ
 
-  if (len_trim(pft_mgmt_in)==0)then
-    return
-  else
-!    write(199,*)'ReadPlantManagementNC'
-  ! initialize the disturbance arrays
-    DO NX=NHW,NHE
-      DO NY=NVN,NVS
-        DO NZ=1,NP(NY,NX)
-          DO M=1,366
-            iHarvstType_pft(NZ,M,NY,NX)=-1
-            jHarvst_pft(NZ,M,NY,NX)=0
-            CutingHeightORFrac_pft(NZ,M,NY,NX)=1.0E+06_r8
-            THIN_pft(NZ,M,NY,NX)=-1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-            FracBiomRMbyHVST(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-            FracBiomRMbyHVST(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
-          ENDDO
-          PlantinDepz_pft(NZ,NY,NX)=ppmc
-        ENDDO
-      ENDDO
-    ENDDO
+  if (len_trim(pft_mgmt_in)==0)return
+  
+  call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
 
-    call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
+  call check_var(pftinfo_nfid, 'pft_dflag', vardesc, readvar)
 
-    call check_var(pftinfo_nfid, 'pft_dflag', vardesc, readvar)
+  call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
+    trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 
-    call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
-      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-!    write(199,*)'pppft_dflag=',pft_dflag,IGO
-    if(pft_dflag==0)then
-      ! constant pft data
-      iyear=1
-      if(IGO>0)return
-    else
-      iyear=1
-      DO while(.true.)
-        call ncd_getvar(pftinfo_nfid,'year',iyear,year)
-        if(year==yeari)exit
-        iyear=iyear+1
-      ENDDO
+  !obtain the number of topographic units
+  ntopou=get_dim_len(pftinfo_nfid, 'ntopou')    
+  if(first_topou)ntopou=1
+
+  if(pft_dflag==0)then
+    ! constant pft data
+    iyear=1
+    if(IGO==0)then
+    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+    elseif(IGO==1)then
+    iyear=2
+    call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     endif
-    !obtain the number of topographic units
-    ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
-    nyears=get_dim_len(pftinfo_nfid, 'year')
-    if(first_topou)ntopou=1
-    DO NTOPO=1,ntopou
-      call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
-      call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
-      call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
-      call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
-      call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
-
-      call check_var(pftinfo_nfid, 'pft_pltinfo', vardesc, readvar)
-      if(.not. readvar)then
-        call endrun('fail to find pft_pltinfo in '//trim(mod_filename), __LINE__)
-      endif
-
-      call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_pltinfo, &
-        start = (/1,1,NTOPO,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),&
-        trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
-
-      call check_var(pftinfo_nfid, 'nmgnts', vardesc, readvar)
-      if(.not. readvar)then
-        call endrun('fail to find pft_type in '//trim(mod_filename), __LINE__)
-      endif
-
-      call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_nmgnt, &
-        start = (/1,NTOPO,iyear/),count = (/JP,1,1/)),trim(mod_filename)// &
-        '::at line '//trim(int2str(__LINE__)))
-
-      if(any(pft_nmgnt(1:NS)>0))then
-        call check_var(pftinfo_nfid, 'pft_mgmt', vardesc, readvar)
-        if(.not. readvar)then
-          call endrun('fail to find pft_mgmt in '//trim(mod_filename), __LINE__)
-        endif
-
-        call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_mgmtinfo, &
-          start = (/1,1,1,NTOPO,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
-          trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-      endif
-
-      DO NX=NH1,NH2
-        DO NY=NV1,NV2
-          DO NZ=1,MIN(NS,NP(NY,NX))
-            tstr=trim(pft_pltinfo(NZ))
-            read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-            read(tstr,*)DY,PPI(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
-
-            LPY=0
-            if(isLeap(iyr) .and. IMO.GT.2)LPY=1
-            !obtain the ordinal day
-            IF(IMO.EQ.1)then
-              IDY=IDX
-            else
-              IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
-            endif
-            IF(IDY.GT.0.AND.IYR.GT.0)THEN
-              iDayPlanting_pft(NZ,NY,NX)=IDY
-              IYR=yearc
-              iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
-              iPlantingDay_pft(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
-              iPlantingYear_pft(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
-              PPatSeeding_pft(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
-            ENDIF
-
-            if(pft_nmgnt(NZ)>0)then
-              NN=0
-              DO nn1=1,pft_nmgnt(NZ)
-                tstr=trim(pft_mgmtinfo(NN1,NZ))
-                read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-                READ(TSTR,*)DY,ICUT,NumOfCanopyLayersUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
-                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
-
-                if(isLeap(iyr) .and. IMO.GT.2)LPY=1
-                !obtain the ordinal day
-                IF(IMO.EQ.1)then
-                  IDY=IDX
-                else
-                  IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
-                endif
-
-                IF(IDY.GT.0.AND.NumOfCanopyLayersUT.EQ.1)THEN
-                  iDayPlantHarvest_pft(NZ,NY,NX)=IDY
-                  IYR=yearc
-                  iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
-                ENDIF
-
-                iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
-                jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
-                CutingHeightORFrac_pft(NZ,IDY,NY,NX)=HCUT
-                THIN_pft(NZ,IDY,NY,NX)=PCUT
-                FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
-                FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
-                FracBiomRMbyHVST(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
-                FracBiomRMbyHVST(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
-                FracBiomRMbyHVST(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
-                FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
-                FracBiomRMbyHVST(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
-                FracBiomRMbyHVST(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
-
-                IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
-                  !animal or insect biomass
-                  NN=NN+1
-                  if(mod(nn,2)==0)then
-                    IDYE=IDY
-                    D580: DO IDYG=IDYS+1,IDYE-1
-                      iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
-                      jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
-                      CutingHeightORFrac_pft(NZ,IDYG,NY,NX)=HCUT
-                      THIN_pft(NZ,IDYG,NY,NX)=PCUT
-                      FracBiomRMbyHVST(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
-                      FracBiomRMbyHVST(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
-                      FracBiomRMbyHVST(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
-                      FracBiomRMbyHVST(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
-                      FracBiomRMbyHVST(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
-                      FracBiomRMbyHVST(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
-                      FracBiomRMbyHVST(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
-                      FracBiomRMbyHVST(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
-                    ENDDO D580
-                  endif
-                  IDYS=IDY
-                ENDIF
-              ENDDO
-            endif
-          ENDDO
-        ENDDO
-      ENDDO
+  else
+    iyear=1
+    DO while(.true.)
+      call ncd_getvar(pftinfo_nfid,'year',iyear,year)
+      if(year==yeari)exit
+      iyear=iyear+1
     ENDDO
-
-    call ncd_pio_closefile(pftinfo_nfid)
-
-  ENDIF
+    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+    call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+  endif
+  call ncd_pio_closefile(pftinfo_nfid)
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
@@ -388,7 +449,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenolPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'INTYP', loc, iPlantNfixType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenolType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -419,7 +480,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CTC', loc, TCChill4Seed_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
-  call ncd_getvar(pft_nfid, 'WDLF', loc,rLen2WidthLeaf(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'WDLF', loc,rLen2WidthLeaf_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PB', loc,MinNonstC2InitBranch_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
@@ -427,7 +488,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'XDL', loc,CriticPhotoPeriod_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XPPD', loc,PhotoPeriodSens_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SSL1', loc,PetoLen2Mass_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC(NZ,NY,NX))
 
@@ -528,7 +589,7 @@ implicit none
 !   iPlantRootProfile_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
 !   iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
 !   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
-!   iPlantNfixType=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
+!   iPlantNfixType_pft=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
 !   iPlantPhenolType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
 !   iPlantPhotoperiodType_pft=photoperiod type:0=day neutral,1=short day,2=long day
@@ -586,7 +647,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'Growth pattern',strval,40)
 
-  select case (iPlantNfixType(NZ,NY,NX))
+  select case (iPlantNfixType_pft(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
   case (in2fixtyp_root_fast)
     strval='Rapid root N-fixation'
@@ -745,7 +806,7 @@ implicit none
   call writefixl(nu_plt,'Chilling temperature for CO2 fixation, seed loss (oC) CTC',TCChill4Seed_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Hour requirement for spring leafout VRNLI',VRNLI,70)
   call writefixl(nu_plt,'Hour requirement for autumn leafoff VRNXI',VRNXI,70)
-  call writefixl(nu_plt,'Leaf length:width ratio WDLF',rLen2WidthLeaf(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Leaf length:width ratio WDLF',rLen2WidthLeaf_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',MinNonstC2InitBranch_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
   call writefixl(nu_plt,'Node number at planting XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),70)
@@ -764,7 +825,7 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)  
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1(NZ,NY,NX),70)
+  call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC(NZ,NY,NX),70)
   call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
@@ -915,7 +976,7 @@ implicit none
   end subroutine plant_optic_trait_disp
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE routq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE routq(yearc,yeari,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
@@ -923,7 +984,7 @@ implicit none
       use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
   integer, intent(in) :: yearc,yeari
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
   CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
   CHARACTER(len=4) :: CHARY
@@ -947,21 +1008,21 @@ implicit none
 
   ENDIF
   if(lverb)write(*,*)'ReadPlantInfoNC'
-  call ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  call ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
 
   END subroutine routq
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
   !
   !Description
   use netcdf
   use ncdio_pio
   use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: yeari
   integer :: IDATE
   integer :: NPP(JY,JX)

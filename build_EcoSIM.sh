@@ -21,23 +21,70 @@ function status_message()
 
 ############# EDIT THESE! ##################
 
-
 debug=0
 mpi=0
 shared=0
 verbose=0
 sanitize=0
-travis=0
+regression_test=0
 
 precision="double"
 prefix=""
 systype=""
 
+print_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  --CC=<compiler>        Set C compiler"
+    echo "  --CXX=<compiler>       Set C++ compiler"
+    echo "  --FC=<compiler>        Set Fortran compiler"
+    echo "  --regression-test      Enable regression test"
+    echo "  --debug                Enable debug mode"
+    echo "  --mpi                  Enable MPI"
+    echo "  --shared               Enable shared libraries"
+    echo "  --verbose              Enable verbose output"
+    echo "  --sanitize             Enable sanitizer"
+    echo "  --help                 Display this help message"
+    exit 0
+}
 
-#Leave empty to just use the environment variable compiler
-CC="/global/software/rocky-8.x86_64/gcc/linux-rocky8-x86_64/gcc-11.4.0/openmpi-4.1.6-kk4tbvrqcaj7su6jdcofpa5bprjbb7nm/bin/mpicc"
-CXX="/global/software/rocky-8.x86_64/gcc/linux-rocky8-x86_64/gcc-11.4.0/openmpi-4.1.6-kk4tbvrqcaj7su6jdcofpa5bprjbb7nm/bin/mpicxx"
-FC="/global/software/rocky-8.x86_64/gcc/linux-rocky8-x86_64/gcc-11.4.0/openmpi-4.1.6-kk4tbvrqcaj7su6jdcofpa5bprjbb7nm/bin/mpif90"
+
+#Using command-line arguments
+for arg in "$@"
+do
+  case $arg in
+    --help|--h)
+      print_help
+      ;; 
+    CC=*|--CC=*)
+      CC="${arg#CC=}" 
+      ;;
+    CXX=*|--CXX=*)
+      CXX="${arg#CXX=}"
+      ;;
+    FC=*|--FC=*)
+      FC="${arg#FC=}"   
+      ;;
+    --regression_test)
+      regression_test=1
+      ;;
+    --debug)
+      debug=1
+      ;;
+    --mpi)
+      mpi=1
+      ;;
+    --shared)
+      shared=1
+      ;;
+    --verbose)
+      verbose=1
+      ;;                
+    --sanitize)
+      sanitize=1
+      ;; 
+  esac
+done
 
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
@@ -88,34 +135,47 @@ if [ "$sanitize" -eq 1 ]; then
     CONFIG_FLAGS="${CONFIG_FLAGS} -DADDRESS_SANITIZER=1"
 fi
 
-if [ $ATS_ECOSIM -eq 1 ]; then
+if [ -n "$ATS_ECOSIM" ]; then
     echo "Building ATS-EcoSIM"
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=1" 
+    #Having this automatically set to use mpi compilers
+    if [ "$mpi" -eq 0 ]; then
+    	mpi=1
+    fi
 fi
 
-# Check if CC is set and not empty
-if [ -n "$CC" ]; then
-  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${CC}"
+#if mpi is set use the mpi compilers, if not use default
+if [ "$mpi" -eq 1 ]; then
+  # Use MPI versions of the compilers
+  if [ -n "$MPICC" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${MPICC}"
+  fi
+
+  if [ -n "$MPICXX" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${MPICXX}"
+  fi
+
+  if [ -n "$MPIF90" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${MPIF90}"
+  fi
+else
+  # Use non-MPI versions of the compilers
+  if [ -n "$CC" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_C_COMPILER=${CC}"
+  fi
+
+  if [ -n "$CXX" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${CXX}"
+  fi
+
+  if [ -n "$FC" ]; then
+    CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${FC}"
+  fi
 fi
-
-# Check if CXX is set and not empty
-if [ -n "$CXX" ]; then
-  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_CXX_COMPILER=${CXX}"
-fi
-
-# Check if FC is set and not empty
-if [ -n "$FC" ]; then
-  CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_Fortran_COMPILER=${FC}"
-fi
-
-CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=$ATS_ECOSIM"
-
-echo "Config Flags: "
-echo "${CONFIG_FLAGS}"
 
 cmd_configure="${cmake_binary} \
   ${CONFIG_FLAGS}
   ${ecosim_source_dir}"
-
 
 # Check if the build exists
 if [ ! -d "$ecosim_build_dir" ]; then
@@ -129,31 +189,20 @@ fi
 # Note: many of the options that used to be in the CMakeLists.txt file
 # have been moved here to remove redundancies
 
-ATS_ECOSIM=$ATS_ECOSIM
-echo $ATS_ECOSIM
-
 echo "cmd_configure: $cmd_configure"
 echo "building in: $ecosim_build_dir"
 #run the configure command
 #cd ${ecosim_build_dir}
 #${cmd_configure}
 cd build
-#pwd
-#cmake ../ -DATS_ECOSIM=$ATS_ECOSIM
 ${cmd_configure}
 
 #This does the build
 make -j ${parallel_jobs}
-#if [ $? -ne 0 ]; then
-#    error_message "Failed to build EcoSIM"
-#    exit_now 50
-#fi
-#status_message "EcoSIM build complete"
+
+if [ "$regression_test" -eq 1 ]; then
+  make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gcc;
+fi
 
 #Does the install
 make install
-#if [ $? -ne 0 ]; then
-#  error_message "Failed to install EcoSIM"
-#  exit_now 50
-#fi
-#status_message "EcoSIM install complete"

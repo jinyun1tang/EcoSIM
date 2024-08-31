@@ -86,10 +86,9 @@ PROGRAM main
   call  InitModules(nmicbguilds)
 
   if(lverb)WRITE(*,*)'read initialization information READI'
-  CALL readi(NE,NEX,NHW,NHE,NVN,NVS)
+  CALL readi(NHW,NHE,NVN,NVS)
 
   call write_modelconfig()
-  NE=1;NEX=1
 
   call set_sim_type()
 
@@ -133,7 +132,7 @@ PROGRAM main
         nlend=.false.
         IGO=yeari-year_ini
         if(frectyp%yearcur==yeari)then
-          call soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
+          call soil(NHW,NHE,NVN,NVS,nlend)
         endif
         if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1

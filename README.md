@@ -8,55 +8,46 @@ git clone --recursive git@github.com:jinyun1tang/EcoSIM.git
 
 ## Building
 
-make config CC=icc CXX=icpc FC=ifort 
+use the script to build the code:
 
-make install CC=icc CXX=icpc FC=ifort
+sh build_EcoSIM.sh
 
-Find the executable under ./local/bin/ecosim.f90.x
+you can also run as a bash script:
 
-make test CC=icc CXX=icpc FC=ifort F90=1
+./build_EcoSIM.sh
 
-will check if the code is downloaded properly.  (Hower, because compiler difference, tests may fail.)
+This should build and link all the required tpls
 
-For gnu compilers, change icc, icpc and ifort into gcc, g++ and gfortran, respectively.
+The executable will be found in ./build/bin/ecosim.f90.x
 
-## netcdf library
+This has been tested with gcc on multiple systems, but not intel compilers
 
-It is recommended you have the netcdf library installed on your system for C, C++ and fortran. 
-For mac, this can be done through either macport of homebrew.
+## additional options
 
-If a system provided netcdf libraray is provided. Use the following 
+Opening the build_EcoSIM.sh script there are some opttional parameters you can set:
 
-make config CC=icx CXX=icpc FC=ifort netcdfsys=1
+debug=0
+mpi=0
+shared=0
+verbose=0
+sanitize=0
+regression_test=0
 
-to config, and use
+precision="double"
+prefix=""
+systype=""
 
-make install CC=icx CXX=icpc FC=ifort netcdfsys=1
+#Leave empty to just use the environment variable compiler
+CC=""
+CXX=""
+FC=""
 
-to build.
+You can also set options via the command line, for example:
 
-There is another approach when your system does not have netcdf support. Assume using
-gnu compiler, first do
+./build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran --debug --regression_test
 
-make stage CC=gcc CXX=g++ FC=gfortran 
+run
 
-then
+./build_EcoSIM.sh --help 
 
-make config CC=gcc CXX=g++ FC=gfortran netcdfsys=1
-
-and 
-
-make install CC=gcc CXX=g++ FC=gfortran netcdfsys=1
-
-
-## more about build
-
-read the Makefile.
-
-## Examples
-Examples can be found in examples/run_dir.
-To run the example, for instance, dryland, goes to dryland, then type
-
-../../../local/bin/ecosim.f90.x dryland.namelist
-
-and output can be found at dryland_maize_outputs.
+for a full list of optional arguments

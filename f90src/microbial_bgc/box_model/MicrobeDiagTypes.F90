@@ -43,15 +43,30 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: tRCO2MicrbProd
     real(r8) :: tRCH4MicrbProd
     real(r8) :: tRNOxMicrbRedux
-    real(r8) :: tRCO2GrothAutor            !CO2 taken up for autotrophic biomass growth
+    real(r8) :: tRCO2GrothAutor       !CO2 taken up for autotrophic biomass growth
     real(r8) :: TProdH2               !H2 production by fermenters
     real(r8) :: tRO2MicrbUptk         !O2 uptake by microbes
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
     real(r8) :: TReduxNO3Band         !NO3 reduction in banded soil by denitrifiers
     real(r8) :: TReduxNO2Soil         !NO2 reduction in non-band soil, by ammonia oxidizers, and denitrifiers
     real(r8) :: TReduxNO2Band         !NO2 reduction in banded soil, by ammonia oxidizers, and denitrifiers
+    real(r8) :: TDeniReduxNO2Band
+    real(r8) :: TDeniReduxNO2Soil
+    real(r8) :: TNitReduxNO2Band
+    real(r8) :: TNitReduxNO2Soil
+
     real(r8) :: TReduxN2O             !N2O reduction by detnitrifiers
     real(r8) :: TFixN2                !N2 fixation by aerobic and anaerobic N2 fixers
+    real(r8) :: tCH4OxiAero           !aerobic CH4 oxidation
+    real(r8) :: tRNH3Oxi              !NH3 oxidation by nitrifiers, soil+band
+
+    real(r8) :: RNO2ReduxSoilChemo
+    real(r8) :: RNO2ReduxBandChemo
+    real(r8) :: RN2OProdSoilChemo
+    real(r8) :: RN2OProdBandChemo
+    real(r8) :: RNO3ProdSoilChemo
+    real(r8) :: RNO3ProdBandChemo
+    real(r8) :: RNO2ReduxChemo
 
   contains
     procedure, public :: ZeroOut => nit_aqmf_diag
@@ -249,13 +264,6 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: H1P4T
   real(r8) :: H2P4T
   real(r8) :: RH2UptkAutor
-  real(r8) :: RNO2ReduxSoilChemo
-  real(r8) :: RNO2ReduxBandChemo
-  real(r8) :: RN2OProdSoilChemo
-  real(r8) :: RN2OProdBandChemo
-  real(r8) :: RNO3ProdSoilChemo
-  real(r8) :: RNO3ProdBandChemo
-  real(r8) :: RNO2ReduxChemo
   real(r8) :: ThetaLitr
   real(r8) :: ThetaZ
   real(r8) :: TOMBioResdu
@@ -317,6 +325,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%TReduxNO2Band=0.0_r8
   this%TReduxN2O=0.0_r8
   this%TFixN2=0.0_r8
+  this%tCH4OxiAero=0._r8
   end subroutine nit_aqmf_diag
 !------------------------------------------------------------------------------------------
 

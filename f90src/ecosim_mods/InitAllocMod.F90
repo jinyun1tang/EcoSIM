@@ -37,7 +37,7 @@ implicit none
   use InitSoluteMod       , only : InitSoluteProperty
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
-
+  use EcoSIMCtrlMod       , only : plant_model
   use PlantTraitDataType   , only : InitPlantTraits
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
@@ -65,9 +65,6 @@ implicit none
 
   call InitPlantMorphSize()
 
-  !putting in the if statement to avoid PFT file load error
-
-  write(*,*) "plant_model: ", plant_model
   if(plant_model)call InitGrosub(NumGrowthStages,MaxNumRootAxes)
 
   call InitGridData

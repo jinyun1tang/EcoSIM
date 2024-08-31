@@ -92,8 +92,8 @@ module NitroDisturbMod
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
-!     VOLWOU=VOLWOU+DCORPC*VLWatMicP_vr(L,NY,NX)
-!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
+!     QH2OLoss_lnds=QH2OLoss_lnds+DCORPC*VLWatMicP_vr(L,NY,NX)
+!     HeatOut_lnds=HeatOut_lnds+DCORPC*4.19*TKS_vr(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
 !     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)-DCORPC*VLWatMicP_vr(L,NY,NX)
         OMelm=0._r8
         dOMelm=0._r8
@@ -198,7 +198,7 @@ module NitroDisturbMod
 !     REMOVE DOC, DON, DOP
 !
             DO idom=idom_beg,idom_end
-              rmDOM(idom)=DCORPC*DOM_vr(idom_doc,K,L,NY,NX)
+              rmDOM(idom)=DCORPC*DOM_vr(idom,K,L,NY,NX)
             enddo
 
             ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
@@ -327,23 +327,21 @@ module NitroDisturbMod
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
-        SoilOrgM_vr(ielmc,L,NY,NX)=dOMelm(ielmc)
-        SoilOrgM_vr(ielmn,L,NY,NX)=dOMelm(ielmn)
-        SoilOrgM_vr(ielmp,L,NY,NX)=dOMelm(ielmp)
+        SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=dOMelm(1:NumPlantChemElms)
         IF(L.EQ.0)THEN
-          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS(L,NY,NX)
-          HEATOU=HEATOU+HFLXD
+          HFLXD=4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS_vr(L,NY,NX)
+          HeatOut_lnds=HeatOut_lnds+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHeatCapacity(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
-!    2+1.9274*VLiceMicP(0,NY,NX)
+!     VHeatCapacity_vr(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
+!    2+1.9274*VLiceMicP_vr(0,NY,NX)
 !     ELSE
-!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP(L,NY,NX))
-!    2+1.9274*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
+!     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
+!    2+1.9274*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
 !     ENDIF
         IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
           DO NE=1,NumPlantChemElms
-            TOMOU(NE)=TOMOU(NE)+OMelm(NE)
+            TOMOU_lnds(NE)=TOMOU_lnds(NE)+OMelm(NE)
           ENDDO
 
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
@@ -356,8 +354,8 @@ module NitroDisturbMod
           OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
           OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)
 
-          TOMOU(ielmn)=TOMOU(ielmn)+OMelm(ielmn)
-          TOMOU(ielmp)=TOMOU(ielmp)+OMelm(ielmp)
+          TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)+OMelm(ielmn)
+          TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)+OMelm(ielmp)
           CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
           CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
           O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)

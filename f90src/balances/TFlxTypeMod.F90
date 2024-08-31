@@ -46,26 +46,25 @@ implicit none
   real(r8),allocatable ::  trcx_TER(:,:,:)                         !
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
   real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
-  real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
-  real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
-  real(r8),allocatable ::  THeatFlow2Soil(:,:,:)                       !
-  real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
+  real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)                        !
+  real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)                       !
+  real(r8),allocatable ::  TWaterFlowMacP_vr(:,:,:)                       !
 
   real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)                      !
 
-  real(r8),allocatable ::  WatIceThawMicP(:,:,:)                       !
-  real(r8),allocatable ::  THeatSoiThaw(:,:,:)                      !
-  real(r8),allocatable ::  WatIceThawMacP(:,:,:)                      !
+  real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                       !
+  real(r8),allocatable ::  THeatSoiThaw_vr(:,:,:)                      !
+  real(r8),allocatable ::  WatIceThawMacP_vr(:,:,:)                      !
   real(r8),allocatable ::  VLWatMicP1(:,:,:)                       !
   real(r8),allocatable ::  VLiceMicP1(:,:,:)                       !
-  real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
   real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
 
   real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
 
   real(r8),allocatable :: TOMEERauto(:,:,:,:)
  
-  real(r8),allocatable ::  DOM_Transp2Micp_flx(:,:,:,:,:)
+  real(r8),allocatable ::  DOM_Transp2Micp_vr(:,:,:,:,:)
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
   real(r8),allocatable ::  TOMQRS(:,:,:,:)
   real(r8),allocatable ::  TORMER(:,:,:,:,:)
@@ -130,22 +129,21 @@ implicit none
   allocate(trcs_Transp2MicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MicP_vr=0._r8
 
   allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
-  allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
-  allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
-  allocate(THeatFlow2Soil(JZ,JY,JX));    THeatFlow2Soil=0._r8
-  allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
-  allocate(WatIceThawMicP(JZ,JY,JX));    WatIceThawMicP=0._r8
-  allocate(THeatSoiThaw(JZ,JY,JX));   THeatSoiThaw=0._r8
-  allocate(WatIceThawMacP(JZ,JY,JX));   WatIceThawMacP=0._r8
+  allocate(TWatFlowCellMicP_vr(JZ,JY,JX));     TWatFlowCellMicP_vr=0._r8
+  allocate(TWatFlowCellMicPX_vr(JZ,JY,JX));    TWatFlowCellMicPX_vr=0._r8
+  allocate(TWaterFlowMacP_vr(JZ,JY,JX));    TWaterFlowMacP_vr=0._r8
+  allocate(WatIceThawMicP_vr(JZ,JY,JX));    WatIceThawMicP_vr=0._r8
+  allocate(THeatSoiThaw_vr(JZ,JY,JX));   THeatSoiThaw_vr=0._r8
+  allocate(WatIceThawMacP_vr(JZ,JY,JX));   WatIceThawMacP_vr=0._r8
   allocate(VLWatMicP1(JZ,JY,JX));    VLWatMicP1=0._r8
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
-  allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
+  allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
   allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
   allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
   allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
 
-  allocate(DOM_Transp2Micp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_flx=0._r8
+  allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_vr=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
   allocate(TOMQRS(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS=0._r8
   allocate(TORMER(NumPlantChemElms,ndbiomcp,1:jcplx,JY,JX));TORMER=0._r8
@@ -206,18 +204,17 @@ implicit none
   call destroy(TNUreaErosBand_col)
   call destroy(TNO3ErosBand_col)
   call destroy(tErosionSedmLoss)
-  call destroy(TWatFlowCellMicP)
-  call destroy(TWatFlowCellMicPX)
-  call destroy(THeatFlow2Soil)
-  call destroy(TWaterFlowMacP)
-  call destroy(WatIceThawMicP)
-  call destroy(THeatSoiThaw)
-  call destroy(WatIceThawMacP)
+  call destroy(TWatFlowCellMicP_vr)
+  call destroy(TWatFlowCellMicPX_vr)
+  call destroy(TWaterFlowMacP_vr)
+  call destroy(WatIceThawMicP_vr)
+  call destroy(THeatSoiThaw_vr)
+  call destroy(WatIceThawMacP_vr)
   call destroy(VLWatMicP1)
   call destroy(VLiceMicP1)
-  call destroy(VLWatMacP1)
+  call destroy(VLWatMacP1_vr)
   call destroy(VLiceMacP1)
-  call destroy(DOM_Transp2Micp_flx)
+  call destroy(DOM_Transp2Micp_vr)
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)
   call destroy(Gas_AdvDif_Flx_vr)

@@ -8,8 +8,6 @@ set (ECOSIM_MINOR_VERSION 1)
 set (ECOSIM_PATCH_VERSION 0)
 set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PATCH_VERSION}")
 
-message("We are in the EcoSIM top-level CMakeLists")
-
 set(TPL_INSTALL_PREFIX $ENV{AMANZI_TPLS_DIR})
 
 # Adjust CMake's module path.
@@ -161,16 +159,8 @@ else()
   message(STATUS "ATS_ECOSIM NOT set")
 endif()
 
-
-message(STATUS "ATS_ECOSIM: ${ATS_ECOSIM}")
-message(STATUS "ECOSIM_INSTALL_PREFIX: ${ECOSIM_INSTALL_PREFIX}")
-message(STATUS "BGC: ${BGC}")
-message(STATUS "ECOSIM_BGC: ${ECOSIM_BGC}")
-message(STATUS "ECOSIM: ${ECOSIM}")
-
 if (ATS_ECOSIM)
-    message(STATUS "In if statement")
-    message(STATUS "CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+    message(STATUS "Compiling ATS:")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
     set(NETCDF_FFLAGS "-I${TPL_INSTALL_PREFIX}/include")
     set(NETCDF_FLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5")
@@ -227,15 +217,7 @@ else()
     add_subdirectory(3rd-partylibs)
 endif()
 
-message("After ATS-EcoSIM loop:")
-message(STATUS "ECOSIM_LIBRARIES: ${ECOSIM_LIBRARIES}")
-message(STATUS "ECOSIM_TPLS: ${ECOSIM_TPLS}")
-
-#add_subdirectory(3rd-partylibs)
-
 if (NOT ECOSIM_HAVE_NETCDF)
-  message("not ecosim have netcdf")
-  message(("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}"))
   list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
   list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
 endif()

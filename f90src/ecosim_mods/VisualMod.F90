@@ -137,13 +137,13 @@ module VisualMod
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
             SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP(8,NY,NX) &
-              ,VLWatMacP(8,NY,NX)))/VGeomLayer(8,NY,NX)
+              ,VLWatMacP_vr(8,NY,NX)))/VGeomLayer(8,NY,NX)
           ELSEIF(NU(NY,NX).EQ.4)THEN
             SWC(NY,NX)=(VLWatMicP_vr(5,NY,NX)+AMIN1(VLMacP(5,NY,NX) &
-              ,VLWatMacP(5,NY,NX)))/VGeomLayer(5,NY,NX)
+              ,VLWatMacP_vr(5,NY,NX)))/VGeomLayer(5,NY,NX)
           ELSE
             SWC(NY,NX)=(VLWatMicP_vr(2,NY,NX)+AMIN1(VLMacP(2,NY,NX) &
-              ,VLWatMacP(2,NY,NX)))/VGeomLayer(2,NY,NX)
+              ,VLWatMacP_vr(2,NY,NX)))/VGeomLayer(2,NY,NX)
           ENDIF
         ENDIF
 !     GO TO 9990
@@ -221,24 +221,24 @@ module VisualMod
           OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
-            OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP(L,NY,NX)))/VGeomLayer(L,NY,NX)
+            OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP_vr(L,NY,NX)))/VGeomLayer(L,NY,NX)
             L=L+1
           ENDDO D60
 
           L=1
           D61: DO N=28,38
-            OUT(N)=TKS(L,NY,NX)
+            OUT(N)=TKS_vr(L,NY,NX)
             L=L+1
           ENDDO D61
           OUT(39)=-1000.0*ETCanopy_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(40)=-1000.0*ETCanopy_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(41)=-1000.0*ETCanopy_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(42)=1000.0*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(42)=1000.0*QEvap_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
-          OUT(44)=1000.0*URUN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(44)=1000.0*Qrunoff_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*AnualH2OLoss_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-          OUT(47)=SnowDepth(NY,NX)
+          OUT(47)=SnowDepth_col(NY,NX)
           OUT(48)=CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(49)=1.E-3_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(50)=1.E-3_r8*LeafStrutElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -280,7 +280,7 @@ module VisualMod
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN
-      WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth(NY,NX) &
+      WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth_col(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &

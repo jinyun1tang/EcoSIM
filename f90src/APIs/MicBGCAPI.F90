@@ -1,13 +1,16 @@
 module MicBGCAPI
 
-  use data_kind_mod  , only : r8 => DAT_KIND_R8
-  use NitrosMod      , only : DownwardMixOM,sumMicBiomLayL
-  use NitroDisturbMod, only : SOMRemovalByDisturbance
-  use EcoSIMSolverPar
-  use MicFLuxTypeMod, only : micfluxtype
-  use MicStateTraitTypeMod, only : micsttype
-  use MicForcTypeMod , only : micforctype
-  use minimathmod    , only : AZMAX1
+  use data_kind_mod,        only: r8 => DAT_KIND_R8
+  use NitrosMod,            only: DownwardMixOM, sumMicBiomLayL
+  use NitroDisturbMod,      only: SOMRemovalByDisturbance
+  use MicFLuxTypeMod,       only: micfluxtype
+  use MicStateTraitTypeMod, only: micsttype
+  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type
+  use MicForcTypeMod,       only: micforctype
+  use minimathmod,          only: AZMAX1
+  use EcoSiMParDataMod,     only: micpar
+  use MicBGCMod,            only: SoilBGCOneLayer
+  use EcoSIMSolverPar  
   use TracerIDMod
   use SoilBGCDataType
   USE PlantDataRateType
@@ -24,8 +27,6 @@ module MicBGCAPI
   use MicrobialDataType
   use IrrigationDataType
   use SoilHeatDataType
-  use EcoSiMParDataMod, only : micpar
-  use MicBGCMod, only : SoilBGCOneLayer
 implicit none
   save
   private
@@ -137,14 +138,15 @@ implicit none
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-
+  type(Cumlate_Flux_Diag_type) :: naqfdiag
+  
   call micflx%ZeroOut()
 
   call MicAPISend(L,NY,NX,micfor,micstt,micflx)
 
-  call SoilBGCOneLayer(micfor,micstt,micflx)
+  call SoilBGCOneLayer(micfor,micstt,micflx,naqfdiag)
 
-  call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx)
+  call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag)
 
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
@@ -157,7 +159,8 @@ implicit none
   type(micfluxtype), intent(inout) :: micflx
 
   integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus
-  integer :: kk, ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx,NE
+  integer :: ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx,NE
+
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
@@ -177,14 +180,14 @@ implicit none
   micfor%Rain2LitRSurf =Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset=TempOffset_col(NY,NX)
   micfor%VLitR  =VLitR(NY,NX)
-  micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity(NY,NX)
+  micfor%VWatLitRHoldCapcity=VWatLitRHoldCapcity_col(NY,NX)
   micfor%ZEROS2=ZEROS2(NY,NX)
   micfor%ZEROS =ZEROS(NY,NX)
   micfor%VLSoilMicP  =VLSoilMicP(L,NY,NX)
   micfor%THETY =THETY_vr(L,NY,NX)
   micfor%POROS =POROS(L,NY,NX)
   micfor%FieldCapacity    =FieldCapacity(L,NY,NX)
-  micfor%TKS   =TKS(L,NY,NX)
+  micfor%TKS   =TKS_vr(L,NY,NX)
   micfor%THETW =THETW_vr(L,NY,NX)
   micfor%PH    =PH(L,NY,NX)
   micfor%SoilMicPMassLayer  =SoilMicPMassLayer(L,NY,NX)
@@ -267,10 +270,10 @@ implicit none
   micfor%DiffusivitySolutEff(1:NPH)=DiffusivitySolutEff(1:NPH,L,NY,NX)
   micfor%FILM(1:NPH)=FILM(1:NPH,L,NY,NX)
   micfor%THETPM(1:NPH)=THETPM(1:NPH,L,NY,NX)
-  micfor%VLWatMicPM(1:NPH)=VLWatMicPM(1:NPH,L,NY,NX)
+  micfor%VLWatMicPM(1:NPH)=VLWatMicPM_vr(1:NPH,L,NY,NX)
   micfor%TortMicPM(1:NPH)=TortMicPM_vr(1:NPH,L,NY,NX)
   micfor%VLsoiAirPM(1:NPH)=VLsoiAirPM(1:NPH,L,NY,NX)
-  micfor%VLsoiAirP=VLsoiAirP(L,NY,NX)
+  micfor%VLsoiAirP=VLsoiAirP_vr(L,NY,NX)
   micstt%EPOC=EPOC(L,NY,NX)
   micstt%EHUM=EHUM(L,NY,NX)
   micstt%ZNH4B=trc_solml_vr(ids_NH4B,L,NY,NX)
@@ -341,18 +344,31 @@ implicit none
 !------------------------------------------------------------------------------------------
 
 
-  subroutine MicAPIRecv(L,NY,NX,litrM,micstt,micflx)
+  subroutine MicAPIRecv(L,NY,NX,litrM,micstt,micflx,naqfdiag)
   implicit none
   integer, intent(in) :: L,NY,NX
   logical, intent(in) :: litrM
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
+  type(Cumlate_Flux_Diag_type), intent(in) :: naqfdiag
+
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
-  integer :: NE,idom
+  integer :: NE,idom,K
   
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
+
+
+  RCH4ProdHydrog_vr(L,NY,NX) = naqfdiag%tCH4ProdAceto
+  RCH4ProdAcetcl_vr(L,NY,NX) = naqfdiag%tCH4ProdH2
+  RCH4Oxi_aero_vr(L,NY,NX)   = naqfdiag%tCH4OxiAero
+  RFermen_vr(L,NY,NX)        = naqfdiag%tCResp4H2Prod
+  RNH3oxi_vr(L,NY,NX)        = naqfdiag%tRNH3Oxi
+  RN2ODeniProd_vr(L,NY,NX)   = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
+  RN2OChemoProd_vr(L,NY,NX)  = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
+  RN2ONitProd_vr(L,NY,NX)    = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band  
+  RN2ORedux_vr(L,NY,NX)      = naqfdiag%TReduxN2O
 
   trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
   trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
@@ -373,11 +389,12 @@ implicit none
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo
-  NetNH4Mineralize_col(NY,NX)=NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
-  NetPO4Mineralize_col(NY,NX)=NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
+  NetNH4Mineralize_col(NY,NX)           = NetNH4Mineralize_col(NY,NX)+micflx%NetNH4Mineralize
+  NetPO4Mineralize_col(NY,NX)           = NetPO4Mineralize_col(NY,NX)+micflx%NetPO4Mineralize
   DO idom=idom_beg,idom_end
-    REcoDOMUptk_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMUptk(idom,1:jcplx)
+    REcoDOMProd_vr(idom,1:jcplx,L,NY,NX)=micflx%REcoDOMProd(idom,1:jcplx)    
   ENDDO
+  RDOMMicProd_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
  
   RO2DmndAutort_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)
   RNH3OxidAutor(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH3OxidAutor(1:NumMicrobAutrophCmplx)
@@ -420,7 +437,6 @@ implicit none
       SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(NE)
       SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(NE)      
     ENDDO
-
   endif
 
   RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
@@ -440,7 +456,12 @@ implicit none
   FracBulkSOMC_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOMC(1:jcplx)
   DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
-
+  do k=1,jcplx
+  DO idom=idom_beg,idom_end
+  if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.E-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
+  if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8
+  enddo
+  enddo
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
   mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)

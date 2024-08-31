@@ -251,7 +251,7 @@ implicit none
     call ncd_putvar(ncf,'CFEOH',CFEOH(L,NY,NX))
     call ncd_putvar(ncf,'CCACO',CCACO(L,NY,NX))
     call ncd_putvar(ncf,'CCASO',CCASO(L,NY,NX))
-    call ncd_putvar(ncf,'BKDS',SoiBulkDensity(L,NY,NX))
+    call ncd_putvar(ncf,'BKDS',SoiBulkDensity_vr(L,NY,NX))
 
     call ncd_putvar(ncf,'FracBulkSOMC_vr',FracBulkSOMC_vr(:,L,NY,NX))
     call ncd_putvar(ncf,'OQM',DOM_vr(:,:,L,NY,NX))

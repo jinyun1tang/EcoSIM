@@ -132,7 +132,7 @@ implicit none
   integer :: fid_TR_OH_1e_soil     !total solute OH transformation, [mol d-2 h-1]
   integer :: fid_TR_SO4_2e_soil    !total solute SO4 transformation, [mol d-2 h-1]
   integer :: fid_TR_CO3_2e_soil    !total solute CO3 transformation, [mol d-2 h-1]
-  integer :: fid_TRHCO    !total solute HCO3 transformation, [mol d-2 h-1]
+  integer :: fid_TR_HCO3    !total solute HCO3 transformation, [mol d-2 h-1]
   integer :: fid_TR_CO2_aqu_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlOH_soil    !total solute AlOH transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO2H2_soil    !total solute AlOH2 transformation, [mol d-2 h-1]
@@ -181,7 +181,7 @@ implicit none
   integer :: fid_TR_CaSO4_precip_soil   !total precipitated CaSO4 transformation, [mol d-2 h-1]
   integer :: fid_TRH2O    !total solute H2O transformation, [mol d-2 h-1]
   integer :: fid_TBION    !total solute ion transformation, [mol d-2 h-1]
-  integer :: fid_TBCO2    !CO2 net change from all solute equilibria
+  integer :: fid_Txchem_CO2    !CO2 net change from all solute equilibria
 
   integer :: fid_TR_NH4_band_soil    !total solute NH4 transformation band, [mol d-2 h-1]
   integer :: fid_TR_NH3_band_soil    !total solute NH3 transformation band, [mol d-2 h-1]

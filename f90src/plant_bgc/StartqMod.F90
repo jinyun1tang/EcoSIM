@@ -111,8 +111,8 @@ module StartqMod
   iDayPlanting_pft(NZ,NY,NX)=iPlantingDay_pft(NZ,NY,NX) !planting day
   iYearPlantHarvest_pft(NZ,NY,NX)=iHarvestYear_pft(NZ,NY,NX)
   iDayPlantHarvest_pft(NZ,NY,NX)=iHarvestDay_pft(NZ,NY,NX)
-  PPI(NZ,NY,NX)=PPatSeeding_pft(NZ,NY,NX)
-  PPX_pft(NZ,NY,NX)=PPI(NZ,NY,NX)
+  PPI_pft(NZ,NY,NX)=PPatSeeding_pft(NZ,NY,NX)
+  PPX_pft(NZ,NY,NX)=PPI_pft(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
   H2OCuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)/3600.0_r8
@@ -179,7 +179,7 @@ module StartqMod
 !
 !     LEGUMES
 !
-  ELSEIF(iPlantNfixType(NZ,NY,NX).NE.0)THEN
+  ELSEIF(iPlantNfixType_pft(NZ,NY,NX).NE.0)THEN
     ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)=0.16_r8
     ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX)=0.38_r8
     ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX)=0.34_r8
@@ -570,7 +570,7 @@ module StartqMod
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)=0._r8
       LeafProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
-      PetioleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
+      PetoleProteinCNode_brch(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,NumOfCanopyLayers
         CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)=0._r8
@@ -600,7 +600,7 @@ module StartqMod
   NoduleNonstructCconc_pft(NZ,NY,NX)=0._r8
   ShootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  PetioleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
+  PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   CanopyStalkC_pft(NZ,NY,NX)=0._r8
   StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
@@ -676,18 +676,18 @@ module StartqMod
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
-!     VHeatCapCanP=canopy heat capacity (MJ m-3 K-1)
+!     VHeatCapCanP_pft=canopy heat capacity (MJ m-3 K-1)
 !     TCelciusCanopy_pft,TKC=canopy temperature for growth (oC,K)
-!     TCG,TKG=canopy temperature for phenology (oC,K)
+!     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHeatCapCanP(NZ,NY,NX)=cpw*ShootStrutElms_pft(ielmc,NZ,NY,NX)*10.0E-06
-  ENGYX(NZ,NY,NX)=0._r8
-  DeltaTKC(NZ,NY,NX)=0._r8
+  VHeatCapCanP_pft(NZ,NY,NX)=cpw*ShootStrutElms_pft(ielmc,NZ,NY,NX)*10.0E-06
+  ENGYX_pft(NZ,NY,NX)=0._r8
+  DeltaTKC_pft(NZ,NY,NX)=0._r8
   TCelciusCanopy_pft(NZ,NY,NX)=ATCA(NY,NX)
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
-  TCG(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
-  TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
+  TCGroth_pft(NZ,NY,NX)=TCelciusCanopy_pft(NZ,NY,NX)
+  TKGroth_pft(NZ,NY,NX)=units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
   fTCanopyGroth_pft(NZ,NY,NX)=1.0_r8
   PSICanopy_pft(NZ,NY,NX)=-1.0E-03_r8
   PSICanopyOsmo_pft(NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
@@ -718,6 +718,13 @@ module StartqMod
   RootH2PO4Uptake_pft(NZ,NY,NX)=0._r8
   RootHPO4Uptake_pft(NZ,NY,NX)=0._r8
   RootN2Fix_pft(NZ,NY,NX)=0._r8
+
+  DO NR=1,MaxNumRootAxes
+    DO N=1,pltpar%jroots
+      Root1stDepz_pft(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
+      RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
+    ENDDO
+  ENDDO  
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
       AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
@@ -779,8 +786,6 @@ module StartqMod
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
         Root2ndLen_pvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
-        Root1stDepz_pft(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
-        Root1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
 
       IF(N.EQ.1)THEN
@@ -817,7 +822,7 @@ module StartqMod
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
 !     LeafPetolBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyWater_pft,WatByPCanopy=water volume in,on canopy (m3)
+!     CanopyWater_pft,WatByPCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
@@ -836,7 +841,7 @@ module StartqMod
     
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
-  WatByPCanopy(NZ,NY,NX)=0._r8
+  WatByPCanopy_pft(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   CanopyNonstElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   
@@ -844,8 +849,8 @@ module StartqMod
     CNGR(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
     CPGR(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  Root1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*Root1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
-  Root1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*Root1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &

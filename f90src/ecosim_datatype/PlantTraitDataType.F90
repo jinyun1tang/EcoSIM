@@ -82,7 +82,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                      !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX(:,:,:)                      !initial plant maturity group, [-]
-  real(r8),target,allocatable ::  PPI(:,:,:)                         !initial plant population, [m-2]
+  real(r8),target,allocatable ::  PPI_pft(:,:,:)                         !initial plant population, [m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)                      !initial standing dead C, [g C m-2]
   real(r8),target,allocatable ::  PPX_pft(:,:,:)                         !plant population, [m-2]
   integer,target,allocatable ::  NumActivePlants(:,:)                          !number of active PFT
@@ -91,8 +91,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                  !canopy temperature growth function, [-]
-  real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
-  real(r8),target,allocatable ::  TKG(:,:,:)                         !canopy growth temperature, [K]
+  real(r8),target,allocatable ::  TCGroth_pft(:,:,:)                         !canopy growth temperature, [oC]
+  real(r8),target,allocatable ::  TKGroth_pft(:,:,:)                         !canopy growth temperature, [K]
   real(r8),target,allocatable ::  PetioleBiomGrowthYield(:,:,:)                       !sheath growth yield, [g g-1]
   real(r8),target,allocatable ::  StalkBiomGrowthYield(:,:,:)                       !stalk growth yield, [g g-1]
   real(r8),target,allocatable ::  ReserveBiomGrowthYield(:,:,:)                       !reserve growth yield, [g g-1]
@@ -112,8 +112,8 @@ module PlantTraitDataType
   integer,target,allocatable ::  KMinNumLeaf4GroAlloc_brch(:,:,:,:)                     !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
   integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)                      !leaf growth stage counter, [-]
   real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)                        !rate of leaf initiation, [h-1 at 25 oC]
-  real(r8),target,allocatable ::  rLen2WidthLeaf(:,:,:)                        !leaf length:width ratio, [-]
-  real(r8),target,allocatable ::  SLA1(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
+  real(r8),target,allocatable ::  rLen2WidthLeaf_pft(:,:,:)                        !leaf length:width ratio, [-]
+  real(r8),target,allocatable ::  SLA1_pft(:,:,:)                        !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                         !threshold temperature for spring leafout/dehardening, [oC]
   real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                        !petiole length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)                      !hours above threshold temperature required for spring leafout/dehardening, [-]
@@ -242,7 +242,7 @@ contains
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX(JP,JY,JX));   GROUPX=0._r8
-  allocate(PPI(JP,JY,JX));      PPI=0._r8
+  allocate(PPI_pft(JP,JY,JX));      PPI_pft=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
   allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
   allocate(NumActivePlants(JY,JX));       NumActivePlants=0
@@ -251,8 +251,8 @@ contains
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
   allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
-  allocate(TCG(JP,JY,JX));      TCG=0._r8
-  allocate(TKG(JP,JY,JX));      TKG=0._r8
+  allocate(TCGroth_pft(JP,JY,JX));      TCGroth_pft=0._r8
+  allocate(TKGroth_pft(JP,JY,JX));      TKGroth_pft=0._r8
   allocate(PetioleBiomGrowthYield(JP,JY,JX));    PetioleBiomGrowthYield=0._r8
   allocate(StalkBiomGrowthYield(JP,JY,JX));    StalkBiomGrowthYield=0._r8
   allocate(ReserveBiomGrowthYield(JP,JY,JX));    ReserveBiomGrowthYield=0._r8
@@ -272,8 +272,8 @@ contains
   allocate(KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP,JY,JX));KMinNumLeaf4GroAlloc_brch=0
   allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
   allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
-  allocate(rLen2WidthLeaf(JP,JY,JX));     rLen2WidthLeaf=0._r8
-  allocate(SLA1(JP,JY,JX));     SLA1=0._r8
+  allocate(rLen2WidthLeaf_pft(JP,JY,JX));     rLen2WidthLeaf_pft=0._r8
+  allocate(SLA1_pft(JP,JY,JX));     SLA1_pft=0._r8
   allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
   allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
   allocate(HourReq4LeafOut_brch(NumOfCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
@@ -399,7 +399,7 @@ contains
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)
   call destroy(GROUPX)
-  call destroy(PPI)
+  call destroy(PPI_pft)
   call destroy(StandingDeadInitC_pft)
   call destroy(PPX_pft)
   call destroy(NumActivePlants)
@@ -408,8 +408,8 @@ contains
   call destroy(HoursTooLowPsiCan_pft)
   call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
-  call destroy(TCG)
-  call destroy(TKG)
+  call destroy(TCGroth_pft)
+  call destroy(TKGroth_pft)
   call destroy(PetioleBiomGrowthYield)
   call destroy(StalkBiomGrowthYield)
   call destroy(ReserveBiomGrowthYield)
@@ -429,8 +429,8 @@ contains
   call destroy(KMinNumLeaf4GroAlloc_brch)
   call destroy(KHiestGroLeafNode_brch)
   call destroy(RefLeafAppearRate_pft)
-  call destroy(rLen2WidthLeaf)
-  call destroy(SLA1)
+  call destroy(rLen2WidthLeaf_pft)
+  call destroy(SLA1_pft)
   call destroy(TC4LeafOut_pft)
   call destroy(PetoLen2Mass_pft)
   call destroy(HourReq4LeafOut_brch)

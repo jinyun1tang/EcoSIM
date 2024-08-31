@@ -21,7 +21,7 @@ implicit none
 contains
 
   subroutine Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-  USE SoilHeatDataType, ONLY : TKS
+
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1
@@ -235,7 +235,7 @@ contains
     write(iulog, *) '--------------------'
 
   endif
-  erosion_model=iErosionMode<0
+  erosion_model=iErosionMode>=0
   read(start_date,'(I4)')year0
   call etimer%Init(nml_buffer,year0=year0)
   if(do_bgcforc_write)then
@@ -255,7 +255,7 @@ contains
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
-subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
+subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
@@ -283,7 +283,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   implicit none
   integer :: yearc, yeari
-  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   logical, intent(out) :: nlend
   character(len=*), parameter :: mod_filename = &
   __FILE__
@@ -304,13 +304,12 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   call init_timer(outdir)
 
   if(lverb)WRITE(*,333)'READS: read climate forcing'
-  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
 
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
 
   call etimer%get_ymdhs(ymdhs)
-
 
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     if(lverb)WRITE(*,333)'STARTS'
@@ -327,7 +326,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     !are set using the checkpoint file.
     if(lverb)WRITE(*,333)'ReadPlantInfo'
     WRITE(*,333)'ReadPlantInfo'
-    call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+    call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
   endif
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
@@ -488,7 +487,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
     category = 'state'
     name = 'liquid soil water (m^3 m^-3)'
-    datv=THETWZ(1:12,NY,NX)
+    datv=ThetaH2OZ_vr(1:12,NY,NX)
     call regression%writedata(category,name,datv)
 
     category = 'state'
@@ -510,7 +509,7 @@ end subroutine regressiontest
 
   if(disp_modelconfig)then
     nu_cfg=getavu()
-    write(fnm_loc,'(A,I4,A)')'ecosim.cfg'
+    write(fnm_loc,'(A,I4,A)')'ecosim.setup'
     call opnfil(fnm_loc,nu_cfg,'f')    
 
     write(nu_cfg,*)'microbial_model=',microbial_model
