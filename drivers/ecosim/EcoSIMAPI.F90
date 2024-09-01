@@ -350,8 +350,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
   iYearCurrent=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
-
-  DO I=1,LYRC
+  DO I=1,LYRC    
     IF(do_rgres .and. I.eq.LYRG)RETURN
     !   UPDATE DAILY VARIABLES SUCH AS MANAGEMENT INPUTS
     !
@@ -419,7 +418,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     endif
     if(nlend)exit
   END DO
-
+  if(lverb)write(*,333)'exit soil'
   RETURN
 END subroutine soil
 ! ----------------------------------------------------------------------
