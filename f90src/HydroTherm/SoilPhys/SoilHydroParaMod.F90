@@ -61,7 +61,7 @@ contains
   ! THETIX=ice concentration
 !
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX) .AND. VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)),1.e-6_r8)
+      THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FieldCapacity(L,NY,NX))THEN
         PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((LOGFldCapacity(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
@@ -72,12 +72,12 @@ contains
         PSISoilMatricP_vr(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
     ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI_col(L,NY,NX)>ZEROS2(NY,NX))THEN
-      FCX=FCI*THETI_col(L,NY,NX)
-      WPX=WPI*THETI_col(L,NY,NX)
-      FCLX=LOG(FCX)
-      WPLX=LOG(WPX)
-      PSDX=LOGPOROS(L,NY,NX)-FCLX
-      FCDX=FCLX-WPLX
+      FCX  = FCI*THETI_col(L,NY,NX)
+      WPX  = WPI*THETI_col(L,NY,NX)
+      FCLX = LOG(FCX)
+      WPLX = LOG(WPX)
+      PSDX = LOGPOROS(L,NY,NX)-FCLX
+      FCDX = FCLX-WPLX
       IF(THETW_vr(L,NY,NX).LT.FCX)THEN
         PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((FCLX-LOG(THETW_vr(L,NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
@@ -95,9 +95,9 @@ contains
 !
 !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
 !
-    PSISoilOsmotic_vr(L,NY,NX)=-RGASC*1.E-6_r8*TKS_vr(L,NY,NX)*CION(L,NY,NX)
-    PSIGrav_vr(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
-    TotalSoilH2OPSIMPa_vr(L,NY,NX)=AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
+    PSISoilOsmotic_vr(L,NY,NX)     = -RGASC*1.E-6_r8*TKS_vr(L,NY,NX)*CION(L,NY,NX)
+    PSIGrav_vr(L,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
+    TotalSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -173,9 +173,9 @@ contains
   VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
     +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
 
-  IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
-    ThetaAir_vr(L,NY,NX)=VLsoiAirP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)
+    ThetaAir_vr(L,NY,NX)=VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)
   ELSE
     ThetaAir_vr(L,NY,NX)=0.0_r8
   ENDIF
@@ -278,7 +278,8 @@ contains
     PathLenMacP(L,NY,NX)=1.0_r8
   ENDIF
   VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(L,NY,NX))
-  HydroCondMacP(L,NY,NX)=3.6E+03_r8*PICON*MacPNumLayer(L,NY,NX)*MacPRadius(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
+  HydroCondMacP_vr(L,NY,NX)=3.6E+03_r8*PICON*MacPNumLayer(L,NY,NX)*MacPRadius(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
+  
   end subroutine SoilHydroProperty
 
 !------------------------------------------------------------------------------------------
@@ -317,10 +318,10 @@ contains
     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
     WiltPoint(L,NY,NX)=AMIN1(0.75_r8*FieldCapacity(L,NY,NX),WiltPoint(L,NY,NX))
   ENDIF
-  LOGFldCapacity(L,NY,NX)=LOG(FieldCapacity(L,NY,NX))
-  LOGWiltPoint(L,NY,NX)=LOG(WiltPoint(L,NY,NX))
-  PSD(L,NY,NX)=LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX)
-  FCD(L,NY,NX)=LOGFldCapacity(L,NY,NX)-LOGWiltPoint(L,NY,NX)
+  LOGFldCapacity(L,NY,NX) = LOG(FieldCapacity(L,NY,NX))
+  LOGWiltPoint(L,NY,NX)   = LOG(WiltPoint(L,NY,NX))
+  PSD(L,NY,NX)            = LOGPOROS(L,NY,NX)-LOGFldCapacity(L,NY,NX)
+  FCD(L,NY,NX)            = LOGFldCapacity(L,NY,NX)-LOGWiltPoint(L,NY,NX)
 
 !   IBEGIN:   start date of model run
 
@@ -355,11 +356,11 @@ contains
     ENDIF
 
   !in a cold run, set it
-    VLWatMicP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-    VLWatMacP_vr(L,NY,NX)=THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VLiceMicP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_vr(L,NY,NX)=THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLWatMicP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
+    VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLiceMicP_vr(L,NY,NX)  = THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLiceMacP_vr(L,NY,NX)  = THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
     ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
@@ -377,8 +378,8 @@ contains
   integer, parameter :: n100=100
   real(r8) :: H2OSOIatK(n100),PSISK(0:n100)
 
-  IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    SoiBulkDensity_vr(0,NY,NX)=SoilMicPMassLayer(0,NY,NX)/VGeomLayer(0,NY,NX)
+  IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    SoiBulkDensity_vr(0,NY,NX)=SoilMicPMassLayer(0,NY,NX)/VGeomLayer_vr(0,NY,NX)
   ELSE
     SoiBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF

@@ -79,7 +79,7 @@ module UptakesMod
     Canopy_Heat_Latent_col => plt_ew%Canopy_Heat_Latent_col,  &
     Transpiration_pft      => plt_ew%Transpiration_pft,       &
     WatByPCanopy_pft       => plt_ew%WatByPCanopy_pft,        &
-    CumSoilThickness       => plt_site%CumSoilThickness,      &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,      &
     PlantPopu_col          => plt_site%PlantPopu_col,         &
     NP                     => plt_site%NP,                    &
     PlantPopulation_pft    => plt_site%PlantPopulation_pft,   &
@@ -130,7 +130,7 @@ module UptakesMod
       IF((iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)&
         .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ) &
         .AND.FracPARRadbyCanopy_pft(NZ).GT.0.0_r8)&
-        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness(0)))THEN
+        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
 !
 !        if(I>176)print*,'calcreist'
@@ -243,7 +243,7 @@ module UptakesMod
     THETY_vr              => plt_soilchem%THETY_vr,          &
     SoiBulkDensity_vr     => plt_soilchem%SoiBulkDensity_vr, &
     VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr,      &
-    VLSoilMicP            => plt_soilchem%VLSoilMicP,        &
+    VLSoilMicP_vr         => plt_soilchem%VLSoilMicP_vr,     &
     CanopyStemArea_pft    => plt_morph%CanopyStemArea_pft,   &
     MY                    => plt_morph%MY,                   &
     CanopyLeafArea_pft    => plt_morph%CanopyLeafArea_pft,   &
@@ -299,7 +299,7 @@ module UptakesMod
   D9000: DO L=NU,MaxNumRootLays
     ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
     IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
-      WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
+      WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)-THETY_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake
       AirPoreAvail4Fill(L)=AZMAX1(VLMicP_vr(L)-VLWatMicP_vr(L)-VLiceMicP_vr(L))  !air volume
     ELSE
       WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)
@@ -449,7 +449,7 @@ module UptakesMod
   associate(                                                      &
     PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr,       &
     FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr,         &
-    CumSoilThickness        => plt_site%CumSoilThickness,         &
+    CumSoilThickness_vr        => plt_site%CumSoilThickness_vr,         &
     DLYR3                   => plt_site%DLYR3,                    &
     ZEROS                   => plt_site%ZEROS,                    &
     ZERO                    => plt_site%ZERO,                     &
@@ -471,7 +471,7 @@ module UptakesMod
 !     RootDepZ,Root1stDepz_pft=primary root depth
 !     FracSoiLayByPrimRoot=fraction of each soil layer with primary root
 !     DLYR=layer thickness
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
 !     HypoctoHeight_pft=hypocotyledon height
 !     FracPRoot4Uptake=PFT fraction of biome root mass
@@ -495,8 +495,8 @@ module UptakesMod
           FracSoiLayByPrimRoot(L,NZ)=1.0_r8
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
-            RTDPX=AZMAX1(RootDepZ-CumSoilThickness(L-1))
-            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoHeight_pft(NZ)))
+            RTDPX=AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
+            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
             FracSoiLayByPrimRoot(L,NZ)=RTDPX/DLYR3(L)
           ELSE
             FracSoiLayByPrimRoot(L,NZ)=0.0_r8
@@ -1025,7 +1025,7 @@ module UptakesMod
   real(r8) :: RSSL,RTAR2
   integer :: N, L
   associate(                                                           &
-    DPTHZ                    => plt_site%DPTHZ,                        &
+    DPTHZ_vr                 => plt_site%DPTHZ_vr,                     &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,          &
     VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,                &
     ZERO                     => plt_site%ZERO,                         &
@@ -1123,7 +1123,7 @@ module UptakesMod
         !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of primary,secondary axes
 !
         FRAD1=(Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
-        RootResistRadial(N,L)=RoottAxialResist_pft(N,NZ)*DPTHZ(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
+        RootResistRadial(N,L)=RoottAxialResist_pft(N,NZ)*DPTHZ_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
           +RoottAxialResist_pft(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
         FRAD2=(Root2ndRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
         RootResistAxial(N,L)=RoottAxialResist_pft(N,NZ)*Root2ndAveLen_pvr(N,L,NZ)/(FRAD2*Root2ndXNum_pvr(N,L,NZ))

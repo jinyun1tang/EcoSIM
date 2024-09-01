@@ -64,7 +64,7 @@ module RootGasMod
     RootStrutElms_pft        => plt_biom%RootStrutElms_pft,        &
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,           &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
-    DPTHZ                    => plt_site%DPTHZ,                    &
+    DPTHZ_vr                 => plt_site%DPTHZ_vr,                 &
     AtmGasc                  => plt_site%AtmGasc,                  &
     ZEROS                    => plt_site%ZEROS,                    &
     ZERO                     => plt_site%ZERO,                     &
@@ -97,7 +97,7 @@ module RootGasMod
     GasSolbility_vr          => plt_soilchem%GasSolbility_vr,      &
     trc_solcl_vr             => plt_soilchem%trc_solcl_vr,         &
     THETY_vr                 => plt_soilchem%THETY_vr,             &
-    VLSoilMicP               => plt_soilchem%VLSoilMicP,           &
+    VLSoilMicP_vr            => plt_soilchem%VLSoilMicP_vr,        &
     THETPM                   => plt_soilchem%THETPM,               &
     trc_gasml_vr             => plt_soilchem%trc_gasml_vr,         &
     DiffusivitySolutEff      => plt_soilchem%DiffusivitySolutEff,  &
@@ -184,7 +184,7 @@ module RootGasMod
 !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ)) &
-        *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ(L)
+        *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ_vr(L)
       RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2 &
         /Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
@@ -263,7 +263,7 @@ module RootGasMod
       VLWatMicPMB=VLWatMicPMM*trcs_VLN_vr(ids_NH4B,L)
       VOLWSA=RTVLWA+VLWatMicPMA
       VOLWSB=RTVLWB+VLWatMicPMB
-      THETW1=AZMAX1(VLWatMicPM_vr(M,L)/VLSoilMicP(L))
+      THETW1=AZMAX1(VLWatMicPM_vr(M,L)/VLSoilMicP_vr(L))
 
       IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
         THETM=TortMicPM_vr(M,L)*THETW1

@@ -46,7 +46,7 @@ implicit none
   real(r8) :: OXYE      !atmospheric O2 concentration, [umol mol-1]
   real(r8) :: PlantPopu_col       !total plant population, [d-2]
   real(r8) :: POROS1    !top layer soil porosity
-  real(r8) :: WindSpeedAtm        !wind speed, [m h-1]
+  real(r8) :: WindSpeedAtm_col        !wind speed, [m h-1]
   real(r8), pointer :: PlantElemntStoreLandscape(:)  => null() !total plant element balance	g d-2
   real(r8) :: WindMesHeight        !wind speed measurement height, [m]
   real(r8) :: ZEROS2    !threshold zero
@@ -69,13 +69,13 @@ implicit none
   CHARACTER(len=16), pointer :: DATA(:)  => null()   !pft file
   real(r8), pointer :: AREA3(:)   => null()    !soil cross section area (vertical plan defined by its normal direction)
   real(r8), pointer :: ElmBalanceCum_pft(:,:)      => null()    !plant element balance, [g d-2]
-  real(r8), pointer :: CumSoilThickness(:)         => null()    !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8), pointer :: CumSoilThickness_vr(:)         => null()    !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8), pointer :: PPI_pft(:)                      => null()    !initial plant population, [m-2]
   real(r8), pointer :: PPatSeeding_pft(:)                      => null()    !plant population at seeding, [m-2]
   real(r8), pointer :: PPX_pft(:)                      => null()    !plant population, [m-2]
   logical , pointer :: flag_pft_active(:)          => null()
   real(r8), pointer :: PlantPopulation_pft(:)      => null()    !plant population, [d-2]
-  real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8), pointer :: DPTHZ_vr(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FracSoiAsMicP_vr(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
   real(r8), pointer :: VLWatMicPM_vr(:,:) => null()    !soil micropore water content, [m3 d-2]
@@ -384,21 +384,18 @@ implicit none
   real(r8), pointer :: SoluteDifusvty_vr(:,:)=> null()  !aqueous diffusivity [m2 h-1]
 
   real(r8), pointer :: trc_gasml_vr(:,:)=> null()!gas layer mass [g d-2]
-
-  real(r8), pointer :: GasSolbility_vr(:,:)=> null() !gas solubility, [m3 m-3]
-
-  real(r8), pointer :: THETW_vr(:)    => null()  !volumetric water content [m3 m-3]
-  real(r8), pointer :: THETY_vr(:)    => null()  !air-dry water content, [m3 m-3]
-  real(r8), pointer :: VLSoilPoreMicP_vr(:)     => null()  !volume of soil layer	m3 d-2
-  real(r8), pointer :: trcs_VLN_vr(:,:)=> null()
-
-  real(r8), pointer :: VLSoilMicP(:)     => null()  !total micropore volume in layer [m3 d-2]
-  real(r8), pointer :: VLiceMicP_vr(:)     => null()  !soil micropore ice content   [m3 d-2]
-  real(r8), pointer :: VLWatMicP_vr(:)     => null()  !soil micropore water content [m3 d-2]
+  real(r8), pointer :: GasSolbility_vr(:,:) => null() !gas solubility, [m3 m-3]
+  real(r8), pointer :: THETW_vr(:)          => null()  !volumetric water content [m3 m-3]
+  real(r8), pointer :: THETY_vr(:)          => null()  !air-dry water content, [m3 m-3]
+  real(r8), pointer :: VLSoilPoreMicP_vr(:) => null()  !volume of soil layer	m3 d-2
+  real(r8), pointer :: trcs_VLN_vr(:,:)     => null()
+  real(r8), pointer :: VLSoilMicP_vr(:) => null()  !total micropore volume in layer [m3 d-2]
+  real(r8), pointer :: VLiceMicP_vr(:)  => null()  !soil micropore ice content   [m3 d-2]
+  real(r8), pointer :: VLWatMicP_vr(:)  => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VLMicP_vr(:)     => null()  !total volume in micropores [m3 d-2]
 
-  real(r8), pointer :: DOM_vr(:,:,:)    => null()  !dissolved organic C micropore	[gC d-2]
-  real(r8), pointer :: trc_solml_vr(:,:)=> null() !aqueous tracer [g d-2]
+  real(r8), pointer :: DOM_vr(:,:,:)     => null()  !dissolved organic C micropore	[gC d-2]
+  real(r8), pointer :: trc_solml_vr(:,:) => null() !aqueous tracer [g d-2]
   contains
     procedure, public :: Init => plt_soilchem_init
     procedure, public :: Destroy => plt_soilchem_destroy
@@ -929,8 +926,8 @@ implicit none
   allocate(this%AREA3(0:JZ1));this%AREA3=spval
   allocate(this%DLYR3(0:JZ1)); this%DLYR3=spval
   allocate(this%ElmBalanceCum_pft(NumPlantChemElms,JP1));this%ElmBalanceCum_pft=spval
-  allocate(this%CumSoilThickness(0:JZ1));this%CumSoilThickness=spval
-  allocate(this%DPTHZ(0:JZ1));this%DPTHZ=spval
+  allocate(this%CumSoilThickness_vr(0:JZ1));this%CumSoilThickness_vr=spval
+  allocate(this%DPTHZ_vr(0:JZ1));this%DPTHZ_vr=spval
   allocate(this%PPI_pft(JP1));this%PPI_pft=spval
   allocate(this%PPatSeeding_pft(JP1));this%PPatSeeding_pft=spval
   allocate(this%PPX_pft(JP1));this%PPX_pft=spval
@@ -957,7 +954,7 @@ implicit none
 !  if(allocated(AREA3))deallocate(AREA3)
 !  if(allocated(ElmBalanceCum_pft))deallocate(ElmBalanceCum_pft)
 !  if(allocated(BALP))deallocate(BALP)
-!  if(allocated(CumSoilThickness))deallocate(CumSoilThickness)
+!  if(allocated(CumSoilThickness_vr))deallocate(CumSoilThickness_vr)
 !  if(allocated(DPTHZ))deallocate(DPTHZ)
 !  if(allocated(PPI_pft)) deallocate(PPI_pft)
 !  if(allocated(PPatSeeding_pft)) deallocate(PPatSeeding_pft)
@@ -1436,7 +1433,7 @@ implicit none
   allocate(this%TScal4Difsvity_vr(0:JZ1));this%TScal4Difsvity_vr=spval
   allocate(this%THETPM(60,0:JZ1));this%THETPM=spval
   allocate(this%DiffusivitySolutEff(60,0:JZ1));this%DiffusivitySolutEff=spval
-  allocate(this%VLSoilMicP(0:JZ1));this%VLSoilMicP=spval
+  allocate(this%VLSoilMicP_vr(0:JZ1));this%VLSoilMicP_vr=spval
   allocate(this%VLiceMicP_vr(0:JZ1));this%VLiceMicP_vr=spval
   allocate(this%VLWatMicP_vr(0:JZ1));this%VLWatMicP_vr=spval
   allocate(this%VLMicP_vr(0:JZ1));this%VLMicP_vr=spval

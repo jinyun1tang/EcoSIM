@@ -27,7 +27,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLsoiAirPM(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
   real(r8),target,allocatable ::  WaterTBLSlope(:,:)                !slope of water table relative to surface slope, [-]
-  real(r8),target,allocatable ::  DTBLDI(:,:)                       !depth of artificial water table
+  real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                       !depth of artificial water table
   real(r8),target,allocatable ::  DTBLY(:,:)                        !artificial water table depth, [m]
   real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepthInternalWTBL(:,:)            !internal water table depth, [m]
@@ -39,7 +39,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                     !excess water
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
   real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
-  real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
+  real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
   real(r8),target,allocatable ::  WatFlux4ErosionM_2DH(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  RunoffVelocity(:,:,:)                        !runoff velocity, [m t-1]
@@ -125,7 +125,7 @@ module SoilWaterDataType
   allocate(VLsoiAirPM(60,0:JZ,JY,JX));VLsoiAirPM=0._r8
   allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
   allocate(WaterTBLSlope(JY,JX));       WaterTBLSlope=0._r8
-  allocate(DTBLDI(JY,JX));      DTBLDI=0._r8
+  allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
   allocate(DTBLY(JY,JX));       DTBLY=0._r8
   allocate(DTBLD(JY,JX));       DTBLD=0._r8
   allocate(DepthInternalWTBL(JY,JX));       DepthInternalWTBL=0._r8
@@ -137,7 +137,7 @@ module SoilWaterDataType
   allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
   allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
-  allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
+  allocate(HydroCondMacP_vr(JZ,JY,JX));     HydroCondMacP_vr=0._r8
   allocate(HydroCondMicP4RootUptake(JZ,JY,JX));     HydroCondMicP4RootUptake=0._r8
   allocate(WatFlux4ErosionM_2DH(60,JV,JH));      WatFlux4ErosionM_2DH=0._r8
   allocate(RunoffVelocity(60,JY,JX));      RunoffVelocity=0._r8
@@ -211,7 +211,7 @@ module SoilWaterDataType
   call destroy(VLsoiAirPM)
   call destroy(FILM)
   call destroy(WaterTBLSlope)
-  call destroy(DTBLDI)
+  call destroy(WtblDepzTile_col)
   call destroy(DTBLY)
   call destroy(DTBLD)
   call destroy(DepthInternalWTBL)
@@ -223,7 +223,7 @@ module SoilWaterDataType
   call destroy(XVLMobileWatMicPM)
   call destroy(XVLiceMicPM)
   call destroy(HydroCond3D)
-  call destroy(HydroCondMacP)
+  call destroy(HydroCondMacP_vr)
   call destroy(HydroCondMicP4RootUptake)
   call destroy(WatFlux4ErosionM_2DH)
   call destroy(RunoffVelocity)

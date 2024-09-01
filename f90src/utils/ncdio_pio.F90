@@ -1840,7 +1840,6 @@ module ncdio_pio
     ! !ARGUMENTS:
     class(file_desc_t), intent(inout) :: file   ! PIO file handle to close
     !-----------------------------------------------------------------------
-
     call check_ret(nf90_close(file%fh), 'ncd_pio_closefile')
 
   end subroutine ncd_pio_closefile

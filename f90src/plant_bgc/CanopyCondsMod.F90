@@ -49,7 +49,7 @@ module CanopyCondsMod
   REAL(R8) :: ZZ
 !     begin_execution
   associate(                                                 &
-    WindSpeedAtm           => plt_site%WindSpeedAtm,         &
+    WindSpeedAtm_col           => plt_site%WindSpeedAtm_col,         &
     ZERO                   => plt_site%ZERO,                 &
     AREA3                  => plt_site%AREA3,                &
     KoppenClimZone         => plt_site%KoppenClimZone,       &
@@ -103,11 +103,11 @@ module CanopyCondsMod
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
 !
 !     BndlResistAboveCanG,RAM=biome canopy,minimum isothermal boundary layer resistance
-!     WindSpeedAtm=wind speed
+!     WindSpeedAtm_col=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm))
-    RIB=1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm**2._r8*TairK)
+    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm_col))
+    RIB=1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2._r8*TairK)
   ELSE
     BndlResistAboveCanG=RAM
     RIB=0.0_r8
@@ -309,7 +309,7 @@ module CanopyCondsMod
     POROS1                 => plt_site%POROS1,                 &
     SolarNoonHour_col      => plt_site%SolarNoonHour_col,      &
     VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr,  &
-    VLSoilMicP             => plt_soilchem%VLSoilMicP,         &
+    VLSoilMicP_vr          => plt_soilchem%VLSoilMicP_vr,      &
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
     ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &
     CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,     &
@@ -785,7 +785,7 @@ module CanopyCondsMod
         GrndAlbedo=FracGrndBySnow*SnowpackAlbedo+(1.0_r8-FracGrndBySnow)*SoilAlbedo
       ELSE
         IF(VLSoilPoreMicP_vr(NU).GT.ZEROS2)THEN
-          THETW1=AMIN1(POROS1,VLWatMicP_vr(NU)/VLSoilMicP(NU))
+          THETW1=AMIN1(POROS1,VLWatMicP_vr(NU)/VLSoilMicP_vr(NU))
         ELSE
           THETW1=0.0_r8
         ENDIF

@@ -69,7 +69,7 @@ module IngridTranspMod
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !
-      IF((VGeomLayer(0,NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
+      IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
         .AND.(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 
         call TopsoilResidueSolutedifusExch(M,NY,NX,FLWRM1,trcSalt_flx_diffus)
@@ -710,7 +710,7 @@ module IngridTranspMod
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
   VLWatMicPMNU=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
-  VOLWHS=AMIN1(XFRS*VGeomLayer(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
+  VOLWHS=AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
   VOLWT=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VOLWHS
 
   DO nsalts=idsalt_beg,idsalt_KSO4
@@ -1568,7 +1568,7 @@ module IngridTranspMod
 !     *2,*H2=solute content of micropores,macropores
 !
   IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-    VOLWHS=AMIN1(XFRS*VGeomLayer(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
+    VOLWHS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
     VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VOLWHS
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
@@ -1761,8 +1761,8 @@ module IngridTranspMod
 !
       IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
-          THETW1(N3,N2,N1)=AZMAX1(VLWatMicPM_vr(M,N3,N2,N1)/VLSoilMicP(N3,N2,N1))
-          THETW1(N6,N5,N4)=AZMAX1(VLWatMicPM_vr(M,N6,N5,N4)/VLSoilMicP(N6,N5,N4))
+          THETW1(N3,N2,N1)=AZMAX1(VLWatMicPM_vr(M,N3,N2,N1)/VLSoilMicP_vr(N3,N2,N1))
+          THETW1(N6,N5,N4)=AZMAX1(VLWatMicPM_vr(M,N6,N5,N4)/VLSoilMicP_vr(N6,N5,N4))
 !
           call SoluteAdvDifsMicMacpore(M,N,N1,N2,N3,N4,N5,N6,THETW1)
 

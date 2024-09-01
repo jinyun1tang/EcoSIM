@@ -457,7 +457,7 @@ module InitPlantMod
     CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,        &
     VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft,        &
     KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft,          &
-    CumSoilThickness      => plt_site%CumSoilThickness,       &
+    CumSoilThickness_vr      => plt_site%CumSoilThickness_vr,       &
     NU                    => plt_site%NU,                     &
     NL                    => plt_site%NL,                     &
     NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft,    &
@@ -495,7 +495,7 @@ module InitPlantMod
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
 !     SeedDepth_pft=seeding depth(m) from PFT management file
-!     CumSoilThickness=depth to soil layer bottom from surface(m)
+!     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
 !     CNRTS_pft,CPRTS_pft=N,P root growth yield
 !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
@@ -507,8 +507,8 @@ module InitPlantMod
 !
   SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)
   D9795: DO L=NU,NL
-    IF(SeedDepth_pft(NZ).GE.CumSoilThickness(L-1) &
-      .AND.SeedDepth_pft(NZ).LT.CumSoilThickness(L))THEN
+    IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
+      .AND.SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
       NGTopRootLayer_pft(NZ)=L
       NIXBotRootLayer_pft(NZ)=L
       D9790: DO NR=1,pltpar%MaxNumRootAxes

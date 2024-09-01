@@ -22,8 +22,8 @@ implicit none
    real(r8) ,target,allocatable ::  SoiBulkDensity_vr(:,:,:)                      !soil bulk density, [Mg m-3]
    integer  ,target,allocatable ::  MacPNumLayer(:,:,:)                 !number of macropores
    real(r8) ,target,allocatable ::  POROS(:,:,:)                     !soil porosity
-   real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !micropore volume of soil layer	m3 d-2
-   real(r8) ,target,allocatable ::  VLSoilMicP(:,:,:)                      !micropore volume
+   real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	m3 d-2
+   real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                      !micropore volume
    real(r8) ,target,allocatable ::  SoilMicPMassLayer(:,:,:)                      !mass of soil layer	Mg d-2
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMn(:,:)                      !minimum soil layer mass
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMX(:,:)                      !maximum soil layer mass
@@ -32,7 +32,7 @@ implicit none
    real(r8) ,target,allocatable ::  CLAY(:,:,:)                      !soil clay content	Mg d-2
    real(r8) ,target,allocatable ::  VLMicP_vr(:,:,:)                    !total micropore volume in layer
    real(r8) ,target,allocatable ::  VLMacP_vr(:,:,:)                    !total macropore volume in layer
-   real(r8) ,target,allocatable ::  VGeomLayer(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
+   real(r8) ,target,allocatable ::  VGeomLayer_vr(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
    real(r8) ,target,allocatable ::  VGeomLayert0_vr(:,:,:)                     !initial soil volume including  macropores+rock [m3 d-2]
   private :: InitAllocate
 
@@ -68,7 +68,7 @@ contains
   allocate(MacPNumLayer(JZ,JY,JX));      MacPNumLayer=0
   allocate(POROS(0:JZ,JY,JX));   POROS=0._r8
   allocate(VLSoilPoreMicP_vr(0:JZ,JY,JX));    VLSoilPoreMicP_vr=0._r8
-  allocate(VLSoilMicP(0:JZ,JY,JX));    VLSoilMicP=0._r8
+  allocate(VLSoilMicP_vr(0:JZ,JY,JX));    VLSoilMicP_vr=0._r8
   allocate(SoilMicPMassLayer(0:JZ,JY,JX));    SoilMicPMassLayer=0._r8
   allocate(SoilMicPMassLayerMn(JY,JX));       SoilMicPMassLayerMn=0._r8
   allocate(SoilMicPMassLayerMX(JY,JX));       SoilMicPMassLayerMX=0._r8
@@ -77,7 +77,7 @@ contains
   allocate(CLAY(JZ,JY,JX));      CLAY=0._r8
   allocate(VLMicP_vr(0:JZ,JY,JX));    VLMicP_vr=0._r8
   allocate(VLMacP_vr(JZ,JY,JX));     VLMacP_vr=0._r8
-  allocate(VGeomLayer(0:JZ,JY,JX));    VGeomLayer=0._r8
+  allocate(VGeomLayer_vr(0:JZ,JY,JX));    VGeomLayer_vr=0._r8
   allocate(VGeomLayert0_vr(0:JZ,JY,JX));   VGeomLayert0_vr=0._r8
   end subroutine InitAllocate
 
@@ -102,7 +102,7 @@ contains
   call destroy(MacPNumLayer)
   call destroy(POROS)
   call destroy(VLSoilPoreMicP_vr)
-  call destroy(VLSoilMicP)
+  call destroy(VLSoilMicP_vr)
   call destroy(SoilMicPMassLayer)
   call destroy(SoilMicPMassLayerMn)
   call destroy(SoilMicPMassLayerMX)
@@ -111,7 +111,7 @@ contains
   call destroy(CLAY)
   call destroy(VLMicP_vr)
   call destroy(VLMacP_vr)
-  call destroy(VGeomLayer)
+  call destroy(VGeomLayer_vr)
   call destroy(VGeomLayert0_vr)
   end subroutine DestructSoilProperty
 

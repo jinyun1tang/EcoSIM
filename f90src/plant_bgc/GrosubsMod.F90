@@ -53,6 +53,7 @@ module grosubsMod
   integer, intent(out) :: NumGrowthStages,MaxNumRootAxes
 
   call InitVegPars(pltpar)
+  
   NumGrowthStages = pltpar%NumGrowthStages
   MaxNumRootAxes = pltpar%MaxNumRootAxes
 
@@ -167,7 +168,7 @@ module grosubsMod
     GrossResp_pft                  => plt_bgcr%GrossResp_pft,                  &
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft,                &
     PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft,         &
-    CumSoilThickness               => plt_site%CumSoilThickness,               &
+    CumSoilThickness_vr               => plt_site%CumSoilThickness_vr,               &
     PlantinDepz_pft                => plt_morph%PlantinDepz_pft,               &
     NumOfBranches_pft              => plt_morph%NumOfBranches_pft              &
   )
@@ -181,7 +182,7 @@ module grosubsMod
           .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)=I
           iYearPlanting_pft(NZ)=iYearCurrent
-          PlantinDepz_pft(NZ)=0.005_r8+CumSoilThickness(0)
+          PlantinDepz_pft(NZ)=0.005_r8+CumSoilThickness_vr(0)
           !mark plant as initialized
           doInitPlant_pft(NZ)=ifalse
         ENDIF

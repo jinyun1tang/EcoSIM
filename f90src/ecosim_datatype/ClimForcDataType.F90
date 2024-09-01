@@ -59,7 +59,7 @@ implicit none
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA_col(:,:)                           !air temperature, [oC]
   real(r8),target,allocatable ::  TairK_col(:,:)                           !air temperature, [K]
-  real(r8),target,allocatable ::  WindSpeedAtm(:,:)                            !wind speed, [m h-1]
+  real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
   real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
@@ -190,7 +190,7 @@ implicit none
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
-  allocate(WindSpeedAtm(JY,JX));          WindSpeedAtm=0._r8
+  allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK_col(JY,JX));         VPK_col=0._r8
   allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
@@ -320,7 +320,7 @@ implicit none
   call destroy(TDCNO)
   call destroy(TCA_col)
   call destroy(TairK_col)
-  call destroy(WindSpeedAtm)
+  call destroy(WindSpeedAtm_col)
   call destroy(VPA)
   call destroy(VPK_col)
   call destroy(PBOT)

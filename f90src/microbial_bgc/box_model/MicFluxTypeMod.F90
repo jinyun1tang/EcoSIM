@@ -33,8 +33,19 @@ implicit none
   real(r8) :: MicrbN2Fix
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo
-  real(r8) :: NetNH4Mineralize
-  real(r8) :: NetPO4Mineralize
+  real(r8) :: CDOMuptk1
+  real(r8) :: tROMT
+  real(r8) :: tRGOXP
+  real(r8) :: tRGOZP
+  real(r8) :: tRGOMP
+  real(r8) :: tGROMO
+  real(r8) :: CDOMuptk2
+  real(r8) :: GrosAssimhr
+  real(r8) :: NetCAssimhr                     !>0 uptake/ASSIMILATION
+  real(r8) :: NetNH4Mineralize                !>0 uptake/ASSIMILATION
+  real(r8) :: NetPO4Mineralize                !>0 uptake/ASSIMILATION
+  real(r8) :: RNiDemand
+  real(r8) :: RPiDemand
   real(r8) :: TRDOE2DIE(1:NumPlantChemElms)              !cumulative conversion of organic element to inorganic element  
   real(r8), allocatable :: REcoDOMProd(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)

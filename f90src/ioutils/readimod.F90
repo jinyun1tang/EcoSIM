@@ -44,7 +44,7 @@ module readiMod
 
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
-  real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
+  real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,WTBLDepz_nat,WTBLDepz_tile
   real(r8) :: DTBLGG,DEC,initSnowDepth,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
@@ -199,7 +199,7 @@ module readiMod
 ! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
 ! IETYPG,iErosionMode=Koppen climate zone,erosion options
 ! NCNG=1:lateral connections between grid cells,3:no connections
-! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (iWaterTabelMode)
+! WTBLDepz_nat,WTBLDepz_tile=depth of natural,artificial (tile) water table (iWaterTabelMode)
 ! DTBLGG=slope of natural water table relative to landscape surface
 ! RCHQNG,RCHQEG,RCHQSG,RCHQWG=boundary condns for N,E,S,W surface runoff
 ! RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
@@ -216,8 +216,8 @@ module readiMod
   call ncd_getvar(grid_nfid,'IDTBLG',loc,iWaterTabelMode)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
-  call ncd_getvar(grid_nfid,'DTBLIG',loc,DTBLIG)
-  call ncd_getvar(grid_nfid,'DTBLDIG',loc,DTBLDIG)
+  call ncd_getvar(grid_nfid,'DTBLIG',loc,WTBLDepz_nat)
+  call ncd_getvar(grid_nfid,'DTBLDIG',loc,WTBLDepz_tile)
   call ncd_getvar(grid_nfid,'DTBLGG',loc,DTBLGG)
 
   call ncd_getvar(grid_nfid,'RCHQNG',loc,RCHQNG)
@@ -248,8 +248,8 @@ module readiMod
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
 
-    write(*,*)'depth of natural water table: DTBLIG',DTBLIG
-    write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
+    write(*,*)'depth of natural water table: DTBLIG',WTBLDepz_nat
+    write(*,*)'depth of artificial water table: DTBLDIG',WTBLDepz_tile
     write(*,*)'slope of natural water table relative to landscape '// &
       'surface: DTBLGG',DTBLGG
     write(*,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
@@ -286,24 +286,24 @@ module readiMod
       CH4E(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
-      KoppenClimZone_col(NY,NX)=IETYPG
-      FlowDirIndicator(NY,NX)=grid_mode
-      NatWtblDepz_col(NY,NX)=DTBLIG
-      DTBLDI(NY,NX)=DTBLDIG
-      WaterTBLSlope(NY,NX)=DTBLGG
-      RechargNorthSurf(NY,NX)=RCHQNG
-      RechargEastSurf(NY,NX)=RCHQEG
-      RechargSouthSurf(NY,NX)=RCHQSG
-      RechargWestSurf(NY,NX)=RCHQWG
-      RechargNorthSubSurf(NY,NX)=RCHGNUG
-      RechargEastSubSurf(NY,NX)=RCHGEUG
-      RechargSouthSubSurf(NY,NX)=RCHGSUG
-      RechargWestSubSurf(NY,NX)=RCHGWUG
-      RechargRateNorthWTBL(NY,NX)=RCHGNTG
-      RechargRateEastWTBL(NY,NX)=RCHGETG
-      RechargRateSouthWTBL(NY,NX)=RCHGSTG
-      RechargRateWestWTBL(NY,NX)=RCHGWTG
-      RCHGD(NY,NX)=RCHGDG
+      KoppenClimZone_col(NY,NX)   = IETYPG
+      FlowDirIndicator(NY,NX)     = grid_mode
+      NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
+      WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
+      WaterTBLSlope(NY,NX)        = DTBLGG
+      RechargNorthSurf(NY,NX)     = RCHQNG
+      RechargEastSurf(NY,NX)      = RCHQEG
+      RechargSouthSurf(NY,NX)     = RCHQSG
+      RechargWestSurf(NY,NX)      = RCHQWG
+      RechargNorthSubSurf(NY,NX)  = RCHGNUG
+      RechargEastSubSurf(NY,NX)   = RCHGEUG
+      RechargSouthSubSurf(NY,NX)  = RCHGSUG
+      RechargWestSubSurf(NY,NX)   = RCHGWUG
+      RechargRateNorthWTBL(NY,NX) = RCHGNTG
+      RechargRateEastWTBL(NY,NX)  = RCHGETG
+      RechargRateSouthWTBL(NY,NX) = RCHGSTG
+      RechargRateWestWTBL(NY,NX)  = RCHGWTG
+      RCHGD(NY,NX)                = RCHGDG
       DH(NY,NX)=DHI(NX)
       DV(NY,NX)=DVI(NY)
       CO2E(NY,NX)=CO2EI(NY,NX)

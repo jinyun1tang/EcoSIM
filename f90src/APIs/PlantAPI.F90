@@ -689,7 +689,7 @@ implicit none
     plt_soilchem%HydroCondMicP4RootUptake(L)=HydroCondMicP4RootUptake(L,NY,NX)
     plt_soilchem%GasDifc_vr(idg_beg:idg_end,L)=GasDifc_vr(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%SoilResit4RootPentrate_vr(L)=SoilResit4RootPentrate_vr(L,NY,NX)
-    plt_site%DPTHZ(L)=DPTHZ(L,NY,NX)
+    plt_site%DPTHZ_vr(L)=DPTHZ_vr(L,NY,NX)
   ENDDO
   plt_allom%FracHour4LeafoffRemob(:) = FracHour4LeafoffRemob(:)
   DO L=1,NL(NY,NX)
@@ -707,7 +707,7 @@ implicit none
 
     plt_soilchem%trc_gascl_vr(idg_beg:idg_end,L) =trc_gascl_vr(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%CSoilOrgM_vr(ielmc,L) =CSoilOrgM_vr(ielmc,L,NY,NX)
-    plt_site%CumSoilThickness(L)    =CumSoilThickness(L,NY,NX)
+    plt_site%CumSoilThickness_vr(L)    =CumSoilThickness_vr(L,NY,NX)
     plt_site%FracSoiAsMicP_vr(L) =FracSoiAsMicP_vr(L,NY,NX)
 
     plt_soilchem%trc_solml_vr(ids_beg:ids_end,L)  =trc_solml_vr(ids_beg:ids_end,L,NY,NX)
@@ -737,7 +737,7 @@ implicit none
     plt_soilchem%trcs_VLN_vr(ids_H1PO4B,L) =trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NO3,L) =trcs_VLN_vr(ids_NO3,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_H1PO4,L) =trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    plt_soilchem%VLSoilMicP(L)  =VLSoilMicP(L,NY,NX)
+    plt_soilchem%VLSoilMicP_vr(L)  =VLSoilMicP_vr(L,NY,NX)
     plt_soilchem%VLiceMicP_vr(L)  =VLiceMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)  =VLWatMicP_vr(L,NY,NX)
     plt_soilchem%VLMicP_vr(L)  =VLMicP_vr(L,NY,NX)
@@ -1456,7 +1456,7 @@ implicit none
   plt_morph%CanopyHeight_col   =CanopyHeight_col(NY,NX)
   plt_site%WindMesHeight=WindMesHeight(NY,NX)
   plt_ew%ZERO4PlantDisplace_col=ZERO4PlantDisplace_col(NY,NX)
-  plt_site%WindSpeedAtm=WindSpeedAtm(NY,NX)
+  plt_site%WindSpeedAtm_col=WindSpeedAtm_col(NY,NX)
   plt_ew%VLHeatCapSnowMin_col=VLHeatCapSnowMin_col(NY,NX)
   plt_ew%VLHeatCapSurfSnow_col=VLHeatCapSnow_col(1,NY,NX)
   plt_morph%CanopyHeightZ_col(0)=CanopyHeightZ_col(0,NY,NX)
@@ -1471,7 +1471,7 @@ implicit none
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)=AREA(3,L,NY,NX)
     plt_soilchem%VLSoilPoreMicP_vr(L)=VLSoilPoreMicP_vr(L,NY,NX)
-    plt_soilchem%VLSoilMicP(L)=VLSoilMicP(L,NY,NX)
+    plt_soilchem%VLSoilMicP_vr(L)=VLSoilMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)=VLWatMicP_vr(L,NY,NX)
   ENDDO
   plt_rad%SineSunInclAngle_col=SineSunInclAngle_col(NY,NX)

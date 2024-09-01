@@ -42,7 +42,7 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
-  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
+  use EcoSIMConfig, only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
   use SoilBGCNLayMod, only : sumORGMLayL
@@ -198,7 +198,7 @@ module Hour1Mod
 !     OUTPUT FOR WATER TABLE DEPTH
       call GetOutput4WaterTableDepth(NY,NX,THETPZ)
 
-      call GetSurfResidualProperties(NY,NX,DPTH0)
+      call GetSurfResidualProperties(I,J,NY,NX,DPTH0)
 
       call SetTracerPropertyInLiterAir(NY,NX)
 
@@ -520,11 +520,11 @@ module Hour1Mod
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
-    VGeomLayer(L,NY,NX)=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
+    VGeomLayer_vr(L,NY,NX)=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
 
-    VLSoilPoreMicP_vr(L,NY,NX)=AMAX1(VGeomLayer(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX),1.e-8_r8)
+    VLSoilPoreMicP_vr(L,NY,NX)=AMAX1(VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX),1.e-8_r8)
     IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO)THEN
-      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
+      VLSoilMicP_vr(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
     ENDIF
     !
     !     BKVL=soil mass
@@ -578,12 +578,12 @@ module Hour1Mod
       POROS(L,NY,NX)=1.0_r8
       !write(*,*) "final else - POROS(L,NY,NX) = ", POROS(L,NY,NX)
     ENDIF
-    !     VLMicP_vr(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
+    !     VLMicP_vr(L,NY,NX)=AMAX1(POROS(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
-    !     VLMacP_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer(L,NY,NX)
+    !     VLMacP_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
     !    2,VLWatMacP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
-    VLMicP_vr(L,NY,NX)=POROS(L,NY,NX)*VLSoilMicP(L,NY,NX)
-    VLMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer(L,NY,NX)
+    VLMicP_vr(L,NY,NX) = POROS(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
+    VLMacP_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
         +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
@@ -591,8 +591,7 @@ module Hour1Mod
       VLsoiAirP_vr(L,NY,NX)=0.0_r8
     ENDIF
     EHUM(L,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
-    EPOC(L,NY,NX)=1.0_r8
-    if(lverb)write(*,*)'SoilHydroProperty',NY,NX,L,NUI(NY,NX),NLI(NY,NX)
+    EPOC(L,NY,NX)=1.0_r8    
     call SoilHydroProperty(L,NY,NX,I,J)
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
@@ -1268,36 +1267,36 @@ module Hour1Mod
 ! R*Y,R*X=total substrate uptake from previous,current hour
 ! used in nitro.f, uptake.f
 !
-    RO2EcoDmndPrev_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)
-    RNH4EcoDmndSoilPrev_vr(L,NY,NX)=REcoNH4DmndSoil_vr(L,NY,NX)
-    RNO3EcoDmndSoilPrev_vr(L,NY,NX)=REcoNO3DmndSoil_vr(L,NY,NX)
-    RNO2EcoUptkSoilPrev_vr(L,NY,NX)=RNO2EcoUptkSoil_vr(L,NY,NX)
-    RN2OEcoUptkSoilPrev_vr(L,NY,NX)=RN2OEcoUptkSoil_vr(L,NY,NX)
-    RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)=REcoH1PO4DmndSoil_vr(L,NY,NX)
-    RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)=REcoH2PO4DmndSoil_vr(L,NY,NX)
-    RNH4EcoDmndBandPrev_vr(L,NY,NX)=REcoNH4DmndBand_vr(L,NY,NX)
-    RNO3EcoDmndBandPrev_vr(L,NY,NX)=REcoNO3DmndBand_vr(L,NY,NX)
-    RNO2EcoUptkBandPrev_vr(L,NY,NX)=RNO2EcoUptkBand_vr(L,NY,NX)
-    RH1PO4EcoDmndBandPrev_vr(L,NY,NX)=REcoH1PO4DmndBand_vr(L,NY,NX)
-    RH2PO4EcoDmndBandPrev_vr(L,NY,NX)=REcoH2PO4DmndBand_vr(L,NY,NX)
-    REcoO2DmndResp_vr(L,NY,NX)=0.0_r8
-    REcoNH4DmndSoil_vr(L,NY,NX)=0.0_r8
-    REcoNO3DmndSoil_vr(L,NY,NX)=0.0_r8
-    RNO2EcoUptkSoil_vr(L,NY,NX)=0.0_r8
-    RN2OEcoUptkSoil_vr(L,NY,NX)=0.0_r8
-    REcoH1PO4DmndSoil_vr(L,NY,NX)=0.0_r8
-    REcoH2PO4DmndSoil_vr(L,NY,NX)=0.0_r8
-    REcoNH4DmndBand_vr(L,NY,NX)=0.0_r8
-    REcoNO3DmndBand_vr(L,NY,NX)=0.0_r8
-    RNO2EcoUptkBand_vr(L,NY,NX)=0.0_r8
-    REcoH1PO4DmndBand_vr(L,NY,NX)=0.0_r8
-    REcoH2PO4DmndBand_vr(L,NY,NX)=0.0_r8
+    RO2EcoDmndPrev_vr(L,NY,NX)        = REcoO2DmndResp_vr(L,NY,NX)
+    RNH4EcoDmndSoilPrev_vr(L,NY,NX)   = REcoNH4DmndSoil_vr(L,NY,NX)
+    RNO3EcoDmndSoilPrev_vr(L,NY,NX)   = REcoNO3DmndSoil_vr(L,NY,NX)
+    RNO2EcoUptkSoilPrev_vr(L,NY,NX)   = RNO2EcoUptkSoil_vr(L,NY,NX)
+    RN2OEcoUptkSoilPrev_vr(L,NY,NX)   = RN2OEcoUptkSoil_vr(L,NY,NX)
+    RH1PO4EcoDmndSoilPrev_vr(L,NY,NX) = REcoH1PO4DmndSoil_vr(L,NY,NX)
+    RH2PO4EcoDmndSoilPrev_vr(L,NY,NX) = REcoH2PO4DmndSoil_vr(L,NY,NX)
+    RNH4EcoDmndBandPrev_vr(L,NY,NX)   = REcoNH4DmndBand_vr(L,NY,NX)
+    RNO3EcoDmndBandPrev_vr(L,NY,NX)   = REcoNO3DmndBand_vr(L,NY,NX)
+    RNO2EcoUptkBandPrev_vr(L,NY,NX)   = RNO2EcoUptkBand_vr(L,NY,NX)
+    RH1PO4EcoDmndBandPrev_vr(L,NY,NX) = REcoH1PO4DmndBand_vr(L,NY,NX)
+    RH2PO4EcoDmndBandPrev_vr(L,NY,NX) = REcoH2PO4DmndBand_vr(L,NY,NX)
+    REcoO2DmndResp_vr(L,NY,NX)        = 0.0_r8
+    REcoNH4DmndSoil_vr(L,NY,NX)       = 0.0_r8
+    REcoNO3DmndSoil_vr(L,NY,NX)       = 0.0_r8
+    RNO2EcoUptkSoil_vr(L,NY,NX)       = 0.0_r8
+    RN2OEcoUptkSoil_vr(L,NY,NX)       = 0.0_r8
+    REcoH1PO4DmndSoil_vr(L,NY,NX)     = 0.0_r8
+    REcoH2PO4DmndSoil_vr(L,NY,NX)     = 0.0_r8
+    REcoNH4DmndBand_vr(L,NY,NX)       = 0.0_r8
+    REcoNO3DmndBand_vr(L,NY,NX)       = 0.0_r8
+    RNO2EcoUptkBand_vr(L,NY,NX)       = 0.0_r8
+    REcoH1PO4DmndBand_vr(L,NY,NX)     = 0.0_r8
+    REcoH2PO4DmndBand_vr(L,NY,NX)     = 0.0_r8
 
     D5050: DO K=1,jcplx
-      RDOMEcoDmndPrev_vr(K,L,NY,NX)=ROQCX(K,L,NY,NX)
-      RAcetateEcoDmndPrev_vr(K,L,NY,NX)=ROQAX(K,L,NY,NX)
-      ROQCX(K,L,NY,NX)=0.0_r8
-      ROQAX(K,L,NY,NX)=0.0_r8
+      RDOMEcoDmndPrev_vr(K,L,NY,NX)     = ROQCX(K,L,NY,NX)
+      RAcetateEcoDmndPrev_vr(K,L,NY,NX) = ROQAX(K,L,NY,NX)
+      ROQCX(K,L,NY,NX)                  = 0.0_r8
+      ROQAX(K,L,NY,NX)                  = 0.0_r8
     ENDDO D5050
 !
 ! DIFFUSIVITY
@@ -1414,9 +1413,10 @@ module Hour1Mod
   end subroutine Prep4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSurfResidualProperties(NY,NX,DPTH0)
+  subroutine GetSurfResidualProperties(I,J,NY,NX,DPTH0)
 
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8),intent(out) :: DPTH0(JY,JX)
   real(r8) :: VxcessWatLitR,TVOLWI,ThetaWLitR
@@ -1445,9 +1445,10 @@ module Hour1Mod
 !
   !write(*,*) "In GetSurfResidualProperties: "
   VxcessWatLitR=AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))
-  VGeomLayer(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
-  IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer(0,NY,NX)
+  VGeomLayer_vr(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
+!  write(113,*)I+J/24.,VGeomLayer_vr(0,NY,NX),VxcessWatLitR,VLitR(NY,NX)
+  IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer_vr(0,NY,NX)
     SoilMicPMassLayer(0,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
     VLMicP_vr(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
     VLsoiAirP_vr(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
@@ -1882,7 +1883,7 @@ module Hour1Mod
         SolidOM_vr(ielmp,M,K,LFDPTH,NY,NX)=SolidOM_vr(ielmp,M,K,LFDPTH,NY,NX)+OSP1
         SolidOMAct_vr(M,K,LFDPTH,NY,NX)=SolidOMAct_vr(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1,K)
         IF(LFDPTH.EQ.0)THEN
-          VGeomLayer(LFDPTH,NY,NX)=VGeomLayer(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
+          VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
         ENDIF
       ENDDO D2970
       TORGF=TORGF+OSCI
@@ -2265,9 +2266,9 @@ module Hour1Mod
       THETI_col(L,NY,NX)=0.0_r8
       ThetaAir_vr(L,NY,NX)=0.0_r8
     ELSE
-      THETW_vr(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)))
-      THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX)))
-      ThetaAir_vr(L,NY,NX)=AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP(L,NY,NX))
+      THETW_vr(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
+      THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
+      ThetaAir_vr(L,NY,NX)=AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
     ENDIF
     THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_col(L,NY,NX))
 !

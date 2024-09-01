@@ -288,7 +288,6 @@ contains
         this%rNCOMCa(2,N,K)=0.09_r8           !minimum
         this%rPCOMCa(1,N,K)=0.015_r8
         this%rPCOMCa(2,N,K)=0.009_r8
-
       ELSE
         do NGL=this%JGnio(n),this%JGnfo(n)
           rNCOMC(1,NGL,K)=0.225_r8
@@ -309,7 +308,6 @@ contains
       this%rPCOMCa(3,N,K)=DOT_PRODUCT(FL,this%rPCOMCa(1:2,N,K))
     enddo
   ENDDO D95
-
   DO  N=1,this%NumMicbFunGrupsPerCmplx
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(1,NGL)=0.225_r8

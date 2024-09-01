@@ -39,6 +39,9 @@ implicit none
   real(r8),allocatable ::  Prec2LitR1(:,:)                          !
   real(r8),allocatable ::  BAREW(:,:)                         !
   real(r8),allocatable ::  HCNDR(:,:)                         !
+  real(r8),allocatable :: TEvapXAir2Toplay_col(:,:)
+  real(r8),allocatable :: TEvapXAir2LitR_col(:,:)
+  real(r8),allocatable :: TEvapXAir2Snow_col(:,:)
 
   real(r8),allocatable :: watflw(:,:)
   real(r8),allocatable :: waticefl(:,:)
@@ -87,6 +90,10 @@ implicit none
   allocate(Prec2LitR1(JY,JX));        Prec2LitR1=0._r8  
   allocate(BAREW(JY,JX));       BAREW=0._r8  
   allocate(HCNDR(JY,JX));       HCNDR=0._r8  
+  allocate(TEvapXAir2Toplay_col(JY,JX)); TEvapXAir2Toplay_col=0._r8
+  allocate(TEvapXAir2LitR_col(JY,JX)); TEvapXAir2LitR_col=0._r8
+  allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col=0._r8
+
   end subroutine InitSurfPhysData  
 !------------------------------------------------------------------------------------------  
 
@@ -94,6 +101,9 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
+  call destroy(TEvapXAir2Toplay_col)
+  call destroy(TEvapXAir2LitR_col) 
+  call destroy(TEvapXAir2Snow_col) 
   call destroy(XVLMobileWaterLitR)
   call destroy(XVLMobileWatMicP)
   call destroy(XVLiceMicP_col)

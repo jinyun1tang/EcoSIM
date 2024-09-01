@@ -132,17 +132,18 @@ implicit none
   
   call micflx%ZeroOut()
 
-  call MicAPISend(L,NY,NX,micfor,micstt,micflx)
-
+  call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
+  
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag)
 
-  call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag)
+  call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag)
 
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
 
-  subroutine MicAPISend(L,NY,NX,micfor,micstt,micflx)
+  subroutine MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: L,NY,NX
   type(micforctype), intent(inout) :: micfor
   type(micsttype), intent(inout) :: micstt
@@ -151,15 +152,15 @@ implicit none
   integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus
   integer :: ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx,NE
 
-  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
-  jcplx=micpar%jcplx
+  NumMicbFunGrupsPerCmplx = micpar%NumMicbFunGrupsPerCmplx
+  jcplx                   = micpar%jcplx
 
-  ndbiomcp = micpar%ndbiomcp
-  nlbiomcp = micpar%nlbiomcp
-  NumMicrobAutrophCmplx  = micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx  = micpar%NumHetetrMicCmplx
-  k_humus  = micpar%k_humus
-  k_POM    = micpar%k_POM
+  ndbiomcp              = micpar%ndbiomcp
+  nlbiomcp              = micpar%nlbiomcp
+  NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
+  NumHetetrMicCmplx     = micpar%NumHetetrMicCmplx
+  k_humus               = micpar%k_humus
+  k_POM                 = micpar%k_POM
 
   micfor%VOLW0               = VLWatMicP_vr(0,NY,NX)
   micfor%ZERO                = ZERO
@@ -174,7 +175,7 @@ implicit none
   micfor%VWatLitRHoldCapcity = VWatLitRHoldCapcity_col(NY,NX)
   micfor%ZEROS2              = ZEROS2(NY,NX)
   micfor%ZEROS               = ZEROS(NY,NX)
-  micfor%VLSoilMicP          = VLSoilMicP(L,NY,NX)
+  micfor%VLSoilMicP          = VLSoilMicP_vr(L,NY,NX)
   micfor%THETY               = THETY_vr(L,NY,NX)
   micfor%POROS               = POROS(L,NY,NX)
   micfor%FieldCapacity       = FieldCapacity(L,NY,NX)
@@ -205,6 +206,8 @@ implicit none
   micfor%RH1PO4EcoDmndBandPrev        = RH1PO4EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RO2AquaXchangePrev           = RO2AquaXchangePrev_vr(L,NY,NX)
   micfor%RDOMEcoDmndPrev(1:jcplx)     = RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
+
+!  write(201,*)I+J/24.,L,RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
   micfor%RAcetateEcoDmndPrev(1:jcplx) = RAcetateEcoDmndPrev_vr(1:jcplx,L,NY,NX)
   !is it litter layer?
   micfor%litrm=(L==0)
@@ -258,15 +261,15 @@ implicit none
   if(micfor%Lsurf)then
     micfor%SoilMicPMassLayer0=SoilMicPMassLayer(0,NY,NX)
   endif
-  micfor%DiffusivitySolutEff(1:NPH)=DiffusivitySolutEff(1:NPH,L,NY,NX)
-  micfor%FILM(1:NPH)=FILM(1:NPH,L,NY,NX)
-  micfor%THETPM(1:NPH)=THETPM(1:NPH,L,NY,NX)
-  micfor%VLWatMicPM(1:NPH)=VLWatMicPM_vr(1:NPH,L,NY,NX)
-  micfor%TortMicPM(1:NPH)=TortMicPM_vr(1:NPH,L,NY,NX)
-  micfor%VLsoiAirPM(1:NPH)=VLsoiAirPM(1:NPH,L,NY,NX)
-  micfor%VLsoiAirP=VLsoiAirP_vr(L,NY,NX)
-  micstt%EPOC=EPOC(L,NY,NX)
-  micstt%EHUM=EHUM(L,NY,NX)
+  micfor%DiffusivitySolutEff(1:NPH) = DiffusivitySolutEff(1:NPH,L,NY,NX)
+  micfor%FILM(1:NPH)                = FILM(1:NPH,L,NY,NX)
+  micfor%THETPM(1:NPH)              = THETPM(1:NPH,L,NY,NX)
+  micfor%VLWatMicPM(1:NPH)          = VLWatMicPM_vr(1:NPH,L,NY,NX)
+  micfor%TortMicPM(1:NPH)           = TortMicPM_vr(1:NPH,L,NY,NX)
+  micfor%VLsoiAirPM(1:NPH)          = VLsoiAirPM(1:NPH,L,NY,NX)
+  micfor%VLsoiAirP                  = VLsoiAirP_vr(L,NY,NX)
+  micstt%EPOC                       = EPOC(L,NY,NX)
+  micstt%EHUM                       = EHUM(L,NY,NX)
   micstt%ZNH4B             = AZMAX1(trc_solml_vr(ids_NH4B,L,NY,NX))
   micstt%ZNH4S             = AZMAX1(trc_solml_vr(ids_NH4,L,NY,NX))
   micstt%ZNO3B             = AZMAX1(trc_solml_vr(ids_NO3B,L,NY,NX))
@@ -321,23 +324,26 @@ implicit none
   micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx) = RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
   micflx%RO2DmndAutort(1:NumMicrobAutrophCmplx)       = RO2DmndAutort_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
 
-  micflx%RNH4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)=RNH4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RNH4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)=RNH4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RNO3DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)=RNO3DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RNO3DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)=RNO3DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RH2PO4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)=RH2PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RH2PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)=RH2PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RH1PO4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)=RH1PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RH1PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)=RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
-  micflx%RO2DmndHetert(1:NumHetetrMicCmplx,1:jcplx)=RO2DmndHetert(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RNH4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)   = RNH4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RNH4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)   = RNH4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RNO3DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)   = RNO3DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RNO3DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)   = RNO3DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RH2PO4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx) = RH2PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RH2PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx) = RH2PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RH1PO4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx) = RH1PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RH1PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx) = RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RO2DmndHetert(1:NumHetetrMicCmplx,1:jcplx)       = RO2DmndHetert(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RDOCUptkHeter(1:NumHetetrMicCmplx,1:jcplx)       = RDOCUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
+  micflx%RAcetateUptkHeter(1:NumHetetrMicCmplx,1:jcplx)   = RAcetateUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)
 
   end subroutine MicAPISend
 
 !------------------------------------------------------------------------------------------
 
 
-  subroutine MicAPIRecv(L,NY,NX,litrM,micstt,micflx,naqfdiag)
+  subroutine MicAPIRecv(I,J,L,NY,NX,litrM,micstt,micflx,naqfdiag)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: L,NY,NX
   logical, intent(in) :: litrM
   type(micsttype), intent(in) :: micstt
@@ -409,10 +415,9 @@ implicit none
   RH2PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)    = micflx%RH2PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)
   RH1PO4DmndSoilHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)    = micflx%RH1PO4DmndSoilHeter(1:NumHetetrMicCmplx,1:jcplx)
   RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX)    = micflx%RH1PO4DmndBandHeter(1:NumHetetrMicCmplx,1:jcplx)
-
   
-  SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)
-  SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)=micstt%SolidOMAct(1:jsken,1:jcplx)
+  SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX) = micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)
+  SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)                 = micstt%SolidOMAct(1:jsken,1:jcplx)
   
   if(litrm)then
     RNH4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RNH4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
@@ -431,33 +436,38 @@ implicit none
     ENDDO
   endif
 
-  RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
-  RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)
-  RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)
-  RNO3UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RNO3UptkBandAutor(1:NumMicrobAutrophCmplx)
-  RH2PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH2PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
-  RH2PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH2PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
-  RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
-  RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)=micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
-  RO2UptkSoilM_vr(1:NPH,L,NY,NX)=micflx%RO2UptkSoilM(1:NPH)
+  RNH4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)   = micflx%RNH4UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RNH4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)   = micflx%RNH4UptkBandAutor(1:NumMicrobAutrophCmplx)
+  RNO3UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)   = micflx%RNO3UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RNO3UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)   = micflx%RNO3UptkBandAutor(1:NumMicrobAutrophCmplx)
+  RH2PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH2PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RH2PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH2PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
+  RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
+  RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
+  RO2UptkSoilM_vr(1:NPH,L,NY,NX)                          = micflx%RO2UptkSoilM(1:NPH)
 
-  TSens4MicbGrwoth_vr(L,NY,NX)=micstt%TSens4MicbGrwoth
-  VWatMicrobAct_vr(L,NY,NX)=micstt%VWatMicrobAct
-  TMicHeterAct_vr(L,NY,NX)=micstt%TMicHeterAct
-  ZNFNI(L,NY,NX)=micstt%ZNFNI
-  FracBulkSOMC_vr(1:jcplx,L,NY,NX)=micstt%FracBulkSOMC(1:jcplx)
-  DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%DOM(idom_beg:idom_end,1:jcplx)
-  SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)=micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
+  TSens4MicbGrwoth_vr(L,NY,NX)                   = micstt%TSens4MicbGrwoth
+  VWatMicrobAct_vr(L,NY,NX)                      = micstt%VWatMicrobAct
+  TMicHeterAct_vr(L,NY,NX)                       = micstt%TMicHeterAct
+  ZNFNI(L,NY,NX)                                 = micstt%ZNFNI
+  FracBulkSOMC_vr(1:jcplx,L,NY,NX)               = micstt%FracBulkSOMC(1:jcplx)
+  DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)      = micstt%DOM(idom_beg:idom_end,1:jcplx)
+  SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX) = micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
+!  if(L==0)write(141,*)I+J/24.,DOM_vr(idom_doc,1:3,L,NY,NX),micflx%NetCAssimhr,micflx%GrosAssimhr 
+!  if(L==0)write(143,*)I+J/24.,micflx%RNiDemand,micflx%NetNH4Mineralize,micflx%RPiDemand,micflx%NetPO4Mineralize,micstt%TotActMicrobiom
+!  if(L==0)write(144,*)I+J/24.,micflx%CDOMuptk1,micflx%CDOMuptk2,micflx%tROMT,micflx%tGROMO,micflx%tRGOMP,micflx%tRGOXP,micflx%tRGOZP
+!  if(L==0)write(145,*)I+J/24.,micflx%tRGOXP,micflx%tRGOZP
+
   do k=1,jcplx
-  DO idom=idom_beg,idom_end
-  if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.E-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
-  if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8
+    DO idom=idom_beg,idom_end
+      if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.E-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
+      if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8
+    enddo
   enddo
-  enddo
-  OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)=micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
-  mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)=micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
-  mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
-  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)=tRDOE2Die_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
+  OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)           = micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
+  mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX) = micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
+  mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)          = micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
+  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)                                = tRDOE2Die_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

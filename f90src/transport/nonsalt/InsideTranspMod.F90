@@ -980,8 +980,8 @@ module InsideTranspMod
   real(r8) :: THETW1(JZ,JY,JX)
   integer :: K,nsol,idom
 
-  THETW1(N3,N2,N1)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
-  THETW1(N6,N5,N4)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N6,N5,N4),VLSoilMicP(N6,N5,N4)))
+  THETW1(N3,N2,N1)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
+  THETW1(N6,N5,N4)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N6,N5,N4),VLSoilMicP_vr(N6,N5,N4)))
 
 !     SOLUTE TRANSPORT IN MICROPORES
 !
@@ -1215,7 +1215,7 @@ module InsideTranspMod
 !     *2,*H2=solute content of micropores,macropores
 !
   IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-    VLWatMacPS=AMIN1(XFRS*VGeomLayer(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
+    VLWatMacPS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
     VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VLWatMacPS
 
     D9955: DO K=1,jcplx
@@ -1283,7 +1283,7 @@ module InsideTranspMod
 !     S*L=solubility of gas in water from hour1.f
 !
   IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
-    THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
+    THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
     IF(THETW1.GT.THETY_vr(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
 
       trcg_SLX(idg_CO2) =catomw*GasSolbility_vr(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol

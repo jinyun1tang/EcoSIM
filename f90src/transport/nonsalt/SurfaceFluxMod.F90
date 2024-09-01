@@ -236,7 +236,7 @@ contains
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !
-  IF((VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
+  IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
     .AND.(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 !
 !     DIFFUSIVITIES IN RESIDUE AND SOIL SURFACE
@@ -501,7 +501,7 @@ contains
 !     *H2,*2=macropore,micropore solute content
 !
   IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VLWatMacPS=AMIN1(XFRS*VGeomLayer(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
+    VLWatMacPS=AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
     VOLWT=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VLWatMacPS
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
@@ -847,7 +847,7 @@ contains
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     R*DXR=gas exchange between atmosphere and surface litter water for gas flux calculations
 !
-  IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX) &
+  IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) &
     .AND.VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
     .AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
 
@@ -951,7 +951,7 @@ contains
   real(r8) :: DFGcc(idg_beg:idg_NH3)
   real(r8) :: DLYR0,TORT0
 
-  IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX)) !vertical layer thickness
     TORT0=TortMicPM_vr(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
 

@@ -185,7 +185,7 @@ module WthrMod
 !
       !     UA=wind speed
 !
-      WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WIND(I))
+      WindSpeedAtm_col(NY,NX)=AMAX1(3600.0_r8,WIND(I))
 !
 !     TSNOW=temperature below which precipitation is snow (oC)
 !     PrecAsRain,PrecAsSnow=rainfall,snowfall
@@ -236,8 +236,7 @@ module WthrMod
       !elevation corrected saturated air vapor pressure, KPa
       VPS(NY,NX)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK_col(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))   
-      WindSpeedAtm(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
-
+      WindSpeedAtm_col(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
       !snowfall is determined by air tempeature
       IF(TCA_col(NY,NX).GT.TSNOW)THEN
         PrecAsRain(NY,NX)=RAINH(J,I)
@@ -288,7 +287,7 @@ module WthrMod
 
         SineSunInclAnglNxtHour_col(NY,NX)=AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
 
-        !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8.AND.SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
+        !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
         IF(RADN(NY,NX).LE.0.0_r8)SineSunInclAngle_col(NY,NX)=0.0_r8
         IF(SineSunInclAngle_col(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0_r8
         RADX=SolConst*AZMAX1(SineSunInclAngle_col(NY,NX))
@@ -512,7 +511,7 @@ module WthrMod
       RadSWDiffus_col(NY,NX)=RadSWDiffus_col(NY,NX)*TDRAD(N,NY,NX)
       RadPARDirect_col(NY,NX)=RadPARDirect_col(NY,NX)*TDRAD(N,NY,NX)
       RadPARDiffus_col(NY,NX)=RadPARDiffus_col(NY,NX)*TDRAD(N,NY,NX)
-      WindSpeedAtm(NY,NX)=WindSpeedAtm(NY,NX)*TDWND(N,NY,NX)
+      WindSpeedAtm_col(NY,NX)=WindSpeedAtm_col(NY,NX)*TDWND(N,NY,NX)
       VPK_col(NY,NX)=AMIN1(VPS(NY,NX),VPK_col(NY,NX)*TDHUM(N,NY,NX))
       PrecAsRain(NY,NX)=PrecAsRain(NY,NX)*TDPRC(N,NY,NX)
       PrecAsSnow(NY,NX)=PrecAsSnow(NY,NX)*TDPRC(N,NY,NX)
@@ -541,12 +540,13 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-
+      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD(NY,NX)= &
+        RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA_col(NY,NX))          !celcius
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA_col(NY,NX))          !celcius
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, KPa
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, KPa
-      TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm(NY,NX)      !wind speed, m/hr
+      TWIND(NY,NX)=TWIND(NY,NX)+WindSpeedAtm_col(NY,NX)      !wind speed, m/hr
       VPA(NY,NX)=VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)    !atmospheric vapor concentration, [m3 m-3], 2.173E-03_r8=18g/mol/(8.3142)
 !      PrecDaily_col(NY,NX)=PrecDaily_col(NY,NX)+(PrecAsRain(NY,NX)+PrecAsSnow(NY,NX) &
 !        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8

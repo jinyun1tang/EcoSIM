@@ -79,7 +79,6 @@ module MicAutoCPLXMod
     RCO2ProdAutor                => nmicf%RCO2ProdAutor,                 &
     RCH4ProdAutor                => nmicf%RCH4ProdAutor,                 &
     TOMEAutoK                    => ncplxs%TOMEAutoK,                    &
-    jcplx                        => micpar%jcplx,                        &
     mid_AmmoniaOxidBacter        => micpar%mid_AmmoniaOxidBacter,        &
     mid_NitriteOxidBacter        => micpar%mid_NitriteOxidBacter,        &
     mid_H2GenoMethanogArchea     => micpar%mid_H2GenoMethanogArchea,     &

@@ -101,7 +101,7 @@ module RedistMod
       !   write(116,*)I+J/24.,'beg1',trc_solml_vr(ids_NO3,0,NY,NX),RNutMicbTransf_vr(ids_NO3,0,NY,NX),trcn_RChem_soil_vr(ids_NO3,0,NY,NX)
 
 !      if(NX==5)write(111,*)I+J/24.,'beg1',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
-      call AddFlux2SurfaceResidue(NY,NX)
+      call AddFlux2SurfaceResidue(I,J,NY,NX)
 !
       !   write(116,*)I+J/24.,'beg2',trc_solml_vr(ids_NO3,0,NY,NX),RNutMicbTransf_vr(ids_NO3,0,NY,NX),trcn_RChem_soil_vr(ids_NO3,0,NY,NX)
 !      if(NX==5)write(111,*)I+J/24.,'beg2',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
@@ -242,7 +242,7 @@ module RedistMod
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
 !     CumDepth2LayerBottom(NU=soil surface elevation
-!     DTBLI,DTBLDI=depth of natural,artificial water table from readi.f
+!     DTBLI,WtblDepzTile_col=depth of natural,artificial water table from readi.f
 !     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
 !     IDWaterTable=water table flag from readi.f
@@ -268,8 +268,8 @@ module RedistMod
     ELSEIF(IDWaterTable(NY,NX).EQ.2)THEN
       IDWaterTable(NY,NX)=4
     ENDIF
-    DTBLDI(NY,NX)=DCORPW
-    DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
+    WtblDepzTile_col(NY,NX)=DCORPW
+    DTBLD(NY,NX)=AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
     DTBLY(NY,NX)=DTBLD(NY,NX)
   ENDIF
 !
@@ -876,7 +876,7 @@ module RedistMod
 !     VLMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX)
 !    2+DVLWatMicP_vr(L,NY,NX)+DVLiceMicP_vr(L,NY,NX)
 !     VLSoilPoreMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)
-!     VGeomLayer(L,NY,NX)=VLMicP_vr(L,NY,NX)
+!     VGeomLayer_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)
     ENDIF
     ENGY=VHeatCapacityX*TKSX
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
@@ -1537,8 +1537,9 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AddFlux2SurfaceResidue(NY,NX)
+  subroutine AddFlux2SurfaceResidue(I,J,NY,NX)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
 
   integer :: M,N,K,NGL,NE
@@ -1572,14 +1573,15 @@ module RedistMod
     enddo
   ENDDO
 
-  call SumSurfMicBGCFluxes(NY,NX)
+  call SumSurfMicBGCFluxes(I,J,NY,NX)
 
   end subroutine AddFlux2SurfaceResidue
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SumSurfMicBGCFluxes(NY,NX)
+  subroutine SumSurfMicBGCFluxes(I,J,NY,NX)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   INTEGER :: K,N,NGL
   !
@@ -1613,20 +1615,20 @@ module RedistMod
     IF(micpar%is_litter(K))THEN
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
-          REcoO2DmndResp_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
-          REcoNO3DmndSoil_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)+RNO3ReduxDmndSoilHeter_vr(NGL,K,0,NY,NX)
-          RNO2EcoUptkSoil_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2DmndReduxSoilHeter_vr(NGL,K,0,NY,NX)
-          RN2OEcoUptkSoil_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)+RN2ODmndReduxHeter_vr(NGL,K,0,NY,NX)
-          REcoNH4DmndSoil_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)+RNH4DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          REcoNO3DmndSoil_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)+RNO3DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          REcoH2PO4DmndSoil_vr(0,NY,NX)=REcoH2PO4DmndSoil_vr(0,NY,NX)+RH2PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          REcoH1PO4DmndSoil_vr(0,NY,NX)=REcoH1PO4DmndSoil_vr(0,NY,NX)+RH1PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
-          REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)+RNH4DmndLitrHeter_col(NGL,K,NY,NX)
-          REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)=REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
-          REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
-          REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)=REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
-          ROQCX(K,0,NY,NX)=ROQCX(K,0,NY,NX)+RDOCUptkHeter_vr(NGL,K,0,NY,NX)
-          ROQAX(K,0,NY,NX)=ROQAX(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
+          REcoO2DmndResp_vr(0,NY,NX)            = REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
+          REcoNO3DmndSoil_vr(0,NY,NX)           = REcoNO3DmndSoil_vr(0,NY,NX)+RNO3ReduxDmndSoilHeter_vr(NGL,K,0,NY,NX)
+          RNO2EcoUptkSoil_vr(0,NY,NX)           = RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2DmndReduxSoilHeter_vr(NGL,K,0,NY,NX)
+          RN2OEcoUptkSoil_vr(0,NY,NX)           = RN2OEcoUptkSoil_vr(0,NY,NX)+RN2ODmndReduxHeter_vr(NGL,K,0,NY,NX)
+          REcoNH4DmndSoil_vr(0,NY,NX)           = REcoNH4DmndSoil_vr(0,NY,NX)+RNH4DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoNO3DmndSoil_vr(0,NY,NX)           = REcoNO3DmndSoil_vr(0,NY,NX)+RNO3DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoH2PO4DmndSoil_vr(0,NY,NX)         = REcoH2PO4DmndSoil_vr(0,NY,NX)+RH2PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoH1PO4DmndSoil_vr(0,NY,NX)         = REcoH1PO4DmndSoil_vr(0,NY,NX)+RH1PO4DmndSoilHeter_vr(NGL,K,0,NY,NX)
+          REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)   = REcoNH4DmndSoil_vr(NU(NY,NX),NY,NX)+RNH4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)   = REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX) = REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX) = REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          ROQCX(K,0,NY,NX)                      = ROQCX(K,0,NY,NX)+RDOCUptkHeter_vr(NGL,K,0,NY,NX)
+          ROQAX(K,0,NY,NX)                      = ROQAX(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
         ENDDO
       ENDDO
     ENDIF

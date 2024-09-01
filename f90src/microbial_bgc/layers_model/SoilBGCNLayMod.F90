@@ -92,7 +92,7 @@ module SoilBGCNLayMod
         ENDDO D1100
         ORGRL=AZMAX1(OMLitrC_vr(L,NY,NX))
         ORGRLL=AZMAX1(OMLitrC_vr(LL,NY,NX))
-        OSCXD=(ORGRL*VGeomLayer(LL,NY,NX)-ORGRLL*VGeomLayer(L,NY,NX))/(VGeomLayer(L,NY,NX)+VGeomLayer(LL,NY,NX))
+        OSCXD=(ORGRL*VGeomLayer_vr(LL,NY,NX)-ORGRLL*VGeomLayer_vr(L,NY,NX))/(VGeomLayer_vr(L,NY,NX)+VGeomLayer_vr(LL,NY,NX))
         IF(OSCXD.GT.0.0_r8.AND.OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FOSCXD=OSCXD/OMLitrC_vr(L,NY,NX)
         ELSEIF(OSCXD.LT.0.0_r8.AND.OMLitrC_vr(LL,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -100,8 +100,8 @@ module SoilBGCNLayMod
         ELSE
           FOSCXD=0.0_r8
         ENDIF
-        IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer(L,NY,NX)          
+        IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer_vr(L,NY,NX)          
         ELSE
           FracLitrMix=0.0_r8
         ENDIF

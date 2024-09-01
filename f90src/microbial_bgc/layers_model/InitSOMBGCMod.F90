@@ -137,9 +137,10 @@ module InitSOMBGCMOD
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
+!    write(*,*)K,L,CNOSCT(K),CPOSCT(K)    
   ENDDO D975
 
-  D990: DO K=micpar%NumOfLitrCmplxs+1,jcplx1
+  D990: DO K=micpar%NumOfLitrCmplxs+1,jcplx
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
@@ -157,6 +158,7 @@ module InitSOMBGCMOD
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
+!    write(*,*)K,L,CNOSCT(K),CPOSCT(K),jcplx
   ENDDO D990
 !
 !     MICROBIAL BIOMASS,RESIDUE, DOC, ADSORBED
@@ -181,9 +183,9 @@ module InitSOMBGCMOD
       OSNI(K)=CORGNX(K)*SoilMicPMassLayer(L,NY,NX)
       OSPI(K)=CORGPX(K)*SoilMicPMassLayer(L,NY,NX)
     ELSE
-      OSCI(K)=CORGCX(K)*VGeomLayer(L,NY,NX)
-      OSNI(K)=CORGNX(K)*VGeomLayer(L,NY,NX)
-      OSPI(K)=CORGPX(K)*VGeomLayer(L,NY,NX)
+      OSCI(K)=CORGCX(K)*VGeomLayer_vr(L,NY,NX)
+      OSNI(K)=CORGNX(K)*VGeomLayer_vr(L,NY,NX)
+      OSPI(K)=CORGPX(K)*VGeomLayer_vr(L,NY,NX)
     ENDIF
     TOSCK(K)=OMCK(K)+ORCK(K)+OQCK(K)+OHCK(K)
     TOSNK(K)=ORCK(K)*CNRH(K)+OQCK(K)*CNOSCT(KK)+OHCK(K)*CNOSCT(KK)
@@ -206,9 +208,9 @@ module InitSOMBGCMOD
       OSCM(K)=AMIN1(DCKR,0.1_r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
       X=0.0_r8
       KK=K
-      FOSCI=1.0
-      FOSNI=1.0
-      FOSPI=1.0
+      FOSCI=1.0_r8
+      FOSNI=1.0_r8
+      FOSPI=1.0_r8
     ELSE
       IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
         IF(K.LE.micpar%NumOfLitrCmplxs)THEN
@@ -218,9 +220,9 @@ module InitSOMBGCMOD
         ENDIF
       ELSE
         IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-          OSCM(K)=AMIN1(DCKR,0.1_r8)*CORGCX(K)*VGeomLayer(L,NY,NX)
+          OSCM(K)=AMIN1(DCKR,0.1_r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)
         ELSE
-          OSCM(K)=AMIN1(FCX,0.1_r8)*CORGCX(K)*VGeomLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=AMIN1(FCX,0.1_r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ENDIF
       X=1.0_r8
@@ -229,6 +231,7 @@ module InitSOMBGCMOD
         FOSCI=AMIN1(1.0_r8,OSCI(KK)/TOSCI)
         FOSNI=AMIN1(1.0_r8,OSCI(KK)*CNOSCT(KK)/TOSNI)
         FOSPI=AMIN1(1.0_r8,OSCI(KK)*CPOSCT(KK)/TOSPI)
+!        write(*,*)K,L,FOSCI,FOSNI,FOSPI,CNOSCT(KK),CPOSCT(KK),KK
       ELSE
         FOSCI=0.0_r8
         FOSNI=0.0_r8
@@ -253,10 +256,11 @@ module InitSOMBGCMOD
         OME1(ielmc)=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
         OME1(ielmn)=AZMAX1(OME1(ielmc)*rNCOMCa(M,N,K)*FOSNI)
         OME1(ielmp)=AZMAX1(OME1(ielmc)*rPCOMCa(M,N,K)*FOSPI)
+!        write(*,*)M,OME1(ielmc),rNCOMCa(M,N,K),FOSNI,rPCOMCa(M,N,K),FOSPI
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            mBiomeHeter_vr(ielmc,MID,K,L,NY,NX)=OME1(ielmc)/tglds
+            mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
           ENDDO
         ENDDO
         OSCX(KK)=OSCX(KK)+OME1(ielmc)
@@ -267,7 +271,7 @@ module InitSOMBGCMOD
           do NGL=JGniA(N),JGnfA(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
-              mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(ielmc,MID,L,NY,NX)+OME1(ielmc)*OMCA(NN)/tglds
+              mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(ielmc,MID,L,NY,NX)+OME1(NE)*OMCA(NN)/tglds
             ENDDO
           ENDDO
           OSCX(KK)=OSCX(KK)+OME1(ielmc)*OMCA(NN)
@@ -296,14 +300,14 @@ module InitSOMBGCMOD
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
 !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
 !
-    DOM_vr(idom_doc,K,L,NY,NX)     = X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
-    DOM_vr(idom_don,K,L,NY,NX)     = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    DOM_vr(idom_dop,K,L,NY,NX)     = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    DOM_vr(idom_acetate,K,L,NY,NX) = 0.0_r8
-    DOM_MacP_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
-    OSCX(KK)=OSCX(KK)+DOM_vr(idom_doc,K,L,NY,NX)
-    OSNX(KK)=OSNX(KK)+DOM_vr(idom_don,K,L,NY,NX)
-    OSPX(KK)=OSPX(KK)+DOM_vr(idom_dop,K,L,NY,NX)
+    DOM_vr(idom_doc,K,L,NY,NX)               = X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
+    DOM_vr(idom_don,K,L,NY,NX)               = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    DOM_vr(idom_dop,K,L,NY,NX)               = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    DOM_vr(idom_acetate,K,L,NY,NX)           = 0.0_r8
+    DOM_MacP_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
+    OSCX(KK)                                 = OSCX(KK)+DOM_vr(idom_doc,K,L,NY,NX)
+    OSNX(KK)                                 = OSNX(KK)+DOM_vr(idom_don,K,L,NY,NX)
+    OSPX(KK)                                 = OSPX(KK)+DOM_vr(idom_dop,K,L,NY,NX)
 !
 !     ADSORBED C, N AND P
 !
@@ -343,6 +347,12 @@ module InitSOMBGCMOD
       ENDIF
     ENDDO D8980
   ENDDO D8995
+!  DO K=1,jcplx
+!  write(171,*)K,L,SolidOMAct_vr(1:jsken,K,L,NY,NX)
+!   write(181,*)K,L,mBiomeHeter_vr(ielmc,:,K,L,NY,NX)
+!   write(182,*)K,L,mBiomeHeter_vr(ielmn,:,K,L,NY,NX)
+!   write(183,*)K,L,mBiomeHeter_vr(ielmp,:,K,L,NY,NX)
+!  enddo
 !
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !
@@ -671,7 +681,7 @@ module InitSOMBGCMOD
     CORGNX(1:NumOfLitrCmplxs)=RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs)=RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
-    scal=AREA(3,L,NY,NX)/VGeomLayer(L,NY,NX)
+    scal=AREA(3,L,NY,NX)/VGeomLayer_vr(L,NY,NX)
     CORGCX(1:NumOfLitrCmplxs)=RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGNX(1:NumOfLitrCmplxs)=RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs)=RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal

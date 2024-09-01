@@ -11,7 +11,7 @@ module RestartMod
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use EcoSiMParDataMod  , only : micpar,pltpar
   use TracerIDMod       , only : trc_confs
-  use EcoSIMCtrlMod     , only : etimer,do_budgets
+  use EcoSIMCtrlMod     , only : etimer,do_budgets,plant_model
   use EcoSIMCtrlDataType  
   use restUtilMod  
   use abortutils        , only : endrun,destroy
@@ -3244,7 +3244,7 @@ implicit none
       dim3name='levcan',dim4name='nbranches',long_name='stem surface area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)       
   endif  
-
+  if(plant_model)then
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
     call restartvar(ncid, flag, varname='PSIRoot_pvr', dim1name='pft',dim2name='rootyps',&
@@ -3261,7 +3261,7 @@ implicit none
      dim3name='levsoi',long_name='root total water potential', units='MPa', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
-
+  endif
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:pltpar%jroots)
     call restartvar(ncid, flag, varname='RootVolPerMassC_pft', dim1name='pft',dim2name='rootyps',&
@@ -6072,16 +6072,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CumSoilThickness', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumSoilThickness_vr', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer from grid surface', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness_vr,datrc_2d) 
   else
-    !print*,'CumSoilThickness'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d)   
+    !print*,'CumSoilThickness_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CumSoilThickness', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumSoilThickness_vr', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer from grid surface', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -6446,16 +6446,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='VLSoilMicP', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VLSoilMicP_vr', dim1name='column',dim2name='levsoi1',&
        long_name='micropore volume', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP_vr,datrc_2d)     
   else
     !print*,'VLSoilMicP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP,datrc_2d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicP_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='VLSoilMicP', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VLSoilMicP_vr', dim1name='column',dim2name='levsoi1',&
        long_name='micropore volume', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
@@ -8640,7 +8640,6 @@ implicit none
 !-----------------------------------------------------------------------
   subroutine restFile_open( flag, file, ncid )
 
-  use EcoSIMCtrlMod     , only : etimer
   use ncdio_pio
   implicit none
   character(len=*),  intent(in) :: flag ! flag to specify read or write

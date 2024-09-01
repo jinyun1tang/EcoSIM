@@ -137,13 +137,13 @@ module VisualMod
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
             SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP_vr(8,NY,NX) &
-              ,VLWatMacP_vr(8,NY,NX)))/VGeomLayer(8,NY,NX)
+              ,VLWatMacP_vr(8,NY,NX)))/VGeomLayer_vr(8,NY,NX)
           ELSEIF(NU(NY,NX).EQ.4)THEN
             SWC(NY,NX)=(VLWatMicP_vr(5,NY,NX)+AMIN1(VLMacP_vr(5,NY,NX) &
-              ,VLWatMacP_vr(5,NY,NX)))/VGeomLayer(5,NY,NX)
+              ,VLWatMacP_vr(5,NY,NX)))/VGeomLayer_vr(5,NY,NX)
           ELSE
             SWC(NY,NX)=(VLWatMicP_vr(2,NY,NX)+AMIN1(VLMacP_vr(2,NY,NX) &
-              ,VLWatMacP_vr(2,NY,NX)))/VGeomLayer(2,NY,NX)
+              ,VLWatMacP_vr(2,NY,NX)))/VGeomLayer_vr(2,NY,NX)
           ENDIF
         ENDIF
 !     GO TO 9990
@@ -221,7 +221,7 @@ module VisualMod
           OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
-            OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)))/VGeomLayer(L,NY,NX)
+            OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)))/VGeomLayer_vr(L,NY,NX)
             L=L+1
           ENDDO D60
 

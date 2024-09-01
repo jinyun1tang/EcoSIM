@@ -266,7 +266,7 @@ module TillageMixMod
     VLWatMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)*XCORP0
     VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
     VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
-    VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
+    VGeomLayer_vr(0,NY,NX)=VGeomLayer_vr(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
     ZNHUXI=AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
     ZNFNX0=AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
@@ -274,13 +274,13 @@ module TillageMixMod
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
 !
-    DCORPZ=AMIN1(DCORP(I,NY,NX),CumSoilThickness(NL(NY,NX),NY,NX))
+    DCORPZ=AMIN1(DCORP(I,NY,NX),CumSoilThickness_vr(NL(NY,NX),NY,NX))
 !
 !     ACCUMULATE SOIL STATE VARIABLES WITHIN TILLAGE MIXING ZONE
 !
     DO L=NU(NY,NX),NL(NY,NX)
-      IF(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
+      IF(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TBKDX=TBKDX+FI*SoiBulkDensityt0_vr(L,NY,NX)
@@ -389,7 +389,7 @@ module TillageMixMod
 
     D2000: DO  L=NU(NY,NX),LL
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TX=1.0_r8-TI

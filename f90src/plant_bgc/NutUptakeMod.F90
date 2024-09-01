@@ -198,8 +198,6 @@ module NutUptakeMod
 
       ENDIF
 
-
-
     ENDDO D950
   ENDDO D955
 

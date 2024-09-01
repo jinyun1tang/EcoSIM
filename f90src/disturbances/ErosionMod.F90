@@ -21,7 +21,7 @@ module ErosionMod
   use GridDataType
   use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
+  use EcoSIMConfig, only : jcplx1=> jcplxcm1, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
 
