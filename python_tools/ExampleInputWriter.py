@@ -118,7 +118,44 @@ config_Blodget_dict={
 'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Blodget/',    
 'ntopu':'1'
 }    
-case=7
+
+config_Morrow2_dict={
+'case':'Morrow2',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/Morrow_figure3/17-2/',
+'pftf':'mexxxxp',
+'year':'1898-2021',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Morrow2/',    
+'ntopu':'1'
+}    
+
+config_Morrow4_dict={
+'case':'Morrow4',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/Morrow_figure3/17-4/',
+'pftf':'mexxxxp',
+'year':'1898-2021',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Morrow4/',    
+'ntopu':'1'
+}    
+
+config_spruces1_dict={
+'case':'Spruce-s1',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/spruce_PQ_3PFT_s1/',
+'pftf':'spr_p:spr_g',
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/Spruce-s1/',    
+'ntopu':'1'
+}    
+
+config_sorghum_dict={
+'case':'Sorghum',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/',
+'pftf':'mexxxxp',
+'year':'2002-2007',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Sorghum/',    
+'ntopu':'1'
+}    
+
+
+case=11
 
 if case==1:
     config_dict=config_Fen_StordIsland_dict
@@ -134,6 +171,14 @@ elif case==6:
     config_dict=config_SnodgrassTransect_dict
 elif case==7:
     config_dict=config_Blodget_dict
+elif case==8:
+    config_dict=config_Morrow2_dict
+elif case==9:
+    config_dict=config_Morrow4_dict
+elif case==10:
+    config_dict=config_spruces1_dict
+elif case==11:
+    config_dict=config_sorghum_dict
     
 write_pft_mgmt(config_dict)
 
@@ -310,6 +355,66 @@ config_Blodget_dict={
 'NVS':'1'
 }
 
+config_Morrow2_dict={
+'case':'Morrow2',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/Morrow_figure3/17-2/',
+'sitef':'mesite',
+'topf':'metopo',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Morrow2/',    
+'ntopu':'1',
+'ncol':'1',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
+}
+
+config_Morrow4_dict={
+'case':'Morrow4',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/Morrow_figure3/17-4/',
+'sitef':'mesite',
+'topf':'metopo',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Morrow4/',    
+'ntopu':'1',
+'ncol':'1',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
+}
+
+config_spruces1_dict={
+'case':'Spruce-s1',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/spruce_PQ_3PFT_s1/',
+'sitef':'sprsite',
+'topf':'sprtopo',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/Spruce-s1/',    
+'ntopu':'1',
+'ncol':'1',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
+}
+
+config_sorghum_dict={
+'case':'Sorghum',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/',
+'sitef':'mesite',
+'topf':'metopo',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/Sorghum/',    
+'ntopu':'1',
+'ncol':'1',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
+}
+
 from SiteTopoWriter import write_site_topo_data
 
 if case==1:
@@ -326,4 +431,12 @@ elif case==6:
     config_dict=config_SnodgrassTransect_dict
 elif case==7:
     config_dict=config_Blodget_dict
+elif case==8:
+    config_dict=config_Morrow2_dict
+elif case==9:
+    config_dict=config_Morrow4_dict    
+elif case==10:
+    config_dict=config_spruces1_dict
+elif case==11:
+    config_dict=config_sorghum_dict
 write_site_topo_data(config_dict)

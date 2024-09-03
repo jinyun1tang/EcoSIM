@@ -14,7 +14,7 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  TLIceThawMicP(:,:,:)               !hourly accumulated freeze-thaw flux in micropores
   real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi(:,:,:)        !hourly accumulated freeze-thaw latent heat flux
   real(r8),target,allocatable ::  TLIceThawMacP(:,:,:)               !hourly accumulated freeze-thaw flux in macropores
-  real(r8),target,allocatable ::  XPhaseChangeHeatL(:,:,:)           !hourly accumulated latent heat flux from freeze-thaw
+  real(r8),target,allocatable ::  XPhaseChangeHeatL_snvr(:,:,:)           !hourly accumulated latent heat flux from freeze-thaw
   real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)               !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
   real(r8),target,allocatable ::  HeatStore_col(:,:)                 !heat stored over the grid MJ d-2, including soil, litter and canopy
@@ -36,7 +36,7 @@ contains
   allocate(TLIceThawMicP(JZ,JY,JX));     TLIceThawMicP=0._r8
   allocate(TLPhaseChangeHeat2Soi(JZ,JY,JX));    TLPhaseChangeHeat2Soi=0._r8
   allocate(TLIceThawMacP(JZ,JY,JX));    TLIceThawMacP=0._r8
-  allocate(XPhaseChangeHeatL(JS,JY,JX));   XPhaseChangeHeatL=0._r8
+  allocate(XPhaseChangeHeatL_snvr(JS,JY,JX));   XPhaseChangeHeatL_snvr=0._r8
   allocate(VHeatCapacity_vr(0:JZ,JY,JX));   VHeatCapacity_vr=0._r8
   allocate(TCS(0:JZ,JY,JX));    TCS=0._r8
   allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond=0._r8
@@ -55,7 +55,7 @@ contains
   call destroy(TLPhaseChangeHeat2Soi)
   call destroy(TLIceThawMacP)
   call destroy(HeatStore_col)
-  call destroy(XPhaseChangeHeatL)
+  call destroy(XPhaseChangeHeatL_snvr)
   call destroy(VHeatCapacity_vr)
   call destroy(TCS)
   call destroy(NumerSolidThermCond)

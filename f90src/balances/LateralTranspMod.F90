@@ -48,6 +48,7 @@ implicit none
   real(r8) :: trcg_VOLG(idg_beg:idg_end)
   
 ! begin_execution
+  if(lverb)write(*,*)'XGridTranspt'
   call ZeroFluxArrays(NY,NX)
 
   call ZeroFluxAccumulators(NY,NX)
@@ -67,13 +68,13 @@ implicit none
     !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
     !             :*ZN3*=NH3,*H2G*=H2
 !
-    trcg_VOLG(idg_CO2)=trc_gasml_vr(idg_CO2,L,NY,NX)/catomw
-    trcg_VOLG(idg_CH4)=trc_gasml_vr(idg_CH4,L,NY,NX)/catomw
-    trcg_VOLG(idg_O2)=trc_gasml_vr(idg_O2,L,NY,NX)/32.0_r8
-    trcg_VOLG(idg_N2)=trc_gasml_vr(idg_N2,L,NY,NX)/28.0_r8
-    trcg_VOLG(idg_N2O)=trc_gasml_vr(idg_N2O,L,NY,NX)/28.0_r8
-    trcg_VOLG(idg_NH3)=trc_gasml_vr(idg_NH3,L,NY,NX)/natomw
-    trcg_VOLG(idg_H2)=trc_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
+    trcg_VOLG(idg_CO2) = trc_gasml_vr(idg_CO2,L,NY,NX)/catomw
+    trcg_VOLG(idg_CH4) = trc_gasml_vr(idg_CH4,L,NY,NX)/catomw
+    trcg_VOLG(idg_O2)  = trc_gasml_vr(idg_O2,L,NY,NX)/32.0_r8
+    trcg_VOLG(idg_N2)  = trc_gasml_vr(idg_N2,L,NY,NX)/28.0_r8
+    trcg_VOLG(idg_N2O) = trc_gasml_vr(idg_N2O,L,NY,NX)/28.0_r8
+    trcg_VOLG(idg_NH3) = trc_gasml_vr(idg_NH3,L,NY,NX)/natomw
+    trcg_VOLG(idg_H2)  = trc_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
 
     VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_vr(L,NY,NX)/TKS_vr(L,NY,NX))
 !   NH3B does not have explicit gas species, so there is an inconsistency
@@ -84,14 +85,15 @@ implicit none
 
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
-    IF(ThetaAir_vr(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
+    !THETX minimum air-filled porosity
+    IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)LX=1
 
-    IF(ThetaAir_vr(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
+    IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
     VLWatMicP1(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP_vr(L,NY,NX)
     VLWatMacP1_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)
-    VLiceMacP1(L,NY,NX)=VLiceMacP_col(L,NY,NX)
+    VLiceMacP1(L,NY,NX)=VLiceMacP_vr(L,NY,NX)
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
@@ -140,7 +142,7 @@ implicit none
         call TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
       ENDIF
 !
-      call FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
+      call FluxThruGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
     ENDDO D8580
 !
 !     NET FREEZE-THAW
@@ -533,9 +535,10 @@ implicit none
   end subroutine TotalFluxFromSedmentTransp
 !------------------------------------------------------------------------------------------
 
-  subroutine FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
+  subroutine FluxThruGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
   implicit none
-  integer, intent(in) :: N          !exchagne along direction
+  integer, intent(in) :: I,J
+  integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
   integer, intent(in) :: NY,NX      !geophysical location
   integer, intent(in) :: N1,N2,N3   !source grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
@@ -619,9 +622,10 @@ implicit none
 
       DO NTS=ids_beg,ids_end
         trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MicP_3D(NTS,N,N3,N2,N1)-trcs_3DTransp2MicP_3D(NTS,N,N6,N5,N4)
+          +trcs_Transp2MicP_3D(NTS,N,N3,N2,N1)-trcs_Transp2MicP_3D(NTS,N,N6,N5,N4)
         trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
-          +trcs_3DTransp2MacP(NTS,N,N3,N2,N1)-trcs_3DTransp2MacP(NTS,N,N6,N5,N4)
+          +trcs_Transp2MacP_3D(NTS,N,N3,N2,N1)-trcs_Transp2MacP_3D(NTS,N,N6,N5,N4)
+
       ENDDO
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS

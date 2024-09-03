@@ -2,7 +2,7 @@ program ClimReader
   use ClimReadMod
   use abortutils, only : endrun
   USE EcoSIMCtrlMod, ONLY : LVERB
-  use EcoSIMCtrlMod, only : clm_file_in
+  use EcoSIMCtrlMod, only : clm_hour_file_in
 implicit none
 
   character(len=40) :: progname
@@ -20,7 +20,7 @@ implicit none
   if (num_args<2)then
     call endrun(msg='Please use code as: '//trim(progname)//' infile iyear')
   endif
-  call GETARG(1,clm_file_in)
+  call GETARG(1,clm_hour_file_in)
   call GETARG(2,buf);read(buf,*)iyear
 
   lverb=.true.

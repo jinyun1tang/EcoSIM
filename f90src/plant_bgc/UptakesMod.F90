@@ -67,7 +67,6 @@ module UptakesMod
   associate(                                                  &
     CanopyBndlResist_pft   => plt_photo%CanopyBndlResist_pft, &
     CanopyWater_pft        => plt_ew%CanopyWater_pft,         &
-    TCelciusCanopy_pft     => plt_ew%TCelciusCanopy_pft,      &
     TKCanopy_pft           => plt_ew%TKCanopy_pft,            &
     PrecIntcptByCanopy_pft => plt_ew%PrecIntcptByCanopy_pft,  &
     EvapTransHeat_pft      => plt_ew%EvapTransHeat_pft,       &
@@ -75,13 +74,12 @@ module UptakesMod
     PSICanopy_pft          => plt_ew%PSICanopy_pft,           &
     HeatXAir2PCan          => plt_ew%HeatXAir2PCan,           &
     Canopy_Heat_Sens_col   => plt_ew%Canopy_Heat_Sens_col,    &
-    DeltaTKC_pft           => plt_ew%DeltaTKC_pft,            &
     VapXAir2Canopy_pft     => plt_ew%VapXAir2Canopy_pft,      &
     TairK                  => plt_ew%TairK,                   &
     Canopy_Heat_Latent_col => plt_ew%Canopy_Heat_Latent_col,  &
     Transpiration_pft      => plt_ew%Transpiration_pft,       &
     WatByPCanopy_pft       => plt_ew%WatByPCanopy_pft,        &
-    CumSoilThickness       => plt_site%CumSoilThickness,      &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,      &
     PlantPopu_col          => plt_site%PlantPopu_col,         &
     NP                     => plt_site%NP,                    &
     PlantPopulation_pft    => plt_site%PlantPopulation_pft,   &
@@ -112,8 +110,8 @@ module UptakesMod
   DO NZ=1,NP
     PopPlantO2Uptake=0.0_r8
     PopPlantO2Demand=0.0_r8
-
-    IF(IsPlantActive_pft(NZ).EQ.iActive.AND.PlantPopulation_pft(NZ).GT.0.0_r8)THEN
+!    if(I>176)print*,'uptake',nz
+    IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -132,9 +130,10 @@ module UptakesMod
       IF((iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)&
         .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ) &
         .AND.FracPARRadbyCanopy_pft(NZ).GT.0.0_r8)&
-        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness(0)))THEN
+        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
 !
+!        if(I>176)print*,'calcreist'
         call CalcResistance(NZ,PATH,FineRootRadius,RootAreaDivRadius_vr,RootResist,RootResistSoi,&
           RootResistRadial,RootResistAxial,SoiH2OResist,SoiAddRootResist,CNDT,PSILH,LayrHasRoot)
 !
@@ -177,26 +176,18 @@ module UptakesMod
 !
 !     CONVERGENCE SOLUTION
 !
+!        if(I>176)print*,'canenergy'
         NN=CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanPMassC,&
           ElvAdjstedtSoiPSIMPa,HeatSensConductCanP,DIFF,cumPRootH2OUptake,&
           VFLXC,FDMP,SoiAddRootResist,FracPRoot4Uptake,AirPoreAvail4Fill,&
           WatAvail4Uptake_vr,TKCX,CNDT,VHCPX,PrecHEATIN_lndtcptByCanP1,PSILH,LayrHasRoot)
-!
-!     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
-!
-!     TKC=final estimate of canopy temperature TKCanopy_pft
-!     TairK=current air temperature
-!     DeltaTKC_pft=TKC-TairK for next hour
-!
-        TKC(NZ)=TKCanopy_pft(NZ)
-        TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-        DeltaTKC_pft(NZ)=TKC(NZ)-TairK
 !
 !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
 !     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
 !
         call HandlingDivergence(I,J,NN,NZ,ElvAdjstedtSoiPSIMPa,DIFF,FDMP)
 
+!        if(I>176)print*,'canwaterup'
         call UpdateCanopyWater(NZ,HeatSensConductCanP,ElvAdjstedtSoiPSIMPa,RootResist,SoiH2OResist,&
           SoiAddRootResist,TKCX,VHCPX,PrecHEATIN_lndtcptByCanP1,cumPRootH2OUptake,VFLXC,LayrHasRoot)
 !
@@ -208,9 +199,10 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(I,J,NZ)
 
+!      if(I>176)print*,'plant nut'
       call PlantNutientO2Uptake(I,J,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
         PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
-
+!      if(I>176)print*,'plant nutfini'
       Canopy_Heat_Latent_col=Canopy_Heat_Latent_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Canopy_Heat_Sens_col=Canopy_Heat_Sens_col+HeatXAir2PCan(NZ)*CanopyBndlResist_pft(NZ)
       IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN
@@ -236,27 +228,27 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                                              &
-    ZERO               => plt_site%ZERO,                  &
-    NP                 => plt_site%NP,                    &
-    MaxNumRootLays     => plt_site%MaxNumRootLays,        &
-    VLWatMicPM_vr      => plt_site%VLWatMicPM_vr,         &
-    ALT                => plt_site%ALT,                   &
-    NU                 => plt_site%NU,                    &
-    NP0                => plt_site%NP0,                   &
-    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,      &
-    PopuRootMycoC_pvr  => plt_biom% PopuRootMycoC_pvr,    &
-    VLMicP_vr          => plt_soilchem%VLMicP_vr,         &
-    VLiceMicP_vr       => plt_soilchem%VLiceMicP_vr,      &
-    THETY_vr           => plt_soilchem%THETY_vr,          &
-    SoiBulkDensity_vr  => plt_soilchem%SoiBulkDensity_vr, &
-    VLWatMicP_vr       => plt_soilchem%VLWatMicP_vr,      &
-    VLSoilMicP         => plt_soilchem%VLSoilMicP,        &
-    CanopyStemArea_pft => plt_morph%CanopyStemArea_pft,   &
-    MY                 => plt_morph%MY,                   &
-    CanopyLeafArea_pft => plt_morph%CanopyLeafArea_pft,   &
-    RadNet2Canopy_pft  => plt_rad%RadNet2Canopy_pft,      &
-    LWRadCanopy_pft    => plt_rad%LWRadCanopy_pft          &
+  associate(                                                 &
+    ZERO                  => plt_site%ZERO,                  &
+    NP                    => plt_site%NP,                    &
+    MaxNumRootLays        => plt_site%MaxNumRootLays,        &
+    VLWatMicPM_vr         => plt_site%VLWatMicPM_vr,         &
+    ALT                   => plt_site%ALT,                   &
+    NU                    => plt_site%NU,                    &
+    NP0                   => plt_site%NP0,                   &
+    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,   &
+    PopuRootMycoC_pvr     => plt_biom% PopuRootMycoC_pvr,    &
+    VLMicP_vr             => plt_soilchem%VLMicP_vr,         &
+    VLiceMicP_vr          => plt_soilchem%VLiceMicP_vr,      &
+    THETY_vr              => plt_soilchem%THETY_vr,          &
+    SoiBulkDensity_vr     => plt_soilchem%SoiBulkDensity_vr, &
+    VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr,      &
+    VLSoilMicP_vr         => plt_soilchem%VLSoilMicP_vr,     &
+    CanopyStemArea_pft    => plt_morph%CanopyStemArea_pft,   &
+    MY                    => plt_morph%MY,                   &
+    CanopyLeafArea_pft    => plt_morph%CanopyLeafArea_pft,   &
+    RadNet2Canopy_pft     => plt_rad%RadNet2Canopy_pft,      &
+    LWRadCanopy_pft       => plt_rad%LWRadCanopy_pft          &
   )
 !
 !     RESET TOTAL UPTAKE ARRAYS
@@ -269,30 +261,30 @@ module UptakesMod
 !     TKC(NZ)=TairK+DeltaTKC_pft(NZ)
 !     TCelciusCanopy_pft(NZ)=TKC(NZ)-TC2K
     ARLSC=ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-    RadNet2Canopy_pft(NZ)=0.0_r8
-    plt_ew%EvapTransHeat_pft(NZ)=0.0_r8
-    plt_ew%HeatXAir2PCan(NZ)=0.0_r8
-    plt_ew%HeatStorCanP(NZ)=0.0_r8
-    LWRadCanopy_pft(NZ)=0.0_r8
-    plt_ew%Transpiration_pft(NZ)=0.0_r8
-    plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-    plt_rbgc%RootMycoExudElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
-    plt_rbgc%RootNH4Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootNO3Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootH2PO4Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootHPO4Uptake_pft(NZ)=0.0_r8
-    plt_rbgc%RootN2Fix_pft(NZ)=0.0_r8
+    RadNet2Canopy_pft(NZ)                                = 0.0_r8
+    plt_ew%EvapTransHeat_pft(NZ)                         = 0.0_r8
+    plt_ew%HeatXAir2PCan(NZ)                             = 0.0_r8
+    plt_ew%HeatStorCanP(NZ)                              = 0.0_r8
+    LWRadCanopy_pft(NZ)                                  = 0.0_r8
+    plt_ew%Transpiration_pft(NZ)                         = 0.0_r8
+    plt_ew%VapXAir2Canopy_pft(NZ)                        = 0.0_r8
+    plt_rbgc%RootMycoExudElms_pft(1:NumPlantChemElms,NZ) = 0.0_r8
+    plt_rbgc%RootNH4Uptake_pft(NZ)                       = 0.0_r8
+    plt_rbgc%RootNO3Uptake_pft(NZ)                       = 0.0_r8
+    plt_rbgc%RootH2PO4Uptake_pft(NZ)                     = 0.0_r8
+    plt_rbgc%RootHPO4Uptake_pft(NZ)                      = 0.0_r8
+    plt_rbgc%RootN2Fix_pft(NZ)                           = 0.0_r8
 !
 !     RESET UPTAKE ARRAYS
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
-        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
-        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)=0.0_r8
-        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)=0.0_r8
-        plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,N,L,NZ)=0.0_r8
-        plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
-        plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
+        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)                     = 0.0_r8
+        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                            = 0.0_r8
+        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                             = 0.0_r8
+        plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,N,L,NZ)               = 0.0_r8
+        plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ)   = 0.0_r8
+        plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ) = 0.0_r8
       enddo
     enddo
   ENDDO D9984
@@ -307,7 +299,7 @@ module UptakesMod
   D9000: DO L=NU,MaxNumRootLays
     ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
     IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
-      WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)-THETY_vr(L)*VLSoilMicP(L)     !maximum amount of water for uptake
+      WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)-THETY_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake
       AirPoreAvail4Fill(L)=AZMAX1(VLMicP_vr(L)-VLWatMicP_vr(L)-VLiceMicP_vr(L))  !air volume
     ELSE
       WatAvail4Uptake_vr(L)=VLWatMicPM_vr(NPH,L)
@@ -454,39 +446,39 @@ module UptakesMod
   real(r8) :: RootDepZ,RTDPX
   integer :: N,L,NR
 
-  associate(                                                           &
-     PopuRootMycoC_pvr       =>  plt_biom% PopuRootMycoC_pvr         , &
-    FracSoiAsMicP            =>  plt_site%FracSoiAsMicP              , &
-    CumSoilThickness         =>  plt_site%CumSoilThickness           , &
-    DLYR3                    =>  plt_site%DLYR3                      , &
-    ZEROS                    =>  plt_site%ZEROS                      , &
-    ZERO                     =>  plt_site%ZERO                       , &
-    PlantPopulation_pft      =>  plt_site%PlantPopulation_pft        , &
-    NU                       =>  plt_site%NU                         , &
-    NumRootAxes_pft          =>  plt_morph%NumRootAxes_pft           , &
-    MY                       =>  plt_morph%MY                        , &
-    RootLenDensPerPlant_pvr  =>  plt_morph%RootLenDensPerPlant_pvr   , &
-    Root2ndMaxRadius1_pft    =>  plt_morph%Root2ndMaxRadius1_pft     , &
-    HypoctoHeight_pft        =>  plt_morph%HypoctoHeight_pft         , &
-    RootLenPerPlant_pvr      =>  plt_morph%RootLenPerPlant_pvr       , &
-    Root1stDepz_pft          =>  plt_morph%Root1stDepz_pft           , &
-    RootPorosity_pft         =>  plt_morph%RootPorosity_pft          , &
-    RootVH2O_pvr             =>  plt_morph%RootVH2O_pvr              , &
-    Root2ndMaxRadius_pft     =>  plt_morph%Root2ndMaxRadius_pft      , &
-    SeedDepth_pft            =>  plt_morph%SeedDepth_pft             , &
-    MaxSoiL4Root_pft             =>  plt_morph%MaxSoiL4Root_pft                &
+  associate(                                                      &
+    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr,       &
+    FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr,         &
+    CumSoilThickness_vr        => plt_site%CumSoilThickness_vr,         &
+    DLYR3                   => plt_site%DLYR3,                    &
+    ZEROS                   => plt_site%ZEROS,                    &
+    ZERO                    => plt_site%ZERO,                     &
+    PlantPopulation_pft     => plt_site%PlantPopulation_pft,      &
+    NU                      => plt_site%NU,                       &
+    NumRootAxes_pft         => plt_morph%NumRootAxes_pft,         &
+    MY                      => plt_morph%MY,                      &
+    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
+    Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft,   &
+    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft,       &
+    RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr,     &
+    Root1stDepz_pft         => plt_morph%Root1stDepz_pft,         &
+    RootPorosity_pft        => plt_morph%RootPorosity_pft,        &
+    RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
+    Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft,    &
+    SeedDepth_pft           => plt_morph%SeedDepth_pft,           &
+    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 !     RootDepZ,Root1stDepz_pft=primary root depth
 !     FracSoiLayByPrimRoot=fraction of each soil layer with primary root
 !     DLYR=layer thickness
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
 !     HypoctoHeight_pft=hypocotyledon height
 !     FracPRoot4Uptake=PFT fraction of biome root mass
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     FineRootRadius=root radius
 !     RootPorosity_pft=root porosity
-!     FracSoiAsMicP=micropore fraction excluding macropore,rock
+!     FracSoiAsMicP_vr=micropore fraction excluding macropore,rock
 !     RootVH2O_pvr=root aqueous volume
 !     PP=plant population
 !     PATH=path length of water and nutrient uptake
@@ -503,8 +495,8 @@ module UptakesMod
           FracSoiLayByPrimRoot(L,NZ)=1.0_r8
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
-            RTDPX=AZMAX1(RootDepZ-CumSoilThickness(L-1))
-            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoHeight_pft(NZ)))
+            RTDPX=AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
+            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
             FracSoiLayByPrimRoot(L,NZ)=RTDPX/DLYR3(L)
           ELSE
             FracSoiLayByPrimRoot(L,NZ)=0.0_r8
@@ -523,7 +515,7 @@ module UptakesMod
         FineRootRadius(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
         PATH(N,L)=AMAX1(1.001_r8*FineRootRadius(N,L) &
-          ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ))/FracSoiAsMicP(L))))
+          ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ))/FracSoiAsMicP_vr(L))))
         RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot(L,NZ)
       ELSE
         FineRootRadius(N,L)=Root2ndMaxRadius_pft(N,NZ)
@@ -553,12 +545,12 @@ module UptakesMod
 ! begin_execution
   associate(                                                         &
    RAZ                       => plt_ew%RAZ,                          &
-   DeltaTKC_pft                  => plt_ew%DeltaTKC_pft,                     &
+   DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
    TKC                       => plt_ew%TKC,                          &
    TairK                     => plt_ew%TairK,                        &
-   TKS_vr                       => plt_ew%TKS_vr,                          &
+   TKS_vr                    => plt_ew%TKS_vr,                       &
    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
    AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
@@ -589,17 +581,17 @@ module UptakesMod
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
 
     IF(DIFF.GT.0.5_r8)THEN
-      plt_rad%RadNet2Canopy_pft(NZ)=0.0_r8
-      plt_ew%EvapTransHeat_pft(NZ)=0.0_r8
-      plt_ew%HeatXAir2PCan(NZ)=0.0_r8
-      plt_ew%HeatStorCanP(NZ)=0.0_r8
-      plt_ew%VapXAir2Canopy_pft(NZ)=0.0_r8
-      plt_ew%Transpiration_pft(NZ)=0.0_r8
-      TKC(NZ)=TairK+DeltaTKC_pft(NZ)
-      TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
-      FTHRM=EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
-      LWRadCanopy_pft(NZ)=FTHRM*TKC(NZ)**4._r8
-      PSICanopy_pft(NZ)=ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))     
+      plt_rad%RadNet2Canopy_pft(NZ) = 0.0_r8
+      plt_ew%EvapTransHeat_pft(NZ)  = 0.0_r8
+      plt_ew%HeatXAir2PCan(NZ)      = 0.0_r8
+      plt_ew%HeatStorCanP(NZ)       = 0.0_r8
+      plt_ew%VapXAir2Canopy_pft(NZ) = 0.0_r8
+      plt_ew%Transpiration_pft(NZ)  = 0.0_r8
+      TKC(NZ)                       = TairK+DeltaTKC_pft(NZ)
+      TCelciusCanopy_pft(NZ)        = units%Kelvin2Celcius(TKC(NZ))
+      FTHRM                         = EMMC*stefboltz_const*FracPARRadbyCanopy_pft(NZ)*AREA3(NU)
+      LWRadCanopy_pft(NZ)           = FTHRM*TKC(NZ)**4._r8
+      PSICanopy_pft(NZ)             = ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
 
       CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
         +CanopyNonstElmConc_pft(ielmp,NZ)
@@ -673,11 +665,14 @@ module UptakesMod
   associate(                                                          &
     NU                        => plt_site%NU,                         &
     AREA3                     => plt_site%AREA3,                      &
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
+    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
     PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
+    TKC                       => plt_ew%TKC,                          &
     RAZ                       => plt_ew%RAZ,                          &
     VPA                       => plt_ew%VPA,                          &
-    TKS_vr                       => plt_ew%TKS_vr,                          &
+    TKS_vr                    => plt_ew%TKS_vr,                       &
     TairK                     => plt_ew%TairK,                        &
     RIB                       => plt_ew%RIB,                          &
     Transpiration_pft         => plt_ew%Transpiration_pft,            &
@@ -798,7 +793,7 @@ module UptakesMod
 !     VAP=latent heat of evaporation
 !     HeatLatentConductCanP=aerodynamic conductance
 
-    VPC=vapsat(tkc1)*EXP(18.0_r8*PSICanopy_pft(NZ)/(RGAS*TKC1))
+    VPC=vapsat(tkc1)*EXP(18.0_r8*PSICanopy_pft(NZ)/(RGASC*TKC1))
     EX=HeatLatentConductCanP*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3]=[ton H2O/(h*m2)]
     
     IF(EX.GT.0.0_r8)THEN
@@ -845,8 +840,7 @@ module UptakesMod
 !
 !     XC,IC=magnitude,direction of change in canopy temp for next cycle
 !
-    IF((IC.EQ.0 .AND. TKCY.GT.TKC1)&
-      .OR.(IC.EQ.1 .AND. TKCY.LT.TKC1))THEN
+    IF((IC.EQ.0 .AND. TKCY.GT.TKC1) .OR. (IC.EQ.1 .AND. TKCY.LT.TKC1))THEN
       XC=0.5_r8*XC
     ENDIF
     !0.1 is the learning/updating rate
@@ -998,6 +992,18 @@ module UptakesMod
       ENDIF
     ENDIF
   ENDDO D4000
+
+!
+!     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
+!
+!     TKC=final estimate of canopy temperature TKCanopy_pft
+!     TairK=current air temperature
+!     DeltaTKC_pft=TKC-TairK for next hour
+!
+  TKC(NZ)=TKCanopy_pft(NZ)
+  TCelciusCanopy_pft(NZ)=units%Kelvin2Celcius(TKC(NZ))
+  DeltaTKC_pft(NZ)=TKC(NZ)-TairK
+
   end associate
   end function CanopyEnergyH2OIteration
 !------------------------------------------------------------------------
@@ -1019,7 +1025,7 @@ module UptakesMod
   real(r8) :: RSSL,RTAR2
   integer :: N, L
   associate(                                                           &
-    DPTHZ                    => plt_site%DPTHZ,                        &
+    DPTHZ_vr                 => plt_site%DPTHZ_vr,                     &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,          &
     VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,                &
     ZERO                     => plt_site%ZERO,                         &
@@ -1117,7 +1123,7 @@ module UptakesMod
         !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of primary,secondary axes
 !
         FRAD1=(Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
-        RootResistRadial(N,L)=RoottAxialResist_pft(N,NZ)*DPTHZ(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
+        RootResistRadial(N,L)=RoottAxialResist_pft(N,NZ)*DPTHZ_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
           +RoottAxialResist_pft(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
         FRAD2=(Root2ndRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
         RootResistAxial(N,L)=RoottAxialResist_pft(N,NZ)*Root2ndAveLen_pvr(N,L,NZ)/(FRAD2*Root2ndXNum_pvr(N,L,NZ))
@@ -1163,7 +1169,7 @@ module UptakesMod
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKSnow                    => plt_ew%TKSnow,                       &
     TKC                       => plt_ew%TKC,                          &
-    TKS_vr                       => plt_ew%TKS_vr,                          &
+    TKS_vr                    => plt_ew%TKS_vr,                       &
     TairK                     => plt_ew%TairK,                        &
     SnowDepth                 => plt_ew%SnowDepth,                    &
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
@@ -1336,7 +1342,7 @@ module UptakesMod
     TCelciusCanopy_pft  => plt_ew%TCelciusCanopy_pft,     &
     TairK               => plt_ew%TairK,                  &
     TKC                 => plt_ew%TKC,                    &
-    TKS_vr                => plt_ew%TKS_vr,                    &
+    TKS_vr              => plt_ew%TKS_vr,                 &
     PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &

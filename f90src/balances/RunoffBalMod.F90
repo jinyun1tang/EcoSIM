@@ -159,7 +159,7 @@ implicit none
 !
 !     QR,QS,WatBySnowRedistrib,IceBySnowRedistrib=runoff from surface water, 
 !     snowpack snow,water,ice from watsub.f
-!     CRUN,Qrunoff_col=cumulative water and snow runoff
+!     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
 !
   IF(N.NE.ivertdir.AND.L.EQ.NU(NY,NX))THEN
@@ -168,7 +168,7 @@ implicit none
     QRunSurf_col(N2,N1)=QRunSurf_col(N2,N1)+WQRN
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRN
-      Qrunoff_col(NY,NX)=Qrunoff_col(NY,NX)-WQRN
+      Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRN
       HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
       HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
       HeatOut_lnds=HeatOut_lnds-HQRN
@@ -182,14 +182,14 @@ implicit none
 !     XN=direction indicator
 !     TOMOU_lnds(ielmc),OXYGOU,H2GOU,TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)=cumulative C,O2,H2,N,P loss through lateral and lower boundaries
 !     HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through runoff
-!     HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through runoff
-!     HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through runoff
+!     HydroSufDONFlx_CumYr_col,HydroSufDINFlx_CumYr_col=dissolved organic,inorganic N loss through runoff
+!     HydroSufDOPFlx_CumYr_col,HydroSufDIPFlx_CumYr_col=dissolved organic,inorganic P loss through runoff
 !
-      CXR=XN*(trcg_2DFloXSurRunoff(idg_CO2,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_CH4,N,NN,N5,N4))
-      ZXR=XN*(trcn_2DFloXSurRunoff(ids_NH4,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_NH3,N,NN,N5,N4) &
-        +trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_NO2,N,NN,N5,N4))
-      ZGR=XN*(trcg_2DFloXSurRunoff(idg_N2O,N,NN,N5,N4)+trcg_2DFloXSurRunoff(idg_N2,N,NN,N5,N4))
-      PXR=XN*(trcn_2DFloXSurRunoff(ids_H2PO4,N,NN,N5,N4)+trcn_2DFloXSurRunoff(ids_H1PO4,N,NN,N5,N4))
+      CXR=XN*(trcg_FloXSurRunoff_2D(idg_CO2,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_CH4,N,NN,N5,N4))
+      ZXR=XN*(trcn_FloXSurRunoff_2D(ids_NH4,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_NH3,N,NN,N5,N4) &
+        +trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_NO2,N,NN,N5,N4))
+      ZGR=XN*(trcg_FloXSurRunoff_2D(idg_N2O,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_N2,N,NN,N5,N4))
+      PXR=XN*(trcn_FloXSurRunoff_2D(ids_H2PO4,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_H1PO4,N,NN,N5,N4))
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
         DO idom=idom_beg,idom_end
@@ -201,13 +201,13 @@ implicit none
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
       HydroSufDOCFlx_col(NY,NX)=-OMRof(ielmc)-OMRof(idom_acetate)
       HydroSufDICFlx_col(NY,NX)=-CXR
-      HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)-OMRof(ielmn)
-      HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
-      HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
-      HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
-      OXR=XN*trcg_2DFloXSurRunoff(idg_O2,N,NN,N5,N4)
+      HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
+      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
+      HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
+      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
+      OXR=XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
-      HGR=XN*trcg_2DFloXSurRunoff(idg_H2,N,NN,N5,N4)
+      HGR=XN*trcg_FloXSurRunoff_2D(idg_H2,N,NN,N5,N4)
       H2GOU=H2GOU+HGR
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
@@ -262,7 +262,7 @@ implicit none
         TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
-        HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SSR
+        HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR
 !     WRITE(20,3336)'SSR',I,J,N,N5,N4,SSR,SS1,SS2,SS3,SS4,TIONOU
 !3336  FORMAT(A8,5I6,20F16.9)
 !
@@ -287,7 +287,7 @@ implicit none
           ECHC=0.044_r8*AZMAX1(trc_salt_rof_bounds(idsalt_HCO3,N,NN,N5,N4)/WX)
           ECSO=0.080_r8*AZMAX1(trc_salt_rof_bounds(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
           ECCL=0.076_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Cl,N,NN,N5,N4)/WX)
-          ECNO=0.071_r8*AZMAX1(trcn_2DFloXSurRunoff(ids_NO3,N,NN,N5,N4)/(WX*natomw))
+          ECNO=0.071_r8*AZMAX1(trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)/(WX*natomw))
           ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',iYearCurrent,I,J,N4,N5,N,NN,WX,ECNDQ
 !9991  FORMAT(A8,7I4,2E12.4)
@@ -301,13 +301,13 @@ implicit none
 !     iErosionMode=erosion flag
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
-!     TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
+!     TSedmErossLoss_lnds,SedmErossLoss_CumYr_col=cumulative sediment loss through lateral and lower boundaries
 !
       IF(N.NE.3.AND.iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
         IF(ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
           ER=XN*cumSedErosion(N,NN,N5,N4)
-          TSEDOU=TSEDOU-ER
-          USEDOU(NY,NX)=USEDOU(NY,NX)-ER
+          TSedmErossLoss_lnds=TSedmErossLoss_lnds-ER
+          SedmErossLoss_CumYr_col(NY,NX)=SedmErossLoss_CumYr_col(NY,NX)-ER
 !
 !
 !         RUNOFF BOUNDARY FLUXES OF ORGANIC MATTER FROM EROSION
@@ -315,10 +315,10 @@ implicit none
 !         *ER=sediment flux from erosion.f
 !         sediment code:OMC,OMN,OMP=microbial C,N,P; ORC=microbial residue C,N,P
 !                      :OHC,OHN,OHP=adsorbed C,N,P; OSC,OSN,OSP=humus C,N,P
-!         TSEDOU,USEDOU=cumulative sediment loss through lateral and lower boundaries
+!         TSedmErossLoss_lnds,SedmErossLoss_CumYr_col=cumulative sediment loss through lateral and lower boundaries
 !         HydroSufDOCFlx_col,HydroSufDICFlx_col=dissolved organic,inorganic C loss through lateral and lower boundaries
-!         HydroSufDONFlx_col,HydroSufDINFlx_col=dissolved organic,inorganic N loss through lateral and lower boundaries
-!         HydroSufDOPFlx_col,HydroSufDIPFlx_col=dissolved organic,inorganic P loss through lateral and lower boundaries
+!         HydroSufDONFlx_CumYr_col,HydroSufDINFlx_CumYr_col=dissolved organic,inorganic N loss through lateral and lower boundaries
+!         HydroSufDOPFlx_CumYr_col,HydroSufDIPFlx_CumYr_col=dissolved organic,inorganic P loss through lateral and lower boundaries
 !         TOMOU_lnds(ielmc),TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)=total C,N,P loss through lateral and lower boundaries
 
 !         MICROBIAL C IN RUNOFF SEDIMENT
@@ -336,6 +336,7 @@ implicit none
             +2.0_r8*(trcp_ER(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_ER(idsp_CaH4P2O8B,N,NN,N5,N4)) &
             +3.0_r8*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4)))
           MOE(:)=0.0_r8
+          
           D3580: DO K=1,jcplx
             DO NO=1,NumMicbFunGrupsPerCmplx
               DO M=1,nlbiomcp
@@ -389,12 +390,12 @@ implicit none
           TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PPE          
 
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
-          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)-MOE(ielmn)
-          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)-MOE(ielmp)
+          HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
+          HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
                     
           HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-MXE(ielmc)          
-          HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-MXE(ielmn)-ZPE          
-          HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-MXE(ielmp)-PPE
+          HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE          
+          HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
 !     WRITE(*,6635)'MOE(ielmp)',I,J,N4,N5,N,NN
 !    2,MOE(ielmc),MXE(ielmc),MOE(ielmn),MXE(ielmn),ZPE
 !    3,MOE(ielmp),MXE(ielmp),PPE,TOMOU_lnds(ielmp),cumSedErosion(N,NN,N5,N4)
@@ -420,7 +421,7 @@ implicit none
 !           :PALPB,PFEPB=precip AlPO4,FEPO4 in band
 !           :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
 !           :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
-!         TIONOU,HydroIonFlx_col=total salt loss through lateral and lower boundaries
+!         TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
             SEF=XN*(XNH3ER(N,NN,N5,N4)+XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4) &
@@ -445,7 +446,7 @@ implicit none
               +XN*9.0*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4))
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
-            HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SET
+            HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SET
 !     WRITE(*,3342)'SET',I,J,N4,N5,NN,N,SET,SEF,SEX,SEP,TIONOU
 !3342  FORMAT(A8,6I4,12F18.6)
           ENDIF
@@ -478,7 +479,7 @@ implicit none
 !
 !     FLW,WaterFlowMacP,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
-!     UVOLO,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
+!     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
   IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.ivertdir)THEN
     HeatOut_lnds=HeatOut_lnds-XN*HeatFlow2Soil_3D(N,N6,N5,N4)
@@ -487,7 +488,7 @@ implicit none
     IF(abs(WO)>0._r8)THEN
       QH2OLoss_lnds=QH2OLoss_lnds-WO
       QDischar_col(N2,N1)=QDischar_col(N2,N1)-WO
-      AnualH2OLoss_col(N2,N1)=AnualH2OLoss_col(N2,N1)-WO
+      H2OLoss_CumYr_col(N2,N1)=H2OLoss_CumYr_col(N2,N1)-WO
 !
 !     SUBSURFACE BOUNDARY FLUXES OF CO2 AND DOC
 !
@@ -516,29 +517,30 @@ implicit none
           MOD(idom)=MOD(idom)+XN*(DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)+DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4))
         ENDDO
       ENDDO D450
-      MXD(ielmc)=XN*(trcs_3DTransp2MicP_3D(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_CO2,N,N6,N5,N4) &
-        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(idg_CH4,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
-      MXD(ielmn)=XN*(trcs_3DTransp2MicP_3D(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(idg_NH3,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_NO3,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(idg_NH3B,N,N6,N5,N4)&
-        +trcs_3DTransp2MicP_3D(ids_NO3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(ids_NO2B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NH4,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NH4B,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_NH3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NO3B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_NO2,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_3DTransp2MicP_3D(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_N2,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(idg_N2O,N,N6,N5,N4) &
+
+      MXD(ielmc)=XN*(trcs_Transp2MicP_3D(idg_CO2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_CO2,N,N6,N5,N4) &
+        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_CH4,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
+      MXD(ielmn)=XN*(trcs_Transp2MicP_3D(ids_NH4,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_NH3,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_NO3,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_NH4B,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_NH3B,N,N6,N5,N4)&
+        +trcs_Transp2MicP_3D(ids_NO3B,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_NO2,N,N6,N5,N4)+trcs_Transp2MicP_3D(ids_NO2B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NH4,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_NH3,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NO3,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NH4B,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_NH3B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NO3B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_NO2,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_NO2B,N,N6,N5,N4))
+      ZGD=XN*(trcs_Transp2MicP_3D(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(idg_N2,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(idg_N2O,N,N6,N5,N4) &
         +Gas_3DAdvDif_Flx_vr(idg_NH3,N,N6,N5,N4))
-      MXD(ielmp)=XN*(trcs_3DTransp2MicP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MicP_3D(ids_H2PO4B,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_H2PO4,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H2PO4B,N,N6,N5,N4)&
-        +trcs_3DTransp2MicP_3D(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_3DTransp2MicP_3D(ids_H1PO4B,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_3DTransp2MacP(ids_H1PO4B,N,N6,N5,N4))
+      MXD(ielmp)=XN*(trcs_Transp2MicP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_Transp2MicP_3D(ids_H2PO4B,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_H2PO4B,N,N6,N5,N4)&
+        +trcs_Transp2MicP_3D(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_Transp2MicP_3D(ids_H1PO4B,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_Transp2MacP_3D(ids_H1PO4B,N,N6,N5,N4))
 
       TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-MOD(ielmc)-MOD(idom_acetate)-MXD(ielmc)
       TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-MOD(ielmn)-MXD(ielmn)-ZGD
@@ -556,9 +558,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(trcs_3DTransp2MicP_3D(idg_O2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_Transp2MicP_3D(idg_O2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(trcs_3DTransp2MicP_3D(idg_H2,N,N6,N5,N4)+trcs_3DTransp2MacP(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_Transp2MicP_3D(idg_H2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -567,7 +569,7 @@ implicit none
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band from TranspSalt.f
 !     X*FHS=hourly convective + diffusive solute flux through macropores from TranspSalt.f
 !     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from TranspSalt.f
-!     TIONOU,HydroIonFlx_col=total salt loss through lateral and lower boundaries
+!     TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
         PQD=XN*patomw*(trcSalt3DFlo2Cell(idsalt_H0PO4,N,N6,N5,N4)+trcSalt3DFlo2Cell(idsalt_H0PO4B,N,N6,N5,N4) &
@@ -661,7 +663,7 @@ implicit none
 
         SO=SSD+SHD
         TIONOU=TIONOU-SO
-        HydroIonFlx_col(N2,N1)=HydroIonFlx_col(N2,N1)-SO
+        HydroIonFlx_CumYr_col(N2,N1)=HydroIonFlx_CumYr_col(N2,N1)-SO
 
 !
 !     SUBSURFACE FLUX ELECTRICAL CONDUCTIVITY
@@ -687,13 +689,13 @@ implicit none
           ECHC=0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
           ECSO=0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
           ECCL=0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((trcs_3DTransp2MicP_3D(ids_NO3,N,N6,N5,N4)+trcs_3DTransp2MacP(ids_NO3,N,N6,N5,N4))/(WX*natomw))
+          ECNO=0.071*AZMAX1((trcs_Transp2MicP_3D(ids_NO3,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_NO3,N,N6,N5,N4))/(WX*natomw))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
         ELSE
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_3DTransp2MicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_Transp2MicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfXBoundaryFlow
@@ -716,7 +718,7 @@ implicit none
     WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRS
-      Qrunoff_col(NY,NX)=Qrunoff_col(NY,NX)-WQRS
+      Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRS
       HQRS=XN*HeatBySnowRedistrib_2DH(N,N5,N4)
       HeatOut_lnds=HeatOut_lnds-HQRS
       CXS=XN*(trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,N5,N4))
@@ -727,8 +729,8 @@ implicit none
       TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZXS-ZGS
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXS
       HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-CXR
-      HydroSufDINFlx_col(NY,NX)=HydroSufDINFlx_col(NY,NX)-ZXR-ZGR
-      HydroSufDIPFlx_col(NY,NX)=HydroSufDIPFlx_col(NY,NX)-PXR
+      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
+      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXS=XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(salt_model)THEN
@@ -761,7 +763,7 @@ implicit none
           +XN*5.0*(trcSalt_XQS(idsalt_AlOH4,N,N5,N4)+trcSalt_XQS(idsalt_FeOH4,N,N5,N4))
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
-        HydroIonFlx_col(NY,NX)=HydroIonFlx_col(NY,NX)-SSR
+        HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR
       ENDIF
     ENDIF
   ENDIF

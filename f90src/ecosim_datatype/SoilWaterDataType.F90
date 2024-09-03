@@ -21,13 +21,13 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TotalSoilH2OPSIMPa_vr(:,:,:)                      !soil micropore total water potential [MPa]
   real(r8),target,allocatable ::  VLWatMicPX_vr(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
   real(r8),target,allocatable ::  FWatExMacP2MicP(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
-  real(r8),target,allocatable ::  VLiceMacP_col(:,:,:)                      !soil macropore ice content [m3 d-2]
+  real(r8),target,allocatable ::  VLiceMacP_vr(:,:,:)                      !soil macropore ice content [m3 d-2]
   real(r8),target,allocatable ::  VLWatMicPM_vr(:,:,:,:)                    !soil micropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
   real(r8),target,allocatable ::  WaterTBLSlope(:,:)                !slope of water table relative to surface slope, [-]
-  real(r8),target,allocatable ::  DTBLDI(:,:)                       !depth of artificial water table
+  real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                       !depth of artificial water table
   real(r8),target,allocatable ::  DTBLY(:,:)                        !artificial water table depth, [m]
   real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepthInternalWTBL(:,:)            !internal water table depth, [m]
@@ -39,7 +39,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                     !excess water
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
   real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
-  real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
+  real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
   real(r8),target,allocatable ::  WatFlux4ErosionM_2DH(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  RunoffVelocity(:,:,:)                        !runoff velocity, [m t-1]
@@ -78,11 +78,11 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
-  real(r8),target,allocatable ::  QEvap_col(:,:)                        !total evaporation, [m3 d-2]
-  real(r8),target,allocatable ::  QRain_col(:,:)                        !total precipitation, [m3 d-2]
-  real(r8),target,allocatable ::  Qrunoff_col(:,:)                         !total surface runoff, [m3 d-2]
+  real(r8),target,allocatable ::  QEvap_CumYr_col(:,:)                        !total evaporation, [m3 d-2]
+  real(r8),target,allocatable ::  QRain_CumYr_col(:,:)                        !total precipitation, [m3 d-2]
+  real(r8),target,allocatable ::  Qrunoff_CumYr_col(:,:)                         !total surface runoff, [m3 d-2]
   real(r8),target,allocatable ::  WatMass_col(:,:)                !total soil water content, [m3 d-2]
-  real(r8),target,allocatable ::  AnualH2OLoss_col(:,:)                        !total subsurface water flux, [m3 d-2]
+  real(r8),target,allocatable ::  H2OLoss_CumYr_col(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  QDrain_col(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
@@ -119,13 +119,13 @@ module SoilWaterDataType
   allocate(TotalSoilH2OPSIMPa_vr(0:JZ,JY,JX));  TotalSoilH2OPSIMPa_vr=0._r8
   allocate(VLWatMicPX_vr(0:JZ,JY,JX));  VLWatMicPX_vr=0._r8
   allocate(FWatExMacP2MicP(JZ,JY,JX));     FWatExMacP2MicP=0._r8
-  allocate(VLiceMacP_col(JZ,JY,JX));    VLiceMacP_col=0._r8
+  allocate(VLiceMacP_vr(JZ,JY,JX));    VLiceMacP_vr=0._r8
   allocate(VLWatMicPM_vr(60,0:JZ,JY,JX));VLWatMicPM_vr=0._r8
   allocate(VLWatMacPM(60,JZ,JY,JX));VLWatMacPM=0._r8
   allocate(VLsoiAirPM(60,0:JZ,JY,JX));VLsoiAirPM=0._r8
   allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
   allocate(WaterTBLSlope(JY,JX));       WaterTBLSlope=0._r8
-  allocate(DTBLDI(JY,JX));      DTBLDI=0._r8
+  allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
   allocate(DTBLY(JY,JX));       DTBLY=0._r8
   allocate(DTBLD(JY,JX));       DTBLD=0._r8
   allocate(DepthInternalWTBL(JY,JX));       DepthInternalWTBL=0._r8
@@ -137,7 +137,7 @@ module SoilWaterDataType
   allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
   allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
-  allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
+  allocate(HydroCondMacP_vr(JZ,JY,JX));     HydroCondMacP_vr=0._r8
   allocate(HydroCondMicP4RootUptake(JZ,JY,JX));     HydroCondMicP4RootUptake=0._r8
   allocate(WatFlux4ErosionM_2DH(60,JV,JH));      WatFlux4ErosionM_2DH=0._r8
   allocate(RunoffVelocity(60,JY,JX));      RunoffVelocity=0._r8
@@ -175,11 +175,11 @@ module SoilWaterDataType
   allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
   allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
-  allocate(QEvap_col(JY,JX));       QEvap_col=0._r8
-  allocate(QRain_col(JY,JX));       QRain_col=0._r8
-  allocate(Qrunoff_col(JY,JX));        Qrunoff_col=0._r8
+  allocate(QEvap_CumYr_col(JY,JX));       QEvap_CumYr_col=0._r8
+  allocate(QRain_CumYr_col(JY,JX));       QRain_CumYr_col=0._r8
+  allocate(Qrunoff_CumYr_col(JY,JX));        Qrunoff_CumYr_col=0._r8
   allocate(WatMass_col(JY,JX));       WatMass_col=0._r8
-  allocate(AnualH2OLoss_col(JY,JX));       AnualH2OLoss_col=0._r8
+  allocate(H2OLoss_CumYr_col(JY,JX));       H2OLoss_CumYr_col=0._r8
   allocate(QDrain_col(JY,JX));      QDrain_col=0._r8
   allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
   allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
@@ -205,13 +205,13 @@ module SoilWaterDataType
   call destroy(TotalSoilH2OPSIMPa_vr)
   call destroy(VLWatMicPX_vr)
   call destroy(FWatExMacP2MicP)
-  call destroy(VLiceMacP_col)
+  call destroy(VLiceMacP_vr)
   call destroy(VLWatMicPM_vr)
   call destroy(VLWatMacPM)
   call destroy(VLsoiAirPM)
   call destroy(FILM)
   call destroy(WaterTBLSlope)
-  call destroy(DTBLDI)
+  call destroy(WtblDepzTile_col)
   call destroy(DTBLY)
   call destroy(DTBLD)
   call destroy(DepthInternalWTBL)
@@ -223,7 +223,7 @@ module SoilWaterDataType
   call destroy(XVLMobileWatMicPM)
   call destroy(XVLiceMicPM)
   call destroy(HydroCond3D)
-  call destroy(HydroCondMacP)
+  call destroy(HydroCondMacP_vr)
   call destroy(HydroCondMicP4RootUptake)
   call destroy(WatFlux4ErosionM_2DH)
   call destroy(RunoffVelocity)
@@ -261,12 +261,12 @@ module SoilWaterDataType
   call destroy(THETY_vr)
   call destroy(Theta_sat)
   call destroy(WaterFlowSoiMicPX)
-  call destroy(QEvap_col)
+  call destroy(QEvap_CumYr_col)
   call destroy(EvapoTransp_col)
-  call destroy(QRain_col)
-  call destroy(Qrunoff_col)
+  call destroy(QRain_CumYr_col)
+  call destroy(Qrunoff_CumYr_col)
   call destroy(WatMass_col)
-  call destroy(AnualH2OLoss_col)
+  call destroy(H2OLoss_CumYr_col)
   call destroy(QDrain_col)
   call destroy(Wat2GridBySurfRunoff)
   call destroy(Heat2GridBySurfRunoff)

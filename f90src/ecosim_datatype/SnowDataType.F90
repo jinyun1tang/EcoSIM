@@ -23,10 +23,10 @@ module SnowDataType
   real(r8),target, allocatable ::  VLSnoDWIprev_snvr(:,:,:)                       !snow volume in snowpack layer
   real(r8),target, allocatable ::  SnoDens_snvr(:,:,:)                       !snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  SnowThickL_snvr(:,:,:)                 !snowpack layer thickness
-  real(r8),target, allocatable ::  WatXfer2SnoLay(:,:,:)                       !hourly snow water transfer
-  real(r8),target, allocatable ::  SnoXfer2SnoLay(:,:,:)                       !hourly snow transfer
-  real(r8),target, allocatable ::  IceXfer2SnoLay(:,:,:)                       !hourly snow ice transfer
-  real(r8),target, allocatable ::  HeatXfer2SnoLay(:,:,:)                      !hourly convective heat flux from water transfer
+  real(r8),target, allocatable ::  WatXfer2SnoLay_snvr(:,:,:)                       !hourly snow water transfer
+  real(r8),target, allocatable ::  SnoXfer2SnoLay_snvr(:,:,:)                       !hourly snow transfer
+  real(r8),target, allocatable ::  IceXfer2SnoLay_snvr(:,:,:)                       !hourly snow ice transfer
+  real(r8),target, allocatable ::  HeatXfer2SnoLay_snvr(:,:,:)                      !hourly convective heat flux from water transfer
   integer ,target, allocatable ::  nsnol_col(:,:)                     !number of snow layers in column
   real(r8),target, allocatable ::  cumSnowDepz_col(:,:,:)                !cumulative depth to bottom of snowpack layer
   real(r8),target, allocatable ::  VLSnoDWIMax_col(:,:,:)                    !Initial snowpack volume, [m3 d-2]
@@ -49,7 +49,7 @@ module SnowDataType
   real(r8),target, allocatable ::  trcg_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  trcn_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
 
-  real(r8),target, allocatable ::  trcg_solsml(:,:,:,:)               ! snowpack dual phase disolved tracers
+  real(r8),target, allocatable ::  trcg_solsml_snvr(:,:,:,:)               ! snowpack dual phase disolved tracers
   real(r8),target, allocatable ::  trcn_solsml(:,:,:,:)               ! snowpack nutrient dissolved tracers
   real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
 
@@ -75,10 +75,10 @@ contains
   allocate(VLSnoDWIprev_snvr(JS,JY,JX));    VLSnoDWIprev_snvr=0._r8
   allocate(SnoDens_snvr(JS,JY,JX));    SnoDens_snvr=0._r8
   allocate(SnowThickL_snvr(JS,JY,JX));    SnowThickL_snvr=0._r8
-  allocate(WatXfer2SnoLay(JS,JY,JX));    WatXfer2SnoLay=0._r8
-  allocate(SnoXfer2SnoLay(JS,JY,JX));    SnoXfer2SnoLay=0._r8
-  allocate(IceXfer2SnoLay(JS,JY,JX));    IceXfer2SnoLay=0._r8
-  allocate(HeatXfer2SnoLay(JS,JY,JX));   HeatXfer2SnoLay=0._r8
+  allocate(WatXfer2SnoLay_snvr(JS,JY,JX));    WatXfer2SnoLay_snvr=0._r8
+  allocate(SnoXfer2SnoLay_snvr(JS,JY,JX));    SnoXfer2SnoLay_snvr=0._r8
+  allocate(IceXfer2SnoLay_snvr(JS,JY,JX));    IceXfer2SnoLay_snvr=0._r8
+  allocate(HeatXfer2SnoLay_snvr(JS,JY,JX));   HeatXfer2SnoLay_snvr=0._r8
   allocate(nsnol_col(JY,JX)); nsnol_col=0
   allocate(cumSnowDepz_col(0:JS,JY,JX)); cumSnowDepz_col=0._r8
   allocate(VLSnoDWIMax_col(JS,JY,JX));    VLSnoDWIMax_col=0._r8
@@ -103,7 +103,7 @@ contains
   allocate(trcn_FloXSnow_2DH(ids_nut_beg:ids_nuts_end,2,JV,JH));    trcn_FloXSnow_2DH=0._r8
 
 ! exclude NH3B
-  allocate(trcg_solsml(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml=0._r8
+  allocate(trcg_solsml_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml_snvr=0._r8
   allocate(trcn_solsml(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml=0._r8
   if(salt_model)then
     allocate(trcs_solsml(idsalt_beg:idsalt_end,JS,JY,JX)); trcs_solsml=0._r8
@@ -125,6 +125,7 @@ contains
   call destroy(DrySnoFlxBySnoRedistM_2DH)
   call destroy(SoilAlbedo_col)
   call destroy(NewSnowDens_col)
+  call destroy(trcg_solsml_snvr)
   call destroy(TCSnow_snvr)
   call destroy(TKSnow_snvr)
   call destroy(VLHeatCapSnow_col)
@@ -134,10 +135,10 @@ contains
   call destroy(VLSnoDWIprev_snvr)
   call destroy(SnoDens_snvr)
   call destroy(SnowThickL_snvr)
-  call destroy(WatXfer2SnoLay)
-  call destroy(SnoXfer2SnoLay)
-  call destroy(IceXfer2SnoLay)
-  call destroy(HeatXfer2SnoLay)
+  call destroy(WatXfer2SnoLay_snvr)
+  call destroy(SnoXfer2SnoLay_snvr)
+  call destroy(IceXfer2SnoLay_snvr)
+  call destroy(HeatXfer2SnoLay_snvr)
   call destroy(nsnol_col)
   call destroy(cumSnowDepz_col)
   call destroy(VLSnoDWIMax_col)

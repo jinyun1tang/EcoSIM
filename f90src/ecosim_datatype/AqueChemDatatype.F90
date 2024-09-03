@@ -34,15 +34,15 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
   real(r8),target,allocatable :: trcsalt_rain_conc(:,:,:)            !salt tracer concentration in rain [g m-3]
-  real(r8),target,allocatable :: trcSalt_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
-  real(r8),target,allocatable :: trcx_solml(:,:,:,:)                 !exchangeable tracers
-  real(r8),target,allocatable :: trcp_salml(:,:,:,:)                !salt precipitate in micropore
+  real(r8),target,allocatable :: trcSalt_solml_vr(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
+  real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)                 !exchangeable tracers
+  real(r8),target,allocatable :: trcp_saltpml_vr(:,:,:,:)                !salt precipitate in micropore
 
-  real(r8),target,allocatable ::  ECND(:,:,:)                        !electrical conductivity , [dS m-1]
+  real(r8),target,allocatable ::  ECND_vr(:,:,:)                        !electrical conductivity , [dS m-1]
   real(r8),target,allocatable ::  CSTR(:,:,:)                        !solution ion strength, [mol m-3]
   real(r8),target,allocatable ::  CION(:,:,:)                        !solution ion concentratiom, [mol m-3]
 
-  real(r8),target,allocatable :: trcSalt_soHml(:,:,:,:)
+  real(r8),target,allocatable :: trcSalt_soHml_vr(:,:,:,:)
   real(r8),target,allocatable :: trcSalt_XFHS(:,:,:,:,:)
   real(r8),target,allocatable :: trcSalt3DFlo2Cell(:,:,:,:,:)
   real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
@@ -67,8 +67,8 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TR_HCO3_sorbed_soil(:,:,:)                       !total adsorbed COOH transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_AlO2H2_sorbed_soil(:,:,:)                      !total adsorbed AlOH2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_KSO4_soil(:,:,:)                       !total solute KSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TR_Fe_sorbed_soil(:,:,:)                       !total Fe adsorption
-  real(r8),target,allocatable ::  TR_FeO2H2_sorbed_soil(:,:,:)                      !total FeOH2 adsorption
+  real(r8),target,allocatable ::  TR_Fe_sorbed_soil_vr(:,:,:)                       !total Fe adsorption
+  real(r8),target,allocatable ::  TR_FeO2H2_sorbed_soil_vr(:,:,:)                      !total FeOH2 adsorption
   real(r8),target,allocatable ::  trcx_TRSoilChem_vr(:,:,:,:)                   !total adsorbed OH- transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  Txchem_CO2_vr(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBION(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
@@ -115,9 +115,9 @@ module AqueChemDatatype
   allocate(GKCM(JZ,JY,JX));     GKCM=0._r8
   allocate(GKCN(JZ,JY,JX));     GKCN=0._r8
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
-  allocate(trcx_solml(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml=0._r8
-  allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
-  allocate(ECND(JZ,JY,JX));     ECND=0._r8
+  allocate(trcx_solml_vr(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml_vr=0._r8
+  allocate(trcp_saltpml_vr(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_saltpml_vr=0._r8
+  allocate(ECND_vr(JZ,JY,JX));     ECND_vr=0._r8
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
 
@@ -145,8 +145,8 @@ module AqueChemDatatype
   allocate(TR_HCO3_sorbed_soil(JZ,JY,JX));    TR_HCO3_sorbed_soil=0._r8
   allocate(TR_AlO2H2_sorbed_soil(JZ,JY,JX));   TR_AlO2H2_sorbed_soil=0._r8
   allocate(TR_KSO4_soil(JZ,JY,JX));    TR_KSO4_soil=0._r8
-  allocate(TR_Fe_sorbed_soil(JZ,JY,JX));    TR_Fe_sorbed_soil=0._r8
-  allocate(TR_FeO2H2_sorbed_soil(JZ,JY,JX));   TR_FeO2H2_sorbed_soil=0._r8
+  allocate(TR_Fe_sorbed_soil_vr(JZ,JY,JX));    TR_Fe_sorbed_soil_vr=0._r8
+  allocate(TR_FeO2H2_sorbed_soil_vr(JZ,JY,JX));   TR_FeO2H2_sorbed_soil_vr=0._r8
   allocate(Txchem_CO2_vr(JZ,JY,JX));    Txchem_CO2_vr=0._r8
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
   allocate(TRN3G(0:JZ,JY,JX));  TRN3G=0._r8
@@ -157,10 +157,10 @@ module AqueChemDatatype
     allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8
     allocate(trcSalt3DFlo2Cell(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2Cell=0._r8
     allocate(trcSalt_XFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS=0._r8
-    allocate(trcSalt_solml(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml=0._r8
+    allocate(trcSalt_solml_vr(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml_vr=0._r8
     allocate(trcsalt_rain_conc(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_conc=0._r8
     allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
-    allocate(trcSalt_soHml(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml=0._r8
+    allocate(trcSalt_soHml_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml_vr=0._r8
     allocate(trcSalt_XFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS=0._r8
     allocate(trcSalt_TR(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR=0._r8
   endif
@@ -197,12 +197,12 @@ module AqueChemDatatype
 
   call destroy(trcSalt_TR)
   call destroy(trcSalt_TR)
-  call destroy(trcx_solml)
-  call destroy(trcSalt_solml)
+  call destroy(trcx_solml_vr)
+  call destroy(trcSalt_solml_vr)
   call destroy(trcsalt_rain_conc)
-  call destroy(trcSalt_soHml)
-  call destroy(trcp_salml)
-  call destroy(ECND)
+  call destroy(trcSalt_soHml_vr)
+  call destroy(trcp_saltpml_vr)
+  call destroy(ECND_vr)
   call destroy(CSTR)
   call destroy(CION)
   call destroy(trcSalt_XFXS)
@@ -222,8 +222,8 @@ module AqueChemDatatype
   call destroy(TR_HCO3_sorbed_soil)
   call destroy(TR_AlO2H2_sorbed_soil)
   call destroy(TR_KSO4_soil)
-  call destroy(TR_Fe_sorbed_soil)
-  call destroy(TR_FeO2H2_sorbed_soil)
+  call destroy(TR_Fe_sorbed_soil_vr)
+  call destroy(TR_FeO2H2_sorbed_soil_vr)
   call destroy(Txchem_CO2_vr)
   call destroy(TBION)
   call destroy(TRN3G)

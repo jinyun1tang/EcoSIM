@@ -60,12 +60,12 @@ module NoduleBGCMod
     AREA3                     => plt_site%AREA3,                     &
     k_fine_litr               => pltpar%k_fine_litr,                 &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    iPlantNfixType_pft            => plt_morph%iPlantNfixType_pft,           &
-    fTCanopyGroth_pft                => plt_pheno%fTCanopyGroth_pft,               &
+    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
+    fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,        &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
     ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
-    CanopyRespC_pft           => plt_bgcr%CanopyRespC_pft,           &
-    Eco_AutoR_col             => plt_bgcr%Eco_AutoR_col,             &
+    CanopyRespC_CumYr_pft           => plt_bgcr%CanopyRespC_CumYr_pft,           &
+    Eco_AutoR_CumYr_col             => plt_bgcr%Eco_AutoR_CumYr_col,             &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
     NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &
@@ -76,8 +76,8 @@ module NoduleBGCMod
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
-    ZERO4Groth_pft                     => plt_biom%ZERO4Groth_pft,                     &
-    ZERO4LeafVar_pft                     => plt_biom%ZERO4LeafVar_pft,                     &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
+    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  &
   )
 !     iPlantNfixType_pft=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
@@ -295,17 +295,17 @@ module NoduleBGCMod
 !     RespNonst_Oltd=respiration from non-structural C
 !     NoduleCResp=bacterial respiration for growth and N2 fixation
 !     NodulELmSenes2Recyc(ielmc)=bacterial C senescence to recycling
-!     CanopyGrosRCO2_pft,CanopyRespC_pft=total,above-ground PFT respiration
+!     CanopyGrosRCO2_pft,CanopyRespC_CumYr_pft=total,above-ground PFT respiration
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     ECO_ER_col=ecosystem respiration
-!     Eco_AutoR_col=total autotrophic respiration
+!     Eco_AutoR_CumYr_col=total autotrophic respiration
 !
     RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
     CanopyGrosRCO2_pft(NZ)=CanopyGrosRCO2_pft(NZ)-RCO2T
-    CanopyRespC_pft(NZ)=CanopyRespC_pft(NZ)-RCO2T
+    CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-RCO2T
     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
     ECO_ER_col=ECO_ER_col-RCO2T
-    Eco_AutoR_col=Eco_AutoR_col-RCO2T
+    Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-RCO2T
 !
 !     NODULE LitrFall CAUSED BY REMOBILIZATION
 !
@@ -462,12 +462,12 @@ module NoduleBGCMod
     RootN2Fix_pvr          => plt_bgcr%RootN2Fix_pvr,          &
     PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr,     &
     RootNodulStrutElms_pvr => plt_biom%RootNodulStrutElms_pvr, &
-    ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft,                  &
+    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft,         &
     RootNodulNonstElms_pvr => plt_biom%RootNodulNonstElms_pvr, &
-    ZERO4LeafVar_pft                  => plt_biom%ZERO4LeafVar_pft,                  &
+    ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft,       &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
     ElmAllocmat4Litr       => plt_soilchem%ElmAllocmat4Litr,   &
-    iPlantNfixType_pft         => plt_morph%iPlantNfixType_pft,        &
+    iPlantNfixType_pft     => plt_morph%iPlantNfixType_pft,    &
     NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    &
   )
 !     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
@@ -685,7 +685,7 @@ module NoduleBGCMod
 !     TOTAL NODULE RESPIRATION
 !
 !     RCO2TM,RCO2T=total C respiration unlimited,limited by O2
-!     GrossResp_pft,CanopyRespC_pft=total,above-ground PFT respiration
+!     GrossResp_pft,CanopyRespC_CumYr_pft=total,above-ground PFT respiration
 !     Rmaint=bacterial maintenance respiration
 !     RespNonst_Oltd=respiration from non-structural C
 !     NoduleCResp=bacterial respiration for growth and N2 fixation

@@ -17,6 +17,7 @@ PROGRAM main
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
   use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
+  use ClimReadMod       , only : get_clm_years
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
@@ -39,6 +40,7 @@ PROGRAM main
   logical :: is_dos,nlend
   character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
+  integer :: idy
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
 !!
@@ -110,7 +112,9 @@ PROGRAM main
   endif
 
   call hist_htapes_build()
-
+  
+  !prepare climate forcing
+  call get_clm_years()
   IGO=0
 
 !  print*,frectyp%ymdhs0,yeari
@@ -125,7 +129,9 @@ PROGRAM main
 
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
-      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2)
+      idy=1
+      if(forc_periods(nn3+1)>forc_periods(nn3+2))idy=-1
+      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2),idy
 
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()

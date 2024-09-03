@@ -38,6 +38,7 @@ module ExtractsMod
 
     ENDIF
   ENDDO
+
   RETURN
   END subroutine extracts
 !------------------------------------------------------------------------------------------
@@ -173,8 +174,8 @@ module ExtractsMod
     tRootCO2Emis_vr           => plt_bgcr%tRootCO2Emis_vr,          &
     REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr,     &
-    TKS_vr                       => plt_ew%TKS_vr,                        &
-    THeatRootUptake_vr           => plt_ew%THeatRootUptake_vr,            &
+    TKS_vr                    => plt_ew%TKS_vr,                     &
+    THeatRootUptake_vr        => plt_ew%THeatRootUptake_vr,         &
     GridPlantRootH2OUptake_vr => plt_ew%GridPlantRootH2OUptake_vr,  &
     AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,   &
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,          &
@@ -182,7 +183,7 @@ module ExtractsMod
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr, &
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr,       &
     MY                        => plt_morph%MY,                      &
-    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft             &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft         &
   )
 
   trcs_plant_uptake_vr=0._r8
@@ -332,13 +333,13 @@ module ExtractsMod
   associate(                                                         &
     PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape, &
     ElmBalanceCum_pft         => plt_site%ElmBalanceCum_pft,         &
-    NH3EmisCum_pft            => plt_bgcr%NH3EmisCum_pft,            &
+    NH3Emis_CumYr_pft         => plt_bgcr%NH3Emis_CumYr_pft,         &
     Canopy_NEE_col            => plt_bgcr%Canopy_NEE_col,            &
     LitrFallStrutElms_col     => plt_bgcr%LitrFallStrutElms_col,     &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
-    ETCanopy_pft              => plt_ew%ETCanopy_pft,                &
+    ETCanopy_CumYr_pft        => plt_ew%ETCanopy_CumYr_pft,          &
     TH2GZ                     => plt_bgcr%TH2GZ,                     &
     trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,      &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
@@ -353,7 +354,7 @@ module ExtractsMod
     EvapTransHeat_pft         => plt_ew%EvapTransHeat_pft,           &
     CanWat_col                => plt_ew%CanWat_col,                  &
     TKC                       => plt_ew%TKC,                         &
-    TKS_vr                       => plt_ew%TKS_vr,                         &
+    TKS_vr                    => plt_ew%TKS_vr,                      &
     ENGYX_pft                 => plt_ew%ENGYX_pft,                   &
     Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
     VapXAir2CanG              => plt_ew%VapXAir2CanG,                &
@@ -413,7 +414,7 @@ module ExtractsMod
   Eco_Heat_Sens_col   = Eco_Heat_Sens_col+HeatXAir2PCan(NZ)
   Eco_Heat_Grnd_col   = Eco_Heat_Grnd_col+HeatStorCanP(NZ)
   Canopy_NEE_col      = Canopy_NEE_col+CO2NetFix_pft(NZ)
-  ETCanopy_pft(NZ)    = ETCanopy_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  ETCanopy_CumYr_pft(NZ)    = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanWat_col          = CanWat_col+CanopyWater_pft(NZ)
   CanH2OHeldVg        = CanH2OHeldVg+WatByPCanopy_pft(NZ)
   TEVAPP              = TEVAPP+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
@@ -437,10 +438,10 @@ module ExtractsMod
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
-!     NH3EmisCum_pft=total NH3 flux between atmosphere and canopy
+!     NH3Emis_CumYr_pft=total NH3 flux between atmosphere and canopy
 !
     
-  NH3EmisCum_pft(NZ)=NH3EmisCum_pft(NZ)+NH3Dep2Can_pft(NZ)
+  NH3Emis_CumYr_pft(NZ)=NH3Emis_CumYr_pft(NZ)+NH3Dep2Can_pft(NZ)
 
   end associate
   end subroutine CanopyFluxesandFixation

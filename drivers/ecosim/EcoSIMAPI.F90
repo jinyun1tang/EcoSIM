@@ -9,6 +9,8 @@ module EcoSIMAPI
   use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TranspNoSaltMod , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
+  use SoilBGCDataType , only : trc_soHml_vr
+  use TracerIDMod     , only : ids_NO2B,ids_NO2
   use EcoSIMCtrlMod  
   use WatsubMod    , only : watsub
 implicit none
@@ -39,7 +41,7 @@ contains
   call end_timer('WAT',t1)
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
-  !
+  !     
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     call start_timer(t1)
@@ -57,7 +59,6 @@ contains
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
   !
-
   if(soichem_model)then
     if(lverb)WRITE(*,334)'SOL'
     call start_timer(t1)
@@ -94,14 +95,12 @@ contains
   !   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
-  if(lverb)WRITE(*,334)'RED'
+  if(lverb)WRITE(*,334)'REDIST'
 
-
-  call start_timer(t1)
-
+  call start_timer(t1)    
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   call end_timer('RED',t1)
-
+  
 334   FORMAT(A8)
 
   end subroutine Run_EcoSIM_one_step
@@ -137,7 +136,7 @@ contains
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
-    clm_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
+    clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
@@ -195,12 +194,13 @@ contains
   bgc_fname='bbforc.nc'
   do_instequil=.false.
 
-  clm_factor_in=''
+  clm_factor_in='NO'
   pft_file_in=''
   grid_file_in=''
-  pft_mgmt_in=''
-  clm_file_in=''
-  soil_mgmt_in=''
+  pft_mgmt_in='NO'
+  clm_hour_file_in=''
+  clm_day_file_in=''
+  soil_mgmt_in='NO'
   atm_ghg_in=''
   aco2_ppm  = 280._r8
   ach4_ppm  = 1.144_r8
@@ -271,6 +271,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   use RestartMod   , only : restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : ReadClimSoilForcing
+  use YearMod, only : SetAnnualAccumlators  
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use EcoSIMCtrlMod
   use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
@@ -349,21 +350,23 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
   iYearCurrent=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
-
-  DO I=1,LYRC
+  DO I=1,LYRC    
     IF(do_rgres .and. I.eq.LYRG)RETURN
     !   UPDATE DAILY VARIABLES SUCH AS MANAGEMENT INPUTS
     !
     if(lverb)WRITE(*,333)'DAY'
     CALL DAY(I,NHW,NHE,NVN,NVS)
-
+    
+    call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
+    
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
         frectyp%lskip_loop=.false.        
-        if(is_restart())then
+        if(is_restart() .or. is_branch())then
           call restFile(flag='read')
+          if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
         endif
       endif
       if(frectyp%lskip_loop)then
@@ -380,18 +383,10 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-  !
-  !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
-  !
-      IF(visual_out)THEN
-        IF((J/JOUT)*JOUT.EQ.J)THEN
-          if(lverb)WRITE(*,333)'VIS'
-          CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
-        ENDIF
-      ENDIF
-
+  
       call end_timer_loop()
-
+      
+      if(lverb)write(*,*)'hist_update'
       call hist_ecosim%hist_update(I,J,bounds)
 
       call hist_update_hbuf(bounds)
@@ -407,6 +402,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       if(rstwr)then
         call restFile(flag='write')
       endif
+      if(lverb)write(*,*)'end?',nlend
       if(nlend)exit
     END DO
 
@@ -422,7 +418,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     endif
     if(nlend)exit
   END DO
-
+  if(lverb)write(*,333)'exit soil'
   RETURN
 END subroutine soil
 ! ----------------------------------------------------------------------

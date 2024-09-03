@@ -20,7 +20,7 @@ module TillageMixMod
   USE EcoSimSumDataType
   use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts
   use UnitMod, only : units
-  use nitrosMod, only : sumLitrOMLayL,sumORGMLayL
+  use SoilBGCNLayMod, only : sumLitrOMLayL,sumORGMLayL
   implicit none
   character(len=*),private, parameter :: mod_filename =&
      __FILE__
@@ -80,7 +80,8 @@ module TillageMixMod
 !
   !DCORP=soil mixing fraction with tillage
   !XCORP=factor for surface litter incorporation and soil mixing
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0_r8)THEN
+  
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. XCORP(NY,NX).LT.1.0 .AND. DCORP(I,NY,NX).GT.0.0_r8)THEN
 !
 !     EXTENT OF MIXING
 !
@@ -137,7 +138,7 @@ module TillageMixMod
 !
 !     IF(SoilOrgM_vr(ielmc,0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     XCORP0=AMAX1(XCORP(NY,NX),AMIN1(1.0,
-!    2(VHeatCapLitR(NY,NX)/cpo)/SoilOrgM_vr(ielmc,0,NY,NX)))
+!    2(VHeatCapLitRMin_col(NY,NX)/cpo)/SoilOrgM_vr(ielmc,0,NY,NX)))
     XCORP0=AMAX1(0.001_r8,XCORP(NY,NX))
 !     ELSE
 !     XCORP0=1.0
@@ -211,14 +212,14 @@ module TillageMixMod
       TS0_solml(NTS)=trc_solml_vr(NTS,0,NY,NX)*CORP0
     ENDDO
 
-    TXN4G=trcx_solml(idx_NH4,0,NY,NX)*CORP0
+    TXN4G=trcx_solml_vr(idx_NH4,0,NY,NX)*CORP0
 
     DO NTX= idx_AEC+1,idx_anion_soil_end
-      TX_anion(NTX)=trcx_solml(NTX,0,NY,NX)*CORP0
+      TX_anion(NTX)=trcx_solml_vr(NTX,0,NY,NX)*CORP0
     ENDDO
 
     DO NTP=idsp_psoi_beg,idsp_psoi_end
-      TP_soil(NTP)=trcp_salml(NTP,0,NY,NX)*CORP0
+      TP_soil(NTP)=trcp_saltpml_vr(NTP,0,NY,NX)*CORP0
     ENDDO
 
     DO NTN=ifertn_beg,ifertn_end
@@ -246,17 +247,17 @@ module TillageMixMod
       trc_solml_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)*XCORP0
     ENDDO
 
-    trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)*XCORP0
+    trcx_solml_vr(idx_NH4,0,NY,NX)=trcx_solml_vr(idx_NH4,0,NY,NX)*XCORP0
 
     DO NTX=idx_AEC+1,idx_anion_soil_end
-      trcx_solml(idx_OHe,0,NY,NX)=trcx_solml(idx_OHe,0,NY,NX)*XCORP0
+      trcx_solml_vr(idx_OHe,0,NY,NX)=trcx_solml_vr(idx_OHe,0,NY,NX)*XCORP0
     ENDDO
 
-    trcp_salml(idsp_AlPO4,0,NY,NX)    = trcp_salml(idsp_AlPO4,0,NY,NX)*XCORP0
-    trcp_salml(idsp_FePO4,0,NY,NX)    = trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
-    trcp_salml(idsp_CaHPO4,0,NY,NX)   = trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
-    trcp_salml(idsp_HA,0,NY,NX)       = trcp_salml(idsp_HA,0,NY,NX)*XCORP0
-    trcp_salml(idsp_CaH4P2O8,0,NY,NX) = trcp_salml(idsp_CaH4P2O8,0,NY,NX)*XCORP0
+    trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)    = trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)*XCORP0
+    trcp_saltpml_vr(idsp_FePO4,0,NY,NX)    = trcp_saltpml_vr(idsp_FePO4,0,NY,NX)*XCORP0
+    trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX)   = trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX)*XCORP0
+    trcp_saltpml_vr(idsp_HA,0,NY,NX)       = trcp_saltpml_vr(idsp_HA,0,NY,NX)*XCORP0
+    trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX) = trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX)*XCORP0
 
     DO NTN=ifertn_beg,ifertn_end
       FertN_soil_vr(NTN,0,NY,NX)=FertN_soil_vr(NTN,0,NY,NX)*XCORP0
@@ -264,8 +265,8 @@ module TillageMixMod
 
     VLWatMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)*XCORP0
     VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
-    VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
-    VGeomLayer(0,NY,NX)=VGeomLayer(0,NY,NX)*XCORP0
+    VLitR_col(NY,NX)=VLitR_col(NY,NX)*XCORP0
+    VGeomLayer_vr(0,NY,NX)=VGeomLayer_vr(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
     ZNHUXI=AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
     ZNFNX0=AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
@@ -273,13 +274,13 @@ module TillageMixMod
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
 !
-    DCORPZ=AMIN1(DCORP(I,NY,NX),CumSoilThickness(NL(NY,NX),NY,NX))
+    DCORPZ=AMIN1(DCORP(I,NY,NX),CumSoilThickness_vr(NL(NY,NX),NY,NX))
 !
 !     ACCUMULATE SOIL STATE VARIABLES WITHIN TILLAGE MIXING ZONE
 !
     DO L=NU(NY,NX),NL(NY,NX)
-      IF(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
+      IF(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TBKDX=TBKDX+FI*SoiBulkDensityt0_vr(L,NY,NX)
@@ -300,7 +301,7 @@ module TillageMixMod
 !     TVOLP=TVOLP+TI*VLsoiAirP_vr(L,NY,NX)
 !     TVOLA=TVOLA+TI*VLMicP_vr(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
           TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil_vr(NTN,L,NY,NX)
         ENDDO
@@ -314,19 +315,19 @@ module TillageMixMod
         ENDDO
 
         DO NTSA=idsalt_beg,idsalt_end
-          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcSalt_solml(NTSA,L,NY,NX)
+          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcSalt_solml_vr(NTSA,L,NY,NX)
         ENDDO
 !cation
         DO NTX=idx_CEC,idx_cation_end
-          TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
+          TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml_vr(NTX,L,NY,NX)
         ENDDO
 !anion
         DO NTX=idx_AEC,idx_end
-          TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
+          TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml_vr(NTX,L,NY,NX)
         ENDDO
 
         DO NTP=idsp_beg,idsp_end
-          TP_salml(NTP)=TP_salml(NTP)+TI*trcp_salml(NTP,L,NY,NX)
+          TP_salml(NTP)=TP_salml(NTP)+TI*trcp_saltpml_vr(NTP,L,NY,NX)
         ENDDO
 
         DO NTG=idg_beg,idg_end-1
@@ -388,7 +389,7 @@ module TillageMixMod
 
     D2000: DO  L=NU(NY,NX),LL
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness(L,NY,NX)-DLYR(3,L,NY,NX)))
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
         TX=1.0_r8-TI
@@ -411,20 +412,20 @@ module TillageMixMod
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
         
         ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS_vr(L,NY,NX)
-        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX)))*TKS_vr(L,NY,NX)
+        ENGYV=(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
         VLWatMicP_vr(L,NY,NX)=TI*VLWatMicP_vr(L,NY,NX)+CORP*(FI*TVOLW-TI*VLWatMicP_vr(L,NY,NX))+TX*VLWatMicP_vr(L,NY,NX)+FI*TVOLWR
         VLiceMicP_vr(L,NY,NX)=TI*VLiceMicP_vr(L,NY,NX)+CORP*(FI*TVOLI-TI*VLiceMicP_vr(L,NY,NX))+TX*VLiceMicP_vr(L,NY,NX)
         VLWatMicPX_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
 !     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+CORP*VLWatMacP_vr(L,NY,NX)
-!     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)+CORP*VLiceMacP_col(L,NY,NX)
-!     VLMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)+CORP*VLMacP(L,NY,NX)
+!     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)+CORP*VLiceMacP_vr(L,NY,NX)
+!     VLMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)+CORP*VLMacP_vr(L,NY,NX)
 !     VLWatMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLWatMacP_vr(L,NY,NX)
-!     VLiceMacP_col(L,NY,NX)=XCORP(NY,NX)*VLiceMacP_col(L,NY,NX)
-!     VLMacP(L,NY,NX)=XCORP(NY,NX)*VLMacP(L,NY,NX)
-!     SoilFracAsMacP(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP(L,NY,NX)
+!     VLiceMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLiceMacP_vr(L,NY,NX)
+!     VLMacP_vr(L,NY,NX)=XCORP(NY,NX)*VLMacP_vr(L,NY,NX)
+!     SoilFracAsMacP_vr(L,NY,NX)=XCORP(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
         TKS_vr(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity_vr(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))
 
@@ -442,9 +443,9 @@ module TillageMixMod
 
         !SALT
         DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_solml(NTSA,L,NY,NX)=TI*trcSalt_solml(NTSA,L,NY,NX)  &
-            +CORP*(FI*TSA_solml(NTSA)-TI*trcSalt_solml(NTSA,L,NY,NX)) &
-            +TX*trcSalt_solml(NTSA,L,NY,NX)+CORP*trcSalt_soHml(NTSA,L,NY,NX)
+          trcSalt_solml_vr(NTSA,L,NY,NX)=TI*trcSalt_solml_vr(NTSA,L,NY,NX)  &
+            +CORP*(FI*TSA_solml(NTSA)-TI*trcSalt_solml_vr(NTSA,L,NY,NX)) &
+            +TX*trcSalt_solml_vr(NTSA,L,NY,NX)+CORP*trcSalt_soHml_vr(NTSA,L,NY,NX)
         ENDDO
 
         ! solute
@@ -455,18 +456,18 @@ module TillageMixMod
         ENDDO
 
         DO NTX=idx_CEC,idx_cation_end
-          trcx_solml(NTX,L,NY,NX)=TI*trcx_solml(NTX,L,NY,NX)+ &
-            CORP*(FI*TX_solml(NTX)-TI*trcx_solml(NTX,L,NY,NX))+TX*trcx_solml(NTX,L,NY,NX)
+          trcx_solml_vr(NTX,L,NY,NX)=TI*trcx_solml_vr(NTX,L,NY,NX)+ &
+            CORP*(FI*TX_solml(NTX)-TI*trcx_solml_vr(NTX,L,NY,NX))+TX*trcx_solml_vr(NTX,L,NY,NX)
         ENDDO
 
         DO NTX=idx_AEC,idx_end
-          trcx_solml(NTX,L,NY,NX)=TI*trcx_solml(NTX,L,NY,NX)+ &
-            CORP*(FI*TX_solml(NTX)-TI*trcx_solml(NTX,L,NY,NX))+TX*trcx_solml(NTX,L,NY,NX)
+          trcx_solml_vr(NTX,L,NY,NX)=TI*trcx_solml_vr(NTX,L,NY,NX)+ &
+            CORP*(FI*TX_solml(NTX)-TI*trcx_solml_vr(NTX,L,NY,NX))+TX*trcx_solml_vr(NTX,L,NY,NX)
         ENDDO
 
         DO NTP=idsp_beg,idsp_end
-          trcp_salml(NTP,L,NY,NX)=TI*trcp_salml(NTP,L,NY,NX)+CORP*(FI*TP_salml(NTP) &
-            -TI*trcp_salml(NTP,L,NY,NX))+TX*trcp_salml(NTP,L,NY,NX)
+          trcp_saltpml_vr(NTP,L,NY,NX)=TI*trcp_saltpml_vr(NTP,L,NY,NX)+CORP*(FI*TP_salml(NTP) &
+            -TI*trcp_saltpml_vr(NTP,L,NY,NX))+TX*trcp_saltpml_vr(NTP,L,NY,NX)
         ENDDO
 
         DO NTG=idg_beg,idg_end-1
@@ -590,15 +591,15 @@ module TillageMixMod
           trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FI*TS0_solml(NTS)
         ENDDO
 
-        trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)+FI*TXN4G
+        trcx_solml_vr(idx_NH4,L,NY,NX)=trcx_solml_vr(idx_NH4,L,NY,NX)+FI*TXN4G
 
 
         DO NTX=idx_AEC+1,idx_anion_soil_end
-          trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)+FI*TX_anion(NTX)
+          trcx_solml_vr(NTX,L,NY,NX)=trcx_solml_vr(NTX,L,NY,NX)+FI*TX_anion(NTX)
         ENDDO
 
         DO NTP=idsp_psoi_beg,idsp_psoi_end
-          trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)+FI*TP_soil(NTP)
+          trcp_saltpml_vr(NTP,L,NY,NX)=trcp_saltpml_vr(NTP,L,NY,NX)+FI*TP_soil(NTP)
         ENDDO
 
         DO NTN=ifertn_beg,ifertn_end
@@ -641,7 +642,7 @@ module TillageMixMod
   ENDDO
 
   DO NTSA=idsalt_beg,idsalt_end
-    trcSalt_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcSalt_soHml(ntsa,L,NY,NX)
+    trcSalt_soHml_vr(ntsa,L,NY,NX)=XCORP(NY,NX)*trcSalt_soHml_vr(ntsa,L,NY,NX)
   ENDDO
   end subroutine MixSoluteMacpore
 

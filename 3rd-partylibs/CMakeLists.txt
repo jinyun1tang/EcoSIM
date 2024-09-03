@@ -462,7 +462,6 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
     message(FATAL_ERROR "Copying library source failed.")
   endif()
 
-  
   message("Configuring netcdf-fortran library...")
 
   execute_process(COMMAND autoreconf -if WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-fortran)

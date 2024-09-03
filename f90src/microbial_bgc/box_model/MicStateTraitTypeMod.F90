@@ -62,6 +62,7 @@ implicit none
   real(r8) ::CH1P4BU
   real(r8) ::CNO3SU
   real(r8) ::CNO3BU
+  real(r8) :: TotActMicrobiom
   real(r8) :: TSens4MicbGrwoth
   real(r8) :: VWatMicrobAct
   real(r8),allocatable :: FracBulkSOMC(:)

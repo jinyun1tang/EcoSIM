@@ -44,7 +44,7 @@ module readiMod
 
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
-  real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
+  real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,WTBLDepz_nat,WTBLDepz_tile
   real(r8) :: DTBLGG,DEC,initSnowDepth,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
@@ -199,7 +199,7 @@ module readiMod
 ! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
 ! IETYPG,iErosionMode=Koppen climate zone,erosion options
 ! NCNG=1:lateral connections between grid cells,3:no connections
-! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (iWaterTabelMode)
+! WTBLDepz_nat,WTBLDepz_tile=depth of natural,artificial (tile) water table (iWaterTabelMode)
 ! DTBLGG=slope of natural water table relative to landscape surface
 ! RCHQNG,RCHQEG,RCHQSG,RCHQWG=boundary condns for N,E,S,W surface runoff
 ! RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
@@ -216,8 +216,8 @@ module readiMod
   call ncd_getvar(grid_nfid,'IDTBLG',loc,iWaterTabelMode)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
-  call ncd_getvar(grid_nfid,'DTBLIG',loc,DTBLIG)
-  call ncd_getvar(grid_nfid,'DTBLDIG',loc,DTBLDIG)
+  call ncd_getvar(grid_nfid,'DTBLIG',loc,WTBLDepz_nat)
+  call ncd_getvar(grid_nfid,'DTBLDIG',loc,WTBLDepz_tile)
   call ncd_getvar(grid_nfid,'DTBLGG',loc,DTBLGG)
 
   call ncd_getvar(grid_nfid,'RCHQNG',loc,RCHQNG)
@@ -248,8 +248,8 @@ module readiMod
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
 
-    write(*,*)'depth of natural water table: DTBLIG',DTBLIG
-    write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
+    write(*,*)'depth of natural water table: DTBLIG',WTBLDepz_nat
+    write(*,*)'depth of artificial water table: DTBLDIG',WTBLDepz_tile
     write(*,*)'slope of natural water table relative to landscape '// &
       'surface: DTBLGG',DTBLGG
     write(*,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
@@ -286,24 +286,24 @@ module readiMod
       CH4E(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
-      KoppenClimZone(NY,NX)=IETYPG
-      FlowDirIndicator(NY,NX)=grid_mode
-      NatWtblDepz_col(NY,NX)=DTBLIG
-      DTBLDI(NY,NX)=DTBLDIG
-      WaterTBLSlope(NY,NX)=DTBLGG
-      RechargNorthSurf(NY,NX)=RCHQNG
-      RechargEastSurf(NY,NX)=RCHQEG
-      RechargSouthSurf(NY,NX)=RCHQSG
-      RechargWestSurf(NY,NX)=RCHQWG
-      RechargNorthSubSurf(NY,NX)=RCHGNUG
-      RechargEastSubSurf(NY,NX)=RCHGEUG
-      RechargSouthSubSurf(NY,NX)=RCHGSUG
-      RechargWestSubSurf(NY,NX)=RCHGWUG
-      RechargRateNorthWTBL(NY,NX)=RCHGNTG
-      RechargRateEastWTBL(NY,NX)=RCHGETG
-      RechargRateSouthWTBL(NY,NX)=RCHGSTG
-      RechargRateWestWTBL(NY,NX)=RCHGWTG
-      RCHGD(NY,NX)=RCHGDG
+      KoppenClimZone_col(NY,NX)   = IETYPG
+      FlowDirIndicator(NY,NX)     = grid_mode
+      NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
+      WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
+      WaterTBLSlope(NY,NX)        = DTBLGG
+      RechargNorthSurf(NY,NX)     = RCHQNG
+      RechargEastSurf(NY,NX)      = RCHQEG
+      RechargSouthSurf(NY,NX)     = RCHQSG
+      RechargWestSurf(NY,NX)      = RCHQWG
+      RechargNorthSubSurf(NY,NX)  = RCHGNUG
+      RechargEastSubSurf(NY,NX)   = RCHGEUG
+      RechargSouthSubSurf(NY,NX)  = RCHGSUG
+      RechargWestSubSurf(NY,NX)   = RCHGWUG
+      RechargRateNorthWTBL(NY,NX) = RCHGNTG
+      RechargRateEastWTBL(NY,NX)  = RCHGETG
+      RechargRateSouthWTBL(NY,NX) = RCHGSTG
+      RechargRateWestWTBL(NY,NX)  = RCHGWTG
+      RCHGD(NY,NX)                = RCHGDG
       DH(NY,NX)=DHI(NX)
       DV(NY,NX)=DVI(NY)
       CO2E(NY,NX)=CO2EI(NY,NX)
@@ -425,7 +425,7 @@ module readiMod
 
     call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'PH',ntp,PH(1:JZ,NV1,NH1))
@@ -539,7 +539,7 @@ module readiMod
             SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NV1,NH1)
             CSAND(L,NY,NX)=CSAND(L,NV1,NH1)
             CSILT(L,NY,NX)=CSILT(L,NV1,NH1)
-            SoilFracAsMacP(L,NY,NX)=SoilFracAsMacP(L,NV1,NH1)
+            SoilFracAsMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK(L,NY,NX)=ROCK(L,NV1,NH1)
             PH(L,NY,NX)=PH(L,NV1,NH1)
             CEC(L,NY,NX)=CEC(L,NV1,NH1)
@@ -629,7 +629,7 @@ module readiMod
               CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
               CSILT(L,NY,NX)=CSILT(L+1,NY,NX)
               CCLAY(L,NY,NX)=CCLAY(L+1,NY,NX)
-              SoilFracAsMacP(L,NY,NX)=SoilFracAsMacP(L+1,NY,NX)
+              SoilFracAsMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L+1,NY,NX)
               ROCK(L,NY,NX)=ROCK(L+1,NY,NX)
               PH(L,NY,NX)=PH(L+1,NY,NX)
               CEC(L,NY,NX)=CEC(L+1,NY,NX)
@@ -687,7 +687,7 @@ module readiMod
 !
 !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
 !
-!   FracSoiAsMicP=micropore fraction excluding macropore,rock
+!   FracSoiAsMicP_vr=micropore fraction excluding macropore,rock
 !   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
 !   CSAND,CSILT,CCLAY=sand,silt,clay content converted to g Mg-1
 !   CORGC,CORGR=SOC,POC converted to g Mg-1
@@ -697,23 +697,23 @@ module readiMod
 
         DO  L=1,NL(NY,NX)
   !   SoilFracAsMacP: macropore fraction
-  !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
+  !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoiBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
-          IF(isclose(SoiBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
+          IF(isclose(SoiBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
-          FracSoiAsMicP(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+          FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
   !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
   !  both macropores and micropores    
-  !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
-  !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
+  !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
+  !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !
-          SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
-          SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+          SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+          SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
           CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
-          SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
+          SoilFracAsMacPt0_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)
   ! soil texture is reported based on mass basis soley for mineral component of the soil
           corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
           CSAND(L,NY,NX)=CSAND(L,NY,NX)*corrector
@@ -761,7 +761,7 @@ module readiMod
           ENDIF
         ENDDO
         CSoilOrgM_vr(ielmc,0,NY,NX)=orgcden
-        FracSoiAsMicP(0,NY,NX)=1.0_r8
+        FracSoiAsMicP_vr(0,NY,NX)=1.0_r8
       ENDDO
     ENDDO
   ENDDO
@@ -841,7 +841,7 @@ module readiMod
 !     PHYSICAL PROPERTIES
 !
 !     CSAND,CSILT=sand,silt contents (kg Mg-1)
-!     SoilFracAsMacP,ROCK=macropore,rock fraction
+!     SoilFracAsMacP_vr,ROCK=macropore,rock fraction
 !
 
   write(*,*)''
@@ -850,7 +850,7 @@ module readiMod
   write(*,*)'Silt (kg Mg-1): CSILT'
   write(*,*)(CSILT(L,NY,NX),L=NU,NM)
   write(*,*)'Macropore fraction (0-1): FOHL'
-  write(*,*)(SoilFracAsMacP(L,NY,NX),L=NU,NM)
+  write(*,*)(SoilFracAsMacP_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Rock fraction (0-1): ROCK'
   write(*,*)(ROCK(L,NY,NX),L=NU,NM)
 !

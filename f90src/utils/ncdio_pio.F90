@@ -819,7 +819,7 @@ module ncdio_pio
 
     call check_var(ncid, trim(varname), vardesc, readvar)
 
-    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,start=(/rec/)),trim(sub))
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,start=(/1,rec/)),trim(sub))
 
   end subroutine ncd_putvar_string_1d
 !----------------------------------------------------------------------
@@ -1840,7 +1840,6 @@ module ncdio_pio
     ! !ARGUMENTS:
     class(file_desc_t), intent(inout) :: file   ! PIO file handle to close
     !-----------------------------------------------------------------------
-
     call check_ret(nf90_close(file%fh), 'ncd_pio_closefile')
 
   end subroutine ncd_pio_closefile

@@ -94,7 +94,7 @@ implicit none
   ENDDO D9995
 
   if(disp_planttrait)call relavu(nu_plt)
-  print*,'yearc',yearc,yeari
+
   call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
   RETURN
   END SUBROUTINE readq
@@ -198,7 +198,7 @@ implicit none
         DO M=1,366
           iHarvstType_pft(NZ,M,NY,NX)=-1
           jHarvst_pft(NZ,M,NY,NX)=0
-          CutHeightORFrac_pft(NZ,M,NY,NX)=1.0E+06_r8
+          FracCanopyHeightCut_pft(NZ,M,NY,NX)=1.0E+06_r8
           THIN_pft(NZ,M,NY,NX)=-1.0_r8
           FracBiomHarvsted(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
           FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
@@ -256,7 +256,6 @@ implicit none
               IF(IMO.EQ.1)then
                 IDY=IDX
               else
-                print*,tstr,IMO
                 IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
               endif
 
@@ -268,7 +267,7 @@ implicit none
 
               iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
               jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
-              CutHeightORFrac_pft(NZ,IDY,NY,NX)=HCUT
+              FracCanopyHeightCut_pft(NZ,IDY,NY,NX)=HCUT
               THIN_pft(NZ,IDY,NY,NX)=PCUT
               FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
               FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
@@ -287,7 +286,7 @@ implicit none
                   D580: DO IDYG=IDYS+1,IDYE-1
                     iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
                     jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
-                    CutHeightORFrac_pft(NZ,IDYG,NY,NX)=HCUT
+                    FracCanopyHeightCut_pft(NZ,IDYG,NY,NX)=HCUT
                     THIN_pft(NZ,IDYG,NY,NX)=PCUT
                     FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
                     FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
@@ -443,7 +442,7 @@ implicit none
   character(len=3) :: koppen_clims
   integer :: loc,N
 
-  loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
+  loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
   DATAPI(NZ,NY,NX)=loc
   call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
@@ -665,7 +664,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'N-fixation symbiosis',strval,40)
+  call writefixsl(nu_plt,'N-fixation symbiosis INTYP',strval,40)
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
@@ -691,7 +690,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photoperiod',strval,40)
+  call writefixsl(nu_plt,'Photoperiod IPTYP',strval,40)
 
   if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -716,7 +715,7 @@ implicit none
       strval='Undefined herbaceous pattern'
     end select
   endif
-  call writefixsl(nu_plt,'Biome turnover pattern',strval,40)
+  call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,40)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
@@ -726,7 +725,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Storage organ',strval,40)
+  call writefixsl(nu_plt,'Storage organ IRTYP',strval,40)
 
   select case(MY(NZ,NY,NX))
   case (1)
@@ -736,23 +735,24 @@ implicit none
   case default
     strval='Wrong option'
   end select
-  call writefixsl(nu_plt,'Mycorrhizal association',strval,40)
+  call writefixsl(nu_plt,'Mycorrhizal association MY',strval,40)
 
   select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
   case (ithermozone_arcboreal)
-    strval='Arctic, boreal'
+    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_cooltempr)
-    strval='Cool temperate'
+    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_warmtempr)
-    strval='Warm temperate'
+    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_subtropic)
-    strval='Subtropical'
+    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone(NZ,NY,NX)
   case (ithermozone_tropical)
-    strval='Tropical'
+    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone(NZ,NY,NX)
   case default
-    strval='Not defined'
+    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone(NZ,NY,NX)
   end select
-  call writefixsl(nu_plt,'Thermal adaptation zone',strval,40)
+  
+  call writefixsl(nu_plt,'Thermal adaptation zone ZTYPI',strval,40)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------
@@ -1118,10 +1118,14 @@ implicit none
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
                 flag_pft_active(NZ,NY,NX)=.true.
-                IF(KoppenClimZone(NY,NX).GT.0)THEN
-                  WRITE(CLIMATE,'(I2)')KoppenClimZone(NY,NX)
+                !modify pft name 
+                IF(KoppenClimZone_col(NY,NX).GT.0)THEN
+                  WRITE(CLIMATE,'(I2)')KoppenClimZone_col(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
                   DATAX_pft(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
+                !consider cases when koppen climate zone is zero  
+                elseif(KoppenClimZone_col(NY,NX)==0)then
+                  DATAX_pft(NZ)=pft_gtype(NZ)
                 ENDIF
               ENDDO D4965
               if(first_pft)then
@@ -1133,26 +1137,19 @@ implicit none
           ENDDO D4975
         ENDIF
 
-!        IF(.not. is_restart())THEN
-    ! there was no chechk point file read in, so update pft info
-    ! from input file
-          D8995: DO NX=NH1,NH2
-            D8990: DO NY=NV1,NV2
-              NP(NY,NX)=NS
-    !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
-              D100: DO NZ=1,NP(NY,NX)
-                DATAP(NZ,NY,NX)=DATAX_pft(NZ)
-              ENDDO D100
+        D8995: DO NX=NH1,NH2
+          D8990: DO NY=NV1,NV2
+            NP(NY,NX)=NS
+            !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
+            D100: DO NZ=1,NP(NY,NX)
+              DATAP(NZ,NY,NX)=DATAX_pft(NZ)
+            ENDDO D100
 
-              D101: DO NZ=NP(NY,NX)+1,JP
-                DATAP(NZ,NY,NX)='NO'
-              ENDDO D101
-            ENDDO D8990
-          ENDDO D8995
-!        ELSE
-!read from chck point file, i.e. datap and datam
-!          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
-!        ENDIF
+            D101: DO NZ=NP(NY,NX)+1,JP
+              DATAP(NZ,NY,NX)='NO'
+            ENDDO D101
+          ENDDO D8990
+        ENDDO D8995
       ENDDO
     ENDIF 
     call ncd_pio_closefile(pftinfo_nfid)

@@ -318,7 +318,12 @@ implicit none
       ,ROWX,IR0,IR1,IR2
 
     LPY=0
-    read(fertf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
+    IDY1=INT(DY/1.0E+06_r8)
+    !return for bad fertilization data
+    if(IDY1==0)return
+    IDY2=INT(DY/1.0E+04_r8-IDY1*1.0E+02_r8)
+    IDY3=INT(DY-(IDY1*1.0E+06_r8+IDY2*1.0E+04_r8))       
+     
     IF(LVERB)then
       print*,fertf(kk)
       PRINT*,IDY1,IDY2,IDY3,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
@@ -339,40 +344,40 @@ implicit none
 !
 !         NH4,NH3,UREA,NO3 BROADCAST (A) AND BANDED (B)
 !
-        FERT(1,IDY,NY,NX)=Z4A
-        FERT(2,IDY,NY,NX)=Z3A
-        FERT(3,IDY,NY,NX)=ZUA
-        FERT(4,IDY,NY,NX)=ZOA
-        FERT(5,IDY,NY,NX)=Z4B
-        FERT(6,IDY,NY,NX)=Z3B
-        FERT(7,IDY,NY,NX)=ZUB
-        FERT(8,IDY,NY,NX)=ZOB
+        FERT(ifert_nh4,IDY,NY,NX)=Z4A        !NH4 broadcast
+        FERT(ifert_nh3,IDY,NY,NX)=Z3A        !NH3 broadcast
+        FERT(ifert_urea,IDY,NY,NX)=ZUA        !Urea broadcast
+        FERT(ifert_no3,IDY,NY,NX)=ZOA        !NO3 broadcast
+        FERT(ifert_nh4_band,IDY,NY,NX)=Z4B        !NH4 band
+        FERT(ifert_nh3_band,IDY,NY,NX)=Z3B        !NH3 band
+        FERT(ifert_urea_band,IDY,NY,NX)=ZUB        !Urea band
+        FERT(ifert_no3_band,IDY,NY,NX)=ZOB        !NO3 band
 !
 !         MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE BROADCAST (A)
 !         AND BANDED (B)
 !
-        FERT(9,IDY,NY,NX)=PMA
-        FERT(10,IDY,NY,NX)=PMB
-        FERT(11,IDY,NY,NX)=PHA
+        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)  = PMA        !PM broadcast
+        FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = PMB        !PM band
+        FERT(ifert_P_apatite,IDY,NY,NX) = PHA        !
 !
 !         LIME AND GYPSUM
 !
-        FERT(12,IDY,NY,NX)=CAC
-        FERT(13,IDY,NY,NX)=CAS
+        FERT(ifert_Ca_lime,IDY,NY,NX)=CAC
+        FERT(ifert_Ca_gypsum,IDY,NY,NX)=CAS
 !
 !         PLANT AND ANIMAL RESIDUE C, N AND P
 !
-        FERT(14,IDY,NY,NX)=RSC1
-        FERT(15,IDY,NY,NX)=RSN1
-        FERT(16,IDY,NY,NX)=RSP1
-        FERT(17,IDY,NY,NX)=RSC2
-        FERT(18,IDY,NY,NX)=RSN2
-        FERT(19,IDY,NY,NX)=RSP2
+        FERT(ifert_plant_resC,IDY,NY,NX)=RSC1
+        FERT(ifert_plant_resN,IDY,NY,NX)=RSN1
+        FERT(ifert_plant_resP,IDY,NY,NX)=RSP1
+        FERT(ifert_plant_manuC,IDY,NY,NX)=RSC2
+        FERT(ifert_plant_manuN,IDY,NY,NX)=RSN2
+        FERT(ifert_plant_manuP,IDY,NY,NX)=RSP2
 !
 !         DEPTH AND WIDTH OF APPLICATION
 !
-        FDPTH(IDY,NY,NX)=FDPTHI
-        ROWI(IDY,NY,NX)=ROWX
+        FDPTH(IDY,NY,NX) = FDPTHI    !depth
+        ROWI(IDY,NY,NX)  = ROWX       !width
 !
 !         TYPE OF FERTILIZER,PLANT OR ANIMAL RESIDUE
 !

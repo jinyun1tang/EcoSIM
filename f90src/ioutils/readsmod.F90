@@ -182,14 +182,11 @@ module readsmod
         FDPTH(I,NY,NX)=0.0_r8
       ENDDO D40
       D125: DO I=1,366
-        D120: DO J=1,24
-          RRIG(J,I,NY,NX)=0.0_r8
-        ENDDO D120
+        RRIG(1:24,I,NY,NX)=0.0_r8
         PHQ(I,NY,NX)=7.0_r8
         NH4_irrig_conc(I,NY,NX)=0.0_r8
         NO3_irrig_conc(I,NY,NX)=0.0_r8
         H2PO4_irrig_conc(I,NY,NX)=0.0_r8
-
 
         WDPTH(I,NY,NX)=0.0_r8
         ROWI(I,NY,NX)=0.0_r8

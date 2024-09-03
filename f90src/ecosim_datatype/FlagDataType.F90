@@ -9,11 +9,11 @@ implicit none
   __FILE__
   integer  ::  ICLM                                !changes to weather data (0=none,1=step,2=transient)
   integer  ::  IMNG                                !flag for land management
-  integer  ::  IWTHR(2)                            !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
+  integer  ::  IWTHR                               !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
 
   integer,target,allocatable ::  IYTYP(:,:,:,:)                      !fertilizer release type from fertilizer input file
   integer,target,allocatable ::  iSoilDisturbType_col(:,:,:)                        !soil disturbance type, [-]
-  integer,target,allocatable ::  KoppenClimZone(:,:)                          !Koppen climate zone
+  integer,target,allocatable ::  KoppenClimZone_col(:,:)                          !Koppen climate zone
   integer,target,allocatable ::  IFLGV(:,:)                          !flag for irrigation criterion,0=SWC,1=canopy water potential
   integer,target,allocatable ::  IFLGS(:,:)                          !disturbance flag
   integer,target,allocatable ::  IFNHB(:,:)                          !banded NH4 fertilizer flag
@@ -45,7 +45,7 @@ contains
   implicit none
   allocate(IYTYP(0:2,366,JY,JX));IYTYP=0
   allocate(iSoilDisturbType_col(366,JY,JX));   iSoilDisturbType_col=0
-  allocate(KoppenClimZone(JY,JX));       KoppenClimZone=0
+  allocate(KoppenClimZone_col(JY,JX));       KoppenClimZone_col=0
   allocate(IFLGV(JY,JX));       IFLGV=0
   allocate(IFLGS(JY,JX));       IFLGS=0
   allocate(IFNHB(JY,JX));       IFNHB=0
@@ -76,7 +76,7 @@ contains
   implicit none
   call destroy(IYTYP)
   call destroy(iSoilDisturbType_col)
-  call destroy(KoppenClimZone)
+  call destroy(KoppenClimZone_col)
   call destroy(IFLGV)
   call destroy(IFLGS)
   call destroy(IFNHB)

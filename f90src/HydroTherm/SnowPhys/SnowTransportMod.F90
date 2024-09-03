@@ -1,7 +1,9 @@
 module SnowTransportMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use data_const_mod, only : spval => DAT_CONST_SPVAL
-  use EcoSimConst, only : DENSICE  
+  use data_kind_mod,  only: r8 => DAT_KIND_R8
+  use data_const_mod, only: spval => DAT_CONST_SPVAL
+  use EcoSimConst,    only: DENSICE
+  use EcoSIMCtrlMod,  only: lverb
+  use MiniMathMod,    only: fixEXflux
   use SnowPhysData
   use GridDataType
   use SnowDataType
@@ -101,23 +103,23 @@ implicit none
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
-            -trcs_3DTransp2MicP_3D(NTG,3,0,N2,N1)-trcs_3DTransp2MicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
-            -trcs_3DTransp2MacP(NTG,3,NUM(N2,N1),N2,N1)
+            -trcs_Transp2MicP_3D(NTG,3,0,N2,N1)-trcs_Transp2MicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
+            -trcs_Transp2MacP_3D(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
-            -trcs_3DTransp2MicP_3D(NTN,3,0,N2,N1)-trcs_3DTransp2MicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
-            -trcs_3DTransp2MacP(NTN,3,NUM(N2,N1),N2,N1)
+            -trcs_Transp2MicP_3D(NTN,3,0,N2,N1)-trcs_Transp2MicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
+            -trcs_Transp2MacP_3D(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         !add band flux
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -trcs_3DTransp2MicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -trcs_Transp2MicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_Transp2MacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
         DO NTS=0,ids_nuts
           trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
-            -trcs_3DTransp2MicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_3DTransp2MacP(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
+            -trcs_Transp2MicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_Transp2MacP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         IF(salt_model)THEN
@@ -139,7 +141,7 @@ implicit none
 !     WATER,GAS,SOLUTE,SALT FLUXES INTO SNOWPACK SURFACE
 !
     ELSEIF(LS.EQ.1)THEN
-      IF(abs(SnoXfer2SnoLay(LS,N2,N1))>0._r8)THEN
+      IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1)
@@ -162,14 +164,15 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DiagSnowChemMass(NY,NX)
+  subroutine DiagSnowChemMass(I,J,NY,NX)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8) :: SSW,ENGYW,WS
   integer :: L,nsalts
 
-
-  CALL ChemicalBySnowRedistribution(NY,NX)
+  if(lverb)write(*,*)'DiagSnowChemMass'
+  CALL ChemicalBySnowRedistribution(I,J,NY,NX)
   !
   !     UPDATE STATE VARIABLES WITH TOTAL FLUXES CALCULATED ABOVE
   !
@@ -186,11 +189,11 @@ implicit none
     WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
     ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow_snvr(L,NY,NX)
     HeatStore_lnd=HeatStore_lnd+ENGYW
-    TGasC_lnd=TGasC_lnd+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
-    TSoilO2G_lnd=TSoilO2G_lnd+trcg_solsml(idg_O2,L,NY,NX)
-    TGasN_lnd=TGasN_lnd+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
-    TDisolNH4_lnd=TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
+    TGasC_lnd=TGasC_lnd+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
+    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
+    TSoilO2G_lnd=TSoilO2G_lnd+trcg_solsml_snvr(idg_O2,L,NY,NX)
+    TGasN_lnd=TGasN_lnd+trcg_solsml_snvr(idg_N2,L,NY,NX)+trcg_solsml_snvr(idg_N2O,L,NY,NX)
+    TDisolNH4_lnd=TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
     tNO3_lnd=tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
     TDisolPi_lnd=TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
@@ -205,8 +208,9 @@ implicit none
   end subroutine DiagSnowChemMass  
 !------------------------------------------------------------------------------------------
 
-  subroutine ChemicalBySnowRedistribution(NY,NX)
+  subroutine ChemicalBySnowRedistribution(I,J,NY,NX)
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
 
   integer :: NTA,NTG,NTS
@@ -215,18 +219,24 @@ implicit none
 !
   IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
     DO NTG=idg_beg,idg_end-1
-      trcg_solsml(NTG,1,NY,NX)=trcg_solsml(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
+      trcg_solsml_snvr(NTG,1,NY,NX)=trcg_solsml_snvr(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
     ENDDO
+
+    !   write(116,*)I+J/24.,'beg611',trc_solml_vr(ids_NO3,0,NY,NX),trcn_QSS(ids_NO3,NY,NX),trcn_QSS(ids_NO2,NY,NX)
 
     DO NTS=ids_nut_beg,ids_nuts_end
       trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
     ENDDO
+
+    !   write(116,*)I+J/24.,'beg612',trc_solml_vr(ids_NO3,0,NY,NX),RNutMicbTransf_vr(ids_NO3,0,NY,NX),trcn_RChem_soil_vr(ids_NO3,0,NY,NX)
+
     IF(salt_model)THEN
       DO NTA=idsalt_beg,idsalt_end
         trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
       ENDDO
     ENDIF
   ENDIF
+
   end subroutine ChemicalBySnowRedistribution
 
 !------------------------------------------------------------------------------------------
@@ -246,30 +256,30 @@ implicit none
   D1202: DO NN=1,2
     !gaseous tracers
     DO NTG=idg_beg,idg_end-1
-      trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)+trcg_2DFloXSurRunoff(NTG,N,NN,N2,N1)
+      trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)+trcg_FloXSurRunoff_2D(NTG,N,NN,N2,N1)
     ENDDO
 
     !nutrient tracres
     DO NTN=ids_nut_beg,ids_nuts_end
-      trcn_TFloXSurRunoff(NTN,N2,N1)=trcn_TFloXSurRunoff(NTN,N2,N1)+trcn_2DFloXSurRunoff(NTN,N,NN,N2,N1)
+      trcn_TFloXSurRunoff_2D(NTN,N2,N1)=trcn_TFloXSurRunoff_2D(NTN,N2,N1)+trcn_FloXSurRunoff_2D(NTN,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
 
       DO NTG=idg_beg,idg_end-1
-        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_2DFloXSurRunoff(NTG,N,NN,N5,N4)
+        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5,N4)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TFloXSurRunoff(NTN,N2,N1)=trcn_TFloXSurRunoff(NTN,N2,N1)-trcn_2DFloXSurRunoff(NTN,N,NN,N5,N4)
+        trcn_TFloXSurRunoff_2D(NTN,N2,N1)=trcn_TFloXSurRunoff_2D(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5,N4)
       ENDDO
 
     ENDIF 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       DO NTG=idg_beg,idg_end-1
-        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_2DFloXSurRunoff(NTG,N,NN,N5B,N4B)
+        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5B,N4B)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TFloXSurRunoff(NTN,N2,N1)=trcn_TFloXSurRunoff(NTN,N2,N1)-trcn_2DFloXSurRunoff(NTN,N,NN,N5B,N4B)
+        trcn_TFloXSurRunoff_2D(NTN,N2,N1)=trcn_TFloXSurRunoff_2D(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5B,N4B)
       ENDDO
 
     ENDIF
@@ -344,25 +354,44 @@ implicit none
   ENDIF
 
   end subroutine MassFluxThruSnowRunoff
+!------------------------------------------------------------------------------------------
 
-  subroutine OverlandFlowThruSnow(NY,NX)
+  subroutine OverlandFlowThruSnow(I,J,NY,NX)
   implicit none 
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   integer :: NTSA,NTU,NTG
+  real(r8) :: dflx
 
     !    SOLUTES
 !  exclude NH3B
+  if(NX==5)write(111,*)I+J/24.,'beg18',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+
   DO NTG=idg_beg,idg_end-1
-    trc_solml_vr(NTG,0,NY,NX)=trc_solml_vr(NTG,0,NY,NX)+trcg_TFloXSurRunoff(NTG,NY,NX)
+    dflx=-trcg_TFloXSurRunoff(NTG,NY,NX)
+    call fixEXflux(trc_solml_vr(NTG,0,NY,NX),dflx)
+    trcg_TFloXSurRunoff(NTG,NY,NX)=-dflx
   ENDDO
 
+  if(NX==5)write(111,*)I+J/24.,'beg19',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+
+!  !   write(116,*)I+J/24.,'beg5xxxx1',trc_solml_vr(ids_NO3,0,NY,NX),trcn_TFloXSurRunoff_2D(ids_NO3,NY,NX)
+
   DO NTU=ids_nut_beg,ids_nuts_end
-    trc_solml_vr(NTU,0,NY,NX)=trc_solml_vr(NTU,0,NY,NX)+trcn_TFloXSurRunoff(NTU,NY,NX)
+    dflx=-trcn_TFloXSurRunoff_2D(NTU,NY,NX)
+    call fixEXflux(trc_solml_vr(NTU,0,NY,NX),dflx)
+    trcn_TFloXSurRunoff_2D(NTU,NY,NX)=-dflx
   ENDDO
+
+!  !   write(116,*)I+J/24.,'beg5xxxx2',trc_solml_vr(ids_NO3,0,NY,NX),trcn_TFloXSurRunoff_2D(ids_NO3,NY,NX)
+
+  if(NX==5)write(111,*)I+J/24.,'beg20',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,0,NY,NX)=trcSalt_solml(NTSA,0,NY,NX)+trcSalt_TQR(NTSA,NY,NX)
+      dflx=-trcSalt_TQR(NTSA,NY,NX)
+      call fixEXflux(trcSalt_solml_vr(NTSA,0,NY,NX),dflx)
+      trcSalt_TQR(NTSA,NY,NX)=-dflx
     ENDDO
   ENDIF
   end subroutine OverlandFlowThruSnow

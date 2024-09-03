@@ -1,4 +1,4 @@
-module NitroDisturbMod
+module SoilDisturbMod
 
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
@@ -316,12 +316,12 @@ module NitroDisturbMod
           do ids=ids_nut_beg,ids_nuts_end
             trc_solml_vr(ids,L,NY,NX)=DCORPC1*trc_solml_vr(ids,L,NY,NX)
           enddo
-          trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
-          trcp_salml(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
-          trcp_salml(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
-          trcp_salml(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
-          trcp_salml(idsp_HA,L,NY,NX)       = DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
-          trcp_salml(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_salml(idsp_CaH4P2O8,L,NY,NX)
+          trcx_solml_vr(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml_vr(idx_NH4,L,NY,NX)
+          trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)
+          trcp_saltpml_vr(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_FePO4,L,NY,NX)
+          trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)
+          trcp_saltpml_vr(idsp_HA,L,NY,NX)       = DCORPC1*trcp_saltpml_vr(idsp_HA,L,NY,NX)
+          trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
             FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
@@ -337,7 +337,7 @@ module NitroDisturbMod
 !    2+1.9274*VLiceMicP_vr(0,NY,NX)
 !     ELSE
 !     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
-!    2+1.9274*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_col(L,NY,NX))
+!    2+1.9274*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
 !     ENDIF
         IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
           DO NE=1,NumPlantChemElms
@@ -345,24 +345,24 @@ module NitroDisturbMod
           ENDDO
 
           HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
-          HydroSufDONFlx_col(NY,NX)=HydroSufDONFlx_col(NY,NX)+OMelm(ielmn)
-          HydroSufDOPFlx_col(NY,NX)=HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
+          HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)+OMelm(ielmn)
+          HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)+OMelm(ielmp)
           
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
+          Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
-          CO2GIN=CO2GIN-OMelm(ielmc)
-          OXYGIN=OXYGIN+2.667_r8*OMelm(ielmc)
+          SurfGas_CO2_lnd=SurfGas_CO2_lnd-OMelm(ielmc)
+          SurfGas_O2_lnd=SurfGas_O2_lnd+2.667_r8*OMelm(ielmc)
           OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)
 
           TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)+OMelm(ielmn)
           TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)+OMelm(ielmp)
-          CO2byFire_col(NY,NX)=CO2byFire_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
-          CH4byFire_col(NY,NX)=CH4byFire_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
-          O2byFire_col(NY,NX)=O2byFire_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
-          NH3byFire_col(NY,NX)=NH3byFire_col(NY,NX)-OMelm(ielmn)
-          N2ObyFire_col(NY,NX)=N2ObyFire_col(NY,NX)-0.0_r8
-          PO4byFire_col(NY,NX)=PO4byFire_col(NY,NX)-OMelm(ielmp)
-          Eco_NBP_col(NY,NX)=Eco_NBP_col(NY,NX)-OMelm(ielmc)
+          CO2byFire_CumYr_col(NY,NX)=CO2byFire_CumYr_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
+          CH4byFire_CumYr_col(NY,NX)=CH4byFire_CumYr_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
+          O2byFire_CumYr_col(NY,NX)=O2byFire_CumYr_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
+          NH3byFire_CumYr_col(NY,NX)=NH3byFire_CumYr_col(NY,NX)-OMelm(ielmn)
+          N2ObyFire_CumYr_col(NY,NX)=N2ObyFire_CumYr_col(NY,NX)-0.0_r8
+          PO4byFire_CumYr_col(NY,NX)=PO4byFire_CumYr_col(NY,NX)-OMelm(ielmp)
+          Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ENDIF
       ENDIF
     ENDDO D2950
@@ -371,4 +371,4 @@ module NitroDisturbMod
 !------------------------------------------------------------------------------------------
 
 
-end module NitroDisturbMod
+end module SoilDisturbMod

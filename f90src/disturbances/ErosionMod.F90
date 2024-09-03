@@ -21,7 +21,7 @@ module ErosionMod
   use GridDataType
   use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
+  use EcoSIMConfig, only : jcplx1=> jcplxcm1, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
   use EcoSIMConfig, only : column_mode
   implicit none
 
@@ -124,7 +124,7 @@ module ErosionMod
         DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM_vr(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
         SoilDetachRate=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
           ,DETW*EnergyImpact4ErosionM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
-          *FracSoiAsMicP(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
+          *FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
         RDTSED(NY,NX)=RDTSED(NY,NX)+SoilDetachRate
       ENDIF
 !
@@ -139,7 +139,7 @@ module ErosionMod
             CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
         
             DEPI=AMAX1(-SEDX,VLS(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
-              *FracVol4Erosion(NY,NX)*FracSoiAsMicP(NU(NY,NX),NY,NX)*dts_HeatWatTP)
+              *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
             RDTSED(NY,NX)=RDTSED(NY,NX)+DEPI
           ENDIF
         ELSE
@@ -156,11 +156,11 @@ module ErosionMod
           IF(CSEDX.GT.CSEDD)THEN
             DETI=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
               ,SoilDetachability4Erosion2(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
-              *FracVol4Erosion(NY,NX)*FracSoiAsMicP(NU(NY,NX),NY,NX)*dts_HeatWatTP)
+              *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
           ELSE
             IF(SEDX.GT.ZEROS(NY,NX))THEN
               DETI=AMAX1(-SEDX,VLS(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
-                *FracVol4Erosion(NY,NX)*FracSoiAsMicP(NU(NY,NX),NY,NX)*dts_HeatWatTP)
+                *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
             ELSE
               DETI=0._r8
             ENDIF
@@ -490,7 +490,7 @@ module ErosionMod
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
               DO NTX=idx_beg,idx_end
-                trcx_XER(NTX,N,2,N5,N4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                trcx_XER(NTX,N,2,N5,N4)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     PRECIPITATES
@@ -504,7 +504,7 @@ module ErosionMod
 !       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
               DO NTP=idsp_beg,idsp_end
-                trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     ORGANIC MATTER
@@ -650,7 +650,7 @@ module ErosionMod
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
                 DO NTX=idx_beg,idx_end
-                  trcx_XER(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                  trcx_XER(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
                 ENDDO
 !
 !     PRECIPITATES
@@ -664,7 +664,7 @@ module ErosionMod
 !       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
                 DO NTP=idsp_beg,idsp_end
-                  trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                  trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
                 ENDDO
 !
 !     ORGANIC MATTER
@@ -947,13 +947,13 @@ module ErosionMod
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
               DO NTX=idx_beg,idx_end
-                trcx_XER(NTX,N,NN,M5,M4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                trcx_XER(NTX,N,NN,M5,M4)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     PRECIPITATES
 !
               DO NTP=idsp_beg,idsp_end
-                trcp_ER(NTP,N,NN,M5,M4)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                trcp_ER(NTP,N,NN,M5,M4)=FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
               ENDDO
 !
 !     ORGANIC MATTER

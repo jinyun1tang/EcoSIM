@@ -7,7 +7,7 @@ implicit none
   CHARACTER(LEN=*), Private,PARAMETER :: MOD_FILENAME=&
   __FILE__
   real(r8), parameter :: XFRS=0.05_r8
-  real(r8), Parameter :: VFLWX=0.5
+  real(r8), Parameter :: VFLWX=0.5_r8           !default outflow in water for micropore-macropore exchange
 
   real(r8), allocatable :: trcg_VFloSnow(:)
   real(r8), allocatable :: trcn_band_VFloSnow(:)
@@ -31,7 +31,7 @@ implicit none
   real(r8), allocatable :: dom_FloXSurRunoff(:,:,:,:)
   real(r8), allocatable :: RBGCSinkG_vr(:,:,:,:)   !BGC sink for gaseous tracers
   real(r8), allocatable :: RBGCSinkS_vr(:,:,:,:)   !BGC sink for solute tracers
-  real(r8), allocatable :: trcg_RBLS(:,:,:,:)                      !
+  real(r8), allocatable :: trcg_advW_snvr(:,:,:,:) !gas flow by water advection in snow                     !
   real(r8), allocatable :: trcn_RBLS(:,:,:,:)                      !
   real(r8), allocatable :: RDOMFL0(:,:,:,:)                      !
   real(r8), allocatable :: RDOMFL1(:,:,:,:)                      !
@@ -47,9 +47,9 @@ implicit none
   real(r8), allocatable ::  trcg_SnowDrift(:,:,:)                        !
   real(r8), allocatable ::  trcn_SnowDrift(:,:,:)
   real(r8), allocatable ::  trcg_TFloXSurRunoff(:,:,:)
-  real(r8), allocatable ::  trcn_TFloXSurRunoff(:,:,:)
-  real(r8), allocatable ::  R3PorTSolFlx(:,:,:,:)          !total 3D micropore flux
-  real(r8), allocatable ::  R3PorTSoHFlx(:,:,:,:)          !total 3D macropore flux
+  real(r8), allocatable ::  trcn_TFloXSurRunoff_2D(:,:,:)
+  real(r8), allocatable ::  TR3MicPoreSolFlx_vr(:,:,:,:)          !total 3D micropore flux
+  real(r8), allocatable ::  TR3MacPoreSolFlx_vr(:,:,:,:)          !total 3D macropore flux
 
   real(r8), allocatable ::  GasDifc_vrc(:,:,:,:)
   real(r8), allocatable ::  SoluteDifusvty_vrc(:,:,:,:)
@@ -77,10 +77,10 @@ implicit none
   real(r8), allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)                    !
   real(r8), allocatable ::  DOMdiffusivity2_vr(:,:,:,:)                      !
 
-  real(r8), allocatable :: trcg_solsml2(:,:,:,:)
+  real(r8), allocatable :: trcg_solsml2_snvr(:,:,:,:)
   real(r8), allocatable :: trcn_solsml2(:,:,:,:)
 
-  real(r8), allocatable ::  trcg_TBLS(:,:,:,:)                      !
+  real(r8), allocatable ::  trcg_TBLS_snvr(:,:,:,:)                      !
   real(r8), allocatable ::  trcn_TBLS(:,:,:,:)
   real(r8), allocatable ::  dom_2DFloXSurRunoffM(:,:,:,:,:,:)                   !
   real(r8), allocatable ::  trcg_2DFloXSurRunoffM(:,:,:,:,:)                    !
@@ -96,13 +96,13 @@ implicit none
   real(r8), allocatable ::  trcn_2DFloXSurRunoffM(:,:,:,:,:)                    !
                   !
   real(r8), allocatable ::  RGasSSVol(:,:,:)     !soil surface gas volatization
-  real(r8), allocatable ::  RGasDSFlx(:,:,:,:)   !gas dissolution-volatilization
-  real(r8), allocatable ::  R3GasADFlx(:,:,:,:,:) !3D gas flux advection + diffusion
+  real(r8), allocatable ::  RGasDSFlx_vr(:,:,:,:)   !gas dissolution-volatilization
+  real(r8), allocatable ::  RGasADFlx_3D(:,:,:,:,:) !3D gas flux advection + diffusion
   real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)  !total 3D gas flux advection + diffusion
 
-  real(r8), allocatable :: R3PoreSoHFlx(:,:,:,:,:)        !3D macropore flux
-  real(r8), allocatable :: R3PoreSolFlx_vr(:,:,:,:,:)        !3D micropore flux
-  real(r8), allocatable :: RporeSoXFlx(:,:,:,:)        !Mac-mic pore exchange flux
+  real(r8), allocatable :: R3PoreSoHFlx_3D(:,:,:,:,:)        !3D macropore flux
+  real(r8), allocatable :: R3PoreSolFlx_3D(:,:,:,:,:)        !3D micropore flux
+  real(r8), allocatable :: RMac2MicSolFlx_vr(:,:,:,:)        !Mac-mic pore exchange flux
 !----------------------------------------------------------------------
 
 contains
@@ -123,7 +123,7 @@ contains
   allocate(DOM_MacpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_MacpTranspFlxM_3D=0._r8
   allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));    DOM_Transp2Micp_vr=0._r8
 
-  allocate(trcg_RBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_RBLS=0._r8
+  allocate(trcg_advW_snvr(idg_beg:idg_NH3,JS,JY,JX));   trcg_advW_snvr=0._r8
   allocate(trcn_RBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));   trcn_RBLS=0._r8
   allocate(RDOMFL0(idom_beg:idom_end,1:NumOfLitrCmplxs,JY,JX));  RDOMFL0=0._r8
   allocate(RDOMFL1(idom_beg:idom_end,1:NumOfLitrCmplxs,JY,JX));  RDOMFL1=0._r8
@@ -140,7 +140,7 @@ contains
   allocate(trcg_SnowDrift(idg_beg:idg_NH3,JY,JX));      trcg_SnowDrift=0._r8
   allocate(trcn_SnowDrift(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_SnowDrift=0._r8
   allocate(trcg_TFloXSurRunoff(idg_beg:idg_NH3,JY,JX)); trcg_TFloXSurRunoff=0._r8
-  allocate(trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TFloXSurRunoff=0._r8
+  allocate(trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TFloXSurRunoff_2D=0._r8
 
   allocate(CDOM_MicP1(idom_beg:idom_end,1:jcplx)); CDOM_MicP1=0._r8
   allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
@@ -167,52 +167,52 @@ contains
   allocate(RBGCSinkG_vr(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG_vr=0._r8
   allocate(RBGCSinkS_vr(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkS_vr=0._r8
 
-  allocate(trcg_Ebu_vr(idg_beg:idg_end,JZ,JY,JX));   trcg_Ebu_vr=0._r8
-  allocate(trcg_FloXSurRunoff(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff=0._r8
-  allocate(trcn_FloXSurRunoff(ids_nut_beg:ids_nuts_end,JV,JH));     trcn_FloXSurRunoff=0._r8
-  allocate(DOM_MacP2(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_MacP2=0._r8
-  allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
+  allocate(trcg_Ebu_vr(idg_beg:idg_end,JZ,JY,JX));   trcg_Ebu_vr                        = 0._r8
+  allocate(trcg_FloXSurRunoff(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff           = 0._r8
+  allocate(trcn_FloXSurRunoff(ids_nut_beg:ids_nuts_end,JV,JH));     trcn_FloXSurRunoff  = 0._r8
+  allocate(DOM_MacP2(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_MacP2                     = 0._r8
+  allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx = 0._r8
 
-  allocate(DOMdiffusivity2_vr(idom_beg:idom_end,0:JZ,JY,JX)); DOMdiffusivity2_vr=0._r8
+  allocate(DOMdiffusivity2_vr(idom_beg:idom_end,0:JZ,JY,JX)); DOMdiffusivity2_vr = 0._r8
 
-  allocate(trcg_solsml2(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml2=0._r8
-  allocate(trcn_solsml2(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2=0._r8
+  allocate(trcg_solsml2_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml2_snvr = 0._r8
+  allocate(trcn_solsml2(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2  = 0._r8
 
-  allocate(trcg_TBLS(idg_beg:idg_NH3,JS,JY,JX));   trcg_TBLS=0._r8
-  allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS=0._r8
+  allocate(trcg_TBLS_snvr(idg_beg:idg_NH3,JS,JY,JX));   trcg_TBLS_snvr = 0._r8
+  allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS     = 0._r8
 
-  allocate(dom_2DFloXSurRunoffM(idom_beg:idom_end,1:jcplx,2,2,JV,JH));dom_2DFloXSurRunoffM=0._r8
-  allocate(trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,2,2,JV,JH));  trcg_2DFloXSurRunoffM=0._r8
+  allocate(dom_2DFloXSurRunoffM(idom_beg:idom_end,1:jcplx,2,2,JV,JH));dom_2DFloXSurRunoffM = 0._r8
+  allocate(trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,2,2,JV,JH));  trcg_2DFloXSurRunoffM       = 0._r8
 
   allocate(RDFR_gas(idg_beg:idg_NH3,JY,JX));      RDFR_gas=0._r8
 
   allocate(trc_gasml2_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2_vr(:,:,:,:) = 0._r8
   allocate(trc_solml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2_vr(:,:,:,:) = 0._r8
-  allocate(trc_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2_vr(:,:,:,:)       = 0._r8
+  allocate(trc_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2_vr(:,:,:,:) = 0._r8
 
   allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift                    = 0._r8
   allocate(trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoffM = 0._r8
-  allocate(R3GasADFlx(idg_beg:idg_NH3,3,JD,JV,JH));R3GasADFlx                                 = 0._r8
+  allocate(RGasADFlx_3D(idg_beg:idg_NH3,3,JD,JV,JH));RGasADFlx_3D                             = 0._r8
   allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_Flx_vr                     = 0._r8
 
   allocate(DOM_Adv2MicP_flx(idom_beg:idom_end,1:jcplx));DOM_Adv2MicP_flx = 0._r8
 
-  allocate(RGasDSFlx(idg_beg:idg_end,0:JZ,JY,JX)); RGasDSFlx = 0._r8
-  allocate(RGasSSVol(idg_beg:idg_end,JY,JX)); RGasSSVol      = 0._r8
+  allocate(RGasDSFlx_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGasDSFlx_vr = 0._r8
+  allocate(RGasSSVol(idg_beg:idg_end,JY,JX)); RGasSSVol            = 0._r8
 
   allocate(trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,2,JV,JH)); trcn_2DSnowDrift = 0._r8
 
 
-  allocate(R3PoreSoHFlx(ids_beg:ids_end,3,JD,JV,JH));R3PoreSoHFlx            = 0._r8
-  allocate(R3PoreSolFlx_vr(ids_beg:ids_end,3,0:JD,JV,JH));R3PoreSolFlx_vr    = 0._r8
-  allocate(RporeSoXFlx(ids_beg:ids_end,JZ,JY,JX));RporeSoXFlx                = 0._r8
-  allocate(R3PorTSolFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSolFlx              = 0._r8
-  allocate(R3PorTSoHFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSoHFlx              = 0._r8
-  allocate(trcg_VFloSnow(idg_beg:idg_end));trcg_VFloSnow                     = 0._r8
-  allocate(trcn_band_VFloSnow(ids_nutb_beg:ids_nutb_end));trcn_band_VFloSnow = 0._r8
-  allocate(trcn_soil_VFloSnow(ids_nut_beg:ids_nuts_end));trcn_soil_VFloSnow  = 0._r8
-  allocate(DOM_Adv2MacP_flx(idom_beg:idom_end,1:jcplx)); DOM_Adv2MacP_flx=0._r8
-  allocate(Difus_Micp_flx_DOM(idom_beg:idom_end,1:jcplx)); Difus_Micp_flx_DOM=0._r8
+  allocate(R3PoreSoHFlx_3D(ids_beg:ids_end,3,JD,JV,JH));R3PoreSoHFlx_3D       = 0._r8
+  allocate(R3PoreSolFlx_3D(ids_beg:ids_end,3,0:JD,JV,JH));R3PoreSolFlx_3D     = 0._r8
+  allocate(RMac2MicSolFlx_vr(ids_beg:ids_end,JZ,JY,JX));RMac2MicSolFlx_vr     = 0._r8
+  allocate(TR3MicPoreSolFlx_vr(ids_beg:ids_end,JZ,JY,JX));TR3MicPoreSolFlx_vr = 0._r8
+  allocate(TR3MacPoreSolFlx_vr(ids_beg:ids_end,JZ,JY,JX));TR3MacPoreSolFlx_vr = 0._r8
+  allocate(trcg_VFloSnow(idg_beg:idg_end));trcg_VFloSnow                      = 0._r8
+  allocate(trcn_band_VFloSnow(ids_nutb_beg:ids_nutb_end));trcn_band_VFloSnow  = 0._r8
+  allocate(trcn_soil_VFloSnow(ids_nut_beg:ids_nuts_end));trcn_soil_VFloSnow   = 0._r8
+  allocate(DOM_Adv2MacP_flx(idom_beg:idom_end,1:jcplx)); DOM_Adv2MacP_flx     = 0._r8
+  allocate(Difus_Micp_flx_DOM(idom_beg:idom_end,1:jcplx)); Difus_Micp_flx_DOM = 0._r8
 
   end subroutine InitTransfrData
 
@@ -239,7 +239,7 @@ contains
   call destroy(trcs_RFL1)
   call destroy(trcn_RFL0)
   call destroy(DOM_XPoreTransp_flx)
-  call destroy(trcg_RBLS)
+  call destroy(trcg_advW_snvr)
   call destroy(trcn_RBLS)
   call destroy(trcg_Ebu_vr)
   call destroy(RBGCSinkG_vr)
@@ -248,10 +248,10 @@ contains
   call destroy(trcg_FloXSurRunoff)
   call destroy(dom_TFloXSurRunoff)
   call destroy(trcg_TFloXSurRunoff)
-  call destroy(trcn_TFloXSurRunoff)
+  call destroy(trcn_TFloXSurRunoff_2D)
   call destroy(trcg_SnowDrift)
   call destroy(trcn_SnowDrift)
-  call destroy(R3PorTSolFlx)
+  call destroy(TR3MicPoreSolFlx_vr)
   call destroy(trcg_VLWatMicP)
   call destroy(trcn_FloXSurRunoff)
   call destroy(DH2GG)
@@ -269,17 +269,17 @@ contains
   call destroy(RXR_gas)
 
   call destroy(DOMdiffusivity2_vr)
-  call destroy(R3GasADFlx)
-  call destroy(trcg_solsml2)
+  call destroy(RGasADFlx_3D)
+  call destroy(trcg_solsml2_snvr)
   call destroy(trcn_solsml2)
   call destroy(trcn_2DFloXSurRunoffM)
-  call destroy(trcg_TBLS)
+  call destroy(trcg_TBLS_snvr)
   call destroy(trcn_TBLS)
   call destroy(trcg_RFL0)
   call destroy(trcg_2DSnowDrift)
   call destroy(Difus_Micp_flx_DOM)
   call destroy(Difus_Macp_flx_DOM)
-  call destroy(R3PorTSoHFlx)
+  call destroy(TR3MacPoreSolFlx_vr)
 
   call destroy(RDFR_gas)
   call destroy(DOM_MacP2)
@@ -290,12 +290,12 @@ contains
   call destroy(trcn_band_VFloSnow)
   call destroy(trcn_soil_VFloSnow)
   call destroy(trcg_2DFloXSurRunoffM)
-  call destroy(RGasDSFlx)
+  call destroy(RGasDSFlx_vr)
   call destroy(trcn_2DSnowDrift)
   call destroy(RGasSSVol)
-  call destroy(R3PoreSoHFlx)
-  call destroy(R3PoreSolFlx_vr)
-  call destroy(RporeSoXFlx)
+  call destroy(R3PoreSoHFlx_3D)
+  call destroy(R3PoreSolFlx_3D)
+  call destroy(RMac2MicSolFlx_vr)
   call destroy(CDOM_MacP1)
   call destroy(CDOM_MacP2)
   call destroy(DOM_Adv2MicP_flx)
