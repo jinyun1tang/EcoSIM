@@ -953,7 +953,7 @@ module Hour1Mod
         D50=1.0_r8*CCLAY(NU(NY,NX),NY,NX)+10.0_r8*CSILT(NU(NY,NX),NY,NX) &
           +100.0_r8*CSAND(NU(NY,NX),NY,NX)+100.0_r8*CORGM
         ZD50=0.041*(ppmc*D50)**0.167_r8
-        SoiSurfRoughness(NY,NX)=SoiSurfRoughnesst0(NY,NX)+ZD50+1.0_r8*VLitR(NY,NX)/AREA(3,0,NY,NX)
+        SoiSurfRoughness(NY,NX)=SoiSurfRoughnesst0(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
         CER(NY,NX)=((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER(NY,NX)=((D50+5.0_r8)/300.0_r8)**0.25_r8
 
@@ -1445,41 +1445,37 @@ module Hour1Mod
 !
   !write(*,*) "In GetSurfResidualProperties: "
   VxcessWatLitR=AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))
-  VGeomLayer_vr(0,NY,NX)=VxcessWatLitR+VLitR(NY,NX)
-!  write(113,*)I+J/24.,VGeomLayer_vr(0,NY,NX),VxcessWatLitR,VLitR(NY,NX)
+  VGeomLayer_vr(0,NY,NX)=VxcessWatLitR+VLitR_col(NY,NX)
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    VLSoilPoreMicP_vr(0,NY,NX)=VGeomLayer_vr(0,NY,NX)
-    SoilMicPMassLayer(0,NY,NX)=MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
-    VLMicP_vr(0,NY,NX)=AZMAX1(VLitR(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
-    VLsoiAirP_vr(0,NY,NX)=AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
-    IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-      POROS(0,NY,NX)=VLMicP_vr(0,NY,NX)/VLitR(NY,NX)
-      !write(*,*) "VLitR gt 0 - POROS(0,NY,NX) = ", POROS(0,NY,NX)
-      THETW_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VLitR(NY,NX)))
-      THETI_col(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLiceMicP_vr(0,NY,NX)/VLitR(NY,NX)))
-      ThetaAir_vr(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VLsoiAirP_vr(0,NY,NX)/VLitR(NY,NX)))
+    VLSoilPoreMicP_vr(0,NY,NX) = VGeomLayer_vr(0,NY,NX)
+    SoilMicPMassLayer(0,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
+    VLMicP_vr(0,NY,NX)         = AZMAX1(VLitR_col(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
+    VLsoiAirP_vr(0,NY,NX)      = AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
+    IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
+      POROS(0,NY,NX)       = VLMicP_vr(0,NY,NX)/VLitR_col(NY,NX)
+      THETW_vr(0,NY,NX)    = AZMAX1(AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VLitR_col(NY,NX)))
+      THETI_col(0,NY,NX)   = AZMAX1(AMIN1(1.0_r8,VLiceMicP_vr(0,NY,NX)/VLitR_col(NY,NX)))
+      ThetaAir_vr(0,NY,NX) = AZMAX1(AMIN1(1.0_r8,VLsoiAirP_vr(0,NY,NX)/VLitR_col(NY,NX)))
     ELSE
-      POROS(0,NY,NX)=1.0_r8
-      !write(*,*) "VLitR else - POROS(0,NY,NX) = ", POROS(0,NY,NX)
-      THETW_vr(0,NY,NX)=0.0_r8
-      THETI_col(0,NY,NX)=0.0_r8
-      ThetaAir_vr(0,NY,NX)=0.0_r8
+      POROS(0,NY,NX)       = 1.0_r8
+      THETW_vr(0,NY,NX)    = 0.0_r8
+      THETI_col(0,NY,NX)   = 0.0_r8
+      ThetaAir_vr(0,NY,NX) = 0.0_r8
     ENDIF
     TVOLWI=VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
-      VWatLitrZ=VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
-      VOLIRZ=VLiceMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
-      XVOLW0=AZMAX1(VLWatMicP_vr(0,NY,NX)-VWatLitrZ)/AREA(3,NU(NY,NX),NY,NX)
-      XVOLI0=AZMAX1(VLiceMicP_vr(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
+      VWatLitrZ = VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
+      VOLIRZ    = VLiceMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
+      XVOLW0    = AZMAX1(VLWatMicP_vr(0,NY,NX)-VWatLitrZ)/AREA(3,NU(NY,NX),NY,NX)
+      XVOLI0    = AZMAX1(VLiceMicP_vr(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
     ELSE
       XVOLW0=0.0_r8
       XVOLI0=0.0_r8
     ENDIF
     DPTH0(NY,NX)=XVOLW0+XVOLI0
-
     DLYR(3,0,NY,NX)=VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
-    IF(VLitR(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR(NY,NX)
+    IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR_col(NY,NX)
       IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
         PSISoilMatricP_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR)) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
@@ -1503,24 +1499,23 @@ module Hour1Mod
       ENDDO
 
     ELSE
-      PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
-      trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
+      PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+      trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0.0_r8
     ENDIF
   ELSE
-    VLSoilPoreMicP_vr(0,NY,NX)=0.0_r8
-    SoilMicPMassLayer(0,NY,NX)=0.0_r8
-    VLMicP_vr(0,NY,NX)=0.0_r8
-    VLsoiAirP_vr(0,NY,NX)=0.0_r8
-    POROS(0,NY,NX)=1.0
-    DLYR(3,0,NY,NX)=0.0_r8
-    THETW_vr(0,NY,NX)=0.0_r8
-    THETI_col(0,NY,NX)=0.0_r8
-    ThetaAir_vr(0,NY,NX)=1.0
-    VWatLitRHoldCapcity_col(NY,NX)=0.0_r8
-    PSISoilMatricP_vr(0,NY,NX)=PSISoilMatricP_vr(NU(NY,NX),NY,NX)
-
-    trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
-    trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)=0.0_r8
+    VLSoilPoreMicP_vr(0,NY,NX)     = 0.0_r8
+    SoilMicPMassLayer(0,NY,NX)     = 0.0_r8
+    VLMicP_vr(0,NY,NX)             = 0.0_r8
+    VLsoiAirP_vr(0,NY,NX)          = 0.0_r8
+    POROS(0,NY,NX)                 = 1.0_r8
+    DLYR(3,0,NY,NX)                = 0.0_r8
+    THETW_vr(0,NY,NX)              = 0.0_r8
+    THETI_col(0,NY,NX)             = 0.0_r8
+    ThetaAir_vr(0,NY,NX)           = 1.0_r8
+    VWatLitRHoldCapcity_col(NY,NX) = 0.0_r8
+    PSISoilMatricP_vr(0,NY,NX)     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+    trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0.0_r8
+    trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)        = 0.0_r8
   ENDIF
   end subroutine GetSurfResidualProperties
 
@@ -2414,10 +2409,10 @@ module Hour1Mod
       ENDDO
 
       VWatLitRHoldCapcity_col(NY,NX)=AZMAX1(VWatLitRHoldCapcity0)
-      VLitR(NY,NX)=AZMAX1(VLitR0*ppmc)
+      VLitR_col(NY,NX)=AZMAX1(VLitR0*ppmc)
 
-      IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
-        FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR(NY,NX)
+      IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
+        FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR_col(NY,NX)
       ELSE
         FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
       ENDIF

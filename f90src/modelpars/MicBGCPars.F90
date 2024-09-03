@@ -102,13 +102,14 @@ contains
   !organic matter is grouped into five complexes, including woody(1),
   ! non-woody(2), manure(3), litter, POC(4) and humus(5) (g Mg-1)
 
-  this%ndbiomcp=NumDeadMicrbCompts  !number of necrobiomass components
-  this%nlbiomcp=NumLiveMicrbCompts  !number of living biomass components
+  this%ndbiomcp = NumDeadMicrbCompts  !number of necrobiomass components
+  this%nlbiomcp = NumLiveMicrbCompts  !number of living biomass components
   
-  this%jcplx=jcplxc         !# of microbe-substrate complexes
-  this%jsken=jskenc         !# of kinetic components of the substrates
-  this%jguilds=nmicbguilds
-  this%NumMicbFunGrupsPerCmplx=NumMicbFunGrupsPerCmplx
+  this%jcplx                   = jcplxc         !# of microbe-substrate complexes
+  this%jsken                   = jskenc         !# of kinetic components of the substrates
+  this%jguilds                 = nmicbguilds
+  this%NumMicbFunGrupsPerCmplx = NumMicbFunGrupsPerCmplx
+
   !woody, non_woody litter and manure are defined as litter
   allocate(this%is_litter(1:this%jcplx));this%is_litter(:)=.false.
   allocate(this%is_finelitter(1:this%jcplx));this%is_finelitter(:)=.false.
@@ -120,77 +121,77 @@ contains
   this%is_litter(this%k_fine_litr) = .true.
   this%is_litter(this%k_manure)    = .true.
 
-  this%iprotein =1
-  this%icarbhyro=2
-  this%icellulos=3
-  this%ilignin  =4
+  this%iprotein  = 1
+  this%icarbhyro = 2
+  this%icellulos = 3
+  this%ilignin   = 4
 
-  this%NumOfLitrCmplxs=this%k_manure
-  this%k_POM=this%k_manure+1
-  this%k_humus=this%k_POM+1
+  this%NumOfLitrCmplxs = this%k_manure
+  this%k_POM           = this%k_manure+1
+  this%k_humus         = this%k_POM+1
   
-  this%kiname(0)='protein'
-  this%kiname(1)='carbhydro'
-  this%kiname(2)='cellulose'
-  this%kiname(3)='lignin'
-  this%cplxname(1)='woodylitr'
-  this%cplxname(2)='nwoodylit'
-  this%cplxname(3)='manure'
-  this%cplxname(4)='pom'
-  this%cplxname(5)='humus'
-  this%hmicname(1)='aerohetrob'
-  this%hmicname(2)='anerofaclb'
-  this%hmicname(3)='aerofungi'
-  this%hmicname(4)='aneroferm'
-  this%hmicname(5)='acetMicBiome_colhg'
-  this%hmicname(6)='aeron2fix'
-  this%hmicname(7)='aneron2fix'
-  this%amicname(1)='amoniaoxib'
-  this%amicname(2)='nititeoxib'
-  this%amicname(3)='aeromethtp'
-  this%amicname(5)='hydromethg'
-  this%amicname(4)='null'
-  this%amicname(6)='null'
-  this%amicname(7)='null'
-  this%micresb(0)='labile'
-  this%micresb(1)='resist'
-  this%micbiom(1)='labile'
-  this%micbiom(2)='resist'
-  this%micbiom(3)='active'
+  this%kiname(0)   = 'protein'
+  this%kiname(1)   = 'carbhydro'
+  this%kiname(2)   = 'cellulose'
+  this%kiname(3)   = 'lignin'
+  this%cplxname(1) = 'woodylitr'
+  this%cplxname(2) = 'nwoodylit'
+  this%cplxname(3) = 'manure'
+  this%cplxname(4) = 'pom'
+  this%cplxname(5) = 'humus'
+  this%hmicname(1) = 'aerohetrob'
+  this%hmicname(2) = 'anerofaclb'
+  this%hmicname(3) = 'aerofungi'
+  this%hmicname(4) = 'aneroferm'
+  this%hmicname(5) = 'acetMicBiome_colhg'
+  this%hmicname(6) = 'aeron2fix'
+  this%hmicname(7) = 'aneron2fix'
+  this%amicname(1) = 'amoniaoxib'
+  this%amicname(2) = 'nititeoxib'
+  this%amicname(3) = 'aeromethtp'
+  this%amicname(5) = 'hydromethg'
+  this%amicname(4) = 'null'
+  this%amicname(6) = 'null'
+  this%amicname(7) = 'null'
+  this%micresb(0)  = 'labile'
+  this%micresb(1)  = 'resist'
+  this%micbiom(1)  = 'labile'
+  this%micbiom(2)  = 'resist'
+  this%micbiom(3)  = 'active'
 
   call this%Initallocate()
 
 !set up functional group ids
 ! five om-complexes
-  this%mid_Aerob_HeteroBacter=1
-  this%mid_Facult_DenitBacter=2
-  this%mid_Aerob_Fungi=3
-  this%mid_fermentor=4
-  this%mid_AcetoMethanogArchea=5
-  this%mid_aerob_N2Fixer=6
-  this%mid_Anaerob_N2Fixer=7
+  this%mid_Aerob_HeteroBacter  = 1
+  this%mid_Facult_DenitBacter  = 2
+  this%mid_Aerob_Fungi         = 3
+  this%mid_fermentor           = 4
+  this%mid_AcetoMethanogArchea = 5
+  this%mid_aerob_N2Fixer       = 6
+  this%mid_Anaerob_N2Fixer     = 7
 
-  this%is_aerobic_hetr(this%mid_Aerob_HeteroBacter)=.true.
-  this%is_aerobic_hetr(this%mid_Facult_DenitBacter)=.true.
-  this%is_aerobic_hetr(this%mid_Aerob_Fungi)=.true.
-  this%is_aerobic_hetr(this%mid_aerob_N2Fixer)=.true.
+  this%is_aerobic_hetr(this%mid_Aerob_HeteroBacter) = .true.
+  this%is_aerobic_hetr(this%mid_Facult_DenitBacter) = .true.
+  this%is_aerobic_hetr(this%mid_Aerob_Fungi)        = .true.
+  this%is_aerobic_hetr(this%mid_aerob_N2Fixer)      = .true.
 
-  this%is_anaerobic_hetr(this%mid_fermentor)=.true.
-  this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer)=.true.
+  this%is_anaerobic_hetr(this%mid_fermentor)       = .true.
+  this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer) = .true.
 !the autotrophic complex
-  this%mid_AmmoniaOxidBacter=1
-  this%mid_NitriteOxidBacter=2
-  this%mid_AerobicMethanotrofBacter=3
-  this%mid_H2GenoMethanogArchea=5
+  this%mid_AmmoniaOxidBacter        = 1
+  this%mid_NitriteOxidBacter        = 2
+  this%mid_AerobicMethanotrofBacter = 3
+  this%mid_H2GenoMethanogArchea     = 5
 
-  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)=.True.
-  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)=.True.
-  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter)=.True.
-  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)=.True.
+  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .True.
+  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .True.
+  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .True.
+  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .True.
 
-  this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)=.true.
-  this%is_CO2_autotroph(this%mid_NitriteOxidBacter)=.true.
-  this%is_CO2_autotroph(this%mid_H2GenoMethanogArchea)=.true.
+  this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)    = .true.
+  this%is_CO2_autotroph(this%mid_NitriteOxidBacter)    = .true.
+  this%is_CO2_autotroph(this%mid_H2GenoMethanogArchea) = .true.
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -237,6 +238,7 @@ contains
      ,0.001,0.005,0.001,0.005/),r8),shape(ORCI))
 
   DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
+
   SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8,7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
     ,7.5_r8,7.5_r8,1.5_r8,0.5_r8,0.05_r8,0.00_r8,0.00_r8,0.00_r8 &
     ,0.05_r8,0.0167_r8,0.00_r8,0.00_r8/),shape(sposc))

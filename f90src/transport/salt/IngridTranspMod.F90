@@ -265,7 +265,7 @@ module IngridTranspMod
             VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
             VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow_snvr(L,NY,NX)))
           ELSE
-            VFLWR=FracSurfByLitR(NY,NX)
+            VFLWR=FracSurfByLitR_col(NY,NX)
             VFLWS=FracSurfBareSoil_col(NY,NX)
           ENDIF
           VFLWPO4=VFLWS*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
@@ -466,7 +466,7 @@ module IngridTranspMod
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
   DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
-  TORT0=TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR(NY,NX)
+  TORT0=TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR_col(NY,NX)
   DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
   TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)
   TORTL=AMIN1(1.0_r8,(TORT0+TORT1)/(DLYR0+DLYR1))

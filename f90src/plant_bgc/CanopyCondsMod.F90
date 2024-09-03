@@ -20,8 +20,6 @@ module CanopyCondsMod
   real(r8), parameter :: StalkPARAbsorpty=1.0_r8-StalkAlbedo4PARRad
   real(r8), parameter :: StalkClumpFactor=0.5_r8           !stalk clumping factor,FORGW=minimum SOC or organic soil (g Mg-1)
 
-  integer :: curday
-
   contains
 
   subroutine CanopyConditionModel(I,J,DepthSurfWatIce)
@@ -29,10 +27,9 @@ module CanopyCondsMod
   integer, intent(in) :: I,J
   real(r8), intent(in) :: DepthSurfWatIce !water+ice depth at surface
 
-  curday=I
-  call MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce)
+  call DivideCanopyDepthByLAI(I,J)
 
-  call DivideCanopyDepthByLAI()
+  call MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce)
 
   call CalcBoundaryLayerProperties(DepthSurfWatIce)
 
@@ -49,7 +46,7 @@ module CanopyCondsMod
   REAL(R8) :: ZZ
 !     begin_execution
   associate(                                                 &
-    WindSpeedAtm_col           => plt_site%WindSpeedAtm_col,         &
+    WindSpeedAtm_col       => plt_site%WindSpeedAtm_col,     &
     ZERO                   => plt_site%ZERO,                 &
     AREA3                  => plt_site%AREA3,                &
     KoppenClimZone         => plt_site%KoppenClimZone,       &
@@ -67,7 +64,7 @@ module CanopyCondsMod
     VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,  &
     CanopyHeight_col       => plt_morph%CanopyHeight_col,    &
     StemArea_col           => plt_morph%StemArea_col,        &
-    CanopyLeafArea_col     => plt_morph%CanopyLeafArea_col  &
+    CanopyLeafArea_col     => plt_morph%CanopyLeafArea_col   &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -77,7 +74,7 @@ module CanopyCondsMod
 !     ZZ=reference height for wind speed
 !
   ARLSC=CanopyLeafArea_col+StemArea_col
-  IF(ARLSC.GT.ZEROS.AND.CanopyHeight_col.GE.SnowDepth-ZERO.AND.CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
+  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
     ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5_r8*ARLSG)
     ZY=1.0_r8-ZX
@@ -117,9 +114,9 @@ module CanopyCondsMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DivideCanopyDepthByLAI()
+  subroutine DivideCanopyDepthByLAI(I,J)
   implicit none
-
+  integer, intent(in) :: I,J
   real(r8) :: ZL1(0:NumOfCanopyLayers1)
   real(r8) :: AreaInterval,AreaL
   real(r8) :: ARX
@@ -149,12 +146,12 @@ module CanopyCondsMod
   D9685: DO NZ=1,NP
     CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
   ENDDO D9685  
-  CanopyHeightZ_col(NumOfCanopyLayers1)=CanopyHeight_col+0.01_r8
-  ZL1(NumOfCanopyLayers1)=CanopyHeightZ_col(NumOfCanopyLayers1)
-  ZL1(0)=0.0_r8
+  CanopyHeightZ_col(NumOfCanopyLayers1) = CanopyHeight_col+0.01_r8
+  ZL1(NumOfCanopyLayers1)               = CanopyHeightZ_col(NumOfCanopyLayers1)
+  ZL1(0)                                = 0.0_r8
   !divide total are into NumOfCanopyLayers1
   AreaInterval=(CanopyLeafArea_col+StemArea_col)/NumOfCanopyLayers1
-
+  
   IF(AreaInterval.GT.ZEROS)THEN
     D2765: DO L=NumOfCanopyLayers1,2,-1
       AreaL=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)
@@ -326,6 +323,7 @@ module CanopyCondsMod
 
   LeafStalkArea_col=0.0_r8
   D1135: DO NZ=1,NP
+!    write(110,*)I+J/24.,CanopyHeightZ_col(1-1),SnowDepth-ZERO, DepthSurfWatIce-ZERO
     LeafStalkArea_pft(NZ)=0.0_r8
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumOfCanopyLayers1    
@@ -334,33 +332,33 @@ module CanopyCondsMod
           !above snow depth and above water/ice surface
           !add all nodes over a branch
           D1130: DO K=1,MaxNodesPerBranch1
-            LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
-            LeafStalkArea_col=LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
+            LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
+            LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
           ENDDO D1130
           !add stem/stalk area
-          LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
-          LeafStalkArea_col=LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
+          LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
+          LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
         ENDIF
       enddo
     enddo
   ENDDO D1135
-    
+
   IF(SineSunInclAngle_col.GT.ZERO)THEN
     RadSWSolarBeam_col =RadSWDirect_col*SineSunInclAngle_col+RadSWDiffus_col*TotSineSkyAngles_grd
     RadPARSolarBeam_col=RadPARDirect_col*SineSunInclAngle_col+RadPARDiffus_col*TotSineSkyAngles_grd
   ELSE
-    RadSWDirect_col=0.0_r8
-    RadSWDiffus_col=0.0_r8
-    RadPARDirect_col=0.0_r8
-    RadPARDiffus_col=0.0_r8
-    RadSWSolarBeam_col=0.0_r8
-    RadPARSolarBeam_col=0.0_r8
+    RadSWDirect_col     = 0.0_r8
+    RadSWDiffus_col     = 0.0_r8
+    RadPARDirect_col    = 0.0_r8
+    RadPARDiffus_col    = 0.0_r8
+    RadSWSolarBeam_col  = 0.0_r8
+    RadPARSolarBeam_col = 0.0_r8
   ENDIF
   !compute leaf clumping factor
   D1025: DO NZ=1,NP
-    RadSWbyCanopy_pft(NZ)=0.0_r8
-    RadPARbyCanopy_pft(NZ)=0.0_r8
-    ClumpFactorNow_pft(NZ)=ClumpFactor_pft(NZ)*(1.0_r8-0.025_r8*CanopyLeafArea_pft(NZ)/AREA3(NU))
+    RadSWbyCanopy_pft(NZ)  = 0.0_r8
+    RadPARbyCanopy_pft(NZ) = 0.0_r8
+    ClumpFactorNow_pft(NZ) = ClumpFactor_pft(NZ)*(1.0_r8-0.025_r8*CanopyLeafArea_pft(NZ)/AREA3(NU))
   ENDDO D1025
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
@@ -373,10 +371,10 @@ module CanopyCondsMod
   !     0.2618=pi/12 (hrs), 4.7124=1.5*pi=270 degree
   IF(SineSunInclAngle_col.GT.ZERO)THEN
     !the solar azimuth angle is computed according to north hemisphere,
-    SolarAzimuthAngle=PICON*(SolarNoonHour_col-J)/12._r8+1.5_r8*PICON
-    CoSineSunInclAngle_col=SQRT(1.0_r8-SineSunInclAngle_col**2._r8)
-    DGAZI=COS(GroundSurfAzimuth_col-SolarAzimuthAngle)
-    GrndIncidSolarAngle=AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col*SineSunInclAngle_col+&
+    SolarAzimuthAngle      = PICON*(SolarNoonHour_col-J)/12._r8+1.5_r8*PICON
+    CoSineSunInclAngle_col = SQRT(1.0_r8-SineSunInclAngle_col**2._r8)
+    DGAZI                  = COS(GroundSurfAzimuth_col-SolarAzimuthAngle)
+    GrndIncidSolarAngle    = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col*SineSunInclAngle_col+&
       SineGrndSlope_col*CoSineSunInclAngle_col*DGAZI))
 
     IF(LeafStalkArea_col.GT.0.0_r8)THEN
@@ -406,9 +404,9 @@ module CanopyCondsMod
         LeafAzimuthAngle=SolarAzimuthAngle+(M-0.5_r8)*PICON/real(NumOfSkyAzimuSects1,r8)
         DAZI=COS(LeafAzimuthAngle-SolarAzimuthAngle)
         DO  N=1,NumOfLeafZenithSectors1
-          BETY=CosineLeafAngle(N)*SineSunInclAngle_col+SineLeafAngle(N)*CoSineSunInclAngle_col*DAZI
-          BETA(N,M)=ABS(BETY)
-          BETX(N,M)=BETA(N,M)/SineSunInclAngle_col
+          BETY      = CosineLeafAngle(N)*SineSunInclAngle_col+SineLeafAngle(N)*CoSineSunInclAngle_col*DAZI
+          BETA(N,M) = ABS(BETY)
+          BETX(N,M) = BETA(N,M)/SineSunInclAngle_col
           IF(CosineLeafAngle(N).GT.SineSunInclAngle_col)THEN
             BETZ=ACOS(BETY)
           ELSE
@@ -435,10 +433,10 @@ module CanopyCondsMod
           !     TAU_DirRadTransm,TAU_DiffRadTransm=fraction of direct,diffuse radiation transmitted
 !
           DO  NZ=1,NP
-            RadSWbyLeafSurf_zsec(N,M,NZ)=RadSWatLeafSurf_pft(NZ)*ABS(BETA(N,M))
-            RadSWbyStalkSurf_zsec(N,M,NZ)=RadSWatStalkSurf_pft(NZ)*ABS(BETA(N,M))
-            RadPARDirLeafSurf_zsec(N,M,NZ)=RadPARatLeafSurf_pft(NZ)*ABS(BETA(N,M))
-            RadPARDirStalkSurf_zsec(N,M,NZ)=RadPARatStalkSurf_pft(NZ)*ABS(BETA(N,M))
+            RadSWbyLeafSurf_zsec(N,M,NZ)    = RadSWatLeafSurf_pft(NZ)*ABS(BETA(N,M))
+            RadSWbyStalkSurf_zsec(N,M,NZ)   = RadSWatStalkSurf_pft(NZ)*ABS(BETA(N,M))
+            RadPARDirLeafSurf_zsec(N,M,NZ)  = RadPARatLeafSurf_pft(NZ)*ABS(BETA(N,M))
+            RadPARDirStalkSurf_zsec(N,M,NZ) = RadPARatStalkSurf_pft(NZ)*ABS(BETA(N,M))
             DO L=1,NumOfCanopyLayers1
               RadDifPAR_zsec(N,M,L,NZ)=0.0_r8
               RadPAR_zsec(N,M,L,NZ)=RadPARDirLeafSurf_zsec(N,M,NZ)
@@ -446,15 +444,15 @@ module CanopyCondsMod
           enddo
         enddo
       ENDDO D1100
-      XAREA=1.00_r8/AREA3(NU)
-      YAREA=1.00_r8/(AREA3(NU)*REAL(NumOfLeafZenithSectors1,R8))
-      RadSWDiffusL  =RadSWDiffus_col
-      RadPARDiffusL =RadPARDiffus_col
-      TAU_DirRadTransm(NumOfCanopyLayers1+1)=1.0_r8
-      TAU_DiffRadTransm(NumOfCanopyLayers1+1)=1.0_r8
-      RadSWFwdScat2NextL(NumOfCanopyLayers1+1)=0.0_r8
-      RadPARFwdScat2NextL(NumOfCanopyLayers1+1)=0.0_r8
-      FracDirRadAbsorbtCum=0.0_r8
+      XAREA                                     = 1.00_r8/AREA3(NU)
+      YAREA                                     = 1.00_r8/(AREA3(NU)*REAL(NumOfLeafZenithSectors1,R8))
+      RadSWDiffusL                              = RadSWDiffus_col
+      RadPARDiffusL                             = RadPARDiffus_col
+      TAU_DirRadTransm(NumOfCanopyLayers1+1)    = 1.0_r8
+      TAU_DiffRadTransm(NumOfCanopyLayers1+1)   = 1.0_r8
+      RadSWFwdScat2NextL(NumOfCanopyLayers1+1)  = 0.0_r8
+      RadPARFwdScat2NextL(NumOfCanopyLayers1+1) = 0.0_r8
+      FracDirRadAbsorbtCum                      = 0.0_r8
       !
       !     RESET ARRAYS OF SUNLIT AND SHADED LEAF AREAS IN DIFFERENT
       !     LAYERS AND ANGLE CLASSES
@@ -504,35 +502,35 @@ module CanopyCondsMod
     !
     !
           D1500: DO NZ=1,NP
-            RadDirSWbyLeaf_pft(NZ)=0.0_r8
-            RadDirSWbyStalk_pft(NZ)=0.0_r8
-            RadDirPARbyLeaf_pft(NZ)=0.0_r8
-            RadDirPARbyStalk_pft(NZ)=0.0_r8
+            RadDirSWbyLeaf_pft(NZ)   = 0.0_r8
+            RadDirSWbyStalk_pft(NZ)  = 0.0_r8
+            RadDirPARbyLeaf_pft(NZ)  = 0.0_r8
+            RadDirPARbyStalk_pft(NZ) = 0.0_r8
 
-            RadDifSWbyLeaf_pft(NZ)=0.0_r8
-            RadDifSWbyStalk_pft(NZ)=0.0_r8
-            RadDifPARbyLeaf_pft(NZ)=0.0_r8
-            RadDifPARbyStalk_pft(NZ)=0.0_r8
+            RadDifSWbyLeaf_pft(NZ)   = 0.0_r8
+            RadDifSWbyStalk_pft(NZ)  = 0.0_r8
+            RadDifPARbyLeaf_pft(NZ)  = 0.0_r8
+            RadDifPARbyStalk_pft(NZ) = 0.0_r8
 
-            bakScatRadDirSWbyLeaf_pft(NZ)=0.0_r8
-            bakScatRadDirSWbyStalk_pft(NZ)=0.0_r8
-            bakScatRadDirPARbyLeaf_pft(NZ)=0.0_r8
-            bakScatRadDirPARbyStalk_pft(NZ)=0.0_r8
+            bakScatRadDirSWbyLeaf_pft(NZ)   = 0.0_r8
+            bakScatRadDirSWbyStalk_pft(NZ)  = 0.0_r8
+            bakScatRadDirPARbyLeaf_pft(NZ)  = 0.0_r8
+            bakScatRadDirPARbyStalk_pft(NZ) = 0.0_r8
 
-            bakScatRadDifSWbyLeaf_pft(NZ)=0.0_r8
-            bakScatRadDifSWbyStalk_pft(NZ)=0.0_r8
-            bakScatRadDifPARbyLeaf_pft(NZ)=0.0_r8
-            bakScatRadDifPARbyStalk_pft(NZ)=0.0_r8
+            bakScatRadDifSWbyLeaf_pft(NZ)   = 0.0_r8
+            bakScatRadDifSWbyStalk_pft(NZ)  = 0.0_r8
+            bakScatRadDifPARbyLeaf_pft(NZ)  = 0.0_r8
+            bakScatRadDifPARbyStalk_pft(NZ) = 0.0_r8
 
-            fwdScatRadDirSWbyLeaf_pft(NZ)=0.0_r8
-            fwdScatRadDirSWbyStalk_pft(NZ)=0.0_r8
-            fwdScatRadDirPARbyLeaf_pft(NZ)=0.0_r8
-            fwdScatRadDirPARbyStalk_pft(NZ)=0.0_r8
+            fwdScatRadDirSWbyLeaf_pft(NZ)   = 0.0_r8
+            fwdScatRadDirSWbyStalk_pft(NZ)  = 0.0_r8
+            fwdScatRadDirPARbyLeaf_pft(NZ)  = 0.0_r8
+            fwdScatRadDirPARbyStalk_pft(NZ) = 0.0_r8
 
-            fwdScatRadDifSWbyLeaf_pft(NZ)=0.0_r8
-            fwdScatRadDifSWbyStalk_pft(NZ)=0.0_r8
-            fwdScatRadDifPARbyLeaf_pft(NZ)=0.0_r8
-            fwdScatRadDifPARbyStalk_pft(NZ)=0.0_r8
+            fwdScatRadDifSWbyLeaf_pft(NZ)   = 0.0_r8
+            fwdScatRadDifSWbyStalk_pft(NZ)  = 0.0_r8
+            fwdScatRadDifPARbyLeaf_pft(NZ)  = 0.0_r8
+            fwdScatRadDifPARbyStalk_pft(NZ) = 0.0_r8
     !
       !     LEAF SURFACE AREA IN EACH INCLINATION CLASS N, AZIMUTH CLASS M,
       !     LAYER L AND SPECIES NZ
@@ -547,42 +545,42 @@ module CanopyCondsMod
       !     StalkIntceptArea=TSURWS m-2
       !
             D1600: DO N=1,NumOfLeafZenithSectors1
-              UnselfShadeLeafArea=LeafAreaZsec_pft(N,L,NZ)*ClumpFactorNow_pft(NZ)
-              UnselfShadeLeafAreaAzclass=UnselfShadeLeafArea*YAREA
-              TSURFS=UnselfShadeLeafArea*TAU_DirRadTransm(L+1)
-              LeafIntceptArea=TSURFS*XAREA
+              UnselfShadeLeafArea        = LeafAreaZsec_pft(N,L,NZ)*ClumpFactorNow_pft(NZ)
+              UnselfShadeLeafAreaAzclass = UnselfShadeLeafArea*YAREA
+              TSURFS                     = UnselfShadeLeafArea*TAU_DirRadTransm(L+1)
+              LeafIntceptArea            = TSURFS*XAREA
 
-              UnselfShadeStalkArea=StemAreaZsec_pft(N,L,NZ)*StalkClumpFactor
-              UnselfShadeStalkAreaAzclass=UnselfShadeStalkArea*YAREA
-              TSURWS=UnselfShadeStalkArea*TAU_DirRadTransm(L+1)
-              StalkIntceptArea=TSURWS*XAREA
+              UnselfShadeStalkArea        = StemAreaZsec_pft(N,L,NZ)*StalkClumpFactor
+              UnselfShadeStalkAreaAzclass = UnselfShadeStalkArea*YAREA
+              TSURWS                      = UnselfShadeStalkArea*TAU_DirRadTransm(L+1)
+              StalkIntceptArea            = TSURWS*XAREA
               !
               !     ABSORPTION OF DIRECT RADIATION BY SUNLIT LEAF SURFACES
               !
               !     STOPZ=accumulated horizontal area of intercepted direct radiation
               !
               D1700: DO M=1,NumOfSkyAzimuSects1
-                RadDirSWbyLeaf_pft(NZ)=RadDirSWbyLeaf_pft(NZ)+TSURFS*RadSWbyLeafSurf_zsec(N,M,NZ)
-                RadDirSWbyStalk_pft(NZ)=RadDirSWbyStalk_pft(NZ)+TSURWS*RadSWbyStalkSurf_zsec(N,M,NZ)
-                RadDirPARbyLeaf_pft(NZ)=RadDirPARbyLeaf_pft(NZ)+TSURFS*RadPARDirLeafSurf_zsec(N,M,NZ)
-                RadDirPARbyStalk_pft(NZ)=RadDirPARbyStalk_pft(NZ)+TSURWS*RadPARDirStalkSurf_zsec(N,M,NZ)
-                FracDirRadAbsorbt=FracDirRadAbsorbt+(LeafIntceptArea+StalkIntceptArea)*BETX(N,M)
+                RadDirSWbyLeaf_pft(NZ)   = RadDirSWbyLeaf_pft(NZ)+TSURFS*RadSWbyLeafSurf_zsec(N,M,NZ)
+                RadDirSWbyStalk_pft(NZ)  = RadDirSWbyStalk_pft(NZ)+TSURWS*RadSWbyStalkSurf_zsec(N,M,NZ)
+                RadDirPARbyLeaf_pft(NZ)  = RadDirPARbyLeaf_pft(NZ)+TSURFS*RadPARDirLeafSurf_zsec(N,M,NZ)
+                RadDirPARbyStalk_pft(NZ) = RadDirPARbyStalk_pft(NZ)+TSURWS*RadPARDirStalkSurf_zsec(N,M,NZ)
+                FracDirRadAbsorbt        = FracDirRadAbsorbt+(LeafIntceptArea+StalkIntceptArea)*BETX(N,M)
 !
           !     BACKSCATTERING OF REFLECTED DIRECT RADIATION
           !
                 IF(iScatteringDirect(N,M).EQ.ibackward)THEN
-                  bakScatRadDirSWbyLeaf_pft(NZ)=bakScatRadDirSWbyLeaf_pft(NZ)+TSURFS*RadSWbyLeafSurf_zsec(N,M,NZ)
-                  bakScatRadDirSWbyStalk_pft(NZ)=bakScatRadDirSWbyStalk_pft(NZ)+TSURWS*RadSWbyStalkSurf_zsec(N,M,NZ)
-                  bakScatRadDirPARbyLeaf_pft(NZ)=bakScatRadDirPARbyLeaf_pft(NZ)+TSURFS*RadPARDirLeafSurf_zsec(N,M,NZ)
-                  bakScatRadDirPARbyStalk_pft(NZ)=bakScatRadDirPARbyStalk_pft(NZ)+TSURWS*RadPARDirStalkSurf_zsec(N,M,NZ)
+                  bakScatRadDirSWbyLeaf_pft(NZ)   = bakScatRadDirSWbyLeaf_pft(NZ)+TSURFS*RadSWbyLeafSurf_zsec(N,M,NZ)
+                  bakScatRadDirSWbyStalk_pft(NZ)  = bakScatRadDirSWbyStalk_pft(NZ)+TSURWS*RadSWbyStalkSurf_zsec(N,M,NZ)
+                  bakScatRadDirPARbyLeaf_pft(NZ)  = bakScatRadDirPARbyLeaf_pft(NZ)+TSURFS*RadPARDirLeafSurf_zsec(N,M,NZ)
+                  bakScatRadDirPARbyStalk_pft(NZ) = bakScatRadDirPARbyStalk_pft(NZ)+TSURWS*RadPARDirStalkSurf_zsec(N,M,NZ)
                   !
                   ! FORWARD SCATTERING OF REFLECTED DIRECT RADIATION
                   !
                 ELSE
-                  fwdScatRadDirSWbyLeaf_pft(NZ)=fwdScatRadDirSWbyLeaf_pft(NZ)+TSURFS*RadSWbyLeafSurf_zsec(N,M,NZ)
-                  fwdScatRadDirSWbyStalk_pft(NZ)=fwdScatRadDirSWbyStalk_pft(NZ)+TSURWS*RadSWbyStalkSurf_zsec(N,M,NZ)
-                  fwdScatRadDirPARbyLeaf_pft(NZ)=fwdScatRadDirPARbyLeaf_pft(NZ)+TSURFS*RadPARDirLeafSurf_zsec(N,M,NZ)
-                  fwdScatRadDirPARbyStalk_pft(NZ)=fwdScatRadDirPARbyStalk_pft(NZ)+TSURWS*RadPARDirStalkSurf_zsec(N,M,NZ)
+                  fwdScatRadDirSWbyLeaf_pft(NZ)   = fwdScatRadDirSWbyLeaf_pft(NZ)+TSURFS*RadSWbyLeafSurf_zsec(N,M,NZ)
+                  fwdScatRadDirSWbyStalk_pft(NZ)  = fwdScatRadDirSWbyStalk_pft(NZ)+TSURWS*RadSWbyStalkSurf_zsec(N,M,NZ)
+                  fwdScatRadDirPARbyLeaf_pft(NZ)  = fwdScatRadDirPARbyLeaf_pft(NZ)+TSURFS*RadPARDirLeafSurf_zsec(N,M,NZ)
+                  fwdScatRadDirPARbyStalk_pft(NZ) = fwdScatRadDirPARbyStalk_pft(NZ)+TSURWS*RadPARDirStalkSurf_zsec(N,M,NZ)
                 ENDIF
     !
                 !     INTENSITY OF ABSORBED DIFFUSE RADIATION AT LEAF SURFACES
@@ -591,38 +589,38 @@ module CanopyCondsMod
                 !     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
 !
                 D1750: DO NN=1,NumOfLeafAzimuthSectors1
-                  diffusSWLeafAbsorptAzclass=RadSWDiffusL*OMEGA(M,N,NN)*LeafSWabsorpty_pft(NZ)
-                  diffusSWStalkAbsorptAzclass=RadSWDiffusL*OMEGA(M,N,NN)*StalkSWAbsorpty
-                  diffusPARLeafAbsorptAzclass=RadPARDiffusL*OMEGA(M,N,NN)*LeafPARabsorpty_pft(NZ)
-                  diffusPARStalkAbsorptAzclass=RadPARDiffusL*OMEGA(M,N,NN)*StalkPARAbsorpty
-                  RadDifPAR_zsec(N,M,L,NZ)=RadDifPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
-                  RadPAR_zsec(N,M,L,NZ)=RadPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
+                  diffusSWLeafAbsorptAzclass   = RadSWDiffusL*OMEGA(M,N,NN)*LeafSWabsorpty_pft(NZ)
+                  diffusSWStalkAbsorptAzclass  = RadSWDiffusL*OMEGA(M,N,NN)*StalkSWAbsorpty
+                  diffusPARLeafAbsorptAzclass  = RadPARDiffusL*OMEGA(M,N,NN)*LeafPARabsorpty_pft(NZ)
+                  diffusPARStalkAbsorptAzclass = RadPARDiffusL*OMEGA(M,N,NN)*StalkPARAbsorpty
+                  RadDifPAR_zsec(N,M,L,NZ)     = RadDifPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
+                  RadPAR_zsec(N,M,L,NZ)        = RadPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
 !
                   !     ABSORPTION OF DIFFUSE RADIATION BY SHADED LEAF SURFACES
                   !
                   !     FracDifRadAbsorbt=accumulated horizontal area of intercepted diffuse radiation
                   !
-                  RadDifSWbyLeaf_pft(NZ)=RadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
-                  RadDifSWbyStalk_pft(NZ)=RadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
-                  RadDifPARbyLeaf_pft(NZ)=RadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
-                  RadDifPARbyStalk_pft(NZ)=RadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
-                  FracDifRadAbsorbt=FracDifRadAbsorbt+(UnselfShadeLeafAreaAzclass+UnselfShadeStalkAreaAzclass)*OMEGX(M,N,NN)
+                  RadDifSWbyLeaf_pft(NZ)   = RadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
+                  RadDifSWbyStalk_pft(NZ)  = RadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
+                  RadDifPARbyLeaf_pft(NZ)  = RadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
+                  RadDifPARbyStalk_pft(NZ) = RadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
+                  FracDifRadAbsorbt        = FracDifRadAbsorbt+(UnselfShadeLeafAreaAzclass+UnselfShadeStalkAreaAzclass)*OMEGX(M,N,NN)
     !
                   !     BACKSCATTERING OF REFLECTED DIFFUSE RADIATION
                   !
                   IF(iScatteringDiffus(M,N,NN).EQ.ibackward)THEN
-                    bakScatRadDifSWbyLeaf_pft(NZ)=bakScatRadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
-                    bakScatRadDifSWbyStalk_pft(NZ)=bakScatRadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
-                    bakScatRadDifPARbyLeaf_pft(NZ)=bakScatRadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
-                    bakScatRadDifPARbyStalk_pft(NZ)=bakScatRadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
+                    bakScatRadDifSWbyLeaf_pft(NZ)   = bakScatRadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
+                    bakScatRadDifSWbyStalk_pft(NZ)  = bakScatRadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
+                    bakScatRadDifPARbyLeaf_pft(NZ)  = bakScatRadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
+                    bakScatRadDifPARbyStalk_pft(NZ) = bakScatRadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
                     !
                     !     FORWARD SCATTERING OF REFLECTED DIFFUSE RADIATION
                     !
                   ELSE
-                    fwdScatRadDifSWbyLeaf_pft(NZ)=fwdScatRadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
-                    fwdScatRadDifSWbyStalk_pft(NZ)=fwdScatRadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
-                    fwdScatRadDifPARbyLeaf_pft(NZ)=fwdScatRadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
-                    fwdScatRadDifPARbyStalk_pft(NZ)=fwdScatRadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
+                    fwdScatRadDifSWbyLeaf_pft(NZ)   = fwdScatRadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
+                    fwdScatRadDifSWbyStalk_pft(NZ)  = fwdScatRadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
+                    fwdScatRadDifPARbyLeaf_pft(NZ)  = fwdScatRadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
+                    fwdScatRadDifPARbyStalk_pft(NZ) = fwdScatRadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
                   ENDIF
                 ENDDO D1750
               ENDDO D1700
@@ -645,20 +643,20 @@ module CanopyCondsMod
             TAU_DirRadTransm(L+1)=TAU_DirRadTransm(L+1)*XTAUS
             FracDirRadAbsorbt=FracDirRadAbsorbt*XTAUS
             D1510: DO NZ=1,NP
-              RadDirSWbyLeaf_pft(NZ)=RadDirSWbyLeaf_pft(NZ)*XTAUS
-              RadDirSWbyStalk_pft(NZ)=RadDirSWbyStalk_pft(NZ)*XTAUS
-              RadDirPARbyLeaf_pft(NZ)=RadDirPARbyLeaf_pft(NZ)*XTAUS
-              RadDirPARbyStalk_pft(NZ)=RadDirPARbyStalk_pft(NZ)*XTAUS
+              RadDirSWbyLeaf_pft(NZ)   = RadDirSWbyLeaf_pft(NZ)*XTAUS
+              RadDirSWbyStalk_pft(NZ)  = RadDirSWbyStalk_pft(NZ)*XTAUS
+              RadDirPARbyLeaf_pft(NZ)  = RadDirPARbyLeaf_pft(NZ)*XTAUS
+              RadDirPARbyStalk_pft(NZ) = RadDirPARbyStalk_pft(NZ)*XTAUS
 
-              bakScatRadDirSWbyLeaf_pft(NZ)=bakScatRadDirSWbyLeaf_pft(NZ)*XTAUS
-              bakScatRadDirSWbyStalk_pft(NZ)=bakScatRadDirSWbyStalk_pft(NZ)*XTAUS
-              bakScatRadDirPARbyLeaf_pft(NZ)=bakScatRadDirPARbyLeaf_pft(NZ)*XTAUS
-              bakScatRadDirPARbyStalk_pft(NZ)=bakScatRadDirPARbyStalk_pft(NZ)*XTAUS
+              bakScatRadDirSWbyLeaf_pft(NZ)   = bakScatRadDirSWbyLeaf_pft(NZ)*XTAUS
+              bakScatRadDirSWbyStalk_pft(NZ)  = bakScatRadDirSWbyStalk_pft(NZ)*XTAUS
+              bakScatRadDirPARbyLeaf_pft(NZ)  = bakScatRadDirPARbyLeaf_pft(NZ)*XTAUS
+              bakScatRadDirPARbyStalk_pft(NZ) = bakScatRadDirPARbyStalk_pft(NZ)*XTAUS
 
-              fwdScatRadDirSWbyLeaf_pft(NZ)=fwdScatRadDirSWbyLeaf_pft(NZ)*XTAUS
-              fwdScatRadDirSWbyStalk_pft(NZ)=fwdScatRadDirSWbyStalk_pft(NZ)*XTAUS
-              fwdScatRadDirPARbyLeaf_pft(NZ)=fwdScatRadDirPARbyLeaf_pft(NZ)*XTAUS
-              fwdScatRadDirPARbyStalk_pft(NZ)=fwdScatRadDirPARbyStalk_pft(NZ)*XTAUS
+              fwdScatRadDirSWbyLeaf_pft(NZ)   = fwdScatRadDirSWbyLeaf_pft(NZ)*XTAUS
+              fwdScatRadDirSWbyStalk_pft(NZ)  = fwdScatRadDirSWbyStalk_pft(NZ)*XTAUS
+              fwdScatRadDirPARbyLeaf_pft(NZ)  = fwdScatRadDirPARbyLeaf_pft(NZ)*XTAUS
+              fwdScatRadDirPARbyStalk_pft(NZ) = fwdScatRadDirPARbyStalk_pft(NZ)*XTAUS
             ENDDO D1510
           ENDIF
 !
@@ -672,20 +670,20 @@ module CanopyCondsMod
             TAU_DiffRadTransm(L+1)=TAU_DiffRadTransm(L+1)*XTAUY
             FracDifRadAbsorbt=FracDifRadAbsorbt*XTAUY
             D1520: DO NZ=1,NP
-              RadDifSWbyLeaf_pft(NZ)=RadDifSWbyLeaf_pft(NZ)*XTAUY
-              RadDifSWbyStalk_pft(NZ)=RadDifSWbyStalk_pft(NZ)*XTAUY
-              RadDifPARbyLeaf_pft(NZ)=RadDifPARbyLeaf_pft(NZ)*XTAUY
-              RadDifPARbyStalk_pft(NZ)=RadDifPARbyStalk_pft(NZ)*XTAUY
+              RadDifSWbyLeaf_pft(NZ)   = RadDifSWbyLeaf_pft(NZ)*XTAUY
+              RadDifSWbyStalk_pft(NZ)  = RadDifSWbyStalk_pft(NZ)*XTAUY
+              RadDifPARbyLeaf_pft(NZ)  = RadDifPARbyLeaf_pft(NZ)*XTAUY
+              RadDifPARbyStalk_pft(NZ) = RadDifPARbyStalk_pft(NZ)*XTAUY
 
-              bakScatRadDifSWbyLeaf_pft(NZ)=bakScatRadDifSWbyLeaf_pft(NZ)*XTAUY
-              bakScatRadDifSWbyStalk_pft(NZ)=bakScatRadDifSWbyStalk_pft(NZ)*XTAUY
-              bakScatRadDifPARbyLeaf_pft(NZ)=bakScatRadDifPARbyLeaf_pft(NZ)*XTAUY
-              bakScatRadDifPARbyStalk_pft(NZ)=bakScatRadDifPARbyStalk_pft(NZ)*XTAUY
+              bakScatRadDifSWbyLeaf_pft(NZ)   = bakScatRadDifSWbyLeaf_pft(NZ)*XTAUY
+              bakScatRadDifSWbyStalk_pft(NZ)  = bakScatRadDifSWbyStalk_pft(NZ)*XTAUY
+              bakScatRadDifPARbyLeaf_pft(NZ)  = bakScatRadDifPARbyLeaf_pft(NZ)*XTAUY
+              bakScatRadDifPARbyStalk_pft(NZ) = bakScatRadDifPARbyStalk_pft(NZ)*XTAUY
 
-              fwdScatRadDifSWbyLeaf_pft(NZ)=fwdScatRadDifSWbyLeaf_pft(NZ)*XTAUY
-              fwdScatRadDifSWbyStalk_pft(NZ)=fwdScatRadDifSWbyStalk_pft(NZ)*XTAUY
-              fwdScatRadDifPARbyLeaf_pft(NZ)=fwdScatRadDifPARbyLeaf_pft(NZ)*XTAUY
-              fwdScatRadDifPARbyStalk_pft(NZ)=fwdScatRadDifPARbyStalk_pft(NZ)*XTAUY
+              fwdScatRadDifSWbyLeaf_pft(NZ)   = fwdScatRadDifSWbyLeaf_pft(NZ)*XTAUY
+              fwdScatRadDifSWbyStalk_pft(NZ)  = fwdScatRadDifSWbyStalk_pft(NZ)*XTAUY
+              fwdScatRadDifPARbyLeaf_pft(NZ)  = fwdScatRadDifPARbyLeaf_pft(NZ)*XTAUY
+              fwdScatRadDifPARbyStalk_pft(NZ) = fwdScatRadDifPARbyStalk_pft(NZ)*XTAUY
               D1730: DO N=1,NumOfLeafZenithSectors1
                 DO  M=1,NumOfSkyAzimuSects1
                   RadDifPAR_zsec(N,M,L,NZ)=RadDifPAR_zsec(N,M,L,NZ)*XTAUY
@@ -702,20 +700,20 @@ module CanopyCondsMod
           !     TAU_DirRadTransm,TAU_DiffRadTransm=transmission of direct,diffuse radiation to next lower layer
           !
           D1530: DO NZ=1,NP
-            RadSWbyLeafT  =RadDirSWbyLeaf_pft(NZ)+RadDifSWbyLeaf_pft(NZ)
-            RadSWbyStalkT =RadDirSWbyStalk_pft(NZ)+RadDifSWbyStalk_pft(NZ)
-            RadPARbyLeafT =RadDirPARbyLeaf_pft(NZ)+RadDifPARbyLeaf_pft(NZ)
-            RadPARbyStalkT=RadDirPARbyStalk_pft(NZ)+RadDifPARbyStalk_pft(NZ)
+            RadSWbyLeafT   = RadDirSWbyLeaf_pft(NZ)+RadDifSWbyLeaf_pft(NZ)
+            RadSWbyStalkT  = RadDirSWbyStalk_pft(NZ)+RadDifSWbyStalk_pft(NZ)
+            RadPARbyLeafT  = RadDirPARbyLeaf_pft(NZ)+RadDifPARbyLeaf_pft(NZ)
+            RadPARbyStalkT = RadDirPARbyStalk_pft(NZ)+RadDifPARbyStalk_pft(NZ)
 
-            bakScatRadSWbyLeafT  =bakScatRadDirSWbyLeaf_pft(NZ)+bakScatRadDifSWbyLeaf_pft(NZ)
-            bakScatRadSWbyStalkT =bakScatRadDirSWbyStalk_pft(NZ)+bakScatRadDifSWbyStalk_pft(NZ)
-            bakScatRadPARbyLeafT =bakScatRadDirPARbyLeaf_pft(NZ)+bakScatRadDifPARbyLeaf_pft(NZ)
-            bakScatRadPARbyStalkT=bakScatRadDirPARbyStalk_pft(NZ)+bakScatRadDifPARbyStalk_pft(NZ)
+            bakScatRadSWbyLeafT   = bakScatRadDirSWbyLeaf_pft(NZ)+bakScatRadDifSWbyLeaf_pft(NZ)
+            bakScatRadSWbyStalkT  = bakScatRadDirSWbyStalk_pft(NZ)+bakScatRadDifSWbyStalk_pft(NZ)
+            bakScatRadPARbyLeafT  = bakScatRadDirPARbyLeaf_pft(NZ)+bakScatRadDifPARbyLeaf_pft(NZ)
+            bakScatRadPARbyStalkT = bakScatRadDirPARbyStalk_pft(NZ)+bakScatRadDifPARbyStalk_pft(NZ)
 
-            fwdScatRadSWbyLeafT=fwdScatRadDirSWbyLeaf_pft(NZ)+fwdScatRadDifSWbyLeaf_pft(NZ)
-            fwdScatRadSWbyStalkT=fwdScatRadDirSWbyStalk_pft(NZ)+fwdScatRadDifSWbyStalk_pft(NZ)
-            fwdScatRadPARbyLeafT=fwdScatRadDirPARbyLeaf_pft(NZ)+fwdScatRadDifPARbyLeaf_pft(NZ)
-            fwdScatRadPARbyStalkT=fwdScatRadDirPARbyStalk_pft(NZ)+fwdScatRadDifPARbyStalk_pft(NZ)
+            fwdScatRadSWbyLeafT   = fwdScatRadDirSWbyLeaf_pft(NZ)+fwdScatRadDifSWbyLeaf_pft(NZ)
+            fwdScatRadSWbyStalkT  = fwdScatRadDirSWbyStalk_pft(NZ)+fwdScatRadDifSWbyStalk_pft(NZ)
+            fwdScatRadPARbyLeafT  = fwdScatRadDirPARbyLeaf_pft(NZ)+fwdScatRadDifPARbyLeaf_pft(NZ)
+            fwdScatRadPARbyStalkT = fwdScatRadDirPARbyStalk_pft(NZ)+fwdScatRadDifPARbyStalk_pft(NZ)
 
             RadSWFwdScat2NextL(L)=RadSWFwdScat2NextL(L)+(RadSWbyLeafT*RadSWLeafTransmis_pft(NZ) &
               +fwdScatRadSWbyLeafT*RadSWLeafAlbedo_pft(NZ) &
@@ -728,20 +726,20 @@ module CanopyCondsMod
             RadPARBakScat2NextL(L)=RadPARBakScat2NextL(L)+(bakScatRadPARbyLeafT*CanopyPARalbedo_pft(NZ)+&
               bakScatRadPARbyStalkT*StalkAlbedo4PARRad)*YAREA
 
-            RadSWbyCanopy_pft(NZ)=RadSWbyCanopy_pft(NZ)+RadSWbyLeafT+RadSWbyStalkT
-            RadPARbyCanopy_pft(NZ)=RadPARbyCanopy_pft(NZ)+RadPARbyLeafT+RadPARbyStalkT
+            RadSWbyCanopy_pft(NZ)  = RadSWbyCanopy_pft(NZ)+RadSWbyLeafT+RadSWbyStalkT
+            RadPARbyCanopy_pft(NZ) = RadPARbyCanopy_pft(NZ)+RadPARbyLeafT+RadPARbyStalkT
           ENDDO D1530
-          FracDirRadAbsorbtCum=FracDirRadAbsorbtCum+FracDirRadAbsorbt
-          FracDifRadAbsorbtCum=FracDifRadAbsorbtCum+FracDifRadAbsorbt
-          TAU_DirRadTransm(L)=1.0_r8-FracDirRadAbsorbtCum
-          TAU_RadThru(L)=1.0_r8-TAU_DirRadTransm(L)
-          TAU_DiffRadTransm(L)=1.0_r8-FracDifRadAbsorbtCum
+          FracDirRadAbsorbtCum = FracDirRadAbsorbtCum+FracDirRadAbsorbt
+          FracDifRadAbsorbtCum = FracDifRadAbsorbtCum+FracDifRadAbsorbt
+          TAU_DirRadTransm(L)  = 1.0_r8-FracDirRadAbsorbtCum
+          TAU_RadThru(L)       = 1.0_r8-TAU_DirRadTransm(L)
+          TAU_DiffRadTransm(L) = 1.0_r8-FracDifRadAbsorbtCum
         ELSE
-          RadSWFwdScat2NextL(L)=RadSWFwdScat2NextL(L+1)
-          RadPARFwdScat2NextL(L)=RadPARFwdScat2NextL(L+1)
-          TAU_DirRadTransm(L)=TAU_DirRadTransm(L+1)
-          TAU_RadThru(L)=1.0_r8-TAU_DirRadTransm(L)
-          TAU_DiffRadTransm(L)=TAU_DiffRadTransm(L+1)
+          RadSWFwdScat2NextL(L)  = RadSWFwdScat2NextL(L+1)
+          RadPARFwdScat2NextL(L) = RadPARFwdScat2NextL(L+1)
+          TAU_DirRadTransm(L)    = TAU_DirRadTransm(L+1)
+          TAU_RadThru(L)         = 1.0_r8-TAU_DirRadTransm(L)
+          TAU_DiffRadTransm(L)   = TAU_DiffRadTransm(L+1)
         ENDIF
       ENDDO D1800
       !
@@ -754,13 +752,13 @@ module CanopyCondsMod
       !     RadSW_Grnd,RadPAR_Grnd=total SW,PAR at ground surface
       !     GrndIncidSolarAngle,OMEGAG=incident solar,sky angle at ground surface
 !
-      RADSG=RadSWDirect_col*TAU_DirRadTransm(1)
-      RADYG=RadSWDiffusL*TAU_DiffRadTransm(1)+RadSWFwdScat2NextL(1)
-      RAPSG=RadPARDirect_col*TAU_DirRadTransm(1)
-      RAPYG=RadPARDiffusL*TAU_DiffRadTransm(1)+RadPARFwdScat2NextL(1)
+      RADSG = RadSWDirect_col*TAU_DirRadTransm(1)
+      RADYG = RadSWDiffusL*TAU_DiffRadTransm(1)+RadSWFwdScat2NextL(1)
+      RAPSG = RadPARDirect_col*TAU_DirRadTransm(1)
+      RAPYG = RadPARDiffusL*TAU_DiffRadTransm(1)+RadPARFwdScat2NextL(1)
 
-      RadSW_Grnd=ABS(GrndIncidSolarAngle)*RADSG
-      RadPAR_Grnd=ABS(GrndIncidSolarAngle)*RAPSG
+      RadSW_Grnd  = ABS(GrndIncidSolarAngle)*RADSG
+      RadPAR_Grnd = ABS(GrndIncidSolarAngle)*RAPSG
       
       D20: DO N=1,NumOfSkyAzimuSects1
         RadSW_Grnd=RadSW_Grnd+ABS(OMEGAG(N))*RADYG
@@ -802,11 +800,11 @@ module CanopyCondsMod
       !     RadDifSWbyLeaf_pft,RadDifSWbyStalk_pft,RadDifPARbyLeaf_pft,RadDifPARbyStalk_pft=total leaf,stalk SW,PAR absbd fwd+back
       !     RadSWbyCanopy_pft,TRADC,RadPARbyCanopy_pft,TRADP=total SW,PAR absbd by each,all PFT
 !
-      RadSWDiffusL=0.0_r8
-      RadPARDiffusL=0.0_r8
-      TAU_DiffRadTransm(0)=1.0_r8
-      RadSWFwdScat2NextL(0)=0.0_r8
-      RadPARFwdScat2NextL(0)=0.0_r8
+      RadSWDiffusL           = 0.0_r8
+      RadPARDiffusL          = 0.0_r8
+      TAU_DiffRadTransm(0)   = 1.0_r8
+      RadSWFwdScat2NextL(0)  = 0.0_r8
+      RadPARFwdScat2NextL(0) = 0.0_r8
 
       D2800: DO L=1,NumOfCanopyLayers1
         !the following line shuts off radiation when it is below water 
@@ -816,35 +814,35 @@ module CanopyCondsMod
           RadSWFwdScat2NextL(L)=0.0
           RadPARFwdScat2NextL(L)=0.0_r8
           D2500: DO NZ=1,NP
-            RadDifSWbyLeaf_pft(NZ)=0.0_r8
-            RadDifSWbyStalk_pft(NZ)=0.0_r8
-            RadDifPARbyLeaf_pft(NZ)=0.0_r8
-            RadDifPARbyStalk_pft(NZ)=0.0_r8
+            RadDifSWbyLeaf_pft(NZ)   = 0.0_r8
+            RadDifSWbyStalk_pft(NZ)  = 0.0_r8
+            RadDifPARbyLeaf_pft(NZ)  = 0.0_r8
+            RadDifPARbyStalk_pft(NZ) = 0.0_r8
 
             D2600: DO N=1,NumOfLeafZenithSectors1
-              UnselfShadeLeafArea=LeafAreaZsec_pft(N,L,NZ)*ClumpFactorNow_pft(NZ)
-              UnselfShadeStalkArea=StemAreaZsec_pft(N,L,NZ)*StalkClumpFactor
+              UnselfShadeLeafArea  = LeafAreaZsec_pft(N,L,NZ)*ClumpFactorNow_pft(NZ)
+              UnselfShadeStalkArea = StemAreaZsec_pft(N,L,NZ)*StalkClumpFactor
               D2700: DO M=1,NumOfSkyAzimuSects1
                 D2750: DO NN=1,NumOfLeafAzimuthSectors1
-                  diffusSWLeafAbsorptAzclass=RadSWDiffusL*OMEGA(M,N,NN)*LeafSWabsorpty_pft(NZ)
-                  diffusSWStalkAbsorptAzclass=RadSWDiffusL*OMEGA(M,N,NN)*StalkSWAbsorpty
-                  diffusPARLeafAbsorptAzclass=RadPARDiffusL*OMEGA(M,N,NN)*LeafPARabsorpty_pft(NZ)
-                  diffusPARStalkAbsorptAzclass=RadPARDiffusL*OMEGA(M,N,NN)*StalkPARAbsorpty
+                  diffusSWLeafAbsorptAzclass   = RadSWDiffusL*OMEGA(M,N,NN)*LeafSWabsorpty_pft(NZ)
+                  diffusSWStalkAbsorptAzclass  = RadSWDiffusL*OMEGA(M,N,NN)*StalkSWAbsorpty
+                  diffusPARLeafAbsorptAzclass  = RadPARDiffusL*OMEGA(M,N,NN)*LeafPARabsorpty_pft(NZ)
+                  diffusPARStalkAbsorptAzclass = RadPARDiffusL*OMEGA(M,N,NN)*StalkPARAbsorpty
 
-                  RadDifPAR_zsec(N,M,L,NZ)=RadDifPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
-                  RadPAR_zsec(N,M,L,NZ)=RadPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
+                  RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
+                  RadPAR_zsec(N,M,L,NZ)    = RadPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
                   
-                  RadDifSWbyLeaf_pft(NZ)=RadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
-                  RadDifSWbyStalk_pft(NZ)=RadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
-                  RadDifPARbyLeaf_pft(NZ)=RadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
-                  RadDifPARbyStalk_pft(NZ)=RadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
+                  RadDifSWbyLeaf_pft(NZ)   = RadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
+                  RadDifSWbyStalk_pft(NZ)  = RadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
+                  RadDifPARbyLeaf_pft(NZ)  = RadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass
+                  RadDifPARbyStalk_pft(NZ) = RadDifPARbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusPARStalkAbsorptAzclass
                 ENDDO D2750
               ENDDO D2700
             ENDDO D2600
-            RadSWFwdScat2NextL(L)=RadSWFwdScat2NextL(L)+RadDifSWbyLeaf_pft(NZ)*RadSWLeafTransmis_pft(NZ)*YAREA
-            RadPARFwdScat2NextL(L)=RadPARFwdScat2NextL(L)+RadDifPARbyLeaf_pft(NZ)*RadPARLeafTransmis_pft(NZ)*YAREA
-            RadSWbyCanopy_pft(NZ)=RadSWbyCanopy_pft(NZ)+RadDifSWbyLeaf_pft(NZ)+RadDifSWbyStalk_pft(NZ)
-            RadPARbyCanopy_pft(NZ)=RadPARbyCanopy_pft(NZ)+RadDifPARbyLeaf_pft(NZ)+RadDifPARbyStalk_pft(NZ)
+            RadSWFwdScat2NextL(L)  = RadSWFwdScat2NextL(L)+RadDifSWbyLeaf_pft(NZ)*RadSWLeafTransmis_pft(NZ)*YAREA
+            RadPARFwdScat2NextL(L) = RadPARFwdScat2NextL(L)+RadDifPARbyLeaf_pft(NZ)*RadPARLeafTransmis_pft(NZ)*YAREA
+            RadSWbyCanopy_pft(NZ)  = RadSWbyCanopy_pft(NZ)+RadDifSWbyLeaf_pft(NZ)+RadDifSWbyStalk_pft(NZ)
+            RadPARbyCanopy_pft(NZ) = RadPARbyCanopy_pft(NZ)+RadDifPARbyLeaf_pft(NZ)+RadDifPARbyStalk_pft(NZ)
           ENDDO D2500
         ELSE
           RadSWFwdScat2NextL(L)=RadSWFwdScat2NextL(L-1)

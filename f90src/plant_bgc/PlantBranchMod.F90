@@ -1555,10 +1555,12 @@ module PlantBranchMod
       D8315: DO M=1,jsken
         DO NE=1,NumPlantChemElms
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)&
-            +ElmAllocmat4Litr(NE,istalk,M,NZ)*SenecStalkStrutElms_brch(NE,NB,NZ)*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+            +ElmAllocmat4Litr(NE,istalk,M,NZ)*SenecStalkStrutElms_brch(NE,NB,NZ) &
+            *FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
 
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
-            +ElmAllocmat4Litr(NE,istalk,M,NZ)*SenecStalkStrutElms_brch(NE,NB,NZ)*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+            +ElmAllocmat4Litr(NE,istalk,M,NZ)*SenecStalkStrutElms_brch(NE,NB,NZ) &
+            *FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
         ENDDO    
       ENDDO D8315
       DO NE=1,NumPlantChemElms
@@ -1610,36 +1612,36 @@ module PlantBranchMod
   real(r8) :: RSTK
   real(r8) :: TotLeafElevation
 ! begin_execution
-  associate(                                                             &
-    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
-    LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,          &
-    CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,          &
-    StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,          &
-    StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,         &
-    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,     &
-    FracGroth2Node_pft          => plt_allom%FracGroth2Node_pft,         &
-    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,      &
-    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft,    &
-    KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch,     &
-    iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,  &
-    KLowestGroLeafNode_brch     => plt_pheno%KLowestGroLeafNode_brch,    &
-    rLen2WidthLeaf_pft              => plt_morph%rLen2WidthLeaf_pft,             &
-    SeedDepth_pft               => plt_morph%SeedDepth_pft,              &
-    MainBranchNum_pft           => plt_morph%MainBranchNum_pft,          &
-    CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft,        &
-    PetoleLensNode_brch         => plt_morph%PetoleLensNode_brch,        &
-    CanopyStalkArea_lbrch       => plt_morph%CanopyStalkArea_lbrch,      &
-    BranchNumber_brch           => plt_morph%BranchNumber_brch,          &
-    LiveInterNodeHight_brch     => plt_morph%LiveInterNodeHight_brch,    &
-    CanopyHeightZ_col           => plt_morph%CanopyHeightZ_col,          &
-    CanopyHeight_pft            => plt_morph%CanopyHeight_pft,           &
-    HypoctoHeight_pft           => plt_morph%HypoctoHeight_pft,          &
-    CLASS                       => plt_morph%CLASS,                      &
-    LeafAreaNode_brch           => plt_morph%LeafAreaNode_brch,          &
-    CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft,        &
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft,         &
-    ZERO                        => plt_site%ZERO,                        &
-    SineLeafAngle               => plt_rad%SineLeafAngle                 &
+  associate(                                                          &
+    LeafElmsByLayerNode_brch  => plt_biom%LeafElmsByLayerNode_brch,   &
+    LeafElmntNode_brch        => plt_biom%LeafElmntNode_brch,         &
+    CanopyLeafCLyr_pft        => plt_biom%CanopyLeafCLyr_pft,         &
+    StalkBiomassC_brch        => plt_biom%StalkBiomassC_brch,         &
+    StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch,        &
+    PetoleProteinCNode_brch   => plt_biom%PetoleProteinCNode_brch,    &
+    FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft,        &
+    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,     &
+    iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft,   &
+    KHiestGroLeafNode_brch    => plt_pheno%KHiestGroLeafNode_brch,    &
+    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
+    KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch,   &
+    rLen2WidthLeaf_pft        => plt_morph%rLen2WidthLeaf_pft,        &
+    SeedDepth_pft             => plt_morph%SeedDepth_pft,             &
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft,         &
+    CanopyLeafArea_lpft       => plt_morph%CanopyLeafArea_lpft,       &
+    PetoleLensNode_brch       => plt_morph%PetoleLensNode_brch,       &
+    CanopyStalkArea_lbrch     => plt_morph%CanopyStalkArea_lbrch,     &
+    BranchNumber_brch         => plt_morph%BranchNumber_brch,         &
+    LiveInterNodeHight_brch   => plt_morph%LiveInterNodeHight_brch,   &
+    CanopyHeightZ_col         => plt_morph%CanopyHeightZ_col,         &
+    CanopyHeight_pft          => plt_morph%CanopyHeight_pft,          &
+    HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft,         &
+    CLASS                     => plt_morph%CLASS,                     &
+    LeafAreaNode_brch         => plt_morph%LeafAreaNode_brch,         &
+    CanopyLeafAreaZ_pft       => plt_morph%CanopyLeafAreaZ_pft,       &
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
+    ZERO                      => plt_site%ZERO,                       &
+    SineLeafAngle             => plt_rad%SineLeafAngle                &
   )
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
 !
@@ -3357,9 +3359,9 @@ module PlantBranchMod
 !
       SpecAreaLeafGrowth=EtoliationCoeff*SLA1_pft(NZ)*(AMAX1(ZERO4LeafVar_pft(NZ) &
         ,LeafElmntNode_brch(ielmc,K,NB,NZ))/(PlantPopulation_pft(NZ)*GrowthSLA))**SLA2*WFNS
-      LeafAreaGrowth=GrowthChemElmt(ielmc)*SpecAreaLeafGrowth
-      LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
-      LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)+LeafAreaGrowth
+      LeafAreaGrowth             = GrowthChemElmt(ielmc)*SpecAreaLeafGrowth
+      LeafAreaLive_brch(NB,NZ)   = LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
+      LeafAreaNode_brch(K,NB,NZ) = LeafAreaNode_brch(K,NB,NZ)+LeafAreaGrowth
     ENDDO D490
   ENDIF
   end associate  

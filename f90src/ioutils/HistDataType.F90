@@ -159,6 +159,7 @@ implicit none
   real(r8),pointer   :: h1D_Plant_N_ptc(:)        !whole plant N  
   real(r8),pointer   :: h1D_Plant_P_ptc(:)        !whole plant P  
   real(r8),pointer   :: h1D_stomatal_stress_ptc(:)
+  real(r8),pointer   :: h1D_VHeatCap_litr_col(:)
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: h2D_tSOC_vr(:,:)        !SoilOrgM_vr(ielmc,1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
   real(r8),pointer   :: h2D_litrC_vr(:,:)
@@ -527,6 +528,7 @@ implicit none
   allocate(this%h1D_sN2O_FLX_col(beg_col:end_col))        ;this%h1D_sN2O_FLX_col(:)=spval
   allocate(this%h1D_sN2G_FLX_col(beg_col:end_col))        ;this%h1D_sN2G_FLX_col(:)=spval
   allocate(this%h1D_sNH3_FLX_col(beg_col:end_col))        ;this%h1D_sNH3_FLX_col(:)=spval
+  allocate(this%h1D_VHeatCap_litr_col(beg_col:end_col))   ;this%h1D_VHeatCap_litr_col(:)=spval
   allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col))      ;this%h1D_RUNOFF_FLX_col(:)=spval
   allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))    ;this%h1D_SEDIMENT_FLX_col(:)=spval
   allocate(this%h1D_DISCHG_FLX_col(beg_col:end_col))      ;this%h1D_DISCHG_FLX_col(:)=spval
@@ -1210,6 +1212,10 @@ implicit none
   data1d_ptr => this%h1D_sNH3_FLX_col(beg_col:end_col)       
   call hist_addfld1d(fname='sNH3_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='soil NH3 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_VHeatCap_litr_col(beg_col:end_col)
+  call hist_addfld1d(fname='vHeatCap_litr',units='MJ/m3/K',avgflag='A',&
+    long_name='surface litter heat capacity',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_RUNOFF_FLX_col(beg_col:end_col)   
   call hist_addfld1d(fname='RUNOFF_FLX',units='mmH2O/m2/hr',avgflag='A',&
@@ -2244,6 +2250,7 @@ implicit none
       this%h1D_sN2G_FLX_col(ncol)        = SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sNH3_FLX_col(ncol)        = SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PAR_col(ncol)             = RadPARSolarBeam_col(NY,NX)
+      this%h1D_VHeatCap_litr_col(ncol)   = VHeatCapacity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       call sumMicBiomLayL(0,NY,NX,micBE)      
       this%h2D_MicroBiomeE_litr_col(ncol,1:NumPlantChemElms) =micBE/AREA(3,NU(NY,NX),NY,NX)  

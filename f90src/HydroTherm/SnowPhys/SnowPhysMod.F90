@@ -446,7 +446,7 @@ contains
           cumHeatCndFlxLitr2Soi=0.0_r8
 
           !surface litter layer is active
-          IF(VLHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
+          IF(VLHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
             call SnowSurLitterExch(dt_SnoHeat,M,L,NY,NX,VapCond1,VapCond2,TCND1W,VLairSno1,PSISV1,TCNDS,&
               CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi,&
               cumHeatConvFlxLitr2Soi1,cumHeatCndFlxLitr2Soi)
@@ -1326,7 +1326,7 @@ contains
       VapSnow0=vapsat(TK0X)*dssign(VLWatSnow0M_snvr(L,NY,NX)) !snow vapor pressure, saturated
       !snow <-> residue vapor flux
       H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX) &
-        *FracSurfByLitR(NY,NX)*dts_litrvapht 
+        *FracSurfByLitR_col(NY,NX)*dts_litrvapht 
       !volume weighted vapor pressure
       VPY=(VapSnow0*VLairSno1+VPR*VLsoiAirPM(M,0,NY,NX))/(VLairSno1+VLsoiAirPM(M,0,NY,NX))             
       H2OVapFlxMax=(VapSnow0-VPY)*VLairSno1*dt_watvap
@@ -1353,7 +1353,7 @@ contains
     ! VLSnowHeatCapMM= volumetric heat capacity in snow layer
     TKY=(TK0X*VLHeatCapSnowM1_snvr(L,NY,NX)+TKXR*VLHeatCapacity_vr(0,NY,NX))/(VLHeatCapSnowM1_snvr(L,NY,NX)+VLHeatCapacity_vr(0,NY,NX))
     HeatCnductMax=(TK0X-TKY)*VLHeatCapSnowM1_snvr(L,NY,NX)*dt_watvap
-    HeatCnduct=AvgThermCondctSnoLitR*(TK0X-TKXR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*FracSurfByLitR(NY,NX)*dts_litrvapht
+    HeatCnduct=AvgThermCondctSnoLitR*(TK0X-TKXR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
     IF(HeatCnduct.GE.0.0_r8)THEN
       HeatCndFlxSno2Litr=AZMAX1(AMIN1(HeatCnductMax,HeatCnduct))
     ELSE
@@ -1374,11 +1374,11 @@ contains
     !both litter layer and topsoil are not-saturated
     IF(VLsoiAirPM(M,0,NY,NX).GT.ZEROS(NY,NX).AND.VLsoiAirPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       VP1=vapsat(TK1X)*EXP(18.0_r8*PSISV1/(RGASC*TK1X))
-      H2OVapFlx=AvgVaporCondctSoilLitR*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*FracSurfByLitR(NY,NX)*dts_litrvapht
+      H2OVapFlx=AvgVaporCondctSoilLitR*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
 
       if(abs(H2OVapFlx)>1.e20_r8)then
         write(*,*)'AvgVaporCondctSoilLitR=',AvgVaporCondctSoilLitR,VPR,VP1
-        write(*,*)'FracSurfAsSnow(NY,NX)*FracSurfByLitR(NY,NX)=',FracSurfAsSnow(NY,NX),FracSurfByLitR(NY,NX)
+        write(*,*)'FracSurfAsSnow(NY,NX)*FracSurfByLitR_col(NY,NX)=',FracSurfAsSnow(NY,NX),FracSurfByLitR_col(NY,NX)
         write(*,*)'at line',__LINE__
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
@@ -1427,7 +1427,7 @@ contains
       /(VLHeatCapacity_vr(0,NY,NX)+VLHeatCapacity_vr(NUM(NY,NX),NY,NX))
     HeatCnductMax=(TKXR-TKY)*VLHeatCapacity_vr(0,NY,NX)*dt_watvap
     HeatCnduct=AvgThermCondctSoilLitR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX) &
-      *FracSurfByLitR(NY,NX)*dts_litrvapht
+      *FracSurfByLitR_col(NY,NX)*dts_litrvapht
     
     IF(HeatCnduct.GE.0.0_r8)THEN
       HeatCndFlxLitr2Soi=AZMAX1(AMIN1(HeatCnductMax,HeatCnduct))
@@ -1560,8 +1560,8 @@ contains
   ! VWatLitRHoldCapcity=litter water retention capacity
   ! PSISM1(0,PSISM1(NUM=litter,soil water potentials
 
-  IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1(0,NY,NX))/VLitR(NY,NX)
+  IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1(0,NY,NX))/VLitR_col(NY,NX)
     IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
       PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX) &
         *LOGPSIMND(NY,NX))))
@@ -1585,7 +1585,7 @@ contains
   if(TKXR<0._r8)then
     write(*,*)'SnowSurLitterExch negative M, L, TKR',M,L,TKXR
   endif
-  IF(FracSurfByLitR(NY,NX).GT.ZERO)THEN
+  IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
     IF(VapCond1.GT.ZERO .AND. CNVR.GT.ZERO)THEN      
       AvgVaporCondctSnowLitR=2.0_r8*CNVR*VapCond1/(VapCond1*DLYRR_COL(NY,NX)+CNVR*SnowThickL0_snvr(L,NY,NX))
     ELSE

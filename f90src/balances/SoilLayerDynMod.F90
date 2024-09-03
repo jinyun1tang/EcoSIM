@@ -667,7 +667,7 @@ implicit none
         DDLYRX(NN)=(MaxVLWatByLitR(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
         DLYR0=(AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX)) &
-          +VLitR(NY,NX))/AREA(3,0,NY,NX)
+          +VLitR_col(NY,NX))/AREA(3,0,NY,NX)
         DLYR(3,0,NY,NX)=DLYR0+DDLYRX(NN)
         DLYR(3,NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
         IF(L.GT.2)THEN

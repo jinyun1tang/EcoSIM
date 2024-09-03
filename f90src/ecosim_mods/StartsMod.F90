@@ -164,7 +164,7 @@ module StartsMod
 !
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
-      VHeatCapLitR(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHeatCapLitRMin_col(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
       VHCPNX(NY,NX)=VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !
@@ -316,7 +316,7 @@ module StartsMod
       !     SURFACE LITTER HEAT CAPACITY
       !
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      IF(VLitR(NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
         VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
       else
         VHeatCapacity_vr(0,NY,NX)=0._r8
@@ -882,8 +882,8 @@ module StartsMod
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
       ENDDO
       !volume of litter layer
-      VLitR(NY,NX)               = VLitR0*ppmc*AREA(3,L,NY,NX)
-      VGeomLayer_vr(L,NY,NX)     = VLitR(NY,NX)
+      VLitR_col(NY,NX)               = VLitR0*ppmc*AREA(3,L,NY,NX)
+      VGeomLayer_vr(L,NY,NX)     = VLitR_col(NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)     = VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)
@@ -1063,7 +1063,7 @@ module StartsMod
 !
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
-      VHeatCapLitR(NY,NX) = VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHeatCapLitRMin_col(NY,NX) = VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
       VHCPNX(NY,NX)       = VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !

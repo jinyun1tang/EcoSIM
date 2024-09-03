@@ -138,7 +138,7 @@ module TillageMixMod
 !
 !     IF(SoilOrgM_vr(ielmc,0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     XCORP0=AMAX1(XCORP(NY,NX),AMIN1(1.0,
-!    2(VHeatCapLitR(NY,NX)/cpo)/SoilOrgM_vr(ielmc,0,NY,NX)))
+!    2(VHeatCapLitRMin_col(NY,NX)/cpo)/SoilOrgM_vr(ielmc,0,NY,NX)))
     XCORP0=AMAX1(0.001_r8,XCORP(NY,NX))
 !     ELSE
 !     XCORP0=1.0
@@ -265,7 +265,7 @@ module TillageMixMod
 
     VLWatMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)*XCORP0
     VHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
-    VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
+    VLitR_col(NY,NX)=VLitR_col(NY,NX)*XCORP0
     VGeomLayer_vr(0,NY,NX)=VGeomLayer_vr(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
     ZNHUXI=AMAX1(ZNHUXI,ZNHUI(0,NY,NX))

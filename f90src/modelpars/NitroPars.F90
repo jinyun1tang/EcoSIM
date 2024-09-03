@@ -221,11 +221,11 @@ module NitroPars
   DCKML=1.0E+03_r8
   VMXO=0.125_r8
   VMXF=0.125_r8
-  VMXM=0.125_r8
+  VMXM=0.125_r8  !acetoclastic methanogenesis
   VMXH=0.375_r8
   VMXN=0.25_r8
   VMX4=0.375_r8
-  VMXC=0.125_r8
+  VMXC=0.125_r8  !hydrogenotrophic methanogenesis
   OQKM=1.2E+01_r8
   OQKA=1.2E+01_r8
   OQKAM=1.2E+01_r8

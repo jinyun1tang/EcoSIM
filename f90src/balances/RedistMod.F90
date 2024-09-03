@@ -1567,7 +1567,6 @@ module RedistMod
       HRAINR=RAINR*cpw*TairK_col(NY,NX)
       WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
       HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR
-
       CRAIN=CRAIN+RAINR
       HEATIN_lnd=HEATIN_lnd+HRAINR
     enddo

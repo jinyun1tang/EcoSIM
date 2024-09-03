@@ -5510,16 +5510,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='VLitR', dim1name='column',&
+    call restartvar(ncid, flag, varname='VLitR_col', dim1name='column',&
        long_name='surface litter volume', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLitR,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLitR_col,datrc_1d) 
   else
-    !print*,'VLitR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLitR,datrc_1d)   
+    !print*,'VLitR_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLitR_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='VLitR', dim1name='column',&
+    call restartvar(ncid, flag, varname='VLitR_col', dim1name='column',&
        long_name='surface litter volume', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
