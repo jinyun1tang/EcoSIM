@@ -26,11 +26,11 @@ implicit none
   real(r8),allocatable ::  PARSW(:,:)                         !  
   real(r8),allocatable ::  Ice2Snowt(:,:)                         !  
   real(r8),allocatable ::  TKQ(:,:)                           !  
-  real(r8),allocatable ::  LWEmscefSnow(:,:)                         !  
+  real(r8),allocatable ::  LWEmscefSnow_col(:,:)                         !  
   real(r8),allocatable ::  RAGW(:,:)                          !  
   real(r8),allocatable ::  LWRad2Snow(:,:)                         !  
   real(r8),allocatable ::  VLairMicP1_vr(:,:,:)                       ! corrected air-filled micropore volume 
-  real(r8),allocatable ::  TKSnow0(:,:,:)                         !  
+  real(r8),allocatable ::  TKSnow0_snvr(:,:,:)                         !  
   real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
   real(r8),allocatable ::  SoilFracAsMicP(:,:,:)                        !
   real(r8),allocatable ::  VLHeatCapacityA(:,:,:)                      !
@@ -85,11 +85,11 @@ implicit none
   allocate(PARSW(JY,JX));       PARSW=0._r8
   allocate(Ice2Snowt(JY,JX));       Ice2Snowt=0._r8    
   allocate(TKQ(JY,JX));         TKQ=0._r8  
-  allocate(LWEmscefSnow(JY,JX));       LWEmscefSnow=0._r8  
+  allocate(LWEmscefSnow_col(JY,JX));       LWEmscefSnow_col=0._r8  
   allocate(RAGW(JY,JX));        RAGW=0._r8  
   allocate(LWRad2Snow(JY,JX));       LWRad2Snow=0._r8  
   allocate(VLairMicP1_vr(0:JZ,JY,JX));  VLairMicP1_vr=0._r8  
-  allocate(TKSnow0(JS,JY,JX));      TKSnow0=0._r8  
+  allocate(TKSnow0_snvr(JS,JY,JX));      TKSnow0_snvr=0._r8  
   allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
   allocate(SoilFracAsMicP(JZ,JY,JX));     SoilFracAsMicP=0._r8
   allocate(VLHeatCapacityA(JZ,JY,JX));   VLHeatCapacityA=0._r8
@@ -143,11 +143,11 @@ implicit none
   call destroy(PARSW)  
   call destroy(Ice2Snowt)
   call destroy(TKQ)
-  call destroy(LWEmscefSnow)
+  call destroy(LWEmscefSnow_col)
   call destroy(RAGW) 
   call destroy(LWRad2Snow)
   call destroy(VLairMicP1_vr)
-  call destroy(TKSnow0)  
+  call destroy(TKSnow0_snvr)  
   call destroy(VLWatMacP1_vr)
   call destroy(SoilFracAsMicP)
   call destroy(VLHeatCapacityA)

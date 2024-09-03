@@ -50,7 +50,7 @@ implicit none
   use PlantMgmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
 
-  use EcoSIMConfig        , only : jcplx1 => jcplx1c
+  use EcoSIMConfig        , only : jcplx1 => jcplxcm1
   use TracerIDMod         , only : InitTracerIDs
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData

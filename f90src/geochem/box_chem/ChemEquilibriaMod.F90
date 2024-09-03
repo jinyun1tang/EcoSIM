@@ -801,8 +801,8 @@ module ChemEquilibriaMod
   write(*,*)'NH4_1p_band_conc'  ,chemvar%NH4_1p_band_conc
   write(*,*)'XNH4_conc'  ,chemvar%XNH4_conc
   write(*,*)'XNH4_band_conc'  ,chemvar%XNH4_band_conc
-  IF(chemvar%VLWatMicPNH>0. .AND. chemvar%VLWatMicPNB>0. &
-    .AND. chemvar%VLWatMicPPO>0. .AND. chemvar%VLWatMicPPB>0.)PAUSE
+!  IF(chemvar%VLWatMicPNH>0. .AND. chemvar%VLWatMicPNB>0. &
+!    .AND. chemvar%VLWatMicPPO>0. .AND. chemvar%VLWatMicPPB>0.)PAUSE
   end subroutine PrintChemVar
 
 end module ChemEquilibriaMod

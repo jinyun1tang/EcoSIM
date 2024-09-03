@@ -205,7 +205,6 @@ make -j ${parallel_jobs}
 #Does the install
 make install
 
-echo "regression_test=$regression_test"
 if [ "$regression_test" -eq 1 ]; then
   make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;
 fi

@@ -326,13 +326,13 @@ module TranspSaltMod
     FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
 
     DO nsalts=idsalt_beg,idsalt_KSO4
-      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
+      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
     ENDDO
 
     DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
       ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-      trcSalt_RFLU(ids,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+      trcSalt_RFLU(ids,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     ENDDO
 
 !
@@ -372,8 +372,8 @@ module TranspSaltMod
 !          :*1=non-band,*B=band
 !
     DO nsalts=idsalt_beg,idsaltb_end
-      trcSalt_solml2(nsalts,L,NY,NX)=trcSalt_solml(nsalts,L,NY,NX)
-      trcSalt_soHml2(nsalts,L,NY,NX)=trcSalt_soHml(nsalts,L,NY,NX)
+      trcSalt_solml2(nsalts,L,NY,NX)=trcSalt_solml_vr(nsalts,L,NY,NX)
+      trcSalt_soHml2(nsalts,L,NY,NX)=trcSalt_soHml_vr(nsalts,L,NY,NX)
     ENDDO
 
   ENDDO D10

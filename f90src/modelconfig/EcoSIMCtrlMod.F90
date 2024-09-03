@@ -3,6 +3,7 @@ module EcoSIMCtrlMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only : ecosim_time_type
   use fileUtil, only :   datestrlen  
+  use abortutils, only : endrun
 implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
@@ -17,6 +18,9 @@ implicit none
   logical :: soichem_model   =.true.
   logical :: snowRedist_model=.true.
   logical :: ATS_cpl_mode=.false.
+  integer :: yearf1       !first year of daily climate forcing
+  integer :: yearf2       !first year of hourly climate forcing
+  integer :: nyeardal1    !number of daily climate forcing
   real(r8) :: aco2_ppm  = 280._r8
   real(r8) :: ach4_ppm  = 1.144_r8
   real(r8) :: an2o_ppm  = 0.270_r8
@@ -29,7 +33,8 @@ implicit none
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in
-  character(len=300) :: clm_file_in      !file for climate forcing
+  character(len=300) :: clm_hour_file_in =''     !file for hourly climate forcing
+  character(len=300) :: clm_day_file_in  =''    !file for daily climate forcing
   character(len=300) :: soil_mgmt_in     !file for soil management information
   character(len=300) :: clm_factor_in    !file for climate change factors
   character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
@@ -97,7 +102,11 @@ implicit none
   get_sim_len=0
   DO nn1=0,2
     id=nn1*3+1
-    get_sim_len=get_sim_len+(forc_periods(id+1)-forc_periods(id)+1)*forc_periods(id+2)
+    get_sim_len=get_sim_len+(abs(forc_periods(id+1)-forc_periods(id))+1)*forc_periods(id+2)
   enddo
+  if(get_sim_len<0)then
+  call endrun('Negative simulation length, check forc_periods set up in '//mod_filename,__LINE__)
+  endif
   end function get_sim_len  
+
 end module EcoSIMCtrlMod

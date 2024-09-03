@@ -44,7 +44,7 @@ module MicAutoCPLXMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout) :: ncplxs
-  integer  :: M,K
+  integer  :: M
   real(r8) :: COMC
   real(r8) :: ECHZ
   real(r8) :: FOXYX
@@ -78,8 +78,7 @@ module MicAutoCPLXMod
     RNOxReduxRespAutorLim        => nmicf%RNOxReduxRespAutorLim,         &
     RCO2ProdAutor                => nmicf%RCO2ProdAutor,                 &
     RCH4ProdAutor                => nmicf%RCH4ProdAutor,                 &
-    TOMK                         => ncplxs%TOMK,                         &
-    jcplx                        => micpar%jcplx,                        &
+    TOMEAutoK                    => ncplxs%TOMEAutoK,                    &
     mid_AmmoniaOxidBacter        => micpar%mid_AmmoniaOxidBacter,        &
     mid_NitriteOxidBacter        => micpar%mid_NitriteOxidBacter,        &
     mid_H2GenoMethanogArchea     => micpar%mid_H2GenoMethanogArchea,     &
@@ -104,9 +103,8 @@ module MicAutoCPLXMod
     FracNO2ReduxAutor(NGL)=1.0_r8
   ENDIF
 
-  K=micpar%jcplx
-  IF(TOMK(K).GT.ZEROS)THEN
-    FracAutorBiomOfActK(NGL)=OMActAutor(NGL)/TOMK(K)
+  IF(TOMEAutoK(ielmc).GT.ZEROS)THEN
+    FracAutorBiomOfActK(NGL)=OMActAutor(NGL)/TOMEAutoK(ielmc)
   ELSE
     FracAutorBiomOfActK(NGL)=1.0_r8
   ENDIF
@@ -172,11 +170,11 @@ module MicAutoCPLXMod
   if (N.eq.mid_AmmoniaOxidBacter .or. N.eq.mid_NitriteOxidBacter .or. N.eq.mid_AerobicMethanotrofBacter)then
     call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx)
   elseif (N.eq.mid_H2GenoMethanogArchea)then
-    RespGrossAutor(NGL)=RGOMP
-    RCO2ProdAutor(NGL)=0.0_r8
-    RCH4ProdAutor(NGL)=RespGrossAutor(NGL)
-    RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)
-    RH2UptkAutor=0.667_r8*RespGrossAutor(NGL)
+    RespGrossAutor(NGL)    = RGOMP
+    RCO2ProdAutor(NGL)     = 0.0_r8
+    RCH4ProdAutor(NGL)     = RespGrossAutor(NGL)
+    RO2Uptk4RespAutor(NGL) = RO2Dmnd4RespAutor(NGL)
+    RH2UptkAutor           = 0.667_r8*RespGrossAutor(NGL)
   ENDIF
 !
 !     AUTOTROPHIC DENITRIFICATION
@@ -185,10 +183,10 @@ module MicAutoCPLXMod
     call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
   ELSE
-    RNO3UptkAutor(NGL)=0.0_r8
-    RNO2ReduxAutorSoil(NGL)=0.0_r8
-    RNO2ReduxAutorBand(NGL)=0.0_r8
-    RNOxReduxRespAutorLim(NGL)=0.0_r8
+    RNO3UptkAutor(NGL)         = 0.0_r8
+    RNO2ReduxAutorSoil(NGL)    = 0.0_r8
+    RNO2ReduxAutorBand(NGL)    = 0.0_r8
+    RNOxReduxRespAutorLim(NGL) = 0.0_r8
   ENDIF
 !
 !     BIOMASS DECOMPOSITION AND MINERALIZATION
@@ -1212,7 +1210,7 @@ module MicAutoCPLXMod
 !     and energy yield of hydrogenotrophic
 !     methanogenesis GH2X at ambient H2 concentration CH2GS
 
-  GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03_r8,CH2GS)/H2KI)**4)
+  GH2X=RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
   GH2H=GH2X/12.08_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
   VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXC

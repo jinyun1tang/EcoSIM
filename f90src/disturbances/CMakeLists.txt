@@ -1,7 +1,7 @@
 set(DISTURB_MOD_SOURCES
 	ErosionMod.F90
   PlantDisturbMod.F90
-  NitroDisturbMod.F90
+  SoilDisturbMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(disturb_mods ${DISTURB_MOD_SOURCES})

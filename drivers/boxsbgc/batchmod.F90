@@ -1258,13 +1258,15 @@ contains
   type(micfluxtype), intent(inout) :: micflx
   type(model_status_type), intent(out) :: err_status
   type(Cumlate_Flux_Diag_type)  :: naqfdiag
+  integer :: I,J
 
+  I=1;J=1
   call err_status%reset()
 
   ystatesfl=0._r8
   if(.not.forc%disvolonly)then
 !    print*,'SoilBGCOneLayer'
-    call SoilBGCOneLayer(micfor,micstt,micflx,naqfdiag)
+    call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag)
 !    print*,'RunModel_nosalt'
     call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
   endif

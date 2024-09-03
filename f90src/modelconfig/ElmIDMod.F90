@@ -135,9 +135,9 @@ implicit none
   integer, parameter :: in2fixtyp_canopy_medium=5
   integer, parameter :: in2fixtyp_canopy_slow=6
 
-  integer, parameter :: ithermozone_arcboreal=1
-  integer, parameter :: ithermozone_cooltempr=2
-  integer, parameter :: ithermozone_warmtempr=3
-  integer, parameter :: ithermozone_subtropic=4
-  integer, parameter :: ithermozone_tropical=5
+  integer, parameter :: ithermozone_arcboreal = 1
+  integer, parameter :: ithermozone_cooltempr = 2
+  integer, parameter :: ithermozone_warmtempr = 3
+  integer, parameter :: ithermozone_subtropic = 4
+  integer, parameter :: ithermozone_tropical  = 5
 end module ElmIDMod

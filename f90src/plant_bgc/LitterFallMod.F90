@@ -20,29 +20,15 @@ implicit none
   integer :: NumDeadBranches
 
 !     begin_execution
-  associate(                                                        &
-    iYearPlantHarvest_pft    => plt_distb%iYearPlantHarvest_pft,    &
-    jHarvst_pft              => plt_distb%jHarvst_pft,              &
-    iDayPlantHarvest_pft     => plt_distb%iDayPlantHarvest_pft,     &
-    UVOLO                    => plt_ew%UVOLO,                       &
-    CanopyWater_pft          => plt_ew%CanopyWater_pft,             &
-    ShootC4NonstC_brch       => plt_biom%ShootC4NonstC_brch,        &
-    RootElms_pft             => plt_biom%RootElms_pft,              &
-    SeasonalNonstElms_pft    => plt_biom%SeasonalNonstElms_pft,     &
-    iPlantPhenolPattern_pft  => plt_pheno%iPlantPhenolPattern_pft,  &
-    iPlantRootState_pft      => plt_pheno%iPlantRootState_pft,      &
-    iPlantShootState_pft     => plt_pheno%iPlantShootState_pft,     &
-    doInitPlant_pft          => plt_pheno%doInitPlant_pft,          &
-    HoursTooLowPsiCan_pft => plt_pheno%HoursTooLowPsiCan_pft, &
-    iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,      &
-    PlantPopulation_pft      => plt_site%PlantPopulation_pft,       &
-    iYearCurrent             => plt_site%iYearCurrent,              &
-    QH2OLoss_lnds                   => plt_site%QH2OLoss_lnds,                    &
-    SolarNoonHour_col        => plt_site%SolarNoonHour_col,         &
-    HypoctoHeight_pft        => plt_morph%HypoctoHeight_pft,        &
-    NumOfBranches_pft        => plt_morph%NumOfBranches_pft,        &
-    MainBranchNum_pft        => plt_morph%MainBranchNum_pft,        &
-    BranchNumber_pft         => plt_morph%BranchNumber_pft          &
+  associate(                                                      &
+    iYearPlantHarvest_pft   => plt_distb%iYearPlantHarvest_pft,   &
+    iDayPlantHarvest_pft    => plt_distb%iDayPlantHarvest_pft,    &
+    ShootC4NonstC_brch      => plt_biom%ShootC4NonstC_brch,       &
+    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
+    iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch,     &
+    iYearCurrent            => plt_site%iYearCurrent,             &
+    SolarNoonHour_col       => plt_site%SolarNoonHour_col,        &
+    MainBranchNum_pft       => plt_morph%MainBranchNum_pft        &
   )
 !
 !     SolarNoonHour_col=hour of solar noon
@@ -78,48 +64,9 @@ implicit none
 !
     call LiterfallFromDeadBranches(I,J,NZ,NumDeadBranches,ShootC4NonstC_brch)
 
-    IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
-      iPlantShootState_pft(NZ)=iDead
-      BranchNumber_pft(NZ)=0
-      HoursTooLowPsiCan_pft(NZ)=0._r8
-      IF(doInitPlant_pft(NZ).EQ.itrue)THEN
-        NumOfBranches_pft(NZ)=1
-      ELSE
-        NumOfBranches_pft(NZ)=0
-      ENDIF
-      HypoctoHeight_pft(NZ)=0._r8
-      QH2OLoss_lnds=QH2OLoss_lnds+CanopyWater_pft(NZ)
-      UVOLO=UVOLO+CanopyWater_pft(NZ)
-      CanopyWater_pft(NZ)=0._r8
-!
-!     RESET LIVING FLAGS
-!
-!     WTRVC,WTRT=PFT storage,root C
-!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
-!     jHarvst_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
-!     PP=PFT population
-!     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
-!
-      IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ).AND.&
-        iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
-        iPlantRootState_pft(NZ)=iDead
-      endif
-      IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)then
-        iPlantRootState_pft(NZ)=iDead
-      endif
-      IF(jHarvst_pft(NZ).NE.jharvtyp_noaction)then
-        iPlantRootState_pft(NZ)=iDead
-      endif
-      IF(PlantPopulation_pft(NZ).LE.0.0_r8)then
-        iPlantRootState_pft(NZ)=iDead
-      endif
-      IF(iPlantRootState_pft(NZ).EQ.iDead)then
-        iPlantShootState_pft(NZ)=iDead
-      endif
-    ENDIF
+    call SetDeadPlant(NZ,NumDeadBranches)
 !
 !     DEAD ROOTS
-!
 !
 !     LitrFall FROM DEAD ROOTS
 !
@@ -129,6 +76,70 @@ implicit none
   ENDIF
   end associate
   end subroutine ResetDeadBranch
+!------------------------------------------------------------------------------------------
+  subroutine SetDeadPlant(NZ,NumDeadBranches)
+  implicit none
+  integer, intent(in) :: NZ
+  integer, intent(in) :: NumDeadBranches
+
+  associate(                                                      &
+    doInitPlant_pft         => plt_pheno%doInitPlant_pft,         &
+    iPlantShootState_pft    => plt_pheno%iPlantShootState_pft,    &
+    NumOfBranches_pft       => plt_morph%NumOfBranches_pft,       &
+    HoursTooLowPsiCan_pft   => plt_pheno%HoursTooLowPsiCan_pft,   &
+    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft,       &
+    SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft,    &
+    CanopyWater_pft         => plt_ew%CanopyWater_pft,            &
+    RootElms_pft            => plt_biom%RootElms_pft,             &
+    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
+    PlantPopulation_pft     => plt_site%PlantPopulation_pft,      &    
+    jHarvst_pft             => plt_distb%jHarvst_pft,             &    
+    iPlantRootState_pft     => plt_pheno%iPlantRootState_pft,     &
+    QH2OLoss_lnds           => plt_site%QH2OLoss_lnds,            &
+    H2OLoss_CumYr_col       => plt_ew%H2OLoss_CumYr_col,          &
+    BranchNumber_pft        => plt_morph%BranchNumber_pft         &
+  )
+  IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
+    iPlantShootState_pft(NZ)  = iDead
+    BranchNumber_pft(NZ)      = 0
+    HoursTooLowPsiCan_pft(NZ) = 0._r8
+    IF(doInitPlant_pft(NZ).EQ.itrue)THEN
+      NumOfBranches_pft(NZ)=1
+    ELSE
+      NumOfBranches_pft(NZ)=0
+    ENDIF
+    HypoctoHeight_pft(NZ) = 0._r8
+    QH2OLoss_lnds         = QH2OLoss_lnds+CanopyWater_pft(NZ)
+    H2OLoss_CumYr_col     = H2OLoss_CumYr_col+CanopyWater_pft(NZ)
+    CanopyWater_pft(NZ)   = 0._r8
+!
+!     RESET LIVING FLAGS
+!
+!     WTRVC,WTRT=PFT storage,root C
+!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
+!     jHarvst_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
+!     PP=PFT population
+!     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+!
+    IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ).AND.&
+      iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
+      iPlantRootState_pft(NZ)=iDead
+    endif
+    IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)then
+      iPlantRootState_pft(NZ)=iDead
+    endif
+    IF(jHarvst_pft(NZ).NE.jharvtyp_noaction)then
+      iPlantRootState_pft(NZ)=iDead
+    endif
+    IF(PlantPopulation_pft(NZ).LE.0.0_r8)then
+      iPlantRootState_pft(NZ)=iDead
+    endif
+    IF(iPlantRootState_pft(NZ).EQ.iDead)then
+      iPlantShootState_pft(NZ)=iDead
+    endif
+  ENDIF
+  end associate
+  end subroutine SetDeadPlant    
 !------------------------------------------------------------------------------------------
 
   subroutine LiterfallFromRootShootStorage(I,J,NZ,ShootC4NonstC_brch)
@@ -376,7 +387,7 @@ implicit none
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft,     &
     SeedDepth_pft             => plt_morph%SeedDepth_pft,            &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft               &
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           &
   )
 !     IDTHR=PFT root living flag: 0=alive,1=dead
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
@@ -518,7 +529,7 @@ implicit none
 !     NIXBotRootLayer_rpft=deepest root layer
 !     RTDP1=primary root depth from soil surface
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!
+!   
     D8795: DO NR=1,NumRootAxes_pft(NZ)
       NIXBotRootLayer_rpft(NR,NZ)=NGTopRootLayer_pft(NZ)
       D8790: DO N=1,MY(NZ)
@@ -833,7 +844,7 @@ implicit none
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,       &
     InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,     &
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,       &
-    LeafChemElmByLayerNode_brch => plt_biom%LeafChemElmByLayerNode_brch, &
+    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,          &
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,        &
     CPOOL3_node                 => plt_photo%CPOOL3_node,                &
@@ -918,9 +929,9 @@ implicit none
     InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ)=0._r8
     D8865: DO L=1,NumOfCanopyLayers1
       CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)-CanopyLeafArea_lpft(L,K,NB,NZ)
-      CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)-LeafChemElmByLayerNode_brch(ielmc,L,K,NB,NZ)
+      CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)-LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
       CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
-      LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+      LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,NumOfLeafZenithSectors1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8

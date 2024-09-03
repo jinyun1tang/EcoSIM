@@ -67,6 +67,7 @@ implicit none
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
+  if(lverb)write(*,*)'RelayerSoilProfile'
   IF(.not. erosion_model)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
 
@@ -338,7 +339,7 @@ implicit none
       ! SoiBulkDensityt0_vr: initial bulk density,
       IF((iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)&
         .AND.ABS(DORGC(LX)).GT.ZEROS(NY,NX))THEN
-        DDLEqv_OrgC=MWC2Soil*DORGC(LX)/((1.0_r8-SoilFracAsMacP(LX,NY,NX)) &
+        DDLEqv_OrgC=MWC2Soil*DORGC(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX)) &
           *SoiBulkDensityt0_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
 
         ! obtain diagnostics only for NX==1
@@ -468,9 +469,9 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D200
-    VLSoilMicP(LX,NY,NX)=VLSoilPoreMicP_vr(LX,NY,NX)
+    VLSoilMicP_vr(LX,NY,NX)=VLSoilPoreMicP_vr(LX,NY,NX)
   ENDDO D225
-  VLSoilMicP(0,NY,NX)=VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)
+  VLSoilMicP_vr(0,NY,NX)=VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)
   end subroutine SoilRelayering
 
 !------------------------------------------------------------------------------------------
@@ -606,17 +607,17 @@ implicit none
   !     CDPTHY(L)=CDPTHY(L)+DDLYRY(L)
     DLYR(3,L,NY,NX)=DLYR(3,L,NY,NX)+DDLYRY(L)
     SoiDepthMidLay(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
-    CumSoilThickness(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+    CumSoilThickness_vr(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     IF(L.EQ.NL(NY,NX)-1)THEN
       DLYR(3,L+1,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-CumDepth2LayerBottom(L,NY,NX)
       SoiDepthMidLay(L+1,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L+1,NY,NX)+CumDepth2LayerBottom(L,NY,NX))
-      CumSoilThickness(L+1,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+      CumSoilThickness_vr(L+1,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     ENDIF
     IF(L.EQ.NU(NY,NX))THEN
-      DPTHZ(L,NY,NX)=0.5_r8*CumSoilThickness(L,NY,NX)
+      DPTHZ_vr(L,NY,NX)=0.5_r8*CumSoilThickness_vr(L,NY,NX)
     !     DDLYRX(NN)=DDLYRX(NN)+DDLYR(L,5)
     ELSE
-      DPTHZ(L,NY,NX)=0.5_r8*(CumSoilThickness(L,NY,NX)+CumSoilThickness(L-1,NY,NX))
+      DPTHZ_vr(L,NY,NX)=0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
     ENDIF
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
     !     DDLYRX(NN)=CumDepth2LayerBottom(L,NY,NX)-CDPTHX(L)
@@ -638,8 +639,8 @@ implicit none
           IFLGL(L,NN)=1
           DLYR(3,NUX,NY,NX)=0.0_r8
           IF(SoiBulkDensity_vr(NUX,NY,NX).LE.ZERO)THEN
-            VGeomLayer(NUX,NY,NX)=AREA(3,NUX,NY,NX)*DLYR(3,NUX,NY,NX)
-            VLSoilPoreMicP_vr(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FracSoiAsMicP(NUX,NY,NX)
+            VGeomLayer_vr(NUX,NY,NX)=AREA(3,NUX,NY,NX)*DLYR(3,NUX,NY,NX)
+            VLSoilPoreMicP_vr(NUX,NY,NX)=VGeomLayer_vr(NUX,NY,NX)*FracSoiAsMicP_vr(NUX,NY,NX)
           ENDIF
           exit
         ENDIF
@@ -666,7 +667,7 @@ implicit none
         DDLYRX(NN)=(MaxVLWatByLitR(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
         DLYR0=(AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX)) &
-          +VLitR(NY,NX))/AREA(3,0,NY,NX)
+          +VLitR_col(NY,NX))/AREA(3,0,NY,NX)
         DLYR(3,0,NY,NX)=DLYR0+DDLYRX(NN)
         DLYR(3,NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
         IF(L.GT.2)THEN
@@ -678,8 +679,8 @@ implicit none
         CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
         CDPTHY(0)=CDPTHY(NU(NY,NX))-DLYR(3,NU(NY,NX),NY,NX)
         SoiDepthMidLay(NU(NY,NX),NY,NX)=0.5_r8*(CumDepth2LayerBottom(NU(NY,NX),NY,NX)+CumDepth2LayerBottom(0,NY,NX))
-        CumSoilThickness(NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)
-        DPTHZ(NU(NY,NX),NY,NX)=0.5_r8*CumSoilThickness(NU(NY,NX),NY,NX)
+        CumSoilThickness_vr(NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)
+        DPTHZ_vr(NU(NY,NX),NY,NX)=0.5_r8*CumSoilThickness_vr(NU(NY,NX),NY,NX)
       ELSE
         DDLYRX(NN)=0.0_r8
         IFLGL(L,NN)=0
@@ -710,17 +711,17 @@ implicit none
     SAND(L1,NY,NX)=SAND(L1,NY,NX)+FX*SAND(L0,NY,NX)
     SILT(L1,NY,NX)=SILT(L1,NY,NX)+FX*SILT(L0,NY,NX)
     CLAY(L1,NY,NX)=CLAY(L1,NY,NX)+FX*CLAY(L0,NY,NX)
-    trcx_solml(idx_CEC,L1,NY,NX)=trcx_solml(idx_CEC,L1,NY,NX) &
-      +FX*trcx_solml(idx_CEC,L0,NY,NX)
-    trcx_solml(idx_AEC,L1,NY,NX)=trcx_solml(idx_AEC,L1,NY,NX) &
-      +FX*trcx_solml(idx_AEC,L0,NY,NX)
+    trcx_solml_vr(idx_CEC,L1,NY,NX)=trcx_solml_vr(idx_CEC,L1,NY,NX) &
+      +FX*trcx_solml_vr(idx_CEC,L0,NY,NX)
+    trcx_solml_vr(idx_AEC,L1,NY,NX)=trcx_solml_vr(idx_AEC,L1,NY,NX) &
+      +FX*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
 
   VLWatMicP_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)+FX*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP_vr(L1,NY,NX)=VLiceMicP_vr(L1,NY,NX)+FX*VLiceMicP_vr(L0,NY,NX)
   VLsoiAirP_vr(L1,NY,NX)=VLsoiAirP_vr(L1,NY,NX)+FX*VLsoiAirP_vr(L0,NY,NX)
   VLMicP_vr(L1,NY,NX)=VLMicP_vr(L1,NY,NX)+FX*VLMicP_vr(L0,NY,NX)
-  VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FX*VLSoilMicP(L0,NY,NX)
+  VLSoilMicP_vr(L1,NY,NX)=VLSoilMicP_vr(L1,NY,NX)+FX*VLSoilMicP_vr(L0,NY,NX)
   VLWatMicPX_vr(L1,NY,NX)=VLWatMicP_vr(L1,NY,NX)
   ENGY1=VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)
   ENGY0=VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)
@@ -728,7 +729,7 @@ implicit none
   VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FX*VHeatCapacitySoilM(L0,NY,NX)
   VHeatCapacity_vr(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
     +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP_vr(L1,NY,NX)) &
-    +cpi*(VLiceMicP_vr(L1,NY,NX)+VLiceMacP_col(L1,NY,NX))
+    +cpi*(VLiceMicP_vr(L1,NY,NX)+VLiceMacP_vr(L1,NY,NX))
 
   IF(VHeatCapacity_vr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS_vr(L1,NY,NX)=ENGY1/VHeatCapacity_vr(L1,NY,NX)
@@ -753,8 +754,8 @@ implicit none
 
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)&
-        +FX*trcSalt_solml(NTSA,L0,NY,NX)
+      trcSalt_solml_vr(NTSA,L1,NY,NX)=trcSalt_solml_vr(NTSA,L1,NY,NX)&
+        +FX*trcSalt_solml_vr(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
 
@@ -766,20 +767,20 @@ implicit none
 
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
-        trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FX*trcSalt_solml(NTSAB,L0,NY,NX)
+        trcSalt_solml_vr(NTSAB,L1,NY,NX)=trcSalt_solml_vr(NTSAB,L1,NY,NX)+FX*trcSalt_solml_vr(NTSAB,L0,NY,NX)
       ENDDO
     ENDIF
 
     DO NTX=idx_beg+1,idx_cation_end
-      trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FX*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FX*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
 
     DO NTX=idx_AEC+1,idx_end
-      trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FX*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FX*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
 
     DO NTP=idsp_beg,idsp_end
-      trcp_salml(NTP,L1,NY,NX)=trcp_salml(NTP,L1,NY,NX)+FX*trcp_salml(NTP,L0,NY,NX)
+      trcp_saltpml_vr(NTP,L1,NY,NX)=trcp_saltpml_vr(NTP,L1,NY,NX)+FX*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
     DO NTG=idg_beg,idg_end-1
@@ -889,25 +890,25 @@ implicit none
     SAND(L0,NY,NX)=FY*SAND(L0,NY,NX)
     SILT(L0,NY,NX)=FY*SILT(L0,NY,NX)
     CLAY(L0,NY,NX)=FY*CLAY(L0,NY,NX)
-    trcx_solml(idx_CEC,L0,NY,NX)=FY*trcx_solml(idx_CEC,L0,NY,NX)
-    trcx_solml(idx_AEC,L0,NY,NX)=FY*trcx_solml(idx_AEC,L0,NY,NX)
+    trcx_solml_vr(idx_CEC,L0,NY,NX)=FY*trcx_solml_vr(idx_CEC,L0,NY,NX)
+    trcx_solml_vr(idx_AEC,L0,NY,NX)=FY*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
 !     IF(SoiBulkDensity_vr(L0,NY,NX).LE.ZERO)THEN
-!     VGeomLayer(L0,NY,NX)=FY*VGeomLayer(L0,NY,NX)
+!     VGeomLayer_vr(L0,NY,NX)=FY*VGeomLayer_vr(L0,NY,NX)
 !     VLSoilPoreMicP_vr(L0,NY,NX)=FY*VLSoilPoreMicP_vr(L0,NY,NX)
 !     ENDIF
   VLWatMicP_vr(L0,NY,NX)=FY*VLWatMicP_vr(L0,NY,NX)
   VLiceMicP_vr(L0,NY,NX)=FY*VLiceMicP_vr(L0,NY,NX)
   VLsoiAirP_vr(L0,NY,NX)=FY*VLsoiAirP_vr(L0,NY,NX)
   VLMicP_vr(L0,NY,NX)=FY*VLMicP_vr(L0,NY,NX)
-  VLSoilMicP(L0,NY,NX)=FY*VLSoilMicP(L0,NY,NX)
+  VLSoilMicP_vr(L0,NY,NX)=FY*VLSoilMicP_vr(L0,NY,NX)
   VLWatMicPX_vr(L0,NY,NX)=VLWatMicP_vr(L0,NY,NX)
   ENGY0=FY*ENGY0
   VHeatCapacitySoilM(L0,NY,NX)=FY*VHeatCapacitySoilM(L0,NY,NX)
   IF(L0.NE.0)THEN
     VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP_vr(L0,NY,NX)) &
-      +cpi*(VLiceMicP_vr(L0,NY,NX)+VLiceMacP_col(L0,NY,NX))
+      +cpi*(VLiceMicP_vr(L0,NY,NX)+VLiceMacP_vr(L0,NY,NX))
   ELSE
     VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP_vr(L0,NY,NX)
   ENDIF
@@ -933,7 +934,7 @@ implicit none
   ENDDO
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_solml(NTSA,L0,NY,NX)=FY*trcSalt_solml(NTSA,L0,NY,NX)
+      trcSalt_solml_vr(NTSA,L0,NY,NX)=FY*trcSalt_solml_vr(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
   IF(L0.NE.0)THEN
@@ -941,19 +942,19 @@ implicit none
     trc_solml_vr(ids_H2PO4B,L0,NY,NX)=FY*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
-        trcSalt_solml(NTSAB,L0,NY,NX)=FY*trcSalt_solml(NTSAB,L0,NY,NX)
+        trcSalt_solml_vr(NTSAB,L0,NY,NX)=FY*trcSalt_solml_vr(NTSAB,L0,NY,NX)
       ENDDO
     ENDIF
 
     DO NTX=idx_beg+1,idx_cation_end
-      trcx_solml(NTX,L0,NY,NX)=FY*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L0,NY,NX)=FY*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
     DO NTX=idx_AEC+1,idx_end
-      trcx_solml(NTX,L0,NY,NX)=FY*trcx_solml(NTX,L0,NY,NX)
+      trcx_solml_vr(NTX,L0,NY,NX)=FY*trcx_solml_vr(NTX,L0,NY,NX)
     ENDDO
 
     DO NTP=idsp_beg,idsp_end
-      trcp_salml(NTP,L0,NY,NX)=FY*trcp_salml(NTP,L0,NY,NX)
+      trcp_saltpml_vr(NTP,L0,NY,NX)=FY*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
     DO NTG=idg_beg,idg_end-1
@@ -1140,7 +1141,7 @@ implicit none
         DOM_vr(idom,K,L0,NY,NX)=DOM_vr(idom,K,L0,NY,NX)-FXOQC
       enddo
 
-      IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
+      IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
         DO idom=idom_beg,idom_end
           FXOQCH=FXO*DOM_MacP_vr(idom,K,L0,NY,NX)
           DOM_MacP_vr(idom,K,L1,NY,NX)=DOM_MacP_vr(idom,K,L1,NY,NX)+FXOQCH
@@ -1168,10 +1169,10 @@ implicit none
     DO NZ=1,NP(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND.RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        IF(L0.EQ.L.OR.DPTHZ(L1,NY,NX).LE.ZERO)THEN
+        IF(L0.EQ.L.OR.DPTHZ_vr(L1,NY,NX).LE.ZERO)THEN
           FRO=FO
         ELSE
-          FRO=AMIN1(0.5,FO*DPTHZ(L0,NY,NX)/DPTHZ(L1,NY,NX))
+          FRO=AMIN1(0.5,FO*DPTHZ_vr(L0,NY,NX)/DPTHZ_vr(L1,NY,NX))
         ENDIF
 
         DO  N=1,MY(NZ,NY,NX)
@@ -1296,7 +1297,7 @@ implicit none
 !
 !     SOIL MACROPORE N,P SOLUTES
 !
-  IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
+  IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
 
     DO NTS=ids_beg,ids_end
       FXSH=FHO*trc_soHml_vr(NTS,L0,NY,NX)
@@ -1309,9 +1310,9 @@ implicit none
 !
     IF(salt_model)THEN
       DO NTSA=idsalt_beg,idsaltb_end
-        FXH=FHO*trcSalt_soHml(NTSA,L0,NY,NX)
-        trcSalt_soHml(NTSA,L1,NY,NX)=trcSalt_soHml(NTSA,L1,NY,NX)+FXH
-        trcSalt_soHml(NTSA,L0,NY,NX)=trcSalt_soHml(NTSA,L0,NY,NX)-FXH
+        FXH=FHO*trcSalt_soHml_vr(NTSA,L0,NY,NX)
+        trcSalt_soHml_vr(NTSA,L1,NY,NX)=trcSalt_soHml_vr(NTSA,L1,NY,NX)+FXH
+        trcSalt_soHml_vr(NTSA,L0,NY,NX)=trcSalt_soHml_vr(NTSA,L0,NY,NX)-FXH
       ENDDO
     ENDIF
 !
@@ -1340,9 +1341,9 @@ implicit none
 
   IF(salt_model)THEN
     DO NTSAB=idsaltb_beg,idsaltb_end
-      FXB=FWO*trcSalt_solml(NTSAB,L0,NY,NX)
-      trcSalt_solml(NTSAB,L1,NY,NX)=trcSalt_solml(NTSAB,L1,NY,NX)+FXB
-      trcSalt_solml(NTSAB,L0,NY,NX)=trcSalt_solml(NTSAB,L0,NY,NX)-FXB
+      FXB=FWO*trcSalt_solml_vr(NTSAB,L0,NY,NX)
+      trcSalt_solml_vr(NTSAB,L1,NY,NX)=trcSalt_solml_vr(NTSAB,L1,NY,NX)+FXB
+      trcSalt_solml_vr(NTSAB,L0,NY,NX)=trcSalt_solml_vr(NTSAB,L0,NY,NX)-FXB
     ENDDO
   ENDIF
 !
@@ -1354,9 +1355,9 @@ implicit none
     FCO=AMIN1(0.5_r8,FO*CEC(L1,NY,NX)/CEC(L0,NY,NX))
   ENDIF
   DO NTX=idx_beg,idx_cation_end
-    FXXC=FCO*trcx_solml(NTX,L0,NY,NX)
-    trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FXXC
-    trcx_solml(NTX,L0,NY,NX)=trcx_solml(NTX,L0,NY,NX)-FXXC
+    FXXC=FCO*trcx_solml_vr(NTX,L0,NY,NX)
+    trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FXXC
+    trcx_solml_vr(NTX,L0,NY,NX)=trcx_solml_vr(NTX,L0,NY,NX)-FXXC
   ENDDO
 !
 !     SOIL ADSORBED ANIONS IN BAND, NON-BAND
@@ -1368,17 +1369,17 @@ implicit none
   ENDIF
 
   DO NTX=idx_cation_end+1,idx_end
-    FXXA=FAO*trcx_solml(NTX,L0,NY,NX)
-    trcx_solml(NTX,L1,NY,NX)=trcx_solml(NTX,L1,NY,NX)+FXXA
-    trcx_solml(NTX,L0,NY,NX)=trcx_solml(NTX,L0,NY,NX)-FXXA
+    FXXA=FAO*trcx_solml_vr(NTX,L0,NY,NX)
+    trcx_solml_vr(NTX,L1,NY,NX)=trcx_solml_vr(NTX,L1,NY,NX)+FXXA
+    trcx_solml_vr(NTX,L0,NY,NX)=trcx_solml_vr(NTX,L0,NY,NX)-FXXA
   ENDDo
 !
 !     SOIL PRECIPITATES IN BAND, NON-BAND
 !
   DO NTP=idsp_beg,idsp_end
-    FXP=AMIN1(FX*trcp_salml(NTP,L,NY,NX),trcp_salml(NTP,L0,NY,NX))
-    trcp_salml(NTP,L1,NY,NX)=trcp_salml(NTP,L1,NY,NX)+FXP
-    trcp_salml(NTP,L0,NY,NX)=trcp_salml(NTP,L0,NY,NX)-FXP
+    FXP=AMIN1(FX*trcp_saltpml_vr(NTP,L,NY,NX),trcp_saltpml_vr(NTP,L0,NY,NX))
+    trcp_saltpml_vr(NTP,L1,NY,NX)=trcp_saltpml_vr(NTP,L1,NY,NX)+FXP
+    trcp_saltpml_vr(NTP,L0,NY,NX)=trcp_saltpml_vr(NTP,L0,NY,NX)-FXP
   ENDDO
 
   end subroutine MoveBandSolute
@@ -1454,9 +1455,9 @@ implicit none
 !
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      FXZ=FWO*trcSalt_solml(NTSA,L0,NY,NX)
-      trcSalt_solml(NTSA,L1,NY,NX)=trcSalt_solml(NTSA,L1,NY,NX)+FXZ
-      trcSalt_solml(NTSA,L0,NY,NX)=trcSalt_solml(NTSA,L0,NY,NX)-FXZ
+      FXZ=FWO*trcSalt_solml_vr(NTSA,L0,NY,NX)
+      trcSalt_solml_vr(NTSA,L1,NY,NX)=trcSalt_solml_vr(NTSA,L1,NY,NX)+FXZ
+      trcSalt_solml_vr(NTSA,L0,NY,NX)=trcSalt_solml_vr(NTSA,L0,NY,NX)-FXZ
     ENDDO
   ENDIF
   end subroutine MoveFertSalt
@@ -1587,22 +1588,22 @@ implicit none
 !
 !     SOIL WATER AND HEAT
 !
-  IF(SoilFracAsMacP(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP(L0,NY,NX).GT.ZERO)THEN
-    IF(L0.EQ.L.OR.SoilFracAsMacPt0(L0,NY,NX).LE.ZERO)THEN
+  IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
+    IF(L0.EQ.L.OR.SoilFracAsMacPt0_vr(L0,NY,NX).LE.ZERO)THEN
       FHO=FO
     ELSE
-      FHO=AMIN1(0.5_r8,FO*SoilFracAsMacPt0(L1,NY,NX)/SoilFracAsMacPt0(L0,NY,NX))
+      FHO=AMIN1(0.5_r8,FO*SoilFracAsMacPt0_vr(L1,NY,NX)/SoilFracAsMacPt0_vr(L0,NY,NX))
     ENDIF
-    SoilFracAsMacP(L1,NY,NX)=(1.0_r8-FO)*SoilFracAsMacP(L1,NY,NX)+FO*SoilFracAsMacP(L0,NY,NX)
+    SoilFracAsMacP_vr(L1,NY,NX)=(1.0_r8-FO)*SoilFracAsMacP_vr(L1,NY,NX)+FO*SoilFracAsMacP_vr(L0,NY,NX)
     FXVOLWH=FHO*VLWatMacP_vr(L0,NY,NX)
     VLWatMacP_vr(L1,NY,NX)=VLWatMacP_vr(L1,NY,NX)+FXVOLWH
     VLWatMacP_vr(L0,NY,NX)=VLWatMacP_vr(L0,NY,NX)-FXVOLWH
-    FXVOLIH=FHO*VLiceMacP_col(L0,NY,NX)
-    VLiceMacP_col(L1,NY,NX)=VLiceMacP_col(L1,NY,NX)+FXVOLIH
-    VLiceMacP_col(L0,NY,NX)=VLiceMacP_col(L0,NY,NX)-FXVOLIH
-    FXVOLAH=FHO*VLMacP(L0,NY,NX)
-    VLMacP(L1,NY,NX)=VLMacP(L1,NY,NX)+FXVOLAH
-    VLMacP(L0,NY,NX)=VLMacP(L0,NY,NX)-FXVOLAH
+    FXVOLIH=FHO*VLiceMacP_vr(L0,NY,NX)
+    VLiceMacP_vr(L1,NY,NX)=VLiceMacP_vr(L1,NY,NX)+FXVOLIH
+    VLiceMacP_vr(L0,NY,NX)=VLiceMacP_vr(L0,NY,NX)-FXVOLIH
+    FXVOLAH=FHO*VLMacP_vr(L0,NY,NX)
+    VLMacP_vr(L1,NY,NX)=VLMacP_vr(L1,NY,NX)+FXVOLAH
+    VLMacP_vr(L0,NY,NX)=VLMacP_vr(L0,NY,NX)-FXVOLAH
   ENDIF
   end subroutine MoveFertMinerals
 
@@ -1646,9 +1647,9 @@ implicit none
 !     IF(L0.NE.NU(NY,NX))THEN
 !     VLMicP_vr(L0,NY,NX)=VLMicP_vr(L0,NY,NX)-FXVOLA
 !     ENDIF
-  FXVLSoilMicP=FWO*VLSoilMicP(L0,NY,NX)
-  VLSoilMicP(L1,NY,NX)=VLSoilMicP(L1,NY,NX)+FXVLSoilMicP
-  VLSoilMicP(L0,NY,NX)=VLSoilMicP(L0,NY,NX)-FXVLSoilMicP
+  FXVLSoilMicP=FWO*VLSoilMicP_vr(L0,NY,NX)
+  VLSoilMicP_vr(L1,NY,NX)=VLSoilMicP_vr(L1,NY,NX)+FXVLSoilMicP
+  VLSoilMicP_vr(L0,NY,NX)=VLSoilMicP_vr(L0,NY,NX)-FXVLSoilMicP
   FXVOLWX=FWO*VLWatMicPX_vr(L0,NY,NX)
   VLWatMicPX_vr(L1,NY,NX)=VLWatMicPX_vr(L1,NY,NX)+FXVOLWX
   VLWatMicPX_vr(L0,NY,NX)=VLWatMicPX_vr(L0,NY,NX)-FXVOLWX

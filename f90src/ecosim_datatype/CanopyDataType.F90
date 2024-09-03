@@ -1,6 +1,7 @@
 module CanopyDataType
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval => DAT_CONST_SPVAL     
   use GridConsts
   use ElmIDMod
   use EcoSIMConfig, only : jsken => jskenc
@@ -10,6 +11,7 @@ module CanopyDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  real(r8),target,allocatable ::  StomatalStress_pft(:,:,:)               !stomatal stress from water/turgor, [0-1]
   real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                        !canopy PAR albedo , [-]
   real(r8),target,allocatable ::  RadPARLeafTransmis_pft(:,:,:)                        !canopy PAR transmissivity , [-]
   real(r8),target,allocatable ::  LeafSWabsorpty_pft(:,:,:)                        !canopy shortwave absorptivity , [-]
@@ -106,7 +108,6 @@ module CanopyDataType
   real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                       !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                 !
-  real(r8),target,allocatable ::  ShootElmsbeg_pft(:,:,:,:)           !shoot biomass for each pft
   real(r8),target,allocatable ::  ShootElms_brch(:,:,:,:,:)           !shoot biomass for each branch, struct + nonstructual, g/d2
   real(r8),target,allocatable ::  ShootC4NonstC_brch(:,:,:,:)
   real(r8),target,allocatable ::  ShootStrutElms_pft(:,:,:,:)                    !canopy shoot element, [g d-2]
@@ -147,7 +148,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafElmntNode_brch(:,:,:,:,:,:)                    !leaf element, [g d-2]
   real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)                 !sheath element , [g d-2]
   real(r8),target,allocatable ::  InternodeStrutElms_brch(:,:,:,:,:,:)                  !internode element, [g d-2]
-  real(r8),target,allocatable ::  LeafChemElmByLayerNode_brch(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
+  real(r8),target,allocatable ::  LeafElmsByLayerNode_brch(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_lpft(:,:,:,:,:,:)                 !layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafProteinCNode_brch(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
   real(r8),target,allocatable ::  PetoleProteinCNode_brch(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
@@ -158,12 +159,17 @@ module CanopyDataType
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)                      !landscape average canopy shoot C, [g d-2]
+  real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)
+  real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)
   contains
 !----------------------------------------------------------------------
 
   subroutine InitCanopyData
 
   implicit none
+  allocate(CO2FixCL_pft(JP,JY,JX)); CO2FixCL_pft=spval
+  allocate(CO2FixLL_pft(JP,JY,JX)); CO2FixLL_pft=spval
+  allocate(StomatalStress_pft(JP,JY,JX)); StomatalStress_pft=spval     !no stress when equals to one
   allocate(CanopyPARalbedo_pft(JP,JY,JX));     CanopyPARalbedo_pft=0._r8
   allocate(RadPARLeafTransmis_pft(JP,JY,JX));     RadPARLeafTransmis_pft=0._r8
   allocate(LeafSWabsorpty_pft(JP,JY,JX));     LeafSWabsorpty_pft=0._r8
@@ -259,7 +265,6 @@ module CanopyDataType
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
   allocate(tCanLeafC_cl(NumOfCanopyLayers,JY,JX));    tCanLeafC_cl=0._r8
   allocate(ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));ElmAllocmat4Litr=0._r8
-  allocate(ShootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); ShootElmsbeg_pft=0._r8
   allocate(ShootStrutElms_pft(NumPlantChemElms,JP,JY,JX)); ShootStrutElms_pft=0._r8
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
   allocate(PetoleStrutElms_pft(NumPlantChemElms,JP,JY,JX)); PetoleStrutElms_pft=0._r8
@@ -301,8 +306,8 @@ module CanopyDataType
   allocate(LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
   allocate(PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
   allocate(InternodeStrutElms_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeStrutElms_brch=0._r8
-  allocate(LeafChemElmByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));
-  LeafChemElmByLayerNode_brch=0._r8
+  allocate(LeafElmsByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));
+  LeafElmsByLayerNode_brch=0._r8
   allocate(CanopyLeafArea_lpft(NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafArea_lpft=0._r8
   allocate(LeafProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinCNode_brch=0._r8
   allocate(PetoleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleProteinCNode_brch=0._r8
@@ -319,7 +324,9 @@ module CanopyDataType
   subroutine DestructCanopyData
   use abortutils, only : destroy
   implicit none
-
+  call destroy(CO2FixCL_pft)
+  call destroy(CO2FixLL_pft)
+  call destroy(StomatalStress_pft)
   call destroy(CanopyPARalbedo_pft)
   call destroy(RadPARLeafTransmis_pft)
   call destroy(LeafSWabsorpty_pft)
@@ -416,7 +423,6 @@ module CanopyDataType
   call destroy(NetCumElmntFlx2Plant_pft)
   call destroy(tCanLeafC_cl)
   call destroy(ElmAllocmat4Litr)
-  call destroy(ShootElmsbeg_pft)
   call destroy(ShootStrutElms_pft)
   call destroy(LeafStrutElms_pft)
   call destroy(PetoleStrutElms_pft)
@@ -457,7 +463,7 @@ module CanopyDataType
   call destroy(LeafElmntNode_brch)
   call destroy(PetioleElmntNode_brch)
   call destroy(InternodeStrutElms_brch)
-  call destroy(LeafChemElmByLayerNode_brch)
+  call destroy(LeafElmsByLayerNode_brch)
   call destroy(CanopyLeafArea_lpft)
   call destroy(LeafProteinCNode_brch)
   call destroy(PetoleProteinCNode_brch)

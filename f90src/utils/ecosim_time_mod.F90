@@ -176,6 +176,7 @@ contains
       endif
     endif
     if(present(year0))this%year0=year0
+    this%leap_yr=isLeapi(this%year0)
   end subroutine Init
 
   ! ----------------------------------------------------------------------
@@ -283,7 +284,6 @@ contains
     this%rest_frq=rest_frq
     this%stop_count=stop_n
     this%curr_stop_count=0
-
     select case (trim(stop_option))
     case ('nsteps')
       this%stop_opt=1
@@ -649,8 +649,10 @@ contains
   integer function get_days_cur_year(this)
     implicit none
     class(ecosim_time_type), intent(in) :: this
-
-    get_days_cur_year=365+this%leap_yr
+    integer :: year
+    year=this%get_curr_yearAD()    
+    get_days_cur_year=365
+    if(isLeap(year))get_days_cur_year=366
   end function  get_days_cur_year
   !-------------------------------------------------------------------------------
 
@@ -854,7 +856,11 @@ contains
   integer :: ans
 
   ans=0
-  if(isLeap(year))ans=1
+  if(year<=0)then
+    ans=0
+  else if(isLeap(year))then
+    ans=1
+  endif
   return
   end function isLeapi
 !------------------------------------------------------------------------------------------

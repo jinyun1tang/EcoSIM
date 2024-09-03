@@ -6,14 +6,14 @@
 case_name='lake'
 prefix='../../inputs/lake/'
 do_regression_test=.false.
-pft_file_in='../../../input_data/ecosim_pft_20240314.nc'
+pft_file_in='../../../input_data/ecosim_pftpar_20240723.nc'
 grid_file_in='../../../examples/inputs/lake/lake_grid_20230510.nc'
 pft_mgmt_in='../../../examples/inputs/lake/lake_pft_20230131.nc'
 soil_mgmt_in='NO'
-clm_file_in='../../../examples/inputs/lake/lake_clim_20230203.nc'
+clm_hour_file_in='../../../examples/inputs/lake/lake_clim_20230203.nc'
 clm_factor_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
-lverbose=.true.
+lverbose=.false.
 plant_model=.true.
 microbial_model=.true.
 soichem_model=.true.
@@ -23,7 +23,7 @@ iErosionMode=0
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '19900101000000'
-continue_run=.true.
+continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2001,2001,10,2001,2004,0,2001,2008,0
 

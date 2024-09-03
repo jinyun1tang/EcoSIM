@@ -25,7 +25,7 @@ implicit none
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
 
   real(r8),allocatable ::  TWatXChange2WatTableX(:,:,:)                      !
-  real(r8),allocatable ::  FWatIrrigate2MicP1(:,:,:)                        !
+  real(r8),allocatable ::  FWatIrrigate2MicP1_vr(:,:,:)                        !
   real(r8),allocatable ::  HeatIrrigation1(:,:,:)                      !
 
   real(r8),allocatable ::  FIceThawMacP(:,:,:)                      !
@@ -74,7 +74,7 @@ contains
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
 
   allocate(TWatXChange2WatTableX(JZ,JY,JX));   TWatXChange2WatTableX=0._r8
-  allocate(FWatIrrigate2MicP1(JZ,JY,JX));     FWatIrrigate2MicP1=0._r8
+  allocate(FWatIrrigate2MicP1_vr(JZ,JY,JX));     FWatIrrigate2MicP1_vr=0._r8
   allocate(HeatIrrigation1(JZ,JY,JX));   HeatIrrigation1=0._r8
 
   allocate(FIceThawMacP(JZ,JY,JX));   FIceThawMacP=0._r8
@@ -120,7 +120,7 @@ contains
   call destroy(AVCNHL)
 
   call destroy(TWatXChange2WatTableX)
-  call destroy(FWatIrrigate2MicP1)
+  call destroy(FWatIrrigate2MicP1_vr)
   call destroy(HeatIrrigation1)
 
   call destroy(FIceThawMacP)

@@ -68,18 +68,14 @@
 
 !  leap year February.
     IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
-      IF(I.LE.N)THEN
-        N1=I-NN
-        N2=M
-        N3=iYearCurrent
-        WRITE(CHARN1,'(I3)')N1+100
-        WRITE(CHARN2,'(I3)')N2+100
-        WRITE(CHARN3,'(I4)')N3
-        WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-        call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
-        exit
-      ENDIF
-      NN=N
+    IF(I.LE.N)THEN
+      N1=I-NN
+      N2=M
+      N3=iYearCurrent
+      call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
+      exit
+    ENDIF
+    NN=N
   ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
@@ -91,7 +87,6 @@
   subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
-  use YearMod, only : SetAnnualAccumlators
   implicit none
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
@@ -104,10 +99,6 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
-        call SetAnnualAccumlators(NY,NX)
-      ENDIF
-
       TAMX(NY,NX)=-100.0_r8
       TAMN(NY,NX)=100.0_r8
       HUDX(NY,NX)=0._r8
@@ -121,20 +112,15 @@
 !     DayLenthPrev,DLYN=daylength of previous,current day
 !     ALAT=latitude
 !
-      DayLenthPrev(NY,NX)=DayLenthCurrent(NY,NX)
+      DayLenthPrev_col(NY,NX)=DayLensCurr_col(NY,NX)
 
-      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),I)
+      DayLensCurr_col(NY,NX)=GetDayLength(ALAT(NY,NX),I)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
 !
-      IF(is_first_year)THEN
-      !weather input is in daily format
-        ITYPE=IWTHR(1)
-      ELSE
-      !weather input is in hourly format
-        ITYPE=IWTHR(2)
-      ENDIF
+      ITYPE=IWTHR
+
 
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
@@ -150,9 +136,9 @@
 !     KoppenClimZone=Koppen climate zone
 
       IF(ITYPE.EQ.1)THEN
-        IF(KoppenClimZone(NY,NX).GE.-1)THEN
-          IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
-            RMAX=SRAD(I)/(DayLenthCurrent(NY,NX)*0.658_r8)
+        IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
+          IF(DayLensCurr_col(NY,NX).GT.ZERO)THEN
+            RMAX=SRAD(I)/(DayLensCurr_col(NY,NX)*0.658_r8)
           ELSE
             RMAX=0._r8
           ENDIF

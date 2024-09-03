@@ -136,14 +136,14 @@ module VisualMod
         TTCH=TTCH+SurfGasFlx_col(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
-            SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP(8,NY,NX) &
-              ,VLWatMacP_vr(8,NY,NX)))/VGeomLayer(8,NY,NX)
+            SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP_vr(8,NY,NX) &
+              ,VLWatMacP_vr(8,NY,NX)))/VGeomLayer_vr(8,NY,NX)
           ELSEIF(NU(NY,NX).EQ.4)THEN
-            SWC(NY,NX)=(VLWatMicP_vr(5,NY,NX)+AMIN1(VLMacP(5,NY,NX) &
-              ,VLWatMacP_vr(5,NY,NX)))/VGeomLayer(5,NY,NX)
+            SWC(NY,NX)=(VLWatMicP_vr(5,NY,NX)+AMIN1(VLMacP_vr(5,NY,NX) &
+              ,VLWatMacP_vr(5,NY,NX)))/VGeomLayer_vr(5,NY,NX)
           ELSE
-            SWC(NY,NX)=(VLWatMicP_vr(2,NY,NX)+AMIN1(VLMacP(2,NY,NX) &
-              ,VLWatMacP_vr(2,NY,NX)))/VGeomLayer(2,NY,NX)
+            SWC(NY,NX)=(VLWatMicP_vr(2,NY,NX)+AMIN1(VLMacP_vr(2,NY,NX) &
+              ,VLWatMacP_vr(2,NY,NX)))/VGeomLayer_vr(2,NY,NX)
           ENDIF
         ENDIF
 !     GO TO 9990
@@ -209,11 +209,11 @@ module VisualMod
           OUT(4)=-1.E-3_r8*GrossResp_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(5)=-1.E-3_r8*GrossResp_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(6)=-1.E-3_r8*GrossResp_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(7)=1.E-3_r8*Eco_GPP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(8)=1.E-3_r8*Eco_NPP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(9)=-1.E-3_r8*Eco_AutoR_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(10)=-1.E-3_r8*Eco_HR_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(11)=1.E-3_r8*Eco_NBP_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(7)=1.E-3_r8*Eco_GPP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(8)=1.E-3_r8*Eco_NPP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(9)=-1.E-3_r8*Eco_AutoR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(10)=-1.E-3_r8*Eco_HR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(11)=1.E-3_r8*Eco_NBP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(12)=-1.E-3_r8*SurfGasFlx_col(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(13)=-1.E-3_r8*SurfGasFlx_col(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
@@ -221,7 +221,7 @@ module VisualMod
           OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
-            OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),VLWatMacP_vr(L,NY,NX)))/VGeomLayer(L,NY,NX)
+            OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)))/VGeomLayer_vr(L,NY,NX)
             L=L+1
           ENDDO D60
 
@@ -230,13 +230,13 @@ module VisualMod
             OUT(N)=TKS_vr(L,NY,NX)
             L=L+1
           ENDDO D61
-          OUT(39)=-1000.0*ETCanopy_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(40)=-1000.0*ETCanopy_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(41)=-1000.0*ETCanopy_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(42)=1000.0*QEvap_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(39)=-1000.0*ETCanopy_CumYr_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(40)=-1000.0*ETCanopy_CumYr_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(41)=-1000.0*ETCanopy_CumYr_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(42)=1000.0*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
-          OUT(44)=1000.0*Qrunoff_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(45)=1000.0*AnualH2OLoss_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(44)=1000.0*Qrunoff_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(45)=1000.0*H2OLoss_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth_col(NY,NX)
           OUT(48)=CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

@@ -343,7 +343,7 @@ module PlantNonstElmDynMod
     ShutRutNonstElmntConducts_pft     => plt_pheno%ShutRutNonstElmntConducts_pft,     &
     RootCO2Autor_pvr                  => plt_rbgc%RootCO2Autor_pvr,                   &
     ECO_ER_col                        => plt_bgcr%ECO_ER_col,                         &
-    Eco_AutoR_col                     => plt_bgcr%Eco_AutoR_col,                      &
+    Eco_AutoR_CumYr_col                     => plt_bgcr%Eco_AutoR_CumYr_col,                      &
     k_woody_litr                      => pltpar%k_woody_litr,                         &
     k_fine_litr                       => pltpar%k_fine_litr,                          &
     NIXBotRootLayer_pft               => plt_morph%NIXBotRootLayer_pft,               &
@@ -360,7 +360,7 @@ module PlantNonstElmDynMod
 !     GrossResp_pft=total PFT respiration
 !     RootCO2Autor_pvr=total root respiration
 !     ECO_ER_col=ecosystem respiration
-!     Eco_AutoR_col=total autotrophic respiration
+!     Eco_AutoR_CumYr_col=total autotrophic respiration
 !
   D5445: DO N=1,MY(NZ)
     D5450: DO L=NU,MaxSoiL4Root_pft(NZ)
@@ -372,7 +372,7 @@ module PlantNonstElmDynMod
           +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
       ENDDO D5460
       ECO_ER_col=ECO_ER_col+RootCO2Autor_pvr(N,L,NZ)
-      Eco_AutoR_col=Eco_AutoR_col+RootCO2Autor_pvr(N,L,NZ)
+      Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col+RootCO2Autor_pvr(N,L,NZ)
     ENDDO D5450
 
     DO  NR=1,NumRootAxes_pft(NZ)

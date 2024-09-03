@@ -87,8 +87,8 @@ module InitPlantMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP+1,JP1
-        plt_bgcr%SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
-        plt_bgcr%LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
         plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
@@ -405,7 +405,7 @@ module InitPlantMod
     TC4LeafOut_pft           => plt_pheno%TC4LeafOut_pft,           &
     TempOffset_pft           => plt_pheno%TempOffset_pft,           &
     PlantInitThermoAdaptZone => plt_pheno%PlantInitThermoAdaptZone, &
-    iPlantThermoAdaptZone    => plt_pheno%iPlantThermoAdaptZone,    &
+    iPlantThermoAdaptZone_pft    => plt_pheno%iPlantThermoAdaptZone_pft,    &
     SeedTempSens_pft         => plt_pheno%SeedTempSens_pft          &
   )
 !
@@ -417,20 +417,20 @@ module InitPlantMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  iPlantThermoAdaptZone(NZ)=PlantInitThermoAdaptZone(NZ)
-  TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone(NZ))
+  iPlantThermoAdaptZone_pft(NZ)=PlantInitThermoAdaptZone(NZ)
+  TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone_pft(NZ))
   TC4LeafOut_pft(NZ)=TCZD-TempOffset_pft(NZ)
   TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
-      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8
     ELSE
-      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8
     ENDIF
   ELSE
-    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone(NZ)
+    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
     SeedTempSens_pft(NZ)=0.005_r8
   ENDIF
   end associate
@@ -457,7 +457,7 @@ module InitPlantMod
     CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,        &
     VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft,        &
     KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft,          &
-    CumSoilThickness      => plt_site%CumSoilThickness,       &
+    CumSoilThickness_vr      => plt_site%CumSoilThickness_vr,       &
     NU                    => plt_site%NU,                     &
     NL                    => plt_site%NL,                     &
     NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft,    &
@@ -495,7 +495,7 @@ module InitPlantMod
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
 !     SeedDepth_pft=seeding depth(m) from PFT management file
-!     CumSoilThickness=depth to soil layer bottom from surface(m)
+!     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
 !     NG,NIX,NIXBotRootLayer_rpft=seeding,upper,lower rooting layer
 !     CNRTS_pft,CPRTS_pft=N,P root growth yield
 !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
@@ -507,8 +507,8 @@ module InitPlantMod
 !
   SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)
   D9795: DO L=NU,NL
-    IF(SeedDepth_pft(NZ).GE.CumSoilThickness(L-1) &
-      .AND.SeedDepth_pft(NZ).LT.CumSoilThickness(L))THEN
+    IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
+      .AND.SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
       NGTopRootLayer_pft(NZ)=L
       NIXBotRootLayer_pft(NZ)=L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
@@ -723,7 +723,7 @@ module InitPlantMod
 
       D55: DO L=1,NumOfCanopyLayers1
         CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
-        plt_biom%LeafChemElmByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+        plt_biom%LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3_node(K,NB,NZ)=0._r8
@@ -772,55 +772,58 @@ module InitPlantMod
   integer :: M,NE
   real(r8) :: WTSTDX
 
-  associate(                                                             &
-    NU                          => plt_site%NU,                          &
-    AREA3                       => plt_site%AREA3,                       &
-    ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,        &
-    ETCanopy_pft                => plt_ew%ETCanopy_pft,                  &
-    StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft,      &
-    StandDeadStrutElms_pft      => plt_biom%StandDeadStrutElms_pft,      &
-    StandingDeadInitC_pft       => plt_biom%StandingDeadInitC_pft,       &
-    RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft,       &
-    rNCStalk_pft                => plt_allom%rNCStalk_pft,               &
-    rPCStalk_pft                => plt_allom%rPCStalk_pft,               &
-    PlantExudChemElmCum_pft     => plt_rbgc%PlantExudChemElmCum_pft,     &
-    NH3EmisCum_pft              => plt_bgcr%NH3EmisCum_pft,              &
-    NH3Dep2Can_pft              => plt_bgcr%NH3Dep2Can_pft,              &
-    SurfLitrfalStrutElmsCum_pft => plt_bgcr%SurfLitrfalStrutElmsCum_pft, &
-    GrossCO2Fix_pft             => plt_bgcr%GrossCO2Fix_pft,             &
-    CanopyRespC_pft             => plt_bgcr%CanopyRespC_pft,             &
-    GrossResp_pft               => plt_bgcr%GrossResp_pft,               &
-    PlantN2FixCum_pft           => plt_bgcr%PlantN2FixCum_pft,           &
-    LitrfalStrutElmsCum_pft     => plt_bgcr%LitrfalStrutElmsCum_pft,     &
-    CanopyStemArea_pft          => plt_morph%CanopyStemArea_pft,         &
-    icwood                      => pltpar%icwood,                        &
-    NetCumElmntFlx2Plant_pft    => plt_pheno%NetCumElmntFlx2Plant_pft    &
-
+  associate(                                                                   &
+    NU                             => plt_site%NU,                             &
+    AREA3                          => plt_site%AREA3,                          &
+    ElmAllocmat4Litr               => plt_soilchem%ElmAllocmat4Litr,           &
+    ETCanopy_CumYr_pft             => plt_ew%ETCanopy_CumYr_pft,               &
+    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft,         &
+    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft,         &
+    StandingDeadInitC_pft          => plt_biom%StandingDeadInitC_pft,          &
+    RootBiomCPerPlant_pft          => plt_biom%RootBiomCPerPlant_pft,          &
+    rNCStalk_pft                   => plt_allom%rNCStalk_pft,                  &
+    rPCStalk_pft                   => plt_allom%rPCStalk_pft,                  &
+    PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft,         &
+    RootUptk_N_CumYr_pft           => plt_rbgc%RootUptk_N_CumYr_pft,           &
+    RootUptk_P_CumYr_pft           => plt_rbgc%RootUptk_P_CumYr_pft,           &
+    NH3Emis_CumYr_pft              => plt_bgcr%NH3Emis_CumYr_pft,              &
+    NH3Dep2Can_pft                 => plt_bgcr%NH3Dep2Can_pft,                 &
+    SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft, &
+    GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft,                &
+    CanopyRespC_CumYr_pft          => plt_bgcr%CanopyRespC_CumYr_pft,          &
+    GrossResp_pft                  => plt_bgcr%GrossResp_pft,                  &
+    PlantN2Fix_CumYr_pft           => plt_bgcr%PlantN2Fix_CumYr_pft,           &
+    LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft,     &
+    CanopyStemArea_pft             => plt_morph%CanopyStemArea_pft,            &
+    icwood                         => pltpar%icwood,                           &
+    NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft       &
   )
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
   IF(.not.is_restart().AND.is_first_year)THEN
-    GrossCO2Fix_pft(NZ)=0._r8
-    SurfLitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
-    GrossResp_pft(NZ)=0._r8
-    CanopyRespC_pft(NZ)=0._r8
-    PlantExudChemElmCum_pft(1:NumPlantChemElms,NZ)=0._r8
-    LitrfalStrutElmsCum_pft(1:NumPlantChemElms,NZ)=0._r8
+    GrossCO2Fix_pft(NZ)                                   = 0._r8
+    SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
+    GrossResp_pft(NZ)                                     = 0._r8
+    CanopyRespC_CumYr_pft(NZ)                             = 0._r8
+    PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ)         = 0._r8
+    RootUptk_N_CumYr_pft(NZ)                              = 0._r8
+    RootUptk_P_CumYr_pft(NZ)                              = 0._r8
+    LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)     = 0._r8
 
-    PlantN2FixCum_pft(NZ)=0._r8
+    PlantN2Fix_CumYr_pft(NZ)=0._r8
     NH3Dep2Can_pft(NZ)=0._r8
-    NH3EmisCum_pft(NZ)=0._r8
-    plt_distb%CO2ByFire_pft(NZ)=0._r8
-    plt_distb%CH4ByFire_pft(NZ)=0._r8
-    plt_distb%O2ByFire_pft(NZ)=0._r8
-    plt_distb%NH3byFire_pft(NZ)=0._r8
-    plt_distb%N2ObyFire_pft(NZ)=0._r8
-    plt_distb%PO4byFire_pft(NZ)=0._r8
+    NH3Emis_CumYr_pft(NZ)=0._r8
+    plt_distb%CO2ByFire_CumYr_pft(NZ)=0._r8
+    plt_distb%CH4ByFire_CumYr_pft(NZ)=0._r8
+    plt_distb%O2ByFire_CumYr_pft(NZ)=0._r8
+    plt_distb%NH3byFire_CumYr_pft(NZ)=0._r8
+    plt_distb%N2ObyFire_CumYr_pft(NZ)=0._r8
+    plt_distb%PO4byFire_CumYr_pft(NZ)=0._r8
     plt_distb%EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ)=0._r8
-    plt_distb%EcoHavstElmnt_pft(1:NumPlantChemElms,NZ)=0._r8
+    plt_distb%EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)=0._r8
-    ETCanopy_pft(NZ)=0._r8
+    ETCanopy_CumYr_pft(NZ)=0._r8
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
     WTSTDX=StandingDeadInitC_pft(NZ)*AREA3(NU)
     D155: DO M=1,jsken
@@ -927,11 +930,11 @@ module InitPlantMod
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
   NumRootAxes_pft(NZ)=0
-  plt_rbgc%RootNH4Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootNO3Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootH2PO4Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootHPO4Uptake_pft(NZ)=0._r8
-  plt_rbgc%RootN2Fix_pft(NZ)=0._r8
+  plt_rbgc%RootNH4Uptake_pft(NZ)   = 0._r8
+  plt_rbgc%RootNO3Uptake_pft(NZ)   = 0._r8
+  plt_rbgc%RootH2PO4Uptake_pft(NZ) = 0._r8
+  plt_rbgc%RootHPO4Uptake_pft(NZ)  = 0._r8
+  plt_rbgc%RootN2Fix_pft(NZ)       = 0._r8
   DO NR=1,MaxNumRootAxes
     DO N=1,pltpar%jroots
       plt_morph%Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)

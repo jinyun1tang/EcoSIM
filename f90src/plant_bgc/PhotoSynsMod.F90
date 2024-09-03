@@ -15,13 +15,15 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2OClmK,CH2OLlmK)
+  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CO2FCL,CO2FLL)
 
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in) :: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress
-  real(r8), intent(out) :: CH2O3K,CH2OClmK,CH2OLlmK
+  real(r8), intent(out) :: CH2O3K
+  real(r8), intent(out) :: CO2FCL
+  real(r8), intent(out) :: CO2FLL
   integer :: L,NN,M,N,LP
   real(r8) :: WFNB
   real(r8) :: CO2X,CO2C,CO2Y
@@ -31,10 +33,10 @@ implicit none
   real(r8) :: ETLF
   real(r8) :: EGRO
   real(r8) :: GSL
-  real(r8) :: PARX,PARJ
+  real(r8) :: PARX,PARJ,PARJ2,delta
   real(r8) :: RS,RSL
   real(r8) :: VL,VGROX
-  real(r8) :: VA,VG
+  real(r8) :: VA,VG  
   real(r8) :: Tau_rad,PAR_zsec
 !begin_execution
   associate(                                                                 &
@@ -65,8 +67,7 @@ implicit none
     
   CH2O3K=0._r8
 ! FOR EACH CANOPY LAYER
-  CH2OClmK=0._r8
-  CH2OLlmK=0._r8
+  CO2FCL=0._r8;CO2FLL=0._r8
   D210: DO L=NumOfCanopyLayers1,1,-1
     IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
@@ -104,16 +105,21 @@ implicit none
 !             CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2 from stomate.f
 !             RubiscoActivity_brch=N,P feedback inhibition on C4 CO2 fixation
 !
-                PARX=QNTM*PAR_zsec
-                PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
-                ETLF=(PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
-                EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
-                VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
-                !turn off the limiter of rubisco acitivity
-                VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)
-                !the tow lines below are for diagnostics
-                CH2OClmK=CH2OClmK+CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)
-                CH2OLlmK=CH2OLlmK+EGRO
+                PARX = QNTM*PAR_zsec
+                PARJ = PARX+LigthSatCarboxyRate_node(K,NB,NZ)
+                PARJ2= PARJ*PARJ
+!                delta=CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)/PARJ2
+                ETLF = (PARJ-SQRT(PARJ2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
+                EGRO = ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
+                VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
+!                if(LP==1)THEN
+!                  write(124,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,ETLF/PAR_zsec,PARJ/PAR_zsec,PAR_zsec,&
+!                    LigthSatCarboxyRate_node(K,NB,NZ),delta
+!                ELSE
+!                  write(125,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,ETLF/PAR_zsec,PARJ/PAR_zsec,PAR_zsec,&
+!                    LigthSatCarboxyRate_node(K,NB,NZ),delta
+!                ENDIF
+
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -161,12 +167,12 @@ implicit none
                   CO2X=LeafIntracellularCO2_pft(NZ)
                 
                   D225: DO NN=1,100
-                    CO2C=CO2X*CO2Solubility_pft(NZ)
-                    CO2Y=AZMAX1(CO2C-CO2CompenPoint_node(K,NB,NZ))
-                    CBXNX=CO2Y/(ELEC3*CO2C+10.5_r8*CO2CompenPoint_node(K,NB,NZ))
-                    VGROX=Vmax4RubiscoCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
-                    EGROX=ETLF*CBXNX
-                    VL=AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)
+                    CO2C  = CO2X*CO2Solubility_pft(NZ)
+                    CO2Y  = AZMAX1(CO2C-CO2CompenPoint_node(K,NB,NZ))
+                    CBXNX = CO2Y/(ELEC3*CO2C+10.5_r8*CO2CompenPoint_node(K,NB,NZ))
+                    VGROX = Vmax4RubiscoCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
+                    EGROX = ETLF*CBXNX
+                    VL    = AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)
                     VG=(CanopyGasCO2_pft(NZ)-CO2X)*GSL
                   
                     IF(VL+VG.GT.ZERO)THEN
@@ -179,6 +185,9 @@ implicit none
                       exit
                     ENDIF
                   ENDDO D225
+                  CO2FCL=CO2FCL+VGROX
+                  CO2FLL=CO2FLL+EGROX
+!                  WRITE(123,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,VL,VGROX,EGROX,WFNB,EGROX/PAR_zsec
                   
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -205,12 +214,15 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K)
+  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K,CO2FCL,CO2FLL)
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
-  real(r8), intent(in):: PsiCan4Photosyns,Stomata_Stress
+  real(r8), intent(in):: PsiCan4Photosyns
+  real(r8), intent(in) :: Stomata_Stress
   real(r8), intent(out) :: CH2O3K
   real(r8), intent(out) :: CH2O4K
+  real(r8), intent(out) :: CO2FCL
+  real(r8), intent(out) :: CO2FLL
   integer :: L,NN,M,N,LP
   real(r8) :: WFN4
   real(r8) :: WFNB
@@ -258,6 +270,7 @@ implicit none
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
+  CO2FCL=0._r8;CO2FLL=0._r8
 ! FOR EACH CANOPY LAYER
 !
   D110: DO L=NumOfCanopyLayers1,1,-1
@@ -367,6 +380,8 @@ implicit none
                       exit
                     ENDIF
                   ENDDO D125
+                  CO2FCL=CO2FCL+VGROX
+                  CO2FLL=CO2FLL+EGROX
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -422,10 +437,12 @@ implicit none
   real(r8), intent(in) :: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress    !between 0. and 1., a function of canopy turgor
   real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
-  real(r8), intent(out) :: CO2F,CH2O   !CO2 fixation
-  real(r8), intent(out) :: CH2OClm,CH2OLlm
+  real(r8), intent(out) :: CO2F   !CO2 fixation
+  real(r8), intent(out) :: CH2O   !CO2 fixation
+  real(r8), intent(out) :: CH2OClm  !C-limited C fix
+  real(r8), intent(out) :: CH2OLlm  !L-limited C fix
   real(r8) :: ZADDB,PADDB
-  real(r8) :: CH2OClmK,CH2OLlmK
+  real(r8) :: CO2FCL,CO2FLL
   integer  :: K
 
 ! begin_execution
@@ -465,18 +482,21 @@ implicit none
 !
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
 !
-              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K))
+              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CO2FCL,CO2FLL)
               CO2F=CO2F+CH2O4(K)
               CH2O=CH2O+CH2O3(K)             
+              CH2OClm=CH2OClm+CO2FCL
+              CH2OLlm=CH2OLlm+CO2FLL
+
 !
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
-              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2OClmK,CH2OLlmK)
+              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
               CO2F=CO2F+CH2O3(K)
               CH2O=CH2O+CH2O3(K)
-              CH2OClm=CH2OClm+CH2OClmK
-              CH2OLlm=CH2OLlm+CH2OLlmK
+              CH2OClm=CH2OClm+CO2FCL
+              CH2OLlm=CH2OLlm+CO2FLL
 
             ENDIF
           ENDIF

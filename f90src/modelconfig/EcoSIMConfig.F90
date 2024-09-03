@@ -18,7 +18,7 @@ implicit none
   integer, parameter :: NumLiveMicrbCompts = 3 !# of living biomass components
   integer, parameter :: jskenc    = 4 !# of kinetic components of the substrates
   integer, parameter :: jcplxc    = 5 !# of microbe-substrate complexes
-  integer, parameter :: jcplx1c   = jcplxc-1
+  integer, parameter :: jcplxcm1   = jcplxc-1
   integer, parameter :: NumMicbFunGrupsPerCmplx     = 7 !# of microbial functional groups in each complex
 
   character(len=datestrlen)  :: ref_date  = '18000101000000'
@@ -39,6 +39,7 @@ implicit none
   integer, public, parameter :: nsrStartup  = 0        ! Startup from initial conditions
   integer, public, parameter :: nsrContinue = 1        ! Continue from restart files
   public :: is_restart,   &
+            is_branch,    &
             set_sim_type, &
             cold_run
 contains
@@ -54,6 +55,20 @@ contains
     is_restart = .false.
   end if
   end function is_restart
+!-----------------------------------------------------------------------
+
+  logical function is_branch( )
+  !
+  ! Determine if it is branch run
+  implicit none
+  
+  if (nsrest == nsrBranch) then
+    is_branch = .true.
+  else
+    is_branch = .false.
+  end if
+  end function is_branch
+
 !-----------------------------------------------------------------------
 
   subroutine set_sim_type()

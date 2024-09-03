@@ -20,7 +20,7 @@ implicit none
   real(r8) :: RTK,STK
   real(r8) :: ACTV,ACTVM
 
-  RTK=RGAS*TKSO
+  RTK=RGASC*TKSO
   STK=710.0_r8*TKSO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
   TSensGrowth=EXP(25.229_r8-62500._r8/RTK)/ACTV

@@ -5,7 +5,7 @@ module EcosimConst
   __FILE__
   real(r8), parameter :: secspday=86400._r8
   real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
-  real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water, J/g/K
+  real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water, J/g/K~MJ/m3/K
   real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice
   real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter
   real(r8), parameter :: cps=2.095_r8          !heat capacity for fresh snow
@@ -27,7 +27,7 @@ module EcosimConst
   real(r8), parameter :: EvapLHTC=2465.0_r8                !latent heat of vaporization of water, kJ/kg
   real(r8), parameter :: SublmHTC=LtHeatIceMelt+EvapLHTC   !sublimation of ice, kJ/kg
   real(r8), parameter :: TCNDG=8.1E-03_r8          !assumed thermal conductivity below lower soil boundary,[MJ m-1 h-1 K-1]
-  real(r8), parameter :: RGAS=8.3143_r8            !universal gas constant, J/mole.oK
+  real(r8), parameter :: RGASC=8.3143_r8            !universal gas constant, J/mole.oK
   real(r8), parameter :: orgcden=0.55E+06_r8       !density of organic carbon, gC/m3
   real(r8), parameter :: hpresc=8.4334E+03_r8      !elapsing height for atmospheric pressure, m
   real(r8), parameter :: POROQ=0.66_r8                    !soil porosity ^ 2/3
