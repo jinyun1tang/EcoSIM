@@ -18,6 +18,9 @@ Module SharedDataMod
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
   real(r8), allocatable :: a_CumDepth2LayerBottom(:,:)   !dpeth (from surfce to bottom)
+  real(r8), allocatable :: a_Volume(:,:)   !volume
+  real(r8), allocatable :: a_dz(:,:)      !distance between layers  
+  real(r8), allocatable :: a_AreaZ(:,:)   !Area normal to z axis
   real(r8), allocatable :: a_FC(:,:)      !field capacity
   real(r8), allocatable :: a_WP(:,:)      !wilting point
   real(r8), allocatable :: a_FHOL(:,:)    !macropore fraction
@@ -42,7 +45,8 @@ Module SharedDataMod
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
-  real(r8), allocatable :: prec(:)        !precipitation, mm H2O/hr
+  real(r8), allocatable :: p_rain(:)      !precipitation, mm H2O/hr
+  real(r8), allocatable :: p_snow(:)      !precipitation snow, mm H2O/hr 
   real(r8), allocatable :: sunrad(:)      !solar radiation,
   real(r8), allocatable :: swrad(:)       !shortwave radiation,
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
@@ -74,6 +78,7 @@ Module SharedDataMod
 
     allocate(a_csand(ncells_per_col_,ncol))
     allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
+    !allocate(a_AreaZ(ncells_per_col_,ncol))   !actually need to allocate area
     !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
     !allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
     !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
@@ -109,6 +114,7 @@ Module SharedDataMod
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
   call destroy(a_MATP)
+  call destroy(a_AreaZ)
   call destroy(a_CumDepth2LayerBottom)
   call destroy(a_FC)
   call destroy(a_WP)
@@ -123,7 +129,8 @@ Module SharedDataMod
   call destroy(a_ALT)
   call destroy(tairc)
   call destroy(uwind)
-  call destroy(prec)
+  call destroy(p_rain)
+  call destroy(p_snow)
   call destroy(sunrad)
   call destroy(swrad)
   call destroy(vpair)

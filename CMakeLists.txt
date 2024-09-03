@@ -1,3 +1,4 @@
+# NOTE: this is the old CMake file for compiling with a UNIX Makefile
 # Minimum CMake version, determined by hdf5.
 cmake_minimum_required (VERSION 3.4)
 
@@ -7,36 +8,25 @@ set (ECOSIM_MINOR_VERSION 1)
 set (ECOSIM_PATCH_VERSION 0)
 set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PATCH_VERSION}")
 
+set(TPL_INSTALL_PREFIX $ENV{AMANZI_TPLS_DIR})
 
 # Adjust CMake's module path.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Options for building EcoSIM. These come from the xSDK compliance rules.
-option(USE_XSDK_DEFAULTS "Set to use xSDK defaults for options [ON]." ON)
-option(CMAKE_INSTALL_PREFIX "Sets installation prefix [/usr/local].")
-option(XSDK_ENABLE_DEBUG "Enables Debug mode builds [OFF]." OFF)
-option(BUILD_SHARED_LIBS "Builds shared libraries [ON]." ON)
-option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
-option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
-option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
-
-
-
-# For now, we disable shared libs on Macs.
-#if (APPLE)
-#  set(BUILD_SHARED_LIBS OFF)
-#endif()
-
-if (BUILD_SHARED_LIBS)
-	message("-- EcoSIM will be built as a shared library.")
-else()
-	message("-- EcoSIM will be built as a static library.")
-endif()
+#ioption(USE_XSDK_DEFAULTS "Set to use xSDK defaults for options [ON]." ON)
+#option(CMAKE_INSTALL_PREFIX "Sets installation prefix [/usr/local].")
+#option(XSDK_ENABLE_DEBUG "Enables Debug mode builds [OFF]." OFF)
+#option(BUILD_SHARED_LIBS "Builds shared libraries [OFF]." OFF)
+#option(XSDK_WITH_NETCDF "Enables support for netcdf [OFF]." ON)
+#option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
+#option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
 
 if (NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX local)
+  set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
 endif()
 
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
 
 # set the number of cores to something reasonable so we don't over
 # subscribe a laptop or exceed hpc login node restrictions. could
@@ -131,9 +121,9 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Basic libraries to be linked in.
 # added the standard mathematical library for C and C++
-set(ECOSIM_LIBRARIES "")
+#set(ECOSIM_LIBRARIES "")
+#set(ECOSIM_TPLS m)
 
-set(ECOSIM_TPLS m)
 if (${NEED_LAPACK})
   # NEED_LAPACK is set by set_up_platform()
   include(FindBLAS)
@@ -152,95 +142,109 @@ endif()
 set(ECOSIM_NEED_PFUNIT 0)
 set(ECOSIM_NEED_PETSC 0)
 set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
-#if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
 
-  if ((TPL_NETCDF_LIBRARIES MATCHES "lib") AND (TPL_NETCDF_INCLUDE_DIRS MATCHES "include"))
-#    message(FATAL_ERROR "TPL_NETCDF_LIBRARIES option be set for netcdf support to be enabled.")
-#    message("TPL_NETCDF_LIBRARIES option be set for netcdf support to be enabled.")
-     message("ECOSIM has netcdf support from the system")
-     message("TPL_NETCDF_LIBRARIES ${TPL_NETCDF_LIBRARIES}")
-     message("TPL_NETCDF_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS}")
-     list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
-     list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
-     set(ECOSIM_HAVE_NETCDF 1)
-  else()
-     message("ECOSIM does not have netcdf support from the system")
-     set(ECOSIM_HAVE_NETCDF 0)
-  endif()
-#  foreach(lib ${TPL_NETCDF_LIBRARIES})
-#    message(${lib})
-#    if (NOT EXISTS ${lib})
-#      message(FATAL_ERROR "netcdf library not found: ${lib}")
-#    endif()
-#  endforeach()
-
-#  if (NOT TPL_NETCDF_INCLUDE_DIRS)
-#    message(FATAL_ERROR "TPL_NETCDF_INCLUDE_DIRS option be set for netcdf support to be enabled.")
-#  endif()
-  foreach(dir ${TPL_NETCDF_INCLUDE_DIRS})
-    string(STRIP ${dir} dirl)
-    if (NOT EXISTS ${dirl})
-      message(FATAL_ERROR "netcdf include directory not found: ${dir}")
-    endif()
-  endforeach()
-
-#  message("-- Enabled support for netcdf.")
-#  list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
-#  list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
-#  set(ECOSIM_HAVE_NETCDF 1)
-#else()
-#  set(ECOSIM_HAVE_NETCDF 0)
-#endif()
-# Other third-party libraries.
-add_subdirectory(3rd-partylibs)
-
-if (NOT ECOSIM_HAVE_NETCDF)
-  message(("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}"))
-  list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
-  list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
-endif()
-# Include the binary directory in the header file search path,
-# since it's where we place the third-party libraries.
-
-include_directories("${PROJECT_BINARY_DIR}/include")
-link_directories("${PROJECT_BINARY_DIR}/lib")
-
-list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
-include_directories(${ECOSIM_INCLUDE_DIRS})
-
-#message("ECOSIM_INCLUDE_DIRS ${ECOSIM_INCLUDE_DIRS}")
-#message("${PROJECT_BINARY_DIR}/include")
-#message("${PROJECT_BINARY_DIR}/lib")
-# Unit testing.
-enable_testing()
-
-# Source code itself.
-include_directories("${PROJECT_SOURCE_DIR}")
-
-add_subdirectory(f90src)
-add_subdirectory(drivers)
-
-# Drivers for benchmarks.
-#X#add_subdirectory(drivers)
-
-# Benchmarks.
-#X#add_subdirectory(benchmarks)
-
-
-# Now that we have gathered all our libraries, generate an ecosim.cmake
-# file that contains all the vital information.
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/ecosim.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake"
   @ONLY
 )
 
-# Install miscellaneous build/test files.
-#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake DESTINATION share/ecosim)
+# Other third-party libraries.
+# adding in ATS tpl support:
 
-#if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#target_link_libraries(ecosiml PUBLIC ${ECOSIM_TPLS})
-# message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-# Set the installation path for the library
-#install(TARGETS ecosiml DESTINATION lib/)
-#endif()
+if(ATS_ECOSIM)
+  message(STATUS "ATS_ECOSIM is set")
+  #set(ATS_ECOSIM TRUE)
+else()
+  message(STATUS "ATS_ECOSIM NOT set")
+endif()
+
+if (ATS_ECOSIM)
+    message(STATUS "Compiling ATS:")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
+    set(NETCDF_FFLAGS "-I${TPL_INSTALL_PREFIX}/include")
+    set(NETCDF_FLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5")
+    set(Z_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
+    set(Z_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")
+    set(HDF5_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
+    set(HDF5_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")    
+    set(ECOSIM_HAVE_NETCDF TRUE)
+    set(NETCDF_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib/libnetcdf${LIB_SUFFIX}")
+    set(NETCDF_CFLAGS "-I${TPL_INSTALL_PREFIX}/include")
+    set(NETCDF_CLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdf")
+    #Needed to share with ATS (probably an easier way to do this)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC")
+
+    #What were these even for? are they neccesary?
+    include_directories("${TPL_INSTALL_PREFIX}/include")
+    #link_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib")
+
+    # Check for math library (libm)
+    find_library(M_LIBRARY m)
+    if (M_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${M_LIBRARY}")
+    endif()
+
+    # Check for zlib library
+    find_library(ZLIB_LIBRARY z)
+    if (ZLIB_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${ZLIB_LIBRARY}")
+    endif()
+
+    # Check for libzip library
+    find_library(ZIP_LIBRARY zip)
+    if (ZIP_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${ZIP_LIBRARY}")
+    endif()
+
+    # Check for libxml2 library
+    find_library(XML2_LIBRARY xml2)
+    if (XML2_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${XML2_LIBRARY}")
+    endif()
+
+    # Check for libcurl library
+    find_library(CURL_LIBRARY curl)
+    if (CURL_LIBRARY)
+        set(ECOSIM_TPLS "${ECOSIM_TPLS} ${CURL_LIBRARY}")
+    endif()
+
+    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -fPIC")
+
+else()
+    add_subdirectory(3rd-partylibs)
+endif()
+
+if (NOT ECOSIM_HAVE_NETCDF)
+  list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
+  list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
+endif()
+# Include the binary directory in the header file search path,
+# since it's where we place the third-party libraries.
+
+message(STATUS "linking directories: ")
+message(STATUS "linking include and lib in ${PROJECT_BINARY_DIR}")
+include_directories("${PROJECT_BINARY_DIR}/include")
+link_directories("${PROJECT_BINARY_DIR}/lib")
+
+#list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
+#include_directories(${ECOSIM_INCLUDE_DIRS})
+
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
+
+enable_testing()
+
+# Source code itself.
+include_directories("${PROJECT_SOURCE_DIR}")
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+    message(STATUS "CMAKE_BUILD_TYPE not specified, defaulting to Debug")
+endif()
+
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+
+add_subdirectory(f90src)
+add_subdirectory(drivers)
