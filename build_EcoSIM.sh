@@ -38,7 +38,7 @@ print_help() {
     echo "  --CC=<compiler>        Set C compiler"
     echo "  --CXX=<compiler>       Set C++ compiler"
     echo "  --FC=<compiler>        Set Fortran compiler"
-    echo "  --regression-test      Enable regression test"
+    echo "  --regression_test      Enable regression test"
     echo "  --debug                Enable debug mode"
     echo "  --mpi                  Enable MPI"
     echo "  --shared               Enable shared libraries"
@@ -85,7 +85,6 @@ do
       ;; 
   esac
 done
-
 #This is a little confusing, but we have to move into the build dir
 #and then point cmake to the top-level CMakeLists file which will
 #be a directory up from the build dir hence setting
@@ -142,6 +141,8 @@ if [ -n "$ATS_ECOSIM" ]; then
     if [ "$mpi" -eq 0 ]; then
     	mpi=1
     fi
+else
+  echo "Building standalone EcoSIM"    
 fi
 
 #if mpi is set use the mpi compilers, if not use default
@@ -200,9 +201,11 @@ ${cmd_configure}
 #This does the build
 make -j ${parallel_jobs}
 
-if [ "$regression_test" -eq 1 ]; then
-  make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gcc;
-fi
 
 #Does the install
 make install
+
+echo "regression_test=$regression_test"
+if [ "$regression_test" -eq 1 ]; then
+  make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;
+fi
