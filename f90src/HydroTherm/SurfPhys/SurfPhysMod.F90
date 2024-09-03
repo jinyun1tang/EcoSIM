@@ -30,6 +30,7 @@ module SurfPhysMod
   use EcoSIMSolverPar
   use EcoSIMCtrlMod
   use SoilPhysParaMod
+  use SnowBalanceMod
 implicit none
   private
   character(len=*), parameter :: mod_filename=&
@@ -1626,6 +1627,13 @@ contains
       if(.not.ATS_cpl_mode)call LateralGridsHdryoExch(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
 
       if(snowRedist_model)call SnowRedistribution(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
+
+    ! In ATS coupled mode we do not run the full Redist so we put the snow
+    ! models here instead
+      if (ATS_cpl_mode) then
+        call SnowMassUpdate(I,J,NY,NX)
+        call SnowpackLayering(I,J,NY,NX)
+      end if
 
       call AccumWaterVaporHeatFluxes(M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,&
         Radnet2Snow,VapXAir2TopLay)

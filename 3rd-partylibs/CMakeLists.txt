@@ -75,6 +75,11 @@ if (NOT EXISTS ${Z_LIBRARY})
   set(ZLIB_CONFIG_OPTS --prefix=${PROJECT_BINARY_DIR} --static)
 
   message("Preparing zlib...")
+  message("PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}")
+  message("CMAKE_COMMAND: ${CMAKE_COMMAND}")
+  message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+  message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/zlib ${CMAKE_CURRENT_BINARY_DIR}/zlib
                   RESULT_VARIABLE stat)
   if (NOT stat EQUAL 0)
@@ -82,6 +87,9 @@ if (NOT EXISTS ${Z_LIBRARY})
   endif()
 
   message("Configuring zlib...")
+  message("CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+  message("CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+  message("ZLIB_CONFIG_OPTS: ${ZLIB_CONFIG_OPTS}") 
 
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS} ./configure ${ZLIB_CONFIG_OPTS}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib
@@ -356,6 +364,13 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
   else()
     set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS} --enable-shared=no)
   endif()
+
+  message("Netcdf-c opts: ${NETCDF_C_CONFIG_OPTS}")
+
+  message("NETCDF_CPPFLAGS: ${NETCDF_CPPFLAGS}")
+  message("NETCDF_LIBFLAGS: ${NETCDF_LIBFLAGS}")
+
+  #Original version
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
     env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=-I${PROJECT_BINARY_DIR}/include
     env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=-L${PROJECT_BINARY_DIR}/lib
@@ -363,6 +378,19 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-c
     OUTPUT_VARIABLE netcdf_c_config_log ERROR_VARIABLE netcdf_c_config_err
     RESULT_VARIABLE stat)
+
+  #Attempt to change (might have made things worse)
+  #execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
+  #  env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=${NETCDF_CPPFLAGS}
+  #  env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=${NETCDF_LIBFLAGS}
+  #  env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ env LIBS=${NETCDF_LIBFLAGS} 
+  #  ./configure ${NETCDF_C_CONFIG_OPTS}
+  #  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-c
+  #  OUTPUT_VARIABLE netcdf_c_config_log ERROR_VARIABLE netcdf_c_config_err
+  #  RESULT_VARIABLE stat)
+
+  message("In netcdf c build:")
+  message("NETCDF_C_CONFIG_OPTS: ${NETCDF_C_CONFIG_OPTS}")
 
   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/netcdf_c_config.log ${netcdf_c_config_log})
   if (NOT stat EQUAL 0)
@@ -399,7 +427,10 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
   if (APPLE AND BUILD_SHARED_LIBS)
     execute_process(COMMAND install_name_tool -id @rpath/libnetcdf${LIB_SUFFIX} ${PROJECT_BINARY_DIR}/lib/libnetcdf${LIB_SUFFIX})
   endif()
-
+ #file(GLOB MY_PUBLIC_HEADERS "${PROJECT_BINARY_DIR}/OFF/netcdf*")
+ #file(COPY ${MY_PUBLIC_HEADERS} DESTINATION ${PROJECT_BINARY_DIR}/include)
+ #file(GLOB MY_PUBLIC_HEADERS "${PROJECT_BINARY_DIR}/OFF/type*")
+ #file(COPY ${MY_PUBLIC_HEADERS} DESTINATION ${PROJECT_BINARY_DIR}/include)
 endif()
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
@@ -412,6 +443,10 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
     install(FILES ${nc_utils} DESTINATION bin
             PERMISSIONS OWNER_READ;OWNER_WRITE;OWNER_EXECUTE;
                         GROUP_READ;GROUP_EXECUTE;WORLD_READ;WORLD_EXECUTE)
+  
+  message("NETCDF_LIBRARY: ${NETCDF_LIBRARY}")
+  message("nc_libs: ${nc_libs}")
+  message("nc_utils: ${nc_utils}")
   endif()
 endif()
 
@@ -458,6 +493,8 @@ endif ()
 
 #  set(NETCDF_LIBFLAGS -L${PROJECT_BINARY_DIR}/lib/)
 
+message("Netcdf-f opts: ${NETCDF_F_CONFIG_OPTS}")
+
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS}
      env CPPFLAGS=${NETCDF_CPPFLAGS} env LDFLAGS=${NETCDF_LIBFLAGS} env FC=${CMAKE_Fortran_COMPILER}
      env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ 
@@ -466,6 +503,8 @@ endif ()
                   OUTPUT_VARIABLE netcdf_fortran_config_log ERROR_VARIABLE netcdf_fortran_config_err
                   RESULT_VARIABLE stat)
 
+  message("In netcdf f build:")
+  message("NETCDF_C_CONFIG_OPTS: ${NETCDF_F_CONFIG_OPTS}")
 
   file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/netcdf_fortran_config.log ${netcdf_fortran_config_log})
   if (NOT stat EQUAL 0)
@@ -522,6 +561,9 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
     install(FILES ${nc_utils} DESTINATION bin
             PERMISSIONS OWNER_READ;OWNER_WRITE;OWNER_EXECUTE;
                         GROUP_READ;GROUP_EXECUTE;WORLD_READ;WORLD_EXECUTE)
+  message("NETCDF_LIBRARY: ${NETCDF_LIBRARY}")
+  message("nc_libs: ${nc_libs}")
+  message("nc_utils: ${nc_utils}")
   endif()
 endif()
 set(ECOSIM_TP_LIBS netcdff;${ECOSIM_TP_LIBS})
