@@ -40,7 +40,7 @@ PROGRAM main
   logical :: is_dos,nlend
   character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
-  integer :: idy
+  integer :: idy, nperiods
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
 !!
@@ -94,7 +94,7 @@ PROGRAM main
 
   call set_sim_type()
 
-  nstopyr=get_sim_len(forc_periods)
+  nstopyr=get_sim_len(forc_periods,nperiods)
 
   call etimer%update_sim_len(nstopyr)
   
@@ -119,7 +119,7 @@ PROGRAM main
 
 !  print*,frectyp%ymdhs0,yeari
 
-  DO nn1=1,3
+  DO nn1=1,nperiods
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 
    !set up output frequency
@@ -129,10 +129,12 @@ PROGRAM main
 
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
-      idy=1
+      !determine the step size
+      idy=1      
       if(forc_periods(nn3+1)>forc_periods(nn3+2))idy=-1
-      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2),idy
 
+      !do the simulation loop for the period
+      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2),idy
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()
         nlend=.false.

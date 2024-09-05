@@ -1315,7 +1315,7 @@ implicit none
 
   data1d_ptr => this%h1D_TRANSPN_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='QvTransp',units='mmH2O/m2/h',avgflag='A',&
-    long_name='canopy transpiration',ptr_patch=data1d_ptr)      
+    long_name='canopy transpiration (<0 into atmosphere)',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='UPTK_NH4_FLX',units='gN/m2/hr',&

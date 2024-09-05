@@ -312,26 +312,23 @@ module RedistMod
 
   if(lverb)write(*,*)'HandleSurfaceBoundary'
 
-
-!  if(NX==5)write(111,*)I+J/24.,'beg411',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
   call UpdateLitRPhys(NY,NX,TWat2GridBySurfRunoff(NY,NX),THeat2GridBySurfRunoff(NY,NX),&
     HeatStore_lnd,HEATIN_lnd)
 
-!  if(NX==5)write(111,*)I+J/24.,'beg412',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
-  WI=PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
-  CRAIN=CRAIN+WI
-  QRain_CumYr_col(NY,NX)=WI
-  WO=VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
-  CEVAP=CEVAP-WO
-  QEvap_CumYr_col(NY,NX)=QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
-  EvapoTransp_col(NY,NX)=-WO
-  QH2OLoss_lnds=QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
-  QDischar_col(NY,NX)=QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  H2OLoss_CumYr_col(NY,NX)=H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  QDrain_col(NY,NX)=QDrain_col(NY,NX)+WaterFlowSoiMicP_3D(3,NK(NY,NX),NY,NX)
+  WI                       = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux    = rain/snowfall + irrigation
+  CRAIN                    = CRAIN+WI
+  QRain_CumYr_col(NY,NX)   = WI
+  WO                       = VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
+  CEVAP                    = CEVAP-WO
+  QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
+  EvapoTransp_col(NY,NX)   = -WO
+  QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
+  QDischar_col(NY,NX)      = QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  QDrain_col(NY,NX)        = QDrain_col(NY,NX)+WaterFlowSoiMicP_3D(3,NK(NY,NX),NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
@@ -365,12 +362,12 @@ module RedistMod
     +(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*CH4_rain_conc(NY,NX) &
     +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*CH4_irrig_conc(NY,NX) &
     +Gas_Disol_Flx_vr(idg_CH4,0,NY,NX)+trcg_surf_disevap_flx(idg_CH4,NY,NX)
-  CO=-IrrigSubsurf_col(NY,NX)*CO2_irrig_conc(NY,NX)
-  CX=-IrrigSubsurf_col(NY,NX)*CH4_irrig_conc(NY,NX)
-  SurfGasFlx_col(idg_CO2,NY,NX)=SurfGasFlx_col(idg_CO2,NY,NX)+CI
-  SurfGasFlx_col(idg_CH4,NY,NX)=SurfGasFlx_col(idg_CH4,NY,NX)+CH
-  SurfGas_CO2_lnd=SurfGas_CO2_lnd+CI+CH
-  TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)+CO+CX
+  CO                            = -IrrigSubsurf_col(NY,NX)*CO2_irrig_conc(NY,NX)
+  CX                            = -IrrigSubsurf_col(NY,NX)*CH4_irrig_conc(NY,NX)
+  SurfGasFlx_col(idg_CO2,NY,NX) = SurfGasFlx_col(idg_CO2,NY,NX)+CI
+  SurfGasFlx_col(idg_CH4,NY,NX) = SurfGasFlx_col(idg_CH4,NY,NX)+CH
+  SurfGas_CO2_lnd               = SurfGas_CO2_lnd+CI+CH
+  TOMOU_lnds(ielmc)             = TOMOU_lnds(ielmc)+CO+CX
   !
   !     SURFACE BOUNDARY O2 FLUXES
   !
@@ -379,16 +376,15 @@ module RedistMod
     +(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*O2_rain_conc(NY,NX) &
     +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*O2_irrig_conc(NY,NX) &
     +Gas_Disol_Flx_vr(idg_O2,0,NY,NX)+trcg_surf_disevap_flx(idg_O2,NY,NX)
-  SurfGas_O2_lnd=SurfGas_O2_lnd+OI
-  OO=trcg_RMicbTransf_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*O2_irrig_conc(NY,NX)
-  OXYGOU=OXYGOU+OO
-  SurfGasFlx_col(idg_O2,NY,NX)=SurfGasFlx_col(idg_O2,NY,NX)+OI
-  HI=Gas_Flx_atmDif2soil_col(idg_H2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_H2,3,NU(NY,NX),NY,NX) &
-    +TRootGasLossDisturb_pft(idg_H2,NY,NX) &
-    +Gas_Disol_Flx_vr(idg_H2,0,NY,NX)+trcg_surf_disevap_flx(idg_H2,NY,NX)
-  SurfGas_H2_lnd=SurfGas_H2_lnd+HI
-  HO=trcg_RMicbTransf_vr(idg_H2,0,NY,NX)
-  H2GOU=H2GOU+HO
+  SurfGas_O2_lnd               = SurfGas_O2_lnd+OI
+  OO                           = trcg_RMicbTransf_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*O2_irrig_conc(NY,NX)
+  OXYGOU                       = OXYGOU+OO
+  SurfGasFlx_col(idg_O2,NY,NX) = SurfGasFlx_col(idg_O2,NY,NX)+OI
+  HI                           = Gas_Flx_atmDif2soil_col(idg_H2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_H2,3,NU(NY,NX),NY,NX) &
+    +TRootGasLossDisturb_pft(idg_H2,NY,NX)+Gas_Disol_Flx_vr(idg_H2,0,NY,NX)+trcg_surf_disevap_flx(idg_H2,NY,NX)
+  SurfGas_H2_lnd = SurfGas_H2_lnd+HI
+  HO             = trcg_RMicbTransf_vr(idg_H2,0,NY,NX)
+  H2GOU          = H2GOU+HO
   !
   !     SURFACE BOUNDARY N2, N2O, NH3, NH4, NO3, AND DON FLUXES
   !

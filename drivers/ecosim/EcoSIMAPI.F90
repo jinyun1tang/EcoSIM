@@ -179,7 +179,8 @@ contains
   brnch_retain_casename=.false.
   hist_yrclose=.false.
 
-  forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)
+  forc_periods=0
+  forc_periods(1:9)=(/1980,1980,1,1981,1988,2,1989,2008,1/)
 
   num_of_simdays=-1
   do_year=-1
