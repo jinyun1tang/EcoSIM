@@ -90,6 +90,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  QDischar_col(:,:)                !water discharge, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
   real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)
+  real(r8),target,allocatable :: QdewCanopy_CumYr_pft(:,:,:)
   private :: InitAllocate
   contains
 
@@ -104,6 +105,7 @@ module SoilWaterDataType
   subroutine InitAllocate
 
   implicit none
+  allocate(QdewCanopy_CumYr_pft(JZ,JY,JX)); QdewCanopy_CumYr_pft=0._r8
   allocate(EvapoTransp_col(JY,JX)); EvapoTransp_col=0._r8
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
   allocate(ThetaAir_vr(0:JZ,JY,JX));  ThetaAir_vr=0._r8
@@ -192,6 +194,7 @@ module SoilWaterDataType
   subroutine DestructSoilWater
   use abortutils, only : destroy
   implicit none
+  call destroy(QdewCanopy_CumYr_pft)
   call destroy(ThetaAir_vr)
   call destroy(VLsoiAirP_vr)
   call destroy(THETW_vr)

@@ -420,19 +420,19 @@ implicit none
   SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)                 = micstt%SolidOMAct(1:jsken,1:jcplx)
   
   if(litrm)then
-    RNH4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RNH4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
-    RNO3DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RNO3DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
-    RH2PO4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RH2PO4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
-    RH1PO4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)=micflx%RH1PO4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
-    RNH4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RNH4UptkLitrAutor(1:NumMicrobAutrophCmplx)
-    RNO3UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RNO3UptkLitrAutor(1:NumMicrobAutrophCmplx)
-    RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
-    RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)=micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RNH4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)   = micflx%RNH4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
+    RNO3DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)   = micflx%RNO3DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
+    RH2PO4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX) = micflx%RH2PO4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
+    RH1PO4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX) = micflx%RH1PO4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
+    RNH4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)       = micflx%RNH4UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RNO3UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)       = micflx%RNO3UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RH2PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)     = micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
+    RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)     = micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
 
     DO NE=1,NumPlantChemElms
-      SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)=micstt%SOMPomProtein(NE)
-      SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumProtein(NE)
-      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)=micstt%SOMHumCarbohyd(NE)      
+      SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)    = micstt%SOMPomProtein(NE)
+      SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)  = micstt%SOMHumProtein(NE)
+      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX) = micstt%SOMHumCarbohyd(NE)
     ENDDO
   endif
 
@@ -453,10 +453,6 @@ implicit none
   FracBulkSOMC_vr(1:jcplx,L,NY,NX)               = micstt%FracBulkSOMC(1:jcplx)
   DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)      = micstt%DOM(idom_beg:idom_end,1:jcplx)
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX) = micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
-!  if(L==0)write(141,*)I+J/24.,DOM_vr(idom_doc,1:3,L,NY,NX),micflx%NetCAssimhr,micflx%GrosAssimhr 
-!  if(L==0)write(143,*)I+J/24.,micflx%RNiDemand,micflx%NetNH4Mineralize,micflx%RPiDemand,micflx%NetPO4Mineralize,micstt%TotActMicrobiom
-!  if(L==0)write(144,*)I+J/24.,micflx%CDOMuptk1,micflx%CDOMuptk2,micflx%tROMT,micflx%tGROMO,micflx%tRGOMP,micflx%tRGOXP,micflx%tRGOZP
-!  if(L==0)write(145,*)I+J/24.,micflx%tRGOXP,micflx%tRGOZP
 
   do k=1,jcplx
     DO idom=idom_beg,idom_end

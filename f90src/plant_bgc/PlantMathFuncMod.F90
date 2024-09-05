@@ -58,9 +58,9 @@ contains
 
   FDMP=get_FDM(PSIO)
   if(present(fdmp1))FDMP1=FDMP
-  OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
-  PSIOsmo=FDMP/0.16_r8*OSMO-RGASC*TKP*FDMP*CCPOLT/OSWT
-  PSITurg=AZMAX1(PSIO-PSIOsmo)
+  OSWT    = 36.0_r8+840.0_r8*AZMAX1(CCPOLT)
+  PSIOsmo = FDMP/0.16_r8*OSMO-RGASC*TKP*FDMP*CCPOLT/OSWT
+  PSITurg = AZMAX1(PSIO-PSIOsmo)
 
   end subroutine update_osmo_turg_pressure
 !--------------------------------------------------------------------------------

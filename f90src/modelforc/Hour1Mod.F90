@@ -763,7 +763,7 @@ module Hour1Mod
   CanH2OHeldVg(NY,NX)     = 0.0_r8
   TFLWCI(NY,NX)           = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
-  TEVAPP(NY,NX)           = 0.0_r8
+  QvET_col(NY,NX)           = 0.0_r8
   VapXAir2CanG(NY,NX)     = 0.0_r8
   THFLXC(NY,NX)           = 0.0_r8
   TEngyCanopy_col(NY,NX)           = 0.0_r8
@@ -1058,13 +1058,13 @@ module Hour1Mod
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  trc_gascl_vr(idg_CO2,0,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_CH4,0,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_O2,0,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_N2,0,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_N2O,0,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_NH3,0,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_H2,0,NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CO2,0,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CH4,0,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_O2,0,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_N2,0,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_N2O,0,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_H2,0,NY,NX)  = H2GE(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
 
 ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0.0_r8
@@ -1084,16 +1084,16 @@ module Hour1Mod
   TFACL=TEFAQUDIF(TKS_vr(0,NY,NX))
   TScal4Difsvity_vr(0,NY,NX)=TFACL
 
-  SoluteDifusvty_vr(idg_CO2,0,NY,NX)=CLSG*TFACL
-  SoluteDifusvty_vr(idg_CH4,0,NY,NX)=CQSG*TFACL
-  SoluteDifusvty_vr(idg_O2,0,NY,NX)=OLSG*TFACL
-  SoluteDifusvty_vr(idg_N2,0,NY,NX)=ZLSG*TFACL
-  SoluteDifusvty_vr(idg_NH3,0,NY,NX)=ZNSG*TFACL
-  SoluteDifusvty_vr(idg_H2,0,NY,NX)=HLSG*TFACL
-  SoluteDifusvty_vr(idg_N2O,0,NY,NX)=ZVSG*TFACL
+  SoluteDifusvty_vr(idg_CO2,0,NY,NX) = CLSG*TFACL
+  SoluteDifusvty_vr(idg_CH4,0,NY,NX) = CQSG*TFACL
+  SoluteDifusvty_vr(idg_O2,0,NY,NX)  = OLSG*TFACL
+  SoluteDifusvty_vr(idg_N2,0,NY,NX)  = ZLSG*TFACL
+  SoluteDifusvty_vr(idg_NH3,0,NY,NX) = ZNSG*TFACL
+  SoluteDifusvty_vr(idg_H2,0,NY,NX)  = HLSG*TFACL
+  SoluteDifusvty_vr(idg_N2O,0,NY,NX) = ZVSG*TFACL
 
-  SoluteDifusvty_vr(ids_NO3,0,NY,NX)=ZOSG*TFACL
-  SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)=POSG*TFACL
+  SoluteDifusvty_vr(ids_NO3,0,NY,NX)   = ZOSG*TFACL
+  SoluteDifusvty_vr(ids_H1PO4,0,NY,NX) = POSG*TFACL
   
   SoluteDifusvty_vr(ids_NH4,0,NY,NX)   =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
   SoluteDifusvty_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvty_vr(ids_NH4,0,NY,NX)
@@ -1105,33 +1105,33 @@ module Hour1Mod
   SoluteDifusvty_vr(ids_H1PO4B,0,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)
   SoluteDifusvty_vr(ids_H2PO4B,0,NY,NX)=SoluteDifusvty_vr(ids_H2PO4,0,NY,NX)
 
-  DOMdiffusivity_vr(idom_doc,0,NY,NX)=OCSG*TFACL
-  DOMdiffusivity_vr(idom_don,0,NY,NX)=ONSG*TFACL
-  DOMdiffusivity_vr(idom_dop,0,NY,NX)=OPSG*TFACL
-  DOMdiffusivity_vr(idom_acetate,0,NY,NX)=OASG*TFACL
+  DOMdiffusivity_vr(idom_doc,0,NY,NX)     = OCSG*TFACL
+  DOMdiffusivity_vr(idom_don,0,NY,NX)     = ONSG*TFACL
+  DOMdiffusivity_vr(idom_dop,0,NY,NX)     = OPSG*TFACL
+  DOMdiffusivity_vr(idom_acetate,0,NY,NX) = OASG*TFACL
 !
 !     R*Y,R*X=total substrate uptake from previous,current hour
 !     used in nitro.f, uptake.f
 !
-  RO2EcoDmndPrev_vr(0,NY,NX)=REcoO2DmndResp_vr(0,NY,NX)
-  RNH4EcoDmndSoilPrev_vr(0,NY,NX)=REcoNH4DmndSoil_vr(0,NY,NX)
-  RNO3EcoDmndSoilPrev_vr(0,NY,NX)=REcoNO3DmndSoil_vr(0,NY,NX)
-  RNO2EcoUptkSoilPrev_vr(0,NY,NX)=RNO2EcoUptkSoil_vr(0,NY,NX)
-  RN2OEcoUptkSoilPrev_vr(0,NY,NX)=RN2OEcoUptkSoil_vr(0,NY,NX)
-  RH1PO4EcoDmndSoilPrev_vr(0,NY,NX)=REcoH1PO4DmndSoil_vr(0,NY,NX)
-  RH2PO4EcoDmndSoilPrev_vr(0,NY,NX)=REcoH2PO4DmndSoil_vr(0,NY,NX)
-  REcoO2DmndResp_vr(0,NY,NX)=0.0_r8
-  REcoNH4DmndSoil_vr(0,NY,NX)=0.0_r8
-  REcoNO3DmndSoil_vr(0,NY,NX)=0.0_r8
-  RNO2EcoUptkSoil_vr(0,NY,NX)=0.0_r8
-  RN2OEcoUptkSoil_vr(0,NY,NX)=0.0_r8
-  REcoH1PO4DmndSoil_vr(0,NY,NX)=0.0_r8
-  REcoH2PO4DmndSoil_vr(0,NY,NX)=0.0_r8
+  RO2EcoDmndPrev_vr(0,NY,NX)        = REcoO2DmndResp_vr(0,NY,NX)
+  RNH4EcoDmndSoilPrev_vr(0,NY,NX)   = REcoNH4DmndSoil_vr(0,NY,NX)
+  RNO3EcoDmndSoilPrev_vr(0,NY,NX)   = REcoNO3DmndSoil_vr(0,NY,NX)
+  RNO2EcoUptkSoilPrev_vr(0,NY,NX)   = RNO2EcoUptkSoil_vr(0,NY,NX)
+  RN2OEcoUptkSoilPrev_vr(0,NY,NX)   = RN2OEcoUptkSoil_vr(0,NY,NX)
+  RH1PO4EcoDmndSoilPrev_vr(0,NY,NX) = REcoH1PO4DmndSoil_vr(0,NY,NX)
+  RH2PO4EcoDmndSoilPrev_vr(0,NY,NX) = REcoH2PO4DmndSoil_vr(0,NY,NX)
+  REcoO2DmndResp_vr(0,NY,NX)        = 0.0_r8
+  REcoNH4DmndSoil_vr(0,NY,NX)       = 0.0_r8
+  REcoNO3DmndSoil_vr(0,NY,NX)       = 0.0_r8
+  RNO2EcoUptkSoil_vr(0,NY,NX)       = 0.0_r8
+  RN2OEcoUptkSoil_vr(0,NY,NX)       = 0.0_r8
+  REcoH1PO4DmndSoil_vr(0,NY,NX)     = 0.0_r8
+  REcoH2PO4DmndSoil_vr(0,NY,NX)     = 0.0_r8
   D5055: DO K=1,jcplx
-    RDOMEcoDmndPrev_vr(K,0,NY,NX)=ROQCX(K,0,NY,NX)
-    RAcetateEcoDmndPrev_vr(K,0,NY,NX)=ROQAX(K,0,NY,NX)
-    ROQCX(K,0,NY,NX)=0.0_r8
-    ROQAX(K,0,NY,NX)=0.0_r8
+    RDOMEcoDmndPrev_vr(K,0,NY,NX)=RDOMEcoDmndK_vr(K,0,NY,NX)
+    RAcetateEcoDmndPrev_vr(K,0,NY,NX)=RAcetateEcoDmndK_vr(K,0,NY,NX)
+    RDOMEcoDmndK_vr(K,0,NY,NX)=0.0_r8
+    RAcetateEcoDmndK_vr(K,0,NY,NX)=0.0_r8
   ENDDO D5055
 !
 !     WVapDifusvityAir_col,VaporDiffusivityLitR_col,WGSGW=vapor diffusivity in air,litter,snowpack
@@ -1293,10 +1293,10 @@ module Hour1Mod
     REcoH2PO4DmndBand_vr(L,NY,NX)     = 0.0_r8
 
     D5050: DO K=1,jcplx
-      RDOMEcoDmndPrev_vr(K,L,NY,NX)     = ROQCX(K,L,NY,NX)
-      RAcetateEcoDmndPrev_vr(K,L,NY,NX) = ROQAX(K,L,NY,NX)
-      ROQCX(K,L,NY,NX)                  = 0.0_r8
-      ROQAX(K,L,NY,NX)                  = 0.0_r8
+      RDOMEcoDmndPrev_vr(K,L,NY,NX)     = RDOMEcoDmndK_vr(K,L,NY,NX)
+      RAcetateEcoDmndPrev_vr(K,L,NY,NX) = RAcetateEcoDmndK_vr(K,L,NY,NX)
+      RDOMEcoDmndK_vr(K,L,NY,NX)        = 0.0_r8
+      RAcetateEcoDmndK_vr(K,L,NY,NX)    = 0.0_r8
     ENDDO D5050
 !
 ! DIFFUSIVITY
@@ -1306,29 +1306,29 @@ module Hour1Mod
 ! *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 ! *SG PARAMETER statement above
 !
-    TFACG=TEFGASDIF(TKS_vr(L,NY,NX))
-    TFACL=TEFAQUDIF(TKS_vr(L,NY,NX))
-    TScal4Difsvity_vr(L,NY,NX)=TFACL
+    TFACG                      = TEFGASDIF(TKS_vr(L,NY,NX))
+    TFACL                      = TEFAQUDIF(TKS_vr(L,NY,NX))
+    TScal4Difsvity_vr(L,NY,NX) = TFACL
 
-    GasDifc_vr(idg_CO2,L,NY,NX)=CGSG*TFACG
-    GasDifc_vr(idg_CH4,L,NY,NX)=CHSG*TFACG
-    GasDifc_vr(idg_O2,L,NY,NX)=OGSG*TFACG
-    GasDifc_vr(idg_N2,L,NY,NX)=ZGSG*TFACG
-    GasDifc_vr(idg_N2O,L,NY,NX)=Z2SG*TFACG
-    GasDifc_vr(idg_NH3,L,NY,NX)=ZHSG*TFACG
-    GasDifc_vr(idg_H2,L,NY,NX)=HGSG*TFACG
-    GasDifc_vr(idg_NH3B,L,NY,NX)=ZHSG*TFACG
+    GasDifc_vr(idg_CO2,L,NY,NX)  = CGSG*TFACG
+    GasDifc_vr(idg_CH4,L,NY,NX)  = CHSG*TFACG
+    GasDifc_vr(idg_O2,L,NY,NX)   = OGSG*TFACG
+    GasDifc_vr(idg_N2,L,NY,NX)   = ZGSG*TFACG
+    GasDifc_vr(idg_N2O,L,NY,NX)  = Z2SG*TFACG
+    GasDifc_vr(idg_NH3,L,NY,NX)  = ZHSG*TFACG
+    GasDifc_vr(idg_H2,L,NY,NX)   = HGSG*TFACG
+    GasDifc_vr(idg_NH3B,L,NY,NX) = ZHSG*TFACG
 
-    SoluteDifusvty_vr(idg_CO2,L,NY,NX)=CLSG*TFACL
-    SoluteDifusvty_vr(idg_CH4,L,NY,NX)=CQSG*TFACL
-    SoluteDifusvty_vr(idg_O2,L,NY,NX)=OLSG*TFACL
-    SoluteDifusvty_vr(idg_N2,L,NY,NX)=ZLSG*TFACL
-    SoluteDifusvty_vr(idg_NH3,L,NY,NX)=ZNSG*TFACL
-    SoluteDifusvty_vr(idg_H2,L,NY,NX)=HLSG*TFACL
-    SoluteDifusvty_vr(idg_N2O,L,NY,NX)=ZVSG*TFACL
-    SoluteDifusvty_vr(idg_NH3B,L,NY,NX)=SoluteDifusvty_vr(idg_NH3,L,NY,NX)
-    SoluteDifusvty_vr(ids_NO3,L,NY,NX)=ZOSG*TFACL
-    SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)=POSG*TFACL
+    SoluteDifusvty_vr(idg_CO2,L,NY,NX)   = CLSG*TFACL
+    SoluteDifusvty_vr(idg_CH4,L,NY,NX)   = CQSG*TFACL
+    SoluteDifusvty_vr(idg_O2,L,NY,NX)    = OLSG*TFACL
+    SoluteDifusvty_vr(idg_N2,L,NY,NX)    = ZLSG*TFACL
+    SoluteDifusvty_vr(idg_NH3,L,NY,NX)   = ZNSG*TFACL
+    SoluteDifusvty_vr(idg_H2,L,NY,NX)    = HLSG*TFACL
+    SoluteDifusvty_vr(idg_N2O,L,NY,NX)   = ZVSG*TFACL
+    SoluteDifusvty_vr(idg_NH3B,L,NY,NX)  = SoluteDifusvty_vr(idg_NH3,L,NY,NX)
+    SoluteDifusvty_vr(ids_NO3,L,NY,NX)   = ZOSG*TFACL
+    SoluteDifusvty_vr(ids_H1PO4,L,NY,NX) = POSG*TFACL
 
     SoluteDifusvty_vr(ids_NH4,L,NY,NX)   =SoluteDifusvty_vr(idg_NH3,L,NY,NX)
     SoluteDifusvty_vr(ids_NH4B,L,NY,NX)  =SoluteDifusvty_vr(ids_NH4,L,NY,NX)
@@ -1339,25 +1339,25 @@ module Hour1Mod
     SoluteDifusvty_vr(ids_H1PO4B,L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)
     SoluteDifusvty_vr(ids_H2PO4B,L,NY,NX)=SoluteDifusvty_vr(ids_H2PO4,L,NY,NX)
 
-    DOMdiffusivity_vr(idom_doc,L,NY,NX)=OCSG*TFACL
-    DOMdiffusivity_vr(idom_don,L,NY,NX)=ONSG*TFACL
-    DOMdiffusivity_vr(idom_dop,L,NY,NX)=OPSG*TFACL
-    DOMdiffusivity_vr(idom_acetate,L,NY,NX)=OASG*TFACL
-    WVapDifusvitySoil_vr(L,NY,NX)=WGSG*TFACG
+    DOMdiffusivity_vr(idom_doc,L,NY,NX)     = OCSG*TFACL
+    DOMdiffusivity_vr(idom_don,L,NY,NX)     = ONSG*TFACL
+    DOMdiffusivity_vr(idom_dop,L,NY,NX)     = OPSG*TFACL
+    DOMdiffusivity_vr(idom_acetate,L,NY,NX) = OASG*TFACL
+    WVapDifusvitySoil_vr(L,NY,NX)           = WGSG*TFACG
 
     IF(salt_model)THEN
-      AquaIonDifusivty_vr(idsalt_Al,L,NY,NX)=ALSG*TFACL
-      AquaIonDifusivty_vr(idsalt_Fe,L,NY,NX)=FESG*TFACL
-      AquaIonDifusivty_vr(idsalt_Hp,L,NY,NX)=HYSG*TFACL
-      AquaIonDifusivty_vr(idsalt_Ca,L,NY,NX)=CASG*TFACL
-      AquaIonDifusivty_vr(idsalt_Mg,L,NY,NX)=GMSG*TFACL
-      AquaIonDifusivty_vr(idsalt_Na,L,NY,NX)=ANSG*TFACL
-      AquaIonDifusivty_vr(idsalt_K,L,NY,NX)=AKSG*TFACL
-      AquaIonDifusivty_vr(idsalt_OH,L,NY,NX)=OHSG*TFACL
-      AquaIonDifusivty_vr(idsalt_CO3,L,NY,NX)=C3SG*TFACL
-      AquaIonDifusivty_vr(idsalt_HCO3,L,NY,NX)=HCSG*TFACL
-      AquaIonDifusivty_vr(idsalt_SO4,L,NY,NX)=SOSG*TFACL
-      AquaIonDifusivty_vr(idsalt_Cl,L,NY,NX)=CLSX*TFACL
+      AquaIonDifusivty_vr(idsalt_Al,L,NY,NX)   = ALSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Fe,L,NY,NX)   = FESG*TFACL
+      AquaIonDifusivty_vr(idsalt_Hp,L,NY,NX)   = HYSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Ca,L,NY,NX)   = CASG*TFACL
+      AquaIonDifusivty_vr(idsalt_Mg,L,NY,NX)   = GMSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Na,L,NY,NX)   = ANSG*TFACL
+      AquaIonDifusivty_vr(idsalt_K,L,NY,NX)    = AKSG*TFACL
+      AquaIonDifusivty_vr(idsalt_OH,L,NY,NX)   = OHSG*TFACL
+      AquaIonDifusivty_vr(idsalt_CO3,L,NY,NX)  = C3SG*TFACL
+      AquaIonDifusivty_vr(idsalt_HCO3,L,NY,NX) = HCSG*TFACL
+      AquaIonDifusivty_vr(idsalt_SO4,L,NY,NX)  = SOSG*TFACL
+      AquaIonDifusivty_vr(idsalt_Cl,L,NY,NX)   = CLSX*TFACL
 !
 !   TOTAL ION CONCENTRATION
 !

@@ -6907,16 +6907,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)        
-    call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='RDOMEcoDmndK_vr', dim1name='column',dim2name='nomcomplx',&
        dim3name='levsoi1',long_name='total root + microbial DOC uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROQCX,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RDOMEcoDmndK_vr,datrc_3d)      
   else
-    !print*,'ROQCX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQCX,datrc_3d)        
+    !print*,'RDOMEcoDmndK_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RDOMEcoDmndK_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
-    call restartvar(ncid, flag, varname='ROQCX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='RDOMEcoDmndK_vr', dim1name='column',dim2name='nomcomplx',&
        dim3name='levsoi1',long_name='total root + microbial DOC uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
@@ -6940,16 +6940,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
-    call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='RAcetateEcoDmndK_vr', dim1name='column',dim2name='nomcomplx',&
        dim3name='levsoi1',long_name='total root + microbial acetate uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROQAX,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RAcetateEcoDmndK_vr,datrc_3d)      
   else
-    !print*,'ROQAX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROQAX,datrc_3d)        
+    !print*,'RAcetateEcoDmndK_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RAcetateEcoDmndK_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:jcplx, 1:JZ+1)            
-    call restartvar(ncid, flag, varname='ROQAX', dim1name='column',dim2name='nomcomplx',&
+    call restartvar(ncid, flag, varname='RAcetateEcoDmndK_vr', dim1name='column',dim2name='nomcomplx',&
        dim3name='levsoi1',long_name='total root + microbial acetate uptake', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  

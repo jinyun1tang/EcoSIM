@@ -307,7 +307,8 @@ module SoilBGCNLayMod
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
         if(ORGM(NE)<-1.e-6_r8)then
-        print*,'orgm1',ORGM,SolidOM_vr(:,M,K,L,NY,NX)
+        print*,'orgm1 in '//trim(mod_filename)
+        print*,'lay ',L,ORGM,SolidOM_vr(:,M,K,L,NY,NX)
         stop
         endif
       ENDDO  

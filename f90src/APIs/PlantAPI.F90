@@ -74,7 +74,7 @@ implicit none
   Eco_NetRad_col(NY,NX)                            = plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)                       = plt_ew%Eco_Heat_Latent_col
   Eco_Heat_Grnd_col(NY,NX)                         = plt_ew%Eco_Heat_Grnd_col
-  TEVAPP(NY,NX)                                    = plt_ew%TEVAPP
+  QvET_col(NY,NX)                                    = plt_ew%QvET_col
   LWRadCanG(NY,NX)                                 = plt_ew%LWRadCanG
   VapXAir2CanG(NY,NX)                              = plt_ew%VapXAir2CanG
   THFLXC(NY,NX)                                    = plt_ew%THFLXC
@@ -144,6 +144,7 @@ implicit none
   DO NZ=1,NP0(NY,NX)
     PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
       plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
+    QdewCanopy_CumYr_pft(NZ,NY,NX)                              = QdewCanopy_CumYr_pft(NZ,NY,NX)+plt_ew%QdewCanopy_pft(NZ)  
     RootUptk_N_CumYr_pft(NZ,NY,NX)                              = plt_rbgc%RootUptk_N_CumYr_pft(NZ)
     RootUptk_P_CumYr_pft(NZ,NY,NX)                              = plt_rbgc%RootUptk_P_CumYr_pft(NZ)
     RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)                   = plt_biom%RootElms_pft(1:NumPlantChemElms,NZ)
@@ -919,7 +920,7 @@ implicit none
   plt_ew%Eco_Heat_Latent_col=Eco_Heat_Latent_col(NY,NX)
   plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)=TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)
   plt_ew%Eco_Heat_Grnd_col    =Eco_Heat_Grnd_col(NY,NX)
-  plt_ew%TEVAPP =TEVAPP(NY,NX)
+  plt_ew%QvET_col =QvET_col(NY,NX)
   plt_ew%THFLXC =THFLXC(NY,NX)
   plt_ew%LWRadCanG  =LWRadCanG(NY,NX)
   plt_ew%CanWat_col =CanWat_col(NY,NX)

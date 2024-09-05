@@ -394,7 +394,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       call etimer%update_time_stamp()
 
       nlend=etimer%its_time_to_exit()
-      rstwr=etimer%its_time_to_write_restart()
+      rstwr=etimer%its_time_to_write_restart(nlend)
       lnyr=etimer%its_a_new_year()
 
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )

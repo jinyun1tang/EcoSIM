@@ -324,7 +324,7 @@ module RedistMod
   WI=PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux=rain/snowfall + irrigation
   CRAIN=CRAIN+WI
   QRain_CumYr_col(NY,NX)=WI
-  WO=VapXAir2GSurf_col(NY,NX)+TEVAPP(NY,NX)        !total outgoing water flux, > 0 into ground surface
+  WO=VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
   CEVAP=CEVAP-WO
   QEvap_CumYr_col(NY,NX)=QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)=-WO
@@ -1605,7 +1605,7 @@ module RedistMod
   !     RNO3DmndSoilHeter_vr,RNO3DmndLitrHeter_col=substrate-unlimited NO3 immobilization
   !     RH2PO4DmndSoilHeter_vr,RH2PO4DmndLitrHeter_col=substrate-unlimited H2PO4 immobilization
   !     RH1PO4DmndSoilHeter_vr,RH1PO4DmndLitrHeter_col=substrate-unlimited HPO4 immobilization
-  !     ROQCX,ROQAX=total DOC,DOA demand from DOC,DOA oxidation
+  !     RDOMEcoDmndK_vr,RAcetateEcoDmndK_vr=total DOC,DOA demand from DOC,DOA oxidation
   !     RDOCUptkHeter_vr,RAcetateUptkHeter_vr=DOC,DOA demand from DOC,DOA oxidation
   !     RNO2EcoUptkSoil_vr=total demand for NO2 reduction
   !     RNO2DmndSoilChemo_vr=demand for NO2 reduction
@@ -1626,8 +1626,8 @@ module RedistMod
           REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)   = REcoNO3DmndSoil_vr(NU(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
           REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX) = REcoH2PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
           REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX) = REcoH1PO4DmndSoil_vr(NU(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
-          ROQCX(K,0,NY,NX)                      = ROQCX(K,0,NY,NX)+RDOCUptkHeter_vr(NGL,K,0,NY,NX)
-          ROQAX(K,0,NY,NX)                      = ROQAX(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
+          RDOMEcoDmndK_vr(K,0,NY,NX)                      = RDOMEcoDmndK_vr(K,0,NY,NX)+RDOCUptkHeter_vr(NGL,K,0,NY,NX)
+          RAcetateEcoDmndK_vr(K,0,NY,NX)                      = RAcetateEcoDmndK_vr(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
         ENDDO
       ENDDO
     ENDIF
@@ -1680,8 +1680,8 @@ module RedistMod
   REcoH1PO4DmndBand_vr(L,NY,NX)=REcoH1PO4DmndBand_vr(L,NY,NX)+SUM(RH1PO4DmndBandHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
 
   DO K=1,jcplx
-    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(RDOCUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
-    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(RAcetateUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+    RDOMEcoDmndK_vr(K,L,NY,NX)=RDOMEcoDmndK_vr(K,L,NY,NX)+SUM(RDOCUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
+    RAcetateEcoDmndK_vr(K,L,NY,NX)=RAcetateEcoDmndK_vr(K,L,NY,NX)+SUM(RAcetateUptkHeter_vr(1:NumHetetrMicCmplx,1:jcplx,L,NY,NX))
   ENDDO
   REcoO2DmndResp_vr(L,NY,NX)=REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndAutort_vr(1:NumHetetrMicCmplx,L,NY,NX))
   REcoNH4DmndSoil_vr(L,NY,NX)=REcoNH4DmndSoil_vr(L,NY,NX)+SUM(RNH3OxidAutor(1:NumHetetrMicCmplx,L,NY,NX)) &
