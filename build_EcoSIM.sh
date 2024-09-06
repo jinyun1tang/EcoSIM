@@ -44,6 +44,7 @@ print_help() {
     echo "  --shared               Enable shared libraries"
     echo "  --verbose              Enable verbose output"
     echo "  --sanitize             Enable sanitizer"
+    echo "  --clean                Cleans build directory"
     echo "  --help                 Display this help message"
     exit 0
 }
@@ -83,6 +84,11 @@ do
     --sanitize)
       sanitize=1
       ;; 
+    --clean)
+      echo "Cleaning build directory..."
+      rm -rf ./build
+      exit 0
+      ;;
   esac
 done
 #This is a little confusing, but we have to move into the build dir
@@ -198,12 +204,26 @@ echo "building in: $ecosim_build_dir"
 cd build
 ${cmd_configure}
 
+if [ $? -ne 0 ]; then
+  echo "Configuration failed, aborting."
+  exit 1
+fi
+
 #This does the build
 make -j ${parallel_jobs}
 
+if [ $? -ne 0 ]; then
+  echo "Build failed, aborting."
+  exit 1
+fi
 
 #Does the install
 make install
+
+if [ $? -ne 0 ]; then
+  echo "Install failed, aborting."
+  exit 1
+fi
 
 if [ "$regression_test" -eq 1 ]; then
   make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;
