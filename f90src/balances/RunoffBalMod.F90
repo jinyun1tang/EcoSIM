@@ -162,7 +162,7 @@ implicit none
 !     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
 !
-  IF(N.NE.ivertdir.AND.L.EQ.NU(NY,NX))THEN
+  IF(N.NE.ivertdir .AND. L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
     WQRN=XN*Wat2GridBySurfRunoff(N,NN,N5,N4)
     QRunSurf_col(N2,N1)=QRunSurf_col(N2,N1)+WQRN

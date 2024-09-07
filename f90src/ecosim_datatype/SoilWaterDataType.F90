@@ -70,12 +70,12 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DiffusivitySolutEff(:,:,:,:)                     !coefficient for dissolution - volatilization, []
   real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
-  real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
+  real(r8),target,allocatable ::  PSISE_vr(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                      !osmotic soil water potential , [Mpa]
   real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                      !gravimetric soil water potential , [Mpa]
   real(r8),target,allocatable ::  THETY_vr(:,:,:)                      !air-dry water content, [m3 m-3]
-  real(r8),target,allocatable ::  Theta_sat(:,:,:)                      !micropore class water content
+  real(r8),target,allocatable ::  ThetaSat_vr(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
   real(r8),target,allocatable ::  QEvap_CumYr_col(:,:)                        !total evaporation, [m3 d-2]
@@ -170,12 +170,12 @@ module SoilWaterDataType
   allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
   allocate(DiffusivitySolutEff(60,0:JZ,JY,JX));DiffusivitySolutEff=0._r8
   allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
-  allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
+  allocate(PSISE_vr(0:JZ,JY,JX));  PSISE_vr=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic_vr(0:JZ,JY,JX));  PSISoilOsmotic_vr=0._r8
   allocate(PSIGrav_vr(0:JZ,JY,JX));  PSIGrav_vr=0._r8
   allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
-  allocate(Theta_sat(0:JZ,JY,JX));  Theta_sat=0._r8
+  allocate(ThetaSat_vr(0:JZ,JY,JX));  ThetaSat_vr=0._r8
   allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
   allocate(QEvap_CumYr_col(JY,JX));       QEvap_CumYr_col=0._r8
   allocate(QRain_CumYr_col(JY,JX));       QRain_CumYr_col=0._r8
@@ -257,12 +257,12 @@ module SoilWaterDataType
   call destroy(TortMacPM)
   call destroy(DiffusivitySolutEff)
   call destroy(SoilResit4RootPentrate_vr)
-  call destroy(PSISE)
+  call destroy(PSISE_vr)
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic_vr)
   call destroy(PSIGrav_vr)
   call destroy(THETY_vr)
-  call destroy(Theta_sat)
+  call destroy(ThetaSat_vr)
   call destroy(WaterFlowSoiMicPX)
   call destroy(QEvap_CumYr_col)
   call destroy(EvapoTransp_col)

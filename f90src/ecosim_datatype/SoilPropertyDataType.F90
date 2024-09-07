@@ -8,7 +8,7 @@ implicit none
   __FILE__
 
    real(r8) ,target,allocatable ::  CORGCI(:,:,:)                    !soil organic C content   [g kg-1]
-   real(r8) ,target,allocatable ::  POROSI(:,:,:)                    !soil porosity            [m3 m-3]
+   real(r8) ,target,allocatable ::  POROSI_vr(:,:,:)                    !soil porosity            [m3 m-3]
    real(r8) ,target,allocatable ::  SoilFracAsMacPt0_vr(:,:,:)                     !soil macropore fraction
    real(r8) ,target,allocatable ::  CSAND(:,:,:)                     !soil sand content [kg Mg-1]
    real(r8) ,target,allocatable ::  CSILT(:,:,:)                     !soil silt content [kg Mg-1]
@@ -21,7 +21,7 @@ implicit none
    real(r8) ,target,allocatable ::  MacPRadius(:,:,:)                      !radius of macropores
    real(r8) ,target,allocatable ::  SoiBulkDensity_vr(:,:,:)                      !soil bulk density, [Mg m-3]
    integer  ,target,allocatable ::  MacPNumLayer(:,:,:)                 !number of macropores
-   real(r8) ,target,allocatable ::  POROS(:,:,:)                     !soil porosity
+   real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity
    real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	m3 d-2
    real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                      !micropore volume
    real(r8) ,target,allocatable ::  SoilMicPMassLayer(:,:,:)                      !mass of soil layer	Mg d-2
@@ -53,7 +53,7 @@ contains
 
   implicit none
   allocate(CORGCI(JZ,JY,JX));    CORGCI=0._r8
-  allocate(POROSI(0:JZ,JY,JX));  POROSI=0._r8
+  allocate(POROSI_vr(0:JZ,JY,JX));  POROSI_vr=0._r8
   allocate(SoilFracAsMacPt0_vr(JZ,JY,JX));     SoilFracAsMacPt0_vr=0._r8
   allocate(CSAND(JZ,JY,JX));     CSAND=0._r8
   allocate(CSILT(JZ,JY,JX));     CSILT=0._r8
@@ -66,7 +66,7 @@ contains
   allocate(MacPRadius(JZ,JY,JX));      MacPRadius=0._r8
   allocate(SoiBulkDensity_vr(0:JZ,JY,JX));    SoiBulkDensity_vr=0._r8
   allocate(MacPNumLayer(JZ,JY,JX));      MacPNumLayer=0
-  allocate(POROS(0:JZ,JY,JX));   POROS=0._r8
+  allocate(POROS_vr(0:JZ,JY,JX));   POROS_vr=0._r8
   allocate(VLSoilPoreMicP_vr(0:JZ,JY,JX));    VLSoilPoreMicP_vr=0._r8
   allocate(VLSoilMicP_vr(0:JZ,JY,JX));    VLSoilMicP_vr=0._r8
   allocate(SoilMicPMassLayer(0:JZ,JY,JX));    SoilMicPMassLayer=0._r8
@@ -87,7 +87,7 @@ contains
   use abortutils, only : destroy
   implicit none
   call destroy(CORGCI)
-  call destroy(POROSI)
+  call destroy(POROSI_vr)
   call destroy(SoilFracAsMacPt0_vr)
   call destroy(CSAND)
   call destroy(CSILT)
@@ -100,7 +100,7 @@ contains
   call destroy(MacPRadius)
   call destroy(SoiBulkDensity_vr)
   call destroy(MacPNumLayer)
-  call destroy(POROS)
+  call destroy(POROS_vr)
   call destroy(VLSoilPoreMicP_vr)
   call destroy(VLSoilMicP_vr)
   call destroy(SoilMicPMassLayer)

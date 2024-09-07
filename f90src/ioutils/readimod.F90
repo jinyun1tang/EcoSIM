@@ -415,11 +415,11 @@ module readiMod
     NLI(NV1,NH1)=NM(NV1,NH1)+NL2
     NL(NV1,NH1)=NLI(NV1,NH1)
 
-    call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepth2LayerBottom(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayerBot_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'WP', ntp,WiltPoint(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'WP', ntp,WiltPoint_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'SCNV', ntp,SatHydroCondVert(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn(1:JZ,NV1,NH1))
 
@@ -531,10 +531,10 @@ module readiMod
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
-            CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NV1,NH1)
+            CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L,NV1,NH1)
             SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NV1,NH1)
-            FieldCapacity(L,NY,NX)=FieldCapacity(L,NV1,NH1)
-            WiltPoint(L,NY,NX)=WiltPoint(L,NV1,NH1)
+            FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NV1,NH1)
+            WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NV1,NH1)
             SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NV1,NH1)
             SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NV1,NH1)
             CSAND(L,NY,NX)=CSAND(L,NV1,NH1)
@@ -604,7 +604,7 @@ module readiMod
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
 !
-!     ISOIL=flag for calculating FC(1),WiltPoint(2),SatHydroCondVert(3),SatHydroCondHrzn(4)
+!     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert(3),SatHydroCondHrzn(4)
 !
         call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM(NY,NX))
 
@@ -616,14 +616,14 @@ module readiMod
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
             IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
-              CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.01_r8
+              CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L+1,NY,NX)-0.01_r8
             ELSE
-              CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.02_r8
+              CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
               SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L+1,NY,NX)
-              FieldCapacity(L,NY,NX)=FieldCapacity(L+1,NY,NX)
-              WiltPoint(L,NY,NX)=WiltPoint(L+1,NY,NX)
+              FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L+1,NY,NX)
+              WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L+1,NY,NX)
               SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L+1,NY,NX)
               SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L+1,NY,NX)
               CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
@@ -704,8 +704,8 @@ module readiMod
           FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
   !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
   !  both macropores and micropores    
-  !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
-  !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
+  !     FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
+  !     WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !
           SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
@@ -816,7 +816,7 @@ module readiMod
   write(*,'(A,I2,A,I2)')'read data for layers from layer NU ',NU,' to layer NM ',NM
 
   write(*,*)'Depth to bottom of soil layer (m): CDPTH'
-  write(*,*)(CumDepth2LayerBottom(L,NY,NX),L=NU,NM)
+  write(*,*)(CumDepz2LayerBot_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0_vr'
   write(*,*)(SoiBulkDensityt0_vr(L,NY,NX),L=NU,NM)
 !
@@ -830,9 +830,9 @@ module readiMod
   write(*,*)'NY,NX=',NY,NX
   write(*,*)'L=',NU,NM
   write(*,*)'Field capacity (m3 m-3): FC'
-  write(*,*)(FieldCapacity(L,NY,NX),L=NU,NM)
+  write(*,*)(FieldCapacity_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Wilting point (m3 m-3): WP'
-  write(*,*)(WiltPoint(L,NY,NX),L=NU,NM)
+  write(*,*)(WiltPoint_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Vertical Ksat (mm h-1): SCNV'
   write(*,*)(SatHydroCondVert(L,NY,NX),L=NU,NM)
   write(*,*)'Lateral Ksat (mm h-1): SCNH'

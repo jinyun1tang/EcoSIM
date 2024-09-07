@@ -181,8 +181,8 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
-  real(r8) :: VLSoilPoreMicP_vrX   !maximal soil micropore allowed
-  real(r8) :: VOLTX                !maximum soil pore volume allowed
+  real(r8) :: VLSoilPoreMicPX   !maximal soil micropore allowed
+  real(r8) :: VOLTX(0:JZ)                !maximum soil pore volume allowed
   integer  :: L
   if(lverb)write(*,*)'UpdateOutputVars'
 
@@ -223,11 +223,14 @@ module RedistMod
   ThetaICEZ_vr(0,NY,NX)=AZMAX1((VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))/AREA(3,0,NY,NX))
   
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
-    VLSoilPoreMicP_vrX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-    VOLTX=VLSoilPoreMicP_vrX+VLMacP_vr(L,NY,NX)
-    ThetaH2OZ_vr(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX)
-    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX)
+    VLWatMacP_vr(L,NY,NX)=AZMAX1(VLWatMacP_vr(L,NY,NX))
+    VLiceMacP_vr(L,NY,NX)=AZMAX1(VLiceMacP_vr(L,NY,NX))
+    VLSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+    VOLTX(L)=VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
+    ThetaH2OZ_vr(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX(L))
+    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX(L))
   ENDDO D9945
+
   end subroutine UpdateOutputVars
 
 
@@ -241,7 +244,7 @@ module RedistMod
 !     SolarNoonHour_col=hour of solar noon from weather file
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
-!     CumDepth2LayerBottom(NU=soil surface elevation
+!     CumDepz2LayerBot_vr(NU=soil surface elevation
 !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table from readi.f
 !     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
@@ -254,15 +257,15 @@ module RedistMod
   if(lverb)write(*,*)'ModifyExWTBLByDisturbance'
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
     ! drainage is on
-    DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+    DCORPW=DCORP(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
     NatWtblDepz_col(NY,NX)=DCORPW
     ExtWaterTablet0(NY,NX)=NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
-    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.iSoilDisturbType_col(I,NY,NX).EQ.24)THEN
     ! drainage in on
-    DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+    DCORPW=DCORP(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
     IF(IDWaterTable(NY,NX).EQ.1)THEN
       IDWaterTable(NY,NX)=3
     ELSEIF(IDWaterTable(NY,NX).EQ.2)THEN
@@ -279,8 +282,8 @@ module RedistMod
 ! 4 is mobile tile drainge.
   IF(IDWaterTable(NY,NX).EQ.2.OR.IDWaterTable(NY,NX).EQ.4)THEN
     ExtWaterTable(NY,NX)=ExtWaterTable(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(ExtWaterTable(NY,NX)-ExtWaterTablet0(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+      -0.00167_r8*(ExtWaterTable(NY,NX)-ExtWaterTablet0(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
   
   IF(IDWaterTable(NY,NX).EQ.4)THEN
@@ -855,13 +858,13 @@ module RedistMod
     VLWatMicPX_vr(L,NY,NX)=AMIN1(VLWatMicP_vr(L,NY,NX),VLWatMicPX_vr(L,NY,NX)+0.01_r8*(VLWatMicP_vr(L,NY,NX)-VLWatMicPX_vr(L,NY,NX)))
     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)-WatIceThawMicP_vr(L,NY,NX)/DENSICE
 
-    !micropore
+    !macropore
     VLWatMacP_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)+TWaterFlowMacP_vr(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
     VLiceMacP_vr(L,NY,NX)=VLiceMacP_vr(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
 
     !volume change
-    DVLWatMicP_vr(L,NY,NX)=VLWatMicP1(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
-    DVLiceMicP_vr(L)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
+    DVLWatMicP_vr(L,NY,NX)=VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
+    DVLiceMicP_vr(L)=VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -931,7 +934,7 @@ module RedistMod
     VOLISO=VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
     WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
     HeatStore_col(NY,NX)=HeatStore_col(NY,NX)+HS
-!    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+!    2-WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     HeatStore_lnd=HeatStore_lnd+HS
   ENDDO
   end subroutine update_physVar_Profile

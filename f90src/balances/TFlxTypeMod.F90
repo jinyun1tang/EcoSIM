@@ -55,10 +55,10 @@ implicit none
   real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                       !
   real(r8),allocatable ::  THeatSoiThaw_vr(:,:,:)                      !
   real(r8),allocatable ::  WatIceThawMacP_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLWatMicP1(:,:,:)                       !
-  real(r8),allocatable ::  VLiceMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                       !
+  real(r8),allocatable ::  VLiceMicP1_vr(:,:,:)                       !
   real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
 
   real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
 
@@ -135,10 +135,10 @@ implicit none
   allocate(WatIceThawMicP_vr(JZ,JY,JX));    WatIceThawMicP_vr=0._r8
   allocate(THeatSoiThaw_vr(JZ,JY,JX));   THeatSoiThaw_vr=0._r8
   allocate(WatIceThawMacP_vr(JZ,JY,JX));   WatIceThawMacP_vr=0._r8
-  allocate(VLWatMicP1(JZ,JY,JX));    VLWatMicP1=0._r8
-  allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
+  allocate(VLWatMicP1_vr(JZ,JY,JX));    VLWatMicP1_vr=0._r8
+  allocate(VLiceMicP1_vr(JZ,JY,JX));    VLiceMicP1_vr=0._r8
   allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
-  allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
+  allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8
   allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
   allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
@@ -210,10 +210,10 @@ implicit none
   call destroy(WatIceThawMicP_vr)
   call destroy(THeatSoiThaw_vr)
   call destroy(WatIceThawMacP_vr)
-  call destroy(VLWatMicP1)
-  call destroy(VLiceMicP1)
+  call destroy(VLWatMicP1_vr)
+  call destroy(VLiceMicP1_vr)
   call destroy(VLWatMacP1_vr)
-  call destroy(VLiceMacP1)
+  call destroy(VLiceMacP1_vr)
   call destroy(DOM_Transp2Micp_vr)
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)

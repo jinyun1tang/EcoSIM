@@ -205,7 +205,7 @@ module InitSOMBGCMOD
 
   D8995: DO K=1,jcplx
     IF(L.EQ.0)THEN
-      OSCM(K)=AMIN1(DCKR,0.1_r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
+      OSCM(K)=AMIN1(DCKR,1._r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
       X=0.0_r8
       KK=K
       FOSCI=1.0_r8
@@ -214,15 +214,15 @@ module InitSOMBGCMOD
     ELSE
       IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
         IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-          OSCM(K)=AMIN1(DCKR,0.1_r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
+          OSCM(K)=AMIN1(DCKR,1._r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
         ELSE
-          OSCM(K)=AMIN1(FCX,0.1_r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=AMIN1(FCX,1._r8)*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ELSE
         IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-          OSCM(K)=AMIN1(DCKR,0.1_r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)
+          OSCM(K)=AMIN1(DCKR,1._r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)
         ELSE
-          OSCM(K)=AMIN1(FCX,0.1_r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=AMIN1(FCX,1._r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ENDIF
       X=1.0_r8
@@ -569,7 +569,7 @@ module InitSOMBGCMOD
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
       IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoiDepthMidLay(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
-        +CumDepth2LayerBottom(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
+        +CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &

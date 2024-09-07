@@ -407,7 +407,7 @@ contains
           PtWatFlowSno2Soi=WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
           !actual flow to micro- and macropores
           WatFlowSno2MicP=AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP(NUM(NY,NX),NY,NX))
-          WatFlowSno2MacP=AMIN1(VLairMacP1(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1(NUM(NY,NX),NY,NX))
+          WatFlowSno2MacP=AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1(NUM(NY,NX),NY,NX))
           WatFlowSno2Soil=WatFlowSno2MicP+WatFlowSno2MacP
           HeatFlowSno2SoiByWat=cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil
           WatFlowSno2LitR=WatFloInSnoMax-WatFlowSno2Soil
@@ -1051,14 +1051,14 @@ contains
     VLIceSnow0_snvr(1,NY,NX)=VLIceSnow0_snvr(1,NY,NX)-FLWI
  
     !add to litter layer?
-    VLWatMicP1(NUM(NY,NX),NY,NX)=VLWatMicP1(NUM(NY,NX),NY,NX)+FLWW
-    VLiceMicP1(NUM(NY,NX),NY,NX)=VLiceMicP1(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+    VLWatMicP1_vr(NUM(NY,NX),NY,NX)=VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
+    VLiceMicP1_vr(NUM(NY,NX),NY,NX)=VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
     
     ENGY1=VLHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKSoi1(NUM(NY,NX),NY,NX)
     VLHeatCapacityA(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
-      +cpw*VLWatMicP1(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1(NUM(NY,NX),NY,NX)
+      +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
     VLHeatCapacityB(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
-      +cpi*VLiceMacP1(NUM(NY,NX),NY,NX)
+      +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
     VLHeatCapacity_vr(NUM(NY,NX),NY,NX)=VLHeatCapacityA(NUM(NY,NX),NY,NX)+VLHeatCapacityB(NUM(NY,NX),NY,NX)
 
     IF(VLHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
@@ -1313,10 +1313,10 @@ contains
     ! HFLVRSX=convective heat flux from snow-litter vapor flux
     !
     !residue vapor pressure
-    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGASC*TKXR))
+    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKXR))
     if(abs(VPR)>1.e20_r8)then
       write(*,*)'TKXR=',TKXR,TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX),NN
-      write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
+      write(*,*)'PSISM1_vr(0,NY,NX)=',PSISM1_vr(0,NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif
 
@@ -1503,41 +1503,41 @@ contains
   real(r8) :: THETW1,VPY,FCX,WPX
   real(r8) :: LOGFCX,LOGWPX,PSDX,FCDX
 
-  THETW1=AMAX1(THETY_vr(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
-    ,safe_adb(VLWatMicP1(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX))))
+  THETW1=AMAX1(THETY_vr(NUM(NY,NX),NY,NX),AMIN1(POROS_vr(NUM(NY,NX),NY,NX) &
+    ,safe_adb(VLWatMicP1_vr(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX))))
   IF(SoilMicPMassLayer(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    IF(THETW1.LT.FieldCapacity(NUM(NY,NX),NY,NX))THEN
-      PSISM1(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-        +((LOGFldCapacity(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
+    IF(THETW1.LT.FieldCapacity_vr(NUM(NY,NX),NY,NX))THEN
+      PSISM1_vr(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
+        +((LOGFldCapacity_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
         /FCD(NUM(NY,NX),NY,NX)*LOGPSIMND(NY,NX))))
-    ELSEIF(THETW1.LT.POROS(NUM(NY,NX),NY,NX)-DTHETW)THEN
-      PSISM1(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
-        +(((LOGPOROS(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
+    ELSEIF(THETW1.LT.POROS_vr(NUM(NY,NX),NY,NX)-DTHETW)THEN
+      PSISM1_vr(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
+        +(((LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
         /PSD(NUM(NY,NX),NY,NX))**SRP(NUM(NY,NX),NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE
-      THETW1=POROS(NUM(NY,NX),NY,NX)
-      PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
+      THETW1=POROS_vr(NUM(NY,NX),NY,NX)
+      PSISM1_vr(NUM(NY,NX),NY,NX)=PSISE_vr(NUM(NY,NX),NY,NX)
     ENDIF
   ELSEIF(VLSoilPoreMicP_vr(NUM(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     FCX=FCI*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)
     WPX=WPI*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)
     LOGFCX=LOG(FCX)
     LOGWPX=LOG(WPX)
-    PSDX=LOGPOROS(NUM(NY,NX),NY,NX)-LOGFCX
+    PSDX=LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOGFCX
     FCDX=LOGFCX-LOGWPX
     IF(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX).LT.FCX)THEN
-      PSISM1(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
+      PSISM1_vr(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
         +((LOGFCX-LOG(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
-    ELSEIF(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX).LT.POROS(NUM(NY,NX),NY,NX)-DTHETW)THEN
-      PSISM1(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
-        +(((LOGPOROS(NUM(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD(NY,NX)))
+    ELSEIF(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX).LT.POROS_vr(NUM(NY,NX),NY,NX)-DTHETW)THEN
+      PSISM1_vr(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
+        +(((LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD(NY,NX)))
     ELSE
-      THETW1=POROS(NUM(NY,NX),NY,NX)
-      PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
+      THETW1=POROS_vr(NUM(NY,NX),NY,NX)
+      PSISM1_vr(NUM(NY,NX),NY,NX)=PSISE_vr(NUM(NY,NX),NY,NX)
     ENDIF
   ELSE
-    THETW1=POROS(NUM(NY,NX),NY,NX)
-    PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
+    THETW1=POROS_vr(NUM(NY,NX),NY,NX)
+    PSISM1_vr(NUM(NY,NX),NY,NX)=PSISE_vr(NUM(NY,NX),NY,NX)
   ENDIF
   end subroutine UpdateSoilWaterPotential  
 !------------------------------------------------------------------------------------------
@@ -1558,29 +1558,29 @@ contains
 
   ! ThetaWLitR,THETW1=litter, soil water concentration
   ! VWatLitRHoldCapcity=litter water retention capacity
-  ! PSISM1(0,PSISM1(NUM=litter,soil water potentials
+  ! PSISM1_vr(0,PSISM1_vr(NUM=litter,soil water potentials
 
-  IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1(0,NY,NX))/VLitR_col(NY,NX)
-    IF(ThetaWLitR.LT.FieldCapacity(0,NY,NX))THEN
-      PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX) &
+  IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1_vr(0,NY,NX))/VLitR_col(NY,NX)
+    IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
+      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX) &
         *LOGPSIMND(NY,NX))))
     ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
-      PSISM1(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(ThetaWLitR))/PSD(0,NY,NX))**SRP(0,NY,NX) &
+      PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR))/PSD(0,NY,NX))**SRP(0,NY,NX) &
         *LOGPSIMXD(NY,NX)))
     ELSE
       ThetaWLitR=POROS0(NY,NX)
-      PSISM1(0,NY,NX)=PSISE(0,NY,NX)
+      PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
     ENDIF
   ELSE
     ThetaWLitR=POROS0(NY,NX)
-    PSISM1(0,NY,NX)=PSISE(0,NY,NX)
+    PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
   ENDIF
 
   TK0X=TKSnow1_snvr(L,NY,NX)
   TKXR=TKSoi1(0,NY,NX)
   TK1X=TKSoi1(NUM(NY,NX),NY,NX)
-  CNVR=safe_adb(VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS(0,NY,NX))
+  CNVR=safe_adb(VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS_vr(0,NY,NX))
 
   if(TKXR<0._r8)then
     write(*,*)'SnowSurLitterExch negative M, L, TKR',M,L,TKXR
@@ -1645,7 +1645,7 @@ contains
 
   call UpdateSoilWaterPotential(NY,NX)
   !micropore pressure, excluding gravitational pressure
-  PSISV1=PSISM1(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
+  PSISV1=PSISM1_vr(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
 !
   ! VAPOR FLUX BETWEEN SNOWPACK AND SOIL SURFACE
   !
@@ -1665,7 +1665,7 @@ contains
   !
   IF(VLairSno1.GT.ZEROS2(NY,NX).AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
     VapCond2=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
-      *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
+      *THETPM(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
     VapSoiDest=vapsat(TKSoi1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoi1(NUM(NY,NX),NY,NX)))
     AvgVaporCondctSoilLitR=2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR(3,NUM(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
     H2OVapFlx=AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)&

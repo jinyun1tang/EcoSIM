@@ -485,7 +485,7 @@ module SoluteMod
 !     DPNH4=NH4 fertilizer band depth
 !
   IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayerBot_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
 !
@@ -502,7 +502,7 @@ module SoluteMod
 !     DPFLW=change in NH4 fertilizer band depth
 !     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
 !
-      IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
+      IF(CumDepz2LayerBot_vr(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
         DPFLW=FLWD+DWNH4
         BandDepthNH4_col(NY,NX)=BandDepthNH4_col(NY,NX)+DPFLW
         BandThicknessNH4_vr(L,NY,NX)=BandThicknessNH4_vr(L,NY,NX)+DPFLW
@@ -588,7 +588,7 @@ module SoluteMod
 !     DPPO4=H2PO4 fertilizer band depth
 !
   IF(IFPOB(NY,NX).EQ.1 .AND. ROWP(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayerBot_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
 !
 !     PO4 BAND WIDTH
 !     DWPO4=change in H2PO4 fertilizer band width
@@ -604,7 +604,7 @@ module SoluteMod
 !     DPFLW=change in H2PO4 fertilizer band depth
 !     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
 !
-      IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
+      IF(CumDepz2LayerBot_vr(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
         DPFLW=FLWD+DWPO4
         BandDepthPO4_col(NY,NX)=BandDepthPO4_col(NY,NX)+DPFLW
         BandThicknessPO4_vr(L,NY,NX)=BandThicknessPO4_vr(L,NY,NX)+DPFLW
@@ -817,7 +817,7 @@ module SoluteMod
 !
   IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
 
-    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayerBot_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
 !
 !     NO3 BAND WIDTH
 !
@@ -834,7 +834,7 @@ module SoluteMod
 !     DPFLW=change in NO3 fertilizer band depth
 !     BandDepthNO3_col,DPNOB=total,layer NO3 fertilizer band depth
 !
-      IF(CumDepth2LayerBottom(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
+      IF(CumDepz2LayerBot_vr(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
         DPFLW=FLWD+DWNO3
         BandDepthNO3_col(NY,NX)=BandDepthNO3_col(NY,NX)+DPFLW
         BandThicknessNO3_vr(L,NY,NX)=BandThicknessNO3_vr(L,NY,NX)+DPFLW

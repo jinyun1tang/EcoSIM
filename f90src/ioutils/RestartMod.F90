@@ -6049,21 +6049,20 @@ implicit none
        dim3name='levsoi1',long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
-
   endif
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='CumDepth2LayerBottom', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumDepz2LayerBot_vr', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumDepz2LayerBot_vr,datrc_2d) 
   else
-    !print*,'CumDepth2LayerBottom'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d)   
+    !print*,'CumDepz2LayerBot_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumDepz2LayerBot_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CumDepth2LayerBottom', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumDepz2LayerBot_vr', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -6139,16 +6138,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='POROS', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='POROS_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil porosity', units='m3 m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,POROS,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,POROS_vr,datrc_2d) 
   else
     !print*,'POROS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,POROS,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,POROS_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='POROS', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='POROS_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil porosity', units='m3 m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -6245,10 +6244,10 @@ implicit none
        long_name='Field capacity', units='m3 m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity_vr,datrc_2d) 
   else
     !print*,'FieldCapacity'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FieldCapacity_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='FieldCapacity', dim1name='column',dim2name='levsoi1',&
        long_name='Field capacity', units='m3 m-3', &
@@ -6258,16 +6257,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='WiltPoint', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='WiltPoint_vr', dim1name='column',dim2name='levsoi1',&
        long_name='Wilting point', units='m3 m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint_vr,datrc_2d)   
   else
-    !print*,'WiltPoint'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint,datrc_2d)    
+    !print*,'WiltPoint_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WiltPoint_vr,datrc_2d)    
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='WiltPoint', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='WiltPoint_vr', dim1name='column',dim2name='levsoi1',&
        long_name='Wilting point', units='m3 m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      

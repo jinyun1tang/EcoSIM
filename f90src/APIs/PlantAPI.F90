@@ -1493,7 +1493,7 @@ implicit none
   plt_rad%SoilAlbedo   =SoilAlbedo_col(NY,NX)
   plt_rad%SurfAlbedo_col   =SurfAlbedo_col(NY,NX)
   plt_site%ZEROS2=ZEROS2(NY,NX)
-  plt_site%POROS1=POROS(NU(NY,NX),NY,NX)
+  plt_site%POROS1=POROS_vr(NU(NY,NX),NY,NX)
   DO NZ=1,NP(NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)=CanopyLeafArea_pft(NZ,NY,NX)
     plt_morph%CanopyHeight_pft(NZ)=CanopyHeight_pft(NZ,NY,NX)

@@ -8,7 +8,7 @@ implicit none
   __FILE__
 
   real(r8) :: TAREA               !total area of landscape	[m2]
-  real(r8),target,allocatable ::  CumDepth2LayerBottom(:,:,:)                       !depth to bottom of soil layer [m]
+  real(r8),target,allocatable ::  CumDepz2LayerBot_vr(:,:,:)                       !depth to bottom of soil layer [m]
   real(r8),target,allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]
   real(r8),target,allocatable ::  DLYRI(:,:,:,:)                     !thickness of soil layer [m]
   real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
@@ -39,7 +39,7 @@ contains
   subroutine InitGridData
 
   implicit none
-  allocate(CumDepth2LayerBottom(0:JZ,JY,JX));  CumDepth2LayerBottom=0._r8
+  allocate(CumDepz2LayerBot_vr(0:JZ,JY,JX));  CumDepz2LayerBot_vr=0._r8
   allocate(DLYR(3,0:JZ,JY,JX)); DLYR=0._r8
   allocate(DLYRI(3,0:JZ,JY,JX));DLYRI=0._r8
   allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
@@ -70,7 +70,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(CumDepth2LayerBottom)
+  call destroy(CumDepz2LayerBot_vr)
   call destroy(DLYR)
   call destroy(DLYRI)
   call destroy(XDPTH)

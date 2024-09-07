@@ -43,20 +43,20 @@ implicit none
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
 
-  THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
+  THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
 
   IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil
-    IF(THETA1.LT.FieldCapacity(N3,N2,N1))THEN
+    IF(THETA1.LT.FieldCapacity_vr(N3,N2,N1))THEN
       !water less than field capacity
       !PSIHY is the minimum water potential allowed, where hygroscopic water is < 0
       !held tightly on the surfaces of soil particles and exists as a thin layer of vapor
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
-    ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*LOGPSIMXD(N2,N1)))
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity_vr(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
+    ELSEIF(THETA1.LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*LOGPSIMXD(N2,N1)))
     ELSE
-      THETA1        = POROS(N3,N2,N1)
-      PSISoilMatric = PSISE(N3,N2,N1)
+      THETA1        = POROS_vr(N3,N2,N1)
+      PSISoilMatric = PSISE_vr(N3,N2,N1)
     ENDIF
     !
     !     SUBSURFCE UPPER WATER LAYER
@@ -70,20 +70,20 @@ implicit none
     WPX=WPI*FracSoiPAsIce_vr(N3,N2,N1)
     FCLX=LOG(FCX)
     WPLX=LOG(WPX)
-    PSDX=LOGPOROS(N3,N2,N1)-FCLX
+    PSDX=LOGPOROS_vr(N3,N2,N1)-FCLX
     FCDX=FCLX-WPLX
     IF(FracSoiPAsWat_vr(N3,N2,N1).LT.FCX)THEN
       PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((FCLX-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
-    ELSEIF(FracSoiPAsWat_vr(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
+    ELSEIF(FracSoiPAsWat_vr(N3,N2,N1).LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
     ELSE
       !saturated
-      THETA1=POROS(N3,N2,N1)
-      PSISoilMatric=PSISE(N3,N2,N1)
+      THETA1=POROS_vr(N3,N2,N1)
+      PSISoilMatric=PSISE_vr(N3,N2,N1)
     ENDIF
   ELSE
-    THETA1=POROS(N3,N2,N1)
-    PSISoilMatric=PSISE(N3,N2,N1)
+    THETA1=POROS_vr(N3,N2,N1)
+    PSISoilMatric=PSISE_vr(N3,N2,N1)
   ENDIF
 
   if(present(THETA1S))THETA1S=THETA1
@@ -103,10 +103,10 @@ implicit none
   )
 
   DO L=NM+1,JZ
-    CumDepth2LayerBottom(L,NY,NX) = 2.0_r8*CumDepth2LayerBottom(L-1,NY,NX)-1.0_r8*CumDepth2LayerBottom(L-2,NY,NX)
+    CumDepz2LayerBot_vr(L,NY,NX) = 2.0_r8*CumDepz2LayerBot_vr(L-1,NY,NX)-1.0_r8*CumDepz2LayerBot_vr(L-2,NY,NX)
     SoiBulkDensityt0_vr(L,NY,NX)  = SoiBulkDensityt0_vr(L-1,NY,NX)
-    FieldCapacity(L,NY,NX)        = FieldCapacity(L-1,NY,NX)
-    WiltPoint(L,NY,NX)            = WiltPoint(L-1,NY,NX)
+    FieldCapacity_vr(L,NY,NX)        = FieldCapacity_vr(L-1,NY,NX)
+    WiltPoint_vr(L,NY,NX)            = WiltPoint_vr(L-1,NY,NX)
     SatHydroCondVert(L,NY,NX)     = SatHydroCondVert(L-1,NY,NX)
     SatHydroCondHrzn(L,NY,NX)     = SatHydroCondHrzn(L-1,NY,NX)
     CSAND(L,NY,NX)                = CSAND(L-1,NY,NX)

@@ -70,7 +70,7 @@ implicit none
   real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
+  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
   real(r8),pointer   :: h1D_tLITR_N_col(:)      !tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h2D_BotDEPZ_vr(:,:)
   real(r8),pointer   :: h1D_tRAD_col(:)
@@ -147,8 +147,8 @@ implicit none
   real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   real(r8),pointer   :: h1D_SURF_WTR_col(:)       !ThetaH2OZ_vr(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ICE_col(:)       !ThetaICEZ_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepth(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepthInternalWTBL(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_sN2O_FLX_col(:)        !SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sN2G_FLX_col(:)        !SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sNH3_FLX_col(:)        !SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1017,8 +1017,8 @@ implicit none
     long_name='Atmospheric CH4 concentration',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_NBP_col(beg_col:end_col)   
-  call hist_addfld1d(fname='NBP',units='gC/m2/hr',avgflag='A',&
-    long_name='Net biosphere productivity',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='NBP',units='gC/m2',avgflag='A',&
+    long_name='Cumulative net biosphere productivity',ptr_col=data1d_ptr)      
     
   data1d_ptr => this%h1D_ECO_LAI_col(beg_col:end_col)       
   call hist_addfld1d(fname='ECO_LAI',units='m2/m2',avgflag='A',&
@@ -1988,7 +1988,7 @@ implicit none
     long_name='soil heat flow by plant water uptake',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_rWatFillP_vr    (beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
-  call hist_addfld2d(fname='rWatFILLP_vr    ',units='-',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='rWatFILLP_vr',units='-',type2d='levsoi',avgflag='A',&
     long_name='Water-filled porosity',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_rIceFillP_vr    (beg_col:end_col,1:JZ)        
@@ -2167,7 +2167,7 @@ implicit none
       this%h1D_ECO_HVST_P_col(ncol) = EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)  = -NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PSI_SURF_col(ncol)   = PSISoilMatricP_vr(0,NY,NX)
-      this%h1D_SURF_ELEV_col(ncol)  = -CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
+      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol)    = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)  = FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)      = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2184,37 +2184,37 @@ implicit none
       else
         this%h1D_TEMP_SNOW_col(ncol)   = TCSnow_snvr(1,NY,NX)
       endif
-      this%h1D_tLITR_C_col(ncol)   = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tLITR_C_col(ncol) = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
-      this%h1D_AMENDED_C_col(ncol)   = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_CO2_FLX_col(ncol)     = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tMICRO_C_col(ncol)    = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tSoilOrgC_col(ncol)   = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tSoilOrgN_col(ncol)   = tSoilOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tSoilOrgP_col(ncol)   = tSoilOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_OMC_LITR_col(ncol)    = SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_OMN_LITR_col(ncol)    = SoilOrgM_vr(ielmn,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_OMP_LITR_col(ncol)    = SoilOrgM_vr(ielmp,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ATM_CO2_col(ncol)     = CO2E(NY,NX)
-      this%h1D_ATM_CH4_col(ncol)     = CH4E(NY,NX)
-      this%h1D_NBP_col(ncol)         = Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_HVST_C_col(ncol)  = EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_LAI_col(ncol)     = CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_Eco_GPP_CumYr_col(ncol)     = Eco_GPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_RA_col(ncol)      = Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_Eco_NPP_CumYr_col(ncol)     = Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_Eco_HR_CumYr_col(ncol)      = Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tDIC_col(ncol)     = DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tSTANDING_DEAD_C_col(ncol)    = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tSTANDING_DEAD_N_col(ncol)    = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tSTANDING_DEAD_P_col(ncol)    = StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)            
-      this%h1D_tPRECN_col(ncol)       = m2mm*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ECO_ET_col(ncol)       = m2mm*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_N2O_LITR_col(ncol)    = trc_solcl_vr(idg_N2O,0,NY,NX)
-      this%h1D_NH3_LITR_col(ncol)    = trc_solcl_vr(idg_NH3,0,NY,NX)
-      this%h1D_SOL_RADN_col(ncol)    = RadSWSolarBeam_col(NY,NX)*MJ2W*86400.e-6_r8
-      this%h1D_AIR_TEMP_col(ncol)    = TCA_col(NY,NX)
-      this%h1D_HUM_col(ncol)         = VPK_col(NY,NX)
+      this%h1D_AMENDED_C_col(ncol)        = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_CO2_FLX_col(ncol)          = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tSoilOrgC_col(ncol)        = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tSoilOrgN_col(ncol)        = tSoilOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tSoilOrgP_col(ncol)        = tSoilOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_OMC_LITR_col(ncol)         = SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_OMN_LITR_col(ncol)         = SoilOrgM_vr(ielmn,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_OMP_LITR_col(ncol)         = SoilOrgM_vr(ielmp,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ATM_CO2_col(ncol)          = CO2E(NY,NX)
+      this%h1D_ATM_CH4_col(ncol)          = CH4E(NY,NX)
+      this%h1D_NBP_col(ncol)              = Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_HVST_C_col(ncol)       = EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_LAI_col(ncol)          = CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_GPP_CumYr_col(ncol)    = Eco_GPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_RA_col(ncol)           = Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_NPP_CumYr_col(ncol)    = Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_HR_CumYr_col(ncol)     = Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tDIC_col(ncol)             = DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tSTANDING_DEAD_C_col(ncol) = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tSTANDING_DEAD_N_col(ncol) = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tSTANDING_DEAD_P_col(ncol) = StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPRECN_col(ncol)           = m2mm*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_ET_col(ncol)           = m2mm*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_N2O_LITR_col(ncol)         = trc_solcl_vr(idg_N2O,0,NY,NX)
+      this%h1D_NH3_LITR_col(ncol)         = trc_solcl_vr(idg_NH3,0,NY,NX)
+      this%h1D_SOL_RADN_col(ncol)         = RadSWSolarBeam_col(NY,NX)*MJ2W*86400.e-6_r8
+      this%h1D_AIR_TEMP_col(ncol)         = TCA_col(NY,NX)
+      this%h1D_HUM_col(ncol)              = VPK_col(NY,NX)
       
       this%h1D_WIND_col(ncol)            = WindSpeedAtm_col(NY,NX)/secs1hour
       this%h1D_PREC_col(ncol)            = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
@@ -2244,8 +2244,8 @@ implicit none
       this%h1D_SNOWPACK_col(ncol)        = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
       this%h1D_SURF_WTR_col(ncol)        = ThetaH2OZ_vr(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)        = ThetaICEZ_vr(0,NY,NX)
-      this%h1D_ACTV_LYR_col(ncol)        = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-      this%h1D_WTR_TBL_col(ncol)         = -(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+      this%h1D_ACTV_LYR_col(ncol)        = -(ActiveLayDepth(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+      this%h1D_WTR_TBL_col(ncol)         = -(DepthInternalWTBL(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
       this%h1D_sN2O_FLX_col(ncol)        = SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sN2G_FLX_col(ncol)        = SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sNH3_FLX_col(ncol)        = SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2311,7 +2311,7 @@ implicit none
         this%h2D_DOC_vr(ncol,L)           = DOM(idom_doc)/DVOLL
         this%h2D_DON_vr(ncol,L)           = DOM(idom_don)/DVOLL
         this%h2D_DOP_vr(ncol,L)           = DOM(idom_dop)/DVOLL
-        this%h2D_BotDEPZ_vr(ncol,L)       = CumDepth2LayerBottom(L,NY,NX)
+        this%h2D_BotDEPZ_vr(ncol,L)       = CumDepz2LayerBot_vr(L,NY,NX)
         this%h2D_acetate_vr(ncol,L)       = DOM(idom_acetate)/DVOLL
         this%h2D_litrC_vr(ncol,L)         = litrOM_vr(ielmc,L,NY,NX)/DVOLL
         this%h2D_litrN_vr(ncol,L)         = litrOM_vr(ielmn,L,NY,NX)/DVOLL

@@ -1349,7 +1349,7 @@ contains
 !             :*ZN3*=NH3,*H2G*=H2
 !
   DFLG2=AZMAX1(THETPM(M,NU(NY,NX),NY,NX))*POROQ &
-    *THETPM(M,NU(NY,NX),NY,NX)/POROS(NU(NY,NX),NY,NX) &
+    *THETPM(M,NU(NY,NX),NY,NX)/POROS_vr(NU(NY,NX),NY,NX) &
     *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
 
   DO ngas=idg_beg,idg_NH3

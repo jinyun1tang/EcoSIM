@@ -261,16 +261,16 @@
           TFZ=0._r8
           TWP=0._r8
           TVW=0._r8
-          DIRRA1=DIRRA(1,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
-          DIRRA2=DIRRA(2,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+          DIRRA1=DIRRA(1,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+          DIRRA2=DIRRA(2,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
 
           D165: DO L=NU(NY,NX),NL(NY,NX)
-            IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DIRRA1)THEN
-              FW=AMIN1(1.0_r8,(DIRRA1-CumDepth2LayerBottom(L-1,NY,NX)) &
-                /(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)))
-              FZ=AMIN1(POROS(L,NY,NX),WiltPoint(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity(L,NY,NX)-WiltPoint(L,NY,NX)))
+            IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.DIRRA1)THEN
+              FW=AMIN1(1.0_r8,(DIRRA1-CumDepz2LayerBot_vr(L-1,NY,NX)) &
+                /(CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(L-1,NY,NX)))
+              FZ=AMIN1(POROS_vr(L,NY,NX),WiltPoint_vr(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity_vr(L,NY,NX)-WiltPoint_vr(L,NY,NX)))
               TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
-              TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+              TWP=TWP+FW*WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
               TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
             ENDIF
           ENDDO D165
