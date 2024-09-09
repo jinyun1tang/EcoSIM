@@ -122,9 +122,6 @@ PROGRAM main
   DO nn1=1,nperiods
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 
-   !set up output frequency
-    JOUT=JOUTS(NN1)   !frequency on hourly scale
-
     call MicAPI_Init
 
     do nn2=1,forc_periods(nn1*3)

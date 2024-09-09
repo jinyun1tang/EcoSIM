@@ -22,8 +22,7 @@ module EcoSIMCtrlDataType
   integer :: IYRR            !year of recovery from earlier run
   integer :: NYR             !flag for new year
   integer :: ITERM           !end date for reading weather data
-  integer :: IFIN            !end date for reading weather data
-  integer :: JOUT            !frequency of hourly ouput
+  integer :: IFIN            !end date for reading weather data  
   integer :: IOLD            !last day of previous scenario
   integer :: ILAST           !last day of previous scenario
   integer :: IRUN            !start date of current scenario

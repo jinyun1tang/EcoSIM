@@ -52,7 +52,7 @@ implicit none
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_periods(15)
-  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3)
+  integer :: NPXS(5),NPYS(5)
   integer :: NCYC_LITR  !number of subcycles for litr
   integer :: NCYC_SNOW  !number of subcycles for snow
   logical :: lverb           !logical switch for verbose output

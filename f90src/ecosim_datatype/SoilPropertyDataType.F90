@@ -34,6 +34,7 @@ implicit none
    real(r8) ,target,allocatable ::  VLMacP_vr(:,:,:)                    !total macropore volume in layer
    real(r8) ,target,allocatable ::  VGeomLayer_vr(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
    real(r8) ,target,allocatable ::  VGeomLayert0_vr(:,:,:)                     !initial soil volume including  macropores+rock [m3 d-2]
+   real(r8) ,target,allocatable ::  VOLTX_vr(:,:,:)                !maximum soil pore volume allowed   
   private :: InitAllocate
 
 contains
@@ -79,6 +80,7 @@ contains
   allocate(VLMacP_vr(JZ,JY,JX));     VLMacP_vr=0._r8
   allocate(VGeomLayer_vr(0:JZ,JY,JX));    VGeomLayer_vr=0._r8
   allocate(VGeomLayert0_vr(0:JZ,JY,JX));   VGeomLayert0_vr=0._r8
+  allocate(VOLTX_vr(JZ,JY,JX));  VOLTX_vr=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -113,6 +115,7 @@ contains
   call destroy(VLMacP_vr)
   call destroy(VGeomLayer_vr)
   call destroy(VGeomLayert0_vr)
+  call destroy(VOLTX_vr)
   end subroutine DestructSoilProperty
 
 end module SoilPropertyDataType

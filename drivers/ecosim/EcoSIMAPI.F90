@@ -137,7 +137,7 @@ contains
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
-    NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
+    NPXS,NPYS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
@@ -159,7 +159,7 @@ contains
   continue_run=.false.
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
   NPYS=20   !number of cycles per NPX for gas flux calculations
-  JOUTS=1   !frequency on hourly scale
+  
   NCYC_LITR=20
   NCYC_SNOW=20
   grid_mode=3

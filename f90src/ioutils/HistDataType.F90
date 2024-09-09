@@ -369,8 +369,9 @@ implicit none
   real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_HeatUptk_vr(:,:)    !Heat uptake by root  
   real(r8),pointer   :: h2D_HeatFlow_vr(:,:)    !
-  real(r8),pointer   :: h2D_rWatFillP_vr    (:,:)       !ThetaH2OZ_vr(1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_rIceFillP_vr    (:,:)         !ThetaICEZ_vr(1:JZ,NY,NX)  
+  real(r8),pointer   :: h2D_VSPore_vr(:,:)
+  real(r8),pointer   :: h2D_VSM_vr    (:,:)       !ThetaH2OZ_vr(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_VSICE_vr    (:,:)         !ThetaICEZ_vr(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trc_solml_vr(ids_NH4,1:JZ,NY,NX)+trc_solml_vr(ids_NH4B,1:JZ,NY,NX) &
                                                                   !+14.0*(trcx_solml_vr(idx_NH4,1:JZ,NY,NX)+trcx_solml_vr(idx_NH4B,1:JZ,NY,NX)))/SoilMicPMassLayer(1:JZ,NY,NX)
@@ -740,8 +741,9 @@ implicit none
 
   allocate(this%h2D_HeatFlow_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatFlow_vr(:,:)=spval
   allocate(this%h2D_HeatUptk_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatUptk_vr(:,:)=spval
-  allocate(this%h2D_rWatFillP_vr    (beg_col:end_col,1:JZ))     ;this%h2D_rWatFillP_vr    (:,:)=spval
-  allocate(this%h2D_rIceFillP_vr    (beg_col:end_col,1:JZ))       ;this%h2D_rIceFillP_vr    (:,:)=spval
+  allocate(this%h2D_VSM_vr    (beg_col:end_col,1:JZ))     ;this%h2D_VSM_vr    (:,:)=spval
+  allocate(this%h2D_VSPore_vr (beg_col:end_col,1:JZ))     ;this%h2D_VSPore_vr (:,:)=spval
+  allocate(this%h2D_VSICE_vr    (beg_col:end_col,1:JZ))       ;this%h2D_VSICE_vr    (:,:)=spval
   allocate(this%h2D_PSI_vr(beg_col:end_col,1:JZ))        ;this%h2D_PSI_vr(:,:)=spval
   allocate(this%h2D_RootH2OUP_vr(beg_col:end_col,1:JZ))  ;this%h2D_RootH2OUP_vr(:,:)=spval
   allocate(this%h2D_cNH4t_vr(beg_col:end_col,1:JZ))      ;this%h2D_cNH4t_vr(:,:)=spval
@@ -1987,13 +1989,17 @@ implicit none
   call hist_addfld2d(fname='HeatUptk_vr',units='MJ m-3 hr-1',type2d='levsoi',avgflag='A',&
     long_name='soil heat flow by plant water uptake',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_rWatFillP_vr    (beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
-  call hist_addfld2d(fname='rWatFILLP_vr',units='-',type2d='levsoi',avgflag='A',&
-    long_name='Water-filled porosity',ptr_col=data2d_ptr)      
+  data2d_ptr => this%h2D_VSPore_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='VSPore_vr',units='m3 pore/m3 soil',type2d='levsoi',avgflag='A',&
+    long_name='Volumetric soil porosity',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_rIceFillP_vr    (beg_col:end_col,1:JZ)        
-  call hist_addfld2d(fname='rIceFILLP_vr    ',units='-',type2d='levsoi',avgflag='A',&
-    long_name='Ice-filled porosity',ptr_col=data2d_ptr)      
+  data2d_ptr => this%h2D_VSM_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
+  call hist_addfld2d(fname='VSM_vr',units='m3 H2O/m3 soil',type2d='levsoi',avgflag='A',&
+    long_name='Volumetric soil moisture content',ptr_col=data2d_ptr)      
+
+  data2d_ptr => this%h2D_VSICE_vr(beg_col:end_col,1:JZ)        
+  call hist_addfld2d(fname='VSICE_vr',units='m3 ice/m3',type2d='levsoi',avgflag='A',&
+    long_name='Volumetric soil ice content',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_PSI_vr(beg_col:end_col,1:JZ)         
   call hist_addfld2d(fname='PSI_vr',units='MPa',type2d='levsoi',avgflag='A',&
@@ -2328,8 +2334,9 @@ implicit none
         this%h2D_TEMP_vr(ncol,L)          = TCS(L,NY,NX)
         this%h2D_HeatFlow_vr(ncol,L)      = THeatFlow2Soil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_HeatUptk_vr(ncol,L)      = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_rWatFillP_vr    (ncol,L) = ThetaH2OZ_vr(L,NY,NX)
-        this%h2D_rIceFillP_vr    (ncol,L) = ThetaICEZ_vr(L,NY,NX)
+        this%h2D_VSPore_vr(ncol,L)        = VOLTX_vr(L,NY,NX)
+        this%h2D_VSM_vr    (ncol,L)       = VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX))
+        this%h2D_VSICE_vr  (ncol,L)       = VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX))
         this%h2D_PSI_vr(ncol,L)           = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_RootH2OUP_vr(ncol,L)     = GridPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &

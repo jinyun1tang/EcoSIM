@@ -182,7 +182,6 @@ module RedistMod
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
   real(r8) :: VLSoilPoreMicPX   !maximal soil micropore allowed
-  real(r8) :: VOLTX(0:JZ)                !maximum soil pore volume allowed
   integer  :: L
   if(lverb)write(*,*)'UpdateOutputVars'
 
@@ -226,9 +225,9 @@ module RedistMod
     VLWatMacP_vr(L,NY,NX)=AZMAX1(VLWatMacP_vr(L,NY,NX))
     VLiceMacP_vr(L,NY,NX)=AZMAX1(VLiceMacP_vr(L,NY,NX))
     VLSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-    VOLTX(L)=VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
-    ThetaH2OZ_vr(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX(L))
-    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX(L))
+    VOLTX_vr(L,NY,NX)=VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
+    ThetaH2OZ_vr(L,NY,NX)=safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))
+    ThetaICEZ_vr(L,NY,NX)=safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))
   ENDDO D9945
 
   end subroutine UpdateOutputVars
