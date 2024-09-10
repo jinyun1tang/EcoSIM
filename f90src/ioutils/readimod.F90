@@ -420,8 +420,8 @@ module readiMod
 
     call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'WP', ntp,WiltPoint_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'SCNV', ntp,SatHydroCondVert(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'SCNV', ntp,SatHydroCondVert_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
@@ -535,8 +535,8 @@ module readiMod
             SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NV1,NH1)
             FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NV1,NH1)
             WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NV1,NH1)
-            SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NV1,NH1)
-            SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NV1,NH1)
+            SatHydroCondVert_vr(L,NY,NX)=SatHydroCondVert_vr(L,NV1,NH1)
+            SatHydroCondHrzn_vr(L,NY,NX)=SatHydroCondHrzn_vr(L,NV1,NH1)
             CSAND(L,NY,NX)=CSAND(L,NV1,NH1)
             CSILT(L,NY,NX)=CSILT(L,NV1,NH1)
             SoilFracAsMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NV1,NH1)
@@ -600,11 +600,11 @@ module readiMod
         RSC(k_fine_litr,0,NY,NX)=AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
         RSN(k_fine_litr,0,NY,NX)=AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
         RSP(k_fine_litr,0,NY,NX)=AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
-        SatHydroCondVert(0,NY,NX)=10.0_r8*0.098_r8
+        SatHydroCondVert_vr(0,NY,NX)=10.0_r8*0.098_r8
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
 !
-!     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert(3),SatHydroCondHrzn(4)
+!     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert_vr(3),SatHydroCondHrzn_vr(4)
 !
         call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM(NY,NX))
 
@@ -624,8 +624,8 @@ module readiMod
               SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L+1,NY,NX)
               FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L+1,NY,NX)
               WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L+1,NY,NX)
-              SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L+1,NY,NX)
-              SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L+1,NY,NX)
+              SatHydroCondVert_vr(L,NY,NX)=SatHydroCondVert_vr(L+1,NY,NX)
+              SatHydroCondHrzn_vr(L,NY,NX)=SatHydroCondHrzn_vr(L+1,NY,NX)
               CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
               CSILT(L,NY,NX)=CSILT(L+1,NY,NX)
               CCLAY(L,NY,NX)=CCLAY(L+1,NY,NX)
@@ -707,8 +707,8 @@ module readiMod
   !     FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !     WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !
-          SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-          SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+          SatHydroCondVert_vr(L,NY,NX)=0.098_r8*SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+          SatHydroCondHrzn_vr(L,NY,NX)=0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
           CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
@@ -834,9 +834,9 @@ module readiMod
   write(*,*)'Wilting point (m3 m-3): WP'
   write(*,*)(WiltPoint_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Vertical Ksat (mm h-1): SCNV'
-  write(*,*)(SatHydroCondVert(L,NY,NX),L=NU,NM)
+  write(*,*)(SatHydroCondVert_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Lateral Ksat (mm h-1): SCNH'
-  write(*,*)(SatHydroCondHrzn(L,NY,NX),L=NU,NM)
+  write(*,*)(SatHydroCondHrzn_vr(L,NY,NX),L=NU,NM)
 !
 !     PHYSICAL PROPERTIES
 !

@@ -10,8 +10,8 @@ implicit none
   real(r8),target,allocatable ::  SLOPE(:,:,:)                              !slope	in four directions [o]
   real(r8),target,allocatable ::  FieldCapacity_vr(:,:,:)                      !water contents at field capacity
   real(r8),target,allocatable ::  WiltPoint_vr(:,:,:)                          !water contents at wilting point
-  real(r8),target,allocatable ::  SatHydroCondVert(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
-  real(r8),target,allocatable ::  SatHydroCondHrzn(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
+  real(r8),target,allocatable ::  SatHydroCondVert_vr(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
+  real(r8),target,allocatable ::  SatHydroCondHrzn_vr(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
   real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                     !water potentials at field capacity, [MPa]
   real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                       !water potentials at wilting point [MPa]
   real(r8),target,allocatable ::  THW(:,:,:)                         !initial soil water content
@@ -41,8 +41,8 @@ contains
   allocate(SLOPE(0:3,JY,JX));   SLOPE=0._r8
   allocate(FieldCapacity_vr(0:JZ,JY,JX));     FieldCapacity_vr=0._r8
   allocate(WiltPoint_vr(0:JZ,JY,JX));     WiltPoint_vr=0._r8
-  allocate(SatHydroCondVert(0:JZ,JY,JX));   SatHydroCondVert=0._r8
-  allocate(SatHydroCondHrzn(JZ,JY,JX));     SatHydroCondHrzn=0._r8
+  allocate(SatHydroCondVert_vr(0:JZ,JY,JX));   SatHydroCondVert_vr=0._r8
+  allocate(SatHydroCondHrzn_vr(JZ,JY,JX));     SatHydroCondHrzn_vr=0._r8
   allocate(PSIAtFldCapacity(JY,JX));       PSIAtFldCapacity=0._r8
   allocate(PSIAtWiltPoint(JY,JX));       PSIAtWiltPoint=0._r8
   allocate(THW(JZ,JY,JX));      THW=0._r8
@@ -72,8 +72,8 @@ contains
   call destroy(SLOPE)
   call destroy(FieldCapacity_vr)
   call destroy(WiltPoint_vr)
-  call destroy(SatHydroCondVert)
-  call destroy(SatHydroCondHrzn)
+  call destroy(SatHydroCondVert_vr)
+  call destroy(SatHydroCondHrzn_vr)
   call destroy(PSIAtFldCapacity)
   call destroy(PSIAtWiltPoint)
   call destroy(THW)

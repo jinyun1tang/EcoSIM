@@ -110,13 +110,13 @@ contains
       EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
       call CopySnowStates(I,J,NY,NX)
-      print*,'copsff'
+      
       call CopySurfaceVars(NY,NX)
-      print*,'surfacc'
+      
       call PartionSurfaceFraction(NY,NX)
 
       call PartitionPrecip(I,J,NY,NX)
-      print*,'precip'
+      
       call SurfaceRadiation(I,J,NY,NX)
 
       call SurfaceResistances(I,J,NY,NX,ResistanceLitRLay)

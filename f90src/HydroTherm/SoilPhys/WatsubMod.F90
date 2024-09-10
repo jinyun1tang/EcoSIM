@@ -94,7 +94,7 @@ module WatsubMod
 ! begin_execution
 !
   curday=i;curhour=j
-  print*,'watinnn'
+
   call LocalCopySoilVars(I,J,NHW,NHE,NVN,NVS)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)

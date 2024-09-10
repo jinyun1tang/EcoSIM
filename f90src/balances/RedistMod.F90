@@ -135,11 +135,7 @@ module RedistMod
 
       call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP_vr)
 
-      print*,'realysoil model ',trc_solml_vr(idg_O2,1,1,1)
-
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
-
-      print*,'oput model ',trc_solml_vr(idg_O2,1,1,1)
 
     ENDDO D9990
   ENDDO D9995
@@ -181,14 +177,12 @@ module RedistMod
       ENDIF
     ENDDO
   ENDIF
-  print*,'bftilmixmodel ',trc_solml_vr(idg_O2,1,1,1)
   !     MIX ALL SOIL STATE VARIABLES AND INCORPORATE ALL SURFACE
   !     RESIDUE STATE VARIABLES WITHIN THE TILLAGE ZONE TO THE EXTENT
   !     ASSOCIATED IN 'DAY' WITH EACH TILLAGE EVENT ENTERED IN THE
   !     TILLAGE FILE
   if(lverb)write(*,*)'tillage'
   call ApplyTillageMixing(I,J,NY,NX)
-  print*,'tilmixmodel ',trc_solml_vr(idg_O2,1,1,1)
 
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
@@ -1330,8 +1324,6 @@ module RedistMod
     IF(salt_model)call UpdateSaltIonInSoilLayers(L,NY,NX,TDisolPi_lnd)
 
   ENDDO D125
-
-  print*,'plant UpdateChemInSoilLays ',trc_solml_vr(idg_O2,1,1,1)
 
   end subroutine UpdateChemInSoilLays
 

@@ -4,7 +4,7 @@ compiler   = not-set
 
 ECOSIM = ../build/bin/ecosim.f90.x
 ifeq ($(compiler), not-set)
-COMPILER=gcc
+COMPILER=gnu
 else
 COMPILER=$(compiler)
 endif

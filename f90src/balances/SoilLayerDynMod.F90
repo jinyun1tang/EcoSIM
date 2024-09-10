@@ -1622,12 +1622,12 @@ implicit none
   ELSE
     FWO=AMIN1(0.5,FO*POROSI_vr(L1,NY,NX)/POROSI_vr(L0,NY,NX))
   ENDIF
-!             FXSCNV=FWO*SatHydroCondVert(L0,NY,NX)
-!             SatHydroCondVert(L1,NY,NX)=SatHydroCondVert(L1,NY,NX)+FXSCNV
-!             SatHydroCondVert(L0,NY,NX)=SatHydroCondVert(L0,NY,NX)-FXSCNV
-!             FXSCNH=FWO*SatHydroCondHrzn(L0,NY,NX)
-!             SatHydroCondHrzn(L1,NY,NX)=SatHydroCondHrzn(L1,NY,NX)+FXSCNH
-!             SatHydroCondHrzn(L0,NY,NX)=SatHydroCondHrzn(L0,NY,NX)-FXSCNH
+!             FXSCNV=FWO*SatHydroCondVert_vr(L0,NY,NX)
+!             SatHydroCondVert_vr(L1,NY,NX)=SatHydroCondVert_vr(L1,NY,NX)+FXSCNV
+!             SatHydroCondVert_vr(L0,NY,NX)=SatHydroCondVert_vr(L0,NY,NX)-FXSCNV
+!             FXSCNH=FWO*SatHydroCondHrzn_vr(L0,NY,NX)
+!             SatHydroCondHrzn_vr(L1,NY,NX)=SatHydroCondHrzn_vr(L1,NY,NX)+FXSCNH
+!             SatHydroCondHrzn_vr(L0,NY,NX)=SatHydroCondHrzn_vr(L0,NY,NX)-FXSCNH
   IF(L0.EQ.0)THEN
     FXVOLW=FX*AZMAX1(XVOLWP-MaxVLWatByLitR_col(NY,NX))
   ELSE

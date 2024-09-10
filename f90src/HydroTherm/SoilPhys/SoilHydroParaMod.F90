@@ -196,10 +196,10 @@ contains
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
         *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
-      SatHydroCondVert(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2
+      SatHydroCondVert_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2
     ELSE
-      SatHydroCondVert(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
-      SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      SatHydroCondVert_vr(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
+      SatHydroCondVert_vr(L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -208,10 +208,10 @@ contains
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
         *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
-      SatHydroCondHrzn(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2._r8
+      SatHydroCondHrzn_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2._r8
     ELSE
-      SatHydroCondHrzn(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
-      SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      SatHydroCondHrzn_vr(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
+      SatHydroCondHrzn_vr(L,NY,NX)=SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -251,14 +251,14 @@ contains
     DO  N=1,3
       IF(N.EQ.3)THEN
         !vertical
-        HydroCond3D(N,K,L,NY,NX)=SatHydroCondVert(L,NY,NX)*YK*SUM1/SUM2
+        HydroCond3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
         IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(L,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(L,NY,NX))THEN
           !moisture at air-entry saturation
           ThetaSat_vr(L,NY,NX)=H2OSOIatK(K)
         ENDIF
       ELSE
         !horizontal
-        HydroCond3D(N,K,L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*YK*SUM1/SUM2
+        HydroCond3D(N,K,L,NY,NX)=SatHydroCondHrzn_vr(L,NY,NX)*YK*SUM1/SUM2
       ENDIF
     ENDDO
   ENDDO
@@ -407,7 +407,7 @@ contains
     D1230: DO M=K,n100
         SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
     ENDDO D1230
-    HydroCond3D(3,K,0,NY,NX)=SatHydroCondVert(0,NY,NX)*YK*SUM1/SUM2
+    HydroCond3D(3,K,0,NY,NX)=SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
     HydroCond3D(1,K,0,NY,NX)=0.0_r8
     HydroCond3D(2,K,0,NY,NX)=0.0_r8
     if(PSISK(K)/=PSISK(K))write(*,*)'PSISK bad',K
@@ -441,13 +441,13 @@ contains
     ELSE
       ISOIL(isoi_wp,L,NY,NX)=isoi_set
     ENDIF
-    IF(SatHydroCondVert(L,NY,NX).LT.0.0_r8)THEN
+    IF(SatHydroCondVert_vr(L,NY,NX).LT.0.0_r8)THEN
       !soil vertical saturated hydraulic conductivity
       ISOIL(isoi_scnv,L,NY,NX)=isoi_unset
     ELSE
       ISOIL(isoi_scnv,L,NY,NX)=isoi_set
     ENDIF
-    IF(SatHydroCondHrzn(L,NY,NX).LT.0.0_r8)THEN
+    IF(SatHydroCondHrzn_vr(L,NY,NX).LT.0.0_r8)THEN
       !soil horizontal saturated hydraulic conductivity
       ISOIL(isoi_scnh,L,NY,NX)=isoi_unset
     ELSE

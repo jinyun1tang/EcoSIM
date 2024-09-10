@@ -6274,16 +6274,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='SatHydroCondVert', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='SatHydroCondVert_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil vertical saturated hydraulic conductivity', units='mm h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert_vr,datrc_2d)   
   else
-    !print*,'SatHydroCondVert'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert,datrc_2d)     
+    !print*,'SatHydroCondVert_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondVert_vr,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='SatHydroCondVert', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='SatHydroCondVert_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil vertical saturated hydraulic conductivity', units='mm h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
@@ -6291,16 +6291,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)    
-    call restartvar(ncid, flag, varname='SatHydroCondHrzn', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='SatHydroCondHrzn_vr', dim1name='column',dim2name='levsoi',&
        long_name='soil horizontal saturated hydraulic conductivity', units='mm h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn,datrc_2d)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn_vr,datrc_2d)   
   else
-    !print*,'SatHydroCondHrzn'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn,datrc_2d)     
+    !print*,'SatHydroCondHrzn_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SatHydroCondHrzn_vr,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)    
-    call restartvar(ncid, flag, varname='SatHydroCondHrzn', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='SatHydroCondHrzn_vr', dim1name='column',dim2name='levsoi',&
        long_name='soil horizontal saturated hydraulic conductivity', units='mm h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
