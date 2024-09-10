@@ -634,8 +634,8 @@ module Hour1Mod
 !     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
 !     SoiSurfRoughnesst0,ZW=soil,water surface roughness
-!     MaxVLWatByLitR=soil surface water retention capacity
-!     VWatStoreCapSurf=MaxVLWatByLitR accounting for above-ground water table
+!     MaxVLWatByLitR_col=soil surface water retention capacity
+!     VWatStoreCapSurf=MaxVLWatByLitR_col accounting for above-ground water table
 !     EHUM=fraction of microbial decompn product allocated to surface humus
 !     EPOC=fraction of SOC decomposition product allocated to surface POC
 !
@@ -654,13 +654,14 @@ module Hour1Mod
   ELSE
     SoiSurfRoughnesst0(NY,NX)=ZW
   ENDIF
-  MaxVLWatByLitR(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoiSurfRoughnesst0(NY,NX)+&
+  MaxVLWatByLitR_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoiSurfRoughnesst0(NY,NX)+&
     3.10_r8*SoiSurfRoughnesst0(NY,NX)**2._r8 &
     -0.012_r8*SoiSurfRoughnesst0(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
-  VWatStoreCapSurf(NY,NX)=AMAX1(MaxVLWatByLitR(NY,NX),-(ExtWaterTable(NY,NX)-&
+
+  VWatStoreCapSurf(NY,NX)=AMAX1(MaxVLWatByLitR_col(NY,NX),-(ExtWaterTable(NY,NX)-&
     CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
 
-  SoiDepthMidLay(NU(NY,NX),NY,NX)=CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
+  SoiDepthMidLay_vr(NU(NY,NX),NY,NX)=CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
   IF(SoilMicPMassLayer(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/SoilMicPMassLayer(NU(NY,NX),NY,NX)
     CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/SoilMicPMassLayer(NU(NY,NX),NY,NX)
@@ -685,13 +686,13 @@ module Hour1Mod
   real(r8) :: XK,YK
   integer :: K,M
 !     begin_execution
-!     IFLGS=disturbance flag
+!     iResetSoilProf_col=disturbance flag
 !     SoiBulkDensity_vr,BKDSI=current,initial bulk density
 !
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(IFLGS(NY,NX).NE.0)THEN
+      IF(iResetSoilProf_col(NY,NX).NE.ifalse)THEN
 
         if(lverb)write(*,*)'LitterHydroproperty'
         call LitterHydroproperty(NY,NX)
@@ -706,9 +707,9 @@ module Hour1Mod
         if(lverb)write(*,*)'ResetSurfResidualProperty'
         call ResetSurfResidualProperty(NY,NX)
     !
-    !     IFLGS=reset disturbance flag
+    !     iResetSoilProf_col=reset disturbance flag
     !
-        IFLGS(NY,NX)=0
+        iResetSoilProf_col(NY,NX)=ifalse
       ENDIF
     ENDDO  
   ENDDO
@@ -849,13 +850,13 @@ module Hour1Mod
       IF(.not.FoundWaterTable)THEN
         IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
           FoundWaterTable=.true.
-          IF(SoiDepthMidLay(L,NY,NX).LT.ExtWaterTable(NY,NX))THEN
+          IF(SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable(NY,NX))THEN
             D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
               IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
                 !air-filled pore greater minimum, i.e. not saturated
                 FoundWaterTable=.false.
                 exit
-              ELSE IF(SoiDepthMidLay(LL,NY,NX).GE.ExtWaterTable(NY,NX))THEN
+              ELSE IF(SoiDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable(NY,NX))THEN
                 !current layer is lower than external water table
                 exit
               ENDIF
@@ -867,7 +868,7 @@ module Hour1Mod
             IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
               !not bottom layer, saturated
               !PSIeqv
-              PSIEquil=PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay(L+1,NY,NX)-SoiDepthMidLay(L,NY,NX))
+              PSIEquil=PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L+1,NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
 
               THETWM=THETWP*POROS_vr(L,NY,NX)
               THETW1=AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
@@ -881,7 +882,7 @@ module Hour1Mod
               ENDIF
             ELSEIF(L.GT.NU(NY,NX))THEN
               !not bottom layer, and not topsoil layer, partially saturated
-              PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay(L,NY,NX)-SoiDepthMidLay(L-1,NY,NX))
+              PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-SoiDepthMidLay_vr(L-1,NY,NX))
               THETWM = THETWP*POROS_vr(L-1,NY,NX)
               THETW1 = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
                 *PSD(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))

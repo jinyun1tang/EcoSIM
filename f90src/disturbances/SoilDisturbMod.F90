@@ -60,7 +60,7 @@ module SoilDisturbMod
 
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.21 .OR. iSoilDisturbType_col(I,NY,NX).EQ.22))THEN
     IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
-      IFLGS(NY,NX)=1
+      iResetSoilProf_col(NY,NX)=itrue
       IFLGJ=0
       NLL=-1
 
@@ -87,10 +87,10 @@ module SoilDisturbMod
           ELSE
             FORGCX=FORGC
           ENDIF
-          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CSoilOrgM_vr(ielmc,L,NY,NX)-FORGCX) &
+          DCORPC=AMIN1(0.999_r8,DepzCorp_col(I,NY,NX))*(CSoilOrgM_vr(ielmc,L,NY,NX)-FORGCX) &
             /(AMAX1(CSoilOrgM_vr(ielmc,L,NY,NX),orgcden)-FORGCX)
         ELSE
-          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
+          DCORPC=AMIN1(0.999_r8,DepzCorp_col(I,NY,NX))
         ENDIF
 !     QH2OLoss_lnds=QH2OLoss_lnds+DCORPC*VLWatMicP_vr(L,NY,NX)
 !     HeatOut_lnds=HeatOut_lnds+DCORPC*4.19*TKS_vr(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
@@ -336,7 +336,7 @@ module SoilDisturbMod
 !     VHeatCapacity_vr(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
 !    2+1.9274*VLiceMicP_vr(0,NY,NX)
 !     ELSE
-!     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
+!     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
 !    2+1.9274*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
 !     ENDIF
         IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN

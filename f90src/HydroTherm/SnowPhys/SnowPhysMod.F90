@@ -1055,7 +1055,7 @@ contains
     VLiceMicP1_vr(NUM(NY,NX),NY,NX)=VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
     
     ENGY1=VLHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKSoi1(NUM(NY,NX),NY,NX)
-    VLHeatCapacityA(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
+    VLHeatCapacityA(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
       +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
     VLHeatCapacityB(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
       +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)

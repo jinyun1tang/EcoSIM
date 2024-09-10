@@ -110,13 +110,13 @@ contains
       EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
       call CopySnowStates(I,J,NY,NX)
-
+      print*,'copsff'
       call CopySurfaceVars(NY,NX)
-
+      print*,'surfacc'
       call PartionSurfaceFraction(NY,NX)
 
       call PartitionPrecip(I,J,NY,NX)
-
+      print*,'precip'
       call SurfaceRadiation(I,J,NY,NX)
 
       call SurfaceResistances(I,J,NY,NX,ResistanceLitRLay)
@@ -138,8 +138,8 @@ contains
 ! SET INITIAL SOIL VALUES
 !
 ! LitrIceFlxThaw,LitrIceHeatFlxFrez=initialize surface litter freeze,thaw,latent heat
-  LitrIceFlxThaw(NY,NX)=0.0_r8
-  LitrIceHeatFlxFrez(NY,NX)=0.0_r8
+  LitrIceFlxThaw(NY,NX)     = 0.0_r8
+  LitrIceHeatFlxFrez(NY,NX) = 0.0_r8
 
 !
 ! ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
@@ -155,41 +155,45 @@ contains
 !     THETW*,THETI*,THETP*=water,ice,air concentrations
 !     PSISM*=litter matric water potential
 !
-  LWRadBySurf_col(NY,NX)=0.0_r8
-  VLHeatCapacity_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
-  VLPoreLitR(NY,NX)=VLMicP_vr(0,NY,NX)
-  VLWatMicP1_vr(0,NY,NX)=AZMAX1(VLWatMicP_vr(0,NY,NX))
-  VLiceMicP1_vr(0,NY,NX)=AZMAX1(VLiceMicP_vr(0,NY,NX))
-  VLairMicP1_vr(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
-  VLWatMicPM_vr(1,0,NY,NX)=VLWatMicP1_vr(0,NY,NX)
-  VLsoiAirPM(1,0,NY,NX)=VLairMicP1_vr(0,NY,NX)
-  TVWatIceLitR=VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
-  XVLMobileWaterLitR(NY,NX)=AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
+  LWRadBySurf_col(NY,NX)     = 0.0_r8
+  VLHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+  VLPoreLitR(NY,NX)          = VLMicP_vr(0,NY,NX)
+  VLWatMicP1_vr(0,NY,NX)     = AZMAX1(VLWatMicP_vr(0,NY,NX))
+  VLiceMicP1_vr(0,NY,NX)     = AZMAX1(VLiceMicP_vr(0,NY,NX))
+  VLairMicP1_vr(0,NY,NX)     = AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
+  VLWatMicPM_vr(1,0,NY,NX)   = VLWatMicP1_vr(0,NY,NX)
+  VLsoiAirPM(1,0,NY,NX)      = VLairMicP1_vr(0,NY,NX)
+  TVWatIceLitR               = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
+  XVLMobileWaterLitR(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
-    VWatLitrZ=VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
-    VOLIRZ=VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
-    XVLMobileWatMicP(NY,NX)=AZMAX1(VLWatMicP1_vr(0,NY,NX)-VWatLitrZ)
-    XVLiceMicP_col(NY,NX)=AZMAX1(VLiceMicP1_vr(0,NY,NX)-VOLIRZ)
+    VWatLitrZ               = VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
+    VOLIRZ                  = VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
+    XVLMobileWatMicP(NY,NX) = AZMAX1(VLWatMicP1_vr(0,NY,NX)-VWatLitrZ)
+    XVLiceMicP_col(NY,NX)   = AZMAX1(VLiceMicP1_vr(0,NY,NX)-VOLIRZ)
   ELSE
     XVLMobileWatMicP(NY,NX)=0.0_r8
     XVLiceMicP_col(NY,NX)=0.0_r8
   ENDIF
-  XVLMobileWaterLitRM(1,NY,NX)=XVLMobileWaterLitR(NY,NX)
-  XVLMobileWatMicPM(1,NY,NX)=XVLMobileWatMicP(NY,NX)
-  XVLiceMicPM(1,NY,NX)=XVLiceMicP_col(NY,NX)
+  
+  XVLMobileWaterLitRM(1,NY,NX) = XVLMobileWaterLitR(NY,NX)
+  XVLMobileWatMicPM(1,NY,NX)   = XVLMobileWatMicP(NY,NX)
+  XVLiceMicPM(1,NY,NX)         = XVLiceMicP_col(NY,NX)
+  
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
+    
     FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))* &
-      AZMAX1t((1.0_r8-XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR(NY,NX)))
+      AZMAX1t((1.0_r8-XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
     FracSoiPAsAir_vr(0,NY,NX)=1.0
   ENDIF
-  THETPM(1,0,NY,NX)=FracSoiPAsAir_vr(0,NY,NX)
-  PSISM1_vr(0,NY,NX)=PSISoilMatricP_vr(0,NY,NX)
-  TKSoi1(0,NY,NX)=TKS_vr(0,NY,NX)
+  
+  THETPM(1,0,NY,NX)  = FracSoiPAsAir_vr(0,NY,NX)
+  PSISM1_vr(0,NY,NX) = PSISoilMatricP_vr(0,NY,NX)
+  TKSoi1(0,NY,NX)    = TKS_vr(0,NY,NX)
 
   end subroutine CopySurfaceVars
 
@@ -1174,7 +1178,7 @@ contains
 
   IF(VLHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     BAREW(NY,NX)=AZMAX1(FracSurfBareSoil_col(NY,NX)-AMIN1(1.0_r8,&
-      AZMAX1(XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR(NY,NX))))
+      AZMAX1(XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR_col(NY,NX))))
   ELSE
     BAREW(NY,NX)=1.0_r8
   ENDIF

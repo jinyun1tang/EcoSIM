@@ -96,7 +96,7 @@ contains
 !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
 !
     PSISoilOsmotic_vr(L,NY,NX)     = -RGASC*1.E-6_r8*TKS_vr(L,NY,NX)*CION(L,NY,NX)
-    PSIGrav_vr(L,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
+    PSIGrav_vr(L,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
     TotalSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
 
 !
@@ -331,7 +331,7 @@ contains
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
     !ExtWaterTablet0=external water table depth, [m]
-    IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
+    IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
     ELSEIF(isclose(THW(L,NY,NX),1._r8))THEN
@@ -345,7 +345,7 @@ contains
       THETW_vr(L,NY,NX)=0.0_r8
     ENDIF
 
-    IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
+    IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
       THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
       THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
@@ -361,7 +361,7 @@ contains
     VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
     VLiceMicP_vr(L,NY,NX)  = THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     VLiceMacP_vr(L,NY,NX)  = THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
+    VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
     ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
     ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)

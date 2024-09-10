@@ -854,11 +854,11 @@ module TranspNoSaltMod
       trc_soHml2_vr(NTS,L,NY,NX)=fixnegmass(trc_soHml_vr(NTS,L,NY,NX))
 
       if(trc_solml2_vr(NTS,L,NY,NX)<0._r8)then
-      write(*,*)'micv2',NTS,L,trc_solml2_vr(NTS,L,NY,NX)
+      write(*,*)'micv2 ',trcs_names(NTS),L,trc_solml2_vr(NTS,L,NY,NX),trc_solml_vr(NTS,L,NY,NX)
       stop
       endif
       if(trc_soHml_vr(NTS,L,NY,NX)<0._r8)then
-      write(*,*)'macv2',L,NTS,trc_soHml_vr(NTS,L,NY,NX)
+      write(*,*)'macv2 ',trcs_names(NTS),L,trc_soHml_vr(NTS,L,NY,NX)
       endif
     ENDDO
 

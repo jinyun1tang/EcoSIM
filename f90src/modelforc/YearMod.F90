@@ -12,7 +12,6 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XCORP
   use PlantDataRateType
   use CanopyDataType
   use RootDataType

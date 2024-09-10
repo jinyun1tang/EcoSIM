@@ -15,7 +15,7 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XCORP
+  use SurfLitterDataType, only : XTillCorp_col
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -227,15 +227,15 @@
 !     CORP=soil mixing fraction used in redist.f
 !
       IF(iSoilDisturbType_col(I,NY,NX).LE.10)THEN
-      ! type-1 tillage
+        ! type-1 tillage
         CORP=AMIN1(1.0_r8,AZMAX1(iSoilDisturbType_col(I,NY,NX)/10.0_r8))
       ELSEIF(iSoilDisturbType_col(I,NY,NX).LE.20)THEN
-      ! type-2 tillage
+        ! type-2 tillage
         CORP=AMIN1(1.0_r8,AZMAX1((iSoilDisturbType_col(I,NY,NX)-10.0_r8)/10.0_r8))
       ENDIF
-
-      XCORP(NY,NX)=1.0_r8-CORP
-!     WRITE(*,2227)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XCORP(NY,NX)
+      !fraction of material not mixed
+      XTillCorp_col(NY,NX)=1.0_r8-CORP
+!     WRITE(*,2227)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XTillCorp_col(NY,NX)
 !2227  FORMAT(A8,2I4,12E12.4)
 !
 !     AUTOMATIC IRRIGATION IF SELECTED

@@ -94,7 +94,7 @@ module WatsubMod
 ! begin_execution
 !
   curday=i;curhour=j
-
+  print*,'watinnn'
   call LocalCopySoilVars(I,J,NHW,NHE,NVN,NVS)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
@@ -280,7 +280,7 @@ module WatsubMod
         !VLHeatCapacity_vr=total heat capacity
         !VLHeatCapacityA=heat capcity without macropore water/ice
         !VLHeatCapacityB=heat capacity for macropore water/ice
-        VLHeatCapacityA(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX) &
+        VLHeatCapacityA(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX) &
           +cpi*VLiceMicP1_vr(L,NY,NX)    
         VLHeatCapacityB(L,NY,NX)=cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)      
         VLHeatCapacity_vr(L,NY,NX)=VLHeatCapacityA(L,NY,NX)+VLHeatCapacityB(L,NY,NX)
@@ -1117,7 +1117,7 @@ module WatsubMod
             if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)
           endif
           VLHeatCapacityPre          = VLHeatCapacity_vr(L,NY,NX)
-          VLHeatCapacityA(L,NY,NX)   = VHeatCapacitySoilM(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
+          VLHeatCapacityA(L,NY,NX)   = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
           VLHeatCapacityB(L,NY,NX)   = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
           VLHeatCapacity_vr(L,NY,NX) = VLHeatCapacityA(L,NY,NX)+VLHeatCapacityB(L,NY,NX)
           !
@@ -1239,15 +1239,15 @@ module WatsubMod
 !     DTBLYX=equilibrium water potential with artificial water table
 !     IFLGD=micropore discharge flag to artificial water table
 !
-  IF(IDWaterTable(NY,NX).GE.3.AND.SoiDepthMidLay(L,NY,NX).LT.DTBLY(NY,NX))THEN
-    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoiDepthMidLay(L,NY,NX)-DTBLY(NY,NX)))THEN
+  IF(IDWaterTable(NY,NX).GE.3.AND.SoiDepthMidLay_vr(L,NY,NX).LT.DTBLY(NY,NX))THEN
+    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-DTBLY(NY,NX)))THEN
       IFLGD=0
       IF(L.LT.NL(NY,NX))THEN
         D9568: DO  LL=L+1,NL(NY,NX)
           DTBLYX=DTBLY(NY,NX)+PSISE_vr(LL,NY,NX)/mGravAccelerat
-          IF(SoiDepthMidLay(LL,NY,NX).LT.DTBLYX)THEN
-            IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoiDepthMidLay(LL,NY,NX)-DTBLYX) &
-              .AND.L.NE.NL(NY,NX)).OR.SoiDepthMidLay(LL,NY,NX).GT.ActiveLayDepth(NY,NX))THEN
+          IF(SoiDepthMidLay_vr(LL,NY,NX).LT.DTBLYX)THEN
+            IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoiDepthMidLay_vr(LL,NY,NX)-DTBLYX) &
+              .AND.L.NE.NL(NY,NX)).OR.SoiDepthMidLay_vr(LL,NY,NX).GT.ActiveLayDepth(NY,NX))THEN
               IFLGD=1
             ENDIF
           ENDIF
@@ -1279,7 +1279,7 @@ module WatsubMod
     IFLGDH=0
     IF(L.LT.NL(NY,NX))THEN
       D9569: DO  LL=L+1,NL(NY,NX)
-        IF(SoiDepthMidLay(LL,NY,NX).LT.DTBLY(NY,NX))THEN
+        IF(SoiDepthMidLay_vr(LL,NY,NX).LT.DTBLY(NY,NX))THEN
 ! the layer is above tile drain water table
           IF(VLMacP1_vr(LL,NY,NX).LE.ZEROS(NY,NX))THEN
 ! no macropore flow
@@ -1314,16 +1314,16 @@ module WatsubMod
 !     IFLGU=micropore discharge flag to natural water table
 !  total water potential psi+rho*grav*h
 
-  IF(IDWaterTable(NY,NX).NE.0.AND.SoiDepthMidLay(L,NY,NX).LT.ExtWaterTable(NY,NX))THEN
+  IF(IDWaterTable(NY,NX).NE.0.AND.SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable(NY,NX))THEN
     !the layer mid-depth is lower than water table
-    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoiDepthMidLay(L,NY,NX)-ExtWaterTable(NY,NX)))THEN
+    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-ExtWaterTable(NY,NX)))THEN
       IFLGU=0
       D9565: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
         !water level difference
         ExtWaterTableEquil=ExtWaterTable(NY,NX)+PSISE_vr(LL,NY,NX)/mGravAccelerat  
-        IF(SoiDepthMidLay(LL,NY,NX).LT.ExtWaterTableEquil)THEN
-          IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoiDepthMidLay(LL,NY,NX)-ExtWaterTableEquil) &
-            .AND.L.NE.NL(NY,NX)).OR.SoiDepthMidLay(LL,NY,NX).GT.ActiveLayDepth(NY,NX))THEN
+        IF(SoiDepthMidLay_vr(LL,NY,NX).LT.ExtWaterTableEquil)THEN
+          IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoiDepthMidLay_vr(LL,NY,NX)-ExtWaterTableEquil) &
+            .AND.L.NE.NL(NY,NX)).OR.SoiDepthMidLay_vr(LL,NY,NX).GT.ActiveLayDepth(NY,NX))THEN
             IFLGU=1
           ENDIF
         ENDIF
@@ -1355,7 +1355,7 @@ module WatsubMod
     !active water table
     IFLGUH=0
 !     DO 9566 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-!     IF(SoiDepthMidLay(LL,NY,NX).LT.ExtWaterTable(NY,NX))THEN
+!     IF(SoiDepthMidLay_vr(LL,NY,NX).LT.ExtWaterTable(NY,NX))THEN
 !     IF(VLMacP1_vr(LL,NY,NX).LE.ZEROS(NY,NX))THEN
 !     IFLGUH=1
 !     ENDIF
@@ -1873,8 +1873,8 @@ module WatsubMod
   IF(IFLGU.EQ.0 .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN
     PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
     PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
-      +mGravAccelerat*(SoiDepthMidLay(N3,N2,N1)-ExtWaterTable(N2,N1)) &
-      -mGravAccelerat*AZMAX1(SoiDepthMidLay(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
+      +mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-ExtWaterTable(N2,N1)) &
+      -mGravAccelerat*AZMAX1(SoiDepthMidLay_vr(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
     FLWT=PSISWT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAU(N3,N2,N1))/(RechargSubSurf+1.0_r8) &
       *RechargRateWTBL*dts_HeatWatTP
@@ -1952,8 +1952,8 @@ module WatsubMod
   IF(IFLGD.EQ.0.AND.(.not.isclose(RechargRateWTBL,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
     PSISWT=AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
-      +mGravAccelerat*(SoiDepthMidLay(N3,N2,N1)-DTBLY(N2,N1)) &
-      -mGravAccelerat*AZMAX1(SoiDepthMidLay(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
+      +mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-DTBLY(N2,N1)) &
+      -mGravAccelerat*AZMAX1(SoiDepthMidLay_vr(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
 
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
     FLWT = PSISWT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTBL(N3,N2,N1))&
@@ -2028,15 +2028,15 @@ module WatsubMod
   !     HydroCond3D=saturated hydraulic conductivity
   !     AREAU=fraction of layer below natural water table
   !     VLairMicP=air filled 
-      IF(SoiDepthMidLay(N3,N2,N1).GE.ExtWaterTable(N2,N1)     &
+      IF(SoiDepthMidLay_vr(N3,N2,N1).GE.ExtWaterTable(N2,N1)     &
         .AND.ActiveLayDepth(N2,N1).GT.ExtWaterTable(N2,N1)   &
-        .AND.SoiDepthMidLay(N3,N2,N1).LT.ActiveLayDepth(N2,N1) &
+        .AND.SoiDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepth(N2,N1) &
         .AND.(AirfMicP.GT.ZEROS2(N2,N1).OR.SoiBulkDensity_vr(N3,N2,N1).LE.ZERO) &
         .AND.VLairMicP_vr(N3,N2,N1).GT.0.0_r8 &
         .AND.(.not.isclose(RechargRateWTBL,0._r8)))THEN
         PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
         PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
-          mGravAccelerat*(SoiDepthMidLay(N3,N2,N1)-ExtWaterTable(N2,N1)))
+          mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-ExtWaterTable(N2,N1)))
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
         FLWU=PSISUT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*&
           AREAU(N3,N2,N1)/(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
@@ -2078,7 +2078,7 @@ module WatsubMod
 !
       IF(DPTHH.GT.ExtWaterTable(N2,N1)                         & !deeper than water table
         .AND.ActiveLayDepth(N2,N1).GT.ExtWaterTable(N2,N1)     & !active layer below water table
-        .AND.SoiDepthMidLay(N3,N2,N1).LT.ActiveLayDepth(N2,N1) & !midlayer depth above active water layer
+        .AND.SoiDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepth(N2,N1) & !midlayer depth above active water layer
         .AND.AirfMacP.GT.ZEROS2(NY,NX)                         & !macropore has air-filled fraction
         .AND.(.not.isclose(RechargRateWTBL,0.0_r8)))THEN         !recharge is on
         PSISWD                    = XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
@@ -2129,14 +2129,14 @@ module WatsubMod
     +FWatIrrigate2MicP1_vr(N3,N2,N1)
   VLWatMacP1X     = VLWatMacP1_vr(N3,N2,N1)+TConvWaterFlowMacP_3D_vr(N3,N2,N1)-FWatExMacP2MicPi(N3,N2,N1)
   ENGY1           = VLHeatCapacity_vr(N3,N2,N1)*TKSoi1(N3,N2,N1)
-  VLHeatCapacityX = VHeatCapacitySoilM(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X) &
+  VLHeatCapacityX = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X) &
     +cpi*(VLiceMicP1_vr(N3,N2,N1)+VLiceMacP1_vr(N3,N2,N1))
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
     TK1App=(ENGY1+THeatFlow2Soili_vr(N3,N2,N1)+HeatIrrigation1(N3,N2,N1))/VLHeatCapacityX
     IF((TK1App.LT.TFREEZ .AND. VLWatMicP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)) &
       .OR.(TK1App.GT.TFREEZ .AND. VLiceMicP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)))THEN
-      VLHeatCapacityAX     = VHeatCapacitySoilM(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(N3,N2,N1)
+      VLHeatCapacityAX     = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(N3,N2,N1)
       MicPIceHeatFlxFrezPt = VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*TFREEZ)*(1.0_r8-0.10_r8*PSISMX))*dts_wat
       IF(MicPIceHeatFlxFrezPt.LT.0.0_r8)THEN
         !thaw

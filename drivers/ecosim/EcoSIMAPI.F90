@@ -9,8 +9,8 @@ module EcoSIMAPI
   use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TranspNoSaltMod , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
-  use SoilBGCDataType , only : trc_soHml_vr
-  use TracerIDMod     , only : ids_NO2B,ids_NO2
+  use SoilBGCDataType , only : trc_soHml_vr,trc_solml_vr
+  use TracerIDMod     , only : ids_NO2B,ids_NO2,idg_O2
   use EcoSIMCtrlMod  
   use WatsubMod    , only : watsub
 implicit none
@@ -42,12 +42,14 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
+
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('NIT',t1)
   endif
+
   !
   !   UPDATE PLANT biogeochemistry
   !
@@ -55,6 +57,7 @@ contains
   if(plant_model)then
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
   endif
+
   !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
@@ -65,6 +68,7 @@ contains
     CALL soluteModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('SOL',t1)
   endif
+
   !
   !   CALCULATE GAS AND SOLUTE FLUXES IN 'TranspNoSalt'
   !
@@ -72,6 +76,7 @@ contains
   call start_timer(t1)
   CALL TranspNoSalt(I,J,NHW,NHE,NVN,NVS)
   call end_timer('TRN',t1)
+
   !
   !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
   !

@@ -150,7 +150,7 @@ implicit none
     VLiceMicP_vr(NUM(NY,NX),NY,NX)=VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE   
 
     ENGY=VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
-    VHeatCapacity_vr(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
+    VHeatCapacity_vr(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
       +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
       +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
 
