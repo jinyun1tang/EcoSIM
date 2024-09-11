@@ -974,7 +974,7 @@ implicit none
     fTgrowRootP_vr            => plt_pheno%fTgrowRootP_vr,               &
     RAutoRootO2Limter_pvr     => plt_rbgc%RAutoRootO2Limter_pvr,         &
     MaxNumRootLays            => plt_site%MaxNumRootLays,                &
-    CumSoilThickness_vr          => plt_site%CumSoilThickness_vr,              &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,        &
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs,           &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,                &

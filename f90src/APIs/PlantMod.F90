@@ -36,7 +36,7 @@ implicit none
   plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-!
+
       call  PlantAPISend(I,J,NY,NX)
 
       call EnterPlantBalance(I,J,NP(NY,NX))

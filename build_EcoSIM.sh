@@ -228,3 +228,14 @@ fi
 if [ "$regression_test" -eq 1 ]; then
   make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;
 fi
+
+cd ../
+
+mkdir -p ./local
+if [ -L ./local/bin ]; then
+  rm ./local/bin
+fi
+
+build_path=$(realpath "./build/local/bin")
+
+ln -s $build_path ./local/bin

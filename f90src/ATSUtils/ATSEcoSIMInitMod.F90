@@ -7,8 +7,8 @@ module ATSEcoSIMInitMod
   USE SoilPhysDataType
   use LandSurfDataType
   use EcoSIMCtrlMod
-  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
-      SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
+  use HydroThermData, only : PSISM1_vr, TKSoi1, VLHeatCapacity_vr, &
+      SoilFracAsMicP, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm_col, RainH
@@ -85,8 +85,8 @@ implicit none
 
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
-      POROS(L,NY,NX)=a_PORO(L,NY)
+      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
+      POROS_vr(L,NY,NX)=a_PORO(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)

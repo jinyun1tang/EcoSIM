@@ -80,8 +80,8 @@ implicit none
     endif
     D8995: DO NX=NH1,NH2
       D8990: DO NY=NV1,NV2
-        iSoilDisturbType_col(IDY,NY,NX)=IPLOW
-        DCORP(IDY,NY,NX)=DPLOW
+        iSoilDisturbType_col(IDY,NY,NX) = IPLOW
+        DepzCorp_col(IDY,NY,NX)                = DPLOW
       ENDDO D8990
     ENDDO D8995
     kk=kk+1

@@ -104,9 +104,9 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RNO2EcoUptkBandPrev_vr(:,:,:)                       !total root + microbial NO2 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoH2PO4DmndBand_vr(:,:,:)                       !total root + microbial PO4 uptake band, [g d-2 h-1]
   real(r8),target,allocatable ::  RH2PO4EcoDmndBandPrev_vr(:,:,:)                       !total root + microbial PO4 uptake band, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROQCX(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
+  real(r8),target,allocatable ::  RDOMEcoDmndK_vr(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RDOMEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROQAX(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
+  real(r8),target,allocatable ::  RAcetateEcoDmndK_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  TH2GZ(:,:)                         !total root H2 flux, [g d-2]
   private :: InitAllocate
@@ -220,9 +220,9 @@ module PlantDataRateType
   allocate(RNO2EcoUptkBandPrev_vr(0:JZ,JY,JX));  RNO2EcoUptkBandPrev_vr=0._r8
   allocate(REcoH2PO4DmndBand_vr(0:JZ,JY,JX));  REcoH2PO4DmndBand_vr=0._r8
   allocate(RH2PO4EcoDmndBandPrev_vr(0:JZ,JY,JX));  RH2PO4EcoDmndBandPrev_vr=0._r8
-  allocate(ROQCX(1:jcplx,0:JZ,JY,JX));ROQCX=0._r8
+  allocate(RDOMEcoDmndK_vr(1:jcplx,0:JZ,JY,JX));RDOMEcoDmndK_vr=0._r8
   allocate(RDOMEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RDOMEcoDmndPrev_vr=0._r8
-  allocate(ROQAX(1:jcplx,0:JZ,JY,JX));ROQAX=0._r8
+  allocate(RAcetateEcoDmndK_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndK_vr=0._r8
   allocate(RAcetateEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndPrev_vr=0._r8
   allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
   end subroutine InitAllocate
@@ -318,9 +318,9 @@ module PlantDataRateType
   call destroy(RNO2EcoUptkBandPrev_vr)
   call destroy(REcoH2PO4DmndBand_vr)
   call destroy(RH2PO4EcoDmndBandPrev_vr)
-  call destroy(ROQCX)
+  call destroy(RDOMEcoDmndK_vr)
   call destroy(RDOMEcoDmndPrev_vr)
-  call destroy(ROQAX)
+  call destroy(RAcetateEcoDmndK_vr)
   call destroy(RAcetateEcoDmndPrev_vr)
   call destroy(TH2GZ)
   call destroy(trcs_plant_uptake_vr)

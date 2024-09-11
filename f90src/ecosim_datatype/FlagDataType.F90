@@ -15,7 +15,7 @@ implicit none
   integer,target,allocatable ::  iSoilDisturbType_col(:,:,:)                        !soil disturbance type, [-]
   integer,target,allocatable ::  KoppenClimZone_col(:,:)                          !Koppen climate zone
   integer,target,allocatable ::  IFLGV(:,:)                          !flag for irrigation criterion,0=SWC,1=canopy water potential
-  integer,target,allocatable ::  IFLGS(:,:)                          !disturbance flag
+  integer,target,allocatable ::  iResetSoilProf_col(:,:)                          !disturbance flag
   integer,target,allocatable ::  IFNHB(:,:)                          !banded NH4 fertilizer flag
   integer,target,allocatable ::  IFNOB(:,:)                          !banded NO3 fertilizer flag
   integer,target,allocatable ::  IFPOB(:,:)                          !banded H2PO4 fertilizer flag
@@ -47,7 +47,7 @@ contains
   allocate(iSoilDisturbType_col(366,JY,JX));   iSoilDisturbType_col=0
   allocate(KoppenClimZone_col(JY,JX));       KoppenClimZone_col=0
   allocate(IFLGV(JY,JX));       IFLGV=0
-  allocate(IFLGS(JY,JX));       IFLGS=0
+  allocate(iResetSoilProf_col(JY,JX));       iResetSoilProf_col=itrue
   allocate(IFNHB(JY,JX));       IFNHB=0
   allocate(IFNOB(JY,JX));       IFNOB=0
   allocate(IFPOB(JY,JX));       IFPOB=0
@@ -78,7 +78,7 @@ contains
   call destroy(iSoilDisturbType_col)
   call destroy(KoppenClimZone_col)
   call destroy(IFLGV)
-  call destroy(IFLGS)
+  call destroy(iResetSoilProf_col)
   call destroy(IFNHB)
   call destroy(IFNOB)
   call destroy(IFPOB)

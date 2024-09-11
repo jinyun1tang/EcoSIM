@@ -302,7 +302,7 @@ contains
   end subroutine ReadNamelist
 
   !-------------------------------------------------------------------------------
-    function its_time_to_write_restart(this)result(ans)
+    function its_time_to_write_restart(this,nlend)result(ans)
      !
      ! DESCRIPTION
      ! decide if to write restart file
@@ -310,6 +310,7 @@ contains
 
      implicit none
      class(ecosim_time_type), intent(inout) :: this
+     logical, optional, intent(in) :: nlend
      logical :: ans
 
      character(len=80) :: subname = trim(mod_filename)//'::its_time_to_write_restart'
@@ -347,7 +348,7 @@ contains
      case default
        ans=.false.
      end select
-
+     if(present(nlend))ans=ans .or. nlend
      end function its_time_to_write_restart
   !-------------------------------------------------------------------------------
     function its_time_to_diag(this)result(ans)
