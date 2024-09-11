@@ -36,43 +36,14 @@ module TillageMixMod
   integer, intent(in) :: I,J,NY,NX
 
   integer :: K,N,M,L,LL,NGL,NTS
-
-  REAL(R8) :: TOSGE(1:NumPlantChemElms,jsken,0:micpar%NumOfLitrCmplxs),TOSGA(jsken,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TORXE(1:NumPlantChemElms,ndbiomcp,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TDOMG(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs),TDOMH(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
-  real(r8) :: TDOMHG(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
-
-  real(r8) :: TOMGAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
-  real(r8) :: TBOMGE(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TmBiomeHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx)
-  REAL(R8) :: TmBiomeAutor(NumPlantChemElms,NumLiveAutoBioms)
-  real(r8) :: TORM(NumPlantChemElms,ndbiomcp,1:jcplx)
-  real(r8) :: TDOM(idom_beg:idom_end,1:jcplx)
-  real(r8) :: TOHM(idom_beg:idom_end,1:jcplx)
-  real(r8) :: TOSM(1:NumPlantChemElms,jsken,1:jcplx)
-  real(r8) :: TOSA(jsken,1:jcplx)
+  real(r8) :: TDOMH(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
   real(r8) :: FracTillCorp,CORP0,XCORP0,DCORPZ
-  real(r8) :: TWP,TSatHydroCondVert
   REAL(R8) :: ZNHUX0,ZNHUXI,ZNFNX0
-  real(r8) :: TGKCK
-  real(r8) :: TP_soil(idsp_psoi_beg:idsp_psoi_end)
-  real(r8) :: TFertNG_soil(ifertn_beg:ifertn_end),TZNFNG,TVOLWR
-  real(r8) :: TZ2OG,TZ2OS,TZNH3G,TH2GG,TH2GS,TZNFN2,TZNFNI,TCO2GS
-  real(r8) :: TCH4GS,TOXYGS,TZ2GSG,TZ2OGS,TH2GGS,TNH4GS,TNH3GS
-  real(r8) :: TX_anion(idx_AEC+1:idx_anion_soil_end)
-  real(r8) :: TNO3GS,TNO2GS,TP14GS,TPO4GS,TXN4G
-  real(r8) :: TX_solml(idx_beg:idx_end)
-  real(r8) :: TP_salml(idsp_beg:idsp_end)
-  real(r8) :: TG_gasml(idg_beg:idg_end-1)
-  real(r8) :: TS0_solml(ids_beg:ids_end)   !surface mass for incoporation
-  real(r8) :: TfertN_band(ifertn_beg:ifertnb_end)
-  real(r8) :: TNH4S,TNH4B,TNH3S,TNH3B,TNO3S
-  real(r8) :: TNO3B,TNO2S,TNO2B,TZAL,TZFE,TZHY,TZCA,TZMG,TZNA
-  real(r8) :: TNFNIH
-  real(r8) :: TENGYR,TVOLW,TENGY
-  real(r8) :: ENGYV,ENGYL,ENGYM
+  real(r8) :: TZNFNG,TZNFN2
+  real(r8) :: TNFNIH,TZNFNI
+  real(r8) :: ENGYV(0:JZ),ENGYL,ENGYM(0:JZ)
   real(r8) :: ORGM(1:NumPlantChemElms),litrOM(1:NumPlantChemElms)
-  real(r8) :: TVOLI,HFLXD
+  real(r8) :: HFLXD
   real(r8) :: TX,TL
   integer  :: NTX,NTP,NTG,NTSA,NTN,idom,MID,NE
   real(r8) :: FI(JZ),TI(JZ),TI1,FI1
@@ -133,6 +104,8 @@ module TillageMixMod
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
 
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
+
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
@@ -150,36 +123,113 @@ module TillageMixMod
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcp_saltpml_vr(idsp_beg_band:idsp_end,1:JZ,NY,NX))
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcp_saltpml_vr(idsp_psoi_beg:idsp_psoi_end,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_Hp:idx_cation_end,1:JZ,NY,NX))
+
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_CEC:idx_CEC,1:JZ,NY,NX))
+
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC:idx_AEC,1:JZ,NY,NX))
+
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_NH4:idx_NH4,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trc_gasml_vr(idg_beg:idg_end-1,1:JZ,NY,NX))
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SorbedOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SorbedOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOMAct_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOMAct_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeHeter_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeHeter_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, OMBioResdu_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, OMBioResdu_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOM_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOM_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+
+  !build the energy profile
+  !ENGYV: water
+  !ENGYM: material
+  ENGYM(0) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)*TKS_vr(0,NY,NX)
+  ENGYV(0) = (cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX))*TKS_vr(0,NY,NX)
+  VHeatCapacitySoilM_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)
+  D3000: DO  L=NU(NY,NX),LL
+    IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+      ENGYM(L) = VHeatCapacitySoilM_vr(L,NY,NX)*TKS_vr(L,NY,NX)
+      ENGYV(L) = (cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
+    ENDIF    
+  ENDDO D3000
+  HFLXD=ENGYM(0)+ENGYV(0)
+
+  !mix
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLWatMicP_vr(0:JZ,NY,NX),XCORP0)
+
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLiceMicP_vr(0:JZ,NY,NX),XCORP0)
+
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,ENGYV(0:JZ),XCORP0)
+
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,ENGYM(0:JZ),XCORP0)
+
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VHeatCapacitySoilM_vr(0:JZ,NY,NX),XCORP0)
+
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLWatMacP_vr(1:JZ,NY,NX))
+
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLiceMacP_vr(1:JZ,NY,NX))
+
+  !update 
+  call sumLitrOMLayL(0,NY,NX,litrOM)
+
+  SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM(1:NumPlantChemElms)
+
+  OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
+
+  VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+
+  VLitR_col(NY,NX)          = VLitR_col(NY,NX)*XCORP0
+  VGeomLayer_vr(0,NY,NX)    = VGeomLayer_vr(0,NY,NX)*XCORP0
+  TKS_vr(0,NY,NX)           = (ENGYM(0)+ENGYV(0))/VHeatCapacity_vr(0,NY,NX)
+  HFLXD                     = HFLXD-ENGYM(0)-ENGYV(0)
+  DO  L=NU(NY,NX),LL
+    IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+      VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
+      VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
+      TKS_vr(L,NY,NX)=(ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)        
+      TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))      
+    ENDIF
+  ENDDO
+  write(*,*)(TKS_vr(L,NY,NX),L=0,LL)
+  HEATIN_lnd    = HEATIN_lnd-HFLXD
+  HeatStore_lnd = HeatStore_lnd-HFLXD
+
+  !reset
+  EnergyImpact4Erosion(NY,NX) = 0.0_r8
 !
 !     EXTENT OF MIXING
 
     !
     FracTillCorp                = 1.0_r8-XTillCorp_col(NY,NX)
-    EnergyImpact4Erosion(NY,NX) = 0.0_r8
+
 !
 !     TEMPORARY ACCUMULATORS
 !
-    TVOLW             = 0.0_r8
-    TVOLI             = 0.0_r8
-  ! TVOLP             = 0.0_r8
-  ! TVOLA             = 0.0_r8
-    TENGY             = 0.0_r8
     TNFNIH            = 0.0_r8
-
-    TfertN_band(ifertnb_beg:ifertnb_end)=0.0_r8
-
-    TS0_solml(ids_beg:ids_end)  = 0._r8
-    TX_solml(idx_beg:idx_end)   = 0._r8
-    TP_salml(idsp_beg:idsp_end) = 0._r8
-    TG_gasml(idg_beg:idg_end-1) = 0._r8
-
-    TmBiomeHeter = 0.0_r8
-    TmBiomeAutor = 0.0_r8
-    TORM         = 0.0_r8
-    TDOM         = 0.0_r8
-    TOHM         = 0.0_r8
-    TOSM         = 0.0_r8
-    TOSA         = 0.0_r8
     TZNFN2       = 0.0_r8
     TZNFNI       = 0.0_r8
     ZNHUX0       = 0.0_r8
@@ -189,101 +239,21 @@ module TillageMixMod
 !   CORP0: Fraction of material being mixed
     CORP0=1.0_r8-XCORP0   
 
-    DO  K=1,micpar%NumOfLitrCmplxs
-      DO  N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(N),JGnfo(N)
-          DO  M=1,nlbiomcp
-            MID=micpar%get_micb_id(M,NGL)
-            DO NE=1,NumPlantChemElms
-              TBOMGE(NE,MID,K)                 = mBiomeHeter_vr(NE,MID,K,0,NY,NX)*CORP0
-              mBiomeHeter_vr(NE,MID,K,0,NY,NX) = mBiomeHeter_vr(NE,MID,K,0,NY,NX)*XCORP0
-            ENDDO
-          enddo
-        enddo
-      ENDDO
-    ENDDO
-
-    DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGniA(N),JGnfA(N)
-        DO  M=1,nlbiomcp
-          MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,NumPlantChemElms
-            TOMGAutor(NE,MID)              = mBiomeAutor_vr(NE,MID,0,NY,NX)*CORP0
-            mBiomeAutor_vr(NE,MID,0,NY,NX) = mBiomeAutor_vr(NE,MID,0,NY,NX)*XCORP0
-          ENDDO
-        enddo
-      enddo
-    ENDDO
-
     DO K=1,micpar%NumOfLitrCmplxs
-      DO M=1,ndbiomcp
-        DO NE=1,NumPlantChemElms
-          TORXE(NE,M,K)                 = OMBioResdu_vr(NE,M,K,0,NY,NX)*CORP0
-          OMBioResdu_vr(NE,M,K,0,NY,NX) = OMBioResdu_vr(NE,M,K,0,NY,NX)*XCORP0
-        ENDDO
-      ENDDO
-
       DO idom=idom_beg,idom_end
-        TDOMG(idom,K)  = DOM_vr(idom,K,0,NY,NX)*CORP0
         TDOMH(idom,K)  = DOM_MacP_vr(idom,K,0,NY,NX)*CORP0
-        TDOMHG(idom,K) = SorbedOM_vr(idom,K,0,NY,NX)*CORP0
   !
   !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
   !
-        DOM_vr(idom,K,0,NY,NX)      = DOM_vr(idom,K,0,NY,NX)*XCORP0
         DOM_MacP_vr(idom,K,0,NY,NX) = DOM_MacP_vr(idom,K,0,NY,NX)*XCORP0
-        SorbedOM_vr(idom,K,0,NY,NX) = SorbedOM_vr(idom,K,0,NY,NX)*XCORP0
       enddo 
-
-      DO  M=1,jsken
-        TOSGA(M,K)                 = SolidOMAct_vr(M,K,0,NY,NX)*CORP0
-        SolidOMAct_vr(M,K,0,NY,NX) = SolidOMAct_vr(M,K,0,NY,NX)*XCORP0
-
-        DO NE=1,NumPlantChemElms
-          TOSGE(NE,M,K)              = SolidOM_vr(NE,M,K,0,NY,NX)*CORP0
-          SolidOM_vr(NE,M,K,0,NY,NX) = SolidOM_vr(NE,M,K,0,NY,NX)*XCORP0
-        ENDDO
-
-      ENDDO
     ENDDO
 
-    TXN4G=trcx_solml_vr(idx_NH4,0,NY,NX)*CORP0
+    TZNFNG = ZNFNI(0,NY,NX)*CORP0
+    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
+    ZNHUXI = AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
+    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
 
-    DO NTX= idx_AEC+1,idx_anion_soil_end
-      TX_anion(NTX)=trcx_solml_vr(NTX,0,NY,NX)*CORP0
-    ENDDO
-
-
-    TZNFNG        = ZNFNI(0,NY,NX)*CORP0
-    TVOLWR        = VLWatMicP_vr(0,NY,NX)*CORP0
-    HFLXD         = cpo*SoilOrgM_vr(ielmc,0,NY,NX)*CORP0*TKS_vr(0,NY,NX)
-    HEATIN_lnd    = HEATIN_lnd-HFLXD
-    HeatStore_lnd = HeatStore_lnd-HFLXD
-    TENGYR        = cpw*TVOLWR*TKS_vr(0,NY,NX)
-
-    call sumLitrOMLayL(0,NY,NX,litrOM)
-
-    SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM(1:NumPlantChemElms)
-
-    OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
-
-    trcx_solml_vr(idx_NH4,0,NY,NX)=trcx_solml_vr(idx_NH4,0,NY,NX)*XCORP0
-
-    DO NTX=idx_AEC+1,idx_anion_soil_end
-      trcx_solml_vr(NTX,0,NY,NX)=trcx_solml_vr(NTX,0,NY,NX)*XCORP0
-    ENDDO
-
-    DO NTN=ifertn_beg,ifertn_end
-      FertN_soil_vr(NTN,0,NY,NX)=FertN_soil_vr(NTN,0,NY,NX)*XCORP0
-    ENDDO
-
-    VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)*XCORP0
-    VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
-    VLitR_col(NY,NX)          = VLitR_col(NY,NX)*XCORP0
-    VGeomLayer_vr(0,NY,NX)    = VGeomLayer_vr(0,NY,NX)*XCORP0
-    ZNHUX0                    = AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
-    ZNHUXI                    = AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
-    ZNFNX0                    = AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
 !
@@ -299,77 +269,10 @@ module TillageMixMod
       FI1 = TL/DCORPZ
       TI1 = AMIN1(TL/DLYR(3,L,NY,NX),1._r8)
 
-      TVOLW = TVOLW+TI1*VLWatMicP_vr(L,NY,NX)
-      TVOLI = TVOLI+TI1*VLiceMicP_vr(L,NY,NX)
-! TVOLP = TVOLP+TI1*VLsoiAirP_vr(L,NY,NX)
-! TVOLA = TVOLA+TI1*VLMicP_vr(L,NY,NX)
-      TENGY = TENGY+TI1*(cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-        +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
-
-
-      DO NTN=ifertnb_beg,ifertnb_end
-        TfertN_band(NTN)=TfertN_band(NTN)+TI1*FertN_Band_vr(NTN,L,NY,NX)
-      ENDDO
-
-
-!cation
-      DO NTX=idx_CEC,idx_cation_end
-        TX_solml(NTX)=TX_solml(NTX)+TI1*trcx_solml_vr(NTX,L,NY,NX)
-      ENDDO
-!anion
-      DO NTX=idx_AEC,idx_end
-        TX_solml(NTX)=TX_solml(NTX)+TI1*trcx_solml_vr(NTX,L,NY,NX)
-      ENDDO
-
-      DO NTG=idg_beg,idg_end-1
-        TG_gasml(NTG)=TG_gasml(NTG)+TI1*trc_gasml_vr(NTG,L,NY,NX)
-      ENDDO
-
-      DO  K=1,jcplx
-        DO  N=1,NumMicbFunGrupsPerCmplx
-          DO NGL=JGnio(N),JGnfo(N)
-            DO  M=1,nlbiomcp
-              MID=micpar%get_micb_id(M,NGL)
-              DO NE=1,NumPlantChemElms
-                TmBiomeHeter(NE,MID,K)=TmBiomeHeter(NE,MID,K)+TI1*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
-              ENDDO
-            enddo
-          enddo
-        enddo
-      ENDDO
-
-      DO  N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGniA(N),JGnfA(N)
-          DO  M=1,nlbiomcp
-            MID=micpar%get_micb_id(M,NGL)
-            DO NE=1,NumPlantChemElms
-            TmBiomeAutor(NE,MID)=TmBiomeAutor(NE,MID)+TI1*mBiomeAutor_vr(NE,MID,L,NY,NX)
-            ENDDO
-          enddo
-        enddo
-      enddo
-
-      DO K=1,jcplx
-        DO  M=1,ndbiomcp
-          DO NE=1,NumPlantChemElms
-            TORM(NE,M,K)=TORM(NE,M,K)+TI1*OMBioResdu_vr(NE,M,K,L,NY,NX)
-          ENDDO
-        ENDDO
-        do idom=idom_beg,idom_end
-          TDOM(idom,K)=TDOM(idom,K)+TI1*DOM_vr(idom,K,L,NY,NX)
-          TOHM(idom,K)=TOHM(idom,K)+TI1*SorbedOM_vr(idom,K,L,NY,NX)
-        enddo
-        DO  M=1,jsken
-          TOSA(M,K)=TOSA(M,K)+TI1*SolidOMAct_vr(M,K,L,NY,NX)
-          DO NE=1,NumPlantChemElms
-            TOSM(NE,M,K)=TOSM(NE,M,K)+TI1*SolidOM_vr(NE,M,K,L,NY,NX)
-          ENDDO
-        ENDDO
-      ENDDO
-      ZNHUX0=AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
-      ZNHUXI=AMAX1(ZNHUXI,ZNHUI(L,NY,NX))
-      ZNFNX0=AMAX1(ZNFNX0,ZNFN0(L,NY,NX))
-      TZNFNI=TZNFNI+ZNFNI(L,NY,NX)
+      ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
+      ZNHUXI = AMAX1(ZNHUXI,ZNHUI(L,NY,NX))
+      ZNFNX0 = AMAX1(ZNFNX0,ZNFN0(L,NY,NX))
+      TZNFNI = TZNFNI+ZNFNI(L,NY,NX)
       LL=L      
     ENDDO D100
 !
@@ -389,40 +292,11 @@ module TillageMixMod
         TI1=AMIN1(TL/DLYR(3,L,NY,NX),1._r8)
         TX=AZMAX1(1.0_r8-TI1)
         
-        ENGYM                  = VHeatCapacitySoilM_vr(L,NY,NX)*TKS_vr(L,NY,NX)
-        ENGYV                  = (cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
-        VLWatMicP_vr(L,NY,NX)  = TI1*VLWatMicP_vr(L,NY,NX)+FracTillCorp*(FI1*TVOLW-TI1*VLWatMicP_vr(L,NY,NX)) &
-          +TX*VLWatMicP_vr(L,NY,NX)+FI1*TVOLWR
-        VLiceMicP_vr(L,NY,NX)  = TI1*VLiceMicP_vr(L,NY,NX)+FracTillCorp*(FI1*TVOLI-TI1*VLiceMicP_vr(L,NY,NX)) &
-          +TX*VLiceMicP_vr(L,NY,NX)
-        VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-
-!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+FracTillCorp*VLWatMacP_vr(L,NY,NX)
-!     VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)+FracTillCorp*VLiceMacP_vr(L,NY,NX)
-!     VLMicP_vr(L,NY,NX)=VLMicP_vr(L,NY,NX)+FracTillCorp*VLMacP_vr(L,NY,NX)
-!     VLWatMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*VLWatMacP_vr(L,NY,NX)
-!     VLiceMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*VLiceMacP_vr(L,NY,NX)
-!     VLMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*VLMacP_vr(L,NY,NX)
 !     SoilFracAsMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
-        ENGYL=TI1*ENGYV+FracTillCorp*(FI1*TENGY-TI1*ENGYV)+TX*ENGYV+FI1*TENGYR
-
-        VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
-          +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
-        TKS_vr(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity_vr(L,NY,NX)        
-        TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))
-
-
-        DO NTN=ifertnb_beg,ifertnb_end
-          FertN_Band_vr(NTN,L,NY,NX)=TI1*FertN_Band_vr(NTN,L,NY,NX) &
-            +FracTillCorp*(FI1*TFertN_Band(NTN)-TI1*FertN_Band_vr(NTN,L,NY,NX)) &
-            +TX*FertN_Band_vr(NTN,L,NY,NX)
-        ENDDO
 
         !SALT
         DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)  &
-            +FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
+          trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
         ENDDO
 
         ! solute
@@ -430,150 +304,33 @@ module TillageMixMod
           trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FracTillCorp*trc_soHml_vr(NTS,L,NY,NX)
         ENDDO
 
-        DO NTX=idx_CEC,idx_cation_end
-          trcx_solml_vr(NTX,L,NY,NX)=TI1*trcx_solml_vr(NTX,L,NY,NX)+ &
-            FracTillCorp*(FI1*TX_solml(NTX)-TI1*trcx_solml_vr(NTX,L,NY,NX))+TX*trcx_solml_vr(NTX,L,NY,NX)
-        ENDDO
-
-        DO NTX=idx_AEC,idx_end
-          trcx_solml_vr(NTX,L,NY,NX)=TI1*trcx_solml_vr(NTX,L,NY,NX)+ &
-            FracTillCorp*(FI1*TX_solml(NTX)-TI1*trcx_solml_vr(NTX,L,NY,NX))+TX*trcx_solml_vr(NTX,L,NY,NX)
-        ENDDO
-
-
-        DO NTG=idg_beg,idg_end-1
-          trc_gasml_vr(NTG,L,NY,NX)=TI1*trc_gasml_vr(NTG,L,NY,NX)+FracTillCorp*(FI1*TG_gasml(NTG) &
-            -TI1*trc_gasml_vr(NTG,L,NY,NX))+TX*trc_gasml_vr(NTG,L,NY,NX)
-        ENDDO
-
         call MixSoluteMacpore(L,NY,NX)
 
         DO  K=1,jcplx
-          DO  N=1,NumMicbFunGrupsPerCmplx
-            DO NGL=JGnio(N),JGnfo(N)
-              DO  M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)
-                DO NE=1,NumPlantChemElms
-                  mBiomeHeter_vr(NE,MID,K,L,NY,NX)=TI1*mBiomeHeter_vr(NE,MID,K,L,NY,NX)+FracTillCorp*(FI1*TmBiomeHeter(NE,MID,K) &
-                    -TI1*mBiomeHeter_vr(NE,MID,K,L,NY,NX))+TX*mBiomeHeter_vr(NE,MID,K,L,NY,NX)
-                  ENDDO
-              enddo
-            enddo
-          enddo
-        ENDDO
-        DO  N=1,NumMicbFunGrupsPerCmplx
-          DO NGL=JGniA(N),JGnfA(N)
-            DO  M=1,nlbiomcp
-              MID=micpar%get_micb_id(M,NGL)
-              DO NE=1,NumPlantChemElms
-                mBiomeAutor_vr(NE,MID,L,NY,NX)=TI1*mBiomeAutor_vr(NE,MID,L,NY,NX)+FracTillCorp*(FI1*TmBiomeAutor(NE,MID) &
-                  -TI1*mBiomeAutor_vr(NE,MID,L,NY,NX))+TX*mBiomeAutor_vr(NE,MID,L,NY,NX)
-              ENDDO  
-            enddo
-          enddo
-        enddo
-
-        DO  K=1,jcplx
-          DO  M=1,ndbiomcp
-            DO NE=1,NumPlantChemElms
-              OMBioResdu_vr(NE,M,K,L,NY,NX)=TI1*OMBioResdu_vr(NE,M,K,L,NY,NX)+FracTillCorp*(FI1*TORM(NE,M,K) &
-                -TI1*OMBioResdu_vr(NE,M,K,L,NY,NX))+TX*OMBioResdu_vr(NE,M,K,L,NY,NX)
-            ENDDO  
-          ENDDO
-
           DO idom=idom_beg,idom_end
-            DOM_vr(idom,K,L,NY,NX)=TI1*DOM_vr(idom,K,L,NY,NX)+FracTillCorp*(FI1*TDOM(idom,K) &
-              -TI1*DOM_vr(idom,K,L,NY,NX))+TX*DOM_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
+            DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
             DOM_MacP_vr(idom,K,L,NY,NX)=XTillCorp_col(NY,NX)*DOM_MacP_vr(idom,K,L,NY,NX)
-            SorbedOM_vr(idom,K,L,NY,NX)=TI1*SorbedOM_vr(idom,K,L,NY,NX)+FracTillCorp*(FI1*TOHM(idom,K) &
-              -TI1*SorbedOM_vr(idom,K,L,NY,NX))+TX*SorbedOM_vr(idom,K,L,NY,NX)
           ENDDO  
-
-          DO  M=1,jsken
-            SolidOMAct_vr(M,K,L,NY,NX)=TI1*SolidOMAct_vr(M,K,L,NY,NX)+FracTillCorp*(FI1*TOSA(M,K) &
-              -TI1*SolidOMAct_vr(M,K,L,NY,NX))+TX*SolidOMAct_vr(M,K,L,NY,NX)
-            DO NE=1,NumPlantChemElms  
-              SolidOM_vr(NE,M,K,L,NY,NX)=TI1*SolidOM_vr(NE,M,K,L,NY,NX)+FracTillCorp*(FI1*TOSM(NE,M,K) &
-                -TI1*SolidOM_vr(NE,M,K,L,NY,NX))+TX*SolidOM_vr(NE,M,K,L,NY,NX)
-            ENDDO
-          ENDDO
         ENDDO
 !
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-        DO  K=1,micpar%NumOfLitrCmplxs
-          DO  N=1,NumMicbFunGrupsPerCmplx
-            DO NGL=JGnio(N),JGnfo(N)
-              DO M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)         
-                DO NE=1,NumPlantChemElms       
-                  mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)+FI1*TBOMGE(NE,MID,K)
-                ENDDO
-              enddo
-            enddo
-          ENDDO
-        ENDDO
-
-        DO  N=1,NumMicbFunGrupsPerCmplx
-          DO NGL=JGniA(N),JGnfA(N)
-            DO M=1,nlbiomcp
-              MID=micpar%get_micb_id(M,NGL)
-              DO NE=1,NumPlantChemElms
-                mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)+FI1*TOMGAutor(NE,MID)
-              ENDDO
-            enddo
-          enddo
-        ENDDO
-
         DO K=1,micpar%NumOfLitrCmplxs
-          DO  M=1,ndbiomcp
-            DO NE=1,NumPlantChemElms
-              OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)+FI1*TORXE(NE,M,K)
-            ENDDO
-          ENDDO
           DO idom=idom_beg,idom_end
-            DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+FI1*TDOMG(idom,K)
             DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+FI1*TDOMH(idom,K)
-            SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)+FI1*TDOMHG(idom,K)
-          ENDDO
-          DO  M=1,jsken
-            SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)+FI1*TOSGA(M,K)
-            DO NE=1,NumPlantChemElms
-              SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)+FI1*TOSGE(NE,M,K)
-            ENDDO
           ENDDO
         ENDDO
-
-        call sumORGMLayL(L,NY,NX,ORGM)
-
-        call sumLitrOMLayL(L,NY,NX,litrOM)
-
-        SoilOrgM_vr(:,L,NY,NX)=ORGM(:)
-
-        OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
-
 
         if(trc_solml_vr(idg_O2,1,1,1)<0._r8)then
           print*,'tillage problem',trc_solml_vr(idg_O2,1,1,1)
           stop
         endif
 
-        trcx_solml_vr(idx_NH4,L,NY,NX)=trcx_solml_vr(idx_NH4,L,NY,NX)+FI1*TXN4G
-
-        DO NTX=idx_AEC+1,idx_anion_soil_end
-          trcx_solml_vr(NTX,L,NY,NX)=trcx_solml_vr(NTX,L,NY,NX)+FI1*TX_anion(NTX)
-        ENDDO
-
-        DO NTN=ifertn_beg,ifertn_end
-          FertN_soil_vr(NTN,L,NY,NX)=FertN_soil_vr(NTN,L,NY,NX)+FI1*TFertNG_soil(NTN)
-        ENDDO
-
         ZNHU0(L,NY,NX)=ZNHUX0
         ZNHUI(L,NY,NX)=ZNHUXI
         ZNFN0(L,NY,NX)=ZNFNX0
-        ZNFNI(L,NY,NX)=(TI1*ZNFNI(L,NY,NX)+FracTillCorp*(FI1*TZNFNI &
-          -TI1*ZNFNI(L,NY,NX))+TX*ZNFNI(L,NY,NX)+FI1*TZNFNG)/FI1
+        ZNFNI(L,NY,NX)=(TI1*ZNFNI(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI(L,NY,NX))+TX*ZNFNI(L,NY,NX)+FI1*TZNFNG)/FI1
         TZNFN2=TZNFN2+ZNFNI(L,NY,NX)
       ENDIF
     ENDDO D2000
@@ -583,6 +340,7 @@ module TillageMixMod
     ZNFNI(0,NY,NX) = ZNFNI(0,NY,NX)*XCORP0
     TZNFN2         = TZNFN2+TZNFNG
     TZNFNI         = TZNFNI+TZNFNG
+
     DO  L=NU(NY,NX),LL
       IF(TZNFN2.GT.ZERO)THEN
         ZNFNI(L,NY,NX)=ZNFNI(L,NY,NX)*TZNFNI/TZNFN2
@@ -657,7 +415,7 @@ module TillageMixMod
 
 !--------------------------------------------------------------------------------
 
-  subroutine Mix2D(xdCorp,TI,FI,NU,LL,mass2d,XCORP0)
+  subroutine Mix2D(xdCorp,TI,FI,NU,LL,mass2d,XCORP0,name)
 
   implicit none
   real(r8), intent(in) :: xdCorp    !fraction of layer not mixed  
@@ -667,6 +425,7 @@ module TillageMixMod
 
   real(r8), dimension(:,:), intent(inout) :: mass2D
   real(r8), optional, intent(in) :: XCORP0
+  character(len=*), optional,intent(in) :: name
   real(r8)  :: tmass2DR(size(mass2D,1))
   real(r8)  :: tmass2D(size(mass2D,1))
   real(r8)  :: dCorp
@@ -674,6 +433,7 @@ module TillageMixMod
   integer :: sz,ii,L,L0,L1
   real(r8) :: TX,CORP0   !fraction of layer L not tilled  
 
+  if(present(name))print*,name
   sz=size(mass2D,1)
   L0=0
   if(present(XCORP0))then
