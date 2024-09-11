@@ -1126,9 +1126,9 @@ contains
 !
 !include NH3B
     DO ngas=idg_beg,idg_end
-      DiffusivitySolutEff=SoluteDifusvty_vrc(ngas,NU(NY,NX),NY,NX)*TORT1
-      trc_gsolc2=AZMAX1(trc_solml2_vr(ngas,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
-      trc_gsolc=(PARG(M,NY,NX)*AtmGasCgperm3(ngas,NY,NX)*GasSolbility_vr(ngas,NU(NY,NX),NY,NX) &
+      DiffusivitySolutEff = SoluteDifusvty_vrc(ngas,NU(NY,NX),NY,NX)*TORT1
+      trc_gsolc2          = AZMAX1(trc_solml2_vr(ngas,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
+      trc_gsolc           = (PARG(M,NY,NX)*AtmGasCgperm3(ngas,NY,NX)*GasSolbility_vr(ngas,NU(NY,NX),NY,NX) &
         +DiffusivitySolutEff*trc_gsolc2)/(DiffusivitySolutEff+PARG(M,NY,NX))
 !
 !     SURFACE VOLATILIZATION-DISSOLUTION FROM DIFFERENCES
@@ -1349,7 +1349,7 @@ contains
 !             :*ZN3*=NH3,*H2G*=H2
 !
   DFLG2=AZMAX1(THETPM(M,NU(NY,NX),NY,NX))*POROQ &
-    *THETPM(M,NU(NY,NX),NY,NX)/POROS(NU(NY,NX),NY,NX) &
+    *THETPM(M,NU(NY,NX),NY,NX)/POROS_vr(NU(NY,NX),NY,NX) &
     *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
 
   DO ngas=idg_beg,idg_NH3

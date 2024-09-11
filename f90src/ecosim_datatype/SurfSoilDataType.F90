@@ -18,7 +18,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  HeatNet2Surf_col(:,:)                  !total ground heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  VapXAir2GSurf_col(:,:)                 !negative of total evaporation at ground surface, [m3 d-2 t-1]
   real(r8),target,allocatable ::  VWatStoreCapSurf(:,:)                         !surface water storage capacity, [m3 d-2]
-  real(r8),target,allocatable ::  MaxVLWatByLitR(:,:)                         !soil surface water retention capacity
+  real(r8),target,allocatable ::  MaxVLWatByLitR_col(:,:)                         !soil surface water retention capacity
   real(r8),target,allocatable ::  VHCPNX(:,:)                        !minimum heat capacities
   real(r8),target,allocatable ::  PARG(:,:,:)                        !soil surface boundary layer conductance, [m t-1]
   real(r8),target,allocatable ::  Rain2SoilSurf_col(:,:)                         !precipitation flux into soil surface , [m3 d-2 h-1]
@@ -44,7 +44,7 @@ contains
   allocate(VapXAir2GSurf_col(JY,JX));          VapXAir2GSurf_col=0._r8
   allocate(FracSurfBareSoil_col(JY,JX));      FracSurfBareSoil_col=0._r8
   allocate(VWatStoreCapSurf(JY,JX));       VWatStoreCapSurf=0._r8
-  allocate(MaxVLWatByLitR(JY,JX));       MaxVLWatByLitR=0._r8
+  allocate(MaxVLWatByLitR_col(JY,JX));       MaxVLWatByLitR_col=0._r8
   allocate(VHCPNX(JY,JX));      VHCPNX=0._r8
   allocate(PARG(60,JY,JX));     PARG=0._r8
   allocate(Rain2SoilSurf_col(JY,JX));       Rain2SoilSurf_col=0._r8
@@ -70,7 +70,7 @@ contains
   call destroy(VapXAir2GSurf_col)
   call destroy(FracSurfBareSoil_col)
   call destroy(VWatStoreCapSurf)
-  call destroy(MaxVLWatByLitR)
+  call destroy(MaxVLWatByLitR_col)
   call destroy(VHCPNX)
   call destroy(PARG)
   call destroy(Rain2SoilSurf_col)

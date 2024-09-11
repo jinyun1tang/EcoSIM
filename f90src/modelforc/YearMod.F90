@@ -12,7 +12,6 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XCORP
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -52,6 +51,7 @@
 
       IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
         !to be revised for GDD 
+        QdewCanopy_CumYr_pft(:,NY,NX)     = 0._r8
         GDD_col(NY,NX)                    = 0._r8
         AmendCFlx_CumYr_col(NY,NX)        = 0._r8
         LiterfalOrgM_col(:,NY,NX)         = 0._r8

@@ -115,7 +115,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepth2LayerBottom(NU(NY,NX),NY,NX)) !topsoil layer depth
+      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -175,7 +175,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS_vr(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
@@ -321,8 +321,8 @@ module StartsMod
       else
         VHeatCapacity_vr(0,NY,NX)=0._r8
       endif
-      VHeatCapacitySoilM(0,NY,NX)=0.0_r8
-      VLMicPt0_col(0,NY,NX)=0.0_r8      
+      VHeatCapacitySoilM_vr(0,NY,NX) = 0.0_r8
+      VLMicPt0_col(0,NY,NX)       = 0.0_r8
     ENDDO
   ENDDO
   end subroutine InitSoilVars
@@ -406,7 +406,7 @@ module StartsMod
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
     !
-    PSISE(L,NY,NX)                 = PSIPS
+    PSISE_vr(L,NY,NX)                 = PSIPS
     PSISoilAirEntry(L,NY,NX)       = -1.5E-03_r8
     RO2GasXchangePrev_vr(L,NY,NX)  = 0.0_r8
     RCO2GasFlxPrev_vr(L,NY,NX)     = 0.0_r8
@@ -419,14 +419,14 @@ module StartsMod
         !it is a soil layer
         !compute particle density
         PTDS           = ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS(L,NY,NX) = 1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/PTDS)
+        POROS_vr(L,NY,NX) = 1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/PTDS)
       ELSE
         !for ponding water
         PTDS           = 0.0_r8
-        POROS(L,NY,NX) = 1.0_r8
+        POROS_vr(L,NY,NX) = 1.0_r8
       ENDIF
-      POROSI(L,NY,NX)       = POROS(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-      VLMicP_vr(L,NY,NX)    = POROS(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+      POROSI_vr(L,NY,NX)       = POROS_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      VLMicP_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       VLMicPt0_col(L,NY,NX) = VLMicP_vr(L,NY,NX)
       VLMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayert0_vr(L,NY,NX)
       !
@@ -447,10 +447,10 @@ module StartsMod
         VORGC=CORGCM*ppmc*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
-        VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
+        VHeatCapacitySoilM_vr(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP_vr(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer_vr(L,NY,NX)
       ELSE
-        VHeatCapacitySoilM(L,NY,NX)=0.0_r8
+        VHeatCapacitySoilM_vr(L,NY,NX)=0.0_r8
       ENDIF
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
@@ -458,22 +458,22 @@ module StartsMod
       IF(ISOIL(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_set)THEN
       ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0_r8)THEN
-          THETW_vr(L,NY,NX)=POROS(L,NY,NX)
+          THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         ELSEIF(isclose(THW(L,NY,NX),1.0_r8))THEN
-          THETW_vr(L,NY,NX)=FieldCapacity(L,NY,NX)
+          THETW_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)
         ELSEIF(isclose(THW(L,NY,NX),0.0_r8))THEN
-          THETW_vr(L,NY,NX)=WiltPoint(L,NY,NX)
+          THETW_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)
         ELSEIF(THW(L,NY,NX).LT.0.0)THEN
           THETW_vr(L,NY,NX)=0.0_r8
         ELSE
           THETW_vr(L,NY,NX)=THW(L,NY,NX)
         ENDIF
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
-          THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
-          THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
-          THETI_col(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI_col(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
           THETI_col(L,NY,NX)=0.0_r8
         ELSE
@@ -487,23 +487,24 @@ module StartsMod
 !       total air-filled porosity, micropores + macropores
         VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
           +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
-        VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
+        VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
           +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
         ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
         ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
       ENDIF
     ENDIF
-    TKS_vr(L,NY,NX)=ATKS(NY,NX)
-    TCS(L,NY,NX)=ATCS(NY,NX)
+    TKS_vr(L,NY,NX) = ATKS(NY,NX)
+    TCS(L,NY,NX)    = ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
     !
   ENDDO D1200
-!  stop
+
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
 
-  POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
+  POROSI_vr(0,NY,NX)=1._r8  !this is added for numerical fixing
+
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
@@ -763,7 +764,7 @@ module StartsMod
   IFNHB(:,:)           = 0
   IFNOB(:,:)           = 0
   IFPOB(:,:)           = 0
-  IFLGS(:,:)           = 1
+  iResetSoilProf_col(:,:)           = itrue
   NumActivePlants(:,:) = 0
   ATCA(:,:)            = ATCAI(:,:)
   ATCS(:,:)            = ATCAI(:,:)
@@ -838,10 +839,10 @@ module StartsMod
   integer :: L
 
   DO  L=0,NL(NY,NX)
-    DLYRI(1,L,NY,NX)=DH(NY,NX)        !east-west direction
-    DLYRI(2,L,NY,NX)=DV(NY,NX)        !north-south direction
-    DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
-    DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
+    DLYRI_3D(1,L,NY,NX)=DH(NY,NX)        !east-west direction
+    DLYRI_3D(2,L,NY,NX)=DV(NY,NX)        !north-south direction
+    DLYR(1,L,NY,NX)=DLYRI_3D(1,L,NY,NX)
+    DLYR(2,L,NY,NX)=DLYRI_3D(2,L,NY,NX)
     AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)  !grid horizontal area
   ENDDO
   end subroutine InitHGrid
@@ -889,8 +890,8 @@ module StartsMod
       VGeomLayert0_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)
       SoilMicPMassLayer(L,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
-      DLYRI(3,L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)  
-      DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
+      DLYRI_3D(3,L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)  
+      DLYR(3,L,NY,NX)=DLYRI_3D(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
 !     DPTH=depth of layer middle
@@ -901,12 +902,12 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
-      DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
-      call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
+      DLYRI_3D(3,L,NY,NX)=(CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(L-1,NY,NX))
+      call check_bool(DLYRI_3D(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
-      DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-      SoiDepthMidLay(L,NY,NX)      = 0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
-      CumSoilThickness_vr(L,NY,NX) = CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
+      DLYR(3,L,NY,NX)=DLYRI_3D(3,L,NY,NX)
+      SoiDepthMidLay_vr(L,NY,NX)   = 0.5_r8*(CumDepz2LayerBot_vr(L,NY,NX)+CumDepz2LayerBot_vr(L-1,NY,NX))
+      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AMAX1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
@@ -920,8 +921,8 @@ module StartsMod
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
   ENDDO
-  CumDepth2LayerBottom(0,NY,NX) = CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-  CumSoilDeptht0(NY,NX)         = CumDepth2LayerBottom(0,NY,NX)
+  CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
+  CumSoilDeptht0(NY,NX)         = CumDepz2LayerBot_vr(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
   end associate
   end subroutine InitLayerDepths
@@ -1011,7 +1012,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepth2LayerBottom(NU(NY,NX),NY,NX)) !topsoil layer depth
+      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -1074,7 +1075,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth(NY,NX) = AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)            = ATCS(NY,NX)
       TKS_vr(0,NY,NX)         = ATKS(NY,NX)
       TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG

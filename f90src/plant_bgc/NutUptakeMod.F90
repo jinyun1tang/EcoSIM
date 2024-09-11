@@ -636,8 +636,9 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmNH4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NH4,N,L,NZ),&
-      RootCUlmNutUptake_pvr(ids_NH4,N,L,NZ),RootNutUptake_pvr(ids_NH4,N,L,NZ))
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndSoil_pvr(N,L,NZ),&
+      RootOUlmNutUptake_pvr(ids_NH4,N,L,NZ),RootCUlmNutUptake_pvr(ids_NH4,N,L,NZ),&
+      RootNutUptake_pvr(ids_NH4,N,L,NZ))
 
   ENDIF
 !
@@ -698,8 +699,9 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmNH4Root_pft(N,NZ)
 
-    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NH4B,N,L,NZ),&
-      RootCUlmNutUptake_pvr(ids_NH4B,N,L,NZ),RootNutUptake_pvr(ids_NH4B,N,L,NZ))
+    call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndBand_pvr(N,L,NZ),&
+      RootOUlmNutUptake_pvr(ids_NH4B,N,L,NZ),RootCUlmNutUptake_pvr(ids_NH4B,N,L,NZ),&
+      RootNutUptake_pvr(ids_NH4B,N,L,NZ))
 
   ENDIF
   end associate

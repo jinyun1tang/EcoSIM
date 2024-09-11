@@ -308,48 +308,48 @@ implicit none
   idx_end=0
 
   !cations
-  idx_CEC=addone(idx_end)    ! XCEC,  cation exchange capacity, [mol d-2]
-  idx_NH4=addone(idx_end)    ! XN4, exchangeable NH4 non-band, [mol d-2], X-NH4
-  idx_Hp =addone(idx_end)    ! XHY, exchangeable H , [mol d-2], X-H
-  idx_Al =addone(idx_end)    ! XAL, exchangeable Al, [mol d-2], X-Al
-  idx_Fe =addone(idx_end)    ! XFE, exchangeable Fe, [mol d-2], X-Fe
-  idx_Ca =addone(idx_end)    ! XCA, exchangeable Ca, [mol d-2], X-Ca
-  idx_Mg =addone(idx_end)    ! XMG, exchangeable Mg , [mol d-2], X-Mg
-  idx_Na =addone(idx_end)    ! XNA, exchangeable Na, [mol d-2], X-Na
-  idx_K  =addone(idx_end)    ! XKA, exchangeable K, [mol d-2], X-K
-  idx_COOH  =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2], X-COOH
-  idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2], X-Al(OH)2  
-  idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2], X-Fe(OH)2
+  idx_CEC   = addone(idx_end)    ! XCEC, cation exchange capacity,  [mol d-2]
+  idx_NH4   = addone(idx_end)    ! XN4,  exchangeable NH4 non-band, [mol d-2], X-NH4
+  idx_Hp    = addone(idx_end)    ! XHY,  exchangeable H,            [mol d-2], X-H
+  idx_Al    = addone(idx_end)    ! XAL,  exchangeable Al,           [mol d-2], X-Al
+  idx_Fe    = addone(idx_end)    ! XFE,  exchangeable Fe,           [mol d-2], X-Fe
+  idx_Ca    = addone(idx_end)    ! XCA,  exchangeable Ca,           [mol d-2], X-Ca
+  idx_Mg    = addone(idx_end)    ! XMG,  exchangeable Mg,           [mol d-2], X-Mg
+  idx_Na    = addone(idx_end)    ! XNA,  exchangeable Na,           [mol d-2], X-Na
+  idx_K     = addone(idx_end)    ! XKA,  exchangeable K,            [mol d-2], X-K
+  idx_COOH  = addone(idx_end)  ! XHC,    exchangeable COOH,         [mol d-2], X-COOH
+  idx_AlOH2 = addone(idx_end) ! XALO2,   exchangeable AlOH2,        [mol d-2], X-Al(OH)2
+  idx_FeOH2 = addone(idx_end) ! XFEO2,   exchangeable Fe(OH)2,      [mol d-2], X-Fe(OH)2
 
-  idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
-  idx_cation_end=idx_NH4B
-  idx_cation_soil_end=idx_FeOH2
+  idx_NH4B            = addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
+  idx_cation_end      = idx_NH4B
+  idx_cation_soil_end = idx_FeOH2
 
   !anions
-  idx_AEC =addone(idx_end)   ! XAEC, anion exchange capacity, [mol d-2]
-  idx_OHe =addone(idx_end)   ! XOH0, exchangeable OH- non-band, [mol d-2], X-O(-)
-  idx_OH  =addone(idx_end)   ! XOH1, exchangeable OH  non-band, [mol d-2], X-OH
-  idx_OHp =addone(idx_end)   ! XOH2, exchangeable OH2  non-band, [mol d-2], X-OH2(+)
-  idx_HPO4 =addone(idx_end)  ! XH1P, exchangeable HPO4  non-band, [mol d-2],X-HPO4(-)
-  idx_H2PO4 =addone(idx_end) ! XH2P, exchangeable H2PO4  non-band, [mol d-2],X-H2PO4
+  idx_AEC   = addone(idx_end)   ! XAEC, anion exchange capacity,      [mol d-2]
+  idx_OHe   = addone(idx_end)   ! XOH0, exchangeable OH- non-band,    [mol d-2], X-O(-)
+  idx_OH    = addone(idx_end)   ! XOH1, exchangeable OH  non-band,    [mol d-2], X-OH
+  idx_OHp   = addone(idx_end)   ! XOH2, exchangeable OH2  non-band,   [mol d-2], X-OH2(+)
+  idx_HPO4  = addone(idx_end)  ! XH1P,  exchangeable HPO4  non-band,  [mol d-2], X-HPO4(-)
+  idx_H2PO4 = addone(idx_end) ! XH2P,   exchangeable H2PO4  non-band, [mol d-2], X-H2PO4
 
-  idx_OHeB  =addone(idx_end) ! XOH0B, exchangeable OH- band, [mol d-2],
-  idx_OHB  =addone(idx_end)  ! XOH1B, exchangeable OH  band, [mol d-2]
-  idx_OHpB  =addone(idx_end) ! XOH2B, exchangeable OH2  band, [mol d-2]
-  idx_HPO4B =addone(idx_end) ! XH1PB, exchangeable HPO4  band, [mol d-2]
-  idx_H2PO4B =addone(idx_end)! XH2PB, exchangeable H2PO4  band, [mol d-2]
-  idx_end=idx_H2PO4B
-  idx_anion_soil_end=idx_H2PO4
+  idx_OHeB           = addone(idx_end) ! XOH0B,  exchangeable OH- band,    [mol d-2],
+  idx_OHB            = addone(idx_end)  ! XOH1B, exchangeable OH  band,    [mol d-2]
+  idx_OHpB           = addone(idx_end) ! XOH2B,  exchangeable OH2  band,   [mol d-2]
+  idx_HPO4B          = addone(idx_end) ! XH1PB,  exchangeable HPO4  band,  [mol d-2]
+  idx_H2PO4B         = addone(idx_end)! XH2PB,   exchangeable H2PO4  band, [mol d-2]
+  idx_end            = idx_H2PO4B
+  idx_anion_soil_end = idx_H2PO4
 
-  trc_confs%NGasTracers=idg_end-idg_beg
-  trc_confs%NSolutTracers=ids_end-ids_beg+1
-  if(lsalt_model)trc_confs%NSaltTracers=idsaltb_end-idsalt_beg+1
-  trc_confs%NPrecipTracers=idsp_end-idsp_beg+1
-  trc_confs%nxtracers=idx_end-idx_beg+1
-  trc_confs%NnutrientTracers=ids_nuts_end-ids_nut_beg+1
-  trc_confs%NFertNitro    = ifertn_end-ifertn_beg+1
-  trc_confs%NFertNitrob   = ifertnb_end-ifertnb_beg+1
-  trc_confs%NDOMS         = idom_end-idom_beg+1
+   trc_confs%NGasTracers              = idg_end-idg_beg
+   trc_confs%NSolutTracers            = ids_end-ids_beg+1
+   if(lsalt_model)trc_confs%NSaltTracers = idsaltb_end-idsalt_beg+1
+   trc_confs%NPrecipTracers           = idsp_end-idsp_beg+1
+   trc_confs%nxtracers                = idx_end-idx_beg+1
+   trc_confs%NnutrientTracers         = ids_nuts_end-ids_nut_beg+1
+   trc_confs%NFertNitro               = ifertn_end-ifertn_beg+1
+   trc_confs%NFertNitrob              = ifertnb_end-ifertnb_beg+1
+   trc_confs%NDOMS                    = idom_end-idom_beg+1
 
   return
   write(104,*)'ids_beg=',ids_beg,'ids_end=',ids_end

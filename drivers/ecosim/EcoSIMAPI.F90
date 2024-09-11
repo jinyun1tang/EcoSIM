@@ -9,8 +9,8 @@ module EcoSIMAPI
   use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TranspNoSaltMod , only : TranspNoSalt
   use TranspSaltMod   , only : TranspSalt
-  use SoilBGCDataType , only : trc_soHml_vr
-  use TracerIDMod     , only : ids_NO2B,ids_NO2
+  use SoilBGCDataType , only : trc_soHml_vr,trc_solml_vr
+  use TracerIDMod     , only : ids_NO2B,ids_NO2,idg_O2
   use EcoSIMCtrlMod  
   use WatsubMod    , only : watsub
 implicit none
@@ -42,12 +42,14 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
+
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('NIT',t1)
   endif
+
   !
   !   UPDATE PLANT biogeochemistry
   !
@@ -55,6 +57,7 @@ contains
   if(plant_model)then
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
   endif
+
   !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
@@ -65,6 +68,7 @@ contains
     CALL soluteModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('SOL',t1)
   endif
+
   !
   !   CALCULATE GAS AND SOLUTE FLUXES IN 'TranspNoSalt'
   !
@@ -72,6 +76,7 @@ contains
   call start_timer(t1)
   CALL TranspNoSalt(I,J,NHW,NHE,NVN,NVS)
   call end_timer('TRN',t1)
+
   !
   !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
   !
@@ -137,7 +142,7 @@ contains
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
-    NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
+    NPXS,NPYS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
@@ -159,7 +164,7 @@ contains
   continue_run=.false.
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
   NPYS=20   !number of cycles per NPX for gas flux calculations
-  JOUTS=1   !frequency on hourly scale
+  
   NCYC_LITR=20
   NCYC_SNOW=20
   grid_mode=3
@@ -179,7 +184,8 @@ contains
   brnch_retain_casename=.false.
   hist_yrclose=.false.
 
-  forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)
+  forc_periods=0
+  forc_periods(1:9)=(/1980,1980,1,1981,1988,2,1989,2008,1/)
 
   num_of_simdays=-1
   do_year=-1
@@ -394,7 +400,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       call etimer%update_time_stamp()
 
       nlend=etimer%its_time_to_exit()
-      rstwr=etimer%its_time_to_write_restart()
+      rstwr=etimer%its_time_to_write_restart(nlend)
       lnyr=etimer%its_a_new_year()
 
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
