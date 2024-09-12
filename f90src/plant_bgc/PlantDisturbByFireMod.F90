@@ -246,9 +246,9 @@ contains
 !------------------------------------------------------------------------------------------
   subroutine ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
     StandeadElmntRemoval,NonstructElmntRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
-    NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
+    FineNonleafElmntRemoval,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
-    StandeadElmntOffEcosystem,LeafElmnt2Litr,FineNonleafElmnt2Litr,FineNonleafElmntRemoval,&
+    StandeadElmntOffEcosystem,LeafElmnt2Litr,FineNonleafElmnt2Litr,&
     WoodyElmnt2Litr,StandeadElmnt2Litr)
   implicit none
   integer, intent(in) :: I,J
@@ -258,6 +258,7 @@ contains
   real(r8), intent(in) :: NonstructElmntRemoval(NumPlantChemElms)
   real(r8), intent(in) :: LeafElmntRemoval(NumPlantChemElms)
   real(r8), intent(in) :: WoodyElmntRemoval(NumPlantChemElms)
+  real(r8), intent(in) :: FineNonleafElmntRemoval(NumPlantChemElms)  
   real(r8), intent(out) :: NonstructElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: NonstructElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(out) :: LeafElmntOffEcosystem(NumPlantChemElms)
@@ -266,7 +267,6 @@ contains
   real(r8), intent(out) :: StandeadElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(out) :: LeafElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: FineNonleafElmnt2Litr(NumPlantChemElms)
-  real(r8), intent(out) :: FineNonleafElmntRemoval(NumPlantChemElms)
   real(r8), intent(out) :: WoodyElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: StandeadElmnt2Litr(NumPlantChemElms)
 

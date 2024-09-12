@@ -132,17 +132,17 @@ module PlantDisturbsMod
     ShootC4NonstC_brch  => plt_biom%ShootC4NonstC_brch   &
   )
 !  write(102,*)'iHarvstType_pft',I,iHarvstType_pft(NZ),plt_distb%jHarvst_pft(NZ),NZ
-  NonstructElmntRemoval(1:NumPlantChemElms)=0._r8
-  LeafElmntRemoval(1:NumPlantChemElms)=0._r8
-  FineNonleafElmntRemoval(1:NumPlantChemElms)=0._r8
-  WoodyElmntRemoval(1:NumPlantChemElms)=0._r8
-  LeafElmnt2Litr(1:NumPlantChemElms)=0._r8
-  FineNonleafElmnt2Litr(1:NumPlantChemElms)=0._r8
-  WoodyElmnt2Litr(1:NumPlantChemElms)=0._r8
-  StandeadElmnt2Litr(1:NumPlantChemElms)=0._r8
-  LeafElmntHarv2Litr(1:NumPlantChemElms)=0._r8
-  PetioleElmntHarv2Litr(1:NumPlantChemElms)=0._r8
-  WoodyElmntHarv2Litr(1:NumPlantChemElms)=0._r8
+  NonstructElmntRemoval(1:NumPlantChemElms)   = 0._r8
+  LeafElmntRemoval(1:NumPlantChemElms)        = 0._r8
+  FineNonleafElmntRemoval(1:NumPlantChemElms) = 0._r8
+  WoodyElmntRemoval(1:NumPlantChemElms)       = 0._r8
+  LeafElmnt2Litr(1:NumPlantChemElms)          = 0._r8
+  FineNonleafElmnt2Litr(1:NumPlantChemElms)   = 0._r8
+  WoodyElmnt2Litr(1:NumPlantChemElms)         = 0._r8
+  StandeadElmnt2Litr(1:NumPlantChemElms)      = 0._r8
+  LeafElmntHarv2Litr(1:NumPlantChemElms)      = 0._r8
+  PetioleElmntHarv2Litr(1:NumPlantChemElms)   = 0._r8
+  WoodyElmntHarv2Litr(1:NumPlantChemElms)     = 0._r8
 
   WTHTGE(1:NumPlantChemElms)=0._r8
 !     ENDIF
@@ -186,12 +186,12 @@ module PlantDisturbsMod
   real(r8) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8) :: HarvestElmnt2Litr(NumPlantChemElms)
 
-  NonstructElmntOffEcosystem(1:NumPlantChemElms)=0._r8
-  LeafElmntOffEcosystem(1:NumPlantChemElms)=0._r8
-  FineNonleafElmOffEcosystem(1:NumPlantChemElms)=0._r8
-  WoodyElmntOffEcosystem(1:NumPlantChemElms)=0._r8
-  StandeadElmntOffEcosystem(1:NumPlantChemElms)=0._r8
-  NonstructElmnt2Litr(1:NumPlantChemElms)=0._r8
+  NonstructElmntOffEcosystem(1:NumPlantChemElms) = 0._r8
+  LeafElmntOffEcosystem(1:NumPlantChemElms)      = 0._r8
+  FineNonleafElmOffEcosystem(1:NumPlantChemElms) = 0._r8
+  WoodyElmntOffEcosystem(1:NumPlantChemElms)     = 0._r8
+  StandeadElmntOffEcosystem(1:NumPlantChemElms)  = 0._r8
+  NonstructElmnt2Litr(1:NumPlantChemElms)        = 0._r8
 
   call ApplyDisturbanceBiomRemoval(I,J,NZ,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
@@ -322,7 +322,7 @@ module PlantDisturbsMod
     jHarvst_pft             => plt_distb%jHarvst_pft,             &
     SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft,    &
     EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft, &
-    EcoHavstElmnt_CumYr_col       => plt_distb%EcoHavstElmnt_CumYr_col,       &
+    EcoHavstElmnt_CumYr_col => plt_distb%EcoHavstElmnt_CumYr_col, &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft,            &
     Eco_NBP_CumYr_col       => plt_bgcr%Eco_NBP_CumYr_col         &
   )
@@ -419,11 +419,11 @@ module PlantDisturbsMod
 
   IF(iHarvstType_pft(NZ).EQ.iharvtyp_none)THEN
     DO NE=1,NumPlantChemElms
-      NonstructElmnt2Litr(NE)=NonstructElmntRemoval(NE)*EHVST21    !non-structural
-      LeafElmnt2Litr(NE)=LeafElmntRemoval(NE)*EHVST21   !leaf
-      FineNonleafElmnt2Litr(NE)=FineNonleafElmntRemoval(NE)*EHVST22   !fine, non-woody
-      WoodyElmnt2Litr(NE)=WoodyElmntRemoval(NE)*EHVST23   !woody
-      StandeadElmnt2Litr(NE)=StandeadElmntRemoval(NE)*EHVST24   !standing dead
+      NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)*EHVST21    !non-structural
+      LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)*EHVST21   !leaf
+      FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)*EHVST22   !fine, non-woody
+      WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*EHVST23   !woody
+      StandeadElmnt2Litr(NE)    = StandeadElmntRemoval(NE)*EHVST24   !standing dead
     ENDDO
 !
 !     IF ONLY GRAIN C,N,P REMOVED AT HARVEST
@@ -479,9 +479,9 @@ module PlantDisturbsMod
 
     call ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
       StandeadElmntRemoval,NonstructElmntRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
-      NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
+      FineNonleafElmntRemoval,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
       LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
-      StandeadElmntOffEcosystem,LeafElmnt2Litr,FineNonleafElmnt2Litr,FineNonleafElmntRemoval,&
+      StandeadElmntOffEcosystem,LeafElmnt2Litr,FineNonleafElmnt2Litr,&
       WoodyElmnt2Litr,StandeadElmnt2Litr)
 
   ENDIF

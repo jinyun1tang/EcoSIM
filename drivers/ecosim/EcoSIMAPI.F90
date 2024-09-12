@@ -20,6 +20,7 @@ implicit none
   public :: soil
   public :: readnamelist
   public :: regressiontest,write_modelconfig
+  logical :: do_timing
 contains
 
   subroutine Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
@@ -29,25 +30,25 @@ contains
   real(r8) :: t1
 
   if(lverb)WRITE(*,334)'HOUR1'
-  call start_timer(t1)
+  if(do_timing)call start_timer(t1)
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('HOUR1',t1)
+  if(do_timing)call end_timer('HOUR1',t1)
   !
   !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
   !
   if(lverb)WRITE(*,334)'WAT'
-  call start_timer(t1)
+  if(do_timing)call start_timer(t1)
   CALL WATSUB(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('WAT',t1)
+  if(do_timing)call end_timer('WAT',t1)
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
 
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
-    call start_timer(t1)
+    if(do_timing)call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('NIT',t1)
+    if(do_timing)call end_timer('NIT',t1)
   endif
 
   !
@@ -55,7 +56,9 @@ contains
   !
   if(lverb)WRITE(*,334)'PlantModel'
   if(plant_model)then
+    if(do_timing)call start_timer(t1)  
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
+    if(do_timing)call end_timer('PlantModel',t1)    
   endif
 
   !
@@ -64,18 +67,18 @@ contains
   !
   if(soichem_model)then
     if(lverb)WRITE(*,334)'SOL'
-    call start_timer(t1)
+    if(do_timing)call start_timer(t1)
     CALL soluteModel(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('SOL',t1)
+    if(do_timing)call end_timer('soluteModel',t1)
   endif
 
   !
   !   CALCULATE GAS AND SOLUTE FLUXES IN 'TranspNoSalt'
   !
   if(lverb)WRITE(*,334)'TRN'
-  call start_timer(t1)
+  if(do_timing)call start_timer(t1)
   CALL TranspNoSalt(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('TRN',t1)
+  if(do_timing)call end_timer('TranspNoSalt',t1)
 
   !
   !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
@@ -83,9 +86,9 @@ contains
   if(lverb)WRITE(*,334)'TRNS'
 
   if(salt_model)then
-    call start_timer(t1)
+    if(do_timing)call start_timer(t1)
     CALL TranspSalt(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('TranspSalt',t1)
+    if(do_timing)call end_timer('TranspSalt',t1)
   endif
 
   !
@@ -93,18 +96,18 @@ contains
   !
   if(lverb)WRITE(*,334)'EROSION'
 
-  call start_timer(t1)
+  if(do_timing)call start_timer(t1)
   CALL EROSION(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('EROSION',t1)
+  if(do_timing)call end_timer('EROSION',t1)
   !
   !   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
   if(lverb)WRITE(*,334)'REDIST'
 
-  call start_timer(t1)    
+  if(do_timing)call start_timer(t1)    
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('RED',t1)
+  if(do_timing)call end_timer('REDIST',t1)
   
 334   FORMAT(A8)
 
@@ -149,7 +152,7 @@ contains
     atm_co2_fix,first_topou,first_pft
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date
+    do_budgets,ref_date,start_date,do_timing
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -160,7 +163,7 @@ contains
   integer :: rc, fu
   integer :: nml_error
   integer :: year0
-
+  do_timing=.false.
   continue_run=.false.
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
   NPYS=20   !number of cycles per NPX for gas flux calculations
@@ -308,7 +311,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
   is_first_year=frectyp%yearacc.EQ.0
 
-  call init_timer(outdir)
+  if(do_timing)call init_timer(outdir)
 
   if(lverb)WRITE(*,333)'READS: read climate forcing'
   CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
@@ -383,14 +386,14 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     !   UPDATE HOURLY VARIABLES IN 'HOUR1'
     !   set up climate forcing for the new hour
       if(lverb)WRITE(*,333)'WTHR'
-      call start_timer(t1)
+      if(do_timing)call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
-      call end_timer('WTHR',t1)
+      if(do_timing)call end_timer('WTHR',t1)
 
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   
-      call end_timer_loop()
+      if(do_timing)call end_timer_loop()
       
       if(lverb)write(*,*)'hist_update'
       call hist_ecosim%hist_update(I,J,bounds)

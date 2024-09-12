@@ -149,10 +149,10 @@ contains
 !                             end (NHE,NVS)
 
   implicit none
-  integer, intent(out) :: NHW   !upper corner x index
-  integer, intent(out) :: NVN   !upper corner y index
-  integer, intent(out) :: NHE   !lower corner x index
-  integer, intent(out) :: NVS   !lower corner y index
+  integer, intent(in) :: NHW   !upper corner x index
+  integer, intent(in) :: NVN   !upper corner y index
+  integer, intent(in) :: NHE   !lower corner x index
+  integer, intent(in) :: NVS   !lower corner y index
   integer :: nextra_grid
   INTEGER :: NZ,NY,NX,ic,ip
   type(file_desc_t) :: grid_nfid
