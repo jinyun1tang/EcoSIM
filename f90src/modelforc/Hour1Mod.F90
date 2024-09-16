@@ -1,8 +1,15 @@
 module Hour1Mod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
-  use minimathmod  , only : isclose,AZMAX1,AZMIN1
-  use abortutils   , only : endrun, print_info
+  use data_kind_mod,  only: r8 => DAT_KIND_R8
+  use data_const_mod, only: GravAcceleration=>DAT_CONST_G
+  use minimathmod,    only: isclose, AZMAX1, AZMIN1
+  use abortutils,     only: endrun,  print_info
+  use fileUtil,       only: iulog
+  use PlantMod,       only: PlantCanopyRadsModel
+  use EcoSIMConfig, only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
+  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
+  use EcoSIMConfig, only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
+  use EcoSiMParDataMod, only : micpar,pltpar
+  use SoilBGCNLayMod, only : sumORGMLayL
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -10,7 +17,6 @@ module Hour1Mod
   use EcoSIMCtrlMod
   use MiniFuncMod
   use SoilHydroParaMod
-  use PlantMod, only : PlantCanopyRadsModel
   use MicrobialDataType
   use SOMDataType
   use ChemTranspDataType
@@ -42,10 +48,6 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
-  use EcoSIMConfig, only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
-  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
-  use EcoSiMParDataMod, only : micpar,pltpar
-  use SoilBGCNLayMod, only : sumORGMLayL
   implicit none
 
   private
@@ -155,6 +157,7 @@ module Hour1Mod
   call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS)
   if(lverb)write(*,*)'SetSurfaceProp4SedErosion'
   call SetSurfaceProp4SedErosion(NHW,NHE,NVN,NVS)
+  
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -165,7 +168,7 @@ module Hour1Mod
 
 
 !
-!     'RESET HOURLY ACCUMULATORS'
+      if(lverb)write(*,*)'RESET HOURLY ACCUMULATORS'
       call SetHourlyAccumulators(NY,NX)
 !
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
@@ -206,26 +209,24 @@ module Hour1Mod
 !
       call PlantCanopyRadsModel(I,J,NY,NX,DPTH0(NY,NX))
 !
-!     RESET HOURLY INDICATORS
+      if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
-      LWRadCanGPrev(NY,NX)=LWRadCanG(NY,NX)
-      LWRadGrnd(NY,NX)=LWRadBySurf_col(NY,NX)
-      NetCO2Flx2Canopy_col(NY,NX)=Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      LWRadCanG(NY,NX)=0.0_r8
-      LWRadBySurf_col(NY,NX)=0.0_r8
-      TLEX(NY,NX)=Canopy_Heat_Latent_col(NY,NX)
-      TSHX(NY,NX)=Canopy_Heat_Sens_col(NY,NX)
-      Canopy_Heat_Latent_col(NY,NX)=0.0_r8
-      Canopy_Heat_Sens_col(NY,NX)=0.0_r8
-      Eco_NetRad_col(NY,NX)=0.0_r8
-      Eco_Heat_Latent_col(NY,NX)=0.0_r8
-      Eco_Heat_Sens_col(NY,NX)=0.0_r8
-      Eco_Heat_Grnd_col(NY,NX)=0.0_r8
-      Canopy_NEE_col(NY,NX)=0.0_r8
-      Eco_NEE_col(NY,NX)=0.0_r8
-      ECO_ER_col(NY,NX)=0.0_r8
-
-      CALL CanopyInterceptPrecp(NY,NX)
+      LWRadCanGPrev(NY,NX)          = LWRadCanG(NY,NX)
+      LWRadGrnd(NY,NX)              = LWRadBySurf_col(NY,NX)
+      NetCO2Flx2Canopy_col(NY,NX)   = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      LWRadCanG(NY,NX)              = 0.0_r8
+      LWRadBySurf_col(NY,NX)        = 0.0_r8
+      TLEX(NY,NX)                   = Canopy_Heat_Latent_col(NY,NX)
+      TSHX(NY,NX)                   = Canopy_Heat_Sens_col(NY,NX)
+      Canopy_Heat_Latent_col(NY,NX) = 0.0_r8
+      Canopy_Heat_Sens_col(NY,NX)   = 0.0_r8
+      Eco_NetRad_col(NY,NX)         = 0.0_r8
+      Eco_Heat_Latent_col(NY,NX)    = 0.0_r8
+      Eco_Heat_Sens_col(NY,NX)      = 0.0_r8
+      Eco_Heat_Grnd_col(NY,NX)      = 0.0_r8
+      Canopy_NEE_col(NY,NX)         = 0.0_r8
+      Eco_NEE_col(NY,NX)            = 0.0_r8
+      ECO_ER_col(NY,NX)             = 0.0_r8
 
       DO  NZ=1,NP(NY,NX)
 !
@@ -240,6 +241,10 @@ module Hour1Mod
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU(NY,NX))
         ENDDO
       ENDDO
+
+      if(lverb)write(*,*)'CanopyInterceptPrecp'
+      CALL CanopyInterceptPrecp(NY,NX)
+
 !
 !     WRITE SW AND PAR ALBEDO
 
@@ -1530,14 +1535,16 @@ module Hour1Mod
   D8990: DO NX=NHW,NHE
     D8995: DO NY=NVN,NVS
       IF(J.EQ.INT(SolarNoonHour_col(NY,NX)))THEN
-
+        if(lverb)write(iulog,*)'ApplyMineralFertilizer'
         call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
 !
 !     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
 !
+       if(lverb)write(iulog,*) 'ApplyManure'
         call ApplyManure(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
 !
 !     FERTILIZER UREA, NITRIFICATION INHIBITORS
+        if(lverb)write(iulog,*)'ApplyUreaNitrifierInhibitor'
         call ApplyUreaNitrifierInhibitor(I,J,NY,NX,LFDPTH)
 
       ENDIF

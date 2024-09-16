@@ -624,7 +624,6 @@ implicit none
 
   type, public :: plant_bgcrate_type
   real(r8) :: Eco_NBP_CumYr_col      !total NBP, [g d-2]
-  real(r8) :: Eco_GPP_CumYr_col      !ecosystem GPP, [g d-2 h-1]
 
   real(r8) :: NetCO2Flx2Canopy_col     !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8) :: ECO_ER_col      !ecosystem respiration, [g d-2 h-1]

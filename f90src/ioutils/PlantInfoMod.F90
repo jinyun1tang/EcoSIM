@@ -644,7 +644,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Growth pattern',strval,40)
+  call writefixsl(nu_plt,'Growth pattern IDTYP',strval,40)
 
   select case (iPlantNfixType_pft(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
@@ -668,17 +668,17 @@ implicit none
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
-    strval='Evergreen'
+    write(strval,'(A,X,I3)')'Evergreen',iPlantPhenolType_pft(NZ,NY,NX)
   case (iphenotyp_coldecid)
-    strval='Cold deciduous'
+    write(strval,'(A,X,I3)')'Cold deciduous',iPlantPhenolType_pft(NZ,NY,NX)
   case (iphenotyp_drouhtdecidu)
-    strval='Drought deciduous'
+    write(strval,'(A,X,I3)')'Drought deciduous',iPlantPhenolType_pft(NZ,NY,NX)
   case (iphenotyp_coldroutdecid)
-    strval='Cold&drought-tolerant deciduous'
+    write(strval,'(A,X,I3)')'Cold&drought-tolerant deciduous',iPlantPhenolType_pft(NZ,NY,NX)
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Phenology type',strval,40)
+  call writefixsl(nu_plt,'Phenology type IWTYP',strval,40)
 
   select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (iphotop_neutral)

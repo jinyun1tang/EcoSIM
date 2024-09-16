@@ -291,6 +291,7 @@ implicit none
   real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)   !
   real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)   !
   real(r8),pointer   :: h1D_CFIX_lmtf_pft(:)
+  real(r8),pointer   :: h1D_MainBranchNO_pft(:)
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer    :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
@@ -313,7 +314,7 @@ implicit none
   real(r8),pointer   :: h2D_RCH4ProdHydrog_vr(:,:)
   real(r8),pointer   :: h2D_RCH4ProdAcetcl_vr(:,:)
   real(r8),pointer   :: h2D_RCH4Oxi_aero_vr(:,:)
-  real(r8),pointer   :: h2D_RFermen_vr(:,:)
+  real(r8),pointer   :: h2D_RFerment_vr(:,:)
   real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
   real(r8),pointer   :: h2D_n2oprod_vr(:,:)
 
@@ -646,6 +647,7 @@ implicit none
   allocate(this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTP_ptc(:)=spval
   allocate(this%h1D_CFIX_lmtf_pft(beg_ptc:end_ptc))        ;this%h1D_CFIX_lmtf_pft(:)=spval
+  allocate(this%h1D_MainBranchNO_pft(beg_ptc:end_ptc))     ;this%h1D_MainBranchNO_pft(:)=ispval
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
@@ -690,7 +692,7 @@ implicit none
   allocate(this%h2D_RCH4ProdHydrog_vr(beg_col:end_col,1:JZ));   this%h2D_RCH4ProdHydrog_vr(:,:)=spval
   allocate(this%h2D_RCH4ProdAcetcl_vr(beg_col:end_col,1:JZ));   this%h2D_RCH4ProdAcetcl_vr(:,:)=spval
   allocate(this%h2D_RCH4Oxi_aero_vr(beg_col:end_col,1:JZ)); this%h2D_RCH4Oxi_aero_vr(:,:)=spval
-  allocate(this%h2D_RFermen_vr(beg_col:end_col,1:JZ)); this%h2D_RFermen_vr(:,:)=spval
+  allocate(this%h2D_RFerment_vr(beg_col:end_col,1:JZ)); this%h2D_RFerment_vr(:,:)=spval
   allocate(this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ));  this%h2D_nh3oxi_vr(:,:)=spval
   allocate(this%h2D_n2oprod_vr(beg_col:end_col,1:JZ));  this%h2D_n2oprod_vr(:,:)=spval
 
@@ -1696,6 +1698,10 @@ implicit none
   call hist_addfld1d(fname='LEAF_rNC',units='gN/gC',avgflag='A',&
     long_name='mass based plant leaf NC ratio',ptr_patch=data1d_ptr)      
 
+    data1d_ptr => this%h1D_MainBranchNO_pft(beg_ptc:end_ptc)            
+  call hist_addfld1d(fname='MainBranchNO',units='-',avgflag='A',&
+    long_name='Main branch number',ptr_patch=data1d_ptr)      
+
   data2d_ptr => this%h2D_litrC_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='litrC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved litter C',ptr_col=data2d_ptr)      
@@ -1840,6 +1846,30 @@ implicit none
   data2d_ptr =>  this%h2D_H2MethogenC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Hygrogen_methanogenC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Hydrogenotrophic methanogen C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_RCH4ProdHydrog_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CH4Prod_hydro_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved hydrogenotrophic CH4 production rate',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_RCH4ProdAcetcl_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CH4Prod_aceto_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved acetoclastic CH4 production rate',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_RCH4Oxi_aero_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CH4Oxi_Aero_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved aerobic CH4 oxidation rate',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_RFerment_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Fermentation_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved fermentation rate',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='NH3Oxid_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved NH3 oxidation rate',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_n2oprod_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='N2OProd_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved total N2O production rate',ptr_col=data2d_ptr)      
 
 !------
   data2d_ptr =>  this%h2D_AeroHrBactN_vr(beg_col:end_col,1:JZ)
@@ -2303,7 +2333,7 @@ implicit none
       this%h1D_RCH4ProdHydrog_litr_col(ncol) = RCH4ProdHydrog_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_aero_litr_col(ncol)=RCH4Oxi_aero_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RFermen_litr_col(ncol)=RFermen_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RFermen_litr_col(ncol)=RFerment_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_nh3oxi_litr_col(ncol)=RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_n2oprod_litr_col(ncol)= (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
                                +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -2416,11 +2446,10 @@ implicit none
         this%h2D_H2MethogenN_vr(ncol,L) = micBE(ielmn)/DVOLL
         this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)/DVOLL
 
-
         this%h2D_RCH4ProdAcetcl_vr(ncol,L) = RCH4ProdAcetcl_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RCH4ProdHydrog_vr(ncol,L) = RCH4ProdHydrog_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RCH4Oxi_aero_vr(ncol,L)   = RCH4Oxi_aero_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_RFermen_vr(ncol,L)        = RFermen_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RFerment_vr(ncol,L)       = RFerment_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_nh3oxi_vr(ncol,L)         = RNH3oxi_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_n2oprod_vr(ncol,L)        = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
                                +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
@@ -2554,7 +2583,7 @@ implicit none
         this%h1D_FIREp_P_FLX_ptc(nptc)      = PO4byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_P_FLX_ptc(nptc) = SurfLitrfalStrutElms_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_BRANCH_NO_ptc(nptc)        = NumOfBranches_pft(NZ,NY,NX)
-
+        this%h1D_MainBranchNO_pft(nptc)     = MainBranchNum_pft(NZ,NY,NX)
         this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX),&
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         if(MainBranchNum_pft(NZ,NY,NX)> 0)then

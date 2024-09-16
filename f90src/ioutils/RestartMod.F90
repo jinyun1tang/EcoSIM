@@ -12,10 +12,11 @@ module RestartMod
   use EcoSiMParDataMod  , only : micpar,pltpar
   use TracerIDMod       , only : trc_confs
   use EcoSIMCtrlMod     , only : etimer,do_budgets,plant_model
-  use EcoSIMCtrlDataType  
-  use restUtilMod  
+  use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun,destroy
   use HistFileMod       , only : hist_restart_ncd  
+  use EcoSIMCtrlDataType  
+  use restUtilMod  
   use ncdio_pio
   use MicrobialDataType
   use SOMDataType
@@ -8583,7 +8584,6 @@ implicit none
     use EcoSIMConfig     , only : restartFileFullPath, nsrest, nsrStartup, nsrBranch 
     use EcoSIMConfig     , only : nsrContinue, case_name,  brnch_retain_casename
     use fileutil         , only : getfil
-    use ecosim_log_mod   , only : errMsg => shr_log_errMsg
     !
     implicit none
     ! !ARGUMENTS:
@@ -8733,7 +8733,6 @@ implicit none
        call opnfil( filename, nio, 'f' )
        curr_date =etimer%get_calendar()
        write(nio,'(a)') fnamer
-       write(nio,'(a)')curr_date
        call relavu( nio )
        write(iulog,*)'Successfully wrote local restart pointer file'
 !    end if
@@ -9257,13 +9256,23 @@ implicit none
   character(len=256) :: filename  ! local file name
   character(len=256) :: fnamer    ! restart file name
   integer :: nio
-  integer :: ii,year,mon,day,tod
+  integer :: ii,year,mon,day,tod,iostat
   nio = getavu()
   filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
+  
   call opnfil( filename, nio, 'f' )  
-  read(nio,*) fnamer
+  read(nio,'(A)',iostat=iostat) fnamer
+  if (iostat == 0) then
+    write(iulog,*) 'use restart file: ', fnamer
+  else if (iostat > 0) then
+    write(iulog,*) 'Error occurred during read operation: iostat = ', iostat
+    call endrun(msg=errMsg(__FILE__, __LINE__)) 
+  else
+    write(iulog,*) 'End of file reached'
+    call endrun(msg=errMsg(__FILE__, __LINE__)) 
+  end if
   call relavu( nio )
-
+  
   !get current date
   ii=2
   do

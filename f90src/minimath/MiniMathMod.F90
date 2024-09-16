@@ -83,10 +83,11 @@ module minimathmod
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
+  ! ep=\mu R T= (m/M)/V0 RT, V0=1m3, m=ep*V0*M/(RT), [kPa]*[m3]*[g/mol]/[Pa m3]~kg 
   implicit none
   real(r8), intent(in) :: tempK
 
-  real(r8) :: ans  !ton/m3, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
+  real(r8) :: ans  !ton, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
   ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat
 

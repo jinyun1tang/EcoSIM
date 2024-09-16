@@ -58,7 +58,6 @@ implicit none
   PlantPopu_col(NY,NX)                                = plt_site%PlantPopu_col
   ECO_ER_col(NY,NX)                                   = plt_bgcr%ECO_ER_col
   Eco_NBP_CumYr_col(NY,NX)                            = plt_bgcr%Eco_NBP_CumYr_col
-  Eco_GPP_CumYr_col(NY,NX)                            = plt_bgcr%Eco_GPP_CumYr_col
   Canopy_Heat_Latent_col(NY,NX)                       = plt_ew%Canopy_Heat_Latent_col
   Canopy_Heat_Sens_col(NY,NX)                         = plt_ew%Canopy_Heat_Sens_col
   Eco_AutoR_CumYr_col(NY,NX)                          = plt_bgcr%Eco_AutoR_CumYr_col
@@ -74,7 +73,7 @@ implicit none
   Eco_NetRad_col(NY,NX)                            = plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)                       = plt_ew%Eco_Heat_Latent_col
   Eco_Heat_Grnd_col(NY,NX)                         = plt_ew%Eco_Heat_Grnd_col
-  QvET_col(NY,NX)                                    = plt_ew%QvET_col
+  QvET_col(NY,NX)                                  = plt_ew%QvET_col
   LWRadCanG(NY,NX)                                 = plt_ew%LWRadCanG
   VapXAir2CanG(NY,NX)                              = plt_ew%VapXAir2CanG
   THFLXC(NY,NX)                                    = plt_ew%THFLXC
@@ -142,6 +141,7 @@ implicit none
     ENDDO
   ENDDO
   DO NZ=1,NP0(NY,NX)
+    Eco_GPP_CumYr_col(NY,NX)                            = Eco_GPP_CumYr_col(NY,NX)+plt_bgcr%GrossCO2Fix_pft(NZ)
     PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
       plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
     QdewCanopy_CumYr_pft(NZ,NY,NX)                              = QdewCanopy_CumYr_pft(NZ,NY,NX)+plt_ew%QdewCanopy_pft(NZ)  
@@ -901,7 +901,6 @@ implicit none
   plt_ew%Eco_Heat_Sens_col=Eco_Heat_Sens_col(NY,NX)
   plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
   plt_bgcr%Eco_NBP_CumYr_col=Eco_NBP_CumYr_col(NY,NX)
-  plt_bgcr%Eco_GPP_CumYr_col=Eco_GPP_CumYr_col(NY,NX)
   plt_ew%Canopy_Heat_Latent_col=Canopy_Heat_Latent_col(NY,NX)
   plt_ew%Canopy_Heat_Sens_col=Canopy_Heat_Sens_col(NY,NX)
   plt_bgcr%Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col(NY,NX)

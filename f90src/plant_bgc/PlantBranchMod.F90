@@ -2279,11 +2279,8 @@ module PlantBranchMod
     (iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).GT.1))THEN
 
     IF((doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)) .OR. &
-      (doPlantLeaveOff_brch(NB,NZ).EQ.iEnable .AND. Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ)))THEN
-      
-!
-  !    SPRING PHENOLOGY RESET
-  !
+      (doPlantLeaveOff_brch(NB,NZ).EQ.iEnable .AND. Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ)))THEN     
+!  !
   !    GROUP,MatureGroup_pft=node number required for floral initiation
   !    NodeNum2InitFloral_brch=node number at floral initiation
   !    NodeNumberAtAnthesis_brch=node number at flowering
@@ -2294,6 +2291,7 @@ module PlantBranchMod
 !
       IF((doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual) &
         .AND. (Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)))THEN
+
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
           MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
         ELSE
@@ -2956,7 +2954,6 @@ module PlantBranchMod
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
     Eco_AutoR_CumYr_col       => plt_bgcr%Eco_AutoR_CumYr_col,       &
     ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
-    Eco_GPP_CumYr_col         => plt_bgcr%Eco_GPP_CumYr_col,         &
     GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft,           &
     CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft,     &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
@@ -3085,7 +3082,6 @@ module PlantBranchMod
 ! CO2F=total CO2 fixation
 ! CanopyGrosRCO2_pft,CanopyRespC_CumYr_pft=total,above-ground PFT respiration
 ! CO2NetFix_pft=PFT net CO2 fixation
-! Eco_GPP_CumYr_col=ecosystem GPP
 ! ECO_ER_col=ecosystem respiration
 ! Eco_AutoR_CumYr_col=total autotrophic respiration
 !
@@ -3094,7 +3090,6 @@ module PlantBranchMod
   CanopyGrosRCO2_pft(NZ)    = CanopyGrosRCO2_pft(NZ)-Rauto_brch
   CanopyRespC_CumYr_pft(NZ) = CanopyRespC_CumYr_pft(NZ)-Rauto_brch
   CO2NetFix_pft(NZ)         = CO2NetFix_pft(NZ)+CO2F-Rauto_brch
-  Eco_GPP_CumYr_col         = Eco_GPP_CumYr_col+CO2F
   ECO_ER_col                = ECO_ER_col-Rauto_brch
   Eco_AutoR_CumYr_col       = Eco_AutoR_CumYr_col-Rauto_brch
 
@@ -3692,16 +3687,16 @@ module PlantBranchMod
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
     FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
     FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
-    rCNNonstRemob_pft       => plt_allom%rCNNonstRemob_pft,       &
-    rCPNonstRemob_pft       => plt_allom%rCPNonstRemob_pft,       &
+    rCNNonstRemob_pft           => plt_allom%rCNNonstRemob_pft,           &
+    rCPNonstRemob_pft           => plt_allom%rCPNonstRemob_pft,           &
     LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,         &
     SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch,     &
-    ZERO4Groth_pft                       => plt_biom%ZERO4Groth_pft,                        &
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,               &
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,        &
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
     CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch,         &
     LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch,           &
-    PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch,     &
+    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,      &
     PetioleChemElmRemob_brch    => plt_biom%PetioleChemElmRemob_brch,     &
     InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,      &
     LeafChemElmRemob_brch       => plt_biom%LeafChemElmRemob_brch,        &
@@ -3712,14 +3707,14 @@ module PlantBranchMod
     LeafAreaNode_brch           => plt_morph%LeafAreaNode_brch,           &
     LeafAreaDying_brch          => plt_morph%LeafAreaDying_brch,          &
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch,           &
-    PetoleLensNode_brch      => plt_morph%PetoleLensNode_brch,      &
+    PetoleLensNode_brch         => plt_morph%PetoleLensNode_brch,         &
     doSenescence_brch           => plt_pheno%doSenescence_brch,           &
     doRemobilization_brch       => plt_pheno%doRemobilization_brch,       &
     PetioleChemElmRemobFlx_brch => plt_pheno%PetioleChemElmRemobFlx_brch, &
     RefLeafAppearRate_pft       => plt_pheno%RefLeafAppearRate_pft,       &
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch,      &
     LeafElmntRemobFlx_brch      => plt_pheno%LeafElmntRemobFlx_brch,      &
-    fTCanopyGroth_pft                  => plt_pheno%fTCanopyGroth_pft                    &
+    fTCanopyGroth_pft           => plt_pheno%fTCanopyGroth_pft            &
   )    
   
   IF(doSenescence_brch(NB,NZ).EQ.itrue)THEN
