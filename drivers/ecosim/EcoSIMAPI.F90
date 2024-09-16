@@ -358,8 +358,8 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   endif
 
   iYearCurrent=frectyp%yearcur
-  LYRC=etimer%get_days_cur_year()
-  DO I=1,LYRC    
+  DazCurrYear=etimer%get_days_cur_year()
+  DO I=1,DazCurrYear    
     IF(do_rgres .and. I.eq.LYRG)RETURN
     !   UPDATE DAILY VARIABLES SUCH AS MANAGEMENT INPUTS
     !

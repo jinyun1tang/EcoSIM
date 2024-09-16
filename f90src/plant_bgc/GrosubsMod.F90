@@ -385,18 +385,14 @@ module grosubsMod
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
 !
-!  call SumPlantBiom(I,J,NZ,'bfrmbiom')
   if(lverb)write(*,*)'RemoveBiomByMgmt'
   call RemoveBiomByMgmt(I,J,NZ)
-!  PRINT*,'rmbymgmt',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)      
 !
 !     RESET DEAD BRANCHES
-!  call SumPlantBiom(I,J,NZ,'bfresetdead')
   call ResetDeadBranch(I,J,NZ)
-!  PRINT*,'resetdead',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)      
 !  
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
-!  PRINT*,'afaccum',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)        
+
   end associate
   end subroutine GrowPlant
 

@@ -60,7 +60,7 @@ implicit none
   integer :: MaxNumRootLays         !maximum root layer number
   integer :: NP         !number of plant species
   integer :: NU         !soil surface layer number
-  integer :: LYRC       !number of days in current year
+  integer :: DazCurrYear       !number of days in current year
   integer :: iYearCurrent       !current year
 
   real(r8) :: QH2OLoss_lnds    !total subsurface water flux	m3 d-2

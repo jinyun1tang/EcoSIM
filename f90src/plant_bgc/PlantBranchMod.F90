@@ -192,7 +192,7 @@ module PlantBranchMod
 !   ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
 !   CNLFB,CPLFB=N:C,P:C ratios in leaf
 !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0.AND.is_plant_treelike(iPlantRootProfile_pft(NZ)) &
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_treelike(iPlantRootProfile_pft(NZ)) &
       .AND.iPlantBranchState_brch(MainBranchNum_pft(NZ),NZ).EQ.iDead)then
       iPlantBranchState_brch(NB,NZ)=iDead
     endif
@@ -366,12 +366,12 @@ module PlantBranchMod
   Growth_brch(ielmp,ibrch_grain) =Growth_brch(ielmc,ibrch_grain) *rPCReserve_pft(NZ)
   
   DO NE=1,NumPlantChemElms
-    LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_leaf)
-    PetoleStrutElms_brch(NE,NB,NZ)=PetoleStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_petole)
-    StalkStrutElms_brch(NE,NB,NZ)=StalkStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_stalk)
-    StalkRsrvElms_brch(NE,NB,NZ)=StalkRsrvElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_resrv)
-    HuskStrutElms_brch(NE,NB,NZ)=HuskStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_husk)
-    EarStrutElms_brch(NE,NB,NZ)=EarStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_ear)
+    LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_leaf)
+    PetoleStrutElms_brch(NE,NB,NZ) = PetoleStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_petole)
+    StalkStrutElms_brch(NE,NB,NZ)  = StalkStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_stalk)
+    StalkRsrvElms_brch(NE,NB,NZ)   = StalkRsrvElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_resrv)
+    HuskStrutElms_brch(NE,NB,NZ)   = HuskStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_husk)
+    EarStrutElms_brch(NE,NB,NZ)    = EarStrutElms_brch(NE,NB,NZ)+Growth_brch(NE,ibrch_ear)
   ENDDO
 
 !
@@ -608,18 +608,18 @@ module PlantBranchMod
 !
   ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
     IF(iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
-      PART(ibrch_leaf)=0._r8
-      PART(ibrch_petole)=0._r8
+      PART(ibrch_leaf)   = 0._r8
+      PART(ibrch_petole) = 0._r8
     ELSE
-      PART(ibrch_leaf)=AMAX1(PART1X,(0.725_r8-FPART1)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
-      PART(ibrch_petole)=AMAX1(PART2X,(0.275_r8-FPART2)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+      PART(ibrch_leaf)   = AMAX1(PART1X,(0.725_r8-FPART1)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+      PART(ibrch_petole) = AMAX1(PART2X,(0.275_r8-FPART2)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
     ENDIF
-    PARTS=1.0_r8-PART(ibrch_leaf)-PART(ibrch_petole)
-    PART(ibrch_stalk)=AZMAX1(0.60_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
-    PART(ibrch_resrv)=AZMAX1(0.30_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
-    PARTX=PARTS-PART(ibrch_stalk)-PART(ibrch_resrv)
-    PART(ibrch_husk)=0.5_r8*PARTX
-    PART(ibrch_ear)=0.5_r8*PARTX
+    PARTS             = 1.0_r8-PART(ibrch_leaf)-PART(ibrch_petole)
+    PART(ibrch_stalk) = AZMAX1(0.60_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+    PART(ibrch_resrv) = AZMAX1(0.30_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+    PARTX             = PARTS-PART(ibrch_stalk)-PART(ibrch_resrv)
+    PART(ibrch_husk)  = 0.5_r8*PARTX
+    PART(ibrch_ear)   = 0.5_r8*PARTX
 !
 !     DURING GRAIN FILLING, DETERMINATE OR INDETERMINATE
 !
@@ -634,10 +634,10 @@ module PlantBranchMod
       PART(ibrch_petole)=PART2X
       PARTS=1.0_r8-PART(ibrch_leaf)-PART(ibrch_petole)
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-        PART(ibrch_stalk)=0.125_r8*PARTS
-        PART(ibrch_husk)=0.125_r8*PARTS
-        PART(ibrch_ear)=0.125_r8*PARTS
-        PART(ibrch_grain)=0.625_r8*PARTS
+        PART(ibrch_stalk) = 0.125_r8*PARTS
+        PART(ibrch_husk)  = 0.125_r8*PARTS
+        PART(ibrch_ear)   = 0.125_r8*PARTS
+        PART(ibrch_grain) = 0.625_r8*PARTS
       ELSE
         PART(ibrch_stalk)=0.75_r8*PARTS
         PART(ibrch_grain)=0.25_r8*PARTS

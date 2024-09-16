@@ -53,7 +53,7 @@ implicit none
 
   integer :: NB,NR,NZ,K,L,M,N,I1,NE
 
-  I1=I+1;if(I1>LYRC)I1=1
+  I1=I+1;if(I1>DazCurrYear)I1=1
   NumActivePlants(NY,NX)                              = plt_site%NumActivePlants
   PlantPopu_col(NY,NX)                                = plt_site%PlantPopu_col
   ECO_ER_col(NY,NX)                                   = plt_bgcr%ECO_ER_col
@@ -628,8 +628,8 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: K,L,M,N,NB,NZ,NR,I1,NE
 
-  plt_site%LYRC=LYRC
-  I1=I+1;if(I1>LYRC)I1=1
+  plt_site%DazCurrYear=DazCurrYear
+  I1=I+1;if(I1>DazCurrYear)I1=1
   plt_site%ZERO                       = ZERO
   plt_site%ZERO2                      = ZERO2
   plt_site%ALAT                       = ALAT(NY,NX)

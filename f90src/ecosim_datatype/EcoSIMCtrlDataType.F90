@@ -30,7 +30,7 @@ module EcoSIMCtrlDataType
   integer :: ISTART          !start date of model run
   integer :: IEND            !end date of  current scenario
   integer :: LYRX            !last year
-  integer :: LYRC            !number of days in current year
+  integer :: DazCurrYear            !number of days in current year
   integer :: LYRG            !num_of_simdays, defined for regression tests
 
   integer :: iYearCurrent     !current year
