@@ -72,12 +72,9 @@ implicit none
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
-    RainH(NY,NX) = p_rain(NY)
+    !converting precipitation units from m s^-1 to mm hr^-1
+    RainH(NY,NX) = p_rain(NY)*1000.0_r8*3600.0_r8
     TCA(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
-    write(*,*) "p_rain: ", p_rain(NY)
-    write(*,*) "TSNOW: ", TSNOW
-    write(*,*) "TCA: ", TCA(NY,NX)
-    write(*,*) "TairK_col: ", TairK_col(NY,NX)
     IF(TCA(NY,NX).GT.TSNOW)THEN
       PrecAsRain(NY,NX)=RAINH(NY,NX)
       PrecAsSnow(NY,NX)=0.0_r8
@@ -87,11 +84,6 @@ implicit none
     ENDIF
     RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    write(*,*) "PrecAsRain: ", PrecAsRain(NY,NX)
-    write(*,*) "PrecAsSnow: ", PrecAsSnow(NY,NX)
-    write(*,*) "RainFalPrec: ", RainFalPrec(NY,NX)
-    write(*,*) "SnoFalPrec: ", SnoFalPrec(NY,NX)
-    write(*,*) "AREA: ", AREA(3,NU(NY,NX),NY,NX)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
@@ -122,16 +114,14 @@ implicit none
   ENDDO
   
   write(*,*) "Heat and water souces: "
-  write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
-  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
-  write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
-  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
-    write(*,*) "ATS true E source: ", Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     !for every column send the top layer to the transfer var
+    !Convert heat and water flux from EcoSIM units (flux/ hr)
+    !to ATS units (flux / s)
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
-    surf_w_source(NY) = Qinfl2MicP(NY,1)
+    surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP&3600._r8)
     write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
+    write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
   ENDDO
 
   end subroutine RunEcoSIMSurfaceBalance
