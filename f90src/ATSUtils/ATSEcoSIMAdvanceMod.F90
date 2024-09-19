@@ -119,7 +119,7 @@ implicit none
     !Convert heat and water flux from EcoSIM units (flux/ hr)
     !to ATS units (flux / s)
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
-    surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP&3600._r8)
+    surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP*3600._r8)
     write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
     write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
   ENDDO

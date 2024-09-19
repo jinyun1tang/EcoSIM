@@ -83,7 +83,7 @@ contains
 
   if(ATS_cpl_mode) then 
     DO NX=NHW,NHE
-      DO NY=NVN,NHE  
+      DO NY=NVN,NVS  
          NUM(NY,NX)=1 
       enddo
     enddo
@@ -100,6 +100,7 @@ contains
 !     CumDepth2LayerBottom(NUM(NY,NX)-1),=depth of ground surface
 !     EnergyImpact4Erosion=cumulative rainfall energy impact on soil surface
 !
+
       Altitude_grid(NY,NX)=ALT(NY,NX)-CumDepth2LayerBottom(NUM(NY,NX)-1,NY,NX)
       EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
@@ -724,6 +725,11 @@ contains
   WatXChange2WatTableX(3,NUM(NY,NX),NY,NX)=CumWatXFlx2SoiMicP+NetWatFlx2SoiMicP
   ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)=CumWatFlx2SoiMacP+NetWatFlx2SoiMacP
   HeatFlow2Soili(3,NUM(NY,NX),NY,NX)=cumHeatFlowSno2Soi+cumHeatSensAir2Soil
+  write(*,*) "WatNetFlo2TopSoiMicP: ", WatNetFlo2TopSoiMicP
+  write(*,*) "CumWatFlx2SoiMicP: ", CumWatFlx2SoiMicP
+  write(*,*) "cumHeatFlowSno2Soi: ", cumHeatFlowSno2Soi
+  write(*,*) "cumHeatSensAir2Soil: ", cumHeatSensAir2Soil
+  
 !  if(NUM(NY,NX)==1.and.HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
 !    write(*,*)'atlmdn',cumHeatFlowSno2Soi,cumHeatSensAir2Soil
 !  endif
@@ -838,21 +844,25 @@ contains
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
       WatDarcyFloLitR2SoiMicP=AZMIN1(AMAX1(FLQZ,-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
+      write(*,*) "WatDarcyFloLitR2SoiMicP: ", WatDarcyFloLitR2SoiMicP
       FLQ2=AZMIN1(AMAX1(DarcyFlxLitR2Soil,-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
     ENDIF
 
     IF(VLairMicP(NUM(NY,NX),NY,NX).LT.0.0_r8)THEN
       WatDarcyFloLitR2SoiMicP=WatDarcyFloLitR2SoiMicP+AZMIN1(AMAX1(-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,&
         VLairMicP(NUM(NY,NX),NY,NX)))
+      write(*,*) "WatDarcyFloLitR2SoiMicP: ", WatDarcyFloLitR2SoiMicP
       FLQ2=FLQ2+AZMIN1(AMAX1(-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,VLairMicP(NUM(NY,NX),NY,NX)))
     ENDIF
 
     IF(WatDarcyFloLitR2SoiMicP.GT.0.0_r8)THEN
       !litter layer to soil
       HeatFlxLitR2Soi=cpw*TKSoi1(0,NY,NX)*WatDarcyFloLitR2SoiMicP
+      write(*,*) "HeatFlxLitR2Soi: ", HeatFlxLitR2Soi
     ELSE
       !soil to litter layer
       HeatFlxLitR2Soi=cpw*TKSoi1(NUM(NY,NX),NY,NX)*WatDarcyFloLitR2SoiMicP
+      write(*,*) "HeatFlxLitR2Soi: ", HeatFlxLitR2Soi
     ENDIF
 
     WatXChange2WatTable(3,NUM(NY,NX),NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
@@ -873,6 +883,7 @@ contains
   ELSE
     !top layer is water
     WatDarcyFloLitR2SoiMicP=XVLMobileWatMicP(NY,NX)*dts_wat
+    write(*,*) "WatDarcyFloLitR2SoiMicP: ", WatDarcyFloLitR2SoiMicP
     HeatFlxLitR2Soi=cpw*TKSoi1(0,NY,NX)*WatDarcyFloLitR2SoiMicP
     WatXChange2WatTable(3,NUM(NY,NX),NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
     if(abs(WatXChange2WatTable(3,NUM(NY,NX),NY,NX))>1.e20_r8)then
@@ -906,6 +917,7 @@ contains
   IF(VLairMacP1(NUM(NY,NX),NY,NX).GT.0.0_r8 .AND.XVLMobileWatMicP(NY,NX).GT.0.0_r8)THEN
     WatFlowLitR2MacP=AMIN1(XVLMobileWatMicP(NY,NX)*dts_wat,VLairMacP1(NUM(NY,NX),NY,NX))
     HeatFlowLitR2MacP=WatFlowLitR2MacP*cpw*TKSoi1(0,NY,NX)
+    write(*,*) "HeatFlowLitR2MacP: ", HeatFlowLitR2MacP
     ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)=ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)+WatFlowLitR2MacP
     HeatFlow2Soili(3,NUM(NY,NX),NY,NX)=HeatFlow2Soili(3,NUM(NY,NX),NY,NX)+HeatFlowLitR2MacP
 !    if(HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then

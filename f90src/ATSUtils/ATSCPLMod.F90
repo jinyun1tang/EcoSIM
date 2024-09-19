@@ -34,7 +34,7 @@ contains
   integer :: j1,j2,j3,i,j
   real(r8) :: temp_eq, double_eq
 
-  call SetBGCSizes(sizes)
+  !call SetBGCSizes(sizes)
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
@@ -170,7 +170,7 @@ contains
   integer :: num_cols, ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3, i
 
-  call SetBGCSizes(sizes)
+  !call SetBGCSizes(sizes)
 
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
