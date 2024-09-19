@@ -201,7 +201,7 @@ implicit none
   real(r8), pointer :: Root1stXSecArea_pft(:,:)     => null() !root cross-sectional area primary axes, [m2]
   real(r8), pointer :: Root1stMaxRadius1_pft(:,:)     => null() !root diameter primary axes, [m]
   real(r8), pointer :: Root2ndMaxRadius1_pft(:,:)     => null() !root diameter secondary axes, [m]
-  real(r8), pointer :: SeedCMass(:)         => null() !grain size at seeding, [g]
+  real(r8), pointer :: SeedCMass_pft(:)         => null() !grain size at seeding, [g]
   real(r8), pointer :: RootPoreTortu4Gas(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: Root1stLen_rpvr(:,:,:,:)  => null() !root layer length primary axes, [m d-2]
   real(r8), pointer :: Root2ndLen_pvr(:,:,:,:)  => null() !root layer length secondary axes, [m d-2]
@@ -274,7 +274,7 @@ implicit none
   real(r8), pointer :: MaxPotentSeedNumber_pft(:)         => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)         => null() !maximum grain number per node , [-]
   real(r8), pointer :: rLen2WidthLeaf_pft(:)         => null() !leaf length:width ratio, [-]
-  real(r8), pointer :: MaxSeedCMass(:)         => null() !maximum grain size   , [g]
+  real(r8), pointer :: MaxSeedCMass_pft(:)         => null() !maximum grain size   , [g]
   real(r8), pointer :: Root1stRadius_pvr(:,:,:)    => null() !root layer diameter primary axes, [m ]
   real(r8), pointer :: Root2ndRadius_pvr(:,:,:)    => null() !root layer diameter secondary axes, [m ]
   real(r8), pointer :: RootRaidus_rpft(:,:)      => null() !root internal radius, [m]
@@ -1055,7 +1055,7 @@ implicit none
   allocate(this%iHarvestYear_pft(JP1));this%iHarvestYear_pft=0
   allocate(this%iDayPlanting_pft(JP1));this%iDayPlanting_pft=0
   allocate(this%iDayPlantHarvest_pft(JP1));this%iDayPlantHarvest_pft=0
-  allocate(this%iHarvstType_pft(JP1));this%iHarvstType_pft=0
+  allocate(this%iHarvstType_pft(JP1));this%iHarvstType_pft=-1
   allocate(this%jHarvst_pft(JP1));this%jHarvst_pft=0
 
   end subroutine plt_disturb_init
@@ -1803,7 +1803,7 @@ implicit none
   allocate(this%RootVH2O_pvr(jroots,JZ1,JP1));this%RootVH2O_pvr=spval
   allocate(this%Root1stXNumL_pvr(jroots,JZ1,JP1));this%Root1stXNumL_pvr=spval
   allocate(this%Root2ndXNum_pvr(jroots,JZ1,JP1));this%Root2ndXNum_pvr=spval
-  allocate(this%SeedCMass(JP1));this%SeedCMass=spval
+  allocate(this%SeedCMass_pft(JP1));this%SeedCMass_pft=spval
   allocate(this%totRootLenDens_vr(JZ1));this%totRootLenDens_vr=spval
   allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval
   allocate(this%ClumpFactorInit_pft(JP1));this%ClumpFactorInit_pft=spval
@@ -1813,7 +1813,7 @@ implicit none
   allocate(this%rLen2WidthLeaf_pft(JP1));this%rLen2WidthLeaf_pft=spval
   allocate(this%MaxSeedNumPerSite_pft(JP1));this%MaxSeedNumPerSite_pft=spval
   allocate(this%MaxPotentSeedNumber_pft(JP1));this%MaxPotentSeedNumber_pft=spval
-  allocate(this%MaxSeedCMass(JP1));this%MaxSeedCMass=spval
+  allocate(this%MaxSeedCMass_pft(JP1));this%MaxSeedCMass_pft=spval
   allocate(this%Root1stMaxRadius1_pft(jroots,JP1));this%Root1stMaxRadius1_pft=spval
   allocate(this%Root2ndMaxRadius1_pft(jroots,JP1));this%Root2ndMaxRadius1_pft=spval
   allocate(this%RootRaidus_rpft(jroots,JP1));this%RootRaidus_rpft=spval

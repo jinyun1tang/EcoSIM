@@ -703,9 +703,11 @@ implicit none
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
       SeasonalNonstElms_pft(ielmc,NZ)=SeasonalNonstElms_pft(ielmc,NZ)+ShootC4NonstC_brch(NB,NZ)
+
       DO NE=1,NumPlantChemElms
         SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+CanopyNonstElms_brch(NE,NB,NZ)
       ENDDO  
+
       IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
         D6406: DO M=1,jsken
           DO NE=1,NumPlantChemElms
@@ -718,7 +720,7 @@ implicit none
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+StalkRsrvElms_brch(NE,NB,NZ)
         ENDDO  
       ENDIF
-      
+
       call ResetDeadRootStates(NB,NZ,ShootC4NonstC_brch)
 
       NumDeadBranches=NumDeadBranches+1

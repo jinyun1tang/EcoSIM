@@ -156,12 +156,12 @@ implicit none
             IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
           endif
           IF(IDY.GT.0.AND.IYR.GT.0)THEN
-            iDayPlanting_pft(NZ,NY,NX)=IDY
-            IYR=yearc
-            iYearPlanting_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
-            iPlantingDay_pft(NZ,NY,NX)=iDayPlanting_pft(NZ,NY,NX) !planting day
-            iPlantingYear_pft(NZ,NY,NX)=iYearPlanting_pft(NZ,NY,NX)   !planting year
-            PPatSeeding_pft(NZ,NY,NX)=PPI_pft(NZ,NY,NX)     !population density
+            iDayPlanting_pft(NZ,NY,NX)  = IDY
+            IYR                         = yearc
+            iYearPlanting_pft(NZ,NY,NX) = MIN(IYR,iYearCurrent)
+            iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX) !planting day
+            iPlantingYear_pft(NZ,NY,NX) = iYearPlanting_pft(NZ,NY,NX)   !planting year
+            PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)     !population density
           ENDIF          
         ENDDO
       ENDDO
@@ -169,6 +169,36 @@ implicit none
   ENDDO  
   end subroutine readplantinginfo  
 
+
+!------------------------------------------------------------------------------------------
+  subroutine InitPlantMgmnt(NHW,NHE,NVN,NVS)
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: NY,NX,NZ,M
+
+! initialize the disturbance arrays
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      DO NZ=1,NP(NY,NX)
+        DO M=1,366
+          iHarvstType_pft(NZ,M,NY,NX)                         = -1
+          jHarvst_pft(NZ,M,NY,NX)                             = 0
+          FracCanopyHeightCut_pft(NZ,M,NY,NX)                 = 1.0E+06_r8
+          THIN_pft(NZ,M,NY,NX)                                = -1.0_r8
+          FracBiomHarvsted(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+          FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+          FracBiomHarvsted(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+
+  end subroutine InitPlantMgmnt
 !------------------------------------------------------------------------------------------
   subroutine readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   !
@@ -191,28 +221,8 @@ implicit none
   integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS
   integer :: M,NN,N,nn1
 
-! initialize the disturbance arrays
-  DO NX=NHW,NHE
-    DO NY=NVN,NVS
-      DO NZ=1,NP(NY,NX)
-        DO M=1,366
-          iHarvstType_pft(NZ,M,NY,NX)=-1
-          jHarvst_pft(NZ,M,NY,NX)=0
-          FracCanopyHeightCut_pft(NZ,M,NY,NX)=1.0E+06_r8
-          THIN_pft(NZ,M,NY,NX)=-1.0_r8
-          FracBiomHarvsted(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-          FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-          FracBiomHarvsted(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-          FracBiomHarvsted(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
-        ENDDO
-      ENDDO
-    ENDDO
-  ENDDO
-
+  call InitPlantMgmnt(NHW,NHE,NVN,NVS)
+  
   DO NTOPO=1,ntopou
     call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
     call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
@@ -246,6 +256,7 @@ implicit none
           if(pft_nmgnt(NZ)>0)then
             NN=0
             DO nn1=1,pft_nmgnt(NZ)
+              if(len_trim(pft_mgmtinfo(NN1,NZ))==0)cycle
               tstr=trim(pft_mgmtinfo(NN1,NZ))
               read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
               READ(TSTR,*)DY,ICUT,NumOfCanopyLayersUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
@@ -265,18 +276,18 @@ implicit none
                 iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
               ENDIF
 
-              iHarvstType_pft(NZ,IDY,NY,NX)=ICUT
-              jHarvst_pft(NZ,IDY,NY,NX)=NumOfCanopyLayersUT
-              FracCanopyHeightCut_pft(NZ,IDY,NY,NX)=HCUT
-              THIN_pft(NZ,IDY,NY,NX)=PCUT
-              FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT11
-              FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT12
-              FracBiomHarvsted(1,iplthvst_woody,NZ,IDY,NY,NX)=ECUT13
-              FracBiomHarvsted(1,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT14
-              FracBiomHarvsted(2,iplthvst_leaf,NZ,IDY,NY,NX)=ECUT21
-              FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDY,NY,NX)=ECUT22
-              FracBiomHarvsted(2,iplthvst_woody,NZ,IDY,NY,NX)=ECUT23
-              FracBiomHarvsted(2,iplthvst_stdead,NZ,IDY,NY,NX)=ECUT24
+              iHarvstType_pft(NZ,IDY,NY,NX)                         = ICUT
+              jHarvst_pft(NZ,IDY,NY,NX)                             = NumOfCanopyLayersUT
+              FracCanopyHeightCut_pft(NZ,IDY,NY,NX)                 = HCUT
+              THIN_pft(NZ,IDY,NY,NX)                                = PCUT
+              FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
+              FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
+              FracBiomHarvsted(1,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT13
+              FracBiomHarvsted(1,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
+              FracBiomHarvsted(2,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
+              FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
+              FracBiomHarvsted(2,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
+              FracBiomHarvsted(2,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
               IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
                 !animal or insect biomass
@@ -284,18 +295,18 @@ implicit none
                 if(mod(nn,2)==0)then
                   IDYE=IDY
                   D580: DO IDYG=IDYS+1,IDYE-1
-                    iHarvstType_pft(NZ,IDYG,NY,NX)=ICUT
-                    jHarvst_pft(NZ,IDYG,NY,NX)=NumOfCanopyLayersUT
-                    FracCanopyHeightCut_pft(NZ,IDYG,NY,NX)=HCUT
-                    THIN_pft(NZ,IDYG,NY,NX)=PCUT
-                    FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT11
-                    FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT12
-                    FracBiomHarvsted(1,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT13
-                    FracBiomHarvsted(1,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT14
-                    FracBiomHarvsted(2,iplthvst_leaf,NZ,IDYG,NY,NX)=ECUT21
-                    FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX)=ECUT22
-                    FracBiomHarvsted(2,iplthvst_woody,NZ,IDYG,NY,NX)=ECUT23
-                    FracBiomHarvsted(2,iplthvst_stdead,NZ,IDYG,NY,NX)=ECUT24
+                    iHarvstType_pft(NZ,IDYG,NY,NX)                         = ICUT
+                    jHarvst_pft(NZ,IDYG,NY,NX)                             = NumOfCanopyLayersUT
+                    FracCanopyHeightCut_pft(NZ,IDYG,NY,NX)                 = HCUT
+                    THIN_pft(NZ,IDYG,NY,NX)                                = PCUT
+                    FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
+                    FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
+                    FracBiomHarvsted(1,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
+                    FracBiomHarvsted(1,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
+                    FracBiomHarvsted(2,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT21
+                    FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT22
+                    FracBiomHarvsted(2,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT23
+                    FracBiomHarvsted(2,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT24
                   ENDDO D580
                 endif
                 IDYS=IDY
@@ -342,6 +353,7 @@ implicit none
     iyear=1
     if(IGO==0)then
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+    call InitPlantMgmnt(NHW,NHE,NVN,NVS)
     elseif(IGO==1)then
     iyear=2
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
@@ -498,8 +510,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'STMX', loc,MaxPotentSeedNumber_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SDMX', loc,MaxSeedNumPerSite_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRMX', loc,MaxSeedCMass_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRate25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
@@ -695,33 +707,33 @@ implicit none
   if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      strval='Rapid, like deciduous tree'
+      write(strval,'(A,I2)')'Rapid, like deciduous tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (2)
-      strval='Very slow, like evergreen needleleaf tree'
+      write(strval,'(A,I2)')'Very slow, like evergreen needleleaf tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (3)
-      strval='Slow, like evergreen broadleaf'
+      write(strval,'(A,I2)')'Slow, like evergreen broadleaf ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (4)
-      strval='Like semi-deciduous tree'
+      write(strval,'(A,I2)')'Like semi-deciduous tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (5)
-      strval='Like semi-evergreen tree'
+      write(strval,'(A,I2)')'Like semi-evergreen tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case default
-      strval='Undefined tree-like pattern'
+      write(strval,'(A,I2)')'Undefined tree-like pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
   else
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      strval='Rapid all aboveground biome, herbaceous'
+      write(strval,'(A,I2)')'Rapid all aboveground biome, herbaceous ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case default
-      strval='Undefined herbaceous pattern'
+      write(strval,'(A,I2)')'Undefined herbaceous pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
   endif
   call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,40)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
-    strval='Aboveground'
+    strval='Aboveground 0'
   case (igraintyp_blwgrnd)
-    strval='Belowground'
+    strval='Belowground 1'
   case default
     strval='Not defined'
   end select
@@ -836,8 +848,8 @@ implicit none
   call writefixl(nu_plt,'maximum potential seed mumber from '// &
     'pre-anthesis stalk growth STMX',MaxPotentSeedNumber_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'maximum seed number per STMX (none) SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'maximum seed size per SDMX (g) GRMX',MaxSeedCMass(NZ,NY,NX),70)
-  call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass(NZ,NY,NX),70)    !could be greater than MaxSeedCMass, accouting for seedling
+  call writefixl(nu_plt,'maximum seed size per SDMX (g) GRMX',MaxSeedCMass_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass_pft(NZ,NY,NX),70)    !could be greater than MaxSeedCMass, accouting for seedling
   call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRate25C_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'mass of dead standing biomass at planting (gC m-2) WTSTDI',StandingDeadInitC_pft(NZ,NY,NX),70)
   end subroutine morphology_trait_disp

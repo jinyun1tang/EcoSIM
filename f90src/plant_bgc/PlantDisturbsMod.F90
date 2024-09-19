@@ -2,14 +2,15 @@ module PlantDisturbsMod
 !
 !! Description:
 ! code to apply distance to plants
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : isclose,AZMAX1
+  use data_kind_mod,      only: r8 => DAT_KIND_R8
+  use minimathmod,        only: isclose, AZMAX1
+  use EcoSIMCtrlDataType, only: DazCurrYear
+  use PlantBalMod,        only: SumPlantBranchBiome
   use ElmIDMod
   use EcosimConst
   use PlantAPIData
   use GrosubPars
   use PlantMathFuncMod
-  use PlantBalMod, only : SumPlantBranchBiome
   use PlantDisturbByFireMod
   use PlantDisturbByTillageMod
   use PlantDisturbByGrazingMod
@@ -559,6 +560,7 @@ module PlantDisturbsMod
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
+
   IF((iHarvstType_pft(NZ).GE.iharvtyp_none .AND. J.EQ.INT(SolarNoonHour_col) &
     .AND. iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
     .OR. (iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo))THEN
@@ -580,14 +582,15 @@ module PlantDisturbsMod
 !     ZL=height to bottom of each canopy layer
 !
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-      IF(jHarvst_pft(NZ).NE.jharvtyp_tmareseed)THEN
-        !terminate and reseed
-        PPX_pft(NZ)=PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
-        PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
+      IF(jHarvst_pft(NZ).NE.jharvtyp_tmareseed)THEN        
+        
+        PPX_pft(NZ)             = PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
+        PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
+        !terminate and reseed        
       ELSE
 !     PPI_pft(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
-        PPX_pft(NZ)=PPI_pft(NZ)
-        PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
+        PPX_pft(NZ)             = PPI_pft(NZ)
+        PlantPopulation_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
       ENDIF
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
         ClumpFactor_pft(NZ)=ClumpFactor_pft(NZ)*FracCanopyHeightCut_pft(NZ)
@@ -608,20 +611,19 @@ module PlantDisturbsMod
           ARLFR=ARLFR+CanopyLeafAareZ_col(L)
         ENDDO D9875
       ENDIF
-      HvstedLeafC=0._r8
-      HvstedShethC=0._r8
-      HvstedEarC=0._r8
-      HvstedGrainC=0._r8
-      WHVSCP=0._r8
-      HvstedStalkC=0._r8
-      HvstedRsrvC=0._r8
-      LeafC_lbrch=0._r8          !it is a filler 
+      HvstedLeafC  = 0._r8
+      HvstedShethC = 0._r8
+      HvstedEarC   = 0._r8
+      HvstedGrainC = 0._r8
+      WHVSCP       = 0._r8
+      HvstedStalkC = 0._r8
+      HvstedRsrvC  = 0._r8
+      LeafC_lbrch  = 0._r8          !it is a filler
     ELSE
 !
 !     GRAZING REMOVAL
       call GrazingPlant(I,J,NZ,HvstedLeafC,HvstedShethC,HvstedEarC,HvstedGrainC,&
         WHVSCP,HvstedStalkC,HvstedRsrvC,WHVSHH,WHVSNP,LeafC_lbrch)
-
 
     ENDIF
 !
@@ -631,14 +633,14 @@ module PlantDisturbsMod
     CALL CutPlant(I,J,NZ,WHVSHH,WHVSCP,WHVSNP,HvstedShethC,HvstedGrainC,HvstedEarC,&
       HvstedRsrvC,HvstedStalkC)
 
-    CanopyLeafShethC_pft(NZ)=0._r8
-    StalkStrutElms_pft(ielmc,NZ)=0._r8
-    CanopyStalkC_pft(NZ)=0._r8
-    CanopyStemArea_pft(NZ)=0._r8
+    CanopyLeafShethC_pft(NZ)     = 0._r8
+    StalkStrutElms_pft(ielmc,NZ) = 0._r8
+    CanopyStalkC_pft(NZ)         = 0._r8
+    CanopyStemArea_pft(NZ)       = 0._r8
     D9840: DO NB=1,NumOfBranches_pft(NZ)
-      CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
-      StalkStrutElms_pft(ielmc,NZ)=StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
-      CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
+      CanopyLeafShethC_pft(NZ)     = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
+      StalkStrutElms_pft(ielmc,NZ) = StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
+      CanopyStalkC_pft(NZ)         = CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
       D9830: DO L=1,NumOfCanopyLayers1
         CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
       ENDDO D9830
@@ -758,32 +760,34 @@ module PlantDisturbsMod
 
   nonevgreenchk=iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen &
     .AND. Hours4LeafOff_brch(NB,NZ).LE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)
+  write(137,*)I+J/24.,NB,NZ,'reset cut',Hours4LeafOff_brch(NB,NZ),&
+    FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ),&
+    MatureGroup_pft(NZ),ShootNodeNum_brch(NB,NZ),mod(I,DazCurrYear)
 
   IF(nonevgreenchk .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
-    MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-    NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
-    NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
-    LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
-    TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-    TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
-    HourFailGrainFill_brch(NB,NZ)=0._r8
-    iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)=I
-    D3005: DO M=2,NumGrowthStages
-      iPlantCalendar_brch(M,NB,NZ)=0
-    ENDDO D3005
-    doInitLeafOut_brch(NB,NZ)=iEnable
+
+    MatureGroup_brch(NB,NZ)                      = MatureGroup_pft(NZ)
+    NodeNum2InitFloral_brch(NB,NZ)               = ShootNodeNum_brch(NB,NZ)
+    NodeNumberAtAnthesis_brch(NB,NZ)             = 0._r8
+    LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
+    TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
+    TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
+    HourFailGrainFill_brch(NB,NZ)                = 0._r8
+    iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = mod(I,DazCurrYear)
+    iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
+    doInitLeafOut_brch(NB,NZ)                    = iEnable
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       D3010: DO NBX=1,NumOfBranches_pft(NZ)
         IF(NBX.NE.MainBranchNum_pft(NZ))THEN
-          MatureGroup_brch(NBX,NZ)=MatureGroup_pft(NZ)
-          NodeNum2InitFloral_brch(NBX,NZ)=ShootNodeNum_brch(NBX,NZ)
-          NodeNumberAtAnthesis_brch(NBX,NZ)=0._r8
-          LeafNumberAtFloralInit_brch(NBX,NZ)=0._r8
-          TotalNodeNumNormByMatgrp_brch(NBX,NZ)=0._r8
-          TotReproNodeNumNormByMatrgrp_brch(NBX,NZ)=0._r8
-          HourFailGrainFill_brch(NBX,NZ)=0._r8
-          iPlantCalendar_brch(ipltcal_Emerge,NBX,NZ)=I
+          MatureGroup_brch(NBX,NZ)                   = MatureGroup_pft(NZ)
+          NodeNum2InitFloral_brch(NBX,NZ)            = ShootNodeNum_brch(NBX,NZ)
+          NodeNumberAtAnthesis_brch(NBX,NZ)          = 0._r8
+          LeafNumberAtFloralInit_brch(NBX,NZ)        = 0._r8
+          TotalNodeNumNormByMatgrp_brch(NBX,NZ)      = 0._r8
+          TotReproNodeNumNormByMatrgrp_brch(NBX,NZ)  = 0._r8
+          HourFailGrainFill_brch(NBX,NZ)             = 0._r8
+          iPlantCalendar_brch(ipltcal_Emerge,NBX,NZ) = I
           D3015: DO M=2,NumGrowthStages
             iPlantCalendar_brch(M,NBX,NZ)=0
           ENDDO D3015
@@ -1583,7 +1587,6 @@ module PlantDisturbsMod
 !     ACCUMULATE REMAINING BRANCH LEAF AREA, C, N, P
 !
 !     WGLF=leaf node C mass
-!     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
 !     LeafAreaLive_brch,LeafAreaNode_brch=branch,node leaf area
 !     LeafProteinCNode_brch=leaf protein mass
 !
@@ -1663,14 +1666,6 @@ module PlantDisturbsMod
 !     ShootC4NonstC_brch=total C4 nonstructural C in branch
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
-!     WTLSB=leaf+petiole mass
-!     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
-!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-!     WTSTKB,WTSTBN,WTSTBP=stalk C,N,P mass
-!     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-!     WTHSKB,WTHSBN,WTHSBP=husk C,N,P mass
-!     WTEARB,WTEABN,WTEABP=ear C,N,P mass
-!     WTGRB,WTGRBN,WTGRBP=grain C,N,P mass
 !     StalkBiomassC_brch=stalk sapwood mass
 !     PSICanopy_pft=canopy water potential
 !     CanopyWater_pft=water volume in canopy
@@ -1700,6 +1695,7 @@ module PlantDisturbsMod
     IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
       .AND. (iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
       .AND. CanopyHeight_pft(NZ).GT.FracCanopyHeightCut_pft(NZ))THEN
+      write(137,*)I+J/24.,'cut',iHarvstType_pft(NZ),CanopyHeight_pft(NZ),FracCanopyHeightCut_pft(NZ)
       call ResetCutBranch(I,J,NZ,NB)
     ENDIF
 !

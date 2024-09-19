@@ -1946,7 +1946,7 @@ module PlantBranchMod
     LeafPetoNonstElmConc_brch    => plt_biom%LeafPetoNonstElmConc_brch,     &
     GrainStrutElms_brch          => plt_biom%GrainStrutElms_brch,           &
     StalkRsrvElms_brch           => plt_biom%StalkRsrvElms_brch,            &
-    ZERO4Groth_pft                        => plt_biom%ZERO4Groth_pft,                         &
+    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft,                &
     GrainSeedBiomCMean_brch      => plt_allom%GrainSeedBiomCMean_brch,      &
     CNGR                         => plt_allom%CNGR,                         &
     CPGR                         => plt_allom%CPGR,                         &
@@ -1965,12 +1965,12 @@ module PlantBranchMod
     TCChill4Seed_pft             => plt_pheno%TCChill4Seed_pft,             &
     PlantPopulation_pft          => plt_site%PlantPopulation_pft,           &
     MaxSeedNumPerSite_pft        => plt_morph%MaxSeedNumPerSite_pft,        &
-    MaxSeedCMass                 => plt_morph%MaxSeedCMass,                 &
+    MaxSeedCMass_pft             => plt_morph%MaxSeedCMass_pft,             &
     MaxPotentSeedNumber_pft      => plt_morph%MaxPotentSeedNumber_pft,      &
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft,           &
     PotentialSeedSites_brch      => plt_morph%PotentialSeedSites_brch,      &
     iPlantGrainType_pft          => plt_morph%iPlantGrainType_pft,          &
-    MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft,           &    
+    MainBranchNum_pft            => plt_morph%MainBranchNum_pft,            &
     SeedNumSet_brch              => plt_morph%SeedNumSet_brch               &
   )
 !
@@ -2045,8 +2045,8 @@ module PlantBranchMod
 !
     IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0 &
       .AND.iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
-      GRMXB=MaxSeedCMass(NZ)
-      GrainSeedBiomCMean_brch(NB,NZ)=AMIN1(MaxSeedCMass(NZ),GrainSeedBiomCMean_brch(NB,NZ) &
+      GRMXB=MaxSeedCMass_pft(NZ)
+      GrainSeedBiomCMean_brch(NB,NZ)=AMIN1(MaxSeedCMass_pft(NZ),GrainSeedBiomCMean_brch(NB,NZ) &
         +GRMXB*AMAX1(0.50_r8,SeedSET**0.25_r8)*dReproNodeNumNormByMatG_brch(NB,NZ))
     ENDIF
   ENDIF
@@ -2291,12 +2291,13 @@ module PlantBranchMod
 !
       IF((doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual) &
         .AND. (Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)))THEN
+        write(137,*)'annual',iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
 
-        IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-          MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
-        ELSE
+!        IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
+!          MatureGroup_brch(NB,NZ)=AZMAX1(MatureGroup_pft(NZ)-BranchNumber_brch(NB,NZ))
+!        ELSE
           MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-        ENDIF
+!        ENDIF
         NodeNum2InitFloral_brch(NB,NZ)               = ShootNodeNum_brch(NB,NZ)
         NodeNumberAtAnthesis_brch(NB,NZ)             = 0._r8
         LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
@@ -2510,23 +2511,23 @@ module PlantBranchMod
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       !deciduous annual plant
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
-        iDayPlantHarvest_pft(NZ)=I
-        iYearPlantHarvest_pft(NZ)=iYearCurrent
-        iHarvstType_pft(NZ)=1
-        jHarvst_pft(NZ)=jharvtyp_tmareseed
-        FracCanopyHeightCut_pft(NZ)=0._r8
-        THIN_pft(NZ)=0._r8
-        FracBiomHarvsted(1,iplthvst_leaf,NZ)=1.0_r8
-        FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)=1.0_r8
-        FracBiomHarvsted(1,iplthvst_woody,NZ)=1.0_r8
-        FracBiomHarvsted(1,iplthvst_stdead,NZ)=1.0_r8
-        FracBiomHarvsted(2,iplthvst_leaf,NZ)=0._r8
-        FracBiomHarvsted(2,iplthvst_finenonleaf,NZ)=1.0_r8
-        FracBiomHarvsted(2,iplthvst_woody,NZ)=0._r8
-        FracBiomHarvsted(2,iplthvst_stdead,NZ)=0._r8
-        iDayPlanting_pft(NZ)=-1E+06
-        iYearPlanting_pft(NZ)=-1E+06
-        doInitPlant_pft(NZ)=itrue
+        iDayPlantHarvest_pft(NZ)                    = I
+        iYearPlantHarvest_pft(NZ)                   = iYearCurrent
+        iHarvstType_pft(NZ)                         = 1
+        jHarvst_pft(NZ)                             = jharvtyp_tmareseed
+        FracCanopyHeightCut_pft(NZ)                 = 0._r8
+        THIN_pft(NZ)                                = 0._r8
+        FracBiomHarvsted(1,iplthvst_leaf,NZ)        = 1.0_r8
+        FracBiomHarvsted(1,iplthvst_finenonleaf,NZ) = 1.0_r8
+        FracBiomHarvsted(1,iplthvst_woody,NZ)       = 1.0_r8
+        FracBiomHarvsted(1,iplthvst_stdead,NZ)      = 1.0_r8
+        FracBiomHarvsted(2,iplthvst_leaf,NZ)        = 0._r8
+        FracBiomHarvsted(2,iplthvst_finenonleaf,NZ) = 1.0_r8
+        FracBiomHarvsted(2,iplthvst_woody,NZ)       = 0._r8
+        FracBiomHarvsted(2,iplthvst_stdead,NZ)      = 0._r8
+        iDayPlanting_pft(NZ)                        = -1E+06
+        iYearPlanting_pft(NZ)                       = -1E+06
+        doInitPlant_pft(NZ)                         = itrue
       ENDIF
     ENDIF
 !     ENDIF
@@ -2605,6 +2606,7 @@ module PlantBranchMod
   ! fTCanopyGroth_pft=temperature function for canopy growth
   ! HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
   ! main branch leaf out
+    
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       call DevelopMainBranch(I,J,NB,NZ,CanTurgPSIFun4Expans)
     ENDIF
@@ -2699,16 +2701,16 @@ module PlantBranchMod
     .AND. CanopyStalkC_pft(NZ).GT.ZERO4Groth_pft(NZ)  &
     .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) &
     .AND. StalkRsrvElms_brch(ielmc,NB,NZ).LE.XFRX*StalkBiomassC_brch(NB,NZ))THEN
-    FracCanopyCinStalk=StalkBiomassC_brch(NB,NZ)/CanopyStalkC_pft(NZ)
-    WVSTBX=StalkBiomassC_brch(NB,NZ)
-    WTRTTX=RootElms_pft(ielmc,NZ)*FracCanopyCinStalk
-    ShootBiomC_brch=WVSTBX+WTRTTX
-    WTRSBX=AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
-    WTRVCX=AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FracCanopyCinStalk)
-    CPOOLD=(WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
-    XFRE(ielmc)=AZMAX1(XFRY*CPOOLD)
-    StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
-    SeasonalNonstElms_pft(ielmc,NZ)=SeasonalNonstElms_pft(ielmc,NZ)-XFRE(ielmc)
+    FracCanopyCinStalk              = StalkBiomassC_brch(NB,NZ)/CanopyStalkC_pft(NZ)
+    WVSTBX                          = StalkBiomassC_brch(NB,NZ)
+    WTRTTX                          = RootElms_pft(ielmc,NZ)*FracCanopyCinStalk
+    ShootBiomC_brch                 = WVSTBX+WTRTTX
+    WTRSBX                          = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
+    WTRVCX                          = AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FracCanopyCinStalk)
+    CPOOLD                          = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
+    XFRE(ielmc)                     = AZMAX1(XFRY*CPOOLD)
+    StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
+    SeasonalNonstElms_pft(ielmc,NZ) = SeasonalNonstElms_pft(ielmc,NZ)-XFRE(ielmc)
   ENDIF
   end associate
   end subroutine BranchElmntTransfer
@@ -2754,19 +2756,18 @@ module PlantBranchMod
     DayLenthCurrent           => plt_site%DayLenthCurrent             &
   )  
 
-    TotPopuPlantRootC=0._r8
-    TotalRootNonstElms(ielmc)=0._r8
-    D4: DO L=NU,MaxSoiL4Root_pft(NZ)
-      TotPopuPlantRootC=TotPopuPlantRootC+AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))
-      TotalRootNonstElms(ielmc)=TotalRootNonstElms(ielmc)+&
-        AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))
-    ENDDO D4
+  TotPopuPlantRootC         = 0._r8
+  TotalRootNonstElms(ielmc) = 0._r8
+  D4: DO L=NU,MaxSoiL4Root_pft(NZ)
+    TotPopuPlantRootC         = TotPopuPlantRootC+AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))
+    TotalRootNonstElms(ielmc) = TotalRootNonstElms(ielmc)+AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))
+  ENDDO D4
 
   IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long &
     .AND.(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid &
     .OR.iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid))THEN
-    PPDX=AZMAX1(CriticPhotoPeriod_pft(NZ)-PhotoPeriodSens_pft(NZ)-DayLenthCurrent)
-    ATRPPD=EXP(-0.0_r8*PPDX)
+    PPDX   = AZMAX1(CriticPhotoPeriod_pft(NZ)-PhotoPeriodSens_pft(NZ)-DayLenthCurrent)
+    ATRPPD = EXP(-0.0_r8*PPDX)
   ELSE
     ATRPPD=1.0_r8
   ENDIF
@@ -2777,9 +2778,9 @@ module PlantBranchMod
     WFNSP=1.0_r8
   ENDIF
 
-  dTimeIncLeafout=ATRPPD*fTCanopyGroth_pft(NZ)*WFNSP
-  Hours2LeafOut_brch(NB,NZ)=Hours2LeafOut_brch(NB,NZ)+dTimeIncLeafout
-  PlantChk=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND.iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
+  dTimeIncLeafout           = ATRPPD*fTCanopyGroth_pft(NZ)*WFNSP
+  Hours2LeafOut_brch(NB,NZ) = Hours2LeafOut_brch(NB,NZ)+dTimeIncLeafout
+  PlantChk                  = iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
   IF(Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)) .OR. plantChk)THEN
 
     IF(SeasonalNonstElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -2796,12 +2797,11 @@ module PlantBranchMod
 !     FXSH,FXRT=shoot-root partitioning of storage C during leafout
 !     WTRTD=root C mass
 !
-      GFNX=GVMX(iPlantPhenolPattern_pft(NZ))*dTimeIncLeafout
-      CH2OH=AZMAX1(GFNX*SeasonalNonstElms_pft(ielmc,NZ))
-      SeasonalNonstElms_pft(ielmc,NZ)=SeasonalNonstElms_pft(ielmc,NZ)-CH2OH
-      CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+CH2OH &
+      GFNX                              = GVMX(iPlantPhenolPattern_pft(NZ))*dTimeIncLeafout
+      CH2OH                             = AZMAX1(GFNX*SeasonalNonstElms_pft(ielmc,NZ))
+      SeasonalNonstElms_pft(ielmc,NZ)   = SeasonalNonstElms_pft(ielmc,NZ)-CH2OH
+      CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)+CH2OH &
         *FXSH(iPlantPhenolPattern_pft(NZ))
-
 !         if root condition met
       IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
         D50: DO L=NU,MaxSoiL4Root_pft(NZ)
@@ -2903,8 +2903,8 @@ module PlantBranchMod
 !     FXFN=root layer allocation
 !
   DO NE=2,NumPlantChemElms
-    SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)-ElmXferStore2Shoot(NE)-NonstElm2RootMyco(NE)
-    CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+ElmXferStore2Shoot(NE)
+    SeasonalNonstElms_pft(NE,NZ)   = SeasonalNonstElms_pft(NE,NZ)-ElmXferStore2Shoot(NE)-NonstElm2RootMyco(NE)
+    CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+ElmXferStore2Shoot(NE)
   ENDDO
   
   IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
@@ -2913,7 +2913,6 @@ module PlantBranchMod
       DO NE=2,NumPlantChemElms
         RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) &
           +FXFN*NonstElm2RootMyco(NE)
-
       ENDDO  
     ENDDO D51
   ELSE

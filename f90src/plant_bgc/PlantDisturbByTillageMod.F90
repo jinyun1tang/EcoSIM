@@ -22,7 +22,7 @@ contains
   real(r8) :: FDM,VOLWPX  
   associate(                                                             &
     jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
-    H2OLoss_CumYr_col                       => plt_ew%H2OLoss_CumYr_col,                          &
+    H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col,              &
     inonstruct                  => pltpar%inonstruct,                     &
     istalk                      => pltpar%istalk,                         &
     inonfoliar                  => pltpar%inonfoliar,                     &
@@ -72,7 +72,7 @@ contains
     GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch,     &
     ShootStrutElms_brch         => plt_biom%ShootStrutElms_brch,          &
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch,          &
-    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch,  &
+    LeafElmsByLayerNode_brch    => plt_biom%LeafElmsByLayerNode_brch,     &
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch,         &
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,           &
     LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &

@@ -44,28 +44,28 @@ module PlantMgmtDataType
   subroutine InitAllocate
 
   implicit none
-  allocate(flag_pft_active(JP,JY,JX));  flag_pft_active=.false.
-  allocate(THIN_pft(JP,366,JY,JX)); THIN_pft=0._r8
-  allocate(FracBiomHarvsted(2,4,JP,366,JY,JX));FracBiomHarvsted=0._r8
-  allocate(FracCanopyHeightCut_pft(JP,366,JY,JX)); FracCanopyHeightCut_pft=0._r8
-  allocate(iHarvstType_pft(JP,366,JY,JX));iHarvstType_pft=0
-  allocate(jHarvst_pft(JP,366,JY,JX));jHarvst_pft=0
+  allocate(flag_pft_active(JP,JY,JX));  flag_pft_active                    = .false.
+  allocate(THIN_pft(JP,366,JY,JX)); THIN_pft                               = 0._r8
+  allocate(FracBiomHarvsted(2,4,JP,366,JY,JX));FracBiomHarvsted            = 0._r8
+  allocate(FracCanopyHeightCut_pft(JP,366,JY,JX)); FracCanopyHeightCut_pft = 0._r8
+  allocate(iHarvstType_pft(JP,366,JY,JX));iHarvstType_pft                  = -1
+  allocate(jHarvst_pft(JP,366,JY,JX));jHarvst_pft                          = 0
 
-  allocate(iYearPlanting_pft(JP,JY,JX));     iYearPlanting_pft=0
-  allocate(iYearPlantHarvest_pft(JP,JY,JX));     iYearPlantHarvest_pft=0
-  allocate(iDayPlanting_pft(JP,JY,JX));    iDayPlanting_pft=0
-  allocate(iDayPlantHarvest_pft(JP,JY,JX));    iDayPlantHarvest_pft=0
-  allocate(iPlantState_pft(JP,JY,JX));     iPlantState_pft=0
-  allocate(iPlantingYear_pft(JP,JY,JX));     iPlantingYear_pft=0
-  allocate(iPlantingDay_pft(JP,JY,JX));    iPlantingDay_pft=0
-  allocate(iHarvestYear_pft(JP,JY,JX));     iHarvestYear_pft=0
-  allocate(iHarvestDay_pft(JP,JY,JX));    iHarvestDay_pft=0
-  allocate(CO2byFire_CumYr_col(JY,JX));       CO2byFire_CumYr_col=0._r8
-  allocate(CH4byFire_CumYr_col(JY,JX));       CH4byFire_CumYr_col=0._r8
-  allocate(O2byFire_CumYr_col(JY,JX));       O2byFire_CumYr_col=0._r8
-  allocate(NH3byFire_CumYr_col(JY,JX));       NH3byFire_CumYr_col=0._r8
-  allocate(N2ObyFire_CumYr_col(JY,JX));       N2ObyFire_CumYr_col=0._r8
-  allocate(PO4byFire_CumYr_col(JY,JX));       PO4byFire_CumYr_col=0._r8
+  allocate(iYearPlanting_pft(JP,JY,JX));     iYearPlanting_pft         = 0
+  allocate(iYearPlantHarvest_pft(JP,JY,JX));     iYearPlantHarvest_pft = 0
+  allocate(iDayPlanting_pft(JP,JY,JX));    iDayPlanting_pft            = 0
+  allocate(iDayPlantHarvest_pft(JP,JY,JX));    iDayPlantHarvest_pft    = 0
+  allocate(iPlantState_pft(JP,JY,JX));     iPlantState_pft             = 0
+  allocate(iPlantingYear_pft(JP,JY,JX));     iPlantingYear_pft         = 0
+  allocate(iPlantingDay_pft(JP,JY,JX));    iPlantingDay_pft            = 0
+  allocate(iHarvestYear_pft(JP,JY,JX));     iHarvestYear_pft           = 0
+  allocate(iHarvestDay_pft(JP,JY,JX));    iHarvestDay_pft              = 0
+  allocate(CO2byFire_CumYr_col(JY,JX));       CO2byFire_CumYr_col      = 0._r8
+  allocate(CH4byFire_CumYr_col(JY,JX));       CH4byFire_CumYr_col      = 0._r8
+  allocate(O2byFire_CumYr_col(JY,JX));       O2byFire_CumYr_col        = 0._r8
+  allocate(NH3byFire_CumYr_col(JY,JX));       NH3byFire_CumYr_col      = 0._r8
+  allocate(N2ObyFire_CumYr_col(JY,JX));       N2ObyFire_CumYr_col      = 0._r8
+  allocate(PO4byFire_CumYr_col(JY,JX));       PO4byFire_CumYr_col      = 0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------

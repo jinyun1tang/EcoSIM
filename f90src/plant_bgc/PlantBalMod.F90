@@ -144,7 +144,7 @@ implicit none
   DO NE=1,NumPlantChemElms
     ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     if(ShootElms_pft(NE,NZ)>1.e20)then
-    write(*,*)'sumplantstates',SeasonalNonstElms_pft(NE,NZ)
+    write(*,*)'sumplantstates',NE,SeasonalNonstElms_pft(NE,NZ)
     stop
     endif
   ENDDO
@@ -238,8 +238,8 @@ implicit none
   ENDDO
 
   !add C4 specific reserve carbon
-  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN  
-    ShootC4NonstC_brch(NB,NZ)=0._r8
+  ShootC4NonstC_brch(NB,NZ)=0._r8
+  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN      
     D3251: DO K=1,MaxNodesPerBranch1
       ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)+CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ) &
         +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ)

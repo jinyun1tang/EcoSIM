@@ -178,28 +178,28 @@ implicit none
 !
     D7965: DO NX=NH1,NH2
       D7960: DO NY=NV1,NV2
-        IFLGV(NY,NX)=IFLGVX
-        IIRRA(1,NY,NX)=IDYS
-        IIRRA(2,NY,NX)=IDYE
-        IIRRA(3,NY,NX)=INT(IHRS/100)
-        IIRRA(4,NY,NX)=INT(IHRE/100)
-        FIRRA(NY,NX)=FIRRX
-        CIRRA(NY,NX)=CIRRX
-        DIRRA(1,NY,NX)=DIRRX
-        DIRRA(2,NY,NX)=WDPTHI
-        D220: DO I=1,366
-          PHQ(IDY,NY,NX)=PHQX
-          NH4_irrig_conc(IDY,NY,NX)=CN4QX/14.0_r8
-          NO3_irrig_conc(IDY,NY,NX)=CNOQX/14.0_r8
-          H2PO4_irrig_conc(IDY,NY,NX)=CPOQX/31.0_r8
-          trcsalt_irrig_conc(idsalt_Al,IDY,NY,NX)=CALQX/27.0_r8
-          trcsalt_irrig_conc(idsalt_Fe,IDY,NY,NX)=CFEQX/55.8_r8
-          trcsalt_irrig_conc(idsalt_Ca,IDY,NY,NX)=CCAQX/40.0_r8
-          trcsalt_irrig_conc(idsalt_Mg,IDY,NY,NX)=CMGQX/24.3_r8
-          trcsalt_irrig_conc(idsalt_Na,IDY,NY,NX)=CNAQX/23.0_r8
-          trcsalt_irrig_conc(idsalt_K,IDY,NY,NX)=CKAQX/39.1_r8
-          trcsalt_irrig_conc(idsalt_SO4,IDY,NY,NX)=CSOQX/32.0_r8
-          trcsalt_irrig_conc(idsalt_Cl,IDY,NY,NX)=CCLQX/35.5_r8
+        IFLGV(NY,NX)   = IFLGVX
+        IIRRA(1,NY,NX) = IDYS
+        IIRRA(2,NY,NX) = IDYE
+        IIRRA(3,NY,NX) = INT(IHRS/100)
+        IIRRA(4,NY,NX) = INT(IHRE/100)
+        FIRRA(NY,NX)   = FIRRX
+        CIRRA(NY,NX)   = CIRRX
+        DIRRA(1,NY,NX) = DIRRX
+        DIRRA(2,NY,NX) = WDPTHI
+        D220: DO I     = 1, 366
+          PHQ(IDY,NY,NX)                           = PHQX
+          NH4_irrig_conc(IDY,NY,NX)                = CN4QX/14.0_r8
+          NO3_irrig_conc(IDY,NY,NX)                = CNOQX/14.0_r8
+          H2PO4_irrig_conc(IDY,NY,NX)              = CPOQX/31.0_r8
+          trcsalt_irrig_conc(idsalt_Al,IDY,NY,NX)  = CALQX/27.0_r8
+          trcsalt_irrig_conc(idsalt_Fe,IDY,NY,NX)  = CFEQX/55.8_r8
+          trcsalt_irrig_conc(idsalt_Ca,IDY,NY,NX)  = CCAQX/40.0_r8
+          trcsalt_irrig_conc(idsalt_Mg,IDY,NY,NX)  = CMGQX/24.3_r8
+          trcsalt_irrig_conc(idsalt_Na,IDY,NY,NX)  = CNAQX/23.0_r8
+          trcsalt_irrig_conc(idsalt_K,IDY,NY,NX)   = CKAQX/39.1_r8
+          trcsalt_irrig_conc(idsalt_SO4,IDY,NY,NX) = CSOQX/32.0_r8
+          trcsalt_irrig_conc(idsalt_Cl,IDY,NY,NX)  = CCLQX/35.5_r8
         ENDDO D220
       ENDDO D7960
     ENDDO D7965

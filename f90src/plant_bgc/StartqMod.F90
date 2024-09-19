@@ -400,7 +400,7 @@ module StartqMod
 !
 !     SEED CHARACTERISTICS
 !
-  call calc_seed_geometry(SeedCMass(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
+  call calc_seed_geometry(SeedCMass_pft(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
     SeedMeanLen_pft(NZ,NY,NX),SeedAreaMean_pft(NZ,NY,NX))
 
 !
@@ -478,45 +478,45 @@ module StartqMod
 !
 !     PP=population (grid cell-1)
 !
-  PlantPopulation_pft(NZ,NY,NX)=PPX_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-  doInitPlant_pft(NZ,NY,NX)=ifalse
-  iPlantShootState_pft(NZ,NY,NX)=iDead
-  iPlantRootState_pft(NZ,NY,NX)=iDead
-  BranchNumber_pft(NZ,NY,NX)=0
-  NumOfBranches_pft(NZ,NY,NX)=0
-  HypoctoHeight_pft(NZ,NY,NX)=0._r8
-  CanopyHeight_pft(NZ,NY,NX)=0._r8
+  PlantPopulation_pft(NZ,NY,NX)  = PPX_pft(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+  doInitPlant_pft(NZ,NY,NX)      = ifalse
+  iPlantShootState_pft(NZ,NY,NX) = iLive
+  iPlantRootState_pft(NZ,NY,NX)  = iLive
+  BranchNumber_pft(NZ,NY,NX)     = 0
+  NumOfBranches_pft(NZ,NY,NX)    = 0
+  HypoctoHeight_pft(NZ,NY,NX)    = 0._r8
+  CanopyHeight_pft(NZ,NY,NX)     = 0._r8
   D10: DO NB=1,MaxNumBranches
-    doInitLeafOut_brch(NB,NZ,NY,NX)= iEnable
-    doPlantLeafOut_brch(NB,NZ,NY,NX)=iDisable
-    doPlantLeaveOff_brch(NB,NZ,NY,NX)=iDisable
-    Prep4Literfall_brch(NB,NZ,NY,NX)=ifalse
-    Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)=0
-    MatureGroup_brch(NB,NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)
-    ShootNodeNum_brch(NB,NZ,NY,NX)=ShootNodeNumAtPlanting_pft(NZ,NY,NX)
-    NodeNum2InitFloral_brch(NB,NZ,NY,NX)=ShootNodeNum_brch(NB,NZ,NY,NX)
-    NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)=0._r8
-    NumOfLeaves_brch(NB,NZ,NY,NX)=0._r8
-    LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)=0._r8
-    KLeafNumber_brch(NB,NZ,NY,NX)=1
-    KMinNumLeaf4GroAlloc_brch(NB,NZ,NY,NX)=1
-    KHiestGroLeafNode_brch(NB,NZ,NY,NX)=1
-    KLowestGroLeafNode_brch(NB,NZ,NY,NX)=0
-    NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=0._r8
-    ReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=0._r8
-    TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)=0._r8
-    TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)=0._r8
-    Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)=0._r8
-    Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)=0._r8
-    Hours4Leafout_brch(NB,NZ,NY,NX)=Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)
-    Hours4LeafOff_brch(NB,NZ,NY,NX)=Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)
-    Hours2LeafOut_brch(NB,NZ,NY,NX)=0._r8
-    RubiscoActivity_brch(NB,NZ,NY,NX)=1.0_r8
-    C4PhotosynDowreg_brch(NB,NZ,NY,NX)=1.0_r8
-    HourFailGrainFill_brch(NB,NZ,NY,NX)=0
-    HoursDoingRemob_brch(NB,NZ,NY,NX)=0
-    BranchNumber_brch(NB,NZ,NY,NX)=0
-    iPlantBranchState_brch(NB,NZ,NY,NX)=iDead
+    doInitLeafOut_brch(NB,NZ,NY,NX)                = iEnable
+    doPlantLeafOut_brch(NB,NZ,NY,NX)               = iEnable
+    doPlantLeaveOff_brch(NB,NZ,NY,NX)              = iEnable
+    Prep4Literfall_brch(NB,NZ,NY,NX)               = ifalse
+    Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)      = 0
+    MatureGroup_brch(NB,NZ,NY,NX)                  = MatureGroup_pft(NZ,NY,NX)
+    ShootNodeNum_brch(NB,NZ,NY,NX)                 = ShootNodeNumAtPlanting_pft(NZ,NY,NX)
+    NodeNum2InitFloral_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
+    NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)         = 0._r8
+    NumOfLeaves_brch(NB,NZ,NY,NX)                  = 0._r8
+    LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)       = 0._r8
+    KLeafNumber_brch(NB,NZ,NY,NX)                  = 1
+    KMinNumLeaf4GroAlloc_brch(NB,NZ,NY,NX)         = 1
+    KHiestGroLeafNode_brch(NB,NZ,NY,NX)            = 1
+    KLowestGroLeafNode_brch(NB,NZ,NY,NX)           = 0
+    NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)          = 0._r8
+    ReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)   = 0._r8
+    TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)     = 0._r8
+    TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX) = 0._r8
+    Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)     = 0._r8
+    Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)     = 0._r8
+    Hours4Leafout_brch(NB,NZ,NY,NX)                = Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)
+    Hours4LeafOff_brch(NB,NZ,NY,NX)                = Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)
+    Hours2LeafOut_brch(NB,NZ,NY,NX)                = 0._r8
+    RubiscoActivity_brch(NB,NZ,NY,NX)              = 1.0_r8
+    C4PhotosynDowreg_brch(NB,NZ,NY,NX)             = 1.0_r8
+    HourFailGrainFill_brch(NB,NZ,NY,NX)            = 0
+    HoursDoingRemob_brch(NB,NZ,NY,NX)              = 0
+    BranchNumber_brch(NB,NZ,NY,NX)                 = 0
+    iPlantBranchState_brch(NB,NZ,NY,NX)            = iDead
     D15: DO M=1,NumGrowthStages
       iPlantCalendar_brch(M,NB,NZ,NY,NX)=0
     ENDDO D15
@@ -831,14 +831,14 @@ module StartqMod
 !     RootProteinC_pvr=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  SeedCPlanted_pft(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
-  SeasonalNonstElms_pft(ielmc,NZ,NY,NX)=SeedCPlanted_pft(NZ,NY,NX)
-  SeasonalNonstElms_pft(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
-  SeasonalNonstElms_pft(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
-  LeafStrutElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
-  LeafStrutElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
-  LeafPetolBiomassC_brch(1,NZ,NY,NX)=LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetoleStrutElms_brch(ielmc,1,NZ,NY,NX)
-  CanopyLeafShethC_pft(NZ,NY,NX)=CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)  
+  SeedCPlanted_pft(NZ,NY,NX)            = SeedCMass_pft(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmc,NZ,NY,NX) = SeedCPlanted_pft(NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmn,NZ,NY,NX) = CNGR(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmp,NZ,NY,NX) = CPGR(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
+  LeafStrutElms_brch(ielmn,1,NZ,NY,NX)  = CNGR(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
+  LeafStrutElms_brch(ielmp,1,NZ,NY,NX)  = CPGR(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
+  LeafPetolBiomassC_brch(1,NZ,NY,NX)    = LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetoleStrutElms_brch(ielmc,1,NZ,NY,NX)
+  CanopyLeafShethC_pft(NZ,NY,NX)        = CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)
     
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
