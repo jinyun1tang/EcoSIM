@@ -7,6 +7,7 @@ module ATSEcoSIMInitMod
   USE SoilPhysDataType
   use LandSurfDataType
   use EcoSIMCtrlMod
+  use EcoSIMConfig , only : column_mode
   use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
@@ -44,6 +45,7 @@ implicit none
   snowRedist_model=.false.
   disp_planttrait=.false.
   disp_modelconfig=.false.
+  column_mode=.true.
 
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)

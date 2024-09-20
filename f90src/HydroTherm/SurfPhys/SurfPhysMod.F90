@@ -555,23 +555,26 @@ contains
 ! HeatSensVapAir2Soi=convective heat of evaporation flux
 !
   CdSoiEvap=PAREG(NY,NX)/(RAa+RZ)
-  !write(*,*) "Writing for CdSoiEvap: "
-  !write(*,*) "CdSoiEvap: ", CdSoiEvap
-  !write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
-  !write(*,*) "RAa: ", RAa
-  !write(*,*) "RZ: ", RZ
+  write(*,*) "Writing for CdSoiEvap: "
+  write(*,*) "CdSoiEvap: ", CdSoiEvap
+  write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
+  write(*,*) "RAa: ", RAa
+  write(*,*) "RZ: ", RZ
   CdSoiHSens=PARSG(NY,NX)/RAa
-  !write(*,*) "Writing for CdSoiHSens: "
-  !write(*,*) "CdSoiHSens: ", CdSoiHSens
-  !write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
-  !write(*,*) "RAa: ", RAa
-  !write(*,*) "RZ: ", RZ
+  write(*,*) "Writing for CdSoiHSens: "
+  write(*,*) "CdSoiHSens: ", CdSoiHSens
+  write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
+  write(*,*) "RAa: ", RAa
+  write(*,*) "RZ: ", RZ
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
   if(TKX1<0._r8)then
   write(*,*)'TKX1=',TKX1
   call endrun("Negative temperature in "//trim(mod_filename),__LINE__)
   endif
   VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
+  write(*,*) "vaporSoi1: ", VaporSoi1
+  write(*,*) "TKX1: ", TKX1
+  write(*,*) "PSISV1: ", PSISV1
 
   !evaporation, no more than what is available, g H2O
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol(NY,NX)*dts_wat))
@@ -595,6 +598,10 @@ contains
 ! HeatFluxAir2Soi=storage heat flux
 !
   HeatSensAir2Grnd=CdSoiHSens*(TKQ(NY,NX)-TKSoi1(NUM(NY,NX),NY,NX))
+  write(*,*) "HeatSensAir2Grnd: ", HeatSensAir2Grnd
+  write(*,*) "CdSoiHSens: ", CdSoiHSens
+  write(*,*) "TKQ(NY,NX): ", TKQ(NY,NX)
+  write(*,*) "TKSoi1(NUM(NY,NX),NY,NX): ", TKSoi1(NUM(NY,NX),NY,NX)
   !net energy into soil, subtracting latent heat and sensible heat
   tHeatAir2Grnd=Radnet2LitGrnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd
   !total heat plus convective heat > 0 to ground
@@ -725,10 +732,6 @@ contains
   WatXChange2WatTableX(3,NUM(NY,NX),NY,NX)=CumWatXFlx2SoiMicP+NetWatFlx2SoiMicP
   ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)=CumWatFlx2SoiMacP+NetWatFlx2SoiMacP
   HeatFlow2Soili(3,NUM(NY,NX),NY,NX)=cumHeatFlowSno2Soi+cumHeatSensAir2Soil
-  write(*,*) "WatNetFlo2TopSoiMicP: ", WatNetFlo2TopSoiMicP
-  write(*,*) "CumWatFlx2SoiMicP: ", CumWatFlx2SoiMicP
-  write(*,*) "cumHeatFlowSno2Soi: ", cumHeatFlowSno2Soi
-  write(*,*) "cumHeatSensAir2Soil: ", cumHeatSensAir2Soil
   
 !  if(NUM(NY,NX)==1.and.HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
 !    write(*,*)'atlmdn',cumHeatFlowSno2Soi,cumHeatSensAir2Soil
@@ -844,25 +847,21 @@ contains
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
       WatDarcyFloLitR2SoiMicP=AZMIN1(AMAX1(FLQZ,-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
-      write(*,*) "WatDarcyFloLitR2SoiMicP: ", WatDarcyFloLitR2SoiMicP
       FLQ2=AZMIN1(AMAX1(DarcyFlxLitR2Soil,-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
     ENDIF
 
     IF(VLairMicP(NUM(NY,NX),NY,NX).LT.0.0_r8)THEN
       WatDarcyFloLitR2SoiMicP=WatDarcyFloLitR2SoiMicP+AZMIN1(AMAX1(-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,&
         VLairMicP(NUM(NY,NX),NY,NX)))
-      write(*,*) "WatDarcyFloLitR2SoiMicP: ", WatDarcyFloLitR2SoiMicP
       FLQ2=FLQ2+AZMIN1(AMAX1(-VLWatMicP1(NUM(NY,NX),NY,NX)*dts_wat,VLairMicP(NUM(NY,NX),NY,NX)))
     ENDIF
 
     IF(WatDarcyFloLitR2SoiMicP.GT.0.0_r8)THEN
       !litter layer to soil
       HeatFlxLitR2Soi=cpw*TKSoi1(0,NY,NX)*WatDarcyFloLitR2SoiMicP
-      write(*,*) "HeatFlxLitR2Soi: ", HeatFlxLitR2Soi
     ELSE
       !soil to litter layer
       HeatFlxLitR2Soi=cpw*TKSoi1(NUM(NY,NX),NY,NX)*WatDarcyFloLitR2SoiMicP
-      write(*,*) "HeatFlxLitR2Soi: ", HeatFlxLitR2Soi
     ENDIF
 
     WatXChange2WatTable(3,NUM(NY,NX),NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
@@ -883,7 +882,6 @@ contains
   ELSE
     !top layer is water
     WatDarcyFloLitR2SoiMicP=XVLMobileWatMicP(NY,NX)*dts_wat
-    write(*,*) "WatDarcyFloLitR2SoiMicP: ", WatDarcyFloLitR2SoiMicP
     HeatFlxLitR2Soi=cpw*TKSoi1(0,NY,NX)*WatDarcyFloLitR2SoiMicP
     WatXChange2WatTable(3,NUM(NY,NX),NY,NX)=WatXChange2WatTable(3,NUM(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
     if(abs(WatXChange2WatTable(3,NUM(NY,NX),NY,NX))>1.e20_r8)then
@@ -917,7 +915,6 @@ contains
   IF(VLairMacP1(NUM(NY,NX),NY,NX).GT.0.0_r8 .AND.XVLMobileWatMicP(NY,NX).GT.0.0_r8)THEN
     WatFlowLitR2MacP=AMIN1(XVLMobileWatMicP(NY,NX)*dts_wat,VLairMacP1(NUM(NY,NX),NY,NX))
     HeatFlowLitR2MacP=WatFlowLitR2MacP*cpw*TKSoi1(0,NY,NX)
-    write(*,*) "HeatFlowLitR2MacP: ", HeatFlowLitR2MacP
     ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)=ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)+WatFlowLitR2MacP
     HeatFlow2Soili(3,NUM(NY,NX),NY,NX)=HeatFlow2Soili(3,NUM(NY,NX),NY,NX)+HeatFlowLitR2MacP
 !    if(HeatFlow2Soili(3,NUM(NY,NX),NY,NX)>10._r8)then
@@ -1577,6 +1574,9 @@ contains
 ! FLWVLS=water flux within soil accounting for wetting front
 !
   WatNetFlo2TopSoiMicP=PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
+  write(*,*) "WatNetFlo2TopSoiMicP: ", WatNetFlo2TopSoiMicP
+  write(*,*) "PrecNet2SoiMicP: ", PrecNet2SoiMicP
+  write(*,*) "EvapLitR2Soi1: ", EvapLitR2Soi1
   if(abs(WatNetFlo2TopSoiMicP)>1.e20_r8)then
     write(*,*)'PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1',PrecNet2SoiMicP,VapXAir2TopLay,EvapLitR2Soi1
     call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -1585,6 +1585,12 @@ contains
   NetWatFlx2SoiMicP=PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
   NetWatFlx2SoiMacP=PrecNet2SoiMacP
   cumHeatSensAir2Soil=PrecHeat2SoiNet+HeatFluxAir2Soi+HeatSensVapLitR2Soi1+HeatSensLitR2Soi1
+  write(*,*) "cumHeatSensAir2Soil: ", cumHeatSensAir2Soil
+  write(*,*) "PrecHeat2SoiNet: ", PrecHeat2SoiNet
+  write(*,*) "HeatFluxAir2Soi: ", HeatFluxAir2Soi
+  write(*,*) "HeatSensVapLitR2Soi1: ", HeatSensVapLitR2Soi1
+  write(*,*) "HeatSensLitR2Soi1: ", HeatSensLitR2Soi1
+  
   NetWatFlx2LitR=PrecAir2LitR+VapXAir2LitR(NY,NX)-EvapLitR2Soi1
   CumHeatSensAir2LitR=PrecHeatAir2LitR+TotHeatAir2LitR-HeatSensVapLitR2Soi1-HeatSensLitR2Soi1
 !  write(*,*)'CumHeatSensAir2LitR ',PrecHeatAir2LitR,TotHeatAir2LitR,HeatSensVapLitR2Soi1,HeatSensLitR2Soi1
