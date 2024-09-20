@@ -86,6 +86,8 @@ implicit none
   integer, parameter :: jharvtyp_terminate = 1
   integer, parameter :: jharvtyp_tmareseed = 2
 
+  integer, parameter :: ihav_pft = 1
+  integer, parameter :: ihav_eco = 2
   integer, parameter :: iharvtyp_none    = 0
   integer, parameter :: iharvtyp_grain   = 1
   integer, parameter :: iharvtyp_allabv  = 2

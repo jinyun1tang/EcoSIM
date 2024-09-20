@@ -133,7 +133,7 @@ module PlantDisturbsMod
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft,    &
     ShootC4NonstC_brch  => plt_biom%ShootC4NonstC_brch   &
   )
-!  write(102,*)'iHarvstType_pft',I,iHarvstType_pft(NZ),plt_distb%jHarvst_pft(NZ),NZ
+
   NonstructElmntRemoval(1:NumPlantChemElms)   = 0._r8
   LeafElmntRemoval(1:NumPlantChemElms)        = 0._r8
   FineNonleafElmntRemoval(1:NumPlantChemElms) = 0._r8
@@ -311,6 +311,7 @@ module PlantDisturbsMod
   end subroutine LiterfallByDisturbance
 !------------------------------------------------------------------------------------------
   subroutine AbvgBiomRemovalByDisturb(I,J,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
+
   implicit none
   integer , intent(in)  :: I,J,NZ
   real(r8), intent(in)  :: NonstructElmnt2Litr(NumPlantChemElms)
@@ -326,6 +327,7 @@ module PlantDisturbsMod
     EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft, &
     EcoHavstElmnt_CumYr_col => plt_distb%EcoHavstElmnt_CumYr_col, &
     CO2NetFix_pft           => plt_bgcr%CO2NetFix_pft,            &
+    iYearCurrent            => plt_site%iYearCurrent,             &
     Eco_NBP_CumYr_col       => plt_bgcr%Eco_NBP_CumYr_col         &
   )
 !
@@ -339,11 +341,11 @@ module PlantDisturbsMod
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
   DO NE=1,NumPlantChemElms
-    TotalElmntRemoval(NE)=NonstructElmntRemoval(NE)+LeafElmntRemoval(NE)+FineNonleafElmntRemoval(NE)+&
+    TotalElmntRemoval(NE) = NonstructElmntRemoval(NE)+LeafElmntRemoval(NE)+FineNonleafElmntRemoval(NE)+&
       WoodyElmntRemoval(NE)+StandeadElmntRemoval(NE)
-    TotalElmnt2Litr(NE)=NonstructElmnt2Litr(NE)+LeafElmnt2Litr(NE)+FineNonleafElmnt2Litr(NE)+&
+    TotalElmnt2Litr(NE) = NonstructElmnt2Litr(NE)+LeafElmnt2Litr(NE)+FineNonleafElmnt2Litr(NE)+&
       WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE)
-    HarvestElmnt2Litr(NE)=LeafElmntHarv2Litr(NE)+PetioleElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
+    HarvestElmnt2Litr(NE) = LeafElmntHarv2Litr(NE)+PetioleElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
   ENDDO
 
   IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
@@ -355,7 +357,7 @@ module PlantDisturbsMod
           EcoHavstElmnt_CumYr_col(NE)=EcoHavstElmnt_CumYr_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
         Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc)
-      !terminate and reseed
+        !terminate and reseed
       ELSE
         DO NE=1,NumPlantChemElms
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
@@ -582,8 +584,7 @@ module PlantDisturbsMod
 !     ZL=height to bottom of each canopy layer
 !
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-      IF(jHarvst_pft(NZ).NE.jharvtyp_tmareseed)THEN        
-        
+      IF(jHarvst_pft(NZ).NE.jharvtyp_tmareseed)THEN                
         PPX_pft(NZ)             = PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
         PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
         !terminate and reseed        
@@ -760,9 +761,6 @@ module PlantDisturbsMod
 
   nonevgreenchk=iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen &
     .AND. Hours4LeafOff_brch(NB,NZ).LE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)
-  write(137,*)I+J/24.,NB,NZ,'reset cut',Hours4LeafOff_brch(NB,NZ),&
-    FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ),&
-    MatureGroup_pft(NZ),ShootNodeNum_brch(NB,NZ),mod(I,DazCurrYear)
 
   IF(nonevgreenchk .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
 
@@ -773,7 +771,7 @@ module PlantDisturbsMod
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
     HourFailGrainFill_brch(NB,NZ)                = 0._r8
-    iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = mod(I,DazCurrYear)
+    iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = I
     iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
     doInitLeafOut_brch(NB,NZ)                    = iEnable
 
@@ -810,7 +808,7 @@ module PlantDisturbsMod
   real(r8) :: FrcLeafMassLeft,FHGT,FHGTK,FHVSETS,FHVSH
 
   associate(                                                          &
-    FracCanopyHeightCut_pft       => plt_distb%FracCanopyHeightCut_pft,       &
+    FracCanopyHeightCut_pft   => plt_distb%FracCanopyHeightCut_pft,   &
     THIN_pft                  => plt_distb%THIN_pft,                  &
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch,         &
     InternodeHeightDying_brch => plt_morph%InternodeHeightDying_brch, &
@@ -1695,7 +1693,6 @@ module PlantDisturbsMod
     IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
       .AND. (iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
       .AND. CanopyHeight_pft(NZ).GT.FracCanopyHeightCut_pft(NZ))THEN
-      write(137,*)I+J/24.,'cut',iHarvstType_pft(NZ),CanopyHeight_pft(NZ),FracCanopyHeightCut_pft(NZ)
       call ResetCutBranch(I,J,NZ,NB)
     ENDIF
 !
@@ -1710,7 +1707,7 @@ module PlantDisturbsMod
 !     CanopyStalkArea_lbrch=total PFT stalk surface area
 !
     IF(jHarvst_pft(NZ).NE.jharvtyp_noaction)then
-      iPlantBranchState_brch(NB,NZ)=iDead
+      iPlantBranchState_brch(NB,NZ)=iDead      
     endif
 
     IF(PlantPopulation_pft(NZ).LE.0.0_r8)then

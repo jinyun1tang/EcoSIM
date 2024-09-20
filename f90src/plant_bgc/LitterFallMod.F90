@@ -64,7 +64,7 @@ implicit none
 !
     call LiterfallFromDeadBranches(I,J,NZ,NumDeadBranches,ShootC4NonstC_brch)
 
-    call SetDeadPlant(NZ,NumDeadBranches)
+    call SetDeadPlant(i,j,NZ,NumDeadBranches)
 !
 !     DEAD ROOTS
 !
@@ -77,8 +77,9 @@ implicit none
   end associate
   end subroutine ResetDeadBranch
 !------------------------------------------------------------------------------------------
-  subroutine SetDeadPlant(NZ,NumDeadBranches)
+  subroutine SetDeadPlant(I,J,NZ,NumDeadBranches)
   implicit none
+  INTEGER, intent(in) :: i,J
   integer, intent(in) :: NZ
   integer, intent(in) :: NumDeadBranches
 
@@ -99,10 +100,12 @@ implicit none
     H2OLoss_CumYr_col       => plt_ew%H2OLoss_CumYr_col,          &
     BranchNumber_pft        => plt_morph%BranchNumber_pft         &
   )
+
   IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
     iPlantShootState_pft(NZ)  = iDead
     BranchNumber_pft(NZ)      = 0
     HoursTooLowPsiCan_pft(NZ) = 0._r8
+
     IF(doInitPlant_pft(NZ).EQ.itrue)THEN
       NumOfBranches_pft(NZ)=1
     ELSE
@@ -221,7 +224,7 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-  IF(iPlantShootState_pft(NZ).EQ.iDead.AND.iPlantRootState_pft(NZ).EQ.iDead)THEN
+  IF(iPlantShootState_pft(NZ).EQ.iDead .AND. iPlantRootState_pft(NZ).EQ.iDead)THEN
     !both plant shoots and roots are dead
     IF(doInitPlant_pft(NZ).EQ.ifalse)THEN      
       D8825: DO NB=1,NumOfBranches_pft(NZ)
@@ -615,19 +618,19 @@ implicit none
       MatureGroup_brch(NB,NZ)                  = MatureGroup_pft(NZ)
       ShootNodeNum_brch(NB,NZ)                 = ShootNodeNumAtPlanting_pft(NZ)
       NodeNum2InitFloral_brch(NB,NZ)           = ShootNodeNum_brch(NB,NZ)
-      NodeNumberAtAnthesis_brch(NB,NZ)         = 0._r8
-      NumOfLeaves_brch(NB,NZ)                  = 0._r8
-      LeafNumberAtFloralInit_brch(NB,NZ)       = 0._r8
+      NodeNumberAtAnthesis_brch(NB,NZ)         = 0.0_r8
+      NumOfLeaves_brch(NB,NZ)                  = 0.0_r8
+      LeafNumberAtFloralInit_brch(NB,NZ)       = 0.0_r8
       KLeafNumber_brch(NB,NZ)                  = 1
       KHiestGroLeafNode_brch(NB,NZ)            = 1
-      TotalNodeNumNormByMatgrp_brch(NB,NZ)     = 0._r8
-      TotReproNodeNumNormByMatrgrp_brch(NB,NZ) = 0._r8
-      Hours4Leafout_brch(NB,NZ)                = 0._r8
-      Hours4LeafOff_brch(NB,NZ)                = 0._r8
-      Hours4LenthenPhotoPeriod_brch(NB,NZ)     = 0._r8
-      Hours4ShortenPhotoPeriod_brch(NB,NZ)     = 0._r8
-      Hours2LeafOut_brch(NB,NZ)                = 0._r8
-      HourFailGrainFill_brch(NB,NZ)            = 0._r8
+      TotalNodeNumNormByMatgrp_brch(NB,NZ)     = 0.0_r8
+      TotReproNodeNumNormByMatrgrp_brch(NB,NZ) = 0.0_r8
+      Hours4Leafout_brch(NB,NZ)                = 0.0_r8
+      Hours4LeafOff_brch(NB,NZ)                = 0.0_r8
+      Hours4LenthenPhotoPeriod_brch(NB,NZ)     = 0.0_r8
+      Hours4ShortenPhotoPeriod_brch(NB,NZ)     = 0.0_r8
+      Hours2LeafOut_brch(NB,NZ)                = 0.0_r8
+      HourFailGrainFill_brch(NB,NZ)            = 0.0_r8
       RubiscoActivity_brch(NB,NZ)              = 1.0_r8
       C4PhotosynDowreg_brch(NB,NZ)             = 1.0_r8
       doInitLeafOut_brch(NB,NZ)                = iEnable
@@ -813,8 +816,8 @@ implicit none
       enddo
     enddo
   ENDDO D6416
-  SeasonalNonstElms_pft(1:NumPlantChemElms,NZ)=0._r8
-  iPlantState_pft(NZ)=1
+  SeasonalNonstElms_pft(1:NumPlantChemElms,NZ) = 0._r8
+  iPlantState_pft(NZ)                          = iDead
   end associate
   end subroutine ResetBranchRootStates
 

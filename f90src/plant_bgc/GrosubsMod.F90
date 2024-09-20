@@ -55,8 +55,7 @@ module grosubsMod
   call InitVegPars(pltpar)
   
   NumGrowthStages = pltpar%NumGrowthStages
-  MaxNumRootAxes = pltpar%MaxNumRootAxes
-
+  MaxNumRootAxes  = pltpar%MaxNumRootAxes
 
   end subroutine InitGrosub
 !------------------------------------------------------------------------------------------
@@ -84,8 +83,8 @@ module grosubsMod
 !
 !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)=0._r8
+    CanopyHeight_copy(NZ) = CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)  = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -100,10 +99,9 @@ module grosubsMod
       call AccumulateStates(I,J,NZ)
     ENDIF
 
-!    call SumPlantBiom(I,J,NZ,'bfdistb')
     if(lverb)write(*,*)'HARVEST STANDING DEAD'
     call RemoveBiomassByDisturbance(I,J,NZ)
-!    call SumPlantBiom(I,J,NZ,'bflvdeadtrns')
+
   ENDDO D9985
 !
   if(lverb)write(*,*)'TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS'
@@ -176,13 +174,12 @@ module grosubsMod
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
-        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable &
-          .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
+        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)  = I
           iYearPlanting_pft(NZ) = iYearCurrent
           PlantinDepz_pft(NZ)   = 0.005_r8+CumSoilThickness_vr(0)
-          !mark plant as initialized
-          doInitPlant_pft(NZ) = ifalse
+          doInitPlant_pft(NZ)   = ifalse   !mark plant as initialized
+          exit  
         ENDIF
       ENDIF
     ENDDO D205
@@ -209,9 +206,6 @@ module grosubsMod
 !
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
 !
-!     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P LitrFall
-!     TCSNC,TZSNC,TPSNC=cumulative C,N,P LitrFall
-!     HCSNC,HZSNC,HPSNC=hourly C,N,P LitrFall
 !   diagnose surface literfall 
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
@@ -703,11 +697,7 @@ module grosubsMod
     !root state variables
     !sum structural biomass
   ENDDO
-!  if(NZ==1)THEN
-!  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
-!  ELSEIF(NZ==2)THEN
-!  write(112,*)I+J/24.,'grass',CanopyNonstElms_pft(:,NZ)
-!  ENDIF
+
   CanopyStalkC_pft(NZ)                         = sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ)                     = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ)                        = sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))

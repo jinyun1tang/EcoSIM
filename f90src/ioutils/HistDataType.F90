@@ -4,7 +4,7 @@ module HistDataType
 ! when output is done with netcdf, no id is needed.
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use data_const_mod, only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
-  use SoilBGCNLayMod,      only: SumMicbGroup, sumDOML, sumMicBiomLayL
+  use SoilBGCNLayMod,      only: SumMicbGroup, sumDOML, sumMicBiomLayL  
   use GridConsts
   use GridMod
   use HistFileMod

@@ -350,14 +350,15 @@ implicit none
 
   if(pft_dflag==0)then
     ! constant pft data
-    iyear=1
     if(IGO==0)then
-    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
-    call InitPlantMgmnt(NHW,NHE,NVN,NVS)
-    elseif(IGO==1)then
-    iyear=2
-    call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+      iyear=1    
+      call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+      call InitPlantMgmnt(NHW,NHE,NVN,NVS)
+    elseif(IGO>0)then
+      iyear=2
+      call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     endif
+   !transient pft data 
   else
     iyear=1
     DO while(.true.)
