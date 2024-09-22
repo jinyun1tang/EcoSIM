@@ -269,12 +269,12 @@ contains
 ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
 ! rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 
-  CNOFC(1:jskenc,this%k_woody_litr)=real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
-  CPOFC(1:jskenc,this%k_woody_litr)=real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
-  CNOFC(1:jskenc,this%k_fine_litr)=real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
-  CPOFC(1:jskenc,this%k_fine_litr)=real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
-  CNOFC(1:jskenc,this%k_manure)=real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
-  CPOFC(1:jskenc,this%k_manure)=real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
+  CNOFC(1:jskenc,this%k_woody_litr) = real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
+  CPOFC(1:jskenc,this%k_woody_litr) = real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
+  CNOFC(1:jskenc,this%k_fine_litr)  = real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
+  CPOFC(1:jskenc,this%k_fine_litr)  = real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
+  CNOFC(1:jskenc,this%k_manure)     = real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
+  CPOFC(1:jskenc,this%k_manure)     = real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
   FL(1:2)=real((/0.55,0.45/),r8)
 
   D95: DO K=1,this%jcplx
@@ -358,13 +358,13 @@ contains
   this%NumHetetrMicCmplx=0
   !replace the functional group specification with external input later
   do n=1,NumMicbFunGrupsPerCmplx
-    this%JGnio(n)=k
-    this%JGniA(n)=k
-    k=k+jguilds
-    this%JGnfo(n)=k-1
-    this%JGnfA(n)=k-1
-    this%NumMicrobAutrophCmplx=this%NumMicrobAutrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
-    this%NumHetetrMicCmplx=this%NumHetetrMicCmplx+this%JGnfo(n)-this%JGnio(n)+1
+    this%JGnio(n)              = k
+    this%JGniA(n)              = k
+    k                          = k+jguilds
+    this%JGnfo(n)              = k-1
+    this%JGnfA(n)              = k-1
+    this%NumMicrobAutrophCmplx = this%NumMicrobAutrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
+    this%NumHetetrMicCmplx     = this%NumHetetrMicCmplx+this%JGnfo(n)-this%JGnio(n)+1
   enddo
   this%NumLiveHeterBioms=this%nlbiomcp*this%NumHetetrMicCmplx
   this%NumLiveAutoBioms=this%nlbiomcp*this%NumMicrobAutrophCmplx

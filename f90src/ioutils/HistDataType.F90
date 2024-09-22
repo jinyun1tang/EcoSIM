@@ -374,6 +374,7 @@ implicit none
   real(r8),pointer   :: h2D_VSM_vr    (:,:)       !ThetaH2OZ_vr(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_VSICE_vr    (:,:)         !ThetaICEZ_vr(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_PsiO_vr(:,:)
   real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trc_solml_vr(ids_NH4,1:JZ,NY,NX)+trc_solml_vr(ids_NH4B,1:JZ,NY,NX) &
                                                                   !+14.0*(trcx_solml_vr(idx_NH4,1:JZ,NY,NX)+trcx_solml_vr(idx_NH4B,1:JZ,NY,NX)))/SoilMicPMassLayer(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_RootH2OUP_vr(:,:)   !root water uptake flux                                 
@@ -747,6 +748,7 @@ implicit none
   allocate(this%h2D_VSPore_vr (beg_col:end_col,1:JZ))     ;this%h2D_VSPore_vr (:,:)=spval
   allocate(this%h2D_VSICE_vr    (beg_col:end_col,1:JZ))       ;this%h2D_VSICE_vr    (:,:)=spval
   allocate(this%h2D_PSI_vr(beg_col:end_col,1:JZ))        ;this%h2D_PSI_vr(:,:)=spval
+  allocate(this%h2D_PsiO_vr(beg_col:end_col,1:JZ)) ; this%h2D_PsiO_vr(:,:)=spval
   allocate(this%h2D_RootH2OUP_vr(beg_col:end_col,1:JZ))  ;this%h2D_RootH2OUP_vr(:,:)=spval
   allocate(this%h2D_cNH4t_vr(beg_col:end_col,1:JZ))      ;this%h2D_cNH4t_vr(:,:)=spval
   allocate(this%h2D_cNO3t_vr(beg_col:end_col,1:JZ))      ;this%h2D_cNO3t_vr(:,:)=spval
@@ -2024,16 +2026,20 @@ implicit none
     long_name='Volumetric soil porosity',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_VSM_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
-  call hist_addfld2d(fname='VSM_vr',units='m3 H2O/m3 soil',type2d='levsoi',avgflag='A',&
-    long_name='Volumetric soil moisture content',ptr_col=data2d_ptr)      
+  call hist_addfld2d(fname='rWatFLP_vr',units='m3 H2O/m3 soil pore',type2d='levsoi',avgflag='A',&
+    long_name='Fraction of soil porosity filled by water',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_VSICE_vr(beg_col:end_col,1:JZ)        
-  call hist_addfld2d(fname='VSICE_vr',units='m3 ice/m3',type2d='levsoi',avgflag='A',&
-    long_name='Volumetric soil ice content',ptr_col=data2d_ptr)      
+  call hist_addfld2d(fname='rIceFLP_vr',units='m3 ice/m3 soil pore',type2d='levsoi',avgflag='A',&
+    long_name='fraction of soil porosity filled by ice',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_PSI_vr(beg_col:end_col,1:JZ)         
   call hist_addfld2d(fname='PSI_vr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='soil matric pressure+osmotic pressure',ptr_col=data2d_ptr)      
+
+  data2d_ptr => this%h2D_PsiO_vr(beg_col:end_col,1:JZ)         
+  call hist_addfld2d(fname='PsiO_vr',units='MPa',type2d='levsoi',avgflag='A',&
+    long_name='soil osmotic pressure',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_RootH2OUP_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RootH2OUptake_vr',units='mmH2O/hr',type2d='levsoi',avgflag='A',&
@@ -2365,9 +2371,10 @@ implicit none
         this%h2D_HeatFlow_vr(ncol,L)      = THeatFlow2Soil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_HeatUptk_vr(ncol,L)      = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_VSPore_vr(ncol,L)        = VOLTX_vr(L,NY,NX)
-        this%h2D_VSM_vr    (ncol,L)       = VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX))
-        this%h2D_VSICE_vr  (ncol,L)       = VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX))
+        this%h2D_VSM_vr    (ncol,L)       = ThetaH2OZ_vr(L,NY,NX)
+        this%h2D_VSICE_vr  (ncol,L)       = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)           = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
+        this%h2D_PsiO_vr(ncol,L)          = PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_RootH2OUP_vr(ncol,L)     = GridPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)),&
@@ -2506,7 +2513,6 @@ implicit none
         this%h1D_Petole_C_ptc(nptc)      = PetoleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_STALK_C_ptc(nptc)       = StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_RESERVE_C_ptc(nptc)     = StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-
         this%h1D_HUSK_C_ptc(nptc)        = (HuskStrutElms_pft(ielmc,NZ,NY,NX) &
           +EarStrutElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_GRAIN_C_ptc(nptc)       = GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

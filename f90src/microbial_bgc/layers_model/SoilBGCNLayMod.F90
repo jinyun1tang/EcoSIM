@@ -340,7 +340,6 @@ module SoilBGCNLayMod
     enddo
   enddo
 
-
   DO K=1,micpar%NumOfLitrCmplxs
     !add live heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
@@ -349,7 +348,6 @@ module SoilBGCNLayMod
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
-
           ENDDO
         enddo
       enddo
