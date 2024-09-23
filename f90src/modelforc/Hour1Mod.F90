@@ -90,7 +90,7 @@ module Hour1Mod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: L,NX,NY
-  real(r8) :: THETPZ(JZ,JY,JX)
+  real(r8) :: THETPZ_vr(JZ,JY,JX)
   real(r8) :: DPTH0(JY,JX)
 
   real(r8) :: XJ,tPBOT,tmp
@@ -185,7 +185,7 @@ module Hour1Mod
 
       call ZeroHourlyArrays(NY,NX)
 
-      call GetChemicalConcsInSoil(NY,NX,THETPZ)
+      call GetChemicalConcsInSoil(NY,NX,THETPZ_vr)
 
       call GetSoluteConcentrations(NY,NX)
 
@@ -199,7 +199,7 @@ module Hour1Mod
       call DiagActiveLayerDepth(NY,NX)
 
 !     OUTPUT FOR WATER TABLE DEPTH
-      call GetOutput4WaterTableDepth(NY,NX,THETPZ)
+      call GetOutput4WaterTableDepth(NY,NX,THETPZ_vr)
 
       call GetSurfResidualProperties(I,J,NY,NX,DPTH0)
 
@@ -548,20 +548,20 @@ module Hour1Mod
     !     FCL,LOGWiltPoint=log FC,WP
     !     FCD,PSD=FCL-LOGWiltPoint,log(POROS)-FCL
     !
-    SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLSoilMicPMass_vr(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
-      CSAND(L,NY,NX)=SAND(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
-      CSILT(L,NY,NX)=SILT(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
-      CCLAY(L,NY,NX)=CLAY(L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
+    IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      CSoilOrgM_vr(ielmc,L,NY,NX) = AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX))
+      CSAND(L,NY,NX)              = SAND(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+      CSILT(L,NY,NX)              = SILT(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+      CCLAY(L,NY,NX)              = CLAY(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
     ELSE
       CSoilOrgM_vr(ielmc,L,NY,NX)=0.0_r8
       CSAND(L,NY,NX)=0.0_r8
       CSILT(L,NY,NX)=0.0_r8
       CCLAY(L,NY,NX)=0.0_r8
     ENDIF
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZERO)THEN
+    IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZERO)THEN
       CORGCM=AZMAX1(AMIN1(1.0_r8,MWC2Soil*CSoilOrgM_vr(ielmc,L,NY,NX)))
       ParticleDens=1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
       IF(L.EQ.NU(NY,NX))THEN
@@ -608,14 +608,15 @@ module Hour1Mod
       VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
       NumerSolidThermCond(L,NY,NX)=(1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
         +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP_vr(L,NY,NX) &
-        +0.514_r8*ROCK(L,NY,NX)*1.056E-02_r8
+        +0.514_r8*ROCK_vr(L,NY,NX)*1.056E-02_r8
       DenomSolidThermCond(L,NY,NX)=(1.253_r8*VORGC+0.514_r8*VMINL+0.386_r8*VSAND) &
-        *FracSoiAsMicP_vr(L,NY,NX)+0.514_r8*ROCK(L,NY,NX)
+        *FracSoiAsMicP_vr(L,NY,NX)+0.514_r8*ROCK_vr(L,NY,NX)
     ELSE
       NumerSolidThermCond(L,NY,NX)=0.0_r8
       DenomSolidThermCond(L,NY,NX)=0.0_r8
     ENDIF
   ENDDO D9975
+
   end subroutine SetSoilPropertyAftDisturb
 !------------------------------------------------------------------------------------------
 
@@ -667,10 +668,10 @@ module Hour1Mod
     CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
 
   SoiDepthMidLay_vr(NU(NY,NX),NY,NX)=CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
-  IF(SoilMicPMassLayer(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/SoilMicPMassLayer(NU(NY,NX),NY,NX)
-    CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/SoilMicPMassLayer(NU(NY,NX),NY,NX)
-    CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/SoilMicPMassLayer(NU(NY,NX),NY,NX)
+  IF(VLSoilMicPMass_vr(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
+    CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
+    CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
   ELSE
     CCLAY(NU(NY,NX),NY,NX)=0.0_r8
     CSILT(NU(NY,NX),NY,NX)=0.0_r8
@@ -825,11 +826,11 @@ module Hour1Mod
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
 
-  subroutine GetOutput4WaterTableDepth(NY,NX,THETPZ)
+  subroutine GetOutput4WaterTableDepth(NY,NX,THETPZ_vr)
   implicit none
   integer, intent(in) :: NY,NX
 
-  real(r8), intent(in) :: THETPZ(JZ,JY,JX)
+  real(r8), intent(in) :: THETPZ_vr(JZ,JY,JX)
   real(r8) :: PSIEquil    !equilibrium matric potential
   real(r8) :: THETW1
   real(r8) :: THETWM
@@ -853,11 +854,11 @@ module Hour1Mod
 !
     IF(IDWaterTable(NY,NX).NE.0)THEN
       IF(.not.FoundWaterTable)THEN
-        IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
+        IF(THETPZ_vr(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
           FoundWaterTable=.true.
           IF(SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable(NY,NX))THEN
             D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-              IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
+              IF(THETPZ_vr(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
                 !air-filled pore greater minimum, i.e. not saturated
                 FoundWaterTable=.false.
                 exit
@@ -870,7 +871,7 @@ module Hour1Mod
 
           !THETPW=saturation criterion for water table identification
           IF(FoundWaterTable)THEN
-            IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
+            IF(THETPZ_vr(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
               !not bottom layer, saturated
               !PSIeqv
               PSIEquil=PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L+1,NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
@@ -1449,18 +1450,18 @@ module Hour1Mod
   VGeomLayer_vr(0,NY,NX)=VxcessWatLitR+VLitR_col(NY,NX)
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSoilPoreMicP_vr(0,NY,NX) = VGeomLayer_vr(0,NY,NX)
-    SoilMicPMassLayer(0,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
-    VLMicP_vr(0,NY,NX)         = AZMAX1(VLitR_col(NY,NX)-SoilMicPMassLayer(0,NY,NX)/1.30_r8)
+    VLSoilMicPMass_vr(0,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
+    VLMicP_vr(0,NY,NX)         = AZMAX1(VLitR_col(NY,NX)-VLSoilMicPMass_vr(0,NY,NX)/1.30_r8)
     VLsoiAirP_vr(0,NY,NX)      = AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
-      POROS_vr(0,NY,NX)       = VLMicP_vr(0,NY,NX)/VLitR_col(NY,NX)
+      POROS_vr(0,NY,NX)    = VLMicP_vr(0,NY,NX)/VLitR_col(NY,NX)
       THETW_vr(0,NY,NX)    = AZMAX1(AMIN1(1.0_r8,VLWatMicP_vr(0,NY,NX)/VLitR_col(NY,NX)))
-      THETI_col(0,NY,NX)   = AZMAX1(AMIN1(1.0_r8,VLiceMicP_vr(0,NY,NX)/VLitR_col(NY,NX)))
+      THETI_vr(0,NY,NX)    = AZMAX1(AMIN1(1.0_r8,VLiceMicP_vr(0,NY,NX)/VLitR_col(NY,NX)))
       ThetaAir_vr(0,NY,NX) = AZMAX1(AMIN1(1.0_r8,VLsoiAirP_vr(0,NY,NX)/VLitR_col(NY,NX)))
     ELSE
-      POROS_vr(0,NY,NX)       = 1.0_r8
+      POROS_vr(0,NY,NX)    = 1.0_r8
       THETW_vr(0,NY,NX)    = 0.0_r8
-      THETI_col(0,NY,NX)   = 0.0_r8
+      THETI_vr(0,NY,NX)    = 0.0_r8
       ThetaAir_vr(0,NY,NX) = 0.0_r8
     ENDIF
     TVOLWI=VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)
@@ -1504,17 +1505,17 @@ module Hour1Mod
       trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0.0_r8
     ENDIF
   ELSE
-    VLSoilPoreMicP_vr(0,NY,NX)     = 0.0_r8
-    SoilMicPMassLayer(0,NY,NX)     = 0.0_r8
-    VLMicP_vr(0,NY,NX)             = 0.0_r8
-    VLsoiAirP_vr(0,NY,NX)          = 0.0_r8
-    POROS_vr(0,NY,NX)                 = 1.0_r8
-    DLYR(3,0,NY,NX)                = 0.0_r8
-    THETW_vr(0,NY,NX)              = 0.0_r8
-    THETI_col(0,NY,NX)             = 0.0_r8
-    ThetaAir_vr(0,NY,NX)           = 1.0_r8
-    VWatLitRHoldCapcity_col(NY,NX) = 0.0_r8
-    PSISoilMatricP_vr(0,NY,NX)     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+    VLSoilPoreMicP_vr(0,NY,NX)                     = 0.0_r8
+    VLSoilMicPMass_vr(0,NY,NX)                     = 0.0_r8
+    VLMicP_vr(0,NY,NX)                             = 0.0_r8
+    VLsoiAirP_vr(0,NY,NX)                          = 0.0_r8
+    POROS_vr(0,NY,NX)                              = 1.0_r8
+    DLYR(3,0,NY,NX)                                = 0.0_r8
+    THETW_vr(0,NY,NX)                              = 0.0_r8
+    THETI_vr(0,NY,NX)                              = 0.0_r8
+    ThetaAir_vr(0,NY,NX)                           = 1.0_r8
+    VWatLitRHoldCapcity_col(NY,NX)                 = 0.0_r8
+    PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
     trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0.0_r8
     trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)        = 0.0_r8
   ENDIF
@@ -1768,8 +1769,8 @@ module Hour1Mod
       OSCI=OFC(K)*AREA(3,LFDPTH,NY,NX)
       OSNI=OFN(K)*AREA(3,LFDPTH,NY,NX)
       OSPI=OFP(K)*AREA(3,LFDPTH,NY,NX)
-      IF(SoilMicPMassLayer(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
-        CORGCX=OSCI/SoilMicPMassLayer(LFDPTH,NY,NX)
+      IF(VLSoilMicPMass_vr(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
+        CORGCX=OSCI/VLSoilMicPMass_vr(LFDPTH,NY,NX)
       ELSE
         CORGCX=orgcden
       ENDIF
@@ -2244,10 +2245,10 @@ module Hour1Mod
   end subroutine ApplyMineralFertilizer
 !------------------------------------------------------------------------------------------
 
-  subroutine GetChemicalConcsInSoil(NY,NX,THETPZ)
+  subroutine GetChemicalConcsInSoil(NY,NX,THETPZ_vr)
   implicit none
   integer, intent(in) :: NY,NX
-  real(r8), intent(out) :: THETPZ(JZ,JY,JX)
+  real(r8), intent(out) :: THETPZ_vr(JZ,JY,JX)
   integer :: L,NTG
 !     begin_execution
 
@@ -2260,15 +2261,15 @@ module Hour1Mod
   DO L=NUI(NY,NX),NLI(NY,NX)
 
     IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
-      THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
-      THETI_col(L,NY,NX)=0.0_r8
-      ThetaAir_vr(L,NY,NX)=0.0_r8
+      THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
+      THETI_vr(L,NY,NX)    = 0.0_r8
+      ThetaAir_vr(L,NY,NX) = 0.0_r8
     ELSE
-      THETW_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
-      THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
-      ThetaAir_vr(L,NY,NX)=AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
+      THETW_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
+      THETI_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
+      ThetaAir_vr(L,NY,NX) = AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
     ENDIF
-    THETPZ(L,NY,NX)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_col(L,NY,NX))
+    THETPZ_vr(L,NY,NX)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
 !
 !     GAS CONCENTRATIONS
 !
@@ -2293,8 +2294,8 @@ module Hour1Mod
 !
 !     CORGC=SOC concentration
 !
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/SoilMicPMassLayer(L,NY,NX))
+    IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX))
     ELSE
       CSoilOrgM_vr(ielmc,L,NY,NX)=0.0_r8
     ENDIF
@@ -2404,30 +2405,30 @@ module Hour1Mod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      VWatLitRHoldCapcity0=0._r8
-      VLitR0=0._r8
-      DO K=1,micpar%NumOfLitrCmplxs
-        VWatLitRHoldCapcity0=VWatLitRHoldCapcity0+THETRX(K)*RC0(K,NY,NX)
-        VLitR0=VLitR0+RC0(K,NY,NX)/BulkDensLitR(K)
+      VWatLitRHoldCapcity0 = 0._r8
+      VLitR0               = 0._r8
+      DO K=1, micpar%NumOfLitrCmplxs
+        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0(K,NY,NX)
+        VLitR0               = VLitR0+RC0(K,NY,NX)/BulkDensLitR(K)
       ENDDO
 
-      VWatLitRHoldCapcity_col(NY,NX)=AZMAX1(VWatLitRHoldCapcity0)
-      VLitR_col(NY,NX)=AZMAX1(VLitR0*ppmc)
+      VWatLitRHoldCapcity_col(NY,NX) = AZMAX1(VWatLitRHoldCapcity0)
+      VLitR_col(NY,NX)               = AZMAX1(VLitR0*ppmc)
 
       IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
         FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR_col(NY,NX)
       ELSE
         FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
       ENDIF
-      POROS0(NY,NX)=FVLitR
-      FieldCapacity_vr(0,NY,NX)=0.500_r8*FVLitR
-      WiltPoint_vr(0,NY,NX)=0.125_r8*FVLitR
-      LOGPOROS_vr(0,NY,NX)=LOG(POROS0(NY,NX))
-      LOGFldCapacity_vr(0,NY,NX)=LOG(FieldCapacity_vr(0,NY,NX))
-      LOGWiltPoint_vr(0,NY,NX)=LOG(WiltPoint_vr(0,NY,NX))
-      PSD(0,NY,NX)=LOGPOROS_vr(0,NY,NX)-LOGFldCapacity_vr(0,NY,NX)
-      FCD(0,NY,NX)=LOGFldCapacity_vr(0,NY,NX)-LOGWiltPoint_vr(0,NY,NX)
-      SRP(0,NY,NX)=1.00_r8
+      POROS0(NY,NX)              = FVLitR
+      FieldCapacity_vr(0,NY,NX)  = 0.500_r8*FVLitR
+      WiltPoint_vr(0,NY,NX)      = 0.125_r8*FVLitR
+      LOGPOROS_vr(0,NY,NX)       = LOG(POROS0(NY,NX))
+      LOGFldCapacity_vr(0,NY,NX) = LOG(FieldCapacity_vr(0,NY,NX))
+      LOGWiltPoint_vr(0,NY,NX)   = LOG(WiltPoint_vr(0,NY,NX))
+      PSD(0,NY,NX)               = LOGPOROS_vr(0,NY,NX)-LOGFldCapacity_vr(0,NY,NX)
+      FCD(0,NY,NX)               = LOGFldCapacity_vr(0,NY,NX)-LOGWiltPoint_vr(0,NY,NX)
+      SRP(0,NY,NX)               = 1.00_r8
     enddo
   enddo    
   end subroutine UpdateLiterPropertz

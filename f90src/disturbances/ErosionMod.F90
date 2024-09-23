@@ -122,7 +122,7 @@ module ErosionMod
 !     ATTENUATED BY DEPTH OF SURFACE WATER
 !
         DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM_vr(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
-        SoilDetachRate=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
+        SoilDetachRate=AMIN1(VLSoilMicPMass_vr(NU(NY,NX),NY,NX)*dts_wat &
           ,DETW*EnergyImpact4ErosionM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
           *FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
         RDTSED(NY,NX)=RDTSED(NY,NX)+SoilDetachRate
@@ -154,7 +154,7 @@ module ErosionMod
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 
           IF(CSEDX.GT.CSEDD)THEN
-            DETI=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
+            DETI=AMIN1(VLSoilMicPMass_vr(NU(NY,NX),NY,NX)*dts_wat &
               ,SoilDetachability4Erosion2(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
               *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
           ELSE

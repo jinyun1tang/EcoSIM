@@ -110,8 +110,8 @@ module StarteMod
 !
 !     INITIALIZE SOIL WATER
 
-                  IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-                    BulkSoilMass=SoilMicPMassLayer(L,NY,NX)
+                  IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+                    BulkSoilMass=VLSoilMicPMass_vr(L,NY,NX)
                   ELSE
                     !this is for water
                     BulkSoilMass=VLMicP_vr(L,NY,NX)
@@ -453,44 +453,44 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
-    trcx_solml_vr(idx_NH4,L,NY,NX)=solutevar%XNH4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-    trcx_solml_vr(idx_NH4B,L,NY,NX)=solutevar%XNH4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-    trcx_solml_vr(idx_Hp,L,NY,NX)=solutevar%XHY1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_Al,L,NY,NX)=solutevar%XAl_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_Fe,L,NY,NX)=solutevar%XFe_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_Ca,L,NY,NX)=solutevar%XCa_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_Mg,L,NY,NX)=solutevar%XMg_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_Na,L,NY,NX)=solutevar%XNa_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_K,L,NY,NX)=solutevar%XK_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_COOH,L,NY,NX)=solutevar%XHC1*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_AlOH2,L,NY,NX)=solutevar%XAlO2H2_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_FeOH2,L,NY,NX)=solutevar%XFeO2H2_conc*SoilMicPMassLayer(L,NY,NX)
-    trcx_solml_vr(idx_OHe,L,NY,NX)=solutevar%XOH_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcx_solml_vr(idx_OH,L,NY,NX)=solutevar%XROH1_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcx_solml_vr(idx_OHp,L,NY,NX)=solutevar%XROH2_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcx_solml_vr(idx_HPO4,L,NY,NX)=solutevar%XHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcx_solml_vr(idx_H2PO4,L,NY,NX)=solutevar%XH2PO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcx_solml_vr(idx_OHeB,L,NY,NX)=solutevar%XOH_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcx_solml_vr(idx_OHB,L,NY,NX)=solutevar%XROH1_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcx_solml_vr(idx_OHpB,L,NY,NX)=solutevar%XROH2_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcx_solml_vr(idx_HPO4B,L,NY,NX)=solutevar%XHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcx_solml_vr(idx_H2PO4B,L,NY,NX)=solutevar%XH2PO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml_vr(idx_NH4,L,NY,NX)=solutevar%XNH4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+    trcx_solml_vr(idx_NH4B,L,NY,NX)=solutevar%XNH4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
+    trcx_solml_vr(idx_Hp,L,NY,NX)=solutevar%XHY1*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_Al,L,NY,NX)=solutevar%XAl_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_Fe,L,NY,NX)=solutevar%XFe_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_Ca,L,NY,NX)=solutevar%XCa_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_Mg,L,NY,NX)=solutevar%XMg_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_Na,L,NY,NX)=solutevar%XNa_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_K,L,NY,NX)=solutevar%XK_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_COOH,L,NY,NX)=solutevar%XHC1*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_AlOH2,L,NY,NX)=solutevar%XAlO2H2_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_FeOH2,L,NY,NX)=solutevar%XFeO2H2_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcx_solml_vr(idx_OHe,L,NY,NX)=solutevar%XOH_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml_vr(idx_OH,L,NY,NX)=solutevar%XROH1_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml_vr(idx_OHp,L,NY,NX)=solutevar%XROH2_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml_vr(idx_HPO4,L,NY,NX)=solutevar%XHPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml_vr(idx_H2PO4,L,NY,NX)=solutevar%XH2PO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcx_solml_vr(idx_OHeB,L,NY,NX)=solutevar%XOH_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml_vr(idx_OHB,L,NY,NX)=solutevar%XROH1_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml_vr(idx_OHpB,L,NY,NX)=solutevar%XROH2_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml_vr(idx_HPO4B,L,NY,NX)=solutevar%XHPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcx_solml_vr(idx_H2PO4B,L,NY,NX)=solutevar%XH2PO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR PRECIPITATES
 !
-    trcp_saltpml_vr(idsp_AlOH3,L,NY,NX)=solutevar%Precp_AlO3H3_conc*SoilMicPMassLayer(L,NY,NX)
-    trcp_saltpml_vr(idsp_FeOH3,L,NY,NX)=solutevar%Precp_FeO3H3_conc*SoilMicPMassLayer(L,NY,NX)
-    trcp_saltpml_vr(idsp_CaCO3,L,NY,NX)=solutevar%Precp_CaCO3_conc*SoilMicPMassLayer(L,NY,NX)
-    trcp_saltpml_vr(idsp_CaSO4,L,NY,NX)=solutevar%Precp_CaSO4_conc*SoilMicPMassLayer(L,NY,NX)
-    trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)=solutevar%Precp_AlPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcp_saltpml_vr(idsp_FePO4,L,NY,NX)=solutevar%Precp_FePO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)=solutevar%Precp_CaHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcp_saltpml_vr(idsp_HA,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_saltpml_vr(idsp_AlOH3,L,NY,NX)=solutevar%Precp_AlO3H3_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcp_saltpml_vr(idsp_FeOH3,L,NY,NX)=solutevar%Precp_FeO3H3_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcp_saltpml_vr(idsp_CaCO3,L,NY,NX)=solutevar%Precp_CaCO3_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcp_saltpml_vr(idsp_CaSO4,L,NY,NX)=solutevar%Precp_CaSO4_conc*VLSoilMicPMass_vr(L,NY,NX)
+    trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)=solutevar%Precp_AlPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_saltpml_vr(idsp_FePO4,L,NY,NX)=solutevar%Precp_FePO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)=solutevar%Precp_CaHPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_saltpml_vr(idsp_HA,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)=0._r8
-    trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)=solutevar%Precp_AlPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)=solutevar%Precp_FePO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)=solutevar%Precp_CaHPO4_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcp_saltpml_vr(idsp_HAB,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)=solutevar%Precp_AlPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)=solutevar%Precp_FePO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)=solutevar%Precp_CaHPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_saltpml_vr(idsp_HAB,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)=0._r8
     ECND_vr(L,NY,NX)=0._r8
     CSTR(L,NY,NX)=0._r8

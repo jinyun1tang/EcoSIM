@@ -378,7 +378,7 @@ implicit none
 
   real(r8), pointer :: CSoilOrgM_vr(:,:)    => null()  !soil organic C content [gC kg soil-1]
 
-  real(r8), pointer :: HydroCondMicP4RootUptake(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8), pointer :: HydroCondMicP4RootUptake_vr(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
   real(r8), pointer :: GasDifc_vr(:,:)=> null()  !gaseous diffusivity [m2 h-1]
   real(r8), pointer :: SoluteDifusvty_vr(:,:)=> null()  !aqueous diffusivity [m2 h-1]
@@ -1457,7 +1457,7 @@ implicit none
   allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
   allocate(this%SoilResit4RootPentrate_vr(JZ1));this%SoilResit4RootPentrate_vr=spval
   allocate(this%SoiBulkDensity_vr(0:JZ1));this%SoiBulkDensity_vr=spval
-  allocate(this%HydroCondMicP4RootUptake(JZ1));this%HydroCondMicP4RootUptake=spval
+  allocate(this%HydroCondMicP4RootUptake_vr(JZ1));this%HydroCondMicP4RootUptake_vr=spval
 
   end subroutine plt_soilchem_init
 !----------------------------------------------------------------------
@@ -1475,7 +1475,7 @@ implicit none
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
 !  if(allocated(O2GSolubility))deallocate(O2GSolubility)
 
-!  if(allocated(HydroCondMicP4RootUptake))deallocate(HydroCondMicP4RootUptake)
+!  if(allocated(HydroCondMicP4RootUptake_vr))deallocate(HydroCondMicP4RootUptake_vr)
 !  if(allocated(CGSGL))deallocate(CGSGL)
 !  if(allocated(CHSGL))deallocate(CHSGL)
 !  if(allocated(HGSGL))deallocate(HGSGL)

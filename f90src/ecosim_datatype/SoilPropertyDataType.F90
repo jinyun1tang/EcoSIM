@@ -13,7 +13,7 @@ implicit none
    real(r8) ,target,allocatable ::  CSAND(:,:,:)                     !soil sand content [kg Mg-1]
    real(r8) ,target,allocatable ::  CSILT(:,:,:)                     !soil silt content [kg Mg-1]
    real(r8) ,target,allocatable ::  CCLAY(:,:,:)                     !soil clay content [kg Mg-1]
-   real(r8) ,target,allocatable ::  ROCK(:,:,:)                      !Rock fraction
+   real(r8) ,target,allocatable ::  ROCK_vr(:,:,:)                      !Rock fraction
    real(r8) ,target,allocatable ::  SoiBulkDensityt0_vr(:,:,:)                     !initial bulk density [Mg m-3,0=water]
    real(r8) ,target,allocatable ::  FracSoiAsMicP_vr(:,:,:)            !micropore fraction
    real(r8) ,target,allocatable ::  SoilFracAsMacP_vr(:,:,:)                      !macropore fraction
@@ -24,7 +24,7 @@ implicit none
    real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity
    real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	m3 d-2
    real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                      !micropore volume
-   real(r8) ,target,allocatable ::  SoilMicPMassLayer(:,:,:)                      !mass of soil layer	Mg d-2
+   real(r8) ,target,allocatable ::  VLSoilMicPMass_vr(:,:,:)                      !mass of soil layer	Mg d-2
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMn(:,:)                      !minimum soil layer mass
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMX(:,:)                      !maximum soil layer mass
    real(r8) ,target,allocatable ::  SAND(:,:,:)                      !soil sand content	Mg d-2
@@ -59,7 +59,7 @@ contains
   allocate(CSAND(JZ,JY,JX));     CSAND=0._r8
   allocate(CSILT(JZ,JY,JX));     CSILT=0._r8
   allocate(CCLAY(JZ,JY,JX));     CCLAY=0._r8
-  allocate(ROCK(JZ,JY,JX));      ROCK=0._r8
+  allocate(ROCK_vr(JZ,JY,JX));      ROCK_vr=0._r8
   allocate(SoiBulkDensityt0_vr(JZ,JY,JX));     SoiBulkDensityt0_vr=0._r8
   allocate(FracSoiAsMicP_vr(0:JZ,JY,JX));    FracSoiAsMicP_vr=0._r8
   allocate(SoilFracAsMacP_vr(JZ,JY,JX));      SoilFracAsMacP_vr=0._r8
@@ -70,7 +70,7 @@ contains
   allocate(POROS_vr(0:JZ,JY,JX));   POROS_vr=0._r8
   allocate(VLSoilPoreMicP_vr(0:JZ,JY,JX));    VLSoilPoreMicP_vr=0._r8
   allocate(VLSoilMicP_vr(0:JZ,JY,JX));    VLSoilMicP_vr=0._r8
-  allocate(SoilMicPMassLayer(0:JZ,JY,JX));    SoilMicPMassLayer=0._r8
+  allocate(VLSoilMicPMass_vr(0:JZ,JY,JX));    VLSoilMicPMass_vr=0._r8
   allocate(SoilMicPMassLayerMn(JY,JX));       SoilMicPMassLayerMn=0._r8
   allocate(SoilMicPMassLayerMX(JY,JX));       SoilMicPMassLayerMX=0._r8
   allocate(SAND(JZ,JY,JX));      SAND=0._r8
@@ -94,7 +94,7 @@ contains
   call destroy(CSAND)
   call destroy(CSILT)
   call destroy(CCLAY)
-  call destroy(ROCK)
+  call destroy(ROCK_vr)
   call destroy(SoiBulkDensityt0_vr)
   call destroy(FracSoiAsMicP_vr)
   call destroy(SoilFracAsMacP_vr)
@@ -105,7 +105,7 @@ contains
   call destroy(POROS_vr)
   call destroy(VLSoilPoreMicP_vr)
   call destroy(VLSoilMicP_vr)
-  call destroy(SoilMicPMassLayer)
+  call destroy(VLSoilMicPMass_vr)
   call destroy(SoilMicPMassLayerMn)
   call destroy(SoilMicPMassLayerMX)
   call destroy(SAND)

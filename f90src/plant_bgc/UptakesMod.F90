@@ -1037,7 +1037,7 @@ module UptakesMod
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,               &
     THETW_vr                 => plt_soilchem%THETW_vr,                 &
     VLMicP_vr                => plt_soilchem%VLMicP_vr,                &
-    HydroCondMicP4RootUptake => plt_soilchem%HydroCondMicP4RootUptake, &
+    HydroCondMicP4RootUptake_vr => plt_soilchem%HydroCondMicP4RootUptake_vr, &
     VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr,        &
     Root2ndXNum_pvr          => plt_morph%Root2ndXNum_pvr,             &
     Root1stXNumL_pvr         => plt_morph%Root1stXNumL_pvr,            &
@@ -1073,7 +1073,7 @@ module UptakesMod
   !
   !      VLSoilPoreMicP_vr,VLWatMicPM,THETW=soil,water volume,content
   !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
-  !     HydroCondMicP4RootUptake=soil hydraulic conductivity for root uptake
+  !     HydroCondMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
   !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of root,myco primary,secondary axes
   !     SoiLayerHasRoot:1=rooted,0=not rooted
   !     N:1=root,2=mycorrhizae
@@ -1083,7 +1083,7 @@ module UptakesMod
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 &
         .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2 &
         .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND. HydroCondMicP4RootUptake(L).GT.ZERO &
+        .AND. HydroCondMicP4RootUptake_vr(L).GT.ZERO &
         .AND. Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND. Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND. THETW_vr(L).GT.ZERO)THEN
@@ -1098,7 +1098,7 @@ module UptakesMod
         !     FineRootRadius,RootAreaDivRadius_vr=root radius,surface/radius area
         !
         RSSL=(LOG(PATH(N,L)/FineRootRadius(N,L))/RootAreaDivRadius_vr(N,L))/PlantPopulation_pft(NZ)
-        SoiH2OResist(N,L)=RSSL/HydroCondMicP4RootUptake(L)
+        SoiH2OResist(N,L)=RSSL/HydroCondMicP4RootUptake_vr(L)
         !
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
         !     ENTERED IN 'READQ'

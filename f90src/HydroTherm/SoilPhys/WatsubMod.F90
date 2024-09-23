@@ -832,9 +832,9 @@ module WatsubMod
                   K1     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-THETA1)/POROS_vr(N3,N2,N1))+1))
                   KL     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-THETAX)/POROS_vr(N3,N2,N1))+1))
                   IF(N3.EQ.NUM(NY,NX))THEN
-                   HydcondSrc=HydroCond3D(N,K1,N3,N2,N1)*KSatRedusByRainKinetEnergyS(NY,NX)
+                   HydcondSrc=HydroCond_3D(N,K1,N3,N2,N1)*KSatRedusByRainKinetEnergyS(NY,NX)
                   ELSE
-                   HydcondSrc=HydroCond3D(N,K1,N3,N2,N1)
+                   HydcondSrc=HydroCond_3D(N,K1,N3,N2,N1)
                   ENDIF
                 
                   WatXChange2WatTable(N,M6,M5,M4)=AMIN1(VLWatMicP1_vr(N3,N2,N1)*dts_wat, &
@@ -948,7 +948,7 @@ module WatsubMod
 !     VLWatMacP1=macropore volume
 !     FINHX,FINHL=macro-micropore transfer unltd,ltd by water,air volume
 !     FWatExMacP2MicPM=macro-micropore transfer for use in TranspNoSalt.f
-!     HydroCond3D=hydraulic conductivity
+!     HydroCond_3D=hydraulic conductivity
 !     PSISE,PSISoilAirEntry=air entry,matric water potentials
 !     PHOL,MacPRadius=path length between,radius of macropores from hour1.f
 !     dts_HeatWatTP=time step
@@ -957,7 +957,7 @@ module WatsubMod
 !
         IF(VLWatMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
           !south-north direction, is it true?
-          FINHX = TwoPiCON*HydroCond3D(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
+          FINHX = TwoPiCON*HydroCond_3D(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
             *(PSISE_vr(N3,N2,N1)-PSISoilMatricPtmp_vr(N3,N2,N1)) &
             /LOG(PathLenMacP(N3,N2,N1)/MacPRadius(N3,N2,N1))*dts_HeatWatTP
           VLWatMicP1X = VLWatMicP1_vr(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)
@@ -1469,7 +1469,7 @@ module WatsubMod
       -AMIN1(ThetaSat_vr(N6,N5,N4),THETWL))/POROS_vr(N6,N5,N4))+1))
     PSISM1_vr(N3,N2,N1) = PSISoilMatricPtmp_vr(N3,N2,N1)
     
-    IF(SoilMicPMassLayer(N6,N5,N4).GT.ZEROS(NY,NX))THEN
+    IF(VLSoilMicPMass_vr(N6,N5,N4).GT.ZEROS(NY,NX))THEN
       !dest layer is pore active
       IF(THETWL.LT.FieldCapacity_vr(N6,N5,N4))THEN
         !less than field capacity
@@ -1497,7 +1497,7 @@ module WatsubMod
     K1     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-AMIN1(ThetaSat_vr(N3,N2,N1),THETW1))/POROS_vr(N3,N2,N1))+1))
     KL     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N6,N5,N4)-THETWL)/POROS_vr(N6,N5,N4))+1))
 
-    IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+    IF(VLSoilMicPMass_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
       IF(THETW1.LT.FieldCapacity_vr(N3,N2,N1))THEN
         PSISTMP             = -EXP(LOGPSIFLD(N2,N1)+(LOGFldCapacity_vr(N3,N2,N1)-LOG(THETW1)) &
           /FCD(N3,N2,N1)*LOGPSIMND(N2,N1))
@@ -1530,15 +1530,15 @@ module WatsubMod
   !     HYDRAULIC CONUCTIVITY
   !
   !     HydCondSrc,HydCondDest=hydraulic conductivity of source,destination layer
-  !     HydroCond3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
+  !     HydroCond_3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
   !
   IF(N3.EQ.NUM(NY,NX))THEN
     !surface soil
-    HydCondSrc=HydroCond3D(N,K1,N3,N2,N1)*KSatRedusByRainKinetEnergy
+    HydCondSrc=HydroCond_3D(N,K1,N3,N2,N1)*KSatRedusByRainKinetEnergy
   ELSE
-    HydCondSrc=HydroCond3D(N,K1,N3,N2,N1)
+    HydCondSrc=HydroCond_3D(N,K1,N3,N2,N1)
   ENDIF
-  HydCondDest=HydroCond3D(N,KL,N6,N5,N4)
+  HydCondDest=HydroCond_3D(N,KL,N6,N5,N4)
   !
   !     TOTAL SOIL WATER POTENTIAL = MATRIC, GRAVIMETRIC + OSMOTIC
   !
@@ -1867,7 +1867,7 @@ module WatsubMod
 !     DepthInternalWTBL=depth to internal water table
 !     FLWL=micropore discharge to natural water table
 !     HFLWL=convective heat from discharge to natural water table
-!     HydroCond3D=saturated hydraulic conductivity
+!     HydroCond_3D=saturated hydraulic conductivity
 !     AREAU=fraction of layer below natural water table
 !
   IF(IFLGU.EQ.0 .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN
@@ -1876,7 +1876,7 @@ module WatsubMod
       +mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-ExtWaterTable(N2,N1)) &
       -mGravAccelerat*AZMAX1(SoiDepthMidLay_vr(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-    FLWT=PSISWT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAU(N3,N2,N1))/(RechargSubSurf+1.0_r8) &
+    FLWT=PSISWT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAU(N3,N2,N1))/(RechargSubSurf+1.0_r8) &
       *RechargRateWTBL*dts_HeatWatTP
     WatXChange2WatTable(N,M6,M5,M4)  = XN*FLWT
     WatXChange2WatTableX(N,M6,M5,M4) = XN*FLWT
@@ -1906,7 +1906,7 @@ module WatsubMod
 !     HydroCondMacP1=macropore hydraulic conductivity
 !     ConvWaterFlowMacP_3D=macropore discharge to natural water table
 !     HFLWL=convective heat from discharge to natural water table
-!     HydroCond3D=saturated hydraulic conductivity
+!     HydroCond_3D=saturated hydraulic conductivity
   !     AREAU=fraction of layer below natural water table
 !
   IF(IFLGUH.EQ.0 .AND. (.not.isclose(RechargRateWTBL,0._r8)).AND.VLMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -1946,7 +1946,7 @@ module WatsubMod
   !     DepthInternalWTBL=depth to internal water table
   !     FLWL=micropore discharge to natural+artificial water table
   !     HFLWL=convective heat from dischg to natural+artifl water table
-  !     HydroCond3D=saturated hydraulic conductivity
+  !     HydroCond_3D=saturated hydraulic conductivity
   !     AreaUnderWaterTBL=fraction of layer below artificial water table
 !
   IF(IFLGD.EQ.0.AND.(.not.isclose(RechargRateWTBL,0._r8)))THEN
@@ -1956,7 +1956,7 @@ module WatsubMod
       -mGravAccelerat*AZMAX1(SoiDepthMidLay_vr(N3,N2,N1)-DepthInternalWTBL(N2,N1)))
 
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-    FLWT = PSISWT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTBL(N3,N2,N1))&
+    FLWT = PSISWT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTBL(N3,N2,N1))&
       /(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
     WatXChange2WatTable(N,M6,M5,M4)  = WatXChange2WatTable(N,M6,M5,M4)+XN*FLWT
     WatXChange2WatTableX(N,M6,M5,M4) = WatXChange2WatTableX(N,M6,M5,M4)+XN*FLWT
@@ -1979,7 +1979,7 @@ module WatsubMod
 !     HydroCondMacP1=macropore hydraulic conductivity
 !     ConvWaterFlowMacP_3D=macropore discharge to artificial water table
 !     HFLWL=convective heat from discharge to artificial water table
-!     HydroCond3D=saturated hydraulic conductivity
+!     HydroCond_3D=saturated hydraulic conductivity
 !     AreaUnderWaterTBL=fraction of layer below artificial water table
 !
   IF(IFLGDH.EQ.0.AND.(.not.isclose(RechargRateWTBL,0._r8)).AND.VLMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -2025,7 +2025,7 @@ module WatsubMod
   !     FLWU,FLWUL=micropore recharge unltd,ltd by micropore air volume
   !     FLWL=micropore recharge from natural water table
   !     HFLWL=convective heat from recharge from natural water table
-  !     HydroCond3D=saturated hydraulic conductivity
+  !     HydroCond_3D=saturated hydraulic conductivity
   !     AREAU=fraction of layer below natural water table
   !     VLairMicP=air filled 
       IF(SoiDepthMidLay_vr(N3,N2,N1).GE.ExtWaterTable(N2,N1)     &
@@ -2038,7 +2038,7 @@ module WatsubMod
         PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
           mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-ExtWaterTable(N2,N1)))
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
-        FLWU=PSISUT*HydroCond3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*&
+        FLWU=PSISUT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*&
           AREAU(N3,N2,N1)/(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
         !within a time step, the incoming flow cannot exceed avaiable air-filled pores   
         IF(SoiBulkDensity_vr(N3,N2,N1).GT.ZERO)THEN
@@ -2073,7 +2073,7 @@ module WatsubMod
       !     FLWUH,FLWUHL=macropore recharge unltd,ltd by macropore air volume
       !     ConvWaterFlowMacP_3D=macropore discharge to natural water table
       !     HFLWL=convective heat from discharge to natural water table
-      !     HydroCond3D=saturated hydraulic conductivity
+      !     HydroCond_3D=saturated hydraulic conductivity
       !     AREAU=fraction of layer below natural water table
 !
       IF(DPTHH.GT.ExtWaterTable(N2,N1)                         & !deeper than water table

@@ -463,8 +463,8 @@ contains
     !top soil has water or ice
     !ice albedo seems too low.
     !write(*,*) "Albedo recomputed"
-    AlbedoGrnd=(SoilAlbedo_col(NY,NX)*SoilMicPMassLayer(NUM(NY,NX),NY,NX)+0.06_r8*VLWatGrnd &
-      +0.30_r8*VLIceGrnd)/(SoilMicPMassLayer(NUM(NY,NX),NY,NX)+VLWatGrnd+VLIceGrnd)
+    AlbedoGrnd=(SoilAlbedo_col(NY,NX)*VLSoilMicPMass_vr(NUM(NY,NX),NY,NX)+0.06_r8*VLWatGrnd &
+      +0.30_r8*VLIceGrnd)/(VLSoilMicPMass_vr(NUM(NY,NX),NY,NX)+VLWatGrnd+VLIceGrnd)
   ELSE
     !write(*,*) "Albedo from soil"
     AlbedoGrnd=SoilAlbedo_col(NY,NX)
@@ -733,7 +733,7 @@ contains
 ! CNDR,HCNDR=current,saturated litter hydraulic conductivity
 ! PSISE,PSISM1_vr(0,=air entry,current litter water potential
 ! VLWatMicP1_vr(0,VWatLitRHoldCapcity=current,maximum litter water volume
-! CND1,HydroCond3D=soil hydraulic conductivity
+! CND1,HydroCond_3D=soil hydraulic conductivity
 ! KSatReductByRainKineticEnergy=reduction in soil surface Ksat from rainfall energy impact
 ! K1=soil relative water-filled porosity
 ! THETWX,POROS=soil water content,porosity
@@ -749,7 +749,7 @@ contains
 ! WatFLow2LitR,HFLWRL=total litter water,heat flux
 ! FLWRM=litter-soil water flux for solute transfer in TranspNoSalt.f
 ! CND1,CNDL=hydraulic conductivity of source,destination layer
-! HydroCond3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
+! HydroCond_3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
   IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !top layer is soil
@@ -765,8 +765,8 @@ contains
     K0=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS0(NY,NX)-ThetaWLitR))/POROS0(NY,NX))+1))
     !topsoil layer
     K1=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS_vr(NUM(NY,NX),NY,NX)-THETW1))/POROS_vr(NUM(NY,NX),NY,NX))+1))
-    CNDR=HydroCond3D(3,K0,0,NY,NX)
-    CND1=HydroCond3D(3,K1,NUM(NY,NX),NY,NX)*KSatReductByRainKineticEnergy
+    CNDR=HydroCond_3D(3,K0,0,NY,NX)
+    CND1=HydroCond_3D(3,K1,NUM(NY,NX),NY,NX)*KSatReductByRainKineticEnergy
     AVCNDR=2.0_r8*CNDR*CND1/(CNDR*DLYR(3,NUM(NY,NX),NY,NX)+CND1*DLYRR_COL(NY,NX))
     PSIST0=PSISM1_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)
     PSIST1=PSISM1_vr(NUM(NY,NX),NY,NX)+PSIGrav_vr(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)

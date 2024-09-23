@@ -11,7 +11,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  ThetaAir_vr(:,:,:)                      !air concentration [m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP_vr(:,:,:)                       !soil air content [m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                      !volumetric water content [m3 m-3]
-  real(r8),target,allocatable ::  THETI_col(:,:,:)                      !volumetric ice content [m3 m-3]
+  real(r8),target,allocatable ::  THETI_vr(:,:,:)                      !volumetric ice content [m3 m-3]
   real(r8),target,allocatable ::  ThetaH2OZ_vr(:,:,:)                     !volumetric moblize water [m3 m-3]
   real(r8),target,allocatable ::  ThetaICEZ_vr(:,:,:)                     !volumetric mobile ice [m3 m-3]
   real(r8),target,allocatable ::  VLWatMicP_vr(:,:,:)                       !soil micropore water content [m3 d-2]
@@ -38,9 +38,9 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                     !excess water+ice
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                     !excess water
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
-  real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
+  real(r8),target,allocatable ::  HydroCond_3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
-  real(r8),target,allocatable ::  HydroCondMicP4RootUptake(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8),target,allocatable ::  HydroCondMicP4RootUptake_vr(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
   real(r8),target,allocatable ::  WatFlux4ErosionM_2DH(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  RunoffVelocity(:,:,:)                        !runoff velocity, [m t-1]
   integer,target,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
@@ -111,7 +111,7 @@ module SoilWaterDataType
   allocate(ThetaAir_vr(0:JZ,JY,JX));  ThetaAir_vr=0._r8
   allocate(VLsoiAirP_vr(0:JZ,JY,JX));   VLsoiAirP_vr=0._r8
   allocate(THETW_vr(0:JZ,JY,JX));  THETW_vr=0._r8
-  allocate(THETI_col(0:JZ,JY,JX));  THETI_col=0._r8
+  allocate(THETI_vr(0:JZ,JY,JX));  THETI_vr=0._r8
   allocate(ThetaH2OZ_vr(0:JZ,JY,JX)); ThetaH2OZ_vr=0._r8
   allocate(ThetaICEZ_vr(0:JZ,JY,JX)); ThetaICEZ_vr=0._r8
   allocate(VLWatMicP_vr(0:JZ,JY,JX));   VLWatMicP_vr=0._r8
@@ -138,9 +138,9 @@ module SoilWaterDataType
   allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
   allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
-  allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
+  allocate(HydroCond_3D(3,100,0:JZ,JY,JX));HydroCond_3D=0._r8
   allocate(HydroCondMacP_vr(JZ,JY,JX));     HydroCondMacP_vr=0._r8
-  allocate(HydroCondMicP4RootUptake(JZ,JY,JX));     HydroCondMicP4RootUptake=0._r8
+  allocate(HydroCondMicP4RootUptake_vr(JZ,JY,JX));     HydroCondMicP4RootUptake_vr=0._r8
   allocate(WatFlux4ErosionM_2DH(60,JV,JH));      WatFlux4ErosionM_2DH=0._r8
   allocate(RunoffVelocity(60,JY,JX));      RunoffVelocity=0._r8
   allocate(IFLBM(60,2,2,JY,JX));IFLBM=0
@@ -198,7 +198,7 @@ module SoilWaterDataType
   call destroy(ThetaAir_vr)
   call destroy(VLsoiAirP_vr)
   call destroy(THETW_vr)
-  call destroy(THETI_col)
+  call destroy(THETI_vr)
   call destroy(ThetaH2OZ_vr)
   call destroy(ThetaICEZ_vr)
   call destroy(VLWatMicP_vr)
@@ -225,9 +225,9 @@ module SoilWaterDataType
   call destroy(XVLMobileWaterLitRM)
   call destroy(XVLMobileWatMicPM)
   call destroy(XVLiceMicPM)
-  call destroy(HydroCond3D)
+  call destroy(HydroCond_3D)
   call destroy(HydroCondMacP_vr)
-  call destroy(HydroCondMicP4RootUptake)
+  call destroy(HydroCondMicP4RootUptake_vr)
   call destroy(WatFlux4ErosionM_2DH)
   call destroy(RunoffVelocity)
   call destroy(IFLBM)

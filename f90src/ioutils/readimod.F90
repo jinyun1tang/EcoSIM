@@ -426,7 +426,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'PH',ntp,PH(1:JZ,NV1,NH1))
     !meq/100g means 1.e-3 mol/100 g =1 cmol/kg , cmol ~ 1.e-2 mol
@@ -531,65 +531,65 @@ module readiMod
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
-            CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L,NV1,NH1)
-            SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NV1,NH1)
-            FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NV1,NH1)
-            WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NV1,NH1)
-            SatHydroCondVert_vr(L,NY,NX)=SatHydroCondVert_vr(L,NV1,NH1)
-            SatHydroCondHrzn_vr(L,NY,NX)=SatHydroCondHrzn_vr(L,NV1,NH1)
-            CSAND(L,NY,NX)=CSAND(L,NV1,NH1)
-            CSILT(L,NY,NX)=CSILT(L,NV1,NH1)
-            SoilFracAsMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NV1,NH1)
-            ROCK(L,NY,NX)=ROCK(L,NV1,NH1)
-            PH(L,NY,NX)=PH(L,NV1,NH1)
-            CEC(L,NY,NX)=CEC(L,NV1,NH1)
-            AEC(L,NY,NX)=AEC(L,NV1,NH1)
-            CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NV1,NH1)
-            COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NV1,NH1)
-            CSoilOrgM_vr(ielmn,L,NY,NX)=CSoilOrgM_vr(ielmn,L,NV1,NH1)
-            CSoilOrgM_vr(ielmp,L,NY,NX)=CSoilOrgM_vr(ielmp,L,NV1,NH1)
+            CumDepz2LayerBot_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NV1,NH1)
+            SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L,NV1,NH1)
+            FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L,NV1,NH1)
+            WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L,NV1,NH1)
+            SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L,NV1,NH1)
+            SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L,NV1,NH1)
+            CSAND(L,NY,NX)               = CSAND(L,NV1,NH1)
+            CSILT(L,NY,NX)               = CSILT(L,NV1,NH1)
+            SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L,NV1,NH1)
+            ROCK_vr(L,NY,NX)             = ROCK_vr(L,NV1,NH1)
+            PH(L,NY,NX)                  = PH(L,NV1,NH1)
+            CEC(L,NY,NX)                 = CEC(L,NV1,NH1)
+            AEC(L,NY,NX)                 = AEC(L,NV1,NH1)
+            CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NV1,NH1)
+            COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NV1,NH1)
+            CSoilOrgM_vr(ielmn,L,NY,NX)  = CSoilOrgM_vr(ielmn,L,NV1,NH1)
+            CSoilOrgM_vr(ielmp,L,NY,NX)  = CSoilOrgM_vr(ielmp,L,NV1,NH1)
 
-            CNH4(L,NY,NX)=CNH4(L,NV1,NH1)
-            CNO3(L,NY,NX)=CNO3(L,NV1,NH1)
-            CPO4(L,NY,NX)=CPO4(L,NV1,NH1)
+            CNH4(L,NY,NX) = CNH4(L,NV1,NH1)
+            CNO3(L,NY,NX) = CNO3(L,NV1,NH1)
+            CPO4(L,NY,NX) = CPO4(L,NV1,NH1)
 
-            CAL(L,NY,NX)=CAL(L,NV1,NH1)
-            CFE(L,NY,NX)=CFE(L,NV1,NH1)
-            CCA(L,NY,NX)=CCA(L,NV1,NH1)
-            CMG(L,NY,NX)=CMG(L,NV1,NH1)
-            CNA(L,NY,NX)=CNA(L,NV1,NH1)
-            CKA(L,NY,NX)=CKA(L,NV1,NH1)
-            CSO4(L,NY,NX)=CSO4(L,NV1,NH1)
-            CCL(L,NY,NX)=CCL(L,NV1,NH1)
+            CAL(L,NY,NX)  = CAL(L,NV1,NH1)
+            CFE(L,NY,NX)  = CFE(L,NV1,NH1)
+            CCA(L,NY,NX)  = CCA(L,NV1,NH1)
+            CMG(L,NY,NX)  = CMG(L,NV1,NH1)
+            CNA(L,NY,NX)  = CNA(L,NV1,NH1)
+            CKA(L,NY,NX)  = CKA(L,NV1,NH1)
+            CSO4(L,NY,NX) = CSO4(L,NV1,NH1)
+            CCL(L,NY,NX)  = CCL(L,NV1,NH1)
 
-            CALPO(L,NY,NX)=CALPO(L,NV1,NH1)
-            CFEPO(L,NY,NX)=CFEPO(L,NV1,NH1)
-            CCAPD(L,NY,NX)=CCAPD(L,NV1,NH1)
-            CCAPH(L,NY,NX)=CCAPH(L,NV1,NH1)
-            CALOH(L,NY,NX)=CALOH(L,NV1,NH1)
-            CFEOH(L,NY,NX)=CFEOH(L,NV1,NH1)
-            CCACO(L,NY,NX)=CCACO(L,NV1,NH1)
-            CCASO(L,NY,NX)=CCASO(L,NV1,NH1)
+            CALPO(L,NY,NX) = CALPO(L,NV1,NH1)
+            CFEPO(L,NY,NX) = CFEPO(L,NV1,NH1)
+            CCAPD(L,NY,NX) = CCAPD(L,NV1,NH1)
+            CCAPH(L,NY,NX) = CCAPH(L,NV1,NH1)
+            CALOH(L,NY,NX) = CALOH(L,NV1,NH1)
+            CFEOH(L,NY,NX) = CFEOH(L,NV1,NH1)
+            CCACO(L,NY,NX) = CCACO(L,NV1,NH1)
+            CCASO(L,NY,NX) = CCASO(L,NV1,NH1)
 
-            GKC4(L,NY,NX)=GKC4(L,NV1,NH1)
-            GKCH(L,NY,NX)=GKCH(L,NV1,NH1)
-            GKCA(L,NY,NX)=GKCA(L,NV1,NH1)
-            GKCM(L,NY,NX)=GKCM(L,NV1,NH1)
-            GKCN(L,NY,NX)=GKCN(L,NV1,NH1)
-            GKCK(L,NY,NX)=GKCK(L,NV1,NH1)
+            GKC4(L,NY,NX) = GKC4(L,NV1,NH1)
+            GKCH(L,NY,NX) = GKCH(L,NV1,NH1)
+            GKCA(L,NY,NX) = GKCA(L,NV1,NH1)
+            GKCM(L,NY,NX) = GKCM(L,NV1,NH1)
+            GKCN(L,NY,NX) = GKCN(L,NV1,NH1)
+            GKCK(L,NY,NX) = GKCK(L,NV1,NH1)
 
-            THW(L,NY,NX)=THW(L,NV1,NH1)
-            THI(L,NY,NX)=THI(L,NV1,NH1)
+            THW(L,NY,NX) = THW(L,NV1,NH1)
+            THI(L,NY,NX) = THI(L,NV1,NH1)
 
-            RSC(k_fine_litr,L,NY,NX)=RSC(k_fine_litr,L,NV1,NH1)
-            RSN(k_fine_litr,L,NY,NX)=RSN(k_fine_litr,L,NV1,NH1)
-            RSP(k_fine_litr,L,NY,NX)=RSP(k_fine_litr,L,NV1,NH1)
-            RSC(k_woody_litr,L,NY,NX)=RSC(k_woody_litr,L,NV1,NH1)
-            RSN(k_woody_litr,L,NY,NX)=RSN(k_woody_litr,L,NV1,NH1)
-            RSP(k_woody_litr,L,NY,NX)=RSP(k_woody_litr,L,NV1,NH1)
-            RSC(k_manure,L,NY,NX)=RSC(k_manure,L,NV1,NH1)
-            RSN(k_manure,L,NY,NX)=RSN(k_manure,L,NV1,NH1)
-            RSP(k_manure,L,NY,NX)=RSP(k_manure,L,NV1,NH1)
+            RSC(k_fine_litr,L,NY,NX)  = RSC(k_fine_litr,L,NV1,NH1)
+            RSN(k_fine_litr,L,NY,NX)  = RSN(k_fine_litr,L,NV1,NH1)
+            RSP(k_fine_litr,L,NY,NX)  = RSP(k_fine_litr,L,NV1,NH1)
+            RSC(k_woody_litr,L,NY,NX) = RSC(k_woody_litr,L,NV1,NH1)
+            RSN(k_woody_litr,L,NY,NX) = RSN(k_woody_litr,L,NV1,NH1)
+            RSP(k_woody_litr,L,NY,NX) = RSP(k_woody_litr,L,NV1,NH1)
+            RSC(k_manure,L,NY,NX)     = RSC(k_manure,L,NV1,NH1)
+            RSN(k_manure,L,NY,NX)     = RSN(k_manure,L,NV1,NH1)
+            RSP(k_manure,L,NY,NX)     = RSP(k_manure,L,NV1,NH1)
 
           ENDDO
         ENDIF
@@ -597,10 +597,10 @@ module readiMod
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
         endif
-        RSC(k_fine_litr,0,NY,NX)=AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
-        RSN(k_fine_litr,0,NY,NX)=AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
-        RSP(k_fine_litr,0,NY,NX)=AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
-        SatHydroCondVert_vr(0,NY,NX)=10.0_r8*0.098_r8
+        RSC(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
+        RSN(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
+        RSP(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
+        SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
 !
@@ -621,60 +621,60 @@ module readiMod
               CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
-              SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L+1,NY,NX)
-              FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L+1,NY,NX)
-              WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L+1,NY,NX)
-              SatHydroCondVert_vr(L,NY,NX)=SatHydroCondVert_vr(L+1,NY,NX)
-              SatHydroCondHrzn_vr(L,NY,NX)=SatHydroCondHrzn_vr(L+1,NY,NX)
-              CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
-              CSILT(L,NY,NX)=CSILT(L+1,NY,NX)
-              CCLAY(L,NY,NX)=CCLAY(L+1,NY,NX)
-              SoilFracAsMacP_vr(L,NY,NX)=SoilFracAsMacP_vr(L+1,NY,NX)
-              ROCK(L,NY,NX)=ROCK(L+1,NY,NX)
-              PH(L,NY,NX)=PH(L+1,NY,NX)
-              CEC(L,NY,NX)=CEC(L+1,NY,NX)
-              AEC(L,NY,NX)=AEC(L+1,NY,NX)
-              CSoilOrgM_vr(ielmc,L,NY,NX)=1.0_r8*CSoilOrgM_vr(ielmc,L+1,NY,NX)
-              COMLitrC_vr(L,NY,NX)=1.0_r8*COMLitrC_vr(L+1,NY,NX)
-              CSoilOrgM_vr(ielmn,L,NY,NX)=1.0_r8*CSoilOrgM_vr(ielmn,L+1,NY,NX)
-              CSoilOrgM_vr(ielmp,L,NY,NX)=1.0_r8*CSoilOrgM_vr(ielmp,L+1,NY,NX)
-              CNH4(L,NY,NX)=CNH4(L+1,NY,NX)
-              CNO3(L,NY,NX)=CNO3(L+1,NY,NX)
-              CPO4(L,NY,NX)=CPO4(L+1,NY,NX)
-              CAL(L,NY,NX)=CAL(L+1,NY,NX)
-              CFE(L,NY,NX)=CFE(L+1,NY,NX)
-              CCA(L,NY,NX)=CCA(L+1,NY,NX)
-              CMG(L,NY,NX)=CMG(L+1,NY,NX)
-              CNA(L,NY,NX)=CNA(L+1,NY,NX)
-              CKA(L,NY,NX)=CKA(L+1,NY,NX)
-              CSO4(L,NY,NX)=CSO4(L+1,NY,NX)
-              CCL(L,NY,NX)=CCL(L+1,NY,NX)
-              CALOH(L,NY,NX)=CALOH(L+1,NY,NX)
-              CFEOH(L,NY,NX)=CFEOH(L+1,NY,NX)
-              CCACO(L,NY,NX)=CCACO(L+1,NY,NX)
-              CCASO(L,NY,NX)=CCASO(L+1,NY,NX)
-              CALPO(L,NY,NX)=CALPO(L+1,NY,NX)
-              CFEPO(L,NY,NX)=CFEPO(L+1,NY,NX)
-              CCAPD(L,NY,NX)=CCAPD(L+1,NY,NX)
-              CCAPH(L,NY,NX)=CCAPH(L+1,NY,NX)
-              GKC4(L,NY,NX)=GKC4(L+1,NY,NX)
-              GKCH(L,NY,NX)=GKCH(L+1,NY,NX)
-              GKCA(L,NY,NX)=GKCA(L+1,NY,NX)
-              GKCM(L,NY,NX)=GKCM(L+1,NY,NX)
-              GKCN(L,NY,NX)=GKCN(L+1,NY,NX)
-              GKCK(L,NY,NX)=GKCK(L+1,NY,NX)
-              THW(L,NY,NX)=THW(L+1,NY,NX)
-              THI(L,NY,NX)=THI(L+1,NY,NX)
-              ISOIL(1:4,L,NY,NX)=ISOIL(1:4,L+1,NY,NX)
-              RSC(k_fine_litr,L,NY,NX)=0.0_r8
-              RSN(k_fine_litr,L,NY,NX)=0.0_r8
-              RSP(k_fine_litr,L,NY,NX)=0.0_r8
-              RSC(k_woody_litr,L,NY,NX)=0.0_r8
-              RSN(k_woody_litr,L,NY,NX)=0.0_r8
-              RSP(k_woody_litr,L,NY,NX)=0.0_r8
-              RSC(k_manure,L,NY,NX)=0.0_r8
-              RSN(k_manure,L,NY,NX)=0.0_r8
-              RSP(k_manure,L,NY,NX)=0.0_r8
+              SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L+1,NY,NX)
+              FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L+1,NY,NX)
+              WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L+1,NY,NX)
+              SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L+1,NY,NX)
+              SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L+1,NY,NX)
+              CSAND(L,NY,NX)               = CSAND(L+1,NY,NX)
+              CSILT(L,NY,NX)               = CSILT(L+1,NY,NX)
+              CCLAY(L,NY,NX)               = CCLAY(L+1,NY,NX)
+              SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L+1,NY,NX)
+              ROCK_vr(L,NY,NX)             = ROCK_vr(L+1,NY,NX)
+              PH(L,NY,NX)                  = PH(L+1,NY,NX)
+              CEC(L,NY,NX)                 = CEC(L+1,NY,NX)
+              AEC(L,NY,NX)                 = AEC(L+1,NY,NX)
+              CSoilOrgM_vr(ielmc,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmc,L+1,NY,NX)
+              COMLitrC_vr(L,NY,NX)         = 1.0_r8*COMLitrC_vr(L+1,NY,NX)
+              CSoilOrgM_vr(ielmn,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmn,L+1,NY,NX)
+              CSoilOrgM_vr(ielmp,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmp,L+1,NY,NX)
+              CNH4(L,NY,NX)                = CNH4(L+1,NY,NX)
+              CNO3(L,NY,NX)                = CNO3(L+1,NY,NX)
+              CPO4(L,NY,NX)                = CPO4(L+1,NY,NX)
+              CAL(L,NY,NX)                 = CAL(L+1,NY,NX)
+              CFE(L,NY,NX)                 = CFE(L+1,NY,NX)
+              CCA(L,NY,NX)                 = CCA(L+1,NY,NX)
+              CMG(L,NY,NX)                 = CMG(L+1,NY,NX)
+              CNA(L,NY,NX)                 = CNA(L+1,NY,NX)
+              CKA(L,NY,NX)                 = CKA(L+1,NY,NX)
+              CSO4(L,NY,NX)                = CSO4(L+1,NY,NX)
+              CCL(L,NY,NX)                 = CCL(L+1,NY,NX)
+              CALOH(L,NY,NX)               = CALOH(L+1,NY,NX)
+              CFEOH(L,NY,NX)               = CFEOH(L+1,NY,NX)
+              CCACO(L,NY,NX)               = CCACO(L+1,NY,NX)
+              CCASO(L,NY,NX)               = CCASO(L+1,NY,NX)
+              CALPO(L,NY,NX)               = CALPO(L+1,NY,NX)
+              CFEPO(L,NY,NX)               = CFEPO(L+1,NY,NX)
+              CCAPD(L,NY,NX)               = CCAPD(L+1,NY,NX)
+              CCAPH(L,NY,NX)               = CCAPH(L+1,NY,NX)
+              GKC4(L,NY,NX)                = GKC4(L+1,NY,NX)
+              GKCH(L,NY,NX)                = GKCH(L+1,NY,NX)
+              GKCA(L,NY,NX)                = GKCA(L+1,NY,NX)
+              GKCM(L,NY,NX)                = GKCM(L+1,NY,NX)
+              GKCN(L,NY,NX)                = GKCN(L+1,NY,NX)
+              GKCK(L,NY,NX)                = GKCK(L+1,NY,NX)
+              THW(L,NY,NX)                 = THW(L+1,NY,NX)
+              THI(L,NY,NX)                 = THI(L+1,NY,NX)
+              ISOIL(1:4,L,NY,NX)           = ISOIL(1:4,L+1,NY,NX)
+              RSC(k_fine_litr,L,NY,NX)     = 0.0_r8
+              RSN(k_fine_litr,L,NY,NX)     = 0.0_r8
+              RSP(k_fine_litr,L,NY,NX)     = 0.0_r8
+              RSC(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSN(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSP(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSC(k_manure,L,NY,NX)        = 0.0_r8
+              RSN(k_manure,L,NY,NX)        = 0.0_r8
+              RSP(k_manure,L,NY,NX)        = 0.0_r8
             ENDIF
           ENDDO
         ENDIF
@@ -701,7 +701,7 @@ module readiMod
           SoiBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
           IF(isclose(SoiBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
-          FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
+          FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK_vr(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
   !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
   !  both macropores and micropores    
   !     FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
@@ -852,7 +852,7 @@ module readiMod
   write(*,*)'Macropore fraction (0-1): FOHL'
   write(*,*)(SoilFracAsMacP_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Rock fraction (0-1): ROCK'
-  write(*,*)(ROCK(L,NY,NX),L=NU,NM)
+  write(*,*)(ROCK_vr(L,NY,NX),L=NU,NM)
 !
 !     CHEMICAL PROPERTIES
 !

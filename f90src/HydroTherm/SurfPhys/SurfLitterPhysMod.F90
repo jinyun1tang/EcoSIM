@@ -87,8 +87,8 @@ implicit none
 !
 ! litter layer
 ! albedo
-  LitRAlbedo=(0.20_r8*SoilMicPMassLayer(0,NY,NX)+0.06_r8*VLWatMicP1_vr(0,NY,NX)+0.30_r8 &
-    *VLiceMicP1_vr(0,NY,NX))/(SoilMicPMassLayer(0,NY,NX)+VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX))
+  LitRAlbedo=(0.20_r8*VLSoilMicPMass_vr(0,NY,NX)+0.06_r8*VLWatMicP1_vr(0,NY,NX)+0.30_r8 &
+    *VLiceMicP1_vr(0,NY,NX))/(VLSoilMicPMass_vr(0,NY,NX)+VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX))
 
   !radiation incident on litter layer  
   Radt2LitR=(1.0_r8-LitRAlbedo)*RadSWonLitR(NY,NX)+LWRad2LitR(NY,NX)  

@@ -1505,7 +1505,7 @@ contains
 
   THETW1=AMAX1(THETY_vr(NUM(NY,NX),NY,NX),AMIN1(POROS_vr(NUM(NY,NX),NY,NX) &
     ,safe_adb(VLWatMicP1_vr(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX))))
-  IF(SoilMicPMassLayer(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+  IF(VLSoilMicPMass_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     IF(THETW1.LT.FieldCapacity_vr(NUM(NY,NX),NY,NX))THEN
       PSISM1_vr(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
         +((LOGFldCapacity_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
