@@ -6,11 +6,12 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
-  use data_kind_mod , only : r8 => DAT_KIND_R8
-  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
-  use abortutils   , only : endrun, print_info
-  use minimathmod  , only : isclose, isclose,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
-  use ElmIDMod     , only : iewstdir,insthdir,ivertdir
+  use data_kind_mod,  only: r8 => DAT_KIND_R8
+  use data_const_mod, only: GravAcceleration=>DAT_CONST_G
+  use abortutils,     only: endrun,           print_info
+  use minimathmod,    only: isclose,          isclose,  safe_adb, vapsat, AZMAX1, AZMIN1, AZMAX1t
+  use ElmIDMod,       only: iewstdir,         insthdir, ivertdir
+  use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -42,7 +43,6 @@ module WatsubMod
   use HydroThermData
   use SurfPhysMod
   use SoilPhysParaMod
-  use SurfPhysData, only : InitSurfPhysData,DestructSurfPhysData  
   implicit none
 
   private
@@ -280,10 +280,10 @@ module WatsubMod
         !VLHeatCapacity_vr=total heat capacity
         !VLHeatCapacityA=heat capcity without macropore water/ice
         !VLHeatCapacityB=heat capacity for macropore water/ice
-        VLHeatCapacityA(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX) &
+        VLHeatCapacityA_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX) &
           +cpi*VLiceMicP1_vr(L,NY,NX)    
-        VLHeatCapacityB(L,NY,NX)=cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)      
-        VLHeatCapacity_vr(L,NY,NX)=VLHeatCapacityA(L,NY,NX)+VLHeatCapacityB(L,NY,NX)
+        VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
+        VLHeatCapacity_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
     !
     !   MACROPOROSITY
     !
@@ -295,13 +295,13 @@ module WatsubMod
     !
         IF(VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           rsatMacP                 = VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX)
-          SoilFracAsMacP1(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*rsatMacP
-          HydroCondMacP1(L,NY,NX)  = HydroCondMacP_vr(L,NY,NX)*rsatMacP**2._r8
+          SoilFracAsMacP1_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*rsatMacP
+          HydroCondMacP1_vr(L,NY,NX)  = HydroCondMacP_vr(L,NY,NX)*rsatMacP**2._r8
         ELSE
-          SoilFracAsMacP1(L,NY,NX) = 0.0_r8
-          HydroCondMacP1(L,NY,NX)  = 0.0_r8
+          SoilFracAsMacP1_vr(L,NY,NX) = 0.0_r8
+          HydroCondMacP1_vr(L,NY,NX)  = 0.0_r8
         ENDIF
-        SoilFracAsMicP(L,NY,NX)=1.0_r8-SoilFracAsMacP1(L,NY,NX)
+        SoilFracAsMicP_vr(L,NY,NX)=1.0_r8-SoilFracAsMacP1_vr(L,NY,NX)
         TKSoi1(L,NY,NX)=TKS_vr(L,NY,NX)
         if(TKSoi1(L,NY,NX)>400._r8)then
           write(*,*)'TKS_vr(L,NY,NX)',L,TKS_vr(L,NY,NX)
@@ -393,10 +393,10 @@ module WatsubMod
     !     AVCNHL=macropore hydraulic conductance
     !     DLYR=layer depth
     !
-          IF(HydroCondMacP1(N3,N2,N1).GT.ZERO .AND. HydroCondMacP1(N6,N5,N4).GT.ZERO)THEN
+          IF(HydroCondMacP1_vr(N3,N2,N1).GT.ZERO .AND. HydroCondMacP1_vr(N6,N5,N4).GT.ZERO)THEN
             !when both src and dest have macro pores
-            AVCNHL(N,N6,N5,N4)=2.0_r8*HydroCondMacP1(N3,N2,N1)*HydroCondMacP1(N6,N5,N4) &
-              /(HydroCondMacP1(N3,N2,N1)*DLYR(N,N6,N5,N4)+HydroCondMacP1(N6,N5,N4) &
+            AVCNHL(N,N6,N5,N4)=2.0_r8*HydroCondMacP1_vr(N3,N2,N1)*HydroCondMacP1_vr(N6,N5,N4) &
+              /(HydroCondMacP1_vr(N3,N2,N1)*DLYR(N,N6,N5,N4)+HydroCondMacP1_vr(N6,N5,N4) &
               *DLYR(N,N3,N2,N1))
           ELSE
             AVCNHL(N,N6,N5,N4)=0.0_r8
@@ -851,7 +851,7 @@ module WatsubMod
 
                   WatXChange2WatTableX(N,M6,M5,M4) = WatXChange2WatTable(N,M6,M5,M4)
                   ConvWaterFlowMacP_3D(N,M6,M5,M4) = AMIN1(VLWatMacP1_vr(N3,N2,N1)*dts_wat &
-                    ,XN*mGravAccelerat*(-ABS(SLOPE(N,N2,N1)))*HydroCondMacP1(N3,N2,N1)*AREA(3,N3,N2,N1)) &
+                    ,XN*mGravAccelerat*(-ABS(SLOPE(N,N2,N1)))*HydroCondMacP1_vr(N3,N2,N1)*AREA(3,N3,N2,N1)) &
                     *RechargSubSurf*RechargRateWTBL*dts_HeatWatTP
                   HeatFlow2Soili(N,M6,M5,M4)=cpw*TKSoi1(N3,N2,N1)*(WatXChange2WatTable(N,M6,M5,M4) &
                     +ConvWaterFlowMacP_3D(N,M6,M5,M4))
@@ -1094,13 +1094,13 @@ module WatsubMod
             FracSoilAsAirt(L,NY,NX)=0.0_r8
           ENDIF
           IF(VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            SoilFracAsMacP1(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX)
-            HydroCondMacP1(L,NY,NX)  = HydroCondMacP_vr(L,NY,NX)*(VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX))**2
+            SoilFracAsMacP1_vr(L,NY,NX)   = SoilFracAsMacP_vr(L,NY,NX)*VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX)
+            HydroCondMacP1_vr(L,NY,NX) = HydroCondMacP_vr(L,NY,NX)*(VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX))**2
           ELSE
-            SoilFracAsMacP1(L,NY,NX) = 0.0_r8
-            HydroCondMacP1(L,NY,NX)  = 0.0_r8
+            SoilFracAsMacP1_vr(L,NY,NX)   = 0.0_r8
+            HydroCondMacP1_vr(L,NY,NX) = 0.0_r8
           ENDIF
-          SoilFracAsMicP(L,NY,NX) = 1.0_r8-SoilFracAsMacP1(L,NY,NX)
+          SoilFracAsMicP_vr(L,NY,NX) = 1.0_r8-SoilFracAsMacP1_vr(L,NY,NX)
           TKXX                    = TKSoi1(L,NY,NX)
           VHXX                    = VLHeatCapacity_vr(L,NY,NX)
           ENGY1                   = VLHeatCapacity_vr(L,NY,NX)*TKSoi1(L,NY,NX)
@@ -1117,9 +1117,9 @@ module WatsubMod
             if(TKSoi1(L,NY,NX)>1.e3_r8.or.TKSoi1(L,NY,NX)<0._r8)call endrun(trim(mod_filename)//' at line',__LINE__)
           endif
           VLHeatCapacityPre          = VLHeatCapacity_vr(L,NY,NX)
-          VLHeatCapacityA(L,NY,NX)   = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
-          VLHeatCapacityB(L,NY,NX)   = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
-          VLHeatCapacity_vr(L,NY,NX) = VLHeatCapacityA(L,NY,NX)+VLHeatCapacityB(L,NY,NX)
+          VLHeatCapacityA_vr(L,NY,NX)   = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
+          VLHeatCapacityB_vr(L,NY,NX)   = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
+          VLHeatCapacity_vr(L,NY,NX) = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
           !
           !         BEGIN ARTIFICIAL SOIL WARMING
           !
@@ -1914,7 +1914,7 @@ module WatsubMod
     PSISWTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable(N2,N1)) &
       -mGravAccelerat*AZMAX1(DPTHH-DepthInternalWTBL(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
-    FLWTH=PSISWTH*HydroCondMacP1(N3,N2,N1)*AREA(N,N3,N2,N1) &
+    FLWTH=PSISWTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1) &
       *(1.0_r8-AREAU(N3,N2,N1))/(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
 
     MacPoreDischarg=AMAX1(FLWTH,AZMIN1(-(VLWatMacP1_vr(N3,N2,N1)*dts_wat &
@@ -1988,7 +1988,7 @@ module WatsubMod
       -mGravAccelerat*AZMAX1(DPTHH-DepthInternalWTBL(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH = PSISWTH-PSISWD
 
-    FLWTH = PSISWTH*HydroCondMacP1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTBL(N3,N2,N1)) &
+    FLWTH = PSISWTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTBL(N3,N2,N1)) &
       /(RechargSubSurf+1.0_r8)*RechargRateWTBL*dts_HeatWatTP
     MacPoreDischarg=AMAX1(FLWTH,AZMIN1(-(VLWatMacP1_vr(N3,N2,N1)*dts_wat+ConvWaterFlowMacP_3D(3,N3,N2,N1) &
       -ConvWaterFlowMacP_3D(3,N3+1,N2,N1))))
@@ -2084,7 +2084,7 @@ module WatsubMod
         PSISWD                    = XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope(N2,N1))
         PSISUTH                   = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable(N2,N1))
         IF(PSISUTH.GT.0.0_r8)PSISUTH = PSISUTH+PSISWD
-        FLWUH                     = PSISUTH*HydroCondMacP1(N3,N2,N1)*AREA(N,N3,N2,N1)*&
+        FLWUH                     = PSISUTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1)*&
         AREAU(N3,N2,N1)/(RechargSubSurf+1.0_r8)*RechargRateWTBL*dts_HeatWatTP
         !is *dts_wat needed below?  
         FLWUHL                           = AMIN1(FLWUH,AirfMacP*dts_wat)

@@ -14,7 +14,7 @@ module ATSEcoSIMAdvanceMod
       VPA, WindSpeedAtm_col, RainH  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoi1, VLHeatCapacity_vr, &
-      SoilFracAsMicP, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars are double defined
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -82,7 +82,7 @@ implicit none
       VLiceMicP1_vr(L,NY,NX)=0.0
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       VLHeatCapacity_vr(L,NY,NX) = heat_capacity
-      SoilFracAsMicP(L,NY,NX) = 1.0
+      SoilFracAsMicP_vr(L,NY,NX) = 1.0
       PSISM1_vr(L,NY,NX) = a_MATP(L,NY)
       POROS_vr(L,NY,NX) = a_PORO(L,NY)
       !AREA3(L,NY,NX) = a_AREA3(L,NY)

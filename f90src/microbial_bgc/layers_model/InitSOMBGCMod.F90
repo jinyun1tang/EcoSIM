@@ -349,12 +349,6 @@ module InitSOMBGCMOD
       ENDIF
     ENDDO D8980
   ENDDO D8995
-!  DO K=1,jcplx
-!  write(171,*)K,L,SolidOMAct_vr(1:jsken,K,L,NY,NX)
-!   write(181,*)K,L,mBiomeHeter_vr(ielmc,:,K,L,NY,NX)
-!   write(182,*)K,L,mBiomeHeter_vr(ielmn,:,K,L,NY,NX)
-!   write(183,*)K,L,mBiomeHeter_vr(ielmp,:,K,L,NY,NX)
-!  enddo
 !
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !

@@ -473,13 +473,13 @@ module InitPlantMod
     Root1stMaxRadius_pft  => plt_morph%Root1stMaxRadius_pft,  &
     Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft,    &
     NIXBotRootLayer_pft   => plt_morph%NIXBotRootLayer_pft,   &
-    RoottRadialResist_pft => plt_morph%RoottRadialResist_pft, &
+    RootRadialResist_pft => plt_morph%RootRadialResist_pft, &
     Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft,    &
     RootPorosity_pft      => plt_morph%RootPorosity_pft,      &
     RootPoreTortu4Gas     => plt_morph%RootPoreTortu4Gas,     &
     RootRaidus_rpft       => plt_morph%RootRaidus_rpft,       &
     RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft,   &
-    RoottAxialResist_pft  => plt_morph%RoottAxialResist_pft,  &
+    RootAxialResist_pft  => plt_morph%RootAxialResist_pft,  &
     NIXBotRootLayer_rpft  => plt_morph%NIXBotRootLayer_rpft,  &
     SeedVolumeMean_pft    => plt_morph%SeedVolumeMean_pft,    &
     SeedMeanLen_pft       => plt_morph%SeedMeanLen_pft        &
@@ -503,7 +503,7 @@ module InitPlantMod
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     RoottRadialResist_pft,RoottAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
+!     RootRadialResist_pft,RootAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)
   D9795: DO L=NU,NL
@@ -530,8 +530,8 @@ module InitPlantMod
   VmaxPO4Root_pft(2,NZ)=VmaxPO4Root_pft(1,NZ)
   KmPO4Root_pft(2,NZ)=KmPO4Root_pft(1,NZ)
   CMinPO4Root_pft(2,NZ)=CMinPO4Root_pft(1,NZ)
-  RoottRadialResist_pft(2,NZ)=1.0E+04_r8
-  RoottAxialResist_pft(2,NZ)=1.0E+12_r8
+  RootRadialResist_pft(2,NZ)=1.0E+04_r8
+  RootAxialResist_pft(2,NZ)=1.0E+12_r8
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)

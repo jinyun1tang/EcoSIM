@@ -443,8 +443,8 @@ module StartqMod
   VmaxPO4Root_pft(imycorrhz,NZ,NY,NX)=VmaxPO4Root_pft(1,NZ,NY,NX)
   KmPO4Root_pft(imycorrhz,NZ,NY,NX)=KmPO4Root_pft(1,NZ,NY,NX)
   CMinPO4Root_pft(imycorrhz,NZ,NY,NX)=CMinPO4Root_pft(1,NZ,NY,NX)
-  RoottRadialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+04
-  RoottAxialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+12
+  RootRadialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+04
+  RootAxialResist_pft(imycorrhz,NZ,NY,NX)=1.0E+12
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)

@@ -280,8 +280,8 @@ implicit none
   real(r8), pointer :: RootRaidus_rpft(:,:)      => null() !root internal radius, [m]
   real(r8), pointer :: Root1stMaxRadius_pft(:,:)     => null() !maximum radius of primary roots, [m]
   real(r8), pointer :: Root2ndMaxRadius_pft(:,:)     => null() !maximum radius of secondary roots, [m]
-  real(r8), pointer :: RoottRadialResist_pft(:,:)       => null() !root radial resistivity, [MPa h m-2]
-  real(r8), pointer :: RoottAxialResist_pft(:,:)       => null() !root axial resistivity, [MPa h m-4]
+  real(r8), pointer :: RootRadialResist_pft(:,:)       => null() !root radial resistivity, [MPa h m-2]
+  real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity, [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)        => null() !total root length density, [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:,:)     => null() !root layer number primary axes, [d-2]
   real(r8), pointer :: Root2ndXNum_pvr(:,:,:)     => null() !root layer number axes, [d-2]
@@ -1891,8 +1891,8 @@ implicit none
   allocate(this%RootPorosity_pft(jroots,JP1));this%RootPorosity_pft=spval
   allocate(this%Root2ndXSecArea_pft(jroots,JP1));this%Root2ndXSecArea_pft=spval
   allocate(this%Root1stXSecArea_pft(jroots,JP1));this%Root1stXSecArea_pft=spval
-  allocate(this%RoottRadialResist_pft(jroots,JP1));this%RoottRadialResist_pft=spval
-  allocate(this%RoottAxialResist_pft(jroots,JP1));this%RoottAxialResist_pft=spval
+  allocate(this%RootRadialResist_pft(jroots,JP1));this%RootRadialResist_pft=spval
+  allocate(this%RootAxialResist_pft(jroots,JP1));this%RootAxialResist_pft=spval
   allocate(this%iPlantGrainType_pft(JP1));this%iPlantGrainType_pft=0
   end subroutine plt_morph_init
 

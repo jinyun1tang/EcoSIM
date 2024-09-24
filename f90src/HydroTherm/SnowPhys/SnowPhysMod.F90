@@ -406,8 +406,8 @@ contains
           !potential flow to soil
           PtWatFlowSno2Soi=WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
           !actual flow to micro- and macropores
-          WatFlowSno2MicP=AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP(NUM(NY,NX),NY,NX))
-          WatFlowSno2MacP=AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1(NUM(NY,NX),NY,NX))
+          WatFlowSno2MicP=AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
+          WatFlowSno2MacP=AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
           WatFlowSno2Soil=WatFlowSno2MicP+WatFlowSno2MacP
           HeatFlowSno2SoiByWat=cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil
           WatFlowSno2LitR=WatFloInSnoMax-WatFlowSno2Soil
@@ -1055,11 +1055,11 @@ contains
     VLiceMicP1_vr(NUM(NY,NX),NY,NX)=VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
     
     ENGY1=VLHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKSoi1(NUM(NY,NX),NY,NX)
-    VLHeatCapacityA(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+    VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
       +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
-    VLHeatCapacityB(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
+    VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
       +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
-    VLHeatCapacity_vr(NUM(NY,NX),NY,NX)=VLHeatCapacityA(NUM(NY,NX),NY,NX)+VLHeatCapacityB(NUM(NY,NX),NY,NX)
+    VLHeatCapacity_vr(NUM(NY,NX),NY,NX)=VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)
 
     IF(VLHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     ! topsoil layer is there

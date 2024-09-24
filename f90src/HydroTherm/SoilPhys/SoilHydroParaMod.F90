@@ -328,8 +328,8 @@ contains
   ENDIF
   LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
   LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
-  PSD(L,NY,NX)            = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-  FCD(L,NY,NX)            = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+  PSD(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+  FCD(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
 
 !   IBEGIN:   start date of model run
 
@@ -364,15 +364,15 @@ contains
     ENDIF
 
   !in a cold run, set it
-    VLWatMicP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-    VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VLiceMicP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
+    VLWatMicP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
+    VLWatMacP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
+    ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
+    VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
-    ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
-    ThetaICEZ_vr(L,NY,NX)=THETI_vr(L,NY,NX)
   ENDIF
   end subroutine SetColdRunSoilProps
 !------------------------------------------------------------------------------------------  
@@ -418,8 +418,7 @@ contains
     ENDDO D1230
     HydroCond_3D(3,K,0,NY,NX)=SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
     HydroCond_3D(1,K,0,NY,NX)=0.0_r8
-    HydroCond_3D(2,K,0,NY,NX)=0.0_r8
-    if(PSISK(K)/=PSISK(K))write(*,*)'PSISK bad',K
+    HydroCond_3D(2,K,0,NY,NX)=0.0_r8    
     IF(K.GT.1.AND.(PSISK(K).LT.PSISoilAirEntry(0,NY,NX)))THEN
       IF(PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
         !moisture at air-entry saturation

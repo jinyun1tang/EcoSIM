@@ -1406,8 +1406,8 @@ contains
     PrecHeat2LitR=cpw*TairK_col(NY,NX)*PrecThrufall2LitR                                 !heat flux to snow-free surface covered by litter
     PrecThrufall2Soil=PrecThruFall*FracSurfBareSoil_col(NY,NX)                          !heat flux to snow-free surface not covered by litter
     PrecHeat2Soil=cpw*TairK_col(NY,NX)*PrecThrufall2Soil
-    PrecThrufall2SoiMicP=PrecThrufall2Soil*SoilFracAsMicP(NUM(NY,NX),NY,NX)          !water flux to micropore
-    PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1(NUM(NY,NX),NY,NX)         !water flux to macropore
+    PrecThrufall2SoiMicP=PrecThrufall2Soil*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX)          !water flux to micropore
+    PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX)         !water flux to macropore
   ELSE
   ! no precipitation
     Rain4ToSno=-PrecIntceptByCanopy_col(NY,NX)*FracSurfAsSnow(NY,NX)                   !
@@ -1418,8 +1418,8 @@ contains
     PrecHeat2LitR=cpw*TairK_col(NY,NX)*PrecThrufall2LitR
     PrecThrufall2Soil=PrecThruFall*FracSurfBareSoil_col(NY,NX)
     PrecHeat2Soil=cpw*TairK_col(NY,NX)*PrecThrufall2Soil
-    PrecThrufall2SoiMicP=PrecThrufall2Soil*SoilFracAsMicP(NUM(NY,NX),NY,NX)
-    PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1(NUM(NY,NX),NY,NX)
+    PrecThrufall2SoiMicP=PrecThrufall2Soil*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX)
+    PrecThrufall2SoiMacP=PrecThrufall2Soil*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX)
   ENDIF
 !
 !     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F

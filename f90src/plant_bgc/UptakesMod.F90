@@ -51,8 +51,8 @@ module UptakesMod
   real(r8) :: FineRootRadius(jroots,JZ1)
   real(r8) :: RootResist(jroots,JZ1)
   real(r8) :: RootResistSoi(jroots,JZ1)
-  real(r8) :: RootResistRadial(jroots,JZ1)
-  real(r8) :: RootResistAxial(jroots,JZ1)
+  real(r8) :: RootResistPrimary(jroots,JZ1)
+  real(r8) :: RootResist2ndary(jroots,JZ1)
   real(r8) :: SoiH2OResist(jroots,JZ1)
   real(r8) :: SoiAddRootResist(jroots,JZ1),AllRootC_vr(JZ1)
   real(r8) :: FracPRoot4Uptake(jroots,JZ1,JP1)
@@ -135,7 +135,7 @@ module UptakesMod
 !
 !        if(I>176)print*,'calcreist'
         call CalcResistance(NZ,PATH,FineRootRadius,RootAreaDivRadius_vr,RootResist,RootResistSoi,&
-          RootResistRadial,RootResistAxial,SoiH2OResist,SoiAddRootResist,CNDT,PSIgravCanopyHeight,SoiLayerHasRoot)
+          RootResistPrimary,RootResist2ndary,SoiH2OResist,SoiAddRootResist,CNDT,PSIgravCanopyHeight,SoiLayerHasRoot)
 !
 !     INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
 !     BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
@@ -1010,7 +1010,7 @@ module UptakesMod
   end function CanopyEnergyH2OIteration
 !------------------------------------------------------------------------
   subroutine CalcResistance(NZ,PATH,FineRootRadius,RootAreaDivRadius_vr,&
-    RootResist,RootResistSoi,RootResistRadial,RootResistAxial,SoiH2OResist,&
+    RootResist,RootResistSoi,RootResistPrimary,RootResist2ndary,SoiH2OResist,&
     SoiAddRootResist,CNDT,PSIgravCanopyHeight,SoiLayerHasRoot)
 
   implicit none
@@ -1018,7 +1018,7 @@ module UptakesMod
   real(r8), intent(in)  :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1)
   real(r8), intent(in)  :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(out) :: RootResist(jroots,JZ1),RootResistSoi(jroots,JZ1)
-  real(r8), intent(out) :: RootResistRadial(jroots,JZ1),RootResistAxial(jroots,JZ1)
+  real(r8), intent(out) :: RootResistPrimary(jroots,JZ1),RootResist2ndary(jroots,JZ1)
   real(r8), intent(out) :: SoiH2OResist(jroots,JZ1),SoiAddRootResist(jroots,JZ1)
   real(r8), intent(out) :: CNDT  !total root conductance
   real(r8), intent(out) :: PSIgravCanopyHeight
@@ -1026,34 +1026,34 @@ module UptakesMod
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,RTAR2
   integer :: N, L
-  associate(                                                           &
-    DPTHZ_vr                 => plt_site%DPTHZ_vr,                     &
-    PlantPopulation_pft      => plt_site%PlantPopulation_pft,          &
-    VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,                &
-    ZERO                     => plt_site%ZERO,                         &
-    ZEROS2                   => plt_site%ZEROS2,                       &
-    NU                       => plt_site%NU,                           &
-    PSICanopy_pft            => plt_ew%PSICanopy_pft,                  &
-    ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,               &
-    THETW_vr                 => plt_soilchem%THETW_vr,                 &
-    VLMicP_vr                => plt_soilchem%VLMicP_vr,                &
+  associate(                                                                 &
+    DPTHZ_vr                    => plt_site%DPTHZ_vr,                        &
+    PlantPopulation_pft         => plt_site%PlantPopulation_pft,             &
+    VLWatMicPM_vr               => plt_site%VLWatMicPM_vr,                   &
+    ZERO                        => plt_site%ZERO,                            &
+    ZEROS2                      => plt_site%ZEROS2,                          &
+    NU                          => plt_site%NU,                              &
+    PSICanopy_pft               => plt_ew%PSICanopy_pft,                     &
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,                  &
+    THETW_vr                    => plt_soilchem%THETW_vr,                    &
+    VLMicP_vr                   => plt_soilchem%VLMicP_vr,                   &
     HydroCondMicP4RootUptake_vr => plt_soilchem%HydroCondMicP4RootUptake_vr, &
-    VLSoilPoreMicP_vr        => plt_soilchem%VLSoilPoreMicP_vr,        &
-    Root2ndXNum_pvr          => plt_morph%Root2ndXNum_pvr,             &
-    Root1stXNumL_pvr         => plt_morph%Root1stXNumL_pvr,            &
-    Root2ndMaxRadius_pft     => plt_morph%Root2ndMaxRadius_pft,        &
-    RoottAxialResist_pft     => plt_morph%RoottAxialResist_pft,        &
-    Root2ndRadius_pvr        => plt_morph%Root2ndRadius_pvr,           &
-    RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr,     &
-    CanPHeight4WatUptake     => plt_morph%CanPHeight4WatUptake,        &
-    RootLenPerPlant_pvr      => plt_morph%RootLenPerPlant_pvr,         &
-    Root2ndAveLen_pvr        => plt_morph%Root2ndAveLen_pvr,           &
-    Root1stRadius_pvr        => plt_morph%Root1stRadius_pvr,           &
-    MY                       => plt_morph%MY,                          &
-    RoottRadialResist_pft    => plt_morph%RoottRadialResist_pft,       &
-    CanopyHeight_pft         => plt_morph%CanopyHeight_pft,            &
-    NGTopRootLayer_pft       => plt_morph%NGTopRootLayer_pft,          &
-    MaxSoiL4Root_pft             => plt_morph%MaxSoiL4Root_pft         &
+    VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr,           &
+    Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr,                &
+    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr,               &
+    Root2ndMaxRadius_pft        => plt_morph%Root2ndMaxRadius_pft,           &
+    RootAxialResist_pft         => plt_morph%RootAxialResist_pft,            &
+    Root2ndRadius_pvr           => plt_morph%Root2ndRadius_pvr,              &
+    RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr,        &
+    CanPHeight4WatUptake        => plt_morph%CanPHeight4WatUptake,           &
+    RootLenPerPlant_pvr         => plt_morph%RootLenPerPlant_pvr,            &
+    Root2ndAveLen_pvr           => plt_morph%Root2ndAveLen_pvr,              &
+    Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr,              &
+    MY                          => plt_morph%MY,                             &
+    RootRadialResist_pft        => plt_morph%RootRadialResist_pft,           &
+    CanopyHeight_pft            => plt_morph%CanopyHeight_pft,               &
+    NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft,             &
+    MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft                &
   )
 
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
@@ -1106,29 +1106,30 @@ module UptakesMod
         !     Root2ndRadius_pvr=secondary root radius
         !     RootLenPerPlant_pvr=root length per plant
         !     RootResistSoi=radial resistance
-        !     RoottRadialResist_pft=radial resistivity from PFT file
+        !     RootRadialResist_pft=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !
         RTAR2              = TwoPiCON*Root2ndRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
-        RootResistSoi(N,L) = RoottRadialResist_pft(N,NZ)/RTAR2*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
+        RootResistSoi(N,L) = RootRadialResist_pft(N,NZ)/RTAR2*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
         !
         !     FRAD1,FRAD2=primary,secondary root radius relative to maximum
-        !     secondary radius from PFT file Root2ndMaxRadius_pft at which RoottAxialResist_pft is defined
+        !     secondary radius from PFT file Root2ndMaxRadius_pft at which RootAxialResist_pft is defined
         !     Root1stRadius_pvr,Root2ndRadius_pvr=primary,secondary root radius
-        !     RoottAxialResist_pft=axial resistivity from PFT file
+        !     RootAxialResist_pft=axial resistivity from PFT file
         !     DPTHZ=depth of primary root from surface
-        !     RootResistRadial,RootResistAxial=axial resistance of primary,secondary roots
+        !     RootResistPrimary,RootResist2ndary=axial resistance of primary,secondary roots
         !     Root2ndAveLen_pvr=average secondary root length
         !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of primary,secondary axes
 !
         FRAD1                 = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
-        RootResistRadial(N,L) = RoottAxialResist_pft(N,NZ)*DPTHZ_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
-          +RoottAxialResist_pft(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
+        RootResistPrimary(N,L) = RootAxialResist_pft(N,NZ)*DPTHZ_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
+          +RootAxialResist_pft(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
+
         FRAD2                = (Root2ndRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
-        RootResistAxial(N,L) = RoottAxialResist_pft(N,NZ)*Root2ndAveLen_pvr(N,L,NZ)/(FRAD2*Root2ndXNum_pvr(N,L,NZ))
+        RootResist2ndary(N,L) = RootAxialResist_pft(N,NZ)*Root2ndAveLen_pvr(N,L,NZ)/(FRAD2*Root2ndXNum_pvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !
@@ -1137,7 +1138,7 @@ module UptakesMod
         !     CNDT=total soil+root conductance for all layers
         ! assuming all roots work in parallel
 
-        RootResist(N,L)       = RootResistSoi(N,L)+RootResistRadial(N,L)+RootResistAxial(N,L)
+        RootResist(N,L)       = RootResistSoi(N,L)+RootResistPrimary(N,L)+RootResist2ndary(N,L)
         SoiAddRootResist(N,L) = SoiH2OResist(N,L)+RootResist(N,L)
         CNDT                  = CNDT+1.0_r8/SoiAddRootResist(N,L)
         
