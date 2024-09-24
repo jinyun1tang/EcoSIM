@@ -283,7 +283,7 @@ module RedistMod
 
   if(lverb)write(*,*)'HandleSurfaceBoundary'
 
-  call UpdateLitRPhys(NY,NX,TWat2GridBySurfRunoff(NY,NX),THeat2GridBySurfRunoff(NY,NX),&
+  call UpdateLitRPhys(I,J,NY,NX,TWat2GridBySurfRunoff(NY,NX),THeat2GridBySurfRunoff(NY,NX),&
     HeatStore_lnd,HEATIN_lnd)
 
   do idg=idg_beg,idg_NH3-1
@@ -698,6 +698,8 @@ module RedistMod
 
   SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM_vr(1:NumPlantChemElms,0,NY,NX)
 
+  !update heat capacity for consistency
+  VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   DO NE=1,NumPlantChemElms
     tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,0,NY,NX)
   enddo
@@ -795,20 +797,20 @@ module RedistMod
   integer :: L
 
   if(lverb)write(*,*)'update_physVar_Profile'
-  TVHeatCapacity=0.0_r8
-  TVHeatCapacitySoilM=0.0_r8
-  TVOLW=0.0_r8
-  TVOLWH=0.0_r8
-  TVOLI=0.0_r8
-  TVOLIH=0.0_r8
-  TENGY=0.0_r8
-  DVLiceMicP_vr=0._r8
+  TVHeatCapacity      = 0.0_r8
+  TVHeatCapacitySoilM = 0.0_r8
+  TVOLW               = 0.0_r8
+  TVOLWH              = 0.0_r8
+  TVOLI               = 0.0_r8
+  TVOLIH              = 0.0_r8
+  TENGY               = 0.0_r8
+  DVLiceMicP_vr       = 0._r8
   
   DO L=NU(NY,NX),NL(NY,NX)
-    TKSX=TKS_vr(L,NY,NX)
-    VHeatCapacityX=VHeatCapacity_vr(L,NY,NX)
-    VOLWXX=VLWatMicP_vr(L,NY,NX)
-    VOLIXX=VLiceMicP_vr(L,NY,NX)
+    TKSX           = TKS_vr(L,NY,NX)
+    VHeatCapacityX = VHeatCapacity_vr(L,NY,NX)
+    VOLWXX         = VLWatMicP_vr(L,NY,NX)
+    VOLIXX         = VLiceMicP_vr(L,NY,NX)
     !micropore
     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
       +WatIceThawMicP_vr(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
@@ -816,16 +818,16 @@ module RedistMod
       +WatIceThawMicP_vr(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
 
     !do a numerical correction
-    VLWatMicPX_vr(L,NY,NX)=AMIN1(VLWatMicP_vr(L,NY,NX),VLWatMicPX_vr(L,NY,NX)+0.01_r8*(VLWatMicP_vr(L,NY,NX)-VLWatMicPX_vr(L,NY,NX)))
-    VLiceMicP_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)-WatIceThawMicP_vr(L,NY,NX)/DENSICE
+    VLWatMicPX_vr(L,NY,NX) = AMIN1(VLWatMicP_vr(L,NY,NX),VLWatMicPX_vr(L,NY,NX)+0.01_r8*(VLWatMicP_vr(L,NY,NX)-VLWatMicPX_vr(L,NY,NX)))
+    VLiceMicP_vr(L,NY,NX)  = VLiceMicP_vr(L,NY,NX)-WatIceThawMicP_vr(L,NY,NX)/DENSICE
 
     !macropore
     VLWatMacP_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)+TWaterFlowMacP_vr(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
     VLiceMacP_vr(L,NY,NX)=VLiceMacP_vr(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
 
     !volume change
-    DVLWatMicP_vr(L,NY,NX)=VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
-    DVLiceMicP_vr(L)=VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
+    DVLWatMicP_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
+    DVLiceMicP_vr(L)       = VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -842,13 +844,13 @@ module RedistMod
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
       +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
 
-    TVHeatCapacity=TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
-    TVHeatCapacitySoilM=TVHeatCapacitySoilM+VHeatCapacitySoilM_vr(L,NY,NX)    
-    TVOLW=TVOLW+VLWatMicP_vr(L,NY,NX)
-    TVOLWH=TVOLWH+VLWatMacP_vr(L,NY,NX)
-    TVOLI=TVOLI+VLiceMicP_vr(L,NY,NX)
-    TVOLIH=TVOLIH+VLiceMacP_vr(L,NY,NX)
-    TENGY=TENGY+ENGY
+    TVHeatCapacity      = TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
+    TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapacitySoilM_vr(L,NY,NX)
+    TVOLW               = TVOLW+VLWatMicP_vr(L,NY,NX)
+    TVOLWH              = TVOLWH+VLWatMacP_vr(L,NY,NX)
+    TVOLI               = TVOLI+VLiceMicP_vr(L,NY,NX)
+    TVOLIH              = TVOLIH+VLiceMacP_vr(L,NY,NX)
+    TENGY               = TENGY+ENGY
     !
     !     ARTIFICIAL SOIL WARMING
     !
@@ -888,13 +890,13 @@ module RedistMod
     ELSE
       TKS_vr(L,NY,NX)=TKS_vr(NUM(NY,NX),NY,NX)
     ENDIF
-    TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))
-    WS=VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
-    HS=VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
-    WatMassStore_lnd=WatMassStore_lnd+WS
-    VOLISO=VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
-    WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
-    HeatStore_col(NY,NX)=HeatStore_col(NY,NX)+HS
+    TCS(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+    WS                   = VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
+    HS                   = VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
+    WatMassStore_lnd     = WatMassStore_lnd+WS
+    VOLISO               = VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
+    WatMass_col(NY,NX)   = WatMass_col(NY,NX)+WS
+    HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+HS
 !    2-WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     HeatStore_lnd=HeatStore_lnd+HS
   ENDDO
@@ -1505,7 +1507,7 @@ module RedistMod
 
   integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
-
+  real(r8) :: VLWatMicP1X,ENGYR,VLHeatCapacityX,TK1X
 !     begin_execution
 !     ADD ABOVE-GROUND LitrFall FROM EXTRACT.F TO SURFACE RESIDUE
 !
@@ -1516,6 +1518,7 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN_lnd=cumulative net surface heat transfer
 !
+
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     DO  M=1,jsken
       SolidOMAct_vr(M,K,0,NY,NX)=SolidOMAct_vr(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
@@ -1523,13 +1526,13 @@ module RedistMod
         SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
-      SoilOrgM_vr(ielmc,0,NY,NX)=SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
-      RAINR=LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
-      HRAINR=RAINR*cpw*TairK_col(NY,NX)
-      WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
-      HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR
-      CRAIN=CRAIN+RAINR
-      HEATIN_lnd=HEATIN_lnd+HRAINR
+      SoilOrgM_vr(ielmc,0,NY,NX) = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      RAINR                      = LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*ThetaCX(K)
+      HRAINR                     = RAINR*cpw*TairK_col(NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*cpo*TairK_col(NY,NX)
+      WatFLo2Litr(NY,NX)         = WatFLo2Litr(NY,NX)+RAINR
+      HeatFLo2LitrByWat(NY,NX)   = HeatFLo2LitrByWat(NY,NX)+HRAINR
+      CRAIN                      = CRAIN+RAINR
+      HEATIN_lnd                 = HEATIN_lnd+HRAINR
     enddo
   ENDDO
 

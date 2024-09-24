@@ -90,9 +90,9 @@ module SoilBGCNLayMod
             exit
           ENDIF
         ENDDO D1100
-        ORGRL=AZMAX1(OMLitrC_vr(L,NY,NX))
-        ORGRLL=AZMAX1(OMLitrC_vr(LL,NY,NX))
-        OSCXD=(ORGRL*VGeomLayer_vr(LL,NY,NX)-ORGRLL*VGeomLayer_vr(L,NY,NX))/(VGeomLayer_vr(L,NY,NX)+VGeomLayer_vr(LL,NY,NX))
+        ORGRL  = AZMAX1(OMLitrC_vr(L,NY,NX))
+        ORGRLL = AZMAX1(OMLitrC_vr(LL,NY,NX))
+        OSCXD  = (ORGRL*VGeomLayer_vr(LL,NY,NX)-ORGRLL*VGeomLayer_vr(L,NY,NX))/(VGeomLayer_vr(L,NY,NX)+VGeomLayer_vr(LL,NY,NX))
         IF(OSCXD.GT.0.0_r8.AND.OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FOSCXD=OSCXD/OMLitrC_vr(L,NY,NX)
         ELSEIF(OSCXD.LT.0.0_r8.AND.OMLitrC_vr(LL,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -143,9 +143,9 @@ module SoilBGCNLayMod
               L1=LL
             ENDIF
             DO NE=1,NumPlantChemElms            
-              OMEXS=FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
-              mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
-              mBiomeHeter_vr(NE,MID,K,LL,NY,NX)=mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
+              OMEXS                             = FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
+              mBiomeHeter_vr(NE,MID,K,L,NY,NX)  = mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
+              mBiomeHeter_vr(NE,MID,K,LL,NY,NX) = mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
             ENDDO
           ENDDO D7962
         ENDDO
@@ -163,9 +163,9 @@ module SoilBGCNLayMod
         ENDIF
 
         DO NE=1,NumPlantChemElms
-          ORMXS=FracLitrMix*AZMAX1(OMBioResdu_vr(NE,M,K,L1,NY,NX))        
-          OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)-ORMXS
-          OMBioResdu_vr(NE,M,K,LL,NY,NX)=OMBioResdu_vr(NE,M,K,LL,NY,NX)+ORMXS
+          ORMXS                          = FracLitrMix*AZMAX1(OMBioResdu_vr(NE,M,K,L1,NY,NX))
+          OMBioResdu_vr(NE,M,K,L,NY,NX)  = OMBioResdu_vr(NE,M,K,L,NY,NX)-ORMXS
+          OMBioResdu_vr(NE,M,K,LL,NY,NX) = OMBioResdu_vr(NE,M,K,LL,NY,NX)+ORMXS
         ENDDO
       ENDDO D7941
       !mix dissolved organic matter
@@ -175,17 +175,17 @@ module SoilBGCNLayMod
         L1=LL
       ENDIF      
       DO NE=idom_beg,idom_end
-        OQMXS=FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
-        OQMHXS=FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
-        OHMXS=FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
+        OQMXS  = FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
+        OQMHXS = FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
+        OHMXS  = FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
 
-        DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)-OQMXS
-        DOM_MacP_vr(NE,K,L,NY,NX)=DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
-        SorbedOM_vr(NE,K,L,NY,NX)=SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
+        DOM_vr(NE,K,L,NY,NX)      = DOM_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MacP_vr(NE,K,L,NY,NX) = DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
+        SorbedOM_vr(NE,K,L,NY,NX) = SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
 
-        DOM_vr(NE,K,LL,NY,NX)=DOM_vr(NE,K,LL,NY,NX)+OQMXS
-        DOM_MacP_vr(NE,K,LL,NY,NX)=DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
-        SorbedOM_vr(NE,K,LL,NY,NX)=SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
+        DOM_vr(NE,K,LL,NY,NX)      = DOM_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MacP_vr(NE,K,LL,NY,NX) = DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
+        SorbedOM_vr(NE,K,LL,NY,NX) = SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
       ENDDO
 
       !mix solid organic matter
@@ -196,13 +196,13 @@ module SoilBGCNLayMod
           L1=LL
         ENDIF
         DO NE=1,NumPlantChemElms
-          OSMXS=FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
-          SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS
-          SolidOM_vr(NE,M,K,LL,NY,NX)=SolidOM_vr(NE,M,K,LL,NY,NX)+OSMXS
+          OSMXS                       = FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
+          SolidOM_vr(NE,M,K,L,NY,NX)  = SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS
+          SolidOM_vr(NE,M,K,LL,NY,NX) = SolidOM_vr(NE,M,K,LL,NY,NX)+OSMXS
         ENDDO
-        OSAXS=FracLitrMix*AZMAX1(SolidOMAct_vr(M,K,L1,NY,NX))
-        SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
-        SolidOMAct_vr(M,K,LL,NY,NX)=SolidOMAct_vr(M,K,LL,NY,NX)+OSAXS
+        OSAXS                       = FracLitrMix*AZMAX1(SolidOMAct_vr(M,K,L1,NY,NX))
+        SolidOMAct_vr(M,K,L,NY,NX)  = SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
+        SolidOMAct_vr(M,K,LL,NY,NX) = SolidOMAct_vr(M,K,LL,NY,NX)+OSAXS
       ENDDO D7931
     ENDDO D7901
   ENDIF

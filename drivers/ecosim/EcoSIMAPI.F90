@@ -43,7 +43,6 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
-
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     if(do_timing)call start_timer(t1)
@@ -104,11 +103,9 @@ contains
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
   if(lverb)WRITE(*,334)'REDIST'
-
   if(do_timing)call start_timer(t1)    
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   if(do_timing)call end_timer('REDIST',t1)
-  
 334   FORMAT(A8)
 
   end subroutine Run_EcoSIM_one_step
