@@ -52,6 +52,11 @@ implicit none
   call set_ecosim_solver(1, 1, 1, 1)
   call InitAlloc(NOMicrobeGuilds=1)
 
+  write(*,*) "AREA test: "
+  write(*,*) "AREA(3,0,NY,NX): ", AREA(3,0,1,NX)
+  !write(*,*) "a_AREA3(NX,1): ", a_AREA3(1,1)
+  write(*,*) "a_AREA3(NX,0): ", a_AREA3(0,1)
+
   !setting a few variables 
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays = 1 !Is the number of layers down the roots go

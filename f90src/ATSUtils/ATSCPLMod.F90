@@ -30,8 +30,9 @@ contains
   real(r8), target :: target_val
   real(r8), pointer :: ptr(:,:)
   real(r8), pointer :: temp_array(:,:)
-  integer :: ncol, nvar, size_col, num_cols
+  integer :: ncol, nvar, size_col, num_cols, size_col_pad
   integer :: j1,j2,j3,i,j
+  integer :: test_rows, test_columns
   real(r8) :: temp_eq, double_eq
 
   !call SetBGCSizes(sizes)
@@ -39,33 +40,32 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
-  allocate(temp_array(size_col, num_cols))
+  size_col_pad = size_col+30
 
-  write(*,*) "size_col: ", size_col
-  write(*,*) "num_cols: ", num_cols
+  allocate(temp_array(size_col, num_cols))
   
   call c_f_pointer(props%depth%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_CumDepth2LayerBottom=data2D(:,:)
 
   call c_f_pointer(props%dz%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_dz=data2D(:,:)
 
   call c_f_pointer(props%volume%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_Volume=data2D(:,:)
 
   call c_f_pointer(props%volume%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_AREA3=data2D(:,:) 
 
   call c_f_pointer(state%water_content%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_WC=data2D(:,:)
 
   call c_f_pointer(props%volume%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_AreaZ=data2D(:,:)
 
   do i = 1, size_col
@@ -73,15 +73,36 @@ contains
   end do
 
   call c_f_pointer(state%temperature%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col_pad,num_cols])
   a_TEMP=data2D(:,:)
 
+  call c_f_pointer(state%temperature%data, cptr_temp)
+  call c_f_pointer(cptr_temp,data2D,[size_col_pad,num_cols])
+  a_TEMP_flip=data2D(:,:)
+
+  write(*,*) "Checking flip array sizes: "
+  write(*,*) 'Number of rows:', SIZE(a_TEMP_flip, 1)
+  write(*,*) 'Number of columns:', SIZE(a_TEMP_flip, 2)
+  write(*,*) 'Shape of a_TEMP:', SHAPE(a_TEMP_flip)
+
+  do i = 1, num_cols
+     do j = 1, size_col         
+        !write(*,*) a_TEMP(j,i)
+     end do
+  end do 
+
+  do i = 1, num_cols
+     do j = 1, size_col
+        write(*,*) a_TEMP_flip(j,i)
+     end do
+  end do
+
   call c_f_pointer(state%bulk_density%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_BKDSI=data2D(:,:)
 
   call c_f_pointer(state%matric_pressure%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_MATP=data2D(:,:)
 
   do i = 1, size_col
@@ -89,31 +110,31 @@ contains
   end do
 
   call c_f_pointer(state%porosity%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col_pad,num_cols])
   a_PORO=data2D(:,:)
 
   call c_f_pointer(props%liquid_saturation%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_LSAT=data2D(:,:)
 
   call c_f_pointer(props%relative_permeability%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_RELPERM=data2D(:,:)
 
   call c_f_pointer(state%hydraulic_conductivity%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_HCOND=data2D(:,:)
 
   call c_f_pointer(props%rooting_depth_fraction%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_FC=data2D(:,:)
 
   call c_f_pointer(state%subsurface_water_source%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_SSWS=data2D(:,:)
 
   call c_f_pointer(state%subsurface_energy_source%data, cptr_temp)
-  call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
+  call c_f_pointer(cptr_temp,data2D,[size_col,num_cols])
   a_SSES=data2D(:,:)
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))

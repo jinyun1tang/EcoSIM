@@ -518,19 +518,20 @@ contains
   RAGX=AMAX1(RAM,0.8_r8*RAGS(NY,NX),AMIN1(1.2_r8*RAGS(NY,NX),ResistanceLitRLay(NY,NX)/(1.0_r8-10.0_r8*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)
-  !write(*,*) "Value of RAa: "
-  !write(*,*) "RAa = ", RAa
-  !write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
-  !write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
-  !write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
-  !write(*,*) "RI = ", RI
-  !write(*,*) "RAM = ", RAM
-  !write(*,*) "RAGX = ", RAGX
-  !write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
-  !write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
-  !write(*,*) "FracSoiPAsAir_vr(0,NY,NX) = ", FracSoiPAsAir_vr(0,NY,NX)
-  !write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
-  !write(*,*) "POROQ = ", POROQ
+  write(*,*) "Value of RAa: "
+  write(*,*) "RAa = ", RAa
+  write(*,*) "RIB(NY,NX) = ", RIB(NY,NX)
+  write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
+  write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+  write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
+  write(*,*) "RI = ", RI
+  write(*,*) "RAM = ", RAM
+  write(*,*) "RAGX = ", RAGX
+  write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
+  write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
+  write(*,*) "FracSoiPAsAir_vr(0,NY,NX) = ", FracSoiPAsAir_vr(0,NY,NX)
+  write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
+  write(*,*) "POROQ = ", POROQ
 
 ! IF(I.EQ.63.AND.NX.EQ.1)THEN
 !     WRITE(*,7776)'RAGX',I,J,M,NX,NY,RAGZ,FracSurfAsBareSoi(NY,NX),RAG(NY,NX)
@@ -555,26 +556,26 @@ contains
 ! HeatSensVapAir2Soi=convective heat of evaporation flux
 !
   CdSoiEvap=PAREG(NY,NX)/(RAa+RZ)
-  write(*,*) "Writing for CdSoiEvap: "
-  write(*,*) "CdSoiEvap: ", CdSoiEvap
-  write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
-  write(*,*) "RAa: ", RAa
-  write(*,*) "RZ: ", RZ
+  !write(*,*) "Writing for CdSoiEvap: "
+  !write(*,*) "CdSoiEvap: ", CdSoiEvap
+  !write(*,*) "PAREG(NY,NX): ", PAREG(NY,NX)
+  !write(*,*) "RAa: ", RAa
+  !write(*,*) "RZ: ", RZ
   CdSoiHSens=PARSG(NY,NX)/RAa
-  write(*,*) "Writing for CdSoiHSens: "
-  write(*,*) "CdSoiHSens: ", CdSoiHSens
-  write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
-  write(*,*) "RAa: ", RAa
-  write(*,*) "RZ: ", RZ
+  !write(*,*) "Writing for CdSoiHSens: "
+  !write(*,*) "CdSoiHSens: ", CdSoiHSens
+  !write(*,*) "PARSG(NY,NX): ", PARSG(NY,NX)
+  !write(*,*) "RAa: ", RAa
+  !write(*,*) "RZ: ", RZ
   TKX1=TKSoi1(NUM(NY,NX),NY,NX)
   if(TKX1<0._r8)then
   write(*,*)'TKX1=',TKX1
   call endrun("Negative temperature in "//trim(mod_filename),__LINE__)
   endif
   VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGAS*TKX1))
-  write(*,*) "vaporSoi1: ", VaporSoi1
-  write(*,*) "TKX1: ", TKX1
-  write(*,*) "PSISV1: ", PSISV1
+  !write(*,*) "vaporSoi1: ", VaporSoi1
+  !write(*,*) "TKX1: ", TKX1
+  !write(*,*) "PSISV1: ", PSISV1
 
   !evaporation, no more than what is available, g H2O
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol(NY,NX)*dts_wat))
