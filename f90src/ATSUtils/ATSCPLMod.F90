@@ -80,10 +80,10 @@ contains
   call c_f_pointer(cptr_temp,data2D,[size_col_pad,num_cols])
   a_TEMP_flip=data2D(:,:)
 
-  write(*,*) "Checking flip array sizes: "
-  write(*,*) 'Number of rows:', SIZE(a_TEMP_flip, 1)
-  write(*,*) 'Number of columns:', SIZE(a_TEMP_flip, 2)
-  write(*,*) 'Shape of a_TEMP:', SHAPE(a_TEMP_flip)
+  !write(*,*) "Checking flip array sizes: "
+  !write(*,*) 'Number of rows:', SIZE(a_TEMP_flip, 1)
+  !write(*,*) 'Number of columns:', SIZE(a_TEMP_flip, 2)
+  !write(*,*) 'Shape of a_TEMP:', SHAPE(a_TEMP_flip)
 
   do i = 1, num_cols
      do j = 1, size_col         
@@ -93,7 +93,7 @@ contains
 
   do i = 1, num_cols
      do j = 1, size_col
-        write(*,*) a_TEMP_flip(j,i)
+        !write(*,*) a_TEMP_flip(j,i)
      end do
   end do
 

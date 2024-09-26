@@ -25,7 +25,8 @@ implicit none
   subroutine RunEcoSIMSurfaceBalance(NYS)
   use EcoSimConst
   use GridMod           , only : SetMeshATS
-  use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel
+  use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel, & 
+      SetHourlyAccumulatorsATS
   use StartsMod         , only : set_ecosim_solver
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
@@ -46,6 +47,10 @@ implicit none
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
   NX=1
+
+  do NY=1, NYS
+    call SetHourlyAccumulatorsATS(NY,NX)
+  enddo
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)

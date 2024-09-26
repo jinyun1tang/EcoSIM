@@ -40,6 +40,7 @@ implicit none
   public :: StageSurfacePhysModel
   public :: RunSurfacePhysModel
   public :: SurfaceEnergyModel
+  public :: SetHourlyAccumulatorsATS
   !
   public :: SurfaceRunoff
   public :: UpdateSurfaceAtM
@@ -69,6 +70,40 @@ implicit none
   real(r8) :: PrecHeatAir2LitR,PrecNet2SoiMacP  
 contains
 
+  subroutine SetHourlyAccumulatorsATS(NY,NX)
+!     implicit none
+  integer, intent(in) :: NX,NY
+
+  integer :: L
+!     begin_execution
+
+  WatFLo2Litr(NY,NX)                      = 0.0_r8
+  HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
+  TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
+  TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
+  HeatByRadiation_col(NY,NX)              = 0.0_r8
+  HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
+  HeatNet2Surf_col(NY,NX)                 = 0.0_r8
+  VapXAir2GSurf_col(NY,NX)                = 0.0_r8
+
+  TFLWCI(NY,NX)           = 0.0_r8
+  PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
+
+! zero arrays in the snow layers
+  WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MacP_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8
+  SnoXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay(1:JS,NY,NX)   = 0.0_r8
+  XPhaseChangeHeatL(1:JS,NY,NX) = 0.0_r8
+
+  end subroutine SetHourlyAccumulatorsATS
 
   subroutine StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -518,20 +553,20 @@ contains
   RAGX=AMAX1(RAM,0.8_r8*RAGS(NY,NX),AMIN1(1.2_r8*RAGS(NY,NX),ResistanceLitRLay(NY,NX)/(1.0_r8-10.0_r8*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)
-  write(*,*) "Value of RAa: "
-  write(*,*) "RAa = ", RAa
-  write(*,*) "RIB(NY,NX) = ", RIB(NY,NX)
-  write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
-  write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
-  write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
-  write(*,*) "RI = ", RI
-  write(*,*) "RAM = ", RAM
-  write(*,*) "RAGX = ", RAGX
-  write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
-  write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
-  write(*,*) "FracSoiPAsAir_vr(0,NY,NX) = ", FracSoiPAsAir_vr(0,NY,NX)
-  write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
-  write(*,*) "POROQ = ", POROQ
+  !write(*,*) "Value of RAa: "
+  !write(*,*) "RAa = ", RAa
+  !write(*,*) "RIB(NY,NX) = ", RIB(NY,NX)
+  !write(*,*) "RAGR(NY,NX) = ", RAGR(NY,NX)
+  !write(*,*) "RAGS(NY,NX) = ", RAGS(NY,NX)
+  !write(*,*) "ResistanceLitRLay(NY,NX) = ", ResistanceLitRLay(NY,NX)
+  !write(*,*) "RI = ", RI
+  !write(*,*) "RAM = ", RAM
+  !write(*,*) "RAGX = ", RAGX
+  !write(*,*) "RAG(NY,NX) = ", RAG(NY,NX)
+  !write(*,*) "VapDiffusResistanceLitR(NY,NX) = ", VapDiffusResistanceLitR(NY,NX)
+  !write(*,*) "FracSoiPAsAir_vr(0,NY,NX) = ", FracSoiPAsAir_vr(0,NY,NX)
+  !write(*,*) "POROS(0,NY,NX) = ", POROS(0,NY,NX)
+  !write(*,*) "POROQ = ", POROQ
 
 ! IF(I.EQ.63.AND.NX.EQ.1)THEN
 !     WRITE(*,7776)'RAGX',I,J,M,NX,NY,RAGZ,FracSurfAsBareSoi(NY,NX),RAG(NY,NX)
@@ -599,10 +634,10 @@ contains
 ! HeatFluxAir2Soi=storage heat flux
 !
   HeatSensAir2Grnd=CdSoiHSens*(TKQ(NY,NX)-TKSoi1(NUM(NY,NX),NY,NX))
-  write(*,*) "HeatSensAir2Grnd: ", HeatSensAir2Grnd
-  write(*,*) "CdSoiHSens: ", CdSoiHSens
-  write(*,*) "TKQ(NY,NX): ", TKQ(NY,NX)
-  write(*,*) "TKSoi1(NUM(NY,NX),NY,NX): ", TKSoi1(NUM(NY,NX),NY,NX)
+  !write(*,*) "HeatSensAir2Grnd: ", HeatSensAir2Grnd
+  !write(*,*) "CdSoiHSens: ", CdSoiHSens
+  !write(*,*) "TKQ(NY,NX): ", TKQ(NY,NX)
+  !write(*,*) "TKSoi1(NUM(NY,NX),NY,NX): ", TKSoi1(NUM(NY,NX),NY,NX)
   !net energy into soil, subtracting latent heat and sensible heat
   tHeatAir2Grnd=Radnet2LitGrnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd
   !total heat plus convective heat > 0 to ground
@@ -1575,9 +1610,9 @@ contains
 ! FLWVLS=water flux within soil accounting for wetting front
 !
   WatNetFlo2TopSoiMicP=PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
-  write(*,*) "WatNetFlo2TopSoiMicP: ", WatNetFlo2TopSoiMicP
-  write(*,*) "PrecNet2SoiMicP: ", PrecNet2SoiMicP
-  write(*,*) "EvapLitR2Soi1: ", EvapLitR2Soi1
+  !write(*,*) "WatNetFlo2TopSoiMicP: ", WatNetFlo2TopSoiMicP
+  !write(*,*) "PrecNet2SoiMicP: ", PrecNet2SoiMicP
+  !write(*,*) "EvapLitR2Soi1: ", EvapLitR2Soi1
   if(abs(WatNetFlo2TopSoiMicP)>1.e20_r8)then
     write(*,*)'PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1',PrecNet2SoiMicP,VapXAir2TopLay,EvapLitR2Soi1
     call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -1586,11 +1621,11 @@ contains
   NetWatFlx2SoiMicP=PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
   NetWatFlx2SoiMacP=PrecNet2SoiMacP
   cumHeatSensAir2Soil=PrecHeat2SoiNet+HeatFluxAir2Soi+HeatSensVapLitR2Soi1+HeatSensLitR2Soi1
-  write(*,*) "cumHeatSensAir2Soil: ", cumHeatSensAir2Soil
-  write(*,*) "PrecHeat2SoiNet: ", PrecHeat2SoiNet
-  write(*,*) "HeatFluxAir2Soi: ", HeatFluxAir2Soi
-  write(*,*) "HeatSensVapLitR2Soi1: ", HeatSensVapLitR2Soi1
-  write(*,*) "HeatSensLitR2Soi1: ", HeatSensLitR2Soi1
+  !write(*,*) "cumHeatSensAir2Soil: ", cumHeatSensAir2Soil
+  !write(*,*) "PrecHeat2SoiNet: ", PrecHeat2SoiNet
+  !write(*,*) "HeatFluxAir2Soi: ", HeatFluxAir2Soi
+  !write(*,*) "HeatSensVapLitR2Soi1: ", HeatSensVapLitR2Soi1
+  !write(*,*) "HeatSensLitR2Soi1: ", HeatSensLitR2Soi1
   
   NetWatFlx2LitR=PrecAir2LitR+VapXAir2LitR(NY,NX)-EvapLitR2Soi1
   CumHeatSensAir2LitR=PrecHeatAir2LitR+TotHeatAir2LitR-HeatSensVapLitR2Soi1-HeatSensLitR2Soi1

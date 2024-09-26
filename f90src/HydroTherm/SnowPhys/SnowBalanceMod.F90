@@ -48,16 +48,16 @@ implicit none
   VOLSWI=0.0_r8
   !update snow layer from top to bottom
 
-  write(*,*) "----- SNOW Parameters Before -----"
-  write(*,*) "Number of snow layers: ", JS
-  write(*,*) "Snow Depth: ", SnowDepth_col(NY,NX)
-  write(*,*) "TKSnow: ", TKSnow_snvr(1,NY,NX)
-  write(*,*) "VcumDrySnoWE_col(NY,NX)=", VcumDrySnoWE_col(NY,NX)
-  write(*,*) "VcumWatSnow_col(NY,NX)=", VcumWatSnow_col(NY,NX)
-  write(*,*) "VcumIceSnow_col(NY,NX)=", VcumIceSnow_col(NY,NX)
-  write(*,*) "VcumSnoDWI_col(NY,NX)=", VcumSnoDWI_col(NY,NX)
-  write(*,*) "VcumSnowWE_col(NY,NX)=", VcumSnowWE_col(NY,NX)
-  write(*,*) "---------------------------------"
+  !write(*,*) "----- SNOW Parameters Before -----"
+  !write(*,*) "Number of snow layers: ", JS
+  !write(*,*) "Snow Depth: ", SnowDepth_col(NY,NX)
+  !write(*,*) "TKSnow: ", TKSnow_snvr(1,NY,NX)
+  !write(*,*) "VcumDrySnoWE_col(NY,NX)=", VcumDrySnoWE_col(NY,NX)
+  !write(*,*) "VcumWatSnow_col(NY,NX)=", VcumWatSnow_col(NY,NX)
+  !write(*,*) "VcumIceSnow_col(NY,NX)=", VcumIceSnow_col(NY,NX)
+  !write(*,*) "VcumSnoDWI_col(NY,NX)=", VcumSnoDWI_col(NY,NX)
+  !write(*,*) "VcumSnowWE_col(NY,NX)=", VcumSnowWE_col(NY,NX)
+  !write(*,*) "---------------------------------"
 
   D9780: DO L=1,JS
 
@@ -106,16 +106,16 @@ implicit none
   SnowDepth_col(NY,NX)=sum(SnowThickL_snvr(1:JS,NY,NX))
   VcumSnowWE_col(NY,NX)=VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX) 
 
-  write(*,*) "----- SNOW Parameters After -----"
-  write(*,*) "Number of snow layers: ", JS
+  !write(*,*) "----- SNOW Parameters After -----"
+  !write(*,*) "Number of snow layers: ", JS
   write(*,*) "Snow Depth: ", SnowDepth_col(NY,NX)
-  write(*,*) "TKSnow: ", TKSnow_snvr(1,NY,NX)
-  write(*,*) "VcumDrySnoWE_col(NY,NX)=", VcumDrySnoWE_col(NY,NX)
-  write(*,*) "VcumWatSnow_col(NY,NX)=", VcumWatSnow_col(NY,NX)
-  write(*,*) "VcumIceSnow_col(NY,NX)=", VcumIceSnow_col(NY,NX)
-  write(*,*) "VcumSnoDWI_col(NY,NX)=", VcumSnoDWI_col(NY,NX)
+  write(*,*) "TKSnow: ", TKSnow_snvr(1,NY,NX), "TKair: ", TairK_col(NY,NX), "TKsoil: ", TKS_vr(1,NY,NX)
+  !write(*,*) "VcumDrySnoWE_col(NY,NX)=", VcumDrySnoWE_col(NY,NX)
+  !write(*,*) "VcumWatSnow_col(NY,NX)=", VcumWatSnow_col(NY,NX)
+  !write(*,*) "VcumIceSnow_col(NY,NX)=", VcumIceSnow_col(NY,NX)
+  !write(*,*) "VcumSnoDWI_col(NY,NX)=", VcumSnoDWI_col(NY,NX)
   write(*,*) "VcumSnowWE_col(NY,NX)=", VcumSnowWE_col(NY,NX)
-  write(*,*) "---------------------------------"
+  !write(*,*) "---------------------------------"
 
 !
 ! IF SNOWPACK DISAPPEARS
