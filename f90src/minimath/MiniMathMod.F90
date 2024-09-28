@@ -16,7 +16,7 @@ module minimathmod
   public :: vapsat, vapsat0
   public :: isLeap
   public :: isnan
-  public :: AZMAX1,AZMIN1,AZMAX1t
+  public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d
   public :: GetMolAirPerm3
   public :: fSiLU
   public :: fixnegmass
@@ -34,6 +34,7 @@ module minimathmod
   public :: addone
   public :: RichardsonNumber
   real(r8), parameter :: tiny_val=1.e-20_r8
+
   contains
 
    pure function isnan(a)result(ans)
@@ -128,6 +129,23 @@ module minimathmod
   ans=AMAX1(val,tiny_val)
 
   end function AZMAX1t
+!------------------------------------------------------------------------------------------
+
+  pure function AZMAX1d(val,tiny_val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: tiny_val2
+
+  real(r8) :: ans
+
+  if(val>-tiny_val2)then
+    ans=AMAX1(val,tiny_val2)
+  elseif(val<tiny_val2)then
+    ans=0._r8
+  else
+    ans=val
+  endif
+  end function AZMAX1d
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)

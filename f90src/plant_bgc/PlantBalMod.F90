@@ -392,7 +392,7 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NP
   integer :: NZ
-  real(r8) :: balE(1:NumPlantChemElms)
+  real(r8) :: balE(1:NP)
 
   associate(                                                         &
     GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft,           &  !>0 add to plant
@@ -410,7 +410,6 @@ implicit none
   )
 
   DO NZ=1,NP
-
     balE(NZ)=RootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)  &
       +ShootElms_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)   &
       +StandDeadStrutElms_pft(ielmc,NZ)-StandDeadStrutElmsBeg_pft(ielmc,NZ)  &

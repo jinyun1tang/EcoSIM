@@ -2370,7 +2370,7 @@ implicit none
         this%h2D_TEMP_vr(ncol,L)          = TCS(L,NY,NX)
         this%h2D_HeatFlow_vr(ncol,L)      = THeatFlow2Soil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_HeatUptk_vr(ncol,L)      = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_VSPore_vr(ncol,L)        = VOLTX_vr(L,NY,NX)
+        this%h2D_VSPore_vr(ncol,L)        = POROS_vr(L,NY,NX)
         this%h2D_VSM_vr    (ncol,L)       = ThetaH2OZ_vr(L,NY,NX)
         this%h2D_VSICE_vr  (ncol,L)       = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)           = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)

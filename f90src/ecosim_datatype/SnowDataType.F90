@@ -16,7 +16,7 @@ module SnowDataType
   real(r8),target, allocatable ::  NewSnowDens_col(:,:)                   !new snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  TCSnow_snvr(:,:,:)                         !snow temperature, [oC]
   real(r8),target, allocatable ::  TKSnow_snvr(:,:,:)                         !snow temperature, [K]
-  real(r8),target, allocatable ::  VLHeatCapSnow_col(:,:,:)                       !snowpack heat capacity, [MJ m-3 K-1]
+  real(r8),target, allocatable ::  VLHeatCapSnow_snvr(:,:,:)                       !snowpack heat capacity, [MJ m-3 K-1]
   real(r8),target, allocatable ::  VLDrySnoWE_snvr(:,:,:)                  !water equivalent dry snow in snowpack layer
   real(r8),target, allocatable ::  VLWatSnow_snvr(:,:,:)                      !snow water volume in snowpack layer
   real(r8),target, allocatable ::  VLIceSnow_snvr(:,:,:)                      !snow ice volume in snowpack layer
@@ -68,7 +68,7 @@ contains
   allocate(NewSnowDens_col(JY,JX));       NewSnowDens_col=0._r8
   allocate(TCSnow_snvr(JS,JY,JX));      TCSnow_snvr=0._r8
   allocate(TKSnow_snvr(JS,JY,JX));      TKSnow_snvr=0._r8
-  allocate(VLHeatCapSnow_col(JS,JY,JX));    VLHeatCapSnow_col=0._r8
+  allocate(VLHeatCapSnow_snvr(JS,JY,JX));    VLHeatCapSnow_snvr=0._r8
   allocate(VLDrySnoWE_snvr(JS,JY,JX));   VLDrySnoWE_snvr=0._r8
   allocate(VLWatSnow_snvr(JS,JY,JX));   VLWatSnow_snvr=0._r8
   allocate(VLIceSnow_snvr(JS,JY,JX));   VLIceSnow_snvr=0._r8
@@ -128,7 +128,7 @@ contains
   call destroy(trcg_solsml_snvr)
   call destroy(TCSnow_snvr)
   call destroy(TKSnow_snvr)
-  call destroy(VLHeatCapSnow_col)
+  call destroy(VLHeatCapSnow_snvr)
   call destroy(VLDrySnoWE_snvr)
   call destroy(VLWatSnow_snvr)
   call destroy(VLIceSnow_snvr)

@@ -616,28 +616,27 @@ implicit none
   ! VHeatCapacity1_vr=volumetric heat capacity of litter
   ! TK1=litter temperature
   ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff=litter total cond+conv,latent,runoff heat flux
-  VLWatMicP10=VLWatMicP1_vr(0,NY,NX)
-  VLiceMicP10=VLiceMicP1_vr(0,NY,NX)
+  VLWatMicP10 = VLWatMicP1_vr(0,NY,NX)
+  VLiceMicP10 = VLiceMicP1_vr(0,NY,NX)
 
-  VLWatMicP1_vr(0,NY,NX)=AZMAX1(VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff(NY,NX))
-
-  VLairMicP1_vr(0,NY,NX)=AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
-  VLWatMicPM_vr(M+1,0,NY,NX)=VLWatMicP1_vr(0,NY,NX)
-  VLsoiAirPM(M+1,0,NY,NX)=VLairMicP1_vr(0,NY,NX)
-  TVWatIceLitR=VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
-  XVLMobileWaterLitR(NY,NX)=AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
+  VLWatMicP1_vr(0,NY,NX)     = AZMAX1(VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff(NY,NX))
+  VLairMicP1_vr(0,NY,NX)     = AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
+  VLWatMicPM_vr(M+1,0,NY,NX) = VLWatMicP1_vr(0,NY,NX)
+  VLsoiAirPM(M+1,0,NY,NX)    = VLairMicP1_vr(0,NY,NX)
+  TVWatIceLitR               = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
+  XVLMobileWaterLitR(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
-    VWatLitrZ=VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
-    VOLIRZ=VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
-    XVLMobileWatMicP(NY,NX)=AZMAX1(VLWatMicP1_vr(0,NY,NX)-VWatLitrZ)
-    XVLiceMicP_col(NY,NX)=AZMAX1(VLiceMicP1_vr(0,NY,NX)-VOLIRZ)
+    VWatLitrZ               = VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
+    VOLIRZ                  = VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
+    XVLMobileWatMicP(NY,NX) = AZMAX1(VLWatMicP1_vr(0,NY,NX)-VWatLitrZ)
+    XVLiceMicP_col(NY,NX)   = AZMAX1(VLiceMicP1_vr(0,NY,NX)-VOLIRZ)
   ELSE
-    XVLMobileWatMicP(NY,NX)=0.0_r8
-    XVLiceMicP_col(NY,NX)=0.0_r8
+    XVLMobileWatMicP(NY,NX) = 0.0_r8
+    XVLiceMicP_col(NY,NX)   = 0.0_r8
   ENDIF
-  XVLMobileWaterLitRM(M+1,NY,NX)=XVLMobileWaterLitR(NY,NX)
-  XVLMobileWatMicPM(M+1,NY,NX)=XVLMobileWatMicP(NY,NX)
-  XVLiceMicPM(M+1,NY,NX)=XVLiceMicP_col(NY,NX)
+  XVLMobileWaterLitRM(M+1,NY,NX) = XVLMobileWaterLitR(NY,NX)
+  XVLMobileWatMicPM(M+1,NY,NX)   = XVLMobileWatMicP(NY,NX)
+  XVLiceMicPM(M+1,NY,NX)         = XVLiceMicP_col(NY,NX)
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
@@ -648,11 +647,11 @@ implicit none
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
     FracSoiPAsAir_vr(0,NY,NX)=1.0_r8
   ENDIF
-  THETPM(M+1,0,NY,NX)=FracSoiPAsAir_vr(0,NY,NX)
-  VLHeatCapLitRPre=VHeatCapacity1_vr(0,NY,NX)                !heat capacity
-  TK0Prev=TKSoi1(0,NY,NX)                                 !residual temperature
-  ENGYR=VHeatCapacity1_vr(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
-  VHeatCapacity1_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
+  THETPM(M+1,0,NY,NX)        = FracSoiPAsAir_vr(0,NY,NX)
+  VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
+  TK0Prev                    = TKSoi1(0,NY,NX)                                 !residual temperature
+  ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoi1(0,NY,NX)  !initial energy content
+  VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoi1(0,NY,NX)=(ENGYR+cumHeatFlx2LitRByRunoff(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
@@ -678,6 +677,6 @@ implicit none
   ELSE
     TKSoi1(0,NY,NX)=TKSoi1(NUM(NY,NX),NY,NX)
   ENDIF
-!  if(NY==1 .AND. NX==1 .and. M>=26)write(192,*)'UpdateLitRAftRunoff',M,VLWatMicP_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX),cumWatFlx2LitRByRunoff(NY,NX)
+
   end subroutine UpdateLitRAftRunoff  
 end module SurfLitterPhysMod

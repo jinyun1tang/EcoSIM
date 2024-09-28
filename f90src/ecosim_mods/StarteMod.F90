@@ -544,7 +544,7 @@ module StarteMod
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 !
     D9985: DO L=1,JS
-      IF(VLHeatCapSnow_col(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+      IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         VOLWW=VLWatSnow_snvr(L,NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
         trcg_solsml_snvr(idg_CO2,L,NY,NX)=VOLWW*CO2_rain_conc(NY,NX)
         trcg_solsml_snvr(idg_CH4,L,NY,NX)=VOLWW*CH4_rain_conc(NY,NX)

@@ -1451,7 +1451,7 @@ implicit none
   plt_ew%ZERO4PlantDisplace_col=ZERO4PlantDisplace_col(NY,NX)
   plt_site%WindSpeedAtm_col=WindSpeedAtm_col(NY,NX)
   plt_ew%VLHeatCapSnowMin_col=VLHeatCapSnowMin_col(NY,NX)
-  plt_ew%VLHeatCapSurfSnow_col=VLHeatCapSnow_col(1,NY,NX)
+  plt_ew%VLHeatCapSurfSnow_col=VLHeatCapSnow_snvr(1,NY,NX)
   plt_morph%CanopyHeightZ_col(0)=CanopyHeightZ_col(0,NY,NX)
   DO L=1,NumOfCanopyLayers
     plt_morph%CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L,NY,NX)

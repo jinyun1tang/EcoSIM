@@ -12,6 +12,8 @@ module WatsubMod
   use minimathmod,    only: isclose,          isclose,  safe_adb, vapsat, AZMAX1, AZMIN1, AZMAX1t
   use ElmIDMod,       only: iewstdir,         insthdir, ivertdir
   use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
+  use SnowBalanceMod, only : DebugSnowPrint
+  use EcoSIMCtrlMod,  only: lverb,snowRedist_model  
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -93,7 +95,6 @@ module WatsubMod
   real(r8) :: Hinfl2Soil(JY,JX)
 ! begin_execution
 !
-  curday=i;curhour=j
 
   call LocalCopySoilVars(I,J,NHW,NHE,NVN,NVS)
 
@@ -117,7 +118,7 @@ module WatsubMod
         
     call Subsurface3DFlowMit(I,J,M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS,HeatFluxAir2Soi)
 
-    call LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
+    call LateralWatHeatExchMit(I,J,M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
 
 !   update states and fluxes
     DO NX=NHW,NHE
@@ -606,11 +607,12 @@ module WatsubMod
   end subroutine Subsurface3DFlowMit
 !------------------------------------------------------------------------------------------
 
-  subroutine LateralWatHeatExchMit(M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
+  subroutine LateralWatHeatExchMit(I,J,M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergyS)
   !
   !Description
   ! boundary flow involes exchange with external water table, and through tile drainage
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
   real(r8),intent(in) :: KSatRedusByRainKinetEnergyS(JY,JX)
   integer :: NY,NX
@@ -906,7 +908,7 @@ module WatsubMod
     !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
 !        if(I>=132 .and. j==19)print*,'top layer snow redistribution'!
           IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir)THEN
-            call SumSnowDriftByRunoff(M,N,N1,N2,N4,N5,N4B,N5B)
+            if(snowRedist_model)call SumSnowDriftByRunoff(M,N,N1,N2,N4,N5,N4B,N5B)
           ENDIF
 !
         !     NET WATER AND HEAT FLUXES THROUGH SOIL AND SNOWPACK
@@ -1094,8 +1096,8 @@ module WatsubMod
             FracSoilAsAirt(L,NY,NX)=0.0_r8
           ENDIF
           IF(VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            SoilFracAsMacP1_vr(L,NY,NX)   = SoilFracAsMacP_vr(L,NY,NX)*VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX)
-            HydroCondMacP1_vr(L,NY,NX) = HydroCondMacP_vr(L,NY,NX)*(VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX))**2
+            SoilFracAsMacP1_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX)
+            HydroCondMacP1_vr(L,NY,NX)  = HydroCondMacP_vr(L,NY,NX)*(VLMacP1_vr(L,NY,NX)/VLMacP_vr(L,NY,NX))**2
           ELSE
             SoilFracAsMacP1_vr(L,NY,NX)   = 0.0_r8
             HydroCondMacP1_vr(L,NY,NX) = 0.0_r8
@@ -1795,7 +1797,7 @@ module WatsubMod
   !
   
   IF(VHeatCapacity1_vr(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
-    IF(N3.EQ.NUM(NY,NX) .AND. VLHeatCapSnow_col(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
+    IF(N3.EQ.NUM(NY,NX) .AND. VLHeatCapSnow_snvr(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       !surface layer, not significant snowpack
       TK1X=TKSoi1(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFluxAir2Soi)/VHeatCapacity1_vr(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then
