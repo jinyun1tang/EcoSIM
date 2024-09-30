@@ -138,9 +138,9 @@ module minimathmod
 
   real(r8) :: ans
 
-  if(val>-tiny_val2)then
-    ans=AMAX1(val,tiny_val2)
-  elseif(val<tiny_val2)then
+  if(val>tiny_val2)then
+    ans=val 
+  elseif(val>-tiny_val2)then
     ans=0._r8
   else
     ans=val

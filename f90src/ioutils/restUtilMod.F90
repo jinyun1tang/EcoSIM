@@ -1524,7 +1524,7 @@ module restUtilMod
   character(len=*),intent(in) :: flag
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: NP(:,:)
-  real(r8), intent(inout) :: dat_arp(:,:,:,:)
+  real(r8), intent(inout) :: dat_arp(:,:,:,:)    !data to read or write
   real(r8), intent(inout):: datrp_2d(:,:)
   integer, intent(in), optional :: NumActivePlants(:,:)
   integer, intent(in), optional :: IsPlantActive_pft(:,:,:)

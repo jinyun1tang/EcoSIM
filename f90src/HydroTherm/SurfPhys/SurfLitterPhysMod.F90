@@ -537,7 +537,7 @@ implicit none
   VLWatMicPM_vr(M+1,0,NY,NX) = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM(M+1,0,NY,NX)    = VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR               = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
-  XVLMobileWaterLitR(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
+  XVLMobileWaterLitR_col(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
     VWatLitrZ               = VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     VOLIRZ                  = VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
@@ -547,14 +547,14 @@ implicit none
     XVLMobileWatMicP(NY,NX) = 0.0_r8
     XVLiceMicP_col(NY,NX)   = 0.0_r8
   ENDIF
-  XVLMobileWaterLitRM(M+1,NY,NX) = XVLMobileWaterLitR(NY,NX)
+  XVLMobileWaterLitRM(M+1,NY,NX) = XVLMobileWaterLitR_col(NY,NX)
   XVLMobileWatMicPM(M+1,NY,NX)   = XVLMobileWatMicP(NY,NX)
   XVLiceMicPM(M+1,NY,NX)         = XVLiceMicP_col(NY,NX)
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
-      *AZMAX1t((1.0_r8-XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
@@ -624,7 +624,7 @@ implicit none
   VLWatMicPM_vr(M+1,0,NY,NX) = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM(M+1,0,NY,NX)    = VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR               = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
-  XVLMobileWaterLitR(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
+  XVLMobileWaterLitR_col(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
     VWatLitrZ               = VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     VOLIRZ                  = VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
@@ -634,14 +634,15 @@ implicit none
     XVLMobileWatMicP(NY,NX) = 0.0_r8
     XVLiceMicP_col(NY,NX)   = 0.0_r8
   ENDIF
-  XVLMobileWaterLitRM(M+1,NY,NX) = XVLMobileWaterLitR(NY,NX)
+  XVLMobileWaterLitRM(M+1,NY,NX) = XVLMobileWaterLitR_col(NY,NX)
   XVLMobileWatMicPM(M+1,NY,NX)   = XVLMobileWatMicP(NY,NX)
   XVLiceMicPM(M+1,NY,NX)         = XVLiceMicP_col(NY,NX)
+  
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
-      *AZMAX1t((1.0_r8-XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8

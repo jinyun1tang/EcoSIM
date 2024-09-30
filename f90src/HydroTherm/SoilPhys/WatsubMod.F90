@@ -124,10 +124,12 @@ module WatsubMod
     DO NX=NHW,NHE
       DO  NY=NVN,NVS
         HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX)+Hinfl2Soil(NY,NX)
-        Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP(NY,NX)
+        Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP(NY,NX)        
       ENDDO
     ENDDO  
 
+    if(snowRedist_model)call AccumulateSnowRedisFlux(I,J,M,NHW,NHE,NVN,NVS)
+    
     IF(M.NE.NPH)THEN
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 

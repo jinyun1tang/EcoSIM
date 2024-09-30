@@ -154,8 +154,16 @@ config_sorghum_dict={
 'ntopu':'1'
 }    
 
+config_plm_dict={
+'case':'PLM',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/plmrEcosys/',
+'pftf':'nlegp1:nlegg1',  
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/PLM/',    
+'ntopu':'7'
+}    
 
-case=11
+
+case=12
 
 if case==1:
     config_dict=config_Fen_StordIsland_dict
@@ -179,6 +187,8 @@ elif case==10:
     config_dict=config_spruces1_dict
 elif case==11:
     config_dict=config_sorghum_dict
+elif case==12:
+    config_dict=config_plm_dict
     
 write_pft_mgmt(config_dict)
 
@@ -415,6 +425,22 @@ config_sorghum_dict={
 'NVS':'1'
 }
 
+
+config_PLM_dict={
+'case':'PLM',
+'mdir':'/Users/jinyuntang/work/github/ecosys_benchmark/plmrEcosys/',
+'sitef':'st074773',
+'topf':'tp074773',    
+'outdir':'/Users/jinyuntang/work/github/ecosim_benchmark/smallset/PLM/',    
+'ntopu':'7',
+'ncol':'7',
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'7',
+'NVS':'1'
+}
+
 from SiteTopoWriter import write_site_topo_data
 
 if case==1:
@@ -439,4 +465,6 @@ elif case==10:
     config_dict=config_spruces1_dict
 elif case==11:
     config_dict=config_sorghum_dict
+elif case==12:
+    config_dict=config_PLM_dict
 write_site_topo_data(config_dict)

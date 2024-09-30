@@ -165,7 +165,7 @@ contains
   VLWatMicPM_vr(1,0,NY,NX)   = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM(1,0,NY,NX)      = VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR               = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
-  XVLMobileWaterLitR(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
+  XVLMobileWaterLitR_col(NY,NX)  = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
     VWatLitrZ               = VLWatMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
     VOLIRZ                  = VLiceMicP1_vr(0,NY,NX)/TVWatIceLitR*VWatLitRHoldCapcity_col(NY,NX)
@@ -176,7 +176,7 @@ contains
     XVLiceMicP_col(NY,NX)=0.0_r8
   ENDIF
   
-  XVLMobileWaterLitRM(1,NY,NX) = XVLMobileWaterLitR(NY,NX)
+  XVLMobileWaterLitRM(1,NY,NX) = XVLMobileWaterLitR_col(NY,NX)
   XVLMobileWatMicPM(1,NY,NX)   = XVLMobileWatMicP(NY,NX)
   XVLiceMicPM(1,NY,NX)         = XVLiceMicP_col(NY,NX)
   
@@ -185,7 +185,7 @@ contains
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     
     FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))* &
-      AZMAX1t((1.0_r8-XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
+      AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
@@ -943,8 +943,8 @@ contains
 !     Q=runoff from Mannings equation
 !     QRM,QRV=runoff,velocity for erosion, solute transfer
 !
-  IF(XVLMobileWaterLitR(N2,N1).GT.VWatStoreCapSurf(N2,N1))THEN
-    VWatExcess                    = XVLMobileWaterLitR(N2,N1)-VWatStoreCapSurf(N2,N1)
+  IF(XVLMobileWaterLitR_col(N2,N1).GT.VWatStoreCapSurf(N2,N1))THEN
+    VWatExcess                    = XVLMobileWaterLitR_col(N2,N1)-VWatStoreCapSurf(N2,N1)
     WatExcessDetph                = VWatExcess/AREA(3,0,N2,N1)
     HydraulicRadius               = WatExcessDetph/2.828_r8
     CrossSectVelocity             = GaucklerManningVelocity(HydraulicRadius,SLOPE(0,N2,N1))/SoiSurfRoughness(N2,N1)  !1/s
@@ -952,7 +952,7 @@ contains
     VLWatMicP1X                   = AZMAX1(VLWatMicP1_vr(0,N2,N1)+LitrIceFlxThaw(N2,N1))
     RunoffVelocity(M,N2,N1)       = CrossSectVelocity
     WatFlux4ErosionM_2DH(M,N2,N1) = AMIN1(Q,VWatExcess*dts_wat,VLWatMicP1X*dts_wat) &
-      *XVLMobileWatMicP(N2,N1)/XVLMobileWaterLitR(N2,N1)
+      *XVLMobileWatMicP(N2,N1)/XVLMobileWaterLitR_col(N2,N1)
   ELSE
     RunoffVelocity(M,N2,N1)       = 0.0_r8
     WatFlux4ErosionM_2DH(M,N2,N1) = 0.0_r8
@@ -1010,18 +1010,18 @@ contains
       IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
         ! there is runoff
         ! source grid elevation
-        ALT1=Altitude_grid(N2,N1)+XVLMobileWaterLitR(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
+        ALT1=Altitude_grid(N2,N1)+XVLMobileWaterLitR_col(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
 !
 !     EAST OR SOUTH RUNOFF
 !
         IF(NN.EQ.1)THEN
           !destination grid elevation
-          ALT2=Altitude_grid(N5,N4)+XVLMobileWaterLitR(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
+          ALT2=Altitude_grid(N5,N4)+XVLMobileWaterLitR_col(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
           IF(ALT1.GT.ALT2)THEN
             !source grid into dest grid
             QRQ1=AZMAX1(((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1) &
-              *AREA(3,NU(N5,N4),N5,N4)-XVLMobileWaterLitR(N5,N4)*AREA(3,NUM(N2,N1),N2,N1) &
-              +XVLMobileWaterLitR(N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &
+              *AREA(3,NU(N5,N4),N5,N4)-XVLMobileWaterLitR_col(N5,N4)*AREA(3,NUM(N2,N1),N2,N1) &
+              +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &
               /(AREA(3,NUM(N2,N1),N2,N1)+AREA(3,NU(N5,N4),N5,N4)))
             WatFlx2LitRByRunoff(N,2,N5,N4)=AMIN1(QRQ1,WatFlux4ErosionM_2DH(M,N2,N1))*FSLOPE(N,N2,N1)
             HeatFlx2LitRByRunoff(N,2,N5,N4)=cpw*TKSoi1(0,N2,N1)*WatFlx2LitRByRunoff(N,2,N5,N4)
@@ -1042,12 +1042,12 @@ contains
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            ALTB=Altitude_grid(N5B,N4B)+XVLMobileWaterLitR(N5B,N4B)/AREA(3,NU(N5,N4B),N5B,N4B)
+            ALTB=Altitude_grid(N5B,N4B)+XVLMobileWaterLitR_col(N5B,N4B)/AREA(3,NU(N5,N4B),N5B,N4B)
             IF(ALT1.GT.ALTB)THEN
               QRQ1=AZMAX1(((ALT1-ALTB)*AREA(3,NUM(N2,N1),N2,N1) &
-                *AREA(3,NU(N5B,N4B),N5B,N4B)-XVLMobileWaterLitR(N5B,N4B) &
+                *AREA(3,NU(N5B,N4B),N5B,N4B)-XVLMobileWaterLitR_col(N5B,N4B) &
                 *AREA(3,NUM(N2,N1),N2,N1) &
-                +XVLMobileWaterLitR(N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B)) &
+                +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B)) &
                 /(AREA(3,NUM(N2,N1),N2,N1)+AREA(3,NU(N5B,N4B),N5B,N4B)))
               WatFlx2LitRByRunoff(N,1,N5B,N4B)=AMIN1(QRQ1,WatFlux4ErosionM_2DH(M,N2,N1))*FSLOPE(N,N2,N1)
               HeatFlx2LitRByRunoff(N,1,N5B,N4B)=cpw*TKSoi1(0,N2,N1)*WatFlx2LitRByRunoff(N,1,N5B,N4B)
@@ -1166,7 +1166,7 @@ contains
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     BAREW(NY,NX)=AZMAX1(FracSurfBareSoil_col(NY,NX)-AMIN1(1.0_r8,&
-      AZMAX1(XVLMobileWaterLitR(NY,NX)/MaxVLWatByLitR_col(NY,NX))))
+      AZMAX1(XVLMobileWaterLitR_col(NY,NX)/MaxVLWatByLitR_col(NY,NX))))
   ELSE
     BAREW(NY,NX)=1.0_r8
   ENDIF
@@ -1265,7 +1265,7 @@ contains
   ENDIF
 
   IF(ENGYD+ENGYB.GT.ZERO)THEN
-    HV=1.0E+03_r8*AZMAX1(XVLMobileWaterLitR(NY,NX)-VWatStoreCapSurf(NY,NX))/AREA(3,NUM(NY,NX),NY,NX)
+    HV=1.0E+03_r8*AZMAX1(XVLMobileWaterLitR_col(NY,NX)-VWatStoreCapSurf(NY,NX))/AREA(3,NUM(NY,NX),NY,NX)
     EnergyImpact4ErosionM(M,NY,NX)=(ENGYD*PRECD(NY,NX)+ENGYB*PRECB(NY,NX))*EXP(-2.0_r8*HV) &
       *FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
     EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)+EnergyImpact4ErosionM(M,NY,NX)
@@ -1310,7 +1310,7 @@ contains
   !
   ! RUNOFF
   !
-  DPTHW1=XVLMobileWaterLitR(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
+  DPTHW1=XVLMobileWaterLitR_col(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
   DPTHW2=VWatStoreCapSurf(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
   !elevation at the source center
   ALT1=Altitude_grid(N2,N1)+DPTHW1      
