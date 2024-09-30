@@ -47,13 +47,13 @@ implicit none
   
   D1205: DO LS=1,JS
 
-    IF(VLHeatCapSnow_col(LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+    IF(VLHeatCapSnow_snvr(LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       !id of next snow layer
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS .AND. VLHeatCapSnow_col(LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
+      IF(LS.LT.JS .AND. VLHeatCapSnow_snvr(LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         !not surface layer, and is heat significant
         !     NET SOLUTE FLUXES THROUGH SNOWPACK
         !
@@ -187,7 +187,7 @@ implicit none
 
     WatMassStore_lnd=WatMassStore_lnd+WS
     WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
-    ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow_snvr(L,NY,NX)
+    ENGYW=VLHeatCapSnow_snvr(L,NY,NX)*TKSnow_snvr(L,NY,NX)
     HeatStore_lnd=HeatStore_lnd+ENGYW
     TGasC_lnd=TGasC_lnd+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
     DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
@@ -246,12 +246,14 @@ implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
   integer :: NN,NTG,NTN,NTSA
 
-  TDrysnoBySnowRedist(N2,N1)=TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistrib(N,N2,N1)&
+  TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistrib(N,N2,N1)&
     -DrysnoBySnowRedistrib(N,N5,N4)
-  TWatBySnowRedist(N2,N1)=TWatBySnowRedist(N2,N1)+WatBySnowRedistrib_2DH(N,N2,N1)-WatBySnowRedistrib_2DH(N,N5,N4)
-  TIceBySnowRedist(N2,N1)=TIceBySnowRedist(N2,N1)+IceBySnowRedistrib_2DH(N,N2,N1)-IceBySnowRedistrib_2DH(N,N5,N4)
-  THeatBySnowRedist_col(N2,N1)=THeatBySnowRedist_col(N2,N1)+HeatBySnowRedistrib_2DH(N,N2,N1)-HeatBySnowRedistrib_2DH(N,N5,N4)
-
+  TWatBySnowRedist(N2,N1)      = TWatBySnowRedist(N2,N1)+WatBySnowRedistrib_2DH(N,N2,N1) &
+    -WatBySnowRedistrib_2DH(N,N5,N4)
+  TIceBySnowRedist(N2,N1)      = TIceBySnowRedist(N2,N1)+IceBySnowRedistrib_2DH(N,N2,N1) &
+    -IceBySnowRedistrib_2DH(N,N5,N4)
+  THeatBySnowRedist_col(N2,N1) = THeatBySnowRedist_col(N2,N1)+HeatBySnowRedistrib_2DH(N,N2,N1) &
+    -HeatBySnowRedistrib_2DH(N,N5,N4)
 
   D1202: DO NN=1,2
     !gaseous tracers
@@ -365,7 +367,7 @@ implicit none
 
     !    SOLUTES
 !  exclude NH3B
-  if(NX==5)write(111,*)I+J/24.,'beg18',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+!  if(NX==5)write(111,*)I+J/24.,'beg18',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 
   DO NTG=idg_beg,idg_end-1
     dflx=-trcg_TFloXSurRunoff(NTG,NY,NX)
@@ -373,7 +375,7 @@ implicit none
     trcg_TFloXSurRunoff(NTG,NY,NX)=-dflx
   ENDDO
 
-  if(NX==5)write(111,*)I+J/24.,'beg19',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+!  if(NX==5)write(111,*)I+J/24.,'beg19',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 
 !  !   write(116,*)I+J/24.,'beg5xxxx1',trc_solml_vr(ids_NO3,0,NY,NX),trcn_TFloXSurRunoff_2D(ids_NO3,NY,NX)
 
@@ -385,7 +387,7 @@ implicit none
 
 !  !   write(116,*)I+J/24.,'beg5xxxx2',trc_solml_vr(ids_NO3,0,NY,NX),trcn_TFloXSurRunoff_2D(ids_NO3,NY,NX)
 
-  if(NX==5)write(111,*)I+J/24.,'beg20',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+!  if(NX==5)write(111,*)I+J/24.,'beg20',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end

@@ -95,12 +95,16 @@ done
 #and then point cmake to the top-level CMakeLists file which will
 #be a directory up from the build dir hence setting
 #ecosim_source_dir to ../
-ecosim_source_dir='../'
-ecosim_build_dir='./build/'
+ecosim_source_dir=$(pwd)
 
 ############## END EDIT ####################
 
 cmake_binary=$(which cmake)
+
+cputype=$(uname -m | sed "s/\\ /_/g")
+systype=$(uname -s)
+
+BUILDDIR="${systype}-${cputype}"
 
 if [ "$shared" -eq 1 ]; then
     BUILDDIR="${BUILDDIR}-shared"
@@ -124,6 +128,7 @@ else
 fi
 
 if [ -n "$prefix"]; then
+    echo "add prefix here ${prefix}"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DCMAKE_INSTALL_PREFIX:PATH=${prefix}"
 fi
 
@@ -180,6 +185,8 @@ else
   fi
 fi
 
+ecosim_build_dir="build/$BUILDDIR"
+
 cmd_configure="${cmake_binary} \
   ${CONFIG_FLAGS}
   ${ecosim_source_dir}"
@@ -198,10 +205,12 @@ fi
 
 echo "cmd_configure: $cmd_configure"
 echo "building in: $ecosim_build_dir"
+
 #run the configure command
-#cd ${ecosim_build_dir}
+cd ${ecosim_build_dir}
 #${cmd_configure}
-cd build
+pwd
+
 ${cmd_configure}
 
 if [ $? -ne 0 ]; then
@@ -225,17 +234,18 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-if [ "$regression_test" -eq 1 ]; then
-  make -C ../regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;
-fi
-
-cd ../
+cd ../../
 
 mkdir -p ./local
 if [ -L ./local/bin ]; then
   rm ./local/bin
 fi
 
-build_path=$(realpath "./build/local/bin")
+build_path=$(realpath "$ecosim_build_dir/local/bin")
 
 ln -s $build_path ./local/bin
+
+
+if [ "$regression_test" -eq 1 ]; then
+  make -C ./regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;
+fi

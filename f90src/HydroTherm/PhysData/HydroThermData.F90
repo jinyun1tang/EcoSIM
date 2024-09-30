@@ -10,7 +10,7 @@ implicit none
   real(r8),allocatable ::  DLYRR_COL(:,:)                         !  
   real(r8),allocatable ::  FracSoiPAsIce_vr(:,:,:)               !  
   real(r8),allocatable ::  FracSoiPAsAir_vr(:,:,:)               !  
-  real(r8),allocatable ::  VLHeatCapacity_vr(:,:,:)              !whole layer heat capacity (not snow)
+  real(r8),allocatable ::  VHeatCapacity1_vr(:,:,:)              !whole layer heat capacity (not snow)
   real(r8),allocatable ::  FracSoilAsAirt(:,:,:)              !fraction of soil volume as air, normalized using current pore volume
   real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                  !    
   real(r8),allocatable ::  VLiceMicP1_vr(:,:,:)                  !  
@@ -20,7 +20,7 @@ implicit none
   real(r8),allocatable ::  EVAPW(:,:)                         !  
   real(r8),allocatable ::  EVAPS(:,:)                         !  
   real(r8),allocatable ::  VapXAir2Sno(:,:)                   ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
-  real(r8),allocatable ::  SoilFracAsMacP1(:,:,:)                        !  
+  real(r8),allocatable ::  SoilFracAsMacP1_vr(:,:,:)                        !  
   real(r8),allocatable ::  HeatFall2Snowt(:,:)                        !  
   real(r8),allocatable ::  VPQ_col(:,:)                           !  
   real(r8),allocatable ::  PARSW(:,:)                         !  
@@ -32,9 +32,9 @@ implicit none
   real(r8),allocatable ::  VLairMicP1_vr(:,:,:)                       ! corrected air-filled micropore volume 
   real(r8),allocatable ::  TKSnow0_snvr(:,:,:)                         !  
   real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
-  real(r8),allocatable ::  SoilFracAsMicP(:,:,:)                        !
-  real(r8),allocatable ::  VLHeatCapacityA(:,:,:)                      !
-  real(r8),allocatable ::  VLHeatCapacityB(:,:,:)                      !
+  real(r8),allocatable ::  SoilFracAsMicP_vr(:,:,:)                        !
+  real(r8),allocatable ::  VLHeatCapacityA_vr(:,:,:)                      !
+  real(r8),allocatable ::  VLHeatCapacityB_vr(:,:,:)                      !
   real(r8),allocatable ::  RAG(:,:)                           !
   real(r8),allocatable ::  PAREW(:,:)                         ! 
   real(r8),allocatable ::  Altitude_grid(:,:)                          ! 
@@ -69,7 +69,7 @@ implicit none
   allocate(DLYRR_COL(JY,JX));       DLYRR_col=0._r8  
   allocate(FracSoiPAsIce_vr(0:JZ,JY,JX)); FracSoiPAsIce_vr=0._r8 
   allocate(FracSoiPAsAir_vr(0:JZ,JY,JX)); FracSoiPAsAir_vr=0._r8   
-  allocate(VLHeatCapacity_vr(0:JZ,JY,JX));  VLHeatCapacity_vr=0._r8  
+  allocate(VHeatCapacity1_vr(0:JZ,JY,JX));  VHeatCapacity1_vr=0._r8  
   allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
   allocate(VLWatMicP1_vr(0:JZ,JY,JX));  VLWatMicP1_vr=0._r8  
   allocate(VLiceMicP1_vr(0:JZ,JY,JX));  VLiceMicP1_vr=0._r8
@@ -79,7 +79,7 @@ implicit none
   allocate(VapXAir2Sno(JY,JX));      VapXAir2Sno=0._r8  
   allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
-  allocate(SoilFracAsMacP1(JZ,JY,JX));     SoilFracAsMacP1=0._r8  
+  allocate(SoilFracAsMacP1_vr(JZ,JY,JX));     SoilFracAsMacP1_vr=0._r8  
   allocate(HeatFall2Snowt(JY,JX));      HeatFall2Snowt=0._r8  
   allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
   allocate(PARSW(JY,JX));       PARSW=0._r8
@@ -91,9 +91,9 @@ implicit none
   allocate(VLairMicP1_vr(0:JZ,JY,JX));  VLairMicP1_vr=0._r8  
   allocate(TKSnow0_snvr(JS,JY,JX));      TKSnow0_snvr=0._r8  
   allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
-  allocate(SoilFracAsMicP(JZ,JY,JX));     SoilFracAsMicP=0._r8
-  allocate(VLHeatCapacityA(JZ,JY,JX));   VLHeatCapacityA=0._r8
-  allocate(VLHeatCapacityB(JZ,JY,JX));   VLHeatCapacityB=0._r8  
+  allocate(SoilFracAsMicP_vr(JZ,JY,JX));     SoilFracAsMicP_vr=0._r8
+  allocate(VLHeatCapacityA_vr(JZ,JY,JX));   VLHeatCapacityA_vr=0._r8
+  allocate(VLHeatCapacityB_vr(JZ,JY,JX));   VLHeatCapacityB_vr=0._r8  
   allocate(RAG(JY,JX));         RAG=0._r8
   allocate(PAREW(JY,JX));       PAREW=0._r8
   allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
@@ -127,7 +127,7 @@ implicit none
   call destroy(DLYRR_COL)  
   call destroy(FracSoiPAsIce_vr)  
   call destroy(FracSoiPAsAir_vr)  
-  call destroy(VLHeatCapacity_vr)  
+  call destroy(VHeatCapacity1_vr)  
   call destroy(FracSoilAsAirt)  
   call destroy(VLWatMicP1_vr)  
   call destroy(VLiceMicP1_vr)
@@ -137,7 +137,7 @@ implicit none
   call destroy(EVAPW)  
   call destroy(EVAPS)  
   call destroy(VapXAir2Sno)  
-  call destroy(SoilFracAsMacP1)  
+  call destroy(SoilFracAsMacP1_vr)  
   call destroy(HeatFall2Snowt)
   call destroy(VPQ_col)    
   call destroy(PARSW)  
@@ -149,9 +149,9 @@ implicit none
   call destroy(VLairMicP1_vr)
   call destroy(TKSnow0_snvr)  
   call destroy(VLWatMacP1_vr)
-  call destroy(SoilFracAsMicP)
-  call destroy(VLHeatCapacityA)
-  call destroy(VLHeatCapacityB)  
+  call destroy(SoilFracAsMicP_vr)
+  call destroy(VLHeatCapacityA_vr)
+  call destroy(VLHeatCapacityB_vr)  
   call destroy(RAG)
   call destroy(PAREW)
   call destroy(Altitude_grid)

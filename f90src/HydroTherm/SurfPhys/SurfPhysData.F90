@@ -6,7 +6,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
 
-  real(r8),allocatable ::  XVLMobileWaterLitR(:,:)                         !
+  real(r8),allocatable ::  XVLMobileWaterLitR_col(:,:)                         !
   real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP_col(:,:)                         !
   real(r8),allocatable ::  LWEmscefLitR_col(:,:)                         !
@@ -57,7 +57,7 @@ implicit none
   allocate(watflw(JY, JX))
   allocate(waticefl(JY,JX))
 
-  allocate(XVLMobileWaterLitR(JY,JX));       XVLMobileWaterLitR=0._r8
+  allocate(XVLMobileWaterLitR_col(JY,JX));       XVLMobileWaterLitR_col=0._r8
   allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
   allocate(XVLiceMicP_col(JY,JX));       XVLiceMicP_col=0._r8
   allocate(LWEmscefLitR_col(JY,JX));       LWEmscefLitR_col=0._r8
@@ -104,7 +104,7 @@ implicit none
   call destroy(TEvapXAir2Toplay_col)
   call destroy(TEvapXAir2LitR_col) 
   call destroy(TEvapXAir2Snow_col) 
-  call destroy(XVLMobileWaterLitR)
+  call destroy(XVLMobileWaterLitR_col)
   call destroy(XVLMobileWatMicP)
   call destroy(XVLiceMicP_col)
   call destroy(LWEmscefLitR_col)

@@ -12,10 +12,11 @@ module RestartMod
   use EcoSiMParDataMod  , only : micpar,pltpar
   use TracerIDMod       , only : trc_confs
   use EcoSIMCtrlMod     , only : etimer,do_budgets,plant_model
-  use EcoSIMCtrlDataType  
-  use restUtilMod  
+  use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun,destroy
   use HistFileMod       , only : hist_restart_ncd  
+  use EcoSIMCtrlDataType  
+  use restUtilMod  
   use ncdio_pio
   use MicrobialDataType
   use SOMDataType
@@ -79,7 +80,7 @@ implicit none
     call restFile_read( bounds, fnamer)    
   else if(flag=='write')then  
     call etimer%get_curr_date(yr,mon,day,tod)
-    write(rdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i5.5)') yr,mon,day,tod
+    write(rdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i6.6)') yr,mon,day,tod
     filer = restFile_filename(rdate=rdate)
     call restFile_write(bounds, filer,rdate=rdate)
   endif
@@ -5934,16 +5935,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLHeatCapSnow_snvr', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col(:,1:JY0,1:JX0),datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_snvr(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'VLHeatCapSnow'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_col(:,1:JY0,1:JX0),datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLHeatCapSnow_snvr(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JS)        
-    call restartvar(ncid, flag, varname='VLHeatCapSnow_col', dim1name='column',dim2name='levsno',&
+    call restartvar(ncid, flag, varname='VLHeatCapSnow_snvr', dim1name='column',dim2name='levsno',&
        long_name='snowpack heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -6172,16 +6173,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='SoilMicPMassLayer', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VLSoilMicPMass_vr', dim1name='column',dim2name='levsoi1',&
        long_name='mass of soil layer', units='Mg d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SoilMicPMassLayer,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicPMass_vr,datrc_2d) 
   else
     !print*,'POROS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilMicPMassLayer,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLSoilMicPMass_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='SoilMicPMassLayer', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VLSoilMicPMass_vr', dim1name='column',dim2name='levsoi1',&
        long_name='mass of soil layer', units='Mg d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -8583,7 +8584,6 @@ implicit none
     use EcoSIMConfig     , only : restartFileFullPath, nsrest, nsrStartup, nsrBranch 
     use EcoSIMConfig     , only : nsrContinue, case_name,  brnch_retain_casename
     use fileutil         , only : getfil
-    use ecosim_log_mod   , only : errMsg => shr_log_errMsg
     !
     implicit none
     ! !ARGUMENTS:
@@ -8733,7 +8733,6 @@ implicit none
        call opnfil( filename, nio, 'f' )
        curr_date =etimer%get_calendar()
        write(nio,'(a)') fnamer
-       write(nio,'(a)')curr_date
        call relavu( nio )
        write(iulog,*)'Successfully wrote local restart pointer file'
 !    end if
@@ -9257,12 +9256,36 @@ implicit none
   character(len=256) :: filename  ! local file name
   character(len=256) :: fnamer    ! restart file name
   integer :: nio
+  integer :: ii,year,mon,day,tod,iostat
   nio = getavu()
   filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
+  
   call opnfil( filename, nio, 'f' )  
-  read(nio,*) fnamer
-  read(nio,*)curr_date
+  read(nio,'(A)',iostat=iostat) fnamer
+  if (iostat == 0) then
+    write(iulog,*) 'use restart file: ', fnamer
+  else if (iostat > 0) then
+    write(iulog,*) 'Error occurred during read operation: iostat = ', iostat
+    call endrun(msg=errMsg(__FILE__, __LINE__)) 
+  else
+    write(iulog,*) 'End of file reached'
+    call endrun(msg=errMsg(__FILE__, __LINE__)) 
+  end if
   call relavu( nio )
-
+  
+  !get current date
+  ii=2
+  do
+    ii=ii+1
+    if(fnamer(ii-2:ii)=='.r.')exit
+  enddo
+  read(fnamer(ii+1:),'(I4)')year
+  ii=ii+5
+  read(fnamer(ii+1:),'(I2)')mon
+  ii=ii+3
+  read(fnamer(ii+1:),'(I2)')day
+  ii=ii+3
+  read(fnamer(ii+1:),'(I6)')tod
+  write(curr_date,'(I4.4,I2.2,I2.2,I6.6)')year,mon,day,tod
   end subroutine get_restart_date
 end module restartMod

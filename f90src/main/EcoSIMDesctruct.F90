@@ -47,6 +47,7 @@ module EcoSIMDesctruct
   use TranspNoSaltMod           , only : DestructTranspNoSalt
   use SnowPhysData        , only : DestructSnowPhysData
   use HydroThermData      , only : DestructHydroThermData
+  use BalanceCheckDataType, only : DestructBalanceCheckData
   implicit none
 
   call DestructMicrobialData
@@ -119,7 +120,8 @@ module EcoSIMDesctruct
   call DestructEcoSimSum
 
   if(plant_model)call ncd_pio_closefile(pft_nfid)
-
+ 
+  call DestructBalanceCheckData
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

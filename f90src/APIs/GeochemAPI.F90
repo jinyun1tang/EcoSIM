@@ -109,14 +109,14 @@ module GeochemAPI
           chemvar%VLWatMicPNZ=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
           chemvar%VLWatMicPPO=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
           chemvar%VLWatMicPPB=VLWatMicPM_vr(NPH,L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-          IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-            chemvar%SoilMicPMassLayerX=SoilMicPMassLayer(L,NY,NX)
-            chemvar%BKVLNH=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-            chemvar%BKVLNB=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-            chemvar%BKVLNO=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
-            chemvar%BKVLNZ=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
-            chemvar%BKVLPO=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-            chemvar%BKVLPB=SoilMicPMassLayer(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+          IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+            chemvar%SoilMicPMassLayerX=VLSoilMicPMass_vr(L,NY,NX)
+            chemvar%BKVLNH=VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+            chemvar%BKVLNB=VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
+            chemvar%BKVLNO=VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
+            chemvar%BKVLNZ=VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
+            chemvar%BKVLPO=VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+            chemvar%BKVLPB=VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
           ELSE
             chemvar%SoilMicPMassLayerX=VLMicP_vr(L,NY,NX)
             chemvar%BKVLNH=chemvar%VLWatMicPNH
@@ -216,7 +216,7 @@ module GeochemAPI
     chemvar%ZMG1PB=trcSalt_solml_vr(idsalt_MgHPO4B,L,NY,NX)
   endif
   chemvar%CCA=CCA(L,NY,NX)
-  chemvar%SoilMicPMassLayer=SoilMicPMassLayer(L,NY,NX)
+  chemvar%SoilMicPMassLayer=VLSoilMicPMass_vr(L,NY,NX)
   chemvar%XAEC=trcx_solml_vr(idx_AEC,L,NY,NX)
   chemvar%VLNH4=trcs_VLN_vr(ids_NH4,L,NY,NX)
   chemvar%GKC4=GKC4(L,NY,NX)

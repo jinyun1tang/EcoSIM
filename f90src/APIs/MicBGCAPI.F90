@@ -182,7 +182,7 @@ implicit none
   micfor%TKS                 = TKS_vr(L,NY,NX)
   micfor%THETW               = THETW_vr(L,NY,NX)
   micfor%PH                  = PH(L,NY,NX)
-  micfor%SoilMicPMassLayer            = SoilMicPMassLayer(L,NY,NX)
+  micfor%SoilMicPMassLayer            = VLSoilMicPMass_vr(L,NY,NX)
   micfor%VLSoilPoreMicP               = VLSoilPoreMicP_vr(L,NY,NX)
   micfor%TScal4Difsvity               = TScal4Difsvity_vr(L,NY,NX)
   micfor%VLNOB                        = trcs_VLN_vr(ids_NO3B,L,NY,NX)
@@ -259,7 +259,7 @@ implicit none
   micfor%VLWatMicP             = VLWatMicP_vr(L,NY,NX)
 
   if(micfor%Lsurf)then
-    micfor%SoilMicPMassLayer0=SoilMicPMassLayer(0,NY,NX)
+    micfor%SoilMicPMassLayer0=VLSoilMicPMass_vr(0,NY,NX)
   endif
   micfor%DiffusivitySolutEff(1:NPH) = DiffusivitySolutEff(1:NPH,L,NY,NX)
   micfor%FILM(1:NPH)                = FILM(1:NPH,L,NY,NX)
@@ -357,15 +357,14 @@ implicit none
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
-
   RCH4ProdHydrog_vr(L,NY,NX) = naqfdiag%tCH4ProdAceto
   RCH4ProdAcetcl_vr(L,NY,NX) = naqfdiag%tCH4ProdH2
   RCH4Oxi_aero_vr(L,NY,NX)   = naqfdiag%tCH4OxiAero
-  RFermen_vr(L,NY,NX)        = naqfdiag%tCResp4H2Prod
+  RFerment_vr(L,NY,NX)       = naqfdiag%tCResp4H2Prod
   RNH3oxi_vr(L,NY,NX)        = naqfdiag%tRNH3Oxi
   RN2ODeniProd_vr(L,NY,NX)   = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
   RN2OChemoProd_vr(L,NY,NX)  = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
-  RN2ONitProd_vr(L,NY,NX)    = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band  
+  RN2ONitProd_vr(L,NY,NX)    = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band
   RN2ORedux_vr(L,NY,NX)      = naqfdiag%TReduxN2O
 
   trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb

@@ -187,8 +187,8 @@ module SoluteMod
 !     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
 !     ZNHUI=current inhibition activity
 !
-  IF(FertN_soil_vr(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    CNHUA=FertN_soil_vr(ifert_urea,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
+  IF(FertN_soil_vr(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    CNHUA=FertN_soil_vr(ifert_urea,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
   ELSEIF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     CNHUA=FertN_soil_vr(ifert_urea,L,NY,NX)/VLWatMicP_vr(L,NY,NX)
   ELSE
@@ -206,8 +206,8 @@ module SoluteMod
 !     SPNHU=specific rate constant for urea hydrolysis
 !     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
 !
-  IF(FertN_Band_vr(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
+  IF(FertN_Band_vr(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
   ELSEIF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     CNHUB=FertN_Band_vr(ifert_urea_band,L,NY,NX)/VLWatMicP_vr(L,NY,NX)
   ELSE
@@ -925,7 +925,7 @@ module SoluteMod
 !     BKVL=litter mass
 !
   IF(VLWatMicPM_vr(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    BulkSoilMass=SoilMicPMassLayer(0,NY,NX)
+    BulkSoilMass=VLSoilMicPMass_vr(0,NY,NX)
 !
 !     UREA HYDROLYSIS IN SURFACE RESIDUE
 !
@@ -964,8 +964,8 @@ module SoluteMod
 !     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
 !
     IF(FertN_soil_vr(ifert_urea,0,NY,NX).GT.ZEROS(NY,NX) &
-      .AND.SoilMicPMassLayer(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      CNHUA=FertN_soil_vr(ifert_urea,0,NY,NX)/SoilMicPMassLayer(0,NY,NX)
+      .AND.VLSoilMicPMass_vr(0,NY,NX).GT.ZEROS(NY,NX))THEN
+      CNHUA=FertN_soil_vr(ifert_urea,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
       DFNSA=CNHUA/(CNHUA+DUKD)
       RSNUA=AMIN1(FertN_soil_vr(ifert_urea,0,NY,NX),SPNHU*TMicHeterAct_vr(0,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(0,NY,NX))*(1.0_r8-ZNHUI(0,NY,NX))
     ELSE

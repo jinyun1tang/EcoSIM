@@ -82,7 +82,7 @@
         EcoHavstElmnt_CumYr_col(:,NY,NX)  = 0._r8
         NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
         NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
-
+        HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8
         D960: DO NZ=1,NP0(NY,NX)
           !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
           DO NE=1,NumPlantChemElms

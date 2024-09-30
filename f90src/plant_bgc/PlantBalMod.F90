@@ -144,7 +144,7 @@ implicit none
   DO NE=1,NumPlantChemElms
     ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     if(ShootElms_pft(NE,NZ)>1.e20)then
-    write(*,*)'sumplantstates',SeasonalNonstElms_pft(NE,NZ)
+    write(*,*)'sumplantstates',NE,SeasonalNonstElms_pft(NE,NZ)
     stop
     endif
   ENDDO
@@ -238,8 +238,8 @@ implicit none
   ENDDO
 
   !add C4 specific reserve carbon
-  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN  
-    ShootC4NonstC_brch(NB,NZ)=0._r8
+  ShootC4NonstC_brch(NB,NZ)=0._r8
+  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN      
     D3251: DO K=1,MaxNodesPerBranch1
       ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)+CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ) &
         +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ)
@@ -392,7 +392,7 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NP
   integer :: NZ
-  real(r8) :: balE(1:NumPlantChemElms)
+  real(r8) :: balE(1:NP)
 
   associate(                                                         &
     GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft,           &  !>0 add to plant
@@ -410,7 +410,6 @@ implicit none
   )
 
   DO NZ=1,NP
-
     balE(NZ)=RootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)  &
       +ShootElms_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)   &
       +StandDeadStrutElms_pft(ielmc,NZ)-StandDeadStrutElmsBeg_pft(ielmc,NZ)  &

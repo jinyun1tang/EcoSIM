@@ -49,7 +49,10 @@ module timings
     implicit none
     real(r8), intent(out) :: t1
 
-    call timec(t1)
+!    call timec(t1)
+
+    call timer(.true., t1)
+
     END subroutine start_timer
 ! ----------------------------------------------------------------------
 
@@ -64,7 +67,8 @@ module timings
     real(r8) :: t2
 !   calculate the time between start_timer and end_timer
 !   and add it to the timer_array
-    call timec(t2)
+!    call timec(t2)
+    call timer(.false., t2)
     elapsed_time = (t2 - t1)
 
     timer_array(timer_number+1) = elapsed_time
@@ -100,5 +104,24 @@ module timings
     timer_number = 0
 
     end subroutine end_timer_loop
+
+! ----------------------------------------------------------------------
+
+  subroutine timer(start, time)
+    implicit none
+    logical, intent(in) :: start
+    real(r8), intent(out) :: time
+    integer :: count, count_rate, count_max
+    save count, count_rate, count_max
+    integer :: new_count
+
+    if (start) then
+      call system_clock(count, count_rate, count_max)
+      time=0._r8
+    else
+      call system_clock(new_count, count_rate, count_max)
+      time = real(new_count - count,kind=r8) / real(count_rate,kind=r8)
+    end if
+  end subroutine timer
 
 END module timings

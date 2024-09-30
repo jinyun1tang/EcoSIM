@@ -105,7 +105,7 @@ implicit none
   real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)
   real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)
   real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)
-  real(r8),target,allocatable :: RFermen_vr(:,:,:)
+  real(r8),target,allocatable :: RFerment_vr(:,:,:)
   real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)
   real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)    !denitrification N2O production
   real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)
@@ -148,7 +148,7 @@ implicit none
   allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
   allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
   allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
-  allocate(RFermen_vr(0:JZ,JY,JX)); RFermen_vr=0._r8
+  allocate(RFerment_vr(0:JZ,JY,JX)); RFerment_vr=0._r8
   allocate(RNH3oxi_vr(0:JZ,JY,JX)); RNH3oxi_vr=0._r8
   allocate(RN2ODeniProd_vr(0:JZ,JY,JX)); RN2ODeniProd_vr=0._r8
   allocate(RN2ONitProd_vr(0:JZ,JY,JX)); RN2ONitProd_vr=0._r8
@@ -250,7 +250,7 @@ implicit none
   call destroy(RCH4ProdAcetcl_vr)
   call destroy(RCH4ProdHydrog_vr)
   call destroy(RCH4Oxi_aero_vr)
-  call destroy(RFermen_vr)
+  call destroy(RFerment_vr)
   call destroy(RNH3oxi_vr)
   call destroy(RN2ONitProd_vr)  
   call destroy(RN2ODeniProd_vr)

@@ -39,7 +39,7 @@ module SnowPhysData
   real(r8),allocatable ::  CumHeat2SnowLM_snvr(:,:,:)
   real(r8),allocatable ::  XSnowThawMassLM_snvr(:,:,:)
   real(r8),allocatable ::  XIceThawMassLM_snvr(:,:,:)
-
+  real(r8),allocatable ::  tEnGYM_snvr(:,:,:)  
   real(r8),allocatable ::  CumSno2SnowL_snvr(:,:,:)                       !
   real(r8),allocatable ::  CumWat2SnowL_snvr(:,:,:)                       !
   real(r8),allocatable ::  CumIce2SnowL_snvr(:,:,:)                       !
@@ -87,7 +87,7 @@ module SnowPhysData
   allocate(VLIceSnow0M_snvr(JS,JY,JX));   VLIceSnow0M_snvr=0._r8
   allocate(VLWatSnow0M_snvr(JS,JY,JX));   VLWatSnow0M_snvr=0._r8
   allocate(CumSno2SnowL_snvr(JS,JY,JX));    CumSno2SnowL_snvr=0._r8
-
+  allocate(tEnGYM_snvr(JS,JY,JX));  tEnGYM_snvr=0._r8
   allocate(CumSno2SnowLM_snvr(JS,JY,JX)); CumSno2SnowLM_snvr=0._r8
   allocate(CumWat2SnowLM_snvr(JS,JY,JX)); CumWat2SnowLM_snvr=0._r8
   allocate(CumIce2SnowLM_snvr(JS,JY,JX)); CumIce2SnowLM_snvr=0._r8
@@ -122,6 +122,7 @@ module SnowPhysData
   call destroy(trcSalt_TBLS)
   call destroy(trcn_TFloXSurRunoff_2D)  
   call destroy(trcSalt_TQR)
+  call destroy(tEnGYM_snvr)
   call destroy(trcg_QSS)
   call destroy(trcn_QSS)  
   call destroy(trcg_TFloXSurRunoff)

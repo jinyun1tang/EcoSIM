@@ -213,7 +213,7 @@ implicit none
     call ncd_putvar(ncf,'ORGC',SoilOrgM_vr(ielmc,L,NY,NX))
     call ncd_putvar(ncf,'ElmAllocmatMicrblitr2POM',ElmAllocmatMicrblitr2POM_vr(:,L,NY,NX))
     call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP_vr(L,NY,NX))
-    call ncd_putvar(ncf,'BKVL',SoilMicPMassLayer(L,NY,NX))
+    call ncd_putvar(ncf,'BKVL',VLSoilMicPMass_vr(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS_vr(L,NY,NX))
     call ncd_putvar(ncf,'FC',FieldCapacity_vr(L,NY,NX))
     call ncd_putvar(ncf,'ATKA',TairKClimMean(NY,NX))

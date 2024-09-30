@@ -457,13 +457,13 @@ module InitPlantMod
     CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,        &
     VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft,        &
     KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft,          &
-    CumSoilThickness_vr      => plt_site%CumSoilThickness_vr,       &
+    CumSoilThickness_vr   => plt_site%CumSoilThickness_vr,    &
     NU                    => plt_site%NU,                     &
     NL                    => plt_site%NL,                     &
     NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft,    &
     SeedDepth_pft         => plt_morph%SeedDepth_pft,         &
     SeedAreaMean_pft      => plt_morph%SeedAreaMean_pft,      &
-    SeedCMass             => plt_morph%SeedCMass,             &
+    SeedCMass_pft         => plt_morph%SeedCMass_pft,         &
     PlantinDepz_pft       => plt_morph%PlantinDepz_pft,       &
     Root2ndMaxRadius1_pft => plt_morph%Root2ndMaxRadius1_pft, &
     Root2ndXSecArea_pft   => plt_morph%Root2ndXSecArea_pft,   &
@@ -473,13 +473,13 @@ module InitPlantMod
     Root1stMaxRadius_pft  => plt_morph%Root1stMaxRadius_pft,  &
     Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft,    &
     NIXBotRootLayer_pft   => plt_morph%NIXBotRootLayer_pft,   &
-    RoottRadialResist_pft => plt_morph%RoottRadialResist_pft, &
+    RootRadialResist_pft => plt_morph%RootRadialResist_pft, &
     Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft,    &
     RootPorosity_pft      => plt_morph%RootPorosity_pft,      &
     RootPoreTortu4Gas     => plt_morph%RootPoreTortu4Gas,     &
     RootRaidus_rpft       => plt_morph%RootRaidus_rpft,       &
     RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft,   &
-    RoottAxialResist_pft  => plt_morph%RoottAxialResist_pft,  &
+    RootAxialResist_pft  => plt_morph%RootAxialResist_pft,  &
     NIXBotRootLayer_rpft  => plt_morph%NIXBotRootLayer_rpft,  &
     SeedVolumeMean_pft    => plt_morph%SeedVolumeMean_pft,    &
     SeedMeanLen_pft       => plt_morph%SeedMeanLen_pft        &
@@ -490,7 +490,7 @@ module InitPlantMod
 !     SeedVolumeMean_pft,SeedMeanLen_pft,SeedAreaMean_pft=seed volume(m3),length(m),AREA3(NU)(m2)
 !     SeedCMass=seed C mass (g) from PFT file
 !
-  call calc_seed_geometry(SeedCMass(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ))
+  call calc_seed_geometry(SeedCMass_pft(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ))
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
@@ -503,7 +503,7 @@ module InitPlantMod
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     RoottRadialResist_pft,RoottAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
+!     RootRadialResist_pft,RootAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)
   D9795: DO L=NU,NL
@@ -530,8 +530,8 @@ module InitPlantMod
   VmaxPO4Root_pft(2,NZ)=VmaxPO4Root_pft(1,NZ)
   KmPO4Root_pft(2,NZ)=KmPO4Root_pft(1,NZ)
   CMinPO4Root_pft(2,NZ)=CMinPO4Root_pft(1,NZ)
-  RoottRadialResist_pft(2,NZ)=1.0E+04_r8
-  RoottAxialResist_pft(2,NZ)=1.0E+12_r8
+  RootRadialResist_pft(2,NZ)=1.0E+04_r8
+  RootAxialResist_pft(2,NZ)=1.0E+12_r8
 !
 !     RootPoreTortu4Gas=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
@@ -629,44 +629,44 @@ module InitPlantMod
 !     PP=population (grid cell-1)
 !
   PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
-  plt_pheno%doInitPlant_pft(NZ)=ifalse
-  plt_pheno%iPlantShootState_pft(NZ)=iDead
-  plt_pheno%iPlantRootState_pft(NZ)=iDead
-  BranchNumber_pft(NZ)=0
-  NumOfBranches_pft(NZ)=0
-  HypoctoHeight_pft(NZ)=0._r8
-  CanopyHeight_pft(NZ)=0._r8
+  plt_pheno%doInitPlant_pft(NZ)      = ifalse
+  plt_pheno%iPlantShootState_pft(NZ) = iLive
+  plt_pheno%iPlantRootState_pft(NZ)  = iLive
+  BranchNumber_pft(NZ)               = 0
+  NumOfBranches_pft(NZ)              = 0
+  HypoctoHeight_pft(NZ)              = 0._r8
+  CanopyHeight_pft(NZ)               = 0._r8
   D10: DO NB=1,MaxNumBranches
-    plt_pheno%doInitLeafOut_brch(NB,NZ)=iEnable
-    plt_pheno%doPlantLeafOut_brch(NB,NZ)=iDisable
-    plt_pheno%doPlantLeaveOff_brch(NB,NZ)=iDisable
-    plt_pheno%Prep4Literfall_brch(NB,NZ)=ifalse
-    plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ)=0
-    MatureGroup_brch(NB,NZ)=MatureGroup_pft(NZ)
-    ShootNodeNum_brch(NB,NZ)=ShootNodeNumAtPlanting_pft(NZ)
-    NodeNum2InitFloral_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
-    NodeNumberAtAnthesis_brch(NB,NZ)=0._r8
-    NumOfLeaves_brch(NB,NZ)=0._r8
-    LeafNumberAtFloralInit_brch(NB,NZ)=0._r8
-    KLeafNumber_brch(NB,NZ)=1
-    KMinNumLeaf4GroAlloc_brch(NB,NZ)=1
-    KHiestGroLeafNode_brch(NB,NZ)=1
-    KLowestGroLeafNode_brch(NB,NZ)=0
-    NodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-    ReprodNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
-    TotalNodeNumNormByMatgrp_brch(NB,NZ)=0._r8
-    TotReproNodeNumNormByMatrgrp_brch(NB,NZ)=0._r8
-    Hours4LenthenPhotoPeriod_brch(NB,NZ)=0._r8
-    Hours4ShortenPhotoPeriod_brch(NB,NZ)=0._r8
-    Hours4Leafout_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)
-    Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
-    Hours2LeafOut_brch(NB,NZ)=0._r8
-    RubiscoActivity_brch(NB,NZ)=1.0
-    C4PhotosynDowreg_brch(NB,NZ)=1.0
-    HourFailGrainFill_brch(NB,NZ)=0
-    HoursDoingRemob_brch(NB,NZ)=0
-    BranchNumber_brch(NB,NZ)=0
-    plt_pheno%iPlantBranchState_brch(NB,NZ)=iDead
+    plt_pheno%doInitLeafOut_brch(NB,NZ)           = iEnable
+    plt_pheno%doPlantLeafOut_brch(NB,NZ)          = iEnable
+    plt_pheno%doPlantLeaveOff_brch(NB,NZ)         = iEnable
+    plt_pheno%Prep4Literfall_brch(NB,NZ)          = ifalse
+    plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ) = 0
+    MatureGroup_brch(NB,NZ)                       = MatureGroup_pft(NZ)
+    ShootNodeNum_brch(NB,NZ)                      = ShootNodeNumAtPlanting_pft(NZ)
+    NodeNum2InitFloral_brch(NB,NZ)                = ShootNodeNum_brch(NB,NZ)
+    NodeNumberAtAnthesis_brch(NB,NZ)              = 0._r8
+    NumOfLeaves_brch(NB,NZ)                       = 0._r8
+    LeafNumberAtFloralInit_brch(NB,NZ)            = 0._r8
+    KLeafNumber_brch(NB,NZ)                       = 1
+    KMinNumLeaf4GroAlloc_brch(NB,NZ)              = 1
+    KHiestGroLeafNode_brch(NB,NZ)                 = 1
+    KLowestGroLeafNode_brch(NB,NZ)                = 0
+    NodeNumNormByMatgrp_brch(NB,NZ)               = 0._r8
+    ReprodNodeNumNormByMatrgrp_brch(NB,NZ)        = 0._r8
+    TotalNodeNumNormByMatgrp_brch(NB,NZ)          = 0._r8
+    TotReproNodeNumNormByMatrgrp_brch(NB,NZ)      = 0._r8
+    Hours4LenthenPhotoPeriod_brch(NB,NZ)          = 0._r8
+    Hours4ShortenPhotoPeriod_brch(NB,NZ)          = 0._r8
+    Hours4Leafout_brch(NB,NZ)                     = Hours4LenthenPhotoPeriod_brch(NB,NZ)
+    Hours4LeafOff_brch(NB,NZ)                     = Hours4ShortenPhotoPeriod_brch(NB,NZ)
+    Hours2LeafOut_brch(NB,NZ)                     = 0._r8
+    RubiscoActivity_brch(NB,NZ)                   = 1.0
+    C4PhotosynDowreg_brch(NB,NZ)                  = 1.0
+    HourFailGrainFill_brch(NB,NZ)                 = 0
+    HoursDoingRemob_brch(NB,NZ)                   = 0
+    BranchNumber_brch(NB,NZ)                      = 0
+    plt_pheno%iPlantBranchState_brch(NB,NZ)       = iDead
     D15: DO M=1,pltpar%NumGrowthStages
       iPlantCalendar_brch(M,NB,NZ)=0
     ENDDO D15
@@ -1025,7 +1025,7 @@ module InitPlantMod
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
     CNGR                      => plt_allom%CNGR,                      &
     CPGR                      => plt_allom%CPGR,                      &
-    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs,            &
+    RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs,        &
     SeedCPlanted_pft          => plt_biom%SeedCPlanted_pft,           &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr,  &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,     &
@@ -1038,7 +1038,7 @@ module InitPlantMod
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,       &
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch,         &
     SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &
-    SeedCMass                 => plt_morph%SeedCMass,                 &
+    SeedCMass_pft             => plt_morph%SeedCMass_pft,             &
     Root1stDepz_pft           => plt_morph%Root1stDepz_pft,           &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         &
   )
@@ -1057,20 +1057,20 @@ module InitPlantMod
 !     RootProteinC_pvr=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  SeedCPlanted_pft(NZ)=SeedCMass(NZ)*PlantPopulation_pft(NZ)
-  SeasonalNonstElms_pft(ielmc,NZ)=SeedCPlanted_pft(NZ)
-  SeasonalNonstElms_pft(ielmn,NZ)=CNGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-  SeasonalNonstElms_pft(ielmp,NZ)=CPGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-  LeafStrutElms_brch(ielmn,1,NZ)=CNGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
-  LeafStrutElms_brch(ielmp,1,NZ)=CPGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
-  LeafPetolBiomassC_brch(1,NZ)=LeafStrutElms_brch(ielmc,1,NZ)+PetoleStrutElms_brch(ielmc,1,NZ)
-  CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(1,NZ)
-  FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ))
-  CanopyWater_pft(NZ)=ppmc*CanopyLeafShethC_pft(NZ)/FDM
-  WatByPCanopy_pft(NZ)=0._r8
-  CanopyNonstElms_brch(ielmn,1,NZ)=CNGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
-  CanopyNonstElms_brch(ielmp,1,NZ)=CPGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
-  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CNGR(NZ) &
+  SeedCPlanted_pft(NZ)             = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)
+  SeasonalNonstElms_pft(ielmc,NZ)  = SeedCPlanted_pft(NZ)
+  SeasonalNonstElms_pft(ielmn,NZ)  = CNGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+  SeasonalNonstElms_pft(ielmp,NZ)  = CPGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+  LeafStrutElms_brch(ielmn,1,NZ)   = CNGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
+  LeafStrutElms_brch(ielmp,1,NZ)   = CPGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
+  LeafPetolBiomassC_brch(1,NZ)     = LeafStrutElms_brch(ielmc,1,NZ)+PetoleStrutElms_brch(ielmc,1,NZ)
+  CanopyLeafShethC_pft(NZ)         = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(1,NZ)
+  FDM                              = AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ))
+  CanopyWater_pft(NZ)              = ppmc*CanopyLeafShethC_pft(NZ)/FDM
+  WatByPCanopy_pft(NZ)             = 0._r8
+  CanopyNonstElms_brch(ielmn,1,NZ) = CNGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
+  CanopyNonstElms_brch(ielmp,1,NZ) = CPGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
+  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ) = CNGR(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
