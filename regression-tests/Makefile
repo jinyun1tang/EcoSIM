@@ -2,7 +2,7 @@
 # switch to some sort of cmake-ified out of source tests.
 compiler   = not-set
 
-ECOSIM = ../build/bin/ecosim.f90.x
+ECOSIM = ../local/bin/ecosim.f90.x
 ifeq ($(compiler), not-set)
 COMPILER=gnu
 else
