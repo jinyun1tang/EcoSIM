@@ -118,16 +118,24 @@ implicit none
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
   ENDDO
   
-  write(*,*) "Heat and water souces: "
+  !write(*,*) "Heat and water souces: "
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !Convert heat and water flux from EcoSIM units (flux/ hr)
     !to ATS units (flux / s)
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP*3600._r8)
-    write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
-    write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
+    !write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
+    !write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
   ENDDO
+  
+  write(*,*) "prec = ", RAINH(1,1), " m/s"
+  write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 
+  write(*,*) "Q_w ", surf_w_source(1) , " m/s"
+
+  open(unit=10, file="fluxes.txt", status="unknown", position="append")
+  write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"
+  close(10)
 
   end subroutine RunEcoSIMSurfaceBalance
 

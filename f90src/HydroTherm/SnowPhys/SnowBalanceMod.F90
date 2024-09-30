@@ -117,6 +117,19 @@ implicit none
   write(*,*) "VcumSnowWE_col(NY,NX)=", VcumSnowWE_col(NY,NX)
   !write(*,*) "---------------------------------"
 
+  IF (NY.EQ.1 .AND. NX.EQ.1)THEN
+      write(*,*) "Snow Depth: ", SnowDepth_col(1,1)
+      write(*,*) "TKSnow: ", TKSnow_snvr(1,1,1), "TKair: ", TairK_col(1,1), "TKsoil: ", TKS_vr(1,1,1)
+      write(*,*) "VcumSnowWE_col(NY,NX)=", VcumSnowWE_col(1,1)
+
+      open(unit=10, file="snow_balance.txt", status="unknown", position="append")
+      write(10,*) "Snow Depth: ", SnowDepth_col(1,1), " TKSnow: ", TKSnow_snvr(1,1,1),&
+             " TKair: ", TairK_col(1,1), " TKsoil: ", TKS_vr(1,1,1), &
+             " VcumSnowWE_col(1,1): ", VcumSnowWE_col(1,1)
+      close(10)
+  ENDIF
+  
+
 !
 ! IF SNOWPACK DISAPPEARS
 
