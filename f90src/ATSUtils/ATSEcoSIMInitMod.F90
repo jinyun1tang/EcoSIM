@@ -7,8 +7,8 @@ module ATSEcoSIMInitMod
   USE SoilPhysDataType
   use LandSurfDataType
   use EcoSIMCtrlMod
-  use HydroThermData, only : PSISM1_vr, TKSoi1, VLHeatCapacity_vr, &
-      SoilFracAsMicP, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
+  use HydroThermData, only : PSISM1_vr, TKSoi1, VHeatCapacity1_vr, &
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm_col, RainH

@@ -30,7 +30,7 @@ implicit none
 
   real(r8),allocatable ::  FIceThawMacP(:,:,:)                      !
 
-  real(r8),allocatable ::  HydroCondMacP1(:,:,:)                       !
+  real(r8),allocatable ::  HydroCondMacP1_vr(:,:,:)                       !
   real(r8),allocatable ::  VLMicP1_vr(:,:,:)                       !
   real(r8),allocatable ::  VLMacP1_vr(:,:,:)                      !
 
@@ -79,7 +79,7 @@ contains
 
   allocate(FIceThawMacP(JZ,JY,JX));   FIceThawMacP=0._r8
 
-  allocate(HydroCondMacP1(JZ,JY,JX));    HydroCondMacP1=0._r8
+  allocate(HydroCondMacP1_vr(JZ,JY,JX));    HydroCondMacP1_vr=0._r8
   allocate(VLMicP1_vr(0:JZ,JY,JX));  VLMicP1_vr=0._r8
   allocate(VLMacP1_vr(JZ,JY,JX));   VLMacP1_vr=0._r8
 
@@ -125,7 +125,7 @@ contains
 
   call destroy(FIceThawMacP)
 
-  call destroy(HydroCondMacP1)
+  call destroy(HydroCondMacP1_vr)
   call destroy(VLMicP1_vr)
 
   call destroy(VLMacP1_vr)

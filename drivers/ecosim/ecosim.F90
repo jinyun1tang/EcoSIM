@@ -110,7 +110,7 @@ PROGRAM main
   else
     frectyp%ymdhs0=start_date   !the actual simulation beginning year
   endif
-
+  
   call hist_htapes_build()
   
   !prepare climate forcing

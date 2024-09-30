@@ -1,6 +1,8 @@
 module SoilHydroParaMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSiMParDataMod   , only : micpar
+  use minimathmod  , only : isclose,AZMAX1,AZMIN1  
   use EcoSimConst
   use SoilWaterDataType
   use SoilPropertyDataType
@@ -17,15 +19,14 @@ module SoilHydroParaMod
   use SurfLitterDataType
   use EcoSIMCtrlMod
   use PhysPars
-  use EcoSiMParDataMod   , only : micpar
-  use minimathmod  , only : isclose,AZMAX1,AZMIN1
+
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
-
+  real(r8), parameter :: tiny_val=1.e-6_r8   !minimum value 
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
   public :: LitterHydroproperty
@@ -59,21 +60,26 @@ contains
   ! FCD,PSD=FCL-WPL,log(POROS)-FCL
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
-!
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX) .AND. VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      THETW1=AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)),1.e-6_r8)
+
+    !significant soil mass
+    IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX) .AND. VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      THETW1=AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)),tiny_val)
+      !water content less than field capacity
       IF(THETW1.LT.FieldCapacity_vr(L,NY,NX))THEN
         PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((LOGFldCapacity_vr(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
+      !water content exceeds field capacity but less than sturation    
       ELSE IF(THETW1.LT.POROS_vr(L,NY,NX)-DTHETW)THEN
         PSISoilMatricP_vr(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(L,NY,NX)-LOG(THETW1)) &
           /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))
+      !saturated    
       ELSE
         PSISoilMatricP_vr(L,NY,NX)=PSISE_vr(L,NY,NX)
       ENDIF
-    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI_col(L,NY,NX)>ZEROS2(NY,NX))THEN
-      FCX  = FCI*THETI_col(L,NY,NX)
-      WPX  = WPI*THETI_col(L,NY,NX)
+      !ice 
+    ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI_vr(L,NY,NX)>ZEROS2(NY,NX))THEN
+      FCX  = FCI*THETI_vr(L,NY,NX)
+      WPX  = WPI*THETI_vr(L,NY,NX)
       FCLX = LOG(FCX)
       WPLX = LOG(WPX)
       PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
@@ -117,11 +123,13 @@ contains
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
 !
-!     HydroCondMicP4RootUptake=soil hydraulic conductivity for root uptake
+!     HydroCondMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
 !
     K=MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX))/POROS_vr(L,NY,NX))+1))
-    HydroCondMicP4RootUptake(L,NY,NX)=0.5_r8*(HydroCond3D(1,K,L,NY,NX)+HydroCond3D(3,K,L,NY,NX))
+    HydroCondMicP4RootUptake_vr(L,NY,NX)=0.5_r8*(HydroCond_3D(1,K,L,NY,NX)+HydroCond_3D(3,K,L,NY,NX))
+    
   END DO
+  
   end subroutine GetSoilHydraulicVars
 
 
@@ -221,7 +229,7 @@ contains
   !     THETK,PSISK=micropore class water content,potential
   !     HCND=lateral(1,2),vertical(3) micropore hydraulic conductivity
   !
-  !     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
+  !     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
   SUM2=0.0_r8
   DO  K=1,100
     XK=K-1
@@ -251,14 +259,14 @@ contains
     DO  N=1,3
       IF(N.EQ.3)THEN
         !vertical
-        HydroCond3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
+        HydroCond_3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
         IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(L,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(L,NY,NX))THEN
           !moisture at air-entry saturation
           ThetaSat_vr(L,NY,NX)=H2OSOIatK(K)
         ENDIF
       ELSE
         !horizontal
-        HydroCond3D(N,K,L,NY,NX)=SatHydroCondHrzn_vr(L,NY,NX)*YK*SUM1/SUM2
+        HydroCond_3D(N,K,L,NY,NX)=SatHydroCondHrzn_vr(L,NY,NX)*YK*SUM1/SUM2
       ENDIF
     ENDDO
   ENDDO
@@ -279,7 +287,7 @@ contains
   ENDIF
   VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(L,NY,NX))
   HydroCondMacP_vr(L,NY,NX)=3.6E+03_r8*PICON*MacPNumLayer(L,NY,NX)*MacPRadius(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
-  
+!  write(*,*)L,SatHydroCondVert_vr(L,NY,NX),HydroCondMacP_vr(L,NY,NX)
   end subroutine SoilHydroProperty
 
 !------------------------------------------------------------------------------------------
@@ -320,8 +328,8 @@ contains
   ENDIF
   LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
   LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
-  PSD(L,NY,NX)            = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-  FCD(L,NY,NX)            = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+  PSD(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+  FCD(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
 
 !   IBEGIN:   start date of model run
 
@@ -346,25 +354,25 @@ contains
     ENDIF
 
     IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
-      THETI_col(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
-      THETI_col(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(isclose(THI(L,NY,NX),0._r8))THEN
-      THETI_col(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
-      THETI_col(L,NY,NX)=0.0_r8
+      THETI_vr(L,NY,NX)=0.0_r8
     ENDIF
 
   !in a cold run, set it
-    VLWatMicP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-    VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VLiceMicP_vr(L,NY,NX)  = THETI_col(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_vr(L,NY,NX)  = THETI_col(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
+    VLWatMicP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
+    VLWatMacP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+    VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
+    ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
+    VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
-    ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
-    ThetaICEZ_vr(L,NY,NX)=THETI_col(L,NY,NX)
   ENDIF
   end subroutine SetColdRunSoilProps
 !------------------------------------------------------------------------------------------  
@@ -379,11 +387,12 @@ contains
   real(r8) :: H2OSOIatK(n100),PSISK(0:n100)
 
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    SoiBulkDensity_vr(0,NY,NX)=SoilMicPMassLayer(0,NY,NX)/VGeomLayer_vr(0,NY,NX)
+    SoiBulkDensity_vr(0,NY,NX)=VLSoilMicPMass_vr(0,NY,NX)/VGeomLayer_vr(0,NY,NX)
   ELSE
     SoiBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF
   THETY_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
+
   SUM2=0.0_r8
   D1220: DO  K=1,n100
     XK=K-1
@@ -407,10 +416,9 @@ contains
     D1230: DO M=K,n100
         SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
     ENDDO D1230
-    HydroCond3D(3,K,0,NY,NX)=SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
-    HydroCond3D(1,K,0,NY,NX)=0.0_r8
-    HydroCond3D(2,K,0,NY,NX)=0.0_r8
-    if(PSISK(K)/=PSISK(K))write(*,*)'PSISK bad',K
+    HydroCond_3D(3,K,0,NY,NX)=SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
+    HydroCond_3D(1,K,0,NY,NX)=0.0_r8
+    HydroCond_3D(2,K,0,NY,NX)=0.0_r8    
     IF(K.GT.1.AND.(PSISK(K).LT.PSISoilAirEntry(0,NY,NX)))THEN
       IF(PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
         !moisture at air-entry saturation
@@ -429,15 +437,15 @@ contains
   DO  L=NU,NM
     IF(FieldCapacity_vr(L,NY,NX).LT.0.0_r8)THEN
       !computing field capacity
-      ISOIL(isoi_fc,L,NY,NX)=isoi_unset
-      PSIAtFldCapacity(NY,NX)=-0.033_r8
+      ISOIL(isoi_fc,L,NY,NX)  = isoi_unset
+      PSIAtFldCapacity(NY,NX) = -0.033_r8
     ELSE
       ISOIL(isoi_fc,L,NY,NX)=isoi_set
     ENDIF
     IF(WiltPoint_vr(L,NY,NX).LT.0.0_r8)THEN
       !computing wilting point
-      ISOIL(isoi_wp,L,NY,NX)=isoi_unset
-      PSIAtWiltPoint(NY,NX)=-1.5_r8
+      ISOIL(isoi_wp,L,NY,NX) = isoi_unset
+      PSIAtWiltPoint(NY,NX)  = -1.5_r8
     ELSE
       ISOIL(isoi_wp,L,NY,NX)=isoi_set
     ENDIF

@@ -149,7 +149,7 @@
         I3=I+1
         IF(I.EQ.1)I2=LYRX
         IF(I.EQ.IBEGIN)I2=I
-        IF(I.EQ.LYRC)I3=I
+        IF(I.EQ.DazCurrYear)I3=I
         TAVG1=(TMPX(I2)+TMPN(I))/2._r8
         TAVG2=(TMPX(I)+TMPN(I))/2._r8
         TAVG3=(TMPX(I)+TMPN(I3))/2._r8
@@ -192,16 +192,16 @@
 !     INCRENENTAL CHANGES
 !
         ELSEIF(ICLM.EQ.2)THEN
-! LYRC: number of days in current year
-          TDTPX(N,NY,NX)=TDTPX(N,NY,NX)+DTMPX(N)/LYRC
-          TDTPN(N,NY,NX)=TDTPN(N,NY,NX)+DTMPN(N)/LYRC
-          TDRAD(N,NY,NX)=TDRAD(N,NY,NX)+(DRAD(N)-1.0_r8)/LYRC
-          TDWND(N,NY,NX)=TDWND(N,NY,NX)+(DWIND(N)-1.0_r8)/LYRC
-          TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/LYRC
-          TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/LYRC
-          TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/LYRC
-          TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/LYRC
-          TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/LYRC
+! DazCurrYear: number of days in current year
+          TDTPX(N,NY,NX)=TDTPX(N,NY,NX)+DTMPX(N)/DazCurrYear
+          TDTPN(N,NY,NX)=TDTPN(N,NY,NX)+DTMPN(N)/DazCurrYear
+          TDRAD(N,NY,NX)=TDRAD(N,NY,NX)+(DRAD(N)-1.0_r8)/DazCurrYear
+          TDWND(N,NY,NX)=TDWND(N,NY,NX)+(DWIND(N)-1.0_r8)/DazCurrYear
+          TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/DazCurrYear
+          TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/DazCurrYear
+          TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/DazCurrYear
+          TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/DazCurrYear
+          TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/DazCurrYear
         ENDIF
       ENDDO D600
     ENDDO D950

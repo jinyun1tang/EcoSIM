@@ -432,7 +432,6 @@ implicit none
     DLYR3                     => plt_site%DLYR3,                         &
     ZERO                      => plt_site%ZERO,                          &
     Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,              &
-    MaxSeedCMass              => plt_morph%MaxSeedCMass,                 &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,             &
     RootBranchFreq_pft        => plt_morph%RootBranchFreq_pft,           &

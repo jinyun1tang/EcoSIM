@@ -55,8 +55,7 @@ module grosubsMod
   call InitVegPars(pltpar)
   
   NumGrowthStages = pltpar%NumGrowthStages
-  MaxNumRootAxes = pltpar%MaxNumRootAxes
-
+  MaxNumRootAxes  = pltpar%MaxNumRootAxes
 
   end subroutine InitGrosub
 !------------------------------------------------------------------------------------------
@@ -72,7 +71,6 @@ module grosubsMod
   real(r8) :: CanopyHeight_copy(JP1)
   integer :: L,K,M
   integer :: NZ,NE
-  real(r8) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
 ! begin_execution
   associate(                                                      &
     NP0                     =>  plt_site%NP0                    , &  
@@ -85,8 +83,8 @@ module grosubsMod
 !
 !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ)=CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)=0._r8
+    CanopyHeight_copy(NZ) = CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)  = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -101,16 +99,14 @@ module grosubsMod
       call AccumulateStates(I,J,NZ)
     ENDIF
 
-!    call SumPlantBiom(I,J,NZ,'bfdistb')
     if(lverb)write(*,*)'HARVEST STANDING DEAD'
     call RemoveBiomassByDisturbance(I,J,NZ)
-!    PRINT*,'aftremvbydisturb',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ),NZ         
-!    call SumPlantBiom(I,J,NZ,'bflvdeadtrns')
+
   ENDDO D9985
 !
   if(lverb)write(*,*)'TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS'
   call LiveDeadTransformation(I,J)
-!  PRINT*,'aftrdeadtransf',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,1)
+  
   DO NZ=1,NP
     call SumPlantBiom(I,J,NZ,'exgrosubs')
   ENDDO
@@ -168,7 +164,7 @@ module grosubsMod
     GrossResp_pft                  => plt_bgcr%GrossResp_pft,                  &
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft,                &
     PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft,         &
-    CumSoilThickness_vr               => plt_site%CumSoilThickness_vr,               &
+    CumSoilThickness_vr            => plt_site%CumSoilThickness_vr,            &
     PlantinDepz_pft                => plt_morph%PlantinDepz_pft,               &
     NumOfBranches_pft              => plt_morph%NumOfBranches_pft              &
   )
@@ -178,13 +174,12 @@ module grosubsMod
 !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
-        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable &
-          .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
-          iDayPlanting_pft(NZ)=I
-          iYearPlanting_pft(NZ)=iYearCurrent
-          PlantinDepz_pft(NZ)=0.005_r8+CumSoilThickness_vr(0)
-          !mark plant as initialized
-          doInitPlant_pft(NZ)=ifalse
+        IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
+          iDayPlanting_pft(NZ)  = I
+          iYearPlanting_pft(NZ) = iYearCurrent
+          PlantinDepz_pft(NZ)   = 0.005_r8+CumSoilThickness_vr(0)
+          doInitPlant_pft(NZ)   = ifalse   !mark plant as initialized
+          exit  
         ENDIF
       ENDIF
     ENDDO D205
@@ -211,9 +206,6 @@ module grosubsMod
 !
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
 !
-!     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P LitrFall
-!     TCSNC,TZSNC,TPSNC=cumulative C,N,P LitrFall
-!     HCSNC,HZSNC,HPSNC=hourly C,N,P LitrFall
 !   diagnose surface literfall 
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
@@ -350,30 +342,20 @@ module grosubsMod
 
 
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
-    CanopyN2Fix_pft(NZ)=0._r8
-    BegRemoblize = 0
-
-!    call SumPlantBiom(I,J,NZ,'bfstageplant')
+    CanopyN2Fix_pft(NZ) = 0._r8
+    BegRemoblize        = 0
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
-!
-!     WTLFB,WTSHEB,LeafPetolBiomassC_brch=leaf,petiole,leaf+petiole mass
-!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-!
-!    call SumPlantBiom(I,J,NZ,'bfgrowpbrch')
 
-!    PRINT*,'bfgrowpbrch',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)       
     DO  NB=1,NumOfBranches_pft(NZ)
       if(lverb)write(*,*)'GrowOneBranch'
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
-!    PRINT*,'aftgrowbranch',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)    
-!
-!    call SumPlantBiom(I,J,NZ,'bfRootBGCM')
+
     if(lverb)write(*,*)'RootBGCModel'
     call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
       RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
@@ -385,18 +367,14 @@ module grosubsMod
     call ComputeTotalBiom(I,J,NZ)
   ENDIF
 !
-!  call SumPlantBiom(I,J,NZ,'bfrmbiom')
   if(lverb)write(*,*)'RemoveBiomByMgmt'
   call RemoveBiomByMgmt(I,J,NZ)
-!  PRINT*,'rmbymgmt',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)      
 !
 !     RESET DEAD BRANCHES
-!  call SumPlantBiom(I,J,NZ,'bfresetdead')
   call ResetDeadBranch(I,J,NZ)
-!  PRINT*,'resetdead',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)      
-!  
+
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
-!  PRINT*,'afaccum',plt_biom%RootMycoNonstElms_rpvr(ielmc,1,4,NZ)        
+
   end associate
   end subroutine GrowPlant
 
@@ -719,11 +697,7 @@ module grosubsMod
     !root state variables
     !sum structural biomass
   ENDDO
-!  if(NZ==1)THEN
-!  write(111,*)I+J/24.,'tree',CanopyNonstElms_pft(:,NZ)
-!  ELSEIF(NZ==2)THEN
-!  write(112,*)I+J/24.,'grass',CanopyNonstElms_pft(:,NZ)
-!  ENDIF
+
   CanopyStalkC_pft(NZ)                         = sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ)                     = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ)                        = sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))

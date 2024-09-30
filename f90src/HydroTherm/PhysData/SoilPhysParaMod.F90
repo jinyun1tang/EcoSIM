@@ -45,7 +45,7 @@ implicit none
 
   THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
 
-  IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+  IF(VLSoilMicPMass_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil
     IF(THETA1.LT.FieldCapacity_vr(N3,N2,N1))THEN
       !water less than field capacity
@@ -113,7 +113,7 @@ implicit none
     CSILT(L,NY,NX)               = CSILT(L-1,NY,NX)
     CCLAY(L,NY,NX)               = CCLAY(L-1,NY,NX)
     SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L-1,NY,NX)
-    ROCK(L,NY,NX)                = ROCK(L-1,NY,NX)
+    ROCK_vr(L,NY,NX)                = ROCK_vr(L-1,NY,NX)
     PH(L,NY,NX)                  = PH(L-1,NY,NX)
     CEC(L,NY,NX)                 = CEC(L-1,NY,NX)
     AEC(L,NY,NX)                 = AEC(L-1,NY,NX)

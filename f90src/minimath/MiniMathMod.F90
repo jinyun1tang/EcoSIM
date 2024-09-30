@@ -16,7 +16,7 @@ module minimathmod
   public :: vapsat, vapsat0
   public :: isLeap
   public :: isnan
-  public :: AZMAX1,AZMIN1,AZMAX1t
+  public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d
   public :: GetMolAirPerm3
   public :: fSiLU
   public :: fixnegmass
@@ -34,6 +34,7 @@ module minimathmod
   public :: addone
   public :: RichardsonNumber
   real(r8), parameter :: tiny_val=1.e-20_r8
+
   contains
 
    pure function isnan(a)result(ans)
@@ -83,10 +84,11 @@ module minimathmod
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
+  ! ep=\mu R T= (m/M)/V0 RT, V0=1m3, m=ep*V0*M/(RT), [kPa]*[m3]*[g/mol]/[Pa m3]~kg 
   implicit none
   real(r8), intent(in) :: tempK
 
-  real(r8) :: ans  !ton/m3, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
+  real(r8) :: ans  !ton, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
   ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat
 
@@ -127,6 +129,23 @@ module minimathmod
   ans=AMAX1(val,tiny_val)
 
   end function AZMAX1t
+!------------------------------------------------------------------------------------------
+
+  pure function AZMAX1d(val,tiny_val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: tiny_val2
+
+  real(r8) :: ans
+
+  if(val>tiny_val2)then
+    ans=val 
+  elseif(val>-tiny_val2)then
+    ans=0._r8
+  else
+    ans=val
+  endif
+  end function AZMAX1d
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)

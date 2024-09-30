@@ -2,8 +2,8 @@ module SnowBalanceMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use data_const_mod, only: spval => DAT_CONST_SPVAL
   use abortutils,     only: endrun
-  use EcoSIMCtrlMod,  only: lverb
-  use minimathmod,    only: AZMAX1, isclose, AZMIN1
+  use EcoSIMCtrlMod,  only: lverb,snowRedist_model
+  use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d  
   USE SnowDataType
   use GridConsts
   use GridDataType
@@ -31,7 +31,21 @@ implicit none
   public :: SnowMassUpdate     !called in redist
   public :: SnowpackLayering   !called in redist after SnowMassUpdate
   public :: ZeroSnowArrays
+  public :: DebugSnowPrint
   contains
+
+  subroutine DebugSnowPrint(I,J,NY,NX,info)
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
+  character(len=*), intent(in) :: info
+  integer :: L
+    if(I==152 .and. J==1 .and. NX==7)then
+    L=1
+    write(113,*)trim(info)//'snoadd',L,CumSno2SnowL_snvr(L,NY,NX),CumWat2SnowL_snvr(L,NY,NX),CumIce2SnowL_snvr(L,NY,NX),CumHeat2SnowL_snvr(L,NY,NX)
+    endif
+
+  end subroutine DebugSnowPrint
+!------------------------------------------------------------------------------------------
 
   subroutine SnowMassUpdate(I,J,NY,NX)
   !
@@ -39,24 +53,29 @@ implicit none
   !
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  real(r8) :: VOLSWI,ENGYW
+  real(r8) :: VOLSWI,ENGYW,TKSnow_pre
   integer :: L
       !
       !     CALCULATE SNOWPACK TEMPERATURE FROM ITS CHANGE
       !     IN HEAT STORAGE
       !
   if(lverb)write(*,*)'SnowMassUpdate'
-  VOLSWI=0.0_r8
-  !update snow layer from top to bottom
-  
-  D9780: DO L=1,JS
+  !update snow layer from top to bottom  
+  VOLSWI     = 0.0_r8
+  TKSnow_pre = TKSnow_snvr(1,NY,NX)
+!  if(TKSnow_snvr(1,NY,NX)<230._r8)then
+!    write(*,*)I,J,TKSnow_pre,TairK_col(NY,NX)
+!    call endrun(trim(mod_filename)//' at line',__LINE__)     
+!  endif  
 
-    IF(VLHeatCapSnow_col(L,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .and. L.EQ.1)THEN
+
+  D9780: DO L=1,JS
+    IF(VLHeatCapSnow_snvr(L,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .and. L.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay_snvr(L,NY,NX))>0._r8)THEN
-        CumSno2SnowL_snvr(L,NY,NX)=CumSno2SnowL_snvr(L,NY,NX)+SnoXfer2SnoLay_snvr(L,NY,NX)
-        CumWat2SnowL_snvr(L,NY,NX)=CumWat2SnowL_snvr(L,NY,NX)+WatXfer2SnoLay_snvr(L,NY,NX)
-        CumIce2SnowL_snvr(L,NY,NX)=CumIce2SnowL_snvr(L,NY,NX)+IceXfer2SnoLay_snvr(L,NY,NX)
-        CumHeat2SnowL_snvr(L,NY,NX)=CumHeat2SnowL_snvr(L,NY,NX)+HeatXfer2SnoLay_snvr(L,NY,NX)
+        CumSno2SnowL_snvr(L,NY,NX)  = CumSno2SnowL_snvr(L,NY,NX)+SnoXfer2SnoLay_snvr(L,NY,NX)
+        CumWat2SnowL_snvr(L,NY,NX)  = CumWat2SnowL_snvr(L,NY,NX)+WatXfer2SnoLay_snvr(L,NY,NX)
+        CumIce2SnowL_snvr(L,NY,NX)  = CumIce2SnowL_snvr(L,NY,NX)+IceXfer2SnoLay_snvr(L,NY,NX)
+        CumHeat2SnowL_snvr(L,NY,NX) = CumHeat2SnowL_snvr(L,NY,NX)+HeatXfer2SnoLay_snvr(L,NY,NX)
       ENDIF  
     ENDIF
     
@@ -66,35 +85,17 @@ implicit none
     
   ENDDO D9780
 
-!
-!     SNOW RUNOFF from snow laye near soil surface
-!
-  VLDrySnoWE_snvr(1,NY,NX)=VLDrySnoWE_snvr(1,NY,NX)+TDrysnoBySnowRedist(NY,NX)
-  VLWatSnow_snvr(1,NY,NX)=VLWatSnow_snvr(1,NY,NX)+TWatBySnowRedist(NY,NX)
-  VLIceSnow_snvr(1,NY,NX)=VLIceSnow_snvr(1,NY,NX)+TIceBySnowRedist(NY,NX)
-  ENGYW=VLHeatCapSnow_col(1,NY,NX)*TKSnow_snvr(1,NY,NX)
-  VLHeatCapSnow_col(1,NY,NX)=cps*VLDrySnoWE_snvr(1,NY,NX)+cpw*VLWatSnow_snvr(1,NY,NX)+cpi*VLIceSnow_snvr(1,NY,NX)
+!  if(TKSnow_snvr(1,NY,NX)<230._r8)then
+!    write(*,*)I,J,TKSnow_pre,TairK_col(NY,NX)
+!    call endrun(trim(mod_filename)//' at line',__LINE__)     
+!  endif  
 
-  IF(VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-!    if(I>=138.and.I<=139)print*,I+J/24.,'revi',TKSnow_snvr(1,NY,NX),ENGYW,THeatBySnowRedist_col(NY,NX),VLHeatCapSnow_col(1,NY,NX)    
-    TKSnow_snvr(1,NY,NX)=(ENGYW+THeatBySnowRedist_col(NY,NX))/VLHeatCapSnow_col(1,NY,NX)    
-    if(TKSnow_snvr(1,NY,NX)<0._r8)then
-      write(*,*)'TKSnow_snvr(1,NY,NX)',TKSnow_snvr(1,NY,NX),VLDrySnoWE_snvr(1,NY,NX), &
-        VLWatSnow_snvr(1,NY,NX),VLIceSnow_snvr(1,NY,NX),TairK_col(NY,NX),&
-        ENGYW,THeatBySnowRedist_col(NY,NX)
-      call endrun(trim(mod_filename)//' at line',__LINE__)   
-    endif
-
-  ELSE
-    TKSnow_snvr(1,NY,NX)=TairK_col(NY,NX)
-  ENDIF
-
-  VcumDrySnoWE_col(NY,NX)=sum(VLDrySnoWE_snvr(1:JS,NY,NX))
-  VcumWatSnow_col(NY,NX)=sum(VLWatSnow_snvr(1:JS,NY,NX))
-  VcumIceSnow_col(NY,NX)=sum(VLIceSnow_snvr(1:JS,NY,NX))
-  VcumSnoDWI_col(NY,NX)=sum(VLSnoDWIprev_snvr(1:JS,NY,NX))
-  SnowDepth_col(NY,NX)=sum(SnowThickL_snvr(1:JS,NY,NX))
-  VcumSnowWE_col(NY,NX)=VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX) 
+  VcumDrySnoWE_col(NY,NX) = sum(VLDrySnoWE_snvr(1:JS,NY,NX))
+  VcumWatSnow_col(NY,NX)  = sum(VLWatSnow_snvr(1:JS,NY,NX))
+  VcumIceSnow_col(NY,NX)  = sum(VLIceSnow_snvr(1:JS,NY,NX))
+  VcumSnoDWI_col(NY,NX)   = sum(VLSnoDWIprev_snvr(1:JS,NY,NX))
+  SnowDepth_col(NY,NX)    = sum(SnowThickL_snvr(1:JS,NY,NX))
+  VcumSnowWE_col(NY,NX)   = VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX)
 !
 ! IF SNOWPACK DISAPPEARS
 
@@ -117,28 +118,30 @@ implicit none
 !     begin_execution
 !
 
-  IF(VLHeatCapSnow_col(1,NY,NX).GT.0.0_r8 .AND. VLHeatCapSnow_col(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) &
+  IF(VLHeatCapSnow_snvr(1,NY,NX).GT.0.0_r8 .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) &
     .AND. TairK_col(NY,NX).GT.TFICE)THEN
+
     !air temperature above freezing, surface snow layer heat insignificant, so it is merged
     !to the surface layer, and all varaibles are reset
-    ENGYS=TKSnow_snvr(1,NY,NX)*VLHeatCapSnow_col(1,NY,NX)
-    ENGY1=TKS_vr(NUM(NY,NX),NY,NX)*VHeatCapacity_vr(NUM(NY,NX),NY,NX)
-    FLWS=VLDrySnoWE_snvr(1,NY,NX)
-    FLWW=VLWatSnow_snvr(1,NY,NX)
-    FLWI=VLIceSnow_snvr(1,NY,NX)
-    HeatFlo2Surface=(cpw*FLWW+cps*FLWS+cpi*FLWI)*TKSnow_snvr(1,NY,NX)
+    ENGYS           = TKSnow_snvr(1,NY,NX)*VLHeatCapSnow_snvr(1,NY,NX)
+    ENGY1           = TKS_vr(NUM(NY,NX),NY,NX)*VHeatCapacity_vr(NUM(NY,NX),NY,NX)
+    FLWS            = VLDrySnoWE_snvr(1,NY,NX)
+    FLWW            = VLWatSnow_snvr(1,NY,NX)
+    FLWI            = VLIceSnow_snvr(1,NY,NX)
+    HeatFlo2Surface = (cpw*FLWW+cps*FLWS+cpi*FLWI)*TKSnow_snvr(1,NY,NX)
 
     !reset snow layer variables
-    VLDrySnoWE_snvr(1,NY,NX)=0.0_r8
-    VLWatSnow_snvr(1,NY,NX)=0.0_r8
-    VLIceSnow_snvr(1,NY,NX)=0.0_r8
-    VLHeatCapSnow_col(1,NY,NX)=0.0_r8
-    VcumDrySnoWE_col(NY,NX)=0.0_r8
-    VcumWatSnow_col(NY,NX)=0.0_r8
-    VcumIceSnow_col(NY,NX)=0.0_r8
-    VcumSnoDWI_col(NY,NX)=0.0_r8
-    SnowDepth_col(NY,NX)=0.0_r8    
-    VcumSnowWE_col(NY,NX)=0._r8
+    VLDrySnoWE_snvr(1,NY,NX)    = 0.0_r8
+    VLWatSnow_snvr(1,NY,NX)     = 0.0_r8
+    VLIceSnow_snvr(1,NY,NX)     = 0.0_r8
+    VLHeatCapSnow_snvr(1,NY,NX) = 0.0_r8
+    VcumDrySnoWE_col(NY,NX)     = 0.0_r8
+    VcumWatSnow_col(NY,NX)      = 0.0_r8
+    VcumIceSnow_col(NY,NX)      = 0.0_r8
+    VcumSnoDWI_col(NY,NX)       = 0.0_r8
+    SnowDepth_col(NY,NX)        = 0.0_r8
+    VcumSnowWE_col(NY,NX)       = 0.0_r8
+
     D9770: DO L=1,JS
       SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
       if(L/=1)TKSnow_snvr(L,NY,NX)=spval
@@ -146,17 +149,17 @@ implicit none
 
     !update top soil layer variables
     !maybe should be add to surface residual layer?
-    VLWatMicP_vr(NUM(NY,NX),NY,NX)=VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
-    VLiceMicP_vr(NUM(NY,NX),NY,NX)=VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE   
+    VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
+    VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
 
-    ENGY=VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
-    VHeatCapacity_vr(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+    ENGY                               = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
+    VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
       +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
       +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
 
     IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-      TKSX=TKS_vr(NUM(NY,NX),NY,NX)
-      TKS_vr(NUM(NY,NX),NY,NX)=(ENGY+HeatFlo2Surface)/VHeatCapacity_vr(NUM(NY,NX),NY,NX)
+      TKSX                     = TKS_vr(NUM(NY,NX),NY,NX)
+      TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(NUM(NY,NX),NY,NX)
 !      if(abs(TKS_vr(NUM(NY,NX),NY,NX)/tksx-1._r8)>0.025_r8)then
 !        TKS_vr(NUM(NY,NX),NY,NX)=TKSX
 !      endif
@@ -179,8 +182,8 @@ implicit none
 !  endif
   
   !the starting enthalpy
-  ENGY=VLHeatCapSnow_col(L,NY,NX)*TKSnow_snvr(L,NY,NX)
-  dHeat=VLHeatCapSnow_col(L,NY,NX)*(TKSnow_snvr(L,NY,NX)-TFICE)
+  ENGY=VLHeatCapSnow_snvr(L,NY,NX)*TKSnow_snvr(L,NY,NX)
+  dHeat=VLHeatCapSnow_snvr(L,NY,NX)*(TKSnow_snvr(L,NY,NX)-TFICE)
   fs=AZMAX1(VLDrySnoWE_snvr(L,NY,NX))/SnoIce
   fi=(1._r8-fs)/DENSICE
 
@@ -194,19 +197,19 @@ implicit none
     VLDrySnoWE_snvr(L,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)-fs*dIce
     VLIceSnow_snvr(L,NY,NX)=VLIceSnow_snvr(L,NY,NX)-fi*dIce
     VLWatSnow_snvr(L,NY,NX)=VLWatSnow_snvr(L,NY,NX)+dIce
-    cpold=VLHeatCapSnow_col(L,NY,NX)
-    VLHeatCapSnow_col(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
-!    print*,cpold,VLHeatCapSnow_col(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX)
-    TKSnow_snvr(L,NY,NX)=(ENGY+dHPhaseChange)/VLHeatCapSnow_col(L,NY,NX)
+    cpold=VLHeatCapSnow_snvr(L,NY,NX)
+    VLHeatCapSnow_snvr(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
+!    print*,cpold,VLHeatCapSnow_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX)
+    TKSnow_snvr(L,NY,NX)=(ENGY+dHPhaseChange)/VLHeatCapSnow_snvr(L,NY,NX)
   else
     !all ice melt
     dHPhaseChange=-SnoIce*LtHeatIceMelt  !thaw, cooling
     VLDrySnoWE_snvr(L,NY,NX)=0._r8
     VLIceSnow_snvr(L,NY,NX)=0._r8
     VLWatSnow_snvr(L,NY,NX)=VLWatSnow_snvr(L,NY,NX)+SnoIce
-    VLHeatCapSnow_col(L,NY,NX)=cpw*VLWatSnow_snvr(L,NY,NX)
+    VLHeatCapSnow_snvr(L,NY,NX)=cpw*VLWatSnow_snvr(L,NY,NX)
   endif
-  TKSnow_snvr(L,NY,NX)=(ENGY+dHPhaseChange)/VLHeatCapSnow_col(L,NY,NX)  
+  TKSnow_snvr(L,NY,NX)=(ENGY+dHPhaseChange)/VLHeatCapSnow_snvr(L,NY,NX)  
 !  print*,'Hightemp',TKSnow_snvr(L,NY,NX)
   end subroutine DealHighTempSnow
 !------------------------------------------------------------------------------------------
@@ -234,7 +237,7 @@ implicit none
     call endrun('Negative snow mass '//trim(mod_filename)//' at line',__LINE__)         
   endif
   !the starting enthalpy
-  ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKSnow_snvr(L,NY,NX)  
+  ENGYW=VLHeatCapSnow_snvr(L,NY,NX)*TKSnow_snvr(L,NY,NX)  
 
   !thaw all ice + snow, absorb heat/cooling (<0)
 !  if(I>=138.and.I<=139)write(149,*)'neg',I+J/24.,VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX),&
@@ -300,6 +303,7 @@ implicit none
   real(r8) :: CVISC,DENSX
   real(r8) :: frcnew,SnowIceMass,VLwatNet
   real(r8) :: vwat,vice,vdry
+  real(r8), parameter :: tinyw=1.e-13_r8
 ! begin_execution
 
   !the line below is a hack, and likely a better snow layering scheme is needed.
@@ -314,12 +318,28 @@ implicit none
 ! XSnowThawMassL,XIceThawMassL=freeze-thaw flux from watsub.f
 !
 !
-  vwat=VLWatSnow_snvr(L,NY,NX);vice=VLIceSnow_snvr(L,NY,NX);vdry=VLDrySnoWE_snvr(L,NY,NX)
-  VLDrySnoWE_snvr(L,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)+CumSno2SnowL_snvr(L,NY,NX)-XSnowThawMassL_snvr(L,NY,NX)
-  VLWatSnow_snvr(L,NY,NX)=VLWatSnow_snvr(L,NY,NX)+CumWat2SnowL_snvr(L,NY,NX)+XSnowThawMassL_snvr(L,NY,NX)+XIceThawMassL_snvr(L,NY,NX)
-  VLIceSnow_snvr(L,NY,NX)=VLIceSnow_snvr(L,NY,NX)+CumIce2SnowL_snvr(L,NY,NX)-XIceThawMassL_snvr(L,NY,NX)/DENSICE
+  vwat                     = VLWatSnow_snvr(L,NY,NX);vice = VLIceSnow_snvr(L,NY,NX);vdry = VLDrySnoWE_snvr(L,NY,NX)
+  VLDrySnoWE_snvr(L,NY,NX) = AZMAX1d(VLDrySnoWE_snvr(L,NY,NX)+CumSno2SnowL_snvr(L,NY,NX)-XSnowThawMassL_snvr(L,NY,NX),tinyw)
+  VLWatSnow_snvr(L,NY,NX)  = AZMAX1d(VLWatSnow_snvr(L,NY,NX)+CumWat2SnowL_snvr(L,NY,NX)+XSnowThawMassL_snvr(L,NY,NX)+XIceThawMassL_snvr(L,NY,NX),tinyw)
+  VLIceSnow_snvr(L,NY,NX)  = AZMAX1d(VLIceSnow_snvr(L,NY,NX)+CumIce2SnowL_snvr(L,NY,NX)-XIceThawMassL_snvr(L,NY,NX)/DENSICE,tinyw)
+
+!  if(I==152 .and. J==1 .and. NX==7)then
+!    write(113,*)'pdateSnowLayerL',I+J/24.,L,NY,NX
+!    write(113,*)'oldwat',vdry,vwat,vice,SnoXfer2SnoLay_snvr(L,NY,NX),VLHeatCapSnow_snvr(L,NY,NX)  
+!    write(113,*)'newat',VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)
+!    write(113,*)'heat incom, fase',CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX)    
+!    write(113,*)'diffsnow',CumSno2SnowL_snvr(L,NY,NX)-XSnowThawMassL_snvr(L,NY,NX),&
+!          CumWat2SnowL_snvr(L,NY,NX)+XSnowThawMassL_snvr(L,NY,NX)+XIceThawMassL_snvr(L,NY,NX),&
+!          CumIce2SnowL_snvr(L,NY,NX)-XIceThawMassL_snvr(L,NY,NX)/DENSICE    
+!    write(113,*)'diffcomp',CumSno2SnowL_snvr(L,NY,NX),XSnowThawMassL_snvr(L,NY,NX),&
+!          CumWat2SnowL_snvr(L,NY,NX),XIceThawMassL_snvr(L,NY,NX),&
+!          CumIce2SnowL_snvr(L,NY,NX)
+!    write(113,*)'---------------------------'      
+!  endif
 
   if(any((/VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)/)<0._r8))then      
+    write(113,*)I+J/24.,J,L,NY,NX,VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)
+    call endrun(trim(mod_filename)//' at line',__LINE__)    
     call DealNegativeSnowMass(I,J,L,NY,NX)
   endif
 !
@@ -341,11 +361,11 @@ implicit none
 !   RESET SNOW SURFACE DENSITY FOR SNOWFALL
 !
     IF(SnoXfer2SnoLay_snvr(L,NY,NX).GT.0.0_r8)THEN
-      DENSX=SnoDens_snvr(L,NY,NX)
-      TCASF=AMAX1(-15.0_r8,AMIN1(2.0_r8,TCA_col(NY,NX)))
-      !fresh snow density
-      DENSF=0.05_r8+1.7E-03_r8*(TCASF+15.0_r8)**1.5_r8
-      VOLSF=AMIN1(SnoXfer2SnoLay_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX))/DENSF + &
+      !DENSF: fresh snow density    
+      DENSX = SnoDens_snvr(L,NY,NX)
+      TCASF = AMAX1(-15.0_r8,AMIN1(2.0_r8,TCA_col(NY,NX)))
+      DENSF = 0.05_r8+1.7E-03_r8*(TCASF+15.0_r8)**1.5_r8
+      VOLSF = AMIN1(SnoXfer2SnoLay_snvr(L,NY,NX),VLDrySnoWE_snvr(L,NY,NX))/DENSF + &
         AZMAX1(VLDrySnoWE_snvr(L,NY,NX)-SnoXfer2SnoLay_snvr(L,NY,NX))/SnoDens_snvr(L,NY,NX)        
       if(VOLSF>0._r8)SnoDens_snvr(L,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)/VOLSF
       !write(*,*)'xVOLSSL=',VLDrySnoWE_snvr(L,NY,NX),SnoXfer2SnoLay_snvr(L,NY,NX),SnoDens_snvr(L,NY,NX),VOLSF
@@ -403,17 +423,26 @@ implicit none
   VLSnoDWIprev_snvr(L,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)
 
   IF(VLSnoDWIprev_snvr(L,NY,NX) > ZEROS2(NY,NX))THEN
-    SnowThickL_snvr(L,NY,NX)=AZMAX1(VLSnoDWIprev_snvr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-    cumSnowDepz_col(L,NY,NX)=cumSnowDepz_col(L-1,NY,NX)+SnowThickL_snvr(L,NY,NX)
-    VHCPWZ(L,NY,NX)=VLHeatCapSnow_col(L,NY,NX)
-    TKWX=TKSnow_snvr(L,NY,NX)
-    ENGYW=VLHeatCapSnow_col(L,NY,NX)*TKWX
-    VLHeatCapSnow_col(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)    
-    IF(VHCPWZ(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX) .AND. VLHeatCapSnow_col(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      !there is significant snow layer mass
-!      if(I>=138.and.I<=139)write(149,*)'rest',L,ENGYW,CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX),VLHeatCapSnow_col(L,NY,NX)
-      TKSnow_snvr(L,NY,NX)=(ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX))/VLHeatCapSnow_col(L,NY,NX)
+    SnowThickL_snvr(L,NY,NX)    = AZMAX1(VLSnoDWIprev_snvr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+    cumSnowDepz_col(L,NY,NX)    = cumSnowDepz_col(L-1,NY,NX)+SnowThickL_snvr(L,NY,NX)
+    VHCPWZ(L,NY,NX)             = VLHeatCapSnow_snvr(L,NY,NX)
+    TKWX                        = TKSnow_snvr(L,NY,NX)
+    ENGYW                       = VLHeatCapSnow_snvr(L,NY,NX)*TKWX
+    VLHeatCapSnow_snvr(L,NY,NX) = cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
 
+    IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+      !there is significant snow layer mass
+      TKSnow_snvr(L,NY,NX)=(ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX))/VLHeatCapSnow_snvr(L,NY,NX)
+!      if(I==152 .and. J==1 .and. NX==7)then
+!        write(113,*)'HHeatcap old new',VHCPWZ(L,NY,NX),VLHeatCapSnow_snvr(L,NY,NX),ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)
+!        write(113,*)'sepengy',ENGYW,CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX)
+!        write(*,*)'LL',L,TKWX,TKSnow_snvr(L,NY,NX),VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)
+!      endif
+      if(abs(TKSnow_snvr(L,NY,NX)-TKWX)>20._r8 .and. VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))then
+        write(*,*)'ijl',I,J,L,NY,NX,TKSnow_snvr(L,NY,NX),TKWX
+        write(*,*)VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)
+        call endrun(trim(mod_filename)//' at line',__LINE__)     
+      endif
       if(TKSnow_snvr(L,NY,NX)>280._r8)call DealHighTempSnow(I,J,L,NY,NX)
     ELSE
       !there is no significant snow mass      
@@ -425,17 +454,17 @@ implicit none
         TKSnow_snvr(L,NY,NX)=TKSnow_snvr(L-1,NY,NX)
       ENDIF
       IF(VHCPWZ(L,NY,NX).GT.ZEROS(NY,NX))THEN
-        HEATIN_lnd=HEATIN_lnd+(TKSnow_snvr(L,NY,NX)-TKWX)*VLHeatCapSnow_col(L,NY,NX)
+        HEATIN_lnd=HEATIN_lnd+(TKSnow_snvr(L,NY,NX)-TKWX)*VLHeatCapSnow_snvr(L,NY,NX)
       ENDIF
     ENDIF
   ELSE
     !there is no snow in layer L
-    VLDrySnoWE_snvr(L,NY,NX)=0.0_r8
-    VLWatSnow_snvr(L,NY,NX)=0.0_r8
-    VLIceSnow_snvr(L,NY,NX)=0.0_r8
-    VLSnoDWIprev_snvr(L,NY,NX)=0.0_r8
-    SnowThickL_snvr(L,NY,NX)=0.0_r8
-    cumSnowDepz_col(L,NY,NX)=cumSnowDepz_col(L-1,NY,NX)
+    VLDrySnoWE_snvr(L,NY,NX)   = 0.0_r8
+    VLWatSnow_snvr(L,NY,NX)    = 0.0_r8
+    VLIceSnow_snvr(L,NY,NX)    = 0.0_r8
+    VLSnoDWIprev_snvr(L,NY,NX) = 0.0_r8
+    SnowThickL_snvr(L,NY,NX)   = 0.0_r8
+    cumSnowDepz_col(L,NY,NX)   = cumSnowDepz_col(L-1,NY,NX)
     IF(L.EQ.1)THEN
       TKSnow_snvr(L,NY,NX)=TairK_col(NY,NX)
     ELSE
@@ -443,7 +472,7 @@ implicit none
     ENDIF
   ENDIF  
   TCSnow_snvr(L,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L,NY,NX))
-!  if(I>=138.and.I<=139)print*,'updtesnowl',L,TKSnow_snvr(L,NY,NX)
+
   end subroutine UpdateSnowLayerL
 !------------------------------------------------------------------------------------------
 
@@ -511,7 +540,7 @@ implicit none
 
   if(lverb)write(*,*)'SnowpackLayering'
 !  if(I>=138.and.I<=139)print*,I+J/24.,'bflay',TKSnow_snvr(1:JS,NY,NX)
-  IF(VLHeatCapSnow_col(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+  IF(VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     D325: DO L=1,JS-1
 !      VOLSLX=VLSnoDWIprev_snvr(L,NY,NX)
       IF(VLSnoDWIprev_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -584,13 +613,13 @@ implicit none
           VLIceSnow_snvr(L1,NY,NX)=VLIceSnow_snvr(L1,NY,NX)+FX*VLIceSnow_snvr(L0,NY,NX)          
           VLSnoDWIprev_snvr(L1,NY,NX)=VLDrySnoWE_snvr(L1,NY,NX)/SnoDens_snvr(L1,NY,NX)+VLWatSnow_snvr(L1,NY,NX)+VLIceSnow_snvr(L1,NY,NX)
 !         energy
-          ENGY1X=VLHeatCapSnow_col(L1,NY,NX)*TKSnow_snvr(L1,NY,NX)
-          ENGY0X=VLHeatCapSnow_col(L0,NY,NX)*TKSnow_snvr(L0,NY,NX)
+          ENGY1X=VLHeatCapSnow_snvr(L1,NY,NX)*TKSnow_snvr(L1,NY,NX)
+          ENGY0X=VLHeatCapSnow_snvr(L0,NY,NX)*TKSnow_snvr(L0,NY,NX)
           ENGY1=ENGY1X+FX*ENGY0X
-          VLHeatCapSnow_col(L1,NY,NX)=cps*VLDrySnoWE_snvr(L1,NY,NX)+cpw*VLWatSnow_snvr(L1,NY,NX)+cpi*VLIceSnow_snvr(L1,NY,NX)
+          VLHeatCapSnow_snvr(L1,NY,NX)=cps*VLDrySnoWE_snvr(L1,NY,NX)+cpw*VLWatSnow_snvr(L1,NY,NX)+cpi*VLIceSnow_snvr(L1,NY,NX)
 
-          IF(VLHeatCapSnow_col(L1,NY,NX).GT.ZEROS(NY,NX))THEN
-            TKSnow_snvr(L1,NY,NX)=ENGY1/VLHeatCapSnow_col(L1,NY,NX)
+          IF(VLHeatCapSnow_snvr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+            TKSnow_snvr(L1,NY,NX)=ENGY1/VLHeatCapSnow_snvr(L1,NY,NX)
           ELSE
             TKSnow_snvr(L1,NY,NX)=TKSnow_snvr(L0,NY,NX)
           ENDIF
@@ -620,9 +649,9 @@ implicit none
           VLSnoDWIprev_snvr(L0,NY,NX)=VLDrySnoWE_snvr(L0,NY,NX)/SnoDens_snvr(L0,NY,NX)+VLWatSnow_snvr(L0,NY,NX)+VLIceSnow_snvr(L0,NY,NX)
 !     energy 
           ENGY0=FY*ENGY0X
-          VLHeatCapSnow_col(L0,NY,NX)=cps*VLDrySnoWE_snvr(L0,NY,NX)+cpw*VLWatSnow_snvr(L0,NY,NX)+cpi*VLIceSnow_snvr(L0,NY,NX)
-          IF(VLHeatCapSnow_col(L0,NY,NX).GT.ZEROS(NY,NX))THEN
-            TKSnow_snvr(L0,NY,NX)=ENGY0/VLHeatCapSnow_col(L0,NY,NX)
+          VLHeatCapSnow_snvr(L0,NY,NX)=cps*VLDrySnoWE_snvr(L0,NY,NX)+cpw*VLWatSnow_snvr(L0,NY,NX)+cpi*VLIceSnow_snvr(L0,NY,NX)
+          IF(VLHeatCapSnow_snvr(L0,NY,NX).GT.ZEROS(NY,NX))THEN
+            TKSnow_snvr(L0,NY,NX)=ENGY0/VLHeatCapSnow_snvr(L0,NY,NX)
           ELSE
             TKSnow_snvr(L0,NY,NX)=TKSnow_snvr(L1,NY,NX)
           ENDIF
@@ -650,18 +679,18 @@ implicit none
   DO L=1,JS
 !     if(I>=138.and.I<140)print*,I+J/24.,'layering',L,VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),TKSnow_snvr(L,NY,NX)
     if(TKSnow_snvr(L,NY,NX)/=spval)then
-      VLHeatCapSnow_col(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
-      if(VLHeatCapSnow_col(L,NY,NX)>ZEROS(NY,NX))then
+      VLHeatCapSnow_snvr(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
+      if(VLHeatCapSnow_snvr(L,NY,NX)>ZEROS(NY,NX))then
         nsnol_col(NY,NX)=nsnol_col(NY,NX)+1
       endif
     else
       VLDrySnoWE_snvr(L,NY,NX)=0._r8
       VLWatSnow_snvr(L,NY,NX)=0._r8
       VLIceSnow_snvr(L,NY,NX)=0._r8
-      VLHeatCapSnow_col(L,NY,NX)=0._r8
+      VLHeatCapSnow_snvr(L,NY,NX)=0._r8
       SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
     endif
-    if(VLHeatCapSnow_col(L,NY,NX)<ZEROS(NY,NX))then
+    if(VLHeatCapSnow_snvr(L,NY,NX)<ZEROS(NY,NX))then
       if(L>1)then
         TKSnow_snvr(L,NY,NX)=spval        
       else
@@ -669,19 +698,19 @@ implicit none
       endif  
     endif  
     !move up to handel loss of surface layer, this should rarely occur, but round off error may trigger it
-    if(L>1 .and. VLHeatCapSnow_col(L,NY,NX)>=ZEROS(NY,NX))then
+    if(L>1 .and. VLHeatCapSnow_snvr(L,NY,NX)>=ZEROS(NY,NX))then
       if (TKSnow_snvr(L-1,NY,NX)==spval)then
         VLDrySnoWE_snvr(L-1,NY,NX)=VLDrySnoWE_snvr(L,NY,NX)
         VLWatSnow_snvr(L-1,NY,NX)=VLWatSnow_snvr(L,NY,NX)
         VLIceSnow_snvr(L-1,NY,NX)=VLIceSnow_snvr(L,NY,NX)
-        VLHeatCapSnow_col(L-1,NY,NX)=VLHeatCapSnow_col(L,NY,NX)
+        VLHeatCapSnow_snvr(L-1,NY,NX)=VLHeatCapSnow_snvr(L,NY,NX)
         TKSnow_snvr(L-1,NY,NX)=TKSnow_snvr(L,NY,NX)
         SnoDens_snvr(L-1,NY,NX)=SnoDens_snvr(L,NY,NX)
 
         VLDrySnoWE_snvr(L,NY,NX)=0._r8
         VLWatSnow_snvr(L,NY,NX)=0._r8
         VLIceSnow_snvr(L,NY,NX)=0._r8
-        VLHeatCapSnow_col(L,NY,NX)=0._r8
+        VLHeatCapSnow_snvr(L,NY,NX)=0._r8
         TKSnow_snvr(L,NY,NX)=spval
         SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
       endif
@@ -696,15 +725,15 @@ implicit none
   integer, intent(in) :: NY,NX
   integer :: L
 
-  TDrysnoBySnowRedist(NY,NX)=0.0_r8
-  TWatBySnowRedist(NY,NX)=0.0_r8
-  TIceBySnowRedist(NY,NX)=0.0_r8
-  THeatBySnowRedist_col(NY,NX)=0.0_r8
+  TDrysnoBySnowRedist(NY,NX)   = 0.0_r8
+  TWatBySnowRedist(NY,NX)      = 0.0_r8
+  TIceBySnowRedist(NY,NX)      = 0.0_r8
+  THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
-  trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
-  trcg_QSS(idg_beg:idg_end-1,NY,NX)=0.0_r8  
-  trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
-  trcg_TFloXSurRunoff(idg_beg:idg_end-1,NY,NX)=0.0_r8
+  trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
+  trcg_QSS(idg_beg:idg_end-1,NY,NX)                      = 0.0_r8
+  trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)               = 0.0_r8
+  trcg_TFloXSurRunoff(idg_beg:idg_end-1,NY,NX)           = 0.0_r8
 
   DO  L=1,JS
     trcg_TBLS(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
