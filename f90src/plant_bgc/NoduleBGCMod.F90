@@ -216,10 +216,10 @@ module NoduleBGCMod
 !     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
 !     NodulElmDecayRecyc(ielmc),NodulElmDecayRecyc(ielmn),NodulElmDecayRecyc(ielmp)=bacterial C,N,P decomposition to recycling
 !
-    RCCC=RCCZN+CCC*RCCYN
-    RCCN=CNC*RCCXN
-    RCCP=CPC*RCCQN
-    SPNDX=SPNDL*SQRT(fTCanopyGroth_pft(NZ)*WFNG)
+    RCCC  = RCCZN+CCC*RCCYN
+    RCCN  = CNC*RCCXN
+    RCCP  = CPC*RCCQN
+    SPNDX = SPNDL*SQRT(fTCanopyGroth_pft(NZ)*WFNG)
     DO NE=1,NumPlantChemElms
       NoduleElmDecayLoss(NE)=SPNDX*CanopyNodulStrutElms_brch(NE,NB,NZ)
     ENDDO
@@ -283,9 +283,9 @@ module NoduleBGCMod
         NodulELmSenes2Recyc(NE)=NodulELmLoss2Senes(NE)-NodulELmSenes2Litr(NE)
       ENDDO
     ELSE
-      NodulELmLoss2Senes(1:NumPlantChemElms)=0._r8
-      NodulELmSenes2Litr(1:NumPlantChemElms)=0._r8
-      NodulELmSenes2Recyc(1:NumPlantChemElms)=0._r8
+      NodulELmLoss2Senes(1:NumPlantChemElms)  = 0._r8
+      NodulELmSenes2Litr(1:NumPlantChemElms)  = 0._r8
+      NodulELmSenes2Recyc(1:NumPlantChemElms) = 0._r8
     ENDIF
 !
 !     TOTAL NODULE RESPIRATION

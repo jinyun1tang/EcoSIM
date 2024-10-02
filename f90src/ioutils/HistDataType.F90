@@ -317,7 +317,9 @@ implicit none
   real(r8),pointer   :: h2D_RFerment_vr(:,:)
   real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
   real(r8),pointer   :: h2D_n2oprod_vr(:,:)
-
+  real(r8),pointer   :: h2D_RootMassC_vr(:,:)
+  real(r8),pointer   :: h2D_RootMassN_vr(:,:)
+  real(r8),pointer   :: h2D_RootMassP_vr(:,:)
   real(r8),pointer   :: h1D_RCH4ProdHydrog_litr_col(:)
   real(r8),pointer   :: h1D_RCH4ProdAcetcl_litr_col(:)  
   real(r8),pointer   :: h1D_RCH4Oxi_aero_litr_col(:)
@@ -668,6 +670,9 @@ implicit none
   allocate(this%h2D_N2O_vr(beg_col:end_col,1:JZ))        ;this%h2D_N2O_vr(:,:)=spval
   allocate(this%h2D_NH3_vr(beg_col:end_col,1:JZ))        ;this%h2D_NH3_vr(:,:)=spval
   allocate(this%h2D_TEMP_vr(beg_col:end_col,1:JZ))       ;this%h2D_TEMP_vr(:,:)=spval
+  allocate(this%h2D_RootMassC_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassC_vr(:,:)=spval
+  allocate(this%h2D_RootMassN_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassN_vr(:,:)=spval
+  allocate(this%h2D_RootMassP_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassP_vr(:,:)=spval
 
   allocate(this%h2D_DOC_vr(beg_col:end_col,1:JZ)); this%h2D_DOC_vr(:,:)=spval
   allocate(this%h2D_DON_vr(beg_col:end_col,1:JZ)); this%h2D_DON_vr(:,:)=spval
@@ -1772,6 +1777,19 @@ implicit none
   call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='levsoi',avgflag='A',&
     long_name='soil temperature profile',ptr_col=data2d_ptr)      
 !-----
+
+  data2d_ptr =>  this%h2D_RootMassC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='RootC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Root C density profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_RootMassN_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='RootN_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
+    long_name='Root N density profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_RootMassP_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='RootP_vr',units='gP/m3',type2d='levsoi',avgflag='A',&
+    long_name='Root P density profile',ptr_col=data2d_ptr)      
+
   data2d_ptr =>  this%h2D_DOC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='DOC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
     long_name='DOC profile',ptr_col=data2d_ptr)      
@@ -2349,6 +2367,9 @@ implicit none
         DVOLL=DLYR(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 
         if(DVOLL<=0._r8)cycle
+        this%h2D_RootMassC_vr(ncol,L)     = RootMassElm_vr(ielmc,L,NY,NX)/DVOLL
+        this%h2D_RootMassN_vr(ncol,L)     = RootMassElm_vr(ielmn,L,NY,NX)/DVOLL
+        this%h2D_RootMassP_vr(ncol,L)     = RootMassElm_vr(ielmp,L,NY,NX)/DVOLL                
         call sumDOML(L,NY,NX,DOM)
         this%h2D_DOC_vr(ncol,L)           = DOM(idom_doc)/DVOLL
         this%h2D_DON_vr(ncol,L)           = DOM(idom_don)/DVOLL
@@ -2628,7 +2649,7 @@ implicit none
           this%h2D_Root2ndStrutN_ptc(nptc,L)=0._r8
           this%h2D_Root2ndStrutP_ptc(nptc,L)=0._r8
 
-          DO NR=1,NumRootAxes_pft(NZ,NY,NX)          
+          DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stStrutC_ptc(nptc,L)= this%h2D_Root1stStrutC_ptc(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
             this%h2D_Root1stStrutN_ptc(nptc,L)= this%h2D_Root1stStrutN_ptc(nptc,L) + &
@@ -2641,7 +2662,7 @@ implicit none
              RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)            
             this%h2D_Root2ndStrutP_ptc(nptc,L)=this%h2D_Root2ndStrutP_ptc(nptc,L) + &
              RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)            
-        ENDDO
+          ENDDO
 
         ENDDO
       ENDDO 

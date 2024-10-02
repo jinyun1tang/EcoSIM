@@ -98,6 +98,7 @@ implicit none
   ENDDO
   
   DO L=NU(NY,NX),NL(NY,NX)
+    
     DO K=1,jcplx
       DO NE=1,NumPlantChemElms
         REcoDOMProd_vr(NE,K,L,NY,NX)=plt_bgcr%REcoDOMProd_vr(NE,K,L)
@@ -129,6 +130,9 @@ implicit none
   ENDDO
 
   DO L=1,NL(NY,NX)
+    DO NE=1,NumPlantChemElms
+      RootMassElm_vr(NE,L,NY,NX)=  sum(plt_biom%RootMassElm_pvr(NE,L,1:NP0(NY,NX)))
+    ENDDO
     totRootLenDens_vr(L,NY,NX)                      = plt_morph%totRootLenDens_vr(L)
     trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_end-1,L)
     trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
@@ -140,6 +144,7 @@ implicit none
       tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)=plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)
     ENDDO
   ENDDO
+
   DO NZ=1,NP0(NY,NX)
     Eco_GPP_CumYr_col(NY,NX)                            = Eco_GPP_CumYr_col(NY,NX)+plt_bgcr%GrossCO2Fix_pft(NZ)
     PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
@@ -629,7 +634,7 @@ implicit none
   integer :: K,L,M,N,NB,NZ,NR,I1,NE
 
   plt_site%DazCurrYear=DazCurrYear
-  I1=I+1;if(I1>DazCurrYear)I1=1
+  I1=I+1;if(I1>DazCurrYear)I1=1  
   plt_site%ZERO                       = ZERO
   plt_site%ZERO2                      = ZERO2
   plt_site%ALAT                       = ALAT(NY,NX)

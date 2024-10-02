@@ -144,8 +144,8 @@ implicit none
   DO NE=1,NumPlantChemElms
     ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
     if(ShootElms_pft(NE,NZ)>1.e20)then
-    write(*,*)'sumplantstates',NE,SeasonalNonstElms_pft(NE,NZ)
-    stop
+      write(*,*)'sumplantstates',NE,SeasonalNonstElms_pft(NE,NZ)
+      stop
     endif
   ENDDO
 
@@ -316,7 +316,7 @@ implicit none
   real(r8), optional, intent(out) :: massr2nd(NumPlantChemElms)
   real(r8), optional, intent(out) :: massnonst(NumPlantChemElms)
   real(r8), optional, intent(out) :: massnodul(NumPlantChemElms)
-  integer :: NE,N
+  integer :: NE,N,L
   real(r8) :: massr1st1(NumPlantChemElms)
   real(r8) :: massr2nd1(NumPlantChemElms)
   real(r8) :: massnodul1(NumPlantChemElms)
@@ -334,12 +334,18 @@ implicit none
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     RootStrutElms_pft         => plt_biom%RootStrutElms_pft,         &
+    RootMassElm_pvr           => plt_biom%RootMassElm_pvr ,          &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     &
   )
   massr1st1=0._r8;massr2nd1=0._r8;massnodul1=0._r8
   mass_roots=0._r8
 
   DO NE=1,NumPlantChemElms
+    DO L=NU,MaxNumRootLays
+      RootMassElm_pvr(NE,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
+        sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
+        sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),L,NZ))
+    ENDDO
     massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)

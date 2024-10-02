@@ -120,6 +120,24 @@ module minimathmod
   end function isLeap
 !------------------------------------------------------------------------------------------
 
+  pure function iisLeap(year)result(ans)
+!
+! Description
+! Determine if it is a leap year
+
+  implicit none
+  integer, intent(in) :: year
+  integer :: ans
+
+  if (isLeap(year))then
+    ans=1
+  else
+    ans=0
+  endif
+  end function iisLeap
+
+!------------------------------------------------------------------------------------------
+
   pure function AZMAX1t(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
@@ -311,4 +329,37 @@ module minimathmod
     mass=mass-consum_flux  
   endif
   end subroutine fixEXflux
+
+! ----------------------------------------------------------------------
+
+  pure function yearday(year,month,day)result(doy)
+  implicit none
+  integer, intent(in) :: year
+  integer, intent(in) :: month
+  integer, intent(in) :: day
+
+  integer, parameter :: daz(12)=(/31,28,31,30,31,30,31,31,30,31,30,31/)
+  integer :: doy
+  integer :: jj
+
+  doy=0
+  do jj = 1, month-1
+    doy=doy+daz(jj)
+  enddo
+  if(month>2)then
+    doy=doy+iisleap(year);
+  endif
+  doy=doy+day-1
+  end function yearday
+! ----------------------------------------------------------------------
+
+  pure function isletter(c)result(ans)
+  implicit none
+  character(len=1), intent(in) :: c
+  logical :: ans
+
+  ans=(c>='a' .and. c<='z') .or. (c>='A' .and. c<='Z')
+
+  end function isletter
+
 end module minimathmod

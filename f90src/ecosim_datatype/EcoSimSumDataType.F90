@@ -6,19 +6,19 @@ module EcoSimSumDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  real(r8) :: TSoilH2G_lnd    !total soil N2	g d-2
-  real(r8) :: SurfGas_H2_lnd    !total soil H2 g d-2
-  real(r8) :: H2GOU    !cumulative H2 loss through lateral and lower boundaries
-  real(r8) :: TION     !total soil ion content	mol d-2
-  real(r8) :: TIONIN   !total surface ion flux	mol d-2
-  real(r8) :: TIONOU   !total subsurface ion flux	mol d-2
-  real(r8) :: TSEDSO   !total soil sediment	Mg d-2
-  real(r8) :: TSedmErossLoss_lnds   !total sediment subsurface flux	Mg d-2
-  real(r8) :: WatMassStore_lnd   !total soil water content	m3 d-2
-  real(r8) :: HeatStore_lnd   !total soil heat content	MJ d-2
-  real(r8) :: TSoilO2G_lnd   !total soil O2 content	g d-2
-  real(r8) :: LitRMStoreLndscap(1:NumPlantChemElms)   !total soil litter OM content	g d-2
-  real(r8) :: POMHumStoreLndscap(NumPlantChemElms)   !total soil POM + humus C content	g d-2
+  real(r8) :: TSoilH2G_lnd                             !total soil N2	g d-2
+  real(r8) :: SurfGas_H2_lnd                           !total soil H2 g d-2
+  real(r8) :: H2GOU                                    !cumulative H2 loss through lateral and lower boundaries
+  real(r8) :: TION                                     !total soil ion content	mol d-2
+  real(r8) :: TIONIN                                   !total surface ion flux	mol d-2
+  real(r8) :: TIONOU                                   !total subsurface ion flux	mol d-2
+  real(r8) :: TSEDSO                                   !total soil sediment	Mg d-2
+  real(r8) :: TSedmErossLoss_lnds                      !total sediment subsurface flux	Mg d-2
+  real(r8) :: WatMassStore_lnd                         !total soil water content	m3 d-2
+  real(r8) :: HeatStore_lnd                            !total soil heat content	MJ d-2
+  real(r8) :: TSoilO2G_lnd                             !total soil O2 content	g d-2
+  real(r8) :: LitRMStoreLndscap(1:NumPlantChemElms)    !total soil litter OM content	g d-2
+  real(r8) :: POMHumStoreLndscap(NumPlantChemElms)     !total soil POM + humus C content	g d-2
   real(r8) :: TDisolNH4_lnd    !total soil NH4 content	g d-2
   real(r8) :: tNO3_lnd    !total soil NO3 content	g d-2
   real(r8) :: TDisolPi_lnd    !total soil PO4 content	g d-2

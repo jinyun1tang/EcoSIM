@@ -34,11 +34,11 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
   real(r8),target,allocatable :: trcsalt_rain_conc(:,:,:)            !salt tracer concentration in rain [g m-3]
-  real(r8),target,allocatable :: trcSalt_solml_vr(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
-  real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)                 !exchangeable tracers
-  real(r8),target,allocatable :: trcp_saltpml_vr(:,:,:,:)                !salt precipitate in micropore
+  real(r8),target,allocatable :: trcSalt_solml_vr(:,:,:,:)           !soil aqueous salt content micropre, [mol d-2]
+  real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)              !exchangeable tracers
+  real(r8),target,allocatable :: trcp_saltpml_vr(:,:,:,:)            !salt precipitate in micropore
 
-  real(r8),target,allocatable ::  ECND_vr(:,:,:)                        !electrical conductivity , [dS m-1]
+  real(r8),target,allocatable ::  ECND_vr(:,:,:)                     !electrical conductivity , [dS m-1]
   real(r8),target,allocatable ::  CSTR(:,:,:)                        !solution ion strength, [mol m-3]
   real(r8),target,allocatable ::  CION(:,:,:)                        !solution ion concentratiom, [mol m-3]
 
