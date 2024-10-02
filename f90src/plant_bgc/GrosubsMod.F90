@@ -83,8 +83,9 @@ module grosubsMod
 !
 !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ) = CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)  = 0._r8
+    CanopyHeight_copy(NZ)            = CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)             = 0._r8
+    plt_biom%RootMassElm_pvr(:,:,NZ) = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS

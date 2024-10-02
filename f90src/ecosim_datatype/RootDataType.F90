@@ -87,6 +87,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootNonstructElmConc_pvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_pvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
+  real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)
 !----------------------------------------------------------------------
 
 contains
@@ -95,6 +96,7 @@ contains
   implicit none
   integer, intent(in) :: jroots
 
+  allocate(RootMassElm_vr(NumPlantChemElms,JZ,JY,JX)); RootMassElm_vr =0._r8
   allocate(NumRootAxes_pft(JP,JY,JX));      NumRootAxes_pft=0
   allocate(NIXBotRootLayer_rpft(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_rpft=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
@@ -178,6 +180,8 @@ contains
   subroutine DestructRootData
   use abortutils, only : destroy
   implicit none
+
+  call destroy(RootMassElm_vr)
   call destroy(NumRootAxes_pft)
   call destroy(NIXBotRootLayer_rpft)
   call destroy(iPlantRootState_pft)
