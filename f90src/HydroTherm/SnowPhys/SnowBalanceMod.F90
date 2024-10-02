@@ -303,6 +303,7 @@ implicit none
   real(r8) :: CVISC,DENSX
   real(r8) :: frcnew,SnowIceMass,VLwatNet
   real(r8) :: vwat,vice,vdry
+  logical :: watchk,icechk
   real(r8), parameter :: tinyw=1.e-13_r8
 ! begin_execution
 
@@ -434,14 +435,16 @@ implicit none
       !there is significant snow layer mass
       TKSnow_snvr(L,NY,NX)=(ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX))/VLHeatCapSnow_snvr(L,NY,NX)
 !      if(I==152 .and. J==1 .and. NX==7)then
-        write(113,*)'HHeatcap old new',VHCPWZ(L,NY,NX),VLHeatCapSnow_snvr(L,NY,NX),ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)
-        write(113,*)'sepengy',ENGYW,CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX)
+!        write(113,*)'HHeatcap old new',VHCPWZ(L,NY,NX),VLHeatCapSnow_snvr(L,NY,NX),ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)
+!        write(113,*)'sepengy',ENGYW,CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX)
 !        write(*,*)'LL',L,TKWX,TKSnow_snvr(L,NY,NX),VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)
 !      endif
       if((TKSnow_snvr(L,NY,NX)<200._r8 .or. TKSnow_snvr(L,NY,NX)>290._r8) .and. VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))then
-        write(*,*)'ijl',I,J,L,NY,NX,TKSnow_snvr(L,NY,NX),TKWX
+        write(*,*)'ijl',I,J,L,NY,NX,TKSnow_snvr(L,NY,NX),TKWX,TairK_col(NY,NX)
         write(*,*)VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX)
-        call endrun(trim(mod_filename)//' at line',__LINE__)     
+        icechk=TKSnow_snvr(L,NY,NX)>290._r8 .and. VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)>1.e-10_r8
+        watchk=TKSnow_snvr(L,NY,NX)<200._r8 .and. VLWatSnow_snvr(L,NY,NX) > 1.e-10_r8
+        if(icechk .or. watchk)call endrun(trim(mod_filename)//' at line',__LINE__)     
       endif
       if(TKSnow_snvr(L,NY,NX)>280._r8)call DealHighTempSnow(I,J,L,NY,NX)
     ELSE
