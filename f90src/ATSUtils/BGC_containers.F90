@@ -157,6 +157,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: subsurface_energy_source
      type (BGCVectorDouble) :: surface_energy_source
      type (BGCVectorDouble) :: surface_water_source
+     type (BGCVectorDouble) :: snow_depth
      type (BGCTensorDouble) :: total_component_concentration
   end type BGCState
 
