@@ -53,6 +53,7 @@ implicit none
   use TracerIDMod         , only : InitTracerIDs
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
+  use PerturbationMod     , only : InitSoilWarming
   use GridConsts
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
@@ -136,7 +137,10 @@ implicit none
 
   if(salt_model)call InitSoluteProperty
 
+  call InitSoilWarming
+  
   call InitBalanceCheckData
+
   end subroutine InitAlloc
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()

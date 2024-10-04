@@ -21,6 +21,7 @@ module minimathmod
   public :: fSiLU
   public :: fixnegmass
   public :: fixEXflux
+  public :: yearday,isletter
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -349,7 +350,7 @@ module minimathmod
   if(month>2)then
     doy=doy+iisleap(year);
   endif
-  doy=doy+day-1
+  doy=doy+day
   end function yearday
 ! ----------------------------------------------------------------------
 
@@ -361,5 +362,7 @@ module minimathmod
   ans=(c>='a' .and. c<='z') .or. (c>='A' .and. c<='Z')
 
   end function isletter
+
+
 
 end module minimathmod

@@ -1,10 +1,14 @@
 module ErosionMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : isclose,AZMAX1
-  use MicrobialDataType
-  use SOMDataType
+  use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
+  use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
+  use EcoSIMConfig, only : jcplx1=> jcplxcm1, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
+  use EcoSIMConfig, only : column_mode
   use EcoSiMParDataMod    , only : micpar  
   use EcoSIMCtrlMod, only : iErosionMode
+  use MicrobialDataType
+  use SOMDataType
   use EcoSIMSolverPar
   use FertilizerDataType
   use GridConsts
@@ -19,10 +23,6 @@ module ErosionMod
   use SoilPropertyDataType
   USE SedimentDataType
   use GridDataType
-  use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
-  use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
-  use EcoSIMConfig, only : jcplx1=> jcplxcm1, NumMicbFunGrupsPerCmplx => NumMicbFunGrupsPerCmplx,jcplx=>jcplxc
-  use EcoSIMConfig, only : column_mode
   implicit none
 
   private

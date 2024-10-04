@@ -1,5 +1,6 @@
 module ClimForcDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSIMCtrlMod, only : warming_exp
   use GridConsts
 implicit none
   character(len=*), private, parameter :: mod_filename = &
@@ -48,6 +49,7 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
+  real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)
   real(r8),target,allocatable ::  WDPTHD(:,:,:)                      !
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
   real(r8),target,allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
@@ -175,9 +177,13 @@ implicit none
   contains
 !----------------------------------------------------------------------
 
-  subroutine InitClimForcData
+  subroutine InitClimForcData()
   use TracerIDMod
   implicit none
+
+  if(len(trim(warming_exp))>10)then
+    allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
+  endif
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
@@ -345,7 +351,7 @@ implicit none
 
   call destroy(AtmGasCgperm3)
   call destroy(AtmGmms)
-
+  call destroy(TKS_ref_vr)
   call destroy(OXYE)
   call destroy(Z2OE)
   call destroy(Z2GE)

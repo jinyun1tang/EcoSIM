@@ -27,6 +27,7 @@ target_include_directories(ioutils  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model/  
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
+  ${CMAKE_BINARY_DIR}/f90src/disturbances/
   ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ioutils PARENT_SCOPE)
