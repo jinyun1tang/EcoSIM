@@ -30,6 +30,7 @@ module PerturbationMod
   public :: set_soil_warming
   public :: InitSoilWarming
   public :: destructSoilWarming
+  public :: is_warming_layerL
   contains
 
   subroutine InitSoilWarming()
@@ -200,16 +201,23 @@ module PerturbationMod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO L=NU(NY,NX),NL(NY,NX)
-        IF(CumDepz2LayerBot_vr(L,NY,NX).GE.warm_depz)THEN
+        IF(CumDepz2LayerBot_vr(L,NY,NX).LE.warm_depz)THEN
           warm_LL(NY,NX)=L
           TKS_ref_vr(i1:i2,L,NY,NX)=TKS_ref_vr(i1:i2,L,NY,NX)+warm_dTK
-          exit
         ENDIF    
       ENDDO  
     ENDDO
   ENDDO
-
   end subroutine set_soil_warming
 
+!------------------------------------------------------------------------------------------
 
+  function is_warming_layerL(L,NY,NX)result(ans)
+
+  implicit none 
+  integer, intent(in) :: L,NY,NX
+  logical :: ans
+
+  ans=warm_LL(NY,NX)>=L
+  end function is_warming_layerL
 end module PerturbationMod

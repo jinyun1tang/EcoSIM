@@ -127,7 +127,7 @@ module RedistMod
 !
       call LitterLayerSummary(NY,NX)
 
-      call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP_vr)    
+      call update_physVar_Profile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
 
       call UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,TXCO2,DORGE)
 !
@@ -783,10 +783,12 @@ module RedistMod
   UION(NY,NX)=UION(NY,NX)+SSS
   end subroutine DiagSurfLitRLayerSalt
 !------------------------------------------------------------------------------------------
-  subroutine update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP_vr)    
+  subroutine update_physVar_Profile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
   !     WATER, ICE, HEAT, TEMPERATUR
   !
+  use PerturbationMod, only : check_Soil_Warming,is_warming_layerL
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
   REAL(R8),INTENT(OUT) :: DVLiceMicP_vr(JZ)  !change in ice volume
@@ -796,7 +798,11 @@ module RedistMod
   real(r8) :: TVHeatCapacitySoilM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY
   real(r8) :: VOLWXX,VOLIXX,VHeatCapacityX,WS,HS
   real(r8) :: DVLWatMicP_vr(JZ,JY,JX)   !change in water volume
-  integer :: L
+  integer :: L,it
+  logical :: do_warming
+
+  do_warming=check_Soil_Warming(iYearCurrent,I)
+  it=(I-1)*24+J
 
   if(lverb)write(*,*)'update_physVar_Profile'
   TVHeatCapacity      = 0.0_r8
@@ -869,6 +875,11 @@ module RedistMod
     !
     TKSpre=TKS_vr(L,NY,NX)
     IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_vr(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
+      if(do_warming .and. is_warming_layerL(L,NY,NX))then     
+        THeatFlow2Soil_vr(L,NY,NX) = THeatFlow2Soil_vr(L,NY,NX) + &
+          (TKS_ref_vr(it,L,NY,NX)-TKS_vr(L,NY,NX))*VHeatCapacity_vr(L,NY,NX)
+      endif   
+
       TKS00=TKS_vr(L,NY,NX)
       TKS_vr(L,NY,NX)=(ENGY+THeatFlow2Soil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)

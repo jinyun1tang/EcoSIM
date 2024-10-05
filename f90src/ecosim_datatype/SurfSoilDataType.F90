@@ -26,7 +26,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  LakeSurfFlowMicP(:,:)                         !lake surface water flux
   real(r8),target,allocatable ::  LakeSurfFlowMicPX(:,:)                        !lake surface water flux
   real(r8),target,allocatable ::  LakeSurfFlowMacP(:,:)                        !lake surface water flux
-  real(r8),target,allocatable ::  LakeSurfHeatFlux(:,:)              !lake surface heat flux, outgoing positive
+  real(r8),target,allocatable ::  LakeSurfHeatFlux_col(:,:)              !lake surface heat flux, outgoing positive
 !----------------------------------------------------------------------
 
 contains
@@ -52,7 +52,7 @@ contains
   allocate(LakeSurfFlowMicP(JY,JX));       LakeSurfFlowMicP=0._r8
   allocate(LakeSurfFlowMicPX(JY,JX));      LakeSurfFlowMicPX=0._r8
   allocate(LakeSurfFlowMacP(JY,JX));      LakeSurfFlowMacP=0._r8
-  allocate(LakeSurfHeatFlux(JY,JX));      LakeSurfHeatFlux=0._r8
+  allocate(LakeSurfHeatFlux_col(JY,JX));      LakeSurfHeatFlux_col=0._r8
   end subroutine InitSurfSoilData
 
 !----------------------------------------------------------------------
@@ -78,7 +78,7 @@ contains
   call destroy(LakeSurfFlowMicP)
   call destroy(LakeSurfFlowMicPX)
   call destroy(LakeSurfFlowMacP)
-  call destroy(LakeSurfHeatFlux)
+  call destroy(LakeSurfHeatFlux_col)
   end subroutine DestructSurfSoilData
 
 end module SurfSoilDataType

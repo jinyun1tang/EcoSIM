@@ -1027,7 +1027,7 @@ implicit none
   type(Var_desc_t) :: vardesc   ! Output variable descriptor
   logical           :: readvar   ! If variable exists or not
   integer           :: nsteps,nlevs,ncol
-  integer           :: kk, icol, ny,nx
+  integer           :: kk, icol, ny,nx, ll
   real(r8), allocatable    :: data(:,:)  
   
   call get_warming_fname(year,fname)
@@ -1046,11 +1046,11 @@ implicit none
     DO NX=NHW,NHE
       DO NY=NVN,NVS
         icol=get_col(NY,NX)
-        TKS_ref_vr(kk,1:nlevs,NY,NX)=data(icol,1:nlevs)
+        TKS_ref_vr(kk,1:nlevs,NY,NX)=data(icol,1:nlevs)+TC2K
       ENDDO
     ENDDO  
 !    if(mod(kk,24*30)==0)then
-!      print*,kk/24,data(1,1:3)
+!      print*,kk/24,TKS_ref_vr(kk,1:3,1,1),data(1,1:3)
 !    endif
   enddo
   call ncd_pio_closefile(ncid)
