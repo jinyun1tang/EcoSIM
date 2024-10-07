@@ -566,7 +566,7 @@ contains
   tinyw1             = tinyw*NPS*5._r8
   D3000: DO MM=1,NPS
 
-     if(TKSoi1(0,NY,NX)<100._r8 .or. TKSoi1(0,NY,NX)>400._r8)write(*,*)'TXKR MM=',MM,TKSoi1(0,NY,NX)
+     if(TKSoi1_vr(0,NY,NX)<100._r8 .or. TKSoi1_vr(0,NY,NX)>400._r8)write(*,*)'TXKR MM=',MM,TKSoi1_vr(0,NY,NX)
 !    write(*,*)'CumHeatFlow2LitR MM=',MM,NY,NX,CumHeatFlow2LitR
     call SnowAtmosExchange(I,J,M,NY,NX,LatentHeatAir2Sno,HeatSensEvap,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
 
@@ -575,7 +575,7 @@ contains
       CumWatXFlx2SoiMicP,CumWatFlow2LitR,CumHeatFlow2LitR,cumHeatFlowSno2Soi)
 
     if(CumWatFlow2LitR>1.e10)then
-      print*,I+J/24.,'snowphysWatFlow2LitR',MM,CumWatFlow2LitR,CumHeatFlow2LitR,safe_adb(CumHeatFlow2LitR,cpw*CumWatFLow2LitR),TKSoi1(0,NY,NX)
+      print*,I+J/24.,'snowphysWatFlow2LitR',MM,CumWatFlow2LitR,CumHeatFlow2LitR,safe_adb(CumHeatFlow2LitR,cpw*CumWatFLow2LitR),TKSoi1_vr(0,NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif  
 !
@@ -1115,7 +1115,7 @@ contains
 !     SNOWPACK WATER, ICE, SNOW AND TEMPERATURE
 
   !      if(curday>=176)then
-  !        write(*,*)'line',__LINE__,'tk1',TKSoi1(8,ny,nx),TKSoi1(9,ny,nx),M
+  !        write(*,*)'line',__LINE__,'tk1',TKSoi1_vr(8,ny,nx),TKSoi1_vr(9,ny,nx),M
   !      endif
   !
   !     SNOW RUNOFF
@@ -1167,7 +1167,7 @@ contains
     !add to litter layer?
     VLWatMicP1_vr(NUM(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
     VLiceMicP1_vr(NUM(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
-    ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoi1(NUM(NY,NX),NY,NX)
+    ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoi1_vr(NUM(NY,NX),NY,NX)
     VLHeatCapacityA_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
       +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
     VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
@@ -1176,13 +1176,13 @@ contains
 
     IF(VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     ! topsoil layer is there
-      tk1pres=TKSoi1(NUM(NY,NX),NY,NX)
-      TKSoi1(NUM(NY,NX),NY,NX)=(ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
-!      if(abs(tk1pres/TKSoi1(NUM(NY,NX),NY,NX)-1._r8)>0.025_r8)then
-!        TKSoi1(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
+      tk1pres=TKSoi1_vr(NUM(NY,NX),NY,NX)
+      TKSoi1_vr(NUM(NY,NX),NY,NX)=(ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
+!      if(abs(tk1pres/TKSoi1_vr(NUM(NY,NX),NY,NX)-1._r8)>0.025_r8)then
+!        TKSoi1_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
 !      endif
     ELSE
-      TKSoi1(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
+      TKSoi1_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
     ENDIF
   ENDIF
 
@@ -1420,7 +1420,7 @@ contains
     !residue vapor pressure
     VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKXR))
     if(abs(VPR)>1.e20_r8)then
-      write(*,*)'TKXR=',TKXR,TKSoi1(0,NY,NX),TKSoi1(NUM(NY,NX),NY,NX),NN
+      write(*,*)'TKXR=',TKXR,TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX),NN
       write(*,*)'PSISM1_vr(0,NY,NX)=',PSISM1_vr(0,NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif
@@ -1683,8 +1683,8 @@ contains
   ENDIF
 
   TK0X=TKSnow1_snvr(L,NY,NX)
-  TKXR=TKSoi1(0,NY,NX)
-  TK1X=TKSoi1(NUM(NY,NX),NY,NX)
+  TKXR=TKSoi1_vr(0,NY,NX)
+  TK1X=TKSoi1_vr(NUM(NY,NX),NY,NX)
   CNVR=safe_adb(VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS_vr(0,NY,NX))
 
   if(TKXR<0._r8)then
@@ -1771,7 +1771,7 @@ contains
   IF(VLairSno1.GT.ZEROS2(NY,NX).AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
     VapCond2=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
       *THETPM(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
-    VapSoiDest=vapsat(TKSoi1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoi1(NUM(NY,NX),NY,NX)))
+    VapSoiDest=vapsat(TKSoi1_vr(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoi1_vr(NUM(NY,NX),NY,NX)))
     AvgVaporCondctSoilLitR=2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR(3,NUM(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
     H2OVapFlx=AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow(NY,NX)&
       *FracSurfBareSoil_col(NY,NX)*dt_SnoHeat
@@ -1786,7 +1786,7 @@ contains
     ELSE
       !water flux out of soil
       VapFlxSno2Soi1=AZMIN1(AMAX1(H2OVapFlx,H2OVapFlxMax))
-      HeatConvFlxSno2Soi1=(cpw*TKSoi1(NUM(NY,NX),NY,NX)+EvapLHTC)*VapFlxSno2Soi1
+      HeatConvFlxSno2Soi1=(cpw*TKSoi1_vr(NUM(NY,NX),NY,NX)+EvapLHTC)*VapFlxSno2Soi1
     ENDIF
   ELSE
     VapCond2=0.0_r8
@@ -1824,7 +1824,7 @@ contains
     AvgThermCondctSoilLitR=0.0_r8
   ENDIF
 
-  TKWX1=TKSoi1(NUM(NY,NX),NY,NX)+HeatConvFlxSno2Soi1/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
+  TKWX1=TKSoi1_vr(NUM(NY,NX),NY,NX)+HeatConvFlxSno2Soi1/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
   TKY=(TKSnow1_snvr(L,NY,NX)*VLHeatCapSnowM1_snvr(L,NY,NX)+TKWX1*VHeatCapacity1_vr(NUM(NY,NX),NY,NX)) &
     /(VLHeatCapSnowM1_snvr(L,NY,NX)+VHeatCapacity1_vr(NUM(NY,NX),NY,NX))
   HeatCnductMax=(TKSnow1_snvr(L,NY,NX)-TKY)*VLHeatCapSnowM1_snvr(L,NY,NX)*dts_sno

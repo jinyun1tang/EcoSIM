@@ -23,7 +23,7 @@ implicit none
   real(r8),allocatable ::  PARSR(:,:)                         !
   real(r8),allocatable ::  VapDiffusResistanceLitR(:,:)                           !
   real(r8),allocatable ::  WatFLow2LitR_col(:,:)                         !
-  real(r8),allocatable ::  HeatFLoByWat2LitRi(:,:)                        !  
+  real(r8),allocatable ::  HeatFLoByWat2LitRi_col(:,:)                        !  
   real(r8),allocatable ::  PARSG(:,:)                         !
   real(r8),allocatable ::  VapXAir2LitR(:,:)                  !water vapor flux from canopy air to litr
 !  real(r8),allocatable ::  VapXAir2TopLay(:,:)                !water vapor flux from canopy air to top layer of soi/lake
@@ -74,7 +74,7 @@ implicit none
   allocate(PARSR(JY,JX));       PARSR=0._r8
   allocate(VapDiffusResistanceLitR(JY,JX));         VapDiffusResistanceLitR=0._r8  
   allocate(WatFLow2LitR_col(JY,JX));       WatFLow2LitR_col=0._r8
-  allocate(HeatFLoByWat2LitRi(JY,JX));      HeatFLoByWat2LitRi=0._r8  
+  allocate(HeatFLoByWat2LitRi_col(JY,JX));      HeatFLoByWat2LitRi_col=0._r8  
   allocate(PARSG(JY,JX));       PARSG=0._r8  
   allocate(VapXAir2LitR(JY,JX));       VapXAir2LitR=0._r8  
 !  allocate(VapXAir2TopLay(JY,JX));       VapXAir2TopLay=0._r8  
@@ -121,7 +121,7 @@ implicit none
   call destroy(PARSR)
   call destroy(VapDiffusResistanceLitR)  
   call destroy(WatFLow2LitR_col)
-  call destroy(HeatFLoByWat2LitRi)  
+  call destroy(HeatFLoByWat2LitRi_col)  
   call destroy(PARSG)  
   call destroy(VapXAir2LitR)
 !  call destroy(VapXAir2TopLay)

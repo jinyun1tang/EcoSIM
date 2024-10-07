@@ -265,36 +265,37 @@ contains
 !
   totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ) &
     +EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
+  
   IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-    WHVSHX=WHVSSX*PetoleStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVSHY=AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
-    WHVSHH=WHVSHY*(1._r8-CCPOLX)
-    WHVSCS=WHVSHY*CCPOLX
-    WHVSNS=WHVSHY*CCPLNX
+    WHVSHX = WHVSSX*PetoleStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
+    WHVSHY = AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
+    WHVSHH = WHVSHY*(1._r8-CCPOLX)
+    WHVSCS = WHVSHY*CCPOLX
+    WHVSNS = WHVSHY*CCPLNX
 
-    CGrazedDeficit=AZMAX1(WHVSHX-WHVSHY)
-    WHVHSX=WHVSSX*HuskStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVHSY=AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
-    HvstedShethC=WHVHSY
+    CGrazedDeficit = AZMAX1(WHVSHX-WHVSHY)
+    WHVHSX         = WHVSSX*HuskStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
+    WHVHSY         = AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
+    HvstedShethC   = WHVHSY
 
-    CGrazedDeficit=AZMAX1(WHVHSX-WHVHSY)
-    WHVEAX=WHVSSX*EarStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVEAY=AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
-    HvstedEarC=WHVEAY
+    CGrazedDeficit = AZMAX1(WHVHSX-WHVHSY)
+    WHVEAX         = WHVSSX*EarStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
+    WHVEAY         = AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
+    HvstedEarC     = WHVEAY
 
-    CGrazedDeficit=AZMAX1(WHVEAX-WHVEAY)
-    WHVGRX=WHVSSX*GrainStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVGRY=AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
-    HvstedGrainC=WHVGRY
-    CGrazedDeficit=AZMAX1(WHVGRX-WHVGRY)
+    CGrazedDeficit = AZMAX1(WHVEAX-WHVEAY)
+    WHVGRX         = WHVSSX*GrainStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
+    WHVGRY         = AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
+    HvstedGrainC   = WHVGRY
+    CGrazedDeficit = AZMAX1(WHVGRX-WHVGRY)
   ELSE
-    WHVSHH=0._r8
-    WHVSCS=0._r8
-    WHVSNS=0._r8
-    HvstedShethC=0._r8
-    HvstedEarC=0._r8
-    HvstedGrainC=0._r8
-    CGrazedDeficit=CGrazedDeficit+WHVSSX
+    WHVSHH         = 0._r8
+    WHVSCS         = 0._r8
+    WHVSNS         = 0._r8
+    HvstedShethC   = 0._r8
+    HvstedEarC     = 0._r8
+    HvstedGrainC   = 0._r8
+    CGrazedDeficit = CGrazedDeficit+WHVSSX
   ENDIF
   WHVSCP=WHVSCL+WHVSCS
   WHVSNP=WHVSNL+WHVSNS
@@ -337,29 +338,30 @@ contains
       WHVSNL=WHVSNL+WHVSLY*CCPLNX
 
       CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVSLY)
+
       IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-        WHVSHX=CGrazedDeficit*PetoleStrutElms_pft(ielmc,NZ)/totShootC
-        WHVSHY=AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
-        WHVSHH=WHVSHH+WHVSHY*(1._r8-CCPOLX)
-        WHVSCS=WHVSCS+WHVSHY*CCPOLX
-        WHVSNS=WHVSNS+WHVSHY*CCPLNX
+        WHVSHX = CGrazedDeficit*PetoleStrutElms_pft(ielmc,NZ)/totShootC
+        WHVSHY = AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
+        WHVSHH = WHVSHH+WHVSHY*(1._r8-CCPOLX)
+        WHVSCS = WHVSCS+WHVSHY*CCPOLX
+        WHVSNS = WHVSNS+WHVSHY*CCPLNX
 
-        CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVSHY)
-        WHVHSX=CGrazedDeficit*HuskStrutElms_pft(ielmc,NZ)/totShootC
-        WHVHSY=AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
-        HvstedShethC=HvstedShethC+WHVHSY
+        CGrazedDeficit = AZMAX1(CGrazedDeficit-WHVSHY)
+        WHVHSX         = CGrazedDeficit*HuskStrutElms_pft(ielmc,NZ)/totShootC
+        WHVHSY         = AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
+        HvstedShethC   = HvstedShethC+WHVHSY
 
-        CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVHSY)
-        WHVEAX=CGrazedDeficit*EarStrutElms_pft(ielmc,NZ)/totShootC
-        WHVEAY=AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
-        HvstedEarC=HvstedEarC+WHVEAY
+        CGrazedDeficit = AZMAX1(CGrazedDeficit-WHVHSY)
+        WHVEAX         = CGrazedDeficit*EarStrutElms_pft(ielmc,NZ)/totShootC
+        WHVEAY         = AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
+        HvstedEarC     = HvstedEarC+WHVEAY
 
-        CGrazedDeficit=AZMAX1(WHVEAX-WHVEAY)
-        WHVGRX=CGrazedDeficit*GrainStrutElms_pft(ielmc,NZ)/totShootC
-        WHVGRY=AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
-        HvstedGrainC=HvstedGrainC+WHVGRY
+        CGrazedDeficit = AZMAX1(WHVEAX-WHVEAY)
+        WHVGRX         = CGrazedDeficit*GrainStrutElms_pft(ielmc,NZ)/totShootC
+        WHVGRY         = AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
+        HvstedGrainC   = HvstedGrainC+WHVGRY
         
-        CGrazedDeficit=AZMAX1(WHVGRX-WHVGRY)
+        CGrazedDeficit = AZMAX1(WHVGRX-WHVGRY)
       ENDIF
     ENDIF
   ENDIF

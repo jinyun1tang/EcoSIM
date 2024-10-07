@@ -6,7 +6,7 @@ implicit none
   __FILE__
   real(r8),allocatable ::  FracSoiPAsWat_vr(:,:,:)                      !
   real(r8),allocatable ::  PSISM1_vr(:,:,:)                      !  
-  real(r8),allocatable ::  TKSoi1(:,:,:)                         !  
+  real(r8),allocatable ::  TKSoi1_vr(:,:,:)                         !  
   real(r8),allocatable ::  DLYRR_COL(:,:)                         !  
   real(r8),allocatable ::  FracSoiPAsIce_vr(:,:,:)               !  
   real(r8),allocatable ::  FracSoiPAsAir_vr(:,:,:)               !  
@@ -65,7 +65,7 @@ implicit none
 
   allocate(FracSoiPAsWat_vr(0:JZ,JY,JX)); FracSoiPAsWat_vr=0._r8
   allocate(PSISM1_vr(0:JZ,JY,JX)); PSISM1_vr=0._r8
-  allocate(TKSoi1(0:JZ,JY,JX));    TKSoi1=0._r8    
+  allocate(TKSoi1_vr(0:JZ,JY,JX));    TKSoi1_vr=0._r8    
   allocate(DLYRR_COL(JY,JX));       DLYRR_col=0._r8  
   allocate(FracSoiPAsIce_vr(0:JZ,JY,JX)); FracSoiPAsIce_vr=0._r8 
   allocate(FracSoiPAsAir_vr(0:JZ,JY,JX)); FracSoiPAsAir_vr=0._r8   
@@ -123,7 +123,7 @@ implicit none
   call destroy(WatFlx2LitRByRunoff)
   call destroy(FracSoiPAsWat_vr)
   call destroy(PSISM1_vr)  
-  call destroy(TKSoi1)  
+  call destroy(TKSoi1_vr)  
   call destroy(DLYRR_COL)  
   call destroy(FracSoiPAsIce_vr)  
   call destroy(FracSoiPAsAir_vr)  
