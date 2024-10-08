@@ -183,19 +183,18 @@ implicit none
   !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
   !
   DO  L=1,JS
-    WS=VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
-
-    WatMassStore_lnd=WatMassStore_lnd+WS
-    WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
-    ENGYW=VLHeatCapSnow_snvr(L,NY,NX)*TKSnow_snvr(L,NY,NX)
-    HeatStore_lnd=HeatStore_lnd+ENGYW
-    TGasC_lnd=TGasC_lnd+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
-    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
-    TSoilO2G_lnd=TSoilO2G_lnd+trcg_solsml_snvr(idg_O2,L,NY,NX)
-    TGasN_lnd=TGasN_lnd+trcg_solsml_snvr(idg_N2,L,NY,NX)+trcg_solsml_snvr(idg_N2O,L,NY,NX)
-    TDisolNH4_lnd=TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
-    tNO3_lnd=tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
-    TDisolPi_lnd=TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
+    WS                  = VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
+    WatMassStore_lnd    = WatMassStore_lnd+WS
+    WatMass_col(NY,NX)  = WatMass_col(NY,NX)+WS
+    ENGYW               = VLHeatCapSnow_snvr(L,NY,NX)*TKSnow_snvr(L,NY,NX)
+    HeatStore_lnd       = HeatStore_lnd+ENGYW
+    TGasC_lnd           = TGasC_lnd+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
+    DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
+    TSoilO2G_lnd        = TSoilO2G_lnd+trcg_solsml_snvr(idg_O2,L,NY,NX)
+    TGasN_lnd           = TGasN_lnd+trcg_solsml_snvr(idg_N2,L,NY,NX)+trcg_solsml_snvr(idg_N2O,L,NY,NX)
+    TDisolNH4_lnd       = TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
+    tNO3_lnd            = tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
+    TDisolPi_lnd        = TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
     IF(salt_model)THEN
       SSW=0._r8

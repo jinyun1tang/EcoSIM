@@ -4608,16 +4608,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='CanH2OHeldVg', dim1name='column',&
+    call restartvar(ncid, flag, varname='CanH2OHeldVg_col', dim1name='column',&
        long_name='canopy surface water content', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg_col,datrc_1d) 
   else
-    !print*,'CanH2OHeldVg'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg,datrc_1d)   
+    !print*,'CanH2OHeldVg_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg_col,datrc_1d)   
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='CanH2OHeldVg', dim1name='column',&
+    call restartvar(ncid, flag, varname='CanH2OHeldVg_col', dim1name='column',&
        long_name='canopy surface water content', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

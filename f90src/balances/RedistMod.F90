@@ -713,12 +713,12 @@ module RedistMod
     tLitrOM_col(NE,NY,NX)=tLitrOM_col(NE,NY,NX)+litrOM_vr(NE,0,NY,NX)
   ENDDO
   !water mass 
-  WS=CanH2OHeldVg(NY,NX)+CanWat_col(NY,NX)+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
-  WatMassStore_lnd=WatMassStore_lnd+WS
-  WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
-  HeatStore_col(NY,NX)=HeatStore_col(NY,NX)+TEngyCanopy_col(NY,NX)
-  HeatStore_lnd=HeatStore_lnd+TEngyCanopy_col(NY,NX)
-  CS                  = trc_solml_vr(idg_CO2,0,NY,NX)+trc_solml_vr(idg_CH4,0,NY,NX)
+  WS                   = CanH2OHeldVg_col(NY,NX)+CanWat_col(NY,NX)+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
+  WatMassStore_lnd     = WatMassStore_lnd+WS
+  WatMass_col(NY,NX)   = WatMass_col(NY,NX)+WS
+  HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+TEngyCanopy_col(NY,NX)
+  HeatStore_lnd        = HeatStore_lnd+TEngyCanopy_col(NY,NX)
+  CS                   = trc_solml_vr(idg_CO2,0,NY,NX)+trc_solml_vr(idg_CH4,0,NY,NX)
   TGasC_lnd           = TGasC_lnd+CS
   DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+CS
   HS                  = trc_solml_vr(idg_H2,0,NY,NX)
@@ -748,9 +748,9 @@ module RedistMod
   POP=patomw*(trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)+trcp_saltpml_vr(idsp_FePO4,0,NY,NX) &
     +trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX))+2._r8*patomw*trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX) &
     +3._r8*patomw*trcp_saltpml_vr(idsp_HA,0,NY,NX)
-  TDisolPi_lnd=TDisolPi_lnd+POS+POX+POP
-  tHxPO4_col(NY,NX)=tHxPO4_col(NY,NX)+POX
-  tXPO4_col(NY,NX)=tXPO4_col(NY,NX)+POP
+  TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
+  tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX
+  tXPO4_col(NY,NX)  = tXPO4_col(NY,NX)+POP
 
   IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TDisolPi_lnd)
 

@@ -63,7 +63,7 @@ implicit none
   Eco_AutoR_CumYr_col(NY,NX)                          = plt_bgcr%Eco_AutoR_CumYr_col
   LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)     = plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)
   EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)   = plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)
-  CanH2OHeldVg(NY,NX)                                 = plt_ew%CanH2OHeldVg
+  CanH2OHeldVg_col(NY,NX)                                 = plt_ew%CanH2OHeldVg
   Eco_Heat_Sens_col(NY,NX)                            = plt_ew%Eco_Heat_Sens_col
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)
   H2OLoss_CumYr_col(NY,NX)                            = plt_ew%H2OLoss_CumYr_col
@@ -904,7 +904,7 @@ implicit none
   plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)=LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)
   plt_morph%StemArea_col=StemArea_col(NY,NX)
   plt_ew%Eco_Heat_Sens_col=Eco_Heat_Sens_col(NY,NX)
-  plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
+  plt_ew%CanH2OHeldVg=CanH2OHeldVg_col(NY,NX)
   plt_bgcr%Eco_NBP_CumYr_col=Eco_NBP_CumYr_col(NY,NX)
   plt_ew%Canopy_Heat_Latent_col=Canopy_Heat_Latent_col(NY,NX)
   plt_ew%Canopy_Heat_Sens_col=Canopy_Heat_Sens_col(NY,NX)

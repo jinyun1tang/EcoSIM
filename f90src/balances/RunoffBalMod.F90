@@ -164,8 +164,8 @@ implicit none
 !
   IF(N.NE.ivertdir .AND. L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
-    WQRN=XN*Wat2GridBySurfRunoff(N,NN,N5,N4)
-    QRunSurf_col(N2,N1)=QRunSurf_col(N2,N1)+WQRN
+    WQRN                = XN*Wat2GridBySurfRunoff(N,NN,N5,N4)
+    QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
       CRUN=CRUN-WQRN
       Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRN

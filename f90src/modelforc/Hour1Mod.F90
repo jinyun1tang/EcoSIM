@@ -756,23 +756,23 @@ module Hour1Mod
   HeatNet2Surf_col(NY,NX)                 = 0.0_r8
   VapXAir2GSurf_col(NY,NX)                = 0.0_r8
 
-  trcs_Transp2MacP_3D(:,:,:,:,:)            = 0._r8
+  trcs_Transp2MacP_3D(:,:,:,:,:)                 = 0._r8
   Gas_Flx_atmDif2soil_col(idg_beg:idg_end,NY,NX) = 0._r8
-  trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX)=0.0_r8
+  trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX) = 0.0_r8
 
-  CanWat_col(NY,NX)       = 0.0_r8
-  CanH2OHeldVg(NY,NX)     = 0.0_r8
-  TFLWCI(NY,NX)           = 0.0_r8
+  CanWat_col(NY,NX)              = 0.0_r8
+  CanH2OHeldVg_col(NY,NX)        = 0.0_r8
+  TFLWCI(NY,NX)                  = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
-  QvET_col(NY,NX)           = 0.0_r8
-  VapXAir2CanG(NY,NX)     = 0.0_r8
-  THFLXC(NY,NX)           = 0.0_r8
-  TEngyCanopy_col(NY,NX)           = 0.0_r8
+  QvET_col(NY,NX)                = 0.0_r8
+  VapXAir2CanG(NY,NX)            = 0.0_r8
+  THFLXC(NY,NX)                  = 0.0_r8
+  TEngyCanopy_col(NY,NX)         = 0.0_r8
 
-  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  LitrFallStrutElms_col(:,NY,NX)=0.0_r8
-  StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX)=0.0_r8
-  PlantPopu_col(NY,NX)=0.0_r8
+  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)    = 0.0_r8
+  LitrFallStrutElms_col(:,NY,NX)                      = 0.0_r8
+  StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0.0_r8
+  PlantPopu_col(NY,NX)                                = 0.0_r8
 ! zero arrays in the snow layers
   WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
   WatConvSno2MacP_snvr(1:JS,NY,NX)   = 0.0_r8
