@@ -123,7 +123,7 @@ module StartsMod
 !     *E=atmospheric concentration from readi.f (umol mol-1)
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !
-      tPBOT=PBOT(NY,NX)/1.01325E+02_r8
+      tPBOT=PBOT_col(NY,NX)/1.01325E+02_r8
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT

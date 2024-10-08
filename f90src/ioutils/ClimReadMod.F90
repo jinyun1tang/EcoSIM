@@ -802,6 +802,13 @@ implicit none
     call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
     call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SWRad_hrly,fdatam)
 
+    call check_var(clm_nfid, 'PATM', vardesc, readvar,print_err=.false.)
+    if(readvar)then
+      call ncd_getvar(clm_nfid,'PATM',irec,fdatam); call reshape2(PBOT_hrly,fdatam)
+    else
+      PBOT_hrly=1.01325E+02_r8
+    endif
+
     call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
     call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
     call ncd_getvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
@@ -834,6 +841,7 @@ implicit none
         RAINH(J,I+1)= RAINH(J,I)
         SWRad_hrly(J,I+1)= SWRad_hrly(J,I)
         RadLWClm(J,I+1)= RadLWClm(J,I)
+        PBOT_hrly(J,I+1)=PBOT_hrly(J,I)
       ENDDO
     endif
 

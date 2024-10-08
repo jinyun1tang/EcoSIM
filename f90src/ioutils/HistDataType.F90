@@ -116,6 +116,7 @@ implicit none
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
   real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA_col(NY,NX)
+  real(r8),pointer   :: h1D_PATM_col(:)           !atmospheric pressure
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK_col(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm_col(NY,NX)/secs1hour
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
@@ -498,6 +499,7 @@ implicit none
   allocate(this%h1D_NH3_LITR_col(beg_col:end_col))        ;this%h1D_NH3_LITR_col(:)=spval
   allocate(this%h1D_SOL_RADN_col(beg_col:end_col))        ;this%h1D_SOL_RADN_col(:)=spval
   allocate(this%h1D_AIR_TEMP_col(beg_col:end_col))        ;this%h1D_AIR_TEMP_col(:)=spval
+  allocate(this%h1D_PATM_col(beg_col:end_col))            ;this%h1D_PATM_col(:)=spval
   allocate(this%h1D_HUM_col(beg_col:end_col))             ;this%h1D_HUM_col(:)=spval
   allocate(this%h1D_WIND_col(beg_col:end_col))            ;this%h1D_WIND_col(:)=spval
   allocate(this%h1D_PREC_col(beg_col:end_col))            ;this%h1D_PREC_col(:)=spval
@@ -1084,6 +1086,10 @@ implicit none
   data1d_ptr => this%h1D_AIR_TEMP_col(beg_col:end_col)      
   call hist_addfld1d(fname='AIR_TEMP',units='oC',avgflag='A',&
     long_name='air temperature',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_PATM_col(beg_col:end_col)      
+  call hist_addfld1d(fname='PATM',units='kPa',avgflag='A',&
+    long_name='atmospheric pressure',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_HUM_col(beg_col:end_col)    
   call hist_addfld1d(fname='HUM',units='kPa',avgflag='A',&
@@ -2268,7 +2274,7 @@ implicit none
       this%h1D_SOL_RADN_col(ncol)         = RadSWSolarBeam_col(NY,NX)*MJ2W*86400.e-6_r8
       this%h1D_AIR_TEMP_col(ncol)         = TCA_col(NY,NX)
       this%h1D_HUM_col(ncol)              = VPK_col(NY,NX)
-      
+      this%h1D_PATM_col(ncol)             = PBOT_col(NY,NX)
       this%h1D_WIND_col(ncol)            = WindSpeedAtm_col(NY,NX)/secs1hour
       this%h1D_PREC_col(ncol)            = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_RN_col(ncol)         = HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)

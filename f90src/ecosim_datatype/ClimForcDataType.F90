@@ -39,7 +39,7 @@ implicit none
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
   real(r8) :: RadLWClm(24,366)                     !longwave radiation (MJ m-2 h-1)
-
+  real(r8) :: PBOT_hrly(24,366)
   real(r8) :: DRAD(12)                          !change factor for radiation, [-]
   real(r8) :: DTMPX(12)                         !change factor for maximum temperature, [-]
   real(r8) :: DTMPN(12)                         !change factor for minimum temperature, [-]
@@ -60,11 +60,11 @@ implicit none
   real(r8),target,allocatable ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA_col(:,:)                           !air temperature, [oC]
-  real(r8),target,allocatable ::  TairK_col(:,:)                           !air temperature, [K]
+  real(r8),target,allocatable ::  TairK_col(:,:)                         !air temperature, [K]
   real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
-  real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
+  real(r8),target,allocatable ::  PBOT_col(:,:)                          !atmospheric pressure [kPa]
   real(r8),target,allocatable ::  DayLensCurr_col(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
@@ -76,15 +76,15 @@ implicit none
   real(r8),target,allocatable ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
   real(r8),target,allocatable ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
   real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
-!  real(r8),target,allocatable ::  PrecDaily_col(:,:)                          !total daily precipitation, [m d-1]
-  real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
-  real(r8),target,allocatable ::  TempOffset_col(:,:)                        !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
+!  real(r8),target,allocatable ::  PrecDaily_col(:,:)                !total daily precipitation, [m d-1]
+  real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                !sky longwave radiation , [MJ m-2 h-1]
+  real(r8),target,allocatable ::  TempOffset_col(:,:)                !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
   real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
-  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)                     !atmospheric gas concentration in g m-3
+  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)               !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
@@ -94,13 +94,13 @@ implicit none
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
-  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)                         !time of solar noon, [h]
-  real(r8),target,allocatable ::  RadSWDirect_col(:,:)                          !direct shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RadSWDiffus_col(:,:)                          !diffuse shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RadPARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  RadPARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)                          !sine of solar angle, [-]
-  real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
+  real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  RadPARDirect_col(:,:)              !direct PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadPARDiffus_col(:,:)              !diffuse PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)          !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)    !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
@@ -122,10 +122,10 @@ implicit none
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                          !precipitation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                          !precipitation  NH3 concentration, [g m-3]
-  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                          !precipitation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                 !precipitation  NH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                 !precipitation  NH3 concentration, [g m-3]
+  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                 !precipitation  NO3 concentration, [g m-3]
+  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)               !precipitation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
@@ -138,7 +138,7 @@ implicit none
   real(r8),target,allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
   real(r8),target,allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
   real(r8),target,allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                          !precipitation  CH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                 !precipitation  CH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
   real(r8),target,allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
@@ -161,7 +161,7 @@ implicit none
   real(r8),target,allocatable ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                         !precipitation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                !precipitation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
@@ -199,7 +199,7 @@ implicit none
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK_col(JY,JX));         VPK_col=0._r8
-  allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
+  allocate(PBOT_col(JY,JX));        PBOT_col=1.01325E+02_r8
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
   allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
@@ -329,7 +329,7 @@ implicit none
   call destroy(WindSpeedAtm_col)
   call destroy(VPA)
   call destroy(VPK_col)
-  call destroy(PBOT)
+  call destroy(PBOT_col)
   call destroy(DayLensCurr_col)
   call destroy(DayLenthPrev_col)
   call destroy(DayLenthMax)
