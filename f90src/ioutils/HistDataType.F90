@@ -89,7 +89,6 @@ implicit none
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
   real(r8),pointer   :: h1D_tLITR_C_col(:)      !tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AMENDED_C_col(:)      !AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CO2_FLX_col(:)        !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_C_col(:)        !tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_OMC_LITR_col(:)       !SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
   real(r8),pointer   :: h1D_OMN_LITR_col(:)       !SoilOrgM_vr(ielmn,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual N
@@ -472,7 +471,6 @@ implicit none
   allocate(this%h1D_TEMP_SNOW_col(beg_col:end_col))       ;this%h1D_TEMP_SNOW_col(:)=spval
 
   allocate(this%h1D_AMENDED_C_col(beg_col:end_col))       ;this%h1D_AMENDED_C_col(:)=spval
-  allocate(this%h1D_CO2_FLX_col(beg_col:end_col))         ;this%h1D_CO2_FLX_col(:)=spval
   allocate(this%h1D_tMICRO_C_col(beg_col:end_col))        ;this%h1D_tMICRO_C_col(:)=spval
   allocate(this%h1D_tSoilOrgC_col(beg_col:end_col))       ;this%h1D_tSoilOrgC_col(:)=spval
   allocate(this%h1D_tSoilOrgN_col(beg_col:end_col))       ;this%h1D_tSoilOrgN_col(:)=spval
@@ -1003,10 +1001,6 @@ implicit none
   call hist_addfld1d(fname='TEMP_SNOW',units='oC',avgflag='A',&
     long_name='First snow layer temperature',ptr_col=data1d_ptr)      
     
-  data1d_ptr => this%h1D_CO2_FLX_col(beg_col:end_col)  
-  call hist_addfld1d(fname='CO2_FLX',units='gC/m2/hr',avgflag='A',&
-    long_name='total soil CO2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
-
   data1d_ptr => this%h1D_OMC_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='Surf_LitrC',units='gC/m2',avgflag='A',&
     long_name='total litter residual C, including microbes',ptr_col=data1d_ptr)      
@@ -2247,7 +2241,6 @@ implicit none
       this%h1D_tLITR_C_col(ncol) = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       this%h1D_AMENDED_C_col(ncol)        = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_CO2_FLX_col(ncol)          = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgC_col(ncol)        = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgN_col(ncol)        = tSoilOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
