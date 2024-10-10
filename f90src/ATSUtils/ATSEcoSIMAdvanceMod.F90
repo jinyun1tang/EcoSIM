@@ -6,6 +6,7 @@ module ATSEcoSIMAdvanceMod
   use GridConsts
   use SOMDataType
   USE SoilPhysDataType
+  use SnowDataType
   use LandSurfDataType
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
@@ -28,6 +29,7 @@ implicit none
   use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel, & 
       SetHourlyAccumulatorsATS
   use StartsMod         , only : set_ecosim_solver
+  use SnowBalanceMod    , only : SnowMassUpdate
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
   integer, intent(in) :: NYS
@@ -38,6 +40,7 @@ implicit none
   real(r8) :: TopLayWatVol(JY,JX)
   real(r8) :: Qinfl2MicP(JY,JX)
   real(r8) :: HInfl2Soil(JY,JX)
+  !real(r8) :: SnowDepth_col(JY,JX)
   real(r8) :: PrecAsRain(JY,JX)
   real(r8) :: PrecAsSnow(JY,JX)
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
@@ -127,15 +130,17 @@ implicit none
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP*3600._r8)
     !write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
     !write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
+    surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
   
+  write(*,*) "SnowDepth_col = ", SnowDepth_col(1,1), ' m'
   write(*,*) "prec = ", RAINH(1,1), " m/s"
   write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 
   write(*,*) "Q_w ", surf_w_source(1) , " m/s"
 
-  open(unit=10, file="fluxes.txt", status="unknown", position="append")
-  write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"
-  close(10)
+  !open(unit=10, file="fluxes.txt", status="unknown", position="append")
+  !write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"
+  !close(10)
 
   end subroutine RunEcoSIMSurfaceBalance
 

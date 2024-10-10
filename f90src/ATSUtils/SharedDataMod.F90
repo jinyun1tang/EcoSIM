@@ -53,6 +53,7 @@ Module SharedDataMod
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
   real(r8), allocatable :: surf_e_source(:) !surface energy source
   real(r8), allocatable :: surf_w_source(:) !surface water source
+  real(r8), allocatable :: surf_snow_depth(:) !snow depth source
   !real(r8), allocatable :: a_AREA3(:)
   integer,  allocatable :: a_NU(:)        !upper soil layer index
   integer,  allocatable :: a_NL(:)        !lower soil layer index
@@ -130,6 +131,7 @@ Module SharedDataMod
     allocate(vpair(ncells_per_col_))                ! vapor pressure deficit
     allocate(surf_e_source(ncells_per_col_))        ! surface energy source
     allocate(surf_w_source(ncells_per_col_))        ! surface water source
+    allocate(surf_snow_depth(ncells_per_col_))        ! surface snow depth
 
     a_NU=1
     a_NL=ncells_per_col_
