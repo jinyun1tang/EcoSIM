@@ -276,7 +276,7 @@ module readiMod
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
       ALAT(NY,NX)=ALATG
-      PBOT(NY,NX)=PBOT(NY,NX)*exp(-ALT(NY,NX)/hpresc)
+      PBOT_col(NY,NX)=PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
       ALTI(NY,NX)=ALTIG
       ATCAI(NY,NX)=ATCAG
       IDWaterTable(NY,NX)=iWaterTabelMode

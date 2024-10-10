@@ -6,6 +6,7 @@ set(BALANCES_MOD_SOURCES
   ErosionBalMod.F90
 	RedistMod.F90
   TillageMixMod.F90
+  BalancesMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(balances ${BALANCES_MOD_SOURCES})
@@ -17,9 +18,9 @@ target_include_directories(balances  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/mesh/
   ${CMAKE_BINARY_DIR}/f90src/modelpars/
   ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/
+  ${CMAKE_BINARY_DIR}/f90src/disturbances/  
   ${CMAKE_BINARY_DIR}/f90src/plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model
   ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)

@@ -75,7 +75,7 @@ module StartsMod
   integer :: NY,NX,L,NGL
   REAL(R8) :: ALTY
   real(r8) :: ALTZG
-  real(r8) :: tPBOT
+  real(r8) :: tPBOT,XWS
   real(r8) :: LandScape1stSoiLayDepth
   real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects)
   real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
@@ -123,15 +123,15 @@ module StartsMod
 !     *E=atmospheric concentration from readi.f (umol mol-1)
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !
-      tPBOT=PBOT(NY,NX)/1.01325E+02_r8
-      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
+      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -146,12 +146,11 @@ module StartsMod
 !     LOGPSIMX,LOGPSIMN,LOGPSIAtSat=log water potential at FC,WP,POROS
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,LOGPSIMN-LOGPSIMX
 !
-      LOGPSIAtSat(NY,NX)=LOG(-PSIPS)
-      LOGPSIFLD(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
-      LOGPSIMN(NY,NX)=LOG(-PSIAtWiltPoint(NY,NX))
-      LOGPSIMXD(NY,NX)=LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
-      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
-!     VLSoilMicPMass_vr(0,NY,NX)=0.0_r8
+      LOGPSIAtSat(NY,NX) = LOG(-PSIPS)
+      LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
+      LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
+      LOGPSIMXD(NY,NX)   = LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND(NY,NX)   = LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
@@ -164,8 +163,8 @@ module StartsMod
 !
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
-      VHeatCapLitRMin_col(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPNX(NY,NX)=VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
+      VHeatCapLitRMin_col(NY,NX) = VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX(NY,NX)              = VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
@@ -175,8 +174,8 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
-      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
+      SoilHeatSrcDepth(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
+      TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
     ENDDO
   ENDDO
@@ -184,18 +183,19 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  CanopyHeight_col(:,:)=0.0_r8
-  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)=0.0_r8
-  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
-  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:)=0.0_r8
-  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)=0.0_r8
+  CanopyHeight_col(:,:)                        = 0.0_r8
+  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
+  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
+  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
+  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 !     INITIALIZE SNOWPACK LAYERS
-      call InitSnowLayers(NY,NX)
+      call InitSnowLayers(NY,NX,XWS)
+      WatMass_col(NY,NX) = WatMass_col(NY,NX)+XWS
     ENDDO  
   ENDDO
   RETURN
@@ -330,7 +330,7 @@ module StartsMod
   real(r8) :: VSAND
   real(r8) :: TORGL(JZ)
   real(r8) :: VMINL
-  real(r8) :: VORGC
+  real(r8) :: VORGC,XS
 ! begin_execution
 ! RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 ! CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
@@ -374,7 +374,8 @@ module StartsMod
   ELSE
     HCX=0.0_r8
   ENDIF
-
+  WatMass_col(NY,NX) = 0._r8
+  XS                 = 0._r8
   D1200: DO L=0,NL(NY,NX)
     !
     if(L==0)then
@@ -483,6 +484,7 @@ module StartsMod
         ThetaH2OZ_vr(L,NY,NX)=THETW_vr(L,NY,NX)
         ThetaICEZ_vr(L,NY,NX)=THETI_vr(L,NY,NX)
       ENDIF
+      XS=XS+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
     ELSEIF(L==0)THEN 
     
       IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
@@ -493,6 +495,7 @@ module StartsMod
       POROSI_vr(0,NY,NX)             = 1._r8  !this is added for numerical fixing
       VHeatCapacitySoilM_vr(0,NY,NX) = 0.0_r8
       VLMicPt0_col(0,NY,NX)          = 0.0_r8
+      XS=XS+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
     ENDIF
 
     TKS_vr(L,NY,NX) = ATKS(NY,NX)
@@ -500,8 +503,11 @@ module StartsMod
     !
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
+    
   ENDDO D1200
-  
+
+  WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
+
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
 
   !
@@ -592,8 +598,8 @@ module StartsMod
 1112    FORMAT(2A4,4A6,20A12)
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
-      ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
-      ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
+      ZEROS(NY,NX)  = ZERO*DH(NY,NX)*DV(NY,NX)
+      ZEROS2(NY,NX) = ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
       GroundSurfAzimuth_col(NY,NX)     = ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)   = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
@@ -644,11 +650,11 @@ module StartsMod
       ENDIF
 
 !    compute incident sky angle at ground surface
-      SineGrndSlope_col(NY,NX)=SLOPE(0,NY,NX)    !this is exact
-      CosineGrndSlope_col(NY,NX)=SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
+      SineGrndSlope_col(NY,NX)   = SLOPE(0,NY,NX)    !this is exact
+      CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
       D240: DO N=1,NumOfSkyAzimuSects
-        DGAZI=COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
-        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
+        DGAZI           = COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
+        OMEGAG(N,NY,NX) = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
           SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
       ENDDO D240
 !     compute ground surface elevation
@@ -716,9 +722,9 @@ module StartsMod
   !     IF(NHE.GT.NHW)NDIM=NDIM+1
   !     IF(NVS.GT.NVN)NDIM=NDIM+1
   !     XDIM=1.0/NDIM
-  ZERO=1.0E-15_r8
-  ZERO2=1.0E-08_r8
-  TAREA=0.0_r8  !land scape area
+  ZERO  = 1.0E-15_r8
+  ZERO2 = 1.0E-08_r8
+  TAREA = 0.0_r8  !land scape area
   !
   !     INITIALIZE MASS BALANCE CHECKS
   !
@@ -821,7 +827,7 @@ module StartsMod
   TLEX(:,:)                      = 0.0_r8
   TSHX(:,:)                      = 0.0_r8
   Eco_NEE_col(:,:)               = 0.0_r8
-  CanH2OHeldVg(:,:)              = 0.0_r8
+  CanH2OHeldVg_col(:,:)              = 0.0_r8
   CanopyLeafArea_col(:,:)        = 0.0_r8
   StemArea_col(:,:)              = 0.0_r8
   PrecIntceptByCanopy_col(:,:)   = 0.0_r8

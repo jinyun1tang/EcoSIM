@@ -2083,9 +2083,8 @@ module PlantBranchMod
 !     GROLM,GROLC=maximum,actual grain fill rate
 !     MaxChemElmRsrv2Grain,ChemElmRsrv2Grain(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
-    IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*CNGR(NZ) &
-      *GrainStrutElms_brch(ielmc,NB,NZ).OR.GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM &
-      *CPGR(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
+    IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*CNGR(NZ)*GrainStrutElms_brch(ielmc,NB,NZ) &
+      .OR.GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM*CPGR(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
       GROLC=0._r8
     ELSE
       GROLC=GROLM
@@ -2111,9 +2110,9 @@ module PlantBranchMod
         +SETN*StalkRsrvElms_brch(ielmc,NB,NZ))
       ZNPGP=StalkRsrvElms_brch(ielmp,NB,NZ)/(StalkRsrvElms_brch(ielmp,NB,NZ) &
         +SETP*StalkRsrvElms_brch(ielmc,NB,NZ))
-      ZPGRN=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGN))
-      ZPGRP=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
-      ChemElmRsrv2Grain(ielmn)=AMIN1(MaxChemElmRsrv2Grain*CNGR(NZ) &
+      ZPGRN                    = ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGN))
+      ZPGRP                    = ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
+      ChemElmRsrv2Grain(ielmn) = AMIN1(MaxChemElmRsrv2Grain*CNGR(NZ) &
         ,AZMAX1(StalkRsrvElms_brch(ielmn,NB,NZ)*ZPGRN) &
         ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CNGR(NZ) &
         -GrainStrutElms_brch(ielmn,NB,NZ))

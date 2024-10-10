@@ -1,7 +1,10 @@
 module RunoffBalMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  USE EcoSimSumDataType
   use minimathmod, only : AZMAX1
+  use EcoSiMParDataMod    , only : micpar  
+  use EcoSIMConfig, only : jcplx => jcplxc  
+  use EcosimConst, only : patomw,natomw
+  USE EcoSimSumDataType
   USE ChemTranspDataType
   use GridConsts
   use SnowDataType
@@ -15,9 +18,7 @@ module RunoffBalMod
   USE GridDataType
   use EcoSIMCtrlMod
   use ElmIDMod   
-  use EcoSiMParDataMod    , only : micpar  
-  use EcoSIMConfig, only : jcplx => jcplxc  
-  use EcosimConst, only : patomw,natomw
+  use SoilHeatDatatype
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -50,7 +51,7 @@ implicit none
     N2=NY
     D9980: DO N=FlowDirIndicator(NY,NX),3
       D9975: DO NN=1,2
-        IF(N.EQ.iewstdir)THEN
+        IF(N.EQ.iEastWestDirection)THEN
           !east-west direction
           IF(NN.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
@@ -75,7 +76,7 @@ implicit none
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.insthdir)THEN
+        ELSEIF(N.EQ.iNorthSouthDirection)THEN
           !north-south direction
           IF(NN.EQ.1)THEN
             IF(NY.EQ.NVS)THEN
@@ -100,7 +101,7 @@ implicit none
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.ivertdir)THEN
+        ELSEIF(N.EQ.iVerticalDirection)THEN
           !vertical direction
           IF(NN.EQ.1)THEN
             IF(L.EQ.NL(NY,NX))THEN
@@ -162,16 +163,17 @@ implicit none
 !     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
 !
-  IF(N.NE.ivertdir .AND. L.EQ.NU(NY,NX))THEN
+  IF(N.NE.iVerticalDirection .AND. L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
-    WQRN=XN*Wat2GridBySurfRunoff(N,NN,N5,N4)
-    QRunSurf_col(N2,N1)=QRunSurf_col(N2,N1)+WQRN
+    WQRN                = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)
+    QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
+    
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
-      CRUN=CRUN-WQRN
-      Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRN
-      HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
-      HQRN=XN*Heat2GridBySurfRunoff(N,NN,N5,N4)
-      HeatOut_lnds=HeatOut_lnds-HQRN
+      CRUN                     = CRUN-WQRN
+      Qrunoff_CumYr_col(NY,NX) = Qrunoff_CumYr_col(NY,NX)-WQRN
+      HQRN                     = XN*HeatXGridBySurfRunoff_2DH(N,NN,N5,N4)
+      HeatOut_lnds             = HeatOut_lnds-HQRN
+      HeatRunSurf_col(N2,N1)   = HeatRunSurf_col(N2,N1)+HQRN
 !
 !     RUNOFF BOUNDARY FLUXES OF C, N AND P
 !
@@ -199,13 +201,13 @@ implicit none
       TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-CXR-OMRof(ielmc)-OMRof(idom_acetate)
       TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZXR-OMRof(ielmn)-ZGR
       TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
-      HydroSufDOCFlx_col(NY,NX)=-OMRof(ielmc)-OMRof(idom_acetate)
-      HydroSufDICFlx_col(NY,NX)=-CXR
-      HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
-      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
-      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
-      OXR=XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
+      HydroSufDOCFlx_col(NY,NX)       = -OMRof(ielmc)-OMRof(idom_acetate)
+      HydroSufDICFlx_col(NY,NX)       = -CXR
+      HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
+      HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
+      HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
+      HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
+      OXR                             = XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
       HGR=XN*trcg_FloXSurRunoff_2D(idg_H2,N,NN,N5,N4)
       H2GOU=H2GOU+HGR
@@ -272,8 +274,7 @@ implicit none
 !       XQR*=solute in runoff from TranspSalt.f
 !       ECNDQ=electrical conductivity of runoff
 !       where are those coefficients from?
-        WX=Wat2GridBySurfRunoff(N,NN,N5,N4)
-        WX=Wat2GridBySurfRunoff(N,NN,N5,N4)
+        WX=XGridSurfRunoff_2DH(N,NN,N5,N4)
         IF(ABS(WX).GT.ZEROS(N5,N4))THEN
           ECHY=0.337_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Hp,N,NN,N5,N4)/WX)
           ECOH=0.192_r8*AZMAX1(trc_salt_rof_bounds(idsalt_OH,N,NN,N5,N4)/WX)
@@ -305,9 +306,9 @@ implicit none
 !
       IF(N.NE.3.AND.iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
         IF(ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
-          ER=XN*cumSedErosion(N,NN,N5,N4)
-          TSedmErossLoss_lnds=TSedmErossLoss_lnds-ER
-          SedmErossLoss_CumYr_col(NY,NX)=SedmErossLoss_CumYr_col(NY,NX)-ER
+          ER                             = XN*cumSedErosion(N,NN,N5,N4)
+          TSedmErossLoss_lnds            = TSedmErossLoss_lnds-ER
+          SedmErossLoss_CumYr_col(NY,NX) = SedmErossLoss_CumYr_col(NY,NX)-ER
 !
 !
 !         RUNOFF BOUNDARY FLUXES OF ORGANIC MATTER FROM EROSION
@@ -481,7 +482,7 @@ implicit none
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
 !     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
-  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.ivertdir)THEN
+  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.iVerticalDirection)THEN
     HeatOut_lnds=HeatOut_lnds-XN*HeatFlow2Soil_3D(N,N6,N5,N4)
     WO=XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4))   !<0, going out grid
 
