@@ -30,6 +30,7 @@ implicit none
   real(r8) :: atm_co2_fix=-100._r8
   real(r8) :: atm_ch4_fix=-100._r8
   real(r8) :: atm_n2o_fix=-100._r8
+  character(len=256) :: warming_exp=''
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in

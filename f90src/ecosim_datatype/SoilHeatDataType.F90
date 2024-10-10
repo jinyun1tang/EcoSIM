@@ -21,8 +21,10 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
   real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model 
-  real(r8),target,allocatable ::  THeatFlow2Soil_vr(:,:,:)              !hourly heat flux into soil layer  MJ m-3
-  real(r8),target,allocatable ::  tHeatUptk_col(:,:)
+  real(r8),target,allocatable ::  THeatFlow2Soil_vr(:,:,:)              !hourly heat flux into soil layer  [MJ m-3]
+  real(r8),target,allocatable ::  tHeatUptk_col(:,:)                 !Heat utake by plant through transpiration [MJ/d2/h] 
+  real(r8),target,allocatable ::  HeatDrain_col(:,:)                 !heat loss through drainage [MJ/d2/h]
+  real(r8),target,allocatable ::  HeatRunSurf_col(:,:)               !heat loss through surface runoff [MJ/d2/h]
 !----------------------------------------------------------------------
 
 contains
@@ -43,6 +45,8 @@ contains
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond=0._r8
   allocate(THeatFlow2Soil_vr(JZ,JY,JX));    THeatFlow2Soil_vr=0._r8  
   allocate(tHeatUptk_col(JY,JX));   tHeatUptk_col=0._r8
+  allocate(HeatDrain_col(JY,JX));  HeatDrain_col = 0._r8
+  allocate(HeatRunSurf_col(JY,JX)); HeatRunSurf_col=0._r8
   end subroutine InitSoilHeatData
 
 !----------------------------------------------------------------------
@@ -62,6 +66,8 @@ contains
   call destroy(DenomSolidThermCond)
   call destroy(THeatFlow2Soil_vr)  
   call destroy(tHeatUptk_col)
+  call destroy(HeatDrain_col)
+  call destroy(HeatRunSurf_col)
   end subroutine DestructSoilHeatData
 
 end module SoilHeatDatatype

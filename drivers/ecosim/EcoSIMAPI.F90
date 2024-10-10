@@ -1,18 +1,20 @@
 module EcoSIMAPI
   USE EcoSIMCtrlDataType
-  use timings         , only : start_timer, end_timer
-  use ErosionMod      , only : erosion
-  use Hour1Mod        , only : hour1
-  use RedistMod       , only : redist
-  use GeochemAPI      , only : soluteModel
-  use PlantMod        , only : PlantModel
-  use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
-  use TranspNoSaltMod , only : TranspNoSalt
-  use TranspSaltMod   , only : TranspSalt
-  use SoilBGCDataType , only : trc_soHml_vr,trc_solml_vr
-  use TracerIDMod     , only : ids_NO2B,ids_NO2,idg_O2
+  use timings,         only: start_timer,        end_timer
+  use ErosionMod,      only: erosion
+  use Hour1Mod,        only: hour1
+  use RedistMod,       only: redist
+  use GeochemAPI,      only: soluteModel
+  use PlantMod,        only: PlantModel
+  use MicBGCAPI,       only: MicrobeModel,       MicAPI_Init,      MicAPI_cleanup
+  use TranspNoSaltMod, only: TranspNoSalt
+  use TranspSaltMod,   only: TranspSalt
+  use SoilBGCDataType, only: trc_soHml_vr,       trc_solml_vr
+  use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
+  use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
+  use WatsubMod,       only: watsub
   use EcoSIMCtrlMod  
-  use WatsubMod    , only : watsub
+  use BalancesMod  
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -28,6 +30,8 @@ contains
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1
+
+  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
@@ -108,6 +112,8 @@ contains
   if(do_timing)call end_timer('REDIST',t1)
 334   FORMAT(A8)
 
+  call EndCheckBalances(I,J,NHW,NHE,NVN,NVS)
+
   end subroutine Run_EcoSIM_one_step
 ! ----------------------------------------------------------------------
  subroutine readnamelist(nml_buffer, case_name, prefix,LYRG,nmicbguilds)
@@ -149,7 +155,7 @@ contains
     atm_co2_fix,first_topou,first_pft
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date,do_timing
+    do_budgets,ref_date,start_date,do_timing,warming_exp
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -160,64 +166,66 @@ contains
   integer :: rc, fu
   integer :: nml_error
   integer :: year0
-  do_timing=.false.
-  continue_run=.false.
-  NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
-  NPYS=20   !number of cycles per NPX for gas flux calculations
+
+  do_timing    = .false.
+  continue_run = .false.
+  NPXS         = 30   !number of cycles per hour for water, heat, solute flux calcns
+  NPYS         = 20   !number of cycles per NPX for gas flux calculations
   
-  NCYC_LITR=20
-  NCYC_SNOW=20
-  grid_mode=3
-  iErosionMode=-1
-  visual_out =.false.
-  restart_out=.false.
-  do_budgets =.false.
-  plant_model=.true.
-  soichem_model=.true.
-  microbial_model=.true.
-  disp_planttrait=.false.
-  ref_date  = '18000101000000'   !place holder for future
-  start_date= '18000101000000'   !start date of the simulation, differ from the forcing date
-  finidat=' '
-  restartFileFullPath = ' '                   !contains the full pathname of the restart file
+  NCYC_LITR             = 20
+  NCYC_SNOW             = 20
+  grid_mode             = 3
+  iErosionMode          = -1
+  visual_out            = .false.
+  restart_out           = .false.
+  do_budgets            = .false.
+  plant_model           = .true.
+  soichem_model         = .true.
+  microbial_model       = .true.
+  disp_planttrait       = .false.
+  ref_date              = '18000101000000'   !place holder for future
+  start_date            = '18000101000000'   !start date of the simulation, differ from the forcing date
+  finidat               = ''
+  restartFileFullPath   = ''                 !contains the full pathname of the restart file
+  warming_exp           = ''
+  brnch_retain_casename = .false.
+  hist_yrclose          = .false.
 
-  brnch_retain_casename=.false.
-  hist_yrclose=.false.
+  forc_periods      = 0
+  forc_periods(1:9) = (/1980,1980,1,1981,1988,2,1989,2008,1/)
 
-  forc_periods=0
-  forc_periods(1:9)=(/1980,1980,1,1981,1988,2,1989,2008,1/)
+  num_of_simdays       = -1
+  do_year              = -1
+  do_doy               = 0
+  do_layer             = 1
+  salt_model           = .false.
+  laddband             = .false.
+  do_regression_test   = .false.
+  lverbose             = .false.
+  num_microbial_guilds = 1
+  do_bgcforc_write     = .false.
+  bgc_fname            = 'bbforc.nc'
+  do_instequil         = .false.
 
-  num_of_simdays=-1
-  do_year=-1
-  do_doy=0
-  do_layer=1
-  salt_model=.false.
-  laddband=.false.
-  do_regression_test=.false.
-  lverbose=.false.
-  num_microbial_guilds=1
-  do_bgcforc_write=.false.
-  bgc_fname='bbforc.nc'
-  do_instequil=.false.
-
-  clm_factor_in='NO'
-  pft_file_in=''
-  grid_file_in=''
-  pft_mgmt_in='NO'
-  clm_hour_file_in=''
-  clm_day_file_in=''
-  soil_mgmt_in='NO'
-  atm_ghg_in=''
-  aco2_ppm  = 280._r8
-  ach4_ppm  = 1.144_r8
-  an2o_ppm  = 0.270_r8
-  ao2_ppm   = 0.209e6_r8
-  an2_ppm   = 0.78e6_r8
-  anh3_ppm  = 5.e-3_r8
-  atm_co2_fix=-100._r8
-  atm_n2o_fix=-100._r8
-  atm_ch4_fix=-100._r8
-  first_topou=.false.
+  clm_factor_in    = 'NO'
+  pft_file_in      = ''
+  grid_file_in     = ''
+  pft_mgmt_in      = 'NO'
+  clm_hour_file_in = ''
+  clm_day_file_in  = ''
+  soil_mgmt_in     = 'NO'
+  atm_ghg_in       = ''
+  aco2_ppm         = 280._r8
+  ach4_ppm         = 1.144_r8
+  an2o_ppm         = 0.270_r8
+  ao2_ppm          = 0.209e6_r8
+  an2_ppm          = 0.78e6_r8
+  anh3_ppm         = 5.e-3_r8
+  atm_co2_fix      = -100._r8
+  atm_n2o_fix      = -100._r8
+  atm_ch4_fix      = -100._r8
+  first_topou      = .false.
+  
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading ecosim namelist ",nml_error,ioerror_msg
@@ -258,6 +266,8 @@ contains
   if(.not.soichem_model)then
     salt_model=.false.
   endif
+
+  call config_soil_warming(warming_exp)
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
@@ -266,27 +276,28 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use DayMod       , only : day
-  use ExecMod      , only : exec
-  use StarteMod    , only : starte
-  use StartqMod    , only : startq
-  use StartsMod    , only : starts
-  use VisualMod    , only : visual
-  use WthrMod      , only : wthr
-  use RestartMod   , only : restFile
-  use PlantInfoMod , only : ReadPlantInfo
-  use readsmod     , only : ReadClimSoilForcing
-  use YearMod, only : SetAnnualAccumlators  
-  use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
+  use data_kind_mod,   only: r8 => DAT_KIND_R8
+  use DayMod,          only: day
+  use ExecMod,         only: exec
+  use StarteMod,       only: starte
+  use StartqMod,       only: startq
+  use StartsMod,       only: starts
+  use VisualMod,       only: visual
+  use WthrMod,         only: wthr
+  use RestartMod,      only: restFile
+  use PlantInfoMod,    only: ReadPlantInfo
+  use readsmod,        only: ReadClimSoilForcing
+  use YearMod,         only: SetAnnualAccumlators
+  use timings,         only: init_timer,         start_timer, end_timer, end_timer_loop
+  use ForcWriterMod,   only: do_bgcforc_write,   WriteBBGCForc
+  use HistDataType,    only: hist_ecosim
+  use HistFileMod,     only: hist_update_hbuf,   hist_htapes_wrapup
+  use ClimReadMod,     only: read_soil_warming_Tref
   use EcoSIMCtrlMod
-  use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
   use GridConsts
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcoSIMConfig
-  use HistDataType , only : hist_ecosim
-  use HistFileMod  , only : hist_update_hbuf,hist_htapes_wrapup
 
   implicit none
   integer :: yearc, yeari
@@ -355,6 +366,12 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   endif
 
   iYearCurrent=frectyp%yearcur
+
+  if(check_Soil_Warming(iYearCurrent,1))then
+    call read_soil_warming_Tref(iYearCurrent,NHW,NHE,NVN,NVS)    
+
+    call set_soil_warming(iYearCurrent,NHW,NHE,NVN,NVS)
+  endif
   DazCurrYear=etimer%get_days_cur_year()
   DO I=1,DazCurrYear    
     IF(do_rgres .and. I.eq.LYRG)RETURN

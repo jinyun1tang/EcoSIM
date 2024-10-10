@@ -2,15 +2,16 @@ module HistDataType
 !
 ! this module is an intermediate step to support ascii output
 ! when output is done with netcdf, no id is needed.
-  use data_kind_mod,  only: r8 => DAT_KIND_R8
-  use data_const_mod, only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
-  use SoilBGCNLayMod,      only: SumMicbGroup, sumDOML, sumMicBiomLayL  
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use data_const_mod,   only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
+  use SoilBGCNLayMod,   only: SumMicbGroup,              sumDOML, sumMicBiomLayL
+  use UnitMod,          only: units
+  use MiniMathMod,      only: safe_adb,                  AZMAX1
+  use EcoSiMParDataMod, only: pltpar,                    micpar
   use GridConsts
   use GridMod
   use HistFileMod
-  use MiniMathMod, only : safe_adb,AZMAX1
   use ElmIDMod
-  use EcoSiMParDataMod, only : pltpar, micpar
   use GridDataType
   use EcoSIMCtrlDataType
   use EcosimConst
@@ -58,6 +59,7 @@ implicit none
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)   !
 
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
+  real(r8),pointer   :: h1D_Qdrain_col(:)          !drainage
   real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
@@ -89,7 +91,6 @@ implicit none
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
   real(r8),pointer   :: h1D_tLITR_C_col(:)      !tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_AMENDED_C_col(:)      !AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CO2_FLX_col(:)        !UCO2G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_C_col(:)        !tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_OMC_LITR_col(:)       !SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
   real(r8),pointer   :: h1D_OMN_LITR_col(:)       !SoilOrgM_vr(ielmn,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual N
@@ -117,9 +118,10 @@ implicit none
   real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
   real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
   real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA_col(NY,NX)
+  real(r8),pointer   :: h1D_PATM_col(:)           !atmospheric pressure
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK_col(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm_col(NY,NX)/secs1hour
-  real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec_col(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
   real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SOIL_H_col(:)         !HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -181,8 +183,8 @@ implicit none
   real(r8),pointer   :: h1D_acetate_litr_col(:)
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTCanopyGroth_pft(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
@@ -440,6 +442,7 @@ implicit none
   allocate(this%h1D_SUB_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DIP_FLX_col(:)=spval
   allocate(this%h1D_HeatFlx2Grnd_col(beg_col:end_col))     ;this%h1D_HeatFlx2Grnd_col(:)=spval
   allocate(this%h1D_Qinfl2soi_col(beg_col:end_col))     ;this%h1D_Qinfl2soi_col(:)=spval
+  allocate(this%h1D_Qdrain_col(beg_col:end_col))       ; this%h1D_Qdrain_col(:)=spval
   allocate(this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col)) ;this%h1D_tSALT_DISCHG_FLX_col(:)=spval
   allocate(this%h1D_SUR_DON_FLX_col(beg_col:end_col))    ;this%h1D_SUR_DON_FLX_col(:)=spval
   allocate(this%h1D_SUB_DON_FLX_col(beg_col:end_col))    ;this%h1D_SUB_DON_FLX_col(:)=spval
@@ -472,7 +475,6 @@ implicit none
   allocate(this%h1D_TEMP_SNOW_col(beg_col:end_col))       ;this%h1D_TEMP_SNOW_col(:)=spval
 
   allocate(this%h1D_AMENDED_C_col(beg_col:end_col))       ;this%h1D_AMENDED_C_col(:)=spval
-  allocate(this%h1D_CO2_FLX_col(beg_col:end_col))         ;this%h1D_CO2_FLX_col(:)=spval
   allocate(this%h1D_tMICRO_C_col(beg_col:end_col))        ;this%h1D_tMICRO_C_col(:)=spval
   allocate(this%h1D_tSoilOrgC_col(beg_col:end_col))       ;this%h1D_tSoilOrgC_col(:)=spval
   allocate(this%h1D_tSoilOrgN_col(beg_col:end_col))       ;this%h1D_tSoilOrgN_col(:)=spval
@@ -500,6 +502,7 @@ implicit none
   allocate(this%h1D_NH3_LITR_col(beg_col:end_col))        ;this%h1D_NH3_LITR_col(:)=spval
   allocate(this%h1D_SOL_RADN_col(beg_col:end_col))        ;this%h1D_SOL_RADN_col(:)=spval
   allocate(this%h1D_AIR_TEMP_col(beg_col:end_col))        ;this%h1D_AIR_TEMP_col(:)=spval
+  allocate(this%h1D_PATM_col(beg_col:end_col))            ;this%h1D_PATM_col(:)=spval
   allocate(this%h1D_HUM_col(beg_col:end_col))             ;this%h1D_HUM_col(:)=spval
   allocate(this%h1D_WIND_col(beg_col:end_col))            ;this%h1D_WIND_col(:)=spval
   allocate(this%h1D_PREC_col(beg_col:end_col))            ;this%h1D_PREC_col(:)=spval
@@ -921,6 +924,11 @@ implicit none
   call hist_addfld1d(fname='Qinfl2soi_col',units='mm H2O/hr',avgflag='A',&
     long_name='Water flux into the ground',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_Qdrain_col(beg_col:end_col)
+  call hist_addfld1d(fname='Qdrain_col',units='mm H2O/hr',avgflag='A',&
+    long_name='Drainage water flux out of the soil column',ptr_col=data1d_ptr)      
+
+
   IF(salt_model)THEN
     data1d_ptr => this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col) 
     call hist_addfld1d(fname='tSALT_DISCHG_FLX',units='mol/m2/hr',avgflag='A',&
@@ -1003,10 +1011,6 @@ implicit none
   call hist_addfld1d(fname='TEMP_SNOW',units='oC',avgflag='A',&
     long_name='First snow layer temperature',ptr_col=data1d_ptr)      
     
-  data1d_ptr => this%h1D_CO2_FLX_col(beg_col:end_col)  
-  call hist_addfld1d(fname='CO2_FLX',units='gC/m2/hr',avgflag='A',&
-    long_name='total soil CO2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
-
   data1d_ptr => this%h1D_OMC_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='Surf_LitrC',units='gC/m2',avgflag='A',&
     long_name='total litter residual C, including microbes',ptr_col=data1d_ptr)      
@@ -1090,6 +1094,10 @@ implicit none
   data1d_ptr => this%h1D_AIR_TEMP_col(beg_col:end_col)      
   call hist_addfld1d(fname='AIR_TEMP',units='oC',avgflag='A',&
     long_name='air temperature',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_PATM_col(beg_col:end_col)      
+  call hist_addfld1d(fname='PATM',units='kPa',avgflag='A',&
+    long_name='atmospheric pressure',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_HUM_col(beg_col:end_col)    
   call hist_addfld1d(fname='HUM',units='kPa',avgflag='A',&
@@ -1181,11 +1189,11 @@ implicit none
 
   data1d_ptr => this%h1D_tSWC_col(beg_col:end_col)  
   call hist_addfld1d(fname='tSWC',units='mmH2O/m2',avgflag='A', &
-    long_name='column integrated water content (exclude snow)',ptr_col=data1d_ptr)        
+    long_name='column integrated water content (include snow)',ptr_col=data1d_ptr)        
 
   data1d_ptr => this%h1D_tHeat_col(beg_col:end_col)
   call hist_addfld1d(fname='tSHeat',units='MJ/m2',avgflag='A', &
-    long_name='column integrated heat content (exclude snow)',ptr_col=data1d_ptr)        
+    long_name='column integrated heat content (include snow)',ptr_col=data1d_ptr)        
 
   data1d_ptr => this%h1D_SNOWPACK_col(beg_col:end_col)      
   call hist_addfld1d(fname='SNOWPACK',units='mmH2O/m2',&
@@ -1237,7 +1245,7 @@ implicit none
     long_name='total sediment subsurface flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_DISCHG_FLX_col(beg_col:end_col)   
-  call hist_addfld1d(fname='DISCHG_FLX',units='mmH2O/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='Qdischarge_flx',units='mmH2O/m2/hr',avgflag='A',&
     long_name='landscape water discharge',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc)       
@@ -2208,6 +2216,7 @@ implicit none
       this%h1D_SUB_DIP_FLX_col(ncol)      = HydroSubsDIPFlx_col(NY,NX)/TAREA  
       this%h1D_HeatFlx2Grnd_col(ncol)     = HeatFlx2Grnd_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Qdrain_col(ncol)           = m2mm*QDrain_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SUR_DON_FLX_col(ncol)      = HydroSufDONFlx_CumYr_col(NY,NX)/TAREA
       this%h1D_SUB_DON_FLX_col(ncol)      = HydroSubsDONFlx_col(NY,NX)/TAREA
       this%h1D_tSALT_DISCHG_FLX_col(ncol) = HydroIonFlx_CumYr_col(NY,NX)/TAREA
@@ -2247,7 +2256,6 @@ implicit none
       this%h1D_tLITR_C_col(ncol) = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       this%h1D_AMENDED_C_col(ncol)        = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_CO2_FLX_col(ncol)          = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgC_col(ncol)        = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgN_col(ncol)        = tSoilOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2272,12 +2280,12 @@ implicit none
       this%h1D_ECO_ET_col(ncol)           = m2mm*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)         = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)         = trc_solcl_vr(idg_NH3,0,NY,NX)
-      this%h1D_SOL_RADN_col(ncol)         = RadSWSolarBeam_col(NY,NX)*MJ2W*86400.e-6_r8
+      this%h1D_SOL_RADN_col(ncol)         = RadSWSolarBeam_col(NY,NX)*units%get_SecondsPerDay()
       this%h1D_AIR_TEMP_col(ncol)         = TCA_col(NY,NX)
       this%h1D_HUM_col(ncol)              = VPK_col(NY,NX)
-      
+      this%h1D_PATM_col(ncol)             = PBOT_col(NY,NX)
       this%h1D_WIND_col(ncol)            = WindSpeedAtm_col(NY,NX)/secs1hour
-      this%h1D_PREC_col(ncol)            = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_PREC_col(ncol)            = (RainFalPrec(NY,NX)+SnoFalPrec_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_RN_col(ncol)         = HeatByRadiation_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_LE_col(ncol)         = HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_H_col(ncol)          = HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -2396,7 +2404,7 @@ implicit none
         this%h2D_VSICE_vr  (ncol,L)       = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)           = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_PsiO_vr(ncol,L)          = PSISoilOsmotic_vr(L,NY,NX)
-        this%h2D_RootH2OUP_vr(ncol,L)     = GridPlantRootH2OUptake_vr(L,NY,NX)
+        this%h2D_RootH2OUP_vr(ncol,L)     = TPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr(ncol,L)=  safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)),&
                                                VLSoilMicPMass_vr(L,NY,NX))
@@ -2500,8 +2508,8 @@ implicit none
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)        = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_LE_ptc(nptc)        = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
         this%h1D_CAN_TEMPFN_ptc(nptc)    = fTCanopyGroth_pft(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec

@@ -323,7 +323,7 @@ module TranspSaltMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
+    FLWU(L,NY,NX)=TPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
 
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
@@ -398,7 +398,7 @@ module TranspSaltMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !
-      IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
+      IF(SnoFalPrec_col(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
         .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
   !     there is snowpack
 

@@ -35,6 +35,7 @@ implicit none
     procedure, public :: Kelvin2Celcius
     procedure, public :: Fahrenheit2Celcius
     procedure, public :: Celcius2Fahrenheit
+    procedure, public :: get_SecondsPerDay
   end type unit_type
 
   type(unit_type), public, target :: units
@@ -79,6 +80,15 @@ contains
   endif
 
   end function Celcius2Kelvin
+!------------------------------------------------------------------------
+  elemental function get_SecondsPerDay(this)result(ans)
+  implicit none
+  class(unit_type), intent(in) :: this
+  real(r8) :: ans
+
+  ans = this%day2seconds
+
+  end function get_SecondsPerDay
 !------------------------------------------------------------------------
   elemental function Kelvin2Celcius(this,TK)result(TC)
   implicit none

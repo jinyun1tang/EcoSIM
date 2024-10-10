@@ -96,9 +96,6 @@ module RedistMod
     D9990: DO NY=NVN,NVS
       TXCO2(NY,NX)        = 0.0_r8
       DORGE(NY,NX)        = 0.0_r8
-      QRunSurf_col(NY,NX) = 0.0_r8
-
-
       call AddFlux2SurfaceResidue(I,J,NY,NX)
 !
       call SinkChemicals(NY,NX)
@@ -123,11 +120,11 @@ module RedistMod
 
       call SoilErosion(NY,NX,DORGE)
 !
-      call DiagSnowChemMass(I,J,NY,NX)
+      call DiagSnowChemMass(I,J,NY,NX,HeatStore_col(NY,NX))
 !
       call LitterLayerSummary(NY,NX)
 
-      call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP_vr)    
+      call update_physVar_Profile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
 
       call UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,TXCO2,DORGE)
 !
@@ -230,7 +227,7 @@ module RedistMod
     DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
     NatWtblDepz_col(NY,NX)=DCORPW
     ExtWaterTablet0(NY,NX)=NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
-    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.iSoilDisturbType_col(I,NY,NX).EQ.24)THEN
@@ -250,10 +247,10 @@ module RedistMod
 ! switched on for change of water table due to discharge/drainage
 ! why 0.00167, time relaxization constant, ?
 ! 4 is mobile tile drainge.
-  IF(IDWaterTable(NY,NX).EQ.2.OR.IDWaterTable(NY,NX).EQ.4)THEN
-    ExtWaterTable(NY,NX)=ExtWaterTable(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(ExtWaterTable(NY,NX)-ExtWaterTablet0(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+  IF(IDWaterTable(NY,NX).EQ.2 .OR. IDWaterTable(NY,NX).EQ.4)THEN
+    ExtWaterTable_col(NY,NX)=ExtWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+      -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTablet0(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+    ExtWaterTable_col(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
   
   IF(IDWaterTable(NY,NX).EQ.4)THEN
@@ -285,7 +282,7 @@ module RedistMod
 
   if(lverb)write(*,*)'HandleSurfaceBoundary'
 
-  call UpdateLitRPhys(I,J,NY,NX,TWat2GridBySurfRunoff(NY,NX),THeat2GridBySurfRunoff(NY,NX),&
+  call UpdateLitRPhys(I,J,NY,NX,TXGridSurfRunoff_2DH(NY,NX),THeatXGridBySurfRunoff_2DH(NY,NX),&
     HeatStore_lnd,HEATIN_lnd)
 
   do idg=idg_beg,idg_NH3-1
@@ -349,15 +346,16 @@ module RedistMod
   CEVAP                    = CEVAP-WO
   QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)   = -WO
-  QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   QDischar_col(NY,NX)      = QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)
   H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  QDrain_col(NY,NX)        = QDrain_col(NY,NX)+WaterFlowSoiMicP_3D(3,NK(NY,NX),NY,NX)
+  QDrain_col(NY,NX)        = WaterFlowSoiMicP_3D(3,NK(NY,NX),NY,NX)
+  HeatDrain_col(NY,NX)     = HeatFlow2Soil_3D(3,NK(NY,NX),NY,NX)
+  QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PrecRainAndSurfirrig(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec(NY,NX)
-  HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+THFLXC(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PrecRainAndIrrig_col(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec_col(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+HeatFlx2Canopy_col(NY,NX)
 
   D5150: DO L=1,JS
     HEATIN_lnd=HEATIN_lnd+XPhaseChangeHeatL_snvr(L,NY,NX)
@@ -557,7 +555,7 @@ module RedistMod
   !     begin_execution
   !
   if(lverb)write(*,*)'OverlandFlow'
-  IF(ABS(TWat2GridBySurfRunoff(NY,NX)).GT.ZEROS(NY,NX))THEN
+  IF(ABS(TXGridSurfRunoff_2DH(NY,NX)).GT.ZEROS(NY,NX))THEN
     !
     !     DOC, DON, DOP
     !
@@ -713,12 +711,12 @@ module RedistMod
     tLitrOM_col(NE,NY,NX)=tLitrOM_col(NE,NY,NX)+litrOM_vr(NE,0,NY,NX)
   ENDDO
   !water mass 
-  WS=CanH2OHeldVg(NY,NX)+CanWat_col(NY,NX)+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
-  WatMassStore_lnd=WatMassStore_lnd+WS
-  WatMass_col(NY,NX)=WatMass_col(NY,NX)+WS
-  HeatStore_col(NY,NX)=HeatStore_col(NY,NX)+TEngyCanopy_col(NY,NX)
-  HeatStore_lnd=HeatStore_lnd+TEngyCanopy_col(NY,NX)
-  CS                  = trc_solml_vr(idg_CO2,0,NY,NX)+trc_solml_vr(idg_CH4,0,NY,NX)
+  WS                   = CanH2OHeldVg_col(NY,NX)+CanWat_col(NY,NX)+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
+  WatMassStore_lnd     = WatMassStore_lnd+WS
+  WatMass_col(NY,NX)   = WatMass_col(NY,NX)+WS
+  HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+CanopyHeatStor_col(NY,NX)
+  HeatStore_lnd        = HeatStore_lnd+CanopyHeatStor_col(NY,NX)
+  CS                   = trc_solml_vr(idg_CO2,0,NY,NX)+trc_solml_vr(idg_CH4,0,NY,NX)
   TGasC_lnd           = TGasC_lnd+CS
   DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+CS
   HS                  = trc_solml_vr(idg_H2,0,NY,NX)
@@ -748,9 +746,9 @@ module RedistMod
   POP=patomw*(trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)+trcp_saltpml_vr(idsp_FePO4,0,NY,NX) &
     +trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX))+2._r8*patomw*trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX) &
     +3._r8*patomw*trcp_saltpml_vr(idsp_HA,0,NY,NX)
-  TDisolPi_lnd=TDisolPi_lnd+POS+POX+POP
-  tHxPO4_col(NY,NX)=tHxPO4_col(NY,NX)+POX
-  tXPO4_col(NY,NX)=tXPO4_col(NY,NX)+POP
+  TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
+  tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX
+  tXPO4_col(NY,NX)  = tXPO4_col(NY,NX)+POP
 
   IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TDisolPi_lnd)
 
@@ -783,10 +781,12 @@ module RedistMod
   UION(NY,NX)=UION(NY,NX)+SSS
   end subroutine DiagSurfLitRLayerSalt
 !------------------------------------------------------------------------------------------
-  subroutine update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP_vr)    
+  subroutine update_physVar_Profile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
   !     WATER, ICE, HEAT, TEMPERATUR
   !
+  use PerturbationMod, only : check_Soil_Warming,is_warming_layerL
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
   REAL(R8),INTENT(OUT) :: DVLiceMicP_vr(JZ)  !change in ice volume
@@ -796,7 +796,11 @@ module RedistMod
   real(r8) :: TVHeatCapacitySoilM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY
   real(r8) :: VOLWXX,VOLIXX,VHeatCapacityX,WS,HS
   real(r8) :: DVLWatMicP_vr(JZ,JY,JX)   !change in water volume
-  integer :: L
+  integer :: L,it
+  logical :: do_warming
+
+  do_warming=check_Soil_Warming(iYearCurrent,I)
+  it=(I-1)*24+J
 
   if(lverb)write(*,*)'update_physVar_Profile'
   TVHeatCapacity      = 0.0_r8
@@ -815,9 +819,9 @@ module RedistMod
     VOLIXX         = VLiceMicP_vr(L,NY,NX)
     !micropore
     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
-      +WatIceThawMicP_vr(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
+      +WatIceThawMicP_vr(L,NY,NX)+TPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
     VLWatMicPX_vr(L,NY,NX)=VLWatMicPX_vr(L,NY,NX)+TWatFlowCellMicPX_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
-      +WatIceThawMicP_vr(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
+      +WatIceThawMicP_vr(L,NY,NX)+TPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
 
     !do a numerical correction
     VLWatMicPX_vr(L,NY,NX) = AMIN1(VLWatMicP_vr(L,NY,NX),VLWatMicPX_vr(L,NY,NX)+0.01_r8*(VLWatMicP_vr(L,NY,NX)-VLWatMicPX_vr(L,NY,NX)))
@@ -869,6 +873,11 @@ module RedistMod
     !
     TKSpre=TKS_vr(L,NY,NX)
     IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_vr(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
+      if(do_warming .and. is_warming_layerL(L,NY,NX))then     
+        THeatFlow2Soil_vr(L,NY,NX) = THeatFlow2Soil_vr(L,NY,NX) + &
+          (TKS_ref_vr(it,L,NY,NX)-TKS_vr(L,NY,NX))*VHeatCapacity_vr(L,NY,NX)
+      endif   
+
       TKS00=TKS_vr(L,NY,NX)
       TKS_vr(L,NY,NX)=(ENGY+THeatFlow2Soil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)

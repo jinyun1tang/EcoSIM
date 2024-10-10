@@ -50,11 +50,11 @@ module CanopyCondsMod
     ZERO                   => plt_site%ZERO,                 &
     AREA3                  => plt_site%AREA3,                &
     KoppenClimZone         => plt_site%KoppenClimZone,       &
-    SoiSurfRoughnesst0     => plt_site%SoiSurfRoughnesst0,   &
+    SoilSurfRoughnesst0_col     => plt_site%SoilSurfRoughnesst0_col,   &
     WindMesHeight          => plt_site%WindMesHeight,        &
     ZEROS                  => plt_site%ZEROS,                &
     NU                     => plt_site%NU,                   &
-    BndlResistAboveCanG    => plt_ew%BndlResistAboveCanG,    &
+    AbvCanopyBndlResist_col    => plt_ew%AbvCanopyBndlResist_col,    &
     ZERO4PlantDisplace_col => plt_ew%ZERO4PlantDisplace_col, &
     RoughHeight            => plt_ew%RoughHeight,            &
     RIB                    => plt_ew%RIB,                    &
@@ -94,19 +94,19 @@ module CanopyCondsMod
     IF(VLHeatCapSurfSnow_col.GT.VLHeatCapSnowMin_col)THEN
       RoughHeight=AMAX1(0.001_r8,ZE,ZW)
     ELSE
-      RoughHeight=AMAX1(0.001_r8,ZE,SoiSurfRoughnesst0)
+      RoughHeight=AMAX1(0.001_r8,ZE,SoilSurfRoughnesst0_col)
     ENDIF
 !
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
 !
-!     BndlResistAboveCanG,RAM=biome canopy,minimum isothermal boundary layer resistance
+!     AbvCanopyBndlResist_col,RAM=biome canopy,minimum isothermal boundary layer resistance
 !     WindSpeedAtm_col=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm_col))
+    AbvCanopyBndlResist_col=AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm_col))
     RIB=1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2._r8*TairK)
   ELSE
-    BndlResistAboveCanG=RAM
+    AbvCanopyBndlResist_col=RAM
     RIB=0.0_r8
   ENDIF
   end associate

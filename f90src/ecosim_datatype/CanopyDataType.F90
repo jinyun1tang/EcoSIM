@@ -73,13 +73,13 @@ module CanopyDataType
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                         !fraction of radiation intercepted by ground surface, [-]
   real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                          !radiation intercepted by ground surface, [MJ m-2 h-1]
   real(r8),target,allocatable ::  LWRadCanGPrev(:,:)                        !longwave radiation emitted by canopy, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  LWRadGrnd(:,:)                        !longwave radiation emitted by ground surface, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  CanH2OHeldVg(:,:)                  !grid canopy held water content, [m3 d-2]
-  real(r8),target,allocatable ::  TFLWCI(:,:)                        !net ice transfer to canopy, [MJ d-2 t-1]
-  real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)              !grid net precipitation water interception to canopy, [MJ d-2 t-1]
+  real(r8),target,allocatable ::  LWRadGrnd(:,:)                          !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  CanH2OHeldVg_col(:,:)                   !canopy held water content, [m3 d-2]
+  real(r8),target,allocatable ::  TFLWCI(:,:)                             !net ice transfer to canopy, [MJ d-2 t-1]
+  real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)            !grid net precipitation water interception to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  EvapTransHeat_pft(:,:,:)                       !canopy latent heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  HeatXAir2PCan(:,:,:)               !air to canopy sensible heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  HeatStorCanP(:,:,:)                       !canopy storage heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatXAir2PCan_pft(:,:,:)               !air to canopy sensible heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatStorCanopy_pft(:,:,:)                       !canopy storage heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  ENGYX_pft(:,:,:)                       !canopy heat storage from previous time step, [MJ d-2]
   real(r8),target,allocatable ::  VHeatCapCanP_pft(:,:,:)                       !canopy heat capacity, [MJ d-2 K-1]
   real(r8),target,allocatable ::  PSICanopy_pft(:,:,:)                     !plant canopy total water potential , [Mpa]
@@ -90,9 +90,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  VapXAir2Canopy_pft(:,:,:)                !negative of canopy evaporation, [m2 d-2 h-1]
   real(r8),target,allocatable ::  CanopyWater_pft(:,:,:)                       !canopy water content associated with dry matter, [m3 d-2]
   real(r8),target,allocatable ::  QvET_col(:,:)                        !total canopy evaporation + transpiration, [m3 d-2]
-  real(r8),target,allocatable ::  VapXAir2CanG(:,:)                        !total canopy evaporation, [m3 d-2]
-  real(r8),target,allocatable ::  TEngyCanopy_col(:,:)                        !total canopy heat content, [MJ  d-2]
-  real(r8),target,allocatable ::  THFLXC(:,:)                        !total canopy heat flux, [MJ  d-2]
+  real(r8),target,allocatable ::  VapXAir2Canopy_col(:,:)                        !total canopy evaporation, [m3 d-2]
+  real(r8),target,allocatable ::  CanopyHeatStor_col(:,:)                        !total canopy heat content, [MJ  d-2]
+  real(r8),target,allocatable ::  HeatFlx2Canopy_col(:,:)                        !total canopy heat flux, [MJ  d-2]
   real(r8),target,allocatable ::  CanWat_col(:,:)                       !total canopy water content stored in dry matter, [m3 d-2]
   real(r8),target,allocatable ::  LWRadCanG(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWLeafAlbedo_pft(:,:,:)                        !canopy shortwave albedo , [-]
@@ -232,12 +232,12 @@ module CanopyDataType
   allocate(RadSWGrnd_col(JY,JX));        RadSWGrnd_col=0._r8
   allocate(LWRadCanGPrev(JY,JX));      LWRadCanGPrev=0._r8
   allocate(LWRadGrnd(JY,JX));      LWRadGrnd=0._r8
-  allocate(CanH2OHeldVg(JY,JX));      CanH2OHeldVg=0._r8
+  allocate(CanH2OHeldVg_col(JY,JX));      CanH2OHeldVg_col=0._r8
   allocate(TFLWCI(JY,JX));      TFLWCI=0._r8
   allocate(PrecIntceptByCanopy_col(JY,JX));       PrecIntceptByCanopy_col=0._r8
   allocate(EvapTransHeat_pft(JP,JY,JX));    EvapTransHeat_pft=0._r8
-  allocate(HeatXAir2PCan(JP,JY,JX));    HeatXAir2PCan=0._r8
-  allocate(HeatStorCanP(JP,JY,JX));    HeatStorCanP=0._r8
+  allocate(HeatXAir2PCan_pft(JP,JY,JX));    HeatXAir2PCan_pft=0._r8
+  allocate(HeatStorCanopy_pft(JP,JY,JX));    HeatStorCanopy_pft=0._r8
   allocate(ENGYX_pft(JP,JY,JX));    ENGYX_pft=0._r8
   allocate(VHeatCapCanP_pft(JP,JY,JX));    VHeatCapCanP_pft=0._r8
   allocate(PSICanopy_pft(JP,JY,JX));    PSICanopy_pft=0._r8
@@ -248,9 +248,9 @@ module CanopyDataType
   allocate(VapXAir2Canopy_pft(JP,JY,JX));    VapXAir2Canopy_pft=0._r8
   allocate(CanopyWater_pft(JP,JY,JX));    CanopyWater_pft=0._r8
   allocate(QvET_col(JY,JX));      QvET_col=0._r8
-  allocate(VapXAir2CanG(JY,JX));      VapXAir2CanG=0._r8
-  allocate(TEngyCanopy_col(JY,JX));      TEngyCanopy_col=0._r8
-  allocate(THFLXC(JY,JX));      THFLXC=0._r8
+  allocate(VapXAir2Canopy_col(JY,JX));      VapXAir2Canopy_col=0._r8
+  allocate(CanopyHeatStor_col(JY,JX));      CanopyHeatStor_col=0._r8
+  allocate(HeatFlx2Canopy_col(JY,JX));      HeatFlx2Canopy_col=0._r8
   allocate(CanWat_col(JY,JX));      CanWat_col=0._r8
   allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
   allocate(RadSWLeafAlbedo_pft(JP,JY,JX));     RadSWLeafAlbedo_pft=0._r8
@@ -389,12 +389,12 @@ module CanopyDataType
   call destroy(RadSWGrnd_col)
   call destroy(LWRadCanGPrev)
   call destroy(LWRadGrnd)
-  call destroy(CanH2OHeldVg)
+  call destroy(CanH2OHeldVg_col)
   call destroy(TFLWCI)
   call destroy(PrecIntceptByCanopy_col)
   call destroy(EvapTransHeat_pft)
-  call destroy(HeatXAir2PCan)
-  call destroy(HeatStorCanP)
+  call destroy(HeatXAir2PCan_pft)
+  call destroy(HeatStorCanopy_pft)
   call destroy(ENGYX_pft)
   call destroy(VHeatCapCanP_pft)
   call destroy(PSICanopy_pft)
@@ -405,9 +405,9 @@ module CanopyDataType
   call destroy(VapXAir2Canopy_pft)
   call destroy(CanopyWater_pft)
   call destroy(QvET_col)
-  call destroy(VapXAir2CanG)
-  call destroy(TEngyCanopy_col)
-  call destroy(THFLXC)
+  call destroy(VapXAir2Canopy_col)
+  call destroy(CanopyHeatStor_col)
+  call destroy(HeatFlx2Canopy_col)
   call destroy(CanWat_col)
   call destroy(LWRadCanG)
   call destroy(RadSWLeafAlbedo_pft)

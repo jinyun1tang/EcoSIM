@@ -45,6 +45,7 @@ implicit none
   public :: ReadClimNC    !read climate data
   public :: GetAtmGts
   public :: get_clm_years
+  public :: read_soil_warming_Tref
   contains
 
 !------------------------------------------------------------------------------------------
@@ -801,6 +802,13 @@ implicit none
     call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
     call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SWRad_hrly,fdatam)
 
+    call check_var(clm_nfid, 'PATM', vardesc, readvar,print_err=.false.)
+    if(readvar)then
+      call ncd_getvar(clm_nfid,'PATM',irec,fdatam); call reshape2(PBOT_hrly,fdatam)
+    else
+      PBOT_hrly=1.01325E+02_r8
+    endif
+
     call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
     call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
     call ncd_getvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
@@ -833,6 +841,7 @@ implicit none
         RAINH(J,I+1)= RAINH(J,I)
         SWRad_hrly(J,I+1)= SWRad_hrly(J,I)
         RadLWClm(J,I+1)= RadLWClm(J,I)
+        PBOT_hrly(J,I+1)=PBOT_hrly(J,I)
       ENDDO
     endif
 
@@ -1008,4 +1017,54 @@ implicit none
   endif
   return
   end function get_forc_step_type
+!-----------------------------------------------------------------------
+
+  subroutine read_soil_warming_Tref(year,NHW,NHE,NVN,NVS)
+  !
+  !Description
+  !read soil warming file
+  use abortutils,      only: destroy
+  use PerturbationMod, only: get_warming_fname
+  use GridMod,         only: get_col
+  implicit none
+  integer, intent(in) :: year
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+
+  character(len=256) :: fname
+  type(file_desc_t) :: ncid
+  type(Var_desc_t) :: vardesc   ! Output variable descriptor
+  logical           :: readvar   ! If variable exists or not
+  integer           :: nsteps,nlevs,ncol
+  integer           :: kk, icol, ny,nx, ll
+  real(r8), allocatable    :: data(:,:)  
+  
+  call get_warming_fname(year,fname)
+  !write(*,*)fname
+  call ncd_pio_openfile (ncid, trim(fname), ncd_nowrite)
+  call check_var(ncid, 'TEMP_vr', vardesc, readvar, print_err=.true.)
+  nsteps = get_dim_len(ncid,'time')
+  nlevs  = get_dim_len(ncid,'levsoi')
+  ncol   = get_dim_len(ncid,'column')
+  allocate(data(ncol,nlevs))
+
+  !write(*,*)nsteps,nlevs,ncol
+  do kk = 1,nsteps
+    call ncd_getvar(ncid,'TEMP_vr', kk, data)
+
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        icol=get_col(NY,NX)
+        TKS_ref_vr(kk,1:nlevs,NY,NX)=data(icol,1:nlevs)+TC2K
+      ENDDO
+    ENDDO  
+!    if(mod(kk,24*30)==0)then
+!      print*,kk/24,TKS_ref_vr(kk,1:3,1,1),data(1,1:3)
+!    endif
+  enddo
+  call ncd_pio_closefile(ncid)
+
+  call destroy(data)
+
+  end subroutine read_soil_warming_Tref
+
 end module ClimReadMod

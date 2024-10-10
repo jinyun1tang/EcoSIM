@@ -10,13 +10,13 @@ module LandSurfDataType
   __FILE__
   real(r8) :: ALTIG                             !altitude of landscape, [m]
 
-  real(r8),target,allocatable ::  SoiSurfRoughnesst0(:,:)                            !initial soil surface roughness height, [m]
+  real(r8),target,allocatable ::  SoilSurfRoughnesst0_col(:,:)                            !initial soil surface roughness height, [m]
   real(r8),target,allocatable ::  ZERO4PlantDisplace_col(:,:)                            !zero plane displacement height, [m]
   real(r8),target,allocatable ::  RoughHeight_col(:,:)                   !canopy surface roughness height, [m]
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)              ! soil surface roughness height for calculating runoff velocity, [m]
   real(r8),target,allocatable ::  WindMesHeight(:,:)                 !wind speed measurement height, [m]
   real(r8),target,allocatable ::  ALT(:,:)                           !altitude of grid cell, [m]
-  real(r8),target,allocatable ::  BndlResistAboveCanG(:,:)                           !isothermal boundary layer resistance, [h m-1]
+  real(r8),target,allocatable ::  AbvCanopyBndlResist_col(:,:)                           !isothermal boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
   real(r8),target,allocatable ::  ALTI(:,:)                          !altitude of landscape, [m]
   real(r8),target,allocatable ::  SineGrndSlope_col(:,:)                          !sine of slope, [-]
@@ -33,13 +33,13 @@ contains
   subroutine InitLandSurfData
 
   implicit none
-  allocate(SoiSurfRoughnesst0(JY,JX));          SoiSurfRoughnesst0=0._r8
+  allocate(SoilSurfRoughnesst0_col(JY,JX));          SoilSurfRoughnesst0_col=0._r8
   allocate(ZERO4PlantDisplace_col(JY,JX));          ZERO4PlantDisplace_col=0._r8
   allocate(RoughHeight_col(JY,JX));          RoughHeight_col=0._r8
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
   allocate(WindMesHeight(JY,JX));          WindMesHeight=0._r8
   allocate(ALT(JY,JX));         ALT=0._r8
-  allocate(BndlResistAboveCanG(JY,JX));         BndlResistAboveCanG=0._r8
+  allocate(AbvCanopyBndlResist_col(JY,JX));         AbvCanopyBndlResist_col=0._r8
   allocate(RIB(JY,JX));         RIB=0._r8
   allocate(ALTI(JY,JX));        ALTI=0._r8
   allocate(SineGrndSlope_col(JY,JX));        SineGrndSlope_col=0._r8
@@ -56,13 +56,13 @@ contains
   subroutine DestructLandSurfData
   use abortutils, only : destroy
   implicit none
-  call destroy(SoiSurfRoughnesst0)
+  call destroy(SoilSurfRoughnesst0_col)
   call destroy(ZERO4PlantDisplace_col)
   call destroy(RoughHeight_col)
   call destroy(SoiSurfRoughness)
   call destroy(WindMesHeight)
   call destroy(ALT)
-  call destroy(BndlResistAboveCanG)
+  call destroy(AbvCanopyBndlResist_col)
   call destroy(RIB)
   call destroy(ALTI)
   call destroy(SineGrndSlope_col)

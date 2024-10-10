@@ -1,5 +1,6 @@
 module ClimForcDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSIMCtrlMod, only : warming_exp
   use GridConsts
 implicit none
   character(len=*), private, parameter :: mod_filename = &
@@ -38,7 +39,7 @@ implicit none
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
   real(r8) :: RadLWClm(24,366)                     !longwave radiation (MJ m-2 h-1)
-
+  real(r8) :: PBOT_hrly(24,366)
   real(r8) :: DRAD(12)                          !change factor for radiation, [-]
   real(r8) :: DTMPX(12)                         !change factor for maximum temperature, [-]
   real(r8) :: DTMPN(12)                         !change factor for minimum temperature, [-]
@@ -48,6 +49,7 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
+  real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)
   real(r8),target,allocatable ::  WDPTHD(:,:,:)                      !
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
   real(r8),target,allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
@@ -58,11 +60,11 @@ implicit none
   real(r8),target,allocatable ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA_col(:,:)                           !air temperature, [oC]
-  real(r8),target,allocatable ::  TairK_col(:,:)                           !air temperature, [K]
+  real(r8),target,allocatable ::  TairK_col(:,:)                         !air temperature, [K]
   real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
-  real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
+  real(r8),target,allocatable ::  PBOT_col(:,:)                          !atmospheric pressure [kPa]
   real(r8),target,allocatable ::  DayLensCurr_col(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
@@ -74,15 +76,15 @@ implicit none
   real(r8),target,allocatable ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
   real(r8),target,allocatable ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
   real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
-!  real(r8),target,allocatable ::  PrecDaily_col(:,:)                          !total daily precipitation, [m d-1]
-  real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
-  real(r8),target,allocatable ::  TempOffset_col(:,:)                        !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
-  real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
-  real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
+!  real(r8),target,allocatable ::  PrecDaily_col(:,:)                !total daily precipitation, [m d-1]
+  real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                !sky longwave radiation , [MJ m-2 h-1]
+  real(r8),target,allocatable ::  TempOffset_col(:,:)                !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
+  real(r8),target,allocatable ::  PRECD_col(:,:)                     !direct precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PRECB_col(:,:)                         !indirect precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
-  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)                     !atmospheric gas concentration in g m-3
+  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)               !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
@@ -92,13 +94,13 @@ implicit none
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
-  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)                         !time of solar noon, [h]
-  real(r8),target,allocatable ::  RadSWDirect_col(:,:)                          !direct shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RadSWDiffus_col(:,:)                          !diffuse shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RadPARDirect_col(:,:)                          !direct PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  RadPARDiffus_col(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)                          !sine of solar angle, [-]
-  real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
+  real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
+  real(r8),target,allocatable ::  RadPARDirect_col(:,:)              !direct PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadPARDiffus_col(:,:)              !diffuse PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)          !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)    !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
@@ -113,17 +115,17 @@ implicit none
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  SnoFalPrec(:,:)                    !snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PrecRainAndSurfirrig(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecRainAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                          !precipitation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                          !precipitation  NH3 concentration, [g m-3]
-  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                          !precipitation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                 !precipitation  NH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                 !precipitation  NH3 concentration, [g m-3]
+  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                 !precipitation  NO3 concentration, [g m-3]
+  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)               !precipitation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
@@ -136,7 +138,7 @@ implicit none
   real(r8),target,allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
   real(r8),target,allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
   real(r8),target,allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                          !precipitation  CH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                 !precipitation  CH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
   real(r8),target,allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
@@ -159,7 +161,7 @@ implicit none
   real(r8),target,allocatable ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                         !precipitation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                !precipitation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
@@ -175,9 +177,13 @@ implicit none
   contains
 !----------------------------------------------------------------------
 
-  subroutine InitClimForcData
+  subroutine InitClimForcData()
   use TracerIDMod
   implicit none
+
+  if(len(trim(warming_exp))>10)then
+    allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
+  endif
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
@@ -193,7 +199,7 @@ implicit none
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK_col(JY,JX));         VPK_col=0._r8
-  allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
+  allocate(PBOT_col(JY,JX));        PBOT_col=1.01325E+02_r8
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
   allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
@@ -208,8 +214,8 @@ implicit none
 !  allocate(PrecDaily_col(JY,JX));        PrecDaily_col=0._r8
   allocate(SkyLonwRad_col(JY,JX));        SkyLonwRad_col=0._r8
   allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
-  allocate(PRECD(JY,JX));       PRECD=0._r8
-  allocate(PRECB(JY,JX));       PRECB=0._r8
+  allocate(PRECD_col(JY,JX));       PRECD_col=0._r8
+  allocate(PRECB_col(JY,JX));       PRECB_col=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
 
@@ -245,9 +251,9 @@ implicit none
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
-  allocate(SnoFalPrec(JY,JX));       SnoFalPrec=0._r8
+  allocate(SnoFalPrec_col(JY,JX));       SnoFalPrec_col=0._r8
   allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
-  allocate(PrecRainAndSurfirrig(JY,JX));       PrecRainAndSurfirrig=0._r8
+  allocate(PrecRainAndIrrig_col(JY,JX));       PrecRainAndIrrig_col=0._r8
   allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
@@ -323,7 +329,7 @@ implicit none
   call destroy(WindSpeedAtm_col)
   call destroy(VPA)
   call destroy(VPK_col)
-  call destroy(PBOT)
+  call destroy(PBOT_col)
   call destroy(DayLensCurr_col)
   call destroy(DayLenthPrev_col)
   call destroy(DayLenthMax)
@@ -338,14 +344,14 @@ implicit none
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)
-  call destroy(PRECD)
-  call destroy(PRECB)
+  call destroy(PRECD_col)
+  call destroy(PRECB_col)
   call destroy(CO2EI)
   call destroy(CCO2EI)
 
   call destroy(AtmGasCgperm3)
   call destroy(AtmGmms)
-
+  call destroy(TKS_ref_vr)
   call destroy(OXYE)
   call destroy(Z2OE)
   call destroy(Z2GE)
@@ -375,9 +381,9 @@ implicit none
   call destroy(TairKClimMean)
   call destroy(ATKS)
   call destroy(RainFalPrec)
-  call destroy(SnoFalPrec)
+  call destroy(SnoFalPrec_col)
   call destroy(PrecAtm_col)
-  call destroy(PrecRainAndSurfirrig)
+  call destroy(PrecRainAndIrrig_col)
   call destroy(EnergyImpact4Erosion)
   call destroy(PHR)
   call destroy(CN4RI)

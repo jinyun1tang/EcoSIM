@@ -32,7 +32,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepthInternalWTBL(:,:)            !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
-  real(r8),target,allocatable ::  ExtWaterTable(:,:)                !current external water table depth, elevation corrected [m]
+  real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                !current external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                        !external water table depth, [m]
   real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)                     !total energy impact for erosion
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                     !excess water+ice
@@ -84,8 +84,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WatMass_col(:,:)                !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  H2OLoss_CumYr_col(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  QDrain_col(:,:)                       !total water drainage below root zone, [m3 d-2]
-  real(r8),target,allocatable ::  Wat2GridBySurfRunoff(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  Heat2GridBySurfRunoff(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  XGridSurfRunoff_2DH(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  HeatXGridBySurfRunoff_2DH(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  QRunSurf_col(:,:)                         !runoff from surface water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QDischar_col(:,:)                !water discharge, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
@@ -132,7 +132,7 @@ module SoilWaterDataType
   allocate(DTBLD(JY,JX));       DTBLD=0._r8
   allocate(DepthInternalWTBL(JY,JX));       DepthInternalWTBL=0._r8
   allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
-  allocate(ExtWaterTable(JY,JX));       ExtWaterTable=0._r8
+  allocate(ExtWaterTable_col(JY,JX));       ExtWaterTable_col=0._r8
   allocate(NatWtblDepz_col(JY,JX));       NatWtblDepz_col=0._r8
   allocate(EnergyImpact4ErosionM(60,JY,JX));   EnergyImpact4ErosionM=0._r8
   allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
@@ -183,8 +183,8 @@ module SoilWaterDataType
   allocate(WatMass_col(JY,JX));       WatMass_col=0._r8
   allocate(H2OLoss_CumYr_col(JY,JX));       H2OLoss_CumYr_col=0._r8
   allocate(QDrain_col(JY,JX));      QDrain_col=0._r8
-  allocate(Wat2GridBySurfRunoff(2,2,JV,JH));      Wat2GridBySurfRunoff=0._r8
-  allocate(Heat2GridBySurfRunoff(2,2,JV,JH));     Heat2GridBySurfRunoff=0._r8
+  allocate(XGridSurfRunoff_2DH(2,2,JV,JH));      XGridSurfRunoff_2DH=0._r8
+  allocate(HeatXGridBySurfRunoff_2DH(2,2,JV,JH));     HeatXGridBySurfRunoff_2DH=0._r8
   allocate(QRunSurf_col(JY,JX));        QRunSurf_col=0._r8
   allocate(QDischar_col(JY,JX));       QDischar_col=0._r8
   allocate(QflxSurfRunoffM(60,2,2,JV,JH)); QflxSurfRunoffM=0._r8
@@ -219,7 +219,7 @@ module SoilWaterDataType
   call destroy(DTBLD)
   call destroy(DepthInternalWTBL)
   call destroy(ExtWaterTablet0)
-  call destroy(ExtWaterTable)
+  call destroy(ExtWaterTable_col)
   call destroy(NatWtblDepz_col)
   call destroy(EnergyImpact4ErosionM)
   call destroy(XVLMobileWaterLitRM)
@@ -271,8 +271,8 @@ module SoilWaterDataType
   call destroy(WatMass_col)
   call destroy(H2OLoss_CumYr_col)
   call destroy(QDrain_col)
-  call destroy(Wat2GridBySurfRunoff)
-  call destroy(Heat2GridBySurfRunoff)
+  call destroy(XGridSurfRunoff_2DH)
+  call destroy(HeatXGridBySurfRunoff_2DH)
   call destroy(QRunSurf_col)
   call destroy(QDischar_col)
   call destroy(QflxSurfRunoffM)

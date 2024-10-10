@@ -63,7 +63,7 @@ implicit none
   Eco_AutoR_CumYr_col(NY,NX)                          = plt_bgcr%Eco_AutoR_CumYr_col
   LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)     = plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)
   EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)   = plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)
-  CanH2OHeldVg(NY,NX)                                 = plt_ew%CanH2OHeldVg
+  CanH2OHeldVg_col(NY,NX)                                 = plt_ew%CanH2OHeldVg
   Eco_Heat_Sens_col(NY,NX)                            = plt_ew%Eco_Heat_Sens_col
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)
   H2OLoss_CumYr_col(NY,NX)                            = plt_ew%H2OLoss_CumYr_col
@@ -75,10 +75,10 @@ implicit none
   Eco_Heat_Grnd_col(NY,NX)                         = plt_ew%Eco_Heat_Grnd_col
   QvET_col(NY,NX)                                  = plt_ew%QvET_col
   LWRadCanG(NY,NX)                                 = plt_ew%LWRadCanG
-  VapXAir2CanG(NY,NX)                              = plt_ew%VapXAir2CanG
-  THFLXC(NY,NX)                                    = plt_ew%THFLXC
+  VapXAir2Canopy_col(NY,NX)                              = plt_ew%VapXAir2Canopy_col
+  HeatFlx2Canopy_col(NY,NX)                                    = plt_ew%HeatFlx2Canopy_col
   CanWat_col(NY,NX)                                = plt_ew%CanWat_col
-  TEngyCanopy_col(NY,NX)                           = plt_ew%TENGYC
+  CanopyHeatStor_col(NY,NX)                           = plt_ew%CanopyHeatStor_col
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) = plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)
   Canopy_NEE_col(NY,NX)                            = plt_bgcr%Canopy_NEE_col
 
@@ -119,7 +119,7 @@ implicit none
     REcoNH4DmndSoil_vr(L,NY,NX)        = plt_bgcr%REcoNH4DmndSoil_vr(L)
     REcoO2DmndResp_vr(L,NY,NX)         = plt_bgcr%REcoO2DmndResp_vr(L)
     THeatRootUptake_vr(L,NY,NX)        = plt_ew%THeatRootUptake_vr(L)
-    GridPlantRootH2OUptake_vr(L,NY,NX) = plt_ew%GridPlantRootH2OUptake_vr(L)
+    TPlantRootH2OUptake_vr(L,NY,NX) = plt_ew%TPlantRootH2OUptake_vr(L)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -208,7 +208,7 @@ implicit none
     CanopySeedNum_pft(NZ,NY,NX)         = plt_morph%CanopySeedNum_pft(NZ)
     HypoctoHeight_pft(NZ,NY,NX)         = plt_morph%HypoctoHeight_pft(NZ)
     HighTempLimitSeed_pft(NZ,NY,NX)     = plt_pheno%HighTempLimitSeed_pft(NZ)
-    HeatStorCanP(NZ,NY,NX)              = plt_ew%HeatStorCanP(NZ)
+    HeatStorCanopy_pft(NZ,NY,NX)              = plt_ew%HeatStorCanopy_pft(NZ)
     CanPHeight4WatUptake(NZ,NY,NX)      = plt_morph%CanPHeight4WatUptake(NZ)
     IsPlantActive_pft(NZ,NY,NX)         = plt_pheno%IsPlantActive_pft(NZ)
     iPlantState_pft(NZ,NY,NX)           = plt_pheno%iPlantState_pft(NZ)
@@ -257,7 +257,7 @@ implicit none
     SeedMeanLen_pft(NZ,NY,NX)                          = plt_morph%SeedMeanLen_pft(NZ)
     SeedAreaMean_pft(NZ,NY,NX)                         = plt_morph%SeedAreaMean_pft(NZ)
     SeedDepth_pft(NZ,NY,NX)                            = plt_morph%SeedDepth_pft(NZ)
-    HeatXAir2PCan(NZ,NY,NX)                            = plt_ew%HeatXAir2PCan(NZ)
+    HeatXAir2PCan_pft(NZ,NY,NX)                            = plt_ew%HeatXAir2PCan_pft(NZ)
     GrossResp_pft(NZ,NY,NX)                            = plt_bgcr%GrossResp_pft(NZ)
     GrossRespC_CumYr_pft(NZ,NY,NX)                     = GrossRespC_CumYr_pft(NZ,NY,NX)+GrossResp_pft(NZ,NY,NX)
     CanopyRespC_CumYr_pft(NZ,NY,NX)                    = plt_bgcr%CanopyRespC_CumYr_pft(NZ)
@@ -659,7 +659,7 @@ implicit none
   plt_site%NP                         = NP(NY,NX)
   plt_site%NU                         = NU(NY,NX)
   plt_site%OXYE                       = OXYE(NY,NX)
-  plt_ew%BndlResistAboveCanG          = BndlResistAboveCanG(NY,NX)
+  plt_ew%AbvCanopyBndlResist_col          = AbvCanopyBndlResist_col(NY,NX)
   plt_ew%RIB                          = RIB(NY,NX)
   plt_rad%SineSunInclAnglNxtHour_col  = SineSunInclAnglNxtHour_col(NY,NX)
   plt_rad%SineSunInclAngle_col        = SineSunInclAngle_col(NY,NX)
@@ -904,7 +904,7 @@ implicit none
   plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)=LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)
   plt_morph%StemArea_col=StemArea_col(NY,NX)
   plt_ew%Eco_Heat_Sens_col=Eco_Heat_Sens_col(NY,NX)
-  plt_ew%CanH2OHeldVg=CanH2OHeldVg(NY,NX)
+  plt_ew%CanH2OHeldVg=CanH2OHeldVg_col(NY,NX)
   plt_bgcr%Eco_NBP_CumYr_col=Eco_NBP_CumYr_col(NY,NX)
   plt_ew%Canopy_Heat_Latent_col=Canopy_Heat_Latent_col(NY,NX)
   plt_ew%Canopy_Heat_Sens_col=Canopy_Heat_Sens_col(NY,NX)
@@ -912,15 +912,15 @@ implicit none
   plt_ew%H2OLoss_CumYr_col    =H2OLoss_CumYr_col(NY,NX)
   plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)=EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)
   plt_rad%Eco_NetRad_col     =Eco_NetRad_col(NY,NX)
-  plt_ew%VapXAir2CanG=VapXAir2CanG(NY,NX)
+  plt_ew%VapXAir2Canopy_col=VapXAir2Canopy_col(NY,NX)
   plt_ew%Eco_Heat_Latent_col=Eco_Heat_Latent_col(NY,NX)
   plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)=TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)
   plt_ew%Eco_Heat_Grnd_col    =Eco_Heat_Grnd_col(NY,NX)
   plt_ew%QvET_col =QvET_col(NY,NX)
-  plt_ew%THFLXC =THFLXC(NY,NX)
+  plt_ew%HeatFlx2Canopy_col =HeatFlx2Canopy_col(NY,NX)
   plt_ew%LWRadCanG  =LWRadCanG(NY,NX)
   plt_ew%CanWat_col =CanWat_col(NY,NX)
-  plt_ew%TENGYC =TEngyCanopy_col(NY,NX)
+  plt_ew%CanopyHeatStor_col =CanopyHeatStor_col(NY,NX)
   plt_bgcr%Canopy_NEE_col=Canopy_NEE_col(NY,NX)
   plt_distb%FERT(1:20)=FERT(1:20,I1,NY,NX)
 
@@ -954,7 +954,7 @@ implicit none
     plt_bgcr%REcoNH4DmndSoil_vr(L)=REcoNH4DmndSoil_vr(L,NY,NX)
     plt_bgcr%REcoO2DmndResp_vr(L)=REcoO2DmndResp_vr(L,NY,NX)
     plt_ew%THeatRootUptake_vr(L)  =THeatRootUptake_vr(L,NY,NX)
-    plt_ew%GridPlantRootH2OUptake_vr(L) =GridPlantRootH2OUptake_vr(L,NY,NX)
+    plt_ew%TPlantRootH2OUptake_vr(L) =TPlantRootH2OUptake_vr(L,NY,NX)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -1010,7 +1010,7 @@ implicit none
     plt_ew%TKCanopy_pft(NZ)=TKCanopy_pft(NZ,NY,NX)
     plt_photo%LeafO2Solubility_pft(NZ)=LeafO2Solubility_pft(NZ,NY,NX)
     plt_ew%PSICanPDailyMin(NZ)=PSICanPDailyMin(NZ,NY,NX)
-    plt_ew%HeatStorCanP(NZ)=HeatStorCanP(NZ,NY,NX)
+    plt_ew%HeatStorCanopy_pft(NZ)=HeatStorCanopy_pft(NZ,NY,NX)
     plt_photo%CanopyGasCO2_pft(NZ)=CanopyGasCO2_pft(NZ,NY,NX)
     plt_photo%O2L(NZ)=O2L(NZ,NY,NX)
 
@@ -1093,7 +1093,7 @@ implicit none
     plt_photo%CanopyBndlResist_pft(NZ)      = CanopyBndlResist_pft(NZ,NY,NX)
     plt_photo%CanPStomaResistH2O_pft(NZ)    = CanPStomaResistH2O_pft(NZ,NY,NX)
     plt_ew%TKC(NZ)                          = TKC(NZ,NY,NX)
-    plt_ew%HeatXAir2PCan(NZ)                = HeatXAir2PCan(NZ,NY,NX)
+    plt_ew%HeatXAir2PCan_pft(NZ)                = HeatXAir2PCan_pft(NZ,NY,NX)
     plt_rad%RadNet2Canopy_pft(NZ)           = RadNet2Canopy_pft(NZ,NY,NX)
     plt_rad%LWRadCanopy_pft(NZ)             = LWRadCanopy_pft(NZ,NY,NX)
     plt_ew%EvapTransHeat_pft(NZ)            = EvapTransHeat_pft(NZ,NY,NX)
@@ -1482,7 +1482,7 @@ implicit none
   plt_rad%RadPARDiffus_col=RadPARDiffus_col(NY,NX)
   plt_rad%RadSWDirect_col=RadSWDirect_col(NY,NX)
   plt_rad%RadPARDirect_col=RadPARDirect_col(NY,NX)
-  plt_site%SoiSurfRoughnesst0=SoiSurfRoughnesst0(NY,NX)
+  plt_site%SoilSurfRoughnesst0_col=SoilSurfRoughnesst0_col(NY,NX)
   plt_ew%VcumWatSnow_col=VcumWatSnow_col(NY,NX)
   plt_ew%VcumIceSnow_col=VcumIceSnow_col(NY,NX)
   plt_ew%VcumDrySnoWE_col=VcumDrySnoWE_col(NY,NX)
@@ -1556,7 +1556,7 @@ implicit none
 
   ZERO4PlantDisplace_col(NY,NX)=plt_ew%ZERO4PlantDisplace_col
   RoughHeight_col(NY,NX)=plt_ew%RoughHeight
-  BndlResistAboveCanG(NY,NX)=plt_ew%BndlResistAboveCanG
+  AbvCanopyBndlResist_col(NY,NX)=plt_ew%AbvCanopyBndlResist_col
   RIB(NY,NX)=plt_ew%RIB
   
   CanopyHeight_col(NY,NX)=plt_morph%CanopyHeight_col

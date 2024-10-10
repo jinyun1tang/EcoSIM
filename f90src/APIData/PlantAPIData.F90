@@ -42,7 +42,7 @@ implicit none
   real(r8) :: DayLenthPrev      !daylength of previous day, [h]
   real(r8) :: DayLenthCurrent      !daylength, [h]
   real(r8) :: DayLenthMax      !maximum daylength, [h]
-  real(r8) :: SoiSurfRoughnesst0        !initial soil surface roughness height, [m]
+  real(r8) :: SoilSurfRoughnesst0_col        !initial soil surface roughness height, [m]
   real(r8) :: OXYE      !atmospheric O2 concentration, [umol mol-1]
   real(r8) :: PlantPopu_col       !total plant population, [d-2]
   real(r8) :: POROS1    !top layer soil porosity
@@ -534,11 +534,11 @@ implicit none
   real(r8) :: Canopy_Heat_Sens_col               !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: VLHeatCapSnowMin_col    !minimum snowpack heat capacity [MJ d-2 K-1]
   real(r8) :: VLHeatCapSurfSnow_col    !snowpack heat capacity, [MJ m-3 K-1]
-  real(r8) :: TENGYC    !total canopy heat content, [MJ  d-2]
+  real(r8) :: CanopyHeatStor_col    !total canopy heat content, [MJ  d-2]
   real(r8) :: LWRadCanG     !grid total canopy LW emission, [MJ d-2 h-1]
   real(r8) :: QvET_col    !total canopy evaporation + transpiration, [m3 d-2]
-  real(r8) :: VapXAir2CanG    !grid canopy evaporation, [m3 d-2]
-  real(r8) :: THFLXC    !total canopy heat flux, [MJ  d-2]
+  real(r8) :: VapXAir2Canopy_col    !grid canopy evaporation, [m3 d-2]
+  real(r8) :: HeatFlx2Canopy_col    !total canopy heat flux, [MJ  d-2]
   real(r8) :: H2OLoss_CumYr_col     !total subsurface water flux, [m3 d-2]
   real(r8) :: VPA       !vapor concentration, [m3 m-3]
   real(r8) :: TairK       !air temperature, [K]
@@ -551,7 +551,7 @@ implicit none
   real(r8) :: Eco_Heat_Sens_col       !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughHeight        !canopy surface roughness height, [m]
   real(r8) :: ZERO4PlantDisplace_col        !zero plane displacement height, [m]
-  real(r8) :: BndlResistAboveCanG       !isothermal boundary layer resistance, [h m-1]
+  real(r8) :: AbvCanopyBndlResist_col       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: Eco_Heat_Grnd_col       !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8), pointer :: Transpiration_pft(:)            => null()    !canopy transpiration,                                         [m2 d-2 h-1]
@@ -559,7 +559,7 @@ implicit none
   real(r8), pointer :: PrecIntcptByCanopy_pft(:)       => null()    !water flux into canopy,                                       [m3 d-2 h-1]
   real(r8), pointer :: PSICanopy_pft(:)                => null()    !canopy total water potential,                                 [Mpa]
   real(r8), pointer :: VapXAir2Canopy_pft(:)           => null()    !canopy evaporation,                                           [m2 d-2 h-1]
-  real(r8), pointer :: HeatStorCanP(:)                 => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
+  real(r8), pointer :: HeatStorCanopy_pft(:)                 => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
   real(r8), pointer :: EvapTransHeat_pft(:)            => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
   real(r8), pointer :: RAZ(:)                          => null()    !canopy roughness height,                                      [m]
   real(r8), pointer :: TKS_vr(:)                       => null()    !mean annual soil temperature,                                 [K]
@@ -570,14 +570,14 @@ implicit none
   real(r8), pointer :: TKC(:)                          => null()    !canopy temperature,                                           [K]
   real(r8), pointer :: PSICanopyOsmo_pft(:)            => null()    !canopy osmotic water potential,                               [Mpa]
   real(r8), pointer :: CanOsmoPsi0pt_pft(:)            => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-  real(r8), pointer :: HeatXAir2PCan(:)                => null()    !canopy sensible heat flux,                                    [MJ d-2 h-1]
+  real(r8), pointer :: HeatXAir2PCan_pft(:)                => null()    !canopy sensible heat flux,                                    [MJ d-2 h-1]
   real(r8), pointer :: TKCanopy_pft(:)                 => null()    !canopy temperature,                                           [K]
   real(r8), pointer :: PSIRoot_pvr(:,:,:)              => null() !root total water potential,                                      [Mpa]
   real(r8), pointer :: PSIRootOSMO_vr(:,:,:)           => null() !root osmotic water potential,                                    [Mpa]
   real(r8), pointer :: PSIRootTurg_vr(:,:,:)           => null() !root turgor water potential,                                     [Mpa]
   real(r8), pointer :: AllPlantRootH2OUptake_vr(:,:,:) => null() !root water uptake,                                               [m2 d-2 h-1]
   real(r8), pointer :: THeatRootUptake_vr(:)           => null()   !total root heat uptake,                                        [MJ d-2]
-  real(r8), pointer :: GridPlantRootH2OUptake_vr(:)    => null()   !total root water uptake,                                       [m3 d-2]
+  real(r8), pointer :: TPlantRootH2OUptake_vr(:)    => null()   !total root water uptake,                                       [m3 d-2]
   real(r8), pointer :: WatByPCanopy_pft(:)             => null()  !canopy surface water content,                                   [m3 d-2]
   real(r8), pointer :: CanopyWater_pft(:)              => null()  !canopy water content,                                           [m3 d-2]
   real(r8), pointer :: VHeatCapCanP_pft(:)             => null()  !canopy heat capacity,                                           [MJ d-2 K-1]
@@ -1102,12 +1102,12 @@ implicit none
   allocate(this%TotalSoilH2OPSIMPa_vr(0:JZ1));this%TotalSoilH2OPSIMPa_vr=spval
   allocate(this%THeatRootUptake_vr(0:JZ1));this%THeatRootUptake_vr=spval
   allocate(this%TKCanopy_pft(JP1));this%TKCanopy_pft=spval
-  allocate(this%HeatXAir2PCan(JP1));this%HeatXAir2PCan=spval
+  allocate(this%HeatXAir2PCan_pft(JP1));this%HeatXAir2PCan_pft=spval
   allocate(this%PrecIntcptByCanopy_pft(JP1));this%PrecIntcptByCanopy_pft=spval
   allocate(this%PSICanopyTurg_pft(JP1));this%PSICanopyTurg_pft=spval
   allocate(this%PSICanopy_pft(JP1));this%PSICanopy_pft=spval
   allocate(this%VapXAir2Canopy_pft(JP1));this%VapXAir2Canopy_pft=spval
-  allocate(this%HeatStorCanP(JP1));this%HeatStorCanP=spval
+  allocate(this%HeatStorCanopy_pft(JP1));this%HeatStorCanopy_pft=spval
   allocate(this%EvapTransHeat_pft(JP1));this%EvapTransHeat_pft=spval
   allocate(this%WatByPCanopy_pft(JP1));this%WatByPCanopy_pft=spval
   allocate(this%VHeatCapCanP_pft(JP1));this%VHeatCapCanP_pft=spval
@@ -1116,7 +1116,7 @@ implicit none
   allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1));this%PSIRootOSMO_vr=spval
   allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1));this%PSIRootTurg_vr=spval
   allocate(this%AllPlantRootH2OUptake_vr(jroots,JZ1,JP1));this%AllPlantRootH2OUptake_vr=spval
-  allocate(this%GridPlantRootH2OUptake_vr(0:JZ1));this%GridPlantRootH2OUptake_vr=spval
+  allocate(this%TPlantRootH2OUptake_vr(0:JZ1));this%TPlantRootH2OUptake_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
@@ -1139,12 +1139,12 @@ implicit none
 !  if(allocated(PSIST))deallocate(PSIST)
 !  if(allocated(THeatRootUptake_vr))deallocate(THeatRootUptake_vr)
 !  if(allocated(TKCanopy_pft))deallocate(TKCanopy_pft)
-!  if(allocated(HeatXAir2PCan))deallocate(HeatXAir2PCan)
+!  if(allocated(HeatXAir2PCan_pft))deallocate(HeatXAir2PCan_pft)
 !  if(allocated(PrecIntcptByCanopy_pft))deallocate(PrecIntcptByCanopy_pft)
 !  if(allocated(PSICanopyTurg_pft))deallocate(PSICanopyTurg_pft)
 !  if(allocated(PSICanopy_pft))deallocate(PSICanopy_pft)
 !  if(allocated(VapXAir2Canopy_pft))deallocate(VapXAir2Canopy_pft)
-!  if(allocated(HeatStorCanP))deallocate(HeatStorCanP)
+!  if(allocated(HeatStorCanopy_pft))deallocate(HeatStorCanopy_pft)
 !  if(allocated(EvapTransHeat_pft))deallocate(EvapTransHeat_pft)
 !  if(allocated(WatByPCanopy_pft))deallocate(WatByPCanopy_pft)
 !  if(allocated(VHeatCapCanP_pft))deallocate(VHeatCapCanP_pft)
