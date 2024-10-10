@@ -4438,16 +4438,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='BndlResistAboveCanG', dim1name='column',&
+    call restartvar(ncid, flag, varname='AbvCanopyBndlResist_col', dim1name='column',&
        long_name='above canopy boundary layer resistance', units='h m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,BndlResistAboveCanG,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,AbvCanopyBndlResist_col,datrc_1d)
   else
     !print*,'CanopyHeight_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,BndlResistAboveCanG,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AbvCanopyBndlResist_col,datrc_1d)  
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='BndlResistAboveCanG', dim1name='column',&
+    call restartvar(ncid, flag, varname='AbvCanopyBndlResist_col', dim1name='column',&
        long_name='above canopy boundary layer resistance', units='h m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -4489,16 +4489,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='SoiSurfRoughnesst0', dim1name='column',&
+    call restartvar(ncid, flag, varname='SoilSurfRoughnesst0_col', dim1name='column',&
        long_name='initial soil surface roughness height', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughnesst0,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilSurfRoughnesst0_col,datrc_1d)
   else
-    !print*,'SoiSurfRoughnesst0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiSurfRoughnesst0,datrc_1d)  
+    !print*,'SoilSurfRoughnesst0_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilSurfRoughnesst0_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='SoiSurfRoughnesst0', dim1name='column',&
+    call restartvar(ncid, flag, varname='SoilSurfRoughnesst0_col', dim1name='column',&
        long_name='initial soil surface roughness height', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -4540,16 +4540,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='TEngyCanopy_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='CanopyHeatStor_col', dim1name='column',&
        long_name='total canopy heat content', units='MJ d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,TEngyCanopy_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeatStor_col,datrc_1d)
   else
     !print*,'LWRadCanG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TEngyCanopy_col,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeatStor_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='TEngyCanopy_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='CanopyHeatStor_col', dim1name='column',&
        long_name='total canopy heat content', units='MJ d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -5684,10 +5684,10 @@ implicit none
        long_name='current external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable_col,datrc_1d) 
   else
     !print*,'ExtWaterTable'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable_col,datrc_1d)   
     datpr1 => datrc_1d        
     call restartvar(ncid, flag, varname='ExtWaterTable', dim1name='column',&
        long_name='current external water table depth', units='m', &

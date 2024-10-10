@@ -32,7 +32,7 @@ implicit none
   real(r8),allocatable ::  RAGS(:,:)                          !    
   real(r8),allocatable ::  CVRDW(:,:)                         !
   real(r8),allocatable ::  Prec2SoiMacP1(:,:)                          !
-  real(r8),allocatable ::  PRECM(:,:)                         !
+  real(r8),allocatable ::  PRECM_col(:,:)                         !
   real(r8),allocatable ::  Prec2SoiMicP1(:,:)                          !
   real(r8),allocatable ::  PrecHeat2SoiMicP1(:,:)                        !
   real(r8),allocatable ::  PrecHeat2LitR1(:,:)                        !
@@ -83,7 +83,7 @@ implicit none
   allocate(LitrIceHeatFlxFrez(JY,JX));       LitrIceHeatFlxFrez=0._r8  
   allocate(CVRDW(JY,JX));       CVRDW=0._r8
   allocate(Prec2SoiMacP1(JY,JX));        Prec2SoiMacP1=0._r8
-  allocate(PRECM(JY,JX));       PRECM=0._r8
+  allocate(PRECM_col(JY,JX));       PRECM_col=0._r8
   allocate(Prec2SoiMicP1(JY,JX));        Prec2SoiMicP1=0._r8
   allocate(PrecHeat2SoiMicP1(JY,JX));      PrecHeat2SoiMicP1=0._r8
   allocate(PrecHeat2LitR1(JY,JX));      PrecHeat2LitR1=0._r8  
@@ -130,7 +130,7 @@ implicit none
   call destroy(LitrIceHeatFlxFrez)
   call destroy(CVRDW)
   call destroy(Prec2SoiMacP1)
-  call destroy(PRECM)
+  call destroy(PRECM_col)
   call destroy(Prec2SoiMicP1)
   call destroy(PrecHeat2SoiMicP1)
   call destroy(PrecHeat2LitR1)

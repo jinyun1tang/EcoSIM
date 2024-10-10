@@ -1,19 +1,20 @@
 module EcoSIMAPI
   USE EcoSIMCtrlDataType
-  use timings         , only : start_timer, end_timer
-  use ErosionMod      , only : erosion
-  use Hour1Mod        , only : hour1
-  use RedistMod       , only : redist
-  use GeochemAPI      , only : soluteModel
-  use PlantMod        , only : PlantModel
-  use MicBGCAPI       , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
-  use TranspNoSaltMod , only : TranspNoSalt
-  use TranspSaltMod   , only : TranspSalt
-  use SoilBGCDataType , only : trc_soHml_vr,trc_solml_vr
-  use TracerIDMod     , only : ids_NO2B,ids_NO2,idg_O2
-  use PerturbationMod , only : check_Soil_Warming, set_soil_warming,config_soil_warming  
+  use timings,         only: start_timer,        end_timer
+  use ErosionMod,      only: erosion
+  use Hour1Mod,        only: hour1
+  use RedistMod,       only: redist
+  use GeochemAPI,      only: soluteModel
+  use PlantMod,        only: PlantModel
+  use MicBGCAPI,       only: MicrobeModel,       MicAPI_Init,      MicAPI_cleanup
+  use TranspNoSaltMod, only: TranspNoSalt
+  use TranspSaltMod,   only: TranspSalt
+  use SoilBGCDataType, only: trc_soHml_vr,       trc_solml_vr
+  use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
+  use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
+  use WatsubMod,       only: watsub
   use EcoSIMCtrlMod  
-  use WatsubMod    , only : watsub
+  use BalancesMod  
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -29,6 +30,8 @@ contains
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1
+
+  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
@@ -108,6 +111,8 @@ contains
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   if(do_timing)call end_timer('REDIST',t1)
 334   FORMAT(A8)
+
+  call EndCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
   end subroutine Run_EcoSIM_one_step
 ! ----------------------------------------------------------------------

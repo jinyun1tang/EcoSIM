@@ -79,8 +79,8 @@ implicit none
 !  real(r8),target,allocatable ::  PrecDaily_col(:,:)                !total daily precipitation, [m d-1]
   real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                !sky longwave radiation , [MJ m-2 h-1]
   real(r8),target,allocatable ::  TempOffset_col(:,:)                !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
-  real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
-  real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PRECD_col(:,:)                     !direct precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PRECB_col(:,:)                         !indirect precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
@@ -115,9 +115,9 @@ implicit none
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  SnoFalPrec(:,:)                    !snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PrecRainAndSurfirrig(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecRainAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
@@ -214,8 +214,8 @@ implicit none
 !  allocate(PrecDaily_col(JY,JX));        PrecDaily_col=0._r8
   allocate(SkyLonwRad_col(JY,JX));        SkyLonwRad_col=0._r8
   allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
-  allocate(PRECD(JY,JX));       PRECD=0._r8
-  allocate(PRECB(JY,JX));       PRECB=0._r8
+  allocate(PRECD_col(JY,JX));       PRECD_col=0._r8
+  allocate(PRECB_col(JY,JX));       PRECB_col=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
 
@@ -251,9 +251,9 @@ implicit none
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
-  allocate(SnoFalPrec(JY,JX));       SnoFalPrec=0._r8
+  allocate(SnoFalPrec_col(JY,JX));       SnoFalPrec_col=0._r8
   allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
-  allocate(PrecRainAndSurfirrig(JY,JX));       PrecRainAndSurfirrig=0._r8
+  allocate(PrecRainAndIrrig_col(JY,JX));       PrecRainAndIrrig_col=0._r8
   allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
@@ -344,8 +344,8 @@ implicit none
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)
-  call destroy(PRECD)
-  call destroy(PRECB)
+  call destroy(PRECD_col)
+  call destroy(PRECB_col)
   call destroy(CO2EI)
   call destroy(CCO2EI)
 
@@ -381,9 +381,9 @@ implicit none
   call destroy(TairKClimMean)
   call destroy(ATKS)
   call destroy(RainFalPrec)
-  call destroy(SnoFalPrec)
+  call destroy(SnoFalPrec_col)
   call destroy(PrecAtm_col)
-  call destroy(PrecRainAndSurfirrig)
+  call destroy(PrecRainAndIrrig_col)
   call destroy(EnergyImpact4Erosion)
   call destroy(PHR)
   call destroy(CN4RI)
