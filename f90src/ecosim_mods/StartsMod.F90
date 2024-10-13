@@ -435,12 +435,11 @@ module StartsMod
       IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
-        VORGC=CORGCM*ppmc*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VORGC=CORGCM*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
-        VHeatCapacitySoilM_vr(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
+        VHeatCapacitySoilM_vr(L,NY,NX)=((cpo*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP_vr(L,NY,NX)+2.128_r8*ROCK_vr(L,NY,NX))*VGeomLayer_vr(L,NY,NX)
-!        write(*,*)'vhcm',L,VORGC,VMINL,VSAND,PTDS  
       ELSE
         VHeatCapacitySoilM_vr(L,NY,NX)=0.0_r8
       ENDIF

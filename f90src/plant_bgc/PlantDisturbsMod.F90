@@ -1670,7 +1670,7 @@ module PlantDisturbsMod
 
     VOLWPX              = CanopyWater_pft(NZ)
     WVPLT               = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
-    FDM                 = get_FDM(PSICanopy_pft(NZ))
+    FDM                 = get_FDM(PSICanopy_pft(NZ))    !drymatter/water=fdm
     CanopyWater_pft(NZ) = ppmc*WVPLT/FDM
     QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
     H2OLoss_CumYr_col   = H2OLoss_CumYr_col+VOLWPX-CanopyWater_pft(NZ)

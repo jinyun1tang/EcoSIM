@@ -31,11 +31,12 @@ contains
   
   implicit none
   real(r8), intent(in) :: PSICanopy !canopy water potential, MPa
-  real(r8) :: APSILT
-  real(r8) :: FDMP
+  
+  real(r8) :: APSILT    !abosolute value of psi
+  real(r8) :: FDMP   !=dry matter/water
 
-  APSILT=ABS(PSICanopy)
-  FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
+  APSILT = ABS(PSICanopy)
+  FDMP   = 0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
 
   end function get_FDM
 

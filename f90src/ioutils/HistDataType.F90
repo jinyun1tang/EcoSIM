@@ -2378,6 +2378,7 @@ implicit none
         this%h2D_RootMassC_vr(ncol,L)     = RootMassElm_vr(ielmc,L,NY,NX)/DVOLL
         this%h2D_RootMassN_vr(ncol,L)     = RootMassElm_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_RootMassP_vr(ncol,L)     = RootMassElm_vr(ielmp,L,NY,NX)/DVOLL                
+
         call sumDOML(L,NY,NX,DOM)
         this%h2D_DOC_vr(ncol,L)           = DOM(idom_doc)/DVOLL
         this%h2D_DON_vr(ncol,L)           = DOM(idom_don)/DVOLL

@@ -538,7 +538,7 @@ module UptakesMod
   real(r8), intent(out):: FDMP
   real(r8) :: APSILT
   real(r8) :: CCPOLT
-  real(r8) :: FTHRM,FDMR
+  real(r8) :: FTHRM
   real(r8) :: OSWT,Stomata_Stress
 
   integer :: N,L
@@ -640,7 +640,7 @@ module UptakesMod
   real(r8) :: DTHS1
   real(r8) :: DIFFZ,DIFFU,DPSI
   real(r8) :: EX,PTransPre
-  real(r8) :: FTHRM,FDMR
+  real(r8) :: FTHRM
   real(r8) :: LWRad2CanP
   real(r8) :: HeatAdd2Can
   real(r8) :: EffGrndAreaByPFT4H2O,EffGrndAreaByPFT4Heat,PSICanPPre,HeatLatentConductCanP
@@ -1099,8 +1099,8 @@ module UptakesMod
         !     PATH=path length of water and nutrient uptake
         !     FineRootRadius,RootAreaDivRadius_vr=root radius,surface/radius area
         !
-        RSSL=(LOG(PATH(N,L)/FineRootRadius(N,L))/RootAreaDivRadius_vr(N,L))/PlantPopulation_pft(NZ)
-        SoiH2OResist(N,L)=RSSL/HydroCondMicP4RootUptake_vr(L)
+        RSSL              = (LOG(PATH(N,L)/FineRootRadius(N,L))/RootAreaDivRadius_vr(N,L))/PlantPopulation_pft(NZ)
+        SoiH2OResist(N,L) = RSSL/HydroCondMicP4RootUptake_vr(L)
         !
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
         !     ENTERED IN 'READQ'
@@ -1165,12 +1165,12 @@ module UptakesMod
   integer :: N,L
   real(r8) :: APSILT
   real(r8) :: CCPOLT
-  real(r8) :: FTHRM,FDMR
+  real(r8) :: FTHRM
   real(r8) :: OSWT,Stomata_Stress
 
 ! begin_execution
   associate(                                                          &
-    QdewCanopy_pft            => plt_ew%QdewCanopy_pft        ,       &
+    QdewCanopy_pft            => plt_ew%QdewCanopy_pft,               &
     TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKSnow                    => plt_ew%TKSnow,                       &
@@ -1189,9 +1189,9 @@ module UptakesMod
     PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr,                  &
     Transpiration_pft         => plt_ew%Transpiration_pft,            &
-    HeatStorCanopy_pft              => plt_ew%HeatStorCanopy_pft,                 &
+    HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft,           &
     EvapTransHeat_pft         => plt_ew%EvapTransHeat_pft,            &
-    HeatXAir2PCan_pft             => plt_ew%HeatXAir2PCan_pft,                &
+    HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft,            &
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,           &
     NU                        => plt_site%NU,                         &
     ZERO                      => plt_site%ZERO,                       &
@@ -1242,13 +1242,13 @@ module UptakesMod
 
   DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
-      PSIRoot_pvr(N,L,NZ) = ElvAdjstedtSoiPSIMPa(L)
-      CCPOLT              = sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
+      PSIRoot_pvr(N,L,NZ)              = ElvAdjstedtSoiPSIMPa(L)
+      CCPOLT                           = sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
+      AllPlantRootH2OUptake_vr(N,L,NZ) = 0.0_r8
 
       call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
-      AllPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
     enddo
   ENDDO
   end associate
@@ -1270,7 +1270,6 @@ module UptakesMod
   real(r8), intent(in) :: TKCX,VHCPX,PrecHEATIN_lndtcptByCanP1,cumPRootH2OUptake,VFLXC
   integer , intent(in) :: SoiLayerHasRoot(jroots,JZ1)
   real(r8) :: CCPOLT
-  real(r8) :: FDMR
   real(r8) :: OSWT
   integer :: N,L
   associate(                                                       &
@@ -1318,9 +1317,7 @@ module UptakesMod
   !     ElvAdjstedtSoiPSIMPa=total soil water potential PSIST adjusted for surf elevn
   !     SoiH2OResist,SoiAddRootResist,RootResist=soil,soil+root,root radial+axial resistance
   !     PSIRootOSMO_vr,PSIRootTurg_vr=root osmotic,turgor water potential
-  !     FDMR=dry matter content
   !     CanOsmoPsi0pt_pft=osmotic potential at PSIRoot_pvr=0 from PFT file
-!
   !
   D4505: DO N=1,MY(NZ)
     D4510: DO L=NU,MaxSoiL4Root_pft(NZ)

@@ -849,6 +849,7 @@ module RedistMod
     ENGY=VHeatCapacityX*TKSX
     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
       +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
+    if(VHeatCapacity_vr(L,NY,NX)>0._r8)VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)
 
     TVHeatCapacity      = TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
     TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapacitySoilM_vr(L,NY,NX)
@@ -871,6 +872,7 @@ module RedistMod
     !
     !     END ARTIFICIAL SOIL WARMING
     !
+    write(113,*)I+J/24.,L,TKS_vr(L,NY,NX),cpo*RootMassElm_vr(ielmc,L,NY,NX),VHeatCapacity_vr(L,NY,NX)
     TKSpre=TKS_vr(L,NY,NX)
     IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_vr(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
       if(do_warming .and. is_warming_layerL(L,NY,NX))then     
@@ -881,11 +883,12 @@ module RedistMod
       TKS00=TKS_vr(L,NY,NX)
       TKS_vr(L,NY,NX)=(ENGY+THeatFlow2Soil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
+      write(113,*)'tkssssss',I+J/24.,L,NY,NX,TKSpre,VHeatCapacity_vr(L,NY,NX)  
       tHeatUptk_col(NY,NX)=tHeatUptk_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)      
 !      if(curday>=285.and.L<=2)write(*,*)'rexL=',L,NY,NX,curhour,VHeatCapacityX,VHeatCapacity_vr(L,NY,NX),&
 !        SoiBulkDensity_vr(L,NY,NX),NU(NY,NX)
-      if(TKS_vr(L,NY,NX)>4.e2)then
-        write(*,*)'weird temperature in redist',L,NY,NX,TKSpre,TKS_vr(L,NY,NX)
+      if(TKS_vr(L,NY,NX)>4.e2 .or. TKS_vr(L,NY,NX)<100._r8)then
+        write(*,*)'weird temperature in redist',NU(NY,NX),L,NY,NX,TKSpre,TKS_vr(L,NY,NX)
         write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity_vr(L,NY,NX),ZEROS(NY,NX),SoiBulkDensity_vr(L,NY,NX)
         write(*,*)'itemized',ENGY/VHeatCapacity_vr(L,NY,NX),&
           THeatFlow2Soil_vr(L,NY,NX)/VHeatCapacity_vr(L,NY,NX),&
@@ -1518,7 +1521,7 @@ module RedistMod
 
   integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
-  real(r8) :: VLWatMicP1X,ENGYR,VLHeatCapacityX,TK1X
+  real(r8) :: VLWatMicP1X,ENGYR,TK1X
 !     begin_execution
 !     ADD ABOVE-GROUND LitrFall FROM EXTRACT.F TO SURFACE RESIDUE
 !
