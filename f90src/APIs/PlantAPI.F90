@@ -645,7 +645,7 @@ implicit none
   plt_site%CCO2EI                     = CCO2EI(NY,NX)
   plt_site%CO2EI                      = CO2EI(NY,NX)
   plt_bgcr%NetCO2Flx2Canopy_col       = NetCO2Flx2Canopy_col(NY,NX)
-  plt_site%CO2E                       = CO2E(NY,NX)
+  plt_site%CO2E                       = CO2E_col(NY,NX)
   plt_site%AtmGasc(idg_beg:idg_end-1) = AtmGasCgperm3(idg_beg:idg_end-1,NY,NX)
   plt_site%DayLenthPrev               = DayLenthPrev_col(NY,NX)
   plt_site%DayLenthCurrent            = DayLensCurr_col(NY,NX)

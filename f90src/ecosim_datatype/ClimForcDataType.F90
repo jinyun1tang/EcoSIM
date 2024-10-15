@@ -90,9 +90,9 @@ implicit none
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  ZNH3E(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CH4E(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
@@ -226,9 +226,9 @@ implicit none
   allocate(Z2OE(JY,JX));        Z2OE=0._r8
   allocate(Z2GE(JY,JX));        Z2GE=0._r8
   allocate(ZNH3E(JY,JX));       ZNH3E=0._r8
-  allocate(CH4E(JY,JX));        CH4E=0._r8
+  allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
   allocate(H2GE(JY,JX));        H2GE=0._r8
-  allocate(CO2E(JY,JX));        CO2E=0._r8
+  allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
 
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
@@ -356,11 +356,11 @@ implicit none
   call destroy(Z2OE)
   call destroy(Z2GE)
   call destroy(ZNH3E)
-  call destroy(CH4E)
+  call destroy(CH4E_col)
   call destroy(H2GE)
 
   call destroy(SolarNoonHour_col)
-  call destroy(CO2E)
+  call destroy(CO2E_col)
   call destroy(RadSWDirect_col)
   call destroy(RadSWDiffus_col)
   call destroy(RadPARDirect_col)

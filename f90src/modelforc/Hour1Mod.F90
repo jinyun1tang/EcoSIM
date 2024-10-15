@@ -125,8 +125,8 @@ module Hour1Mod
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*tmp
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
       AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*tmp
       AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*tmp
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*tmp
@@ -325,8 +325,8 @@ module Hour1Mod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
 
-      AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
+      AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
+      AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
       AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
       AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
       AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
@@ -1061,8 +1061,8 @@ module Hour1Mod
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  trc_gascl_vr(idg_CO2,0,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_CH4,0,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_O2,0,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_N2,0,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_N2O,0,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)

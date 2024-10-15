@@ -99,7 +99,7 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DOC_FLX_col(:)    !HydroSubsDOCFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUR_DIC_FLX_col(:)    !HydroSufDICFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIC_FLX_col(:)    !HydroSubsDICFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_ATM_CO2_col(:)        !CO2E(NY,NX)
+  real(r8),pointer   :: h1D_ATM_CO2_col(:)        !CO2E_col(NY,NX)
   real(r8),pointer   :: h1D_ATM_CH4_col(:)        !CH4E
   real(r8),pointer   :: h1D_NBP_col(:)            !Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_C_col(:)     !EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2263,8 +2263,8 @@ implicit none
       this%h1D_OMC_LITR_col(ncol)         = SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMN_LITR_col(ncol)         = SoilOrgM_vr(ielmn,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_OMP_LITR_col(ncol)         = SoilOrgM_vr(ielmp,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_ATM_CO2_col(ncol)          = CO2E(NY,NX)
-      this%h1D_ATM_CH4_col(ncol)          = CH4E(NY,NX)
+      this%h1D_ATM_CO2_col(ncol)          = CO2E_col(NY,NX)
+      this%h1D_ATM_CH4_col(ncol)          = CH4E_col(NY,NX)
       this%h1D_NBP_col(ncol)              = Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_HVST_C_col(ncol)       = EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_LAI_col(ncol)          = CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

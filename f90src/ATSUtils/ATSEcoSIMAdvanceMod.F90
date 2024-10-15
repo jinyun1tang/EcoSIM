@@ -55,8 +55,8 @@ implicit none
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
-    !CO2E(NY,NX)=atm_co2
-    !CH4E(NY,NX)=atm_ch4
+    !CO2E_col(NY,NX)=atm_co2
+    !CH4E_col(NY,NX)=atm_ch4
     !OXYE(NY,NX)=atm_o2
     !Z2GE(NY,NX)=atm_n2
     !Z2OE(NY,NX)=atm_n2o
