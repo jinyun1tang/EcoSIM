@@ -178,8 +178,8 @@ contains
   call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
   surf_e_source = data(:)
 
-  !call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
-  !surf_snow_depth = data(:)
+  call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
+  surf_snow_depth = data(:)
 
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
