@@ -469,7 +469,7 @@ implicit none
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
   real(r8) :: ECNDX
-  real(r8) :: WO,SO
+  real(r8) :: WO,SO,HO
   real(r8) :: MOD(idom_beg:idom_end),HOD,OOD
   real(r8) :: MXD(NumPlantChemElms),ZGD
   real(r8) :: SSD,SHD,PHD,PQD
@@ -483,13 +483,15 @@ implicit none
 !     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
   IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.iVerticalDirection)THEN
-    HeatOut_lnds=HeatOut_lnds-XN*HeatFlow2Soil_3D(N,N6,N5,N4)
-    WO=XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4))   !<0, going out grid
+    HO           = XN*HeatFlow2Soil_3D(N,N6,N5,N4)
+    HeatOut_lnds = HeatOut_lnds-HO
+    WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4))   !<0, going out grid
 
     IF(abs(WO)>0._r8)THEN
-      QH2OLoss_lnds=QH2OLoss_lnds-WO
-      QDischar_col(N2,N1)=QDischar_col(N2,N1)-WO
-      H2OLoss_CumYr_col(N2,N1)=H2OLoss_CumYr_col(N2,N1)-WO
+      QH2OLoss_lnds            = QH2OLoss_lnds-WO
+      QDischar_col(N2,N1)      = QDischar_col(N2,N1)-WO
+      H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
+      HeatDischar_col(N2,N1)   = HeatDischar_col(N2,N1)-HO
 !
 !     SUBSURFACE BOUNDARY FLUXES OF CO2 AND DOC
 !

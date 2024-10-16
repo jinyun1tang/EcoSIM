@@ -203,7 +203,7 @@ implicit none
     VapXAir2Canopy_pft(NZ,NY,NX)        = plt_ew%VapXAir2Canopy_pft(NZ)
     EvapTransHeat_pft(NZ,NY,NX)         = plt_ew%EvapTransHeat_pft(NZ)
     AirConc_pft(NZ,NY,NX)               = plt_photo%AirConc_pft(NZ)
-    FracPARRadbyCanopy_pft(NZ,NY,NX)    = plt_rad%FracPARRadbyCanopy_pft(NZ)
+    FracPARads2Canopy_pft(NZ,NY,NX)    = plt_rad%FracPARads2Canopy_pft(NZ)
     FracGroth2Node_pft(NZ,NY,NX)        = plt_allom%FracGroth2Node_pft(NZ)
     CanopySeedNum_pft(NZ,NY,NX)         = plt_morph%CanopySeedNum_pft(NZ)
     HypoctoHeight_pft(NZ,NY,NX)         = plt_morph%HypoctoHeight_pft(NZ)
@@ -1028,7 +1028,7 @@ implicit none
 
     plt_rbgc%ZERO4Uptk_pft(NZ)=ZERO4Uptk_pft(NZ,NY,NX)
     plt_pheno%SeedTempSens_pft(NZ)=SeedTempSens_pft(NZ,NY,NX)
-    plt_rad%FracPARRadbyCanopy_pft(NZ) =FracPARRadbyCanopy_pft(NZ,NY,NX)
+    plt_rad%FracPARads2Canopy_pft(NZ) =FracPARads2Canopy_pft(NZ,NY,NX)
     plt_bgcr%NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ,NY,NX)
     plt_ew%DeltaTKC_pft(NZ)   =DeltaTKC_pft(NZ,NY,NX)
     plt_pheno%iPlantThermoAdaptZone_pft(NZ)=iPlantThermoAdaptZone_pft(NZ,NY,NX)
@@ -1581,7 +1581,7 @@ implicit none
     RadSWbyCanopy_pft(NZ,NY,NX) =plt_rad%RadSWbyCanopy_pft(NZ)
     RadPARbyCanopy_pft(NZ,NY,NX) =plt_rad%RadPARbyCanopy_pft(NZ)
     ClumpFactorNow_pft(NZ,NY,NX)  =plt_morph%ClumpFactorNow_pft(NZ)
-    FracPARRadbyCanopy_pft(NZ,NY,NX)=plt_rad%FracPARRadbyCanopy_pft(NZ)
+    FracPARads2Canopy_pft(NZ,NY,NX)=plt_rad%FracPARads2Canopy_pft(NZ)
     StomatalStress_pft(NZ,NY,NX)=plt_biom%StomatalStress_pft(NZ)
     DO L=1,NumOfCanopyLayers
       DO M=1,NumOfSkyAzimuSects

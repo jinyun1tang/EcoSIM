@@ -811,7 +811,7 @@ module RedistMod
   TVOLIH              = 0.0_r8
   TENGY               = 0.0_r8
   DVLiceMicP_vr       = 0._r8
-  
+  THeatFlow2Soil_col   = 0._r8
   DO L=NU(NY,NX),NL(NY,NX)
     TKSX           = TKS_vr(L,NY,NX)
     VHeatCapacityX = VHeatCapacity_vr(L,NY,NX)
@@ -879,7 +879,7 @@ module RedistMod
         THeatFlow2Soil_vr(L,NY,NX) = THeatFlow2Soil_vr(L,NY,NX) + &
           (TKS_ref_vr(it,L,NY,NX)-TKS_vr(L,NY,NX))*VHeatCapacity_vr(L,NY,NX)
       endif   
-
+      THeatFlow2Soil_col(NY,NX) = THeatFlow2Soil_col(NY,NX) + THeatFlow2Soil_vr(L,NY,NX)
       TKS00=TKS_vr(L,NY,NX)
       TKS_vr(L,NY,NX)=(ENGY+THeatFlow2Soil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
@@ -942,6 +942,7 @@ module RedistMod
 
   if(lverb)write(*,*)'UpdateChemInSoilLays'
   DORGC=0._r8
+  THeatRootUptake_col(NY,NX)=0._r8
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !
     SurfGasFlx_col(idg_H2,NY,NX)=SurfGasFlx_col(idg_H2,NY,NX)+Micb_N2Fixation_vr(L,NY,NX)
@@ -1155,6 +1156,7 @@ module RedistMod
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
     !  watch out the following code for changes
     HEATIN_lnd=HEATIN_lnd+THeatSoiThaw_vr(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
+    THeatRootUptake_col(NY,NX)=THeatRootUptake_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)
     CIB=trcg_air2root_flx_vr(idg_CO2,L,NY,NX)
     CHB=trcg_air2root_flx_vr(idg_CH4,L,NY,NX)
     OIB=trcg_air2root_flx_vr(idg_O2,L,NY,NX)

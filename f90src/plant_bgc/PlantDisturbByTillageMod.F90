@@ -53,7 +53,7 @@ contains
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
     InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,      &
     CanopyLeafShethC_pft        => plt_biom%CanopyLeafShethC_pft,         &
-    FracPARRadbyCanopy_pft      => plt_rad%FracPARRadbyCanopy_pft,        &
+    FracPARads2Canopy_pft      => plt_rad%FracPARads2Canopy_pft,        &
     CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
     iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch,      &
@@ -88,10 +88,10 @@ contains
   )
 
 !     PPX,PP=PFT population per m2,grid cell
-!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     VHeatCapCanP_pft=canopy heat capacity
 
-  FracPARRadbyCanopy_pft(NZ)=FracPARRadbyCanopy_pft(NZ)*XHVST
+  FracPARads2Canopy_pft(NZ)=FracPARads2Canopy_pft(NZ)*XHVST
   VHeatCapCanP_pft(NZ)=VHeatCapCanP_pft(NZ)*XHVST
   CanopyLeafShethC_pft(NZ)=0._r8
   CanopyStalkC_pft(NZ)=0._r8

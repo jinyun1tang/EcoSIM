@@ -751,16 +751,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='FracPARRadbyCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='FracPARads2Canopy_pft', dim1name='pft',&
      long_name='fraction of incoming PAR absorbed by canopy', units='none', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARRadbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARads2Canopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARRadbyCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,FracPARads2Canopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='FracPARRadbyCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='FracPARads2Canopy_pft', dim1name='pft',&
      long_name='fraction of incoming PAR absorbed by canopy', units='none', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)         
   endif

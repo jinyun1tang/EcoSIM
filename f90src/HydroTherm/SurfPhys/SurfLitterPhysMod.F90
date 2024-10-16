@@ -61,7 +61,7 @@ implicit none
 ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
 !
 
-  VapXAir2LitR(NY,NX)  = 0.0_r8
+  VapXAir2LitR_col(NY,NX)  = 0.0_r8
   Radnet2LitR          = 0.0_r8
   LatentHeatAir2LitR   = 0.0_r8
   HeatSensEvapAir2LitR = 0.0_r8
@@ -379,7 +379,7 @@ implicit none
 !     AGGREGATE WATER AND ENERGY FLUXES FROM TIME STEP FOR LITTER
 !     CALCULATIONS TO THAT FOR SOIL PROFILE
 !
-      VapXAir2LitR(NY,NX)  = VapXAir2LitR(NY,NX)+EVAPR2
+      VapXAir2LitR_col(NY,NX)  = VapXAir2LitR_col(NY,NX)+EVAPR2
       Radnet2LitR          = Radnet2LitR+Radnet2LitR2
       LatentHeatAir2LitR   = LatentHeatAir2LitR+LatentHeatAir2LitR2
       HeatSensEvapAir2LitR = HeatSensEvapAir2LitR+HeatSensEvapAir2LitR2

@@ -58,11 +58,11 @@ module Hour1Mod
   public :: hour1
   public :: InitHour1
 
-  real(r8) :: XVOLWC(0:3)
+  real(r8) :: FoliarWatRetcap(0:3)
   real(r8), pointer :: THETRX(:)
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 !
-!     XVOLWC=foliar water retention capacity (m3 m-2)
+!     FoliarWatRetcap=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
 
   contains
@@ -74,7 +74,7 @@ module Hour1Mod
 
   allocate(THETRX(1:NumOfLitrCmplxs))
 
-  XVOLWC=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
+  FoliarWatRetcap=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
 
   end subroutine InitHour1
@@ -267,18 +267,19 @@ module Hour1Mod
 !
 !     CANOPY RETENTION OF PRECIPITATION
 !
-!     XVOLWC=foliar surface water retention capacity
+!     FoliarWatRetcap=foliar surface water retention capacity
 !     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
-!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-    PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndIrrig_col(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX) &
+    VOLWCX                           = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
+      *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
+    PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX) &
       ,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndIrrig_col(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX)
+    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
     PrecIntceptByCanopy_col(NY,NX)=PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
 

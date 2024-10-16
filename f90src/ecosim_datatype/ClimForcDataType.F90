@@ -79,8 +79,8 @@ implicit none
 !  real(r8),target,allocatable ::  PrecDaily_col(:,:)                !total daily precipitation, [m d-1]
   real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                !sky longwave radiation , [MJ m-2 h-1]
   real(r8),target,allocatable ::  TempOffset_col(:,:)                !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
-  real(r8),target,allocatable ::  PRECD_col(:,:)                     !direct precipitation at ground surface used to calculate soil erosion, [m h-1]
-  real(r8),target,allocatable ::  PRECB_col(:,:)                         !indirect precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PrecDirect2Grnd_col(:,:)                     !direct precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PrecIndirect2Grnd_col(:,:)                         !indirect precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
@@ -214,8 +214,8 @@ implicit none
 !  allocate(PrecDaily_col(JY,JX));        PrecDaily_col=0._r8
   allocate(SkyLonwRad_col(JY,JX));        SkyLonwRad_col=0._r8
   allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
-  allocate(PRECD_col(JY,JX));       PRECD_col=0._r8
-  allocate(PRECB_col(JY,JX));       PRECB_col=0._r8
+  allocate(PrecDirect2Grnd_col(JY,JX));       PrecDirect2Grnd_col=0._r8
+  allocate(PrecIndirect2Grnd_col(JY,JX));       PrecIndirect2Grnd_col=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
 
@@ -344,8 +344,8 @@ implicit none
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)
-  call destroy(PRECD_col)
-  call destroy(PRECB_col)
+  call destroy(PrecDirect2Grnd_col)
+  call destroy(PrecIndirect2Grnd_col)
   call destroy(CO2EI)
   call destroy(CCO2EI)
 
