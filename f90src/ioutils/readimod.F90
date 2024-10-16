@@ -283,7 +283,7 @@ module readiMod
       OXYE(NY,NX)=ao2_ppm
       Z2GE(NY,NX)=an2_ppm
       CO2EI(NY,NX)=aco2_ppm
-      CH4E(NY,NX)=ach4_ppm
+      CH4E_col(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
       KoppenClimZone_col(NY,NX)   = IETYPG
@@ -306,7 +306,7 @@ module readiMod
       RCHGD(NY,NX)                = RCHGDG
       DH(NY,NX)=DHI(NX)
       DV(NY,NX)=DVI(NY)
-      CO2E(NY,NX)=CO2EI(NY,NX)
+      CO2E_col(NY,NX)=CO2EI(NY,NX)
       H2GE(NY,NX)=1.0E-03_r8
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY

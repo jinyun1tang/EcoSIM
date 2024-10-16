@@ -694,7 +694,7 @@ module StartqMod
   PSICanopyOsmo_pft(NZ,NY,NX)      = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)      = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)      = 0._r8
-  FracPARRadbyCanopy_pft(NZ,NY,NX) = 0._r8
+  FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 

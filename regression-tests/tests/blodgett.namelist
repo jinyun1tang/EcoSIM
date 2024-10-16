@@ -1,0 +1,60 @@
+&regression_test
+ cells   =           3
+ write_regression_output=.true.
+/
+
+&ecosim
+do_regression_test=.true.
+num_of_simdays=180
+case_name='blodgett'
+prefix='../../examples/inputs/blodgett'
+pft_file_in='../../examples/inputs/blodgett/blodgett_pftpar_20241010.nc'
+grid_file_in='../../examples/inputs/blodgett/Blodget_grid_20240622.nc'
+pft_mgmt_in='../../examples/inputs/blodgett/Blodget_pft_20240622.ENF.nc'
+clm_hour_file_in='../../examples/inputs/blodgett/Blodget.clim.2012-2022.nc'
+clm_factor_in='NO'
+soil_mgmt_in='NO'
+atm_ghg_in='../../input_data/fatm_hist_GHGs_1750-2023.nc'
+
+lverbose=.false.
+disp_planttrait=.true.
+plant_model=.true.
+microbial_model=.true.
+soichem_model=.true.
+!set up output variable lists
+!set up the first year of simulation
+start_date  = '19800101000000'
+grid_mode=1    !enable lateral runoff
+continue_run=.false.
+!set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
+forc_periods=2013,2013,1,2022,2012,1,2013,2022,2,2012,2022,1
+
+!set up solvers
+NPXS=30,30,30,30,30      !number of cycles per hour for water,heat,solute flux calcns
+NPYS=10,10,10,10,10      !number of cycles per NPX for gas flux calcns
+NCYC_LITR=20
+NCYC_SNOW=20
+!set up output frequency
+hist_mfilt=7665 ! 8760
+!hist_fincl2 = 'AIR_TEMP','TEMP_vr','PREC','SOIL_RN','SOIL_LE','SOIL_G','SOIL_H','SOL_RADN','WIND','EVAPN',
+!  'RUNOFF_FLX','rWatFILLP_vr','rIceFILLP_vr','SNOWPACK','SURF_WTR'
+!hist_fincl2='TEMP_vr'
+hist_nhtfrq=-24 !, -1
+/
+
+&bbgcforc
+/
+
+!namelist for timer
+&ecosim_time
+rest_opt='nyears'  !'ndays','nmonths','nyears'
+rest_frq=1
+delta_time=3600.
+stop_n=1            !this shall overwrite what is set in forc_periods
+stop_option='nyears' !run by nyears, nmonths, ndays,
+diag_frq=1
+diag_opt='nsteps'
+/
+
+
+

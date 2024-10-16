@@ -58,11 +58,11 @@ module Hour1Mod
   public :: hour1
   public :: InitHour1
 
-  real(r8) :: XVOLWC(0:3)
+  real(r8) :: FoliarWatRetcap(0:3)
   real(r8), pointer :: THETRX(:)
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 !
-!     XVOLWC=foliar water retention capacity (m3 m-2)
+!     FoliarWatRetcap=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
 
   contains
@@ -74,7 +74,7 @@ module Hour1Mod
 
   allocate(THETRX(1:NumOfLitrCmplxs))
 
-  XVOLWC=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
+  FoliarWatRetcap=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
 
   end subroutine InitHour1
@@ -125,8 +125,8 @@ module Hour1Mod
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*tmp
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
       AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*tmp
       AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*tmp
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*tmp
@@ -225,7 +225,7 @@ module Hour1Mod
       Canopy_NEE_col(NY,NX)         = 0.0_r8
       Eco_NEE_col(NY,NX)            = 0.0_r8
       ECO_ER_col(NY,NX)             = 0.0_r8
-
+      HeatPrec_col(NY,NX)           = 0.0_r8
       DO  NZ=1,NP(NY,NX)
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
@@ -264,22 +264,24 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
   integer :: NZ
   real(r8) :: VOLWCX  !maximum precipitation holding capacity by canopy (leaf+stem)
+  real(r8) :: prec2canopy_pft
 !
 !     CANOPY RETENTION OF PRECIPITATION
 !
-!     XVOLWC=foliar surface water retention capacity
+!     FoliarWatRetcap=foliar surface water retention capacity
 !     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
-!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
   DO  NZ=1,NP(NY,NX)
-    VOLWCX=XVOLWC(iPlantRootProfile_pft(NZ,NY,NX))*(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-    PrecIntcptByCanopy_pft(NZ,NY,NX)=AZMAX1(AMIN1(PrecRainAndIrrig_col(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX) &
-      ,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndIrrig_col(NY,NX)*FracPARRadbyCanopy_pft(NZ,NY,NX)
-    PrecIntceptByCanopy_col(NY,NX)=PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
+    VOLWCX                           = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
+      *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
+    prec2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
+    PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(prec2canopy_pft,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
+    Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+prec2canopy_pft
+    PrecIntceptByCanopy_col(NY,NX)   = PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
 
   end subroutine CanopyInterceptPrecp
@@ -289,21 +291,21 @@ module Hour1Mod
 !     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
 !
   implicit none
-  WatMassStore_lnd=0.0_r8
-  HeatStore_lnd=0.0_r8
-  TSoilO2G_lnd=0.0_r8
-  TSoilH2G_lnd=0.0_r8
-  TSEDSO=0.0_r8
-  LitRMStoreLndscap(:)=0.0_r8
+  WatMassStore_lnd     = 0.0_r8
+  HeatStore_lnd        = 0.0_r8
+  TSoilO2G_lnd         = 0.0_r8
+  TSoilH2G_lnd         = 0.0_r8
+  TSEDSO               = 0.0_r8
+  LitRMStoreLndscap(:) = 0.0_r8
 
-  POMHumStoreLndscap(:)=0.0_r8
-  TGasC_lnd=0.0_r8
-  TGasN_lnd=0.0_r8
-  TDisolNH4_lnd=0.0_r8
-  tNO3_lnd=0.0_r8
-  TDisolPi_lnd=0.0_r8
-  TION=0.0_r8
-  PlantElemntStoreLandscape(:)=0.0_r8
+  POMHumStoreLndscap(:)        = 0.0_r8
+  TGasC_lnd                    = 0.0_r8
+  TGasN_lnd                    = 0.0_r8
+  TDisolNH4_lnd                = 0.0_r8
+  tNO3_lnd                     = 0.0_r8
+  TDisolPi_lnd                 = 0.0_r8
+  TION                         = 0.0_r8
+  PlantElemntStoreLandscape(:) = 0.0_r8
   end subroutine ResetLndscapeAccumlators
 !------------------------------------------------------------------------------------------
 
@@ -325,8 +327,8 @@ module Hour1Mod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
 
-      AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
+      AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
+      AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
       AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
       AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
       AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
@@ -765,12 +767,12 @@ module Hour1Mod
 
   CanWat_col(NY,NX)              = 0.0_r8
   CanH2OHeldVg_col(NY,NX)        = 0.0_r8
-  TFLWCI(NY,NX)                  = 0.0_r8
+  Prec2Canopy_col(NY,NX)                  = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
   QvET_col(NY,NX)                = 0.0_r8
-  VapXAir2Canopy_col(NY,NX)            = 0.0_r8
-  HeatFlx2Canopy_col(NY,NX)                  = 0.0_r8
-  CanopyHeatStor_col(NY,NX)         = 0.0_r8
+  VapXAir2Canopy_col(NY,NX)      = 0.0_r8
+  HeatFlx2Canopy_col(NY,NX)      = 0.0_r8
+  CanopyHeatStor_col(NY,NX)      = 0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)    = 0.0_r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0.0_r8
@@ -1061,8 +1063,8 @@ module Hour1Mod
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  trc_gascl_vr(idg_CO2,0,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_CH4,0,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_O2,0,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_N2,0,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_N2O,0,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)

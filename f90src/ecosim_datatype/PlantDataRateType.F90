@@ -76,7 +76,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)
   real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)
   real(r8),target,allocatable ::  TPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
-  real(r8),target,allocatable ::  THeatRootUptake_vr(:,:,:)                       !total root heat uptake, [MJ d-2]
+  real(r8),target,allocatable ::  THeatRootUptake_vr(:,:,:)                       !vertically profile of root heat uptake, [MJ d-2]
+  real(r8),target,allocatable :: THeatRootUptake_col(:,:)                        !total root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_root_vr(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
@@ -193,6 +194,7 @@ module PlantDataRateType
   allocate(RootUptk_P_CumYr_pft(JP,JY,JX)); RootUptk_P_CumYr_pft=0._r8
   allocate(TPlantRootH2OUptake_vr(0:JZ,JY,JX)); TPlantRootH2OUptake_vr=0._r8
   allocate(THeatRootUptake_vr(0:JZ,JY,JX));  THeatRootUptake_vr=0._r8
+  allocate(THeatRootUptake_col(JY,JX)); THeatRootUptake_col=0._r8
   allocate(trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_air2root_flx_vr=0._r8
   allocate(trcg_root_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_root_vr=0._r8
   allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
@@ -294,6 +296,7 @@ module PlantDataRateType
   call destroy(RootUptk_P_CumYr_pft)
   call destroy(TPlantRootH2OUptake_vr)
   call destroy(THeatRootUptake_vr)
+  call destroy(THeatRootUptake_col)
   call destroy(tRootMycoExud2Soil_vr)
   call destroy(tRootCO2Emis_vr)
   call destroy(tRO2MicrbUptk_vr)

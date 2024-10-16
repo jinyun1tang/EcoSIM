@@ -273,7 +273,7 @@ module CanopyCondsMod
     SineGrndSlope_col      => plt_rad%SineGrndSlope_col,       &
     iScatteringDiffus      => plt_rad%iScatteringDiffus,       &
     OMEGA                  => plt_rad%OMEGA,                   &
-    FracPARRadbyCanopy_pft => plt_rad%FracPARRadbyCanopy_pft,  &
+    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft,  &
     RadPAR_zsec            => plt_rad%RadPAR_zsec,             &
     RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec,          &
     OMEGAG                 => plt_rad%OMEGAG,                  &
@@ -886,13 +886,13 @@ module CanopyCondsMod
   IF(LeafStalkArea_col.GT.ZEROS)THEN
     FRadPARbyLeafT=1.0_r8-EXP(-0.65_r8*LeafStalkArea_col/AREA3(NU))
     D145: DO NZ=1,NP
-      FracPARRadbyCanopy_pft(NZ)=FRadPARbyLeafT*LeafStalkArea_pft(NZ)/LeafStalkArea_col
-      FracSWRad2Grnd_col=FracSWRad2Grnd_col-FracPARRadbyCanopy_pft(NZ)
+      FracPARads2Canopy_pft(NZ)=FRadPARbyLeafT*LeafStalkArea_pft(NZ)/LeafStalkArea_col
+      FracSWRad2Grnd_col=FracSWRad2Grnd_col-FracPARads2Canopy_pft(NZ)
     ENDDO D145
   ELSE
     FracSWRad2Grnd_col=1.0_r8
     D146: DO NZ=1,NP
-      FracPARRadbyCanopy_pft(NZ)=0.0_r8
+      FracPARads2Canopy_pft(NZ)=0.0_r8
     ENDDO D146
   ENDIF
   end associate

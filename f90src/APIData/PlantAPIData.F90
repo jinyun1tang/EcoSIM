@@ -181,7 +181,7 @@ implicit none
   real(r8), pointer :: RadSWLeafTransmis_pft(:)     => null() !canopy shortwave transmissivity , [-]
   real(r8), pointer :: RadPARLeafTransmis_pft(:)     => null() !canopy PAR transmissivity , [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR , [umol m-2 s-1]
-  real(r8), pointer :: FracPARRadbyCanopy_pft(:)    => null() !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8), pointer :: FracPARads2Canopy_pft(:)    => null() !fraction of incoming PAR absorbed by canopy, [-]
   real(r8), pointer :: RadPAR_zsec(:,:,:,:)=> null()     !direct incoming PAR, [umol m-2 s-1]
   real(r8), pointer :: RadDifPAR_zsec(:,:,:,:)=> null()  !diffuse incoming PAR, [umol m-2 s-1]
   contains
@@ -1633,7 +1633,7 @@ implicit none
   allocate(this%RadPARLeafTransmis_pft(JP1))
   allocate(this%RadSWLeafTransmis_pft(JP1))
   allocate(this%RadPARbyCanopy_pft(JP1))
-  allocate(this%FracPARRadbyCanopy_pft(JP1))
+  allocate(this%FracPARads2Canopy_pft(JP1))
   end subroutine plt_rad_init
 !------------------------------------------------------------------------
   subroutine plt_rad_destroy(this)
