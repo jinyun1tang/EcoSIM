@@ -859,7 +859,7 @@ module InitPlantMod
     TCGroth_pft            => plt_pheno%TCGroth_pft,       &
     fTCanopyGroth_pft      => plt_pheno%fTCanopyGroth_pft, &
     ShootStrutElms_pft     => plt_biom%ShootStrutElms_pft, &
-    FracPARRadbyCanopy_pft => plt_rad%FracPARRadbyCanopy_pft    &
+    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft    &
   )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
@@ -881,7 +881,7 @@ module InitPlantMod
   PSICanopyOsmo_pft(NZ)      = CanOsmoPsi0pt_pft(NZ)+PSICanopy_pft(NZ)
   PSICanopyTurg_pft(NZ)      = AZMAX1(PSICanopy_pft(NZ)-PSICanopyOsmo_pft(NZ))
   Transpiration_pft(NZ)      = 0._r8
-  FracPARRadbyCanopy_pft(NZ) = 0._r8
+  FracPARads2Canopy_pft(NZ) = 0._r8
   end associate
   end subroutine InitPlantHeatWater
 !------------------------------------------------------------------------------------------

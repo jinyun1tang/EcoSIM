@@ -79,8 +79,8 @@ implicit none
 !  real(r8),target,allocatable ::  PrecDaily_col(:,:)                !total daily precipitation, [m d-1]
   real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                !sky longwave radiation , [MJ m-2 h-1]
   real(r8),target,allocatable ::  TempOffset_col(:,:)                !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
-  real(r8),target,allocatable ::  PRECD_col(:,:)                     !direct precipitation at ground surface used to calculate soil erosion, [m h-1]
-  real(r8),target,allocatable ::  PRECB_col(:,:)                         !indirect precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PrecDirect2Grnd_col(:,:)                     !direct precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),target,allocatable ::  PrecIndirect2Grnd_col(:,:)                         !indirect precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
@@ -90,9 +90,9 @@ implicit none
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  ZNH3E(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CH4E(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
@@ -174,6 +174,7 @@ implicit none
   real(r8),target,allocatable ::  N2_rain_conc(:,:)                          !precipitation  N2 concentration, [g m-3]
   real(r8),target,allocatable ::  N2O_rain_conc(:,:)                          !precipitation  N2O concentration, [g m-3]
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
+  real(r8),target,allocatable ::  HeatPrec_col(:,:)    !precipitation heat to surface [MJ/d2/h]
   contains
 !----------------------------------------------------------------------
 
@@ -194,6 +195,7 @@ implicit none
   allocate(TDWND(12,JY,JX));    TDWND=0._r8
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
+  allocate(HeatPrec_col(JY,JX)); HeatPrec_col=0._r8
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
@@ -214,8 +216,8 @@ implicit none
 !  allocate(PrecDaily_col(JY,JX));        PrecDaily_col=0._r8
   allocate(SkyLonwRad_col(JY,JX));        SkyLonwRad_col=0._r8
   allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
-  allocate(PRECD_col(JY,JX));       PRECD_col=0._r8
-  allocate(PRECB_col(JY,JX));       PRECB_col=0._r8
+  allocate(PrecDirect2Grnd_col(JY,JX));       PrecDirect2Grnd_col=0._r8
+  allocate(PrecIndirect2Grnd_col(JY,JX));       PrecIndirect2Grnd_col=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
 
@@ -226,9 +228,9 @@ implicit none
   allocate(Z2OE(JY,JX));        Z2OE=0._r8
   allocate(Z2GE(JY,JX));        Z2GE=0._r8
   allocate(ZNH3E(JY,JX));       ZNH3E=0._r8
-  allocate(CH4E(JY,JX));        CH4E=0._r8
+  allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
   allocate(H2GE(JY,JX));        H2GE=0._r8
-  allocate(CO2E(JY,JX));        CO2E=0._r8
+  allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
 
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
@@ -315,6 +317,7 @@ implicit none
   subroutine DestructClimForcData
   use abortutils, only : destroy
   implicit none
+  call destroy(HeatPrec_col)
   call destroy(WDPTHD)
   call destroy(TDTPX)
   call destroy(TDTPN)
@@ -344,8 +347,8 @@ implicit none
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)
-  call destroy(PRECD_col)
-  call destroy(PRECB_col)
+  call destroy(PrecDirect2Grnd_col)
+  call destroy(PrecIndirect2Grnd_col)
   call destroy(CO2EI)
   call destroy(CCO2EI)
 
@@ -356,11 +359,11 @@ implicit none
   call destroy(Z2OE)
   call destroy(Z2GE)
   call destroy(ZNH3E)
-  call destroy(CH4E)
+  call destroy(CH4E_col)
   call destroy(H2GE)
 
   call destroy(SolarNoonHour_col)
-  call destroy(CO2E)
+  call destroy(CO2E_col)
   call destroy(RadSWDirect_col)
   call destroy(RadSWDiffus_col)
   call destroy(RadPARDirect_col)

@@ -103,9 +103,9 @@ module WthrMod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       CO2EI(NY,NX)=atm_co2_mon(mon)
-      CH4E(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
+      CH4E_col(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
       Z2OE(NY,NX) =atm_n2o_mon(mon)*1.e-3_r8  !ppb to ppm
-      CO2E(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
+      CO2E_col(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
     ENDDO
   ENDDO
 

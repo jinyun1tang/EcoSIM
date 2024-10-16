@@ -67,7 +67,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LWRadCanopy_pft(:,:,:)                   !canopy longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWbyCanopy_pft(:,:,:)                 !canopy absorbed shortwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadPARbyCanopy_pft(:,:,:)                   !canopy absorbed PAR , [umol m-2 s-1]
-  real(r8),target,allocatable ::  FracPARRadbyCanopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8),target,allocatable ::  FracPARads2Canopy_pft(:,:,:)                       !fraction of incoming PAR absorbed by canopy, [-]
   real(r8),target,allocatable ::  TAU_RadThru(:,:,:)                        !fraction of radiation transmitted by canopy layer, [-]
   real(r8),target,allocatable ::  TAU_DirRadTransm(:,:,:)                        !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                         !fraction of radiation intercepted by ground surface, [-]
@@ -75,7 +75,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LWRadCanGPrev(:,:)                        !longwave radiation emitted by canopy, [MJ m-2 h-1]
   real(r8),target,allocatable ::  LWRadGrnd(:,:)                          !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8),target,allocatable ::  CanH2OHeldVg_col(:,:)                   !canopy held water content, [m3 d-2]
-  real(r8),target,allocatable ::  TFLWCI(:,:)                             !net ice transfer to canopy, [MJ d-2 t-1]
+  real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                             !net ice transfer to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)            !grid net precipitation water interception to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  EvapTransHeat_pft(:,:,:)                       !canopy latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatXAir2PCan_pft(:,:,:)               !air to canopy sensible heat flux, [MJ d-2 h-1]
@@ -225,7 +225,7 @@ module CanopyDataType
   allocate(LWRadCanopy_pft(JP,JY,JX));    LWRadCanopy_pft=0._r8
   allocate(RadSWbyCanopy_pft(JP,JY,JX));     RadSWbyCanopy_pft=0._r8
   allocate(RadPARbyCanopy_pft(JP,JY,JX));     RadPARbyCanopy_pft=0._r8
-  allocate(FracPARRadbyCanopy_pft(JP,JY,JX));    FracPARRadbyCanopy_pft=0._r8
+  allocate(FracPARads2Canopy_pft(JP,JY,JX));    FracPARads2Canopy_pft=0._r8
   allocate(TAU_RadThru(NumOfCanopyLayers+1,JY,JX));   TAU_RadThru=0._r8
   allocate(TAU_DirRadTransm(NumOfCanopyLayers+1,JY,JX));   TAU_DirRadTransm=0._r8
   allocate(FracSWRad2Grnd_col(JY,JX));       FracSWRad2Grnd_col=0._r8
@@ -233,7 +233,7 @@ module CanopyDataType
   allocate(LWRadCanGPrev(JY,JX));      LWRadCanGPrev=0._r8
   allocate(LWRadGrnd(JY,JX));      LWRadGrnd=0._r8
   allocate(CanH2OHeldVg_col(JY,JX));      CanH2OHeldVg_col=0._r8
-  allocate(TFLWCI(JY,JX));      TFLWCI=0._r8
+  allocate(Prec2Canopy_col(JY,JX));      Prec2Canopy_col=0._r8
   allocate(PrecIntceptByCanopy_col(JY,JX));       PrecIntceptByCanopy_col=0._r8
   allocate(EvapTransHeat_pft(JP,JY,JX));    EvapTransHeat_pft=0._r8
   allocate(HeatXAir2PCan_pft(JP,JY,JX));    HeatXAir2PCan_pft=0._r8
@@ -382,7 +382,7 @@ module CanopyDataType
   call destroy(LWRadCanopy_pft)
   call destroy(RadSWbyCanopy_pft)
   call destroy(RadPARbyCanopy_pft)
-  call destroy(FracPARRadbyCanopy_pft)
+  call destroy(FracPARads2Canopy_pft)
   call destroy(TAU_RadThru)
   call destroy(TAU_DirRadTransm)
   call destroy(FracSWRad2Grnd_col)
@@ -390,7 +390,7 @@ module CanopyDataType
   call destroy(LWRadCanGPrev)
   call destroy(LWRadGrnd)
   call destroy(CanH2OHeldVg_col)
-  call destroy(TFLWCI)
+  call destroy(Prec2Canopy_col)
   call destroy(PrecIntceptByCanopy_col)
   call destroy(EvapTransHeat_pft)
   call destroy(HeatXAir2PCan_pft)

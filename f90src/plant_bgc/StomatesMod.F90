@@ -775,7 +775,7 @@
     MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft, &
     DiffCO2Atmos2Intracel_pft => plt_photo%DiffCO2Atmos2Intracel_pft, &
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
-    FracPARRadbyCanopy_pft    => plt_rad%FracPARRadbyCanopy_pft,      &
+    FracPARads2Canopy_pft    => plt_rad%FracPARads2Canopy_pft,      &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          &
   )
 
@@ -811,13 +811,13 @@
 !
 !     RSX,MinCanPStomaResistH2O_pft=minimum canopy stomatal resistance to CO2,H2O (h m-1)
 !     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate
-!     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     DiffCO2Atmos2Intracel_pft=difference between atmosph and intercellular CO2 concn (umol m-3)
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
   IF(CH2O.GT.ZERO4Groth_pft(NZ))THEN
-    RSX=FracPARRadbyCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
+    RSX=FracPARads2Canopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
     RSX=H2OCuticleResist_pft(NZ)*1.56_r8
   ENDIF

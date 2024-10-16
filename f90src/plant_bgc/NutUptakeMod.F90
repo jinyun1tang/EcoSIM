@@ -70,7 +70,7 @@ module NutUptakeMod
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,     &
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch,        &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
-    FracPARRadbyCanopy_pft    => plt_rad%FracPARRadbyCanopy_pft,     &
+    FracPARads2Canopy_pft    => plt_rad%FracPARads2Canopy_pft,     &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        &
   )
   !
@@ -86,11 +86,11 @@ module NutUptakeMod
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
   !     NH3Dep2Can_brch=NH3 flux between atmosphere and branch
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
-  !     FracPARRadbyCanopy_pft=fraction of radiation received by each PFT canopy
+  !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
   !
   SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy_pft(NZ))
   FNH3P=1.0E-04_r8*FDMP
-  if(FracPARRadbyCanopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
+  if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -98,7 +98,7 @@ module NutUptakeMod
         ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2Can_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
-          *FracPARRadbyCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
+          *FracPARads2Canopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
       ELSE
         NH3Dep2Can_brch(NB,NZ)=0.0_r8
       ENDIF

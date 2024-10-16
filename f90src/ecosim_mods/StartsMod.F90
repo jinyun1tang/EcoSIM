@@ -125,8 +125,8 @@ module StartsMod
 !
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
@@ -435,12 +435,11 @@ module StartsMod
       IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
-        VORGC=CORGCM*ppmc*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VORGC=CORGCM*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
-        VHeatCapacitySoilM_vr(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
+        VHeatCapacitySoilM_vr(L,NY,NX)=((cpo*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP_vr(L,NY,NX)+2.128_r8*ROCK_vr(L,NY,NX))*VGeomLayer_vr(L,NY,NX)
-!        write(*,*)'vhcm',L,VORGC,VMINL,VSAND,PTDS  
       ELSE
         VHeatCapacitySoilM_vr(L,NY,NX)=0.0_r8
       ENDIF
@@ -1028,8 +1027,8 @@ module StartsMod
 !     tPBOT = # atmosphere
       tPBOT=1._r8   
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
