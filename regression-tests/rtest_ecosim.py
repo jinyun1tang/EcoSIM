@@ -898,7 +898,7 @@ def setup_log(test_dir):
                         filemode='w',
                         level=logging.INFO,
                         format='%(message)s')
-    logging.info("BeTR regression tests")
+    logging.info("EcoSIM regression tests")
     logging.info("Run time : {0}".format(time_stamp))
     logging.info("System information :")
     logging.info("    {0}".format(os.uname()))
@@ -908,7 +908,7 @@ def setup_log(test_dir):
     tempfile = "{0}/tmp-ecosim-test-info.txt".format(test_dir)
 
     logging.info(SEPERATOR)
-    logging.info("BeTR repository status ")
+    logging.info("EcoSIM repository status ")
     if os.path.isdir("{0}/../.git".format(test_dir)):
         cmd = ["git", "log", "-n", "1"]
         append_command_to_log(cmd, tempfile)

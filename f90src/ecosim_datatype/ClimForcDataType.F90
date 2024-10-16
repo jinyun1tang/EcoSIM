@@ -174,6 +174,7 @@ implicit none
   real(r8),target,allocatable ::  N2_rain_conc(:,:)                          !precipitation  N2 concentration, [g m-3]
   real(r8),target,allocatable ::  N2O_rain_conc(:,:)                          !precipitation  N2O concentration, [g m-3]
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
+  real(r8),target,allocatable ::  HeatPrec_col(:,:)    !precipitation heat to surface [MJ/d2/h]
   contains
 !----------------------------------------------------------------------
 
@@ -194,6 +195,7 @@ implicit none
   allocate(TDWND(12,JY,JX));    TDWND=0._r8
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
+  allocate(HeatPrec_col(JY,JX)); HeatPrec_col=0._r8
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
@@ -315,6 +317,7 @@ implicit none
   subroutine DestructClimForcData
   use abortutils, only : destroy
   implicit none
+  call destroy(HeatPrec_col)
   call destroy(WDPTHD)
   call destroy(TDTPX)
   call destroy(TDTPN)

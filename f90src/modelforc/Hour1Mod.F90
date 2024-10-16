@@ -225,7 +225,7 @@ module Hour1Mod
       Canopy_NEE_col(NY,NX)         = 0.0_r8
       Eco_NEE_col(NY,NX)            = 0.0_r8
       ECO_ER_col(NY,NX)             = 0.0_r8
-
+      HeatPrec_col(NY,NX)           = 0.0_r8
       DO  NZ=1,NP(NY,NX)
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
@@ -264,6 +264,7 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
   integer :: NZ
   real(r8) :: VOLWCX  !maximum precipitation holding capacity by canopy (leaf+stem)
+  real(r8) :: prec2canopy_pft
 !
 !     CANOPY RETENTION OF PRECIPITATION
 !
@@ -277,10 +278,10 @@ module Hour1Mod
   DO  NZ=1,NP(NY,NX)
     VOLWCX                           = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
       *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-    PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX) &
-      ,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
-    TFLWCI(NY,NX)=TFLWCI(NY,NX)+PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
-    PrecIntceptByCanopy_col(NY,NX)=PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
+    prec2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
+    PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(prec2canopy_pft,VOLWCX-WatByPCanopy_pft(NZ,NY,NX)))
+    Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+prec2canopy_pft
+    PrecIntceptByCanopy_col(NY,NX)   = PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
 
   end subroutine CanopyInterceptPrecp
@@ -290,21 +291,21 @@ module Hour1Mod
 !     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
 !
   implicit none
-  WatMassStore_lnd=0.0_r8
-  HeatStore_lnd=0.0_r8
-  TSoilO2G_lnd=0.0_r8
-  TSoilH2G_lnd=0.0_r8
-  TSEDSO=0.0_r8
-  LitRMStoreLndscap(:)=0.0_r8
+  WatMassStore_lnd     = 0.0_r8
+  HeatStore_lnd        = 0.0_r8
+  TSoilO2G_lnd         = 0.0_r8
+  TSoilH2G_lnd         = 0.0_r8
+  TSEDSO               = 0.0_r8
+  LitRMStoreLndscap(:) = 0.0_r8
 
-  POMHumStoreLndscap(:)=0.0_r8
-  TGasC_lnd=0.0_r8
-  TGasN_lnd=0.0_r8
-  TDisolNH4_lnd=0.0_r8
-  tNO3_lnd=0.0_r8
-  TDisolPi_lnd=0.0_r8
-  TION=0.0_r8
-  PlantElemntStoreLandscape(:)=0.0_r8
+  POMHumStoreLndscap(:)        = 0.0_r8
+  TGasC_lnd                    = 0.0_r8
+  TGasN_lnd                    = 0.0_r8
+  TDisolNH4_lnd                = 0.0_r8
+  tNO3_lnd                     = 0.0_r8
+  TDisolPi_lnd                 = 0.0_r8
+  TION                         = 0.0_r8
+  PlantElemntStoreLandscape(:) = 0.0_r8
   end subroutine ResetLndscapeAccumlators
 !------------------------------------------------------------------------------------------
 
@@ -766,12 +767,12 @@ module Hour1Mod
 
   CanWat_col(NY,NX)              = 0.0_r8
   CanH2OHeldVg_col(NY,NX)        = 0.0_r8
-  TFLWCI(NY,NX)                  = 0.0_r8
+  Prec2Canopy_col(NY,NX)                  = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
   QvET_col(NY,NX)                = 0.0_r8
-  VapXAir2Canopy_col(NY,NX)            = 0.0_r8
-  HeatFlx2Canopy_col(NY,NX)                  = 0.0_r8
-  CanopyHeatStor_col(NY,NX)         = 0.0_r8
+  VapXAir2Canopy_col(NY,NX)      = 0.0_r8
+  HeatFlx2Canopy_col(NY,NX)      = 0.0_r8
+  CanopyHeatStor_col(NY,NX)      = 0.0_r8
 
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)    = 0.0_r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0.0_r8
