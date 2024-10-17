@@ -9,16 +9,16 @@ module PlantDataRateType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  Eco_NEE_col(:,:)                         !total canopy net CO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)             
-  real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)             
+  real(r8),target,allocatable ::  Eco_NEE_col(:,:)                               !total canopy net CO2 exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                          !canopy NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)                   !pft nodule infection [g d-2 h-1]
+  real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)                !pft cumulative nodule infection
   real(r8),target,allocatable ::  NH3Emis_CumYr_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
-  real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)                     !total surface LitrFall element, [g d-2]
-  real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)              !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)       !root uptake of NH4 non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)             !root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUPGasSol_vr(:,:,:,:,:,:)          !aqueous H2 flux from roots to soil water, [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
+  real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)             !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [g d-2 h-1]
+  real(r8),target,allocatable ::  RUPGasSol_vr(:,:,:,:,:,:)                      !aqueous H2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)                  !root uptake of H2PO4 non-band
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)                  !root uptake of H2PO4 band
   real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
@@ -109,7 +109,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RDOMEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndK_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
-  real(r8),target,allocatable ::  TH2GZ(:,:)                         !total root H2 flux, [g d-2]
+  real(r8),target,allocatable ::  TRootH2Flx_col(:,:)                                          !total root H2 flux, [g d-2]
+  real(r8),target,allocatable ::  RootCO2Autor_vr(:,:)                                 !root autotrophic respiraiton [gC/m3/hr]
   private :: InitAllocate
   contains
 
@@ -226,7 +227,8 @@ module PlantDataRateType
   allocate(RDOMEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RDOMEcoDmndPrev_vr=0._r8
   allocate(RAcetateEcoDmndK_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndK_vr=0._r8
   allocate(RAcetateEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndPrev_vr=0._r8
-  allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
+  allocate(TRootH2Flx_col(JY,JX));       TRootH2Flx_col=0._r8
+  allocate(RootCO2Autor_vr(JZ,JY,JX));   RootCO2Autor_vr=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -325,8 +327,9 @@ module PlantDataRateType
   call destroy(RDOMEcoDmndPrev_vr)
   call destroy(RAcetateEcoDmndK_vr)
   call destroy(RAcetateEcoDmndPrev_vr)
-  call destroy(TH2GZ)
+  call destroy(TRootH2Flx_col)
   call destroy(trcs_plant_uptake_vr)
+  call destroy(RootCO2Autor_vr)
   end subroutine DestructPlantRates
 
 end module PlantDataRateType

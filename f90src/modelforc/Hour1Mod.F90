@@ -729,7 +729,7 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-
+  RootCO2Autor_vr(:,NY,NX)                = 0._r8
   tRDOE2Die_col(1:NumPlantChemElms,NY,NX) = 0._r8
   QRunSurf_col(NY,NX)                     = 0.0_r8
   HeatRunSurf_col(NY,NX)                  = 0._r8
@@ -761,7 +761,7 @@ module Hour1Mod
   HeatNet2Surf_col(NY,NX)                 = 0.0_r8
   VapXAir2GSurf_col(NY,NX)                = 0.0_r8
 
-  trcs_Transp2MacP_3D(:,:,:,:,:)                 = 0._r8
+  trcs_Transp2MacP_3D(:,:,:,:,:) = 0._r8
   Gas_Flx_atmDif2soil_col(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX) = 0.0_r8
 

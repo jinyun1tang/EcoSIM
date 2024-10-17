@@ -73,7 +73,8 @@ implicit none
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
-  real(r8),pointer   :: h1D_tLITR_N_col(:)      !tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tLITR_N_col(:)       !litter N
+  real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton
   real(r8),pointer   :: h2D_BotDEPZ_vr(:,:)
   real(r8),pointer   :: h1D_tRAD_col(:)
   real(r8),pointer   :: h1D_tHeatUptk_col(:)
@@ -706,7 +707,7 @@ implicit none
   allocate(this%h2D_RFerment_vr(beg_col:end_col,1:JZ)); this%h2D_RFerment_vr(:,:)=spval
   allocate(this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ));  this%h2D_nh3oxi_vr(:,:)=spval
   allocate(this%h2D_n2oprod_vr(beg_col:end_col,1:JZ));  this%h2D_n2oprod_vr(:,:)=spval
-
+  allocate(this%h2D_RootAR_vr(beg_col:end_col,1:JZ)); this%h2D_RootAR_vr(:,:)=spval
   allocate(this%h1D_RCH4ProdHydrog_litr_col(beg_col:end_col));  this%h1D_RCH4ProdHydrog_litr_col(:)=spval
   allocate(this%h1D_RCH4ProdAcetcl_litr_col(beg_col:end_col));  this%h1D_RCH4ProdAcetcl_litr_col(:)=spval
   allocate(this%h1D_RCH4Oxi_aero_litr_col(beg_col:end_col)); this%h1D_RCH4Oxi_aero_litr_col(:)=spval
@@ -1897,6 +1898,10 @@ implicit none
   call hist_addfld2d(fname='Fermentation_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved fermentation rate',ptr_col=data2d_ptr)      
 
+  data2d_ptr =>  this%h2D_RootAR_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='RootAR_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved root respiration rate',ptr_col=data2d_ptr)      
+
   data2d_ptr =>  this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='NH3Oxid_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved NH3 oxidation rate',ptr_col=data2d_ptr)      
@@ -2497,7 +2502,7 @@ implicit none
         this%h2D_nh3oxi_vr(ncol,L)         = RNH3oxi_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_n2oprod_vr(ncol,L)        = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
                                +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-
+        this%h2D_RootAR_vr(ncol,L) = RootCO2Autor_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       ENDDO
 
       DO NZ=1,NP0(NY,NX)

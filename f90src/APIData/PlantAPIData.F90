@@ -629,7 +629,7 @@ implicit none
   real(r8) :: NetCO2Flx2Canopy_col     !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8) :: ECO_ER_col      !ecosystem respiration, [g d-2 h-1]
   real(r8) :: Eco_AutoR_CumYr_col      !ecosystem autotrophic respiration, [g d-2 h-1]
-  real(r8) :: TH2GZ     !total root H2 flux, [g d-2]
+  real(r8) :: TRootH2Flx_col     !total root H2 flux, [g d-2]
   real(r8) :: Canopy_NEE_col     !total net CO2 fixation, [gC d-2]
   real(r8), pointer :: LitrFallStrutElms_col(:)        => null() !total LitrFall element,                       [g d-2 h-1]
   real(r8), pointer :: NetPrimProduct_pft(:)           => null()   !total net primary productivity,             [gC d-2]

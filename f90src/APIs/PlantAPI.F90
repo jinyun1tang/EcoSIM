@@ -490,6 +490,7 @@ implicit none
         RootCO2Autor_pvr(N,L,NZ,NY,NX)        = plt_rbgc%RootCO2Autor_pvr(N,L,NZ)
         RootCO2Emis_pvr(N,L,NZ,NY,NX)         = plt_rbgc%RootCO2Emis_pvr(N,L,NZ)
         RootO2Uptk_pvr(N,L,NZ,NY,NX)          = plt_rbgc%RootO2Uptk_pvr(N,L,NZ)
+
         RUPGasSol_vr(idg_CO2,N,L,NZ,NY,NX)           = plt_rbgc%RUPGasSol_vr(idg_CO2,N,L,NZ)
         RUPGasSol_vr(idg_O2,N,L,NZ,NY,NX)            = plt_rbgc%RUPGasSol_vr(idg_O2,N,L,NZ)
         RUPGasSol_vr(idg_CH4,N,L,NZ,NY,NX)           = plt_rbgc%RUPGasSol_vr(idg_CH4,N,L,NZ)
@@ -547,6 +548,7 @@ implicit none
         PopuRootMycoC_pvr(N,L,NZ,NY,NX)                = plt_biom% PopuRootMycoC_pvr(N,L,NZ)
         RootProteinC_pvr(N,L,NZ,NY,NX)                 = plt_biom%RootProteinC_pvr(N,L,NZ)
         RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)            = plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)
+        RootCO2Autor_vr(L,NY,NX) = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)        
       ENDDO
     ENDDO
 

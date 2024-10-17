@@ -1298,11 +1298,11 @@ module MicAutoCPLXMod
 !     RCHDF=gaseous-aqueous CH4 exchange
 !     DiffusivitySolutEff=rate constant for gaseous-aqueous exchange
 !
-  ECHZ=EH4X
-  VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*OMActAutor(NGL)*VMX4
-  RCH4L1=RCH4PhysexchPrev_vr*dts_gas
-  RCH4F1=RCH4F*dts_gas
-  RCH4S1=(naqfdiag%tCH4ProdAceto+naqfdiag%tCH4ProdH2)*dts_gas
+  ECHZ   = EH4X
+  VMXA   = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*OMActAutor(NGL)*VMX4
+  RCH4L1 = RCH4PhysexchPrev_vr*dts_gas
+  RCH4F1 = RCH4F*dts_gas
+  RCH4S1 = (naqfdiag%tCH4ProdAceto+naqfdiag%tCH4ProdH2)*dts_gas
 
   IF(litrm)THEN
     !surface residue layer
@@ -1356,11 +1356,10 @@ module MicAutoCPLXMod
         ELSE
           RCHDF=0.0_r8
         ENDIF
-        CH4G1=CH4G1-RCHDF
-        CH4S1=CH4S1+RCHDF
-        RCH4Oxid=RCH4Oxid+RVOXP1
-        RGOMP=RGOMP+RGOMP1
-
+        CH4G1    = CH4G1-RCHDF
+        CH4S1    = CH4S1+RCHDF
+        RCH4Oxid = RCH4Oxid+RVOXP1
+        RGOMP    = RGOMP+RGOMP1
       ENDDO D325
     ENDIF
   ENDDO D320
@@ -1372,9 +1371,9 @@ module MicAutoCPLXMod
 !     RO2Dmnd4RespHeter=O2 demand from respiration
 !     ROXYP=O2 demand from respiration + CH4 oxidation
 ! 
-  RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
-  RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+5.333_r8*RCH4Oxid
-  RO2DmndAutort(NGL)=RO2DmndAutor(NGL)
+  RO2Dmnd4RespAutor(NGL) = 2.667_r8*RGOMP
+  RO2DmndAutor(NGL)      = RO2Dmnd4RespAutor(NGL)+5.333_r8*RCH4Oxid
+  RO2DmndAutort(NGL)     = RO2DmndAutor(NGL)
   end associate
   end subroutine MethanotrophCatabolism
 !------------------------------------------------------------------------------------------

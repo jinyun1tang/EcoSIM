@@ -514,11 +514,11 @@ implicit none
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration unltd,ltd by O2 and unlimited by N,P
 !     WFNRG=respiration function of root water potential
 !
-  RNonstCO2_Oltd=RNonstCO2_OUltd*RAutoRootO2Limter_pvr(N,L,NZ)
-  RCO2XMaint2nd_OUltd=RNonstCO2_OUltd-Rmaint2nd_CO2
-  RCO2XMaint2nd_Oltd=RNonstCO2_Oltd-Rmaint2nd_CO2
-  RGrowCO2_OUltd=AZMAX1(RCO2XMaint2nd_OUltd)*WFNRG
-  RGrowCO2_Oltd=AZMAX1(RCO2XMaint2nd_Oltd)*WFNRG
+  RNonstCO2_Oltd      = RNonstCO2_OUltd*RAutoRootO2Limter_pvr(N,L,NZ)
+  RCO2XMaint2nd_OUltd = RNonstCO2_OUltd-Rmaint2nd_CO2
+  RCO2XMaint2nd_Oltd  = RNonstCO2_Oltd-Rmaint2nd_CO2
+  RGrowCO2_OUltd      = AZMAX1(RCO2XMaint2nd_OUltd)*WFNRG
+  RGrowCO2_Oltd       = AZMAX1(RCO2XMaint2nd_Oltd)*WFNRG
 !
 !     SECONDARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -529,10 +529,10 @@ implicit none
 !     FNP=growth respiration limited by non-structural N,P
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
 !
-  DMRTR=DMRTD*FRTN
-  ZPOOLB=AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))
-  PPOOLB=AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))
-  FNP=AMIN1(ZPOOLB/CNRTS_pft(NZ),PPOOLB/CPRTS_pft(NZ))*DMRTR
+  DMRTR  = DMRTD*FRTN
+  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))
+  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))
+  FNP    = AMIN1(ZPOOLB/CNRTS_pft(NZ),PPOOLB/CPRTS_pft(NZ))*DMRTR
   IF(RGrowCO2_OUltd.GT.0.0_r8)THEN
     RGrowCO2_OUltd=AMIN1(RGrowCO2_OUltd,FNP)
   ELSE
@@ -557,12 +557,12 @@ implicit none
 !     RootMycoNonst4Grow_OUltd(:)=nonstructural N,P unlimited,limited by O2 used in growth
 !     RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
 !
-  RootMycoNonst4GrowC_OUltd=RGrowCO2_OUltd/DMRTD
-  RootMycoNonst4GrowC_Oltd=RGrowCO2_Oltd/DMRTD
-  RootMycoNonst4Grow_OUltd(ielmc)=RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
-  RootMycoNonst4Grow_OUltd(ielmn)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
-  RootMycoNonst4Grow_OUltd(ielmp)=AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CPRTW)
-  RCO2Nonst4Nassim_OUltd=AZMAX1(1.70_r8*RootMycoNonst4Grow_OUltd(ielmn))
+  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRTD
+  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRTD
+  RootMycoNonst4Grow_OUltd(ielmc) = RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
+  RootMycoNonst4Grow_OUltd(ielmn) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
+  RootMycoNonst4Grow_OUltd(ielmp) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CPRTW)
+  RCO2Nonst4Nassim_OUltd          = AZMAX1(1.70_r8*RootMycoNonst4Grow_OUltd(ielmn))
 
   RootMycoNonst4Grow_Oltd(ielmc)=RootMycoNonst4GrowC_Oltd*RootBiomGrosYld_pft(NZ)
 !  print*,'rootmyco4gro',RootMycoNonst4Grow_Oltd(ielmc),RootMycoNonst4GrowC_Oltd,RootBiomGrosYld_pft(NZ)
@@ -721,13 +721,13 @@ implicit none
 !     RootCO2Autor_pvr=total root respiration
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !
-  RCO2T2nd_OUltd=AMIN1(Rmaint2nd_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd+RCO2Nonst4Nassim_OUltd+RCO2Nonst4Xmaint2nd_OUltd
-  RCO2T2nd_Oltd=AMIN1(Rmaint2nd_CO2,RNonstCO2_Oltd)+RGrowCO2_Oltd+RCO2Nonst4Nassim_Oltd+RCO2Nonst4Xmaint2nd_Oltd
-  RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+RCO2T2nd_OUltd
-  RootCO2EmisPot_pvr(N,L,NZ)=RootCO2EmisPot_pvr(N,L,NZ)+RCO2T2nd_Oltd
-  RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)-RCO2T2nd_Oltd
-  RCO2flx2=-RCO2T2nd_Oltd
-  RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T2nd_Oltd
+  RCO2T2nd_OUltd                       = AMIN1(Rmaint2nd_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd+RCO2Nonst4Nassim_OUltd+RCO2Nonst4Xmaint2nd_OUltd
+  RCO2T2nd_Oltd                        = AMIN1(Rmaint2nd_CO2,RNonstCO2_Oltd)+RGrowCO2_Oltd+RCO2Nonst4Nassim_Oltd+RCO2Nonst4Xmaint2nd_Oltd
+  RootRespPotent_pvr(N,L,NZ)           = RootRespPotent_pvr(N,L,NZ)+RCO2T2nd_OUltd
+  RootCO2EmisPot_pvr(N,L,NZ)           = RootCO2EmisPot_pvr(N,L,NZ)+RCO2T2nd_Oltd
+  RootCO2Autor_pvr(N,L,NZ)             = RootCO2Autor_pvr(N,L,NZ)-RCO2T2nd_Oltd
+  RCO2flx2                             = -RCO2T2nd_Oltd
+  RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T2nd_Oltd
 
 !
 !     SECONDARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR

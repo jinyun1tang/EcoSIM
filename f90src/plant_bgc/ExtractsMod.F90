@@ -340,7 +340,7 @@ module ExtractsMod
     RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
     ETCanopy_CumYr_pft        => plt_ew%ETCanopy_CumYr_pft,          &
-    TH2GZ                     => plt_bgcr%TH2GZ,                     &
+    TRootH2Flx_col                     => plt_bgcr%TRootH2Flx_col,                     &
     trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,      &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
     TRootGasLossDisturb_pft   => plt_rbgc%TRootGasLossDisturb_pft,   &
