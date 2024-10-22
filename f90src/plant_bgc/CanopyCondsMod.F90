@@ -27,9 +27,12 @@ module CanopyCondsMod
   integer, intent(in) :: I,J
   real(r8), intent(in) :: DepthSurfWatIce !water+ice depth at surface
 
-  call DivideCanopyDepthByLAI(I,J)
+  real(r8) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
+  real(r8) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    
 
-  call MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce)
+  call DivideCanopyDepthByLAI(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+
+  call MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
   call CalcBoundaryLayerProperties(DepthSurfWatIce)
 
@@ -45,26 +48,26 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
-  associate(                                                 &
-    WindSpeedAtm_col       => plt_site%WindSpeedAtm_col,     &
-    ZERO                   => plt_site%ZERO,                 &
-    AREA3                  => plt_site%AREA3,                &
-    KoppenClimZone         => plt_site%KoppenClimZone,       &
-    SoilSurfRoughnesst0_col     => plt_site%SoilSurfRoughnesst0_col,   &
-    WindMesHeight          => plt_site%WindMesHeight,        &
-    ZEROS                  => plt_site%ZEROS,                &
-    NU                     => plt_site%NU,                   &
-    AbvCanopyBndlResist_col    => plt_ew%AbvCanopyBndlResist_col,    &
-    ZERO4PlantDisplace_col => plt_ew%ZERO4PlantDisplace_col, &
-    RoughHeight            => plt_ew%RoughHeight,            &
-    RIB                    => plt_ew%RIB,                    &
-    TairK                  => plt_ew%TairK,                  &
-    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col,   &
-    SnowDepth              => plt_ew%SnowDepth,              &
-    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,  &
-    CanopyHeight_col       => plt_morph%CanopyHeight_col,    &
-    StemArea_col           => plt_morph%StemArea_col,        &
-    CanopyLeafArea_col     => plt_morph%CanopyLeafArea_col   &
+  associate(                                                     &
+    WindSpeedAtm_col        => plt_site%WindSpeedAtm_col,        &
+    ZERO                    => plt_site%ZERO,                    &
+    AREA3                   => plt_site%AREA3,                   &
+    KoppenClimZone          => plt_site%KoppenClimZone,          &
+    SoilSurfRoughnesst0_col => plt_site%SoilSurfRoughnesst0_col, &
+    WindMesHeight           => plt_site%WindMesHeight,           &
+    ZEROS                   => plt_site%ZEROS,                   &
+    NU                      => plt_site%NU,                      &
+    AbvCanopyBndlResist_col => plt_ew%AbvCanopyBndlResist_col,   &
+    ZERO4PlantDisplace_col  => plt_ew%ZERO4PlantDisplace_col,    &
+    RoughHeight             => plt_ew%RoughHeight,               &
+    RIB                     => plt_ew%RIB,                       &
+    TairK                   => plt_ew%TairK,                     &
+    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col,      &
+    SnowDepth               => plt_ew%SnowDepth,                 &
+    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col,     &
+    CanopyHeight_col        => plt_morph%CanopyHeight_col,       &
+    StemArea_col            => plt_morph%StemArea_col,           &
+    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col      &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -114,25 +117,37 @@ module CanopyCondsMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DivideCanopyDepthByLAI(I,J)
+  subroutine DivideCanopyDepthByLAI(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
   implicit none
   integer, intent(in) :: I,J
+  real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice thickness above soil surface  
+  real(r8), intent(out) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
+  real(r8), intent(out) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    
   real(r8) :: ZL1(0:NumOfCanopyLayers1)
   real(r8) :: AreaInterval,AreaL
-  real(r8) :: ARX
-  real(r8) :: DZL
-  integer :: NZ,L
+  real(r8) :: ARX  !interval canopy area: leaf+stem
+  real(r8) :: DZL  !canopy interval height 
+  integer :: NZ,L,K,NB,N
   !     begin_execution
-  associate(                                                        &
-    NP                       => plt_site%NP                       , &
-    ZEROS                    => plt_site%ZEROS                    , &
-    CanopyHeight_col         => plt_morph%CanopyHeight_col        , &
-    CanopyHeightZ_col        => plt_morph%CanopyHeightZ_col       , &
-    CanopyHeight_pft         => plt_morph%CanopyHeight_pft        , &
-    CanopyStemAareZ_col      => plt_morph%CanopyStemAareZ_col     , &
-    CanopyLeafAareZ_col      => plt_morph%CanopyLeafAareZ_col     , &
-    StemArea_col             => plt_morph%StemArea_col            , &
-    CanopyLeafArea_col       => plt_morph%CanopyLeafArea_col        &
+  associate(                                                  &
+    NP                    => plt_site%NP,                     &
+    ZEROS                 => plt_site%ZEROS,                  &
+    ZERO                  => plt_site%ZERO,                   &
+    SnowDepth             => plt_ew%SnowDepth,                &
+    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch,     &
+    StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch,     &
+    CanopyHeight_col      => plt_morph%CanopyHeight_col,      &
+    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     &
+    CanopyHeight_pft      => plt_morph%CanopyHeight_pft,      &
+    CanopyStemAareZ_col   => plt_morph%CanopyStemAareZ_col,   &
+    CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   &
+    StemArea_col          => plt_morph%StemArea_col,          &
+    LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft,     &
+    LeafStalkArea_col     => plt_morph%LeafStalkArea_col,     &
+    CanopyLeafArea_lpft   => plt_morph%CanopyLeafArea_lpft,   &
+    CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch, &
+    NumOfBranches_pft     => plt_morph%NumOfBranches_pft,     &
+    CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col     &
   )
   !
   !     DIVISION OF CANOPY INTO NumOfCanopyLayers LAYERS WITH EQUAL LAI
@@ -156,8 +171,8 @@ module CanopyCondsMod
     D2765: DO L=NumOfCanopyLayers1,2,-1
       AreaL=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)
       IF(AreaL.GT.1.01_r8*AreaInterval)THEN
-        DZL=CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)
-        ZL1(L-1)=CanopyHeightZ_col(L-1)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
+        DZL      = CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)
+        ZL1(L-1) = CanopyHeightZ_col(L-1)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
       ELSEIF(AreaL.LT.0.99_r8*AreaInterval)THEN
         ARX=CanopyLeafAareZ_col(L-1)+CanopyStemAareZ_col(L-1)
         DZL=CanopyHeightZ_col(L-1)-CanopyHeightZ_col(L-2)
@@ -175,15 +190,67 @@ module CanopyCondsMod
       CanopyHeightZ_col(L-1)=ZL1(L-1)
     ENDDO D2770
   ENDIF
+
+  LeafStalkArea_col=0.0_r8
+  D1135: DO NZ=1,NP
+    LeafStalkArea_pft(NZ)=0.0_r8
+    DO  NB=1,NumOfBranches_pft(NZ)
+      DO  L=1,NumOfCanopyLayers1    
+        !above snow and water    
+        IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+          !above snow depth and above water/ice surface
+          !add all nodes over a branch
+          D1130: DO K=1,MaxNodesPerBranch1
+            LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
+            LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
+          ENDDO D1130
+          !add stem/stalk area
+          LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
+          LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
+        ENDIF
+      enddo
+    enddo
+  ENDDO D1135
+
+
+  D1150: DO NZ=1,NP
+    DO  L=1,NumOfCanopyLayers1
+      DO  N=1,NumOfLeafZenithSectors1
+        LeafAreaZsec_pft(N,L,NZ)=0.0_r8
+        StemAreaZsec_pft(N,L,NZ)=0.0_r8
+      enddo
+    enddo
+  ENDDO D1150
+
+  D1200: DO NZ=1,NP
+    DO  NB=1,NumOfBranches_pft(NZ)
+      DO  L=1,NumOfCanopyLayers1
+        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GT.DepthSurfWatIce-ZERO)THEN
+          D1205: DO N=1,NumOfLeafZenithSectors1
+            D1210: DO K=1,MaxNodesPerBranch1
+              LeafAreaZsec_pft(N,L,NZ)=LeafAreaZsec_pft(N,L,NZ)+LeafAreaZsec_brch(N,L,K,NB,NZ)
+            ENDDO D1210
+            StemAreaZsec_pft(N,L,NZ)=StemAreaZsec_pft(N,L,NZ)+StemAreaZsec_brch(N,L,NB,NZ)
+          ENDDO D1205
+        ENDIF
+      enddo
+    enddo
+  ENDDO D1200
+
+
   end associate
   end subroutine DivideCanopyDepthByLAI
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce)
+  subroutine MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  !
+  !
   implicit none
   integer, intent(in) :: I,J
-  real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice depth
+  real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice thickness above soil surface    
+  real(r8), intent(in) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
+  real(r8), intent(in) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)  
   integer :: NB,NZ,L,K,M,N,NN
   integer :: iScatteringDirect(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1)
   real(r8) :: TAU_DiffRadTransm(0:NumOfCanopyLayers1+1)
@@ -216,8 +283,7 @@ module CanopyCondsMod
   real(r8) :: BETX(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1)                         !sine of direct solar radiation on leaf surface/sine of direct solar radiation, [-]
   REAL(R8) :: RadSWbyLeafSurf_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,JP1)
   real(r8) :: RadSWbyStalkSurf_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuSects1,JP1)
-  real(r8) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
-  real(r8) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
+
   real(r8) :: SnowpackAlbedo,GrndAlbedo
   real(r8) :: GrndIncidSolarAngle,BETY,BETZ
   real(r8) :: DGAZI,DAZI
@@ -273,7 +339,7 @@ module CanopyCondsMod
     SineGrndSlope_col      => plt_rad%SineGrndSlope_col,       &
     iScatteringDiffus      => plt_rad%iScatteringDiffus,       &
     OMEGA                  => plt_rad%OMEGA,                   &
-    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft,  &
+    FracPARads2Canopy_pft  => plt_rad%FracPARads2Canopy_pft,   &
     RadPAR_zsec            => plt_rad%RadPAR_zsec,             &
     RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec,          &
     OMEGAG                 => plt_rad%OMEGAG,                  &
@@ -311,8 +377,6 @@ module CanopyCondsMod
     ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &
     CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,     &
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft,     &
-    LeafAreaZsec_brch      => plt_morph%LeafAreaZsec_brch,     &
-    StemAreaZsec_brch      => plt_morph%StemAreaZsec_brch,     &
     CanopyLeafArea_pft     => plt_morph%CanopyLeafArea_pft,    &
     CanopyLeafArea_lpft    => plt_morph%CanopyLeafArea_lpft,   &
     CanopyStalkArea_lbrch  => plt_morph%CanopyStalkArea_lbrch, &
@@ -320,28 +384,6 @@ module CanopyCondsMod
     ClumpFactor_pft        => plt_morph%ClumpFactor_pft,       &
     LeafStalkArea_col      => plt_morph%LeafStalkArea_col      &
   )
-
-  LeafStalkArea_col=0.0_r8
-  D1135: DO NZ=1,NP
-!    write(110,*)I+J/24.,CanopyHeightZ_col(1-1),SnowDepth-ZERO, DepthSurfWatIce-ZERO
-    LeafStalkArea_pft(NZ)=0.0_r8
-    DO  NB=1,NumOfBranches_pft(NZ)
-      DO  L=1,NumOfCanopyLayers1    
-        !above snow and water    
-        IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
-          !above snow depth and above water/ice surface
-          !add all nodes over a branch
-          D1130: DO K=1,MaxNodesPerBranch1
-            LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
-            LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
-          ENDDO D1130
-          !add stem/stalk area
-          LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
-          LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
-        ENDIF
-      enddo
-    enddo
-  ENDDO D1135
 
   IF(SineSunInclAngle_col.GT.ZERO)THEN
     RadSWSolarBeam_col =RadSWDirect_col*SineSunInclAngle_col+RadSWDiffus_col*TotSineSkyAngles_grd
@@ -459,28 +501,6 @@ module CanopyCondsMod
       !
       !     TSURF,StemAreaZsec_pft,SURF,StemAreaZsec_brch=leaf,stalk total,PFT surface area
 !
-      D1150: DO NZ=1,NP
-        DO  L=1,NumOfCanopyLayers1
-          DO  N=1,NumOfLeafZenithSectors1
-            LeafAreaZsec_pft(N,L,NZ)=0.0_r8
-            StemAreaZsec_pft(N,L,NZ)=0.0_r8
-          enddo
-        enddo
-      ENDDO D1150
-      D1200: DO NZ=1,NP
-        DO  NB=1,NumOfBranches_pft(NZ)
-          DO  L=1,NumOfCanopyLayers1
-            IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GT.DepthSurfWatIce-ZERO)THEN
-              D1205: DO N=1,NumOfLeafZenithSectors1
-                D1210: DO K=1,MaxNodesPerBranch1
-                  LeafAreaZsec_pft(N,L,NZ)=LeafAreaZsec_pft(N,L,NZ)+LeafAreaZsec_brch(N,L,K,NB,NZ)
-                ENDDO D1210
-                StemAreaZsec_pft(N,L,NZ)=StemAreaZsec_pft(N,L,NZ)+StemAreaZsec_brch(N,L,NB,NZ)
-              ENDDO D1205
-            ENDIF
-          enddo
-        enddo
-      ENDDO D1200
       !
       !     CALCULATE ABSORPTION, REFLECTION AND TRANSMISSION OF DIRECT AND
       !     DIFFUSE DOWNWARD TOTAL AND VISIBLE RADIATION BY EACH SPECIES
@@ -488,15 +508,15 @@ module CanopyCondsMod
       !
       D1800: DO L=NumOfCanopyLayers1,1,-1
         IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
-          RadSWDiffusL =RadSWDiffusL *TAU_DiffRadTransm(L+1)+RadSWFwdScat2NextL(L+1)
-          RadPARDiffusL=RadPARDiffusL*TAU_DiffRadTransm(L+1)+RadPARFwdScat2NextL(L+1)
-          RadSWFwdScat2NextL(L)=0.0_r8
-          RadPARFwdScat2NextL(L)=0.0_r8
-          RadSWBakScat2NextL(L)=0.0_r8
-          RadPARBakScat2NextL(L)=0.0_r8
-          FracDifRadAbsorbtCum=0.0_r8
-          FracDirRadAbsorbt=0.0_r8
-          FracDifRadAbsorbt=0.0_r8
+          RadSWDiffusL           = RadSWDiffusL *TAU_DiffRadTransm(L+1)+RadSWFwdScat2NextL(L+1)
+          RadPARDiffusL          = RadPARDiffusL*TAU_DiffRadTransm(L+1)+RadPARFwdScat2NextL(L+1)
+          RadSWFwdScat2NextL(L)  = 0.0_r8
+          RadPARFwdScat2NextL(L) = 0.0_r8
+          RadSWBakScat2NextL(L)  = 0.0_r8
+          RadPARBakScat2NextL(L) = 0.0_r8
+          FracDifRadAbsorbtCum   = 0.0_r8
+          FracDirRadAbsorbt      = 0.0_r8
+          FracDifRadAbsorbt      = 0.0_r8
     !
     !     RESET ACCUMULATORS OB ABSORBED, REFLECTED AND TRANSMITTED RADIATION
     !
@@ -761,8 +781,8 @@ module CanopyCondsMod
       RadPAR_Grnd = ABS(GrndIncidSolarAngle)*RAPSG
       
       D20: DO N=1,NumOfSkyAzimuSects1
-        RadSW_Grnd=RadSW_Grnd+ABS(OMEGAG(N))*RADYG
-        RadPAR_Grnd=RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
+        RadSW_Grnd  = RadSW_Grnd+ABS(OMEGAG(N))*RADYG
+        RadPAR_Grnd = RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
       ENDDO D20 
       RadSWGrnd_col=RadSW_Grnd*AREA3(NU)
 !
@@ -809,10 +829,10 @@ module CanopyCondsMod
       D2800: DO L=1,NumOfCanopyLayers1
         !the following line shuts off radiation when it is below water 
         IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
-          RadSWDiffusL=RadSWDiffusL*TAU_DiffRadTransm(L-1)+RadSWFwdScat2NextL(L-1)+RadSWBakScat2NextL(L-1)
-          RadPARDiffusL=RadPARDiffusL*TAU_DiffRadTransm(L-1)+RadPARFwdScat2NextL(L-1)+RadPARBakScat2NextL(L-1)
-          RadSWFwdScat2NextL(L)=0.0
-          RadPARFwdScat2NextL(L)=0.0_r8
+          RadSWDiffusL           = RadSWDiffusL*TAU_DiffRadTransm(L-1)+RadSWFwdScat2NextL(L-1)+RadSWBakScat2NextL(L-1)
+          RadPARDiffusL          = RadPARDiffusL*TAU_DiffRadTransm(L-1)+RadPARFwdScat2NextL(L-1)+RadPARBakScat2NextL(L-1)
+          RadSWFwdScat2NextL(L)  = 0.0
+          RadPARFwdScat2NextL(L) = 0.0_r8
           D2500: DO NZ=1,NP
             RadDifSWbyLeaf_pft(NZ)   = 0.0_r8
             RadDifSWbyStalk_pft(NZ)  = 0.0_r8

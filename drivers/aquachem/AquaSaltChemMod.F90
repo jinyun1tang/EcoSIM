@@ -148,7 +148,7 @@ implicit none
   cid_PrecpB_AlPO4_conc   =addone(itemp)  !precipitated AlPO4 band soil, [mol m-3]
   cid_PrecpB_CaHPO4_conc   =addone(itemp)  !precipitated CaHPO4 band soil, [mol m-3]
   cid_PrecpB_Ca5P3O12O3H3_conc   =addone(itemp)  !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
-  cid_PrecpB_CaH4P2O8_con   =addone(itemp)  !precipitated CaH4P2O8 band soil, [mol m-3]
+  cid_PrecpB_CaH4P2O8_conc   =addone(itemp)  !precipitated CaH4P2O8 band soil, [mol m-3]
   cid_PrecpB_FePO4_con   =addone(itemp)  !precipitated FePO4 band soil, [mol m-3]
   cid_XNH4_band_conc     =addone(itemp)  !exchangeable NH4 band soil, [mol d-2]
   cid_XROH1_band_conc    =addone(itemp)  !exchangeable OH- band, [mol d-2]
@@ -536,8 +536,8 @@ implicit none
   varl(cid_PrecpB_Ca5P3O12O3H3_conc) ='PrecpB_Ca5P3O12O3H3_conc';varlnml(cid_PrecpB_Ca5P3O12O3H3_conc)='band soil precipitated Ca5(PO4)3OH hydroxyapatite'
   unitl(cid_PrecpB_Ca5P3O12O3H3_conc)='mol m-3';vartypes(cid_PrecpB_Ca5P3O12O3H3_conc)=var_state_type
 
-  varl(cid_PrecpB_CaH4P2O8_con) ='PrecpB_CaH4P2O8_con';varlnml(cid_PrecpB_CaH4P2O8_con)='band soil precipitated CaH4P2O8'
-  unitl(cid_PrecpB_CaH4P2O8_con)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_con)=var_state_type
+  varl(cid_PrecpB_CaH4P2O8_conc) ='PrecpB_CaH4P2O8_conc';varlnml(cid_PrecpB_CaH4P2O8_conc)='band soil precipitated CaH4P2O8'
+  unitl(cid_PrecpB_CaH4P2O8_conc)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_conc)=var_state_type
 
   varl(cid_PrecpB_FePO4_con) ='PrecpB_FePO4_con';varlnml(cid_PrecpB_FePO4_con)='band soil precipitated FePO4'
   unitl(cid_PrecpB_FePO4_con)='mol m-3';vartypes(cid_PrecpB_FePO4_con)=var_state_type
@@ -996,7 +996,7 @@ implicit none
   ystatesfl(fid_TR_apatite_precip_band_soil)=solflx%TR_apatite_precip_band_soil
 
   !PCPMB=PCPMB+TR_CaH4P2O8_precip_band_soil
-  ystatesfl(cid_PrecpB_CaH4P2O8_con)=ystates0l(cid_PrecpB_CaH4P2O8_con)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaH4P2O8_conc)=ystates0l(cid_PrecpB_CaH4P2O8_conc)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TR_CaH4P2O8_precip_band_soil)=solflx%TR_CaH4P2O8_precip_band_soil
   end subroutine RetrieveYstatef
 

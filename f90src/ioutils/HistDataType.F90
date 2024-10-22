@@ -2502,7 +2502,7 @@ implicit none
         this%h2D_nh3oxi_vr(ncol,L)         = RNH3oxi_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_n2oprod_vr(ncol,L)        = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
                                +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_RootAR_vr(ncol,L) = RootCO2Autor_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RootAR_vr(ncol,L) = -RootCO2Autor_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       ENDDO
 
       DO NZ=1,NP0(NY,NX)

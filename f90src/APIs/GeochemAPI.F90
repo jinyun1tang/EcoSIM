@@ -399,7 +399,7 @@ module GeochemAPI
     trcSalt_TR(idsalt_OH,L,NY,NX)=solflx%TR_OH_1e_soil
     trcSalt_TR(idsalt_SO4,L,NY,NX)=solflx%TR_SO4_2e_soil
     trcSalt_TR(idsalt_CO3,L,NY,NX)=solflx%TR_CO3_2e_soil
-    trcSalt_TR(idsalt_HCO3,L,NY,NX)=solflx%TR_HCO3
+    trcSalt_TR(idsalt_HCO3,L,NY,NX)=solflx%TR_HCO3_soil
     trcSalt_TR(idsalt_AlOH,L,NY,NX)=solflx%TR_AlOH_soil
     trcSalt_TR(idsalt_AlOH2,L,NY,NX)=solflx%TR_AlO2H2_soil
     trcSalt_TR(idsalt_AlOH3,L,NY,NX)=solflx%TR_AlO3H3_soil
@@ -454,9 +454,9 @@ module GeochemAPI
   trcp_RChem_soil(idsp_FeOH3,L,NY,NX)=solflx%TR_FeOH3_precip_soil
   trcp_RChem_soil(idsp_CaCO3,L,NY,NX)=solflx%TR_CaCO3_precip_soil
   trcp_RChem_soil(idsp_CaSO4,L,NY,NX)=solflx%TR_CaSO4_precip_soil
-  TRH2O(L,NY,NX)=solflx%TRH2O
-  TBION(L,NY,NX)=solflx%TBION
-  Txchem_CO2_vr(L,NY,NX)=solflx%Txchem_CO2
+  TRH2O(L,NY,NX)=solflx%TRH2O_soil
+  TBION(L,NY,NX)=solflx%TBION_soil
+  Txchem_CO2_vr(L,NY,NX)=solflx%Txchem_CO2_soil
   end subroutine GeochemAPIRecv
 
 end module GeochemAPI

@@ -536,11 +536,11 @@ module MicBGCMod
   DO N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       if(OMActAutor(NGL)>ZEROS)then
-        TOMEAutoK(ielmc)=TOMEAutoK(ielmc)+OMActAutor(NGL)      
-        TOMEAutoK(ielmn)=TOMEAutoK(ielmn)+OMActAutor(NGL)*rCNBiomeActAutor(ielmn,NGL)
-        TOMEAutoK(ielmp)=TOMEAutoK(ielmp)+OMActAutor(NGL)*rCNBiomeActAutor(ielmp,NGL)
-        tMaxNActMicrbK(K)=tMaxNActMicrbK(K)+OMActAutor(NGL)*rNCOMCAutor(1,NGL)   !maximum total N in active micb
-        tMaxPActMicrbK(K)=tMaxPActMicrbK(K)+OMActAutor(NGL)*rPCOMCAutor(1,NGL)   !maximum total P in active micb
+        TOMEAutoK(ielmc)  = TOMEAutoK(ielmc)+OMActAutor(NGL)
+        TOMEAutoK(ielmn)  = TOMEAutoK(ielmn)+OMActAutor(NGL)*rCNBiomeActAutor(ielmn,NGL)
+        TOMEAutoK(ielmp)  = TOMEAutoK(ielmp)+OMActAutor(NGL)*rCNBiomeActAutor(ielmp,NGL)
+        tMaxNActMicrbK(K) = tMaxNActMicrbK(K)+OMActAutor(NGL)*rNCOMCAutor(1,NGL)   !maximum total N in active micb
+        tMaxPActMicrbK(K) = tMaxPActMicrbK(K)+OMActAutor(NGL)*rPCOMCAutor(1,NGL)   !maximum total P in active micb
       endif
     ENDDO
   ENDDO
@@ -1828,7 +1828,7 @@ module MicBGCMod
   call MicrobAutotrophAnabolicUpdate(micfor,micstt,nmicf)
 
   D550: DO K=1,jcplx
-    IF(.not.litrm .OR. (K.NE.k_POM.AND.K.NE.k_humus))THEN
+    IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           D540: DO M=1,2
@@ -2087,7 +2087,7 @@ module MicBGCMod
     REcoDOMProd                  => micflx%REcoDOMProd                   &
   )
   D650: DO K=1,jcplx
-    IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
+    IF(.not.litrm.OR.(K.NE.k_POM .AND. K.NE.k_humus))THEN
       DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilHeter(NGL,K)
@@ -2126,20 +2126,20 @@ module MicBGCMod
   DO  N=1,NumMicbFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        naqfdiag%tRNH4MicrbTransfSoil=naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilAutor(NGL)
-        naqfdiag%tRNO3MicrbTransfSoil=naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfSoilAutor(NGL)
-        naqfdiag%tRH2PO4MicrbTransfSoil=naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfSoilAutor(NGL)
-        naqfdiag%tRH1PO4MicrbTransfSoil=naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfSoilAutor(NGL)
-        naqfdiag%tRNH4MicrbTransfBand=naqfdiag%tRNH4MicrbTransfBand+RNH4TransfBandAutor(NGL)
-        naqfdiag%tRNO3MicrbTransfBand=naqfdiag%tRNO3MicrbTransfBand+RNO3TransfBandAutor(NGL)
-        naqfdiag%tRH2PO4MicrbTransfBand=naqfdiag%tRH2PO4MicrbTransfBand+RH2PO4TransfBandAutor(NGL)
-        naqfdiag%tRH1PO4MicrbTransfBand=naqfdiag%tRH1PO4MicrbTransfBand+RH1PO4TransfBandAutor(NGL)
-        naqfdiag%TFixN2=naqfdiag%TFixN2+RN2FixAutor(NGL)
+        naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilAutor(NGL)
+        naqfdiag%tRNO3MicrbTransfSoil   = naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfSoilAutor(NGL)
+        naqfdiag%tRH2PO4MicrbTransfSoil = naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfSoilAutor(NGL)
+        naqfdiag%tRH1PO4MicrbTransfSoil = naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfSoilAutor(NGL)
+        naqfdiag%tRNH4MicrbTransfBand   = naqfdiag%tRNH4MicrbTransfBand+RNH4TransfBandAutor(NGL)
+        naqfdiag%tRNO3MicrbTransfBand   = naqfdiag%tRNO3MicrbTransfBand+RNO3TransfBandAutor(NGL)
+        naqfdiag%tRH2PO4MicrbTransfBand = naqfdiag%tRH2PO4MicrbTransfBand+RH2PO4TransfBandAutor(NGL)
+        naqfdiag%tRH1PO4MicrbTransfBand = naqfdiag%tRH1PO4MicrbTransfBand+RH1PO4TransfBandAutor(NGL)
+        naqfdiag%TFixN2                 = naqfdiag%TFixN2+RN2FixAutor(NGL)
         IF(Lsurf)THEN
-          naqfdiag%tRNH4MicrbTransfSoil=naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfLitrAutor(NGL)
-          naqfdiag%tRNO3MicrbTransfSoil=naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfLitrAutor(NGL)
-          naqfdiag%tRH2PO4MicrbTransfSoil=naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfLitrAutor(NGL)
-          naqfdiag%tRH1PO4MicrbTransfSoil=naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfLitrAutor(NGL)
+          naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfLitrAutor(NGL)
+          naqfdiag%tRNO3MicrbTransfSoil   = naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfLitrAutor(NGL)
+          naqfdiag%tRH2PO4MicrbTransfSoil = naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfLitrAutor(NGL)
+          naqfdiag%tRH1PO4MicrbTransfSoil = naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfLitrAutor(NGL)
         ENDIF
         naqfdiag%tRCO2MicrbProd=naqfdiag%tRCO2MicrbProd+RCO2ProdAutor(NGL)
         naqfdiag%tRCH4MicrbProd=naqfdiag%tRCH4MicrbProd+RCH4ProdAutor(NGL)
@@ -3901,13 +3901,13 @@ module MicBGCMod
     CCC=AZMAX1(AMIN1(1.0_r8 &
       ,mBiomeHeter(ielmn,MID3,K)/(mBiomeHeter(ielmn,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)) &
       ,mBiomeHeter(ielmp,MID3,K)/(mBiomeHeter(ielmp,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rPCOMC(3,NGL,K))))
-    CXC=mBiomeHeter(ielmc,MID3,K)/mBiomeHeter(ielmc,MID1,K)
-    C3C=1.0_r8/(1.0_r8+CXC/CKC)
-    CNC=AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmn,MID3,K)/rNCOMC(3,NGL,K))))
-    CPC=AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmp,MID3,K)/rPCOMC(3,NGL,K))))
-    RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
-    RCCN=CNC*RCCX
-    RCCP=CPC*RCCQ
+    CXC  = mBiomeHeter(ielmc,MID3,K)/mBiomeHeter(ielmc,MID1,K)
+    C3C  = 1.0_r8/(1.0_r8+CXC/CKC)
+    CNC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmn,MID3,K)/rNCOMC(3,NGL,K))))
+    CPC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmp,MID3,K)/rPCOMC(3,NGL,K))))
+    RCCC = RCCZ+AMAX1(CCC,C3C)*RCCY
+    RCCN = CNC*RCCX
+    RCCP = CPC*RCCQ
   ELSE
     RCCC=RCCZ
     RCCN=0.0_r8
@@ -3945,8 +3945,8 @@ module MicBGCMod
 !     RkillLitfalOMHeter,RDOMN,RDOMP=microbial C,N,P LitrFall
 !     R3OMC,R3OMN,RkillRecycOMHeter=microbial C,N,P recycling
 !
-    MID=micpar%get_micb_id(M,NGL)
-    SPOMX=SQRT(GrowthEnvScalHeter(NGL,K))*SPOMC(M)*SPOMK(M)
+    MID   = micpar%get_micb_id(M,NGL)
+    SPOMX = SQRT(GrowthEnvScalHeter(NGL,K))*SPOMC(M)*SPOMK(M)
     DO NE=1,NumPlantChemElms
       RKillOMHeter(NE,M,NGL,K)=AZMAX1(mBiomeHeter(NE,MID,K)*SPOMX)
     ENDDO

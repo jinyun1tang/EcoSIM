@@ -110,7 +110,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RAcetateEcoDmndK_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  TRootH2Flx_col(:,:)                                          !total root H2 flux, [g d-2]
-  real(r8),target,allocatable ::  RootCO2Autor_vr(:,:)                                 !root autotrophic respiraiton [gC/m3/hr]
+  real(r8),target,allocatable ::  RootCO2Autor_vr(:,:,:)                                 !root autotrophic respiraiton [gC/m3/hr]
   private :: InitAllocate
   contains
 

@@ -63,7 +63,7 @@ contains
   cid_Precp_Ca5P3O12O3H3_conc =addone(itemp)
   cid_PrecpB_Ca5P3O12O3H3_conc =addone(itemp)
   cid_Precp_CaH4P2O8_conc =addone(itemp)
-  cid_PrecpB_CaH4P2O8_con =addone(itemp)
+  cid_PrecpB_CaH4P2O8_conc =addone(itemp)
   cid_Precp_FePO4_conc =addone(itemp)
   cid_PrecpB_FePO4_con =addone(itemp)
 
@@ -183,7 +183,7 @@ contains
   ystatesfl(cid_Precp_Ca5P3O12O3H3_conc)  =0.0_r8
   ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)  =0.0_r8
   ystatesfl(cid_Precp_CaH4P2O8_conc)  =0.0_r8
-  ystatesfl(cid_PrecpB_CaH4P2O8_con)  =600.89_r8
+  ystatesfl(cid_PrecpB_CaH4P2O8_conc)  =600.89_r8
   ystatesfl(cid_Precp_FePO4_conc)  =0.0_r8
   ystatesfl(cid_PrecpB_FePO4_con)  =0.0_r8
 
@@ -309,7 +309,7 @@ contains
   chemvar%Precp_Ca5P3O12O3H3_conc  =ystates0l(cid_Precp_Ca5P3O12O3H3_conc)
   chemvar%PrecpB_Ca5P3O12O3H3_conc  =ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)
   chemvar%Precp_CaH4P2O8_conc  =ystates0l(cid_Precp_CaH4P2O8_conc)
-  chemvar%PrecpB_CaH4P2O8_con  =ystates0l(cid_PrecpB_CaH4P2O8_con)
+  chemvar%PrecpB_CaH4P2O8_conc  =ystates0l(cid_PrecpB_CaH4P2O8_conc)
   chemvar%Precp_FePO4_conc  =ystates0l(cid_Precp_FePO4_conc)
   chemvar%PrecpB_FePO4_con  =ystates0l(cid_PrecpB_FePO4_con)
 
@@ -436,7 +436,7 @@ contains
   ystatesfl(fid_TR_apatite_precip_band_soil)=solflx%TR_apatite_precip_band_soil
 
   !PCPMB=PCPMB+TR_CaH4P2O8_precip_band_soil
-  ystatesfl(cid_PrecpB_CaH4P2O8_con)=ystates0l(cid_PrecpB_CaH4P2O8_con)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaH4P2O8_conc)=ystates0l(cid_PrecpB_CaH4P2O8_conc)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TR_CaH4P2O8_precip_band_soil)=solflx%TR_CaH4P2O8_precip_band_soil
   end subroutine RetrieveYstatef
 
