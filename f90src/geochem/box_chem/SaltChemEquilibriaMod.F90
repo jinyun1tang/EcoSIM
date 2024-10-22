@@ -1062,23 +1062,23 @@ module SaltChemEquilibriaMod
         SP=SHA4P2
       ENDIF
     ENDIF
-    RHA0P1=0._r8
-    RHA1P1=0._r8
-    RHA2P1=0._r8
-    RHA3P1=0._r8
-    RHA4P1=0._r8
-    RHA0P2=0._r8
-    RHA1P2=0._r8
-    RHA2P2=0._r8
-    RHA3P2=0._r8
-    RHA4P2=0._r8
-    R1=AMAX1(ZERO,R1)
-    P1=AMAX1(ZERO,P1)
-    P2=AMAX1(ZERO,P2)
-    P3=AMAX1(ZERO,P3)
-    SPX=SP*R1**NR1/P3**NP3
-    S0=P1+P2
-    S1=AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
+    RHA0P1 = 0._r8
+    RHA1P1 = 0._r8
+    RHA2P1 = 0._r8
+    RHA3P1 = 0._r8
+    RHA4P1 = 0._r8
+    RHA0P2 = 0._r8
+    RHA1P2 = 0._r8
+    RHA2P2 = 0._r8
+    RHA3P2 = 0._r8
+    RHA4P2 = 0._r8
+    R1     = AMAX1(ZERO,R1)
+    P1     = AMAX1(ZERO,P1)
+    P2     = AMAX1(ZERO,P2)
+    P3     = AMAX1(ZERO,P3)
+    SPX    = SP*R1**NR1/P3**NP3
+    S0     = P1+P2
+    S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
     H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
@@ -1177,23 +1177,23 @@ module SaltChemEquilibriaMod
         SP=SHF4P2
       ENDIF
     ENDIF
-    RHF0P1=0._r8
-    RHF1P1=0._r8
-    RHF2P1=0._r8
-    RHF3P1=0._r8
-    RHF4P1=0._r8
-    RHF0P2=0._r8
-    RHF1P2=0._r8
-    RHF2P2=0._r8
-    RHF3P2=0._r8
-    RHF4P2=0._r8
-    R1=AMAX1(ZERO,R1)
-    P1=AMAX1(ZERO,P1)
-    P2=AMAX1(ZERO,P2)
-    P3=AMAX1(ZERO,P3)
-    SPX=SP*R1**NR1/P3**NP3
-    S0=P1+P2
-    S1=AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
+    RHF0P1 = 0._r8
+    RHF1P1 = 0._r8
+    RHF2P1 = 0._r8
+    RHF3P1 = 0._r8
+    RHF4P1 = 0._r8
+    RHF0P2 = 0._r8
+    RHF1P2 = 0._r8
+    RHF2P2 = 0._r8
+    RHF3P2 = 0._r8
+    RHF4P2 = 0._r8
+    R1     = AMAX1(ZERO,R1)
+    P1     = AMAX1(ZERO,P1)
+    P2     = AMAX1(ZERO,P2)
+    P3     = AMAX1(ZERO,P3)
+    SPX    = SP*R1**NR1/P3**NP3
+    S0     = P1+P2
+    S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
     H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
@@ -1243,14 +1243,14 @@ module SaltChemEquilibriaMod
       NR1=1
       SP=SHCAD2
     ENDIF
-    RPCAD1=0._r8
-    RHCAD2=0._r8
-    R1=AMAX1(ZERO,R1)
-    P1=AMAX1(ZERO,P1)
-    P2=AMAX1(ZERO,P2)
-    SPX=SP*R1**NR1
-    S0=P1+P2
-    S1=AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
+    RPCAD1 = 0._r8
+    RHCAD2 = 0._r8
+    R1     = AMAX1(ZERO,R1)
+    P1     = AMAX1(ZERO,P1)
+    P2     = AMAX1(ZERO,P2)
+    SPX    = SP*R1**NR1
+    S0     = P1+P2
+    S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
     H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
@@ -1277,12 +1277,12 @@ module SaltChemEquilibriaMod
       NR1=7
       SP=SHCAH2
     ENDIF
-    RHCAH1=0._r8
-    RHCAH2=0._r8
-    R1=AMAX1(ZERO,R1)
-    P1=AMAX1(ZERO,P1)
-    P2=AMAX1(ZERO,P2)
-    SPX=(SP*R1**NR1/P1**5)**0.333
+    RHCAH1 = 0._r8
+    RHCAH2 = 0._r8
+    R1     = AMAX1(ZERO,R1)
+    P1     = AMAX1(ZERO,P1)
+    P2     = AMAX1(ZERO,P2)
+    SPX    = (SP*R1**NR1/P1**5)**0.333_r8
     H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_conc,TPDX*(P2-SPX))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RHCAH1=H2PO4_1e_apatite_dissol_flx
@@ -1308,44 +1308,44 @@ module SaltChemEquilibriaMod
 !
 !     MONOCALCIUM PHOSPHATE
 !
-    P1=Ca_2p_activity
-    P2=H2PO4_1e_activity
-    P1=AMAX1(ZERO,P1)
-    P2=AMAX1(ZERO,P2)
-    SPX=SPCAM
-    S0=P1+P2
-    S1=AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaH4P2O8_dissol_flx=AMAX1(-Precp_CaH4P2O8_conc,TPDX*(S0-SQRT(S1)))
+    P1                           = Ca_2p_activity
+    P2                           = H2PO4_1e_activity
+    P1                           = AMAX1(ZERO,P1)
+    P2                           = AMAX1(ZERO,P2)
+    SPX                          = SPCAM
+    S0                           = P1+P2
+    S1                           = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
+    H2PO4_1e_CaH4P2O8_dissol_flx = AMAX1(-Precp_CaH4P2O8_conc,TPDX*(S0-SQRT(S1)))
   ELSE
-    H2PO4_1e_AlPO4_dissol_flx=0._r8
-    H2PO4_1e_FePO4_dissol_flx=0._r8
-    H2PO4_1e_CaHPO4_dissol_flx=0._r8
-    H2PO4_1e_apatite_dissol_flx=0._r8
-    RHA0P1=0._r8
-    RHA1P1=0._r8
-    RHA2P1=0._r8
-    RHA3P1=0._r8
-    RHA4P1=0._r8
-    RHA0P2=0._r8
-    RHA1P2=0._r8
-    RHA2P2=0._r8
-    RHA3P2=0._r8
-    RHA4P2=0._r8
-    RHF0P1=0._r8
-    RHF1P1=0._r8
-    RHF2P1=0._r8
-    RHF3P1=0._r8
-    RHF4P1=0._r8
-    RHF0P2=0._r8
-    RHF1P2=0._r8
-    RHF2P2=0._r8
-    RHF3P2=0._r8
-    RHF4P2=0._r8
-    RPCAD1=0._r8
-    RHCAD2=0._r8
-    RHCAH1=0._r8
-    RHCAH2=0._r8
-    H2PO4_1e_CaH4P2O8_dissol_flx=0._r8
+    H2PO4_1e_AlPO4_dissol_flx    = 0._r8
+    H2PO4_1e_FePO4_dissol_flx    = 0._r8
+    H2PO4_1e_CaHPO4_dissol_flx   = 0._r8
+    H2PO4_1e_apatite_dissol_flx  = 0._r8
+    RHA0P1                       = 0._r8
+    RHA1P1                       = 0._r8
+    RHA2P1                       = 0._r8
+    RHA3P1                       = 0._r8
+    RHA4P1                       = 0._r8
+    RHA0P2                       = 0._r8
+    RHA1P2                       = 0._r8
+    RHA2P2                       = 0._r8
+    RHA3P2                       = 0._r8
+    RHA4P2                       = 0._r8
+    RHF0P1                       = 0._r8
+    RHF1P1                       = 0._r8
+    RHF2P1                       = 0._r8
+    RHF3P1                       = 0._r8
+    RHF4P1                       = 0._r8
+    RHF0P2                       = 0._r8
+    RHF1P2                       = 0._r8
+    RHF2P2                       = 0._r8
+    RHF3P2                       = 0._r8
+    RHF4P2                       = 0._r8
+    RPCAD1                       = 0._r8
+    RHCAD2                       = 0._r8
+    RHCAH1                       = 0._r8
+    RHCAH2                       = 0._r8
+    H2PO4_1e_CaH4P2O8_dissol_flx = 0._r8
   ENDIF
   end subroutine PhospPrecipDissolNonBand
 
