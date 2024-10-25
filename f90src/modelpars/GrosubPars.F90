@@ -7,7 +7,7 @@ module GrosubPars
   save
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-! PART1X,PART2X=modifiers to organ partitioning coefficients
+! PART1X,PART2X=modifiers for organ partitioning coefficients
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! FSNR=rate constant for LitrFall at end of growing season (h-1)
 ! Hours4PhyslMature=number of hours with no grain filling required for physilogical maturity
@@ -166,7 +166,7 @@ module GrosubPars
   integer :: MaxNumRootAxes              !maximum number of root axes
   integer  :: JP1                        !number of plants
   integer  :: MaxNumBranches             !maximum number of branches
-  integer  :: NumOfSkyAzimuSects1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer  :: NumOfSkyAzimuthSects1        !number of sectors for the sky azimuth  [0,2*pi]
   integer  :: jcplx                      !number of organo-microbial complexes
   integer  :: NumOfLeafAzimuthSectors    !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers
@@ -208,9 +208,9 @@ module GrosubPars
       call endrun(msg='Fail to locate plant trait file '//trim(pft_file_in)//' in ' &
         //mod_filename,line=__LINE__)
     else
-      npfts=get_dim_len(pft_file_in, 'npfts')
-      npft=get_dim_len(pft_file_in, 'npft')
-      nkopenclms=get_dim_len(pft_file_in,'nkopenclms')
+      npfts      = get_dim_len(pft_file_in, 'npfts')
+      npft       = get_dim_len(pft_file_in, 'npft')
+      nkopenclms = get_dim_len(pft_file_in,'nkopenclms')
       allocate(pftss(npfts))
       allocate(pft_long(npft))
       allocate(pft_short(npft))
@@ -235,77 +235,77 @@ module GrosubPars
 
   pltpar%jroots=2
 
-  PART1X=0.05_r8
-  PART2X=0.02_r8
-  VMXC=0.015_r8
-  FSNR=2.884E-03_r8
-  Hours4PhyslMature=168.0_r8
-  Hours4FullSenes=240.0_r8
-  XFRX=2.5E-02_r8
-  XFRY=2.5E-03_r8
-  FSNK=0.05_r8
-  FXFS=1.0_r8
-  FMYC=0.1_r8
-  CNKI=1.0E-01_r8
-  CPKI=1.0E-02_r8
-  RmSpecPlant=0.010_r8
-  PSIMin4OrganExtens=0.1_r8
-  RCMN=1.560E+01_r8
-  RTDPX=0.00_r8
-  Root2ndAveLenMin=1.0E-03_r8
-  EMODR=5.0_r8
-  QNTM=0.45_r8
-  CURV=0.70_r8
-  CURV2=2.0_r8*CURV
-  CURV4=4.0_r8*CURV
-  ELEC3=4.5_r8
-  ELEC4=3.0_r8
-  CO2KI=1.0E+03_r8
-  FCMassCO2BundleSheath_node=0.02_r8
-  FCMassHCO3BundleSheath_node=1.0_r8-FCMassCO2BundleSheath_node
-  COMP4=0.5_r8
-  FDML=6.0_r8
-  FBS=0.2_r8*FDML
-  FMP=0.8_r8*FDML
-  ZPLFM=0.33_r8
-  ZPLFD=1.0_r8-ZPLFM
-  ZPGRM=0.75_r8
-  ZPGRD=1.0_r8-ZPGRM
+  PART1X                      = 0.05_r8
+  PART2X                      = 0.02_r8
+  VMXC                        = 0.015_r8
+  FSNR                        = 2.884E-03_r8
+  Hours4PhyslMature           = 168.0_r8
+  Hours4FullSenes             = 240.0_r8
+  XFRX                        = 2.5E-02_r8
+  XFRY                        = 2.5E-03_r8
+  FSNK                        = 0.05_r8
+  FXFS                        = 1.0_r8
+  FMYC                        = 0.1_r8
+  CNKI                        = 1.0E-01_r8
+  CPKI                        = 1.0E-02_r8
+  RmSpecPlant                 = 0.010_r8
+  PSIMin4OrganExtens          = 0.1_r8
+  RCMN                        = 1.560E+01_r8
+  RTDPX                       = 0.00_r8
+  Root2ndAveLenMin            = 1.0E-03_r8
+  EMODR                       = 5.0_r8
+  QNTM                        = 0.45_r8
+  CURV                        = 0.70_r8
+  CURV2                       = 2.0_r8*CURV
+  CURV4                       = 4.0_r8*CURV
+  ELEC3                       = 4.5_r8
+  ELEC4                       = 3.0_r8
+  CO2KI                       = 1.0E+03_r8
+  FCMassCO2BundleSheath_node  = 0.02_r8
+  FCMassHCO3BundleSheath_node = 1.0_r8-FCMassCO2BundleSheath_node
+  COMP4                       = 0.5_r8
+  FDML                        = 6.0_r8
+  FBS                         = 0.2_r8*FDML
+  FMP                         = 0.8_r8*FDML
+  ZPLFM                       = 0.33_r8
+  ZPLFD                       = 1.0_r8-ZPLFM
+  ZPGRM                       = 0.75_r8
+  ZPGRD                       = 1.0_r8-ZPGRM
 
-  FSTK=0.05_r8
-  ZSTX=1.0E-03_r8
-  DSTK=0.225_r8
-  VSTK=1.0E-06_r8/DSTK
-  FRTX=1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
-  SETC=1.0E-02_r8
-  SETN=1.0E-03_r8
-  SETP=1.0E-04_r8
-  SLA2=-0.33_r8
-  SSL2=-0.50_r8
-  SNL2=-0.67_r8
-  CNMX=0.20_r8
-  CPMX=0.020_r8
-  CNMN=0.050_r8
-  CPMN=0.005_r8
-  EN2F=0.20_r8
-  VMXO=0.125_r8
-  SPNDLK=0.01_r8
-  SPNDL=5.0E-04_r8
-  CCNGR=2.5E-01_r8
-  CCNGB=6.0E-04_r8
-  NodulBiomCatInfection=1.0E-03_r8
-  CZKM=2.5E-03_r8
-  CPKM=2.5E-04_r8
-  RCCZR=0.056_r8
-  RCCYR=0.167_r8
-  RCCXR=0.833_r8
-  RCCQR=0.833_r8
-  RCCZN=0.167_r8
-  RCCYN=0.833_r8
-  RCCXN=0.833_r8
-  RCCQN=0.833_r8
+  FSTK                  = 0.05_r8
+  ZSTX                  = 1.0E-03_r8
+  DSTK                  = 0.225_r8
+  VSTK                  = 1.0E-06_r8/DSTK
+  FRTX                  = 1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
+  SETC                  = 1.0E-02_r8
+  SETN                  = 1.0E-03_r8
+  SETP                  = 1.0E-04_r8
+  SLA2                  = -0.33_r8
+  SSL2                  = -0.50_r8
+  SNL2                  = -0.67_r8
+  CNMX                  = 0.20_r8
+  CPMX                  = 0.020_r8
+  CNMN                  = 0.050_r8
+  CPMN                  = 0.005_r8
+  EN2F                  = 0.20_r8
+  VMXO                  = 0.125_r8
+  SPNDLK                = 0.01_r8
+  SPNDL                 = 5.0E-04_r8
+  CCNGR                 = 2.5E-01_r8
+  CCNGB                 = 6.0E-04_r8
+  NodulBiomCatInfection = 1.0E-03_r8
+  CZKM                  = 2.5E-03_r8
+  CPKM                  = 2.5E-04_r8
+  RCCZR                 = 0.056_r8
+  RCCYR                 = 0.167_r8
+  RCCXR                 = 0.833_r8
+  RCCQR                 = 0.833_r8
+  RCCZN                 = 0.167_r8
+  RCCYN                 = 0.833_r8
+  RCCXN                 = 0.833_r8
+  RCCQN                 = 0.833_r8
 
-  HoursReq4LiterfalAftMature=960
+  HoursReq4LiterfalAftMature = 960
 
 
   RCCZ=real((/0.167,0.167,0.167,0.056/),r8)

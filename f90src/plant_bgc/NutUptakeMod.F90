@@ -1,8 +1,9 @@
 module NutUptakeMod
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use StomatesMod   , only : stomates
-  use minimathmod  , only : safe_adb,vapsat,AZMAX1
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use StomatesMod,   only: stomates
+  use minimathmod,   only: safe_adb, vapsat, AZMAX1
+  use TracerPropMod, only: gas_solubility
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -20,8 +21,8 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine PlantNutientO2Uptake(I,J,NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,&
-    PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+  subroutine PlantNutientO2Uptake(I,J,NZ,FDMP, PATH,FineRootRadius,FracPRoot4Uptake,&
+    MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
   !
   !DESCRIPTION
   !doing plant population level nutrient, and O2 uptake
@@ -31,17 +32,28 @@ module NutUptakeMod
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
-  real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
+  real(r8)  :: PopPlantO2Uptake,PopPlantO2Demand
 
-!  if(I>176)print*,'canopynh3'
+  associate(                                                  &
+    PlantO2Stress_pft      => plt_pheno%PlantO2Stress_pft,    &
+    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft         &    
+  )
+
   call CanopyNH3Flux(NZ,FDMP)
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
-!  if(I>176)print*,'rootmyco'
-  call RootMycoO2NutrientUptake(I,J,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
+  call RootMycoO2NutrientUptake(I,J,NZ,PATH,FineRootRadius,&
+    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr &
+    ,PopPlantO2Uptake,PopPlantO2Demand)
+
+  IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN
+    PlantO2Stress_pft(NZ)=PopPlantO2Uptake/PopPlantO2Demand
+  ELSE
+    PlantO2Stress_pft(NZ)=0.0_r8
+  ENDIF    
+  end associate
   end subroutine PlantNutientO2Uptake
 !------------------------------------------------------------------------
 
@@ -70,7 +82,7 @@ module NutUptakeMod
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,     &
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch,        &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
-    FracPARads2Canopy_pft    => plt_rad%FracPARads2Canopy_pft,     &
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft,      &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        &
   )
   !
@@ -78,7 +90,7 @@ module NutUptakeMod
   !     CONCENTRATION DIFFERENCES 'AtmGasc(idg_NH3)' (ATMOSPHERE FROM 'READS') AND
   !     'CNH3P' (CANOPY), AND FROM STOMATAL + BOUNDARY LAYER RESISTANCE
   !
-  !     SNH3P,SNH3X=NH3 solubility at TCelciusCanopy_pft, 25 oC
+  !     SNH3P =NH3 solubility at TCelciusCanopy_pft
   !     TCelciusCanopy_pft=canopy temperature (oC)
   !     FDMP,FNH3P=canopy dry matter content,NH3 concentration
   !     LeafAreaLive_brch,CanopyLeafArea_pft=branch,canopy leaf area
@@ -88,8 +100,8 @@ module NutUptakeMod
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
   !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
   !
-  SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCelciusCanopy_pft(NZ))
-  FNH3P=1.0E-04_r8*FDMP
+  SNH3P = gas_solubility(idg_NH3,TCelciusCanopy_pft(NZ))
+  FNH3P = 1.0E-04_r8*FDMP
   if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
@@ -111,15 +123,15 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootMycoO2NutrientUptake(I,J,NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,FineRootRadius,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+  subroutine RootMycoO2NutrientUptake(I,J,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
+    MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr,PopPlantO2Uptake,PopPlantO2Demand)
 
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8),  intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
-  real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
+  real(r8), intent(out) :: PopPlantO2Uptake,PopPlantO2Demand
   real(r8) :: TFOXYX
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
@@ -143,7 +155,8 @@ module NutUptakeMod
   )
 
   call ZeroUptake(NZ)
-
+  PopPlantO2Uptake=0._r8
+  PopPlantO2Demand=0._r8
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &

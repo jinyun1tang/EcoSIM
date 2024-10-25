@@ -27,7 +27,7 @@ implicit none
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
   integer, intent(in) :: NYS
-  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: DORGC(JZ),DVLiceMicP(JZ)
   real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
   real(r8) :: VOLISO,VOLPT,VOLTT
@@ -75,7 +75,7 @@ implicit none
     !OXYE(NY,NX)=atm_o2
     !Z2GE(NY,NX)=atm_n2
     !Z2OE(NY,NX)=atm_n2o
-    !ZNH3E(NY,NX)=atm_nh3
+    !ZNH3E_col(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
     TairK_col(NY,NX)=tairc(NY) !it's already in K??
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)

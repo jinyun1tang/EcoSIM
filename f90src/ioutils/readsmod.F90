@@ -321,7 +321,7 @@ module readsmod
   ZNOONG=atmf%ZNOONG
   D8970: DO NX=NHW,NHE
     D8975: DO NY=NVN,NVS
-      WindMesHeight(NY,NX)=Z0G         !windspeed meast height
+      WindMesureHeight_col(NY,NX)=Z0G         !windspeed meast height
       SolarNoonHour_col(NY,NX)=ZNOONG
       PHR(NY,NX)=PHRG
       CN4RI(NY,NX)=CN4RIG

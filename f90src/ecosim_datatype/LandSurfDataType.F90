@@ -14,7 +14,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  ZERO4PlantDisplace_col(:,:)                            !zero plane displacement height, [m]
   real(r8),target,allocatable ::  RoughHeight_col(:,:)                   !canopy surface roughness height, [m]
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)              ! soil surface roughness height for calculating runoff velocity, [m]
-  real(r8),target,allocatable ::  WindMesHeight(:,:)                 !wind speed measurement height, [m]
+  real(r8),target,allocatable ::  WindMesureHeight_col(:,:)                 !wind speed measurement height, [m]
   real(r8),target,allocatable ::  ALT(:,:)                           !altitude of grid cell, [m]
   real(r8),target,allocatable ::  AbvCanopyBndlResist_col(:,:)                           !isothermal boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
@@ -37,7 +37,7 @@ contains
   allocate(ZERO4PlantDisplace_col(JY,JX));          ZERO4PlantDisplace_col=0._r8
   allocate(RoughHeight_col(JY,JX));          RoughHeight_col=0._r8
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
-  allocate(WindMesHeight(JY,JX));          WindMesHeight=0._r8
+  allocate(WindMesureHeight_col(JY,JX));          WindMesureHeight_col=0._r8
   allocate(ALT(JY,JX));         ALT=0._r8
   allocate(AbvCanopyBndlResist_col(JY,JX));         AbvCanopyBndlResist_col=0._r8
   allocate(RIB(JY,JX));         RIB=0._r8
@@ -60,7 +60,7 @@ contains
   call destroy(ZERO4PlantDisplace_col)
   call destroy(RoughHeight_col)
   call destroy(SoiSurfRoughness)
-  call destroy(WindMesHeight)
+  call destroy(WindMesureHeight_col)
   call destroy(ALT)
   call destroy(AbvCanopyBndlResist_col)
   call destroy(RIB)

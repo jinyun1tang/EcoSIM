@@ -74,7 +74,7 @@ implicit none
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
       D215: DO N=1,NumOfLeafZenithSectors1
-        D220: DO M=1,NumOfSkyAzimuSects1
+        D220: DO M=1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
@@ -280,7 +280,7 @@ implicit none
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
       D115: DO N =1,NumOfLeafZenithSectors1
-        D120: DO M =1,NumOfSkyAzimuSects1
+        D120: DO M =1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !

@@ -285,20 +285,23 @@ module readiMod
       CO2EI(NY,NX)=aco2_ppm
       CH4E_col(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
-      ZNH3E(NY,NX)=ZNH3EG
+      ZNH3E_col(NY,NX)=ZNH3EG
       KoppenClimZone_col(NY,NX)   = IETYPG
       FlowDirIndicator(NY,NX)     = grid_mode
       NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
       WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
       WaterTBLSlope(NY,NX)        = DTBLGG
+
       RechargNorthSurf(NY,NX)     = RCHQNG
       RechargEastSurf(NY,NX)      = RCHQEG
       RechargSouthSurf(NY,NX)     = RCHQSG
       RechargWestSurf(NY,NX)      = RCHQWG
+
       RechargNorthSubSurf(NY,NX)  = RCHGNUG
       RechargEastSubSurf(NY,NX)   = RCHGEUG
       RechargSouthSubSurf(NY,NX)  = RCHGSUG
       RechargWestSubSurf(NY,NX)   = RCHGWUG
+
       RechargRateNorthWTBL(NY,NX) = RCHGNTG
       RechargRateEastWTBL(NY,NX)  = RCHGETG
       RechargRateSouthWTBL(NY,NX) = RCHGSTG

@@ -77,8 +77,9 @@ module StartsMod
   real(r8) :: ALTZG
   real(r8) :: tPBOT,XWS
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects)
-  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8) :: YSIN(NumOfSkyAzimuthSects)
+  real(r8) :: YCOS(NumOfSkyAzimuthSects)
+  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
 ! begin_execution
 
 
@@ -130,7 +131,7 @@ module StartsMod
       AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_H2,NY,NX)  = H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
@@ -575,7 +576,9 @@ module StartsMod
   subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(in) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8),intent(in) :: YSIN(NumOfSkyAzimuthSects)
+  real(r8),intent(in) :: YCOS(NumOfSkyAzimuthSects)
+  real(r8),intent(in) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
   REAL(R8),INTENT(OUT):: ALTY
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI
@@ -651,7 +654,7 @@ module StartsMod
 !    compute incident sky angle at ground surface
       SineGrndSlope_col(NY,NX)   = SLOPE(0,NY,NX)    !this is exact
       CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
-      D240: DO N=1,NumOfSkyAzimuSects
+      D240: DO N=1,NumOfSkyAzimuthSects
         DGAZI           = COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
         OMEGAG(N,NY,NX) = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
           SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
@@ -977,7 +980,9 @@ module StartsMod
   real(r8) :: tPBOT
   integer :: NY,NX,NM
   real(r8) :: LandScape1stSoiLayDepth
-  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8) :: YSIN(NumOfSkyAzimuthSects)
+  real(r8) :: YCOS(NumOfSkyAzimuthSects)
+  real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -1032,7 +1037,7 @@ module StartsMod
       AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_H2,NY,NX)  = H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION

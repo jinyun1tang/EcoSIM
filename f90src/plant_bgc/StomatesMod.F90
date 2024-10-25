@@ -166,18 +166,18 @@
   integer :: N,M,LP
   real(r8) :: PAR_zsec,Tau_rad
 !     begin_execution
-  associate(                                                 &
-    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                  , &
-    LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec    , &
-    RadPAR_zsec         => plt_rad%RadPAR_zsec             , &
-    RadDifPAR_zsec      => plt_rad%RadDifPAR_zsec          , &
-    TAU_DirRadTransm    => plt_rad%TAU_DirRadTransm        , &
-    TAU_RadThru         => plt_rad%TAU_RadThru               &
+  associate(                                            &
+    ZERO4Groth_pft     => plt_biom%ZERO4Groth_pft,      &
+    LeafAUnshaded_zsec => plt_photo%LeafAUnshaded_zsec, &
+    RadPAR_zsec        => plt_rad%RadPAR_zsec,          &
+    RadDifPAR_zsec     => plt_rad%RadDifPAR_zsec,       &
+    TAU_DirRadTransm   => plt_rad%TAU_DirRadTransm,     &
+    TAU_RadThru        => plt_rad%TAU_RadThru           &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,NumOfLeafZenithSectors1
-    DO M=1,NumOfSkyAzimuSects1
+    DO M=1,NumOfSkyAzimuthSects1
       IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
         DO LP=1,2
@@ -206,7 +206,7 @@
   real(r8), intent(inout) :: CH2O
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,ProteinPerLeafArea,Km4RubOxy
   integer :: L
-  real(r8) :: ETDN,VCDN
+  real(r8) :: MesophyllChlDensity,MesophyllRubiscoSurfDensity
   real(r8) :: VOGRO
 !     begin_execution
   associate(                                                                  & 
@@ -225,26 +225,26 @@
     RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node,        &
     VmaxRubOxyRef_pft             => plt_photo%VmaxRubOxyRef_pft,             &
     CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node,           &
-    LeafRuBPConc_pft              => plt_photo%LeafRuBPConc_pft                &
+    LeafRuBPConc_pft              => plt_photo%LeafRuBPConc_pft               &
   )
 !
 !     SURFICIAL DENSITY OF RUBISCO AND ITS LeafC3ChlorofilConc_pftOROPHYLL
 !
-!     VCDN=surficial density of rubisco in mesophyll
-!     ETDN=surficial density of chlorophyll in esophyll
+!     MesophyllRubiscoSurfDensity=surficial density of rubisco in mesophyll
+!     MesophyllChlDensity=surficial density of chlorophyll in esophyll
 !     LeafRuBPConc_pft=fraction of leaf protein in rubisco
 !     LeafC3ChlorofilConc_pft=fraction of leaf protein in mesophyll chlorophyll
 !     ProteinPerLeafArea=leaf protein surficial density
 !
-  VCDN=LeafRuBPConc_pft(NZ)*ProteinPerLeafArea
-  ETDN=LeafC3ChlorofilConc_pft(NZ)*ProteinPerLeafArea
+  MesophyllRubiscoSurfDensity=LeafRuBPConc_pft(NZ)*ProteinPerLeafArea
+  MesophyllChlDensity=LeafC3ChlorofilConc_pft(NZ)*ProteinPerLeafArea
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES
 !
 !     Vmax4RubiscoCarboxy_pft=rubisco carboxylation rate unlimited by CO2
 !     VmaxRubCarboxyRef_pft=specific rubisco carboxylation activity from PFT file
 !     TFN_Carboxy=temperature function for carboxylation
-!     VCDN=surficial density of rubisco in mesophyll
+!     MesophyllRubiscoSurfDensity=surficial density of rubisco in mesophyll
 !     VOGRO=rubisco oxygenation rate
 !     TFN_Oxy=temperature function for oxygenation
 !     CO2CompenPoint_node=C3 CO2 compensation point (uM)
@@ -253,10 +253,10 @@
 !     Km4RubOxy=Km for rubisco oxygenation
 !     CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2
 !
-  Vmax4RubiscoCarboxy_pft(K,NB,NZ)=VmaxRubCarboxyRef_pft(NZ)*TFN_Carboxy*VCDN
-  VOGRO=VmaxRubOxyRef_pft(NZ)*TFN_Oxy*VCDN
-  CO2CompenPoint_node(K,NB,NZ)=0.5_r8*O2L(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
-  CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)=AZMAX1(Vmax4RubiscoCarboxy_pft(K,NB,NZ)&
+  Vmax4RubiscoCarboxy_pft(K,NB,NZ)       = VmaxRubCarboxyRef_pft(NZ)*TFN_Carboxy*MesophyllRubiscoSurfDensity
+  VOGRO                                  = VmaxRubOxyRef_pft(NZ)*TFN_Oxy*MesophyllRubiscoSurfDensity
+  CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
+  CO2lmtRubiscoCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4RubiscoCarboxy_pft(K,NB,NZ)&
     *(aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ)) &
     /(aquCO2Intraleaf_pft(NZ)+Km4RubiscoCarboxy_pft(NZ)))
 !
@@ -265,16 +265,14 @@
 !     LigthSatCarboxyRate_node=light-limited rubisco carboxylation rate
 !     SpecChloryfilAct_pft=specific chlorophyll activity from PFT file
 !     TFN_eTransp=temperature function for e- transport
-!     ETDN=surficial density of chlorophyll in mesophyll
+!     MesophyllChlDensity=surficial density of chlorophyll in mesophyll
 !     RubiscoCarboxyEff_node=rubisco caboxylation efficiency
 !     aquCO2Intraleaf_pft=intercellular CO2 concentrations (uM)
 !     CO2CompenPoint_node=C3 CO2 compensation point (uM)
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
-  LigthSatCarboxyRate_node(K,NB,NZ)=SpecChloryfilAct_pft(NZ)*TFN_eTransp*ETDN
-!  write(125,*)((I*100+J)*100+K)*10+NB,LigthSatCarboxyRate_node(K,NB,NZ),&
-!    SpecChloryfilAct_pft(NZ),TFN_eTransp,ETDN
-  RubiscoCarboxyEff_node(K,NB,NZ)=AZMAX1((aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ)) &
+  LigthSatCarboxyRate_node(K,NB,NZ) = SpecChloryfilAct_pft(NZ)*TFN_eTransp*MesophyllChlDensity
+  RubiscoCarboxyEff_node(K,NB,NZ)   = AZMAX1((aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ)) &
     /(ELEC3*aquCO2IntraLeaf_pft(NZ)+10.5_r8*CO2CompenPoint_node(K,NB,NZ)))
 !
 !     FOR EACH CANOPY LAYER
@@ -299,10 +297,10 @@
   real(r8), intent(in) :: TFN_eTransp,Km4RubOxy,ProteinPerLeafArea
   integer :: L
   real(r8) :: CC4M
-  real(r8) :: CCBS,ETDN4
-  real(r8) :: ETDN
-  real(r8) :: VCDN4,VCDN
-  real(r8) :: VOGRO
+  real(r8) :: CCBS,MesophyllChlDensity
+  real(r8) :: BundlSheathChlDensity
+  real(r8) :: MesophyllPEPSurfDensity,MesophyllRubiscoSurfDensity
+  real(r8) :: VOGRO   !vmax 4 oxygenation in mesophyll
 !     begin_execution
   associate(                                                                       &
     LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
@@ -344,34 +342,34 @@
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll
 !     NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M=AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FMP))
-  CCBS=AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FBS))
-  NutrientCtrlonC4Carboxy_node(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
-  NutrientCtrlonC4Carboxy_node(K,NB,NZ)=NutrientCtrlonC4Carboxy_node(K,NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
+  CC4M                                  = AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FMP))
+  CCBS                                  = AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FBS))
+  NutrientCtrlonC4Carboxy_node(K,NB,NZ) = 1.0_r8/(1.0_r8+CC4M/C4KI)
+  NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
 !
 !     SURFICIAL DENSITY OF FracLeafProtinAsPEPCarboxyl_pftAND ITS LeafC3ChlorofilConc_pftOROPHYLL
 !
-!     VCDN4=surficial density of PEP carboxylase in mesophyll
-!     ETDN4=surficial density of chlorophyll in mesophyll
+!     MesophyllPEPSurfDensity=surficial density of PEP carboxylase in mesophyll
+!     MesophyllChlDensity=surficial density of chlorophyll in mesophyll
 !     FracLeafProtinAsPEPCarboxyl_pft=fraction of leaf protein in PEP carboxylase
 !     LeafC4ChlorofilConc_pft=fraction of leaf protein in mesophyll chlorophyll
 !     ProteinPerLeafArea=leaf protein surficial density, gC/m2 leaf
 !
-  VCDN4=FracLeafProtinAsPEPCarboxyl_pft(NZ)*ProteinPerLeafArea
-  ETDN4=LeafC4ChlorofilConc_pft(NZ)*ProteinPerLeafArea
+  MesophyllPEPSurfDensity = FracLeafProtinAsPEPCarboxyl_pft(NZ)*ProteinPerLeafArea
+  MesophyllChlDensity     = LeafC4ChlorofilConc_pft(NZ)*ProteinPerLeafArea
 !
 !     CO2-LIMITED C4 CARBOXYLATION RATES
 !
 !     Vmax4PEPCarboxy_pft,CO2lmtPEPCarboxyRate_node=PEP carboxylation rate unlimited,limited by CO2
 !     VmaxPEPCarboxyRef_pft=specific PEP carboxylase activity from PFT file
 !     TFN_Carboxy=temperature function for carboxylation
-!     VCDN4=surficial density of PEP carboxylase in mesophyll
+!     MesophyllPEPSurfDensity=surficial density of PEP carboxylase in mesophyll
 !     aquCO2Intraleaf_pft=intercellular CO2 concentrations (uM)
 !     COMP4=C4 CO2 compensation point (uM)
 !     Km4PEPCarboxy_pft=Km for VmaxPEPCarboxyRef_pft from PFT file (uM)
 !
-  Vmax4PEPCarboxy_pft(K,NB,NZ)=VmaxPEPCarboxyRef_pft(NZ)*TFN_Carboxy*VCDN4
-  CO2lmtPEPCarboxyRate_node(K,NB,NZ)=AZMAX1(Vmax4PEPCarboxy_pft(K,NB,NZ) &
+  Vmax4PEPCarboxy_pft(K,NB,NZ)       = VmaxPEPCarboxyRef_pft(NZ)*TFN_Carboxy*MesophyllPEPSurfDensity
+  CO2lmtPEPCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4PEPCarboxy_pft(K,NB,NZ) &
     *(aquCO2Intraleaf_pft(NZ)-COMP4)/(aquCO2Intraleaf_pft(NZ)+Km4PEPCarboxy_pft(NZ)))
 !
 !     C4 ELECTRON TRANSFER RATES
@@ -379,13 +377,13 @@
 !     LigthSatC4CarboxyRate_node=light saturated e- transport rate
 !     SpecChloryfilAct_pft=specific chlorophyll activity from PFT file
 !     TFN_eTransp=temperature function for e- transport
-!     ETDN4=surficial density of chlorophyll in mesophyll
+!     MesophyllChlDensity=surficial density of chlorophyll in mesophyll
 !     C4CarboxyEff_node=PEP caboxylation efficiency
 !     aquCO2Intraleaf_pft=intercellular CO2 concentrations (uM)
 !     COMP4=C4 CO2 compensation point (uM)
 !     ELEC4=e- requirement for CO2 fixn by PEP carboxylase
 !
-  LigthSatC4CarboxyRate_node(K,NB,NZ)=SpecChloryfilAct_pft(NZ)*TFN_eTransp*ETDN4
+  LigthSatC4CarboxyRate_node(K,NB,NZ)=SpecChloryfilAct_pft(NZ)*TFN_eTransp*MesophyllChlDensity
   C4CarboxyEff_node(K,NB,NZ)=AZMAX1((aquCO2Intraleaf_pft(NZ)-COMP4) &
     /(ELEC4*aquCO2Intraleaf_pft(NZ)+10.5_r8*COMP4))
 !
@@ -402,21 +400,21 @@
 !
 !     VARIABLES FOR C3 PHOTOSYNTHESIS DRIVEN BY C4
 !
-!     VCDN=surficial density of rubisco in bundle sheath
-!     ETDN=surficial density of chlorophyll in bundle sheath
+!     MesophyllRubiscoSurfDensity=surficial density of rubisco in bundle sheath
+!     BundlSheathChlDensity=surficial density of chlorophyll in bundle sheath
 !     LeafRuBPConc_pft=fraction of leaf protein in rubisco
 !     LeafC3ChlorofilConc_pft=fraction of leaf protein in bundle sheath chlorophyll
 !     ProteinPerLeafArea=leaf protein surficial density
 !
-  VCDN=LeafRuBPConc_pft(NZ)*ProteinPerLeafArea
-  ETDN=LeafC3ChlorofilConc_pft(NZ)*ProteinPerLeafArea
+  MesophyllRubiscoSurfDensity = LeafRuBPConc_pft(NZ)*ProteinPerLeafArea
+  BundlSheathChlDensity       = LeafC3ChlorofilConc_pft(NZ)*ProteinPerLeafArea
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES
 !
 !     Vmax4RubiscoCarboxy_pft=rubisco carboxylation rate unlimited by CO2
 !     VmaxRubCarboxyRef_pft=specific rubisco carboxylation activity from PFT file
 !     TFN_Carboxy=temperature function for carboxylation
-!     VCDN=surficial density of rubisco in bundle sheath
+!     MesophyllRubiscoSurfDensity=surficial density of rubisco in bundle sheath
 !     VOGRO=rubisco oxygenation rate
 !     TFN_Oxy=temperature function for oxygenation
 !     CO2CompenPoint_node=C3 CO2 compensation point (uM)
@@ -426,11 +424,10 @@
 !     CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2
 !     CCBS=C4 nonstruct C concn in bundle sheath (uM)
 !
-  Vmax4RubiscoCarboxy_pft(K,NB,NZ)=VmaxRubCarboxyRef_pft(NZ)*TFN_Carboxy*VCDN
-  VOGRO=VmaxRubOxyRef_pft(NZ)*TFN_Oxy*VCDN
-  CO2CompenPoint_node(K,NB,NZ)=0.5_r8*O2L(NZ)*VOGRO* &
-    Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
-  CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)=AZMAX1(Vmax4RubiscoCarboxy_pft(K,NB,NZ)* &
+  Vmax4RubiscoCarboxy_pft(K,NB,NZ)       = VmaxRubCarboxyRef_pft(NZ)*TFN_Carboxy*MesophyllRubiscoSurfDensity
+  VOGRO                                  = VmaxRubOxyRef_pft(NZ)*TFN_Oxy*MesophyllRubiscoSurfDensity
+  CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
+  CO2lmtRubiscoCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4RubiscoCarboxy_pft(K,NB,NZ)* &
     (CCBS-CO2CompenPoint_node(K,NB,NZ))/(CCBS+Km4RubiscoCarboxy_pft(NZ)))
 !
 !     C3 ELECTRON TRANSFER RATES
@@ -438,14 +435,14 @@
 !     LigthSatCarboxyRate_node=light-limited rubisco carboxylation rate
 !     SpecChloryfilAct_pft=specific chlorophyll activity from PFT file
 !     TFN_eTransp=temperature function for e- transport
-!     ETDN=surficial density of chlorophyll in bundle sheath
+!     BundlSheathChlDensity=surficial density of chlorophyll in bundle sheath
 !     RubiscoCarboxyEff_node=rubisco caboxylation efficiency
 !     aquCO2Intraleaf_pft=intercellular CO2 concentrations (uM)
 !     CO2CompenPoint_node=C3 CO2 compensation point (uM)
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
-  LigthSatCarboxyRate_node(K,NB,NZ)=SpecChloryfilAct_pft(NZ)*TFN_eTransp*ETDN
-  RubiscoCarboxyEff_node(K,NB,NZ)=AZMAX1((CCBS-CO2CompenPoint_node(K,NB,NZ))/ &
+  LigthSatCarboxyRate_node(K,NB,NZ) = SpecChloryfilAct_pft(NZ)*TFN_eTransp*BundlSheathChlDensity
+  RubiscoCarboxyEff_node(K,NB,NZ)   = AZMAX1((CCBS-CO2CompenPoint_node(K,NB,NZ))/ &
     (ELEC3*CCBS+10.5_r8*CO2CompenPoint_node(K,NB,NZ)))
   end associate
   end subroutine C4Photosynthesis
@@ -470,7 +467,7 @@
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO  N=1,NumOfLeafZenithSectors1
-    DO  M=1,NumOfSkyAzimuSects1
+    DO  M=1,NumOfSkyAzimuthSects1
       IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
         DO LP=1,2

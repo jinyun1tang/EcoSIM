@@ -89,7 +89,7 @@ implicit none
   real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  ZNH3E(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  ZNH3E_col(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
@@ -205,7 +205,7 @@ implicit none
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
   allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
-  allocate(OMEGAG(NumOfSkyAzimuSects,JY,JX));  OMEGAG=0._r8
+  allocate(OMEGAG(NumOfSkyAzimuthSects,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
@@ -227,7 +227,7 @@ implicit none
   allocate(OXYE(JY,JX));        OXYE=0._r8
   allocate(Z2OE(JY,JX));        Z2OE=0._r8
   allocate(Z2GE(JY,JX));        Z2GE=0._r8
-  allocate(ZNH3E(JY,JX));       ZNH3E=0._r8
+  allocate(ZNH3E_col(JY,JX));       ZNH3E_col=0._r8
   allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
   allocate(H2GE(JY,JX));        H2GE=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
@@ -358,7 +358,7 @@ implicit none
   call destroy(OXYE)
   call destroy(Z2OE)
   call destroy(Z2GE)
-  call destroy(ZNH3E)
+  call destroy(ZNH3E_col)
   call destroy(CH4E_col)
   call destroy(H2GE)
 

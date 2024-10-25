@@ -878,7 +878,7 @@ implicit none
     ENDDO
 
     DO L=1,NumOfCanopyLayers
-      DO  M=1,NumOfSkyAzimuSects
+      DO  M=1,NumOfSkyAzimuthSects
         DO  N=1,NumOfLeafZenithSectors
           plt_rad%RadPAR_zsec(N,M,L,NZ)    = RadPAR_zsec(N,M,L,NZ,NY,NX)
           plt_rad%RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ,NY,NX)
@@ -1454,7 +1454,7 @@ implicit none
   plt_ew%SnowDepth   =SnowDepth_col(NY,NX)
   plt_ew%TairK     =TairK_col(NY,NX)
   plt_morph%CanopyHeight_col   =CanopyHeight_col(NY,NX)
-  plt_site%WindMesHeight=WindMesHeight(NY,NX)
+  plt_site%WindMesureHeight_col=WindMesureHeight_col(NY,NX)
   plt_ew%ZERO4PlantDisplace_col=ZERO4PlantDisplace_col(NY,NX)
   plt_site%WindSpeedAtm_col=WindSpeedAtm_col(NY,NX)
   plt_ew%VLHeatCapSnowMin_col=VLHeatCapSnowMin_col(NY,NX)
@@ -1528,7 +1528,7 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
-  DO N=1,NumOfSkyAzimuSects
+  DO N=1,NumOfSkyAzimuthSects
     plt_rad%OMEGAG(N)=OMEGAG(N,NY,NX)
   ENDDO
   DO N=1,NumOfLeafZenithSectors
@@ -1537,7 +1537,7 @@ implicit none
   ENDDO
   DO NN=1,NumOfLeafAzimuthSectors
     DO M=1,NumOfLeafZenithSectors
-      DO N=1,NumOfSkyAzimuSects
+      DO N=1,NumOfSkyAzimuthSects
         plt_rad%OMEGA(N,M,NN)=OMEGA(N,M,NN)
         plt_rad%OMEGX(N,M,NN)=OMEGX(N,M,NN)
         plt_rad%iScatteringDiffus(N,M,NN)=iScatteringDiffus(N,M,NN)
@@ -1586,7 +1586,7 @@ implicit none
     FracPARads2Canopy_pft(NZ,NY,NX)=plt_rad%FracPARads2Canopy_pft(NZ)
     StomatalStress_pft(NZ,NY,NX)=plt_biom%StomatalStress_pft(NZ)
     DO L=1,NumOfCanopyLayers
-      DO M=1,NumOfSkyAzimuSects
+      DO M=1,NumOfSkyAzimuthSects
         DO  N=1,NumOfLeafZenithSectors
           RadDifPAR_zsec(N,M,L,NZ,NY,NX)=plt_rad%RadDifPAR_zsec(N,M,L,NZ)
           RadPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadPAR_zsec(N,M,L,NZ)

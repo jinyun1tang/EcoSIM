@@ -56,14 +56,14 @@ module CanopyRadDataType
 
   allocate(SineLeafAngle(NumOfLeafZenithSectors))
   allocate(CosineLeafAngle(NumOfLeafZenithSectors))
-  allocate(OMEGA(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(OMEGX(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(iScatteringDiffus(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(OMEGA(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(OMEGX(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(iScatteringDiffus(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
   allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX))
   allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
   allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
-  allocate(RadPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuSects,NumOfCanopyLayers,JP,JY,JX))
-  allocate(RadDifPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuSects,NumOfCanopyLayers,JP,JY,JX))
+  allocate(RadPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX))
+  allocate(RadDifPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX))
   allocate(StemAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNumBranches,JP,JY,JX))
 
   end subroutine InitAllocate
