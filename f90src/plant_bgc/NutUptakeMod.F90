@@ -106,9 +106,9 @@ module NutUptakeMod
     D105: DO NB=1,NumOfBranches_pft(NZ)
       IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
-        CNH3P=AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
-        ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
-        NH3Dep2Can_brch(NB,NZ)=AMIN1(0.1_r8*ZPOOLB &
+        CNH3P                  = AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
+        ZPOOLB                 = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
+        NH3Dep2Can_brch(NB,NZ) = AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(CanopyBndlResist_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracPARads2Canopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
       ELSE

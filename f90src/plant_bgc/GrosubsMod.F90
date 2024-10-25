@@ -43,7 +43,7 @@ module grosubsMod
 !
 
   integer  :: curday,curhour
-  public :: grosubs
+  public :: GrowPlants
   public :: InitGrosub
   contains
 
@@ -60,7 +60,7 @@ module grosubsMod
   end subroutine InitGrosub
 !------------------------------------------------------------------------------------------
 
-  subroutine grosubs(I,J)
+  subroutine GrowPlants(I,J)
 !
 !     THIS subroutine CALCULATES ALL PLANT BIOLOGICAL TRANSFORMATIONS
 !
@@ -112,7 +112,7 @@ module grosubsMod
     call SumPlantBiom(I,J,NZ,'exgrosubs')
   ENDDO
   end associate
-  END subroutine grosubs
+  END subroutine GrowPlants
 
 !------------------------------------------------------------------------------------------
 
