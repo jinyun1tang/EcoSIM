@@ -52,11 +52,11 @@ module CanopyCondsMod
 !     begin_execution
   associate(                                                     &
     WindSpeedAtm_col        => plt_site%WindSpeedAtm_col,        & !input:
+    WindMesureHeight_col    => plt_site%WindMesureHeight_col,    &  !Input:
     ZERO                    => plt_site%ZERO,                    &
     AREA3                   => plt_site%AREA3,                   &
     KoppenClimZone          => plt_site%KoppenClimZone,          &
     SoilSurfRoughnesst0_col => plt_site%SoilSurfRoughnesst0_col, &
-    WindMesureHeight_col    => plt_site%WindMesureHeight_col,    &  !Input:
     ZEROS                   => plt_site%ZEROS,                   &
     NU                      => plt_site%NU,                      &
     AbvCanopyBndlResist_col => plt_ew%AbvCanopyBndlResist_col,   &
@@ -156,9 +156,9 @@ module CanopyCondsMod
   CanopyHeightZ_col(NumOfCanopyLayers1) = CanopyHeight_col+0.01_r8
   ZL1(NumOfCanopyLayers1)               = CanopyHeightZ_col(NumOfCanopyLayers1)
   ZL1(0)                                = 0.0_r8
+
   !divide total are into NumOfCanopyLayers1
-  AreaInterval=(CanopyLeafArea_col+StemArea_col)/NumOfCanopyLayers1
-  
+  AreaInterval=(CanopyLeafArea_col+StemArea_col)/NumOfCanopyLayers1  
   IF(AreaInterval.GT.ZEROS)THEN
     D2765: DO L=NumOfCanopyLayers1,2,-1
       AreaL=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)
@@ -209,6 +209,7 @@ module CanopyCondsMod
     CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch, &
     CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col      &    
   )
+  
   LeafStalkArea_col=0.0_r8
   D1135: DO NZ=1,NP
     LeafStalkArea_pft(NZ)=0.0_r8

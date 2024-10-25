@@ -2,6 +2,7 @@ module UptakesMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use StomatesMod   , only : stomates
+  use GrosubPars
   use minimathmod
   use EcoSIMCtrlMod , only : etimer  
   use UnitMod       , only : units
@@ -146,7 +147,7 @@ module UptakesMod
 !     OSWT=molar mass of CCPOLT
 !     TKCX=intermediate estimate of TKC used in convergence solution
 !     CanopyMassC=leaf+petiole+stalk mass
-!     VSTK=specific stalk volume
+!     SpecStalkVolume=specific stalk volume
 !     CanopyWater_pft,WatByPCanopy_pft=water volume in canopy,on canopy surfaces
 !
         PSICanopy_pft(NZ)         = AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
@@ -166,7 +167,7 @@ module UptakesMod
 
         TKCX                   = TKC(NZ)
         CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
-        VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*VSTK+WatByPCanopy_pft(NZ)+CanopyWater_pft(NZ))
+        VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*SpecStalkVolume+WatByPCanopy_pft(NZ)+CanopyWater_pft(NZ))
 !
 !     CONVERGENCE SOLUTION
 !

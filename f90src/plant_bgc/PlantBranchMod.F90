@@ -1602,17 +1602,17 @@ module PlantBranchMod
   integer  :: LL,LU,L,K,k1,k2,KK,NE
   integer  :: KMinGroingLeafNodeNum,KLeafNumHighestGrowing
   integer  :: LNumHeightLeafTip,LNumHeightLeafBase
-  integer  :: LHTBRU,LHTBRL,N
+  integer  :: LNumHeightBranchTip,LNumHeightBranchBase,N
   real(r8) :: ZSTK
   real(r8) :: YLeafElmntNode_brch(NumPlantChemElms)
   real(r8) :: YLeafArea_brch,LeafElevation,LeafLength
-  real(r8) :: ARSTKB,ASTV
+  real(r8) :: StalkSurfArea,ASTV
   real(r8) :: FRACL
   real(r8) :: HeightBranchBase
   real(r8) :: HeightStalk
   real(r8) :: HeightLeafNode,HeightLeafLow,HeightLeafTip
   real(r8) :: HeightLeafBase
-  real(r8) :: RSTK
+  real(r8) :: StalkRadius
   real(r8) :: TotLeafElevation
 ! begin_execution
   associate(                                                          &
@@ -1656,8 +1656,8 @@ module PlantBranchMod
   KLowestGroLeafNode_brch(NB,NZ)=0
 
   IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
-    LeafLength=SQRT(1.0E+02_r8*LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
-    HypoctoHeight_pft(NZ)=LeafLength+PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ) &
+    LeafLength            = SQRT(1.0E+02_r8*LeafAreaNode_brch(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
+    HypoctoHeight_pft(NZ) = LeafLength+PetoleLensNode_brch(0,MainBranchNum_pft(NZ),NZ) &
       +LiveInterNodeHight_brch(0,MainBranchNum_pft(NZ),NZ)
 
   ENDIF
@@ -1667,8 +1667,8 @@ module PlantBranchMod
   IF(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ))THEN
     D540: DO K=0,MaxNodesPerBranch1
       DO  L=1,NumOfCanopyLayers1
-        CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
-        LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
+        CanopyLeafArea_lpft(L,K,NB,NZ)                         = 0._r8
+        LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) = 0._r8
       enddo
     ENDDO D540
     D535: DO L=1,NumOfCanopyLayers1
@@ -1683,12 +1683,12 @@ module PlantBranchMod
 !   LiveInterNodeHight_brch=internode length
 !   HeightBranchBase=branch base height
 !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0.AND.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
       IF(NB.NE.MainBranchNum_pft(NZ))THEN
         KLeafNumHighestGrowing=MAX(1,KHiestGroLeafNode_brch(MainBranchNum_pft(NZ),NZ)-MaxNodesPerBranch1+1)
         IF(BranchNumber_brch(NB,NZ).GE.KLeafNumHighestGrowing)THEN
-          K=pMOD(BranchNumber_brch(NB,NZ),MaxNodesPerBranch1)
-          HeightBranchBase=LiveInterNodeHight_brch(K,MainBranchNum_pft(NZ),NZ)
+          K                = pMOD(BranchNumber_brch(NB,NZ),MaxNodesPerBranch1)
+          HeightBranchBase = LiveInterNodeHight_brch(K,MainBranchNum_pft(NZ),NZ)
         ELSE
           HeightBranchBase=0._r8
         ENDIF
@@ -1716,11 +1716,11 @@ module PlantBranchMod
       !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
       !     LeafLength=leaf length
 !
-      HeightStalk=HeightBranchBase+LiveInterNodeHight_brch(K,NB,NZ)
-      HeightLeafNode=HeightStalk+PetoleLensNode_brch(K,NB,NZ)
-      LeafLength=AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafAreaNode_brch(K,NB,NZ)) &
+      HeightStalk    = HeightBranchBase+LiveInterNodeHight_brch(K,NB,NZ)
+      HeightLeafNode = HeightStalk+PetoleLensNode_brch(K,NB,NZ)
+      LeafLength     = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafAreaNode_brch(K,NB,NZ)) &
         /(PlantPopulation_pft(NZ)*FracGroth2Node_pft(NZ))))
-      TotLeafElevation=0._r8
+      TotLeafElevation = 0._r8
       !
       !   ALLOCATE FRACTIONS OF LEAF IN EACH INCLINATION CLASS
       !     FROM HIGHEST TO LOWEST TO CANOPY LAYER
@@ -1735,26 +1735,27 @@ module PlantBranchMod
       !     FRACL=leaf fraction in each layer
 !
       D555: DO N=NumOfLeafZenithSectors1,1,-1
-        LeafElevation=SineLeafAngle(N)*CLASS(N,NZ)*LeafLength
-        HeightLeafLow=AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
-        HeightLeafTip=AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
-        LU=0
-        LL=0
-        D550: DO L=NumOfCanopyLayers1,1,-1
+        LeafElevation = SineLeafAngle(N)*CLASS(N,NZ)*LeafLength
+        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
+        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
+        LU            = 0
+        LL            = 0
+        D550: DO L = NumOfCanopyLayers1, 1, -1
           IF(LU.EQ.1 .AND. LL.EQ.1)exit
-          IF((HeightLeafTip.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO).AND.LU.EQ.0)THEN
-            LNumHeightLeafTip=MAX(1,L)
-            LU=1
+          IF((HeightLeafTip.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) .AND. LU.EQ.0)THEN
+            LNumHeightLeafTip = MAX(1,L)
+            LU                = 1
           ENDIF
-          IF((HeightLeafLow.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO).AND.LL.EQ.0)THEN
-            LNumHeightLeafBase=MAX(1,L)
-            LL=1
+          IF((HeightLeafLow.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) .AND. LL.EQ.0)THEN
+            LNumHeightLeafBase = MAX(1,L)
+            LL                 = 1
           ENDIF
         ENDDO D550
+
         D570: DO L=LNumHeightLeafBase,LNumHeightLeafTip
           IF(LNumHeightLeafTip.EQ.LNumHeightLeafBase)THEN
             FRACL=CLASS(N,NZ)
-          ELSEIF(HeightLeafTip.GT.HeightLeafLow.AND.CanopyHeightZ_col(L).GT.HeightLeafLow)THEN
+          ELSEIF(HeightLeafTip.GT.HeightLeafLow .AND. CanopyHeightZ_col(L).GT.HeightLeafLow)THEN
             FRACL=CLASS(N,NZ)*(AMIN1(HeightLeafTip,CanopyHeightZ_col(L)) &
               -AMAX1(HeightLeafLow,CanopyHeightZ_col(L-1)))/(HeightLeafTip-HeightLeafLow)
           ELSE
@@ -1776,12 +1777,13 @@ module PlantBranchMod
           DO NE=1,NumPlantChemElms
             LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)=LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)+YLeafElmntNode_brch(NE)
           ENDDO
-          CanopyLeafAreaZ_pft(L,NZ)=CanopyLeafAreaZ_pft(L,NZ)+YLeafArea_brch
-          CanopyLeafCLyr_pft(L,NZ)=CanopyLeafCLyr_pft(L,NZ)+YLeafElmntNode_brch(ielmc)
+          CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ)+YLeafArea_brch
+          CanopyLeafCLyr_pft(L,NZ)  = CanopyLeafCLyr_pft(L,NZ)+YLeafElmntNode_brch(ielmc)
         ENDDO D570
         TotLeafElevation=TotLeafElevation+LeafElevation
         CanopyHeight_pft(NZ)=AMAX1(CanopyHeight_pft(NZ),HeightLeafTip)
       ENDDO D555
+
       IF(PetoleProteinCNode_brch(K,NB,NZ).GT.0.0_r8)THEN
         IF(KLowestGroLeafNode_brch(NB,NZ).EQ.0)KLowestGroLeafNode_brch(NB,NZ)=MIN(KK,KHiestGroLeafNode_brch(NB,NZ))
       ENDIF
@@ -1800,10 +1802,10 @@ module PlantBranchMod
   !     LiveInterNodeHight_brch=internode length
   !     HeightLeafBase=leaf base height
   !     ZL=height to bottom of each canopy layer
-  !     LHTBRL,LHTBRU=layer number of branch base,tip
-  !     WTSTKB,ARSTKB=branch stalk mass,surface area
+  !     LNumHeightBranchBase,LNumHeightBranchTip=layer number of branch base,tip
+  !     WTSTKB,StalkSurfArea=branch stalk mass,surface area
   !     FSTK=fraction of stalk area contributing to water,heat flow
-  !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
+  !     StalkMassDensity,SpecStalkVolume=stalk density (Mg m-3),specific volume (m3 g-1)
   !     StalkBiomassC_brch=stalk sapwood mass
   !     FRACL=stalk fraction in each layer
   !     CanopyStalkArea_lbrch=total branch stalk surface area in each layer
@@ -1815,28 +1817,28 @@ module PlantBranchMod
         IF(LU.EQ.1 .AND. LL.EQ.1)exit
         IF((HeightLeafBase.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) &
           .AND. LU.EQ.0)THEN
-          LHTBRU=MAX(1,L)
-          LU=1
+          LNumHeightBranchTip = MAX(1,L)
+          LU                  = 1
         ENDIF
         IF((HeightBranchBase.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO) &
           .AND. LL.EQ.0)THEN
-          LHTBRL=MAX(1,L)
-          LL=1
+          LNumHeightBranchBase = MAX(1,L)
+          LL                   = 1
         ENDIF
       ENDDO D545
       
-      RSTK=SQRT(VSTK*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
+      StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
         /(PICON*LiveInterNodeHight_brch(K1,NB,NZ)))
-      ARSTKB=PICON*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)*RSTK
+      StalkSurfArea = PICON*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)*StalkRadius
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
         StalkBiomassC_brch(NB,NZ)=StalkStrutElms_brch(ielmc,NB,NZ)
       ELSE
-        ZSTK=AMIN1(ZSTX,FSTK*RSTK)
-        ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK*ZSTK)
-        StalkBiomassC_brch(NB,NZ)=ASTV/VSTK*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
+        ZSTK                      = AMIN1(ZSTX,FSTK*StalkRadius)
+        ASTV                      = PICON*(2.0_r8*StalkRadius*ZSTK-ZSTK*ZSTK)
+        StalkBiomassC_brch(NB,NZ) = ASTV/SpecStalkVolume*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
       ENDIF
 
-      D445: DO L=LHTBRL,LHTBRU
+      D445: DO L=LNumHeightBranchBase,LNumHeightBranchTip
         IF(HeightLeafBase.GT.HeightBranchBase)THEN
           IF(HeightLeafBase.GT.CanopyHeightZ_col(L-1))THEN
             FRACL=(AMIN1(HeightLeafBase,CanopyHeightZ_col(L))-AMAX1(HeightBranchBase &
@@ -1847,7 +1849,7 @@ module PlantBranchMod
         ELSE
           FRACL=1.0_r8
         ENDIF
-        CanopyStalkArea_lbrch(L,NB,NZ)=FRACL*ARSTKB
+        CanopyStalkArea_lbrch(L,NB,NZ)=FRACL*StalkSurfArea
       ENDDO D445
     ELSE
       StalkBiomassC_brch(NB,NZ)=0._r8
