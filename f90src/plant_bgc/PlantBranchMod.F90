@@ -1815,13 +1815,11 @@ module PlantBranchMod
       LL=0
       D545: DO L=NumOfCanopyLayers1,1,-1
         IF(LU.EQ.1 .AND. LL.EQ.1)exit
-        IF((HeightLeafBase.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) &
-          .AND. LU.EQ.0)THEN
+        IF((HeightLeafBase.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) .AND. LU.EQ.0)THEN
           LNumHeightBranchTip = MAX(1,L)
           LU                  = 1
         ENDIF
-        IF((HeightBranchBase.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO) &
-          .AND. LL.EQ.0)THEN
+        IF((HeightBranchBase.GT.CanopyHeightZ_col(L-1).OR.CanopyHeightZ_col(L-1).LE.ZERO) .AND. LL.EQ.0)THEN
           LNumHeightBranchBase = MAX(1,L)
           LL                   = 1
         ENDIF
@@ -1833,13 +1831,9 @@ module PlantBranchMod
 
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
         StalkBiomassC_brch(NB,NZ)=StalkStrutElms_brch(ielmc,NB,NZ)
-      ELSE
-        
-        RadiusInnerStalk4Transp = AMIN1(ZSTX,FSTK*StalkRadius)
-        !the old algorithm
-        !StalkSectionArea = PICON*(2.0_r8*StalkRadius-RadiusInnerStalk4Transp)*RadiusInnerStalk4Transp        
-        !now, assuming uniform distribution, which more right for trees.
-        StalkSectionArea = PICON*StalkRadius*(StalkRadius-RadiusInnerStalk4Transp)
+      ELSE        
+        RadiusInnerStalk4Transp   = AMIN1(ZSTX,FSTK*StalkRadius)
+        StalkSectionArea          = PICON*StalkRadius*(StalkRadius-RadiusInnerStalk4Transp)
         StalkBiomassC_brch(NB,NZ) = StalkSectionArea*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)/SpecStalkVolume
       ENDIF
 
