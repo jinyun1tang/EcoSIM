@@ -1603,10 +1603,10 @@ module PlantBranchMod
   integer  :: KMinGroingLeafNodeNum,KLeafNumHighestGrowing
   integer  :: LNumHeightLeafTip,LNumHeightLeafBase
   integer  :: LNumHeightBranchTip,LNumHeightBranchBase,N
-  real(r8) :: ZSTK
+  real(r8) :: RadiusInnerStalk4Transp
   real(r8) :: YLeafElmntNode_brch(NumPlantChemElms)
   real(r8) :: YLeafArea_brch,LeafElevation,LeafLength
-  real(r8) :: StalkSurfArea,ASTV
+  real(r8) :: StalkSurfArea,StalkSectionArea
   real(r8) :: FRACL
   real(r8) :: HeightBranchBase
   real(r8) :: HeightStalk
@@ -1830,19 +1830,24 @@ module PlantBranchMod
       StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
         /(PICON*LiveInterNodeHight_brch(K1,NB,NZ)))
       StalkSurfArea = PICON*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)*StalkRadius
+
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
         StalkBiomassC_brch(NB,NZ)=StalkStrutElms_brch(ielmc,NB,NZ)
       ELSE
-        ZSTK                      = AMIN1(ZSTX,FSTK*StalkRadius)
-        ASTV                      = PICON*(2.0_r8*StalkRadius*ZSTK-ZSTK*ZSTK)
-        StalkBiomassC_brch(NB,NZ) = ASTV/SpecStalkVolume*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
+        
+        RadiusInnerStalk4Transp = AMIN1(ZSTX,FSTK*StalkRadius)
+        !the old algorithm
+        !StalkSectionArea = PICON*(2.0_r8*StalkRadius-RadiusInnerStalk4Transp)*RadiusInnerStalk4Transp        
+        !now, assuming uniform distribution, which more right for trees.
+        StalkSectionArea = PICON*StalkRadius*(StalkRadius-RadiusInnerStalk4Transp)
+        StalkBiomassC_brch(NB,NZ) = StalkSectionArea*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)/SpecStalkVolume
       ENDIF
 
       D445: DO L=LNumHeightBranchBase,LNumHeightBranchTip
         IF(HeightLeafBase.GT.HeightBranchBase)THEN
           IF(HeightLeafBase.GT.CanopyHeightZ_col(L-1))THEN
-            FRACL=(AMIN1(HeightLeafBase,CanopyHeightZ_col(L))-AMAX1(HeightBranchBase &
-              ,CanopyHeightZ_col(L-1)))/(HeightLeafBase-HeightBranchBase)
+            FRACL=(AMIN1(HeightLeafBase,CanopyHeightZ_col(L))-AMAX1(HeightBranchBase,CanopyHeightZ_col(L-1))) &
+              /(HeightLeafBase-HeightBranchBase)
           ELSE
             FRACL=0._r8
           ENDIF
