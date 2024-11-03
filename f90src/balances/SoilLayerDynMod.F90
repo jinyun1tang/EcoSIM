@@ -656,15 +656,15 @@ implicit none
   ELSEIF(NN.EQ.3)THEN
     !CumSoilDeptht0 is the initial litter layer bottom
     !obtain the water exceeds litter layer water holding capacity
-    XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-MaxVLWatByLitR_col(NY,NX))
+    XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-VLWatheldCapSurf_col(NY,NX))
     IF(L.EQ.NU(NY,NX).AND.CumDepz2LayerBot_vr(0,NY,NX).GT.CumSoilDeptht0(NY,NX) &
-      .AND.XVOLWP.GT.MaxVLWatByLitR_col(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
+      .AND.XVOLWP.GT.VLWatheldCapSurf_col(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((SoiBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoiBulkDensity_vr(L,NY,NX).LE.ZERO))THEN
       IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))THEN
         NU(NY,NX)=NUI(NY,NX)
         NUM(NY,NX)=NUI(NY,NX)
-        DDLYRX(NN)=(MaxVLWatByLitR_col(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
+        DDLYRX(NN)=(VLWatheldCapSurf_col(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
         DLYR0=(AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX)) &
           +VLitR_col(NY,NX))/AREA(3,0,NY,NX)
@@ -1629,7 +1629,7 @@ implicit none
 !             SatHydroCondHrzn_vr(L1,NY,NX)=SatHydroCondHrzn_vr(L1,NY,NX)+FXSCNH
 !             SatHydroCondHrzn_vr(L0,NY,NX)=SatHydroCondHrzn_vr(L0,NY,NX)-FXSCNH
   IF(L0.EQ.0)THEN
-    FXVOLW=FX*AZMAX1(XVOLWP-MaxVLWatByLitR_col(NY,NX))
+    FXVOLW=FX*AZMAX1(XVOLWP-VLWatheldCapSurf_col(NY,NX))
   ELSE
     FXVOLW=FWO*VLWatMicP_vr(L0,NY,NX)
   ENDIF

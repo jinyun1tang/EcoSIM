@@ -108,8 +108,8 @@ module ErosionMod
 
       TERSED(NY,NX)=0._r8
       RDTSED(NY,NX)=0._r8
-      FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLiceMicPM(M,NY,NX)/VWatStoreCapSurf(NY,NX)))
-      FVLWatMicPM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLMobileWatMicPM(M,NY,NX)/VWatStoreCapSurf(NY,NX)))
+      FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLiceMicPM(M,NY,NX)/VWatStoreCapSurf_col(NY,NX)))
+      FVLWatMicPM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVLMobileWatMicPM(M,NY,NX)/VWatStoreCapSurf_col(NY,NX)))
       FracVol4Erosion(NY,NX)=(1.0_r8-FVOLIM(NY,NX))*FVLWatMicPM(NY,NX)
 !
 !     DETACHMENT BY RAINFALL WHEN SURFACE WATER IS PRESENT
@@ -124,7 +124,7 @@ module ErosionMod
         DETW=SoilDetachability4Erosion1(NY,NX)*(1.0_r8+2.0_r8*VLWatMicPM_vr(M,NU(NY,NX),NY,NX)/VLMicP_vr(NU(NY,NX),NY,NX))
         SoilDetachRate=AMIN1(VLSoilMicPMass_vr(NU(NY,NX),NY,NX)*dts_wat &
           ,DETW*EnergyImpact4ErosionM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
-          *FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
+          *FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*FracSurfSnoFree_col(NY,NX)*(1.0-FVOLIM(NY,NX)))
         RDTSED(NY,NX)=RDTSED(NY,NX)+SoilDetachRate
       ENDIF
 !
@@ -134,7 +134,7 @@ module ErosionMod
       IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.FracVol4Erosion(NY,NX).GT.ZERO)THEN
 
         SEDX=SED(NY,NX)+RDTSED(NY,NX)
-        IF(XVLMobileWaterLitRM(M,NY,NX).LE.VWatStoreCapSurf(NY,NX))THEN
+        IF(XVLMobileWaterLitRM(M,NY,NX).LE.VWatStoreCapSurf_col(NY,NX))THEN
           IF(SEDX.GT.ZEROS(NY,NX))THEN
             CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
         

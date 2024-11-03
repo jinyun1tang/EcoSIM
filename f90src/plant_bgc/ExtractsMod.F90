@@ -4,7 +4,8 @@ module ExtractsMod
 !     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 !     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use minimathmod,   only: AZMAX1
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -83,7 +84,10 @@ module ExtractsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+AZMAX1(LitrfalStrutElms_pvr(NE,M,K,L,NZ))
+            if(LitrfalStrutElms_vr(NE,M,K,L)<0._r8)then
+            write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+            endif
           enddo
         ENDDO
       ENDDO
@@ -349,7 +353,7 @@ module ExtractsMod
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,          &
     WatByPCanopy_pft          => plt_ew%WatByPCanopy_pft,            &
     CanopyWater_pft           => plt_ew%CanopyWater_pft,             &
-    Eco_Heat_Grnd_col         => plt_ew%Eco_Heat_Grnd_col,           &
+    Eco_Heat_GrndSurf_col         => plt_ew%Eco_Heat_GrndSurf_col,           &
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft,           &
     EvapTransHeat_pft         => plt_ew%EvapTransHeat_pft,           &
     CanWat_col                => plt_ew%CanWat_col,                  &
@@ -390,7 +394,7 @@ module ExtractsMod
 !     EvapTransHeat_pft=PFT canopy latent heat flux
 !     Eco_Heat_Sens_col=total canopy sensible heat flux
 !     HeatXAir2PCan_pft=PFT canopy sensible heat flux
-!     Eco_Heat_Grnd_col=total canopy storage heat flux
+!     Eco_Heat_GrndSurf_col=total canopy storage heat flux
 !     HeatStorCanopy_pft=PFT canopy storage heat flux
 !     Canopy_NEE_col=total net CO2 fixation
 !     CO2NetFix_pft=PFT net CO2 fixation
@@ -412,7 +416,7 @@ module ExtractsMod
   Eco_NetRad_col         = Eco_NetRad_col+RadNet2Canopy_pft(NZ)
   Eco_Heat_Latent_col    = Eco_Heat_Latent_col+EvapTransHeat_pft(NZ)
   Eco_Heat_Sens_col      = Eco_Heat_Sens_col+HeatXAir2PCan_pft(NZ)
-  Eco_Heat_Grnd_col      = Eco_Heat_Grnd_col+HeatStorCanopy_pft(NZ)
+  Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
   Canopy_NEE_col         = Canopy_NEE_col+CO2NetFix_pft(NZ)
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanWat_col             = CanWat_col+CanopyWater_pft(NZ)
@@ -420,7 +424,7 @@ module ExtractsMod
   QvET_col               = QvET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
   ENGYC                  = cpw*(WatByPCanopy_pft(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ))*TKC(NZ)
-  CanopyHeatStor_col                 = CanopyHeatStor_col+ENGYC
+  CanopyHeatStor_col     = CanopyHeatStor_col+ENGYC
   HeatFlx2Canopy_col     = HeatFlx2Canopy_col+ENGYC-ENGYX_pft(NZ)-(PrecIntcptByCanopy_pft(NZ)*cpw*TairK)
   ENGYX_pft(NZ)          = ENGYC
   LWRadCanG              = LWRadCanG+LWRadCanopy_pft(NZ)

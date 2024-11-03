@@ -22,7 +22,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  RCS(:,:,:)                         !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)         !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  MinCanPStomaResistH2O_pft(:,:,:)      !canopy minimum stomatal resistance, [s m-1]
-  real(r8),target,allocatable ::  BndlResistCanopy_col(:,:)                           !canopy boundary layer resistance, [m h-1]
+  real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                           !canopy boundary layer resistance, [m h-1]
   real(r8),target,allocatable ::  O2I(:,:,:)                         !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  LeafIntracellularCO2_pft(:,:,:)                        !leaf gaseous CO2 concentration, [umol m-3]
   real(r8),target,allocatable ::  AirConc_pft(:,:,:)                        !total gas concentration, [mol m-3]
@@ -71,10 +71,10 @@ module CanopyDataType
   real(r8),target,allocatable ::  TAU_RadThru(:,:,:)                        !fraction of radiation transmitted by canopy layer, [-]
   real(r8),target,allocatable ::  TAU_DirRadTransm(:,:,:)                        !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                         !fraction of radiation intercepted by ground surface, [-]
-  real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                          !radiation intercepted by ground surface, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  LWRadCanGPrev(:,:)                        !longwave radiation emitted by canopy, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  LWRadGrnd(:,:)                          !longwave radiation emitted by ground surface, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  CanH2OHeldVg_col(:,:)                   !canopy held water content, [m3 d-2]
+  real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                        !shortwave radiation incident on ground surface, [MJ h-1]
+  real(r8),target,allocatable ::  LWRadCanGPrev_col(:,:)                        !longwave radiation emitted by canopy, [MJ h-1]
+  real(r8),target,allocatable ::  LWRadGrnd(:,:)                            !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  CanH2OHeldVg_col(:,:)                     !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                             !net ice transfer to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)            !grid net precipitation water interception to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  EvapTransHeat_pft(:,:,:)                       !canopy latent heat flux, [MJ d-2 h-1]
@@ -180,7 +180,7 @@ module CanopyDataType
   allocate(RCS(JP,JY,JX));      RCS=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(MinCanPStomaResistH2O_pft(JP,JY,JX));     MinCanPStomaResistH2O_pft=0._r8
-  allocate(BndlResistCanopy_col(JY,JX));         BndlResistCanopy_col=0._r8
+  allocate(CanopyBndlResist_col(JY,JX));         CanopyBndlResist_col=0._r8
   allocate(O2I(JP,JY,JX));      O2I=0._r8
   allocate(LeafIntracellularCO2_pft(JP,JY,JX));     LeafIntracellularCO2_pft=0._r8
   allocate(AirConc_pft(JP,JY,JX));     AirConc_pft=0._r8
@@ -230,7 +230,7 @@ module CanopyDataType
   allocate(TAU_DirRadTransm(NumOfCanopyLayers+1,JY,JX));   TAU_DirRadTransm=0._r8
   allocate(FracSWRad2Grnd_col(JY,JX));       FracSWRad2Grnd_col=0._r8
   allocate(RadSWGrnd_col(JY,JX));        RadSWGrnd_col=0._r8
-  allocate(LWRadCanGPrev(JY,JX));      LWRadCanGPrev=0._r8
+  allocate(LWRadCanGPrev_col(JY,JX));      LWRadCanGPrev_col=0._r8
   allocate(LWRadGrnd(JY,JX));      LWRadGrnd=0._r8
   allocate(CanH2OHeldVg_col(JY,JX));      CanH2OHeldVg_col=0._r8
   allocate(Prec2Canopy_col(JY,JX));      Prec2Canopy_col=0._r8
@@ -337,7 +337,7 @@ module CanopyDataType
   call destroy(RCS)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(MinCanPStomaResistH2O_pft)
-  call destroy(BndlResistCanopy_col)
+  call destroy(CanopyBndlResist_col)
   call destroy(O2I)
   call destroy(LeafIntracellularCO2_pft)
   call destroy(AirConc_pft)
@@ -387,7 +387,7 @@ module CanopyDataType
   call destroy(TAU_DirRadTransm)
   call destroy(FracSWRad2Grnd_col)
   call destroy(RadSWGrnd_col)
-  call destroy(LWRadCanGPrev)
+  call destroy(LWRadCanGPrev_col)
   call destroy(LWRadGrnd)
   call destroy(CanH2OHeldVg_col)
   call destroy(Prec2Canopy_col)

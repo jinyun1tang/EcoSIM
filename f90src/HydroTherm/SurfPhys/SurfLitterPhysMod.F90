@@ -34,7 +34,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
   subroutine SRFLitterEnergyBalance(M,NY,NX,PSISV1,Prec2LitR2,PrecHeat2LitR2,HeatSensLitR2Soi1,&
-    HeatSensVapLitR2Soi1,EvapLitR2Soi1,TotHeatAir2LitR)
+    HeatSensVapLitR2Soi1,EvapLitR2Soi1,HeatFluxAir2LitR)
 !!
 ! Description:
   implicit none
@@ -45,17 +45,20 @@ implicit none
   real(r8), intent(out) :: HeatSensLitR2Soi1
   real(r8), intent(out) :: HeatSensVapLitR2Soi1
   real(r8), intent(out) :: EvapLitR2Soi1
-  real(r8), intent(out) :: TotHeatAir2LitR
+  real(r8), intent(out) :: HeatFluxAir2LitR
   real(r8) :: HeatSensAir2LitR
   real(r8) :: HeatSensEvapAir2LitR
   real(r8) :: LWRadLitR  
-  real(r8) :: VWatLitr2,ATCNDR,ATCNVR,Radt2LitR
+  real(r8) :: VWatLitr2,CdTLit2Soil,CdVaporLit2Soil,Radt2LitR
   real(r8) :: CNVR,CNV1
   real(r8) :: TCNDR
   real(r8) :: TCND1
   real(r8) :: DTKX
   real(r8) :: LitRAlbedo  
-  real(r8) :: Radnet2LitR,LatentHeatAir2LitR
+  real(r8) :: Radnet2LitR         !net radiation on to litter [MJ]
+  real(r8) :: RadSWByLitR         !shortwave radiation absorbed by litter [MJ]
+  real(r8) :: LatentHeatAir2LitR
+
 
 ! begin_execution
 ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
@@ -66,7 +69,7 @@ implicit none
   LatentHeatAir2LitR   = 0.0_r8
   HeatSensEvapAir2LitR = 0.0_r8
   HeatSensAir2LitR     = 0.0_r8
-  TotHeatAir2LitR      = 0.0_r8
+  HeatFluxAir2LitR      = 0.0_r8
 
   EvapLitR2Soi1        = 0.0_r8
   HeatSensVapLitR2Soi1 = 0.0_r8
@@ -82,7 +85,7 @@ implicit none
 !
 ! LitRAlbedo=litter albedo
 ! VLWatMicP1,VLiceMicP1=water,ice volume in litter
-! RadSWonLitR,LWRad2LitR=incoming shortwave,longwave radiation
+! RadSWonLitR_col,LWRad2LitR_col=incoming shortwave,longwave radiation
 
 !
 ! litter layer
@@ -91,8 +94,9 @@ implicit none
     *VLiceMicP1_vr(0,NY,NX))/(VLSoilMicPMass_vr(0,NY,NX)+VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX))
 
   !radiation incident on litter layer  
-  Radt2LitR=(1.0_r8-LitRAlbedo)*RadSWonLitR(NY,NX)+LWRad2LitR(NY,NX)  
-
+  RadSWByLitR          = (1.0_r8-LitRAlbedo)*RadSWonLitR_col(NY,NX)
+  Radt2LitR            = RadSWByLitR+LWRad2LitR_col(NY,NX)
+  Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWByLitR
   !
   ! THERMAL CONDUCTIVITY BETWEEN SURFACE RESIDUE AND SOIL SURFACE
   !
@@ -101,14 +105,14 @@ implicit none
   ! POROS,POROQ=litter porosity, tortuosity
   ! VaporDiffusivityLitR_col,WVapDifusvitySoil_vr=litter,soil vapor diffusivity
   ! CVRD=litter cover fraction
-  ! ATCNVR=litter-soil vapor conductance
+  ! CdVaporLit2Soil=litter-soil vapor conductance
   ! DLYRR,DLYR=litter,soil depths
   ! THETRR=dry litter concentration
   ! DTH*,RYL*,DNU*,TRB*=turbulence effects on thermal conductivity
   ! WTHET0,WTHET1=multiplier for air concn in thermal conductivity
   ! TCNDW*,TCNDA*=thermal conductivity of water,air
   ! TCNDR,TCND1=litter,soil thermal conductivity
-  ! ATCNDR=litter-soil thermal conductance
+  ! CdTLit2Soil=litter-soil thermal conductance
   !
   CNVR=VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS_vr(0,NY,NX)
   CNV1=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
@@ -117,13 +121,13 @@ implicit none
   IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
     !there is litter layer
     IF(CNVR.GT.ZERO.AND.CNV1.GT.ZERO)THEN
-      ATCNVR=2.0_r8*CNVR*CNV1/(CNVR*DLYR(3,NUM(NY,NX),NY,NX)+CNV1*DLYRR_COL(NY,NX))
+      CdVaporLit2Soil=2.0_r8*CNVR*CNV1/(CNVR*DLYR(3,NUM(NY,NX),NY,NX)+CNV1*DLYRR_COL(NY,NX))
     ELSE
       !below is a numerical hack
-      ATCNVR=2.0_r8*CNVR/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))*FracSurfByLitR_col(NY,NX)
+      CdVaporLit2Soil=2.0_r8*CNVR/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))*FracSurfByLitR_col(NY,NX)
     ENDIF
   ELSE
-    ATCNVR=0.0_r8
+    CdVaporLit2Soil=0.0_r8
   ENDIF
 
 
@@ -133,19 +137,20 @@ implicit none
 
   call CalcSoilThermConductivity(NX,NY,NUM(NY,NX),DTKX,TCND1)
 
-  ATCNDR=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR_COL(NY,NX))
+  CdTLit2Soil=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR_COL(NY,NX))
 !
 ! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
 !
-  call SurfLitterIterateNN(M,NY,NX,ATCNDR,ATCNVR,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
+  call SurfLitterIterateNN(M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
     EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,&
-    HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,TotHeatAir2LitR)
+    HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,HeatFluxAir2LitR)
 
-  HeatByRadiation_col(NY,NX)=HeatByRadiation_col(NY,NX)+Radnet2LitR
-  HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
-  HeatEvapAir2Surf_col(NY,NX)=HeatEvapAir2Surf_col(NY,NX)+LatentHeatAir2LitR
-  HeatSensVapAir2Surf_col(NY,NX)=HeatSensVapAir2Surf_col(NY,NX)+HeatSensEvapAir2LitR
-  LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)+LWRadLitR
+  HeatByRad2Surf_col(NY,NX)     = HeatByRad2Surf_col(NY,NX)+Radnet2LitR
+  HeatNet2Surf_col(NY,NX)        = HeatNet2Surf_col(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
+  HeatSensAir2Surf_col(NY,NX)    = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2LitR
+  HeatEvapAir2Surf_col(NY,NX)    = HeatEvapAir2Surf_col(NY,NX)+LatentHeatAir2LitR
+  HeatSensVapAir2Surf_col(NY,NX) = HeatSensVapAir2Surf_col(NY,NX)+HeatSensEvapAir2LitR
+  LWRadBySurf_col(NY,NX)         = LWRadBySurf_col(NY,NX)+LWRadLitR
 
   end subroutine SRFLitterEnergyBalance
 !------------------------------------------------------------------------------------------
@@ -184,33 +189,49 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfLitterIterateNN(M,NY,NX,ATCNDR,ATCNVR,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
+  subroutine SurfLitterIterateNN(M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
     EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,&
-    LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,TotHeatAir2LitR)
+    LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,HeatFluxAir2LitR)
 
   implicit none
   integer, intent(in) :: M     !soil heat-flow iteration id
   integer, intent(in) :: NY,NX
-  real(r8),intent(in) :: ATCNDR,ATCNVR,PSISV1,Radt2LitR
-  real(r8), intent(in):: Prec2LitR2,PrecHeat2LitR2
-  real(r8), intent(inout) :: EvapLitR2Soi1
-  real(r8), intent(inout) :: HeatSensAir2LitR
-  real(r8), intent(inout) :: HeatSensEvapAir2LitR
-  real(r8), intent(inout) :: HeatSensLitR2Soi1
-  real(r8), intent(inout) :: HeatSensVapLitR2Soi1
-  real(r8), intent(inout) :: LatentHeatAir2LitR
-  real(r8), intent(inout) :: LWRadLitR
-  real(r8), intent(inout) :: Radnet2LitR
-  real(r8), intent(inout) :: TotHeatAir2LitR
+  real(r8), intent(in) :: CdTLit2Soil     !heat conductance between litter and soil [1/(m2 K h)]
+  real(r8), intent(in) :: CdVaporLit2Soil     !water conductance between litter and soil [m/h]
+  real(r8), intent(in) :: PSISV1     !surface soil suction pressure [MPa]
+  real(r8), intent(in) :: Radt2LitR    !incoming radiation (from canopy air and sun) onto litter [MJ]
+  real(r8), intent(in):: Prec2LitR2                !precipitation water flux added to litter [MJ]
+  real(r8), intent(in) :: PrecHeat2LitR2           !precipitation heat flux added to litter [MJ]
+  real(r8), intent(inout) :: EvapLitR2Soi1         !cumulated evaporation flux from litter to soil [kg H2O]
+  real(r8), intent(inout) :: HeatSensAir2LitR      !cumulated sensible heat flux from air to litter [MJ]
+  real(r8), intent(inout) :: HeatSensEvapAir2LitR  !cumulated sensible heat associated with water flux [MJ]
+  real(r8), intent(inout) :: HeatSensLitR2Soi1     !cumulated sensible heat flux from litter to soil [MJ]
+  real(r8), intent(inout) :: HeatSensVapLitR2Soi1  !cumulated heat flux from litter to soil due to water vapor flux [MJ]
+  real(r8), intent(inout) :: LatentHeatAir2LitR    !cumulated latent heat from air to litter [MJ]
+  real(r8), intent(inout) :: LWRadLitR             !cumulated outgoing long wave radiation from litter [MJ]
+  real(r8), intent(inout) :: Radnet2LitR           !cumulated net radiation on litter [MJ]
+  real(r8), intent(inout) :: HeatFluxAir2LitR       !cumulated heat into litter [MJ]
   integer  :: NN
   real(r8) :: tk1pre,VHCPRXX
   real(r8) :: RAa,VaporSoi1,VapLitR,VPY
   real(r8) :: TKXR,TK1X,TKY
   real(r8) :: FLVC,FLVX,ENGYR
-  real(r8) :: HFLWC,HFLWX,EVAPR2,LatentHeatAir2LitR2
-  real(r8) :: HeatSensEvapAir2LitR2
-  real(r8) :: NetHeatAir2LitR2,LWRadLitR2,ThetaWLitR,HeatSensAir2LitR2,EvapLitR2Soi2,HeatSensVapLitR2Soi2
-  real(r8) :: CdLitREvap,CdLitRHSens,RAGX,RI,Radnet2LitR2,TotHeatAir2LitR2,HeatSensLitR2Soi2
+  real(r8) :: HFLWC,HFLWX
+  real(r8) :: EVAPR2                 !eavporation flux from air to litter [ton H2O]
+  real(r8) :: LatentHeatAir2LitR2    !latent heat flux from air to litter [MJ]
+  real(r8) :: HeatSensEvapAir2LitR2  !sensible heat associated with water flux [MJ]
+  real(r8) :: NetHeatAir2LitR2       !residual heat flux into litter by subtracting latent and sensible heat from radiation [MJ]
+  real(r8) :: LWRadLitR2             !outgoing long wave radiation from litter [MJ]
+  real(r8) :: ThetaWLitR             !volumetric water held in litter [m3 water/m3 litter]
+  real(r8) :: HeatSensAir2LitR2      !sensible heat flux from air to litter [MJ]
+  real(r8) :: EvapLitR2Soi2          !evaporation flux from litter to soil [kg H2O]
+  real(r8) :: HeatSensVapLitR2Soi2   !advective heat by evaporation [MJ]
+  real(r8) :: CdLitREvap             !conductance of evaporation [m3]
+  real(r8) :: CdLitRHSens            !conductance of sensible heat [MJ/K]
+  real(r8) :: RAGX,RI
+  real(r8) :: Radnet2LitR2           !litter net radiation,after taking out outgoing radiation from litter [MJ]
+  real(r8) :: HeatFluxAir2LitR2       !total residual heat into litter [MJ]
+  real(r8) :: HeatSensLitR2Soi2      !sensible heat flux from litter to soil
   real(r8) :: VLHeatCapcityLitR2,VLHeatCapacity2
   real(r8) :: VLWatMicP12,VWatLitr2
   real(r8) :: TKR1,TKS1
@@ -227,7 +248,7 @@ implicit none
   !embedded iteration, local time step size
   dt_litrHeat=dts_HeatWatTP/real(NPR,kind=r8)      !time step for litter flux calculation
   D5000: DO NN=1,NPR
-!    write(*,*)'TotHeatAir2LitR  x',NN,TotHeatAir2LitR
+!    write(*,*)'HeatFluxAir2LitR  x',NN,HeatFluxAir2LitR
     IF(VLHeatCapcityLitR2.GT.VHeatCapLitRMin_col(NY,NX))THEN
       !
       ! AERODYNAMIC RESISTANCE ABOVE RESIDUE INCLUDING
@@ -241,24 +262,24 @@ implicit none
       ! RAG,RAGR=isothermal blr at ground surface
       ! CdLitREvap,CdLitRHSens=conductance for litter latent,sensible heat fluxes
       !
-      RI=RichardsonNumber(RIB(NY,NX),TKQ(NY,NX),TKR1)
-      RAGX=AMAX1(RAM,0.8_r8*RAGR(NY,NX),AMIN1(1.2_r8*RAGR(NY,NX),RARG(NY,NX)/(1.0_r8-10.0_r8*RI)))
-      RAGR(NY,NX)=RAGX
-      RAa=RAGX
-      CdLitREvap=PARER(NY,NX)/(RAa+RZ)
-      CdLitRHSens=PARSR(NY,NX)/RAa
+      RI   = RichardsonNumber(RIB(NY,NX),TKQ_col(NY,NX),TKR1)
+      RAGX = AMAX1(RAM,0.8_r8*ResistAreodynOverLitr_col(NY,NX),&
+        AMIN1(1.2_r8*ResistAreodynOverLitr_col(NY,NX),RARG(NY,NX)/(1.0_r8-10.0_r8*RI)))
+      ResistAreodynOverLitr_col(NY,NX) = RAGX
+      RAa                              = RAGX
+      CdLitREvap                       = AScaledCdWOverLitr_col(NY,NX)/(RAa+RZ)
+      CdLitRHSens                      = AScaledCdHOverLitr_col(NY,NX)/RAa
 !
 !     NET RADIATION AT RESIDUE SURFACE
 !
 !     LWRadLitR2=longwave radiation emitted by litter
-!     Radnet2LitR2=litter net radiation,after taking out outgoing radiation from litter 
 !     ThetaWLitR=litter water content
 !     VWatLitRHoldCapcity=maximum water retention by litter
 !     PSISM1=litter matric water potential
 !
-      LWRadLitR2=LWEmscefLitR_col(NY,NX)*TKR1**4._r8/real(NPR,kind=r8)
-      Radnet2LitR2=Radt2LitR-LWRadLitR2
-!      write(*,*)'Radnet2LitR2',Radt2LitR,LWEmscefLitR_col(NY,NX),TKR1
+      LWRadLitR2   = LWEmscefLitR_col(NY,NX)*TKR1**4._r8/real(NPR,kind=r8)
+      Radnet2LitR2 = Radt2LitR-LWRadLitR2
+
       IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
         ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VWatLitr2)/VLitR_col(NY,NX)
       ELSE
@@ -274,12 +295,12 @@ implicit none
           PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
             /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
         ELSE
-          ThetaWLitR=POROS0(NY,NX)
-          PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
+          ThetaWLitR         = POROS0(NY,NX)
+          PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
         ENDIF
       ELSE
-        ThetaWLitR=POROS0(NY,NX)
-        PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
+        ThetaWLitR         = POROS0(NY,NX)
+        PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
       ENDIF
 !
 !     VAPOR FLUX AT RESIDUE SURFACE
@@ -299,10 +320,10 @@ implicit none
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
 
-      VaporSoi1 = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !in soil, ton/m3
-      EVAPR2    = AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton hr/m]
-      LatentHeatAir2LitR2   = EVAPR2*EvapLHTC          !latent energy flux, kJ/kg *10^3 kg hr/m = MJ hr/m
-      HeatSensEvapAir2LitR2 = EVAPR2*cpw*TKR1        !mass energy flux
+      VaporSoi1             = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !vapor pressure in soil, ton H2O/m3
+      EVAPR2                = AMAX1(-AZMAX1(VWatLitr2*dts_wat),CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton H2O]
+      LatentHeatAir2LitR2   = EVAPR2*EvapLHTC          !latent energy flux,              MJ/ton H2O * ton H2O =MJ
+      HeatSensEvapAir2LitR2 = EVAPR2*cpw*TKR1          !mass energy flux
       !
       ! SOLVE FOR RESIDUE TO SOIL SURFACE HEAT FLUXES
       !
@@ -318,17 +339,18 @@ implicit none
       ! HeatSensLitR2Soi2=litter-soil heat flux
       ! THETPM: air-filled porosity
 
+      ! Water flux by evaporation
       IF(THETPM(M,0,NY,NX).GT.THETX.AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
-        FLVC=ATCNVR*(VapLitR-VaporSoi1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
+        FLVC=CdVaporLit2Soil*(VapLitR-VaporSoi1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
         if(abs(FLVC)>1.e20_r8)then
-          write(*,*)'ATCNVR*(VapLitR-VaporSoi1)=',ATCNVR,VapLitR,VaporSoi1
-          write(*,*)'FracSurfSnoFree(NY,NX),FracSurfByLitR_col(NY,NX)=',FracSurfSnoFree(NY,NX),FracSurfByLitR_col(NY,NX)
+          write(*,*)'CdVaporLit2Soil*(VapLitR-VaporSoi1)=',CdVaporLit2Soil,VapLitR,VaporSoi1
+          write(*,*)'FracSurfSnoFree_col(NY,NX),FracSurfByLitR_col(NY,NX)=',FracSurfSnoFree_col(NY,NX),FracSurfByLitR_col(NY,NX)
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
 
-        VPY=(VapLitR*VLsoiAirPM(M,0,NY,NX)+VaporSoi1*VLsoiAirPM(M,NUM(NY,NX),NY,NX)) &
+        VPY = (VapLitR*VLsoiAirPM(M,0,NY,NX)+VaporSoi1*VLsoiAirPM(M,NUM(NY,NX),NY,NX)) &
           /(VLsoiAirPM(M,0,NY,NX)+VLsoiAirPM(M,NUM(NY,NX),NY,NX))
-        FLVX=(VapLitR-VPY)*VLsoiAirPM(M,0,NY,NX)*XNPB
+        FLVX = (VapLitR-VPY)*VLsoiAirPM(M,0,NY,NX)*XNPB
         if(abs(FLVX)>1.e20_r8)then
           write(*,*)'(VapLitR-VPY)*VLsoiAirPM(M,0,NY,NX)',VapLitR,VPY,VLsoiAirPM(M,0,NY,NX)
           call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -360,7 +382,7 @@ implicit none
       TK1X  = TKS1+HeatSensVapLitR2Soi2/VLHeatCapacity2            !update soil layer temperature
       TKY   = (TKXR*VLHeatCapcityLitR2+TK1X*VLHeatCapacity2)/(VLHeatCapcityLitR2+VLHeatCapacity2)   !equilibrium temperature
       HFLWX = (TKXR-TKY)*VLHeatCapcityLitR2*XNPB                   !sensible heat flux > 0 into soil
-      HFLWC = ATCNDR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
+      HFLWC = CdTLit2Soil*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
       IF(HFLWC.GE.0.0_r8)THEN
         HeatSensLitR2Soi2=AZMAX1(AMIN1(HFLWX,HFLWC))
       ELSE
@@ -370,11 +392,11 @@ implicit none
 !     SOLVE FOR RESIDUE LATENT, SENSIBLE AND STORAGE HEAT FLUXES
 !
 !     HeatSensAir2LitR2,Radnet2LitR2,LatentHeatAir2LitR2=litter sensible,net radn,latent heat fluxes
-!     NetHeatAir2LitR2,TotHeatAir2LitR2=storage,total litter heat flux
+!     NetHeatAir2LitR2,HeatFluxAir2LitR2=storage,total litter heat flux
 !
-      HeatSensAir2LitR2 = CdLitRHSens*(TKQ(NY,NX)-TKR1)    !sensible heat flux between canopy air and litter surface
+      HeatSensAir2LitR2 = CdLitRHSens*(TKQ_col(NY,NX)-TKR1)    !sensible heat flux between canopy air and litter surface
       NetHeatAir2LitR2  = Radnet2LitR2+LatentHeatAir2LitR2+HeatSensAir2LitR2      !
-      TotHeatAir2LitR2  = NetHeatAir2LitR2+HeatSensEvapAir2LitR2
+      HeatFluxAir2LitR2  = NetHeatAir2LitR2+HeatSensEvapAir2LitR2
 !
 !     AGGREGATE WATER AND ENERGY FLUXES FROM TIME STEP FOR LITTER
 !     CALCULATIONS TO THAT FOR SOIL PROFILE
@@ -384,12 +406,12 @@ implicit none
       LatentHeatAir2LitR   = LatentHeatAir2LitR+LatentHeatAir2LitR2
       HeatSensEvapAir2LitR = HeatSensEvapAir2LitR+HeatSensEvapAir2LitR2
       HeatSensAir2LitR     = HeatSensAir2LitR+HeatSensAir2LitR2
-      TotHeatAir2LitR      = TotHeatAir2LitR+TotHeatAir2LitR2
+      HeatFluxAir2LitR      = HeatFluxAir2LitR+HeatFluxAir2LitR2
 
-      ! write(*,*)'.........TotHeatAir2LitR',TotHeatAir2LitR,TotHeatAir2LitR2,TKQ(NY,NX),TKR1
+      ! write(*,*)'.........HeatFluxAir2LitR',HeatFluxAir2LitR,HeatFluxAir2LitR2,TKQ_col(NY,NX),TKR1
       ! write(*,*)'NetHeatAir2LitR2+HeatSensEvapAir2LitR2,NN',NetHeatAir2LitR2,HeatSensEvapAir2LitR2,NN
       ! write(*,*)'Radnet2LitR2+LatentHeatAir2LitR2+HeatSensAir2LitR2',Radnet2LitR2,LatentHeatAir2LitR2,HeatSensAir2LitR2
-      ! write(*,*)'CdLitRHSens*(TKQ(NY,NX)-TKR1)',CdLitRHSens,TKQ(NY,NX),TKR1
+      ! write(*,*)'CdLitRHSens*(TKQ_col(NY,NX)-TKR1)',CdLitRHSens,TKQ_col(NY,NX),TKR1
       ! call print_info(trim(mod_filename)//' at line',__LINE__)
       EvapLitR2Soi1        = EvapLitR2Soi1+EvapLitR2Soi2
       HeatSensVapLitR2Soi1 = HeatSensVapLitR2Soi1+HeatSensVapLitR2Soi2
@@ -402,7 +424,7 @@ implicit none
       LatentHeatAir2LitR2   = 0.0_r8
       HeatSensEvapAir2LitR2 = 0.0_r8
       HeatSensAir2LitR2     = 0.0_r8
-      TotHeatAir2LitR2      = 0.0_r8
+      HeatFluxAir2LitR2      = 0.0_r8
       EvapLitR2Soi2         = 0.0_r8
       HeatSensVapLitR2Soi2  = 0.0_r8
       HeatSensLitR2Soi2     = 0.0_r8
@@ -418,9 +440,9 @@ implicit none
     VLHeatCapcityLitR2 = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VWatLitr2+cpi*VLiceMicP1_vr(0,NY,NX)
     VLHeatCapacity2    = VLHeatCapacity2+cpw*EvapLitR2Soi2
     tk1pre             = TKR1
-    TKR1               = (ENGYR+TotHeatAir2LitR2+PrecHeat2LitR2-HeatSensVapLitR2Soi2-HeatSensLitR2Soi2)/VLHeatCapcityLitR2
+    TKR1               = (ENGYR+HeatFluxAir2LitR2+PrecHeat2LitR2-HeatSensVapLitR2Soi2-HeatSensLitR2Soi2)/VLHeatCapcityLitR2
     TKS1               = TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
-!    print*,'tkr1',NN,TKR1,TKS1,TKQ(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
+!    print*,'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
 !    print*,'cplitr',NN,VLHeatCapcityLitR2,SoilOrgM_vr(ielmc,0,NY,NX),VWatLitr2,VLiceMicP1_vr(0,NY,NX)
   ENDDO D5000
   end subroutine SurfLitterIterateNN
@@ -554,7 +576,7 @@ implicit none
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
-      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
@@ -642,7 +664,7 @@ implicit none
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
-      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/MaxVLWatByLitR_col(NY,NX)))
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8

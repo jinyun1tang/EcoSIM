@@ -209,7 +209,7 @@ module Hour1Mod
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
-      LWRadCanGPrev(NY,NX)          = LWRadCanG(NY,NX)
+      LWRadCanGPrev_col(NY,NX)          = LWRadCanG(NY,NX)
       LWRadGrnd(NY,NX)              = LWRadBySurf_col(NY,NX)
       NetCO2Flx2Canopy_col(NY,NX)   = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       LWRadCanG(NY,NX)              = 0.0_r8
@@ -221,7 +221,7 @@ module Hour1Mod
       Eco_NetRad_col(NY,NX)         = 0.0_r8
       Eco_Heat_Latent_col(NY,NX)    = 0.0_r8
       Eco_Heat_Sens_col(NY,NX)      = 0.0_r8
-      Eco_Heat_Grnd_col(NY,NX)      = 0.0_r8
+      Eco_Heat_GrndSurf_col(NY,NX)      = 0.0_r8
       Canopy_NEE_col(NY,NX)         = 0.0_r8
       Eco_NEE_col(NY,NX)            = 0.0_r8
       ECO_ER_col(NY,NX)             = 0.0_r8
@@ -263,8 +263,8 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: NY,NX
   integer :: NZ
-  real(r8) :: VOLWCX  !maximum precipitation holding capacity by canopy (leaf+stem)
-  real(r8) :: prec2canopy_pft
+  real(r8) :: VOLWCX  !maximum precipitation holding capacity by canopy (leaf+stem) [m H2O/h]
+  real(r8) :: prec2canopy_pft  !precipiation onto canopy [m H2O/h]
 !
 !     CANOPY RETENTION OF PRECIPITATION
 !
@@ -640,8 +640,8 @@ module Hour1Mod
 !     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
 !     SoilSurfRoughnesst0_col,ZW=soil,water surface roughness
-!     MaxVLWatByLitR_col=soil surface water retention capacity
-!     VWatStoreCapSurf=MaxVLWatByLitR_col accounting for above-ground water table
+!     VLWatheldCapSurf_col=soil surface water retention capacity
+!     VWatStoreCapSurf_col=VLWatheldCapSurf_col accounting for above-ground water table
 !     EHUM=fraction of microbial decompn product allocated to surface humus
 !     EPOC=fraction of SOC decomposition product allocated to surface POC
 !
@@ -660,11 +660,11 @@ module Hour1Mod
   ELSE
     SoilSurfRoughnesst0_col(NY,NX)=ZW
   ENDIF
-  MaxVLWatByLitR_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughnesst0_col(NY,NX)+&
+  VLWatheldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughnesst0_col(NY,NX)+&
     3.10_r8*SoilSurfRoughnesst0_col(NY,NX)**2._r8 &
     -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
 
-  VWatStoreCapSurf(NY,NX)=AMAX1(MaxVLWatByLitR_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
+  VWatStoreCapSurf_col(NY,NX)=AMAX1(VLWatheldCapSurf_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
     CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
 
   SoiDepthMidLay_vr(NU(NY,NX),NY,NX)=CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
@@ -729,6 +729,7 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  Eco_RadSW_col(NY,NX)                    = 0._r8
   RootCO2Autor_vr(:,NY,NX)                = 0._r8
   tRDOE2Die_col(1:NumPlantChemElms,NY,NX) = 0._r8
   QRunSurf_col(NY,NX)                     = 0.0_r8
@@ -754,7 +755,7 @@ module Hour1Mod
   HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
   TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
   TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
-  HeatByRadiation_col(NY,NX)              = 0.0_r8
+  HeatByRad2Surf_col(NY,NX)              = 0.0_r8
   HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
   HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
   HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
@@ -767,7 +768,7 @@ module Hour1Mod
 
   CanWat_col(NY,NX)              = 0.0_r8
   CanH2OHeldVg_col(NY,NX)        = 0.0_r8
-  Prec2Canopy_col(NY,NX)                  = 0.0_r8
+  Prec2Canopy_col(NY,NX)         = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
   QvET_col(NY,NX)                = 0.0_r8
   VapXAir2Canopy_col(NY,NX)      = 0.0_r8

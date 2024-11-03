@@ -221,6 +221,7 @@ module SoilBGCNLayMod
   character(len=*), optional, intent(in) :: info
   integer :: K,N,NGL,M,MID,NE,jcplx1,nelms,idom
   logical :: conly_loc
+  real(r8) :: orgm0(1:NumPlantChemElms)
 
   if(present(conly))then
     conly_loc=conly
@@ -305,10 +306,11 @@ module SoilBGCNLayMod
     !add solid organic matter, litter, manure etc
     DO  M=1,jsken
       DO NE=1,nelms
+        orgm0(NE)=ORGM(NE)
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
-        if(ORGM(NE)<-1.e-6_r8)then
-        print*,'orgm1 in '//trim(mod_filename)
-        print*,'lay ',L,ORGM,SolidOM_vr(:,M,K,L,NY,NX)
+        if(ORGM(NE)<0._r8)then
+        print*,K,NE,nelms,trim(info)//' orgm1 in '//trim(mod_filename)
+        print*,'lay ',L,ORGM,SolidOM_vr(:,M,K,L,NY,NX),orgm0
         stop
         endif
       ENDDO  

@@ -59,8 +59,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RechargSouthSurf(:,:)                        !southern surface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargWestSurf(:,:)                        !western surface boundary water flux , [-]
   real(r8),target,allocatable ::  RCHGD(:,:)                        !lower subsurface boundary water flux , [-]
-  real(r8),target,allocatable ::  WaterFlow2MicPM(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  WaterFlow2MacPM(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  WaterFlow2MicPM_3D(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  WaterFlow2MacPM_3D(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  ReductVLsoiAirPM(:,:,:,:)                     !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
   real(r8),target,allocatable ::  FWatExMacP2MicPM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
   real(r8),target,allocatable ::  WatFlowSno2MicPM(:,:,:)                      !meltwater flux into soil micropores
@@ -159,8 +159,8 @@ module SoilWaterDataType
   allocate(RechargSouthSurf(JY,JX));       RechargSouthSurf=0._r8
   allocate(RechargWestSurf(JY,JX));       RechargWestSurf=0._r8
   allocate(RCHGD(JY,JX));       RCHGD=0._r8
-  allocate(WaterFlow2MicPM(60,3,JD,JV,JH));WaterFlow2MicPM=0._r8
-  allocate(WaterFlow2MacPM(60,3,JD,JV,JH));WaterFlow2MacPM=0._r8
+  allocate(WaterFlow2MicPM_3D(60,3,JD,JV,JH));WaterFlow2MicPM_3D=0._r8
+  allocate(WaterFlow2MacPM_3D(60,3,JD,JV,JH));WaterFlow2MacPM_3D=0._r8
   allocate(ReductVLsoiAirPM(60,JZ,JY,JX));  ReductVLsoiAirPM=0._r8
   allocate(FWatExMacP2MicPM(60,JZ,JY,JX)); FWatExMacP2MicPM=0._r8
   allocate(WatFlowSno2MicPM(60,JY,JX));    WatFlowSno2MicPM=0._r8
@@ -246,8 +246,8 @@ module SoilWaterDataType
   call destroy(RechargSouthSurf)
   call destroy(RechargWestSurf)
   call destroy(RCHGD)
-  call destroy(WaterFlow2MicPM)
-  call destroy(WaterFlow2MacPM)
+  call destroy(WaterFlow2MicPM_3D)
+  call destroy(WaterFlow2MacPM_3D)
   call destroy(ReductVLsoiAirPM)
   call destroy(FWatExMacP2MicPM)
   call destroy(WatFlowSno2MicPM)

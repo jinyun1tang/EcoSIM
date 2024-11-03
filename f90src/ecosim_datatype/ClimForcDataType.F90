@@ -49,7 +49,8 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
-  real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)
+  real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
+  real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)      !reference tempeature profile from control run to warming experiment [K]
   real(r8),target,allocatable ::  WDPTHD(:,:,:)                      !
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
   real(r8),target,allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
@@ -69,7 +70,7 @@ implicit none
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
-  real(r8),target,allocatable ::  LWRadSky(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
+  real(r8),target,allocatable ::  LWRadSky_col(:,:)                  !sky longwave radiation , [MJ/h]
   real(r8),target,allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
   real(r8),target,allocatable ::  TAMX(:,:)                          !daily maximum air temperature , [oC]
   real(r8),target,allocatable ::  TAMN(:,:)                          !daily minimum air temperature , [oC]
@@ -114,7 +115,7 @@ implicit none
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
-  real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  RainFalPrec_col(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecRainAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
@@ -185,6 +186,7 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
+  allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
@@ -206,7 +208,7 @@ implicit none
   allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
   allocate(OMEGAG(NumOfSkyAzimuthSects,JY,JX));  OMEGAG=0._r8
-  allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
+  allocate(LWRadSky_col(JY,JX));         LWRadSky_col=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
   allocate(TAMN(JY,JX));        TAMN=0._r8
@@ -252,7 +254,7 @@ implicit none
   allocate(ATCS(JY,JX));        ATCS=0._r8
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
-  allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
+  allocate(RainFalPrec_col(JY,JX));       RainFalPrec_col=0._r8
   allocate(SnoFalPrec_col(JY,JX));       SnoFalPrec_col=0._r8
   allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
   allocate(PrecRainAndIrrig_col(JY,JX));       PrecRainAndIrrig_col=0._r8
@@ -337,7 +339,7 @@ implicit none
   call destroy(DayLenthPrev_col)
   call destroy(DayLenthMax)
   call destroy(OMEGAG)
-  call destroy(LWRadSky)
+  call destroy(LWRadSky_col)
   call destroy(TRAD)
   call destroy(TAMX)
   call destroy(TAMN)
@@ -355,6 +357,7 @@ implicit none
   call destroy(AtmGasCgperm3)
   call destroy(AtmGmms)
   call destroy(TKS_ref_vr)
+  call destroy(Eco_RadSW_col)
   call destroy(OXYE)
   call destroy(Z2OE)
   call destroy(Z2GE)
@@ -383,7 +386,7 @@ implicit none
   call destroy(ATCS)
   call destroy(TairKClimMean)
   call destroy(ATKS)
-  call destroy(RainFalPrec)
+  call destroy(RainFalPrec_col)
   call destroy(SnoFalPrec_col)
   call destroy(PrecAtm_col)
   call destroy(PrecRainAndIrrig_col)

@@ -14,7 +14,7 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  Eco_NetRad_col(:,:)                           !ecosystem net radiation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  Eco_Heat_Latent_col(:,:)                           !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  Eco_Heat_Sens_col(:,:)                           !ecosystem sensible heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  Eco_Heat_Grnd_col(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Eco_Heat_GrndSurf_col(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  Eco_GPP_CumYr_col(:,:)                          !ecosystem GPP, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_AutoR_CumYr_col(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8),target,allocatable ::  Eco_NPP_CumYr_col(:,:)                          !ecosystem NPP, [g d-2 h-1]
@@ -40,7 +40,7 @@ contains
   allocate(Eco_NetRad_col(JY,JX));         Eco_NetRad_col=0._r8
   allocate(Eco_Heat_Latent_col(JY,JX));         Eco_Heat_Latent_col=0._r8
   allocate(Eco_Heat_Sens_col(JY,JX));         Eco_Heat_Sens_col=0._r8
-  allocate(Eco_Heat_Grnd_col(JY,JX));         Eco_Heat_Grnd_col=0._r8
+  allocate(Eco_Heat_GrndSurf_col(JY,JX));         Eco_Heat_GrndSurf_col=0._r8
   allocate(Eco_GPP_CumYr_col(JY,JX));        Eco_GPP_CumYr_col=0._r8
   allocate(Eco_AutoR_CumYr_col(JY,JX));        Eco_AutoR_CumYr_col=0._r8
   allocate(Eco_NPP_CumYr_col(JY,JX));        Eco_NPP_CumYr_col=0._r8
@@ -66,7 +66,7 @@ contains
   call destroy(Eco_NetRad_col)
   call destroy(Eco_Heat_Latent_col)
   call destroy(Eco_Heat_Sens_col)
-  call destroy(Eco_Heat_Grnd_col)
+  call destroy(Eco_Heat_GrndSurf_col)
   call destroy(Eco_GPP_CumYr_col)
   call destroy(Eco_AutoR_CumYr_col)
   call destroy(Eco_NPP_CumYr_col)

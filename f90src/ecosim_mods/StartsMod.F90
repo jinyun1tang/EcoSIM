@@ -823,7 +823,7 @@ module StartsMod
   Eco_NetRad_col(:,:)            = 0.0_r8
   Eco_Heat_Latent_col(:,:)       = 0.0_r8
   Eco_Heat_Sens_col(:,:)         = 0.0_r8
-  Eco_Heat_Grnd_col(:,:)         = 0.0_r8
+  Eco_Heat_GrndSurf_col(:,:)         = 0.0_r8
   Canopy_Heat_Latent_col(:,:)    = 0.0_r8
   Canopy_Heat_Sens_col(:,:)      = 0.0_r8
   TLEX(:,:)                      = 0.0_r8

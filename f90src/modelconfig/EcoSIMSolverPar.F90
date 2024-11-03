@@ -7,14 +7,14 @@ module EcoSIMSolverPar
   __FILE__
   public
 
-  real(r8) :: dts_wat        !1/hour, time step for water transport calculation
-  real(r8) :: dts_sno        !1/hour, time step for snow process
+  real(r8) :: dts_wat        !time step for water transport calculation, [h]
+  real(r8) :: dts_sno        !time step for snow process, [h]
   real(r8) :: XNPB
-  real(r8) :: dt_watvap      !1/hour, time step for water vapor fluxes
+  real(r8) :: dt_watvap      !time step for water vapor fluxes, [h]
   real(r8) :: XNPD
-  real(r8) :: dts_HeatWatTP   !1/hour, time step for heat, water, solute transport
-  real(r8) :: dt_GasCyc
-  real(r8) :: dts_gas         !1/hour, time step for gas flx update
+  real(r8) :: dts_HeatWatTP   !time step for heat, water, solute transport , [h]
+  real(r8) :: dt_GasCyc       !time step for gas iteration/cycling, [h]
+  real(r8) :: dts_gas         !time step for gas flx update, [h]
   real(r8) :: XNPR
   real(r8) :: XNPS
   integer :: NPH             !number of model cycles per hour for heat and water fluxes

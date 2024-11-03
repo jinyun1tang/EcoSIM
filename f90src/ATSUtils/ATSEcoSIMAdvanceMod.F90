@@ -10,7 +10,7 @@ module ATSEcoSIMAdvanceMod
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
-  use ClimForcDataType, only : LWRadSky, TairK_col, &
+  use ClimForcDataType, only : LWRadSky_col, TairK_col, &
       VPA, WindSpeedAtm_col, RainH  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoi1_vr, VHeatCapacity1_vr, &
@@ -69,7 +69,7 @@ implicit none
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
-    LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
+    LWRadSky_col(NY,NX) = sunrad(NY)*0.0036_r8
     RainH(NY,NX) = p_rain(NY)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)

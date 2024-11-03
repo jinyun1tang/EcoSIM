@@ -387,10 +387,10 @@ module MicBGCMod
 !     SolidOMK=total SOC n each K, SolidOMActK=total colonized SOC
 !     OMBioResduK=total microbial residue, OHCT=total adsorbed C
 !
-  TOSC=0.0_r8
-  TSolidOMActC=0.0_r8
-  TOMBioResdu=0.0_r8
-  TSorbedOMC=0.0_r8
+  TOSC         = 0.0_r8
+  TSolidOMActC = 0.0_r8
+  TOMBioResdu  = 0.0_r8
+  TSorbedOMC   = 0.0_r8
 !
 !     TOTAL SOLID SUBSTRATE
 !
@@ -1285,18 +1285,18 @@ module MicBGCMod
       VLSoilPoreMicPX=SoilMicPMassLayer*AECX*HSORP*FracBulkSOMC(K)
       VLSoilPoreMicPW=VLWatMicPM(NPH)*FracBulkSOMC(K)
       IF(FOCA(K).GT.ZERO)THEN
-        VOLCX=FOCA(K)*VLSoilPoreMicPX
-        VOLCW=FOCA(K)*VLSoilPoreMicPW
-        RDOMSorp(idom_doc,K)=TSORP*(OQEX(idom_doc)*VOLCX-OHEX(idom_doc)*VOLCW)/(VOLCX+VOLCW)
+        VOLCX                = FOCA(K)*VLSoilPoreMicPX
+        VOLCW                = FOCA(K)*VLSoilPoreMicPW
+        RDOMSorp(idom_doc,K) = TSORP*(OQEX(idom_doc)*VOLCX-OHEX(idom_doc)*VOLCW)/(VOLCX+VOLCW)
       ELSE
         RDOMSorp(idom_doc,K)=TSORP*(OQEX(idom_doc)*VLSoilPoreMicPX  &
           -OHEX(idom_doc)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
       ENDIF
 
       IF(FOAA(K).GT.ZERO)THEN
-        VOLAX=FOAA(K)*VLSoilPoreMicPX
-        VOLAW=FOAA(K)*VLSoilPoreMicPW
-        RDOMSorp(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VOLAX-OHEX(idom_acetate)*VOLAW)/(VOLAX+VOLAW)
+        VOLAX                    = FOAA(K)*VLSoilPoreMicPX
+        VOLAW                    = FOAA(K)*VLSoilPoreMicPW
+        RDOMSorp(idom_acetate,K) = TSORP*(OQEX(idom_acetate)*VOLAX-OHEX(idom_acetate)*VOLAW)/(VOLAX+VOLAW)
       ELSE
         RDOMSorp(idom_acetate,K)=TSORP*(OQEX(idom_acetate)*VLSoilPoreMicPX &
           -OHEX(idom_acetate)*VLSoilPoreMicPW)/(VLSoilPoreMicPX+VLSoilPoreMicPW)
@@ -1563,14 +1563,14 @@ module MicBGCMod
   !
     IF(BulkSOMC(K).GT.ZEROS)THEN
       IF(SorbedOM(ielmc,K).GT.ZEROS)THEN
-        rCNSorbOM(K)=AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
-        rCPSorbOM(K)=AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
-        RHydlysSorptOM(ielmc,K)=AZMAX1(AMIN1(SorbedOM(ielmc,K) &
+        rCNSorbOM(K)            = AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
+        rCPSorbOM(K)            = AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
+        RHydlysSorptOM(ielmc,K) = AZMAX1(AMIN1(SorbedOM(ielmc,K) &
           ,SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SorbedOM(ielmc,K)/BulkSOMC(K)))
 
-        RHydlysSorptOM(ielmn,K)=AZMAX1(AMIN1(SorbedOM(ielmn,K),rCNSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
-        RHydlysSorptOM(ielmp,K)=AZMAX1(AMIN1(SorbedOM(ielmp,K),rCPSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
-        RHydlysSorptOM(idom_acetate,K)=AZMAX1(AMIN1(SorbedOM(idom_acetate,K) &
+        RHydlysSorptOM(ielmn,K)        = AZMAX1(AMIN1(SorbedOM(ielmn,K),rCNSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
+        RHydlysSorptOM(ielmp,K)        = AZMAX1(AMIN1(SorbedOM(ielmp,K),rCPSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
+        RHydlysSorptOM(idom_acetate,K) = AZMAX1(AMIN1(SorbedOM(idom_acetate,K) &
           ,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS*TSensGrowth*SorbedOM(idom_acetate,K)/BulkSOMC(K)))
 
       ELSE
@@ -1720,8 +1720,8 @@ module MicBGCMod
     ENDDO D575
 
     DO idom=idom_beg,idom_end
-      DOM(idom,K)=DOM(idom,K)+RHydlysSorptOM(idom,K)
-      SorbedOM(idom,K)=SorbedOM(idom,K)-RHydlysSorptOM(idom,K)
+      DOM(idom,K)      = DOM(idom,K)+RHydlysSorptOM(idom,K)
+      SorbedOM(idom,K) = SorbedOM(idom,K)-RHydlysSorptOM(idom,K)
     ENDDO
 !
 !     MICROBIAL UPTAKE OF DISSOLVED C, N, P
@@ -1731,10 +1731,10 @@ module MicBGCMod
 !
     D570: DO N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGnio(N),JGnfo(N)
-        DOM(idom_doc,K)=DOM(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
-        DOM(idom_don,K)=DOM(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)
-        DOM(idom_dop,K)=DOM(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
-        DOM(idom_acetate,K)=DOM(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
+        DOM(idom_doc,K)     = DOM(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
+        DOM(idom_don,K)     = DOM(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)
+        DOM(idom_dop,K)     = DOM(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
+        DOM(idom_acetate,K) = DOM(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
@@ -2467,8 +2467,7 @@ module MicBGCMod
     ENDIF
   ENDIF
 
-  IF(Lsurf.AND.K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus &
-    .AND.SoilMicPMassLayer0.GT.ZEROS)THEN
+  IF(Lsurf.AND.K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus .AND. SoilMicPMassLayer0.GT.ZEROS)THEN
     naqfdiag%TFNH4X=naqfdiag%TFNH4X+AttenfNH4Heter(NGL,K)
     naqfdiag%TFNO3X=naqfdiag%TFNO3X+AttenfNO3Heter(NGL,K)
     naqfdiag%TFPO4X=naqfdiag%TFPO4X+AttenfH2PO4Heter(NGL,K)
@@ -3837,10 +3836,10 @@ module MicBGCMod
     EHUM                             => micstt%EHUM,                            &
     mBiomeHeter                      => micstt%mBiomeHeter,                     &
     DOM                              => micstt%DOM,                             &
-    CDOMuptk1                        => micflx%CDOMuptk1                   ,    &
-    CDOMuptk2                        => micflx%CDOMuptk2                   ,    &    
-    tROMT                            => micflx%tROMT                        ,   &
-    tGROMO                           => micflx%tGROMO                      , &
+    CDOMuptk1                        => micflx%CDOMuptk1,                       &
+    CDOMuptk2                        => micflx%CDOMuptk2,                       &
+    tROMT                            => micflx%tROMT,                           &
+    tGROMO                           => micflx%tGROMO,                          &
     ZEROS                            => micfor%ZEROS,                           &
     ZERO                             => micfor%ZERO                             &
   )
@@ -4013,18 +4012,18 @@ module MicBGCMod
 !     RMaintDefcitLitrfal2ResduOMHeter,RCMMN,RMaintDefcitLitrfal2ResduOMHeter=transfer of senesence LitrFall C,N,P to residue
 !
 
-        RMaintDefcitLitrfal2HumOMHeter(NE,M,NGL,K)=AZMAX1(RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)*EHUM)
-        RMaintDefcitLitrfal2ResduOMHeter(NE,M,NGL,K)=RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)-RMaintDefcitLitrfal2HumOMHeter(NE,M,NGL,K)
+        RMaintDefcitLitrfal2HumOMHeter(NE,M,NGL,K)   = AZMAX1(RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)*EHUM)
+        RMaintDefcitLitrfal2ResduOMHeter(NE,M,NGL,K) = RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)-RMaintDefcitLitrfal2HumOMHeter(NE,M,NGL,K)
       ENDDO
     ENDDO D730
   ELSE
     D720: DO M=1,2
       DO NE=1,NumPlantChemElms
-        RMaintDefcitKillOMHeter(NE,M,NGL,K)=0.0_r8
-        RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)=0.0_r8
-        RMaintDefcitRecycOMHeter(NE,M,NGL,K)=0.0_r8
-        RMaintDefcitLitrfal2HumOMHeter(NE,M,NGL,K)=0.0_r8
-        RMaintDefcitLitrfal2ResduOMHeter(NE,M,NGL,K)=0.0_r8
+        RMaintDefcitKillOMHeter(NE,M,NGL,K)          = 0.0_r8
+        RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)       = 0.0_r8
+        RMaintDefcitRecycOMHeter(NE,M,NGL,K)         = 0.0_r8
+        RMaintDefcitLitrfal2HumOMHeter(NE,M,NGL,K)   = 0.0_r8
+        RMaintDefcitLitrfal2ResduOMHeter(NE,M,NGL,K) = 0.0_r8
       ENDDO
 
     ENDDO D720

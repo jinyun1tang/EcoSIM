@@ -10,7 +10,7 @@ module ATSEcoSIMInitMod
   use HydroThermData, only : PSISM1_vr, TKSoi1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
-  use ClimForcDataType, only : LWRadSky, TairK_col, &
+  use ClimForcDataType, only : LWRadSky_col, TairK_col, &
       VPA, WindSpeedAtm_col, RainH
   use SoilPropertyDataType
 implicit none

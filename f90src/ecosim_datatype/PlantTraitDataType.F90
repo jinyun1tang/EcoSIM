@@ -44,7 +44,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PetioleAngle_pft(:,:,:)                       !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                       !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  SinePetioleAngle_pft(:,:,:)                       !sheath angle, [degree from horizontal]
-  real(r8),target,allocatable ::  RAZ(:,:,:)                         !canopy roughness height, [m]
+  real(r8),target,allocatable ::  ReistanceCanopy_pft(:,:,:)                         !canopy roughness height, [m]
   real(r8),target,allocatable ::  CanPHeight4WatUptake(:,:,:)                       !canopy height, [m]
   real(r8),target,allocatable ::  LeafAreaNode_brch(:,:,:,:,:)                    !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)                   !sheath height, [m]
@@ -203,7 +203,7 @@ contains
   allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
   allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
-  allocate(RAZ(JP,JY,JX));      RAZ=0._r8
+  allocate(ReistanceCanopy_pft(JP,JY,JX));      ReistanceCanopy_pft=0._r8
   allocate(CanPHeight4WatUptake(JP,JY,JX));    CanPHeight4WatUptake=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
@@ -360,7 +360,7 @@ contains
   call destroy(PetioleAngle_pft)
   call destroy(SineBranchAngle_pft)
   call destroy(SinePetioleAngle_pft)
-  call destroy(RAZ)
+  call destroy(ReistanceCanopy_pft)
   call destroy(CanPHeight4WatUptake)
   call destroy(LeafAreaNode_brch)
   call destroy(PetoleLensNode_brch)

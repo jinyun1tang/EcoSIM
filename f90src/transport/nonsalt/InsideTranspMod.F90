@@ -121,14 +121,14 @@ module InsideTranspMod
 !
 !     PARG=boundary layer conductance above soil surface from watsub.f
 !
-    PARGM=PARG(M,NY,NX)*dt_GasCyc
-    PARG_cef(idg_CO2,NY,NX)=PARGM*0.74_r8
-    PARG_cef(idg_CH4,NY,NX)=PARGM*1.04_r8
-    PARG_cef(idg_O2,NY,NX)=PARGM*0.83_r8
-    PARG_cef(idg_N2,NY,NX)=PARGM*0.86_r8
-    PARG_cef(idg_N2O,NY,NX)=PARGM*0.74_r8
-    PARG_cef(idg_NH3,NY,NX)=PARGM*1.02_r8
-    PARG_cef(idg_H2,NY,NX)=PARGM*2.08_r8
+    PARGM                   = CondGasXSnowM_col(M,NY,NX)*dt_GasCyc
+    PARG_cef(idg_CO2,NY,NX) = PARGM*0.74_r8
+    PARG_cef(idg_CH4,NY,NX) = PARGM*1.04_r8
+    PARG_cef(idg_O2,NY,NX)  = PARGM*0.83_r8
+    PARG_cef(idg_N2,NY,NX)  = PARGM*0.86_r8
+    PARG_cef(idg_N2O,NY,NX) = PARGM*0.74_r8
+    PARG_cef(idg_NH3,NY,NX) = PARGM*1.02_r8
+    PARG_cef(idg_H2,NY,NX)  = PARGM*2.08_r8
 !
 !     RESET RUNOFF SOLUTE FLUX ACCUMULATORS
 !
@@ -327,8 +327,8 @@ module InsideTranspMod
 !     S*L=solubility of gas in water from hour1.f
 !     WaterFlow2Soil=total water flux into soil micropore+macropore from watsub.f
 !
-            WaterFlow2Soil(N,N6,N5,N4)=(WaterFlow2MicPM(M,N,N6,N5,N4) &
-              +WaterFlow2MacPM(M,N,N6,N5,N4))*dt_GasCyc
+            WaterFlow2Soil(N,N6,N5,N4)=(WaterFlow2MicPM_3D(M,N,N6,N5,N4) &
+              +WaterFlow2MacPM_3D(M,N,N6,N5,N4))*dt_GasCyc
 !
             call SoluteAdvDifusTransp(M,N,N1,N2,N3,N4,N5,N6)
 
@@ -376,7 +376,7 @@ module InsideTranspMod
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN CURRENT GRID CELL
 !
-!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
+!     WaterFlow2MicPM_3D=water flux through soil micropore from watsub.f
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     RFL*S=solute diffusive flux through micropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -385,9 +385,9 @@ module InsideTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     *S2,*B2=micropore solute content in non-band,band
 !
-  IF(WaterFlow2MicPM(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlow2MicPM_3D(M,N,N6,N5,N4).GT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -408,7 +408,7 @@ module InsideTranspMod
 !
   ELSE
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -583,7 +583,7 @@ module InsideTranspMod
 !     DLYR=soil layer thickness
 !     TORT=micropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
+!     WaterFlow2MicPM_3D=water flux through soil micropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through micropore
 !     *SGL2=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -599,7 +599,7 @@ module InsideTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DO idom=idom_beg,idom_end
       DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -647,10 +647,10 @@ module InsideTranspMod
   real(r8) :: trcs_RFH(ids_beg:ids_end)
   integer  :: K,ngas,nsol,idom
   real(r8) :: VFLW
-!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !
 
-  IF(WaterFlow2MacPM(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).GT.0.0_r8)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -670,7 +670,7 @@ module InsideTranspMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     IF(VLWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -719,9 +719,9 @@ module InsideTranspMod
 !     OF WATER FLUX AND MACROPORE SOLUTE CONCENTRATIONS IN ADJACENT
 !     GRID CELL
 !
-  ELSEIF(WaterFlow2MacPM(M,N,N6,N5,N4).LT.0.0_r8)THEN
+  ELSEIF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).LT.0.0_r8)THEN
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -915,7 +915,7 @@ module InsideTranspMod
 !     DLYR=soil layer thickness
 !     TortMacPM=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
 !     *SGL2=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -931,7 +931,7 @@ module InsideTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DO idom=idom_beg,idom_end
       DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)

@@ -46,7 +46,7 @@
 !     begin_execution
   associate(                                                              &
     RIB                        =>  plt_ew%RIB                           , &
-    RAZ                        =>  plt_ew%RAZ                           , &
+    ReistanceCanopy_pft                        =>  plt_ew%ReistanceCanopy_pft                           , &
     TairK                      =>  plt_ew%TairK                         , &
     TKCanopy_pft               =>  plt_ew%TKCanopy_pft                  , &
     CO2E                       =>  plt_site%CO2E                        , &
@@ -70,13 +70,13 @@
 !     RI=Richardson's number
 !     RIB=canopy isothermal Richardson's number
 !     TairK,TKCanopy_pft=air,canopy temperature
-!     RAZ=canopy isothermal boundary later resistance
+!     ReistanceCanopy_pft=canopy isothermal boundary later resistance
 !     CanopyBndlResist_pft4CO2=canopy boundary layer resistance to CO2, h/m
 !     AirConc_pft=number of moles of air per m3
 !
   RI=RichardsonNumber(RIB,TairK,TKCanopy_pft(NZ))
 
-  CanopyBndlResist_pft4CO2=1.34_r8*AMAX1(5.56E-03_r8,RAZ(NZ)/(1.0_r8-10.0_r8*RI))
+  CanopyBndlResist_pft4CO2=1.34_r8*AMAX1(5.56E-03_r8,ReistanceCanopy_pft(NZ)/(1.0_r8-10.0_r8*RI))
 
   !assuming pressure is one atmosphere
   AirConc_pft(NZ)=GetMolAirPerm3(TKCanopy_pft(NZ))

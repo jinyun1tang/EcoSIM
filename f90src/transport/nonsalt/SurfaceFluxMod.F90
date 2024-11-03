@@ -47,7 +47,7 @@ contains
   real(r8) :: RFLs_adv(ids_beg:ids_end)
   real(r8) :: SDifFlx(ids_beg:ids_end)
 !     VLWatMicPM,VLWatMacPM,VLsoiAirPM,ReductVLsoiAirPM=micropore,macropore water volume, air volume and change in air volume
-!     WaterFlow2MicPM,WaterFlow2MacPM=water flux into soil micropore,macropore from watsub.f
+!     WaterFlow2MicPM_3D,WaterFlow2MacPM_3D=water flux into soil micropore,macropore from watsub.f
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !     CumReductVLsoiAirPM,FLM=air,water flux in gas flux calculations
@@ -60,7 +60,7 @@ contains
   VLsoiAirPMA(NU(NY,NX),NY,NX)=VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
   VLsoiAirPMB(NU(NY,NX),NY,NX)=VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
   CumReductVLsoiAirPM(NU(NY,NX),NY,NX)=ReductVLsoiAirPM(M,NU(NY,NX),NY,NX)*dt_GasCyc
-  WaterFlow2Soil(3,NU(NY,NX),NY,NX)=(WaterFlow2MicPM(M,3,NU(NY,NX),NY,NX)+WaterFlow2MacPM(M,3,NU(NY,NX),NY,NX))*dt_GasCyc
+  WaterFlow2Soil(3,NU(NY,NX),NY,NX)=(WaterFlow2MicPM_3D(M,3,NU(NY,NX),NY,NX)+WaterFlow2MacPM_3D(M,3,NU(NY,NX),NY,NX))*dt_GasCyc
 !
 !     SURFACE EXCHANGE OF AQUEOUS CO2, CH4, O2, N2, NH3
 !     THROUGH VOLATILIZATION-DISSOLUTION FROM AQUEOUS
@@ -1128,8 +1128,8 @@ contains
     DO ngas=idg_beg,idg_end
       DiffusivitySolutEff = SoluteDifusvty_vrc(ngas,NU(NY,NX),NY,NX)*TORT1
       trc_gsolc2          = AZMAX1(trc_solml2_vr(ngas,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
-      trc_gsolc           = (PARG(M,NY,NX)*AtmGasCgperm3(ngas,NY,NX)*GasSolbility_vr(ngas,NU(NY,NX),NY,NX) &
-        +DiffusivitySolutEff*trc_gsolc2)/(DiffusivitySolutEff+PARG(M,NY,NX))
+      trc_gsolc           = (CondGasXSnowM_col(M,NY,NX)*AtmGasCgperm3(ngas,NY,NX)*GasSolbility_vr(ngas,NU(NY,NX),NY,NX) &
+        +DiffusivitySolutEff*trc_gsolc2)/(DiffusivitySolutEff+CondGasXSnowM_col(M,NY,NX))
 !
 !     SURFACE VOLATILIZATION-DISSOLUTION FROM DIFFERENCES
 !     BETWEEN ATMOSPHERIC AND SOIL SURFACE EQUILIBRIUM

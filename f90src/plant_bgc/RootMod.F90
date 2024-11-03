@@ -670,11 +670,11 @@ implicit none
     ENDDO  
     D6350: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        dsenecE=Remobl2ndelm(NE)-Remobl2ndcycl(NE)
+        dsenecE=AZMAX1(Remobl2ndelm(NE)-Remobl2ndcycl(NE))
         dwoodyE=ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_woody_litr)
         dfineE=ElmAllocmat4Litr(NE,iroot,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_fine_litr)
-        LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+dwoodyE
-        LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+dfineE
+        LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) = LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+dwoodyE
+        LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)  = LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+dfineE
 
         litrflx2(NE)=litrflx2(NE)+dwoodyE+dfineE 
         dmass(NE)=dmass(NE)-dfineE-dwoodyE
@@ -1389,7 +1389,7 @@ implicit none
       dRootMycoNonst2Litr=0._r8
       D6450: DO M=1,jsken
         D64511: DO NE=1,NumPlantChemElms
-          dsenecE=FSNCM*(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
+          dsenecE=FSNCM*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
           dwoodyE=ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_woody_litr)
           dfineE1=ElmAllocmat4Litr(NE,iroot,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_fine_litr)
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,LL,NZ)+dwoodyE
@@ -1550,7 +1550,7 @@ implicit none
   if(Frac2Senes1>0._r8)then
     D6355: DO M=1,jsken
       DO NE=1,NumPlantChemElms    
-        dsenecE=Frac2Senes1*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)-Root1stStrutRemob(NE))
+        dsenecE=Frac2Senes1*AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)-Root1stStrutRemob(NE))
         LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
           +ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_woody_litr)
         litrflxt(NE)=litrflxt(NE)+ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_woody_litr)

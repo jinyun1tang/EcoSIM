@@ -160,7 +160,7 @@ implicit none
   real(r8) :: GroundSurfAzimuth_col     !azimuth of slope, [-]
   real(r8) :: CosineGrndSlope_col      !cosine of slope, [-]
   real(r8) :: LWRadGrnd    !longwave radiation emitted by ground surface, [MJ m-2 h-1]
-  real(r8) :: LWRadSky       !sky longwave radiation , [MJ d-2 h-1]
+  real(r8) :: LWRadSky_col       !sky longwave radiation , [MJ d-2 h-1]
   real(r8) :: SineSunInclAnglNxtHour_col     !sine of solar angle next hour, [-]
   real(r8) :: SineSunInclAngle_col      !sine of solar angle, [-]
   real(r8), pointer :: RadSWLeafAlbedo_pft(:)     => null() !canopy shortwave albedo , [-]
@@ -553,7 +553,7 @@ implicit none
   real(r8) :: ZERO4PlantDisplace_col        !zero plane displacement height, [m]
   real(r8) :: AbvCanopyBndlResist_col       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
-  real(r8) :: Eco_Heat_Grnd_col       !ecosystem storage heat flux, [MJ d-2 h-1]
+  real(r8) :: Eco_Heat_GrndSurf_col       !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8), pointer :: Transpiration_pft(:)            => null()    !canopy transpiration,                                         [m2 d-2 h-1]
   real(r8), pointer :: PSICanopyTurg_pft(:)            => null()    !plant canopy turgor water potential,                          [MPa]
   real(r8), pointer :: PrecIntcptByCanopy_pft(:)       => null()    !water flux into canopy,                                       [m3 d-2 h-1]
@@ -561,7 +561,7 @@ implicit none
   real(r8), pointer :: VapXAir2Canopy_pft(:)           => null()    !canopy evaporation,                                           [m2 d-2 h-1]
   real(r8), pointer :: HeatStorCanopy_pft(:)                 => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
   real(r8), pointer :: EvapTransHeat_pft(:)            => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
-  real(r8), pointer :: RAZ(:)                          => null()    !canopy roughness height,                                      [m]
+  real(r8), pointer :: ReistanceCanopy_pft(:)                          => null()    !canopy roughness height,                                      [m]
   real(r8), pointer :: TKS_vr(:)                       => null()    !mean annual soil temperature,                                 [K]
   real(r8), pointer :: PSICanPDailyMin(:)              => null()    !minimum daily canopy water potential,                         [MPa]
   real(r8), pointer :: TCelciusCanopy_pft(:)           => null()    !canopy temperature,                                           [oC]
@@ -1121,7 +1121,7 @@ implicit none
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
   allocate(this%CanOsmoPsi0pt_pft(JP1));this%CanOsmoPsi0pt_pft=spval
-  allocate(this%RAZ(JP1));this%RAZ=spval
+  allocate(this%ReistanceCanopy_pft(JP1));this%ReistanceCanopy_pft=spval
   allocate(this%DeltaTKC_pft(JP1));this%DeltaTKC_pft=spval
   allocate(this%TKC(JP1));this%TKC=spval
   allocate(this%ENGYX_pft(JP1));this%ENGYX_pft=spval
@@ -1158,7 +1158,7 @@ implicit none
 !  if(allocated(PSICanopyOsmo_pft))deallocate(PSICanopyOsmo_pft)
 !  if(allocated(TKS))deallocate(TKS)
 !  if(allocated(PSICanPDailyMin))deallocate(PSICanPDailyMin)
-!  if(allocated(RAZ))deallocate(RAZ)
+!  if(allocated(ReistanceCanopy_pft))deallocate(ReistanceCanopy_pft)
 !  if(allocated(CanOsmoPsi0pt_pft))deallocate(CanOsmoPsi0pt_pft)
 !  if(allocated(DeltaTKC_pft))deallocate(DeltaTKC_pft)
 !  if(allocated(TKC))deallocate(TKC)

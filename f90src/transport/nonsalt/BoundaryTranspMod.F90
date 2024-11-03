@@ -297,10 +297,10 @@ module BoundaryTranspMod
   integer :: K,idg,NTN,ids,idom
   real(r8) :: VFLW
 
-  IF(NN.EQ.1.AND.WaterFlow2MicPM(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR.NN.EQ.2.AND.WaterFlow2MicPM(M,N,M6,M5,M4).LT.0.0_r8)THEN
+  IF(NN.EQ.1.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR.NN.EQ.2.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
@@ -328,7 +328,7 @@ module BoundaryTranspMod
 
    !add irrigation flux
     DO ids=ids_nuts_beg,ids_nuts_end
-      R3PoreSolFlx_3D(ids,N,M6,M5,M4)=WaterFlow2MicPM(M,N,M6,M5,M4) &
+      R3PoreSolFlx_3D(ids,N,M6,M5,M4)=WaterFlow2MicPM_3D(M,N,M6,M5,M4) &
         *trcn_irrig(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
     ENDDO
 
@@ -336,7 +336,7 @@ module BoundaryTranspMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !     VLWatMacPM=macropore water-filled porosity from watsub.f
 !     RFH*S=solute diffusive flux through macropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -344,10 +344,10 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-  IF(NN.EQ.1.AND.WaterFlow2MacPM(M,N,M6,M5,M4).GT.0.0 &
-    .OR.NN.EQ.2.AND.WaterFlow2MacPM(M,N,M6,M5,M4).LT.0.0)THEN
+  IF(NN.EQ.1.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
+    .OR.NN.EQ.2.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
     IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
@@ -420,7 +420,7 @@ module BoundaryTranspMod
       call BoundaryRunoffandSnowXY(M,N,NN,N1,N2,M4,M5,RCHQF)
     ENDIF
 
-!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
+!     WaterFlow2MicPM_3D=water flux through soil micropore from watsub.f
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     R*FLS=convective solute flux through micropores
 !     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
@@ -438,7 +438,7 @@ module BoundaryTranspMod
 !
 !     GASOUS LOSS WITH SUBSURFACE MICROPORE WATER GAIN
 !
-!     WaterFlow2MicPM,WaterFlow2MacPM=micropore,macropore water flux from watsub.f
+!     WaterFlow2MicPM_3D,WaterFlow2MacPM_3D=micropore,macropore water flux from watsub.f
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !     VLsoiAirPM=air-filled porosity
 !     R*FLG=convective gas flux
@@ -446,7 +446,7 @@ module BoundaryTranspMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    FLGM=(WaterFlow2MicPM(M,N,M6,M5,M4)+WaterFlow2MacPM(M,N,M6,M5,M4))*dt_GasCyc
+    FLGM=(WaterFlow2MicPM_3D(M,N,M6,M5,M4)+WaterFlow2MacPM_3D(M,N,M6,M5,M4))*dt_GasCyc
     IF(NN.EQ.1.AND.FLGM.LT.0.0.OR.NN.EQ.2.AND.FLGM.GT.0.0)THEN
       IF(VLsoiAirPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
         VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM(M,M3,M2,M1)))
