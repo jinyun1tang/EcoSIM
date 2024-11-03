@@ -52,24 +52,24 @@ implicit none
 
   !setting a few variables 
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
-  MaxNumRootLays = 1 !Is the number of layers down the roots go
-  NX=1
+  MaxNumRootLays   = 1 !Is the number of layers down the roots go
+  NX               = 1
 
-  VOLISO=0.0_r8
-  TFLWT=0.0_r8
-  VOLPT=0.0_r8
-  VOLTT=0.0_r8
+  VOLISO = 0.0_r8
+  TFLWT  = 0.0_r8
+  VOLPT  = 0.0_r8
+  VOLTT  = 0.0_r8
  
   do NY=1,NYS
-    TXCO2(NY,NX)=0.0_r8
-    DORGE(NY,NX)=0.0_r8
-    QRunSurf_col(NY,NX)=0.0_r8
-    NU(NY,NX)=a_NU(NY)
-    NL(NY,NX)=a_NL(NY)
-    AREA(3,0,NY,NX)=a_AREA3(0,NY)
-    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
-    ASP_col(NY,NX)=a_ASP(NY)
-    !TairKClimMean(NY,NX)=a_ATKA(NY)
+    TXCO2(NY,NX)            = 0.0_r8
+    DORGE(NY,NX)            = 0.0_r8
+    QRunSurf_col(NY,NX)     = 0.0_r8
+    NU(NY,NX)               = a_NU(NY)
+    NL(NY,NX)               = a_NL(NY)
+    AREA(3,0,NY,NX)         = a_AREA3(0,NY)
+    AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
+    ASP_col(NY,NX)          = a_ASP(NY)
+    !TairKClimMean(NY,NX)   = a_ATKA(NY)
     !CO2E_col(NY,NX)=atm_co2
     !CH4E_col(NY,NX)=atm_ch4
     !OXYE(NY,NX)=atm_o2

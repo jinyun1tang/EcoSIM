@@ -116,9 +116,9 @@ contains
 
       call PartitionPrecip(I,J,NY,NX)
       
-      call SurfaceRadiation(I,J,NY,NX)
-
       call SurfaceResistances(I,J,NY,NX,ResistanceLitRLay(NY,NX))
+
+      call SurfaceRadiation(I,J,NY,NX)
 
       call SetCanopyProperty(NY,NX)
 
@@ -278,12 +278,12 @@ contains
   RADGX                  = RadSWGrnd_col(NY,NX)*dts_HeatWatTP
   RadSWonSno_col(NY,NX)  = RADGX*FracSurfAsSnow_col(NY,NX)*XNPS
   RadSWonSoil_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
-  RadSWonLitR_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
+  RadSWonLitR_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
 
   THRYX                 = (LWRadSky_col(NY,NX)*FracSWRad2Grnd_col(NY,NX)+LWRadCanGPrev_col(NY,NX))*dts_HeatWatTP
   LWRad2Snow_col(NY,NX) = THRYX*FracSurfAsSnow_col(NY,NX)*XNPS
   LWRad2Soil_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
-  LWRad2LitR_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
+  LWRad2LitR_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
 
   ! SoilEmisivity,SnowEmisivity,SurfLitREmisivity=emissivities of surface soil, snow and litter
   !stefboltz_const is stefan-boltzman constant converted into [MJ /(m^2 K^4 h)]
@@ -292,7 +292,6 @@ contains
   LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
   LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP
 !
-
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
   subroutine SurfaceResistances(I,J,NY,NX,ResistanceLitRLay)
@@ -378,9 +377,9 @@ contains
   
   AScaledCdWOverSnow_col(NY,NX)=PAREX*FracSurfAsSnow_col(NY,NX)*XNPS
   AScaledCdHOverSnow_col(NY,NX)=PARSX*FracSurfAsSnow_col(NY,NX)*XNPS
-  AScaledCdWOverSoil_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX) !*FracAsExposedSoil_col(NY,NX)
+  AScaledCdWOverSoil_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)
   AScaledCdWOverLitr_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)*FracEffAsLitR_col(NY,NX)*XNPR
-  AScaledCdHOverSoil_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)  !*FracAsExposedSoil_col(NY,NX)
+  AScaledCdHOverSoil_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)
   AScaledCdHOverLitr_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)*FracEffAsLitR_col(NY,NX)*XNPR
 
 !     PARR=boundary layer conductance above litter,soil surfaces, (m^2/h)/(h/m)
