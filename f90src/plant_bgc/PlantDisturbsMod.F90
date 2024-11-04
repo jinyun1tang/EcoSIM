@@ -120,9 +120,9 @@ module PlantDisturbsMod
 
   D6475: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      StandeadElmntRemoval(NE)=StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadKCompElms_pft(NE,M,NZ)
-      StandeadElmntHarv2Litr(NE)=StandeadElmntHarv2Litr(NE)+(FHVSH-FHVSE)*StandDeadKCompElms_pft(NE,M,NZ)
-      StandDeadKCompElms_pft(NE,M,NZ)=FHVSE*StandDeadKCompElms_pft(NE,M,NZ)
+      StandeadElmntRemoval(NE)        = StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadKCompElms_pft(NE,M,NZ)
+      StandeadElmntHarv2Litr(NE)      = StandeadElmntHarv2Litr(NE)+(FHVSH-FHVSE)*StandDeadKCompElms_pft(NE,M,NZ)
+      StandDeadKCompElms_pft(NE,M,NZ) = FHVSE*StandDeadKCompElms_pft(NE,M,NZ)
     ENDDO
   ENDDO D6475
   end associate

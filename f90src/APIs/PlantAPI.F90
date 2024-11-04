@@ -456,8 +456,7 @@ implicit none
       ENDDO
     ENDDO
     DO M=1,jsken
-      StandDeadKCompElms_pft(1:NumPlantChemElms,M,NZ,NY,NX)=&
-        plt_biom%StandDeadKCompElms_pft(1:NumPlantChemElms,M,NZ)
+      StandDeadKCompElms_pft(1:NumPlantChemElms,M,NZ,NY,NX)=plt_biom%StandDeadKCompElms_pft(1:NumPlantChemElms,M,NZ)
     ENDDO
 
     DO  L=1,NL(NY,NX)

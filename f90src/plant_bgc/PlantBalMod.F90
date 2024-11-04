@@ -107,7 +107,7 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NZ
   character(len=*),intent(in) :: header
-  integer :: NB,NE,K
+  integer :: NB,NE,K,jk
   real(r8) :: root1st,root2nd
   real(r8) :: balc
 
@@ -173,6 +173,9 @@ implicit none
     ShootElms_pft(NE,NZ)=ShootElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)
         if(ShootElms_pft(NE,NZ)>1.e20)then
           write(*,*)'sum3plantstates',StandDeadStrutElms_pft(NE,NZ)
+          DO jk=1,jsken
+            write(*,*)NE,StandDeadKCompElms_pft(NE,jk,NZ)
+          enddo
           stop
         endif
 

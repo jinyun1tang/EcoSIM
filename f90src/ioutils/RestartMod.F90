@@ -253,7 +253,7 @@ implicit none
   endif
 
   if(flag=='read')then
-    datpr3 => datrp_3d(1:npfts,1:jsken,1:NumPlantChemElms)
+    datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:jsken)
     call restartvar(ncid, flag, varname='StandDeadKCompElms_pft', dim1name='pft',dim2name='nkinecmp',&
        dim3name='elmnts',long_name='standing dead element fraction', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
@@ -262,9 +262,10 @@ implicit none
   else
     !print*,'StandDeadKCompElms_pft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StandDeadKCompElms_pft,datrp_3d)
-    datpr3 => datrp_3d(1:npfts,1:jsken,1:NumPlantChemElms)    
-    call restartvar(ncid, flag, varname='StandDeadKCompElms_pft', dim1name='pft',dim2name='nkinecmp',&
-       dim3name='elmnts',long_name='standing dead element fraction', units='g d-2', &
+    write(111,*)'restart',datrp_3d(1:npfts,1:NumPlantChemElms,jsken)    
+    datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:jsken)    
+    call restartvar(ncid, flag, varname='StandDeadKCompElms_pft', dim1name='pft',dim2name='elmnts',&
+       dim3name='nkinecmp',long_name='standing dead element fraction', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
 
   endif
@@ -1252,6 +1253,22 @@ implicit none
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='SurfLitrfalStrutElms_CumYr_pft', dim1name='pft',dim2name='elmnts',&
+     long_name='total surface LitrFall element', units='g d-2', &
+     interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
+    call restartvar(ncid, flag, varname='LitrfalStrutElms_CumYr_pft', dim1name='pft',dim2name='elmnts',&
+     long_name='total surface LitrFall element', units='g d-2', &
+     interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,LitrfalStrutElms_CumYr_pft,datrp_2d,&
+      NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LitrfalStrutElms_CumYr_pft,datrp_2d,NumActivePlants=NumActivePlants,&
+      IsPlantActive_pft=IsPlantActive_pft)    
+    datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
+    call restartvar(ncid, flag, varname='LitrfalStrutElms_CumYr_pft', dim1name='pft',dim2name='elmnts',&
      long_name='total surface LitrFall element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
   endif  

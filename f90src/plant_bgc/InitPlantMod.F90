@@ -822,9 +822,9 @@ module InitPlantMod
     plt_distb%EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ)    = 0._r8
     plt_distb%EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)          = 0._r8
-    ETCanopy_CumYr_pft(NZ)=0._r8
-    StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
-    WTSTDX=StandingDeadInitC_pft(NZ)*AREA3(NU)
+    StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)            = 0._r8
+    ETCanopy_CumYr_pft(NZ)                                   = 0._r8
+    WTSTDX                                                   = StandingDeadInitC_pft(NZ)*AREA3(NU)
     D155: DO M=1,jsken
       StandDeadKCompElms_pft(ielmc,M,NZ)=WTSTDX*ElmAllocmat4Litr(ielmc,icwood,M,NZ)
       StandDeadKCompElms_pft(ielmn,M,NZ)=WTSTDX*rNCStalk_pft(NZ)*ElmAllocmat4Litr(ielmn,icwood,M,NZ)
