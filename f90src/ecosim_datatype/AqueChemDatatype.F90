@@ -38,9 +38,9 @@ module AqueChemDatatype
   real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)              !exchangeable tracers
   real(r8),target,allocatable :: trcp_saltpml_vr(:,:,:,:)            !salt precipitate in micropore
 
-  real(r8),target,allocatable ::  ECND_vr(:,:,:)                     !electrical conductivity , [dS m-1]
-  real(r8),target,allocatable ::  CSTR(:,:,:)                        !solution ion strength, [mol m-3]
-  real(r8),target,allocatable ::  CION(:,:,:)                        !solution ion concentratiom, [mol m-3]
+  real(r8),target,allocatable ::  ElectricConductivity_vr(:,:,:)                     !electrical conductivity , [dS m-1]
+  real(r8),target,allocatable ::  SolutesIonStrenth_vr(:,:,:)                        !solution ion strength, [mol m-3]
+  real(r8),target,allocatable ::  SolutesIonConc_vr(:,:,:)                        !solution ion concentratiom, [mol m-3]
 
   real(r8),target,allocatable :: trcSalt_soHml_vr(:,:,:,:)
   real(r8),target,allocatable :: trcSalt_XFHS(:,:,:,:,:)
@@ -117,9 +117,9 @@ module AqueChemDatatype
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
   allocate(trcx_solml_vr(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml_vr=0._r8
   allocate(trcp_saltpml_vr(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_saltpml_vr=0._r8
-  allocate(ECND_vr(JZ,JY,JX));     ECND_vr=0._r8
-  allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
-  allocate(CION(JZ,JY,JX));     CION=0._r8
+  allocate(ElectricConductivity_vr(JZ,JY,JX));     ElectricConductivity_vr=0._r8
+  allocate(SolutesIonStrenth_vr(JZ,JY,JX));     SolutesIonStrenth_vr=0._r8
+  allocate(SolutesIonConc_vr(JZ,JY,JX));     SolutesIonConc_vr=0._r8
 
   allocate(DOM_PoreTranspFlx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_PoreTranspFlx=0._r8
   allocate(trcs_PoreTranspFlx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_PoreTranspFlx_vr=0._r8
@@ -202,9 +202,9 @@ module AqueChemDatatype
   call destroy(trcsalt_rain_conc)
   call destroy(trcSalt_soHml_vr)
   call destroy(trcp_saltpml_vr)
-  call destroy(ECND_vr)
-  call destroy(CSTR)
-  call destroy(CION)
+  call destroy(ElectricConductivity_vr)
+  call destroy(SolutesIonStrenth_vr)
+  call destroy(SolutesIonConc_vr)
   call destroy(trcSalt_XFXS)
   call destroy(trcSalt3DFlo2Cell)
   call destroy(trcSalt_XFHS)

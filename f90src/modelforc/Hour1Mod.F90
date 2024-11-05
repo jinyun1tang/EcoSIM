@@ -1368,7 +1368,7 @@ module Hour1Mod
 !   TOTAL ION CONCENTRATION
 !
 !   ZC3,ZA3,ZC2,ZA2,ZC1,ZA1=total tri-,di-,univalent cations C,anions A
-!   CSTR,CION=ion strength, total ion concentration
+!   CSTR,SolutesIonConc_vr=ion strength, total ion concentration
 !
       ZC3=trcSalt_solml_vr(idsalt_Al,L,NY,NX)+trcSalt_solml_vr(idsalt_Fe,L,NY,NX)
       ZA3=trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_H0PO4B,L,NY,NX)
@@ -1402,12 +1402,12 @@ module Hour1Mod
 
       ZION1=ABS(3.0_r8*(ZC3-ZA3)+2.0_r8*(ZC2-ZA2)+ZC1-ZA1)
       IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        CSTR(L,NY,NX)=AZMAX1(0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
+        SolutesIonStrenth_vr(L,NY,NX)=AZMAX1(0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
           +ZC1+ZA1+ZION1)/VLWatMicP_vr(L,NY,NX))
-        CION(L,NY,NX)=AZMAX1((ZC3+ZA3+ZC2+ZA2+ZC1+ZA1+ZN)/VLWatMicP_vr(L,NY,NX))
+        SolutesIonConc_vr(L,NY,NX)=AZMAX1((ZC3+ZA3+ZC2+ZA2+ZC1+ZA1+ZN)/VLWatMicP_vr(L,NY,NX))
       ELSE
-        CSTR(L,NY,NX)=0.0_r8
-        CION(L,NY,NX)=0.0_r8
+        SolutesIonStrenth_vr(L,NY,NX)=0.0_r8
+        SolutesIonConc_vr(L,NY,NX)=0.0_r8
       ENDIF
     ENDIF
 !
@@ -2387,9 +2387,9 @@ module Hour1Mod
 ! S*L=solubility of gas in water
 ! TCS=soil temperature (oC)
 ! 5.56E+04_r8 := mole H2O / m3
-    FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
+    FH2O=5.56E+04_r8/(5.56E+04_r8+SolutesIonConc_vr(L,NY,NX))
     DO NTG=idg_beg,idg_end-1
-      GasSolbility_vr(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))*EXP(-ACTCG(NTG)*CSTR(L,NY,NX))*FH2O
+      GasSolbility_vr(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))*EXP(-ACTCG(NTG)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
     ENDDO
   ENDDO
   end subroutine CalGasSolubility

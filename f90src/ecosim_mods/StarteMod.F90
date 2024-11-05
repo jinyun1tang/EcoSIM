@@ -492,9 +492,9 @@ module StarteMod
     trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)=solutevar%Precp_CaHPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_HAB,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)=0._r8
-    ECND_vr(L,NY,NX)=0._r8
-    CSTR(L,NY,NX)=0._r8
-    CION(L,NY,NX)=0._r8
+    ElectricConductivity_vr(L,NY,NX) = 0._r8
+    SolutesIonStrenth_vr(L,NY,NX)    = 0._r8
+    SolutesIonConc_vr(L,NY,NX)       = 0._r8
 ! the following line is quite interesting, Jinyun Tang, Nov 17, 2022
     trc_solml_vr(ids_NH4,L,NY,NX)=trc_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)
     SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)=SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)-0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)

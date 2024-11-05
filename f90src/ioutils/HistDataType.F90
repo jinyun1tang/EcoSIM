@@ -392,7 +392,7 @@ implicit none
                                                                   !+trc_solml_vr(ids_NO2,1,NY,NX)+trc_solml_vr(ids_NO2B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
   real(r8),pointer   :: h2D_cPO4_vr(:,:)        !(trc_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trc_solml_vr(ids_H1PO4B,1,NY,NX)+trc_solml_vr(ids_H2PO4,1,NY,NX)+trc_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
   real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)     !31.0*(trcx_solml_vr(idx_HPO4,1,NY,NX)+trcx_solml_vr(idx_H2PO4,1,NY,NX)+trcx_solml_vr(idx_HPO4B,1,NY,NX)+trcx_solml_vr(idx_H2PO4B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
-  real(r8),pointer   :: h2D_ECND_vr(:,:)         !ECND_vr(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:)         !ElectricConductivity_vr(1:JZ,NY,NX)
 
   real(r8),pointer   :: h2D_PSI_RT_vr_ptc(:,:)     !PSIRoot_pvr(1,1:JZ,NZ,NY,NX), root total water potential , MPa
   real(r8),pointer   :: h2D_prtUP_NH4_vr_ptc(:,:)     !(RootNutUptake_pvr(ids_NH4,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4,2,1:JZ,NZ,NY,NX) &
@@ -772,7 +772,7 @@ implicit none
                                                              
   allocate(this%h2D_cPO4_vr(beg_col:end_col,1:JZ))       ;this%h2D_cPO4_vr(:,:)=spval
   allocate(this%h2D_cEXCH_P_vr(beg_col:end_col,1:JZ))    ;this%h2D_cEXCH_P_vr(:,:)=spval
-  allocate(this%h2D_ECND_vr(beg_col:end_col,1:JZ))       ;this%h2D_ECND_vr(:,:)=spval
+  allocate(this%h2D_ElectricConductivity_vr(beg_col:end_col,1:JZ))       ;this%h2D_ElectricConductivity_vr(:,:)=spval
   allocate(this%h2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_vr_ptc(:,:)=spval
   allocate(this%h2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NH4_vr_ptc(:,:)=spval                                                              
   allocate(this%h2D_prtUP_NO3_vr_ptc(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NO3_vr_ptc(:,:)=spval                                                              
@@ -2133,8 +2133,8 @@ implicit none
   call hist_addfld1d(fname='TMIN_LITR',units='oC',avgflag='M',&
     long_name='Litter minimum temperature',ptr_col=data1d_ptr)      
 
-  data2d_ptr => this%h2D_ECND_vr(beg_col:end_col,1:JZ)     
-  call hist_addfld2d(fname='ECND_vr',units='dS m-1',type2d='levsoi',avgflag='A',&
+  data2d_ptr => this%h2D_ElectricConductivity_vr(beg_col:end_col,1:JZ)     
+  call hist_addfld2d(fname='ElectricConductivity_vr',units='dS m-1',type2d='levsoi',avgflag='A',&
     long_name='electrical conductivity',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ)  
@@ -2454,7 +2454,7 @@ implicit none
         this%h2D_cEXCH_P_vr(ncol,L)= patomw*safe_adb(trcx_solml_vr(idx_HPO4,L,NY,NX)+trcx_solml_vr(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml_vr(idx_HPO4B,L,NY,NX)+trcx_solml_vr(idx_H2PO4B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
-        this%h2D_ECND_vr(ncol,L)     = ECND_vr(L,NY,NX)
+        this%h2D_ElectricConductivity_vr(ncol,L)     = ElectricConductivity_vr(L,NY,NX)
         !aerobic heterotropic bacteria
         call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
         this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)/DVOLL   
