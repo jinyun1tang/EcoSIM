@@ -56,8 +56,8 @@ module UptakesMod
   real(r8) :: RootResist2ndary(jroots,JZ1)
   real(r8) :: SoiH2OResist(jroots,JZ1)
   real(r8) :: SoiAddRootResist(jroots,JZ1),AllRootC_vr(JZ1)
-  real(r8) :: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8) :: AirMicPore4Fill_vr(JZ1)  !
   real(r8) :: WatAvail4Uptake_vr(JZ1)
@@ -118,8 +118,8 @@ module UptakesMod
       CALL STOMATEs(I,J,NZ)
 !
 !     CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS
-      call UpdateRootProperty(NZ,PATH,FineRootRadius,AllRootC_vr,FracPRoot4Uptake,&
-        MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+      call UpdateRootProperty(NZ,PATH,FineRootRadius,AllRootC_vr,FracPRoot4Uptake_pvr,&
+        MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 !
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
@@ -173,7 +173,7 @@ module UptakesMod
 !
         NN=CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanopyMassC,&
           ElvAdjstedtSoiPSIMPa,VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,&
-          HeatEvapSens,FDMP,SoiAddRootResist,FracPRoot4Uptake,AirMicPore4Fill_vr,&
+          HeatEvapSens,FDMP,SoiAddRootResist,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,&
           WatAvail4Uptake_vr,TKCX,CNDT,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIgravCanopyHeight,SoiLayerHasRoot)
 !
 !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
@@ -195,8 +195,8 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(I,J,NZ)
 
-      call PlantNutientO2Uptake(I,J,NZ,FDMP,PATH,FineRootRadius,FracPRoot4Uptake,&
-        MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+      call PlantNutientO2Uptake(I,J,NZ,FDMP,PATH,FineRootRadius,FracPRoot4Uptake_pvr,&
+        MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 
     ENDIF
   ENDDO
@@ -418,7 +418,7 @@ module UptakesMod
   end subroutine UpdateCanopyProperty
 !------------------------------------------------------------------------
   subroutine UpdateRootProperty(NZ,PATH,FineRootRadius,AllRootC_vr,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+    FracPRoot4Uptake_pvr,MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
 !
 !     update root characterization
 
@@ -427,8 +427,8 @@ module UptakesMod
   real(r8), intent(in) :: AllRootC_vr(JZ1)
   real(r8), intent(out) :: PATH(jroots,JZ1)
   real(r8), intent(out) :: FineRootRadius(jroots,JZ1)
-  real(r8), intent(out) :: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(out) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8), intent(out) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8), intent(out) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(out) :: FracSoiLayByPrimRoot(JZ1,JP1)
   real(r8), intent(out) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8) :: RootDepZ,RTDPX
@@ -462,7 +462,7 @@ module UptakesMod
 !     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
 !     HypoctoHeight_pft=hypocotyledon height
-!     FracPRoot4Uptake=PFT fraction of biome root mass
+!     FracPRoot4Uptake_pvr=PFT fraction of biome root mass
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     FineRootRadius=root radius
 !     RootPorosity_pft=root porosity
@@ -493,12 +493,12 @@ module UptakesMod
 
       ENDIF
       IF(AllRootC_vr(L).GT.ZEROS)THEN
-        FracPRoot4Uptake(N,L,NZ)=AZMAX1(PopuRootMycoC_pvr(N,L,NZ))/AllRootC_vr(L)
+        FracPRoot4Uptake_pvr(N,L,NZ)=AZMAX1(PopuRootMycoC_pvr(N,L,NZ))/AllRootC_vr(L)
       ELSE
-        !FracPRoot4Uptake(N,L,NZ)=1.0_r8
-        FracPRoot4Uptake(N,L,NZ)=FMN
+        !FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
+        FracPRoot4Uptake_pvr(N,L,NZ)=FMN
       ENDIF
-      MinFracPRoot4Uptake_vr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake(N,L,NZ))
+      MinFracPRoot4Uptake_pvr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ))
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
         FineRootRadius(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
@@ -611,14 +611,14 @@ module UptakesMod
 !------------------------------------------------------------------------------
   function CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanopyMassC,&
     ElvAdjstedtSoiPSIMPa,VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,HeatEvapSens,FDMP,&
-    SoiAddRootResist,FracPRoot4Uptake,AirMicPore4Fill_vr,WatAvail4Uptake_vr,TKCX,CNDT,&
+    SoiAddRootResist,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,WatAvail4Uptake_vr,TKCX,CNDT,&
     VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIgravCanopyHeight,SoiLayerHasRoot) result(NN)
   implicit none
   integer  , intent(in) :: I, J
   integer  , intent(in) :: NZ
   real(r8) , intent(in) :: FracGrndByPFT,CanopyMassC,ElvAdjstedtSoiPSIMPa(JZ1)
   real(r8) , intent(in) :: SoiAddRootResist(jroots,JZ1)
-  real(r8) , intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8) , intent(in) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8) , intent(in) :: AirMicPore4Fill_vr(JZ1),WatAvail4Uptake_vr(JZ1)
   real(r8) , intent(in) :: TKCX,CNDT,VHeatCapCanopyPrev_pft
   real(r8) , intent(in) :: PrecpHeatbyCanopy  !heat added to canopy by precipitation [MJ]
@@ -863,7 +863,7 @@ module UptakesMod
 !     SoiLayerHasRoot=rooted layer flag
 !     AllPlantRootH2OUptake_vr=root water uptake from soil layer > 0
 !     WatAvail4Uptake_vr,AirMicPore4Fill_vr=water volume available for uptake,air volume
-!     FracPRoot4Uptake=PFT fraction of biome root mass
+!     FracPRoot4Uptake_pvr=PFT fraction of biome root mass
 !     PSILC=height corrected canopy water potential 
 !     ElvAdjstedtSoiPSIMPa=total soil water potential PSIST adjusted for surf elevn
 !     SoiAddRootResist=total soil+root resistance
@@ -874,9 +874,9 @@ module UptakesMod
         D4201: DO L=NU,MaxSoiL4Root_pft(NZ)
           IF(SoiLayerHasRoot(N,L).EQ.itrue)THEN
             !<0 active uptake
-            AllPlantRootH2OUptake_vr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake(N,L,NZ)), &
+            AllPlantRootH2OUptake_vr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
               AMIN1((PSILC-ElvAdjstedtSoiPSIMPa(L))/SoiAddRootResist(N,L), &
-              AirMicPore4Fill_vr(L)*FracPRoot4Uptake(N,L,NZ)))
+              AirMicPore4Fill_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)))
 
             IF(AllPlantRootH2OUptake_vr(N,L,NZ).GT.0.0_r8)THEN
               !plant/myco lose water to soil
