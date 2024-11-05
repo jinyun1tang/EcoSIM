@@ -6024,10 +6024,10 @@ implicit none
        dim3name='levsno',long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml,datrc_3d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml_snvr,datrc_3d) 
   else
     !print*,'trcn_solsml'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml,datrc_3d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcn_solsml_snvr,datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NnutrientTracers,1:JS)            
     call restartvar(ncid, flag, varname='trcn_solsml', dim1name='column',dim2name='NnutrientTracers',&
        dim3name='levsno',long_name='snow temperature', units='oC', &
@@ -7217,10 +7217,10 @@ implicit none
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &
          interpinic_flag='skip', data=datpr3, missing_value=spval, &
          fill_value=spval)  
-        call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solsml,datrc_3d)      
+        call cpcol(flag,NHW,NHE,NVN,NVS,trc_Saltml_snvr,datrc_3d)      
     else
       !print*,'trcs_solsml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solsml,datrc_3d)        
+      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trc_Saltml_snvr,datrc_3d)        
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JS)    
       call restartvar(ncid, flag, varname='trcs_solsml', dim1name='column',dim2name='satracers',&
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &
@@ -8134,14 +8134,29 @@ implicit none
     call restartvar(ncid, flag, varname='AEC', dim1name='column', &
       dim2name='levsoi',long_name='anion exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,AEC,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,AEC_vr,datrc_2d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AEC,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AEC_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='AEC', dim1name='column', &
       dim2name='levsoi',long_name='anion exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
+
+!  if(flag=='read')then
+!    datpr2 => datrc_2d(1:ncols,1:JZ)    
+!    call restartvar(ncid, flag, varname='CEC', dim1name='column', &
+!      dim2name='levsoi',long_name='cation exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
+!      data=datpr2, missing_value=spval, fill_value=spval)   
+!    call cpcol(flag,NHW,NHE,NVN,NVS,CEC_vr,datrc_2d)
+!  else
+!    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CEC_vr,datrc_2d)  
+!    datpr2 => datrc_2d(1:ncols,1:JZ)    
+!    call restartvar(ncid, flag, varname='CEC_v', dim1name='column', &
+!      dim2name='levsoi',long_name='cation exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
+!      data=datpr2, missing_value=spval, fill_value=spval)   
+!  endif  
+
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)    

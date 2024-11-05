@@ -66,7 +66,6 @@ module TranspSaltMod
   implicit none
 
   allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));       trcSalt_TQR=0._r8
-
   allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MicP_vr=0._r8
   allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MacP_vr=0._r8
   allocate(trcSalt_RFLZ(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLZ=0._r8
@@ -249,7 +248,7 @@ module TranspSaltMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-C
   D20: DO L=1,JS
     DO NTA=idsalt_beg,idsalt_end
-      trcSalt_sosml2(NTA,L,NY,NX)=trcs_solsml(NTA,L,NY,NX)
+      trc_Saltml2_snvr(NTA,L,NY,NX)=trc_Saltml_snvr(NTA,L,NY,NX)
     ENDDO
   ENDDO D20
   end subroutine InitSolutesInSnowpack
@@ -280,8 +279,8 @@ module TranspSaltMod
 !          :*1=non-band,*B=band
 !
   DO nsalts=idsalt_beg,idsalt_end
-    trcSaltAdv2SowLay(nsalts,1,NY,NX)=trcSaltFlo2SnowLay(nsalts,1,NY,NX)*dts_HeatWatTP
-    trcSalt_RFL0(nsalts,NY,NX)=trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)*dts_HeatWatTP
+    trcSaltAdv2SowLay(nsalts,1,NY,NX) = trcSaltFlo2SnowLay(nsalts,1,NY,NX)*dts_HeatWatTP
+    trcSalt_RFL0(nsalts,NY,NX)        = trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
@@ -1065,11 +1064,11 @@ module TranspSaltMod
 !          :*1=non-band,*B=band
 !
   DO NTA=idsalt_beg,idsalt_end
-    trcSalt_sosml2(NTA,1,NY,NX)=trcSalt_sosml2(NTA,1,NY,NX)+trcSalt_TQ(NTA,NY,NX)
+    trc_Saltml2_snvr(NTA,1,NY,NX)=trc_Saltml2_snvr(NTA,1,NY,NX)+trcSalt_TQ(NTA,NY,NX)
   ENDDO
   D9670: DO L=1,JS
     DO NTA=idsalt_beg,idsalt_end
-      trcSalt_sosml2(NTA,L,NY,NX)=trcSalt_sosml2(NTA,L,NY,NX)+trcSalt_TBLS(NTA,L,NY,NX)
+      trc_Saltml2_snvr(NTA,L,NY,NX)=trc_Saltml2_snvr(NTA,L,NY,NX)+trcSalt_TBLS(NTA,L,NY,NX)
     ENDDO
   ENDDO D9670
   end subroutine UpdateSoluteInSnow

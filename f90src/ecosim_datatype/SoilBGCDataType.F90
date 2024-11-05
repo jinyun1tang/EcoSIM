@@ -28,12 +28,12 @@ implicit none
   real(r8),target,allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
 
-  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)     !layer mass of gases [g d-2]
-
-  real(r8),target,allocatable :: PH(:,:,:)             !soil pH
-  real(r8),target,allocatable :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
-  real(r8),target,allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
-
+  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)             !layer mass of gases [g d-2]
+  real(r8),target,allocatable :: trcVolatileMass_col(:,:,:)        !column integrated volatile tracer mass [g d-2]
+  real(r8),target,allocatable :: PH(:,:,:)                         !soil pH
+  real(r8),target,allocatable :: CEC_vr(:,:,:)                     !soil cation exchange capacity	[cmol kg-1]
+  real(r8),target,allocatable :: AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
+ 
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)                         !total C amendment, [g d-2]
@@ -70,7 +70,7 @@ implicit none
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)
-  real(r8),target,allocatable ::  tRDOE2Die_col(:,:,:)
+  real(r8),target,allocatable ::  tRDIM2DOM_col(:,:,:)               !conversion flux from DIM into DOM [g d-2 h-1]
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
@@ -132,12 +132,13 @@ implicit none
   allocate(CNO3(JZ,JY,JX));     CNO3=0._r8
   allocate(CPO4(JZ,JY,JX));     CPO4=0._r8
 
+  allocate(trcVolatileMass_col(idg_beg:idg_end,JY,JX)); trcVolatileMass_col=0._r8
   allocate(trc_gasml_vr(idg_beg:idg_end,JZ,JY,JX)); trc_gasml_vr=0._r8
-  allocate(trc_soHml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml_vr=0._r8
+  allocate(trc_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trc_soHml_vr=0._r8
   allocate(trc_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr=0._r8
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
   allocate(trc_gascl_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl_vr=0._r8
-  allocate(tRDOE2Die_col(1:NumPlantChemElms,JY,JX)); tRDOE2Die_col=0._r8
+  allocate(tRDIM2DOM_col(1:NumPlantChemElms,JY,JX)); tRDIM2DOM_col=0._r8
 
   allocate(ZNFNI(0:JZ,JY,JX));  ZNFNI=0._r8
   allocate(ZNFN0(0:JZ,JY,JX));  ZNFN0=0._r8
@@ -155,8 +156,8 @@ implicit none
   allocate(RN2OChemoProd_vr(0:JZ,JY,JX)); RN2OChemoProd_vr=0._r8
   allocate(RN2ORedux_vr(0:JZ,JY,JX));RN2ORedux_vr=0._r8
   allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
-  allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
-  allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
+  allocate(CEC_vr(JZ,JY,JX));CEC_vr(JZ,JY,JX)=0._r8
+  allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
   allocate(SurfGasFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasFlx_col=0._r8
@@ -242,7 +243,7 @@ implicit none
   call destroy(trcg_ebu_flx_col)
   call destroy(trcg_pltroot_flx_col)
 
-  call destroy(tRDOE2Die_col)
+  call destroy(tRDIM2DOM_col)
   call destroy(CNH4)
   call destroy(CNO3)
   call destroy(CPO4)
@@ -268,8 +269,8 @@ implicit none
   call destroy(ZNHU0)
 
   call destroy(PH)
-  call destroy(CEC)
-  call destroy(AEC)
+  call destroy(CEC_vr)
+  call destroy(AEC_vr)
   call destroy(CPO4S)
   call destroy(RO2UptkSoilM_vr)
   call destroy(AmendCFlx_CumYr_col)
@@ -304,6 +305,7 @@ implicit none
   call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)
   call destroy(LitrfalStrutElms_vr)
+  call destroy(trcVolatileMass_col)
 
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)

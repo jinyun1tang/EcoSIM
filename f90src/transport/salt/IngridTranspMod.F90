@@ -238,7 +238,7 @@ module IngridTranspMod
         ENDIF
 
         DO nsalts=idsalt_beg,idsalt_end
-          trcSaltAdv2SowLay(nsalts,L2,NY,NX)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWW
+          trcSaltAdv2SowLay(nsalts,L2,NY,NX)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWW
           trcSaltFlo2SnowLay(nsalts,L2,NY,NX)=trcSaltFlo2SnowLay(nsalts,L2,NY,NX)+trcSaltAdv2SowLay(nsalts,L2,NY,NX)
         ENDDO
 
@@ -272,17 +272,17 @@ module IngridTranspMod
           VFLWPOB=VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
           DO nsalts=idsalt_beg,idsalt_end
-            trcSaltSnoFlo2LitR(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWR
+            trcSaltSnoFlo2LitR(nsalts)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWR
           ENDDO
 
           DO nsalts=idsalt_beg,idsalt_KSO4
-            trcSaltSnoFlo2Soil(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWS
+            trcSaltSnoFlo2Soil(nsalts)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWS
           ENDDO
 
           DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
             ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
-            trcSaltSnoFlo2Soil(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWPO4
-            trcSaltSnoFlo2Soil(ids)=trcSalt_sosml2(ids,L,NY,NX)*VFLWPOB
+            trcSaltSnoFlo2Soil(nsalts)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWPO4
+            trcSaltSnoFlo2Soil(ids)=trc_Saltml2_snvr(ids,L,NY,NX)*VFLWPOB
           ENDDO
           ICHKL=1
         ENDIF
@@ -939,7 +939,7 @@ module IngridTranspMod
           ENDIF
 
           DO nsalts=idsalt_beg,idsaltb_end
-            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trcSalt_sosml2(nsalts,1,N2,N1))
+            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trc_Saltml2_snvr(nsalts,1,N2,N1))
           ENDDO
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
@@ -951,7 +951,7 @@ module IngridTranspMod
             VFLW=-VFLWX
           ENDIF
           DO nsalts=idsalt_beg,idsaltb_end
-            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trcSalt_sosml2(nsalts,1,N5,N4))
+            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trc_Saltml2_snvr(nsalts,1,N5,N4))
           ENDDO
         ENDIF
 !

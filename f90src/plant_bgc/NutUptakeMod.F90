@@ -22,7 +22,7 @@ module NutUptakeMod
 !------------------------------------------------------------------------
 
   subroutine PlantNutientO2Uptake(I,J,NZ,FDMP, PATH,FineRootRadius,FracPRoot4Uptake,&
-    MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
+    MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
   !
   !DESCRIPTION
   !doing plant population level nutrient, and O2 uptake
@@ -30,7 +30,7 @@ module NutUptakeMod
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: FDMP
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8)  :: PopPlantO2Uptake,PopPlantO2Demand
 
@@ -45,7 +45,7 @@ module NutUptakeMod
 !
 
   call RootMycoO2NutrientUptake(I,J,NZ,PATH,FineRootRadius,&
-    FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr &
+    FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr &
     ,PopPlantO2Uptake,PopPlantO2Demand)
 
   IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN
@@ -124,14 +124,18 @@ module NutUptakeMod
 !------------------------------------------------------------------------------------------
 
   subroutine RootMycoO2NutrientUptake(I,J,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
-    MinFracPRoot4Uptake_vr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr,PopPlantO2Uptake,PopPlantO2Demand)
+    MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr,PopPlantO2Uptake,PopPlantO2Demand)
 
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8),  intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
-  real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
-  real(r8), intent(out) :: PopPlantO2Uptake,PopPlantO2Demand
+  real(r8), intent(in) :: PATH(jroots,JZ1)
+  real(r8), intent(in) :: FineRootRadius(jroots,JZ1)
+  real(r8), intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)   !minimum active fraction of roots for substance uptake from soil [none]
+  real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
+  real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
+  real(r8), intent(out) :: PopPlantO2Uptake
+  real(r8), intent(out) :: PopPlantO2Demand
   real(r8) :: TFOXYX
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
@@ -163,7 +167,7 @@ module NutUptakeMod
         .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. THETW_vr(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
 !        if(I>176)print*,'getuptkcp',L
-        call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
+        call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
         TFOXYX=TFOXYX+FOXYX
@@ -198,13 +202,13 @@ module NutUptakeMod
 !     FZUP=limitn to active uptake respiration from CZPOLR
 !         
 !          if(I>176)print*,'uptakemin'
-          call UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
+          call UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
             RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 !
 !     FPUP=limitn to active uptake respiration from CPPOLR
 !         
 !          if(I>176)print*,'uptakeppp'
-          call UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
+          call UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
             RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
         ENDIF
       ELSE
@@ -277,14 +281,14 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------0
 
-  subroutine UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,&
+  subroutine UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
     RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
   real(r8), intent(in):: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(in):: RootAreaDivRadius_vr(jroots,JZ1),FCUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
   real(r8) :: DIFFL
@@ -313,22 +317,22 @@ module NutUptakeMod
 
 !     begin_execution
   IF(RH2PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FPO4X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH2PO4DmndSoil_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
+    FPO4X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH2PO4DmndSoil_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FPO4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH2PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FPOBX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH2PO4DmndBand_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
+    FPOBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH2PO4DmndBand_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
   ELSE
     FPOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FP14X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH1PO4DmndSoil_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
+    FP14X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH1PO4DmndSoil_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FP14X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FP1BX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootH1PO4DmndBand_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
+    FP1BX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH1PO4DmndBand_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
   ELSE
     FP1BX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1045,14 +1049,14 @@ module NutUptakeMod
 !------------------------------------------------------------------------
 
   subroutine UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
-    MinFracPRoot4Uptake_vr,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
+    MinFracPRoot4Uptake_pvr,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer , intent(in) :: I,J
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
   real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(in) :: FCUP,FZUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: FNO3X,FNOBX,FNH4X,FNHBX
@@ -1077,23 +1081,23 @@ module NutUptakeMod
   TFNOBX=0.0_r8
 
   IF(RNH4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNH4X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
+    FNH4X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
   ELSE
     FNH4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNH4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNHBX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNH4DmndBand_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
+    FNHBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNH4DmndBand_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
   ELSE
     FNHBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
 
   IF(RNO3EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNO3X=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNO3DmndSoil_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
+    FNO3X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNO3DmndSoil_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
   ELSE
     FNO3X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNO3EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNOBX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootNO3DmndBand_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
+    FNOBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNO3DmndBand_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
   ELSE
     FNOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1121,14 +1125,14 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_vr,FCUP,FZUP,FPUP,&
+  subroutine GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FCUP,FZUP,FPUP,&
     FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
   REAL(R8), INTENT(IN):: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake_vr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX
 
   associate(                                                          &
@@ -1232,11 +1236,11 @@ module NutUptakeMod
   !     RH1PO4EcoDmndBandPrev_vr=HPO4 demand in band by all microbial,root,myco populations
   !     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root,myco population
   !     FP1BX=fraction of RH1PO4EcoDmndBandPrev_vr by each root,myco populn
-  !     MinFracPRoot4Uptake_vr=minimum uptake fraction
+  !     MinFracPRoot4Uptake_pvr=minimum uptake fraction
   !     FracPRoot4Uptake=PFT fraction of biome root mass
   !
   IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
-    FOXYX=AMAX1(MinFracPRoot4Uptake_vr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
+    FOXYX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF

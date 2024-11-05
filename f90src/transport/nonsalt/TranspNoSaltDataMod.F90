@@ -78,7 +78,7 @@ implicit none
   real(r8), allocatable ::  DOMdiffusivity2_vr(:,:,:,:)                      !
 
   real(r8), allocatable :: trcg_solsml2_snvr(:,:,:,:)
-  real(r8), allocatable :: trcn_solsml2(:,:,:,:)
+  real(r8), allocatable :: trcn_solsml2_snvr(:,:,:,:)
 
   real(r8), allocatable ::  trcg_TBLS_snvr(:,:,:,:)                      !
   real(r8), allocatable ::  trcn_TBLS(:,:,:,:)
@@ -176,7 +176,7 @@ contains
   allocate(DOMdiffusivity2_vr(idom_beg:idom_end,0:JZ,JY,JX)); DOMdiffusivity2_vr = 0._r8
 
   allocate(trcg_solsml2_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml2_snvr = 0._r8
-  allocate(trcn_solsml2(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2  = 0._r8
+  allocate(trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2_snvr  = 0._r8
 
   allocate(trcg_TBLS_snvr(idg_beg:idg_NH3,JS,JY,JX));   trcg_TBLS_snvr = 0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS     = 0._r8
@@ -271,7 +271,7 @@ contains
   call destroy(DOMdiffusivity2_vr)
   call destroy(RGasADFlx_3D)
   call destroy(trcg_solsml2_snvr)
-  call destroy(trcn_solsml2)
+  call destroy(trcn_solsml2_snvr)
   call destroy(trcn_2DFloXSurRunoffM)
   call destroy(trcg_TBLS_snvr)
   call destroy(trcn_TBLS)

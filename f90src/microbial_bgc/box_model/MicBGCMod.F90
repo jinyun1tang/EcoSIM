@@ -2252,7 +2252,6 @@ module MicBGCMod
 !     XZHYS=total H+ production
 !     TFixN2=total N2 fixation
 !
-!  micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)+
 
   micflx%TRDOE2DIE(ielmn)=micflx%TRDOE2DIE(ielmn)+naqfdiag%tRNH4MicrbTransfSoil &
     +naqfdiag%tRNH4MicrbTransfBand+naqfdiag%tRNO3MicrbTransfSoil &
@@ -3398,7 +3397,7 @@ module MicBGCMod
     ZNHBM                      = Z4MN*VOLWU*FNHBS
     RNH4TransfSoilHeter(NGL,K) = AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4DmndSoilHeter(NGL,K))
     RNH4TransfBandHeter(NGL,K) = AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4DmndBandHeter(NGL,K))
-    !mineralization  
+    !mineralization  (<0._r8)
   ELSE
     RNH4DmndSoilHeter(NGL,K)   = 0.0_r8
     RNH4DmndBandHeter(NGL,K)   = 0.0_r8

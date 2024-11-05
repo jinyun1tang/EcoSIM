@@ -195,14 +195,14 @@ implicit none
       DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
       TSoilO2G_lnd        = TSoilO2G_lnd+trcg_solsml_snvr(idg_O2,L,NY,NX)
       TGasN_lnd           = TGasN_lnd+trcg_solsml_snvr(idg_N2,L,NY,NX)+trcg_solsml_snvr(idg_N2O,L,NY,NX)
-      TDisolNH4_lnd       = TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
-      tNO3_lnd            = tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
-      TDisolPi_lnd        = TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
+      TDisolNH4_lnd       = TDisolNH4_lnd+trcn_solsml_snvr(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
+      tNO3_lnd            = tNO3_lnd+trcn_solsml_snvr(ids_NO3,L,NY,NX)
+      TDisolPi_lnd        = TDisolPi_lnd+trcn_solsml_snvr(ids_H1PO4,L,NY,NX)+trcn_solsml_snvr(ids_H2PO4,L,NY,NX)
 
       IF(salt_model)THEN
         SSW=0._r8
         do nsalts=idsalt_beg,idsalt_end
-          SSW=SSW+trcs_solsml(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
+          SSW=SSW+trc_Saltml_snvr(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
         ENDDO  
         TION=TION+SSW
       ENDIF
@@ -228,14 +228,14 @@ implicit none
     !   write(116,*)I+J/24.,'beg611',trc_solml_vr(ids_NO3,0,NY,NX),trcn_QSS(ids_NO3,NY,NX),trcn_QSS(ids_NO2,NY,NX)
 
     DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
+      trcn_solsml_snvr(NTS,1,NY,NX)=trcn_solsml_snvr(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
     ENDDO
 
     !   write(116,*)I+J/24.,'beg612',trc_solml_vr(ids_NO3,0,NY,NX),RNutMicbTransf_vr(ids_NO3,0,NY,NX),trcn_RChem_soil_vr(ids_NO3,0,NY,NX)
 
     IF(salt_model)THEN
       DO NTA=idsalt_beg,idsalt_end
-        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
+        trc_Saltml_snvr(NTA,1,NY,NX)=trc_Saltml_snvr(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
       ENDDO
     ENDIF
   ENDIF

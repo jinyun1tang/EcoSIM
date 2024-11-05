@@ -33,11 +33,12 @@ implicit none
 
 
 !------------------------------------------------------------------------------------------
-  subroutine SRFLitterEnergyBalance(M,NY,NX,PSISV1,Prec2LitR2,PrecHeat2LitR2,HeatSensLitR2Soi1,&
+  subroutine SRFLitterEnergyBalance(I,J,M,NY,NX,PSISV1,Prec2LitR2,PrecHeat2LitR2,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,EvapLitR2Soi1,HeatFluxAir2LitR)
 !!
 ! Description:
   implicit none
+  integer , intent(in) :: I,J
   integer , intent(in) :: M       !soil heat-water iteration id
   integer , intent(in) :: NY,NX
   real(r8), intent(in) :: PSISV1
@@ -141,7 +142,7 @@ implicit none
 !
 ! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
 !
-  call SurfLitterIterateNN(M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
+  call SurfLitterIteration(I,J,M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
     EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,HeatFluxAir2LitR)
 
@@ -189,11 +190,12 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfLitterIterateNN(M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
+  subroutine SurfLitterIteration(I,J,M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
     EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,&
     LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,HeatFluxAir2LitR)
 
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: M     !soil heat-flow iteration id
   integer, intent(in) :: NY,NX
   real(r8), intent(in) :: CdTLit2Soil     !heat conductance between litter and soil [1/(m2 K h)]
@@ -442,10 +444,10 @@ implicit none
     tk1pre             = TKR1
     TKR1               = (ENGYR+HeatFluxAir2LitR2+PrecHeat2LitR2-HeatSensVapLitR2Soi2-HeatSensLitR2Soi2)/VLHeatCapcityLitR2
     TKS1               = TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
-!    print*,'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
+    write(124,*)'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
 !    print*,'cplitr',NN,VLHeatCapcityLitR2,SoilOrgM_vr(ielmc,0,NY,NX),VWatLitr2,VLiceMicP1_vr(0,NY,NX)
   ENDDO D5000
-  end subroutine SurfLitterIterateNN
+  end subroutine SurfLitterIteration
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateLitRPhys(I,J,NY,NX,WatInByRunoff,HEATIN_lndByRunoff,HeatStore_lnd,HEATIN_lnd)
@@ -517,16 +519,14 @@ implicit none
 !      TKS_vr(0,NY,NX)=TKS_vr(NUM(NY,NX),NY,NX)
 !    endif
   ELSE
-    HEATIN_lnd=HEATIN_lnd+HeatByLitrMassChange+(TKS_vr(NUM(NY,NX),NY,NX)-TKS_vr(0,NY,NX))*VHeatCapacity_vr(0,NY,NX)
-    TKS_vr(0,NY,NX)=TKS_vr(NUM(NY,NX),NY,NX)
+    HEATIN_lnd      = HEATIN_lnd+HeatByLitrMassChange+(TKS_vr(NUM(NY,NX),NY,NX)-TKS_vr(0,NY,NX))*VHeatCapacity_vr(0,NY,NX)
+    TKS_vr(0,NY,NX) = TKS_vr(NUM(NY,NX),NY,NX)
   ENDIF
 
-  TCS(0,NY,NX)=units%Kelvin2Celcius(TKS_vr(0,NY,NX))
-    
-  ENGYR=VHeatCapacity_vr(0,NY,NX)*TKS_vr(0,NY,NX)
-
-  HeatStore_lnd=HeatStore_lnd+ENGYR
-  HEATIN_lnd=HEATIN_lnd+TLitrIceHeatFlxFrez(NY,NX)
+  TCS(0,NY,NX)  = units%Kelvin2Celcius(TKS_vr(0,NY,NX))
+  ENGYR         = VHeatCapacity_vr(0,NY,NX)*TKS_vr(0,NY,NX)
+  HeatStore_lnd = HeatStore_lnd+ENGYR
+  HEATIN_lnd    = HEATIN_lnd+TLitrIceHeatFlxFrez(NY,NX)
 
   end subroutine UpdateLitRPhys
 

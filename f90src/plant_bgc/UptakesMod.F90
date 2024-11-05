@@ -532,7 +532,7 @@ module UptakesMod
   integer :: N,L
 ! begin_execution
   associate(                                                         &
-   ReistanceCanopy_pft                       => plt_ew%ReistanceCanopy_pft,                          &
+   ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft,          &
    DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
@@ -580,8 +580,7 @@ module UptakesMod
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC(NZ)**4._r8
       PSICanopy_pft(NZ)             = ElvAdjstedtSoiPSIMPa(NGTopRootLayer_pft(NZ))
-
-      CCPOLT=CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
+      CCPOLT                        = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
         +CanopyNonstElmConc_pft(ielmp,NZ)
 
       CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC(NZ) &
@@ -664,7 +663,7 @@ module UptakesMod
     PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKC                       => plt_ew%TKC,                          &
-    ReistanceCanopy_pft                       => plt_ew%ReistanceCanopy_pft,                          &
+    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft,          &
     VPA                       => plt_ew%VPA,                          &
     TKS_vr                    => plt_ew%TKS_vr,                       &
     TairK                     => plt_ew%TairK,                        &
@@ -886,7 +885,7 @@ module UptakesMod
               !cumRootHeatUptake=cumRootHeatUptake+AllPlantRootH2OUptake_vr(N,L,NZ)*TKC1
             else  
               !plant/myco gain water from soil
-              cumRootHeatUptake=cumRootHeatUptake+AllPlantRootH2OUptake_vr(N,L,NZ)*TKS_vr(L)
+              cumRootHeatUptake=cumRootHeatUptake+cpw*AllPlantRootH2OUptake_vr(N,L,NZ)*TKS_vr(L)
             ENDIF
             cumPRootH2OUptake=cumPRootH2OUptake+AllPlantRootH2OUptake_vr(N,L,NZ)
           ELSE
@@ -894,7 +893,6 @@ module UptakesMod
           ENDIF
         enddo D4201
       ENDDO D4200
-!      cumPRootH2OUptake=cumPRootH2OUptake*cpw
 !
 !     TEST TRANSPIRATION - ROOT WATER UPTAKE VS. CHANGE IN CANOPY
 !     WATER STORAGE
@@ -977,8 +975,6 @@ module UptakesMod
         PTransPre            = Transpiration_pft(NZ)
         cumPRootH2OUptakePre = cumPRootH2OUptake
         VOLWPX               = SymplasmicWat
-
-!        DTmR=PTransPre-cumPRootH2OUptakePre
 
         PSICanopy_pft(NZ) = AZMIN1(PSICanopy_pft(NZ)+0.1_r8*DPSI)
         DPSI_old          = DPSI
@@ -1116,7 +1112,7 @@ module UptakesMod
         !     Root2ndAveLen_pvr=average secondary root length
         !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of primary,secondary axes
 !
-        FRAD1                 = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
+        FRAD1                  = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
         RootResistPrimary(N,L) = RootAxialResist_pft(N,NZ)*DPTHZ_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
           +RootAxialResist_pft(ipltroot,NZ)*CanPHeight4WatUptake(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
 

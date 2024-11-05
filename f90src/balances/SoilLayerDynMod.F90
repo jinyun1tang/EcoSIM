@@ -1341,18 +1341,18 @@ implicit none
 
   IF(salt_model)THEN
     DO NTSAB=idsaltb_beg,idsaltb_end
-      FXB=FWO*trcSalt_solml_vr(NTSAB,L0,NY,NX)
-      trcSalt_solml_vr(NTSAB,L1,NY,NX)=trcSalt_solml_vr(NTSAB,L1,NY,NX)+FXB
-      trcSalt_solml_vr(NTSAB,L0,NY,NX)=trcSalt_solml_vr(NTSAB,L0,NY,NX)-FXB
+      FXB                              = FWO*trcSalt_solml_vr(NTSAB,L0,NY,NX)
+      trcSalt_solml_vr(NTSAB,L1,NY,NX) = trcSalt_solml_vr(NTSAB,L1,NY,NX)+FXB
+      trcSalt_solml_vr(NTSAB,L0,NY,NX) = trcSalt_solml_vr(NTSAB,L0,NY,NX)-FXB
     ENDDO
   ENDIF
 !
 !     SOIL ADSORBED CATIONS IN BAND, NON-BAND
 !
-  IF(L0.EQ.L.OR.CEC(L0,NY,NX).LE.ZERO)THEN
+  IF(L0.EQ.L .OR. CEC_vr(L0,NY,NX).LE.ZERO)THEN
     FCO=FO
   ELSE
-    FCO=AMIN1(0.5_r8,FO*CEC(L1,NY,NX)/CEC(L0,NY,NX))
+    FCO=AMIN1(0.5_r8,FO*CEC_vr(L1,NY,NX)/CEC_vr(L0,NY,NX))
   ENDIF
   DO NTX=idx_beg,idx_cation_end
     FXXC=FCO*trcx_solml_vr(NTX,L0,NY,NX)
@@ -1362,10 +1362,10 @@ implicit none
 !
 !     SOIL ADSORBED ANIONS IN BAND, NON-BAND
 !
-  IF(L0.EQ.L.OR.AEC(L0,NY,NX).LE.ZERO)THEN
+  IF(L0.EQ.L.OR.AEC_vr(L0,NY,NX).LE.ZERO)THEN
     FAO=FO
   ELSE
-    FAO=AMIN1(0.5_r8,FO*AEC(L1,NY,NX)/AEC(L0,NY,NX))
+    FAO=AMIN1(0.5_r8,FO*AEC_vr(L1,NY,NX)/AEC_vr(L0,NY,NX))
   ENDIF
 
   DO NTX=idx_cation_end+1,idx_end

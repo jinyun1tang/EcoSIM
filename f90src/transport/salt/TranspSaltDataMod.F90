@@ -28,7 +28,7 @@ implicit none
   real(r8),allocatable ::  trcSalt_RFHS(:,:,:,:,:)                    !
   real(r8),allocatable ::  trcSalt_soHml2(:,:,:,:)                       !
   real(r8),allocatable ::  trcSalt_RFXS(:,:,:,:)                      !
-  real(r8), allocatable ::  trcSalt_sosml2(:,:,:,:)               ! snowpack salt dissolved tracers
+  real(r8), allocatable ::  trc_Saltml2_snvr(:,:,:,:)               ! snowpack salt dissolved tracers
   real(r8),allocatable ::  trcSalt_RFL0(:,:,:)                        !
   real(r8),allocatable ::  trcSalt_RFL1(:,:,:)                        !
 !----------------------------------------------------------------------
@@ -51,7 +51,7 @@ contains
   allocate(trcSalt_soHml2(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2=0._r8
   allocate(trcSalt_RFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFXS=0._r8
 
-  allocate(trcSalt_sosml2(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_sosml2=0._r8
+  allocate(trc_Saltml2_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trc_Saltml2_snvr=0._r8
 
   allocate(trcSalt_RFL0(idsalt_beg:idsalt_end,JY,JX));      trcSalt_RFL0=0._r8
   allocate(trcSalt_RFL1(idsalt_beg:idsaltb_end,JY,JX));     trcSalt_RFL1=0._r8

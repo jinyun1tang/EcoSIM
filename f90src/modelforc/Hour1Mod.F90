@@ -209,7 +209,7 @@ module Hour1Mod
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
-      LWRadCanGPrev_col(NY,NX)          = LWRadCanG(NY,NX)
+      LWRadCanGPrev_col(NY,NX)      = LWRadCanG(NY,NX)
       LWRadGrnd(NY,NX)              = LWRadBySurf_col(NY,NX)
       NetCO2Flx2Canopy_col(NY,NX)   = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       LWRadCanG(NY,NX)              = 0.0_r8
@@ -221,7 +221,7 @@ module Hour1Mod
       Eco_NetRad_col(NY,NX)         = 0.0_r8
       Eco_Heat_Latent_col(NY,NX)    = 0.0_r8
       Eco_Heat_Sens_col(NY,NX)      = 0.0_r8
-      Eco_Heat_GrndSurf_col(NY,NX)      = 0.0_r8
+      Eco_Heat_GrndSurf_col(NY,NX)  = 0.0_r8
       Canopy_NEE_col(NY,NX)         = 0.0_r8
       Eco_NEE_col(NY,NX)            = 0.0_r8
       ECO_ER_col(NY,NX)             = 0.0_r8
@@ -252,6 +252,8 @@ module Hour1Mod
   if(lverb)write(*,*)'ApplyFertilizerAtNoon'
 !     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
   call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
+
+  call SummarizeTracers(NHW,NHE,NVN,NVS)
 
   END subroutine hour1
 !------------------------------------------------------------------------------------------
@@ -731,7 +733,7 @@ module Hour1Mod
 
   Eco_RadSW_col(NY,NX)                    = 0._r8
   RootCO2Autor_vr(:,NY,NX)                = 0._r8
-  tRDOE2Die_col(1:NumPlantChemElms,NY,NX) = 0._r8
+  tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
   QRunSurf_col(NY,NX)                     = 0.0_r8
   HeatRunSurf_col(NY,NX)                  = 0._r8
   tHeatUptk_col(NY,NX)                    = 0._r8
@@ -2436,4 +2438,33 @@ module Hour1Mod
     enddo
   enddo    
   end subroutine UpdateLiterPropertz
+
+!------------------------------------------------------------------------------------------
+  subroutine SummarizeTracers(NHW,NHE,NVN,NVS)
+  !
+  !Description
+  !sum up mass of tracers
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS  
+  integer :: NY,NX
+  integer :: idg,L
+
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      trcVolatileMass_col(idg_beg:idg_end,NY,NX)=0._r8
+      DO L=NUI(NY,NX),NLI(NY,NX)
+        DO idg=idg_beg,idg_end
+          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trc_gasml_vr(idg,L,NY,NX) + &
+            trc_solml_vr(idg,L,NY,NX) + trc_soHml_vr(idg,L,NY,NX)
+        ENDDO
+      ENDDO
+      DO idg=idg_beg,idg_NH3
+        trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trc_solml_vr(idg,0,NY,NX)
+        DO L=1,JS
+          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+  end subroutine SummarizeTracers
 end module Hour1Mod

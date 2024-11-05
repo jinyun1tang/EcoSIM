@@ -53,14 +53,14 @@ contains
 !     CumReductVLsoiAirPM,FLM=air,water flux in gas flux calculations
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
-  VLWatMicPMA(NU(NY,NX),NY,NX)=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
-  VLWatMicPMB(NU(NY,NX),NY,NX)=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
-  VLWatMicPXA(NU(NY,NX),NY,NX)=natomw*VLWatMicPMA(NU(NY,NX),NY,NX)
-  VLWatMicPXB(NU(NY,NX),NY,NX)=natomw*VLWatMicPMB(NU(NY,NX),NY,NX)
-  VLsoiAirPMA(NU(NY,NX),NY,NX)=VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
-  VLsoiAirPMB(NU(NY,NX),NY,NX)=VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
-  CumReductVLsoiAirPM(NU(NY,NX),NY,NX)=ReductVLsoiAirPM(M,NU(NY,NX),NY,NX)*dt_GasCyc
-  WaterFlow2Soil(3,NU(NY,NX),NY,NX)=(WaterFlow2MicPM_3D(M,3,NU(NY,NX),NY,NX)+WaterFlow2MacPM_3D(M,3,NU(NY,NX),NY,NX))*dt_GasCyc
+  VLWatMicPMA(NU(NY,NX),NY,NX)         = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
+  VLWatMicPMB(NU(NY,NX),NY,NX)         = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
+  VLWatMicPXA(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMA(NU(NY,NX),NY,NX)
+  VLWatMicPXB(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMB(NU(NY,NX),NY,NX)
+  VLsoiAirPMA(NU(NY,NX),NY,NX)         = VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
+  VLsoiAirPMB(NU(NY,NX),NY,NX)         = VLsoiAirPM(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
+  CumReductVLsoiAirPM(NU(NY,NX),NY,NX) = ReductVLsoiAirPM(M,NU(NY,NX),NY,NX)*dt_GasCyc
+  WaterFlow2Soil(3,NU(NY,NX),NY,NX)    = (WaterFlow2MicPM_3D(M,3,NU(NY,NX),NY,NX)+WaterFlow2MacPM_3D(M,3,NU(NY,NX),NY,NX))*dt_GasCyc
 !
 !     SURFACE EXCHANGE OF AQUEOUS CO2, CH4, O2, N2, NH3
 !     THROUGH VOLATILIZATION-DISSOLUTION FROM AQUEOUS
@@ -808,12 +808,12 @@ contains
 
         if(.not.isclose(VFLW,0._r8))then
           DO ngas=idg_beg,idg_NH3
-            trcg_2DSnowDrift(ngas,N,N5,N4)=VFLW*AZMAX1(trcg_solsml2_snvr(ngas,1,N5,N4))
-            trcg_FloXSnow_2DH(ngas,N,N5,N4)=trcg_FloXSnow_2DH(ngas,N,N5,N4)+trcg_2DSnowDrift(ngas,N,N5,N4)
+            trcg_2DSnowDrift(ngas,N,N5,N4)  = VFLW*AZMAX1(trcg_solsml2_snvr(ngas,1,N5,N4))
+            trcg_FloXSnow_2DH(ngas,N,N5,N4) = trcg_FloXSnow_2DH(ngas,N,N5,N4)+trcg_2DSnowDrift(ngas,N,N5,N4)
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
-            trcn_2DSnowDrift(nnut,N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(nnut,1,N5,N4))
+            trcn_2DSnowDrift(nnut,N,N5,N4)=VFLW*AZMAX1(trcn_solsml2_snvr(nnut,1,N5,N4))
             trcn_FloXSnow_2DH(nnut,N,N5,N4)=trcn_FloXSnow_2DH(nnut,N,N5,N4)+trcn_2DSnowDrift(nnut,N,N5,N4)
           ENDDO
         endif  
@@ -1203,7 +1203,7 @@ contains
         ENDDO
 
         DO nnut=ids_nut_beg,ids_nuts_end
-          trcn_RBLS(nnut,L2,NY,NX)=trcn_solsml2(nnut,L,NY,NX)*VFLWW
+          trcn_RBLS(nnut,L2,NY,NX)=trcn_solsml2_snvr(nnut,L,NY,NX)*VFLWW
           trcn_Xbndl_flx(nnut,L2,NY,NX)=trcn_Xbndl_flx(nnut,L2,NY,NX)+trcn_RBLS(nnut,L2,NY,NX)
         ENDDO
       ELSE
@@ -1243,43 +1243,42 @@ contains
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
-            trcn_FloSno2LitR(nnut)=trcn_solsml2(nnut,L,NY,NX)*VFLWR
+            trcn_FloSno2LitR(nnut)=trcn_solsml2_snvr(nnut,L,NY,NX)*VFLWR
           ENDDO
 
-          trcg_VFloSnow(idg_CO2)=trcg_solsml2_snvr(idg_CO2,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_CH4)=trcg_solsml2_snvr(idg_CH4,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_O2)=trcg_solsml2_snvr(idg_O2,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_N2)=trcg_solsml2_snvr(idg_N2,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_N2O)=trcg_solsml2_snvr(idg_N2O,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_NH3)=trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
-          trcg_VFloSnow(idg_NH3B)=trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
+          trcg_VFloSnow(idg_CO2)  = trcg_solsml2_snvr(idg_CO2,L,NY,NX)*VFLWS
+          trcg_VFloSnow(idg_CH4)  = trcg_solsml2_snvr(idg_CH4,L,NY,NX)*VFLWS
+          trcg_VFloSnow(idg_O2)   = trcg_solsml2_snvr(idg_O2,L,NY,NX)*VFLWS
+          trcg_VFloSnow(idg_N2)   = trcg_solsml2_snvr(idg_N2,L,NY,NX)*VFLWS
+          trcg_VFloSnow(idg_N2O)  = trcg_solsml2_snvr(idg_N2O,L,NY,NX)*VFLWS
+          trcg_VFloSnow(idg_NH3)  = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
+          trcg_VFloSnow(idg_NH3B) = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
 
-          trcn_soil_VFloSnow(ids_NH4)=trcn_solsml2(ids_NH4,L,NY,NX)*VFLWNH4
-          trcn_soil_VFloSnow(ids_NO3)=trcn_solsml2(ids_NO3,L,NY,NX)*VFLWNO3
-          trcn_soil_VFloSnow(ids_H1PO4)=trcn_solsml2(ids_H1PO4,L,NY,NX)*VFLWPO4
-          trcn_soil_VFloSnow(ids_H2PO4)=trcn_solsml2(ids_H2PO4,L,NY,NX)*VFLWPO4
-          
-          trcn_band_VFloSnow(ids_NH4B)=trcn_solsml2(ids_NH4,L,NY,NX)*VFLWNHB
-          trcn_band_VFloSnow(ids_NO3B)=trcn_solsml2(ids_NO3,L,NY,NX)*VFLWNOB
-          trcn_band_VFloSnow(ids_H1PO4B)=trcn_solsml2(ids_H1PO4,L,NY,NX)*VFLWPOB
-          trcn_band_VFloSnow(ids_H2PO4B)=trcn_solsml2(ids_H2PO4,L,NY,NX)*VFLWPOB
-          ICHKL=1
+          trcn_soil_VFloSnow(ids_NH4)    = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNH4
+          trcn_soil_VFloSnow(ids_NO3)    = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNO3
+          trcn_soil_VFloSnow(ids_H1PO4)  = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPO4
+          trcn_soil_VFloSnow(ids_H2PO4)  = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPO4
+          trcn_band_VFloSnow(ids_NH4B)   = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNHB
+          trcn_band_VFloSnow(ids_NO3B)   = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNOB
+          trcn_band_VFloSnow(ids_H1PO4B) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
+          trcn_band_VFloSnow(ids_H2PO4B) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
+          ICHKL                          = 1
         ENDIF
       ENDIF
     ELSE
-      trcg_FloSno2LitR(idg_beg:idg_NH3)=0.0_r8
-      trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)=0.0_r8
-      trcg_VFloSnow(idg_beg:idg_end)=0.0_r8
+      trcg_FloSno2LitR(idg_beg:idg_NH3)          = 0.0_r8
+      trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end) = 0.0_r8
+      trcg_VFloSnow(idg_beg:idg_end)             = 0.0_r8
 
-      trcn_soil_VFloSnow(ids_NH4)=0.0_r8
-      trcn_soil_VFloSnow(ids_NO3)=0.0_r8
-      trcn_soil_VFloSnow(ids_H1PO4)=0.0_r8
-      trcn_soil_VFloSnow(ids_H2PO4)=0.0_r8
-      trcn_band_VFloSnow(ids_NH4B)=0.0_r8
+      trcn_soil_VFloSnow(ids_NH4)   = 0.0_r8
+      trcn_soil_VFloSnow(ids_NO3)   = 0.0_r8
+      trcn_soil_VFloSnow(ids_H1PO4) = 0.0_r8
+      trcn_soil_VFloSnow(ids_H2PO4) = 0.0_r8
+      trcn_band_VFloSnow(ids_NH4B)  = 0.0_r8
 
-      trcn_band_VFloSnow(ids_NO3B)=0.0_r8
-      trcn_band_VFloSnow(ids_H1PO4B)=0.0_r8
-      trcn_band_VFloSnow(ids_H2PO4B)=0.0_r8
+      trcn_band_VFloSnow(ids_NO3B)   = 0.0_r8
+      trcn_band_VFloSnow(ids_H1PO4B) = 0.0_r8
+      trcn_band_VFloSnow(ids_H2PO4B) = 0.0_r8
     ENDIF
   ENDDO
   end subroutine SoluteFluxSnowpackDischrg
