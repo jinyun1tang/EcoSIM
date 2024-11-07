@@ -1189,7 +1189,7 @@ contains
   DO  L=1,JS
     IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+      IF(L.LT.JS .AND. VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         !water flow from L to L2
         IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
@@ -1198,8 +1198,8 @@ contains
           VFLWW=1.0_r8
         ENDIF
         DO ngas=idg_beg,idg_NH3
-          trcg_advW_snvr(ngas,L2,NY,NX)=trcg_solsml2_snvr(ngas,L,NY,NX)*VFLWW
-          trcg_Xbndl_flx(ngas,L2,NY,NX)=trcg_Xbndl_flx(ngas,L2,NY,NX)+trcg_advW_snvr(ngas,L2,NY,NX)
+          trcg_advW_snvr(ngas,L2,NY,NX) = trcg_solsml2_snvr(ngas,L,NY,NX)*VFLWW
+          trcVolatile_Xbndl_flx_snvr(ngas,L2,NY,NX) = trcVolatile_Xbndl_flx_snvr(ngas,L2,NY,NX)+trcg_advW_snvr(ngas,L2,NY,NX)
         ENDDO
 
         DO nnut=ids_nut_beg,ids_nuts_end

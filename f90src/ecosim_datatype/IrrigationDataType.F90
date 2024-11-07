@@ -27,7 +27,6 @@ module IrrigationDataType
   real(r8),target,allocatable ::  TDIRI(:,:,:)                      !accumulated change  for irrigation, [-]
   real(r8),target,allocatable ::  PHQ(:,:,:)                        !surface irrigation  pH, [-]
   real(r8),target,allocatable ::  NH4_irrig_conc(:,:,:)                       !surface irrigation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH3_irrig_conc(:,:,:)                       !surface irrigation  NH3 concentration, [g m-3]
   real(r8),target,allocatable ::  NO3_irrig_conc(:,:,:)                       !surface irrigation  NO3 concentration, [g m-3]
   real(r8),target,allocatable ::  H2PO4_irrig_conc(:,:,:)                       !surface irrigation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALQ(:,:,:)                       !surface irrigation  Al concentration, [g m-3]
@@ -74,11 +73,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CM1PQ(:,:,:)                      !surface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CSTRQ(:,:,:)                      !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  CSTRR(:,:)                        !surface irrigation ion strength, [g m-3]
-  real(r8),target,allocatable ::  CO2_irrig_conc(:,:)                         !surface irrigation  CO2 concentration, [g m-3]
-  real(r8),target,allocatable ::  CH4_irrig_conc(:,:)                         !surface irrigation  CH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  O2_irrig_conc(:,:)                         !surface irrigation  O2 concentration, [g m-3]
-  real(r8),target,allocatable ::  N2_irrig_conc(:,:)                         !surface irrigation  N2 concentration, [g m-3]
-  real(r8),target,allocatable ::  N2O_irrig_conc(:,:)                         !surface irrigation  N2O concentration, [g m-3]
+  real(r8),target,allocatable ::  trcVolatile_irrig_conc(:,:,:)     !surface irrigation  volatile concentration, [g m-3]
   real(r8),target,allocatable ::  COCU(:,:,:,:)                     !subsurface irrigation  DOC concentration, [g m-3]
   real(r8),target,allocatable ::  CONU(:,:,:,:)                     !subsurface irrigation  DON concentration, [g m-3]
   real(r8),target,allocatable ::  COAU(:,:,:,:)                     !subsurface irrigation  acetate concentration, [g m-3]
@@ -109,7 +104,7 @@ module IrrigationDataType
 
   allocate(PHQ(366,JY,JX));     PHQ=0._r8
   allocate(NH4_irrig_conc(366,JY,JX));    NH4_irrig_conc=0._r8
-  allocate(NH3_irrig_conc(366,JY,JX));    NH3_irrig_conc=0._r8
+  allocate(trcVolatile_irrig_conc(idg_beg:idg_end-1,JY,JX));   trcVolatile_irrig_conc=0._r8
   allocate(NO3_irrig_conc(366,JY,JX));    NO3_irrig_conc=0._r8
   allocate(H2PO4_irrig_conc(366,JY,JX));    H2PO4_irrig_conc=0._r8
   allocate(CALQ(366,JY,JX));    CALQ=0._r8
@@ -166,11 +161,6 @@ module IrrigationDataType
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
   allocate(TDIRI(12,JY,JX));    TDIRI=0._r8
   allocate(CSTRR(JY,JX));       CSTRR=0._r8
-  allocate(CO2_irrig_conc(JY,JX));        CO2_irrig_conc=0._r8
-  allocate(CH4_irrig_conc(JY,JX));        CH4_irrig_conc=0._r8
-  allocate(O2_irrig_conc(JY,JX));        O2_irrig_conc=0._r8
-  allocate(N2_irrig_conc(JY,JX));        N2_irrig_conc=0._r8
-  allocate(N2O_irrig_conc(JY,JX));        N2O_irrig_conc=0._r8
   allocate(COCU(1:jcplx,JZ,JY,JX)); COCU=0._r8
   allocate(CONU(1:jcplx,JZ,JY,JX)); CONU=0._r8
   allocate(COAU(1:jcplx,JZ,JY,JX)); COAU=0._r8
@@ -194,7 +184,6 @@ module IrrigationDataType
   call destroy(trcs_Irrig_vr)
   call destroy(PHQ)
   call destroy(NH4_irrig_conc)
-  call destroy(NH3_irrig_conc)
   call destroy(NO3_irrig_conc)
   call destroy(H2PO4_irrig_conc)
   call destroy(CALQ)
@@ -250,11 +239,7 @@ module IrrigationDataType
   call destroy(DIRRA)
   call destroy(TDIRI)
   call destroy(CSTRR)
-  call destroy(CO2_irrig_conc)
-  call destroy(CH4_irrig_conc)
-  call destroy(O2_irrig_conc)
-  call destroy(N2_irrig_conc)
-  call destroy(N2O_irrig_conc)
+  call destroy(trcVolatile_irrig_conc)
   call destroy(trcsalt_subirrig_conc)
   call destroy(COCU)
   call destroy(CONU)

@@ -58,7 +58,7 @@ implicit none
   real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)   !
-
+  
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
   real(r8),pointer   :: h1D_Qdrain_col(:)          !drainage
   real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -75,7 +75,8 @@ implicit none
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
   real(r8),pointer   :: h1D_tLITR_N_col(:)       !litter N
-  real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton
+  real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton profile 
+  real(r8),pointer   :: h1D_RootAR_col(:)        !integrated Root autotrophic respiraiton
   real(r8),pointer   :: h2D_BotDEPZ_vr(:,:)
   real(r8),pointer   :: h1D_tRAD_col(:)
   real(r8),pointer   :: h1D_tHeatUptk_col(:)
@@ -112,6 +113,8 @@ implicit none
   real(r8),pointer   :: h1D_ECO_RA_col(:)         !Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_Eco_NPP_CumYr_col(:)        !Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_Eco_HR_CumYr_col(:)         !Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Eco_HR_CO2_col(:)   
+!  real(r8),pointer   :: h1D_Eco_HR_CH4_col(:)   
   real(r8),pointer   :: h1D_tDIC_col(:)        !DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
   real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)       !StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -470,6 +473,7 @@ implicit none
   allocate(this%h1D_SURF_ELEV_col(beg_col:end_col))      ;this%h1D_SURF_ELEV_col(:)=spval
   allocate(this%h1D_tLITR_C_col(beg_col:end_col));this%h1D_tLITR_C_col(:)=spval
   allocate(this%h1D_tLITR_N_col(beg_col:end_col));this%h1D_tLITR_N_col(:)=spval
+  allocate(this%h1D_RootAR_col(beg_col:end_col)); this%h1D_RootAR_col(:)=spval
   allocate(this%h1D_tRAD_col(beg_col:end_col)); this%h1D_tRAD_col(:)=spval
   allocate(this%h2D_BotDEPZ_vr(beg_col:end_col,1:JZ)); this%h2D_BotDEPZ_vr(:,:)=spval
   allocate(this%h1D_AMENDED_N_col(beg_col:end_col))       ;this%h1D_AMENDED_N_col(:)=spval
@@ -499,6 +503,8 @@ implicit none
   allocate(this%h1D_ECO_RA_col(beg_col:end_col))          ;this%h1D_ECO_RA_col(:)=spval
   allocate(this%h1D_Eco_NPP_CumYr_col(beg_col:end_col))         ;this%h1D_Eco_NPP_CumYr_col(:)=spval
   allocate(this%h1D_Eco_HR_CumYr_col(beg_col:end_col))          ;this%h1D_Eco_HR_CumYr_col(:)=spval
+  allocate(this%h1D_Eco_HR_CO2_col(beg_col:end_col));  this%h1D_Eco_HR_CO2_col(:)=spval
+!  allocate(this%h1D_Eco_HR_CH4_col(beg_col:end_col));  this%h1D_Eco_HR_CH4_col(:)=spval
   allocate(this%h1D_tDIC_col(beg_col:end_col))            ;this%h1D_tDIC_col=spval
   allocate(this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_C_col=spval 
   allocate(this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_N_col=spval  
@@ -833,6 +839,10 @@ implicit none
   call hist_addfld1d(fname='tLITR_N',units='gN/m2',avgflag='A',&
     long_name='column integrated total litter N',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_RootAR_col(beg_col:end_col)
+  call hist_addfld1d(fname='Root_AR',units='gC/m2/h',avgflag='A',&
+    long_name='column integrated Root respiration',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_tLITR_P_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITR_P',units='gP/m2',avgflag='A',&
     long_name='column integrated total litter P',ptr_col=data1d_ptr)      
@@ -1071,6 +1081,14 @@ implicit none
   data1d_ptr => this%h1D_Eco_HR_CumYr_col(beg_col:end_col)      
   call hist_addfld1d(fname='ECO_RH',units='gC/m2',avgflag='A',&
     long_name='cumulative ecosystem heterotrophic respiration',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Eco_HR_CO2_col(beg_col:end_col)
+  call hist_addfld1d(fname='ECO_RH_CO2',units='gC/m2/hr',avgflag='A',&
+    long_name='Ecosystem heterotrophic respiration as CO2',ptr_col=data1d_ptr)      
+
+!  data1d_ptr => this%h1D_Eco_HR_CH4_col(beg_col:end_col)
+!  call hist_addfld1d(fname='ECO_RH_CH4',units='gC/m2/hr',avgflag='A',&
+!    long_name='Ecosystem heterotrophic respiration as CH4',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tDIC_col(beg_col:end_col)       
   call hist_addfld1d(fname='tDIC',units='gC/m2',avgflag='A',&
@@ -2142,28 +2160,28 @@ implicit none
     long_name='root total water potential of each pft',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_Root1stStrutC_ptc(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='ROOTC_1st_pvr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Primary root structural biomass C',ptr_patch=data2d_ptr)      
+  call hist_addfld2d(fname='ROOTC_1st_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Primary root structural biomass C density',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_Root1stStrutN_ptc(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='ROOTN_1st_pvr',units='gN/m2',type2d='levsoi',avgflag='A',&
-    long_name='Primary root structural biomass N',ptr_patch=data2d_ptr)      
+  call hist_addfld2d(fname='ROOTN_1st_pvr',units='gN/m3',type2d='levsoi',avgflag='A',&
+    long_name='Primary root structural biomass N density',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_Root1stStrutP_ptc(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='ROOTP_1st_pvr',units='gP/m2',type2d='levsoi',avgflag='A',&
-    long_name='Primary root structural biomass P',ptr_patch=data2d_ptr)      
+  call hist_addfld2d(fname='ROOTP_1st_pvr',units='gP/m3',type2d='levsoi',avgflag='A',&
+    long_name='Primary root structural biomass P density',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_Root2ndStrutC_ptc(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='ROOTC_2nd_pvr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Secondary root structural biomass C',ptr_patch=data2d_ptr)      
+  call hist_addfld2d(fname='ROOTC_2nd_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Secondary root structural biomass C density',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_Root2ndStrutN_ptc(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='ROOTN_2nd_pvr',units='gN/m2',type2d='levsoi',avgflag='A',&
-    long_name='Secondary root structural biomass N',ptr_patch=data2d_ptr)      
+  call hist_addfld2d(fname='ROOTN_2nd_pvr',units='gN/m3',type2d='levsoi',avgflag='A',&
+    long_name='Secondary root structural biomass N density',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_Root2ndStrutP_ptc(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='ROOTP_2nd_pvr',units='gP/m2',type2d='levsoi',avgflag='A',&
-    long_name='Secondary root structural biomass P',ptr_patch=data2d_ptr)      
+  call hist_addfld2d(fname='ROOTP_2nd_pvr',units='gP/m3',type2d='levsoi',avgflag='A',&
+    long_name='Secondary root structural biomass P density',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%h2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='prtUP_NH4_vr',units='gN/m3/hr',type2d='levsoi',avgflag='A',&
@@ -2304,6 +2322,8 @@ implicit none
       this%h1D_ECO_RA_col(ncol)           = Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Eco_NPP_CumYr_col(ncol)    = Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Eco_HR_CumYr_col(ncol)     = Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Eco_HR_CO2_col(ncol)       = ECO_HR_CO2_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+!      this%h1D_Eco_HR_CH4_col(ncol)       = ECO_HR_CH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tDIC_col(ncol)             = DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_C_col(ncol) = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_N_col(ncol) = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2391,24 +2411,24 @@ implicit none
       this%h2D_H2MethogenE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA(3,NU(NY,NX),NY,NX)
 
       call sumDOML(0,NY,NX,DOM)
-      this%h1D_DOC_LITR_col(ncol)=DOM(idom_doc)
-      this%h1D_DON_LITR_col(ncol)=DOM(idom_don)
-      this%h1D_DOP_LITR_col(ncol)=DOM(idom_dop)
-      this%h1D_acetate_LITR_col(ncol)=DOM(idom_acetate)
+      this%h1D_DOC_LITR_col(ncol)     = DOM(idom_doc)
+      this%h1D_DON_LITR_col(ncol)     = DOM(idom_don)
+      this%h1D_DOP_LITR_col(ncol)     = DOM(idom_dop)
+      this%h1D_acetate_LITR_col(ncol) = DOM(idom_acetate)
 
       this%h1D_RCH4ProdHydrog_litr_col(ncol) = RCH4ProdHydrog_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RCH4Oxi_aero_litr_col(ncol)=RCH4Oxi_aero_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_RFermen_litr_col(ncol)=RFerment_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_nh3oxi_litr_col(ncol)=RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_n2oprod_litr_col(ncol)= (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
+      this%h1D_RCH4Oxi_aero_litr_col(ncol)   = RCH4Oxi_aero_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RFermen_litr_col(ncol)        = RFerment_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_nh3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_n2oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
                                +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
 
-
+      this%h1D_RootAR_col(ncol) = 0._r8
       DO L=1,JZ        
         DVOLL=DLYR(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 
-        if(DVOLL<=0._r8)cycle
+        if(DVOLL<=1.e-8_r8)cycle
         this%h2D_RootMassC_vr(ncol,L)     = RootMassElm_vr(ielmc,L,NY,NX)/DVOLL
         this%h2D_RootMassN_vr(ncol,L)     = RootMassElm_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_RootMassP_vr(ncol,L)     = RootMassElm_vr(ielmp,L,NY,NX)/DVOLL                
@@ -2525,7 +2545,9 @@ implicit none
         this%h2D_n2oprod_vr(ncol,L)        = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
                                +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RootAR_vr(ncol,L) = -RootCO2Autor_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_RootAR_col(ncol) = this%h1D_RootAR_col(ncol)-RootCO2Autor_vr(L,NY,NX)
       ENDDO
+      this%h1D_RootAR_col(ncol) = this%h1D_RootAR_col(ncol)/AREA(3,NU(NY,NX),NY,NX)
 
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
@@ -2675,6 +2697,8 @@ implicit none
           ENDDO
         endif
         DO L=1,JZ
+          DVOLL=DLYR(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+          if(DVOLL<1.e-8_r8)cycle
           this%h2D_PSI_RT_vr_ptc(nptc,L)    = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)
           this%h2D_prtUP_NH4_vr_ptc(nptc,L) = (sum(RootNutUptake_pvr(ids_NH4,:,L,NZ,NY,NX))+&
             sum(RootNutUptake_pvr(ids_NH4B,:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
@@ -2691,7 +2715,6 @@ implicit none
           this%h2D_Root2ndStrutC_ptc(nptc,L)=0._r8
           this%h2D_Root2ndStrutN_ptc(nptc,L)=0._r8
           this%h2D_Root2ndStrutP_ptc(nptc,L)=0._r8
-
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stStrutC_ptc(nptc,L)= this%h2D_Root1stStrutC_ptc(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
@@ -2700,13 +2723,18 @@ implicit none
             this%h2D_Root1stStrutP_ptc(nptc,L)= this%h2D_Root1stStrutP_ptc(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)
             this%h2D_Root2ndStrutC_ptc(nptc,L)=this%h2D_Root2ndStrutC_ptc(nptc,L) + &
-             RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)            
+             RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
             this%h2D_Root2ndStrutN_ptc(nptc,L)=this%h2D_Root2ndStrutN_ptc(nptc,L) + &
-             RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)            
+             RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)
             this%h2D_Root2ndStrutP_ptc(nptc,L)=this%h2D_Root2ndStrutP_ptc(nptc,L) + &
-             RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)            
+             RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)
           ENDDO
-
+          this%h2D_Root1stStrutC_ptc(nptc,L)= this%h2D_Root1stStrutC_ptc(nptc,L)/DVOLL            
+          this%h2D_Root1stStrutN_ptc(nptc,L)= this%h2D_Root1stStrutN_ptc(nptc,L)/DVOLL            
+          this%h2D_Root1stStrutP_ptc(nptc,L)= this%h2D_Root1stStrutP_ptc(nptc,L)/DVOLL            
+          this%h2D_Root2ndStrutC_ptc(nptc,L)=this%h2D_Root2ndStrutC_ptc(nptc,L)/DVOLL            
+          this%h2D_Root2ndStrutN_ptc(nptc,L)=this%h2D_Root2ndStrutN_ptc(nptc,L)/DVOLL            
+          this%h2D_Root2ndStrutP_ptc(nptc,L)=this%h2D_Root2ndStrutP_ptc(nptc,L)/DVOLL            
         ENDDO
       ENDDO 
     ENDDO 

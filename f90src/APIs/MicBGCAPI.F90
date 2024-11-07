@@ -93,24 +93,21 @@ implicit none
              call sumMicBiomLayL(L,NY,NX,OrGM_beg)
              call MicBGC1Layer(I,J,L,NY,NX)
              call sumMicBiomLayL(L,NY,NX,dOrGM)
-             dOrGM=dOrGM-OrGM_beg
-             tdOrGM=tdOrGM+dOrGM
+             dOrGM  = dOrGM-OrGM_beg
+             tdOrGM = tdOrGM+dOrGM
           ELSE
-
-            trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
-
-            RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX)=0.0_r8
-
-            Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
+            trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+            RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
+            Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
 
           call DownwardMixOM(I,J,L,NY,NX)
 
         ELSE
-          trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX)=0.0_r8
-          Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
+          trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+          RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
+          Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
         ENDIF
       ENDDO D998
 !
@@ -166,8 +163,8 @@ implicit none
   micfor%ZERO                = ZERO
   micfor%CCH4E               = AtmGasCgperm3(idg_CH4,NY,NX)
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
-  micfor%O2_irrig_conc       = O2_irrig_conc(NY,NX)
-  micfor%O2_rain_conc        = O2_rain_conc(NY,NX)
+  micfor%O2_irrig_conc       = trcVolatile_irrig_conc(idg_O2,NY,NX)
+  micfor%O2_rain_conc        = trcVolatile_rain_conc(idg_O2,NY,NX)
   micfor%Irrig2LitRSurf      = Irrig2LitRSurf(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)

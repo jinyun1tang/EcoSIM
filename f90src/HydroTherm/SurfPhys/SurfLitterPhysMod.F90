@@ -444,7 +444,7 @@ implicit none
     tk1pre             = TKR1
     TKR1               = (ENGYR+HeatFluxAir2LitR2+PrecHeat2LitR2-HeatSensVapLitR2Soi2-HeatSensLitR2Soi2)/VLHeatCapcityLitR2
     TKS1               = TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
-    write(124,*)'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
+!    write(124,*)'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
 !    print*,'cplitr',NN,VLHeatCapcityLitR2,SoilOrgM_vr(ielmc,0,NY,NX),VWatLitr2,VLiceMicP1_vr(0,NY,NX)
   ENDDO D5000
   end subroutine SurfLitterIteration

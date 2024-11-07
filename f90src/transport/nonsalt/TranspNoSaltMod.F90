@@ -489,7 +489,6 @@ module TranspNoSaltMod
   !reset DOM to value before the iteration
   D9979: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-!      DOM_MicP2(idom,K,0,NY,NX)=AZMAX1(DOM_vr(idom,K,0,NY,NX)-RDOMMicProd_vr(idom,K,0,NY,NX))      
       DOM_MicP2(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)
     ENDDO
   ENDDO D9979
@@ -499,12 +498,12 @@ module TranspNoSaltMod
     trc_solml2_vr(NTS,0,NY,NX)=trc_solml_vr(NTS,0,NY,NX)
   ENDDO
 
-  trc_solml2_vr(ids_H1PO4B,0,NY,NX)=trc_solml2_vr(ids_H1PO4,0,NY,NX)
-  trc_solml2_vr(ids_H2PO4B,0,NY,NX)=trc_solml2_vr(ids_H2PO4,0,NY,NX)
-  trc_solml2_vr(ids_NO3B,0,NY,NX)=trc_solml2_vr(ids_NO3,0,NY,NX)
-  trc_solml2_vr(ids_NO2B,0,NY,NX)=trc_solml2_vr(ids_NO2,0,NY,NX)
-  trc_solml2_vr(ids_NH4B,0,NY,NX)=trc_solml2_vr(ids_NH4,0,NY,NX)
-  trc_solml2_vr(idg_NH3B,0,NY,NX)=trc_solml2_vr(idg_NH3,0,NY,NX)
+  trc_solml2_vr(ids_H1PO4B,0,NY,NX) = trc_solml2_vr(ids_H1PO4,0,NY,NX)
+  trc_solml2_vr(ids_H2PO4B,0,NY,NX) = trc_solml2_vr(ids_H2PO4,0,NY,NX)
+  trc_solml2_vr(ids_NO3B,0,NY,NX)   = trc_solml2_vr(ids_NO3,0,NY,NX)
+  trc_solml2_vr(ids_NO2B,0,NY,NX)   = trc_solml2_vr(ids_NO2,0,NY,NX)
+  trc_solml2_vr(ids_NH4B,0,NY,NX)   = trc_solml2_vr(ids_NH4,0,NY,NX)
+  trc_solml2_vr(idg_NH3B,0,NY,NX)   = trc_solml2_vr(idg_NH3,0,NY,NX)
 
   end subroutine StateVarforGasandSolute
 !------------------------------------------------------------------------------------------
@@ -529,14 +528,13 @@ module TranspNoSaltMod
 
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-
+  integer :: idg
   IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
-    trcg_Xbndl_flx(idg_CO2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CO2_irrig_conc(NY,NX)
-    trcg_Xbndl_flx(idg_CH4,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CH4_irrig_conc(NY,NX)
-    trcg_Xbndl_flx(idg_O2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*O2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*O2_irrig_conc(NY,NX)
-    trcg_Xbndl_flx(idg_N2,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*N2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2_irrig_conc(NY,NX)
-    trcg_Xbndl_flx(idg_N2O,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*N2O_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2O_irrig_conc(NY,NX)
-    trcg_Xbndl_flx(idg_NH3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH3_irrig_conc(I,NY,NX))*natomw
+
+    DO idg=idg_beg,idg_end-1
+      trcVolatile_Xbndl_flx_snvr(idg,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
+        +Irrig2SoilSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
+    ENDDO
 
     trcn_Xbndl_flx(ids_NH4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw
     trcn_Xbndl_flx(ids_NO3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw
@@ -548,8 +546,8 @@ module TranspNoSaltMod
 !
 !     X*FLS,X*FLB=hourly solute flux to micropores in non-band,band
 !
-    trcs_Transp2MicP_3D(ids_beg:ids_end,3,0,NY,NX)=0.0_r8
-    trcs_Transp2MicP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)=0.0_r8
+    trcs_Transp2MicP_3D(ids_beg:ids_end,3,0,NY,NX)         = 0.0_r8
+    trcs_Transp2MicP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX) = 0.0_r8
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
@@ -573,36 +571,27 @@ module TranspNoSaltMod
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
 !
-    trcg_Xbndl_flx(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
+    trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
     trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
-
-    trcs_Transp2MicP_3D(idg_CO2,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*CO2_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_CH4,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*CH4_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_O2,3,0,NY,NX)  = Rain2LitRSurf_col(NY,NX)*O2_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*O2_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_N2,3,0,NY,NX)  = Rain2LitRSurf_col(NY,NX)*N2_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*N2_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_N2O,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*N2O_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*N2O_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_H2,3,0,NY,NX)  = 0.0_r8
-
+    do idg=idg_beg,idg_NH3
+      trcs_Transp2MicP_3D(idg,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
+        +Irrig2LitRSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
+      trcs_Transp2MicP_3D(idg,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
+        +Irrig2SoilSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
+    ENDDO
 !    write(115,*)I+J/24.,'tp1',trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX)
     trcs_Transp2MicP_3D(ids_NH4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NH4_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw
-    trcs_Transp2MicP_3D(idg_NH3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NH3_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*NH3_irrig_conc(I,NY,NX))*natomw
+    trcs_Transp2MicP_3D(idg_NH3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg_NH3,NY,NX)+Irrig2LitRSurf(NY,NX)*trcVolatile_irrig_conc(idg_NH3,NY,NX))*natomw
     trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NO3_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw
     trcs_Transp2MicP_3D(ids_NO2,3,0,NY,NX)=0.0_r8
     trcs_Transp2MicP_3D(ids_H1PO4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*HPO4_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*HPO4_irrig_conc(I,NY,NX))*patomw
     trcs_Transp2MicP_3D(ids_H2PO4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_conc(NY,NX)+Irrig2LitRSurf(NY,NX)*H2PO4_irrig_conc(I,NY,NX))*patomw
 !    write(115,*)I+J/24.,'tp2',trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX)
 
-    trcs_Transp2MicP_3D(idg_CO2,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*CO2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CO2_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_CH4,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*CH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*CH4_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_O2,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*O2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*O2_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_N2,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*N2_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_N2O,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*N2O_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*N2O_irrig_conc(NY,NX)
-    trcs_Transp2MicP_3D(idg_H2,3,NU(NY,NX),NY,NX)=0.0_r8
-
     trcs_Transp2MicP_3D(ids_NH4,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX) &
       +Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
-    trcs_Transp2MicP_3D(idg_NH3,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NH3_rain_conc(NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*NH3_irrig_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
+    trcs_Transp2MicP_3D(idg_NH3,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*trcVolatile_rain_conc(idg_NH3,NY,NX) &
+      +Irrig2SoilSurf(NY,NX)*trcVolatile_irrig_conc(idg_NH3,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
     trcs_Transp2MicP_3D(ids_NO3,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX) &
       +Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
 
@@ -613,8 +602,8 @@ module TranspNoSaltMod
       +Irrig2SoilSurf(NY,NX)*H2PO4_irrig_conc(I,NY,NX))*patomw)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
     trcs_Transp2MicP_3D(ids_NH4B,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX) &
       +Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
-    trcs_Transp2MicP_3D(idg_NH3B,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NH3_rain_conc(NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*NH3_irrig_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
+    trcs_Transp2MicP_3D(idg_NH3B,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*trcVolatile_rain_conc(idg_NH3,NY,NX) &
+      +Irrig2SoilSurf(NY,NX)*trcVolatile_irrig_conc(idg_NH3,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
     trcs_Transp2MicP_3D(ids_NO3B,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX) &
       +Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
     trcs_Transp2MicP_3D(ids_NO2B,3,NU(NY,NX),NY,NX)=0.0_r8
@@ -626,12 +615,12 @@ module TranspNoSaltMod
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
   ELSE
-    trcg_Xbndl_flx(idg_beg:idg_end-1,1,NY,NX)=0.0_r8
-    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX)=0.0_r8
+    trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
+    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
 
-    trcs_Transp2MicP_3D(idg_beg:idg_end-1,3,0,NY,NX)=0.0_r8
-    trcs_Transp2MicP_3D(ids_nut_beg:ids_nuts_end,3,0,NY,NX)=0.0_r8
-    trcs_Transp2MicP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)=0.0_r8
+    trcs_Transp2MicP_3D(idg_beg:idg_end-1,3,0,NY,NX)        = 0.0_r8
+    trcs_Transp2MicP_3D(ids_nut_beg:ids_nuts_end,3,0,NY,NX) = 0.0_r8
+    trcs_Transp2MicP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)  = 0.0_r8
 
   ENDIF
 
@@ -655,7 +644,7 @@ module TranspNoSaltMod
   enddo
 
   DO NTG=idg_beg,idg_end-1
-    trcg_advW_snvr(idg_CO2,1,NY,NX)=trcg_Xbndl_flx(idg_CO2,1,NY,NX)*dts_HeatWatTP
+    trcg_advW_snvr(idg_CO2,1,NY,NX)=trcVolatile_Xbndl_flx_snvr(idg_CO2,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO NTN=ids_nut_beg,ids_nuts_end
@@ -755,20 +744,20 @@ module TranspNoSaltMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    trcs_Irrig_vr(idg_CO2,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*CO2_irrig_conc(NY,NX)
-    trcs_Irrig_vr(idg_CH4,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*CH4_irrig_conc(NY,NX)
-    trcs_Irrig_vr(idg_O2,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*O2_irrig_conc(NY,NX)
-    trcs_Irrig_vr(idg_N2,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*N2_irrig_conc(NY,NX)
-    trcs_Irrig_vr(idg_N2O,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*N2O_irrig_conc(NY,NX)
+    trcs_Irrig_vr(idg_CO2,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_CO2,NY,NX)
+    trcs_Irrig_vr(idg_CH4,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_CH4,NY,NX)
+    trcs_Irrig_vr(idg_O2,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_O2,NY,NX)
+    trcs_Irrig_vr(idg_N2,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_N2,NY,NX)
+    trcs_Irrig_vr(idg_N2O,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_N2O,NY,NX)
     trcs_Irrig_vr(idg_H2,L,NY,NX)=0.0_r8
 
     trcs_Irrig_vr(ids_NH4,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*NH4_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
-    trcs_Irrig_vr(idg_NH3,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*NH3_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trcs_Irrig_vr(idg_NH3,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_NH3,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
     trcs_Irrig_vr(ids_NO3,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*NO3_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
     trcs_Irrig_vr(ids_H1PO4,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*HPO4_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
     trcs_Irrig_vr(ids_H2PO4,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*H2PO4_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
     trcs_Irrig_vr(ids_NH4B,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*NH4_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
-    trcs_Irrig_vr(idg_NH3B,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*NH3_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trcs_Irrig_vr(idg_NH3B,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_NH3,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
     trcs_Irrig_vr(ids_NO3B,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*NO3_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*natomw
     trcs_Irrig_vr(ids_H1PO4B,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*HPO4_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
     trcs_Irrig_vr(ids_H2PO4B,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*H2PO4_irrig_conc(I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw

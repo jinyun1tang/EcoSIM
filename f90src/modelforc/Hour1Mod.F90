@@ -338,26 +338,26 @@ module Hour1Mod
       AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3
       AtmGasCgperm3(idg_NH3B,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
 
-      CO2_rain_conc(NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA_col(NY,NX)) &
+      trcVolatile_rain_conc(idg_CO2,NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA_col(NY,NX)) &
          /(EXP(ACTCG(idg_CO2)*CSTRR(NY,NX)))
-      CH4_rain_conc(NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA_col(NY,NX)) &
+      trcVolatile_rain_conc(idg_CH4,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_CH4)*CSTRR(NY,NX)))
-      O2_rain_conc(NY,NX) = AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
+      trcVolatile_rain_conc(idg_O2,NY,NX) = AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*CSTRR(NY,NX)))
-      N2_rain_conc(NY,NX) = AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
+      trcVolatile_rain_conc(idg_N2,NY,NX) = AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2)*CSTRR(NY,NX)))
-      N2O_rain_conc(NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
+      trcVolatile_rain_conc(idg_N2O,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRR(NY,NX)))
 
-      CO2_irrig_conc(NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA_col(NY,NX)) &
+      trcVolatile_irrig_conc(idg_CO2,NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_CO2)*CSTRQ(I,NY,NX)))
-      CH4_irrig_conc(NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA_col(NY,NX)) &
+      trcVolatile_irrig_conc(idg_CH4,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_CH4)*CSTRQ(I,NY,NX)))
-      O2_irrig_conc(NY,NX) = AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
+      trcVolatile_irrig_conc(idg_O2,NY,NX) = AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*CSTRQ(I,NY,NX)))
-      N2_irrig_conc(NY,NX) = AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
+      trcVolatile_irrig_conc(idg_N2,NY,NX) = AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2)*CSTRQ(I,NY,NX)))
-      N2O_irrig_conc(NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
+      trcVolatile_irrig_conc(idg_N2O,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
         /(EXP(ACTCG(idg_N2O)*CSTRQ(I,NY,NX)))
       GDD_col(NY,NX) = GDD_col(NY,NX)+TCA_col(NY,NX)/24._r8
     ENDDO
@@ -731,6 +731,8 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  ECO_HR_CO2_col(NY,NX)                   = 0._r8
+  ECO_HR_CH4_col(NY,NX)                   = 0._r8  
   Eco_RadSW_col(NY,NX)                    = 0._r8
   RootCO2Autor_vr(:,NY,NX)                = 0._r8
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -757,7 +759,7 @@ module Hour1Mod
   HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
   TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
   TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
-  HeatByRad2Surf_col(NY,NX)              = 0.0_r8
+  HeatByRad2Surf_col(NY,NX)               = 0.0_r8
   HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
   HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
   HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
@@ -793,7 +795,7 @@ module Hour1Mod
   HeatXfer2SnoLay_snvr(1:JS,NY,NX)   = 0.0_r8
   XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0.0_r8
 
-  trcg_Xbndl_flx(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
+  trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
   trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
   IF(salt_model)THEN
     trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0.0_r8
@@ -2315,37 +2317,37 @@ module Hour1Mod
 
   integer :: K,L,NTSA
 !     begin_execution
+
   DO L=NUI(NY,NX),NLI(NY,NX)
-    FWatExMacP2MicP(L,NY,NX)=0.0_r8
-    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
-    tRootCO2Emis_vr(L,NY,NX)=0.0_r8
-    trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
-    tRO2MicrbUptk_vr(L,NY,NX)=0.0_r8
-    trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
+    FWatExMacP2MicP(L,NY,NX)                        = 0.0_r8
+    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)   = 0.0_r8
+    tRootCO2Emis_vr(L,NY,NX)                        = 0.0_r8
+    trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)         = 0.0_r8
+    tRO2MicrbUptk_vr(L,NY,NX)                       = 0.0_r8
+    trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX) = 0.0_r8
 
-    trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=0.0_r8
-    trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)=0.0_r8
-    trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=0.0_r8
-    trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)=0.0_r8
-    trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
-    trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
-    TR_CO2_aqu_soil_vr(L,NY,NX)=0.0_r8
-    Txchem_CO2_vr(L,NY,NX)=0.0_r8
-
+    trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0.0_r8
+    trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = 0.0_r8
+    trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = 0.0_r8
+    trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0.0_r8
+    trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0.0_r8
+    trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0.0_r8
+    TR_CO2_aqu_soil_vr(L,NY,NX)                 = 0.0_r8
+    Txchem_CO2_vr(L,NY,NX)                      = 0.0_r8
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0.0_r8
     trcx_TRSoilChem_vr(idx_OHeB:idx_end,L,NY,NX)=0.0_r8
 
-    TR_H_p_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_Al_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_Fe_sorbed_soil_vr(L,NY,NX)=0.0_r8
-    TR_Ca_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_Mg_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_Na_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_K_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_HCO3_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_AlO2H2_sorbed_soil(L,NY,NX)=0.0_r8
-    TR_FeO2H2_sorbed_soil_vr(L,NY,NX)=0.0_r8
+    TR_H_p_sorbed_soil(L,NY,NX)       = 0.0_r8
+    TR_Al_sorbed_soil(L,NY,NX)        = 0.0_r8
+    TR_Fe_sorbed_soil_vr(L,NY,NX)     = 0.0_r8
+    TR_Ca_sorbed_soil(L,NY,NX)        = 0.0_r8
+    TR_Mg_sorbed_soil(L,NY,NX)        = 0.0_r8
+    TR_Na_sorbed_soil(L,NY,NX)        = 0.0_r8
+    TR_K_sorbed_soil(L,NY,NX)         = 0.0_r8
+    TR_HCO3_sorbed_soil(L,NY,NX)      = 0.0_r8
+    TR_AlO2H2_sorbed_soil(L,NY,NX)    = 0.0_r8
+    TR_FeO2H2_sorbed_soil_vr(L,NY,NX) = 0.0_r8
 
     trcp_RChem_soil(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0.0_r8
 

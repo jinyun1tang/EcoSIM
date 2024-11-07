@@ -65,8 +65,8 @@ implicit none
         !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
         !
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
-            -trcg_Xbndl_flx(NTG,LS2,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
+            -trcVolatile_Xbndl_flx_snvr(NTG,LS2,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -102,7 +102,7 @@ implicit none
 
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
             -trcs_Transp2MicP_3D(NTG,3,0,N2,N1)-trcs_Transp2MicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
             -trcs_Transp2MacP_3D(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
@@ -144,7 +144,7 @@ implicit none
       IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end

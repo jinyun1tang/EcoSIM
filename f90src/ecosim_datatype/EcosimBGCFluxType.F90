@@ -15,10 +15,12 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  Eco_Heat_Latent_col(:,:)                           !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  Eco_Heat_Sens_col(:,:)                           !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  Eco_Heat_GrndSurf_col(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  Eco_GPP_CumYr_col(:,:)                          !ecosystem GPP, [g d-2 h-1]
-  real(r8),target,allocatable ::  Eco_AutoR_CumYr_col(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  Eco_NPP_CumYr_col(:,:)                          !ecosystem NPP, [g d-2 h-1]
-  real(r8),target,allocatable ::  Eco_HR_CumYr_col(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  Eco_GPP_CumYr_col(:,:)                          !cumulative ecosystem GPP, [g d-2]
+  real(r8),target,allocatable ::  Eco_AutoR_CumYr_col(:,:)                        !cumulative ecosystem autotrophic respiration, [gC d-2 h]
+  real(r8),target,allocatable ::  Eco_NPP_CumYr_col(:,:)                          !cumulative ecosystem NPP, [gC d-2]
+  real(r8),target,allocatable ::  Eco_HR_CumYr_col(:,:)                          !cumulative ecosystem heterotrophic respiration, [gC d-2]
+  real(r8),target,allocatable ::  ECO_HR_CO2_col(:,:)                            !heterotrophic respiration as CO2, [gC d-2]
+  real(r8),target,allocatable ::  ECO_HR_CH4_col(:,:)                            !heterotrophic respiration as CH4, [gC d-2]
   real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_col(:,:,:)                      !ecosystem harvest , [g d-2]
   real(r8),target,allocatable ::  NetNH4Mineralize_CumYr_col(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
   real(r8),target,allocatable ::  NetPO4Mineralize_CumYr_col(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
@@ -45,6 +47,8 @@ contains
   allocate(Eco_AutoR_CumYr_col(JY,JX));        Eco_AutoR_CumYr_col=0._r8
   allocate(Eco_NPP_CumYr_col(JY,JX));        Eco_NPP_CumYr_col=0._r8
   allocate(Eco_HR_CumYr_col(JY,JX));        Eco_HR_CumYr_col=0._r8
+  allocate(ECO_HR_CO2_col(JY,JX));          ECO_HR_CO2_col=0._r8
+  allocate(ECO_HR_CH4_col(JY,JX));          ECO_HR_CH4_col=0._r8
   allocate(EcoHavstElmnt_CumYr_col(NumPlantChemElms,JY,JX));      EcoHavstElmnt_CumYr_col=0._r8
   allocate(NetNH4Mineralize_CumYr_col(JY,JX));      NetNH4Mineralize_CumYr_col=0._r8
   allocate(NetPO4Mineralize_CumYr_col(JY,JX));      NetPO4Mineralize_CumYr_col=0._r8
@@ -71,6 +75,8 @@ contains
   call destroy(Eco_AutoR_CumYr_col)
   call destroy(Eco_NPP_CumYr_col)
   call destroy(Eco_HR_CumYr_col)
+  call destroy(ECO_HR_CO2_col)
+  call destroy(ECO_HR_CH4_col)
   call destroy(EcoHavstElmnt_CumYr_col)
   call destroy(NetNH4Mineralize_CumYr_col)
   call destroy(NetPO4Mineralize_CumYr_col)

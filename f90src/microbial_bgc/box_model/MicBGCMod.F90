@@ -967,29 +967,29 @@ module MicBGCMod
 !  ENDIF
 !
   IF(micpar%is_aerobic_hetr(N))THEN    
-    RespGrossHeter(NGL,K)=RGOMP*OxyLimterHeter(NGL,K)
-    RCO2ProdHeter(NGL,K)=RespGrossHeter(NGL,K)
-    RAcettProdHeter(NGL,K)=0.0_r8
-    RCH4ProdHeter(NGL,K)=0.0_r8
-    RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)*OxyLimterHeter(NGL,K)
-    RH2ProdHeter(NGL,K)=0.0_r8
-    tRGOMP=tRGOMP+RGOMP
+    RespGrossHeter(NGL,K)  = RGOMP*OxyLimterHeter(NGL,K)
+    RCO2ProdHeter(NGL,K)   = RespGrossHeter(NGL,K)
+    RAcettProdHeter(NGL,K) = 0.0_r8
+    RCH4ProdHeter(NGL,K)   = 0.0_r8
+    RO2Uptk4RespHeter(NGL,K) = RO2Dmnd4RespHeter(NGL,K)*OxyLimterHeter(NGL,K)
+    RH2ProdHeter(NGL,K)      = 0.0_r8
+    tRGOMP                   = tRGOMP+RGOMP
     !anaerboic fertmenting heterotrophs
   ELSEIF(micpar%is_anaerobic_hetr(N))THEN
     !fermentation  (CH2O)6 -> 2CO2 + 2(CH2O)2  
-    RespGrossHeter(NGL,K)=RGOMP
-    RCO2ProdHeter(NGL,K)=0.333_r8*RespGrossHeter(NGL,K)
-    RAcettProdHeter(NGL,K)=0.667_r8*RespGrossHeter(NGL,K)
-    RCH4ProdHeter(NGL,K)=0.0_r8
+    RespGrossHeter(NGL,K)  = RGOMP
+    RCO2ProdHeter(NGL,K)   = 0.333_r8*RespGrossHeter(NGL,K)
+    RAcettProdHeter(NGL,K) = 0.667_r8*RespGrossHeter(NGL,K)
+    RCH4ProdHeter(NGL,K)   = 0.0_r8
     RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2ProdHeter(NGL,K)=0.111_r8*RespGrossHeter(NGL,K)
 !    tRGOMP=tRGOMP+RGOMP    
   ELSEIF(N.EQ.micpar%mid_AcetoMethanogArchea)THEN
     ! CH3COOH -> CO2 + CH4
-    RespGrossHeter(NGL,K)=RGOMP
-    RCO2ProdHeter(NGL,K)=0.50_r8*RespGrossHeter(NGL,K)
-    RAcettProdHeter(NGL,K)=0.0_r8
-    RCH4ProdHeter(NGL,K)=0.50_r8*RespGrossHeter(NGL,K)
+    RespGrossHeter(NGL,K)  = RGOMP
+    RCO2ProdHeter(NGL,K)   = 0.50_r8*RespGrossHeter(NGL,K)
+    RAcettProdHeter(NGL,K) = 0.0_r8
+    RCH4ProdHeter(NGL,K)   = 0.50_r8*RespGrossHeter(NGL,K)
     RO2Uptk4RespHeter(NGL,K)=RO2Dmnd4RespHeter(NGL,K)
     RH2ProdHeter(NGL,K)=0.0_r8
 !    tRGOMP=tRGOMP+RGOMP    
@@ -2189,13 +2189,13 @@ module MicBGCMod
 !     RN2OProdSoilChemo,RN2OProdBandChemo=nitrous acid reduction in non-band,band
 !
 !  print*,'RCO2NetUptkMicb',naqfdiag%tRCO2GrothAutor,naqfdiag%tRCO2MicrbProd,naqfdiag%tRNOxMicrbRedux
-  RCO2NetUptkMicb=naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
-  RCH4UptkAutor=-naqfdiag%tRCH4MicrbProd
+  RCO2NetUptkMicb = naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
+  RCH4UptkAutor   = -naqfdiag%tRCH4MicrbProd
 
   DO NGL=JGniA(mid_AerobicMethanotrofBacter),JGnfA(mid_AerobicMethanotrofBacter)
-    RCO2NetUptkMicb=RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
-    RCH4UptkAutor=RCH4UptkAutor+RSOxidSoilAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
-    micflx%TRDOE2DIE(ielmc)=micflx%TRDOE2DIE(ielmc)-RSOxidSoilAutor(NGL)-DOMuptk4GrothAutor(ielmc,NGL)
+    RCO2NetUptkMicb         = RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
+    RCH4UptkAutor           = RCH4UptkAutor+RSOxidSoilAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
+    micflx%TRDOE2DIE(ielmc) = micflx%TRDOE2DIE(ielmc)-RSOxidSoilAutor(NGL)-DOMuptk4GrothAutor(ielmc,NGL)
   ENDDO
   !>0. microbial uptake
   RH2NetUptkMicb =RH2UptkAutor-naqfdiag%TProdH2

@@ -8131,32 +8131,31 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)    
-    call restartvar(ncid, flag, varname='AEC', dim1name='column', &
+    call restartvar(ncid, flag, varname='AEC_vr', dim1name='column', &
       dim2name='levsoi',long_name='anion exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
     call cpcol(flag,NHW,NHE,NVN,NVS,AEC_vr,datrc_2d)
   else
     if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,AEC_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
-    call restartvar(ncid, flag, varname='AEC', dim1name='column', &
+    call restartvar(ncid, flag, varname='AEC_vr', dim1name='column', &
       dim2name='levsoi',long_name='anion exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
 
-!  if(flag=='read')then
-!    datpr2 => datrc_2d(1:ncols,1:JZ)    
-!    call restartvar(ncid, flag, varname='CEC', dim1name='column', &
-!      dim2name='levsoi',long_name='cation exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
-!      data=datpr2, missing_value=spval, fill_value=spval)   
-!    call cpcol(flag,NHW,NHE,NVN,NVS,CEC_vr,datrc_2d)
-!  else
-!    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CEC_vr,datrc_2d)  
-!    datpr2 => datrc_2d(1:ncols,1:JZ)    
-!    call restartvar(ncid, flag, varname='CEC_v', dim1name='column', &
-!      dim2name='levsoi',long_name='cation exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
-!      data=datpr2, missing_value=spval, fill_value=spval)   
-!  endif  
-
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CEC_vr', dim1name='column', &
+      dim2name='levsoi',long_name='cation exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CEC_vr,datrc_2d)
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CEC_vr,datrc_2d)  
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CEC_vr', dim1name='column', &
+      dim2name='levsoi',long_name='cation exchange capacity', units='cmol kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+  endif  
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)    

@@ -199,13 +199,13 @@ module StarteMod
   )
   IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
   !litter pool, top soil layer
-    CO2_rain_conc(NY,NX)=solutevar%H2CO3_aqu_conc
-    CH4_rain_conc(NY,NX)=solutevar%CH4_aqu_conc
-    O2_rain_conc(NY,NX)=solutevar%O2_aqu_conc
-    N2_rain_conc(NY,NX)=solutevar%N2_aqu_conc
-    N2O_rain_conc(NY,NX)=solutevar%N2O_aqu_conc
+    trcVolatile_rain_conc(idg_CO2,NY,NX)=solutevar%H2CO3_aqu_conc
+    trcVolatile_rain_conc(idg_CH4,NY,NX)=solutevar%CH4_aqu_conc
+    trcVolatile_rain_conc(idg_O2,NY,NX)=solutevar%O2_aqu_conc
+    trcVolatile_rain_conc(idg_N2,NY,NX)=solutevar%N2_aqu_conc
+    trcVolatile_rain_conc(idg_N2O,NY,NX)=solutevar%N2O_aqu_conc
     NH4_rain_conc(NY,NX)=solutevar%NH4_1p_conc
-    NH3_rain_conc(NY,NX)=solutevar%NH3_aqu_conc
+    trcVolatile_rain_conc(idg_NH3,NY,NX)=solutevar%NH3_aqu_conc
     if(salt_model)then
       trcsalt_rain_conc(idsalt_Al,NY,NX)=solutevar%Al_3p_conc
       trcsalt_rain_conc(idsalt_Fe,NY,NX)=solutevar%Fe_3p_conc
@@ -257,13 +257,13 @@ module StarteMod
 !
   ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
   ! manure, top layer
-    CO2_irrig_conc(NY,NX)=solutevar%H2CO3_aqu_conc
-    CH4_irrig_conc(NY,NX)=solutevar%CH4_aqu_conc
-    O2_irrig_conc(NY,NX)=solutevar%O2_aqu_conc
-    N2_irrig_conc(NY,NX)=solutevar%N2_aqu_conc
-    N2O_irrig_conc(NY,NX)=solutevar%N2O_aqu_conc
+    trcVolatile_irrig_conc(idg_CO2,NY,NX)=solutevar%H2CO3_aqu_conc
+    trcVolatile_irrig_conc(idg_CH4,NY,NX)=solutevar%CH4_aqu_conc
+    trcVolatile_irrig_conc(idg_O2,NY,NX)=solutevar%O2_aqu_conc
+    trcVolatile_irrig_conc(idg_N2,NY,NX)=solutevar%N2_aqu_conc
+    trcVolatile_irrig_conc(idg_N2O,NY,NX)=solutevar%N2O_aqu_conc
     NH4_irrig_conc(I,NY,NX)=solutevar%NH4_1p_conc
-    NH3_irrig_conc(I,NY,NX)=solutevar%NH3_aqu_conc
+    trcVolatile_irrig_conc(idg_NH3,NY,NX)=solutevar%NH3_aqu_conc
     HPO4_irrig_conc(I,NY,NX)=solutevar%H1PO4_2e_conc
     H2PO4_irrig_conc(I,NY,NX)=solutevar%H2PO4_1e_conc
     CSTRQ(I,NY,NX)=solutevar%CSTR1
@@ -546,12 +546,12 @@ module StarteMod
     D9985: DO L=1,JS
       IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         VOLWW                             = VLWatSnow_snvr(L,NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
-        trcg_solsml_snvr(idg_CO2,L,NY,NX) = VOLWW*CO2_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_CH4,L,NY,NX) = VOLWW*CH4_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_O2,L,NY,NX)  = VOLWW*O2_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_N2,L,NY,NX)  = VOLWW*N2_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_N2O,L,NY,NX) = VOLWW*N2O_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_NH3,L,NY,NX) = VOLWW*NH3_rain_conc(NY,NX)*natomw
+        trcg_solsml_snvr(idg_CO2,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_CO2,NY,NX)
+        trcg_solsml_snvr(idg_CH4,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_CH4,NY,NX)
+        trcg_solsml_snvr(idg_O2,L,NY,NX)  = VOLWW*trcVolatile_rain_conc(idg_O2,NY,NX)
+        trcg_solsml_snvr(idg_N2,L,NY,NX)  = VOLWW*trcVolatile_rain_conc(idg_N2,NY,NX)
+        trcg_solsml_snvr(idg_N2O,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_N2O,NY,NX)
+        trcg_solsml_snvr(idg_NH3,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_NH3,NY,NX)*natomw
 
         trcn_solsml_snvr(ids_NH4,L,NY,NX)   = VOLWW*NH4_rain_conc(NY,NX)*natomw
         trcn_solsml_snvr(ids_NO3,L,NY,NX)   = VOLWW*NO3_rain_conc(NY,NX)*natomw
