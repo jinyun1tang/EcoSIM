@@ -270,9 +270,9 @@ module PlantBranchMod
         XFRE(ielmn)=AMAX1(XFRN1,10.0_r8*XFRP1)
         XFRE(ielmp)=AMAX1(XFRP1,0.10_r8*XFRN1)
         DO NE=2,NumPlantChemElms
-          LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-XFRE(NE)
-          LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)-XFRE(NE)
-          CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
+          LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-XFRE(NE)
+          LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-XFRE(NE)
+          CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
         ENDDO
         LeafProteinCNode_brch(K,NB,NZ)=AZMAX1(LeafProteinCNode_brch(K,NB,NZ)-&
           AMAX1(XFRE(ielmn)*rCNNonstRemob_pft(NZ),XFRE(ielmp)*rCPNonstRemob_pft(NZ)))
@@ -3059,9 +3059,9 @@ module PlantBranchMod
 ! CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 ! RMxess_brch=excess maintenance respiration, drives remobilization & senescence
 !
-  RCO2X=RCO2NonstC_brch-RCO2Maint_brch
-  RCO2Y=AZMAX1(RCO2X)*CanTurgPSIFun4Expans
-  RMxess_brch=AZMAX1(-RCO2X)
+  RCO2X       = RCO2NonstC_brch-RCO2Maint_brch
+  RCO2Y       = AZMAX1(RCO2X)*CanTurgPSIFun4Expans
+  RMxess_brch = AZMAX1(-RCO2X)
 !
 ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
 ! AVAILABLE FOR GROWTH
@@ -3076,10 +3076,9 @@ module PlantBranchMod
 ! CNPG=N,P constraint on growth respiration
 !
   IF(RCO2Y.GT.0.0_r8 .AND. (CNSHX.GT.0.0_r8 .OR. CNLFX.GT.0.0_r8))THEN
-    ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
-    PPOOLB=AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
-    RgroCO2_ltd=AMIN1(RCO2Y,ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
-      ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
+    ZPOOLB      = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
+    PPOOLB      = AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
+    RgroCO2_ltd = AMIN1(RCO2Y,ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG),PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
   ELSE
     RgroCO2_ltd=0._r8
   ENDIF
@@ -3102,12 +3101,10 @@ module PlantBranchMod
 ! CH2O=total CH2O production, 1/4 newly fixed C is used for N-assimilation (where is this number from?)
 !
   
-  NonstC4Groth_brch=RgroCO2_ltd/DMSHD
-  CanopyNonstElm4Gros(ielmn)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmn,NB,NZ) &
-    ,NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
-  CanopyNonstElm4Gros(ielmp)=AZMAX1(AMIN1(CanopyNonstElms_brch(ielmp,NB,NZ) &
-    ,NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))  
-  RCO2NonstC4Nassim_brch=AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn)-0.025_r8*CH2O)
+  NonstC4Groth_brch          = RgroCO2_ltd/DMSHD
+  CanopyNonstElm4Gros(ielmn) = AZMAX1(AMIN1(CanopyNonstElms_brch(ielmn,NB,NZ),NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
+  CanopyNonstElm4Gros(ielmp) = AZMAX1(AMIN1(CanopyNonstElms_brch(ielmp,NB,NZ),NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))
+  RCO2NonstC4Nassim_brch     = AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn)-0.025_r8*CH2O)
 !
 ! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
 ! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE

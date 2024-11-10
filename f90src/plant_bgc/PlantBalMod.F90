@@ -52,11 +52,7 @@ implicit none
     MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft,         &
     NumRootAxes_pft          => plt_morph%NumRootAxes_pft,          &
     MaxNumRootLays           => plt_site%MaxNumRootLays,            &
-    SeasonalNonstElms_pft    => plt_biom%SeasonalNonstElms_pft,     &
-    RootElmsBeg_pft          => plt_biom%RootElmsBeg_pft,           &
-    ShootElmsBeg_pft         => plt_biom%ShootElmsBeg_pft,          &
     RootElms_pft             => plt_biom%RootElms_pft,              &
-    ShootElms_brch           => plt_biom%ShootElms_brch,            &
     ShootC4NonstC_brch       => plt_biom%ShootC4NonstC_brch,        &
     RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr,          &
     ShootElms_pft            => plt_biom%ShootElms_pft              &
@@ -68,7 +64,6 @@ implicit none
     write(*,*)'rootshoot',RootElms_pft(ielmc,NZ),ShootElms_pft(ielmc,NZ)
     stop
   endif
-
   !sum fluxes
 !     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
   NH3Dep2Can_pft(NZ)=0._r8
@@ -131,8 +126,8 @@ implicit none
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch, &
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
     StandDeadKCompElms_pft    => plt_biom%StandDeadKCompElms_pft,    &
+    ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch  ,     &
     RootElms_pft              => plt_biom%RootElms_pft,              &
-    ShootElms_brch            => plt_biom%ShootElms_brch,            &
     ShootElms_pft             => plt_biom%ShootElms_pft              &
   )
   
@@ -142,7 +137,7 @@ implicit none
   ENDDO
 
   DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ)=sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
+    ShootElms_pft(NE,NZ)=sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))    
     if(ShootElms_pft(NE,NZ)>1.e20)then
       write(*,*)'sumplantstates',NE,SeasonalNonstElms_pft(NE,NZ)
       stop
@@ -169,16 +164,14 @@ implicit none
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !add standing dead to shoot
   DO NE=1,NumPlantChemElms
-    StandDeadStrutElms_pft(NE,NZ)=sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
-    ShootElms_pft(NE,NZ)=ShootElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)
-        if(ShootElms_pft(NE,NZ)>1.e20)then
-          write(*,*)'sum3plantstates',StandDeadStrutElms_pft(NE,NZ)
-          DO jk=1,jsken
-            write(*,*)NE,StandDeadKCompElms_pft(NE,jk,NZ)
-          enddo
-          stop
-        endif
-
+    StandDeadStrutElms_pft(NE,NZ)=sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))    
+    if(StandDeadStrutElms_pft(NE,NZ)>1.e20)then
+      write(*,*)'sum3plantstates',StandDeadStrutElms_pft(NE,NZ)
+      DO jk=1,jsken
+        write(*,*)NE,StandDeadKCompElms_pft(NE,jk,NZ)
+      enddo
+      stop
+    endif
   ENDDO
 
   call SumRootBiome(NZ,RootElms_pft(:,NZ))
@@ -229,8 +222,7 @@ implicit none
     iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType     , &                
     CMassHCO3BundleSheath_node     =>  plt_photo%CMassHCO3BundleSheath_node   , &
     CMassCO2BundleSheath_node      =>  plt_photo%CMassCO2BundleSheath_node    , &           
-    ShootStrutElms_brch            =>  plt_biom%ShootStrutElms_brch           , &    
-    ShootElms_brch                 =>  plt_biom%ShootElms_brch                  &
+    ShootStrutElms_brch            =>  plt_biom%ShootStrutElms_brch             &    
   )  
   DO NE=1,NumPlantChemElms
     ShootStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ) &
@@ -249,8 +241,6 @@ implicit none
     ENDDO D3251
     ShootStrutElms_brch(ielmc,NB,NZ)=ShootStrutElms_brch(ielmc,NB,NZ)+ShootC4NonstC_brch(NB,NZ)
   ENDIF
-
-  ShootElms_brch(1:NumPlantChemElms,NB,NZ)=ShootStrutElms_brch(1:NumPlantChemElms,NB,NZ)
 
   end associate
   end subroutine SumPlantBranchBiome
@@ -380,9 +370,10 @@ implicit none
   INTEGER :: NZ
 
   DO NZ=1,NP
-    plt_biom%RootElmsBeg_pft(:,NZ) = plt_biom%RootElms_pft(:,NZ)
+    plt_biom%RootElmsBeg_pft(:,NZ)           = plt_biom%RootElms_pft(:,NZ)
     plt_biom%StandDeadStrutElmsBeg_pft(:,NZ) = plt_biom%StandDeadStrutElms_pft(:,NZ)
-    plt_biom%ShootElmsBeg_pft(:,NZ) = plt_biom%ShootElms_pft(:,NZ)
+    plt_biom%ShootElmsBeg_pft(:,NZ)          = plt_biom%ShootElms_pft(:,NZ)
+    plt_biom%SeasonalNonstElmsbeg_pft(:,NZ)  = plt_biom%SeasonalNonstElms_pft(:,NZ)
   ENDDO
   end subroutine EnterPlantBalance
 !------------------------------------------------------------------------------------------
@@ -404,14 +395,16 @@ implicit none
   real(r8) :: balE(1:NP)
 
   associate(                                                         &
-    GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft,           &  !>0 add to plant
-    GrossResp_pft             => plt_bgcr%GrossResp_pft,             &  !<0 add to plant
-    NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &  !>0 add to plant
+    GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft,           &  !>0 onto plant
+    GrossResp_pft             => plt_bgcr%GrossResp_pft,             &  !<0 onto plant
+    NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &  !>0 onto plant
     LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft,      &  !>0 off plant
-    RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft,      &  !>0 add to plant
-    EcoHavstElmnt_CumYr_pft         => plt_distb%EcoHavstElmnt_CumYr_pft,        &
+    RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft,      &  !>0 onto plant
+    EcoHavstElmnt_CumYr_pft   => plt_distb%EcoHavstElmnt_CumYr_pft,  &  !>0 off plant
     RootElmsBeg_pft           => plt_biom%RootElmsBeg_pft,           &
     RootElms_pft              => plt_biom%RootElms_pft,              &
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,     &
+    SeasonalNonstElmsbeg_pft  => plt_biom%SeasonalNonstElmsbeg_pft,  &
     StandDeadStrutElmsBeg_pft => plt_biom%StandDeadStrutElmsBeg_pft, &
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
     ShootElmsBeg_pft          => plt_biom%ShootElmsBeg_pft,          &
@@ -422,6 +415,7 @@ implicit none
     balE(NZ)=RootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)  &
       +ShootElms_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)   &
       +StandDeadStrutElms_pft(ielmc,NZ)-StandDeadStrutElmsBeg_pft(ielmc,NZ)  &
+      +SeasonalNonstElms_pft(ielmc,NZ)-SeasonalNonstElmsbeg_pft(ielmc,NZ) &
       -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   &
       -NodulInfectElms_pft(ielmc,NZ)  &      
       -RootMycoExudElms_pft(ielmc,NZ) &

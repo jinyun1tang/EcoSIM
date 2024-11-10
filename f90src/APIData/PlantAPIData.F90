@@ -487,14 +487,14 @@ implicit none
   real(r8), pointer :: CanopyNodulElms_pft(:,:)               => null()
   real(r8), pointer :: RootStrutElms_pft(:,:)                 => null()  !plant root structural element,                [gC d-2]
   real(r8), pointer :: SeedCPlanted_pft(:)                    => null()  !plant stored nonstructural C at planting,     [gC d-2]
-  real(r8), pointer :: SeasonalNonstElms_pft(:,:)             => null()  !plant stored nonstructural element,           [gC d-2]
+  real(r8), pointer :: SeasonalNonstElms_pft(:,:)             => null()  !plant stored nonstructural element at cur step,  [gC d-2]
+  real(r8), pointer :: SeasonalNonstElmsbeg_pft(:,:)          => null()  !plant stored nonstructural element at prev step, [gC d-2]  
   real(r8), pointer :: CanopyLeafShethC_pft(:)                => null()  !canopy leaf + sheath C,                       [g d-2]
   real(r8), pointer :: ShootStrutElms_pft(:,:)                => null()  !canopy shoot C,                               [g d-2]
   real(r8), pointer :: AvgCanopyBiomC2Graze_pft(:)            => null()  !landscape average canopy shoot C,             [g d-2]
   real(r8), pointer :: StandDeadStrutElms_pft(:,:)            => null()  !standing dead element,                        [g d-2]
   real(r8), pointer :: NodulStrutElms_pft(:,:)                => null()  !root total nodule mass,                       element [g d-2]
   real(r8), pointer :: CanopyNonstElms_brch(:,:,:)            => null()  !branch nonstructural element,                 [g d-2]
-  real(r8), pointer :: ShootElms_brch(:,:,:)                  => null()      !branch shoot elemental biomass,           [g d-2]
   real(r8), pointer :: ShootC4NonstC_brch(:,:)                => null()  !branch shoot nonstrucal elelment [g d-2]
   real(r8), pointer :: CanopyNodulNonstElms_brch(:,:,:)       => null()  !branch nodule nonstructural element,          [g d-2]
   real(r8), pointer :: LeafPetolBiomassC_brch(:,:)            => null()  !plant branch leaf + sheath C,                 [g d-2]
@@ -1295,7 +1295,6 @@ implicit none
   allocate(this%RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootMycoNonstElms_rpvr=spval
   allocate(this%RootNonstructElmConc_pvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootNonstructElmConc_pvr=spval
   allocate(this%CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNonstElms_brch=spval
-  allocate(this%ShootElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%ShootElms_brch=spval
   allocate(this%ShootC4NonstC_brch(MaxNumBranches,JP1));this%ShootC4NonstC_brch=spval
   allocate(this%CanopyStalkC_pft(JP1));this%CanopyStalkC_pft=spval
   allocate(this%ShootElms_pft(NumPlantChemElms,JP1));this%ShootElms_pft=spval
@@ -1321,6 +1320,7 @@ implicit none
   allocate(this%RootElmsBeg_pft(NumPlantChemElms,JP1));this%RootElmsBeg_pft=spval
   allocate(this%SeedCPlanted_pft(JP1));this%SeedCPlanted_pft=spval
   allocate(this%SeasonalNonstElms_pft(NumPlantChemElms,JP1));this%SeasonalNonstElms_pft=spval
+  allocate(this%SeasonalNonstElmsbeg_pft(NumPlantChemElms,JP1));this%SeasonalNonstElmsbeg_pft=spval
   allocate(this%CanopyLeafShethC_pft(JP1));this%CanopyLeafShethC_pft=spval
   allocate(this%StandDeadStrutElms_pft(NumPlantChemElms,JP1));this%StandDeadStrutElms_pft=spval
   allocate(this%RootBiomCPerPlant_pft(JP1));this%RootBiomCPerPlant_pft=spval

@@ -378,9 +378,9 @@ contains
   AScaledCdWOverSnow_col(NY,NX)=PAREX*FracSurfAsSnow_col(NY,NX)*XNPS
   AScaledCdHOverSnow_col(NY,NX)=PARSX*FracSurfAsSnow_col(NY,NX)*XNPS
   AScaledCdWOverSoil_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)
-  AScaledCdWOverLitr_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)*FracEffAsLitR_col(NY,NX)*XNPR
+  AScaledCdWOverLitr_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
   AScaledCdHOverSoil_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)
-  AScaledCdHOverLitr_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)*FracEffAsLitR_col(NY,NX)*XNPR
+  AScaledCdHOverLitr_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
 
 !     PARR=boundary layer conductance above litter,soil surfaces, (m^2/h)/(h/m)
 !

@@ -232,12 +232,12 @@ implicit none
   real(r8) :: CdLitRHSens            !conductance of sensible heat [MJ/K]
   real(r8) :: RAGX,RI
   real(r8) :: Radnet2LitR2           !litter net radiation,after taking out outgoing radiation from litter [MJ]
-  real(r8) :: HeatFluxAir2LitR2       !total residual heat into litter [MJ]
+  real(r8) :: HeatFluxAir2LitR2      !total residual heat into litter [MJ]
   real(r8) :: HeatSensLitR2Soi2      !sensible heat flux from litter to soil
   real(r8) :: VLHeatCapcityLitR2,VLHeatCapacity2
   real(r8) :: VLWatMicP12,VWatLitr2
   real(r8) :: TKR1,TKS1
-  real(r8) :: dt_litrHeat
+  real(r8) :: dt_litrHeat            !time step for solving litter heat/water fluxes
 ! begin_execution
 
   VWatLitr2          = VLWatMicP1_vr(0,NY,NX)
@@ -350,8 +350,7 @@ implicit none
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
 
-        VPY = (VapLitR*VLsoiAirPM(M,0,NY,NX)+VaporSoi1*VLsoiAirPM(M,NUM(NY,NX),NY,NX)) &
-          /(VLsoiAirPM(M,0,NY,NX)+VLsoiAirPM(M,NUM(NY,NX),NY,NX))
+        VPY  = (VapLitR*VLsoiAirPM(M,0,NY,NX)+VaporSoi1*VLsoiAirPM(M,NUM(NY,NX),NY,NX))/(VLsoiAirPM(M,0,NY,NX)+VLsoiAirPM(M,NUM(NY,NX),NY,NX))
         FLVX = (VapLitR-VPY)*VLsoiAirPM(M,0,NY,NX)*XNPB
         if(abs(FLVX)>1.e20_r8)then
           write(*,*)'(VapLitR-VPY)*VLsoiAirPM(M,0,NY,NX)',VapLitR,VPY,VLsoiAirPM(M,0,NY,NX)
@@ -446,6 +445,7 @@ implicit none
     TKS1               = TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
 !    write(124,*)'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
 !    print*,'cplitr',NN,VLHeatCapcityLitR2,SoilOrgM_vr(ielmc,0,NY,NX),VWatLitr2,VLiceMicP1_vr(0,NY,NX)
+!    write(124,*)I+J/24.,M,NN,TKR1,TKS1,TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
   ENDDO D5000
   end subroutine SurfLitterIteration
 

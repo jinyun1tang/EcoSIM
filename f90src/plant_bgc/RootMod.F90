@@ -852,11 +852,8 @@ implicit none
 
   SoilRest4Root2ndPentrate = SoilResit4RootPentrate_vr(L)*Root2ndRadius_pvr(N,L,NZ)/1.0E-03_r8
   WFNR                     = AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtens-SoilRest4Root2ndPentrate))
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-    WFNRG=WFNR**0.10_r8
-  ELSE
-    WFNRG=WFNR**0.25_r8
-  ENDIF  
+  WFNRG                    = fRespWatSens(WFNR,iPlantRootProfile_pft(NZ))
+
 
   !respiration fraction
   DMRTD         = 1.0_r8-RootBiomGrosYld_pft(NZ)
@@ -1307,13 +1304,10 @@ implicit none
 !     WFNR=water function for root extension
 !     WFNRG=respiration function of root water potential
 !
-  SoilResit4PrimRootPentration=SoilResit4RootPentrate_vr(L)*Root1stRadius_pvr(N,L,NZ)/1.0E-03_r8
-  WFNR=AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtens-SoilResit4PrimRootPentration))
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-    WFNRG=WFNR**0.10_r8
-  ELSE
-    WFNRG=WFNR**0.25_r8
-  ENDIF
+  SoilResit4PrimRootPentration = SoilResit4RootPentrate_vr(L)*Root1stRadius_pvr(N,L,NZ)/1.0E-03_r8
+  WFNR                         = AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-PSIMin4OrganExtens-SoilResit4PrimRootPentration))
+  WFNRG                        = fRespWatSens(WFNR,iPlantRootProfile_pft(NZ))
+
   end associate    
   END subroutine RootGroWaterDependence      
 !------------------------------------------------------------------------------------------

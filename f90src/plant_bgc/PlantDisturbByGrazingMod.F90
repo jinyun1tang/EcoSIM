@@ -48,21 +48,21 @@ contains
 !     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_CumYr_col=total autotrophic respiration
 
-  EcoHavstElmnt_CumYr_pft(ielmc,NZ)=EcoHavstElmnt_CumYr_pft(ielmc,NZ)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  EcoHavstElmnt_CumYr_col(ielmc)=EcoHavstElmnt_CumYr_col(ielmc)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  EcoHavstElmnt_CumYr_pft(ielmc,NZ) = EcoHavstElmnt_CumYr_pft(ielmc,NZ)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  EcoHavstElmnt_CumYr_col(ielmc)    = EcoHavstElmnt_CumYr_col(ielmc)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
 
   DO NE=2,NumPlantChemElms
-    EcoHavstElmnt_CumYr_pft(NE,NZ)=EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
-    EcoHavstElmnt_CumYr_col(NE)=EcoHavstElmnt_CumYr_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
+    EcoHavstElmnt_CumYr_pft(NE,NZ) = EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
+    EcoHavstElmnt_CumYr_col(NE)    = EcoHavstElmnt_CumYr_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
   ENDDO
   !GZ : fraction of removal into respiration by herbivory/grazing
-  dRespC=GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  GrossResp_pft(NZ)=GrossResp_pft(NZ)-dRespC
-  CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-dRespC
+  dRespC                    = GZ*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  GrossResp_pft(NZ)         = GrossResp_pft(NZ)-dRespC
+  CanopyRespC_CumYr_pft(NZ) = CanopyRespC_CumYr_pft(NZ)-dRespC
 !     Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+GY*(TotalElmnt2Litr(ielmc)-TotalElmntRemoval(ielmc))
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-dRespC
-  ECO_ER_col=ECO_ER_col-dRespC
-  Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-dRespC
+  ECO_ER_col          = ECO_ER_col-dRespC
+  Eco_AutoR_CumYr_col = Eco_AutoR_CumYr_col-dRespC
   end associate
   end subroutine AbvgBiomRemovalByGrazing
 
@@ -445,9 +445,9 @@ contains
       CanopyNodulStrutElmAfhvst(:)=0._r8
     ENDIF
   ELSE
-    CanopyNonstElmAfhvst(:)=0._r8
-    CanopyNodulNonstElmAfhvst(:)=0._r8
-    CanopyNodulStrutElmAfhvst(:)=0._r8
+    CanopyNonstElmAfhvst(:)      = 0._r8
+    CanopyNodulNonstElmAfhvst(:) = 0._r8
+    CanopyNodulStrutElmAfhvst(:) = 0._r8
   ENDIF
   end associate
   end subroutine CutBranchNonstalByGrazing

@@ -1402,7 +1402,7 @@ implicit none
 
   data1d_ptr => this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='SHOOT_C',units='gC/m2',avgflag='A',&
-    long_name='plant shoot C',ptr_patch=data1d_ptr)      
+    long_name='Live plant shoot C',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_SHOOTST_C_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='SHOOTST_C',units='gC/m2',avgflag='A',&
@@ -1576,7 +1576,7 @@ implicit none
 
   data1d_ptr => this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='SHOOT_N',units='gN/m2',avgflag='A',&
-    long_name='plant shoot N',ptr_patch=data1d_ptr)      
+    long_name='Live plant shoot N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_Plant_N_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='PLANT_N',units='gN/m2',avgflag='A',&
@@ -1664,7 +1664,7 @@ implicit none
 
   data1d_ptr => this%h1D_SHOOT_P_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='SHOOT_P',units='gP/m2',avgflag='A',&
-    long_name='plant shoot P',ptr_patch=data1d_ptr)      
+    long_name='Live plant shoot P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_Plant_P_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='PLANT_P',units='gP/m2',avgflag='A',&
@@ -2304,7 +2304,7 @@ implicit none
       this%h1D_FracBySnow_col(ncol)=FracSurfAsSnow_col(NY,NX)
       this%h1D_FracByLitr_col(ncol)=FracSurfByLitR_col(NY,NX)
       this%h1D_tLITR_C_col(ncol) = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-
+!      write(114,*)I+J/24.,SoilOrgM_vr(ielmc,0,NY,NX),TCS(0,NY,NX),TCS(NU(NY,NX),NY,NX)
       this%h1D_AMENDED_C_col(ncol)        = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgC_col(ncol)        = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

@@ -109,10 +109,10 @@ contains
   real(r8) :: fT_canp
   real(r8) :: RTK,STK,ACTV
 
-  RTK=RGASC*TKGO
-  STK=710.0_r8*TKGO
-  ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
-  FT_canp=EXP(25.229_r8-62500._r8/RTK)/ACTV
+  RTK     = RGASC*TKGO
+  STK     = 710.0_r8*TKGO
+  ACTV    = 1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
+  FT_canp = EXP(25.229_r8-62500._r8/RTK)/ACTV
 
   end function calc_canopy_grow_tempf
 
@@ -125,10 +125,10 @@ contains
   real(r8) :: TFNP
   real(r8) :: RTK,STK,ACTV
   
-  RTK=RGASC*TKCO
-  STK=710.0_r8*TKCO
-  ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
-  TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
+  RTK  = RGASC*TKCO
+  STK  = 710.0_r8*TKCO
+  ACTV = 1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
+  TFNP = EXP(24.269_r8-60000._r8/RTK)/ACTV
   end function calc_leave_grow_tempf
 
 !--------------------------------------------------------------------------------
@@ -139,10 +139,10 @@ contains
   real(r8) :: TFN5
   real(r8) :: RTK,STK,ACTVM
 
-  RTK=RGASC*TKCM
-  STK=710.0_r8*TKCM
-  ACTVM=1._r8+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
-  TFN5=EXP(25.214_r8-62500._r8/RTK)/ACTVM
+  RTK   = RGASC*TKCM
+  STK   = 710.0_r8*TKCM
+  ACTVM = 1._r8+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
+  TFN5  = EXP(25.214_r8-62500._r8/RTK)/ACTVM
   END function calc_plant_maint_tempf
 !--------------------------------------------------------------------------------
 
@@ -305,7 +305,21 @@ contains
   yesno=iPlantNfixType_pft.NE.iN2fixtyp_none
 
   end function is_plant_N2fix
+!--------------------------------------------------------------------------------
 
+  pure function fRespWatSens(WFN,iPlantRootProfile)result(ans)
 
+  implicit none
+  real(r8), intent(in) :: WFN   !turgor based leaf/root expansion 
+  integer, intent(in) :: iPlantRootProfile
+  real(r8) :: ans
+
+  IF(is_root_shallow(iPlantRootProfile))THEN
+    ans=WFN**0.10_r8
+  ELSE
+    ans=WFN**0.25_r8
+  ENDIF
+
+  end function fRespWatSens
   
 end module PlantMathFuncMod

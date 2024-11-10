@@ -960,7 +960,7 @@ module StartsMod
   XNPS          = 1.0_r8/NPS
 
   XNPV      = XNPR*XNPS
-  XNPD      = 600.0_r8*dts_gas
+  XNPD      = 600.0_r8*dts_gas                    !600. is adjustable
   dts_wat   = AMIN1(1.0_r8,5.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno   = dts_wat*XNPS
   XNPB      = dts_wat*XNPR
