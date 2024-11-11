@@ -679,13 +679,15 @@ contains
 ! HFLWRL=total heat flux into litter
 ! FLWV*=total internal vapor flux in soil
 !
-  WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)  = CumWatFlx2SoiMicP+WatNetFlo2TopSoiMicP
-  WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX) = CumWatXFlx2SoiMicP+NetWatFlx2SoiMicP
+  WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)   = CumWatFlx2SoiMicP+WatNetFlo2TopSoiMicP
+  WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX)  = CumWatXFlx2SoiMicP+NetWatFlx2SoiMicP
   ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX) = CumWatFlx2SoiMacP+NetWatFlx2SoiMacP
-  HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)       = cumHeatFlowSno2Soi+cumHeatSensAir2Soil
+  HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)    = cumHeatFlowSno2Soi+cumHeatSensAir2Soil
   WatFLow2LitR_col(NY,NX)                  = CumWatFlow2LitR+NetWatFlx2LitR
   HeatFLoByWat2LitRi_col(NY,NX)            = CumHeatFlow2LitR+CumHeatSensAir2LitR
-
+  if(I==357 .and. j==11)then
+  write(112,*)I,J,M,'up1',VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)
+  endif
   end subroutine AtmLandSurfExchange
 !------------------------------------------------------------------------------------------
 
@@ -699,13 +701,13 @@ contains
   HeatSensVapAir2Soi     = 0.0_r8       !convective heat flux from air and topsoil
   HeatSensAir2Grnd       = 0.0_r8         !sensible heat flux from air to topsoil
 
-  WatNetFlo2TopSoiMicP = 0.0_r8     !total water flux from air into top soil
-  NetWatFlx2SoiMicP    = 0.0_r8        !total water flux from air into soil micropores
-  NetWatFlx2SoiMacP    = 0.0_r8        !total water flux from air into macropores
-  cumHeatSensAir2Soil  = 0.0_r8      !total water associated heat flux from air into soil
-  NetWatFlx2LitR       = 0.0_r8            !total water flux from air to litter
-  CumHeatSensAir2LitR  = 0.0_r8       !total water associated heat flux from air to litter
-  VapXAir2LitR_col(NY,NX)  = 0.0_r8  !evaporative flux from air into litter
+  WatNetFlo2TopSoiMicP    = 0.0_r8     !total water flux from air into top soil
+  NetWatFlx2SoiMicP       = 0.0_r8        !total water flux from air into soil micropores
+  NetWatFlx2SoiMacP       = 0.0_r8        !total water flux from air into macropores
+  cumHeatSensAir2Soil     = 0.0_r8      !total water associated heat flux from air into soil
+  NetWatFlx2LitR          = 0.0_r8            !total water flux from air to litter
+  CumHeatSensAir2LitR     = 0.0_r8       !total water associated heat flux from air to litter
+  VapXAir2LitR_col(NY,NX) = 0.0_r8  !evaporative flux from air into litter
   end subroutine SnowCoveredTopSoilFlux  
 !------------------------------------------------------------------------------------------
 
@@ -775,8 +777,8 @@ contains
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
-      WatDarcyFloLitR2SoiMicP=AZMAX1(AMIN1(FLQZ,VLWatMicP1_vr(0,NY,NX)*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
-      FLQ2=AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatMicP1_vr(0,NY,NX)*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
+      WatDarcyFloLitR2SoiMicP = AZMAX1(AMIN1(FLQZ,VLWatMicP1_vr(0,NY,NX)*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
+      FLQ2                    = AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatMicP1_vr(0,NY,NX)*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
     ELSE
       !from soil to liter
       IF(THETW1.GT.ThetaSat_vr(NUM(NY,NX),NY,NX))THEN
@@ -788,11 +790,10 @@ contains
       WatDarcyFloLitR2SoiMicP = AZMIN1(AMAX1(FLQZ,-VLWatMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
       FLQ2                    = AZMIN1(AMAX1(DarcyFlxLitR2Soil,-VLWatMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
     ENDIF
-
+    !top soil layer has negative air volume 
     IF(VLairMicP_vr(NUM(NY,NX),NY,NX).LT.0.0_r8)THEN
-      WatDarcyFloLitR2SoiMicP=WatDarcyFloLitR2SoiMicP+AZMIN1(AMAX1(-VLWatMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,&
-        VLairMicP_vr(NUM(NY,NX),NY,NX)))
-      FLQ2=FLQ2+AZMIN1(AMAX1(-VLWatMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,VLairMicP_vr(NUM(NY,NX),NY,NX)))
+      WatDarcyFloLitR2SoiMicP = WatDarcyFloLitR2SoiMicP+AZMIN1(AMAX1(-VLWatMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,VLairMicP_vr(NUM(NY,NX),NY,NX)))
+      FLQ2                    = FLQ2+AZMIN1(AMAX1(-VLWatMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,VLairMicP_vr(NUM(NY,NX),NY,NX)))
     ENDIF
 
     IF(WatDarcyFloLitR2SoiMicP.GT.0.0_r8)THEN
@@ -816,8 +817,7 @@ contains
     WatFLow2LitR_col(NY,NX)       = WatFLow2LitR_col(NY,NX)-WatDarcyFloLitR2SoiMicP
     HeatFLoByWat2LitRi_col(NY,NX) = HeatFLoByWat2LitRi_col(NY,NX)-HeatFlxLitR2Soi
     WatFLo2LitrM(M,NY,NX)         = WatDarcyFloLitR2SoiMicP
-!    write(*,*)I+J/24.,'if1',HeatFlxLitR2Soi,WatDarcyFloLitR2SoiMicP,&
-!      safe_adb(HeatFlxLitR2Soi,(cpw*WatDarcyFloLitR2SoiMicP))
+    !soil to litter
   ELSE
     !top layer is water
     WatDarcyFloLitR2SoiMicP                 = XVLMobileWatMicP(NY,NX)*dts_wat
@@ -846,19 +846,18 @@ contains
 !     WaterFlow2Micpt_3D,HFLWL=micropore water,heat flux
 !     WatFLow2LitR,HFLWRL=total litter water,heat flux
 !
-  IF(VLairMacP1_vr(NUM(NY,NX),NY,NX).GT.0.0_r8 .AND.XVLMobileWatMicP(NY,NX).GT.0.0_r8)THEN
+  IF(VLairMacP1_vr(NUM(NY,NX),NY,NX).GT.0.0_r8 .AND. XVLMobileWatMicP(NY,NX).GT.0.0_r8)THEN
     WatFlowLitR2MacP                         = AMIN1(XVLMobileWatMicP(NY,NX)*dts_wat,VLairMacP1_vr(NUM(NY,NX),NY,NX))
     HeatFlowLitR2MacP                        = WatFlowLitR2MacP*cpw*TKSoi1_vr(0,NY,NX)
     ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX) = ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)+WatFlowLitR2MacP
-    HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)       = HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)+HeatFlowLitR2MacP
+    HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)    = HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)+HeatFlowLitR2MacP
 !    if(HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)>10._r8)then
 !      write(*,*)'HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)x=',HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX),HeatFlowLitR2MacP
 !    endif
-    WatFLow2LitR_col(NY,NX)   = WatFLow2LitR_col(NY,NX)-WatFlowLitR2MacP
+    WatFLow2LitR_col(NY,NX)       = WatFLow2LitR_col(NY,NX)-WatFlowLitR2MacP
     HeatFLoByWat2LitRi_col(NY,NX) = HeatFLoByWat2LitRi_col(NY,NX)-HeatFlowLitR2MacP
-!    write(*,*)I+J/24.,'surif',HeatFlowLitR2MacP,WatFlowLitR2MacP,safe_adb(HeatFlowLitR2MacP,WatFlowLitR2MacP*cpw)
   ENDIF
-!  if(M==11)write(*,*)'SurfLitrSoilWaterExchange macP',M,NY,NX,HeatFLoByWat2LitRi_col(NY,NX)
+
   end subroutine SurfLitrSoilWaterExchange
 !------------------------------------------------------------------------------------------
 
@@ -897,6 +896,7 @@ contains
   ELSE
     TK1X=TKSoi1_vr(0,NY,NX)
   ENDIF
+
   IF((TK1X.LT.TFREEZ .AND. VLWatMicP1_vr(0,NY,NX).GT.ZERO*VGeomLayer_vr(0,NY,NX)) &
     .OR.(TK1X.GT.TFREEZ .AND. VLiceMicP1_vr(0,NY,NX).GT.ZERO*VGeomLayer_vr(0,NY,NX)))THEN
     LitrIceHeatFlxFrezPt=VHeatCapacity1_vr(0,NY,NX)*(TFREEZ-TK1X) &
@@ -1104,18 +1104,14 @@ contains
 ! FLWM,WaterFlow2MacPM_3D=water flux into soil micropore,macropore for use in TranspNoSalt.f
 ! VLWatMicPX1=VLWatMicP1 accounting for wetting front
 !
-  TLitrIceFlxThaw(NY,NX)=TLitrIceFlxThaw(NY,NX)+LitrIceFlxThaw(NY,NX)
-  TLitrIceHeatFlxFrez(NY,NX)=TLitrIceHeatFlxFrez(NY,NX)+LitrIceHeatFlxFrez(NY,NX)
-  WaterFlowSoiMicP_3D(3,NUM(NY,NX),NY,NX)=WaterFlowSoiMicP_3D(3,NUM(NY,NX),NY,NX) &
-    +WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)
-  WaterFlowSoiMicPX(3,NUM(NY,NX),NY,NX)=WaterFlowSoiMicPX(3,NUM(NY,NX),NY,NX) &
-    +WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX)
-  WaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)=WaterFlowMacP_3D(3,NUM(NY,NX),NY,NX) &
-    +ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)
-  HeatFlow2Soil_3D(3,NUM(NY,NX),NY,NX)=HeatFlow2Soil_3D(3,NUM(NY,NX),NY,NX) &
-    +HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)
-  WatFLo2Litr(NY,NX)       = WatFLo2Litr(NY,NX)+WatFLow2LitR_col(NY,NX)
-  HeatFLo2LitrByWat(NY,NX) = HeatFLo2LitrByWat(NY,NX)+HeatFLoByWat2LitRi_col(NY,NX)
+  TLitrIceFlxThaw(NY,NX)                  = TLitrIceFlxThaw(NY,NX)+LitrIceFlxThaw(NY,NX)
+  TLitrIceHeatFlxFrez(NY,NX)              = TLitrIceHeatFlxFrez(NY,NX)+LitrIceHeatFlxFrez(NY,NX)
+  WaterFlowSoiMicP_3D(3,NUM(NY,NX),NY,NX) = WaterFlowSoiMicP_3D(3,NUM(NY,NX),NY,NX)+WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)
+  WaterFlowSoiMicPX(3,NUM(NY,NX),NY,NX)   = WaterFlowSoiMicPX(3,NUM(NY,NX),NY,NX)+WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX)
+  WaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)    = WaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)+ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)
+  HeatFlow2Soil_3D(3,NUM(NY,NX),NY,NX)    = HeatFlow2Soil_3D(3,NUM(NY,NX),NY,NX)+HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)
+  WatFLo2Litr(NY,NX)                      = WatFLo2Litr(NY,NX)+WatFLow2LitR_col(NY,NX)
+  HeatFLo2LitrByWat(NY,NX)                = HeatFLo2LitrByWat(NY,NX)+HeatFLoByWat2LitRi_col(NY,NX)
 
   HeatByRad2Surf_col(NY,NX)     = HeatByRad2Surf_col(NY,NX)+Radnet2LitGrnd+Radnet2Snow
   HeatSensAir2Surf_col(NY,NX)    = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow

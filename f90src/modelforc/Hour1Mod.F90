@@ -1091,17 +1091,16 @@ module Hour1Mod
 !     *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 !     *SG PARAMETER statement above
 !
-  TFACL=TEFAQUDIF(TKS_vr(0,NY,NX))
-  TScal4Difsvity_vr(0,NY,NX)=TFACL
+  TFACL                      = TEFAQUDIF(TKS_vr(0,NY,NX))
+  TScal4Difsvity_vr(0,NY,NX) = TFACL
 
-  SoluteDifusvty_vr(idg_CO2,0,NY,NX) = CLSG*TFACL
-  SoluteDifusvty_vr(idg_CH4,0,NY,NX) = CQSG*TFACL
-  SoluteDifusvty_vr(idg_O2,0,NY,NX)  = OLSG*TFACL
-  SoluteDifusvty_vr(idg_N2,0,NY,NX)  = ZLSG*TFACL
-  SoluteDifusvty_vr(idg_NH3,0,NY,NX) = ZNSG*TFACL
-  SoluteDifusvty_vr(idg_H2,0,NY,NX)  = HLSG*TFACL
-  SoluteDifusvty_vr(idg_N2O,0,NY,NX) = ZVSG*TFACL
-
+  SoluteDifusvty_vr(idg_CO2,0,NY,NX)   = CLSG*TFACL
+  SoluteDifusvty_vr(idg_CH4,0,NY,NX)   = CQSG*TFACL
+  SoluteDifusvty_vr(idg_O2,0,NY,NX)    = OLSG*TFACL
+  SoluteDifusvty_vr(idg_N2,0,NY,NX)    = ZLSG*TFACL
+  SoluteDifusvty_vr(idg_NH3,0,NY,NX)   = ZNSG*TFACL
+  SoluteDifusvty_vr(idg_H2,0,NY,NX)    = HLSG*TFACL
+  SoluteDifusvty_vr(idg_N2O,0,NY,NX)   = ZVSG*TFACL
   SoluteDifusvty_vr(ids_NO3,0,NY,NX)   = ZOSG*TFACL
   SoluteDifusvty_vr(ids_H1PO4,0,NY,NX) = POSG*TFACL
   
@@ -1146,10 +1145,10 @@ module Hour1Mod
 !
 !     WVapDifusvityAir_col,VaporDiffusivityLitR_col,WGSGW=vapor diffusivity in air,litter,snowpack
 !
-  TFACA=TEFGASDIF(TairK_col(NY,NX))
-  WVapDifusvityAir_col(NY,NX)=WGSG*TFACA
-  TFACR=TEFGASDIF(TKS_vr(0,NY,NX))
-  VaporDiffusivityLitR_col(NY,NX)=WGSG*TFACR
+  TFACA                           = TEFGASDIF(TairK_col(NY,NX))
+  WVapDifusvityAir_col(NY,NX)     = WGSG*TFACA
+  TFACR                           = TEFGASDIF(TKS_vr(0,NY,NX))
+  VaporDiffusivityLitR_col(NY,NX) = WGSG*TFACR
   !write(*,*) "VaporDiffusivityLitR_col(NY,NX) = ", VaporDiffusivityLitR_col(NY,NX)
   !write(*,*) "WGSG = ", WGSG
   !write(*,*) "TFACR = ", TFACR
@@ -1244,15 +1243,15 @@ module Hour1Mod
         endif  
         CPO4B(L,NY,NX)=AZMAX1(CPO4B(L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)))
       ELSE
-        trc_solcl_vr(ids_H1PO4B,L,NY,NX)=0.0_r8
-        trc_solcl_vr(ids_H2PO4B,L,NY,NX)=0.0_r8
-        CPO4B(L,NY,NX)=0.0_r8
+        trc_solcl_vr(ids_H1PO4B,L,NY,NX) = 0.0_r8
+        trc_solcl_vr(ids_H2PO4B,L,NY,NX) = 0.0_r8
+        CPO4B(L,NY,NX)                   = 0.0_r8
       ENDIF
 
     ELSE
-      trc_solcl_vr(ids_nuts_beg:ids_nuts_end,L,NY,NX)=0.0_r8
-      CPO4S(L,NY,NX)=0.0_r8
-      CPO4B(L,NY,NX)=0.0_r8
+      trc_solcl_vr(ids_nuts_beg:ids_nuts_end,L,NY,NX) = 0.0_r8
+      CPO4S(L,NY,NX)                                  = 0.0_r8
+      CPO4B(L,NY,NX)                                  = 0.0_r8
     ENDIF
   ENDDO
   end subroutine GetSoluteConcentrations

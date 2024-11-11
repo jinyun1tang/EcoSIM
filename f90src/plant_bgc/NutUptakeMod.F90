@@ -288,7 +288,7 @@ module NutUptakeMod
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
   real(r8), intent(in):: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)  !the minimum root fraction involved in substrate uptake
   real(r8), intent(in):: RootAreaDivRadius_vr(jroots,JZ1),FCUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
   real(r8) :: DIFFL

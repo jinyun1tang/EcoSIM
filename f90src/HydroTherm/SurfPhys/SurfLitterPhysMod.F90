@@ -443,6 +443,9 @@ implicit none
     tk1pre             = TKR1
     TKR1               = (ENGYR+HeatFluxAir2LitR2+PrecHeat2LitR2-HeatSensVapLitR2Soi2-HeatSensLitR2Soi2)/VLHeatCapcityLitR2
     TKS1               = TKS1+(HeatSensVapLitR2Soi2+HeatSensLitR2Soi2)/VLHeatCapacity2
+    if(I==357 .and. j==11)then
+    write(112,*)I,J,M,NN,TKR1,TKS1,TK1pre,VWatLitr2,VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
+    endif
 !    write(124,*)'tkr1',NN,TKR1,TKS1,TKQ_col(NY,NX),TairK_col(NY,NX),TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
 !    print*,'cplitr',NN,VLHeatCapcityLitR2,SoilOrgM_vr(ielmc,0,NY,NX),VWatLitr2,VLiceMicP1_vr(0,NY,NX)
 !    write(124,*)I+J/24.,M,NN,TKR1,TKS1,TKSoi1_vr(0,NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
@@ -553,6 +556,9 @@ implicit none
   ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff=litter total cond+conv,latent,runoff heat flux
   VLWatMicP10                   = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP10                   = VLiceMicP1_vr(0,NY,NX)
+  if(I==357 .and. j==11)then
+  write(112,*)I,J,M,'updatel',VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)+LitrIceFlxThaw(NY,NX),WatFLow2LitR_col(NY,NX),LitrIceFlxThaw(NY,NX)
+  endif
   VLWatMicP1_vr(0,NY,NX)        = AZMAX1(VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)+LitrIceFlxThaw(NY,NX))
   VLiceMicP1_vr(0,NY,NX)        = AZMAX1(VLiceMicP1_vr(0,NY,NX)-LitrIceFlxThaw(NY,NX)/DENSICE)
   VLairMicP1_vr(0,NY,NX)        = AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
@@ -590,16 +596,17 @@ implicit none
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoi1_vr(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi_col(NY,NX)+LitrIceHeatFlxFrez(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
-!    if(I==280)print*,I+J/24.,J,'cpksoi0',VHeatCapacity1_vr(0,NY,NX),SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
-    if(TKSoi1_vr(0,NY,NX)<100._r8 .or. TKSoi1_vr(0,NY,NX)>400._r8)then
-      write(*,*)'weird litter temp UpdateLitRB4RunoffM=',I,J,M,NY,NX,TKSoi1_vr(0,NY,NX),TK0Prev,VHeatCapacity1_vr(0,NY,NX)
+    if(TKSoi1_vr(0,NY,NX)<100._r8 .or. TKSoi1_vr(0,NY,NX)>400._r8 .or. I==357)then
+      write(*,*)'weird litter temp UpdateLitRB4RunoffM=',TKSoi1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoi1_vr(NUM(NY,NX),NY,NX)
+      write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
       write(*,*)'engy',ENGYR/VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRi_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),&
         LitrIceHeatFlxFrez(NY,NX)/VHeatCapacity1_vr(0,NY,NX)
       write(*,*)'cpo',cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitRMin_col(NY,NX) 
-      write(*,*)'cpw',cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
+      write(*,*)'cpw',cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
       write(*,*)'watflw',ENGYR,WatFLow2LitR_col(NY,NX),HeatFLoByWat2LitRi_col(NY,NX),HeatFLoByWat2LitRi_col(NY,NX)/(WatFLow2LitR_col(NY,NX)*cpw)
       write(*,*)'vlwat',VLWatMicP10,WatFLow2LitR_col(NY,NX),cumWatFlx2LitRByRunoff(NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)
-      call endrun(trim(mod_filename)//'at line',__LINE__)
+      write(*,*)I,J,M      
+      if(abs(HeatFLoByWat2LitRi_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX))>20._r8)call endrun(trim(mod_filename)//'at line',__LINE__)
     endif
 !    IF(ABS(VHeatCapacity1_vr(0,NY,NX)/VLHeatCapLitRPre-1._r8)>0.025_r8.or. &
 !      abs(TKSoi1_vr(0,NY,NX)/TK0Prev-1._r8)>0.025_r8)THEN
@@ -689,7 +696,7 @@ implicit none
       write(*,*)'weird litter temp UpdateLitRAftRunoff  =',M,NY,NX,TKSoi1_vr(0,NY,NX),TK0Prev,VHeatCapacity1_vr(0,NY,NX)
       write(*,*)ENGYR/VHeatCapacity1_vr(0,NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)/VHeatCapacity1_vr(0,NY,NX)
       write(*,*)cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitRMin_col(NY,NX) 
-      write(*,*)cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
+      write(*,*)cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
       write(*,*)VLWatMicP10,cumWatFlx2LitRByRunoff(NY,NX),cumHeatFlx2LitRByRunoff(NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif

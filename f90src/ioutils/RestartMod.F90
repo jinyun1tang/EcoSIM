@@ -262,7 +262,6 @@ implicit none
   else
     !print*,'StandDeadKCompElms_pft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StandDeadKCompElms_pft,datrp_3d)
-    write(111,*)'restart',datrp_3d(1:npfts,1:NumPlantChemElms,jsken)    
     datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:jsken)    
     call restartvar(ncid, flag, varname='StandDeadKCompElms_pft', dim1name='pft',dim2name='elmnts',&
        dim3name='nkinecmp',long_name='standing dead element fraction', units='g d-2', &

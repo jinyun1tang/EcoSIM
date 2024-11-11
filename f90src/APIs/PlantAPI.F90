@@ -4,6 +4,7 @@ module PlantAPI
   use data_kind_mod   , only : r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only : micpar, pltpar
   use SoilPhysDataType, only : SurfAlbedo_col
+  use MiniMathMod, only : AZMAX1
   use EcoSIMSolverPar
   use EcoSIMHistMod
   use SnowDataType
@@ -543,7 +544,7 @@ implicit none
         RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)              = plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)
         AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)         = plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)          = plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)
-        PopuRootMycoC_pvr(N,L,NZ,NY,NX)                = plt_biom% PopuRootMycoC_pvr(N,L,NZ)
+        PopuRootMycoC_pvr(N,L,NZ,NY,NX)                = AZMAX1(plt_biom%PopuRootMycoC_pvr(N,L,NZ))
         RootProteinC_pvr(N,L,NZ,NY,NX)                 = plt_biom%RootProteinC_pvr(N,L,NZ)
         RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)            = plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)
         RootCO2Autor_vr(L,NY,NX) = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)        
@@ -1345,20 +1346,20 @@ implicit none
 
 !        plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ)=trcg_air2root_flx__pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
 !        plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ)=trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
-        plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ) =RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)=RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNH4DmndBand_pvr(N,L,NZ)=RootNH4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNO3DmndSoil_pvr(N,L,NZ)=RootNO3DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNO3DmndBand_pvr(N,L,NZ)=RootNO3DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH2PO4DmndSoil_pvr(N,L,NZ)=RootH2PO4DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)=RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)=RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)=RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)   =AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
-        plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)   =RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)
-        plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ) =RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)
-        plt_biom% PopuRootMycoC_pvr(N,L,NZ) = PopuRootMycoC_pvr(N,L,NZ,NY,NX)
-        plt_biom%RootProteinC_pvr(N,L,NZ) =RootProteinC_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)     = RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)     = RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNH4DmndBand_pvr(N,L,NZ)     = RootNH4DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNO3DmndSoil_pvr(N,L,NZ)     = RootNO3DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNO3DmndBand_pvr(N,L,NZ)     = RootNO3DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH2PO4DmndSoil_pvr(N,L,NZ)   = RootH2PO4DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)   = RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)   = RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)   = RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)  = AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
+        plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)   = RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)
+        plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)
+        plt_biom%PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ,NY,NX)
+        plt_biom%RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ,NY,NX)
 
       enddo
 !      plt_bgcr%RootN2Fix_pvr(L,NZ) =RootN2Fix_pvr(L,NZ,NY,NX)

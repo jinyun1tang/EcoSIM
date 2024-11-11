@@ -3060,8 +3060,10 @@ module PlantBranchMod
 ! RMxess_brch=excess maintenance respiration, drives remobilization & senescence
 !
   RCO2X       = RCO2NonstC_brch-RCO2Maint_brch
-  RCO2Y       = AZMAX1(RCO2X)*CanTurgPSIFun4Expans
+  RCO2Y       = AZMAX1(RCO2X)*CanTurgPSIFun4Expans  
   RMxess_brch = AZMAX1(-RCO2X)
+!  write(111,'(I4,5(X,F12.7))')NB,I+J/24.,CanopyNonstElms_brch(ielmc,NB,NZ),&
+!    RCO2NonstC_brch,RCO2Maint_brch,fTCanopyGroth_pft(NZ),CanTurgPSIFun4Expans  
 !
 ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
 ! AVAILABLE FOR GROWTH
@@ -3232,12 +3234,14 @@ module PlantBranchMod
 ! CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 ! SenesMaxByMaintDefcit,RMxess_brch=excess maintenance respiration unltd,ltd by O2
 !
-  RCO2X_O2ulm=RCO2CM-RCO2Maint_brch
-  RCO2X=RCO2NonstC_brch-RCO2Maint_brch
-  RCO2YM=AZMAX1(RCO2X_O2ulm)*CanTurgPSIFun4Expans
-  RCO2Y=AZMAX1(RCO2X)*CanTurgPSIFun4Expans
-  SenesMaxByMaintDefcit=AZMAX1(-RCO2X_O2ulm)
-  RMxess_brch=AZMAX1(-RCO2X)
+  RCO2X_O2ulm           = RCO2CM-RCO2Maint_brch
+  RCO2X                 = RCO2NonstC_brch-RCO2Maint_brch
+  RCO2YM                = AZMAX1(RCO2X_O2ulm)*CanTurgPSIFun4Expans
+  RCO2Y                 = AZMAX1(RCO2X)*CanTurgPSIFun4Expans
+  SenesMaxByMaintDefcit = AZMAX1(-RCO2X_O2ulm)
+  RMxess_brch           = AZMAX1(-RCO2X)
+!  write(111,'(I4,F10.4,6(X,E12.6))')NB,I+J/24.,CanopyNonstElms_brch(ielmc,NB,NZ),RCO2NonstC_brch,RCO2Maint_brch,&
+!    fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ),CanTurgPSIFun4Expans,RAutoRootO2Limter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
 !
 ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
 ! AVAILABLE FOR GROWTH

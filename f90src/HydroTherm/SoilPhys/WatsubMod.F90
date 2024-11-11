@@ -1384,7 +1384,7 @@ module WatsubMod
     VLSoiPorAV = VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)-VLiceMicP1_vr(L,NY,NX)-VLiceMacP1_vr(L,NY,NX)
     IF(VLSoiPorAV.GT.ZEROS2(NY,NX) .AND. VLsoiAirPM(M,L,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWA                         = AZMAX1(AMIN1(1.0_r8,VLWatSoi/VLSoiPorAV))
-      TScal4Aquadifsvity             = TEFAQUDIF(TKSoi1_vr(0,NY,NX))
+      TScal4Aquadifsvity             = TEFAQUDIF(TKSoi1_vr(L,NY,NX))
       Z3S                            = FieldCapacity_vr(L,NY,NX)/POROS_vr(L,NY,NX)
       scalar                         = TScal4Aquadifsvity*XNPD
       DiffusivitySolutEff(M,L,NY,NX) = fDiffusivitySolutEff(scalar,THETWA,Z3S)
