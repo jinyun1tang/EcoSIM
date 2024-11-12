@@ -73,8 +73,8 @@ implicit none
     QRunSurf_col(NY,NX)=0.0_r8
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
-    AREA(3,0,NY,NX)=a_AREA3(0,NY)
-    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
+    !AREA(3,0,NY,NX)=a_AREA3(0,NY)
+    !AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E(NY,NX)=atm_co2
@@ -93,6 +93,8 @@ implicit none
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       POROS(L,NY,NX)=a_PORO(L,NY)
+      AREA(3,L,NY,NX)=a_AREA3(L,NY)
+      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
@@ -103,7 +105,22 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
+  write(*,*) "Before startsim: "
+  write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
+
   call startsim(NHW,NHE,NVN,NVS)
+
+  do NY=1,NYS
+    DO L=NU(NY,NX),NL(NY,NX)
+      AREA(3,L,NY,NX)=a_AREA3(L,NY)
+      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
+    ENDDO
+  ENDDO
+ 
+  write(*,*) "After startsim: "
+  write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
+
+  !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
 
   end subroutine Init_EcoSIM_Soil
 

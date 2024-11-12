@@ -39,10 +39,11 @@ Module SharedDataMod
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
   real(r8), allocatable :: a_HCOND(:,:)   !hydraulic conductivity
   real(r8), allocatable :: a_TEMP(:,:)    !temperature
-  real(r8), allocatable :: a_TEMP_flip(:,:)    !temperature
+  real(r8), allocatable :: a_TEMP_pad(:,:)    !temperature
   real(r8), allocatable :: a_SSES(:,:)    !subsurface energy source
   real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
   real(r8), allocatable :: a_AREA3(:,:) 
+  real(r8), allocatable :: a_AREA3_pad(:,:)
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
@@ -103,35 +104,37 @@ Module SharedDataMod
     !allocate(vpair(1:ncells_per_col_))
     allocate(a_ATKA(1:ncells_per_col_))
  
-    allocate(a_BKDSI(ncells_per_col_, ncol))        ! bulk density
-    allocate(a_CumDepth2LayerBottom(ncells_per_col_, ncol))  ! depth (from surface to bottom)
-    allocate(a_Volume(ncells_per_col_, ncol))       ! volume
-    allocate(a_dz(ncells_per_col_, ncol))           ! distance between layers
-    allocate(a_AreaZ(ncells_per_col_, ncol))        ! area normal to z-axis
-    allocate(a_FC(ncells_per_col_, ncol))           ! field capacity
-    allocate(a_WP(ncells_per_col_, ncol))           ! wilting point
-    allocate(a_PORO(ncells_per_col_, ncol))         ! porosity
-    allocate(a_MATP(ncells_per_col_, ncol))         ! matric pressure
-    allocate(a_WC(ncells_per_col_, ncol))           ! soil water content
-    allocate(a_LSAT(ncells_per_col_, ncol))         ! liquid saturation
-    allocate(a_RELPERM(ncells_per_col_, ncol))      ! relative permeability
-    allocate(a_HCOND(ncells_per_col_, ncol))        ! hydraulic conductivity
-    allocate(a_TEMP(ncells_per_col_, ncol))         ! temperature
-    allocate(a_SSES(ncells_per_col_, ncol))         ! subsurface energy source
-    allocate(a_SSWS(ncells_per_col_, ncol))         ! subsurface water source
-    allocate(a_AREA3(ncells_per_col_, ncol)) 
+    !allocate(a_BKDSI(ncells_per_col_, ncol))        ! bulk density
+    !allocate(a_CumDepth2LayerBottom(ncells_per_col_, ncol))  ! depth (from surface to bottom)
+    !allocate(a_Volume(ncells_per_col_, ncol))       ! volume
+    !allocate(a_dz(ncells_per_col_, ncol))           ! distance between layers
+    !allocate(a_AreaZ(ncells_per_col_, ncol))        ! area normal to z-axis
+    !allocate(a_FC(ncells_per_col_, ncol))           ! field capacity
+    !allocate(a_WP(ncells_per_col_, ncol))           ! wilting point
+    !allocate(a_PORO(ncells_per_col_, ncol))         ! porosity
+    !allocate(a_MATP(ncells_per_col_, ncol))         ! matric pressure
+    !allocate(a_WC(ncells_per_col_, ncol))           ! soil water content
+    !allocate(a_LSAT(ncells_per_col_, ncol))         ! liquid saturation
+    !allocate(a_RELPERM(ncells_per_col_, ncol))      ! relative permeability
+    !allocate(a_HCOND(ncells_per_col_, ncol))        ! hydraulic conductivity
+    !allocate(a_TEMP(ncells_per_col_, ncol))         ! temperature
+    !allocate(a_SSES(ncells_per_col_, ncol))         ! subsurface energy source
+    !allocate(a_SSWS(ncells_per_col_, ncol))         ! subsurface water source
+    !allocate(a_AREA3(ncells_per_col_, ncol)) 
+    !allocate(a_AREA3_pad(ncells_per_col_, ncol))
+    !allocate(a_TEMP_pad(ncells_per_col_, ncol))
 
-    allocate(a_ASP(ncells_per_col_))                ! aspect
-    allocate(tairc(ncells_per_col_))                ! air temperature
-    allocate(uwind(ncells_per_col_))                ! wind speed
-    allocate(p_rain(ncells_per_col_))               ! precipitation (rain)
-    allocate(p_snow(ncells_per_col_))               ! precipitation (snow)
-    allocate(sunrad(ncells_per_col_))               ! solar radiation
-    allocate(swrad(ncells_per_col_))                ! shortwave radiation
-    allocate(vpair(ncells_per_col_))                ! vapor pressure deficit
-    allocate(surf_e_source(ncells_per_col_))        ! surface energy source
-    allocate(surf_w_source(ncells_per_col_))        ! surface water source
-    allocate(surf_snow_depth(ncells_per_col_))        ! surface snow depth
+    !allocate(a_ASP(ncells_per_col_))                ! aspect
+    !allocate(tairc(ncells_per_col_))                ! air temperature
+    !allocate(uwind(ncells_per_col_))                ! wind speed
+    !allocate(p_rain(ncells_per_col_))               ! precipitation (rain)
+    !allocate(p_snow(ncells_per_col_))               ! precipitation (snow)
+    !allocate(sunrad(ncells_per_col_))               ! solar radiation
+    !allocate(swrad(ncells_per_col_))                ! shortwave radiation
+    !allocate(vpair(ncells_per_col_))                ! vapor pressure deficit
+    !allocate(surf_e_source(ncells_per_col_))        ! surface energy source
+    !allocate(surf_w_source(ncells_per_col_))        ! surface water source
+    !allocate(surf_snow_depth(ncells_per_col_))        ! surface snow depth
 
     a_NU=1
     a_NL=ncells_per_col_
@@ -168,6 +171,8 @@ Module SharedDataMod
   call destroy(swrad)
   call destroy(vpair)
   call destroy(a_ATKA)
+  call destroy(a_AREA3_pad)
+  call destroy(a_TEMP_pad)
   end subroutine DestroySharedData
 
 end module SharedDataMod

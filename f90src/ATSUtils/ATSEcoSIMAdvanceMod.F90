@@ -58,10 +58,10 @@ implicit none
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
-    a_AREA3(0,NY) = 1.0_r8
-    AREA(3,0,NY,NX)=a_AREA3(0,NY)
-    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
-    AREA(3,2,NY,NX)=a_AREA3(0,NY)
+    !a_AREA3(0,NY) = 1.0_r8
+    !AREA(3,0,NY,NX)=a_AREA3(1,NY)
+    !AREA(3,NU(NY,NX),NY,NX)=a_AREA3(1,NY)
+    !AREA(3,2,NY,NX)=a_AREA3(1,NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
@@ -83,19 +83,12 @@ implicit none
     !converting precipitation units from m s^-1 to mm hr^-1
     RainH(NY,NX) = p_rain(NY)*1000.0_r8*3600.0_r8
     TCA(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
-    IF(TCA(NY,NX).GT.TSNOW)THEN
-      PrecAsRain(NY,NX)=RAINH(NY,NX)
-      PrecAsSnow(NY,NX)=0.0_r8
-    ELSE
-      PrecAsRain(NY,NX)=0.0_r8
-      PrecAsSnow(NY,NX)=RAINH(NY,NX)
-    ENDIF
-    RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
+      AREA(3,L,NY,NX)=a_AREA3(L,NY)
+      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
-      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
+      SoiBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
@@ -108,19 +101,34 @@ implicit none
       POROS(L,NY,NX) = a_PORO(L,NY)
       !AREA3(L,NY,NX) = a_AREA3(L,NY)
    ENDDO
-   POROS(0,NY,NX) = POROS(1,NY,NX)
+    IF(TCA(NY,NX).GT.TSNOW)THEN
+      PrecAsRain(NY,NX)=RAINH(NY,NX)
+      PrecAsSnow(NY,NX)=0.0_r8
+    ELSE
+      PrecAsRain(NY,NX)=0.0_r8
+      PrecAsSnow(NY,NX)=RAINH(NY,NX)
+    ENDIF
+    RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    POROS(0,NY,NX) = POROS(1,NY,NX)
   ENDDO
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
+  !write(*,*) "before stage: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
+
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
+
+  !write(*,*) "after stage: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
   DO M=1,NPH
     call RunSurfacePhysModel(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
   ENDDO
-  
+ 
+  !write(*,*) "after run: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
+
   !write(*,*) "Heat and water souces: "
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
@@ -132,9 +140,8 @@ implicit none
     !write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
-  
-  write(*,*) "SnowDepth_col = ", SnowDepth_col(1,1), ' m'
-  write(*,*) "prec = ", RAINH(1,1), " m/s"
+ 
+  write(*,*) "snow_depth = ", surf_snow_depth(1) 
   write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 
   write(*,*) "Q_w ", surf_w_source(1) , " m/s"
 
