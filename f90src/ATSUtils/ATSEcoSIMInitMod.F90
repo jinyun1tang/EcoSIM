@@ -8,8 +8,8 @@ module ATSEcoSIMInitMod
   use LandSurfDataType
   use EcoSIMCtrlMod
   use EcoSIMConfig , only : column_mode
-  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
-      SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
+  use HydroThermData, only : PSISM1_vr, TKSoi1_vr, VHeatCapacity1_vr, &
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm_col, RainH
@@ -91,9 +91,9 @@ implicit none
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
 
     DO L=NU(NY,NX),NL(NY,NX)
-      TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
-      POROS(L,NY,NX)=a_PORO(L,NY)
+      TKSoi1_vr(L,NY,NX) = a_TEMP(L,NY)
+      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
+      POROS_vr(L,NY,NX)=a_PORO(L,NY)
       AREA(3,L,NY,NX)=a_AREA3(L,NY)
       !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)

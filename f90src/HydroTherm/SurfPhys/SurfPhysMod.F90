@@ -89,7 +89,7 @@ contains
   HeatNet2Surf_col(NY,NX)                 = 0.0_r8
   VapXAir2GSurf_col(NY,NX)                = 0.0_r8
 
-  TFLWCI(NY,NX)           = 0.0_r8
+  !TFLWCI(NY,NX)           = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
 
 ! zero arrays in the snow layers
@@ -98,11 +98,11 @@ contains
   HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
   WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
   HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8
-  SnoXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
-  WatXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
-  IceXfer2SnoLay(1:JS,NY,NX)    = 0.0_r8
-  HeatXfer2SnoLay(1:JS,NY,NX)   = 0.0_r8
-  XPhaseChangeHeatL(1:JS,NY,NX) = 0.0_r8
+  SnoXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay_snvr(1:JS,NY,NX)   = 0.0_r8
+  XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0.0_r8
 
   end subroutine SetHourlyAccumulatorsATS
 

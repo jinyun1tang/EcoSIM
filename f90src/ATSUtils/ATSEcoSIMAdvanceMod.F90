@@ -82,9 +82,9 @@ implicit none
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
     !converting precipitation units from m s^-1 to mm hr^-1
     RainH(NY,NX) = p_rain(NY)*1000.0_r8*3600.0_r8
-    TCA(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
+    TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
-      CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
+      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
       AREA(3,L,NY,NX)=a_AREA3(L,NY)
       !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
@@ -92,16 +92,16 @@ implicit none
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
-      VLWatMicP1(L,NY,NX)=a_WC(L,NY)
-      VLiceMicP1(L,NY,NX)=0.0
-      TKSoi1(L,NY,NX) = a_TEMP(L,NY)
-      VLHeatCapacity_vr(L,NY,NX) = heat_capacity
-      SoilFracAsMicP(L,NY,NX) = 1.0
-      PSISM1(L,NY,NX) = a_MATP(L,NY)
-      POROS(L,NY,NX) = a_PORO(L,NY)
+      VLWatMicP1_vr(L,NY,NX)=a_WC(L,NY)
+      VLiceMicP1_vr(L,NY,NX)=0.0
+      TKSoi1_vr(L,NY,NX) = a_TEMP(L,NY)
+      VHeatCapacity1_vr(L,NY,NX) = heat_capacity
+      SoilFracAsMicP_vr(L,NY,NX) = 1.0
+      PSISM1_vr(L,NY,NX) = a_MATP(L,NY)
+      POROS_vr(L,NY,NX) = a_PORO(L,NY)
       !AREA3(L,NY,NX) = a_AREA3(L,NY)
    ENDDO
-    IF(TCA(NY,NX).GT.TSNOW)THEN
+    IF(TCA_col(NY,NX).GT.TSNOW)THEN
       PrecAsRain(NY,NX)=RAINH(NY,NX)
       PrecAsSnow(NY,NX)=0.0_r8
     ELSE
@@ -109,8 +109,8 @@ implicit none
       PrecAsSnow(NY,NX)=RAINH(NY,NX)
     ENDIF
     RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    SnoFalPrec(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    POROS(0,NY,NX) = POROS(1,NY,NX)
+    SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    POROS_vr(0,NY,NX) = POROS_vr(1,NY,NX)
   ENDDO
 
   PSIAtFldCapacity = pressure_at_field_capacity
