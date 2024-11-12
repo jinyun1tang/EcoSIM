@@ -1,4 +1,4 @@
-module nitrosMod
+module SoilBGCNLayMod
 !!
 ! DESCRIPTION:
 ! codes to do soil biological transformations
@@ -14,7 +14,7 @@ module nitrosMod
   use ChemTranspDataType
   use FertilizerDataType
   use MicrobeDiagTypes
-  use NitroDisturbMod
+  use SoilDisturbMod
   use GridConsts
   use SoilBGCDataType
   use EcoSIMCtrlDataType
@@ -90,9 +90,9 @@ module nitrosMod
             exit
           ENDIF
         ENDDO D1100
-        ORGRL=AZMAX1(OMLitrC_vr(L,NY,NX))
-        ORGRLL=AZMAX1(OMLitrC_vr(LL,NY,NX))
-        OSCXD=(ORGRL*VGeomLayer(LL,NY,NX)-ORGRLL*VGeomLayer(L,NY,NX))/(VGeomLayer(L,NY,NX)+VGeomLayer(LL,NY,NX))
+        ORGRL  = AZMAX1(OMLitrC_vr(L,NY,NX))
+        ORGRLL = AZMAX1(OMLitrC_vr(LL,NY,NX))
+        OSCXD  = (ORGRL*VGeomLayer_vr(LL,NY,NX)-ORGRLL*VGeomLayer_vr(L,NY,NX))/(VGeomLayer_vr(L,NY,NX)+VGeomLayer_vr(LL,NY,NX))
         IF(OSCXD.GT.0.0_r8.AND.OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FOSCXD=OSCXD/OMLitrC_vr(L,NY,NX)
         ELSEIF(OSCXD.LT.0.0_r8.AND.OMLitrC_vr(LL,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -100,8 +100,8 @@ module nitrosMod
         ELSE
           FOSCXD=0.0_r8
         ENDIF
-        IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer(L,NY,NX)          
+        IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer_vr(L,NY,NX)          
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
@@ -143,9 +143,9 @@ module nitrosMod
               L1=LL
             ENDIF
             DO NE=1,NumPlantChemElms            
-              OMEXS=FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
-              mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
-              mBiomeHeter_vr(NE,MID,K,LL,NY,NX)=mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
+              OMEXS                             = FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
+              mBiomeHeter_vr(NE,MID,K,L,NY,NX)  = mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
+              mBiomeHeter_vr(NE,MID,K,LL,NY,NX) = mBiomeHeter_vr(NE,MID,K,LL,NY,NX)+OMEXS
             ENDDO
           ENDDO D7962
         ENDDO
@@ -163,9 +163,9 @@ module nitrosMod
         ENDIF
 
         DO NE=1,NumPlantChemElms
-          ORMXS=FracLitrMix*AZMAX1(OMBioResdu_vr(NE,M,K,L1,NY,NX))        
-          OMBioResdu_vr(NE,M,K,L,NY,NX)=OMBioResdu_vr(NE,M,K,L,NY,NX)-ORMXS
-          OMBioResdu_vr(NE,M,K,LL,NY,NX)=OMBioResdu_vr(NE,M,K,LL,NY,NX)+ORMXS
+          ORMXS                          = FracLitrMix*AZMAX1(OMBioResdu_vr(NE,M,K,L1,NY,NX))
+          OMBioResdu_vr(NE,M,K,L,NY,NX)  = OMBioResdu_vr(NE,M,K,L,NY,NX)-ORMXS
+          OMBioResdu_vr(NE,M,K,LL,NY,NX) = OMBioResdu_vr(NE,M,K,LL,NY,NX)+ORMXS
         ENDDO
       ENDDO D7941
       !mix dissolved organic matter
@@ -175,17 +175,17 @@ module nitrosMod
         L1=LL
       ENDIF      
       DO NE=idom_beg,idom_end
-        OQMXS=FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
-        OQMHXS=FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
-        OHMXS=FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
+        OQMXS  = FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
+        OQMHXS = FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
+        OHMXS  = FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
 
-        DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)-OQMXS
-        DOM_MacP_vr(NE,K,L,NY,NX)=DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
-        SorbedOM_vr(NE,K,L,NY,NX)=SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
+        DOM_vr(NE,K,L,NY,NX)      = DOM_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MacP_vr(NE,K,L,NY,NX) = DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
+        SorbedOM_vr(NE,K,L,NY,NX) = SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
 
-        DOM_vr(NE,K,LL,NY,NX)=DOM_vr(NE,K,LL,NY,NX)+OQMXS
-        DOM_MacP_vr(NE,K,LL,NY,NX)=DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
-        SorbedOM_vr(NE,K,LL,NY,NX)=SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
+        DOM_vr(NE,K,LL,NY,NX)      = DOM_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MacP_vr(NE,K,LL,NY,NX) = DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
+        SorbedOM_vr(NE,K,LL,NY,NX) = SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
       ENDDO
 
       !mix solid organic matter
@@ -196,13 +196,13 @@ module nitrosMod
           L1=LL
         ENDIF
         DO NE=1,NumPlantChemElms
-          OSMXS=FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
-          SolidOM_vr(NE,M,K,L,NY,NX)=SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS
-          SolidOM_vr(NE,M,K,LL,NY,NX)=SolidOM_vr(NE,M,K,LL,NY,NX)+OSMXS
+          OSMXS                       = FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
+          SolidOM_vr(NE,M,K,L,NY,NX)  = SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS
+          SolidOM_vr(NE,M,K,LL,NY,NX) = SolidOM_vr(NE,M,K,LL,NY,NX)+OSMXS
         ENDDO
-        OSAXS=FracLitrMix*AZMAX1(SolidOMAct_vr(M,K,L1,NY,NX))
-        SolidOMAct_vr(M,K,L,NY,NX)=SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
-        SolidOMAct_vr(M,K,LL,NY,NX)=SolidOMAct_vr(M,K,LL,NY,NX)+OSAXS
+        OSAXS                       = FracLitrMix*AZMAX1(SolidOMAct_vr(M,K,L1,NY,NX))
+        SolidOMAct_vr(M,K,L,NY,NX)  = SolidOMAct_vr(M,K,L,NY,NX)-OSAXS
+        SolidOMAct_vr(M,K,LL,NY,NX) = SolidOMAct_vr(M,K,LL,NY,NX)+OSAXS
       ENDDO D7931
     ENDDO D7901
   ENDIF
@@ -240,6 +240,7 @@ module nitrosMod
   else
     nelms=NumPlantChemElms
   endif  
+  
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
@@ -283,6 +284,7 @@ module nitrosMod
       if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
       if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
     ENDDO  
+
     DO NE=1,nelms      
       ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
         if(ORGM(NE)<0._r8)then
@@ -292,18 +294,21 @@ module nitrosMod
     ENDDO
 
     ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
     if(ORGM(ielmc)<0._r8)then
     print*,'orgmxxx',ORGM,DOM_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
     print*,'L=',L
     if(present(info))print*,info
     stop
     endif
-    !add solid organic matter
+
+    !add solid organic matter, litter, manure etc
     DO  M=1,jsken
       DO NE=1,nelms
         ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
-        if(ORGM(NE)<0._r8)then
-        print*,'orgm1',ORGM,SolidOM_vr(:,M,K,L,NY,NX)
+        if(ORGM(NE)<-1.e-6_r8)then
+        print*,'orgm1 in '//trim(mod_filename)
+        print*,'lay ',L,ORGM,SolidOM_vr(:,M,K,L,NY,NX)
         stop
         endif
       ENDDO  
@@ -335,7 +340,6 @@ module nitrosMod
     enddo
   enddo
 
-
   DO K=1,micpar%NumOfLitrCmplxs
     !add live heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
@@ -344,7 +348,6 @@ module nitrosMod
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
-
           ENDDO
         enddo
       enddo
@@ -610,4 +613,4 @@ module nitrosMod
   ENDDO
 
   end subroutine sumDOML
-end module nitrosMod
+end module SoilBGCNLayMod

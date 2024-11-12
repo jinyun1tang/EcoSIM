@@ -12,7 +12,7 @@ module ATSEcoSIMInitMod
       SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky, TairK_col, &
-      VPA, WindSpeedAtm, RainH
+      VPA, WindSpeedAtm_col, RainH
   use SoilPropertyDataType
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -77,8 +77,8 @@ implicit none
     !AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
-    !CO2E(NY,NX)=atm_co2
-    !CH4E(NY,NX)=atm_ch4
+    !CO2E_col(NY,NX)=atm_co2
+    !CH4E_col(NY,NX)=atm_ch4
     !OXYE(NY,NX)=atm_o2
     !Z2GE(NY,NX)=atm_n2
     !Z2OE(NY,NX)=atm_n2o
@@ -88,7 +88,8 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
-    WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
+    WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
+
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1(L,NY,NX) = a_TEMP(L,NY)
       CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)

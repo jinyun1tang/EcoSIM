@@ -798,8 +798,9 @@ implicit none
           name = getname (fincl(f,t))
           do ff = 1,nfmaster
              mastername = masterlist(ff)%field%name
-             if (name == mastername) exit
+             if (name == mastername) exit             
           end do
+
           if (name /= mastername) then
              write(iulog,*) trim(subname),' ERROR: ', trim(name), ' in fincl(', f, ') ',&
                   'for history tape ',t,' not found'
@@ -807,7 +808,7 @@ implicit none
           end if
           f = f + 1
        end do
-
+       
        f = 1
        do while (f < max_flds .and. fexcl(f,t) /= ' ')
           do ff = 1,nfmaster
@@ -1602,8 +1603,6 @@ implicit none
   !-----------------------------------------------------------------------
   subroutine hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
 
-!  subroutine hist_htapes_wrapup( rstwr, nlend, bounds, &
-!       watsat_col, sucsat_col, bsw_col, hksat_col)
     !
     ! !DESCRIPTION:
     ! Write history tape(s)
@@ -1679,6 +1678,7 @@ implicit none
 
     ! Loop over active history tapes, create new history files if necessary
     ! and write data to history files if end of history interval.
+    
     do t = 1, ntapes
 
        ! Skip nstep=0 if monthly average
@@ -1709,10 +1709,10 @@ implicit none
           ! If first time sample, generate unique history file name, open file,
           ! define dims, vars, etc.
 
-
           if (tape(t)%ntimes == 1) then
 !             call t_startf('hist_htapes_wrapup_define')
              locfnh(t) = set_hist_filename (hist_freq=tape(t)%nhtfrq,hist_mfilt=tape(t)%mfilt, hist_file=t)
+             print*,'locfnh(t), t=',t,locfnh(t)
 !             if (masterproc) then
                 write(iulog,*) trim(subname),' : Creating history file ', trim(locfnh(t)), &
                      ' at nstep = ',etimer%get_nstep()
@@ -1775,7 +1775,7 @@ implicit none
       hist_mfilt(t)=tape(t)%mfilt
     end do  ! end loop over history tapes
     ! Determine if file needs to be closed
-
+    
     if(ntapes>0)then
       call hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend, lnyr)
     endif
@@ -1816,10 +1816,11 @@ implicit none
        endif
     end do
     ! Reset number of time samples to zero if file is full
-
+    ! make sure for high frequency output, daily or hourly, are recorded by whole year 
     do t = 1, ntapes
-       if ( tape(t)%nhtfrq/=-24 .and. ((if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) .or. lnyr) &
-         .or. (if_disphist(t) .and. tape(t)%ntimes>=tape(t)%mfilt .and. tape(t)%nhtfrq==-24 .and. lnyr)) then
+       if ( tape(t)%nhtfrq>=0 .and. ((if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) .or. lnyr) &
+         .or. (if_disphist(t) .and. tape(t)%ntimes>=tape(t)%mfilt .and. tape(t)%nhtfrq<0 .and. lnyr)) then
+          print*,'htapwrap',lnyr,tape(t)%ntimes,tape(t)%mfilt
           tape(t)%ntimes = 0
        end if
     end do
@@ -2027,8 +2028,8 @@ implicit none
 
        if_disphist(1:ntapes) = .false.
        do t = 1,ntapes          
-          if ((hist_ntimes(t) ==  hist_mfilt(t) .and. tape(t)%nhtfrq/=-24) .or. &
-            hist_ntimes(t) >=  hist_mfilt(t) .and. tape(t)%nhtfrq==-24 .and. lnyr) then
+          if ((hist_ntimes(t) ==  hist_mfilt(t) .and. tape(t)%nhtfrq >=0) .or. &
+            hist_ntimes(t) >=  hist_mfilt(t) .and. tape(t)%nhtfrq<0 .and. lnyr) then
             if_disphist(t) = .true.
           endif
        end do
@@ -2069,6 +2070,7 @@ implicit none
      write(cdate,'(i4.4,"-",i2.2)') yr,mon
    else                        !other
       call etimer%get_curr_date (yr, mon, day, sec)
+      if(sec/=0)sec=sec-etimer%get_step_size()
       write(cdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i5.5)') yr,mon,day-1,sec
    endif
    write(hist_index,'(i1.1)') hist_file - 1
@@ -2102,24 +2104,24 @@ implicit none
    integer :: num1d_out,beg1d_out,end1d_out ! 1d size, beginning and ending indices
    integer :: num2d                         ! 2d size (e.g. number of vertical levels)
    integer :: numg                 ! total number of gridcells across all processors
-    integer :: numt                 ! total number of topounits across all processors
-    integer :: numc                 ! total number of columns across all processors
-    integer :: nump                 ! total number of pfts across all processors
-    character(len=max_namlen) :: name            ! variable name
-    character(len=max_namlen) :: name_acc        ! accumulator variable name
-    character(len=max_namlen) :: long_name       ! long name of variable
-    character(len=max_namlen) :: standard_name       ! standard_name of var
-    character(len=max_chars)  :: long_name_acc   ! long name for accumulator
-    character(len=max_chars)  :: units           ! units of variable
-    character(len=max_chars)  :: units_acc       ! accumulator units
-    character(len=max_chars)  :: fname           ! full name of history file
-    character(len=max_chars)  :: locrest(max_tapes) ! local history restart file names
+   integer :: numt                 ! total number of topounits across all processors
+   integer :: numc                 ! total number of columns across all processors
+   integer :: nump                 ! total number of pfts across all processors
+   character(len=max_namlen) :: name            ! variable name
+   character(len=max_namlen) :: name_acc        ! accumulator variable name
+   character(len=max_namlen) :: long_name       ! long name of variable
+   character(len=max_namlen) :: standard_name       ! standard_name of var
+   character(len=max_chars)  :: long_name_acc   ! long name for accumulator
+   character(len=max_chars)  :: units           ! units of variable
+   character(len=max_chars)  :: units_acc       ! accumulator units
+   character(len=max_chars)  :: fname           ! full name of history file
+   character(len=max_chars)  :: locrest(max_tapes) ! local history restart file names
 
-    character(len=max_namlen),allocatable :: tname(:)
-    character(len=max_chars), allocatable :: tunits(:),tlongname(:)
-    character(len=hist_dim_name_length), allocatable :: tmpstr(:,:)
-    character(len=1), allocatable :: tavgflag(:)
-    integer :: start(2)
+   character(len=max_namlen),allocatable :: tname(:)
+   character(len=max_chars), allocatable :: tunits(:),tlongname(:)
+   character(len=hist_dim_name_length), allocatable :: tmpstr(:,:)
+   character(len=1), allocatable :: tavgflag(:)
+   integer :: start(2)
 
     character(len=1)   :: hnum                   ! history file index
     character(len=hist_dim_name_length)   :: type1d                 ! clm pointer 1d type
@@ -2376,7 +2378,7 @@ implicit none
        ! Add history filenames to master restart file
        do t = 1,ntapes
           call ncd_putvar(ncid,'locfnh', t, locfnh(t))
-          call ncd_putvar(ncid,'locfnhr', t, locfnhr(t))
+          call ncd_putvar(ncid,'locfnhr', t, locfnhr(t))          
        end do
 
        fincl(:,1) = hist_fincl1(:)

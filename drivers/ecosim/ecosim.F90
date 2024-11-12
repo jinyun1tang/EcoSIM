@@ -17,6 +17,8 @@ PROGRAM main
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
   use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
+  use ClimReadMod       , only : get_clm_years
+  use PerturbationMod   , only : config_soil_warming
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
@@ -39,6 +41,7 @@ PROGRAM main
   logical :: is_dos,nlend
   character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
+  integer :: idy, nperiods
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
 !!
@@ -92,7 +95,7 @@ PROGRAM main
 
   call set_sim_type()
 
-  nstopyr=get_sim_len(forc_periods)
+  nstopyr=get_sim_len(forc_periods,nperiods)
 
   call etimer%update_sim_len(nstopyr)
   
@@ -108,25 +111,29 @@ PROGRAM main
   else
     frectyp%ymdhs0=start_date   !the actual simulation beginning year
   endif
-
+  
   call hist_htapes_build()
-
+  
+  !prepare climate forcing
+  call get_clm_years()
+  
   IGO=0
 
 !  print*,frectyp%ymdhs0,yeari
 
-  DO nn1=1,3
+  DO nn1=1,nperiods
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
-
-   !set up output frequency
-    JOUT=JOUTS(NN1)   !frequency on hourly scale
 
     call MicAPI_Init
 
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
-      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2)
+      !determine the step size
+      idy=1      
+      if(forc_periods(nn3+1)>forc_periods(nn3+2))idy=-1
 
+      !do the simulation loop for the period
+      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2),idy
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()
         nlend=.false.

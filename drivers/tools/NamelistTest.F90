@@ -13,9 +13,9 @@ PROGRAM NamelistTest
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_year0
   integer :: forc_periods(5)
-  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3),KOUTS(3)
+  integer :: NPXS(5),NPYS(5),J
   namelist /ecosys_ctrl/hist_config,sim_yyyymmdd,forc_year0,forc_periods,&
-    NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run
+    NPXS,NPYS,continue_run
 
   !local variables
   character(len=256) :: ioerror_msg
@@ -34,9 +34,6 @@ PROGRAM NamelistTest
   continue_run=.false.
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
   NPYS=20   !number of cycles per NPX for gas flux calcns
-  JOUTS=1   !frequency on hourly scale
-  IOUTS=1   !frequency on daily scale
-  KOUTS=500 !frequency on restart file writing
 
   hist_config='NO'
   sim_yyyymmdd='18000101'

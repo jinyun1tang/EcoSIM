@@ -1,20 +1,20 @@
 module InitSOMBGCMOD
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcoSIMConfig,     only: nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
+  use SoilBGCNLayMod,   only: sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
+  use minimathmod,      only: AZMAX1
+  use EcoSiMParDataMod, only: micpar
   use MicrobialDataType
   use SOMDataType
   use GridConsts
-  use minimathmod, only : AZMAX1
   use SoilPhysDataType
   use FlagDataType
   use EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcosimConst
-  use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
   use SurfLitterDataType
   use SoilPropertyDataType
   use GridDataType
-  use EcoSiMParDataMod, only : micpar
-  use nitrosMod, only : sumorgmlayl,sumLitrOMLayL
   implicit none
 
   private
@@ -68,11 +68,12 @@ module InitSOMBGCMOD
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in) :: FCX
 
-  real(r8), parameter :: DCKR=0.25_r8,DCKM=2.5E+04_r8
+  real(r8), parameter :: DCKR=0.25_r8
+  real(r8), parameter :: DCKM=2.5E+04_r8
 
   integer :: K,M,KK,N,NGL,NN
   real(r8) :: OC,ON,OP,X
-  real(r8) :: OMC1,OMN1,OMP1
+  real(r8) :: OME1(1:NumPlantChemElms)
   real(r8) :: FOSCI,FOSNI,FOSPI
   real(r8) :: RNT,RPT
   real(r8) :: FRNT,FRPT
@@ -87,7 +88,7 @@ module InitSOMBGCMOD
   real(r8) :: litrOM(NumPlantChemElms)
   real(r8) :: ORGM(NumPlantChemElms)
   real(r8) :: tglds
-  integer :: MID
+  integer  :: MID,NE
   ! begin_execution
 
   associate(                                               &
@@ -123,10 +124,10 @@ module InitSOMBGCMOD
       FRNT=RSN(K,L,NY,NX)/RNT
       FRPT=RSP(K,L,NY,NX)/RPT
       D960: DO M=1,jsken
-        CNOSC(M,K,L,NY,NX)=CNOFC(M,K)*FRNT
-        CPOSC(M,K,L,NY,NX)=CPOFC(M,K)*FRPT
-        CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
-        CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
+        CNOSC(M,K,L,NY,NX) = CNOFC(M,K)*FRNT
+        CPOSC(M,K,L,NY,NX) = CPOFC(M,K)*FRPT
+        CNOSCT(K)          = CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
+        CPOSCT(K)          = CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
       ENDDO D960
     ELSE
       D965: DO M=1,jsken
@@ -136,17 +137,18 @@ module InitSOMBGCMOD
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
+!    write(*,*)K,L,CNOSCT(K),CPOSCT(K)    
   ENDDO D975
 
-  D990: DO K=micpar%NumOfLitrCmplxs+1,jcplx1
+  D990: DO K=micpar%NumOfLitrCmplxs+1,jcplx
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
       D985: DO M=1,jsken
-        CNOSC(M,K,L,NY,NX)=CORGNX(K)/CORGCX(K)
-        CPOSC(M,K,L,NY,NX)=CORGPX(K)/CORGCX(K)
-        CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
-        CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
+        CNOSC(M,K,L,NY,NX) = CORGNX(K)/CORGCX(K)
+        CPOSC(M,K,L,NY,NX) = CORGPX(K)/CORGCX(K)
+        CNOSCT(K)          = CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
+        CPOSCT(K)          = CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
       ENDDO D985
     ELSE
       D980: DO M=1,jsken
@@ -156,6 +158,7 @@ module InitSOMBGCMOD
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
+!    write(*,*)K,L,CNOSCT(K),CPOSCT(K),jcplx
   ENDDO D990
 !
 !     MICROBIAL BIOMASS,RESIDUE, DOC, ADSORBED
@@ -175,15 +178,16 @@ module InitSOMBGCMOD
       !humus complex
       KK=micpar%k_humus
     ENDIF
-    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      OSCI(K)=CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
-      OSNI(K)=CORGNX(K)*SoilMicPMassLayer(L,NY,NX)
-      OSPI(K)=CORGPX(K)*SoilMicPMassLayer(L,NY,NX)
+    IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      OSCI(K)=CORGCX(K)*VLSoilMicPMass_vr(L,NY,NX)
+      OSNI(K)=CORGNX(K)*VLSoilMicPMass_vr(L,NY,NX)
+      OSPI(K)=CORGPX(K)*VLSoilMicPMass_vr(L,NY,NX)
     ELSE
-      OSCI(K)=CORGCX(K)*VGeomLayer(L,NY,NX)
-      OSNI(K)=CORGNX(K)*VGeomLayer(L,NY,NX)
-      OSPI(K)=CORGPX(K)*VGeomLayer(L,NY,NX)
+      OSCI(K)=CORGCX(K)*VGeomLayer_vr(L,NY,NX)
+      OSNI(K)=CORGNX(K)*VGeomLayer_vr(L,NY,NX)
+      OSPI(K)=CORGPX(K)*VGeomLayer_vr(L,NY,NX)
     ENDIF
+!    write(*,*)L,K,CORGCX(K),VLSoilMicPMass_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX)
     TOSCK(K)=OMCK(K)+ORCK(K)+OQCK(K)+OHCK(K)
     TOSNK(K)=ORCK(K)*CNRH(K)+OQCK(K)*CNOSCT(KK)+OHCK(K)*CNOSCT(KK)
     TOSPK(K)=ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
@@ -192,34 +196,34 @@ module InitSOMBGCMOD
     TOSNK(K)=TOSNK(K)+OMCI(1,K)*rNCOMCa(1,1,K)+OMCI(2,K)*rNCOMCa(2,1,K)
     TOSPK(K)=TOSPK(K)+OMCI(1,K)*rPCOMCa(1,1,K)+OMCI(2,K)*rPCOMCa(2,1,K)
 
-    TOSCI=TOSCI+OSCI(K)*TOSCK(K)
-    TOSNI=TOSNI+OSCI(K)*TOSNK(K)
-    TOSPI=TOSPI+OSCI(K)*TOSPK(K)
-    OSCX(K)=0.0_r8
-    OSNX(K)=0.0_r8
-    OSPX(K)=0.0_r8
+    TOSCI   = TOSCI+OSCI(K)*TOSCK(K)
+    TOSNI   = TOSNI+OSCI(K)*TOSNK(K)
+    TOSPI   = TOSPI+OSCI(K)*TOSPK(K)
+    OSCX(K) = 0.0_r8
+    OSNX(K) = 0.0_r8
+    OSPX(K) = 0.0_r8
   ENDDO D995
 
   D8995: DO K=1,jcplx
     IF(L.EQ.0)THEN
-      OSCM(K)=DCKR*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
-      X=0.0_r8
-      KK=K
-      FOSCI=1.0
-      FOSNI=1.0
-      FOSPI=1.0
+      OSCM(K) = AMIN1(DCKR,1._r8)*CORGCX(K)*VLSoilMicPMass_vr(L,NY,NX)
+      X       = 0.0_r8
+      KK      = K
+      FOSCI   = 1.0_r8
+      FOSNI   = 1.0_r8
+      FOSPI   = 1.0_r8
     ELSE
-      IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
         IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-          OSCM(K)=DCKR*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
+          OSCM(K)=AMIN1(DCKR,1._r8)*CORGCX(K)*VLSoilMicPMass_vr(L,NY,NX)
         ELSE
-          OSCM(K)=FCX*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=AMIN1(FCX,1._r8)*CORGCX(K)*VLSoilMicPMass_vr(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ELSE
         IF(K.LE.micpar%NumOfLitrCmplxs)THEN
-          OSCM(K)=DCKR*CORGCX(K)*VGeomLayer(L,NY,NX)
+          OSCM(K)=AMIN1(DCKR,1._r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)
         ELSE
-          OSCM(K)=FCX*CORGCX(K)*VGeomLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=AMIN1(FCX,1._r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ENDIF
       X=1.0_r8
@@ -228,6 +232,7 @@ module InitSOMBGCMOD
         FOSCI=AMIN1(1.0_r8,OSCI(KK)/TOSCI)
         FOSNI=AMIN1(1.0_r8,OSCI(KK)*CNOSCT(KK)/TOSNI)
         FOSPI=AMIN1(1.0_r8,OSCI(KK)*CPOSCT(KK)/TOSPI)
+!        write(*,*)K,L,OSCI(KK),CNOSCT(KK),CPOSCT(KK),TOSCI,TOSNI,TOSPI
       ELSE
         FOSCI=0.0_r8
         FOSNI=0.0_r8
@@ -249,29 +254,31 @@ module InitSOMBGCMOD
     D8990: DO N=1,NumMicbFunGrupsPerCmplx
       tglds=JGnfo(N)-JGnio(N)+1._r8
       D8991: DO M=1,nlbiomcp
-        OMC1=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
-        OMN1=AZMAX1(OMC1*rNCOMCa(M,N,K)*FOSNI)
-        OMP1=AZMAX1(OMC1*rPCOMCa(M,N,K)*FOSPI)
+        OME1(ielmc)=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
+        OME1(ielmn)=AZMAX1(OME1(ielmc)*rNCOMCa(M,N,K)*FOSNI)
+        OME1(ielmp)=AZMAX1(OME1(ielmc)*rPCOMCa(M,N,K)*FOSPI)
+!        write(*,*)L,M,OME1(ielmc),rNCOMCa(M,N,K),rPCOMCa(M,N,K)
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
-          mBiomeHeter_vr(ielmc,MID,K,L,NY,NX)=OMC1/tglds
-          mBiomeHeter_vr(ielmn,MID,K,L,NY,NX)=OMN1/tglds
-          mBiomeHeter_vr(ielmp,MID,K,L,NY,NX)=OMP1/tglds
+          DO NE=1,NumPlantChemElms
+            mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
+          ENDDO
         ENDDO
-        OSCX(KK)=OSCX(KK)+OMC1
-        OSNX(KK)=OSNX(KK)+OMN1
-        OSPX(KK)=OSPX(KK)+OMP1
+        OSCX(KK)=OSCX(KK)+OME1(ielmc)
+        OSNX(KK)=OSNX(KK)+OME1(ielmn)
+        OSPX(KK)=OSPX(KK)+OME1(ielmp)
         D8992: DO NN=1,NumMicbFunGrupsPerCmplx
           tglds=JGnfA(N)-JGniA(N)+1._r8
           do NGL=JGniA(N),JGnfA(N)
             MID=micpar%get_micb_id(M,NGL)
-            mBiomeAutor_vr(ielmc,MID,L,NY,NX)=mBiomeAutor_vr(ielmc,MID,L,NY,NX)+OMC1*OMCA(NN)/tglds
-            mBiomeAutor_vr(ielmn,MID,L,NY,NX)=mBiomeAutor_vr(ielmn,MID,L,NY,NX)+OMN1*OMCA(NN)/tglds
-            mBiomeAutor_vr(ielmp,MID,L,NY,NX)=mBiomeAutor_vr(ielmp,MID,L,NY,NX)+OMP1*OMCA(NN)/tglds
+            DO NE=1,NumPlantChemElms
+              mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)+OME1(NE)*OMCA(NN)/tglds
+            ENDDO
           ENDDO
-          OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
-          OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
-          OSPX(KK)=OSPX(KK)+OMP1*OMCA(NN)
+          OSCX(KK)=OSCX(KK)+OME1(ielmc)*OMCA(NN)
+          OSNX(KK)=OSNX(KK)+OME1(ielmn)*OMCA(NN)
+          OSPX(KK)=OSPX(KK)+OME1(ielmp)*OMCA(NN)
+!          write(*,*)L,K,OME1(ielmc)*OMCA(NN),OME1(ielmn)*OMCA(NN),OME1(ielmp)*OMCA(NN)
         ENDDO D8992
       ENDDO D8991
     ENDDO D8990
@@ -295,14 +302,14 @@ module InitSOMBGCMOD
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
 !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
 !
-    DOM_vr(idom_doc,K,L,NY,NX)=X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
-    DOM_vr(idom_don,K,L,NY,NX)=AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    DOM_vr(idom_dop,K,L,NY,NX)=AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    DOM_vr(idom_acetate,K,L,NY,NX)=0.0_r8
-    DOM_MacP_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
-    OSCX(KK)=OSCX(KK)+DOM_vr(idom_doc,K,L,NY,NX)
-    OSNX(KK)=OSNX(KK)+DOM_vr(idom_don,K,L,NY,NX)
-    OSPX(KK)=OSPX(KK)+DOM_vr(idom_dop,K,L,NY,NX)
+    DOM_vr(idom_doc,K,L,NY,NX)               = X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
+    DOM_vr(idom_don,K,L,NY,NX)               = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    DOM_vr(idom_dop,K,L,NY,NX)               = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    DOM_vr(idom_acetate,K,L,NY,NX)           = 0.0_r8
+    DOM_MacP_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
+    OSCX(KK)                                 = OSCX(KK)+DOM_vr(idom_doc,K,L,NY,NX)
+    OSNX(KK)                                 = OSNX(KK)+DOM_vr(idom_don,K,L,NY,NX)
+    OSPX(KK)                                 = OSPX(KK)+DOM_vr(idom_dop,K,L,NY,NX)
 !
 !     ADSORBED C, N AND P
 !
@@ -346,52 +353,50 @@ module InitSOMBGCMOD
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !
 
-  RO2DmndHetert(:,:,L,NY,NX)=0.0_r8
-  RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RN2ODmndReduxHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RNH4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RNH4DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RNO3DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RH2PO4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RNO3DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RH2PO4DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RH1PO4DmndSoilHeter_vr(:,:,L,NY,NX)=0.0_r8
-  RH1PO4DmndBandHeter_vr(:,:,L,NY,NX)=0.0_r8
+  RO2DmndHetert(:,:,L,NY,NX)             = 0.0_r8
+  RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
+  RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
+  RN2ODmndReduxHeter_vr(:,:,L,NY,NX)     = 0.0_r8
+  RNH4DmndSoilHeter_vr(:,:,L,NY,NX)      = 0.0_r8
+  RNH4DmndBandHeter_vr(:,:,L,NY,NX)      = 0.0_r8
+  RNO3DmndSoilHeter_vr(:,:,L,NY,NX)      = 0.0_r8
+  RH2PO4DmndSoilHeter_vr(:,:,L,NY,NX)    = 0.0_r8
+  RNO3DmndBandHeter_vr(:,:,L,NY,NX)      = 0.0_r8
+  RH2PO4DmndBandHeter_vr(:,:,L,NY,NX)    = 0.0_r8
+  RH1PO4DmndSoilHeter_vr(:,:,L,NY,NX)    = 0.0_r8
+  RH1PO4DmndBandHeter_vr(:,:,L,NY,NX)    = 0.0_r8
   IF(L.EQ.0)THEN
-    RNH4DmndLitrHeter_col(:,:,NY,NX)=0.0_r8
-    RNO3DmndLitrHeter_col(:,:,NY,NX)=0.0_r8
-    RH2PO4DmndLitrHeter_col(:,:,NY,NX)=0.0_r8
+    RNH4DmndLitrHeter_col(:,:,NY,NX)   = 0.0_r8
+    RNO3DmndLitrHeter_col(:,:,NY,NX)   = 0.0_r8
+    RH2PO4DmndLitrHeter_col(:,:,NY,NX) = 0.0_r8
   ENDIF
 
-
-  RO2DmndAutort_vr(:,L,NY,NX)=0.0_r8
-  RNH3OxidAutor(:,L,NY,NX)=0.0_r8
-  RNO2OxidAutor(:,L,NY,NX)=0.0_r8
-  RN2ODmndReduxAutor_vr(:,L,NY,NX)=0.0_r8
-  RNH4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
-  RNH4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
-  RNO3UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
-  RNO3UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
-  RH2PO4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
-  RH2PO4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
-  RH1PO4UptkSoilAutor_vr(:,L,NY,NX)=0.0_r8
-  RH1PO4UptkBandAutor_vr(:,L,NY,NX)=0.0_r8
+  RO2DmndAutort_vr(:,L,NY,NX)       = 0.0_r8
+  RNH3OxidAutor(:,L,NY,NX)          = 0.0_r8
+  RNO2OxidAutor(:,L,NY,NX)          = 0.0_r8
+  RN2ODmndReduxAutor_vr(:,L,NY,NX)  = 0.0_r8
+  RNH4UptkSoilAutor_vr(:,L,NY,NX)   = 0.0_r8
+  RNH4UptkBandAutor_vr(:,L,NY,NX)   = 0.0_r8
+  RNO3UptkSoilAutor_vr(:,L,NY,NX)   = 0.0_r8
+  RNO3UptkBandAutor_vr(:,L,NY,NX)   = 0.0_r8
+  RH2PO4UptkSoilAutor_vr(:,L,NY,NX) = 0.0_r8
+  RH2PO4UptkBandAutor_vr(:,L,NY,NX) = 0.0_r8
+  RH1PO4UptkSoilAutor_vr(:,L,NY,NX) = 0.0_r8
+  RH1PO4UptkBandAutor_vr(:,L,NY,NX) = 0.0_r8
 
   IF(L.EQ.0)THEN
-    RNH4UptkLitrAutor_col(:,NY,NX)=0.0_r8
-    RNO3UptkLitrAutor_col(:,NY,NX)=0.0_r8
-    RH2PO4UptkLitrAutor_col(:,NY,NX)=0.0_r8
+    RNH4UptkLitrAutor_col(:,NY,NX)   = 0.0_r8
+    RNO3UptkLitrAutor_col(:,NY,NX)   = 0.0_r8
+    RH2PO4UptkLitrAutor_col(:,NY,NX) = 0.0_r8
   ENDIF
   
   call sumORGMLayL(L,NY,NX,ORGM)
 
-  SoilOrgM_vr(ielmc,L,NY,NX)=ORGM(ielmc)
-  SoilOrgM_vr(ielmn,L,NY,NX)=ORGM(ielmn)
-  SoilOrgM_vr(ielmp,L,NY,NX)=ORGM(ielmp)
+  SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=ORGM(1:NumPlantChemElms)
   ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
-  
+    
   call sumLitrOMLayL(L,NY,NX,litrOM)
+
   OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
 
   end associate
@@ -483,8 +488,8 @@ module InitSOMBGCMOD
     !     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
 !
   ELSE
-    CFOSC(1:jsken,k_woody_litr,L,NY,NX)=real((/0.00,0.00,0.20,0.80/),r8)
-    CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
+    CFOSC(1:jsken,k_woody_litr,L,NY,NX) = real((/0.00,0.00,0.20,0.80/),r8)
+    CFOSC(1:jsken,k_fine_litr,L,NY,NX)  = real((/0.02,0.06,0.34,0.58/),r8)
   ENDIF
   end associate
   end subroutine InitSurfResiduKinetiComponent
@@ -529,14 +534,16 @@ module InitSOMBGCMOD
   real(r8) :: FCY,FC0,FC1
 
 ! begin_execution
-  associate(                      &
-    k_POM => micpar%k_POM      ,  &
-    k_humus  => micpar%k_humus ,  &
-    iprotein => micpar%iprotein,  &
-    icarbhyro=> micpar%icarbhyro, &
-    icellulos=> micpar%icellulos, &
-    ilignin  => micpar%ilignin  , &
-    jsken => micpar%jsken         &
+  associate(                           &
+    k_POM       => micpar%k_POM,       &
+    k_humus     => micpar%k_humus,     &
+    k_fine_litr => micpar%k_fine_litr, &
+    k_manure    => micpar%k_manure,    &
+    iprotein    => micpar%iprotein,    &
+    icarbhyro   => micpar%icarbhyro,   &
+    icellulos   => micpar%icellulos,   &
+    ilignin     => micpar%ilignin,     &
+    jsken       => micpar%jsken        &
   )
 !
 ! CFOSC=siNGLe kinetic fraction in POM
@@ -560,8 +567,8 @@ module InitSOMBGCMOD
       !     FCX=reduction in FC0 at DPTH
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
-      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC.OR.SoiDepthMidLay(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
-        +CumDepth2LayerBottom(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
+      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoiDepthMidLay_vr(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
+        +CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
@@ -589,8 +596,7 @@ module InitSOMBGCMOD
     ELSE
       FCY=0.30_r8
       IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
-        FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
-          10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
+        FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), 10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
       ELSE
         FC0=FCY
       ENDIF
@@ -602,10 +608,10 @@ module InitSOMBGCMOD
 !   CFOSC=fraction of humus in less(1),more(2) resistant component
 !
     FC1=FC0*FCX
-    CFOSC(iprotein,k_humus,L,NY,NX)=FC1
-    CFOSC(icarbhyro,k_humus,L,NY,NX)=1.0_r8-FC1
-    CFOSC(icellulos,k_humus,L,NY,NX)=0.00_r8
-    CFOSC(ilignin,k_humus,L,NY,NX)=0.00_r8
+    CFOSC(iprotein,k_humus,L,NY,NX)  = FC1
+    CFOSC(icarbhyro,k_humus,L,NY,NX) = 1.0_r8-FC1
+    CFOSC(icellulos,k_humus,L,NY,NX) = 0.00_r8
+    CFOSC(ilignin,k_humus,L,NY,NX)   = 0.00_r8
 !
 !   MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
 !   HUMUS PARTITIONING TO COMPONENTS
@@ -618,7 +624,7 @@ module InitSOMBGCMOD
 
   IF(L.GT.0)THEN
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AMIN1(orgcden,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(k_humus)))/0.55_r8
+      CORGCM=AMIN1(orgcden,(CORGCX(k_fine_litr)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus)))/0.55_r8
     else
       CORGCM=0._r8
     endif
@@ -648,7 +654,7 @@ module InitSOMBGCMOD
   !
   !     POM
   call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,CORGCM)
-
+  
   end subroutine InitSOMProfile
 
 !------------------------------------------------------------------------------------------
@@ -661,55 +667,57 @@ module InitSOMBGCMOD
   real(r8) :: CORGCZ,CORGNZ,CORGPZ,CORGRZ
   real(r8) :: scal
 ! begin_execution
-  associate(                     &
-    NumOfLitrCmplxs=> micpar%NumOfLitrCmplxs , &
-    k_POM   => micpar%k_POM    , &
-    k_humus => micpar%k_humus  , &
-    CNRH    => micpar%CNRH     , &
-    CPRH    => micpar%CPRH       &
+  associate(                                   &
+    NumOfLitrCmplxs => micpar%NumOfLitrCmplxs, &
+    k_POM           => micpar%k_POM,           &
+    k_humus         => micpar%k_humus,         &
+    CNRH            => micpar%CNRH,            &
+    CPRH            => micpar%CPRH             &
   )
-  IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    scal=AREA(3,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
-    CORGCX(1:NumOfLitrCmplxs)=RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGNX(1:NumOfLitrCmplxs)=RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGPX(1:NumOfLitrCmplxs)=RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
+  IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    scal                      = AREA(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+    CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
-    scal=AREA(3,L,NY,NX)/VGeomLayer(L,NY,NX)
-    CORGCX(1:NumOfLitrCmplxs)=RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGNX(1:NumOfLitrCmplxs)=RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGPX(1:NumOfLitrCmplxs)=RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    scal                      = AREA(3,L,NY,NX)/VGeomLayer_vr(L,NY,NX)
+    CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ENDIF
     !
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
-    IF(L.GT.0)THEN
-      CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
-      CORGRZ=COMLitrC_vr(L,NY,NX)
-      CORGNZ=CSoilOrgM_vr(ielmn,L,NY,NX)
-      CORGPZ=CSoilOrgM_vr(ielmp,L,NY,NX)
-      IF(CORGCZ.GT.ZERO)THEN
-        CORGCX(k_POM)=CORGRZ
-        CORGCX(k_humus)=AZMAX1(CORGCZ-CORGCX(3))
-        CORGNX(k_POM)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
-        CORGNX(k_humus)=AZMAX1(CORGNZ-CORGNX(3))
-        CORGPX(k_POM)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
-        CORGPX(k_humus)=AZMAX1(CORGPZ-CORGPX(3))
-      ELSE
-        CORGCX(k_POM)=0.0_r8
-        CORGCX(k_humus)=0.0_r8
-        CORGNX(k_POM)=0.0_r8
-        CORGNX(k_humus)=0.0_r8
-        CORGPX(k_POM)=0.0_r8
-        CORGPX(k_humus)=0.0_r8
-      ENDIF
+  IF(L.GT.0)THEN
+    CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
+    CORGRZ=COMLitrC_vr(L,NY,NX)
+    CORGNZ=CSoilOrgM_vr(ielmn,L,NY,NX)
+    CORGPZ=CSoilOrgM_vr(ielmp,L,NY,NX)
+    IF(CORGCZ.GT.ZERO)THEN
+      CORGCX(k_POM)   = CORGRZ
+      CORGCX(k_humus) = AZMAX1(CORGCZ-CORGCX(k_POM))
+      CORGNX(k_POM)   = AMIN1(CNRH(k_POM)*CORGCX(k_POM),CORGNZ)
+      CORGNX(k_humus) = AZMAX1(CORGNZ-CORGNX(k_POM))
+      CORGPX(k_POM)   = AMIN1(CPRH(k_POM)*CORGCX(k_POM),CORGPZ)
+      CORGPX(k_humus) = AZMAX1(CORGPZ-CORGPX(k_POM))
+
     ELSE
-      CORGCX(k_POM)=0.0_r8
-      CORGCX(k_humus)=0.0_r8
-      CORGNX(k_POM)=0.0_r8
-      CORGNX(k_humus)=0.0_r8
-      CORGPX(k_POM)=0.0_r8
-      CORGPX(k_humus)=0.0_r8
+      CORGCX(k_POM)   = 0.0_r8
+      CORGCX(k_humus) = 0.0_r8
+      CORGNX(k_POM)   = 0.0_r8
+      CORGNX(k_humus) = 0.0_r8
+      CORGPX(k_POM)   = 0.0_r8
+      CORGPX(k_humus) = 0.0_r8
     ENDIF
+  ELSE
+    CORGCX(k_POM)   = 0.0_r8
+    CORGCX(k_humus) = 0.0_r8
+    CORGNX(k_POM)   = 0.0_r8
+    CORGNX(k_humus) = 0.0_r8
+    CORGPX(k_POM)   = 0.0_r8
+    CORGPX(k_humus) = 0.0_r8
+  ENDIF
+!  write(*,*)L,CORGCX
   end associate
   end subroutine InitLitterProfile
 

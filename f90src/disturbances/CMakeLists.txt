@@ -1,7 +1,8 @@
 set(DISTURB_MOD_SOURCES
 	ErosionMod.F90
+  PerturbationMod.F90
   PlantDisturbMod.F90
-  NitroDisturbMod.F90
+  SoilDisturbMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(disturb_mods ${DISTURB_MOD_SOURCES})
@@ -12,8 +13,7 @@ target_include_directories(disturb_mods  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/mesh/
   ${CMAKE_BINARY_DIR}/f90src/modelpars/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};disturb_mods PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};disturb_mods)

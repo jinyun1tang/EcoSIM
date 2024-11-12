@@ -1,6 +1,6 @@
 set(LAYERS_SOURCES
   InitSOMBGCMod.F90
-	NitrosMod.F90
+	SoilBGCNLayMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(layers_model ${LAYERS_SOURCES})

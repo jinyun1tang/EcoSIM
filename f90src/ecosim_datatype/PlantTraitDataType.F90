@@ -78,7 +78,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                        !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                         !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)                       !initial plant thermal adaptation zone, [-]
-  real(r8),target,allocatable ::  iPlantThermoAdaptZone(:,:,:)                        !plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  iPlantThermoAdaptZone_pft(:,:,:)                        !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                     !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                      !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX(:,:,:)                      !initial plant maturity group, [-]
@@ -149,9 +149,9 @@ module PlantTraitDataType
   integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)                        !maximum grain number per node , [-]
-  real(r8),target,allocatable ::  MaxSeedCMass(:,:,:)                        !maximum grain size   , [g]
+  real(r8),target,allocatable ::  MaxSeedCMass_pft(:,:,:)                        !maximum grain size   , [g]
   real(r8),target,allocatable ::  ShootNodeNumAtPlanting_pft(:,:,:)                        !number of nodes in seed, [-]
-  real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
+  real(r8),target,allocatable ::  SeedCMass_pft(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  Hours2LeafOut_brch(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
@@ -238,7 +238,7 @@ contains
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
-  allocate(iPlantThermoAdaptZone(JP,JY,JX));     iPlantThermoAdaptZone=0._r8
+  allocate(iPlantThermoAdaptZone_pft(JP,JY,JX));     iPlantThermoAdaptZone_pft=0._r8
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX(JP,JY,JX));   GROUPX=0._r8
@@ -309,9 +309,9 @@ contains
   allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
   allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
-  allocate(MaxSeedCMass(JP,JY,JX));     MaxSeedCMass=0._r8
+  allocate(MaxSeedCMass_pft(JP,JY,JX));     MaxSeedCMass_pft=0._r8
   allocate(ShootNodeNumAtPlanting_pft(JP,JY,JX));     ShootNodeNumAtPlanting_pft=0._r8
-  allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
+  allocate(SeedCMass_pft(JP,JY,JX));     SeedCMass_pft=0._r8
   allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
   allocate(Hours2LeafOut_brch(MaxNumBranches,JP,JY,JX));  Hours2LeafOut_brch=0._r8
@@ -395,7 +395,7 @@ contains
   call destroy(CanOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone)
-  call destroy(iPlantThermoAdaptZone)
+  call destroy(iPlantThermoAdaptZone_pft)
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)
   call destroy(GROUPX)
@@ -466,9 +466,9 @@ contains
   call destroy(iPlantShootState_pft)
   call destroy(MaxPotentSeedNumber_pft)
   call destroy(MaxSeedNumPerSite_pft)
-  call destroy(MaxSeedCMass)
+  call destroy(MaxSeedCMass_pft)
   call destroy(ShootNodeNumAtPlanting_pft)
-  call destroy(SeedCMass)
+  call destroy(SeedCMass_pft)
   call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
   call destroy(Hours2LeafOut_brch)

@@ -432,7 +432,6 @@ implicit none
     DLYR3                     => plt_site%DLYR3,                         &
     ZERO                      => plt_site%ZERO,                          &
     Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,              &
-    MaxSeedCMass              => plt_morph%MaxSeedCMass,                 &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,             &
     RootBranchFreq_pft        => plt_morph%RootBranchFreq_pft,           &
@@ -888,7 +887,7 @@ implicit none
 !
 !     SoiBulkDensity_vr=soil bulk density
 !     RTDP1,Root1stDepz2Surf=primary root depth from soil surface
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     ICHKL=flag for identifying layer with primary root tip
 !     RTN1=number of primary root axes
 !     RootPrimeAxsNum=multiplier for number of primary root axes
@@ -974,7 +973,7 @@ implicit none
     fTgrowRootP_vr            => plt_pheno%fTgrowRootP_vr,               &
     RAutoRootO2Limter_pvr     => plt_rbgc%RAutoRootO2Limter_pvr,         &
     MaxNumRootLays            => plt_site%MaxNumRootLays,                &
-    CumSoilThickness          => plt_site%CumSoilThickness,              &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,        &
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs,           &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,                &
@@ -1009,7 +1008,7 @@ implicit none
 !   call SumRootBiome(NZ,mass_inital)
 
   IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
-    Root1stDepz2Surf=Root1stDepz_pft(N,NR,NZ)-CumSoilThickness(0)
+    Root1stDepz2Surf=Root1stDepz_pft(N,NR,NZ)-CumSoilThickness_vr(0)
   ELSE
     Root1stDepz2Surf=Root1stDepz_pft(N,NR,NZ)
   ENDIF
@@ -1017,10 +1016,10 @@ implicit none
   litrflxt=0._r8;RCO2flxt=0._r8
   !root pass the top surface of layer L, and the given root referenced by (N,NR) has not been updated
   !identify root tip
-  IF(Root1stDepz2Surf.GT.CumSoilThickness(L-1) .AND. iRootXsUpdateFlag(N,NR).EQ.ifalse)THEN
+  IF(Root1stDepz2Surf.GT.CumSoilThickness_vr(L-1) .AND. iRootXsUpdateFlag(N,NR).EQ.ifalse)THEN
     Root1stXNumL_pvr(N,L,NZ)=Root1stXNumL_pvr(N,L,NZ)+RootPrimeAxsNum
     !primary roots
-    IF(Root1stDepz2Surf.LE.CumSoilThickness(L) .OR. L.EQ.MaxNumRootLays)THEN
+    IF(Root1stDepz2Surf.LE.CumSoilThickness_vr(L) .OR. L.EQ.MaxNumRootLays)THEN
       iRootXsUpdateFlag(N,NR)=itrue
 !
 !     FRACTION OF PRIMARY ROOT SINK IN SOIL LAYER
@@ -1099,7 +1098,7 @@ implicit none
 !
       RNonstCO2_OUltd=AZMAX1(VMXC*FRTN*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)) &
         *fTgrowRootP_vr(L,NZ)*CNPG*C4PhotosynDowreg_brch(MainBranchNum_pft(NZ),NZ)*fRootGrowPSISense
-      IF(Root1stDepz2Surf.GE.CumSoilThickness(MaxNumRootLays))THEN
+      IF(Root1stDepz2Surf.GE.CumSoilThickness_vr(MaxNumRootLays))THEN
         RNonstCO2_OUltd=AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)
       ENDIF
 !
@@ -1197,7 +1196,7 @@ implicit none
 !     THROUGH WHICH PRIMARY ROOTS GROW
 !
 !     RTDP1=primary root depth from soil surface
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     Root1stLen_rpvr=primary root length
 !     SeedDepth_pft=seeding depth
 !     FRCO2=fraction of primary root respiration attributed to layer
@@ -1205,7 +1204,7 @@ implicit none
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
 !     RCO2T1st_OUltd,RCO2T1st_Oltd=total C respiration unltd,ltd by O2
 !
-      IF(Root1stDepz_pft(N,NR,NZ).GT.CumSoilThickness(NGTopRootLayer_pft(NZ)))THEN
+      IF(Root1stDepz_pft(N,NR,NZ).GT.CumSoilThickness_vr(NGTopRootLayer_pft(NZ)))THEN
         TFRCO2=0._r8
         D5100: DO LL=NGTopRootLayer_pft(NZ),NIXBotRootLayer_rpft(NR,NZ)
           IF(LL.LT.NIXBotRootLayer_rpft(NR,NZ))THEN
@@ -1612,7 +1611,7 @@ implicit none
     rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft,        &
     rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft,        &
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,    &
-    CumSoilThickness          => plt_site%CumSoilThickness,          &
+    CumSoilThickness_vr          => plt_site%CumSoilThickness_vr,          &
     DLYR3                     => plt_site%DLYR3,                     &
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,       &
@@ -1668,7 +1667,7 @@ implicit none
 ! if FGROL < 1.0, then the extension is all in current layer, meaning FGROZ=0.0
 !  
   IF(Root1stExtension.GT.ZERO4Groth_pft(NZ) .AND. L.LT.MaxNumRootLays)THEN
-    FGROL=AZMAX1(AMIN1(1.0_r8,(CumSoilThickness(L)-Root1stDepz_pft(N,NR,NZ))/Root1stExtension))
+    FGROL=AZMAX1(AMIN1(1.0_r8,(CumSoilThickness_vr(L)-Root1stDepz_pft(N,NR,NZ))/Root1stExtension))
     IF(FGROL.LT.1.0_r8)FGROL=0._r8
     FGROZ=AZMAX1(1.0_r8-FGROL)
   ELSE
@@ -1772,7 +1771,7 @@ implicit none
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
-    CumSoilThickness          => plt_site%CumSoilThickness,          &
+    CumSoilThickness_vr          => plt_site%CumSoilThickness_vr,          &
     ZEROS2                    => plt_site%ZEROS2,                    &
     DLYR3                     => plt_site%DLYR3,                     &
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,           &
@@ -1797,7 +1796,7 @@ implicit none
 !     NIXBotRootLayer_rpft=deepest root layer
 !     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
 !     Root1stDepz2Surf=primary root depth from soil surface
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
 !     FRTN=fraction of primary root sink strength in axis
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
@@ -1808,7 +1807,7 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 
   D5115: DO LL=L,NGTopRootLayer_pft(NZ)+1,-1
-    RootDepzChk=Root1stDepz2Surf.LT.CumSoilThickness(LL-1) .OR. Root1stDepz2Surf.LT.SeedDepth_pft(NZ)
+    RootDepzChk=Root1stDepz2Surf.LT.CumSoilThickness_vr(LL-1) .OR. Root1stDepz2Surf.LT.SeedDepth_pft(NZ)
     IF(VLSoilPoreMicP_vr(LL-1).GT.ZEROS2 .AND. RootDepzChk)THEN
       IF(RootSinkC_vr(N,LL).GT.ZERO4Groth_pft(NZ))THEN
         FRTN=(Root1stSink_pvr(N,LL,NR)+Root2ndSink_pvr(N,LL,NR))/RootSinkC_vr(N,LL)
@@ -1859,7 +1858,7 @@ implicit none
 !     Root2ndXNum_rpvr,Root2ndXNum_pvr=number of secondary root axes
 !     Root1stXNumL_pvr=number of primary root axes
 !     Root1stLen_rpvr=primary root length
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
 !
       Root2ndXNum_pvr(N,LL,NZ)=Root2ndXNum_pvr(N,LL,NZ)-Root2ndXNum_rpvr(N,LL,NR,NZ)
@@ -1867,10 +1866,10 @@ implicit none
       Root2ndXNum_rpvr(N,LL,NR,NZ)=0._r8
       Root1stXNumL_pvr(N,LL,NZ)=Root1stXNumL_pvr(N,LL,NZ)-RootPrimeAxsNum
       IF(LL-1.GT.NGTopRootLayer_pft(NZ))THEN
-        Root1stLen_rpvr(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness(LL-1)-Root1stDepz_pft(N,NR,NZ))
+        Root1stLen_rpvr(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness_vr(LL-1)-Root1stDepz_pft(N,NR,NZ))
       ELSE
-        Root1stLen_rpvr(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness(LL-1)-Root1stDepz_pft(N,NR,NZ)) &
-          -(SeedDepth_pft(NZ)-CumSoilThickness(LL-2))
+        Root1stLen_rpvr(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness_vr(LL-1)-Root1stDepz_pft(N,NR,NZ)) &
+          -(SeedDepth_pft(NZ)-CumSoilThickness_vr(LL-2))
       ENDIF
 !
 !     WITHDRAW C,N,P FROM ROOT NODULES IN LEGUMES
@@ -1924,7 +1923,7 @@ implicit none
     VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr,  &
     ZEROS2                 => plt_site%ZEROS2,                 &
     NU                     => plt_site%NU,                     &
-    CumSoilThickness       => plt_site%CumSoilThickness,       &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,       &
     ZERO                   => plt_site%ZERO,                   &
     DLYR3                  => plt_site%DLYR3,                  &
     RootNutUptake_pvr      => plt_rbgc%RootNutUptake_pvr,      &
@@ -2039,7 +2038,7 @@ implicit none
 !
 !     RTDP1=primary root depth from soil surface
 !     RTDPP=primary root depth from canopy
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     CanPHeight4WatUptake=canopy height for water uptake
 !     RTSK=relative primary root sink strength
 !     Root1stSink_pvr=primary root sink strength
@@ -2048,8 +2047,8 @@ implicit none
 !     RootSinkC,RootSinkC_vr=total root sink strength
 !
           IF(N.EQ.ipltroot)THEN
-            IF(Root1stDepz_pft(N,NR,NZ).GT.CumSoilThickness(L-1))THEN
-              IF(Root1stDepz_pft(N,NR,NZ).LE.CumSoilThickness(L))THEN
+            IF(Root1stDepz_pft(N,NR,NZ).GT.CumSoilThickness_vr(L-1))THEN
+              IF(Root1stDepz_pft(N,NR,NZ).LE.CumSoilThickness_vr(L))THEN
                 RTDPP=Root1stDepz_pft(N,NR,NZ)+CanPHeight4WatUptake(NZ)
                 Root1stSink_pvr(N,L,NR)=RTSK(iPlantRootProfile_pft(NZ))&
                   *RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPP
@@ -2064,7 +2063,7 @@ implicit none
 !
 !     Root1stLocDepz_vr=depth of primary root axis in layer
 !     RTDP1=primary root depth from soil surface
-!     CumSoilThickness=depth from soil surface to layer bottom
+!     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     RTDPX=distance behind growing point for secondary roots
 !     DLYR=layer thickness
 !     SeedDepth_pft=seeding depth
@@ -2077,10 +2076,10 @@ implicit none
 !     Root2ndAveLen_pvr=average secondary root length
 !     RootSinkC,RootSinkC_vr=total root sink strength
 !
-            Root1stLocDepz_vr(NR,L)=AZMAX1(Root1stDepz_pft(ipltroot,NR,NZ)-CumSoilThickness(L-1)-RTDPX)
+            Root1stLocDepz_vr(NR,L)=AZMAX1(Root1stDepz_pft(ipltroot,NR,NZ)-CumSoilThickness_vr(L-1)-RTDPX)
             Root1stLocDepz_vr(NR,L)=AZMAX1(AMIN1(DLYR3(L),Root1stLocDepz_vr(NR,L)) &
-              -AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness(L-1)-HypoctoHeight_pft(NZ)))
-            RTDPS=AMAX1(SeedDepth_pft(NZ),CumSoilThickness(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L) &
+              -AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
+            RTDPS=AMAX1(SeedDepth_pft(NZ),CumSoilThickness_vr(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L) &
               +CanPHeight4WatUptake(NZ)
             IF(RTDPS.GT.ZERO)THEN
               RTSKP=RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPS

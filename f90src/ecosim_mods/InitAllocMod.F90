@@ -49,14 +49,14 @@ implicit none
   use PlantAPIData        , only : InitPlantAPIData
   use PlantMgmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
-
-  use EcoSIMConfig        , only : jcplx1 => jcplx1c
+  use EcoSIMConfig        , only : jcplx1 => jcplxcm1
   use TracerIDMod         , only : InitTracerIDs
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
+  use PerturbationMod     , only : InitSoilWarming
   use GridConsts
   use WatsubMod           , only : InitWatsub
-
+  use BalanceCheckDataType, only : InitBalanceCheckData
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 ! begin_execution
@@ -136,6 +136,11 @@ implicit none
   call InitSoilPhysData
 
   if(salt_model)call InitSoluteProperty
+
+  call InitSoilWarming
+  
+  call InitBalanceCheckData
+
   end subroutine InitAlloc
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()

@@ -28,8 +28,8 @@ module RootDataType
   real(r8),target,allocatable ::  RootrNC_pft(:,:,:)                        !root N:C ratio, [g g-1]
   real(r8),target,allocatable ::  RootrPC_pft(:,:,:)                        !root P:C ratio, [g g-1]
   real(r8),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
-  real(r8),target,allocatable ::  RoottRadialResist_pft(:,:,:,:)                      !root radial resistivity, [MPa h m-2]
-  real(r8),target,allocatable ::  RoottAxialResist_pft(:,:,:,:)                      !root axial resistivity, [MPa h m-4]
+  real(r8),target,allocatable ::  RootRadialResist_pft(:,:,:,:)                      !root radial resistivity, [MPa h m-2]
+  real(r8),target,allocatable ::  RootAxialResist_pft(:,:,:,:)                      !root axial resistivity, [MPa h m-4]
   real(r8),target,allocatable ::  ShutRutNonstElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                    !maximum root NH4 uptake rate, [g m-2 h-1]
   real(r8),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                    !Km for root NH4 uptake, [g m-3]
@@ -87,6 +87,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootNonstructElmConc_pvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_pvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
+  real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)
 !----------------------------------------------------------------------
 
 contains
@@ -95,6 +96,7 @@ contains
   implicit none
   integer, intent(in) :: jroots
 
+  allocate(RootMassElm_vr(NumPlantChemElms,JZ,JY,JX)); RootMassElm_vr =0._r8
   allocate(NumRootAxes_pft(JP,JY,JX));      NumRootAxes_pft=0
   allocate(NIXBotRootLayer_rpft(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_rpft=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
@@ -113,8 +115,8 @@ contains
   allocate(RootrNC_pft(JP,JY,JX));     RootrNC_pft=0._r8
   allocate(RootrPC_pft(JP,JY,JX));     RootrPC_pft=0._r8
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._r8
-  allocate(RoottRadialResist_pft(jroots,JP,JY,JX));   RoottRadialResist_pft=0._r8
-  allocate(RoottAxialResist_pft(jroots,JP,JY,JX));   RoottAxialResist_pft=0._r8
+  allocate(RootRadialResist_pft(jroots,JP,JY,JX));   RootRadialResist_pft=0._r8
+  allocate(RootAxialResist_pft(jroots,JP,JY,JX));   RootAxialResist_pft=0._r8
   allocate(ShutRutNonstElmntConducts_pft(JP,JY,JX));    ShutRutNonstElmntConducts_pft=0._r8
   allocate(VmaxNH4Root_pft(jroots,JP,JY,JX)); VmaxNH4Root_pft=0._r8
   allocate(KmNH4Root_pft(jroots,JP,JY,JX)); KmNH4Root_pft=0._r8
@@ -178,6 +180,8 @@ contains
   subroutine DestructRootData
   use abortutils, only : destroy
   implicit none
+
+  call destroy(RootMassElm_vr)
   call destroy(NumRootAxes_pft)
   call destroy(NIXBotRootLayer_rpft)
   call destroy(iPlantRootState_pft)
@@ -196,8 +200,8 @@ contains
   call destroy(RootrNC_pft)
   call destroy(RootrPC_pft)
   call destroy(RootPorosity_pft)
-  call destroy(RoottRadialResist_pft)
-  call destroy(RoottAxialResist_pft)
+  call destroy(RootRadialResist_pft)
+  call destroy(RootAxialResist_pft)
   call destroy(ShutRutNonstElmntConducts_pft)
   call destroy(VmaxNH4Root_pft)
   call destroy(KmNH4Root_pft)

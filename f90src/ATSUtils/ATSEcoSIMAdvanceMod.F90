@@ -13,8 +13,8 @@ module ATSEcoSIMAdvanceMod
   !    H2GE
   use ClimForcDataType 
   use SoilPropertyDataType
-  use HydroThermData, only : PSISM1, TKSoi1, VLHeatCapacity_vr, &
-      SoilFracAsMicP, VLWatMicP1, VLiceMicP1 !need the only as some vars are double defined
+  use HydroThermData, only : PSISM1_vr, TKSoi1_vr, VHeatCapacity1_vr, &
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
 implicit none
@@ -65,8 +65,8 @@ implicit none
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX)=a_ATKA(NY)
-    !CO2E(NY,NX)=atm_co2
-    !CH4E(NY,NX)=atm_ch4
+    !CO2E_col(NY,NX)=atm_co2
+    !CH4E_col(NY,NX)=atm_ch4
     !OXYE(NY,NX)=atm_o2
     !Z2GE(NY,NX)=atm_n2
     !Z2OE(NY,NX)=atm_n2o
@@ -75,8 +75,8 @@ implicit none
     TairK_col(NY,NX)=tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8
-    !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
-    WindSpeedAtm(NY,NX) = uwind(NY)*3600.0_r8
+    !convert WindSpeedAtm_col from ATS units (m s^-1) to EcoSIM (m h^-1)
+    WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8

@@ -36,30 +36,30 @@ implicit none
 
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  AmendCFlx_col(:,:)                         !total C amendment, [g d-2]
-  real(r8),target,allocatable ::  FertNFlx_col(:,:)                        !total fertilizer N amendment, [g d-2]
-  real(r8),target,allocatable ::  FerPFlx_col(:,:)                        !total fertilizer P amendment, [g d-2]
+  real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)                         !total C amendment, [g d-2]
+  real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)                        !total fertilizer N amendment, [g d-2]
+  real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)                        !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)                         !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)                         !total subsurface DOC flux, [g d-2]
   real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)                         !total LitrFall C, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDONFlx_col(:,:)                         !total surface DON flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDONFlx_CumYr_col(:,:)                         !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)                         !total subsurface DON flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)                         !total surface DOP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDOPFlx_CumYr_col(:,:)                         !total surface DOP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOPFlx_col(:,:)                         !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  tXPO4_col(:,:)                          !total soil precipited P, [g d-2]
-  real(r8),target,allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
-  real(r8),target,allocatable ::  USEDOU(:,:)                        !total sediment subsurface flux, [Mg d-2]
+  real(r8),target,allocatable ::  RootResp_CumYr_col(:,:)                          !total soil autotrophic respiration, [g d-2]
+  real(r8),target,allocatable ::  SedmErossLoss_CumYr_col(:,:)                        !total sediment subsurface flux, [Mg d-2]
   real(r8),target,allocatable ::  HydroSufDICFlx_col(:,:)                         !total surface DIC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDICFlx_col(:,:)                         !total subsurface DIC flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDINFlx_col(:,:)                         !total surface DIN flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDINFlx_CumYr_col(:,:)                         !total surface DIN flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)                         !total subsurface DIN flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDIPFlx_col(:,:)                         !total surface DIP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDIPFlx_CumYr_col(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)                         !total subsurface DIP flux, [g d-2]
   real(r8),target,allocatable ::  StandingDeadStrutElms_col(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
-  real(r8),target,allocatable ::  HydroIonFlx_col(:,:)                        !total subsurface ion flux, [mol d-2]
+  real(r8),target,allocatable ::  HydroIonFlx_CumYr_col(:,:)                        !total subsurface ion flux, [mol d-2]
   real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
@@ -87,23 +87,25 @@ implicit none
   real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !gas bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_col(:,:,:)
+  real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
   real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_3DTransp2MicP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_Transp2MicP_3D(:,:,:,:,:)
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_3DTransp2MacP(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_Transp2MacP_3D(:,:,:,:,:)
   real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
   real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)
   real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)
   real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)
-  real(r8),target,allocatable :: RFermen_vr(:,:,:)
+  real(r8),target,allocatable :: RFerment_vr(:,:,:)
   real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)
   real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)    !denitrification N2O production
   real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)
@@ -146,7 +148,7 @@ implicit none
   allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
   allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
   allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
-  allocate(RFermen_vr(0:JZ,JY,JX)); RFermen_vr=0._r8
+  allocate(RFerment_vr(0:JZ,JY,JX)); RFerment_vr=0._r8
   allocate(RNH3oxi_vr(0:JZ,JY,JX)); RNH3oxi_vr=0._r8
   allocate(RN2ODeniProd_vr(0:JZ,JY,JX)); RN2ODeniProd_vr=0._r8
   allocate(RN2ONitProd_vr(0:JZ,JY,JX)); RN2ONitProd_vr=0._r8
@@ -158,31 +160,31 @@ implicit none
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
   allocate(SurfGasFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasFlx_col=0._r8
-  allocate(AmendCFlx_col(JY,JX));       AmendCFlx_col=0._r8
-  allocate(FertNFlx_col(JY,JX));      FertNFlx_col=0._r8
-  allocate(FerPFlx_col(JY,JX));      FerPFlx_col=0._r8
+  allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
+  allocate(FertNFlx_CumYr_col(JY,JX));      FertNFlx_CumYr_col=0._r8
+  allocate(FerPFlx_CumYr_col(JY,JX));      FerPFlx_CumYr_col=0._r8
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
   allocate(LiterfalOrgM_col(NumPlantChemElms,JY,JX));       LiterfalOrgM_col=0._r8
-  allocate(HydroSufDONFlx_col(JY,JX));       HydroSufDONFlx_col=0._r8
+  allocate(HydroSufDONFlx_CumYr_col(JY,JX));       HydroSufDONFlx_CumYr_col=0._r8
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
-  allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
+  allocate(HydroSufDOPFlx_CumYr_col(JY,JX));       HydroSufDOPFlx_CumYr_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
 
-  allocate(UCOP(JY,JX));        UCOP=0._r8
-  allocate(USEDOU(JY,JX));      USEDOU=0._r8
+  allocate(RootResp_CumYr_col(JY,JX));        RootResp_CumYr_col=0._r8
+  allocate(SedmErossLoss_CumYr_col(JY,JX));      SedmErossLoss_CumYr_col=0._r8
   allocate(HydroSufDICFlx_col(JY,JX));       HydroSufDICFlx_col=0._r8
   allocate(HydroSubsDICFlx_col(JY,JX));       HydroSubsDICFlx_col=0._r8
-  allocate(HydroSufDINFlx_col(JY,JX));       HydroSufDINFlx_col=0._r8
+  allocate(HydroSufDINFlx_CumYr_col(JY,JX));       HydroSufDINFlx_CumYr_col=0._r8
   allocate(HydroSubsDINFlx_col(JY,JX));       HydroSubsDINFlx_col=0._r8
-  allocate(HydroSufDIPFlx_col(JY,JX));       HydroSufDIPFlx_col=0._r8
+  allocate(HydroSufDIPFlx_CumYr_col(JY,JX));       HydroSufDIPFlx_CumYr_col=0._r8
   allocate(HydroSubsDIPFlx_col(JY,JX));       HydroSubsDIPFlx_col=0._r8
   allocate(StandingDeadStrutElms_col(NumPlantChemElms,JY,JX));      StandingDeadStrutElms_col=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
-  allocate(HydroIonFlx_col(JY,JX));      HydroIonFlx_col=0._r8
+  allocate(HydroIonFlx_CumYr_col(JY,JX));      HydroIonFlx_CumYr_col=0._r8
   allocate(RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNutMicbTransf_vr=0._r8
   allocate(trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcg_RMicbTransf_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
@@ -213,15 +215,18 @@ implicit none
   allocate(RNO2DmndBandChemo_vr(0:JZ,JY,JX));  RNO2DmndBandChemo_vr=0._r8
   allocate(trcg_surf_disevap_flx(idg_beg:idg_end-1,JY,JX));      trcg_surf_disevap_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
+  allocate(trcg_ebu_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_ebu_flx_col=0._r8
+  allocate(trcg_pltroot_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_pltroot_flx_col=0._r8
+
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
   allocate(WaterFlowSoiMicP_3D(3,JD,JV,JH));    WaterFlowSoiMicP_3D=0._r8
   allocate(WaterFlowMacP_3D(3,JD,JV,JH));   WaterFlowMacP_3D=0._r8
   allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
-  allocate(trcs_3DTransp2MicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MicP_3D=0._r8
+  allocate(trcs_Transp2MicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_Transp2MicP_3D=0._r8
   allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,3,JD,JV,JH));Gas_3DAdvDif_Flx_vr=0._r8
-  allocate(trcs_3DTransp2MacP(ids_beg:ids_end,3,0:JD,JV,JH));trcs_3DTransp2MacP=0._r8
+  allocate(trcs_Transp2MacP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_Transp2MacP_3D=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
   allocate(DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));DOM_3DMacp_Transp_flx=0._r8
 
@@ -233,6 +238,9 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
+  
+  call destroy(trcg_ebu_flx_col)
+  call destroy(trcg_pltroot_flx_col)
 
   call destroy(tRDOE2Die_col)
   call destroy(CNH4)
@@ -242,7 +250,7 @@ implicit none
   call destroy(RCH4ProdAcetcl_vr)
   call destroy(RCH4ProdHydrog_vr)
   call destroy(RCH4Oxi_aero_vr)
-  call destroy(RFermen_vr)
+  call destroy(RFerment_vr)
   call destroy(RNH3oxi_vr)
   call destroy(RN2ONitProd_vr)  
   call destroy(RN2ODeniProd_vr)
@@ -264,30 +272,30 @@ implicit none
   call destroy(AEC)
   call destroy(CPO4S)
   call destroy(RO2UptkSoilM_vr)
-  call destroy(AmendCFlx_col)
-  call destroy(FertNFlx_col)
-  call destroy(FerPFlx_col)
+  call destroy(AmendCFlx_CumYr_col)
+  call destroy(FertNFlx_CumYr_col)
+  call destroy(FerPFlx_CumYr_col)
   call destroy(HydroSufDOCFlx_col)
   call destroy(HydroSubsDOCFlx_col)
   call destroy(LiterfalOrgM_col)
-  call destroy(HydroSufDONFlx_col)
+  call destroy(HydroSufDONFlx_CumYr_col)
   call destroy(HydroSubsDONFlx_col)
-  call destroy(HydroSufDOPFlx_col)
+  call destroy(HydroSufDOPFlx_CumYr_col)
   call destroy(HydroSubsDOPFlx_col)
   call destroy(tXPO4_col)
-  call destroy(UCOP)
-  call destroy(USEDOU)
+  call destroy(RootResp_CumYr_col)
+  call destroy(SedmErossLoss_CumYr_col)
   call destroy(HydroSufDICFlx_col)
   call destroy(HydroSubsDICFlx_col)
-  call destroy(HydroSufDINFlx_col)
+  call destroy(HydroSufDINFlx_CumYr_col)
   call destroy(HydroSubsDINFlx_col)
-  call destroy(HydroSufDIPFlx_col)
+  call destroy(HydroSufDIPFlx_CumYr_col)
   call destroy(HydroSubsDIPFlx_col)
   call destroy(StandingDeadStrutElms_col)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)
-  call destroy(HydroIonFlx_col)
+  call destroy(HydroIonFlx_CumYr_col)
   call destroy(Micb_N2Fixation_vr)
   call destroy(RNutMicbTransf_vr)
   call destroy(REcoDOMProd_vr)

@@ -176,6 +176,7 @@ contains
       endif
     endif
     if(present(year0))this%year0=year0
+    this%leap_yr=isLeapi(this%year0)
   end subroutine Init
 
   ! ----------------------------------------------------------------------
@@ -283,7 +284,6 @@ contains
     this%rest_frq=rest_frq
     this%stop_count=stop_n
     this%curr_stop_count=0
-
     select case (trim(stop_option))
     case ('nsteps')
       this%stop_opt=1
@@ -302,7 +302,7 @@ contains
   end subroutine ReadNamelist
 
   !-------------------------------------------------------------------------------
-    function its_time_to_write_restart(this)result(ans)
+    function its_time_to_write_restart(this,nlend)result(ans)
      !
      ! DESCRIPTION
      ! decide if to write restart file
@@ -310,6 +310,7 @@ contains
 
      implicit none
      class(ecosim_time_type), intent(inout) :: this
+     logical, optional, intent(in) :: nlend
      logical :: ans
 
      character(len=80) :: subname = trim(mod_filename)//'::its_time_to_write_restart'
@@ -347,7 +348,7 @@ contains
      case default
        ans=.false.
      end select
-
+     if(present(nlend))ans=ans .or. nlend
      end function its_time_to_write_restart
   !-------------------------------------------------------------------------------
     function its_time_to_diag(this)result(ans)
@@ -649,8 +650,10 @@ contains
   integer function get_days_cur_year(this)
     implicit none
     class(ecosim_time_type), intent(in) :: this
-
-    get_days_cur_year=365+this%leap_yr
+    integer :: year
+    year=this%get_curr_yearAD()    
+    get_days_cur_year=365
+    if(isLeap(year))get_days_cur_year=366
   end function  get_days_cur_year
   !-------------------------------------------------------------------------------
 
@@ -854,7 +857,11 @@ contains
   integer :: ans
 
   ans=0
-  if(isLeap(year))ans=1
+  if(year<=0)then
+    ans=0
+  else if(isLeap(year))then
+    ans=1
+  endif
   return
   end function isLeapi
 !------------------------------------------------------------------------------------------

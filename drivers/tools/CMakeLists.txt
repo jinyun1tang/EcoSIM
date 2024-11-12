@@ -6,6 +6,7 @@ set(TOOLS_SOURCES
   restartTest.F90
   NamelistTest.F90
   HFileTest.F90
+  SoilWarmReadTest.F90
 	EcoATSTest.F90
 )
 include(add_ecosim_library)
@@ -18,6 +19,7 @@ add_ecosim_executable(NamelistTest.x NamelistTest.F90)
 add_ecosim_executable(HFileTest.x HFileTest.F90)
 add_ecosim_executable(restartTest.x restartTest.F90)
 add_ecosim_executable(EcoATSTest.x EcoATSTest.F90)
+add_ecosim_executable(SoilWarmReadTest.x SoilWarmReadTest.F90)
 
 target_include_directories(EcoATSTest.x PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
@@ -79,6 +81,16 @@ target_include_directories(restartTest.x PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/ioutils/)
 
+  target_include_directories(SoilWarmReadTest.x PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/mesh/
+  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/minimath/
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/disturbances/
+  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+
+
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ClimTransformer.x DESTINATION bin)
   install(TARGETS ManagementReader.x DESTINATION bin)
@@ -88,6 +100,8 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS HFileTest.x DESTINATION bin)
   install(TARGETS restartTest.x DESTINATION bin)
   install(TARGETS EcoATSTest.x DESTINATION bin)
+  install(TARGETS SoilWarmReadTest.x DESTINATION bin)
+
   file(GLOB HEADERS *.mod)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

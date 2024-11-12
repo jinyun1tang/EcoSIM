@@ -6,17 +6,17 @@ module CanopyRadDataType
   public
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  real(r8),target,allocatable :: SineLeafAngle(:)                        !sine of leaf angle	-
-  real(r8),target,allocatable :: CosineLeafAngle(:)                        !cosine of leaf angle	-
-  real(r8),target,allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface
-  real(r8),target,allocatable :: OMEGX(:,:,:)                   !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
-  integer,target,allocatable :: iScatteringDiffus(:,:,:)        !flag for calculating backscattering of radiation in canopy
-  real(r8),target,allocatable :: RadDifPAR_zsec(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
-  real(r8),target,allocatable :: RadPAR_zsec(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
-  real(r8),target,allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
-  real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
-  real(r8),target,allocatable :: LeafAUnshaded_zsec(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
-  real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
+  real(r8),target,allocatable :: SineLeafAngle(:)                   !sine of leaf angle	-
+  real(r8),target,allocatable :: CosineLeafAngle(:)                 !cosine of leaf angle	-
+  real(r8),target,allocatable :: OMEGA(:,:,:)                       !sine of indirect sky radiation on leaf surface
+  real(r8),target,allocatable :: OMEGX(:,:,:)                       !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
+  integer,target,allocatable :: iScatteringDiffus(:,:,:)            !flag for calculating backscattering of radiation in canopy
+  real(r8),target,allocatable :: RadDifPAR_zsec(:,:,:,:,:,:)        !diffuse incoming PAR, [umol m-2 s-1]
+  real(r8),target,allocatable :: RadPAR_zsec(:,:,:,:,:,:)           !direct incoming PAR, [umol m-2 s-1]
+  real(r8),target,allocatable :: CLASS(:,:,:,:)                     !fractionction of leaves in different angle classes, [-]
+  real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)   !leaf surface area, [m2 d-2]
+  real(r8),target,allocatable :: LeafAUnshaded_zsec(:,:,:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
+  real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)     !stem surface area, [m2 d-2]
 
   real(r8) :: TotSineSkyAngles_grd
   real(r8) :: dangle

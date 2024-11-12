@@ -8,18 +8,18 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable ::  SLOPE(:,:,:)                              !slope	in four directions [o]
-  real(r8),target,allocatable ::  FieldCapacity(:,:,:)                      !water contents at field capacity
-  real(r8),target,allocatable ::  WiltPoint(:,:,:)                          !water contents at wilting point
-  real(r8),target,allocatable ::  SatHydroCondVert(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
-  real(r8),target,allocatable ::  SatHydroCondHrzn(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
+  real(r8),target,allocatable ::  FieldCapacity_vr(:,:,:)                      !water contents at field capacity
+  real(r8),target,allocatable ::  WiltPoint_vr(:,:,:)                          !water contents at wilting point
+  real(r8),target,allocatable ::  SatHydroCondVert_vr(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
+  real(r8),target,allocatable ::  SatHydroCondHrzn_vr(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
   real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                     !water potentials at field capacity, [MPa]
   real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                       !water potentials at wilting point [MPa]
   real(r8),target,allocatable ::  THW(:,:,:)                         !initial soil water content
   real(r8),target,allocatable ::  THI(:,:,:)                         !initial ice content
   REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                          !Surface albedo
-  real(r8),target,allocatable ::  LOGPOROS(:,:,:)                         !log soil porosity	-
-  real(r8),target,allocatable ::  LOGFldCapacity(:,:,:)                         !log water content at field capacity
-  real(r8),target,allocatable ::  LOGWiltPoint(:,:,:)                         !log water content at wilting point
+  real(r8),target,allocatable ::  LOGPOROS_vr(:,:,:)                         !log soil porosity	-
+  real(r8),target,allocatable ::  LOGFldCapacity_vr(:,:,:)                         !log water content at field capacity
+  real(r8),target,allocatable ::  LOGWiltPoint_vr(:,:,:)                         !log water content at wilting point
   real(r8),target,allocatable ::  PSD(:,:,:)                         !log soil porosity - log water content at field capacity
   real(r8),target,allocatable ::  FCD(:,:,:)                         !log water content at field capacity
   real(r8),target,allocatable ::  SRP(:,:,:)                         !shape parameter for water desorption
@@ -30,7 +30,7 @@ implicit none
   REAL(R8),target,allocatable ::  LOGPSIMN(:,:)                         !log water potential at wilting point
   REAL(R8),target,allocatable ::  LOGPSIMXD(:,:)                         !log water potential at field capacity 	-
   REAL(R8),target,allocatable ::  LOGPSIMND(:,:)                         !log water potential at saturation - log water potential at field capacity
-  real(r8),target,allocatable ::  VHeatCapacitySoilM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
+  real(r8),target,allocatable ::  VHeatCapacitySoilM_vr(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
   real(r8),target,allocatable ::  ActiveLayDepth(:,:)                         !active layer depth, [m]
 !----------------------------------------------------------------------
 
@@ -39,18 +39,18 @@ contains
 
   implicit none
   allocate(SLOPE(0:3,JY,JX));   SLOPE=0._r8
-  allocate(FieldCapacity(0:JZ,JY,JX));     FieldCapacity=0._r8
-  allocate(WiltPoint(0:JZ,JY,JX));     WiltPoint=0._r8
-  allocate(SatHydroCondVert(0:JZ,JY,JX));   SatHydroCondVert=0._r8
-  allocate(SatHydroCondHrzn(JZ,JY,JX));     SatHydroCondHrzn=0._r8
+  allocate(FieldCapacity_vr(0:JZ,JY,JX));     FieldCapacity_vr=0._r8
+  allocate(WiltPoint_vr(0:JZ,JY,JX));     WiltPoint_vr=0._r8
+  allocate(SatHydroCondVert_vr(0:JZ,JY,JX));   SatHydroCondVert_vr=0._r8
+  allocate(SatHydroCondHrzn_vr(JZ,JY,JX));     SatHydroCondHrzn_vr=0._r8
   allocate(PSIAtFldCapacity(JY,JX));       PSIAtFldCapacity=0._r8
   allocate(PSIAtWiltPoint(JY,JX));       PSIAtWiltPoint=0._r8
   allocate(THW(JZ,JY,JX));      THW=0._r8
   allocate(THI(JZ,JY,JX));      THI=0._r8
   allocate(SurfAlbedo_col(JY,JX));        SurfAlbedo_col=0._r8
-  allocate(LOGPOROS(0:JZ,JY,JX));    LOGPOROS=0._r8
-  allocate(LOGFldCapacity(0:JZ,JY,JX));    LOGFldCapacity=0._r8
-  allocate(LOGWiltPoint(0:JZ,JY,JX));    LOGWiltPoint=0._r8
+  allocate(LOGPOROS_vr(0:JZ,JY,JX));    LOGPOROS_vr=0._r8
+  allocate(LOGFldCapacity_vr(0:JZ,JY,JX));    LOGFldCapacity_vr=0._r8
+  allocate(LOGWiltPoint_vr(0:JZ,JY,JX));    LOGWiltPoint_vr=0._r8
   allocate(PSD(0:JZ,JY,JX));    PSD=0._r8
   allocate(FCD(0:JZ,JY,JX));    FCD=0._r8
   allocate(SRP(0:JZ,JY,JX));    SRP=0._r8
@@ -61,7 +61,7 @@ contains
   allocate(LOGPSIMN(JY,JX));       LOGPSIMN=0._r8
   allocate(LOGPSIMXD(JY,JX));       LOGPSIMXD=0._r8
   allocate(LOGPSIMND(JY,JX));       LOGPSIMND=0._r8
-  allocate(VHeatCapacitySoilM(0:JZ,JY,JX));   VHeatCapacitySoilM=0._r8
+  allocate(VHeatCapacitySoilM_vr(0:JZ,JY,JX));   VHeatCapacitySoilM_vr=0._r8
   allocate(ActiveLayDepth(JY,JX));       ActiveLayDepth=0._r8
   end subroutine InitSoilPhysData
 
@@ -70,18 +70,18 @@ contains
   use abortutils, only : destroy
   implicit none
   call destroy(SLOPE)
-  call destroy(FieldCapacity)
-  call destroy(WiltPoint)
-  call destroy(SatHydroCondVert)
-  call destroy(SatHydroCondHrzn)
+  call destroy(FieldCapacity_vr)
+  call destroy(WiltPoint_vr)
+  call destroy(SatHydroCondVert_vr)
+  call destroy(SatHydroCondHrzn_vr)
   call destroy(PSIAtFldCapacity)
   call destroy(PSIAtWiltPoint)
   call destroy(THW)
   call destroy(THI)
   call destroy(SurfAlbedo_col)
-  call destroy(LOGPOROS)
-  call destroy(LOGFldCapacity)
-  call destroy(LOGWiltPoint)
+  call destroy(LOGPOROS_vr)
+  call destroy(LOGFldCapacity_vr)
+  call destroy(LOGWiltPoint_vr)
   call destroy(PSD)
   call destroy(FCD)
   call destroy(SRP)
@@ -92,7 +92,7 @@ contains
   call destroy(LOGPSIMN)
   call destroy(LOGPSIMXD)
   call destroy(LOGPSIMND)
-  call destroy(VHeatCapacitySoilM)
+  call destroy(VHeatCapacitySoilM_vr)
   call destroy(ActiveLayDepth)
   end subroutine DestructSoilPhysData
 

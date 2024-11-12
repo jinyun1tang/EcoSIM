@@ -42,7 +42,6 @@ module GrosubPars
 !
 !     ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
 !     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
-!     GY,GZ=partitioning of grazed material to removal,respiration
 !     FSTK=fraction of stalk area contributing to water,heat flow
 !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
 !     FRTX=fraction used to calculate woody faction of stalk,root
@@ -105,8 +104,6 @@ module GrosubPars
   real(r8) :: ZPLFD
   real(r8) :: ZPGRM
   real(r8) :: ZPGRD
-  real(r8) :: GY
-  real(r8) :: GZ
   real(r8) :: FSTK
   real(r8) :: ZSTX
   real(r8) :: DSTK
@@ -149,7 +146,7 @@ module GrosubPars
   real(r8) :: HourReq2InitSStor4LeafOut(0:1)
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
-  character(len=6), allocatable :: pftss(:)
+  character(len=10), allocatable :: pftss(:)
   character(len=40),allocatable :: pft_long(:)
   character(len=4), allocatable :: pft_short(:)
   character(len=2), allocatable :: koppen_clim_no(:)
@@ -229,12 +226,12 @@ module GrosubPars
       call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
     endif
   endif  
-  pltpar%inonstruct=0
-  pltpar%ifoliar=1
-  pltpar%inonfoliar=2
-  pltpar%istalk=3
-  pltpar%iroot=4
-  pltpar%icwood=5
+  pltpar%inonstruct = 0
+  pltpar%ifoliar    = 1
+  pltpar%inonfoliar = 2
+  pltpar%istalk     = 3
+  pltpar%iroot      = 4
+  pltpar%icwood     = 5
 
   pltpar%jroots=2
 
@@ -274,8 +271,7 @@ module GrosubPars
   ZPLFD=1.0_r8-ZPLFM
   ZPGRM=0.75_r8
   ZPGRD=1.0_r8-ZPGRM
-  GY=1.0_r8
-  GZ=1.0_r8-GY
+
   FSTK=0.05_r8
   ZSTX=1.0E-03_r8
   DSTK=0.225_r8
@@ -330,30 +326,45 @@ module GrosubPars
   end subroutine InitVegPars
 !------------------------------------------------------------------------------------------
 
-  function get_pft_loc(pft_name,pft_lname,koppen_climl,koppen_clims)result(loc)
+  function get_pft_loc(koppen_def,pft_name,pft_lname,koppen_climl,koppen_clims)result(loc)
 !
 !!DESCRIPTION
 ! return the id of pft to be read
   implicit none
-  character(len=6), intent(in) :: pft_name
+  integer, intent(in) :: koppen_def
+  character(len=*), intent(in) :: pft_name
   character(len=40),intent(out):: pft_lname
   character(len=64),intent(out):: koppen_climl
   character(len=3), intent(out):: koppen_clims
-  integer :: loc,loc1
+  integer :: loc,loc1,len
 
+  len=len_trim(pft_name)
   loc=1
   DO
-    if(pftss(loc)==pft_name)exit
+    if(pftss(loc)(1:len)==pft_name(1:len))exit
     loc=loc+1
   enddo
+
   loc1=1
   do 
     if(pft_name(1:4)==pft_short(loc1))exit
     loc1=loc1+1
+    if(loc1 > size(pft_short))then
+      exit      
+    endif
   enddo
-  pft_lname=pft_long(loc1)
-
-  loc1=1
+  if(loc1 <=  size(pft_short))then
+    pft_lname=pft_long(loc1)
+  else
+    pft_lname=pft_name
+  endif
+  
+  if(koppen_def==0)then
+    koppen_climl='None'  
+    koppen_clims='None'
+    return
+  endif
+  loc1=1  
   do
     if(koppen_clim_no(loc1)==pft_name(5:6))exit
     loc1=loc1+1

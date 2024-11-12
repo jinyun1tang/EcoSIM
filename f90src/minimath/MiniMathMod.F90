@@ -16,9 +16,12 @@ module minimathmod
   public :: vapsat, vapsat0
   public :: isLeap
   public :: isnan
-  public :: AZMAX1,AZMIN1,AZMAX1t
+  public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d
   public :: GetMolAirPerm3
   public :: fSiLU
+  public :: fixnegmass
+  public :: fixEXflux
+  public :: yearday,isletter
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -32,6 +35,7 @@ module minimathmod
   public :: addone
   public :: RichardsonNumber
   real(r8), parameter :: tiny_val=1.e-20_r8
+
   contains
 
    pure function isnan(a)result(ans)
@@ -81,10 +85,11 @@ module minimathmod
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
+  ! ep=\mu R T= (m/M)/V0 RT, V0=1m3, m=ep*V0*M/(RT), [kPa]*[m3]*[g/mol]/[Pa m3]~kg 
   implicit none
   real(r8), intent(in) :: tempK
 
-  real(r8) :: ans  !ton/m3, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
+  real(r8) :: ans  !ton, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
   ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat
 
@@ -116,6 +121,24 @@ module minimathmod
   end function isLeap
 !------------------------------------------------------------------------------------------
 
+  pure function iisLeap(year)result(ans)
+!
+! Description
+! Determine if it is a leap year
+
+  implicit none
+  integer, intent(in) :: year
+  integer :: ans
+
+  if (isLeap(year))then
+    ans=1
+  else
+    ans=0
+  endif
+  end function iisLeap
+
+!------------------------------------------------------------------------------------------
+
   pure function AZMAX1t(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
@@ -125,6 +148,23 @@ module minimathmod
   ans=AMAX1(val,tiny_val)
 
   end function AZMAX1t
+!------------------------------------------------------------------------------------------
+
+  pure function AZMAX1d(val,tiny_val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: tiny_val2
+
+  real(r8) :: ans
+
+  if(val>tiny_val2)then
+    ans=val 
+  elseif(val>-tiny_val2)then
+    ans=0._r8
+  else
+    ans=val
+  endif
+  end function AZMAX1d
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)
@@ -230,9 +270,9 @@ module minimathmod
   real(r8) :: ans
 
   if(present(Patm_Pa))then
-    ans = Patm_Pa/(TKair*RGAS)
+    ans = Patm_Pa/(TKair*RGASC)
   else
-    ans= 1.01325E5_r8/(TKair*RGAS)
+    ans= 1.01325E5_r8/(TKair*RGASC)
   endif
 
   end function GetMolAirPerm3
@@ -255,4 +295,74 @@ module minimathmod
   ans=x/(1._r8+exp(-b_loc*x))
   
   end function fSiLU
+! ----------------------------------------------------------------------
+  function fixnegmass(val,refcon)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), optional, intent(in) :: refcon
+  real(r8) :: ans
+
+  ans=val
+
+  if(present(refcon))then
+    if(val<0._r8 .and. val>AMIN1(-refcon*1.e-3_r8,-1.e-5))ans=0._r8
+  else
+    if(val<0._r8 .and. val >-1.e-5_r8)ans=0._r8
+  endif
+
+  end function fixnegmass
+! ----------------------------------------------------------------------
+
+  subroutine fixEXflux(mass,consum_flux,ldebug)
+  implicit none
+  real(r8), intent(inout) :: mass
+  real(r8), intent(inout) :: consum_flux
+  logical, optional, intent(in) :: ldebug
+  logical :: lldebug
+
+  lldebug=.false.
+  if(present(ldebug))lldebug=ldebug
+  if(lldebug)write(116,*)'mass<consum_flux',mass,consum_flux
+  if(mass<consum_flux)then
+    consum_flux=mass
+    mass=0._r8
+  else
+    mass=mass-consum_flux  
+  endif
+  end subroutine fixEXflux
+
+! ----------------------------------------------------------------------
+
+  pure function yearday(year,month,day)result(doy)
+  implicit none
+  integer, intent(in) :: year
+  integer, intent(in) :: month
+  integer, intent(in) :: day
+
+  integer, parameter :: daz(12)=(/31,28,31,30,31,30,31,31,30,31,30,31/)
+  integer :: doy
+  integer :: jj
+
+  doy=0
+  do jj = 1, month-1
+    doy=doy+daz(jj)
+  enddo
+  if(month>2)then
+    doy=doy+iisleap(year);
+  endif
+  doy=doy+day
+  end function yearday
+! ----------------------------------------------------------------------
+
+  pure function isletter(c)result(ans)
+  implicit none
+  character(len=1), intent(in) :: c
+  logical :: ans
+
+  ans=(c>='a' .and. c<='z') .or. (c>='A' .and. c<='Z')
+
+  end function isletter
+
+
+
 end module minimathmod

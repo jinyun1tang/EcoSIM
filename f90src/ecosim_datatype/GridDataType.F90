@@ -8,13 +8,13 @@ implicit none
   __FILE__
 
   real(r8) :: TAREA               !total area of landscape	[m2]
-  real(r8),target,allocatable ::  CumDepth2LayerBottom(:,:,:)                       !depth to bottom of soil layer [m]
+  real(r8),target,allocatable ::  CumDepz2LayerBot_vr(:,:,:)                       !depth to bottom of soil layer [m]
   real(r8),target,allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]
-  real(r8),target,allocatable ::  DLYRI(:,:,:,:)                     !thickness of soil layer [m]
+  real(r8),target,allocatable ::  DLYRI_3D(:,:,:,:)                     !thickness of soil layer in 3 directions [m]
   real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
-  real(r8),target,allocatable ::  SoiDepthMidLay(:,:,:)                        !depth to middle of soil layer [m]
-  real(r8),target,allocatable ::  CumSoilThickness(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
-  real(r8),target,allocatable ::  DPTHZ(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  SoiDepthMidLay_vr(:,:,:)                        !depth to middle of soil layer [m]
+  real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  DPTHZ_vr(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
   real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
   real(r8),target,allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
   integer,target,allocatable ::  NU(:,:)                             !soil surface layer number
@@ -39,13 +39,13 @@ contains
   subroutine InitGridData
 
   implicit none
-  allocate(CumDepth2LayerBottom(0:JZ,JY,JX));  CumDepth2LayerBottom=0._r8
+  allocate(CumDepz2LayerBot_vr(0:JZ,JY,JX));  CumDepz2LayerBot_vr=0._r8
   allocate(DLYR(3,0:JZ,JY,JX)); DLYR=0._r8
-  allocate(DLYRI(3,0:JZ,JY,JX));DLYRI=0._r8
+  allocate(DLYRI_3D(3,0:JZ,JY,JX));DLYRI_3D=0._r8
   allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
-  allocate(SoiDepthMidLay(JZ,JY,JX));     SoiDepthMidLay=0._r8
-  allocate(CumSoilThickness(0:JZ,JY,JX)); CumSoilThickness=0._r8
-  allocate(DPTHZ(JZ,JY,JX));    DPTHZ=0._r8
+  allocate(SoiDepthMidLay_vr(JZ,JY,JX));     SoiDepthMidLay_vr=0._r8
+  allocate(CumSoilThickness_vr(0:JZ,JY,JX)); CumSoilThickness_vr=0._r8
+  allocate(DPTHZ_vr(JZ,JY,JX));    DPTHZ_vr=0._r8
   allocate(AREA(3,0:JZ,JY,JX)); AREA=0._r8
   allocate(DIST(3,JD,JV,JH));   DIST=0._r8
   allocate(NU(JY,JX));          NU=0
@@ -70,13 +70,13 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(CumDepth2LayerBottom)
+  call destroy(CumDepz2LayerBot_vr)
   call destroy(DLYR)
-  call destroy(DLYRI)
+  call destroy(DLYRI_3D)
   call destroy(XDPTH)
-  call destroy(SoiDepthMidLay)
-  call destroy(CumSoilThickness)
-  call destroy(DPTHZ)
+  call destroy(SoiDepthMidLay_vr)
+  call destroy(CumSoilThickness_vr)
+  call destroy(DPTHZ_vr)
   call destroy(AREA)
   call destroy(DIST)
   call destroy(NU)

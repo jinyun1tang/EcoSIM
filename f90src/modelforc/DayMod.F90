@@ -15,7 +15,7 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XCORP
+  use SurfLitterDataType, only : XTillCorp_col
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -68,18 +68,14 @@
 
 !  leap year February.
     IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
-      IF(I.LE.N)THEN
-        N1=I-NN
-        N2=M
-        N3=iYearCurrent
-        WRITE(CHARN1,'(I3)')N1+100
-        WRITE(CHARN2,'(I3)')N2+100
-        WRITE(CHARN3,'(I4)')N3
-        WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-        call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
-        exit
-      ENDIF
-      NN=N
+    IF(I.LE.N)THEN
+      N1=I-NN
+      N2=M
+      N3=iYearCurrent
+      call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
+      exit
+    ENDIF
+    NN=N
   ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
@@ -91,7 +87,6 @@
   subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
 
-  use YearMod, only : SetAnnualAccumlators
   implicit none
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
@@ -104,10 +99,6 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1).OR.(ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
-        call SetAnnualAccumlators(NY,NX)
-      ENDIF
-
       TAMX(NY,NX)=-100.0_r8
       TAMN(NY,NX)=100.0_r8
       HUDX(NY,NX)=0._r8
@@ -121,20 +112,15 @@
 !     DayLenthPrev,DLYN=daylength of previous,current day
 !     ALAT=latitude
 !
-      DayLenthPrev(NY,NX)=DayLenthCurrent(NY,NX)
+      DayLenthPrev_col(NY,NX)=DayLensCurr_col(NY,NX)
 
-      DayLenthCurrent(NY,NX)=GetDayLength(ALAT(NY,NX),I)
+      DayLensCurr_col(NY,NX)=GetDayLength(ALAT(NY,NX),I)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
 !
-      IF(is_first_year)THEN
-      !weather input is in daily format
-        ITYPE=IWTHR(1)
-      ELSE
-      !weather input is in hourly format
-        ITYPE=IWTHR(2)
-      ENDIF
+      ITYPE=IWTHR
+
 
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
@@ -150,9 +136,9 @@
 !     KoppenClimZone=Koppen climate zone
 
       IF(ITYPE.EQ.1)THEN
-        IF(KoppenClimZone(NY,NX).GE.-1)THEN
-          IF(DayLenthCurrent(NY,NX).GT.ZERO)THEN
-            RMAX=SRAD(I)/(DayLenthCurrent(NY,NX)*0.658_r8)
+        IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
+          IF(DayLensCurr_col(NY,NX).GT.ZERO)THEN
+            RMAX=SRAD(I)/(DayLensCurr_col(NY,NX)*0.658_r8)
           ELSE
             RMAX=0._r8
           ENDIF
@@ -163,7 +149,7 @@
         I3=I+1
         IF(I.EQ.1)I2=LYRX
         IF(I.EQ.IBEGIN)I2=I
-        IF(I.EQ.LYRC)I3=I
+        IF(I.EQ.DazCurrYear)I3=I
         TAVG1=(TMPX(I2)+TMPN(I))/2._r8
         TAVG2=(TMPX(I)+TMPN(I))/2._r8
         TAVG3=(TMPX(I)+TMPN(I3))/2._r8
@@ -206,16 +192,16 @@
 !     INCRENENTAL CHANGES
 !
         ELSEIF(ICLM.EQ.2)THEN
-! LYRC: number of days in current year
-          TDTPX(N,NY,NX)=TDTPX(N,NY,NX)+DTMPX(N)/LYRC
-          TDTPN(N,NY,NX)=TDTPN(N,NY,NX)+DTMPN(N)/LYRC
-          TDRAD(N,NY,NX)=TDRAD(N,NY,NX)+(DRAD(N)-1.0_r8)/LYRC
-          TDWND(N,NY,NX)=TDWND(N,NY,NX)+(DWIND(N)-1.0_r8)/LYRC
-          TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/LYRC
-          TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/LYRC
-          TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/LYRC
-          TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/LYRC
-          TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/LYRC
+! DazCurrYear: number of days in current year
+          TDTPX(N,NY,NX)=TDTPX(N,NY,NX)+DTMPX(N)/DazCurrYear
+          TDTPN(N,NY,NX)=TDTPN(N,NY,NX)+DTMPN(N)/DazCurrYear
+          TDRAD(N,NY,NX)=TDRAD(N,NY,NX)+(DRAD(N)-1.0_r8)/DazCurrYear
+          TDWND(N,NY,NX)=TDWND(N,NY,NX)+(DWIND(N)-1.0_r8)/DazCurrYear
+          TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/DazCurrYear
+          TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/DazCurrYear
+          TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/DazCurrYear
+          TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/DazCurrYear
+          TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/DazCurrYear
         ENDIF
       ENDDO D600
     ENDDO D950
@@ -241,15 +227,15 @@
 !     CORP=soil mixing fraction used in redist.f
 !
       IF(iSoilDisturbType_col(I,NY,NX).LE.10)THEN
-      ! type-1 tillage
+        ! type-1 tillage
         CORP=AMIN1(1.0_r8,AZMAX1(iSoilDisturbType_col(I,NY,NX)/10.0_r8))
       ELSEIF(iSoilDisturbType_col(I,NY,NX).LE.20)THEN
-      ! type-2 tillage
+        ! type-2 tillage
         CORP=AMIN1(1.0_r8,AZMAX1((iSoilDisturbType_col(I,NY,NX)-10.0_r8)/10.0_r8))
       ENDIF
-
-      XCORP(NY,NX)=1.0_r8-CORP
-!     WRITE(*,2227)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XCORP(NY,NX)
+      !fraction of material not mixed
+      XTillCorp_col(NY,NX)=1.0_r8-CORP
+!     WRITE(*,2227)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XTillCorp_col(NY,NX)
 !2227  FORMAT(A8,2I4,12E12.4)
 !
 !     AUTOMATIC IRRIGATION IF SELECTED
@@ -275,16 +261,16 @@
           TFZ=0._r8
           TWP=0._r8
           TVW=0._r8
-          DIRRA1=DIRRA(1,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
-          DIRRA2=DIRRA(2,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+          DIRRA1=DIRRA(1,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+          DIRRA2=DIRRA(2,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
 
           D165: DO L=NU(NY,NX),NL(NY,NX)
-            IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DIRRA1)THEN
-              FW=AMIN1(1.0_r8,(DIRRA1-CumDepth2LayerBottom(L-1,NY,NX)) &
-                /(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)))
-              FZ=AMIN1(POROS(L,NY,NX),WiltPoint(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity(L,NY,NX)-WiltPoint(L,NY,NX)))
+            IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.DIRRA1)THEN
+              FW=AMIN1(1.0_r8,(DIRRA1-CumDepz2LayerBot_vr(L-1,NY,NX)) &
+                /(CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(L-1,NY,NX)))
+              FZ=AMIN1(POROS_vr(L,NY,NX),WiltPoint_vr(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity_vr(L,NY,NX)-WiltPoint_vr(L,NY,NX)))
               TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
-              TWP=TWP+FW*WiltPoint(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+              TWP=TWP+FW*WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
               TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
             ENDIF
           ENDDO D165

@@ -45,9 +45,9 @@ module InsideTranspMod
   end subroutine DestructInsTp
 !------------------------------------------------------------------------------------------
 
-  subroutine ModelTracerHydroFlux(M,MX, NHW, NHE, NVN, NVS,WaterFlow2Soil)
+  subroutine ModelTracerHydroFlux(I,J,M,MX, NHW, NHE, NVN, NVS,WaterFlow2Soil)
   implicit none
-
+  integer, intent(in) :: I,J
   integer, intent(in) :: M,MX, NHW, NHE, NVN, NVS
   real(r8), intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
   integer :: NY,NX
@@ -77,7 +77,7 @@ module InsideTranspMod
 !     CONTEnsolutes, WATER FLUXES 'WaterFlow2Soil' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
-        call SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,&
+        call SoluteFluxSurface(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
           WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RDifus_gas_flx)
 !
       ENDIF
@@ -112,7 +112,7 @@ module InsideTranspMod
 
   integer, intent(in) :: M, NY, NX,MX
 
-  integer :: K,L,ngases,nsolutes,idom
+  integer :: K,L,ngas,nsol,idom
   real(r8) :: PARGM
 
   IF(M.NE.MX)THEN
@@ -149,22 +149,22 @@ module InsideTranspMod
     ENDDO
 
     trcg_TFloXSurRunoff(idg_beg:idg_NH3,NY,NX)=0.0_r8
-    trcn_TFloXSurRunoff(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
+    trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
     trcg_SnowDrift(idg_beg:idg_NH3,NY,NX)=0.0_r8
     trcn_SnowDrift(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
 
 !   because NH3 is gas-aqua dual phase
     trc_solml2_vr(idg_NH3,0,NY,NX)=trc_solml2_vr(idg_NH3,0,NY,NX)-RBGCSinkS_vr(idg_NH3,0,NY,NX)
 !   exclude nutrients in band
-    DO nsolutes=ids_nut_beg,ids_nuts_end
-      trc_solml2_vr(nsolutes,0,NY,NX)=trc_solml2_vr(nsolutes,0,NY,NX)-RBGCSinkS_vr(nsolutes,0,NY,NX)
+    DO nsol=ids_nut_beg,ids_nuts_end
+      trc_solml2_vr(nsol,0,NY,NX)=trc_solml2_vr(nsol,0,NY,NX)-RBGCSinkS_vr(nsol,0,NY,NX)
     ENDDO
     RBGCSinkG_vr(idg_O2,0,NY,NX)=RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
   ENDIF
 
-  DO ngases=idg_beg,idg_NH3
-    if(ngases/=idg_NH3)then
-      trc_solml2_vr(ngases,0,NY,NX)=trc_solml2_vr(ngases,0,NY,NX)-RBGCSinkG_vr(ngases,0,NY,NX)
+  DO ngas=idg_beg,idg_NH3
+    if(ngas/=idg_NH3)then
+      trc_solml2_vr(ngas,0,NY,NX)=trc_solml2_vr(ngas,0,NY,NX)-RBGCSinkG_vr(ngas,0,NY,NX)
     ELSE
       trc_gasml2_vr(idg_NH3,0,NY,NX)=trc_gasml2_vr(idg_NH3,0,NY,NX)-RBGCSinkG_vr(idg_NH3,0,NY,NX)
     ENDIF
@@ -174,7 +174,7 @@ module InsideTranspMod
 !
   IF(M.NE.MX)THEN
     DO  L=1,JS
-      trcg_TBLS(idg_beg:idg_NH3,L,NY,NX)=0._r8
+      trcg_TBLS_snvr(idg_beg:idg_NH3,L,NY,NX)=0._r8
       trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX)=0._r8
     ENDDO
   ENDIF
@@ -190,8 +190,8 @@ module InsideTranspMod
 !          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_CumEcoProd_vr(idom,K,L,NY,NX)
 !        enddo
       ENDDO
-      R3PorTSolFlx(ids_beg:ids_end,L,NY,NX)=0.0_r8
-      R3PorTSoHFlx(ids_beg:ids_end,L,NY,NX)=0._r8
+      TR3MicPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
+      TR3MacPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 !
 !     ADD SOLUTE SINKS
 !
@@ -200,8 +200,8 @@ module InsideTranspMod
 !     ZNH4B,ZNH3B,ZNO3B,ZNO2B,H1POB,H2POB=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band micropores
 !
 !     include NH3 and band nutrients
-      DO nsolutes=ids_nuts_beg,ids_nuts_end
-        trc_solml2_vr(nsolutes,L,NY,NX)=trc_solml2_vr(nsolutes,L,NY,NX)-RBGCSinkS_vr(nsolutes,L,NY,NX)
+      DO nsol=ids_nuts_beg,ids_nuts_end
+        trc_solml2_vr(nsol,L,NY,NX)=trc_solml2_vr(nsol,L,NY,NX)-RBGCSinkS_vr(nsol,L,NY,NX)
       ENDDO
 
       RBGCSinkG_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
@@ -214,11 +214,11 @@ module InsideTranspMod
 !     ZN3G=gaseous NH3
 !
     Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
-    DO ngases=idg_beg,idg_NH3
-      if(ngases/=idg_NH3)then
-        trc_solml2_vr(ngases,L,NY,NX)=trc_solml2_vr(ngases,L,NY,NX)-RBGCSinkG_vr(ngases,L,NY,NX)
+    DO ngas=idg_beg,idg_NH3
+      if(ngas/=idg_NH3)then
+        trc_solml2_vr(ngas,L,NY,NX)=trc_solml2_vr(ngas,L,NY,NX)-RBGCSinkG_vr(ngas,L,NY,NX)
       else
-        trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RBGCSinkG_vr(ngases,L,NY,NX)
+        trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RBGCSinkG_vr(ngas,L,NY,NX)
       endif
     ENDDO
 
@@ -242,7 +242,8 @@ module InsideTranspMod
   real(r8) :: VLWatMacPS,VOLWT
 
   integer :: iFlagEbu,N,L,K,LL
-  integer :: N1,N2,N3,N4,N5,N6
+  integer :: N1,N2,N3  !source grid index
+  integer :: N4,N5,N6  !dest grid index
 
 ! begin_execution
 !     N3,N2,N1=L,NY,NX of source grid cell
@@ -250,6 +251,7 @@ module InsideTranspMod
 !
   iFlagEbu=0
   D125: DO L=1,NL(NY,NX)
+    !source
     N1=NX;N2=NY;N3=L    
 !
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
@@ -366,8 +368,8 @@ module InsideTranspMod
    subroutine SoluteAdvTranspMicropore(M,N,N1,N2,N3,N4,N5,N6)
    implicit none
    integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
-   real(r8) :: trc_RFL(ids_beg:ids_end)
-   integer :: K,nsolutes,idom
+   real(r8) :: trcs_adv_flx(ids_beg:ids_end)
+   integer :: K,nsol,idom
    real(r8) :: VFLW
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -395,8 +397,8 @@ module InsideTranspMod
       enddo
     ENDDO
 
-    DO nsolutes=ids_beg,ids_end
-      trc_RFL(nsolutes)=VFLW*AZMAX1(trc_solml2_vr(nsolutes,N3,N2,N1))
+    DO nsol=ids_beg,ids_end
+      trcs_adv_flx(nsol)=VFLW*AZMAX1(trc_solml2_vr(nsol,N3,N2,N1))
     ENDDO
 !
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS TO CURRENT FROM
@@ -415,13 +417,13 @@ module InsideTranspMod
         DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,N6,N5,N4))
       enddo
     ENDDO D9815
-    DO nsolutes=ids_beg,ids_end
-      trc_RFL(nsolutes)=VFLW*AZMAX1(trc_solml2_vr(nsolutes,N6,N5,N4))
+    DO nsol=ids_beg,ids_end
+      trcs_adv_flx(nsol)=VFLW*AZMAX1(trc_solml2_vr(nsol,N6,N5,N4))
     ENDDO
   ENDIF
 
-  DO nsolutes=ids_beg,ids_end
-    R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)=trc_RFL(nsolutes)
+  DO nsol=ids_beg,ids_end
+    R3PoreSolFlx_3D(nsol,N,N6,N5,N4)=trcs_adv_flx(nsol)
   ENDDO
 
   end subroutine SoluteAdvTranspMicropore
@@ -432,20 +434,20 @@ module InsideTranspMod
   integer , intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8), intent(in) :: THETW1(JZ,JY,JX)
   real(r8) :: VLWatMicPOA,VLWatMicPOB,VLWatMicPPA,VLWatMicPPB
-  real(r8) :: VLWatMicP2_vrA,VLWatMicP2_vrB,VLWatMicP3A,VLWatMicP3B,VLWatMicP4A,VLWatMicP4B
+  real(r8) :: VLWatMicP2A,VLWatMicP2B,VLWatMicP3A,VLWatMicP3B,VLWatMicP4A,VLWatMicP4B
   real(r8) :: trcsolc1(ids_beg:ids_end)
   real(r8) :: trcsolc2(ids_beg:ids_end)
 
   real(r8) :: SDifc(ids_beg:ids_end),SDifFlx(ids_beg:ids_end)
   real(r8) :: DISPN,DIFOM(idom_beg:idom_end)
   real(r8) :: DLYR1,DLYR2,TORTL
-  integer  :: K,nsolutes,ngases,idom
+  integer  :: K,nsol,ngas,idom
 
-  IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1).AND.THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
-    .AND.VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1).AND.VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+  IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1) .AND. THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
+    .AND. VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) .AND. VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
-      VLWatMicP2_vrA=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
-      VLWatMicP2_vrB=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+      VLWatMicP2A=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+      VLWatMicP2B=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
       VLWatMicP3A=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3,N3,N2,N1)
       VLWatMicP3B=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3B,N3,N2,N1)
       VLWatMicP4A=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4,N3,N2,N1)
@@ -481,8 +483,8 @@ module InsideTranspMod
       enddo
     ENDDO D9810
 
-    DO ngases=idg_beg,idg_end-2
-      trcsolc1(ngases)=AZMAX1(trc_solml2_vr(ngases,N3,N2,N1)/VLWatMicPM_vr(M,N3,N2,N1))
+    DO ngas=idg_beg,idg_end-2
+      trcsolc1(ngas)=AZMAX1(trc_solml2_vr(ngas,N3,N2,N1)/VLWatMicPM_vr(M,N3,N2,N1))
     ENDDO
 
     IF(VLWatMicP4A.GT.ZEROS2(N2,N1))THEN
@@ -499,9 +501,9 @@ module InsideTranspMod
       trcsolc1(ids_NO3)=0.0_r8
       trcsolc1(ids_NO2)=0.0_r8
     ENDIF
-    IF(VLWatMicP2_vrA.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml2_vr(ids_H1PO4,N3,N2,N1)/VLWatMicP2_vrA)
-      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml2_vr(ids_H2PO4,N3,N2,N1)/VLWatMicP2_vrA)
+    IF(VLWatMicP2A.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml2_vr(ids_H1PO4,N3,N2,N1)/VLWatMicP2A)
+      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml2_vr(ids_H2PO4,N3,N2,N1)/VLWatMicP2A)
     ELSE
       trcsolc1(ids_H1PO4)=0.0_r8
       trcsolc1(ids_H2PO4)=0.0_r8
@@ -520,16 +522,16 @@ module InsideTranspMod
       trcsolc1(ids_NO3B)=trcsolc1(ids_NO3)
       trcsolc1(ids_NO2B)=trcsolc1(ids_NO2)
     ENDIF
-    IF(VLWatMicP2_vrB.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml2_vr(ids_H1PO4B,N3,N2,N1)/VLWatMicP2_vrB)
-      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml2_vr(ids_H2PO4B,N3,N2,N1)/VLWatMicP2_vrB)
+    IF(VLWatMicP2B.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml2_vr(ids_H1PO4B,N3,N2,N1)/VLWatMicP2B)
+      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml2_vr(ids_H2PO4B,N3,N2,N1)/VLWatMicP2B)
     ELSE
       trcsolc1(ids_H1PO4B)=trcsolc1(ids_H1PO4)
       trcsolc1(ids_H2PO4B)=trcsolc1(ids_H2PO4)
     ENDIF
 
-    DO ngases=idg_beg,idg_end-2
-      trcsolc2(ngases)=AZMAX1(trc_solml2_vr(ngases,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
+    DO ngas=idg_beg,idg_end-2
+      trcsolc2(ngas)=AZMAX1(trc_solml2_vr(ngas,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
     ENDDO
 
 
@@ -603,8 +605,8 @@ module InsideTranspMod
       DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     ENDDO
 
-    DO nsolutes=ids_beg,ids_end
-      SDifc(nsolutes)=(SoluteDifusvty_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DO nsol=ids_beg,ids_end
+      SDifc(nsol)=(SoluteDifusvty_vrc(nsol,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     ENDDO
 
 !
@@ -617,13 +619,13 @@ module InsideTranspMod
       enddo
     ENDDO D9805
 
-    DO ngases=idg_beg,idg_end-2
-      SDifFlx(ngases)=SDifc(ngases)*(trcsolc1(ngases)-trcsolc2(ngases))
+    DO ngas=idg_beg,idg_end-2
+      SDifFlx(ngas)=SDifc(ngas)*(trcsolc1(ngas)-trcsolc2(ngas))
     ENDDO
 
-    DO nsolutes=ids_nuts_beg,ids_nuts_end
-      SDifFlx(nsolutes)=SDifc(nsolutes)*(trcsolc1(nsolutes)-trcsolc2(nsolutes)) &
-        *AMIN1(trcs_VLN_vr(nsolutes,N3,N2,N1),trcs_VLN_vr(nsolutes,N6,N5,N4))
+    DO nsol=ids_nuts_beg,ids_nuts_end
+      SDifFlx(nsol)=SDifc(nsol)*(trcsolc1(nsol)-trcsolc2(nsol)) &
+        *AMIN1(trcs_VLN_vr(nsol,N3,N2,N1),trcs_VLN_vr(nsol,N6,N5,N4))
     ENDDO
   ELSE
     D9905: DO K=1,jcplx
@@ -632,8 +634,8 @@ module InsideTranspMod
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
 
-  DO nsolutes=ids_beg,ids_end
-    R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)=R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)+SDifFlx(nsolutes)
+  DO nsol=ids_beg,ids_end
+    R3PoreSolFlx_3D(nsol,N,N6,N5,N4)=R3PoreSolFlx_3D(nsol,N,N6,N5,N4)+SDifFlx(nsol)
   ENDDO
 
   end subroutine SoluteDifTranspMicropore
@@ -643,7 +645,7 @@ module InsideTranspMod
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: trcs_RFH(ids_beg:ids_end)
-  integer  :: K,ngases,nsolutes,idom
+  integer  :: K,ngas,nsol,idom
   real(r8) :: VFLW
 !     WaterFlow2MacPM=water flux through soil macropore from watsub.f
 !
@@ -675,7 +677,7 @@ module InsideTranspMod
 !
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE
 !
-    IF(N.EQ.3.AND.VLMacP(N6,N5,N4).GT.VLWatMacPM(M,N6,N5,N4))THEN
+    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM(M,N6,N5,N4))THEN
       D9800: DO K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_Adv2MacP_flx(idom,K)=VFLW*AZMAX1((DOM_MacP2(idom,K,N3,N2,N1) &
@@ -683,15 +685,15 @@ module InsideTranspMod
         enddo
       ENDDO D9800
 
-      DO ngases=idg_beg,idg_end-2
-        trcs_RFH(ngases)=VFLW*AZMAX1((trc_soHml2_vr(ngases,N3,N2,N1) &
-          -AZMIN1(RporeSoXFlx(ngases,NU(N2,N1),N2,N1))))
+      DO ngas=idg_beg,idg_end-2
+        trcs_RFH(ngas)=VFLW*AZMAX1((trc_soHml2_vr(ngas,N3,N2,N1) &
+          -AZMIN1(RMac2MicSolFlx_vr(ngas,NU(N2,N1),N2,N1))))
       ENDDO
 
-      DO nsolutes=ids_nuts_beg,ids_nuts_end
-        trcs_RFH(nsolutes)=VFLW*AZMAX1((trc_soHml2_vr(nsolutes,N3,N2,N1) &
-          -AZMIN1(RporeSoXFlx(nsolutes,NU(N2,N1),N2,N1)*trcs_VLN_vr(nsolutes,N3,N2,N1)))) &
-          *trcs_VLN_vr(nsolutes,N6,N5,N4)
+      DO nsol=ids_nuts_beg,ids_nuts_end
+        trcs_RFH(nsol)=VFLW*AZMAX1((trc_soHml2_vr(nsol,N3,N2,N1) &
+          -AZMIN1(RMac2MicSolFlx_vr(nsol,NU(N2,N1),N2,N1)*trcs_VLN_vr(nsol,N3,N2,N1)))) &
+          *trcs_VLN_vr(nsol,N6,N5,N4)
       ENDDO
 !
 !     OTHERWISE
@@ -703,12 +705,12 @@ module InsideTranspMod
         enddo
       ENDDO D9850
 !exclude NH3 and NH3B
-      DO ngases=idg_beg,idg_end-2
-        trcs_RFH(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,N3,N2,N1))
+      DO ngas=idg_beg,idg_end-2
+        trcs_RFH(ngas)=VFLW*AZMAX1(trc_soHml2_vr(ngas,N3,N2,N1))
       ENDDO
 
-      DO nsolutes=ids_nuts_beg,ids_nuts_end
-        trcs_RFH(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,N3,N2,N1))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+      DO nsol=ids_nuts_beg,ids_nuts_end
+        trcs_RFH(nsol)=VFLW*AZMAX1(trc_soHml2_vr(nsol,N3,N2,N1))*trcs_VLN_vr(nsol,N6,N5,N4)
       ENDDO
     ENDIF
 !
@@ -729,12 +731,12 @@ module InsideTranspMod
       enddo
     ENDDO D9665
 
-    DO ngases=idg_beg,idg_end-2
-      trcs_RFH(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4))
+    DO ngas=idg_beg,idg_end-2
+      trcs_RFH(ngas)=VFLW*AZMAX1(trc_soHml2_vr(ngas,N6,N5,N4))
     ENDDO
 
-    DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trcs_RFH(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+    DO nsol=ids_nuts_beg,ids_nuts_end
+      trcs_RFH(nsol)=VFLW*AZMAX1(trc_soHml2_vr(nsol,N6,N5,N4))*trcs_VLN_vr(nsol,N6,N5,N4)
     ENDDO
   ELSE
 !
@@ -746,8 +748,8 @@ module InsideTranspMod
     trcs_RFH(ids_beg:ids_end)=0.0_r8
   ENDIF
 
-  DO nsolutes=ids_beg,ids_end
-    R3PoreSoHFlx(nsolutes,N,N6,N5,N4)=trcs_RFH(nsolutes)
+  DO nsol=ids_beg,ids_end
+    R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)=trcs_RFH(nsol)
   ENDDO
 
   end subroutine SoluteAdvTranspMacropore
@@ -764,7 +766,7 @@ module InsideTranspMod
   real(r8) :: DIFOM(idom_beg:idom_end)
   real(r8) :: DISPN,DLYR1,DLYR2
   real(r8) :: SDifHFlx(ids_beg:ids_end)
-  integer  :: K,nsolutes,ngases,idom
+  integer  :: K,nsol,ngas,idom
 
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN CURRENT AND
 !     ADJACENT GRID CELL MACROPORES FROM AQUEOUS DIFFUSIVITIES
@@ -774,8 +776,8 @@ module InsideTranspMod
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 !
-  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP(N3,N2,N1) &
-    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP(N6,N5,N4))THEN
+  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
+    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
@@ -808,8 +810,8 @@ module InsideTranspMod
       enddo
     ENDDO D9790
 !exclude NH3 and NH3B
-    DO ngases=idg_beg,idg_end-2
-      trcs_coH1(ngases)=AZMAX1(trc_soHml2_vr(ngases,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
+    DO ngas=idg_beg,idg_end-2
+      trcs_coH1(ngas)=AZMAX1(trc_soHml2_vr(ngas,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
     ENDDO
 
     IF(VOLH4A.GT.ZEROS2(N2,N1))THEN
@@ -855,8 +857,8 @@ module InsideTranspMod
       trcs_coH1(ids_H2PO4B)=trcs_coH1(ids_H2PO4)
     ENDIF
 !excldue NH3 and NH3B
-    DO ngases=idg_beg,idg_end-2
-      trcs_coH2(ngases)=AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
+    DO ngas=idg_beg,idg_end-2
+      trcs_coH2(ngas)=AZMAX1(trc_soHml2_vr(ngas,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
     ENDDO
 
     VOLHMA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
@@ -935,8 +937,8 @@ module InsideTranspMod
       DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     ENDDO
 
-    DO nsolutes=ids_beg,ids_end
-      SDifc(nsolutes)=(SoluteDifusvty_vrc(nsolutes,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DO nsol=ids_beg,ids_end
+      SDifc(nsol)=(SoluteDifusvty_vrc(nsol,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     ENDDO
 
 !
@@ -949,13 +951,13 @@ module InsideTranspMod
       enddo
     ENDDO D9785
 ! exclude NH3 and NH3B
-    DO ngases=idg_beg,idg_end-2
-      SDifHFlx(ngases)=SDifc(ngases)*(trcs_coH1(ngases)-trcs_coH2(ngases))
+    DO ngas=idg_beg,idg_end-2
+      SDifHFlx(ngas)=SDifc(ngas)*(trcs_coH1(ngas)-trcs_coH2(ngas))
     ENDDO
 
-    DO nsolutes=ids_nuts_beg,ids_end
-      SDifHFlx(nsolutes)=SDifc(nsolutes)*(trcs_coH1(nsolutes)-trcs_coH2(nsolutes)) &
-        *AMIN1(trcs_VLN_vr(nsolutes,N3,N2,N1),trcs_VLN_vr(nsolutes,N6,N5,N4))
+    DO nsol=ids_nuts_beg,ids_end
+      SDifHFlx(nsol)=SDifc(nsol)*(trcs_coH1(nsol)-trcs_coH2(nsol)) &
+        *AMIN1(trcs_VLN_vr(nsol,N3,N2,N1),trcs_VLN_vr(nsol,N6,N5,N4))
     ENDDO
   ELSE
     D9780: DO K=1,jcplx
@@ -963,21 +965,23 @@ module InsideTranspMod
     ENDDO D9780
     SDifHFlx(ids_beg:ids_end)=0.0_r8
   ENDIF
-  DO nsolutes = ids_beg,ids_end
-    R3PoreSoHFlx(nsolutes,N,N6,N5,N4)=R3PoreSoHFlx(nsolutes,N,N6,N5,N4)+SDifHFlx(nsolutes)
+  DO nsol = ids_beg,ids_end
+    R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)=R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)+SDifHFlx(nsol)
   ENDDO
   end subroutine SoluteDifTranspMacropore
 
 ! ----------------------------------------------------------------------
   subroutine SoluteAdvDifusTransp(M,N,N1,N2,N3,N4,N5,N6)
   implicit none
-  integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
+  integer, intent(in) :: M,N
+  integer, intent(in) :: N1,N2,N3  !source grid
+  integer, intent(in) :: N4,N5,N6  !dest grid
 
   real(r8) :: THETW1(JZ,JY,JX)
-  integer :: K,nsolutes,idom
+  integer :: K,nsol,idom
 
-  THETW1(N3,N2,N1)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
-  THETW1(N6,N5,N4)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N6,N5,N4),VLSoilMicP(N6,N5,N4)))
+  THETW1(N3,N2,N1)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
+  THETW1(N6,N5,N4)=AZMAX1(safe_adb(VLWatMicPM_vr(M,N6,N5,N4),VLSoilMicP_vr(N6,N5,N4)))
 
 !     SOLUTE TRANSPORT IN MICROPORES
 !
@@ -1039,11 +1043,11 @@ module InsideTranspMod
     enddo
   ENDDO D9755
 
-  DO nsolutes=ids_beg,ids_end
-    trcs_3DTransp2MicP_3D(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MicP_3D(nsolutes,N,N6,N5,N4) &
-      +R3PoreSolFlx_vr(nsolutes,N,N6,N5,N4)
-    trcs_3DTransp2MacP(nsolutes,N,N6,N5,N4)=trcs_3DTransp2MacP(nsolutes,N,N6,N5,N4) &
-      +R3PoreSoHFlx(nsolutes,N,N6,N5,N4)
+  DO nsol=ids_beg,ids_end
+    trcs_Transp2MicP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MicP_3D(nsol,N,N6,N5,N4) &
+      +R3PoreSolFlx_3D(nsol,N,N6,N5,N4)
+    trcs_Transp2MacP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MacP_3D(nsol,N,N6,N5,N4) &
+      +R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifusTransp
@@ -1053,7 +1057,7 @@ module InsideTranspMod
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
-  integer :: K,nsolutes,idg,idom
+  integer :: K,nsol,idg,idom
 
   do idg=idg_beg,idg_NH3-1
     trcg_VLWatMicP(idg,N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*GasSolbility_vr(idg,N6,N5,N4)
@@ -1087,9 +1091,9 @@ module InsideTranspMod
     enddo
   ENDDO D9945
 
-  DO nsolutes=ids_beg,ids_end
-    trcs_PoreTranspFlx_vr(nsolutes,N6,N5,N4)=trcs_PoreTranspFlx_vr(nsolutes,N6,N5,N4) &
-      +RporeSoXFlx(nsolutes,N6,N5,N4)
+  DO nsol=ids_beg,ids_end
+    trcs_PoreTranspFlx_vr(nsol,N6,N5,N4)=trcs_PoreTranspFlx_vr(nsol,N6,N5,N4) &
+      +RMac2MicSolFlx_vr(nsol,N6,N5,N4)
   ENDDO
 
   end subroutine MicMacPoresSoluteExchange
@@ -1098,9 +1102,9 @@ module InsideTranspMod
   subroutine MicMacPoresSoluteAdvExchange(M,N,N1,N2,N3,N4,N5,N6)
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
-  real(r8) :: VFLW
-  real(r8) :: trc_RFL(ids_beg:ids_end)
-  integer :: K,ngases,nsolutes,idom
+  real(r8) :: VFLW    !fraction in flow
+  real(r8) :: trcs_adv_flx(ids_beg:ids_end)
+  integer :: K,ngas,nsol,idom
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
 !     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
@@ -1128,12 +1132,12 @@ module InsideTranspMod
       enddo
     ENDDO D9970
 
-    DO ngases=idg_beg,idg_end-2
-      trc_RFL(ngases)=VFLW*AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4))
+    DO ngas=idg_beg,idg_end-2
+      trcs_adv_flx(ngas)=VFLW*AZMAX1(trc_soHml2_vr(ngas,N6,N5,N4))
     ENDDO
 
-    DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trc_RFL(nsolutes)=VFLW*AZMAX1(trc_soHml2_vr(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+    DO nsol=ids_nuts_beg,ids_nuts_end
+      trcs_adv_flx(nsol)=VFLW*AZMAX1(trc_soHml2_vr(nsol,N6,N5,N4))*trcs_VLN_vr(nsol,N6,N5,N4)
     ENDDO
 !
 !     MICROPORE TO MACROPORE TRANSFER
@@ -1151,12 +1155,12 @@ module InsideTranspMod
       enddo
     ENDDO D9965
 !exclude NH3 and NH3B
-    DO ngases=idg_beg,idg_end-2
-      trc_RFL(ngases)=VFLW*AZMAX1(trc_solml2_vr(ngases,N6,N5,N4))
+    DO ngas=idg_beg,idg_end-2
+      trcs_adv_flx(ngas)=VFLW*AZMAX1(trc_solml2_vr(ngas,N6,N5,N4))
     ENDDO
 
-    DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trc_RFL(nsolutes)=VFLW*AZMAX1(trc_solml2_vr(nsolutes,N6,N5,N4))*trcs_VLN_vr(nsolutes,N6,N5,N4)
+    DO nsol=ids_nuts_beg,ids_nuts_end
+      trcs_adv_flx(nsol)=VFLW*AZMAX1(trc_solml2_vr(nsol,N6,N5,N4))*trcs_VLN_vr(nsol,N6,N5,N4)
     ENDDO
 !
 !     NO MACROPORE TO MICROPORE TRANSFER
@@ -1165,11 +1169,11 @@ module InsideTranspMod
     D9960: DO K=1,jcplx
       DOM_Adv2MicP_flx(idom_beg:idom_end,K)=0.0_r8
     ENDDO D9960
-    trc_RFL(ids_beg:ids_end)=0.0_r8
+    trcs_adv_flx(ids_beg:ids_end)=0.0_r8
   ENDIF
 
-  DO nsolutes=ids_beg,ids_end
-    RporeSoXFlx(nsolutes,N6,N5,N4)=trc_RFL(nsolutes)
+  DO nsol=ids_beg,ids_end
+    RMac2MicSolFlx_vr(nsol,N6,N5,N4)=trcs_adv_flx(nsol)
   ENDDO
 !
 !     TOTAL CONVECTIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
@@ -1199,7 +1203,7 @@ module InsideTranspMod
 
   real(r8) :: trcs_DFV(ids_beg:ids_end)
   real(r8) :: VLWatMacPS,VOLWT
-  integer  :: K,nsolutes,ngases,idom
+  integer  :: K,nsol,ngas,idom
 !
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     DFV*S,DFV*B=diffusive solute flux between macro- and micropore in non-band,band
@@ -1211,7 +1215,7 @@ module InsideTranspMod
 !     *2,*H2=solute content of micropores,macropores
 !
   IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-    VLWatMacPS=AMIN1(XFRS*VGeomLayer(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
+    VLWatMacPS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
     VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VLWatMacPS
 
     D9955: DO K=1,jcplx
@@ -1221,15 +1225,15 @@ module InsideTranspMod
       enddo
     ENDDO D9955
 
-    DO ngases=idg_beg,idg_NH3-1
-      trcs_DFV(ngases)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(ngases,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
-        -AZMAX1(trc_solml2_vr(ngases,N6,N5,N4))*VLWatMacPS)/VOLWT
+    DO ngas=idg_beg,idg_NH3-1
+      trcs_DFV(ngas)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(ngas,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
+        -AZMAX1(trc_solml2_vr(ngas,N6,N5,N4))*VLWatMacPS)/VOLWT
     ENDDO
 
-    DO nsolutes=ids_nuts_beg,ids_nuts_end
-      trcs_DFV(nsolutes)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(nsolutes,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
-        -AZMAX1(trc_solml2_vr(nsolutes,N6,N5,N4))*VLWatMacPS)/VOLWT &
-        *trcs_VLN_vr(nsolutes,N6,N5,N4)
+    DO nsol=ids_nuts_beg,ids_nuts_end
+      trcs_DFV(nsol)=dts_HeatWatTP*(AZMAX1(trc_soHml2_vr(nsol,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
+        -AZMAX1(trc_solml2_vr(nsol,N6,N5,N4))*VLWatMacPS)/VOLWT &
+        *trcs_VLN_vr(nsol,N6,N5,N4)
     ENDDO
 
   ELSE
@@ -1240,8 +1244,8 @@ module InsideTranspMod
     trcs_DFV(ids_beg:ids_end)=0.0_r8
   ENDIF
 
-  DO nsolutes=ids_beg,ids_end
-    RporeSoXFlx(nsolutes,N6,N5,N4)=RporeSoXFlx(nsolutes,N6,N5,N4)+trcs_DFV(nsolutes)
+  DO nsol=ids_beg,ids_end
+    RMac2MicSolFlx_vr(nsol,N6,N5,N4)=RMac2MicSolFlx_vr(nsol,N6,N5,N4)+trcs_DFV(nsol)
   ENDDO
 !
 !     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
@@ -1270,7 +1274,7 @@ module InsideTranspMod
   real(r8) :: THETW1
   real(r8) :: trcg_SLX(idg_beg:idg_end)
   real(r8) :: trcg_VOLG(idg_beg:idg_end)
-  integer  :: ngases
+  integer  :: ngas
   real(r8) :: VTATM,VTGAS,DVTGAS
 !
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
@@ -1279,7 +1283,7 @@ module InsideTranspMod
 !     S*L=solubility of gas in water from hour1.f
 !
   IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
-    THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP(N3,N2,N1)))
+    THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
     IF(THETW1.GT.THETY_vr(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
 
       trcg_SLX(idg_CO2) =catomw*GasSolbility_vr(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
@@ -1299,12 +1303,12 @@ module InsideTranspMod
 !     R*DFS=gas exchange between atmosphere and soil surface water
 !
       IF(N3.EQ.NU(N2,N1))THEN
-        DO ngases=idg_beg,idg_end
-          trcg_VOLG(ngases)=(trc_solml2_vr(ngases,N3,N2,N1)+RGasSSVol(ngases,NY,NX))/trcg_SLX(ngases)
+        DO ngas=idg_beg,idg_end
+          trcg_VOLG(ngas)=(trc_solml2_vr(ngas,N3,N2,N1)+RGasSSVol(ngas,NY,NX))/trcg_SLX(ngas)
         ENDDO
       ELSE
-        DO ngases=idg_beg,idg_end
-          trcg_VOLG(ngases)=trc_solml2_vr(ngases,N3,N2,N1)/trcg_SLX(ngases)
+        DO ngas=idg_beg,idg_end
+          trcg_VOLG(ngas)=trc_solml2_vr(ngas,N3,N2,N1)/trcg_SLX(ngas)
         ENDDO
       ENDIF
 !
@@ -1325,16 +1329,17 @@ module InsideTranspMod
 !
       IF(VTGAS.GT.VTATM)THEN
         DVTGAS=0.5_r8*(VTATM-VTGAS)
-        DO ngases=idg_beg,idg_end
-          trcg_Ebu_vr(ngases,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(ngases)/VTGAS)*trcg_SLX(ngases)
+        DO ngas=idg_beg,idg_end
+          trcg_Ebu_vr(ngas,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(ngas)/VTGAS)*trcg_SLX(ngas)
+          IF(trcg_Ebu_vr(ngas,N3,N2,N1)<1.e-10_r8)trcg_Ebu_vr(ngas,N3,N2,N1)=0._r8
         ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
 !     X*BBL=hourly bubble flux
 !
-        DO ngases=idg_beg,idg_end
-          trcg_ebu_flx_vr(ngases,N3,N2,N1)=trcg_ebu_flx_vr(ngases,N3,N2,N1)+trcg_Ebu_vr(ngases,N3,N2,N1)
+        DO ngas=idg_beg,idg_end
+          trcg_ebu_flx_vr(ngas,N3,N2,N1)=trcg_ebu_flx_vr(ngas,N3,N2,N1)+trcg_Ebu_vr(ngas,N3,N2,N1)
         ENDDO
       ELSE
         trcg_Ebu_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
@@ -1358,8 +1363,7 @@ module InsideTranspMod
   real(r8) :: CNDC1
   real(r8) :: CNDC2
   real(r8) :: DFLG2,DFLGL
-  real(r8) :: DFVGG(idg_beg:idg_end)
-  integer :: ngases
+  integer :: ngas
 
 !     GASEOUS DIFFUSIVITIES
 !
@@ -1373,10 +1377,10 @@ module InsideTranspMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-  DFLG2=2.0_r8*AZMAX1(THETPM(M,N3,N2,N1))*POROQ*THETPM(M,N3,N2,N1)/POROS(N3,N2,N1) &
+  DFLG2=2.0_r8*AZMAX1(THETPM(M,N3,N2,N1))*POROQ*THETPM(M,N3,N2,N1)/POROS_vr(N3,N2,N1) &
     *AREA(N,N3,N2,N1)/DLYR(N,N3,N2,N1)
 
-  DFLGL=2.0_r8*AZMAX1(THETPM(M,N6,N5,N4))*POROQ*THETPM(M,N6,N5,N4)/POROS(N6,N5,N4) &
+  DFLGL=2.0_r8*AZMAX1(THETPM(M,N6,N5,N4))*POROQ*THETPM(M,N6,N5,N4)/POROS_vr(N6,N5,N4) &
     *AREA(N,N6,N5,N4)/DLYR(N,N6,N5,N4)
 
 !
@@ -1386,10 +1390,10 @@ module InsideTranspMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-  DO ngases=idg_beg,idg_end
-    CNDC1=DFLG2*GasDifc_vrc(ngases,N3,N2,N1)
-    CNDC2=DFLGL*GasDifc_vrc(ngases,N6,N5,N4)
-    DifuscG_vr(ngases,N,N6,N5,N4)=(CNDC1*CNDC2)/(CNDC1+CNDC2)
+  DO ngas=idg_beg,idg_end
+    CNDC1=DFLG2*GasDifc_vrc(ngas,N3,N2,N1)
+    CNDC2=DFLGL*GasDifc_vrc(ngas,N6,N5,N4)
+    DifuscG_vr(ngas,N,N6,N5,N4)=(CNDC1*CNDC2)/(CNDC1+CNDC2)
   ENDDO
 !
 !     GASEOUS CONCENTRATIONS FROM AIR-FILLED POROSITY
@@ -1409,11 +1413,10 @@ module InsideTranspMod
 !     C*G1,C*G2=gaseous concentration in source,destination layer
 !
 ! does not include band NH3
-  DO ngases=idg_beg,idg_NH3
-    trc_gasc1(ngases)=AZMAX1(trc_gasml2_vr(ngases,N3,N2,N1)/VLsoiAirPM(M,N3,N2,N1))
-    trc_gasc2(ngases)=AZMAX1(trc_gasml2_vr(ngases,N6,N5,N4)/VLsoiAirPM(M,N6,N5,N4))
-    DFVGG(ngases)=DifuscG_vr(ngases,N,N6,N5,N4)*(trc_gasc1(ngases)-trc_gasc2(ngases))
-    R3GasADFlx(ngases,N,N6,N5,N4)=DFVGG(ngases)
+  DO ngas=idg_beg,idg_NH3
+    trc_gasc1(ngas)=AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1)/VLsoiAirPM(M,N3,N2,N1))
+    trc_gasc2(ngas)=AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4)/VLsoiAirPM(M,N6,N5,N4))
+    RGasADFlx_3D(ngas,N,N6,N5,N4)=DifuscG_vr(ngas,N,N6,N5,N4)*(trc_gasc1(ngas)-trc_gasc2(ngas))
   ENDDO
 
   end subroutine GasDifTransport
@@ -1426,7 +1429,7 @@ module InsideTranspMod
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: RGasAdv
   real(r8) :: VFLW,FLQW
-  integer :: ngases
+  integer :: ngas
 !
 !     CONVECTIVE GAS TRANSFER DRIVEN BY SOIL WATER FLUXES
 !     FROM 'WATSUB' AND GAS CONCENTRATIONS IN THE ADJACENT GRID CELLS
@@ -1446,9 +1449,9 @@ module InsideTranspMod
     ELSE
       VFLW=-VFLWX
     ENDIF
-    DO ngases=idg_beg,idg_NH3
-      RGasAdv=VFLW*AZMAX1(trc_gasml2_vr(ngases,N6,N5,N4))
-      R3GasADFlx(ngases,N,N6,N5,N4)=R3GasADFlx(ngases,N,N6,N5,N4)+RGasAdv
+    DO ngas=idg_beg,idg_NH3
+      RGasAdv=VFLW*AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4))
+      RGasADFlx_3D(ngas,N,N6,N5,N4)=RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
     ENDDO
   ELSE
     IF(VLsoiAirPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -1456,9 +1459,9 @@ module InsideTranspMod
     ELSE
       VFLW=VFLWX
     ENDIF
-    DO ngases=idg_beg,idg_NH3
-      RGasAdv=VFLW*AZMAX1(trc_gasml2_vr(ngases,N3,N2,N1))
-      R3GasADFlx(ngases,N,N6,N5,N4)=R3GasADFlx(ngases,N,N6,N5,N4)+RGasAdv
+    DO ngas=idg_beg,idg_NH3
+      RGasAdv=VFLW*AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1))
+      RGasADFlx_3D(ngas,N,N6,N5,N4)=RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
     ENDDO
   ENDIF
 
@@ -1470,7 +1473,7 @@ module InsideTranspMod
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8), intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
-  integer :: ngases
+  integer :: ngas
 
 !     THETPM,VLsoiAirPM=air-filled porosity,volume from watsub.f
 
@@ -1488,13 +1491,13 @@ module InsideTranspMod
 !
 !     X*FLG=hourly total convective+diffusive gas flux
 !
-    DO ngases=idg_beg,idg_NH3
-      Gas_3DAdvDif_Flx_vr(ngases,N,N6,N5,N4)=Gas_3DAdvDif_Flx_vr(ngases,N,N6,N5,N4) &
-        +R3GasADFlx(ngases,N,N6,N5,N4)
+    DO ngas=idg_beg,idg_NH3
+      Gas_3DAdvDif_Flx_vr(ngas,N,N6,N5,N4)=Gas_3DAdvDif_Flx_vr(ngas,N,N6,N5,N4) &
+        +RGasADFlx_3D(ngas,N,N6,N5,N4)
     ENDDO
 
   ELSE
-    R3GasADFlx(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
+    RGasADFlx_3D(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
   ENDIF
   call VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)
   end subroutine GaseousTransport
@@ -1504,7 +1507,7 @@ module InsideTranspMod
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
-  integer :: ngases
+  integer :: ngas
 !
 !     VOLATILIZATION-DISSOLUTION OF GASES IN SOIL
 !     LAYER FROM GASEOUS CONCENTRATIONS VS. THEIR AQUEOUS
@@ -1521,31 +1524,31 @@ module InsideTranspMod
 !
   IF(N.EQ.3)THEN
     IF(THETPM(M,N6,N5,N4).GT.THETX)THEN
-      do ngases=idg_beg,idg_NH3-1
-        RGasDSFlx(ngases,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-          ,trc_gasml2_vr(ngases,N6,N5,N4))*trcg_VLWatMicP(ngases,N6,N5,N4) &
-          -trc_solml2_vr(ngases,N6,N5,N4)*VLsoiAirPM(M,N6,N5,N4)) &
-          /(trcg_VLWatMicP(ngases,N6,N5,N4)+VLsoiAirPM(M,N6,N5,N4))
+      do ngas=idg_beg,idg_NH3-1
+        RGasDSFlx_vr(ngas,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
+          ,trc_gasml2_vr(ngas,N6,N5,N4))*trcg_VLWatMicP(ngas,N6,N5,N4) &
+          -trc_solml2_vr(ngas,N6,N5,N4)*VLsoiAirPM(M,N6,N5,N4)) &
+          /(trcg_VLWatMicP(ngas,N6,N5,N4)+VLsoiAirPM(M,N6,N5,N4))
       enddo    
 
       IF(VLsoiAirPMA(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-        RGasDSFlx(idg_NH3,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
+        RGasDSFlx_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
           ,trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP(idg_NH3,N6,N5,N4) &
           -trc_solml2_vr(idg_NH3,N6,N5,N4)*VLsoiAirPMA(N6,N5,N4)) &
           /(trcg_VLWatMicP(idg_NH3,N6,N5,N4)+VLsoiAirPMA(N6,N5,N4))
 
       ELSE
-        RGasDSFlx(idg_NH3,N6,N5,N4)=0.0_r8
+        RGasDSFlx_vr(idg_NH3,N6,N5,N4)=0.0_r8
       ENDIF
 
       IF(VLsoiAirPMB(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-        RGasDSFlx(idg_NH3B,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
+        RGasDSFlx_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
           ,trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP(idg_NH3B,N6,N5,N4) &
           -trc_solml2_vr(idg_NH3B,N6,N5,N4)*VLsoiAirPMB(N6,N5,N4)) &
           /(trcg_VLWatMicP(idg_NH3B,N6,N5,N4)+VLsoiAirPMB(N6,N5,N4))
 
       ELSE
-        RGasDSFlx(idg_NH3B,N6,N5,N4)=0.0_r8
+        RGasDSFlx_vr(idg_NH3B,N6,N5,N4)=0.0_r8
       ENDIF
 
 !
@@ -1553,11 +1556,11 @@ module InsideTranspMod
 !
 !     X*DFG=hourly water-air gas flux
 !
-      DO ngases=idg_beg,idg_end
-        Gas_Disol_Flx_vr(ngases,N6,N5,N4)=Gas_Disol_Flx_vr(ngases,N6,N5,N4)+RGasDSFlx(ngases,N6,N5,N4)
+      DO ngas=idg_beg,idg_end
+        Gas_Disol_Flx_vr(ngas,N6,N5,N4)=Gas_Disol_Flx_vr(ngas,N6,N5,N4)+RGasDSFlx_vr(ngas,N6,N5,N4)
       ENDDO
     ELSE
-      RGasDSFlx(idg_beg:idg_end,N6,N5,N4)=0.0_r8
+      RGasDSFlx_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
     ENDIF
   ENDIF
   end subroutine VolatilizationDissolution
@@ -1577,11 +1580,11 @@ module InsideTranspMod
     DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
   ENDDO D9750
 
-  R3PoreSolFlx_vr(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
+  R3PoreSolFlx_3D(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
-  R3PoreSoHFlx(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
+  R3PoreSoHFlx_3D(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
-  R3GasADFlx(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
+  RGasADFlx_3D(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
   end subroutine ZeroTransport1
 ! ----------------------------------------------------------------------
 
@@ -1599,8 +1602,8 @@ module InsideTranspMod
     DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
   ENDDO D9751
 
-  R3PoreSolFlx_vr(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
-  R3PoreSoHFlx(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
-  R3GasADFlx(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
+  R3PoreSolFlx_3D(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
+  R3PoreSoHFlx_3D(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
+  RGasADFlx_3D(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
   end subroutine ZeroTransport2
 end module InsideTranspMod

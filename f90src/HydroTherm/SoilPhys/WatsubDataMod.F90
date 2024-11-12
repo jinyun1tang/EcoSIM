@@ -11,7 +11,7 @@ implicit none
   real(r8),allocatable ::  AREAU(:,:,:)                       !
   real(r8),allocatable ::  AreaUnderWaterTBL(:,:,:)           !
 
-  real(r8),allocatable ::  VLairMacP(:,:,:)                   !
+  real(r8),allocatable ::  VLairMacP_vr(:,:,:)                   !
   real(r8),allocatable ::  TLPhaseChangeHeat2Soi1(:,:,:)        !total soil layer latent heat release from melting
   real(r8),allocatable ::  TLPhaseChangeHeat2Soi1s(:,:,:)        !total soil layer latent heat release from melting
 
@@ -25,14 +25,14 @@ implicit none
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
 
   real(r8),allocatable ::  TWatXChange2WatTableX(:,:,:)                      !
-  real(r8),allocatable ::  FWatIrrigate2MicP1(:,:,:)                        !
+  real(r8),allocatable ::  FWatIrrigate2MicP1_vr(:,:,:)                        !
   real(r8),allocatable ::  HeatIrrigation1(:,:,:)                      !
 
   real(r8),allocatable ::  FIceThawMacP(:,:,:)                      !
 
-  real(r8),allocatable ::  HydroCondMacP1(:,:,:)                       !
-  real(r8),allocatable ::  VLMicP1(:,:,:)                       !
-  real(r8),allocatable ::  VLMacP1(:,:,:)                      !
+  real(r8),allocatable ::  HydroCondMacP1_vr(:,:,:)                       !
+  real(r8),allocatable ::  VLMicP1_vr(:,:,:)                       !
+  real(r8),allocatable ::  VLMacP1_vr(:,:,:)                      !
 
   real(r8),allocatable ::  H2OFlow2TopSoiMicP_col(:,:)                         !
   real(r8),allocatable ::  H2OFlow2TopSoiMicPX_col(:,:)                        !
@@ -60,7 +60,7 @@ contains
   allocate(AreaUnderWaterTBL(JZ,JY,JX));   AreaUnderWaterTBL=0._r8
 
 
-  allocate(VLairMacP(JZ,JY,JX));  VLairMacP=0._r8
+  allocate(VLairMacP_vr(JZ,JY,JX));  VLairMacP_vr=0._r8
   allocate(TLPhaseChangeHeat2Soi1(JZ,JY,JX));   TLPhaseChangeHeat2Soi1=0._r8
   allocate(TLPhaseChangeHeat2Soi1s(JZ,JY,JX));   TLPhaseChangeHeat2Soi1s=0._r8
 
@@ -74,14 +74,14 @@ contains
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
 
   allocate(TWatXChange2WatTableX(JZ,JY,JX));   TWatXChange2WatTableX=0._r8
-  allocate(FWatIrrigate2MicP1(JZ,JY,JX));     FWatIrrigate2MicP1=0._r8
+  allocate(FWatIrrigate2MicP1_vr(JZ,JY,JX));     FWatIrrigate2MicP1_vr=0._r8
   allocate(HeatIrrigation1(JZ,JY,JX));   HeatIrrigation1=0._r8
 
   allocate(FIceThawMacP(JZ,JY,JX));   FIceThawMacP=0._r8
 
-  allocate(HydroCondMacP1(JZ,JY,JX));    HydroCondMacP1=0._r8
-  allocate(VLMicP1(0:JZ,JY,JX));  VLMicP1=0._r8
-  allocate(VLMacP1(JZ,JY,JX));   VLMacP1=0._r8
+  allocate(HydroCondMacP1_vr(JZ,JY,JX));    HydroCondMacP1_vr=0._r8
+  allocate(VLMicP1_vr(0:JZ,JY,JX));  VLMicP1_vr=0._r8
+  allocate(VLMacP1_vr(JZ,JY,JX));   VLMacP1_vr=0._r8
 
 
   allocate(H2OFlow2TopSoiMicP_col(JY,JX));       H2OFlow2TopSoiMicP_col=0._r8
@@ -106,7 +106,7 @@ contains
   call destroy(AREAU)
   call destroy(AreaUnderWaterTBL)
 
-  call destroy(VLairMacP)
+  call destroy(VLairMacP_vr)
   call destroy(TLPhaseChangeHeat2Soi1)
   call destroy(TLPhaseChangeHeat2Soi1s)
 
@@ -120,15 +120,15 @@ contains
   call destroy(AVCNHL)
 
   call destroy(TWatXChange2WatTableX)
-  call destroy(FWatIrrigate2MicP1)
+  call destroy(FWatIrrigate2MicP1_vr)
   call destroy(HeatIrrigation1)
 
   call destroy(FIceThawMacP)
 
-  call destroy(HydroCondMacP1)
-  call destroy(VLMicP1)
+  call destroy(HydroCondMacP1_vr)
+  call destroy(VLMicP1_vr)
 
-  call destroy(VLMacP1)
+  call destroy(VLMacP1_vr)
 
   call destroy(H2OFlow2TopSoiMicP_col)
   call destroy(H2OFlow2TopSoiMicPX_col)

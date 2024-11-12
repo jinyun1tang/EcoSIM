@@ -31,11 +31,12 @@ contains
   
   implicit none
   real(r8), intent(in) :: PSICanopy !canopy water potential, MPa
-  real(r8) :: APSILT
-  real(r8) :: FDMP
+  
+  real(r8) :: APSILT    !abosolute value of psi
+  real(r8) :: FDMP   !=dry matter/water
 
-  APSILT=ABS(PSICanopy)
-  FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
+  APSILT = ABS(PSICanopy)
+  FDMP   = 0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
 
   end function get_FDM
 
@@ -58,9 +59,9 @@ contains
 
   FDMP=get_FDM(PSIO)
   if(present(fdmp1))FDMP1=FDMP
-  OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
-  PSIOsmo=FDMP/0.16_r8*OSMO-RGAS*TKP*FDMP*CCPOLT/OSWT
-  PSITurg=AZMAX1(PSIO-PSIOsmo)
+  OSWT    = 36.0_r8+840.0_r8*AZMAX1(CCPOLT)
+  PSIOsmo = FDMP/0.16_r8*OSMO-RGASC*TKP*FDMP*CCPOLT/OSWT
+  PSITurg = AZMAX1(PSIO-PSIOsmo)
 
   end subroutine update_osmo_turg_pressure
 !--------------------------------------------------------------------------------
@@ -92,7 +93,7 @@ contains
   real(r8) :: fT_root
   real(r8) :: RTK,STK,ACTV
 
-  RTK=RGAS*TKSO
+  RTK=RGASC*TKSO
   STK=710.0_r8*TKSO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
   FT_ROOT=EXP(25.229_r8-62500._r8/RTK)/ACTV
@@ -108,7 +109,7 @@ contains
   real(r8) :: fT_canp
   real(r8) :: RTK,STK,ACTV
 
-  RTK=RGAS*TKGO
+  RTK=RGASC*TKGO
   STK=710.0_r8*TKGO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
   FT_canp=EXP(25.229_r8-62500._r8/RTK)/ACTV
@@ -124,7 +125,7 @@ contains
   real(r8) :: TFNP
   real(r8) :: RTK,STK,ACTV
   
-  RTK=RGAS*TKCO
+  RTK=RGASC*TKCO
   STK=710.0_r8*TKCO
   ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
   TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
@@ -138,7 +139,7 @@ contains
   real(r8) :: TFN5
   real(r8) :: RTK,STK,ACTVM
 
-  RTK=RGAS*TKCM
+  RTK=RGASC*TKCM
   STK=710.0_r8*TKCM
   ACTVM=1._r8+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
   TFN5=EXP(25.214_r8-62500._r8/RTK)/ACTVM
@@ -146,7 +147,7 @@ contains
 !--------------------------------------------------------------------------------
 
   subroutine SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig, PltUptake_Ol, &
-    PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl)
+    PltUptake_Sl, PltUptake_OSl, PltUptake_OSCl,ldebug)
   !
   !DESCRIPTION
   !solve for substrate uptake rate as a function of solute concentration
@@ -160,14 +161,15 @@ contains
 
   implicit none
   type(PlantSoluteUptakeConfig_type), intent(in) :: PlantSoluteUptakeConfig
-  real(r8), intent(out) :: PltUptake_Ol
-  real(r8), intent(out) :: PltUptake_Sl
-  real(r8), intent(out) :: PltUptake_OSl  
-  real(r8), intent(out) :: PltUptake_OSCl
+  real(r8), intent(out) :: PltUptake_Ol     !oxygen limited but solute or carbon unlimited
+  real(r8), intent(out) :: PltUptake_Sl     !oxygen and carbon unlimited but solute limited uptake
+  real(r8), intent(out) :: PltUptake_OSl    !oxygen and solute limited, but not carbon limited
+  real(r8), intent(out) :: PltUptake_OSCl   !oxygen, solute and carbon limited uptake
+  logical, optional, intent(in) :: ldebug
   real(r8) :: UptakeRateMax_Ol   !oxygen limited maximum uptake rate
-  real(r8) :: X, Y, B, C, BP, CP 
+  real(r8) :: X, Y, B, C, BP, CP, delta
   real(r8) :: Uptake, Uptake_Ol
-
+  logical :: lldebug
   associate(                                                    &
   SolAdvFlx       => PlantSoluteUptakeConfig%SolAdvFlx        , &
   SolDifusFlx     => PlantSoluteUptakeConfig%SolDifusFlx      , &
@@ -180,30 +182,50 @@ contains
   SoluteKM        => PlantSoluteUptakeConfig%SoluteKM         , &
   SoluteConcMin   => PlantSoluteUptakeConfig%SoluteConcMin      &
   )
+  lldebug=.false.
+  if(present(ldebug))lldebug=ldebug
 
   UptakeRateMax_Ol=UptakeRateMax*O2Stress  
+
 
   X=(SolDifusFlx+SolAdvFlx)*SoluteConc
   Y=SolDifusFlx*SoluteConcMin
 
   !Oxygen limited but not solute or carbon limited uptake
-  B=-UptakeRateMax_Ol-SolDifusFlx*SoluteKM-X+Y
-  C=(X-Y)*UptakeRateMax_Ol
-  Uptake_Ol=(-B-SQRT(B*B-4.0_r8*C))/2.0_r8
+  ! u^2+Bu+C=0., it requires when C=0, delta=1, u=0
+  B=-(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
+  C=AZMAX1(X-Y)*UptakeRateMax_Ol
 
-  !Oxygen, solute and carbon unlimited solute uptake
-  BP=-UptakeRateMax-SolDifusFlx*SoluteKM-X+Y
-  CP=(X-Y)*UptakeRateMax
-  Uptake=(-BP-SQRT(BP*BP-4.0_r8*CP))/2.0_r8
+  delta=B*B-4.0_r8*C
+  if(delta<0._r8)then
+    Uptake_Ol=0._r8
+  else
+    Uptake_Ol=AZMAX1(-B-SQRT(delta))/2.0_r8
+  endif
+  if(lldebug)then
+  write(115,*)'X-Y',SolDifusFlx,SolAdvFlx,X-Y,SoluteConc-SoluteConcMin
+  write(115,*)'delta1',delta,Uptake_Ol,'B=',B,C
+  endif
 
-  !oxygen limited but solute or carbon unlimited
+  !Oxygen, and carbon unlimited solute uptake
+  BP=-(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
+  CP=AZMAX1(X-Y)*UptakeRateMax
+  delta=BP*BP-4.0_r8*CP
+  if(delta<0._r8)then
+    Uptake=0._r8
+  else
+    Uptake=AZMAX1(-BP-SQRT(delta))/2.0_r8
+  endif
+  if(lldebug)write(115,*)'delta2',delta,Uptake,'BP=',BP,CP
+
+  !oxygen and solute limited but carbon unlimited
   PltUptake_Ol=AZMAX1(Uptake_Ol*PlantPopulation)
 
   !oxygen and solute limited, but not carbon limited
   PltUptake_OSl=AMIN1(SoluteMassMax,PltUptake_Ol)
 
   !oxygen and carbon unlimited but solute limited uptake
-  PltUptake_Sl=AMIN1(SoluteMassMax,AZMAX1(Uptake*PlantPopulation))
+  PltUptake_Sl=AMIN1(SoluteMassMax,Uptake*PlantPopulation)
 
   !oxygen, solute and carbon limited uptake
   PltUptake_OSCl=PltUptake_OSl/CAvailStress

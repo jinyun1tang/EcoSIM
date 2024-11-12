@@ -15,8 +15,8 @@ implicit none
 
   real(r8),allocatable ::  trcs_Transp2MicP_vr(:,:,:,:)                      !
   real(r8),allocatable ::  trcs_Transp2MacP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  TWat2GridBySurfRunoff(:,:)                           !
-  real(r8),allocatable ::  THeat2GridBySurfRunoff(:,:)                          !
+  real(r8),allocatable ::  TXGridSurfRunoff_2DH(:,:)                           !
+  real(r8),allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)                          !
 
   real(r8),allocatable ::  TCOQSS(:,:)                        !
   real(r8),allocatable ::  TCHQSS(:,:)                        !
@@ -55,10 +55,10 @@ implicit none
   real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                       !
   real(r8),allocatable ::  THeatSoiThaw_vr(:,:,:)                      !
   real(r8),allocatable ::  WatIceThawMacP_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLWatMicP1(:,:,:)                       !
-  real(r8),allocatable ::  VLiceMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                       !
+  real(r8),allocatable ::  VLiceMicP1_vr(:,:,:)                       !
   real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
 
   real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
 
@@ -88,10 +88,10 @@ implicit none
   allocate(trcs_Transp2MacP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MacP_vr=0._r8
   allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JX));   Gas_AdvDif_Flx_vr=0._r8
 
-  allocate(TWat2GridBySurfRunoff(JY,JX));         TWat2GridBySurfRunoff=0._r8
-  allocate(THeat2GridBySurfRunoff(JY,JX));        THeat2GridBySurfRunoff=0._r8
- ! allocate(TWat2GridBySurfRunoff(JY,JX));         TWat2GridBySurfRunoff=0._r8
- ! allocate(THeat2GridBySurfRunoff(JY,JX));        THeat2GridBySurfRunoff=0._r8
+  allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
+  allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
+ ! allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
+ ! allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
 
 !  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
 !  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
@@ -135,10 +135,10 @@ implicit none
   allocate(WatIceThawMicP_vr(JZ,JY,JX));    WatIceThawMicP_vr=0._r8
   allocate(THeatSoiThaw_vr(JZ,JY,JX));   THeatSoiThaw_vr=0._r8
   allocate(WatIceThawMacP_vr(JZ,JY,JX));   WatIceThawMacP_vr=0._r8
-  allocate(VLWatMicP1(JZ,JY,JX));    VLWatMicP1=0._r8
-  allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
+  allocate(VLWatMicP1_vr(JZ,JY,JX));    VLWatMicP1_vr=0._r8
+  allocate(VLiceMicP1_vr(JZ,JY,JX));    VLiceMicP1_vr=0._r8
   allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
-  allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
+  allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8
   allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
   allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
@@ -172,8 +172,8 @@ implicit none
   call destroy(trcSalt_Flo2MicP_vr)
   call destroy(trcs_Transp2MicP_vr)
   call destroy(trcSalt_Flo2MacP_vr)
-  call destroy(TWat2GridBySurfRunoff)
-  call destroy(THeat2GridBySurfRunoff)
+  call destroy(TXGridSurfRunoff_2DH)
+  call destroy(THeatXGridBySurfRunoff_2DH)
 !  call destroy(TFLWS)
 !  call destroy(TFLWW)
 !  call destroy(TFLWI)
@@ -210,10 +210,10 @@ implicit none
   call destroy(WatIceThawMicP_vr)
   call destroy(THeatSoiThaw_vr)
   call destroy(WatIceThawMacP_vr)
-  call destroy(VLWatMicP1)
-  call destroy(VLiceMicP1)
+  call destroy(VLWatMicP1_vr)
+  call destroy(VLiceMicP1_vr)
   call destroy(VLWatMacP1_vr)
-  call destroy(VLiceMacP1)
+  call destroy(VLiceMacP1_vr)
   call destroy(DOM_Transp2Micp_vr)
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)

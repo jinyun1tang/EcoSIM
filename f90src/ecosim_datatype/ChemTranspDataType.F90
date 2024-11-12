@@ -33,8 +33,8 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AquaIonDifusivty_vr(:,:,:,:)
   real(r8),target,allocatable ::  trc_salt_rof_bounds(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcg_2DFloXSurRunoff(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcn_2DFloXSurRunoff(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_FloXSurRunoff_2D(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcn_FloXSurRunoff_2D(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
   real(r8),target,allocatable ::  dom_2DFloXSurRunoff(:,:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
 
   private :: InitAllocate
@@ -84,8 +84,8 @@ module ChemTranspDataType
 
 
   allocate(trc_salt_rof_bounds(idsalt_beg:idsalt_end,2,2,JV,JH));   trc_salt_rof_bounds=0._r8
-  allocate(trcg_2DFloXSurRunoff(idg_beg:idg_end-1,2,2,JV,JH));  trcg_2DFloXSurRunoff=0._r8
-  allocate(trcn_2DFloXSurRunoff(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoff=0._r8
+  allocate(trcg_FloXSurRunoff_2D(idg_beg:idg_end-1,2,2,JV,JH));  trcg_FloXSurRunoff_2D=0._r8
+  allocate(trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_FloXSurRunoff_2D=0._r8
   allocate(dom_2DFloXSurRunoff(idom_beg:idom_end,1:jcplx,2,2,JV,JH));dom_2DFloXSurRunoff=0._r8
 
   end subroutine InitAllocate
@@ -111,8 +111,8 @@ module ChemTranspDataType
   call destroy(VaporDiffusivityLitR_col)
   call destroy(WVapDifusvityAir_col)
 
-  call destroy(trcn_2DFloXSurRunoff)
-  call destroy(trcg_2DFloXSurRunoff)
+  call destroy(trcn_FloXSurRunoff_2D)
+  call destroy(trcg_FloXSurRunoff_2D)
   call destroy(GasSolbility_vr)
   call destroy(AquaIonDifusivty_vr)
   call destroy(RCO2GasFlxPrev_vr)

@@ -3,6 +3,7 @@ module EcoSIMCtrlMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only : ecosim_time_type
   use fileUtil, only :   datestrlen  
+  use abortutils, only : endrun
 implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
@@ -17,6 +18,9 @@ implicit none
   logical :: soichem_model   =.true.
   logical :: snowRedist_model=.true.
   logical :: ATS_cpl_mode=.false.
+  integer :: yearf1       !first year of daily climate forcing
+  integer :: yearf2       !first year of hourly climate forcing
+  integer :: nyeardal1    !number of daily climate forcing
   real(r8) :: aco2_ppm  = 280._r8
   real(r8) :: ach4_ppm  = 1.144_r8
   real(r8) :: an2o_ppm  = 0.270_r8
@@ -26,10 +30,12 @@ implicit none
   real(r8) :: atm_co2_fix=-100._r8
   real(r8) :: atm_ch4_fix=-100._r8
   real(r8) :: atm_n2o_fix=-100._r8
+  character(len=256) :: warming_exp=''
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in
-  character(len=300) :: clm_file_in      !file for climate forcing
+  character(len=300) :: clm_hour_file_in =''     !file for hourly climate forcing
+  character(len=300) :: clm_day_file_in  =''    !file for daily climate forcing
   character(len=300) :: soil_mgmt_in     !file for soil management information
   character(len=300) :: clm_factor_in    !file for climate change factors
   character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
@@ -46,8 +52,8 @@ implicit none
   logical :: hist_yrclose
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
-  integer :: forc_periods(9)
-  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3)
+  integer :: forc_periods(15)
+  integer :: NPXS(5),NPYS(5)
   integer :: NCYC_LITR  !number of subcycles for litr
   integer :: NCYC_SNOW  !number of subcycles for snow
   logical :: lverb           !logical switch for verbose output
@@ -88,16 +94,23 @@ implicit none
   end subroutine Init_frectyp
 
   !-----------------------------------------------------------------------
-  integer function get_sim_len(forc_periods)
+  integer function get_sim_len(forc_periods,nperiods)
   implicit none
-  integer, intent(in) :: forc_periods(9)
+  integer, dimension(:), intent(in) :: forc_periods
+  integer :: nperiods
+  integer :: nn1,id,nelms
 
-  integer :: nn1,id
+  nelms = size(forc_periods)
+  nperiods   = nelms/3
 
   get_sim_len=0
-  DO nn1=0,2
+  DO nn1=0,nperiods-1
     id=nn1*3+1
-    get_sim_len=get_sim_len+(forc_periods(id+1)-forc_periods(id)+1)*forc_periods(id+2)
+    get_sim_len=get_sim_len+(abs(forc_periods(id+1)-forc_periods(id))+1)*forc_periods(id+2)
   enddo
+  if(get_sim_len<0)then
+  call endrun('Negative simulation length, check forc_periods set up in '//mod_filename,__LINE__)
+  endif
   end function get_sim_len  
+
 end module EcoSIMCtrlMod
