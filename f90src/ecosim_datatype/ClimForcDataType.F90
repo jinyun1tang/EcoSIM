@@ -102,7 +102,7 @@ implicit none
   real(r8),target,allocatable ::  RadPARDiffus_col(:,:)              !diffuse PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)          !sine of solar angle, [-]
   real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)    !sine of solar angle next hour, [-]
-  real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  TLEX_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Canopy_Heat_Sens_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
@@ -236,7 +236,7 @@ implicit none
   allocate(RadPARDiffus_col(JY,JX));        RadPARDiffus_col=0._r8
   allocate(SineSunInclAngle_col(JY,JX));        SineSunInclAngle_col=0._r8
   allocate(SineSunInclAnglNxtHour_col(JY,JX));       SineSunInclAnglNxtHour_col=0._r8
-  allocate(TLEX(JY,JX));        TLEX=0._r8
+  allocate(TLEX_col(JY,JX));        TLEX_col=0._r8
   allocate(TSHX(JY,JX));        TSHX=0._r8
   allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
   allocate(Canopy_Heat_Sens_col(JY,JX));        Canopy_Heat_Sens_col=0._r8
@@ -364,7 +364,7 @@ implicit none
   call destroy(RadPARDiffus_col)
   call destroy(SineSunInclAngle_col)
   call destroy(SineSunInclAnglNxtHour_col)
-  call destroy(TLEX)
+  call destroy(TLEX_col)
   call destroy(TSHX)
   call destroy(Canopy_Heat_Latent_col)
   call destroy(Canopy_Heat_Sens_col)

@@ -826,7 +826,7 @@ module StartsMod
   Eco_Heat_GrndSurf_col(:,:)     = 0.0_r8
   Canopy_Heat_Latent_col(:,:)    = 0.0_r8
   Canopy_Heat_Sens_col(:,:)      = 0.0_r8
-  TLEX(:,:)                      = 0.0_r8
+  TLEX_col(:,:)                      = 0.0_r8
   TSHX(:,:)                      = 0.0_r8
   Eco_NEE_col(:,:)               = 0.0_r8
   CanH2OHeldVg_col(:,:)          = 0.0_r8
@@ -960,10 +960,10 @@ module StartsMod
   XNPS          = 1.0_r8/NPS
 
   XNPV      = XNPR*XNPS
-  XNPD      = 600.0_r8*dts_gas                    !600. is adjustable
+  XNPD      = 600.0_r8*dts_gas                     !600. is adjustable
   dts_wat   = AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno   = dts_wat*XNPS
-  XNPB      = dts_wat*XNPR
+  XNPB      = dts_wat*XNPR      !vapor flux in litter iteration
   dt_watvap = dts_wat*XNPV
 
   end subroutine set_ecosim_solver

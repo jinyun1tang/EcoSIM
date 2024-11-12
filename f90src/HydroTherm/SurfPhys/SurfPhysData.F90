@@ -9,13 +9,8 @@ implicit none
   real(r8),allocatable ::  XVLMobileWaterLitR_col(:,:)                   !water excessive holding capacity of surface litter, available for store on surface [m3 H2O/d2]
   real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP_col(:,:)                           !
-  real(r8),allocatable ::  LWEmscefLitR_col(:,:)                         !
   real(r8),allocatable ::  VLPoreLitR(:,:)                        !
-  real(r8),allocatable ::  LWRad2LitR_col(:,:)                         !
-  real(r8),allocatable ::  LWEmscefSoil_col(:,:)                         !
-  real(r8),allocatable ::  RadSWonLitR_col(:,:)                         !
-  real(r8),allocatable ::  LWRad2Soil_col(:,:)                         !
-  real(r8),allocatable ::  RadSWonSoil_col(:,:)                         !
+
   real(r8),allocatable ::  ResistAreodynOverLitr_col(:,:)          !aerodynamic resistance over litter [m]
   real(r8),allocatable ::  AScaledCdWOverSoil_col(:,:)             !area scaled conductance for latent heat flux over exposed soil [m^2 h]
   real(r8),allocatable ::  AScaledCdWOverLitr_col(:,:)             !area scaled conductance for latent heat flux over litter [m^2 h]
@@ -60,13 +55,8 @@ implicit none
   allocate(XVLMobileWaterLitR_col(JY,JX));       XVLMobileWaterLitR_col=0._r8
   allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
   allocate(XVLiceMicP_col(JY,JX));       XVLiceMicP_col=0._r8
-  allocate(LWEmscefLitR_col(JY,JX));       LWEmscefLitR_col=0._r8
   allocate(VLPoreLitR(JY,JX));      VLPoreLitR=0._r8
-  allocate(LWRad2LitR_col(JY,JX));       LWRad2LitR_col=0._r8
-  allocate(LWEmscefSoil_col(JY,JX));       LWEmscefSoil_col=0._r8
-  allocate(RadSWonLitR_col(JY,JX));       RadSWonLitR_col=0._r8    
-  allocate(LWRad2Soil_col(JY,JX));       LWRad2Soil_col=0._r8
-  allocate(RadSWonSoil_col(JY,JX));       RadSWonSoil_col=0._r8
+
   allocate(ResistAreodynOverLitr_col(JY,JX));        ResistAreodynOverLitr_col=0._r8
   allocate(AScaledCdWOverSoil_col(JY,JX));       AScaledCdWOverSoil_col=0._r8
   allocate(AScaledCdWOverLitr_col(JY,JX));       AScaledCdWOverLitr_col=0._r8
@@ -107,13 +97,7 @@ allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col       = 0._r8
   call destroy(XVLMobileWaterLitR_col)
   call destroy(XVLMobileWatMicP)
   call destroy(XVLiceMicP_col)
-  call destroy(LWEmscefLitR_col)
-  call destroy(VLPoreLitR)
-  call destroy(LWRad2LitR_col)
-  call destroy(LWEmscefSoil_col)
-  call destroy(RadSWonLitR_col)  
-  call destroy(LWRad2Soil_col)
-  call destroy(RadSWonSoil_col)
+  call destroy(VLPoreLitR)  
   call destroy(ResistAreodynOverLitr_col)
   call destroy(AScaledCdWOverSoil_col)
   call destroy(AScaledCdWOverLitr_col)

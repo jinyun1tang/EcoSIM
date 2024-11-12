@@ -214,7 +214,7 @@ module Hour1Mod
       NetCO2Flx2Canopy_col(NY,NX)   = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       LWRadCanG(NY,NX)              = 0.0_r8
       LWRadBySurf_col(NY,NX)        = 0.0_r8
-      TLEX(NY,NX)                   = Canopy_Heat_Latent_col(NY,NX)
+      TLEX_col(NY,NX)               = Canopy_Heat_Latent_col(NY,NX)
       TSHX(NY,NX)                   = Canopy_Heat_Sens_col(NY,NX)
       Canopy_Heat_Latent_col(NY,NX) = 0.0_r8
       Canopy_Heat_Sens_col(NY,NX)   = 0.0_r8
@@ -226,6 +226,7 @@ module Hour1Mod
       Eco_NEE_col(NY,NX)            = 0.0_r8
       ECO_ER_col(NY,NX)             = 0.0_r8
       HeatPrec_col(NY,NX)           = 0.0_r8
+
       DO  NZ=1,NP(NY,NX)
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
@@ -233,7 +234,7 @@ module Hour1Mod
 !     NG=number of uppermost rooted layer
 !     NIXBotRootLayer_rpft=number of lowest rooted layer
 !
-        NGTopRootLayer_pft(NZ,NY,NX)=MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
+        NGTopRootLayer_pft(NZ,NY,NX) =MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
         NIXBotRootLayer_pft(NZ,NY,NX)=MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU(NY,NX))
         DO  NR=1,NumOfCanopyLayers
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU(NY,NX))

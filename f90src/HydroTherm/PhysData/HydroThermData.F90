@@ -4,9 +4,17 @@ module HydroThermData
 implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
+  real(r8),allocatable ::  LWEmscefLitR_col(:,:)                         !  
+  real(r8),allocatable ::  LWRad2LitR_col(:,:)                         !
+  real(r8),allocatable ::  LWEmscefSoil_col(:,:)                         !
+  real(r8),allocatable ::  LWRad2Soil_col(:,:)                         !
+  real(r8),allocatable ::  RadSWonLitR_col(:,:)                         !
+  real(r8),allocatable ::  RadSWonSoil_col(:,:)                         !
+  real(r8),allocatable ::  LWEmscefSnow_col(:,:)                 !  
+  real(r8),allocatable ::  LWRad2Snow_col(:,:)                   !    
   real(r8),allocatable ::  FracSoiPAsWat_vr(:,:,:)               !
   real(r8),allocatable ::  PSISM1_vr(:,:,:)                      !  
-  real(r8),allocatable ::  TKSoi1_vr(:,:,:)                      !  
+  real(r8),allocatable ::  TKSoil1_vr(:,:,:)                      !  
   real(r8),allocatable ::  DLYRR_COL(:,:)                        !  
   real(r8),allocatable ::  FracSoiPAsIce_vr(:,:,:)               !  
   real(r8),allocatable ::  FracSoiPAsAir_vr(:,:,:)               !  
@@ -26,9 +34,7 @@ implicit none
   real(r8),allocatable ::  AScaledCdHOverSnow_col(:,:)           ! area scaled sensible heat flux conductance over snow  [MJ h /(m K)]
   real(r8),allocatable ::  Ice2Snowt(:,:)                        !  
   real(r8),allocatable ::  TKQ_col(:,:)                          ! air temperature in canopy [K]
-  real(r8),allocatable ::  LWEmscefSnow_col(:,:)                 !  
   real(r8),allocatable ::  ResistAreodynOverSnow_col(:,:)        !  
-  real(r8),allocatable ::  LWRad2Snow_col(:,:)                       !  
   real(r8),allocatable ::  VLairMicP1_vr(:,:,:)                  ! corrected air-filled micropore volume [m3/d2]
   real(r8),allocatable ::  TKSnow0_snvr(:,:,:)                   !  
   real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                  !
@@ -65,7 +71,7 @@ implicit none
 
   allocate(FracSoiPAsWat_vr(0:JZ,JY,JX)); FracSoiPAsWat_vr=0._r8
   allocate(PSISM1_vr(0:JZ,JY,JX)); PSISM1_vr=0._r8
-  allocate(TKSoi1_vr(0:JZ,JY,JX));    TKSoi1_vr=0._r8    
+  allocate(TKSoil1_vr(0:JZ,JY,JX));    TKSoil1_vr=0._r8    
   allocate(DLYRR_COL(JY,JX));       DLYRR_col=0._r8  
   allocate(FracSoiPAsIce_vr(0:JZ,JY,JX)); FracSoiPAsIce_vr=0._r8 
   allocate(FracSoiPAsAir_vr(0:JZ,JY,JX)); FracSoiPAsAir_vr=0._r8   
@@ -113,6 +119,13 @@ implicit none
   allocate(VLairMicP_vr(JZ,JY,JX));   VLairMicP_vr=0._r8
   allocate(VLWatMicPX1_vr(JZ,JY,JX));   VLWatMicPX1_vr=0._r8
 
+  allocate(LWEmscefLitR_col(JY,JX));       LWEmscefLitR_col=0._r8
+  allocate(LWRad2LitR_col(JY,JX));       LWRad2LitR_col=0._r8
+  allocate(LWEmscefSoil_col(JY,JX));       LWEmscefSoil_col=0._r8
+  allocate(RadSWonLitR_col(JY,JX));       RadSWonLitR_col=0._r8    
+  allocate(LWRad2Soil_col(JY,JX));       LWRad2Soil_col=0._r8
+  allocate(RadSWonSoil_col(JY,JX));       RadSWonSoil_col=0._r8
+
   end subroutine InitHydroThermData
 
 !------------------------------------------------------------------------------------------
@@ -123,7 +136,7 @@ implicit none
   call destroy(WatFlx2LitRByRunoff)
   call destroy(FracSoiPAsWat_vr)
   call destroy(PSISM1_vr)  
-  call destroy(TKSoi1_vr)  
+  call destroy(TKSoil1_vr)  
   call destroy(DLYRR_COL)  
   call destroy(FracSoiPAsIce_vr)  
   call destroy(FracSoiPAsAir_vr)  
@@ -169,6 +182,12 @@ implicit none
   call destroy(VLWatMicP2_vr)
   call destroy(VLairMicP_vr)
   call destroy(VLWatMicPX1_vr)
+  call destroy(LWEmscefLitR_col)
+  call destroy(LWRad2LitR_col)
+  call destroy(LWEmscefSoil_col)
+  call destroy(RadSWonLitR_col)  
+  call destroy(LWRad2Soil_col)
+  call destroy(RadSWonSoil_col)
 
   end subroutine DestructHydroThermData
 end module HydroThermData

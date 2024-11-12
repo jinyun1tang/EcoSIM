@@ -1120,11 +1120,11 @@ implicit none
 
   data1d_ptr => this%h1D_N2O_LITR_col(beg_col:end_col)      
   call hist_addfld1d(fname='N2O_LITR',units='g/m3',avgflag='A',&
-    long_name='N2O solute concentration in soil micropres',ptr_col=data1d_ptr)      
+    long_name='N2O solute concentration in soil micropores',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_NH3_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='NH3_LITR',units='g/m3',avgflag='A',&
-    long_name='NH3 solute concentration in soil micropres',ptr_col=data1d_ptr)      
+    long_name='NH3 solute concentration in soil micropores',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOL_RADN_col(beg_col:end_col)      
   call hist_addfld1d(fname='SOL_RADN',units='W/m2',avgflag='A',&
