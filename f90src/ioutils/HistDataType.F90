@@ -2304,7 +2304,7 @@ implicit none
       this%h1D_FracBySnow_col(ncol)=FracSurfAsSnow_col(NY,NX)
       this%h1D_FracByLitr_col(ncol)=FracSurfByLitR_col(NY,NX)
       this%h1D_tLITR_C_col(ncol) = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-!      write(114,*)I+J/24.,SoilOrgM_vr(ielmc,0,NY,NX),TCS(0,NY,NX),TCS(NU(NY,NX),NY,NX)
+
       this%h1D_AMENDED_C_col(ncol)        = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSoilOrgC_col(ncol)        = tSoilOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

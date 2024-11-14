@@ -209,23 +209,23 @@ module Hour1Mod
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
-      LWRadCanGPrev_col(NY,NX)      = LWRadCanG(NY,NX)
-      LWRadGrnd(NY,NX)              = LWRadBySurf_col(NY,NX)
-      NetCO2Flx2Canopy_col(NY,NX)   = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      LWRadCanG(NY,NX)              = 0.0_r8
-      LWRadBySurf_col(NY,NX)        = 0.0_r8
-      TLEX_col(NY,NX)               = Canopy_Heat_Latent_col(NY,NX)
-      TSHX(NY,NX)                   = Canopy_Heat_Sens_col(NY,NX)
-      Canopy_Heat_Latent_col(NY,NX) = 0.0_r8
-      Canopy_Heat_Sens_col(NY,NX)   = 0.0_r8
-      Eco_NetRad_col(NY,NX)         = 0.0_r8
-      Eco_Heat_Latent_col(NY,NX)    = 0.0_r8
-      Eco_Heat_Sens_col(NY,NX)      = 0.0_r8
-      Eco_Heat_GrndSurf_col(NY,NX)  = 0.0_r8
-      Canopy_NEE_col(NY,NX)         = 0.0_r8
-      Eco_NEE_col(NY,NX)            = 0.0_r8
-      ECO_ER_col(NY,NX)             = 0.0_r8
-      HeatPrec_col(NY,NX)           = 0.0_r8
+      LWRadCanGPrev_col(NY,NX)         = LWRadCanG(NY,NX)
+      LWRadGrnd(NY,NX)                 = LWRadBySurf_col(NY,NX)
+      NetCO2Flx2Canopy_col(NY,NX)      = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      LWRadCanG(NY,NX)                 = 0.0_r8
+      LWRadBySurf_col(NY,NX)           = 0.0_r8
+      TLEX_col(NY,NX)                  = Air_Heat_Latent_store_col(NY,NX)
+      TSHX_col(NY,NX)                  = Air_Heat_Sens_store_col(NY,NX)
+      Air_Heat_Latent_store_col(NY,NX) = 0.0_r8
+      Air_Heat_Sens_store_col(NY,NX)   = 0.0_r8
+      Eco_NetRad_col(NY,NX)            = 0.0_r8
+      Eco_Heat_Latent_col(NY,NX)       = 0.0_r8
+      Eco_Heat_Sens_col(NY,NX)         = 0.0_r8
+      Eco_Heat_GrndSurf_col(NY,NX)     = 0.0_r8
+      Canopy_NEE_col(NY,NX)            = 0.0_r8
+      Eco_NEE_col(NY,NX)               = 0.0_r8
+      ECO_ER_col(NY,NX)                = 0.0_r8
+      HeatPrec_col(NY,NX)              = 0.0_r8
 
       DO  NZ=1,NP(NY,NX)
 !
@@ -2332,7 +2332,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0.0_r8
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0.0_r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0.0_r8
-    TR_CO2_aqu_soil_vr(L,NY,NX)                 = 0.0_r8
+    TR_CO2_gchem_soil_vr(L,NY,NX)                 = 0.0_r8
     Txchem_CO2_vr(L,NY,NX)                      = 0.0_r8
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0.0_r8
@@ -2353,7 +2353,7 @@ module Hour1Mod
 
     trcp_RChem_soil(idsp_beg_band:idsp_end,L,NY,NX)=0.0_r8
 
-    trcs_PoreTranspFlx_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
+    trcs_Mac2MicXfer_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
     DO NTSA=idsalt_beg,idsaltb_end
       trcSalt_TR(NTSA,L,NY,NX)=0.0_r8

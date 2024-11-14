@@ -18,7 +18,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)             !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUPGasSol_vr(:,:,:,:,:,:)                      !aqueous H2 flux from roots to soil water, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootUptkSoiSol_vr(:,:,:,:,:,:)                      !aqueous H2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)                  !root uptake of H2PO4 non-band
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)                  !root uptake of H2PO4 band
   real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
@@ -48,8 +48,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  N2ObyFire_CumYr_pft(:,:,:)                       !plant N2O emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  PO4byFire_CumYr_pft(:,:,:)                       !plant PO4 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  RootO2Dmnd4Resp_pvr(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_air2root_flx__pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_air2root_flx_pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_Root_gas2aqu_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2Emis_pvr(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootO2Uptk_pvr(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotent_pvr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
@@ -165,9 +165,9 @@ module PlantDataRateType
   allocate(N2ObyFire_CumYr_pft(JP,JY,JX));    N2ObyFire_CumYr_pft=0._r8
   allocate(PO4byFire_CumYr_pft(JP,JY,JX));    PO4byFire_CumYr_pft=0._r8
   allocate(RootO2Dmnd4Resp_pvr(jroots,JZ,JP,JY,JX));RootO2Dmnd4Resp_pvr=0._r8
-  allocate(trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx__pvr=0._r8
-  allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
-  allocate(RUPGasSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RUPGasSol_vr=0._r8
+  allocate(trcg_air2root_flx_pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx_pvr=0._r8
+  allocate(trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_gas2aqu_flx_vr=0._r8
+  allocate(RootUptkSoiSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RootUptkSoiSol_vr=0._r8
   allocate(RootCO2Emis_pvr(jroots,JZ,JP,JY,JX));RootCO2Emis_pvr=0._r8
   allocate(RootO2Uptk_pvr(jroots,JZ,JP,JY,JX));RootO2Uptk_pvr=0._r8
   allocate(RootRespPotent_pvr(jroots,JZ,JP,JY,JX));RootRespPotent_pvr=0._r8
@@ -241,7 +241,7 @@ module PlantDataRateType
   call destroy(SurfLitrfalStrutElms_CumYr_pft)
   call destroy(RootMycoExudElm_pvr)
   call destroy(RootNutUptake_pvr)
-  call destroy(RUPGasSol_vr)
+  call destroy(RootUptkSoiSol_vr)
   call destroy(RootN2Fix_pvr)
   call destroy(RootH2PO4DmndSoil_pvr)
   call destroy(RootH2PO4DmndBand_pvr)

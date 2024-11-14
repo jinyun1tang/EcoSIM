@@ -2,7 +2,7 @@ module NutUptakeMod
 
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use StomatesMod,   only: stomates
-  use minimathmod,   only: safe_adb, vapsat, AZMAX1
+  use minimathmod,   only: safe_adb, vapsat, AZMAX1,dssign
   use TracerPropMod, only: gas_solubility
   use EcosimConst
   use EcoSIMSolverPar
@@ -21,7 +21,7 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine PlantNutientO2Uptake(I,J,NZ,FDMP, PATH,FineRootRadius,FracPRoot4Uptake,&
+  subroutine PlantNutientO2Uptake(I,J,NZ,FDMP, PathLen_pvr,FineRootRadius,FracPRoot4Uptake,&
     MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr)
   !
   !DESCRIPTION
@@ -29,7 +29,7 @@ module NutUptakeMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: FDMP
-  real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
   real(r8)  :: PopPlantO2Uptake,PopPlantO2Demand
@@ -44,7 +44,7 @@ module NutUptakeMod
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
 
-  call RootMycoO2NutrientUptake(I,J,NZ,PATH,FineRootRadius,&
+  call RootMycoO2NutrientUptake(I,J,NZ,PathLen_pvr,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr &
     ,PopPlantO2Uptake,PopPlantO2Demand)
 
@@ -123,12 +123,12 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootMycoO2NutrientUptake(I,J,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
+  subroutine RootMycoO2NutrientUptake(I,J,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,&
     MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr,PopPlantO2Uptake,PopPlantO2Demand)
 
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(in) :: PATH(jroots,JZ1)
+  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1)
   real(r8), intent(in) :: FineRootRadius(jroots,JZ1)
   real(r8), intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)   !minimum active fraction of roots for substance uptake from soil [none]
@@ -159,6 +159,7 @@ module NutUptakeMod
   )
 
   call ZeroUptake(NZ)
+
   PopPlantO2Uptake=0._r8
   PopPlantO2Demand=0._r8
   D955: DO N=1,MY(NZ)
@@ -180,7 +181,7 @@ module NutUptakeMod
 !     FOXYX=fraction of total O2 demand from previous hour
 !
         RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
-!        if(I>176)print*,'rootsoigas'
+
         call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
           RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
@@ -202,13 +203,13 @@ module NutUptakeMod
 !     FZUP=limitn to active uptake respiration from CZPOLR
 !         
 !          if(I>176)print*,'uptakemin'
-          call UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
+          call UptakeMineralNitrogen(I,J,N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
             RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 !
 !     FPUP=limitn to active uptake respiration from CPPOLR
 !         
 !          if(I>176)print*,'uptakeppp'
-          call UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
+          call UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
             RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
         ENDIF
       ELSE
@@ -237,13 +238,12 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
 
-  plt_rbgc%trcg_air2root_flx__pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)       = 0.0_r8
-  plt_rbgc%trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)     = 0.0_r8
-  plt_rbgc%RUPGasSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)                   = 0.0_r8
+  plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)        = 0.0_r8
+  plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)     = 0.0_r8
+  plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
   plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
-  plt_rbgc%RootO2Uptk_pvr(1:NN,L1:L2,NZ)                                 = 0.0_r8
   plt_rbgc%RootMycoExudElm_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
-  plt_rbgc%RAutoRootO2Limter_pvr(1:NN,L1:L2,NZ)                          = 1.0
+  plt_rbgc%RAutoRootO2Limter_pvr(1:NN,L1:L2,NZ)                          = 1.0_r8
   plt_rbgc%RootNH4DmndSoil_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)                      = 0.0_r8
   plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)                  = 0.0_r8
@@ -279,15 +279,15 @@ module NutUptakeMod
   plt_bgcr%RootN2Fix_pvr(L1:L2,NZ)                                       = 0.0_r8
   end subroutine ZeroUptake
 
-!------------------------------------------------------------------------0
+!------------------------------------------------------------------------
 
-  subroutine UptakeMineralPhosporhus(N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
+  subroutine UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
     RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  real(r8), intent(in):: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in):: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)  !the minimum root fraction involved in substrate uptake
   real(r8), intent(in):: RootAreaDivRadius_vr(jroots,JZ1),FCUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
@@ -350,12 +350,12 @@ module NutUptakeMod
     !
     !     POSGL=PO4 diffusivity
     !     TortMicPM_vr=soil tortuosity
-    !     PATH=path length of water and nutrient uptake
+    !     PathLen_pvr=path length of water and nutrient uptake
     !     FineRootRadius=root radius
     !     DIFFL=PO4 diffusion per plant
     !
     POSGX=SoluteDifusvty_vr(ids_H1PO4,L)*TortMicPM_vr(NPH,L)
-    PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0*POSGX))
+    PATHL=AMIN1(PathLen_pvr(N,L),FineRootRadius(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 
     call UptakeH2PO4(N,L,NZ,DIFFL,FPO4X,FPOBX,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
@@ -367,14 +367,17 @@ module NutUptakeMod
   end subroutine UptakeMineralPhosporhus
 !------------------------------------------------------------------------
 
-  subroutine UptakeNO3(I,J,N,L,NZ,FNO3X,FNOBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,&
+  subroutine UptakeNO3(I,J,N,L,NZ,FNO3X,FNOBX,PathLen_pvr,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,&
     FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  real(r8), intent(in):: FNO3X,FNOBX,PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),RootAreaDivRadius_vr(jroots,JZ1)
+  real(r8), intent(in):: FNO3X,FNOBX
+  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1)
+  real(r8), intent(in) :: FineRootRadius(jroots,JZ1)
+  real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(in):: FCUP,FZUP,FWSRT,PerPlantRootH2OUptake
 
   real(r8) :: DIFFL
@@ -420,7 +423,7 @@ module NutUptakeMod
 ! DIFFL=NO3 diffusion per plant
 !
   ZOSGX=SoluteDifusvty_vr(ids_NO3,L)*TortMicPM_vr(NPH,L)
-  PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0_r8*ZOSGX))
+  PATHL=AMIN1(PathLen_pvr(N,L),FineRootRadius(N,L)+SQRT(2.0_r8*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
   !
   ! NO3 UPTAKE IN NON-BAND SOIL ZONE
@@ -550,13 +553,13 @@ module NutUptakeMod
   end associate
   end subroutine UptakeNO3
 !------------------------------------------------------------------------
-  subroutine UptakeNH4(N,L,NZ,FNH4X,FNHBX,PATH,FineRootRadius,RootAreaDivRadius_vr,&
+  subroutine UptakeNH4(N,L,NZ,FNH4X,FNHBX,PathLen_pvr,FineRootRadius,RootAreaDivRadius_vr,&
     FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
-  real(r8), intent(in) :: FNH4X,FNHBX,PATH(jroots,JZ1),FineRootRadius(jroots,JZ1)
+  real(r8), intent(in) :: FNH4X,FNHBX,PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1)
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(in) :: FCUP,FZUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: DIFFL
@@ -595,7 +598,7 @@ module NutUptakeMod
 ! DIFFL=NH4 diffusion per plant
 !
   ZNSGX=SoluteDifusvty_vr(idg_NH3,L)*TortMicPM_vr(NPH,L)
-  PATHL=AMIN1(PATH(N,L),FineRootRadius(N,L)+SQRT(2.0*ZNSGX))
+  PATHL=AMIN1(PathLen_pvr(N,L),FineRootRadius(N,L)+SQRT(2.0*ZNSGX))
   DIFFL=ZNSGX*safe_adb(RootAreaDivRadius_vr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 !
 ! NH4 UPTAKE IN NON-BAND SOIL ZONE
@@ -639,8 +642,8 @@ module NutUptakeMod
 !   RootOUlmNutUptake_pvr=NH4 uptake in non-band unlimited by O2
 !   RootCUlmNutUptake_pvr=NH4 uptake in non-band unlimited by nonstructural C
 !
-    ZNH4M=CMinNH4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NH4,L)
-    ZNH4X=AZMAX1(FNH4X*(trc_solml_vr(ids_NH4,L)-ZNH4M))
+    ZNH4M = CMinNH4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NH4,L)
+    ZNH4X = AZMAX1(FNH4X*(trc_solml_vr(ids_NH4,L)-ZNH4M))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNH4
@@ -775,8 +778,8 @@ module NutUptakeMod
   !     DIFH1P=soil-root HPO4 diffusion per plant in non-band > 0._r8
 !
     IF(trcs_VLN_vr(ids_H1PO4,L).GT.ZERO.AND.trc_solcl_vr(ids_H1PO4,L).GT.CMinPO4Root_pft(N,NZ))THEN
-      RMFH1P=PerPlantRootH2OUptake*trcs_VLN_vr(ids_H1PO4,L)
-      DIFH1P=DIFFL*trcs_VLN_vr(ids_H1PO4,L)
+      RMFH1P = PerPlantRootH2OUptake*trcs_VLN_vr(ids_H1PO4,L)
+      DIFH1P = DIFFL*trcs_VLN_vr(ids_H1PO4,L)
     !
     !     HPO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
     !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -866,8 +869,8 @@ module NutUptakeMod
     !     RootOUlmNutUptake_pvr=HPO4 uptake in band unlimited by O2
     !     RootCUlmNutUptake_pvr=HPO4 uptake in band unlimited by nonstructural C
 
-    H1PXM=CMinPO4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_H1PO4B,L)
-    H1PXB=AZMAX1(FP1BX*(trc_solml_vr(ids_H1PO4B,L)-H1PXM))
+    H1PXM = CMinPO4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_H1PO4B,L)
+    H1PXB = AZMAX1(FP1BX*(trc_solml_vr(ids_H1PO4B,L)-H1PXM))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
@@ -1048,14 +1051,14 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------
 
-  subroutine UptakeMineralNitrogen(I,J,N,L,NZ,PATH,FineRootRadius,FracPRoot4Uptake,&
+  subroutine UptakeMineralNitrogen(I,J,N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,&
     MinFracPRoot4Uptake_pvr,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 
   implicit none
   integer , intent(in) :: I,J
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
-  real(r8), intent(in) :: PATH(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(in) :: FCUP,FZUP,FWSRT,PerPlantRootH2OUptake
@@ -1113,10 +1116,10 @@ module NutUptakeMod
     !     FROM SOIL TO ROOT
     !
 
-    call UptakeNH4(N,L,NZ,FNH4X,FNHBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
+    call UptakeNH4(N,L,NZ,FNH4X,FNHBX,PathLen_pvr,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
       PerPlantRootH2OUptake)
 
-    call UptakeNO3(I,J,N,L,NZ,FNO3X,FNOBX,PATH,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
+    call UptakeNO3(I,J,N,L,NZ,FNO3X,FNOBX,PathLen_pvr,FineRootRadius,RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,&
       PerPlantRootH2OUptake)
 
   ENDIF
@@ -1129,12 +1132,14 @@ module NutUptakeMod
     FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
   implicit none
-  integer, intent(in) :: N,L
-  integer, intent(in) :: NZ
-  REAL(R8), INTENT(IN):: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
-  real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX
-
+  integer, intent(in)   :: N,L
+  integer, intent(in)   :: NZ
+  REAL(R8), INTENT(IN)  :: FracPRoot4Uptake(jroots,JZ1,JP1)
+  real(r8), intent(in)  :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8), intent(out) :: FCUP,FZUP,FPUP,FWSRT
+  real(r8), intent(out) :: PerPlantRootH2OUptake,dtPerPlantRootH2OUptake
+  real(r8), intent(out) :: FOXYX
+  real(r8) :: dss
   associate(                                                          &
     RO2EcoDmndPrev_vr         => plt_bgcr%RO2EcoDmndPrev_vr,          &
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,         &
@@ -1241,6 +1246,8 @@ module NutUptakeMod
   !
   IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
     FOXYX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
+!    dss=dssign(RootO2Dmnd4Resp_pvr(N,L,NZ))
+!    FOXYX=AMAX1(FMN,RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1285,7 +1292,7 @@ module NutUptakeMod
   !     OQC=soil DOC
   !     RDFOMC,RDFOMN,RDFOMP=nonstructl C,N,P exchange:-ve=exudn,+ve=uptake
   !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation
-  !     Canopy_Heat_Latent_col,Canopy_Heat_Sens_col=total fluxes x blr for calculating canopy air temperature,
+  !     Air_Heat_Latent_store_col,Air_Heat_Sens_store_col=total fluxes x blr for calculating canopy air temperature,
   !     vapor pressure in watsub.f
   !      EvapTransHeat_pft,SFLXC=canopylatent,sensible heat fluxes
   !      RA=canopy boundary layer resistance

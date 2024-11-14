@@ -570,7 +570,7 @@ contains
   ENDDO
 
   DO nnut=ids_beg,ids_end
-    trcs_PoreTranspFlx_vr(nnut,NU(NY,NX),NY,NX)=trcs_PoreTranspFlx_vr(nnut,NU(NY,NX),NY,NX)&
+    trcs_Mac2MicXfer_vr(nnut,NU(NY,NX),NY,NX)=trcs_Mac2MicXfer_vr(nnut,NU(NY,NX),NY,NX)&
       +RMac2MicSolFlx_vr(nnut,NU(NY,NX),NY,NX)
   ENDDO
 

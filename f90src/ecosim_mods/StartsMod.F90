@@ -824,10 +824,10 @@ module StartsMod
   Eco_Heat_Latent_col(:,:)       = 0.0_r8
   Eco_Heat_Sens_col(:,:)         = 0.0_r8
   Eco_Heat_GrndSurf_col(:,:)     = 0.0_r8
-  Canopy_Heat_Latent_col(:,:)    = 0.0_r8
-  Canopy_Heat_Sens_col(:,:)      = 0.0_r8
+  Air_Heat_Latent_store_col(:,:)    = 0.0_r8
+  Air_Heat_Sens_store_col(:,:)      = 0.0_r8
   TLEX_col(:,:)                      = 0.0_r8
-  TSHX(:,:)                      = 0.0_r8
+  TSHX_col(:,:)                      = 0.0_r8
   Eco_NEE_col(:,:)               = 0.0_r8
   CanH2OHeldVg_col(:,:)          = 0.0_r8
   CanopyLeafArea_col(:,:)        = 0.0_r8

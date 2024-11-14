@@ -446,17 +446,17 @@ module InsideTranspMod
   IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1) .AND. THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
     .AND. VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) .AND. VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
-      VLWatMicP2A=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
-      VLWatMicP2B=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
-      VLWatMicP3A=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3,N3,N2,N1)
-      VLWatMicP3B=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3B,N3,N2,N1)
-      VLWatMicP4A=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4,N3,N2,N1)
-      VLWatMicP4B=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4B,N3,N2,N1)
+      VLWatMicP2A = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+      VLWatMicP2B = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+      VLWatMicP3A = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3,N3,N2,N1)
+      VLWatMicP3B = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3B,N3,N2,N1)
+      VLWatMicP4A = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4,N3,N2,N1)
+      VLWatMicP4B = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4B,N3,N2,N1)
 
-      VLWatMicPPA=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
-      VLWatMicPPB=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
-      VLWatMicPOA=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
-      VLWatMicPOB=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
+      VLWatMicPPA = VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      VLWatMicPPB = VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+      VLWatMicPOA = VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
+      VLWatMicPOB = VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
 
 !
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
@@ -488,8 +488,8 @@ module InsideTranspMod
     ENDDO
 
     IF(VLWatMicP4A.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_NH4)=AZMAX1(trc_solml2_vr(ids_NH4,N3,N2,N1)/VLWatMicP4A)
-      trcsolc1(idg_NH3)=AZMAX1(trc_solml2_vr(idg_NH3,N3,N2,N1)/VLWatMicP4A)
+      trcsolc1(ids_NH4) = AZMAX1(trc_solml2_vr(ids_NH4,N3,N2,N1)/VLWatMicP4A)
+      trcsolc1(idg_NH3) = AZMAX1(trc_solml2_vr(idg_NH3,N3,N2,N1)/VLWatMicP4A)
     ELSE
       trcsolc1(ids_NH4)=0.0_r8
       trcsolc1(idg_NH3)=0.0_r8
@@ -1044,10 +1044,8 @@ module InsideTranspMod
   ENDDO D9755
 
   DO nsol=ids_beg,ids_end
-    trcs_Transp2MicP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MicP_3D(nsol,N,N6,N5,N4) &
-      +R3PoreSolFlx_3D(nsol,N,N6,N5,N4)
-    trcs_Transp2MacP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MacP_3D(nsol,N,N6,N5,N4) &
-      +R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)
+    trcs_Transp2MicP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MicP_3D(nsol,N,N6,N5,N4)+R3PoreSolFlx_3D(nsol,N,N6,N5,N4)
+    trcs_Transp2MacP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MacP_3D(nsol,N,N6,N5,N4)+R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifusTransp
@@ -1092,8 +1090,7 @@ module InsideTranspMod
   ENDDO D9945
 
   DO nsol=ids_beg,ids_end
-    trcs_PoreTranspFlx_vr(nsol,N6,N5,N4)=trcs_PoreTranspFlx_vr(nsol,N6,N5,N4) &
-      +RMac2MicSolFlx_vr(nsol,N6,N5,N4)
+    trcs_Mac2MicXfer_vr(nsol,N6,N5,N4)=trcs_Mac2MicXfer_vr(nsol,N6,N5,N4)+RMac2MicSolFlx_vr(nsol,N6,N5,N4)
   ENDDO
 
   end subroutine MicMacPoresSoluteExchange
@@ -1414,9 +1411,9 @@ module InsideTranspMod
 !
 ! does not include band NH3
   DO ngas=idg_beg,idg_NH3
-    trc_gasc1(ngas)=AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1)/VLsoiAirPM(M,N3,N2,N1))
-    trc_gasc2(ngas)=AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4)/VLsoiAirPM(M,N6,N5,N4))
-    RGasADFlx_3D(ngas,N,N6,N5,N4)=DifuscG_vr(ngas,N,N6,N5,N4)*(trc_gasc1(ngas)-trc_gasc2(ngas))
+    trc_gasc1(ngas)               = AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1)/VLsoiAirPM(M,N3,N2,N1))
+    trc_gasc2(ngas)               = AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4)/VLsoiAirPM(M,N6,N5,N4))
+    RGasADFlx_3D(ngas,N,N6,N5,N4) = DifuscG_vr(ngas,N,N6,N5,N4)*(trc_gasc1(ngas)-trc_gasc2(ngas))
   ENDDO
 
   end subroutine GasDifTransport
@@ -1450,8 +1447,8 @@ module InsideTranspMod
       VFLW=-VFLWX
     ENDIF
     DO ngas=idg_beg,idg_NH3
-      RGasAdv=VFLW*AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4))
-      RGasADFlx_3D(ngas,N,N6,N5,N4)=RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
+      RGasAdv                       = VFLW*AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4))
+      RGasADFlx_3D(ngas,N,N6,N5,N4) = RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
     ENDDO
   ELSE
     IF(VLsoiAirPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -1460,8 +1457,8 @@ module InsideTranspMod
       VFLW=VFLWX
     ENDIF
     DO ngas=idg_beg,idg_NH3
-      RGasAdv=VFLW*AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1))
-      RGasADFlx_3D(ngas,N,N6,N5,N4)=RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
+      RGasAdv                       = VFLW*AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1))
+      RGasADFlx_3D(ngas,N,N6,N5,N4) = RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
     ENDDO
   ENDIF
 
@@ -1492,13 +1489,13 @@ module InsideTranspMod
 !     X*FLG=hourly total convective+diffusive gas flux
 !
     DO ngas=idg_beg,idg_NH3
-      Gas_3DAdvDif_Flx_vr(ngas,N,N6,N5,N4)=Gas_3DAdvDif_Flx_vr(ngas,N,N6,N5,N4) &
-        +RGasADFlx_3D(ngas,N,N6,N5,N4)
+      Gas_3DAdvDif_Flx_vr(ngas,N,N6,N5,N4)=Gas_3DAdvDif_Flx_vr(ngas,N,N6,N5,N4)+RGasADFlx_3D(ngas,N,N6,N5,N4)
     ENDDO
 
   ELSE
     RGasADFlx_3D(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
   ENDIF
+
   call VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)
   end subroutine GaseousTransport
 
@@ -1598,12 +1595,12 @@ module InsideTranspMod
   DifuscG_vr(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
 
   D9751: DO K=1,jcplx
-    DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
-    DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1)=0.0_r8
+    DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1) = 0.0_r8
+    DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1) = 0.0_r8
   ENDDO D9751
 
-  R3PoreSolFlx_3D(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
-  R3PoreSoHFlx_3D(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
-  RGasADFlx_3D(idg_beg:idg_NH3,N,N3,N2,N1)=0.0_r8
+  R3PoreSolFlx_3D(ids_beg:ids_end,N,N3,N2,N1) = 0.0_r8
+  R3PoreSoHFlx_3D(ids_beg:ids_end,N,N3,N2,N1) = 0.0_r8
+  RGasADFlx_3D(idg_beg:idg_NH3,N,N3,N2,N1)    = 0.0_r8
   end subroutine ZeroTransport2
 end module InsideTranspMod

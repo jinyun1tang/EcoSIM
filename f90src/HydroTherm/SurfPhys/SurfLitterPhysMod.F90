@@ -340,7 +340,7 @@ implicit none
       VapLitR   = vapsat(TKR1)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKR1))
       VaporSoi1 = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !vapor pressure in soil, ton H2O/m3
       EVAPR2    = AMAX1(-AZMAX1(VWatLitr2)*dts_wat,CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton H2O]
-!      if(I==104 .and. j>=1)then
+!      if(I==178 .and. j>=1)then
 !      write(113,*)(I*100+J)*10000+M*100+NN,EVAPR2,-AZMAX1(VWatLitr2)*dts_wat,'d',CdLitREvap*(VPQ_col(NY,NX)-VapLitR),&
 !        VPQ_col(NY,NX),VapLitR,ThetaWLitR,PSISM1_vr(0,NY,NX)
 !      endif
@@ -445,7 +445,7 @@ implicit none
     tk1pre             = TKR1
     TKR1               = (ENGYR+HeatFluxAir2LitR2+PrecHeat2LitR2-tHeatLitR2Soil2)/VLHeatCapcityLitR2
     TKS1               = (ENGYS+tHeatLitR2Soil2+dLWSoil)/VLHeatCapacity2
-!    if(I==104 .and. j>=1)then
+!    if(I==178 .and. j>=1)then
 !    write(112,*)(I*100+J)*10000+M*100+NN,VLHeatCapcityLitR2,TKR1-273.15,TK1pre-273.15,TKS1-273.15,TKQ_col(NY,NX)-273.15,TairK_col(NY,NX)-273.15,&
 !      EVAPR2,-EvapLitR2Soi2,VWatLitr2,safe_adb(HeatFluxAir2LitR2+PrecHeat2LitR2-tHeatLitR2Soil2,dWLitR)/tk1pre,Radnet2LitR2
 !    if(j==17)call endrun(trim(mod_filename)//' at line',__LINE__)      
@@ -480,10 +480,10 @@ implicit none
   VHeatCapacityLitR  = cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX)
   VLWatMicPr         = VLWatMicP_vr(0,NY,NX)
   VLiceMicPr         = VLiceMicP_vr(0,NY,NX)
-  if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP_vr(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
-    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP_vr(0,NY,NX),VHeatCapacityLitR,SoilOrgM_vr(ielmc,0,NY,NX) 
-    call endrun(trim(mod_filename)//' at line',__LINE__)    
-  endif
+!  if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP_vr(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
+!    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP_vr(0,NY,NX),VHeatCapacityLitR,SoilOrgM_vr(ielmc,0,NY,NX) 
+!    call endrun(trim(mod_filename)//' at line',__LINE__)    
+!  endif
   !TairK: air temperature in kelvin, HeatByLitrMassChange represents increase heat in litr
   dVHeatCapacityLitr   = VHeatCapacityLitR-VHeatCapacityLitrX
   HeatByLitrMassChange = dVHeatCapacityLitr*TairK_col(NY,NX)
@@ -592,7 +592,7 @@ implicit none
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoil1_vr(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi_col(NY,NX)+LitrIceHeatFlxFrez(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
-    if(TKSoil1_vr(0,NY,NX)<100._r8 .or. TKSoil1_vr(0,NY,NX)>340._r8)then
+    if(TKSoil1_vr(0,NY,NX)<100._r8 .or. TKSoil1_vr(0,NY,NX)>380._r8)then
       write(*,*)'weird litter temp UpdateLitRB4RunoffM=',TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX)
       write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
       write(*,*)'engy',ENGYR/VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRi_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),&

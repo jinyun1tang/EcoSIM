@@ -22,6 +22,7 @@ module minimathmod
   public :: fixnegmass
   public :: fixEXflux
   public :: yearday,isletter
+  public :: dssign
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -77,7 +78,19 @@ module minimathmod
    ans=AMAX1(0._r8,a/b)
    return
    end function p_adb
+!------------------------------------------------------------------------------------------
 
+  function dssign(snow)result(ans)
+  implicit none
+  real(r8), intent(in) :: snow
+  real(r8) :: ans
+
+  if(snow<=1.e-8_r8)then
+    ans=0._r8
+  else
+    ans=1._r8
+  endif
+  end function dssign
 
 !------------------------------------------------------------------------------------------
 

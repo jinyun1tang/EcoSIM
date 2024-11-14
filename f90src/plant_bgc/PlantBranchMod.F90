@@ -3221,7 +3221,7 @@ module PlantBranchMod
 ! WaterStress4Groth=growth function of canopy water potential
 !
   RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructN)
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)).OR.&
+  IF(is_root_shallow(iPlantRootProfile_pft(NZ)) .OR. &
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WaterStress4Groth
   ENDIF
@@ -3259,9 +3259,9 @@ module PlantBranchMod
 ! RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
 !
   IF(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8)THEN
-    ZPOOLB=AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
-    PPOOLB=AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
-    FNP=AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG),PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
+    ZPOOLB = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
+    PPOOLB = AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
+    FNP    = AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG),PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
     IF(RCO2YM.GT.0.0_r8)THEN
       RCO2GM=AMIN1(RCO2YM,FNP)
     ELSE
@@ -3293,13 +3293,13 @@ module PlantBranchMod
 ! CNPG=N,P constraint on growth respiration
 ! RCO2NonstC4NassimOUltd,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
 !
-  CGROSM=RCO2GM/DMSHD
-  NonstC4Groth_brch=RgroCO2_ltd/DMSHD
-  ZADDBM=AZMAX1(CGROSM*(CNSHX+CNLFM+CNLFX*CNPG))
-  CanopyNonstElm4Gros(ielmn)=AZMAX1(NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG))
-  CanopyNonstElm4Gros(ielmp)=AZMAX1(NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG))
-  RCO2NonstC4NassimOUltd=AZMAX1(1.70_r8*ZADDBM)
-  RCO2NonstC4Nassim_brch=AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn))
+  CGROSM                     = RCO2GM/DMSHD
+  NonstC4Groth_brch          = RgroCO2_ltd/DMSHD
+  ZADDBM                     = AZMAX1(CGROSM*(CNSHX+CNLFM+CNLFX*CNPG))
+  CanopyNonstElm4Gros(ielmn) = AZMAX1(NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG))
+  CanopyNonstElm4Gros(ielmp) = AZMAX1(NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG))
+  RCO2NonstC4NassimOUltd     = AZMAX1(1.70_r8*ZADDBM)
+  RCO2NonstC4Nassim_brch     = AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn))
 !
 ! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
 ! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE

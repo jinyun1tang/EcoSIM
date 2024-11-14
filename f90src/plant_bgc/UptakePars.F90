@@ -43,7 +43,7 @@ module UptakePars
   MaxIterNum              = 200
   DIFFX                   = 1.0E-09_r8
   DIFFY                   = 0.5E-02_r8
-  FMN                     = ppmc
+  FMN                     = 1.e-3_r8 !ppmc
   MinCanopyBndlResist_pft = 0.00139_r8
   RACX                    = 0.0278_r8
   RZ                      = 0.0139_r8

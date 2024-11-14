@@ -248,7 +248,7 @@ contains
   ! VHCPWMM=previous snowpack heat capacity
 
   lchkBottomL=.false.
-  !loop from surface to bottom
+  !loop from surface (L=1) to bottom (L=JS, maximum)
   D9880: DO L=1,JS
 
     IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
@@ -774,7 +774,8 @@ contains
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: LatentHeatAir2Sno
   real(r8), intent(inout) :: HeatSensEvapAir2Snow    !cumulated heat by vapor advection from air to snow [MJ]
-  real(r8), intent(inout) :: HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow
+  real(r8), intent(inout) :: HeatNetFlx2Snow,Radnet2Snow
+  real(r8), intent(inout) :: HeatSensAir2Snow
   real(r8) :: SnowAlbedo    !snow surface albedo for reflecting short wave radiation
   real(r8) :: RFLX0         !net radiation (from sun + canopy) on snow surface [MJ]
   real(r8) :: RI            !Richardson number
@@ -866,13 +867,13 @@ contains
 !  
   HeatSensAir2Sno2 = CdSnoHSens*(TKQ_col(NY,NX)-TKSnow1_snvr(1,NY,NX))
   !occasionally, RadNet2Sno2 and HeatSensAir2Sno2 go to infinity
-  HeatNetFlx2Sno1   = RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2
-  HeatNetFlx2Sno2   = HeatNetFlx2Sno1+HeatAdvAir2SnoByEvap2
-  Radnet2Snow       = Radnet2Snow+RadNet2Sno2
-  LatentHeatAir2Sno = LatentHeatAir2Sno+LatentHeatAir2Sno2
-  HeatSensEvapAir2Snow      = HeatSensEvapAir2Snow+HeatAdvAir2SnoByEvap2
-  HeatSensAir2Snow  = HeatSensAir2Snow+HeatSensAir2Sno2
-  HeatNetFlx2Snow   = HeatNetFlx2Snow+HeatNetFlx2Sno2
+  HeatNetFlx2Sno1      = RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2
+  HeatNetFlx2Sno2      = HeatNetFlx2Sno1+HeatAdvAir2SnoByEvap2
+  Radnet2Snow          = Radnet2Snow+RadNet2Sno2
+  LatentHeatAir2Sno    = LatentHeatAir2Sno+LatentHeatAir2Sno2
+  HeatSensEvapAir2Snow = HeatSensEvapAir2Snow+HeatAdvAir2SnoByEvap2
+  HeatSensAir2Snow     = HeatSensAir2Snow+HeatSensAir2Sno2
+  HeatNetFlx2Snow      = HeatNetFlx2Snow+HeatNetFlx2Sno2
 
   EVAPS(NY,NX)                   = EVAPS(NY,NX)+EvapSublimation2
   EVAPW(NY,NX)                   = EVAPW(NY,NX)+EVAPW2
@@ -1837,15 +1838,4 @@ contains
   end subroutine SnowTopSoilExch
 !------------------------------------------------------------------------------------------
 
-  function dssign(snow)result(ans)
-  implicit none
-  real(r8), intent(in) :: snow
-  real(r8) :: ans
-
-  if(snow<0._r8)then
-    ans=0._r8
-  else
-    ans=1._r8
-  endif
-  end function dssign
 end module SnowPhysMod

@@ -21,14 +21,14 @@ implicit none
   real(r8),target,allocatable :: trc_soHml_vr(:,:,:,:)                 !solute mass in macropore [g d-2]
   real(r8),target,allocatable :: trc_solml_vr(:,:,:,:)                 !solute mass in micropore [g d-2]
   real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                 !solute concentration in micropre [g m-3]
-  real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)                 !gaseous concentation [g m-3]
+  real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)                 !gaseous concentation in micropore [g m-3]
 
   real(r8),target,allocatable ::  ZNFNI(:,:,:)                      !current nitrification inhibition activity
   real(r8),target,allocatable ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
   real(r8),target,allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
 
-  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)             !layer mass of gases [g d-2]
+  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)             !layer mass of gases in micropores [g d-2]
   real(r8),target,allocatable :: trcVolatileMass_col(:,:,:)        !column integrated volatile tracer mass [g d-2]
   real(r8),target,allocatable :: PH(:,:,:)                         !soil pH
   real(r8),target,allocatable :: CEC_vr(:,:,:)                     !soil cation exchange capacity	[cmol kg-1]

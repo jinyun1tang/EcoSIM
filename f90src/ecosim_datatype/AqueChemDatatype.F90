@@ -47,7 +47,7 @@ module AqueChemDatatype
   real(r8),target,allocatable :: trcSalt3DFlo2Cell(:,:,:,:,:)
   real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
   real(r8),target,allocatable ::  DOM_PoreTranspFlx(:,:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcs_PoreTranspFlx_vr(:,:,:,:)                 !total non-salt solute micropore-macropore transfer, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_Mac2MicXfer_vr(:,:,:,:)         !total non-salt solute micropore->macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_XFXS(:,:,:,:)                !total salt micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_RChem_soil_vr(:,:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_NH3_soil_vr(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
@@ -55,7 +55,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)     !total solute nutrient transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_HCO3_col(:,:,:)                       !total solute HCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TR_CO2_aqu_soil_vr(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_CO2_gchem_soil_vr(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2O(:,:,:)                       !total solute H2O transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_FeO3H3_soil(:,:,:)                       !total solute FeOH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_H_p_sorbed_soil(:,:,:)                       !total adsorbed H transformation, [mol d-2 h-1]
@@ -122,7 +122,7 @@ module AqueChemDatatype
   allocate(SolutesIonConc_vr(JZ,JY,JX));     SolutesIonConc_vr=0._r8
 
   allocate(DOM_PoreTranspFlx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_PoreTranspFlx=0._r8
-  allocate(trcs_PoreTranspFlx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_PoreTranspFlx_vr=0._r8
+  allocate(trcs_Mac2MicXfer_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Mac2MicXfer_vr=0._r8
 
   allocate(trcn_RChem_soil_vr(ids_nut_beg:ids_nuts_end,0:JZ,JY,JX)); trcn_RChem_soil_vr=0._r8
 
@@ -133,7 +133,7 @@ module AqueChemDatatype
   allocate(trcx_TRSoilChem_vr(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TRSoilChem_vr=0._r8
 
   allocate(TR_HCO3_col(JZ,JY,JX));    TR_HCO3_col=0._r8
-  allocate(TR_CO2_aqu_soil_vr(JZ,JY,JX));    TR_CO2_aqu_soil_vr=0._r8
+  allocate(TR_CO2_gchem_soil_vr(JZ,JY,JX));    TR_CO2_gchem_soil_vr=0._r8
   allocate(TRH2O(0:JZ,JY,JX));  TRH2O=0._r8
   allocate(TR_FeO3H3_soil(JZ,JY,JX));    TR_FeO3H3_soil=0._r8
   allocate(TR_H_p_sorbed_soil(JZ,JY,JX));    TR_H_p_sorbed_soil=0._r8
@@ -211,7 +211,7 @@ module AqueChemDatatype
   call destroy(TR_NH3_soil_vr)
   call destroy(trcn_RChem_band_soil_vr)
   call destroy(TR_HCO3_col)
-  call destroy(TR_CO2_aqu_soil_vr)
+  call destroy(TR_CO2_gchem_soil_vr)
   call destroy(TRH2O)
   call destroy(TR_FeO3H3_soil)
   call destroy(TR_Al_sorbed_soil)
@@ -230,7 +230,7 @@ module AqueChemDatatype
 
 
   call destroy(trcSaltIonNumber)
-  call destroy(trcs_PoreTranspFlx_vr)
+  call destroy(trcs_Mac2MicXfer_vr)
   call destroy(DOM_PoreTranspFlx)
   call destroy(trcn_RChem_soil_vr)
   end subroutine DestructAquaChem

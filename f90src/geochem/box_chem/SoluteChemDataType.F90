@@ -173,7 +173,7 @@ module SoluteChemDataType
     real(r8) :: TR_SO4_2e_soil
     real(r8) :: TR_CO3_2e_soil
     real(r8) :: TR_HCO3_soil
-    real(r8) :: TR_CO2_aqu_soil_vr
+    real(r8) :: TR_CO2_gchem_soil_vr
     real(r8) :: TR_AlOH_soil
     real(r8) :: TR_AlO2H2_soil
     real(r8) :: TR_AlO3H3_soil
@@ -413,7 +413,7 @@ contains
   solflx%TR_SO4_2e_soil = 0._r8
   solflx%TR_CO3_2e_soil = 0._r8
   solflx%TR_HCO3_soil = 0._r8
-  solflx%TR_CO2_aqu_soil_vr = 0._r8
+  solflx%TR_CO2_gchem_soil_vr = 0._r8
   solflx%TR_AlOH_soil = 0._r8
   solflx%TR_AlO2H2_soil = 0._r8
   solflx%TR_AlO3H3_soil = 0._r8

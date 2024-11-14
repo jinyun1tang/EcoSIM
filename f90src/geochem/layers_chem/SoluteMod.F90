@@ -125,7 +125,7 @@ module SoluteMod
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)=trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+RSNUBA+RSNUBB
   trcn_RChem_soil_vr(ids_NO3,L,NY,NX)=trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
   trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
-  TR_CO2_aqu_soil_vr(L,NY,NX)=TR_CO2_aqu_soil_vr(L,NY,NX)*catomw
+  TR_CO2_gchem_soil_vr(L,NY,NX)=TR_CO2_gchem_soil_vr(L,NY,NX)*catomw
   TRN3G(L,NY,NX)=TRN3G(L,NY,NX)*natomw
   trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)*natomw
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)*natomw

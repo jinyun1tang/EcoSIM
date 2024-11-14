@@ -226,7 +226,7 @@ contains
   implicit none
   integer, intent(in) :: NY,NX
 
-  real(r8), parameter :: SensHeatCondctance=1.25E-03_r8
+  real(r8), parameter :: SpecHeatCapAir=1.25E-03_r8    !heat capacity of 1m3 air, [MJ/(m3 K)]
 
   !TLEX=total latent heat flux x boundary layer resistance, [MJ m-1]
   !TSHX=total sensible heat flux x boundary layer resistance, [MJ m-1]
@@ -242,11 +242,11 @@ contains
   !write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
   !write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
   !write(*,*) "TairK_col(NY,NX) = ", TairK_col(NY,NX)
-  !write(*,*) "TSHX(NY,NX) = ", TSHX(NY,NX)
-  !write(*,*) "SensHeatCondctance = ", SensHeatCondctance
+  !write(*,*) "TSHX_col(NY,NX) = ", TSHX_col(NY,NX)
+  !write(*,*) "SpecHeatCapAir = ", SpecHeatCapAir
 
-  VPQ_col(NY,NX)=VPA(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
-  TKQ_col(NY,NX)=TairK_col(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
+  VPQ_col(NY,NX) = VPA(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
+  TKQ_col(NY,NX) = TairK_col(NY,NX)-TSHX_col(NY,NX)/(SpecHeatCapAir*AREA(3,NUM(NY,NX),NY,NX))
 
   end subroutine SetCanopyProperty
 !------------------------------------------------------------------------------------------
@@ -731,7 +731,7 @@ contains
   real(r8) :: HeatFlowLitR2MacP,WatFlowLitR2MacP    
   real(r8) :: CND1
   integer :: K0,K1
-  real(r8) :: TKRt,VHCapLitR,ENGYR
+  real(r8) :: TKRt,VHCapLitR,ENGYR,VLWatLitR
 
 ! begin_execution
 ! CNDR,HCNDLitr_col=current,saturated litter hydraulic conductivity
@@ -755,8 +755,10 @@ contains
 ! CND1,CNDL=hydraulic conductivity of source,destination layer
 ! HydroCond_3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
-!  if(I==104 .and. j>=1)then
+
   !check litter temperature
+  VLWatLitR=AMIN1(VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX),VLWatMicP1_vr(0,NY,NX))
+!  if(I==178 .and. j>=1)then
 !  ENGYR     = TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)
 !  VHCapLitR = VHeatCapacity1_vr(0,NY,NX)+cpw*WatFLow2LitR_col(NY,NX)
 !  TKRt      = (ENGYR+HeatFLoByWat2LitRi_col(NY,NX))/VHCapLitR
@@ -767,7 +769,7 @@ contains
     !top layer is soil
     IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
       !surface litter holds water
-      ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1_vr(0,NY,NX))/VLitR_col(NY,NX)
+      ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatLitR)/VLitR_col(NY,NX)
     ELSE
       ThetaWLitR=POROS0(NY,NX)
     ENDIF
@@ -795,8 +797,8 @@ contains
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
-      WatDarcyFloLitR2SoiMicP = AZMAX1(AMIN1(FLQZ,VLWatMicP1_vr(0,NY,NX)*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
-      FLQ2                    = AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatMicP1_vr(0,NY,NX)*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
+      WatDarcyFloLitR2SoiMicP = AZMAX1(AMIN1(FLQZ,VLWatLitR*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
+      FLQ2                    = AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatLitR*dts_wat,VLairMicP1_vr(NUM(NY,NX),NY,NX)))
     ELSE
       !from soil to liter
       IF(THETW1.GT.ThetaSat_vr(NUM(NY,NX),NY,NX))THEN
