@@ -7,6 +7,8 @@ module SoilWaterDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
+  real(r8),target,allocatable ::  TXGridSurfRunoff_2DH(:,:)                           !
+  real(r8),target,allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)                          !
 
   real(r8),target,allocatable ::  ThetaAir_vr(:,:,:)                      !air concentration [m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP_vr(:,:,:)                       !soil air content [m3 d-2]
@@ -88,7 +90,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  HeatXGridBySurfRunoff_2DH(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  QRunSurf_col(:,:)                         !runoff from surface water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QDischar_col(:,:)                !water discharge, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  QflxSurfRunoffM(:,:,:,:,:)        !surface runoff,
+  real(r8),target,allocatable ::  QflxSurfRunoffM_2DH(:,:,:,:,:)        !surface runoff,
   real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)
   real(r8),target,allocatable :: QdewCanopy_CumYr_pft(:,:,:)
   private :: InitAllocate
@@ -187,7 +189,10 @@ module SoilWaterDataType
   allocate(HeatXGridBySurfRunoff_2DH(2,2,JV,JH));     HeatXGridBySurfRunoff_2DH=0._r8
   allocate(QRunSurf_col(JY,JX));        QRunSurf_col=0._r8
   allocate(QDischar_col(JY,JX));       QDischar_col=0._r8
-  allocate(QflxSurfRunoffM(60,2,2,JV,JH)); QflxSurfRunoffM=0._r8
+  allocate(QflxSurfRunoffM_2DH(60,2,2,JV,JH)); QflxSurfRunoffM_2DH=0._r8
+  allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
+  allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
+
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -275,8 +280,11 @@ module SoilWaterDataType
   call destroy(HeatXGridBySurfRunoff_2DH)
   call destroy(QRunSurf_col)
   call destroy(QDischar_col)
-  call destroy(QflxSurfRunoffM)
+  call destroy(QflxSurfRunoffM_2DH)
   call destroy(Qinflx2Soil_col)
+  call destroy(TXGridSurfRunoff_2DH)
+  call destroy(THeatXGridBySurfRunoff_2DH)
+
   end subroutine DestructSoilWater
 
 end module SoilWaterDataType

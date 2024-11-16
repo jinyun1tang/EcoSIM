@@ -1166,13 +1166,13 @@ contains
   end subroutine UpdateSnowAtM
 
 !------------------------------------------------------------------------------------------
-  subroutine SnowRedistribution(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
+  subroutine SnowRedistribution(M,NY,NX,NHE,NHW,NVS,NVN)
 !
 ! SNOW redistribution
 ! currently, it does consider wind effect
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
-  integer, intent(in) :: N1,N2   !reference grid
+  integer  :: N1,N2   !reference grid
 
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALTS1,ALTS2
@@ -1194,7 +1194,8 @@ contains
 !     QS,WatBySnowRedistrib,IceBySnowRedistrib=hourly-accumulated snow,water,ice transfer
 !     HeatBySnowRedistrib_2DH=hourly-accumd convective heat from snow,water,ice transfer
 !     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
-
+  N1=NX
+  N2=NY
   DO  N=1,2
     DO  NN=1,2
       IF(N.EQ.idirew)THEN
@@ -1275,28 +1276,28 @@ contains
   integer :: NN
   real(r8) :: cumwat0
 
-  cumwat0=cumWatFlx2LitRByRunoff(N2,N1)
-  D1202: DO NN=1,2
-    cumWatFlx2LitRByRunoff(N2,N1)=cumWatFlx2LitRByRunoff(N2,N1)+WatFlx2LitRByRunoff(N,NN,N2,N1)
-    cumHeatFlx2LitRByRunoff(N2,N1)=cumHeatFlx2LitRByRunoff(N2,N1)+HeatFlx2LitRByRunoff(N,NN,N2,N1)
-    IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-      !there is runoff
-      cumWatFlx2LitRByRunoff(N2,N1)=cumWatFlx2LitRByRunoff(N2,N1)-WatFlx2LitRByRunoff(N,NN,N5,N4)
-      cumHeatFlx2LitRByRunoff(N2,N1)=cumHeatFlx2LitRByRunoff(N2,N1)-HeatFlx2LitRByRunoff(N,NN,N5,N4)
-    ENDIF
+  cumwat0=cumWatFlx2LitRByRunoff_col(N2,N1)
+!  D1202: DO NN=1,2
+!    cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)+WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
+!    cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)+HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
+!    IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
+!      !there is runoff
+!      cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
+!      cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
+!    ENDIF
 
-    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-      cumWatFlx2LitRByRunoff(N2,N1)=cumWatFlx2LitRByRunoff(N2,N1)-WatFlx2LitRByRunoff(N,NN,N5B,N4B)
-      cumHeatFlx2LitRByRunoff(N2,N1)=cumHeatFlx2LitRByRunoff(N2,N1)-HeatFlx2LitRByRunoff(N,NN,N5B,N4B)
-    ENDIF
+!    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.1)THEN
+!      cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
+!      cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
+!    ENDIF
 
-    IF(M.EQ.NPH)THEN
-      IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
-      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-        IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
-      ENDIF
-    ENDIF
-  ENDDO D1202
+!    IF(M.EQ.NPH)THEN
+!      IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
+!      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+!        IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
+!      ENDIF
+!    ENDIF
+!  ENDDO D1202
 
   cumDrySnoFlxByRedistribut(N2,N1)=cumDrySnoFlxByRedistribut(N2,N1)+DrySnoFlxBySnowRedistribut(N,N2,N1) &
     -DrySnoFlxBySnowRedistribut(N,N5,N4)
@@ -1312,8 +1313,6 @@ contains
   
   implicit none
   integer, intent(in) :: NY,NX
-  cumWatFlx2LitRByRunoff(NY,NX)      = 0.0_r8
-  cumHeatFlx2LitRByRunoff(NY,NX)     = 0.0_r8
   cumDrySnoFlxByRedistribut(NY,NX)   = 0.0_r8
   cumWatFlxBySnowRedistribut(NY,NX)  = 0.0_r8
   cumIceFlxBySnowRedistribut(NY,NX)  = 0.0_r8

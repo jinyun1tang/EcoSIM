@@ -62,7 +62,8 @@ module RootGasMod
   real(r8) :: RootUptkSoiSolute(idg_beg:idg_end)  !root uptake of aqueous volatile from soil to inside roots
   real(r8) :: RDXSolute(idg_beg:idg_end)    !maximum fluxes can be taken by roots
   real(r8) :: RDFSolute(idg_beg:idg_end)
-  real(r8) :: RUPOST,RUPNTX
+  real(r8) :: RUPOST
+  real(r8) :: RUPNTX  !total uptake of NH4 from soil into roots
   real(r8) :: Root_gas2sol_flx(idg_beg:idg_end-1)    !gas dissolution into aqueous phase of the volatile tracers
   real(r8) :: trcg_air2root_flx(idg_beg:idg_end-1)   !diffusion flux of gas from atmosphere to inside roots
   real(r8) :: THETW1,THETM

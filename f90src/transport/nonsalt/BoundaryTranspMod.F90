@@ -212,9 +212,9 @@ module BoundaryTranspMod
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
+    IF((NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
           dom_2DFloXSurRunoffM(idom,K,N,NN,M5,M4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
@@ -250,17 +250,17 @@ module BoundaryTranspMod
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
         dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
 
-      trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCOU
-      trcg_2DFloXSurRunoffM(idg_CH4,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CCHU
-      trcg_2DFloXSurRunoffM(idg_O2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*COXU
-      trcg_2DFloXSurRunoffM(idg_N2,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CNNU
-      trcg_2DFloXSurRunoffM(idg_N2O,N,NN,M5,M4)=QflxSurfRunoffM(M,N,NN,M5,M4)*CN2U
+      trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCOU
+      trcg_2DFloXSurRunoffM(idg_CH4,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCHU
+      trcg_2DFloXSurRunoffM(idg_O2,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*COXU
+      trcg_2DFloXSurRunoffM(idg_N2,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CNNU
+      trcg_2DFloXSurRunoffM(idg_N2O,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CN2U
       trcg_2DFloXSurRunoffM(idg_H2,N,NN,M5,M4)=0.0_r8
       trcg_2DFloXSurRunoffM(idg_NH3,N,NN,M5,M4)=0.0_r8
 
@@ -391,8 +391,8 @@ module BoundaryTranspMod
   enddo
 
   DO ids=ids_beg,ids_end
-    trcs_Transp2MicP_3D(ids,N,M6,M5,M4)=trcs_Transp2MicP_3D(ids,N,M6,M5,M4)+R3PoreSolFlx_3D(ids,N,M6,M5,M4)
-    trcs_Transp2MacP_3D(ids,N,M6,M5,M4)=trcs_Transp2MacP_3D(ids,N,M6,M5,M4)+R3PoreSoHFlx_3D(ids,N,M6,M5,M4)
+    trcs_TransptMicP_3D(ids,N,M6,M5,M4)=trcs_TransptMicP_3D(ids,N,M6,M5,M4)+R3PoreSolFlx_3D(ids,N,M6,M5,M4)
+    trcs_TransptMacP_3D(ids,N,M6,M5,M4)=trcs_TransptMacP_3D(ids,N,M6,M5,M4)+R3PoreSoHFlx_3D(ids,N,M6,M5,M4)
   ENDDO
 
   end subroutine BoundaryRunoffandSnowZ

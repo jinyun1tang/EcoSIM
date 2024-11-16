@@ -843,7 +843,7 @@ module PlantBranchMod
   CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)+CH2O-dNonstCX  
   CanopyNonstElms_brch(ielmn,NB,NZ)=CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)+NH3Dep2Can_brch(NB,NZ)
   CanopyNonstElms_brch(ielmp,NB,NZ)=CanopyNonstElms_brch(ielmp,NB,NZ)-CanopyNonstElm4Gros(ielmp)
-
+!  write(118,*)I*1000+J,CH2O,dNonstCX,CanopyNonstElms_brch(1:NumPlantChemElms,NB,NZ),Stomata_Stress
   end associate
   end subroutine UpdatePhotosynthates
 !------------------------------------------------------------------------------------------
@@ -2580,7 +2580,8 @@ module PlantBranchMod
   use PlantNonstElmDynMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ,BegRemoblize
-  real(r8), intent(in) :: WaterStress4Groth,CanTurgPSIFun4Expans
+  real(r8), intent(in) :: WaterStress4Groth
+  real(r8), intent(in) :: CanTurgPSIFun4Expans
   integer :: NE
   real(r8) :: CPOOLD
   real(r8) :: FracCanopyCinStalk
@@ -2668,8 +2669,8 @@ module PlantBranchMod
         XFRE(NE)=AZMAX1(0.05_r8*fTCanopyGroth_pft(NZ) &
           *(0.5_r8*(CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)+CanopyNonstElms_brch(NE,NB,NZ)) &
           -CanopyNonstElms_brch(NE,NB,NZ)))
-        CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
-        CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)=CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE)
+        CanopyNonstElms_brch(NE,NB,NZ)                    = CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
+        CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ) = CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE)
       ENDDO
     ENDIF
   ENDIF
@@ -2841,8 +2842,7 @@ module PlantBranchMod
       GFNX                              = GVMX(iPlantPhenolPattern_pft(NZ))*dTimeIncLeafout
       CH2OH                             = AZMAX1(GFNX*SeasonalNonstElms_pft(ielmc,NZ))
       SeasonalNonstElms_pft(ielmc,NZ)   = SeasonalNonstElms_pft(ielmc,NZ)-CH2OH
-      CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)+CH2OH &
-        *FXSH(iPlantPhenolPattern_pft(NZ))
+      CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)+CH2OH*FXSH(iPlantPhenolPattern_pft(NZ))
 !         if root condition met
       IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
         D50: DO L=NU,MaxSoiL4Root_pft(NZ)
@@ -2973,8 +2973,11 @@ module PlantBranchMod
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: DMSHD
   real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructN,CO2F,CH2O,TFN5
-  real(r8), intent(in) :: WaterStress4Groth,CanTurgPSIFun4Expans
+  real(r8), intent(in) :: ShootStructN,CO2F
+  real(r8), intent(in) :: CH2O  !total CH2O production
+  real(r8), intent(in) :: TFN5  !temperature function for canopy maintenance respiration
+  real(r8), intent(in) :: WaterStress4Groth
+  real(r8), intent(in) :: CanTurgPSIFun4Expans
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), INTENT(OUT) :: CNPG
   real(r8), intent(out) :: RCO2NonstC_brch
@@ -3038,7 +3041,7 @@ module PlantBranchMod
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
 !
 ! RCO2Maint_brch=maintenance respiration
-! TFN5=temperature function for canopy maintenance respiration
+! TFN5=
 ! ShootStructE_brch(ielmn)=shoot structural N mass
 ! iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
@@ -3100,10 +3103,11 @@ module PlantBranchMod
 ! CNLFX,CPLFX=diff between min and max leaf N,P prodn vs nonstruct C consumption
 ! CNPG=N,P constraint on growth respiration
 ! RCO2NonstC4Nassim_brch=respiration for N assimilation
-! CH2O=total CH2O production, 1/4 newly fixed C is used for N-assimilation (where is this number from?)
+! CH2O= 1/4 newly fixed C is used for N-assimilation (where is this number from?)
 !
   
   NonstC4Groth_brch          = RgroCO2_ltd/DMSHD
+!  write(116,*)I*1000+J,NonstC4Groth_brch,RCO2Y,CanTurgPSIFun4Expans,WaterStress4Groth,CanopyNonstElms_brch(ielmc,NB,NZ)  
   CanopyNonstElm4Gros(ielmn) = AZMAX1(AMIN1(CanopyNonstElms_brch(ielmn,NB,NZ),NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG)))
   CanopyNonstElm4Gros(ielmp) = AZMAX1(AMIN1(CanopyNonstElms_brch(ielmp,NB,NZ),NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG)))
   RCO2NonstC4Nassim_brch     = AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn)-0.025_r8*CH2O)
@@ -3144,7 +3148,8 @@ module PlantBranchMod
   integer, intent(in) :: I,J,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructN,WaterStress4Groth
+  real(r8), intent(in) :: ShootStructN
+  real(r8), intent(in) :: WaterStress4Groth
   real(r8), intent(in) :: CanTurgPSIFun4Expans
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), intent(out) :: RCO2NonstC_brch
@@ -3295,6 +3300,7 @@ module PlantBranchMod
 !
   CGROSM                     = RCO2GM/DMSHD
   NonstC4Groth_brch          = RgroCO2_ltd/DMSHD
+!  write(117,*)I*1000+J,NonstC4Groth_brch,RgroCO2_ltd,CanTurgPSIFun4Expans,WaterStress4Groth,RAutoRootO2Limter_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)
   ZADDBM                     = AZMAX1(CGROSM*(CNSHX+CNLFM+CNLFX*CNPG))
   CanopyNonstElm4Gros(ielmn) = AZMAX1(NonstC4Groth_brch*(CNSHX+CNLFM+CNLFX*CNPG))
   CanopyNonstElm4Gros(ielmp) = AZMAX1(NonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG))

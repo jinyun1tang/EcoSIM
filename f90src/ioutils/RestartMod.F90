@@ -3183,7 +3183,6 @@ implicit none
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
     call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyLeafArea_lpft,datrp_4d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
-    print*,CanopyLeafArea_lpft(5,25,1,1,1,1)    
   else
     !print*,'CanopyLeafArea_lpft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyLeafArea_lpft,datrp_4d,NumActivePlants=NumActivePlants,&

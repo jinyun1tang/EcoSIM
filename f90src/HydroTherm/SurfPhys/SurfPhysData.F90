@@ -22,8 +22,8 @@ implicit none
   real(r8),allocatable ::  AScaledCdHOverSoil_col(:,:)             !area scaled conductance for sensible heat flux over exposed soil [MJ h /(m K)]
   real(r8),allocatable ::  VapXAir2LitR_col(:,:)                   !water vapor flux from canopy air to litr
 !  real(r8),allocatable :: VapXAir2TopLay(:,:)                     !water vapor flux from canopy air to top layer of soi/lake
-  real(r8),allocatable ::  LitrIceFlxThaw(:,:)                     !Water flux from ice thaw in litter 
-  real(r8),allocatable ::  LitrIceHeatFlxFrez(:,:)                 !Heat associated with ice freeze in litter (>0 freeze) 
+  real(r8),allocatable ::  LitrIceFlxThaw_col(:,:)                 !Water flux from ice thaw in litter  (>0 thaw)
+  real(r8),allocatable ::  LitrIceHeatFlxFrez_col(:,:)             !Heat associated with ice freeze in litter (<0 thaw) 
   real(r8),allocatable ::  ResistBndlSurf_col(:,:)                 !boundary layer resistance over ground surface [h/m]
   real(r8),allocatable ::  FracEffAsLitR_col(:,:)                  !fraction of surface effectively coverd by litter [none]
   real(r8),allocatable ::  Prec2SoiMacP1(:,:)                      !
@@ -68,9 +68,9 @@ implicit none
   allocate(AScaledCdHOverSoil_col(JY,JX));       AScaledCdHOverSoil_col=0._r8  
   allocate(VapXAir2LitR_col(JY,JX));       VapXAir2LitR_col=0._r8  
 !  allocate(VapXAir2TopLay(JY,JX));       VapXAir2TopLay=0._r8  
-allocate(LitrIceFlxThaw(JY,JX));       LitrIceFlxThaw         = 0._r8
+allocate(LitrIceFlxThaw_col(JY,JX));       LitrIceFlxThaw_col         = 0._r8
 allocate(ResistBndlSurf_col(JY,JX));        ResistBndlSurf_col                            = 0._r8
-allocate(LitrIceHeatFlxFrez(JY,JX));       LitrIceHeatFlxFrez = 0._r8
+allocate(LitrIceHeatFlxFrez_col(JY,JX));       LitrIceHeatFlxFrez_col = 0._r8
 allocate(FracEffAsLitR_col(JY,JX));       FracEffAsLitR_col                           = 0._r8
 allocate(Prec2SoiMacP1(JY,JX));        Prec2SoiMacP1          = 0._r8
 allocate(PRECM_col(JY,JX));       PRECM_col                   = 0._r8
@@ -109,9 +109,9 @@ allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col       = 0._r8
   call destroy(AScaledCdHOverSoil_col)  
   call destroy(VapXAir2LitR_col)
 !  call destroy(VapXAir2TopLay)
-  call destroy(LitrIceFlxThaw)  
+  call destroy(LitrIceFlxThaw_col)  
   call destroy(ResistBndlSurf_col) 
-  call destroy(LitrIceHeatFlxFrez)
+  call destroy(LitrIceHeatFlxFrez_col)
   call destroy(FracEffAsLitR_col)
   call destroy(Prec2SoiMacP1)
   call destroy(PRECM_col)

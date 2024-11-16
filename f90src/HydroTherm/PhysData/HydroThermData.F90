@@ -46,8 +46,8 @@ implicit none
   real(r8),allocatable ::  Altitude_grid(:,:)                    ! grid altitude [m]
   real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
   real(r8),allocatable ::  RadSWonSno_col(:,:)                   !short wave radiation on snow [MJ]  
-  real(r8),allocatable ::  WatFlx2LitRByRunoff(:,:,:,:)                       !  
-  real(r8),allocatable ::  HeatFlx2LitRByRunoff(:,:,:,:)                      !  
+  real(r8),allocatable ::  WatFlx2LitRByRunoff_2DH(:,:,:,:)      !surface runoff flux  
+  real(r8),allocatable ::  HeatFlx2LitRByRunoff_2DH(:,:,:,:)                      !  
   real(r8),allocatable ::  DrySnoFlxBySnowRedistribut(:,:,:)                         !  
   real(r8),allocatable ::  WatFlxBySnowRedistribut(:,:,:)                         !
   real(r8),allocatable ::  IceFlxBySnowRedistribut(:,:,:)                         !  
@@ -105,8 +105,8 @@ implicit none
   allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
   allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8  
   allocate(RadSWonSno_col(JY,JX));       RadSWonSno_col=0._r8  
-  allocate(WatFlx2LitRByRunoff(2,2,JV,JH));     WatFlx2LitRByRunoff=0._r8  
-  allocate(HeatFlx2LitRByRunoff(2,2,JV,JH));    HeatFlx2LitRByRunoff=0._r8
+  allocate(WatFlx2LitRByRunoff_2DH(2,2,JV,JH));     WatFlx2LitRByRunoff_2DH=0._r8  
+  allocate(HeatFlx2LitRByRunoff_2DH(2,2,JV,JH));    HeatFlx2LitRByRunoff_2DH=0._r8
   allocate(DrySnoFlxBySnowRedistribut(2,JV,JH));       DrySnoFlxBySnowRedistribut=0._r8
   allocate(WatFlxBySnowRedistribut(2,JV,JH));       WatFlxBySnowRedistribut=0._r8
   allocate(IceFlxBySnowRedistribut(2,JV,JH));       IceFlxBySnowRedistribut=0._r8  
@@ -133,7 +133,7 @@ implicit none
   use abortutils, only : destroy  
   implicit none
 
-  call destroy(WatFlx2LitRByRunoff)
+  call destroy(WatFlx2LitRByRunoff_2DH)
   call destroy(FracSoiPAsWat_vr)
   call destroy(PSISM1_vr)  
   call destroy(TKSoil1_vr)  
@@ -170,7 +170,7 @@ implicit none
   call destroy(Altitude_grid)
   call destroy(VLiceMacP1_vr)
   call destroy(RadSWonSno_col)
-  call destroy(HeatFlx2LitRByRunoff)    
+  call destroy(HeatFlx2LitRByRunoff_2DH)    
   call destroy(DrySnoFlxBySnowRedistribut)  
   call destroy(WatFlxBySnowRedistribut)
   call destroy(IceFlxBySnowRedistribut)

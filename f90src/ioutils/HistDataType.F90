@@ -174,6 +174,7 @@ implicit none
   real(r8),pointer   :: h1D_VHeatCap_litr_col(:)
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: h2D_tSOC_vr(:,:)        !SoilOrgM_vr(ielmc,1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
+  real(r8),pointer   :: h2D_fTRootGro_vr_ptc(:,:) !
   real(r8),pointer   :: h2D_litrC_vr(:,:)
   real(r8),pointer   :: h2D_litrN_vr(:,:)
   real(r8),pointer   :: h2D_litrP_vr(:,:)
@@ -216,6 +217,8 @@ implicit none
   real(r8),pointer   :: h1D_N2_FIXN_FLX_ptc(:)       !RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_cNH3_FLX_ptc(:)       !NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)      !RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_TC_Canopy_pft(:)
+  real(r8),pointer   :: h1D_TC_Groth_pft(:)
   real(r8),pointer   :: h2D_Root1stStrutC_ptc(:,:) !primary root structural C biomass
   real(r8),pointer   :: h2D_Root1stStrutN_ptc(:,:)
   real(r8),pointer   :: h2D_Root1stStrutP_ptc(:,:)
@@ -581,6 +584,8 @@ implicit none
   allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NO3_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_N2_FIXN_FLX_ptc(:)=spval
   allocate(this%h1D_cNH3_FLX_ptc(beg_ptc:end_ptc))        ;this%h1D_cNH3_FLX_ptc(:)=spval
+  allocate(this%h1D_TC_Canopy_pft(beg_ptc:end_ptc))       ;this%h1D_TC_Canopy_pft(:)=spval
+  allocate(this%h1D_TC_Groth_pft(beg_ptc:end_ptc))        ;this%h1D_TC_Groth_pft(:)=spval
   allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_PO4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_C_ptc(:)=spval
   allocate(this%h1D_SHOOTST_C_ptc(beg_ptc:end_ptc))       ;this%h1D_SHOOTST_C_ptc(:)=spval
@@ -790,7 +795,7 @@ implicit none
   allocate(this%h2D_Root2ndStrutC_ptc(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root2ndStrutC_ptc=spval
   allocate(this%h2D_Root2ndStrutN_ptc(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root2ndStrutN_ptc=spval
   allocate(this%h2D_Root2ndStrutP_ptc(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root2ndStrutP_ptc=spval
-
+  allocate(this%h2D_fTRootGro_vr_ptc(beg_ptc:end_ptc,1:JZ)) ; this%h2D_fTRootGro_vr_ptc=spval
   allocate(this%h3D_PARTS_ptc(beg_ptc:end_ptc,1:NumOfPlantMorphUnits,1:MaxNumBranches));this%h3D_PARTS_ptc(:,:,:)=spval
   !-----------------------------------------------------------------------
   ! initialize history fields 
@@ -1060,7 +1065,7 @@ implicit none
 
   data1d_ptr => this%h1D_NBP_col(beg_col:end_col)   
   call hist_addfld1d(fname='NBP',units='gC/m2',avgflag='A',&
-    long_name='Cumulative net biosphere productivity',ptr_col=data1d_ptr)      
+    long_name='Cumulative net biosphere productivity (<0 into atmosphere)',ptr_col=data1d_ptr)      
     
   data1d_ptr => this%h1D_ECO_LAI_col(beg_col:end_col)       
   call hist_addfld1d(fname='ECO_LAI',units='m2/m2',avgflag='A',&
@@ -1080,11 +1085,11 @@ implicit none
 
   data1d_ptr => this%h1D_Eco_HR_CumYr_col(beg_col:end_col)      
   call hist_addfld1d(fname='ECO_RH',units='gC/m2',avgflag='A',&
-    long_name='cumulative ecosystem heterotrophic respiration',ptr_col=data1d_ptr)      
+    long_name='cumulative ecosystem heterotrophic respiration (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_HR_CO2_col(beg_col:end_col)
   call hist_addfld1d(fname='ECO_RH_CO2',units='gC/m2/hr',avgflag='A',&
-    long_name='Ecosystem heterotrophic respiration as CO2',ptr_col=data1d_ptr)      
+    long_name='Ecosystem heterotrophic respiration as CO2 (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
 !  data1d_ptr => this%h1D_Eco_HR_CH4_col(beg_col:end_col)
 !  call hist_addfld1d(fname='ECO_RH_CH4',units='gC/m2/hr',avgflag='A',&
@@ -1197,7 +1202,7 @@ implicit none
 
   data1d_ptr => this%h1D_ECO_CO2_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_NEE_CO2',units='umol C/m2/s',avgflag='A',&
-    long_name='ecosystem net CO2 exchange',ptr_col=data1d_ptr)      
+    long_name='ecosystem net CO2 exchange (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_FLX_col(beg_col:end_col)     
   call hist_addfld1d(fname='CH4_FLX',units='umol C/m2/s',avgflag='A',&
@@ -1317,8 +1322,8 @@ implicit none
     long_name='canopy temperature',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CAN_TEMPFN_ptc(beg_ptc:end_ptc)     
-  call hist_addfld1d(fname='TEMP_FN',units='none',avgflag='A',&
-    long_name='canopy temperature growth function/stress,[0-1]',ptr_patch=data1d_ptr)      
+  call hist_addfld1d(fname='GRO_TEMP_FN',units='none',avgflag='A',&
+    long_name='canopy temperature growth function/stress',ptr_patch=data1d_ptr)        
 
   data1d_ptr => this%h1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='CAN_CO2_FLX',units='umol C/m2/s',avgflag='A',&
@@ -1395,6 +1400,14 @@ implicit none
   data1d_ptr => this%h1D_cNH3_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='cNH3_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='*canopy NH3 flux',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_TC_Canopy_pft(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='TC_CAN',units='oC',avgflag='A',&
+    long_name='Canopy temperature',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_TC_Groth_pft(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='TC_Groth',units='oC',avgflag='A',&
+    long_name='Plant growth temperature',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='UPTK_PO4_FLX',units='gP/m2/hr',avgflag='A',&
@@ -2199,6 +2212,11 @@ implicit none
   call hist_addfld2d(fname='DNS_RT_vr',units='m/m3',type2d='levsoi',avgflag='A',&
     long_name='root layer length density',ptr_patch=data2d_ptr)      
 
+  data2d_ptr => this%h2D_fTRootGro_vr_ptc(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='GRO_TEMP_FN_vr',units='none',type2d='levsoi',avgflag='A',&
+    long_name='root growth temperature function',ptr_patch=data2d_ptr)      
+
+
   do nbr=1,MaxNumBranches
     data2d_ptr => this%h3D_PARTS_ptc(beg_ptc:end_ptc,1:NumOfPlantMorphUnits,nbr)
     write(fieldname,'(I2.2)')nbr
@@ -2452,7 +2470,7 @@ implicit none
         this%h2D_N2O_vr(ncol,L)           = trc_solcl_vr(idg_N2O,L,NY,NX)
         this%h2D_NH3_vr(ncol,L)           = trc_solcl_vr(idg_NH3,L,NY,NX)
         this%h2D_TEMP_vr(ncol,L)          = TCS(L,NY,NX)
-        this%h2D_HeatFlow_vr(ncol,L)      = THeatFlow2Soil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_HeatFlow_vr(ncol,L)      = THeatFlowCellSoil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_HeatUptk_vr(ncol,L)      = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_VSPore_vr(ncol,L)        = POROS_vr(L,NY,NX)
         this%h2D_VSM_vr    (ncol,L)       = ThetaH2OZ_vr(L,NY,NX)
@@ -2588,6 +2606,8 @@ implicit none
         this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_TC_Canopy_pft(nptc)     = TKCanopy_pft(NZ,NY,NX)-273.15_r8
+        this%h1D_TC_Groth_pft(nptc)      = TCGroth_pft(NZ,NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracPARads2Canopy_pft(NZ,NY,NX)
         this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
@@ -2697,6 +2717,7 @@ implicit none
           ENDDO
         endif
         DO L=1,JZ
+          this%h2D_fTRootGro_vr_ptc(nptc,L) = fTgrowRootP_vr(L,NZ,NY,NX)
           DVOLL=DLYR(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
           if(DVOLL<1.e-8_r8)cycle
           this%h2D_PSI_RT_vr_ptc(nptc,L)    = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)

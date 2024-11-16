@@ -1044,8 +1044,8 @@ module InsideTranspMod
   ENDDO D9755
 
   DO nsol=ids_beg,ids_end
-    trcs_Transp2MicP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MicP_3D(nsol,N,N6,N5,N4)+R3PoreSolFlx_3D(nsol,N,N6,N5,N4)
-    trcs_Transp2MacP_3D(nsol,N,N6,N5,N4)=trcs_Transp2MacP_3D(nsol,N,N6,N5,N4)+R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)
+    trcs_TransptMicP_3D(nsol,N,N6,N5,N4)=trcs_TransptMicP_3D(nsol,N,N6,N5,N4)+R3PoreSolFlx_3D(nsol,N,N6,N5,N4)
+    trcs_TransptMacP_3D(nsol,N,N6,N5,N4)=trcs_TransptMacP_3D(nsol,N,N6,N5,N4)+R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifusTransp

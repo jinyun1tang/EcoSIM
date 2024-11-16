@@ -16,7 +16,7 @@ module minimathmod
   public :: vapsat, vapsat0
   public :: isLeap
   public :: isnan
-  public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d
+  public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d,AZMIN1d
   public :: GetMolAirPerm3
   public :: fSiLU
   public :: fixnegmass
@@ -35,7 +35,7 @@ module minimathmod
 
   public :: addone
   public :: RichardsonNumber
-  real(r8), parameter :: tiny_val=1.e-20_r8
+  real(r8), parameter :: tiny_val=1.e-14_r8
 
   contains
 
@@ -164,20 +164,36 @@ module minimathmod
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1d(val,tiny_val2)result(ans)
+  !
   implicit none
   real(r8), intent(in) :: val
-  real(r8), intent(in) :: tiny_val2
+  real(r8), intent(in) :: tiny_val2 !positive tiny threshold value
 
   real(r8) :: ans
 
   if(val>tiny_val2)then
     ans=val 
-  elseif(val>-tiny_val2)then
-    ans=0._r8
   else
-    ans=val
+    ans=0._r8
   endif
   end function AZMAX1d
+
+!------------------------------------------------------------------------------------------
+
+  pure function AZMIN1d(val,tiny_val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: tiny_val2 !positive tiny threshold value
+
+  real(r8) :: ans
+
+  if(val<-tiny_val2)then
+    ans=val 
+  else
+    ans=0._r8
+  endif
+  end function AZMIN1d
+
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)
@@ -252,13 +268,13 @@ module minimathmod
   real(r8) :: c,ac,bc
   logical :: ans
   
-  c=max(abs(a),(b))  
+  c=max(abs(a),abs(b))  
   if (c==0._r8) then
     ans=.True.
     return 
   endif
 
-  ac=a/c;bc=b/c  
+  ac=a/c;bc=b/c    
   ans=abs((ac-bc)/(ac+bc))<tiny_val
   end function isclose
 

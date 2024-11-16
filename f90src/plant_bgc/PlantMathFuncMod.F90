@@ -41,12 +41,12 @@ contains
   end function get_FDM
 
 !--------------------------------------------------------------------------------
-  subroutine update_osmo_turg_pressure(PSIO,CCPOLT,OSMO,TKP,PSIOsmo,PSITurg,FDMP1)
+  subroutine update_osmo_turg_pressure(PSICanopy,CCPOLT,OSMO,TKP,PSIOsmo,PSITurg,FDMP1)
   !
   !DESCRIPTION
   !update the osmotic and turgor pressure of a plant organ
   implicit none
-  real(r8), intent(in) :: PSIO   !plant orgran pressure, MPa
+  real(r8), intent(in) :: PSICanopy   !plant orgran pressure, MPa
   real(r8), intent(in) :: CCPOLT !total organ dry mass, C+N+P
   real(r8), intent(in) :: OSMO   !canopy osmotic potential when canopy water potential = 0 MPa
   real(r8), intent(in) :: TKP    !organ temperature, Kelvin
@@ -57,11 +57,11 @@ contains
   real(r8) :: OSWT
   real(r8) :: FDMP
 
-  FDMP=get_FDM(PSIO)
+  FDMP=get_FDM(PSICanopy)
   if(present(fdmp1))FDMP1=FDMP
   OSWT    = 36.0_r8+840.0_r8*AZMAX1(CCPOLT)
   PSIOsmo = FDMP/0.16_r8*OSMO-RGASC*TKP*FDMP*CCPOLT/OSWT
-  PSITurg = AZMAX1(PSIO-PSIOsmo)
+  PSITurg = AZMAX1(PSICanopy-PSIOsmo)
 
   end subroutine update_osmo_turg_pressure
 !--------------------------------------------------------------------------------

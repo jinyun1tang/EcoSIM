@@ -378,6 +378,9 @@ module Hour1Mod
   extragrid=1
   if(column_mode)extragrid=0
 
+  XGridSurfRunoff_2DH(1:2,1:2,:,:)       = 0.0_r8
+  HeatXGridBySurfRunoff_2DH(1:2,1:2,:,:) = 0.0_r8
+
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 !
@@ -392,8 +395,6 @@ module Hour1Mod
       HydroSubsDOPFlx_col(NY,NX)           = 0._r8
       HydroSubsDIPFlx_col(NY,NX)           = 0._r8
       WatFlux4ErosionM_2DH(:,NY,NX)        = 0._r8
-      XGridSurfRunoff_2DH(1:2,1:2,NY,NX)  = 0.0_r8
-      HeatXGridBySurfRunoff_2DH(1:2,1:2,NY,NX) = 0.0_r8
 
       dom_2DFloXSurRunoff(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0.0_r8
 
@@ -416,7 +417,7 @@ module Hour1Mod
 !
       DO  L=0,NL(NY,NX)+1
 
-        trcs_Transp2MicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
+        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
 
         DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
       ENDDO
@@ -429,7 +430,7 @@ module Hour1Mod
         WaterFlowMacP_3D(1:3,L,NY,NX)=0.0_r8
         HeatFlow2Soil_3D(1:3,L,NY,NX)=0.0_r8
 
-        trcs_Transp2MicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
+        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0.0_r8
         Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
 
         DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0.0_r8
@@ -733,7 +734,7 @@ module Hour1Mod
 !     begin_execution
 
   ECO_HR_CO2_col(NY,NX)                   = 0._r8
-  ECO_HR_CH4_col(NY,NX)                   = 0._r8  
+  ECO_HR_CH4_col(NY,NX)                   = 0._r8
   Eco_RadSW_col(NY,NX)                    = 0._r8
   RootCO2Autor_vr(:,NY,NX)                = 0._r8
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -758,8 +759,8 @@ module Hour1Mod
   SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)   = 0.0_r8
   WatFLo2Litr(NY,NX)                      = 0.0_r8
   HeatFLo2LitrByWat(NY,NX)                = 0.0_r8
-  TLitrIceFlxThaw(NY,NX)                  = 0.0_r8
-  TLitrIceHeatFlxFrez(NY,NX)              = 0.0_r8
+  TLitrIceFlxThaw_col(NY,NX)              = 0.0_r8
+  TLitrIceHeatFlxFrez_col(NY,NX)          = 0.0_r8
   HeatByRad2Surf_col(NY,NX)               = 0.0_r8
   HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
   HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
@@ -767,7 +768,7 @@ module Hour1Mod
   HeatNet2Surf_col(NY,NX)                 = 0.0_r8
   VapXAir2GSurf_col(NY,NX)                = 0.0_r8
 
-  trcs_Transp2MacP_3D(:,:,:,:,:) = 0._r8
+  trcs_TransptMacP_3D(:,:,:,:,:) = 0._r8
   Gas_Flx_atmDif2soil_col(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX) = 0.0_r8
 

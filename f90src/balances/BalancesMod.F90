@@ -1,7 +1,6 @@
 module BalancesMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use CanopyDataType, only: QvET_col
-  use TFlxTypeMod,    only: THeatXGridBySurfRunoff_2DH
   use BalanceCheckDataType
   use SoilWaterDataType
   use ClimForcDataType

@@ -375,35 +375,35 @@ contains
   ENDDO
 
   do ntg=idg_beg,idg_NH3
-    trcs_Transp2MicP_3D(ntg,3,0,NY,NX)=trcs_Transp2MicP_3D(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
+    trcs_TransptMicP_3D(ntg,3,0,NY,NX)=trcs_TransptMicP_3D(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
   ENDDO
-!  write(116,*)I+J/24.,M,'tp30',trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX)
+!  write(116,*)I+J/24.,M,'tp30',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_Transp2MicP_3D(nts,3,0,NY,NX)=trcs_Transp2MicP_3D(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,0,NY,NX)=trcs_TransptMicP_3D(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
   enddo
 
-!  write(116,*)I+J/24.,M,'tp31',trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX),trcn_FloSno2LitR(ids_NO3),-RFLs_adv(ids_NO3),-SDifFlx(ids_NO3)
+!  write(116,*)I+J/24.,M,'tp31',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),trcn_FloSno2LitR(ids_NO3),-RFLs_adv(ids_NO3),-SDifFlx(ids_NO3)
 
-  trcs_Transp2MicP_3D(idg_NH3,3,0,NY,NX)=trcs_Transp2MicP_3D(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
-  trcs_Transp2MicP_3D(ids_NH4,3,0,NY,NX)=trcs_Transp2MicP_3D(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX)=trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
-  trcs_Transp2MicP_3D(ids_NO2,3,0,NY,NX)=trcs_Transp2MicP_3D(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
-  trcs_Transp2MicP_3D(ids_H1PO4,3,0,NY,NX)=trcs_Transp2MicP_3D(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  trcs_Transp2MicP_3D(ids_H2PO4,3,0,NY,NX)=trcs_Transp2MicP_3D(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)=trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
+  trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
+  trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
+  trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
+  trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
-!  write(116,*)I+J/24.,M,'tp32',trcs_Transp2MicP_3D(ids_NO3,3,0,NY,NX),-RFLs_adv(ids_NO3B),-SDifFlx(ids_NO3B)  
+!  write(116,*)I+J/24.,M,'tp32',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),-RFLs_adv(ids_NO3B),-SDifFlx(ids_NO3B)  
 
   do ntg=idg_beg,idg_NH3
-    trcs_Transp2MicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_Transp2MicP_3D(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
+    trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
   enddo
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_Transp2MicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_Transp2MicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
   enddo
 
   do nts=ids_nutb_beg,ids_nutb_end
-    trcs_Transp2MicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_Transp2MicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
   enddo
   end subroutine TotalPoreFluxAdjacentCell
 !------------------------------------------------------------------------------------------
@@ -665,7 +665,7 @@ contains
 !
       IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
               dom_2DFloXSurRunoffM(idom,K,N,2,N5,N4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
@@ -710,7 +710,7 @@ contains
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
             DO  K=1,jcplx
               do idom=idom_beg,idom_end
                 dom_2DFloXSurRunoffM(idom,K,N,1,N5B,N4B)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM

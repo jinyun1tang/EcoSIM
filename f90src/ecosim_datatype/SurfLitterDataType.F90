@@ -20,8 +20,8 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   VHeatCapLitRMin_col(:,:)                !threshold surface litter heat capacity, [MJ d-2 K-1]
   real(r8) ,target,allocatable ::   VWatLitRHoldCapcity_col(:,:)                   !surface litter water holding capacity, [m3 d-2]
   real(r8) ,target,allocatable ::   WatFLo2Litr(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
-  real(r8) ,target,allocatable ::   TLitrIceFlxThaw(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
+  real(r8) ,target,allocatable ::   TLitrIceFlxThaw_col(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez_col(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
   real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
@@ -58,8 +58,8 @@ module SurfLitterDataType
   allocate(VHeatCapLitRMin_col(JY,JX));       VHeatCapLitRMin_col=0._r8
   allocate(VWatLitRHoldCapcity_col(JY,JX));       VWatLitRHoldCapcity_col=0._r8
   allocate(WatFLo2Litr(JY,JX));         WatFLo2Litr=0._r8
-  allocate(TLitrIceFlxThaw(JY,JX));        TLitrIceFlxThaw=0._r8
-  allocate(TLitrIceHeatFlxFrez(JY,JX));       TLitrIceHeatFlxFrez=0._r8
+  allocate(TLitrIceFlxThaw_col(JY,JX));        TLitrIceFlxThaw_col=0._r8
+  allocate(TLitrIceHeatFlxFrez_col(JY,JX));       TLitrIceHeatFlxFrez_col=0._r8
   allocate(Rain2LitRSurf_col(JY,JX));        Rain2LitRSurf_col=0._r8
   allocate(Irrig2LitRSurf(JY,JX));        Irrig2LitRSurf=0._r8
   allocate(POROS0(JY,JX));       POROS0=0._r8
@@ -84,8 +84,8 @@ module SurfLitterDataType
   call destroy(VHeatCapLitRMin_col)
   call destroy(VWatLitRHoldCapcity_col)
   call destroy(WatFLo2Litr)
-  call destroy(TLitrIceFlxThaw)
-  call destroy(TLitrIceHeatFlxFrez)
+  call destroy(TLitrIceFlxThaw_col)
+  call destroy(TLitrIceHeatFlxFrez_col)
   call destroy(Rain2LitRSurf_col)
   call destroy(Irrig2LitRSurf)
   call destroy(POROS0)

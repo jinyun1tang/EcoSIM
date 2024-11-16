@@ -230,7 +230,7 @@ module ErosionMod
         IF(BaseErosionRate(N2,N1).GT.ZEROS(N2,N1))THEN
           IF(NN.EQ.1)THEN
             !well-defined dest grid          
-            FERM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
+            FERM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
             SedErosionM(N,2,N5,N4)=BaseErosionRate(N2,N1)*FERM
             cumSedErosion(N,2,N5,N4)=cumSedErosion(N,2,N5,N4)+SedErosionM(N,2,N5,N4)
           ELSE
@@ -240,7 +240,7 @@ module ErosionMod
           IF(NN.EQ.2)THEN
             IF(N4B.GT.0.AND.N5B.GT.0)THEN
               !well-defined dest grid
-              FERM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
+              FERM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
               SedErosionM(N,1,N5B,N4B)=BaseErosionRate(N2,N1)*FERM
               cumSedErosion(N,1,N5B,N4B)=cumSedErosion(N,1,N5B,N4B)+SedErosionM(N,1,N5B,N4B)
             ELSE
@@ -381,13 +381,13 @@ module ErosionMod
         SedErosionM(N,NN,M5,M4)=0._r8
       ELSE
         IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-          IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-            .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-            FERM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
+          IF((NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+            .OR.(NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+            FERM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
             SedErosionM(N,NN,M5,M4)=BaseErosionRate(N2,N1)*FERM
             cumSedErosion(N,NN,M5,M4)=cumSedErosion(N,NN,M5,M4)+SedErosionM(N,NN,M5,M4)
-          ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-            .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+          ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+            .OR.(NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
             SedErosionM(N,NN,M5,M4)=0._r8
           ELSE
             SedErosionM(N,NN,M5,M4)=0._r8

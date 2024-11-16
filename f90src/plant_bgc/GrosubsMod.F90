@@ -318,7 +318,7 @@ module grosubsMod
   real(r8) :: PTRT
   real(r8) :: RootPrimeAxsNum
   real(r8) :: TFN5
-  real(r8) :: WFNG
+  real(r8) :: WaterStress4Groth
   real(r8) :: Stomata_Stress
   real(r8) :: WFNS,CanTurgPSIFun4Expans
   real(r8) :: RootSinkC_vr(jroots,JZ1),RootSinkC(jroots)
@@ -347,14 +347,14 @@ module grosubsMod
     BegRemoblize        = 0
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
       if(lverb)write(*,*)'GrowOneBranch'
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
+        TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 
     if(lverb)write(*,*)'RootBGCModel'
@@ -381,13 +381,13 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootPrimeAxsNum
   real(r8), intent(out) :: TFN5
-  real(r8), intent(out) :: WFNG
+  real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
   real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
   integer :: L,NR,N,NE
@@ -547,20 +547,21 @@ module grosubsMod
 !     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
 !     Stomata_Stress=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
-!     WFNG=growth function of canopy water potential
+!     WaterStress4Groth=growth function of canopy water potential
 !     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
-    Stomata_Stress       = 1.0_r8
-    WFNG                 = EXP(0.05_r8*PSICanopy_pft(NZ))
+    Stomata_Stress    = 1.0_r8
+    WaterStress4Groth = EXP(0.05_r8*PSICanopy_pft(NZ))
   ELSE
     !others
-    Stomata_Stress       = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
-    WFNG                 = EXP(0.10_r8*PSICanopy_pft(NZ))
+    Stomata_Stress    = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    WaterStress4Groth = EXP(0.10_r8*PSICanopy_pft(NZ))
   ENDIF
+!  write(119,*)I*1000+J,Stomata_Stress,RCS(NZ),PSICanopyTurg_pft(NZ),PSICanopy_pft(NZ),plt_ew%PSICanopyOsmo_pft(NZ)
   CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
   end associate

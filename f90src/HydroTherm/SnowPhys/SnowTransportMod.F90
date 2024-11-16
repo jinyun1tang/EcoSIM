@@ -103,23 +103,23 @@ implicit none
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
-            -trcs_Transp2MicP_3D(NTG,3,0,N2,N1)-trcs_Transp2MicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
-            -trcs_Transp2MacP_3D(NTG,3,NUM(N2,N1),N2,N1)
+            -trcs_TransptMicP_3D(NTG,3,0,N2,N1)-trcs_TransptMicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
+            -trcs_TransptMacP_3D(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
-            -trcs_Transp2MicP_3D(NTN,3,0,N2,N1)-trcs_Transp2MicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
-            -trcs_Transp2MacP_3D(NTN,3,NUM(N2,N1),N2,N1)
+            -trcs_TransptMicP_3D(NTN,3,0,N2,N1)-trcs_TransptMicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
+            -trcs_TransptMacP_3D(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         !add band flux
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -trcs_Transp2MicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_Transp2MacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -trcs_TransptMicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
         DO NTS=0,ids_nuts
           trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
-            -trcs_Transp2MicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_Transp2MacP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
+            -trcs_TransptMicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         IF(salt_model)THEN

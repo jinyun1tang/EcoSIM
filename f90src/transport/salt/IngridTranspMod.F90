@@ -858,7 +858,7 @@ module IngridTranspMod
 !
       IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
 
           DO nsalts=idsalt_beg,idsalt_end
             trcSalt_RQR(nsalts,N,2,N5,N4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
@@ -880,7 +880,7 @@ module IngridTranspMod
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
             DO nsalts=idsalt_beg,idsalt_end
               trcSalt_RQR(nsalts,N,1,N5B,N4B)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
             ENDDO

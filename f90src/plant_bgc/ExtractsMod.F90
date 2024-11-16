@@ -256,7 +256,7 @@ module ExtractsMod
         trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx_pvr(NTG,N,L,NZ)
       ENDDO
 
-      tRootCO2Emis_vr(L)=tRootCO2Emis_vr(L)-RootCO2Emis_pvr(N,L,NZ)
+      tRootCO2Emis_vr(L) =tRootCO2Emis_vr(L)-RootCO2Emis_pvr(N,L,NZ)
       tRO2MicrbUptk_vr(L)=tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_vr(idg,N,L,NZ)
