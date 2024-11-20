@@ -118,7 +118,7 @@ module SoluteMod
 !     TR_NH3_soil_vr,TR_NH3_band_soil=NH3 dissolution from urea in non-band,band
 !     TRNO3,TRNOB=NO3 dissolution in non-band,band
 !
-  TRN3G(L,NY,NX)=TRN3G(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
+  TR_NH3_geochem_vr(L,NY,NX)=TR_NH3_geochem_vr(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
   trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+RSN4AA
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+RSN4BA+RSN4BB
   TR_NH3_soil_vr(L,NY,NX)=TR_NH3_soil_vr(L,NY,NX)+RSNUAA
@@ -126,7 +126,7 @@ module SoluteMod
   trcn_RChem_soil_vr(ids_NO3,L,NY,NX)=trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
   trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
   TR_CO2_gchem_soil_vr(L,NY,NX)=TR_CO2_gchem_soil_vr(L,NY,NX)*catomw
-  TRN3G(L,NY,NX)=TRN3G(L,NY,NX)*natomw
+  TR_NH3_geochem_vr(L,NY,NX)=TR_NH3_geochem_vr(L,NY,NX)*natomw
   trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)*natomw
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)*natomw
   TR_NH3_soil_vr(L,NY,NX)=TR_NH3_soil_vr(L,NY,NX)*natomw

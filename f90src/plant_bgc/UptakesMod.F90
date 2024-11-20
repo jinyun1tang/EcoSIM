@@ -432,13 +432,14 @@ module UptakesMod
   real(r8), intent(out) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(out) :: FracSoiLayByPrimRoot_pvr(JZ1,JP1)
   real(r8), intent(out) :: RootAreaDivRadius_vr(jroots,JZ1)
-  real(r8) :: RootDepZ,RTDPX
+  real(r8) :: RootDepZ  !primary root depth
+  real(r8) :: RTDPX  !root occupied layer thickness
   integer :: N,L,NR
 
   associate(                                                      &
     PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr,       &
     FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr,         &
-    CumSoilThickness_vr     => plt_site%CumSoilThickness_vr,      &
+    CumSoilThickness_vr     => plt_site%CumSoilThickness_vr,      & !in: depth from soil surface to layer bottom
     DLYR3                   => plt_site%DLYR3,                    &
     ZEROS                   => plt_site%ZEROS,                    &
     ZERO                    => plt_site%ZERO,                     &
@@ -448,21 +449,17 @@ module UptakesMod
     MY                      => plt_morph%MY,                      &
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
     Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft,   &
-    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft,       &
+    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft,       & !in: hypocotyledon height
     RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr,     &
     Root1stDepz_pft         => plt_morph%Root1stDepz_pft,         &
     RootPorosity_pft        => plt_morph%RootPorosity_pft,        &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
     Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft,    &
-    SeedDepth_pft           => plt_morph%SeedDepth_pft,           &
+    SeedDepth_pft           => plt_morph%SeedDepth_pft,           & !in: seeding depth
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
-!     RootDepZ,Root1stDepz_pft=primary root depth
 !     FracSoiLayByPrimRoot_pvr=fraction of each soil layer with primary root
 !     DLYR=layer thickness
-!     CumSoilThickness_vr=depth from soil surface to layer bottom
-!     SeedDepth_pft=seeding depth
-!     HypoctoHeight_pft=hypocotyledon height
 !     FracPRoot4Uptake_pvr=PFT fraction of biome root mass
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     FineRootRadius_rvr=root radius
@@ -480,13 +477,15 @@ module UptakesMod
         D2005: DO NR=1,NumRootAxes_pft(NZ)
           RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
         ENDDO D2005
+
         IF(L.EQ.NU)THEN
           FracSoiLayByPrimRoot_pvr(L,NZ)=1.0_r8
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
-            RTDPX=AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
-            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
-            FracSoiLayByPrimRoot_pvr(L,NZ)=RTDPX/DLYR3(L)
+            RTDPX                          = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
+            RTDPX                          = AZMAX1(AMIN1(DLYR3(L),RTDPX)-&
+              AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
+            FracSoiLayByPrimRoot_pvr(L,NZ) = RTDPX/DLYR3(L)
           ELSE
             FracSoiLayByPrimRoot_pvr(L,NZ)=0.0_r8
           ENDIF
@@ -499,7 +498,6 @@ module UptakesMod
         FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
       ENDIF
       MinFracPRoot4Uptake_pvr(N,L,NZ)=AMIN1(FMN,AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ)))
-!      MinFracPRoot4Uptake_pvr(N,L,NZ)=FMN*FracPRoot4Uptake_pvr(N,L,NZ)
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoiLayByPrimRoot_pvr(L,NZ).GT.ZERO)THEN
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
@@ -508,7 +506,7 @@ module UptakesMod
         RootAreaDivRadius_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracSoiLayByPrimRoot_pvr(L,NZ)
       ELSE
         FineRootRadius_rvr(N,L)   = Root2ndMaxRadius_pft(N,NZ)
-        PathLen_pvr(N,L)                 = 1.001_r8*FineRootRadius_rvr(N,L)
+        PathLen_pvr(N,L)          = 1.001_r8*FineRootRadius_rvr(N,L)
         RootAreaDivRadius_vr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
       ENDIF
     enddo

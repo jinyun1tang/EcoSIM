@@ -353,6 +353,7 @@ module CanopyCondsMod
       SineGrndSlope_col*CoSineSunInclAngle_col*DGAZI))
 
     !where there is canopy
+
     IF(LeafStalkArea_col.GT.0.0_r8)THEN
 
       call MultiLayerSurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft,&
@@ -532,10 +533,10 @@ module CanopyCondsMod
   !     perpendicular to incoming radiation
   !
   D1050: DO NZ=1,NP
-    RadSWbyLeafSurf_pft(NZ)  =RadSWDirect_col*LeafSWabsorpty_pft(NZ)
-    RadSWbyStalkSurf_pft(NZ) =RadSWDirect_col*StalkSWAbsorpty
-    RadPARbyLeafSurf_pft(NZ) =RadPARDirect_col*LeafPARabsorpty_pft(NZ)
-    RadPARbyStalkSurf_pft(NZ)=RadPARDirect_col*StalkPARAbsorpty
+    RadSWbyLeafSurf_pft(NZ)   = RadSWDirect_col*LeafSWabsorpty_pft(NZ)
+    RadSWbyStalkSurf_pft(NZ)  = RadSWDirect_col*StalkSWAbsorpty
+    RadPARbyLeafSurf_pft(NZ)  = RadPARDirect_col*LeafPARabsorpty_pft(NZ)
+    RadPARbyStalkSurf_pft(NZ) = RadPARDirect_col*StalkPARAbsorpty
   ENDDO D1050
   !
   !     ANGLES BETWEEN SUN OR SKY ZONES AND FOLIAR SURFACES
@@ -585,8 +586,8 @@ module CanopyCondsMod
         RadPARDirLeafSurf_zsec(N,M,NZ)  = RadPARbyLeafSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirStalkSurf_zsec(N,M,NZ) = RadPARbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
         DO L=1,NumOfCanopyLayers1
-          RadDifPAR_zsec(N,M,L,NZ)=0.0_r8
-          RadPAR_zsec(N,M,L,NZ)=RadPARDirLeafSurf_zsec(N,M,NZ)
+          RadDifPAR_zsec(N,M,L,NZ) = 0.0_r8
+          RadPAR_zsec(N,M,L,NZ)    = RadPARDirLeafSurf_zsec(N,M,NZ)
         enddo
       enddo
     enddo
@@ -612,6 +613,7 @@ module CanopyCondsMod
       !     NZ IN EACH LAYER L
       !
   D1800: DO L=NumOfCanopyLayers1,1,-1
+
     IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
       RadSWDiffusL           = RadSWDiffusL *TAU_DiffRadTransm(L+1)+RadSWFwdScat2NextL(L+1)
       RadPARDiffusL          = RadPARDiffusL*TAU_DiffRadTransm(L+1)+RadPARFwdScat2NextL(L+1)
@@ -765,8 +767,8 @@ module CanopyCondsMod
         ELSE
           XTAUS=0.0_r8
         ENDIF
-        TAU_DirRadTransm(L+1)=TAU_DirRadTransm(L+1)*XTAUS
-        FracDirRadAbsorbt=FracDirRadAbsorbt*XTAUS
+        TAU_DirRadTransm(L+1)= TAU_DirRadTransm(L+1)*XTAUS
+        FracDirRadAbsorbt    = FracDirRadAbsorbt*XTAUS
         D1510: DO NZ=1,NP
           RadDirSWbyLeaf_pft(NZ)   = RadDirSWbyLeaf_pft(NZ)*XTAUS
           RadDirSWbyStalk_pft(NZ)  = RadDirSWbyStalk_pft(NZ)*XTAUS
@@ -811,8 +813,8 @@ module CanopyCondsMod
           fwdScatRadDifPARbyStalk_pft(NZ) = fwdScatRadDifPARbyStalk_pft(NZ)*XTAUY
           D1730: DO N=1,NumOfLeafZenithSectors1
             DO  M=1,NumOfSkyAzimuthSects1
-              RadDifPAR_zsec(N,M,L,NZ)=RadDifPAR_zsec(N,M,L,NZ)*XTAUY
-              RadPAR_zsec(N,M,L,NZ)=RadPARDirLeafSurf_zsec(N,M,NZ)+RadDifPAR_zsec(N,M,L,NZ)
+              RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ)*XTAUY
+              RadPAR_zsec(N,M,L,NZ)    = RadPARDirLeafSurf_zsec(N,M,NZ)+RadDifPAR_zsec(N,M,L,NZ)
             enddo
           ENDDO D1730
         ENDDO D1520

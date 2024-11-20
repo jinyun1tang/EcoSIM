@@ -1273,31 +1273,6 @@ contains
   integer, intent(in) :: N1,N2
   integer, intent(in) :: N4,N5    !forward dest grid
   integer, intent(in) :: N4B,N5B  !backward dest grid  
-  integer :: NN
-  real(r8) :: cumwat0
-
-  cumwat0=cumWatFlx2LitRByRunoff_col(N2,N1)
-!  D1202: DO NN=1,2
-!    cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)+WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-!    cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)+HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-!    IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-!      !there is runoff
-!      cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-!      cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-!    ENDIF
-
-!    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.1)THEN
-!      cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-!      cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-!    ENDIF
-
-!    IF(M.EQ.NPH)THEN
-!      IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
-!      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-!        IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
-!      ENDIF
-!    ENDIF
-!  ENDDO D1202
 
   cumDrySnoFlxByRedistribut(N2,N1)=cumDrySnoFlxByRedistribut(N2,N1)+DrySnoFlxBySnowRedistribut(N,N2,N1) &
     -DrySnoFlxBySnowRedistribut(N,N5,N4)
@@ -1700,11 +1675,11 @@ contains
       AvgVaporCondctSoilLitR=2.0_r8*VapCond2/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))
     ENDIF
 
-    THETRR = AZMAX1(1.0_r8-FracSoiPAsAir_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
+    THETRR = AZMAX1(1.0_r8-FracSoilPoreAsAir_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
     TCNDR  = (0.779_r8*THETRR*9.050E-04_r8+0.622_r8*FracSoiPAsWat_vr(0,NY,NX) &
-      *2.067E-03_r8+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+FracSoiPAsAir_vr(0,NY,NX) &
+      *2.067E-03_r8+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+FracSoilPoreAsAir_vr(0,NY,NX) &
       *9.050E-05_r8)/(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX) &
-      +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+FracSoiPAsAir_vr(0,NY,NX))
+      +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+FracSoilPoreAsAir_vr(0,NY,NX))
 
     IF(TCND1W.GT.ZERO.AND.TCNDR.GT.ZERO)THEN
       AvgThermCondctSnoLitR=2.0_r8*TCND1W*TCNDR/(TCND1W*DLYRR_COL(NY,NX)+TCNDR*SnowThickL0_snvr(L,NY,NX))
@@ -1811,10 +1786,10 @@ contains
   WTHET2=1.467_r8-0.467_r8*FracSoilAsAirt(NUM(NY,NX),NY,NX)
   TCNDS=(NumerSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
     *2.067E-03_r8+0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
-    +WTHET2*FracSoiPAsAir_vr(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
+    +WTHET2*FracSoilPoreAsAir_vr(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
     /(DenomSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
     +0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX) &
-    +WTHET2*FracSoiPAsAir_vr(NUM(NY,NX),NY,NX))
+    +WTHET2*FracSoilPoreAsAir_vr(NUM(NY,NX),NY,NX))
 
   !the mean thermal conductivity
   IF(FracSurfBareSoil_col(NY,NX).GT.ZERO)THEN

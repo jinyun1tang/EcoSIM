@@ -87,7 +87,7 @@ implicit none
   real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !gas bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !<0., active gas bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_col(:,:,:)
   real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production

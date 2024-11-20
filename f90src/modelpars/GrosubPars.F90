@@ -102,7 +102,7 @@ module GrosubPars
 
   integer :: HoursReq4LiterfalAftMature    !required hours after physl maturity until start of LitrFall [h]
   REAL(R8) :: FRSV(0:3),FXFY(0:1),FXFZ(0:1)
-  real(r8) :: RateConst4ShootSeaStoreNonstXfer(0:3),RateConst4RootSeaStoreNonstXfer(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
+  real(r8) :: RateConst4ShootSeaStoreNonstXfer(0:3),RateConst4RootSeaStorNonstXfer(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
   REAL(R8) :: RCCX(0:3),RCCQ(0:3)
   REAL(R8) :: RCCZ(0:3),RCCY(0:3)
   real(r8) :: Hours4SenesAftMature(0:3)
@@ -279,7 +279,7 @@ module GrosubPars
   RTSK=real((/0.25,1.0,4.0,4.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   RateConst4ShootSeaStoreNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
-  RateConst4RootSeaStoreNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  RateConst4RootSeaStorNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)

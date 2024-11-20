@@ -160,9 +160,9 @@ module NutUptakeMod
 
   call ZeroUptake(NZ)
 
-  PopPlantO2Uptake=0._r8
-  PopPlantO2Demand=0._r8
-  D955: DO N=1,MY(NZ)
+  PopPlantO2Uptake = 0._r8
+  PopPlantO2Demand = 0._r8
+  D955: DO N            = 1, MY(NZ)
     D950: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. THETW_vr(L).GT.ZERO)THEN
@@ -185,8 +185,8 @@ module NutUptakeMod
         call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
           RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
 
-        PopPlantO2Demand=PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
-        PopPlantO2Uptake=PopPlantO2Uptake+PopPlantO2Uptake_vr
+        PopPlantO2Demand = PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
+        PopPlantO2Uptake = PopPlantO2Uptake+PopPlantO2Uptake_vr
 !        if(I>176)print*,'rootexud'
         call RootExudates(I,J,N,L,NZ)
 !
@@ -1246,8 +1246,6 @@ module NutUptakeMod
   !
   IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
     FOXYX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
-!    dss=dssign(RootO2Dmnd4Resp_pvr(N,L,NZ))
-!    FOXYX=AMAX1(FMN,RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF

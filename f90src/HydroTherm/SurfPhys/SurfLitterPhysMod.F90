@@ -23,8 +23,11 @@ module SurfLitterPhysMod
   USE ClimForcDataType
   use SnowPhysData
 implicit none
+  private
   character(len=*), parameter, private :: mod_filename=&
   __FILE__
+  real(r8), parameter :: tiny_wat=1.e-13_r8
+
   public :: SurfLitREnergyBalance
   public :: UpdateLitRPhys
   public :: LateralGridsHdryoExch
@@ -78,9 +81,6 @@ implicit none
   HeatSensAir2LitR        = 0.0_r8
   HeatFluxAir2LitR        = 0.0_r8
 
-  cumWatFlx2LitRByRunoff_col(NY,NX)      = 0.0_r8
-  cumHeatFlx2LitRByRunoff_col(NY,NX)     = 0.0_r8
-
   EvapLitR2Soi1        = 0.0_r8
   HeatSensVapLitR2Soi1 = 0.0_r8
   HeatSensLitR2Soi1    = 0.0_r8
@@ -88,7 +88,6 @@ implicit none
 
   IF(VHeatCapacity1_vr(0,NY,NX).LE.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoil1_vr(0,NY,NX)=TKSoil1_vr(NUM(NY,NX),NY,NX)
-    RETURN
   ENDIF  
 !
 ! NET RADIATION AT RESIDUE SURFACE
@@ -180,9 +179,9 @@ implicit none
 
   !THETRR=litter in relative volume
   !FracSoilAsAirt=relative volume as air  
-  THETRR           = AZMAX1(1.0_r8-FracSoiPAsAir_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
+  THETRR           = AZMAX1(1.0_r8-FracSoilPoreAsAir_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
   HeatDiffusByWat0 = AZMAX1(FracSoiPAsWat_vr(0,NY,NX)-TRBW)**3._r8
-  HeatDiffusByAir0 = AZMAX1(FracSoiPAsAir_vr(0,NY,NX)-TRBA)**3._r8
+  HeatDiffusByAir0 = AZMAX1(FracSoilPoreAsAir_vr(0,NY,NX)-TRBA)**3._r8
   RYLXW0           = DTKX*HeatDiffusByWat0
   RYLXA0           = DTKX*HeatDiffusByAir0
   RYLNW0           = AMIN1(1.0E+04_r8,RYLXW*RYLXW0)
@@ -193,8 +192,8 @@ implicit none
   TCNDA0           = 9.050E-05_r8*XNUSA0
   WTHET0           = 1.467_r8-0.467_r8*FracSoilAsAirt(0,NY,NX)
   TCNDR            = (0.779_r8*THETRR*9.050E-04_r8+0.622_r8*FracSoiPAsWat_vr(0,NY,NX)*TCNDW0 &
-    +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+WTHET0*FracSoiPAsAir_vr(0,NY,NX)*TCNDA0) &
-    /(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX)+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+WTHET0*FracSoiPAsAir_vr(0,NY,NX))
+    +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+WTHET0*FracSoilPoreAsAir_vr(0,NY,NX)*TCNDA0) &
+    /(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX)+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+WTHET0*FracSoilPoreAsAir_vr(0,NY,NX))
   end subroutine CalcLitRThermConductivity
 
 !------------------------------------------------------------------------------------------
@@ -449,11 +448,7 @@ implicit none
     tk1pre             = TKR1
     TKR1               = (ENGYR+HeatFluxAir2LitR2+PrecHeat2LitR2-tHeatLitR2Soil2)/VLHeatCapcityLitR2
     TKS1               = (ENGYS+tHeatLitR2Soil2+dLWSoil)/VLHeatCapacity2
-!    if(I==178 .and. j>=1)then
-!    write(112,*)(I*100+J)*10000+M*100+NN,VLHeatCapcityLitR2,TKR1-273.15,TK1pre-273.15,TKS1-273.15,TKQ_col(NY,NX)-273.15,TairK_col(NY,NX)-273.15,&
-!      EVAPR2,-EvapLitR2Soi2,VWatLitr2,safe_adb(HeatFluxAir2LitR2+PrecHeat2LitR2-tHeatLitR2Soil2,dWLitR)/tk1pre,Radnet2LitR2
-!    if(j==17)call endrun(trim(mod_filename)//' at line',__LINE__)      
-!    endif
+
   ENDDO D5000
   end subroutine SurfLitterIteration
 
@@ -484,17 +479,14 @@ implicit none
   VHeatCapacityLitR  = cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX)
   VLWatMicPr         = VLWatMicP_vr(0,NY,NX)
   VLiceMicPr         = VLiceMicP_vr(0,NY,NX)
-!  if(VLWatMicP_vr(0,NY,NX)<0._r8 .or. VLiceMicP_vr(0,NY,NX)<0._r8 .or. VHeatCapacityLitR<0._r8)then
-!    write(*,*)'negative litr water',VLWatMicP_vr(0,NY,NX),VLiceMicP_vr(0,NY,NX),VHeatCapacityLitR,SoilOrgM_vr(ielmc,0,NY,NX) 
-!    call endrun(trim(mod_filename)//' at line',__LINE__)    
-!  endif
+
   !TairK: air temperature in kelvin, HeatByLitrMassChange represents increase heat in litr
   dVHeatCapacityLitr   = VHeatCapacityLitR-VHeatCapacityLitrX
   HeatByLitrMassChange = dVHeatCapacityLitr*TairK_col(NY,NX)
   ENGYZ                = VHeatCapacityLitrX*TKS_vr(0,NY,NX)
 
   !update water, ice content and heat capacity of residue
-  VLWatMicP_vr(0,NY,NX)     = AZMAX1(VLWatMicP_vr(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+WatInByRunoff)
+  VLWatMicP_vr(0,NY,NX)     = AZMAX1(VLWatMicP_vr(0,NY,NX)+WatFLo2LitR_col(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+WatInByRunoff)
   VLiceMicP_vr(0,NY,NX)     = AZMAX1(VLiceMicP_vr(0,NY,NX)-TLitrIceFlxThaw_col(NY,NX)/DENSICE)
   VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
 
@@ -508,8 +500,8 @@ implicit none
     HeatStore_lnd        = HeatStore_lnd+HS
     if(TKS_vr(0,NY,NX)<100._r8 .or. TKS_vr(0,NY,NX)>360._r8)then
       write(*,*)I,J,NY,NX,TKS_vr(0,NY,NX),tkspre
-      write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2Litr(NY,NX),WatInByRunoff
-      write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2Litr(NY,NX),TLitrIceFlxThaw_col(NY,NX),WatInByRunoff
+      write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2LitR_col(NY,NX),WatInByRunoff
+      write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2LitR_col(NY,NX),TLitrIceFlxThaw_col(NY,NX),WatInByRunoff
       write(*,*)'ice',VLiceMicPr,VLiceMicP_vr(0,NY,NX)
       write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez_col(NY,NX),HeatByLitrMassChange, &
         HEATIN_lndByRunoff,VHeatCapacity_vr(0,NY,NX)        
@@ -541,7 +533,7 @@ implicit none
   integer, intent(in) :: M,NY,NX,I,J
   real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
   real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
-  real(r8) :: VLWatMicP10,VLiceMicP10
+  real(r8) :: VLWatMicP10,VLiceMicP10,VLWatLitR,VLicelitR
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
   ! XVOLT,XVOLW=free water+ice,water in litter layer
@@ -558,14 +550,25 @@ implicit none
   ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff_col=litter total cond+conv,latent,runoff heat flux
   VLWatMicP10                   = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP10                   = VLiceMicP1_vr(0,NY,NX)
-!  if(I==159 .and. j>=1)then
-!  write(112,*)I,J,M,'updatel',VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)+LitrIceFlxThaw_col(NY,NX),WatFLow2LitR_col(NY,NX),LitrIceFlxThaw_col(NY,NX)
-!  endif
-  VLWatMicP1_vr(0,NY,NX)        = AZMAX1(VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)+LitrIceFlxThaw_col(NY,NX))
-  VLiceMicP1_vr(0,NY,NX)        = AZMAX1(VLiceMicP1_vr(0,NY,NX)-LitrIceFlxThaw_col(NY,NX)/DENSICE)
-  VLairMicP1_vr(0,NY,NX)        = AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
+
+  VLWatMicP1_vr(0,NY,NX)        = (VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)+LitrIceFlxThaw_col(NY,NX))
+  VLiceMicP1_vr(0,NY,NX)        = (VLiceMicP1_vr(0,NY,NX)-LitrIceFlxThaw_col(NY,NX)/DENSICE)
+
+
+  VLairMicP1_vr(0,NY,NX)        = AZMAX1(VLPoreLitR_col(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
+  
   VLWatMicPM_vr(M+1,0,NY,NX)    = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM(M+1,0,NY,NX)       = VLairMicP1_vr(0,NY,NX)
+
+  VLWatLitR  = VLWatMicP_vr(0,NY,NX)+WatFLo2LitR_col(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+TXGridSurfRunoff_2DH(NY,NX)
+  VLicelitR  = VLiceMicP_vr(0,NY,NX)-TLitrIceFlxThaw_col(NY,NX)/DENSICE
+
+  if(abs(AZMAX1(VLWatLitR)-VLWatMicP1_vr(0,NY,NX))>tiny_wat)then
+    if(VLWatLitR<0._r8)then
+      call endrun(trim(mod_filename)//'at line',__LINE__)
+    endif
+  endif
+
   TVWatIceLitR                  = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
   XVLMobileWaterLitR_col(NY,NX) = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
@@ -583,14 +586,14 @@ implicit none
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
-    FracSoiPAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
+    FracSoilPoreAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
       *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
-    FracSoiPAsAir_vr(0,NY,NX)=1.0_r8
+    FracSoilPoreAsAir_vr(0,NY,NX)=1.0_r8
   ENDIF
-  THETPM(M+1,0,NY,NX)        = FracSoiPAsAir_vr(0,NY,NX)
+  THETPM(M+1,0,NY,NX)        = FracSoilPoreAsAir_vr(0,NY,NX)
   VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
   TK0Prev                    = TKSoil1_vr(0,NY,NX)                                 !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
@@ -617,12 +620,9 @@ implicit none
   ELSE
     TKSoil1_vr(0,NY,NX)=TKSoil1_vr(NUM(NY,NX),NY,NX)
   ENDIF
-!  if(NY==1 .AND. NX==1)write(191,*)'M  UpdateLitRB4RunoffM',M,VLWatMicP_vr(0,NY,NX),VLWatMicP10,VLWatMicP1_vr(0,NY,NX),&
-!    watflw(NY,NX),waticefl(NY,NX)
 
-  watflw(NY, NX)=watflw(NY,NX)+WatFLow2LitR_col(NY,NX)
-  waticefl(NY,NX)=waticefl(NY,NX)+LitrIceFlxThaw_col(NY,NX)
-!  if(NY==1 .AND. NX==1)write(*,*)'afM  UpdateLitRB4RunoffM',M,watflw(NY,NX),waticefl(NY,NX),VLWatMicP10,WatFLow2LitR_col(NY,NX)
+!  watflw(NY, NX)  = watflw(NY,NX)+WatFLow2LitR_col(NY,NX)
+!  waticefl(NY,NX) = waticefl(NY,NX)+LitrIceFlxThaw_col(NY,NX)
 
   end subroutine UpdateLitRB4RunoffM
 
@@ -633,8 +633,9 @@ implicit none
   real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
   real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
   real(r8) :: VLWatMicP10,VLiceMicP10
-  real(r8) :: VLWatLitR
+  real(r8) :: VLWatLitR,VLicelitR
   integer :: K
+
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
   ! XVOLT,XVOLW=free water+ice,water in litter layer
@@ -653,9 +654,21 @@ implicit none
   VLiceMicP10 = VLiceMicP1_vr(0,NY,NX)
 
   VLWatMicP1_vr(0,NY,NX)        = AZMAX1(VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff_col(NY,NX))
-  VLairMicP1_vr(0,NY,NX)        = AZMAX1(VLPoreLitR(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
+  VLairMicP1_vr(0,NY,NX)        = AZMAX1(VLPoreLitR_col(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
   VLWatMicPM_vr(M+1,0,NY,NX)    = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM(M+1,0,NY,NX)       = VLairMicP1_vr(0,NY,NX)
+
+  VLWatLitR  = VLWatMicP_vr(0,NY,NX)+WatFLo2LitR_col(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+TXGridSurfRunoff_2DH(NY,NX)
+  VLicelitR  = VLiceMicP_vr(0,NY,NX)-TLitrIceFlxThaw_col(NY,NX)/DENSICE
+
+  if(I>=120)then
+    write(211,*)(I*1000+J)*10+M,'b',VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX)-VLWatLitR,VLiceMicP1_vr(0,NY,NX)-VLicelitR  
+  endif
+  if(abs(AZMAX1(VLWatLitR)-VLWatMicP1_vr(0,NY,NX))>tiny_wat)then
+    write(*,*)(I*1000+J)*10+M,'b',VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX)-VLWatLitR,VLiceMicP1_vr(0,NY,NX)-VLicelitR
+    call endrun('litter water inconsisntecy in  '//trim(mod_filename),__LINE__)
+  endif
+
   TVWatIceLitR                  = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
   XVLMobileWaterLitR_col(NY,NX) = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
@@ -674,14 +687,14 @@ implicit none
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX) = AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     FracSoiPAsIce_vr(0,NY,NX) = AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
-    FracSoiPAsAir_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
+    FracSoilPoreAsAir_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
       *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX) = 0.0_r8
     FracSoiPAsIce_vr(0,NY,NX) = 0.0_r8
-    FracSoiPAsAir_vr(0,NY,NX) = 1.0_r8
+    FracSoilPoreAsAir_vr(0,NY,NX) = 1.0_r8
   ENDIF
-  THETPM(M+1,0,NY,NX)        = FracSoiPAsAir_vr(0,NY,NX)
+  THETPM(M+1,0,NY,NX)        = FracSoilPoreAsAir_vr(0,NY,NX)
   VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
   TK0Prev                    = TKSoil1_vr(0,NY,NX)                                 !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
@@ -704,26 +717,15 @@ implicit none
     TKSoil1_vr(0,NY,NX)=TKSoil1_vr(NUM(NY,NX),NY,NX)
   ENDIF
 
-  VLWatLitR  = VLWatMicP_vr(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+TXGridSurfRunoff_2DH(NY,NX)
-
-  if(M.EQ.NPH)then
-    if(.not.isclose(VLWatLitR,VLWatMicP1_vr(0,NY,NX)))then      
-      write(*,*)'lateral',NY,NX,VLWatLitR,VLWatMicP1_vr(0,NY,NX),VLWatLitR-VLWatMicP1_vr(0,NY,NX),isclose(VLWatLitR,VLWatMicP1_vr(0,NY,NX))
-      call endrun("Negative temperature in "//trim(mod_filename),__LINE__)    
-    endif
-  endif
-  if(NX==1)then
-    write(111,*)'rof',M,VLWatLitR,VLWatMicP1_vr(0,NY,NX),TXGridSurfRunoff_2DH(NY,NX),cumWatFlx2LitRByRunoff_col(NY,NX)
-  endif  
-
-  end subroutine UpdateLitRAftRunoff  
+  end subroutine UpdateLitRAftRunoff
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LateralGridsHdryoExch(M,NY,NX,NHE,NHW,NVS,NVN)
+  subroutine LateralGridsHdryoExch(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
   !
   !between grid horizontal water flow
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
   integer :: N1,N2   !source grid, with which the lateral exchange is computed 
   integer :: N,NN,N4,N5,N4B,N5B
@@ -736,15 +738,9 @@ implicit none
 !     begin_execution
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-  if(M==1)then
-  write(112,*)'NY,NX=',NY,NX
-  write(112,*)M,'xo',N,NN,N2,N1,XGridSurfRunoff_2DH(1,1,1,1),WatFlx2LitRByRunoff_2DH(1,1,1,1)
-  endif
 
-  TXGridSurfRunoff_2DH(NY,NX)       = 0.0_r8
-  THeatXGridBySurfRunoff_2DH(NY,NX) = 0.0_r8
   N1=NX;N2=NY
-  if(M==1)write(112,*)'lateral',NY,NX
+
   DO  N=1,2
     DO  NN=1,2
       IF(N.EQ.iEastWestDirection)THEN
@@ -796,21 +792,24 @@ implicit none
           ALT2=Altitude_grid(N5,N4)+XVLMobileWaterLitR_col(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
           IF(ALT1.GT.ALT2)THEN
             !out flow from source grid into dest grid, AZMAX1 ensures upstream flow,
-            QRQ1=0.5_r8*AZMAX1((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &              
+            QRQ1=AZMAX1((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5,N4),N5,N4) &  
+              -XVLMobileWaterLitR_col(N5,N4)*AREA(3,NUM(N2,N1),N2,N1) &
+              +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &            
               /(AREA(3,NUM(N2,N1),N2,N1)+AREA(3,NU(N5,N4),N5,N4))
 
             !assign flux to target
             WatFlx2LitRByRunoff_2DH(N,2,N5,N4)   = AMIN1(QRQ1,WatFlux4ErosionM_2DH(M,N2,N1))*FSLOPE(N,N2,N1)
-            HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)      = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
+            HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)  = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
             XGridSurfRunoff_2DH(N,2,N5,N4)       = XGridSurfRunoff_2DH(N,2,N5,N4)+WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
             HeatXGridBySurfRunoff_2DH(N,2,N5,N4) = HeatXGridBySurfRunoff_2DH(N,2,N5,N4)+HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)
             QflxSurfRunoffM_2DH(M,N,2,N5,N4)     = WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
             IFLBM(M,N,2,N5,N4)                   = 0
+
           ELSE
-            WatFlx2LitRByRunoff_2DH(N,2,N5,N4) = 0.0_r8
-            HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)    = 0.0_r8
-            QflxSurfRunoffM_2DH(M,N,2,N5,N4)   = 0.0_r8
-            IFLBM(M,N,2,N5,N4)                 = 0
+            WatFlx2LitRByRunoff_2DH(N,2,N5,N4)  = 0.0_r8
+            HeatFlx2LitRByRunoff_2DH(N,2,N5,N4) = 0.0_r8
+            QflxSurfRunoffM_2DH(M,N,2,N5,N4)    = 0.0_r8
+            IFLBM(M,N,2,N5,N4)                  = 0
           ENDIF
         ENDIF
 !
@@ -822,37 +821,37 @@ implicit none
             ALTB = Altitude_grid(N5B,N4B)+XVLMobileWaterLitR_col(N5B,N4B)/AREA(3,NU(N5,N4B),N5B,N4B)
             
             IF(ALT1.GT.ALTB)THEN
-              QRQ1 = 0.5_r8*AZMAX1((ALT1-ALTB)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B)) &
+              QRQ1 = AZMAX1((ALT1-ALTB)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B) &
+                -XVLMobileWaterLitR_col(N5B,N4B)*AREA(3,NUM(N2,N1),N2,N1) &
+                +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B)) &
                 /(AREA(3,NUM(N2,N1),N2,N1)+AREA(3,NU(N5B,N4B),N5B,N4B))
               !assign flux to target
               WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)   = AMIN1(QRQ1,WatFlux4ErosionM_2DH(M,N2,N1))*FSLOPE(N,N2,N1)
-              HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)      = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
+              HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
               XGridSurfRunoff_2DH(N,1,N5B,N4B)       = XGridSurfRunoff_2DH(N,1,N5B,N4B)+WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
               HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B)+HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
               QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)     = WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
               IFLBM(M,N,1,N5B,N4B)                   = 1
-              if(M==1)then
-                write(112,*)'xxxx',N,N5B,N4B,XGridSurfRunoff_2DH(N,1,N5B,N4B),WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
-              endif
+
             ELSE
-              WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
-              HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)    = 0.0_r8
-              QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)   = 0.0_r8
-              IFLBM(M,N,1,N5B,N4B)                 = 1
+              WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = 0.0_r8
+              HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
+              QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)    = 0.0_r8
+              IFLBM(M,N,1,N5B,N4B)                  = 1
             ENDIF
           ENDIF
         ENDIF
       ELSE
         !there is no runoff
-        WatFlx2LitRByRunoff_2DH(N,2,N5,N4) = 0.0_r8
-        HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)    = 0.0_r8
-        QflxSurfRunoffM_2DH(M,N,2,N5,N4)   = 0.0_r8
-        IFLBM(M,N,2,N5,N4)                 = 0
+        WatFlx2LitRByRunoff_2DH(N,2,N5,N4)  = 0.0_r8
+        HeatFlx2LitRByRunoff_2DH(N,2,N5,N4) = 0.0_r8
+        QflxSurfRunoffM_2DH(M,N,2,N5,N4)    = 0.0_r8
+        IFLBM(M,N,2,N5,N4)                  = 0
         IF(N4B.GT.0 .AND. N5B.GT.0)THEN
-          WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
-          HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)    = 0.0_r8
-          QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)   = 0.0_r8
-          IFLBM(M,N,1,N5B,N4B)                 = 0
+          WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = 0.0_r8
+          HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
+          QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)    = 0.0_r8
+          IFLBM(M,N,1,N5B,N4B)                  = 0
         ENDIF
       ENDIF
       IF(M.EQ.NPH)THEN
@@ -865,76 +864,8 @@ implicit none
     ENDDO  
   ENDDO
 
-  DO  N=1,2
-    DO  NN=1,2
-      IF(N.EQ.iEastWestDirection)THEN
-        !east-west
-        IF((NX.EQ.NHE .AND. NN.EQ.1) .OR. (NX.EQ.NHW .AND. NN.EQ.2))THEN
-          !at the boundary
-          cycle
-        ELSE
-          N4  = NX+1   !right/east
-          N5  = NY
-          N4B = NX-1   !left/west
-          N5B = NY
-        ENDIF
-      ELSEIF(N.EQ.iNorthSouthDirection)THEN
-        !south-north
-        IF((NY.EQ.NVS .AND. NN.EQ.1) .OR. (NY.EQ.NVN .AND. NN.EQ.2))THEN
-          !at the boundary
-          cycle
-        ELSE
-          N4  = NX
-          N5  = NY+1  !upper/north
-          N4B = NX
-          N5B = NY-1  !lower/south
-        ENDIF
-      ENDIF
-
-      cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)+WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-      cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)+HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-      
-      IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-        !there is outflow in east or south
-        cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-        cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-      ENDIF
-
-      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.1)THEN
-        !there is outflow in west and north
-        cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-        cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-      ENDIF
-
-      TXGridSurfRunoff_2DH(N2,N1)       = TXGridSurfRunoff_2DH(N2,N1)+XGridSurfRunoff_2DH(N,NN,N2,N1)
-      THeatXGridBySurfRunoff_2DH(N2,N1) = THeatXGridBySurfRunoff_2DH(N2,N1)+HeatXGridBySurfRunoff_2DH(N,NN,N2,N1)
-      if(M==1)then
-      write(112,*)M,'o',N,NN,N2,N1,XGridSurfRunoff_2DH(N,NN,N2,N1),WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-      endif
-      IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-        !there is lateral runoff
-        !water flux
-        TXGridSurfRunoff_2DH(N2,N1)      = TXGridSurfRunoff_2DH(N2,N1)-XGridSurfRunoff_2DH(N,NN,N5,N4)
-        THeatXGridBySurfRunoff_2DH(N2,N1)= THeatXGridBySurfRunoff_2DH(N2,N1)-HeatXGridBySurfRunoff_2DH(N,NN,N5,N4)
-        if(M==1)then
-        write(112,*)M,'oo',XGridSurfRunoff_2DH(N,NN,N5,N4),WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-        endif
-      ENDIF
-
-      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.1)THEN
-          TXGridSurfRunoff_2DH(N2,N1)       = TXGridSurfRunoff_2DH(N2,N1)-XGridSurfRunoff_2DH(N,NN,N5B,N4B)
-          THeatXGridBySurfRunoff_2DH(N2,N1) = THeatXGridBySurfRunoff_2DH(N2,N1)-HeatXGridBySurfRunoff_2DH(N,NN,N5B,N4B)
-          if(M==1)then
-          write(112,*)M,'ooo',WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B),XGridSurfRunoff_2DH(N,NN,N5B,N4B)
-          endif
-      ENDIF
-    ENDDO
-  ENDDO
-
-  if(VLWatLitR<0._r8)then
-  call endrun("Negative temperature in "//trim(mod_filename),__LINE__)
-  endif
   
   end subroutine LateralGridsHdryoExch
+
 
 end module SurfLitterPhysMod

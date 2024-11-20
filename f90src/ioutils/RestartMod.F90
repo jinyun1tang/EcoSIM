@@ -6666,16 +6666,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RO2AquaXchangePrev_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RO2AquaSourcePrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net aqueous O2 flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaXchangePrev_vr,datrc_2d)       
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaSourcePrev_vr,datrc_2d)       
   else
-    !print*,'RO2AquaXchangePrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaXchangePrev_vr,datrc_2d)         
+    !print*,'RO2AquaSourcePrev_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2AquaSourcePrev_vr,datrc_2d)         
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RO2AquaXchangePrev_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='RO2AquaSourcePrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net aqueous O2 flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  

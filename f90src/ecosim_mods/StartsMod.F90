@@ -398,13 +398,13 @@ module StartsMod
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
     !
-    PSISE_vr(L,NY,NX)              = PSIPS
-    PSISoilAirEntry(L,NY,NX)       = -1.5E-03_r8
-    RO2GasXchangePrev_vr(L,NY,NX)  = 0.0_r8
-    RCO2GasFlxPrev_vr(L,NY,NX)     = 0.0_r8
-    RO2AquaXchangePrev_vr(L,NY,NX) = 0.0_r8
-    RCH4F(L,NY,NX)                 = 0.0_r8
-    RCH4PhysexchPrev_vr(L,NY,NX)   = 0.0_r8
+    PSISE_vr(L,NY,NX)             = PSIPS
+    PSISoilAirEntry(L,NY,NX)      = -1.5E-03_r8
+    RO2GasXchangePrev_vr(L,NY,NX) = 0.0_r8
+    RCO2GasFlxPrev_vr(L,NY,NX)    = 0.0_r8
+    RO2AquaSourcePrev_vr(L,NY,NX) = 0.0_r8
+    RCH4F(L,NY,NX)                = 0.0_r8
+    RCH4PhysexchPrev_vr(L,NY,NX)  = 0.0_r8
 
     IF(L.GT.0)THEN
       IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -882,11 +882,11 @@ module StartsMod
 !
     IF(L.EQ.0)THEN
       ! surface litter residue layer
-      TAREA=TAREA+AREA(3,L,NY,NX)
-      CumSoilThickness_vr(L,NY,NX)=0.0_r8
-      SoilOrgM_vr(ielmc,L,NY,NX)=SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
-      ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
-      VLitR0=0._r8
+      TAREA                        = TAREA+AREA(3,L,NY,NX)
+      CumSoilThickness_vr(L,NY,NX) = 0.0_r8
+      SoilOrgM_vr(ielmc,L,NY,NX)   = SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
+      ORGCX_vr(L,NY,NX)            = SoilOrgM_vr(ielmc,L,NY,NX)
+      VLitR0                       = 0._r8
       DO K=1,NumOfLitrCmplxs
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
       ENDDO
@@ -922,11 +922,11 @@ module StartsMod
       VGeomLayert0_vr(L,NY,NX)     = VGeomLayer_vr(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
-      VLSoilMicPMass_vr(L,NY,NX)=SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-      totRootLenDens_vr(L,NY,NX)=0.0_r8      
+      VLSoilMicPMass_vr(L,NY,NX) = SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+      totRootLenDens_vr(L,NY,NX) = 0.0_r8
     ENDIF
-    AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
-    AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
+    AREA(1,L,NY,NX) = DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
+    AREA(2,L,NY,NX) = DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
   ENDDO
   CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
   CumSoilDeptht0(NY,NX)         = CumDepz2LayerBot_vr(0,NY,NX)

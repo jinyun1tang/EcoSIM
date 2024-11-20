@@ -110,11 +110,11 @@ module WatsubMod
   D3320: DO M=1,NPH
 
     call FWDCopyTopLayerWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol)
-
+    
     if(lverb)write(*,*)'run surface energy balance model, uses ResistanceLitRLay, update top layer soil moisture'
     call RunSurfacePhysModel(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,KSatRedusByRainKinetEnergyS,&
       TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
-
+    
     if(lverb)write(*,*)'prepare update for the other soil layers'
     call CopySoilWatVolMit(I,J,M,NHW,NHE,NVN,NVS,TopLayWatVol)
 
@@ -133,8 +133,10 @@ module WatsubMod
     ENDDO  
 
     if(snowRedist_model)call AccumulateSnowRedisFlux(I,J,M,NHW,NHE,NVN,NVS)
-    
+
     call UpdateSoilMoistTemp(I,J,M,NHW,NHE,NVN,NVS)
+
+    call AggregateSurfRunoffFlux(I,J,M,NHW,NHE,NVN,NVS)
 
     IF(M.NE.NPH)THEN
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
@@ -276,13 +278,13 @@ module WatsubMod
           !fraction as ice
           FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLTSoiPore)
           !fraction as air
-          FracSoiPAsAir_vr(L,NY,NX)=AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
+          FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
         ELSE
           FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
           FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-          FracSoiPAsAir_vr(L,NY,NX)=0.0_r8
+          FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
         ENDIF
-        THETPM(1,L,NY,NX)=FracSoiPAsAir_vr(L,NY,NX)
+        THETPM(1,L,NY,NX)=FracSoilPoreAsAir_vr(L,NY,NX)
         IF(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           FracSoilAsAirt(L,NY,NX)=AZMAX1((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX)) &
             /(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)))
@@ -668,11 +670,11 @@ module WatsubMod
           D9575: DO NN=1,2
             IF(N.EQ.iEastWestDirection)THEN
               ! along the W-E direction
-              N4=NX+1
-              N5=NY
-              N4B=NX-1
-              N5B=NY
-              N6=L
+              N4  = NX+1
+              N5  = NY
+              N4B = NX-1
+              N5B = NY
+              N6  = L
               IF(NN.EQ.1)THEN
                 !eastern boundary
                 IF(NX.EQ.NHE)THEN                
@@ -708,11 +710,11 @@ module WatsubMod
               ENDIF
             ELSEIF(N.EQ.iNorthSouthDirection)THEN
               ! along the N-S direction
-              N4=NX
-              N5=NY+1
-              N4B=NX
-              N5B=NY-1
-              N6=L
+              N4  = NX
+              N5  = NY+1
+              N4B = NX
+              N5B = NY-1
+              N6  = L
               IF(NN.EQ.1)THEN
                 !south boundary
                 IF(NY.EQ.NVS)THEN
@@ -748,9 +750,9 @@ module WatsubMod
               ENDIF
             ELSEIF(N.EQ.iVerticalDirection)THEN
 ! in the vertical direction
-              N4=NX
-              N5=NY
-              N6=L+1
+              N4 = NX
+              N5 = NY
+              N6 = L+1
               IF(NN.EQ.1)THEN
                 !bottom
                 IF(L.EQ.NL(NY,NX))THEN
@@ -787,11 +789,10 @@ module WatsubMod
               !  NO runoff
               IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RechargSurf,0._r8) .OR. &
                 ABS(WatFlux4ErosionM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
-                WatFlx2LitRByRunoff_2DH(N,NN,M5,M4) = 0.0_r8
-                HeatFlx2LitRByRunoff_2DH(N,NN,M5,M4)    = 0.0_r8
+
                 !runoff
               ELSE
-                call SurfaceRunoff(M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
+                call SurfaceRunoff(I,J,M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
 !
         !     BOUNDARY SNOW FLUX
         !
@@ -807,11 +808,6 @@ module WatsubMod
                   HeatFlxBySnowRedistribut(N,M5,M4)    = 0.0_r8
                   DrySnoFlxBySnoRedistM_2DH(M,N,M5,M4) = DrySnoFlxBySnowRedistribut(N,M5,M4)
                 ENDIF
-              ENDIF
-            ELSE
-              IF(N.NE.iVerticalDirection)THEN
-                WatFlx2LitRByRunoff_2DH(N,NN,M5,M4)  = 0.0_r8
-                HeatFlx2LitRByRunoff_2DH(N,NN,M5,M4) = 0.0_r8
               ENDIF
             ENDIF
 !
@@ -838,10 +834,8 @@ module WatsubMod
 !
                 IF(IDWaterTable(N2,N1).EQ.0 .OR. N.EQ.iVerticalDirection)THEN              
                   !involve no water table or vertical direction
-                  THETA1 = AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),&
-                    safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
-                  THETAX = AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),&
-                    safe_adb(VLWatMicPX1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
+                  THETA1 = AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
+                  THETAX = AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicPX1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
                   K1     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-THETA1)/POROS_vr(N3,N2,N1))+1))
                   KL     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-THETAX)/POROS_vr(N3,N2,N1))+1))
 
@@ -856,7 +850,7 @@ module WatsubMod
                     *RechargSubSurf*RechargRateWTBL*dts_HeatWatTP
 
                   if(abs(WaterFlow2Micpt_3D(N,M6,M5,M4)).LT.tiny_wat)then
-                    WaterFlow2Micpt_3D(N,M6,M5,M4)=0._r8
+                    WaterFlow2Micpt_3D(N,M6,M5,M4) = 0._r8
                   endif
 
                   WaterFlow2MicptX_3D(N,M6,M5,M4) = WaterFlow2Micpt_3D(N,M6,M5,M4)
@@ -891,7 +885,7 @@ module WatsubMod
         !     SoilHeatSrcDepth,CDPTH=depth of thermal sink/source, lower boundary
         !     KoppenClimZone=Koppen climate zone
                 IF(N.EQ.iVerticalDirection .AND. KoppenClimZone_col(N2,N1).NE.-2)THEN
-                  HeatFlow2Soili_3D(N,M6,M5,M4)=HeatFlow2Soili_3D(N,M6,M5,M4)+(TKSoil1_vr(N3,N2,N1)-TKSD(N2,N1))* &
+                  HeatFlow2Soili_3D(N,M6,M5,M4) = HeatFlow2Soili_3D(N,M6,M5,M4)+(TKSoil1_vr(N3,N2,N1)-TKSD(N2,N1))* &
                     TCNDG/(SoilHeatSrcDepth(N2,N1)-CumDepz2LayerBot_vr(N3,N2,N1)) &
                     *AREA(N,N3,N2,N1)*dts_HeatWatTP
                 ENDIF
@@ -1055,7 +1049,7 @@ module WatsubMod
           VLTSoiPore                  = VLSoilMicP_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)
           FracSoiPAsWat_vr(L,NY,NX)   = AZMAX1t((VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX))/VLTSoiPore)
           FracSoiPAsIce_vr(L,NY,NX)   = AZMAX1t((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLTSoiPore)
-          FracSoiPAsAir_vr(L,NY,NX)   = AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
+          FracSoilPoreAsAir_vr(L,NY,NX)   = AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
           
           IF(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             FracSoilAsAirt(L,NY,NX)=AZMAX1((VLairMicP1_vr(L,NY,NX)+ &
@@ -1149,7 +1143,7 @@ module WatsubMod
           !change in soil air volume
           ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM(M,L,NY,NX)-VLsoiAirPM(M+1,L,NY,NX)
 
-          THETPM(M+1,L,NY,NX)         = FracSoiPAsAir_vr(L,NY,NX)
+          THETPM(M+1,L,NY,NX)         = FracSoilPoreAsAir_vr(L,NY,NX)
  !
         ELSE
           !layer L disappears

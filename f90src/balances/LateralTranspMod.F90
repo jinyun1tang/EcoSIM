@@ -250,11 +250,8 @@ implicit none
   !     QS,QW,QI=snow,water,ice transfer from watsub.f
   !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
   !
-
   D1202: DO NN=1,2
     !water flux
-!    TXGridSurfRunoff_2DH(N2,N1)       = TXGridSurfRunoff_2DH(N2,N1)+XGridSurfRunoff_2DH(N,NN,N2,N1)
-!    THeatXGridBySurfRunoff_2DH(N2,N1) = THeatXGridBySurfRunoff_2DH(N2,N1)+HeatXGridBySurfRunoff_2DH(N,NN,N2,N1)
     D8590: DO K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
         TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)+dom_2DFloXSurRunoff(idom,K,N,NN,N2,N1)
@@ -264,8 +261,6 @@ implicit none
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
       !water flux
-!      TXGridSurfRunoff_2DH(N2,N1)      = TXGridSurfRunoff_2DH(N2,N1)-XGridSurfRunoff_2DH(N,NN,N5,N4)
-!      THeatXGridBySurfRunoff_2DH(N2,N1)= THeatXGridBySurfRunoff_2DH(N2,N1)-HeatXGridBySurfRunoff_2DH(N,NN,N5,N4)
       D8591: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5,N4)
@@ -276,8 +271,7 @@ implicit none
 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       IF(IFLBH(N,NN,N5B,N4B).EQ.1)then
-!        TXGridSurfRunoff_2DH(N2,N1)       = TXGridSurfRunoff_2DH(N2,N1)-XGridSurfRunoff_2DH(N,NN,N5B,N4B)
-!        THeatXGridBySurfRunoff_2DH(N2,N1) = THeatXGridBySurfRunoff_2DH(N2,N1)-HeatXGridBySurfRunoff_2DH(N,NN,N5B,N4B)
+
         D8592: DO K=1,micpar%NumOfLitrCmplxs
           DO idom=idom_beg,idom_end
             TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5B,N4B)
@@ -285,10 +279,6 @@ implicit none
         ENDDO D8592
       ENDIF
 
-      !     WRITE(*,6631)'TQRB',I,J,N1,N2,N4B,N5B,N,NN
-      !    2,IFLBH(N,NN,N5B,N4B)
-      !    2,TXGridSurfRunoff_2DH(N2,N1),XGridSurfRunoff_2DH(N,NN,N5B,N4B)
-!6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
 

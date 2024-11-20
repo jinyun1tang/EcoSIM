@@ -29,7 +29,7 @@ module grosubsMod
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
 !     RateConst4ShootSeaStoreNonstXfer=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
-!     RateConst4RootSeaStoreNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
+!     RateConst4RootSeaStorNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
 !     FPART=parameter for allocating nonstructural C to shoot organs
 !     FXSH,FXRT=shoot-root partitioning of storage C during leafout
 !     FRSV=rate constant for remobiln of storage C,N,P during leafout (h-1)
@@ -86,6 +86,7 @@ module grosubsMod
     CanopyHeight_copy(NZ)            = CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)             = 0._r8
     plt_biom%RootMassElm_pvr(:,:,NZ) = 0._r8
+    plt_rbgc%canopy_growth_pft(NZ)   = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -251,7 +252,7 @@ module grosubsMod
 !     CO2ByFire_CumYr_pft,CH4ByFire_CumYr_pft=CO2,CH4 emission from disturbance
 !     LitrfalStrutElms_CumYr_pft= >0 to the environment (soil + surface)
 !   GrossResp_pft < 0 respired into atmosphere
-    NetPrimProduct_pft(NZ)=GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
+    NetPrimProduct_pft(NZ) = GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       !check for living plant
@@ -262,7 +263,7 @@ module grosubsMod
           -NetCumElmntFlx2Plant_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
       !add more fluxes
-      ElmBalanceCum_pft(ielmc,NZ)=ElmBalanceCum_pft(ielmc,NZ)-NetPrimProduct_pft(NZ) &
+      ElmBalanceCum_pft(ielmc,NZ) = ElmBalanceCum_pft(ielmc,NZ)-NetPrimProduct_pft(NZ) &
         -CO2ByFire_CumYr_pft(NZ)-CH4ByFire_CumYr_pft(NZ)
 !
 !     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LitrFall
@@ -755,7 +756,7 @@ module grosubsMod
     RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
   RootUptk_N_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ) + &
     RootMycoExudElms_pft(ielmn,NZ)
-  RootUptk_P_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
+  RootUptk_P_CumYr_pft(NZ)=RootUptk_P_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
     RootMycoExudElms_pft(ielmp,NZ)
 
   PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)

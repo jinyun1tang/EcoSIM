@@ -62,7 +62,7 @@ module BoundaryTranspMod
                   M4=NX+1
                   M5=NY
                   M6=L
-                  XN=-1.0
+                  XN=-1.0    !going out
                   RCHQF=RechargEastSurf(M2,M1)
                   RCHGFU=RechargEastSubSurf(M2,M1)
                   RCHGFT=RechargRateEastWTBL(M2,M1)
@@ -78,7 +78,7 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY
                   M6=L
-                  XN=1.0
+                  XN=1.0     !coming in
                   RCHQF=RechargWestSurf(M5,M4)
                   RCHGFU=RechargWestSubSurf(M5,M4)
                   RCHGFT=RechargRateWestWTBL(M5,M4)
@@ -102,7 +102,7 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY+1
                   M6=L
-                  XN=-1.0_r8
+                  XN=-1.0_r8    !going out
                   RCHQF=RechargSouthSurf(M2,M1)
                   RCHGFU=RechargSouthSubSurf(M2,M1)
                   RCHGFT=RechargRateSouthWTBL(M2,M1)
@@ -118,7 +118,7 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY
                   M6=L
-                  XN=1.0_r8
+                  XN=1.0_r8   !coming in
                   RCHQF=RechargNorthSurf(M5,M4)
                   RCHGFU=RechargNorthSubSurf(M5,M4)
                   RCHGFT=RechargRateNorthWTBL(M5,M4)
@@ -143,7 +143,7 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY
                   M6=L+1
-                  XN=-1.0_r8
+                  XN=-1.0_r8  !going out
                 ELSE
                   cycle
                 ENDIF
@@ -205,8 +205,8 @@ module BoundaryTranspMod
     DO  K=1,jcplx
       dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
     ENDDO
-    trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
-    trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+    trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)          = 0.0_r8
+    trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4) = 0.0_r8
   ELSE
 !
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
@@ -256,13 +256,13 @@ module BoundaryTranspMod
         dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
 
-      trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCOU
-      trcg_2DFloXSurRunoffM(idg_CH4,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCHU
-      trcg_2DFloXSurRunoffM(idg_O2,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*COXU
-      trcg_2DFloXSurRunoffM(idg_N2,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CNNU
-      trcg_2DFloXSurRunoffM(idg_N2O,N,NN,M5,M4)=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CN2U
-      trcg_2DFloXSurRunoffM(idg_H2,N,NN,M5,M4)=0.0_r8
-      trcg_2DFloXSurRunoffM(idg_NH3,N,NN,M5,M4)=0.0_r8
+      trcg_2DFloXSurRunoffM(idg_CO2,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCOU
+      trcg_2DFloXSurRunoffM(idg_CH4,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCHU
+      trcg_2DFloXSurRunoffM(idg_O2,N,NN,M5,M4)  = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*COXU
+      trcg_2DFloXSurRunoffM(idg_N2,N,NN,M5,M4)  = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CNNU
+      trcg_2DFloXSurRunoffM(idg_N2O,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CN2U
+      trcg_2DFloXSurRunoffM(idg_H2,N,NN,M5,M4)  = 0.0_r8
+      trcg_2DFloXSurRunoffM(idg_NH3,N,NN,M5,M4) = 0.0_r8
 
       trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
 
@@ -273,8 +273,8 @@ module BoundaryTranspMod
       DO  K=1,jcplx
         dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
-      trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)=0.0_r8
-      trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+      trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,NN,M5,M4)          = 0.0_r8
+      trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,NN,M5,M4) = 0.0_r8
     ENDIF
 
   ENDIF
@@ -282,11 +282,11 @@ module BoundaryTranspMod
 !     BOUNDARY SNOW FLUX
 !
   IF(NN.EQ.1)THEN
-    trcg_2DSnowDrift(idg_beg:idg_NH3,N,M5,M4)=0.0_r8
-    trcn_2DSnowDrift(ids_NH4,N,M5,M4)=0.0_r8
-    trcn_2DSnowDrift(ids_NO3,N,M5,M4)=0.0_r8
-    trcn_2DSnowDrift(ids_H1PO4,N,M5,M4)=0.0_r8
-    trcn_2DSnowDrift(ids_H2PO4,N,M5,M4)=0.0_r8
+    trcg_2DSnowDrift(idg_beg:idg_NH3,N,M5,M4) = 0.0_r8
+    trcn_2DSnowDrift(ids_NH4,N,M5,M4)         = 0.0_r8
+    trcn_2DSnowDrift(ids_NO3,N,M5,M4)         = 0.0_r8
+    trcn_2DSnowDrift(ids_H1PO4,N,M5,M4)       = 0.0_r8
+    trcn_2DSnowDrift(ids_H2PO4,N,M5,M4)       = 0.0_r8
   ENDIF
   end subroutine BoundaryRunoffandSnowXY
 ! ----------------------------------------------------------------------

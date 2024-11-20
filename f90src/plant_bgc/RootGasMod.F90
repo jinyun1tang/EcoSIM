@@ -49,7 +49,7 @@ module RootGasMod
   real(r8) :: trc_gasml_loc(idg_beg:idg_end-1)
   real(r8) :: O2AquaDiffusvityP,RTVLWA
   real(r8) :: RTVLWB,ROXYFX,RCO2FX,ROXYLX
-  real(r8) :: RDFQSolute(idg_beg:idg_end)
+  real(r8) :: RDFQSolute(idg_beg:idg_end)   !gas dissolution into aqueous concentration
   real(r8) :: RTCR1,RTCR2
   real(r8) :: RTCRA,RTARRX
   real(r8) :: RCO2PX                       !root CO2 gas efflux due to root respiration at time step for gas flux calculations
@@ -89,7 +89,7 @@ module RootGasMod
     FILM                     => plt_site%FILM,                     &
     RO2GasXchangePrev_vr     => plt_bgcr%RO2GasXchangePrev_vr,     &
     RCO2GasFlxPrev_vr        => plt_bgcr%RCO2GasFlxPrev_vr,        &
-    RO2AquaXchangePrev_vr    => plt_bgcr%RO2AquaXchangePrev_vr,    &
+    RO2AquaSourcePrev_vr    => plt_bgcr%RO2AquaSourcePrev_vr,    &
     RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           & !out: O2 uptake from O2 inside root
     RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
     ZERO4Uptk_pft            => plt_rbgc%ZERO4Uptk_pft,            &
@@ -171,7 +171,7 @@ module RootGasMod
     RootOxyDemandPerPlant = RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
     ROXYFX                = RO2GasXchangePrev_vr(L)*FOXYX*dts_gas
     RCO2FX                = RCO2GasFlxPrev_vr(L)*FOXYX*dts_gas
-    ROXYLX                = RO2AquaXchangePrev_vr(L)*FOXYX*dts_gas
+    ROXYLX                = RO2AquaSourcePrev_vr(L)*FOXYX*dts_gas
 
 !
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
@@ -187,7 +187,7 @@ module RootGasMod
     enddo
     O2AquaDiffusvityP = SoluteDifusvty_vr(idg_O2,L)*dts_gas
 
-    RDFQSolute(idg_beg:idg_end)           = 0.0_r8
+    RDFQSolute(idg_beg:idg_end)         = 0.0_r8
     Root_gas2sol_flx(idg_beg:idg_end-1) = 0.0_r8
 !
 !     ROOT CONDUCTANCE TO GAS TRANSFER
@@ -201,15 +201,13 @@ module RootGasMod
 !     DPTHZ=depth of primary root from surface
 !     Root2ndAveLen_pvr=average secondary root length
 !
-    IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ).AND.FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
-      RTCR1=AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ)) &
-        *PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ_vr(L)
-      RTCR2=(Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2 &
-        /Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+    IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
+      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ_vr(L)
+      RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
-        RTCRA=RTCR1*RTCR2/(RTCR1+RTCR2)
+        RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE
-        RTCRA=RTCR1
+        RTCRA = RTCR1
       ENDIF
     ELSE
       RTCRA=0.0_r8
@@ -244,6 +242,7 @@ module RootGasMod
       DIFOP                                = 0.0_r8
       DisolvedGasVolume(idg_beg:idg_end-1) = 0.0_r8
       DFAGas(idg_beg:idg_end-1)            = 0.0_r8
+      DFAGas(idg_O2)                       = AMIN1(1.e-12_r8,RootPoreVol_pvr(N,L,NZ))
     ENDIF
 
     DFGP   = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
@@ -381,8 +380,8 @@ module RootGasMod
               ROxyRoot2UptkPerPlant = 0.0_r8
             ENDIF
           ENDIF
-!          write(113,*)I*1000+J,MX,M,RootOxyUptakePerPlant,ROxySoil2UptkPerPlant,X,trc_solml_loc(idg_O2),&
-!            X.GT.ZERO .AND. trc_solml_loc(idg_O2).GT.ZERO4Groth_pft(NZ),ROXYLX
+!          write(113,*)I*1000+J,MX,M,RootOxyUptakePerPlant,ROxySoil2UptkPerPlant,DifAqueVolatile(idg_O2),DIFOP, &
+!            trcaqu_conc_soi_loc(idg_O2),trc_conc_root_loc(idg_O2),trc_solml_loc(idg_O2),trc_solml_vr(idg_O2,L),ROXYLX
 !
 !     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
 !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
@@ -525,6 +524,7 @@ module RootGasMod
           trc_gasml_loc(idg_O2)  = trc_gasml_loc(idg_O2)-RDFQSolute(idg_O2)+ROXYFX
           trc_gasml_loc(idg_CO2) = trc_gasml_loc(idg_CO2)-RDFQSolute(idg_CO2)+RCO2FX
 
+          !aqueous concentration in soil
           DO NTG=idg_beg,idg_end
             if(NTG/=idg_O2)then
               trc_solml_loc(NTG)=trc_solml_loc(NTG)+RDFQSolute(NTG)-RootUptkSoiSolute(NTG)
@@ -551,8 +551,8 @@ module RootGasMod
 !     C*E,C*A1=atmosphere,root gas concentration
 !     DF*A=root-atmosphere gas conductance
 !
-            trcs_maxRootml_loc(idg_CO2)=trcs_rootml_loc(idg_CO2)+RCO2PX
-            trcs_maxRootml_loc(idg_NH3)=trcs_rootml_loc(idg_NH3)+RUPNTX
+            trcs_maxRootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RCO2PX
+            trcs_maxRootml_loc(idg_NH3) = trcs_rootml_loc(idg_NH3)+RUPNTX
 
             DO NTG=idg_beg,idg_end-1
               if(NTG/=idg_CO2 .and. NTG/=idg_NH3)then
@@ -579,7 +579,9 @@ module RootGasMod
           DO NTG=idg_beg,idg_end-1
             trcg_rootml_loc(NTG) = trcg_rootml_loc(NTG)-Root_gas2sol_flx(NTG)+trcg_air2root_flx(NTG)
             if(NTG==idg_O2)then
-              trcs_rootml_loc(NTG) = trcs_rootml_loc(NTG)+Root_gas2sol_flx(NTG)-ROxyRoot2Uptk      !O2 is consumed.                       
+              trcs_rootml_loc(NTG) = trcs_rootml_loc(NTG)+Root_gas2sol_flx(NTG)-ROxyRoot2Uptk      !O2 is consumed.     
+!              write(114,*)I+J/24.,MX,M,N,trcs_rootml_loc(NTG),trcg_rootml_loc(NTG),trcg_air2root_flx(NTG),Root_gas2sol_flx(NTG),&
+!                DFAGas(NTG),RootPoreVol_pvr(N,L,NZ),ROxySoil2Uptk
             else
               trcs_rootml_loc(NTG) = trcs_rootml_loc(NTG)+Root_gas2sol_flx(NTG)+RootUptkSoiSolute(NTG)              
             endif
@@ -634,10 +636,6 @@ module RootGasMod
 !
     PopPlantO2Uptake_vr           = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_vr(idg_O2,N,L,NZ)
     RAutoRootO2Limter_pvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
-!    if(N==1)then
-!    write(111,*)I*1000+J,L,RAutoRootO2Limter_pvr(N,L,NZ),RootO2Uptk_pvr(N,L,NZ),RootUptkSoiSol_vr(idg_O2,N,L,NZ),&
-!      RootO2Dmnd4Resp_pvr(N,L,NZ),RootRespPotent_pvr(N,L,NZ)
-!    endif
   ELSE
     PopPlantO2Uptake_vr=0.0_r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN

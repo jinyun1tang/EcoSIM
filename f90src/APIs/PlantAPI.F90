@@ -209,7 +209,8 @@ implicit none
     CanopySeedNum_pft(NZ,NY,NX)         = plt_morph%CanopySeedNum_pft(NZ)
     HypoctoHeight_pft(NZ,NY,NX)         = plt_morph%HypoctoHeight_pft(NZ)
     HighTempLimitSeed_pft(NZ,NY,NX)     = plt_pheno%HighTempLimitSeed_pft(NZ)
-    HeatStorCanopy_pft(NZ,NY,NX)              = plt_ew%HeatStorCanopy_pft(NZ)
+    HeatStorCanopy_pft(NZ,NY,NX)        = plt_ew%HeatStorCanopy_pft(NZ)
+    canopy_growth_pft(NZ,NY,NX)         = plt_rbgc%canopy_growth_pft(NZ)
     CanPHeight4WatUptake(NZ,NY,NX)      = plt_morph%CanPHeight4WatUptake(NZ)
     IsPlantActive_pft(NZ,NY,NX)         = plt_pheno%IsPlantActive_pft(NZ)
     iPlantState_pft(NZ,NY,NX)           = plt_pheno%iPlantState_pft(NZ)
@@ -726,7 +727,7 @@ implicit none
     plt_bgcr%RNO3EcoDmndBandPrev_vr(L)   = RNO3EcoDmndBandPrev_vr(L,NY,NX)
     plt_bgcr%RO2GasXchangePrev_vr(L)     = RO2GasXchangePrev_vr(L,NY,NX)
     plt_bgcr%RCO2GasFlxPrev_vr(L)        = RCO2GasFlxPrev_vr(L,NY,NX)
-    plt_bgcr%RO2AquaXchangePrev_vr(L)    = RO2AquaXchangePrev_vr(L,NY,NX)
+    plt_bgcr%RO2AquaSourcePrev_vr(L)    = RO2AquaSourcePrev_vr(L,NY,NX)
     plt_bgcr%RO2EcoDmndPrev_vr(L)        = RO2EcoDmndPrev_vr(L,NY,NX)
     plt_ew%TKS_vr(L)                     = TKS_vr(L,NY,NX)
 

@@ -11,6 +11,7 @@ module CanopyDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  real(r8),target,allocatable ::  canopy_growth_pft(:,:,:)                !canopy structural growth rate [gC/h]
   real(r8),target,allocatable ::  StomatalStress_pft(:,:,:)               !stomatal stress from water/turgor, [0-1]
   real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                        !canopy PAR albedo , [-]
   real(r8),target,allocatable ::  RadPARLeafTransmis_pft(:,:,:)                        !canopy PAR transmissivity , [-]
@@ -168,6 +169,7 @@ module CanopyDataType
   implicit none
   allocate(CO2FixCL_pft(JP,JY,JX)); CO2FixCL_pft=spval
   allocate(CO2FixLL_pft(JP,JY,JX)); CO2FixLL_pft=spval
+  allocate(canopy_growth_pft(JP,JY,JX)); canopy_growth_pft=spval
   allocate(StomatalStress_pft(JP,JY,JX)); StomatalStress_pft=spval     !no stress when equals to one
   allocate(CanopyPARalbedo_pft(JP,JY,JX));     CanopyPARalbedo_pft=0._r8
   allocate(RadPARLeafTransmis_pft(JP,JY,JX));     RadPARLeafTransmis_pft=0._r8
@@ -322,6 +324,7 @@ module CanopyDataType
   subroutine DestructCanopyData
   use abortutils, only : destroy
   implicit none
+  call destroy(canopy_growth_pft)
   call destroy(CO2FixCL_pft)
   call destroy(CO2FixLL_pft)
   call destroy(StomatalStress_pft)

@@ -10,7 +10,7 @@ implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
   public :: ComputeGPP
-
+  real(r8), parameter :: VLScal=1._r8
   contains
 
 !------------------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ implicit none
                     CBXNX = CO2Y/(ELEC3*CO2C+10.5_r8*CO2CompenPoint_node(K,NB,NZ))
                     VGROX = Vmax4RubiscoCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
                     EGROX = ETLF*CBXNX
-                    VL    = AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)
+                    VL    = AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)*VLScal
                     VG=(CanopyGasCO2_pft(NZ)-CO2X)*GSL
                   
                     IF(VL+VG.GT.ZERO)THEN

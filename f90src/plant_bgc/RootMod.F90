@@ -498,7 +498,7 @@ implicit none
 !
   respscal=VMXC*FRTN*fTgrowRootP_vr(L,NZ)*fRootGrowPSISense &
     *CNPG*C4PhotosynDowreg_brch(MainBranchNum_pft(NZ),NZ)
-!  print*,'respscal',respscal,N,L,NZ,RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+
   RNonstCO2_OUltd=AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))*VMXC*FRTN &
     *fTgrowRootP_vr(L,NZ)*fRootGrowPSISense &
     *CNPG*C4PhotosynDowreg_brch(MainBranchNum_pft(NZ),NZ)
@@ -1224,7 +1224,6 @@ implicit none
       if(Frac2Senes1>0._r8)then
         !remobilization nonzero
         DO NE=1,NumPlantChemElms
-!          Root1stNetGrowthElms(NE)=Root1stNetGrowthElms(NE)-Frac2Senes1*RootMyco1stElm_raxs(NE,N,NR,NZ)          
           Root1stNetGrowthElms(NE)=Root1stNetGrowthElms(NE)-Frac2Senes1*RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)  
         ENDDO
       endif
@@ -1252,10 +1251,9 @@ implicit none
     IF(RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ).LT.0.0_r8)THEN
 !      print*,'rm as nonst',RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
 
-      RootMycoNonstElms_rpvr(ielmc,N,L,NZ)=RootMycoNonstElms_rpvr(ielmc,N,L,NZ) &
-        +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
-      RootMyco1stElm_raxs(ielmc,N,NR,NZ)=RootMyco1stElm_raxs(ielmc,N,NR,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)  
-      RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)=0._r8
+      RootMycoNonstElms_rpvr(ielmc,N,L,NZ)       = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
+      RootMyco1stElm_raxs(ielmc,N,NR,NZ)         = RootMyco1stElm_raxs(ielmc,N,NR,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
+      RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ) = 0._r8
     ENDIF
 
     IF(RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ).LT.0.0_r8)THEN
@@ -1529,8 +1527,8 @@ implicit none
   ENDIF
 
   IF(RCO2Nonst4Xmaint1st_Oltd.GT.0.0_r8 .AND. RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
-    Root1stStrutRemob(ielmc)=RCCC*RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
-    Root1stStrutRemob(ielmn)=RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ)*(RCCN+(1.0_r8-RCCN) &
+    Root1stStrutRemob(ielmc) = RCCC*RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
+    Root1stStrutRemob(ielmn) = RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ)*(RCCN+(1.0_r8-RCCN) &
       *Root1stStrutRemob(ielmc)/RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ))      
     Root1stStrutRemob(ielmp)=RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ)*(RCCP+(1.0_r8-RCCP) &
       *Root1stStrutRemob(ielmc)/RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ))
@@ -1558,8 +1556,8 @@ implicit none
   if(Frac2Senes1>0._r8)then
     D6355: DO M=1,jsken
       DO NE=1,NumPlantChemElms    
-        dsenecE=Frac2Senes1*AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)-Root1stStrutRemob(NE))
-        LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
+        dsenecE                                      = Frac2Senes1*AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)-Root1stStrutRemob(NE))
+        LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) = LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ) &
           +ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_woody_litr)
         litrflxt(NE)=litrflxt(NE)+ElmAllocmat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAlloc2Litr(NE,k_woody_litr)
         
@@ -1619,7 +1617,7 @@ implicit none
     rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft,        &
     rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft,        &
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,    &
-    CumSoilThickness_vr          => plt_site%CumSoilThickness_vr,          &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,       &
     DLYR3                     => plt_site%DLYR3,                     &
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,       &
@@ -1698,8 +1696,8 @@ implicit none
   Root1stDepz_pft(N,NR,NZ)=Root1stDepz_pft(N,NR,NZ)+Root1stExtension
 
   DO NE=1,NumPlantChemElms
-    RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)+RootNetGrowthElms(NE)
-    RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+    RootMyco1stElm_raxs(NE,N,NR,NZ)         = RootMyco1stElm_raxs(NE,N,NR,NZ)+RootNetGrowthElms(NE)
+    RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
       +RootNetGrowthElms(NE)*FGROL 
   ENDDO
 
