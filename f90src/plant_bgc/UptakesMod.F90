@@ -1,10 +1,10 @@
 module UptakesMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
-  use StomatesMod   , only : stomates
+  use StomatesMod   , only : StomatalDynamics
   use GrosubPars
   use minimathmod
-  use EcoSIMCtrlMod , only : etimer  
+  use EcoSIMCtrlMod , only : etimer, lverb  
   use UnitMod       , only : units
   use EcosimConst
   use EcoSIMSolverPar
@@ -68,7 +68,7 @@ module UptakesMod
   real(r8) :: FDMP
   integer :: SoiLayerHasRoot(jroots,JZ1)
 !     begin_execution
-  associate(                                                  &
+  associate(                                                       &
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,   &
     CanopyWater_pft           => plt_ew%CanopyWater_pft,           &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,              &
@@ -102,9 +102,10 @@ module UptakesMod
     LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft,      &
     SeedDepth_pft             => plt_morph%SeedDepth_pft,          &
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft,      &
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft    &
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft     &
   )
 
+  if(lverb)write(*,*)'PrepH2ONutrientUptake'
   call PrepH2ONutrientUptake(ElvAdjstedtSoiPSIMPa,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
 !
 !     IF PLANT SPECIES EXISTS
@@ -113,12 +114,14 @@ module UptakesMod
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
+      if(lverb)write(*,*)'UpdateCanopyProperty'
       call UpdateCanopyProperty(NZ)
 
 !     STOMATE=solve for minimum canopy stomatal resistance
-      CALL STOMATEs(I,J,NZ)
+      if(lverb)write(*,*)'STOMATEs'
+      CALL StomatalDynamics(I,J,NZ)
 !
-!     CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS
+      if(lverb)write(*,*)'CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS'
       call UpdateRootProperty(NZ,PathLen_pvr,FineRootRadius_rvr,AllRootC_vr,FracPRoot4Uptake_pvr,&
         MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot_pvr,RootAreaDivRadius_vr)
 !
@@ -133,6 +136,7 @@ module UptakesMod
         .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0)))THEN
         !shoot area > 0, absorped par>0, and rooting depth > seeding depth
 !
+        if(lverb)write(*,*)'CalcResistance'
         call CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootAreaDivRadius_vr,RootResist,RootResistSoi,&
           RootResistPrimary,RootResist2ndary,SoiH2OResist,SoiAddRootResist,CNDT,PSIgravCanopyHeight,SoiLayerHasRoot)
 !
@@ -194,8 +198,10 @@ module UptakesMod
       Air_Heat_Latent_store_col = Air_Heat_Latent_store_col+EvapTransHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col+HeatXAir2PCan_pft(NZ)*CanopyBndlResist_pft(NZ)
 
+      if(lverb)write(*,*)'SetCanopyGrowthFuncs'
       call SetCanopyGrowthFuncs(I,J,NZ)
 
+      if(lverb)write(*,*)'PlantNutientO2Uptake'
       call PlantNutientO2Uptake(I,J,NZ,FDMP,PathLen_pvr,FineRootRadius_rvr,FracPRoot4Uptake_pvr,&
         MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot_pvr,RootAreaDivRadius_vr)
 
@@ -325,7 +331,7 @@ module UptakesMod
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 & !input:
     ZERO4PlantDisplace_col    => plt_ew%ZERO4PlantDisplace_col,       & !input:
     RoughHeight               => plt_ew%RoughHeight,                  &
-    ReistanceCanopy_pft                       => plt_ew%ReistanceCanopy_pft,                          &
+    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft,          &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
     LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch,      &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
@@ -367,7 +373,7 @@ module UptakesMod
     ENDDO D550
   ENDDO D500
 !
-!     CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER
+  if(lverb)write(*,*)'   CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER',LeafStalkArea_pft(NZ)
 !
 !     DIFFUSIVE RESISTANCE OF OTHER TALLER CANOPIES TO HEAT AND VAPOR
 !     TRANSFER OF CURRENT CANOPY ADDED TO BOUNDARY LAYER RESISTANCE
@@ -388,9 +394,7 @@ module UptakesMod
         ENDIF
       ENDDO D700
       ALFZ=2.0_r8*TFRADP
-      IF(AbvCanopyBndlResist_col.GT.ZERO &
-        .AND. CanopyHeight_col.GT.ZERO &
-        .AND. ALFZ.GT.ZERO)THEN
+      IF(AbvCanopyBndlResist_col.GT.ZERO .AND. CanopyHeight_col.GT.ZERO .AND. ALFZ.GT.ZERO)THEN
         ReistanceBndlCanopy(NZ)=AMIN1(RACX,AZMAX1(CanopyHeight_col*EXP(ALFZ) &
           /(ALFZ/AbvCanopyBndlResist_col)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/CanopyHeight_col) &
           -EXP(-ALFZ*(ZERO4PlantDisplace_col+RoughHeight)/CanopyHeight_col))))
@@ -918,7 +922,7 @@ module UptakesMod
       IF(DIFF.LT.5.0E-03_r8)THEN
         IF(ICHK.EQ.1)EXIT
         ICHK=1
-        CALL STOMATEs(I,J,NZ)
+        CALL StomatalDynamics(I,J,NZ)
         CYCLE
       ENDIF
       
@@ -966,7 +970,7 @@ module UptakesMod
       IF((NN.GE.30.AND.ABS(DPSI).LT.1.0E-03_r8).OR.NN.GE.MaxIterNum)then
         IF(ICHK.EQ.1)EXIT
         ICHK=1
-        CALL STOMATEs(I,J,NZ)      
+        CALL StomatalDynamics(I,J,NZ)      
       ELSE
         !make copies for next iteration
         PSICanPPre           = PSICanopy_pft(NZ)

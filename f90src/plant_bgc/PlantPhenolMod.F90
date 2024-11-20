@@ -871,7 +871,7 @@ module PlantPhenolMod
   real(r8) :: ACTV,OFNG
   real(r8) :: RTK
   real(r8) :: STK,TKCO
-  real(r8) :: NodeInitRate,LeafAppearRate
+  real(r8) :: NodeInitRate,LeafAppearRate,HourlyNodeNumNormByMatgrp_brch
   integer :: kk
   logical :: NodeNumChk,PlantDayChk,LeafOutChk,LeafOffChk,CalChk
   logical :: DayLenChk,CanHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
@@ -900,7 +900,6 @@ module PlantPhenolMod
     iPlantDevelopPattern_pft          => plt_pheno%iPlantDevelopPattern_pft,          &
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
     CriticPhotoPeriod_pft             => plt_pheno%CriticPhotoPeriod_pft,             &
-    HourlyNodeNumNormByMatgrp_brch    => plt_pheno%HourlyNodeNumNormByMatgrp_brch,    &
     PhotoPeriodSens_pft               => plt_pheno%PhotoPeriodSens_pft,               &
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch,     &
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch,                  &
@@ -982,9 +981,9 @@ module PlantPhenolMod
 !   MatureGroup_pft=node number required for floral initiation
 
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
-      NodeNumNormByMatgrp_brch(NB,NZ)       = (ShootNodeNum_brch(NB,NZ)-NodeNum2InitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
-      HourlyNodeNumNormByMatgrp_brch(NB,NZ) = NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4VegetaPheno)
-      TotalNodeNumNormByMatgrp_brch(NB,NZ)  = TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch(NB,NZ)
+      NodeNumNormByMatgrp_brch(NB,NZ)      = (ShootNodeNum_brch(NB,NZ)-NodeNum2InitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
+      HourlyNodeNumNormByMatgrp_brch       = NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4VegetaPheno)
+      TotalNodeNumNormByMatgrp_brch(NB,NZ) = TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch
     ENDIF
 
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0)THEN

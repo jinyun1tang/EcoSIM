@@ -96,7 +96,7 @@ module Hour1Mod
   real(r8) :: tPBOT,tmp
   integer :: NZ,NR,K
 !     execution begins here
-
+!  write(111,*)'xxxxxx',I,J,CanopyLeafArea_lpft(1,25,1,1,1,5)
 !
   if(lverb)write(*,*)'ResetLndscapeAccumlators'
   call ResetLndscapeAccumlators()
@@ -121,7 +121,8 @@ module Hour1Mod
 !
   if(lverb)write(*,*)'set atms gas conc'
   DO  NX=NHW,NHE
-    DO  NY=NVN,NVS     
+    DO  NY=NVN,NVS  
+
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
@@ -145,26 +146,22 @@ module Hour1Mod
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
   if(lverb)write(*,*)'UpdateLiterPropertz'
   call UpdateLiterPropertz(NHW,NHE,NVN,NVS)
-
 !
-
 !
 !     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
 !     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
   if(lverb)write(*,*)'SetLiterSoilPropAftDisturb'
   call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS)
+
   if(lverb)write(*,*)'SetSurfaceProp4SedErosion'
   call SetSurfaceProp4SedErosion(NHW,NHE,NVN,NVS)
   
-
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 !
 !
 !     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
 !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
-
-
 !
       if(lverb)write(*,*)'RESET HOURLY ACCUMULATORS'
       call SetHourlyAccumulators(NY,NX)
@@ -425,10 +422,10 @@ module Hour1Mod
 !     BAND AND MACROPORE FLUXES
 !
       DO L=1,NL(NY,NX)+1
-        WaterFlowSoiMicP_3D(1:3,L,NY,NX)=0._r8
-        WaterFlowSoiMicPX(1:3,L,NY,NX)=0._r8
-        WaterFlowMacP_3D(1:3,L,NY,NX)=0._r8
-        HeatFlow2Soil_3D(1:3,L,NY,NX)=0._r8
+        WaterFlowSoiMicP_3D(1:3,L,NY,NX) = 0._r8
+        WaterFlowSoiMicPX(1:3,L,NY,NX)   = 0._r8
+        WaterFlowMacP_3D(1:3,L,NY,NX)    = 0._r8
+        HeatFlow2Soil_3D(1:3,L,NY,NX)    = 0._r8
 
         trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0._r8
         Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,1:3,L,NY,NX)=0._r8

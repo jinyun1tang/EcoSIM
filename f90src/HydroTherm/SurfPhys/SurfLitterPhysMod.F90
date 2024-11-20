@@ -123,8 +123,8 @@ implicit none
   ! TCNDR,TCND1=litter,soil thermal conductivity
   ! CdTLit2Soil=litter-soil thermal conductance
   !
-  CNVR=VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS_vr(0,NY,NX)
-  CNV1=WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
+  CNVR = VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS_vr(0,NY,NX)
+  CNV1 = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
     *THETPM(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
 
   IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
@@ -259,17 +259,10 @@ implicit none
 
   VWatLitr2          = VLWatMicP1_vr(0,NY,NX)+CumNetWatFlow2LitR
   VLHeatCapcityLitR2 = VHeatCapacity1_vr(0,NY,NX)+cpw*CumNetWatFlow2LitR
-!  VLHeatCapacity2    = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)+cpw*(CumWatFlx2SoiMacP+CumWatFlx2SoiMicP)
-!  VLWatMicP12        = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+CumWatFlx2SoiMicP
   TKR1               = (TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)+CumNetHeatFlow2LitR)/VLHeatCapcityLitR2
-!  TKS1               = (TKSoil1_vr(NUM(NY,NX),NY,NX)*VHeatCapacity1_vr(NUM(NY,NX),NY,NX)+cumNetHeatFlow2Soil)/VLHeatCapacity2
-!  dLWdTSoil          =-0._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)**3._r8/real(NPR,kind=r8)
 
-!  VWatLitr2          = VLWatMicP1_vr(0,NY,NX)
-!  VLHeatCapcityLitR2 = VHeatCapacity1_vr(0,NY,NX)
   VLHeatCapacity2    = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
   VLWatMicP12        = VLWatMicP1_vr(NUM(NY,NX),NY,NX)
-!  TKR1               = TKSoil1_vr(0,NY,NX)
   TKS1               = TKSoil1_vr(NUM(NY,NX),NY,NX)
 
   !embedded iteration, local time step size
@@ -584,14 +577,14 @@ implicit none
   XVLMobileWatMicPM(M+1,NY,NX)   = XVLMobileWatMicP(NY,NX)
   XVLiceMicPM(M+1,NY,NX)         = XVLiceMicP_col(NY,NX)
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
-    FracSoiPAsWat_vr(0,NY,NX)=AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
-    FracSoiPAsIce_vr(0,NY,NX)=AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
-    FracSoilPoreAsAir_vr(0,NY,NX)=AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
+    FracSoiPAsWat_vr(0,NY,NX)     = AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
+    FracSoiPAsIce_vr(0,NY,NX)     = AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
+    FracSoilPoreAsAir_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
       *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
-    FracSoiPAsWat_vr(0,NY,NX)=0.0_r8
-    FracSoiPAsIce_vr(0,NY,NX)=0.0_r8
-    FracSoilPoreAsAir_vr(0,NY,NX)=1.0_r8
+    FracSoiPAsWat_vr(0,NY,NX)     = 0.0_r8
+    FracSoiPAsIce_vr(0,NY,NX)     = 0.0_r8
+    FracSoilPoreAsAir_vr(0,NY,NX) = 1.0_r8
   ENDIF
   THETPM(M+1,0,NY,NX)        = FracSoilPoreAsAir_vr(0,NY,NX)
   VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
@@ -661,9 +654,6 @@ implicit none
   VLWatLitR  = VLWatMicP_vr(0,NY,NX)+WatFLo2LitR_col(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+TXGridSurfRunoff_2DH(NY,NX)
   VLicelitR  = VLiceMicP_vr(0,NY,NX)-TLitrIceFlxThaw_col(NY,NX)/DENSICE
 
-  if(I>=120)then
-    write(211,*)(I*1000+J)*10+M,'b',VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX)-VLWatLitR,VLiceMicP1_vr(0,NY,NX)-VLicelitR  
-  endif
   if(abs(AZMAX1(VLWatLitR)-VLWatMicP1_vr(0,NY,NX))>tiny_wat)then
     write(*,*)(I*1000+J)*10+M,'b',VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),VLWatMicP1_vr(0,NY,NX)-VLWatLitR,VLiceMicP1_vr(0,NY,NX)-VLicelitR
     call endrun('litter water inconsisntecy in  '//trim(mod_filename),__LINE__)

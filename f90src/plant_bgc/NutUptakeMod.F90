@@ -1,7 +1,6 @@
 module NutUptakeMod
 
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use StomatesMod,   only: stomates
   use minimathmod,   only: safe_adb, vapsat, AZMAX1,dssign
   use TracerPropMod, only: gas_solubility
   use EcosimConst

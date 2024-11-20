@@ -1522,7 +1522,7 @@ implicit none
     long_name='plant leaf storage of nonstructural P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CFIX_lmtf_pft(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='CFIX_rC2L_pft',units='gP/m2',avgflag='A',&
+  call hist_addfld1d(fname='CFIX_rC2L_pft',units='none',avgflag='A',&
     long_name='plant rubisco to light limiting ratio (>1 light-limited)',ptr_patch=data1d_ptr)      
 
 
@@ -2587,7 +2587,7 @@ implicit none
         this%h1D_SHOOT_NONSTC_ptc(nptc) = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
         this%h1D_SHOOT_NONSTN_ptc(nptc) = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
         this%h1D_SHOOT_NONSTP_ptc(nptc) = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
-        if(CO2FixLL_pft(NZ,NY,NX)/=spval)then
+        if(CO2FixLL_pft(NZ,NY,NX)/=spval .and. CO2FixCL_pft(NZ,NY,NX)/=spval)then
           if(CO2FixLL_pft(NZ,NY,NX)>0._r8)this%h1D_CFIX_lmtf_pft(nptc)  = CO2FixCL_pft(NZ,NY,NX)/CO2FixLL_pft(NZ,NY,NX)
         endif
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin(NZ,NY,NX)

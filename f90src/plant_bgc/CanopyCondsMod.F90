@@ -222,13 +222,25 @@ module CanopyCondsMod
           D1130: DO K=1,MaxNodesPerBranch1
             LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
             LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
+            if(LeafStalkArea_pft(NZ)>1.e10)then                      
+              write(*,*)L,K,NB,NZ,'CanopyLeafArea_lpft(L,K,NB,NZ)',CanopyLeafArea_lpft(1,25,1,1)
+              stop
+            endif
           ENDDO D1130
           !add stem/stalk area
           LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
+          if(LeafStalkArea_pft(NZ)>1.e10)then          
+            write(*,*)L,NB,NZ,'CanopyStalkArea_lbrch(L,NB,NZ)',CanopyStalkArea_lbrch(L,NB,NZ)
+            stop
+          endif
           LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
         ENDIF
       enddo
     enddo
+    if(LeafStalkArea_pft(NZ)>1.e10)then
+      write(*,*)'canopy',LeafStalkArea_pft(NZ)
+      stop
+    endif  
   ENDDO D1135
 
   D1150: DO NZ=1,NP
@@ -585,6 +597,10 @@ module CanopyCondsMod
         RadSWbyStalkSurf_zsec(N,M,NZ)   = RadSWbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirLeafSurf_zsec(N,M,NZ)  = RadPARbyLeafSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirStalkSurf_zsec(N,M,NZ) = RadPARbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
+        if(RadPARDirLeafSurf_zsec(N,M,NZ)>1.e10)then
+          write(*,*)'RadPARDirLeafSurf_zsec(N,M,NZ)',RadPARDirLeafSurf_zsec(N,M,NZ)
+          stop
+        endif  
         DO L=1,NumOfCanopyLayers1
           RadDifPAR_zsec(N,M,L,NZ) = 0.0_r8
           RadPAR_zsec(N,M,L,NZ)    = RadPARDirLeafSurf_zsec(N,M,NZ)

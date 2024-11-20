@@ -727,41 +727,38 @@ contains
 
             DO K=1,jcplx
               do idom=idom_beg,idom_end
-                dom_2DFloXSurRunoff(idom,K,N,1,N5B,N4B)=dom_2DFloXSurRunoff(idom,K,N,1,N5B,N4B) &
-                  +dom_2DFloXSurRunoffM(idom,K,N,1,N5B,N4B)
+                dom_2DFloXSurRunoff(idom,K,N,1,N5B,N4B)=dom_2DFloXSurRunoff(idom,K,N,1,N5B,N4B)+dom_2DFloXSurRunoffM(idom,K,N,1,N5B,N4B)
               enddo
             ENDDO
 
             DO ngas=idg_beg,idg_NH3
-              trcg_FloXSurRunoff_2D(ngas,N,1,N5B,N4B)=trcg_FloXSurRunoff_2D(ngas,N,1,N5B,N4B) &
-                +trcg_2DFloXSurRunoffM(ngas,N,1,N5B,N4B)
+              trcg_FloXSurRunoff_2D(ngas,N,1,N5B,N4B)=trcg_FloXSurRunoff_2D(ngas,N,1,N5B,N4B)+trcg_2DFloXSurRunoffM(ngas,N,1,N5B,N4B)
             ENDDO
 
             DO nnut=ids_nut_beg,ids_nuts_end
-              trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)=trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B) &
-                +trcn_2DFloXSurRunoffM(nnut,N,1,N5B,N4B)
+              trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)=trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)+trcn_2DFloXSurRunoffM(nnut,N,1,N5B,N4B)
             ENDDO
           ELSE
             DO  K=1,jcplx
               dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
             ENDDO
-            trcg_2DFloXSurRunoffM(idg_beg:idg_end,N,1,N5B,N4B)=0.0_r8
-            trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B)=0.0_r8
+            trcg_2DFloXSurRunoffM(idg_beg:idg_end,N,1,N5B,N4B)          = 0.0_r8
+            trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
           ENDIF
         ENDIF
       ELSE
         DO K=1,jcplx
           dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
         ENDDO
-        trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,2,N5,N4)=0.0_r8
-        trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
+        trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,2,N5,N4)          = 0.0_r8
+        trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,2,N5,N4) = 0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
           DO  K=1,jcplx
             dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
           ENDDO
-          trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,1,N5B,N4B)=0.0_r8
-          trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B)=0.0_r8
+          trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,1,N5B,N4B)          = 0.0_r8
+          trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
         ENDIF
       ENDIF
 !
@@ -783,9 +780,9 @@ contains
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
         IF(ABS(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
-          trcg_2DSnowDrift(idg_beg:idg_NH3,N,N5,N4)=0.0_r8
-          trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,N,N5,N4)=0.0_r8
-          VFLW=0._r8
+          trcg_2DSnowDrift(idg_beg:idg_NH3,N,N5,N4)          = 0.0_r8
+          trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,N,N5,N4) = 0.0_r8
+          VFLW                                               = 0._r8
     !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
@@ -813,8 +810,8 @@ contains
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
-            trcn_2DSnowDrift(nnut,N,N5,N4)=VFLW*AZMAX1(trcn_solsml2_snvr(nnut,1,N5,N4))
-            trcn_FloXSnow_2DH(nnut,N,N5,N4)=trcn_FloXSnow_2DH(nnut,N,N5,N4)+trcn_2DSnowDrift(nnut,N,N5,N4)
+            trcn_2DSnowDrift(nnut,N,N5,N4)  = VFLW*AZMAX1(trcn_solsml2_snvr(nnut,1,N5,N4))
+            trcn_FloXSnow_2DH(nnut,N,N5,N4) = trcn_FloXSnow_2DH(nnut,N,N5,N4)+trcn_2DSnowDrift(nnut,N,N5,N4)
           ENDDO
         endif  
 
@@ -847,11 +844,8 @@ contains
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     R*DXR=gas exchange between atmosphere and surface litter water for gas flux calculations
 !
-!  write(114,*)I+J/24.,VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX),VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX),&
-!    VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)
-  IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) &
-    .AND. VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
-    .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+
+  IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) .AND. VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
 
     do ngas=idg_beg,idg_NH3
       trcg_VLWatMicP(ngas,0,NY,NX)=VLWatMicPM_vr(M,0,NY,NX)*GasSolbility_vr(ngas,0,NY,NX)
@@ -862,9 +856,8 @@ contains
       trc_gascl_vr0              = trc_gascl_vr(ngas,0,NY,NX)*VLsoiAirPM(M,0,NY,NX)
       VOLGas                     = trcg_VLWatMicP(ngas,0,NY,NX)+VLsoiAirPM(M,0,NY,NX)
       RGasDSFlx_vr(ngas,0,NY,NX) = DiffusivitySolutEff(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl_vr0)*trcg_VLWatMicP(ngas,0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2_vr(ngas,0,NY,NX)+RXR_gas(ngas))*VLsoiAirPM(M,0,NY,NX))/VOLGas
+        -AMAX1(ZEROS(NY,NX),trc_solml2_vr(ngas,0,NY,NX)+RXR_gas(ngas))*VLsoiAirPM(M,0,NY,NX))/VOLGas
     ENDDO
-!    write(114,*)I+J/24.,trc_gascl_vr(idg_O2,0,NY,NX)*VLsoiAirPM(M,0,NY,NX),RGasDSFlx_vr(idg_O2,0,NY,NX)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -873,7 +866,7 @@ contains
 !   does not include band
 !   > 0 dissolve in water
     DO ngas=idg_beg,idg_NH3
-      Gas_Disol_Flx_vr(ngas,0,NY,NX)=Gas_Disol_Flx_vr(ngas,0,NY,NX)+RGasDSFlx_vr(ngas,0,NY,NX)
+      Gas_Disol_Flx_vr(ngas,0,NY,NX) = Gas_Disol_Flx_vr(ngas,0,NY,NX)+RGasDSFlx_vr(ngas,0,NY,NX)
     ENDDO
 
   ELSE
@@ -934,8 +927,8 @@ contains
       RGasDSFlx_vr(idg_beg:idg_end,NU(NY,NX),NY,NX)=0.0_r8
     ENDIF
   ELSE
-    RGasADFlx_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX)=0.0_r8
-    RGasDSFlx_vr(idg_beg:idg_end,NU(NY,NX),NY,NX)=0.0_r8
+    RGasADFlx_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX) = 0.0_r8
+    RGasDSFlx_vr(idg_beg:idg_end,NU(NY,NX),NY,NX)   = 0.0_r8
   ENDIF
   end subroutine SurfSoilFluxGasDifAdv
 
@@ -1046,12 +1039,12 @@ contains
 !     ZNH4B,ZNH3B,ZNO3B,ZNO2B,H1POB,H2POB=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band micropores
 !
   IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VLWatMicPOA=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
-    VLWatMicPOB=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
-    VLWatMicPPA=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    VLWatMicPPB=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
-    DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
+    VLWatMicPOA = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
+    VLWatMicPOB = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
+    VLWatMicPPA = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+    VLWatMicPPB = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
+    DLYR1       = AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
+    TORT1       = TortMicPM_vr(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
       do idom=idom_beg,idom_end
@@ -1147,10 +1140,6 @@ contains
 !   seven gas species plus aqueous NH3 in band
 
       Gas_Flx_atmDif2soil_col(ngas,NY,NX) = Gas_Flx_atmDif2soil_col(ngas,NY,NX)+RGasSSVol(ngas,NY,NX)     !> 0. atmosphere into soil
-!      if(idg_O2==ngas)then
-!        write(131,*)I+J/24.,M,Gas_Flx_atmDif2soil_col(idg_O2,NY,NX),trc_gsolc,trcs_cl2(idg_O2),RGasSSVol(ngas,NY,NX),&
-!          DiffusivitySolutEff,CondGasXSnowM_col(M,NY,NX)
-!      endif
     ENDDO
 
   ELSE

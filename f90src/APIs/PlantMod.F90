@@ -82,6 +82,7 @@ implicit none
 
   subroutine PlantCanopyRadsModel(I,J,NY,NX,DPTH0)
   use CanopyCondsMod
+  use CanopyDataType, only : CanopyLeafArea_lpft
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: DPTH0

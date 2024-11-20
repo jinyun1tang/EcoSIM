@@ -160,7 +160,7 @@ implicit none
 !     snowpack snow,water,ice from watsub.f
 !     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
-!
+! surface runoff
   IF(N.NE.iVerticalDirection .AND. L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
     WQRN                = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)    

@@ -139,7 +139,7 @@ implicit none
   DO NE=1,NumPlantChemElms
     ShootElms_pft(NE,NZ)=sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))    
     if(ShootElms_pft(NE,NZ)>1.e20)then
-      write(*,*)'sumplantstates',NE,SeasonalNonstElms_pft(NE,NZ)
+      write(*,*)'sumplantstates',NE,NumOfBranches_pft(NZ),ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)
       stop
     endif
   ENDDO

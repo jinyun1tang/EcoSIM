@@ -92,6 +92,7 @@ module PlantBranchMod
     MainBranchNum_pft            =>  plt_morph%MainBranchNum_pft            &
   )
 
+  
   II=I;JJ=J
   LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
@@ -1063,8 +1064,8 @@ module PlantBranchMod
 !     Frac2Remobl=fraction of current leaf to be remobilized
 !     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
 !
-      LeafAreaLive_brch(NB,NZ)=AZMAX1(LeafAreaLive_brch(NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ))
-      LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ)
+      LeafAreaLive_brch(NB,NZ)   = AZMAX1(LeafAreaLive_brch(NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ))
+      LeafAreaNode_brch(K,NB,NZ) = LeafAreaNode_brch(K,NB,NZ)-FSNAL*LeafAreaNode_brch(K,NB,NZ)
 
       DO NE=1,NumPlantChemElms
         LeafStrutElms_brch(NE,NB,NZ)=AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-Frac2Remobl*LeafElmntNode_brch(NE,K,NB,NZ))
@@ -1771,6 +1772,8 @@ module PlantBranchMod
     !     LiveInterNodeHight_brch=internode length
     !
           CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)+YLeafArea_brch
+          
+          if(abs(LeafAreaNode_brch(K,NB,NZ))>1.e10)stop
           DO NE=1,NumPlantChemElms
             LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)=LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)+YLeafElmntNode_brch(NE)
           ENDDO
@@ -3412,6 +3415,7 @@ module PlantBranchMod
       LeafAreaGrowth             = GrowthChemElmt(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ)   = LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
       LeafAreaNode_brch(K,NB,NZ) = LeafAreaNode_brch(K,NB,NZ)+LeafAreaGrowth
+
     ENDDO D490
   ENDIF
   end associate  
@@ -3844,12 +3848,12 @@ module PlantBranchMod
 !
       LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)-FracRemobAsLeaf*LeafAreaDying_brch(NB,NZ)
       DO NE=1,NumPlantChemElms
-        LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)-FracRemobAsLeaf*LeafChemElmRemob_brch(NE,NB,NZ)
-        LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmntNode_brch(NE,K,NB,NZ)-FracRemobAsLeaf*LeafChemElmRemob_brch(NE,NB,NZ)
-        CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+FracRemobAsLeaf*LeafElmntRemobFlx_brch(NE,NB,NZ)
+        LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-FracRemobAsLeaf*LeafChemElmRemob_brch(NE,NB,NZ)
+        LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-FracRemobAsLeaf*LeafChemElmRemob_brch(NE,NB,NZ)
+        CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+FracRemobAsLeaf*LeafElmntRemobFlx_brch(NE,NB,NZ)
       ENDDO
-      LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)-FracRemobAsLeaf*LeafAreaDying_brch(NB,NZ)
-      LeafProteinCNode_brch(K,NB,NZ)=AZMAX1(LeafProteinCNode_brch(K,NB,NZ) &
+      LeafAreaNode_brch(K,NB,NZ)     = LeafAreaNode_brch(K,NB,NZ)-FracRemobAsLeaf*LeafAreaDying_brch(NB,NZ)
+      LeafProteinCNode_brch(K,NB,NZ) = AZMAX1(LeafProteinCNode_brch(K,NB,NZ) &
         -FracRemobAsLeaf*AMAX1(LeafChemElmRemob_brch(ielmn,NB,NZ)*rCNNonstRemob_pft(NZ) &
         ,LeafChemElmRemob_brch(ielmp,NB,NZ)*rCPNonstRemob_pft(NZ)))
 !

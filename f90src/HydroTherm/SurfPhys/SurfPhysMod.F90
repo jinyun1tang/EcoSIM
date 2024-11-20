@@ -380,12 +380,12 @@ contains
   ! assuming volumetric heat capacity of air is 1.25E-3_r8 MJ/(m^3 K)
   PARSX                            = 1.25E-03_r8*AREA(3,NUM(NY,NX),NY,NX)*dts_HeatWatTP   !conductance for sensible heat flux, MJ h /(m K)
   
-  AScaledCdWOverSnow_col(NY,NX)=PAREX*FracSurfAsSnow_col(NY,NX)*XNPS
-  AScaledCdHOverSnow_col(NY,NX)=PARSX*FracSurfAsSnow_col(NY,NX)*XNPS
-  AScaledCdWOverSoil_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)
-  AScaledCdWOverLitr_col(NY,NX)=PAREX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
-  AScaledCdHOverSoil_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)
-  AScaledCdHOverLitr_col(NY,NX)=PARSX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
+  AScaledCdWOverSnow_col(NY,NX) = PAREX*FracSurfAsSnow_col(NY,NX)*XNPS
+  AScaledCdHOverSnow_col(NY,NX) = PARSX*FracSurfAsSnow_col(NY,NX)*XNPS
+  AScaledCdWOverSoil_col(NY,NX) = PAREX*FracSurfSnoFree_col(NY,NX)
+  AScaledCdWOverLitr_col(NY,NX) = PAREX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
+  AScaledCdHOverSoil_col(NY,NX) = PARSX*FracSurfSnoFree_col(NY,NX)
+  AScaledCdHOverLitr_col(NY,NX) = PARSX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR
 !  write(143,*)I+J/24.,ResistAreodynOverSoil_col(NY,NX),FracSoilPoreAsAir_vr(0,NY,NX),VapDiffusResistanceLitR(NY,NX),DFVR
 
 !     PARR=boundary layer conductance above litter,soil surfaces, (m^2/h)/(h/m)
@@ -1622,6 +1622,10 @@ contains
               HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4) = HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)+Heatflxlitr
               cumWatFlx2LitRByRunoff_col(N2,N1)    = cumWatFlx2LitRByRunoff_col(N2,N1)-VLWatLitR
               cumHeatFlx2LitRByRunoff_col(N2,N1)   = cumHeatFlx2LitRByRunoff_col(N2,N1)-Heatflxlitr
+              if(NN.EQ.2)then
+                XGridSurfRunoff_2DH(N,2,N5,N4)       = XGridSurfRunoff_2DH(N,2,N5,N4)+VLWatLitR
+                HeatXGridBySurfRunoff_2DH(N,2,N5,N4) = HeatXGridBySurfRunoff_2DH(N,2,N5,N4)+Heatflxlitr
+              endif
             endif
           ENDIF
 
@@ -1639,6 +1643,9 @@ contains
               HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B) = HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)+Heatflxlitr
               cumWatFlx2LitRByRunoff_col(N2,N1)      = cumWatFlx2LitRByRunoff_col(N2,N1)-VLWatLitR
               cumHeatFlx2LitRByRunoff_col(N2,N1)     = cumHeatFlx2LitRByRunoff_col(N2,N1)-Heatflxlitr
+              XGridSurfRunoff_2DH(N,1,N5B,N4B)       = XGridSurfRunoff_2DH(N,1,N5B,N4B)+VLWatLitR
+              HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B)+Heatflxlitr
+
             endif
 
           ENDIF

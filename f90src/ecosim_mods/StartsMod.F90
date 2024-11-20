@@ -597,7 +597,7 @@ module StartsMod
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
     'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
-1112    FORMAT(2A4,4A6,20A12)
+1112    FORMAT(2A4,4A6,25A12)
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)  = ZERO*DH(NY,NX)*DV(NY,NX)
