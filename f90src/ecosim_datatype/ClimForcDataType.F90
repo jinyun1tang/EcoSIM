@@ -49,7 +49,8 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
-  real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)
+  real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
+  real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)      !reference tempeature profile from control run to warming experiment [K]
   real(r8),target,allocatable ::  WDPTHD(:,:,:)                      !
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
   real(r8),target,allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
@@ -69,7 +70,7 @@ implicit none
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
-  real(r8),target,allocatable ::  LWRadSky(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
+  real(r8),target,allocatable ::  LWRadSky_col(:,:)                  !sky longwave radiation , [MJ/h]
   real(r8),target,allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
   real(r8),target,allocatable ::  TAMX(:,:)                          !daily maximum air temperature , [oC]
   real(r8),target,allocatable ::  TAMN(:,:)                          !daily minimum air temperature , [oC]
@@ -89,7 +90,7 @@ implicit none
   real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  ZNH3E(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  ZNH3E_col(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
   real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
@@ -101,10 +102,10 @@ implicit none
   real(r8),target,allocatable ::  RadPARDiffus_col(:,:)              !diffuse PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)          !sine of solar angle, [-]
   real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)    !sine of solar angle next hour, [-]
-  real(r8),target,allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  Canopy_Heat_Latent_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  Canopy_Heat_Sens_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  TLEX_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  TSHX_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  Air_Heat_Latent_store_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  Air_Heat_Sens_store_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  SoilHeatSrcDepth(:,:)                        !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
@@ -114,7 +115,7 @@ implicit none
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
   real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
-  real(r8),target,allocatable ::  RainFalPrec(:,:)                   !rainfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  RainFalPrec_col(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecRainAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
@@ -123,7 +124,6 @@ implicit none
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
   real(r8),target,allocatable ::  NH4_rain_conc(:,:)                 !precipitation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH3_rain_conc(:,:)                 !precipitation  NH3 concentration, [g m-3]
   real(r8),target,allocatable ::  NO3_rain_conc(:,:)                 !precipitation  NO3 concentration, [g m-3]
   real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)               !precipitation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
@@ -138,7 +138,7 @@ implicit none
   real(r8),target,allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
   real(r8),target,allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
   real(r8),target,allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  CH4_rain_conc(:,:)                 !precipitation  CH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  trcVolatile_rain_conc(:,:,:)       !precipitation volatile concentration, [g m-3]
   real(r8),target,allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
   real(r8),target,allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
@@ -169,10 +169,6 @@ implicit none
   real(r8),target,allocatable ::  CC1PR(:,:)                         !precipitation  CaHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  CO2_rain_conc(:,:)                          !precipitation  CO2 concentration, [g m-3]
-  real(r8),target,allocatable ::  O2_rain_conc(:,:)                          !precipitation  O2 concentration, [g m-3]
-  real(r8),target,allocatable ::  N2_rain_conc(:,:)                          !precipitation  N2 concentration, [g m-3]
-  real(r8),target,allocatable ::  N2O_rain_conc(:,:)                          !precipitation  N2O concentration, [g m-3]
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
   real(r8),target,allocatable ::  HeatPrec_col(:,:)    !precipitation heat to surface [MJ/d2/h]
   contains
@@ -185,6 +181,7 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
+  allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
@@ -205,8 +202,8 @@ implicit none
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
   allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
-  allocate(OMEGAG(NumOfSkyAzimuSects,JY,JX));  OMEGAG=0._r8
-  allocate(LWRadSky(JY,JX));         LWRadSky=0._r8
+  allocate(OMEGAG(NumOfSkyAzimuthSects,JY,JX));  OMEGAG=0._r8
+  allocate(LWRadSky_col(JY,JX));         LWRadSky_col=0._r8
   allocate(TRAD(JY,JX));        TRAD=0._r8
   allocate(TAMX(JY,JX));        TAMX=0._r8
   allocate(TAMN(JY,JX));        TAMN=0._r8
@@ -227,7 +224,7 @@ implicit none
   allocate(OXYE(JY,JX));        OXYE=0._r8
   allocate(Z2OE(JY,JX));        Z2OE=0._r8
   allocate(Z2GE(JY,JX));        Z2GE=0._r8
-  allocate(ZNH3E(JY,JX));       ZNH3E=0._r8
+  allocate(ZNH3E_col(JY,JX));       ZNH3E_col=0._r8
   allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
   allocate(H2GE(JY,JX));        H2GE=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
@@ -239,10 +236,10 @@ implicit none
   allocate(RadPARDiffus_col(JY,JX));        RadPARDiffus_col=0._r8
   allocate(SineSunInclAngle_col(JY,JX));        SineSunInclAngle_col=0._r8
   allocate(SineSunInclAnglNxtHour_col(JY,JX));       SineSunInclAnglNxtHour_col=0._r8
-  allocate(TLEX(JY,JX));        TLEX=0._r8
-  allocate(TSHX(JY,JX));        TSHX=0._r8
-  allocate(Canopy_Heat_Latent_col(JY,JX));        Canopy_Heat_Latent_col=0._r8
-  allocate(Canopy_Heat_Sens_col(JY,JX));        Canopy_Heat_Sens_col=0._r8
+  allocate(TLEX_col(JY,JX));        TLEX_col=0._r8
+  allocate(TSHX_col(JY,JX));        TSHX_col=0._r8
+  allocate(Air_Heat_Latent_store_col(JY,JX));        Air_Heat_Latent_store_col=0._r8
+  allocate(Air_Heat_Sens_store_col(JY,JX));        Air_Heat_Sens_store_col=0._r8
   allocate(SoilHeatSrcDepth(JY,JX));      SoilHeatSrcDepth=0._r8
   allocate(TKSD(JY,JX));        TKSD=0._r8
   allocate(ATCAI(JY,JX));       ATCAI=0._r8
@@ -252,7 +249,7 @@ implicit none
   allocate(ATCS(JY,JX));        ATCS=0._r8
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
-  allocate(RainFalPrec(JY,JX));       RainFalPrec=0._r8
+  allocate(RainFalPrec_col(JY,JX));       RainFalPrec_col=0._r8
   allocate(SnoFalPrec_col(JY,JX));       SnoFalPrec_col=0._r8
   allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
   allocate(PrecRainAndIrrig_col(JY,JX));       PrecRainAndIrrig_col=0._r8
@@ -261,7 +258,6 @@ implicit none
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
   allocate(CNORI(JY,JX));       CNORI=0._r8
   allocate(NH4_rain_conc(JY,JX));        NH4_rain_conc=0._r8
-  allocate(NH3_rain_conc(JY,JX));        NH3_rain_conc=0._r8
   allocate(NO3_rain_conc(JY,JX));        NO3_rain_conc=0._r8
   allocate(H2PO4_rain_conc(JY,JX));        H2PO4_rain_conc=0._r8
   allocate(CALR(JY,JX));        CALR=0._r8
@@ -276,7 +272,7 @@ implicit none
   allocate(CCLR(JY,JX));        CCLR=0._r8
   allocate(CC3R(JY,JX));        CC3R=0._r8
   allocate(CHCR(JY,JX));        CHCR=0._r8
-  allocate(CH4_rain_conc(JY,JX));        CH4_rain_conc=0._r8
+  allocate(trcVolatile_rain_conc(idg_beg:idg_end-1,JY,JX));        trcVolatile_rain_conc=0._r8
   allocate(CAL1R(JY,JX));       CAL1R=0._r8
   allocate(CAL2R(JY,JX));       CAL2R=0._r8
   allocate(CAL3R(JY,JX));       CAL3R=0._r8
@@ -307,10 +303,7 @@ implicit none
   allocate(CC1PR(JY,JX));       CC1PR=0._r8
   allocate(CC2PR(JY,JX));       CC2PR=0._r8
   allocate(CM1PR(JY,JX));       CM1PR=0._r8
-  allocate(CO2_rain_conc(JY,JX));        CO2_rain_conc=0._r8
-  allocate(O2_rain_conc(JY,JX));        O2_rain_conc=0._r8
-  allocate(N2_rain_conc(JY,JX));        N2_rain_conc=0._r8
-  allocate(N2O_rain_conc(JY,JX));        N2O_rain_conc=0._r8
+
   end subroutine InitClimForcData
 
 !----------------------------------------------------------------------
@@ -337,7 +330,7 @@ implicit none
   call destroy(DayLenthPrev_col)
   call destroy(DayLenthMax)
   call destroy(OMEGAG)
-  call destroy(LWRadSky)
+  call destroy(LWRadSky_col)
   call destroy(TRAD)
   call destroy(TAMX)
   call destroy(TAMN)
@@ -355,10 +348,11 @@ implicit none
   call destroy(AtmGasCgperm3)
   call destroy(AtmGmms)
   call destroy(TKS_ref_vr)
+  call destroy(Eco_RadSW_col)
   call destroy(OXYE)
   call destroy(Z2OE)
   call destroy(Z2GE)
-  call destroy(ZNH3E)
+  call destroy(ZNH3E_col)
   call destroy(CH4E_col)
   call destroy(H2GE)
 
@@ -370,10 +364,10 @@ implicit none
   call destroy(RadPARDiffus_col)
   call destroy(SineSunInclAngle_col)
   call destroy(SineSunInclAnglNxtHour_col)
-  call destroy(TLEX)
-  call destroy(TSHX)
-  call destroy(Canopy_Heat_Latent_col)
-  call destroy(Canopy_Heat_Sens_col)
+  call destroy(TLEX_col)
+  call destroy(TSHX_col)
+  call destroy(Air_Heat_Latent_store_col)
+  call destroy(Air_Heat_Sens_store_col)
   call destroy(SoilHeatSrcDepth)
   call destroy(TKSD)
   call destroy(ATCAI)
@@ -383,7 +377,7 @@ implicit none
   call destroy(ATCS)
   call destroy(TairKClimMean)
   call destroy(ATKS)
-  call destroy(RainFalPrec)
+  call destroy(RainFalPrec_col)
   call destroy(SnoFalPrec_col)
   call destroy(PrecAtm_col)
   call destroy(PrecRainAndIrrig_col)
@@ -392,7 +386,6 @@ implicit none
   call destroy(CN4RI)
   call destroy(CNORI)
   call destroy(NH4_rain_conc)
-  call destroy(NH3_rain_conc)
   call destroy(NO3_rain_conc)
   call destroy(H2PO4_rain_conc)
   call destroy(CALR)
@@ -407,7 +400,7 @@ implicit none
   call destroy(CCLR)
   call destroy(CC3R)
   call destroy(CHCR)
-  call destroy(CH4_rain_conc)
+  call destroy(trcVolatile_rain_conc)
   call destroy(CAL1R)
   call destroy(CAL2R)
   call destroy(CAL3R)
@@ -438,9 +431,5 @@ implicit none
   call destroy(CC1PR)
   call destroy(CC2PR)
   call destroy(CM1PR)
-  call destroy(CO2_rain_conc)
-  call destroy(O2_rain_conc)
-  call destroy(N2_rain_conc)
-  call destroy(N2O_rain_conc)
   end subroutine DestructClimForcData
 end module ClimForcDataType

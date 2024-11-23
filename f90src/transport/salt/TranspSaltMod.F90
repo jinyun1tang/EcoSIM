@@ -66,7 +66,6 @@ module TranspSaltMod
   implicit none
 
   allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));       trcSalt_TQR=0._r8
-
   allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MicP_vr=0._r8
   allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MacP_vr=0._r8
   allocate(trcSalt_RFLZ(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLZ=0._r8
@@ -249,7 +248,7 @@ module TranspSaltMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-C
   D20: DO L=1,JS
     DO NTA=idsalt_beg,idsalt_end
-      trcSalt_sosml2(NTA,L,NY,NX)=trcs_solsml(NTA,L,NY,NX)
+      trc_Saltml2_snvr(NTA,L,NY,NX)=trc_Saltml_snvr(NTA,L,NY,NX)
     ENDDO
   ENDDO D20
   end subroutine InitSolutesInSnowpack
@@ -280,8 +279,8 @@ module TranspSaltMod
 !          :*1=non-band,*B=band
 !
   DO nsalts=idsalt_beg,idsalt_end
-    trcSaltAdv2SowLay(nsalts,1,NY,NX)=trcSaltFlo2SnowLay(nsalts,1,NY,NX)*dts_HeatWatTP
-    trcSalt_RFL0(nsalts,NY,NX)=trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)*dts_HeatWatTP
+    trcSaltAdv2SowLay(nsalts,1,NY,NX) = trcSaltFlo2SnowLay(nsalts,1,NY,NX)*dts_HeatWatTP
+    trcSalt_RFL0(nsalts,NY,NX)        = trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
@@ -398,7 +397,7 @@ module TranspSaltMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
 !
-      IF(SnoFalPrec_col(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
+      IF(SnoFalPrec_col(NY,NX).GT.0.0.OR.(RainFalPrec_col(NY,NX).GT.0.0 &
         .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
   !     there is snowpack
 
@@ -487,7 +486,7 @@ module TranspSaltMod
   integer :: nsalts
 !     begin_execution
 
-  FQRM=QflxSurfRunoffM(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
+  FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
 
   DO nsalts=idsalt_beg,idsalt_end
     trcSalt_RQR(nsalts,N,NN,M5,M4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
@@ -529,7 +528,7 @@ module TranspSaltMod
   real(r8) :: VFLOW
 !     begin_execution
 
-  VFLOW=WaterFlow2MicPM(M,N,M6,M5,M4)
+  VFLOW=WaterFlow2MicPM_3D(M,N,M6,M5,M4)
   DO nsalts=idsalt_beg,idsalt_KSO4
     trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(nsalts,M3,M2,M1)
   ENDDO
@@ -552,7 +551,7 @@ module TranspSaltMod
 !     begin_execution
 
   IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM(M,N,M6,M5,M4) &
+    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4) &
       /VLWatMicPM_vr(M,M3,M2,M1)))
   ELSE
     VFLW=0.0_r8
@@ -580,7 +579,7 @@ module TranspSaltMod
 !     begin_execution
 
   IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
+    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
 
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_RFHS(nsalts,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,M3,M2,M1))
@@ -923,16 +922,16 @@ module TranspSaltMod
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                IF((NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                IF((NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
 
                   call SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.1.AND.QflxSurfRunoffM(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
                   call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
                 ELSE
                   call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
@@ -948,7 +947,7 @@ module TranspSaltMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
 !
-!     WaterFlow2MicPM=water flux through soil micropore from watsub.f
+!     WaterFlow2MicPM_3D=water flux through soil micropore from watsub.f
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     R*FLS=convective solute flux through micropores
 !     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
@@ -966,8 +965,8 @@ module TranspSaltMod
             IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
               IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
-                IF(NN.EQ.1.AND.WaterFlow2MicPM(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.2.AND.WaterFlow2MicPM(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.1.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0 &
+                  .OR.NN.EQ.2.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMicropore(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -979,7 +978,7 @@ module TranspSaltMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !     VLWatMacPM=macropore water-filled porosity from watsub.f
 !     RFH*S=solute diffusive flux through macropore
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -993,8 +992,8 @@ module TranspSaltMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-                IF(NN.EQ.1.AND.WaterFlow2MacPM(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.2.AND.WaterFlow2MacPM(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.1.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
+                  .OR.NN.EQ.2.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMacropore(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -1065,11 +1064,11 @@ module TranspSaltMod
 !          :*1=non-band,*B=band
 !
   DO NTA=idsalt_beg,idsalt_end
-    trcSalt_sosml2(NTA,1,NY,NX)=trcSalt_sosml2(NTA,1,NY,NX)+trcSalt_TQ(NTA,NY,NX)
+    trc_Saltml2_snvr(NTA,1,NY,NX)=trc_Saltml2_snvr(NTA,1,NY,NX)+trcSalt_TQ(NTA,NY,NX)
   ENDDO
   D9670: DO L=1,JS
     DO NTA=idsalt_beg,idsalt_end
-      trcSalt_sosml2(NTA,L,NY,NX)=trcSalt_sosml2(NTA,L,NY,NX)+trcSalt_TBLS(NTA,L,NY,NX)
+      trc_Saltml2_snvr(NTA,L,NY,NX)=trc_Saltml2_snvr(NTA,L,NY,NX)+trcSalt_TBLS(NTA,L,NY,NX)
     ENDDO
   ENDDO D9670
   end subroutine UpdateSoluteInSnow

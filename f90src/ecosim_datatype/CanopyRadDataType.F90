@@ -56,15 +56,15 @@ module CanopyRadDataType
 
   allocate(SineLeafAngle(NumOfLeafZenithSectors))
   allocate(CosineLeafAngle(NumOfLeafZenithSectors))
-  allocate(OMEGA(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(OMEGX(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(iScatteringDiffus(NumOfSkyAzimuSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX))
-  allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
-  allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX))
-  allocate(RadPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuSects,NumOfCanopyLayers,JP,JY,JX))
-  allocate(RadDifPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuSects,NumOfCanopyLayers,JP,JY,JX))
-  allocate(StemAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNumBranches,JP,JY,JX))
+  allocate(OMEGA(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGA=0._r8
+  allocate(OMEGX(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGX=0._r8
+  allocate(iScatteringDiffus(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX));CLASS=0._r8
+  allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaZsec_brch=0._r8
+  allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAUnshaded_zsec=0._r8
+  allocate(RadPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX));RadPAR_zsec=0._r8
+  allocate(RadDifPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX));RadDifPAR_zsec=0._r8
+  allocate(StemAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));StemAreaZsec_brch=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------

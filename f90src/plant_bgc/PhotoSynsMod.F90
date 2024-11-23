@@ -10,7 +10,7 @@ implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
   public :: ComputeGPP
-
+  real(r8), parameter :: VLScal=1._r8
   contains
 
 !------------------------------------------------------------------------------------------
@@ -20,10 +20,10 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in) :: PsiCan4Photosyns
-  real(r8), intent(in) :: Stomata_Stress
+  real(r8), intent(in) :: Stomata_Stress   !stomatal resistance function of canopy turgor
   real(r8), intent(out) :: CH2O3K
-  real(r8), intent(out) :: CO2FCL
-  real(r8), intent(out) :: CO2FLL
+  real(r8), intent(out) :: CO2FCL          !carbon-dependent photosynthesis rate
+  real(r8), intent(out) :: CO2FLL          !light-dependent photosynthesis rate
   integer :: L,NN,M,N,LP
   real(r8) :: WFNB
   real(r8) :: CO2X,CO2C,CO2Y
@@ -74,7 +74,7 @@ implicit none
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
       D215: DO N=1,NumOfLeafZenithSectors1
-        D220: DO M=1,NumOfSkyAzimuSects1
+        D220: DO M=1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
@@ -112,13 +112,6 @@ implicit none
                 ETLF = (PARJ-SQRT(PARJ2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
                 EGRO = ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
                 VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
-!                if(LP==1)THEN
-!                  write(124,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,ETLF/PAR_zsec,PARJ/PAR_zsec,PAR_zsec,&
-!                    LigthSatCarboxyRate_node(K,NB,NZ),delta
-!                ELSE
-!                  write(125,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,ETLF/PAR_zsec,PARJ/PAR_zsec,PAR_zsec,&
-!                    LigthSatCarboxyRate_node(K,NB,NZ),delta
-!                ENDIF
 
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
@@ -128,13 +121,12 @@ implicit none
 !             CO2CuticleResist_pft=cuticular resistance to CO2 from startq.f (s m-1)
 !             DiffCO2Atmos2Intracel_pft=difference between atmosph and intercellular CO2 concn (umol m-3)
 !             GSL=leaf stomatal conductance (mol m-2 s-1)
-!             Stomata_Stress=stomatal resistance function of canopy turgor
 !             AirConc_pft=number of moles of air per m3
 !                
                 IF(VL.GT.ZERO)THEN
-                  RS=AMIN1(CO2CuticleResist_pft(NZ),AMAX1(RCMN,DiffCO2Atmos2Intracel_pft(NZ)/VL))
-                  RSL=RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Stress
-                  GSL=1.0_r8/RSL*AirConc_pft(NZ)
+                  RS  = AMIN1(CO2CuticleResist_pft(NZ),AMAX1(RCMN,DiffCO2Atmos2Intracel_pft(NZ)/VL))
+                  RSL = RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Stress
+                  GSL = 1.0_r8/RSL*AirConc_pft(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -172,21 +164,21 @@ implicit none
                     CBXNX = CO2Y/(ELEC3*CO2C+10.5_r8*CO2CompenPoint_node(K,NB,NZ))
                     VGROX = Vmax4RubiscoCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
                     EGROX = ETLF*CBXNX
-                    VL    = AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)
+                    VL    = AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)*VLScal
                     VG=(CanopyGasCO2_pft(NZ)-CO2X)*GSL
                   
                     IF(VL+VG.GT.ZERO)THEN
-                      DIFF=(VL-VG)/(VL+VG)
+                      DIFF = (VL-VG)/(VL+VG)
                       IF(ABS(DIFF).LT.0.005_r8)exit
-                      VA=0.95_r8*VG+0.05_r8*VL
-                      CO2X=CanopyGasCO2_pft(NZ)-VA/GSL
+                      VA   = 0.95_r8*VG+0.05_r8*VL
+                      CO2X = CanopyGasCO2_pft(NZ)-VA/GSL
                     ELSE
                       VL=0._r8
                       exit
                     ENDIF
                   ENDDO D225
-                  CO2FCL=CO2FCL+VGROX
-                  CO2FLL=CO2FLL+EGROX
+                  CO2FCL = CO2FCL+VGROX
+                  CO2FLL = CO2FLL+EGROX
 !                  WRITE(123,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,VL,VGROX,EGROX,WFNB,EGROX/PAR_zsec
                   
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
@@ -280,7 +272,7 @@ implicit none
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
       D115: DO N =1,NumOfLeafZenithSectors1
-        D120: DO M =1,NumOfSkyAzimuSects1
+        D120: DO M =1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
@@ -289,11 +281,11 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
             DO LP=1,2
               if(LP==1)then
-                PAR_zsec=RadPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_DirRadTransm(L+1)
+                PAR_zsec = RadPAR_zsec(N,M,L,NZ)
+                Tau_rad  = TAU_DirRadTransm(L+1)
               else
-                PAR_zsec=RadDifPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_RadThru(L+1)
+                PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
+                Tau_rad  = TAU_RadThru(L+1)
               endif
               IF(PAR_zsec.GT.0.0_r8)THEN
 !
@@ -310,11 +302,11 @@ implicit none
 !             CO2lmtPEPCarboxyRate_node=PEP carboxylation rate limited by CO2 from stomate.f
 !             NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-                PARX=QNTM*PAR_zsec
-                PARJ=PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
-                ETLF4=(PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
-                EGRO4=ETLF4*C4CarboxyEff_node(K,NB,NZ)
-                VL=AMIN1(CO2lmtPEPCarboxyRate_node(K,NB,NZ),EGRO4)*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
+                PARX  = QNTM*PAR_zsec
+                PARJ  = PARX+LigthSatC4CarboxyRate_node(K,NB,NZ)
+                ETLF4 = (PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatC4CarboxyRate_node(K,NB,NZ)))/CURV2
+                EGRO4 = ETLF4*C4CarboxyEff_node(K,NB,NZ)
+                VL    = AMIN1(CO2lmtPEPCarboxyRate_node(K,NB,NZ),EGRO4)*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -327,9 +319,9 @@ implicit none
 !             AirConc_pft=number of moles of air per m3
 !
                 IF(VL.GT.ZERO)THEN
-                  RS=AMIN1(CO2CuticleResist_pft(NZ),AMAX1(RCMN,DiffCO2Atmos2Intracel_pft(NZ)/VL))
-                  RSL=RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Stress
-                  GSL=1.0_r8/RSL*AirConc_pft(NZ)
+                  RS  = AMIN1(CO2CuticleResist_pft(NZ),AMAX1(RCMN,DiffCO2Atmos2Intracel_pft(NZ)/VL))
+                  RSL = RS+(CO2CuticleResist_pft(NZ)-RS)*Stomata_Stress
+                  GSL = 1.0_r8/RSL*AirConc_pft(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -337,11 +329,11 @@ implicit none
 !               WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
                   IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-                    WFN4=RS/RSL
-                    WFNB=SQRT(RS/RSL)
+                    WFN4 = RS/RSL
+                    WFNB = SQRT(RS/RSL)
                   ELSE
-                    WFN4=PsiCan4Photosyns
-                    WFNB=PsiCan4Photosyns
+                    WFN4 = PsiCan4Photosyns
+                    WFNB = PsiCan4Photosyns
                   ENDIF
 !
 !               CONVERGENCE SOLUTION FOR LeafIntracellularCO2_pftAT WHICH CARBOXYLATION
@@ -363,25 +355,25 @@ implicit none
 !
                   CO2X=LeafIntracellularCO2_pft(NZ)
                   D125: DO NN=1,100
-                    CO2C=CO2X*CO2Solubility_pft(NZ)
-                    CO2Y=AZMAX1(CO2C-COMP4)
-                    CBXNX=CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
-                    VGROX=Vmax4PEPCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4PEPCarboxy_pft(NZ))
-                    EGROX=ETLF4*CBXNX
-                    VL=AMIN1(VGROX,EGROX)*WFN4*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
-                    VG=(CanopyGasCO2_pft(NZ)-CO2X)*GSL
+                    CO2C  = CO2X*CO2Solubility_pft(NZ)
+                    CO2Y  = AZMAX1(CO2C-COMP4)
+                    CBXNX = CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
+                    VGROX = Vmax4PEPCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4PEPCarboxy_pft(NZ))
+                    EGROX = ETLF4*CBXNX
+                    VL    = AMIN1(VGROX,EGROX)*WFN4*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
+                    VG    = (CanopyGasCO2_pft(NZ)-CO2X)*GSL
                     IF(VL+VG.GT.ZERO)THEN
                       DIFF=(VL-VG)/(VL+VG)
                       IF(ABS(DIFF).LT.0.005_r8)exit
-                      VA=0.95_r8*VG+0.05_r8*VL
-                      CO2X=CanopyGasCO2_pft(NZ)-VA/GSL
+                      VA   = 0.95_r8*VG+0.05_r8*VL
+                      CO2X = CanopyGasCO2_pft(NZ)-VA/GSL
                     ELSE
                       VL=0._r8
                       exit
                     ENDIF
                   ENDDO D125
-                  CO2FCL=CO2FCL+VGROX
-                  CO2FLL=CO2FLL+EGROX
+                  CO2FCL = CO2FCL+VGROX
+                  CO2FLL = CO2FLL+EGROX
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -405,10 +397,10 @@ implicit none
 !               CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2 from stomate.f
 !               RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !
-                  PARJ=PARX+LigthSatCarboxyRate_node(K,NB,NZ)
-                  ETLF=(PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
-                  EGRO=ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
-                  VL=AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*WFNB*RubiscoActivity_brch(NB,NZ)
+                  PARJ = PARX+LigthSatCarboxyRate_node(K,NB,NZ)
+                  ETLF = (PARJ-SQRT(PARJ*PARJ-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
+                  EGRO = ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
+                  VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*WFNB*RubiscoActivity_brch(NB,NZ)
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
@@ -439,8 +431,8 @@ implicit none
   real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
   real(r8), intent(out) :: CO2F   !CO2 fixation
   real(r8), intent(out) :: CH2O   !CO2 fixation
-  real(r8), intent(out) :: CH2OClm  !C-limited C fix
-  real(r8), intent(out) :: CH2OLlm  !L-limited C fix
+  real(r8), intent(out) :: CH2OClm  !Carbon-dependent C fix
+  real(r8), intent(out) :: CH2OLlm  !Light-dependent C fix
   real(r8) :: ZADDB,PADDB
   real(r8) :: CO2FCL,CO2FLL
   integer  :: K
@@ -469,8 +461,8 @@ implicit none
 !         FOR EACH NODE
 !
         D100: DO K=1,MaxNodesPerBranch1
-          CH2O3(K)=0._r8
-          CH2O4(K)=0._r8
+          CH2O3(K) = 0._r8
+          CH2O4(K) = 0._r8
 
           IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
@@ -483,20 +475,20 @@ implicit none
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CO2FCL,CO2FLL)
-              CO2F=CO2F+CH2O4(K)
-              CH2O=CH2O+CH2O3(K)             
-              CH2OClm=CH2OClm+CO2FCL
-              CH2OLlm=CH2OLlm+CO2FLL
+              CO2F    = CO2F+CH2O4(K)
+              CH2O    = CH2O+CH2O3(K)
+              CH2OClm = CH2OClm+CO2FCL
+              CH2OLlm = CH2OLlm+CO2FLL
 
 !
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
               call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
-              CO2F=CO2F+CH2O3(K)
-              CH2O=CH2O+CH2O3(K)
-              CH2OClm=CH2OClm+CO2FCL
-              CH2OLlm=CH2OLlm+CO2FLL
+              CO2F    = CO2F+CH2O3(K)
+              CH2O    = CH2O+CH2O3(K)
+              CH2OClm = CH2OClm+CO2FCL
+              CH2OLlm = CH2OLlm+CO2FLL
 
             ENDIF
           ENDIF
@@ -504,45 +496,45 @@ implicit none
 !
 !         CO2F,CH2O=total CO2 fixation,CH2O production
 !
-        CO2F=CO2F*0.0432_r8
-        CH2O=CH2O*0.0432_r8
+        CO2F = CO2F*0.0432_r8
+        CH2O = CH2O*0.0432_r8
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
         D150: DO K=1,MaxNodesPerBranch1
-          CH2O3(K)=CH2O3(K)*0.0432_r8
-          CH2O4(K)=CH2O4(K)*0.0432_r8
+          CH2O3(K) = CH2O3(K)*0.0432_r8
+          CH2O4(K) = CH2O4(K)*0.0432_r8
         ENDDO D150
-        CH2OClm=CH2OClm*0.0432_r8
-        CH2OLlm=CH2OLlm*0.0432_r8
+        CH2OClm = CH2OClm*0.0432_r8
+        CH2OLlm = CH2OLlm*0.0432_r8
       ELSE
-        CO2F=0._r8
-        CH2O=0._r8
+        CO2F = 0._r8
+        CH2O = 0._r8
         IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
           D155: DO K=1,MaxNodesPerBranch1
-            CH2O3(K)=0._r8
-            CH2O4(K)=0._r8
+            CH2O3(K) = 0._r8
+            CH2O4(K) = 0._r8
           ENDDO D155
         ENDIF
       ENDIF
     ELSE
-      CO2F=0._r8
-      CH2O=0._r8
+      CO2F = 0._r8
+      CH2O = 0._r8
       !C4
       IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
         D160: DO K=1,MaxNodesPerBranch1
-          CH2O3(K)=0._r8
-          CH2O4(K)=0._r8
+          CH2O3(K) = 0._r8
+          CH2O4(K) = 0._r8
         ENDDO D160
       ENDIF
     ENDIF
   ELSE
-    CO2F=0._r8
-    CH2O=0._r8
+    CO2F = 0._r8
+    CH2O = 0._r8
     IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
       D165: DO K=1,MaxNodesPerBranch1
-        CH2O3(K)=0._r8
-        CH2O4(K)=0._r8
+        CH2O3(K) = 0._r8
+        CH2O4(K) = 0._r8
       ENDDO D165
     ENDIF
   ENDIF

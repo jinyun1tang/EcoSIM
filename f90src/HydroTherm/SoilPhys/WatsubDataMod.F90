@@ -19,12 +19,12 @@ implicit none
 
   real(r8),allocatable ::  TWatCharge2MicP(:,:,:)                       !
   real(r8),allocatable ::  TConvWaterFlowMacP_3D_vr(:,:,:)                      !
-  real(r8),allocatable ::  THeatFlow2Soili_vr(:,:,:)                      !
+  real(r8),allocatable ::  THeatFlow2Soili_3D_vr(:,:,:)                      !
   real(r8),allocatable ::  FIceThawMicP(:,:,:)                       !
   real(r8),allocatable ::  SoiPLIceHeatFlxFrez(:,:,:)                       !
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
 
-  real(r8),allocatable ::  TWatXChange2WatTableX(:,:,:)                      !
+  real(r8),allocatable ::  TWaterFlow2MicptX_vr(:,:,:)                      !
   real(r8),allocatable ::  FWatIrrigate2MicP1_vr(:,:,:)                        !
   real(r8),allocatable ::  HeatIrrigation1(:,:,:)                      !
 
@@ -68,12 +68,12 @@ contains
 
   allocate(TWatCharge2MicP(JZ,JY,JX));    TWatCharge2MicP=0._r8
   allocate(TConvWaterFlowMacP_3D_vr(JZ,JY,JX));   TConvWaterFlowMacP_3D_vr=0._r8
-  allocate(THeatFlow2Soili_vr(JZ,JY,JX));   THeatFlow2Soili_vr=0._r8
+  allocate(THeatFlow2Soili_3D_vr(JZ,JY,JX));   THeatFlow2Soili_3D_vr=0._r8
   allocate(FIceThawMicP(JZ,JY,JX));    FIceThawMicP=0._r8
   allocate(SoiPLIceHeatFlxFrez(JZ,JY,JX));    SoiPLIceHeatFlxFrez=0._r8
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
 
-  allocate(TWatXChange2WatTableX(JZ,JY,JX));   TWatXChange2WatTableX=0._r8
+  allocate(TWaterFlow2MicptX_vr(JZ,JY,JX));   TWaterFlow2MicptX_vr=0._r8
   allocate(FWatIrrigate2MicP1_vr(JZ,JY,JX));     FWatIrrigate2MicP1_vr=0._r8
   allocate(HeatIrrigation1(JZ,JY,JX));   HeatIrrigation1=0._r8
 
@@ -114,12 +114,12 @@ contains
 
   call destroy(TWatCharge2MicP)
   call destroy(TConvWaterFlowMacP_3D_vr)
-  call destroy(THeatFlow2Soili_vr)
+  call destroy(THeatFlow2Soili_3D_vr)
   call destroy(FIceThawMicP)
   call destroy(SoiPLIceHeatFlxFrez)
   call destroy(AVCNHL)
 
-  call destroy(TWatXChange2WatTableX)
+  call destroy(TWaterFlow2MicptX_vr)
   call destroy(FWatIrrigate2MicP1_vr)
   call destroy(HeatIrrigation1)
 

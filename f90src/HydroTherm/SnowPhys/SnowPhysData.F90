@@ -23,8 +23,8 @@ module SnowPhysData
   real(r8),allocatable ::  THeatBySnowRedist_col(:,:)                          !
   real(r8),allocatable ::  TIceBySnowRedist(:,:)                           !
   real(r8),allocatable ::  TWatBySnowRedist(:,:)                           !
-  real(r8),allocatable ::  cumWatFlx2LitRByRunoff(:,:)                          !
-  real(r8),allocatable ::  cumHeatFlx2LitRByRunoff(:,:)                         !
+  real(r8),allocatable ::  cumWatFlx2LitRByRunoff_col(:,:)                          !
+  real(r8),allocatable ::  cumHeatFlx2LitRByRunoff_col(:,:)                         !
   real(r8),allocatable ::  cumDrySnoFlxByRedistribut(:,:)                          !
   real(r8),allocatable ::  cumWatFlxBySnowRedistribut(:,:)                          !
   real(r8),allocatable ::  cumIceFlxBySnowRedistribut(:,:)                          !
@@ -77,9 +77,9 @@ module SnowPhysData
   allocate(TDrysnoBySnowRedist(JY,JX));         TDrysnoBySnowRedist=0._r8
   allocate(THeatBySnowRedist_col(JY,JX));        THeatBySnowRedist_col=0._r8
   allocate(TKSnow1_snvr(JS,JY,JX));     TKSnow1_snvr=0._r8
-  allocate(cumHeatFlx2LitRByRunoff(JY,JX));       cumHeatFlx2LitRByRunoff=0._r8
+  allocate(cumHeatFlx2LitRByRunoff_col(JY,JX));       cumHeatFlx2LitRByRunoff_col=0._r8
   allocate(cumHeatFlxBySnowRedistribut(JY,JX));       cumHeatFlxBySnowRedistribut=0._r8
-  allocate(cumWatFlx2LitRByRunoff(JY,JX));        cumWatFlx2LitRByRunoff=0._r8
+  allocate(cumWatFlx2LitRByRunoff_col(JY,JX));        cumWatFlx2LitRByRunoff_col=0._r8
   allocate(cumDrySnoFlxByRedistribut(JY,JX));        cumDrySnoFlxByRedistribut=0._r8
   allocate(cumWatFlxBySnowRedistribut(JY,JX));        cumWatFlxBySnowRedistribut=0._r8
   allocate(cumIceFlxBySnowRedistribut(JY,JX));        cumIceFlxBySnowRedistribut=0._r8
@@ -127,7 +127,7 @@ module SnowPhysData
   call destroy(trcn_QSS)  
   call destroy(trcg_TFloXSurRunoff)
   call destroy(TWatBySnowRedist)  
-  call destroy(cumWatFlx2LitRByRunoff)
+  call destroy(cumWatFlx2LitRByRunoff_col)
   call destroy(cumDrySnoFlxByRedistribut)
   call destroy(cumWatFlxBySnowRedistribut)
   call destroy(cumIceFlxBySnowRedistribut)
@@ -161,7 +161,7 @@ module SnowPhysData
   call destroy(SnowThickL0_snvr)
   call destroy(XSnowThawMassL_snvr)  
   call destroy(trcSalt_TQS)
-  call destroy(cumHeatFlx2LitRByRunoff)
+  call destroy(cumHeatFlx2LitRByRunoff_col)
   call destroy(TDrysnoBySnowRedist)
   call destroy(XIceThawMassL_snvr)  
   end subroutine DestructSnowPhysData

@@ -95,7 +95,7 @@ implicit none
   integer :: cid_PrecpB_AlPO4_conc   !precipitated AlPO4 band soil, [mol m-3]
   integer :: cid_PrecpB_CaHPO4_conc   !precipitated CaHPO4 band soil, [mol m-3]
   integer :: cid_PrecpB_Ca5P3O12O3H3_conc   !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
-  integer :: cid_PrecpB_CaH4P2O8_con   !precipitated CaH4P2O8 band soil, [mol m-3]
+  integer :: cid_PrecpB_CaH4P2O8_conc   !precipitated CaH4P2O8 band soil, [mol m-3]
   integer :: cid_PrecpB_FePO4_con   !precipitated FePO4 band soil, [mol m-3]
   integer :: cid_XNH4_band_conc     !exchangeable NH4 band soil, [mol d-2]
   integer :: cid_XROH1_band_conc    !exchangeable OH- band, [mol d-2]
@@ -133,7 +133,7 @@ implicit none
   integer :: fid_TR_SO4_2e_soil    !total solute SO4 transformation, [mol d-2 h-1]
   integer :: fid_TR_CO3_2e_soil    !total solute CO3 transformation, [mol d-2 h-1]
   integer :: fid_TR_HCO3    !total solute HCO3 transformation, [mol d-2 h-1]
-  integer :: fid_TR_CO2_aqu_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
+  integer :: fid_TR_CO2_gchem_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlOH_soil    !total solute AlOH transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO2H2_soil    !total solute AlOH2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO3H3_soil    !total solute AlOH3 transformation, [mol d-2 h-1]
@@ -291,8 +291,8 @@ implicit none
   varl(cid_Precp_CaH4P2O8_conc) ='Precp_CaH4P2O8_conc';varlnml(cid_Precp_CaH4P2O8_conc)='non-band soil precipitated Ca(H2PO4)2'
   unitl(cid_Precp_CaH4P2O8_conc)='mol m-3';vartypes(cid_Precp_CaH4P2O8_conc)=var_state_type
 
-  varl(cid_PrecpB_CaH4P2O8_con) ='PrecpB_CaH4P2O8_con';varlnml(cid_PrecpB_CaH4P2O8_con)='band soil precipitated CaH4P2O8'
-  unitl(cid_PrecpB_CaH4P2O8_con)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_con)=var_state_type
+  varl(cid_PrecpB_CaH4P2O8_conc) ='PrecpB_CaH4P2O8_conc';varlnml(cid_PrecpB_CaH4P2O8_conc)='band soil precipitated CaH4P2O8'
+  unitl(cid_PrecpB_CaH4P2O8_conc)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_conc)=var_state_type
 
   varl(cid_Precp_FePO4_conc) ='Precp_FePO4_conc';varlnml(cid_Precp_FePO4_conc)='non-band soil precipitated FePO4'
   unitl(cid_Precp_FePO4_conc)='mol m-3';vartypes(cid_Precp_FePO4_conc)=var_state_type

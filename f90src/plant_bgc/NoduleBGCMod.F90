@@ -64,8 +64,8 @@ module NoduleBGCMod
     fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,        &
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
     ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
-    CanopyRespC_CumYr_pft           => plt_bgcr%CanopyRespC_CumYr_pft,           &
-    Eco_AutoR_CumYr_col             => plt_bgcr%Eco_AutoR_CumYr_col,             &
+    CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft,     &
+    Eco_AutoR_CumYr_col       => plt_bgcr%Eco_AutoR_CumYr_col,       &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
     NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &
@@ -300,12 +300,12 @@ module NoduleBGCMod
 !     ECO_ER_col=ecosystem respiration
 !     Eco_AutoR_CumYr_col=total autotrophic respiration
 !
-    RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
-    CanopyGrosRCO2_pft(NZ)=CanopyGrosRCO2_pft(NZ)-RCO2T
-    CanopyRespC_CumYr_pft(NZ)=CanopyRespC_CumYr_pft(NZ)-RCO2T
-    CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-RCO2T
-    ECO_ER_col=ECO_ER_col-RCO2T
-    Eco_AutoR_CumYr_col=Eco_AutoR_CumYr_col-RCO2T
+    RCO2T                     = AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
+    CanopyGrosRCO2_pft(NZ)    = CanopyGrosRCO2_pft(NZ)-RCO2T
+    CanopyRespC_CumYr_pft(NZ) = CanopyRespC_CumYr_pft(NZ)-RCO2T
+    CO2NetFix_pft(NZ)         = CO2NetFix_pft(NZ)-RCO2T
+    ECO_ER_col                = ECO_ER_col-RCO2T
+    Eco_AutoR_CumYr_col       = Eco_AutoR_CumYr_col-RCO2T
 !
 !     NODULE LitrFall CAUSED BY REMOBILIZATION
 !
@@ -404,11 +404,10 @@ module NoduleBGCMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootNodulBiochemistry(I,J,NZ,TFN6_vr,fRootGrowPSISense)
+  subroutine RootNodulBiochemistry(I,J,NZ,TFN6_vr)
   implicit none
   integer , intent(in) :: I,J,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1)
-  real(r8), intent(in) :: fRootGrowPSISense(2,JZ1)
   integer :: L,M
   real(r8) :: ZPOOLD
   real(r8) :: CCC,CNC,CPC
@@ -452,18 +451,19 @@ module NoduleBGCMod
     NodulerPC_pft          => plt_allom%NodulerPC_pft,         &
     k_fine_litr            => pltpar%k_fine_litr,              &
     iroot                  => pltpar%iroot,                    &
+    fRootGrowPSISense_pvr  => plt_pheno%fRootGrowPSISense_pvr, &
     RootRespPotent_pvr     => plt_rbgc%RootRespPotent_pvr,     &
     RootCO2EmisPot_pvr     => plt_rbgc%RootCO2EmisPot_pvr,     &
-    RAutoRootO2Limter_pvr  => plt_rbgc%RAutoRootO2Limter_pvr,  &
+    RAutoRootO2Limter_rpvr  => plt_rbgc%RAutoRootO2Limter_rpvr,  &
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr,       &
     NodulInfectElms_pft    => plt_bgcr%NodulInfectElms_pft,    &
     LitrfalStrutElms_pvr   => plt_bgcr%LitrfalStrutElms_pvr,   &
     RootN2Fix_pft          => plt_rbgc%RootN2Fix_pft,          &
     RootN2Fix_pvr          => plt_bgcr%RootN2Fix_pvr,          &
     PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr,     &
-    RootNodulStrutElms_pvr => plt_biom%RootNodulStrutElms_pvr, &
+    RootNodulStrutElms_rpvr => plt_biom%RootNodulStrutElms_rpvr, &
     ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft,         &
-    RootNodulNonstElms_pvr => plt_biom%RootNodulNonstElms_pvr, &
+    RootNodulNonstElms_rpvr => plt_biom%RootNodulNonstElms_rpvr, &
     ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft,       &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
     ElmAllocmat4Litr       => plt_soilchem%ElmAllocmat4Litr,   &
@@ -482,13 +482,13 @@ module NoduleBGCMod
 !
 !     INITIAL INFECTION
 !
-        IF(RootNodulStrutElms_pvr(ielmc,L,NZ).LE.0.0_r8)THEN
-          RootNodulStrutElms_pvr(ielmc,L,NZ)=RootNodulStrutElms_pvr(ielmc,L,NZ)+NodulBiomCatInfection*AREA3(NU)
-          RootNodulStrutElms_pvr(ielmn,L,NZ)=RootNodulStrutElms_pvr(ielmn,L,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerNC_pft(NZ)
-          RootNodulStrutElms_pvr(ielmp,L,NZ)=RootNodulStrutElms_pvr(ielmp,L,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerPC_pft(NZ)
+        IF(RootNodulStrutElms_rpvr(ielmc,L,NZ).LE.0.0_r8)THEN
+          RootNodulStrutElms_rpvr(ielmc,L,NZ)=RootNodulStrutElms_rpvr(ielmc,L,NZ)+NodulBiomCatInfection*AREA3(NU)
+          RootNodulStrutElms_rpvr(ielmn,L,NZ)=RootNodulStrutElms_rpvr(ielmn,L,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerNC_pft(NZ)
+          RootNodulStrutElms_rpvr(ielmp,L,NZ)=RootNodulStrutElms_rpvr(ielmp,L,NZ)+NodulBiomCatInfection*AREA3(NU)*NodulerPC_pft(NZ)
 
           DO NE=1,NumPlantChemElms
-            NodulInfectElms_pft(NE,NZ)=NodulInfectElms_pft(NE,NZ)+RootNodulStrutElms_pvr(NE,L,NZ)
+            NodulInfectElms_pft(NE,NZ)=NodulInfectElms_pft(NE,NZ)+RootNodulStrutElms_rpvr(NE,L,NZ)
           ENDDO
         ENDIF
 !
@@ -503,9 +503,9 @@ module NoduleBGCMod
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     FCNPF=N,P constraint to bacterial activity
 !
-        IF(RootNodulStrutElms_pvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+        IF(RootNodulStrutElms_rpvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
-            NodulNonstElmConc(NE)=AZMAX1(RootNodulNonstElms_pvr(NE,L,NZ)/RootNodulStrutElms_pvr(ielmc,L,NZ))
+            NodulNonstElmConc(NE)=AZMAX1(RootNodulNonstElms_rpvr(NE,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ))
           ENDDO
         ELSE
           NodulNonstElmConc(1:NumPlantChemElms)=1.0_r8
@@ -521,10 +521,10 @@ module NoduleBGCMod
           CNC=0._r8
           CPC=0._r8
         ENDIF
-        IF(RootNodulStrutElms_pvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+        IF(RootNodulStrutElms_rpvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
           FCNPF=AMIN1(1.0_r8 &
-            ,SQRT(RootNodulStrutElms_pvr(ielmn,L,NZ)/(RootNodulStrutElms_pvr(ielmc,L,NZ)*NodulerNC_pft(NZ))) &
-            ,SQRT(RootNodulStrutElms_pvr(ielmp,L,NZ)/(RootNodulStrutElms_pvr(ielmc,L,NZ)*NodulerPC_pft(NZ))))
+            ,SQRT(RootNodulStrutElms_rpvr(ielmn,L,NZ)/(RootNodulStrutElms_rpvr(ielmc,L,NZ)*NodulerNC_pft(NZ))) &
+            ,SQRT(RootNodulStrutElms_rpvr(ielmp,L,NZ)/(RootNodulStrutElms_rpvr(ielmc,L,NZ)*NodulerPC_pft(NZ))))
         ELSE
           FCNPF=1.0_r8
         ENDIF
@@ -541,16 +541,17 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     fRootGrowPSISense=growth function of root water potential
 !
-        RespNonst_OUltd=AZMAX1(AMIN1(RootNodulNonstElms_pvr(ielmc,L,NZ) &
-          ,VMXO*RootNodulStrutElms_pvr(ielmc,L,NZ))*FCNPF*fTgrowRootP_vr(L,NZ)*fRootGrowPSISense(1,L))
-        CPOOLNX=RootNodulNonstElms_pvr(ielmc,L,NZ)
+        RespNonst_OUltd=AZMAX1(AMIN1(RootNodulNonstElms_rpvr(ielmc,L,NZ) &
+          ,VMXO*RootNodulStrutElms_rpvr(ielmc,L,NZ))*FCNPF*fTgrowRootP_vr(L,NZ) &
+          *fRootGrowPSISense_pvr(ipltroot,L,NZ))
+        CPOOLNX=RootNodulNonstElms_rpvr(ielmc,L,NZ)
 !
 !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
 !     RespNonst_Oltd=respiration from non-structural C ltd by O2
-!     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
+!     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
 !
-        RespNonst_Oltd=RespNonst_OUltd*RAutoRootO2Limter_pvr(1,L,NZ)
+        RespNonst_Oltd=RespNonst_OUltd*RAutoRootO2Limter_rpvr(1,L,NZ)
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     NODULE STRUCTURAL N
@@ -560,7 +561,7 @@ module NoduleBGCMod
 !     TFN6_vr=temperature function for root maintenance respiration
 !     WTNDLN=bacterial N mass
 !
-        Rmaint=AZMAX1(RmSpecPlant*TFN6_vr(L)*RootNodulStrutElms_pvr(ielmn,L,NZ))*SPNDLI
+        Rmaint=AZMAX1(RmSpecPlant*TFN6_vr(L)*RootNodulStrutElms_rpvr(ielmn,L,NZ))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -569,12 +570,12 @@ module NoduleBGCMod
 !     RGNDLM,RGNDL=growth respiration unlimited by N,P and unltd,ltd by O2
 !     RSNDLM,RSNDL=excess maintenance respiration unltd,ltd by O2
 !
-        RXNDLM=RespNonst_OUltd-Rmaint
-        RXNDL=RespNonst_Oltd-Rmaint
-        RGNDLM=AZMAX1(RXNDLM)
-        RGNDL=AZMAX1(RXNDL)
-        RSNDLM=AZMAX1(-RXNDLM)
-        RSNDL=AZMAX1(-RXNDL)
+        RXNDLM = RespNonst_OUltd-Rmaint
+        RXNDL  = RespNonst_Oltd-Rmaint
+        RGNDLM = AZMAX1(RXNDLM)
+        RGNDL  = AZMAX1(RXNDL)
+        RSNDLM = AZMAX1(-RXNDLM)
+        RSNDL  = AZMAX1(-RXNDL)
 !
 !     NODULE N2 FIXATION FROM GROWTH RESPIRATION, FIXATION ENERGY
 !     REQUIREMENT AND NON-STRUCTURAL C:N:P PRODUCT INHIBITION,
@@ -588,7 +589,7 @@ module NoduleBGCMod
 !     Rauto4Nfix_rvr=respiration for N2 fixation
 !     RootN2Fix_pvr,RootN2Fix_pft=layer,total root N2 fixation
 !
-        RGN2P=AZMAX1(RootNodulStrutElms_pvr(ielmc,L,NZ)*NodulerNC_pft(NZ)-RootNodulStrutElms_pvr(ielmn,L,NZ))/EN2F
+        RGN2P=AZMAX1(RootNodulStrutElms_rpvr(ielmc,L,NZ)*NodulerNC_pft(NZ)-RootNodulStrutElms_rpvr(ielmn,L,NZ))/EN2F
         IF(RGNDL.GT.ZERO4Groth_pft(NZ))THEN
           Rauto4Nfix_rvr=RGNDL*RGN2P/(RGNDL+RGN2P)
         ELSE
@@ -615,9 +616,9 @@ module NoduleBGCMod
         RCCC=RCCZN+CCC*RCCYN
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
-        SPNDX=SPNDL*SQRT(fTgrowRootP_vr(L,NZ)*fRootGrowPSISense(1,L))
+        SPNDX=SPNDL*SQRT(fTgrowRootP_vr(L,NZ)*fRootGrowPSISense_pvr(ipltroot,L,NZ))
         DO NE=1,NumPlantChemElms
-          NoduleElmDecayLoss(NE)=SPNDX*RootNodulStrutElms_pvr(NE,L,NZ)
+          NoduleElmDecayLoss(NE)=SPNDX*RootNodulStrutElms_rpvr(NE,L,NZ)
         ENDDO
 
         NoduleElmntDecay2Litr(ielmc)=NoduleElmDecayLoss(ielmc)*(1.0_r8-RCCC)
@@ -646,13 +647,13 @@ module NoduleBGCMod
 !     NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmn),NodulNonstElmConc(ielmp)=nonstructural C,N,P concn in bacteria
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
-        NodulUseNonstElm_rvr(ielmc)=AMIN1(RootNodulNonstElms_pvr(ielmc,L,NZ)-AMIN1(Rmaint,RespNonst_Oltd) &
+        NodulUseNonstElm_rvr(ielmc)=AMIN1(RootNodulNonstElms_rpvr(ielmc,L,NZ)-AMIN1(Rmaint,RespNonst_Oltd) &
           -Rauto4Nfix_rvr+NodulElmDecayRecyc(ielmc),(RGNDL-Rauto4Nfix_rvr)/(1.0_r8-NoduGrowthYield_pft(NZ)))
         NoduleBiomCGrowth=NodulUseNonstElm_rvr(ielmc)*NoduGrowthYield_pft(NZ)
         NoduleCResp=Rauto4Nfix_rvr+NodulUseNonstElm_rvr(ielmc)*(1.0_r8-NoduGrowthYield_pft(NZ))
-        NodulUseNonstElm_rvr(ielmn)=AZMAX1(AMIN1(RootNodulNonstElms_pvr(ielmn,L,NZ),NoduleBiomCGrowth*NodulerNC_pft(NZ)))&
+        NodulUseNonstElm_rvr(ielmn)=AZMAX1(AMIN1(RootNodulNonstElms_rpvr(ielmn,L,NZ),NoduleBiomCGrowth*NodulerNC_pft(NZ)))&
           *NodulNonstElmConc(ielmn)/(NodulNonstElmConc(ielmn)+CZKM)
-        NodulUseNonstElm_rvr(ielmp)=AZMAX1(AMIN1(RootNodulNonstElms_pvr(ielmp,L,NZ),NoduleBiomCGrowth*NodulerPC_pft(NZ)))&
+        NodulUseNonstElm_rvr(ielmp)=AZMAX1(AMIN1(RootNodulNonstElms_rpvr(ielmp,L,NZ),NoduleBiomCGrowth*NodulerPC_pft(NZ)))&
           *NodulNonstElmConc(ielmp)/(NodulNonstElmConc(ielmp)+CPKM)
 !
 !     NODULE SENESCENCE
@@ -664,12 +665,12 @@ module NoduleBGCMod
 !     NodulELmSenes2Litr(ielmc),NodulELmSenes2Litr(ielmc),NodulELmSenes2Litr(ielmp)=bacterial C,N,P senescence to LitrFall
 !     NodulELmSenes2Recyc(ielmc),NodulELmSenes2Recyc(ielmc),NodulELmSenes2Recyc(ielmp)=bacterial C,N,P senescence to recycling
 !
-        IF(RSNDL.GT.0.0_r8 .AND. RootNodulStrutElms_pvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RCCC.GT.ZERO)THEN
+        IF(RSNDL.GT.0.0_r8 .AND. RootNodulStrutElms_rpvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RCCC.GT.ZERO)THEN
           NodulELmLoss2Senes(ielmc)=RSNDL/RCCC
-          NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_pvr(ielmn,L,NZ)&
-            /RootNodulStrutElms_pvr(ielmc,L,NZ)
-          NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_pvr(ielmp,L,NZ)&
-            /RootNodulStrutElms_pvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmn,L,NZ)&
+            /RootNodulStrutElms_rpvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmp,L,NZ)&
+            /RootNodulStrutElms_rpvr(ielmc,L,NZ)
           NodulELmSenes2Litr(ielmc)=NodulELmLoss2Senes(ielmc)*(1.0_r8-RCCC)
           NodulELmSenes2Litr(ielmn)=NodulELmLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
           NodulELmSenes2Litr(ielmp)=NodulELmLoss2Senes(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
@@ -709,7 +710,7 @@ module NoduleBGCMod
         D6370: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)&
-              +ElmAllocmat4Litr(NE,iroot,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
+              +ElmAllocmat4Litr(NE,iroot,M,NZ)*AZMAX1(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
           ENDDO
         ENDDO D6370
 !
@@ -725,11 +726,11 @@ module NoduleBGCMod
 !     NodulUseNonstElm_rvr(ielmn),NodulUseNonstElm_rvr(ielmp)=nonstructural N,P used in growth
 !     RootN2Fix_pvr=root N2 fixation
 !
-        RootNodulNonstElms_pvr(ielmc,L,NZ)=RootNodulNonstElms_pvr(ielmc,L,NZ)-AMIN1(Rmaint,RespNonst_Oltd)&
+        RootNodulNonstElms_rpvr(ielmc,L,NZ)=RootNodulNonstElms_rpvr(ielmc,L,NZ)-AMIN1(Rmaint,RespNonst_Oltd)&
           -Rauto4Nfix_rvr-NodulUseNonstElm_rvr(ielmc)+NodulElmDecayRecyc(ielmc)
-        RootNodulNonstElms_pvr(ielmn,L,NZ)=RootNodulNonstElms_pvr(ielmn,L,NZ)-NodulUseNonstElm_rvr(ielmn) &
+        RootNodulNonstElms_rpvr(ielmn,L,NZ)=RootNodulNonstElms_rpvr(ielmn,L,NZ)-NodulUseNonstElm_rvr(ielmn) &
           +NodulElmDecayRecyc(ielmn)+NodulELmSenes2Recyc(ielmn)+RootN2Fix_pvr(L,NZ)
-        RootNodulNonstElms_pvr(ielmp,L,NZ)=RootNodulNonstElms_pvr(ielmp,L,NZ)-NodulUseNonstElm_rvr(ielmp) &
+        RootNodulNonstElms_rpvr(ielmp,L,NZ)=RootNodulNonstElms_rpvr(ielmp,L,NZ)-NodulUseNonstElm_rvr(ielmp) &
           +NodulElmDecayRecyc(ielmp)+NodulELmSenes2Recyc(ielmp)
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
@@ -740,10 +741,10 @@ module NoduleBGCMod
 !     NodulELmLoss2Senes(ielmc),NodulELmLoss2Senes(ielmc),NodulELmLoss2Senes(ielmp)=bacterial C,N,P loss from senescence
 !     NodulUseNonstElm_rvr(ielmn),NodulUseNonstElm_rvr(ielmp)=nonstructural N,P used in growth
 !
-        RootNodulStrutElms_pvr(ielmc,L,NZ)=RootNodulStrutElms_pvr(ielmc,L,NZ) &
+        RootNodulStrutElms_rpvr(ielmc,L,NZ)=RootNodulStrutElms_rpvr(ielmc,L,NZ) &
           +NoduleBiomCGrowth-NoduleElmDecayLoss(ielmc)-NodulELmLoss2Senes(ielmc)
         DO NE=2,NumPlantChemElms  
-          RootNodulStrutElms_pvr(NE,L,NZ)=RootNodulStrutElms_pvr(NE,L,NZ) &
+          RootNodulStrutElms_rpvr(NE,L,NZ)=RootNodulStrutElms_rpvr(NE,L,NZ) &
             +NodulUseNonstElm_rvr(NE)-NoduleElmDecayLoss(NE)-NodulELmLoss2Senes(NE)
         ENDDO  
 !
@@ -762,28 +763,28 @@ module NoduleBGCMod
 !
         IF(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
           .AND. PopuRootMycoC_pvr(ipltroot,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
-          CCNDLR=RootNodulStrutElms_pvr(ielmc,L,NZ)/PopuRootMycoC_pvr(ipltroot,L,NZ)
+          CCNDLR=RootNodulStrutElms_rpvr(ielmc,L,NZ)/PopuRootMycoC_pvr(ipltroot,L,NZ)
           WTRTD1=PopuRootMycoC_pvr(ipltroot,L,NZ)
-          WTNDL1=AMIN1(PopuRootMycoC_pvr(ipltroot,L,NZ),AMAX1(NodulBiomCatInfection*AREA3(NU),RootNodulStrutElms_pvr(ielmc,L,NZ)))
+          WTNDL1=AMIN1(PopuRootMycoC_pvr(ipltroot,L,NZ),AMAX1(NodulBiomCatInfection*AREA3(NU),RootNodulStrutElms_rpvr(ielmc,L,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZERO4Groth_pft(NZ))THEN
             FXRNX=FXRN(iPlantNfixType_pft(NZ))/(1.0_r8+CCNDLR/CCNGR)
 !    2/(1.0+CCNDLR/(CCNGR*FXRN(iPlantNfixType_pft(NZ))))
-            CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*WTNDL1-RootNodulNonstElms_pvr(ielmc,L,NZ)*WTRTD1)/WTRTDT
+            CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*WTNDL1-RootNodulNonstElms_rpvr(ielmc,L,NZ)*WTRTD1)/WTRTDT
             XFRE(ielmc)=FXRNX*CPOOLD
             RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
-            RootNodulNonstElms_pvr(ielmc,L,NZ)=RootNodulNonstElms_pvr(ielmc,L,NZ)+XFRE(ielmc)
-            CPOOLT=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+RootNodulNonstElms_pvr(ielmc,L,NZ)
+            RootNodulNonstElms_rpvr(ielmc,L,NZ)=RootNodulNonstElms_rpvr(ielmc,L,NZ)+XFRE(ielmc)
+            CPOOLT=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+RootNodulNonstElms_rpvr(ielmc,L,NZ)
             IF(CPOOLT.GT.ZERO4Groth_pft(NZ))THEN
-              ZPOOLD=(RootMycoNonstElms_rpvr(ielmn,ipltroot,L,NZ)*RootNodulNonstElms_pvr(ielmc,L,NZ) &
-                -RootNodulNonstElms_pvr(ielmn,L,NZ)* RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/CPOOLT
+              ZPOOLD=(RootMycoNonstElms_rpvr(ielmn,ipltroot,L,NZ)*RootNodulNonstElms_rpvr(ielmc,L,NZ) &
+                -RootNodulNonstElms_rpvr(ielmn,L,NZ)* RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(ielmn)=FXRNX*ZPOOLD
-              PPOOLD=(RootMycoNonstElms_rpvr(ielmp,ipltroot,L,NZ)*RootNodulNonstElms_pvr(ielmc,L,NZ) &
-                -RootNodulNonstElms_pvr(ielmp,L,NZ)* RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/CPOOLT
+              PPOOLD=(RootMycoNonstElms_rpvr(ielmp,ipltroot,L,NZ)*RootNodulNonstElms_rpvr(ielmc,L,NZ) &
+                -RootNodulNonstElms_rpvr(ielmp,L,NZ)* RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(ielmp)=FXRNX*PPOOLD
               DO NE=2,NumPlantChemElms
                 RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)-XFRE(NE)
-                RootNodulNonstElms_pvr(NE,L,NZ)=RootNodulNonstElms_pvr(NE,L,NZ)+XFRE(NE)
+                RootNodulNonstElms_rpvr(NE,L,NZ)=RootNodulNonstElms_rpvr(NE,L,NZ)+XFRE(NE)
               ENDDO
             ENDIF
           ENDIF

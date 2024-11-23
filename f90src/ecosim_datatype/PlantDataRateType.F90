@@ -9,16 +9,17 @@ module PlantDataRateType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  Eco_NEE_col(:,:)                         !total canopy net CO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)             
-  real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)             
+  real(r8),target,allocatable :: CanopyGrosRCO2_pft(:,:,:)                       !canopy autotrophic respiraiton [gC d-2 h-1]
+  real(r8),target,allocatable ::  Eco_NEE_col(:,:)                               !total canopy net CO2 exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                          !canopy NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)                   !pft nodule infection [g d-2 h-1]
+  real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)                !pft cumulative nodule infection
   real(r8),target,allocatable ::  NH3Emis_CumYr_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
-  real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)                     !total surface LitrFall element, [g d-2]
-  real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)              !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)       !root uptake of NH4 non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)             !root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RUPGasSol_vr(:,:,:,:,:,:)          !aqueous H2 flux from roots to soil water, [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
+  real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)             !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootUptkSoiSol_vr(:,:,:,:,:,:)                      !aqueous H2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)                  !root uptake of H2PO4 non-band
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)                  !root uptake of H2PO4 band
   real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
@@ -48,8 +49,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  N2ObyFire_CumYr_pft(:,:,:)                       !plant N2O emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  PO4byFire_CumYr_pft(:,:,:)                       !plant PO4 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  RootO2Dmnd4Resp_pvr(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_air2root_flx__pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_Root_DisEvap_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_air2root_flx_pvr(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_Root_gas2aqu_flx_vr(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2Emis_pvr(:,:,:,:,:)                   !aqueous CO2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootO2Uptk_pvr(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotent_pvr(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
@@ -68,9 +69,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootNO3DmndSoil_pvr(:,:,:,:,:)                  !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4DmndBand_pvr(:,:,:,:,:)                  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3DmndBand_pvr(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNH3Z(:,:,:)                       !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Dep2Can_brch(:,:,:,:)                     !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RAutoRootO2Limter_pvr(:,:,:,:,:)                     !O2 constraint to root respiration, []
+  real(r8),target,allocatable ::  RAutoRootO2Limter_rpvr(:,:,:,:,:)                     !O2 constraint to root respiration, []
   real(r8),target,allocatable ::  PlantRootSoilElmNetX_pft(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  PlantExudElm_CumYr_pft(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)
@@ -109,7 +109,9 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RDOMEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial DOC uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndK_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndPrev_vr(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
-  real(r8),target,allocatable ::  TH2GZ(:,:)                         !total root H2 flux, [g d-2]
+  real(r8),target,allocatable ::  TRootH2Flx_col(:,:)                                          !total root H2 flux, [g d-2]
+  real(r8),target,allocatable ::  RootCO2Autor_vr(:,:,:)                                 !root autotrophic respiraiton [gC/m3/hr]
+  real(r8),target,allocatable ::  fRootGrowPSISense_pvr(:,:,:,:,:)             !moisture dependence scalar for root growth [none]
   private :: InitAllocate
   contains
 
@@ -128,6 +130,8 @@ module PlantDataRateType
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots    !number of root types, root,mycos
+
+  allocate(CanopyGrosRCO2_pft(JP,JY,JX)); CanopyGrosRCO2_pft=0._r8
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
   allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
   allocate(NH3Emis_CumYr_pft(JP,JY,JX));    NH3Emis_CumYr_pft=0._r8  
@@ -164,9 +168,9 @@ module PlantDataRateType
   allocate(N2ObyFire_CumYr_pft(JP,JY,JX));    N2ObyFire_CumYr_pft=0._r8
   allocate(PO4byFire_CumYr_pft(JP,JY,JX));    PO4byFire_CumYr_pft=0._r8
   allocate(RootO2Dmnd4Resp_pvr(jroots,JZ,JP,JY,JX));RootO2Dmnd4Resp_pvr=0._r8
-  allocate(trcg_air2root_flx__pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx__pvr=0._r8
-  allocate(trcg_Root_DisEvap_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_DisEvap_flx_vr=0._r8
-  allocate(RUPGasSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RUPGasSol_vr=0._r8
+  allocate(trcg_air2root_flx_pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_air2root_flx_pvr=0._r8
+  allocate(trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_Root_gas2aqu_flx_vr=0._r8
+  allocate(RootUptkSoiSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RootUptkSoiSol_vr=0._r8
   allocate(RootCO2Emis_pvr(jroots,JZ,JP,JY,JX));RootCO2Emis_pvr=0._r8
   allocate(RootO2Uptk_pvr(jroots,JZ,JP,JY,JX));RootO2Uptk_pvr=0._r8
   allocate(RootRespPotent_pvr(jroots,JZ,JP,JY,JX));RootRespPotent_pvr=0._r8
@@ -185,9 +189,9 @@ module PlantDataRateType
   allocate(RootNO3DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndSoil_pvr=0._r8
   allocate(RootNH4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndBand_pvr=0._r8
   allocate(RootNO3DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndBand_pvr=0._r8
-  allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
+  allocate(fRootGrowPSISense_pvr(jroots,JZ,JP,JY,JX)); fRootGrowPSISense_pvr=0._r8
   allocate(NH3Dep2Can_brch(MaxNumBranches,JP,JY,JX)); NH3Dep2Can_brch=0._r8
-  allocate(RAutoRootO2Limter_pvr(jroots,JZ,JP,JY,JX)); RAutoRootO2Limter_pvr=0._r8
+  allocate(RAutoRootO2Limter_rpvr(jroots,JZ,JP,JY,JX)); RAutoRootO2Limter_rpvr=0._r8
   allocate(PlantRootSoilElmNetX_pft(NumPlantChemElms,JP,JY,JX));   PlantRootSoilElmNetX_pft=0._r8
   allocate(PlantExudElm_CumYr_pft(NumPlantChemElms,JP,JY,JX));   PlantExudElm_CumYr_pft=0._r8
   allocate(RootUptk_N_CumYr_pft(JP,JY,JX)); RootUptk_N_CumYr_pft=0._r8
@@ -226,20 +230,23 @@ module PlantDataRateType
   allocate(RDOMEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RDOMEcoDmndPrev_vr=0._r8
   allocate(RAcetateEcoDmndK_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndK_vr=0._r8
   allocate(RAcetateEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndPrev_vr=0._r8
-  allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
+  allocate(TRootH2Flx_col(JY,JX));       TRootH2Flx_col=0._r8
+  allocate(RootCO2Autor_vr(JZ,JY,JX));   RootCO2Autor_vr=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
   subroutine DestructPlantRates
   use abortutils, only : destroy
   implicit none
+
+  call destroy(CanopyGrosRCO2_pft)
   call destroy(Eco_NEE_col)
   call destroy(NH3Dep2Can_pft)
   call destroy(NH3Emis_CumYr_pft)
   call destroy(SurfLitrfalStrutElms_CumYr_pft)
   call destroy(RootMycoExudElm_pvr)
   call destroy(RootNutUptake_pvr)
-  call destroy(RUPGasSol_vr)
+  call destroy(RootUptkSoiSol_vr)
   call destroy(RootN2Fix_pvr)
   call destroy(RootH2PO4DmndSoil_pvr)
   call destroy(RootH2PO4DmndBand_pvr)
@@ -287,9 +294,9 @@ module PlantDataRateType
   call destroy(RootNO3DmndSoil_pvr)
   call destroy(RootNH4DmndBand_pvr)
   call destroy(RootNO3DmndBand_pvr)
-  call destroy(RNH3Z)
+  call destroy(fRootGrowPSISense_pvr)
   call destroy(NH3Dep2Can_brch)
-  call destroy(RAutoRootO2Limter_pvr)
+  call destroy(RAutoRootO2Limter_rpvr)
   call destroy(PlantRootSoilElmNetX_pft)
   call destroy(PlantExudElm_CumYr_pft)
   call destroy(RootUptk_N_CumYr_pft)
@@ -325,8 +332,9 @@ module PlantDataRateType
   call destroy(RDOMEcoDmndPrev_vr)
   call destroy(RAcetateEcoDmndK_vr)
   call destroy(RAcetateEcoDmndPrev_vr)
-  call destroy(TH2GZ)
+  call destroy(TRootH2Flx_col)
   call destroy(trcs_plant_uptake_vr)
+  call destroy(RootCO2Autor_vr)
   end subroutine DestructPlantRates
 
 end module PlantDataRateType

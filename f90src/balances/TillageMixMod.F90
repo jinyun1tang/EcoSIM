@@ -207,14 +207,14 @@ module TillageMixMod
   HFLXD                     = HFLXD-ENGYM(0)-ENGYV(0)
   DO  L=NU(NY,NX),LL
     IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-      VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-      VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+      VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
+      VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
-      TKS_vr(L,NY,NX)=(ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)        
-      TCS(L,NY,NX)=units%Kelvin2Celcius(TKS_vr(L,NY,NX))      
+      TKS_vr(L,NY,NX) = (ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)
+      TCS(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDIF
   ENDDO
-  write(*,*)(TKS_vr(L,NY,NX),L=0,LL)
+
   HEATIN_lnd    = HEATIN_lnd-HFLXD
   HeatStore_lnd = HeatStore_lnd-HFLXD
 
@@ -343,8 +343,8 @@ module TillageMixMod
 
     DO  L=NU(NY,NX),LL
       IF(TZNFN2.GT.ZERO)THEN
-        ZNFNI(L,NY,NX)=ZNFNI(L,NY,NX)*TZNFNI/TZNFN2
-        ZNFNI(L,NY,NX)=ZNFNI(L,NY,NX)+0.5_r8*(ZNFN0(L,NY,NX)-ZNFNI(L,NY,NX))
+        ZNFNI(L,NY,NX) = ZNFNI(L,NY,NX)*TZNFNI/TZNFN2
+        ZNFNI(L,NY,NX) = ZNFNI(L,NY,NX)+0.5_r8*(ZNFN0(L,NY,NX)-ZNFNI(L,NY,NX))
       ENDIF
     ENDDO
 

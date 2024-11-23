@@ -238,7 +238,7 @@ module IngridTranspMod
         ENDIF
 
         DO nsalts=idsalt_beg,idsalt_end
-          trcSaltAdv2SowLay(nsalts,L2,NY,NX)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWW
+          trcSaltAdv2SowLay(nsalts,L2,NY,NX)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWW
           trcSaltFlo2SnowLay(nsalts,L2,NY,NX)=trcSaltFlo2SnowLay(nsalts,L2,NY,NX)+trcSaltAdv2SowLay(nsalts,L2,NY,NX)
         ENDDO
 
@@ -272,17 +272,17 @@ module IngridTranspMod
           VFLWPOB=VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
           DO nsalts=idsalt_beg,idsalt_end
-            trcSaltSnoFlo2LitR(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWR
+            trcSaltSnoFlo2LitR(nsalts)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWR
           ENDDO
 
           DO nsalts=idsalt_beg,idsalt_KSO4
-            trcSaltSnoFlo2Soil(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWS
+            trcSaltSnoFlo2Soil(nsalts)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWS
           ENDDO
 
           DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
             ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
-            trcSaltSnoFlo2Soil(nsalts)=trcSalt_sosml2(nsalts,L,NY,NX)*VFLWPO4
-            trcSaltSnoFlo2Soil(ids)=trcSalt_sosml2(ids,L,NY,NX)*VFLWPOB
+            trcSaltSnoFlo2Soil(nsalts)=trc_Saltml2_snvr(nsalts,L,NY,NX)*VFLWPO4
+            trcSaltSnoFlo2Soil(ids)=trc_Saltml2_snvr(ids,L,NY,NX)*VFLWPOB
           ENDDO
           ICHKL=1
         ENDIF
@@ -858,7 +858,7 @@ module IngridTranspMod
 !
       IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QflxSurfRunoffM(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
 
           DO nsalts=idsalt_beg,idsalt_end
             trcSalt_RQR(nsalts,N,2,N5,N4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
@@ -880,7 +880,7 @@ module IngridTranspMod
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
             DO nsalts=idsalt_beg,idsalt_end
               trcSalt_RQR(nsalts,N,1,N5B,N4B)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
             ENDDO
@@ -939,7 +939,7 @@ module IngridTranspMod
           ENDIF
 
           DO nsalts=idsalt_beg,idsaltb_end
-            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trcSalt_sosml2(nsalts,1,N2,N1))
+            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trc_Saltml2_snvr(nsalts,1,N2,N1))
           ENDDO
 !
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
@@ -951,7 +951,7 @@ module IngridTranspMod
             VFLW=-VFLWX
           ENDIF
           DO nsalts=idsalt_beg,idsaltb_end
-            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trcSalt_sosml2(nsalts,1,N5,N4))
+            trcSalt_RQ(nsalts,N,N5,N4)=VFLW*AZMAX1(trc_Saltml2_snvr(nsalts,1,N5,N4))
           ENDDO
         ENDIF
 !
@@ -995,7 +995,7 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     *S2,*B2=micropore solute content in non-band,band
 !
-  IF(WaterFlow2MicPM(M,N,N6,N5,N4).GT.0.0)THEN
+  IF(WaterFlow2MicPM_3D(M,N,N6,N5,N4).GT.0.0)THEN
 !
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -1003,7 +1003,7 @@ module IngridTranspMod
 !     IN CURRENT GRID CELL
 !
     IF(VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1027,7 +1027,7 @@ module IngridTranspMod
 !
   ELSE
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1167,7 +1167,7 @@ module IngridTranspMod
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
 
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1229,9 +1229,9 @@ module IngridTranspMod
   integer :: nsalts
   real(r8) :: trcSalt_RFH(idsalt_beg:idsaltb_end)
   real(r8) :: VFLW
-!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !
-  IF(WaterFlow2MacPM(M,N,N6,N5,N4).GT.0.0)THEN
+  IF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).GT.0.0)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -1257,7 +1257,7 @@ module IngridTranspMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     IF(VLWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1298,7 +1298,7 @@ module IngridTranspMod
           *trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
       ENDDO
     ENDIF
-  ELSEIF(WaterFlow2MacPM(M,N,N6,N5,N4).LT.0.0)THEN
+  ELSEIF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).LT.0.0)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM ADJACENT TO
 !     CURRENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -1306,7 +1306,7 @@ module IngridTranspMod
 !     IN ADJACENT GRID CELL
 !
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1387,7 +1387,7 @@ module IngridTranspMod
 !     DLYR=soil layer thickness
 !     TortMacPM=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     WaterFlow2MacPM=water flux through soil macropore from watsub.f
+!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
 !     *SGL2=solute diffusivity from hour1.f
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -1409,7 +1409,7 @@ module IngridTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)

@@ -49,9 +49,9 @@ module SnowDataType
   real(r8),target, allocatable ::  trcg_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  trcn_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
 
-  real(r8),target, allocatable ::  trcg_solsml_snvr(:,:,:,:)               ! snowpack dual phase disolved tracers
-  real(r8),target, allocatable ::  trcn_solsml(:,:,:,:)               ! snowpack nutrient dissolved tracers
-  real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
+  real(r8),target, allocatable ::  trcg_solsml_snvr(:,:,:,:)               ! Disolved volatile tracers in snow [g d-2]
+  real(r8),target, allocatable ::  trcn_solsml_snvr(:,:,:,:)               ! Dissolved nutrient tracers in snow [g d-2]
+  real(r8),target, allocatable ::  trc_Saltml_snvr(:,:,:,:)                    ! snowpack salt dissolved tracers
 
 
   real(r8),target, allocatable ::  trcSalt_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
@@ -104,9 +104,9 @@ contains
 
 ! exclude NH3B
   allocate(trcg_solsml_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml_snvr=0._r8
-  allocate(trcn_solsml(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml=0._r8
+  allocate(trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml_snvr=0._r8
   if(salt_model)then
-    allocate(trcs_solsml(idsalt_beg:idsalt_end,JS,JY,JX)); trcs_solsml=0._r8
+    allocate(trc_Saltml_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trc_Saltml_snvr=0._r8
   endif
 
   allocate(trcSalt_XQS(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_XQS=0._r8
@@ -117,7 +117,7 @@ contains
   use abortutils, only : destroy
   implicit none
   if(salt_model)then
-    call destroy(trcs_solsml)
+    call destroy(trc_Saltml_snvr)
     call destroy(trcSalt_XQS)
   endif
   call destroy(VLSnowHeatCapM_snvr)
@@ -160,6 +160,7 @@ contains
   call destroy(HeatBySnowRedistrib_2DH)
   call destroy(trcg_FloXSnow_2DH)
   call destroy(trcn_FloXSnow_2DH)
+  call destroy(trcn_solsml_snvr)
   if(salt_model)then
     call destroy(trcSalt_XQS)
   endif

@@ -22,10 +22,10 @@ disp_planttrait=.true.
 iErosionMode=0
 !set up output variable lists
 !set up the first year of simulation
-start_date  = '19900101000000'
+start_date  = '19990101000000'
 continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
-forc_periods=2001,2001,10,2001,2004,0,2001,2008,0
+forc_periods=2001,2001,2,2001,2008,1,2001,2008,0
 
 !set up solvers
 NPXS=30,30,20   !number of cycles per hour for water,heat,solute flux calcns

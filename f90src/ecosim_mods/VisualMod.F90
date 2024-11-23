@@ -26,7 +26,7 @@ module VisualMod
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  real(r8) :: TCSNX,TTRN,TTLE,TTSH,TEco_Heat_Grnd_col,TTCO,TTCH
+  real(r8) :: TCSNX,TTRN,TTLE,TTSH,TEco_Heat_GrndSurf_col,TTCO,TTCH
 
   integer :: L,NX,NY,N
 
@@ -123,7 +123,7 @@ module VisualMod
     TTRN=0.0_r8
     TTLE=0.0_r8
     TTSH=0.0_r8
-    TEco_Heat_Grnd_col=0.0_r8
+    TEco_Heat_GrndSurf_col=0.0_r8
     TTCO=0.0_r8
     TTCH=0.0_r8
     D9995: DO NX=NHW,NHE
@@ -131,7 +131,7 @@ module VisualMod
         TTRN=TTRN+Eco_NetRad_col(NY,NX)
         TTLE=TTLE+Eco_Heat_Latent_col(NY,NX)
         TTSH=TTSH+Eco_Heat_Sens_col(NY,NX)
-        TEco_Heat_Grnd_col=TEco_Heat_Grnd_col+Eco_Heat_Grnd_col(NY,NX)
+        TEco_Heat_GrndSurf_col=TEco_Heat_GrndSurf_col+Eco_Heat_GrndSurf_col(NY,NX)
         TTCO=TTCO+Eco_NEE_col(NY,NX)
         TTCH=TTCH+SurfGasFlx_col(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
@@ -272,7 +272,7 @@ module VisualMod
 !     WRITE LANDSCAPE OUTPUT
 !
     WRITE(19,2025)'FLUXES',iYearCurrent,I,J,TTRN*277.8/TAREA &
-      ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TEco_Heat_Grnd_col*277.8/TAREA &
+      ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TEco_Heat_GrndSurf_col*277.8/TAREA &
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
       ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &

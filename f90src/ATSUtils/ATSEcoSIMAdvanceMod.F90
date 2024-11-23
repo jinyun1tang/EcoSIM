@@ -10,10 +10,10 @@ module ATSEcoSIMAdvanceMod
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
-  use ClimForcDataType, only : LWRadSky, TairK_col, &
+  use ClimForcDataType, only : LWRadSky_col, TairK_col, &
       VPA, WindSpeedAtm_col, RainH  
   use SoilPropertyDataType
-  use HydroThermData, only : PSISM1_vr, TKSoi1_vr, VHeatCapacity1_vr, &
+  use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
 implicit none
@@ -30,7 +30,7 @@ implicit none
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
   integer, intent(in) :: NYS
-  real(r8) :: YSIN(NumOfSkyAzimuSects),YCOS(NumOfSkyAzimuSects),SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
   real(r8) :: HeatFluxAir2Soi(JY,JX)
@@ -60,7 +60,7 @@ implicit none
     !OXYE(NY,NX)=atm_o2
     !Z2GE(NY,NX)=atm_n2
     !Z2OE(NY,NX)=atm_n2o
-    !ZNH3E(NY,NX)=atm_nh3
+    !ZNH3E_col(NY,NX)=atm_nh3
     !H2GE(NY,NX)=atm_H2
     TairK_col(NY,NX)=tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
@@ -69,7 +69,7 @@ implicit none
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
-    LWRadSky(NY,NX) = sunrad(NY)*0.0036_r8
+    LWRadSky_col(NY,NX) = sunrad(NY)*0.0036_r8
     RainH(NY,NX) = p_rain(NY)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
@@ -80,7 +80,7 @@ implicit none
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
       VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)
       VLiceMicP1_vr(L,NY,NX)       = 0.0
-      TKSoi1_vr(L,NY,NX)              = a_TEMP(L,NY)
+      TKSoil1_vr(L,NY,NX)              = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0
       PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)

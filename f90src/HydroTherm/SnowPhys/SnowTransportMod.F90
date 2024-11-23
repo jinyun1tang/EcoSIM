@@ -65,8 +65,8 @@ implicit none
         !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
         !
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
-            -trcg_Xbndl_flx(NTG,LS2,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
+            -trcVolatile_Xbndl_flx_snvr(NTG,LS2,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -102,24 +102,24 @@ implicit none
 
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1) &
-            -trcs_Transp2MicP_3D(NTG,3,0,N2,N1)-trcs_Transp2MicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
-            -trcs_Transp2MacP_3D(NTG,3,NUM(N2,N1),N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
+            -trcs_TransptMicP_3D(NTG,3,0,N2,N1)-trcs_TransptMicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
+            -trcs_TransptMacP_3D(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
-            -trcs_Transp2MicP_3D(NTN,3,0,N2,N1)-trcs_Transp2MicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
-            -trcs_Transp2MacP_3D(NTN,3,NUM(N2,N1),N2,N1)
+            -trcs_TransptMicP_3D(NTN,3,0,N2,N1)-trcs_TransptMicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
+            -trcs_TransptMacP_3D(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         !add band flux
         trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -trcs_Transp2MicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_Transp2MacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -trcs_TransptMicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
         DO NTS=0,ids_nuts
           trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
-            -trcs_Transp2MicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_Transp2MacP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
+            -trcs_TransptMicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         IF(salt_model)THEN
@@ -144,7 +144,7 @@ implicit none
       IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_Xbndl_flx(NTG,LS,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -195,14 +195,14 @@ implicit none
       DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
       TSoilO2G_lnd        = TSoilO2G_lnd+trcg_solsml_snvr(idg_O2,L,NY,NX)
       TGasN_lnd           = TGasN_lnd+trcg_solsml_snvr(idg_N2,L,NY,NX)+trcg_solsml_snvr(idg_N2O,L,NY,NX)
-      TDisolNH4_lnd       = TDisolNH4_lnd+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
-      tNO3_lnd            = tNO3_lnd+trcn_solsml(ids_NO3,L,NY,NX)
-      TDisolPi_lnd        = TDisolPi_lnd+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
+      TDisolNH4_lnd       = TDisolNH4_lnd+trcn_solsml_snvr(ids_NH4,L,NY,NX)+trcg_solsml_snvr(idg_NH3,L,NY,NX)
+      tNO3_lnd            = tNO3_lnd+trcn_solsml_snvr(ids_NO3,L,NY,NX)
+      TDisolPi_lnd        = TDisolPi_lnd+trcn_solsml_snvr(ids_H1PO4,L,NY,NX)+trcn_solsml_snvr(ids_H2PO4,L,NY,NX)
 
       IF(salt_model)THEN
         SSW=0._r8
         do nsalts=idsalt_beg,idsalt_end
-          SSW=SSW+trcs_solsml(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
+          SSW=SSW+trc_Saltml_snvr(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
         ENDDO  
         TION=TION+SSW
       ENDIF
@@ -228,14 +228,14 @@ implicit none
     !   write(116,*)I+J/24.,'beg611',trc_solml_vr(ids_NO3,0,NY,NX),trcn_QSS(ids_NO3,NY,NX),trcn_QSS(ids_NO2,NY,NX)
 
     DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
+      trcn_solsml_snvr(NTS,1,NY,NX)=trcn_solsml_snvr(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
     ENDDO
 
     !   write(116,*)I+J/24.,'beg612',trc_solml_vr(ids_NO3,0,NY,NX),RNutMicbTransf_vr(ids_NO3,0,NY,NX),trcn_RChem_soil_vr(ids_NO3,0,NY,NX)
 
     IF(salt_model)THEN
       DO NTA=idsalt_beg,idsalt_end
-        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
+        trc_Saltml_snvr(NTA,1,NY,NX)=trc_Saltml_snvr(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
       ENDDO
     ENDIF
   ENDIF

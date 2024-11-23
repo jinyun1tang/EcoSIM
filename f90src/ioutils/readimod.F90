@@ -285,20 +285,23 @@ module readiMod
       CO2EI(NY,NX)=aco2_ppm
       CH4E_col(NY,NX)=ach4_ppm
       Z2OE(NY,NX)=an2o_ppm
-      ZNH3E(NY,NX)=ZNH3EG
+      ZNH3E_col(NY,NX)=ZNH3EG
       KoppenClimZone_col(NY,NX)   = IETYPG
       FlowDirIndicator(NY,NX)     = grid_mode
       NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
       WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
       WaterTBLSlope(NY,NX)        = DTBLGG
+
       RechargNorthSurf(NY,NX)     = RCHQNG
       RechargEastSurf(NY,NX)      = RCHQEG
       RechargSouthSurf(NY,NX)     = RCHQSG
       RechargWestSurf(NY,NX)      = RCHQWG
+
       RechargNorthSubSurf(NY,NX)  = RCHGNUG
       RechargEastSubSurf(NY,NX)   = RCHGEUG
       RechargSouthSubSurf(NY,NX)  = RCHGSUG
       RechargWestSubSurf(NY,NX)   = RCHGWUG
+
       RechargRateNorthWTBL(NY,NX) = RCHGNTG
       RechargRateEastWTBL(NY,NX)  = RCHGETG
       RechargRateSouthWTBL(NY,NX) = RCHGSTG
@@ -430,8 +433,8 @@ module readiMod
 
     call ncd_getvar(grid_nfid, 'PH',ntp,PH(1:JZ,NV1,NH1))
     !meq/100g means 1.e-3 mol/100 g =1 cmol/kg , cmol ~ 1.e-2 mol
-    call ncd_getvar(grid_nfid, 'CEC',ntp,CEC(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'AEC',ntp,AEC(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CEC',ntp,CEC_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'AEC',ntp,AEC_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CORGC',ntp,CSoilOrgM_vr(ielmc,1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CORGR',ntp,COMLitrC_vr(1:JZ,NV1,NH1))
@@ -542,8 +545,8 @@ module readiMod
             SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK_vr(L,NY,NX)             = ROCK_vr(L,NV1,NH1)
             PH(L,NY,NX)                  = PH(L,NV1,NH1)
-            CEC(L,NY,NX)                 = CEC(L,NV1,NH1)
-            AEC(L,NY,NX)                 = AEC(L,NV1,NH1)
+            CEC_vr(L,NY,NX)                 = CEC_vr(L,NV1,NH1)
+            AEC_vr(L,NY,NX)                 = AEC_vr(L,NV1,NH1)
             CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NV1,NH1)
             COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NV1,NH1)
             CSoilOrgM_vr(ielmn,L,NY,NX)  = CSoilOrgM_vr(ielmn,L,NV1,NH1)
@@ -632,8 +635,8 @@ module readiMod
               SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L+1,NY,NX)
               ROCK_vr(L,NY,NX)             = ROCK_vr(L+1,NY,NX)
               PH(L,NY,NX)                  = PH(L+1,NY,NX)
-              CEC(L,NY,NX)                 = CEC(L+1,NY,NX)
-              AEC(L,NY,NX)                 = AEC(L+1,NY,NX)
+              CEC_vr(L,NY,NX)                 = CEC_vr(L+1,NY,NX)
+              AEC_vr(L,NY,NX)                 = AEC_vr(L+1,NY,NX)
               CSoilOrgM_vr(ielmc,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmc,L+1,NY,NX)
               COMLitrC_vr(L,NY,NX)         = 1.0_r8*COMLitrC_vr(L+1,NY,NX)
               CSoilOrgM_vr(ielmn,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmn,L+1,NY,NX)
@@ -719,8 +722,8 @@ module readiMod
           CSAND(L,NY,NX)=CSAND(L,NY,NX)*corrector
           CSILT(L,NY,NX)=CSILT(L,NY,NX)*corrector
           CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*corrector
-          CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
-          AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
+          CEC_vr(L,NY,NX)=CEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
+          AEC_vr(L,NY,NX)=AEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
           CNO3(L,NY,NX)=CNO3(L,NY,NX)/natomw
           CPO4(L,NY,NX)=CPO4(L,NY,NX)/patomw
@@ -753,9 +756,9 @@ module readiMod
             CSoilOrgM_vr(ielmp,L,NY,NX)=AMIN1(0.0125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
               1.2E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.52_r8)
           ENDIF
-          IF(CEC(L,NY,NX).LT.0.0_r8)THEN
+          IF(CEC_vr(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
-            CEC(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+06_r8 &
+            CEC_vr(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+06_r8 &
               +80.0_r8*CCLAY(L,NY,NX)+20.0_r8*CSILT(L,NY,NX) &
               +5.0_r8*CSAND(L,NY,NX))
           ENDIF
@@ -864,9 +867,9 @@ module readiMod
   write(*,*)'pH'
   write(*,*)(PH(L,NY,NX),L=NU,NM)
   write(*,*)'Cation exchange capacity (cmol Kg-1): CEC'
-  write(*,*)(CEC(L,NY,NX),L=NU,NM)
+  write(*,*)(CEC_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Anion exchange capacity (cmol Kg-1): AEC'
-  write(*,*)(AEC(L,NY,NX),L=NU,NM)
+  write(*,*)(AEC_vr(L,NY,NX),L=NU,NM)
 !
 !     ORGANIC C, N AND P CONCENTRATIONS
 !

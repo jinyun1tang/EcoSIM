@@ -13,10 +13,8 @@ implicit none
 
   public
 
-  real(r8),allocatable ::  trcs_Transp2MicP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  trcs_Transp2MacP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  TXGridSurfRunoff_2DH(:,:)                           !
-  real(r8),allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)                          !
+  real(r8),allocatable ::  trcs_TransptMicP_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  trcs_TransptMacP_vr(:,:,:,:)                      !
 
   real(r8),allocatable ::  TCOQSS(:,:)                        !
   real(r8),allocatable ::  TCHQSS(:,:)                        !
@@ -48,7 +46,7 @@ implicit none
   real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)                       !
-  real(r8),allocatable ::  TWaterFlowMacP_vr(:,:,:)                       !
+  real(r8),allocatable ::  TWatFlowCellMacP_vr(:,:,:)                       !
 
   real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)                      !
 
@@ -85,13 +83,9 @@ implicit none
 
   implicit none
 
-  allocate(trcs_Transp2MacP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MacP_vr=0._r8
+  allocate(trcs_TransptMacP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_TransptMacP_vr=0._r8
   allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JX));   Gas_AdvDif_Flx_vr=0._r8
 
-  allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
-  allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
- ! allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
- ! allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
 
 !  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
 !  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
@@ -126,12 +120,12 @@ implicit none
 
   allocate(trcx_TER(idx_beg:idx_end,JY,JX));    trcx_TER=0._r8
   allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
-  allocate(trcs_Transp2MicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Transp2MicP_vr=0._r8
+  allocate(trcs_TransptMicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_TransptMicP_vr=0._r8
 
   allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
   allocate(TWatFlowCellMicP_vr(JZ,JY,JX));     TWatFlowCellMicP_vr=0._r8
   allocate(TWatFlowCellMicPX_vr(JZ,JY,JX));    TWatFlowCellMicPX_vr=0._r8
-  allocate(TWaterFlowMacP_vr(JZ,JY,JX));    TWaterFlowMacP_vr=0._r8
+  allocate(TWatFlowCellMacP_vr(JZ,JY,JX));    TWatFlowCellMacP_vr=0._r8
   allocate(WatIceThawMicP_vr(JZ,JY,JX));    WatIceThawMicP_vr=0._r8
   allocate(THeatSoiThaw_vr(JZ,JY,JX));   THeatSoiThaw_vr=0._r8
   allocate(WatIceThawMacP_vr(JZ,JY,JX));   WatIceThawMacP_vr=0._r8
@@ -170,16 +164,14 @@ implicit none
   call destroy(TOSMER)
   call destroy(TOSAER)
   call destroy(trcSalt_Flo2MicP_vr)
-  call destroy(trcs_Transp2MicP_vr)
+  call destroy(trcs_TransptMicP_vr)
   call destroy(trcSalt_Flo2MacP_vr)
-  call destroy(TXGridSurfRunoff_2DH)
-  call destroy(THeatXGridBySurfRunoff_2DH)
 !  call destroy(TFLWS)
 !  call destroy(TFLWW)
 !  call destroy(TFLWI)
 !  call destroy(THFLWW)
 
-  call destroy(trcs_Transp2MacP_vr)
+  call destroy(trcs_TransptMacP_vr)
 
   call destroy(TCOQSS)
   call destroy(TCHQSS)
@@ -206,7 +198,7 @@ implicit none
   call destroy(tErosionSedmLoss)
   call destroy(TWatFlowCellMicP_vr)
   call destroy(TWatFlowCellMicPX_vr)
-  call destroy(TWaterFlowMacP_vr)
+  call destroy(TWatFlowCellMacP_vr)
   call destroy(WatIceThawMicP_vr)
   call destroy(THeatSoiThaw_vr)
   call destroy(WatIceThawMacP_vr)
