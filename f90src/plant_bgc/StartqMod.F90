@@ -733,8 +733,8 @@ module StartqMod
       PSIRootOSMO_vr(N,L,NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
-      RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
-      RootProteinConc_pvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
+      RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
+      RootProteinConc_rpvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)=0._r8
       PopuRootMycoC_pvr(N,L,NZ,NY,NX)=0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)=0._r8
@@ -779,13 +779,13 @@ module StartqMod
       trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)=0._r8
       trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)=COXYA*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_O2,N,L,NZ,NY,NX)=COXYP*RootVH2O_pvr(N,L,NZ,NY,NX)
-      RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)=1.0_r8
+      RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)=1.0_r8
 
       D30: DO NR=1,MaxNumRootAxes
         Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         Root1stLen_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
-        Root2ndLen_pvr(N,L,NR,NZ,NY,NX)=0._r8
+        Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
       ENDDO D30
 
@@ -795,8 +795,8 @@ module StartqMod
             LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
-        RootNodulNonstElms_pvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
-        RootNodulStrutElms_pvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
+        RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
+        RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
         RootN2Fix_pvr(L,NZ,NY,NX)=0._r8
       ENDIF
     ENDDO D20

@@ -249,7 +249,7 @@ module PlantNonstElmDynMod
     MY                        => plt_morph%MY,                        &
     ZERO                      => plt_site%ZERO,                       &
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
-    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,   &
+    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,   &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr      &
   )
     DO NE=1,NumPlantChemElms
@@ -258,11 +258,11 @@ module PlantNonstElmDynMod
 
     D5545: DO N=1,MY(NZ)
       D5550: DO L=NU,MaxSoiL4Root_pft(NZ)
-        IF(RootNonstructElmConc_pvr(ielmc,N,L,NZ).GT.ZERO)THEN
-          CNL=RootNonstructElmConc_pvr(ielmc,N,L,NZ)/(RootNonstructElmConc_pvr(ielmc,N,L,NZ) &
-            +RootNonstructElmConc_pvr(ielmn,N,L,NZ)/CNKI)
-          CPL=RootNonstructElmConc_pvr(ielmc,N,L,NZ)/(RootNonstructElmConc_pvr(ielmc,N,L,NZ) &
-            +RootNonstructElmConc_pvr(ielmp,N,L,NZ)/CPKI)
+        IF(RootNonstructElmConc_rpvr(ielmc,N,L,NZ).GT.ZERO)THEN
+          CNL=RootNonstructElmConc_rpvr(ielmc,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmc,N,L,NZ) &
+            +RootNonstructElmConc_rpvr(ielmn,N,L,NZ)/CNKI)
+          CPL=RootNonstructElmConc_rpvr(ielmc,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmc,N,L,NZ) &
+            +RootNonstructElmConc_rpvr(ielmp,N,L,NZ)/CPKI)
         ELSE
           CNL=0._r8
           CPL=0._r8

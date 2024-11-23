@@ -49,10 +49,10 @@ module RootDataType
   real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                        !root brancing frequency, [m-1]
   real(r8),target,allocatable ::  RootNodulElms_pft(:,:,:,:)            
   real(r8),target,allocatable ::  RootPoreTortu4Gas(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8),target,allocatable ::  RootNodulNonstElms_pvr(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
+  real(r8),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                   !root layer length per plant, [m p-1]
   real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
-  real(r8),target,allocatable ::  Root2ndLen_pvr(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
+  real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)          !root length density in soil layers, [m m-3]
   real(r8),target,allocatable ::  Root1stXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
   real(r8),target,allocatable ::  Root2ndXNum_pvr(:,:,:,:,:)                    !root layer number axes, [d-2]
@@ -80,13 +80,13 @@ module RootDataType
   real(r8),target,allocatable ::  RootMyco1stStrutElms_rpvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
   real(r8),target,allocatable ::  RootMyco2ndStrutElms_rpvr(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
   real(r8),target,allocatable ::   PopuRootMycoC_pvr(:,:,:,:,:)                   !root layer C, [g d-2]
-  real(r8),target,allocatable ::  RootNodulStrutElms_pvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
+  real(r8),target,allocatable ::  RootNodulStrutElms_rpvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
   real(r8),target,allocatable ::  NodulStrutElms_pft(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  RootMycoActiveBiomC_pvr(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::   RootMycoNonstElms_rpvr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  RootNonstructElmConc_pvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
+  real(r8),target,allocatable ::  RootNonstructElmConc_rpvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
-  real(r8),target,allocatable ::  RootProteinConc_pvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
+  real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
   real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)
 !----------------------------------------------------------------------
 
@@ -136,10 +136,10 @@ contains
   allocate(Root2ndMaxRadius_pft(jroots,JP,JY,JX)); Root2ndMaxRadius_pft=0._r8
   allocate(RootBranchFreq_pft(JP,JY,JX));     RootBranchFreq_pft=0._r8
   allocate(RootPoreTortu4Gas(jroots,JP,JY,JX));  RootPoreTortu4Gas=0._r8
-  allocate(RootNodulNonstElms_pvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_pvr=0._r8
+  allocate(RootNodulNonstElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_rpvr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
   allocate(Root1stLen_rpvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stLen_rpvr=0._r8
-  allocate(Root2ndLen_pvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndLen_pvr=0._r8
+  allocate(Root2ndLen_rpvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndLen_rpvr=0._r8
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
   allocate(Root1stXNumL_pvr(jroots,JZ,JP,JY,JX));Root1stXNumL_pvr=0._r8
   allocate(Root2ndXNum_pvr(jroots,JZ,JP,JY,JX));Root2ndXNum_pvr=0._r8
@@ -157,8 +157,8 @@ contains
   allocate(PSIRoot_pvr(jroots,JZ,JP,JY,JX));PSIRoot_pvr=0._r8
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._r8
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
-  allocate(trcg_rootml_pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcg_rootml_pvr =0._r8
-  allocate(trcs_rootml_pvr(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml_pvr =0._r8
+  allocate(trcg_rootml_pvr(idg_beg:idg_end-1,jroots,JZ,JP,JY,JX)); trcg_rootml_pvr =0._r8
+  allocate(trcs_rootml_pvr(idg_beg:idg_end-1,jroots,JZ,JP,JY,JX)); trcs_rootml_pvr =0._r8
   allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootElms_pft(NumPlantChemElms,JP,JY,JX)); RootElms_pft=0._r8
@@ -167,13 +167,13 @@ contains
   allocate(RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));RootMyco1stStrutElms_rpvr=0._r8
   allocate(RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));RootMyco2ndStrutElms_rpvr=0._r8
   allocate( PopuRootMycoC_pvr(jroots,JZ,JP,JY,JX)); PopuRootMycoC_pvr=0._r8
-  allocate(RootNodulStrutElms_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodulStrutElms_pvr=0._r8
+  allocate(RootNodulStrutElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodulStrutElms_rpvr=0._r8
   allocate(NodulStrutElms_pft(NumPlantChemElms,JP,JY,JX));  NodulStrutElms_pft=0._r8
   allocate(RootMycoActiveBiomC_pvr(jroots,JZ,JP,JY,JX));RootMycoActiveBiomC_pvr=0._r8
   allocate(RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstElms_rpvr=0._r8
-  allocate(RootNonstructElmConc_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_pvr=0._r8
+  allocate(RootNonstructElmConc_rpvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_rpvr=0._r8
   allocate(RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));RootMyco1stElm_raxs=0._r8
-  allocate(RootProteinConc_pvr(jroots,JZ,JP,JY,JX));RootProteinConc_pvr=0._r8
+  allocate(RootProteinConc_rpvr(jroots,JZ,JP,JY,JX));RootProteinConc_rpvr=0._r8
   end subroutine InitRootData
 
 !----------------------------------------------------------------------
@@ -220,10 +220,10 @@ contains
   call destroy(Root2ndMaxRadius_pft)
   call destroy(RootBranchFreq_pft)
   call destroy(RootPoreTortu4Gas)
-  call destroy(RootNodulNonstElms_pvr)
+  call destroy(RootNodulNonstElms_rpvr)
   call destroy(RootLenPerPlant_pvr)
   call destroy(Root1stLen_rpvr)
-  call destroy(Root2ndLen_pvr)
+  call destroy(Root2ndLen_rpvr)
   call destroy(RootLenDensPerPlant_pvr)
   call destroy(Root1stXNumL_pvr)
   call destroy(Root2ndXNum_pvr)
@@ -252,13 +252,13 @@ contains
   call destroy(RootMyco1stStrutElms_rpvr)
   call destroy(RootMyco2ndStrutElms_rpvr)
   call destroy( PopuRootMycoC_pvr)
-  call destroy(RootNodulStrutElms_pvr)
+  call destroy(RootNodulStrutElms_rpvr)
   call destroy(NodulStrutElms_pft)
   call destroy(RootMycoActiveBiomC_pvr)
   call destroy(RootMycoNonstElms_rpvr)
-  call destroy(RootNonstructElmConc_pvr)
+  call destroy(RootNonstructElmConc_rpvr)
   call destroy(RootMyco1stElm_raxs)
-  call destroy(RootProteinConc_pvr)
+  call destroy(RootProteinConc_rpvr)
   end subroutine DestructRootData
 
 end module RootDataType

@@ -792,7 +792,6 @@ module RedistMod
   subroutine update_physVar_Profile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
   !     WATER, ICE, HEAT, TEMPERATUR
   !
-  use PerturbationMod, only : check_Soil_Warming,is_warming_layerL
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
@@ -805,10 +804,6 @@ module RedistMod
   real(r8) :: VOLWXX,VOLIXX,VHeatCapacityX,WS,HS
   real(r8) :: DVLWatMicP_vr(JZ,JY,JX)   !change in water volume
   integer :: L,it
-  logical :: do_warming
-
-  do_warming=check_Soil_Warming(iYearCurrent,I)
-  it=(I-1)*24+J
 
   if(lverb)write(*,*)'update_physVar_Profile'
   TVHeatCapacity      = 0.0_r8
@@ -821,8 +816,6 @@ module RedistMod
   DVLiceMicP_vr       = 0._r8
   THeatFlow2Soil_col   = 0._r8
   DO L=NU(NY,NX),NL(NY,NX)
-    TKSX           = TKS_vr(L,NY,NX)
-    VHeatCapacityX = VHeatCapacity_vr(L,NY,NX)
     VOLWXX         = VLWatMicP_vr(L,NY,NX)
     VOLIXX         = VLiceMicP_vr(L,NY,NX)
     !micropore
@@ -851,6 +844,8 @@ module RedistMod
       VLsoiAirP_vr(L,NY,NX)=0.0_r8
     ENDIF
 
+    TKSX                      = TKS_vr(L,NY,NX)
+    VHeatCapacityX            = VHeatCapacity_vr(L,NY,NX)
     ENGY                      = VHeatCapacityX*TKSX
     VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
       +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
@@ -864,35 +859,24 @@ module RedistMod
     TVOLIH              = TVOLIH+VLiceMacP_vr(L,NY,NX)
     TENGY               = TENGY+ENGY
     !
-    !     ARTIFICIAL SOIL WARMING
     !
-    !     IF(NX.EQ.3.AND.NY.EQ.2.AND.L.GT.NU(NY,NX)
-    !    3.AND.L.LE.17.AND.I.GE.152.AND.I.LE.304)THEN
-    !     THeatFlowCellSoil_vr(L,NY,NX)=THeatFlowCellSoil_vr(L,NY,NX)
-    !    2+(TKSZ(I,J,L)-TKS_vr(L,NY,NX))*VHeatCapacity_vr(L,NY,NX)
-    !     WRITE(*,3379)'TKSZ',I,J,NX,NY,L,TKSZ(I,J,L)
-    !    2,TKS_vr(L,NY,NX),VHeatCapacity_vr(L,NY,NX),THeatFlowCellSoil_vr(L,NY,NX)
-    !3379  FORMAT(A8,6I4,12E12.4)
-    !     ENDIF
     !
-    !     END ARTIFICIAL SOIL WARMING
-    !
-    TKSpre=TKS_vr(L,NY,NX)
     IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_vr(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
-      if(do_warming .and. is_warming_layerL(L,NY,NX))then     
-        THeatFlowCellSoil_vr(L,NY,NX) = THeatFlowCellSoil_vr(L,NY,NX) + &
-          (TKS_ref_vr(it,L,NY,NX)-TKS_vr(L,NY,NX))*VHeatCapacity_vr(L,NY,NX)
-      endif   
 
+      !     ARTIFICIAL SOIL WARMING
+!      if(do_warming .and. is_warming_layerL(L,NY,NX))then     
+!        THeatFlowCellSoil_vr(L,NY,NX) = THeatFlowCellSoil_vr(L,NY,NX) + (TKS_ref_vr(it,L,NY,NX)-TKSX)*VHeatCapacity_vr(L,NY,NX)
+!      endif   
+      !     END ARTIFICIAL SOIL WARMING
+      tHeatUptk_col(NY,NX)      = tHeatUptk_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)
       THeatFlow2Soil_col(NY,NX) = THeatFlow2Soil_col(NY,NX) + THeatFlowCellSoil_vr(L,NY,NX)
-      TKS00                     = TKS_vr(L,NY,NX)
-      TKS_vr(L,NY,NX)           = (ENGY+THeatFlowCellSoil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) &
+      TKS_vr(L,NY,NX)           = (ENGY+THeatFlowCellSoil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) +HeatSource_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
-      tHeatUptk_col(NY,NX)=tHeatUptk_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)      
 
-      if(TKS_vr(L,NY,NX)> 400._r8 .and. isclose(ENGY,0._r8))TKS_vr(L,NY,NX)=TKS00
+      if(TKS_vr(L,NY,NX)> 400._r8 .and. isclose(ENGY,0._r8))TKS_vr(L,NY,NX)=TKSX
+
       if(TKS_vr(L,NY,NX)>4.e2 .or. TKS_vr(L,NY,NX)<100._r8)then
-        write(*,*)'weird temperature in redist',NU(NY,NX),L,NY,NX,TKSpre,TKS_vr(NU(NY,NX):L,NY,NX)
+        write(*,*)'weird temperature in redist',NU(NY,NX),L,NY,NX,TKSX,TKS_vr(NU(NY,NX):L,NY,NX)
         write(*,*)'heatcap',VHeatCapacityX,VHeatCapacity_vr(NU(NY,NX):L,NY,NX),ZEROS(NY,NX)
         write(*,*)'soilbkd',SoiBulkDensity_vr(NU(NY,NX):L,NY,NX)
         write(*,*)'itemized',ENGY/VHeatCapacity_vr(L,NY,NX),&

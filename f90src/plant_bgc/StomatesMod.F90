@@ -152,6 +152,7 @@
 !
   VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
   CH2O = CH2O+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
+  if(lverb)write(*,*)'C3FixCO2'
   end associate
   end subroutine C3FixCO2
 !------------------------------------------------------------------------------------------
@@ -188,6 +189,8 @@
             Tau_rad  = TAU_RadThru(L+1)
           ENDIF
     !
+          if(lverb)write(*,*)LP,L,N,M,NumOfLeafZenithSectors1,NumOfSkyAzimuthSects1,LeafAUnshaded_zsec(N,L,K,NB,NZ),'C3FixCO2',PAR_zsec     
+
           if(PAR_zsec>0._r8)call C3FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)          
         ENDDO
       ENDIF

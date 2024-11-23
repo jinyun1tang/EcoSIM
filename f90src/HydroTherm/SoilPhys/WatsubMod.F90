@@ -13,6 +13,7 @@ module WatsubMod
   use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
   use SnowBalanceMod, only : DebugSnowPrint
   use EcoSIMCtrlMod,  only: lverb,snowRedist_model  
+  use PerturbationMod, only : check_Soil_Warming,is_warming_layerL  
   use minimathmod      
   use RootDataType
   use EcosimConst
@@ -55,6 +56,7 @@ module WatsubMod
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   real(r8), parameter :: tiny_wat=1.e-12_r8   !threshold water flux
   integer :: curday,curhour
+  logical :: do_warming
 
   public :: watsub,InitWatsub
   public :: DestroyWatsub
@@ -97,6 +99,7 @@ module WatsubMod
   real(r8) :: Hinfl2Soil(JY,JX)
 ! begin_execution
 
+  do_warming=check_Soil_Warming(iYearCurrent,I)
 ! this enters the EcoSIM interaction with the soil-water-temperature module
   call LocalCopySoilVars(I,J,NHW,NHE,NVN,NVS)
 ! 
@@ -1001,7 +1004,10 @@ module WatsubMod
   integer :: NY,NX,L
   real(r8) :: tk1pres,tk1l
   real(r8) :: ENGY1,VLTSoiPore,VHXX
-  real(r8) :: TKXX,VLWMicPre,VLHeatCapacityPre
+  real(r8) :: TKXX,VLWMicPre,VLHeatCapacityPre,dHeat
+  integer :: it
+  real(r8),parameter :: tau=100._r8
+  it=(I-1)*24+J
 
 ! begin_execution
   D11: DO NX=NHW,NHE
@@ -1085,9 +1091,17 @@ module WatsubMod
 
          IF(VHeatCapacity1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
-            tk1l                = TKSoil1_vr(L,NY,NX)
+            
             TKSoil1_vr(L,NY,NX) = (ENGY1+THeatFlow2Soili_3D_vr(L,NY,NX)+TLPhaseChangeHeat2Soi1(L,NY,NX)+&
               HeatIrrigation1(L,NY,NX))/VHeatCapacity1_vr(L,NY,NX)
+
+            if(do_warming .and. is_warming_layerL(L,NY,NX))then     
+              tk1l                   = TKSoil1_vr(L,NY,NX)
+              dHeat                  = (TKS_ref_vr(it,L,NY,NX)-tk1l)*VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP
+              HeatSource_vr(L,NY,NX) = HeatSource_vr(L,NY,NX)+(TKS_ref_vr(it,L,NY,NX)-tk1l)*VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP
+              TKSoil1_vr(L,NY,NX)    = tk1l+dHeat/VHeatCapacity1_vr(L,NY,NX)
+            endif
+
             
             if(TKSoil1_vr(L,NY,NX)>400.0_r8)then
               write(*,*)'TKSoil1_vr(L,NY,NX)',M,L,TKSoil1_vr(L,NY,NX),tk1l,VLHeatCapacityPre,VHeatCapacity1_vr(L,NY,NX)
@@ -1706,9 +1720,8 @@ module WatsubMod
   !     ConvectVapFlux,ConvectiveHeatFlux=vapor flux and its convective heat flux
 !
   IF(THETPM(M,N3,N2,N1).GT.THETX.AND.THETPM(M,N6,N5,N4).GT.THETX)THEN
-    TK11 = TKSoil1_vr(N3,N2,N1)
-    TK12 = TKSoil1_vr(N6,N5,N4)
-
+    TK11   = TKSoil1_vr(N3,N2,N1)
+    TK12   = TKSoil1_vr(N6,N5,N4)
     VP1    = vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGASC*TK11))
     VPL    = vapsat(TK12)*EXP(18.0_r8*PSISVL/(RGASC*TK12))
     CNV1   = WVapDifusvitySoil_vr(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS_vr(N3,N2,N1)
@@ -1783,6 +1796,7 @@ module WatsubMod
     IF(N3.EQ.NUM(NY,NX) .AND. VLHeatCapSnow_snvr(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       !surface layer, not significant snowpack
       TK1X=TKSoil1_vr(N3,N2,N1)-(ConvectHeatFluxMicP-HeatFluxAir2Soi)/VHeatCapacity1_vr(N3,N2,N1)
+
       if(abs(TK1X)>1.e5_r8)then
         write(*,*)'TKSoil1_vr(N3,N2,N1)-ConvectHeatFluxMicP/VHeatCapacity1_vr(N3,N2,N1)',&
           TKSoil1_vr(N3,N2,N1),ConvectHeatFluxMicP,HeatFluxAir2Soi,VHeatCapacity1_vr(N3,N2,N1)
@@ -2068,7 +2082,7 @@ module WatsubMod
         !is *dts_wat needed below?  
         FLWUHL                           = AMIN1(FLWUH,AirfMacP*dts_wat)
         ConvWaterFlowMacP_3D(N,M6,M5,M4) = ConvWaterFlowMacP_3D(N,M6,M5,M4)+XN*FLWUHL
-        HeatFlow2Soili_3D(N,M6,M5,M4)       = HeatFlow2Soili_3D(N,M6,M5,M4)+cpw*TKSoil1_vr(N3,N2,N1)*XN*FLWUHL
+        HeatFlow2Soili_3D(N,M6,M5,M4)    = HeatFlow2Soili_3D(N,M6,M5,M4)+cpw*TKSoil1_vr(N3,N2,N1)*XN*FLWUHL
         AirfMacP                         = AirfMacP-XN*ConvWaterFlowMacP_3D(N,M6,M5,M4)
       ENDIF
     
@@ -2104,12 +2118,11 @@ module WatsubMod
 !
   PSISMX          = PSISoilMatricPtmp_vr(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
   TFREEZ          = -9.0959E+04_r8/(PSISMX-LtHeatIceMelt)
-  VLWatMicP1X     = VLWatMicP1_vr(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatExMacP2MicPi(N3,N2,N1)&
-    +FWatIrrigate2MicP1_vr(N3,N2,N1)
+  VLWatMicP1X     = VLWatMicP1_vr(N3,N2,N1)+TWatCharge2MicP(N3,N2,N1)+FWatExMacP2MicPi(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)
   VLWatMacP1X     = VLWatMacP1_vr(N3,N2,N1)+TConvWaterFlowMacP_3D_vr(N3,N2,N1)-FWatExMacP2MicPi(N3,N2,N1)
   ENGY1           = VHeatCapacity1_vr(N3,N2,N1)*TKSoil1_vr(N3,N2,N1)
-  VLHeatCapacityX = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X) &
-    +cpi*(VLiceMicP1_vr(N3,N2,N1)+VLiceMacP1_vr(N3,N2,N1))
+  VLHeatCapacityX = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X)+cpi*(VLiceMicP1_vr(N3,N2,N1)+VLiceMacP1_vr(N3,N2,N1))
+
   if(VLHeatCapacityX>0._r8)VLHeatCapacityX=VLHeatCapacityX+cpo*RootMassElm_vr(ielmc,N3,N2,N1)
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN

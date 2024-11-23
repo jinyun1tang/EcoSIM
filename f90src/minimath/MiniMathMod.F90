@@ -269,9 +269,9 @@ module minimathmod
   logical :: ans
   
   c=max(abs(a),abs(b))  
-  if (c==0._r8) then
+  if (c<tiny_val) then
     ans=.True.
-    return 
+    return     
   endif
 
   ac=a/c;bc=b/c    

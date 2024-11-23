@@ -910,7 +910,7 @@ module InitPlantMod
     ATCA                      => plt_site%ATCA,                       &
     CCO2EI                    => plt_site%CCO2EI,                     &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    RootProteinConc_pvr       => plt_biom%RootProteinConc_pvr,        &
+    RootProteinConc_rpvr       => plt_biom%RootProteinConc_rpvr,        &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
     SeedDepth_pft             => plt_morph%SeedDepth_pft,             &
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr,              &
@@ -947,8 +947,8 @@ module InitPlantMod
       PSIRootOSMO_vr(N,L,NZ)                                       = CanOsmoPsi0pt_pft(NZ)+PSIRoot_pvr(N,L,NZ)
       PSIRootTurg_vr(N,L,NZ)                                       = AZMAX1(PSIRoot_pvr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)   = 0._r8
-      plt_biom%RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ) = 0._r8
-      RootProteinConc_pvr(N,L,NZ)                                  = RootFracRemobilizableBiom(NZ)
+      plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = 0._r8
+      RootProteinConc_rpvr(N,L,NZ)                                  = RootFracRemobilizableBiom(NZ)
       plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)                     = 0._r8
       plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
@@ -986,11 +986,11 @@ module InitPlantMod
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
       plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_pvr(N,L,NZ)
       plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
-      plt_rbgc%RAutoRootO2Limter_pvr(N,L,NZ)=1.0
+      plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
       D30: DO NR=1,MaxNumRootAxes
         plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)                            = 0._r8
         plt_morph%Root1stLen_rpvr(N,L,NR,NZ)                             = 0._r8
-        plt_morph%Root2ndLen_pvr(N,L,NR,NZ)                              = 0._r8
+        plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)                              = 0._r8
         plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
       ENDDO D30
@@ -998,8 +998,8 @@ module InitPlantMod
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           plt_bgcr%LitrfalStrutElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
-        plt_biom%RootNodulNonstElms_pvr(1:NumPlantChemElms,L,NZ)=0._r8
-        plt_biom%RootNodulStrutElms_pvr(1:NumPlantChemElms,L,NZ)=0._r8
+        plt_biom%RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8
+        plt_biom%RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8
         RootN2Fix_pvr(L,NZ)=0._r8
       ENDIF
     ENDDO D20

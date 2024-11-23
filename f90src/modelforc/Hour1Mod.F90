@@ -783,17 +783,17 @@ module Hour1Mod
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0._r8
   PlantPopu_col(NY,NX)                                = 0._r8
 ! zero arrays in the snow layers
-  WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0._r8
-  WatConvSno2MacP_snvr(1:JS,NY,NX)   = 0._r8
-  HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0._r8
-  WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0._r8
-  HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0._r8
-  SnoXfer2SnoLay_snvr(1:JS,NY,NX)    = 0._r8
-  WatXfer2SnoLay_snvr(1:JS,NY,NX)    = 0._r8
-  IceXfer2SnoLay_snvr(1:JS,NY,NX)    = 0._r8
-  HeatXfer2SnoLay_snvr(1:JS,NY,NX)   = 0._r8
-  XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0._r8
-
+  WatConvSno2MicP_snvr(1:JS,NY,NX)                         = 0._r8
+  WatConvSno2MacP_snvr(1:JS,NY,NX)                         = 0._r8
+  HeatConvSno2Soi_snvr(1:JS,NY,NX)                         = 0._r8
+  WatConvSno2LitR_snvr(1:JS,NY,NX)                         = 0._r8
+  HeatConvSno2LitR_snvr(1:JS,NY,NX)                        = 0._r8
+  SnoXfer2SnoLay_snvr(1:JS,NY,NX)                          = 0._r8
+  WatXfer2SnoLay_snvr(1:JS,NY,NX)                          = 0._r8
+  IceXfer2SnoLay_snvr(1:JS,NY,NX)                          = 0._r8
+  HeatXfer2SnoLay_snvr(1:JS,NY,NX)                         = 0._r8
+  XPhaseChangeHeatL_snvr(1:JS,NY,NX)                       = 0._r8
+  HeatSource_vr(:,NY,NX)                                   = 0._r8
   trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1:JS,NY,NX) = 0._r8
   trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
   IF(salt_model)THEN

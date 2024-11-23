@@ -22,8 +22,8 @@ implicit none
   real(r8), intent(in) :: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress   !stomatal resistance function of canopy turgor
   real(r8), intent(out) :: CH2O3K
-  real(r8), intent(out) :: CO2FCL
-  real(r8), intent(out) :: CO2FLL
+  real(r8), intent(out) :: CO2FCL          !carbon-dependent photosynthesis rate
+  real(r8), intent(out) :: CO2FLL          !light-dependent photosynthesis rate
   integer :: L,NN,M,N,LP
   real(r8) :: WFNB
   real(r8) :: CO2X,CO2C,CO2Y
@@ -112,13 +112,6 @@ implicit none
                 ETLF = (PARJ-SQRT(PARJ2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
                 EGRO = ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
                 VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
-!                if(LP==1)THEN
-!                  write(124,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,ETLF/PAR_zsec,PARJ/PAR_zsec,PAR_zsec,&
-!                    LigthSatCarboxyRate_node(K,NB,NZ),delta
-!                ELSE
-!                  write(125,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,ETLF/PAR_zsec,PARJ/PAR_zsec,PAR_zsec,&
-!                    LigthSatCarboxyRate_node(K,NB,NZ),delta
-!                ENDIF
 
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
@@ -438,8 +431,8 @@ implicit none
   real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
   real(r8), intent(out) :: CO2F   !CO2 fixation
   real(r8), intent(out) :: CH2O   !CO2 fixation
-  real(r8), intent(out) :: CH2OClm  !C-limited C fix
-  real(r8), intent(out) :: CH2OLlm  !L-limited C fix
+  real(r8), intent(out) :: CH2OClm  !Carbon-dependent C fix
+  real(r8), intent(out) :: CH2OLlm  !Light-dependent C fix
   real(r8) :: ZADDB,PADDB
   real(r8) :: CO2FCL,CO2FLL
   integer  :: K

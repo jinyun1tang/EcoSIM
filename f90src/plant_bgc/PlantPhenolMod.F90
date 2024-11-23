@@ -407,7 +407,7 @@ module PlantPhenolMod
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
-    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,  &
+    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,  &
     ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,   &
@@ -451,12 +451,12 @@ module PlantPhenolMod
     D160: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms
-          RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ) &
+          RootNonstructElmConc_rpvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ) &
             /RootMycoActiveBiomC_pvr(N,L,NZ))
         ENDDO
       ELSE
         DO NE=1,NumPlantChemElms
-          RootNonstructElmConc_pvr(NE,N,L,NZ)=1.0_r8
+          RootNonstructElmConc_rpvr(NE,N,L,NZ)=1.0_r8
         ENDDO
       ENDIF
     ENDDO D160

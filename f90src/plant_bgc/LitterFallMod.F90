@@ -350,8 +350,8 @@ implicit none
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,        &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,   &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,    &
     iPlantRootState_pft       => plt_pheno%iPlantRootState_pft,      &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
@@ -380,7 +380,7 @@ implicit none
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft,     &
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,      &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     MY                        => plt_morph%MY,                       &
@@ -456,7 +456,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
+!     Root1stLen_rpvr,Root2ndLen_rpvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
@@ -473,7 +473,7 @@ implicit none
           RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
           Root1stLen_rpvr(N,L,NR,NZ)                              = 0._r8
-          Root2ndLen_pvr(N,L,NR,NZ)                               = 0._r8
+          Root2ndLen_rpvr(N,L,NR,NZ)                               = 0._r8
           Root2ndXNum_rpvr(N,L,NR,NZ)                             = 0._r8
         ENDDO
       ENDDO    
@@ -515,12 +515,12 @@ implicit none
           D6420: DO M=1,jsken
             DO NE=1,NumPlantChemElms            
               LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
-                ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ)+&
-                ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ)
+                ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ)+&
+                ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ)
             ENDDO
           ENDDO D6420
-          RootNodulStrutElms_pvr(1:NumPlantChemElms,L,NZ)=0._r8
-          RootNodulNonstElms_pvr(1:NumPlantChemElms,L,NZ)=0._r8  
+          RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8
+          RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8  
         ENDDO          
       ENDIF
     ENDDO 
@@ -761,7 +761,7 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     NU                        => plt_site%NU,                        &
     iPlantState_pft           => plt_pheno%iPlantState_pft,          &
-    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
     MY                        => plt_morph%MY,                       &
@@ -809,7 +809,7 @@ implicit none
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         Root1stLen_rpvr(N,L,NR,NZ)                              = 0._r8
-        Root2ndLen_pvr(N,L,NR,NZ)                               = 0._r8
+        Root2ndLen_rpvr(N,L,NR,NZ)                               = 0._r8
         Root2ndXNum_rpvr(N,L,NR,NZ)                             = 0._r8
       enddo
     enddo

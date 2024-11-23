@@ -120,8 +120,8 @@ implicit none
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch, &
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
@@ -321,8 +321,8 @@ implicit none
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,         &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
     RootMycoNonstElms_pft     => plt_biom%RootMycoNonstElms_pft,     &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
@@ -349,8 +349,8 @@ implicit none
     mass_roots(NE)=massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     !add reserve to struct
     if(is_plant_N2fix(iPlantNfixType_pft(NZ)) .and. is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
-      massnodul1(NE)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
-          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
+      massnodul1(NE)=sum(RootNodulStrutElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
+          sum(RootNodulNonstElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
       mass_roots(NE)=mass_roots(NE)+massnodul1(NE)    
     endif      
   ENDDO

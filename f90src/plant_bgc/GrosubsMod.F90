@@ -638,10 +638,10 @@ module grosubsMod
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft,          &
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft,        &
     CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,      &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
     CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft,       &
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
     PlantN2Fix_CumYr_pft      => plt_bgcr%PlantN2Fix_CumYr_pft,      &
     PlantExudElm_CumYr_pft    => plt_rbgc%PlantExudElm_CumYr_pft,    &
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft,        &
@@ -730,8 +730,8 @@ module grosubsMod
       ENDDO
     ELSEIF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
       DO NE=1,NumPlantChemElms
-        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
-          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
+        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
+          sum(RootNodulNonstElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
       ENDDO
     ENDIF
   ENDIF

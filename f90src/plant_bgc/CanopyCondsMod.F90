@@ -597,10 +597,7 @@ module CanopyCondsMod
         RadSWbyStalkSurf_zsec(N,M,NZ)   = RadSWbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirLeafSurf_zsec(N,M,NZ)  = RadPARbyLeafSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirStalkSurf_zsec(N,M,NZ) = RadPARbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
-        if(RadPARDirLeafSurf_zsec(N,M,NZ)>1.e10)then
-          write(*,*)'RadPARDirLeafSurf_zsec(N,M,NZ)',RadPARDirLeafSurf_zsec(N,M,NZ)
-          stop
-        endif  
+ 
         DO L=1,NumOfCanopyLayers1
           RadDifPAR_zsec(N,M,L,NZ) = 0.0_r8
           RadPAR_zsec(N,M,L,NZ)    = RadPARDirLeafSurf_zsec(N,M,NZ)
@@ -831,6 +828,7 @@ module CanopyCondsMod
             DO  M=1,NumOfSkyAzimuthSects1
               RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ)*XTAUY
               RadPAR_zsec(N,M,L,NZ)    = RadPARDirLeafSurf_zsec(N,M,NZ)+RadDifPAR_zsec(N,M,L,NZ)
+
             enddo
           ENDDO D1730
         ENDDO D1520
@@ -975,7 +973,6 @@ module CanopyCondsMod
 
               RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
               RadPAR_zsec(N,M,L,NZ)    = RadPAR_zsec(N,M,L,NZ)+diffusPARLeafAbsorptAzclass
-              
               RadDifSWbyLeaf_pft(NZ)   = RadDifSWbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusSWLeafAbsorptAzclass
               RadDifSWbyStalk_pft(NZ)  = RadDifSWbyStalk_pft(NZ)+UnselfShadeStalkArea*diffusSWStalkAbsorptAzclass
               RadDifPARbyLeaf_pft(NZ)  = RadDifPARbyLeaf_pft(NZ)+UnselfShadeLeafArea*diffusPARLeafAbsorptAzclass

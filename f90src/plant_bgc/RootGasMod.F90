@@ -90,7 +90,7 @@ module RootGasMod
     RCO2GasFlxPrev_vr        => plt_bgcr%RCO2GasFlxPrev_vr,        &
     RO2AquaSourcePrev_vr    => plt_bgcr%RO2AquaSourcePrev_vr,    &
     RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           & !out: O2 uptake from O2 inside root
-    RAutoRootO2Limter_pvr    => plt_rbgc%RAutoRootO2Limter_pvr,    &
+    RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr,    &
     ZERO4Uptk_pft            => plt_rbgc%ZERO4Uptk_pft,            &
     RootRespPotent_pvr       => plt_rbgc%RootRespPotent_pvr,       &
     RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
@@ -630,17 +630,17 @@ module RootGasMod
 !
 !     RO2UptkHeterT=O2 uptake from soil+root by each root,myco population
 !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-!     RAutoRootO2Limter_pvr=constraint by O2 consumption on all root processes
+!     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
 !     imposed by O2 uptake
 !
     PopPlantO2Uptake_vr           = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_vr(idg_O2,N,L,NZ)
-    RAutoRootO2Limter_pvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
+    RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE
     PopPlantO2Uptake_vr=0.0_r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
-      RAutoRootO2Limter_pvr(N,L,NZ)=RAutoRootO2Limter_pvr(N,L-1,NZ)
+      RAutoRootO2Limter_rpvr(N,L,NZ)=RAutoRootO2Limter_rpvr(N,L-1,NZ)
     ELSE
-      RAutoRootO2Limter_pvr(N,L,NZ)=1.0
+      RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
     ENDIF
   ENDIF
   end associate

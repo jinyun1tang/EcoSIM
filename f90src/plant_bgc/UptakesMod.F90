@@ -556,7 +556,7 @@ module UptakesMod
    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,          &
    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,        &
    MY                        => plt_morph%MY,                        &
-   RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,   &
+   RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,   &
    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft,     &
    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft,         &
    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,      &
@@ -599,7 +599,7 @@ module UptakesMod
       D4290: DO N=1,MY(NZ)
         DO  L=NU,MaxSoiL4Root_pft(NZ)
           PSIRoot_pvr(N,L,NZ) = ElvAdjstedtSoiPSIMPa(L)
-          CCPOLT              = sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
+          CCPOLT              = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
           CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
@@ -1185,7 +1185,7 @@ module UptakesMod
     ZERO                      => plt_site%ZERO,                       &
     AREA3                     => plt_site%AREA3,                      &
     CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft,     &
-    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,   &
+    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,   &
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft,         &
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,          &
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft,          &
@@ -1231,7 +1231,7 @@ module UptakesMod
   DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       PSIRoot_pvr(N,L,NZ)              = ElvAdjstedtSoiPSIMPa(L)
-      CCPOLT                           = sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
+      CCPOLT                           = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
       AllPlantRootH2OUptake_vr(N,L,NZ) = 0.0_r8
 
       call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
@@ -1280,7 +1280,7 @@ module UptakesMod
     PSIRootOSMO_vr           => plt_ew%PSIRootOSMO_vr,             &
     PSIRootTurg_vr           => plt_ew%PSIRootTurg_vr,             &
     PSICanopy_pft            => plt_ew%PSICanopy_pft,              &
-    RootNonstructElmConc_pvr => plt_biom%RootNonstructElmConc_pvr, &
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr, &
     MY                       => plt_morph%MY,                      &
     MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
   )
@@ -1316,7 +1316,7 @@ module UptakesMod
       ELSE
         PSIRoot_pvr(N,L,NZ)=ElvAdjstedtSoiPSIMPa(L)
       ENDIF           
-      CCPOLT=sum(RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ))
+      CCPOLT=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
 
       CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))

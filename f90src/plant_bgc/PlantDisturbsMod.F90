@@ -1819,7 +1819,7 @@ module PlantDisturbsMod
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
@@ -1835,8 +1835,8 @@ module PlantDisturbsMod
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,        &
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,        &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    &
   )
 !
@@ -1846,7 +1846,7 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
+!     Root1stLen_rpvr,Root2ndLen_rpvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
@@ -1864,7 +1864,7 @@ module PlantDisturbsMod
         RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
       ENDDO
       Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*FracLeftThin
-      Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*FracLeftThin
+      Root2ndLen_rpvr(N,L,NR,NZ)=Root2ndLen_rpvr(N,L,NR,NZ)*FracLeftThin
       Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*FracLeftThin
     ENDDO D3960
 
@@ -1897,11 +1897,11 @@ module PlantDisturbsMod
       DO NE=1,NumPlantChemElms
         D3395: DO M=1,jsken
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+ &
-            XHVST1*AZMAX1(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
-            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
+            XHVST1*AZMAX1(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ) &
+            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ))
         ENDDO D3395
-        RootNodulStrutElms_pvr(NE,L,NZ)=RootNodulStrutElms_pvr(NE,L,NZ)*FracLeftThin
-        RootNodulNonstElms_pvr(NE,L,NZ)=RootNodulNonstElms_pvr(NE,L,NZ)*FracLeftThin
+        RootNodulStrutElms_rpvr(NE,L,NZ)=RootNodulStrutElms_rpvr(NE,L,NZ)*FracLeftThin
+        RootNodulNonstElms_rpvr(NE,L,NZ)=RootNodulNonstElms_rpvr(NE,L,NZ)*FracLeftThin
       ENDDO
     ENDIF
   end associate          
