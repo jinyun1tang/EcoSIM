@@ -93,24 +93,21 @@ implicit none
              call sumMicBiomLayL(L,NY,NX,OrGM_beg)
              call MicBGC1Layer(I,J,L,NY,NX)
              call sumMicBiomLayL(L,NY,NX,dOrGM)
-             dOrGM=dOrGM-OrGM_beg
-             tdOrGM=tdOrGM+dOrGM
+             dOrGM  = dOrGM-OrGM_beg
+             tdOrGM = tdOrGM+dOrGM
           ELSE
-
-            trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
-
-            RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX)=0.0_r8
-
-            Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
+            trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+            RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
+            Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
 
           call DownwardMixOM(I,J,L,NY,NX)
 
         ELSE
-          trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)=0.0_r8
-          RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX)=0.0_r8
-          Micb_N2Fixation_vr(L,NY,NX)=0.0_r8
+          trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+          RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
+          Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
         ENDIF
       ENDDO D998
 !
@@ -166,8 +163,8 @@ implicit none
   micfor%ZERO                = ZERO
   micfor%CCH4E               = AtmGasCgperm3(idg_CH4,NY,NX)
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
-  micfor%O2_irrig_conc       = O2_irrig_conc(NY,NX)
-  micfor%O2_rain_conc        = O2_rain_conc(NY,NX)
+  micfor%O2_irrig_conc       = trcVolatile_irrig_conc(idg_O2,NY,NX)
+  micfor%O2_rain_conc        = trcVolatile_rain_conc(idg_O2,NY,NX)
   micfor%Irrig2LitRSurf      = Irrig2LitRSurf(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)
@@ -204,7 +201,7 @@ implicit none
   micfor%RNO3EcoDmndBandPrev          = RNO3EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RH2PO4EcoDmndBandPrev        = RH2PO4EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RH1PO4EcoDmndBandPrev        = RH1PO4EcoDmndBandPrev_vr(L,NY,NX)
-  micfor%RO2AquaXchangePrev           = RO2AquaXchangePrev_vr(L,NY,NX)
+  micfor%RO2AquaXchangePrev           = RO2AquaSourcePrev_vr(L,NY,NX)
   micfor%RDOMEcoDmndPrev(1:jcplx)     = RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
 
 !  write(201,*)I+J/24.,L,RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
@@ -284,16 +281,16 @@ implicit none
   micstt%CH4S              = AZMAX1(trc_solml_vr(idg_CH4,L,NY,NX))  
   micstt%OXYS              = AZMAX1(trc_solml_vr(idg_O2,L,NY,NX))  
   micstt%H2GS              = AZMAX1(trc_solml_vr(idg_H2,L,NY,NX))
-  micstt%CCO2S             = trc_solcl_vr(idg_CO2,L,NY,NX)
-  micstt%CNO2S             = trc_solcl_vr(ids_NO2,L,NY,NX)
-  micstt%CNO2B             = trc_solcl_vr(ids_NO2B,L,NY,NX)
-  micstt%CZ2OS             = trc_solcl_vr(idg_N2O,L,NY,NX)
-  micstt%COXYS             = trc_solcl_vr(idg_O2,L,NY,NX)
-  micstt%COXYG             = trc_gascl_vr(idg_O2,L,NY,NX)
-  micstt%CZ2GS             = trc_solcl_vr(idg_N2,L,NY,NX)
-  micstt%CH2GS             = trc_solcl_vr(idg_H2,L,NY,NX)
-  micstt%CCH4G             = trc_gascl_vr(idg_CH4,L,NY,NX)
-
+  micstt%CCO2S             = AZMAX1(trc_solcl_vr(idg_CO2,L,NY,NX))
+  micstt%CNO2S             = AZMAX1(trc_solcl_vr(ids_NO2,L,NY,NX))
+  micstt%CNO2B             = AZMAX1(trc_solcl_vr(ids_NO2B,L,NY,NX))
+  micstt%CZ2OS             = AZMAX1(trc_solcl_vr(idg_N2O,L,NY,NX))
+  micstt%COXYS             = AZMAX1(trc_solcl_vr(idg_O2,L,NY,NX))
+  micstt%COXYG             = AZMAX1(trc_gascl_vr(idg_O2,L,NY,NX))
+  micstt%CZ2GS             = AZMAX1(trc_solcl_vr(idg_N2,L,NY,NX))
+  micstt%CH2GS             = AZMAX1(trc_solcl_vr(idg_H2,L,NY,NX))
+  micstt%CCH4G             = AZMAX1(trc_gascl_vr(idg_CH4,L,NY,NX))
+!  write(115,*)I+J/24.,L,micstt%COXYG,micstt%COXYS,VLsoiAirPM(1,L,NY,NX)
   micstt%O2GSolubility     = GasSolbility_vr(idg_O2,L,NY,NX)  
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
   micstt%ZNFN0             = ZNFN0(L,NY,NX)
@@ -309,8 +306,8 @@ implicit none
   micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
   micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
   if(.not.micfor%litrm)then
-    micfor%AEC=AEC(L,NY,NX)
-    micstt%OXYG=trc_gasml_vr(idg_O2,L,NY,NX)
+    micfor%AEC  = AEC_vr(L,NY,NX)
+    micstt%OXYG = trc_gasml_vr(idg_O2,L,NY,NX)
   endif
   micflx%RNO2DmndSoilChemo=RNO2DmndSoilChemo_vr(L,NY,NX)
   micflx%RNO2DmndBandChemo=RNO2DmndBandChemo_vr(L,NY,NX)
@@ -462,7 +459,7 @@ implicit none
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)           = micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
   mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX) = micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)
   mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)          = micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
-  tRDOE2Die_col(1:NumPlantChemElms,NY,NX)                                = tRDOE2Die_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
+  tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)                                = tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

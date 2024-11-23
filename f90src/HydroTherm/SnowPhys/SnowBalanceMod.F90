@@ -497,7 +497,7 @@ implicit none
   ENDDO
 
   DO NTN =ids_nut_beg,ids_nuts_end
-    trcn_solsml(NTN,L,NY,NX)=trcn_solsml(NTN,L,NY,NX)+trcn_TBLS(NTN,L,NY,NX)
+    trcn_solsml_snvr(NTN,L,NY,NX)=trcn_solsml_snvr(NTN,L,NY,NX)+trcn_TBLS(NTN,L,NY,NX)
   ENDDO
   !
   !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -512,7 +512,7 @@ implicit none
   !
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
-      trcs_solsml(NTSA,L,NY,NX)=trcs_solsml(NTSA,L,NY,NX)+trcSalt_TBLS(NTSA,L,NY,NX)
+      trc_Saltml_snvr(NTSA,L,NY,NX)=trc_Saltml_snvr(NTSA,L,NY,NX)+trcSalt_TBLS(NTSA,L,NY,NX)
     ENDDO
 
   ENDIF
@@ -635,12 +635,12 @@ implicit none
 
           !nutrients
           DO NTN=ids_nut_beg,ids_nuts_end
-            trcn_solsml(NTN,L1,NY,NX)=trcn_solsml(NTN,L1,NY,NX)+FX*trcn_solsml(NTN,L0,NY,NX)
+            trcn_solsml_snvr(NTN,L1,NY,NX)=trcn_solsml_snvr(NTN,L1,NY,NX)+FX*trcn_solsml_snvr(NTN,L0,NY,NX)
           ENDDO
           !salt
           IF(salt_model)THEN
             DO NTSA=idsalt_beg,idsalt_end
-              trcs_solsml(NTSA,L1,NY,NX)=trcs_solsml(NTSA,L1,NY,NX)+FX*trcs_solsml(NTSA,L0,NY,NX)
+              trc_Saltml_snvr(NTSA,L1,NY,NX)=trc_Saltml_snvr(NTSA,L1,NY,NX)+FX*trc_Saltml_snvr(NTSA,L0,NY,NX)
             ENDDO
           ENDIF
 !
@@ -664,12 +664,12 @@ implicit none
             trcg_solsml_snvr(NTG,L0,NY,NX)=FY*trcg_solsml_snvr(NTG,L0,NY,NX)
           ENDDO
           DO NTU=ids_nut_beg,ids_nuts_end
-            trcn_solsml(NTU,L0,NY,NX)=FY*trcn_solsml(NTU,L0,NY,NX)
+            trcn_solsml_snvr(NTU,L0,NY,NX)=FY*trcn_solsml_snvr(NTU,L0,NY,NX)
           ENDDO
 
           IF(salt_model)THEN
             DO NTSA=idsalt_beg,idsalt_end
-              trcs_solsml(NTSA,L0,NY,NX)=FY*trcs_solsml(NTSA,L0,NY,NX)
+              trc_Saltml_snvr(NTSA,L0,NY,NX)=FY*trc_Saltml_snvr(NTSA,L0,NY,NX)
             ENDDO
 
           ENDIF

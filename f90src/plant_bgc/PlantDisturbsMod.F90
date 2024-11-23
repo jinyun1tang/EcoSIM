@@ -120,9 +120,9 @@ module PlantDisturbsMod
 
   D6475: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      StandeadElmntRemoval(NE)=StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadKCompElms_pft(NE,M,NZ)
-      StandeadElmntHarv2Litr(NE)=StandeadElmntHarv2Litr(NE)+(FHVSH-FHVSE)*StandDeadKCompElms_pft(NE,M,NZ)
-      StandDeadKCompElms_pft(NE,M,NZ)=FHVSE*StandDeadKCompElms_pft(NE,M,NZ)
+      StandeadElmntRemoval(NE)        = StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadKCompElms_pft(NE,M,NZ)
+      StandeadElmntHarv2Litr(NE)      = StandeadElmntHarv2Litr(NE)+(FHVSH-FHVSE)*StandDeadKCompElms_pft(NE,M,NZ)
+      StandDeadKCompElms_pft(NE,M,NZ) = FHVSE*StandDeadKCompElms_pft(NE,M,NZ)
     ENDDO
   ENDDO D6475
   end associate
@@ -221,6 +221,7 @@ module PlantDisturbsMod
   real(r8), intent(in) :: WoodyElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(in) :: StandeadElmntOffEcosystem(NumPlantChemElms)
   integer :: M,NE
+  real(r8) :: dWoody
 !     begin_execution
   associate(                                                                   &
     ilignin                        => pltpar%ilignin,                          &
@@ -255,25 +256,24 @@ module PlantDisturbsMod
       D6375: DO M=1,jsken
         DO NE=1,NumPlantChemElms        
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*(NonstructElmnt2Litr(NE)) &
+            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(NonstructElmnt2Litr(NE)) &
             +ElmAllocmat4Litr(NE,ifoliar,M,NZ)*(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)) &
             +ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetioleElmntHarv2Litr(NE))
 
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-              +ElmAllocmat4Litr(NE,istalk,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmnt2Litr(NE)&
+              +ElmAllocmat4Litr(NE,istalk,M,NZ)*AZMAX1(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmnt2Litr(NE)&
               +StandeadElmntHarv2Litr(NE))
           ELSE
             StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ) &
-              +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE))
+              +ElmAllocmat4Litr(NE,icwood,M,NZ)*AZMAX1(WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE))
 
+            dWoody=AZMAX1(WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE))
             LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
-              +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE) &
-              +StandeadElmnt2Litr(NE))*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+              +ElmAllocmat4Litr(NE,icwood,M,NZ)*dWoody*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
 
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-              +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE) &
-              +StandeadElmnt2Litr(NE))*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+              +ElmAllocmat4Litr(NE,icwood,M,NZ)*dWoody*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
           ENDIF
         ENDDO
       ENDDO D6375
@@ -692,7 +692,7 @@ module PlantDisturbsMod
         XHVST1=1._r8-FracLeftThin
         DO NE=1,NumPlantChemElms
           D3400: DO M=1,jsken
-            dLitR=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)
+            dLitR=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(SeasonalNonstElms_pft(NE,NZ))
             LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
               +dLitR*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
@@ -1758,7 +1758,7 @@ module PlantDisturbsMod
   XHVST1=1._r8-FracLeftThin
   D3385: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
+      FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
         +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
     ENDDO
@@ -1767,7 +1767,7 @@ module PlantDisturbsMod
 
     DO NR=1,NumRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms
-        FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+        FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
           (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
@@ -1776,7 +1776,7 @@ module PlantDisturbsMod
       call RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
       DO NE=1,NumPlantChemElms
-        FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
+        FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
           +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
@@ -1819,7 +1819,7 @@ module PlantDisturbsMod
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
@@ -1835,8 +1835,8 @@ module PlantDisturbsMod
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,        &
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,        &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    &
   )
 !
@@ -1846,7 +1846,7 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
+!     Root1stLen_rpvr,Root2ndLen_rpvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
@@ -1864,7 +1864,7 @@ module PlantDisturbsMod
         RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
       ENDDO
       Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*FracLeftThin
-      Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*FracLeftThin
+      Root2ndLen_rpvr(N,L,NR,NZ)=Root2ndLen_rpvr(N,L,NR,NZ)*FracLeftThin
       Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*FracLeftThin
     ENDDO D3960
 
@@ -1897,11 +1897,11 @@ module PlantDisturbsMod
       DO NE=1,NumPlantChemElms
         D3395: DO M=1,jsken
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+ &
-            XHVST1*(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
-            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
+            XHVST1*AZMAX1(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ) &
+            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ))
         ENDDO D3395
-        RootNodulStrutElms_pvr(NE,L,NZ)=RootNodulStrutElms_pvr(NE,L,NZ)*FracLeftThin
-        RootNodulNonstElms_pvr(NE,L,NZ)=RootNodulNonstElms_pvr(NE,L,NZ)*FracLeftThin
+        RootNodulStrutElms_rpvr(NE,L,NZ)=RootNodulStrutElms_rpvr(NE,L,NZ)*FracLeftThin
+        RootNodulNonstElms_rpvr(NE,L,NZ)=RootNodulNonstElms_rpvr(NE,L,NZ)*FracLeftThin
       ENDDO
     ENDIF
   end associate          

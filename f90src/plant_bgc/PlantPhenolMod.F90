@@ -407,7 +407,7 @@ module PlantPhenolMod
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
-    RootNonstructElmConc_pvr  => plt_biom%RootNonstructElmConc_pvr,  &
+    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,  &
     ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,   &
@@ -451,12 +451,12 @@ module PlantPhenolMod
     D160: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms
-          RootNonstructElmConc_pvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ) &
+          RootNonstructElmConc_rpvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ) &
             /RootMycoActiveBiomC_pvr(N,L,NZ))
         ENDDO
       ELSE
         DO NE=1,NumPlantChemElms
-          RootNonstructElmConc_pvr(NE,N,L,NZ)=1.0_r8
+          RootNonstructElmConc_rpvr(NE,N,L,NZ)=1.0_r8
         ENDDO
       ENDIF
     ENDDO D160
@@ -525,6 +525,7 @@ module PlantPhenolMod
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk = (HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_pft(ipltroot,1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
+!    write(121,*)I+J/24.,CanopyChk, RootChk,HypoctoHeight_pft(NZ),CanopyLeafArea_pft(NZ),CanopyStemArea_pft(NZ),SeedDepth_pft(NZ),ZERO4LeafVar_pft(NZ)
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanP_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy_pft(NZ))
@@ -870,7 +871,7 @@ module PlantPhenolMod
   real(r8) :: ACTV,OFNG
   real(r8) :: RTK
   real(r8) :: STK,TKCO
-  real(r8) :: NodeInitRate,LeafAppearRate
+  real(r8) :: NodeInitRate,LeafAppearRate,HourlyNodeNumNormByMatgrp_brch
   integer :: kk
   logical :: NodeNumChk,PlantDayChk,LeafOutChk,LeafOffChk,CalChk
   logical :: DayLenChk,CanHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
@@ -899,7 +900,6 @@ module PlantPhenolMod
     iPlantDevelopPattern_pft          => plt_pheno%iPlantDevelopPattern_pft,          &
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
     CriticPhotoPeriod_pft             => plt_pheno%CriticPhotoPeriod_pft,             &
-    HourlyNodeNumNormByMatgrp_brch    => plt_pheno%HourlyNodeNumNormByMatgrp_brch,    &
     PhotoPeriodSens_pft               => plt_pheno%PhotoPeriodSens_pft,               &
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch,     &
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch,                  &
@@ -981,9 +981,9 @@ module PlantPhenolMod
 !   MatureGroup_pft=node number required for floral initiation
 
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
-      NodeNumNormByMatgrp_brch(NB,NZ)       = (ShootNodeNum_brch(NB,NZ)-NodeNum2InitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
-      HourlyNodeNumNormByMatgrp_brch(NB,NZ) = NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4VegetaPheno)
-      TotalNodeNumNormByMatgrp_brch(NB,NZ)  = TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch(NB,NZ)
+      NodeNumNormByMatgrp_brch(NB,NZ)      = (ShootNodeNum_brch(NB,NZ)-NodeNum2InitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
+      HourlyNodeNumNormByMatgrp_brch       = NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4VegetaPheno)
+      TotalNodeNumNormByMatgrp_brch(NB,NZ) = TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch
     ENDIF
 
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0)THEN

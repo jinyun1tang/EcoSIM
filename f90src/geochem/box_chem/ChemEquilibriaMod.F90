@@ -108,7 +108,7 @@ module ChemEquilibriaMod
   real(r8), pointer :: Precp_Ca5P3O12O3H3_conc
   real(r8), pointer :: PrecpB_Ca5P3O12O3H3_conc
   real(r8), pointer :: Precp_CaH4P2O8_conc
-  real(r8), pointer :: PrecpB_CaH4P2O8_con
+  real(r8), pointer :: PrecpB_CaH4P2O8_conc
   real(r8), pointer :: Precp_FePO4_conc
   real(r8), pointer :: PrecpB_FePO4_con
 
@@ -174,7 +174,7 @@ module ChemEquilibriaMod
   Precp_Ca5P3O12O3H3_conc  => chemvar%Precp_Ca5P3O12O3H3_conc
   PrecpB_Ca5P3O12O3H3_conc => chemvar%PrecpB_Ca5P3O12O3H3_conc
   Precp_CaH4P2O8_conc      => chemvar%Precp_CaH4P2O8_conc
-  PrecpB_CaH4P2O8_con      => chemvar%PrecpB_CaH4P2O8_con
+  PrecpB_CaH4P2O8_conc      => chemvar%PrecpB_CaH4P2O8_conc
   Precp_FePO4_conc         => chemvar%Precp_FePO4_conc
   PrecpB_FePO4_con         => chemvar%PrecpB_FePO4_con
   SoilMicPMassLayerX       => chemvar%SoilMicPMassLayerX
@@ -479,10 +479,10 @@ module ChemEquilibriaMod
 !     H2PO4_1e_CaH4P2O8_dissolB_flx=H2PO4 dissolution from Ca(H2PO4)2 in band
 !
     H2PO4_1e_CaH4P2O8_eqv=SQRT(SPCAM/Ca_2p_conc)
-    H2PO4_1e_CaH4P2O8_dissolB_flx=AMAX1(-PrecpB_CaH4P2O8_con*SPPO4,TPD*(H2PO4_1e_band_conc-H2PO4_1e_CaH4P2O8_eqv))
+    H2PO4_1e_CaH4P2O8_dissolB_flx=AMAX1(-PrecpB_CaH4P2O8_conc*SPPO4,TPD*(H2PO4_1e_band_conc-H2PO4_1e_CaH4P2O8_eqv))
 !     IF(I.GT.315)THEN
 !     WRITE(*,1117)'RPPOB',I,J,L,H2PO4_1e_CaH4P2O8_dissolB_flx,H2PO4_1e_CaH4P2O8_eqv,H2PO4_1e_band_conc,SPCAM,Ca_2p_conc
-!    2,PrecpB_CaH4P2O8_con,SPPO4,TPD,PCPMB,BKVLPB
+!    2,PrecpB_CaH4P2O8_conc,SPPO4,TPD,PCPMB,BKVLPB
 !     ENDIF
 !
 !     PHOSPHORUS ANION EXCHANGE IN BAND SOIL ZONE
@@ -789,7 +789,7 @@ module ChemEquilibriaMod
   write(*,*)'PrecpB_FePO4_con',chemvar%PrecpB_FePO4_con
   write(*,*)'PrecpB_CaHPO4_conc',chemvar%PrecpB_CaHPO4_conc
   write(*,*)'PrecpB_Ca5P3O12O3H3_conc',chemvar%PrecpB_Ca5P3O12O3H3_conc
-  write(*,*)'PrecpB_CaH4P2O8_con',chemvar%PrecpB_CaH4P2O8_con
+  write(*,*)'PrecpB_CaH4P2O8_conc',chemvar%PrecpB_CaH4P2O8_conc
   write(*,*)'XROH2_band_conc' ,chemvar%XROH2_band_conc
   write(*,*)'XH2PO4_band_conc' ,chemvar%XH2PO4_band_conc
   write(*,*)'XROH_band_conc' ,chemvar%XROH_band_conc

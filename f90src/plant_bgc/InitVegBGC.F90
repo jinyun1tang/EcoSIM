@@ -15,11 +15,11 @@ module InitVegBGC
   use CanopyRadDataType
   implicit none
 
-  real(r8), intent(out) :: YSIN(NumOfSkyAzimuSects)
-  real(r8), intent(out) :: YCOS(NumOfSkyAzimuSects)
-  real(r8), intent(out) :: SkyAzimuthAngle(NumOfSkyAzimuSects)
+  real(r8), intent(out) :: YSIN(NumOfSkyAzimuthSects)
+  real(r8), intent(out) :: YCOS(NumOfSkyAzimuthSects)
+  real(r8), intent(out) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ZAZI(NumOfLeafAzimuthSectors)
-  real(r8) :: YAGL
+  real(r8) :: YAGL    !sector angle of sky azimuth
   real(r8) :: OMEGZ,OMEGY
   real(r8) :: ZAGL,DAZI
 
@@ -36,20 +36,20 @@ module InitVegBGC
   D205: DO L=1,NumOfLeafAzimuthSectors
     ZAZI(L)=(L-0.5)*PICON/real(NumOfLeafAzimuthSectors,r8)
   ENDDO D205
-  !NumOfSkyAzimuSects: number of sky azimuth sectors
+  !NumOfSkyAzimuthSects: number of sky azimuth sectors
   !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
-  D230: DO N=1,NumOfSkyAzimuSects
-    SkyAzimuthAngle(N)=PICON*(2*N-1)/real(NumOfSkyAzimuSects,r8)
-    YAGL=PICON/real(NumOfSkyAzimuSects,r8)
-    YSIN(N)=SIN(YAGL)
-    YCOS(N)=COS(YAGL)
-    TotSineSkyAngles_grd=TotSineSkyAngles_grd+YSIN(N)
+  D230: DO N=1,NumOfSkyAzimuthSects
+    SkyAzimuthAngle(N)   = PICON*(2*N-1)/real(NumOfSkyAzimuthSects,r8)
+    YAGL                 = PICON/real(NumOfSkyAzimuthSects,r8)
+    YSIN(N)              = SIN(YAGL)
+    YCOS(N)              = COS(YAGL)
+    TotSineSkyAngles_grd = TotSineSkyAngles_grd+YSIN(N)
     D225: DO L=1,NumOfLeafAzimuthSectors
       DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
       DO  M=1,NumOfLeafZenithSectors
-        OMEGY=CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
-        OMEGA(N,M,L)=ABS(OMEGY)
-        OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
+        OMEGY        = CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
+        OMEGA(N,M,L) = ABS(OMEGY)
+        OMEGX(N,M,L) = OMEGA(N,M,L)/YSIN(N)
         IF(CosineLeafAngle(M).GT.YSIN(N))THEN
           OMEGZ=ACOS(OMEGY)
         ELSE

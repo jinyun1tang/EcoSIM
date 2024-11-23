@@ -38,65 +38,65 @@ contains
   integer :: itemp
   itemp=0
 
-  cid_H1PO4_2e_conc  =addone(itemp)
-  cid_H1PO4_2e_band_conc  =addone(itemp)
-  cid_H2PO4_1e_conc  =addone(itemp)
-  cid_H2PO4_1e_band_conc  =addone(itemp)
-  cid_NH3_aqu_conc   =addone(itemp)
-  cid_NH3_aqu_band_conc   =addone(itemp)
-  cid_NH4_1p_conc   =addone(itemp)
-  cid_NH4_1p_band_conc   =addone(itemp)
-  cid_XNH4_conc   =addone(itemp)
-  cid_XNH4_band_conc   =addone(itemp)
-  cid_XHPO4_band_conc  =addone(itemp)
-  cid_XH2PO4_band_conc  =addone(itemp)
-  cid_XROH_band_conc  =addone(itemp)
-  cid_XHPO4_conc  =addone(itemp)
-  cid_XROH2_band_conc  =addone(itemp)
-  cid_XH2PO4_conc  =addone(itemp)
-  cid_XROH1_conc  =addone(itemp)
-  cid_XROH2_conc  =addone(itemp)
-  cid_Precp_AlPO4_conc =addone(itemp)
-  cid_PrecpB_AlPO4_conc =addone(itemp)
-  cid_Precp_CaHPO4_conc =addone(itemp)
-  cid_PrecpB_CaHPO4_conc =addone(itemp)
-  cid_Precp_Ca5P3O12O3H3_conc =addone(itemp)
-  cid_PrecpB_Ca5P3O12O3H3_conc =addone(itemp)
-  cid_Precp_CaH4P2O8_conc =addone(itemp)
-  cid_PrecpB_CaH4P2O8_con =addone(itemp)
-  cid_Precp_FePO4_conc =addone(itemp)
-  cid_PrecpB_FePO4_con =addone(itemp)
+  cid_H1PO4_2e_conc            = addone(itemp)
+  cid_H1PO4_2e_band_conc       = addone(itemp)
+  cid_H2PO4_1e_conc            = addone(itemp)
+  cid_H2PO4_1e_band_conc       = addone(itemp)
+  cid_NH3_aqu_conc             = addone(itemp)
+  cid_NH3_aqu_band_conc        = addone(itemp)
+  cid_NH4_1p_conc              = addone(itemp)
+  cid_NH4_1p_band_conc         = addone(itemp)
+  cid_XNH4_conc                = addone(itemp)
+  cid_XNH4_band_conc           = addone(itemp)
+  cid_XHPO4_band_conc          = addone(itemp)
+  cid_XH2PO4_band_conc         = addone(itemp)
+  cid_XROH_band_conc           = addone(itemp)
+  cid_XHPO4_conc               = addone(itemp)
+  cid_XROH2_band_conc          = addone(itemp)
+  cid_XH2PO4_conc              = addone(itemp)
+  cid_XROH1_conc               = addone(itemp)
+  cid_XROH2_conc               = addone(itemp)
+  cid_Precp_AlPO4_conc         = addone(itemp)
+  cid_PrecpB_AlPO4_conc        = addone(itemp)
+  cid_Precp_CaHPO4_conc        = addone(itemp)
+  cid_PrecpB_CaHPO4_conc       = addone(itemp)
+  cid_Precp_Ca5P3O12O3H3_conc  = addone(itemp)
+  cid_PrecpB_Ca5P3O12O3H3_conc = addone(itemp)
+  cid_Precp_CaH4P2O8_conc      = addone(itemp)
+  cid_PrecpB_CaH4P2O8_conc     = addone(itemp)
+  cid_Precp_FePO4_conc         = addone(itemp)
+  cid_PrecpB_FePO4_con         = addone(itemp)
 
-  fid_TR_NH4_soil = addone(itemp)
-  fid_TR_NH4_band_soil = addone(itemp)
-  fid_TR_NH3_soil_vr = addone(itemp)
-  fid_TR_NH3_band_soil = addone(itemp)
-  fid_TR_H1PO4_soil = addone(itemp)
-  fid_TR_H2PO4_soil = addone(itemp)
-  fid_TR_H1PO4_band_soil = addone(itemp)
-  fid_TR_H2PO4_band_soil = addone(itemp)
-  fid_TR_NH4_sorbed_soil = addone(itemp)
-  fid_TR_NH4_sorbed_band_soil = addone(itemp)
-  fid_TR_ROH_sorbed_soil = addone(itemp)
-  fid_TR_ROH2_sorbed_soil = addone(itemp)
-  fid_TR_RHPO4_sorbed_soil = addone(itemp)
-  fid_TR_RH2PO4_sorbed_soil = addone(itemp)
-  fid_TR_ROH_sorbed_band_soil = addone(itemp)
-  fid_TR_ROH2_sorbed_band_soil = addone(itemp)
-  fid_TR_RHPO4_sorbed_band_soil = addone(itemp)
-  fid_TR_RH2PO4_sorbed_band_soil = addone(itemp)
-  fid_TR_AlPO4_precip_soil= addone(itemp)
-  fid_TR_FePO4_precip_soil= addone(itemp)
-  fid_TR_CaHPO4_precip_soil= addone(itemp)
-  fid_TR_apatite_precip_soil= addone(itemp)
-  fid_TR_CaH4P2O8_precip_soil= addone(itemp)
-  fid_TR_AlPO4_precip_band_soil= addone(itemp)
-  fid_TR_FePO4_precip_band_soil= addone(itemp)
-  fid_TR_CaHPO4_precip_band_soil= addone(itemp)
-  fid_TR_apatite_precip_band_soil= addone(itemp)
-  fid_TR_CaH4P2O8_precip_band_soil= addone(itemp)
-  fid_TR_Al_3p_soil  = addone(itemp)
-  nvars = itemp
+  fid_TR_NH4_soil                  = addone(itemp)
+  fid_TR_NH4_band_soil             = addone(itemp)
+  fid_TR_NH3_soil_vr               = addone(itemp)
+  fid_TR_NH3_band_soil             = addone(itemp)
+  fid_TR_H1PO4_soil                = addone(itemp)
+  fid_TR_H2PO4_soil                = addone(itemp)
+  fid_TR_H1PO4_band_soil           = addone(itemp)
+  fid_TR_H2PO4_band_soil           = addone(itemp)
+  fid_TR_NH4_sorbed_soil           = addone(itemp)
+  fid_TR_NH4_sorbed_band_soil      = addone(itemp)
+  fid_TR_ROH_sorbed_soil           = addone(itemp)
+  fid_TR_ROH2_sorbed_soil          = addone(itemp)
+  fid_TR_RHPO4_sorbed_soil         = addone(itemp)
+  fid_TR_RH2PO4_sorbed_soil        = addone(itemp)
+  fid_TR_ROH_sorbed_band_soil      = addone(itemp)
+  fid_TR_ROH2_sorbed_band_soil     = addone(itemp)
+  fid_TR_RHPO4_sorbed_band_soil    = addone(itemp)
+  fid_TR_RH2PO4_sorbed_band_soil   = addone(itemp)
+  fid_TR_AlPO4_precip_soil         = addone(itemp)
+  fid_TR_FePO4_precip_soil         = addone(itemp)
+  fid_TR_CaHPO4_precip_soil        = addone(itemp)
+  fid_TR_apatite_precip_soil       = addone(itemp)
+  fid_TR_CaH4P2O8_precip_soil      = addone(itemp)
+  fid_TR_AlPO4_precip_band_soil    = addone(itemp)
+  fid_TR_FePO4_precip_band_soil    = addone(itemp)
+  fid_TR_CaHPO4_precip_band_soil   = addone(itemp)
+  fid_TR_apatite_precip_band_soil  = addone(itemp)
+  fid_TR_CaH4P2O8_precip_band_soil = addone(itemp)
+  fid_TR_Al_3p_soil                = addone(itemp)
+  nvars                            = itemp
   end subroutine Init_geochem_nosalt
 
 
@@ -183,7 +183,7 @@ contains
   ystatesfl(cid_Precp_Ca5P3O12O3H3_conc)  =0.0_r8
   ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)  =0.0_r8
   ystatesfl(cid_Precp_CaH4P2O8_conc)  =0.0_r8
-  ystatesfl(cid_PrecpB_CaH4P2O8_con)  =600.89_r8
+  ystatesfl(cid_PrecpB_CaH4P2O8_conc)  =600.89_r8
   ystatesfl(cid_Precp_FePO4_conc)  =0.0_r8
   ystatesfl(cid_PrecpB_FePO4_con)  =0.0_r8
 
@@ -309,7 +309,7 @@ contains
   chemvar%Precp_Ca5P3O12O3H3_conc  =ystates0l(cid_Precp_Ca5P3O12O3H3_conc)
   chemvar%PrecpB_Ca5P3O12O3H3_conc  =ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)
   chemvar%Precp_CaH4P2O8_conc  =ystates0l(cid_Precp_CaH4P2O8_conc)
-  chemvar%PrecpB_CaH4P2O8_con  =ystates0l(cid_PrecpB_CaH4P2O8_con)
+  chemvar%PrecpB_CaH4P2O8_conc  =ystates0l(cid_PrecpB_CaH4P2O8_conc)
   chemvar%Precp_FePO4_conc  =ystates0l(cid_Precp_FePO4_conc)
   chemvar%PrecpB_FePO4_con  =ystates0l(cid_PrecpB_FePO4_con)
 
@@ -436,7 +436,7 @@ contains
   ystatesfl(fid_TR_apatite_precip_band_soil)=solflx%TR_apatite_precip_band_soil
 
   !PCPMB=PCPMB+TR_CaH4P2O8_precip_band_soil
-  ystatesfl(cid_PrecpB_CaH4P2O8_con)=ystates0l(cid_PrecpB_CaH4P2O8_con)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaH4P2O8_conc)=ystates0l(cid_PrecpB_CaH4P2O8_conc)+solflx%TR_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TR_CaH4P2O8_precip_band_soil)=solflx%TR_CaH4P2O8_precip_band_soil
   end subroutine RetrieveYstatef
 

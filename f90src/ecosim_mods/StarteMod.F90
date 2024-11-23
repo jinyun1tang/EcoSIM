@@ -116,8 +116,8 @@ module StarteMod
                     !this is for water
                     BulkSoilMass=VLMicP_vr(L,NY,NX)
                   ENDIF
-                  trcx_solml_vr(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BulkSoilMass
-                  trcx_solml_vr(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BulkSoilMass
+                  trcx_solml_vr(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC_vr(L,NY,NX))*BulkSoilMass
+                  trcx_solml_vr(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC_vr(L,NY,NX))*BulkSoilMass
                   solutevar%CN4X=CNH4(L,NY,NX)
                   solutevar%CALX=CAL(L,NY,NX)
                   solutevar%CFEX=CFE(L,NY,NX)
@@ -157,7 +157,7 @@ module StarteMod
             ENDIF
 
             solutevar%XAEC  = trcx_solml_vr(idx_AEC,L,NY,NX)
-            solutevar%CEC   = CEC(L,NY,NX)
+            solutevar%CEC   = CEC_vr(L,NY,NX)
             solutevar%ORGC  = SoilOrgM_vr(ielmc,L,NY,NX)
             solutevar%VLPO4 = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
             solutevar%XCEC  = trcx_solml_vr(idx_CEC,L,NY,NX)
@@ -199,13 +199,13 @@ module StarteMod
   )
   IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
   !litter pool, top soil layer
-    CO2_rain_conc(NY,NX)=solutevar%H2CO3_aqu_conc
-    CH4_rain_conc(NY,NX)=solutevar%CH4_aqu_conc
-    O2_rain_conc(NY,NX)=solutevar%O2_aqu_conc
-    N2_rain_conc(NY,NX)=solutevar%N2_aqu_conc
-    N2O_rain_conc(NY,NX)=solutevar%N2O_aqu_conc
+    trcVolatile_rain_conc(idg_CO2,NY,NX)=solutevar%H2CO3_aqu_conc
+    trcVolatile_rain_conc(idg_CH4,NY,NX)=solutevar%CH4_aqu_conc
+    trcVolatile_rain_conc(idg_O2,NY,NX)=solutevar%O2_aqu_conc
+    trcVolatile_rain_conc(idg_N2,NY,NX)=solutevar%N2_aqu_conc
+    trcVolatile_rain_conc(idg_N2O,NY,NX)=solutevar%N2O_aqu_conc
     NH4_rain_conc(NY,NX)=solutevar%NH4_1p_conc
-    NH3_rain_conc(NY,NX)=solutevar%NH3_aqu_conc
+    trcVolatile_rain_conc(idg_NH3,NY,NX)=solutevar%NH3_aqu_conc
     if(salt_model)then
       trcsalt_rain_conc(idsalt_Al,NY,NX)=solutevar%Al_3p_conc
       trcsalt_rain_conc(idsalt_Fe,NY,NX)=solutevar%Fe_3p_conc
@@ -257,13 +257,13 @@ module StarteMod
 !
   ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
   ! manure, top layer
-    CO2_irrig_conc(NY,NX)=solutevar%H2CO3_aqu_conc
-    CH4_irrig_conc(NY,NX)=solutevar%CH4_aqu_conc
-    O2_irrig_conc(NY,NX)=solutevar%O2_aqu_conc
-    N2_irrig_conc(NY,NX)=solutevar%N2_aqu_conc
-    N2O_irrig_conc(NY,NX)=solutevar%N2O_aqu_conc
+    trcVolatile_irrig_conc(idg_CO2,NY,NX)=solutevar%H2CO3_aqu_conc
+    trcVolatile_irrig_conc(idg_CH4,NY,NX)=solutevar%CH4_aqu_conc
+    trcVolatile_irrig_conc(idg_O2,NY,NX)=solutevar%O2_aqu_conc
+    trcVolatile_irrig_conc(idg_N2,NY,NX)=solutevar%N2_aqu_conc
+    trcVolatile_irrig_conc(idg_N2O,NY,NX)=solutevar%N2O_aqu_conc
     NH4_irrig_conc(I,NY,NX)=solutevar%NH4_1p_conc
-    NH3_irrig_conc(I,NY,NX)=solutevar%NH3_aqu_conc
+    trcVolatile_irrig_conc(idg_NH3,NY,NX)=solutevar%NH3_aqu_conc
     HPO4_irrig_conc(I,NY,NX)=solutevar%H1PO4_2e_conc
     H2PO4_irrig_conc(I,NY,NX)=solutevar%H2PO4_1e_conc
     CSTRQ(I,NY,NX)=solutevar%CSTR1
@@ -492,9 +492,9 @@ module StarteMod
     trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)=solutevar%Precp_CaHPO4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_HAB,L,NY,NX)=solutevar%Precp_Ca5P3O12O3H3_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)=0._r8
-    ECND_vr(L,NY,NX)=0._r8
-    CSTR(L,NY,NX)=0._r8
-    CION(L,NY,NX)=0._r8
+    ElectricConductivity_vr(L,NY,NX) = 0._r8
+    SolutesIonStrenth_vr(L,NY,NX)    = 0._r8
+    SolutesIonConc_vr(L,NY,NX)       = 0._r8
 ! the following line is quite interesting, Jinyun Tang, Nov 17, 2022
     trc_solml_vr(ids_NH4,L,NY,NX)=trc_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)
     SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)=SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)-0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)
@@ -545,34 +545,34 @@ module StarteMod
 !
     D9985: DO L=1,JS
       IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        VOLWW=VLWatSnow_snvr(L,NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
-        trcg_solsml_snvr(idg_CO2,L,NY,NX)=VOLWW*CO2_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_CH4,L,NY,NX)=VOLWW*CH4_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_O2,L,NY,NX)=VOLWW*O2_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_N2,L,NY,NX)=VOLWW*N2_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_N2O,L,NY,NX)=VOLWW*N2O_rain_conc(NY,NX)
-        trcg_solsml_snvr(idg_NH3,L,NY,NX)=VOLWW*NH3_rain_conc(NY,NX)*natomw
+        VOLWW                             = VLWatSnow_snvr(L,NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
+        trcg_solsml_snvr(idg_CO2,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_CO2,NY,NX)
+        trcg_solsml_snvr(idg_CH4,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_CH4,NY,NX)
+        trcg_solsml_snvr(idg_O2,L,NY,NX)  = VOLWW*trcVolatile_rain_conc(idg_O2,NY,NX)
+        trcg_solsml_snvr(idg_N2,L,NY,NX)  = VOLWW*trcVolatile_rain_conc(idg_N2,NY,NX)
+        trcg_solsml_snvr(idg_N2O,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_N2O,NY,NX)
+        trcg_solsml_snvr(idg_NH3,L,NY,NX) = VOLWW*trcVolatile_rain_conc(idg_NH3,NY,NX)*natomw
 
-        trcn_solsml(ids_NH4,L,NY,NX)=VOLWW*NH4_rain_conc(NY,NX)*natomw
-        trcn_solsml(ids_NO3,L,NY,NX)=VOLWW*NO3_rain_conc(NY,NX)*natomw
-        trcn_solsml(ids_H1PO4,L,NY,NX)=VOLWW*HPO4_rain_conc(NY,NX)*patomw
-        trcn_solsml(ids_H2PO4,L,NY,NX)=VOLWW*H2PO4_rain_conc(NY,NX)*patomw
+        trcn_solsml_snvr(ids_NH4,L,NY,NX)   = VOLWW*NH4_rain_conc(NY,NX)*natomw
+        trcn_solsml_snvr(ids_NO3,L,NY,NX)   = VOLWW*NO3_rain_conc(NY,NX)*natomw
+        trcn_solsml_snvr(ids_H1PO4,L,NY,NX) = VOLWW*HPO4_rain_conc(NY,NX)*patomw
+        trcn_solsml_snvr(ids_H2PO4,L,NY,NX) = VOLWW*H2PO4_rain_conc(NY,NX)*patomw
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
         IF(salt_model)THEN
           do nsalts=idsalt_beg,idsalt_end
-            trcs_solsml(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_conc(nsalts,NY,NX)
+            trc_Saltml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_conc(nsalts,NY,NX)
           enddo
         ENDIF
       ELSE
-        trcg_solsml_snvr(idg_beg:idg_end-1,L,NY,NX)=0._r8
-        trcn_solsml(ids_nut_beg:ids_nuts_end,L,NY,NX)=0._r8
+        trcg_solsml_snvr(idg_beg:idg_end-1,L,NY,NX)        = 0._r8
+        trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
         IF(salt_model)THEN
-          trcs_solsml(idsalt_beg:idsalt_end,L,NY,NX)=0._r8
+          trc_Saltml_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0._r8
         ENDIF
       ENDIF
     ENDDO D9985

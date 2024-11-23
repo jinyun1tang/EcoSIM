@@ -1,7 +1,6 @@
 module BalancesMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use CanopyDataType, only: QvET_col
-  use TFlxTypeMod,    only: THeatXGridBySurfRunoff_2DH
   use BalanceCheckDataType
   use SoilWaterDataType
   use ClimForcDataType
@@ -39,14 +38,14 @@ contains
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      WaterErr_col(NY,NX) = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+(RainFalPrec(NY,NX)+SnoFalPrec_col(NY,NX)) &
+      WaterErr_col(NY,NX) = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+(RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)) &
         +VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)-QDischar_col(NY,NX)+QRunSurf_col(NY,NX)-QDrain_col(NY,NX)
 
       HeatErr_col(NY,NX) = HeatErr_col(NY,NX)-HeatStore_col(NY,NX)+THeatRootUptake_col(NY,NX) &
         +THeatFlow2Soil_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
         +THeatXGridBySurfRunoff_2DH(NY,NX)+HeatPrec_col(NY,NX)
 
-!      write(114,*)I+J/24., WaterErr_col(NY,NX),WatMass_col(NY,NX),(RainFalPrec(NY,NX)+SnoFalPrec_col(NY,NX)), &
+!      write(114,*)I+J/24., WaterErr_col(NY,NX),WatMass_col(NY,NX),(RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)), &
 !        VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX),-QDischar_col(NY,NX)-QDrain_col(NY,NX)+QRunSurf_col(NY,NX)
 
 !      write(115,*)I+J/24., HeatErr_col(NY,NX),HeatStore_col(NY,NX),THeatRootUptake_col(NY,NX),&

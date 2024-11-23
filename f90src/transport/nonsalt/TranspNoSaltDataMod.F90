@@ -52,7 +52,7 @@ implicit none
   real(r8), allocatable ::  TR3MacPoreSolFlx_vr(:,:,:,:)          !total 3D macropore flux
 
   real(r8), allocatable ::  GasDifc_vrc(:,:,:,:)
-  real(r8), allocatable ::  SoluteDifusvty_vrc(:,:,:,:)
+  real(r8), allocatable ::  SoluteDifusvtytscal_vr(:,:,:,:)
   real(r8), allocatable ::  DifuscG_vr(:,:,:,:,:)
   real(r8), allocatable ::  trcg_VLWatMicP(:,:,:,:)                      !
 
@@ -78,7 +78,7 @@ implicit none
   real(r8), allocatable ::  DOMdiffusivity2_vr(:,:,:,:)                      !
 
   real(r8), allocatable :: trcg_solsml2_snvr(:,:,:,:)
-  real(r8), allocatable :: trcn_solsml2(:,:,:,:)
+  real(r8), allocatable :: trcn_solsml2_snvr(:,:,:,:)
 
   real(r8), allocatable ::  trcg_TBLS_snvr(:,:,:,:)                      !
   real(r8), allocatable ::  trcn_TBLS(:,:,:,:)
@@ -146,7 +146,7 @@ contains
   allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
 
   allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX)); GasDifc_vrc=0._r8
-  allocate(SoluteDifusvty_vrc(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvty_vrc=0._r8
+  allocate(SoluteDifusvtytscal_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvtytscal_vr=0._r8
   allocate(DifuscG_vr(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG_vr=0._r8
 
   allocate(trcg_VLWatMicP(idg_beg:idg_end,0:JZ,JY,JX)); trcg_VLWatMicP=0._r8
@@ -176,7 +176,7 @@ contains
   allocate(DOMdiffusivity2_vr(idom_beg:idom_end,0:JZ,JY,JX)); DOMdiffusivity2_vr = 0._r8
 
   allocate(trcg_solsml2_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml2_snvr = 0._r8
-  allocate(trcn_solsml2(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2  = 0._r8
+  allocate(trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml2_snvr  = 0._r8
 
   allocate(trcg_TBLS_snvr(idg_beg:idg_NH3,JS,JY,JX));   trcg_TBLS_snvr = 0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS     = 0._r8
@@ -223,7 +223,7 @@ contains
 
   call destroy(GasDifc_vrc)
   call destroy(DifuscG_vr)
-  call destroy(SoluteDifusvty_vrc)
+  call destroy(SoluteDifusvtytscal_vr)
   call destroy(DOM_MicP2)
   call destroy(CDOM_MicP1)
   call destroy(CDOM_MicP2)
@@ -271,7 +271,7 @@ contains
   call destroy(DOMdiffusivity2_vr)
   call destroy(RGasADFlx_3D)
   call destroy(trcg_solsml2_snvr)
-  call destroy(trcn_solsml2)
+  call destroy(trcn_solsml2_snvr)
   call destroy(trcn_2DFloXSurRunoffM)
   call destroy(trcg_TBLS_snvr)
   call destroy(trcn_TBLS)

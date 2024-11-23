@@ -21,19 +21,19 @@ implicit none
   real(r8),target,allocatable :: trc_soHml_vr(:,:,:,:)                 !solute mass in macropore [g d-2]
   real(r8),target,allocatable :: trc_solml_vr(:,:,:,:)                 !solute mass in micropore [g d-2]
   real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                 !solute concentration in micropre [g m-3]
-  real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)                 !gaseous concentation [g m-3]
+  real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)                 !gaseous concentation in micropore [g m-3]
 
   real(r8),target,allocatable ::  ZNFNI(:,:,:)                      !current nitrification inhibition activity
   real(r8),target,allocatable ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
   real(r8),target,allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
 
-  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)     !layer mass of gases [g d-2]
-
-  real(r8),target,allocatable :: PH(:,:,:)             !soil pH
-  real(r8),target,allocatable :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
-  real(r8),target,allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
-
+  real(r8),target,allocatable :: trc_gasml_vr(:,:,:,:)             !layer mass of gases in micropores [g d-2]
+  real(r8),target,allocatable :: trcVolatileMass_col(:,:,:)        !column integrated volatile tracer mass [g d-2]
+  real(r8),target,allocatable :: PH(:,:,:)                         !soil pH
+  real(r8),target,allocatable :: CEC_vr(:,:,:)                     !soil cation exchange capacity	[cmol kg-1]
+  real(r8),target,allocatable :: AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
+ 
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)                         !total C amendment, [g d-2]
@@ -70,7 +70,7 @@ implicit none
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)
-  real(r8),target,allocatable ::  tRDOE2Die_col(:,:,:)
+  real(r8),target,allocatable ::  tRDIM2DOM_col(:,:,:)               !conversion flux from DIM into DOM [g d-2 h-1]
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
@@ -87,7 +87,7 @@ implicit none
   real(r8),target,allocatable ::  RNO2DmndSoilChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  RNO2DmndBandChemo_vr(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_surf_disevap_flx(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !gas bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)                      !<0., active gas bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_col(:,:,:)
   real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
@@ -95,10 +95,10 @@ implicit none
   real(r8),target,allocatable ::  WaterFlowMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_Transp2MicP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_TransptMicP_3D(:,:,:,:,:)
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_Transp2MacP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_TransptMacP_3D(:,:,:,:,:)
   real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
 
@@ -132,12 +132,13 @@ implicit none
   allocate(CNO3(JZ,JY,JX));     CNO3=0._r8
   allocate(CPO4(JZ,JY,JX));     CPO4=0._r8
 
+  allocate(trcVolatileMass_col(idg_beg:idg_end,JY,JX)); trcVolatileMass_col=0._r8
   allocate(trc_gasml_vr(idg_beg:idg_end,JZ,JY,JX)); trc_gasml_vr=0._r8
-  allocate(trc_soHml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml_vr=0._r8
+  allocate(trc_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trc_soHml_vr=0._r8
   allocate(trc_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr=0._r8
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
   allocate(trc_gascl_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl_vr=0._r8
-  allocate(tRDOE2Die_col(1:NumPlantChemElms,JY,JX)); tRDOE2Die_col=0._r8
+  allocate(tRDIM2DOM_col(1:NumPlantChemElms,JY,JX)); tRDIM2DOM_col=0._r8
 
   allocate(ZNFNI(0:JZ,JY,JX));  ZNFNI=0._r8
   allocate(ZNFN0(0:JZ,JY,JX));  ZNFN0=0._r8
@@ -155,8 +156,8 @@ implicit none
   allocate(RN2OChemoProd_vr(0:JZ,JY,JX)); RN2OChemoProd_vr=0._r8
   allocate(RN2ORedux_vr(0:JZ,JY,JX));RN2ORedux_vr=0._r8
   allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
-  allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
-  allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
+  allocate(CEC_vr(JZ,JY,JX));CEC_vr(JZ,JY,JX)=0._r8
+  allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
   allocate(SurfGasFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasFlx_col=0._r8
@@ -223,10 +224,10 @@ implicit none
   allocate(WaterFlowMacP_3D(3,JD,JV,JH));   WaterFlowMacP_3D=0._r8
   allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
-  allocate(trcs_Transp2MicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_Transp2MicP_3D=0._r8
+  allocate(trcs_TransptMicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_TransptMicP_3D=0._r8
   allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,3,JD,JV,JH));Gas_3DAdvDif_Flx_vr=0._r8
-  allocate(trcs_Transp2MacP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_Transp2MacP_3D=0._r8
+  allocate(trcs_TransptMacP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_TransptMacP_3D=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
   allocate(DOM_3DMacp_Transp_flx(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));DOM_3DMacp_Transp_flx=0._r8
 
@@ -242,7 +243,7 @@ implicit none
   call destroy(trcg_ebu_flx_col)
   call destroy(trcg_pltroot_flx_col)
 
-  call destroy(tRDOE2Die_col)
+  call destroy(tRDIM2DOM_col)
   call destroy(CNH4)
   call destroy(CNO3)
   call destroy(CPO4)
@@ -268,8 +269,8 @@ implicit none
   call destroy(ZNHU0)
 
   call destroy(PH)
-  call destroy(CEC)
-  call destroy(AEC)
+  call destroy(CEC_vr)
+  call destroy(AEC_vr)
   call destroy(CPO4S)
   call destroy(RO2UptkSoilM_vr)
   call destroy(AmendCFlx_CumYr_col)
@@ -304,6 +305,7 @@ implicit none
   call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)
   call destroy(LitrfalStrutElms_vr)
+  call destroy(trcVolatileMass_col)
 
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)

@@ -15,7 +15,7 @@ clm_hour_file_in='../../examples/inputs/sample/sample_clim_200230202.nc'
 clm_factor_in='NO'
 soil_mgmt_in='NO'
 atm_ghg_in='../../input_data/fatm_hist_GHGs_1750-2023.nc'
-
+num_of_simdays=180
 lverbose=.false.
 disp_planttrait=.true.
 plant_model=.true.

@@ -18,10 +18,11 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)            !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
   real(r8),target,allocatable ::  HeatStore_col(:,:)                 !heat stored over the grid, including soil, litter and canopy, [MJ d-2]
+  real(r8),target,allocatable ::  HeatSource_vr(:,:,:)               !heat source for warming
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
   real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model, [MJ/d2/h]
-  real(r8),target,allocatable ::  THeatFlow2Soil_vr(:,:,:)           !hourly heat flux into soil layer  [MJ m-3]
+  real(r8),target,allocatable ::  THeatFlowCellSoil_vr(:,:,:)           !hourly heat flux into soil layer  [MJ m-3]
   real(r8),target,allocatable ::  tHeatUptk_col(:,:)                 !Heat utake by plant through transpiration [MJ/d2/h] 
   real(r8),target,allocatable ::  HeatDrain_col(:,:)                 !heat loss through drainage [MJ/d2/h]
   real(r8),target,allocatable ::  HeatRunSurf_col(:,:)               !heat loss through surface runoff [MJ/d2/h]
@@ -45,7 +46,8 @@ contains
   allocate(TCS(0:JZ,JY,JX));    TCS                                    = 0._r8
   allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond    = 0._r8
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond    = 0._r8
-  allocate(THeatFlow2Soil_vr(JZ,JY,JX));    THeatFlow2Soil_vr          = 0._r8
+  allocate(THeatFlowCellSoil_vr(JZ,JY,JX));    THeatFlowCellSoil_vr          = 0._r8
+  allocate(HeatSource_vr(JZ,JY,JX)); HeatSource_vr=0._r8
   allocate(tHeatUptk_col(JY,JX));   tHeatUptk_col                      = 0._r8
   allocate(HeatDrain_col(JY,JX));  HeatDrain_col                       = 0._r8
   allocate(HeatRunSurf_col(JY,JX)); HeatRunSurf_col                    = 0._r8
@@ -59,6 +61,7 @@ contains
   implicit none
   call destroy(TKSZ)
   call destroy(TKS_vr)
+  call destroy(HeatSource_vr)
   call destroy(TLIceThawMicP)
   call destroy(TLPhaseChangeHeat2Soi)
   call destroy(TLIceThawMacP)
@@ -68,7 +71,7 @@ contains
   call destroy(TCS)
   call destroy(NumerSolidThermCond)
   call destroy(DenomSolidThermCond)
-  call destroy(THeatFlow2Soil_vr)  
+  call destroy(THeatFlowCellSoil_vr)  
   call destroy(tHeatUptk_col)
   call destroy(HeatDrain_col)
   call destroy(HeatRunSurf_col)

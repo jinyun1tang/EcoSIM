@@ -118,15 +118,15 @@ module SoluteMod
 !     TR_NH3_soil_vr,TR_NH3_band_soil=NH3 dissolution from urea in non-band,band
 !     TRNO3,TRNOB=NO3 dissolution in non-band,band
 !
-  TRN3G(L,NY,NX)=TRN3G(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
+  TR_NH3_geochem_vr(L,NY,NX)=TR_NH3_geochem_vr(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
   trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+RSN4AA
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+RSN4BA+RSN4BB
   TR_NH3_soil_vr(L,NY,NX)=TR_NH3_soil_vr(L,NY,NX)+RSNUAA
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)=trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+RSNUBA+RSNUBB
   trcn_RChem_soil_vr(ids_NO3,L,NY,NX)=trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
   trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
-  TR_CO2_aqu_soil_vr(L,NY,NX)=TR_CO2_aqu_soil_vr(L,NY,NX)*catomw
-  TRN3G(L,NY,NX)=TRN3G(L,NY,NX)*natomw
+  TR_CO2_gchem_soil_vr(L,NY,NX)=TR_CO2_gchem_soil_vr(L,NY,NX)*catomw
+  TR_NH3_geochem_vr(L,NY,NX)=TR_NH3_geochem_vr(L,NY,NX)*natomw
   trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)*natomw
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)*natomw
   TR_NH3_soil_vr(L,NY,NX)=TR_NH3_soil_vr(L,NY,NX)*natomw
@@ -249,7 +249,7 @@ module SoluteMod
   real(r8), pointer :: Precp_Ca5P3O12O3H3_conc
   real(r8), pointer :: PrecpB_Ca5P3O12O3H3_conc
   real(r8), pointer :: Precp_CaH4P2O8_conc
-  real(r8), pointer :: PrecpB_CaH4P2O8_con
+  real(r8), pointer :: PrecpB_CaH4P2O8_conc
   real(r8), pointer :: Precp_FePO4_conc
   real(r8), pointer :: PrecpB_FePO4_con
   real(r8), pointer :: XHPO4_band_conc
@@ -289,7 +289,7 @@ module SoluteMod
   Precp_Ca5P3O12O3H3_conc  => chemvar%Precp_Ca5P3O12O3H3_conc
   PrecpB_Ca5P3O12O3H3_conc => chemvar%PrecpB_Ca5P3O12O3H3_conc
   Precp_CaH4P2O8_conc      => chemvar%Precp_CaH4P2O8_conc
-  PrecpB_CaH4P2O8_con      => chemvar%PrecpB_CaH4P2O8_con
+  PrecpB_CaH4P2O8_conc     => chemvar%PrecpB_CaH4P2O8_conc
   Precp_FePO4_conc         => chemvar%Precp_FePO4_conc
   PrecpB_FePO4_con         => chemvar%PrecpB_FePO4_con
   H2PO4_1e_conc            => chemvar%H2PO4_1e_conc
@@ -448,7 +448,7 @@ module SoluteMod
     XH2PO4_band_conc=AZMAX1(trcx_solml_vr(idx_H2PO4B,L,NY,NX))/BKVLPB
     PrecpB_AlPO4_conc=AZMAX1(trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX))/BKVLPB
     PrecpB_FePO4_con=AZMAX1(trcp_saltpml_vr(idsp_FePO4B,L,NY,NX))/BKVLPB
-    PrecpB_CaH4P2O8_con=AZMAX1(trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX))/BKVLPB
+    PrecpB_CaH4P2O8_conc=AZMAX1(trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX))/BKVLPB
     PrecpB_CaHPO4_conc=AZMAX1(trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX))/BKVLPB
     PrecpB_Ca5P3O12O3H3_conc=AZMAX1(trcp_saltpml_vr(idsp_HAB,L,NY,NX))/BKVLPB
   ELSE
@@ -463,7 +463,7 @@ module SoluteMod
     XH2PO4_band_conc=0._r8
     PrecpB_AlPO4_conc=0._r8
     PrecpB_FePO4_con=0._r8
-    PrecpB_CaH4P2O8_con=0._r8
+    PrecpB_CaH4P2O8_conc=0._r8
     PrecpB_CaHPO4_conc=0._r8
     PrecpB_Ca5P3O12O3H3_conc=0._r8
   ENDIF

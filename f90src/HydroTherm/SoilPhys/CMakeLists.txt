@@ -14,6 +14,7 @@ target_include_directories(SoilPhys  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/modelpars/
   ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/disturbances/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/)

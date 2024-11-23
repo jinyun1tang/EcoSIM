@@ -338,8 +338,8 @@ contains
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs,         &
     SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft,       &
     RootMyco2ndStrutElms_rpvr  => plt_biom%RootMyco2ndStrutElms_rpvr,   &
-    RootNodulNonstElms_pvr     => plt_biom%RootNodulNonstElms_pvr,      &
-    RootNodulStrutElms_pvr     => plt_biom%RootNodulStrutElms_pvr,      &
+    RootNodulNonstElms_rpvr     => plt_biom%RootNodulNonstElms_rpvr,      &
+    RootNodulStrutElms_rpvr     => plt_biom%RootNodulStrutElms_rpvr,      &
     FracRootStalkElmAlloc2Litr => plt_allom%FracRootStalkElmAlloc2Litr, &
     FracRootElmAlloc2Litr      => plt_allom%FracRootElmAlloc2Litr,      &
     QH2OLoss_lnds              => plt_site%QH2OLoss_lnds,               &
@@ -363,7 +363,7 @@ contains
     iPlantNfixType_pft         => plt_morph%iPlantNfixType_pft,         &
     RootLenPerPlant_pvr        => plt_morph%RootLenPerPlant_pvr,        &
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr,           &
-    Root2ndLen_pvr             => plt_morph%Root2ndLen_pvr,             &
+    Root2ndLen_rpvr             => plt_morph%Root2ndLen_rpvr,             &
     Root2ndXNum_pvr            => plt_morph%Root2ndXNum_pvr,            &
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft,         &
     NumRootAxes_pft            => plt_morph%NumRootAxes_pft             &
@@ -425,7 +425,7 @@ contains
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
+!     Root1stLen_rpvr,Root2ndLen_rpvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
@@ -442,7 +442,7 @@ contains
           RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
         ENDDO
         Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*XHVST
-        Root2ndLen_pvr(N,L,NR,NZ)=Root2ndLen_pvr(N,L,NR,NZ)*XHVST
+        Root2ndLen_rpvr(N,L,NR,NZ)=Root2ndLen_rpvr(N,L,NR,NZ)*XHVST
         Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*XHVST
       ENDDO D8960
 
@@ -475,11 +475,11 @@ contains
         DO NE=1,NumPlantChemElms
           D6395: DO M=1,jsken
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
-              XHVST1*(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ) &
-              +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ))
+              XHVST1*(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ) &
+              +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ))
           ENDDO D6395
-          RootNodulStrutElms_pvr(NE,L,NZ)=RootNodulStrutElms_pvr(NE,L,NZ)*XHVST
-          RootNodulNonstElms_pvr(NE,L,NZ)=RootNodulNonstElms_pvr(NE,L,NZ)*XHVST
+          RootNodulStrutElms_rpvr(NE,L,NZ)=RootNodulStrutElms_rpvr(NE,L,NZ)*XHVST
+          RootNodulNonstElms_rpvr(NE,L,NZ)=RootNodulNonstElms_rpvr(NE,L,NZ)*XHVST
         ENDDO
       ENDIF
     ENDDO D8985

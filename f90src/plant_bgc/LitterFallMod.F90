@@ -152,6 +152,7 @@ implicit none
   integer, intent(in) :: I,J,NZ
   REAL(R8),INTENT(INOUT) :: ShootC4NonstC_brch(NumOfCanopyLayers1,JP1)
   integer :: L,M,NR,NB,N,NE
+  REAL(R8) :: dRootMyco
 !     begin_execution
   associate(                                                              &
     jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
@@ -230,7 +231,7 @@ implicit none
       D8825: DO NB=1,NumOfBranches_pft(NZ)
         D6425: DO M=1,jsken
           LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
-            +ElmAllocmat4Litr(ielmc,inonstruct,M,NZ)*ShootC4NonstC_brch(NB,NZ)
+            +ElmAllocmat4Litr(ielmc,inonstruct,M,NZ)*AZMAX1(ShootC4NonstC_brch(NB,NZ))
 
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
@@ -247,19 +248,19 @@ implicit none
 
             IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
               SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+ElmAllocmat4Litr(NE,inonfoliar,M,NZ) &
-                *GrainStrutElms_brch(NE,NB,NZ)
+                *AZMAX1(GrainStrutElms_brch(NE,NB,NZ))
             ELSE
               LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-                +ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
+                +ElmAllocmat4Litr(NE,inonfoliar,M,NZ)*AZMAX1(GrainStrutElms_brch(NE,NB,NZ))
             ENDIF
 
             IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
               !all above ground, or not a tree
               LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)&
-                +ElmAllocmat4Litr(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
+                +ElmAllocmat4Litr(NE,istalk,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))
             ELSE
               StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)&
-                +ElmAllocmat4Litr(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
+                +ElmAllocmat4Litr(NE,icwood,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))
             ENDIF
           ENDDO
         ENDDO D6425  
@@ -283,20 +284,17 @@ implicit none
           DO M=1,jsken
             DO NE=1,NumPlantChemElms
               LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-                +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
+                +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
             ENDDO    
 
             DO NR=1,NumRootAxes_pft(NZ)
               DO NE=1,NumPlantChemElms
+                dRootMyco=AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))
                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)&
-                  +ElmAllocmat4Litr(NE,icwood,M,NZ) &
-                  *(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))&
-                  *FracRootElmAlloc2Litr(NE,k_woody_litr)
+                  +ElmAllocmat4Litr(NE,icwood,M,NZ)*dRootMyco*FracRootElmAlloc2Litr(NE,k_woody_litr)
 
                 LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
-                  +ElmAllocmat4Litr(NE,iroot,M,NZ) &
-                  *(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))&
-                  *FracRootElmAlloc2Litr(NE,k_fine_litr)
+                  +ElmAllocmat4Litr(NE,iroot,M,NZ)*dRootMyco*FracRootElmAlloc2Litr(NE,k_fine_litr)
               ENDDO
             ENDDO  
           ENDDO  
@@ -307,11 +305,11 @@ implicit none
         DO NE=1,NumPlantChemElms  
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
              LitrfalStrutElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
-            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(SeasonalNonstElms_pft(NE,NZ))*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
 
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)= &
              LitrfalStrutElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
-            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+            +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(SeasonalNonstElms_pft(NE,NZ))*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
         ENDDO
       ENDDO
 !
@@ -352,8 +350,8 @@ implicit none
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,        &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,   &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr,    &
     iPlantRootState_pft       => plt_pheno%iPlantRootState_pft,      &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
@@ -382,7 +380,7 @@ implicit none
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft,     &
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,      &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     MY                        => plt_morph%MY,                       &
@@ -458,7 +456,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_pvr=primary,secondary root length
+!     Root1stLen_rpvr,Root2ndLen_rpvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
@@ -475,7 +473,7 @@ implicit none
           RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
           Root1stLen_rpvr(N,L,NR,NZ)                              = 0._r8
-          Root2ndLen_pvr(N,L,NR,NZ)                               = 0._r8
+          Root2ndLen_rpvr(N,L,NR,NZ)                               = 0._r8
           Root2ndXNum_rpvr(N,L,NR,NZ)                             = 0._r8
         ENDDO
       ENDDO    
@@ -517,12 +515,12 @@ implicit none
           D6420: DO M=1,jsken
             DO NE=1,NumPlantChemElms            
               LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
-                ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_pvr(NE,L,NZ)+&
-                ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_pvr(NE,L,NZ)
+                ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ)+&
+                ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ)
             ENDDO
           ENDDO D6420
-          RootNodulStrutElms_pvr(1:NumPlantChemElms,L,NZ)=0._r8
-          RootNodulNonstElms_pvr(1:NumPlantChemElms,L,NZ)=0._r8  
+          RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8
+          RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8  
         ENDDO          
       ENDIF
     ENDDO 
@@ -763,7 +761,7 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     NU                        => plt_site%NU,                        &
     iPlantState_pft           => plt_pheno%iPlantState_pft,          &
-    Root2ndLen_pvr            => plt_morph%Root2ndLen_pvr,           &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
     MY                        => plt_morph%MY,                       &
@@ -811,7 +809,7 @@ implicit none
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         Root1stLen_rpvr(N,L,NR,NZ)                              = 0._r8
-        Root2ndLen_pvr(N,L,NR,NZ)                               = 0._r8
+        Root2ndLen_rpvr(N,L,NR,NZ)                               = 0._r8
         Root2ndXNum_rpvr(N,L,NR,NZ)                             = 0._r8
       enddo
     enddo

@@ -3,6 +3,7 @@ set(PLANT_BGC_SOURCES
   PlantDisturbByFireMod.F90
   PlantDisturbByTillageMod.F90 
   PlantDisturbByGrazingMod.F90
+  PrescribePhenolMod.F90
   InitVegBGC.F90
   RootGasMod.F90
   PlantBalMod.F90

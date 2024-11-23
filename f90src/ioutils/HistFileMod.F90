@@ -1721,7 +1721,7 @@ implicit none
              call htape_create (t)
 
              ! Define time-constant field variables
-             !call htape_timeconst(t, mode='define')
+             call htape_timeconst(t, mode='define')
 
              ! Define 3D time-constant field variables only to first primary tape
 !             if ( do_3Dtconst .and. t == 1 ) then
@@ -1740,7 +1740,7 @@ implicit none
 
 !          call t_startf('hist_htapes_wrapup_tconst')
           ! Write time constant history variables
-          !call htape_timeconst(t, mode='write')
+          call htape_timeconst(t, mode='write')
 
           ! Write 3D time constant history variables only to first primary tape
 !          if ( do_3Dtconst .and. t == 1 .and. tape(t)%ntimes == 1 )then
@@ -1826,6 +1826,44 @@ implicit none
     end do
 
   end subroutine hist_htapes_wrapup
+
+  !-----------------------------------------------------------------------
+  subroutine htape_timeconst(t, mode)  
+  implicit none
+    ! !ARGUMENTS:
+    integer, intent(in) :: t              ! tape index
+    character(len=*), intent(in) :: mode  ! 'define' or 'write'
+
+
+  real(r8),pointer:: timedata(:)                ! time interval boundaries
+  integer :: dim2id(2)           ! netCDF dimension id
+  integer :: varid                             ! variable id
+  integer :: nt
+
+  if (tape(t)%ntimes == 1) then
+    if (mode == 'define') then
+    elseif (mode == 'write') then
+    endif
+  endif
+   
+  ! For define mode -- only do this for first time-sample
+  if (mode == 'define' .and. tape(t)%ntimes == 1) then
+    
+    call ncd_defvar(nfid(t), 'time_bounds', ncd_double, dim1name='hist_interval', &
+      dim2name= 'time', long_name = 'history time interval endpoints')   
+
+  elseif (mode == 'write') then
+    allocate(timedata(2))
+    timedata(1) = tape(t)%begtime
+    timedata(2) = etimer%get_curr_time ()/secspday
+    nt         = tape(t)%ntimes
+
+    call ncd_io(flag='write', varname='time_bounds', &
+      dim1name='hist_interval', data=timedata, ncid=nfid(t), nt=nt)
+
+    deallocate(timedata)
+  endif       
+  end subroutine htape_timeconst
   !-----------------------------------------------------------------------
   subroutine hfields_write(t, mode)
     !

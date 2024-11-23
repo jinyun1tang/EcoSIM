@@ -524,24 +524,24 @@ module StartqMod
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-  HoursTooLowPsiCan_pft(NZ,NY,NX)=0._r8
-  ChillHours_pft(NZ,NY,NX)=0._r8
-  CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  ShootStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetoleStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  StalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  LeafStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  StalkRsrvElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  HuskStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  GrainStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  PetioleChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8  
-  SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
-  LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)=0._r8
+  HoursTooLowPsiCan_pft(NZ,NY,NX)                                           = 0._r8
+  ChillHours_pft(NZ,NY,NX)                                                  = 0._r8
+  CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
+  CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
+  ShootStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
+  PetoleStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
+  StalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
+  LeafStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
+  StalkRsrvElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
+  HuskStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
+  GrainStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
+  EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)           = 0._r8
+  CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
+  LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = 0._r8
+  PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = 0._r8
+  PetioleChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
+  SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
+  LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)       = 0._r8
   
   D25: DO NB=1,MaxNumBranches
     StalkBiomassC_brch(NB,NZ,NY,NX)=0._r8
@@ -733,8 +733,8 @@ module StartqMod
       PSIRootOSMO_vr(N,L,NZ,NY,NX)=CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)=AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
-      RootNonstructElmConc_pvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
-      RootProteinConc_pvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
+      RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)=0._r8
+      RootProteinConc_rpvr(N,L,NZ,NY,NX)=RootFracRemobilizableBiom(NZ,NY,NX)
       RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)=0._r8
       PopuRootMycoC_pvr(N,L,NZ,NY,NX)=0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)=0._r8
@@ -769,9 +769,9 @@ module StartqMod
       CCO2P=0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA(NY,NX))*CO2EI(NY,NX)
       trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)=CCO2A*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)=CCO2P*RootVH2O_pvr(N,L,NZ,NY,NX)
-      trcg_air2root_flx__pvr(idg_CO2,N,L,NZ,NY,NX)=0._r8
-      trcg_Root_DisEvap_flx_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
-      RUPGasSol_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
+      trcg_air2root_flx_pvr(idg_CO2,N,L,NZ,NY,NX)=0._r8
+      trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
+      RootUptkSoiSol_vr(idg_CO2,N,L,NZ,NY,NX)=0._r8
       RootCO2Emis_pvr(N,L,NZ,NY,NX)=0._r8
       COXYA=AtmGasCgperm3(idg_O2,NY,NX)
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA(NY,NX))*OXYE(NY,NX)
@@ -779,13 +779,13 @@ module StartqMod
       trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)=0._r8
       trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)=COXYA*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_O2,N,L,NZ,NY,NX)=COXYP*RootVH2O_pvr(N,L,NZ,NY,NX)
-      RAutoRootO2Limter_pvr(N,L,NZ,NY,NX)=1.0_r8
+      RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)=1.0_r8
 
       D30: DO NR=1,MaxNumRootAxes
         Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         Root1stLen_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
-        Root2ndLen_pvr(N,L,NR,NZ,NY,NX)=0._r8
+        Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)=0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)=0._r8
       ENDDO D30
 
@@ -795,8 +795,8 @@ module StartqMod
             LitrfalStrutElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
-        RootNodulNonstElms_pvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
-        RootNodulStrutElms_pvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
+        RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
+        RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX)=0._r8
         RootN2Fix_pvr(L,NZ,NY,NX)=0._r8
       ENDIF
     ENDDO D20
@@ -870,16 +870,13 @@ module StartqMod
     ShootStrutElms_brch(NE,NB,NZ,NY,NX)=LeafStrutElms_brch(NE,NB,NZ,NY,NX) &
       +PetoleStrutElms_brch(NE,NB,NZ,NY,NX)+StalkStrutElms_brch(NE,NB,NZ,NY,NX) &
       +StalkRsrvElms_brch(NE,NB,NZ,NY,NX)+HuskStrutElms_brch(NE,NB,NZ,NY,NX)&
-      +EarStrutElms_brch(NE,NB,NZ,NY,NX)+GrainStrutElms_brch(NE,NB,NZ,NY,NX) 
+      +EarStrutElms_brch(NE,NB,NZ,NY,NX)+GrainStrutElms_brch(NE,NB,NZ,NY,NX) &
+      +CanopyNonstElms_brch(NE,NB,NZ,NY,NX)
         
-    ShootElms_brch(NE,NB,NZ,NY,NX)=ShootStrutElms_brch(NE,NB,NZ,NY,NX)+CanopyNonstElms_brch(NE,NB,NZ,NY,NX)
+    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_pft(NE,NZ,NY,NX)+ShootStrutElms_brch(NE,NB,NZ,NY,NX) 
+      
   ENDDO
   
-  
-  DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_brch(NE,1,NZ,NY,NX)+SeasonalNonstElms_pft(NE,NZ,NY,NX) 
-  ENDDO
-
   RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
   !roots
   DO NR=1,MaxNumRootAxes

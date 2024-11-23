@@ -1,9 +1,9 @@
 module PlantMod
-  use data_kind_mod   , only : r8 => DAT_KIND_R8
-  use grosubsMod      , only : grosubs
-  use PlantPhenolMod       , only : hfuncs
-  use UptakesMod      , only : uptakes  
-  use PlantDisturbMod , only : PrepLandscapeGrazing
+  use data_kind_mod,   only: r8 => DAT_KIND_R8
+  use grosubsMod,      only: GrowPlants
+  use PlantPhenolMod,  only: hfuncs
+  use UptakesMod,      only: RootUptakes
+  use PlantDisturbMod, only: PrepLandscapeGrazing
   use EcoSimSumDataType
   use EcoSIMCtrlMod, only : lverb
   use PlantAPIData  
@@ -58,13 +58,13 @@ implicit none
 !      ENDDO
       !predict uptake fluxes of nutrients and O2
       if(lverb)write(*,*)'uptake'
-      CALL UPTAKES(I,J)
+      CALL ROOTUPTAKES(I,J)
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
 !      ENDDO
       !do growth of active branches
       if(lverb)write(*,*)'grosub'
-      CALL GROSUBs(I,J)
+      CALL GROWPLANTS(I,J)
       if(lverb)write(*,*)'EXTRACT'
       !aggregate varaibles
       CALL EXTRACTs(I,J)
@@ -82,6 +82,7 @@ implicit none
 
   subroutine PlantCanopyRadsModel(I,J,NY,NX,DPTH0)
   use CanopyCondsMod
+  use CanopyDataType, only : CanopyLeafArea_lpft
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: DPTH0

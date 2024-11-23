@@ -90,10 +90,10 @@ implicit none
 
     IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. LX.EQ.0)LG=L
     !make a copy of soil water/ice in micro- and macropores
-    VLWatMicP1_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)
-    VLiceMicP1_vr(L,NY,NX)=VLiceMicP_vr(L,NY,NX)
-    VLWatMacP1_vr(L,NY,NX)=VLWatMacP_vr(L,NY,NX)
-    VLiceMacP1_vr(L,NY,NX)=VLiceMacP_vr(L,NY,NX)
+    VLWatMicP1_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
+    VLiceMicP1_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)
+    VLWatMacP1_vr(L,NY,NX) = VLWatMacP_vr(L,NY,NX)
+    VLiceMacP1_vr(L,NY,NX) = VLiceMacP_vr(L,NY,NX)
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
@@ -167,8 +167,6 @@ implicit none
 !
 !     INITIALIZE NET WATER AND HEAT FLUXES FOR RUNOFF
 !
-  TXGridSurfRunoff_2DH(NY,NX)  = 0.0_r8
-  THeatXGridBySurfRunoff_2DH(NY,NX) = 0.0_r8
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
@@ -210,30 +208,28 @@ implicit none
 !     INITIALIZE WATER AND HEAT NET FLUX ACCUMULATORS WITHIN SOIL
 !
   DO  L=NU(NY,NX),NL(NY,NX)
-    TWatFlowCellMicP_vr(L,NY,NX)=0.0_r8
-    TWatFlowCellMicPX_vr(L,NY,NX)=0.0_r8
-    TWaterFlowMacP_vr(L,NY,NX)=0.0_r8
-    THeatFlow2Soil_vr(L,NY,NX)=0.0_r8
-    WatIceThawMicP_vr(L,NY,NX)=0.0_r8
-    WatIceThawMacP_vr(L,NY,NX)=0.0_r8
-    THeatSoiThaw_vr(L,NY,NX)=0.0_r8
+    TWatFlowCellMicP_vr(L,NY,NX)  = 0.0_r8
+    TWatFlowCellMicPX_vr(L,NY,NX) = 0.0_r8
+    TWatFlowCellMacP_vr(L,NY,NX)  = 0.0_r8
+    THeatFlowCellSoil_vr(L,NY,NX) = 0.0_r8
+    WatIceThawMicP_vr(L,NY,NX)    = 0.0_r8
+    WatIceThawMacP_vr(L,NY,NX)    = 0.0_r8
+    THeatSoiThaw_vr(L,NY,NX)      = 0.0_r8
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
     D8595: DO K=1,jcplx
-      DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8      
-      DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
+      DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)  = 0.0_r8
+      DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
     ENDDO D8595
 
-    trcs_Transp2MicP_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
-
-    trcs_Transp2MacP_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
-
-    Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0.0_r8
+    trcs_TransptMicP_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
+    trcs_TransptMacP_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
+    Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)   = 0.0_r8
 
     IF(salt_model)THEN
-      trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
-      trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+      trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,L,NY,NX) = 0.0_r8
+      trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,L,NY,NX) = 0.0_r8
     ENDIF
   ENDDO
   end subroutine ZeroFluxAccumulators
@@ -254,12 +250,8 @@ implicit none
   !     QS,QW,QI=snow,water,ice transfer from watsub.f
   !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
   !
-
   D1202: DO NN=1,2
     !water flux
-    TXGridSurfRunoff_2DH(N2,N1)=TXGridSurfRunoff_2DH(N2,N1)+XGridSurfRunoff_2DH(N,NN,N2,N1)
-    !heat flux
-    THeatXGridBySurfRunoff_2DH(N2,N1)=THeatXGridBySurfRunoff_2DH(N2,N1)+HeatXGridBySurfRunoff_2DH(N,NN,N2,N1)
     D8590: DO K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
         TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)+dom_2DFloXSurRunoff(idom,K,N,NN,N2,N1)
@@ -269,9 +261,6 @@ implicit none
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
       !water flux
-      TXGridSurfRunoff_2DH(N2,N1)=TXGridSurfRunoff_2DH(N2,N1)-XGridSurfRunoff_2DH(N,NN,N5,N4)
-      !heat flux
-      THeatXGridBySurfRunoff_2DH(N2,N1)=THeatXGridBySurfRunoff_2DH(N2,N1)-HeatXGridBySurfRunoff_2DH(N,NN,N5,N4)
       D8591: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5,N4)
@@ -282,19 +271,14 @@ implicit none
 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       IF(IFLBH(N,NN,N5B,N4B).EQ.1)then
-      TXGridSurfRunoff_2DH(N2,N1)=TXGridSurfRunoff_2DH(N2,N1)-XGridSurfRunoff_2DH(N,NN,N5B,N4B)
-      THeatXGridBySurfRunoff_2DH(N2,N1)=THeatXGridBySurfRunoff_2DH(N2,N1)-HeatXGridBySurfRunoff_2DH(N,NN,N5B,N4B)
-      D8592: DO K=1,micpar%NumOfLitrCmplxs
-        DO idom=idom_beg,idom_end
-          TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5B,N4B)
-        enddo
-      ENDDO D8592
+
+        D8592: DO K=1,micpar%NumOfLitrCmplxs
+          DO idom=idom_beg,idom_end
+            TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5B,N4B)
+          enddo
+        ENDDO D8592
       ENDIF
 
-      !     WRITE(*,6631)'TQRB',I,J,N1,N2,N4B,N5B,N,NN
-      !    2,IFLBH(N,NN,N5B,N4B)
-      !    2,TXGridSurfRunoff_2DH(N2,N1),XGridSurfRunoff_2DH(N,NN,N5B,N4B)
-!6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
 
@@ -337,17 +321,17 @@ implicit none
         .OR.ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
         !incoming from south or east grid 
         tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)+cumSedErosion(N,NN,N2,N1)
-        TSANER(N2,N1)=TSANER(N2,N1)+XSANER(N,NN,N2,N1)
-        TSILER(N2,N1)=TSILER(N2,N1)+XSILER(N,NN,N2,N1)
-        TCLAER(N2,N1)=TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
-        TNH4Eros_col(N2,N1)=TNH4Eros_col(N2,N1)+XNH4ER(N,NN,N2,N1)
-        TNH3Eros_col(N2,N1)=TNH3Eros_col(N2,N1)+XNH3ER(N,NN,N2,N1)
-        TNUreaEros_col(N2,N1)=TNUreaEros_col(N2,N1)+XNHUER(N,NN,N2,N1)
-        TNO3Eros_col(N2,N1)=TNO3Eros_col(N2,N1)+XNO3ER(N,NN,N2,N1)
-        TNH4ErosBand_col(N2,N1)=TNH4ErosBand_col(N2,N1)+XNH4EB(N,NN,N2,N1)
-        TNH3ErosBand_col(N2,N1)=TNH3ErosBand_col(N2,N1)+XNH3EB(N,NN,N2,N1)
-        TNUreaErosBand_col(N2,N1)=TNUreaErosBand_col(N2,N1)+XNHUEB(N,NN,N2,N1)
-        TNO3ErosBand_col(N2,N1)=TNO3ErosBand_col(N2,N1)+XNO3EB(N,NN,N2,N1)
+        TSANER(N2,N1)             = TSANER(N2,N1)+XSANER(N,NN,N2,N1)
+        TSILER(N2,N1)             = TSILER(N2,N1)+XSILER(N,NN,N2,N1)
+        TCLAER(N2,N1)             = TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
+        TNH4Eros_col(N2,N1)       = TNH4Eros_col(N2,N1)+XNH4ER(N,NN,N2,N1)
+        TNH3Eros_col(N2,N1)       = TNH3Eros_col(N2,N1)+XNH3ER(N,NN,N2,N1)
+        TNUreaEros_col(N2,N1)     = TNUreaEros_col(N2,N1)+XNHUER(N,NN,N2,N1)
+        TNO3Eros_col(N2,N1)       = TNO3Eros_col(N2,N1)+XNO3ER(N,NN,N2,N1)
+        TNH4ErosBand_col(N2,N1)   = TNH4ErosBand_col(N2,N1)+XNH4EB(N,NN,N2,N1)
+        TNH3ErosBand_col(N2,N1)   = TNH3ErosBand_col(N2,N1)+XNH3EB(N,NN,N2,N1)
+        TNUreaErosBand_col(N2,N1) = TNUreaErosBand_col(N2,N1)+XNHUEB(N,NN,N2,N1)
+        TNO3ErosBand_col(N2,N1)   = TNO3ErosBand_col(N2,N1)+XNO3EB(N,NN,N2,N1)
 
         DO NTX=idx_beg,idx_end
           trcx_TER(NTX,N2,N1)=trcx_TER(NTX,N2,N1)+trcx_XER(NTX,N,NN,N2,N1)
@@ -402,17 +386,17 @@ implicit none
 !     IF(NN.EQ.2)THEN
 !       outgoing
         tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5,N4)
-        TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5,N4)
-        TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5,N4)
-        TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
-        TNH4Eros_col(N2,N1)=TNH4Eros_col(N2,N1)-XNH4ER(N,NN,N5,N4)
-        TNH3Eros_col(N2,N1)=TNH3Eros_col(N2,N1)-XNH3ER(N,NN,N5,N4)
-        TNUreaEros_col(N2,N1)=TNUreaEros_col(N2,N1)-XNHUER(N,NN,N5,N4)
-        TNO3Eros_col(N2,N1)=TNO3Eros_col(N2,N1)-XNO3ER(N,NN,N5,N4)
-        TNH4ErosBand_col(N2,N1)=TNH4ErosBand_col(N2,N1)-XNH4EB(N,NN,N5,N4)
-        TNH3ErosBand_col(N2,N1)=TNH3ErosBand_col(N2,N1)-XNH3EB(N,NN,N5,N4)
-        TNUreaErosBand_col(N2,N1)=TNUreaErosBand_col(N2,N1)-XNHUEB(N,NN,N5,N4)
-        TNO3ErosBand_col(N2,N1)=TNO3ErosBand_col(N2,N1)-XNO3EB(N,NN,N5,N4)
+        TSANER(N2,N1)             = TSANER(N2,N1)-XSANER(N,NN,N5,N4)
+        TSILER(N2,N1)             = TSILER(N2,N1)-XSILER(N,NN,N5,N4)
+        TCLAER(N2,N1)             = TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
+        TNH4Eros_col(N2,N1)       = TNH4Eros_col(N2,N1)-XNH4ER(N,NN,N5,N4)
+        TNH3Eros_col(N2,N1)       = TNH3Eros_col(N2,N1)-XNH3ER(N,NN,N5,N4)
+        TNUreaEros_col(N2,N1)     = TNUreaEros_col(N2,N1)-XNHUER(N,NN,N5,N4)
+        TNO3Eros_col(N2,N1)       = TNO3Eros_col(N2,N1)-XNO3ER(N,NN,N5,N4)
+        TNH4ErosBand_col(N2,N1)   = TNH4ErosBand_col(N2,N1)-XNH4EB(N,NN,N5,N4)
+        TNH3ErosBand_col(N2,N1)   = TNH3ErosBand_col(N2,N1)-XNH3EB(N,NN,N5,N4)
+        TNUreaErosBand_col(N2,N1) = TNUreaErosBand_col(N2,N1)-XNHUEB(N,NN,N5,N4)
+        TNO3ErosBand_col(N2,N1)   = TNO3ErosBand_col(N2,N1)-XNO3EB(N,NN,N5,N4)
 
         DO NTX=idx_beg,idx_end
           trcx_TER(NTX,N2,N1)=trcx_TER(NTX,N2,N1)-trcx_XER(NTX,N,NN,N5,N4)
@@ -467,18 +451,18 @@ implicit none
       ENDIF
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         IF(ABS(cumSedErosion(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
-          tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
-          TSANER(N2,N1)=TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
-          TSILER(N2,N1)=TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
-          TCLAER(N2,N1)=TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)
-          TNH4Eros_col(N2,N1)=TNH4Eros_col(N2,N1)-XNH4ER(N,NN,N5B,N4B)
-          TNH3Eros_col(N2,N1)=TNH3Eros_col(N2,N1)-XNH3ER(N,NN,N5B,N4B)
-          TNUreaEros_col(N2,N1)=TNUreaEros_col(N2,N1)-XNHUER(N,NN,N5B,N4B)
-          TNO3Eros_col(N2,N1)=TNO3Eros_col(N2,N1)-XNO3ER(N,NN,N5B,N4B)
-          TNH4ErosBand_col(N2,N1)=TNH4ErosBand_col(N2,N1)-XNH4EB(N,NN,N5B,N4B)
-          TNH3ErosBand_col(N2,N1)=TNH3ErosBand_col(N2,N1)-XNH3EB(N,NN,N5B,N4B)
-          TNUreaErosBand_col(N2,N1)=TNUreaErosBand_col(N2,N1)-XNHUEB(N,NN,N5B,N4B)
-          TNO3ErosBand_col(N2,N1)=TNO3ErosBand_col(N2,N1)-XNO3EB(N,NN,N5B,N4B)
+          tErosionSedmLoss(N2,N1)   = tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
+          TSANER(N2,N1)             = TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
+          TSILER(N2,N1)             = TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
+          TCLAER(N2,N1)             = TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)
+          TNH4Eros_col(N2,N1)       = TNH4Eros_col(N2,N1)-XNH4ER(N,NN,N5B,N4B)
+          TNH3Eros_col(N2,N1)       = TNH3Eros_col(N2,N1)-XNH3ER(N,NN,N5B,N4B)
+          TNUreaEros_col(N2,N1)     = TNUreaEros_col(N2,N1)-XNHUER(N,NN,N5B,N4B)
+          TNO3Eros_col(N2,N1)       = TNO3Eros_col(N2,N1)-XNO3ER(N,NN,N5B,N4B)
+          TNH4ErosBand_col(N2,N1)   = TNH4ErosBand_col(N2,N1)-XNH4EB(N,NN,N5B,N4B)
+          TNH3ErosBand_col(N2,N1)   = TNH3ErosBand_col(N2,N1)-XNH3EB(N,NN,N5B,N4B)
+          TNUreaErosBand_col(N2,N1) = TNUreaErosBand_col(N2,N1)-XNHUEB(N,NN,N5B,N4B)
+          TNO3ErosBand_col(N2,N1)   = TNO3ErosBand_col(N2,N1)-XNO3EB(N,NN,N5B,N4B)
 
           DO NTX=idx_beg,idx_end
             trcx_TER(NTX,N2,N1)=trcx_TER(NTX,N2,N1)-trcx_XER(NTX,N,NN,N5B,N4B)
@@ -549,7 +533,7 @@ implicit none
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
   !     GRID CELLS
   !
-  !     TFLW,TWaterFlowMacP_vr,TWaterFlowMacP_vr=net micropore,macropore water flux, heat flux
+  !     TFLW,TWatFlowCellMacP_vr,TWatFlowCellMacP_vr=net micropore,macropore water flux, heat flux
   !     FLW,FLWH,HFLW=micropore,macropore water flux, heat flux from watsub.f
   !     LakeSurfFlowMicP,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
   !when FlowDirIndicator /=3, it means lateral exchange is consdiered
@@ -572,24 +556,24 @@ implicit none
         !vertical direction, source is at soil surface
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP_col(N5,N4)
         TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-LakeSurfFlowMicPX(N5,N4)
-        TWaterFlowMacP_vr(N3,N2,N1)    = TWaterFlowMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)
-        THeatFlow2Soil_vr(N3,N2,N1)    = THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)
+        TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)
+        THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)
 
-        if(THeatFlow2Soil_vr(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)',&
-            THeatFlow2Soil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),LakeSurfHeatFlux_col(N5,N4)
+        if(THeatFlowCellSoil_vr(N3,N2,N1)<-1.e10)then
+          write(*,*)'THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)',&
+            THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),LakeSurfHeatFlux_col(N5,N4)
           write(*,*)'Ns=',N1,n2,n3,n4,n5
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ELSE
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
         TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-WaterFlowSoiMicPX(N,N6,N5,N4)
-        TWaterFlowMacP_vr(N3,N2,N1)    = TWaterFlowMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-WaterFlowMacP_3D(N,N6,N5,N4)
-        THeatFlow2Soil_vr(N3,N2,N1)    = THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
+        TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowMacP_3D(N,N3,N2,N1)-WaterFlowMacP_3D(N,N6,N5,N4)
+        THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
 
-        if(THeatFlow2Soil_vr(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlow2Soil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)',&
-            THeatFlow2Soil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
+        if(THeatFlowCellSoil_vr(N3,N2,N1)<-1.e10)then
+          write(*,*)'THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)',&
+            THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
           write(*,*)'Ns=',N,N1,n2,n3,n4,n5,n6
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
@@ -597,7 +581,7 @@ implicit none
       !     IF(N1.EQ.1.AND.N3.EQ.1)THEN
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
       !    2,TWatFlowCellMicP_vr(N3,N2,N1),WaterFlowSoiMicP_3D(N,N3,N2,N1),WaterFlowSoiMicP_3D(N,N6,N5,N4),LakeSurfFlowMicP_col(N5,N4)
-      !    3,THeatFlow2Soil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
+      !    3,THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
       !    2,LakeSurfHeatFlux_col(N5,N4),VLWatMicP_vr(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
@@ -621,11 +605,10 @@ implicit none
       ENDDO D8585
 
       DO NTS=ids_beg,ids_end
-        trcs_Transp2MicP_vr(NTS,N3,N2,N1)=trcs_Transp2MicP_vr(NTS,N3,N2,N1) &
-          +trcs_Transp2MicP_3D(NTS,N,N3,N2,N1)-trcs_Transp2MicP_3D(NTS,N,N6,N5,N4)
-        trcs_Transp2MacP_vr(NTS,N3,N2,N1)=trcs_Transp2MacP_vr(NTS,N3,N2,N1) &
-          +trcs_Transp2MacP_3D(NTS,N,N3,N2,N1)-trcs_Transp2MacP_3D(NTS,N,N6,N5,N4)
-
+        trcs_TransptMicP_vr(NTS,N3,N2,N1)=trcs_TransptMicP_vr(NTS,N3,N2,N1) &
+          +trcs_TransptMicP_3D(NTS,N,N3,N2,N1)-trcs_TransptMicP_3D(NTS,N,N6,N5,N4)
+        trcs_TransptMacP_vr(NTS,N3,N2,N1)=trcs_TransptMacP_vr(NTS,N3,N2,N1) &
+          +trcs_TransptMacP_3D(NTS,N,N3,N2,N1)-trcs_TransptMacP_3D(NTS,N,N6,N5,N4)
       ENDDO
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS
@@ -665,25 +648,24 @@ implicit none
     ELSE
       TWatFlowCellMicP_vr(N3,N2,N1)  = 0.0_r8
       TWatFlowCellMicPX_vr(N3,N2,N1) = 0.0_r8
-      TWaterFlowMacP_vr(N3,N2,N1)    = 0.0_r8
-      THeatFlow2Soil_vr(N3,N2,N1)    = 0.0_r8
+      TWatFlowCellMacP_vr(N3,N2,N1)  = 0.0_r8
+      THeatFlowCellSoil_vr(N3,N2,N1) = 0.0_r8
       WatIceThawMicP_vr(N3,N2,N1)    = 0.0_r8
       WatIceThawMacP_vr(N3,N2,N1)    = 0.0_r8
       THeatSoiThaw_vr(N3,N2,N1)      = 0.0_r8
 
       D8596: DO K=1,jcplx
-        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)  = 0.0_r8
+        DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1) = 0.0_r8
       ENDDO D8596
 
-      trcs_Transp2MicP_vr(ids_beg:ids_end,N3,N2,N1)=0.0_r8
-      trcs_Transp2MacP_vr(ids_beg:ids_end,N3,N2,N1)=0.0_r8
-
-      Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,N3,N2,N1)=0.0_r8
+      trcs_TransptMicP_vr(ids_beg:ids_end,N3,N2,N1) = 0.0_r8
+      trcs_TransptMacP_vr(ids_beg:ids_end,N3,N2,N1) = 0.0_r8
+      Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,N3,N2,N1)   = 0.0_r8
 
       IF(salt_model)THEN
-        trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
-        trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0_r8
+        trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,N3,N2,N1) = 0.0_r8
+        trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,N3,N2,N1) = 0.0_r8
       ENDIF
     ENDIF
   ENDIF

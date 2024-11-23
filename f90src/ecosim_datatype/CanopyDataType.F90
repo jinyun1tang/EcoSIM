@@ -11,6 +11,7 @@ module CanopyDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  real(r8),target,allocatable ::  canopy_growth_pft(:,:,:)                !canopy structural growth rate [gC/h]
   real(r8),target,allocatable ::  StomatalStress_pft(:,:,:)               !stomatal stress from water/turgor, [0-1]
   real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                        !canopy PAR albedo , [-]
   real(r8),target,allocatable ::  RadPARLeafTransmis_pft(:,:,:)                        !canopy PAR transmissivity , [-]
@@ -22,7 +23,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  RCS(:,:,:)                         !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)         !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  MinCanPStomaResistH2O_pft(:,:,:)      !canopy minimum stomatal resistance, [s m-1]
-  real(r8),target,allocatable ::  BndlResistCanopy_col(:,:)                           !canopy boundary layer resistance, [m h-1]
+  real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                           !canopy boundary layer resistance, [m h-1]
   real(r8),target,allocatable ::  O2I(:,:,:)                         !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  LeafIntracellularCO2_pft(:,:,:)                        !leaf gaseous CO2 concentration, [umol m-3]
   real(r8),target,allocatable ::  AirConc_pft(:,:,:)                        !total gas concentration, [mol m-3]
@@ -71,10 +72,10 @@ module CanopyDataType
   real(r8),target,allocatable ::  TAU_RadThru(:,:,:)                        !fraction of radiation transmitted by canopy layer, [-]
   real(r8),target,allocatable ::  TAU_DirRadTransm(:,:,:)                        !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                         !fraction of radiation intercepted by ground surface, [-]
-  real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                          !radiation intercepted by ground surface, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  LWRadCanGPrev(:,:)                        !longwave radiation emitted by canopy, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  LWRadGrnd(:,:)                          !longwave radiation emitted by ground surface, [MJ m-2 h-1]
-  real(r8),target,allocatable ::  CanH2OHeldVg_col(:,:)                   !canopy held water content, [m3 d-2]
+  real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                        !shortwave radiation incident on ground surface, [MJ h-1]
+  real(r8),target,allocatable ::  LWRadCanGPrev_col(:,:)                        !longwave radiation emitted by canopy, [MJ h-1]
+  real(r8),target,allocatable ::  LWRadGrnd(:,:)                            !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  CanH2OHeldVg_col(:,:)                     !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                             !net ice transfer to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)            !grid net precipitation water interception to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  EvapTransHeat_pft(:,:,:)                       !canopy latent heat flux, [MJ d-2 h-1]
@@ -107,8 +108,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  NetCumElmntFlx2Plant_pft(:,:,:,:)                     !effect of canopy element status on seed set , []
   real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                       !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
-  real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                 !
-  real(r8),target,allocatable ::  ShootElms_brch(:,:,:,:,:)           !shoot biomass for each branch, struct + nonstructual, g/d2
+  real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                 !shoot structural element, [g d-2]
   real(r8),target,allocatable ::  ShootC4NonstC_brch(:,:,:,:)
   real(r8),target,allocatable ::  ShootStrutElms_pft(:,:,:,:)                    !canopy shoot element, [g d-2]
   real(r8),target,allocatable ::  LeafStrutElms_pft(:,:,:,:)                     !canopy leaf element, [g d-2]
@@ -169,6 +169,7 @@ module CanopyDataType
   implicit none
   allocate(CO2FixCL_pft(JP,JY,JX)); CO2FixCL_pft=spval
   allocate(CO2FixLL_pft(JP,JY,JX)); CO2FixLL_pft=spval
+  allocate(canopy_growth_pft(JP,JY,JX)); canopy_growth_pft=spval
   allocate(StomatalStress_pft(JP,JY,JX)); StomatalStress_pft=spval     !no stress when equals to one
   allocate(CanopyPARalbedo_pft(JP,JY,JX));     CanopyPARalbedo_pft=0._r8
   allocate(RadPARLeafTransmis_pft(JP,JY,JX));     RadPARLeafTransmis_pft=0._r8
@@ -180,7 +181,7 @@ module CanopyDataType
   allocate(RCS(JP,JY,JX));      RCS=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(MinCanPStomaResistH2O_pft(JP,JY,JX));     MinCanPStomaResistH2O_pft=0._r8
-  allocate(BndlResistCanopy_col(JY,JX));         BndlResistCanopy_col=0._r8
+  allocate(CanopyBndlResist_col(JY,JX));         CanopyBndlResist_col=0._r8
   allocate(O2I(JP,JY,JX));      O2I=0._r8
   allocate(LeafIntracellularCO2_pft(JP,JY,JX));     LeafIntracellularCO2_pft=0._r8
   allocate(AirConc_pft(JP,JY,JX));     AirConc_pft=0._r8
@@ -230,7 +231,7 @@ module CanopyDataType
   allocate(TAU_DirRadTransm(NumOfCanopyLayers+1,JY,JX));   TAU_DirRadTransm=0._r8
   allocate(FracSWRad2Grnd_col(JY,JX));       FracSWRad2Grnd_col=0._r8
   allocate(RadSWGrnd_col(JY,JX));        RadSWGrnd_col=0._r8
-  allocate(LWRadCanGPrev(JY,JX));      LWRadCanGPrev=0._r8
+  allocate(LWRadCanGPrev_col(JY,JX));      LWRadCanGPrev_col=0._r8
   allocate(LWRadGrnd(JY,JX));      LWRadGrnd=0._r8
   allocate(CanH2OHeldVg_col(JY,JX));      CanH2OHeldVg_col=0._r8
   allocate(Prec2Canopy_col(JY,JX));      Prec2Canopy_col=0._r8
@@ -284,7 +285,6 @@ module CanopyDataType
   allocate(CanopyNodulElms_pft(NumPlantChemElms,JP,JY,JX));CanopyNodulElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
   allocate(StalkBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkBiomassC_brch=0._r8
-  allocate(ShootElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ShootElms_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
   allocate(ShootC4NonstC_brch(MaxNumBranches,JP,JY,JX));ShootC4NonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
@@ -324,6 +324,7 @@ module CanopyDataType
   subroutine DestructCanopyData
   use abortutils, only : destroy
   implicit none
+  call destroy(canopy_growth_pft)
   call destroy(CO2FixCL_pft)
   call destroy(CO2FixLL_pft)
   call destroy(StomatalStress_pft)
@@ -337,7 +338,7 @@ module CanopyDataType
   call destroy(RCS)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(MinCanPStomaResistH2O_pft)
-  call destroy(BndlResistCanopy_col)
+  call destroy(CanopyBndlResist_col)
   call destroy(O2I)
   call destroy(LeafIntracellularCO2_pft)
   call destroy(AirConc_pft)
@@ -387,7 +388,7 @@ module CanopyDataType
   call destroy(TAU_DirRadTransm)
   call destroy(FracSWRad2Grnd_col)
   call destroy(RadSWGrnd_col)
-  call destroy(LWRadCanGPrev)
+  call destroy(LWRadCanGPrev_col)
   call destroy(LWRadGrnd)
   call destroy(CanH2OHeldVg_col)
   call destroy(Prec2Canopy_col)
@@ -443,7 +444,6 @@ module CanopyDataType
   call destroy(CanopyNodulElms_pft)
   call destroy(StalkBiomassC_brch)
   call destroy(CanopyNonstElms_brch)
-  call destroy(ShootElms_brch)
   call destroy(ShootC4NonstC_brch)
   call destroy(LeafPetolBiomassC_brch)
   call destroy(ShootStrutElms_brch)

@@ -29,7 +29,7 @@ module grosubsMod
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
 !     RateConst4ShootSeaStoreNonstXfer=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
-!     RateConst4RootSeaStoreNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
+!     RateConst4RootSeaStorNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
 !     FPART=parameter for allocating nonstructural C to shoot organs
 !     FXSH,FXRT=shoot-root partitioning of storage C during leafout
 !     FRSV=rate constant for remobiln of storage C,N,P during leafout (h-1)
@@ -43,7 +43,7 @@ module grosubsMod
 !
 
   integer  :: curday,curhour
-  public :: grosubs
+  public :: GrowPlants
   public :: InitGrosub
   contains
 
@@ -60,7 +60,7 @@ module grosubsMod
   end subroutine InitGrosub
 !------------------------------------------------------------------------------------------
 
-  subroutine grosubs(I,J)
+  subroutine GrowPlants(I,J)
 !
 !     THIS subroutine CALCULATES ALL PLANT BIOLOGICAL TRANSFORMATIONS
 !
@@ -86,6 +86,7 @@ module grosubsMod
     CanopyHeight_copy(NZ)            = CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)             = 0._r8
     plt_biom%RootMassElm_pvr(:,:,NZ) = 0._r8
+    plt_rbgc%canopy_growth_pft(NZ)   = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -112,7 +113,7 @@ module grosubsMod
     call SumPlantBiom(I,J,NZ,'exgrosubs')
   ENDDO
   end associate
-  END subroutine grosubs
+  END subroutine GrowPlants
 
 !------------------------------------------------------------------------------------------
 
@@ -251,7 +252,7 @@ module grosubsMod
 !     CO2ByFire_CumYr_pft,CH4ByFire_CumYr_pft=CO2,CH4 emission from disturbance
 !     LitrfalStrutElms_CumYr_pft= >0 to the environment (soil + surface)
 !   GrossResp_pft < 0 respired into atmosphere
-    NetPrimProduct_pft(NZ)=GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
+    NetPrimProduct_pft(NZ) = GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
       !check for living plant
@@ -262,7 +263,7 @@ module grosubsMod
           -NetCumElmntFlx2Plant_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
       ENDDO
       !add more fluxes
-      ElmBalanceCum_pft(ielmc,NZ)=ElmBalanceCum_pft(ielmc,NZ)-NetPrimProduct_pft(NZ) &
+      ElmBalanceCum_pft(ielmc,NZ) = ElmBalanceCum_pft(ielmc,NZ)-NetPrimProduct_pft(NZ) &
         -CO2ByFire_CumYr_pft(NZ)-CH4ByFire_CumYr_pft(NZ)
 !
 !     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LitrFall
@@ -318,7 +319,7 @@ module grosubsMod
   real(r8) :: PTRT
   real(r8) :: RootPrimeAxsNum
   real(r8) :: TFN5
-  real(r8) :: WFNG
+  real(r8) :: WaterStress4Groth
   real(r8) :: Stomata_Stress
   real(r8) :: WFNS,CanTurgPSIFun4Expans
   real(r8) :: RootSinkC_vr(jroots,JZ1),RootSinkC(jroots)
@@ -347,14 +348,14 @@ module grosubsMod
     BegRemoblize        = 0
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
       if(lverb)write(*,*)'GrowOneBranch'
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
+        TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 
     if(lverb)write(*,*)'RootBGCModel'
@@ -381,13 +382,13 @@ module grosubsMod
 
 !------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WFNG,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8), intent(out) :: RootPrimeAxsNum
   real(r8), intent(out) :: TFN5
-  real(r8), intent(out) :: WFNG
+  real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
   real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
   integer :: L,NR,N,NE
@@ -547,24 +548,23 @@ module grosubsMod
 !     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
 !     Stomata_Stress=stomatal resistance function of canopy turgor
 !     PSICanopy_pft=canopy water potential
-!     WFNG=growth function of canopy water potential
+!     WaterStress4Groth=growth function of canopy water potential
 !     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
 !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
-    Stomata_Stress=1.0_r8
-    WFNG=EXP(0.05_r8*PSICanopy_pft(NZ))
-    CanTurgPSIFun4Expans=WFNS**0.10_r8
+    Stomata_Stress    = 1.0_r8
+    WaterStress4Groth = EXP(0.05_r8*PSICanopy_pft(NZ))
   ELSE
     !others
-    Stomata_Stress=EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
-
-    WFNG=EXP(0.10_r8*PSICanopy_pft(NZ))
-    CanTurgPSIFun4Expans=WFNS**0.25_r8
+    Stomata_Stress    = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    WaterStress4Groth = EXP(0.10_r8*PSICanopy_pft(NZ))
   ENDIF
-  plt_biom%StomatalStress_pft(NZ)=Stomata_Stress
+!  write(119,*)I*1000+J,Stomata_Stress,RCS(NZ),PSICanopyTurg_pft(NZ),PSICanopy_pft(NZ),plt_ew%PSICanopyOsmo_pft(NZ)
+  CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))
+  plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
   end associate
   end subroutine StagePlantForGrowth
 !------------------------------------------------------------------------------------------
@@ -638,10 +638,10 @@ module grosubsMod
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft,          &
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft,        &
     CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,      &
-    RootNodulStrutElms_pvr    => plt_biom%RootNodulStrutElms_pvr,    &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
     CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft,       &
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
-    RootNodulNonstElms_pvr    => plt_biom%RootNodulNonstElms_pvr,    &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
     PlantN2Fix_CumYr_pft      => plt_bgcr%PlantN2Fix_CumYr_pft,      &
     PlantExudElm_CumYr_pft    => plt_rbgc%PlantExudElm_CumYr_pft,    &
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft,        &
@@ -730,8 +730,8 @@ module grosubsMod
       ENDDO
     ELSEIF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
       DO NE=1,NumPlantChemElms
-        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
-          sum(RootNodulNonstElms_pvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
+        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
+          sum(RootNodulNonstElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
       ENDDO
     ENDIF
   ENDIF
@@ -756,7 +756,7 @@ module grosubsMod
     RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
   RootUptk_N_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ) + &
     RootMycoExudElms_pft(ielmn,NZ)
-  RootUptk_P_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
+  RootUptk_P_CumYr_pft(NZ)=RootUptk_P_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
     RootMycoExudElms_pft(ielmp,NZ)
 
   PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)

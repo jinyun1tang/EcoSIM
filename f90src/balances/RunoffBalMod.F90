@@ -39,6 +39,7 @@ implicit none
   real(r8) :: ZGR
 
   SG=0._r8;CXR=0._r8;ZXR=0._r8;PXR=0._r8;ZGR=0._r8
+
   D9985: DO L=NU(NY,NX),NL(NY,NX)
 !
 !     LOCATE EXTERNAL BOUNDARIES
@@ -47,8 +48,7 @@ implicit none
 !     N5,N4=NY,NX of destination grid cell
 !
 !flow from west to east, north to south, up to down
-    N1=NX
-    N2=NY
+    N1=NX;N2=NY
     D9980: DO N=FlowDirIndicator(NY,NX),3
       D9975: DO NN=1,2
         IF(N.EQ.iEastWestDirection)THEN
@@ -56,22 +56,20 @@ implicit none
           IF(NN.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
               !eastern boundary
-              !eastern boundary
-              N4=NX+1
-              N5=NY
-              N6=L
-              XN=-1.0_r8   !going out
+              N4 = NX+1
+              N5 = NY
+              N6 = L
+              XN = -1.0_r8   !going out
             ELSE
               cycle
             ENDIF
           ELSEIF(NN.EQ.2)THEN
             IF(NX.EQ.NHW)THEN
               !western boundary
-              !western boundary
-              N4=NX
-              N5=NY
-              N6=L
-              XN=1.0_r8    !coming in
+              N4 = NX
+              N5 = NY
+              N6 = L
+              XN = 1.0_r8    !coming in
             ELSE
               cycle
             ENDIF
@@ -81,22 +79,20 @@ implicit none
           IF(NN.EQ.1)THEN
             IF(NY.EQ.NVS)THEN
               !south boundary
-              !south boundary
-              N4=NX
-              N5=NY+1
-              N6=L
-              XN=-1.0_r8   !going out
+              N4 = NX
+              N5 = NY+1
+              N6 = L
+              XN = -1.0_r8   !going out
             ELSE
               cycle
             ENDIF
           ELSEIF(NN.EQ.2)THEN
             IF(NY.EQ.NVN)THEN
               !north boundary
-              !north boundary
-              N4=NX
-              N5=NY
-              N6=L
-              XN=1.0_r8       !coming in
+              N4 = NX
+              N5 = NY
+              N6 = L
+              XN = 1.0_r8       !coming in
             ELSE
               cycle
             ENDIF
@@ -105,10 +101,10 @@ implicit none
           !vertical direction
           IF(NN.EQ.1)THEN
             IF(L.EQ.NL(NY,NX))THEN
-              N4=NX
-              N5=NY
-              N6=L+1
-              XN=-1.0_r8       !going out
+              N4 = NX
+              N5 = NY
+              N6 = L+1
+              XN = -1.0_r8       !going out
             ELSE
               cycle
             ENDIF
@@ -117,7 +113,7 @@ implicit none
           ENDIF
         ENDIF
 !
-        call RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
+        call RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
         call SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
 
@@ -128,12 +124,14 @@ implicit none
 !
     ENDDO D9980
   ENDDO D9985
+
   end subroutine RunoffBal
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
+  subroutine RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: L   !vertical layer
   integer, intent(in) :: N   !horizontal direction
   integer, intent(in) :: NY,NX  !geographic location
@@ -162,10 +160,10 @@ implicit none
 !     snowpack snow,water,ice from watsub.f
 !     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
-!
+! surface runoff
   IF(N.NE.iVerticalDirection .AND. L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
-    WQRN                = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)
+    WQRN                = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)    
     QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
     
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
@@ -276,20 +274,20 @@ implicit none
 !       where are those coefficients from?
         WX=XGridSurfRunoff_2DH(N,NN,N5,N4)
         IF(ABS(WX).GT.ZEROS(N5,N4))THEN
-          ECHY=0.337_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Hp,N,NN,N5,N4)/WX)
-          ECOH=0.192_r8*AZMAX1(trc_salt_rof_bounds(idsalt_OH,N,NN,N5,N4)/WX)
-          ECAL=0.056_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Al,N,NN,N5,N4)*3.0_r8/WX)
-          ECFE=0.051_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Fe,N,NN,N5,N4)*3.0_r8/WX)
-          ECCA=0.060_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Ca,N,NN,N5,N4)*2.0_r8/WX)
-          ECMG=0.053_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Mg,N,NN,N5,N4)*2.0_r8/WX)
-          ECNA=0.050_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Na,N,NN,N5,N4)/WX)
-          ECKA=0.070_r8*AZMAX1(trc_salt_rof_bounds(idsalt_K,N,NN,N5,N4)/WX)
-          ECCO=0.072_r8*AZMAX1(trc_salt_rof_bounds(idsalt_CO3,N,NN,N5,N4)*2.0_r8/WX)
-          ECHC=0.044_r8*AZMAX1(trc_salt_rof_bounds(idsalt_HCO3,N,NN,N5,N4)/WX)
-          ECSO=0.080_r8*AZMAX1(trc_salt_rof_bounds(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
-          ECCL=0.076_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Cl,N,NN,N5,N4)/WX)
-          ECNO=0.071_r8*AZMAX1(trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)/(WX*natomw))
-          ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
+          ECHY  = 0.337_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Hp,N,NN,N5,N4)/WX)
+          ECOH  = 0.192_r8*AZMAX1(trc_salt_rof_bounds(idsalt_OH,N,NN,N5,N4)/WX)
+          ECAL  = 0.056_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Al,N,NN,N5,N4)*3.0_r8/WX)
+          ECFE  = 0.051_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Fe,N,NN,N5,N4)*3.0_r8/WX)
+          ECCA  = 0.060_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Ca,N,NN,N5,N4)*2.0_r8/WX)
+          ECMG  = 0.053_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Mg,N,NN,N5,N4)*2.0_r8/WX)
+          ECNA  = 0.050_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Na,N,NN,N5,N4)/WX)
+          ECKA  = 0.070_r8*AZMAX1(trc_salt_rof_bounds(idsalt_K,N,NN,N5,N4)/WX)
+          ECCO  = 0.072_r8*AZMAX1(trc_salt_rof_bounds(idsalt_CO3,N,NN,N5,N4)*2.0_r8/WX)
+          ECHC  = 0.044_r8*AZMAX1(trc_salt_rof_bounds(idsalt_HCO3,N,NN,N5,N4)/WX)
+          ECSO  = 0.080_r8*AZMAX1(trc_salt_rof_bounds(idsalt_SO4,N,NN,N5,N4)*2.0_r8/WX)
+          ECCL  = 0.076_r8*AZMAX1(trc_salt_rof_bounds(idsalt_Cl,N,NN,N5,N4)/WX)
+          ECNO  = 0.071_r8*AZMAX1(trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)/(WX*natomw))
+          ECNDQ = ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',iYearCurrent,I,J,N4,N5,N,NN,WX,ECNDQ
 !9991  FORMAT(A8,7I4,2E12.4)
         ELSE
@@ -387,16 +385,15 @@ implicit none
           DO NE=1,NumPlantChemElms            
             TOMOU_lnds(NE)=TOMOU_lnds(NE)-MOE(NE)-MXE(NE)
           ENDDO
-          TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZPE
-          TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PPE          
+          TOMOU_lnds(ielmn) = TOMOU_lnds(ielmn)-ZPE
+          TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)-PPE
 
-          HydroSufDOCFlx_col(NY,NX)=HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
-          HydroSufDONFlx_CumYr_col(NY,NX)=HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
-          HydroSufDOPFlx_CumYr_col(NY,NX)=HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
-                    
-          HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-MXE(ielmc)          
-          HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE          
-          HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
+          HydroSufDOCFlx_col(NY,NX)       = HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
+          HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
+          HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
+          HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-MXE(ielmc)
+          HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE
+          HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
 !     WRITE(*,6635)'MOE(ielmp)',I,J,N4,N5,N,NN
 !    2,MOE(ielmc),MXE(ielmc),MOE(ielmn),MXE(ielmn),ZPE
 !    3,MOE(ielmp),MXE(ielmp),PPE,TOMOU_lnds(ielmp),cumSedErosion(N,NN,N5,N4)
@@ -482,14 +479,14 @@ implicit none
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
 !     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
-  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.iVerticalDirection)THEN
+  IF(FlowDirIndicator(NY,NX).NE.3 .OR. N.EQ.iVerticalDirection)THEN
     HO           = XN*HeatFlow2Soil_3D(N,N6,N5,N4)
     HeatOut_lnds = HeatOut_lnds-HO
-    WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4))   !<0, going out grid
+    WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4))   !XN<0, going out grid
 
     IF(abs(WO)>0._r8)THEN
       QH2OLoss_lnds            = QH2OLoss_lnds-WO
-      QDischar_col(N2,N1)      = QDischar_col(N2,N1)-WO
+      QDischar_col(N2,N1)      = QDischar_col(N2,N1)-WO  !>0 going out of grid
       H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
       HeatDischar_col(N2,N1)   = HeatDischar_col(N2,N1)-HO
 !
@@ -521,39 +518,39 @@ implicit none
         ENDDO
       ENDDO D450
 
-      MXD(ielmc)=XN*(trcs_Transp2MicP_3D(idg_CO2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_CO2,N,N6,N5,N4) &
-        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_CH4,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
-      MXD(ielmn)=XN*(trcs_Transp2MicP_3D(ids_NH4,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_NH3,N,N6,N5,N4) &
-        +trcs_Transp2MicP_3D(ids_NO3,N,N6,N5,N4) &
-        +trcs_Transp2MicP_3D(ids_NH4B,N,N6,N5,N4)+trcs_Transp2MicP_3D(idg_NH3B,N,N6,N5,N4)&
-        +trcs_Transp2MicP_3D(ids_NO3B,N,N6,N5,N4) &
-        +trcs_Transp2MicP_3D(ids_NO2,N,N6,N5,N4)+trcs_Transp2MicP_3D(ids_NO2B,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_NH4,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_NH3,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_NO3,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_NH4B,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_NH3B,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_NO3B,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_NO2,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_Transp2MicP_3D(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(idg_N2,N,N6,N5,N4) &
-        +trcs_Transp2MicP_3D(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(idg_N2O,N,N6,N5,N4) &
+      MXD(ielmc)=XN*(trcs_TransptMicP_3D(idg_CO2,N,N6,N5,N4)+trcs_TransptMacP_3D(idg_CO2,N,N6,N5,N4) &
+        +Gas_3DAdvDif_Flx_vr(idg_CO2,N,N6,N5,N4)+trcs_TransptMicP_3D(idg_CH4,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(idg_CH4,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_CH4,N,N6,N5,N4))
+      MXD(ielmn)=XN*(trcs_TransptMicP_3D(ids_NH4,N,N6,N5,N4)+trcs_TransptMicP_3D(idg_NH3,N,N6,N5,N4) &
+        +trcs_TransptMicP_3D(ids_NO3,N,N6,N5,N4) &
+        +trcs_TransptMicP_3D(ids_NH4B,N,N6,N5,N4)+trcs_TransptMicP_3D(idg_NH3B,N,N6,N5,N4)&
+        +trcs_TransptMicP_3D(ids_NO3B,N,N6,N5,N4) &
+        +trcs_TransptMicP_3D(ids_NO2,N,N6,N5,N4)+trcs_TransptMicP_3D(ids_NO2B,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_NH4,N,N6,N5,N4)+trcs_TransptMacP_3D(idg_NH3,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_NO3,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_NH4B,N,N6,N5,N4)+trcs_TransptMacP_3D(idg_NH3B,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_NO3B,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_NO2,N,N6,N5,N4)+trcs_TransptMacP_3D(ids_NO2B,N,N6,N5,N4))
+      ZGD=XN*(trcs_TransptMicP_3D(idg_N2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(idg_N2,N,N6,N5,N4) &
+        +trcs_TransptMicP_3D(idg_N2O,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_N2O,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(idg_N2O,N,N6,N5,N4) &
         +Gas_3DAdvDif_Flx_vr(idg_NH3,N,N6,N5,N4))
-      MXD(ielmp)=XN*(trcs_Transp2MicP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_Transp2MicP_3D(ids_H2PO4B,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_H2PO4B,N,N6,N5,N4)&
-        +trcs_Transp2MicP_3D(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_Transp2MicP_3D(ids_H1PO4B,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_Transp2MacP_3D(ids_H1PO4B,N,N6,N5,N4))
+      MXD(ielmp)=XN*(trcs_TransptMicP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_TransptMicP_3D(ids_H2PO4B,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_H2PO4,N,N6,N5,N4)+trcs_TransptMacP_3D(ids_H2PO4B,N,N6,N5,N4)&
+        +trcs_TransptMicP_3D(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_TransptMicP_3D(ids_H1PO4B,N,N6,N5,N4)+trcs_TransptMacP_3D(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_TransptMacP_3D(ids_H1PO4B,N,N6,N5,N4))
 
-      TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-MOD(ielmc)-MOD(idom_acetate)-MXD(ielmc)
-      TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-MOD(ielmn)-MXD(ielmn)-ZGD
-      TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-MOD(ielmp)-MXD(ielmp)
-      HydroSubsDOCFlx_col(N2,N1)=-MOD(ielmc)-MOD(idom_acetate)
-      HydroSubsDONFlx_col(N2,N1)=-MOD(ielmn)
-      HydroSubsDOPFlx_col(N2,N1)=-MOD(ielmp)
-      HydroSubsDICFlx_col(N2,N1)=-MXD(ielmc)
-      HydroSubsDINFlx_col(N2,N1)=-MXD(ielmn)
-      HydroSubsDIPFlx_col(N2,N1)=-MXD(ielmp)
+      TOMOU_lnds(ielmc)          = TOMOU_lnds(ielmc)-MOD(ielmc)-MOD(idom_acetate)-MXD(ielmc)
+      TOMOU_lnds(ielmn)          = TOMOU_lnds(ielmn)-MOD(ielmn)-MXD(ielmn)-ZGD
+      TOMOU_lnds(ielmp)          = TOMOU_lnds(ielmp)-MOD(ielmp)-MXD(ielmp)
+      HydroSubsDOCFlx_col(N2,N1) = -MOD(ielmc)-MOD(idom_acetate)
+      HydroSubsDONFlx_col(N2,N1) = -MOD(ielmn)
+      HydroSubsDOPFlx_col(N2,N1) = -MOD(ielmp)
+      HydroSubsDICFlx_col(N2,N1) = -MXD(ielmc)
+      HydroSubsDINFlx_col(N2,N1) = -MXD(ielmn)
+      HydroSubsDIPFlx_col(N2,N1) = -MXD(ielmp)
 !
 !     SUBSURFACE BOUNDARY FLUXES OF O2
 !
@@ -561,9 +558,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(trcs_Transp2MicP_3D(idg_O2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_TransptMicP_3D(idg_O2,N,N6,N5,N4)+trcs_TransptMacP_3D(idg_O2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(trcs_Transp2MicP_3D(idg_H2,N,N6,N5,N4)+trcs_Transp2MacP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_TransptMicP_3D(idg_H2,N,N6,N5,N4)+trcs_TransptMacP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -680,25 +677,25 @@ implicit none
 !
         WX=WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4)
         IF(ABS(WX).GT.ZEROS(N2,N1))THEN
-          ECHY=0.337*AZMAX1((trcSalt3DFlo2Cell(idsalt_Hp,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Hp,N,N6,N5,N4))/WX)
-          ECOH=0.192*AZMAX1((trcSalt3DFlo2Cell(idsalt_OH,N,N6,N5,N4)+trcSalt_XFHS(idsalt_OH,N,N6,N5,N4))/WX)
-          ECAL=0.056*AZMAX1((trcSalt3DFlo2Cell(idsalt_Al,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*3.0/WX)
-          ECFE=0.051*AZMAX1((trcSalt3DFlo2Cell(idsalt_Fe,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Fe,N,N6,N5,N4))*3.0/WX)
-          ECCA=0.060*AZMAX1((trcSalt3DFlo2Cell(idsalt_Ca,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*2.0/WX)
-          ECMG=0.053*AZMAX1((trcSalt3DFlo2Cell(idsalt_Mg,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Mg,N,N6,N5,N4))*2.0/WX)
-          ECNA=0.050*AZMAX1((trcSalt3DFlo2Cell(idsalt_Na,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Na,N,N6,N5,N4))/WX)
-          ECKA=0.070*AZMAX1((trcSalt3DFlo2Cell(idsalt_K,N,N6,N5,N4)+trcSalt_XFHS(idsalt_K,N,N6,N5,N4))/WX)
-          ECCO=0.072*AZMAX1((trcSalt3DFlo2Cell(idsalt_CO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CO3,N,N6,N5,N4))*2.0/WX)
-          ECHC=0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
-          ECSO=0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
-          ECCL=0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((trcs_Transp2MicP_3D(ids_NO3,N,N6,N5,N4)+trcs_Transp2MacP_3D(ids_NO3,N,N6,N5,N4))/(WX*natomw))
-          ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
+          ECHY  = 0.337*AZMAX1((trcSalt3DFlo2Cell(idsalt_Hp,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Hp,N,N6,N5,N4))/WX)
+          ECOH  = 0.192*AZMAX1((trcSalt3DFlo2Cell(idsalt_OH,N,N6,N5,N4)+trcSalt_XFHS(idsalt_OH,N,N6,N5,N4))/WX)
+          ECAL  = 0.056*AZMAX1((trcSalt3DFlo2Cell(idsalt_Al,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*3.0/WX)
+          ECFE  = 0.051*AZMAX1((trcSalt3DFlo2Cell(idsalt_Fe,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Fe,N,N6,N5,N4))*3.0/WX)
+          ECCA  = 0.060*AZMAX1((trcSalt3DFlo2Cell(idsalt_Ca,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Ca,N,N6,N5,N4))*2.0/WX)
+          ECMG  = 0.053*AZMAX1((trcSalt3DFlo2Cell(idsalt_Mg,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Mg,N,N6,N5,N4))*2.0/WX)
+          ECNA  = 0.050*AZMAX1((trcSalt3DFlo2Cell(idsalt_Na,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Na,N,N6,N5,N4))/WX)
+          ECKA  = 0.070*AZMAX1((trcSalt3DFlo2Cell(idsalt_K,N,N6,N5,N4)+trcSalt_XFHS(idsalt_K,N,N6,N5,N4))/WX)
+          ECCO  = 0.072*AZMAX1((trcSalt3DFlo2Cell(idsalt_CO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_CO3,N,N6,N5,N4))*2.0/WX)
+          ECHC  = 0.044*AZMAX1((trcSalt3DFlo2Cell(idsalt_HCO3,N,N6,N5,N4)+trcSalt_XFHS(idsalt_HCO3,N,N6,N5,N4))/WX)
+          ECSO  = 0.080*AZMAX1((trcSalt3DFlo2Cell(idsalt_SO4,N,N6,N5,N4)+trcSalt_XFHS(idsalt_SO4,N,N6,N5,N4))*2.0/WX)
+          ECCL  = 0.076*AZMAX1((trcSalt3DFlo2Cell(idsalt_Cl,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Cl,N,N6,N5,N4))/WX)
+          ECNO  = 0.071*AZMAX1((trcs_TransptMicP_3D(ids_NO3,N,N6,N5,N4)+trcs_TransptMacP_3D(ids_NO3,N,N6,N5,N4))/(WX*natomw))
+          ECNDX = ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
         ELSE
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_Transp2MicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_TransptMicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfXBoundaryFlow
@@ -720,22 +717,22 @@ implicit none
   IF(N.NE.3 .AND. L.EQ.NU(NY,NX))THEN
     WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
-      CRUN=CRUN-WQRS
-      Qrunoff_CumYr_col(NY,NX)=Qrunoff_CumYr_col(NY,NX)-WQRS
-      HQRS=XN*HeatBySnowRedistrib_2DH(N,N5,N4)
-      HeatOut_lnds=HeatOut_lnds-HQRS
-      CXS=XN*(trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,N5,N4))
-      ZXS=XN*(trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)+trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)+trcn_FloXSnow_2DH(ids_NO3,N,N5,N4))
-      ZGS=XN*(trcg_FloXSnow_2DH(idg_N2O,N,N5,N4)+trcg_FloXSnow_2DH(idg_N2,N,N5,N4))
-      PXS=XN*(trcn_FloXSnow_2DH(ids_H2PO4,N,N5,N4)+trcn_FloXSnow_2DH(ids_H1PO4,N,N5,N4))
-      TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-CXS
-      TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZXS-ZGS
-      TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXS
-      HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)-CXR
-      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
-      OXS=XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
-      OXYGOU=OXYGOU-OXS
+      CRUN                            = CRUN-WQRS
+      Qrunoff_CumYr_col(NY,NX)        = Qrunoff_CumYr_col(NY,NX)-WQRS
+      HQRS                            = XN*HeatBySnowRedistrib_2DH(N,N5,N4)
+      HeatOut_lnds                    = HeatOut_lnds-HQRS
+      CXS                             = XN*(trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,N5,N4))
+      ZXS                             = XN*(trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)+trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)+trcn_FloXSnow_2DH(ids_NO3,N,N5,N4))
+      ZGS                             = XN*(trcg_FloXSnow_2DH(idg_N2O,N,N5,N4)+trcg_FloXSnow_2DH(idg_N2,N,N5,N4))
+      PXS                             = XN*(trcn_FloXSnow_2DH(ids_H2PO4,N,N5,N4)+trcn_FloXSnow_2DH(ids_H1PO4,N,N5,N4))
+      TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXS
+      TOMOU_lnds(ielmn)               = TOMOU_lnds(ielmn)-ZXS-ZGS
+      TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXS
+      HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-CXR
+      HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
+      HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
+      OXS                             = XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
+      OXYGOU                          = OXYGOU-OXS
       IF(salt_model)THEN
         PSS=XN*patomw*(trcSalt_XQS(idsalt_CaPO4,N,N5,N4) &
           +trcSalt_XQS(idsalt_FeHPO4,N,N5,N4)+trcSalt_XQS(idsalt_CaHPO4,N,N5,N4) &
