@@ -1098,6 +1098,13 @@ module StartsMod
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 
+ !do NY=1,NYS
+ !   DO L=NU(NY,NX),NL(NY,NX)
+ !     AREA(3,L,NY,NX)=a_AREA3(L,NY)
+ !     write(*,*) "Before InitSnowLayers AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
+ !   ENDDO
+ ! ENDDO
+
 !     INITIALIZE SNOWPACK LAYERS
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS

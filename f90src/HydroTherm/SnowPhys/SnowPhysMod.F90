@@ -92,10 +92,12 @@ contains
       DLYRSI                   = cumSnowDepzRef_col(L)-cumSnowDepzRef_col(L-1)
       SnowThickL_snvr(L,NY,NX) = AMIN1(DLYRSI,AZMAX1(SnowDepth_col(NY,NX)-cumSnowDepzRef_col(L-1)))
     ENDIF
-    VLSnoDWIMax_col(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
+    !VLSnoDWIMax_col(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
+    !Can this not just be AREA?
+    VLSnoDWIMax_col(L,NY,NX)=DLYRSI*0.1
     if(SnowThickL_snvr(L,NY,NX) .GT. ZEROS(NY,NX))then
     !there is meaningful snow
-      VLDrySnoWE_snvr(L,NY,NX) = SnowThickL_snvr(L,NY,NX)*NewSnowDens_col(NY,NX)*DH(NY,NX)*DV(NY,NX)
+      VLDrySnoWE_snvr(L,NY,NX) = SnowThickL_snvr(L,NY,NX)*NewSnowDens_col(NY,NX)*0.1
       VLWatSnow_snvr(L,NY,NX)  = 0.0_r8
       VLIceSnow_snvr(L,NY,NX)  = 0.0_r8
 
@@ -132,7 +134,7 @@ contains
 !     VLHeatCapSnowMin_col,=minimum heat capacities for solving
 !      snowpack water and heat fluxes
 !
-  VLHeatCapSnowMin_col(NY,NX)=VLHeatCapSnoMin*AREA(3,NU(NY,NX),NY,NX)
+  VLHeatCapSnowMin_col(NY,NX)=VLHeatCapSnoMin*0.1
 
   end subroutine InitSnowLayers
 
@@ -751,7 +753,15 @@ contains
       TK1X                          = TKSnow1_snvr(L,NY,NX)
       
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
+        write(*,*) "(SolveSnowpack) In Layer L = ", L
+        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX) = ", VLHeatCapSnowM1_snvr(L,NY,NX)
+        write(*,*) "VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8 = ", VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8
+        write(*,*) "ENGY0 = ", ENGY0
+        write(*,*) "NetHeat2LayL = ", NetHeat2LayL
+        write(*,*) "HeatByFrezThaw = ", HeatByFrezThaw
+        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX) = ", VLHeatCapSnowM1_snvr(L,NY,NX)
         TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
+        write(*,*) "TKSnow1_snvr(L,NY,NX) = ", TKSnow1_snvr(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
         TKSnow1_snvr(L,NY,NX)=TairK_col(NY,NX)
       ELSE

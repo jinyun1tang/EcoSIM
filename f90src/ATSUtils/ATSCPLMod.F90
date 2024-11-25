@@ -140,9 +140,11 @@ contains
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
 
-  do i = 1, size_col
-     a_MATP(i, 1) = 100.0
-  end do
+  a_MATP(:,:) = 100.0
+
+  !do i = 1, size_col
+  !  a_MATP(i, 1) = 100.0
+  !end do
 
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2

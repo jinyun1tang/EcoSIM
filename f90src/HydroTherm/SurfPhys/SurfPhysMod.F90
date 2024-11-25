@@ -685,6 +685,7 @@ contains
       CumHeatFlow2LitR,cumHeatFlowSno2Soi)
   ENDIF
 
+
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
@@ -1600,7 +1601,7 @@ contains
 
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
-!      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS_vr(0,NY,NX)
+      write(*,*)'RunSurfacePhysModel',NY,NX,'M=',M,TKS_vr(0,NY,NX)
 
       call SurfaceEnergyModel(I,J,M,NX,NY,ResistanceLitRLay,KSatReductByRainKineticEnergy(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvap,HeatSensAir2Snow,Radnet2Snow,&

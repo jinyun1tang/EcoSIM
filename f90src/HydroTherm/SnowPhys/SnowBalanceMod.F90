@@ -68,7 +68,7 @@ implicit none
 !    call endrun(trim(mod_filename)//' at line',__LINE__)     
 !  endif  
 
-
+  
   D9780: DO L=1,JS
     IF(VLHeatCapSnow_snvr(L,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .and. L.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay_snvr(L,NY,NX))>0._r8)THEN
@@ -550,6 +550,16 @@ implicit none
         !compute the free volume/thickness: DDLYXS
         DDLYXS=(VLSnoDWIMax_col(L,NY,NX)-VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX) &
           -VLWatSnow_snvr(L,NY,NX)-VLIceSnow_snvr(L,NY,NX))/AREA(3,L,NY,NX)
+        IF(NX.EQ.1 .AND. NY.EQ.1 .AND. L.EQ.1)THEN
+          write(*,*) "Computing DDLYXS: "
+          write(*,*) "DDLYXS = ", DDLYXS
+          write(*,*) "VLSnoDWIMax_col(L,NY,NX) = ", VLSnoDWIMax_col(L,NY,NX)
+          write(*,*) "VLDrySnoWE_snvr(L,NY,NX) = ", VLDrySnoWE_snvr(L,NY,NX)
+          write(*,*) "SnoDens_snvr(L,NY,NX) = ", SnoDens_snvr(L,NY,NX)
+          write(*,*) "VLWatSnow_snvr(L,NY,NX) = ", VLWatSnow_snvr(L,NY,NX)
+          write(*,*) "VLIceSnow_snvr(L,NY,NX)) = ", VLIceSnow_snvr(L,NY,NX)
+          write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX)
+        ENDIF
 !        DDLYXX=DDLYXS
         IF(DDLYXS.LT.-ZERO .OR. SnowThickL_snvr(L+1,NY,NX).GT.ZERO)THEN
           !current volume is greater than allowed, or next layer exists   
@@ -677,6 +687,10 @@ implicit none
       ENDIF
     ENDDO D325
   ENDIF
+
+  !write(*,*) "SnowpackLayering After first do loop - ", NX, NY
+  !write(*,*) "VLHeatCapSnow_snvr(1,NY,NX) = ", VLHeatCapSnow_snvr(1,NY,NX)
+  !write(*,*) "VLHeatCapSnow_snvr(5,NY,NX) = ", VLHeatCapSnow_snvr(5,NY,NX)
   !update volumetric snow heat capacity
   nsnol_col(NY,NX)=0
   DO L=1,JS
@@ -719,7 +733,10 @@ implicit none
       endif
     endif 
   ENDDO  
-  
+
+  !write(*,*) "End SnowpackLayering - ", NX, NY
+  !write(*,*) "VLHeatCapSnow_snvr(1,NY,NX) = ", VLHeatCapSnow_snvr(1,NY,NX)
+  !write(*,*) "VLHeatCapSnow_snvr(5,NY,NX) = ", VLHeatCapSnow_snvr(5,NY,NX)
   end subroutine SnowpackLayering
 
 !------------------------------------------------------------------------------------------
