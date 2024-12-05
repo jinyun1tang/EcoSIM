@@ -166,7 +166,7 @@ contains
   VLiceMicP1_vr(0,NY,NX)        = AZMAX1(VLiceMicP_vr(0,NY,NX))
   VLairMicP1_vr(0,NY,NX)        = AZMAX1(VLPoreLitR_col(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
   VLWatMicPM_vr(1,0,NY,NX)      = VLWatMicP1_vr(0,NY,NX)
-  VLsoiAirPM(1,0,NY,NX)         = VLairMicP1_vr(0,NY,NX)
+  VLsoiAirPM_vr(1,0,NY,NX)         = VLairMicP1_vr(0,NY,NX)
   TVWatIceLitR                  = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
   XVLMobileWaterLitR_col(NY,NX) = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
@@ -1072,7 +1072,7 @@ contains
   ResistBndlSurf_col(NY,NX)  = 1.0_r8/(FracAsExposedSoil_col(NY,NX)/ResistAreodynOverLitr_col(NY,NX)+FracEffAsLitR_col(NY,NX)/ResistanceLitRLay)
   RAS                        = SnowBNDResistance(NY,NX)
   CondGasXSnowM_col(M,NY,NX) = AREA(3,NUM(NY,NX),NY,NX)*dts_HeatWatTP/(ResistBndlSurf_col(NY,NX)+RAS)  !m^2 h/(h/m) = m3
-!  write(141,*)I+J/24.,M,CondGasXSnowM_col(M,NY,NX),ResistBndlSurf_col(NY,NX),RAS,ResistAreodynOverLitr_col(NY,NX),FracEffAsLitR_col(NY,NX),ResistanceLitRLay
+
 !
 ! REDISTRIBUTE INCOMING PRECIPITATION
 ! BETWEEN RESIDUE AND SOIL SURFACE
@@ -1118,7 +1118,7 @@ contains
 ! VOLAT0=ice-excluded porosity in litter
 
   VOLAT0=VLPoreLitR_col(NY,NX)-VLiceMicP1_vr(0,NY,NX)
-  IF(VOLAT0.GT.ZEROS2(NY,NX).AND.VLsoiAirPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VOLAT0.GT.ZEROS2(NY,NX).AND.VLsoiAirPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     !litter layer is not saturated
     THETWA                         = AZMAX1(AMIN1(1.0_r8,VLWatMicP1_vr(0,NY,NX)/VOLAT0))
     TScal4Aquadifsvity             = TEFAQUDIF(TKSoil1_vr(0,NY,NX))
@@ -1660,7 +1660,7 @@ contains
         VLWatMicP1_vr(0,NY,NX)   = VLWatMicP1_vr(0,NY,NX) +cumWatFlx2LitRByRunoff_col(NY,NX)
         VLairMicP1_vr(0,NY,NX)   = AZMAX1(VLPoreLitR_col(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
         VLWatMicPM_vr(M,0,NY,NX) = VLWatMicP1_vr(0,NY,NX)
-        VLsoiAirPM(M,0,NY,NX)    = VLairMicP1_vr(0,NY,NX)
+        VLsoiAirPM_vr(M,0,NY,NX)    = VLairMicP1_vr(0,NY,NX)
       ELSE
 
         VLWatLitR  = VLWatMicP_vr(0,NY,NX)+WatFLo2LitR_col(NY,NX)+TLitrIceFlxThaw_col(NY,NX)+TXGridSurfRunoff_2DH(NY,NX)

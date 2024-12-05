@@ -79,7 +79,7 @@ implicit none
   real(r8), pointer :: FracSoiAsMicP_vr(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
   real(r8), pointer :: VLWatMicPM_vr(:,:) => null()    !soil micropore water content, [m3 d-2]
-  real(r8), pointer :: VLsoiAirPM(:,:) => null()    !soil air content, [m3 d-2]
+  real(r8), pointer :: VLsoiAirPM_vr(:,:) => null()    !soil air content, [m3 d-2]
   real(r8), pointer :: TortMicPM_vr(:,:)  => null()    !micropore soil tortuosity, []
   real(r8), pointer :: FILM(:,:)  => null()    !soil water film thickness , [m]
   contains
@@ -938,7 +938,7 @@ implicit none
   allocate(this%PlantPopulation_pft(JP1));this%PlantPopulation_pft=spval
   allocate(this%flag_pft_active(JP1));  this%flag_pft_active=.false.
   allocate(this%VLWatMicPM_vr(60,0:JZ1));this%VLWatMicPM_vr=spval
-  allocate(this%VLsoiAirPM(60,0:JZ1));this%VLsoiAirPM=spval
+  allocate(this%VLsoiAirPM_vr(60,0:JZ1));this%VLsoiAirPM_vr=spval
   allocate(this%TortMicPM_vr(60,0:JZ1));this%TortMicPM_vr=spval
   allocate(this%FILM(60,0:JZ1)); this%FILM=spval
 

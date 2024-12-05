@@ -25,7 +25,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  ALTZ(:,:)                          !altitude, [m]
   real(r8),target,allocatable ::  SL(:,:)                            !slope, [o]
   real(r8),target,allocatable ::  ASP_col(:,:)                           !aspect , [o]
-  real(r8),target,allocatable ::  Gas_Flx_atmDif2soil_col(:,:,:)              ! surface-atmosphere gas exchange flux , >0 into soil [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_SurfSoil_DisolEvap_flx(:,:,:)              ! surface-atmosphere gas exchange flux , >0 into soil [g d-2 h-1]
 
 !----------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ contains
   allocate(SL(JY,JX));          SL=0._r8
   allocate(ASP_col(JY,JX));         ASP_col=0._r8
 
-  allocate(Gas_Flx_atmDif2soil_col(idg_beg:idg_end,JY,JX)); Gas_Flx_atmDif2soil_col=0._r8
+  allocate(trcg_SurfSoil_DisolEvap_flx(idg_beg:idg_end,JY,JX)); trcg_SurfSoil_DisolEvap_flx=0._r8
   end subroutine InitLandSurfData
 
 !----------------------------------------------------------------------

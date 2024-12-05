@@ -266,7 +266,10 @@ module SoilBGCNLayMod
         enddo
       enddo
     enddo DC100
+  ENDDO DK100
+!  write(*,*)'OMC',ORGM(ielmc)
 
+  DK200: DO K=1,jcplx1
     !add microbial residual
     DO  M=1,ndbiomcp
       DO NE=1,nelms
@@ -275,7 +278,6 @@ module SoilBGCNLayMod
         print*,'orgm3',ORGM
         stop
         endif
-
       ENDDO    
     ENDDO
 
@@ -315,7 +317,7 @@ module SoilBGCNLayMod
         endif
       ENDDO  
     ENDDO  
-  ENDDO DK100   
+  ENDDO DK200   
 
   end subroutine sumORGMLayL
 !------------------------------------------------------------------------------------------

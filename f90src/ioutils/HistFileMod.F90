@@ -1287,9 +1287,9 @@ implicit none
     real(r8), pointer :: field(:)       ! clm 1d pointer field
     logical , pointer :: active(:)      ! flag saying whether each point is active (used for type1d = landunit/column/pft) (this refers to a point being active, NOT a history field being active)
     real(r8) :: field_gcell(bounds%begg:bounds%endg)  ! gricell level field (used if mapping to gridcell is done)
-    integer j
+    integer :: j
     character(len=*),parameter :: subname = 'hist_update_hbuf_field_1d'
-    integer k_offset                    ! offset for mapping sliced subarray pointers when outputting variables in PFT/col vector form
+    integer :: k_offset                    ! offset for mapping sliced subarray pointers when outputting variables in PFT/col vector form
     !-----------------------------------------------------------------------
 
     avgflag        =  tape(t)%hlist(f)%avgflag
@@ -1303,9 +1303,6 @@ implicit none
     field          => esmptr_rs(hpindex)%ptr
 
     ! set variables to check weights when allocate all pfts
-
-
-
 
        ! For data defined on the pft, col, and landunit we need to check if a point is active
        ! to determine whether that point should be assigned spval

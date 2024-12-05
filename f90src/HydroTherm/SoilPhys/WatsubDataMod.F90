@@ -17,7 +17,7 @@ implicit none
 
   real(r8),allocatable ::  FWatExMacP2MicPi(:,:,:)             !pressure-driven water flow from macpore to micpore
 
-  real(r8),allocatable ::  TWatCharge2MicP(:,:,:)                       !
+  real(r8),allocatable ::  TWatCharge2MicP_vr(:,:,:)                       !
   real(r8),allocatable ::  TConvWaterFlowMacP_3D_vr(:,:,:)                      !
   real(r8),allocatable ::  THeatFlow2Soili_3D_vr(:,:,:)                      !
   real(r8),allocatable ::  FIceThawMicP(:,:,:)                       !
@@ -66,7 +66,7 @@ contains
 
   allocate(FWatExMacP2MicPi(JZ,JY,JX));    FWatExMacP2MicPi=0._r8
 
-  allocate(TWatCharge2MicP(JZ,JY,JX));    TWatCharge2MicP=0._r8
+  allocate(TWatCharge2MicP_vr(JZ,JY,JX));    TWatCharge2MicP_vr=0._r8
   allocate(TConvWaterFlowMacP_3D_vr(JZ,JY,JX));   TConvWaterFlowMacP_3D_vr=0._r8
   allocate(THeatFlow2Soili_3D_vr(JZ,JY,JX));   THeatFlow2Soili_3D_vr=0._r8
   allocate(FIceThawMicP(JZ,JY,JX));    FIceThawMicP=0._r8
@@ -112,7 +112,7 @@ contains
 
   call destroy(FWatExMacP2MicPi)
 
-  call destroy(TWatCharge2MicP)
+  call destroy(TWatCharge2MicP_vr)
   call destroy(TConvWaterFlowMacP_3D_vr)
   call destroy(THeatFlow2Soili_3D_vr)
   call destroy(FIceThawMicP)

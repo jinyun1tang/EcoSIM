@@ -92,6 +92,7 @@ module MicBGCMod
   micflx%RPiDemand=0._r8; micflx%RNiDemand=0._r8;micflx%GrosAssimhr=0._r8
   micflx%CDOMuptk1=0._r8;micflx%CDOMuptk2=0._r8;micflx%tROMT=0._r8;micflx%tGROMO=0._r8
   micflx%tRGOMP=0._r8;micflx%tRGOXP=0._r8; micflx%tRGOZP=0._r8
+  micflx%tRHydlySOM =0._r8;   micflx%tRHydlyBioReSOM =0._r8; micflx%tRHydlySoprtOM =0._r8
 
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(I,J,micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
@@ -131,7 +132,7 @@ module MicBGCMod
 !
     !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
 !
-    call SolidOMDecomposition(I,J,KL,micfor,micstt,naqfdiag,nmicdiag,ncplxf,ncplxs)
+    call SolidOMDecomposition(I,J,KL,micfor,micstt,naqfdiag,nmicdiag,ncplxf,ncplxs,micflx)
 !
           !write(*,*)'DOC ADSORPTION - DESORPTION'
 !
@@ -914,8 +915,8 @@ module MicBGCMod
     micfor,naqfdiag,nmicf,nmics,micflx)
 
 ! RO2UptkHeter, RO2DmndHeter=O2-limited, O2-unlimited rates of O2 uptake
-  RGOMP=0.0_r8
-  RO2UptkHeter(NGL,K)=0.0_r8
+  RGOMP               = 0.0_r8
+  RO2UptkHeter(NGL,K) = 0.0_r8
 
 !
 ! HETEROTROPHIC BIOMASS RESPIRATION
@@ -1315,7 +1316,7 @@ module MicBGCMod
   end subroutine RDOMSorption
 !------------------------------------------------------------------------------------------
 
-  subroutine SolidOMDecomposition(I,J,KL,micfor,micstt,naqfdiag,nmicdiag,ncplxf,ncplxs)
+  subroutine SolidOMDecomposition(I,J,KL,micfor,micstt,naqfdiag,nmicdiag,ncplxf,ncplxs,micflx)
 
   implicit none
   integer, intent(in) :: I,J
@@ -1326,6 +1327,7 @@ module MicBGCMod
   type(Microbe_Diag_type), intent(inout) :: nmicdiag
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type),intent(inout) :: ncplxs
+  type(micfluxtype), intent(inout) :: micflx  
   integer  :: M,NE,idom,K
   real(r8) :: CNOMX,CPOMX
   real(r8) :: COQCK,COSC
@@ -1339,6 +1341,9 @@ module MicBGCMod
 
 !     begin_execution
   associate(                                             &
+    tRHydlySOM           => micflx%tRHydlySOM,           &
+    tRHydlyBioReSOM      => micflx%tRHydlyBioReSOM,      &
+    tRHydlySoprtOM       => micflx%tRHydlySoprtOM,       &
     RHydlysSolidOM       => ncplxf%RHydlysSolidOM,       &
     RHumifySolidOM       => ncplxf%RHumifySolidOM,       &
     RDcmpProdDOM         => ncplxf%RDcmpProdDOM,         &
@@ -1392,13 +1397,13 @@ module MicBGCMod
 !
   DO K=1,KL
     IF(TOMK(K).GT.ZEROS)THEN
-      CNOMX=TONK(K)/tMaxNActMicrbK(K)
-      CPOMX=TOPK(K)/tMaxPActMicrbK(K)
-      FCNK(K)=AMIN1(1.0_r8,AMAX1(0.50_r8,CNOMX))
-      FCPK(K)=AMIN1(1.0_r8,AMAX1(0.50_r8,CPOMX))
+      CNOMX   = TONK(K)/tMaxNActMicrbK(K)
+      CPOMX   = TOPK(K)/tMaxPActMicrbK(K)
+      FCNK(K) = AMIN1(1.0_r8,AMAX1(0.50_r8,CNOMX))
+      FCPK(K) = AMIN1(1.0_r8,AMAX1(0.50_r8,CPOMX))
     ELSE
-      FCNK(K)=1.0_r8
-      FCPK(K)=1.0_r8
+      FCNK(K) = 1.0_r8
+      FCPK(K) = 1.0_r8
     ENDIF
   !
   !     AQUEOUS CONCENTRATION OF BIOMASS TO CACULATE INHIBITION
@@ -1421,9 +1426,8 @@ module MicBGCMod
       ELSE
         COSC=BulkSOMC(K)/VLSoilMicP
       ENDIF
-      DFNS=COSC/(COSC+DCKD)
-
-      OQCI=1.0_r8/(1.0_r8+CDOM(idom_doc,K)/OQKI)
+      DFNS = COSC/(COSC+DCKD)
+      OQCI = 1.0_r8/(1.0_r8+CDOM(idom_doc,K)/OQKI)
   !
   !     C, N, P DECOMPOSITION RATE OF SOLID SUBSTRATES 'RDOS*' FROM
   !     RATE CONSTANT, TOTAL ACTIVE BIOMASS, DENSITY FACTOR,
@@ -1442,17 +1446,20 @@ module MicBGCMod
   !
       D785: DO M=1,jsken
         IF(SolidOM(ielmc,M,K).GT.ZEROS)THEN
-          CNS(M,K)=AZMAX1(SolidOM(ielmn,M,K)/SolidOM(ielmc,M,K))
-          CPS(M,K)=AZMAX1(SolidOM(ielmp,M,K)/SolidOM(ielmc,M,K))
-          RHydlysSolidOM(ielmc,M,K)=AZMAX1(AMIN1(0.5_r8*SolidOMAct(M,K) &
-            ,SPOSC(M,K)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SolidOMAct(M,K)/BulkSOMC(K)))
+          CNS(M,K)                  = AZMAX1(SolidOM(ielmn,M,K)/SolidOM(ielmc,M,K))
+          CPS(M,K)                  = AZMAX1(SolidOM(ielmp,M,K)/SolidOM(ielmc,M,K))
+          RHydlysSolidOM(ielmc,M,K) = SolidOMAct(M,K)*AZMAX1(AMIN1(0.5_r8 &
+            ,SPOSC(M,K)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
           RHydlysSolidOM(ielmn,M,K)=AZMAX1(AMIN1(SolidOM(ielmn,M,K),CNS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCNK(K)
           RHydlysSolidOM(ielmp,M,K)=AZMAX1(AMIN1(SolidOM(ielmp,M,K),CPS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCPK(K)
 
-        ELSE
-          CNS(M,K)=CNOSC(M,K)
-          CPS(M,K)=CPOSC(M,K)
           DO NE=1,NumPlantChemElms
+            tRHydlySOM(NE)=tRHydlySOM(NE)+RHydlysSolidOM(NE,M,K)
+          ENDDO
+        ELSE
+          CNS(M,K) = CNOSC(M,K)
+          CPS(M,K) = CPOSC(M,K)
+          DO NE    = 1, NumPlantChemElms
             RHydlysSolidOM(NE,M,K)=0.0_r8
           ENDDO
         ENDIF
@@ -1470,8 +1477,8 @@ module MicBGCMod
       IF(K.LE.micpar%NumOfLitrCmplxs)THEN
         RHumifySolidOM(ielmc,ilignin,K)=AZMAX1(AMIN1(RHydlysSolidOM(ielmn,ilignin,K)/CNRH(k_POM) &
           ,RHydlysSolidOM(ielmp,ilignin,K)/CPRH(k_POM),EPOC*RHydlysSolidOM(ielmc,ilignin,K)))
-        RHOSCM=0.10_r8*RHumifySolidOM(ielmc,ilignin,K)
-        RHumifySolidOM(ielmc,iprotein,K)=AZMAX1(AMIN1(RHydlysSolidOM(ielmc,iprotein,K) &
+        RHOSCM                           = 0.10_r8*RHumifySolidOM(ielmc,ilignin,K)
+        RHumifySolidOM(ielmc,iprotein,K) = AZMAX1(AMIN1(RHydlysSolidOM(ielmc,iprotein,K) &
           ,RHydlysSolidOM(ielmn,iprotein,K)/CNRH(k_POM) &
           ,RHydlysSolidOM(ielmp,iprotein,K)/CPRH(k_POM),RHOSCM))
         RHumifySolidOM(ielmc,icarbhyro,K)=AZMAX1(AMIN1(RHydlysSolidOM(ielmc,icarbhyro,K) &
@@ -1491,8 +1498,8 @@ module MicBGCMod
       ELSE
         D810: DO M=1,jsken
           DO NE=1,NumPlantChemElms      
-            RHumifySolidOM(NE,M,K)=0.0_r8
-            RDcmpProdDOM(NE,M,K)=RHydlysSolidOM(NE,M,K)
+            RHumifySolidOM(NE,M,K) = 0.0_r8
+            RDcmpProdDOM(NE,M,K)   = RHydlysSolidOM(NE,M,K)
           ENDDO
         ENDDO D810
       ENDIF
@@ -1500,9 +1507,9 @@ module MicBGCMod
     ELSE
       D780: DO M=1,jsken
         DO NE=1,NumPlantChemElms    
-          RHydlysSolidOM(NE,M,K)=0.0_r8
-          RHumifySolidOM(NE,M,K)=0.0_r8
-          RDcmpProdDOM(NE,M,K)=0.0_r8
+          RHydlysSolidOM(NE,M,K) = 0.0_r8
+          RHumifySolidOM(NE,M,K) = 0.0_r8
+          RDcmpProdDOM(NE,M,K)   = 0.0_r8
         ENDDO  
       ENDDO D780
     ENDIF
@@ -1525,13 +1532,16 @@ module MicBGCMod
     IF(BulkSOMC(K).GT.ZEROS)THEN
       D775: DO M=1,ndbiomcp
         IF(OMBioResdu(ielmc,M,K).GT.ZEROS)THEN
-          CNR=AZMAX1(OMBioResdu(ielmn,M,K)/OMBioResdu(ielmc,M,K))
-          CPR=AZMAX1(OMBioResdu(ielmp,M,K)/OMBioResdu(ielmc,M,K))
-          RHydlysBioResduOM(ielmc,M,K)=AZMAX1(AMIN1(OMBioResdu(ielmc,M,K) &
-            ,SPORC(M)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*OMBioResdu(ielmc,M,K)/BulkSOMC(K)))
+          CNR                          = AZMAX1(OMBioResdu(ielmn,M,K)/OMBioResdu(ielmc,M,K))
+          CPR                          = AZMAX1(OMBioResdu(ielmp,M,K)/OMBioResdu(ielmc,M,K))
+          RHydlysBioResduOM(ielmc,M,K) = OMBioResdu(ielmc,M,K)*AZMAX1(AMIN1(1._r8 &
+            ,SPORC(M)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
+          RHydlysBioResduOM(ielmn,M,K) = AZMAX1(AMIN1(OMBioResdu(ielmn,M,K),CNR*RHydlysBioResduOM(ielmc,M,K)))/FCNK(K)
+          RHydlysBioResduOM(ielmp,M,K) = AZMAX1(AMIN1(OMBioResdu(ielmp,M,K),CPR*RHydlysBioResduOM(ielmc,M,K)))/FCPK(K)
 
-          RHydlysBioResduOM(ielmn,M,K)=AZMAX1(AMIN1(OMBioResdu(ielmn,M,K),CNR*RHydlysBioResduOM(ielmc,M,K)))/FCNK(K)
-          RHydlysBioResduOM(ielmp,M,K)=AZMAX1(AMIN1(OMBioResdu(ielmp,M,K),CPR*RHydlysBioResduOM(ielmc,M,K)))/FCPK(K)
+          DO NE=1,NumPlantChemElms
+            tRHydlyBioReSOM(NE)=tRHydlyBioReSOM(NE)+RHydlysBioResduOM(NE,M,K)
+          ENDDO
         ELSE
           DO NE=1,NumPlantChemElms      
             RHydlysBioResduOM(NE,M,K)=0.0_r8
@@ -1565,13 +1575,17 @@ module MicBGCMod
       IF(SorbedOM(ielmc,K).GT.ZEROS)THEN
         rCNSorbOM(K)            = AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
         rCPSorbOM(K)            = AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
-        RHydlysSorptOM(ielmc,K) = AZMAX1(AMIN1(SorbedOM(ielmc,K) &
-          ,SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth*SorbedOM(ielmc,K)/BulkSOMC(K)))
+        RHydlysSorptOM(ielmc,K) = SorbedOM(ielmc,K)*AZMAX1(AMIN1(1._r8 &
+          ,SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
 
         RHydlysSorptOM(ielmn,K)        = AZMAX1(AMIN1(SorbedOM(ielmn,K),rCNSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
         RHydlysSorptOM(ielmp,K)        = AZMAX1(AMIN1(SorbedOM(ielmp,K),rCPSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
         RHydlysSorptOM(idom_acetate,K) = AZMAX1(AMIN1(SorbedOM(idom_acetate,K) &
           ,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS*TSensGrowth*SorbedOM(idom_acetate,K)/BulkSOMC(K)))
+
+        DO NE=1,NumPlantChemElms
+          tRHydlySoprtOM(NE)=tRHydlySoprtOM(NE)+RHydlysSorptOM(NE,K)
+        ENDDO
 
       ELSE
         rCNSorbOM(K)=0.0_r8
@@ -1998,6 +2012,7 @@ module MicBGCMod
     RAnabolDOCUptkHeter          => nmicf%RAnabolDOCUptkHeter,           &
     RAnabolAcetUptkHeter         => nmicf%RAnabolAcetUptkHeter,          &
     RO2UptkHeter                 => nmicf%RO2UptkHeter,                  &
+    RO2DmndHeter                 => nmicf%RO2DmndHeter,                  &
     RNO3ReduxHeterSoil           => nmicf%RNO3ReduxHeterSoil,            &
     RNO3ReduxHeterBand           => nmicf%RNO3ReduxHeterBand,            &
     RNO2ReduxHeterSoil           => nmicf%RNO2ReduxHeterSoil,            &
@@ -2117,6 +2132,10 @@ module MicBGCMod
           naqfdiag%TReduxNO2Band     = naqfdiag%TReduxNO2Band+RNO2ReduxHeterBand(NGL,K)
           naqfdiag%TReduxN2O         = naqfdiag%TReduxN2O+RN2OReduxHeter(NGL,K)
           naqfdiag%TProdH2           = naqfdiag%TProdH2+RH2ProdHeter(NGL,K)
+          naqfdiag%tRO2UptkHeterG    = naqfdiag%tRO2UptkHeterG+RO2UptkHeter(NGL,K)
+          naqfdiag%tRO2DmndHeterG    = naqfdiag%tRO2DmndHeterG + RO2DmndHeter(NGL,K)
+          nmicf%RO2UptkHeterG(NGL)   = nmicf%RO2UptkHeterG(NGL)+RO2UptkHeter(NGL,K)
+          nmicf%RO2DmndHeterG(NGL)   = nmicf%RO2DmndHeterG(NGL)+RO2DmndHeter(NGL,K)
           micflx%TRDOE2DIE(ielmc)    = micflx%TRDOE2DIE(ielmc)+RCO2ProdHeter(NGL,K)+RCH4ProdHeter(NGL,K)
         ENDDO
       ENDDO
@@ -2304,7 +2323,8 @@ module MicBGCMod
     micfor,naqfdiag,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
-  real(r8), intent(out):: FOXYX,FNH4X
+  real(r8), intent(out):: FOXYX   !fraction of demand over all demand
+  real(r8), intent(out):: FNH4X
   real(r8),intent(out) :: FNB3X,FNB4X,FNO3X
   real(r8),intent(out) :: FPO4X,FPOBX,FP14X,FP1BX
   real(r8),intent(out) :: FOQC,FOQA
@@ -3073,7 +3093,8 @@ module MicBGCMod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NGL,N,K
-  real(r8), intent(in) :: OXKX,FOXYX,RGOMP,RVOXP
+  real(r8), intent(in) :: OXKX
+  real(r8), intent(in) :: FOXYX,RGOMP,RVOXP
   real(r8), intent(in) :: RVOXPA
   real(r8), intent(in) :: RVOXPB
   type(micforctype), intent(in) :: micfor

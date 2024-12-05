@@ -1406,7 +1406,7 @@ contains
       H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX) &
         *FracSurfByLitR_col(NY,NX)*dts_litrvapht 
       !equilibrium vapor pressure
-      VPY          = (VapSnow0*VLairSno1+VPR*VLsoiAirPM(M,0,NY,NX))/(VLairSno1+VLsoiAirPM(M,0,NY,NX))
+      VPY          = (VapSnow0*VLairSno1+VPR*VLsoiAirPM_vr(M,0,NY,NX))/(VLairSno1+VLsoiAirPM_vr(M,0,NY,NX))
       H2OVapFlxMax = (VapSnow0-VPY)*VLairSno1*dt_watvap  !from snow to litter
 
       IF(H2OVapFlx.GE.0.0_r8)THEN
@@ -1452,13 +1452,13 @@ contains
 !     TKXR,TK1X=interim calculation of litter,soil temperatures
 !
     !both litter layer and topsoil are not-saturated
-    IF(VLsoiAirPM(M,0,NY,NX).GT.ZEROS(NY,NX) .AND. VLsoiAirPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VLsoiAirPM_vr(M,0,NY,NX).GT.ZEROS(NY,NX) .AND. VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       VP1       = vapsat(TK1X)*EXP(18.0_r8*PSISV1/(RGASC*TK1X))
       H2OVapFlx = AvgVaporCondctSoilLitR*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
 
-      VPY=(VPR*VLsoiAirPM(M,0,NY,NX)+VP1*VLsoiAirPM(M,NUM(NY,NX),NY,NX)) &
-        /(VLsoiAirPM(M,0,NY,NX)+VLsoiAirPM(M,NUM(NY,NX),NY,NX))
-      H2OVapFlxMax=(VPR-VPY)*VLsoiAirPM(M,0,NY,NX)*dt_watvap
+      VPY=(VPR*VLsoiAirPM_vr(M,0,NY,NX)+VP1*VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX)) &
+        /(VLsoiAirPM_vr(M,0,NY,NX)+VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))
+      H2OVapFlxMax=(VPR-VPY)*VLsoiAirPM_vr(M,0,NY,NX)*dt_watvap
 
       IF(H2OVapFlx.GE.0.0_r8)THEN
         !vapor flux from litter to soil
@@ -1716,8 +1716,10 @@ contains
   real(r8), intent(in) :: dt_SnoHeat   !time step size for snow iteration
   integer , intent(in) :: M            !soil heat-flow iteration id
   integer , intent(in) :: L,NY,NX
-  real(r8), intent(in) :: VapCond1,VapSnoSrc,VLairSno1,TCND1W
-  real(r8), intent(out):: VapFlxSno2Soi1,HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS
+  real(r8), intent(in) :: VapCond1,VapSnoSrc
+  real(r8), intent(in) :: VLairSno1,TCND1W
+  real(r8), intent(out):: VapFlxSno2Soi1,HeatConvFlxSno2Soi1
+  real(r8), intent(out) :: HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS
   real(r8) :: AvgThermCondctSoilLitR
   real(r8) :: WTHET2,VPY,VapSoiDest,AvgVaporCondctSoilLitR,H2OVapFlx,H2OVapFlxMax
   real(r8) :: HeatCnduct,HeatCnductMax,TKWX1,TKY
@@ -1749,9 +1751,13 @@ contains
     AvgVaporCondctSoilLitR = 2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR(3,NUM(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
     H2OVapFlx              = AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)&
       *FracSurfBareSoil_col(NY,NX)*dt_SnoHeat
-    VPY          = (VapSnoSrc*VLairSno1+VapSoiDest*VLsoiAirPM(M,NUM(NY,NX),NY,NX))/(VLairSno1+VLsoiAirPM(M,NUM(NY,NX),NY,NX))
+    VPY          = (VapSnoSrc*VLairSno1+VapSoiDest*VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))/(VLairSno1+VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))
     H2OVapFlxMax = (VapSnoSrc-VPY)*VLairSno1*dts_sno
 
+    if(abs(H2OVapFlx)>1.e10)then
+      print*,'hev',vapsat(TKSoil1_vr(NUM(NY,NX),NY,NX)),PSISV1,RGASC,TKSoil1_vr(NUM(NY,NX),NY,NX)
+      print*,'h2ovapflx',AvgVaporCondctSoilLitR,VapSnoSrc,VapSoiDest,FracSurfAsSnow_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
+    endif
     IF(H2OVapFlx.GE.0.0_r8)THEN
       !water flux goes into soil
       VapFlxSno2Soi1=AZMAX1(AMIN1(H2OVapFlx,H2OVapFlxMax))

@@ -275,42 +275,42 @@ module readiMod
 
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
-      ALAT(NY,NX)=ALATG
-      PBOT_col(NY,NX)=PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
-      ALTI(NY,NX)=ALTIG
-      ATCAI(NY,NX)=ATCAG
-      IDWaterTable(NY,NX)=iWaterTabelMode
-      OXYE(NY,NX)=ao2_ppm
-      Z2GE(NY,NX)=an2_ppm
-      CO2EI(NY,NX)=aco2_ppm
-      CH4E_col(NY,NX)=ach4_ppm
-      Z2OE(NY,NX)=an2o_ppm
-      ZNH3E_col(NY,NX)=ZNH3EG
-      KoppenClimZone_col(NY,NX)   = IETYPG
-      FlowDirIndicator(NY,NX)     = grid_mode
-      NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
-      WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
-      WaterTBLSlope(NY,NX)        = DTBLGG
+      ALAT(NY,NX)               = ALATG
+      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
+      ALTI(NY,NX)               = ALTIG
+      ATCAI(NY,NX)              = ATCAG
+      IDWaterTable(NY,NX)       = iWaterTabelMode
+      OXYE(NY,NX)               = ao2_ppm
+      Z2GE(NY,NX)               = an2_ppm
+      CO2EI(NY,NX)              = aco2_ppm
+      CH4E_col(NY,NX)           = ach4_ppm
+      Z2OE(NY,NX)               = an2o_ppm
+      ZNH3E_col(NY,NX)          = ZNH3EG
+      KoppenClimZone_col(NY,NX) = IETYPG
+      FlowDirIndicator(NY,NX)   = grid_mode
+      NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
+      WtblDepzTile_col(NY,NX)   = WTBLDepz_tile
+      WaterTBLSlope(NY,NX)      = DTBLGG
 
-      RechargNorthSurf(NY,NX)     = RCHQNG
-      RechargEastSurf(NY,NX)      = RCHQEG
-      RechargSouthSurf(NY,NX)     = RCHQSG
-      RechargWestSurf(NY,NX)      = RCHQWG
+      RechargNorthSurf(NY,NX) = RCHQNG
+      RechargEastSurf(NY,NX)  = RCHQEG
+      RechargSouthSurf(NY,NX) = RCHQSG
+      RechargWestSurf(NY,NX)  = RCHQWG
 
-      RechargNorthSubSurf(NY,NX)  = RCHGNUG
-      RechargEastSubSurf(NY,NX)   = RCHGEUG
-      RechargSouthSubSurf(NY,NX)  = RCHGSUG
-      RechargWestSubSurf(NY,NX)   = RCHGWUG
+      RechargNorthSubSurf(NY,NX) = RCHGNUG
+      RechargEastSubSurf(NY,NX)  = RCHGEUG
+      RechargSouthSubSurf(NY,NX) = RCHGSUG
+      RechargWestSubSurf(NY,NX)  = RCHGWUG
 
       RechargRateNorthWTBL(NY,NX) = RCHGNTG
       RechargRateEastWTBL(NY,NX)  = RCHGETG
       RechargRateSouthWTBL(NY,NX) = RCHGSTG
       RechargRateWestWTBL(NY,NX)  = RCHGWTG
       RCHGD(NY,NX)                = RCHGDG
-      DH(NY,NX)=DHI(NX)
-      DV(NY,NX)=DVI(NY)
-      CO2E_col(NY,NX)=CO2EI(NY,NX)
-      H2GE(NY,NX)=1.0E-03_r8
+      DH(NY,NX)                   = DHI(NX)
+      DV(NY,NX)                   = DVI(NY)
+      CO2E_col(NY,NX)             = CO2EI(NY,NX)
+      H2GE(NY,NX)                 = 1.0E-03_r8
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
@@ -499,30 +499,30 @@ module readiMod
 !     NL1,NL2=number of additional layers below NJ with,without data in file
 !     ISOILR=natural(0),reconstructed(1) soil profile
 !
-          PSIAtFldCapacity(NY,NX)=PSIAtFldCapacity(NV1,NH1)
-          PSIAtWiltPoint(NY,NX)=PSIAtWiltPoint(NV1,NH1)
-          SoilAlbedo_col(NY,NX) =SoilAlbedo_col(NV1,NH1)
-          PH(0,NY,NX) =PH(0,NV1,NH1)
-          RSC(k_fine_litr,0,NY,NX) =RSC(k_fine_litr,0,NV1,NH1)
-          RSN(k_fine_litr,0,NY,NX) =RSN(k_fine_litr,0,NV1,NH1)
-          RSP(k_fine_litr,0,NY,NX) =RSP(k_fine_litr,0,NV1,NH1)
-          RSC(k_woody_litr,0,NY,NX) =RSC(k_woody_litr,0,NV1,NH1)
-          RSN(k_woody_litr,0,NY,NX) =RSN(k_woody_litr,0,NV1,NH1)
-          RSP(k_woody_litr,0,NY,NX) =RSP(k_woody_litr,0,NV1,NH1)
-          RSC(k_manure,0,NY,NX) =RSC(k_manure,0,NV1,NH1)
-          RSN(k_manure,0,NY,NX) =RSN(k_manure,0,NV1,NH1)
-          RSP(k_manure,0,NY,NX) =RSP(k_manure,0,NV1,NH1)
-          IXTYP(1,NY,NX) =IXTYP(1,NV1,NH1)
-          IXTYP(2,NY,NX) =IXTYP(2,NV1,NH1)
-          NUI(NY,NX) = NUI(NV1,NH1)
-          MaxNumRootLays(NY,NX)  = MaxNumRootLays(NV1,NH1)
-          ISOILR(NY,NX)=ISOILR(NV1,NH1)
-          NU(NY,NX)=NU(NV1,NH1)
-          NK(NY,NX)=NK(NV1,NH1)
-          NM(NY,NX)=NM(NV1,NH1)
+          PSIAtFldCapacity(NY,NX)   = PSIAtFldCapacity(NV1,NH1)
+          PSIAtWiltPoint(NY,NX)     = PSIAtWiltPoint(NV1,NH1)
+          SoilAlbedo_col(NY,NX)     = SoilAlbedo_col(NV1,NH1)
+          PH(0,NY,NX)               = PH(0,NV1,NH1)
+          RSC(k_fine_litr,0,NY,NX)  = RSC(k_fine_litr,0,NV1,NH1)
+          RSN(k_fine_litr,0,NY,NX)  = RSN(k_fine_litr,0,NV1,NH1)
+          RSP(k_fine_litr,0,NY,NX)  = RSP(k_fine_litr,0,NV1,NH1)
+          RSC(k_woody_litr,0,NY,NX) = RSC(k_woody_litr,0,NV1,NH1)
+          RSN(k_woody_litr,0,NY,NX) = RSN(k_woody_litr,0,NV1,NH1)
+          RSP(k_woody_litr,0,NY,NX) = RSP(k_woody_litr,0,NV1,NH1)
+          RSC(k_manure,0,NY,NX)     = RSC(k_manure,0,NV1,NH1)
+          RSN(k_manure,0,NY,NX)     = RSN(k_manure,0,NV1,NH1)
+          RSP(k_manure,0,NY,NX)     = RSP(k_manure,0,NV1,NH1)
+          IXTYP(1,NY,NX)            = IXTYP(1,NV1,NH1)
+          IXTYP(2,NY,NX)            = IXTYP(2,NV1,NH1)
+          NUI(NY,NX)                = NUI(NV1,NH1)
+          MaxNumRootLays(NY,NX)     = MaxNumRootLays(NV1,NH1)
+          ISOILR(NY,NX)             = ISOILR(NV1,NH1)
+          NU(NY,NX)                 = NU(NV1,NH1)
+          NK(NY,NX)                 = NK(NV1,NH1)
+          NM(NY,NX)                 = NM(NV1,NH1)
 !  the extra soil layer below root zone cannot be greater than what is allowed
-          NLI(NY,NX)=NLI(NV1,NH1)
-          NL(NY,NX)=NLI(NV1,NH1)
+          NLI(NY,NX) = NLI(NV1,NH1)
+          NL(NY,NX)  = NLI(NV1,NH1)
         ENDIF
 
 !
@@ -545,8 +545,8 @@ module readiMod
             SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK_vr(L,NY,NX)             = ROCK_vr(L,NV1,NH1)
             PH(L,NY,NX)                  = PH(L,NV1,NH1)
-            CEC_vr(L,NY,NX)                 = CEC_vr(L,NV1,NH1)
-            AEC_vr(L,NY,NX)                 = AEC_vr(L,NV1,NH1)
+            CEC_vr(L,NY,NX)              = CEC_vr(L,NV1,NH1)
+            AEC_vr(L,NY,NX)              = AEC_vr(L,NV1,NH1)
             CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NV1,NH1)
             COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NV1,NH1)
             CSoilOrgM_vr(ielmn,L,NY,NX)  = CSoilOrgM_vr(ielmn,L,NV1,NH1)
@@ -635,8 +635,8 @@ module readiMod
               SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L+1,NY,NX)
               ROCK_vr(L,NY,NX)             = ROCK_vr(L+1,NY,NX)
               PH(L,NY,NX)                  = PH(L+1,NY,NX)
-              CEC_vr(L,NY,NX)                 = CEC_vr(L+1,NY,NX)
-              AEC_vr(L,NY,NX)                 = AEC_vr(L+1,NY,NX)
+              CEC_vr(L,NY,NX)              = CEC_vr(L+1,NY,NX)
+              AEC_vr(L,NY,NX)              = AEC_vr(L+1,NY,NX)
               CSoilOrgM_vr(ielmc,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmc,L+1,NY,NX)
               COMLitrC_vr(L,NY,NX)         = 1.0_r8*COMLitrC_vr(L+1,NY,NX)
               CSoilOrgM_vr(ielmn,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmn,L+1,NY,NX)

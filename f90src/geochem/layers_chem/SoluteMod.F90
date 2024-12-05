@@ -1058,13 +1058,13 @@ module SoluteMod
 !
 !     CALCULATE H2PO4 COPRECIPITATES FRPM LITTER PH
 !
-    H_1p_conc=AMAX1(ZERO,10.0_r8**(-(PH(0,NY,NX)-3.0_r8)))
-    OH_1e_conc=AMAX1(ZERO,DPH2O/H_1p_conc)
-    Al_3p_conc=AMAX1(ZERO,SPALO/OH_1e_conc**3._r8)
-    Fe_3p_conc=AMAX1(ZERO,SPFEO/OH_1e_conc**3_r8)
-    CCO20=AMAX1(ZERO,trc_solcl_vr(idg_CO2,0,NY,NX)/catomw)
-    CO3_2e_conc=AMAX1(ZERO,CCO20*DPCO3/H_1p_conc**2._r8)
-    Ca_2p_conc=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_conc))
+    H_1p_conc   = AMAX1(ZERO,10.0_r8**(-(PH(0,NY,NX)-3.0_r8)))
+    OH_1e_conc  = AMAX1(ZERO,DPH2O/H_1p_conc)
+    Al_3p_conc  = AMAX1(ZERO,SPALO/OH_1e_conc**3._r8)
+    Fe_3p_conc  = AMAX1(ZERO,SPFEO/OH_1e_conc**3_r8)
+    CCO20       = AMAX1(ZERO,trc_solcl_vr(idg_CO2,0,NY,NX)/catomw)
+    CO3_2e_conc = AMAX1(ZERO,CCO20*DPCO3/H_1p_conc**2._r8)
+    Ca_2p_conc  = AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_conc))
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !

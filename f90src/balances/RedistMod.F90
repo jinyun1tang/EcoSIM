@@ -289,29 +289,29 @@ module RedistMod
 
  trcO2S=trc_solml_vr(idg_O2,0,NY,NX)
   do idg=idg_beg,idg_NH3-1
-    trc_solml_vr(idg,0,NY,NX)=trc_solml_vr(idg,0,NY,NX)+trcg_surf_disevap_flx(idg,NY,NX) &
-      +trcs_TransptMicP_3D(idg,3,0,NY,NX)+Gas_Disol_Flx_vr(idg,0,NY,NX)-trcg_RMicbTransf_vr(idg,0,NY,NX)
+    trc_solml_vr(idg,0,NY,NX)=trc_solml_vr(idg,0,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg,NY,NX) &
+      +trcs_TransptMicP_3D(idg,3,0,NY,NX)+Gas_Disol_Flx_vr(idg,0,NY,NX)-trcs_RMicbTransf_vr(idg,0,NY,NX)
 
     if(trc_solml_vr(idg,0,NY,NX)<0._r8)then
-      trcg_surf_disevap_flx(idg,NY,NX) = trcg_surf_disevap_flx(idg,NY,NX)-trc_solml_vr(idg,0,NY,NX)
+      trcg_SurfLitr_DisolEvap_flx(idg,NY,NX) = trcg_SurfLitr_DisolEvap_flx(idg,NY,NX)-trc_solml_vr(idg,0,NY,NX)
       trc_solml_vr(idg,0,NY,NX)        = 0._r8
     endif
   enddo
 
-!  write(112,*)I+J/24.,trcO2S,trc_solml_vr(idg_O2,0,NY,NX),trcg_surf_disevap_flx(idg_O2,NY,NX), &
-!      trcs_TransptMicP_3D(idg_O2,3,0,NY,NX),Gas_Disol_Flx_vr(idg_O2,0,NY,NX),-trcg_RMicbTransf_vr(idg_O2,0,NY,NX)
+!  write(112,*)I+J/24.,trcO2S,trc_solml_vr(idg_O2,0,NY,NX),trcg_SurfLitr_DisolEvap_flx(idg_O2,NY,NX), &
+!      trcs_TransptMicP_3D(idg_O2,3,0,NY,NX),Gas_Disol_Flx_vr(idg_O2,0,NY,NX),-trcs_RMicbTransf_vr(idg_O2,0,NY,NX)
 
   trc_solml_vr(idg_N2,0,NY,NX) = trc_solml_vr(idg_N2,0,NY,NX)-Micb_N2Fixation_vr(0,NY,NX)
   trc_solml_vr(idg_N2,0,NY,NX) = fixnegmass(trc_solml_vr(idg_N2,0,NY,NX))
   rval                         = trc_solml_vr(idg_NH3,0,NY,NX)
-  dflx                         = trcg_surf_disevap_flx(idg_NH3,NY,NX)+trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX) &
+  dflx                         = trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)+trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX) &
     +Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)+TR_NH3_soil_vr(0,NY,NX)
   trc_solml_vr(idg_NH3,0,NY,NX)=rval+dflx  
   !negative value correction  
   
   if(trc_solml_vr(idg_NH3,0,NY,NX)<-1.e-7)then
     pval                                   = abs(rval/dflx)
-    trcg_surf_disevap_flx(idg_NH3,NY,NX)   = trcg_surf_disevap_flx(idg_NH3,NY,NX)*pval
+    trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)   = trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)*pval
     trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX) = trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)*pval
     Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)      = Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)*pval
     TR_NH3_soil_vr(0,NY,NX)                = TR_NH3_soil_vr(0,NY,NX)*pval
@@ -334,12 +334,12 @@ module RedistMod
 
 !update aqueous concentrations
   DO NTG=idg_beg,idg_end
-    dval=-Gas_Flx_atmDif2soil_col(NTG,NY,NX)
-    trc_solml_vr(NTG,NU(NY,NX),NY,NX)=trc_solml_vr(NTG,NU(NY,NX),NY,NX)+Gas_Flx_atmDif2soil_col(NTG,NY,NX)
+    dval                              = -trcg_SurfSoil_DisolEvap_flx(NTG,NY,NX)
+    trc_solml_vr(NTG,NU(NY,NX),NY,NX) = trc_solml_vr(NTG,NU(NY,NX),NY,NX)+trcg_SurfSoil_DisolEvap_flx(NTG,NY,NX)
     call fixEXflux(trc_solml_vr(NTG,NU(NY,NX),NY,NX),dval)
-    Gas_Flx_atmDif2soil_col(NTG,NY,NX)=-dval
+    trcg_SurfSoil_DisolEvap_flx(NTG,NY,NX)=-dval
     if(trc_solml_vr(NTG,NU(NY,NX),NY,NX)<0._r8)then
-      write(*,*)'redistntg ',trcs_names(NTG),trc_solml_vr(NTG,NU(NY,NX),NY,NX),Gas_Flx_atmDif2soil_col(NTG,NY,NX)
+      write(*,*)'redistntg ',trcs_names(NTG),trc_solml_vr(NTG,NU(NY,NX),NY,NX),trcg_SurfSoil_DisolEvap_flx(NTG,NY,NX)
     endif
   ENDDO
 
@@ -381,39 +381,47 @@ module RedistMod
 ! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
 ! UCO2G: total soil CO2 flux, [g d-2]
 ! HCO2G: hourly soil CO2 flux, [g d-2 h-1]
-  CI=Gas_Flx_atmDif2soil_col(idg_CO2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_CO2,3,NU(NY,NX),NY,NX) &
-    +TRootGasLossDisturb_pft(idg_CO2,NY,NX) &
+  CI=trcg_SurfSoil_DisolEvap_flx(idg_CO2,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg_CO2,NY,NX)&
+    +Gas_3DAdvDif_Flx_vr(idg_CO2,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_CO2,NY,NX) &
     +(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcVolatile_rain_conc(idg_CO2,NY,NX) &
     +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*trcVolatile_irrig_conc(idg_CO2,NY,NX) &
-    +Gas_Disol_Flx_vr(idg_CO2,0,NY,NX)+trcg_surf_disevap_flx(idg_CO2,NY,NX)
-  CH=Gas_Flx_atmDif2soil_col(idg_CH4,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_CH4,3,NU(NY,NX),NY,NX) &
-    +TRootGasLossDisturb_pft(idg_CH4,NY,NX) &
+    +Gas_Disol_Flx_vr(idg_CO2,0,NY,NX)
+
+  CH=trcg_SurfSoil_DisolEvap_flx(idg_CH4,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg_CH4,NY,NX)&
+    +Gas_3DAdvDif_Flx_vr(idg_CH4,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_CH4,NY,NX) &
     +(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcVolatile_rain_conc(idg_CH4,NY,NX) &
     +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*trcVolatile_irrig_conc(idg_CH4,NY,NX) &
-    +Gas_Disol_Flx_vr(idg_CH4,0,NY,NX)+trcg_surf_disevap_flx(idg_CH4,NY,NX)
+    +Gas_Disol_Flx_vr(idg_CH4,0,NY,NX)
+
   CO                            = -IrrigSubsurf_col(NY,NX)*trcVolatile_irrig_conc(idg_CO2,NY,NX)
   CX                            = -IrrigSubsurf_col(NY,NX)*trcVolatile_irrig_conc(idg_CH4,NY,NX)
   SurfGasFlx_col(idg_CO2,NY,NX) = SurfGasFlx_col(idg_CO2,NY,NX)+CI
   SurfGasFlx_col(idg_CH4,NY,NX) = SurfGasFlx_col(idg_CH4,NY,NX)+CH
   SurfGas_CO2_lnd               = SurfGas_CO2_lnd+CI+CH
   TOMOU_lnds(ielmc)             = TOMOU_lnds(ielmc)+CO+CX
+
+  SurfGasDifflx_col(idg_CO2,NY,NX) = SurfGasDifflx_col(idg_CO2,NY,NX)+CI
+  SurfGasDifflx_col(idg_CH4,NY,NX) = SurfGasDifflx_col(idg_CH4,NY,NX)+CH
+
   !
   !     SURFACE BOUNDARY O2 FLUXES
   !
-  OI=Gas_Flx_atmDif2soil_col(idg_O2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_O2,3,NU(NY,NX),NY,NX) &
-    +TRootGasLossDisturb_pft(idg_O2,NY,NX) &
+  OI=trcg_SurfSoil_DisolEvap_flx(idg_O2,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg_O2,NY,NX)&
+    +Gas_3DAdvDif_Flx_vr(idg_O2,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_O2,NY,NX) &
     +(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcVolatile_rain_conc(idg_O2,NY,NX) &
     +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*trcVolatile_irrig_conc(idg_O2,NY,NX) &
-    +Gas_Disol_Flx_vr(idg_O2,0,NY,NX)+trcg_surf_disevap_flx(idg_O2,NY,NX)
-  SurfGas_O2_lnd               = SurfGas_O2_lnd+OI
-  OO                           = trcg_RMicbTransf_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*trcVolatile_irrig_conc(idg_O2,NY,NX)
-  OXYGOU                       = OXYGOU+OO
-  SurfGasFlx_col(idg_O2,NY,NX) = SurfGasFlx_col(idg_O2,NY,NX)+OI
-  HI                           = Gas_Flx_atmDif2soil_col(idg_H2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_H2,3,NU(NY,NX),NY,NX) &
-    +TRootGasLossDisturb_pft(idg_H2,NY,NX)+Gas_Disol_Flx_vr(idg_H2,0,NY,NX)+trcg_surf_disevap_flx(idg_H2,NY,NX)
-  SurfGas_H2_lnd = SurfGas_H2_lnd+HI
-  HO             = trcg_RMicbTransf_vr(idg_H2,0,NY,NX)
-  H2GOU          = H2GOU+HO
+    +Gas_Disol_Flx_vr(idg_O2,0,NY,NX)
+  SurfGas_O2_lnd                  = SurfGas_O2_lnd+OI
+  OO                              = trcs_RMicbTransf_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*trcVolatile_irrig_conc(idg_O2,NY,NX)
+  OXYGOU                          = OXYGOU+OO
+  SurfGasFlx_col(idg_O2,NY,NX)    = SurfGasFlx_col(idg_O2,NY,NX)+OI
+  SurfGasDifflx_col(idg_O2,NY,NX) = SurfGasDifflx_col(idg_O2,NY,NX)+OI
+  HI                              = trcg_SurfSoil_DisolEvap_flx(idg_H2,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg_H2,NY,NX) &
+    +Gas_3DAdvDif_Flx_vr(idg_H2,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_H2,NY,NX)+Gas_Disol_Flx_vr(idg_H2,0,NY,NX)
+  SurfGas_H2_lnd                  = SurfGas_H2_lnd+HI
+  SurfGasDifflx_col(idg_H2,NY,NX) = HI
+  HO                              = trcs_RMicbTransf_vr(idg_H2,0,NY,NX)
+  H2GOU                           = H2GOU+HO
   !
   !     SURFACE BOUNDARY N2, N2O, NH3, NH4, NO3, AND DON FLUXES
   !
@@ -423,17 +431,18 @@ module RedistMod
       *(NH4_irrig_conc(I,NY,NX)+trcVolatile_irrig_conc(idg_NH3,NY,NX)+NO3_irrig_conc(I,NY,NX)))*14.0
   ZXB=-IrrigSubsurf_col(NY,NX)*(trcVolatile_irrig_conc(idg_N2,NY,NX)+trcVolatile_irrig_conc(idg_N2O,NY,NX))-IrrigSubsurf_col(NY,NX) &
       *(NH4_irrig_conc(I,NY,NX)+trcVolatile_irrig_conc(idg_NH3,NY,NX)+NO3_irrig_conc(I,NY,NX))*14.0
-  TZIN=TZIN+ZSI
-  TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)+ZXB
-  ZGI=(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(trcVolatile_rain_conc(idg_N2,NY,NX)+trcVolatile_rain_conc(idg_N2O,NY,NX)) &
+  TZIN              = TZIN+ZSI
+  TOMOU_lnds(ielmn) = TOMOU_lnds(ielmn)+ZXB
+  ZGI               = (Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
+      *(trcVolatile_rain_conc(idg_N2,NY,NX)+trcVolatile_rain_conc(idg_N2O,NY,NX)) &
       +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(trcVolatile_irrig_conc(idg_N2,NY,NX)+trcVolatile_irrig_conc(idg_N2O,NY,NX)) &
-      +Gas_Flx_atmDif2soil_col(idg_N2,NY,NX)+Gas_Flx_atmDif2soil_col(idg_N2O,NY,NX)+Gas_Flx_atmDif2soil_col(idg_NH3,NY,NX) &
-      +Gas_Flx_atmDif2soil_col(idg_NH3B,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_N2,3,NU(NY,NX),NY,NX) &
+      +trcg_SurfSoil_DisolEvap_flx(idg_N2,NY,NX)+trcg_SurfSoil_DisolEvap_flx(idg_N2O,NY,NX)+trcg_SurfSoil_DisolEvap_flx(idg_NH3,NY,NX) &
+      +trcg_SurfSoil_DisolEvap_flx(idg_NH3B,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_N2,3,NU(NY,NX),NY,NX) &
       +Gas_3DAdvDif_Flx_vr(idg_N2O,3,NU(NY,NX),NY,NX)+Gas_3DAdvDif_Flx_vr(idg_NH3,3,NU(NY,NX),NY,NX) &
       +TRootGasLossDisturb_pft(idg_N2O,NY,NX)+TRootGasLossDisturb_pft(idg_NH3,NY,NX) &
       +Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX)+Gas_Disol_Flx_vr(idg_NH3,0,NY,NX) &
-      +trcg_surf_disevap_flx(idg_N2,NY,NX)+trcg_surf_disevap_flx(idg_N2O,NY,NX) &
-      +trcg_surf_disevap_flx(idg_NH3,NY,NX)
+      +trcg_SurfLitr_DisolEvap_flx(idg_N2,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg_N2O,NY,NX) &
+      +trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)
   SurfGas_N2_lnd=SurfGas_N2_lnd+ZGI
   ZDRAIN(NY,NX)=ZDRAIN(NY,NX)+trcs_TransptMicP_3D(ids_NH4,3,NK(NY,NX),NY,NX) &
       +trcs_TransptMicP_3D(idg_NH3,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NO3,3,NK(NY,NX),NY,NX) &
@@ -441,16 +450,17 @@ module RedistMod
       +trcs_TransptMicP_3D(idg_NH3B,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NO3B,3,NK(NY,NX),NY,NX) &
       +trcs_TransptMicP_3D(ids_NO2B,3,NK(NY,NX),NY,NX)
 
-  ZNGGIN=Gas_Flx_atmDif2soil_col(idg_N2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_N2,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX)
-  ZN2OIN=Gas_Flx_atmDif2soil_col(idg_N2O,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_N2O,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)
-  ZNH3IN=Gas_Flx_atmDif2soil_col(idg_NH3,NY,NX)+Gas_Flx_atmDif2soil_col(idg_NH3B,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_NH3,3,NU(NY,NX),NY,NX) &
+  ZNGGIN = trcg_SurfSoil_DisolEvap_flx(idg_N2,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_N2,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX)
+  ZN2OIN = trcg_SurfSoil_DisolEvap_flx(idg_N2O,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_N2O,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)
+  ZNH3IN = trcg_SurfSoil_DisolEvap_flx(idg_NH3,NY,NX)+trcg_SurfSoil_DisolEvap_flx(idg_NH3B,NY,NX)+Gas_3DAdvDif_Flx_vr(idg_NH3,3,NU(NY,NX),NY,NX) &
     +Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)
 
-  SurfGasFlx_col(idg_N2,NY,NX)  = SurfGasFlx_col(idg_N2,NY,NX)+ZNGGIN
-  SurfGasFlx_col(idg_N2O,NY,NX) = SurfGasFlx_col(idg_N2O,NY,NX)+ZN2OIN
-  SurfGasFlx_col(idg_NH3,NY,NX) = SurfGasFlx_col(idg_NH3,NY,NX)+ZNH3IN
-  SurfGasFlx_col(idg_N2,NY,NX)  = SurfGasFlx_col(idg_N2,NY,NX)+Micb_N2Fixation_vr(0,NY,NX)
-  SurfGasFlx_col(idg_H2,NY,NX)  = SurfGasFlx_col(idg_H2,NY,NX)+HI
+  SurfGasDifflx_col(idg_NH3,NY,NX) = ZNH3IN
+  SurfGasFlx_col(idg_N2,NY,NX)     = SurfGasFlx_col(idg_N2,NY,NX)+ZNGGIN
+  SurfGasFlx_col(idg_N2O,NY,NX)    = SurfGasFlx_col(idg_N2O,NY,NX)+ZN2OIN
+  SurfGasFlx_col(idg_NH3,NY,NX)    = SurfGasFlx_col(idg_NH3,NY,NX)+ZNH3IN
+  SurfGasFlx_col(idg_N2,NY,NX)     = SurfGasFlx_col(idg_N2,NY,NX)+Micb_N2Fixation_vr(0,NY,NX)
+  SurfGasFlx_col(idg_H2,NY,NX)     = SurfGasFlx_col(idg_H2,NY,NX)+HI
   !
   !     SURFACE BOUNDARY PO4 AND DOP FLUXES
   !
@@ -458,10 +468,10 @@ module RedistMod
       *(H2PO4_rain_conc(NY,NX)+HPO4_rain_conc(NY,NX)) &
       +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX)) &
       *(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX)))
-  PXB=-patomw*IrrigSubsurf_col(NY,NX)*(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX))
-  TPIN=TPIN+PI
-  TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)+PXB
-  PDRAIN(NY,NX)=PDRAIN(NY,NX)+trcs_TransptMicP_3D(ids_H2PO4,3,NK(NY,NX),NY,NX) &
+  PXB               = -patomw*IrrigSubsurf_col(NY,NX)*(H2PO4_irrig_conc(I,NY,NX)+HPO4_irrig_conc(I,NY,NX))
+  TPIN              = TPIN+PI
+  TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)+PXB
+  PDRAIN(NY,NX)     = PDRAIN(NY,NX)+trcs_TransptMicP_3D(ids_H2PO4,3,NK(NY,NX),NY,NX) &
       +trcs_TransptMicP_3D(ids_H2PO4B,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_H1PO4,3,NK(NY,NX),NY,NX) &
       +trcs_TransptMicP_3D(ids_H1PO4B,3,NK(NY,NX),NY,NX)
   !
@@ -473,12 +483,12 @@ module RedistMod
       *(2.0*NH4_irrig_conc(I,NY,NX)+trcVolatile_irrig_conc(idg_NH3,NY,NX)+NO3_irrig_conc(I,NY,NX)))
   SGN=(2.0_r8*(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(trcVolatile_rain_conc(idg_N2,NY,NX)+trcVolatile_rain_conc(idg_N2O,NY,NX)) &
       +2.0_r8*(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(trcVolatile_irrig_conc(idg_N2,NY,NX)+trcVolatile_irrig_conc(idg_N2O,NY,NX)) &
-      +2.0_r8*(Gas_Flx_atmDif2soil_col(idg_N2,NY,NX)+Gas_Flx_atmDif2soil_col(idg_N2O,NY,NX))+Gas_Flx_atmDif2soil_col(idg_NH3,NY,NX) &
-      +Gas_Flx_atmDif2soil_col(idg_NH3B,NY,NX)+2.0_r8*(Gas_3DAdvDif_Flx_vr(idg_N2,3,NU(NY,NX),NY,NX) &
+      +2.0_r8*(trcg_SurfSoil_DisolEvap_flx(idg_N2,NY,NX)+trcg_SurfSoil_DisolEvap_flx(idg_N2O,NY,NX))+trcg_SurfSoil_DisolEvap_flx(idg_NH3,NY,NX) &
+      +trcg_SurfSoil_DisolEvap_flx(idg_NH3B,NY,NX)+2.0_r8*(Gas_3DAdvDif_Flx_vr(idg_N2,3,NU(NY,NX),NY,NX) &
       +Gas_3DAdvDif_Flx_vr(idg_N2O,3,NU(NY,NX),NY,NX))+Gas_3DAdvDif_Flx_vr(idg_NH3,3,NU(NY,NX),NY,NX) &
       +2.0_r8*TRootGasLossDisturb_pft(idg_N2O,NY,NX)+TRootGasLossDisturb_pft(idg_NH3,NY,NX) &
       +2.0_r8*(Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX))+Gas_Disol_Flx_vr(idg_NH3,0,NY,NX) &
-      +2.0_r8*(trcg_surf_disevap_flx(idg_N2,NY,NX)+trcg_surf_disevap_flx(idg_N2O,NY,NX))+trcg_surf_disevap_flx(idg_NH3,NY,NX))/natomw
+      +2.0_r8*(trcg_SurfLitr_DisolEvap_flx(idg_N2,NY,NX)+trcg_SurfLitr_DisolEvap_flx(idg_N2O,NY,NX))+trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX))/natomw
   SIP=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_rain_conc(NY,NX)+2.0_r8*HPO4_rain_conc(NY,NX)) &
       +(Irrig2SoilSurf(NY,NX)+Irrig2LitRSurf(NY,NX))*(3.0_r8*H2PO4_irrig_conc(I,NY,NX)+2.0_r8*HPO4_irrig_conc(I,NY,NX)))
   SNB=-IrrigSubsurf_col(NY,NX)*(trcVolatile_irrig_conc(idg_N2,NY,NX)+trcVolatile_irrig_conc(idg_N2O,NY,NX))-IrrigSubsurf_col(NY,NX) &
@@ -501,13 +511,13 @@ module RedistMod
     SIR=0._r8
     SII=0._r8
     do nsalts=idsalt_beg,idsalt_end
-      SIR=SIR+trcsalt_rain_conc(nsalts,NY,NX)*trcSaltIonNumber(nsalts)
-      SII=SII+trcsalt_irrig_conc(idsalt_Al,I,NY,NX)*trcSaltIonNumber(nsalts)
+      SIR = SIR+trcsalt_rain_conc(nsalts,NY,NX)*trcSaltIonNumber(nsalts)
+      SII = SII+trcsalt_irrig_conc(idsalt_Al,I,NY,NX)*trcSaltIonNumber(nsalts)
     ENDDO  
-    SIR=SIR*PrecAtm_col(NY,NX)
-    SBU=-IrrigSubsurf_col(NY,NX)*SII
-    SII=SII*IrrigSurface_col(NY,NX)
-    TIONIN=TIONIN+SIR+SII    
+    SIR    = SIR*PrecAtm_col(NY,NX)
+    SBU    = -IrrigSubsurf_col(NY,NX)*SII
+    SII    = SII*IrrigSurface_col(NY,NX)
+    TIONIN = TIONIN+SIR+SII
     !
     !     SUBSURFACE BOUNDARY SALT FLUXES FROM SUBSURFACE IRRIGATION
     !
@@ -521,23 +531,23 @@ module RedistMod
     enddo
   ENDDO D9680
 
-  ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,0,NY,NX)
-  Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,0,NY,NX)
-  SurfGasFlx_col(idg_N2,NY,NX) = SurfGasFlx_col(idg_N2,NY,NX)+trcg_RMicbTransf_vr(idg_N2,0,NY,NX)
+  ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,0,NY,NX)
+  Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,0,NY,NX)
+  SurfGasFlx_col(idg_N2,NY,NX) = SurfGasFlx_col(idg_N2,NY,NX)+trcs_RMicbTransf_vr(idg_N2,0,NY,NX)
 
   RO2GasXchangePrev_vr(0,NY,NX) = Gas_Disol_Flx_vr(idg_O2,0,NY,NX)
   RCO2GasFlxPrev_vr(0,NY,NX)    = Gas_Disol_Flx_vr(idg_CO2,0,NY,NX)
   RCH4F(0,NY,NX)                = Gas_Disol_Flx_vr(idg_CH4,0,NY,NX)
 
-  !RO2AquaSourcePrev_vr:=soil surface O2 dissolution + aqueous O2 flux micropore
-  RO2AquaSourcePrev_vr(0,NY,NX)=trcg_surf_disevap_flx(idg_O2,NY,NX)+trcs_TransptMicP_3D(idg_O2,3,0,NY,NX) &
+  !RO2AquaSourcePrev_vr:=soil surface O2 dissolution + aqueous O2 flux micropore, >0 into aqueous phase
+  RO2AquaSourcePrev_vr(0,NY,NX)=trcg_SurfLitr_DisolEvap_flx(idg_O2,NY,NX)+trcs_TransptMicP_3D(idg_O2,3,0,NY,NX) &
     -(Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg_O2,NY,NX)+Irrig2LitRSurf(NY,NX)*trcVolatile_irrig_conc(idg_O2,NY,NX))
 
-  RCH4PhysexchPrev_vr(0,NY,NX)=trcg_surf_disevap_flx(idg_CH4,NY,NX)+trcs_TransptMicP_3D(idg_CH4,3,0,NY,NX) &
+  RCH4PhysexchPrev_vr(0,NY,NX)=trcg_SurfLitr_DisolEvap_flx(idg_CH4,NY,NX)+trcs_TransptMicP_3D(idg_CH4,3,0,NY,NX) &
     -(Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg_CH4,NY,NX)+Irrig2LitRSurf(NY,NX)*trcVolatile_irrig_conc(idg_CH4,NY,NX))
     
-  RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX) = RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX)+Gas_Flx_atmDif2soil_col(idg_O2,NY,NX)
-  RCH4PhysexchPrev_vr(NU(NY,NX),NY,NX)   = RCH4PhysexchPrev_vr(NU(NY,NX),NY,NX)+Gas_Flx_atmDif2soil_col(idg_CH4,NY,NX)
+  RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX) = RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX)+trcg_SurfSoil_DisolEvap_flx(idg_O2,NY,NX)
+  RCH4PhysexchPrev_vr(NU(NY,NX),NY,NX)  = RCH4PhysexchPrev_vr(NU(NY,NX),NY,NX)+trcg_SurfSoil_DisolEvap_flx(idg_CH4,NY,NX)
   !
   !     SURFACE LITTER ION EXCHANGE AND PRECIPITATION
   !
@@ -1017,25 +1027,25 @@ module RedistMod
         +trcs_Irrig_vr(idg,L,NY,NX)+trcs_Mac2MicXfer_vr(idg,L,NY,NX)+trcg_ebu_flx_vr(idg,L,NY,NX)
 
        trc_solml_vr(idg,L,NY,NX)=fixnegmass(trc_solml_vr(idg,L,NY,NX))       
-       if(trcg_RMicbTransf_vr(idg,L,NY,NX)<=0._r8)then
+       if(trcs_RMicbTransf_vr(idg,L,NY,NX)<=0._r8)then
          !production
-         trc_solml_vr(idg,L,NY,NX)=trc_solml_vr(idg,L,NY,NX)-trcg_RMicbTransf_vr(idg,L,NY,NX)
+         trc_solml_vr(idg,L,NY,NX)=trc_solml_vr(idg,L,NY,NX)-trcs_RMicbTransf_vr(idg,L,NY,NX)
          call fixEXflux(trc_solml_vr(idg,L,NY,NX),trcs_plant_uptake_vr(idg,L,NY,NX))
        else
-         dval0=trcs_plant_uptake_vr(idg,L,NY,NX) + trcg_RMicbTransf_vr(idg,L,NY,NX)
+         dval0=trcs_plant_uptake_vr(idg,L,NY,NX) + trcs_RMicbTransf_vr(idg,L,NY,NX)
          dval=dval0
          call fixEXflux(trc_solml_vr(idg,L,NY,NX),dval)
          if(dval<dval0)then
            pval=dval/dval0
            trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
-           trcg_RMicbTransf_vr(idg,L,NY,NX)  = trcg_RMicbTransf_vr(idg,L,NY,NX)*pval
+           trcs_RMicbTransf_vr(idg,L,NY,NX)  = trcs_RMicbTransf_vr(idg,L,NY,NX)*pval
          endif
        endif
 
       if(trc_solml_vr(idg,L,NY,NX)<0._r8)then
         print*,idg,'xxx',L,dval,trc_solml_vr(idg,L,NY,NX)
         print*,trcs_TransptMicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX), &
-          -trcg_RMicbTransf_vr(idg,L,NY,NX),-trcs_plant_uptake_vr(idg,L,NY,NX), &
+          -trcs_RMicbTransf_vr(idg,L,NY,NX),-trcs_plant_uptake_vr(idg,L,NY,NX), &
           +trcs_Irrig_vr(idg,L,NY,NX)+trcs_Mac2MicXfer_vr(idg,L,NY,NX) &
           +trcg_ebu_flx_vr(idg,L,NY,NX)
       endif  
@@ -1104,9 +1114,9 @@ module RedistMod
       endif  
     enddo
 
-    Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
-    ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+ trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
-    SurfGasFlx_col(idg_N2,NY,NX) = SurfGasFlx_col(idg_N2,NY,NX)+trcg_RMicbTransf_vr(idg_N2,L,NY,NX)
+    Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)
+    ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+ trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)
+    SurfGasFlx_col(idg_N2,NY,NX) = SurfGasFlx_col(idg_N2,NY,NX)+trcs_RMicbTransf_vr(idg_N2,L,NY,NX)
     !
     !     EXCHANGEABLE CATIONS AND ANIONS FROM EXCHANGE REACTIONS
     !
@@ -1136,7 +1146,7 @@ module RedistMod
     RO2GasXchangePrev_vr(L,NY,NX)  = Gas_AdvDif_Flx_vr(idg_O2,L,NY,NX)
     RCO2GasFlxPrev_vr(L,NY,NX)     = Gas_AdvDif_Flx_vr(idg_CO2,L,NY,NX)
     RCH4F(L,NY,NX)                 = Gas_AdvDif_Flx_vr(idg_CH4,L,NY,NX)
-    RO2AquaSourcePrev_vr(L,NY,NX) = trcs_TransptMicP_vr(idg_O2,L,NY,NX)+trcs_Irrig_vr(idg_O2,L,NY,NX) &
+    RO2AquaSourcePrev_vr(L,NY,NX)  = trcs_TransptMicP_vr(idg_O2,L,NY,NX)+trcs_Irrig_vr(idg_O2,L,NY,NX) &
       +trcs_Mac2MicXfer_vr(idg_O2,L,NY,NX)+trcg_ebu_flx_vr(idg_O2,L,NY,NX)
     RCH4PhysexchPrev_vr(L,NY,NX) = trcs_TransptMicP_vr(idg_CH4,L,NY,NX)+trcs_Irrig_vr(idg_CH4,L,NY,NX) &
       +trcs_Mac2MicXfer_vr(idg_CH4,L,NY,NX)+trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
@@ -1153,7 +1163,9 @@ module RedistMod
     Z2B                        = trcg_air2root_flx_vr(idg_N2O,L,NY,NX)
     ZHB                        = trcg_air2root_flx_vr(idg_NH3,L,NY,NX)
 
-    trcg_pltroot_flx_col(idg_beg:idg_NH3,NY,NX)=trcg_pltroot_flx_col(idg_beg:idg_NH3,NY,NX)+trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
+    DO idg=idg_beg,idg_NH3
+      trcg_pltroot_flx_col(idg,NY,NX)=trcg_pltroot_flx_col(idg,NY,NX)+trcg_air2root_flx_vr(idg,L,NY,NX)
+    ENDDO
 
 !
 !     GRID CELL BOUNDARY FLUXES BUBBLING
@@ -1182,9 +1194,9 @@ module RedistMod
         TGasC_lnd           = TGasC_lnd-trcg_ebu_flx_vr(idg_CO2,L,NY,NX)-trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
         DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)-trcg_ebu_flx_vr(idg_CO2,L,NY,NX)-trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
         TSoilO2G_lnd        = TSoilO2G_lnd-trcg_ebu_flx_vr(idg_O2,L,NY,NX)
+        TSoilH2G_lnd        = TSoilH2G_lnd-trcg_ebu_flx_vr(idg_H2,L,NY,NX)
         TGasN_lnd           = TGasN_lnd-trcg_ebu_flx_vr(idg_N2,L,NY,NX)-trcg_ebu_flx_vr(idg_N2O,L,NY,NX) &
           -trcg_ebu_flx_vr(idg_NH3,L,NY,NX)-trcg_ebu_flx_vr(idg_NH3B,L,NY,NX)
-        TSoilH2G_lnd=TSoilH2G_lnd-trcg_ebu_flx_vr(idg_H2,L,NY,NX)
       ENDIF
     ENDIF
     SurfGas_CO2_lnd   = SurfGas_CO2_lnd+CIB+CHB
@@ -1195,10 +1207,10 @@ module RedistMod
     HydroSubsDICFlx_col(NY,NX) = HydroSubsDICFlx_col(NY,NX)-catomw*Txchem_CO2_vr(L,NY,NX)
     TXCO2(NY,NX)               = TXCO2(NY,NX)+catomw*Txchem_CO2_vr(L,NY,NX)
     SurfGas_O2_lnd             = SurfGas_O2_lnd+OIB   !>0. into soil
-    OOB                        = trcg_RMicbTransf_vr(idg_O2,L,NY,NX)+tRO2MicrbUptk_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
+    OOB                        = trcs_RMicbTransf_vr(idg_O2,L,NY,NX)+tRO2MicrbUptk_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_O2,L,NY,NX)
     OXYGOU                     = OXYGOU+OOB
     SurfGas_H2_lnd             = SurfGas_H2_lnd+HGB
-    HOB                        = trcg_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX)
+    HOB                        = trcs_RMicbTransf_vr(idg_H2,L,NY,NX)+trcs_plant_uptake_vr(idg_H2,L,NY,NX)
     H2GOU                      = H2GOU+HOB
     SurfGas_N2_lnd             = SurfGas_N2_lnd+ZGB+Z2B+ZHB
     
@@ -1209,6 +1221,8 @@ module RedistMod
     SurfGasFlx_col(idg_N2O,NY,NX) = SurfGasFlx_col(idg_N2O,NY,NX)+Z2B
     SurfGasFlx_col(idg_NH3,NY,NX) = SurfGasFlx_col(idg_NH3,NY,NX)+ZHB
     SurfGasFlx_col(idg_H2,NY,NX)  = SurfGasFlx_col(idg_H2,NY,NX)+HGB
+
+!    write(111,*)I+J/24.,SurfGasFlx_col(idg_CO2,NY,NX)-SurfGasDifflx_col(idg_CO2,NY,NX)    
     !
     !     GRID CELL BOUNDARY FLUXES FROM EQUILIBRIUM REACTIONS
 !
@@ -1547,6 +1561,8 @@ module RedistMod
 !------------------------------------------------------------------------------------------
 
   subroutine SumSurfMicBGCFluxes(I,J,NY,NX)
+  !
+  !some up microbial bgc fluxes in the surface litter layer
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX

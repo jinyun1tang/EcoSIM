@@ -186,14 +186,14 @@ module InsideTranspMod
   DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
       DO  K=1,jcplx
-        DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
-        DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
+        DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)= 0.0_r8
 !        do idom=idom_beg,idom_end
 !          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_CumEcoProd_vr(idom,K,L,NY,NX)
 !        enddo
       ENDDO
-      TR3MicPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX)=0.0_r8
-      TR3MacPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
+      TR3MicPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
+      TR3MacPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
 !
 !     ADD SOLUTE SINKS
 !
@@ -311,13 +311,13 @@ module InsideTranspMod
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
           .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
           IF(M.NE.MX)THEN
-            VLWatMicPMA(N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
-            VLWatMicPMB(N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
-            VLWatMicPXA(N6,N5,N4)=natomw*VLWatMicPMA(N6,N5,N4)
-            VLWatMicPXB(N6,N5,N4)=natomw*VLWatMicPMB(N6,N5,N4)
+            VLWatMicPMA_vr(N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
+            VLWatMicPMB_vr(N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
+            VLWatMicPXA(N6,N5,N4)=natomw*VLWatMicPMA_vr(N6,N5,N4)
+            VLWatMicPXB(N6,N5,N4)=natomw*VLWatMicPMB_vr(N6,N5,N4)
 
-            VLsoiAirPMA(N6,N5,N4)=VLsoiAirPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
-            VLsoiAirPMB(N6,N5,N4)=VLsoiAirPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
+            VLsoiAirPMA(N6,N5,N4)=VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
+            VLsoiAirPMB(N6,N5,N4)=VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
             CumReductVLsoiAirPM(N6,N5,N4)=ReductVLsoiAirPM(M,N6,N5,N4)*dt_GasCyc
 !
 !     GASEOUS SOLUBILITIES
@@ -537,9 +537,9 @@ module InsideTranspMod
     ENDDO
 
 
-    IF(VLWatMicPMA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      trcsolc2(idg_NH3) = AZMAX1(trc_solml2_vr(idg_NH3,N6,N5,N4)/VLWatMicPMA(N6,N5,N4))
-      trcsolc2(ids_NH4) = AZMAX1(trc_solml2_vr(ids_NH4,N6,N5,N4)/VLWatMicPMA(N6,N5,N4))
+    IF(VLWatMicPMA_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      trcsolc2(idg_NH3) = AZMAX1(trc_solml2_vr(idg_NH3,N6,N5,N4)/VLWatMicPMA_vr(N6,N5,N4))
+      trcsolc2(ids_NH4) = AZMAX1(trc_solml2_vr(ids_NH4,N6,N5,N4)/VLWatMicPMA_vr(N6,N5,N4))
     ELSE
       trcsolc2(idg_NH3) = 0.0_r8
       trcsolc2(ids_NH4) = 0.0_r8
@@ -558,9 +558,9 @@ module InsideTranspMod
       trcsolc2(ids_H1PO4) = 0.0_r8
       trcsolc2(ids_H2PO4) = 0.0_r8
     ENDIF
-    IF(VLWatMicPMB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      trcsolc2(idg_NH3B) = AZMAX1(trc_solml2_vr(idg_NH3B,N6,N5,N4)/VLWatMicPMB(N6,N5,N4))
-      trcsolc2(ids_NH4B) = AZMAX1(trc_solml2_vr(ids_NH4B,N6,N5,N4)/VLWatMicPMB(N6,N5,N4))
+    IF(VLWatMicPMB_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      trcsolc2(idg_NH3B) = AZMAX1(trc_solml2_vr(idg_NH3B,N6,N5,N4)/VLWatMicPMB_vr(N6,N5,N4))
+      trcsolc2(ids_NH4B) = AZMAX1(trc_solml2_vr(ids_NH4B,N6,N5,N4)/VLWatMicPMB_vr(N6,N5,N4))
     ELSE
       trcsolc2(idg_NH3B) = trcsolc2(idg_NH3)
       trcsolc2(ids_NH4B) = trcsolc2(ids_NH4)
@@ -929,10 +929,10 @@ module InsideTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
-    DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DLYR1 = AMAX1(ZERO2,DLYR(N,N3,N2,N1))
+    DLYR2 = AMAX1(ZERO2,DLYR(N,N6,N5,N4))
+    TORTL = (TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    DISPN = DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DO idom=idom_beg,idom_end
       DIFOM(idom)=(DOMdiffusivity2_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1059,11 +1059,11 @@ module InsideTranspMod
   integer :: K,nsol,idg,idom
 
   do idg=idg_beg,idg_NH3-1
-    trcg_VLWatMicP(idg,N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*GasSolbility_vr(idg,N6,N5,N4)
+    trcg_VLWatMicP_vr(idg,N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*GasSolbility_vr(idg,N6,N5,N4)
   enddo
 
-  trcg_VLWatMicP(idg_NH3,N6,N5,N4)=VLWatMicPMA(N6,N5,N4)*GasSolbility_vr(idg_NH3,N6,N5,N4)
-  trcg_VLWatMicP(idg_NH3B,N6,N5,N4)=VLWatMicPMB(N6,N5,N4)*GasSolbility_vr(idg_NH3,N6,N5,N4)
+  trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4)=VLWatMicPMA_vr(N6,N5,N4)*GasSolbility_vr(idg_NH3,N6,N5,N4)
+  trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4)=VLWatMicPMB_vr(N6,N5,N4)*GasSolbility_vr(idg_NH3,N6,N5,N4)
 !
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
@@ -1412,8 +1412,8 @@ module InsideTranspMod
 !
 ! does not include band NH3
   DO ngas=idg_beg,idg_NH3
-    trc_gasc1(ngas)               = AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1)/VLsoiAirPM(M,N3,N2,N1))
-    trc_gasc2(ngas)               = AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4)/VLsoiAirPM(M,N6,N5,N4))
+    trc_gasc1(ngas)               = AZMAX1(trc_gasml2_vr(ngas,N3,N2,N1)/VLsoiAirPM_vr(M,N3,N2,N1))
+    trc_gasc2(ngas)               = AZMAX1(trc_gasml2_vr(ngas,N6,N5,N4)/VLsoiAirPM_vr(M,N6,N5,N4))
     RGasADFlx_3D(ngas,N,N6,N5,N4) = DifuscG_vr(ngas,N,N6,N5,N4)*(trc_gasc1(ngas)-trc_gasc2(ngas))
   ENDDO
 
@@ -1442,8 +1442,8 @@ module InsideTranspMod
 !
   FLQW=WaterFlow2Soil(N,N6,N5,N4)
   IF(FLQW.GT.0.0_r8)THEN
-    IF(VLsoiAirPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VLsoiAirPM(M,N6,N5,N4)))
+    IF(VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VLsoiAirPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1452,8 +1452,8 @@ module InsideTranspMod
       RGasADFlx_3D(ngas,N,N6,N5,N4) = RGasADFlx_3D(ngas,N,N6,N5,N4)+RGasAdv
     ENDDO
   ELSE
-    IF(VLsoiAirPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=-AZMIN1(AMAX1(-VFLWX,FLQW/VLsoiAirPM(M,N3,N2,N1)))
+    IF(VLsoiAirPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=-AZMIN1(AMAX1(-VFLWX,FLQW/VLsoiAirPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1476,8 +1476,8 @@ module InsideTranspMod
 !     THETPM,VLsoiAirPM=air-filled porosity,volume from watsub.f
 
   IF(THETPM(M,N3,N2,N1).GT.THETX.AND.THETPM(M,N6,N5,N4).GT.THETX &
-    .AND.VLsoiAirPM(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
-    .AND.VLsoiAirPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+    .AND.VLsoiAirPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
+    .AND.VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
 !     TOTAL SOIL GAS FLUX FROM DIFFUSIVE
     call GasDifTransport(M,N,N1,N2,N3,N4,N5,N6)
@@ -1523,30 +1523,30 @@ module InsideTranspMod
   IF(N.EQ.3)THEN
     IF(THETPM(M,N6,N5,N4).GT.THETX)THEN
       do ngas=idg_beg,idg_NH3-1
-        RGasDSFlx_vr(ngas,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-          ,trc_gasml2_vr(ngas,N6,N5,N4))*trcg_VLWatMicP(ngas,N6,N5,N4) &
-          -trc_solml2_vr(ngas,N6,N5,N4)*VLsoiAirPM(M,N6,N5,N4)) &
-          /(trcg_VLWatMicP(ngas,N6,N5,N4)+VLsoiAirPM(M,N6,N5,N4))
+        RGas_Disol_flx_vr(ngas,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)* &
+         (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(ngas,N6,N5,N4))*trcg_VLWatMicP_vr(ngas,N6,N5,N4) &
+          -trc_solml2_vr(ngas,N6,N5,N4)*VLsoiAirPM_vr(M,N6,N5,N4)) &
+          /(trcg_VLWatMicP_vr(ngas,N6,N5,N4)+VLsoiAirPM_vr(M,N6,N5,N4))
       enddo    
 
       IF(VLsoiAirPMA(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-        RGasDSFlx_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-          ,trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP(idg_NH3,N6,N5,N4) &
+        RGas_Disol_flx_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)* &
+         (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
           -trc_solml2_vr(idg_NH3,N6,N5,N4)*VLsoiAirPMA(N6,N5,N4)) &
-          /(trcg_VLWatMicP(idg_NH3,N6,N5,N4)+VLsoiAirPMA(N6,N5,N4))
+          /(trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4)+VLsoiAirPMA(N6,N5,N4))
 
       ELSE
-        RGasDSFlx_vr(idg_NH3,N6,N5,N4)=0.0_r8
+        RGas_Disol_flx_vr(idg_NH3,N6,N5,N4)=0.0_r8
       ENDIF
 
       IF(VLsoiAirPMB(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-        RGasDSFlx_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-          ,trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP(idg_NH3B,N6,N5,N4) &
+        RGas_Disol_flx_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)* &
+          (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
           -trc_solml2_vr(idg_NH3B,N6,N5,N4)*VLsoiAirPMB(N6,N5,N4)) &
-          /(trcg_VLWatMicP(idg_NH3B,N6,N5,N4)+VLsoiAirPMB(N6,N5,N4))
+          /(trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4)+VLsoiAirPMB(N6,N5,N4))
 
       ELSE
-        RGasDSFlx_vr(idg_NH3B,N6,N5,N4)=0.0_r8
+        RGas_Disol_flx_vr(idg_NH3B,N6,N5,N4)=0.0_r8
       ENDIF
 
 !
@@ -1555,10 +1555,10 @@ module InsideTranspMod
 !     X*DFG=hourly water-air gas flux
 !
       DO ngas=idg_beg,idg_end
-        Gas_Disol_Flx_vr(ngas,N6,N5,N4)=Gas_Disol_Flx_vr(ngas,N6,N5,N4)+RGasDSFlx_vr(ngas,N6,N5,N4)
+        Gas_Disol_Flx_vr(ngas,N6,N5,N4)=Gas_Disol_Flx_vr(ngas,N6,N5,N4)+RGas_Disol_flx_vr(ngas,N6,N5,N4)
       ENDDO
     ELSE
-      RGasDSFlx_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
+      RGas_Disol_flx_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
     ENDIF
   ENDIF
   end subroutine VolatilizationDissolution

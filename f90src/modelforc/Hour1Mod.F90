@@ -730,44 +730,45 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  ECO_HR_CO2_col(NY,NX)                   = 0._r8
-  ECO_HR_CH4_col(NY,NX)                   = 0._r8
-  Eco_RadSW_col(NY,NX)                    = 0._r8
-  RootCO2Autor_vr(:,NY,NX)                = 0._r8
-  tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  QRunSurf_col(NY,NX)                     = 0._r8
-  HeatRunSurf_col(NY,NX)                  = 0._r8
-  tHeatUptk_col(NY,NX)                    = 0._r8
-  Qinflx2Soil_col(NY,NX)                  = 0._r8
-  HeatFlx2Grnd_col(NY,NX)                 = 0._r8
-  DIC_mass_col(NY,NX)                     = 0._r8
-  tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  WatMass_col(NY,NX)                      = 0._r8
-  HeatStore_col(NY,NX)                    = 0._r8
-  tLitrOM_col(1:NumPlantChemElms,NY,NX)   = 0._r8
-  tHumOM_col(1:NumPlantChemElms,NY,NX)    = 0._r8
-  tNH4_col(NY,NX)                         = 0._r8
-  tNO3_col(NY,NX)                         = 0._r8
-  tHxPO4_col(NY,NX)                       = 0._r8
-  tXPO4_col(NY,NX)                        = 0._r8
-  UION(NY,NX)                             = 0._r8
-  QDischar_col(NY,NX)                     = 0._r8
-  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)   = 0._r8
-  WatFLo2LitR_col(NY,NX)                      = 0._r8
-  HeatFLo2LitrByWat(NY,NX)                = 0._r8
-  TLitrIceFlxThaw_col(NY,NX)              = 0._r8
-  TLitrIceHeatFlxFrez_col(NY,NX)          = 0._r8
-  HeatByRad2Surf_col(NY,NX)               = 0._r8
-  HeatSensAir2Surf_col(NY,NX)             = 0._r8
-  HeatEvapAir2Surf_col(NY,NX)             = 0._r8
-  HeatSensVapAir2Surf_col(NY,NX)          = 0._r8
-  HeatNet2Surf_col(NY,NX)                 = 0._r8
-  VapXAir2GSurf_col(NY,NX)                = 0._r8
+  ECO_HR_CO2_col(NY,NX)                    = 0._r8
+  ECO_HR_CH4_col(NY,NX)                    = 0._r8
+  Eco_RadSW_col(NY,NX)                     = 0._r8
+  RootCO2Autor_vr(:,NY,NX)                 = 0._r8
+  tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)  = 0._r8
+  QRunSurf_col(NY,NX)                      = 0._r8
+  HeatRunSurf_col(NY,NX)                   = 0._r8
+  tHeatUptk_col(NY,NX)                     = 0._r8
+  Qinflx2Soil_col(NY,NX)                   = 0._r8
+  HeatFlx2Grnd_col(NY,NX)                  = 0._r8
+  DIC_mass_col(NY,NX)                      = 0._r8
+  tMicBiome_col(1:NumPlantChemElms,NY,NX)  = 0._r8
+  tSoilOrgM_col(1:NumPlantChemElms,NY,NX)  = 0._r8
+  WatMass_col(NY,NX)                       = 0._r8
+  HeatStore_col(NY,NX)                     = 0._r8
+  tLitrOM_col(1:NumPlantChemElms,NY,NX)    = 0._r8
+  tHumOM_col(1:NumPlantChemElms,NY,NX)     = 0._r8
+  tNH4_col(NY,NX)                          = 0._r8
+  tNO3_col(NY,NX)                          = 0._r8
+  tHxPO4_col(NY,NX)                        = 0._r8
+  tXPO4_col(NY,NX)                         = 0._r8
+  UION(NY,NX)                              = 0._r8
+  QDischar_col(NY,NX)                      = 0._r8
+  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)    = 0._r8
+  SurfGasDifflx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  WatFLo2LitR_col(NY,NX)                   = 0._r8
+  HeatFLo2LitrByWat(NY,NX)                 = 0._r8
+  TLitrIceFlxThaw_col(NY,NX)               = 0._r8
+  TLitrIceHeatFlxFrez_col(NY,NX)           = 0._r8
+  HeatByRad2Surf_col(NY,NX)                = 0._r8
+  HeatSensAir2Surf_col(NY,NX)              = 0._r8
+  HeatEvapAir2Surf_col(NY,NX)              = 0._r8
+  HeatSensVapAir2Surf_col(NY,NX)           = 0._r8
+  HeatNet2Surf_col(NY,NX)                  = 0._r8
+  VapXAir2GSurf_col(NY,NX)                 = 0._r8
 
   trcs_TransptMacP_3D(:,:,:,:,:) = 0._r8
-  Gas_Flx_atmDif2soil_col(idg_beg:idg_end,NY,NX) = 0._r8
-  trcg_surf_disevap_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
+  trcg_SurfSoil_DisolEvap_flx(idg_beg:idg_end,NY,NX) = 0._r8
+  trcg_SurfLitr_DisolEvap_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
 
   CanWat_col(NY,NX)              = 0._r8
   CanH2OHeldVg_col(NY,NX)        = 0._r8
@@ -1048,7 +1049,7 @@ module Hour1Mod
   real(r8) :: TFACR
   real(r8) :: TFACA
   real(r8) :: TFACW
-  integer :: K,L,NTG
+  integer :: K,L,idg
 !     begin_execution
 !
 !     LITTER GAS CONCENTRATIOS
@@ -1071,8 +1072,8 @@ module Hour1Mod
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
   IF(VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
 ! exclude NH3B,
-    DO NTG=idg_beg,idg_end-1
-      trc_solcl_vr(NTG,0,NY,NX)=AZMAX1(trc_solml_vr(NTG,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
+    DO idg=idg_beg,idg_end-1
+      trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trc_solml_vr(idg,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
     ENDDO
   ELSE
     trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)=0._r8

@@ -155,16 +155,17 @@ contains
   ELSE
     SRP(L,NY,NX)=1.00_r8
   ENDIF
+  
   if(lverb)write(*,*)'SoilHydroProperty::setshape',POROS_vr(L,NY,NX),cold_run()
 ! double check cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
 
   IF((ISOIL(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.cold_run()))THEN
   ! read from check point file or if soil properties are set with soil file    
-    LOGFldCapacity_vr(L,NY,NX)=LOG(FieldCapacity_vr(L,NY,NX))
-    LOGWiltPoint_vr(L,NY,NX)=LOG(WiltPoint_vr(L,NY,NX))
-    PSD(L,NY,NX)=LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-    FCD(L,NY,NX)=LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+    LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
+    LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
+    PSD(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+    FCD(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
   ELSE
     !
     !     DEFAULT SOIL HYDROLOGIC PPTYS (FIELD CAPACITY, WILTING POINT)
@@ -206,8 +207,8 @@ contains
         *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
       SatHydroCondVert_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2
     ELSE
-      SatHydroCondVert_vr(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
-      SatHydroCondVert_vr(L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      SatHydroCondVert_vr(L,NY,NX) = 0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
+      SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -218,8 +219,8 @@ contains
         *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
       SatHydroCondHrzn_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2._r8
     ELSE
-      SatHydroCondHrzn_vr(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
-      SatHydroCondHrzn_vr(L,NY,NX)=SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      SatHydroCondHrzn_vr(L,NY,NX) = 0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
+      SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -232,8 +233,8 @@ contains
   !     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
   SUM2=0.0_r8
   DO  K=1,100
-    XK=K-1
-    H2OSOIatK(K)=POROS_vr(L,NY,NX)-(XK/100.0_r8*POROS_vr(L,NY,NX))
+    XK           = K-1
+    H2OSOIatK(K) = POROS_vr(L,NY,NX)-(XK/100.0_r8*POROS_vr(L,NY,NX))
     IF(H2OSOIatK(K).LT.FieldCapacity_vr(L,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(L,NY,NX)-LOG(H2OSOIatK(K))) &
         /FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
@@ -249,10 +250,10 @@ contains
   ENDDO
 
   DO  K=1,100
-    SUM1=0.0_r8
-    XK=K-1
-    YK=((100.0_r8-XK)/100.0_r8)**1.33_r8
-    DO  M=K,100
+    SUM1 = 0.0_r8
+    XK   = K-1
+    YK   = ((100.0_r8-XK)/100.0_r8)**1.33_r8
+    DO M    = K, 100
       SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2_r8)
     ENDDO
 
@@ -277,16 +278,16 @@ contains
 !     PathLenMacP,MacPNumLayer,MacPRadius=path length between, number,radius of macropores
 !     CNDH=macropore hydraulic conductivity
 !
-  MacPRadius(L,NY,NX)=0.5E-03_r8
-  MacPNumLayer(L,NY,NX)=INT(VLMacP_vr(L,NY,NX)/(PICON*MacPRadius(L,NY,NX)**2._r8*VGeomLayert0_vr(L,NY,NX)))
+  MacPRadius(L,NY,NX)   = 0.5E-03_r8
+  MacPNumLayer(L,NY,NX) = INT(VLMacP_vr(L,NY,NX)/(PICON*MacPRadius(L,NY,NX)**2._r8*VGeomLayert0_vr(L,NY,NX)))
 
   IF(MacPNumLayer(L,NY,NX).GT.0.0_r8)THEN
     PathLenMacP(L,NY,NX)=1.0_r8/(SQRT(PICON*MacPNumLayer(L,NY,NX)))
   ELSE
     PathLenMacP(L,NY,NX)=1.0_r8
   ENDIF
-  VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(L,NY,NX))
-  HydroCondMacP_vr(L,NY,NX)=3.6E+03_r8*PICON*MacPNumLayer(L,NY,NX)*MacPRadius(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
+  VISCWL                    = VISCW*EXP(0.533_r8-0.0267_r8*TCS(L,NY,NX))
+  HydroCondMacP_vr(L,NY,NX) = 3.6E+03_r8*PICON*MacPNumLayer(L,NY,NX)*MacPRadius(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
 !  write(*,*)L,SatHydroCondVert_vr(L,NY,NX),HydroCondMacP_vr(L,NY,NX)
   end subroutine SoilHydroProperty
 
@@ -310,8 +311,8 @@ contains
         FieldCapacity_vr(L,NY,NX)=0.71_r8
       ENDIF
     ENDIF
-    FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
-    FieldCapacity_vr(L,NY,NX)=AMIN1(0.75_r8*POROS_vr(L,NY,NX),FieldCapacity_vr(L,NY,NX))
+    FieldCapacity_vr(L,NY,NX) = FieldCapacity_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
+    FieldCapacity_vr(L,NY,NX) = AMIN1(0.75_r8*POROS_vr(L,NY,NX),FieldCapacity_vr(L,NY,NX))
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       WiltPoint_vr(L,NY,NX)=0.0260_r8+0.50_r8*CCLAY(L,NY,NX)+0.32E-06_r8*CSoilOrgM_vr(ielmc,L,NY,NX)
     ELSE
@@ -323,8 +324,8 @@ contains
         WiltPoint_vr(L,NY,NX)=0.22_r8
       ENDIF
     ENDIF
-    WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
-    WiltPoint_vr(L,NY,NX)=AMIN1(0.75_r8*FieldCapacity_vr(L,NY,NX),WiltPoint_vr(L,NY,NX))
+    WiltPoint_vr(L,NY,NX) = WiltPoint_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
+    WiltPoint_vr(L,NY,NX) = AMIN1(0.75_r8*FieldCapacity_vr(L,NY,NX),WiltPoint_vr(L,NY,NX))
   ENDIF
   LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
   LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
@@ -392,11 +393,10 @@ contains
     SoiBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF
   THETY_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
-
-  SUM2=0.0_r8
+  SUM2             =0.0_r8
   D1220: DO  K=1,n100
-    XK=K-1
-    H2OSOIatK(K)=POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
+    XK           = K-1
+    H2OSOIatK(K) = POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
     IF(H2OSOIatK(K).LT.FieldCapacity_vr(0,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(H2OSOIatK(K))) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
@@ -410,15 +410,15 @@ contains
   ENDDO D1220
 
   D1235: DO  K=1,n100
-    SUM1=0.0_r8
-    XK=K-1
-    YK=((n100-XK)/n100)**1.33_r8
-    D1230: DO M=K,n100
-        SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
+    SUM1  = 0.0_r8
+    XK    = K-1
+    YK    = ((n100-XK)/n100)**1.33_r8
+    D1230: DO M = K, n100
+      SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
     ENDDO D1230
-    HydroCond_3D(3,K,0,NY,NX)=SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
-    HydroCond_3D(1,K,0,NY,NX)=0.0_r8
-    HydroCond_3D(2,K,0,NY,NX)=0.0_r8    
+    HydroCond_3D(3,K,0,NY,NX) = SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
+    HydroCond_3D(1,K,0,NY,NX) = 0.0_r8
+    HydroCond_3D(2,K,0,NY,NX) = 0.0_r8
     IF(K.GT.1.AND.(PSISK(K).LT.PSISoilAirEntry(0,NY,NX)))THEN
       IF(PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
         !moisture at air-entry saturation
@@ -442,6 +442,7 @@ contains
     ELSE
       ISOIL(isoi_fc,L,NY,NX)=isoi_set
     ENDIF
+
     IF(WiltPoint_vr(L,NY,NX).LT.0.0_r8)THEN
       !computing wilting point
       ISOIL(isoi_wp,L,NY,NX) = isoi_unset

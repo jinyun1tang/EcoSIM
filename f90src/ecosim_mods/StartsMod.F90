@@ -505,7 +505,7 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     
   ENDDO D1200
-
+  
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
@@ -916,13 +916,15 @@ module StartsMod
       SoiDepthMidLay_vr(L,NY,NX)   = 0.5_r8*(CumDepz2LayerBot_vr(L,NY,NX)+CumDepz2LayerBot_vr(L-1,NY,NX))
       CumSoilThickness_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
-      VGeomLayer_vr(L,NY,NX)       = AMAX1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
+      VGeomLayer_vr(L,NY,NX)       = AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0_vr(L,NY,NX)     = VGeomLayer_vr(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
       VLSoilMicPMass_vr(L,NY,NX) = SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+!      write(112,*)'bkvl',L,SoiBulkDensity_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX),FracSoiAsMicP_vr(L,NY,NX),&
+!        AREA(3,L,NY,NX),DLYR(3,L,NY,NX)
       totRootLenDens_vr(L,NY,NX) = 0.0_r8
     ENDIF
     AREA(1,L,NY,NX) = DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)

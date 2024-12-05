@@ -889,7 +889,7 @@ implicit none
   DO L=1,NL(NY,NX)
     DO M=1,NPH
       plt_site%VLWatMicPM_vr(M,L)           = VLWatMicPM_vr(M,L,NY,NX)
-      plt_site%VLsoiAirPM(M,L)              = VLsoiAirPM(M,L,NY,NX)
+      plt_site%VLsoiAirPM_vr(M,L)           = VLsoiAirPM_vr(M,L,NY,NX)
       plt_site%TortMicPM_vr(M,L)            = TortMicPM_vr(M,L,NY,NX)
       plt_site%FILM(M,L)                    = FILM(M,L,NY,NX)
       plt_soilchem%DiffusivitySolutEff(M,L) = DiffusivitySolutEff(M,L,NY,NX)

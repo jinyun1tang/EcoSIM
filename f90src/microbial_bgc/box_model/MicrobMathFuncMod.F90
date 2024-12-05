@@ -32,6 +32,8 @@ implicit none
 
 
   pure function TranspBasedsubstrateUptake(S_conc,diffusc, KM, V_max, zeros)result(uptake)
+  !
+  !transport based substrate uptake
   implicit none
   real(r8), intent(in) :: S_conc   !substrate concentration
   real(r8), intent(in) :: diffusc !diffusion coefficient

@@ -96,7 +96,7 @@ implicit none
              dOrGM  = dOrGM-OrGM_beg
              tdOrGM = tdOrGM+dOrGM
           ELSE
-            trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+            trcs_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
             RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
             Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
           ENDIF
@@ -105,7 +105,7 @@ implicit none
           call DownwardMixOM(I,J,L,NY,NX)
 
         ELSE
-          trcg_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+          trcs_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
           RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
           Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
         ENDIF
@@ -263,7 +263,7 @@ implicit none
   micfor%THETPM(1:NPH)              = THETPM(1:NPH,L,NY,NX)
   micfor%VLWatMicPM(1:NPH)          = VLWatMicPM_vr(1:NPH,L,NY,NX)
   micfor%TortMicPM(1:NPH)           = TortMicPM_vr(1:NPH,L,NY,NX)
-  micfor%VLsoiAirPM(1:NPH)          = VLsoiAirPM(1:NPH,L,NY,NX)
+  micfor%VLsoiAirPM(1:NPH)          = VLsoiAirPM_vr(1:NPH,L,NY,NX)
   micfor%VLsoiAirP                  = VLsoiAirP_vr(L,NY,NX)
   micstt%EPOC                       = EPOC(L,NY,NX)
   micstt%EHUM                       = EHUM(L,NY,NX)
@@ -354,22 +354,28 @@ implicit none
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
 
-  RCH4ProdHydrog_vr(L,NY,NX) = naqfdiag%tCH4ProdAceto
-  RCH4ProdAcetcl_vr(L,NY,NX) = naqfdiag%tCH4ProdH2
-  RCH4Oxi_aero_vr(L,NY,NX)   = naqfdiag%tCH4OxiAero
-  RFerment_vr(L,NY,NX)       = naqfdiag%tCResp4H2Prod
-  RNH3oxi_vr(L,NY,NX)        = naqfdiag%tRNH3Oxi
-  RN2ODeniProd_vr(L,NY,NX)   = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
-  RN2OChemoProd_vr(L,NY,NX)  = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
-  RN2ONitProd_vr(L,NY,NX)    = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band
-  RN2ORedux_vr(L,NY,NX)      = naqfdiag%TReduxN2O
+  RCH4ProdHydrog_vr(L,NY,NX)                     = naqfdiag%tCH4ProdAceto
+  RCH4ProdAcetcl_vr(L,NY,NX)                     = naqfdiag%tCH4ProdH2
+  RCH4Oxi_aero_vr(L,NY,NX)                       = naqfdiag%tCH4OxiAero
+  RFerment_vr(L,NY,NX)                           = naqfdiag%tCResp4H2Prod
+  RNH3oxi_vr(L,NY,NX)                            = naqfdiag%tRNH3Oxi
+  RN2ODeniProd_vr(L,NY,NX)                       = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
+  RN2OChemoProd_vr(L,NY,NX)                      = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
+  RN2ONitProd_vr(L,NY,NX)                        = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band
+  RN2ORedux_vr(L,NY,NX)                          = naqfdiag%TReduxN2O
+  OxyDecompLimiter_vr(L,NY,NX)                   = naqfdiag%tRO2UptkHeterG/naqfdiag%tRO2DmndHeterG
+  RO2DecompUptk_vr(L,NY,NX)                      = naqfdiag%tRO2UptkHeterG
+  tRHydlySOM_vr(1:NumPlantChemElms,L,NY,NX)      = micflx%tRHydlySOM
+  tRHydlyBioReSOM_vr(1:NumPlantChemElms,L,NY,NX) = micflx%tRHydlyBioReSOM
+  tRHydlySoprtOM_vr(1:NumPlantChemElms,L,NY,NX)  = micflx%tRHydlySoprtOM
 
-  trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
-  trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
-  trcg_RMicbTransf_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
-  trcg_RMicbTransf_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
-  trcg_RMicbTransf_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
-  trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+  trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
+  trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
+  trcs_RMicbTransf_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
+  trcs_RMicbTransf_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
+  trcs_RMicbTransf_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
+  trcs_RMicbTransf_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+
   RNutMicbTransf_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNutMicbTransf_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
   RNutMicbTransf_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil

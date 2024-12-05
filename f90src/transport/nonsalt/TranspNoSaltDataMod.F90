@@ -54,7 +54,7 @@ implicit none
   real(r8), allocatable ::  GasDifc_vrc(:,:,:,:)
   real(r8), allocatable ::  SoluteDifusvtytscal_vr(:,:,:,:)
   real(r8), allocatable ::  DifuscG_vr(:,:,:,:,:)
-  real(r8), allocatable ::  trcg_VLWatMicP(:,:,:,:)                      !
+  real(r8), allocatable ::  trcg_VLWatMicP_vr(:,:,:,:)                      !
 
   real(r8), allocatable ::  DH2GG(:,:,:,:)                     !
   real(r8), allocatable ::  RHGFXS(:,:,:)                      !
@@ -63,8 +63,8 @@ implicit none
   real(r8), allocatable ::  THETHL(:,:,:)                      !
   real(r8), allocatable ::  VLsoiAirPMA(:,:,:)                      !
   real(r8), allocatable ::  VLsoiAirPMB(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPMA(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPMB(:,:,:)                      !
+  real(r8), allocatable ::  VLWatMicPMA_vr(:,:,:)                      !
+  real(r8), allocatable ::  VLWatMicPMB_vr(:,:,:)                      !
   real(r8), allocatable ::  VLWatMicPXA(:,:,:)                      !
   real(r8), allocatable ::  VLWatMicPXB(:,:,:)                      !
   real(r8), allocatable ::  PARG_cef(:,:,:)                        !
@@ -96,7 +96,7 @@ implicit none
   real(r8), allocatable ::  trcn_2DFloXSurRunoffM(:,:,:,:,:)                    !
                   !
   real(r8), allocatable ::  RGasSSVol(:,:,:)     !soil surface gas volatization
-  real(r8), allocatable ::  RGasDSFlx_vr(:,:,:,:)   !gas dissolution-volatilization
+  real(r8), allocatable ::  RGas_Disol_flx_vr(:,:,:,:)   !gas dissolution (>0 into aqueous phase)
   real(r8), allocatable ::  RGasADFlx_3D(:,:,:,:,:) !3D gas flux advection + diffusion
   real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)  !total 3D gas flux advection + diffusion
 
@@ -149,7 +149,7 @@ contains
   allocate(SoluteDifusvtytscal_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvtytscal_vr=0._r8
   allocate(DifuscG_vr(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG_vr=0._r8
 
-  allocate(trcg_VLWatMicP(idg_beg:idg_end,0:JZ,JY,JX)); trcg_VLWatMicP=0._r8
+  allocate(trcg_VLWatMicP_vr(idg_beg:idg_end,0:JZ,JY,JX)); trcg_VLWatMicP_vr=0._r8
 
   allocate(DH2GG(3,JZ,JY,JX));  DH2GG=0._r8
   allocate(RHGFXS(JZ,JY,JX));   RHGFXS=0._r8
@@ -158,8 +158,8 @@ contains
   allocate(THETHL(JZ,JY,JX));   THETHL=0._r8
   allocate(VLsoiAirPMA(JZ,JY,JX));   VLsoiAirPMA=0._r8
   allocate(VLsoiAirPMB(JZ,JY,JX));   VLsoiAirPMB=0._r8
-  allocate(VLWatMicPMA(JZ,JY,JX));   VLWatMicPMA=0._r8
-  allocate(VLWatMicPMB(JZ,JY,JX));   VLWatMicPMB=0._r8
+  allocate(VLWatMicPMA_vr(JZ,JY,JX));   VLWatMicPMA_vr=0._r8
+  allocate(VLWatMicPMB_vr(JZ,JY,JX));   VLWatMicPMB_vr=0._r8
   allocate(VLWatMicPXA(0:JZ,JY,JX)); VLWatMicPXA=0._r8
   allocate(VLWatMicPXB(JZ,JY,JX));   VLWatMicPXB=0._r8
   allocate(PARG_cef(idg_beg:idg_NH3,JY,JX));      PARG_cef=0._r8
@@ -197,7 +197,7 @@ contains
 
   allocate(DOM_Adv2MicP_flx(idom_beg:idom_end,1:jcplx));DOM_Adv2MicP_flx = 0._r8
 
-  allocate(RGasDSFlx_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGasDSFlx_vr = 0._r8
+  allocate(RGas_Disol_flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGas_Disol_flx_vr = 0._r8
   allocate(RGasSSVol(idg_beg:idg_end,JY,JX)); RGasSSVol            = 0._r8
 
   allocate(trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,2,JV,JH)); trcn_2DSnowDrift = 0._r8
@@ -252,7 +252,7 @@ contains
   call destroy(trcg_SnowDrift)
   call destroy(trcn_SnowDrift)
   call destroy(TR3MicPoreSolFlx_vr)
-  call destroy(trcg_VLWatMicP)
+  call destroy(trcg_VLWatMicP_vr)
   call destroy(trcn_FloXSurRunoff)
   call destroy(DH2GG)
   call destroy(RHGFXS)
@@ -261,8 +261,8 @@ contains
   call destroy(THETHL)
   call destroy(VLsoiAirPMA)
   call destroy(VLsoiAirPMB)
-  call destroy(VLWatMicPMA)
-  call destroy(VLWatMicPMB)
+  call destroy(VLWatMicPMA_vr)
+  call destroy(VLWatMicPMB_vr)
   call destroy(VLWatMicPXA)
   call destroy(VLWatMicPXB)
   call destroy(PARG_cef)
@@ -290,7 +290,7 @@ contains
   call destroy(trcn_band_VFloSnow)
   call destroy(trcn_soil_VFloSnow)
   call destroy(trcg_2DFloXSurRunoffM)
-  call destroy(RGasDSFlx_vr)
+  call destroy(RGas_Disol_flx_vr)
   call destroy(trcn_2DSnowDrift)
   call destroy(RGasSSVol)
   call destroy(R3PoreSoHFlx_3D)

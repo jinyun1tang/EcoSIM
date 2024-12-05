@@ -212,8 +212,8 @@ module BoundaryTranspMod
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    IF((NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    IF((NN.EQ.1 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.2 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/WatFlux4ErosionM_2DH(M,N2,N1)
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
@@ -250,8 +250,8 @@ module BoundaryTranspMod
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    ELSEIF((NN.EQ.2 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.1 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
         dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
@@ -297,8 +297,8 @@ module BoundaryTranspMod
   integer :: K,idg,NTN,ids,idom
   real(r8) :: VFLW
 
-  IF(NN.EQ.1.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR.NN.EQ.2.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+  IF(NN.EQ.1 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR.NN.EQ.2 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
     ELSE
@@ -344,8 +344,8 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-  IF(NN.EQ.1.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
-    .OR.NN.EQ.2.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
+  IF(NN.EQ.1 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR. NN.EQ.2 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
     IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
     ELSE
@@ -431,7 +431,7 @@ module BoundaryTranspMod
 !
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(FlowDirIndicator(M2,M1).NE.3 .OR. N.EQ.3)THEN
-
+        !
         call BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
       ENDIF
     ENDIF
@@ -447,9 +447,10 @@ module BoundaryTranspMod
 !             :*ZN3*=NH3,*H2G*=H2
 !
     FLGM=(WaterFlow2MicPM_3D(M,N,M6,M5,M4)+WaterFlow2MacPM_3D(M,N,M6,M5,M4))*dt_GasCyc
-    IF(NN.EQ.1.AND.FLGM.LT.0.0.OR.NN.EQ.2.AND.FLGM.GT.0.0)THEN
-      IF(VLsoiAirPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-        VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM(M,M3,M2,M1)))
+
+    IF(NN.EQ.1 .AND. FLGM.LT.0.0_r8 .OR. NN.EQ.2 .AND. FLGM.GT.0.0_r8)THEN
+      IF(VLsoiAirPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+        VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM_vr(M,M3,M2,M1)))
       ELSE
         VFLW=0.0_r8
       ENDIF
@@ -459,19 +460,19 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
       DO idg=idg_beg,idg_NH3
-        RGasADFlx_3D(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
-        Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)=Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+RGasADFlx_3D(idg,N,M6,M5,M4)
+        RGasADFlx_3D(idg,N,M6,M5,M4)        = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
+        Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4) = Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+RGasADFlx_3D(idg,N,M6,M5,M4)
       ENDDO
 
     ELSE
       RGasADFlx_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
     ENDIF
   ELSE
-      DO  K=1,jcplx
-        DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
-      enddo
-      R3PoreSoHFlx_3D(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
-      RGasADFlx_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
+    DO  K=1,jcplx
+      DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
+    enddo
+    R3PoreSoHFlx_3D(ids_beg:ids_end,N,M6,M5,M4) = 0.0_r8
+    RGasADFlx_3D(idg_beg:idg_NH3,N,M6,M5,M4)    = 0.0_r8
   ENDIF
   end subroutine BoundaryRunoffandSnow
 !------------------------------------------------------------------------------------------
@@ -685,8 +686,7 @@ module BoundaryTranspMod
 !
   IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
-      Gas_AdvDif_Flx_vr(idg,N3,N2,N1)=Gas_AdvDif_Flx_vr(idg,N3,N2,N1) &
-        +RGasADFlx_3D(idg,N,N3,N2,N1)-RGasADFlx_3D(idg,N,N6,N5,N4)
+      Gas_AdvDif_Flx_vr(idg,N3,N2,N1)=Gas_AdvDif_Flx_vr(idg,N3,N2,N1)+RGasADFlx_3D(idg,N,N3,N2,N1)-RGasADFlx_3D(idg,N,N6,N5,N4)
     ENDDO
   ELSE
     Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,N3,N2,N1)=0._r8

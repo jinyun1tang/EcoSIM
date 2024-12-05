@@ -47,6 +47,9 @@ implicit none
   real(r8) :: RNiDemand
   real(r8) :: RPiDemand
   real(r8) :: TRDOE2DIE(1:NumPlantChemElms)              !cumulative conversion of organic element to inorganic element  
+  real(r8) :: tRHydlySOM(1:NumPlantChemElms)
+  real(r8) :: tRHydlyBioReSOM(1:NumPlantChemElms)
+  real(r8) :: tRHydlySoprtOM(1:NumPlantChemElms)
   real(r8), allocatable :: REcoDOMProd(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
   real(r8), allocatable :: RNH3OxidAutor(:)
