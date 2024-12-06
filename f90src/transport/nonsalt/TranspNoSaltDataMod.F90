@@ -13,7 +13,6 @@ implicit none
   real(r8), allocatable :: trcn_band_VFloSnow(:)
   real(r8), allocatable :: trcn_soil_VFloSnow(:)
   real(r8), allocatable :: DOM_Adv2MacP_flx(:,:)
-  real(r8), allocatable :: RXR_gas(:)
   real(r8), allocatable :: CDOM_MacP1(:,:)
   real(r8), allocatable :: CDOM_MacP2(:,:)
   
@@ -112,7 +111,6 @@ contains
   integer :: NumOfLitrCmplxs
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
 
-  allocate(RXR_gas(idg_beg:idg_end-1)); RXR_gas=0._r8
   allocate(CDOM_MacP1(idom_beg:idom_end,1:jcplx));CDOM_MacP1=0._r8
   allocate(CDOM_MacP2(idom_beg:idom_end,1:jcplx));CDOM_MacP2=0._r8
 
@@ -266,8 +264,6 @@ contains
   call destroy(VLWatMicPXA)
   call destroy(VLWatMicPXB)
   call destroy(PARG_cef)
-  call destroy(RXR_gas)
-
   call destroy(DOMdiffusivity2_vr)
   call destroy(RGasADFlx_3D)
   call destroy(trcg_solsml2_snvr)

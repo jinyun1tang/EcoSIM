@@ -87,12 +87,12 @@ implicit none
 
   real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)               !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
-  real(r8),target,allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
-  real(r8),target,allocatable ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  OXYE_col(:,:)                          !atmospheric O2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  Z2OE_col(:,:)                          !atmospheric N2O concentration, [umol mol-1]
+  real(r8),target,allocatable ::  Z2GE_col(:,:)                          !atmospheric N2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  ZNH3E_col(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  H2GE_col(:,:)                          !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
 
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
@@ -221,12 +221,12 @@ implicit none
   allocate(AtmGasCgperm3(idg_beg:idg_end,JY,JX)); AtmGasCgperm3=0._r8
   allocate(AtmGmms(idg_beg:idg_end,JY,JX)); AtmGmms=0._r8
 
-  allocate(OXYE(JY,JX));        OXYE=0._r8
-  allocate(Z2OE(JY,JX));        Z2OE=0._r8
-  allocate(Z2GE(JY,JX));        Z2GE=0._r8
+  allocate(OXYE_col(JY,JX));        OXYE_col=0._r8
+  allocate(Z2OE_col(JY,JX));        Z2OE_col=0._r8
+  allocate(Z2GE_col(JY,JX));        Z2GE_col=0._r8
   allocate(ZNH3E_col(JY,JX));       ZNH3E_col=0._r8
   allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
-  allocate(H2GE(JY,JX));        H2GE=0._r8
+  allocate(H2GE_col(JY,JX));        H2GE_col=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
 
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
@@ -349,12 +349,12 @@ implicit none
   call destroy(AtmGmms)
   call destroy(TKS_ref_vr)
   call destroy(Eco_RadSW_col)
-  call destroy(OXYE)
-  call destroy(Z2OE)
-  call destroy(Z2GE)
+  call destroy(OXYE_col)
+  call destroy(Z2OE_col)
+  call destroy(Z2GE_col)
   call destroy(ZNH3E_col)
   call destroy(CH4E_col)
-  call destroy(H2GE)
+  call destroy(H2GE_col)
 
   call destroy(SolarNoonHour_col)
   call destroy(CO2E_col)

@@ -280,11 +280,11 @@ module readiMod
       ALTI(NY,NX)               = ALTIG
       ATCAI(NY,NX)              = ATCAG
       IDWaterTable(NY,NX)       = iWaterTabelMode
-      OXYE(NY,NX)               = ao2_ppm
-      Z2GE(NY,NX)               = an2_ppm
+      OXYE_col(NY,NX)               = ao2_ppm
+      Z2GE_col(NY,NX)               = an2_ppm
       CO2EI(NY,NX)              = aco2_ppm
       CH4E_col(NY,NX)           = ach4_ppm
-      Z2OE(NY,NX)               = an2o_ppm
+      Z2OE_col(NY,NX)               = an2o_ppm
       ZNH3E_col(NY,NX)          = ZNH3EG
       KoppenClimZone_col(NY,NX) = IETYPG
       FlowDirIndicator(NY,NX)   = grid_mode
@@ -310,7 +310,7 @@ module readiMod
       DH(NY,NX)                   = DHI(NX)
       DV(NY,NX)                   = DVI(NY)
       CO2E_col(NY,NX)             = CO2EI(NY,NX)
-      H2GE(NY,NX)                 = 1.0E-03_r8
+      H2GE_col(NY,NX)                 = 1.0E-03_r8
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !

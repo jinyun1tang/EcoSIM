@@ -3106,9 +3106,11 @@ module MicBGCMod
   real(r8) :: COXYS1,DIFOX
   real(r8) :: B,C,O2AquaDiffusvity1
   real(r8) :: OXYG1,OXYS1
-  real(r8) :: RUPMX,ROXYFX
+  real(r8) :: RUPMX
+  real(r8) :: ROXYFX !dissolution flux
   real(r8) :: ROXYLX
-  real(r8) :: RRADO,RMPOX,ROXDFQ
+  real(r8) :: RRADO,RMPOX
+  real(r8) :: ROXDFQ  !gas dissolution 
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
   real(r8) :: X
@@ -3222,6 +3224,7 @@ module MicBGCMod
   
           !apply the uptake
           OXYS1=OXYS1-RMPOX
+
           !apply dissolution-volatilization
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM

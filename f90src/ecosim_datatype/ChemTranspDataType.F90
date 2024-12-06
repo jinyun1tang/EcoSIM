@@ -26,11 +26,9 @@ module ChemTranspDataType
 
   real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                !solubility of gases
 
-  real(r8),target,allocatable ::  RCO2GasFlxPrev_vr(:,:,:)                       !net gaseous CO2 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RGasFlxPrev_vr(:,:,:,:)                          !net gaseous flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4PhysexchPrev_vr(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  RO2GasXchangePrev_vr(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  RO2AquaSourcePrev_vr(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RO2AquaSourcePrev_vr(:,:,:)                      !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AquaIonDifusivty_vr(:,:,:,:)
   real(r8),target,allocatable ::  trc_salt_rof_bounds(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_FloXSurRunoff_2D(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
@@ -72,12 +70,11 @@ module ChemTranspDataType
   allocate(GasSolbility_vr(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility_vr=0._r8
 
   allocate(Gas_Disol_Flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); Gas_Disol_Flx_vr=0._r8
-
-  allocate(RCO2GasFlxPrev_vr(0:JZ,JY,JX));  RCO2GasFlxPrev_vr=0._r8
+  
   allocate(RCH4PhysexchPrev_vr(0:JZ,JY,JX));  RCH4PhysexchPrev_vr=0._r8
-  allocate(RO2GasXchangePrev_vr(0:JZ,JY,JX));  RO2GasXchangePrev_vr=0._r8
+  allocate(RGasFlxPrev_vr(idg_beg:idg_end,0:JZ,JY,JX));  RGasFlxPrev_vr=0._r8
   allocate(RO2AquaSourcePrev_vr(0:JZ,JY,JX));  RO2AquaSourcePrev_vr=0._r8
-  allocate(RCH4F(0:JZ,JY,JX));  RCH4F=0._r8
+
   if(lsalt_model)then
     allocate(AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,JZ,JY,JX));AquaIonDifusivty_vr=0._r8
   endif
@@ -115,11 +112,9 @@ module ChemTranspDataType
   call destroy(trcg_FloXSurRunoff_2D)
   call destroy(GasSolbility_vr)
   call destroy(AquaIonDifusivty_vr)
-  call destroy(RCO2GasFlxPrev_vr)
+  call destroy(RGasFlxPrev_vr)
   call destroy(RCH4PhysexchPrev_vr)
-  call destroy(RO2GasXchangePrev_vr)
   call destroy(RO2AquaSourcePrev_vr)
-  call destroy(RCH4F)
   call destroy(dom_2DFloXSurRunoff)
   end subroutine DestructChemTranspData
 end module ChemTranspDataType

@@ -57,11 +57,11 @@ implicit none
     !TairKClimMean(NY,NX)=a_ATKA(NY)
     !CO2E_col(NY,NX)=atm_co2
     !CH4E_col(NY,NX)=atm_ch4
-    !OXYE(NY,NX)=atm_o2
-    !Z2GE(NY,NX)=atm_n2
-    !Z2OE(NY,NX)=atm_n2o
+    !OXYE_col(NY,NX)=atm_o2
+    !Z2GE_col(NY,NX)=atm_n2
+    !Z2OE_col(NY,NX)=atm_n2o
     !ZNH3E_col(NY,NX)=atm_nh3
-    !H2GE(NY,NX)=atm_H2
+    !H2GE_col(NY,NX)=atm_H2
     TairK_col(NY,NX)=tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8

@@ -128,11 +128,11 @@ module Hour1Mod
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
       AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
       AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*tmp
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*tmp
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*tmp
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
       AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE(NY,NX)*8.92E-05_r8*tmp
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
 
       IF(J.EQ.1)THEN
         NumActivePlants(NY,NX)=0
@@ -329,11 +329,11 @@ module Hour1Mod
 
       AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
       AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
-      AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
-      AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
+      AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
+      AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
+      AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
       AtmGasCgperm3(idg_NH3,NY,NX)  = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
-      AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3
+      AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3
       AtmGasCgperm3(idg_NH3B,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
 
       trcVolatile_rain_conc(idg_CO2,NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA_col(NY,NX)) &
@@ -1062,11 +1062,11 @@ module Hour1Mod
 !
   trc_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_O2,0,NY,NX)  = OXYE(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_N2,0,NY,NX)  = Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_N2O,0,NY,NX) = Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_O2,0,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_N2,0,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
   trc_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trc_gascl_vr(idg_H2,0,NY,NX)  = H2GE(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
+  trc_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
 
 ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8

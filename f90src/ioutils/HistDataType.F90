@@ -168,6 +168,7 @@ implicit none
   real(r8),pointer   :: h1D_sN2O_FLX_col(:)        !SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sN2G_FLX_col(:)        !SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sNH3_FLX_col(:)        !SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_sH2_Flx_col(:)
   real(r8),pointer   :: h1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
   real(r8),pointer   :: h1D_PAR_CAN_ptc(:)        !PAR absorbed by Canopy, umol /m2/s
   real(r8),pointer   :: h1D_PAR_col(:)            !incoming PAR, umol/s
@@ -578,6 +579,7 @@ implicit none
   allocate(this%h1D_sN2O_FLX_col(beg_col:end_col))        ;this%h1D_sN2O_FLX_col(:)=spval
   allocate(this%h1D_sN2G_FLX_col(beg_col:end_col))        ;this%h1D_sN2G_FLX_col(:)=spval
   allocate(this%h1D_sNH3_FLX_col(beg_col:end_col))        ;this%h1D_sNH3_FLX_col(:)=spval
+  allocate(this%h1D_sH2_Flx_col(beg_col:end_col))         ;this%h1D_sH2_Flx_col(:)=spval
   allocate(this%h1D_VHeatCap_litr_col(beg_col:end_col))   ;this%h1D_VHeatCap_litr_col(:)=spval
   allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col))      ;this%h1D_RUNOFF_FLX_col(:)=spval
   allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))    ;this%h1D_SEDIMENT_FLX_col(:)=spval
@@ -1250,7 +1252,7 @@ implicit none
     long_name='ecosystem net CO2 exchange (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_FLX_col(beg_col:end_col)     
-  call hist_addfld1d(fname='CH4_FLX',units='umol C/m2/s',avgflag='A',&
+  call hist_addfld1d(fname='SOIL_CH4_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_EBU_flx_col(beg_col:end_col)     
@@ -1278,7 +1280,7 @@ implicit none
     long_name='soil CH4 flux through advection+diffusion (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='O2_FLX',units='umol O2/m2/s',avgflag='A',&
+  call hist_addfld1d(fname='SOIL_O2_FLX',units='umol O2/m2/s',avgflag='A',&
     long_name='soil O2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_LITR_col(beg_col:end_col)      
@@ -1331,12 +1333,16 @@ implicit none
     ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_sN2G_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='sN2G_FLX',units='g/m2/hr',&
+  call hist_addfld1d(fname='SOIL_N2_FLX',units='g/m2/hr',&
     avgflag='A',long_name='soil N2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_sNH3_FLX_col(beg_col:end_col)       
-  call hist_addfld1d(fname='sNH3_FLX',units='gN/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='SOIL_NH3_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='soil NH3 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_sH2_Flx_col(beg_col:end_col)       
+  call hist_addfld1d(fname='SOIL_H2_FLX',units='gN/m2/hr',avgflag='A',&
+    long_name='soil H2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)  
 
   data1d_ptr => this%h1D_VHeatCap_litr_col(beg_col:end_col)
   call hist_addfld1d(fname='vHeatCap_litr',units='MJ/m3/K',avgflag='A',&
@@ -2512,6 +2518,7 @@ implicit none
       this%h1D_sN2O_FLX_col(ncol)         = SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sN2G_FLX_col(ncol)         = SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sNH3_FLX_col(ncol)         = SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_sH2_Flx_col(ncol)          = SurfGasFlx_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PAR_col(ncol)              = RadPARSolarBeam_col(NY,NX)
       this%h1D_VHeatCap_litr_col(ncol)    = VHeatCapacity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 

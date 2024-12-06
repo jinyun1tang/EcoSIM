@@ -6649,38 +6649,22 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2GasXchangePrev_vr', dim1name='column',dim2name='levsoi1',&
-       long_name='net gaseous O2 flux', units='g d-2 h-1', &
-       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ+1)    
+    call restartvar(ncid, flag, varname='RGasFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
+       dim3name='levsoi1',long_name='net gaseous flux', units='g d-2 h-1', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RO2GasXchangePrev_vr,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RGasFlxPrev_vr,datrc_3d)     
   else
     !print*,'RO2GasXchangePrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2GasXchangePrev_vr,datrc_2d)       
-    datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RO2GasXchangePrev_vr', dim1name='column',dim2name='levsoi1',&
-       long_name='net gaseous O2 flux', units='g d-2 h-1', &
-       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RGasFlxPrev_vr,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ+1)        
+    call restartvar(ncid, flag, varname='RGasFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
+       dim3name='levsoi1',long_name='net gaseous flux', units='g d-2 h-1', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
   endif  
 
-  if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RCO2GasFlxPrev_vr', dim1name='column',dim2name='levsoi1',&
-       long_name='net gaseous CO2 flux', units='g d-2 h-1', &
-       interpinic_flag='skip', data=datpr2, missing_value=spval, &
-       fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)     
-  else
-    !print*,'RCO2GasFlxPrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCO2GasFlxPrev_vr,datrc_2d)       
-    datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RCO2GasFlxPrev_vr', dim1name='column',dim2name='levsoi1',&
-       long_name='net gaseous CO2 flux', units='g d-2 h-1', &
-       interpinic_flag='skip', data=datpr2, missing_value=spval, &
-       fill_value=spval)  
-  endif  
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
@@ -6695,23 +6679,6 @@ implicit none
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
     call restartvar(ncid, flag, varname='RO2AquaSourcePrev_vr', dim1name='column',dim2name='levsoi1',&
        long_name='net aqueous O2 flux', units='g d-2 h-1', &
-       interpinic_flag='skip', data=datpr2, missing_value=spval, &
-       fill_value=spval)  
-  endif  
-
-  if(flag=='read')then
-    datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RCH4F', dim1name='column',dim2name='levsoi1',&
-       long_name='net gaseous CH4 flux', units='g d-2 h-1', &
-       interpinic_flag='skip', data=datpr2, missing_value=spval, &
-       fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RCH4F,datrc_2d)       
-  else
-    !print*,'RCH4F'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCH4F,datrc_2d)         
-    datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RCH4F', dim1name='column',dim2name='levsoi1',&
-       long_name='net gaseous CH4 flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
   endif  

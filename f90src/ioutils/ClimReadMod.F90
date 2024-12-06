@@ -948,7 +948,7 @@ implicit none
       CO2EI(NY,NX)=atm_co2_mon(1)
       CO2E_col(NY,NX) =CO2EI(NY,NX)
       CH4E_col(NY,NX) =atm_ch4_mon(1)*1.e-3_r8  !ppb to ppm
-      Z2OE(NY,NX) =atm_n2o_mon(1)*1.e-3_r8  !ppb to ppm
+      Z2OE_col(NY,NX) =atm_n2o_mon(1)*1.e-3_r8  !ppb to ppm
     ENDDO
   ENDDO
   end subroutine GetAtmGts

@@ -55,7 +55,7 @@ module InsideTranspMod
   real(r8) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
   real(r8) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8) :: RDifus_gas_flx(idg_beg:idg_end)
-
+  real(r8) :: RGas_Disol(idg_beg:idg_end-1)
   RDifus_gas_flx(idg_beg:idg_end)=0._r8
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -78,7 +78,7 @@ module InsideTranspMod
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
         call SoluteFluxSurface(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
-          WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RDifus_gas_flx)
+          WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RDifus_gas_flx,RGas_Disol)
 !
       ENDIF
 !
@@ -87,7 +87,7 @@ module InsideTranspMod
 !     EQUIVALEnsolutes DEPENDING ON SOLUBILITY FROM 'HOUR1'
 !     AND TRANSFER COEFFICIENT 'DiffusivitySolutEff' FROM 'WATSUB'
 !
-      call LitterGasVolatilDissol(I,J,M,NY,NX)
+      call LitterGasVolatilDissol(I,J,M,NY,NX,RGas_Disol)
 !
 !     SURFACE GAS EXCHANGE FROM GAS DIFFUSIVITY THROUGH
 !     SOIL SURFACE LAYER AND THROUGH ATMOSPHERE BOUNDARY
@@ -1497,11 +1497,14 @@ module InsideTranspMod
     RGasADFlx_3D(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
   ENDIF
 
-  call VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)
+  call VolatileDissolution(M,N,N1,N2,N3,N4,N5,N6)
   end subroutine GaseousTransport
 
 ! ----------------------------------------------------------------------
-  subroutine VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)
+  subroutine VolatileDissolution(M,N,N1,N2,N3,N4,N5,N6)
+  !
+  !Description
+  !
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
@@ -1561,7 +1564,7 @@ module InsideTranspMod
       RGas_Disol_flx_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
     ENDIF
   ENDIF
-  end subroutine VolatilizationDissolution
+  end subroutine VolatileDissolution
 
 ! ----------------------------------------------------------------------
   subroutine ZeroTransport1(N,N1,N2,N3,N4,N5,N6)
