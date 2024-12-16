@@ -18,12 +18,12 @@ add_ecosim_executable(etimerTest.x etimerTest.F90)
 add_ecosim_executable(NamelistTest.x NamelistTest.F90)
 add_ecosim_executable(HFileTest.x HFileTest.F90)
 add_ecosim_executable(restartTest.x restartTest.F90)
-add_ecosim_executable(EcoATSTest.x EcoATSTest.F90)
+#add_ecosim_executable(EcoATSTest.x EcoATSTest.F90)
 add_ecosim_executable(SoilWarmReadTest.x SoilWarmReadTest.F90)
 
-target_include_directories(EcoATSTest.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
-  )
+#target_include_directories(EcoATSTest.x PRIVATE
+#  ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
+#  )
 
 target_include_directories(ClimTransformer.x PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/utils/
@@ -99,7 +99,7 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS NamelistTest.x DESTINATION bin)
   install(TARGETS HFileTest.x DESTINATION bin)
   install(TARGETS restartTest.x DESTINATION bin)
-  install(TARGETS EcoATSTest.x DESTINATION bin)
+  #install(TARGETS EcoATSTest.x DESTINATION bin)
   install(TARGETS SoilWarmReadTest.x DESTINATION bin)
 
   file(GLOB HEADERS *.mod)

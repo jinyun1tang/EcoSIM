@@ -257,7 +257,7 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = sizes%num_columns
 
-  vec_size = size(surf_e_source)
+  !vec_size = size(surf_e_source)
   call RunEcoSIMSurfaceBalance(num_cols)
 
   end subroutine SurfaceEBalance
