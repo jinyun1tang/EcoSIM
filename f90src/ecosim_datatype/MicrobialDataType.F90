@@ -1,8 +1,9 @@
 module MicrobialDataType
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcoSIMConfig, only : jcplx => jcplxc,nlbiomcp=>NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx=> NumMicbFunGrupsPerCmplx
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use EcoSIMConfig,  only: jcplx => jcplxc, nlbiomcp=>NumLiveMicrbCompts, NumMicbFunGrupsPerCmplx=> NumMicbFunGrupsPerCmplx
+  use ElmIDMod,      only: NumPlantChemElms
+  use abortutils,    only: destroy
   use GridConsts
-  use ElmIDMod, only : NumPlantChemElms
 implicit none
   public
   save
@@ -31,7 +32,7 @@ implicit none
   real(r8),target,allocatable :: RH1PO4DmndBandHeter_vr(:,:,:,:,:)    !substrate-unlimited HPO4 mineraln-immobiln
   real(r8),target,allocatable :: RH1PO4DmndLitrHeter_col(:,:,:,:)     !substrate-unlimited HPO4 immobilization
   real(r8),target,allocatable :: OMEERhetr(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
-
+!  real(r8),target,allocatable :: ROQC4HeterMicActCmpK_vr(:,:,:,:)     !microbial activity as measured by respiration
   real(r8),target,allocatable :: mBiomeAutor_vr(:,:,:,:,:)
   real(r8),target,allocatable :: RO2DmndAutort_vr(:,:,:,:)
   real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)
@@ -90,7 +91,7 @@ implicit none
   allocate(RH1PO4DmndBandHeter_vr(NumHetetrMicCmplx,1:jcplx,0:JZ,JY,JX));RH1PO4DmndBandHeter_vr=0._r8
   allocate(RH1PO4DmndLitrHeter_col(NumHetetrMicCmplx,1:jcplx,JY,JX));RH1PO4DmndLitrHeter_col=0._r8
   allocate(OMEERhetr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH));OMEERhetr=0._r8
-
+!  allocate(ROQC4HeterMicActCmpK_vr(1:jcplx,0:JZ,JY,JX); ROQC4HeterMicActCmpK_vr=0._r8
   allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX));mBiomeAutor_vr=0._r8
   allocate(RO2DmndAutort_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RO2DmndAutort_vr=0._r8
   allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNH4UptkSoilAutor_vr=0._r8
@@ -117,49 +118,49 @@ implicit none
   subroutine DestructMicrobialData
   implicit none
 
-  if(allocated(mBiomeHeter_vr))deallocate(mBiomeHeter_vr)
-  if(allocated(RO2DmndHetert))deallocate(RO2DmndHetert)
-  if(allocated(RDOCUptkHeter_vr))deallocate(RDOCUptkHeter_vr)
-  if(allocated(RAcetateUptkHeter_vr))deallocate(RAcetateUptkHeter_vr)
-  if(allocated(RNH4DmndSoilHeter_vr))deallocate(RNH4DmndSoilHeter_vr)
-  if(allocated(RNO3DmndSoilHeter_vr))deallocate(RNO3DmndSoilHeter_vr)
-  if(allocated(RH2PO4DmndSoilHeter_vr))deallocate(RH2PO4DmndSoilHeter_vr)
-  if(allocated(RNH4DmndLitrHeter_col))deallocate(RNH4DmndLitrHeter_col)
-  if(allocated(RH2PO4DmndLitrHeter_col))deallocate(RH2PO4DmndLitrHeter_col)
-  if(allocated(RNO3DmndLitrHeter_col))deallocate(RNO3DmndLitrHeter_col)
-  if(allocated(RNO3ReduxDmndSoilHeter_vr))deallocate(RNO3ReduxDmndSoilHeter_vr)
-  if(allocated(RNO2DmndReduxSoilHeter_vr))deallocate(RNO2DmndReduxSoilHeter_vr)
-  if(allocated(RNO3ReduxDmndBandHeter_vr))deallocate(RNO3ReduxDmndBandHeter_vr)
-  if(allocated(RNO2DmndReduxBandHeter_vr))deallocate(RNO2DmndReduxBandHeter_vr)
-  if(allocated(RN2ODmndReduxHeter_vr))deallocate(RN2ODmndReduxHeter_vr)
-  if(allocated(RNH4DmndBandHeter_vr))deallocate(RNH4DmndBandHeter_vr)
-  if(allocated(RNO3DmndBandHeter_vr))deallocate(RNO3DmndBandHeter_vr)
-  if(allocated(RH2PO4DmndBandHeter_vr))deallocate(RH2PO4DmndBandHeter_vr)
-  if(allocated(RH1PO4DmndSoilHeter_vr))deallocate(RH1PO4DmndSoilHeter_vr)
-  if(allocated(RH1PO4DmndBandHeter_vr))deallocate(RH1PO4DmndBandHeter_vr)
-  if(allocated(RH1PO4DmndLitrHeter_col))deallocate(RH1PO4DmndLitrHeter_col)
-  if(allocated(OMEERhetr))deallocate(OMEERhetr)
-
-  if(allocated(mBiomeAutor_vr))deallocate(mBiomeAutor_vr)
-  if(allocated(RO2DmndAutort_vr))deallocate(RO2DmndAutort_vr)
-  if(allocated(RNH4UptkSoilAutor_vr))deallocate(RNH4UptkSoilAutor_vr)
-  if(allocated(RNO3UptkSoilAutor_vr))deallocate(RNO3UptkSoilAutor_vr)
-  if(allocated(RH2PO4UptkSoilAutor_vr))deallocate(RH2PO4UptkSoilAutor_vr)
-  if(allocated(RNH4UptkLitrAutor_col))deallocate(RNH4UptkLitrAutor_col)
-  if(allocated(RH2PO4UptkLitrAutor_col))deallocate(RH2PO4UptkLitrAutor_col)
-  if(allocated(RNO3UptkLitrAutor_col))deallocate(RNO3UptkLitrAutor_col)
-  if(allocated(RNH3OxidAutor))deallocate(RNH3OxidAutor)
-  if(allocated(RNO2OxidAutor))deallocate(RNO2OxidAutor)
-  if(allocated(RNH3OxidAutorBand))deallocate(RNH3OxidAutorBand)
-  if(allocated(RNO2OxidAutorBand))deallocate(RNO2OxidAutorBand)
-  if(allocated(RN2ODmndReduxAutor_vr))deallocate(RN2ODmndReduxAutor_vr)
-  if(allocated(RNH4UptkBandAutor_vr))deallocate(RNH4UptkBandAutor_vr)
-  if(allocated(RNO3UptkBandAutor_vr))deallocate(RNO3UptkBandAutor_vr)
-  if(allocated(RH2PO4UptkBandAutor_vr))deallocate(RH2PO4UptkBandAutor_vr)
-  if(allocated(RH1PO4UptkSoilAutor_vr))deallocate(RH1PO4UptkSoilAutor_vr)
-  if(allocated(RH1PO4UptkBandAutor_vr))deallocate(RH1PO4UptkBandAutor_vr)
-  if(allocated(RH1PO4UptkLitrAutor_col))deallocate(RH1PO4UptkLitrAutor_col)
-  if(allocated(OMEERauto))deallocate(OMEERauto)
+  call destroy(mBiomeHeter_vr)
+  call destroy(RO2DmndHetert)
+  call destroy(RDOCUptkHeter_vr)
+  call destroy(RAcetateUptkHeter_vr)
+  call destroy(RNH4DmndSoilHeter_vr)
+  call destroy(RNO3DmndSoilHeter_vr)
+  call destroy(RH2PO4DmndSoilHeter_vr)
+  call destroy(RNH4DmndLitrHeter_col)
+  call destroy(RH2PO4DmndLitrHeter_col)
+  call destroy(RNO3DmndLitrHeter_col)
+  call destroy(RNO3ReduxDmndSoilHeter_vr)
+  call destroy(RNO2DmndReduxSoilHeter_vr)
+  call destroy(RNO3ReduxDmndBandHeter_vr)
+  call destroy(RNO2DmndReduxBandHeter_vr)
+  call destroy(RN2ODmndReduxHeter_vr)
+  call destroy(RNH4DmndBandHeter_vr)
+  call destroy(RNO3DmndBandHeter_vr)
+  call destroy(RH2PO4DmndBandHeter_vr)
+  call destroy(RH1PO4DmndSoilHeter_vr)
+  call destroy(RH1PO4DmndBandHeter_vr)
+  call destroy(RH1PO4DmndLitrHeter_col)
+  call destroy(OMEERhetr)
+!  call destroy(ROQC4HeterMicActCmpK_vr)
+  call destroy(mBiomeAutor_vr)
+  call destroy(RO2DmndAutort_vr)
+  call destroy(RNH4UptkSoilAutor_vr)
+  call destroy(RNO3UptkSoilAutor_vr)
+  call destroy(RH2PO4UptkSoilAutor_vr)
+  call destroy(RNH4UptkLitrAutor_col)
+  call destroy(RH2PO4UptkLitrAutor_col)
+  call destroy(RNO3UptkLitrAutor_col)
+  call destroy(RNH3OxidAutor)
+  call destroy(RNO2OxidAutor)
+  call destroy(RNH3OxidAutorBand)
+  call destroy(RNO2OxidAutorBand)
+  call destroy(RN2ODmndReduxAutor_vr)
+  call destroy(RNH4UptkBandAutor_vr)
+  call destroy(RNO3UptkBandAutor_vr)
+  call destroy(RH2PO4UptkBandAutor_vr)
+  call destroy(RH1PO4UptkSoilAutor_vr)
+  call destroy(RH1PO4UptkBandAutor_vr)
+  call destroy(RH1PO4UptkLitrAutor_col)
+  call destroy(OMEERauto)
   end subroutine DestructMicrobialData
 
 end module MicrobialDataType

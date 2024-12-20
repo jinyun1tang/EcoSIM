@@ -92,9 +92,9 @@ implicit none
   ENDIF
   TotRootVol=RootPoreVol_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RootVH2O_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+ &
     SeedVolumeMean_pft(NZ)*PlantPopulation_pft(NZ)
-  RootPoreVol_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootPorosity_pft(ipltroot,NZ)*TotRootVol
-  RootVH2O_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=(1.0_r8-RootPorosity_pft(ipltroot,NZ))*TotRootVol
-  RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+&
+  RootPoreVol_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)      = RootPorosity_pft(ipltroot,NZ)*TotRootVol
+  RootVH2O_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)         = (1.0_r8-RootPorosity_pft(ipltroot,NZ))*TotRootVol
+  RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+&
     SeedAreaMean_pft(NZ)
 
   IF(NumRootAxes4DeadPlant.EQ.NumRootAxes_pft(NZ) .OR. (SeasonalNonstElms_pft(ielmc,NZ).LE.ZERO4LeafVar_pft(NZ).AND. &

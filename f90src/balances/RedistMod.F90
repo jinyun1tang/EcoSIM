@@ -4,6 +4,7 @@ module RedistMod
   use minimathmod,       only: safe_adb, AZMAX1, fixEXflux, fixnegmass, isclose
   use EcoSiMParDataMod,  only: micpar
   use SurfLitterPhysMod, only: UpdateLitRPhys
+  use InitSOMBGCMOD, only :  MicrobeByLitterFall
   use SoilBGCNLayMod  
   use ElmIDMod
   use EcosimConst
@@ -530,8 +531,8 @@ module RedistMod
       DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+DOM_MicpTransp_3D(idom,K,3,0,NY,NX)
     enddo
   ENDDO D9680
-
-  ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,0,NY,NX)
+  ECO_HR_CO2_vr(0,NY,NX)       = trcs_RMicbTransf_vr(idg_CO2,0,NY,NX)
+  ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,0,NY,NX) !+trcs_RMicbTransf_vr(idg_CH4,0,NY,NX)
   Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,0,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,0,NY,NX)
   SurfGasFlx_col(idg_N2,NY,NX) = SurfGasFlx_col(idg_N2,NY,NX)+trcs_RMicbTransf_vr(idg_N2,0,NY,NX)
 
@@ -646,8 +647,8 @@ module RedistMod
             DO NE=1,NumPlantChemElms
               mBiomeHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)=mBiomeHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(NE,MID,K,NY,NX)
             ENDDO
-            DORGE(NY,NX)=DORGE(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
-            DORGP=DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
+            DORGE(NY,NX) = DORGE(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
+            DORGP        = DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
           enddo
         enddo
       enddo
@@ -660,8 +661,8 @@ module RedistMod
           DO NE=1,NumPlantChemElms
             mBiomeAutor_vr(NE,MID,NU(NY,NX),NY,NX)=mBiomeAutor_vr(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
           ENDDO
-          DORGE(NY,NX)=DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
-          DORGP=DORGP+TOMEERauto(ielmp,MID,NY,NX)
+          DORGE(NY,NX) = DORGE(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
+          DORGP        = DORGP+TOMEERauto(ielmp,MID,NY,NX)
         enddo
       enddo
     enddo
@@ -671,21 +672,21 @@ module RedistMod
         DO NE=1,NumPlantChemElms
           OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)=OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)+TORMER(NE,M,K,NY,NX)
         ENDDO
-        DORGE(NY,NX)=DORGE(NY,NX)+TORMER(ielmc,M,K,NY,NX)
-        DORGP=DORGP+TORMER(ielmp,M,K,NY,NX)
+        DORGE(NY,NX) = DORGE(NY,NX)+TORMER(ielmc,M,K,NY,NX)
+        DORGP        = DORGP+TORMER(ielmp,M,K,NY,NX)
       ENDDO D9270
       DO idom=idom_beg,idom_end
         SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)=SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)+TOHMER(idom,K,NY,NX)
       ENDDO
-      DORGE(NY,NX)=DORGE(NY,NX)+TOHMER(idom_doc,K,NY,NX)+TOHMER(idom_acetate,K,NY,NX)
-      DORGP=DORGP+TOHMER(idom_dop,K,NY,NX)
-      D9265: DO M=1,jsken
+      DORGE(NY,NX) = DORGE(NY,NX)+TOHMER(idom_doc,K,NY,NX)+TOHMER(idom_acetate,K,NY,NX)
+      DORGP  = DORGP+TOHMER(idom_dop,K,NY,NX)
+      D9265: DO M  = 1, jsken
         SolidOMAct_vr(M,K,NU(NY,NX),NY,NX)=SolidOMAct_vr(M,K,NU(NY,NX),NY,NX)+TOSAER(M,K,NY,NX)
         DO NE=1,NumPlantChemElms
           SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)=SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)+TOSMER(NE,M,K,NY,NX)
         ENDDO
-        DORGE(NY,NX)=DORGE(NY,NX)+TOSMER(ielmc,M,K,NY,NX)
-        DORGP=DORGP+TOSMER(ielmp,M,K,NY,NX)
+        DORGE(NY,NX) = DORGE(NY,NX)+TOSMER(ielmc,M,K,NY,NX)
+        DORGP        = DORGP+TOSMER(ielmp,M,K,NY,NX)
       ENDDO D9265
     ENDDO D9275
   ENDIF
@@ -1112,9 +1113,9 @@ module RedistMod
         endif
       endif  
     enddo
-
+    ECO_HR_CO2_vr(L,NY,NX)       = trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)
     Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)
-    ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+ trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)+trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)
+    ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+ trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)  !+trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)
     SurfGasFlx_col(idg_N2,NY,NX) = SurfGasFlx_col(idg_N2,NY,NX)+trcs_RMicbTransf_vr(idg_N2,L,NY,NX)
     !
     !     EXCHANGEABLE CATIONS AND ANIONS FROM EXCHANGE REACTIONS
@@ -1527,6 +1528,7 @@ module RedistMod
   integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
   real(r8) :: VLWatMicP1X,ENGYR,TK1X
+  real(r8) :: OSCMK
 !     begin_execution
 !     ADD ABOVE-GROUND LitrFall FROM EXTRACT.F TO SURFACE RESIDUE
 !
@@ -1537,22 +1539,26 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN_lnd=cumulative net surface heat transfer
 !
-
+  
   DO   K=1,micpar%NumOfPlantLitrCmplxs
+    OSCMK=0._r8
     DO  M=1,jsken
+      OSCMK=OSCMK+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       SolidOMAct_vr(M,K,0,NY,NX)=SolidOMAct_vr(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
       DO NE=1,NumPlantChemElms
         SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
 
-      SoilOrgM_vr(ielmc,0,NY,NX) = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
-      RAINR                      = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
-      HRAINR                     = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
-      WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX)+RAINR
-      HeatFLo2LitrByWat(NY,NX)   = HeatFLo2LitrByWat(NY,NX)+HRAINR
-      CRAIN                      = CRAIN+RAINR
-      HEATIN_lnd                 = HEATIN_lnd+HRAINR
+      SoilOrgM_vr(ielmc,0,NY,NX)   = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
+      HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
+      WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
+      HeatFLo2LitrByWat_col(NY,NX) = HeatFLo2LitrByWat_col(NY,NX)+HRAINR
+      CRAIN                        = CRAIN+RAINR
+      HEATIN_lnd                   = HEATIN_lnd+HRAINR
     enddo
+!    write(113,*)I+J/24.,K,OSCMK,SolidOM_vr(ielmc,1:jsken,K,0,NY,NX)
+    call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)

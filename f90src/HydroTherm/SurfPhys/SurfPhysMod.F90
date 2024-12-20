@@ -268,7 +268,7 @@ contains
 !     AT SNOW, RESIDUE AND SOIL SURFACES
 !
 !     RADGX=shortwave radiation at ground surface
-!     RadSWonSno,RadSWonSoil_col,RadSWonLitR_col= shortwave radn at snowpack,soil,litter, [MJ]
+!     RadSWonSno,RadSW2Soil_col,RadSW2LitR_col= shortwave radn at snowpack,soil,litter, [MJ]
 !     FracSWRad2Grnd_col=fraction of shortwave radiation at ground surface
 !     FSNW,FSNX=fractions of snow,snow-free cover
 !     BARE,CVRD=fractions of soil,litter cover
@@ -280,10 +280,10 @@ contains
 !     THS=sky longwave radiation
 !     LWRadCanGPrev_col=longwave radiation emitted by canopy
 
-  RADGX                  = RadSWGrnd_col(NY,NX)*dts_HeatWatTP
-  RadSWonSno_col(NY,NX)  = RADGX*FracSurfAsSnow_col(NY,NX)*XNPS
-  RadSWonSoil_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
-  RadSWonLitR_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
+  RADGX                 = RadSWGrnd_col(NY,NX)*dts_HeatWatTP
+  RadSW2Sno_col(NY,NX)  = RADGX*FracSurfAsSnow_col(NY,NX)*XNPS
+  RadSW2Soil_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
+  RadSW2LitR_col(NY,NX) = RADGX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
 
   THRYX                 = (LWRadSky_col(NY,NX)*FracSWRad2Grnd_col(NY,NX)+LWRadCanGPrev_col(NY,NX))*dts_HeatWatTP
   LWRad2Snow_col(NY,NX) = THRYX*FracSurfAsSnow_col(NY,NX)*XNPS
@@ -410,13 +410,12 @@ contains
   real(r8) :: VaporSoi1      ! soil vapor pressure [ton water/m3]
   real(r8) :: CdSoiEvap      ! scaled conductance for evaporation   [m^3]
   real(r8) :: CdSoiHSens     ! scaled conductance for sensible heat [MJ/K]
-  real(r8) :: RAGX           ! resistance [h/m]
   real(r8) :: tRadIncid      !total incoming radiation to soil or liter surface, short + long [MJ]
   real(r8) :: RI,WPLX,WPX,FracSoiPAsAir0
   real(r8) :: VLWatGrnd,VLIceGrnd,DFVR
   real(r8) :: TKX1,THETA1S
   real(r8) :: tHeatAir2Grnd   !residual heat flux into soil from incoming radiation minus sensible and latent heat [MJ]
-  real(r8) :: AlbedoGrnd
+  real(r8) :: AlbedoGrnd      !albedo at the ground
   real(r8) :: RadSWbySoil     !shortwave radiation absorbed by exposed soil [MJ]
 ! begin_execution
 !
@@ -462,7 +461,7 @@ contains
 ! VLWatMacP1,VLiceMacP1=water,ice volume in macopores
 ! AlbedoGrnd,SoilAlbedo=albedo of ground surface,soil
 ! BKVL=soil mass
-! RadSWonSoil_col,LWRad2Soil_col,Radnet2LitGrnd=incoming shortwave,longwave,net radiation
+! RadSW2Soil_col,LWRad2Soil_col,Radnet2LitGrnd=incoming shortwave,longwave,net radiation
 ! LWRadGrnd,LWEmscefSoil_col=emitted longwave radiation, emissivity
 ! TK1=soil temperature
 ! albedo of water and ice are set to 0.06, and 0.30 respectively
@@ -482,7 +481,7 @@ contains
   !absorbed radiation
   !Radnet2LitGrnd=net radiation, after taking out outgoing surface layer radiation  
   !LWRadGrnd=emitted longwave radiation  
-  RadSWbySoil          = (1.0_r8-AlbedoGrnd)*RadSWonSoil_col(NY,NX)
+  RadSWbySoil          = (1.0_r8-AlbedoGrnd)*RadSW2Soil_col(NY,NX)
   tRadIncid            = RadSWbySoil+LWRad2Soil_col(NY,NX)
   LWRadGrnd            = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)**4._r8
   Radnet2LitGrnd       = tRadIncid-LWRadGrnd
@@ -506,8 +505,8 @@ contains
   DFVR                      = FracSoiPAsAir0*POROQ*FracSoiPAsAir0/POROS_vr(0,NY,NX)
   ResistanceLitRLay         = ResistAreodynOverSoil_col(NY,NX)+VapDiffusResistanceLitR(NY,NX)/DFVR
   RI                        = RichardsonNumber(RIB(NY,NX),TKQ_col(NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX))
-  RAGX                      = AMAX1(RAM,0.8_r8*ResistBndlSurf_col(NY,NX),AMIN1(1.2_r8*ResistBndlSurf_col(NY,NX), ResistanceLitRLay/(1.0_r8-10.0_r8*RI)))
-  ResistBndlSurf_col(NY,NX) = RAGX
+  ResistBndlSurf_col(NY,NX) = AMAX1(RAM,0.8_r8*ResistBndlSurf_col(NY,NX),AMIN1(1.2_r8*ResistBndlSurf_col(NY,NX), &
+    ResistanceLitRLay/(1.0_r8-10.0_r8*RI)))
   RAa                       = ResistAreodynOverLitr_col(NY,NX)+ResistBndlSurf_col(NY,NX)
 !
 ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
@@ -526,11 +525,7 @@ contains
   CdSoiEvap  = AScaledCdWOverSoil_col(NY,NX)/(RAa+RZ)
   CdSoiHSens = AScaledCdHOverSoil_col(NY,NX)/RAa
   TKX1       = TKSoil1_vr(NUM(NY,NX),NY,NX)
-  if(TKX1<0._r8)then
-  write(*,*)'TKX1=',TKX1
-  call endrun("Negative temperature in "//trim(mod_filename),__LINE__)
-  endif
-  VaporSoi1=vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGASC*TKX1))
+  VaporSoi1  = vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGASC*TKX1))
 
   !evaporation, no more than what is available, g H2O
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol*dts_wat))   
@@ -1016,7 +1011,7 @@ contains
   WaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)    = WaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)+ConvWaterFlowMacP_3D(3,NUM(NY,NX),NY,NX)
   HeatFlow2Soil_3D(3,NUM(NY,NX),NY,NX)    = HeatFlow2Soil_3D(3,NUM(NY,NX),NY,NX)+HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)
   WatFLo2LitR_col(NY,NX)                  = WatFLo2LitR_col(NY,NX)+WatFLow2LitR_col(NY,NX)
-  HeatFLo2LitrByWat(NY,NX)                = HeatFLo2LitrByWat(NY,NX)+HeatFLoByWat2LitRi_col(NY,NX)
+  HeatFLo2LitrByWat_col(NY,NX)                = HeatFLo2LitrByWat_col(NY,NX)+HeatFLoByWat2LitRi_col(NY,NX)
   HeatByRad2Surf_col(NY,NX)               = HeatByRad2Surf_col(NY,NX)+Radnet2LitGrnd+Radnet2Snow
   HeatSensAir2Surf_col(NY,NX)             = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow
   HeatEvapAir2Surf_col(NY,NX)             = HeatEvapAir2Surf_col(NY,NX)+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno

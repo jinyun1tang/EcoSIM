@@ -30,6 +30,7 @@ module InitSOMBGCMOD
   public :: InitSOMConsts
   public :: InitSOMBGC
   public :: DestructSOMBGC
+  public :: MicrobeByLitterFall
   contains
 !------------------------------------------------------------------------------------------
 
@@ -43,10 +44,10 @@ module InitSOMBGCMOD
   JGnfo  => micpar%JGnfo
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
-  NumMicrobAutrophCmplx= micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx= micpar%NumHetetrMicCmplx
-  NumLiveHeterBioms =micpar%NumLiveHeterBioms
-  NumLiveAutoBioms  =micpar%NumLiveAutoBioms
+  NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
+  NumHetetrMicCmplx     = micpar%NumHetetrMicCmplx
+  NumLiveHeterBioms     = micpar%NumLiveHeterBioms
+  NumLiveAutoBioms      = micpar%NumLiveAutoBioms
   allocate(CORGCX(1:jcplx))
   allocate(CORGNX(1:jcplx))
   allocate(CORGPX(1:jcplx))
@@ -95,7 +96,6 @@ module InitSOMBGCMOD
     rNCOMCa               => micpar%rNCOMCa,               &
     rPCOMCa               => micpar%rPCOMCa,               &
     nlbiomcp              => micpar%nlbiomcp,              &
-    NumMicrobAutrophCmplx => micpar%NumMicrobAutrophCmplx, &
     k_humus               => micpar%k_humus,               &
     OHCK                  => micpar%OHCK,                  &
     OMCK                  => micpar%OMCK,                  &
@@ -259,19 +259,20 @@ module InitSOMBGCMOD
         OME1(ielmc) = AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
         OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMCa(M,N,K)*FOSNI)
         OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMCa(M,N,K)*FOSPI)
-!        write(*,*)'rmc',((L*10+K)*10+N)*10+M,OME1(ielmc),rNCOMCa(M,N,K),rPCOMCa(M,N,K),FOSNI,FOSPI
+
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
           ENDDO
         ENDDO
+
         OSCX (KK)    = OSCX(KK)+OME1(ielmc)
         OSNX (KK)    = OSNX(KK)+OME1(ielmn)
         OSPX (KK)    = OSPX(KK)+OME1(ielmp)
         D8992: DO NN = 1, NumMicbFunGrupsPerCmplx
-          tglds=JGnfA(N)-JGniA(N)+1._r8
-          do NGL=JGniA(N),JGnfA(N)
+          tglds=JGnfA(NN)-JGniA(NN)+1._r8
+          do NGL=JGniA(NN),JGnfA(NN)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
               mBiomeAutor_vr(NE,MID,L,NY,NX)=mBiomeAutor_vr(NE,MID,L,NY,NX)+OME1(NE)*OMCA(NN)/tglds
@@ -280,7 +281,7 @@ module InitSOMBGCMOD
           OSCX(KK) = OSCX(KK)+OME1(ielmc)*OMCA(NN)
           OSNX(KK) = OSNX(KK)+OME1(ielmn)*OMCA(NN)
           OSPX(KK) = OSPX(KK)+OME1(ielmp)*OMCA(NN)
-!          write(*,*)'om',((L*10+K)*10+N)*10+M,OME1(ielmc),OME1(ielmn),OME1(ielmp),OMCA(NN)
+
         ENDDO D8992
       ENDDO D8991
     ENDDO D8990
@@ -723,8 +724,57 @@ module InitSOMBGCMOD
 !  write(*,*)L,CORGCX
   end associate
   end subroutine InitLitterProfile
+!------------------------------------------------------------------------------------------
 
+  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+  implicit none
+  integer, intent(in) :: I,J,K
+  integer, intent(in) :: NY,NX
+  real(r8),intent(in) :: OSCMK
 
+  integer :: M,N,NGL,MID,NE,NN
+  real(r8) :: FOSCI,FOSNI,FOSPI,tglds
+  real(r8) :: OME1(1:NumPlantChemElms)
+  real(r8), parameter :: scal=0.5_r8  
+  associate(                                               &
+    rNCOMCa               => micpar%rNCOMCa,               &
+    rPCOMCa               => micpar%rPCOMCa,               &
+    nlbiomcp              => micpar%nlbiomcp,              &
+    OMCI                  => micpar%OMCI,                  &    
+    OMCF                  => micpar%OMCF,                  &
+    OMCA                  => micpar%OMCA                   &
+  )
+
+  FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
+
+  DO N=1,NumMicbFunGrupsPerCmplx
+    tglds=JGnfo(N)-JGnio(N)+1._r8
+    DO M=1,nlbiomcp
+      OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
+      OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMCa(M,N,K)*FOSNI)
+      OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMCa(M,N,K)*FOSPI)
+
+      do NGL=JGnio(N),JGnfo(N)
+        MID=micpar%get_micb_id(M,NGL)
+        DO NE=1,NumPlantChemElms
+          mBiomeHeter_vr(NE,MID,K,0,NY,NX)=mBiomeHeter_vr(NE,MID,K,0,NY,NX)+OME1(NE)/tglds
+        ENDDO
+      ENDDO
+
+      DO NN = 1, NumMicbFunGrupsPerCmplx
+        tglds=JGnfA(NN)-JGniA(NN)+1._r8
+        do NGL=JGniA(NN),JGnfA(NN)
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            mBiomeAutor_vr(NE,MID,0,NY,NX)=mBiomeAutor_vr(NE,MID,0,NY,NX)+OME1(NE)*OMCA(NN)/tglds
+          ENDDO
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+  
+  end associate
+  end subroutine MicrobeByLitterFall
 !------------------------------------------------------------------------------------------
 
   subroutine DestructSOMBGC

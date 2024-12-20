@@ -94,7 +94,7 @@ implicit none
 !
 ! LitRAlbedo=litter albedo
 ! VLWatMicP1,VLiceMicP1=water,ice volume in litter
-! RadSWonLitR_col,LWRad2LitR_col=incoming shortwave,longwave radiation
+! RadSW2LitR_col,LWRad2LitR_col=incoming shortwave,longwave radiation
 
 !
 ! litter layer
@@ -103,7 +103,7 @@ implicit none
     *VLiceMicP1_vr(0,NY,NX))/(VLSoilMicPMass_vr(0,NY,NX)+VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX))
 
   !radiation incident on litter layer  
-  RadSWByLitR          = (1.0_r8-LitRAlbedo)*RadSWonLitR_col(NY,NX)
+  RadSWByLitR          = (1.0_r8-LitRAlbedo)*RadSW2LitR_col(NY,NX)
   Radt2LitR            = RadSWByLitR+LWRad2LitR_col(NY,NX)
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWByLitR
   !
@@ -135,32 +135,31 @@ implicit none
       !below is a numerical hack
       CdVaporLit2Soil=2.0_r8*CNVR/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))*FracSurfByLitR_col(NY,NX)
     ENDIF
+
+    DTKX=ABS(TKSoil1_vr(0,NY,NX)-TKSoil1_vr(NUM(NY,NX),NY,NX))*ppmc
+
+    call CalcLitRThermConductivity(NY,NX,DTKX,TCNDR)
+
+    call CalcSoilThermConductivity(NX,NY,NUM(NY,NX),DTKX,TCND1)
+
+    CdTLit2Soil=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR_COL(NY,NX))
+  !
+  ! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
+  !
+    call SurfLitterIteration(I,J,M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
+      CumNetWatFlow2LitR,CumNetHeatFlow2LitR,CumWatFlx2SoiMicP,CumWatFlx2SoiMacP,cumNetHeatFlow2Soil,&
+      EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,&
+      HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,HeatFluxAir2LitR)
+
+    HeatByRad2Surf_col(NY,NX)      = HeatByRad2Surf_col(NY,NX)+Radnet2LitR
+    HeatNet2Surf_col(NY,NX)        = HeatNet2Surf_col(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
+    HeatSensAir2Surf_col(NY,NX)    = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2LitR
+    HeatEvapAir2Surf_col(NY,NX)    = HeatEvapAir2Surf_col(NY,NX)+LatentHeatAir2LitR
+    HeatSensVapAir2Surf_col(NY,NX) = HeatSensVapAir2Surf_col(NY,NX)+HeatSensEvapAir2LitR
+    LWRadBySurf_col(NY,NX)         = LWRadBySurf_col(NY,NX)+LWRadLitR
   ELSE
     CdVaporLit2Soil=0.0_r8
   ENDIF
-
-
-  DTKX=ABS(TKSoil1_vr(0,NY,NX)-TKSoil1_vr(NUM(NY,NX),NY,NX))*ppmc
-
-  call CalcLitRThermConductivity(NY,NX,DTKX,TCNDR)
-
-  call CalcSoilThermConductivity(NX,NY,NUM(NY,NX),DTKX,TCND1)
-
-  CdTLit2Soil=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR_COL(NY,NX))
-!
-! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
-!
-  call SurfLitterIteration(I,J,M,NY,NX,CdTLit2Soil,CdVaporLit2Soil,PSISV1,Radt2LitR,Prec2LitR2,PrecHeat2LitR2,&
-    CumNetWatFlow2LitR,CumNetHeatFlow2LitR,CumWatFlx2SoiMicP,CumWatFlx2SoiMacP,cumNetHeatFlow2Soil,&
-    EvapLitR2Soi1,HeatSensAir2LitR,HeatSensEvapAir2LitR,HeatSensLitR2Soi1,&
-    HeatSensVapLitR2Soi1,LatentHeatAir2LitR,LWRadLitR,Radnet2LitR,HeatFluxAir2LitR)
-
-  HeatByRad2Surf_col(NY,NX)      = HeatByRad2Surf_col(NY,NX)+Radnet2LitR
-  HeatNet2Surf_col(NY,NX)        = HeatNet2Surf_col(NY,NX)+Radnet2LitR+HeatSensEvapAir2LitR+HeatSensAir2LitR
-  HeatSensAir2Surf_col(NY,NX)    = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2LitR
-  HeatEvapAir2Surf_col(NY,NX)    = HeatEvapAir2Surf_col(NY,NX)+LatentHeatAir2LitR
-  HeatSensVapAir2Surf_col(NY,NX) = HeatSensVapAir2Surf_col(NY,NX)+HeatSensEvapAir2LitR
-  LWRadBySurf_col(NY,NX)         = LWRadBySurf_col(NY,NX)+LWRadLitR
 
   end subroutine SurfLitREnergyBalance
 !------------------------------------------------------------------------------------------
@@ -333,14 +332,10 @@ implicit none
 !     HeatSensEvapAir2LitR2=convective heat of evaporation flux
 !
 !     in litter      
-      VapLitR   = vapsat(TKR1)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKR1))
-      VaporSoi1 = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !vapor pressure in soil, ton H2O/m3
-      EVAPR2    = AMAX1(-AZMAX1(VWatLitr2)*dts_wat,CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton H2O]
-!      if(I==178 .and. j>=1)then
-!      write(113,*)(I*100+J)*10000+M*100+NN,EVAPR2,-AZMAX1(VWatLitr2)*dts_wat,'d',CdLitREvap*(VPQ_col(NY,NX)-VapLitR),&
-!        VPQ_col(NY,NX),VapLitR,ThetaWLitR,PSISM1_vr(0,NY,NX)
-!      endif
-      LatentHeatAir2LitR2   = EVAPR2*EvapLHTC          !latent energy flux,              MJ/ton H2O * ton H2O =MJ
+      VapLitR               = vapsat(TKR1)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKR1))
+      VaporSoi1             = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !vapor pressure in soil, ton H2O/m3
+      EVAPR2                = AMAX1(-AZMAX1(VWatLitr2)*dts_wat,CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton H2O]
+      LatentHeatAir2LitR2   = EVAPR2*EvapLHTC          !latent energy flux,                             MJ/ton H2O * ton H2O = MJ
       HeatSensEvapAir2LitR2 = EVAPR2*cpw*TKR1          !mass energy flux
       !
       ! SOLVE FOR RESIDUE TO SOIL SURFACE HEAT FLUXES
@@ -465,6 +460,7 @@ implicit none
   real(r8) :: ENGYZ,HeatByLitrMassChange,HS
   integer :: LS
 
+  IF(FracSurfByLitR_col(NY,NX).LE.ZERO)return
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
   !
@@ -486,7 +482,7 @@ implicit none
   IF(VHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
     tkspre          = TKS_vr(0,NY,NX)
-    TKS_vr(0,NY,NX) = (ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez_col(NY,NX)+HeatByLitrMassChange &
+    TKS_vr(0,NY,NX) = (ENGYZ+HeatFLo2LitrByWat_col(NY,NX)+TLitrIceHeatFlxFrez_col(NY,NX)+HeatByLitrMassChange &
       +HEATIN_lndByRunoff)/VHeatCapacity_vr(0,NY,NX)
     HS                   = TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
     HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+HS
@@ -496,10 +492,10 @@ implicit none
       write(*,*)'WatFLo2Litr, WatInByRunoff=',WatFLo2LitR_col(NY,NX),WatInByRunoff
       write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2LitR_col(NY,NX),TLitrIceFlxThaw_col(NY,NX),WatInByRunoff
       write(*,*)'ice',VLiceMicPr,VLiceMicP_vr(0,NY,NX)
-      write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat(NY,NX),TLitrIceHeatFlxFrez_col(NY,NX),HeatByLitrMassChange, &
+      write(*,*)'engy',ENGYZ,HeatFLo2LitrByWat_col(NY,NX),TLitrIceHeatFlxFrez_col(NY,NX),HeatByLitrMassChange, &
         HEATIN_lndByRunoff,VHeatCapacity_vr(0,NY,NX)        
       write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,TairK_col(NY,NX),SoilOrgM_vr(ielmc,0,NY,NX)   
-      write(*,*)'tengz',ENGYZ/VHeatCapacity_vr(0,NY,NX),HeatFLo2LitrByWat(NY,NX)/VHeatCapacity_vr(0,NY,NX),&
+      write(*,*)'tengz',ENGYZ/VHeatCapacity_vr(0,NY,NX),HeatFLo2LitrByWat_col(NY,NX)/VHeatCapacity_vr(0,NY,NX),&
         TLitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity_vr(0,NY,NX),HeatByLitrMassChange/VHeatCapacity_vr(0,NY,NX), &
         HEATIN_lndByRunoff/VHeatCapacity_vr(0,NY,NX)
       call endrun(trim(mod_filename)//' at line',__LINE__)

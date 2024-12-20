@@ -88,6 +88,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
   real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)
+  real(r8),target,allocatable :: RootGasConductance_pvr(:,:,:,:,:,:)       !1/hr
 !----------------------------------------------------------------------
 
 contains
@@ -114,6 +115,7 @@ contains
   allocate(fTgrowRootP_vr(JZ,JP,JY,JX));  fTgrowRootP_vr=0._r8
   allocate(RootrNC_pft(JP,JY,JX));     RootrNC_pft=0._r8
   allocate(RootrPC_pft(JP,JY,JX));     RootrPC_pft=0._r8
+  allocate(RootGasConductance_pvr(idg_beg:idg_end-1,jroots,JZ,JP,JY,JX));RootGasConductance_pvr=0._r8
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._r8
   allocate(RootRadialResist_pft(jroots,JP,JY,JX));   RootRadialResist_pft=0._r8
   allocate(RootAxialResist_pft(jroots,JP,JY,JX));   RootAxialResist_pft=0._r8
@@ -181,6 +183,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(RootGasConductance_pvr)
   call destroy(RootMassElm_vr)
   call destroy(NumRootAxes_pft)
   call destroy(NIXBotRootLayer_rpft)

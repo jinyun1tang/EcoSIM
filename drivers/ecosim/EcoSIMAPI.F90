@@ -13,6 +13,7 @@ module EcoSIMAPI
   use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
   use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
   use WatsubMod,       only: watsub
+  use PlantMgmtDataType, only: NP  
   use EcoSIMCtrlMod  
   use BalancesMod  
 implicit none

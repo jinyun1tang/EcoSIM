@@ -1206,7 +1206,8 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data, &
-    start = (/rec/)),trim(mod_filename)//'::ncd_getvar_int::'//trim(varname))
+    start = (/rec/)),trim(mod_filename)//'::ncd_getvar_int::' &
+      //trim(varname)//' in '//trim(ncid%filename))
 
   end subroutine ncd_getvar_int
   !----------------------------------------------------------------------

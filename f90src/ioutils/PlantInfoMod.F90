@@ -3,7 +3,7 @@ module PlantInfoMod
 ! DESCRIPTION
 ! code to read plant information
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use fileUtil, only : open_safe, check_read,int2str,getavu, relavu, opnfil
+  use fileUtil, only : open_safe, check_read,int2str,getavu, relavu, opnfil,iulog
   use minimathmod, only : isLeap
   use abortutils, only : endrun  
   use netcdf
@@ -29,7 +29,6 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  integer :: NumOfCanopyLayersUT
 
   public :: ReadPlantInfo
   contains
@@ -105,7 +104,8 @@ implicit none
   implicit none
   type(file_desc_t), intent(in) :: pftinfo_nfid
   integer, intent(in) :: ntopou
-  integer, intent(in) :: iyear,yearc
+  integer, intent(in) :: iyear    !file record number
+  integer, intent(in) :: yearc    !current model year
   integer, intent(in) :: NHW,NHE,NVN,NVS
   logical  :: readvar
   integer  :: NH1,NV1,NH2,NV2,NS
@@ -169,7 +169,6 @@ implicit none
   ENDDO  
   end subroutine readplantinginfo  
 
-
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMgmnt(NHW,NHE,NVN,NVS)
   implicit none
@@ -206,7 +205,8 @@ implicit none
   implicit none
   type(file_desc_t), intent(in) :: pftinfo_nfid
   integer, intent(in) :: ntopou
-  integer, intent(in) :: iyear,yearc
+  integer, intent(in) :: iyear    !file record number
+  integer, intent(in) :: yearc    !current model year  
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   logical  :: readvar
@@ -220,6 +220,7 @@ implicit none
   character(len=128) :: pft_mgmtinfo(24,JP)
   integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS
   integer :: M,NN,N,nn1
+  integer :: JCUT
 
   call InitPlantMgmnt(NHW,NHE,NVN,NVS)
   
@@ -259,7 +260,7 @@ implicit none
               if(len_trim(pft_mgmtinfo(NN1,NZ))==0)cycle
               tstr=trim(pft_mgmtinfo(NN1,NZ))
               read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-              READ(TSTR,*)DY,ICUT,NumOfCanopyLayersUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
+              READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
 
               if(isLeap(iyr) .and. IMO.GT.2)LPY=1
@@ -270,14 +271,14 @@ implicit none
                 IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
               endif
 
-              IF(IDY.GT.0.AND.NumOfCanopyLayersUT.EQ.1)THEN
+              IF(IDY.GT.0 .AND. JCUT.EQ.1)THEN
                 iDayPlantHarvest_pft(NZ,NY,NX)=IDY
                 IYR=yearc
                 iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
               ENDIF
 
               iHarvstType_pft(NZ,IDY,NY,NX)                         = ICUT
-              jHarvst_pft(NZ,IDY,NY,NX)                             = NumOfCanopyLayersUT
+              jHarvst_pft(NZ,IDY,NY,NX)                             = JCUT
               FracCanopyHeightCut_pft(NZ,IDY,NY,NX)                 = HCUT
               THIN_pft(NZ,IDY,NY,NX)                                = PCUT
               FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
@@ -296,7 +297,7 @@ implicit none
                   IDYE=IDY
                   D580: DO IDYG=IDYS+1,IDYE-1
                     iHarvstType_pft(NZ,IDYG,NY,NX)                         = ICUT
-                    jHarvst_pft(NZ,IDYG,NY,NX)                             = NumOfCanopyLayersUT
+                    jHarvst_pft(NZ,IDYG,NY,NX)                             = JCUT
                     FracCanopyHeightCut_pft(NZ,IDYG,NY,NX)                 = HCUT
                     THIN_pft(NZ,IDYG,NY,NX)                                = PCUT
                     FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
@@ -332,7 +333,8 @@ implicit none
   type(Var_desc_t) :: vardesc
   logical :: readvar
   integer :: pft_dflag
-  integer :: iyear,year
+  integer :: iyear     !data record year
+  integer :: year      !year of the data
   integer :: ntopou,NY,NX,NZ
 
   if (len_trim(pft_mgmt_in)==0)return
@@ -348,8 +350,9 @@ implicit none
   ntopou=get_dim_len(pftinfo_nfid, 'ntopou')    
   if(first_topou)ntopou=1
 
+  
   if(pft_dflag==0)then
-    ! constant pft data
+    if(lverb)write(iulog,*)'Constant pft data'
     if(IGO==0)then
       iyear=1    
       call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
@@ -358,12 +361,13 @@ implicit none
       iyear=2
       call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     endif
-   !transient pft data 
+   
   else
+    if(lverb)write(iulog,*)'Transient pft data',yeari,yearc
     iyear=1
     DO while(.true.)
       call ncd_getvar(pftinfo_nfid,'year',iyear,year)
-      if(year==yeari)exit
+      if(year==yeari)exit   !when year is found matching the forcing data yeari.
       iyear=iyear+1
     ENDDO
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
@@ -374,8 +378,8 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP(NY,NX)
-        iHarvestDay_pft(NZ,NY,NX)=iDayPlantHarvest_pft(NZ,NY,NX)
-        iHarvestYear_pft(NZ,NY,NX)=iYearPlantHarvest_pft(NZ,NY,NX)
+        iHarvestDay_pft(NZ,NY,NX)  = iDayPlantHarvest_pft(NZ,NY,NX)
+        iHarvestYear_pft(NZ,NY,NX) = iYearPlantHarvest_pft(NZ,NY,NX)
       ENDDO
     ENDDO
   ENDDO
@@ -428,7 +432,7 @@ implicit none
       CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
-      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen.AND.iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
+      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
       ELSE
@@ -1011,10 +1015,10 @@ implicit none
     D9999: DO NX=NHW,NHE
       DO  NY=NVN,NVS
         DO NZ=1,JP
-          iDayPlanting_pft(NZ,NY,NX)=-1E+06
-          iYearPlanting_pft(NZ,NY,NX)=-1E+06
-          iDayPlantHarvest_pft(NZ,NY,NX)=1E+06
-          iYearPlantHarvest_pft(NZ,NY,NX)=1E+06
+          iDayPlanting_pft(NZ,NY,NX)      = -1E+06
+          iYearPlanting_pft(NZ,NY,NX)     = -1E+06
+          iDayPlantHarvest_pft(NZ,NY,NX)  = 1E+06
+          iYearPlantHarvest_pft(NZ,NY,NX) = 1E+06
         enddo
       enddo
     ENDDO D9999
@@ -1036,7 +1040,7 @@ implicit none
   use abortutils, only : endrun
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  integer, intent(in) :: yeari
+  integer, intent(in) :: yeari    !forcing year information
   integer :: IDATE
   integer :: NPP(JY,JX)
   integer :: IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS

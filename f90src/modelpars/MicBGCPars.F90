@@ -120,7 +120,7 @@ contains
   this%k_manure                    = this%k_fine_litr+1;   this%is_litter(this%k_manure)   = .true.
   this%is_litter(this%k_fine_litr) = .true.
   this%is_litter(this%k_manure)    = .true.
-
+  this%is_finelitter(this%k_fine_litr)=.true.
   this%iprotein  = 1
   this%icarbhyro = 2
   this%icellulos = 3
@@ -140,10 +140,10 @@ contains
   this%cplxname(4) = 'pom'
   this%cplxname(5) = 'humus'
   this%hmicname(1) = 'aerohetrob'
-  this%hmicname(2) = 'anerofaclb'
+  this%hmicname(2) = 'faculdenit'
   this%hmicname(3) = 'aerofungi'
   this%hmicname(4) = 'aneroferm'
-  this%hmicname(5) = 'acetMicBiome_colhg'
+  this%hmicname(5) = 'acetmethg'
   this%hmicname(6) = 'aeron2fix'
   this%hmicname(7) = 'aneron2fix'
   this%amicname(1) = 'amoniaoxib'

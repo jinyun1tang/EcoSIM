@@ -1,8 +1,13 @@
 module SoilLayerDynMod
 ! Description:
 ! subroutines to do soil relayering
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only : micpar
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod,  only: micpar
+  use PlantMgmtDataType, only: NP
+  use minimathmod,       only: AZMAX1
+  use UnitMod,           only: units
+  use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
+  USE TFlxTypeMod,       ONLY: tErosionSedmLoss, TDLYXF, TDayLenthPrevC, TDVOLI, TDORGC
   use RootDataType
   use GridDataType
   USE EcoSIMCtrlDataType
@@ -20,10 +25,6 @@ module SoilLayerDynMod
   use SurfSoilDataType
   use SurfLitterDataType
   use EcosimConst
-  use minimathmod, only : AZMAX1
-  use UnitMod     , only : units
-  use EcoSIMConfig, only : ndbiomcp => NumDeadMicrbCompts
-  USE TFlxTypeMod , ONLY : tErosionSedmLoss,TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
 implicit none
 
 

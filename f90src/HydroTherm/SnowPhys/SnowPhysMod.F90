@@ -801,8 +801,8 @@ contains
   SnowAlbedo=(0.85_r8*VLDrySnoWE0M_snvr(1,NY,NX)+0.30_r8*VLIceSnow0M_snvr(1,NY,NX)+0.06_r8*VLWatSnow0M_snvr(1,NY,NX)) &
     /(VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX))
 
-  RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSWonSno_col(NY,NX)
-  RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)    !incoming radiation,                                                    short + longwave
+  RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSW2Sno_col(NY,NX)
+  RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)    !incoming radiation, short + longwave
   LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4._r8/real(NPS,kind=r8)         !emitting longwave radiation,
   RadNet2Sno2          = RFLX0-LWRadSno1                            !net radiation
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySnow

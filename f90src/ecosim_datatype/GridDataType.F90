@@ -28,10 +28,8 @@ implicit none
   REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
   real(r8),target,allocatable ::  DH(:,:)                            !number of EW grid cells, [-]
   real(r8),target,allocatable ::  DV(:,:)                            !number of EW grid cells, [-]
-  integer,target,allocatable ::  FlowDirIndicator(:,:)                            !dimension of low
+  integer,target,allocatable ::  FlowDirIndicator(:,:)               !dimension of low
   integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
-  integer,target,allocatable ::  NP(:,:)                             !number of plant species
-  integer,target,allocatable ::  NP0(:,:)                            !intitial number of plant species
 !----------------------------------------------------------------------
 
 contains
@@ -61,8 +59,7 @@ contains
   allocate(DV(JY,JX));          DV=0._r8
   allocate(FlowDirIndicator(JY,JX));         FlowDirIndicator=3   !vertical by default
   allocate(LSG(JZ,JY,JX));      LSG=0
-  allocate(NP(JY,JX));          NP=0
-  allocate(NP0(JY,JX));         NP0=0
+
   end subroutine InitGridData
 
 !----------------------------------------------------------------------
@@ -92,8 +89,6 @@ contains
   call destroy(DV)
   call destroy(FlowDirIndicator)
   call destroy(LSG)
-  call destroy(NP)
-  call destroy(NP0)
   end subroutine DestructGridData
 
 end module GridDataType

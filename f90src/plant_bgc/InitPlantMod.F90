@@ -179,8 +179,8 @@ module InitPlantMod
     MatureGroup_pft           => plt_pheno%MatureGroup_pft,           &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,       &
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft,        &
-    iPlantNfixType_pft            => plt_morph%iPlantNfixType_pft,            &
-    NumCogrothNode_pft             => plt_morph%NumCogrothNode_pft              &
+    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,        &
+    NumCogrothNode_pft        => plt_morph%NumCogrothNode_pft         &
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -191,77 +191,77 @@ module InitPlantMod
 !
 !     NONSTRUCTURAL
 !
-  ElmAllocmat4Litr(ielmc,inonstruct,iprotein,NZ)=0.0_r8
-  ElmAllocmat4Litr(ielmc,inonstruct,icarbhyro,NZ)=0.67_r8
-  ElmAllocmat4Litr(ielmc,inonstruct,icellulos,NZ)=0.33_r8
-  ElmAllocmat4Litr(ielmc,inonstruct,ilignin,NZ)=0.0_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,iprotein,NZ)  = 0.0_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,icarbhyro,NZ) = 0.67_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,icellulos,NZ) = 0.33_r8
+  ElmAllocmat4Litr(ielmc,inonstruct,ilignin,NZ)   = 0.0_r8
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ)=0.30_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)=0.38_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.25_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.30_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)   = 0.38_r8
 
-    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ)=0.25_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ)=0.30_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)=0.38_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.25_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.30_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.38_r8
 !
 !     LEGUMES
 !
   ELSEIF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
-    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)=0.16_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ)=0.38_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ)=0.34_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)=0.12_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.16_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.38_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.34_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)   = 0.12_r8
 
-    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ)=0.41_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ)=0.37_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)=0.15_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.41_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.37_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.15_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
-    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)=0.08_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ)=0.41_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ)=0.36_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)=0.15_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.08_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.41_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.36_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)   = 0.15_r8
 
-    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ)=0.41_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ)=0.36_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)=0.16_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.41_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.36_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.16_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.1 &
     .OR.iPlantTurnoverPattern_pft(NZ).GE.3)THEN
-    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ)=0.34_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ)=0.36_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)=0.23_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.34_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.36_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)   = 0.23_r8
 
-    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)=0.0_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ)=0.045_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ)=0.660_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)=0.295_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)  = 0.0_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.045_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.660_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.295_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ)=0.38_r8
-    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)=0.30_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.25_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.38_r8
+    ElmAllocmat4Litr(ielmc,ifoliar,ilignin,NZ)   = 0.30_r8
 
-    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)=0.0_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ)=0.045_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ)=0.660_r8
-    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)=0.295_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,iprotein,NZ)  = 0.0_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.045_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.660_r8
+    ElmAllocmat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.295_r8
   ENDIF
 !
 !     FRACTIONS OF WOODY LITTER ALLOCATED TO
@@ -270,27 +270,27 @@ module InitPlantMod
 !     NON-VASCULAR
 !
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ)=0.07_r8
-    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ)=0.25_r8
-    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ)=0.30_r8
-    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ)=0.38_r8
+    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ)  = 0.07_r8
+    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ) = 0.25_r8
+    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ) = 0.30_r8
+    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ)   = 0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
-    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ)=0.03_r8
-    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ)=0.25_r8
-    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ)=0.57_r8
-    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ)=0.15_r8
+    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ)  = 0.03_r8
+    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ) = 0.25_r8
+    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ) = 0.57_r8
+    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ)   = 0.15_r8
 !
 !     DECIDUOUS AND CONIFEROUS TREES
 !
   ELSE
-    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ)=0.0_r8
-    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ)=0.045_r8
-    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ)=0.660_r8
-    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ)=0.295_r8
+    ElmAllocmat4Litr(ielmc,istalk,iprotein,NZ)  = 0.0_r8
+    ElmAllocmat4Litr(ielmc,istalk,icarbhyro,NZ) = 0.045_r8
+    ElmAllocmat4Litr(ielmc,istalk,icellulos,NZ) = 0.660_r8
+    ElmAllocmat4Litr(ielmc,istalk,ilignin,NZ)   = 0.295_r8
   ENDIF
 !
 !     FRACTIONS OF FINE ROOT LITTER ALLOCATED TO
@@ -308,50 +308,50 @@ module InitPlantMod
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
-    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ)=0.057_r8
-    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ)=0.263_r8
-    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ)=0.542_r8
-    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ)=0.138_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ)  = 0.057_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ) = 0.263_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ) = 0.542_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ)   = 0.138_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.1&
     .OR.iPlantTurnoverPattern_pft(NZ).GE.3)THEN
-    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ)=0.059_r8
-    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ)=0.308_r8
-    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ)=0.464_r8
-    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ)=0.169_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ)  = 0.059_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ) = 0.308_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ) = 0.464_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ)   = 0.169_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ)=0.059_r8
-    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ)=0.308_r8
-    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ)=0.464_r8
-    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ)=0.169_r8
+    ElmAllocmat4Litr(ielmc,iroot,iprotein,NZ)  = 0.059_r8
+    ElmAllocmat4Litr(ielmc,iroot,icarbhyro,NZ) = 0.308_r8
+    ElmAllocmat4Litr(ielmc,iroot,icellulos,NZ) = 0.464_r8
+    ElmAllocmat4Litr(ielmc,iroot,ilignin,NZ)   = 0.169_r8
   ENDIF
 !
 !     COARSE WOODY LITTER FROM BOLES AND ROOTS
 !
-  ElmAllocmat4Litr(ielmc,icwood,iprotein,NZ)=0.00_r8
-  ElmAllocmat4Litr(ielmc,icwood,icarbhyro,NZ)=0.045_r8
-  ElmAllocmat4Litr(ielmc,icwood,icellulos,NZ)=0.660_r8
-  ElmAllocmat4Litr(ielmc,icwood,ilignin,NZ)=0.295_r8
+  ElmAllocmat4Litr(ielmc,icwood,iprotein,NZ)  = 0.00_r8
+  ElmAllocmat4Litr(ielmc,icwood,icarbhyro,NZ) = 0.045_r8
+  ElmAllocmat4Litr(ielmc,icwood,icellulos,NZ) = 0.660_r8
+  ElmAllocmat4Litr(ielmc,icwood,ilignin,NZ)   = 0.295_r8
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
 !     CNOPC,CPOPC=fractions to allocate N,P to kinetic components
 !     CFOPN,CFOPP=distribution of litter N,P to kinetic components
 !
-  CNOPC(iprotein)=0.020_r8
-  CNOPC(icarbhyro)=0.010_r8
-  CNOPC(icellulos)=0.010_r8
-  CNOPC(ilignin)=0.020_r8
+  CNOPC(iprotein)  = 0.020_r8
+  CNOPC(icarbhyro) = 0.010_r8
+  CNOPC(icellulos) = 0.010_r8
+  CNOPC(ilignin)   = 0.020_r8
 
-  CPOPC(iprotein)=0.0020_r8
-  CPOPC(icarbhyro)=0.0010_r8
-  CPOPC(icellulos)=0.0010_r8
-  CPOPC(ilignin)=0.0020_r8
+  CPOPC(iprotein)  = 0.0020_r8
+  CPOPC(icarbhyro) = 0.0010_r8
+  CPOPC(icellulos) = 0.0010_r8
+  CPOPC(ilignin)   = 0.0020_r8
 
   D110: DO N=0,NumLitterGroups
     CNOPCT=0.0_r8

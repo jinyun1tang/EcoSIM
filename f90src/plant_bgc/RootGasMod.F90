@@ -106,6 +106,7 @@ module RootGasMod
     RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr,         &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
+    RootGasConductance_pvr   => plt_rbgc%RootGasConductance_pvr,   &
     TScal4Difsvity_vr        => plt_soilchem%TScal4Difsvity_vr,    &
     trcs_VLN_vr              => plt_soilchem%trcs_VLN_vr,          &
     trc_solml_vr             => plt_soilchem%trc_solml_vr,         &
@@ -236,7 +237,6 @@ module RootGasMod
 !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 !     RTARR=root surface area/radius for uptake
 !     RootRaidus_rpft=path length for radial diffusion within root
-!     DIFOP=
 !     RootVH2O_pvr=root,myco aqueous volume
 !     S*L=solubility of gas in water from hour1.f:
 !     CO2=CO2,OXY=O2,CH4=CH4,N2O=N2O,NH3=NH3,H2G=H2
@@ -249,17 +249,21 @@ module RootGasMod
       .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX = RootAreaDivRadius_vr(N,L)/RootRaidus_rpft(N,NZ)
       DIFOP  = O2AquaDiffusvityP*RTARRX
-      DO idg  = idg_beg, idg_end-1
+      DO idg  = idg_beg, idg_NH3
         DisolvedGasVolume(idg) = RootVH2O_pvr(N,L,NZ)*GasSolbility_vr(idg,L)
         DFAGas(idg)            = GasDifc_loc(idg)*RTCRA
       ENDDO
     ELSE
       RTARRX                               = 0.0_r8
       DIFOP                                = 0.0_r8
-      DisolvedGasVolume(idg_beg:idg_end-1) = 0.0_r8
-      DFAGas(idg_beg:idg_end-1)            = 0.0_r8
+      DisolvedGasVolume(idg_beg:idg_NH3) = 0.0_r8
+      DFAGas(idg_beg:idg_NH3)            = 0.0_r8
       DFAGas(idg_O2)                       = AMIN1(1.e-12_r8,RootPoreVol_pvr(N,L,NZ))
     ENDIF
+
+    DO idg=idg_beg,idg_NH3
+      RootGasConductance_pvr(idg,N,L,NZ) = AMIN1(DFAGas(idg),RootPoreVol_pvr(N,L,NZ))
+    ENDDO
 
     DFGP   = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
     RCO2PX = -RootCO2Autor_pvr(N,L,NZ)*dts_gas
@@ -365,7 +369,6 @@ module RootGasMod
 !
 !     DifAqueVolatile(idg_O2)=O2 
 !     dtPerPlantRootH2OUptake=water uptake
-!     DIFOP=aqueous diffusivity of O2 within root
 !     trcaqu_conc_soi_loc(idg_O2),trc_conc_root_loc(idg_O2)=soil,root aqueous O2 concentration
 !     RootOxyDemandPerPlant=O2 demand per plant
 !     RootOxyUptakePerPlant=root O2 uptake per plant
@@ -590,7 +593,7 @@ module RootGasMod
                 *DisolvedGasVolume(idg)-trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ)) &
                 /(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))
               !>0._r8 into root, <0._r8 into atmosphere, assuming specific rate 1/hr
-              trcg_air2root_flx(idg)=AMIN1(DFAGas(idg),RootPoreVol_pvr(N,L,NZ))*(AtmGasc(idg)-trcg_gcon_loc(idg))
+              trcg_air2root_flx(idg)=RootGasConductance_pvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
             enddo
           ELSE
             Root_gas2sol_flx(idg_beg:idg_end-1)  = 0.0_r8

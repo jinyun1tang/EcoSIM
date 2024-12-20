@@ -17,6 +17,9 @@ module SOMDataType
   real(r8),target,allocatable :: CNOSC(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components
   real(r8),target,allocatable :: CPOSC(:,:,:,:,:)                   !P:C ratios of SOC kinetic components
   real(r8),target,allocatable :: SolidOM_vr(:,:,:,:,:,:)                   !humus soil OM	[g d-2]
+  real(r8),target,allocatable :: TSolidOMActC_vr(:,:,:)              !total active solid organic C [gC d-2]
+  real(r8),target,allocatable :: TSolidOMC_vr(:,:,:)                 !total solid organic C [gC d-2]
+  real(r8),target,allocatable :: tOMActC_vr(:,:,:)                   !active heterotrophic microbial C in layer [gC d-2]
   real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)                     !adsorbed soil C	[g d-2]
   real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
   real(r8),target,allocatable :: DOM_vr(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
@@ -41,7 +44,7 @@ module SOMDataType
   real(r8),target,allocatable :: tNH4_col(:,:)                         !total soil NH4 + NH3 content, [g d-2]
   real(r8),target,allocatable :: tNO3_col(:,:)                         !total soil NO3 + NO2 content, [g d-2]
   real(r8),target,allocatable :: tHxPO4_col(:,:)                         !total soil PO4 content, [g d-2]
-
+  real(r8),target,allocatable :: FracLitrMix_vr(:,:,:)              !fraction of litter to be mixed downward
   private :: InitAllocate
   contains
 
@@ -66,6 +69,9 @@ module SOMDataType
   allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX)); CNOSC=0._r8
   allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX)); CPOSC=0._r8
   allocate(SolidOM_vr(NumPlantChemElms,jsken,1:jcplx,0:JZ,JY,JX));SolidOM_vr=0._r8
+  allocate(TSolidOMActC_vr(0:JZ,JY,JX));TSolidOMActC_vr=0._r8
+  allocate(TSolidOMC_vr(0:JZ,JY,JX)); TSolidOMC_vr=0._r8
+  allocate(tOMActC_vr(0:JZ,JY,JX)); tOMActC_vr=0._r8
   allocate(SorbedOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));SorbedOM_vr=0._r8
   allocate(OMBioResdu_vr(1:NumPlantChemElms,ndbiomcp,1:jcplx,0:JZ,JY,JX)); OMBioResdu_vr=0._r8
   allocate(DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_vr=0._r8
@@ -90,7 +96,7 @@ module SOMDataType
   allocate(tNH4_col(JY,JX));        tNH4_col=0._r8
   allocate(tNO3_col(JY,JX));        tNO3_col=0._r8
   allocate(tHxPO4_col(JY,JX));        tHxPO4_col=0._r8
-
+  allocate(FracLitrMix_vr(0:JZ,JY,JX)); FracLitrMix_vr=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -99,6 +105,10 @@ module SOMDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(FracLitrMix_vr)
+  call destroy(TSolidOMActC_vr)
+  call destroy(TSolidOMC_vr)
+  call destroy(tOMActC_vr)
   call destroy(litrOM_vr)
   call destroy(RSC)
   call destroy(RSN)

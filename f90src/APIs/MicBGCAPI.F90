@@ -5,7 +5,7 @@ module MicBGCAPI
   use SoilDisturbMod,      only: SOMRemovalByDisturbance
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
-  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type
+  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type,Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
   use minimathmod,          only: AZMAX1
   use EcoSiMParDataMod,     only: micpar
@@ -102,7 +102,7 @@ implicit none
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
 
-          call DownwardMixOM(I,J,L,NY,NX)
+          call DownwardMixOM(I,J,L,NY,NX,FracLitrMix_vr(L,NY,NX))
 
         ELSE
           trcs_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
@@ -126,14 +126,15 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
   type(Cumlate_Flux_Diag_type) :: naqfdiag
-  
+  type(Microbe_Diag_type) :: nmicdiag
+
   call micflx%ZeroOut()
 
   call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
   
-  call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag)
+  call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
 
-  call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag)
+  call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag,nmicdiag)
 
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
@@ -339,7 +340,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
 
-  subroutine MicAPIRecv(I,J,L,NY,NX,litrM,micstt,micflx,naqfdiag)
+  subroutine MicAPIRecv(I,J,L,NY,NX,litrM,micstt,micflx,naqfdiag,nmicdiag)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: L,NY,NX
@@ -347,6 +348,7 @@ implicit none
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
   type(Cumlate_Flux_Diag_type), intent(in) :: naqfdiag
+  type(Microbe_Diag_type), intent(in) :: nmicdiag
 
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
   integer :: NE,idom,K
@@ -376,7 +378,6 @@ implicit none
   trcs_RMicbTransf_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
   trcs_RMicbTransf_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
   trcs_RMicbTransf_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
-
   RNutMicbTransf_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNutMicbTransf_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
   RNutMicbTransf_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil
@@ -387,6 +388,8 @@ implicit none
   RNutMicbTransf_vr(ids_NO2B,L,NY,NX)   = micflx%RNO2MicbTransfBand
   RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbTransfBand
   RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand
+  TempSensDecomp_vr(L,NY,NX)            = nmicdiag%TSensGrowth
+  MoistSensDecomp_vr(L,NY,NX)           = nmicdiag%WatStressMicb
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo
@@ -421,7 +424,9 @@ implicit none
   
   SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX) = micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)
   SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)                 = micstt%SolidOMAct(1:jsken,1:jcplx)
-  
+  TSolidOMActC_vr(L,NY,NX)                                  = micstt%TSolidOMActC  
+  TSolidOMC_vr(L,NY,NX)                                     = micstt%TSolidOMC
+  tOMActC_vr(L,NY,NX)                                       = micstt%tOMActC
   if(litrm)then
     RNH4DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)   = micflx%RNH4DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
     RNO3DmndLitrHeter_col(1:NumHetetrMicCmplx,1:jcplx,NY,NX)   = micflx%RNO3DmndLitrHeter(1:NumHetetrMicCmplx,1:jcplx)
@@ -451,7 +456,7 @@ implicit none
 
   TSens4MicbGrwoth_vr(L,NY,NX)                   = micstt%TSens4MicbGrwoth
   VWatMicrobAct_vr(L,NY,NX)                      = micstt%VWatMicrobAct
-  TMicHeterAct_vr(L,NY,NX)                       = micstt%TMicHeterAct
+  TMicHeterActivity_vr(L,NY,NX)                  = micstt%TMicHeterActivity
   ZNFNI(L,NY,NX)                                 = micstt%ZNFNI
   FracBulkSOMC_vr(1:jcplx,L,NY,NX)               = micstt%FracBulkSOMC(1:jcplx)
   DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)      = micstt%DOM(idom_beg:idom_end,1:jcplx)

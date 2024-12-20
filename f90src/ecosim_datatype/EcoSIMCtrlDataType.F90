@@ -20,7 +20,6 @@ module EcoSIMCtrlDataType
   integer :: IGO             !flag for first scenario
   integer :: IDAYR           !day of recovery from earlier run
   integer :: IYRR            !year of recovery from earlier run
-  integer :: NYR             !flag for new year
   integer :: ITERM           !end date for reading weather data
   integer :: IFIN            !end date for reading weather data  
   integer :: IOLD            !last day of previous scenario

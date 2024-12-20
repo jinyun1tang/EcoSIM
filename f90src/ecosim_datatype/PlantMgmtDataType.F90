@@ -28,6 +28,8 @@ module PlantMgmtDataType
   real(r8),target,allocatable ::  NH3byFire_CumYr_col(:,:)                         !total NH3 flux from fire, [g d-2]
   real(r8),target,allocatable ::  N2ObyFire_CumYr_col(:,:)                         !total N2O flux from fire, [g d-2]
   real(r8),target,allocatable ::  PO4byFire_CumYr_col(:,:)                         !total PO4 flux from fire, [g d-2]
+  integer,target,allocatable ::  NP(:,:)                             !number of plant species
+  integer,target,allocatable ::  NP0(:,:)                            !intitial number of plant species
 
   private :: InitAllocate
   contains
@@ -66,6 +68,8 @@ module PlantMgmtDataType
   allocate(NH3byFire_CumYr_col(JY,JX));       NH3byFire_CumYr_col      = 0._r8
   allocate(N2ObyFire_CumYr_col(JY,JX));       N2ObyFire_CumYr_col      = 0._r8
   allocate(PO4byFire_CumYr_col(JY,JX));       PO4byFire_CumYr_col      = 0._r8
+  allocate(NP(JY,JX));          NP=0
+  allocate(NP0(JY,JX));         NP0=0  
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -95,6 +99,9 @@ module PlantMgmtDataType
   call destroy(NH3byFire_CumYr_col)
   call destroy(N2ObyFire_CumYr_col)
   call destroy(PO4byFire_CumYr_col)
+  call destroy(NP)
+  call destroy(NP0)
+
   end subroutine DestructPlantMngmtData
 
 end module PlantMgmtDataType

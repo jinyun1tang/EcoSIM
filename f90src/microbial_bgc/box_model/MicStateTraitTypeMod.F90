@@ -13,7 +13,7 @@ implicit none
   type, public :: micsttype
   real(r8) :: EPOC
   real(r8) :: EHUM
-  real(r8) :: TMicHeterAct
+  real(r8) :: TMicHeterActivity    !heterotrophic micriobial activity
   real(r8) :: ZNH4B
   real(r8) :: ZNH4S
   real(r8) :: ZNO3B
@@ -65,6 +65,9 @@ implicit none
   real(r8) :: TotActMicrobiom
   real(r8) :: TSens4MicbGrwoth
   real(r8) :: VWatMicrobAct
+  real(r8) :: TSolidOMActC
+  real(r8) :: TSolidOMC
+  real(r8) :: tOMActC
   real(r8),allocatable :: FracBulkSOMC(:)
   real(r8),allocatable :: DOM(:,:)
   real(r8),allocatable :: SorbedOM(:,:)

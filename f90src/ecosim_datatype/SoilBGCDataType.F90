@@ -36,7 +36,8 @@ implicit none
   real(r8),target,allocatable :: PH(:,:,:)                         !soil pH
   real(r8),target,allocatable :: CEC_vr(:,:,:)                     !soil cation exchange capacity	[cmol kg-1]
   real(r8),target,allocatable :: AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
- 
+  real(r8),target,allocatable ::  TempSensDecomp_vr(:,:,:)          !temperature dependense of microbial activity
+  real(r8),target,allocatable :: MoistSensDecomp_vr(:,:,:)         !moisture dependence of microbial activity
   real(r8),target,allocatable ::  SurfGasDifflx_col(:,:,:)         !surface gas flux in advection+diffusion [g d-2 h-1]
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
   real(r8),target,allocatable ::  SurfGasFlx_col(:,:,:)                  !soil gas flux, [g d-2 h-1]
@@ -69,16 +70,13 @@ implicit none
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoDOMProd_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
   real(r8),target,allocatable ::  RDOMMicProd_vr(:,:,:,:,:)          !microbial dom flux, > 0 into soil [g d-2 h-1]
-  real(r8),target,allocatable ::  TMicHeterAct_vr(:,:,:)                       !total respiration of DOC+DOA in soil layer
+  real(r8),target,allocatable ::  TMicHeterActivity_vr(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),target,allocatable ::  VWatMicrobAct_vr(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)                    !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)
   real(r8),target,allocatable ::  tRDIM2DOM_col(:,:,:)               !conversion flux from DIM into DOM [g d-2 h-1]
-  real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
-  real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
-  real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
-  real(r8),target,allocatable ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
+
   real(r8),target,allocatable ::  OxyDecompLimiter_vr(:,:,:)         !decomposer oxygen limitation
   real(r8),target,allocatable ::  RO2DecompUptk_vr(:,:,:)            !decompoer oxygen uptake rate
   real(r8),target,allocatable ::  BandWidthNH4_vr(:,:,:)                       !width of NH4 band, [m]
@@ -203,22 +201,19 @@ implicit none
 
   allocate(REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));REcoDOMProd_vr=0._r8
   allocate(RDOMMicProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RDOMMicProd_vr=0._r8
-  allocate(TMicHeterAct_vr(0:JZ,JY,JX));  TMicHeterAct_vr=0._r8
+  allocate(TMicHeterActivity_vr(0:JZ,JY,JX));  TMicHeterActivity_vr=0._r8
   allocate(VWatMicrobAct_vr(0:JZ,JY,JX));   VWatMicrobAct_vr=0._r8
   allocate(TSens4MicbGrwoth_vr(0:JZ,JY,JX));   TSens4MicbGrwoth_vr=0._r8
   allocate(LitrfalStrutElms_vr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JY,JX));LitrfalStrutElms_vr=0._r8
   allocate(trcs_VLN_vr(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN_vr=1._r8
 
-  allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
-
-  allocate(VLNOB(0:JZ,JY,JX));  VLNOB=0._r8
-  allocate(VLPO4(0:JZ,JY,JX));  VLPO4=0._r8
-  allocate(VLPOB(0:JZ,JY,JX));  VLPOB=0._r8
   allocate(BandWidthNH4_vr(JZ,JY,JX));    BandWidthNH4_vr=0._r8
   allocate(OxyDecompLimiter_vr(0:JZ,JY,JX)); OxyDecompLimiter_vr=0._r8
   allocate(RO2DecompUptk_vr(0:JZ,JY,JX)); RO2DecompUptk_vr=0._r8
   allocate(BandThicknessNH4_vr(JZ,JY,JX));    BandThicknessNH4_vr=0._r8
   allocate(BandWidthNO3_vr(JZ,JY,JX));    BandWidthNO3_vr=0._r8
+  allocate(TempSensDecomp_vr(0:JZ,JY,JX)); TempSensDecomp_vr=0._r8
+  allocate(MoistSensDecomp_vr(0:JZ,JY,JX)); MoistSensDecomp_vr=0._r8
   allocate(BandThicknessNO3_vr(JZ,JY,JX));    BandThicknessNO3_vr=0._r8
   allocate(BandWidthPO4_vr(JZ,JY,JX));    BandWidthPO4_vr=0._r8
   allocate(BandThicknessPO4_vr(JZ,JY,JX));    BandThicknessPO4_vr=0._r8
@@ -320,7 +315,7 @@ implicit none
   call destroy(RNutMicbTransf_vr)
   call destroy(REcoDOMProd_vr)
   call destroy(RDOMMicProd_vr)
-  call destroy(TMicHeterAct_vr)
+  call destroy(TMicHeterActivity_vr)
   call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)
   call destroy(LitrfalStrutElms_vr)
@@ -329,15 +324,13 @@ implicit none
   call destroy(SurfGasFlx_col)
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)
-  call destroy(VLNHB)
   call destroy(trcg_SurfLitr_DisolEvap_flx)
 
-  call destroy(VLNOB)
-  call destroy(VLPO4)
-  call destroy(VLPOB)
   call destroy(BandWidthNH4_vr)
   call destroy(BandThicknessNH4_vr)
   call destroy(BandWidthNO3_vr)
+  call destroy(TempSensDecomp_vr)
+  call destroy(MoistSensDecomp_vr)
   call destroy(BandThicknessNO3_vr)
   call destroy(BandWidthPO4_vr)
   call destroy(BandThicknessPO4_vr)

@@ -738,7 +738,7 @@ module StartsMod
   TZIN                = 0.0_r8
   SurfGas_N2_lnd      = 0.0_r8
   TPIN                = 0.0_r8
-  TORGF               = 0.0_r8
+  tAmendOrgC_lnd               = 0.0_r8
   TORGN               = 0.0_r8
   TORGP               = 0.0_r8
   QH2OLoss_lnds       = 0.0_r8

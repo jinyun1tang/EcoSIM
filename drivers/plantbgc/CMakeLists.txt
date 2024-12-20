@@ -7,6 +7,7 @@ add_ecosim_library(plant_driver ${PLANT_DRIVER_SOURCES})
 
 target_include_directories(plant_driver PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/ioutils/)
 
 

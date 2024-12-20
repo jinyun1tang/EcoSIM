@@ -1,5 +1,8 @@
 module ReadManagementMod
-
+  !!
+  ! Description
+  ! code to read Soil management info
+  !
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils , only : endrun
   use fileUtil   , only : open_safe,int2str

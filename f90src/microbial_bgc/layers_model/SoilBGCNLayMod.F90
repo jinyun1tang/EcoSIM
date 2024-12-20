@@ -54,21 +54,23 @@ module SoilBGCNLayMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DownwardMixOM(I,J,L,NY,NX)
+  subroutine DownwardMixOM(I,J,L,NY,NX,FracLitrMix)
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-  real(r8) :: FracLitrMix,FOSCXD
+  real(r8), intent(out) :: FracLitrMix
+  real(r8) :: FOSCXD
   real(r8) :: ORGRL,ORGRLL
   real(r8) :: OSCXD
-  integer :: LL,LN
+  integer :: LL,LN,K
+  real(r8) :: DOC_s,DOC_u,ActL,ActLL,ActD
 !     begin_execution
 
   IF(FOSCZ0.GT.ZERO)THEN
 !     OMLitrC_vr=total litter C
 !     FOSCZ0=rate constant for mixing surface litter
 !     FracLitrMix=mixing fraction for surface litter
-!     TMicHeterAct_vr=total active biomass respiration activity
+!     TMicHeterActivity_vr=total active biomass respiration activity
 !     VLSoilPoreMicP_vr=soil layer volume
 !     OSCXD=mixing required for equilibrating litter concentration
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
@@ -78,11 +80,28 @@ module SoilBGCNLayMod
 !     get mixing rate
       IF(L.EQ.0)THEN
         LL=NU(NY,NX)
+        DOC_s=0._r8;DOC_u=0._r8
+        DO K=1,micpar%NumOfLitrCmplxs
+          if(.not.micpar%is_finelitter(K))cycle
+          DOC_s=DOC_s+DOM_vr(idom_doc,K,L,NY,NX)
+          DOC_u=DOC_u+DOM_vr(idom_doc,K,LL,NY,NX)
+        ENDDO
+        ActL  = DOC_s
+        ActLL = DOC_u
+        ActD  = (ActL*OMLitrC_vr(LL,NY,NX)-ActLL*OMLitrC_vr(L,NY,NX))/(OMLitrC_vr(L,NY,NX)+OMLitrC_vr(LL,NY,NX))
+
         IF(OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-          FracLitrMix=AMIN1(1.0_r8,FOSCZ0/OMLitrC_vr(L,NY,NX)*TMicHeterAct_vr(L,NY,NX))
+          FracLitrMix=FOSCZ0/OMLitrC_vr(L,NY,NX)*TMicHeterActivity_vr(L,NY,NX)
+!          if(ActD>0._r8)then
+!            FracLitrMix=AMIN1(1.0_r8,FracLitrMix*ActD/DOC_s)
+!          elseif(actD<0._r8)then
+!            FracLitrMix=AMIN1(1.0_r8,FracLitrMix*ActD/DOC_u)
+!          endif
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
+!        write(113,*)I+J/24.,ActD,DOM_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
+
       ELSE
         D1100: DO LN=L+1,NL(NY,NX)
           IF(VLSoilPoreMicP_vr(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -93,15 +112,19 @@ module SoilBGCNLayMod
         ORGRL  = AZMAX1(OMLitrC_vr(L,NY,NX))
         ORGRLL = AZMAX1(OMLitrC_vr(LL,NY,NX))
         OSCXD  = (ORGRL*VGeomLayer_vr(LL,NY,NX)-ORGRLL*VGeomLayer_vr(L,NY,NX))/(VGeomLayer_vr(L,NY,NX)+VGeomLayer_vr(LL,NY,NX))
-        IF(OSCXD.GT.0.0_r8.AND.OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+
+        IF(OSCXD.GT.0.0_r8 .AND. OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+         !mass gradient pointing from LL to L
           FOSCXD=OSCXD/OMLitrC_vr(L,NY,NX)
-        ELSEIF(OSCXD.LT.0.0_r8.AND.OMLitrC_vr(LL,NY,NX).GT.ZEROS(NY,NX))THEN
+        ELSEIF(OSCXD.LT.0.0_r8 .AND. OMLitrC_vr(LL,NY,NX).GT.ZEROS(NY,NX))THEN
+          !mass gradient pointing from layer L to LL
           FOSCXD=OSCXD/OMLitrC_vr(LL,NY,NX)
         ELSE
           FOSCXD=0.0_r8
         ENDIF
+
         IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FracLitrMix=FOSCZL*FOSCXD*TMicHeterAct_vr(L,NY,NX)/VGeomLayer_vr(L,NY,NX)          
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterActivity_vr(L,NY,NX)/VGeomLayer_vr(L,NY,NX)          
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
@@ -119,7 +142,9 @@ module SoilBGCNLayMod
 
   implicit none
   real(r8), intent(in) :: FracLitrMix
-  integer, intent(in) :: L,LL,NY,NX
+  integer, intent(in) :: NY,NX        !horizontal location of the grid
+  integer, intent(in) :: L            !source grid
+  integer, intent(in) :: LL           !destination grid
 
   real(r8) :: OMEXS,ORMXS
   real(r8) :: OQMXS,OQMHXS,OHMXS
@@ -127,8 +152,15 @@ module SoilBGCNLayMod
   integer :: K,M,N,NGL,MID,NE,L1
   
 !     begin_execution
+  IF(FracLitrMix.GT.0.0_r8)THEN
+    L1=L
+  ELSE
+    L1=LL
+  ENDIF
+  !how about heat, water flux and capacity?
 ! only downward mixing is considered
 ! upward mixing is yet to be considered, even though FracLitrMix could be negative
+
   IF(FracLitrMix.GT.ZERO)THEN
     !mix microbial biomass
     D7971: DO K=1,micpar%NumOfLitrCmplxs
@@ -137,11 +169,6 @@ module SoilBGCNLayMod
         DO NGL=JGnio(N),JGnfo(N)
           D7962: DO M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)            
-            IF(FracLitrMix.GT.0.0_r8)THEN
-              L1=L
-            ELSE
-              L1=LL
-            ENDIF
             DO NE=1,NumPlantChemElms            
               OMEXS                             = FracLitrMix*AZMAX1(mBiomeHeter_vr(NE,MID,K,L1,NY,NX))
               mBiomeHeter_vr(NE,MID,K,L,NY,NX)  = mBiomeHeter_vr(NE,MID,K,L,NY,NX)-OMEXS
@@ -152,15 +179,11 @@ module SoilBGCNLayMod
       ENDDO D7961
     ENDDO D7971
 
+    !mix microbial residual
     D7901: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
       !mix fine litter
       D7941: DO M=1,micpar%ndbiomcp
-        IF(FracLitrMix.GT.0.0_r8)THEN
-          L1=L
-        ELSE
-          L1=LL
-        ENDIF
 
         DO NE=1,NumPlantChemElms
           ORMXS                          = FracLitrMix*AZMAX1(OMBioResdu_vr(NE,M,K,L1,NY,NX))
@@ -168,12 +191,9 @@ module SoilBGCNLayMod
           OMBioResdu_vr(NE,M,K,LL,NY,NX) = OMBioResdu_vr(NE,M,K,LL,NY,NX)+ORMXS
         ENDDO
       ENDDO D7941
+
       !mix dissolved organic matter
-      IF(FracLitrMix.GT.0.0_r8)THEN
-        L1=L
-      ELSE
-        L1=LL
-      ENDIF      
+
       DO NE=idom_beg,idom_end
         OQMXS  = FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
         OQMHXS = FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
@@ -190,11 +210,6 @@ module SoilBGCNLayMod
 
       !mix solid organic matter
       D7931: DO M=1,jsken
-        IF(FracLitrMix.GT.0.0_r8)THEN
-          L1=L
-        ELSE
-          L1=LL
-        ENDIF
         DO NE=1,NumPlantChemElms
           OSMXS                       = FracLitrMix*AZMAX1(SolidOM_vr(NE,M,K,L1,NY,NX))
           SolidOM_vr(NE,M,K,L,NY,NX)  = SolidOM_vr(NE,M,K,L,NY,NX)-OSMXS

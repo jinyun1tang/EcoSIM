@@ -6,6 +6,7 @@ module WthrMod
   use MiniMathMod  , only : safe_adb,vapsat0,isclose
   use MiniFuncMod  , only : get_sun_declin
   use EcoSIMCtrlMod, only : etimer,frectyp
+  use PlantMgmtDataType, only: NP  
   use EcosimConst
   use CanopyRadDataType
   use GridConsts

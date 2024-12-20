@@ -10,6 +10,7 @@ module Hour1Mod
   use EcoSIMConfig, only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
   use EcoSiMParDataMod, only : micpar,pltpar
   use SoilBGCNLayMod, only : sumORGMLayL
+  use PlantMgmtDataType, only: NP  
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -521,8 +522,8 @@ module Hour1Mod
     !     VOLT,VLSoilPoreMicP_vr,VLSoilMicP=layer volume including,excluding rock,macropores
     !
     IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).LE.ZERO2)THEN
-      VLWatMicP_vr(L,NY,NX)=0._r8
-      VLiceMicP_vr(L,NY,NX)=0._r8
+      VLWatMicP_vr(L,NY,NX) = 0._r8
+      VLiceMicP_vr(L,NY,NX) = 0._r8
     ENDIF
     AREA(1,L,NY,NX)        = DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)        = DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
@@ -729,7 +730,7 @@ module Hour1Mod
 
   integer :: L
 !     begin_execution
-
+  ECO_HR_CO2_vr(:,NX,NX)                   = 0._r8
   ECO_HR_CO2_col(NY,NX)                    = 0._r8
   ECO_HR_CH4_col(NY,NX)                    = 0._r8
   Eco_RadSW_col(NY,NX)                     = 0._r8
@@ -756,7 +757,7 @@ module Hour1Mod
   SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)    = 0._r8
   SurfGasDifflx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   WatFLo2LitR_col(NY,NX)                   = 0._r8
-  HeatFLo2LitrByWat(NY,NX)                 = 0._r8
+  HeatFLo2LitrByWat_col(NY,NX)                 = 0._r8
   TLitrIceFlxThaw_col(NY,NX)               = 0._r8
   TLitrIceHeatFlxFrez_col(NY,NX)           = 0._r8
   HeatByRad2Surf_col(NY,NX)                = 0._r8
@@ -1881,7 +1882,7 @@ module Hour1Mod
           VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
         ENDIF
       ENDDO D2970
-      TORGF=TORGF+OSCI
+      tAmendOrgC_lnd=tAmendOrgC_lnd+OSCI
       TORGN=TORGN+OSNI
       TORGP=TORGP+OSPI
       AmendCFlx_CumYr_col(NY,NX)=AmendCFlx_CumYr_col(NY,NX)+OSCI

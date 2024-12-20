@@ -254,7 +254,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8),allocatable :: rCNSorbOM(:)
     real(r8),allocatable :: rCPSorbOM(:)
     real(r8),allocatable :: OMBioResduK(:)
-    real(r8),allocatable :: SolidOMK(:)
+    real(r8),allocatable :: SolidOMCK(:)
     real(r8),allocatable :: SolidOMActK(:)
     real(r8),allocatable :: tMaxNActMicrbK(:)
     real(r8),allocatable :: tMaxPActMicrbK(:)
@@ -821,7 +821,7 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%rCNSorbOM(1:ncplx));this%rCNSorbOM=spval
   allocate(this%rCPSorbOM(1:ncplx));this%rCPSorbOM=spval
   allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
-  allocate(this%SolidOMK(1:ncplx));this%SolidOMK=spval
+  allocate(this%SolidOMCK(1:ncplx));this%SolidOMCK=spval
   allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
   allocate(this%tMaxNActMicrbK(1:ncplx+1));this%tMaxNActMicrbK=spval
   allocate(this%tMaxPActMicrbK(1:ncplx+1));this%tMaxPActMicrbK=spval
@@ -846,7 +846,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%rCNSorbOM=0._r8
   this%rCPSorbOM=0._r8
   this%OMBioResduK=0._r8
-  this%SolidOMK=0._r8
+  this%SolidOMCK=0._r8
   this%SolidOMActK=0._r8
   this%tMaxNActMicrbK=0._r8
   this%tMaxPActMicrbK=0._r8
@@ -870,7 +870,7 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%rCNSorbOM)
   call destroy(this%rCPSorbOM)
   call destroy(this%OMBioResduK)
-  call destroy(this%SolidOMK)
+  call destroy(this%SolidOMCK)
   call destroy(this%SolidOMActK)
   call destroy(this%tMaxNActMicrbK)
   call destroy(this%tMaxPActMicrbK)

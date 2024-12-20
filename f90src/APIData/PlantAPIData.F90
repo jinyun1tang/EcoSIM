@@ -722,6 +722,7 @@ implicit none
   real(r8), pointer :: RAutoRootO2Limter_rpvr(:,:,:)      => null()  !O2 constraint to root respiration,                              []
   real(r8), pointer :: trcg_rootml_pvr(:,:,:,:)          => null() !root gas content,                                                [g d-2]
   real(r8), pointer :: trcs_rootml_pvr(:,:,:,:)          => null() !root aqueous content,                                            [g d-2]
+  real(r8), pointer :: RootGasConductance_pvr(:,:,:,:)   => null()
   real(r8), pointer :: NH3Dep2Can_brch(:,:)              => null()  !gaseous NH3 flux fron root disturbance band,                    [g d-2 h-1]
   real(r8), pointer :: RootNutUptake_pvr(:,:,:,:)        => null()  !root uptake of Nutrient band,                                   [g d-2 h-1]
   real(r8), pointer :: RootOUlmNutUptake_pvr(:,:,:,:)    => null()  !root uptake of NH4 band unconstrained by O2,                    [g d-2 h-1]
@@ -761,11 +762,12 @@ implicit none
   implicit none
   class(plant_rootbgc_type) :: this
   allocate(this%trcs_plant_uptake_vr(ids_beg:ids_end,JZ1)); this%trcs_plant_uptake_vr=0._r8
-  allocate(this%trcg_rootml_pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_rootml_pvr=spval
-  allocate(this%trcs_rootml_pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcs_rootml_pvr=spval
+  allocate(this%trcg_rootml_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
+  allocate(this%trcs_rootml_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
+  allocate(this%RootGasConductance_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1)); this%RootGasConductance_pvr=0._r8
   allocate(this%TRootGasLossDisturb_pft(idg_beg:idg_end-1));this%TRootGasLossDisturb_pft=spval
   allocate(this%RO2UptkSoilM_vr(60,0:JZ1)); this%RO2UptkSoilM_vr=spval
-  allocate(this%RootMycoExudElm_pvr(NumPlantChemElms,2,1:jcplx,0:JZ1,JP1));this%RootMycoExudElm_pvr=spval
+  allocate(this%RootMycoExudElm_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%RootMycoExudElm_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
   allocate(this%PlantExudElm_CumYr_pft(NumPlantChemElms,JP1));this%PlantExudElm_CumYr_pft=spval
   allocate(this%RootUptk_N_CumYr_pft(JP1)); this%RootUptk_N_CumYr_pft=spval
@@ -791,8 +793,8 @@ implicit none
   allocate(this%trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ1));this%trcg_air2root_flx_vr=spval
   allocate(this%trcg_root_vr(idg_beg:idg_end-1,JZ1));this%trcg_root_vr=spval
 
-  allocate(this%trcg_air2root_flx_pvr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_air2root_flx_pvr=spval
-  allocate(this%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_Root_gas2aqu_flx_vr=spval
+  allocate(this%trcg_air2root_flx_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcg_air2root_flx_pvr=spval
+  allocate(this%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcg_Root_gas2aqu_flx_vr=spval
   allocate(this%RootO2Dmnd4Resp_pvr(jroots,JZ1,JP1));this%RootO2Dmnd4Resp_pvr=spval
   allocate(this%RootNH4DmndSoil_pvr(jroots,JZ1,JP1));this%RootNH4DmndSoil_pvr=spval
   allocate(this%RootNH4DmndBand_pvr(jroots,JZ1,JP1));this%RootNH4DmndBand_pvr=spval

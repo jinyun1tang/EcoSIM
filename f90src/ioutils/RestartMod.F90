@@ -4241,9 +4241,9 @@ implicit none
        interpinic_flag='skip', data=SurfGas_O2_lnd, missing_value=spval, &
        fill_value=spval)
 
-  call restartvar(ncid, flag, varname='TORGF', &
+  call restartvar(ncid, flag, varname='tAmendOrgC_lnd', &
        long_name='total organic C amendment', units='g d-2', &
-       interpinic_flag='skip', data=TORGF, missing_value=spval, &
+       interpinic_flag='skip', data=tAmendOrgC_lnd, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TORGN', &

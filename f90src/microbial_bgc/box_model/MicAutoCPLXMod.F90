@@ -19,15 +19,16 @@ module MicAutoCPLXMod
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  public :: ActiveMicrobAutotrophs
-  public :: MicrobAutotrophAnabolicUpdate
+  public :: ActiveAutotrophs
+  public :: AutotrophAnabolicUpdate
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine ActiveMicrobAutotrophs(NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,&
+  subroutine ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,&
     SPOMK, RMOMK, OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: NGL,N
   real(r8), intent(in) :: VOLWZ
   real(r8), intent(in):: OXKX,WatStressMicb,TSensGrowth,XCO2
@@ -144,13 +145,13 @@ module MicAutoCPLXMod
 
   elseif (N.eq.mid_AerobicMethanotrofBacter)then
 !     METHANOTROPHS
-    call MethanotrophCatabolism(NGL,N,ECHZ,RGOMP,&
+    call MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
       RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
   else
-    RGOMP=0.0_r8
-    RO2Dmnd4RespAutor(NGL)=0.0_r8
-    RO2DmndAutor(NGL)=0.0_r8
-    RO2DmndAutort(NGL)=0.0_r8
+    RGOMP                  = 0.0_r8
+    RO2Dmnd4RespAutor(NGL) = 0.0_r8
+    RO2DmndAutor(NGL)      = 0.0_r8
+    RO2DmndAutort(NGL)     = 0.0_r8
   ENDif
 !
 !  write(*,*)'O2 UPTAKE BY AEROBES'
@@ -198,11 +199,11 @@ module MicAutoCPLXMod
   call GatherAutotrophRespiration(NGL,N,RMOMK,micfor,micstt,RGrowthRespAutor,&
     RMaintDefcitcitAutor,RMaintRespAutor,nmicf,nmics)
 !
-  call GatherAutotrophAnabolicFlux(NGL,N,ECHZ,FGOCP,FGOAP,RGrowthRespAutor,&
+  call GatherAutotrophAnabolicFlux(I,J,NGL,N,ECHZ,FGOCP,FGOAP,RGrowthRespAutor,&
     RMaintDefcitcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
 
   end associate
-  end subroutine ActiveMicrobAutotrophs
+  end subroutine ActiveAutotrophs
 
 
 !------------------------------------------------------------------------------------------
@@ -365,9 +366,10 @@ module MicAutoCPLXMod
   end subroutine SubstrateCompetitionFactorsff
 !------------------------------------------------------------------------------------------
 
-  subroutine GatherAutotrophAnabolicFlux(NGL,N,ECHZ,FGOCP,FGOAP,&
+  subroutine GatherAutotrophAnabolicFlux(I,J,NGL,N,ECHZ,FGOCP,FGOAP,&
     RGrowthRespAutor,RMaintDefcitcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: NGL,N
   real(r8), intent(in) :: ECHZ
   real(r8), intent(in) :: FGOCP,FGOAP
@@ -439,12 +441,13 @@ module MicAutoCPLXMod
 !
 
   DOMuptk4GrothAutor(idom_beg:idom_end,NGL)=0._r8
-  CGOMX=AMIN1(RMaintRespAutor,RespGrossAutor(NGL))+Resp4NFixAutor(NGL)+(RGrowthRespAutor-Resp4NFixAutor(NGL))/ECHZ
-  !for NO2(-) reduction by NH3
-  CGOMD=RNOxReduxRespAutorLim(NGL)/ENOX
+  CGOMX = AMIN1(RMaintRespAutor,RespGrossAutor(NGL))+Resp4NFixAutor(NGL)+(RGrowthRespAutor-Resp4NFixAutor(NGL))/ECHZ  
+  CGOMD = RNOxReduxRespAutorLim(NGL)/ENOX  !for NO2(-) reduction by NH3
   !total C uptake, which could be CO2, or CH4, depending on the type of organism
   !for aerobic methanotrophs, the following equals to CH4 uptake for biomass
   DOMuptk4GrothAutor(ielmc,NGL)=CGOMX+CGOMD
+
+!  if(micfor%litrm .and. N.eq.micpar%mid_AerobicMethanotrofBacter)write(113,*)I+J/24.,RespGrossAutor(NGL),DOMuptk4GrothAutor(ielmc,NGL)
 
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
@@ -461,19 +464,19 @@ module MicAutoCPLXMod
     CCC=AZMAX1(AMIN1(1.0_r8 &
       ,mBiomeAutor(ielmn,MID3)/(mBiomeAutor(ielmn,MID3)+mBiomeAutor(ielmc,MID3)*rNCOMCAutor(3,NGL)) &
       ,mBiomeAutor(ielmp,MID3)/(mBiomeAutor(ielmp,MID3)+mBiomeAutor(ielmc,MID3)*rPCOMCAutor(3,NGL))))
-    CXC=mBiomeAutor(ielmc,MID3)/mBiomeAutor(ielmc,MID1)
-    C3C=1.0_r8/(1.0_r8+CXC/CKC)
-    CNC=AZMAX1(AMIN1(1.0_r8 &
+    CXC = mBiomeAutor(ielmc,MID3)/mBiomeAutor(ielmc,MID1)
+    C3C = 1.0_r8/(1.0_r8+CXC/CKC)
+    CNC = AZMAX1(AMIN1(1.0_r8 &
       ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmn,MID3)/rNCOMCAutor(3,NGL))))
     CPC=AZMAX1(AMIN1(1.0_r8 &
       ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmp,MID3)/rPCOMCAutor(3,NGL))))
-    RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
-    RCCN=CNC*RCCX
-    RCCP=CPC*RCCQ
+    RCCC = RCCZ+AMAX1(CCC,C3C)*RCCY
+    RCCN = CNC*RCCX
+    RCCP = CPC*RCCQ
   ELSE
-    RCCC=RCCZ
-    RCCN=0.0_r8
-    RCCP=0.0_r8
+    RCCC = RCCZ
+    RCCN = 0.0_r8
+    RCCP = 0.0_r8
   ENDIF
 !
 !     MICROBIAL ASSIMILATION OF NONSTRUCTURAL C,N,P
@@ -485,9 +488,9 @@ module MicAutoCPLXMod
 !     FL=partitioning between labile and resistant microbial components
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
 !
-  MID3=micpar%get_micb_id(3,NGL)
-  CGOMZ=GrowthEnvScalAutor(NGL)*OMGR*AZMAX1(mBiomeAutor(ielmc,MID3))
-  DO  M=1,2
+  MID3  = micpar%get_micb_id(3,NGL)
+  CGOMZ = GrowthEnvScalAutor(NGL)*OMGR*AZMAX1(mBiomeAutor(ielmc,MID3))
+  DO M = 1, 2
     NonstX2stBiomAutor(ielmc,M,NGL)=FL(M)*CGOMZ
     IF(mBiomeAutor(ielmc,MID3).GT.ZEROS)THEN
       NonstX2stBiomAutor(ielmn,M,NGL)=AMIN1(FL(M)*AZMAX1(mBiomeAutor(ielmn,MID3)) &
@@ -509,8 +512,8 @@ module MicAutoCPLXMod
 !     RDOMC,RDOMN,RDOMP=microbial C,N,P LitrFall
 !     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
 !
-    MID=micpar%get_micb_id(M,NGL)
-    SPOMX=SQRT(GrowthEnvScalAutor(NGL))*SPOMC(M)*SPOMK(M)
+    MID   = micpar%get_micb_id(M,NGL)
+    SPOMX = SQRT(GrowthEnvScalAutor(NGL))*SPOMC(M)*SPOMK(M)
     DO NE=1,NumPlantChemElms
       RKillOMAutor(NE,M,NGL)=AZMAX1(mBiomeAutor(NE,MID)*SPOMX)
     ENDDO
@@ -573,18 +576,18 @@ module MicAutoCPLXMod
 !     RCMMC,RCMMN,RCMMC=transfer of senesence LitrFall C,N,P to residue
 !
       DO NE=1,NumPlantChemElms
-        RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)=AZMAX1(RMaintDefcitLitrfalOMAutor(NE,M,NGL)*EHUM)
-        RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL)=RMaintDefcitLitrfalOMAutor(NE,M,NGL)-RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)
+        RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)   = AZMAX1(RMaintDefcitLitrfalOMAutor(NE,M,NGL)*EHUM)
+        RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL) = RMaintDefcitLitrfalOMAutor(NE,M,NGL)-RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)
       ENDDO
     ENDDO
   ELSE
     DO  M=1,2
       DO NE=1,NumPlantChemElms
-        RMaintDefcitKillOMAutor(NE,M,NGL)=0.0_r8
-        RMaintDefcitLitrfalOMAutor(NE,M,NGL)=0.0_r8
-        RMaintDefcitRecycOMAutor(NE,M,NGL)=0.0_r8
-        RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)=0.0_r8
-        RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL)=0.0_r8
+        RMaintDefcitKillOMAutor(NE,M,NGL)          = 0.0_r8
+        RMaintDefcitLitrfalOMAutor(NE,M,NGL)       = 0.0_r8
+        RMaintDefcitRecycOMAutor(NE,M,NGL)         = 0.0_r8
+        RMaintDefcitLitrfal2HumOMAutor(NE,M,NGL)   = 0.0_r8
+        RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL) = 0.0_r8
       ENDDO
     ENDDO
   ENDIF
@@ -664,8 +667,8 @@ module MicAutoCPLXMod
     RNO2OxidAutorBand     => micflx%RNO2OxidAutorBand      &
   )
 
-  IF(RO2DmndAutor(NGL).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
-    IF(.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS)THEN
+  IF(RO2DmndAutor(NGL).GT.ZEROS .AND. FOXYX.GT.ZERO)THEN
+    IF(.not.litrm .OR. VLSoilPoreMicP.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
@@ -674,11 +677,11 @@ module MicAutoCPLXMod
       RO2DmndX=RO2GasXchangePrev*dts_gas*FOXYX    !O2 demand
       O2AquaDiffusvity1=O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
-        OXYG1=OXYG*FOXYX
-        ROXYLX=RO2AquaXchangePrev*dts_gas*FOXYX
+        OXYG1  = OXYG*FOXYX
+        ROXYLX = RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
-        OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
+        OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
+        ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
           +Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
@@ -703,18 +706,18 @@ module MicAutoCPLXMod
         !     OXYG,COXYG=gaseous O2 amount, concentration
         !     RMPOX,RO2UptkSoilM=O2 uptake
         !
-        THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
-        RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TortMicPM(M)*O2AquaDiffusvity1*12.57_r8*BIOS*OMActAutor(NGL)*RRADO
-        VOLWOX=VLWatMicPM(M)*O2GSolubility
-        VOLPOX=VLsoiAirPM(M)
-        VOLWPM=VOLWOX+VOLPOX
+        THETW1 = AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
+        RRADO  = ORAD*(FILM(M)+ORAD)/FILM(M)
+        DIFOX  = TortMicPM(M)*O2AquaDiffusvity1*12.57_r8*BIOS*OMActAutor(NGL)*RRADO
+        VOLWOX = VLWatMicPM(M)*O2GSolubility
+        VOLPOX = VLsoiAirPM(M)
+        VOLWPM = VOLWOX+VOLPOX
 
 !oxygen uptake in the layer
         DO  MX=1,NPT
-          OXYG1=OXYG1+RO2DmndX
-          OXYS1=OXYS1+ROXYLX
-          COXYS1=AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
+          OXYG1  = OXYG1+RO2DmndX
+          OXYS1  = OXYS1+ROXYLX
+          COXYS1 = AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
 
           !solve for uptake flux
           IF(OXYS1<=ZEROS)THEN
@@ -731,11 +734,11 @@ module MicAutoCPLXMod
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
-          OXYG1=OXYG1-ROXDFQ
-          OXYS1=OXYS1+ROXDFQ
+          OXYG1 = OXYG1-ROXDFQ
+          OXYS1 = OXYS1+ROXDFQ
           !accumulate uptake flux
-          RO2UptkAutor(NGL)=RO2UptkAutor(NGL)+RMPOX
-          RO2UptkSoilM(M)=RO2UptkSoilM(M)+RMPOX
+          RO2UptkAutor(NGL) = RO2UptkAutor(NGL)+RMPOX
+          RO2UptkSoilM(M)   = RO2UptkSoilM(M)+RMPOX
         ENDDO
 
       ENDDO
@@ -748,19 +751,19 @@ module MicAutoCPLXMod
       !
       fLimO2Autor(NGL)=AMIN1(1.0,AZMAX1(RO2UptkAutor(NGL)/RO2DmndAutor(NGL)))
       IF(N.EQ.mid_AmmoniaOxidBacter)THEN
-        RNH3OxidAutor(NGL)=RNH3OxidAutor(NGL)*fLimO2Autor(NGL)
-        RNH3OxidAutorBand(NGL)=RNH3OxidAutorBand(NGL)*fLimO2Autor(NGL)
+        RNH3OxidAutor(NGL)     = RNH3OxidAutor(NGL)*fLimO2Autor(NGL)
+        RNH3OxidAutorBand(NGL) = RNH3OxidAutorBand(NGL)*fLimO2Autor(NGL)
       ELSEIF(N.EQ.mid_NitriteOxidBacter)THEN
-        RNO2OxidAutor(NGL)=RNO2OxidAutor(NGL)*fLimO2Autor(NGL)
-        RNO2OxidAutorBand(NGL)=RNO2OxidAutorBand(NGL)*fLimO2Autor(NGL)
+        RNO2OxidAutor(NGL)     = RNO2OxidAutor(NGL)*fLimO2Autor(NGL)
+        RNO2OxidAutorBand(NGL) = RNO2OxidAutorBand(NGL)*fLimO2Autor(NGL)
       ENDIF
     ELSE
-      RO2UptkAutor(NGL)=RO2DmndAutor(NGL)
-      fLimO2Autor(NGL)=1.0_r8
+      RO2UptkAutor(NGL) = RO2DmndAutor(NGL)
+      fLimO2Autor(NGL)  = 1.0_r8
     ENDIF
   ELSE
-    RO2UptkAutor(NGL)=0.0_r8
-    fLimO2Autor(NGL)=1.0_r8
+    RO2UptkAutor(NGL) = 0.0_r8
+    fLimO2Autor(NGL)  = 1.0_r8
   ENDIF
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
   !
@@ -769,12 +772,12 @@ module MicAutoCPLXMod
   !     RO2Uptk4RespHeter=O2-limited O2 uptake
   !     RSOxidSoilAutor,RSOxidBandAutor=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
   !
-  RespGrossAutor(NGL)=RGOMP*fLimO2Autor(NGL)
-  RCO2ProdAutor(NGL)=RespGrossAutor(NGL)
-  RCH4ProdAutor(NGL)=0.0_r8
-  RO2Uptk4RespAutor(NGL)=RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
-  RSOxidSoilAutor(NGL)=RVOXPA*fLimO2Autor(NGL)
-  RSOxidBandAutor(NGL)=RVOXPB*fLimO2Autor(NGL)
+  RespGrossAutor(NGL)    = RGOMP*fLimO2Autor(NGL)
+  RCO2ProdAutor(NGL)     = RespGrossAutor(NGL)
+  RCH4ProdAutor(NGL)     = 0.0_r8
+  RO2Uptk4RespAutor(NGL) = RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
+  RSOxidSoilAutor(NGL)   = RVOXPA*fLimO2Autor(NGL)
+  RSOxidBandAutor(NGL)   = RVOXPB*fLimO2Autor(NGL)
   end associate
   end subroutine AerobicAutorO2Uptake
 
@@ -1227,10 +1230,11 @@ module MicAutoCPLXMod
   end subroutine H2MethanogensCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine MethanotrophCatabolism(NGL,N,ECHZ,RGOMP,&
+  subroutine MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
     RCH4Oxid,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: NGL,N
   real(r8), intent(out) :: ECHZ
   real(r8), intent(out) :: RGOMP     !methane oxidized into CH2O
@@ -1306,15 +1310,15 @@ module MicAutoCPLXMod
 
   IF(litrm)THEN
     !surface residue layer
-    CH4G1=CCH4E*VLsoiAirPM(1)
+    CH4G1 = CCH4E*VLsoiAirPM(1)
+    VMXA1 = AZMAX1(AMIN1(VMXA*dts_gas,RCH4F1))  !apparent vmax for uptake
   ELSE
     CH4G1=CCH4G*VLsoiAirPM(1)
+    VMXA1    = VMXA*dts_gas  !apparent vmax for uptake    
   ENDIF
-  CH4S1=CH4S
-  !apparent vmax for uptake
-  VMXA1=VMXA*dts_gas
-  RCH4Oxid=0.0_r8
-  RGOMP=0.0_r8
+  CH4S1    = CH4S
+  RCH4Oxid = 0.0_r8
+  RGOMP    = 0.0_r8
 !
 !     CH4 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP
 !     TO MAINTAIN AQUEOUS CH4 CONCENTRATION DURING OXIDATION
@@ -1330,19 +1334,18 @@ module MicAutoCPLXMod
 !  C+ O2 -> CO2,  32/12=2.667
   D320: DO M=1,NPH
     IF(VLWatMicPM(M).GT.ZEROS2)THEN
-      VOLWCH=VLWatMicPM(M)*CH4AquaSolubility
-      VOLWPM=VOLWCH+VLsoiAirPM(M)
+      VOLWCH = VLWatMicPM(M)*CH4AquaSolubility
+      VOLWPM = VOLWCH+VLsoiAirPM(M)
 
       !CH4 uptake by aerobic oxidation
       !RCH4F1: net gaseous CH4 flux from transport into the layer
       !RCH4L1: net aqueous CH4 flux from transport into the layer
       !RCH4S1: aquoues CH4 production from methanogenesis in the layer
       D325: DO MM=1,NPT
-        CH4G1=CH4G1+RCH4F1
-        CH4S1=CH4S1+RCH4L1+RCH4S1
-        CCH4S1=AZMAX1(safe_adb(CH4S1,VLWatMicPM(M)))
-        
-        FSBST=CCH4S1/(CCH4S1+CCK4)
+        CH4G1  = CH4G1+RCH4F1
+        CH4S1  = CH4S1+RCH4L1+RCH4S1
+        CCH4S1 = AZMAX1(safe_adb(CH4S1,VLWatMicPM(M)))
+        FSBST  = CCH4S1/(CCH4S1+CCK4)
         !RVOXP1 energy from oxidizing CH4 into CO2
         RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0_r8+ECHO*ECHZ),VMXA1*FSBST)
         !the respiration yield of CH2O, CH4+O2 -> CH2O + H2O (molar basis)
@@ -1363,14 +1366,18 @@ module MicAutoCPLXMod
       ENDDO D325
     ENDIF
   ENDDO D320
-  RVOXPA=RCH4Oxid
-  RVOXPB=0.0_r8
+  RVOXPA = RCH4Oxid
+  RVOXPB = 0.0_r8
 !
 !     O2 DEMAND FROM CH4 OXIDATION
 !
 !     RO2Dmnd4RespHeter=O2 demand from respiration
 !     ROXYP=O2 demand from respiration + CH4 oxidation
 ! 
+!  IF(litrm)THEN
+!  write(114,*)I+J/24.,RGOMP,OMActAutor(NGL)
+!  if(OMActAutor(NGL)>1.e2)stop
+!  endif
   RO2Dmnd4RespAutor(NGL) = 2.667_r8*RGOMP
   RO2DmndAutor(NGL)      = RO2Dmnd4RespAutor(NGL)+5.333_r8*RCH4Oxid
   RO2DmndAutort(NGL)     = RO2DmndAutor(NGL)
@@ -1850,7 +1857,7 @@ module MicAutoCPLXMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MicrobAutotrophAnabolicUpdate(micfor,micstt,nmicf)
+  subroutine AutotrophAnabolicUpdate(micfor,micstt,nmicf)
 
   implicit none
   type(micforctype), intent(in) :: micfor
@@ -1949,20 +1956,19 @@ module MicAutoCPLXMod
 !     RNH4TransfLitrHeter,RNO3TransfLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
 !     RH2PO4TransfLitrHeter,RH1PO4TransfLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
-        CGROMC=DOMuptk4GrothAutor(ielmc,NGL)-RespGrossAutor(NGL)-RNOxReduxRespAutorLim(NGL)-Resp4NFixAutor(NGL)
-        RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+Resp4NFixAutor(NGL)
-        MID3=micpar%get_micb_id(3,NGL)
+        CGROMC             = DOMuptk4GrothAutor(ielmc,NGL)-RespGrossAutor(NGL)-RNOxReduxRespAutorLim(NGL)-Resp4NFixAutor(NGL)
+        RCO2ProdAutor(NGL) = RCO2ProdAutor(NGL)+Resp4NFixAutor(NGL)
+        MID3               = micpar%get_micb_id(3,NGL)
         DO M=1,2
           DO NE=1,NumPlantChemElms
             mBiomeAutor(NE,MID3)=mBiomeAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
           ENDDO
-          mBiomeAutor(ielmn,MID3)=mBiomeAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
-          mBiomeAutor(ielmp,MID3)=mBiomeAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
-          RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)+RMaintDefcitRecycOMAutor(ielmc,M,NGL)
+          mBiomeAutor(ielmn,MID3) = mBiomeAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
+          mBiomeAutor(ielmp,MID3) = mBiomeAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
+          RCO2ProdAutor(NGL)      = RCO2ProdAutor(NGL)+RMaintDefcitRecycOMAutor(ielmc,M,NGL)
         ENDDO
         
         mBiomeAutor(ielmc,MID3)=mBiomeAutor(ielmc,MID3)+CGROMC
-
         mBiomeAutor(ielmn,MID3)=mBiomeAutor(ielmn,MID3)+DOMuptk4GrothAutor(ielmn,NGL) &
           +RNH4TransfSoilAutor(NGL)+RNH4TransfBandAutor(NGL)+RNO3TransfSoilAutor(NGL) &
           +RNO3TransfBandAutor(NGL)+RN2FixAutor(NGL)
@@ -1978,7 +1984,7 @@ module MicAutoCPLXMod
     ENDIF
   ENDDO
   end associate
-  end subroutine MicrobAutotrophAnabolicUpdate
+  end subroutine AutotrophAnabolicUpdate
 
 
 end module MicAutoCPLXMod

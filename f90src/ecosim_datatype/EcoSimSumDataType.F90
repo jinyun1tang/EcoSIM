@@ -26,7 +26,7 @@ module EcoSimSumDataType
   real(r8) :: CRAIN    !total precipitation	m3 d-2
   real(r8) :: HEATIN_lnd   !total surface heat flux	MJ d-2
   real(r8) :: SurfGas_O2_lnd   !total surface O2 flux	g d-2
-  real(r8) :: TORGF    !total organic C amendment	g d-2
+  real(r8) :: tAmendOrgC_lnd    !total organic C amendment	g d-2
   real(r8) :: TORGN    !total organic N amendment	g d-2
   real(r8) :: TORGP    !total organic P amendment	g d-2
   real(r8) :: SurfGas_CO2_lnd   !total surface CO2 flux	g d-2

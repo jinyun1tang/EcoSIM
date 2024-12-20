@@ -15,7 +15,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   WatFLo2LitrM(:,:,:)                     !water transfer between soil surface and surface litter, [g d-2 t-1]
   real(r8) ,target,allocatable ::   WatFlowSno2LitRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   FracSurfByLitR_col(:,:)              !fraction of soil surface covered by surface litter, [-]
-  real(r8) ,target,allocatable ::   HeatFLo2LitrByWat(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
+  real(r8) ,target,allocatable ::   HeatFLo2LitrByWat_col(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   VLitR_col(:,:)                       !surface litter volume, [m3 d-2]
   real(r8) ,target,allocatable ::   VHeatCapLitRMin_col(:,:)                !threshold surface litter heat capacity, [MJ d-2 K-1]
   real(r8) ,target,allocatable ::   VWatLitRHoldCapcity_col(:,:)                   !surface litter water holding capacity, [m3 d-2]
@@ -53,7 +53,7 @@ module SurfLitterDataType
   allocate(WatFLo2LitrM(60,JY,JX));     WatFLo2LitrM=0._r8
   allocate(WatFlowSno2LitRM(60,JY,JX));     WatFlowSno2LitRM=0._r8
   allocate(FracSurfByLitR_col(JY,JX));         FracSurfByLitR_col=0._r8
-  allocate(HeatFLo2LitrByWat(JY,JX));        HeatFLo2LitrByWat=0._r8
+  allocate(HeatFLo2LitrByWat_col(JY,JX));        HeatFLo2LitrByWat_col=0._r8
   allocate(VLitR_col(JY,JX));         VLitR_col=0._r8
   allocate(VHeatCapLitRMin_col(JY,JX));       VHeatCapLitRMin_col=0._r8
   allocate(VWatLitRHoldCapcity_col(JY,JX));       VWatLitRHoldCapcity_col=0._r8
@@ -79,7 +79,7 @@ module SurfLitterDataType
   call destroy(WatFLo2LitrM)
   call destroy(WatFlowSno2LitRM)
   call destroy(FracSurfByLitR_col)
-  call destroy(HeatFLo2LitrByWat)
+  call destroy(HeatFLo2LitrByWat_col)
   call destroy(VLitR_col)
   call destroy(VHeatCapLitRMin_col)
   call destroy(VWatLitRHoldCapcity_col)

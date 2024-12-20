@@ -45,25 +45,25 @@ module ExecMod
 !      padr('CRUN',10),padr('CEVAP',10),padr('QH2OLoss_lnds',10)/), &
 !      (/WatMassStore_lnd,CRAIN,CRUN,CEVAP,QH2OLoss_lnds/))
 !    endif
-    TLH=HeatStore_lnd-HEATIN_lnd+HeatOut_lnds
-    TLO=TSoilO2G_lnd-SurfGas_O2_lnd+OXYGOU
-    TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-TORGF-Litrfall_lnds(ielmc)
-    TLN=LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-SurfGas_N2_lnd-TZIN+TOMOU_lnds(ielmn)-TORGN-Litrfall_lnds(ielmn)
-    TLP=LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU_lnds(ielmp)-TORGP-Litrfall_lnds(ielmp)
-    TLI=TION-TIONIN+TIONOU
+    TLH = HeatStore_lnd-HEATIN_lnd+HeatOut_lnds
+    TLO = TSoilO2G_lnd-SurfGas_O2_lnd+OXYGOU
+    TLC = LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-tAmendOrgC_lnd-Litrfall_lnds(ielmc)
+    TLN = LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-SurfGas_N2_lnd-TZIN+TOMOU_lnds(ielmn)-TORGN-Litrfall_lnds(ielmn)
+    TLP = LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU_lnds(ielmp)-TORGP-Litrfall_lnds(ielmp)
+    TLI = TION-TIONIN+TIONOU
   ENDIF
 !
 ! CALCULATE DEVIATION SINCE MASS BALANCE WAS LAST RESET
 !
   IF(etimer%its_time_to_diag())THEN
-    DIFFQ=(WatMassStore_lnd-CRAIN+CRUN+CEVAP+QH2OLoss_lnds-TLW)/TAREA
-    DIFFH=(HeatStore_lnd-HEATIN_lnd+HeatOut_lnds-TLH)/TAREA
-    DIFFO=(TSoilO2G_lnd-SurfGas_O2_lnd+OXYGOU-TLO)/TAREA
-    DIFFC=(LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-TORGF-Litrfall_lnds(ielmc)-TLC)/TAREA
-    DIFFN=(LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-SurfGas_N2_lnd-TZIN+TOMOU_lnds(ielmn) &
+    DIFFQ = (WatMassStore_lnd-CRAIN+CRUN+CEVAP+QH2OLoss_lnds-TLW)/TAREA
+    DIFFH = (HeatStore_lnd-HEATIN_lnd+HeatOut_lnds-TLH)/TAREA
+    DIFFO = (TSoilO2G_lnd-SurfGas_O2_lnd+OXYGOU-TLO)/TAREA
+    DIFFC = (LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-tAmendOrgC_lnd-Litrfall_lnds(ielmc)-TLC)/TAREA
+    DIFFN = (LitRMStoreLndscap(ielmn)+POMHumStoreLndscap(ielmn)+TGasN_lnd+TDisolNH4_lnd+tNO3_lnd-SurfGas_N2_lnd-TZIN+TOMOU_lnds(ielmn) &
       -TORGN-Litrfall_lnds(ielmn)-TLN)/TAREA
-    DIFFP=(LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU_lnds(ielmp)-TORGP-Litrfall_lnds(ielmp)-TLP)/TAREA
-    DIFFI=(TION-TIONIN+TIONOU-TLI)/TAREA
+    DIFFP = (LitRMStoreLndscap(ielmp)+POMHumStoreLndscap(ielmp)+TDisolPi_lnd-TPIN+TOMOU_lnds(ielmp)-TORGP-Litrfall_lnds(ielmp)-TLP)/TAREA
+    DIFFI = (TION-TIONIN+TIONOU-TLI)/TAREA
     WRITE(*,212)I,iYearCurrent
     WRITE(18,213)I,iYearCurrent,DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN &
       ,DIFFP,DIFFI
@@ -87,7 +87,7 @@ module ExecMod
     IF(ABS(DIFFC).GT.ppmc)THEN
       WRITE(18,191)I,iYearCurrent
 191   FORMAT('CARBON BALANCE LOST ON DAY, YEAR',2I4)
-      TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-TORGF-Litrfall_lnds(ielmc)
+      TLC=LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-tAmendOrgC_lnd-Litrfall_lnds(ielmc)
     ENDIF
     IF(ABS(DIFFN).GT.ppmc)THEN
       WRITE(18,192)I,iYearCurrent
@@ -127,7 +127,7 @@ module ExecMod
   ENDIF
   IOLD=I
   IMNG=0
-  NYR=0
+
   RETURN
 
   END subroutine exec
