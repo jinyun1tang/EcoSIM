@@ -1,15 +1,16 @@
 module MicBGCAPI
 
   use data_kind_mod,        only: r8 => DAT_KIND_R8
-  use SoilBGCNLayMod,            only: DownwardMixOM, sumMicBiomLayL
-  use SoilDisturbMod,      only: SOMRemovalByDisturbance
+  use SoilBGCNLayMod,       only: DownwardMixOM,          sumMicBiomLayL
+  use SoilDisturbMod,       only: SOMRemovalByDisturbance
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
-  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type,Microbe_Diag_type
+  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
   use minimathmod,          only: AZMAX1
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
+  use EcosimConst,          only: LtHeatIceMelt,Tref
   use EcoSIMSolverPar  
   use TracerIDMod
   use SoilBGCDataType
@@ -147,7 +148,7 @@ implicit none
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
 
-  integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus
+  integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus, idom, K
   integer :: ndbiomcp, nlbiomcp, NumMicrobAutrophCmplx, NumHetetrMicCmplx,NE
 
   NumMicbFunGrupsPerCmplx = micpar%NumMicbFunGrupsPerCmplx
@@ -177,7 +178,7 @@ implicit none
   micfor%THETY               = THETY_vr(L,NY,NX)
   micfor%POROS               = POROS_vr(L,NY,NX)
   micfor%FieldCapacity       = FieldCapacity_vr(L,NY,NX)
-  micfor%TKS                 = TKS_vr(L,NY,NX)
+
   micfor%THETW               = THETW_vr(L,NY,NX)
   micfor%PH                  = PH(L,NY,NX)
   micfor%SoilMicPMassLayer            = VLSoilMicPMass_vr(L,NY,NX)
@@ -189,7 +190,19 @@ implicit none
   micfor%VLNHB                        = trcs_VLN_vr(ids_NH4B,L,NY,NX)
   micfor%VLPO4                        = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
   micfor%VLPOB                        = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-  micfor%PSISoilMatricP               = PSISoilMatricP_vr(L,NY,NX)
+
+  if(micfor%litrm)then
+    micfor%TKS            = FracSurfByLitR_col(NY,NX)*TKS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TKS_vr(NU(NY,NX),NY,NX)
+    micfor%PSISoilMatricP = FracSurfByLitR_col(NY,NX)*PSISoilMatricP_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+  else
+    micfor%TKS            = TKS_vr(L,NY,NX)
+    micfor%PSISoilMatricP = PSISoilMatricP_vr(L,NY,NX)
+  endif  
+
+  if (micfor%TKS<Tref)then
+    micfor%PSISoilMatricP  = LtHeatIceMelt*(micfor%TKS-Tref)/micfor%TKS
+  endif
+  
   micfor%O2AquaDiffusvity             = SoluteDifusvty_vr(idg_O2,L,NY,NX)
   micfor%ORGC                         = SoilOrgM_vr(ielmc,L,NY,NX)
   micfor%RNO2EcoUptkSoilPrev          = RNO2EcoUptkSoilPrev_vr(L,NY,NX)
@@ -297,8 +310,11 @@ implicit none
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
   micstt%ZNFN0             = ZNFN0(L,NY,NX)
   micstt%ZNFNI             = ZNFNI(L,NY,NX)
-  
-  micstt%DOM(idom_beg:idom_end,1:jcplx)                    = DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
+  DO K=1,jcplx
+    DO idom=idom_beg,idom_end  
+      micstt%DOM(idom,K) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
+    ENDDO
+  ENDDO
   micstt%SorbedOM(idom_beg:idom_end,1:jcplx)               = SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SolidOMAct(1:jsken,1:jcplx)                       = SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)
   micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)       = SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)

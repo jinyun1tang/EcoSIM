@@ -126,10 +126,10 @@ contains
     FracBiomHarvsted => plt_distb%FracBiomHarvsted, &
     IYTYP            => plt_distb%IYTYP             &
   )
-  EHVST21h=1._r8-FracBiomHarvsted(2,iplthvst_leaf,NZ)*0.5_r8
-  EHVST22h=1._r8-FracBiomHarvsted(2,iplthvst_finenonleaf,NZ)*0.5_r8
-  EHVST23h=1._r8-FracBiomHarvsted(2,iplthvst_woody,NZ)*0.5_r8
-  EHVST24h=1._r8-FracBiomHarvsted(2,iplthvst_stdead,NZ)*0.5_r8
+  EHVST21h = 1._r8-FracBiomHarvsted(2,iplthvst_leaf,NZ)*0.5_r8
+  EHVST22h = 1._r8-FracBiomHarvsted(2,iplthvst_finenonleaf,NZ)*0.5_r8
+  EHVST23h = 1._r8-FracBiomHarvsted(2,iplthvst_woody,NZ)*0.5_r8
+  EHVST24h = 1._r8-FracBiomHarvsted(2,iplthvst_stdead,NZ)*0.5_r8
 
   NonstructElmnt2Litr(ielmc)   = NonstructElmntRemoval(ielmc)*EHVST21
   LeafElmnt2Litr(ielmc)        = LeafElmntRemoval(ielmc)*EHVST21
@@ -138,11 +138,11 @@ contains
   StandeadElmnt2Litr(ielmc)    = StandeadElmntRemoval(ielmc)*EHVST24
 
   DO NE=2,NumPlantChemElms
-    NonstructElmnt2Litr(NE)=NonstructElmntRemoval(NE)*EHVST21h
-    LeafElmnt2Litr(NE)=LeafElmntRemoval(NE)*EHVST21h
-    FineNonleafElmnt2Litr(NE)=FineNonleafElmntRemoval(NE)*EHVST22h
-    WoodyElmnt2Litr(NE)=WoodyElmntRemoval(NE)*EHVST23h
-    StandeadElmnt2Litr(NE)=StandeadElmntRemoval(NE)*EHVST24h
+    NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)*EHVST21h
+    LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)*EHVST21h
+    FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)*EHVST22h
+    WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*EHVST23h
+    StandeadElmnt2Litr(NE)    = StandeadElmntRemoval(NE)*EHVST24h
   ENDDO
     !
     !     ADD MANURE FROM GRAZING TO NEXT DAY FERTILIZER
@@ -247,14 +247,14 @@ contains
 !     WTLF=PFT leaf C mass
 !     CGrazedDeficit=grazing requirement unmet by leaf
 ! grazing from leaf, 
-  WHVSLX=TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_leaf,NZ)
-  WHVSLY=AMIN1(LeafStrutElms_pft(ielmc,NZ),WHVSLX)
-  HvstedLeafC=WHVSLY*(1._r8-CCPOLX)
+  WHVSLX      = TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_leaf,NZ)
+  WHVSLY      = AMIN1(LeafStrutElms_pft(ielmc,NZ),WHVSLX)
+  HvstedLeafC = WHVSLY*(1._r8-CCPOLX)
   
-  WHVSCL=WHVSLY*CCPOLX
-  WHVSNL=WHVSLY*CCPLNX
-  CGrazedDeficit=AZMAX1(WHVSLX-WHVSLY)
-  WHVSSX=TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)
+  WHVSCL         = WHVSLY*CCPOLX
+  WHVSNL         = WHVSLY*CCPLNX
+  CGrazedDeficit = AZMAX1(WHVSLX-WHVSLY)
+  WHVSSX         = TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)
 !
 !     OTHER NON-FOLIAR GRAZED,REMOVED
 !
@@ -297,9 +297,9 @@ contains
     HvstedGrainC   = 0._r8
     CGrazedDeficit = CGrazedDeficit+WHVSSX
   ENDIF
-  WHVSCP=WHVSCL+WHVSCS
-  WHVSNP=WHVSNL+WHVSNS
-  WHVSKX=TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_woody,NZ)
+  WHVSCP = WHVSCL+WHVSCS
+  WHVSNP = WHVSNL+WHVSNS
+  WHVSKX = TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_woody,NZ)
 !
 !     STALK GRAZED, REMOVED
 !
@@ -309,19 +309,19 @@ contains
 !
   TotStalkC=StalkStrutElms_pft(ielmc,NZ)+StalkRsrvElms_pft(ielmc,NZ)
   IF(TotStalkC.GT.WHVSKX+CGrazedDeficit)THEN
-    WHVSTX=WHVSKX*StalkStrutElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
-    WHVSTY=AMIN1(StalkStrutElms_pft(ielmc,NZ),WHVSTX)
-    HvstedStalkC=WHVSTY
+    WHVSTX       = WHVSKX*StalkStrutElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
+    WHVSTY       = AMIN1(StalkStrutElms_pft(ielmc,NZ),WHVSTX)
+    HvstedStalkC = WHVSTY
 
-    CGrazedDeficit=AZMAX1(WHVSTX-WHVSTY)
-    WHVRVX=WHVSKX*StalkRsrvElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
-    WHVRVY=AMIN1(StalkRsrvElms_pft(ielmc,NZ),WHVRVX)
-    HvstedRsrvC=WHVRVY
-    CGrazedDeficit=AZMAX1(WHVRVX-WHVRVY)
+    CGrazedDeficit = AZMAX1(WHVSTX-WHVSTY)
+    WHVRVX         = WHVSKX*StalkRsrvElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
+    WHVRVY         = AMIN1(StalkRsrvElms_pft(ielmc,NZ),WHVRVX)
+    HvstedRsrvC    = WHVRVY
+    CGrazedDeficit = AZMAX1(WHVRVX-WHVRVY)
   ELSE
-    HvstedStalkC=0._r8
-    HvstedRsrvC=0._r8
-    CGrazedDeficit=AZMAX1(WHVSKX)
+    HvstedStalkC   = 0._r8
+    HvstedRsrvC    = 0._r8
+    CGrazedDeficit = AZMAX1(WHVSKX)
 !
 !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PETIOLE,HUSK
 !     EAR,GRAIN
@@ -331,13 +331,13 @@ contains
 !            petiole,husk,ear,grain,nonstructural C removed
 !
     IF(CGrazedDeficit.GT.0.0_r8)THEN
-      WHVSLY=AMIN1(LeafStrutElms_pft(ielmc,NZ)-HvstedLeafC-WHVSCL,CGrazedDeficit)
-      HvstedLeafC=HvstedLeafC+WHVSLY*(1._r8-CCPOLX)
+      WHVSLY      = AMIN1(LeafStrutElms_pft(ielmc,NZ)-HvstedLeafC-WHVSCL,CGrazedDeficit)
+      HvstedLeafC = HvstedLeafC+WHVSLY*(1._r8-CCPOLX)
 
-      WHVSCL=WHVSCL+WHVSLY*CCPOLX
-      WHVSNL=WHVSNL+WHVSLY*CCPLNX
+      WHVSCL = WHVSCL+WHVSLY*CCPOLX
+      WHVSNL = WHVSNL+WHVSLY*CCPLNX
 
-      CGrazedDeficit=AZMAX1(CGrazedDeficit-WHVSLY)
+      CGrazedDeficit = AZMAX1(CGrazedDeficit-WHVSLY)
 
       IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
         WHVSHX = CGrazedDeficit*PetoleStrutElms_pft(ielmc,NZ)/totShootC

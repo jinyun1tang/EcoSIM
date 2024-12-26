@@ -170,13 +170,13 @@ module StartsMod
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
 
-!      SoilHeatSrcDepth=depth at which soil heat sink-source calculated
+!      SoilHeatSrcDepth_col=depth at which soil heat sink-source calculated
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
-      TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
+      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
+      TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
 !
     ENDDO
   ENDDO
@@ -207,7 +207,7 @@ module StartsMod
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !      ALTZG=minimum surface elevation in landscape
   !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table
-  !     WaterTBLSlope=slope of natural water table relative to landscape surface
+  !     WaterTBLSlope_col=slope of natural water table relative to landscape surface
   !     in geography, slope =rise/run
   !     ExtWaterTablet0,DTBLD=depth of natural,artificial water table adjusted for elevn
   !     DepthInternalWTBL=depth to internal water table
@@ -234,7 +234,7 @@ module StartsMod
 ! altz: topographic altitude
 ! ALT: grid altitude
 ! DTBLI: external water table depth, before applying the altitude correction
-! WaterTBLSlope: slope of water table relative to surface slope
+! WaterTBLSlope_col: slope of water table relative to surface slope
 ! ExtWaterTablet0: external water table depth
 ! WtblDepzTile_col: depth of artificial water table
 ! DepthInternalWTBL: internal water table depth
@@ -243,8 +243,8 @@ module StartsMod
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
       IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
-        DTBLD(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
+        ExtWaterTablet0(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+        DTBLD(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
       ELSE
         ExtWaterTablet0(NY,NX)=0.0_r8
         DTBLD(NY,NX)=0.0_r8
@@ -730,7 +730,7 @@ module StartsMod
   !
   !     INITIALIZE MASS BALANCE CHECKS
   !
-  CRAIN               = 0.0_r8
+  CRAIN_lnd               = 0.0_r8
   HEATIN_lnd          = 0.0_r8
   SurfGas_CO2_lnd     = 0.0_r8
   SurfGas_O2_lnd      = 0.0_r8
@@ -829,7 +829,7 @@ module StartsMod
   TLEX_col(:,:)                      = 0.0_r8
   TSHX_col(:,:)                      = 0.0_r8
   Eco_NEE_col(:,:)               = 0.0_r8
-  CanH2OHeldVg_col(:,:)          = 0.0_r8
+  WatHeldOnCanopy_col(:,:)          = 0.0_r8
   CanopyLeafArea_col(:,:)        = 0.0_r8
   StemArea_col(:,:)              = 0.0_r8
   PrecIntceptByCanopy_col(:,:)   = 0.0_r8
@@ -1081,15 +1081,15 @@ module StartsMod
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
 
-!      SoilHeatSrcDepth=depth at which soil heat sink-source calculated
+!      SoilHeatSrcDepth_col=depth at which soil heat sink-source calculated
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)            = ATCS(NY,NX)
       TKS_vr(0,NY,NX)         = ATKS(NY,NX)
-      TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
+      TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
 !
     ENDDO
   ENDDO

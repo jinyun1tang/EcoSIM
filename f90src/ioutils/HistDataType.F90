@@ -61,7 +61,7 @@ implicit none
   real(r8),pointer   :: h1D_RadSW_Grnd_col(:)   !RadSWGrnd_col(NY,NX)
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
   real(r8),pointer   :: h1D_Qdrain_col(:)          !drainage
-  real(r8),pointer   :: h1D_tPRECIP_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tPREC_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
@@ -79,7 +79,6 @@ implicit none
   real(r8),pointer   :: h1D_RootAR_col(:)        !integrated Root autotrophic respiraiton
   real(r8),pointer   :: h2D_BotDEPZ_vr(:,:)
   real(r8),pointer   :: h1D_tRAD_col(:)
-  real(r8),pointer   :: h1D_tHeatUptk_col(:)
   real(r8),pointer   :: h1D_AMENDED_N_col(:)       !FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_N_FLX_col(:)  !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITRf_C_FLX_col(:)  !LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -91,6 +90,7 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DIN_FLX_col(:)    !HydroSubsDINFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_tMICRO_N_col(:)        !tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS(0,NY,NX)
+  real(r8),pointer   :: h1D_TEMP_surf_col(:)
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
   real(r8),pointer   :: h1D_FracBySnow_col(:)    !fraction ground covered by snow
   real(r8),pointer   :: h1D_FracByLitr_col(:)    !fraction ground covered by litter
@@ -120,7 +120,7 @@ implicit none
   real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)       !StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSTANDING_DEAD_P_col(:)       !StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-  real(r8),pointer   :: h1D_tPRECN_col(:)          !1000.0_r8*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tPRECIP_col(:)          !1000.0_r8*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_ET_col(:)             !1000.0_r8*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_RADSW_col(:)
   real(r8),pointer   :: h1d_CAN_NEE_col(:)
@@ -139,7 +139,7 @@ implicit none
   real(r8),pointer   :: h1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_Eco_HeatSen_col(:)    !Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_Heat2G_col(:)          !Eco_Heat_GrndSurf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ECO_Heat2G_col(:)     !Eco_Heat_GrndSurf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_O2_LITR_col(:)       !trc_solcl_vr(idg_O2,0,NY,NX)
   real(r8),pointer   :: h1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   real(r8),pointer   :: h1D_SOIL_CO2_FLX_col(:)  !SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
@@ -201,7 +201,7 @@ implicit none
   real(r8),pointer   :: h1D_DOP_litr_col(:)
   real(r8),pointer   :: h1D_acetate_litr_col(:)
   real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
-  real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransLHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
@@ -500,7 +500,7 @@ implicit none
   allocate(this%h1D_SUR_DIC_FLX_col(beg_col:end_col))    ;this%h1D_SUR_DIC_FLX_col(:)=spval 
   allocate(this%h1D_SUB_DIC_FLX_col(beg_col:end_col))    ;this%h1D_SUB_DIC_FLX_col(:)=spval 
 
-  allocate(this%h1D_tPRECIP_P_col(beg_col:end_col))      ;this%h1D_tPRECIP_P_col(:)=spval 
+  allocate(this%h1D_tPREC_P_col(beg_col:end_col))      ;this%h1D_tPREC_P_col(:)=spval 
   allocate(this%h1D_tMICRO_P_col(beg_col:end_col))       ;this%h1D_tMICRO_P_col(:)=spval
   allocate(this%h1D_PO4_FIRE_col(beg_col:end_col))       ;this%h1D_PO4_FIRE_col(:)=spval
   allocate(this%h1D_cPO4_LITR_col(beg_col:end_col))      ;this%h1D_cPO4_LITR_col(:)=spval
@@ -515,11 +515,11 @@ implicit none
   allocate(this%h1D_tRAD_col(beg_col:end_col)); this%h1D_tRAD_col(:)=spval
   allocate(this%h2D_BotDEPZ_vr(beg_col:end_col,1:JZ)); this%h2D_BotDEPZ_vr(:,:)=spval
   allocate(this%h1D_AMENDED_N_col(beg_col:end_col))       ;this%h1D_AMENDED_N_col(:)=spval
-  allocate(this%h1D_tHeatUptk_col(beg_col:end_col))       ;this%h1D_tHeatUptk_col(:)=spval
   allocate(this%h1D_tNH4X_col(beg_col:end_col))           ;this%h1D_tNH4X_col(:)=spval
   allocate(this%h1D_tNO3_col(beg_col:end_col))            ;this%h1D_tNO3_col(:)=spval
   allocate(this%h1D_tMICRO_N_col(beg_col:end_col))        ;this%h1D_tMICRO_N_col(:)=spval
   allocate(this%h1D_TEMP_LITR_col(beg_col:end_col))       ;this%h1D_TEMP_LITR_col(:)=spval
+  allocate(this%h1D_TEMP_surf_col(beg_col:end_col))       ;this%h1D_TEMP_surf_col(:)=spval
   allocate(this%h1D_TEMP_SNOW_col(beg_col:end_col))       ;this%h1D_TEMP_SNOW_col(:)=spval
   allocate(this%h1D_FracBySnow_col(beg_col:end_col))      ;this%h1D_FracBySnow_col(:)=spval
   allocate(this%h1D_FracByLitr_col(beg_col:end_col))      ;this%h1D_FracByLitr_col(:)=spval
@@ -548,7 +548,7 @@ implicit none
   allocate(this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_C_col=spval 
   allocate(this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_N_col=spval  
   allocate(this%h1D_tSTANDING_DEAD_P_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_P_col=spval  
-  allocate(this%h1D_tPRECN_col(beg_col:end_col))          ;this%h1D_tPRECN_col(:)=spval
+  allocate(this%h1D_tPRECIP_col(beg_col:end_col))          ;this%h1D_tPRECIP_col(:)=spval
   allocate(this%h1D_ECO_ET_col(beg_col:end_col))              ;this%h1D_ECO_ET_col(:)=spval
   allocate(this%h1d_CAN_NEE_col(beg_col:end_col))        ; this%h1d_CAN_NEE_col(:)=spval
   allocate(this%h1D_ECO_RADSW_col(beg_col:end_col))       ; this%h1D_ECO_RADSW_col(:)=spval
@@ -1026,7 +1026,7 @@ implicit none
 
   data1d_ptr => this%h1D_Qdrain_col(beg_col:end_col)
   call hist_addfld1d(fname='Qdrain_col',units='mm H2O/hr',avgflag='A',&
-    long_name='Drainage water flux out of the soil column',ptr_col=data1d_ptr)      
+    long_name='Drainage water flux out (>0) of the soil column',ptr_col=data1d_ptr)      
 
 
   IF(salt_model)THEN
@@ -1035,8 +1035,8 @@ implicit none
       long_name='total subsurface ion flux',ptr_col=data1d_ptr)      
   endif
 
-  data1d_ptr => this%h1D_tPRECIP_P_col(beg_col:end_col)  
-  call hist_addfld1d(fname='tPRECIP_P',units='gP/m2',avgflag='A',&
+  data1d_ptr => this%h1D_tPREC_P_col(beg_col:end_col)  
+  call hist_addfld1d(fname='tPREC_P',units='gP/m2',avgflag='A',&
     long_name='column integrated total soil precipited P',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tSoilOrgC_col(beg_col:end_col)    
@@ -1088,8 +1088,8 @@ implicit none
     long_name='daily maximum vapor pressure',ptr_col=data1d_ptr)      
     
   data1d_ptr => this%h1D_PSI_SURF_col(beg_col:end_col)    
-  call hist_addfld1d(fname='PSI_SURF',units='MPa',avgflag='A',&
-    long_name='soil micropore matric water potential',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='PSI_LITR',units='MPa',avgflag='A',&
+    long_name='Litter layer micropore matric water potential',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SURF_ELEV_col(beg_col:end_col)  
   call hist_addfld1d(fname='SURF_ELEV',units='m',avgflag='A',&
@@ -1106,6 +1106,10 @@ implicit none
   data1d_ptr => this%h1D_TEMP_LITR_col(beg_col:end_col)    
   call hist_addfld1d(fname='TEMP_LITR',units='oC',avgflag='A',&
     long_name='Litter layer temperature',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_TEMP_surf_col(beg_col:end_col)    
+  call hist_addfld1d(fname='TEMP_SURF',units='oC',avgflag='A',&
+    long_name='Ground surface temperature',ptr_col=data1d_ptr)     
 
   data1d_ptr => this%h1D_TEMP_SNOW_col(beg_col:end_col)    
   call hist_addfld1d(fname='TEMP_SNOW',units='oC',avgflag='A',&
@@ -1191,8 +1195,8 @@ implicit none
   call hist_addfld1d(fname='tSTANDING_DEAD_P',units='gP/m2',avgflag='A',&
     long_name='total standing dead P',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_tPRECN_col(beg_col:end_col)      
-  call hist_addfld1d(fname='tPRECN',units='mm/m2',avgflag='A',&
+  data1d_ptr => this%h1D_tPRECIP_col(beg_col:end_col)      
+  call hist_addfld1d(fname='tPRECIP',units='mm/m2',avgflag='A',&
     long_name='cumulative precipitation, including irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_ET_col(beg_col:end_col)  
@@ -1270,7 +1274,8 @@ implicit none
 
   data1d_ptr => this%h1D_ECO_Heat2G_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_Heat2G',units='W/m2',avgflag='A',&
-    long_name='ecosystem storage heat flux (>0 into ground surface, including snow, litter and exposed soil)',ptr_col=data1d_ptr)      
+    long_name='Heat flux to warm the ecosystem (<0 into atmosphere),' &
+    //' including canopy, snow, litter and exposed soil',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_LITR_col(beg_col:end_col)      
   call hist_addfld1d(fname='O2w_conc_LITR',units='g/m3',avgflag='A',&
@@ -1395,7 +1400,7 @@ implicit none
 
   data1d_ptr => this%h1D_QDISCHG_FLX_col(beg_col:end_col)   
   call hist_addfld1d(fname='Qdischarge_flx',units='mmH2O/m2/hr',avgflag='A',&
-    long_name='grid water discharge',ptr_col=data1d_ptr)      
+    long_name='grid water discharge (>0 out of grid)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_HeatDISCHG_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='HeatDischarge_flx',units='MJ/m2/hr',avgflag='A',&
@@ -2284,7 +2289,7 @@ implicit none
 
   data2d_ptr => this%h2D_HeatUptk_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HeatUptk_vr',units='MJ m-3 hr-1',type2d='levsoi',avgflag='A',&
-    long_name='soil heat flow by plant water uptake',ptr_col=data2d_ptr)      
+    long_name='soil heat flow by plant water uptake (<0 into roots)',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_VSPore_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='VSPore_vr',units='m3 pore/m3 soil',type2d='levsoi',avgflag='A',&
@@ -2512,7 +2517,7 @@ implicit none
       this%h1D_SUR_DIC_FLX_col(ncol)      = HydroSufDICFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SUB_DIC_FLX_col(ncol)      = HydroSubsDICFlx_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tPRECIP_P_col(ncol)        = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPREC_P_col(ncol)          = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
@@ -2533,14 +2538,15 @@ implicit none
       endif      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
+      this%h1D_TEMP_surf_col(ncol)        = FracSurfByLitR_col(NY,NX)*TCS(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TCS(NU(NY,NX),NY,NX)
       if(VcumSnowWE_col(NY,NX)<=ZEROS(NY,NX))then
         this%h1D_TEMP_SNOW_col(ncol)   = spval
       else
         this%h1D_TEMP_SNOW_col(ncol)   = TCSnow_snvr(1,NY,NX)
       endif
-      this%h1D_FracBySnow_col(ncol)=FracSurfAsSnow_col(NY,NX)
-      this%h1D_FracByLitr_col(ncol)=FracSurfByLitR_col(NY,NX)
-      this%h1D_tLITR_C_col(ncol) = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_FracBySnow_col(ncol) = FracSurfAsSnow_col(NY,NX)
+      this%h1D_FracByLitr_col(ncol) = FracSurfByLitR_col(NY,NX)
+      this%h1D_tLITR_C_col(ncol)    = tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       
       this%h1D_AMENDED_C_col(ncol)        = AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2565,7 +2571,7 @@ implicit none
       this%h1D_tSTANDING_DEAD_C_col(ncol) = StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_N_col(ncol) = StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSTANDING_DEAD_P_col(ncol) = StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tPRECN_col(ncol)           = m2mm*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_tPRECIP_col(ncol)           = m2mm*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_ET_col(ncol)           = m2mm*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_RADSW_col(ncol)        = MJ2W*Eco_RadSW_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)         = trc_solcl_vr(idg_N2O,0,NY,NX)
@@ -2835,7 +2841,7 @@ implicit none
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)        = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_LE_ptc(nptc)        = MJ2W*EvapTransHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h1D_CAN_LE_ptc(nptc)        = MJ2W*EvapTransLHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
@@ -2860,7 +2866,7 @@ implicit none
         this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)        
         this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_TC_Canopy_ptc(nptc)     = TKCanopy_pft(NZ,NY,NX)-273.15_r8
+        this%h1D_TC_Canopy_ptc(nptc)     = TKC_pft(NZ,NY,NX)-273.15_r8
         this%h1D_TC_Groth_ptc(nptc)      = TCGroth_pft(NZ,NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracPARads2Canopy_pft(NZ,NY,NX)

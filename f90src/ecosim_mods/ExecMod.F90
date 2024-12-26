@@ -39,11 +39,11 @@ module ExecMod
 ! CALCULATE MASS BALANCES FOR WATER, HEAT, O2, C, N, P AND SOLUTES
 !
   IF(I.EQ.IBEGIN.OR.I.EQ.ISTART.OR.I.EQ.ILAST+1)THEN
-    TLW=WatMassStore_lnd-CRAIN+CRUN+CEVAP+QH2OLoss_lnds
+    TLW=WatMassStore_lnd-CRAIN_lnd+CRUN+CEVAP+QH2OLoss_lnds
 !    if(tlw/=tlw)then
-!      call print_info('tlw/=tlw',(/padr('WatMassStore_lnd',10),padr('CRAIN',10), &
+!      call print_info('tlw/=tlw',(/padr('WatMassStore_lnd',10),padr('CRAIN_lnd',10), &
 !      padr('CRUN',10),padr('CEVAP',10),padr('QH2OLoss_lnds',10)/), &
-!      (/WatMassStore_lnd,CRAIN,CRUN,CEVAP,QH2OLoss_lnds/))
+!      (/WatMassStore_lnd,CRAIN_lnd,CRUN,CEVAP,QH2OLoss_lnds/))
 !    endif
     TLH = HeatStore_lnd-HEATIN_lnd+HeatOut_lnds
     TLO = TSoilO2G_lnd-SurfGas_O2_lnd+OXYGOU
@@ -56,7 +56,7 @@ module ExecMod
 ! CALCULATE DEVIATION SINCE MASS BALANCE WAS LAST RESET
 !
   IF(etimer%its_time_to_diag())THEN
-    DIFFQ = (WatMassStore_lnd-CRAIN+CRUN+CEVAP+QH2OLoss_lnds-TLW)/TAREA
+    DIFFQ = (WatMassStore_lnd-CRAIN_lnd+CRUN+CEVAP+QH2OLoss_lnds-TLW)/TAREA
     DIFFH = (HeatStore_lnd-HEATIN_lnd+HeatOut_lnds-TLH)/TAREA
     DIFFO = (TSoilO2G_lnd-SurfGas_O2_lnd+OXYGOU-TLO)/TAREA
     DIFFC = (LitRMStoreLndscap(ielmc)+POMHumStoreLndscap(ielmc)+TGasC_lnd-SurfGas_CO2_lnd+TOMOU_lnds(ielmc)-tAmendOrgC_lnd-Litrfall_lnds(ielmc)-TLC)/TAREA
@@ -70,7 +70,7 @@ module ExecMod
     if(diffq/=diffq)then
       write(*,*)'DIFFQ=',DIFFQ
       write(*,*)'WatMassStore_lnd=',WatMassStore_lnd
-      write(*,*)'CRAIN=',CRAIN
+      write(*,*)'CRAIN_lnd=',CRAIN_lnd
       write(*,*)'CRUN=',CRUN
       write(*,*)'CEVAP=',CEVAP
       write(*,*)'QH2OLoss_lnds=',QH2OLoss_lnds
@@ -102,7 +102,7 @@ module ExecMod
     IF(ABS(DIFFQ).GT.ppmc)THEN
       WRITE(18,194)I,iYearCurrent
 194   FORMAT('WATER BALANCE LOST ON DAY, YEAR',2I4)
-      TLW=WatMassStore_lnd-CRAIN+CRUN+CEVAP+QH2OLoss_lnds
+      TLW=WatMassStore_lnd-CRAIN_lnd+CRUN+CEVAP+QH2OLoss_lnds
     ENDIF
     IF(ABS(DIFFH).GT.ppmc)THEN
       WRITE(18,195)I,iYearCurrent

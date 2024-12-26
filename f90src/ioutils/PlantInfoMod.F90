@@ -146,7 +146,7 @@ implicit none
           tstr=trim(pft_pltinfo(NZ))
           read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
           read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
-
+          PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),ppmc)
           LPY=0
           if(isLeap(iyr) .and. IMO.GT.2)LPY=1
           !obtain the ordinal day

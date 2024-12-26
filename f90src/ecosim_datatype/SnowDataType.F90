@@ -48,11 +48,12 @@ module SnowDataType
   real(r8),target, allocatable ::  HeatBySnowRedistrib_2DH(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
   real(r8),target, allocatable ::  trcg_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8),target, allocatable ::  trcn_FloXSnow_2DH(:,:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
-
+  real(r8),target, allocatable ::  THeatSnowThaw_col(:,:)                  !total heat associated with phase change in snow [MJ/d2/h]
   real(r8),target, allocatable ::  trcg_solsml_snvr(:,:,:,:)               ! Disolved volatile tracers in snow [g d-2]
   real(r8),target, allocatable ::  trcn_solsml_snvr(:,:,:,:)               ! Dissolved nutrient tracers in snow [g d-2]
   real(r8),target, allocatable ::  trc_Saltml_snvr(:,:,:,:)                    ! snowpack salt dissolved tracers
-
+  real(r8),target, allocatable ::  SnowEngyBeg_col(:,:)
+  real(r8),target, allocatable ::  SnowEngyEnd_col(:,:)
 
   real(r8),target, allocatable ::  trcSalt_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
 !----------------------------------------------------------------------
@@ -61,6 +62,9 @@ contains
   subroutine InitSnowData
 
   implicit none
+  allocate(SnowEngyEnd_col(JY,JX)); SnowEngyEnd_col=0._r8
+  allocate(SnowEngyBeg_col(JY,JX)); SnowEngyBeg_col=0._r8
+  allocate(THeatSnowThaw_col(JY,JX))   ; THeatSnowThaw_col=0._r8
   allocate(VLSnowHeatCapM_snvr(60,JS,JY,JX));VLSnowHeatCapM_snvr=0._r8
   allocate(WatFlowInSnowM_snvr(60,JS,JY,JX)); WatFlowInSnowM_snvr=0._r8
   allocate(DrySnoFlxBySnoRedistM_2DH(60,2,JV,JH));    DrySnoFlxBySnoRedistM_2DH=0._r8
@@ -120,6 +124,8 @@ contains
     call destroy(trc_Saltml_snvr)
     call destroy(trcSalt_XQS)
   endif
+  call destroy(SnowEngyEnd_col)
+  call destroy(SnowEngyBeg_col)
   call destroy(VLSnowHeatCapM_snvr)
   call destroy(WatFlowInSnowM_snvr)
   call destroy(DrySnoFlxBySnoRedistM_2DH)
@@ -161,6 +167,7 @@ contains
   call destroy(trcg_FloXSnow_2DH)
   call destroy(trcn_FloXSnow_2DH)
   call destroy(trcn_solsml_snvr)
+  call destroy(THeatSnowThaw_col)
   if(salt_model)then
     call destroy(trcSalt_XQS)
   endif

@@ -1934,7 +1934,7 @@ implicit none
     RootNutUptake_pvr      => plt_rbgc%RootNutUptake_pvr,      &
     RootOUlmNutUptake_pvr  => plt_rbgc%RootOUlmNutUptake_pvr,  &
     RootCUlmNutUptake_pvr  => plt_rbgc%RootCUlmNutUptake_pvr,  &
-    RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
+    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
     RootCO2EmisPot_pvr     => plt_rbgc%RootCO2EmisPot_pvr,     &
     RootRespPotent_pvr     => plt_rbgc%RootRespPotent_pvr,     &
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr,       &

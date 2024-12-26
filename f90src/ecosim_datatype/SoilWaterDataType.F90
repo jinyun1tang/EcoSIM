@@ -28,9 +28,9 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM_vr(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
-  real(r8),target,allocatable ::  WaterTBLSlope(:,:)                !slope of water table relative to surface slope, [-]
+  real(r8),target,allocatable ::  WaterTBLSlope_col(:,:)                !slope of water table relative to surface slope, [-]
   real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                       !depth of artificial water table
-  real(r8),target,allocatable ::  DTBLY(:,:)                        !artificial water table depth, [m]
+  real(r8),target,allocatable ::  TileWaterTable_col(:,:)                        !artificial water table depth, [m]
   real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepthInternalWTBL(:,:)            !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
@@ -60,7 +60,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RechargEastSurf(:,:)                        !eastern surface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargSouthSurf(:,:)                        !southern surface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargWestSurf(:,:)                        !western surface boundary water flux , [-]
-  real(r8),target,allocatable ::  RCHGD(:,:)                        !lower subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RechargBottom_col(:,:)                        !lower subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  WaterFlow2MicPM_3D(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  WaterFlow2MacPM_3D(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  ReductVLsoiAirPM(:,:,:,:)                     !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
@@ -78,7 +78,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                      !gravimetric soil water potential , [Mpa]
   real(r8),target,allocatable ::  THETY_vr(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  ThetaSat_vr(:,:,:)                      !micropore class water content
-  real(r8),target,allocatable ::  WaterFlowSoiMicPX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowSoiMicPX_3D(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
   real(r8),target,allocatable ::  QEvap_CumYr_col(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  QRain_CumYr_col(:,:)                        !total precipitation, [m3 d-2]
@@ -128,9 +128,9 @@ module SoilWaterDataType
   allocate(VLWatMacPM(60,JZ,JY,JX));VLWatMacPM=0._r8
   allocate(VLsoiAirPM_vr(60,0:JZ,JY,JX));VLsoiAirPM_vr=0._r8
   allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
-  allocate(WaterTBLSlope(JY,JX));       WaterTBLSlope=0._r8
+  allocate(WaterTBLSlope_col(JY,JX));       WaterTBLSlope_col=0._r8
   allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
-  allocate(DTBLY(JY,JX));       DTBLY=0._r8
+  allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
   allocate(DTBLD(JY,JX));       DTBLD=0._r8
   allocate(DepthInternalWTBL(JY,JX));       DepthInternalWTBL=0._r8
   allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
@@ -160,7 +160,7 @@ module SoilWaterDataType
   allocate(RechargEastSurf(JY,JX));       RechargEastSurf=0._r8
   allocate(RechargSouthSurf(JY,JX));       RechargSouthSurf=0._r8
   allocate(RechargWestSurf(JY,JX));       RechargWestSurf=0._r8
-  allocate(RCHGD(JY,JX));       RCHGD=0._r8
+  allocate(RechargBottom_col(JY,JX));       RechargBottom_col=0._r8
   allocate(WaterFlow2MicPM_3D(60,3,JD,JV,JH));WaterFlow2MicPM_3D=0._r8
   allocate(WaterFlow2MacPM_3D(60,3,JD,JV,JH));WaterFlow2MacPM_3D=0._r8
   allocate(ReductVLsoiAirPM(60,JZ,JY,JX));  ReductVLsoiAirPM=0._r8
@@ -178,7 +178,7 @@ module SoilWaterDataType
   allocate(PSIGrav_vr(0:JZ,JY,JX));  PSIGrav_vr=0._r8
   allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
   allocate(ThetaSat_vr(0:JZ,JY,JX));  ThetaSat_vr=0._r8
-  allocate(WaterFlowSoiMicPX(3,JD,JV,JH));   WaterFlowSoiMicPX=0._r8
+  allocate(WaterFlowSoiMicPX_3D(3,JD,JV,JH));   WaterFlowSoiMicPX_3D=0._r8
   allocate(QEvap_CumYr_col(JY,JX));       QEvap_CumYr_col=0._r8
   allocate(QRain_CumYr_col(JY,JX));       QRain_CumYr_col=0._r8
   allocate(Qrunoff_CumYr_col(JY,JX));        Qrunoff_CumYr_col=0._r8
@@ -218,9 +218,9 @@ module SoilWaterDataType
   call destroy(VLWatMacPM)
   call destroy(VLsoiAirPM_vr)
   call destroy(FILM)
-  call destroy(WaterTBLSlope)
+  call destroy(WaterTBLSlope_col)
   call destroy(WtblDepzTile_col)
-  call destroy(DTBLY)
+  call destroy(TileWaterTable_col)
   call destroy(DTBLD)
   call destroy(DepthInternalWTBL)
   call destroy(ExtWaterTablet0)
@@ -250,7 +250,7 @@ module SoilWaterDataType
   call destroy(RechargEastSurf)
   call destroy(RechargSouthSurf)
   call destroy(RechargWestSurf)
-  call destroy(RCHGD)
+  call destroy(RechargBottom_col)
   call destroy(WaterFlow2MicPM_3D)
   call destroy(WaterFlow2MacPM_3D)
   call destroy(ReductVLsoiAirPM)
@@ -268,7 +268,7 @@ module SoilWaterDataType
   call destroy(PSIGrav_vr)
   call destroy(THETY_vr)
   call destroy(ThetaSat_vr)
-  call destroy(WaterFlowSoiMicPX)
+  call destroy(WaterFlowSoiMicPX_3D)
   call destroy(QEvap_CumYr_col)
   call destroy(EvapoTransp_col)
   call destroy(QRain_CumYr_col)

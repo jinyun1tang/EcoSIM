@@ -967,7 +967,7 @@ contains
     DO ids=ids_beg,ids_end
       if(ids==idg_O2)then
         !trcs_cl1(ids)=AMAX1(trc_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX),-ZEROS2(NY,NX))
-        trcs_cl1(ids)=trc_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX)
+        trcs_cl1(ids)=AZMAX1(trc_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
       else
         trcs_cl1(ids)=AZMAX1(trc_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
       endif

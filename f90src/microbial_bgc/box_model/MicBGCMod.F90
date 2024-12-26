@@ -6,6 +6,7 @@ module MicBGCMod
 ! USES:
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: endrun, destroy
+  use EcoSIMCtrlMod     , only : etimer  
   use TracerIDMod
   use MicAutoCPLXMod
   use minimathmod, only: safe_adb, AZMAX1
@@ -345,9 +346,12 @@ module MicBGCMod
     ! surface litter layer
     KL=micpar%NumOfLitrCmplxs
     IF(VWatLitRHoldCapcity.GT.ZEROS2)THEN
-      ThetaLitr=VOLW0/VLitR
-      ThetaZ=AZMAX1(ThetaLitr-THETY)
-      VOLWZ=ThetaZ*VLitR
+      ThetaLitr = AMIN1(VOLW0/VLitR,1._r8)
+      ThetaZ    = AZMAX1(ThetaLitr-THETY)
+      VOLWZ     = ThetaZ*VLitR    !effective water volume
+!      if(etimer%get_curr_yearAD()==1980)then
+!      write(116,*)I+J/24.,ThetaZ,VOLW0,VLitR
+!      endif
     ELSE
       VOLWZ=0.0_r8
     ENDIF
@@ -355,7 +359,7 @@ module MicBGCMod
 !     non-surface layer
     KL     = micpar%jcplx
     ThetaZ = AZMAX1((AMIN1(AMAX1(0.5_r8*POROS,FieldCapacity),THETW)-THETY))
-    VOLWZ  = ThetaZ*VLSoilMicP
+    VOLWZ  = ThetaZ*VLSoilMicP    
   ENDIF
 
 
@@ -1451,6 +1455,9 @@ module MicBGCMod
   !     BulkSOMC=total SOC
   !     FCNK,FCPK=N,P limitation to microbial activity in each K
   !
+!      if(etimer%get_curr_yearAD()==1980 .and. litrm)then
+!      write(115,*)I+J/24.,K,ROQC4HeterMicActCmpK(K),VOLWZ,COSC,COQCK,CDOM(idom_doc,K),ZEROS2
+!      endif
       D785: DO M=1,jsken
         IF(SolidOM(ielmc,M,K).GT.ZEROS)THEN
           CNS(M,K)                  = AZMAX1(SolidOM(ielmn,M,K)/SolidOM(ielmc,M,K))
@@ -2597,7 +2604,7 @@ module MicBGCMod
   real(r8), intent(out) :: ECHZ
   real(r8), intent(out) :: RGOMP  !total DOC/acetate C uptake for potential respiraiton
   REAL(R8), INTENT(OUT) :: FGOCP,FGOAP
-  real(r8), intent(out) :: RGOCP
+  real(r8), intent(out) :: RGOCP  !oxygen-unlimited DOC-based respiraiton
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
@@ -2815,8 +2822,9 @@ module MicBGCMod
   !Ref: The microbial nitrogen-cycling network, Kuypers et al., 2018
   implicit none
   integer, intent(in) :: NGL,N,K
-  REAL(R8), INTENT(IN) :: FOQC,RGOCP
-  real(r8), intent(in) :: VOLWZ
+  REAL(R8), INTENT(IN) :: FOQC
+  real(r8), intent(in) :: RGOCP
+  real(r8), intent(in) :: VOLWZ            !volume of water to support biogeochemistry
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag

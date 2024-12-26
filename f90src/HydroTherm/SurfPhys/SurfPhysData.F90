@@ -6,7 +6,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
 
-  real(r8),allocatable ::  XVLMobileWaterLitR_col(:,:)                   !water excessive holding capacity of surface litter, available for store on surface [m3 H2O/d2]
+  real(r8),allocatable ::  XVLMobileWaterLitR_col(:,:)                   !water exceeds holding capacity of surface litter that is available for store on surface [m3 H2O/d2]
   real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP_col(:,:)                           !
   real(r8),allocatable ::  VLPoreLitR_col(:,:)                        !

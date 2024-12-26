@@ -24,7 +24,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  Rain2SoilSurf_col(:,:)               !precipitation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  Irrig2SoilSurf(:,:)                  !irrifation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  LakeSurfFlowMicP_col(:,:)                   !lake surface water flux
-  real(r8),target,allocatable ::  LakeSurfFlowMicPX(:,:)                      !lake surface water flux
+  real(r8),target,allocatable ::  LakeSurfFlowMicPX_col(:,:)                      !lake surface water flux
   real(r8),target,allocatable ::  LakeSurfFlowMacP_col(:,:)                       !lake surface water flux
   real(r8),target,allocatable ::  LakeSurfHeatFlux_col(:,:)              !lake surface heat flux, outgoing positive
 !----------------------------------------------------------------------
@@ -50,7 +50,7 @@ contains
   allocate(Rain2SoilSurf_col(JY,JX));       Rain2SoilSurf_col          = 0._r8
   allocate(Irrig2SoilSurf(JY,JX));       Irrig2SoilSurf                = 0._r8
   allocate(LakeSurfFlowMicP_col(JY,JX));       LakeSurfFlowMicP_col    = 0._r8
-  allocate(LakeSurfFlowMicPX(JY,JX));      LakeSurfFlowMicPX           = 0._r8
+  allocate(LakeSurfFlowMicPX_col(JY,JX));      LakeSurfFlowMicPX_col           = 0._r8
   allocate(LakeSurfFlowMacP_col(JY,JX));      LakeSurfFlowMacP_col     = 0._r8
   allocate(LakeSurfHeatFlux_col(JY,JX));      LakeSurfHeatFlux_col     = 0._r8
   end subroutine InitSurfSoilData
@@ -76,7 +76,7 @@ contains
   call destroy(Rain2SoilSurf_col)
   call destroy(Irrig2SoilSurf)
   call destroy(LakeSurfFlowMicP_col)
-  call destroy(LakeSurfFlowMicPX)
+  call destroy(LakeSurfFlowMicPX_col)
   call destroy(LakeSurfFlowMacP_col)
   call destroy(LakeSurfHeatFlux_col)
   end subroutine DestructSurfSoilData

@@ -677,23 +677,23 @@ module StartqMod
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
-!     VHeatCapCanP_pft=canopy heat capacity (MJ m-3 K-1)
+!     VHeatCapCanopy_pft=canopy heat capacity (MJ m-3 K-1)
 !     TCelciusCanopy_pft,TKC=canopy temperature for growth (oC,K)
 !     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHeatCapCanP_pft(NZ,NY,NX)       = cpw*ShootStrutElms_pft(ielmc,NZ,NY,NX)*10.0E-06
-  ENGYX_pft(NZ,NY,NX)              = 0._r8
-  DeltaTKC_pft(NZ,NY,NX)           = 0._r8
-  TCelciusCanopy_pft(NZ,NY,NX)     = ATCA(NY,NX)
-  TKC(NZ,NY,NX)                    = units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
-  TCGroth_pft(NZ,NY,NX)            = TCelciusCanopy_pft(NZ,NY,NX)
-  TKGroth_pft(NZ,NY,NX)            = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
-  fTCanopyGroth_pft(NZ,NY,NX)      = 1.0_r8
-  PSICanopy_pft(NZ,NY,NX)          = -1.0E-03_r8
-  PSICanopyOsmo_pft(NZ,NY,NX)      = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
-  PSICanopyTurg_pft(NZ,NY,NX)      = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
-  Transpiration_pft(NZ,NY,NX)      = 0._r8
+  VHeatCapCanopy_pft(NZ,NY,NX)    = cpw*ShootStrutElms_pft(ielmc,NZ,NY,NX)*10.0E-06
+  ENGYX_pft(NZ,NY,NX)             = 0._r8
+  DeltaTKC_pft(NZ,NY,NX)          = 0._r8
+  TCelciusCanopy_pft(NZ,NY,NX)    = ATCA(NY,NX)
+  TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
+  TCGroth_pft(NZ,NY,NX)           = TCelciusCanopy_pft(NZ,NY,NX)
+  TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
+  fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
+  PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
+  PSICanopyOsmo_pft(NZ,NY,NX)     = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+  Transpiration_pft(NZ,NY,NX)     = 0._r8
   FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
@@ -823,7 +823,7 @@ module StartqMod
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
 !     LeafPetolBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyWater_pft,WatByPCanopy_pft=water volume in,on canopy (m3)
+!     CanopyWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
@@ -842,7 +842,7 @@ module StartqMod
     
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanopy_pft(NZ,NY,NX))
   CanopyWater_pft(NZ,NY,NX)=ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
-  WatByPCanopy_pft(NZ,NY,NX)=0._r8
+  WatHeldOnCanopy_pft(NZ,NY,NX)=0._r8
   CanopyNonstElms_brch(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   CanopyNonstElms_brch(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   

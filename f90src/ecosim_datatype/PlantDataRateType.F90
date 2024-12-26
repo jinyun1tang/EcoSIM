@@ -16,7 +16,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)                !pft cumulative nodule infection
   real(r8),target,allocatable ::  NH3Emis_CumYr_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
-  real(r8),target,allocatable ::  RootMycoExudElm_pvr(:,:,:,:,:,:,:)             !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootMycoExudEUptk_pvr(:,:,:,:,:,:,:)             !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [g d-2 h-1]
   real(r8),target,allocatable ::  RootUptkSoiSol_vr(:,:,:,:,:,:)                      !aqueous H2 flux from roots to soil water, [g d-2 h-1]
@@ -77,7 +77,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)
   real(r8),target,allocatable ::  TPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
   real(r8),target,allocatable ::  THeatRootUptake_vr(:,:,:)                       !vertically profile of root heat uptake, [MJ d-2]
-  real(r8),target,allocatable :: THeatRootUptake_col(:,:)                        !total root heat uptake, [MJ d-2]
+  real(r8),target,allocatable :: THeatRootRelease_col(:,:)                        !total root heat relase, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_root_vr(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
@@ -138,7 +138,7 @@ module PlantDataRateType
   allocate(NodulInfectElms_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElms_pft=0._r8
   allocate(NodulInfectElmsCum_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElmsCum_pft=0._r8  
   allocate(SurfLitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfalStrutElms_CumYr_pft=0._r8
-  allocate(RootMycoExudElm_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));RootMycoExudElm_pvr=0._r8
+  allocate(RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));RootMycoExudEUptk_pvr=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
   allocate(RootN2Fix_pvr(JZ,JP,JY,JX)); RootN2Fix_pvr=0._r8
   allocate(RootH2PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH2PO4DmndSoil_pvr=0._r8
@@ -198,7 +198,7 @@ module PlantDataRateType
   allocate(RootUptk_P_CumYr_pft(JP,JY,JX)); RootUptk_P_CumYr_pft=0._r8
   allocate(TPlantRootH2OUptake_vr(0:JZ,JY,JX)); TPlantRootH2OUptake_vr=0._r8
   allocate(THeatRootUptake_vr(0:JZ,JY,JX));  THeatRootUptake_vr=0._r8
-  allocate(THeatRootUptake_col(JY,JX)); THeatRootUptake_col=0._r8
+  allocate(THeatRootRelease_col(JY,JX)); THeatRootRelease_col=0._r8
   allocate(trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_air2root_flx_vr=0._r8
   allocate(trcg_root_vr(idg_beg:idg_end-1,JZ,JY,JX));   trcg_root_vr=0._r8
   allocate(trcs_plant_uptake_vr(ids_beg:ids_end,JZ,JY,JX));    trcs_plant_uptake_vr=0._r8
@@ -244,7 +244,7 @@ module PlantDataRateType
   call destroy(NH3Dep2Can_pft)
   call destroy(NH3Emis_CumYr_pft)
   call destroy(SurfLitrfalStrutElms_CumYr_pft)
-  call destroy(RootMycoExudElm_pvr)
+  call destroy(RootMycoExudEUptk_pvr)
   call destroy(RootNutUptake_pvr)
   call destroy(RootUptkSoiSol_vr)
   call destroy(RootN2Fix_pvr)
@@ -303,7 +303,7 @@ module PlantDataRateType
   call destroy(RootUptk_P_CumYr_pft)
   call destroy(TPlantRootH2OUptake_vr)
   call destroy(THeatRootUptake_vr)
-  call destroy(THeatRootUptake_col)
+  call destroy(THeatRootRelease_col)
   call destroy(tRootMycoExud2Soil_vr)
   call destroy(tRootCO2Emis_vr)
   call destroy(tRO2MicrbUptk_vr)

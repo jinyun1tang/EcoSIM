@@ -206,23 +206,28 @@ implicit none
   implicit none
   integer, intent(in) :: NB,NZ
   integer :: NE,K
-  associate(                                                                    &
-    MaxNodesPerBranch1             =>  pltpar%MaxNodesPerBranch1              , &  
-    LeafStrutElms_brch             =>  plt_biom%LeafStrutElms_brch            , &    
-    PetoleStrutElms_brch           =>  plt_biom%PetoleStrutElms_brch          , &
-    StalkStrutElms_brch            =>  plt_biom%StalkStrutElms_brch           , &        
-    StalkRsrvElms_brch             =>  plt_biom%StalkRsrvElms_brch            , &    
-    HuskStrutElms_brch             =>  plt_biom%HuskStrutElms_brch            , &    
-    EarStrutElms_brch              =>  plt_biom%EarStrutElms_brch             , &    
-    GrainStrutElms_brch            =>  plt_biom%GrainStrutElms_brch           , &
-    CanopyNonstElms_brch           =>  plt_biom%CanopyNonstElms_brch          , &
-    ShootC4NonstC_brch             =>  plt_biom%ShootC4NonstC_brch            , &           
-    CPOOL3_node                    =>  plt_photo%CPOOL3_node                  , &
-    CPOOL4_node                    =>  plt_photo%CPOOL4_node                  , &
-    iPlantPhotosynthesisType       =>  plt_photo%iPlantPhotosynthesisType     , &                
-    CMassHCO3BundleSheath_node     =>  plt_photo%CMassHCO3BundleSheath_node   , &
-    CMassCO2BundleSheath_node      =>  plt_photo%CMassCO2BundleSheath_node    , &           
-    ShootStrutElms_brch            =>  plt_biom%ShootStrutElms_brch             &    
+  associate(                                                            &
+    MaxNodesPerBranch1         => pltpar%MaxNodesPerBranch1,            &
+    NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
+    LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch,          &
+    PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch,        &
+    StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch,         &
+    CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
+    StalkBiomassC_brch         => plt_biom%StalkBiomassC_brch,          &
+    CanopyLeafShethC_pft       => plt_biom%CanopyLeafShethC_pft,        &
+    LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
+    StalkRsrvElms_brch         => plt_biom%StalkRsrvElms_brch,          &
+    HuskStrutElms_brch         => plt_biom%HuskStrutElms_brch,          &
+    EarStrutElms_brch          => plt_biom%EarStrutElms_brch,           &
+    GrainStrutElms_brch        => plt_biom%GrainStrutElms_brch,         &
+    CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch,        &
+    ShootC4NonstC_brch         => plt_biom%ShootC4NonstC_brch,          &
+    CPOOL3_node                => plt_photo%CPOOL3_node,                &
+    CPOOL4_node                => plt_photo%CPOOL4_node,                &
+    iPlantPhotosynthesisType   => plt_photo%iPlantPhotosynthesisType,   &
+    CMassHCO3BundleSheath_node => plt_photo%CMassHCO3BundleSheath_node, &
+    CMassCO2BundleSheath_node  => plt_photo%CMassCO2BundleSheath_node,  &
+    ShootStrutElms_brch        => plt_biom%ShootStrutElms_brch          &
   )  
   DO NE=1,NumPlantChemElms
     ShootStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ) &
@@ -231,6 +236,8 @@ implicit none
       +CanopyNonstElms_brch(NE,NB,NZ)
     
   ENDDO
+!  CanopyStalkC_pft(NZ)     = sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopyLeafShethC_pft(NZ) = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
 
   !add C4 specific reserve carbon
   ShootC4NonstC_brch(NB,NZ)=0._r8

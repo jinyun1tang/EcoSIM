@@ -1311,7 +1311,7 @@ module MicAutoCPLXMod
   IF(litrm)THEN
     !surface residue layer
     CH4G1 = CCH4E*VLsoiAirPM(1)
-    VMXA1 = AZMAX1(AMIN1(VMXA*dts_gas,RCH4F1))  !apparent vmax for uptake
+    VMXA1 = AZMAX1(AMIN1(VMXA*dts_gas,CH4G1))  !apparent vmax for uptake
   ELSE
     CH4G1=CCH4G*VLsoiAirPM(1)
     VMXA1    = VMXA*dts_gas  !apparent vmax for uptake    

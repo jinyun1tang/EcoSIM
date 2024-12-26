@@ -20,7 +20,7 @@ contains
   real(r8) :: WVPLT
   integer :: M,NB,NE,K,L
   real(r8) :: FDM,VOLWPX  
-  associate(                                                             &
+  associate(                                                              &
     jHarvst_pft                 => plt_distb%jHarvst_pft,                 &
     H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col,              &
     inonstruct                  => pltpar%inonstruct,                     &
@@ -53,7 +53,7 @@ contains
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch,        &
     InternodeStrutElms_brch     => plt_biom%InternodeStrutElms_brch,      &
     CanopyLeafShethC_pft        => plt_biom%CanopyLeafShethC_pft,         &
-    FracPARads2Canopy_pft      => plt_rad%FracPARads2Canopy_pft,        &
+    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft,         &
     CanopyStalkC_pft            => plt_biom%CanopyStalkC_pft,             &
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
     iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch,      &
@@ -62,7 +62,7 @@ contains
     CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch,    &
     CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch,         &
     ShootC4NonstC_brch          => plt_biom%ShootC4NonstC_brch,           &
-    VHeatCapCanP_pft            => plt_ew%VHeatCapCanP_pft,               &
+    VHeatCapCanopy_pft          => plt_ew%VHeatCapCanopy_pft,             &
     LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch,           &
     GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch,          &
     EarStrutElms_brch           => plt_biom%EarStrutElms_brch,            &
@@ -89,12 +89,12 @@ contains
 
 !     PPX,PP=PFT population per m2,grid cell
 !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
-!     VHeatCapCanP_pft=canopy heat capacity
+!     VHeatCapCanopy_pft=canopy heat capacity
 
-  FracPARads2Canopy_pft(NZ)=FracPARads2Canopy_pft(NZ)*XHVST
-  VHeatCapCanP_pft(NZ)=VHeatCapCanP_pft(NZ)*XHVST
-  CanopyLeafShethC_pft(NZ)=0._r8
-  CanopyStalkC_pft(NZ)=0._r8
+  FracPARads2Canopy_pft(NZ) = FracPARads2Canopy_pft(NZ)*XHVST
+  VHeatCapCanopy_pft(NZ)      = VHeatCapCanopy_pft(NZ)*XHVST
+  CanopyLeafShethC_pft(NZ)  = 0._r8
+  CanopyStalkC_pft(NZ)      = 0._r8
 !
 !     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
 !
@@ -174,8 +174,8 @@ contains
   !     PLANT STATE VARIABLES REMAINING AFTER TILLAGE
   !
 
-    ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)*XHVST
-    StalkBiomassC_brch(NB,NZ)=StalkBiomassC_brch(NB,NZ)*XHVST
+    ShootC4NonstC_brch(NB,NZ) = ShootC4NonstC_brch(NB,NZ)*XHVST
+    StalkBiomassC_brch(NB,NZ) = StalkBiomassC_brch(NB,NZ)*XHVST
     DO NE=1,NumPlantChemElms
       CanopyNonstElms_brch(NE,NB,NZ)      = CanopyNonstElms_brch(NE,NB,NZ)*XHVST
       CanopyNodulNonstElms_brch(NE,NB,NZ) = CanopyNodulNonstElms_brch(NE,NB,NZ)*XHVST
@@ -191,20 +191,19 @@ contains
       SenecStalkStrutElms_brch(NE,NB,NZ)  = SenecStalkStrutElms_brch(NE,NB,NZ)*XHVST
     ENDDO
 
-    PotentialSeedSites_brch(NB,NZ)=PotentialSeedSites_brch(NB,NZ)*XHVST
-    SeedNumSet_brch(NB,NZ)=SeedNumSet_brch(NB,NZ)*XHVST
-    GrainSeedBiomCMean_brch(NB,NZ)=GrainSeedBiomCMean_brch(NB,NZ)*XHVST
-    LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)*XHVST
-    LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
-    CanopyLeafShethC_pft(NZ)=CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
-
-    CanopyStalkC_pft(NZ)=CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
+    PotentialSeedSites_brch(NB,NZ) = PotentialSeedSites_brch(NB,NZ)*XHVST
+    SeedNumSet_brch(NB,NZ)         = SeedNumSet_brch(NB,NZ)*XHVST
+    GrainSeedBiomCMean_brch(NB,NZ) = GrainSeedBiomCMean_brch(NB,NZ)*XHVST
+    LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
+    LeafPetolBiomassC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
+    CanopyLeafShethC_pft(NZ)       = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
+    CanopyStalkC_pft(NZ)           = CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
     D8970: DO K=0,MaxNodesPerBranch1
       IF(K.NE.0)THEN
-        CPOOL3_node(K,NB,NZ)=CPOOL3_node(K,NB,NZ)*XHVST
-        CPOOL4_node(K,NB,NZ)=CPOOL4_node(K,NB,NZ)*XHVST
-        CMassCO2BundleSheath_node(K,NB,NZ)=CMassCO2BundleSheath_node(K,NB,NZ)*XHVST
-        CMassHCO3BundleSheath_node(K,NB,NZ)=CMassHCO3BundleSheath_node(K,NB,NZ)*XHVST
+        CPOOL3_node(K,NB,NZ)                = CPOOL3_node(K,NB,NZ)*XHVST
+        CPOOL4_node(K,NB,NZ)                = CPOOL4_node(K,NB,NZ)*XHVST
+        CMassCO2BundleSheath_node(K,NB,NZ)  = CMassCO2BundleSheath_node(K,NB,NZ)*XHVST
+        CMassHCO3BundleSheath_node(K,NB,NZ) = CMassHCO3BundleSheath_node(K,NB,NZ)*XHVST
       ENDIF
       LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)*XHVST
 
@@ -416,8 +415,8 @@ contains
       DO NTG=idg_beg,idg_end-1
         RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-XHVST1 &
           *(trcg_rootml_pvr(NTG,N,L,NZ)+trcs_rootml_pvr(NTG,N,L,NZ))
-        trcg_rootml_pvr(NTG,N,L,NZ)=XHVST*trcg_rootml_pvr(NTG,N,L,NZ)
-        trcs_rootml_pvr(NTG,N,L,NZ)=XHVST*trcs_rootml_pvr(NTG,N,L,NZ)
+        trcg_rootml_pvr(NTG,N,L,NZ) = XHVST*trcg_rootml_pvr(NTG,N,L,NZ)
+        trcs_rootml_pvr(NTG,N,L,NZ) = XHVST*trcs_rootml_pvr(NTG,N,L,NZ)
       ENDDO
 !
 !     ROOT STATE VARIABLES REMAINING AFTER TILLAGE
@@ -438,12 +437,12 @@ contains
 !
       D8960: DO NR=1,NumRootAxes_pft(NZ)
         DO NE=1,NumPlantChemElms
-          RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
-          RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
+          RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
+          RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
         ENDDO
-        Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)*XHVST
-        Root2ndLen_rpvr(N,L,NR,NZ)=Root2ndLen_rpvr(N,L,NR,NZ)*XHVST
-        Root2ndXNum_rpvr(N,L,NR,NZ)=Root2ndXNum_rpvr(N,L,NR,NZ)*XHVST
+        Root1stLen_rpvr(N,L,NR,NZ)  = Root1stLen_rpvr(N,L,NR,NZ)*XHVST
+        Root2ndLen_rpvr(N,L,NR,NZ)  = Root2ndLen_rpvr(N,L,NR,NZ)*XHVST
+        Root2ndXNum_rpvr(N,L,NR,NZ) = Root2ndXNum_rpvr(N,L,NR,NZ)*XHVST
       ENDDO D8960
 
       DO NE=1,NumPlantChemElms
@@ -478,8 +477,8 @@ contains
               XHVST1*(ElmAllocmat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ) &
               +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ))
           ENDDO D6395
-          RootNodulStrutElms_rpvr(NE,L,NZ)=RootNodulStrutElms_rpvr(NE,L,NZ)*XHVST
-          RootNodulNonstElms_rpvr(NE,L,NZ)=RootNodulNonstElms_rpvr(NE,L,NZ)*XHVST
+          RootNodulStrutElms_rpvr(NE,L,NZ) = RootNodulStrutElms_rpvr(NE,L,NZ)*XHVST
+          RootNodulNonstElms_rpvr(NE,L,NZ) = RootNodulNonstElms_rpvr(NE,L,NZ)*XHVST
         ENDDO
       ENDIF
     ENDDO D8985

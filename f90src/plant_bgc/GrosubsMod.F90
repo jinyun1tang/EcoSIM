@@ -396,7 +396,7 @@ module grosubsMod
 !     begin_execution
 
   associate(                                                              &
-    TKC                         => plt_ew%TKC,                            &
+    TKC_pft                     => plt_ew%TKC_pft,                        &
     TKS_vr                      => plt_ew%TKS_vr,                         &
     PSICanopy_pft               => plt_ew%PSICanopy_pft,                  &
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft,              &
@@ -523,7 +523,7 @@ module grosubsMod
 !     8.3143,710.0=gas constant,enthalpy
 !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
 !
-  TKCM=TKC(NZ)+TempOffset_pft(NZ)
+  TKCM=TKC_pft(NZ)+TempOffset_pft(NZ)
 
   TFN5=calc_plant_maint_tempf(TKCM)  
   D7: DO L=NU,MaxNumRootLays

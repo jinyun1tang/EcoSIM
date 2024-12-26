@@ -54,7 +54,7 @@ implicit none
   real(r8),allocatable ::  HeatFlxBySnowRedistribut(:,:,:)                        !  
   real(r8),allocatable ::  HeatFlow2Soili_3D(:,:,:,:)                     !  
   real(r8),allocatable ::  WaterFlow2Micpt_3D(:,:,:,:)                      !  
-  real(r8),allocatable ::  ConvWaterFlowMacP_3D(:,:,:,:)                     !  
+  real(r8),allocatable ::  WaterFlow2Macpt_3D(:,:,:,:)                     !  
   real(r8),allocatable ::  WaterFlow2MicptX_3D(:,:,:,:)                     !  
   real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                       !
   real(r8),allocatable ::  VLairMicP_vr(:,:,:)                      !
@@ -113,7 +113,7 @@ implicit none
   allocate(HeatFlxBySnowRedistribut(2,JV,JH));      HeatFlxBySnowRedistribut=0._r8
   allocate(HeatFlow2Soili_3D(3,JD,JV,JH));  HeatFlow2Soili_3D=0._r8
   allocate(WaterFlow2Micpt_3D(3,JD,JV,JH));   WaterFlow2Micpt_3D=0._r8  
-  allocate(ConvWaterFlowMacP_3D(3,JD,JV,JH));  ConvWaterFlowMacP_3D=0._r8
+  allocate(WaterFlow2Macpt_3D(3,JD,JV,JH));  WaterFlow2Macpt_3D=0._r8
   allocate(WaterFlow2MicptX_3D(3,JD,JV,JH));  WaterFlow2MicptX_3D=0._r8
   allocate(VLWatMicP2_vr(JZ,JY,JX));    VLWatMicP2_vr=0._r8
   allocate(VLairMicP_vr(JZ,JY,JX));   VLairMicP_vr=0._r8
@@ -177,7 +177,7 @@ implicit none
   call destroy(HeatFlxBySnowRedistribut)    
   call destroy(HeatFlow2Soili_3D)  
   call destroy(WaterFlow2Micpt_3D)  
-  call destroy(ConvWaterFlowMacP_3D)
+  call destroy(WaterFlow2Macpt_3D)
   call destroy(WaterFlow2MicptX_3D)
   call destroy(VLWatMicP2_vr)
   call destroy(VLairMicP_vr)

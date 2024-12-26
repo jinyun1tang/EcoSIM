@@ -502,10 +502,10 @@ module PlantPhenolMod
     CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft, &
     ShootStrutElms_pft  => plt_biom%ShootStrutElms_pft,  &
     HypoctoHeight_pft   => plt_morph%HypoctoHeight_pft,  &
-    VHeatCapCanP_pft    => plt_ew%VHeatCapCanP_pft,      &
+    VHeatCapCanopy_pft    => plt_ew%VHeatCapCanopy_pft,      &
     Root1stDepz_pft     => plt_morph%Root1stDepz_pft,    &
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft,    &
-    WatByPCanopy_pft    => plt_ew%WatByPCanopy_pft,      &
+    WatHeldOnCanopy_pft    => plt_ew%WatHeldOnCanopy_pft,      &
     CanopyStemArea_pft  => plt_morph%CanopyStemArea_pft, &
     SeedDepth_pft       => plt_morph%SeedDepth_pft,      &
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch &
@@ -518,7 +518,7 @@ module PlantPhenolMod
 ! HypoctoHeight_pft=hypocotyledon height
 ! SeedDepth_pft=seeding depth
 ! Root1stDepz_pft=primary root depth
-! VHeatCapCanP_pft,WTSHT,WatByPCanopy_pft=canopy heat capacity,mass,water content
+! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
 !
   ShootArea=0._r8
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
@@ -528,7 +528,7 @@ module PlantPhenolMod
 
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
-      VHeatCapCanP_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatByPCanopy_pft(NZ))
+      VHeatCapCanopy_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))
     ENDIF
   ENDIF
   end associate

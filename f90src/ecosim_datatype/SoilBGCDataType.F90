@@ -96,7 +96,7 @@ implicit none
   real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
   real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  WaterFlowMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowSoiMacP_3D(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_TransptMicP_3D(:,:,:,:,:)
@@ -229,7 +229,7 @@ implicit none
 
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
   allocate(WaterFlowSoiMicP_3D(3,JD,JV,JH));    WaterFlowSoiMicP_3D=0._r8
-  allocate(WaterFlowMacP_3D(3,JD,JV,JH));   WaterFlowMacP_3D=0._r8
+  allocate(WaterFlowSoiMacP_3D(3,JD,JV,JH));   WaterFlowSoiMacP_3D=0._r8
   allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
   allocate(trcs_TransptMicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_TransptMicP_3D=0._r8
@@ -341,7 +341,7 @@ implicit none
   call destroy(RNO2DmndBandChemo_vr)
   call destroy(XZHYS)
   call destroy(WaterFlowSoiMicP_3D)
-  call destroy(WaterFlowMacP_3D)
+  call destroy(WaterFlowSoiMacP_3D)
   call destroy(HeatFlow2Soil_3D)
   call destroy(DOM_MicpTransp_3D)
   call destroy(DOM_3DMacp_Transp_flx)

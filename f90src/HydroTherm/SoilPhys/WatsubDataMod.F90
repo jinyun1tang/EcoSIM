@@ -5,20 +5,19 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),allocatable ::  TMLiceThawMicP(:,:,:)              !micropore layer integrated ice mass loss due to thaw
-  real(r8),allocatable ::  TMLiceThawMacP(:,:,:)              !macropore layer integrated ice mass loss due to thaw
+  real(r8),allocatable ::  TMLiceThawMicP_vr(:,:,:)              !micropore layer integrated ice mass loss due to thaw, 
+  real(r8),allocatable ::  TMLiceThawMacP_vr(:,:,:)              !macropore layer integrated ice mass loss due to thaw, 
 
   real(r8),allocatable ::  AREAU(:,:,:)                       !
   real(r8),allocatable ::  AreaUnderWaterTBL(:,:,:)           !
 
   real(r8),allocatable ::  VLairMacP_vr(:,:,:)                   !
-  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1(:,:,:)        !total soil layer latent heat release from melting
-  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1s(:,:,:)        !total soil layer latent heat release from melting
+  real(r8),allocatable ::  TLPhaseChangeHeat2Soi1_vr(:,:,:)         !total soil layer latent heat release from melting
 
   real(r8),allocatable ::  FWatExMacP2MicPi(:,:,:)             !pressure-driven water flow from macpore to micpore
 
   real(r8),allocatable ::  TWatCharge2MicP_vr(:,:,:)                       !
-  real(r8),allocatable ::  TConvWaterFlowMacP_3D_vr(:,:,:)                      !
+  real(r8),allocatable ::  TWaterFlow2Macpt_3D_vr(:,:,:)                      !
   real(r8),allocatable ::  THeatFlow2Soili_3D_vr(:,:,:)                      !
   real(r8),allocatable ::  FIceThawMicP(:,:,:)                       !
   real(r8),allocatable ::  SoiPLIceHeatFlxFrez(:,:,:)                       !
@@ -52,22 +51,21 @@ contains
 
   allocate(N6X(JY,JX));         N6X=0
 
-  allocate(TMLiceThawMicP(JZ,JY,JX));   TMLiceThawMicP=0._r8
+  allocate(TMLiceThawMicP_vr(JZ,JY,JX));   TMLiceThawMicP_vr=0._r8
 
-  allocate(TMLiceThawMacP(JZ,JY,JX));   TMLiceThawMacP=0._r8
+  allocate(TMLiceThawMacP_vr(JZ,JY,JX));   TMLiceThawMacP_vr=0._r8
 
   allocate(AREAU(JZ,JY,JX));    AREAU=0._r8
   allocate(AreaUnderWaterTBL(JZ,JY,JX));   AreaUnderWaterTBL=0._r8
 
 
   allocate(VLairMacP_vr(JZ,JY,JX));  VLairMacP_vr=0._r8
-  allocate(TLPhaseChangeHeat2Soi1(JZ,JY,JX));   TLPhaseChangeHeat2Soi1=0._r8
-  allocate(TLPhaseChangeHeat2Soi1s(JZ,JY,JX));   TLPhaseChangeHeat2Soi1s=0._r8
+  allocate(TLPhaseChangeHeat2Soi1_vr(JZ,JY,JX));   TLPhaseChangeHeat2Soi1_vr=0._r8
 
   allocate(FWatExMacP2MicPi(JZ,JY,JX));    FWatExMacP2MicPi=0._r8
 
   allocate(TWatCharge2MicP_vr(JZ,JY,JX));    TWatCharge2MicP_vr=0._r8
-  allocate(TConvWaterFlowMacP_3D_vr(JZ,JY,JX));   TConvWaterFlowMacP_3D_vr=0._r8
+  allocate(TWaterFlow2Macpt_3D_vr(JZ,JY,JX));   TWaterFlow2Macpt_3D_vr=0._r8
   allocate(THeatFlow2Soili_3D_vr(JZ,JY,JX));   THeatFlow2Soili_3D_vr=0._r8
   allocate(FIceThawMicP(JZ,JY,JX));    FIceThawMicP=0._r8
   allocate(SoiPLIceHeatFlxFrez(JZ,JY,JX));    SoiPLIceHeatFlxFrez=0._r8
@@ -99,21 +97,20 @@ contains
 
   call destroy(N6X)
 
-  call destroy(TMLiceThawMicP)
+  call destroy(TMLiceThawMicP_vr)
 
-  call destroy(TMLiceThawMacP)
+  call destroy(TMLiceThawMacP_vr)
 
   call destroy(AREAU)
   call destroy(AreaUnderWaterTBL)
 
   call destroy(VLairMacP_vr)
-  call destroy(TLPhaseChangeHeat2Soi1)
-  call destroy(TLPhaseChangeHeat2Soi1s)
+  call destroy(TLPhaseChangeHeat2Soi1_vr)
 
   call destroy(FWatExMacP2MicPi)
 
   call destroy(TWatCharge2MicP_vr)
-  call destroy(TConvWaterFlowMacP_3D_vr)
+  call destroy(TWaterFlow2Macpt_3D_vr)
   call destroy(THeatFlow2Soili_3D_vr)
   call destroy(FIceThawMicP)
   call destroy(SoiPLIceHeatFlxFrez)

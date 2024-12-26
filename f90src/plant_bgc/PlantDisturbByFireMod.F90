@@ -51,9 +51,9 @@ contains
   ELSE
     FracLeftThin=1.0_r8-DCORP*FracBiomHarvsted(1,iplthvst_woody,NZ) &
       *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
-    FFIRE(ielmc)=FracBiomHarvsted(2,iplthvst_woody,NZ)
-    FFIRE(ielmn)=FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
-    FFIRE(ielmp)=FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
+    FFIRE(ielmc) = FracBiomHarvsted(2,iplthvst_woody,NZ)
+    FFIRE(ielmn) = FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
+    FFIRE(ielmp) = FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
   ENDIF
   end associate
   end subroutine StageRootRemovalByFire
@@ -85,14 +85,14 @@ contains
     Eco_NBP_CumYr_col   => plt_bgcr%Eco_NBP_CumYr_col     &
   )
 
-  CO2ByFire_CumYr_pft(NZ)=CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  CH4ByFire_CumYr_pft(NZ)=CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  O2ByFire_CumYr_pft(NZ)=O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
-  NH3byFire_CumYr_pft(NZ)=NH3byFire_CumYr_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
-  N2ObyFire_CumYr_pft(NZ)=N2ObyFire_CumYr_pft(NZ)-0.0_r8
-  PO4byFire_CumYr_pft(NZ)=PO4byFire_CumYr_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
-  CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
-  Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CO2ByFire_CumYr_pft(NZ) = CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  CH4ByFire_CumYr_pft(NZ) = CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  O2ByFire_CumYr_pft(NZ)  = O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)*2.667_r8
+  NH3byFire_CumYr_pft(NZ) = NH3byFire_CumYr_pft(NZ)-FFIRE(ielmn)*FrcMassNotHarvst(ielmn)
+  N2ObyFire_CumYr_pft(NZ) = N2ObyFire_CumYr_pft(NZ)-0.0_r8
+  PO4byFire_CumYr_pft(NZ) = PO4byFire_CumYr_pft(NZ)-FFIRE(ielmp)*FrcMassNotHarvst(ielmp)
+  CO2NetFix_pft(NZ)       = CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
+  Eco_NBP_CumYr_col       = Eco_NBP_CumYr_col-FrcAsCH4byFire*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
   end associate
   end subroutine RemoveRootByFire
 
@@ -232,14 +232,14 @@ contains
     N2ObyFire_CumYr_pft => plt_distb%N2ObyFire_CumYr_pft, &
     CO2ByFire_CumYr_pft => plt_distb%CO2ByFire_CumYr_pft  &
   )
-  CO2ByFire_CumYr_pft(NZ)=CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  CH4ByFire_CumYr_pft(NZ)=CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  O2ByFire_CumYr_pft(NZ)=O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))*2.667_r8
-  NH3byFire_CumYr_pft(NZ)=NH3byFire_CumYr_pft(NZ)-TotalElmntRemoval(ielmn)+TotalElmnt2Litr(ielmn)
-  N2ObyFire_CumYr_pft(NZ)=N2ObyFire_CumYr_pft(NZ)-0.0_r8
-  PO4byFire_CumYr_pft(NZ)=PO4byFire_CumYr_pft(NZ)-TotalElmntRemoval(ielmp)+TotalElmnt2Litr(ielmp)
-  CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
-  Eco_NBP_CumYr_col=Eco_NBP_CumYr_col-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  CO2ByFire_CumYr_pft(NZ) = CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  CH4ByFire_CumYr_pft(NZ) = CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  O2ByFire_CumYr_pft(NZ)  = O2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))*2.667_r8
+  NH3byFire_CumYr_pft(NZ) = NH3byFire_CumYr_pft(NZ)-TotalElmntRemoval(ielmn)+TotalElmnt2Litr(ielmn)
+  N2ObyFire_CumYr_pft(NZ) = N2ObyFire_CumYr_pft(NZ)-0.0_r8
+  PO4byFire_CumYr_pft(NZ) = PO4byFire_CumYr_pft(NZ)-TotalElmntRemoval(ielmp)+TotalElmnt2Litr(ielmp)
+  CO2NetFix_pft(NZ)       = CO2NetFix_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
+  Eco_NBP_CumYr_col       = Eco_NBP_CumYr_col-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   end associate
   end subroutine AbvgBiomRemovalByFire
 
@@ -274,19 +274,19 @@ contains
     iHarvstType_pft  => plt_distb%iHarvstType_pft, &
     FracBiomHarvsted => plt_distb%FracBiomHarvsted &
   )
-  NonstructElmnt2Litr(ielmc)=NonstructElmntRemoval(ielmc)*EHVST21
-  NonstructElmnt2Litr(ielmn)=NonstructElmntRemoval(ielmn)*&
+  NonstructElmnt2Litr(ielmc) = NonstructElmntRemoval(ielmc)*EHVST21
+  NonstructElmnt2Litr(ielmn) = NonstructElmntRemoval(ielmn)*&
     (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
   NonstructElmnt2Litr(ielmp)=NonstructElmntRemoval(ielmp)*&
     (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-  NonstructElmntOffEcosystem(ielmn)=NonstructElmntRemoval(ielmn)*EHVST21
-  NonstructElmntOffEcosystem(ielmp)=NonstructElmntRemoval(ielmp)*EHVST21
+  NonstructElmntOffEcosystem(ielmn) = NonstructElmntRemoval(ielmn)*EHVST21
+  NonstructElmntOffEcosystem(ielmp) = NonstructElmntRemoval(ielmp)*EHVST21
 
-  LeafElmnt2Litr(ielmc)=LeafElmntRemoval(ielmc)*EHVST21
-  LeafElmnt2Litr(ielmn)=LeafElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-  LeafElmnt2Litr(ielmp)=LeafElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
-  LeafElmntOffEcosystem(ielmn)=LeafElmntRemoval(ielmn)*EHVST21
-  LeafElmntOffEcosystem(ielmp)=LeafElmntRemoval(ielmp)*EHVST21
+  LeafElmnt2Litr(ielmc)        = LeafElmntRemoval(ielmc)*EHVST21
+  LeafElmnt2Litr(ielmn)        = LeafElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
+  LeafElmnt2Litr(ielmp)        = LeafElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_leaf,NZ))
+  LeafElmntOffEcosystem(ielmn) = LeafElmntRemoval(ielmn)*EHVST21
+  LeafElmntOffEcosystem(ielmp) = LeafElmntRemoval(ielmp)*EHVST21
 
   FineNonleafElmnt2Litr(ielmc)=FineNonleafElmntRemoval(ielmc)*EHVST22
   FineNonleafElmnt2Litr(ielmn)=FineNonleafElmntRemoval(ielmn)*&
@@ -296,19 +296,19 @@ contains
   FineNonleafElmOffEcosystem(ielmn)=FineNonleafElmntRemoval(ielmn)*EHVST22
   FineNonleafElmOffEcosystem(ielmp)=FineNonleafElmntRemoval(ielmp)*EHVST22
 
-  WoodyElmnt2Litr(ielmc)=WoodyElmntRemoval(ielmc)*EHVST23
-  WoodyElmnt2Litr(ielmn)=WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
-  WoodyElmnt2Litr(ielmp)=WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
-  WoodyElmntOffEcosystem(ielmn)=WoodyElmntRemoval(ielmn)*EHVST23
-  WoodyElmntOffEcosystem(ielmp)=WoodyElmntRemoval(ielmp)*EHVST23
+  WoodyElmnt2Litr(ielmc)        = WoodyElmntRemoval(ielmc)*EHVST23
+  WoodyElmnt2Litr(ielmn)        = WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
+  WoodyElmnt2Litr(ielmp)        = WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_woody,NZ))
+  WoodyElmntOffEcosystem(ielmn) = WoodyElmntRemoval(ielmn)*EHVST23
+  WoodyElmntOffEcosystem(ielmp) = WoodyElmntRemoval(ielmp)*EHVST23
 
-  StandeadElmnt2Litr(ielmc)=StandeadElmntRemoval(ielmc)*EHVST24
-  StandeadElmnt2Litr(ielmn)=StandeadElmntRemoval(ielmn)*&
+  StandeadElmnt2Litr(ielmc) = StandeadElmntRemoval(ielmc)*EHVST24
+  StandeadElmnt2Litr(ielmn) = StandeadElmntRemoval(ielmn)*&
     (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_stdead,NZ))
   StandeadElmnt2Litr(ielmp)=StandeadElmntRemoval(ielmp)*&
     (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(2,iplthvst_stdead,NZ))
-  StandeadElmntOffEcosystem(ielmn)=StandeadElmntRemoval(ielmn)*EHVST24
-  StandeadElmntOffEcosystem(ielmp)=StandeadElmntRemoval(ielmp)*EHVST24
+  StandeadElmntOffEcosystem(ielmn) = StandeadElmntRemoval(ielmn)*EHVST24
+  StandeadElmntOffEcosystem(ielmp) = StandeadElmntRemoval(ielmp)*EHVST24
   end associate
   end subroutine ApplyBiomRemovalByFire
 

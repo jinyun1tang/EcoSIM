@@ -12,7 +12,7 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  TKSZ(:,:,:)                        !
   real(r8),target,allocatable ::  TKS_vr(:,:,:)                         !
   real(r8),target,allocatable ::  TLIceThawMicP(:,:,:)               !hourly accumulated freeze-thaw flux in micropores
-  real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi(:,:,:)       !hourly accumulated freeze-thaw latent heat flux
+  real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi_vr(:,:,:)    !hourly accumulated freeze-thaw latent heat flux
   real(r8),target,allocatable ::  TLIceThawMacP(:,:,:)               !hourly accumulated freeze-thaw flux in macropores
   real(r8),target,allocatable ::  XPhaseChangeHeatL_snvr(:,:,:)      !hourly accumulated latent heat flux from freeze-thaw
   real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)            !soil heat capacity [MJ m-3 K-1]
@@ -23,23 +23,25 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model, [MJ/d2/h]
   real(r8),target,allocatable ::  THeatFlowCellSoil_vr(:,:,:)           !hourly heat flux into soil layer  [MJ m-3]
-  real(r8),target,allocatable ::  tHeatUptk_col(:,:)                 !Heat utake by plant through transpiration [MJ/d2/h] 
   real(r8),target,allocatable ::  HeatDrain_col(:,:)                 !heat loss through drainage [MJ/d2/h]
   real(r8),target,allocatable ::  HeatRunSurf_col(:,:)               !heat loss through surface runoff [MJ/d2/h]
   real(r8),target,allocatable ::  HeatDischar_col(:,:)               !Heat loss through discharge [MJ/d2/h]
   real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:)            !Heat flow into colum [MJ/d2/h]
+  real(r8),target,allocatable ::  HeatSource_col(:,:)                 !Heat source from heating [MJ/d2/h]
+  real(r8),target,allocatable :: THeatSoiThaw_col(:,:)                !Heat associated with freeze-thaw [MJ/d2/h]
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSoilHeatData
 
   implicit none
+  allocate(HeatSource_col(JY,JX)); HeatSource_col = 0._r8
   allocate(TKSZ(366,24,JZ));    TKSZ                                   = 0._r8
   allocate(TKS_vr(0:JZ,JY,JX));    TKS_vr                              = 0._r8
   allocate(HeatFlx2Grnd_col(JY,JX));   HeatFlx2Grnd_col                = 0._r8
   allocate(HeatStore_col(JY,JX));  HeatStore_col                       = 0._r8
   allocate(TLIceThawMicP(JZ,JY,JX));     TLIceThawMicP                 = 0._r8
-  allocate(TLPhaseChangeHeat2Soi(JZ,JY,JX));    TLPhaseChangeHeat2Soi  = 0._r8
+  allocate(TLPhaseChangeHeat2Soi_vr(JZ,JY,JX));    TLPhaseChangeHeat2Soi_vr  = 0._r8
   allocate(TLIceThawMacP(JZ,JY,JX));    TLIceThawMacP                  = 0._r8
   allocate(XPhaseChangeHeatL_snvr(JS,JY,JX));   XPhaseChangeHeatL_snvr = 0._r8
   allocate(VHeatCapacity_vr(0:JZ,JY,JX));   VHeatCapacity_vr           = 0._r8
@@ -48,22 +50,24 @@ contains
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond    = 0._r8
   allocate(THeatFlowCellSoil_vr(JZ,JY,JX));    THeatFlowCellSoil_vr          = 0._r8
   allocate(HeatSource_vr(JZ,JY,JX)); HeatSource_vr=0._r8
-  allocate(tHeatUptk_col(JY,JX));   tHeatUptk_col                      = 0._r8
   allocate(HeatDrain_col(JY,JX));  HeatDrain_col                       = 0._r8
   allocate(HeatRunSurf_col(JY,JX)); HeatRunSurf_col                    = 0._r8
   allocate(HeatDischar_col(JY,JX)); HeatDischar_col                    = 0._r8
   allocate(THeatFlow2Soil_col(JY,JX));THeatFlow2Soil_col               = 0._r8
+  allocate(THeatSoiThaw_col(JY,JX)); THeatSoiThaw_col = 0._r8
   end subroutine InitSoilHeatData
 
 !----------------------------------------------------------------------
   subroutine DestructSoilHeatData
   use abortutils, only : destroy
   implicit none
+  call destroy(THeatSoiThaw_col)
+  call destroy(HeatSource_col)
   call destroy(TKSZ)
   call destroy(TKS_vr)
   call destroy(HeatSource_vr)
   call destroy(TLIceThawMicP)
-  call destroy(TLPhaseChangeHeat2Soi)
+  call destroy(TLPhaseChangeHeat2Soi_vr)
   call destroy(TLIceThawMacP)
   call destroy(HeatStore_col)
   call destroy(XPhaseChangeHeatL_snvr)
@@ -72,7 +76,6 @@ contains
   call destroy(NumerSolidThermCond)
   call destroy(DenomSolidThermCond)
   call destroy(THeatFlowCellSoil_vr)  
-  call destroy(tHeatUptk_col)
   call destroy(HeatDrain_col)
   call destroy(HeatRunSurf_col)
   call destroy(HeatDischar_col)

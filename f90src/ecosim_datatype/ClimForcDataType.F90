@@ -106,7 +106,7 @@ implicit none
   real(r8),target,allocatable ::  TSHX_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Air_Heat_Latent_store_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Air_Heat_Sens_store_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  SoilHeatSrcDepth(:,:)                        !depth of soil heat sink/source, [m]
+  real(r8),target,allocatable ::  SoilHeatSrcDepth_col(:,:)                        !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
   real(r8),target,allocatable ::  RadSWSolarBeam_col(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
@@ -117,8 +117,9 @@ implicit none
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec_col(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Irrigation_col(:,:)                 !irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PrecRainAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PreCRAIN_lndAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
@@ -171,6 +172,7 @@ implicit none
   real(r8),target,allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
   real(r8),target,allocatable ::  HeatPrec_col(:,:)    !precipitation heat to surface [MJ/d2/h]
+  real(r8),target,allocatable ::  RainLitr_col(:,:)  !water from aboveground falling litter
   contains
 !----------------------------------------------------------------------
 
@@ -193,6 +195,7 @@ implicit none
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
   allocate(HeatPrec_col(JY,JX)); HeatPrec_col=0._r8
+  allocate(RainLitr_col(JY,JX)); RainLitr_col=0._r8
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
@@ -240,7 +243,7 @@ implicit none
   allocate(TSHX_col(JY,JX));        TSHX_col=0._r8
   allocate(Air_Heat_Latent_store_col(JY,JX));        Air_Heat_Latent_store_col=0._r8
   allocate(Air_Heat_Sens_store_col(JY,JX));        Air_Heat_Sens_store_col=0._r8
-  allocate(SoilHeatSrcDepth(JY,JX));      SoilHeatSrcDepth=0._r8
+  allocate(SoilHeatSrcDepth_col(JY,JX));      SoilHeatSrcDepth_col=0._r8
   allocate(TKSD(JY,JX));        TKSD=0._r8
   allocate(ATCAI(JY,JX));       ATCAI=0._r8
   allocate(RadSWSolarBeam_col(JY,JX));         RadSWSolarBeam_col=0._r8
@@ -250,9 +253,10 @@ implicit none
   allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec_col(JY,JX));       RainFalPrec_col=0._r8
+  allocate(Irrigation_col(JY,JX));    Irrigation_col=0._r8
   allocate(SnoFalPrec_col(JY,JX));       SnoFalPrec_col=0._r8
   allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
-  allocate(PrecRainAndIrrig_col(JY,JX));       PrecRainAndIrrig_col=0._r8
+  allocate(PreCRAIN_lndAndIrrig_col(JY,JX));       PreCRAIN_lndAndIrrig_col=0._r8
   allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
@@ -311,6 +315,7 @@ implicit none
   use abortutils, only : destroy
   implicit none
   call destroy(HeatPrec_col)
+  call destroy(RainLitr_col)
   call destroy(WDPTHD)
   call destroy(TDTPX)
   call destroy(TDTPN)
@@ -368,7 +373,7 @@ implicit none
   call destroy(TSHX_col)
   call destroy(Air_Heat_Latent_store_col)
   call destroy(Air_Heat_Sens_store_col)
-  call destroy(SoilHeatSrcDepth)
+  call destroy(SoilHeatSrcDepth_col)
   call destroy(TKSD)
   call destroy(ATCAI)
   call destroy(RadSWSolarBeam_col)
@@ -378,9 +383,10 @@ implicit none
   call destroy(TairKClimMean)
   call destroy(ATKS)
   call destroy(RainFalPrec_col)
+  call destroy(Irrigation_col)
   call destroy(SnoFalPrec_col)
   call destroy(PrecAtm_col)
-  call destroy(PrecRainAndIrrig_col)
+  call destroy(PreCRAIN_lndAndIrrig_col)
   call destroy(EnergyImpact4Erosion)
   call destroy(PHR)
   call destroy(CN4RI)

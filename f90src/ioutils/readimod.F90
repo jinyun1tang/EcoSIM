@@ -290,7 +290,7 @@ module readiMod
       FlowDirIndicator(NY,NX)   = grid_mode
       NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
       WtblDepzTile_col(NY,NX)   = WTBLDepz_tile
-      WaterTBLSlope(NY,NX)      = DTBLGG
+      WaterTBLSlope_col(NY,NX)      = DTBLGG
 
       RechargNorthSurf(NY,NX) = RCHQNG
       RechargEastSurf(NY,NX)  = RCHQEG
@@ -306,7 +306,8 @@ module readiMod
       RechargRateEastWTBL(NY,NX)  = RCHGETG
       RechargRateSouthWTBL(NY,NX) = RCHGSTG
       RechargRateWestWTBL(NY,NX)  = RCHGWTG
-      RCHGD(NY,NX)                = RCHGDG
+      
+      RechargBottom_col(NY,NX)                = RCHGDG
       DH(NY,NX)                   = DHI(NX)
       DV(NY,NX)                   = DVI(NY)
       CO2E_col(NY,NX)             = CO2EI(NY,NX)

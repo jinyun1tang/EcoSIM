@@ -59,33 +59,34 @@ implicit none
   PlantPopu_col(NY,NX)                                = plt_site%PlantPopu_col
   ECO_ER_col(NY,NX)                                   = plt_bgcr%ECO_ER_col
   Eco_NBP_CumYr_col(NY,NX)                            = plt_bgcr%Eco_NBP_CumYr_col
-  Air_Heat_Latent_store_col(NY,NX)                       = plt_ew%Air_Heat_Latent_store_col
-  Air_Heat_Sens_store_col(NY,NX)                         = plt_ew%Air_Heat_Sens_store_col
+  Air_Heat_Latent_store_col(NY,NX)                    = plt_ew%Air_Heat_Latent_store_col
+  Air_Heat_Sens_store_col(NY,NX)                      = plt_ew%Air_Heat_Sens_store_col
   Eco_AutoR_CumYr_col(NY,NX)                          = plt_bgcr%Eco_AutoR_CumYr_col
   LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)     = plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)
   EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)   = plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)
-  CanH2OHeldVg_col(NY,NX)                                 = plt_ew%CanH2OHeldVg
+  WatHeldOnCanopy_col(NY,NX)                          = plt_ew%WatHeldOnCanopy_col
   Eco_Heat_Sens_col(NY,NX)                            = plt_ew%Eco_Heat_Sens_col
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)
   H2OLoss_CumYr_col(NY,NX)                            = plt_ew%H2OLoss_CumYr_col
-  StemArea_col(NY,NX)                                 = plt_morph%StemArea_col
-
+  StemArea_col(NY,NX)                              = plt_morph%StemArea_col
+  HeatCanopy2Dist_col(NY,NX)                       = plt_ew%HeatCanopy2Dist_col
+  HeatCanopy2Dist_col(NY,NX)                       = plt_ew%HeatCanopy2Dist_col
   CanopyLeafArea_col(NY,NX)                        = plt_morph%CanopyLeafArea_col
   Eco_NetRad_col(NY,NX)                            = plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)                       = plt_ew%Eco_Heat_Latent_col
-  Eco_Heat_GrndSurf_col(NY,NX)                         = plt_ew%Eco_Heat_GrndSurf_col
+  Eco_Heat_GrndSurf_col(NY,NX)                     = plt_ew%Eco_Heat_GrndSurf_col
   QvET_col(NY,NX)                                  = plt_ew%QvET_col
   LWRadCanG(NY,NX)                                 = plt_ew%LWRadCanG
-  VapXAir2Canopy_col(NY,NX)                              = plt_ew%VapXAir2Canopy_col
-  HeatFlx2Canopy_col(NY,NX)                                    = plt_ew%HeatFlx2Canopy_col
-  CanWat_col(NY,NX)                                = plt_ew%CanWat_col
-  CanopyHeatStor_col(NY,NX)                           = plt_ew%CanopyHeatStor_col
+  VapXAir2Canopy_col(NY,NX)                        = plt_ew%VapXAir2Canopy_col
+  HeatFlx2Canopy_col(NY,NX)                        = plt_ew%HeatFlx2Canopy_col
+  CanopyWat_col(NY,NX)                             = plt_ew%CanopyWat_col
+  CanopyHeatStor_col(NY,NX)                        = plt_ew%CanopyHeatStor_col
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) = plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)
   Canopy_NEE_col(NY,NX)                            = plt_bgcr%Canopy_NEE_col
 
-  FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
-  FERT(3,I1,NY,NX) =plt_distb%FERT(3)
-  IYTYP(2,I1,NY,NX)=plt_distb%IYTYP
+  FERT(17:19,I1,NY,NX) = plt_distb%FERT(17:19)
+  FERT(3,I1,NY,NX)                                                       = plt_distb%FERT(3)
+  IYTYP(2,I1,NY,NX)                                                      = plt_distb%IYTYP
   FracRootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracRootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)       = plt_allom%FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   FracShootLeafElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracShootLeafElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
@@ -202,7 +203,7 @@ implicit none
     ENGYX_pft(NZ,NY,NX)                 = plt_ew%ENGYX_pft(NZ)
     Transpiration_pft(NZ,NY,NX)         = plt_ew%Transpiration_pft(NZ)
     VapXAir2Canopy_pft(NZ,NY,NX)        = plt_ew%VapXAir2Canopy_pft(NZ)
-    EvapTransHeat_pft(NZ,NY,NX)         = plt_ew%EvapTransHeat_pft(NZ)
+    EvapTransLHeat_pft(NZ,NY,NX)         = plt_ew%EvapTransLHeat_pft(NZ)
     AirConc_pft(NZ,NY,NX)               = plt_photo%AirConc_pft(NZ)
     FracPARads2Canopy_pft(NZ,NY,NX)    = plt_rad%FracPARads2Canopy_pft(NZ)
     FracGroth2Node_pft(NZ,NY,NX)        = plt_allom%FracGroth2Node_pft(NZ)
@@ -269,7 +270,8 @@ implicit none
     NodulInfectElms_pft(1:NumPlantChemElms,NZ,NY,NX) = plt_bgcr%NodulInfectElms_pft(1:NumPlantChemElms,NZ)
     NodulInfectElmsCum_pft(1:NumPlantChemElms,NZ,NY,NX)=plt_bgcr%NodulInfectElmsCum_pft(1:NumPlantChemElms,NZ)
     PlantN2Fix_CumYr_pft(NZ,NY,NX)             = plt_bgcr%PlantN2Fix_CumYr_pft(NZ)
-    TKC(NZ,NY,NX)                              = plt_ew%TKC(NZ)
+    TKC_pft(NZ,NY,NX)                              = plt_ew%TKC_pft(NZ)
+
     TCelciusCanopy_pft(NZ,NY,NX)               = plt_ew%TCelciusCanopy_pft(NZ)
     LWRadCanopy_pft(NZ,NY,NX)                  = plt_rad%LWRadCanopy_pft(NZ)
     TKCanopy_pft(NZ,NY,NX)                     = plt_ew%TKCanopy_pft(NZ)
@@ -281,7 +283,7 @@ implicit none
     RootNO3Uptake_pft(NZ,NY,NX)                = plt_rbgc%RootNO3Uptake_pft(NZ)
     RootH2PO4Uptake_pft(NZ,NY,NX)              = plt_rbgc%RootH2PO4Uptake_pft(NZ)
     RootHPO4Uptake_pft(NZ,NY,NX)               = plt_rbgc%RootHPO4Uptake_pft(NZ)
-    WatByPCanopy_pft(NZ,NY,NX)                 = plt_ew%WatByPCanopy_pft(NZ)
+    WatHeldOnCanopy_pft(NZ,NY,NX)              = plt_ew%WatHeldOnCanopy_pft(NZ)
     CanopyWater_pft(NZ,NY,NX)                  = plt_ew%CanopyWater_pft(NZ)
     CO2ByFire_CumYr_pft(NZ,NY,NX)              = plt_distb%CO2ByFire_CumYr_pft(NZ)
     CH4ByFire_CumYr_pft(NZ,NY,NX)              = plt_distb%CH4ByFire_CumYr_pft(NZ)
@@ -289,7 +291,7 @@ implicit none
     NH3byFire_CumYr_pft(NZ,NY,NX)              = plt_distb%NH3byFire_CumYr_pft(NZ)
     N2ObyFire_CumYr_pft(NZ,NY,NX)              = plt_distb%N2ObyFire_CumYr_pft(NZ)
     PO4byFire_CumYr_pft(NZ,NY,NX)              = plt_distb%PO4byFire_CumYr_pft(NZ)
-    VHeatCapCanP_pft(NZ,NY,NX)                 = plt_ew%VHeatCapCanP_pft(NZ)
+    VHeatCapCanopy_pft(NZ,NY,NX)                 = plt_ew%VHeatCapCanopy_pft(NZ)
     HoursTooLowPsiCan_pft(NZ,NY,NX)            = plt_pheno%HoursTooLowPsiCan_pft(NZ)
     SeedCPlanted_pft(NZ,NY,NX)                 = plt_biom%SeedCPlanted_pft(NZ)
     CanopyStalkC_pft(NZ,NY,NX)                 = plt_biom%CanopyStalkC_pft(NZ)
@@ -576,7 +578,7 @@ implicit none
       DO K=1,jcplx
         DO N=1,MY(NZ,NY,NX)
           DO NE=1,NumPlantChemElms
-            RootMycoExudElm_pvr(NE,N,K,L,NZ,NY,NX)=plt_rbgc%RootMycoExudElm_pvr(NE,N,K,L,NZ)
+            RootMycoExudEUptk_pvr(NE,N,K,L,NZ,NY,NX)=plt_rbgc%RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
           ENDDO
         ENDDO
       ENDDO
@@ -746,8 +748,8 @@ implicit none
 
     plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
     DO K=1,jcplx
-      plt_soilchem%FracBulkSOMC_vr(K,L)=FracBulkSOMC_vr(K,L,NY,NX)
-      plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L)=DOM_vr(idom_doc:idom_dop,K,L,NY,NX)
+      plt_soilchem%FracBulkSOMC_vr(K,L)          = FracBulkSOMC_vr(K,L,NY,NX)
+      plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L) = DOM_vr(idom_doc:idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -904,7 +906,7 @@ implicit none
   plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)     = LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)
   plt_morph%StemArea_col                                 = StemArea_col(NY,NX)
   plt_ew%Eco_Heat_Sens_col                               = Eco_Heat_Sens_col(NY,NX)
-  plt_ew%CanH2OHeldVg                                    = CanH2OHeldVg_col(NY,NX)
+  plt_ew%WatHeldOnCanopy_col                             = WatHeldOnCanopy_col(NY,NX)
   plt_bgcr%Eco_NBP_CumYr_col                             = Eco_NBP_CumYr_col(NY,NX)
   plt_ew%Air_Heat_Latent_store_col                       = Air_Heat_Latent_store_col(NY,NX)
   plt_ew%Air_Heat_Sens_store_col                         = Air_Heat_Sens_store_col(NY,NX)
@@ -919,10 +921,12 @@ implicit none
   plt_ew%QvET_col                                        = QvET_col(NY,NX)
   plt_ew%HeatFlx2Canopy_col                              = HeatFlx2Canopy_col(NY,NX)
   plt_ew%LWRadCanG                                       = LWRadCanG(NY,NX)
-  plt_ew%CanWat_col                                      = CanWat_col(NY,NX)
+  plt_ew%CanopyWat_col                                   = CanopyWat_col(NY,NX)
   plt_ew%CanopyHeatStor_col                              = CanopyHeatStor_col(NY,NX)
   plt_bgcr%Canopy_NEE_col                                = Canopy_NEE_col(NY,NX)
   plt_distb%FERT(1:20)                                   = FERT(1:20,I1,NY,NX)
+  plt_ew%HeatCanopy2Dist_col                             = HeatCanopy2Dist_col(NY,NX)
+  plt_ew%HeatCanopy2Dist_col                             = HeatCanopy2Dist_col(NY,NX)
 
   DO  L=1,NumOfCanopyLayers
     plt_morph%CanopyStemAareZ_col(L) = CanopyStemAareZ_col(L,NY,NX)
@@ -1087,11 +1091,11 @@ implicit none
     plt_morph%MaxSoiL4Root_pft(NZ)                           = MaxSoiL4Root_pft(NZ,NY,NX)
     plt_photo%CanopyBndlResist_pft(NZ)                       = CanopyBndlResist_pft(NZ,NY,NX)
     plt_photo%CanPStomaResistH2O_pft(NZ)                     = CanPStomaResistH2O_pft(NZ,NY,NX)
-    plt_ew%TKC(NZ)                                           = TKC(NZ,NY,NX)
+    plt_ew%TKC_pft(NZ)                                           = TKC_pft(NZ,NY,NX)
     plt_ew%HeatXAir2PCan_pft(NZ)                             = HeatXAir2PCan_pft(NZ,NY,NX)
     plt_rad%RadNet2Canopy_pft(NZ)                            = RadNet2Canopy_pft(NZ,NY,NX)
     plt_rad%LWRadCanopy_pft(NZ)                              = LWRadCanopy_pft(NZ,NY,NX)
-    plt_ew%EvapTransHeat_pft(NZ)                             = EvapTransHeat_pft(NZ,NY,NX)
+    plt_ew%EvapTransLHeat_pft(NZ)                             = EvapTransLHeat_pft(NZ,NY,NX)
     plt_ew%VapXAir2Canopy_pft(NZ)                            = VapXAir2Canopy_pft(NZ,NY,NX)
     plt_photo%MinCanPStomaResistH2O_pft(NZ)                  = MinCanPStomaResistH2O_pft(NZ,NY,NX)
     plt_pheno%TempOffset_pft(NZ)                             = TempOffset_pft(NZ,NY,NX)
@@ -1126,8 +1130,8 @@ implicit none
     plt_rbgc%RootNH4Uptake_pft(NZ)                         = RootNH4Uptake_pft(NZ,NY,NX)
     plt_rbgc%RootHPO4Uptake_pft(NZ)                        = RootHPO4Uptake_pft(NZ,NY,NX)
     plt_rbgc%RootH2PO4Uptake_pft(NZ)                       = RootH2PO4Uptake_pft(NZ,NY,NX)
-    plt_ew%WatByPCanopy_pft(NZ)                            = WatByPCanopy_pft(NZ,NY,NX)
-    plt_ew%VHeatCapCanP_pft(NZ)                            = VHeatCapCanP_pft(NZ,NY,NX)
+    plt_ew%WatHeldOnCanopy_pft(NZ)                         = WatHeldOnCanopy_pft(NZ,NY,NX)
+    plt_ew%VHeatCapCanopy_pft(NZ)                            = VHeatCapCanopy_pft(NZ,NY,NX)
     plt_distb%CH4ByFire_CumYr_pft(NZ)                      = CH4ByFire_CumYr_pft(NZ,NY,NX)
     plt_distb%CO2ByFire_CumYr_pft(NZ)                      = CO2ByFire_CumYr_pft(NZ,NY,NX)
     plt_distb%N2ObyFire_CumYr_pft(NZ)                      = N2ObyFire_CumYr_pft(NZ,NY,NX)
@@ -1148,7 +1152,7 @@ implicit none
       DO K=1,jcplx
         DO N=1,MY(NZ,NY,NX)
           DO NE=1,NumPlantChemElms
-            plt_rbgc%RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ,NY,NX)
+            plt_rbgc%RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ,NY,NX)
           ENDDO
         ENDDO
       ENDDO

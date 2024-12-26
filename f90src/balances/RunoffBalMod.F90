@@ -25,20 +25,20 @@ implicit none
   __FILE__
   public :: RunoffBal
 
-  real(r8) :: SG
-
   contains
 
   subroutine RunoffBal(I,J,NY,NX,NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
-  integer :: N,N1,N2,N3,N4,N5,N6
+  integer :: N
+  integer :: N1,N2     !source grid ()
+  integer :: N4,N5,N6  !dest grid
   integer :: L,NN
   real(r8) :: XN
   real(r8) :: CXR,ZXR,PXR
   real(r8) :: ZGR
 
-  SG=0._r8;CXR=0._r8;ZXR=0._r8;PXR=0._r8;ZGR=0._r8
+  CXR=0._r8;ZXR=0._r8;PXR=0._r8;ZGR=0._r8
 
   D9985: DO L=NU(NY,NX),NL(NY,NX)
 !
@@ -115,7 +115,7 @@ implicit none
 !
         call RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
-        call SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
+        call SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
 
     !     WATER, HEAT, SOLUTES IN SNOW DRIFT
         call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
@@ -196,9 +196,9 @@ implicit none
           OMRof(idom)=OMRof(idom)+XN*dom_2DFloXSurRunoff(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D2575
-      TOMOU_lnds(ielmc)=TOMOU_lnds(ielmc)-CXR-OMRof(ielmc)-OMRof(idom_acetate)
-      TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)-ZXR-OMRof(ielmn)-ZGR
-      TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
+      TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXR-OMRof(ielmc)-OMRof(idom_acetate)
+      TOMOU_lnds(ielmn)               = TOMOU_lnds(ielmn)-ZXR-OMRof(ielmn)-ZGR
+      TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
       HydroSufDOCFlx_col(NY,NX)       = -OMRof(ielmc)-OMRof(idom_acetate)
       HydroSufDICFlx_col(NY,NX)       = -CXR
       HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
@@ -206,9 +206,9 @@ implicit none
       HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
       HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXR                             = XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
-      OXYGOU=OXYGOU-OXR
-      HGR=XN*trcg_FloXSurRunoff_2D(idg_H2,N,NN,N5,N4)
-      H2GOU=H2GOU+HGR
+      OXYGOU                          = OXYGOU-OXR
+      HGR                             = XN*trcg_FloXSurRunoff_2D(idg_H2,N,NN,N5,N4)
+      H2GOU                           = H2GOU+HGR
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
 !
@@ -455,13 +455,13 @@ implicit none
   end subroutine RunoffXBoundaryFluxes
 !------------------------------------------------------------------------------------------
 
-  subroutine SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
+  subroutine SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
   !
   !Description
   !Subsurface across boundary flow
   implicit none
   integer, intent(in) :: I,J,N,NY,NX
-  integer, intent(in) :: N1,N2,N3,N4,N5,N6
+  integer, intent(in) :: N1,N2,N4,N5,N6
   real(r8), intent(in) :: XN
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA
   real(r8) :: ECCO,ECHC,ECSO,ECCL,ECNO
@@ -479,10 +479,10 @@ implicit none
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
 !     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
-  IF(FlowDirIndicator(NY,NX).NE.3 .OR. N.EQ.iVerticalDirection)THEN
+  IF(FlowDirIndicator(NY,NX).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     HO           = XN*HeatFlow2Soil_3D(N,N6,N5,N4)
     HeatOut_lnds = HeatOut_lnds-HO
-    WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4))   !XN<0, going out grid
+    WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowSoiMacP_3D(N,N6,N5,N4))   !XN<0, going out grid
 
     IF(abs(WO)>0._r8)THEN
       QH2OLoss_lnds            = QH2OLoss_lnds-WO
@@ -675,7 +675,7 @@ implicit none
 !     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from TranspSalt.f
 !     ECNDQ=electrical conductivity of water flux
 !
-        WX=WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowMacP_3D(N,N6,N5,N4)
+        WX=WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowSoiMacP_3D(N,N6,N5,N4)
         IF(ABS(WX).GT.ZEROS(N2,N1))THEN
           ECHY  = 0.337*AZMAX1((trcSalt3DFlo2Cell(idsalt_Hp,N,N6,N5,N4)+trcSalt_XFHS(idsalt_Hp,N,N6,N5,N4))/WX)
           ECOH  = 0.192*AZMAX1((trcSalt3DFlo2Cell(idsalt_OH,N,N6,N5,N4)+trcSalt_XFHS(idsalt_OH,N,N6,N5,N4))/WX)
@@ -695,7 +695,7 @@ implicit none
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+trcs_TransptMicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
+!      SG=SG+trcs_TransptMicP_3D(idg_H2,N,N6,N5,N4)+Gas_3DAdvDif_Flx_vr(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfXBoundaryFlow

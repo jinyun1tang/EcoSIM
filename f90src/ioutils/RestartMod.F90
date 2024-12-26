@@ -867,16 +867,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TKC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TKC_pft', dim1name='pft',&
      long_name='canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TKC,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,TKC_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'TKC'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TKC,datrp_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TKC_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TKC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TKC_pft', dim1name='pft',&
      long_name='canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
   endif  
@@ -1342,17 +1342,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WatByPCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='WatHeldOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,WatHeldOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'WatByPCanopy_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WatByPCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'WatHeldOnCanopy_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WatHeldOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='WatByPCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='WatHeldOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
   endif  
@@ -2037,16 +2037,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='VHeatCapCanP_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='VHeatCapCanopy_pft', dim1name='pft',&
      long_name='Volumetric canopy heat capacity', units='MJ d-2 K-1', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanP_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'VHeatCapCanP_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanP_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'VHeatCapCanopy_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,VHeatCapCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='VHeatCapCanP_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='VHeatCapCanopy_pft', dim1name='pft',&
      long_name='Volumetric canopy heat capacity', units='MJ d-2 K-1', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
 
@@ -4216,9 +4216,9 @@ implicit none
   NHW = bounds%NHW;NVN = bounds%NVN
   NHE = bounds%NHE;NVS = bounds%NVS
 
-  call restartvar(ncid, flag, varname='CRAIN', &
+  call restartvar(ncid, flag, varname='CRAIN_lnd', &
        long_name='total precipitation', units='m3 d-2', &
-       interpinic_flag='skip', data=CRAIN, missing_value=spval, &
+       interpinic_flag='skip', data=CRAIN_lnd, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='TSedmErossLoss_lnds', &
@@ -4556,16 +4556,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='CanWat_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='CanopyWat_col', dim1name='column',&
        long_name='total water stored in dry matter', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,CanWat_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyWat_col,datrc_1d)
   else
     !print*,'LWRadCanG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanWat_col,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyWat_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='CanWat_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='CanopyWat_col', dim1name='column',&
        long_name='total water stored in dry matter', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -4641,16 +4641,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='CanH2OHeldVg_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='WatHeldOnCanopy_col', dim1name='column',&
        long_name='canopy surface water content', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,WatHeldOnCanopy_col,datrc_1d) 
   else
-    !print*,'CanH2OHeldVg_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanH2OHeldVg_col,datrc_1d)   
+    !print*,'WatHeldOnCanopy_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,WatHeldOnCanopy_col,datrc_1d)   
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='CanH2OHeldVg_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='WatHeldOnCanopy_col', dim1name='column',&
        long_name='canopy surface water content', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5730,16 +5730,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='DTBLY', dim1name='column',&
+    call restartvar(ncid, flag, varname='TileWaterTable_col', dim1name='column',&
        long_name='artificial water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLY,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,TileWaterTable_col,datrc_1d) 
   else
-    !print*,'DTBLY'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLY,datrc_1d)   
+    !print*,'TileWaterTable_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TileWaterTable_col,datrc_1d)   
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='DTBLY', dim1name='column',&
+    call restartvar(ncid, flag, varname='TileWaterTable_col', dim1name='column',&
        long_name='artificial water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

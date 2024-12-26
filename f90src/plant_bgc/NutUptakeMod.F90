@@ -237,7 +237,7 @@ module NutUptakeMod
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)     = 0.0_r8
   plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
   plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
-  plt_rbgc%RootMycoExudElm_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
+  plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
   plt_rbgc%RAutoRootO2Limter_rpvr(1:NN,L1:L2,NZ)                          = 1.0_r8
   plt_rbgc%RootNH4DmndSoil_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8
   plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)                      = 0.0_r8
@@ -1265,7 +1265,7 @@ module NutUptakeMod
     ZEROS2                 => plt_site%ZEROS2,                 &
     VLWatMicPM_vr          => plt_site%VLWatMicPM_vr,          &
     RootVH2O_pvr           => plt_morph%RootVH2O_pvr,          &
-    RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
+    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
     FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr,    &
     DOM_vr                 => plt_soilchem%DOM_vr              &
   )
@@ -1283,7 +1283,7 @@ module NutUptakeMod
   !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation
   !     Air_Heat_Latent_store_col,Air_Heat_Sens_store_col=total fluxes x blr for calculating canopy air temperature,
   !     vapor pressure in watsub.f
-  !      EvapTransHeat_pft,SFLXC=canopylatent,sensible heat fluxes
+  !      EvapTransLHeat_pft,SFLXC=canopylatent,sensible heat fluxes
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !
@@ -1291,24 +1291,24 @@ module NutUptakeMod
     VLWatMicPK=VLWatMicPM_vr(NPH,L)*FracBulkSOMC_vr(K,L)
     IF(VLWatMicPK.GT.ZEROS2.AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
-      XFRE(ielmc)=(DOM_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
+      CPOOLX      = AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
+      XFRE(ielmc) = (DOM_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       !XFRC, >0 positive into plants, 
-      RootMycoExudElm_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
+      RootMycoExudEUptk_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
       IF(DOM_vr(idom_doc,K,L).GT.ZEROS .AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
-        CPOOLT=DOM_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-        ZPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
-        PPOOLX=0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
-        XFRE(ielmn)=(DOM_vr(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM_vr(idom_doc,K,L))/CPOOLT
-        XFRE(ielmp)=(DOM_vr(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM_vr(idom_doc,K,L))/CPOOLT
-        RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=FEXUDE(ielmn)*XFRE(ielmn)
-        RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=FEXUDE(ielmp)*XFRE(ielmp)
+        CPOOLT                                = DOM_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+        ZPOOLX                                = 0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
+        PPOOLX                                = 0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
+        XFRE(ielmn)                           = (DOM_vr(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM_vr(idom_doc,K,L))/CPOOLT
+        XFRE(ielmp)                           = (DOM_vr(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM_vr(idom_doc,K,L))/CPOOLT
+        RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ) = FEXUDE(ielmn)*XFRE(ielmn)
+        RootMycoExudEUptk_pvr(ielmp,N,K,L,NZ) = FEXUDE(ielmp)*XFRE(ielmp)
       ELSE
-        RootMycoExudElm_pvr(ielmn,N,K,L,NZ)=0.0_r8
-        RootMycoExudElm_pvr(ielmp,N,K,L,NZ)=0.0_r8
+        RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ)=0.0_r8
+        RootMycoExudEUptk_pvr(ielmp,N,K,L,NZ)=0.0_r8
       ENDIF
     ELSE
-      RootMycoExudElm_pvr(1:NumPlantChemElms,N,K,L,NZ)=0.0_r8
+      RootMycoExudEUptk_pvr(1:NumPlantChemElms,N,K,L,NZ)=0.0_r8
     ENDIF
 
   ENDDO D195
@@ -1317,14 +1317,14 @@ module NutUptakeMod
   DO NE=1,NumPlantChemElms
     RootExudE=0._r8
     DO K=1,jcplx
-      RootExudE=RootExudE+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+      RootExudE=RootExudE+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
     ENDDO
 
     if(RootExudE<0._r8)then
       if(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootExudE<0._r8)then
         scal=RootMycoNonstElms_rpvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
         DO K=1,jcplx
-          RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ)*scal
+          RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ)*scal
         ENDDO
       endif
     endif
@@ -1352,7 +1352,7 @@ module NutUptakeMod
     VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr,  &
     REcoDOMProd_vr         => plt_bgcr%REcoDOMProd_vr,         &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    RootMycoExudElm_pvr    => plt_rbgc%RootMycoExudElm_pvr,    &
+    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
     RootMycoExudElms_pft   => plt_rbgc%RootMycoExudElms_pft,   &
     RootHPO4Uptake_pft     => plt_rbgc%RootHPO4Uptake_pft,     &
     RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft,    &
@@ -1379,7 +1379,7 @@ module NutUptakeMod
         DO N=1,MY(NZ)
           !positve means uptake from soil
           DO NE=1,NumPlantChemElms
-            DOM_uptk(NE)=DOM_uptk(NE)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+            DOM_uptk(NE)=DOM_uptk(NE)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
           ENDDO
         ENDDO
         if(any(DOM_uptk/=0._r8))then
@@ -1387,7 +1387,7 @@ module NutUptakeMod
             if(DOM_uptk(NE)>DOM_vr(NE,K,L))then
               scal=DOM_uptk(NE)/DOM_vr(NE,K,L)
               DO N=1,MY(NZ)
-                RootMycoExudElm_pvr(NE,N,K,L,NZ)=RootMycoExudElm_pvr(NE,N,K,L,NZ)*scal
+                RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ)*scal
               ENDDO
               DOM_uptk(NE)=DOM_uptk(NE)*scal
             endif
@@ -1400,8 +1400,8 @@ module NutUptakeMod
 
           DO N=1,MY(NZ)
             DO NE=1,NumPlantChemElms
-              RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)        
-              RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudElm_pvr(NE,N,K,L,NZ)
+              RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)        
+              RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
             ENDDO
           ENDDO
         endif

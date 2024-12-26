@@ -104,8 +104,6 @@ module RedistMod
 !     RUNOFF AND SUBSURFACE BOUNDARY FLUXES
 !
       call RunoffBal(I,J,NY,NX,NHW,NHE,NVN,NVS)
-
-!      write(173,*)I*1000+J,TXGridSurfRunoff_2DH(NY,NX),QRunSurf_col(NY,NX)
 !
 !     CHANGE EXTERNAL WATER TABLE DEPTH THROUGH DISTURBANCE
 !
@@ -122,7 +120,7 @@ module RedistMod
 
       call SoilErosion(NY,NX,DORGE)
 !
-      call DiagSnowChemMass(I,J,NY,NX,HeatStore_col(NY,NX))
+      call DiagSnowChemMass(I,J,NY,NX)
 !
       call LitterLayerSummary(NY,NX)
 
@@ -189,6 +187,9 @@ module RedistMod
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
   !
+!  if(etimer%get_curr_yearAD()<=1981)then
+!  write(117,*)I+J/24.,VLWatMicP_vr(0,NY,NX)
+!  endif
   ThetaH2OZ_vr(0,NY,NX)=AZMAX1((VLWatMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))/AREA(3,0,NY,NX))
   ThetaICEZ_vr(0,NY,NX)=AZMAX1((VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))/AREA(3,0,NY,NX))
   
@@ -217,7 +218,7 @@ module RedistMod
 !     CumDepz2LayerBot_vr(NU=soil surface elevation
 !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table from readi.f
 !     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
-!     DTBLY,DTBLD=current,initial artificial water table depth
+!     TileWaterTable_col,DTBLD=current,initial artificial water table depth
 !     IDWaterTable=water table flag from readi.f
 !        :0=none
 !        :1,2=natural stationary,mobile
@@ -225,40 +226,45 @@ module RedistMod
 !     QDischar_col=hourly water loss through lateral and lower boundaries
 !
   if(lverb)write(*,*)'ModifyExWTBLByDisturbance'
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
     ! drainage is on
-    DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
-    NatWtblDepz_col(NY,NX)=DCORPW
-    ExtWaterTablet0(NY,NX)=NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    DCORPW                   = DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    NatWtblDepz_col(NY,NX)   = DCORPW
+    ExtWaterTablet0(NY,NX)   = NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+    ExtWaterTable_col(NY,NX) = ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)).AND.iSoilDisturbType_col(I,NY,NX).EQ.24)THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.24)THEN
     ! drainage in on
     DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
-    IF(IDWaterTable(NY,NX).EQ.1)THEN
+
+    IF(IDWaterTable(NY,NX).EQ.1)THEN  !stationary
       IDWaterTable(NY,NX)=3
-    ELSEIF(IDWaterTable(NY,NX).EQ.2)THEN
+    ELSEIF(IDWaterTable(NY,NX).EQ.2)THEN  !mobile
       IDWaterTable(NY,NX)=4
     ENDIF
-    WtblDepzTile_col(NY,NX)=DCORPW
-    DTBLD(NY,NX)=AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
-    DTBLY(NY,NX)=DTBLD(NY,NX)
+    WtblDepzTile_col(NY,NX)   = DCORPW
+    DTBLD(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+    TileWaterTable_col(NY,NX) = DTBLD(NY,NX)
   ENDIF
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE
+! QDischar_col: < 0 out of soil column/grid, 
 ! switched on for change of water table due to discharge/drainage
 ! why 0.00167, time relaxization constant, ?
 ! 4 is mobile tile drainge.
+!
   IF(IDWaterTable(NY,NX).EQ.2 .OR. IDWaterTable(NY,NX).EQ.4)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+
+    ExtWaterTable_col(NY,NX) = ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX) = ExtWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
       -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTablet0(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+
   ENDIF
-  
+  !update mobile tile water table depth due to drainage
   IF(IDWaterTable(NY,NX).EQ.4)THEN
-    DTBLY(NY,NX)=DTBLY(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(DTBLY(NY,NX)-DTBLD(NY,NX))
+    TileWaterTable_col(NY,NX)=TileWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+      -0.00167_r8*(TileWaterTable_col(NY,NX)-DTBLD(NY,NX))
   ENDIF
   end subroutine ModifyExWTBLByDisturbance
 !------------------------------------------------------------------------------------------
@@ -285,8 +291,7 @@ module RedistMod
 
   if(lverb)write(*,*)'HandleSurfaceBoundary'
 
-  call UpdateLitRPhys(I,J,NY,NX,TXGridSurfRunoff_2DH(NY,NX),THeatXGridBySurfRunoff_2DH(NY,NX),&
-    HeatStore_lnd,HEATIN_lnd)
+  call UpdateLitRPhys(I,J,NY,NX,TXGridSurfRunoff_2DH(NY,NX),THeatXGridBySurfRunoff_2DH(NY,NX),HEATIN_lnd)
 
  trcO2S=trc_solml_vr(idg_O2,0,NY,NX)
   do idg=idg_beg,idg_NH3-1
@@ -311,12 +316,12 @@ module RedistMod
   !negative value correction  
   
   if(trc_solml_vr(idg_NH3,0,NY,NX)<-1.e-7)then
-    pval                                   = abs(rval/dflx)
-    trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)   = trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)*pval
-    trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX) = trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)*pval
-    Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)      = Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)*pval
-    TR_NH3_soil_vr(0,NY,NX)                = TR_NH3_soil_vr(0,NY,NX)*pval
-    trc_solml_vr(idg_NH3,0,NY,NX)          = 0._r8
+    pval                                       = abs(rval/dflx)
+    trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX) = trcg_SurfLitr_DisolEvap_flx(idg_NH3,NY,NX)*pval
+    trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)     = trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)*pval
+    Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)          = Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)*pval
+    TR_NH3_soil_vr(0,NY,NX)                    = TR_NH3_soil_vr(0,NY,NX)*pval
+    trc_solml_vr(idg_NH3,0,NY,NX)              = 0._r8
   endif
   trc_solml_vr(idg_NH3,0,NY,NX)=fixnegmass(trc_solml_vr(idg_NH3,0,NY,NX))
 
@@ -348,21 +353,19 @@ module RedistMod
   !     SURFACE BOUNDARY WATER FLUXES
   !
   WI                       = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux    = rain/snowfall + irrigation
-  CRAIN                    = CRAIN+WI
+  CRAIN_lnd                = CRAIN_lnd+WI
   QRain_CumYr_col(NY,NX)   = WI
   WO                       = VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
   CEVAP                    = CEVAP-WO
   QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)   = -WO
   QDischar_col(NY,NX)      = QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  QDrain_col(NY,NX)        = WaterFlowSoiMicP_3D(3,NK(NY,NX),NY,NX)
-  HeatDrain_col(NY,NX)     = HeatFlow2Soil_3D(3,NK(NY,NX),NY,NX)
+  H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)    
   QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PrecRainAndIrrig_col(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec_col(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PreCRAIN_lndAndIrrig_col(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec_col(NY,NX)
   HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+HeatFlx2Canopy_col(NY,NX)
 
   D5150: DO L=1,JS
@@ -728,12 +731,8 @@ module RedistMod
     LitRMStoreLndscap(NE)=LitRMStoreLndscap(NE)+litrOM_vr(NE,0,NY,NX)
     tLitrOM_col(NE,NY,NX)=tLitrOM_col(NE,NY,NX)+litrOM_vr(NE,0,NY,NX)
   ENDDO
-  !water mass 
-  WS                   = CanH2OHeldVg_col(NY,NX)+CanWat_col(NY,NX)+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
-  WatMassStore_lnd     = WatMassStore_lnd+WS
-  WatMass_col(NY,NX)   = WatMass_col(NY,NX)+WS
-  HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+CanopyHeatStor_col(NY,NX)
-  HeatStore_lnd        = HeatStore_lnd+CanopyHeatStor_col(NY,NX)
+  !water mass/heat stored in canopy + litter layer
+
   CS                   = trc_solml_vr(idg_CO2,0,NY,NX)+trc_solml_vr(idg_CH4,0,NY,NX)
   TGasC_lnd           = TGasC_lnd+CS
   DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+CS
@@ -824,7 +823,7 @@ module RedistMod
   TVOLIH              = 0.0_r8
   TENGY               = 0.0_r8
   DVLiceMicP_vr       = 0._r8
-  THeatFlow2Soil_col   = 0._r8
+  THeatFlow2Soil_col  = 0._r8
   DO L=NU(NY,NX),NL(NY,NX)
     VOLWXX         = VLWatMicP_vr(L,NY,NX)
     VOLIXX         = VLiceMicP_vr(L,NY,NX)
@@ -874,15 +873,13 @@ module RedistMod
     IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_vr(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
 
       !     ARTIFICIAL SOIL WARMING
-!      if(do_warming .and. is_warming_layerL(L,NY,NX))then     
-!        THeatFlowCellSoil_vr(L,NY,NX) = THeatFlowCellSoil_vr(L,NY,NX) + (TKS_ref_vr(it,L,NY,NX)-TKSX)*VHeatCapacity_vr(L,NY,NX)
-!      endif   
+
       !     END ARTIFICIAL SOIL WARMING
-      tHeatUptk_col(NY,NX)      = tHeatUptk_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)
+      THeatSoiThaw_col(NY,NX)   = THeatSoiThaw_col(NY,NX) + THeatSoiThaw_vr(L,NY,NX)
+      HeatSource_col(NY,NX)     = HeatSource_col(NY,NX)+HeatSource_vr(L,NY,NX)
       THeatFlow2Soil_col(NY,NX) = THeatFlow2Soil_col(NY,NX) + THeatFlowCellSoil_vr(L,NY,NX)
       TKS_vr(L,NY,NX)           = (ENGY+THeatFlowCellSoil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) +HeatSource_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
-
       if(TKS_vr(L,NY,NX)> 400._r8 .and. isclose(ENGY,0._r8))TKS_vr(L,NY,NX)=TKSX
 
       if(TKS_vr(L,NY,NX)>4.e2 .or. TKS_vr(L,NY,NX)<100._r8)then
@@ -906,12 +903,9 @@ module RedistMod
       TKS_vr(L,NY,NX)=TKS_vr(NUM(NY,NX),NY,NX)
     ENDIF
     TCS(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
-    WS                   = VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
-    HS                   = VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
-    WatMassStore_lnd     = WatMassStore_lnd+WS
+    
     VOLISO               = VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
-    WatMass_col(NY,NX)   = WatMass_col(NY,NX)+WS
-    HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+HS
+    
 !    2-WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     HeatStore_lnd=HeatStore_lnd+HS
   ENDDO
@@ -942,8 +936,8 @@ module RedistMod
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
 
   if(lverb)write(*,*)'UpdateChemInSoilLays'
-  DORGC=0._r8
-  THeatRootUptake_col(NY,NX)=0._r8
+  DORGC                      = 0._r8
+  THeatRootRelease_col(NY,NX) = 0._r8
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !
     SurfGasFlx_col(idg_H2,NY,NX)=SurfGasFlx_col(idg_H2,NY,NX)+Micb_N2Fixation_vr(L,NY,NX)
@@ -977,14 +971,6 @@ module RedistMod
       enddo
     ENDDO D8560
     !
-    !     DOC, DON, DOP FROM PLANT EXUDATION
-    !
-    D195: DO K=1,jcplx
-      DO NE=1,NumPlantChemElms
-        DOM_vr(NE,K,L,NY,NX)=DOM_vr(NE,K,L,NY,NX)+tRootMycoExud2Soil_vr(NE,K,L,NY,NX)
-        if(DOM_vr(NE,K,L,NY,NX)<0._r8)print*,'933rootx',L,tRootMycoExud2Soil_vr(NE,K,L,NY,NX)
-      ENDDO
-    ENDDO D195
 
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
@@ -1156,7 +1142,7 @@ module RedistMod
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
     !  watch out the following code for changes
     HEATIN_lnd                 = HEATIN_lnd+THeatSoiThaw_vr(L,NY,NX)+THeatRootUptake_vr(L,NY,NX)
-    THeatRootUptake_col(NY,NX) = THeatRootUptake_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)
+    THeatRootRelease_col(NY,NX) = THeatRootRelease_col(NY,NX)+THeatRootUptake_vr(L,NY,NX)
     CIB                        = trcg_air2root_flx_vr(idg_CO2,L,NY,NX)
     CHB                        = trcg_air2root_flx_vr(idg_CH4,L,NY,NX)
     OIB                        = trcg_air2root_flx_vr(idg_O2,L,NY,NX)   !>0., into roots
@@ -1554,8 +1540,10 @@ module RedistMod
       HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
       HeatFLo2LitrByWat_col(NY,NX) = HeatFLo2LitrByWat_col(NY,NX)+HRAINR
-      CRAIN                        = CRAIN+RAINR
+      CRAIN_lnd                    = CRAIN_lnd+RAINR
       HEATIN_lnd                   = HEATIN_lnd+HRAINR
+      HeatPrec_col(NY,NX)          = HeatPrec_col(NY,NX) + HRAINR
+      RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
 !    write(113,*)I+J/24.,K,OSCMK,SolidOM_vr(ielmc,1:jsken,K,0,NY,NX)
     call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)

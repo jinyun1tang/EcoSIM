@@ -66,7 +66,7 @@ module RootDataType
   real(r8),target,allocatable ::  Root2ndRadius_pvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
-  real(r8),target,allocatable ::  AllPlantRootH2OUptake_vr(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  AllPlantRootH2OUptake_vr(:,:,:,:,:)      !root water uptake, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                   !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                   !root turgor water potential , [Mpa]
