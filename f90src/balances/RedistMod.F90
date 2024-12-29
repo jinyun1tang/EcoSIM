@@ -290,7 +290,8 @@ module RedistMod
   ! begin_execution
 
   if(lverb)write(*,*)'HandleSurfaceBoundary'
-
+  QRunSurf_col(NY,NX)    = TXGridSurfRunoff_2DH(NY,NX)
+  HeatRunSurf_col(NY,NX) = THeatXGridBySurfRunoff_2DH(NY,NX)
   call UpdateLitRPhys(I,J,NY,NX,TXGridSurfRunoff_2DH(NY,NX),THeatXGridBySurfRunoff_2DH(NY,NX),HEATIN_lnd)
 
  trcO2S=trc_solml_vr(idg_O2,0,NY,NX)
@@ -365,7 +366,7 @@ module RedistMod
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PreCRAIN_lndAndIrrig_col(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec_col(NY,NX)
+  HEATIN_lnd=HEATIN_lnd+cpw*TairK_col(NY,NX)*PrecRainAndIrrig_col(NY,NX)+cps*TairK_col(NY,NX)*SnoFalPrec_col(NY,NX)
   HEATIN_lnd=HEATIN_lnd+HeatNet2Surf_col(NY,NX)+HeatFlx2Canopy_col(NY,NX)
 
   D5150: DO L=1,JS
@@ -1529,16 +1530,18 @@ module RedistMod
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     OSCMK=0._r8
     DO  M=1,jsken
-      OSCMK=OSCMK+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
-      SolidOMAct_vr(M,K,0,NY,NX)=SolidOMAct_vr(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
+      OSCMK                      = OSCMK+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
+      SolidOMAct_vr(M,K,0,NY,NX) = SolidOMAct_vr(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
       DO NE=1,NumPlantChemElms
         SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
-
+      
       SoilOrgM_vr(ielmc,0,NY,NX)   = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
       HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
+      QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
+      CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
       HeatFLo2LitrByWat_col(NY,NX) = HeatFLo2LitrByWat_col(NY,NX)+HRAINR
       CRAIN_lnd                    = CRAIN_lnd+RAINR
       HEATIN_lnd                   = HEATIN_lnd+HRAINR

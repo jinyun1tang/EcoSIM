@@ -242,11 +242,11 @@ module WthrMod
       PBOT_col(NY,NX)         = PBOT_hrly(J,I)
       !snowfall is determined by air tempeature
       IF(TCA_col(NY,NX).GT.TSNOW)THEN
-        PrecAsRain_col(NY,NX)=RAINH(J,I)
-        PrecAsSnow_col(NY,NX)=0.0_r8
+        PrecAsRain_col(NY,NX) = RAINH(J,I)
+        PrecAsSnow_col(NY,NX) = 0.0_r8
       ELSE
-        PrecAsRain_col(NY,NX)=0.0_r8
-        PrecAsSnow_col(NY,NX)=RAINH(J,I)
+        PrecAsRain_col(NY,NX) = 0.0_r8
+        PrecAsSnow_col(NY,NX) = RAINH(J,I)
       ENDIF
     enddo
   enddo
@@ -376,8 +376,8 @@ module WthrMod
       !
 !      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
 !      IF(WDPTHD.LE.CumDepz2LayerBot_vr(NU(NY,NX),NY,NX))THEN
-        PRECII_col(NY,NX)=RRIG(J,I,NY,NX)   !surface irrigation
-        PRECUI_col(NY,NX)=0.0_r8
+        PRECII_col(NY,NX) = RRIG(J,I,NY,NX)   !surface irrigation
+        PRECUI_col(NY,NX) = 0.0_r8
 !      ELSE
 !        PRECII_col(NY,NX)=0.0_r8
 !        PRECUI_col(NY,NX)=RRIG(J,I,NY,NX)   !subsurface irrigation
@@ -516,8 +516,8 @@ module WthrMod
       RadPARDiffus_col(NY,NX) = RadPARDiffus_col(NY,NX)*TDRAD(N,NY,NX)
       WindSpeedAtm_col(NY,NX) = WindSpeedAtm_col(NY,NX)*TDWND(N,NY,NX)
       VPK_col(NY,NX)          = AMIN1(VPS(NY,NX),VPK_col(NY,NX)*TDHUM(N,NY,NX))
-      PrecAsRain_col(NY,NX)       = PrecAsRain_col(NY,NX)*TDPRC(N,NY,NX)
-      PrecAsSnow_col(NY,NX)       = PrecAsSnow_col(NY,NX)*TDPRC(N,NY,NX)
+      PrecAsRain_col(NY,NX)   = PrecAsRain_col(NY,NX)*TDPRC(N,NY,NX)
+      PrecAsSnow_col(NY,NX)   = PrecAsSnow_col(NY,NX)*TDPRC(N,NY,NX)
       PRECII_col(NY,NX)       = PRECII_col(NY,NX)*TDIRI(N,NY,NX)
       PRECUI_col(NY,NX)       = PRECUI_col(NY,NX)*TDIRI(N,NY,NX)
       NH4_rain_conc(NY,NX)    = CN4RI(NY,NX)*TDCN4(N,NY,NX)
@@ -566,7 +566,7 @@ module WthrMod
       IrrigSurface_col(NY,NX)     = PRECII_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       IrrigSubsurf_col(NY,NX)     = PRECUI_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       Irrigation_col(NY,NX)       = IrrigSurface_col(NY,NX)+IrrigSubsurf_col(NY,NX)
-      PreCRAIN_lndAndIrrig_col(NY,NX) = RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)
+      PrecRainAndIrrig_col(NY,NX) = RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)
       PrecAtm_col(NY,NX)          = RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)
       LWRadSky_col(NY,NX)         = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 

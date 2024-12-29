@@ -90,6 +90,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  Transpiration_pft(:,:,:)                 !canopy transpiration, [m3 d-2 h-1]
   real(r8),target,allocatable ::  VapXAir2Canopy_pft(:,:,:)                !negative of canopy evaporation, [m2 d-2 h-1]
   real(r8),target,allocatable ::  CanopyWater_pft(:,:,:)                   !canopy water content associated with dry matter, [m3 d-2]
+  real(r8),target,allocatable ::  CanopyWaterMassBeg_col(:,:)
+  real(r8),target,allocatable ::  CanopyWaterMassEnd_col(:,:)
   real(r8),target,allocatable ::  HeatCanopy2Dist_col(:,:)                 !Canopy heat content loss to disturbance, [MJ d-2]
   real(r8),target,allocatable ::  QCanopyWat2Dist_col(:,:)                    !canopy water loss to disturbance
   real(r8),target,allocatable ::  QvET_col(:,:)                              !total canopy evaporation + transpiration, [m3 d-2 h-1]
@@ -169,6 +171,9 @@ module CanopyDataType
   subroutine InitCanopyData
 
   implicit none
+
+  allocate(CanopyWaterMassBeg_col(JY,JX)); CanopyWaterMassBeg_col=0._r8
+  allocate(CanopyWaterMassEnd_col(JY,JX)); CanopyWaterMassEnd_col=0._r8
   allocate(HeatCanopy2Dist_col(JY,JX)); HeatCanopy2Dist_col=0._r8
   allocate(QCanopyWat2Dist_col(JY,JX)); QCanopyWat2Dist_col=0._r8
   allocate(CO2FixCL_pft(JP,JY,JX)); CO2FixCL_pft=spval
@@ -329,6 +334,8 @@ module CanopyDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(CanopyWaterMassBeg_col)
+  call destroy(CanopyWaterMassEnd_col)
   call destroy(HeatCanopy2Dist_col)
   call destroy(QCanopyWat2Dist_col)
   call destroy(canopy_growth_pft)

@@ -653,10 +653,10 @@ implicit none
 !     RESET POND SURFACE LAYER NUMBER IF GAIN FROM PRECIPITATION
 !
   ELSEIF(NN.EQ.3)THEN
-    !CumSoilDeptht0 is the initial litter layer bottom
+    !CumLitRDepz_col is the initial litter layer bottom
     !obtain the water exceeds litter layer water holding capacity
     XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-VLWatheldCapSurf_col(NY,NX))
-    IF(L.EQ.NU(NY,NX).AND.CumDepz2LayerBot_vr(0,NY,NX).GT.CumSoilDeptht0(NY,NX) &
+    IF(L.EQ.NU(NY,NX).AND.CumDepz2LayerBot_vr(0,NY,NX).GT.CumLitRDepz_col(NY,NX) &
       .AND.XVOLWP.GT.VLWatheldCapSurf_col(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((SoiBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoiBulkDensity_vr(L,NY,NX).LE.ZERO))THEN

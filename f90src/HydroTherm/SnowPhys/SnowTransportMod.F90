@@ -239,8 +239,8 @@ implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
   integer :: NN,NTG,NTN,NTSA,idg
 
-  TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistrib(N,N2,N1)&
-    -DrysnoBySnowRedistrib(N,N5,N4)
+  TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrySnoBySnoRedistrib_2DH(N,N2,N1)&
+    -DrySnoBySnoRedistrib_2DH(N,N5,N4)
   TWatBySnowRedist(N2,N1)      = TWatBySnowRedist(N2,N1)+WatBySnowRedistrib_2DH(N,N2,N1) &
     -WatBySnowRedistrib_2DH(N,N5,N4)
   TIceBySnowRedist(N2,N1)      = TIceBySnowRedist(N2,N1)+IceBySnowRedistrib_2DH(N,N2,N1) &

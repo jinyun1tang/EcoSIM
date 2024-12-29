@@ -336,9 +336,8 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTS' IF NEEDED
-
-  ENDIF
-  
+    call SumUpStorage(0,0,NHW,NHE,NVN,NVS)  
+  ENDIF  
 !
   if(plant_model)then
     !plant information is read in every year, but the active flags
@@ -373,6 +372,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
     call set_soil_warming(iYearCurrent,NHW,NHE,NVN,NVS)
   endif
+
   DazCurrYear=etimer%get_days_cur_year()
   DO I=1,DazCurrYear    
     IF(do_rgres .and. I.eq.LYRG)RETURN

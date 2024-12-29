@@ -32,7 +32,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                       !depth of artificial water table
   real(r8),target,allocatable ::  TileWaterTable_col(:,:)                        !artificial water table depth, [m]
   real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
-  real(r8),target,allocatable ::  DepthInternalWTBL(:,:)            !internal water table depth, [m]
+  real(r8),target,allocatable ::  DepzIntWTBL_col(:,:)            !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                !current external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                        !external water table depth, [m]
@@ -65,8 +65,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WaterFlow2MacPM_3D(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  ReductVLsoiAirPM(:,:,:,:)                     !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
   real(r8),target,allocatable ::  FWatExMacP2MicPM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
-  real(r8),target,allocatable ::  WatFlowSno2MicPM(:,:,:)                      !meltwater flux into soil micropores
-  real(r8),target,allocatable ::  WatFlowSno2MacPM(:,:,:)                      !meltwater flux into soil macropores
+  real(r8),target,allocatable ::  WatFlowSno2MicPM_col(:,:,:)                      !meltwater flux into soil micropores
+  real(r8),target,allocatable ::  WatFlowSno2MacPM_col(:,:,:)                      !meltwater flux into soil macropores
   real(r8),target,allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
   real(r8),target,allocatable ::  TortMicPM_vr(:,:,:,:)                     !soil tortuosity, []
   real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
@@ -132,7 +132,7 @@ module SoilWaterDataType
   allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
   allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
   allocate(DTBLD(JY,JX));       DTBLD=0._r8
-  allocate(DepthInternalWTBL(JY,JX));       DepthInternalWTBL=0._r8
+  allocate(DepzIntWTBL_col(JY,JX));       DepzIntWTBL_col=0._r8
   allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
   allocate(ExtWaterTable_col(JY,JX));       ExtWaterTable_col=0._r8
   allocate(NatWtblDepz_col(JY,JX));       NatWtblDepz_col=0._r8
@@ -165,8 +165,8 @@ module SoilWaterDataType
   allocate(WaterFlow2MacPM_3D(60,3,JD,JV,JH));WaterFlow2MacPM_3D=0._r8
   allocate(ReductVLsoiAirPM(60,JZ,JY,JX));  ReductVLsoiAirPM=0._r8
   allocate(FWatExMacP2MicPM(60,JZ,JY,JX)); FWatExMacP2MicPM=0._r8
-  allocate(WatFlowSno2MicPM(60,JY,JX));    WatFlowSno2MicPM=0._r8
-  allocate(WatFlowSno2MacPM(60,JY,JX));    WatFlowSno2MacPM=0._r8
+  allocate(WatFlowSno2MicPM_col(60,JY,JX));    WatFlowSno2MicPM_col=0._r8
+  allocate(WatFlowSno2MacPM_col(60,JY,JX));    WatFlowSno2MacPM_col=0._r8
   allocate(THETPM(60,0:JZ,JY,JX));THETPM=0._r8
   allocate(TortMicPM_vr(60,0:JZ,JY,JX));TortMicPM_vr=0._r8
   allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
@@ -222,7 +222,7 @@ module SoilWaterDataType
   call destroy(WtblDepzTile_col)
   call destroy(TileWaterTable_col)
   call destroy(DTBLD)
-  call destroy(DepthInternalWTBL)
+  call destroy(DepzIntWTBL_col)
   call destroy(ExtWaterTablet0)
   call destroy(ExtWaterTable_col)
   call destroy(NatWtblDepz_col)
@@ -255,8 +255,8 @@ module SoilWaterDataType
   call destroy(WaterFlow2MacPM_3D)
   call destroy(ReductVLsoiAirPM)
   call destroy(FWatExMacP2MicPM)
-  call destroy(WatFlowSno2MicPM)
-  call destroy(WatFlowSno2MacPM)
+  call destroy(WatFlowSno2MicPM_col)
+  call destroy(WatFlowSno2MacPM_col)
   call destroy(THETPM)
   call destroy(TortMicPM_vr)
   call destroy(TortMacPM)

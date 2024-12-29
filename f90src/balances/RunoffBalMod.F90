@@ -164,14 +164,14 @@ implicit none
   IF(N.NE.iVerticalDirection .AND. L.EQ.NU(NY,NX))THEN
     !horizontal direction and surface layer
     WQRN                = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)    
-    QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
+!    QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
     
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
       CRUN                     = CRUN-WQRN
       Qrunoff_CumYr_col(NY,NX) = Qrunoff_CumYr_col(NY,NX)-WQRN
       HQRN                     = XN*HeatXGridBySurfRunoff_2DH(N,NN,N5,N4)
       HeatOut_lnds             = HeatOut_lnds-HQRN
-      HeatRunSurf_col(N2,N1)   = HeatRunSurf_col(N2,N1)+HQRN
+!      HeatRunSurf_col(N2,N1)   = HeatRunSurf_col(N2,N1)+HQRN
 !
 !     RUNOFF BOUNDARY FLUXES OF C, N AND P
 !
@@ -486,9 +486,7 @@ implicit none
 
     IF(abs(WO)>0._r8)THEN
       QH2OLoss_lnds            = QH2OLoss_lnds-WO
-      QDischar_col(N2,N1)      = QDischar_col(N2,N1)-WO  !>0 going out of grid
       H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
-      HeatDischar_col(N2,N1)   = HeatDischar_col(N2,N1)-HO
 !
 !     SUBSURFACE BOUNDARY FLUXES OF CO2 AND DOC
 !
@@ -715,7 +713,7 @@ implicit none
 
   !check for it is at surface for lateral flow
   IF(N.NE.3 .AND. L.EQ.NU(NY,NX))THEN
-    WQRS=XN*(DrysnoBySnowRedistrib(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
+    WQRS=XN*(DrySnoBySnoRedistrib_2DH(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
     IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
       CRUN                            = CRUN-WQRS
       Qrunoff_CumYr_col(NY,NX)        = Qrunoff_CumYr_col(NY,NX)-WQRS

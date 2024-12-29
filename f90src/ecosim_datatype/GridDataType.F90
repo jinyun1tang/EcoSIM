@@ -24,10 +24,10 @@ implicit none
   integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
   integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number
   integer,target,allocatable ::  NUM(:,:)                            !new surface layer number
-  real(r8),target,allocatable ::  CumSoilDeptht0(:,:)                !initial depth from surface to bottom of soil layer [m]
+  real(r8),target,allocatable ::  CumLitRDepz_col(:,:)               !initial position of the bottom of liter layer [m]
   REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
-  real(r8),target,allocatable ::  DH(:,:)                            !number of EW grid cells, [-]
-  real(r8),target,allocatable ::  DV(:,:)                            !number of EW grid cells, [-]
+  real(r8),target,allocatable ::  DH(:,:)                            !EW width of the grid cells, [m]
+  real(r8),target,allocatable ::  DV(:,:)                            !NS width of the grid cells, [m]
   integer,target,allocatable ::  FlowDirIndicator(:,:)               !dimension of low
   integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
 !----------------------------------------------------------------------
@@ -53,7 +53,7 @@ contains
   allocate(NLI(JV,JH));         NLI=0
   allocate(NL(JV,JH));          NL=0
   allocate(NUM(JY,JX));         NUM=0
-  allocate(CumSoilDeptht0(JY,JX));      CumSoilDeptht0=0._r8
+  allocate(CumLitRDepz_col(JY,JX));      CumLitRDepz_col=0._r8
   allocate(ALAT(JY,JX));        ALAT=0._r8
   allocate(DH(JY,JX));          DH=0._r8
   allocate(DV(JY,JX));          DV=0._r8
@@ -83,7 +83,7 @@ contains
   call destroy(NLI)
   call destroy(NL)
   call destroy(NUM)
-  call destroy(CumSoilDeptht0)
+  call destroy(CumLitRDepz_col)
   call destroy(ALAT)
   call destroy(DH)
   call destroy(DV)

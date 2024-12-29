@@ -83,7 +83,7 @@ implicit none
   CanopyHeatStor_col(NY,NX)                        = plt_ew%CanopyHeatStor_col
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) = plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)
   Canopy_NEE_col(NY,NX)                            = plt_bgcr%Canopy_NEE_col
-
+  TPlantRootH2OUptake_col(NY,NX)                   = plt_ew%TPlantRootH2OUptake_col
   FERT(17:19,I1,NY,NX) = plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX)                                                       = plt_distb%FERT(3)
   IYTYP(2,I1,NY,NX)                                                      = plt_distb%IYTYP
@@ -927,7 +927,7 @@ implicit none
   plt_distb%FERT(1:20)                                   = FERT(1:20,I1,NY,NX)
   plt_ew%HeatCanopy2Dist_col                             = HeatCanopy2Dist_col(NY,NX)
   plt_ew%HeatCanopy2Dist_col                             = HeatCanopy2Dist_col(NY,NX)
-
+  plt_ew%TPlantRootH2OUptake_col                         = TPlantRootH2OUptake_col(NY,NX)
   DO  L=1,NumOfCanopyLayers
     plt_morph%CanopyStemAareZ_col(L) = CanopyStemAareZ_col(L,NY,NX)
     plt_biom%tCanLeafC_cl(L)         = tCanLeafC_cl(L,NY,NX)
@@ -1442,6 +1442,7 @@ implicit none
     plt_rad%CanopyPARalbedo_pft(NZ)    = CanopyPARalbedo_pft(NZ,NY,NX)
     plt_morph%NumOfBranches_pft(NZ)    = NumOfBranches_pft(NZ,NY,NX)
     plt_morph%ClumpFactor_pft(NZ)      = ClumpFactor_pft(NZ,NY,NX)
+
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers
@@ -1507,6 +1508,7 @@ implicit none
   FracSWRad2Grnd_col(NY,NX)  = plt_rad%FracSWRad2Grnd_col
   RadSWSolarBeam_col(NY,NX)  = plt_rad%RadSWSolarBeam_col
   RadPARSolarBeam_col(NY,NX) = plt_rad%RadPARSolarBeam_col
+  
   DO L=0,NumOfCanopyLayers
     CanopyHeightZ_col(L,NY,NX)=plt_morph%CanopyHeightZ_col(L)
   ENDDO

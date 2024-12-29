@@ -165,7 +165,7 @@ implicit none
   real(r8),pointer   :: h1D_SURF_WTR_col(:)       !ThetaH2OZ_vr(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ICE_col(:)       !ThetaICEZ_vr(0,NY,NX)
   real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepth(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepthInternalWTBL(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_sN2O_FLX_col(:)        !SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sN2G_FLX_col(:)        !SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_sNH3_FLX_col(:)        !SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1331,7 +1331,7 @@ implicit none
 
   data1d_ptr => this%h1D_EVAPN_col(beg_col:end_col)      
   call hist_addfld1d(fname='EVAPN',units='mm H2O/m2/hr',avgflag='A',&
-    long_name='total ground surface evaporation(<0 int atmosphere)',ptr_col=data1d_ptr)      
+    long_name='total ground surface evaporation(<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CANET_col(beg_col:end_col)
   call hist_addfld1d(fname='CANET',units='mm H2O/m2/hr',avgflag='A',&
@@ -2616,7 +2616,7 @@ implicit none
       this%h1D_SURF_WTR_col(ncol)         = ThetaH2OZ_vr(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)         = ThetaICEZ_vr(0,NY,NX)
       this%h1D_ACTV_LYR_col(ncol)         = -(ActiveLayDepth(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-      this%h1D_WTR_TBL_col(ncol)          = -(DepthInternalWTBL(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+      this%h1D_WTR_TBL_col(ncol)          = -(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
       this%h1D_sN2O_FLX_col(ncol)         = SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sN2G_FLX_col(ncol)         = SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_sNH3_FLX_col(ncol)         = SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

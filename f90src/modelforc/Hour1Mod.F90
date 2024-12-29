@@ -91,8 +91,8 @@ module Hour1Mod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: L,NX,NY
-  real(r8) :: THETPZ_vr(JZ,JY,JX)
-  real(r8) :: DPTH0(JY,JX)
+  real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
+  real(r8) :: DPTH0           !water+ice thickness in litter
 
   real(r8) :: tPBOT,tmp
   integer :: NZ,NR,K
@@ -195,7 +195,7 @@ module Hour1Mod
       call DiagActiveLayerDepth(NY,NX)
 
 !     OUTPUT FOR WATER TABLE DEPTH
-      call GetOutput4WaterTableDepth(NY,NX,THETPZ_vr)
+      call DiagWaterTBLDepz(NY,NX,THETPZ_vr)
 
       call GetSurfResidualProperties(I,J,NY,NX,DPTH0)
 
@@ -203,7 +203,7 @@ module Hour1Mod
 
       if(do_instequil)call ForceGasAquaEquil(NY,NX)
 !
-      call PlantCanopyRadsModel(I,J,NY,NX,DPTH0(NY,NX))
+      call PlantCanopyRadsModel(I,J,NY,NX,DPTH0)
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
@@ -214,7 +214,7 @@ module Hour1Mod
       LWRadBySurf_col(NY,NX)           = 0._r8
       TLEX_col(NY,NX)                  = Air_Heat_Latent_store_col(NY,NX)
       TSHX_col(NY,NX)                  = Air_Heat_Sens_store_col(NY,NX)
-      
+
       Air_Heat_Latent_store_col(NY,NX) = 0._r8
       Air_Heat_Sens_store_col(NY,NX)   = 0._r8
       Eco_NetRad_col(NY,NX)            = 0._r8
@@ -279,7 +279,7 @@ module Hour1Mod
   DO  NZ=1,NP(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
       *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-    prec2canopy_pft                  = PreCRAIN_lndAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
+    prec2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
     PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(prec2canopy_pft,CanopyWatHeldCap-WatHeldOnCanopy_pft(NZ,NY,NX)))
     Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+prec2canopy_pft
     PrecIntceptByCanopy_col(NY,NX)   = PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
@@ -401,7 +401,7 @@ module Hour1Mod
       trcg_FloXSurRunoff_2D(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0._r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0._r8
 
-      DrysnoBySnowRedistrib(1:2,NY,NX)             = 0._r8
+      DrySnoBySnoRedistrib_2DH(1:2,NY,NX)             = 0._r8
       WatBySnowRedistrib_2DH(1:2,NY,NX)            = 0._r8
       IceBySnowRedistrib_2DH(1:2,NY,NX)            = 0._r8
       HeatBySnowRedistrib_2DH(1:2,NY,NX)           = 0._r8
@@ -425,10 +425,10 @@ module Hour1Mod
 !     BAND AND MACROPORE FLUXES
 !
       DO L=1,NL(NY,NX)+1
-        WaterFlowSoiMicP_3D(1:3,L,NY,NX) = 0._r8
-        WaterFlowSoiMicPX_3D(1:3,L,NY,NX)   = 0._r8
-        WaterFlowSoiMacP_3D(1:3,L,NY,NX)    = 0._r8
-        HeatFlow2Soil_3D(1:3,L,NY,NX)    = 0._r8
+        WaterFlowSoiMicP_3D(1:3,L,NY,NX)  = 0._r8
+        WaterFlowSoiMicPX_3D(1:3,L,NY,NX) = 0._r8
+        WaterFlowSoiMacP_3D(1:3,L,NY,NX)  = 0._r8
+        HeatFlow2Soil_3D(1:3,L,NY,NX)     = 0._r8
 
         trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0._r8
         Gas_3DAdvDif_Flx_vr(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
@@ -489,13 +489,13 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trc_salt_rof_bounds(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)=0._r8
-      trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)=0._r8
+      trc_salt_rof_bounds(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
+      trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)             = 0._r8
 
       DO  L=1,NL(NY,NX)+1
         DO NSA=idsalt_beg,idsaltb_end
-          trcSalt3DFlo2Cell(NSA,1:3,L,NY,NX)=0._r8
-          trcSalt_XFHS(NSA,1:3,L,NY,NX)=0._r8
+          trcSalt3DFlo2Cell(NSA,1:3,L,NY,NX) = 0._r8
+          trcSalt_XFHS(NSA,1:3,L,NY,NX)      = 0._r8
         ENDDO
       ENDDO
     ENDDO
@@ -595,8 +595,8 @@ module Hour1Mod
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0._r8
     ENDIF
-    EHUM(L,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
-    EPOC(L,NY,NX)=1.0_r8    
+    EHUM(L,NY,NX) = 0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
+    EPOC(L,NY,NX) = 1.0_r8
     call SoilHydroProperty(L,NY,NX,I,J)
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
@@ -732,6 +732,10 @@ module Hour1Mod
 
   integer :: L
 !     begin_execution
+
+  QSnowH2Oloss_col(NY,NX)                 = 0._r8
+  PrecHeat2Snow_col(NY,NX)                = 0._r8
+  Prec2Snow_col(NY,NX)                    = 0._r8
   ECO_HR_CO2_vr(:,NX,NX)                  = 0._r8
   ECO_HR_CO2_col(NY,NX)                   = 0._r8
   ECO_HR_CH4_col(NY,NX)                   = 0._r8
@@ -777,6 +781,7 @@ module Hour1Mod
   trcg_SurfSoil_DisolEvap_flx(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_SurfLitr_DisolEvap_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
 
+  TPlantRootH2OUptake_col(NY,NX) = 0._r8
   CanopyWat_col(NY,NX)           = 0._r8
   WatHeldOnCanopy_col(NY,NX)     = 0._r8
   Prec2Canopy_col(NY,NX)         = 0._r8
@@ -834,12 +839,15 @@ module Hour1Mod
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
 
-  subroutine GetOutput4WaterTableDepth(NY,NX,THETPZ_vr)
+  subroutine DiagWaterTBLDepz(NY,NX,THETPZ_vr)
+  !
+  !Description:
+  !Diagnose water table depth in the soil column
   implicit none
   integer, intent(in) :: NY,NX
 
-  real(r8), intent(in) :: THETPZ_vr(JZ,JY,JX)
-  real(r8) :: PSIEquil    !equilibrium matric potential
+  real(r8), intent(in) :: THETPZ_vr(JZ)  !air-filled porosity in layer
+  real(r8) :: PSIEquil                   !equilibrium matric potential
   real(r8) :: THETW1
   real(r8) :: THETWM
   real(r8) :: THETPX
@@ -848,73 +856,75 @@ module Hour1Mod
   integer :: LL,L
   logical :: FoundWaterTable
 !     begin_execution
-  THETPW=0.01_r8
-  THETWP=1.0_r8-THETPW
 
-  FoundWaterTable=.false.
+  THETPW          = 0.01_r8
+  THETWP          = 1.0_r8-THETPW
+  FoundWaterTable = .false.
+
   DO L=NUI(NY,NX),NLI(NY,NX)
 !     IDWaterTable=water table flag from site file
 !     THETPZ,THETPW=current,minimum air-filled, porosity for water table
 !     DPTH,ExtWaterTable=depth of soil layer midpoint, water table
 !     PSIEquil=water potential in hydraulic equilibrium with layer below
 !     THETW1,THETWP=water content at PSIEquil,minimum SWC for water table
-!     DepthInternalWTBL=water table depth
+!     DepzIntWTBL_col=water table depth
 !
     IF(IDWaterTable(NY,NX).NE.0)THEN
-      IF(.not.FoundWaterTable)THEN
-        IF(THETPZ_vr(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
-          FoundWaterTable=.true.
-          IF(SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN
-            D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-              IF(THETPZ_vr(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
-                !air-filled pore greater minimum, i.e. not saturated
-                FoundWaterTable=.false.
-                exit
-              ELSE IF(SoiDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
-                !current layer is lower than external water table
-                exit
-              ENDIF
-            END DO D5705
-          ENDIF
+      IF(FoundWaterTable)exit
+
+      IF(THETPZ_vr(L).LT.THETPW .OR. L.EQ.NL(NY,NX))THEN
+        FoundWaterTable=.true.
+        IF(SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN   !above external water table
+          D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+            IF(THETPZ_vr(LL).GE.THETPW .AND. LL.NE.NL(NY,NX))THEN
+              !air-filled pore greater minimum, i.e. not saturated
+              FoundWaterTable=.false.
+              exit
+            ELSE IF(SoiDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
+              !current layer is lower than external water table
+              exit
+            ENDIF
+          END DO D5705
+        ENDIF
 
           !THETPW=saturation criterion for water table identification
           IF(FoundWaterTable)THEN
-            IF(THETPZ_vr(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
-              !not bottom layer, saturated
-              !PSIeqv
-              PSIEquil=PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L+1,NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
 
-              THETWM=THETWP*POROS_vr(L,NY,NX)
-              THETW1=AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
+            IF(THETPZ_vr(L).GE.THETPW .AND. L.NE.NL(NY,NX))THEN !saturated and inside the hydrologically active zone
+              !not bottom layer, saturated
+              !PSIeqv in saturated layer
+              PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L+1,NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
+              THETWM   = THETWP*POROS_vr(L,NY,NX)
+              THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
                 *PSD(L,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
 
               IF(THETWM.GT.THETW1)THEN
-                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
-                DepthInternalWTBL(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
+                THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
+                DepzIntWTBL_col(NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
               ELSE
-                DepthInternalWTBL(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)
+                DepzIntWTBL_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)
               ENDIF
             ELSEIF(L.GT.NU(NY,NX))THEN
               !not bottom layer, and not topsoil layer, partially saturated
               PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-SoiDepthMidLay_vr(L-1,NY,NX))
-              THETWM = THETWP*POROS_vr(L-1,NY,NX)
-              THETW1 = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
+              THETWM   = THETWP*POROS_vr(L-1,NY,NX)
+              THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
                 *PSD(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
-                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
-                DepthInternalWTBL(NY,NX)=CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0_r8-THETPX)
+                THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
+                DepzIntWTBL_col(NY,NX) = CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0_r8-THETPX)
               ELSE
-                DepthInternalWTBL(NY,NX)=CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
+                DepzIntWTBL_col(NY,NX)=CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
               ENDIF
             ELSE
-              DepthInternalWTBL(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)
+              DepzIntWTBL_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)
             ENDIF
           ENDIF
         ENDIF
-      ENDIF
+      
     ENDIF
   END DO
-  end subroutine GetOutput4WaterTableDepth
+  end subroutine DiagWaterTBLDepz
 !------------------------------------------------------------------------------------------
 
   subroutine SetSurfaceProp4SedErosion(NHW,NHE,NVN,NVS)
@@ -1424,7 +1434,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  real(r8),intent(out) :: DPTH0(JY,JX)
+  real(r8),intent(out) :: DPTH0    !water+ice thickness in litter layer
   real(r8) :: VxcessWatLitR,TVOLWI,ThetaWLitR
   real(r8) :: VWatLitrZ
   real(r8) :: VOLIRZ
@@ -1470,15 +1480,15 @@ module Hour1Mod
     ENDIF
     TVOLWI=VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
-      VWatLitrZ = VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
-      VOLIRZ    = VLiceMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)
+      VWatLitrZ = VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)    !water helding capacity by litter
+      VOLIRZ    = VLiceMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)    !ice helding capacity by litter
       XVOLW0    = AZMAX1(VLWatMicP_vr(0,NY,NX)-VWatLitrZ)/AREA(3,NU(NY,NX),NY,NX)
       XVOLI0    = AZMAX1(VLiceMicP_vr(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
     ELSE
       XVOLW0=0._r8
       XVOLI0=0._r8
     ENDIF
-    DPTH0(NY,NX)    = XVOLW0+XVOLI0
+    DPTH0    = XVOLW0+XVOLI0
     DLYR(3,0,NY,NX) = VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
 
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -2252,7 +2262,7 @@ module Hour1Mod
   subroutine GetChemicalConcsInSoil(NY,NX,THETPZ_vr)
   implicit none
   integer, intent(in) :: NY,NX
-  real(r8), intent(out) :: THETPZ_vr(JZ,JY,JX)
+  real(r8), intent(out) :: THETPZ_vr(JZ)  !air-filled soil pore, m3/d2
   integer :: L,NTG
 !     begin_execution
 
@@ -2273,7 +2283,7 @@ module Hour1Mod
       THETI_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
       ThetaAir_vr(L,NY,NX) = AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
     ENDIF
-    THETPZ_vr(L,NY,NX)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
+    THETPZ_vr(L)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
 !
 !     GAS CONCENTRATIONS
 !

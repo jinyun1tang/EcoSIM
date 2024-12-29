@@ -119,7 +119,7 @@ implicit none
   real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  Irrigation_col(:,:)                 !irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecAtm_col(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PreCRAIN_lndAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PrecRainAndIrrig_col(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  EnergyImpact4Erosion(:,:)                         !cumulative rainfall energy impact on soil surface
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
@@ -256,7 +256,7 @@ implicit none
   allocate(Irrigation_col(JY,JX));    Irrigation_col=0._r8
   allocate(SnoFalPrec_col(JY,JX));       SnoFalPrec_col=0._r8
   allocate(PrecAtm_col(JY,JX));       PrecAtm_col=0._r8
-  allocate(PreCRAIN_lndAndIrrig_col(JY,JX));       PreCRAIN_lndAndIrrig_col=0._r8
+  allocate(PrecRainAndIrrig_col(JY,JX));       PrecRainAndIrrig_col=0._r8
   allocate(EnergyImpact4Erosion(JY,JX));       EnergyImpact4Erosion=0._r8
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
@@ -386,7 +386,7 @@ implicit none
   call destroy(Irrigation_col)
   call destroy(SnoFalPrec_col)
   call destroy(PrecAtm_col)
-  call destroy(PreCRAIN_lndAndIrrig_col)
+  call destroy(PrecRainAndIrrig_col)
   call destroy(EnergyImpact4Erosion)
   call destroy(PHR)
   call destroy(CN4RI)

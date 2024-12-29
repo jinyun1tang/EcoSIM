@@ -237,7 +237,7 @@ module VisualMod
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*Qrunoff_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*H2OLoss_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+          OUT(46)=-(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth_col(NY,NX)
           OUT(48)=CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(49)=1.E-3_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

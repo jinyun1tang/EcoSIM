@@ -174,7 +174,7 @@ contains
     !     THW,THI=initial soil water,ice content from soil file
     !
     IF(cold_run())THEN
-      call SetColdRunSoilProps(I,J,L,NY,NX)
+      call SetColdRunSoilStates(I,J,L,NY,NX)
     ENDIF
   ENDIF
 
@@ -292,7 +292,7 @@ contains
   end subroutine SoilHydroProperty
 
 !------------------------------------------------------------------------------------------
-  subroutine SetColdRunSoilProps(I,J,L,NY,NX)
+  subroutine SetColdRunSoilStates(I,J,L,NY,NX)
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
   
@@ -375,7 +375,7 @@ contains
     VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
   ENDIF
-  end subroutine SetColdRunSoilProps
+  end subroutine SetColdRunSoilStates
 !------------------------------------------------------------------------------------------  
   subroutine LitterHydroproperty(NY,NX)
   implicit none

@@ -8,25 +8,27 @@ module SurfLitterDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) ,target,allocatable ::   BulkDensLitR(:)                          !surface litter bulk density	[Mg m-3]
-  real(r8) ,target,allocatable ::   PARR(:,:)                        !surface litter boundary layer conductance, [m t-1]
-  integer  ,target,allocatable ::   IXTYP(:,:,:)                     !surface litter type:1 = plant, 2 = manure
-  real(r8) ,target,allocatable ::   XTillCorp_col(:,:)                       !factor for surface litter incorporation and soil mixing
-  real(r8) ,target,allocatable ::   WatFLo2LitrM(:,:,:)                     !water transfer between soil surface and surface litter, [g d-2 t-1]
-  real(r8) ,target,allocatable ::   WatFlowSno2LitRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   FracSurfByLitR_col(:,:)              !fraction of soil surface covered by surface litter, [-]
-  real(r8) ,target,allocatable ::   HeatFLo2LitrByWat_col(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
-  real(r8) ,target,allocatable ::   VLitR_col(:,:)                       !surface litter volume, [m3 d-2]
-  real(r8) ,target,allocatable ::   VHeatCapLitRMin_col(:,:)                !threshold surface litter heat capacity, [MJ d-2 K-1]
-  real(r8) ,target,allocatable ::   VWatLitRHoldCapcity_col(:,:)                   !surface litter water holding capacity, [m3 d-2]
-  real(r8) ,target,allocatable ::   WatFLo2LitR_col(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
-  real(r8) ,target,allocatable ::   TLitrIceFlxThaw_col(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez_col(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
-  real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
-  real(r8) ,target,allocatable ::   RC0(:,:,:)                       !surface litter in each complex	g d-2
+  real(r8) ,target,allocatable ::   BulkDensLitR(:)                   !surface litter bulk density	[Mg m-3]
+  real(r8) ,target,allocatable ::   PARR(:,:)                         !surface litter boundary layer conductance, [m t-1]
+  integer  ,target,allocatable ::   IXTYP(:,:,:)                      !surface litter type:1 = plant, 2 = manure
+  real(r8) ,target,allocatable ::   XTillCorp_col(:,:)                !factor for surface litter incorporation and soil mixing
+  real(r8) ,target,allocatable ::   WatFLo2LitrM(:,:,:)               !water transfer between soil surface and surface litter, [g d-2 t-1]
+  real(r8) ,target,allocatable ::   WatFlowSno2LitRM_col(:,:,:)       !meltwater flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   FracSurfByLitR_col(:,:)           !fraction of soil surface covered by surface litter, [-]
+  real(r8) ,target,allocatable ::   HeatFLo2LitrByWat_col(:,:)        !net heat transfer to surface litter, [MJ d-2 t-1]
+  real(r8) ,target,allocatable ::   VLitR_col(:,:)                    !surface litter volume, [m3 d-2]
+  real(r8) ,target,allocatable ::   VHeatCapLitRMin_col(:,:)          !threshold surface litter heat capacity, [MJ d-2 K-1]
+  real(r8) ,target,allocatable ::   VWatLitRHoldCapcity_col(:,:)      !surface litter water holding capacity, [m3 d-2]
+  real(r8) ,target,allocatable ::   WatFLo2LitR_col(:,:)              !net water transfer to surface litter, [MJ d-2 t-1]
+  real(r8) ,target,allocatable ::   TLitrIceFlxThaw_col(:,:)          !water from ice thaw in surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez_col(:,:)      !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
+  real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)            !precipitation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)               !irrigation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   POROS0(:,:)                       !litter porosity
+  real(r8) ,target,allocatable ::   RC0(:,:,:)                        !surface litter in each complex,	[g d-2]
   real(r8) ,target,allocatable ::   RC0ff(:,:)
+  real(r8) ,target,allocatable ::   LitWatMassBeg_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
+  real(r8) ,target,allocatable ::   LitWatMassEnd_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
 
   private :: InitAllocate
   contains
@@ -46,12 +48,14 @@ module SurfLitterDataType
   implicit none
   integer, intent(in) :: NumOfLitrCmplxs
 
+  allocate(LitWatMassBeg_col(JY,JX)); LitWatMassBeg_col = 0._r8
+  allocate(LitWatMassEnd_col(JY,JX)); LitWatMassEnd_col = 0._r8
   allocate(BulkDensLitR(1:NumOfLitrCmplxs));    BulkDensLitR =0._r8
   allocate(PARR(JY,JX));         PARR=0._r8
   allocate(IXTYP(2,JY,JX));      IXTYP=0
   allocate(XTillCorp_col(JY,JX));        XTillCorp_col=0._r8
   allocate(WatFLo2LitrM(60,JY,JX));     WatFLo2LitrM=0._r8
-  allocate(WatFlowSno2LitRM(60,JY,JX));     WatFlowSno2LitRM=0._r8
+  allocate(WatFlowSno2LitRM_col(60,JY,JX));     WatFlowSno2LitRM_col=0._r8
   allocate(FracSurfByLitR_col(JY,JX));         FracSurfByLitR_col=0._r8
   allocate(HeatFLo2LitrByWat_col(JY,JX));        HeatFLo2LitrByWat_col=0._r8
   allocate(VLitR_col(JY,JX));         VLitR_col=0._r8
@@ -72,12 +76,14 @@ module SurfLitterDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(LitWatMassBeg_col)
+  call destroy(LitWatMassEnd_col)
   call destroy(BulkDensLitR)
   call destroy(PARR)
   call destroy(IXTYP)
   call destroy(XTillCorp_col)
   call destroy(WatFLo2LitrM)
-  call destroy(WatFlowSno2LitRM)
+  call destroy(WatFlowSno2LitRM_col)
   call destroy(FracSurfByLitR_col)
   call destroy(HeatFLo2LitrByWat_col)
   call destroy(VLitR_col)

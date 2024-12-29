@@ -210,7 +210,7 @@ module StartsMod
   !     WaterTBLSlope_col=slope of natural water table relative to landscape surface
   !     in geography, slope =rise/run
   !     ExtWaterTablet0,DTBLD=depth of natural,artificial water table adjusted for elevn
-  !     DepthInternalWTBL=depth to internal water table
+  !     DepzIntWTBL_col=depth to internal water table
   !     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
   !     XDPTH=x-section area/distance in solute flux calculations (m2/m)
   !     DISP=dispersivity parameter in solute flux calculations (m2 h-1)
@@ -237,7 +237,7 @@ module StartsMod
 ! WaterTBLSlope_col: slope of water table relative to surface slope
 ! ExtWaterTablet0: external water table depth
 ! WtblDepzTile_col: depth of artificial water table
-! DepthInternalWTBL: internal water table depth
+! DepzIntWTBL_col: internal water table depth
 ! DTBLD: artifical water table depth, before applying the altitude correction
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -249,7 +249,7 @@ module StartsMod
         ExtWaterTablet0(NY,NX)=0.0_r8
         DTBLD(NY,NX)=0.0_r8
       ENDIF
-      DepthInternalWTBL(NY,NX)=ExtWaterTablet0(NY,NX)
+      DepzIntWTBL_col(NY,NX)=ExtWaterTablet0(NY,NX)
     ENDDO
   ENDDO
 
@@ -931,7 +931,7 @@ module StartsMod
     AREA(2,L,NY,NX) = DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
   ENDDO
   CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-  CumSoilDeptht0(NY,NX)         = CumDepz2LayerBot_vr(0,NY,NX)
+  CumLitRDepz_col(NY,NX)        = CumDepz2LayerBot_vr(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
   end associate
   end subroutine InitLayerDepths
@@ -1087,9 +1087,9 @@ module StartsMod
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
       SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
-      TCS(0,NY,NX)            = ATCS(NY,NX)
-      TKS_vr(0,NY,NX)         = ATKS(NY,NX)
-      TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
+      TCS(0,NY,NX)                = ATCS(NY,NX)
+      TKS_vr(0,NY,NX)             = ATKS(NY,NX)
+      TKSD(NY,NX)                 = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
 !
     ENDDO
   ENDDO

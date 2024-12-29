@@ -182,6 +182,7 @@ module ExtractsMod
     THeatRootUptake_vr       => plt_ew%THeatRootUptake_vr,         &
     TPlantRootH2OUptake_vr   => plt_ew%TPlantRootH2OUptake_vr,     &
     AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr,   &
+    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col ,   &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
@@ -210,8 +211,9 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OUptake_vr(L)=TPlantRootH2OUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)
-      THeatRootUptake_vr(L)=THeatRootUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS_vr(L)
+      TPlantRootH2OUptake_col   = TPlantRootH2OUptake_col+AllPlantRootH2OUptake_vr(N,L,NZ)
+      TPlantRootH2OUptake_vr(L) = TPlantRootH2OUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)
+      THeatRootUptake_vr(L)     = THeatRootUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS_vr(L)
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !

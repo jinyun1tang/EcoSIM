@@ -22,17 +22,17 @@ implicit none
   real(r8),allocatable ::  FracSoilAsAirt(:,:,:)                 !fraction of soil volume as air, normalized using current pore volume
   real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                  !    
   real(r8),allocatable ::  VLiceMicP1_vr(:,:,:)                  !  
-  real(r8),allocatable ::  SnowFallt(:,:)                        !  
-  real(r8),allocatable ::  Rain2Snowt(:,:)                       !  
+  real(r8),allocatable ::  SnowFallt_col(:,:)                    !  snowfall to snow, [m3 d-2]
+  real(r8),allocatable ::  Rain2Snowt_col(:,:)                   !  rainfall to snow, [m3 d-2]
   real(r8),allocatable ::  VLairMacP1_vr(:,:,:)                  !  positively corrected macropore volume, [m^3/d^2]
   real(r8),allocatable ::  EVAPW(:,:)                            !  
   real(r8),allocatable ::  EVAPS(:,:)                            !  
-  real(r8),allocatable ::  VapXAir2Sno(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
+  real(r8),allocatable ::  VapXAir2Sno_col(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
   real(r8),allocatable ::  SoilFracAsMacP1_vr(:,:,:)             !  
-  real(r8),allocatable ::  HeatFall2Snowt(:,:)                   !  
+  real(r8),allocatable ::  HeatFall2Snowt_col(:,:)               ! total heat flux to snow due to precipitation, [m3 d-2]
   real(r8),allocatable ::  VPQ_col(:,:)                          !  
   real(r8),allocatable ::  AScaledCdHOverSnow_col(:,:)           ! area scaled sensible heat flux conductance over snow  [MJ h /(m K)]
-  real(r8),allocatable ::  Ice2Snowt(:,:)                        !  
+  real(r8),allocatable ::  Ice2Snowt_col(:,:)                    ! icefall to snow, [m3 d-2]
   real(r8),allocatable ::  TKQ_col(:,:)                          ! air temperature in canopy [K]
   real(r8),allocatable ::  ResistAreodynOverSnow_col(:,:)        !  
   real(r8),allocatable ::  VLairMicP1_vr(:,:,:)                  ! corrected air-filled micropore volume [m3/d2]
@@ -79,17 +79,17 @@ implicit none
   allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
   allocate(VLWatMicP1_vr(0:JZ,JY,JX));  VLWatMicP1_vr=0._r8  
   allocate(VLiceMicP1_vr(0:JZ,JY,JX));  VLiceMicP1_vr=0._r8
-  allocate(SnowFallt(JY,JX));       SnowFallt=0._r8
-  allocate(Rain2Snowt(JY,JX));       Rain2Snowt=0._r8
+  allocate(SnowFallt_col(JY,JX));       SnowFallt_col=0._r8
+  allocate(Rain2Snowt_col(JY,JX));       Rain2Snowt_col=0._r8
   allocate(VLairMacP1_vr(JZ,JY,JX));   VLairMacP1_vr=0._r8 
-  allocate(VapXAir2Sno(JY,JX));      VapXAir2Sno=0._r8  
+  allocate(VapXAir2Sno_col(JY,JX));      VapXAir2Sno_col=0._r8  
   allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
   allocate(SoilFracAsMacP1_vr(JZ,JY,JX));     SoilFracAsMacP1_vr=0._r8  
-  allocate(HeatFall2Snowt(JY,JX));      HeatFall2Snowt=0._r8  
+  allocate(HeatFall2Snowt_col(JY,JX));      HeatFall2Snowt_col=0._r8  
   allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
   allocate(AScaledCdHOverSnow_col(JY,JX));       AScaledCdHOverSnow_col=0._r8
-  allocate(Ice2Snowt(JY,JX));       Ice2Snowt=0._r8    
+  allocate(Ice2Snowt_col(JY,JX));       Ice2Snowt_col=0._r8    
   allocate(TKQ_col(JY,JX));         TKQ_col=0._r8  
   allocate(LWEmscefSnow_col(JY,JX));       LWEmscefSnow_col=0._r8  
   allocate(ResistAreodynOverSnow_col(JY,JX));        ResistAreodynOverSnow_col=0._r8  
@@ -144,17 +144,17 @@ implicit none
   call destroy(FracSoilAsAirt)  
   call destroy(VLWatMicP1_vr)  
   call destroy(VLiceMicP1_vr)
-  call destroy(SnowFallt)
-  call destroy(Rain2Snowt)
+  call destroy(SnowFallt_col)
+  call destroy(Rain2Snowt_col)
   call destroy(VLairMacP1_vr)    
   call destroy(EVAPW)  
   call destroy(EVAPS)  
-  call destroy(VapXAir2Sno)  
+  call destroy(VapXAir2Sno_col)  
   call destroy(SoilFracAsMacP1_vr)  
-  call destroy(HeatFall2Snowt)
+  call destroy(HeatFall2Snowt_col)
   call destroy(VPQ_col)    
   call destroy(AScaledCdHOverSnow_col)  
-  call destroy(Ice2Snowt)
+  call destroy(Ice2Snowt_col)
   call destroy(TKQ_col)
   call destroy(LWEmscefSnow_col)
   call destroy(ResistAreodynOverSnow_col) 

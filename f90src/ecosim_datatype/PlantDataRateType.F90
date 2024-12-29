@@ -75,13 +75,14 @@ module PlantDataRateType
   real(r8),target,allocatable ::  PlantExudElm_CumYr_pft(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)
   real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)
+  real(r8),target,allocatable ::  TPlantRootH2OUptake_col(:,:)                       !total root H2O uptake [m3 d-2 h-1]
   real(r8),target,allocatable ::  TPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
-  real(r8),target,allocatable ::  THeatRootUptake_vr(:,:,:)                       !vertically profile of root heat uptake, [MJ d-2]
-  real(r8),target,allocatable :: THeatRootRelease_col(:,:)                        !total root heat relase, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_root_vr(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)      !total root-soil solute flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  tRootMycoExud2Soil_vr(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  THeatRootUptake_vr(:,:,:)                          !vertically profile of root heat uptake, [MJ d-2]
+  real(r8),target,allocatable ::  THeatRootRelease_col(:,:)                          !total root heat relase, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                      !total internal root gas flux , [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_root_vr(:,:,:,:)                              !total root internal gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_plant_uptake_vr(:,:,:,:)                      !total root-soil solute flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  tRootMycoExud2Soil_vr(:,:,:,:,:)                   !total root element exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  tRootCO2Emis_vr(:,:,:)                       !total root CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  tRO2MicrbUptk_vr(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  totRootLenDens_vr(:,:,:)                       !total root length density, [m m-3]
@@ -131,6 +132,7 @@ module PlantDataRateType
   integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots    !number of root types, root,mycos
 
+  allocate(TPlantRootH2OUptake_col(JY,JX)); TPlantRootH2OUptake_col=0._r8
   allocate(CanopyGrosRCO2_pft(JP,JY,JX)); CanopyGrosRCO2_pft=0._r8
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
   allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
@@ -239,6 +241,7 @@ module PlantDataRateType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(TPlantRootH2OUptake_col)
   call destroy(CanopyGrosRCO2_pft)
   call destroy(Eco_NEE_col)
   call destroy(NH3Dep2Can_pft)
