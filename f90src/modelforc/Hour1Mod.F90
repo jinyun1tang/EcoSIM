@@ -265,7 +265,7 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
   integer :: NZ
   real(r8) :: CanopyWatHeldCap  !maximum precipitation holding capacity by canopy (leaf+stem) [m3 H2O]
-  real(r8) :: prec2canopy_pft  !precipiation onto canopy [m H2O/h]
+  real(r8) :: prec2canopy_pft   !precipiation onto canopy [m H2O/h]
 !
 !     CANOPY RETENTION OF PRECIPITATION
 !
@@ -276,6 +276,8 @@ module Hour1Mod
 !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
+!     No snofall intercepation is considered at the moment.
+
   DO  NZ=1,NP(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
       *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
@@ -284,6 +286,7 @@ module Hour1Mod
     Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+prec2canopy_pft
     PrecIntceptByCanopy_col(NY,NX)   = PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
+  RainPrecThrufall_col(NY,NX) = PrecRainAndIrrig_col(NY,NX)-PrecIntceptByCanopy_col(NY,NX)
 
   end subroutine CanopyInterceptPrecp
 
@@ -733,6 +736,11 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  RainPrec2Sno_col(NY,NX)                 = 0._r8
+  Precip2Sno_col(NY,NX)                   = 0._r8
+  QSnoIceXfer2Soil_col(NY,NX)             = 0._r8
+  QSnoWatXfer2Soil_col(NY,NX)             = 0._r8
+  QSnoHeatXfer2Soil_col(NY,NX)            = 0._r8
   QSnowH2Oloss_col(NY,NX)                 = 0._r8
   PrecHeat2Snow_col(NY,NX)                = 0._r8
   Prec2Snow_col(NY,NX)                    = 0._r8
@@ -759,7 +767,7 @@ module Hour1Mod
   tXPO4_col(NY,NX)                        = 0._r8
   UION(NY,NX)                             = 0._r8
   QDischar_col(NY,NX)                     = 0._r8
-  HeatPrec_col(NY,NX)                     = 0._r8
+  PrecHeat_col(NY,NX)                     = 0._r8
   QDrain_col(NY,NX)                       = 0._r8
   HeatDrain_col(NY,NX)                    = 0._r8
 
@@ -786,11 +794,12 @@ module Hour1Mod
   WatHeldOnCanopy_col(NY,NX)     = 0._r8
   Prec2Canopy_col(NY,NX)         = 0._r8
   PrecIntceptByCanopy_col(NY,NX) = 0._r8
-  QvET_col(NY,NX)                = 0._r8
+  QVegET_col(NY,NX)              = 0._r8
   VapXAir2Canopy_col(NY,NX)      = 0._r8
   HeatFlx2Canopy_col(NY,NX)      = 0._r8
   CanopyHeatStor_col(NY,NX)      = 0._r8
-
+  Rain2Soil_col(NY,NX)           = 0._r8
+  Rain2LitR_col(NY,NX)         = 0._r8
   TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)    = 0._r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0._r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -2325,7 +2334,7 @@ module Hour1Mod
 !     begin_execution
 
   DO L=NUI(NY,NX),NLI(NY,NX)
-    FWatExMacP2MicP(L,NY,NX)                        = 0._r8
+    FWatExMacP2MicP_vr(L,NY,NX)                     = 0._r8
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)   = 0._r8
     tRootCO2Emis_vr(L,NY,NX)                        = 0._r8
     trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)         = 0._r8
@@ -2338,7 +2347,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
-    TR_CO2_gchem_soil_vr(L,NY,NX)                 = 0._r8
+    TR_CO2_gchem_soil_vr(L,NY,NX)               = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8

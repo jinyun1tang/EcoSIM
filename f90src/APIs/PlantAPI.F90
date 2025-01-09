@@ -75,7 +75,7 @@ implicit none
   Eco_NetRad_col(NY,NX)                            = plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)                       = plt_ew%Eco_Heat_Latent_col
   Eco_Heat_GrndSurf_col(NY,NX)                     = plt_ew%Eco_Heat_GrndSurf_col
-  QvET_col(NY,NX)                                  = plt_ew%QvET_col
+  QVegET_col(NY,NX)                                  = plt_ew%QVegET_col
   LWRadCanG(NY,NX)                                 = plt_ew%LWRadCanG
   VapXAir2Canopy_col(NY,NX)                        = plt_ew%VapXAir2Canopy_col
   HeatFlx2Canopy_col(NY,NX)                        = plt_ew%HeatFlx2Canopy_col
@@ -918,7 +918,7 @@ implicit none
   plt_ew%Eco_Heat_Latent_col                             = Eco_Heat_Latent_col(NY,NX)
   plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)    = TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)
   plt_ew%Eco_Heat_GrndSurf_col                           = Eco_Heat_GrndSurf_col(NY,NX)
-  plt_ew%QvET_col                                        = QvET_col(NY,NX)
+  plt_ew%QVegET_col                                        = QVegET_col(NY,NX)
   plt_ew%HeatFlx2Canopy_col                              = HeatFlx2Canopy_col(NY,NX)
   plt_ew%LWRadCanG                                       = LWRadCanG(NY,NX)
   plt_ew%CanopyWat_col                                   = CanopyWat_col(NY,NX)

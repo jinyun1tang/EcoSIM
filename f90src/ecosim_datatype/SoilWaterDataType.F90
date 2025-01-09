@@ -22,7 +22,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  PSISoilMatricP_vr(:,:,:)             !soil micropore matric water potential [MPa]
   real(r8),target,allocatable ::  TotalSoilH2OPSIMPa_vr(:,:,:)                      !soil micropore total water potential [MPa]
   real(r8),target,allocatable ::  VLWatMicPX_vr(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
-  real(r8),target,allocatable ::  FWatExMacP2MicP(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
+  real(r8),target,allocatable ::  FWatExMacP2MicP_vr(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
   real(r8),target,allocatable ::  VLiceMacP_vr(:,:,:)                      !soil macropore ice content [m3 d-2]
   real(r8),target,allocatable ::  VLWatMicPM_vr(:,:,:,:)                    !soil micropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
@@ -64,7 +64,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WaterFlow2MicPM_3D(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  WaterFlow2MacPM_3D(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  ReductVLsoiAirPM(:,:,:,:)                     !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
-  real(r8),target,allocatable ::  FWatExMacP2MicPM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
+  real(r8),target,allocatable ::  FWatExMacP2MicPM_vr(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
   real(r8),target,allocatable ::  WatFlowSno2MicPM_col(:,:,:)                      !meltwater flux into soil micropores
   real(r8),target,allocatable ::  WatFlowSno2MacPM_col(:,:,:)                      !meltwater flux into soil macropores
   real(r8),target,allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
@@ -92,7 +92,16 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  QDischar_col(:,:)                !water discharge, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QflxSurfRunoffM_2DH(:,:,:,:,:)        !surface runoff,
   real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)
-  real(r8),target,allocatable :: QdewCanopy_CumYr_pft(:,:,:)
+  real(r8),target,allocatable ::  SoilWatMassBeg_col(:,:)
+  real(r8),target,allocatable ::  SoilWatMassEnd_col(:,:)
+  real(r8),target,allocatable ::  Rain2Soil_col(:,:)               !water flow into soil due to precipitation (+ surface irrigation), [m3 H2O/d2/h]
+  real(r8),target,allocatable ::  QdewCanopy_CumYr_pft(:,:,:)
+  real(r8),target,allocatable :: QSnoWatXfer2Soil_col(:,:)
+  real(r8),target,allocatable :: QSnoIceXfer2Soil_col(:,:)
+  real(r8),target,allocatable :: PrecipAtm2LandSurf_col(:,:)       !precipiation from atmosphere to land surface 
+  real(r8),target,allocatable :: RainPrecThrufall_col(:,:)
+  real(r8),target,allocatable :: Precip2Sno_col(:,:)
+  real(r8),target,allocatable :: RainPrec2Sno_col(:,:)
   private :: InitAllocate
   contains
 
@@ -107,6 +116,16 @@ module SoilWaterDataType
   subroutine InitAllocate
 
   implicit none
+
+  allocate(RainPrec2Sno_col(JY,JX)); RainPrec2Sno_col = 0._r8
+  allocate(Precip2Sno_col(JY,JX)); Precip2Sno_col=0._r8
+  allocate(RainPrecThrufall_col(JY,JX)); RainPrecThrufall_col=0._r8
+  allocate(PrecipAtm2LandSurf_col(JY,JX)); PrecipAtm2LandSurf_col=0._r8
+  allocate(QSnoIceXfer2Soil_col(JY,JX)); QSnoIceXfer2Soil_col=0._r8
+  allocate(QSnoWatXfer2Soil_col(JY,JX)); QSnoWatXfer2Soil_col=0._r8
+  allocate(Rain2Soil_col(JY,JX));  Rain2Soil_col=0._r8
+  allocate(SoilWatMassBeg_col(JY,JX)); SoilWatMassBeg_col=0._r8
+  allocate(SoilWatMassEnd_col(JY,JX)); SoilWatMassEnd_col=0._r8
   allocate(QdewCanopy_CumYr_pft(JZ,JY,JX)); QdewCanopy_CumYr_pft=0._r8
   allocate(EvapoTransp_col(JY,JX)); EvapoTransp_col=0._r8
   allocate(Qinflx2Soil_col(JY,JX)); Qinflx2Soil_col=0._r8
@@ -122,7 +141,7 @@ module SoilWaterDataType
   allocate(PSISoilMatricP_vr(0:JZ,JY,JX));  PSISoilMatricP_vr=0._r8
   allocate(TotalSoilH2OPSIMPa_vr(0:JZ,JY,JX));  TotalSoilH2OPSIMPa_vr=0._r8
   allocate(VLWatMicPX_vr(0:JZ,JY,JX));  VLWatMicPX_vr=0._r8
-  allocate(FWatExMacP2MicP(JZ,JY,JX));     FWatExMacP2MicP=0._r8
+  allocate(FWatExMacP2MicP_vr(JZ,JY,JX));     FWatExMacP2MicP_vr=0._r8
   allocate(VLiceMacP_vr(JZ,JY,JX));    VLiceMacP_vr=0._r8
   allocate(VLWatMicPM_vr(60,0:JZ,JY,JX));VLWatMicPM_vr=0._r8
   allocate(VLWatMacPM(60,JZ,JY,JX));VLWatMacPM=0._r8
@@ -164,7 +183,7 @@ module SoilWaterDataType
   allocate(WaterFlow2MicPM_3D(60,3,JD,JV,JH));WaterFlow2MicPM_3D=0._r8
   allocate(WaterFlow2MacPM_3D(60,3,JD,JV,JH));WaterFlow2MacPM_3D=0._r8
   allocate(ReductVLsoiAirPM(60,JZ,JY,JX));  ReductVLsoiAirPM=0._r8
-  allocate(FWatExMacP2MicPM(60,JZ,JY,JX)); FWatExMacP2MicPM=0._r8
+  allocate(FWatExMacP2MicPM_vr(60,JZ,JY,JX)); FWatExMacP2MicPM_vr=0._r8
   allocate(WatFlowSno2MicPM_col(60,JY,JX));    WatFlowSno2MicPM_col=0._r8
   allocate(WatFlowSno2MacPM_col(60,JY,JX));    WatFlowSno2MacPM_col=0._r8
   allocate(THETPM(60,0:JZ,JY,JX));THETPM=0._r8
@@ -192,13 +211,22 @@ module SoilWaterDataType
   allocate(QflxSurfRunoffM_2DH(60,2,2,JV,JH)); QflxSurfRunoffM_2DH=0._r8
   allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
   allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
-
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
   subroutine DestructSoilWater
   use abortutils, only : destroy
   implicit none
+
+  call destroy(RainPrec2Sno_col)
+  call destroy(Precip2Sno_col)
+  call destroy(RainPrecThrufall_col)
+  call destroy(PrecipAtm2LandSurf_col)
+  call destroy(QSnoIceXfer2Soil_col)
+  call destroy(QSnoWatXfer2Soil_col)
+  call destroy(Rain2Soil_col)
+  call destroy(SoilWatMassBeg_col)
+  call destroy(SoilWatMassEnd_col)
   call destroy(QdewCanopy_CumYr_pft)
   call destroy(ThetaAir_vr)
   call destroy(VLsoiAirP_vr)
@@ -212,7 +240,7 @@ module SoilWaterDataType
   call destroy(PSISoilMatricP_vr)
   call destroy(TotalSoilH2OPSIMPa_vr)
   call destroy(VLWatMicPX_vr)
-  call destroy(FWatExMacP2MicP)
+  call destroy(FWatExMacP2MicP_vr)
   call destroy(VLiceMacP_vr)
   call destroy(VLWatMicPM_vr)
   call destroy(VLWatMacPM)
@@ -254,7 +282,7 @@ module SoilWaterDataType
   call destroy(WaterFlow2MicPM_3D)
   call destroy(WaterFlow2MacPM_3D)
   call destroy(ReductVLsoiAirPM)
-  call destroy(FWatExMacP2MicPM)
+  call destroy(FWatExMacP2MicPM_vr)
   call destroy(WatFlowSno2MicPM_col)
   call destroy(WatFlowSno2MacPM_col)
   call destroy(THETPM)

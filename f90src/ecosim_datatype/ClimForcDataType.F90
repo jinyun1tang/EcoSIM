@@ -171,7 +171,7 @@ implicit none
   real(r8),target,allocatable ::  CC2PR(:,:)                         !precipitation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
-  real(r8),target,allocatable ::  HeatPrec_col(:,:)    !precipitation heat to surface [MJ/d2/h]
+  real(r8),target,allocatable ::  PrecHeat_col(:,:)    !precipitation heat to surface [MJ/d2/h]
   real(r8),target,allocatable ::  RainLitr_col(:,:)  !water from aboveground falling litter
   contains
 !----------------------------------------------------------------------
@@ -194,7 +194,7 @@ implicit none
   allocate(TDWND(12,JY,JX));    TDWND=0._r8
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
-  allocate(HeatPrec_col(JY,JX)); HeatPrec_col=0._r8
+  allocate(PrecHeat_col(JY,JX)); PrecHeat_col=0._r8
   allocate(RainLitr_col(JY,JX)); RainLitr_col=0._r8
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
@@ -314,7 +314,7 @@ implicit none
   subroutine DestructClimForcData
   use abortutils, only : destroy
   implicit none
-  call destroy(HeatPrec_col)
+  call destroy(PrecHeat_col)
   call destroy(RainLitr_col)
   call destroy(WDPTHD)
   call destroy(TDTPX)

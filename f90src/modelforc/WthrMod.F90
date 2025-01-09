@@ -2,11 +2,13 @@ module WthrMod
   !
   ! Description:
   ! code to process the weather forcing
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use MiniMathMod  , only : safe_adb,vapsat0,isclose
-  use MiniFuncMod  , only : get_sun_declin
-  use EcoSIMCtrlMod, only : etimer,frectyp
-  use PlantMgmtDataType, only: NP  
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use MiniMathMod,       only: safe_adb, vapsat0, isclose
+  use MiniFuncMod,       only: get_sun_declin
+  use EcoSIMCtrlMod,     only: etimer,   frectyp
+  use PlantMgmtDataType, only: NP
+  use MiniMathMod,       only: AZMAX1
+  use UnitMod,           only: units
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -19,9 +21,8 @@ module WthrMod
   use AqueChemDatatype
   use IrrigationDataType
   use GridDataType
+  use SoilWaterDataType
   use EcoSIMConfig
-  use MiniMathMod, only : AZMAX1
-  use UnitMod    , only : units
   implicit none
 
   private
@@ -569,7 +570,7 @@ module WthrMod
       PrecRainAndIrrig_col(NY,NX) = RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)
       PrecAtm_col(NY,NX)          = RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)
       LWRadSky_col(NY,NX)         = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-
+      PrecipAtm2LandSurf_col(NY,NX)=RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)
     ENDDO
   ENDDO
   end subroutine SummaryClimateForc

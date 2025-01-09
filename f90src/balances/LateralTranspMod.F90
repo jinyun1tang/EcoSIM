@@ -89,11 +89,6 @@ implicit none
     IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)LX=1
 
     IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. LX.EQ.0)LG=L
-    !make a copy of soil water/ice in micro- and macropores
-    VLWatMicP1_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-    VLiceMicP1_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)
-    VLWatMacP1_vr(L,NY,NX) = VLWatMacP_vr(L,NY,NX)
-    VLiceMacP1_vr(L,NY,NX) = VLiceMacP_vr(L,NY,NX)
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX

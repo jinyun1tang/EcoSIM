@@ -53,10 +53,10 @@ implicit none
   real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                       !
   real(r8),allocatable ::  THeatSoiThaw_vr(:,:,:)                      !
   real(r8),allocatable ::  WatIceThawMacP_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                       !
-  real(r8),allocatable ::  VLiceMicP1_vr(:,:,:)                       !
-  real(r8),allocatable ::  VLWatMacP1_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
+  real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                       !local copy of soil water in micropore
+  real(r8),allocatable ::  VLiceMicP2_vr(:,:,:)                       !local copy of soil ice in micropore
+  real(r8),allocatable ::  VLWatMacP2_vr(:,:,:)                       !local copy of soil water in macropore
+  real(r8),allocatable ::  VLiceMacP2_vr(:,:,:)                       !local copy of soil ice in macropore
 
   real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
 
@@ -129,10 +129,10 @@ implicit none
   allocate(WatIceThawMicP_vr(JZ,JY,JX));    WatIceThawMicP_vr=0._r8
   allocate(THeatSoiThaw_vr(JZ,JY,JX));   THeatSoiThaw_vr=0._r8
   allocate(WatIceThawMacP_vr(JZ,JY,JX));   WatIceThawMacP_vr=0._r8
-  allocate(VLWatMicP1_vr(JZ,JY,JX));    VLWatMicP1_vr=0._r8
-  allocate(VLiceMicP1_vr(JZ,JY,JX));    VLiceMicP1_vr=0._r8
-  allocate(VLWatMacP1_vr(JZ,JY,JX));   VLWatMacP1_vr=0._r8
-  allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8
+  allocate(VLWatMicP2_vr(JZ,JY,JX));    VLWatMicP2_vr=0._r8
+  allocate(VLiceMicP2_vr(JZ,JY,JX));    VLiceMicP2_vr=0._r8
+  allocate(VLWatMacP2_vr(JZ,JY,JX));   VLWatMacP2_vr=0._r8
+  allocate(VLiceMacP2_vr(JZ,JY,JX));   VLiceMacP2_vr=0._r8
   allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
 
   allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
@@ -202,10 +202,10 @@ implicit none
   call destroy(WatIceThawMicP_vr)
   call destroy(THeatSoiThaw_vr)
   call destroy(WatIceThawMacP_vr)
-  call destroy(VLWatMicP1_vr)
-  call destroy(VLiceMicP1_vr)
-  call destroy(VLWatMacP1_vr)
-  call destroy(VLiceMacP1_vr)
+  call destroy(VLWatMicP2_vr)
+  call destroy(VLiceMicP2_vr)
+  call destroy(VLWatMacP2_vr)
+  call destroy(VLiceMacP2_vr)
   call destroy(DOM_Transp2Micp_vr)
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER)

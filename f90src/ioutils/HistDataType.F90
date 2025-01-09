@@ -131,6 +131,7 @@ implicit none
   real(r8),pointer   :: h1D_PATM_col(:)           !atmospheric pressure
   real(r8),pointer   :: h1D_HUM_col(:)            !VPK_col(NY,NX)
   real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm_col(NY,NX)/secs1hour
+  real(r8),pointer   :: h1D_Snofall_col(:)
   real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRad2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
   real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -560,6 +561,7 @@ implicit none
   allocate(this%h1D_HUM_col(beg_col:end_col))             ;this%h1D_HUM_col(:)=spval
   allocate(this%h1D_WIND_col(beg_col:end_col))            ;this%h1D_WIND_col(:)=spval
   allocate(this%h1D_PREC_col(beg_col:end_col))            ;this%h1D_PREC_col(:)=spval
+  allocate(this%h1D_Snofall_col(beg_col:end_col))         ;this%h1D_Snofall_col(:)=spval
   allocate(this%h1D_SOIL_RN_col(beg_col:end_col))         ;this%h1D_SOIL_RN_col(:)=spval
   allocate(this%h1D_SOIL_LE_col(beg_col:end_col))         ;this%h1D_SOIL_LE_col(:)=spval
   allocate(this%h1D_SOIL_H_col(beg_col:end_col))          ;this%h1D_SOIL_H_col(:)=spval
@@ -1242,6 +1244,10 @@ implicit none
   data1d_ptr => this%h1D_PREC_col(beg_col:end_col)   
   call hist_addfld1d(fname='PREC',units='mm H2O/m2/hr',avgflag='A',&
     long_name='Total precipitation, excluding irrigation',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Snofall_col(beg_col:end_col)   
+  call hist_addfld1d(fname='SNOFAL',units='mm H2O/m2/hr',avgflag='A',&
+    long_name='Precipitation as snowfall',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOIL_RN_col(beg_col:end_col)   
   call hist_addfld1d(fname='SOIL_RN',units='W/m2',avgflag='A',&
@@ -2582,6 +2588,7 @@ implicit none
       this%h1D_PATM_col(ncol)             = PBOT_col(NY,NX)
       this%h1D_WIND_col(ncol)             = WindSpeedAtm_col(NY,NX)/secs1hour
       this%h1D_PREC_col(ncol)             = (RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Snofall_col(ncol)          = SnoFalPrec_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_RN_col(ncol)          = HeatByRad2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_LE_col(ncol)          = HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SOIL_H_col(ncol)           = HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
@@ -2605,7 +2612,7 @@ implicit none
 
       this%h1D_CO2_LITR_col(ncol)         = trc_solcl_vr(idg_CO2,0,NY,NX)
       this%h1D_EVAPN_col(ncol)            = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_CANET_col(ncol)            = QvET_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_CANET_col(ncol)            = QVegET_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RUNOFF_FLX_col(ncol)       = -QRunSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_SEDIMENT_FLX_col(ncol)     = SedmErossLoss_CumYr_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tSWC_col(ncol)             = WatMass_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)

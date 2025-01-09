@@ -360,7 +360,7 @@ module ExtractsMod
     Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
     VapXAir2Canopy_col        => plt_ew%VapXAir2Canopy_col,          &
     CanopyHeatStor_col        => plt_ew%CanopyHeatStor_col,          &
-    QvET_col                  => plt_ew%QvET_col,                    &
+    QVegET_col                  => plt_ew%QVegET_col,                    &
     HeatFlx2Canopy_col        => plt_ew%HeatFlx2Canopy_col,          &
     LWRadCanG                 => plt_ew%LWRadCanG,                   &
     TairK                     => plt_ew%TairK,                       &
@@ -397,7 +397,7 @@ module ExtractsMod
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     CanopyWat_col,WatHeldOnCanopy=total water volume in canopy,on canopy surfaces
 !     CanopyWater_pft,WatHeldOnCanopy_pft=PFT water volume in canopy,on canopy surfaces
-!     QvET_col,VapXAir2Canopy_col=total water flux to,from canopy,canopy surfaces
+!     QVegET_col,VapXAir2Canopy_col=total water flux to,from canopy,canopy surfaces
 !     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     CanopyHeatStor_col=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
@@ -418,7 +418,7 @@ module ExtractsMod
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanopyWat_col          = CanopyWat_col+CanopyWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
-  QvET_col               = QvET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  QVegET_col               = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
   ENGYC                  = VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   CanopyHeatStor_col     = CanopyHeatStor_col+ENGYC

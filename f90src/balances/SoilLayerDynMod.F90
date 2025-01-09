@@ -7,7 +7,7 @@ module SoilLayerDynMod
   use minimathmod,       only: AZMAX1
   use UnitMod,           only: units
   use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
-  USE TFlxTypeMod,       ONLY: tErosionSedmLoss, TDLYXF, TDayLenthPrevC, TDVOLI, TDORGC
+  USE TFlxTypeMod      
   use RootDataType
   use GridDataType
   USE EcoSIMCtrlDataType
@@ -44,7 +44,22 @@ implicit none
   integer, parameter :: ich_somloss=6
 
   public :: RelayerSoilProfile
+  public :: cp_LocalSoilWaterStates
   contains
+
+  subroutine cp_LocalSoilWaterStates(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: L
+    !make a copy of soil water/ice in micro- and macropores
+  DO L=NU(NY,NX),NL(NY,NX)
+    VLWatMicP2_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
+    VLiceMicP2_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)
+    VLWatMacP2_vr(L,NY,NX) = VLWatMacP_vr(L,NY,NX)
+    VLiceMacP2_vr(L,NY,NX) = VLiceMacP_vr(L,NY,NX)
+  ENDDO
+  end subroutine cp_LocalSoilWaterStates
+!------------------------------------------------------------------------------------------
 
   subroutine RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP_vr)
   !
@@ -660,7 +675,7 @@ implicit none
       .AND.XVOLWP.GT.VLWatheldCapSurf_col(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((SoiBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoiBulkDensity_vr(L,NY,NX).LE.ZERO))THEN
-      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))THEN
+      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO .AND. NU(NY,NX).GT.NUI(NY,NX))THEN
         NU(NY,NX)               = NUI(NY,NX)
         NUM(NY,NX)              = NUI(NY,NX)
         DDLYRX(NN)              = (VLWatheldCapSurf_col(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)

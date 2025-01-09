@@ -380,8 +380,8 @@ module CanopyCondsMod
       ENDDO D120
       RadSWGrnd_col=RadSW_Grnd*AREA3(NU)
       D135: DO NZ=1,NP
-        RadSWbyCanopy_pft(NZ)=0.0_r8
-        RadPARbyCanopy_pft(NZ)=0.0_r8
+        RadSWbyCanopy_pft(NZ)  = 0.0_r8
+        RadPARbyCanopy_pft(NZ) = 0.0_r8
       ENDDO D135
     ENDIF
 !
@@ -390,8 +390,8 @@ module CanopyCondsMod
   ELSE
     RadSWGrnd_col=0.0_r8
     D125: DO NZ=1,NP
-      RadSWbyCanopy_pft(NZ)=0.0_r8
-      RadPARbyCanopy_pft(NZ)=0.0_r8
+      RadSWbyCanopy_pft(NZ)  = 0.0_r8
+      RadPARbyCanopy_pft(NZ) = 0.0_r8
     ENDDO D125
   ENDIF
   !

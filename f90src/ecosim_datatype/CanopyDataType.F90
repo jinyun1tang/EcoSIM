@@ -94,7 +94,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyWaterMassEnd_col(:,:)
   real(r8),target,allocatable ::  HeatCanopy2Dist_col(:,:)                 !Canopy heat content loss to disturbance, [MJ d-2]
   real(r8),target,allocatable ::  QCanopyWat2Dist_col(:,:)                    !canopy water loss to disturbance
-  real(r8),target,allocatable ::  QvET_col(:,:)                              !total canopy evaporation + transpiration, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QVegET_col(:,:)                              !total canopy evaporation + transpiration, [m3 d-2 h-1]
   real(r8),target,allocatable ::  VapXAir2Canopy_col(:,:)                    !total canopy evaporation, [m3 d-2]
   real(r8),target,allocatable ::  CanopyHeatStor_col(:,:)                    !total canopy heat content, [MJ  d-2]
   real(r8),target,allocatable ::  HeatFlx2Canopy_col(:,:)                    !total canopy heat flux, [MJ  d-2 h-1]
@@ -257,7 +257,7 @@ module CanopyDataType
   allocate(Transpiration_pft(JP,JY,JX));       Transpiration_pft=0._r8
   allocate(VapXAir2Canopy_pft(JP,JY,JX));    VapXAir2Canopy_pft=0._r8
   allocate(CanopyWater_pft(JP,JY,JX));    CanopyWater_pft=0._r8
-  allocate(QvET_col(JY,JX));      QvET_col=0._r8
+  allocate(QVegET_col(JY,JX));      QVegET_col=0._r8
   allocate(VapXAir2Canopy_col(JY,JX));      VapXAir2Canopy_col=0._r8
   allocate(CanopyHeatStor_col(JY,JX));      CanopyHeatStor_col=0._r8
   allocate(HeatFlx2Canopy_col(JY,JX));      HeatFlx2Canopy_col=0._r8
@@ -419,7 +419,7 @@ module CanopyDataType
   call destroy(Transpiration_pft)
   call destroy(VapXAir2Canopy_pft)
   call destroy(CanopyWater_pft)
-  call destroy(QvET_col)
+  call destroy(QVegET_col)
   call destroy(VapXAir2Canopy_col)
   call destroy(CanopyHeatStor_col)
   call destroy(HeatFlx2Canopy_col)

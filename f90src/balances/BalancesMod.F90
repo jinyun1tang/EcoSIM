@@ -1,6 +1,6 @@
 module BalancesMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
-  use CanopyDataType, only: QvET_col
+  use CanopyDataType, only: QVegET_col
   use GridDataType, only : NU,NL
   use EcoSimConst, only : DENSICE
   use abortutils , only : endrun
@@ -40,6 +40,7 @@ contains
       CanopyWaterMassBeg_col(NY,NX) = CanopyWaterMassEnd_col(NY,NX)
       SnowMassBeg_col(NY,NX)        = SnowMassEnd_col(NY,NX)
       LitWatMassBeg_col(NY,NX)      = LitWatMassEnd_col(NY,NX)
+      SoilWatMassBeg_col(NY,NX)     = SoilWatMassEnd_col(NY,NX)
     ENDDO
   ENDDO  
   end subroutine BegCheckBalances 
@@ -81,10 +82,13 @@ contains
   LitWatMassEnd_col(NY,NX) = VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
 
   WatMass_col(NY,NX)       = CanopyWaterMassEnd_col(NY,NX)+SnowMassEnd_col(NY,NX)+LitWatMassEnd_col(NY,NX)
+  SoilWatMassEnd_col(NY,NX)= 0._r8
   !add water in soil 
   DO L=NU(NY,NX),NL(NY,NX)
-    WatMass_col(NY,NX) = WatMass_col(NY,NX)+ VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
+    SoilWatMassEnd_col(NY,NX) = SoilWatMassEnd_col(NY,NX)+ VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
   ENDDO
+
+  WatMass_col(NY,NX)=WatMass_col(NY,NX)+SoilWatMassEnd_col(NY,NX)
 
   WatMassStore_lnd = WatMassStore_lnd+WatMass_col(NY,NX)
 
@@ -131,6 +135,8 @@ contains
   real(r8) :: literH2Oerr_test
   real(r8) :: canopyH2Oerr_test
   real(r8) :: SnowMassErr_test
+  real(r8) :: SoilWatErr_test
+  real(r8) :: precipErr_test
   integer :: ii
 
   call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
@@ -138,20 +144,25 @@ contains
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
+      SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)+Qinflx2Soil_col(NY,NX) &
+        -QDrain_col(NY,NX)-QDischar_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)
+
+      precipErr_test = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
+
       literH2Oerr_test = LitWatMassBeg_col(NY,NX)-LitWatMassEnd_col(NY,NX)+QRunSurf_col(NY,NX)+WatFLo2LitR_col(NY,NX)
 
       SnowMassErr_test = SnowMassBeg_col(NY,NX)-SnowMassEnd_col(NY,NX)+Prec2Snow_col(NY,NX)-QSnowH2Oloss_col(NY,NX)
 
       canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+PrecIntceptByCanopy_col(NY,NX) &
-        +QvET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
+        +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
-      WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+ PrecAtm_col(NY,NX)+Irrigation_col(NY,NX) &
-        +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)+QRunSurf_col(NY,NX) &
-        -QDrain_col(NY,NX)-QDischar_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)
+      WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX) &
+        +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)+QRunSurf_col(NY,NX) &
+        -QDrain_col(NY,NX)-QDischar_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
       HeatErr_test = HeatErr_col(NY,NX)-HeatStore_col(NY,NX)+THeatRootRelease_col(NY,NX) &
         +HeatSource_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
-        +HeatPrec_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
+        +PrecHeat_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
 
       if(abs(WaterErr_test)>err_h2o)then
@@ -159,18 +170,23 @@ contains
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
+        write(110,*)'precipErr_test   =',precipErr_test,RainPrecThrufall_col(NY,NX)
         write(110,*)'prec, irrig      =',PrecAtm_col(NY,NX),Irrigation_col(NY,NX) 
         write(110,*)'litfall H2O      =',RainLitr_col(NY,NX)
-        write(110,*)'surf evap        =', VapXAir2GSurf_col(NY,NX)       
-        write(110,*)'plant evap       =',QvET_col(NY,NX)
+        write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)       
+        write(110,*)'plant evap       =',QVegET_col(NY,NX)
         write(110,*)'root uptake      =',QCanopyWat2Dist_col(NY,NX)
         write(110,*)'run on           =',QRunSurf_col(NY,NX)
         write(110,*)'drain            =',QDrain_col(NY,NX)
         write(110,*)'discharge        =',QDischar_col(NY,NX)
         write(110,*)'SnowMassBeg,end  =',SnowMassBeg_col(NY,NX),SnowMassEnd_col(NY,NX)
         write(110,*)'canopyH2Oerr_test=',canopyH2Oerr_test
-        write(110,*)'SnowMassErr_test =',SnowMassErr_test
-        write(110,*)'literH2Oerr_test =',literH2Oerr_test
+        write(110,*)'SnowMassErr_test =',SnowMassErr_test        
+        write(110,*)'literH2Oerr_test =',literH2Oerr_test,LitWatMassBeg_col(NY,NX),LitWatMassEnd_col(NY,NX)
+        write(110,*)'SoilWatErr_test  =',SoilWatErr_test
+        write(110,*)'snofall          =',Prec2Snow_col(NY,NX),SnoFalPrec_col(NY,NX)
+        write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
+        write(110,*)'Snowxfer         =',QSnoWatXfer2Soil_col(NY,NX)+QSnoIceXfer2Soil_col(NY,NX)*DENSICE
         write(110,*)('-',ii=1,50)
 !        call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif
@@ -187,7 +203,7 @@ contains
         write(110,*)'Net Rad=',Eco_NetRad_col(NY,NX)
         write(110,*)'Latent Heat=',Eco_Heat_Latent_col(NY,NX)
         write(110,*)'Sensible Heat=',Eco_Heat_Sens_col(NY,NX)
-        write(110,*)'Heat prec=',HeatPrec_col(NY,NX)
+        write(110,*)'Heat prec=',PrecHeat_col(NY,NX)
         write(110,*)'Heat phase change, soil, snow=',THeatSoiThaw_col(NY,NX),THeatSnowThaw_col(NY,NX)
         write(110,*)'Heat runoff=',HeatRunSurf_col(NY,NX)
         write(110,*)'Heat drain=',HeatDrain_col(NY,NX)

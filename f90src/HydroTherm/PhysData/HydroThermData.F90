@@ -29,7 +29,7 @@ implicit none
   real(r8),allocatable ::  EVAPS(:,:)                            !  
   real(r8),allocatable ::  VapXAir2Sno_col(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
   real(r8),allocatable ::  SoilFracAsMacP1_vr(:,:,:)             !  
-  real(r8),allocatable ::  HeatFall2Snowt_col(:,:)               ! total heat flux to snow due to precipitation, [m3 d-2]
+  real(r8),allocatable ::  PrecHeat2Snowt_col(:,:)               ! total heat flux to snow due to precipitation, [m3 d-2]
   real(r8),allocatable ::  VPQ_col(:,:)                          !  
   real(r8),allocatable ::  AScaledCdHOverSnow_col(:,:)           ! area scaled sensible heat flux conductance over snow  [MJ h /(m K)]
   real(r8),allocatable ::  Ice2Snowt_col(:,:)                    ! icefall to snow, [m3 d-2]
@@ -86,7 +86,7 @@ implicit none
   allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
   allocate(SoilFracAsMacP1_vr(JZ,JY,JX));     SoilFracAsMacP1_vr=0._r8  
-  allocate(HeatFall2Snowt_col(JY,JX));      HeatFall2Snowt_col=0._r8  
+  allocate(PrecHeat2Snowt_col(JY,JX));      PrecHeat2Snowt_col=0._r8  
   allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
   allocate(AScaledCdHOverSnow_col(JY,JX));       AScaledCdHOverSnow_col=0._r8
   allocate(Ice2Snowt_col(JY,JX));       Ice2Snowt_col=0._r8    
@@ -151,7 +151,7 @@ implicit none
   call destroy(EVAPS)  
   call destroy(VapXAir2Sno_col)  
   call destroy(SoilFracAsMacP1_vr)  
-  call destroy(HeatFall2Snowt_col)
+  call destroy(PrecHeat2Snowt_col)
   call destroy(VPQ_col)    
   call destroy(AScaledCdHOverSnow_col)  
   call destroy(Ice2Snowt_col)

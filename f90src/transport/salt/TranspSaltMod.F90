@@ -325,13 +325,13 @@ module TranspSaltMod
     FLWU(L,NY,NX)=TPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
 
     DO nsalts=idsalt_beg,idsalt_KSO4
-      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
+      trcSalt_Irrig_vr(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
     ENDDO
 
     DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
       ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_RFLU(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-      trcSalt_RFLU(ids,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+      trcSalt_Irrig_vr(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+      trcSalt_Irrig_vr(ids,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     ENDDO
 
 !
@@ -341,7 +341,7 @@ module TranspSaltMod
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
     DO nsalts=idsalt_beg,idsaltb_end
-      trcSalt_RFLZ(nsalts,L,NY,NX)=trcSalt_RFLU(nsalts,L,NY,NX)*dts_HeatWatTP
+      trcSalt_RFLZ(nsalts,L,NY,NX)=trcSalt_Irrig_vr(nsalts,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP

@@ -29,12 +29,14 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:)            !Heat flow into colum [MJ/d2/h]
   real(r8),target,allocatable ::  HeatSource_col(:,:)                 !Heat source from heating [MJ/d2/h]
   real(r8),target,allocatable :: THeatSoiThaw_col(:,:)                !Heat associated with freeze-thaw [MJ/d2/h]
+  real(r8),target,allocatable :: QSnoHeatXfer2Soil_col(:,:)          !Heat flux from snow into soil [MJ/d2/h]
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSoilHeatData
 
   implicit none
+  allocate(QSnoHeatXfer2Soil_col(JY,JX)); QSnoHeatXfer2Soil_col = 0._r8
   allocate(HeatSource_col(JY,JX)); HeatSource_col = 0._r8
   allocate(TKSZ(366,24,JZ));    TKSZ                                   = 0._r8
   allocate(TKS_vr(0:JZ,JY,JX));    TKS_vr                              = 0._r8
@@ -61,6 +63,7 @@ contains
   subroutine DestructSoilHeatData
   use abortutils, only : destroy
   implicit none
+  call destroy(QSnoHeatXfer2Soil_col)
   call destroy(THeatSoiThaw_col)
   call destroy(HeatSource_col)
   call destroy(TKSZ)

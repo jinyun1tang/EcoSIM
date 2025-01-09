@@ -1,10 +1,10 @@
 module RedistMod
-  use data_kind_mod,     only: r8 => DAT_KIND_R8
-  use abortutils,        only: padr,     print_info, endrun, destroy
-  use minimathmod,       only: safe_adb, AZMAX1, fixEXflux, fixnegmass, isclose
-  use EcoSiMParDataMod,  only: micpar
-  use SurfLitterPhysMod, only: UpdateLitRPhys
-  use InitSOMBGCMOD, only :  MicrobeByLitterFall
+  use data_kind_mod,     only : r8 => DAT_KIND_R8
+  use abortutils,        only : padr,     print_info, endrun, destroy
+  use minimathmod,       only : safe_adb, AZMAX1, fixEXflux, fixnegmass, isclose
+  use EcoSiMParDataMod,  only : micpar
+  use SurfLitterPhysMod, only : UpdateLitRPhys
+  use InitSOMBGCMOD    , only :  MicrobeByLitterFall
   use SoilBGCNLayMod  
   use ElmIDMod
   use EcosimConst
@@ -85,6 +85,7 @@ module RedistMod
   real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
   real(r8) :: VOLISO,VOLPT,VOLTT
   real(r8) :: TFLWT,orgm(1:NumPlantChemElms)
+  real(r8) :: dWat,dHeat
 !     execution begins here
   curday=I
   curhour=J
@@ -97,9 +98,10 @@ module RedistMod
     D9990: DO NY=NVN,NVS
       TXCO2(NY,NX)        = 0.0_r8
       DORGE(NY,NX)        = 0.0_r8
-      call AddFlux2SurfaceResidue(I,J,NY,NX)
+
+      call AddFlux2SurfaceResidue(I,J,NY,NX,dWat,dHeat)
 !
-      call SinkChemicals(NY,NX)
+      call SinkSediments(NY,NX)
 !
 !     RUNOFF AND SUBSURFACE BOUNDARY FLUXES
 !
@@ -109,11 +111,13 @@ module RedistMod
 !
       call ModifyExWTBLByDisturbance(I,J,NY,NX)
 
+      call cp_LocalSoilWaterStates(NY,NX)
+
       call XGridTranspt(I,J,NY,NX,LG)
 
       call SnowMassUpdate(I,J,NY,NX)
 
-      call HandleSurfaceBoundary(I,J,NY,NX)
+      call HandleSurfaceBoundary(I,J,NY,NX,dWat,dHeat)
 
 !     OVERLAND FLOW
       call OverlandFlow(I,J,NY,NX)
@@ -269,12 +273,12 @@ module RedistMod
   end subroutine ModifyExWTBLByDisturbance
 !------------------------------------------------------------------------------------------
 
-  subroutine HandleSurfaceBoundary(I,J,NY,NX)
+  subroutine HandleSurfaceBoundary(I,J,NY,NX,dWat,dHeat)
 
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-
+  real(r8), intent(in) :: dWat,dHeat
   integer :: L,K,LS,NTG,NTP,NTX,nsalts,NE
   real(r8):: vhcp1s
   real(r8) :: CI,CH,CO,CX
@@ -292,7 +296,7 @@ module RedistMod
   if(lverb)write(*,*)'HandleSurfaceBoundary'
   QRunSurf_col(NY,NX)    = TXGridSurfRunoff_2DH(NY,NX)
   HeatRunSurf_col(NY,NX) = THeatXGridBySurfRunoff_2DH(NY,NX)
-  call UpdateLitRPhys(I,J,NY,NX,TXGridSurfRunoff_2DH(NY,NX),THeatXGridBySurfRunoff_2DH(NY,NX),HEATIN_lnd)
+  call UpdateLitRPhys(I,J,NY,NX,dWat,dHeat,HEATIN_lnd)
 
  trcO2S=trc_solml_vr(idg_O2,0,NY,NX)
   do idg=idg_beg,idg_NH3-1
@@ -356,7 +360,7 @@ module RedistMod
   WI                       = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux    = rain/snowfall + irrigation
   CRAIN_lnd                = CRAIN_lnd+WI
   QRain_CumYr_col(NY,NX)   = WI
-  WO                       = VapXAir2GSurf_col(NY,NX)+QvET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
+  WO                       = VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
   CEVAP                    = CEVAP-WO
   QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)   = -WO
@@ -829,9 +833,9 @@ module RedistMod
     VOLWXX         = VLWatMicP_vr(L,NY,NX)
     VOLIXX         = VLiceMicP_vr(L,NY,NX)
     !micropore
-    VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
+    VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP_vr(L,NY,NX)+FWatExMacP2MicP_vr(L,NY,NX) &
       +WatIceThawMicP_vr(L,NY,NX)+TPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
-    VLWatMicPX_vr(L,NY,NX)=VLWatMicPX_vr(L,NY,NX)+TWatFlowCellMicPX_vr(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
+    VLWatMicPX_vr(L,NY,NX)=VLWatMicPX_vr(L,NY,NX)+TWatFlowCellMicPX_vr(L,NY,NX)+FWatExMacP2MicP_vr(L,NY,NX) &
       +WatIceThawMicP_vr(L,NY,NX)+TPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
 
     !do a numerical correction
@@ -839,12 +843,12 @@ module RedistMod
     VLiceMicP_vr(L,NY,NX)  = VLiceMicP_vr(L,NY,NX)-WatIceThawMicP_vr(L,NY,NX)/DENSICE
 
     !macropore
-    VLWatMacP_vr(L,NY,NX) = VLWatMacP_vr(L,NY,NX)+TWatFlowCellMacP_vr(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
+    VLWatMacP_vr(L,NY,NX) = VLWatMacP_vr(L,NY,NX)+TWatFlowCellMacP_vr(L,NY,NX)-FWatExMacP2MicP_vr(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
     VLiceMacP_vr(L,NY,NX) = VLiceMacP_vr(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
 
-    !volume change
-    DVLWatMicP_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
-    DVLiceMicP_vr(L)       = VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
+    !volume change=initial-final
+    DVLWatMicP_vr(L,NY,NX) = VLWatMicP2_vr(L,NY,NX)+VLWatMacP2_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
+    DVLiceMicP_vr(L)       = VLiceMicP2_vr(L,NY,NX)+VLiceMacP2_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
 
     !update water/ice-unfilled pores
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -880,7 +884,7 @@ module RedistMod
       HeatSource_col(NY,NX)     = HeatSource_col(NY,NX)+HeatSource_vr(L,NY,NX)
       THeatFlow2Soil_col(NY,NX) = THeatFlow2Soil_col(NY,NX) + THeatFlowCellSoil_vr(L,NY,NX)
       TKS_vr(L,NY,NX)           = (ENGY+THeatFlowCellSoil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) +HeatSource_vr(L,NY,NX) &
-        +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
+        +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation_vr(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
       if(TKS_vr(L,NY,NX)> 400._r8 .and. isclose(ENGY,0._r8))TKS_vr(L,NY,NX)=TKSX
 
       if(TKS_vr(L,NY,NX)>4.e2 .or. TKS_vr(L,NY,NX)<100._r8)then
@@ -891,7 +895,7 @@ module RedistMod
           THeatFlowCellSoil_vr(L,NY,NX)/VHeatCapacity_vr(L,NY,NX),&
           THeatSoiThaw_vr(L,NY,NX)/VHeatCapacity_vr(L,NY,NX), &
           THeatRootUptake_vr(L,NY,NX)/VHeatCapacity_vr(L,NY,NX),&
-          HeatIrrigation(L,NY,NX)/VHeatCapacity_vr(L,NY,NX)
+          HeatIrrigation_vr(L,NY,NX)/VHeatCapacity_vr(L,NY,NX)
         write(*,*)'wat',VLWatMicP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX), &
           VLiceMicP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)  
         write(*,*)'heat',ENGY,THeatFlowCellSoil_vr(L,NY,NX),VHeatCapacitySoilM_vr(L,NY,NX), &
@@ -1349,7 +1353,7 @@ module RedistMod
 
   DO nsalts=idsalt_beg,idsaltb_end
     trcSalt_solml_vr(nsalts,L,NY,NX)=trcSalt_solml_vr(nsalts,L,NY,NX)+trcSalt_TR(nsalts,L,NY,NX) &
-      +trcSalt_Flo2MicP_vr(nsalts,L,NY,NX)+trcSalt_RFLU(nsalts,L,NY,NX)+trcSalt_XFXS(nsalts,L,NY,NX)
+      +trcSalt_Flo2MicP_vr(nsalts,L,NY,NX)+trcSalt_Irrig_vr(nsalts,L,NY,NX)+trcSalt_XFXS(nsalts,L,NY,NX)
 
     trcSalt_soHml_vr(nsalts,L,NY,NX)=trcSalt_soHml_vr(nsalts,L,NY,NX)+trcSalt_Flo2MacP_vr(nsalts,L,NY,NX) &
       -trcSalt_XFXS(nsalts,L,NY,NX)
@@ -1507,13 +1511,14 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AddFlux2SurfaceResidue(I,J,NY,NX)
+  subroutine AddFlux2SurfaceResidue(I,J,NY,NX,dWat,dHeat)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-
+  real(r8), intent(out) :: dWat,dHeat
   integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
+
   real(r8) :: VLWatMicP1X,ENGYR,TK1X
   real(r8) :: OSCMK
 !     begin_execution
@@ -1526,7 +1531,7 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN_lnd=cumulative net surface heat transfer
 !
-  
+  dWat=0._r8; dHeat=0._r8
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     OSCMK=0._r8
     DO  M=1,jsken
@@ -1540,12 +1545,15 @@ module RedistMod
       RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
       HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
+      VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
       QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
       CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
       HeatFLo2LitrByWat_col(NY,NX) = HeatFLo2LitrByWat_col(NY,NX)+HRAINR
+      dWat                         = dWat + RAINR
+      dHeat                        = dHeat + HRAINR
       CRAIN_lnd                    = CRAIN_lnd+RAINR
       HEATIN_lnd                   = HEATIN_lnd+HRAINR
-      HeatPrec_col(NY,NX)          = HeatPrec_col(NY,NX) + HRAINR
+      PrecHeat_col(NY,NX)          = PrecHeat_col(NY,NX) + HRAINR
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
 !    write(113,*)I+J/24.,K,OSCMK,SolidOM_vr(ielmc,1:jsken,K,0,NY,NX)

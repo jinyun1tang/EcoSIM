@@ -90,7 +90,7 @@ module IngridTranspMod
 !     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -109,12 +109,12 @@ module IngridTranspMod
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-      IF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).GT.0.0)THEN
+      IF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).GT.0.0)THEN
         call MacToMicPoreSoluteAdvExchange(M,NY,NX)
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-      ELSEIF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).LT.0.0)THEN
+      ELSEIF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).LT.0.0)THEN
         call MicToMacPoreSoluteAdvExchange(M,NY,NX)
 !
 !     NO MACROPORE TO MICROPORE TRANSFER
@@ -619,7 +619,7 @@ module IngridTranspMod
 !     begin_execution
 
   IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
+    VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=VFLWX
   ENDIF
@@ -655,7 +655,7 @@ module IngridTranspMod
   real(r8) :: VFLW
 !     begin_execution
   IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
+    VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=-VFLWX
   ENDIF
@@ -1476,7 +1476,7 @@ module IngridTranspMod
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -1495,9 +1495,9 @@ module IngridTranspMod
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-  IF(FWatExMacP2MicPM(M,N6,N5,N4).GT.0.0)THEN
+  IF(FWatExMacP2MicPM_vr(M,N6,N5,N4).GT.0.0)THEN
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1515,9 +1515,9 @@ module IngridTranspMod
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-  ELSEIF(FWatExMacP2MicPM(M,N6,N5,N4).LT.0.0)THEN
+  ELSEIF(FWatExMacP2MicPM_vr(M,N6,N5,N4).LT.0.0)THEN
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM_vr(M,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF

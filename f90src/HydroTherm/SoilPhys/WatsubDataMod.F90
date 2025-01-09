@@ -14,7 +14,7 @@ implicit none
   real(r8),allocatable ::  VLairMacP_vr(:,:,:)                   !
   real(r8),allocatable ::  TLPhaseChangeHeat2Soi1_vr(:,:,:)         !total soil layer latent heat release from melting
 
-  real(r8),allocatable ::  FWatExMacP2MicPi(:,:,:)             !pressure-driven water flow from macpore to micpore
+  real(r8),allocatable ::  FWatExMacP2MicPi_vr(:,:,:)             !pressure-driven water flow from macpore to micpore
 
   real(r8),allocatable ::  TWatCharge2MicP_vr(:,:,:)                       !
   real(r8),allocatable ::  TWaterFlow2Macpt_3D_vr(:,:,:)                      !
@@ -25,7 +25,7 @@ implicit none
 
   real(r8),allocatable ::  TWaterFlow2MicptX_vr(:,:,:)                      !
   real(r8),allocatable ::  FWatIrrigate2MicP1_vr(:,:,:)                        !
-  real(r8),allocatable ::  HeatIrrigation1(:,:,:)                      !
+  real(r8),allocatable ::  HeatIrrigation1_vr(:,:,:)                  !heat flux due to irrigation, [MJ/d2]
 
   real(r8),allocatable ::  FIceThawMacP(:,:,:)                      !
 
@@ -62,7 +62,7 @@ contains
   allocate(VLairMacP_vr(JZ,JY,JX));  VLairMacP_vr=0._r8
   allocate(TLPhaseChangeHeat2Soi1_vr(JZ,JY,JX));   TLPhaseChangeHeat2Soi1_vr=0._r8
 
-  allocate(FWatExMacP2MicPi(JZ,JY,JX));    FWatExMacP2MicPi=0._r8
+  allocate(FWatExMacP2MicPi_vr(JZ,JY,JX));    FWatExMacP2MicPi_vr=0._r8
 
   allocate(TWatCharge2MicP_vr(JZ,JY,JX));    TWatCharge2MicP_vr=0._r8
   allocate(TWaterFlow2Macpt_3D_vr(JZ,JY,JX));   TWaterFlow2Macpt_3D_vr=0._r8
@@ -73,7 +73,7 @@ contains
 
   allocate(TWaterFlow2MicptX_vr(JZ,JY,JX));   TWaterFlow2MicptX_vr=0._r8
   allocate(FWatIrrigate2MicP1_vr(JZ,JY,JX));     FWatIrrigate2MicP1_vr=0._r8
-  allocate(HeatIrrigation1(JZ,JY,JX));   HeatIrrigation1=0._r8
+  allocate(HeatIrrigation1_vr(JZ,JY,JX));   HeatIrrigation1_vr=0._r8
 
   allocate(FIceThawMacP(JZ,JY,JX));   FIceThawMacP=0._r8
 
@@ -107,7 +107,7 @@ contains
   call destroy(VLairMacP_vr)
   call destroy(TLPhaseChangeHeat2Soi1_vr)
 
-  call destroy(FWatExMacP2MicPi)
+  call destroy(FWatExMacP2MicPi_vr)
 
   call destroy(TWatCharge2MicP_vr)
   call destroy(TWaterFlow2Macpt_3D_vr)
@@ -118,7 +118,7 @@ contains
 
   call destroy(TWaterFlow2MicptX_vr)
   call destroy(FWatIrrigate2MicP1_vr)
-  call destroy(HeatIrrigation1)
+  call destroy(HeatIrrigation1_vr)
 
   call destroy(FIceThawMacP)
 

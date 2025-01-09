@@ -603,52 +603,48 @@ module StartsMod
       ZEROS(NY,NX)  = ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX) = ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GroundSurfAzimuth_col(NY,NX)     = ASP_col(NY,NX)*RadianPerDegree   !radian
-      SineGrndSurfAzimuth_col(NY,NX)   = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
-      CosineGrndSurfAzimuth_col(NY,NX) = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
-      SLOPE(0,NY,NX)                   = AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
+      GroundSurfAzimuth_col(NY,NX)      = ASP_col(NY,NX)*RadianPerDegree   !radian
+      SineGrndSurfAzimuth_col(NY,NX)    = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
+      CosineGrndSurfAzimuth_col(NY,NX)  = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
+      SLOPE(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
+      SLOPE(iEastWestDirection,NY,NX)   = -SLOPE(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
+      SLOPE(iNorthSouthDirection,NY,NX) = SLOPE(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
 
-      IF(ASP_col(NY,NX).GE.0.0_r8.AND.ASP_col(NY,NX).LT.90.0_r8)THEN
-      ! along the northeast
-        SLOPE(1,NY,NX)             = -SLOPE(0,NY,NX)*COS(ASP_col(NY,NX)*RadianPerDegree)    !to south (thus -)
-        SLOPE(2,NY,NX)             = SLOPE(0,NY,NX)*SIN(ASP_col(NY,NX)*RadianPerDegree)     !to east
-        XGridRunoffFlag(1,1,NY,NX) = .true.    !east
+      !aspect angle 
+      IF(ASP_col(NY,NX).GE.0.0_r8 .AND. ASP_col(NY,NX).LT.90.0_r8)THEN
+      ! face the northeast
+        XGridRunoffFlag(1,1,NY,NX) = .true.    !west->east
         XGridRunoffFlag(2,1,NY,NX) = .false.
         XGridRunoffFlag(1,2,NY,NX) = .false.
-        XGridRunoffFlag(2,2,NY,NX) = .true.    !north
+        XGridRunoffFlag(2,2,NY,NX) = .true.    !south->north
       ELSEIF(ASP_col(NY,NX).GE.90.0_r8.AND.ASP_col(NY,NX).LT.180.0_r8)THEN
-      ! along the southeast
-        SLOPE(1,NY,NX)             = SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-90.0_r8)*RadianPerDegree)   !to south
-        SLOPE(2,NY,NX)             = SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-90.0_r8)*RadianPerDegree)   !to east
+      ! face the northwest
         XGridRunoffFlag(1,1,NY,NX) = .false.
-        XGridRunoffFlag(2,1,NY,NX) = .true.   !west to east
+        XGridRunoffFlag(2,1,NY,NX) = .true.   !east -> west
         XGridRunoffFlag(1,2,NY,NX) = .false.
-        XGridRunoffFlag(2,2,NY,NX) = .true.   !north to south
+        XGridRunoffFlag(2,2,NY,NX) = .true.   !south -> north
       ELSEIF(ASP_col(NY,NX).GE.180.0_r8.AND.ASP_col(NY,NX).LT.270.0_r8)THEN
-      !along the southwest
-        SLOPE(1,NY,NX)             = SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-180.0_r8)*RadianPerDegree)    !to south
-        SLOPE(2,NY,NX)             = -SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-180.0_r8)*RadianPerDegree)   !to east (thus -)
+      !face the southwest
         XGridRunoffFlag(1,1,NY,NX) = .false.
-        XGridRunoffFlag(2,1,NY,NX) = .true.  !west
-        XGridRunoffFlag(1,2,NY,NX) = .true.  !south
+        XGridRunoffFlag(2,1,NY,NX) = .true.  !east -> west
+        XGridRunoffFlag(1,2,NY,NX) = .true.  !north -> south
         XGridRunoffFlag(2,2,NY,NX) = .false.
       ELSEIF(ASP_col(NY,NX).GE.270.0_r8.AND.ASP_col(NY,NX).LE.360.0_r8)THEN
-      ! along the northwest
-        SLOPE(1,NY,NX)             = -SLOPE(0,NY,NX)*SIN((ASP_col(NY,NX)-270.0_r8)*RadianPerDegree)   !to north (thus -)
-        SLOPE(2,NY,NX)             = -SLOPE(0,NY,NX)*COS((ASP_col(NY,NX)-270.0_r8)*RadianPerDegree)   !to west (thus -)
-        XGridRunoffFlag(1,1,NY,NX) = .true.  !east
+      ! face the southeast
+        XGridRunoffFlag(1,1,NY,NX) = .true.  !west->east
         XGridRunoffFlag(2,1,NY,NX) = .false.
-        XGridRunoffFlag(1,2,NY,NX) = .true.  !south
+        XGridRunoffFlag(1,2,NY,NX) = .true.  !north->south
         XGridRunoffFlag(2,2,NY,NX) = .false.
       ENDIF
+      !In the vertical direction, for general treatment of flow against slope. 
       SLOPE(3,NY,NX)=-1.0_r8
 
-      IF(.not.isclose(SLOPE(1,NY,NX),0.0_r8).OR.(.not.isclose(SLOPE(2,NY,NX),0.0_r8)))THEN
-        FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))  !
-        FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
+      IF(.not.isclose(SLOPE(iEastWestDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
+        FSLOPE(iEastWestDirection,NY,NX)   = ABS(SLOPE(iEastWestDirection,NY,NX))/(ABS(SLOPE(iEastWestDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
+        FSLOPE(iNorthSouthDirection,NY,NX) = ABS(SLOPE(iNorthSouthDirection,NY,NX))/(ABS(SLOPE(iEastWestDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))
       ELSE
-        FSLOPE(1,NY,NX)=0.5_r8
-        FSLOPE(2,NY,NX)=0.5_r8
+        FSLOPE(iEastWestDirection,NY,NX)   = 0.5_r8
+        FSLOPE(iNorthSouthDirection,NY,NX) = 0.5_r8
       ENDIF
 
 !    compute incident sky angle at ground surface
@@ -664,29 +660,29 @@ module StartsMod
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
           !(west, north) corner
-          ALT(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE(1,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE(2,NY,NX)
+          ALT(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
         ELSE
           !west boundary
           ALT(NY,NX)=ALT(NY-1,NX) &
-            +1.0_r8*DH(NY,NX)*SLOPE(1,NY,NX) &
-            +0.5_r8*DV(NY-1,NX)*(SLOPE(2,NY-1,NX)) &
-            +0.5_r8*DV(NY,NX)*SLOPE(2,NY,NX)
+            +1.0_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX) &
+            +0.5_r8*DV(NY-1,NX)*(SLOPE(iNorthSouthDirection,NY-1,NX)) &
+            +0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
         ENDIF
       ELSE
         IF(NY.EQ.NVN)THEN
           !north boundary
           ALT(NY,NX)=ALT(NY,NX-1) &
-            +0.5_r8*DH(NY,NX-1)*SLOPE(1,NY,NX-1) &
-            +0.5_r8*DH(NY,NX)*SLOPE(1,NY,NX) &
-            +0.5_r8*DV(NY,NX-1)*SLOPE(2,NY,NX-1) &
-            +0.5_r8*DV(NY,NX)*SLOPE(2,NY,NX)
+            +0.5_r8*DH(NY,NX-1)*SLOPE(iEastWestDirection,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX) &
+            +0.5_r8*DV(NY,NX-1)*SLOPE(iNorthSouthDirection,NY,NX-1) &
+            +0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
         ELSE
           ALT(NY,NX)=(ALT(NY,NX-1) &
-            +0.5_r8*DH(NY,NX-1)*SLOPE(1,NY,NX-1) &
-            +0.5_r8*DH(NY,NX)*SLOPE(1,NY,NX) &
+            +0.5_r8*DH(NY,NX-1)*SLOPE(iEastWestDirection,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX) &
             +ALT(NY-1,NX) &
-            +0.5_r8*DV(NY-1,NX)*SLOPE(2,NY-1,NX) &
-            +0.5_r8*DV(NY,N)*SLOPE(2,NY,NX))/2.0
+            +0.5_r8*DV(NY-1,NX)*SLOPE(iNorthSouthDirection,NY-1,NX) &
+            +0.5_r8*DV(NY,N)*SLOPE(iNorthSouthDirection,NY,NX))/2.0
         ENDIF
       ENDIF
 
@@ -698,7 +694,7 @@ module StartsMod
       ENDIF
       WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL(NY,NX) &
-        ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
+        ,SLOPE(0,NY,NX),SLOPE(iEastWestDirection,NY,NX),SLOPE(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
     ENDDO D9980
@@ -730,7 +726,7 @@ module StartsMod
   !
   !     INITIALIZE MASS BALANCE CHECKS
   !
-  CRAIN_lnd               = 0.0_r8
+  CRAIN_lnd           = 0.0_r8
   HEATIN_lnd          = 0.0_r8
   SurfGas_CO2_lnd     = 0.0_r8
   SurfGas_O2_lnd      = 0.0_r8
@@ -738,7 +734,7 @@ module StartsMod
   TZIN                = 0.0_r8
   SurfGas_N2_lnd      = 0.0_r8
   TPIN                = 0.0_r8
-  tAmendOrgC_lnd               = 0.0_r8
+  tAmendOrgC_lnd      = 0.0_r8
   TORGN               = 0.0_r8
   TORGP               = 0.0_r8
   QH2OLoss_lnds       = 0.0_r8

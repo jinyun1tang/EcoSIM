@@ -29,7 +29,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   RC0ff(:,:)
   real(r8) ,target,allocatable ::   LitWatMassBeg_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
   real(r8) ,target,allocatable ::   LitWatMassEnd_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
-
+  real(r8) ,target,allocatable ::   Rain2LitR_col(:,:)              !total precipiation reaches the litter layer [m3 H3O d-2 h-1]
   private :: InitAllocate
   contains
 !----------------------------------------------------------------------
@@ -48,6 +48,7 @@ module SurfLitterDataType
   implicit none
   integer, intent(in) :: NumOfLitrCmplxs
 
+  allocate(Rain2LitR_col(JY,JX)); Rain2LitR_col=0._r8
   allocate(LitWatMassBeg_col(JY,JX)); LitWatMassBeg_col = 0._r8
   allocate(LitWatMassEnd_col(JY,JX)); LitWatMassEnd_col = 0._r8
   allocate(BulkDensLitR(1:NumOfLitrCmplxs));    BulkDensLitR =0._r8
@@ -76,6 +77,7 @@ module SurfLitterDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(Rain2LitR_col)
   call destroy(LitWatMassBeg_col)
   call destroy(LitWatMassEnd_col)
   call destroy(BulkDensLitR)

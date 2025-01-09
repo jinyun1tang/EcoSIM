@@ -18,13 +18,15 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: SinkChemicals
+  public :: SinkSediments
   public :: ZeroErosionArray
   contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SinkChemicals(NY,NX)
+  subroutine SinkSediments(NY,NX)
+  
+  !Sedimentation
   implicit none
   integer, intent(in) :: NY,NX
 
@@ -193,7 +195,7 @@ implicit none
       ENDDO D1900
     ENDIF
   ENDDO D9885
-  end subroutine SinkChemicals
+  end subroutine SinkSediments
 !------------------------------------------------------------------------------------------
 
   subroutine ZeroErosionArray(NY,NX)

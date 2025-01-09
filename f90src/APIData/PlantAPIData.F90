@@ -537,7 +537,7 @@ implicit none
   real(r8) :: VLHeatCapSurfSnow_col      !snowpack heat capacity, [MJ m-3 K-1]
   real(r8) :: CanopyHeatStor_col         !total canopy heat content, [MJ  d-2]
   real(r8) :: LWRadCanG                  !grid total canopy LW emission, [MJ d-2 h-1]
-  real(r8) :: QvET_col                      !total canopy evaporation + transpiration, [m3 d-2]
+  real(r8) :: QVegET_col                      !total canopy evaporation + transpiration, [m3 d-2]
   real(r8) :: VapXAir2Canopy_col            !grid canopy evaporation, [m3 d-2]
   real(r8) :: HeatFlx2Canopy_col            !total canopy heat flux, [MJ  d-2]
   real(r8) :: H2OLoss_CumYr_col             !total subsurface water flux, [m3 d-2]

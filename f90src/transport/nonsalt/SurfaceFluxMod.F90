@@ -419,7 +419,7 @@ contains
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: SAdvFlx(ids_beg:ids_end)
 !
-!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -432,9 +432,9 @@ contains
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-  IF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+  IF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
     IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -456,9 +456,9 @@ contains
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-  ELSEIF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).LT.0.0_r8)THEN
+  ELSEIF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).LT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF

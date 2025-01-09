@@ -82,10 +82,10 @@ module IrrigationDataType
   real(r8),target,allocatable ::  trcsalt_subirrig_conc(:,:,:,:)     !subsurface irrigation  chemical concentration, [g m-3]
   real(r8),target,allocatable ::  COPU(:,:,:,:)                     !subsurface irrigation  DOP concentration, [g m-3]
   real(r8),target,allocatable ::  FWatIrrigate2MicP_vr(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HeatIrrigation(:,:,:)                      !convective heat of underground irrigation, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  trcs_Irrig_vr(:,:,:,:)                     !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcSalt_RFLU(:,:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable :: trcsalt_irrig_conc(:,:,:,:)          !salt tracer concentration in irrigation [g m-3]
+  real(r8),target,allocatable ::  HeatIrrigation_vr(:,:,:)          !convective heat due to underground irrigation, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  trcs_Irrig_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_Irrig_vr(:,:,:,:)          !aqueous salt flux due to underground irrigation non-band, [g d-2 h-1]
+  real(r8),target,allocatable :: trcsalt_irrig_conc(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
   private :: InitAllocate
   contains
 
@@ -169,9 +169,9 @@ module IrrigationDataType
   allocate(trcsalt_subirrig_conc(idsalt_beg:idsalt_end,JZ,JY,JX));     trcsalt_subirrig_conc=0._r8
   allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
   allocate(FWatIrrigate2MicP_vr(JZ,JY,JX));      FWatIrrigate2MicP_vr=0._r8
-  allocate(HeatIrrigation(JZ,JY,JX));    HeatIrrigation=0._r8
+  allocate(HeatIrrigation_vr(JZ,JY,JX));    HeatIrrigation_vr=0._r8
   allocate(trcs_Irrig_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Irrig_vr=0._r8
-  allocate(trcSalt_RFLU(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLU=0._r8
+  allocate(trcSalt_Irrig_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Irrig_vr=0._r8
   allocate(trcsalt_irrig_conc(idsalt_beg:idsaltb_end,366,JY,JX))
   end subroutine InitAllocate
 
@@ -247,7 +247,7 @@ module IrrigationDataType
   call destroy(CNZU)
   call destroy(COPU)
   call destroy(FWatIrrigate2MicP_vr)
-  call destroy(HeatIrrigation)
+  call destroy(HeatIrrigation_vr)
 
   end subroutine DestructIrrigation
 

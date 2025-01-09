@@ -57,7 +57,7 @@ implicit none
   real(r8),optional,intent(out) :: QWatinfl2Mic,QHeatInfl2Soil  
   real(r8) :: QWatinfl2Mic_loc,QHeatInfl2Soil_loc
   real(r8) :: VOLSWI,ENGYW,TKSnow_pre
-
+  real(r8) :: ENGY
   integer :: L,L2
   logical :: test_exist
       !
@@ -92,18 +92,12 @@ implicit none
         CumHeat2SnowL_snvr(L,NY,NX) = CumHeat2SnowL_snvr(L,NY,NX)+HeatXfer2SnoLay_snvr(L,NY,NX)
       ENDIF          
     ENDIF
-    if(I>=108 .and. L==1)write(*,*)'bef',TKSnow_snvr(L,NY,NX),L    
+
     call UpdateSnowLayerL(I,J,L,NY,NX,VOLSWI)
 
-    if(I>=108 .and. L==1)write(*,*)'aft',TKSnow_snvr(L,NY,NX),L
     call UpdateSoluteInSnow(L,NY,NX)
     
   ENDDO D9780
-
-!  if(TKSnow_snvr(1,NY,NX)<230._r8)then
-!    write(*,*)I,J,TKSnow_pre,TairK_col(NY,NX)
-!    call endrun(trim(mod_filename)//' at line',__LINE__)     
-!  endif  
 
   VcumDrySnoWE_col(NY,NX) = sum(VLDrySnoWE_snvr(1:JS,NY,NX))
   VcumWatSnow_col(NY,NX)  = sum(VLWatSnow_snvr(1:JS,NY,NX))
@@ -113,6 +107,22 @@ implicit none
   VcumSnowWE_col(NY,NX)   = VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX)
 !
 ! IF SNOWPACK DISAPPEARS
+
+! intermediate disappearance
+  VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
+  VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
+
+  ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
+
+  VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+    +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
+    +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
+
+  IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+QSnoHeatXfer2Soil_col(NY,NX))/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
+  ELSE
+    TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
+  ENDIF
 
   call SnowpackDisapper(I,J,NY,NX,test_exist,QWatinfl2Mic_loc,QHeatInfl2Soil_loc)
 
@@ -194,8 +204,8 @@ implicit none
       ELSE
         TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
       ENDIF
-
-      QSnowH2Oloss_col(NY,NX)=QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
     endif
 
   ENDIF
@@ -472,13 +482,6 @@ implicit none
     IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       !there is significant snow layer mass
       THeatSnowThaw_col(NY,NX) = THeatSnowThaw_col(NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)
-!      TKSnow_snvr(L,NY,NX)     = (ENGYW+CumHeat2SnowL_snvr(L,NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX))/VLHeatCapSnow_snvr(L,NY,NX)
-      if(I>=108 .and. L==1)then
-        write(*,*)'afw',TKWX,TKSnow_snvr(1:2,NY,NX),L,TairK_col(NY,NX)
-        write(*,*)'w',CumHeat2SnowL_snvr(L,NY,NX),XPhaseChangeHeatL_snvr(L,NY,NX),VHCPWZ(L,NY,NX),&
-          VLHeatCapSnow_snvr(L,NY,NX),VLHeatCapSnowMin_col(NY,NX)
-      endif
-!      if(TKSnow_snvr(L,NY,NX)>TFICE)call DealHighTempSnow(I,J,L,NY,NX)
 
     ELSE
       !there is no significant snow mass      
