@@ -606,7 +606,7 @@ module StartsMod
       GroundSurfAzimuth_col(NY,NX)      = ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)    = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)  = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
-      SLOPE(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !small slope approximation
+      SLOPE(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
       SLOPE(iEastWestDirection,NY,NX)   = -SLOPE(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
       SLOPE(iNorthSouthDirection,NY,NX) = SLOPE(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
 

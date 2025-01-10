@@ -98,6 +98,7 @@ module WatsubMod
   real(r8) :: Qinfl2MicP_col(JY,JX)
   real(r8) :: Hinfl2Soil(JY,JX)
   real(r8) :: Qinfl2MacP_col(JY,JX)
+!  real(r8) :: dtime
 ! begin_execution
 
   do_warming=check_Soil_Warming(iYearCurrent,I)
@@ -108,10 +109,12 @@ module WatsubMod
 !
   call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
-  if(lverb)write(*,*)'DYNAMIC LOOP FOR FLUX CALCULATIONS'
+  !if(lverb)  write(*,*)'DYNAMIC LOOP FOR FLUX CALCULATIONS'
+!  dtime=0._r8
   ! iterate for NPH times
   D3320: DO M=1,NPH
 
+!    dtime=dtime+dts_HeatWatTP
     call FWDCopyTopLayerWatVolMit(NHW,NHE,NVN,NVS,TopLayWatVol_col)
     
     if(lverb)write(*,*)'run surface energy balance model, uses ResistanceLitRLay, update top layer soil moisture'
@@ -150,7 +153,7 @@ module WatsubMod
     ENDIF
 
   ENDDO D3320
-
+!  write(211,*)'dtime=',dtime
   END subroutine watsub
 
 !------------------------------------------------------------------------------------------  

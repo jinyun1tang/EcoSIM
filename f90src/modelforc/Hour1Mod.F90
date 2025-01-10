@@ -276,7 +276,7 @@ module Hour1Mod
 !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
-!     No snofall intercepation is considered at the moment.
+!     Warning: No snofall intercepation is considered at the moment.
 
   DO  NZ=1,NP(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
@@ -736,40 +736,43 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
-  RainPrec2Sno_col(NY,NX)                 = 0._r8
-  Precip2Sno_col(NY,NX)                   = 0._r8
-  QSnoIceXfer2Soil_col(NY,NX)             = 0._r8
-  QSnoWatXfer2Soil_col(NY,NX)             = 0._r8
-  QSnoHeatXfer2Soil_col(NY,NX)            = 0._r8
-  QSnowH2Oloss_col(NY,NX)                 = 0._r8
-  PrecHeat2Snow_col(NY,NX)                = 0._r8
-  Prec2Snow_col(NY,NX)                    = 0._r8
-  ECO_HR_CO2_vr(:,NX,NX)                  = 0._r8
-  ECO_HR_CO2_col(NY,NX)                   = 0._r8
-  ECO_HR_CH4_col(NY,NX)                   = 0._r8
-  Eco_RadSW_col(NY,NX)                    = 0._r8
-  RootCO2Autor_vr(:,NY,NX)                = 0._r8
-  tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  QRunSurf_col(NY,NX)                     = 0._r8
-  HeatRunSurf_col(NY,NX)                  = 0._r8
-  Qinflx2Soil_col(NY,NX)                  = 0._r8
-  HeatFlx2Grnd_col(NY,NX)                 = 0._r8
-  DIC_mass_col(NY,NX)                     = 0._r8
-  tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8
-  WatMass_col(NY,NX)                      = 0._r8
-  HeatStore_col(NY,NX)                    = 0._r8
-  tLitrOM_col(1:NumPlantChemElms,NY,NX)   = 0._r8
-  tHumOM_col(1:NumPlantChemElms,NY,NX)    = 0._r8
-  tNH4_col(NY,NX)                         = 0._r8
-  tNO3_col(NY,NX)                         = 0._r8
-  tHxPO4_col(NY,NX)                       = 0._r8
-  tXPO4_col(NY,NX)                        = 0._r8
-  UION(NY,NX)                             = 0._r8
-  QDischar_col(NY,NX)                     = 0._r8
-  PrecHeat_col(NY,NX)                     = 0._r8
-  QDrain_col(NY,NX)                       = 0._r8
-  HeatDrain_col(NY,NX)                    = 0._r8
+
+    Rain2ExposedSurf_col(NY,NX)             = 0._r8
+    Rain2Soil_col(NY,NX)                    = 0._r8
+    Rain2LitR_col(NY,NX)                    = 0._r8
+    RainPrec2Sno_col(NY,NX)                 = 0._r8
+    QSnoIceXfer2Soil_col(NY,NX)             = 0._r8
+    QSnoWatXfer2Soil_col(NY,NX)             = 0._r8
+    QSnoHeatXfer2Soil_col(NY,NX)            = 0._r8
+    QSnowH2Oloss_col(NY,NX)                 = 0._r8
+    PrecHeat2Snow_col(NY,NX)                = 0._r8
+    Prec2Snow_col(NY,NX)                    = 0._r8
+    ECO_HR_CO2_vr(:,NX,NX)                  = 0._r8
+    ECO_HR_CO2_col(NY,NX)                   = 0._r8
+    ECO_HR_CH4_col(NY,NX)                   = 0._r8
+    Eco_RadSW_col(NY,NX)                    = 0._r8
+    RootCO2Autor_vr(:,NY,NX)                = 0._r8
+    tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
+    QRunSurf_col(NY,NX)                     = 0._r8
+    HeatRunSurf_col(NY,NX)                  = 0._r8
+    Qinflx2Soil_col(NY,NX)                  = 0._r8
+    HeatFlx2Grnd_col(NY,NX)                 = 0._r8
+    DIC_mass_col(NY,NX)                     = 0._r8
+    tMicBiome_col(1:NumPlantChemElms,NY,NX) = 0._r8
+    tSoilOrgM_col(1:NumPlantChemElms,NY,NX) = 0._r8
+    WatMass_col(NY,NX)                      = 0._r8
+    HeatStore_col(NY,NX)                    = 0._r8
+    tLitrOM_col(1:NumPlantChemElms,NY,NX)   = 0._r8
+    tHumOM_col(1:NumPlantChemElms,NY,NX)    = 0._r8
+    tNH4_col(NY,NX)                         = 0._r8
+    tNO3_col(NY,NX)                         = 0._r8
+    tHxPO4_col(NY,NX)                       = 0._r8
+    tXPO4_col(NY,NX)                        = 0._r8
+    UION(NY,NX)                             = 0._r8
+    QDischar_col(NY,NX)                     = 0._r8
+    PrecHeat_col(NY,NX)                     = 0._r8
+    QDrain_col(NY,NX)                       = 0._r8
+    HeatDrain_col(NY,NX)                    = 0._r8
 
   SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)    = 0._r8
   SurfGasDifflx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
@@ -789,18 +792,17 @@ module Hour1Mod
   trcg_SurfSoil_DisolEvap_flx(idg_beg:idg_end,NY,NX) = 0._r8
   trcg_SurfLitr_DisolEvap_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
 
-  TPlantRootH2OUptake_col(NY,NX) = 0._r8
-  CanopyWat_col(NY,NX)           = 0._r8
-  WatHeldOnCanopy_col(NY,NX)     = 0._r8
-  Prec2Canopy_col(NY,NX)         = 0._r8
-  PrecIntceptByCanopy_col(NY,NX) = 0._r8
-  QVegET_col(NY,NX)              = 0._r8
-  VapXAir2Canopy_col(NY,NX)      = 0._r8
-  HeatFlx2Canopy_col(NY,NX)      = 0._r8
-  CanopyHeatStor_col(NY,NX)      = 0._r8
-  Rain2Soil_col(NY,NX)           = 0._r8
-  Rain2LitR_col(NY,NX)         = 0._r8
-  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)    = 0._r8
+  TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
+  CanopyWat_col(NY,NX)                             = 0._r8
+  WatHeldOnCanopy_col(NY,NX)                       = 0._r8
+  Prec2Canopy_col(NY,NX)                           = 0._r8
+  PrecIntceptByCanopy_col(NY,NX)                   = 0._r8
+  QVegET_col(NY,NX)                                = 0._r8
+  VapXAir2Canopy_col(NY,NX)                        = 0._r8
+  HeatFlx2Canopy_col(NY,NX)                        = 0._r8
+  CanopyHeatStor_col(NY,NX)                        = 0._r8
+  
+  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) = 0._r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0._r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0._r8
   PlantPopu_col(NY,NX)                                = 0._r8

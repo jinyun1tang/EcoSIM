@@ -62,9 +62,9 @@ implicit none
   real(r8) :: HeatSensVapAir2Grnd
   real(r8) :: HeatSensAir2Grnd
   real(r8) :: Radnet2Grnd   !net radiation onto ground [MJ]
-  real(r8) :: LatentHeatEvapAir2Grnd,NetWatFlx2SoiMacP
+  real(r8) :: LatentHeatEvapAir2Grnd,NetWatFlxAir2SoiMacP
   real(r8) :: CumHeatSensAir2LitR
-  real(r8) :: cumHeatSensAir2Soil,NetWatFlx2LitR
+  real(r8) :: cumHeatSensAir2Soil,NetWatFlxAir2LitR
   real(r8) :: PrecHeat2SoiNet,RainPrecAir2LitR
 
 contains
@@ -580,10 +580,10 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ExposedSoilFlux(M,I,J,NY,NX,CumNetWatFlow2LitR,CumNetHeatFlow2LitR,&
+  subroutine ExposedSoilFluxM(I,J,M,NY,NX,CumNetWatFlow2LitR,CumNetHeatFlow2LitR,&
     CumWatFlx2SoiMicP,CumWatFlx2SoiMacP,cumNetHeatFlow2Soil,PrecNet2SoiMicP,PrecNet2SoiMacP, &
     RainPrecHeatAir2LitR,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay,HeatFluxAir2Soi,&
-    NetWatFlx2SoiMicP,NetWatXFlx2SoiMicP,NetWatFlx2SoiMacP)
+    NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
   implicit none
   integer, intent(in) :: M,I,J   !soil heat-flow iteration id
   integer, intent(in) :: NY,NX
@@ -596,9 +596,9 @@ contains
   real(r8), intent(inout) :: TopLayWatVol   !water content in topsoil layer 
   real(r8), intent(out) :: VapXAir2TopLay
   real(r8), intent(out) :: HeatFluxAir2Soi    !heat flux from air to top soil [MJ]
-  real(r8), intent(out) :: NetWatFlx2SoiMacP
-  real(r8), intent(out) :: NetWatXFlx2SoiMicP  !
-  real(r8), intent(out) :: NetWatFlx2SoiMicP
+  real(r8), intent(out) :: NetWatFlxAir2SoiMacP
+  real(r8), intent(out) :: NetWatXFlxAir2SoiMicP  !
+  real(r8), intent(out) :: NetWatFlxAir2SoiMicP
   real(r8) :: PSISV1
   real(r8) :: LWRadGrnd
   real(r8) :: HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,EvapLitR2Soi1,HeatFluxAir2LitR
@@ -614,13 +614,13 @@ contains
 !
   call SumAftEnergyBalanceM(I,J,M,NY,NX,LWRadGrnd,VapXAir2TopLay,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,EvapLitR2Soi1,HeatFluxAir2LitR,HeatFluxAir2Soi,PrecNet2SoiMicP,&
-    PrecNet2SoiMacP,RainPrecHeatAir2LitR,NetWatFlx2SoiMicP,NetWatXFlx2SoiMicP,NetWatFlx2SoiMacP)
+    PrecNet2SoiMacP,RainPrecHeatAir2LitR,NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
 
-  end subroutine ExposedSoilFlux
+  end subroutine ExposedSoilFluxM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AtmLandSurfExchange(I,J,M,NY,NX,PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR,&
+  subroutine AtmLandSurfExchangeM(I,J,M,NY,NX,PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR,&
     ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvapAir2Snow,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
   implicit none
@@ -641,9 +641,9 @@ contains
   real(r8) :: CumWatXFlx2SoiMicP
   real(r8) :: CumNetWatFlow2LitR
   real(r8) :: HeatNetFlx2Snow
-  real(r8) :: NetWatXFlx2SoiMicP
-  real(r8) :: NetWatFlx2SoiMicP
-  real(r8) :: NetWatFlx2SoiMacP
+  real(r8) :: NetWatXFlxAir2SoiMicP
+  real(r8) :: NetWatFlxAir2SoiMicP
+  real(r8) :: NetWatFlxAir2SoiMacP
   integer  :: L
 ! begin_execution
   VapXAir2TopLay       = 0._r8
@@ -663,6 +663,7 @@ contains
   !solve for energy balance over significant snow layer 
   IF(VLSnowHeatCapM_snvr(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
+    write(222,*)I+J/24.,'solvesnow',M,FracSurfSnoFree_col(NY,NX)
     call SolveSnowpackM(I,J,M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvapAir2Snow,HeatSensAir2Snow,&
       HeatNetFlx2Snow,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP,CumNetWatFlow2LitR,&
       CumNetHeatFlow2LitR,cumNetHeatFlow2Soil)
@@ -678,16 +679,16 @@ contains
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
-  IF(FracSurfSnoFree_col(NY,NX).GT.0.0_r8 .AND. (SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO.OR. &
+  IF(FracSurfSnoFree_col(NY,NX).GT.0.0_r8 .AND. (SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .OR. &
     VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
     !Ground partically covered by snow, focus on litter-soil interaction     
-    call ExposedSoilFlux(M,I,J,NY,NX,CumNetWatFlow2LitR,CumNetHeatFlow2LitR,&
+    call ExposedSoilFluxM(I,J,M,NY,NX,CumNetWatFlow2LitR,CumNetHeatFlow2LitR,&
       CumWatFlx2SoiMicP,CumWatFlx2SoiMacP,cumNetHeatFlow2Soil,PrecNet2SoiMicP,PrecNet2SoiMacP,&
       RainPrecHeatAir2LitR,ResistanceLitRLay,TopLayWatVol,VapXAir2TopLay,HeatFluxAir2Soi1,&
-      NetWatFlx2SoiMicP,NetWatXFlx2SoiMicP,NetWatFlx2SoiMacP)
+      NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
   ELSE
 !   ground is fully snow covered, thus no flux from soil & litter
-    call SnowCoveredTopSoilFlux(NY,NX,NetWatFlx2SoiMicP,NetWatXFlx2SoiMicP,NetWatFlx2SoiMacP)
+    call ZeroFlxOverSnowCoveredSoilM(I,J,M,NY,NX,NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
   ENDIF
 
 !
@@ -701,38 +702,40 @@ contains
 ! HFLWRL=total heat flux into litter
 ! FLWV*=total internal vapor flux in soil
 !
-  WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)  = WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)+NetWatFlx2SoiMicP
-  WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX) = WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX)+NetWatXFlx2SoiMicP
-  WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX)  = WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX)+NetWatFlx2SoiMacP
+  WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)  = WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)+NetWatFlxAir2SoiMicP
+  WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX) = WaterFlow2MicptX_3D(3,NUM(NY,NX),NY,NX)+NetWatXFlxAir2SoiMicP
+  WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX)  = WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX)+NetWatFlxAir2SoiMacP
   HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)   = HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)+cumHeatSensAir2Soil
   !fluxes to litter
-  WatFLow2LitR_col(NY,NX)                  = WatFLow2LitR_col(NY,NX)+NetWatFlx2LitR
+  WatFLow2LitR_col(NY,NX)                  = WatFLow2LitR_col(NY,NX)+NetWatFlxAir2LitR
   HeatFLoByWat2LitRi_col(NY,NX)            = HeatFLoByWat2LitRi_col(NY,NX)+CumHeatSensAir2LitR
-
-  end subroutine AtmLandSurfExchange
+  write(222,*)I+J/24.,'AtmLandSurfExchangeM'
+  end subroutine AtmLandSurfExchangeM
 !------------------------------------------------------------------------------------------
 
-  subroutine SnowCoveredTopSoilFlux(NY,NX,NetWatFlx2SoiMicP,NetWatXFlx2SoiMicP,NetWatFlx2SoiMacP)
+  subroutine ZeroFlxOverSnowCoveredSoilM(I,J,M,NY,NX,NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
+  !
   implicit none
+  integer, intent(in) :: I,J,M
   integer, intent(in) :: NY,NX
-  real(r8),intent(out):: NetWatFlx2SoiMicP
-  real(r8),intent(out):: NetWatXFlx2SoiMicP
-  real(r8),intent(out):: NetWatFlx2SoiMacP
+  real(r8),intent(out):: NetWatFlxAir2SoiMicP
+  real(r8),intent(out):: NetWatXFlxAir2SoiMicP
+  real(r8),intent(out):: NetWatFlxAir2SoiMacP
 
 ! begin_execution
-  Radnet2Grnd         = 0.0_r8           !net radiation into soil
-  LatentHeatEvapAir2Grnd = 0.0_r8   !latent heat flux from air and topsoil
-  HeatSensVapAir2Grnd     = 0.0_r8       !convective heat flux from air and topsoil
-  HeatSensAir2Grnd       = 0.0_r8         !sensible heat flux from air to topsoil
+  Radnet2Grnd            = 0.0_r8        !net radiation into soil
+  LatentHeatEvapAir2Grnd = 0.0_r8        !latent heat flux from air and topsoil
+  HeatSensVapAir2Grnd    = 0.0_r8        !convective heat flux from air and topsoil
+  HeatSensAir2Grnd       = 0.0_r8        !sensible heat flux from air to topsoil
 
-  NetWatFlx2SoiMicP       = 0.0_r8     !total water flux from air into top soil
-  NetWatXFlx2SoiMicP      = 0.0_r8        !total water flux from air into soil micropores
-  NetWatFlx2SoiMacP       = 0.0_r8        !total water flux from air into macropores
-  cumHeatSensAir2Soil     = 0.0_r8      !total water associated heat flux from air into soil
-  NetWatFlx2LitR          = 0.0_r8            !total water flux from air to litter
-  CumHeatSensAir2LitR     = 0.0_r8       !total water associated heat flux from air to litter
-  VapXAir2LitR_col(NY,NX) = 0.0_r8  !evaporative flux from air into litter
-  end subroutine SnowCoveredTopSoilFlux  
+  NetWatFlxAir2SoiMicP  = 0.0_r8       !total water flux from air into top soil
+  NetWatXFlxAir2SoiMicP = 0.0_r8       !total water flux from air into soil micropores
+  NetWatFlxAir2SoiMacP  = 0.0_r8       !total water flux from air into macropores
+  cumHeatSensAir2Soil   = 0.0_r8       !total water associated heat flux from air into soil
+  NetWatFlxAir2LitR     = 0.0_r8       !total water flux from air to litter
+  CumHeatSensAir2LitR   = 0.0_r8       !total water associated heat flux from air to litter
+  VapXAir2LitR_col(NY,NX) = 0.0_r8       !evaporative flux from air into litter
+  end subroutine ZeroFlxOverSnowCoveredSoilM  
 !------------------------------------------------------------------------------------------
 
   subroutine SurfLitrSoilWaterExchange(I,J,M,NY,NX,RainEkReducedKsat)
@@ -1046,6 +1049,8 @@ contains
 
   subroutine InitSurfModelM(I,J,M,NY,NX,ResistanceLitRLay,RainEkReducedKsat,PrecNet2SoiMicP,&
     PrecNet2SoiMacP,RainPrecHeatAir2LitR)
+  !
+  !Initialize surface model for iteration M  
   implicit none
   integer, intent(in) :: M   !soil heat-flow iteration id
   integer, intent(in) :: NY,NX,I,J
@@ -1106,19 +1111,21 @@ contains
     Rain2MacPflow2LitR    = AZMAX1(Rain2SoiMacP1_col(NY,NX)-VLairMacP1_vr(NUM(NY,NX),NY,NX))
     RainHeat2Soiflow2LitR = cpw*TairK_col(NY,NX)*(Rain2MicPflow2LitR+Rain2MacPflow2LitR)
     RainPrecAir2LitR      = Rain2LitR1_col(NY,NX)+Rain2MicPflow2LitR+Rain2MacPflow2LitR
-    RainPrecHeatAir2LitR      = RainHeat2LitR1_col(NY,NX)+RainHeat2Soiflow2LitR
+    RainPrecHeatAir2LitR  = RainHeat2LitR1_col(NY,NX)+RainHeat2Soiflow2LitR
     !get flow to soil
     PrecNet2SoiMicP  = Rain2SoiMicP1_col(NY,NX)-Rain2MicPflow2LitR
     PrecNet2SoiMacP  = Rain2SoiMacP1_col(NY,NX)-Rain2MacPflow2LitR
     PrecHeat2SoiNet  = RainHeat2SoilP1_col(NY,NX)-RainHeat2Soiflow2LitR
   ELSE
-    RainPrecAir2LitR = Rain2LitR1_col(NY,NX)
+    RainPrecAir2LitR     = Rain2LitR1_col(NY,NX)
     RainPrecHeatAir2LitR = RainHeat2LitR1_col(NY,NX)
-    PrecNet2SoiMicP  = Rain2SoiMicP1_col(NY,NX)
-    PrecNet2SoiMacP  = Rain2SoiMacP1_col(NY,NX)
-    PrecHeat2SoiNet  = RainHeat2SoilP1_col(NY,NX)
+    PrecNet2SoiMicP      = Rain2SoiMicP1_col(NY,NX)
+    PrecNet2SoiMacP      = Rain2SoiMacP1_col(NY,NX)
+    PrecHeat2SoiNet      = RainHeat2SoilP1_col(NY,NX)
   ENDIF
-
+!  write(211,*)I+J/24.,M,Rain2SoiMicP1_col(NY,NX)+Rain2SoiMacP1_col(NY,NX)+Rain2LitR1_col(NY,NX) &
+!    -RainPrecAir2LitR-PrecNet2SoiMicP-PrecNet2SoiMacP
+    
   Rain2LitR_col(NY,NX) = Rain2LitR_col(NY,NX)+RainPrecAir2LitR
   Rain2Soil_col(NY,NX) = Rain2Soil_col(NY,NX)+PrecNet2SoiMicP+PrecNet2SoiMacP
 
@@ -1268,13 +1275,16 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine PartitionPrecip(I,J,NY,NX)
+  !
+  !Do precipitation partitioning over exposed soil, exposed litter and snow.
+  !
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
   real(r8) :: SnoFall,PrecHeat2Sno
   real(r8) :: RainThrufall2SoiMicP,RainThrufall2SoiMacP,Rain2Snow
   real(r8) :: RainThrufall2LitR,RainThrufall2Soil,RainHeat2LitR,RainHeat2Soil
-  real(r8) :: Rain2ExposedSurf  
+  real(r8) :: Rain2ExposedSurf
   real(r8), parameter :: m2mm=1.e3_r8
 !     PRECA=precipitation+irrigation
 !     PRECD,PRECB=direct,indirect precipn+irrign at soil surface
@@ -1322,18 +1332,21 @@ contains
     RainThrufall2SoiMicP = RainThrufall2Soil*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX)          !water flux to micropore
     RainThrufall2SoiMacP = RainThrufall2Soil*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX)         !water flux to macropore
   ELSE
-  ! no rainfall and irrigation, interception should be zero too, thus evertying should be zero  
-    Rain2Snow            = -PrecIntceptByCanopy_col(NY,NX)*FracSurfAsSnow_col(NY,NX)      !should be zero
-    SnoFall              = 0.0_r8
-    PrecHeat2Sno         = cpw*TairK_col(NY,NX)*Rain2Snow
-    Rain2ExposedSurf     = -PrecIntceptByCanopy_col(NY,NX)*FracSurfSnoFree_col(NY,NX)
-    RainThrufall2LitR    = Rain2ExposedSurf*FracSurfByLitR_col(NY,NX)
-    RainHeat2LitR        = cpw*TairK_col(NY,NX)*RainThrufall2LitR
-    RainThrufall2Soil    = Rain2ExposedSurf*FracSurfBareSoil_col(NY,NX)
-    RainHeat2Soil        = cpw*TairK_col(NY,NX)*RainThrufall2Soil
-    RainThrufall2SoiMicP = RainThrufall2Soil*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX)
-    RainThrufall2SoiMacP = RainThrufall2Soil*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX)
+  ! no rainfall and irrigation, interception should be zero too, thus no throughfall and evertying is zero  
+    Rain2Snow            = 0._r8      !should be zero
+    SnoFall              = 0._r8
+    PrecHeat2Sno         = 0._r8
+    Rain2ExposedSurf     = 0._r8
+    RainThrufall2LitR    = 0._r8
+    RainHeat2LitR        = 0._r8
+    RainThrufall2Soil    = 0._r8
+    RainHeat2Soil        = 0._r8
+    RainThrufall2SoiMicP = 0._r8
+    RainThrufall2SoiMacP = 0._r8
   ENDIF
+  Rain2ExposedSurf_col(NY,NX)=Rain2ExposedSurf
+!  write(211,*)I+J/24.,RainPrecThrufall_col(NY,NX)-Rain2Snow-Rain2ExposedSurf,Rain2ExposedSurf-RainThrufall2LitR-RainThrufall2Soil,&
+!    RainThrufall2Soil-RainThrufall2SoiMicP-RainThrufall2SoiMacP
   PrecHeat_col(NY,NX)=PrecHeat_col(NY,NX)+(PrecHeat2Sno+RainHeat2Soil)*dts_HeatWatTP
 !
 !     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F
@@ -1390,8 +1403,6 @@ contains
   Rain2LitR1_col(NY,NX)     = RainThrufall2LitR*dts_HeatWatTP
   RainHeat2LitR1_col(NY,NX) = RainHeat2LitR*dts_HeatWatTP
 
-  Precip2Sno_col(NY,NX)   = Precip2Sno_col(NY,NX)+SnowFallt_col(NY,NX)+Rain2Snowt_col(NY,NX)
-  RainPrec2Sno_col(NY,NX) = RainPrec2Sno_col(NY,NX)+Rain2Snowt_col(NY,NX)
   end subroutine PartitionPrecip
 !------------------------------------------------------------------------------------------  
 
@@ -1418,7 +1429,7 @@ contains
 
   subroutine SumAftEnergyBalanceM(I,J,M,NY,NX,LWRadGrnd,VapXAir2TopLay,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,EvapLitR2Soi1,HeatFluxAir2LitR,HeatFluxAir2Soi,PrecNet2SoiMicP,&
-    PrecNet2SoiMacP,RainPrecHeatAir2LitR,NetWatFlx2SoiMicP,NetWatXFlx2SoiMicP,NetWatFlx2SoiMacP)
+    PrecNet2SoiMacP,RainPrecHeatAir2LitR,NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
   !
   !Sum up fluxes after doing surface energy balance calculation  
   implicit none
@@ -1434,9 +1445,9 @@ contains
   real(r8), intent(in) :: PrecNet2SoiMicP
   real(r8), intent(in) :: PrecNet2SoiMacP
   real(r8), intent(in) :: RainPrecHeatAir2LitR
-  real(r8), intent(out):: NetWatFlx2SoiMicP  
-  real(r8), intent(out):: NetWatXFlx2SoiMicP
-  real(r8), intent(out):: NetWatFlx2SoiMacP
+  real(r8), intent(out):: NetWatFlxAir2SoiMicP  
+  real(r8), intent(out):: NetWatXFlxAir2SoiMicP
+  real(r8), intent(out):: NetWatFlxAir2SoiMacP
   real(r8) :: FLWVLS,VLSnowHeatCap,VLSnowHeatCap0,TKSX,ENGY
 
 ! begin_execution
@@ -1444,18 +1455,18 @@ contains
 ! GATHER WATER, VAPOR AND HEAT FLUXES INTO FLUX ARRAYS
 ! FOR LATER UPDATES TO STATE VARIABLES
 !
-! NetWatFlx2SoiMicP,NetWatFlx2SoiMacP=water flux from atm to soil micropores,macropores
+! NetWatFlxAir2SoiMicP,NetWatFlxAir2SoiMacP=water flux from atm to soil micropores,macropores
 ! cumHeatSensAir2Soil=convective heat flux from atm to soil
-! NetWatFlx2LitR=water flux from atm to litter
+! NetWatFlxAir2LitR=water flux from atm to litter
 ! CumHeatSensAir2LitR=convective heat flux from atm to litter
 ! FLWVLS=water flux within soil accounting for wetting front
 !
-  NetWatFlx2SoiMicP   = PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
-  NetWatXFlx2SoiMicP  = PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
-  NetWatFlx2SoiMacP   = PrecNet2SoiMacP
+  NetWatFlxAir2SoiMicP   = PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
+  NetWatXFlxAir2SoiMicP  = PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
+  NetWatFlxAir2SoiMacP   = PrecNet2SoiMacP
   cumHeatSensAir2Soil = PrecHeat2SoiNet+HeatFluxAir2Soi+HeatSensVapLitR2Soi1+HeatSensLitR2Soi1
   !total water and heat fluxes to litter
-  NetWatFlx2LitR       = RainPrecAir2LitR+VapXAir2LitR_col(NY,NX)-EvapLitR2Soi1
+  NetWatFlxAir2LitR       = RainPrecAir2LitR+VapXAir2LitR_col(NY,NX)-EvapLitR2Soi1
   CumHeatSensAir2LitR  = RainPrecHeatAir2LitR+HeatFluxAir2LitR-HeatSensVapLitR2Soi1-HeatSensLitR2Soi1
   FLWVLS               = (VLWatMicP1_vr(NUM(NY,NX),NY,NX)-VLWatMicPX1_vr(NUM(NY,NX),NY,NX))*dts_HeatWatTP
 !
@@ -1466,14 +1477,20 @@ contains
 ! HeatXfer2SnoLay=hourly convective heat flux from snow,water,ice transfer
 ! PrecHeat2Snowt_col=convective heat flux from snow,water,ice to snowpack
 !
-  IF(VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .AND. SnowFallt_col(NY,NX).GT.ZEROS(NY,NX))THEN
+   write(222,*)I+J/24.,'checkinit',M, VLSnowHeatCapM_snvr(M,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX),&
+     SnowFallt_col(NY,NX)+Rain2Snowt_col(NY,NX).GT.ZEROS(NY,NX),Rain2Snowt_col(NY,NX),&
+     VLSnowHeatCapM_snvr(M,1,NY,NX),VLHeatCapSnow_snvr(1,NY,NX)
+
+  IF(VLSnowHeatCapM_snvr(M,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) .AND. SnowFallt_col(NY,NX)+Rain2Snowt_col(NY,NX).GT.ZEROS(NY,NX))THEN
+    write(222,*)I+J/24.,'initsnow',M
     SnoXfer2SnoLay_snvr(1,NY,NX)  = SnoXfer2SnoLay_snvr(1,NY,NX)+SnowFallt_col(NY,NX)
     WatXfer2SnoLay_snvr(1,NY,NX)  = WatXfer2SnoLay_snvr(1,NY,NX)+Rain2Snowt_col(NY,NX)
     IceXfer2SnoLay_snvr(1,NY,NX)  = IceXfer2SnoLay_snvr(1,NY,NX)+Ice2Snowt_col(NY,NX)
     HeatXfer2SnoLay_snvr(1,NY,NX) = HeatXfer2SnoLay_snvr(1,NY,NX)+PrecHeat2Snowt_col(NY,NX)
     Prec2Snow_col(NY,NX)          = Prec2Snow_col(NY,NX) + SnowFallt_col(NY,NX)+Rain2Snowt_col(NY,NX)+Ice2Snowt_col(NY,NX)
     PrecHeat2Snow_col(NY,NX)      = PrecHeat2Snow_col(NY,NX)+PrecHeat2Snowt_col(NY,NX)
-
+    RainPrec2Sno_col(NY,NX)       = RainPrec2Sno_col(NY,NX)+Rain2Snowt_col(NY,NX)
+  
     !accumulate new snallfall
     VLSnowHeatCap0 = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
 
@@ -1490,6 +1507,7 @@ contains
 
   !LWRadBySurf_col=longwave emission from litter and surface soil into atmosphere
   LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)+LWRadGrnd
+  
   end subroutine SumAftEnergyBalanceM
 !------------------------------------------------------------------------------------------
   subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
@@ -1581,7 +1599,7 @@ contains
     PrecNet2SoiMacP,RainPrecHeatAir2LitR)
 
 ! updates ResistanceLitRLay
-  call AtmLandSurfExchange(I,J,M,NY,NX,PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR,&
+  call AtmLandSurfExchangeM(I,J,M,NY,NX,PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR,&
     ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvapAir2Snow,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
 

@@ -100,8 +100,8 @@ module SoilWaterDataType
   real(r8),target,allocatable :: QSnoIceXfer2Soil_col(:,:)
   real(r8),target,allocatable :: PrecipAtm2LandSurf_col(:,:)       !precipiation from atmosphere to land surface 
   real(r8),target,allocatable :: RainPrecThrufall_col(:,:)
-  real(r8),target,allocatable :: Precip2Sno_col(:,:)
   real(r8),target,allocatable :: RainPrec2Sno_col(:,:)
+  real(r8),target,allocatable :: Rain2ExposedSurf_col(:,:)
   private :: InitAllocate
   contains
 
@@ -117,8 +117,8 @@ module SoilWaterDataType
 
   implicit none
 
+  allocate(Rain2ExposedSurf_col(JY,JX)); Rain2ExposedSurf_col=0._r8
   allocate(RainPrec2Sno_col(JY,JX)); RainPrec2Sno_col = 0._r8
-  allocate(Precip2Sno_col(JY,JX)); Precip2Sno_col=0._r8
   allocate(RainPrecThrufall_col(JY,JX)); RainPrecThrufall_col=0._r8
   allocate(PrecipAtm2LandSurf_col(JY,JX)); PrecipAtm2LandSurf_col=0._r8
   allocate(QSnoIceXfer2Soil_col(JY,JX)); QSnoIceXfer2Soil_col=0._r8
@@ -218,8 +218,8 @@ module SoilWaterDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(Rain2ExposedSurf_col)
   call destroy(RainPrec2Sno_col)
-  call destroy(Precip2Sno_col)
   call destroy(RainPrecThrufall_col)
   call destroy(PrecipAtm2LandSurf_col)
   call destroy(QSnoIceXfer2Soil_col)
