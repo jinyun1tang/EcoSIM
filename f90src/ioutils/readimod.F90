@@ -279,18 +279,18 @@ module readiMod
       PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
       ALTI(NY,NX)               = ALTIG
       ATCAI(NY,NX)              = ATCAG
-      IDWaterTable(NY,NX)       = iWaterTabelMode
-      OXYE_col(NY,NX)               = ao2_ppm
-      Z2GE_col(NY,NX)               = an2_ppm
+      IDWaterTable_col(NY,NX)   = iWaterTabelMode
+      OXYE_col(NY,NX)           = ao2_ppm
+      Z2GE_col(NY,NX)           = an2_ppm
       CO2EI(NY,NX)              = aco2_ppm
       CH4E_col(NY,NX)           = ach4_ppm
-      Z2OE_col(NY,NX)               = an2o_ppm
+      Z2OE_col(NY,NX)           = an2o_ppm
       ZNH3E_col(NY,NX)          = ZNH3EG
       KoppenClimZone_col(NY,NX) = IETYPG
       FlowDirIndicator(NY,NX)   = grid_mode
       NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
       WtblDepzTile_col(NY,NX)   = WTBLDepz_tile
-      WaterTBLSlope_col(NY,NX)      = DTBLGG
+      WaterTBLSlope_col(NY,NX)  = DTBLGG
 
       RechargNorthSurf(NY,NX) = RCHQNG
       RechargEastSurf(NY,NX)  = RCHQEG

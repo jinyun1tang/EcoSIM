@@ -652,13 +652,13 @@ module Hour1Mod
 !     EHUM=fraction of microbial decompn product allocated to surface humus
 !     EPOC=fraction of SOC decomposition product allocated to surface POC
 !
-  IF(IDWaterTable(NY,NX).LE.1 .OR. IDWaterTable(NY,NX).EQ.3)THEN
+  IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0(NY,NX)
-  ELSEIF(IDWaterTable(NY,NX).EQ.2.OR.IDWaterTable(NY,NX).EQ.4)THEN
+  ELSEIF(IDWaterTable_col(NY,NX).EQ.2.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
-  IF(IDWaterTable(NY,NX).EQ.3.OR.IDWaterTable(NY,NX).EQ.4)THEN
+  IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
     TileWaterTable_col(NY,NX)=DTBLD(NY,NX)
   ENDIF
 
@@ -880,7 +880,7 @@ module Hour1Mod
 !     THETW1,THETWP=water content at PSIEquil,minimum SWC for water table
 !     DepzIntWTBL_col=water table depth
 !
-    IF(IDWaterTable(NY,NX).NE.0)THEN
+    IF(IDWaterTable_col(NY,NX).NE.0)THEN
       IF(FoundWaterTable)exit
 
       IF(THETPZ_vr(L).LT.THETPW .OR. L.EQ.NL(NY,NX))THEN
@@ -1036,7 +1036,7 @@ module Hour1Mod
 !     VOLI,VOLIH=ice volume in micropores,macropores
 !     VOLW,VOLWH=water volume in micropores,macropores
 !     VOLA,VOLAH=total volume in micropores,macropores
-!     ActiveLayDepth=active layer depth
+!     ActiveLayDepZ_col=active layer depth
 !     CDPTH,DLYR=depth to bottom,thickness of soil layer
 !
     IF(FoundActiveLayer)exit
@@ -1057,14 +1057,14 @@ module Hour1Mod
 
       if(.not. goto5701)then
         IF(VLPoreTot.GT.ZEROS2(NY,NX))THEN
-          ActiveLayDepth(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)*AMIN1(1.0_r8,VLiceTot/VLPoreTot)
+          ActiveLayDepZ_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)*AMIN1(1.0_r8,VLiceTot/VLPoreTot)
         ELSE
-          ActiveLayDepth(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)
+          ActiveLayDepZ_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR(3,L,NY,NX)
         ENDIF
         FoundActiveLayer=.true.
       else
         !not active layer
-        ActiveLayDepth(NY,NX)=9999.0_r8
+        ActiveLayDepZ_col(NY,NX)=9999.0_r8
       endif
     ENDIF
   ENDDO

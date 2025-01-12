@@ -59,7 +59,7 @@ implicit none
   real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                       !
   real(r8),allocatable ::  VLairMicP_vr(:,:,:)                      !
   real(r8),allocatable ::  VLWatMicPX1_vr(:,:,:)               !micropore water volume behind wetting front
-
+  real(r8),allocatable ::  Qinflx2SoilM_col(:,:)
   public :: InitHydroThermData
   public :: DestructHydroThermData
   contains
@@ -125,7 +125,7 @@ implicit none
   allocate(RadSW2LitR_col(JY,JX));       RadSW2LitR_col=0._r8    
   allocate(LWRad2Soil_col(JY,JX));       LWRad2Soil_col=0._r8
   allocate(RadSW2Soil_col(JY,JX));       RadSW2Soil_col=0._r8
-
+  allocate(Qinflx2SoilM_col(JY,JX)); Qinflx2SoilM_col=0._r8
   end subroutine InitHydroThermData
 
 !------------------------------------------------------------------------------------------
@@ -188,6 +188,7 @@ implicit none
   call destroy(RadSW2LitR_col)  
   call destroy(LWRad2Soil_col)
   call destroy(RadSW2Soil_col)
+  call destroy(Qinflx2SoilM_col)
 
   end subroutine DestructHydroThermData
 end module HydroThermData

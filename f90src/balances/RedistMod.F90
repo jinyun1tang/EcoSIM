@@ -242,10 +242,10 @@ module RedistMod
     ! drainage in on
     DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
 
-    IF(IDWaterTable(NY,NX).EQ.1)THEN  !stationary
-      IDWaterTable(NY,NX)=3
-    ELSEIF(IDWaterTable(NY,NX).EQ.2)THEN  !mobile
-      IDWaterTable(NY,NX)=4
+    IF(IDWaterTable_col(NY,NX).EQ.1)THEN  !stationary
+      IDWaterTable_col(NY,NX)=3
+    ELSEIF(IDWaterTable_col(NY,NX).EQ.2)THEN  !mobile
+      IDWaterTable_col(NY,NX)=4
     ENDIF
     WtblDepzTile_col(NY,NX)   = DCORPW
     DTBLD(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
@@ -258,7 +258,7 @@ module RedistMod
 ! why 0.00167, time relaxization constant, ?
 ! 4 is mobile tile drainge.
 !
-  IF(IDWaterTable(NY,NX).EQ.2 .OR. IDWaterTable(NY,NX).EQ.4)THEN
+  IF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
 
     ExtWaterTable_col(NY,NX) = ExtWaterTablet0(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
     ExtWaterTable_col(NY,NX) = ExtWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
@@ -266,7 +266,7 @@ module RedistMod
 
   ENDIF
   !update mobile tile water table depth due to drainage
-  IF(IDWaterTable(NY,NX).EQ.4)THEN
+  IF(IDWaterTable_col(NY,NX).EQ.4)THEN
     TileWaterTable_col(NY,NX)=TileWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
       -0.00167_r8*(TileWaterTable_col(NY,NX)-DTBLD(NY,NX))
   ENDIF
@@ -829,6 +829,7 @@ module RedistMod
   TENGY               = 0.0_r8
   DVLiceMicP_vr       = 0._r8
   THeatFlow2Soil_col  = 0._r8
+
   DO L=NU(NY,NX),NL(NY,NX)
     VOLWXX         = VLWatMicP_vr(L,NY,NX)
     VOLIXX         = VLiceMicP_vr(L,NY,NX)
@@ -874,17 +875,15 @@ module RedistMod
     TENGY               = TENGY+ENGY
     !
     !
-    !
+    !the following handels soil layers with significant heat capacity/mass
     IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. VHeatCapacity_vr(L,NY,NX)/(VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
 
-      !     ARTIFICIAL SOIL WARMING
-
-      !     END ARTIFICIAL SOIL WARMING
       THeatSoiThaw_col(NY,NX)   = THeatSoiThaw_col(NY,NX) + THeatSoiThaw_vr(L,NY,NX)
       HeatSource_col(NY,NX)     = HeatSource_col(NY,NX)+HeatSource_vr(L,NY,NX)
       THeatFlow2Soil_col(NY,NX) = THeatFlow2Soil_col(NY,NX) + THeatFlowCellSoil_vr(L,NY,NX)
       TKS_vr(L,NY,NX)           = (ENGY+THeatFlowCellSoil_vr(L,NY,NX)+THeatSoiThaw_vr(L,NY,NX) +HeatSource_vr(L,NY,NX) &
         +THeatRootUptake_vr(L,NY,NX)+HeatIrrigation_vr(L,NY,NX))/VHeatCapacity_vr(L,NY,NX)
+
       if(TKS_vr(L,NY,NX)> 400._r8 .and. isclose(ENGY,0._r8))TKS_vr(L,NY,NX)=TKSX
 
       if(TKS_vr(L,NY,NX)>4.e2 .or. TKS_vr(L,NY,NX)<100._r8)then
@@ -904,8 +903,10 @@ module RedistMod
         call endrun(trim(mod_filename)//' at line',__LINE__)  
       endif
 
+    ELSEIF(L.EQ.NU(NY,NX))then
+      TKS_vr(L,NY,NX)=TKSX
     ELSE
-      TKS_vr(L,NY,NX)=TKS_vr(NUM(NY,NX),NY,NX)
+      TKS_vr(L,NY,NX)=TKS_vr(L-1,NY,NX)      
     ENDIF
     TCS(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     

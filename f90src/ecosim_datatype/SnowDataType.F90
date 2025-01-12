@@ -60,12 +60,14 @@ module SnowDataType
   real(r8),target, allocatable ::  Prec2Snow_col(:,:)                         !precipiation to snow [m3 H2O d-2 h-1]
   real(r8),target, allocatable ::  PrecHeat2Snow_col(:,:)                     !precipitation heat to snow [MJ d-2 h-1]
   real(r8),target, allocatable ::  QSnowH2Oloss_col(:,:)                      !snow water eqv loss to other storage [m3 H2O d-2 h-1]
+  real(r8),target, allocatable :: QSnowHeatLoss_col(:,:)
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSnowData
 
   implicit none
+  allocate(QSnowHeatLoss_col(JY,JX)); QSnowHeatLoss_col=0._r8
   allocate(QSnowH2Oloss_col(JY,JX)); QSnowH2Oloss_col=0._r8
   allocate(PrecHeat2Snow_col(JY,JX)); PrecHeat2Snow_col=0._r8
   allocate(Prec2Snow_col(JY,JX)); Prec2Snow_col=0._r8
@@ -134,6 +136,7 @@ contains
     call destroy(trcSalt_XQS)
   endif
 
+  call destroy(QSnowHeatLoss_col)
   call destroy(QSnowH2Oloss_col)
   call destroy(PrecHeat2Snow_col)
   call destroy(Prec2Snow_col)

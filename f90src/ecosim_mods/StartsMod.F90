@@ -159,8 +159,8 @@ module StartsMod
       call InitHGrid(NY,NX)
 
       call InitLayerDepths(NY,NX)
-    ! ActiveLayDepth=active layer depth (m)
-      ActiveLayDepth(NY,NX)=9999.0_r8
+    ! ActiveLayDepZ_col=active layer depth (m)
+      ActiveLayDepZ_col(NY,NX)=9999.0_r8
 !
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
@@ -1066,8 +1066,8 @@ module StartsMod
 
       call InitLayerDepths(NY,NX)
 
-    ! ActiveLayDepth=active layer depth (m)
-      ActiveLayDepth(NY,NX)=9999.0_r8
+    ! ActiveLayDepZ_col=active layer depth (m)
+      ActiveLayDepZ_col(NY,NX)=9999.0_r8
 !
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes

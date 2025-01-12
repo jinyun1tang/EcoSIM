@@ -264,7 +264,7 @@ implicit none
   VLHeatCapacity2    = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
   VLWatMicP12        = VLWatMicP1_vr(NUM(NY,NX),NY,NX)
   TKS1               = TKSoil1_vr(NUM(NY,NX),NY,NX)
-
+  dLWdTSoil          = 0._r8
   !embedded iteration, local time step size
   dt_litrHeat=dts_HeatWatTP/real(NPR,kind=r8)      !time step for litter flux calculation
   D5000: DO NN=1,NPR

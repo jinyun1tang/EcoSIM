@@ -138,6 +138,7 @@ contains
   real(r8) :: SoilWatErr_test
   real(r8) :: precipErr_test
   real(r8) :: prec2expSErr_test
+  real(r8) :: prec2SnoErr_test
   integer :: ii
 
   call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
@@ -150,7 +151,8 @@ contains
 
       precipErr_test = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
       prec2expSErr_test=Rain2ExposedSurf_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)
-  
+      prec2SnoErr_test= Prec2Snow_col(NY,NX)-RainPrec2Sno_col(NY,NX)-SnoFalPrec_col(NY,NX)  
+
       literH2Oerr_test = LitWatMassBeg_col(NY,NX)-LitWatMassEnd_col(NY,NX)+QRunSurf_col(NY,NX)+WatFLo2LitR_col(NY,NX)
 
       SnowMassErr_test = SnowMassBeg_col(NY,NX)-SnowMassEnd_col(NY,NX)+Prec2Snow_col(NY,NX)-QSnowH2Oloss_col(NY,NX)
@@ -174,6 +176,7 @@ contains
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
         write(110,*)'precipErr_test   =',precipErr_test,RainPrecThrufall_col(NY,NX),RainPrec2Sno_col(NY,NX)
         write(110,*)'prec2expSErr_test=',prec2expSErr_test
+        write(110,*)'prec2SnoErr_test =',prec2SnoErr_test
         write(110,*)'prec, irrig      =',PrecAtm_col(NY,NX),Irrigation_col(NY,NX) 
         write(110,*)'litfall H2O      =',RainLitr_col(NY,NX)
         write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)       
@@ -191,7 +194,8 @@ contains
         write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
         write(110,*)'Snowxfer         =',QSnoWatXfer2Soil_col(NY,NX)+QSnoIceXfer2Soil_col(NY,NX)*DENSICE
         write(110,*)('-',ii=1,50)
-!        call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
+        if(abs(SoilWatErr_test)>1.e-4_r8) &
+        call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif
 
       cycle      

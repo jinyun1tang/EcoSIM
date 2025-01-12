@@ -36,7 +36,7 @@ implicit none
   integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
   integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
-  integer,target,allocatable ::  IDWaterTable(:,:)                   !water table flag from site file
+  integer,target,allocatable ::  IDWaterTable_col(:,:)                   !water table flag from site file
 !----------------------------------------------------------------------
 
 contains
@@ -67,7 +67,7 @@ contains
   allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
   allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
   allocate(MY(JP,JY,JX));       MY=0
-  allocate(IDWaterTable(JY,JX));       IDWaterTable=0
+  allocate(IDWaterTable_col(JY,JX));       IDWaterTable_col=0
   end subroutine InitFlagData
 
 !----------------------------------------------------------------------
@@ -98,7 +98,7 @@ contains
   call destroy(iPlantTurnoverPattern_pft)
   call destroy(iPlantGrainType_pft)
   call destroy(MY)
-  call destroy(IDWaterTable)
+  call destroy(IDWaterTable_col)
   end subroutine DestructFlagData
 
 end module FlagDataType

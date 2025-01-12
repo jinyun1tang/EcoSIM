@@ -251,7 +251,7 @@ contains
   lchkBottomL=.false.
   !loop from surface (L=1) to bottom (L=JS, maximum)
   D9880: DO L=1,JS
-    write(223,*)I+J/24.,L,JS,'VLHeatCapSnowM1_snvr(L,NY,NX)',VLHeatCapSnowM1_snvr(L,NY,NX),VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)
+
     IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       ! active snow layer
       VLSnoDWI1_snvr(L,NY,NX)   = VLDrySnoWE0M_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX)+VLWatSnow0M_snvr(L,NY,NX)+VLIceSnow0M_snvr(L,NY,NX)
@@ -289,7 +289,7 @@ contains
       ! maximum JS snow layers 
       ! next layer is L2
       L2=MIN(JS,L+1)
-      write(223,*)I+J/24.,'notbot',L2,L
+
       !not bottom layer, and it is heat significant
       IF(L.LT.JS .AND. VLHeatCapSnowM1_snvr(L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         !if L==JS-1, L2==JS, so top layer is treated here.
@@ -577,12 +577,10 @@ contains
   D3000: DO MM = 1, NPS
     call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,LatentHeatAir2Sno,&
       HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
-    write(223,*)I+J/24.,M,MM,'SnowAtmosExchangeMM'
 
     call SnowPackIterationMM(dt_snoHeat,I,J,M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
       TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
       CumWatXFlx2SoiMicP,CumSnowWatFLow2LitR,CumNetHeatFlow2LitR,cumNetHeatFlow2Soil)
-    write(223,*)I+J/24.,M,MM,'SnowPackIterationMM'
 
 !
 !     ACCUMULATE SNOWPACK FLUXES TO LONGER TIME STEP FOR
@@ -781,7 +779,7 @@ contains
 
     ENDDO D9860
   ENDDO D3000
-  write(223,*)I+J/24.,M,'SolveSnowpackM'
+
   end subroutine SolveSnowpackM
 !------------------------------------------------------------------------------------------
   subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,&
@@ -816,10 +814,12 @@ contains
   real(r8) :: NetHeatAir2Snow,SnofallRain
   real(r8) :: SnofallDry,Snofallice
   real(r8) :: RadSWbySnow                                !shortwave radiation absorbed by snow [MJ]
+  real(r8) :: snowLMass
 
+  snowLMass=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
 
-  SnowAlbedo=(0.85_r8*VLDrySnoWE0M_snvr(1,NY,NX)+0.30_r8*VLIceSnow0M_snvr(1,NY,NX)+0.06_r8*VLWatSnow0M_snvr(1,NY,NX)) &
-    /(VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX))
+  SnowAlbedo=(0.85_r8*(VLDrySnoWE0M_snvr(1,NY,NX)+SnoFall)+0.30_r8*(VLIceSnow0M_snvr(1,NY,NX)+IceFall) &
+    +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/snowLMass
 
   RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSW2Sno_col(NY,NX)
   RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)    !incoming radiation, short + longwave
@@ -913,7 +913,7 @@ contains
   PrecHeat2Snow_col(NY,NX) = PrecHeat2Snow_col(NY,NX)+HeatSnofall2Snow
   QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)-EvapSublimation2-EVAPW2
   RainPrec2Sno_col(NY,NX)  = RainPrec2Sno_col(NY,NX)+Rainfall
-  write(223,*)'RainPrec2Sno_col',RainPrec2Sno_col(NY,NX)
+  
   if(WatFlowInSnowM_snvr(M,1,NY,NX)>0._r8 .and. isclose(TCSnow_snvr(1,NY,NX),spval))then
     TCSnow_snvr(1,NY,NX)=units%Kelvin2Celcius(TairK_col(NY,NX))  
   endif
@@ -944,8 +944,8 @@ contains
   D9765: DO L=1,JS
     VLDrySnoWE0M_snvr(L,NY,NX)    = VLDrySnoWE0_snvr(L,NY,NX)
     VLWatSnow0M_snvr(L,NY,NX)     = VLWatSnow0_snvr(L,NY,NX)
-    VLIceSnow0M_snvr(L,NY,NX)     = VLIceSnow0_snvr(L,NY,NX)
-    VLHeatCapSnowM1_snvr(L,NY,NX) = VLSnowHeatCapM_snvr(M,L,NY,NX)
+    VLIceSnow0M_snvr(L,NY,NX)     = VLIceSnow0_snvr(L,NY,NX)    
+    VLHeatCapSnowM1_snvr(L,NY,NX) = cps*VLDrySnoWE0_snvr(L,NY,NX)+cpw*VLWatSnow0_snvr(L,NY,NX)+cpi*VLIceSnow0_snvr(L,NY,NX)
     TKSnow1_snvr(L,NY,NX)         = TKSnow0_snvr(L,NY,NX)
   ENDDO D9765
   end subroutine PrepIterSnowLayerM
@@ -1148,8 +1148,11 @@ contains
     ENDIF
     Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
     QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+    QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)+HFLWS
+    Qinflx2SoilM_col(NY,NX)=Qinflx2SoilM_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
   ENDIF
   
+  !update the snow state variables after iteration M
   D60: DO L=1,JS
     VLDrySnoWE_snvr(L,NY,NX)    = VLDrySnoWE0_snvr(L,NY,NX)
     VLIceSnow_snvr(L,NY,NX)     = VLIceSnow0_snvr(L,NY,NX)

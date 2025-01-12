@@ -118,7 +118,7 @@ implicit none
     CEC_vr(L,NY,NX)              = CEC_vr(L-1,NY,NX)
     AEC_vr(L,NY,NX)              = AEC_vr(L-1,NY,NX)
 
-!     IF(IDWaterTable(NY,NX).EQ.0)THEN
+!     IF(IDWaterTable_col(NY,NX).EQ.0)THEN
 !       0.25_r8 is the geometric decreasing ratio (tunable)
 !  or different scheme can be used
     CSoilOrgM_vr(ielmc,L,NY,NX) = 0.25_r8*CSoilOrgM_vr(ielmc,L-1,NY,NX)

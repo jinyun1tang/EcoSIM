@@ -4368,20 +4368,19 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IDWaterTable', dim1name='column',&
+    call restartvar(ncid, flag, varname='IDWaterTable_col', dim1name='column',&
        long_name='water table flag from site file', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable_col,datic_1d)
   else
     !print*,'IDWaterTable'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable_col,datic_1d)  
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IDWaterTable', dim1name='column',&
+    call restartvar(ncid, flag, varname='IDWaterTable_col', dim1name='column',&
        long_name='water table flag from site file', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
-
   endif  
 
   if(flag=='read')then

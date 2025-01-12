@@ -283,7 +283,7 @@ module VisualMod
       WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth_col(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((-(ActiveLayDepth(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)) &
+      ,((-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)) &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2026  FORMAT(A8,3I6,100E12.4)
     ENDIF
