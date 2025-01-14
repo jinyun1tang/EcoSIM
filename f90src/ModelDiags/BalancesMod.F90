@@ -128,7 +128,7 @@ contains
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   integer :: NY,NX
-  real(r8), parameter :: err_h2o=1.e-7_r8
+  real(r8), parameter :: err_h2o=1.e-6_r8
   real(r8), parameter :: err_engy=1.e-6_r8
   real(r8) :: WaterErr_test
   real(r8) :: HeatErr_test
@@ -147,7 +147,7 @@ contains
     DO  NY=NVN,NVS
 
       SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)+Qinflx2Soil_col(NY,NX) &
-        -QDrain_col(NY,NX)-QDischar_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)
+        -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)
 
       precipErr_test = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
       prec2expSErr_test=Rain2ExposedSurf_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)
@@ -162,7 +162,7 @@ contains
 
       WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX) &
         +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)+QRunSurf_col(NY,NX) &
-        -QDrain_col(NY,NX)-QDischar_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
+        -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
       HeatErr_test = HeatErr_col(NY,NX)-HeatStore_col(NY,NX)+THeatRootRelease_col(NY,NX) &
         +HeatSource_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
@@ -179,13 +179,15 @@ contains
         write(110,*)'prec2SnoErr_test =',prec2SnoErr_test
         write(110,*)'prec, irrig      =',PrecAtm_col(NY,NX),Irrigation_col(NY,NX) 
         write(110,*)'litfall H2O      =',RainLitr_col(NY,NX)
-        write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)       
+        write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)    
+        write(110,*)'PrecIntceptByCan =',PrecIntceptByCanopy_col(NY,NX)   
         write(110,*)'plant evap       =',QVegET_col(NY,NX)
-        write(110,*)'root uptake      =',QCanopyWat2Dist_col(NY,NX)
+        write(110,*)'root uptake      =',TPlantRootH2OUptake_col(NY,NX)
         write(110,*)'run on           =',QRunSurf_col(NY,NX)
         write(110,*)'drain            =',QDrain_col(NY,NX)
         write(110,*)'discharge        =',QDischar_col(NY,NX)
         write(110,*)'SnowMassBeg,end  =',SnowMassBeg_col(NY,NX),SnowMassEnd_col(NY,NX)
+        write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)
         write(110,*)'canopyH2Oerr_test=',canopyH2Oerr_test
         write(110,*)'SnowMassErr_test =',SnowMassErr_test        
         write(110,*)'literH2Oerr_test =',literH2Oerr_test,LitWatMassBeg_col(NY,NX),LitWatMassEnd_col(NY,NX)

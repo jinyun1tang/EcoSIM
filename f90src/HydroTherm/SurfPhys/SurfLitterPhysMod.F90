@@ -851,7 +851,6 @@ implicit none
 
     ENDDO  
   ENDDO
-
   
   end subroutine LateralGridsHdryoExch
 

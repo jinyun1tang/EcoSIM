@@ -135,7 +135,7 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SoilHydroProperty(L,NY,NX,I,J)
+  subroutine SoilHydroProperty(I,J,L,NY,NX)
   !
   !Set up soil hydraulic property
   implicit none

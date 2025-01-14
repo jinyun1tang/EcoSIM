@@ -10,10 +10,10 @@ module SoilHeatDatatype
   __FILE__
 
   real(r8),target,allocatable ::  TKSZ(:,:,:)                        !
-  real(r8),target,allocatable ::  TKS_vr(:,:,:)                         !
-  real(r8),target,allocatable ::  TLIceThawMicP(:,:,:)               !hourly accumulated freeze-thaw flux in micropores
+  real(r8),target,allocatable ::  TKS_vr(:,:,:)                      !
+  real(r8),target,allocatable ::  TLIceThawMicP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in micropores, [MJ/d-2/h]
   real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi_vr(:,:,:)    !hourly accumulated freeze-thaw latent heat flux
-  real(r8),target,allocatable ::  TLIceThawMacP(:,:,:)               !hourly accumulated freeze-thaw flux in macropores
+  real(r8),target,allocatable ::  TLIceThawMacP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in macropores, [MJ/d-2/h]
   real(r8),target,allocatable ::  XPhaseChangeHeatL_snvr(:,:,:)      !hourly accumulated latent heat flux from freeze-thaw
   real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)            !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
@@ -42,9 +42,9 @@ contains
   allocate(TKS_vr(0:JZ,JY,JX));    TKS_vr                              = 0._r8
   allocate(HeatFlx2Grnd_col(JY,JX));   HeatFlx2Grnd_col                = 0._r8
   allocate(HeatStore_col(JY,JX));  HeatStore_col                       = 0._r8
-  allocate(TLIceThawMicP(JZ,JY,JX));     TLIceThawMicP                 = 0._r8
+  allocate(TLIceThawMicP_vr(JZ,JY,JX));     TLIceThawMicP_vr                 = 0._r8
   allocate(TLPhaseChangeHeat2Soi_vr(JZ,JY,JX));    TLPhaseChangeHeat2Soi_vr  = 0._r8
-  allocate(TLIceThawMacP(JZ,JY,JX));    TLIceThawMacP                  = 0._r8
+  allocate(TLIceThawMacP_vr(JZ,JY,JX));    TLIceThawMacP_vr                  = 0._r8
   allocate(XPhaseChangeHeatL_snvr(JS,JY,JX));   XPhaseChangeHeatL_snvr = 0._r8
   allocate(VHeatCapacity_vr(0:JZ,JY,JX));   VHeatCapacity_vr           = 0._r8
   allocate(TCS(0:JZ,JY,JX));    TCS                                    = 0._r8
@@ -69,9 +69,9 @@ contains
   call destroy(TKSZ)
   call destroy(TKS_vr)
   call destroy(HeatSource_vr)
-  call destroy(TLIceThawMicP)
+  call destroy(TLIceThawMicP_vr)
   call destroy(TLPhaseChangeHeat2Soi_vr)
-  call destroy(TLIceThawMacP)
+  call destroy(TLIceThawMacP_vr)
   call destroy(HeatStore_col)
   call destroy(XPhaseChangeHeatL_snvr)
   call destroy(VHeatCapacity_vr)

@@ -14,6 +14,7 @@ module EcoSIMAPI
   use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
   use WatsubMod,       only: watsub
   use PlantMgmtDataType, only: NP  
+  use SoilWaterDataType
   use EcoSIMCtrlMod  
   use BalancesMod  
 implicit none
@@ -32,11 +33,12 @@ contains
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1
 
-  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
-
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
+
+  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
+
   if(do_timing)call end_timer('HOUR1',t1)
   !
   !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
@@ -65,7 +67,6 @@ contains
     if(do_timing)call end_timer('PlantModel',t1)    
   endif
 
-  !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
   !
@@ -336,7 +337,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTS' IF NEEDED
-    call SumUpStorage(0,0,NHW,NHE,NVN,NVS)  
   ENDIF  
 !
   if(plant_model)then
@@ -354,7 +354,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
   ENDIF
-  
   if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 ! This is done done every year, because tracer concentrations
@@ -391,6 +390,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
         if(is_restart() .or. is_branch())then
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
+          call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
         endif
       endif
       if(frectyp%lskip_loop)then
@@ -407,7 +407,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-  
+
       if(do_timing)call end_timer_loop()
       
       if(lverb)write(*,*)'hist_update'

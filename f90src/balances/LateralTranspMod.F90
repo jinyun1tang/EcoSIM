@@ -147,8 +147,8 @@ implicit none
 !     THAW,TLIceThawMacP=freeze-thaw flux in micropores,macropores from watsub.f
 !     TLPhaseChangeHeat2Soi=freeze-thaw latent heat flux from watsub.f
 
-    WatIceThawMicP_vr(N3,N2,N1) = WatIceThawMicP_vr(N3,N2,N1)+TLIceThawMicP(N3,N2,N1)
-    WatIceThawMacP_vr(N3,N2,N1) = WatIceThawMacP_vr(N3,N2,N1)+TLIceThawMacP(N3,N2,N1)
+    WatIceThawMicP_vr(N3,N2,N1) = WatIceThawMicP_vr(N3,N2,N1)+TLIceThawMicP_vr(N3,N2,N1)
+    WatIceThawMacP_vr(N3,N2,N1) = WatIceThawMacP_vr(N3,N2,N1)+TLIceThawMacP_vr(N3,N2,N1)
     THeatSoiThaw_vr(N3,N2,N1)   = THeatSoiThaw_vr(N3,N2,N1)+TLPhaseChangeHeat2Soi_vr(N3,N2,N1)
   ENDDO D8575
   end subroutine XGridTranspt

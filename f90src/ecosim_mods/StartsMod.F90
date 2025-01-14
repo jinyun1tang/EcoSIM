@@ -398,13 +398,13 @@ module StartsMod
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
     !
-    PSISE_vr(L,NY,NX)             = PSIPS
-    PSISoilAirEntry(L,NY,NX)      = -1.5E-03_r8
-    RGasFlxPrev_vr(idg_O2,L,NY,NX) = 0.0_r8
-    RGasFlxPrev_vr(idg_CO2,L,NY,NX)    = 0.0_r8
-    RO2AquaSourcePrev_vr(L,NY,NX) = 0.0_r8
-    RGasFlxPrev_vr(idg_CH4,L,NY,NX)                = 0.0_r8
-    RCH4PhysexchPrev_vr(L,NY,NX)  = 0.0_r8
+    PSISE_vr(L,NY,NX)               = PSIPS
+    PSISoilAirEntry(L,NY,NX)        = -1.5E-03_r8
+    RGasFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
+    RGasFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
+    RO2AquaSourcePrev_vr(L,NY,NX)   = 0.0_r8
+    RGasFlxPrev_vr(idg_CH4,L,NY,NX) = 0.0_r8
+    RCH4PhysexchPrev_vr(L,NY,NX)    = 0.0_r8
 
     IF(L.GT.0)THEN
       IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -419,7 +419,7 @@ module StartsMod
       ENDIF
       POROSI_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLMicP_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-      VLMicPt0_col(L,NY,NX) = VLMicP_vr(L,NY,NX)
+!      VLMicPt0_col(L,NY,NX) = VLMicP_vr(L,NY,NX)
       VLMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayert0_vr(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
@@ -494,7 +494,7 @@ module StartsMod
       endif
       POROSI_vr(0,NY,NX)             = 1._r8  !this is added for numerical fixing
       VHeatCapacitySoilM_vr(0,NY,NX) = 0.0_r8
-      VLMicPt0_col(0,NY,NX)          = 0.0_r8
+!      VLMicPt0_col(0,NY,NX)          = 0.0_r8
       XS=XS+VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)*DENSICE
     ENDIF
 

@@ -5,12 +5,13 @@ module Hour1Mod
   use abortutils,     only: endrun,  print_info
   use fileUtil,       only: iulog
   use PlantMod,       only: PlantCanopyRadsModel
-  use EcoSIMConfig, only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
-  use EcoSIMConfig, only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
-  use EcoSIMConfig, only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
-  use EcoSiMParDataMod, only : micpar,pltpar
-  use SoilBGCNLayMod, only : sumORGMLayL
-  use PlantMgmtDataType, only: NP  
+  use EcoSIMConfig     , only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
+  use EcoSIMConfig     , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
+  use EcoSIMConfig     , only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
+  use EcoSiMParDataMod,  only : micpar, pltpar
+  use SoilBGCNLayMod,    only : sumORGMLayL
+  use PlantMgmtDataType, only : NP
+  use BalancesMod,       only : SumUpStorage
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -102,8 +103,8 @@ module Hour1Mod
   if(lverb)write(*,*)'ResetLndscapeAccumlators'
   call ResetLndscapeAccumlators()
 
-  if(lverb)write(*,*)'SetAtmosTracerConcentration'
-  call SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
+  if(lverb)write(*,*)'SetAtmsTracerConc'
+  call SetAtmsTracerConc(I,J,NHW,NHE,NVN,NVS)
 !
 !     RESET FLUX ARRAYS USED IN OTHER SUBROUTINES
 !
@@ -147,6 +148,7 @@ module Hour1Mod
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
   if(lverb)write(*,*)'UpdateLiterPropertz'
   call UpdateLiterPropertz(NHW,NHE,NVN,NVS)
+
 !
 !
 !     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
@@ -313,9 +315,9 @@ module Hour1Mod
   end subroutine ResetLndscapeAccumlators
 !------------------------------------------------------------------------------------------
 
-  subroutine SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
+  subroutine SetAtmsTracerConc(I,J,NHW,NHE,NVN,NVS)
   implicit none
-  integer, intent(in) :: I,NHW,NHE,NVN,NVS
+  integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NX, NY
 !     begin_execution
@@ -364,7 +366,7 @@ module Hour1Mod
       GDD_col(NY,NX) = GDD_col(NY,NX)+TCA_col(NY,NX)/24._r8
     ENDDO
   ENDDO
-  end subroutine SetAtmosTracerConcentration
+  end subroutine SetAtmsTracerConc
 !------------------------------------------------------------------------------------------
 
   subroutine ResetFluxArrays(I,NHW,NHE,NVN,NVS)
@@ -460,16 +462,16 @@ module Hour1Mod
         XNHUEB(1:2,1:2,NY,NX)=0._r8
         XNO3EB(1:2,1:2,NY,NX)=0._r8
 
-        trcx_XER(idx_beg:idx_end,1:2,1:2,NY,NX)=0._r8
-        trcp_ER(idsp_beg:idsp_end,1:2,1:2,NY,NX)=0._r8
+        trcx_XER(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
+        trcp_ER(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
 
-        OMEERhetr(:,:,:,1:2,1:2,NY,NX)=0._r8
-        OMEERauto(:,:,1:2,1:2,NY,NX)=0._r8
+        OMEERhetr(:,:,:,1:2,1:2,NY,NX) = 0._r8
+        OMEERauto(:,:,1:2,1:2,NY,NX)   = 0._r8
 
-        ORMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX)=0._r8
-        OSAER(:,:,1:2,1:2,NY,NX)=0._r8
-        OHMER(1:NumPlantChemElms,:,1:2,1:2,NY,NX)=0._r8
-        OSMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX)=0._r8
+        ORMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
+        OSAER(:,:,1:2,1:2,NY,NX)                    = 0._r8
+        OHMER(1:NumPlantChemElms,:,1:2,1:2,NY,NX)   = 0._r8
+        OSMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
       ENDDO
     ENDDO
   ENDIF
@@ -525,8 +527,8 @@ module Hour1Mod
     !
     !     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
     !     VOLT,VLSoilPoreMicP_vr,VLSoilMicP=layer volume including,excluding rock,macropores
-    !
-    IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).LE.ZERO2)THEN
+    !removed ponding layer
+    IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO .AND. DLYR(3,L,NY,NX).LE.ZERO2)THEN
       VLWatMicP_vr(L,NY,NX) = 0._r8
       VLiceMicP_vr(L,NY,NX) = 0._r8
     ENDIF
@@ -564,13 +566,13 @@ module Hour1Mod
       CCLAY(L,NY,NX)              = CLAY(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
     ELSE
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
-      CSAND(L,NY,NX)=0._r8
-      CSILT(L,NY,NX)=0._r8
-      CCLAY(L,NY,NX)=0._r8
+      CSAND(L,NY,NX) = 0._r8
+      CSILT(L,NY,NX) = 0._r8
+      CCLAY(L,NY,NX) = 0._r8
     ENDIF
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AZMAX1(AMIN1(1.0_r8,MWC2Soil*CSoilOrgM_vr(ielmc,L,NY,NX)))
-      ParticleDens=1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
+      CORGCM       = AZMAX1(AMIN1(1.0_r8,MWC2Soil*CSoilOrgM_vr(ielmc,L,NY,NX)))
+      ParticleDens = 1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
       IF(L.EQ.NU(NY,NX))THEN
 !surface layer
         POROS_vr(L,NY,NX)=AMAX1(POROS_vr(L,NY,NX),1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/ParticleDens))
@@ -583,8 +585,8 @@ module Hour1Mod
         endif
       ENDIF
     ELSE
-      ParticleDens=0._r8
-      POROS_vr(L,NY,NX)=1.0_r8
+      ParticleDens      = 0._r8
+      POROS_vr(L,NY,NX) = 1.0_r8
     ENDIF
     !     VLMicP_vr(L,NY,NX)=AMAX1(POROS_vr(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
@@ -600,7 +602,8 @@ module Hour1Mod
     ENDIF
     EHUM(L,NY,NX) = 0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
     EPOC(L,NY,NX) = 1.0_r8
-    call SoilHydroProperty(L,NY,NX,I,J)
+
+    call SoilHydroProperty(I,J,L,NY,NX)
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
 !     FROM SOC AND TEXTURE
@@ -610,17 +613,17 @@ module Hour1Mod
 !
     if(lverb)write(*,*)'setthermcond'
     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      VORGC=CORGCM*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
-      VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
-      VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
-      NumerSolidThermCond(L,NY,NX)=(1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
+      VORGC                        = CORGCM*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
+      VMINL                        = (CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
+      VSAND                        = CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/ParticleDens
+      NumerSolidThermCond(L,NY,NX) = (1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
         +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP_vr(L,NY,NX) &
         +0.514_r8*ROCK_vr(L,NY,NX)*1.056E-02_r8
       DenomSolidThermCond(L,NY,NX)=(1.253_r8*VORGC+0.514_r8*VMINL+0.386_r8*VSAND) &
         *FracSoiAsMicP_vr(L,NY,NX)+0.514_r8*ROCK_vr(L,NY,NX)
     ELSE
-      NumerSolidThermCond(L,NY,NX)=0._r8
-      DenomSolidThermCond(L,NY,NX)=0._r8
+      NumerSolidThermCond(L,NY,NX) = 0._r8
+      DenomSolidThermCond(L,NY,NX) = 0._r8
     ENDIF
   ENDDO D9975
 
@@ -723,6 +726,8 @@ module Hour1Mod
     !     iResetSoilProf_col=reset disturbance flag
     !
         iResetSoilProf_col(NY,NX)=ifalse
+        call SumUpStorage(I,J,NHW,NHE,NVN,NVS)  
+
       ENDIF
     ENDDO  
   ENDDO
@@ -1047,9 +1052,9 @@ module Hour1Mod
     IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
       !significant ice and pore
       D5700: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-        VLiceTotL=VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
-        VOLWTL=VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
-        VLPoreTotL=VLMicP_vr(LL,NY,NX)+VLMacP_vr(LL,NY,NX)
+        VLiceTotL  = VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
+        VOLWTL     = VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
+        VLPoreTotL = VLMicP_vr(LL,NY,NX)+VLMacP_vr(LL,NY,NX)
         !defined as significant increase in ice content
         goto5701=(VLPoreTotL.GT.ZEROS2(NY,NX).AND.VLiceTotL.LT.ZERO2*VLPoreTotL)
         if(goto5701)exit
@@ -2380,8 +2385,8 @@ module Hour1Mod
     DO  K=1,jcplx
       DOM_PoreTranspFlx(idom_beg:idom_end,K,L,NY,NX)=0._r8
     ENDDO
-    TLIceThawMicP(L,NY,NX)=0._r8
-    TLIceThawMacP(L,NY,NX)=0._r8
+    TLIceThawMicP_vr(L,NY,NX)=0._r8
+    TLIceThawMacP_vr(L,NY,NX)=0._r8
     TLPhaseChangeHeat2Soi_vr(L,NY,NX)=0._r8
     trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX)=0._r8
     totRootLenDens_vr(L,NY,NX)=0._r8

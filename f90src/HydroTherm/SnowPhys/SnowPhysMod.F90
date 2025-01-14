@@ -9,6 +9,8 @@ module SnowPhysMod
   use data_const_mod, only : spval => DAT_CONST_SPVAL  
   use abortutils   , only : endrun   
   use SnowDataType
+  use SurfLitterDataType
+  use SOMDataType
   use GridDataType
   use MiniMathMod
   use ClimForcDataType
@@ -761,13 +763,15 @@ contains
       tEnGYM_snvr(L,NY,NX)=ENGY0+NetHeat2LayL+HeatByFrezThaw
 !      if(I>=108 .and. L==1)write(*,*)'solvewm',M,TKSnow1_snvr(L,NY,NX),TK1X
       if(TK1X/=spval .and. abs(TK1X-TKSnow1_snvr(L,NY,NX))>20._r8 .or. TKSnow1_snvr(L,NY,NX)<200._r8)then
-        write(*,*)I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX),VLHeatCapSnowM1_snvr(L,NY,NX),TairK_col(NY,NX),TKSnow_snvr(L,NY,NX)
-        write(*,*)TKS_vr(NUM(NY,NX),NY,NX),TKS_vr(0,NY,NX)
+        write(*,*)'dh, TK1X, TKSnow1',I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX)
+        write(*,*)'VH, tair,TKSnow0',VLHeatCapSnowM1_snvr(L,NY,NX),TairK_col(NY,NX),TKSnow_snvr(L,NY,NX)
+        write(*,*)'TKS_1, TKS_0',TKS_vr(NUM(NY,NX),NY,NX),TKS_vr(0,NY,NX)
         write(*,*)'mass0',vdry,vwat,vice
         write(*,*)'masst',VLDrySnoWE0M_snvr(L,NY,NX),VLWatSnow0M_snvr(L,NY,NX),VLIceSnow0M_snvr(L,NY,NX)
         write(*,*)'NYNX',NY,NX
         call endrun('crazy snow temperature '//trim(mod_filename),__LINE__)      
       endif
+
       if(cphwat < 0._r8)then
         if(abs(cphwat/VLHeatCapSnowM1_snvr(L,NY,NX))>1.e-3_r8)then
           write(*,*)'too great negative water content',VLWatSnow0M_snvr(L,NY,NX),&
@@ -1068,6 +1072,7 @@ contains
   real(r8) :: ENGY0,ENGY1
   real(r8) :: FLWI,FLWW,FLWS
   real(r8) :: HFLWS
+  real(r8) :: dWatMac,dwatMic
 !     SNOWPACK WATER, ICE, SNOW AND TEMPERATURE
 
   !      if(curday>=176)then
@@ -1125,31 +1130,44 @@ contains
     VLWatSnow0_snvr(1,NY,NX)  = 0._r8
     VLIceSnow0_snvr(1,NY,NX)  = 0._r8
  
-    !add to top soil layer?
-    VLWatMicP1_vr(NUM(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
-    VLiceMicP1_vr(NUM(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
-    ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)
-    VLHeatCapacityA_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
-      +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
-    VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
-      +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
-    VHeatCapacity1_vr(NUM(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)
+    !add ice and water to litter layer
+    ENGY1          = TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)
 
-    QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
-    QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
-    QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
-    
-    IF(VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    ! topsoil layer is there
-      tk1pres                      = TKSoil1_vr(NUM(NY,NX),NY,NX)
-      TKSoil1_vr(NUM(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
-    ELSE
-      TKSoil1_vr(NUM(NY,NX),NY,NX) = TairK_col(NY,NX)
-    ENDIF
-    Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
-    QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
-    QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)+HFLWS
-    Qinflx2SoilM_col(NY,NX)=Qinflx2SoilM_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+    !it is not a pond
+    IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN    
+      VLWatMicP1_vr(0,NY,NX)     = VLWatMicP1_vr(0,NY,NX)+FLWW
+      VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
+      VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
+      TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
+      WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
+    !pond
+    else      
+      VLWatMicP1_vr(NUM(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
+      VLiceMicP1_vr(NUM(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+      ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)
+      VLHeatCapacityA_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+        +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
+      VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
+        +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
+      VHeatCapacity1_vr(NUM(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)
+
+      QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
+      QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
+      QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
+
+      ! topsoil layer is there        
+      IF(VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+        tk1pres                      = TKSoil1_vr(NUM(NY,NX),NY,NX)
+        TKSoil1_vr(NUM(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
+      ELSE
+        TKSoil1_vr(NUM(NY,NX),NY,NX) = TairK_col(NY,NX)
+      ENDIF
+
+      Qinflx2Soil_col(NY,NX)   = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      QSnowHeatLoss_col(NY,NX) = QSnowHeatLoss_col(NY,NX)+HFLWS
+      Qinflx2SoilM_col(NY,NX)  = Qinflx2SoilM_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+    endif
   ENDIF
   
   !update the snow state variables after iteration M

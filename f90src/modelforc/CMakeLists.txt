@@ -18,10 +18,12 @@ target_include_directories(modelforc  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys
   ${CMAKE_BINARY_DIR}/f90src/APIs/
+  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/geochem/box_chem
   ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model
-  ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
+  ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model
+  )
 
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelforc PARENT_SCOPE)

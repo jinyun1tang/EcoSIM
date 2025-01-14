@@ -5,10 +5,10 @@ module EcosimConst
   __FILE__
   real(r8), parameter :: secspday=86400._r8
   real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
-  real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water, J/g/K~MJ/m3/K
-  real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice
-  real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter
-  real(r8), parameter :: cps=2.095_r8          !heat capacity for fresh snow
+  real(r8), parameter :: Cpw=4.186_r8           !volumetric heat capacity for water, J/g/K~MJ/m3/K
+  real(r8), parameter :: cpi=1.9274_r8         !volumetric heat capacity for ice, MJ/m3/K
+  real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter, MJ/K/gC
+  real(r8), parameter :: cps=2.095_r8          !volumetric heat capacity for fresh snow,MJ/m3/K
   real(r8), parameter :: TFice=273.15_r8       !frozen temperature [K]
   real(r8), parameter :: TC2K=273.15_r8        !temperature for converting celcius to Kelvin
   real(r8), parameter :: Tref=273.15_r8        !reference temperature for atmospheric variables [K]
@@ -23,7 +23,7 @@ module EcosimConst
   real(r8), parameter :: TwoPiCON=PICON*2._r8
   real(r8), PARAMETER :: PSIPS=-0.5E-03_r8
   real(r8), parameter :: RadianPerDegree=PICON/180._r8     !pi/180.
-  real(r8), parameter :: LtHeatIceMelt=333.55_r8           !latent heat of fusion release from water to ice, kJ/kg
+  real(r8), parameter :: LtHeatIceMelt=333.55_r8           !latent heat of fusion release from water to ice, kJ/kg, MJ/ton
   real(r8), parameter :: EvapLHTC=2465.0_r8                !latent heat of vaporization of water, kJ/kg
   real(r8), parameter :: SublmHTC=LtHeatIceMelt+EvapLHTC   !sublimation of ice, kJ/kg
   real(r8), parameter :: TCNDG=8.1E-03_r8          !assumed thermal conductivity below lower soil boundary,[MJ m-1 h-1 K-1]
@@ -38,7 +38,7 @@ module EcosimConst
   real(r8), parameter :: OXKM=0.080_r8                    !Km for heterotrophic O2 uptake
   real(r8), parameter :: THETX=1.0E-03_r8                 !minimum air-filled porosity for gas transfer	[m3 m-3]
   real(r8), parameter :: THETPI=0.00_r8          !air content of ice	-
-  real(r8), parameter :: DENSICE=0.92_r8-THETPI  !ice density g/cm3
+  real(r8), parameter :: DENSICE=0.92_r8-THETPI  !ice density g/cm3, ton/m3
   real(r8), parameter :: ZW=0.01_r8              !snowpack surface roughness [m]
   real(r8), parameter :: Catomw=12._r8           !C 12 molar mass,[g/mol]
   real(r8), parameter :: Natomw=14._r8           !N 14 molar mass [g/mol]

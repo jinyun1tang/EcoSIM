@@ -4,6 +4,9 @@ module SnowBalanceMod
   use abortutils,     only: endrun
   use EcoSIMCtrlMod,  only: lverb,snowRedist_model
   use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d  
+  use SoilPropertyDataType
+  use SurfLitterDataType
+  use SOMDataType
   USE SnowDataType
   use GridConsts
   use GridDataType
@@ -11,7 +14,6 @@ module SnowBalanceMod
   use SoilWaterDataType
   use SoilHeatDataType
   use ClimForcDataType
-!  use TFlxTypeMod
   use EcosimConst
   USE SoilPhysDataType
   USE EcoSimSumDataType
@@ -178,35 +180,44 @@ implicit none
       if(L/=1)TKSnow_snvr(L,NY,NX)=spval
     ENDDO D9770
 
-    if(test_exist)then
-      !This is for coupling with external models other than EcoSIM itself
-      !The disappeared snow becomes water/heat flux to soil
-
-      QHeatInfl2Soil = HeatFlo2Surface
-      !dump all ice to micropore, assuming no macropore of the host model
-      QWatinfl2Mic   = FLWW+FLWI*DENSICE+FLWS
+    IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN    
+      ENGY                      = TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
+      VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+FLWW
+      VLiceMicP_vr(0,NY,NX)     = VLiceMicP_vr(0,NY,NX)+FLWI+FLWS/DENSICE
+      VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+      TKS_vr(0,NY,NX)           = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(0,NY,NX)
+      WatFLo2LitR_col(NY,NX)    = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     else
-      QWatinfl2Mic   = 0._r8
-      QHeatInfl2Soil = 0._r8
-      !update top soil layer variables
-      !maybe should be add to surface residual layer?
-      VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
-      VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+      if(test_exist)then
+        !This is for coupling with external models other than EcoSIM itself
+        !The disappeared snow becomes water/heat flux to soil
 
-      ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
+        QHeatInfl2Soil = HeatFlo2Surface
+        !dump all ice to micropore, assuming no macropore of the host model
+        QWatinfl2Mic   = FLWW+FLWI*DENSICE+FLWS
+      else
+        QWatinfl2Mic   = 0._r8
+        QHeatInfl2Soil = 0._r8
+        !update top soil layer variables        
+        VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
+        VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
 
-      VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
-        +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
-        +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
+        ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
 
-      IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-        TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
-      ELSE
-        TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
-      ENDIF
-      Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
-      QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
-      QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)+HeatFlo2Surface
+        VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+          +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
+          +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
+
+        IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+          TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
+        ELSE
+          TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
+        ENDIF
+
+        Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+        QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+        QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)+HeatFlo2Surface
+      endif
     endif
 
   ENDIF

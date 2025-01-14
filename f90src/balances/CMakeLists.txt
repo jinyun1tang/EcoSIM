@@ -6,7 +6,6 @@ set(BALANCES_MOD_SOURCES
   ErosionBalMod.F90
 	RedistMod.F90
   TillageMixMod.F90
-  BalancesMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(balances ${BALANCES_MOD_SOURCES})
