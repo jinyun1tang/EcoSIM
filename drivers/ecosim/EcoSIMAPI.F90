@@ -37,8 +37,6 @@ contains
   if(do_timing)call start_timer(t1)
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
 
-  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
-
   if(do_timing)call end_timer('HOUR1',t1)
   !
   !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'

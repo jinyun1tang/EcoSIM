@@ -31,17 +31,17 @@ set(ECOSIM_DATATYPE_SOURCES
   BalanceCheckDataType.F90
 )
 
-#include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-#include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-#include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/Utils/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/Modelconfig/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/Mesh/)
 include(add_ecosim_library)
 add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})
 #add_library(ecosim_datatype OBJECT ${ECOSIM_DATATYPE_SOURCES})
 
 target_include_directories(ecosim_datatype PRIVATE 
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/)
 
 target_include_directories(ecosim_datatype PUBLIC ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype)
 

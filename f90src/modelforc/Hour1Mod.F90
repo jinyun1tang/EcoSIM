@@ -11,7 +11,7 @@ module Hour1Mod
   use EcoSiMParDataMod,  only : micpar, pltpar
   use SoilBGCNLayMod,    only : sumORGMLayL
   use PlantMgmtDataType, only : NP
-  use BalancesMod,       only : SumUpStorage
+  use BalancesMod,       only : SumUpStorage,BegCheckBalances
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -97,6 +97,7 @@ module Hour1Mod
 
   real(r8) :: tPBOT,tmp
   integer :: NZ,NR,K
+  logical :: dosum
 !     execution begins here
 !  write(111,*)'xxxxxx',I,J,CanopyLeafArea_lpft(1,25,1,1,1,5)
 !
@@ -148,17 +149,19 @@ module Hour1Mod
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
   if(lverb)write(*,*)'UpdateLiterPropertz'
   call UpdateLiterPropertz(NHW,NHE,NVN,NVS)
-
-!
 !
 !     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
 !     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
   if(lverb)write(*,*)'SetLiterSoilPropAftDisturb'
-  call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS)
+  call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS,dosum)
+
+  if(dosum) call SumUpStorage(I,J,NHW,NHE,NVN,NVS)  
+
+  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
   if(lverb)write(*,*)'SetSurfaceProp4SedErosion'
   call SetSurfaceProp4SedErosion(NHW,NHE,NVN,NVS)
-  
+
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 !
@@ -234,8 +237,8 @@ module Hour1Mod
 !     NG=number of uppermost rooted layer
 !     NIXBotRootLayer_rpft=number of lowest rooted layer
 !
-        NGTopRootLayer_pft(NZ,NY,NX) =MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
-        NIXBotRootLayer_pft(NZ,NY,NX)=MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU(NY,NX))
+        NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
+        NIXBotRootLayer_pft(NZ,NY,NX) = MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU(NY,NX))
         DO  NR=1,NumOfCanopyLayers
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU(NY,NX))
         ENDDO
@@ -243,7 +246,6 @@ module Hour1Mod
 
       if(lverb)write(*,*)'CanopyInterceptPrecp'
       CALL CanopyInterceptPrecp(NY,NX)
-
 !
 !     WRITE SW AND PAR ALBEDO
 
@@ -692,9 +694,10 @@ module Hour1Mod
   end subroutine ResetSurfResidualProperty
 !------------------------------------------------------------------------------------------
 
-  subroutine SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS)
+  subroutine SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS,dosum)
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+  logical :: dosum
   integer :: NY,NX
 
   real(r8) :: PSISK(0:100),THETK(100)
@@ -705,7 +708,7 @@ module Hour1Mod
 !     iResetSoilProf_col=disturbance flag
 !     SoiBulkDensity_vr,BKDSI=current,initial bulk density
 !
-
+  dosum=.false.
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       IF(iResetSoilProf_col(NY,NX).NE.ifalse)THEN
@@ -725,9 +728,8 @@ module Hour1Mod
     !
     !     iResetSoilProf_col=reset disturbance flag
     !
-        iResetSoilProf_col(NY,NX)=ifalse
-        call SumUpStorage(I,J,NHW,NHE,NVN,NVS)  
-
+        iResetSoilProf_col(NY,NX) = ifalse
+        dosum                     = .true.
       ENDIF
     ENDDO  
   ENDDO
@@ -972,35 +974,35 @@ module Hour1Mod
       BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
         +CLAY(NU(NY,NX),NY,NX)+1.82E-06*SoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)
       IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-        CORGM=MWC2Soil*SoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)/BKVLNX
-        CSoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)=orgcden*CORGM
-        CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
-        CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
-        CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
+        CORGM                               = MWC2Soil*SoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)/BKVLNX
+        CSoilOrgM_vr(ielmc,NU(NY,NX),NY,NX) = orgcden*CORGM
+        CSAND(NU(NY,NX),NY,NX)              = SAND(NU(NY,NX),NY,NX)/BKVLNX
+        CSILT(NU(NY,NX),NY,NX)              = SILT(NU(NY,NX),NY,NX)/BKVLNX
+        CCLAY(NU(NY,NX),NY,NX)              = CLAY(NU(NY,NX),NY,NX)/BKVLNX
       ELSE
-        CORGM=0._r8
-        CSoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)=0._r8
-        CSAND(NU(NY,NX),NY,NX)=0._r8
-        CSILT(NU(NY,NX),NY,NX)=1.0
-        CCLAY(NU(NY,NX),NY,NX)=0._r8
+        CORGM                               = 0._r8
+        CSoilOrgM_vr(ielmc,NU(NY,NX),NY,NX) = 0._r8
+        CSAND(NU(NY,NX),NY,NX)              = 0._r8
+        CSILT(NU(NY,NX),NY,NX)              = 1.0
+        CCLAY(NU(NY,NX),NY,NX)              = 0._r8
       ENDIF
       
       IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
         D50=1.0_r8*CCLAY(NU(NY,NX),NY,NX)+10._r8*CSILT(NU(NY,NX),NY,NX) &
           +100._r8*CSAND(NU(NY,NX),NY,NX)+100._r8*CORGM
-        ZD50=0.041*(ppmc*D50)**0.167_r8
-        SoiSurfRoughness(NY,NX)=SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
-        CER(NY,NX)=((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
-        XER(NY,NX)=((D50+5.0_r8)/300._r8)**0.25_r8
+        ZD50                    = 0.041*(ppmc*D50)**0.167_r8
+        SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
+        CER(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
+        XER(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
 
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
           +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU(NY,NX),NY,NX)))
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
 
-        ParticleDensitySurfLay(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
-        VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
-        VLS(NY,NX)=3.6E+03_r8*9.8_r8*(ParticleDensitySurfLay(NY,NX)-1.0_r8) &
+        ParticleDensitySurfLay(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
+        VISCWL                        = VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
+        VLS(NY,NX)                    = 3.6E+03_r8*9.8_r8*(ParticleDensitySurfLay(NY,NX)-1.0_r8) &
           *(ppmc*D50)**2/(18.0_r8*VISCWL)
       ENDIF
     ENDDO

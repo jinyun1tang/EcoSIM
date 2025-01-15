@@ -11,10 +11,10 @@ add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
 #install(TARGETS modelconfig OBJECTS DESTINATION lib)  
 
 target_include_directories(modelconfig  PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
   PUBLIC
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelconfig PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelconfig)

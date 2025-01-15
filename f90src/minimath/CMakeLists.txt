@@ -8,7 +8,7 @@ include(add_ecosim_library)
 add_ecosim_library(minimath ${MINIMATH_SOURCES})
 
 target_include_directories(minimath  PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/)
 
 
 

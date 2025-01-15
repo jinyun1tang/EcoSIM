@@ -6,8 +6,8 @@ include(add_ecosim_executable)
 add_ecosim_executable(mock.x ${MOCK_DRIVER_SOURCES})
 
 target_include_directories(mock.x  PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 #include(add_ecosim_library)
 #add_ecosim_library(mock_driver ${MOCK_DRIVER_SOURCES})

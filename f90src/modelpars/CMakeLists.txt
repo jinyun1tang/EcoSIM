@@ -12,15 +12,15 @@ add_ecosim_library(modelpars ${MODELPARS_SOURCES})
 #install(TARGETS modelpars OBJECTS DESTINATION lib)
 
 target_include_directories(modelpars  PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/)
 
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelpars PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelpars)
 
 message("install install install")
-file(GLOB files_with_wildcard "${CMAKE_BINARY_DIR}/f90src/modelpars/libmodelpars.*")
+file(GLOB files_with_wildcard "${CMAKE_BINARY_DIR}/f90src/Modelpars/libmodelpars.*")
 if (files_with_wildcard)
 message("lib exists")
 foreach(file ${files_with_wildcard})
