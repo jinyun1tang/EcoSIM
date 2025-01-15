@@ -1080,35 +1080,45 @@ contains
   !      endif
   !
   !
+  
   if (M.NE.NPH)then
 
-    ENGY0   = VLSnowHeatCapM_snvr(M+1,1,NY,NX)*TKSnow0_snvr(1,NY,NX)  
-    VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
-    VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
-    VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
-
     VLSnowHeatCapM_snvr(M+1,1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
-    
-    IF(VLSnowHeatCapM_snvr(M+1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-      TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLSnowHeatCapM_snvr(M+1,1,NY,NX)
-    ELSE
-      TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
-    ENDIF
-  ELSE
-    ENGY0   = VLHeatCapSnow_snvr(1,NY,NX)*TKSnow0_snvr(1,NY,NX)  
-    VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
-    VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
-    VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
 
+    if(any((/cumDrySnoFlxByRedistribut(NY,NX)/=0._r8,cumWatFlxBySnowRedistribut(NY,NX)/=0._r8,&
+      cumIceFlxBySnowRedistribut(NY,NX)/=0._r8/)))then
+      ENGY0   = VLSnowHeatCapM_snvr(M+1,1,NY,NX)*TKSnow0_snvr(1,NY,NX)  
+      VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
+      VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
+      VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
+
+      VLSnowHeatCapM_snvr(M+1,1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
+      
+      IF(VLSnowHeatCapM_snvr(M+1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+        TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLSnowHeatCapM_snvr(M+1,1,NY,NX)
+      ELSE
+        TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
+      ENDIF
+    endif
+  ELSE
     VLHeatCapSnow_snvr(1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
-    
-    IF(VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-      TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLHeatCapSnow_snvr(1,NY,NX)
-      !the following line may introduce error in energy 
-    ELSE
-      TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
-    ENDIF
-    
+    if(any((/cumDrySnoFlxByRedistribut(NY,NX)/=0._r8,cumWatFlxBySnowRedistribut(NY,NX)/=0._r8,&
+      cumIceFlxBySnowRedistribut(NY,NX)/=0._r8/)))then    
+      ENGY0   = VLHeatCapSnow_snvr(1,NY,NX)*TKSnow0_snvr(1,NY,NX)  
+      VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
+      VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
+      VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
+
+      VLHeatCapSnow_snvr(1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
+      
+      IF(VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+        TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLHeatCapSnow_snvr(1,NY,NX)
+        !the following line may introduce error in energy 
+      ELSE
+        TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
+      ENDIF
+
+    endif  
   ENDIF
 
   if(VLWatSnow0_snvr(1,NY,NX)<0._r8)then    
