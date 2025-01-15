@@ -591,10 +591,10 @@ module StartsMod
 ! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
 ! ASP_col=aspect angle in degree
   ALTY=0.0_r8
-  write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-    'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
+  !write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
+  ! 'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
-1112    FORMAT(2A4,4A6,20A12)
+!1112    FORMAT(2A4,4A6,20A12)
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)  = ZERO*DH(NY,NX)*DV(NY,NX)
@@ -895,6 +895,7 @@ module StartsMod
       VGeomLayert0_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)
       VLSoilMicPMass_vr(L,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
+      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX)
       DLYRI_3D(3,L,NY,NX) = VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR(3,L,NY,NX)     = DLYRI_3D(3,L,NY,NX)
     ELSE

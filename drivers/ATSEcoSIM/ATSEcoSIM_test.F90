@@ -9,9 +9,10 @@ program EcoATSTest
   type (BGCState) :: state
   type (BGCProperties) :: props
   type (BGCSizes) :: sizes
-  integer :: NY, NX, L
+  integer :: NY, NX, L, ii
   integer :: ncells_per_col_, ncol
-   
+  real, dimension(2) :: rain_array = (/1.0e-6, 1.0e-6/)
+
   NX = 1
   NYS = 1
   ncells_per_col_ = 100
@@ -22,13 +23,20 @@ program EcoATSTest
   sizes%ncells_per_col_ = 100
   sizes%num_columns = 1
 
-
   call Init_ATSEcoSIM_driver()
 
   call Init_EcoSIM(sizes)
 
-  ! Call Run_EcoSIM_one_step to advance EcoSIM
-  call Run_EcoSIM_one_step(sizes)
+  do ii = 1, size(rain_array)
+    write(*,*) "For p_rain = ", rain_array(ii)
+
+    do NY=1,NYS
+      p_rain(NY) = rain_array(ii)
+    enddo
+
+    ! Call Run_EcoSIM_one_step to advance EcoSIM
+    call Run_EcoSIM_one_step(sizes)
+  end do
 
 end program EcoATSTest
 
@@ -46,10 +54,13 @@ subroutine Init_ATSEcoSIM_driver()
   type (BGCSizes) :: sizes
   integer :: NY, NX, L
   integer :: ncells_per_col_, ncol
+  real(r8) :: dist_step, dist_tot
+
   NX = 1
   NYS = 1
   ncells_per_col_ = 100
   ncol = 1
+  dist_step = 0.1
 
   ! Initialize sizes structure
   sizes%num_components = 1
@@ -59,6 +70,7 @@ subroutine Init_ATSEcoSIM_driver()
   ! needed in starts
   pressure_at_field_capacity = -0.001
   pressure_at_wilting_point = -0.001
+  heat_capacity = 7.5e-5
 
   !need to allocate these because c_f_pointer sets them in the actual coupler
   allocate(a_ASP(ncells_per_col_))
@@ -79,12 +91,15 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_MATP(ncells_per_col_, ncol))
   allocate(a_PORO(ncells_per_col_, ncol))
 
+ 
+
   do NY=1,NYS
     do L=1,ncells_per_col_
       a_AREA3(L,NY) = 0.1
       !DH(NY,NX) = 0.316229
       !DV(NY,NX) = 0.316229
-      a_CumDepz2LayerBot_vr(L,NY) = 0.0
+      a_CumDepz2LayerBot_vr(L,NY) = dist_tot
+      dist_tot = dist_tot+dist_step
       a_BKDSI(L,NY) = 26000.0/1.0e3_r8
       !a_CORGC(L,NY) = 0.0
       !a_CORGN(L,NY) = 0.0
@@ -101,8 +116,9 @@ subroutine Init_ATSEcoSIM_driver()
     swrad(NY) = 400.0*0.0036_r8
     sunrad(NY) =  219.78*0.0036_r8
     
-    p_rain(NY) = 0.0
+    !p_rain(NY) = 0.0
     !p_rain(NY) = 3.e-8*1000.0_r8*3600.0_r8
+
   enddo
 
 end subroutine Init_ATSEcoSIM_driver

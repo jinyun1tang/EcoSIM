@@ -41,8 +41,8 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
-  write(*,*) "capacity_cells: ", state%temperature%cap_rows
-  write(*,*) "capacity_columns: ", state%temperature%cap_cols
+  !write(*,*) "capacity_cells: ", state%temperature%cap_rows
+  !write(*,*) "capacity_columns: ", state%temperature%cap_cols
 
   size_col_pad = size_col+30
 

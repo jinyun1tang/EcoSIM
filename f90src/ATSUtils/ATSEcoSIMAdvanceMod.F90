@@ -14,9 +14,12 @@ module ATSEcoSIMAdvanceMod
   use ClimForcDataType 
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoi1_vr, VHeatCapacity1_vr, &
-      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars are double defined
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, VLairMicP1_vr, &
+      FracSoiPAsWat_vr, FracSoiPAsIce_vr, FracSoiPAsAir_vr !need the only as some vars are double defined
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
+  use EcoSIMCtrlDataType
+  use MiniMathMod
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -43,6 +46,7 @@ implicit none
   !real(r8) :: SnowDepth_col(JY,JX)
   real(r8) :: PrecAsRain(JY,JX)
   real(r8) :: PrecAsSnow(JY,JX)
+  real(r8) :: VLTSoiPore
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
@@ -100,6 +104,20 @@ implicit none
       PSISM1_vr(L,NY,NX) = a_MATP(L,NY)
       POROS_vr(L,NY,NX) = a_PORO(L,NY)
       !AREA3(L,NY,NX) = a_AREA3(L,NY)
+      !Setting the soil moisture for snow-soil heat exchange
+      VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
+      IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN
+        !fraction as water
+        FracSoiPAsWat_vr(L,NY,NX)=AZMAX1t(VLWatMicP1_vr(L,NY,NX)/VLTSoiPore)
+        !fraction as ice
+        FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
+        !fraction as air
+        FracSoiPAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+      ELSE
+        FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
+        FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
+        FracSoiPAsAir_vr(L,NY,NX)=0.0_r8
+      ENDIF
    ENDDO
     IF(TCA_col(NY,NX).GT.TSNOW)THEN
       PrecAsRain(NY,NX)=RAINH(NY,NX)
@@ -119,6 +137,8 @@ implicit none
   !write(*,*) "before stage: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
+
+  !call UpdateSoilMoistureFromATS(I,J,NHW,NHE,NVN,NVS)
 
   !write(*,*) "after stage: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
@@ -150,5 +170,36 @@ implicit none
   !close(10)
 
   end subroutine RunEcoSIMSurfaceBalance
+
+  subroutine UpdateSoilMoistureFromATS(I,J,NHW,NHE,NVN,NVS)
+  implicit none
+  
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: NY,NX, L    
+  real(r8) :: VLTSoiPore
+
+  !Modified to remove all MacP1 as it should all be zero
+  DO NY=1,NYS
+    DO L=NU(NY,NX),NL(NY,NX)
+      !VLTSoiPore = VLSoilMicP_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)
+      VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
+      IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN
+        !fraction as water
+        FracSoiPAsWat_vr(L,NY,NX)=AZMAX1t(VLWatMicP1_vr(L,NY,NX)/VLTSoiPore)
+        !fraction as ice
+        FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
+        !fraction as air
+        FracSoiPAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+      ELSE
+        FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
+        FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
+        FracSoiPAsAir_vr(L,NY,NX)=0.0_r8
+      ENDIF
+      !write(*,*) "NY, NX ", NY, NX
+      !write(*,*) "FracSoiPAsWat_vr(L,NY,NX): ", FracSoiPAsWat_vr(L,NY,NX)
+    ENDDO
+  ENDDO
+  end subroutine UpdateSoilMoistureFromATS
 
 end module ATSEcoSIMAdvanceMod

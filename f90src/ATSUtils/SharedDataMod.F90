@@ -70,14 +70,14 @@ Module SharedDataMod
     integer, intent(in) :: ncol  !NUMBER of cols
     !set # of soil layers
     !JZSOI=JZs
-    write(*,*) "In Shared data before setting: "
-    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    !write(*,*) "In Shared data before setting: "
+    !write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
     
     JX=1;JY=ncol
     JZ = ncells_per_col_
    
-    write(*,*) "In Shared data after setting: "
-    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    !write(*,*) "In Shared data after setting: "
+    !write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
 
     allocate(a_csand(ncells_per_col_,ncol))
     allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction

@@ -112,8 +112,8 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  write(*,*) "Before startsim: "
-  write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
+  !write(*,*) "Before startsim: "
+  !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
 
   call startsim(NHW,NHE,NVN,NVS)
 
@@ -124,8 +124,8 @@ implicit none
     ENDDO
   ENDDO
  
-  write(*,*) "After startsim: "
-  write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
+  !write(*,*) "After startsim: "
+  !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
 
   !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
 
