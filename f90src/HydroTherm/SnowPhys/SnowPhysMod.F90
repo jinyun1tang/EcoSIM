@@ -422,6 +422,18 @@ contains
           call SnowTopSoilExch(dt_SnoHeat,M,L,NY,NX,VapCond1,VapSnoSrc,VLairSno1,TCND1W,&
             VapFlxSno2Soi1,HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS)
 
+          write(*,*) "After SnowTopSoilExch: -----------------------------"
+          write(*,*) "M, L, NY, NX ", M, L, NY, NX
+          write(*,*) "VapCond1: ", VapCond1
+          write(*,*) "VapSnoSrc: ", VapSnoSrc
+          write(*,*) "TCND1W: ", TCND1W
+          write(*,*) "VapFlxSno2Soi1: ", VapFlxSno2Soi1
+          write(*,*) "HeatConvFlxSno2Soi1: ", HeatConvFlxSno2Soi1
+          write(*,*) "HeatCndFlxSno2Soi: ", HeatCndFlxSno2Soi
+          write(*,*) "VapCond2: ", VapCond2
+          write(*,*) "PSISV1: ", PSISV1
+          write(*,*) "TCNDS: ", TCNDS
+          write(*,*) "----------------------------------------------------"
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
           !

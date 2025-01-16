@@ -52,11 +52,6 @@ implicit none
   call set_ecosim_solver(1, 1, 1, 1)
   call InitAlloc(NOMicrobeGuilds=1)
 
-  !write(*,*) "AREA test: "
-  !write(*,*) "AREA(3,0,NY,NX): ", AREA(3,0,1,NX)
-  !write(*,*) "a_AREA3(NX,1): ", a_AREA3(1,1)
-  !write(*,*) "a_AREA3(NX,0): ", a_AREA3(0,1)
-
   !setting a few variables 
   FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays = 1 !Is the number of layers down the roots go
@@ -112,9 +107,6 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  !write(*,*) "Before startsim: "
-  !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
-
   call startsim(NHW,NHE,NVN,NVS)
 
   do NY=1,NYS
@@ -123,11 +115,31 @@ implicit none
       !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
     ENDDO
   ENDDO
- 
-  !write(*,*) "After startsim: "
-  !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,1,1,1), ", a_AREA3(L,NY) = ", a_AREA3(1,1)
 
-  !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
+  NY=1 
+  L=1
+  write(*,*) "End Init_EcoSIM_Soil, L, NY, NX ", L, NY, NX, "---------------"
+  write(*,*) "pressure_at_field_capacity =", pressure_at_field_capacity
+  write(*,*) "pressure_at_wilting_point =", pressure_at_wilting_point
+  write(*,*) "heat_capacity =", heat_capacity
+  write(*,*) "a_ASP =", a_ASP(NY)
+  write(*,*) "tairc =", tairc(NY)
+  write(*,*) "vpair =", vpair(NY)
+  write(*,*) "uwind =", uwind(NY)
+  write(*,*) "swrad =", swrad(NY)
+  write(*,*) "sunrad =", sunrad(NY)
+  write(*,*) "p_rain =", p_rain(NY)
+  write(*,*) "surf_e_source =", surf_e_source(NY)
+  write(*,*) "surf_w_source =", surf_w_source(NY)
+  write(*,*) "surf_snow_depth =", surf_snow_depth(NY)
+  write(*,*) "a_TEMP =", a_TEMP(L,NY)
+  write(*,*) "a_CumDepz2LayerBot_vr =", a_CumDepz2LayerBot_vr(L,NY)
+  write(*,*) "a_AREA3 =", a_AREA3(L,NY)
+  write(*,*) "a_BKDSI =", a_BKDSI(L,NY)
+  write(*,*) "a_WC =", a_WC(L,NY)
+  write(*,*) "a_MATP =", a_MATP(L,NY)
+  write(*,*) "a_PORO =", a_PORO(L,NY)
+  write(*,*) "-----------------------------------------------------------------"
 
   end subroutine Init_EcoSIM_Soil
 

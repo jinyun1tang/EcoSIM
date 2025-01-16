@@ -49,31 +49,31 @@ contains
   allocate(temp_array(size_col, num_cols))
 
   data_ptr = state%temperature%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP=data2D(:,:)
 
   data_ptr = props%depth%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_CumDepz2LayerBot_vr = data2D(:,:)
 
   data_ptr = props%dz%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_dz = data2D(:,:)
 
   data_ptr = props%volume%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_Volume = data2D(:,:)
 
   data_ptr = props%volume%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_AREA3 = data2D(:,:)
 
   data_ptr = state%water_content%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_WC = data2D(:,:)
 
   data_ptr = props%volume%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_AreaZ = data2D(:,:)
 
   do i = 1, size_col
@@ -81,39 +81,39 @@ contains
   end do
 
   data_ptr = state%temperature%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP = data2D(:,:)
 
   data_ptr = state%bulk_density%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_BKDSI = data2D(:,:)
 
   data_ptr = state%matric_pressure%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_MATP = data2D(:,:)
 
   data_ptr = state%porosity%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col_pad])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_PORO = data2D(:,:)
 
   data_ptr = props%liquid_saturation%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_LSAT = data2D(:,:)
 
   data_ptr = props%relative_permeability%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_RELPERM = data2D(:,:)
 
   data_ptr = state%hydraulic_conductivity%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_HCOND = data2D(:,:)
 
   data_ptr = props%rooting_depth_fraction%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_FC = data2D(:,:)
 
   data_ptr = state%subsurface_water_source%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_SSWS = data2D(:,:)
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
