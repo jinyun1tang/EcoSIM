@@ -213,7 +213,7 @@ module WatsubMod
 !      twatmass0(NY,NX)=twatmass1(NY,NX)
     ENDDO
   ENDDO  
-!  if(I==141 .and. J==13 .and. M==7)stop
+
   end subroutine checkMassBalance
 !------------------------------------------------------------------------------------------  
 
@@ -637,6 +637,8 @@ module WatsubMod
               WaterFlow2Macpt_3D(N,N6,N5,N4)  = WaterMacpFlow              
               HeatFlow2Soili_3D(N,N6,N5,N4)   = HeatByDarcyFlowMicP+HeatByConvectVapFlux+HeatByFlowMacP
 
+              WaterFlow2Micptl_3D(N,N6,N5,N4) = WaterFlow2Micpt_3D(N,N6,N5,N4)
+              WaterFlow2Macptl_3D(N,N6,N5,N4) = WaterFlow2Macpt_3D(N,N6,N5,N4)
           !   compute heat flux by conduction
               call Solve4HeatByConduction(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,HeatByConvectVapFlux,HeatFluxAir2Soi(NY,NX))
 
@@ -693,19 +695,21 @@ module WatsubMod
       ENDDO D4400
     ENDDO
   ENDDO  
+  !only do this for 
 
-  DO NX=NHW,NHE-1
-    DO NY=NVN,NVS-1
-      N1=NX;N2=NY
-      DO L=NU(N2,N1),NL(NY,NX)
-        N3=L    
-        DO N=FlowDirIndicator(N2,N1),2
-          QWatIntLaterFlow_col(N2,N1)  = QWatIntLaterFlow_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
-          QWatIntLaterFlowM_col(N2,N1) = QWatIntLaterFlowM_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
-        ENDDO
+  DO N=FlowDirIndicator(N2,N1),2
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        N1=NX;N2=NY
+        DO L=NU(N2,N1),NL(NY,NX)
+          N3=L    
+          QWatIntLaterFlow_col(N2,N1)  = QWatIntLaterFlow_col(N2,N1)+WaterFlow2Micptl_3D(N,N3,N2,N1)+WaterFlow2Macptl_3D(N,N3,N2,N1)
+          QWatIntLaterFlowM_col(N2,N1) = QWatIntLaterFlowM_col(N2,N1)+WaterFlow2Micptl_3D(N,N3,N2,N1)+WaterFlow2Macptl_3D(N,N3,N2,N1)
+        ENDDO        
       ENDDO  
     ENDDO
   ENDDO
+
   end subroutine Subsurface3DInternalFlowM
 !------------------------------------------------------------------------------------------
 
@@ -1590,6 +1594,9 @@ module WatsubMod
   real(r8) :: VLWatSoi,scalar
   real(r8) :: THETWH,Z3S
 
+  WaterFlow2Micptl_3D=0._r8  
+  WaterFlow2Macptl_3D=0._r8        
+
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
       D9885: DO L=NUM(NY,NX),NL(NY,NX)
@@ -2367,8 +2374,8 @@ module WatsubMod
       
       VLHeatCapacityBX     = cpw*VLWatMacP1X+cpi*VLiceMacP1_vr(L,NY,NX)
       !where is the following equation come from?
-      MacPIceHeatFlxFrezPt = VLHeatCapacityBX*(TFICE-TK1App)/((1.0_r8+6.2913E-03_r8*TFICE) &
-          *(1.0_r8-0._r8*0.10_r8*PSISMX))*dts_wat
+      MacPIceHeatFlxFrezPt = VLHeatCapacityBX*(TFICE-TK1App)/((1.0_r8+6.2913E-03_r8*TFICE))*dts_wat 
+!          /(1.0_r8-0._r8*0.10_r8*PSISMX)
 
       !Ice thawed, absorb heat
       IF(MacPIceHeatFlxFrezPt.LT.0.0_r8)THEN        
@@ -2390,7 +2397,7 @@ module WatsubMod
       
       VLHeatCapacityAX     = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(N3,N2,N1)
       if(VLHeatCapacityAX>0._r8)VLHeatCapacityAX=VLHeatCapacityAX+dcpo
-      MicPIceHeatFlxFrezPt = VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*TFREEZ)*(1.0_r8-0._r8*0.10_r8*PSISMX))*dts_wat
+      MicPIceHeatFlxFrezPt = VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*TFREEZ))*dts_wat
 
       !fusion energy absorb (<0) in thaw
       IF(MicPIceHeatFlxFrezPt.LT.0.0_r8)THEN
