@@ -25,7 +25,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  FWatExMacP2MicP_vr(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
   real(r8),target,allocatable ::  VLiceMacP_vr(:,:,:)                      !soil macropore ice content [m3 d-2]
   real(r8),target,allocatable ::  VLWatMicPM_vr(:,:,:,:)                    !soil micropore water content, [m3 d-2]
-  real(r8),target,allocatable ::  VLWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
+  real(r8),target,allocatable ::  VLWatMacPM_vr(:,:,:,:)                   !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM_vr(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
   real(r8),target,allocatable ::  WaterTBLSlope_col(:,:)                !slope of water table relative to surface slope, [-]
@@ -33,7 +33,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TileWaterTable_col(:,:)                        !artificial water table depth, [m]
   real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepzIntWTBL_col(:,:)            !internal water table depth, [m]
-  real(r8),target,allocatable ::  ExtWaterTablet0(:,:)              !initial external water table depth, elevation corrected [m]
+  real(r8),target,allocatable ::  ExtWaterTablet0_col(:,:)              !initial external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                !current external water table depth, elevation corrected [m]
   real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                        !external water table depth, [m]
   real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)                     !total energy impact for erosion
@@ -69,14 +69,14 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WatFlowSno2MacPM_col(:,:,:)                      !meltwater flux into soil macropores
   real(r8),target,allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
   real(r8),target,allocatable ::  TortMicPM_vr(:,:,:,:)                     !soil tortuosity, []
-  real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
+  real(r8),target,allocatable ::  TortMacPM_vr(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DiffusivitySolutEff(:,:,:,:)                     !coefficient for dissolution - volatilization, []
   real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
   real(r8),target,allocatable ::  PSISE_vr(:,:,:)                      !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                      !osmotic soil water potential , [Mpa]
   real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                      !gravimetric soil water potential , [Mpa]
-  real(r8),target,allocatable ::  THETY_vr(:,:,:)                      !air-dry water content, [m3 m-3]
+  real(r8),target,allocatable ::  SoilWatAirDry_vr(:,:,:)                      !air-dry water content, [m3 m-3]
   real(r8),target,allocatable ::  ThetaSat_vr(:,:,:)                      !micropore class water content
   real(r8),target,allocatable ::  WaterFlowSoiMicPX_3D(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
   real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
@@ -102,6 +102,7 @@ module SoilWaterDataType
   real(r8),target,allocatable :: RainPrecThrufall_col(:,:)
   real(r8),target,allocatable :: RainPrec2Sno_col(:,:)
   real(r8),target,allocatable :: Rain2ExposedSurf_col(:,:)
+  real(r8),target,allocatable :: QWatIntLaterFlow_col(:,:)         !Internal lateral flow between grids
   private :: InitAllocate
   contains
 
@@ -117,6 +118,7 @@ module SoilWaterDataType
 
   implicit none
 
+  allocate(QWatIntLaterFlow_col(JY,JX)); QWatIntLaterFlow_col=0._r8
   allocate(Rain2ExposedSurf_col(JY,JX)); Rain2ExposedSurf_col=0._r8
   allocate(RainPrec2Sno_col(JY,JX)); RainPrec2Sno_col = 0._r8
   allocate(RainPrecThrufall_col(JY,JX)); RainPrecThrufall_col=0._r8
@@ -144,7 +146,7 @@ module SoilWaterDataType
   allocate(FWatExMacP2MicP_vr(JZ,JY,JX));     FWatExMacP2MicP_vr=0._r8
   allocate(VLiceMacP_vr(JZ,JY,JX));    VLiceMacP_vr=0._r8
   allocate(VLWatMicPM_vr(60,0:JZ,JY,JX));VLWatMicPM_vr=0._r8
-  allocate(VLWatMacPM(60,JZ,JY,JX));VLWatMacPM=0._r8
+  allocate(VLWatMacPM_vr(60,JZ,JY,JX));VLWatMacPM_vr=0._r8
   allocate(VLsoiAirPM_vr(60,0:JZ,JY,JX));VLsoiAirPM_vr=0._r8
   allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
   allocate(WaterTBLSlope_col(JY,JX));       WaterTBLSlope_col=0._r8
@@ -152,7 +154,7 @@ module SoilWaterDataType
   allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
   allocate(DTBLD(JY,JX));       DTBLD=0._r8
   allocate(DepzIntWTBL_col(JY,JX));       DepzIntWTBL_col=0._r8
-  allocate(ExtWaterTablet0(JY,JX));       ExtWaterTablet0=0._r8
+  allocate(ExtWaterTablet0_col(JY,JX));       ExtWaterTablet0_col=0._r8
   allocate(ExtWaterTable_col(JY,JX));       ExtWaterTable_col=0._r8
   allocate(NatWtblDepz_col(JY,JX));       NatWtblDepz_col=0._r8
   allocate(EnergyImpact4ErosionM(60,JY,JX));   EnergyImpact4ErosionM=0._r8
@@ -188,14 +190,14 @@ module SoilWaterDataType
   allocate(WatFlowSno2MacPM_col(60,JY,JX));    WatFlowSno2MacPM_col=0._r8
   allocate(THETPM(60,0:JZ,JY,JX));THETPM=0._r8
   allocate(TortMicPM_vr(60,0:JZ,JY,JX));TortMicPM_vr=0._r8
-  allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
+  allocate(TortMacPM_vr(60,JZ,JY,JX)); TortMacPM_vr=0._r8
   allocate(DiffusivitySolutEff(60,0:JZ,JY,JX));DiffusivitySolutEff=0._r8
   allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
   allocate(PSISE_vr(0:JZ,JY,JX));  PSISE_vr=0._r8
   allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
   allocate(PSISoilOsmotic_vr(0:JZ,JY,JX));  PSISoilOsmotic_vr=0._r8
   allocate(PSIGrav_vr(0:JZ,JY,JX));  PSIGrav_vr=0._r8
-  allocate(THETY_vr(0:JZ,JY,JX));  THETY_vr=0._r8
+  allocate(SoilWatAirDry_vr(0:JZ,JY,JX));  SoilWatAirDry_vr=0._r8
   allocate(ThetaSat_vr(0:JZ,JY,JX));  ThetaSat_vr=0._r8
   allocate(WaterFlowSoiMicPX_3D(3,JD,JV,JH));   WaterFlowSoiMicPX_3D=0._r8
   allocate(QEvap_CumYr_col(JY,JX));       QEvap_CumYr_col=0._r8
@@ -218,6 +220,7 @@ module SoilWaterDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(QWatIntLaterFlow_col)
   call destroy(Rain2ExposedSurf_col)
   call destroy(RainPrec2Sno_col)
   call destroy(RainPrecThrufall_col)
@@ -243,7 +246,7 @@ module SoilWaterDataType
   call destroy(FWatExMacP2MicP_vr)
   call destroy(VLiceMacP_vr)
   call destroy(VLWatMicPM_vr)
-  call destroy(VLWatMacPM)
+  call destroy(VLWatMacPM_vr)
   call destroy(VLsoiAirPM_vr)
   call destroy(FILM)
   call destroy(WaterTBLSlope_col)
@@ -251,7 +254,7 @@ module SoilWaterDataType
   call destroy(TileWaterTable_col)
   call destroy(DTBLD)
   call destroy(DepzIntWTBL_col)
-  call destroy(ExtWaterTablet0)
+  call destroy(ExtWaterTablet0_col)
   call destroy(ExtWaterTable_col)
   call destroy(NatWtblDepz_col)
   call destroy(EnergyImpact4ErosionM)
@@ -287,14 +290,14 @@ module SoilWaterDataType
   call destroy(WatFlowSno2MacPM_col)
   call destroy(THETPM)
   call destroy(TortMicPM_vr)
-  call destroy(TortMacPM)
+  call destroy(TortMacPM_vr)
   call destroy(DiffusivitySolutEff)
   call destroy(SoilResit4RootPentrate_vr)
   call destroy(PSISE_vr)
   call destroy(PSISoilAirEntry)
   call destroy(PSISoilOsmotic_vr)
   call destroy(PSIGrav_vr)
-  call destroy(THETY_vr)
+  call destroy(SoilWatAirDry_vr)
   call destroy(ThetaSat_vr)
   call destroy(WaterFlowSoiMicPX_3D)
   call destroy(QEvap_CumYr_col)

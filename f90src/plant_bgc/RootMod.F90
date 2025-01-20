@@ -881,7 +881,7 @@ implicit none
 !
 !     PRIMARY ROOT EXTENSION
 !
-!     SoiBulkDensity_vr=soil bulk density
+!     SoilBulkDensity_vr=soil bulk density
 !     RTDP1,Root1stDepz2Surf=primary root depth from soil surface
 !     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     ICHKL=flag for identifying layer with primary root tip
@@ -993,13 +993,13 @@ implicit none
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft,        &
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft,     &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    SoiBulkDensity_vr         => plt_soilchem%SoiBulkDensity_vr,     &
+    SoilBulkDensity_vr         => plt_soilchem%SoilBulkDensity_vr,     &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,    &
     C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch     &
   )  
 !   call SumRootBiome(NZ,mass_inital)
 
-  IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
+  IF(SoilBulkDensity_vr(L).GT.ZERO)THEN
     Root1stDepz2Surf=Root1stDepz_pft(N,NR,NZ)-CumSoilThickness_vr(0)
   ELSE
     Root1stDepz2Surf=Root1stDepz_pft(N,NR,NZ)

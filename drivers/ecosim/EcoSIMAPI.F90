@@ -341,7 +341,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     !plant information is read in every year, but the active flags
     !are set using the checkpoint file.
     if(lverb)WRITE(*,333)'ReadPlantInfo'
-    WRITE(*,333)'ReadPlantInfo'
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
   endif
 

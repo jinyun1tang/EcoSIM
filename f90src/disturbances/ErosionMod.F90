@@ -114,7 +114,7 @@ module ErosionMod
 !
 !     DETACHMENT BY RAINFALL WHEN SURFACE WATER IS PRESENT
 !
-      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.EnergyImpact4ErosionM(M,NY,NX).GT.0.0_r8 &
+      IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.EnergyImpact4ErosionM(M,NY,NX).GT.0.0_r8 &
         .AND.XVLMobileWatMicPM(M,NY,NX).GT.ZEROS(NY,NX))THEN
 !
 !     DETACHMENT OF SEDIMENT FROM SURFACE SOIL DEPENDS ON RAINFALL
@@ -131,7 +131,7 @@ module ErosionMod
 !     DEPOSITION OF SEDIMENT TO SOIL SURFACE FROM IMMOBILE SURFACE WATER
 !
 
-      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.FracVol4Erosion(NY,NX).GT.ZERO)THEN
+      IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO.AND.FracVol4Erosion(NY,NX).GT.ZERO)THEN
 
         SEDX=SED(NY,NX)+RDTSED(NY,NX)
         IF(XVLMobileWaterLitRM(M,NY,NX).LE.VWatStoreCapSurf_col(NY,NX))THEN
@@ -189,7 +189,7 @@ module ErosionMod
   N1=NX
   N2=NY
 !     SEDX=SED(N2,N1)
-  IF(WatFlux4ErosionM_2DH(M,N2,N1).LE.0.0_r8.OR.SoiBulkDensity_vr(NU(N2,N1),N2,N1).LE.ZERO)THEN
+  IF(WatFlux4ErosionM_2DH(M,N2,N1).LE.0.0_r8.OR.SoilBulkDensity_vr(NU(N2,N1),N2,N1).LE.ZERO)THEN
     BaseErosionRate(N2,N1)=0._r8
   ELSE
     IF(XVLMobileWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -280,7 +280,7 @@ module ErosionMod
       call OverLandFlowSedTransp(M,NY,NX,NHW,NHE,NVN,NVS)
       N1=NX
       N2=NY
-      IF(WatFlux4ErosionM_2DH(M,N2,N1).LE.0.0.OR.SoiBulkDensity_vr(NU(N2,N1),N2,N1).LE.ZERO)THEN
+      IF(WatFlux4ErosionM_2DH(M,N2,N1).LE.0.0.OR.SoilBulkDensity_vr(NU(N2,N1),N2,N1).LE.ZERO)THEN
         BaseErosionRate(N2,N1)=0._r8
       ELSE
         IF(XVLMobileWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -798,7 +798,7 @@ module ErosionMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
+      IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
         N1=NX
         N2=NY
         D8980: DO  N=1,2

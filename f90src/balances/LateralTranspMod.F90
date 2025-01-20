@@ -98,25 +98,25 @@ implicit none
   ! source
     N1=NX;N2=NY;N3=L
     D8580: DO N=FlowDirIndicator(NY,NX),3
-      IF(N.EQ.iEastWestDirection)THEN
-        !exchange in the x direction, west-east
-        N4=NX+1   !east
-        N5=NY
-        N4B=NX-1  !west
-        N5B=NY
-        N6=L
-      ELSEIF(N.EQ.iNorthSouthDirection)THEN
-        !exchange in the y direction, north-south
-        N4=NX
-        N5=NY+1    !south
-        N4B=NX
-        N5B=NY-1   !north
-        N6=L
-      ELSEIF(N.EQ.iVerticalDirection)THEN
-        !vertical
-        N4=NX
-        N5=NY
-        N6=L+1
+      !Exchange in the x direction, west-east        
+      IF(N.EQ.iEastWestDirection)THEN 
+        N4  = NX+1   !east
+        N5  = NY
+        N4B = NX-1  !west
+        N5B = NY
+        N6  = L
+      !Exchange in the y direction, north-south 
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN  
+        N4  = NX
+        N5  = NY+1    !south
+        N4B = NX
+        N5B = NY-1   !north
+        N6  = L
+      !Vertical  
+      ELSEIF(N.EQ.iVerticalDirection)THEN       
+        N4 = NX
+        N5 = NY
+        N6 = L+1
       ENDIF
 !
 !
@@ -137,7 +137,7 @@ implicit none
         call TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
       ENDIF
 !
-      call FluxThruGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
+      call FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
     ENDDO D8580
 !
 !     NET FREEZE-THAW
@@ -315,7 +315,7 @@ implicit none
       IF(ABS(cumSedErosion(N,NN,N2,N1)).GT.ZEROS(N2,N1) &
         .OR.ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
         !incoming from south or east grid 
-        tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)+cumSedErosion(N,NN,N2,N1)
+        tErosionSedmLoss_col(N2,N1)=tErosionSedmLoss_col(N2,N1)+cumSedErosion(N,NN,N2,N1)
         TSANER(N2,N1)             = TSANER(N2,N1)+XSANER(N,NN,N2,N1)
         TSILER(N2,N1)             = TSILER(N2,N1)+XSILER(N,NN,N2,N1)
         TCLAER(N2,N1)             = TCLAER(N2,N1)+XCLAER(N,NN,N2,N1)
@@ -380,7 +380,7 @@ implicit none
 
 !     IF(NN.EQ.2)THEN
 !       outgoing
-        tErosionSedmLoss(N2,N1)=tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5,N4)
+        tErosionSedmLoss_col(N2,N1)=tErosionSedmLoss_col(N2,N1)-cumSedErosion(N,NN,N5,N4)
         TSANER(N2,N1)             = TSANER(N2,N1)-XSANER(N,NN,N5,N4)
         TSILER(N2,N1)             = TSILER(N2,N1)-XSILER(N,NN,N5,N4)
         TCLAER(N2,N1)             = TCLAER(N2,N1)-XCLAER(N,NN,N5,N4)
@@ -446,7 +446,7 @@ implicit none
       ENDIF
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         IF(ABS(cumSedErosion(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
-          tErosionSedmLoss(N2,N1)   = tErosionSedmLoss(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
+          tErosionSedmLoss_col(N2,N1)   = tErosionSedmLoss_col(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
           TSANER(N2,N1)             = TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)
           TSILER(N2,N1)             = TSILER(N2,N1)-XSILER(N,NN,N5B,N4B)
           TCLAER(N2,N1)             = TCLAER(N2,N1)-XCLAER(N,NN,N5B,N4B)
@@ -514,7 +514,10 @@ implicit none
   end subroutine TotalFluxFromSedmentTransp
 !------------------------------------------------------------------------------------------
 
-  subroutine FluxThruGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
+  subroutine FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
+  !
+  !Description
+  !Flow across grids
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
@@ -531,8 +534,7 @@ implicit none
   !     TFLW,TWatFlowCellMacP_vr,TWatFlowCellMacP_vr=net micropore,macropore water flux, heat flux
   !     FLW,FLWH,HFLW=micropore,macropore water flux, heat flux from watsub.f
   !     LakeSurfFlowMicP,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
-  !when FlowDirIndicator /=3, it means lateral exchange is consdiered
-  !N==3 means vertical direction
+  !     when FlowDirIndicator /=3, it means lateral exchange is consdiered
 
   IF(FlowDirIndicator(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     !locate the vertical layer for the dest grid
@@ -664,6 +666,6 @@ implicit none
       ENDIF
     ENDIF
   ENDIF
-  end subroutine FluxThruGrids
+  end subroutine FlowXGrids
 
 end module LateralTranspMod

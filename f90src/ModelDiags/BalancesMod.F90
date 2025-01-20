@@ -147,7 +147,7 @@ contains
     DO  NY=NVN,NVS
 
       SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)+Qinflx2Soil_col(NY,NX) &
-        -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)
+        -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)
 
       precipErr_test = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
       prec2expSErr_test=Rain2ExposedSurf_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)
@@ -160,7 +160,7 @@ contains
       canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+PrecIntceptByCanopy_col(NY,NX) &
         +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
-      WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX) &
+      WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX)+QWatIntLaterFlow_col(NY,NX) &
         +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)+QRunSurf_col(NY,NX) &
         -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
@@ -170,7 +170,7 @@ contains
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
 
       if(abs(WaterErr_test)>err_h2o)then
-        write(110,*)I+J/24.,'NY,NX, H2O conservation error',NY,NX,WaterErr_test
+        write(110,*)I+J/24.,'NY,NX, H2O conservation error',NY,NX,WaterErr_test,NU(NY,NX)
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
@@ -188,10 +188,13 @@ contains
         write(110,*)'discharge        =',QDischar_col(NY,NX)
         write(110,*)'SnowMassBeg,end  =',SnowMassBeg_col(NY,NX),SnowMassEnd_col(NY,NX)
         write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)
+        write(110,*)'WatHeldOnCanopy  =',WatHeldOnCanopy_col(NY,NX)
+        write(110,*)'CanopyWat_col    =',CanopyWat_col(NY,NX)
         write(110,*)'canopyH2Oerr_test=',canopyH2Oerr_test
         write(110,*)'SnowMassErr_test =',SnowMassErr_test        
         write(110,*)'literH2Oerr_test =',literH2Oerr_test,LitWatMassBeg_col(NY,NX),LitWatMassEnd_col(NY,NX)
         write(110,*)'SoilWatErr_test  =',SoilWatErr_test
+        write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX)
         write(110,*)'snofall          =',Prec2Snow_col(NY,NX),SnoFalPrec_col(NY,NX)
         write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
         write(110,*)'Snowxfer         =',QSnoWatXfer2Soil_col(NY,NX)+QSnoIceXfer2Soil_col(NY,NX)*DENSICE

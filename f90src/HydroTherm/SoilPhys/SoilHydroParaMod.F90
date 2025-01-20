@@ -110,13 +110,13 @@ contains
 !
 !     SoilResit4RootPentrate_vr=soil resistance to root penetration (MPa)
 !
-!     IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-!     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
+!     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+!     CCLAY_vrT=CCLAY_vr(L,NY,NX)*1.0E+02
 !     CORGCT=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E-04
-!     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
-!     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
-!     EE=3.8521+0.0963*CCLAYT
-!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW_vr(L,NY,NX)**DD*SoiBulkDensity_vr(L,NY,NX)**EE
+!     CC=EXP(-3.6733-0.1447*CCLAY_vrT+0.7653*CORGCT)
+!     DD=-0.4805-0.1239*CCLAY_vrT+0.2080*CORGCT
+!     EE=3.8521+0.0963*CCLAY_vrT
+!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW_vr(L,NY,NX)**DD*SoilBulkDensity_vr(L,NY,NX)**EE
 !     ELSE
     SoilResit4RootPentrate_vr(L,NY,NX)=0.0_r8
 !     ENDIF
@@ -189,10 +189,10 @@ contains
     ThetaAir_vr(L,NY,NX)=0.0_r8
   ENDIF
 
-  IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-    THETY_vr(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(L,NY,NX))
+  IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+    SoilWatAirDry_vr(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(L,NY,NX))
   ELSE
-    THETY_vr(L,NY,NX)=ZERO2
+    SoilWatAirDry_vr(L,NY,NX)=ZERO2
   ENDIF
       !
       !     SATURATED HYDRAULIC CONDUCTIVITY FROM SWC AT SATURATION VS.
@@ -207,7 +207,7 @@ contains
         *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
       SatHydroCondVert_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2
     ELSE
-      SatHydroCondVert_vr(L,NY,NX) = 0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
+      SatHydroCondVert_vr(L,NY,NX) = 0.10_r8+75.0_r8*1.0E-15_r8**SoilBulkDensity_vr(L,NY,NX)
       SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
@@ -219,7 +219,7 @@ contains
         *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
       SatHydroCondHrzn_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2._r8
     ELSE
-      SatHydroCondHrzn_vr(L,NY,NX) = 0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity_vr(L,NY,NX)
+      SatHydroCondHrzn_vr(L,NY,NX) = 0.10_r8+75.0_r8*1.0E-15_r8**SoilBulkDensity_vr(L,NY,NX)
       SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     ENDIF
   ENDIF
@@ -300,12 +300,12 @@ contains
   IF(ISOIL(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
     !calculating FC or WP
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
-      FieldCapacity_vr(L,NY,NX)=0.2576_r8-0.20_r8*CSAND(L,NY,NX) &
-            +0.36_r8*CCLAY(L,NY,NX)+0.60E-06*CSoilOrgM_vr(ielmc,L,NY,NX)
+      FieldCapacity_vr(L,NY,NX)=0.2576_r8-0.20_r8*CSAND_vr(L,NY,NX) &
+            +0.36_r8*CCLAY_vr(L,NY,NX)+0.60E-06*CSoilOrgM_vr(ielmc,L,NY,NX)
     ELSE
-      IF(SoiBulkDensity_vr(L,NY,NX).LT.0.075_r8)THEN
+      IF(SoilBulkDensity_vr(L,NY,NX).LT.0.075_r8)THEN
         FieldCapacity_vr(L,NY,NX)=0.27_r8
-      ELSEIF(SoiBulkDensity_vr(L,NY,NX).LT.0.195_r8)THEN
+      ELSEIF(SoilBulkDensity_vr(L,NY,NX).LT.0.195_r8)THEN
         FieldCapacity_vr(L,NY,NX)=0.62_r8
       ELSE
         FieldCapacity_vr(L,NY,NX)=0.71_r8
@@ -314,11 +314,11 @@ contains
     FieldCapacity_vr(L,NY,NX) = FieldCapacity_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
     FieldCapacity_vr(L,NY,NX) = AMIN1(0.75_r8*POROS_vr(L,NY,NX),FieldCapacity_vr(L,NY,NX))
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
-      WiltPoint_vr(L,NY,NX)=0.0260_r8+0.50_r8*CCLAY(L,NY,NX)+0.32E-06_r8*CSoilOrgM_vr(ielmc,L,NY,NX)
+      WiltPoint_vr(L,NY,NX)=0.0260_r8+0.50_r8*CCLAY_vr(L,NY,NX)+0.32E-06_r8*CSoilOrgM_vr(ielmc,L,NY,NX)
     ELSE
-      IF(SoiBulkDensity_vr(L,NY,NX).LT.0.075_r8)THEN
+      IF(SoilBulkDensity_vr(L,NY,NX).LT.0.075_r8)THEN
         WiltPoint_vr(L,NY,NX)=0.04_r8
-      ELSEIF(SoiBulkDensity_vr(L,NY,NX).LT.0.195_r8)THEN
+      ELSEIF(SoilBulkDensity_vr(L,NY,NX).LT.0.195_r8)THEN
         WiltPoint_vr(L,NY,NX)=0.15_r8
       ELSE
         WiltPoint_vr(L,NY,NX)=0.22_r8
@@ -339,8 +339,8 @@ contains
     !first time step at the beginning year
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
-    !ExtWaterTablet0=external water table depth, [m]
-    IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
+    !ExtWaterTablet0_col=external water table depth, [m]
+    IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
     ELSEIF(isclose(THW(L,NY,NX),1._r8))THEN
@@ -354,7 +354,7 @@ contains
       THETW_vr(L,NY,NX)=0.0_r8
     ENDIF
 
-    IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
+    IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
     ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
       THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
@@ -388,11 +388,11 @@ contains
   real(r8) :: H2OSOIatK(n100),PSISK(0:n100)
 
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    SoiBulkDensity_vr(0,NY,NX)=VLSoilMicPMass_vr(0,NY,NX)/VGeomLayer_vr(0,NY,NX)
+    SoilBulkDensity_vr(0,NY,NX)=VLSoilMicPMass_vr(0,NY,NX)/VGeomLayer_vr(0,NY,NX)
   ELSE
-    SoiBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
+    SoilBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF
-  THETY_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
+  SoilWatAirDry_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
   SUM2             =0.0_r8
   D1220: DO  K=1,n100
     XK           = K-1

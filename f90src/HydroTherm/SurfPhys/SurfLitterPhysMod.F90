@@ -131,10 +131,10 @@ implicit none
   IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
     !there is litter layer
     IF(CNVR.GT.ZERO.AND.CNV1.GT.ZERO)THEN
-      CdVaporLit2Soil=2.0_r8*CNVR*CNV1/(CNVR*DLYR(3,NUM(NY,NX),NY,NX)+CNV1*DLYRR_COL(NY,NX))
+      CdVaporLit2Soil=2.0_r8*CNVR*CNV1/(CNVR*DLYR_3D(3,NUM(NY,NX),NY,NX)+CNV1*DLYRR_COL(NY,NX))
     ELSE
       !below is a numerical hack
-      CdVaporLit2Soil=2.0_r8*CNVR/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))*FracSurfByLitR_col(NY,NX)
+      CdVaporLit2Soil=2.0_r8*CNVR/(DLYR_3D(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))*FracSurfByLitR_col(NY,NX)
     ENDIF
 
     DTKX=ABS(TKSoil1_vr(0,NY,NX)-TKSoil1_vr(NUM(NY,NX),NY,NX))*ppmc
@@ -143,7 +143,7 @@ implicit none
 
     call CalcSoilThermConductivity(NX,NY,NUM(NY,NX),DTKX,TCND1)
 
-    CdTLit2Soil=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR_COL(NY,NX))
+    CdTLit2Soil=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR_3D(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR_COL(NY,NX))
   !
   ! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
   !

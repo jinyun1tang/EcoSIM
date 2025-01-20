@@ -346,8 +346,8 @@ module BoundaryTranspMod
 !
   IF(NN.EQ.1 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
     .OR. NN.EQ.2 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
-    IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
+    IF(VLWatMacPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM_vr(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF

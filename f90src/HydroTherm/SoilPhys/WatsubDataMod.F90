@@ -8,12 +8,12 @@ implicit none
   real(r8),allocatable ::  TMLiceThawedMicP_vr(:,:,:)              !micropore layer integrated ice mass loss due to thaw, 
   real(r8),allocatable ::  TMLiceThawedMacP_vr(:,:,:)              !macropore layer integrated ice mass loss due to thaw, 
 
-  real(r8),allocatable ::  AREAU(:,:,:)                       !
-  real(r8),allocatable ::  AreaUnderWaterTBL(:,:,:)           !
-  real(r8),allocatable ::  VLairMacP_vr(:,:,:)                   !
+  real(r8),allocatable ::  FracLayVolBelowExtWTBL_vr(:,:,:)          !fraction of layer volume below external water table [0-1]
+  real(r8),allocatable ::  FracLayVolBelowTileWTBL_vr(:,:,:)                !
+  real(r8),allocatable ::  VLairMacP_vr(:,:,:)                     !
   real(r8),allocatable ::  TLPhaseChangeHeat2Soi1_vr(:,:,:)         !total soil layer latent heat release from melting
-
-  real(r8),allocatable ::  FWatExMacP2MicPi_vr(:,:,:)             !pressure-driven water flow from macpore to micpore
+  real(r8),allocatable ::  QWatIntLaterFlowM_col(:,:)              !lateral water flow from neighbor grid
+  real(r8),allocatable ::  FWatExMacP2MicPiM_vr(:,:,:)             !pressure-driven water flow from macpore to micpore
 
   real(r8),allocatable ::  TWatFlow2MicP_3DM_vr(:,:,:)             !total water charge to micropore in iteration M
   real(r8),allocatable ::  TWaterFlow2Macpt_3DM_vr(:,:,:)          !total water charge to macropore in iteration M
@@ -22,9 +22,9 @@ implicit none
   real(r8),allocatable ::  SoilWatFrezHeatRelease_vr(:,:,:)        !latent energy released during freeze-thaw
   real(r8),allocatable ::  AVCNHL_3D(:,:,:,:)                      !Macropore hydraulic conductivity 
 
-  real(r8),allocatable ::  TWaterFlow2MicptX_3DM_vr(:,:,:)                      !
-  real(r8),allocatable ::  FWatIrrigate2MicP1_vr(:,:,:)                        !
-  real(r8),allocatable ::  HeatIrrigation1_vr(:,:,:)                  !heat flux due to irrigation, [MJ/d2]
+  real(r8),allocatable ::  TWaterFlow2MicptX_3DM_vr(:,:,:)         !water flux in iteration M [m3 H2O/d2]
+  real(r8),allocatable ::  FWatIrrigate2MicP1_vr(:,:,:)            !water flux due to irrigation [m3 H2O/d2]
+  real(r8),allocatable ::  HeatIrrigation1_vr(:,:,:)               !heat flux due to irrigation, [MJ/d2]
 
   real(r8),allocatable ::  FIceThawedMacP_vr(:,:,:)                 !Ice mass thawed in macropre during an iteration time step, [ton H2O/d2]
 
@@ -49,16 +49,17 @@ contains
 
   implicit none
 
+  allocate(QWatIntLaterFlowM_col(JY,JX)); QWatIntLaterFlowM_col=0._r8
   allocate(N6X(JY,JX));         N6X=0
   allocate(TMLiceThawedMicP_vr(JZ,JY,JX));   TMLiceThawedMicP_vr=0._r8
   allocate(TMLiceThawedMacP_vr(JZ,JY,JX));   TMLiceThawedMacP_vr=0._r8
-  allocate(AREAU(JZ,JY,JX));    AREAU=0._r8
-  allocate(AreaUnderWaterTBL(JZ,JY,JX));   AreaUnderWaterTBL=0._r8
+  allocate(FracLayVolBelowExtWTBL_vr(JZ,JY,JX));    FracLayVolBelowExtWTBL_vr=0._r8
+  allocate(FracLayVolBelowTileWTBL_vr(JZ,JY,JX));   FracLayVolBelowTileWTBL_vr=0._r8
   allocate(QDischarM_col(JY,JX)); QDischarM_col(:,:)=0._r8
   allocate(QDrainM_col(JY,JX)); QDrainM_col(:,:)=0._r8
   allocate(VLairMacP_vr(JZ,JY,JX));  VLairMacP_vr=0._r8
   allocate(TLPhaseChangeHeat2Soi1_vr(JZ,JY,JX));   TLPhaseChangeHeat2Soi1_vr=0._r8
-  allocate(FWatExMacP2MicPi_vr(JZ,JY,JX));    FWatExMacP2MicPi_vr=0._r8
+  allocate(FWatExMacP2MicPiM_vr(JZ,JY,JX));    FWatExMacP2MicPiM_vr=0._r8
 
   allocate(TWatFlow2MicP_3DM_vr(JZ,JY,JX));    TWatFlow2MicP_3DM_vr=0._r8
   allocate(TWaterFlow2Macpt_3DM_vr(JZ,JY,JX));   TWaterFlow2Macpt_3DM_vr=0._r8
@@ -90,14 +91,15 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(QWatIntLaterFlowM_col)
   call destroy(N6X)
   call destroy(TMLiceThawedMicP_vr)
   call destroy(TMLiceThawedMacP_vr)
-  call destroy(AREAU)
-  call destroy(AreaUnderWaterTBL)
+  call destroy(FracLayVolBelowExtWTBL_vr)
+  call destroy(FracLayVolBelowTileWTBL_vr)
   call destroy(VLairMacP_vr)
   call destroy(TLPhaseChangeHeat2Soi1_vr)
-  call destroy(FWatExMacP2MicPi_vr)
+  call destroy(FWatExMacP2MicPiM_vr)
   call destroy(TWatFlow2MicP_3DM_vr)
   call destroy(TWaterFlow2Macpt_3DM_vr)
   call destroy(THeatFlow2Soil_3DM_vr)

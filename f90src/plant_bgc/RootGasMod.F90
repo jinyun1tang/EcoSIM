@@ -115,7 +115,7 @@ module RootGasMod
     SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,    &  !in: aqueous diffusivity of volatile tracers
     GasSolbility_vr          => plt_soilchem%GasSolbility_vr,      &
     trc_solcl_vr             => plt_soilchem%trc_solcl_vr,         &
-    THETY_vr                 => plt_soilchem%THETY_vr,             &
+    SoilWatAirDry_vr                 => plt_soilchem%SoilWatAirDry_vr,             &
     VLSoilMicP_vr            => plt_soilchem%VLSoilMicP_vr,        &
     THETPM                   => plt_soilchem%THETPM,               &
     trc_gasml_vr             => plt_soilchem%trc_gasml_vr,         & !
@@ -302,7 +302,7 @@ module RootGasMod
       VOLWSB      = RTVLWB+VLWatMicPMB
       THETW1      = AZMAX1(VLWatMicPM_vr(M,L)/VLSoilMicP_vr(L))
 
-      IF(THETW1.GT.THETY_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
+      IF(THETW1.GT.SoilWatAirDry_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
         THETM  = TortMicPM_vr(M,L)*THETW1
         RRADS  = LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX = RootAreaDivRadius_vr(N,L)/RRADS

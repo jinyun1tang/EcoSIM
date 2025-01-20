@@ -169,7 +169,7 @@ module TillageMixMod
   ENGYV(0) = (cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX))*TKS_vr(0,NY,NX)
   VHeatCapacitySoilM_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)
   D3000: DO  L=NU(NY,NX),LL
-    IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+    IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       ENGYM(L) = VHeatCapacitySoilM_vr(L,NY,NX)*TKS_vr(L,NY,NX)
       ENGYV(L) = (cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
@@ -206,7 +206,7 @@ module TillageMixMod
   TKS_vr(0,NY,NX)           = (ENGYM(0)+ENGYV(0))/VHeatCapacity_vr(0,NY,NX)
   HFLXD                     = HFLXD-ENGYM(0)-ENGYV(0)
   DO  L=NU(NY,NX),LL
-    IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+    IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
       VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
@@ -261,13 +261,13 @@ module TillageMixMod
 !
     D100: DO L=NU(NY,NX),NL(NY,NX)
       !if current layer is within the tillage depth
-      tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ .AND. DLYR(3,L,NY,NX).GT.ZERO
+      tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX).LT.DCORPZ .AND. DLYR_3D(3,L,NY,NX).GT.ZERO
       if(.not.tillTestL)exit
 !     TL: fraction of layer L over the tillage zone
 !     TI: fraction of layer L being tilled
-      TL = AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
+      TL = AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
       FI1 = TL/DCORPZ
-      TI1 = AMIN1(TL/DLYR(3,L,NY,NX),1._r8)
+      TI1 = AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
 
       ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
       ZNHUXI = AMAX1(ZNHUXI,ZNHUI(L,NY,NX))
@@ -282,14 +282,14 @@ module TillageMixMod
 !   LL is the last layer tilled. 
 
     D2000: DO  L=NU(NY,NX),LL
-      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+      IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
         !TL: soil thickness in tillage zone
         !TI: fraction of current layer being tilled.
         !FI: fraction of current layer over the overall mixing zone
         !TX: fraction of current layer not tilled
-        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
+        TL=AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
         FI1=TL/DCORPZ
-        TI1=AMIN1(TL/DLYR(3,L,NY,NX),1._r8)
+        TI1=AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
         TX=AZMAX1(1.0_r8-TI1)
         
 !     SoilFracAsMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
@@ -602,11 +602,11 @@ module TillageMixMod
   LL=NU(NY,NX)
   D100: DO L=NU(NY,NX),NL(NY,NX)
     !if current layer is within the tillage depth
-    tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ .AND. DLYR(3,L,NY,NX).GT.ZERO
+    tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX).LT.DCORPZ .AND. DLYR_3D(3,L,NY,NX).GT.ZERO
     if(.not.tillTestL)exit
-    TL = AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR(3,L,NY,NX)))
+    TL = AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
     FI(L) = TL/DCORPZ
-    TI(L) = AMIN1(TL/DLYR(3,L,NY,NX),1._r8)
+    TI(L) = AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
     LL=L  
   ENDDO D100
   end subroutine DeriveTillageProf

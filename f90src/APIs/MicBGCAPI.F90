@@ -175,7 +175,7 @@ implicit none
   micfor%ZEROS2              = ZEROS2(NY,NX)
   micfor%ZEROS               = ZEROS(NY,NX)
   micfor%VLSoilMicP          = VLSoilMicP_vr(L,NY,NX)
-  micfor%THETY               = THETY_vr(L,NY,NX)
+  micfor%THETY               = SoilWatAirDry_vr(L,NY,NX)
   micfor%POROS               = POROS_vr(L,NY,NX)
   micfor%FieldCapacity       = FieldCapacity_vr(L,NY,NX)
 

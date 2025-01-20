@@ -578,8 +578,8 @@ module TranspSaltMod
   integer :: nsalts,ids
 !     begin_execution
 
-  IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
+  IF(VLWatMacPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM_vr(M,M3,M2,M1)))
 
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_RFHS(nsalts,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(nsalts,M3,M2,M1))

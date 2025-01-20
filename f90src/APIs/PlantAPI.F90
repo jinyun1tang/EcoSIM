@@ -707,7 +707,7 @@ implicit none
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)                                 = AREA(3,L,NY,NX)
-    plt_soilchem%SoiBulkDensity_vr(L)                 = SoiBulkDensity_vr(L,NY,NX)
+    plt_soilchem%SoilBulkDensity_vr(L)                 = SoilBulkDensity_vr(L,NY,NX)
     plt_soilchem%trc_solcl_vr(ids_beg:ids_end,L)      = trc_solcl_vr(ids_beg:ids_end,L,NY,NX)
     plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L) = SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
     plt_soilchem%trc_gascl_vr(idg_beg:idg_end,L)      = trc_gascl_vr(idg_beg:idg_end,L,NY,NX)
@@ -732,7 +732,7 @@ implicit none
     plt_ew%TKS_vr(L)                           = TKS_vr(L,NY,NX)
 
     plt_soilchem%THETW_vr(L)               = THETW_vr(L,NY,NX)
-    plt_soilchem%THETY_vr(L)               = THETY_vr(L,NY,NX)
+    plt_soilchem%SoilWatAirDry_vr(L)               = SoilWatAirDry_vr(L,NY,NX)
     plt_soilchem%TScal4Difsvity_vr(L)      = TScal4Difsvity_vr(L,NY,NX)
     plt_soilchem%VLSoilPoreMicP_vr(L)      = VLSoilPoreMicP_vr(L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_H1PO4B,L) = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
@@ -746,7 +746,7 @@ implicit none
     plt_soilchem%trcs_VLN_vr(ids_NH4,L)    = trcs_VLN_vr(ids_NH4,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NH4B,L)   = trcs_VLN_vr(ids_NH4B,L,NY,NX)
 
-    plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
+    plt_site%DLYR3(L)     =DLYR_3D(3,L,NY,NX)
     DO K=1,jcplx
       plt_soilchem%FracBulkSOMC_vr(K,L)          = FracBulkSOMC_vr(K,L,NY,NX)
       plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L) = DOM_vr(idom_doc:idom_dop,K,L,NY,NX)

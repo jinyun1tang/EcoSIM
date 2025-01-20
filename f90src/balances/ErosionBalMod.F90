@@ -47,13 +47,13 @@ implicit none
 ! FSINK=hourly rate for sediment sinking
 !
   D9885: DO L=NL(NY,NX)-1,1,-1
-    IF(SoiBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
+    IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
       D9880: DO LL=L+1,NL(NY,NX)
-        IF(DLYR(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
+        IF(DLYR_3D(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
       ENDDO D9880
 
-      FSINK=AMIN1(1.0_r8,VLS(NY,NX)/DLYR(3,L,NY,NX))
+      FSINK=AMIN1(1.0_r8,VLS(NY,NX)/DLYR_3D(3,L,NY,NX))
 !
 !     SOIL MINERALS
 !
@@ -203,7 +203,7 @@ implicit none
   integer, intent(in) :: NY,NX
 
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-    tErosionSedmLoss(NY,NX)   = 0.0_r8
+    tErosionSedmLoss_col(NY,NX)   = 0.0_r8
     TSANER(NY,NX)             = 0.0_r8
     TSILER(NY,NX)             = 0.0_r8
     TCLAER(NY,NX)             = 0.0_r8

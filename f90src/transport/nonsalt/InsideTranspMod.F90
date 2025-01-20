@@ -445,7 +445,7 @@ module InsideTranspMod
   real(r8) :: DLYR1,DLYR2,TORTL
   integer  :: K,nsol,ngas,idom
 
-  IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1) .AND. THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
+  IF(THETW1(N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1) .AND. THETW1(N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4) &
     .AND. VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) .AND. VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
       VLWatMicP2A = VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
@@ -598,8 +598,8 @@ module InsideTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    DLYR1 = AMAX1(ZERO2,DLYR(N,N3,N2,N1))
-    DLYR2 = AMAX1(ZERO2,DLYR(N,N6,N5,N4))
+    DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
+    DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL = (TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN = DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
@@ -670,15 +670,15 @@ module InsideTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    IF(VLWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
+    IF(VLWatMacPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
 !
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE
 !
-    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM(M,N6,N5,N4))THEN
+    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
       D9800: DO K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_Adv2MacP_flx(idom,K)=VFLW*AZMAX1((DOM_MacP2(idom,K,N3,N2,N1) &
@@ -721,8 +721,8 @@ module InsideTranspMod
 !     GRID CELL
 !
   ELSEIF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).LT.0.0_r8)THEN
-    IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+    IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -777,8 +777,8 @@ module InsideTranspMod
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 !
-  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
-    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
+  IF(VLWatMacPM_vr(M,N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
+    .AND.VLWatMacPM_vr(M,N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
@@ -792,27 +792,27 @@ module InsideTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    VOLH4A=VLWatMacPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4,N3,N2,N1)
-    VOLH4B=VLWatMacPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4B,N3,N2,N1)
-    VOLH3A=VLWatMacPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3,N3,N2,N1)
-    VOLH3B=VLWatMacPM(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3B,N3,N2,N1)
-    VOLH2A=VLWatMacPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
-    VOLH2B=VLWatMacPM(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+    VOLH4A=VLWatMacPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4,N3,N2,N1)
+    VOLH4B=VLWatMacPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NH4B,N3,N2,N1)
+    VOLH3A=VLWatMacPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3,N3,N2,N1)
+    VOLH3B=VLWatMacPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_NO3B,N3,N2,N1)
+    VOLH2A=VLWatMacPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+    VOLH2B=VLWatMacPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
 
-    VOLHOA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
-    VOLHOB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
-    VOLHPA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
-    VOLHPB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+    VOLHOA=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
+    VOLHOB=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
+    VOLHPA=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+    VOLHPB=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
 
     D9790: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        CDOM_MacP1(idom,K)=AZMAX1(DOM_MacP2(idom,K,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
-        CDOM_MacP2(idom,K)=AZMAX1(DOM_MacP2(idom,K,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
+        CDOM_MacP1(idom,K)=AZMAX1(DOM_MacP2(idom,K,N3,N2,N1)/VLWatMacPM_vr(M,N3,N2,N1))
+        CDOM_MacP2(idom,K)=AZMAX1(DOM_MacP2(idom,K,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4))
       enddo
     ENDDO D9790
 !exclude NH3 and NH3B
     DO ngas=idg_beg,idg_end-2
-      trcs_coH1(ngas)=AZMAX1(trc_soHml2_vr(ngas,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
+      trcs_coH1(ngas)=AZMAX1(trc_soHml2_vr(ngas,N3,N2,N1)/VLWatMacPM_vr(M,N3,N2,N1))
     ENDDO
 
     IF(VOLH4A.GT.ZEROS2(N2,N1))THEN
@@ -859,10 +859,10 @@ module InsideTranspMod
     ENDIF
 !excldue NH3 and NH3B
     DO ngas=idg_beg,idg_end-2
-      trcs_coH2(ngas)=AZMAX1(trc_soHml2_vr(ngas,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
+      trcs_coH2(ngas)=AZMAX1(trc_soHml2_vr(ngas,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4))
     ENDDO
 
-    VOLHMA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
+    VOLHMA=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
     IF(VOLHMA.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NH4)=AZMAX1(trc_soHml2_vr(ids_NH4,N6,N5,N4)/VOLHMA)
       trcs_coH2(idg_NH3)=AZMAX1(trc_soHml2_vr(idg_NH3,N6,N5,N4)/VOLHMA)
@@ -870,7 +870,7 @@ module InsideTranspMod
       trcs_coH2(ids_NH4)=0.0_r8
       trcs_coH2(idg_NH3)=0.0_r8
     ENDIF
-    VOLHOA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
+    VOLHOA=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3,N6,N5,N4)
     IF(VOLHOA.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NO3)=AZMAX1(trc_soHml2_vr(ids_NO3,N6,N5,N4)/VOLHOA)
       trcs_coH2(ids_NO2)=AZMAX1(trc_soHml2_vr(ids_NO2,N6,N5,N4)/VOLHOA)
@@ -878,7 +878,7 @@ module InsideTranspMod
       trcs_coH2(ids_NO3)=0.0_r8
       trcs_coH2(ids_NO2)=0.0_r8
     ENDIF
-    VOLHPA=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+    VOLHPA=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     IF(VOLHPA.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_H1PO4)=AZMAX1(trc_soHml2_vr(ids_H1PO4,N6,N5,N4)/VOLHPA)
       trcs_coH2(ids_H2PO4)=AZMAX1(trc_soHml2_vr(ids_H2PO4,N6,N5,N4)/VOLHPA)
@@ -886,7 +886,7 @@ module InsideTranspMod
       trcs_coH2(ids_H1PO4)=0.0_r8
       trcs_coH2(ids_H2PO4)=0.0_r8
     ENDIF
-    VOLHMB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
+    VOLHMB=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
     IF(VOLHMB.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NH4B)=AZMAX1(trc_soHml2_vr(ids_NH4B,N6,N5,N4)/VOLHMB)
       trcs_coH2(idg_NH3B)=AZMAX1(trc_soHml2_vr(idg_NH3B,N6,N5,N4)/VOLHMB)
@@ -894,7 +894,7 @@ module InsideTranspMod
       trcs_coH2(ids_NH4B)=trcs_coH2(ids_NH4)
       trcs_coH2(idg_NH3B)=trcs_coH2(idg_NH3)
     ENDIF
-    VOLHOB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
+    VOLHOB=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NO3B,N6,N5,N4)
     IF(VOLHOB.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NO3B)=AZMAX1(trc_soHml2_vr(ids_NO3B,N6,N5,N4)/VOLHOB)
       trcs_coH2(ids_NO2B)=AZMAX1(trc_soHml2_vr(ids_NO2B,N6,N5,N4)/VOLHOB)
@@ -902,7 +902,7 @@ module InsideTranspMod
       trcs_coH2(ids_NO3B)=trcs_coH2(ids_NO3)
       trcs_coH2(ids_NO2B)=trcs_coH2(ids_NO2)
     ENDIF
-    VOLHPB=VLWatMacPM(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+    VOLHPB=VLWatMacPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     IF(VOLHPB.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_H1PO4B)=AZMAX1(trc_soHml2_vr(ids_H1PO4B,N6,N5,N4)/VOLHPB)
       trcs_coH2(ids_H2PO4B)=AZMAX1(trc_soHml2_vr(ids_H2PO4B,N6,N5,N4)/VOLHPB)
@@ -914,7 +914,7 @@ module InsideTranspMod
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MACROPORES
 !
 !     DLYR=soil layer thickness
-!     TortMacPM=macropore tortuosity from hour1.f
+!     TortMacPM_vr=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
 !     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
@@ -929,9 +929,9 @@ module InsideTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    DLYR1 = AMAX1(ZERO2,DLYR(N,N3,N2,N1))
-    DLYR2 = AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL = (TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
+    DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
+    TORTL = (TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN = DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DO idom=idom_beg,idom_end
@@ -1119,8 +1119,8 @@ module InsideTranspMod
 !     MACROPORE TO MICROPORE TRANSFER
 !
   IF(FWatExMacP2MicPM_vr(M,N6,N5,N4).GT.0.0_r8)THEN
-    IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+    IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1212,8 +1212,8 @@ module InsideTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     *2,*H2=solute content of micropores,macropores
 !
-  IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-    VLWatMacPS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
+  IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+    VLWatMacPS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM_vr(M,N6,N5,N4))
     VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VLWatMacPS
 
     D9955: DO K=1,jcplx
@@ -1282,7 +1282,7 @@ module InsideTranspMod
 !
   IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
     THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
-    IF(THETW1.GT.THETY_vr(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
+    IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
 
       trcg_SLX(idg_CO2) =catomw*GasSolbility_vr(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
       trcg_SLX(idg_CH4) =catomw*GasSolbility_vr(idg_CH4,N3,N2,N1)
@@ -1376,10 +1376,10 @@ module InsideTranspMod
 !             :*ZN3*=NH3,*H2G*=H2
 !
   DFLG2=2.0_r8*AZMAX1(THETPM(M,N3,N2,N1))*POROQ*THETPM(M,N3,N2,N1)/POROS_vr(N3,N2,N1) &
-    *AREA(N,N3,N2,N1)/DLYR(N,N3,N2,N1)
+    *AREA(N,N3,N2,N1)/DLYR_3D(N,N3,N2,N1)
 
   DFLGL=2.0_r8*AZMAX1(THETPM(M,N6,N5,N4))*POROQ*THETPM(M,N6,N5,N4)/POROS_vr(N6,N5,N4) &
-    *AREA(N,N6,N5,N4)/DLYR(N,N6,N5,N4)
+    *AREA(N,N6,N5,N4)/DLYR_3D(N,N6,N5,N4)
 
 !
 !     GASOUS CONDUCTANCES

@@ -22,20 +22,25 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
   real(r8),target,allocatable ::  DenomSolidThermCond(:,:,:)         !denominator for soil solid thermal conductivity
   real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model, [MJ/d2/h]
-  real(r8),target,allocatable ::  THeatFlowCellSoil_vr(:,:,:)           !hourly heat flux into soil layer  [MJ m-3]
+  real(r8),target,allocatable ::  THeatFlowCellSoil_vr(:,:,:)        !hourly heat flux into soil layer  [MJ m-3]
   real(r8),target,allocatable ::  HeatDrain_col(:,:)                 !heat loss through drainage [MJ/d2/h]
   real(r8),target,allocatable ::  HeatRunSurf_col(:,:)               !heat loss through surface runoff [MJ/d2/h]
   real(r8),target,allocatable ::  HeatDischar_col(:,:)               !Heat loss through discharge [MJ/d2/h]
   real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:)            !Heat flow into colum [MJ/d2/h]
-  real(r8),target,allocatable ::  HeatSource_col(:,:)                 !Heat source from heating [MJ/d2/h]
-  real(r8),target,allocatable :: THeatSoiThaw_col(:,:)                !Heat associated with freeze-thaw [MJ/d2/h]
-  real(r8),target,allocatable :: QSnoHeatXfer2Soil_col(:,:)          !Heat flux from snow into soil [MJ/d2/h]
+  real(r8),target,allocatable ::  HeatSource_col(:,:)                !Heat source from heating [MJ/d2/h]
+  real(r8),target,allocatable ::  THeatSoiThaw_col(:,:)              !Heat associated with freeze-thaw [MJ/d2/h]
+  real(r8),target,allocatable ::  QSnoHeatXfer2Soil_col(:,:)         !Heat flux from snow into soil [MJ/d2/h]
+  real(r8),target,allocatable ::  QIceInflx_vr(:,:,:)                !Ice influx to layer [m3 H2O/d2/h], essential for pond/lake
+  real(r8),target,allocatable ::  QIceInflx_col(:,:)
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSoilHeatData
 
   implicit none
+
+  allocate(QIceInflx_vr(JZ,JY,JX));  QIceInflx_vr = 0._r8
+  allocate(QIceInflx_col(JY,JX));  QIceInflx_col = 0._r8
   allocate(QSnoHeatXfer2Soil_col(JY,JX)); QSnoHeatXfer2Soil_col = 0._r8
   allocate(HeatSource_col(JY,JX)); HeatSource_col = 0._r8
   allocate(TKSZ(366,24,JZ));    TKSZ                                   = 0._r8
@@ -63,6 +68,9 @@ contains
   subroutine DestructSoilHeatData
   use abortutils, only : destroy
   implicit none
+
+  call destroy(QIceInflx_col)
+  call destroy(QIceInflx_vr)
   call destroy(QSnoHeatXfer2Soil_col)
   call destroy(THeatSoiThaw_col)
   call destroy(HeatSource_col)

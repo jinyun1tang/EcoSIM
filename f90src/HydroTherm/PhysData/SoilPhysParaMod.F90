@@ -26,11 +26,15 @@ implicit none
   contains
 !------------------------------------------------------------------------------------------
   subroutine CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
+  !
+  !Description
+  !Compute soil matric potential
   implicit none
   integer, intent(in) :: NY,NX,N1,N2,N3
-  real(r8), intent(out) :: PSISoilMatric    !< 0
-  real(r8), optional, intent(out) :: THETA1S
-  real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX,THETA1
+  real(r8), intent(out) :: PSISoilMatric      ! soil matric potential
+  real(r8), optional, intent(out) :: THETA1S  ! porosity
+  real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX
+  real(r8) :: THETA1                          !volumetric soil moisture
   !     BKVL=soil mass
   !     FC,WP=water contents at field capacity,wilting point
   !     FCL,WPL=log FC,WP
@@ -43,7 +47,7 @@ implicit none
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
 
-  THETA1=AMAX1(THETY_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
+  THETA1=AMAX1(SoilWatAirDry_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
 
   IF(VLSoilMicPMass_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil
@@ -66,24 +70,24 @@ implicit none
     !     PSISoilMatric=matric water potential
     !
   ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1).and.FracSoiPAsIce_vr(N3,N2,N1)>ZEROS2(N2,N1))THEN
-    FCX=FCI*FracSoiPAsIce_vr(N3,N2,N1)
-    WPX=WPI*FracSoiPAsIce_vr(N3,N2,N1)
-    FCLX=LOG(FCX)
-    WPLX=LOG(WPX)
-    PSDX=LOGPOROS_vr(N3,N2,N1)-FCLX
-    FCDX=FCLX-WPLX
+    FCX  = FCI*FracSoiPAsIce_vr(N3,N2,N1)
+    WPX  = WPI*FracSoiPAsIce_vr(N3,N2,N1)
+    FCLX = LOG(FCX)
+    WPLX = LOG(WPX)
+    PSDX = LOGPOROS_vr(N3,N2,N1)-FCLX
+    FCDX = FCLX-WPLX
     IF(FracSoiPAsWat_vr(N3,N2,N1).LT.FCX)THEN
       PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((FCLX-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
     ELSEIF(FracSoiPAsWat_vr(N3,N2,N1).LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
       PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
     ELSE
       !saturated
-      THETA1=POROS_vr(N3,N2,N1)
-      PSISoilMatric=PSISE_vr(N3,N2,N1)
+      THETA1        = POROS_vr(N3,N2,N1)
+      PSISoilMatric = PSISE_vr(N3,N2,N1)
     ENDIF
   ELSE
-    THETA1=POROS_vr(N3,N2,N1)
-    PSISoilMatric=PSISE_vr(N3,N2,N1)
+    THETA1        = POROS_vr(N3,N2,N1)
+    PSISoilMatric = PSISE_vr(N3,N2,N1)
   ENDIF
 
   if(present(THETA1S))THETA1S=THETA1
@@ -109,9 +113,9 @@ implicit none
     WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L-1,NY,NX)
     SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L-1,NY,NX)
     SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L-1,NY,NX)
-    CSAND(L,NY,NX)               = CSAND(L-1,NY,NX)
+    CSAND_vr(L,NY,NX)               = CSAND_vr(L-1,NY,NX)
     CSILT(L,NY,NX)               = CSILT(L-1,NY,NX)
-    CCLAY(L,NY,NX)               = CCLAY(L-1,NY,NX)
+    CCLAY_vr(L,NY,NX)               = CCLAY_vr(L-1,NY,NX)
     SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L-1,NY,NX)
     ROCK_vr(L,NY,NX)             = ROCK_vr(L-1,NY,NX)
     PH(L,NY,NX)                  = PH(L-1,NY,NX)
@@ -182,7 +186,7 @@ implicit none
   real(r8) :: HeatDiffusByWat1,HeatDiffusByAir1,RYLXW1,RYLXA1,RYLNW1,RYLNA1
   REAL(R8) :: XNUSW1,XNUSA1,ThermalConducByWater,ThermalConducByAir,WTHET1
 
-  IF(SoiBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
+  IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
     HeatDiffusByWat1     = AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3._r8
     HeatDiffusByAir1     = AZMAX1(FracSoilPoreAsAir_vr(N3,N2,N1)-TRBA)**3._r8

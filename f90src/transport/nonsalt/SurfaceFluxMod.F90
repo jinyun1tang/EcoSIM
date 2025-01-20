@@ -255,9 +255,9 @@ contains
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
-    DLYR0 = AMAX1(ZERO2,DLYR(3,0,NY,NX))
+    DLYR0 = AMAX1(ZERO2,DLYR_3D(3,0,NY,NX))
     TORT0 = TortMicPM_vr(M,0,NY,NX)/DLYR0*FracSurfByLitR_col(NY,NX)
-    DLYR1 = AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
+    DLYR1 = AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
     TORT1 = TortMicPM_vr(M,NU(NY,NX),NY,NX)/DLYR1
     DISPN = DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
 
@@ -433,8 +433,8 @@ contains
 !     MACROPORE TO MICROPORE TRANSFER
 !
   IF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-    IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
+    IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMacPM_vr(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -501,8 +501,8 @@ contains
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
 !
-  IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VLWatMacPS = AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
+  IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    VLWatMacPS = AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM_vr(M,NU(NY,NX),NY,NX))
     VOLWT      = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VLWatMacPS
     DO K = 1, jcplx
       !diffusion flux in micropore
@@ -893,9 +893,9 @@ contains
   integer :: idg
 !
 !     THETPM=air-filled porosity from watsub.f
-!     SoiBulkDensity_vr=bulk density
+!     SoilBulkDensity_vr=bulk density
 !
-  IF(THETPM(M,NU(NY,NX),NY,NX).GT.THETX.AND.SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(THETPM(M,NU(NY,NX),NY,NX).GT.THETX.AND.SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
 !
     call SurfSoilDifFlux(M,NY,NX)
 
@@ -950,7 +950,7 @@ contains
   real(r8) :: DLYR0,TORT0
 
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    DLYR0 = AMAX1(ZERO2,DLYR(3,0,NY,NX)) !vertical layer thickness
+    DLYR0 = AMAX1(ZERO2,DLYR_3D(3,0,NY,NX)) !vertical layer thickness
     TORT0 = TortMicPM_vr(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR_col(NY,NX)
 
     DO idg=idg_beg,idg_NH3
@@ -1050,7 +1050,7 @@ contains
     VLWatMicPOB = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
     VLWatMicPPA = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
     VLWatMicPPB = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
-    DLYR1       = AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
+    DLYR1       = AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
     TORT1       = TortMicPM_vr(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
@@ -1344,7 +1344,7 @@ contains
 !
   DFLG2=AZMAX1(THETPM(M,NU(NY,NX),NY,NX))*POROQ &
     *THETPM(M,NU(NY,NX),NY,NX)/POROS_vr(NU(NY,NX),NY,NX) &
-    *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
+    *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
 
   DO idg=idg_beg,idg_NH3
     DifuscG_vr(idg,3,NU(NY,NX),NY,NX)=DFLG2*GasDifc_vrc(idg,NU(NY,NX),NY,NX)

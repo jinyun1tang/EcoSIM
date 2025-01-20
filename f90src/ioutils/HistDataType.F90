@@ -73,7 +73,7 @@ implicit none
   real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
+  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
   real(r8),pointer   :: h1D_tLITR_N_col(:)       !litter N
   real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton profile 
   real(r8),pointer   :: h1D_RootAR_col(:)        !integrated Root autotrophic respiraiton
@@ -2532,7 +2532,7 @@ implicit none
       this%h1D_ECO_HVST_P_col(ncol) = EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)  = -NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PSI_SURF_col(ncol)   = PSISoilMatricP_vr(0,NY,NX)
-      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
+      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol)    = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)  = FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)      = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2696,7 +2696,7 @@ implicit none
       this%h1D_tOMActCDens_litr_col(ncol)      = tOMActC_vr(0,NY,NX)/(TSolidOMC_vr(0,NY,NX)+tOMActC_vr(0,NY,NX))
 
       DO L=1,JZ        
-        DVOLL=DLYR(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+        DVOLL=DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         if(DVOLL<=1.e-8_r8)cycle
         this%h2D_RootMassC_vr(ncol,L)     = RootMassElm_vr(ielmc,L,NY,NX)/DVOLL
@@ -2988,7 +2988,7 @@ implicit none
           this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootGasConductance_pvr(idg_CO2,ipltroot,L,NZ,NY,NX)
           this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)
           this%h2D_fRootGrowPSISense_pvr(nptc,L) = fRootGrowPSISense_pvr(ipltroot,L,NZ,NY,NX)
-          DVOLL                                  = DLYR(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+          DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
           if(DVOLL<1.e-8_r8)cycle
           this%h2D_ROOT_OSTRESS_pvr(nptc,L) = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_PSI_RT_pvr(nptc,L)       = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)

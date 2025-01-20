@@ -5491,16 +5491,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ExtWaterTablet0', dim1name='column',&
+    call restartvar(ncid, flag, varname='ExtWaterTablet0_col', dim1name='column',&
        long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0_col,datrc_1d) 
   else
-    !print*,'ExtWaterTablet0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d)   
+    !print*,'ExtWaterTablet0_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ExtWaterTablet0', dim1name='column',&
+    call restartvar(ncid, flag, varname='ExtWaterTablet0_col', dim1name='column',&
        long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -6069,16 +6069,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:3,1:JZ+1)    
-    call restartvar(ncid, flag, varname='DLYR', dim1name='column',dim2name='sdim',&
+    call restartvar(ncid, flag, varname='DLYR_3D', dim1name='column',dim2name='sdim',&
        dim3name='levsoi1',long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DLYR,datrc_3d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,DLYR_3D,datrc_3d) 
   else
     !print*,'DLYR'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DLYR,datrc_3d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DLYR_3D,datrc_3d)   
     datpr3 => datrc_3d(1:ncols,1:3,1:JZ+1)            
-    call restartvar(ncid, flag, varname='DLYR', dim1name='column',dim2name='sdim',&
+    call restartvar(ncid, flag, varname='DLYR_3D', dim1name='column',dim2name='sdim',&
        dim3name='levsoi1',long_name='snow temperature', units='oC', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)    
@@ -6141,10 +6141,10 @@ implicit none
        long_name='soil bulk density,0=water', units='Mg m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity_vr,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilBulkDensity_vr,datrc_2d) 
   else
     !print*,'SoiBulkDensity'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoiBulkDensity_vr,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilBulkDensity_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='SoiBulkDensity', dim1name='column',dim2name='levsoi1',&
        long_name='soil bulk density,0=water', units='Mg m-3', &
@@ -6494,16 +6494,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='THETY_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='SoilWatAirDry_vr', dim1name='column',dim2name='levsoi1',&
        long_name='air-dry water content', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,THETY_vr,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,SoilWatAirDry_vr,datrc_2d)     
   else
     !print*,'VLSoilMicP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,THETY_vr,datrc_2d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SoilWatAirDry_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='THETY_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='SoilWatAirDry_vr', dim1name='column',dim2name='levsoi1',&
        long_name='air-dry water content', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      

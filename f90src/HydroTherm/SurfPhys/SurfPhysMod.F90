@@ -679,7 +679,7 @@ contains
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
-  IF(FracSurfSnoFree_col(NY,NX).GT.0.0_r8 .AND. (SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .OR. &
+  IF(FracSurfSnoFree_col(NY,NX).GT.0.0_r8 .AND. (SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .OR. &
     VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
     !Ground partically covered by snow, focus on litter-soil interaction     
     call ExposedSoilFluxM(I,J,M,NY,NX,CumNetWatFlow2LitR,CumNetHeatFlow2LitR,&
@@ -777,7 +777,7 @@ contains
   !check litter temperature
   VLWatLitR=AMIN1(VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX),VLWatMicP1_vr(0,NY,NX))
 
-  IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !top layer is soil
     IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
       !surface litter holds water
@@ -785,7 +785,7 @@ contains
     ELSE
       ThetaWLitR=POROS0(NY,NX)
     ENDIF
-    THETW1=AMAX1(THETY_vr(NUM(NY,NX),NY,NX),AMIN1(POROS_vr(NUM(NY,NX),NY,NX) &
+    THETW1=AMAX1(SoilWatAirDry_vr(NUM(NY,NX),NY,NX),AMIN1(POROS_vr(NUM(NY,NX),NY,NX) &
       ,safe_adb(VLWatMicP1_vr(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX))))
     !K0 litter layer  
     !K1 topsoil layer    
@@ -794,7 +794,7 @@ contains
     K1                 = MAX(1,MIN(100,INT(100.0_r8*(AZMAX1(POROS_vr(NUM(NY,NX),NY,NX)-THETW1))/POROS_vr(NUM(NY,NX),NY,NX))+1))
     CNDR               = HydroCond_3D(3,K0,0,NY,NX)
     CND1               = HydroCond_3D(3,K1,NUM(NY,NX),NY,NX)*RainEkReducedKsat
-    DarcyCondLitR2Soil = 2.0_r8*CNDR*CND1/(CNDR*DLYR(3,NUM(NY,NX),NY,NX)+CND1*DLYRR_COL(NY,NX))
+    DarcyCondLitR2Soil = 2.0_r8*CNDR*CND1/(CNDR*DLYR_3D(3,NUM(NY,NX),NY,NX)+CND1*DLYRR_COL(NY,NX))
     PSIST0             = PSISM1_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)
     PSIST1             = PSISM1_vr(NUM(NY,NX),NY,NX)+PSIGrav_vr(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
     DarcyFlxLitR2Soil  = DarcyCondLitR2Soil*(PSIST0-PSIST1)*AREA(3,NUM(NY,NX),NY,NX)*FracEffAsLitR_col(NY,NX)*dts_HeatWatTP
@@ -1104,7 +1104,7 @@ contains
 ! PrecHeat2SoiNet=total convective heat flux to soil micropores, macropores
 ! XNPR=time step for litter water,heat flux calculations
 ! The model always assumes there is a litter layer
-  IF(SoiBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !soil bulk density significant
     !get flow to litter
     Rain2MicPflow2LitR    = AZMAX1(Rain2SoiMicP1_col(NY,NX)-VLairMicP1_vr(NUM(NY,NX),NY,NX))
@@ -1197,7 +1197,7 @@ contains
   ELSE
     EnergyImpact4ErosionM(M,NY,NX)=0.0_r8
   ENDIF
-  RainEkReducedKsat=EXP(-2.0E-03_r8*(CSILT(NUM(NY,NX),NY,NX)+CCLAY(NUM(NY,NX),NY,NX)) &
+  RainEkReducedKsat=EXP(-2.0E-03_r8*(CSILT(NUM(NY,NX),NY,NX)+CCLAY_vr(NUM(NY,NX),NY,NX)) &
     *EnergyImpact4Erosion(NY,NX))
 
 !
@@ -1242,7 +1242,7 @@ contains
   DPTHW2 = VWatStoreCapSurf_col(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
 
   ALT1 = Altitude_grid(N2,N1)+DPTHW1
-  ALT2 = Altitude_grid(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)
+  ALT2 = Altitude_grid(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR_3D(N,NUM(N2,N1),N2,N1)
 
   !grid elevation is higher than outside the grid, and in grid water layer higher than external water table
   !depth is counting downward
@@ -1302,7 +1302,7 @@ contains
 !     DLYRR=litter depth
 !
 !  HCNDLitr_col(NY,NX) = SatHydroCondLitR
-  DLYRR_COL(NY,NX)    = AMAX1(2.5E-03_r8,DLYR(3,0,NY,NX))
+  DLYRR_COL(NY,NX)    = AMAX1(2.5E-03_r8,DLYR_3D(3,0,NY,NX))
 !
 !     DISTRIBUTION OF PRECIPITATION AND ITS HEAT AMONG SURFACE
 !     RESIDUE, SOIL SURFACE, AND MACROPORES
@@ -1519,8 +1519,8 @@ contains
   REAL(R8), dimension(:,:),INTENT(OUT) :: RainEkReducedKsat
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol(JY,JX)
   real(r8), dimension(:,:),intent(out) :: HeatFluxAir2Soi(JY,JX)
-  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)
-  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)
+  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)    !flow into micropore
+  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)    !flow into macropore
   real(r8), dimension(:,:),optional,intent(out) :: Hinfl2Soil(JY,JX)    !heat flow into soil [MJ]
   real(r8) :: LatentHeatAir2Sno,HeatSensAir2Snow,Radnet2Snow,HeatSensEvapAir2Snow,VapXAir2TopLay
   integer  :: N1,N2,NX,NY,L

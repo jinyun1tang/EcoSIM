@@ -236,8 +236,8 @@ module UptakesMod
     PopuRootMycoC_pvr     => plt_biom% PopuRootMycoC_pvr,    &
     VLMicP_vr             => plt_soilchem%VLMicP_vr,         &
     VLiceMicP_vr          => plt_soilchem%VLiceMicP_vr,      &
-    THETY_vr              => plt_soilchem%THETY_vr,          &
-    SoiBulkDensity_vr     => plt_soilchem%SoiBulkDensity_vr, &
+    SoilWatAirDry_vr              => plt_soilchem%SoilWatAirDry_vr,          &
+    SoilBulkDensity_vr     => plt_soilchem%SoilBulkDensity_vr, &
     VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr,      &
     VLSoilMicP_vr         => plt_soilchem%VLSoilMicP_vr,     &
     CanopyStemArea_pft    => plt_morph%CanopyStemArea_pft,   &
@@ -294,8 +294,8 @@ module UptakesMod
 ! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics 
   D9000: DO L=NU,MaxNumRootLays
     ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
-    IF(SoiBulkDensity_vr(L).GT.ZERO)THEN
-      WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)-THETY_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake
+    IF(SoilBulkDensity_vr(L).GT.ZERO)THEN
+      WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)-SoilWatAirDry_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake
       AirMicPore4Fill_vr(L)  = AZMAX1(VLMicP_vr(L)-VLWatMicP_vr(L)-VLiceMicP_vr(L))   !air volume in soil
     ELSE
       WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)

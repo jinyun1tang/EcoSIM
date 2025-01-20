@@ -209,7 +209,7 @@ module StartsMod
   !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table
   !     WaterTBLSlope_col=slope of natural water table relative to landscape surface
   !     in geography, slope =rise/run
-  !     ExtWaterTablet0,DTBLD=depth of natural,artificial water table adjusted for elevn
+  !     ExtWaterTablet0_col,DTBLD=depth of natural,artificial water table adjusted for elevn
   !     DepzIntWTBL_col=depth to internal water table
   !     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
   !     XDPTH=x-section area/distance in solute flux calculations (m2/m)
@@ -235,21 +235,21 @@ module StartsMod
 ! ALT: grid altitude
 ! DTBLI: external water table depth, before applying the altitude correction
 ! WaterTBLSlope_col: slope of water table relative to surface slope
-! ExtWaterTablet0: external water table depth
+! ExtWaterTablet0_col: external water table depth
 ! WtblDepzTile_col: depth of artificial water table
 ! DepzIntWTBL_col: internal water table depth
 ! DTBLD: artifical water table depth, before applying the altitude correction
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
-      IF(SoiBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+      IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
         DTBLD(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
       ELSE
-        ExtWaterTablet0(NY,NX)=0.0_r8
+        ExtWaterTablet0_col(NY,NX)=0.0_r8
         DTBLD(NY,NX)=0.0_r8
       ENDIF
-      DepzIntWTBL_col(NY,NX)=ExtWaterTablet0(NY,NX)
+      DepzIntWTBL_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
     ENDDO
   ENDDO
 
@@ -288,14 +288,14 @@ module StartsMod
               N6=L+1
             ENDIF
           ENDIF
-          DIST(N,N6,N5,N4)=0.5_r8*(DLYR(N,N3,N2,N1)+DLYR(N,N6,N5,N4))
+          DIST(N,N6,N5,N4)=0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
           XDPTH(N,N6,N5,N4)=AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?
           DISP(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
         ENDDO
 
         IF(L.EQ.NU(NY,NX))THEN
-          DIST(3,N3,N2,N1)=0.5_r8*DLYR(3,N3,N2,N1)
+          DIST(3,N3,N2,N1)=0.5_r8*DLYR_3D(3,N3,N2,N1)
           XDPTH(3,N3,N2,N1)=AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
           DISP(3,N3,N2,N1)=0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
@@ -407,11 +407,11 @@ module StartsMod
     RCH4PhysexchPrev_vr(L,NY,NX)    = 0.0_r8
 
     IF(L.GT.0)THEN
-      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+      IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
         !compute particle density
         PTDS              = ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-(SoiBulkDensity_vr(L,NY,NX)/PTDS))        
+        POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-(SoilBulkDensity_vr(L,NY,NX)/PTDS))        
       ELSE
         !for ponding water
         PTDS              = 0.0_r8
@@ -430,15 +430,15 @@ module StartsMod
       !     TKS_vr,TCS=soil temperature (oC,K)
       !     THETW,THETI,THETP=micropore water,ice,air concentration (m3 m-3)
 !
-      SAND(L,NY,NX)=CSAND(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
+      SAND(L,NY,NX)=CSAND_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
       SILT(L,NY,NX)=CSILT(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
-      CLAY(L,NY,NX)=CCLAY(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
-      IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+      CLAY(L,NY,NX)=CCLAY_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
+      IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
-        VORGC=CORGCM*SoiBulkDensity_vr(L,NY,NX)/PTDS
-        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity_vr(L,NY,NX)/PTDS
-        VSAND=CSAND(L,NY,NX)*SoiBulkDensity_vr(L,NY,NX)/PTDS
+        VORGC=CORGCM*SoilBulkDensity_vr(L,NY,NX)/PTDS
+        VMINL=(CSILT(L,NY,NX)+CCLAY_vr(L,NY,NX))*SoilBulkDensity_vr(L,NY,NX)/PTDS
+        VSAND=CSAND_vr(L,NY,NX)*SoilBulkDensity_vr(L,NY,NX)/PTDS
         VHeatCapacitySoilM_vr(L,NY,NX)=((cpo*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP_vr(L,NY,NX)+2.128_r8*ROCK_vr(L,NY,NX))*VGeomLayer_vr(L,NY,NX)
       ELSE
@@ -845,9 +845,9 @@ module StartsMod
   DO  L=0,NL(NY,NX)
     DLYRI_3D(1,L,NY,NX) = DH(NY,NX)        !east-west direction
     DLYRI_3D(2,L,NY,NX) = DV(NY,NX)        !north-south direction
-    DLYR(1,L,NY,NX)     = DLYRI_3D(1,L,NY,NX)
-    DLYR(2,L,NY,NX)     = DLYRI_3D(2,L,NY,NX)
-    AREA(3,L,NY,NX)     = DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)  !grid horizontal area
+    DLYR_3D(1,L,NY,NX)     = DLYRI_3D(1,L,NY,NX)
+    DLYR_3D(2,L,NY,NX)     = DLYRI_3D(2,L,NY,NX)
+    AREA(3,L,NY,NX)     = DLYR_3D(1,L,NY,NX)*DLYR_3D(2,L,NY,NX)  !grid horizontal area
   ENDDO
   end subroutine InitHGrid
 !------------------------------------------------------------------------------------------
@@ -895,7 +895,7 @@ module StartsMod
       VLSoilMicPMass_vr(L,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
       DLYRI_3D(3,L,NY,NX) = VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)
-      DLYR(3,L,NY,NX)     = DLYRI_3D(3,L,NY,NX)
+      DLYR_3D(3,L,NY,NX)     = DLYRI_3D(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
 !     DPTH=depth of layer middle
@@ -905,30 +905,31 @@ module StartsMod
 !     VOLT=total volume
 !     VOLX=total micropore volume
       IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
-!     thickness:=bottom depth-upper depth
+!     layer thickness:=bottom depth-upper depth
       DLYRI_3D(3,L,NY,NX)=(CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(L-1,NY,NX))
       call check_bool(DLYRI_3D(3,L,NY,NX)<0._r8,'negative soil layer thickness',__LINE__,mod_filename)
-      DLYR(3,L,NY,NX)              = DLYRI_3D(3,L,NY,NX)
+
+      DLYR_3D(3,L,NY,NX)           = DLYRI_3D(3,L,NY,NX)
       SoiDepthMidLay_vr(L,NY,NX)   = 0.5_r8*(CumDepz2LayerBot_vr(L,NY,NX)+CumDepz2LayerBot_vr(L-1,NY,NX))
-      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
+      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)+DLYR_3D(3,NU(NY,NX),NY,NX)
       DPTHZ_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
-      VGeomLayer_vr(L,NY,NX)       = AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
+      VGeomLayer_vr(L,NY,NX)       = AREA(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0_vr(L,NY,NX)     = VGeomLayer_vr(L,NY,NX)
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
-      VLSoilMicPMass_vr(L,NY,NX) = SoiBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-!      write(112,*)'bkvl',L,SoiBulkDensity_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX),FracSoiAsMicP_vr(L,NY,NX),&
-!        AREA(3,L,NY,NX),DLYR(3,L,NY,NX)
+      VLSoilMicPMass_vr(L,NY,NX) = SoilBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+!      write(112,*)'bkvl',L,SoilBulkDensity_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX),FracSoiAsMicP_vr(L,NY,NX),&
+!        AREA(3,L,NY,NX),DLYR_3D(3,L,NY,NX)
       totRootLenDens_vr(L,NY,NX) = 0.0_r8
     ENDIF
-    AREA(1,L,NY,NX) = DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
-    AREA(2,L,NY,NX) = DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
+    AREA(1,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
+    AREA(2,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
   ENDDO
-  CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
+  CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
   CumLitRDepz_col(NY,NX)        = CumDepz2LayerBot_vr(0,NY,NX)
-  AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
+  AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR_3D(1,NL(NY,NX),NY,NX)*DLYR_3D(2,NL(NY,NX),NY,NX)
   end associate
   end subroutine InitLayerDepths
 

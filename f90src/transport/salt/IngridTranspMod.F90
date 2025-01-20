@@ -126,7 +126,7 @@ module IngridTranspMod
 !     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
 !     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
 !
-      IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
         call MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_flx_diffus)
       ELSE
         trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8
@@ -465,9 +465,9 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
-  DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
+  DLYR0=AMAX1(ZERO2,DLYR_3D(3,0,NY,NX))
   TORT0=TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR_col(NY,NX)
-  DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
+  DLYR1=AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
   TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)
   TORTL=AMIN1(1.0_r8,(TORT0+TORT1)/(DLYR0+DLYR1))
   DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
@@ -618,8 +618,8 @@ module IngridTranspMod
   integer :: nsalts
 !     begin_execution
 
-  IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
+  IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX)/VLWatMacPM_vr(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=VFLWX
   ENDIF
@@ -710,7 +710,7 @@ module IngridTranspMod
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
   VLWatMicPMNU=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
-  VOLWHS=AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
+  VOLWHS=AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM_vr(M,NU(NY,NX),NY,NX))
   VOLWT=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VOLWHS
 
   DO nsalts=idsalt_beg,idsalt_KSO4
@@ -1066,8 +1066,8 @@ module IngridTranspMod
 !     ADJACENT GRID CELL MICROPORES FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  IF(THETW1(N3,N2,N1).GT.THETY_vr(N3,N2,N1) &
-    .AND.THETW1(N6,N5,N4).GT.THETY_vr(N6,N5,N4) &
+  IF(THETW1(N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1) &
+    .AND.THETW1(N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4) &
     .AND.VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
     .AND.VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 !
@@ -1163,8 +1163,8 @@ module IngridTranspMod
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
 
-    DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
-    DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
+    DLYR1=AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
+    DLYR2=AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL=(TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
 
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
@@ -1256,15 +1256,15 @@ module IngridTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    IF(VLWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N3,N2,N1)))
+    IF(VLWatMacPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
 !
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE IN VERTICAL FLUX
 !
-    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM(M,N6,N5,N4))THEN
+    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
       DO nsalts=idsalt_beg,idsalt_KSO4
         trcSalt_RFH(nsalts)=VFLW*AZMAX1((trcSalt_soHml2(nsalts,N3,N2,N1) &
           -AZMIN1(trcSalt_RFXS(nsalts,NU(N2,N1),N2,N1))))
@@ -1305,8 +1305,8 @@ module IngridTranspMod
 !     OF WATER FLUX AND MACROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN ADJACENT GRID CELL
 !
-    IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+    IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1358,8 +1358,8 @@ module IngridTranspMod
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 
-  IF(VLWatMacPM(M,N3,N2,N1).GT.THETY_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
-    .AND.VLWatMacPM(M,N6,N5,N4).GT.THETY_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
+  IF(VLWatMacPM_vr(M,N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
+    .AND.VLWatMacPM_vr(M,N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
@@ -1378,14 +1378,14 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !
     DO nsalts=idsalt_beg,idsaltb_end
-      trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_soHml2(nsalts,N3,N2,N1)/VLWatMacPM(M,N3,N2,N1))
-      trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4))
+      trcSalt_conc_src(nsalts)=AZMAX1(trcSalt_soHml2(nsalts,N3,N2,N1)/VLWatMacPM_vr(M,N3,N2,N1))
+      trcSalt_conc_dest(nsalts)=AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4))
     ENDDO
 !
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MACROPORES
 !
 !     DLYR=soil layer thickness
-!     TortMacPM=macropore tortuosity from hour1.f
+!     TortMacPM_vr=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
 !     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
@@ -1406,9 +1406,9 @@ module IngridTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
-    DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    DLYR1=AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
+    DLYR2=AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
+    TORTL=(TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
@@ -1496,8 +1496,8 @@ module IngridTranspMod
 !     MACROPORE TO MICROPORE TRANSFER
 !
   IF(FWatExMacP2MicPM_vr(M,N6,N5,N4).GT.0.0)THEN
-    IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+    IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM_vr(M,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1567,8 +1567,8 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     *2,*H2=solute content of micropores,macropores
 !
-  IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-    VOLWHS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
+  IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
+    VOLWHS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM_vr(M,N6,N5,N4))
     VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VOLWHS
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_flx_diffus(nsalts)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2(nsalts,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &

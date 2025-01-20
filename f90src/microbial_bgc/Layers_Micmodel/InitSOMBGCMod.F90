@@ -566,12 +566,12 @@ module InitSOMBGCMOD
       !     DRYLAND SOIL
       !
       !     CORGC,FORGC=SOC,minimum SOC for organic soil(g Mg-1)
-      !     DPTH,ExtWaterTablet0=depth to layer midpoint,external water table(m)
+      !     DPTH,ExtWaterTablet0_col=depth to layer midpoint,external water table(m)
       !     FC0=partitioning to less resistant component at DPTH=0
       !     FCX=reduction in FC0 at DPTH
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
-      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoiDepthMidLay_vr(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
+      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoiDepthMidLay_vr(L,NY,NX).LE.ExtWaterTablet0_col(NY,NX) &
         +CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
@@ -627,7 +627,7 @@ module InitSOMBGCMOD
   ENDIF
 
   IF(L.GT.0)THEN
-    IF(SoiBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+    IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       CORGCM=AMIN1(orgcden,(CORGCX(k_fine_litr)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus)))/0.55_r8
     else
       CORGCM=0._r8

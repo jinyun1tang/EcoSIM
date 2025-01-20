@@ -393,8 +393,8 @@ module StarteMod
     trc_gasml_vr(idg_NH3,L,NY,NX) = AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP_vr(L,NY,NX)
     trc_gasml_vr(idg_H2,L,NY,NX)  = AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
 
-!   ExtWaterTablet0: external water table depth
-    IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.ExtWaterTablet0(NY,NX))THEN
+!   ExtWaterTablet0_col: external water table depth
+    IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.ExtWaterTablet0_col(NY,NX))THEN
       ! above water table
       trc_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)

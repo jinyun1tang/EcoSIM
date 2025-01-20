@@ -43,7 +43,7 @@ implicit none
   real(r8),allocatable ::  TNO3ErosBand_col(:,:)                        !
   real(r8),allocatable ::  trcx_TER(:,:,:)                         !
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
-  real(r8),allocatable ::  tErosionSedmLoss(:,:)                        !
+  real(r8),allocatable ::  tErosionSedmLoss_col(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)                       !
   real(r8),allocatable ::  TWatFlowCellMacP_vr(:,:,:)                       !
@@ -122,7 +122,7 @@ implicit none
   allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
   allocate(trcs_TransptMicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_TransptMicP_vr=0._r8
 
-  allocate(tErosionSedmLoss(JY,JX));      tErosionSedmLoss=0._r8
+  allocate(tErosionSedmLoss_col(JY,JX));      tErosionSedmLoss_col=0._r8
   allocate(TWatFlowCellMicP_vr(JZ,JY,JX));     TWatFlowCellMicP_vr=0._r8
   allocate(TWatFlowCellMicPX_vr(JZ,JY,JX));    TWatFlowCellMicPX_vr=0._r8
   allocate(TWatFlowCellMacP_vr(JZ,JY,JX));    TWatFlowCellMacP_vr=0._r8
@@ -195,7 +195,7 @@ implicit none
   call destroy(TNH3ErosBand_col)
   call destroy(TNUreaErosBand_col)
   call destroy(TNO3ErosBand_col)
-  call destroy(tErosionSedmLoss)
+  call destroy(tErosionSedmLoss_col)
   call destroy(TWatFlowCellMicP_vr)
   call destroy(TWatFlowCellMicPX_vr)
   call destroy(TWatFlowCellMacP_vr)
