@@ -203,8 +203,8 @@ module RedistMod
     VLiceMacP_vr(L,NY,NX) = AZMAX1(VLiceMacP_vr(L,NY,NX))
     VLSoilPoreMicPX       = AREA(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
-    ThetaH2OZ_vr(L,NY,NX) = AMAX1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
-    ThetaICEZ_vr(L,NY,NX) = AMAX1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
+    ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
+    ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
   ENDDO D9945
 
   end subroutine UpdateOutputVars
@@ -881,7 +881,9 @@ module RedistMod
     ENGY                      = VHeatCapacityX*TKSX
     VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
       +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
-    if(VHeatCapacity_vr(L,NY,NX)>0._r8)VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)
+    if(plantOM4Heat .and. VHeatCapacity_vr(L,NY,NX)>0._r8)then
+      VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)
+    endif
 
     !
     !

@@ -12,7 +12,7 @@ module WatsubMod
   use ElmIDMod,       only: iEastWestDirection,         iNorthSouthDirection, iVerticalDirection
   use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
   use SnowBalanceMod, only : DebugSnowPrint
-  use EcoSIMCtrlMod,  only: lverb,snowRedist_model  
+  use EcoSIMCtrlMod,  only: lverb,snowRedist_model,plantOM4Heat  
   use PerturbationMod, only : check_Soil_Warming,is_warming_layerL  
   use minimathmod      
   use RootDataType
@@ -364,7 +364,9 @@ module WatsubMod
         !VLHeatCapacityB=heat capacity for macropore water/ice
         VLHeatCapacityA_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX) &
           +cpi*VLiceMicP1_vr(L,NY,NX)
-        if(VLHeatCapacityA_vr(L,NY,NX)>0._r8)VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)      
+        if(plantOM4Heat .and. VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
+          VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)      
+        endif  
         VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
         VHeatCapacity1_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
     !
@@ -1235,7 +1237,7 @@ module WatsubMod
           ENGY1                      = VHXX*TKXX
           
           VLHeatCapacityA_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
-          if(VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
+          if(plantOM4Heat .and. VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
             VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)
           endif
           VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
@@ -2348,7 +2350,11 @@ module WatsubMod
 !     MacPIceHeatFlxFrezPt,SoilWatFrezHeatRelease_vr=latent heat from macro freeze-thaw unltd,ltd by water,ice
 !     FIceThawedMacP_vr=soil water flux from macropore freeze-thaw
 !
-  dcpo            = cpo*RootMassElm_vr(ielmc,N3,N2,N1)
+  if(plantOM4Heat)then
+    dcpo = cpo*RootMassElm_vr(ielmc,N3,N2,N1)
+  else
+    dcpo=0._r8
+  endif
   PSISMX          = PSISoilMatricPtmp_vr(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
   !apply the Clausis-Clapeyron equation for depressed freezing temperature, 
   !Cary and Mayland (1972), 9.0959E+04_r8~=273.15*LtHeatIceMelt  
