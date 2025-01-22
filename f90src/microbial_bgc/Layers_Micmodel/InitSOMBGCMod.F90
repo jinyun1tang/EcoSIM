@@ -1,9 +1,10 @@
 module InitSOMBGCMOD
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use EcoSIMConfig,     only: nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
-  use SoilBGCNLayMod,   only: sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
-  use minimathmod,      only: AZMAX1
-  use EcoSiMParDataMod, only: micpar
+  use data_kind_mod,    only : r8 => DAT_KIND_R8
+  use EcoSIMConfig,     only : nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
+  use SoilBGCNLayMod,   only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
+  use minimathmod,      only : AZMAX1,safe_adb
+  use EcoSiMParDataMod, only : micpar
+  use EcoSIMCtrlMod   , only : PrintInfo  
   use MicrobialDataType
   use SOMDataType
   use GridConsts
@@ -648,6 +649,8 @@ module InitSOMBGCMOD
   real(r8), intent(out) :: CORGCM
   real(r8), intent(out) :: FCX
 
+  call PrintInfo('beg InitSOMProfile')
+
   call InitLitterProfile(L,NY,NX)
 
   !     SURFACE RESIDUE KINETIC COMPONENTS
@@ -659,6 +662,7 @@ module InitSOMBGCMOD
   !     POM
   call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,CORGCM)
   
+  call PrintInfo('end InitSOMProfile')
   end subroutine InitSOMProfile
 
 !------------------------------------------------------------------------------------------
@@ -678,13 +682,16 @@ module InitSOMBGCMOD
     CNRH            => micpar%CNRH,            &
     CPRH            => micpar%CPRH             &
   )
+
+  call PrintInfo('beg InitLitterProfile')
+
   IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
     scal                      = AREA(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
     CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
-    scal                      = AREA(3,L,NY,NX)/VGeomLayer_vr(L,NY,NX)
+    scal                      = safe_adb(AREA(3,L,NY,NX),VGeomLayer_vr(L,NY,NX))
     CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
@@ -693,10 +700,10 @@ module InitSOMBGCMOD
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
   IF(L.GT.0)THEN
-    CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
-    CORGRZ=COMLitrC_vr(L,NY,NX)
-    CORGNZ=CSoilOrgM_vr(ielmn,L,NY,NX)
-    CORGPZ=CSoilOrgM_vr(ielmp,L,NY,NX)
+    CORGCZ = CSoilOrgM_vr(ielmc,L,NY,NX)
+    CORGRZ = COMLitrC_vr(L,NY,NX)
+    CORGNZ = CSoilOrgM_vr(ielmn,L,NY,NX)
+    CORGPZ = CSoilOrgM_vr(ielmp,L,NY,NX)
     IF(CORGCZ.GT.ZERO)THEN
       CORGCX(k_POM)   = CORGRZ
       CORGCX(k_humus) = AZMAX1(CORGCZ-CORGCX(k_POM))
@@ -721,7 +728,7 @@ module InitSOMBGCMOD
     CORGPX(k_POM)   = 0.0_r8
     CORGPX(k_humus) = 0.0_r8
   ENDIF
-!  write(*,*)L,CORGCX
+  call PrintInfo('end InitLitterProfile')
   end associate
   end subroutine InitLitterProfile
 !------------------------------------------------------------------------------------------

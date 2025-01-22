@@ -88,6 +88,8 @@ module RedistMod
   real(r8) :: TFLWT,orgm(1:NumPlantChemElms)
   real(r8) :: dWat,dHeat
 !     execution begins here
+
+  call PrintInfo('beg redist')
   curday=I
   curhour=J
   VOLISO = 0.0_r8
@@ -143,7 +145,7 @@ module RedistMod
 
     ENDDO D9990
   ENDDO D9995
-  RETURN
+  call PrintInfo('end redist')
 
   END subroutine redist
 
@@ -1584,6 +1586,7 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN_lnd=cumulative net surface heat transfer
 !
+  call PrintInfo('beg AddFlux2SurfaceResidue')
   dWat=0._r8; dHeat=0._r8
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     OSCMK=0._r8
@@ -1598,6 +1601,7 @@ module RedistMod
       RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
       HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
+      write(115,*)I+J/24.,VLWatMicP_vr(0,NY,NX),RAINR      
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
       QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
       CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
@@ -1616,6 +1620,7 @@ module RedistMod
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)
 
+  call PrintInfo('end AddFlux2SurfaceResidue')
   end subroutine AddFlux2SurfaceResidue
 
 !------------------------------------------------------------------------------------------

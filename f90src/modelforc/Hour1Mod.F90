@@ -1544,7 +1544,7 @@ module Hour1Mod
     VLMicP_vr(0,NY,NX)                             = 0._r8
     VLsoiAirP_vr(0,NY,NX)                          = 0._r8
     POROS_vr(0,NY,NX)                              = 1.0_r8
-    DLYR_3D(3,0,NY,NX)                                = 0._r8
+    DLYR_3D(3,0,NY,NX)                             = 0._r8
     THETW_vr(0,NY,NX)                              = 0._r8
     THETI_vr(0,NY,NX)                              = 0._r8
     ThetaAir_vr(0,NY,NX)                           = 1.0_r8

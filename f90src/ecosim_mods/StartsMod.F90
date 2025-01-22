@@ -6,6 +6,10 @@ module StartsMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : padr, print_info,check_bool
   use minimathMod, only : isclose, AZMAX1,AZMIN1
+  use EcoSiMParDataMod, only : micpar  
+  use SnowPhysMod, only : InitSnowLayers
+  use InitSOMBGCMod, only : InitSOMConsts,InitSOMProfile,InitSOMVars
+  use InitVegBGC, only : InitIrradianceGeometry  
   use EcosimConst
   use TracerIDMod
   use SnowDataType
@@ -15,8 +19,6 @@ module StartsMod
   use EcoSIMCtrlMod
   use ChemTranspDataType
   use FertilizerDataType
-  use SnowPhysMod, only : InitSnowLayers
-  use InitSOMBGCMod, only : InitSOMConsts,InitSOMProfile,InitSOMVars
   use CanopyRadDataType
   use GridConsts
   use SoilPhysDataType
@@ -26,7 +28,6 @@ module StartsMod
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use LandSurfDataType
-  use InitVegBGC, only : InitIrradianceGeometry
   use PlantTraitDataType
   use PlantDataRateType
   use SurfLitterDataType
@@ -82,7 +83,7 @@ module StartsMod
   real(r8) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
 ! begin_execution
 
-
+  call PrintInfo('begin starts')
   !  Initialize controlling parameters
   call InitControlParms
   !
@@ -98,11 +99,12 @@ module StartsMod
   call InitAccumulators()
 
 ! this assumes the whole landscape is a grid
-  ALTZG=0.0_r8
-  LandScape1stSoiLayDepth=0.0_r8
+  ALTZG                   = 0.0_r8
+  LandScape1stSoiLayDepth = 0.0_r8
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+
       !
       !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
       !
@@ -156,9 +158,11 @@ module StartsMod
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
 !
+      
       call InitHGrid(NY,NX)
-
+    
       call InitLayerDepths(NY,NX)
+
     ! ActiveLayDepZ_col=active layer depth (m)
       ActiveLayDepZ_col(NY,NX)=9999.0_r8
 !
@@ -190,6 +194,7 @@ module StartsMod
   CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
   tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
 !
+  
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 
   DO  NX=NHW,NHE
@@ -199,6 +204,7 @@ module StartsMod
       WatMass_col(NY,NX) = WatMass_col(NY,NX)+XWS
     ENDDO  
   ENDDO
+  call PrintInfo('end starts')
   RETURN
   END subroutine starts
 !------------------------------------------------------------------------------------------
@@ -223,7 +229,7 @@ module StartsMod
 
 
   ! begin_execution
-
+  call PrintInfo('beg InitSoilVars')
 !     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
 !
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
@@ -316,6 +322,7 @@ module StartsMod
       SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
     ENDDO
   ENDDO
+  call PrintInfo('end InitSoilVars')
   end subroutine InitSoilVars
 !------------------------------------------------------------------------------------------
   subroutine InitSoilProfile(NY,NX,LandScape1stSoiLayDepth)
@@ -343,6 +350,7 @@ module StartsMod
 !
 !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
 !
+  call PrintInfo('beg InitSoilProfile')
   TORGC=0.0_r8
   D1190: DO L=NU(NY,NX),NL(NY,NX)
     !     CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
@@ -419,7 +427,6 @@ module StartsMod
       ENDIF
       POROSI_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLMicP_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-!      VLMicPt0_col(L,NY,NX) = VLMicP_vr(L,NY,NX)
       VLMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayert0_vr(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
@@ -509,11 +516,12 @@ module StartsMod
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
-
+  
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
   
+  call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
 
@@ -842,6 +850,7 @@ module StartsMod
   integer, intent(in) :: NY,NX
   integer :: L
 
+  call PrintInfo('beg InitHGrid')
   DO  L=0,NL(NY,NX)
     DLYRI_3D(1,L,NY,NX) = DH(NY,NX)        !east-west direction
     DLYRI_3D(2,L,NY,NX) = DV(NY,NX)        !north-south direction
@@ -849,10 +858,11 @@ module StartsMod
     DLYR_3D(2,L,NY,NX)     = DLYRI_3D(2,L,NY,NX)
     AREA(3,L,NY,NX)     = DLYR_3D(1,L,NY,NX)*DLYR_3D(2,L,NY,NX)  !grid horizontal area
   ENDDO
+  call PrintInfo('end InitHGrid')
   end subroutine InitHGrid
 !------------------------------------------------------------------------------------------
   subroutine InitLayerDepths(NY,NX)
-  use EcoSiMParDataMod, only : micpar
+
   implicit none
   integer, intent(in) :: NY, NX
   integer :: L,K,j
@@ -863,8 +873,9 @@ module StartsMod
     k_fine_litr     => micpar%k_fine_litr,     &
     k_manure        => micpar%k_manure         &
   )
-
 !     begin_execution
+  call PrintInfo('beg InitLayerDepths')
+
   DO  L=0,NL(NY,NX)
 !
 ! LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
@@ -895,7 +906,7 @@ module StartsMod
       VLSoilMicPMass_vr(L,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
       DLYRI_3D(3,L,NY,NX) = VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)
-      DLYR_3D(3,L,NY,NX)     = DLYRI_3D(3,L,NY,NX)
+      DLYR_3D(3,L,NY,NX)  = DLYRI_3D(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
 !     DPTH=depth of layer middle
@@ -930,6 +941,7 @@ module StartsMod
   CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
   CumLitRDepz_col(NY,NX)        = CumDepz2LayerBot_vr(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR_3D(1,NL(NY,NX),NY,NX)*DLYR_3D(2,NL(NY,NX),NY,NX)
+  call PrintInfo('end InitLayerDepths')
   end associate
   end subroutine InitLayerDepths
 
@@ -1062,7 +1074,7 @@ module StartsMod
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
-!
+!      
       call InitHGrid(NY,NX)
 
       call InitLayerDepths(NY,NX)

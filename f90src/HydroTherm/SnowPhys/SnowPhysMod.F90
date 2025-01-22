@@ -8,6 +8,7 @@ module SnowPhysMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL  
   use abortutils   , only : endrun   
+  use EcoSIMCtrlMod,  only: fixWaterLevel  
   use SnowDataType
   use SurfLitterDataType
   use SOMDataType
@@ -208,7 +209,9 @@ contains
   real(r8), intent(out) :: TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP
   real(r8), intent(out) :: TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr
   real(r8), intent(inout) :: CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP
-  real(r8), intent(inout) :: CumSnowWatFLow2LitR,CumNetHeatFlow2LitR,cumNetHeatFlow2Soil
+  real(r8), intent(inout) :: CumSnowWatFLow2LitR
+  real(r8), intent(inout) :: CumNetHeatFlow2LitR
+  real(r8), intent(inout) :: cumNetHeatFlow2Soil
   real(r8) :: TCND1W,TCNDR
   real(r8) :: ATCNDW,VapCondSnoWeited,TCNDS
   real(r8) :: H2OVapFlx,H2OVapFlxMax,CumVapFlxLitr2Soi
@@ -417,7 +420,7 @@ contains
           WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
           WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
           WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
-          HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil
+          HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
           WatFlowSno2LitR       = WatFloInSnoMax-WatFlowSno2Soil              !this does not consider the abscence of litter layer
           HeatFlowSno2LitrByWat = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2LitR
 
@@ -1144,32 +1147,34 @@ contains
       TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
-    else      
-      VLWatMicP1_vr(NUM(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
-      VLiceMicP1_vr(NUM(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
-      ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)
-      VLHeatCapacityA_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
-        +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
-      VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
-        +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
-      VHeatCapacity1_vr(NUM(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)
+    else 
+      if(.not. fixWaterLevel)then     
+        VLWatMicP1_vr(NUM(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
+        VLiceMicP1_vr(NUM(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+        ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)
+        VLHeatCapacityA_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+          +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
+        VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
+          +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
+        VHeatCapacity1_vr(NUM(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)
 
-      QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
-      QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
-      QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
+        QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
+        QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
+        QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
 
-      ! topsoil layer is there        
-      IF(VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-        tk1pres                      = TKSoil1_vr(NUM(NY,NX),NY,NX)
-        TKSoil1_vr(NUM(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
-      ELSE
-        TKSoil1_vr(NUM(NY,NX),NY,NX) = TairK_col(NY,NX)
-      ENDIF
+        ! topsoil layer is there        
+        IF(VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+          tk1pres                      = TKSoil1_vr(NUM(NY,NX),NY,NX)
+          TKSoil1_vr(NUM(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
+        ELSE
+          TKSoil1_vr(NUM(NY,NX),NY,NX) = TairK_col(NY,NX)
+        ENDIF
 
-      Qinflx2Soil_col(NY,NX)   = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
-      QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
-      QSnowHeatLoss_col(NY,NX) = QSnowHeatLoss_col(NY,NX)+HFLWS
-      Qinflx2SoilM_col(NY,NX)  = Qinflx2SoilM_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+        Qinflx2Soil_col(NY,NX)   = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+        QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+        QSnowHeatLoss_col(NY,NX) = QSnowHeatLoss_col(NY,NX)+HFLWS
+        Qinflx2SoilM_col(NY,NX)  = Qinflx2SoilM_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      endif
     endif
   ENDIF
   
@@ -1484,11 +1489,11 @@ contains
       IF(H2OVapFlx.GE.0.0_r8)THEN
         !vapor flux from litter to soil
         VapConvFlxLitr2Soi  = AZMAX1(AMIN1(H2OVapFlx,H2OVapFlxMax,VLWatLitR*dts_litrvapht))
-        HeatConvFlxLitr2Soi = (cpw*TKXR+EvapLHTC)*VapConvFlxLitr2Soi  !enthalpy flux
+        HeatConvFlxLitr2Soi = (cpw*TKXR*HeatAdv_scal+EvapLHTC)*VapConvFlxLitr2Soi  !enthalpy flux
       ELSE
         !vapor flux from soil to litter
         VapConvFlxLitr2Soi  = AZMIN1(AMAX1(H2OVapFlx,H2OVapFlxMax,-AZMAX1(VLWatSoil)*dts_litrvapht))
-        HeatConvFlxLitr2Soi = (cpw*TK1X+EvapLHTC)*VapConvFlxLitr2Soi
+        HeatConvFlxLitr2Soi = (cpw*TK1X*HeatAdv_scal+EvapLHTC)*VapConvFlxLitr2Soi
       ENDIF
     ELSE
       VapConvFlxLitr2Soi  = 0.0_r8
@@ -1779,11 +1784,11 @@ contains
     IF(H2OVapFlx.GE.0.0_r8)THEN
       !water/heat flux goes into soil
       VapFlxSno2Soi1      = AZMAX1(AMIN1(H2OVapFlx,H2OVapFlxMax))
-      HeatConvFlxSno2Soi1 = (cpw*TKSnow1_snvr(L,NY,NX)+EvapLHTC)*VapFlxSno2Soi1
+      HeatConvFlxSno2Soi1 = (cpw*TKSnow1_snvr(L,NY,NX)*HeatAdv_scal+EvapLHTC)*VapFlxSno2Soi1
     ELSE
       !water flux out of soil
       VapFlxSno2Soi1      = AZMIN1(AMAX1(H2OVapFlx,H2OVapFlxMax))
-      HeatConvFlxSno2Soi1 = (cpw*TKSoil1_vr(NUM(NY,NX),NY,NX)+EvapLHTC)*VapFlxSno2Soi1
+      HeatConvFlxSno2Soi1 = (cpw*TKSoil1_vr(NUM(NY,NX),NY,NX)*HeatAdv_scal+EvapLHTC)*VapFlxSno2Soi1
     ENDIF
   ELSE
     VapCond2            = 0.0_r8

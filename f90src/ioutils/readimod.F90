@@ -410,7 +410,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
-
+    
     NU(NV1,NH1)=NUI(NV1,NH1)
     NK(NV1,NH1)=MaxNumRootLays(NV1,NH1)+1
     NM(NV1,NH1)=MaxNumRootLays(NV1,NH1)+NL1
@@ -601,9 +601,10 @@ module readiMod
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
         endif
-        RSC(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
-        RSN(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
-        RSP(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
+!        RSC(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
+!        RSN(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
+!        RSP(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
+
         SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
@@ -769,6 +770,8 @@ module readiMod
       ENDDO
     ENDDO
   ENDDO
+  write(*,*)'ieadTo',RSC(1:micpar%NumOfLitrCmplxs,0,1,1)
+
   end associate
   end subroutine readTopoNC
 

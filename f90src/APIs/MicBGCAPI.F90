@@ -89,8 +89,7 @@ implicit none
 !       decomposition
       D998: DO L=0,NL(NY,NX)
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
-
+          IF(L.EQ.0 .OR. L.GE.NU(NY,NX))THEN
              call sumMicBiomLayL(L,NY,NX,OrGM_beg)
              call MicBGC1Layer(I,J,L,NY,NX)
              call sumMicBiomLayL(L,NY,NX,dOrGM)
