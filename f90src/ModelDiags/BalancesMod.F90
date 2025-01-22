@@ -1,9 +1,10 @@
 module BalancesMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use CanopyDataType, only: QVegET_col
-  use GridDataType, only : NU,NL
-  use EcoSimConst, only : DENSICE
-  use abortutils , only : endrun
+  use GridDataType,   only: NU, NL
+  use EcoSimConst,    only: DENSICE
+  use abortutils,     only: endrun
+  use EcoSIMCtrlMod,  only: fixWaterLevel
   use SurfLitterDataType
   use CanopyDataType
   use SnowDataType
@@ -146,9 +147,12 @@ contains
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)+Qinflx2Soil_col(NY,NX) &
-        -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)
-
+      if(fixWaterLevel)then
+        SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)      
+      else
+        SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)+Qinflx2Soil_col(NY,NX) &
+          -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)
+      endif
       precipErr_test = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
       prec2expSErr_test=Rain2ExposedSurf_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)
       prec2SnoErr_test= Prec2Snow_col(NY,NX)-RainPrec2Sno_col(NY,NX)-SnoFalPrec_col(NY,NX)  
@@ -160,10 +164,13 @@ contains
       canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+PrecIntceptByCanopy_col(NY,NX) &
         +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
-      WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX)+QWatIntLaterFlow_col(NY,NX) &
-        +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)+QRunSurf_col(NY,NX) &
-        -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
-
+      if(fixWaterLevel)then
+        WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)
+      else      
+        WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX)+QWatIntLaterFlow_col(NY,NX) &
+          +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)+QRunSurf_col(NY,NX) &
+          -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
+      endif
       HeatErr_test = HeatErr_col(NY,NX)-HeatStore_col(NY,NX)+THeatRootRelease_col(NY,NX) &
         +HeatSource_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
         +PrecHeat_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
@@ -174,9 +181,6 @@ contains
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
-        write(110,*)'precipErr_test   =',precipErr_test,RainPrecThrufall_col(NY,NX),RainPrec2Sno_col(NY,NX)
-        write(110,*)'prec2expSErr_test=',prec2expSErr_test
-        write(110,*)'prec2SnoErr_test =',prec2SnoErr_test
         write(110,*)'prec, irrig      =',PrecAtm_col(NY,NX),Irrigation_col(NY,NX) 
         write(110,*)'litfall H2O      =',RainLitr_col(NY,NX)
         write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)    
@@ -190,15 +194,19 @@ contains
         write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)
         write(110,*)'WatHeldOnCanopy  =',WatHeldOnCanopy_col(NY,NX)
         write(110,*)'CanopyWat_col    =',CanopyWat_col(NY,NX)
-        write(110,*)'canopyH2Oerr_test=',canopyH2Oerr_test
-        write(110,*)'SnowMassErr_test =',SnowMassErr_test        
-        write(110,*)'literH2Oerr_test =',literH2Oerr_test,LitWatMassBeg_col(NY,NX),LitWatMassEnd_col(NY,NX)
-        write(110,*)'SoilWatErr_test  =',SoilWatErr_test
         write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX)
         write(110,*)'snofall          =',Prec2Snow_col(NY,NX),SnoFalPrec_col(NY,NX)
         write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
         write(110,*)'Snowxfer         =',QSnoWatXfer2Soil_col(NY,NX)+QSnoIceXfer2Soil_col(NY,NX)*DENSICE
         write(110,*)('-',ii=1,50)
+        write(110,*)'precipErr_test   =',precipErr_test,RainPrecThrufall_col(NY,NX),RainPrec2Sno_col(NY,NX)
+        write(110,*)'prec2expSErr_test=',prec2expSErr_test
+        write(110,*)'prec2SnoErr_test =',prec2SnoErr_test        
+        write(110,*)'canopyH2Oerr_test=',canopyH2Oerr_test
+        write(110,*)'SnowMassErr_test =',SnowMassErr_test        
+        write(110,*)'literH2Oerr_test =',literH2Oerr_test,LitWatMassBeg_col(NY,NX),LitWatMassEnd_col(NY,NX)
+        write(110,*)'SoilWatErr_test  =',SoilWatErr_test
+        write(110,*)('=',ii=1,50)
         if(abs(SoilWatErr_test)>1.e-4_r8) &
         call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif

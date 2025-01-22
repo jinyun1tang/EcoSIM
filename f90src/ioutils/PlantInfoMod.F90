@@ -362,7 +362,7 @@ implicit none
       call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     endif
    
-  else
+  elseif(pft_dflag==1)then
     if(lverb)write(iulog,*)'Transient pft data',yeari,yearc
     iyear=1
     DO while(.true.)
@@ -372,6 +372,16 @@ implicit none
     ENDDO
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+  else
+    !transient pft data (flexible inputs)
+    iyear=1
+    DO while(.true.)
+      call ncd_getvar(pftinfo_nfid,'year',iyear,year)
+      if(year==yearc)exit
+      iyear=iyear+1
+    ENDDO
+    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+    call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)  
   endif
   call ncd_pio_closefile(pftinfo_nfid)
 

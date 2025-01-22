@@ -218,7 +218,7 @@ implicit none
     call ncd_putvar(ncf,'FC',FieldCapacity_vr(L,NY,NX))
     call ncd_putvar(ncf,'ATKA',TairKClimMean(NY,NX))
     call ncd_putvar(ncf,'WP',WiltPoint_vr(L,NY,NX))
-    call ncd_putvar(ncf,'SRP',SRP(L,NY,NX))
+    call ncd_putvar(ncf,'SRP',SRP_vr(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
     call ncd_putvar(ncf,'EPOC',EPOC(L,NY,NX))
     call ncd_putvar(ncf,'THETY',SoilWatAirDry_vr(L,NY,NX))

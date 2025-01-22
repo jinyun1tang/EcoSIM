@@ -1600,11 +1600,11 @@ contains
     IF(THETW1.LT.FieldCapacity_vr(NUM(NY,NX),NY,NX))THEN
       PSISM1_vr(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
         +((LOGFldCapacity_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
-        /FCD(NUM(NY,NX),NY,NX)*LOGPSIMND(NY,NX))))
+        /FCD_vr(NUM(NY,NX),NY,NX)*LOGPSIMND(NY,NX))))
     ELSEIF(THETW1.LT.POROS_vr(NUM(NY,NX),NY,NX)-DTHETW)THEN
       PSISM1_vr(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
         +(((LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
-        /PSD(NUM(NY,NX),NY,NX))**SRP(NUM(NY,NX),NY,NX)*LOGPSIMXD(NY,NX)))
+        /PSD_vr(NUM(NY,NX),NY,NX))**SRP_vr(NUM(NY,NX),NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE
       THETW1=POROS_vr(NUM(NY,NX),NY,NX)
       PSISM1_vr(NUM(NY,NX),NY,NX)=PSISE_vr(NUM(NY,NX),NY,NX)
@@ -1663,10 +1663,10 @@ contains
   IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1_vr(0,NY,NX))/VLitR_col(NY,NX)
     IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
-      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX) &
+      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX) &
         *LOGPSIMND(NY,NX))))
     ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
-      PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR))/PSD(0,NY,NX))**SRP(0,NY,NX) &
+      PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR))/PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX) &
         *LOGPSIMXD(NY,NX)))
     ELSE
       ThetaWLitR=POROS0(NY,NX)

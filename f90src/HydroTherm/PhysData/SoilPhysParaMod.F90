@@ -55,9 +55,9 @@ implicit none
       !water less than field capacity
       !PSIHY is the minimum water potential allowed, where hygroscopic water is < 0
       !held tightly on the surfaces of soil particles and exists as a thin layer of vapor
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity_vr(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity_vr(N3,N2,N1)-LOG(THETA1))/FCD_vr(N3,N2,N1)*LOGPSIMND(N2,N1))))
     ELSEIF(THETA1.LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*LOGPSIMXD(N2,N1)))
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETA1))/PSD_vr(N3,N2,N1))**SRP_vr(N3,N2,N1)*LOGPSIMXD(N2,N1)))
     ELSE
       THETA1        = POROS_vr(N3,N2,N1)
       PSISoilMatric = PSISE_vr(N3,N2,N1)
@@ -160,8 +160,8 @@ implicit none
     GKCM(L,NY,NX)             = GKCM(L-1,NY,NX)
     GKCN(L,NY,NX)             = GKCN(L-1,NY,NX)
     GKCK(L,NY,NX)             = GKCK(L-1,NY,NX)
-    THW(L,NY,NX)              = THW(L-1,NY,NX)
-    THI(L,NY,NX)              = THI(L-1,NY,NX)
+    THW_vr(L,NY,NX)           = THW_vr(L-1,NY,NX)
+    THI_vr(L,NY,NX)           = THI_vr(L-1,NY,NX)
     ISOIL(1:4,L,NY,NX)        = ISOIL(1:4,L-1,NY,NX)
     RSC(k_fine_litr,L,NY,NX)  = 0.0_r8
     RSN(k_fine_litr,L,NY,NX)  = 0.0_r8

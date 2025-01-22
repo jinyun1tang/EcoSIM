@@ -310,10 +310,10 @@ implicit none
         ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VWatLitr2)/VLitR_col(NY,NX)
         IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
           PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-            +((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
+            +((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
         ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
           PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
-            /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
+            /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
         ELSE
           ThetaWLitR         = POROS0(NY,NX)
           PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
@@ -362,11 +362,11 @@ implicit none
         IF(FLVC.GE.0.0_r8)THEN
           !from litter to soil
           EvapLitR2Soi2        = AZMAX1(AMIN1(FLVC,FLVX))
-          HeatSensVapLitR2Soi2 = (cpw*TKR1+EvapLHTC)*EvapLitR2Soi2
+          HeatSensVapLitR2Soi2 = (cpw*TKR1*HeatAdv_scal+EvapLHTC)*EvapLitR2Soi2
         ELSE
           !from soil to litter
           EvapLitR2Soi2        = AZMIN1(AMAX1(FLVC,FLVX))
-          HeatSensVapLitR2Soi2 = (cpw*TKS1+EvapLHTC)*EvapLitR2Soi2
+          HeatSensVapLitR2Soi2 = (cpw*TKS1*HeatAdv_scal+EvapLHTC)*EvapLitR2Soi2
         ENDIF
       ELSE
         EvapLitR2Soi2        = 0.0_r8

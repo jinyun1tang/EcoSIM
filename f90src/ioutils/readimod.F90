@@ -472,8 +472,8 @@ module readiMod
     call ncd_getvar(grid_nfid, 'GKCN',ntp,GKCN(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'GKCK',ntp,GKCK(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'THW',ntp,THW(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'THI',ntp,THI(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'THW',ntp,THW_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'THI',ntp,THI_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'RSCfL',ntp,dat1(1:JZ));RSC(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
     call ncd_getvar(grid_nfid, 'RSNfL',ntp,dat1(1:JZ));RSN(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
@@ -582,8 +582,8 @@ module readiMod
             GKCN(L,NY,NX) = GKCN(L,NV1,NH1)
             GKCK(L,NY,NX) = GKCK(L,NV1,NH1)
 
-            THW(L,NY,NX) = THW(L,NV1,NH1)
-            THI(L,NY,NX) = THI(L,NV1,NH1)
+            THW_vr(L,NY,NX) = THW_vr(L,NV1,NH1)
+            THI_vr(L,NY,NX) = THI_vr(L,NV1,NH1)
 
             RSC(k_fine_litr,L,NY,NX)  = RSC(k_fine_litr,L,NV1,NH1)
             RSN(k_fine_litr,L,NY,NX)  = RSN(k_fine_litr,L,NV1,NH1)
@@ -667,8 +667,8 @@ module readiMod
               GKCM(L,NY,NX)                = GKCM(L+1,NY,NX)
               GKCN(L,NY,NX)                = GKCN(L+1,NY,NX)
               GKCK(L,NY,NX)                = GKCK(L+1,NY,NX)
-              THW(L,NY,NX)                 = THW(L+1,NY,NX)
-              THI(L,NY,NX)                 = THI(L+1,NY,NX)
+              THW_vr(L,NY,NX)                 = THW_vr(L+1,NY,NX)
+              THI_vr(L,NY,NX)                 = THI_vr(L+1,NY,NX)
               ISOIL(1:4,L,NY,NX)           = ISOIL(1:4,L+1,NY,NX)
               RSC(k_fine_litr,L,NY,NX)     = 0.0_r8
               RSN(k_fine_litr,L,NY,NX)     = 0.0_r8
@@ -966,9 +966,9 @@ module readiMod
 !     INITIAL WATER, ICE CONTENTS
 !
   write(*,*)'Initial soil water content (m3/m3): THW'
-  write(*,*)(THW(L,NY,NX),L=NU,NM)
+  write(*,*)(THW_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Initial soil ice content (m3/m3): THI'
-  write(*,*)(THI(L,NY,NX),L=NU,NM)
+  write(*,*)(THI_vr(L,NY,NX),L=NU,NM)
 !
 !     THW,THI=initial water,ice:>1=satd,1=FC,0=WP,<0=0,0-1=m3 m-3
 !

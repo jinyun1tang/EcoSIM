@@ -449,27 +449,27 @@ module StartsMod
       ! the use of POROS in defining relative saturation is not very appropriate.
       IF(ISOIL(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_set)THEN
       ! field capacity and wilting point are read from input
-        IF(THW(L,NY,NX).GT.1.0_r8)THEN
+        IF(THW_vr(L,NY,NX).GT.1.0_r8)THEN
           THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)            !m3 pore /m3 soil
-        ELSEIF(isclose(THW(L,NY,NX),1.0_r8))THEN
+        ELSEIF(isclose(THW_vr(L,NY,NX),1.0_r8))THEN
           THETW_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)    !relative saturation at wilting point
-        ELSEIF(isclose(THW(L,NY,NX),0.0_r8))THEN
+        ELSEIF(isclose(THW_vr(L,NY,NX),0.0_r8))THEN
           THETW_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)        !relative saturation at wilting point
-        ELSEIF(THW(L,NY,NX).LT.0.0_r8)THEN
+        ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
           THETW_vr(L,NY,NX)=0.0_r8
         ELSE
-          THETW_vr(L,NY,NX)=THW(L,NY,NX)
+          THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)
         ENDIF
-        IF(THI(L,NY,NX).GT.1.0_r8)THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
+        IF(THI_vr(L,NY,NX).GT.1.0_r8)THEN
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+        ELSEIF(isclose(THI_vr(L,NY,NX),1.0_r8))THEN
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+        ELSEIF(isclose(THI_vr(L,NY,NX),0.0_r8))THEN
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+        ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
           THETI_vr(L,NY,NX)=0.0_r8
         ELSE
-          THETI_vr(L,NY,NX)=THI(L,NY,NX)
+          THETI_vr(L,NY,NX)=THI_vr(L,NY,NX)
         ENDIF
         VLWatMicP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)

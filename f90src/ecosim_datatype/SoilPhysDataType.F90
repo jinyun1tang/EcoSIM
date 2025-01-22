@@ -12,19 +12,19 @@ implicit none
   real(r8),target,allocatable ::  WiltPoint_vr(:,:,:)                          !water contents at wilting point
   real(r8),target,allocatable ::  SatHydroCondVert_vr(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
   real(r8),target,allocatable ::  SatHydroCondHrzn_vr(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
-  real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                     !water potentials at field capacity, [MPa]
-  real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                       !water potentials at wilting point [MPa]
-  real(r8),target,allocatable ::  THW(:,:,:)                         !initial soil water content
-  real(r8),target,allocatable ::  THI(:,:,:)                         !initial ice content
-  REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                          !Surface albedo
+  real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                      !water potentials at field capacity, [MPa]
+  real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                        !water potentials at wilting point [MPa]
+  real(r8),target,allocatable ::  THW_vr(:,:,:)                              !initial soil water content, [m3 m-3]
+  real(r8),target,allocatable ::  THI_vr(:,:,:)                              !initial ice content, [m3 m-3]
+  REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                        !Surface albedo
   real(r8),target,allocatable ::  LOGPOROS_vr(:,:,:)                         !log soil porosity	-
-  real(r8),target,allocatable ::  LOGFldCapacity_vr(:,:,:)                         !log water content at field capacity
-  real(r8),target,allocatable ::  LOGWiltPoint_vr(:,:,:)                         !log water content at wilting point
-  real(r8),target,allocatable ::  PSD(:,:,:)                         !log soil porosity - log water content at field capacity
-  real(r8),target,allocatable ::  FCD(:,:,:)                         !log water content at field capacity
-  real(r8),target,allocatable ::  SRP(:,:,:)                         !shape parameter for water desorption
-  real(r8),target,allocatable ::  FSLOPE(:,:,:)                      !fraction of slope in 1 and 2
-  REAL(R8),target,allocatable ::  VLMicPt0_col(:,:,:)                       !initial total soil micropore porosity	m3 d-2
+  real(r8),target,allocatable ::  LOGFldCapacity_vr(:,:,:)                   !log water content at field capacity
+  real(r8),target,allocatable ::  LOGWiltPoint_vr(:,:,:)                     !log water content at wilting point
+  real(r8),target,allocatable ::  PSD_vr(:,:,:)                              !log (soil porosity /water content at field capacity)
+  real(r8),target,allocatable ::  FCD_vr(:,:,:)                                 !log water content at field capacity
+  real(r8),target,allocatable ::  SRP_vr(:,:,:)                                 !shape parameter for water desorption
+  real(r8),target,allocatable ::  FSLOPE(:,:,:)                              !fraction of slope in 1 and 2
+  REAL(R8),target,allocatable ::  VLMicPt0_col(:,:,:)                        !initial total soil micropore porosity	m3 d-2
   REAL(R8),target,allocatable ::  LOGPSIAtSat(:,:)                         !log water potential at saturation	MPa
   REAL(R8),target,allocatable ::  LOGPSIFLD(:,:)                         !log water potential at field capacity	-
   REAL(R8),target,allocatable ::  LOGPSIMN(:,:)                         !log water potential at wilting point
@@ -45,15 +45,15 @@ contains
   allocate(SatHydroCondHrzn_vr(JZ,JY,JX));     SatHydroCondHrzn_vr=0._r8
   allocate(PSIAtFldCapacity(JY,JX));       PSIAtFldCapacity=0._r8
   allocate(PSIAtWiltPoint(JY,JX));       PSIAtWiltPoint=0._r8
-  allocate(THW(JZ,JY,JX));      THW=0._r8
-  allocate(THI(JZ,JY,JX));      THI=0._r8
+  allocate(THW_vr(JZ,JY,JX));      THW_vr=0._r8
+  allocate(THI_vr(JZ,JY,JX));      THI_vr=0._r8
   allocate(SurfAlbedo_col(JY,JX));        SurfAlbedo_col=0._r8
   allocate(LOGPOROS_vr(0:JZ,JY,JX));    LOGPOROS_vr=0._r8
   allocate(LOGFldCapacity_vr(0:JZ,JY,JX));    LOGFldCapacity_vr=0._r8
   allocate(LOGWiltPoint_vr(0:JZ,JY,JX));    LOGWiltPoint_vr=0._r8
-  allocate(PSD(0:JZ,JY,JX));    PSD=0._r8
-  allocate(FCD(0:JZ,JY,JX));    FCD=0._r8
-  allocate(SRP(0:JZ,JY,JX));    SRP=0._r8
+  allocate(PSD_vr(0:JZ,JY,JX));    PSD_vr=0._r8
+  allocate(FCD_vr(0:JZ,JY,JX));    FCD_vr=0._r8
+  allocate(SRP_vr(0:JZ,JY,JX));    SRP_vr=0._r8
   allocate(FSLOPE(2,JY,JX));    FSLOPE=0._r8
   allocate(VLMicPt0_col(0:JZ,JY,JX));  VLMicPt0_col=0._r8
   allocate(LOGPSIAtSat(JY,JX));       LOGPSIAtSat=0._r8
@@ -76,15 +76,15 @@ contains
   call destroy(SatHydroCondHrzn_vr)
   call destroy(PSIAtFldCapacity)
   call destroy(PSIAtWiltPoint)
-  call destroy(THW)
-  call destroy(THI)
+  call destroy(THW_vr)
+  call destroy(THI_vr)
   call destroy(SurfAlbedo_col)
   call destroy(LOGPOROS_vr)
   call destroy(LOGFldCapacity_vr)
   call destroy(LOGWiltPoint_vr)
-  call destroy(PSD)
-  call destroy(FCD)
-  call destroy(SRP)
+  call destroy(PSD_vr)
+  call destroy(FCD_vr)
+  call destroy(SRP_vr)
   call destroy(FSLOPE)
   call destroy(VLMicPt0_col)
   call destroy(LOGPSIAtSat)

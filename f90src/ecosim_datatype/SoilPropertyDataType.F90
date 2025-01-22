@@ -21,7 +21,7 @@ implicit none
    real(r8) ,target,allocatable ::  MacPRadius(:,:,:)                   !radius of macropores
    real(r8) ,target,allocatable ::  SoilBulkDensity_vr(:,:,:)           !soil bulk density, [Mg m-3]
    integer  ,target,allocatable ::  MacPNumLayer(:,:,:)                 !number of macropores
-   real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity
+   real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity [m3 m-3]
    real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	[m3 d-2]
    real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                !micropore volume [m3 d-2]
    real(r8) ,target,allocatable ::  VLSoilMicPMass_vr(:,:,:)            !mass of soil layer	[Mg d-2]
@@ -34,7 +34,7 @@ implicit none
    real(r8) ,target,allocatable ::  VLMacP_vr(:,:,:)                    !total macropore volume in layer [m3 d-2]
    real(r8) ,target,allocatable ::  VGeomLayer_vr(:,:,:)                !soil volume including  macropores+rock [m3 d-2]
    real(r8) ,target,allocatable ::  VGeomLayert0_vr(:,:,:)              !initial soil volume including  macropores+rock [m3 d-2]
-   real(r8) ,target,allocatable ::  VOLTX_vr(:,:,:)                     !maximum soil pore volume allowed [m3 d-2]  
+   real(r8) ,target,allocatable ::  VOLTX_vr(:,:,:)                     !maximum soil pore (mac+mic) volume allowed [m3 d-2]  
   private :: InitAllocate
 
 contains

@@ -152,7 +152,7 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp
@@ -190,7 +190,7 @@ contains
   warming_exp           = ''
   brnch_retain_casename = .false.
   hist_yrclose          = .false.
-
+  fixWaterLevel         = .false.
   forc_periods      = 0
   forc_periods(1:9) = (/1980,1980,1,1981,1988,2,1989,2008,1/)
 
@@ -410,6 +410,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       if(lverb)write(*,*)'hist_update'
       call hist_ecosim%hist_update(I,J,bounds)
 
+      if(lverb)write(*,*)'hist_update_hbuf'
       call hist_update_hbuf(bounds)
 
       call etimer%update_time_stamp()

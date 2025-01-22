@@ -2,7 +2,7 @@ module SnowBalanceMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use data_const_mod, only: spval => DAT_CONST_SPVAL
   use abortutils,     only: endrun
-  use EcoSIMCtrlMod,  only: lverb,snowRedist_model
+  use EcoSIMCtrlMod,  only: lverb,snowRedist_model,fixWaterLevel
   use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d  
   use SoilPropertyDataType
   use SurfLitterDataType
@@ -111,20 +111,22 @@ implicit none
 ! IF SNOWPACK DISAPPEARS
 
 ! intermediate disappearance
-  VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
-  VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
+  IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO)THEN    
+    VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
+    VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
 
-  ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
+    ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
 
-  VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
-    +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
-    +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
+    VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+      +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
+      +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
 
-  IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+QSnoHeatXfer2Soil_col(NY,NX))/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
-  ELSE
-    TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
-  ENDIF
+    IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+      TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+QSnoHeatXfer2Soil_col(NY,NX))/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
+    ELSE
+      TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
+    ENDIF
+  endif
 
   call SnowpackDisapper(I,J,NY,NX,test_exist,QWatinfl2Mic_loc,QHeatInfl2Soil_loc)
 
@@ -196,24 +198,25 @@ implicit none
         !dump all ice to micropore, assuming no macropore of the host model
         QWatinfl2Mic   = FLWW+FLWI*DENSICE+FLWS
       else
-        QWatinfl2Mic   = 0._r8
-        QHeatInfl2Soil = 0._r8
-        !update top soil layer variables        
-        VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
-        VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+        if(.not.fixWaterLevel)then
+          QWatinfl2Mic   = 0._r8
+          QHeatInfl2Soil = 0._r8
+          !update top soil layer variables        
+          VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+FLWW
+          VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
 
-        ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
+          ENGY  = VHeatCapacity_vr(NUM(NY,NX),NY,NX)*TKS_vr(NUM(NY,NX),NY,NX)
 
-        VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
-          +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
-          +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
+          VHeatCapacity_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
+            +cpw*(VLWatMicP_vr(NUM(NY,NX),NY,NX)+VLWatMacP_vr(NUM(NY,NX),NY,NX)) &
+            +cpi*(VLiceMicP_vr(NUM(NY,NX),NY,NX)+VLiceMacP_vr(NUM(NY,NX),NY,NX))
 
-        IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-          TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
-        ELSE
-          TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
-        ENDIF
-
+          IF(VHeatCapacity_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+            TKS_vr(NUM(NY,NX),NY,NX) = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(NUM(NY,NX),NY,NX)      
+          ELSE
+            TKS_vr(NUM(NY,NX),NY,NX)=TairK_col(NY,NX)
+          ENDIF
+        endif
         Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
         QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
         QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)+HeatFlo2Surface

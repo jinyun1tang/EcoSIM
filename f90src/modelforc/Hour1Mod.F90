@@ -916,7 +916,7 @@ module Hour1Mod
               PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L+1,NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
               THETWM   = THETWP*POROS_vr(L,NY,NX)
               THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-                *PSD(L,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
+                *PSD_vr(L,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
 
               IF(THETWM.GT.THETW1)THEN
                 THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
@@ -929,7 +929,7 @@ module Hour1Mod
               PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-SoiDepthMidLay_vr(L-1,NY,NX))
               THETWM   = THETWP*POROS_vr(L-1,NY,NX)
               THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-                *PSD(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
+                *PSD_vr(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
                 THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
                 DepzIntWTBL_col(NY,NX) = CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
@@ -1515,10 +1515,10 @@ module Hour1Mod
       ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR_col(NY,NX)
       IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
         PSISoilMatricP_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR)) &
-          /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
+          /FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
       ELSEIF(ThetaWLitR.LT.POROS_vr(0,NY,NX))THEN
         PSISoilMatricP_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
-          /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
+          /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
       ELSE
         PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
       ENDIF
@@ -2460,9 +2460,9 @@ module Hour1Mod
       LOGPOROS_vr(0,NY,NX)       = LOG(POROS0(NY,NX))
       LOGFldCapacity_vr(0,NY,NX) = LOG(FieldCapacity_vr(0,NY,NX))
       LOGWiltPoint_vr(0,NY,NX)   = LOG(WiltPoint_vr(0,NY,NX))
-      PSD(0,NY,NX)               = LOGPOROS_vr(0,NY,NX)-LOGFldCapacity_vr(0,NY,NX)
-      FCD(0,NY,NX)               = LOGFldCapacity_vr(0,NY,NX)-LOGWiltPoint_vr(0,NY,NX)
-      SRP(0,NY,NX)               = 1.00_r8
+      PSD_vr(0,NY,NX)            = LOGPOROS_vr(0,NY,NX)-LOGFldCapacity_vr(0,NY,NX)
+      FCD_vr(0,NY,NX)            = LOGFldCapacity_vr(0,NY,NX)-LOGWiltPoint_vr(0,NY,NX)
+      SRP_vr(0,NY,NX)               = 1.00_r8
     enddo
   enddo    
   end subroutine UpdateLiterPropertz

@@ -438,19 +438,6 @@ contains
   call CalcSoilWatPotential(NY,NX,NX,NY,NUM(NY,NX),PSISM1_vr(NUM(NY,NX),NY,NX),THETA1S)
 
   PSISV1=PSISM1_vr(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
-!  write(109,*)I+J/24.,M,PSISM1_vr(NUM(NY,NX),NY,NX),PSISoilOsmotic_vr(NUM(NY,NX),NY,NX),&
-!    VLWatMicP1_vr(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX)
-!
-! IF(NX.EQ.4.AND.NY.EQ.5)THEN
-!     WRITE(*,3232)'PSISV1',I,J,M,NX,NY,NUM(NY,NX),PSISV1
-!    2,PSISM1_vr(NUM(NY,NX),NY,NX),PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
-!    3,FracSoiPAsWat_vr(NUM(NY,NX),NY,NX),THETW1,POROS_vr(NUM(NY,NX),NY,NX)
-!    4,PSL(NUM(NY,NX),NY,NX),LOG(THETW1),PSD(NUM(NY,NX),NY,NX)
-!    5,VLWatMicP1_vr(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX)
-!    5,VLSoilPoreMicP_vr(NUM(NY,NX),NY,NX)
-!    5,SRP(NUM(NY,NX),NY,NX)
-!3232  FORMAT(A8,6I4,20E14.6)
-! ENDIF
 !
 ! SOIL SURFACE ALBEDO, NET RADIATION
 !
@@ -462,6 +449,7 @@ contains
 ! LWRadGrnd,LWEmscefSoil_col=emitted longwave radiation, emissivity
 ! TK1=soil temperature
 ! albedo of water and ice are set to 0.06, and 0.30 respectively
+
   VLWatGrnd=VLWatMicP1_vr(NUM(NY,NX),NY,NX)+VLWatMacP1_vr(NUM(NY,NX),NY,NX)
   VLIceGrnd=VLiceMicP1_vr(NUM(NY,NX),NY,NX)+VLiceMacP1_vr(NUM(NY,NX),NY,NX)
 
@@ -481,7 +469,7 @@ contains
   RadSWbySoil          = (1.0_r8-AlbedoGrnd)*RadSW2Soil_col(NY,NX)
   tRadIncid            = RadSWbySoil+LWRad2Soil_col(NY,NX)
   LWRadGrnd            = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)**4._r8
-  Radnet2Grnd       = tRadIncid-LWRadGrnd
+  Radnet2Grnd          = tRadIncid-LWRadGrnd
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySoil
 !
 ! AERODYNAMIC RESISTANCE ABOVE SOIL SURFACE INCLUDING
@@ -531,10 +519,10 @@ contains
   LatentHeatEvapAir2Grnd=VapXAir2TopLay*EvapLHTC
   IF(VapXAir2TopLay.LT.0.0_r8)THEN
     !evaporation (<0 into atmosphere)
-    HeatSensVapAir2Grnd=VapXAir2TopLay*cpw*TKSoil1_vr(NUM(NY,NX),NY,NX)
+    HeatSensVapAir2Grnd=VapXAir2TopLay*cpw*TKSoil1_vr(NUM(NY,NX),NY,NX)*HeatAdv_scal
   ELSE
     !condensation (>0 into ground)
-    HeatSensVapAir2Grnd=VapXAir2TopLay*cpw*TKQ_col(NY,NX)
+    HeatSensVapAir2Grnd=VapXAir2TopLay*cpw*TKQ_col(NY,NX)*HeatAdv_scal
   ENDIF
   !take away water from evaporation
   TopLayWatVol=TopLayWatVol+VapXAir2TopLay
@@ -1396,8 +1384,8 @@ contains
   Rain2Snowt_col(NY,NX)     = Rain2Snow*dts_HeatWatTP
   PrecHeat2Snowt_col(NY,NX) = PrecHeat2Sno*dts_HeatWatTP
 
-  Rain2SoiMicP1_col(NY,NX)   = RainThrufall2SoiMicP*dts_HeatWatTP
-  Rain2SoiMacP1_col(NY,NX)   = RainThrufall2SoiMacP*dts_HeatWatTP
+  Rain2SoiMicP1_col(NY,NX)   = RainThrufall2SoiMicP*dts_HeatWatTP*HeatAdv_scal
+  Rain2SoiMacP1_col(NY,NX)   = RainThrufall2SoiMacP*dts_HeatWatTP*HeatAdv_scal
   RainHeat2SoilP1_col(NY,NX) = RainHeat2Soil*dts_HeatWatTP
 
   Rain2LitR1_col(NY,NX)     = RainThrufall2LitR*dts_HeatWatTP
@@ -1508,7 +1496,7 @@ contains
   end subroutine SumAftEnergyBalanceM
 !------------------------------------------------------------------------------------------
   subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
-    TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil,Qinfl2MacP)
+    TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
   !
   !run surface energy/water model for iteration M  
   implicit none
@@ -1519,9 +1507,9 @@ contains
   REAL(R8), dimension(:,:),INTENT(OUT) :: RainEkReducedKsat
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol(JY,JX)
   real(r8), dimension(:,:),intent(out) :: HeatFluxAir2Soi(JY,JX)
-  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)    !flow into micropore
-  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)    !flow into macropore
-  real(r8), dimension(:,:),optional,intent(out) :: Hinfl2Soil(JY,JX)    !heat flow into soil [MJ]
+  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)       !flow into micropore
+  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)       !flow into macropore
+  real(r8), dimension(:,:),optional,intent(out) :: HeatInfl2Soil(JY,JX)    !heat flow into soil [MJ d-2]
   real(r8) :: LatentHeatAir2Sno,HeatSensAir2Snow,Radnet2Snow,HeatSensEvapAir2Snow,VapXAir2TopLay
   integer  :: N1,N2,NX,NY,L
   real(r8) :: QWatinfl2Mic, QHeatInfl2Soil
@@ -1549,13 +1537,13 @@ contains
     ! In ATS coupled mode we do not run the full Redist so we put the snow
     ! the following call is problematic
     ! models here instead
-      if (ATS_cpl_mode) then
-        !this will also update the top soil moisture and temperature
-        call SnowMassUpdate(I,J,NY,NX, QWatinfl2Mic,QHeatInfl2Soil)
-        WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX) = WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)+QWatinfl2Mic
-        HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)+QHeatInfl2Soil
-        call SnowpackLayering(I,J,NY,NX)
-      end if
+!      if (ATS_cpl_mode) then
+!  this will also update the top soil moisture and temperature
+!        call SnowMassUpdate(I,J,NY,NX, QWatinfl2Mic,QHeatInfl2Soil)
+!        WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX) = WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)+QWatinfl2Mic
+!        HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)+QHeatInfl2Soil
+!        call SnowpackLayering(I,J,NY,NX)
+!      end if
 
 !----------------------------------------------------------------------------------------------------
       call AccumWaterVaporHeatFluxes(I,J,M,NY,NX,LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatSensAir2Snow,&
@@ -1564,7 +1552,7 @@ contains
       call UpdateLitRBe4RunoffM(I,J,M,NY,NX)
 
       if(present(Qinfl2MicP))Qinfl2MicP(NY,NX)=WaterFlow2Micpt_3D(3,NUM(NY,NX),NY,NX)
-      if(present(Hinfl2Soil))Hinfl2Soil(NY,NX)=HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)
+      if(present(HeatInfl2Soil))HeatInfl2Soil(NY,NX)=HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)
       if(present(Qinfl2MacP))Qinfl2MacP(NY,NX)=WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX)
     ENDDO D9890
   ENDDO D9895

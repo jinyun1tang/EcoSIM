@@ -62,6 +62,7 @@ implicit none
   real(r8),allocatable ::  VLairMicP_vr(:,:,:)                      !
   real(r8),allocatable ::  VLWatMicPX1_vr(:,:,:)               !micropore water volume behind wetting front
   real(r8),allocatable ::  Qinflx2SoilM_col(:,:)
+  real(r8),save :: HeatAdv_scal = 1._r8
   public :: InitHydroThermData
   public :: DestructHydroThermData
   contains

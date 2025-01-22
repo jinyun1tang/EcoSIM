@@ -1,4 +1,8 @@
 module AqueChemDatatype
+  !!
+  !Description:
+  !Data type for aqueous chemistry and transport
+  !Note: [d-2] represents per grid area
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use TracerIDMod
@@ -9,6 +13,7 @@ module AqueChemDatatype
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
+  
 
   real(r8),target,allocatable ::  CAL(:,:,:)                         !soil Al content, [mg Al kg-1]
   real(r8),target,allocatable ::  CFE(:,:,:)                         !soil Fe content, [mg Fe kg-3]
@@ -35,29 +40,29 @@ module AqueChemDatatype
 
   real(r8),target,allocatable :: trcsalt_rain_conc(:,:,:)            !salt tracer concentration in rain [g m-3]
   real(r8),target,allocatable :: trcSalt_solml_vr(:,:,:,:)           !soil aqueous salt content micropre, [mol d-2]
-  real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)              !exchangeable tracers
+  real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)              !exchangeable tracers, [mol d-2]
   real(r8),target,allocatable :: trcp_saltpml_vr(:,:,:,:)            !salt precipitate in micropore
 
-  real(r8),target,allocatable ::  ElectricConductivity_vr(:,:,:)                     !electrical conductivity , [dS m-1]
-  real(r8),target,allocatable ::  SolutesIonStrenth_vr(:,:,:)                        !solution ion strength, [mol m-3]
-  real(r8),target,allocatable ::  SolutesIonConc_vr(:,:,:)                        !solution ion concentratiom, [mol m-3]
+  real(r8),target,allocatable ::  ElectricConductivity_vr(:,:,:)     !electrical conductivity , [dS m-1]
+  real(r8),target,allocatable ::  SolutesIonStrenth_vr(:,:,:)        !solution ion strength, [mol m-3]
+  real(r8),target,allocatable ::  SolutesIonConc_vr(:,:,:)           !solution ion concentratiom, [mol m-3]
 
   real(r8),target,allocatable :: trcSalt_soHml_vr(:,:,:,:)
   real(r8),target,allocatable :: trcSalt_XFHS(:,:,:,:,:)
   real(r8),target,allocatable :: trcSalt3DFlo2Cell(:,:,:,:,:)
   real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
-  real(r8),target,allocatable ::  DOM_PoreTranspFlx(:,:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcs_Mac2MicXfer_vr(:,:,:,:)         !total non-salt solute micropore->macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcSalt_XFXS(:,:,:,:)                !total salt micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcn_RChem_soil_vr(:,:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TR_NH3_soil_vr(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  DOM_PoreTranspFlx(:,:,:,:,:)       !total DOC micropore-macropore transfer, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_Mac2MicXfer_vr(:,:,:,:)       !total non-salt solute micropore->macropore transfer, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_XFXS(:,:,:,:)              !total salt micropore-macropore transfer non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcn_RChem_soil_vr(:,:,:,:)        !total solute NH4 transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_NH3_soil_vr(:,:,:)              !total solute NH3 transformation non-band, [mol d-2 h-1]
 
-  real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)     !total solute nutrient transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcSalt_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TR_HCO3_col(:,:,:)                       !total solute HCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TR_CO2_gchem_soil_vr(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)   !total solute nutrient transformation band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_TR(:,:,:,:)                !total salt solute transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_HCO3_col(:,:,:)                 !total solute HCO3 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_CO2_gchem_soil_vr(:,:,:)        !total solute CO2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2O(:,:,:)                       !total solute H2O transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TR_FeO3H3_soil(:,:,:)                       !total solute FeOH3 transformation, [mol d-2 h-1]
+  real(r8),target,allocatable ::  TR_FeO3H3_soil(:,:,:)              !total solute FeOH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_H_p_sorbed_soil(:,:,:)                       !total adsorbed H transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_Al_sorbed_soil(:,:,:)                       !total adsorbed Al transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_Ca_sorbed_soil(:,:,:)                       !total adsorbed Ca transformation, [mol d-2 h-1]

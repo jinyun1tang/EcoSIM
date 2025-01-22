@@ -2692,11 +2692,12 @@ implicit none
       this%h1D_FracLitMix_litr_col(ncol)       = FracLitrMix_vr(0,NY,NX)
       this%h1D_Eco_HR_CO2_litr_col(ncol)       = ECO_HR_CO2_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_TSolidOMActC_litr_col(ncol)     = TSolidOMActC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-      this%h1D_TSolidOMActCDens_litr_col(ncol) = TSolidOMActC_vr(0,NY,NX)/TSolidOMC_vr(0,NY,NX)  
-      this%h1D_tOMActCDens_litr_col(ncol)      = tOMActC_vr(0,NY,NX)/(TSolidOMC_vr(0,NY,NX)+tOMActC_vr(0,NY,NX))
-
+      this%h1D_TSolidOMActCDens_litr_col(ncol) = safe_adb(TSolidOMActC_vr(0,NY,NX),TSolidOMC_vr(0,NY,NX))  
+      this%h1D_tOMActCDens_litr_col(ncol)      = safe_adb(tOMActC_vr(0,NY,NX),(TSolidOMC_vr(0,NY,NX)+tOMActC_vr(0,NY,NX)))
+      
       DO L=1,JZ        
         DVOLL=DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+        
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         if(DVOLL<=1.e-8_r8)cycle
         this%h2D_RootMassC_vr(ncol,L)     = RootMassElm_vr(ielmc,L,NY,NX)/DVOLL
@@ -2705,38 +2706,38 @@ implicit none
 
         call sumDOML(L,NY,NX,DOM)
 
-        this%h2D_DOC_vr(ncol,L)            = DOM(idom_doc)/DVOLL
-        this%h2D_DON_vr(ncol,L)            = DOM(idom_don)/DVOLL
-        this%h2D_DOP_vr(ncol,L)            = DOM(idom_dop)/DVOLL
-        this%h2D_BotDEPZ_vr(ncol,L)        = CumDepz2LayerBot_vr(L,NY,NX)
-        this%h2D_acetate_vr(ncol,L)        = DOM(idom_acetate)/DVOLL
-        this%h2D_litrC_vr(ncol,L)          = litrOM_vr(ielmc,L,NY,NX)/DVOLL
-        this%h2D_litrN_vr(ncol,L)          = litrOM_vr(ielmn,L,NY,NX)/DVOLL
-        this%h2D_litrP_vr(ncol,L)          = litrOM_vr(ielmp,L,NY,NX)/DVOLL
-        this%h2D_tSOC_vr(ncol,L)           = SoilOrgM_vr(ielmc,L,NY,NX)/DVOLL
-        this%h2D_tSOCL_vr(ncol,L)          = SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_tSON_vr(ncol,L)           = SoilOrgM_vr(ielmn,L,NY,NX)/DVOLL
-        this%h2D_tSOP_vr(ncol,L)           = SoilOrgM_vr(ielmp,L,NY,NX)/DVOLL
-        this%h2D_VHeatCap_vr(ncol,L)       = VHeatCapacity_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_CO2_vr(ncol,L)            = trc_solcl_vr(idg_CO2,L,NY,NX)
-        this%h2D_CH4_vr(ncol,L)            = trc_solcl_vr(idg_CH4,L,NY,NX)
-        this%h2D_O2_vr(ncol,L)             = trc_solcl_vr(idg_O2,L,NY,NX)
-        this%h2D_N2O_vr(ncol,L)            = trc_solcl_vr(idg_N2O,L,NY,NX)
-        this%h2D_NH3_vr(ncol,L)            = trc_solcl_vr(idg_NH3,L,NY,NX)
-        this%h2D_TEMP_vr(ncol,L)           = TCS(L,NY,NX)
-        this%h2D_decomp_OStress_vr(ncol,L) = OxyDecompLimiter_vr(L,NY,NX)
-        this%h2D_RO2Decomp_vr(ncol,L)      = RO2DecompUptk_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_Decomp_temp_FN_vr(ncol,L) = TempSensDecomp_vr(L,NY,NX)
-        this%h2D_FracLitMix_vr(ncol,L)     = FracLitrMix_vr(L,NY,NX)
-        this%h2D_Decomp_Moist_FN_vr(ncol,L)=MoistSensDecomp_vr(L,NY,NX)
-        this%h2D_HeatFlow_vr(ncol,L)       = THeatFlowCellSoil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_HeatUptk_vr(ncol,L) = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_VSPore_vr(ncol,L)   = POROS_vr(L,NY,NX)
-        this%h2D_VSM_vr    (ncol,L)  = ThetaH2OZ_vr(L,NY,NX)
-        this%h2D_VSICE_vr  (ncol,L)   = ThetaICEZ_vr(L,NY,NX)
-        this%h2D_PSI_vr(ncol,L)       = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
-        this%h2D_PsiO_vr(ncol,L)      = PSISoilOsmotic_vr(L,NY,NX)
-        this%h2D_RootH2OUP_vr(ncol,L) = TPlantRootH2OUptake_vr(L,NY,NX)
+        this%h2D_DOC_vr(ncol,L)             = DOM(idom_doc)/DVOLL
+        this%h2D_DON_vr(ncol,L)             = DOM(idom_don)/DVOLL
+        this%h2D_DOP_vr(ncol,L)             = DOM(idom_dop)/DVOLL
+        this%h2D_BotDEPZ_vr(ncol,L)         = CumDepz2LayerBot_vr(L,NY,NX)
+        this%h2D_acetate_vr(ncol,L)         = DOM(idom_acetate)/DVOLL
+        this%h2D_litrC_vr(ncol,L)           = litrOM_vr(ielmc,L,NY,NX)/DVOLL
+        this%h2D_litrN_vr(ncol,L)           = litrOM_vr(ielmn,L,NY,NX)/DVOLL
+        this%h2D_litrP_vr(ncol,L)           = litrOM_vr(ielmp,L,NY,NX)/DVOLL
+        this%h2D_tSOC_vr(ncol,L)            = SoilOrgM_vr(ielmc,L,NY,NX)/DVOLL
+        this%h2D_tSOCL_vr(ncol,L)           = SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_tSON_vr(ncol,L)            = SoilOrgM_vr(ielmn,L,NY,NX)/DVOLL
+        this%h2D_tSOP_vr(ncol,L)            = SoilOrgM_vr(ielmp,L,NY,NX)/DVOLL
+        this%h2D_VHeatCap_vr(ncol,L)        = VHeatCapacity_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_CO2_vr(ncol,L)             = trc_solcl_vr(idg_CO2,L,NY,NX)
+        this%h2D_CH4_vr(ncol,L)             = trc_solcl_vr(idg_CH4,L,NY,NX)
+        this%h2D_O2_vr(ncol,L)              = trc_solcl_vr(idg_O2,L,NY,NX)
+        this%h2D_N2O_vr(ncol,L)             = trc_solcl_vr(idg_N2O,L,NY,NX)
+        this%h2D_NH3_vr(ncol,L)             = trc_solcl_vr(idg_NH3,L,NY,NX)
+        this%h2D_TEMP_vr(ncol,L)            = TCS(L,NY,NX)
+        this%h2D_decomp_OStress_vr(ncol,L)  = OxyDecompLimiter_vr(L,NY,NX)
+        this%h2D_RO2Decomp_vr(ncol,L)       = RO2DecompUptk_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_Decomp_temp_FN_vr(ncol,L)  = TempSensDecomp_vr(L,NY,NX)
+        this%h2D_FracLitMix_vr(ncol,L)      = FracLitrMix_vr(L,NY,NX)
+        this%h2D_Decomp_Moist_FN_vr(ncol,L) = MoistSensDecomp_vr(L,NY,NX)
+        this%h2D_HeatFlow_vr(ncol,L)        = THeatFlowCellSoil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_HeatUptk_vr(ncol,L)        = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_VSPore_vr(ncol,L)          = POROS_vr(L,NY,NX)
+        this%h2D_VSM_vr    (ncol,L)         = ThetaH2OZ_vr(L,NY,NX)
+        this%h2D_VSICE_vr  (ncol,L)         = ThetaICEZ_vr(L,NY,NX)
+        this%h2D_PSI_vr(ncol,L)             = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
+        this%h2D_PsiO_vr(ncol,L)            = PSISoilOsmotic_vr(L,NY,NX)
+        this%h2D_RootH2OUP_vr(ncol,L)       = TPlantRootH2OUptake_vr(L,NY,NX)
         this%h2D_cNH4t_vr(ncol,L)     = safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)),&
                                                VLSoilMicPMass_vr(L,NY,NX))
@@ -2752,6 +2753,7 @@ implicit none
                                                +trcx_solml_vr(idx_HPO4B,L,NY,NX)+trcx_solml_vr(idx_H2PO4B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
         this%h2D_ElectricConductivity_vr(ncol,L)     = ElectricConductivity_vr(L,NY,NX)
+        
         !aerobic heterotropic bacteria
         call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
         this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)/DVOLL   
@@ -2817,22 +2819,22 @@ implicit none
         this%h2D_H2MethogenC_vr(ncol,L) = micBE(ielmc)/DVOLL
         this%h2D_H2MethogenN_vr(ncol,L) = micBE(ielmn)/DVOLL
         this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)/DVOLL
-
-        this%h2D_TSolidOMActC_vr(ncol,L)=TSolidOMActC_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_TSolidOMActCDens_vr(ncol,L)   =TSolidOMActC_vr(L,NY,NX)/TSolidOMC_vr(L,NY,NX)
-        this%h2D_tOMActCDens_vr(ncol,L)    = tOMActC_vr(L,NY,NX)/(tOMActC_vr(L,NY,NX)+TSolidOMC_vr(L,NY,NX))
-        this%h2D_RCH4ProdAcetcl_vr(ncol,L) = RCH4ProdAcetcl_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_RCH4ProdHydrog_vr(ncol,L) = RCH4ProdHydrog_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_RCH4Oxi_aero_vr(ncol,L)   = RCH4Oxi_aero_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_RFerment_vr(ncol,L)       = RFerment_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_nh3oxi_vr(ncol,L)         = RNH3oxi_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_n2oprod_vr(ncol,L)        = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
+        
+        this%h2D_TSolidOMActC_vr(ncol,L)     = TSolidOMActC_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_TSolidOMActCDens_vr(ncol,L) = safe_adb(TSolidOMActC_vr(L,NY,NX),TSolidOMC_vr(L,NY,NX))
+        this%h2D_tOMActCDens_vr(ncol,L)      = safe_adb(tOMActC_vr(L,NY,NX),(tOMActC_vr(L,NY,NX)+TSolidOMC_vr(L,NY,NX)))
+        this%h2D_RCH4ProdAcetcl_vr(ncol,L)   = RCH4ProdAcetcl_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RCH4ProdHydrog_vr(ncol,L)   = RCH4ProdHydrog_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RCH4Oxi_aero_vr(ncol,L)     = RCH4Oxi_aero_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_RFerment_vr(ncol,L)         = RFerment_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_nh3oxi_vr(ncol,L)           = RNH3oxi_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_n2oprod_vr(ncol,L)          = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
                                +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RootAR_vr(ncol,L) = -RootCO2Autor_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_RootAR_col(ncol) = this%h1D_RootAR_col(ncol)-RootCO2Autor_vr(L,NY,NX)
+        this%h1D_RootAR_col(ncol)  = this%h1D_RootAR_col(ncol)-RootCO2Autor_vr(L,NY,NX)
       ENDDO
       this%h1D_RootAR_col(ncol) = this%h1D_RootAR_col(ncol)/AREA(3,NU(NY,NX),NY,NX)
-
+      
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)

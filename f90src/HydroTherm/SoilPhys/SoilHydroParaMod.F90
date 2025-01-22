@@ -67,11 +67,11 @@ contains
       !water content less than field capacity
       IF(THETW1.LT.FieldCapacity_vr(L,NY,NX))THEN
         PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-          +((LOGFldCapacity_vr(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
+          +((LOGFldCapacity_vr(L,NY,NX)-LOG(THETW1))/FCD_vr(L,NY,NX)*LOGPSIMND(NY,NX))))
       !water content exceeds field capacity but less than sturation    
       ELSE IF(THETW1.LT.POROS_vr(L,NY,NX)-DTHETW)THEN
         PSISoilMatricP_vr(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(L,NY,NX)-LOG(THETW1)) &
-          /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))
+          /PSD_vr(L,NY,NX))**SRP_vr(L,NY,NX)*LOGPSIMXD(NY,NX)))
       !saturated    
       ELSE
         PSISoilMatricP_vr(L,NY,NX)=PSISE_vr(L,NY,NX)
@@ -149,11 +149,11 @@ contains
   real(r8) :: VISCWL
 
   IF(CSoilOrgM_vr(ielmc,L,NY,NX).GT.FORGC)THEN
-    SRP(L,NY,NX)=0.25_r8
+    SRP_vr(L,NY,NX)=0.25_r8
   ELSE IF(CSoilOrgM_vr(ielmc,L,NY,NX).GT.0.5_r8*FORGC)THEN
-    SRP(L,NY,NX)=0.33_r8
+    SRP_vr(L,NY,NX)=0.33_r8
   ELSE
-    SRP(L,NY,NX)=1.00_r8
+    SRP_vr(L,NY,NX)=1.00_r8
   ENDIF
   
   if(lverb)write(*,*)'SoilHydroProperty::setshape',POROS_vr(L,NY,NX),cold_run()
@@ -164,8 +164,8 @@ contains
   ! read from check point file or if soil properties are set with soil file    
     LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
     LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
-    PSD(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-    FCD(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+    PSD_vr(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+    FCD_vr(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
   ELSE
     !
     !     DEFAULT SOIL HYDROLOGIC PPTYS (FIELD CAPACITY, WILTING POINT)
@@ -190,7 +190,7 @@ contains
   ENDIF
 
   IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-    SoilWatAirDry_vr(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(L,NY,NX))
+    SoilWatAirDry_vr(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD_vr(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(L,NY,NX))
   ELSE
     SoilWatAirDry_vr(L,NY,NX)=ZERO2
   ENDIF
@@ -237,11 +237,11 @@ contains
     H2OSOIatK(K) = POROS_vr(L,NY,NX)-(XK/100.0_r8*POROS_vr(L,NY,NX))
     IF(H2OSOIatK(K).LT.FieldCapacity_vr(L,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(L,NY,NX)-LOG(H2OSOIatK(K))) &
-        /FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
+        /FCD_vr(L,NY,NX)*LOGPSIMND(NY,NX))))
     ELSEIF(H2OSOIatK(K).LT.POROS_vr(L,NY,NX)-DTHETW)THEN
       !almost saturated
       PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(L,NY,NX)-LOG(H2OSOIatK(K))) &
-        /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))
+        /PSD_vr(L,NY,NX))**SRP_vr(L,NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE
       !fully saturated
       PSISK(K)=PSISE_vr(L,NY,NX)
@@ -329,8 +329,8 @@ contains
   ENDIF
   LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
   LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
-  PSD(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-  FCD(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+  PSD_vr(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+  FCD_vr(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
 
 !   IBEGIN:   start date of model run
 
@@ -340,27 +340,27 @@ contains
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
     !ExtWaterTablet0_col=external water table depth, [m]
-    IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
+    IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
-    ELSEIF(isclose(THW(L,NY,NX),1._r8))THEN
+    ELSEIF(isclose(THW_vr(L,NY,NX),1._r8))THEN
       !at field capacity
       THETW_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)
-    ELSEIF(isclose(THW(L,NY,NX),0._r8))THEN
+    ELSEIF(isclose(THW_vr(L,NY,NX),0._r8))THEN
       !at wilting point
       THETW_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)
-    ELSEIF(THW(L,NY,NX).LT.0.0_r8)THEN
+    ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
       !CO2CompenPoint_nodeetely dry
       THETW_vr(L,NY,NX)=0.0_r8
     ENDIF
 
-    IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
-    ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
-    ELSEIF(isclose(THI(L,NY,NX),0._r8))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW(L,NY,NX)))
-    ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
+    IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+    ELSEIF(isclose(THI_vr(L,NY,NX),1._r8))THEN
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+    ELSEIF(isclose(THI_vr(L,NY,NX),0._r8))THEN
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+    ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
       THETI_vr(L,NY,NX)=0.0_r8
     ENDIF
 
@@ -392,17 +392,17 @@ contains
   ELSE
     SoilBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF
-  SoilWatAirDry_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
+  SoilWatAirDry_vr(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD_vr(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
   SUM2             =0.0_r8
   D1220: DO  K=1,n100
     XK           = K-1
     H2OSOIatK(K) = POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
     IF(H2OSOIatK(K).LT.FieldCapacity_vr(0,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(H2OSOIatK(K))) &
-          /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
+          /FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
     ELSEIF(H2OSOIatK(K).LT.POROS0(NY,NX))THEN
       PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(H2OSOIatK(K))) &
-          /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
+          /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE
       PSISK(K)=PSISE_vr(0,NY,NX)
     ENDIF

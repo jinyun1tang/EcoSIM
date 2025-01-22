@@ -19,6 +19,7 @@ implicit none
   logical :: snowRedist_model  =.true.
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
+  logical :: fixWaterLevel     =.false.
   integer :: yearf1       !first year of daily climate forcing
   integer :: yearf2       !first year of hourly climate forcing
   integer :: nyeardal1    !number of daily climate forcing
