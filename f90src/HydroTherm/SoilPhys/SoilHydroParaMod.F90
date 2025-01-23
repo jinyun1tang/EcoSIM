@@ -261,9 +261,11 @@ contains
       IF(N.EQ.3)THEN
         !vertical
         HydroCond_3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
-        IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(L,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(L,NY,NX))THEN
-          !moisture at air-entry saturation
-          ThetaSat_vr(L,NY,NX)=H2OSOIatK(K)
+        IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(L,NY,NX))then
+          if(PSISK(K-1).GE.PSISoilAirEntry(L,NY,NX))THEN
+            !moisture at air-entry saturation
+            ThetaSat_vr(L,NY,NX)=H2OSOIatK(K)
+          endif
         ENDIF
       ELSE
         !horizontal

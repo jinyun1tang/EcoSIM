@@ -427,7 +427,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'SCNV', ntp,SatHydroCondVert_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn_vr(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'CSAND_vr',ntp,CSAND_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK_vr(1:JZ,NV1,NH1))
