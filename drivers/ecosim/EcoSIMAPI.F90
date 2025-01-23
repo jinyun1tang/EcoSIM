@@ -35,12 +35,14 @@ contains
 
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
+  !print*,'hour1'
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
 
   if(do_timing)call end_timer('HOUR1',t1)
   !
   !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
   !
+  !print*,'watsub'
   if(lverb)WRITE(*,334)'WAT'
   if(do_timing)call start_timer(t1)
   CALL WATSUB(I,J,NHW,NHE,NVN,NVS)
@@ -48,13 +50,14 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
+  !print*,'microbe model'
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     if(do_timing)call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('NIT',t1)
   endif
-
+!  print*,'plant model'
   !
   !   UPDATE PLANT biogeochemistry
   !
