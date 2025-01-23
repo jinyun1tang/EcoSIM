@@ -193,24 +193,20 @@ contains
 
   !Oxygen limited but not solute or carbon limited uptake
   ! u^2+Bu+C=0., it requires when C=0, delta=1, u=0
-  B=-(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
-  C=AZMAX1(X-Y)*UptakeRateMax_Ol
+  B     = -(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
+  C     = AZMAX1(X-Y)*UptakeRateMax_Ol
+  delta = B*B-4.0_r8*C
 
-  delta=B*B-4.0_r8*C
   if(delta<0._r8)then
     Uptake_Ol=0._r8
   else
     Uptake_Ol=AZMAX1(-B-SQRT(delta))/2.0_r8
   endif
-  if(lldebug)then
-  write(115,*)'X-Y',SolDifusFlx,SolAdvFlx,X-Y,SoluteConc-SoluteConcMin
-  write(115,*)'delta1',delta,Uptake_Ol,'B=',B,C
-  endif
 
   !Oxygen, and carbon unlimited solute uptake
-  BP=-(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
-  CP=AZMAX1(X-Y)*UptakeRateMax
-  delta=BP*BP-4.0_r8*CP
+  BP    = -(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
+  CP    = AZMAX1(X-Y)*UptakeRateMax
+  delta = BP*BP-4.0_r8*CP
   if(delta<0._r8)then
     Uptake=0._r8
   else

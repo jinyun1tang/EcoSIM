@@ -541,7 +541,7 @@ implicit none
 
   VLWatMicP1_vr(0,NY,NX)        = (VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX)+LitrIceFlxThaw_col(NY,NX))
   VLiceMicP1_vr(0,NY,NX)        = (VLiceMicP1_vr(0,NY,NX)-LitrIceFlxThaw_col(NY,NX)/DENSICE)
-  write(113,*)I+J/24.,M,VLWatMicP10,VLWatMicP1_vr(0,NY,NX),WatFLow2LitR_col(NY,NX),LitrIceFlxThaw_col(NY,NX)
+
   VLairMicP1_vr(0,NY,NX)     = AZMAX1(VLPoreLitR_col(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
   VLWatMicPM_vr(M+1,0,NY,NX) = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM_vr(M+1,0,NY,NX) = VLairMicP1_vr(0,NY,NX)

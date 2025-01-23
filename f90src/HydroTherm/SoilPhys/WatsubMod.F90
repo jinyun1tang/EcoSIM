@@ -123,8 +123,6 @@ module WatsubMod
         QDrainM_col(NY,NX)           = 0._r8
         Qinflx2SoilM_col(NY,NX)      = 0._r8
         QWatIntLaterFlowM_col(NY,NX) = 0._r8
-
-        write(111,*)I+J/24.,M,VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
       ENDDO
     ENDDO
 !    dtime=dtime+dts_HeatWatTP

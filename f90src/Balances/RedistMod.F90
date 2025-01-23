@@ -876,6 +876,7 @@ module RedistMod
       TKS_vr(L,NY,NX)        = TairK_col(NY,NX)
       TCS(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
+
     DO L=NUM(NY,NX),NL(NY,NX)
       
       !micropore
@@ -906,9 +907,8 @@ module RedistMod
       if(plantOM4Heat .and. VHeatCapacity_vr(L,NY,NX)>0._r8)then
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)
       endif
-
       !
-      !
+      !      
       !the following handels soil layers with significant heat capacity/mass
       IF(VHeatCapacity_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. safe_adb(VHeatCapacity_vr(L,NY,NX),VHeatCapacityX+VHeatCapacity_vr(L,NY,NX))>0.05_r8)THEN
 
@@ -1601,7 +1601,7 @@ module RedistMod
       RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
       HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
-      write(115,*)I+J/24.,VLWatMicP_vr(0,NY,NX),RAINR      
+
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
       QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
       CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
