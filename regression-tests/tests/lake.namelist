@@ -5,23 +5,24 @@
 
 &ecosim
 case_name='lake'
-prefix='../../examples/inputs/lake/'
-do_regression_test=.true.
+prefix             = '../../inputs/Pond/'
 num_of_simdays=180
-pft_file_in='../../input_data/ecosim_pftpar_20240723.nc'
-grid_file_in='../../examples/inputs/lake/lake_grid_20230510.nc'
-pft_mgmt_in='../../examples/inputs/lake/lake_pft_20230131.nc'
-soil_mgmt_in='NO'
-clm_hour_file_in='../../examples/inputs/lake/lake_clim_20230203.nc'
-clm_factor_in='NO'
-atm_ghg_in='../../input_data/fatm_hist_GHGs_1750-2023.nc'
-lverbose=.false.
-plant_model=.true.
-microbial_model=.true.
-soichem_model=.true.
-grid_mode=1
-disp_planttrait=.true.
-iErosionMode=0
+do_regression_test=.true.
+pft_file_in        = '../../input_data/ecosim_pftpar_20240723.nc'
+grid_file_in       = '../../examples/inputs/Pond/lake_grid_20230510.nc'
+pft_mgmt_in        = '../../examples/inputs/Pond/lake_pft_20230131.nc'
+soil_mgmt_in       = 'NO'
+clm_hour_file_in   = '../../examples/inputs/Pond/lake_clim_20230203.nc'
+clm_factor_in      = 'NO'
+atm_ghg_in         = '../../input_data/fatm_hist_GHGs_1750-2022.nc'
+
+lverbose        = .false.
+plant_model     = .true.
+microbial_model = .true.
+soichem_model   = .true.
+grid_mode       = 1
+disp_planttrait = .true.
+iErosionMode    = 0
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '19900101000000'
