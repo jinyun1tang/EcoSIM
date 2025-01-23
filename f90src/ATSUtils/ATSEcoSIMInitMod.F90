@@ -14,6 +14,7 @@ module ATSEcoSIMInitMod
   use ClimForcDataType, only : LWRadSky, TairK_col, &
       VPA, WindSpeedAtm_col, RainH
   use SoilPropertyDataType
+  use SurfLitterDataType
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -61,7 +62,7 @@ implicit none
   TFLWT=0.0_r8
   VOLPT=0.0_r8
   VOLTT=0.0_r8
- 
+
   do NY=1,NYS
     TXCO2(NY,NX)=0.0_r8
     DORGE(NY,NX)=0.0_r8
@@ -85,6 +86,13 @@ implicit none
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
 
+    !Need to check if litter area is set or not
+    if(VGeomLayer_vr(0,NY,NX).EQ.0.0)then
+      VGeomLayer_vr(0,NY,NX) = 0.1
+    endif
+    POROS0(NY,NX) = 0.5
+    
+
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoi1_vr(L,NY,NX) = a_TEMP(L,NY)
       CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
@@ -98,8 +106,8 @@ implicit none
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
       
-      DH(NY,NX) = 0.316229
-      DV(NY,NX) = 0.316229
+      DH(NY,NX) = 1.0
+      DV(NY,NX) = 1.0
 
     ENDDO
   ENDDO
@@ -112,34 +120,8 @@ implicit none
   do NY=1,NYS
     DO L=NU(NY,NX),NL(NY,NX)
       AREA(3,L,NY,NX)=a_AREA3(L,NY)
-      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
     ENDDO
   ENDDO
-
-  NY=1 
-  L=1
-  write(*,*) "End Init_EcoSIM_Soil, L, NY, NX ", L, NY, NX, "---------------"
-  write(*,*) "pressure_at_field_capacity =", pressure_at_field_capacity
-  write(*,*) "pressure_at_wilting_point =", pressure_at_wilting_point
-  write(*,*) "heat_capacity =", heat_capacity
-  write(*,*) "a_ASP =", a_ASP(NY)
-  write(*,*) "tairc =", tairc(NY)
-  write(*,*) "vpair =", vpair(NY)
-  write(*,*) "uwind =", uwind(NY)
-  write(*,*) "swrad =", swrad(NY)
-  write(*,*) "sunrad =", sunrad(NY)
-  write(*,*) "p_rain =", p_rain(NY)
-  write(*,*) "surf_e_source =", surf_e_source(NY)
-  write(*,*) "surf_w_source =", surf_w_source(NY)
-  write(*,*) "surf_snow_depth =", surf_snow_depth(NY)
-  write(*,*) "a_TEMP =", a_TEMP(L,NY)
-  write(*,*) "a_CumDepz2LayerBot_vr =", a_CumDepz2LayerBot_vr(L,NY)
-  write(*,*) "a_AREA3 =", a_AREA3(L,NY)
-  write(*,*) "a_BKDSI =", a_BKDSI(L,NY)
-  write(*,*) "a_WC =", a_WC(L,NY)
-  write(*,*) "a_MATP =", a_MATP(L,NY)
-  write(*,*) "a_PORO =", a_PORO(L,NY)
-  write(*,*) "-----------------------------------------------------------------"
 
   end subroutine Init_EcoSIM_Soil
 

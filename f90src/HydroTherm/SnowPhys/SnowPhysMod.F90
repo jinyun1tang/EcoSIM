@@ -27,7 +27,9 @@ module SnowPhysMod
   use LandSurfDataType
   use PhysPars  
   use UnitMod, only : units
-
+  use ChemTracerParsMod
+  use MiniFuncMod
+  use EcoSIMCtrlMod
 implicit none
   private
   character(len=*), parameter :: mod_filename=&
@@ -79,10 +81,17 @@ contains
   VcumWatSnow_col(NY,NX)   = 0.0_r8
   VcumIceSnow_col(NY,NX)   = 0.0_r8
   VcumSnoDWI_col(NY,NX)    = VcumDrySnoWE_col(NY,NX)/NewSnowDens_col(NY,NX)+VcumWatSnow_col(NY,NX)+VcumIceSnow_col(NY,NX)
-
+  write(*,*) "----------------------------------------------------"
+  write(*,*) "BEFORE initializing snow layers the snow status is: "
+  write(*,*) "SnowDepth_col(NY,NX) = ", SnowDepth_col(NY,NX)
+  write(*,*) "NewSnowDens_col(NY,NX) = ", NewSnowDens_col(NY,NX)
+  write(*,*) "DH, DV = ", DH(NY,NX), DV(NY,NX)
+  write(*,*) "Vdrysnow, Vwatsnow, VIceSnow  = ", VcumDrySnoWE_col(NY,NX), VcumWatSnow_col(NY,NX), VcumIceSnow_col(NY,NX) 
+  write(*,*) "----------------------------------------------------"
 !  VOLSWI=0.0_r8
-
+  
   !build the snow profile, topdown
+  write(*,*) "(InitSnowLayers) L, DLYRSI, SnowThickL, VLDrySnow, VLWatSnow, VLIceSnow"
   D9580: DO L=1,JS
     IF(L.EQ.1)THEN
       !top snow layer
@@ -94,7 +103,7 @@ contains
     ENDIF
     !VLSnoDWIMax_col(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
     !Can this not just be AREA?
-    VLSnoDWIMax_col(L,NY,NX)=DLYRSI*0.1
+    VLSnoDWIMax_col(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
     if(SnowThickL_snvr(L,NY,NX) .GT. ZEROS(NY,NX))then
     !there is meaningful snow
       VLDrySnoWE_snvr(L,NY,NX) = SnowThickL_snvr(L,NY,NX)*NewSnowDens_col(NY,NX)*0.1
@@ -128,6 +137,7 @@ contains
       VLHeatCapSnow_snvr(L,NY,NX) = 0._r8
     ENDIF
     if(present(XSW))XSW=XSW+VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
+    write(*,*) L, DLYRSI, SnowThickL_snvr(L,NY,NX), VLDrySnoWE_snvr(L,NY,NX), VLWatSnow_snvr(L,NY,NX), VLIceSnow_snvr(L,NY,NX)
   ENDDO D9580
 
 !
@@ -422,18 +432,18 @@ contains
           call SnowTopSoilExch(dt_SnoHeat,M,L,NY,NX,VapCond1,VapSnoSrc,VLairSno1,TCND1W,&
             VapFlxSno2Soi1,HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS)
 
-          write(*,*) "After SnowTopSoilExch: -----------------------------"
-          write(*,*) "M, L, NY, NX ", M, L, NY, NX
-          write(*,*) "VapCond1: ", VapCond1
-          write(*,*) "VapSnoSrc: ", VapSnoSrc
-          write(*,*) "TCND1W: ", TCND1W
-          write(*,*) "VapFlxSno2Soi1: ", VapFlxSno2Soi1
-          write(*,*) "HeatConvFlxSno2Soi1: ", HeatConvFlxSno2Soi1
-          write(*,*) "HeatCndFlxSno2Soi: ", HeatCndFlxSno2Soi
-          write(*,*) "VapCond2: ", VapCond2
-          write(*,*) "PSISV1: ", PSISV1
-          write(*,*) "TCNDS: ", TCNDS
-          write(*,*) "----------------------------------------------------"
+          !write(*,*) "After SnowTopSoilExch: -----------------------------"
+          !write(*,*) "M, L, NY, NX ", M, L, NY, NX
+          !write(*,*) "VapCond1: ", VapCond1
+          !write(*,*) "VapSnoSrc: ", VapSnoSrc
+          !write(*,*) "TCND1W: ", TCND1W
+          !write(*,*) "VapFlxSno2Soi1: ", VapFlxSno2Soi1
+          !write(*,*) "HeatConvFlxSno2Soi1: ", HeatConvFlxSno2Soi1
+          !write(*,*) "HeatCndFlxSno2Soi: ", HeatCndFlxSno2Soi
+          !write(*,*) "VapCond2: ", VapCond2
+          !write(*,*) "PSISV1: ", PSISV1
+          !write(*,*) "TCNDS: ", TCNDS
+          !write(*,*) "----------------------------------------------------"
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
           !
@@ -764,16 +774,11 @@ contains
       VLHeatCapSnowM1_snvr(L,NY,NX) = cps*VLDrySnoWE0M_snvr(L,NY,NX)+cpw*VLWatSnow0M_snvr(L,NY,NX)+cpi*VLIceSnow0M_snvr(L,NY,NX)
       TK1X                          = TKSnow1_snvr(L,NY,NX)
       
+      write(*,*) "(SolveSnowpack) L, NetHeat2LayL, VLHeatCap, TKSnow, VLDrySnow, VLWatSnow, VLIceSNow"
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
-        write(*,*) "(SolveSnowpack) In Layer L = ", L
-        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX) = ", VLHeatCapSnowM1_snvr(L,NY,NX)
-        write(*,*) "VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8 = ", VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8
-        write(*,*) "ENGY0 = ", ENGY0
-        write(*,*) "NetHeat2LayL = ", NetHeat2LayL
-        write(*,*) "HeatByFrezThaw = ", HeatByFrezThaw
-        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX) = ", VLHeatCapSnowM1_snvr(L,NY,NX)
+        write(*,*)  L, NetHeat2LayL, VLHeatCapSnowM1_snvr(L,NY,NX), TKSnow1_snvr(L, NY, NX), &
+                VLDrySnoWE0M_snvr(L,NY,NX), VLWatSnow0M_snvr(L,NY,NX), VLIceSnow0M_snvr(L,NY,NX)
         TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
-        write(*,*) "TKSnow1_snvr(L,NY,NX) = ", TKSnow1_snvr(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
         TKSnow1_snvr(L,NY,NX)=TairK_col(NY,NX)
       ELSE
@@ -1369,6 +1374,7 @@ contains
   real(r8) :: RAS
   real(r8) :: RASL,RASX
   real(r8) :: FracAsAirSno
+  real(r8) :: TFACW
   integer :: L
 
 !     RAS,RASL=blrs of snowpack,snowpack layer
@@ -1383,6 +1389,11 @@ contains
   IF(VcumSnoDWI_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     D9775: DO L=1,JS
       IF(VLSnoDWI1_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        if(ats_cpl_mode)then
+          !In the coupler I need these defined which are typically done in hour1
+          TFACW=TEFGASDIF(TKSnow_snvr(L,NY,NX))
+          H2OVapDifscSno(L,NY,NX)=WGSG*TFACW
+        endif
         RASX         = SnowThickL_snvr(L,NY,NX)/H2OVapDifscSno(L,NY,NX)
         FracAsAirSno = AMAX1(THETPI,1.0_r8-(VLDrySnoWE0_snvr(L,NY,NX)+VLIceSnow0_snvr(L,NY,NX) &
             +VLWatSnow0_snvr(L,NY,NX))/VLSnoDWI1_snvr(L,NY,NX))

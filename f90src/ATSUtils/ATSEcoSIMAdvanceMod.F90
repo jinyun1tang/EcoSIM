@@ -161,31 +161,6 @@ implicit none
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
 
-  NY=1
-  L=1
-  write(*,*) "End RunEcoSIMSurfaceBalance, L, NY, NX ", L, NY, NX, "---------------"
-  write(*,*) "pressure_at_field_capacity =", pressure_at_field_capacity
-  write(*,*) "pressure_at_wilting_point =", pressure_at_wilting_point
-  write(*,*) "heat_capacity =", heat_capacity
-  write(*,*) "a_ASP =", a_ASP(NY)
-  write(*,*) "tairc =", tairc(NY)
-  write(*,*) "vpair =", vpair(NY)
-  write(*,*) "uwind =", uwind(NY)
-  write(*,*) "swrad =", swrad(NY)
-  write(*,*) "sunrad =", sunrad(NY)
-  write(*,*) "p_rain =", p_rain(NY)
-  write(*,*) "surf_e_source =", surf_e_source(NY)
-  write(*,*) "surf_w_source =", surf_w_source(NY)
-  write(*,*) "surf_snow_depth =", surf_snow_depth(NY)
-  write(*,*) "a_TEMP =", a_TEMP(L,NY)
-  write(*,*) "a_CumDepz2LayerBot_vr =", a_CumDepz2LayerBot_vr(L,NY)
-  write(*,*) "a_AREA3 =", a_AREA3(L,NY)
-  write(*,*) "a_BKDSI =", a_BKDSI(L,NY)
-  write(*,*) "a_WC =", a_WC(L,NY)
-  write(*,*) "a_MATP =", a_MATP(L,NY)
-  write(*,*) "a_PORO =", a_PORO(L,NY)
-  write(*,*) "-----------------------------------------------------------------"
-
   write(*,*) "snow_depth = ", surf_snow_depth(1) 
   write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 
   write(*,*) "Q_w ", surf_w_source(1) , " m/s"

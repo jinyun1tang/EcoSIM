@@ -1608,7 +1608,8 @@ contains
         TopLayWatVol,VapXAir2TopLay)
 
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
-      call SurfLitrSoilWaterExchange(I,J,M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
+    ! Litter not used yet 
+      if(.not.ATS_cpl_mode) call SurfLitrSoilWaterExchange(I,J,M,NY,NX,KSatReductByRainKineticEnergy(NY,NX))
 
       call InfilSRFRoffPartition(I,J,M,NY,NX,N1,N2)
     !

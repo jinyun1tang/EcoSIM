@@ -680,7 +680,11 @@ module InitSOMBGCMOD
     CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
-    scal                      = AREA(3,L,NY,NX)/VGeomLayer_vr(L,NY,NX)
+    if(L.EQ.0.AND.VGeomLayer_vr(L,NY,NX).EQ.0.0)then
+      scal=1.0
+    else
+      scal                      = AREA(3,L,NY,NX)/VGeomLayer_vr(L,NY,NX)
+    endif
     CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal

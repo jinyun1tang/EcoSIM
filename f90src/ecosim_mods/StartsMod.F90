@@ -908,6 +908,10 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
+
+      if(L.EQ.1.AND.CumDepz2LayerBot_vr(1,NY,NX).LE.1.0e-10)then
+        CumDepz2LayerBot_vr(1,NY,NX) = 0.0
+      endif
       DLYRI_3D(3,L,NY,NX)=(CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(L-1,NY,NX))
       call check_bool(DLYRI_3D(3,L,NY,NX)<0._r8,'negative soil layer thickness',__LINE__,mod_filename)
       DLYR(3,L,NY,NX)              = DLYRI_3D(3,L,NY,NX)
@@ -1050,8 +1054,11 @@ module StartsMod
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,PSIMN-LOGPSIMX
 !
       LOGPSIAtSat(NY,NX) = LOG(-PSIPS)
-      LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
-      LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
+      !ASG - 1/22 throws a floating point exception because PSI is positive?
+      !LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
+      !LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
+      LOGPSIFLD(NY,NX)   = LOG(PSIAtFldCapacity(NY,NX))
+      LOGPSIMN(NY,NX)    = LOG(PSIAtWiltPoint(NY,NX))      
       LOGPSIMXD(NY,NX)   = LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
       LOGPSIMND(NY,NX)   = LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
 
