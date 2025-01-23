@@ -1,4 +1,7 @@
 module ATSEcoSIMAdvanceMod
+  !
+  !Description
+  
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SoilWaterDataType
   use SharedDataMod
@@ -23,13 +26,15 @@ implicit none
   contains
 
   subroutine RunEcoSIMSurfaceBalance(NYS)
+  !
   use EcoSimConst
   use GridMod           , only : SetMeshATS
-  use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel
+  use SurfPhysMod       , only : RunSurfacePhysModelM, StageSurfacePhysModel, UpdateSurfaceAtM
   use StartsMod         , only : set_ecosim_solver
   implicit none
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
-  integer, intent(in) :: NYS
+  integer, intent(in) :: NYS  !Number of columns?
+
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size  
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
@@ -45,24 +50,24 @@ implicit none
   NX=1
 
   do NY=1,NYS
-    NU(NY,NX)=a_NU(NY)
-    NL(NY,NX)=a_NL(NY)
-    a_AREA3(0,NY) = 1.0_r8
-    AREA(3,0,NY,NX)=a_AREA3(0,NY)
-    AREA(3,NU(NY,NX),NY,NX)=a_AREA3(0,NY)
-    AREA(3,2,NY,NX)=a_AREA3(0,NY)
+    NU(NY,NX)               = a_NU(NY)
+    NL(NY,NX)               = a_NL(NY)
+    a_AREA3(0,NY)           = 1.0_r8
+    AREA(3,0,NY,NX)         = a_AREA3(0,NY)
+    AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
+    AREA(3,2,NY,NX)         = a_AREA3(0,NY)
 
 
     ASP_col(NY,NX)=a_ASP(NY)
-    !TairKClimMean(NY,NX)=a_ATKA(NY)
-    !CO2E_col(NY,NX)=atm_co2
-    !CH4E_col(NY,NX)=atm_ch4
-    !OXYE(NY,NX)=atm_o2
-    !Z2GE(NY,NX)=atm_n2
-    !Z2OE(NY,NX)=atm_n2o
-    !ZNH3E_col(NY,NX)=atm_nh3
-    !H2GE(NY,NX)=atm_H2
-    TairK_col(NY,NX)=tairc(NY)
+    !TairKClimMean(NY,NX) = a_ATKA(NY)
+    !CO2E_col(NY,NX)      = atm_co2
+    !CH4E_col(NY,NX)      = atm_ch4
+    !OXYE_col(NY,NX)      = atm_o2
+    !Z2GE_col(NY,NX)      = atm_n2
+    !Z2OE_col(NY,NX)      = atm_n2o
+    !ZNH3E_col(NY,NX)     = atm_nh3
+    !H2GE_col(NY,NX)      = atm_H2
+    TairK_col(NY,NX)      = tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     VPA(NY,NX) = vpair(NY)/1.0e6_r8
     !convert WindSpeedAtm_col from ATS units (m s^-1) to EcoSIM (m h^-1)
@@ -72,7 +77,7 @@ implicit none
     LWRadSky_col(NY,NX) = sunrad(NY)*0.0036_r8
     RainH(NY,NX) = p_rain(NY)
     DO L=NU(NY,NX),NL(NY,NX)
-      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
+      CumDepz2LayerBot_vr(L,NY,NX) = a_CumDepz2LayerBot_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
@@ -80,7 +85,7 @@ implicit none
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
       VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)
       VLiceMicP1_vr(L,NY,NX)       = 0.0
-      TKSoil1_vr(L,NY,NX)              = a_TEMP(L,NY)
+      TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0
       PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)
@@ -95,9 +100,14 @@ implicit none
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
+  !perhaps doesn't neeed to run NPH times
   DO M=1,NPH
-    call RunSurfacePhysModel(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
+    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
+
+     !also update state variables for each M 
+      call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
+
   ENDDO
   
   write(*,*) "Heat and water souces: "

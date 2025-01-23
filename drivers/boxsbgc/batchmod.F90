@@ -163,22 +163,22 @@ contains
   micfor%VLPOB =forc%VLPOB
   micfor%PSISoilMatricP =forc%PSISoilMatricP
   micfor%O2AquaDiffusvity =forc%O2AquaDiffusvity
-  micfor%ORGC  =forc%ORGC
-  micfor%RNO2EcoUptkSoilPrev =ystates0l(fid_RNO2EcoUptkSoilPrev)
-  micfor%RN2OEcoUptkSoilPrev =ystates0l(fid_RN2OEcoUptkSoilPrev)
-  micfor%RNO2EcoUptkBandPrev =ystates0l(fid_RNO2EcoUptkBandPrev)
-  micfor%RO2EcoDmndPrev =ystates0l(fid_RO2EcoDmndPrev)
-  micfor%RO2GasXchangePrev =ystates0l(fid_RO2GasXchangePrev)
-  micfor%RNH4EcoDmndBandPrev =ystates0l(fid_RNH4EcoDmndBandPrev)
-  micfor%RNO3EcoDmndBandPrev =ystates0l(fid_RNO3EcoDmndBandPrev)
-  micfor%RH2PO4EcoDmndBandPrev =ystates0l(fid_RH2PO4EcoDmndBandPrev)
-  micfor%RH1PO4EcoDmndBandPrev =ystates0l(fid_RH1PO4EcoDmndBandPrev)
-  micfor%RDOMEcoDmndPrev(1:jcplx)=ystates0l(fid_RDOMEcoDmndPrev_b:fid_RDOMEcoDmndPrev_e)
-  micfor%RAcetateEcoDmndPrev(1:jcplx)=ystates0l(fid_RAcetateEcoDmndPrev_b:fid_RAcetateEcoDmndPrev_e)
-  micfor%RCH4PhysexchPrev_vr = 0._r8
-  micfor%RO2AquaXchangePrev = 0._r8
-  micfor%ElmAllocmatMicrblitr2POM =forc%ElmAllocmatMicrblitr2POM(1:ndbiomcp)
-  micfor%litrm=.false.
+  micfor%ORGC                         = forc%ORGC
+  micfor%RNO2EcoUptkSoilPrev          = ystates0l(fid_RNO2EcoUptkSoilPrev)
+  micfor%RN2OEcoUptkSoilPrev          = ystates0l(fid_RN2OEcoUptkSoilPrev)
+  micfor%RNO2EcoUptkBandPrev          = ystates0l(fid_RNO2EcoUptkBandPrev)
+  micfor%RO2EcoDmndPrev               = ystates0l(fid_RO2EcoDmndPrev)
+  micfor%RO2GasXchangePrev            = ystates0l(fid_RO2GasXchangePrev)
+  micfor%RNH4EcoDmndBandPrev          = ystates0l(fid_RNH4EcoDmndBandPrev)
+  micfor%RNO3EcoDmndBandPrev          = ystates0l(fid_RNO3EcoDmndBandPrev)
+  micfor%RH2PO4EcoDmndBandPrev        = ystates0l(fid_RH2PO4EcoDmndBandPrev)
+  micfor%RH1PO4EcoDmndBandPrev        = ystates0l(fid_RH1PO4EcoDmndBandPrev)
+  micfor%RDOMEcoDmndPrev(1:jcplx)     = ystates0l(fid_RDOMEcoDmndPrev_b:fid_RDOMEcoDmndPrev_e)
+  micfor%RAcetateEcoDmndPrev(1:jcplx) = ystates0l(fid_RAcetateEcoDmndPrev_b:fid_RAcetateEcoDmndPrev_e)
+  micfor%RCH4PhysexchPrev             = 0._r8
+  micfor%RO2AquaXchangePrev           = 0._r8
+  micfor%ElmAllocmatMicrblitr2POM     = forc%ElmAllocmatMicrblitr2POM(1:ndbiomcp)
+  micfor%litrm                        = .false.
   micfor%Lsurf=.True.
   if(micfor%litrm)then
 !   the following hasn't been turned on yet
@@ -1247,7 +1247,7 @@ contains
 !
   use ChemMod
   use MicBGCMod           , only : SoilBGCOneLayer
-  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type
+  use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type,Microbe_Diag_type
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(in) :: ystates0l(nvars)
@@ -1258,6 +1258,8 @@ contains
   type(micfluxtype), intent(inout) :: micflx
   type(model_status_type), intent(out) :: err_status
   type(Cumlate_Flux_Diag_type)  :: naqfdiag
+  type(Microbe_Diag_type)  :: nmicdiag
+
   integer :: I,J
 
   I=1;J=1
@@ -1266,7 +1268,7 @@ contains
   ystatesfl=0._r8
   if(.not.forc%disvolonly)then
 !    print*,'SoilBGCOneLayer'
-    call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag)
+    call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
 !    print*,'RunModel_nosalt'
     call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
   endif
@@ -1650,12 +1652,12 @@ contains
 !  H2GS(NU(NY,NX),NY,NX)=H2GS(NU(NY,NX),NY,NX)+XHGDFS(NY,NX)
 
 
-!    CO2S(L,NY,NX)=CO2S(L,NY,NX)+XCODFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_CO2,L,NY,NX)
-!    CH4S(L,NY,NX)=CH4S(L,NY,NX)+XCHDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_CH4,L,NY,NX)
-!    OXYS(L,NY,NX)=OXYS(L,NY,NX)+XOXDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_O2,L,NY,NX
-!    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_N2,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX)
-!    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_N2O,L,NY,NX)
-!    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-trcg_RMicbTransf_vr(idg_H2,L,NY,NX)
+!    CO2S(L,NY,NX)=CO2S(L,NY,NX)+XCODFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)
+!    CH4S(L,NY,NX)=CH4S(L,NY,NX)+XCHDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)
+!    OXYS(L,NY,NX)=OXYS(L,NY,NX)+XOXDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_O2,L,NY,NX
+!    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_N2,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX)
+!    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_N2O,L,NY,NX)
+!    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_H2,L,NY,NX)
 !    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TR_NH3_soil_vr(L,NY,NX)
 
 !    CO2G(L,NY,NX)=CO2G(L,NY,NX)-XCODFG(L,NY,NX)+XCOFLG

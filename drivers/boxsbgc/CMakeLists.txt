@@ -9,14 +9,14 @@ include(add_ecosim_executable)
 add_ecosim_executable(boxsbgc.x ${BOXSBGC_DRIVER_SOURCES})
 
 target_include_directories(boxsbgc.x  PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/modelpars/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/
-  ${CMAKE_BINARY_DIR}/f90src/geochem/box_chem
-  ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/Modelpars/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/
+  ${CMAKE_BINARY_DIR}/f90src/Geochem/Box_chem
+  ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/Box_Micmodel
   ${CMAKE_BINARY_DIR}/drivers/boxshared)
 #include(add_ecosim_library)
 #add_ecosim_library(boxsbgc_driver ${BOXSBGC_DRIVER_SOURCES})
