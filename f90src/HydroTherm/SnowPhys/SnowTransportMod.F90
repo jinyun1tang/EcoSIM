@@ -164,12 +164,11 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DiagSnowChemMass(I,J,NY,NX,ENGYSNW)
+  subroutine DiagSnowChemMass(I,J,NY,NX)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  real(r8),intent(inout):: ENGYSNW   !column heat storage
-  real(r8) :: SSW,ENGYW,WS
+  real(r8) :: SSW,WS
   integer :: L,nsalts
 
   if(lverb)write(*,*)'DiagSnowChemMass'
@@ -186,11 +185,6 @@ implicit none
   DO  L=1,JS
     WS                  = VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
     if(WS>0._r8)then
-      WatMassStore_lnd    = WatMassStore_lnd+WS
-      WatMass_col(NY,NX)  = WatMass_col(NY,NX)+WS
-      ENGYW               = VLHeatCapSnow_snvr(L,NY,NX)*TKSnow_snvr(L,NY,NX)
-      ENGYSNW             = ENGYSNW+ENGYW
-      HeatStore_lnd       = HeatStore_lnd+ENGYW
       TGasC_lnd           = TGasC_lnd+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
       DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+trcg_solsml_snvr(idg_CO2,L,NY,NX)+trcg_solsml_snvr(idg_CH4,L,NY,NX)
       TSoilO2G_lnd        = TSoilO2G_lnd+trcg_solsml_snvr(idg_O2,L,NY,NX)
@@ -225,13 +219,9 @@ implicit none
       trcg_solsml_snvr(NTG,1,NY,NX)=trcg_solsml_snvr(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
     ENDDO
 
-    !   write(116,*)I+J/24.,'beg611',trc_solml_vr(ids_NO3,0,NY,NX),trcn_QSS(ids_NO3,NY,NX),trcn_QSS(ids_NO2,NY,NX)
-
     DO NTS=ids_nut_beg,ids_nuts_end
       trcn_solsml_snvr(NTS,1,NY,NX)=trcn_solsml_snvr(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
     ENDDO
-
-    !   write(116,*)I+J/24.,'beg612',trc_solml_vr(ids_NO3,0,NY,NX),RNutMicbTransf_vr(ids_NO3,0,NY,NX),trcn_RChem_soil_vr(ids_NO3,0,NY,NX)
 
     IF(salt_model)THEN
       DO NTA=idsalt_beg,idsalt_end
@@ -247,10 +237,10 @@ implicit none
 
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
-  integer :: NN,NTG,NTN,NTSA
+  integer :: NN,NTG,NTN,NTSA,idg
 
-  TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrysnoBySnowRedistrib(N,N2,N1)&
-    -DrysnoBySnowRedistrib(N,N5,N4)
+  TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrySnoBySnoRedistrib_2DH(N,N2,N1)&
+    -DrySnoBySnoRedistrib_2DH(N,N5,N4)
   TWatBySnowRedist(N2,N1)      = TWatBySnowRedist(N2,N1)+WatBySnowRedistrib_2DH(N,N2,N1) &
     -WatBySnowRedistrib_2DH(N,N5,N4)
   TIceBySnowRedist(N2,N1)      = TIceBySnowRedist(N2,N1)+IceBySnowRedistrib_2DH(N,N2,N1) &
@@ -302,12 +292,9 @@ implicit none
   !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
   !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
   !
-  trcg_QSS(idg_CO2,N2,N1)=trcg_QSS(idg_CO2,N2,N1)+trcg_FloXSnow_2DH(idg_CO2,N,N2,N1)-trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)
-  trcg_QSS(idg_CH4,N2,N1)=trcg_QSS(idg_CH4,N2,N1)+trcg_FloXSnow_2DH(idg_CH4,N,N2,N1)-trcg_FloXSnow_2DH(idg_CH4,N,N5,N4)
-  trcg_QSS(idg_O2,N2,N1)=trcg_QSS(idg_O2,N2,N1)+trcg_FloXSnow_2DH(idg_O2,N,N2,N1)-trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
-  trcg_QSS(idg_N2,N2,N1)=trcg_QSS(idg_N2,N2,N1)+trcg_FloXSnow_2DH(idg_N2,N,N2,N1)-trcg_FloXSnow_2DH(idg_N2,N,N5,N4)
-  trcg_QSS(idg_N2O,N2,N1)=trcg_QSS(idg_N2O,N2,N1)+trcg_FloXSnow_2DH(idg_N2O,N,N2,N1)-trcg_FloXSnow_2DH(idg_N2O,N,N5,N4)
-  trcg_QSS(idg_NH3,N2,N1)=trcg_QSS(idg_NH3,N2,N1)+trcg_FloXSnow_2DH(idg_NH3,N,N2,N1)-trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)
+  do idg=idg_beg,idg_NH3
+    trcg_QSS(idg,N2,N1) = trcg_QSS(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,N2,N1)-trcg_FloXSnow_2DH(idg,N,N5,N4)
+  ENDDO
 
   trcn_QSS(ids_NH4,N2,N1)=trcn_QSS(ids_NH4,N2,N1)+trcn_FloXSnow_2DH(ids_NH4,N,N2,N1)-trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)
   trcn_QSS(ids_NO3,N2,N1)=trcn_QSS(ids_NO3,N2,N1)+trcn_FloXSnow_2DH(ids_NO3,N,N2,N1)-trcn_FloXSnow_2DH(ids_NO3,N,N5,N4)

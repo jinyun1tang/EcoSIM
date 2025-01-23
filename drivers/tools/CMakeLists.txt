@@ -1,6 +1,7 @@
 set(TOOLS_SOURCES
 	ClimTransformer.F90
-  ManagementReader.F90
+  SoilManagementReader.F90
+  PlantManagementReader.F90
   ClimReader.F90
   etimerTest.F90
   restartTest.F90
@@ -12,7 +13,8 @@ set(TOOLS_SOURCES
 include(add_ecosim_library)
 include(add_ecosim_executable)
 add_ecosim_executable(ClimTransformer.x ClimTransformer.F90)
-add_ecosim_executable(ManagementReader.x ManagementReader.F90)
+add_ecosim_executable(SoilManagementReader.x SoilManagementReader.F90)
+add_ecosim_executable(PlantManagementReader.x PlantManagementReader.F90)
 add_ecosim_executable(ClimReader.x ClimReader.F90)
 add_ecosim_executable(etimerTest.x etimerTest.F90)
 add_ecosim_executable(NamelistTest.x NamelistTest.F90)
@@ -26,74 +28,83 @@ target_include_directories(EcoATSTest.x PRIVATE
   )
 
 target_include_directories(ClimTransformer.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
-target_include_directories(ManagementReader.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+target_include_directories(SoilManagementReader.x PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
+
+target_include_directories(PlantManagementReader.x PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 target_include_directories(ClimReader.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 target_include_directories(etimerTest.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 target_include_directories(NamelistTest.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 target_include_directories(HFileTest.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 target_include_directories(restartTest.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
   target_include_directories(SoilWarmReadTest.x PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
-  ${CMAKE_BINARY_DIR}/f90src/disturbances/
-  ${CMAKE_BINARY_DIR}/f90src/ioutils/)
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/Disturbances/
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
 
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ClimTransformer.x DESTINATION bin)
-  install(TARGETS ManagementReader.x DESTINATION bin)
+  install(TARGETS SoilManagementReader.x DESTINATION bin)
+  install(TARGETS PlantManagementReader.x DESTINATION bin)
   install(TARGETS ClimReader.x DESTINATION bin)
   install(TARGETS etimerTest.x DESTINATION bin)
   install(TARGETS NamelistTest.x DESTINATION bin)

@@ -1,0 +1,8 @@
+&pft_mgmnt
+year0=1990
+yearf=2018
+nyears=40
+NPS=1
+lverb=.true.
+pft_mgmt_in='pft_mgmt_Blodgett_v0_ex12.nc'
+/

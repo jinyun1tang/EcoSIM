@@ -8,8 +8,8 @@ implicit none
   real(r8),allocatable ::  LWRad2LitR_col(:,:)                         !
   real(r8),allocatable ::  LWEmscefSoil_col(:,:)                         !
   real(r8),allocatable ::  LWRad2Soil_col(:,:)                         !
-  real(r8),allocatable ::  RadSWonLitR_col(:,:)                         !
-  real(r8),allocatable ::  RadSWonSoil_col(:,:)                         !
+  real(r8),allocatable ::  RadSW2LitR_col(:,:)                         !
+  real(r8),allocatable ::  RadSW2Soil_col(:,:)                         !
   real(r8),allocatable ::  LWEmscefSnow_col(:,:)                 !  
   real(r8),allocatable ::  LWRad2Snow_col(:,:)                   !    
   real(r8),allocatable ::  FracSoiPAsWat_vr(:,:,:)               !
@@ -22,17 +22,17 @@ implicit none
   real(r8),allocatable ::  FracSoilAsAirt(:,:,:)                 !fraction of soil volume as air, normalized using current pore volume
   real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                  !    
   real(r8),allocatable ::  VLiceMicP1_vr(:,:,:)                  !  
-  real(r8),allocatable ::  SnowFallt(:,:)                        !  
-  real(r8),allocatable ::  Rain2Snowt(:,:)                       !  
+  real(r8),allocatable ::  SnowFallt_col(:,:)                    !  snowfall to snow, [m3 d-2]
+  real(r8),allocatable ::  Rain2Snowt_col(:,:)                   !  rainfall to snow, [m3 d-2]
   real(r8),allocatable ::  VLairMacP1_vr(:,:,:)                  !  positively corrected macropore volume, [m^3/d^2]
   real(r8),allocatable ::  EVAPW(:,:)                            !  
   real(r8),allocatable ::  EVAPS(:,:)                            !  
-  real(r8),allocatable ::  VapXAir2Sno(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
+  real(r8),allocatable ::  VapXAir2Sno_col(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
   real(r8),allocatable ::  SoilFracAsMacP1_vr(:,:,:)             !  
-  real(r8),allocatable ::  HeatFall2Snowt(:,:)                   !  
+  real(r8),allocatable ::  PrecHeat2Snowt_col(:,:)               ! total heat flux to snow due to precipitation, [m3 d-2]
   real(r8),allocatable ::  VPQ_col(:,:)                          !  
   real(r8),allocatable ::  AScaledCdHOverSnow_col(:,:)           ! area scaled sensible heat flux conductance over snow  [MJ h /(m K)]
-  real(r8),allocatable ::  Ice2Snowt(:,:)                        !  
+  real(r8),allocatable ::  Ice2Snowt_col(:,:)                    ! icefall to snow, [m3 d-2]
   real(r8),allocatable ::  TKQ_col(:,:)                          ! air temperature in canopy [K]
   real(r8),allocatable ::  ResistAreodynOverSnow_col(:,:)        !  
   real(r8),allocatable ::  VLairMicP1_vr(:,:,:)                  ! corrected air-filled micropore volume [m3/d2]
@@ -45,7 +45,7 @@ implicit none
   real(r8),allocatable ::  AScaledCdWOverSnow_col(:,:)           ! area scaled latent heat flux conductance over snow, [m^2 h]
   real(r8),allocatable ::  Altitude_grid(:,:)                    ! grid altitude [m]
   real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
-  real(r8),allocatable ::  RadSWonSno_col(:,:)                   !short wave radiation on snow [MJ]  
+  real(r8),allocatable ::  RadSW2Sno_col(:,:)                   !short wave radiation on snow [MJ]  
   real(r8),allocatable ::  WatFlx2LitRByRunoff_2DH(:,:,:,:)      !surface runoff flux  
   real(r8),allocatable ::  HeatFlx2LitRByRunoff_2DH(:,:,:,:)                      !  
   real(r8),allocatable ::  DrySnoFlxBySnowRedistribut(:,:,:)                         !  
@@ -53,13 +53,16 @@ implicit none
   real(r8),allocatable ::  IceFlxBySnowRedistribut(:,:,:)                         !  
   real(r8),allocatable ::  HeatFlxBySnowRedistribut(:,:,:)                        !  
   real(r8),allocatable ::  HeatFlow2Soili_3D(:,:,:,:)                     !  
-  real(r8),allocatable ::  WaterFlow2Micpt_3D(:,:,:,:)                      !  
-  real(r8),allocatable ::  ConvWaterFlowMacP_3D(:,:,:,:)                     !  
+  real(r8),allocatable ::  WaterFlow2Micpt_3D(:,:,:,:)                      !    
+  real(r8),allocatable ::  WaterFlow2Macpt_3D(:,:,:,:)                     !  
+  real(r8),allocatable ::  WaterFlow2Micptl_3D(:,:,:,:)                      !    
+  real(r8),allocatable ::  WaterFlow2Macptl_3D(:,:,:,:)                     !    
   real(r8),allocatable ::  WaterFlow2MicptX_3D(:,:,:,:)                     !  
   real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                       !
   real(r8),allocatable ::  VLairMicP_vr(:,:,:)                      !
   real(r8),allocatable ::  VLWatMicPX1_vr(:,:,:)               !micropore water volume behind wetting front
-
+  real(r8),allocatable ::  Qinflx2SoilM_col(:,:)
+  real(r8),save :: HeatAdv_scal = 1._r8
   public :: InitHydroThermData
   public :: DestructHydroThermData
   contains
@@ -79,17 +82,17 @@ implicit none
   allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
   allocate(VLWatMicP1_vr(0:JZ,JY,JX));  VLWatMicP1_vr=0._r8  
   allocate(VLiceMicP1_vr(0:JZ,JY,JX));  VLiceMicP1_vr=0._r8
-  allocate(SnowFallt(JY,JX));       SnowFallt=0._r8
-  allocate(Rain2Snowt(JY,JX));       Rain2Snowt=0._r8
+  allocate(SnowFallt_col(JY,JX));       SnowFallt_col=0._r8
+  allocate(Rain2Snowt_col(JY,JX));       Rain2Snowt_col=0._r8
   allocate(VLairMacP1_vr(JZ,JY,JX));   VLairMacP1_vr=0._r8 
-  allocate(VapXAir2Sno(JY,JX));      VapXAir2Sno=0._r8  
+  allocate(VapXAir2Sno_col(JY,JX));      VapXAir2Sno_col=0._r8  
   allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
   allocate(SoilFracAsMacP1_vr(JZ,JY,JX));     SoilFracAsMacP1_vr=0._r8  
-  allocate(HeatFall2Snowt(JY,JX));      HeatFall2Snowt=0._r8  
+  allocate(PrecHeat2Snowt_col(JY,JX));      PrecHeat2Snowt_col=0._r8  
   allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
   allocate(AScaledCdHOverSnow_col(JY,JX));       AScaledCdHOverSnow_col=0._r8
-  allocate(Ice2Snowt(JY,JX));       Ice2Snowt=0._r8    
+  allocate(Ice2Snowt_col(JY,JX));       Ice2Snowt_col=0._r8    
   allocate(TKQ_col(JY,JX));         TKQ_col=0._r8  
   allocate(LWEmscefSnow_col(JY,JX));       LWEmscefSnow_col=0._r8  
   allocate(ResistAreodynOverSnow_col(JY,JX));        ResistAreodynOverSnow_col=0._r8  
@@ -104,7 +107,7 @@ implicit none
   allocate(AScaledCdWOverSnow_col(JY,JX));       AScaledCdWOverSnow_col=0._r8
   allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
   allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8  
-  allocate(RadSWonSno_col(JY,JX));       RadSWonSno_col=0._r8  
+  allocate(RadSW2Sno_col(JY,JX));       RadSW2Sno_col=0._r8  
   allocate(WatFlx2LitRByRunoff_2DH(2,2,JV,JH));     WatFlx2LitRByRunoff_2DH=0._r8  
   allocate(HeatFlx2LitRByRunoff_2DH(2,2,JV,JH));    HeatFlx2LitRByRunoff_2DH=0._r8
   allocate(DrySnoFlxBySnowRedistribut(2,JV,JH));       DrySnoFlxBySnowRedistribut=0._r8
@@ -113,7 +116,9 @@ implicit none
   allocate(HeatFlxBySnowRedistribut(2,JV,JH));      HeatFlxBySnowRedistribut=0._r8
   allocate(HeatFlow2Soili_3D(3,JD,JV,JH));  HeatFlow2Soili_3D=0._r8
   allocate(WaterFlow2Micpt_3D(3,JD,JV,JH));   WaterFlow2Micpt_3D=0._r8  
-  allocate(ConvWaterFlowMacP_3D(3,JD,JV,JH));  ConvWaterFlowMacP_3D=0._r8
+  allocate(WaterFlow2Macpt_3D(3,JD,JV,JH));  WaterFlow2Macpt_3D=0._r8
+  allocate(WaterFlow2Micptl_3D(3,JD,JV,JH));   WaterFlow2Micptl_3D=0._r8  
+  allocate(WaterFlow2Macptl_3D(3,JD,JV,JH));  WaterFlow2Macptl_3D=0._r8
   allocate(WaterFlow2MicptX_3D(3,JD,JV,JH));  WaterFlow2MicptX_3D=0._r8
   allocate(VLWatMicP2_vr(JZ,JY,JX));    VLWatMicP2_vr=0._r8
   allocate(VLairMicP_vr(JZ,JY,JX));   VLairMicP_vr=0._r8
@@ -122,10 +127,10 @@ implicit none
   allocate(LWEmscefLitR_col(JY,JX));       LWEmscefLitR_col=0._r8
   allocate(LWRad2LitR_col(JY,JX));       LWRad2LitR_col=0._r8
   allocate(LWEmscefSoil_col(JY,JX));       LWEmscefSoil_col=0._r8
-  allocate(RadSWonLitR_col(JY,JX));       RadSWonLitR_col=0._r8    
+  allocate(RadSW2LitR_col(JY,JX));       RadSW2LitR_col=0._r8    
   allocate(LWRad2Soil_col(JY,JX));       LWRad2Soil_col=0._r8
-  allocate(RadSWonSoil_col(JY,JX));       RadSWonSoil_col=0._r8
-
+  allocate(RadSW2Soil_col(JY,JX));       RadSW2Soil_col=0._r8
+  allocate(Qinflx2SoilM_col(JY,JX)); Qinflx2SoilM_col=0._r8
   end subroutine InitHydroThermData
 
 !------------------------------------------------------------------------------------------
@@ -144,17 +149,17 @@ implicit none
   call destroy(FracSoilAsAirt)  
   call destroy(VLWatMicP1_vr)  
   call destroy(VLiceMicP1_vr)
-  call destroy(SnowFallt)
-  call destroy(Rain2Snowt)
+  call destroy(SnowFallt_col)
+  call destroy(Rain2Snowt_col)
   call destroy(VLairMacP1_vr)    
   call destroy(EVAPW)  
   call destroy(EVAPS)  
-  call destroy(VapXAir2Sno)  
+  call destroy(VapXAir2Sno_col)  
   call destroy(SoilFracAsMacP1_vr)  
-  call destroy(HeatFall2Snowt)
+  call destroy(PrecHeat2Snowt_col)
   call destroy(VPQ_col)    
   call destroy(AScaledCdHOverSnow_col)  
-  call destroy(Ice2Snowt)
+  call destroy(Ice2Snowt_col)
   call destroy(TKQ_col)
   call destroy(LWEmscefSnow_col)
   call destroy(ResistAreodynOverSnow_col) 
@@ -169,7 +174,7 @@ implicit none
   call destroy(AScaledCdWOverSnow_col)
   call destroy(Altitude_grid)
   call destroy(VLiceMacP1_vr)
-  call destroy(RadSWonSno_col)
+  call destroy(RadSW2Sno_col)
   call destroy(HeatFlx2LitRByRunoff_2DH)    
   call destroy(DrySnoFlxBySnowRedistribut)  
   call destroy(WatFlxBySnowRedistribut)
@@ -177,7 +182,9 @@ implicit none
   call destroy(HeatFlxBySnowRedistribut)    
   call destroy(HeatFlow2Soili_3D)  
   call destroy(WaterFlow2Micpt_3D)  
-  call destroy(ConvWaterFlowMacP_3D)
+  call destroy(WaterFlow2Macpt_3D)
+  call destroy(WaterFlow2Micptl_3D)  
+  call destroy(WaterFlow2Macptl_3D)
   call destroy(WaterFlow2MicptX_3D)
   call destroy(VLWatMicP2_vr)
   call destroy(VLairMicP_vr)
@@ -185,9 +192,10 @@ implicit none
   call destroy(LWEmscefLitR_col)
   call destroy(LWRad2LitR_col)
   call destroy(LWEmscefSoil_col)
-  call destroy(RadSWonLitR_col)  
+  call destroy(RadSW2LitR_col)  
   call destroy(LWRad2Soil_col)
-  call destroy(RadSWonSoil_col)
+  call destroy(RadSW2Soil_col)
+  call destroy(Qinflx2SoilM_col)
 
   end subroutine DestructHydroThermData
 end module HydroThermData

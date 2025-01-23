@@ -9,7 +9,7 @@ module PlantMod
   use PlantAPIData  
   use PlantAPI
   use ExtractsMod
-  use GridDataType, only : NP
+  use PlantMgmtDataType, only : NP
   use PlantBalMod
 implicit none
   private
