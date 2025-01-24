@@ -32,7 +32,7 @@ implicit none
   use SurfPhysMod       , only : RunSurfacePhysModel, StageSurfacePhysModel, & 
       SetHourlyAccumulatorsATS
   use StartsMod         , only : set_ecosim_solver
-  use SnowBalanceMod    , only : SnowMassUpdate
+  use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size
   integer, intent(in) :: NYS
@@ -159,6 +159,11 @@ implicit none
     !write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
     !write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
+  ENDDO
+
+  DO NY=1, NYS
+    call SnowMassUpdate(I,J,NY,NX)
+    call SnowpackLayering(I,J,NY,NX)
   ENDDO
 
   write(*,*) "snow_depth = ", surf_snow_depth(1) 

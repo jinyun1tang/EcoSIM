@@ -91,7 +91,6 @@ contains
 !  VOLSWI=0.0_r8
   
   !build the snow profile, topdown
-  write(*,*) "(InitSnowLayers) L, DLYRSI, SnowThickL, VLDrySnow, VLWatSnow, VLIceSnow"
   D9580: DO L=1,JS
     IF(L.EQ.1)THEN
       !top snow layer
@@ -137,7 +136,7 @@ contains
       VLHeatCapSnow_snvr(L,NY,NX) = 0._r8
     ENDIF
     if(present(XSW))XSW=XSW+VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
-    write(*,*) L, DLYRSI, SnowThickL_snvr(L,NY,NX), VLDrySnoWE_snvr(L,NY,NX), VLWatSnow_snvr(L,NY,NX), VLIceSnow_snvr(L,NY,NX)
+    !write(*,*) L, DLYRSI, SnowThickL_snvr(L,NY,NX), VLDrySnoWE_snvr(L,NY,NX), VLWatSnow_snvr(L,NY,NX), VLIceSnow_snvr(L,NY,NX)
   ENDDO D9580
 
 !
@@ -616,7 +615,8 @@ contains
 !     TFLWS,TFLWW,TFLWI=accumulated net snow,water,ice transfer
 !     CumHeat2SnowLay=convective heat flux from accumd snow,water,ice transfer
 !
-    D9860: DO L=1,JS
+   write(*,*) "(SolveSnowpack) L, spval, NetHeat2LayL, VLHeatCap, TKSnow, VLDrySnow, VLWatSnow, VLIceSNow"
+   D9860: DO L=1,JS
 
       VOLS0X          = VLDrySnoWE0M_snvr(L,NY,NX)
       VOLW0X          = VLWatSnow0M_snvr(L,NY,NX)
@@ -773,11 +773,8 @@ contains
       vhcp0                         = VLHeatCapSnowM1_snvr(L,NY,NX)
       VLHeatCapSnowM1_snvr(L,NY,NX) = cps*VLDrySnoWE0M_snvr(L,NY,NX)+cpw*VLWatSnow0M_snvr(L,NY,NX)+cpi*VLIceSnow0M_snvr(L,NY,NX)
       TK1X                          = TKSnow1_snvr(L,NY,NX)
-      
-      write(*,*) "(SolveSnowpack) L, NetHeat2LayL, VLHeatCap, TKSnow, VLDrySnow, VLWatSnow, VLIceSNow"
+
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
-        write(*,*)  L, NetHeat2LayL, VLHeatCapSnowM1_snvr(L,NY,NX), TKSnow1_snvr(L, NY, NX), &
-                VLDrySnoWE0M_snvr(L,NY,NX), VLWatSnow0M_snvr(L,NY,NX), VLIceSnow0M_snvr(L,NY,NX)
         TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
         TKSnow1_snvr(L,NY,NX)=TairK_col(NY,NX)
@@ -785,7 +782,8 @@ contains
         TKSnow1_snvr(L,NY,NX)=TKSnow1_snvr(L-1,NY,NX)
       ENDIF
       tEnGYM_snvr(L,NY,NX)=ENGY0+NetHeat2LayL+HeatByFrezThaw
-
+      write(*,*)  L, spval, NetHeat2LayL, VLHeatCapSnowM1_snvr(L,NY,NX), TKSnow1_snvr(L, NY, NX), &
+                VLDrySnoWE0M_snvr(L,NY,NX), VLWatSnow0M_snvr(L,NY,NX), VLIceSnow0M_snvr(L,NY,NX)
 !      if(I==73 .and. J==24 .and. NX==1 .and. L==1)then
 !        write(*,*)I+J/24.,M,TK1X,TKSnow1_snvr(L,NY,NX),VLHeatCapSnowM1_snvr(L,NY,NX),vhcp0
 !        write(122,*)I+J/24.,M,MM,CumHeat2SnowLM_snvr(L,NY,NX),XPhaseChangeHeatLM_snvr(L,NY,NX)
@@ -798,10 +796,10 @@ contains
 !        endif
 !      endif
       if(TK1X/=spval .and. abs(TK1X-TKSnow1_snvr(L,NY,NX))>20._r8)then
-        write(*,*)I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX),VLHeatCapSnowM1_snvr(L,NY,NX),TairK_col(NY,NX)
-        write(*,*)'mass0',vdry,vwat,vice
-        write(*,*)'masst',VLDrySnoWE0M_snvr(L,NY,NX),VLWatSnow0M_snvr(L,NY,NX),VLIceSnow0M_snvr(L,NY,NX)
-        write(*,*)'NYNX',NY,NX
+        !write(*,*)I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX),VLHeatCapSnowM1_snvr(L,NY,NX),TairK_col(NY,NX)
+        !write(*,*)'mass0',vdry,vwat,vice
+        !write(*,*)'masst',VLDrySnoWE0M_snvr(L,NY,NX),VLWatSnow0M_snvr(L,NY,NX),VLIceSnow0M_snvr(L,NY,NX)
+        !write(*,*)'NYNX',NY,NX
         call endrun('crazy snow temperature '//trim(mod_filename),__LINE__)      
       endif
       if(cphwat < 0._r8)then

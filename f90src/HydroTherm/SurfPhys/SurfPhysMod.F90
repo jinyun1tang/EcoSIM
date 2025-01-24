@@ -1636,14 +1636,14 @@ contains
 
   ! In ATS coupled mode we do not run the full Redist so we put the snow
   ! models here instead
-  DO NX=NHW, NHE
-    DO NY=NVN, NVS
-      if (ATS_cpl_mode) then
-        call SnowMassUpdate(I,J,NY,NX)
-        call SnowpackLayering(I,J,NY,NX)
-      end if
-    ENDDO
-  ENDDO
+  !DO NX=NHW, NHE
+  !  DO NY=NVN, NVS
+  !    if (ATS_cpl_mode) then
+  !      call SnowMassUpdate(I,J,NY,NX)
+  !      call SnowpackLayering(I,J,NY,NX)
+  !    end if
+  !  ENDDO
+  !ENDDO
 
   end subroutine RunSurfacePhysModel
 
