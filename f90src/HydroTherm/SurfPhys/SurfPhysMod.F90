@@ -41,6 +41,7 @@ implicit none
   public :: StageSurfacePhysModel
   public :: RunSurfacePhysModelM
   public :: AggregateSurfRunoffFluxM
+  public :: SetHourlyAccumulatorsATS
   public :: writeSurfDiagnosis
   !
   public :: SurfaceRunoff
@@ -68,6 +69,41 @@ implicit none
   real(r8) :: PrecHeat2SoiNet,RainPrecAir2LitR
 
 contains
+
+  subroutine SetHourlyAccumulatorsATS(NY,NX)
+!     implicit none
+  integer, intent(in) :: NX,NY
+
+  integer :: L
+!     begin_execution
+
+  WatFLo2Litr_col(NY,NX)                      = 0.0_r8
+  HeatFLo2LitrByWat_col(NY,NX)                = 0.0_r8
+  TLitrIceFlxThaw_col(NY,NX)                  = 0.0_r8
+  TLitrIceHeatFlxFrez_col(NY,NX)              = 0.0_r8
+  HeatByRad2Surf_col(NY,NX)               = 0.0_r8
+  HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
+  HeatNet2Surf_col(NY,NX)                 = 0.0_r8
+  VapXAir2GSurf_col(NY,NX)                = 0.0_r8
+
+  !TFLWCI(NY,NX)           = 0.0_r8
+  PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
+
+! zero arrays in the snow layers
+  WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MacP_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8
+  SnoXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay_snvr(1:JS,NY,NX)   = 0.0_r8
+  XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0.0_r8
+
+  end subroutine SetHourlyAccumulatorsATS  
 
   subroutine StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 

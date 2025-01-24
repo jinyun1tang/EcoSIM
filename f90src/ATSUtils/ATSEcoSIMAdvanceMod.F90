@@ -18,11 +18,13 @@ module ATSEcoSIMAdvanceMod
       VPA, WindSpeedAtm_col, RainH  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
-      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars are double defined
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
+      FracSoiPAsIce_vr, FracSoilPoreAsAir_vr, VLairMicP1_vr!need the only as some vars
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
   use MiniMathMod
+  use ClimForcDataType
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -33,7 +35,8 @@ implicit none
   !
   use EcoSimConst
   use GridMod           , only : SetMeshATS
-  use SurfPhysMod       , only : RunSurfacePhysModelM, StageSurfacePhysModel, UpdateSurfaceAtM
+  use SurfPhysMod       , only : RunSurfacePhysModelM, StageSurfacePhysModel, UpdateSurfaceAtM, &
+      SetHourlyAccumulatorsATS
   use StartsMod         , only : set_ecosim_solver
   use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
   implicit none
@@ -113,7 +116,7 @@ implicit none
       PrecAsRain(NY,NX)=0.0_r8
       PrecAsSnow(NY,NX)=RAINH(NY,NX)
     ENDIF
-    RainFalPrec(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = POROS_vr(1,NY,NX)
   ENDDO
@@ -183,11 +186,11 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        FracSoiPAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        FracSoiPAsAir_vr(L,NY,NX)=0.0_r8
+        FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
       ENDIF
       !write(*,*) "NY, NX ", NY, NX
       !write(*,*) "FracSoiPAsWat_vr(L,NY,NX): ", FracSoiPAsWat_vr(L,NY,NX)

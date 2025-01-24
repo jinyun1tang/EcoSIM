@@ -8,12 +8,14 @@ module ATSEcoSIMInitMod
   use LandSurfDataType
   use EcoSIMCtrlMod
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
-      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
+      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
+      FracSoiPAsIce_vr, FracSoilPoreAsAir_vr!need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
       VPA, WindSpeedAtm_col, RainH
   use SoilPropertyDataType
   use SurfLitterDataType
+  use EcoSIMConfig
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -99,7 +101,7 @@ implicit none
       AREA(3,L,NY,NX)=a_AREA3(L,NY)
       !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
-      SoiBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)
+      SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)
       SoilFracAsMicP_vr(L,NY,NX) = 1.0
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
