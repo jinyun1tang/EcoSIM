@@ -11,19 +11,19 @@ include(add_ecosim_library)
 add_ecosim_library(ATSUtils_mods ${ATSUTILS_MOD_SOURCES})
 
 target_include_directories(ATSUtils_mods  PRIVATE
-   ${CMAKE_BINARY_DIR}/f90src/utils/
-   ${CMAKE_BINARY_DIR}/f90src/minimath/
-   ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-   ${CMAKE_BINARY_DIR}/f90src/mesh/
-   ${CMAKE_BINARY_DIR}/f90src/modelpars/
-   ${CMAKE_BINARY_DIR}/f90src/balances/   
-   ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+   ${CMAKE_BINARY_DIR}/f90src/Utils/
+   ${CMAKE_BINARY_DIR}/f90src/Minimath/
+   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+   ${CMAKE_BINARY_DIR}/f90src/Mesh/
+   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
+   ${CMAKE_BINARY_DIR}/f90src/Balances/   
+   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
    ${CMAKE_BINARY_DIR}/f90src/APIData/
-   ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
+   ${CMAKE_BINARY_DIR}/f90src/Ecosim_mods/)
 
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ATSUtils_mods PARENT_SCOPE)

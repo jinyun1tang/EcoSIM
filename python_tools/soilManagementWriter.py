@@ -327,4 +327,3 @@ def write_soil_mgmt(config_dict):
 
     nc_fid.close()  # close the new file
 
-write_soil_mgmt(config_dict)

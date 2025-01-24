@@ -2,16 +2,16 @@ set(APIDATA_SOURCES
   PlantAPIData.F90
 )
 
-#include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-#include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-#include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/Utils/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/Modelconfig/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/Modelpars/)
 include(add_ecosim_library)
 add_ecosim_library(APIData ${APIDATA_SOURCES})
 
 target_include_directories(APIData PRIVATE 
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/modelpars/
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR})
 
 

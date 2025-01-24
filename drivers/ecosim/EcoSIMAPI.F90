@@ -13,6 +13,8 @@ module EcoSIMAPI
   use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
   use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
   use WatsubMod,       only: watsub
+  use PlantMgmtDataType, only: NP  
+  use SoilWaterDataType
   use EcoSIMCtrlMod  
   use BalancesMod  
 implicit none
@@ -31,15 +33,16 @@ contains
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1
 
-  call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
-
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
+  !print*,'hour1'
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
+
   if(do_timing)call end_timer('HOUR1',t1)
   !
   !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
   !
+  !print*,'watsub'
   if(lverb)WRITE(*,334)'WAT'
   if(do_timing)call start_timer(t1)
   CALL WATSUB(I,J,NHW,NHE,NVN,NVS)
@@ -47,13 +50,14 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
+  !print*,'microbe model'
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     if(do_timing)call start_timer(t1)
     CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('NIT',t1)
   endif
-
+!  print*,'plant model'
   !
   !   UPDATE PLANT biogeochemistry
   !
@@ -64,7 +68,6 @@ contains
     if(do_timing)call end_timer('PlantModel',t1)    
   endif
 
-  !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
   !
@@ -152,7 +155,7 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp
@@ -190,7 +193,7 @@ contains
   warming_exp           = ''
   brnch_retain_casename = .false.
   hist_yrclose          = .false.
-
+  fixWaterLevel         = .false.
   forc_periods      = 0
   forc_periods(1:9) = (/1980,1980,1,1981,1988,2,1989,2008,1/)
 
@@ -335,15 +338,12 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTS' IF NEEDED
-
-  ENDIF
-  
+  ENDIF  
 !
   if(plant_model)then
     !plant information is read in every year, but the active flags
     !are set using the checkpoint file.
     if(lverb)WRITE(*,333)'ReadPlantInfo'
-    WRITE(*,333)'ReadPlantInfo'
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
   endif
 
@@ -354,7 +354,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
   ENDIF
-  
   if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 ! This is done done every year, because tracer concentrations
@@ -372,6 +371,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
     call set_soil_warming(iYearCurrent,NHW,NHE,NVN,NVS)
   endif
+
   DazCurrYear=etimer%get_days_cur_year()
   DO I=1,DazCurrYear    
     IF(do_rgres .and. I.eq.LYRG)RETURN
@@ -390,6 +390,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
         if(is_restart() .or. is_branch())then
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
+          call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
         endif
       endif
       if(frectyp%lskip_loop)then
@@ -406,12 +407,13 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-  
+
       if(do_timing)call end_timer_loop()
       
       if(lverb)write(*,*)'hist_update'
       call hist_ecosim%hist_update(I,J,bounds)
 
+      if(lverb)write(*,*)'hist_update_hbuf'
       call hist_update_hbuf(bounds)
 
       call etimer%update_time_stamp()

@@ -203,7 +203,9 @@ def write_site_topo_data(config_dict):
   current_dateTime = datetime.now()
   nc_f=config_dict['outdir']+case+'_grid_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
   nc_fid = Dataset(nc_f, 'w')
-
+    
+  print("check file %s"%nc_f)
+    
   nc_fid.description='Grid input data created on %4d/%02d/%02d/%02d:%02d:%02d'% \
       (current_dateTime.year,current_dateTime.month,current_dateTime.day, \
       current_dateTime.hour,current_dateTime.minute,current_dateTime.second)

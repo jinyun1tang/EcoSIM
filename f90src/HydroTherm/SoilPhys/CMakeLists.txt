@@ -8,12 +8,13 @@ include(add_ecosim_library)
 add_ecosim_library(SoilPhys ${SOILPHYS_SOURCES})
 
 target_include_directories(SoilPhys  PRIVATE
-  ${CMAKE_BINARY_DIR}/f90src/utils/
-  ${CMAKE_BINARY_DIR}/f90src/minimath/
-  ${CMAKE_BINARY_DIR}/f90src/mesh/
-  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
-  ${CMAKE_BINARY_DIR}/f90src/modelpars/
-  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/Modelpars/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/Disturbances/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/)

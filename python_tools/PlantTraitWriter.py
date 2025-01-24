@@ -10,10 +10,12 @@ warnings.filterwarnings("ignore")
 
 
 
-def write_plant_traits(pftnames,pft_path,gfname):
+def write_plant_traits(pft_path,gfname,outdir):
     """
     write plant trait files
     """
+    pft_names=os.listdir(pft_path)
+    
     JLI=4
 #pft files are named as pft+koppen_climate_zone
 #Bdlf:broadleaf tree (deciduous or evergreen, depending on climate zone)
@@ -637,7 +639,7 @@ def write_plant_traits(pftnames,pft_path,gfname):
 
 #write pft file
     current_dateTime = datetime.now()
-    nc_f='../input_data/%s_pftpar_%4d%02d%02d.nc'%(gfname,current_dateTime.year,current_dateTime.month,current_dateTime.day)
+    nc_f='%s%s_pftpar_%4d%02d%02d.nc'%(outdir,gfname,current_dateTime.year,current_dateTime.month,current_dateTime.day)
     nc_fid = Dataset(nc_f, 'w')
 
     nc_fid.description='plant trait parameterization for ecosim created on %4d/%02d/%02d/%02d:%02d:%02d'% \
@@ -816,10 +818,10 @@ def write_plant_traits(pftnames,pft_path,gfname):
 
     nc_fid.close()  # close the new file
 
-pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/spruce_PQ_3PFT_s1/pfts/'
-pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/Blodget/pfts/'
+#pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/spruce_PQ_3PFT_s1/pfts/'
+#pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/Blodget/pfts/'
 #pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/sorghum/plt_sorg/pfts/'
 #pft_path='/Users/jinyuntang/work/github/ecosys_benchmark/plmrEcosys/pfts/'
-pft_names=os.listdir(pft_path)
+#pft_names=os.listdir(pft_path)
 
-write_plant_traits(pft_names,pft_path,'blodgett')
+#write_plant_traits(pft_names,pft_path,'blodgett')
