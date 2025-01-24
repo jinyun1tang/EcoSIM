@@ -69,10 +69,10 @@ implicit none
   do NY=1,NYS
     NU(NY,NX)               = a_NU(NY)
     NL(NY,NX)               = a_NL(NY)
-    a_AREA3(0,NY)           = 1.0_r8
-    AREA(3,0,NY,NX)         = a_AREA3(0,NY)
-    AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
-    AREA(3,2,NY,NX)         = a_AREA3(0,NY)
+    !a_AREA3(0,NY)           = 1.0_r8
+    !AREA(3,0,NY,NX)         = a_AREA3(0,NY)
+    !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
+    !AREA(3,2,NY,NX)         = a_AREA3(0,NY)
 
 
     ASP_col(NY,NX)=a_ASP(NY)
@@ -93,6 +93,7 @@ implicit none
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     LWRadSky_col(NY,NX) = sunrad(NY)*0.0036_r8
     RainH(NY,NX) = p_rain(NY)
+    TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayerBot_vr(L,NY,NX) = a_CumDepz2LayerBot_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
@@ -108,7 +109,20 @@ implicit none
       PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)
       POROS_vr(L,NY,NX)            = a_PORO(L,NY)
       !AREA3(L,NY,NX)              = a_AREA3(L,NY)
-   ENDDO
+      VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
+      IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN
+        !fraction as water
+        FracSoiPAsWat_vr(L,NY,NX)=AZMAX1t(VLWatMicP1_vr(L,NY,NX)/VLTSoiPore)
+        !fraction as ice
+        FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
+        !fraction as air
+        FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+      ELSE
+        FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
+        FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
+        FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
+      ENDIF    
+    ENDDO
     IF(TCA_col(NY,NX).GT.TSNOW)THEN
       PrecAsRain(NY,NX)=RAINH(NY,NX)
       PrecAsSnow(NY,NX)=0.0_r8
@@ -128,6 +142,9 @@ implicit none
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
+  !Actually I update this just in the loop above??
+  !call UpdateSoilMoistureFromATS(I,J,NHW,NHE,NVN,NVS)
+
   !perhaps doesn't neeed to run NPH times
   DO M=1,NPH
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
@@ -137,7 +154,10 @@ implicit none
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
- 
+
+  Do NY=1,NYS
+    call SnowMassUpdate(I,J,NY,NX) 
+  enddo
   !write(*,*) "after run: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
   !write(*,*) "Heat and water souces: "
@@ -152,10 +172,10 @@ implicit none
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
 
-  DO NY=1, NYS
-    call SnowMassUpdate(I,J,NY,NX)
-    call SnowpackLayering(I,J,NY,NX)
-  ENDDO
+  !DO NY=1, NYS
+  !  call SnowMassUpdate(I,J,NY,NX)
+  !  call SnowpackLayering(I,J,NY,NX)
+  !ENDDO
 
   write(*,*) "snow_depth = ", surf_snow_depth(1) 
   write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 

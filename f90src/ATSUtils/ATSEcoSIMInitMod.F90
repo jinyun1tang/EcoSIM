@@ -70,8 +70,8 @@ implicit none
     QRunSurf_col(NY,NX)     = 0.0_r8
     NU(NY,NX)               = a_NU(NY)
     NL(NY,NX)               = a_NL(NY)
-    AREA(3,0,NY,NX)         = a_AREA3(0,NY)
-    AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
+    !AREA(3,0,NY,NX)         = a_AREA3(0,NY)
+    !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
     ASP_col(NY,NX)          = a_ASP(NY)
     !TairKClimMean(NY,NX)   = a_ATKA(NY)
     !CO2E_col(NY,NX)=atm_co2

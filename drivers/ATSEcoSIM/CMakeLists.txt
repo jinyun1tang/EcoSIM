@@ -8,6 +8,7 @@ add_ecosim_executable(ATSEcoSIM_test.x ATSEcoSIM_test.F90)
 
 target_include_directories(ATSEcoSIM_test.x PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   )
 
 #target_include_directories(ClimTransformer.x PRIVATE

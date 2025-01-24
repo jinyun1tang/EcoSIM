@@ -11,7 +11,7 @@ program EcoATSTest
   type (BGCSizes) :: sizes
   integer :: NY, NX, L, ii
   integer :: ncells_per_col_, ncol
-  real, dimension(3) :: rain_array = (/1.0e-6, 1.0e-6, 0.0/)
+  real, dimension(3) :: rain_array = (/1.0e-2, 1.0e-2, 0.0/)
 
   NX = 1
   NYS = 1
