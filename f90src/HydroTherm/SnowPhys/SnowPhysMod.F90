@@ -620,7 +620,7 @@ contains
 !     TFLWS,TFLWW,TFLWI=accumulated net snow,water,ice transfer
 !     CumHeat2SnowLay=convective heat flux from accumd snow,water,ice transfer
 !
-   write(*,*) "(SolveSnowpack) L, spval, NetHeat2LayL, VLHeatCap, TKSnow, VLDrySnow, VLWatSnow, VLIceSNow"
+   write(*,*) "(SolveSnowpack) L, NetHeat2LayL, VLHeatCap, TKSnow, VLDrySnow, VLWatSnow, VLIceSNow"
    D9860: DO L=1,JS
 
       VOLS0X = VLDrySnoWE0M_snvr(L,NY,NX)
@@ -778,6 +778,8 @@ contains
         TKSnow1_snvr(L,NY,NX)=TKSnow1_snvr(L-1,NY,NX)
       ENDIF
       tEnGYM_snvr(L,NY,NX)=ENGY0+NetHeat2LayL+HeatByFrezThaw
+      write(*,*)  L, NetHeat2LayL, VLHeatCapSnowM1_snvr(L,NY,NX), TKSnow1_snvr(L, NY, NX), &
+                VLDrySnoWE0M_snvr(L,NY,NX), VLWatSnow0M_snvr(L,NY,NX), VLIceSnow0M_snvr(L,NY,NX)
 !      if(I>=108 .and. L==1)write(*,*)'solvewm',M,TKSnow1_snvr(L,NY,NX),TK1X
       if(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8 .and. &
         (TK1X/=spval .and. abs(TK1X-TKSnow1_snvr(L,NY,NX))>20._r8 .or. TKSnow1_snvr(L,NY,NX)<200._r8))then
