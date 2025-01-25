@@ -83,9 +83,9 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=1.0     !coming in
-                  RCHQF=RechargWestSurf(M5,M4)
-                  RCHGFU=RechargWestSubSurf(M5,M4)
-                  RCHGFT=RechargRateWestWTBL(M5,M4)
+                  RCHQF  = RechargWestSurf(M5,M4)
+                  RCHGFU = RechargWestSubSurf(M5,M4)
+                  RCHGFT = RechargRateWestWTBL(M5,M4)
                 ELSE
                   cycle
                 ENDIF
@@ -107,9 +107,9 @@ module BoundaryTranspMod
                   M5    = NY+1
                   M6    = L
                   XN    = -1.0_r8    !going out
-                  RCHQF = RechargSouthSurf(M2,M1)
-                  RCHGFU=RechargSouthSubSurf(M2,M1)
-                  RCHGFT=RechargRateSouthWTBL(M2,M1)
+                  RCHQF  = RechargSouthSurf(M2,M1)
+                  RCHGFU = RechargSouthSubSurf(M2,M1)
+                  RCHGFT = RechargRateSouthWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -123,9 +123,9 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=1.0_r8   !coming in
-                  RCHQF=RechargNorthSurf(M5,M4)
-                  RCHGFU=RechargNorthSubSurf(M5,M4)
-                  RCHGFT=RechargRateNorthWTBL(M5,M4)
+                  RCHQF  = RechargNorthSurf(M5,M4)
+                  RCHGFU = RechargNorthSubSurf(M5,M4)
+                  RCHGFT = RechargRateNorthWTBL(M5,M4)
                 ELSE
                   cycle
                 ENDIF
@@ -156,24 +156,23 @@ module BoundaryTranspMod
                 cycle
               ENDIF
             ENDIF
-
-            IF(M.NE.MX)THEN
+            
 !
 !     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
 !     RUNOFF IN 'WATSUB' AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
 !
-              call BoundaryRunoffandSnow(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
+            call OverLandTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
 !
 !     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
 !
-            ENDIF
+            
           ENDDO D9575
 !
 !     NET GAS AND SOLUTE FLUXES IN EACH GRID CELL
 !C
 !     NET OVERLAND SOLUTE FLUX IN WATER
 !
-          call NetOverlandFlux(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)
+          call NetTracerFlowOverLandMM(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)
 !
 !     TOTAL SOLUTE FLUX IN MICROPORES AND MACROPORES
 !
@@ -189,7 +188,7 @@ module BoundaryTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
           IF(FlowDirIndicator(N2,N1).NE.3 .OR. N.EQ.iVerticalDirection)THEN
-            call NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
+            call NetTracerFlowXSoilPoresMM(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
           ENDIF
         ENDDO D9580
       ENDDO D9585
@@ -199,14 +198,14 @@ module BoundaryTranspMod
   end subroutine XBoundaryFluxMM
 !------------------------------------------------------------------------------------------
 
-  subroutine BoundaryRunoffandSnowXY(M,N,NN,N1,N2,M4,M5,RCHQF)
+  subroutine SurfTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
   implicit none
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
   integer :: K,idg,NTN,ids,idom
 
-  IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8).OR.WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
+  IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0.0_r8) .OR. WatFlux4ErosionM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
       dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
     ENDDO
@@ -293,27 +292,31 @@ module BoundaryTranspMod
     trcn_2DSnowDrift(ids_H1PO4,N,M5,M4)       = 0.0_r8
     trcn_2DSnowDrift(ids_H2PO4,N,M5,M4)       = 0.0_r8
   ENDIF
-  end subroutine BoundaryRunoffandSnowXY
+  end subroutine SurfTracerRunoffXYM
 ! ----------------------------------------------------------------------
 
   subroutine BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
   implicit none
-  integer, intent(in) :: M,N,NN,M1,M2,M3,M4,M5,M6
+  integer, intent(in) :: M,N,NN
+  integer, intent(in) :: M1,M2,M3
+  integer, intent(in) :: M4,M5,M6
   integer :: K,idg,NTN,ids,idom
   real(r8) :: VFLW
 
   IF(NN.EQ.1 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR.NN.EQ.2 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+    .OR. NN.EQ.2 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
+
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
         DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
       enddo
     enddo
+
     !does not include NH3 and NH3B
     DO idg=idg_beg,idg_end-2
       R3PoreSolFlx_3D(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(idg,M3,M2,M1))
@@ -403,7 +406,7 @@ module BoundaryTranspMod
   end subroutine BoundaryRunoffandSnowZ
 
 ! ----------------------------------------------------------------------
-  subroutine BoundaryRunoffandSnow(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
+  subroutine OverLandTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
   implicit none
 
   integer, intent(in) :: L,N, NN, M,MX, N1, N2,N3, M1, M2,M3,M4, M5,M6
@@ -421,8 +424,8 @@ module BoundaryTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
   IF(M.NE.MX)THEN
-    IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-      call BoundaryRunoffandSnowXY(M,N,NN,N1,N2,M4,M5,RCHQF)
+    IF(L.EQ.NUM(M2,M1) .AND. N.NE.iVerticalDirection)THEN
+      call SurfTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
     ENDIF
 
 !     WaterFlow2MicPM_3D=water flux through soil micropore from watsub.f
@@ -435,7 +438,7 @@ module BoundaryTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      IF(FlowDirIndicator(M2,M1).NE.3 .OR. N.EQ.3)THEN
+      IF(FlowDirIndicator(M2,M1).NE.3 .OR. N.EQ.iVerticalDirection)THEN
         !
         call BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
       ENDIF
@@ -465,21 +468,20 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
       DO idg=idg_beg,idg_NH3
-        RGasADFlx_3D(idg,N,M6,M5,M4)        = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
-        Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4) = Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+RGasADFlx_3D(idg,N,M6,M5,M4)
+        RGasADFlxMM_3D(idg,N,M6,M5,M4)        = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
+        Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)   = Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+RGasADFlxMM_3D(idg,N,M6,M5,M4)
       ENDDO
-
     ELSE
-      RGasADFlx_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
+      RGasADFlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
     ENDIF
   ELSE
     DO  K=1,jcplx
       DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
     R3PoreSoHFlx_3D(ids_beg:ids_end,N,M6,M5,M4) = 0.0_r8
-    RGasADFlx_3D(idg_beg:idg_NH3,N,M6,M5,M4)    = 0.0_r8
+    RGasADFlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)  = 0.0_r8
   ENDIF
-  end subroutine BoundaryRunoffandSnow
+  end subroutine OverLandTracerFlowMM
 !------------------------------------------------------------------------------------------
 
   subroutine NetOverlandFluxXY(M,N,N1,N2,N4,N5,N4B,N5B)
@@ -553,7 +555,7 @@ module BoundaryTranspMod
 
 !------------------------------------------------------------------------------------------
 !
-  subroutine NetOverlandFlux(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)
+  subroutine NetTracerFlowOverLandMM(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)
   implicit none
 
   integer, intent(in) :: L,N, M, MX,NY,NX,N1,N2,N4B,N5B,N4,N5
@@ -584,7 +586,7 @@ module BoundaryTranspMod
       ENDIF
     ENDIF
   ENDIF
-  end subroutine NetOverlandFlux
+  end subroutine NetTracerFlowOverLandMM
 !------------------------------------------------------------------------------------------
 
   subroutine NetOverlandVerticalFlux(M,N1,N2,NY,NX)
@@ -641,7 +643,7 @@ module BoundaryTranspMod
   end subroutine NetOverlandVerticalFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
+  subroutine NetTracerFlowXSoilPoresMM(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
   implicit none
 
   integer, intent(in) :: NY,NX,N,M,N1,N2,N3,N4,N5,MX
@@ -690,11 +692,11 @@ module BoundaryTranspMod
 !
   IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
-      Gas_AdvDif_Flx_vr(idg,N3,N2,N1)=Gas_AdvDif_Flx_vr(idg,N3,N2,N1)+RGasADFlx_3D(idg,N,N3,N2,N1)-RGasADFlx_3D(idg,N,N6,N5,N4)
+      Gas_AdvDif_Flx_vr(idg,N3,N2,N1)=Gas_AdvDif_Flx_vr(idg,N3,N2,N1)+RGasADFlxMM_3D(idg,N,N3,N2,N1)-RGasADFlxMM_3D(idg,N,N6,N5,N4)
     ENDDO
   ELSE
     Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,N3,N2,N1)=0._r8
   ENDIF
-  end subroutine NetFluxMicroandMacropores
+  end subroutine NetTracerFlowXSoilPoresMM
 
 end module BoundaryTranspMod

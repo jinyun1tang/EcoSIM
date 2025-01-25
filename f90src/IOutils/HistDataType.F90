@@ -1314,7 +1314,7 @@ implicit none
     long_name='soil CH4 ebullition flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_TPR_err_col(beg_col:end_col)
-  call hist_addfld1d(fname='CO2_TPR_Residual',units='g C/m2',avgflag='A',&
+  call hist_addfld1d(fname='CumCO2_Transpt_Residual',units='g C/m2',avgflag='A',&
     long_name='Cumulative difference between soil CO2 production and surface CO2 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_PLTROOT_flx_col(beg_col:end_col)

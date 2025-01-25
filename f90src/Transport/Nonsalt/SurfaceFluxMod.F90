@@ -66,8 +66,8 @@ contains
 
   VLWatMicPMA_vr(NU(NY,NX),NY,NX)      = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
   VLWatMicPMB_vr(NU(NY,NX),NY,NX)      = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
-  VLWatMicPXA(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMA_vr(NU(NY,NX),NY,NX)
-  VLWatMicPXB(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMB_vr(NU(NY,NX),NY,NX)
+  VLWatMicPXA_vr(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMA_vr(NU(NY,NX),NY,NX)
+  VLWatMicPXB_vr(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMB_vr(NU(NY,NX),NY,NX)
   VLsoiAirPMA(NU(NY,NX),NY,NX)         = VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
   VLsoiAirPMB(NU(NY,NX),NY,NX)         = VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
   CumReductVLsoiAirPM(NU(NY,NX),NY,NX) = ReductVLsoiAirPM(M,NU(NY,NX),NY,NX)*dt_GasCyc
@@ -862,20 +862,20 @@ contains
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) .AND. VLsoiAirPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX) &
     .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
 
-    VLWatMicPXA(0,NY,NX)=natomw*VLWatMicPM_vr(M,0,NY,NX)
+    VLWatMicPXA_vr(0,NY,NX)=natomw*VLWatMicPM_vr(M,0,NY,NX)
 
     do idg=idg_beg,idg_NH3
       trcg_VLWatMicP_vr(idg,0,NY,NX)  = VLWatMicPM_vr(M,0,NY,NX)*GasSolbility_vr(idg,0,NY,NX)
       trc_gascl                       = trc_gascl_vr(idg,0,NY,NX)*VLsoiAirPM_vr(M,0,NY,NX)
       VOLGas                          = trcg_VLWatMicP_vr(idg,0,NY,NX)+VLsoiAirPM_vr(M,0,NY,NX)
-      RGas_Disol_FlxM_vr(idg,0,NY,NX) = DiffusivitySolutEffM_vr(M,0,NY,NX) &
+      RGas_Disol_FlxMM_vr(idg,0,NY,NX) = DiffusivitySolutEffM_vr(M,0,NY,NX) &
         *(AMAX1(ZEROS(NY,NX),trc_gascl)*trcg_VLWatMicP_vr(idg,0,NY,NX) &
         - AMAX1(ZEROS(NY,NX),trc_solml2_vr(idg,0,NY,NX)+RGas_Dif_Atm2Litr_FlxMM(idg))*VLsoiAirPM_vr(M,0,NY,NX))/VOLGas
-      Gas_Disol_Flx_vr(idg,0,NY,NX) = Gas_Disol_Flx_vr(idg,0,NY,NX)+RGas_Disol_FlxM_vr(idg,0,NY,NX)
+      Gas_Disol_Flx_vr(idg,0,NY,NX) = Gas_Disol_Flx_vr(idg,0,NY,NX)+RGas_Disol_FlxMM_vr(idg,0,NY,NX)
     ENDDO
 !
   ELSE
-    RGas_Disol_FlxM_vr(idg_beg:idg_end,0,NY,NX)=0.0_r8
+    RGas_Disol_FlxMM_vr(idg_beg:idg_end,0,NY,NX)=0.0_r8
   ENDIF
   end subroutine LitterGasVolatilDissolMM
 
@@ -898,14 +898,13 @@ contains
 !
   IF(AirFilledSoilPoreM_vr(M,NU(NY,NX),NY,NX).GT.THETX .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
 !
-    call SurfSoilDifusFluxMM(M,NY,NX)
+    call TopSoilGasDifussionMM(M,NY,NX)
 
-!
 !     CONVECTIVE GAS TRANSFER DRIVEN BY SURFACE WATER FLUXES
 !     FROM 'WATSUB' AND GAS CONCENTRATIONS IN THE SOIL SURFACE
 !     OR THE ATMOSPHERE DEPENDING ON WATER FLUX DIRECTION
 !
-    call SurfSoillAdvFlux(M,NY,NX,WaterFlow2Soil)
+    call TopSoilGasAdvectionMM(M,NY,NX,WaterFlow2Soil)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -913,25 +912,25 @@ contains
 !
     DO idg=idg_beg,idg_NH3
       Gas_3DAdvDif_Flx_vr(idg,3,NU(NY,NX),NY,NX)=Gas_3DAdvDif_Flx_vr(idg,3,NU(NY,NX),NY,NX) &
-        +RGasADFlx_3D(idg,3,NU(NY,NX),NY,NX)
+        +RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)
     ENDDO
 
     IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      call SurfSoilFluxDisolVapor(M,NY,NX,RGas_Dif_Atm2Soil_FlxMM)
+      call TopSoilGasDissolutionMM(M,NY,NX,RGas_Dif_Atm2Soil_FlxMM)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
 !     X*DFG=hourly water-air gas flux
 !
       DO idg=idg_beg,idg_end
-        Gas_Disol_Flx_vr(idg,NU(NY,NX),NY,NX)=Gas_Disol_Flx_vr(idg,NU(NY,NX),NY,NX)+RGas_Disol_FlxM_vr(idg,NU(NY,NX),NY,NX)
+        Gas_Disol_Flx_vr(idg,NU(NY,NX),NY,NX)=Gas_Disol_Flx_vr(idg,NU(NY,NX),NY,NX)+RGas_Disol_FlxMM_vr(idg,NU(NY,NX),NY,NX)
       ENDDO
     ELSE
-      RGas_Disol_FlxM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX)=0.0_r8
+      RGas_Disol_FlxMM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX)=0.0_r8
     ENDIF
   ELSE
-    RGasADFlx_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX)    = 0.0_r8
-    RGas_Disol_FlxM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX) = 0.0_r8
+    RGasADFlxMM_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX)    = 0.0_r8
+    RGas_Disol_FlxMM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX) = 0.0_r8
   ENDIF
   end subroutine SurfSoilFluxGasDifAdvMM
 
@@ -1256,12 +1255,12 @@ contains
   end subroutine SnowSoluteDischargeM
 
 ! ----------------------------------------------------------------------
-  subroutine SurfSoillAdvFlux(M,NY,NX,WaterFlow2Soil)
+  subroutine TopSoilGasAdvectionMM(M,NY,NX,WaterFlow2Soil)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8) :: VFLW
-  real(r8) :: RFLg_ADV(idg_beg:idg_NH3)
+  real(r8) :: RGas_Adv_flx(idg_beg:idg_NH3)
   integer :: idg
 
 !     WaterFlow2Soil=total water flux into soil micropore+macropore from watsub.f
@@ -1281,11 +1280,11 @@ contains
     ENDIF
 
     DO idg=idg_beg,idg_NH3
-      RFLg_ADV(idg)=VFLW*AZMAX1(trc_gasml2_vr(idg,NU(NY,NX),NY,NX))
+      RGas_Adv_flx(idg)=VFLW*AZMAX1(trc_gasml2_vr(idg,NU(NY,NX),NY,NX))
     ENDDO
   ELSE
     DO idg=idg_beg,idg_NH3
-      RFLg_ADV(idg)=-WaterFlow2Soil(3,NU(NY,NX),NY,NX)*AtmGasCgperm3(idg,NY,NX)
+      RGas_Adv_flx(idg)=-WaterFlow2Soil(3,NU(NY,NX),NY,NX)*AtmGasCgperm3(idg,NY,NX)
     ENDDO
   ENDIF
 !     TOTAL SOIL GAS FLUX + CONVECTIVE FLUX
@@ -1295,12 +1294,12 @@ contains
 !     DFV*G=diffusive gas flux
 !     RFL*G=convective gas flux
   DO idg=idg_beg,idg_NH3
-    RGasADFlx_3D(idg,3,NU(NY,NX),NY,NX)=RGasADFlx_3D(idg,3,NU(NY,NX),NY,NX)+RFLg_ADV(idg)
+    RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)=RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)+RGas_Adv_flx(idg)
   ENDDO
-  end subroutine SurfSoillAdvFlux
+  end subroutine TopSoilGasAdvectionMM
 
 ! ----------------------------------------------------------------------
-  subroutine SurfSoilDifusFluxMM(M,NY,NX)
+  subroutine TopSoilGasDifussionMM(M,NY,NX)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8) :: DFV_g
@@ -1360,13 +1359,16 @@ contains
 !     DFV*G=diffusive gas flux
 !     RFL*G=convective gas flux
 
-    RGasADFlx_3D(idg,3,NU(NY,NX),NY,NX)=DFV_g
+    RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)=DFV_g
   ENDDO
 
-  end subroutine SurfSoilDifusFluxMM
+  end subroutine TopSoilGasDifussionMM
 ! ----------------------------------------------------------------------
 
-  subroutine SurfSoilFluxDisolVapor(M,NY,NX,RGas_Dif_Atm2Soil_FlxMM)
+  subroutine TopSoilGasDissolutionMM(M,NY,NX,RGas_Dif_Atm2Soil_FlxMM)
+  !
+  !Description
+  !Do gas dissolution in the topsoil
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),intent(in) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
@@ -1387,7 +1389,7 @@ contains
   do idg=idg_beg,idg_NH3-1
     trcg_VLWatMicP_vr(idg,NU(NY,NX),NY,NX) = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*GasSolbility_vr(idg,NU(NY,NX),NY,NX)
     trcg_VOLT(idg,NY,NX)                   = trcg_VLWatMicP_vr(idg,NU(NY,NX),NY,NX)+VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)
-    RGas_Disol_FlxM_vr(idg,NU(NY,NX),NY,NX) = DiffusivitySolutEffM_vr(M,NU(NY,NX),NY,NX) &
+    RGas_Disol_FlxMM_vr(idg,NU(NY,NX),NY,NX) = DiffusivitySolutEffM_vr(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2_vr(idg,NU(NY,NX),NY,NX))*trcg_VLWatMicP_vr(idg,NU(NY,NX),NY,NX) &
        -AMAX1(ZEROS(NY,NX),trc_solml2_vr(idg,NU(NY,NX),NY,NX)+RGas_Dif_Atm2Soil_FlxMM(idg))*VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)) &
        /trcg_VOLT(idg,NY,NX)
@@ -1398,23 +1400,23 @@ contains
   trcg_VOLT(idg_NH3,NY,NX)                    = trcg_VLWatMicP_vr(idg_NH3,NU(NY,NX),NY,NX)+VLsoiAirPMA(NU(NY,NX),NY,NX)
   trcg_VOLT(idg_NH3B,NY,NX)                   = trcg_VLWatMicP_vr(idg_NH3B,NU(NY,NX),NY,NX)+VLsoiAirPMB(NU(NY,NX),NY,NX)
 
-  IF(trcg_VOLT(idg_NH3,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPXA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    RGas_Disol_FlxM_vr(idg_NH3,NU(NY,NX),NY,NX)=DiffusivitySolutEffM_vr(M,NU(NY,NX),NY,NX) &
+  IF(trcg_VOLT(idg_NH3,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPXA_vr(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    RGas_Disol_FlxMM_vr(idg_NH3,NU(NY,NX),NY,NX)=DiffusivitySolutEffM_vr(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2_vr(idg_NH3,NU(NY,NX),NY,NX))*trcg_VLWatMicP_vr(idg_NH3,NU(NY,NX),NY,NX) &
       -AMAX1(ZEROS(NY,NX),trc_solml2_vr(idg_NH3,NU(NY,NX),NY,NX)+RGas_Dif_Atm2Soil_FlxMM(idg_NH3))*VLsoiAirPMA(NU(NY,NX),NY,NX)) &
       /trcg_VOLT(idg_NH3,NY,NX)
   ELSE
-    RGas_Disol_FlxM_vr(idg_NH3,NU(NY,NX),NY,NX)=0.0_r8
+    RGas_Disol_FlxMM_vr(idg_NH3,NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
 
-  IF(trcg_VOLT(idg_NH3B,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPXB(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    RGas_Disol_FlxM_vr(idg_NH3B,NU(NY,NX),NY,NX)=DiffusivitySolutEffM_vr(M,NU(NY,NX),NY,NX) &
+  IF(trcg_VOLT(idg_NH3B,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPXB_vr(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    RGas_Disol_FlxMM_vr(idg_NH3B,NU(NY,NX),NY,NX)=DiffusivitySolutEffM_vr(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2_vr(idg_NH3,NU(NY,NX),NY,NX))*trcg_VLWatMicP_vr(idg_NH3B,NU(NY,NX),NY,NX) &
       -AMAX1(ZEROS(NY,NX),trc_solml2_vr(idg_NH3B,NU(NY,NX),NY,NX)+RGas_Dif_Atm2Soil_FlxMM(idg_NH3B))*VLsoiAirPMB(NU(NY,NX),NY,NX)) &
       /trcg_VOLT(idg_NH3B,NY,NX)
   ELSE
-    RGas_Disol_FlxM_vr(idg_NH3B,NU(NY,NX),NY,NX)=0.0_r8
+    RGas_Disol_FlxMM_vr(idg_NH3B,NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
-  end subroutine SurfSoilFluxDisolVapor
+  end subroutine TopSoilGasDissolutionMM
 ! ----------------------------------------------------------------------
 end module SurfaceFluxMod

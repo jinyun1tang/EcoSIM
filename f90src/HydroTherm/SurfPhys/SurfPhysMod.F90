@@ -80,6 +80,7 @@ contains
 
   watflw =0._r8;waticefl=0._r8
 
+  !be careful about the following, consider move to another location.
   if(ATS_cpl_mode) then 
     DO NX=NHW,NHE
       DO NY=NVN,NHE  

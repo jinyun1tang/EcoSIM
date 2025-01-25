@@ -234,12 +234,12 @@ module TranspNoSaltMod
     D9690: DO NY=NVN,NVS
       IF(M.NE.MX)THEN
         ! STATE VARIABLES FOR SOLUTES IN SNOWPACK
-        call UpdateStateVarInSnowpack(NY,NX)
+        call UpdateSnowTracersM(NY,NX)
 
         call UpdateSurfTracerM(NY,NX,RGasAtmDisol2LitrM(:,NY,NX),RGasAtmDisol2SoilM(:,NY,NX))
       ENDIF
 !
-      call UpdateSolutesInSoilLayers(I,J,M,MX,NY,NX,trcsol_Irrig_flx_vr)
+      call UpdateSoilTracersMM(I,J,M,MX,NY,NX,trcsol_Irrig_flx_vr)
 !
 !     GAS EXCHANGE IN SURFACE LITTER
 !
@@ -249,7 +249,7 @@ module TranspNoSaltMod
 !             :*ZN3*=NH3,*H2G*=H2
 !
       DO idg=idg_beg,idg_end
-        trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+RGas_Disol_FlxM_vr(idg,0,NY,NX)
+        trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+RGas_Disol_FlxMM_vr(idg,0,NY,NX)
       ENDDO
 
       DO L=NU(NY,NX),NL(NY,NX)
@@ -264,7 +264,7 @@ module TranspNoSaltMod
   end subroutine UpdateStateVarMM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateStateVarInSnowpack(NY,NX)
+  subroutine UpdateSnowTracersM(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
   integer :: L,idg,idn
@@ -292,7 +292,7 @@ module TranspNoSaltMod
       trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)+trcn_TBLS(idn,L,NY,NX)
     ENDDO
   ENDDO
-  end subroutine UpdateStateVarInSnowpack
+  end subroutine UpdateSnowTracersM
 
 !------------------------------------------------------------------------------------------
 
@@ -358,7 +358,7 @@ module TranspNoSaltMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSolutesInSoilLayers(I,J,M,MX,NY,NX,trcsol_Irrig_flx_vr)
+  subroutine UpdateSoilTracersMM(I,J,M,MX,NY,NX,trcsol_Irrig_flx_vr)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NY,NX,MX
@@ -422,16 +422,16 @@ module TranspNoSaltMod
 !
     IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idg=idg_beg,idg_end
-        trc_solml2_vr(idg,L,NY,NX)=trc_solml2_vr(idg,L,NY,NX)+RGas_Disol_FlxM_vr(idg,L,NY,NX)
+        trc_solml2_vr(idg,L,NY,NX)=trc_solml2_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)
       ENDDO
 
       DO idg=idg_beg,idg_end-1
-        trc_gasml2_vr(idg,L,NY,NX)=trc_gasml2_vr(idg,L,NY,NX)+Gas_AdvDif_Flx_vr(idg,L,NY,NX)-RGas_Disol_FlxM_vr(idg,L,NY,NX)
+        trc_gasml2_vr(idg,L,NY,NX)=trc_gasml2_vr(idg,L,NY,NX)+Gas_AdvDif_Flx_vr(idg,L,NY,NX)-RGas_Disol_FlxMM_vr(idg,L,NY,NX)
       ENDDO
-      trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RGas_Disol_FlxM_vr(idg_NH3B,L,NY,NX)
+      trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX)
     ENDIF
   ENDDO D9685
-  end subroutine UpdateSolutesInSoilLayers
+  end subroutine UpdateSoilTracersMM
 
 !------------------------------------------------------------------------------------------
 

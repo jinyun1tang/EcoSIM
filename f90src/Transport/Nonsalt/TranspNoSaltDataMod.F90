@@ -64,8 +64,8 @@ implicit none
   real(r8), allocatable ::  VLsoiAirPMB(:,:,:)                      !
   real(r8), allocatable ::  VLWatMicPMA_vr(:,:,:)                      !
   real(r8), allocatable ::  VLWatMicPMB_vr(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPXA(:,:,:)                      !
-  real(r8), allocatable ::  VLWatMicPXB(:,:,:)                      !
+  real(r8), allocatable ::  VLWatMicPXA_vr(:,:,:)                      !maximum non-band NH4 mass in micropore [gN /d2]
+  real(r8), allocatable ::  VLWatMicPXB_vr(:,:,:)                      !maximum band NH4 mass in micropore [gN /d2]
   real(r8), allocatable ::  PARG_cef(:,:,:)                        !
 
   real(r8), allocatable ::  trcg_Ebu_vr(:,:,:,:)                      !
@@ -92,9 +92,9 @@ implicit none
   real(r8), allocatable ::  trcg_2DSnowDrift(:,:,:,:)                      !
   real(r8), allocatable ::  trcn_2DFloXSurRunoffM(:,:,:,:,:)                    !
                   !
-  real(r8), allocatable ::  RGas_Disol_FlxM_vr(:,:,:,:)         !gas dissolution (>0 into aqueous phase)
-  real(r8), allocatable ::  RGasADFlx_3D(:,:,:,:,:)             !3D gas flux advection + diffusion
-  real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)          !total 3D gas flux advection + diffusion
+  real(r8), allocatable ::  RGas_Disol_FlxMM_vr(:,:,:,:)         !gas dissolution (>0 into aqueous phase)
+  real(r8), allocatable ::  RGasADFlxMM_3D(:,:,:,:,:)            !3D gas flux advection + diffusion
+  real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)           !total 3D gas flux advection + diffusion
 
   real(r8), allocatable :: R3PoreSoHFlx_3D(:,:,:,:,:)           !3D macropore flux
   real(r8), allocatable :: R3PoreSolFlx_3D(:,:,:,:,:)           !3D micropore flux
@@ -154,8 +154,8 @@ contains
   allocate(VLsoiAirPMB(JZ,JY,JX));   VLsoiAirPMB=0._r8
   allocate(VLWatMicPMA_vr(JZ,JY,JX));   VLWatMicPMA_vr=0._r8
   allocate(VLWatMicPMB_vr(JZ,JY,JX));   VLWatMicPMB_vr=0._r8
-  allocate(VLWatMicPXA(0:JZ,JY,JX)); VLWatMicPXA=0._r8
-  allocate(VLWatMicPXB(JZ,JY,JX));   VLWatMicPXB=0._r8
+  allocate(VLWatMicPXA_vr(0:JZ,JY,JX)); VLWatMicPXA_vr=0._r8
+  allocate(VLWatMicPXB_vr(JZ,JY,JX));   VLWatMicPXB_vr=0._r8
   allocate(PARG_cef(idg_beg:idg_NH3,JY,JX));      PARG_cef=0._r8
 
   allocate(RBGCSinkG_vr(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG_vr=0._r8
@@ -184,12 +184,12 @@ contains
 
   allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift                    = 0._r8
   allocate(trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoffM = 0._r8
-  allocate(RGasADFlx_3D(idg_beg:idg_NH3,3,JD,JV,JH));RGasADFlx_3D                             = 0._r8
+  allocate(RGasADFlxMM_3D(idg_beg:idg_NH3,3,JD,JV,JH));RGasADFlxMM_3D                             = 0._r8
   allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_Flx_vr                     = 0._r8
 
   allocate(DOM_Adv2MicP_flx(idom_beg:idom_end,1:jcplx));DOM_Adv2MicP_flx = 0._r8
 
-  allocate(RGas_Disol_FlxM_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGas_Disol_FlxM_vr = 0._r8
+  allocate(RGas_Disol_FlxMM_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGas_Disol_FlxMM_vr = 0._r8
 
   allocate(trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,2,JV,JH)); trcn_2DSnowDrift = 0._r8
 
@@ -254,11 +254,11 @@ contains
   call destroy(VLsoiAirPMB)
   call destroy(VLWatMicPMA_vr)
   call destroy(VLWatMicPMB_vr)
-  call destroy(VLWatMicPXA)
-  call destroy(VLWatMicPXB)
+  call destroy(VLWatMicPXA_vr)
+  call destroy(VLWatMicPXB_vr)
   call destroy(PARG_cef)
   call destroy(DOMdiffusivity2_vr)
-  call destroy(RGasADFlx_3D)
+  call destroy(RGasADFlxMM_3D)
   call destroy(trcg_solsml2_snvr)
   call destroy(trcn_solsml2_snvr)
   call destroy(trcn_2DFloXSurRunoffM)
@@ -278,7 +278,7 @@ contains
   call destroy(trcn_band_VFloSnow)
   call destroy(trcn_soil_VFloSnow)
   call destroy(trcg_2DFloXSurRunoffM)
-  call destroy(RGas_Disol_FlxM_vr)
+  call destroy(RGas_Disol_FlxMM_vr)
   call destroy(trcn_2DSnowDrift)
   call destroy(R3PoreSoHFlx_3D)
   call destroy(R3PoreSolFlx_3D)
