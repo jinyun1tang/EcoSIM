@@ -429,59 +429,59 @@ module InitSOMBGCMOD
     !
     !     MAIZE
     !
-    IF(IXTYP(1,NY,NX).EQ.1)THEN
+    IF(iLitrType_col(1,NY,NX).EQ.1)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.080,0.245,0.613,0.062/),r8)
       !
       !     WHEAT
       !
-    ELSEIF(IXTYP(1,NY,NX).EQ.2)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.2)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.125,0.171,0.560,0.144/),r8)
 !
       !     SOYBEAN
       !
-    ELSEIF(IXTYP(1,NY,NX).EQ.3)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.3)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.138,0.426,0.316,0.120/),r8)
 
       !     NEW STRAW
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.4)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.4)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.036,0.044,0.767,0.153/),r8)
 
       !     OLD STRAW
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.5)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.5)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
 !
       !     COMPOST
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.6)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.6)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.143,0.015,0.640,0.202/),r8)
 !
       !     GREEN MANURE
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.7)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.7)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.202,0.013,0.560,0.225/),r8)
 
       !     NEW DECIDUOUS FOREST
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.8)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.8)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.070,0.41,0.36,0.16/),r8)
 
 !
       !     NEW CONIFEROUS FOREST
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.9)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.9)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.07,0.25,0.38,0.30/),r8)
 
       !     OLD DECIDUOUS FOREST
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.10)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.10)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
 !
       !     OLD CONIFEROUS FOREST
 !
-    ELSEIF(IXTYP(1,NY,NX).EQ.11)THEN
+    ELSEIF(iLitrType_col(1,NY,NX).EQ.11)THEN
       CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
       !     DEFAULT
 !
@@ -511,13 +511,13 @@ module InitSOMBGCMOD
   !
   !     RUMINANT
 !
-  IF(IXTYP(2,NY,NX).EQ.1)THEN
+  IF(iLitrType_col(2,NY,NX).EQ.1)THEN
     CFOSC(1:jsken,k_manure,L,NY,NX)=real((/0.036,0.044,0.630,0.290/),r8)
 
 !
     !     NON-RUMINANT
 !
-  ELSEIF(IXTYP(2,NY,NX).EQ.2)THEN
+  ELSEIF(iLitrType_col(2,NY,NX).EQ.2)THEN
     CFOSC(1:jsken,k_manure,L,NY,NX)=real((/0.138,0.401,0.316,0.145/),r8)
 !
 !     OTHER

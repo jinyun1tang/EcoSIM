@@ -3,9 +3,9 @@ module SaltChemEquilibriaMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : isclose
   use SoluteChemDataType, only : chem_var_type, solute_flx_type
+  use minimathmod , only : AZMAX1  
   use SoluteParMod
   use EcosimConst
-  use minimathmod , only : AZMAX1  
   use EcoSIMSolverPar
   implicit none
   private
@@ -95,7 +95,7 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: XAEC     !anion exchange capacity, [mol d-2]
   real(r8), pointer :: ORGC     !total soil organic C [g d-2]
   real(r8), pointer :: PH       !pH value of the system
-  real(r8), pointer :: XZHYS    !total H+ production, [flux]
+  real(r8), pointer :: RProd_Hp    !total H+ production, [flux]
 
   real(r8), pointer :: CO2S     !aqueous CO2  micropore	[g d-2]
   real(r8), pointer :: H1PO4_2e_conc    !soil aqueous HPO4 content micropore non-band, [mol m-3]
@@ -341,7 +341,7 @@ module SaltChemEquilibriaMod
   ZNO3S                    => chemvar%ZNO3S
   ZNO3B                    => chemvar%ZNO3B
   VLWatMicPM               => chemvar%VLWatMicPM
-  XZHYS                    => chemvar%XZHYS
+  RProd_Hp                    => chemvar%RProd_Hp
   ZHY                      => chemvar%ZHY
   XCEC                     => chemvar%XCEC
   ZOH                      => chemvar%ZOH
@@ -572,9 +572,9 @@ module SaltChemEquilibriaMod
 !
 !     H CONCENTRATION
 !
-!     XZHYS=total H+ production from nitro.f
+!     RProd_Hp=total H+ production from nitro.f
 !
-  H_1p_conc=AZMAX1(ZHY+XZHYS)/VLWatMicPM
+  H_1p_conc=AZMAX1(ZHY+RProd_Hp)/VLWatMicPM
 !
 !     SOLUTE ION AND ION PAIR CONCENTRATIONS
 !

@@ -30,6 +30,7 @@ implicit none
   use EcoSimConst
   use GridMod           , only : SetMeshATS
   use SurfPhysMod       , only : RunSurfacePhysModelM, StageSurfacePhysModel, UpdateSurfaceAtM
+  use SnowBalanceMod    , only : SnowMassUpdate
   use StartsMod         , only : set_ecosim_solver
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
@@ -42,6 +43,8 @@ implicit none
   real(r8) :: TopLayWatVol(JY,JX)
   real(r8) :: Qinfl2MicP(JY,JX)
   real(r8) :: HInfl2Soil(JY,JX)
+  real(r8) :: Qinfl2MicPM(JY,JX)
+  real(r8) :: Hinfl2SoilM(JY,JX)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
@@ -56,7 +59,6 @@ implicit none
     AREA(3,0,NY,NX)         = a_AREA3(0,NY)
     AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
     AREA(3,2,NY,NX)         = a_AREA3(0,NY)
-
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX) = a_ATKA(NY)
@@ -74,8 +76,8 @@ implicit none
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
-    LWRadSky_col(NY,NX) = sunrad(NY)*0.0036_r8
-    RainH(NY,NX) = p_rain(NY)
+    LWRadSky_col(NY,NX)  = sunrad(NY)*0.0036_r8
+    RainH(NY,NX)         = p_rain(NY)
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayerBot_vr(L,NY,NX) = a_CumDepz2LayerBot_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
@@ -103,13 +105,22 @@ implicit none
   !perhaps doesn't neeed to run NPH times
   DO M=1,NPH
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
-      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
+      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
+
+      Qinfl2MicP = Qinfl2MicPM+Qinfl2MicPM
+      Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
      !also update state variables for each M 
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
+  do NY=1,NYS
+    call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
+  ENDDO
   
+  Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
+  Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
+
   write(*,*) "Heat and water souces: "
   write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
   write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi

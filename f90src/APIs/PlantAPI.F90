@@ -663,7 +663,7 @@ implicit none
   plt_site%NU                         = NU(NY,NX)
   plt_site%OXYE                       = OXYE_col(NY,NX)
   plt_ew%AbvCanopyBndlResist_col      = AbvCanopyBndlResist_col(NY,NX)
-  plt_ew%RIB                          = RIB(NY,NX)
+  plt_ew%RIB                          = RIB_col(NY,NX)
   plt_rad%SineSunInclAnglNxtHour_col  = SineSunInclAnglNxtHour_col(NY,NX)
   plt_rad%SineSunInclAngle_col        = SineSunInclAngle_col(NY,NX)
   plt_ew%TKSnow                       = TKSnow_snvr(1,NY,NX)  !surface layer snow temperature
@@ -893,7 +893,7 @@ implicit none
       plt_site%VLsoiAirPM_vr(M,L)           = VLsoiAirPM_vr(M,L,NY,NX)
       plt_site%TortMicPM_vr(M,L)            = TortMicPM_vr(M,L,NY,NX)
       plt_site%FILM(M,L)                    = FILM(M,L,NY,NX)
-      plt_soilchem%DiffusivitySolutEff(M,L) = DiffusivitySolutEff(M,L,NY,NX)
+      plt_soilchem%DiffusivitySolutEffM_vr(M,L) = DiffusivitySolutEffM_vr(M,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -1366,8 +1366,8 @@ implicit none
 
   DO L=1,NL(NY,NX)
     DO M=1,NPH
-      plt_rbgc%RO2UptkSoilM_vr(M,L) = RO2UptkSoilM_vr(M,L,NY,NX)
-      plt_soilchem%THETPM(M,L)      = THETPM(M,L,NY,NX)
+      plt_rbgc%RO2UptkSoilM_vr(M,L)           = RO2UptkSoilM_vr(M,L,NY,NX)
+      plt_soilchem%AirFilledSoilPoreM_vr(M,L) = AirFilledSoilPoreM_vr(M,L,NY,NX)
     ENDDO
   ENDDO
   end subroutine PlantAPISend
@@ -1497,7 +1497,7 @@ implicit none
   ZERO4PlantDisplace_col(NY,NX)  = plt_ew%ZERO4PlantDisplace_col
   RoughHeight_col(NY,NX)         = plt_ew%RoughHeight
   AbvCanopyBndlResist_col(NY,NX) = plt_ew%AbvCanopyBndlResist_col
-  RIB(NY,NX)                     = plt_ew%RIB
+  RIB_col(NY,NX)                     = plt_ew%RIB
   
   CanopyHeight_col(NY,NX)    = plt_morph%CanopyHeight_col
   RadSWDirect_col(NY,NX)     = plt_rad%RadSWDirect_col

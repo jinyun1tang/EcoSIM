@@ -186,7 +186,7 @@ module Hour1Mod
 
       call ZeroHourlyArrays(NY,NX)
 
-      call GetChemicalConcsInSoil(NY,NX,THETPZ_vr)
+      call GetChemicalConcsInSoil(I,J,NY,NX,THETPZ_vr)
 
       call GetSoluteConcentrations(NY,NX)
 
@@ -340,8 +340,8 @@ module Hour1Mod
       AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
       AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
       AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
+      AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3      
       AtmGasCgperm3(idg_NH3,NY,NX)  = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
-      AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3
       AtmGasCgperm3(idg_NH3B,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
 
       trcVolatile_rain_conc(idg_CO2,NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA_col(NY,NX)) &
@@ -777,14 +777,14 @@ module Hour1Mod
   tNO3_col(NY,NX)                         = 0._r8
   tHxPO4_col(NY,NX)                       = 0._r8
   tXPO4_col(NY,NX)                        = 0._r8
-  UION(NY,NX)                             = 0._r8
+  UION_col(NY,NX)                             = 0._r8
   QDischar_col(NY,NX)                     = 0._r8
   PrecHeat_col(NY,NX)                     = 0._r8
   QDrain_col(NY,NX)                       = 0._r8
   HeatDrain_col(NY,NX)                    = 0._r8
 
-  SurfGasFlx_col(idg_beg:idg_NH3,NY,NX)    = 0._r8
-  SurfGasDifflx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)    = 0._r8
+  SurfGasDifFlx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   WatFLo2LitR_col(NY,NX)                   = 0._r8
   HeatFLo2LitrByWat_col(NY,NX)             = 0._r8
   TLitrIceFlxThaw_col(NY,NX)               = 0._r8
@@ -798,8 +798,8 @@ module Hour1Mod
   THeatSnowThaw_col(NY,NX)                 = 0._r8
   THeatSoiThaw_col(NY,NX)                  = 0._r8
   trcs_TransptMacP_3D(:,:,:,:,:) = 0._r8
-  trcg_SurfSoil_DisolEvap_flx(idg_beg:idg_end,NY,NX) = 0._r8
-  trcg_SurfLitr_DisolEvap_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
+  trcg_DisolEvap_Atm2Soil_flx(idg_beg:idg_end,NY,NX) = 0._r8
+  trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
 
   TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
   CanopyWat_col(NY,NX)                             = 0._r8
@@ -844,7 +844,7 @@ module Hour1Mod
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL(NY,NX),NY,NX) = 0._r8
   HeatSource_col(NY,NX)                                                       = 0._r8
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)                 = 0._r8
-  XZHYS(0:NL(NY,NX),NY,NX)                                                    = 0._r8
+  RProd_Hp_vr(0:NL(NY,NX),NY,NX)                                                    = 0._r8
   trcn_RChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)              = 0._r8
   TR_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
   TR_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
@@ -1460,7 +1460,7 @@ module Hour1Mod
   real(r8) :: VOLIRZ
   real(r8) :: XVOLW0
   real(r8) :: XVOLI0
-  integer  :: NTG,NTN
+  integer  :: idg,NTN
 ! begin_execution
 ! PHYSICAL PROPERTIES, AND WATER, GAS, AND MINERAL CONTENTS
 ! OF SURFACE RESIDUE
@@ -2279,11 +2279,12 @@ module Hour1Mod
   end subroutine ApplyMineralFertilizer
 !------------------------------------------------------------------------------------------
 
-  subroutine GetChemicalConcsInSoil(NY,NX,THETPZ_vr)
+  subroutine GetChemicalConcsInSoil(I,J,NY,NX,THETPZ_vr)
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: NY,NX
   real(r8), intent(out) :: THETPZ_vr(JZ)  !air-filled soil pore, m3/d2
-  integer :: L,NTG
+  integer :: L,idg
 !     begin_execution
 
 !     CALCULATE SOIL CONCENTRATIONS OF SOLUTES, GASES
@@ -2311,20 +2312,22 @@ module Hour1Mod
 !     C*S=soil gas aqueous concentration
 !
     IF(ThetaAir_vr(L,NY,NX).GT.THETX)THEN
-      DO NTG=idg_beg,idg_end-1
-        trc_gascl_vr(NTG,L,NY,NX)=AZMAX1(trc_gasml_vr(NTG,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
+      DO idg=idg_beg,idg_end-1
+        trc_gascl_vr(idg,L,NY,NX)=AZMAX1(trc_gasml_vr(idg,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
       ENDDO
     ELSE
       trc_gascl_vr(idg_beg:idg_end-1,L,NY,NX)=0._r8
     ENDIF
 
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      DO NTG=idg_beg,idg_end-1
-        trc_solcl_vr(NTG,L,NY,NX)=AZMAX1(trc_solml_vr(NTG,L,NY,NX)/VLWatMicP_vr(L,NY,NX))
+      DO idg=idg_beg,idg_end-1
+        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trc_solml_vr(idg,L,NY,NX)/VLWatMicP_vr(L,NY,NX))
       ENDDO
     ELSE
       trc_solcl_vr(idg_beg:idg_end-1,L,NY,NX)=0._r8
     ENDIF
+!    print*,L,trc_solml_vr(idg_CH4,L,NY,NX),VLWatMicP_vr(L,NY,NX)
+
 !
 !     CORGC=SOC concentration
 !
@@ -2405,12 +2408,12 @@ module Hour1Mod
   subroutine CalGasSolubility(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-  integer  :: L,NTG
+  integer  :: L,idg
   real(r8) :: FH2O
 
   L=0
-  DO NTG=idg_beg,idg_end-1
-    GasSolbility_vr(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))
+  DO idg=idg_beg,idg_end-1
+    GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS(L,NY,NX))
   ENDDO
 
   DO  L=1,NL(NY,NX)+1
@@ -2418,8 +2421,8 @@ module Hour1Mod
 ! TCS=soil temperature (oC)
 ! 5.56E+04_r8 := mole H2O / m3
     FH2O=5.56E+04_r8/(5.56E+04_r8+SolutesIonConc_vr(L,NY,NX))
-    DO NTG=idg_beg,idg_end-1
-      GasSolbility_vr(NTG,L,NY,NX)=gas_solubility(NTG,TCS(L,NY,NX))*EXP(-ACTCG(NTG)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
+    DO idg=idg_beg,idg_end-1
+      GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS(L,NY,NX))*EXP(-ACTCG(idg)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
     ENDDO
   ENDDO
   end subroutine CalGasSolubility
@@ -2454,15 +2457,15 @@ module Hour1Mod
       ELSE
         FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
       ENDIF
-      POROS0(NY,NX)              = FVLitR
+      POROS0_col(NY,NX)          = FVLitR
       FieldCapacity_vr(0,NY,NX)  = 0.500_r8*FVLitR
       WiltPoint_vr(0,NY,NX)      = 0.125_r8*FVLitR
-      LOGPOROS_vr(0,NY,NX)       = LOG(POROS0(NY,NX))
+      LOGPOROS_vr(0,NY,NX)       = LOG(POROS0_col(NY,NX))
       LOGFldCapacity_vr(0,NY,NX) = LOG(FieldCapacity_vr(0,NY,NX))
       LOGWiltPoint_vr(0,NY,NX)   = LOG(WiltPoint_vr(0,NY,NX))
       PSD_vr(0,NY,NX)            = LOGPOROS_vr(0,NY,NX)-LOGFldCapacity_vr(0,NY,NX)
       FCD_vr(0,NY,NX)            = LOGFldCapacity_vr(0,NY,NX)-LOGWiltPoint_vr(0,NY,NX)
-      SRP_vr(0,NY,NX)               = 1.00_r8
+      SRP_vr(0,NY,NX)            = 1.00_r8
     enddo
   enddo    
   end subroutine UpdateLiterPropertz

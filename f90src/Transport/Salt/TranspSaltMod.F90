@@ -312,7 +312,7 @@ module TranspSaltMod
       trcSalt_solml2R(nsalts,L,NY,NX)=-trcSalt_TR(nsalts,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
-    trcSalt_solml2R(idsalt_Hp,L,NY,NX)=trcSalt_solml2R(idsalt_Hp,L,NY,NX)-(XZHYS(L,NY,NX))*dts_HeatWatTP
+    trcSalt_solml2R(idsalt_Hp,L,NY,NX)=trcSalt_solml2R(idsalt_Hp,L,NY,NX)-(RProd_Hp_vr(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !

@@ -135,9 +135,9 @@ implicit none
 !       CSoilOrgM_vr(ielmn,L,NY,NX)=CSoilOrgM_vr(ielmn,L-1,NY,NX)
 !       CSoilOrgM_vr(ielmp,L,NY,NX)=CSoilOrgM_vr(ielmp,L-1,NY,NX)
 !     ENDIF
-    CNH4(L,NY,NX)             = CNH4(L-1,NY,NX)
-    CNO3(L,NY,NX)             = CNO3(L-1,NY,NX)
-    CPO4(L,NY,NX)             = CPO4(L-1,NY,NX)
+    CNH4_vr(L,NY,NX)             = CNH4_vr(L-1,NY,NX)
+    CNO3_vr(L,NY,NX)             = CNO3_vr(L-1,NY,NX)
+    CPO4_vr(L,NY,NX)             = CPO4_vr(L-1,NY,NX)
     CAL(L,NY,NX)              = CAL(L-1,NY,NX)
     CFE(L,NY,NX)              = CFE(L-1,NY,NX)
     CCA(L,NY,NX)              = CCA(L-1,NY,NX)
@@ -189,7 +189,7 @@ implicit none
   IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
     HeatDiffusByWat1     = AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3._r8
-    HeatDiffusByAir1     = AZMAX1(FracSoilPoreAsAir_vr(N3,N2,N1)-TRBA)**3._r8
+    HeatDiffusByAir1     = AZMAX1(AirFilledSoilPore_vr(N3,N2,N1)-TRBA)**3._r8
     RYLXW1               = DTKX*HeatDiffusByWat1
     RYLXA1               = DTKX*HeatDiffusByAir1
     RYLNW1               = AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
@@ -200,9 +200,9 @@ implicit none
     ThermalConducByAir   = 9.050E-05_r8*XNUSA1
     WTHET1               = 1.467_r8-0.467_r8*FracSoilAsAirt(N3,N2,N1)
     TCND1                = (NumerSolidThermCond(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)*ThermalConducByWater &
-      +0.611_r8*FracSoiPAsIce_vr(N3,N2,N1)*7.844E-03_r8+WTHET1*FracSoilPoreAsAir_vr(N3,N2,N1)*ThermalConducByAir) &
+      +0.611_r8*FracSoiPAsIce_vr(N3,N2,N1)*7.844E-03_r8+WTHET1*AirFilledSoilPore_vr(N3,N2,N1)*ThermalConducByAir) &
       /(DenomSolidThermCond(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)+0.611_r8*FracSoiPAsIce_vr(N3,N2,N1) &
-      +WTHET1*FracSoilPoreAsAir_vr(N3,N2,N1))
+      +WTHET1*AirFilledSoilPore_vr(N3,N2,N1))
   ELSE
     TCND1=0.0_r8
   ENDIF

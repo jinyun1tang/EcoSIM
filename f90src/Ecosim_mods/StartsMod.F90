@@ -247,10 +247,10 @@ module StartsMod
 ! DTBLD: artifical water table depth, before applying the altitude correction
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      ALTZ(NY,NX)=ALTZG
+      ALTZ_col(NY,NX)=ALTZG
       IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
-        DTBLD(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+        DTBLD(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
       ELSE
         ExtWaterTablet0_col(NY,NX)=0.0_r8
         DTBLD(NY,NX)=0.0_r8
@@ -815,8 +815,8 @@ module StartsMod
   LiterfalOrgM_col(ielmn,:,:)    = 0.0_r8
   LiterfalOrgM_col(ielmp,:,:)    = 0.0_r8
   QDrain_col(:,:)                = 0.0_r8
-  ZDRAIN(:,:)                    = 0.0_r8
-  PDRAIN(:,:)                    = 0.0_r8
+  ZDRAIN_col(:,:)                    = 0.0_r8
+  PDRAIN_col(:,:)                    = 0.0_r8
   BandDepthNH4_col(:,:)          = 0.0_r8
   BandDepthNO3_col(:,:)          = 0.0_r8
   BandDepthPO4_col(:,:)          = 0.0_r8

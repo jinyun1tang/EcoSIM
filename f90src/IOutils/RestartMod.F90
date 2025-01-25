@@ -4627,9 +4627,9 @@ implicit none
        long_name='Richardson number', units=' ', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RIB,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RIB_col,datrc_1d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIB,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RIB_col,datrc_1d)  
     datpr1 => datrc_1d    
     call restartvar(ncid, flag, varname='RIB', dim1name='column',&
        long_name='Richardson number', units=' ', &
@@ -4775,16 +4775,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)    
-    call restartvar(ncid, flag, varname='SurfGasFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasEmisFlx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmisFlx_col,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasFlx_col,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmisFlx_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
-    call restartvar(ncid, flag, varname='SurfGasFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasEmisFlx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -5274,10 +5274,10 @@ implicit none
        long_name='total N drainage below root zone', units='gN d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN_col,datrc_1d) 
   else
     !print*,'ZDRAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZDRAIN_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ZDRAIN', dim1name='column',&
        long_name='total N drainage below root zone', units='gN d-2', &
@@ -5291,10 +5291,10 @@ implicit none
        long_name='total P drainage below root zone', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN_col,datrc_1d) 
   else
     !print*,'PDRAIN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PDRAIN_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='PDRAIN', dim1name='column',&
        long_name='total P drainage below root zone', units='g d-2', &

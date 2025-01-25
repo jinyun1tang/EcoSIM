@@ -56,7 +56,8 @@ implicit none
   !
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  real(r8),optional,intent(out) :: QWatinfl2Mic,QHeatInfl2Soil  
+  real(r8),optional,intent(out) :: QWatinfl2Mic
+  real(r8),optional,intent(out) :: QHeatInfl2Soil  
   real(r8) :: QWatinfl2Mic_loc,QHeatInfl2Soil_loc
   real(r8) :: VOLSWI,ENGYW,TKSnow_pre
   real(r8) :: ENGY,TKSX
@@ -478,7 +479,6 @@ implicit none
     IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       !there is significant snow layer mass
       THeatSnowThaw_col(NY,NX) = THeatSnowThaw_col(NY,NX)+XPhaseChangeHeatL_snvr(L,NY,NX)
-
     ELSE
       !there is no significant snow mass      
       IF(L.EQ.1)THEN

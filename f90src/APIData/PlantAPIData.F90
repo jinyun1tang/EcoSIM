@@ -370,8 +370,8 @@ implicit none
   real(r8), pointer :: FracBulkSOMC_vr(:,:)  => null()  !fraction of total organic C in complex, [-]
   real(r8), pointer :: ElmAllocmat4Litr(:,:,:,:)=> null() !litter kinetic fraction, [-]
   real(r8), pointer :: TScal4Difsvity_vr(:)     => null()  !temperature effect on diffusivity
-  real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
-  real(r8), pointer :: DiffusivitySolutEff(:,:)   => null()  !coefficient for dissolution - volatilization, []
+  real(r8), pointer :: AirFilledSoilPoreM_vr(:,:) => null()  !soil air-filled porosity, [m3 m-3]
+  real(r8), pointer :: DiffusivitySolutEffM_vr(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: SoilResit4RootPentrate_vr(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: SoilBulkDensity_vr(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:) => null() !aqueous tracer concentration [g m-3]
@@ -1441,8 +1441,8 @@ implicit none
   allocate(this%FracBulkSOMC_vr(1:jcplx,0:JZ1));this%FracBulkSOMC_vr=spval
   allocate(this%ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP1));this%ElmAllocmat4Litr=spval
   allocate(this%TScal4Difsvity_vr(0:JZ1));this%TScal4Difsvity_vr=spval
-  allocate(this%THETPM(60,0:JZ1));this%THETPM=spval
-  allocate(this%DiffusivitySolutEff(60,0:JZ1));this%DiffusivitySolutEff=spval
+  allocate(this%AirFilledSoilPoreM_vr(60,0:JZ1));this%AirFilledSoilPoreM_vr=spval
+  allocate(this%DiffusivitySolutEffM_vr(60,0:JZ1));this%DiffusivitySolutEffM_vr=spval
   allocate(this%VLSoilMicP_vr(0:JZ1));this%VLSoilMicP_vr=spval
   allocate(this%VLiceMicP_vr(0:JZ1));this%VLiceMicP_vr=spval
   allocate(this%VLWatMicP_vr(0:JZ1));this%VLWatMicP_vr=spval
@@ -1479,7 +1479,7 @@ implicit none
 
 !  if(allocated(ElmAllocmat4Litr))deallocate(ElmAllocmat4Litr)
 !  if(allocated(TScal4Difsvity_vr))deallocate(TScal4Difsvity_vr)
-!  if(allocated(THETPM))deallocate(THETPM)
+!  if(allocated(AirFilledSoilPoreM_vr))deallocate(AirFilledSoilPoreM_vr)
 !  if(allocated(DiffusivitySolutEff))deallocate(DiffusivitySolutEff)
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
 !  if(allocated(O2GSolubility))deallocate(O2GSolubility)

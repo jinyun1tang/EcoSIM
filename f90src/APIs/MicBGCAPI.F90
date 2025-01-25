@@ -272,9 +272,9 @@ implicit none
   if(micfor%Lsurf)then
     micfor%SoilMicPMassLayer0=VLSoilMicPMass_vr(0,NY,NX)
   endif
-  micfor%DiffusivitySolutEff(1:NPH) = DiffusivitySolutEff(1:NPH,L,NY,NX)
+  micfor%DiffusivitySolutEff(1:NPH) = DiffusivitySolutEffM_vr(1:NPH,L,NY,NX)
   micfor%FILM(1:NPH)                = FILM(1:NPH,L,NY,NX)
-  micfor%THETPM(1:NPH)              = THETPM(1:NPH,L,NY,NX)
+  micfor%THETPM(1:NPH)              = AirFilledSoilPoreM_vr(1:NPH,L,NY,NX)
   micfor%VLWatMicPM(1:NPH)          = VLWatMicPM_vr(1:NPH,L,NY,NX)
   micfor%TortMicPM(1:NPH)           = TortMicPM_vr(1:NPH,L,NY,NX)
   micfor%VLsoiAirPM(1:NPH)          = VLsoiAirPM_vr(1:NPH,L,NY,NX)

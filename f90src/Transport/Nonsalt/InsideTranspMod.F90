@@ -1,7 +1,8 @@
 module InsideTranspMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils, only : destroy
-  use minimathmod, only : safe_adb,AZMAX1,AZMIN1
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: destroy
+  use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
+  use EcoSIMCtrlMod, only: PrintInfo
   use GridConsts
   use EcoSIMSolverPar
   use TranspNoSaltDataMod
@@ -28,7 +29,7 @@ module InsideTranspMod
   __FILE__
 
 
-  public :: ModelTracerHydroFlux
+  public :: ModelTracerHydroFluxMM
   public :: InitInsTp
   public :: DestructInsTp
   contains
@@ -45,40 +46,45 @@ module InsideTranspMod
   end subroutine DestructInsTp
 !------------------------------------------------------------------------------------------
 
-  subroutine ModelTracerHydroFlux(I,J,M,MX, NHW, NHE, NVN, NVS,WaterFlow2Soil)
+  subroutine ModelTracerHydroFluxMM(I,J,M,MX,NHW, NHE, NVN, NVS,WaterFlow2Soil,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
+  !
+  !Description
+  !Hydrological tracer flux in iteration MM
   implicit none
   integer, intent(in) :: I,J
-  integer, intent(in) :: M,MX, NHW, NHE, NVN, NVS
+  integer, intent(in) :: M,MX
+  integer, intent(in) :: NHW, NHE, NVN, NVS
   real(r8), intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
+  real(r8), intent(out) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3,JY,JX)  !atmospheric gas dissolves to litter solutes
+  real(r8), intent(out) :: RGasAtmDisol2SoilM(idg_beg:idg_end,JY,JX)  !atmospheric gas dissolves to soil solutes
+  character(len=*), parameter :: subname='ModelTracerHydroFluxMM' 
   integer :: NY,NX
   real(r8) :: FLWRM1
   real(r8) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
   real(r8) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
-  real(r8) :: RDifus_gas_flx(idg_beg:idg_end)
-  real(r8) :: RGas_Disol(idg_beg:idg_end-1)
-  RDifus_gas_flx(idg_beg:idg_end)=0._r8
+  real(r8) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
+  real(r8) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
+
+  call PrintInfo('beg '//subname)
+
+  RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)=0._r8
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      call ResetFluxAccumulators(I,J,M,NY,NX,MX)
+      call ResetFluxAccumulatorsMM(I,J,M,NY,NX,MX)
 
       IF(M.NE.MX)THEN
-        !this is a new forcing iteration
-!
-!     This IF statement is the next ~1700 lines so I'm leaving it in here
-!
-!     SOLUTE FLUXES FROM MELTING SNOWPACK TO
-!     RESIDUE AND SOIL SURFACE FROM SNOWMELT IN 'WATSUB' AND
-!     CONCENTRATIONS IN SNOWPACK
-!
-        call SoluteFluxSnowpackDischrg(M,NY,NX,trcg_FloSno2LitR,trcn_FloSno2LitR)
+        !this is a new iteration for moisture-temp update
+ 
+        call SnowSoluteDischargeM(M,NY,NX,trcg_FloSno2LitR,trcn_FloSno2LitR)
 !
 !     SOLUTE FLUXES AT SOIL SURFACE FROM SURFACE WATER
 !     CONTEnsolutes, WATER FLUXES 'WaterFlow2Soil' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
-        call SoluteFluxSurface(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
-          WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RDifus_gas_flx,RGas_Disol)
+        call SoluteFluxSurfaceM(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
+          WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
+          RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2SoilM(:,NY,NX),RGasAtmDisol2LitrM(:,NY,NX))
 !
       ENDIF
 !
@@ -87,27 +93,25 @@ module InsideTranspMod
 !     EQUIVALEnsolutes DEPENDING ON SOLUBILITY FROM 'HOUR1'
 !     AND TRANSFER COEFFICIENT 'DiffusivitySolutEff' FROM 'WATSUB'
 !
-      call LitterGasVolatilDissol(I,J,M,NY,NX,RGas_Disol)
+      call LitterGasVolatilDissolMM(I,J,M,NY,NX,RGas_Dif_Atm2Litr_FlxMM)
 !
 !     SURFACE GAS EXCHANGE FROM GAS DIFFUSIVITY THROUGH
 !     SOIL SURFACE LAYER AND THROUGH ATMOSPHERE BOUNDARY
 !     LAYER
 !
-      call SurfSoilFluxGasDifAdv(M,NY,NX,WaterFlow2Soil,RDifus_gas_flx)
-!
-!     SOIL SURFACE WATER-AIR GAS EXCHANGE
-!
+      call SurfSoilFluxGasDifAdvMM(M,NY,NX,WaterFlow2Soil,RGas_Dif_Atm2Soil_FlxMM)
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
 !
-      call TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,WaterFlow2Soil)
+      call TracerExchXGridsMM(M,MX,NY,NX,NHE,NVS,WaterFlow2Soil,RGasAtmDisol2SoilM(:,NY,NX))
 
     ENDDO
   ENDDO
-  end subroutine ModelTracerHydroFlux
+  call PrintInfo('end '//subname)
+  end subroutine ModelTracerHydroFluxMM
 !------------------------------------------------------------------------------------------
 
-  subroutine ResetFluxAccumulators(I,J,M,NY,NX,MX)
+  subroutine ResetFluxAccumulatorsMM(I,J,M,NY,NX,MX)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: M, NY, NX,MX
@@ -116,11 +120,11 @@ module InsideTranspMod
   real(r8) :: PARGM
 
   IF(M.NE.MX)THEN
-!
-!     GASEOUS BOUNDARY LAYER CONDUCTANCES
-!
-!     PARG=boundary layer conductance above soil surface from watsub.f
-!
+    !
+    !     GASEOUS BOUNDARY LAYER CONDUCTANCES
+    !
+    !     PARG=boundary layer conductance above soil surface from watsub.f
+    !
     PARGM                   = CondGasXSnowM_col(M,NY,NX)*dt_GasCyc
     PARG_cef(idg_CO2,NY,NX) = PARGM*0.74_r8
     PARG_cef(idg_CH4,NY,NX) = PARGM*1.04_r8
@@ -140,12 +144,7 @@ module InsideTranspMod
 !
 
     DO  K=1,jcplx
-
       dom_TFloXSurRunoff(idom_beg:idom_end,K,NY,NX)=0.0_r8
-
-!      do idom=idom_beg,idom_end
-!        DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)-RDOM_CumEcoProd_vr(idom,K,0,NY,NX)
-!      enddo
     ENDDO
 
     trcg_TFloXSurRunoff(idg_beg:idg_NH3,NY,NX)             = 0.0_r8
@@ -169,7 +168,6 @@ module InsideTranspMod
       trc_gasml2_vr(idg_NH3,0,NY,NX)=trc_gasml2_vr(idg_NH3,0,NY,NX)-RBGCSinkG_vr(idg_NH3,0,NY,NX)
     ENDIF
   ENDDO
-!  write(125,*)I+J/24.,trc_solml2_vr(idg_O2,0,NY,NX),RBGCSinkG_vr(idg_O2,0,NY,NX)
 
 !
 !     INITIALIZE SNOWPACK NET FLUX ACCUMULATORS
@@ -179,19 +177,13 @@ module InsideTranspMod
       trcg_TBLS_snvr(idg_beg:idg_NH3,L,NY,NX)     = 0._r8
       trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
     ENDDO
-  ENDIF
-!
-!     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
-!
-  DO L=NU(NY,NX),NL(NY,NX)
-    IF(M.NE.MX)THEN
+
+    DO L=NU(NY,NX),NL(NY,NX)    
       DO  K=1,jcplx
         DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
         DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)= 0.0_r8
-!        do idom=idom_beg,idom_end
-!          DOM_MicP2(idom,K,L,NY,NX)=DOM_MicP2(idom,K,L,NY,NX)-RDOM_CumEcoProd_vr(idom,K,L,NY,NX)
-!        enddo
       ENDDO
+
       TR3MicPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
       TR3MacPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
 !
@@ -207,7 +199,12 @@ module InsideTranspMod
       ENDDO
       !add oxygen uptake here
       RBGCSinkG_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
-    ENDIF
+    ENDDO  
+  ENDIF
+!
+!     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
+!
+  DO L=NU(NY,NX),NL(NY,NX)
 !
 !     SOIL GAS FLUX ACCUMULATORS
 !
@@ -225,12 +222,12 @@ module InsideTranspMod
     ENDDO
 
   ENDDO
-  end subroutine ResetFluxAccumulators
+  end subroutine ResetFluxAccumulatorsMM
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,WaterFlow2Soil)
+  subroutine TracerExchXGridsMM(M,MX,NY,NX,NHE,NVS,WaterFlow2Soil,RGasAtmDisol2SoilM)
 !
 ! DESCRIPTION
 ! exchanges tracers within (gaseous vs aqueous phase) and between
@@ -239,6 +236,7 @@ module InsideTranspMod
 
   integer, intent(in) :: M,MX, NY, NX, NHE, NVS
   real(r8), intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
+  real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end)
   real(r8) :: VFLW
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VLWatMacPS,VOLWT
@@ -260,7 +258,7 @@ module InsideTranspMod
 !
     D120: DO N=FlowDirIndicator(N2,N1),3
 
-      IF(N.EQ.1)THEN
+      IF(N.EQ.iEastWestDirection)THEN
         !WEST-EAST
         IF(NX.EQ.NHE)THEN
           cycle
@@ -269,7 +267,7 @@ module InsideTranspMod
           N5=NY
           N6=L
         ENDIF
-      ELSEIF(N.EQ.2)THEN
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !NORTH-SOUTH
         IF(NY.EQ.NVS)THEN
           cycle
@@ -278,14 +276,14 @@ module InsideTranspMod
           N5=NY+1
           N6=L
         ENDIF
-      ELSEIF(N.EQ.3)THEN
+      ELSEIF(N.EQ.iVerticalDirection)THEN
         !VERTICAL
         IF(L.EQ.NL(NY,NX))THEN
           cycle
         ELSE
-          N4=NX
-          N5=NY
-          N6=L+1
+          N4 = NX
+          N5 = NY
+          N6 = L+1
         ENDIF
       ENDIF
 
@@ -311,14 +309,14 @@ module InsideTranspMod
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
           .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
           IF(M.NE.MX)THEN
-            VLWatMicPMA_vr(N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
-            VLWatMicPMB_vr(N6,N5,N4)=VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
-            VLWatMicPXA(N6,N5,N4)=natomw*VLWatMicPMA_vr(N6,N5,N4)
-            VLWatMicPXB(N6,N5,N4)=natomw*VLWatMicPMB_vr(N6,N5,N4)
+            VLWatMicPMA_vr(N6,N5,N4) = VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
+            VLWatMicPMB_vr(N6,N5,N4) = VLWatMicPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
+            VLWatMicPXA(N6,N5,N4)    = natomw*VLWatMicPMA_vr(N6,N5,N4)
+            VLWatMicPXB(N6,N5,N4)    = natomw*VLWatMicPMB_vr(N6,N5,N4)
 
-            VLsoiAirPMA(N6,N5,N4)=VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
-            VLsoiAirPMB(N6,N5,N4)=VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
-            CumReductVLsoiAirPM(N6,N5,N4)=ReductVLsoiAirPM(M,N6,N5,N4)*dt_GasCyc
+            VLsoiAirPMA(N6,N5,N4)         = VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
+            VLsoiAirPMB(N6,N5,N4)         = VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
+            CumReductVLsoiAirPM(N6,N5,N4) = ReductVLsoiAirPM(M,N6,N5,N4)*dt_GasCyc
 !
 !     GASEOUS SOLUBILITIES
 !
@@ -339,7 +337,7 @@ module InsideTranspMod
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-            IF(N.EQ.3)THEN
+            IF(N.EQ.iVerticalDirection)THEN
               call MicMacPoresSoluteExchange(M,N,N1,N2,N3,N4,N5,N6)
             ENDIF
           ENDIF
@@ -349,9 +347,8 @@ module InsideTranspMod
 !
           call GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2Soil)
 
-        ELSEIF(N.NE.3)THEN
+        ELSEIF(N.NE.iVerticalDirection)THEN
           call ZeroTransport1(N,N1,N2,N3,N4,N5,N6)
-
         ENDIF
       ELSE
         call ZeroTransport2(N,N1,N2,N3,N4,N5,N6)
@@ -360,10 +357,10 @@ module InsideTranspMod
 !
 !     CHECK FOR BUBBLING IF THE SUM OF ALL GASEOUS EQUIVALENT
 !     PARTIAL CONCENTRATIONS EXCEEDS ATMOSPHERIC PRESSURE
-    call BubbleEfflux(M,N1,N2,N3,NY,NX,MX,iFlagEbu)
+    call BubbleEfflux(M,N1,N2,N3,NY,NX,MX,RGasAtmDisol2SoilM,iFlagEbu)
 
   ENDDO D125
-  end subroutine TracerExchInBetweenCells
+  end subroutine TracerExchXGridsMM
 
 ! ----------------------------------------------------------------------
 
@@ -373,6 +370,7 @@ module InsideTranspMod
    real(r8) :: trcs_adv_flx(ids_beg:ids_end)
    integer :: K,nsol,idom
    real(r8) :: VFLW
+   
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
@@ -1265,9 +1263,10 @@ module InsideTranspMod
   end subroutine MicMacPoresSoluteDifExchange
 
 ! ----------------------------------------------------------------------
-  subroutine BubbleEfflux(M,N1,N2,N3,NY,NX,MX,iFlagEbu)
+  subroutine BubbleEfflux(M,N1,N2,N3,NY,NX,MX,RGasAtmDisol2SoilM,iFlagEbu)
   implicit none
   integer, intent(in) :: M,N1,N2,N3,NY,NX,MX
+  real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end)
   integer, intent(inout) :: iFlagEbu
   real(r8) :: THETW1
   real(r8) :: trcg_SLX(idg_beg:idg_end)
@@ -1302,7 +1301,7 @@ module InsideTranspMod
 !
       IF(N3.EQ.NU(N2,N1))THEN
         DO ngas=idg_beg,idg_end
-          trcg_VOLG(ngas)=(trc_solml2_vr(ngas,N3,N2,N1)+RGasSSVol(ngas,NY,NX))/trcg_SLX(ngas)
+          trcg_VOLG(ngas)=(trc_solml2_vr(ngas,N3,N2,N1)+RGasAtmDisol2SoilM(ngas))/trcg_SLX(ngas)
         ENDDO
       ELSE
         DO ngas=idg_beg,idg_end
@@ -1375,10 +1374,10 @@ module InsideTranspMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-  DFLG2=2.0_r8*AZMAX1(THETPM(M,N3,N2,N1))*POROQ*THETPM(M,N3,N2,N1)/POROS_vr(N3,N2,N1) &
+  DFLG2=2.0_r8*AZMAX1(AirFilledSoilPoreM_vr(M,N3,N2,N1))*POROQ*AirFilledSoilPoreM_vr(M,N3,N2,N1)/POROS_vr(N3,N2,N1) &
     *AREA(N,N3,N2,N1)/DLYR_3D(N,N3,N2,N1)
 
-  DFLGL=2.0_r8*AZMAX1(THETPM(M,N6,N5,N4))*POROQ*THETPM(M,N6,N5,N4)/POROS_vr(N6,N5,N4) &
+  DFLGL=2.0_r8*AZMAX1(AirFilledSoilPoreM_vr(M,N6,N5,N4))*POROQ*AirFilledSoilPoreM_vr(M,N6,N5,N4)/POROS_vr(N6,N5,N4) &
     *AREA(N,N6,N5,N4)/DLYR_3D(N,N6,N5,N4)
 
 !
@@ -1473,9 +1472,9 @@ module InsideTranspMod
   real(r8), intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   integer :: ngas
 
-!     THETPM,VLsoiAirPM=air-filled porosity,volume from watsub.f
+!     AirFilledSoilPoreM_vr,VLsoiAirPM=air-filled porosity,volume from watsub.f
 
-  IF(THETPM(M,N3,N2,N1).GT.THETX.AND.THETPM(M,N6,N5,N4).GT.THETX &
+  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.THETX.AND.AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX &
     .AND.VLsoiAirPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
     .AND.VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
@@ -1504,7 +1503,7 @@ module InsideTranspMod
   subroutine VolatileDissolution(M,N,N1,N2,N3,N4,N5,N6)
   !
   !Description
-  !
+  !Compute gas dissolution 
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
@@ -1515,7 +1514,7 @@ module InsideTranspMod
 !     EQUIVALEnsolutes DEPENDING ON SOLUBILITY FROM 'HOUR1'
 !     AND TRANSFER COEFFICIENT 'DiffusivitySolutEff' FROM 'WATSUB'
 !
-!     THETPM,VLWatMicPPM=air-filled porosity,volume
+!     AirFilledSoilPoreM_vr,VLWatMicPPM=air-filled porosity,volume
 !     R*DFG=water-air gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
@@ -1524,32 +1523,32 @@ module InsideTranspMod
 !     VLWatMicP*=equivalent aqueous volume for gas
 !
   IF(N.EQ.3)THEN
-    IF(THETPM(M,N6,N5,N4).GT.THETX)THEN
+    IF(AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX)THEN
       do ngas=idg_beg,idg_NH3-1
-        RGas_Disol_flx_vr(ngas,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)* &
+        RGas_Disol_FlxM_vr(ngas,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
          (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(ngas,N6,N5,N4))*trcg_VLWatMicP_vr(ngas,N6,N5,N4) &
           -trc_solml2_vr(ngas,N6,N5,N4)*VLsoiAirPM_vr(M,N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(ngas,N6,N5,N4)+VLsoiAirPM_vr(M,N6,N5,N4))
       enddo    
 
       IF(VLsoiAirPMA(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-        RGas_Disol_flx_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)* &
+        RGas_Disol_FlxM_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
          (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
           -trc_solml2_vr(idg_NH3,N6,N5,N4)*VLsoiAirPMA(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4)+VLsoiAirPMA(N6,N5,N4))
 
       ELSE
-        RGas_Disol_flx_vr(idg_NH3,N6,N5,N4)=0.0_r8
+        RGas_Disol_FlxM_vr(idg_NH3,N6,N5,N4)=0.0_r8
       ENDIF
 
       IF(VLsoiAirPMB(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-        RGas_Disol_flx_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEff(M,N6,N5,N4)* &
+        RGas_Disol_FlxM_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
           (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
           -trc_solml2_vr(idg_NH3B,N6,N5,N4)*VLsoiAirPMB(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4)+VLsoiAirPMB(N6,N5,N4))
 
       ELSE
-        RGas_Disol_flx_vr(idg_NH3B,N6,N5,N4)=0.0_r8
+        RGas_Disol_FlxM_vr(idg_NH3B,N6,N5,N4)=0.0_r8
       ENDIF
 
 !
@@ -1558,10 +1557,10 @@ module InsideTranspMod
 !     X*DFG=hourly water-air gas flux
 !
       DO ngas=idg_beg,idg_end
-        Gas_Disol_Flx_vr(ngas,N6,N5,N4)=Gas_Disol_Flx_vr(ngas,N6,N5,N4)+RGas_Disol_flx_vr(ngas,N6,N5,N4)
+        Gas_Disol_Flx_vr(ngas,N6,N5,N4)=Gas_Disol_Flx_vr(ngas,N6,N5,N4)+RGas_Disol_FlxM_vr(ngas,N6,N5,N4)
       ENDDO
     ELSE
-      RGas_Disol_flx_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
+      RGas_Disol_FlxM_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
     ENDIF
   ENDIF
   end subroutine VolatileDissolution

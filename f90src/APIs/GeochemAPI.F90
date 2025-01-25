@@ -228,7 +228,7 @@ module GeochemAPI
   chemvar%GKCN              = GKCN(L,NY,NX)
   chemvar%ZNO3S             = trc_solml_vr(ids_NO3,L,NY,NX)
   chemvar%ZNO3B             = trc_solml_vr(ids_NO3B,L,NY,NX)
-  chemvar%XZHYS             = XZHYS(L,NY,NX)
+  chemvar%RProd_Hp          = RProd_Hp_vr(L,NY,NX)
   chemvar%CO2S              = trc_solml_vr(idg_CO2,L,NY,NX)
   
   chemvar%XHY   = trcx_solml_vr(idx_Hp,L,NY,NX)

@@ -353,13 +353,13 @@ module WatsubMod
           !fraction as ice
           FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLTSoiPore)
           !fraction as air
-          FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
+          AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
         ELSE
           FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
           FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-          FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
+          AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
         ENDIF
-        THETPM(1,L,NY,NX)=FracSoilPoreAsAir_vr(L,NY,NX)
+        AirFilledSoilPoreM_vr(1,L,NY,NX)=AirFilledSoilPore_vr(L,NY,NX)
         IF(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           FracSoilAsAirt(L,NY,NX)=AZMAX1((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX)) &
             /(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)))
@@ -1243,7 +1243,7 @@ module WatsubMod
           VLTSoiPore                    = VLSoilMicP_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)
           FracSoiPAsWat_vr(L,NY,NX)     = AZMAX1t((VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX))/VLTSoiPore)
           FracSoiPAsIce_vr(L,NY,NX)     = AZMAX1t((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLTSoiPore)
-          FracSoilPoreAsAir_vr(L,NY,NX) = AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
+          AirFilledSoilPore_vr(L,NY,NX) = AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
           
           IF(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             FracSoilAsAirt(L,NY,NX)=AZMAX1((VLairMicP1_vr(L,NY,NX)+ &
@@ -1364,7 +1364,7 @@ module WatsubMod
 
           !change in soil air volume
           ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)-VLsoiAirPM_vr(M+1,L,NY,NX)
-          THETPM(M+1,L,NY,NX)         = FracSoilPoreAsAir_vr(L,NY,NX)
+          AirFilledSoilPoreM_vr(M+1,L,NY,NX)         = AirFilledSoilPore_vr(L,NY,NX)
  !
         ELSE
           !layer L disappears
@@ -1372,7 +1372,7 @@ module WatsubMod
           VLWatMacPM_vr(M+1,L,NY,NX)  = 0.0_r8
           VLsoiAirPM_vr(M+1,L,NY,NX)  = 0.0_r8
           ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)
-          THETPM(M+1,L,NY,NX)         = 0.0_r8
+          AirFilledSoilPoreM_vr(M+1,L,NY,NX)         = 0.0_r8
         ENDIF
         dwat=dwat+VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE
       ENDDO D9785
@@ -1670,9 +1670,9 @@ module WatsubMod
           TScal4Aquadifsvity             = TEFAQUDIF(TKSoil1_vr(L,NY,NX))
           Z3S                            = FieldCapacity_vr(L,NY,NX)/POROS_vr(L,NY,NX)
           scalar                         = TScal4Aquadifsvity*XNPD
-          DiffusivitySolutEff(M,L,NY,NX) = fDiffusivitySolutEff(scalar,THETWA,Z3S)          
+          DiffusivitySolutEffM_vr(M,L,NY,NX) = fDiffusivitySolutEff(scalar,THETWA,Z3S)          
         ELSE
-          DiffusivitySolutEff(M,L,NY,NX)=0.0_r8
+          DiffusivitySolutEffM_vr(M,L,NY,NX)=0.0_r8
         ENDIF
 
         !Pure water layer
@@ -2003,13 +2003,13 @@ module WatsubMod
   ConvectVapFlux       = 0._r8
   HeatByConvectVapFlux = 0._r8
   if(fixWaterLevel)return
-  IF(THETPM(M,N3,N2,N1).GT.THETX .AND. THETPM(M,N6,N5,N4).GT.THETX)THEN
+  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.THETX .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX)THEN
     TK11   = TKSoil1_vr(N3,N2,N1)
     TK12   = TKSoil1_vr(N6,N5,N4)
     VP1    = vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGASC*TK11))
     VPL    = vapsat(TK12)*EXP(18.0_r8*PSISVL/(RGASC*TK12))
-    CNV1   = WVapDifusvitySoil_vr(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS_vr(N3,N2,N1)
-    CNVL   = WVapDifusvitySoil_vr(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS_vr(N6,N5,N4)
+    CNV1   = WVapDifusvitySoil_vr(N3,N2,N1)*AirFilledSoilPoreM_vr(M,N3,N2,N1)*POROQ*AirFilledSoilPoreM_vr(M,N3,N2,N1)/POROS_vr(N3,N2,N1)
+    CNVL   = WVapDifusvitySoil_vr(N6,N5,N4)*AirFilledSoilPoreM_vr(M,N6,N5,N4)*POROQ*AirFilledSoilPoreM_vr(M,N6,N5,N4)/POROS_vr(N6,N5,N4)
     ATCNVL = 2.0_r8*CNV1*CNVL/(CNV1*DLYR_3D(N,N6,N5,N4)+CNVL*DLYR_3D(N,N3,N2,N1))
     !
     !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,

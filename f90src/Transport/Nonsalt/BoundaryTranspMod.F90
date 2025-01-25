@@ -1,6 +1,7 @@
 module BoundaryTranspMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : isclose,AZMAX1
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use minimathmod,   only: isclose, AZMAX1
+  use EcoSIMCtrlMod, only: PrintInfo
   use GridConsts
   USE SoilPropertyDataType
   use TranspNoSaltDataMod
@@ -18,21 +19,24 @@ module BoundaryTranspMod
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
 
-  public :: BoundaryFlux
+  public :: XBoundaryFluxMM
   contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine BoundaryFlux(M,MX,NHW,NHE,NVN,NVS)
+  subroutine XBoundaryFluxMM(M,MX,NHW,NHE,NVN,NVS)
   implicit none
 
   integer, intent(in) :: M,MX,NHW, NHE, NVN, NVS
 
+  character(len=*), parameter :: subname='XBoundaryFluxMM'
   integer :: NY,NX,L
   integer :: N1,N2,N3,N4,N5,N6,NN,N
   integer :: N4B,N5B,M1,M2,M3,M4,M5,M6
   real(r8) :: RCHQF,RCHGFU,RCHGFT,XN
 
+
+  call PrintInfo('beg '//subname)
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     M6,M5,M4=L,NY,NX of destination grid cell
 !
@@ -46,26 +50,26 @@ module BoundaryTranspMod
 !
         D9580: DO  N=FlowDirIndicator(NY,NX),3
           D9575: DO  NN=1,2
-            IF(N.EQ.1)THEN
+            IF(N.EQ.iEastWestDirection)THEN
               !WEST-EAST
-              N4=NX+1
-              N5=NY
-              N4B=NX-1
-              N5B=NY
-              N6=L
+              N4  = NX+1
+              N5  = NY
+              N4B = NX-1
+              N5B = NY
+              N6  = L
               IF(NN.EQ.1)THEN
                 !eastern boundary
                 IF(NX.EQ.NHE)THEN
-                  M1=NX
-                  M2=NY
-                  M3=L
-                  M4=NX+1
-                  M5=NY
-                  M6=L
-                  XN=-1.0    !going out
-                  RCHQF=RechargEastSurf(M2,M1)
-                  RCHGFU=RechargEastSubSurf(M2,M1)
-                  RCHGFT=RechargRateEastWTBL(M2,M1)
+                  M1 = NX
+                  M2 = NY
+                  M3 = L
+                  M4 = NX+1
+                  M5 = NY
+                  M6 = L
+                  XN = -1.0    !going out
+                  RCHQF  = RechargEastSurf(M2,M1)
+                  RCHGFU = RechargEastSubSurf(M2,M1)
+                  RCHGFT = RechargRateEastWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -86,7 +90,7 @@ module BoundaryTranspMod
                   cycle
                 ENDIF
               ENDIF
-            ELSEIF(N.EQ.2)THEN
+            ELSEIF(N.EQ.iNorthSouthDirection)THEN
               !NORTH-SOUTH
               N4=NX
               N5=NY+1
@@ -96,14 +100,14 @@ module BoundaryTranspMod
               IF(NN.EQ.1)THEN
               ! southern boundary
                 IF(NY.EQ.NVS)THEN
-                  M1=NX
-                  M2=NY
-                  M3=L
-                  M4=NX
-                  M5=NY+1
-                  M6=L
-                  XN=-1.0_r8    !going out
-                  RCHQF=RechargSouthSurf(M2,M1)
+                  M1    = NX
+                  M2    = NY
+                  M3    = L
+                  M4    = NX
+                  M5    = NY+1
+                  M6    = L
+                  XN    = -1.0_r8    !going out
+                  RCHQF = RechargSouthSurf(M2,M1)
                   RCHGFU=RechargSouthSubSurf(M2,M1)
                   RCHGFT=RechargRateSouthWTBL(M2,M1)
                 ELSE
@@ -126,7 +130,7 @@ module BoundaryTranspMod
                   cycle
                 ENDIF
               ENDIF
-            ELSEIF(N.EQ.3)THEN
+            ELSEIF(N.EQ.iVerticalDirection)THEN
               !vertical
               N1=NX
               N2=NY
@@ -135,7 +139,7 @@ module BoundaryTranspMod
               N5=NY
               N6=L+1
               IF(NN.EQ.1)THEN
-              !lower boundary
+                !lower boundary
                 IF(L.EQ.NL(NY,NX))THEN
                   M1=NX
                   M2=NY
@@ -184,14 +188,15 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-          IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
+          IF(FlowDirIndicator(N2,N1).NE.3 .OR. N.EQ.iVerticalDirection)THEN
             call NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
           ENDIF
         ENDDO D9580
       ENDDO D9585
     ENDDO
   ENDDO
-  end subroutine BoundaryFlux
+  call PrintInfo('end '//subname)
+  end subroutine XBoundaryFluxMM
 !------------------------------------------------------------------------------------------
 
   subroutine BoundaryRunoffandSnowXY(M,N,NN,N1,N2,M4,M5,RCHQF)
@@ -669,12 +674,11 @@ module BoundaryTranspMod
 
     ELSE
       DO  K=1,jcplx
-        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
-        DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1)=0.0_r8
+        DOM_Transp2Micp_vr(idom_beg:idom_end,K,N3,N2,N1)  = 0.0_r8
+        DOM_Transp2Macp_flx(idom_beg:idom_end,K,N3,N2,N1) = 0.0_r8
       enddo
-      TR3MicPoreSolFlx_vr(ids_beg:ids_end,N3,N2,N1)=0.0_r8
-      TR3MacPoreSolFlx_vr(ids_beg:ids_end,N3,N2,N1)=0._r8
-
+      TR3MicPoreSolFlx_vr(ids_beg:ids_end,N3,N2,N1) = 0.0_r8
+      TR3MacPoreSolFlx_vr(ids_beg:ids_end,N3,N2,N1) = 0._r8
     ENDIF
   ENDIF
 !

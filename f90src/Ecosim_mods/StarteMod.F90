@@ -116,9 +116,9 @@ module StarteMod
                     !this is for water
                     BulkSoilMass=VLMicP_vr(L,NY,NX)
                   ENDIF
-                  trcx_solml_vr(idx_CEC,L,NY,NX) = AMAX1(CNH4(L,NY,NX),CEC_vr(L,NY,NX))*BulkSoilMass
-                  trcx_solml_vr(idx_AEC,L,NY,NX) = AMAX1(CPO4(L,NY,NX),AEC_vr(L,NY,NX))*BulkSoilMass
-                  solutevar%CN4X                 = CNH4(L,NY,NX)
+                  trcx_solml_vr(idx_CEC,L,NY,NX) = AMAX1(CNH4_vr(L,NY,NX),CEC_vr(L,NY,NX))*BulkSoilMass
+                  trcx_solml_vr(idx_AEC,L,NY,NX) = AMAX1(CPO4_vr(L,NY,NX),AEC_vr(L,NY,NX))*BulkSoilMass
+                  solutevar%CN4X                 = CNH4_vr(L,NY,NX)
                   solutevar%CALX                 = CAL(L,NY,NX)
                   solutevar%CFEX                 = CFE(L,NY,NX)
                   solutevar%CaX_conc             = CCA(L,NY,NX)
@@ -136,8 +136,8 @@ module StarteMod
                   solutevar%CCACOX               = CCACO(L,NY,NX)
                   solutevar%CCASOX               = CCASO(L,NY,NX)
                   solutevar%H_1p_conc            = 10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
-                  solutevar%CNOZ                 = CNO3(L,NY,NX)
-                  solutevar%CPOZ                 = CPO4(L,NY,NX)
+                  solutevar%CNOZ                 = CNO3_vr(L,NY,NX)
+                  solutevar%CPOZ                 = CPO4_vr(L,NY,NX)
                   solutevar%OH_1e_conc           = DPH2O/solutevar%H_1p_conc
                   solutevar%CN4Z                 = solutevar%CN4X
                   solutevar%CALZ                 = solutevar%CALX

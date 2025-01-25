@@ -403,8 +403,8 @@ module readiMod
     call ncd_getvar(grid_nfid, 'RSCm',  ntp,RSC(k_manure,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSNm',  ntp,RSN(k_manure,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSPm',  ntp,RSP(k_manure,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'IXTYP1',ntp,IXTYP(1,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'IXTYP2',ntp,IXTYP(2,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'IXTYP1',ntp,iLitrType_col(1,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'IXTYP2',ntp,iLitrType_col(2,NV1,NH1))
     call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
@@ -442,9 +442,9 @@ module readiMod
     call ncd_getvar(grid_nfid, 'CORGN',ntp,CSoilOrgM_vr(ielmn,1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CORGP',ntp,CSoilOrgM_vr(ielmp,1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'CNH4',ntp,CNH4(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CNO3',ntp,CNO3(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CPO4',ntp,CPO4(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CNH4',ntp,CNH4_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CNO3',ntp,CNO3_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CPO4',ntp,CPO4_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CAL' ,ntp,CAL(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CFE' ,ntp,CFE(1:JZ,NV1,NH1))
@@ -513,8 +513,8 @@ module readiMod
           RSC(k_manure,0,NY,NX)     = RSC(k_manure,0,NV1,NH1)
           RSN(k_manure,0,NY,NX)     = RSN(k_manure,0,NV1,NH1)
           RSP(k_manure,0,NY,NX)     = RSP(k_manure,0,NV1,NH1)
-          IXTYP(1,NY,NX)            = IXTYP(1,NV1,NH1)
-          IXTYP(2,NY,NX)            = IXTYP(2,NV1,NH1)
+          iLitrType_col(1,NY,NX)            = iLitrType_col(1,NV1,NH1)
+          iLitrType_col(2,NY,NX)            = iLitrType_col(2,NV1,NH1)
           NUI(NY,NX)                = NUI(NV1,NH1)
           MaxNumRootLays(NY,NX)     = MaxNumRootLays(NV1,NH1)
           ISOILR(NY,NX)             = ISOILR(NV1,NH1)
@@ -553,9 +553,9 @@ module readiMod
             CSoilOrgM_vr(ielmn,L,NY,NX)  = CSoilOrgM_vr(ielmn,L,NV1,NH1)
             CSoilOrgM_vr(ielmp,L,NY,NX)  = CSoilOrgM_vr(ielmp,L,NV1,NH1)
 
-            CNH4(L,NY,NX) = CNH4(L,NV1,NH1)
-            CNO3(L,NY,NX) = CNO3(L,NV1,NH1)
-            CPO4(L,NY,NX) = CPO4(L,NV1,NH1)
+            CNH4_vr(L,NY,NX) = CNH4_vr(L,NV1,NH1)
+            CNO3_vr(L,NY,NX) = CNO3_vr(L,NV1,NH1)
+            CPO4_vr(L,NY,NX) = CPO4_vr(L,NV1,NH1)
 
             CAL(L,NY,NX)  = CAL(L,NV1,NH1)
             CFE(L,NY,NX)  = CFE(L,NV1,NH1)
@@ -643,9 +643,9 @@ module readiMod
               COMLitrC_vr(L,NY,NX)         = 1.0_r8*COMLitrC_vr(L+1,NY,NX)
               CSoilOrgM_vr(ielmn,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmn,L+1,NY,NX)
               CSoilOrgM_vr(ielmp,L,NY,NX)  = 1.0_r8*CSoilOrgM_vr(ielmp,L+1,NY,NX)
-              CNH4(L,NY,NX)                = CNH4(L+1,NY,NX)
-              CNO3(L,NY,NX)                = CNO3(L+1,NY,NX)
-              CPO4(L,NY,NX)                = CPO4(L+1,NY,NX)
+              CNH4_vr(L,NY,NX)                = CNH4_vr(L+1,NY,NX)
+              CNO3_vr(L,NY,NX)                = CNO3_vr(L+1,NY,NX)
+              CPO4_vr(L,NY,NX)                = CPO4_vr(L+1,NY,NX)
               CAL(L,NY,NX)                 = CAL(L+1,NY,NX)
               CFE(L,NY,NX)                 = CFE(L+1,NY,NX)
               CCA(L,NY,NX)                 = CCA(L+1,NY,NX)
@@ -726,9 +726,9 @@ module readiMod
           CCLAY_vr(L,NY,NX)=CCLAY_vr(L,NY,NX)*corrector
           CEC_vr(L,NY,NX)=CEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           AEC_vr(L,NY,NX)=AEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
-          CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
-          CNO3(L,NY,NX)=CNO3(L,NY,NX)/natomw
-          CPO4(L,NY,NX)=CPO4(L,NY,NX)/patomw
+          CNH4_vr(L,NY,NX)=CNH4_vr(L,NY,NX)/natomw
+          CNO3_vr(L,NY,NX)=CNO3_vr(L,NY,NX)/natomw
+          CPO4_vr(L,NY,NX)=CPO4_vr(L,NY,NX)/patomw
           CAL(L,NY,NX)=CAL(L,NY,NX)/27.0_r8
           CFE(L,NY,NX)=CFE(L,NY,NX)/56.0_r8
           CCA(L,NY,NX)=CCA(L,NY,NX)/40.0_r8
@@ -814,7 +814,7 @@ module readiMod
   write(*,*)'C in surface manure litter (g m-2)',RSC(k_manure,0,NY,NX)
   write(*,*)'N in surface manure litter (g m-2)',RSN(k_manure,0,NY,NX)
   write(*,*)'P in surface manure litter (g m-2)',RSP(k_manure,0,NY,NX)
-  write(*,*)'surface litter type:1=plant,2=manure',IXTYP(1,NY,NX),IXTYP(2,NY,NX)
+  write(*,*)'surface litter type:1=plant,2=manure',iLitrType_col(1,NY,NX),iLitrType_col(2,NY,NX)
   write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
   write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays(NY,NX)
   write(*,*)'number of layers involved in model calculation',NL(NY,NX)
@@ -896,11 +896,11 @@ module readiMod
 !
   write(*,*)''
   write(*,*)'Total soil NH4 concentration (gN Mg-1): CNH4 '
-  write(*,*)(CNH4(L,NY,NX),L=NU,NM)
+  write(*,*)(CNH4_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Total soil NO3 concentration (gN Mg-1): CNO3'
-  write(*,*)(CNO3(L,NY,NX),L=NU,NM)
+  write(*,*)(CNO3_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Total soil H2PO4 concentration (gP Mg-1): CPO4 '
-  write(*,*)(CPO4(L,NY,NX),L=NU,NM)
+  write(*,*)(CPO4_vr(L,NY,NX),L=NU,NM)
 !
 !     CATION AND ANION CONCENTRATIONS
 !

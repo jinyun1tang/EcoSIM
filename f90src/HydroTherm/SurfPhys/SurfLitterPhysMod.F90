@@ -127,9 +127,9 @@ implicit none
     Radt2LitR            = RadSWByLitR+LWRad2LitR_col(NY,NX)
     Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWByLitR
 
-    CNVR = VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS_vr(0,NY,NX)
-    CNV1 = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
-      *THETPM(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
+    CNVR = VaporDiffusivityLitR_col(NY,NX)*AirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*AirFilledSoilPoreM_vr(M,0,NY,NX)/POROS_vr(0,NY,NX)
+    CNV1 = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)*POROQ &
+      *AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
     !there is litter layer
     IF(CNVR.GT.ZERO.AND.CNV1.GT.ZERO)THEN
       CdVaporLit2Soil=2.0_r8*CNVR*CNV1/(CNVR*DLYR_3D(3,NUM(NY,NX),NY,NX)+CNV1*DLYRR_COL(NY,NX))
@@ -180,9 +180,9 @@ implicit none
 
   !THETRR=litter in relative volume
   !FracSoilAsAirt=relative volume as air  
-  THETRR           = AZMAX1(1.0_r8-FracSoilPoreAsAir_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
+  THETRR           = AZMAX1(1.0_r8-AirFilledSoilPore_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
   HeatDiffusByWat0 = AZMAX1(FracSoiPAsWat_vr(0,NY,NX)-TRBW)**3._r8
-  HeatDiffusByAir0 = AZMAX1(FracSoilPoreAsAir_vr(0,NY,NX)-TRBA)**3._r8
+  HeatDiffusByAir0 = AZMAX1(AirFilledSoilPore_vr(0,NY,NX)-TRBA)**3._r8
   RYLXW0           = DTKX*HeatDiffusByWat0
   RYLXA0           = DTKX*HeatDiffusByAir0
   RYLNW0           = AMIN1(1.0E+04_r8,RYLXW*RYLXW0)
@@ -193,8 +193,8 @@ implicit none
   TCNDA0           = 9.050E-05_r8*XNUSA0
   WTHET0           = 1.467_r8-0.467_r8*FracSoilAsAirt(0,NY,NX)
   TCNDR            = (0.779_r8*THETRR*9.050E-04_r8+0.622_r8*FracSoiPAsWat_vr(0,NY,NX)*TCNDW0 &
-    +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+WTHET0*FracSoilPoreAsAir_vr(0,NY,NX)*TCNDA0) &
-    /(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX)+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+WTHET0*FracSoilPoreAsAir_vr(0,NY,NX))
+    +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+WTHET0*AirFilledSoilPore_vr(0,NY,NX)*TCNDA0) &
+    /(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX)+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+WTHET0*AirFilledSoilPore_vr(0,NY,NX))
   end subroutine CalcLitRThermConductivity
 
 !------------------------------------------------------------------------------------------
@@ -283,7 +283,7 @@ implicit none
       ! RAG,RAGR=isothermal blr at ground surface
       ! CdLitREvap,CdLitRHSens=conductance for litter latent,sensible heat fluxes
       !
-      RI   = RichardsonNumber(RIB(NY,NX),TKQ_col(NY,NX),TKR1)
+      RI   = RichardsonNumber(RIB_col(NY,NX),TKQ_col(NY,NX),TKR1)
       RAGX = AMAX1(RAM,0.8_r8*ResistAreodynOverLitr_col(NY,NX),&
         AMIN1(1.2_r8*ResistAreodynOverLitr_col(NY,NX),RARG(NY,NX)/(1.0_r8-10.0_r8*RI)))
       ResistAreodynOverLitr_col(NY,NX) = RAGX
@@ -304,7 +304,7 @@ implicit none
       IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
         ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VWatLitr2)/VLitR_col(NY,NX)
       ELSE
-        ThetaWLitR=POROS0(NY,NX)
+        ThetaWLitR=POROS0_col(NY,NX)
       ENDIF
 
       IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -312,15 +312,15 @@ implicit none
         IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
           PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
             +((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
-        ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
+        ELSEIF(ThetaWLitR.LT.POROS0_col(NY,NX))THEN
           PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
             /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
         ELSE
-          ThetaWLitR         = POROS0(NY,NX)
+          ThetaWLitR         = POROS0_col(NY,NX)
           PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
         ENDIF
       ELSE
-        ThetaWLitR         = POROS0(NY,NX)
+        ThetaWLitR         = POROS0_col(NY,NX)
         PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
       ENDIF
 !
@@ -355,7 +355,7 @@ implicit none
       ! THETPM: air-filled porosity
 
       ! Water flux by evaporation
-      IF(THETPM(M,0,NY,NX).GT.THETX .AND. THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
+      IF(AirFilledSoilPoreM_vr(M,0,NY,NX).GT.THETX .AND. AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
         FLVC = CdVaporLit2Soil*(VapLitR-VaporSoi1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
         VPY  = (VapLitR*VLsoiAirPM_vr(M,0,NY,NX)+VaporSoi1*VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))/(VLsoiAirPM_vr(M,0,NY,NX)+VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))
         FLVX = (VapLitR-VPY)*VLsoiAirPM_vr(M,0,NY,NX)*XNPB
@@ -572,14 +572,14 @@ implicit none
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)     = AZMIN1(1._r8,AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)))
     FracSoiPAsIce_vr(0,NY,NX)     = AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
-    FracSoilPoreAsAir_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
+    AirFilledSoilPore_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
       *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)     = 0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)     = 0.0_r8
-    FracSoilPoreAsAir_vr(0,NY,NX) = 1.0_r8
+    AirFilledSoilPore_vr(0,NY,NX) = 1.0_r8
   ENDIF
-  THETPM(M+1,0,NY,NX)        = FracSoilPoreAsAir_vr(0,NY,NX)
+  AirFilledSoilPoreM_vr(M+1,0,NY,NX)        = AirFilledSoilPore_vr(0,NY,NX)
   VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
   TK0Prev                    = TKSoil1_vr(0,NY,NX)                                 !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
@@ -670,15 +670,15 @@ implicit none
   IF(VLitR_col(NY,NX).GT.ZEROS2(NY,NX))THEN
     FracSoiPAsWat_vr(0,NY,NX)     = AZMIN1(1._r8,AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)))
     FracSoiPAsIce_vr(0,NY,NX)     = AZMIN1(1._r8,AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)))
-    FracSoilPoreAsAir_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
+    AirFilledSoilPore_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
       *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)     = 0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)     = 0.0_r8
-    FracSoilPoreAsAir_vr(0,NY,NX) = 1.0_r8
+    AirFilledSoilPore_vr(0,NY,NX) = 1.0_r8
   ENDIF
 
-  if(M.NE.NPH)THETPM(M+1,0,NY,NX) = FracSoilPoreAsAir_vr(0,NY,NX)
+  if(M.NE.NPH)AirFilledSoilPoreM_vr(M+1,0,NY,NX) = AirFilledSoilPore_vr(0,NY,NX)
   VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
   TK0Prev                    = TKSoil1_vr(0,NY,NX)                                 !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content

@@ -90,11 +90,12 @@ module MicBGCMod
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
 
-  micflx%NetCAssimhr=0._r8;micflx%NetNH4Mineralize=0._r8;micflx%NetPO4Mineralize=0._r8
-  micflx%RPiDemand=0._r8; micflx%RNiDemand=0._r8;micflx%GrosAssimhr=0._r8
-  micflx%CDOMuptk1=0._r8;micflx%CDOMuptk2=0._r8;micflx%tROMT=0._r8;micflx%tGROMO=0._r8
-  micflx%tRGOMP=0._r8;micflx%tRGOXP=0._r8; micflx%tRGOZP=0._r8
-  micflx%tRHydlySOM =0._r8;   micflx%tRHydlyBioReSOM =0._r8; micflx%tRHydlySoprtOM =0._r8
+  micflx%tRHydlySOM = 0._r8;   micflx%tRHydlyBioReSOM = 0._r8; micflx%tRHydlySoprtOM = 0._r8
+  micflx%NetCAssimhr = 0._r8;micflx%NetNH4Mineralize = 0._r8;micflx%NetPO4Mineralize = 0._r8
+  micflx%RPiDemand   = 0._r8; micflx%RNiDemand       = 0._r8;micflx%GrosAssimhr      = 0._r8
+  micflx%CDOMuptk1   = 0._r8;micflx%CDOMuptk2        = 0._r8;micflx%tROMT            = 0._r8  
+  micflx%tGROMO     = 0._r8; micflx%tRGOMP            = 0._r8;micflx%tRGOXP          = 0._r8
+  micflx%tRGOZP     = 0._r8
 
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(I,J,micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
@@ -837,7 +838,10 @@ module MicBGCMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NGL,K,N
   real(r8), intent(in) :: VOLWZ
-  real(r8), intent(in):: OXKX,WatStressMicb,TSensGrowth,XCO2
+  real(r8), intent(in):: OXKX
+  real(r8), intent(in):: WatStressMicb
+  real(r8), intent(in):: TSensGrowth
+  real(r8), intent(in):: XCO2
   real(r8), intent(in) :: TotActMicrobiom,TotBiomNO2Consumers
   real(r8), intent(in) :: ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T
   real(r8), intent(in) :: SPOMK(2)

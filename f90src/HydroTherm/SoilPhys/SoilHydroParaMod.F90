@@ -398,11 +398,11 @@ contains
   SUM2             =0.0_r8
   D1220: DO  K=1,n100
     XK           = K-1
-    H2OSOIatK(K) = POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
+    H2OSOIatK(K) = POROS0_col(NY,NX)-(XK/n100*POROS0_col(NY,NX))
     IF(H2OSOIatK(K).LT.FieldCapacity_vr(0,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(H2OSOIatK(K))) &
           /FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
-    ELSEIF(H2OSOIatK(K).LT.POROS0(NY,NX))THEN
+    ELSEIF(H2OSOIatK(K).LT.POROS0_col(NY,NX))THEN
       PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(H2OSOIatK(K))) &
           /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE

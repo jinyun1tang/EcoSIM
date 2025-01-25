@@ -278,7 +278,7 @@ module SoluteChemDataType
   real(r8) :: GKCN
   real(r8) :: ZNO3S
   real(r8) :: ZNO3B
-  real(r8) :: XZHYS
+  real(r8) :: RProd_Hp
   real(r8) :: ZHY
   real(r8) :: ZOH
   real(r8) :: ZAL
