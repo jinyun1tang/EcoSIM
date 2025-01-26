@@ -43,8 +43,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  HydroCond_3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                   !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake_vr(:,:,:)        !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
-  real(r8),target,allocatable ::  WatFlux4ErosionM_2DH(:,:,:)               !runoff water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  RunoffVelocity(:,:,:)                     !runoff velocity, [m t-1]
+  real(r8),target,allocatable ::  SurfRunoffWatFluxM_2DH(:,:,:)               !runoff water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  RunoffVelocityM(:,:,:)                     !runoff velocity, [m t-1]
   integer,target,allocatable ::  IFLBM(:,:,:,:,:)                           !flag for directional surface runoff
   logical,target,allocatable ::  XGridRunoffFlag(:,:,:,:)                   !enables or disables boundary water flux depending on aspect, [-]
   integer,target,allocatable ::  IFLBH(:,:,:,:)                             !flag for directional runoff, related to IFLBM
@@ -164,8 +164,8 @@ module SoilWaterDataType
   allocate(HydroCond_3D(3,100,0:JZ,JY,JX));HydroCond_3D=0._r8
   allocate(HydroCondMacP_vr(JZ,JY,JX));     HydroCondMacP_vr=0._r8
   allocate(HydroCondMicP4RootUptake_vr(JZ,JY,JX));     HydroCondMicP4RootUptake_vr=0._r8
-  allocate(WatFlux4ErosionM_2DH(60,JV,JH));      WatFlux4ErosionM_2DH=0._r8
-  allocate(RunoffVelocity(60,JY,JX));      RunoffVelocity=0._r8
+  allocate(SurfRunoffWatFluxM_2DH(60,JV,JH));      SurfRunoffWatFluxM_2DH=0._r8
+  allocate(RunoffVelocityM(60,JY,JX));      RunoffVelocityM=0._r8
   allocate(IFLBM(60,2,2,JY,JX));IFLBM=0
   allocate(XGridRunoffFlag(2,2,JY,JX));   XGridRunoffFlag=.false.
   allocate(IFLBH(2,2,JY,JX));   IFLBH=0
@@ -264,8 +264,8 @@ module SoilWaterDataType
   call destroy(HydroCond_3D)
   call destroy(HydroCondMacP_vr)
   call destroy(HydroCondMicP4RootUptake_vr)
-  call destroy(WatFlux4ErosionM_2DH)
-  call destroy(RunoffVelocity)
+  call destroy(SurfRunoffWatFluxM_2DH)
+  call destroy(RunoffVelocityM)
   call destroy(IFLBM)
   call destroy(XGridRunoffFlag)
   call destroy(IFLBH)

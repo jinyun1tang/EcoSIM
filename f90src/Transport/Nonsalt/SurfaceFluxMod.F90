@@ -55,8 +55,8 @@ contains
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
   real(r8) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
-  real(r8) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
-  real(r8) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
 
 !     VLWatMicPM,VLWatMacPM,VLsoiAirPM,ReductVLsoiAirPM=micropore,macropore water volume, air volume and change in air volume
@@ -101,20 +101,20 @@ contains
 
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
-  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv2MicP_flxM)
+  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv_Mac2MicP_flxM)
 !
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
 !     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
   call LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,&
-    SDifFlx,DOM_Difus_Micp_flxM)
+    SDifFlx,DOM_Difus_Mac2Micp_flxM)
 
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
   call SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_FloSno2LitR,trcn_FloSno2LitR,&
-    DOM_Adv2MicP_flxM,DOM_Difus_Micp_flxM)
+    DOM_Adv_Mac2MicP_flxM,DOM_Difus_Mac2Micp_flxM)
 
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
@@ -134,7 +134,7 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv2MicP_flxM)
+  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv_Mac2MicP_flxM)
   !
   ! Description:
   ! Litter and top soil tracer exchange by (upstream) advection
@@ -144,7 +144,7 @@ contains
   integer, intent(in) :: M, NY, NX
   real(r8),intent(out) :: solute_adv_flxM(ids_beg:ids_end)
   real(r8),intent(out) :: FLWRM1    !water flow from litter to soil at iteration M
-  real(r8),intent(out) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8),intent(out) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
 
   character(len=*), parameter :: subname='LitterSoilTracerXAdvectionM'
   REAL(R8) :: VFLW
@@ -179,7 +179,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,NY,NX))
       ENDDO
     ENDDO
 
@@ -210,7 +210,7 @@ contains
     ENDIF
     DO K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
       ENDDO
     ENDDO
 
@@ -222,7 +222,7 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,&
-    SDifFlx,DOM_Difus_Micp_flxM)
+    SDifFlx,DOM_Difus_Mac2Micp_flxM)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
@@ -232,7 +232,7 @@ contains
   real(r8), intent(in) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
   real(r8), intent(in) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
   real(r8), intent(out):: SDifFlx(ids_beg:ids_end)
-  real(r8), intent(out):: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(out):: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
   character(len=*), parameter :: subname='LitterSoilTracerDiffusionM'
   real(r8) :: TORT0,TORT1
@@ -297,7 +297,7 @@ contains
 !
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Difus_Micp_flxM(idom,K)=DIFDOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))
+        DOM_Difus_Mac2Micp_flxM(idom,K)=DIFDOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))
       ENDDO
     ENDDO
     !exclude NH3B and NH3
@@ -310,7 +310,7 @@ contains
     ENDDO
   ELSE
     DO  K=1,jcplx
-      DOM_Difus_Micp_flxM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -320,7 +320,7 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_FloSno2LitR,trcn_FloSno2LitR,&
-    DOM_Adv2MicP_flxM,DOM_Difus_Micp_flxM)
+    DOM_Adv_Mac2MicP_flxM,DOM_Difus_Mac2Micp_flxM)
   use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: I,J,M
@@ -329,8 +329,8 @@ contains
   real(r8), intent(in) :: solute_adv_flxM(ids_beg:ids_end)
   real(r8), intent(in) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
   real(r8), intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
-  real(r8), intent(in) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
-  real(r8), intent(in) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(in) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(in) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
   integer :: K,ntg,idom,nts
 
@@ -347,8 +347,8 @@ contains
   !litter layer
   DO K=1,micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)         = DOM_Flo2LitrM(idom,K,NY,NX)-DOM_Adv2MicP_flxM(idom,K)-DOM_Difus_Micp_flxM(idom,K)
-      DOM_MicpTranspFlxM_3D(idom,K,3,NU(NY,NX),NY,NX) = DOM_Flo2TopSoilM(idom,K,NY,NX)+DOM_Adv2MicP_flxM(idom,K)+DOM_Difus_Micp_flxM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)         = DOM_Flo2LitrM(idom,K,NY,NX)-DOM_Adv_Mac2MicP_flxM(idom,K)-DOM_Difus_Mac2Micp_flxM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,3,NU(NY,NX),NY,NX) = DOM_Flo2TopSoilM(idom,K,NY,NX)+DOM_Adv_Mac2MicP_flxM(idom,K)+DOM_Difus_Mac2Micp_flxM(idom,K)
     ENDDO
   ENDDO
 
@@ -387,9 +387,9 @@ contains
   DO K=1,micpar%NumOfLitrCmplxs
     do idom=idom_beg,idom_end
       DOM_MicpTransp_3D(idom,K,3,0,NY,NX)=DOM_MicpTransp_3D(idom,K,3,0,NY,NX) &
-        -DOM_Adv2MicP_flxM(idom,K)-DOM_Difus_Micp_flxM(idom,K)
+        -DOM_Adv_Mac2MicP_flxM(idom,K)-DOM_Difus_Mac2Micp_flxM(idom,K)
       DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)=DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX) &
-        +DOM_Adv2MicP_flxM(idom,K)+DOM_Difus_Micp_flxM(idom,K)
+        +DOM_Adv_Mac2MicP_flxM(idom,K)+DOM_Difus_Mac2Micp_flxM(idom,K)
     ENDDO
   ENDDO
 
@@ -428,28 +428,20 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine TopSoilMicMacPoreTracerXferM(M,NY,NX)
-  implicit none
-
+  implicit none  
   integer, intent(in) :: M, NY, NX
+
+  character, parameter :: subname='TopSoilMicMacPoreTracerXferM'
   integer :: K,nnut,idg,nsol,idom
   real(r8) :: VFLW
   real(r8) :: VLWatMacPS,VOLWT
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: SAdvFlx(ids_beg:ids_end)
-  real(r8) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
-  real(r8) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
-!
-!     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
-!     RFL*=convective macropore-micropore solute transfer
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     *H2,*2=macropore,micropore solute content
+
+  call PrintInfo('beg '//subname)
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
@@ -461,7 +453,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))
       enddo
     ENDDO
 
@@ -485,7 +477,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
       enddo
     ENDDO
 
@@ -503,7 +495,7 @@ contains
 !
   ELSE
     DO  K=1,jcplx      
-      DOM_Adv2MicP_flxM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO
     SAdvFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -511,25 +503,13 @@ contains
 !     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
 !     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
 !
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
-!     XFRS*VOLT=maximum macropore volume for solute transfer
-!     DFV*=diffusive macropore-micropore solute transfer
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     *H2,*2=macropore,micropore solute content
-!
   IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     VLWatMacPS = AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM_vr(M,NU(NY,NX),NY,NX))
     VOLWT      = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VLWatMacPS
     DO K = 1, jcplx
       !diffusion flux in micropore
       do idom=idom_beg,idom_end
-        DOM_Difus_Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))*VLWatMicPM_vr(M,NU(NY,NX),NY,NX) &
+        DOM_Difus_Mac2Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))*VLWatMicPM_vr(M,NU(NY,NX),NY,NX) &
           -AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
       enddo
     ENDDO
@@ -554,43 +534,37 @@ contains
 
   ELSE
     DO  K=1,jcplx
-      DOM_Difus_Micp_flxM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
 !
 !     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
 !
-!     R*FXS=convective + diffusive solute flux between macropores and micropores
-!     RFL*=convective flux between macropores and micropores
-!     DFV*=diffusive solute flux between macropores and micropores
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flxM(idom,K)+DOM_Difus_Micp_flxM(idom,K)
+      DOM_Mac2MicPore_flxM_vr(idom,K,NU(NY,NX),NY,NX)=DOM_Adv_Mac2MicP_flxM(idom,K)+DOM_Difus_Mac2Micp_flxM(idom,K)
     enddo
   ENDDO
 
   DO nnut=ids_beg,ids_end
-    RMac2MicSolFlx_vr(nnut,NU(NY,NX),NY,NX)=SAdvFlx(nnut)+SDifFlx(nnut)
+    trcs_Mac2MicPore_flxM_vr(nnut,NU(NY,NX),NY,NX)=SAdvFlx(nnut)+SDifFlx(nnut)
   ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_PoreTranspFlx(idom,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)
+      DOM_Mac2MicPore_flx_vr(idom,K,NU(NY,NX),NY,NX)=DOM_Mac2MicPore_flx_vr(idom,K,NU(NY,NX),NY,NX) &
+        +DOM_Mac2MicPore_flxM_vr(idom,K,NU(NY,NX),NY,NX)
     enddo
   ENDDO
 
   DO nnut=ids_beg,ids_end
-    trcs_Mac2MicXfer_vr(nnut,NU(NY,NX),NY,NX)=trcs_Mac2MicXfer_vr(nnut,NU(NY,NX),NY,NX)+RMac2MicSolFlx_vr(nnut,NU(NY,NX),NY,NX)
+    trcs_Mac2MicPore_flx_vr(nnut,NU(NY,NX),NY,NX)=trcs_Mac2MicPore_flx_vr(nnut,NU(NY,NX),NY,NX) &
+      +trcs_Mac2MicPore_flxM_vr(nnut,NU(NY,NX),NY,NX)
   ENDDO
-
+  call PrintInfo('end '//subname)
   end subroutine TopSoilMicMacPoreTracerXferM
 !------------------------------------------------------------------------------------------
 
@@ -601,23 +575,12 @@ contains
   real(r8) :: FQRM,VFLW
   integer :: K,N,NN,N1,N2,N4,N5,N4B,N5B,idg,nnut
   integer :: idom
-!     QRM=runoff from watsub.f
-!     RQR*=solute in runoff
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     VLWatMicPM=litter water volume from watsub.f
-!     *S2=litter solute content
-!     N2,N1=NY,NX of source grid cell
-!     N5,N4=NY,NX of destination grid cell
-!     X*QRS=accumulated hourly solute in runoff
 !
   N1=NX;N2=NY
-  IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+  IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM_vr(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,WatFlux4ErosionM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
-      VFLW=AMIN1(VFLWX,WatFlux4ErosionM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -627,7 +590,7 @@ contains
       enddo
     ENDDO
     DO idg=idg_beg,idg_NH3
-      trcg_FloXSurRunoff(idg,N2,N1)=VFLW*AZMAX1(trc_solml2_vr(idg,0,N2,N1))
+      trcg_FloXSurRunoff_flxM(idg,N2,N1)=VFLW*AZMAX1(trc_solml2_vr(idg,0,N2,N1))
     ENDDO
 
     DO nnut=ids_nut_beg,ids_nuts_end
@@ -637,7 +600,7 @@ contains
     DO K=1,jcplx
       dom_FloXSurRunoff(idom_beg:idom_end,K,N2,N1)=0.0_r8
     ENDDO
-    trcg_FloXSurRunoff(idg_beg:idg_NH3,N2,N1)          = 0.0_r8
+    trcg_FloXSurRunoff_flxM(idg_beg:idg_NH3,N2,N1)     = 0.0_r8
     trcn_FloXSurRunoff(ids_nut_beg:ids_nuts_end,N2,N1) = 0.0_r8
   ENDIF
 !
@@ -645,7 +608,7 @@ contains
 !
   D4310: DO N=1,2
     D4305: DO NN=1,2
-      IF(N.EQ.1)THEN
+      IF(N.EQ.iEastWestDirection)THEN
         !east-west
         IF((NX.EQ.NHE.AND.NN.EQ.1) .OR. (NX.EQ.NHW.AND.NN.EQ.2))THEN
           cycle
@@ -655,7 +618,7 @@ contains
           N4B = NX-1
           N5B = NY
         ENDIF
-      ELSEIF(N.EQ.2)THEN
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !south-north
         IF((NY.EQ.NVS.AND.NN.EQ.1) .OR. (NY.EQ.NVN.AND.NN.EQ.2))THEN
           cycle
@@ -667,28 +630,19 @@ contains
         ENDIF
       ENDIF
 !
-!     QRM=runoff from watsub.f
-!     RQR*=solute in runoff
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     VLWatMicPM=litter water volume from watsub.f
-!     *S2=litter solute content
-!
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
-          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
-              dom_2DFloXSurRunoffM(idom,K,N,2,N5,N4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
+              DOM_2DFloXSurRunoff_flxM(idom,K,N,2,N5,N4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
             enddo
           ENDDO
 
           DO idg=idg_beg,idg_NH3
-            trcg_2DFloXSurRunoffM(idg,N,2,N5,N4)=trcg_FloXSurRunoff(idg,N2,N1)*FQRM
+            trcg_2DFloXSurRunoffM(idg,N,2,N5,N4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
@@ -702,7 +656,7 @@ contains
 !
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
-              dom_2DFloXSurRunoff(idom,K,N,2,N5,N4)=dom_2DFloXSurRunoff(idom,K,N,2,N5,N4)+dom_2DFloXSurRunoffM(idom,K,N,2,N5,N4)
+              DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)+DOM_2DFloXSurRunoff_flxM(idom,K,N,2,N5,N4)
             enddo
           ENDDO
           DO idg=idg_beg,idg_NH3
@@ -714,7 +668,7 @@ contains
           ENDDO
         ELSE
           DO K=1,jcplx
-            dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
+            DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
           ENDDO
           trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,2,N5,N4)=0.0_r8
 
@@ -725,15 +679,15 @@ contains
 !
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             DO  K=1,jcplx
               do idom=idom_beg,idom_end
-                dom_2DFloXSurRunoffM(idom,K,N,1,N5B,N4B)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
+                DOM_2DFloXSurRunoff_flxM(idom,K,N,1,N5B,N4B)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
               enddo
             ENDDO
 
             DO idg=idg_beg,idg_NH3
-              trcg_2DFloXSurRunoffM(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff(idg,N2,N1)*FQRM
+              trcg_2DFloXSurRunoffM(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
             ENDDO
 
             DO nnut=ids_nut_beg,ids_nuts_end
@@ -742,7 +696,7 @@ contains
 
             DO K=1,jcplx
               do idom=idom_beg,idom_end
-                dom_2DFloXSurRunoff(idom,K,N,1,N5B,N4B)=dom_2DFloXSurRunoff(idom,K,N,1,N5B,N4B)+dom_2DFloXSurRunoffM(idom,K,N,1,N5B,N4B)
+                DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)+DOM_2DFloXSurRunoff_flxM(idom,K,N,1,N5B,N4B)
               enddo
             ENDDO
 
@@ -755,7 +709,7 @@ contains
             ENDDO
           ELSE
             DO  K=1,jcplx
-              dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
+              DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
             ENDDO
             trcg_2DFloXSurRunoffM(idg_beg:idg_end,N,1,N5B,N4B)          = 0.0_r8
             trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
@@ -763,14 +717,14 @@ contains
         ENDIF
       ELSE
         DO K=1,jcplx
-          dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
+          DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
         ENDDO
         trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,2,N5,N4)          = 0.0_r8
         trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,2,N5,N4) = 0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
           DO  K=1,jcplx
-            dom_2DFloXSurRunoffM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
+            DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
           ENDDO
           trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,1,N5B,N4B)          = 0.0_r8
           trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
@@ -795,9 +749,9 @@ contains
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
         IF(ABS(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
-          trcg_2DSnowDrift(idg_beg:idg_NH3,N,N5,N4)          = 0.0_r8
-          trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,N,N5,N4) = 0.0_r8
-          VFLW                                               = 0._r8
+          trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,N,N5,N4)          = 0.0_r8
+          trcn_SnowDrift_flxM_2D(ids_nut_beg:ids_nuts_end,N,N5,N4) = 0.0_r8
+          VFLW                                                     = 0._r8
     !
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
@@ -820,13 +774,13 @@ contains
 
         if(.not.isclose(VFLW,0._r8))then
           DO idg=idg_beg,idg_NH3
-            trcg_2DSnowDrift(idg,N,N5,N4)  = VFLW*AZMAX1(trcg_solsml2_snvr(idg,1,N5,N4))
-            trcg_FloXSnow_2DH(idg,N,N5,N4) = trcg_FloXSnow_2DH(idg,N,N5,N4)+trcg_2DSnowDrift(idg,N,N5,N4)
+            trcg_SnowDrift_flxM_2D(idg,N,N5,N4) = VFLW*AZMAX1(trcg_solsml2_snvr(idg,1,N5,N4))
+            trcg_FloXSnow_2DH(idg,N,N5,N4)      = trcg_FloXSnow_2DH(idg,N,N5,N4)+trcg_SnowDrift_flxM_2D(idg,N,N5,N4)
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
-            trcn_2DSnowDrift(nnut,N,N5,N4)  = VFLW*AZMAX1(trcn_solsml2_snvr(nnut,1,N5,N4))
-            trcn_FloXSnow_2DH(nnut,N,N5,N4) = trcn_FloXSnow_2DH(nnut,N,N5,N4)+trcn_2DSnowDrift(nnut,N,N5,N4)
+            trcn_SnowDrift_flxM_2D(nnut,N,N5,N4) = VFLW*AZMAX1(trcn_solsml2_snvr(nnut,1,N5,N4))
+            trcn_FloXSnow_2DH(nnut,N,N5,N4)      = trcn_FloXSnow_2DH(nnut,N,N5,N4)+trcn_SnowDrift_flxM_2D(nnut,N,N5,N4)
           ENDDO
         endif  
 

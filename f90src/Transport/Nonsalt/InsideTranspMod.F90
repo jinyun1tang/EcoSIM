@@ -145,13 +145,13 @@ module InsideTranspMod
 !
 
     DO  K=1,jcplx
-      dom_TFloXSurRunoff(idom_beg:idom_end,K,NY,NX)=0.0_r8
+      DOM_SurfRunoff_flxM(idom_beg:idom_end,K,NY,NX)=0.0_r8
     ENDDO
 
-    trcg_TFloXSurRunoff(idg_beg:idg_NH3,NY,NX)             = 0.0_r8
-    trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
-    trcg_SnowDrift(idg_beg:idg_NH3,NY,NX)                  = 0.0_r8
-    trcn_SnowDrift(ids_nut_beg:ids_nuts_end,NY,NX)         = 0.0_r8
+    trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)             = 0.0_r8
+    trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
+    trcg_SnowDrift_flxM(idg_beg:idg_NH3,NY,NX)                  = 0.0_r8
+    trcn_SnowDrift_flxM(ids_nut_beg:ids_nuts_end,NY,NX)         = 0.0_r8
 
 !   because NH3 is gas-aqua dual phase
     trc_solml2_vr(idg_NH3,0,NY,NX)=trc_solml2_vr(idg_NH3,0,NY,NX)-RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)
@@ -208,11 +208,6 @@ module InsideTranspMod
   DO L=NU(NY,NX),NL(NY,NX)
 !
 !     SOIL GAS FLUX ACCUMULATORS
-!
-!     R*SK2=total sink from nitro.f, uptake.f, solute.f
-!     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
-!     ZN3G=gaseous NH3
-!
     Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     DO idg=idg_beg,idg_NH3
       if(idg/=idg_NH3)then
@@ -422,11 +417,11 @@ module InsideTranspMod
   end subroutine MicroporeSoluteAdvectionM
 
 ! ----------------------------------------------------------------------
-  subroutine MicroporeSoluteDiffusionM(M,N,N1,N2,N3,N4,N5,N6,THETW1_vr,DOM_Difus_Micp_flxM)
+  subroutine MicroporeSoluteDiffusionM(M,N,N1,N2,N3,N4,N5,N6,THETW1_vr,DOM_Difus_Mac2Micp_flxM)
   implicit none
   integer , intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8), intent(in) :: THETW1_vr(JZ,JY,JX)
-  real(r8), intent(out):: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(out):: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
   real(r8) :: VLWatMicPOA,VLWatMicPOB,VLWatMicPPA,VLWatMicPPB
   real(r8) :: VLWatMicP2A,VLWatMicP2B,VLWatMicP3A,VLWatMicP3B,VLWatMicP4A,VLWatMicP4B
@@ -611,7 +606,7 @@ module InsideTranspMod
 !
     D9805: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Difus_Micp_flxM(idom,K)=DIFOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))        
+        DOM_Difus_Mac2Micp_flxM(idom,K)=DIFOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))        
       enddo
     ENDDO D9805
 
@@ -624,7 +619,7 @@ module InsideTranspMod
     ENDDO
   ELSE
     D9905: DO K=1,jcplx
-      DOM_Difus_Micp_flxM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO D9905
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -679,18 +674,17 @@ module InsideTranspMod
       D9800: DO K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_Adv2MacP_flxM(idom,K)=VFLW*AZMAX1((DOM_MacP2(idom,K,N3,N2,N1) &
-            -AZMIN1(DOM_XPoreTransp_flx(idom,K,NU(N2,N1),N2,N1))))
+            -AZMIN1(DOM_Mac2MicPore_flxM_vr(idom,K,NU(N2,N1),N2,N1))))
         enddo
       ENDDO D9800
 
       DO idg=idg_beg,idg_end-2
-        trcs_RFH(idg)=VFLW*AZMAX1((trc_soHml2_vr(idg,N3,N2,N1) &
-          -AZMIN1(RMac2MicSolFlx_vr(idg,NU(N2,N1),N2,N1))))
+        trcs_RFH(idg)=VFLW*AZMAX1((trc_soHml2_vr(idg,N3,N2,N1)-AZMIN1(trcs_Mac2MicPore_flxM_vr(idg,NU(N2,N1),N2,N1))))
       ENDDO
 
       DO nsol=ids_nuts_beg,ids_nuts_end
         trcs_RFH(nsol)=VFLW*AZMAX1((trc_soHml2_vr(nsol,N3,N2,N1) &
-          -AZMIN1(RMac2MicSolFlx_vr(nsol,NU(N2,N1),N2,N1)*trcs_VLN_vr(nsol,N3,N2,N1)))) &
+          -AZMIN1(trcs_Mac2MicPore_flxM_vr(nsol,NU(N2,N1),N2,N1)*trcs_VLN_vr(nsol,N3,N2,N1)))) &
           *trcs_VLN_vr(nsol,N6,N5,N4)
       ENDDO
 !
@@ -979,7 +973,7 @@ module InsideTranspMod
   integer, intent(in) :: N1,N2,N3  !source grid
   integer, intent(in) :: N4,N5,N6  !dest grid
 
-  real(r8)  :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)  
+  real(r8)  :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)  
   real(r8) :: THETW1_vr(JZ,JY,JX)  !soil saturation 
   integer  :: K,nsol,idom
   real(r8) :: DOM_Adv2MacP_flxM(idom_beg:idom_end,1:jcplx)
@@ -997,7 +991,7 @@ module InsideTranspMod
 !     ADJACENT GRID CELL MICROPORES FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  call MicroporeSoluteDiffusionM(M,N,N1,N2,N3,N4,N5,N6,THETW1_vr,DOM_Difus_Micp_flxM)
+  call MicroporeSoluteDiffusionM(M,N,N1,N2,N3,N4,N5,N6,THETW1_vr,DOM_Difus_Mac2Micp_flxM)
 !
 !     SOLUTE TRANSPORT IN MACROPORES
 !
@@ -1023,7 +1017,7 @@ module InsideTranspMod
 !
   D9765: DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)=DOM_Adv2MicP_flx(idom,K)+DOM_Difus_Micp_flxM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)=DOM_Adv2MicP_flx(idom,K)+DOM_Difus_Mac2Micp_flxM(idom,K)
       DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)=DOM_Adv2MacP_flxM(idom,K)+DOM_Difus_Macp_flxM(idom,K)
     enddo
   ENDDO D9765
@@ -1081,22 +1075,18 @@ module InsideTranspMod
 !     DIFFERENCES
   call MicMacPoresSoluteDifExchange(M,N,N1,N2,N3,N4,N5,N6)
 
-
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-!     X*FXS,X*FXB= hourly convective + diffusive solute flux between macro- and micropore in non-band,band
-!     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
   D9945: DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_PoreTranspFlx(idom,K,N6,N5,N4)=DOM_PoreTranspFlx(idom,K,N6,N5,N4) &
-        +DOM_XPoreTransp_flx(idom,K,N6,N5,N4)
+      DOM_Mac2MicPore_flx_vr(idom,K,N6,N5,N4)=DOM_Mac2MicPore_flx_vr(idom,K,N6,N5,N4)+DOM_Mac2MicPore_flxM_vr(idom,K,N6,N5,N4)
     enddo
   ENDDO D9945
 
   DO nsol=ids_beg,ids_end
-    trcs_Mac2MicXfer_vr(nsol,N6,N5,N4)=trcs_Mac2MicXfer_vr(nsol,N6,N5,N4)+RMac2MicSolFlx_vr(nsol,N6,N5,N4)
+    trcs_Mac2MicPore_flx_vr(nsol,N6,N5,N4)=trcs_Mac2MicPore_flx_vr(nsol,N6,N5,N4)+trcs_Mac2MicPore_flxM_vr(nsol,N6,N5,N4)
   ENDDO
 
   end subroutine MicMacPoresSoluteXchangeM
@@ -1177,7 +1167,7 @@ module InsideTranspMod
   ENDIF
 
   DO nsol=ids_beg,ids_end
-    RMac2MicSolFlx_vr(nsol,N6,N5,N4)=trcs_adv_flx(nsol)
+    trcs_Mac2MicPore_flxM_vr(nsol,N6,N5,N4)=trcs_adv_flx(nsol)
   ENDDO
 !
 !     TOTAL CONVECTIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
@@ -1193,7 +1183,7 @@ module InsideTranspMod
 
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_XPoreTransp_flx(idom,K,N6,N5,N4)=DOM_Adv2MicP_flx(idom,K)
+      DOM_Mac2MicPore_flxM_vr(idom,K,N6,N5,N4)=DOM_Adv2MicP_flx(idom,K)
     enddo
   enddo
 
@@ -1208,7 +1198,7 @@ module InsideTranspMod
   real(r8) :: trcs_DFV(ids_beg:ids_end)
   real(r8) :: VLWatMacPS,VOLWT
   integer  :: K,nsol,idg,idom
-  real(r8) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
 !
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
@@ -1226,7 +1216,7 @@ module InsideTranspMod
 
     D9955: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Difus_Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,N6,N5,N4)) &
+        DOM_Difus_Mac2Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,N6,N5,N4)) &
           *VLWatMicPM_vr(M,N6,N5,N4)-AZMAX1(DOM_MicP2(idom,K,N6,N5,N4))*VLWatMacPS)/VOLWT
       enddo
     ENDDO D9955
@@ -1244,14 +1234,14 @@ module InsideTranspMod
 
   ELSE
     D9975: DO K=1,jcplx
-      DOM_Difus_Micp_flxM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO D9975
 
     trcs_DFV(ids_beg:ids_end)=0.0_r8
   ENDIF
 
   DO nsol=ids_beg,ids_end
-    RMac2MicSolFlx_vr(nsol,N6,N5,N4)=RMac2MicSolFlx_vr(nsol,N6,N5,N4)+trcs_DFV(nsol)
+    trcs_Mac2MicPore_flxM_vr(nsol,N6,N5,N4)=trcs_Mac2MicPore_flxM_vr(nsol,N6,N5,N4)+trcs_DFV(nsol)
   ENDDO
 !
 !     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
@@ -1267,7 +1257,7 @@ module InsideTranspMod
 
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_XPoreTransp_flx(idom,K,N6,N5,N4)=DOM_XPoreTransp_flx(idom,K,N6,N5,N4)+DOM_Difus_Micp_flxM(idom,K)
+      DOM_Mac2MicPore_flxM_vr(idom,K,N6,N5,N4)=DOM_Mac2MicPore_flxM_vr(idom,K,N6,N5,N4)+DOM_Difus_Mac2Micp_flxM(idom,K)
     enddo
   enddo
   end subroutine MicMacPoresSoluteDifExchange

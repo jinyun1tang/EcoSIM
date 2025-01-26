@@ -235,11 +235,11 @@ module TranspNoSaltMod
 !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
 !
   DO idg=idg_beg,idg_end-1
-    trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml2_snvr(idg,1,NY,NX)+trcg_SnowDrift(idg,NY,NX)
+    trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml2_snvr(idg,1,NY,NX)+trcg_SnowDrift_flxM(idg,NY,NX)
   ENDDO
 
   DO idn=ids_nut_beg,ids_nuts_end
-    trcn_solsml2_snvr(idn,1,NY,NX)=trcn_solsml2_snvr(idn,1,NY,NX)+trcn_SnowDrift(idn,NY,NX)
+    trcn_solsml2_snvr(idn,1,NY,NX)=trcn_solsml2_snvr(idn,1,NY,NX)+trcn_SnowDrift_flxM(idn,NY,NX)
   ENDDO
 
   DO  L=1,JS
@@ -300,17 +300,17 @@ module TranspNoSaltMod
 
   D9680: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+dom_TFloXSurRunoff(idom,K,NY,NX)
+      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+DOM_SurfRunoff_flxM(idom,K,NY,NX)
     ENDDO
   ENDDO D9680
 
 !exclude NH3B
   DO idg=idg_beg,idg_end-1
-    trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+trcg_TFloXSurRunoff(idg,NY,NX)
+    trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)
   ENDDO
 
   DO ids=ids_nut_beg,ids_nuts_end
-    trc_solml2_vr(ids,0,NY,NX)=trc_solml2_vr(ids,0,NY,NX)+trcn_TFloXSurRunoff_2D(ids,NY,NX)
+    trc_solml2_vr(ids,0,NY,NX)=trc_solml2_vr(ids,0,NY,NX)+trcn_SurfRunoff_flxM(ids,NY,NX)
   ENDDO
 
   end subroutine UpdateSurfTracerM
@@ -354,16 +354,16 @@ module TranspNoSaltMod
 
         DO  K=1,jcplx
           DO idom=idom_beg,idom_end
-            DOM_MicP2(idom,K,L,NY,NX) = DOM_MicP2(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX)+DOM_XPoreTransp_flx(idom,K,L,NY,NX)
-            DOM_MacP2(idom,K,L,NY,NX) = DOM_MacP2(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_XPoreTransp_flx(idom,K,L,NY,NX)
+            DOM_MicP2(idom,K,L,NY,NX) = DOM_MicP2(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX)+DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
+            DOM_MacP2(idom,K,L,NY,NX) = DOM_MacP2(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX)-DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
           ENDDO
         ENDDO
 
         DO ids=ids_beg,ids_end
-          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+TR3MicPoreSolFlx_vr(ids,L,NY,NX)+RMac2MicSolFlx_vr(ids,L,NY,NX)
+          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+TR3MicPoreSolFlx_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
           trc_solml2_vr(ids,L,NY,NX) = fixnegmass(trc_solml2_vr(ids,L,NY,NX))
           
-          trc_soHml2_vr(ids,L,NY,NX) = trc_soHml2_vr(ids,L,NY,NX)+TR3MacPoreSolFlx_vr(ids,L,NY,NX)-RMac2MicSolFlx_vr(ids,L,NY,NX)
+          trc_soHml2_vr(ids,L,NY,NX) = trc_soHml2_vr(ids,L,NY,NX)+TR3MacPoreSolFlx_vr(ids,L,NY,NX)-trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
           trc_soHml2_vr(ids,L,NY,NX) = fixnegmass(trc_soHml2_vr(ids,L,NY,NX),trc_solml2_vr(ids,L,NY,NX))
  
         ENDDO

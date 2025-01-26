@@ -251,30 +251,30 @@ implicit none
   D1202: DO NN=1,2
     !gaseous tracers
     DO NTG=idg_beg,idg_end-1
-      trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)+trcg_FloXSurRunoff_2D(NTG,N,NN,N2,N1)
+      trcg_SurfRunoff_flxM(NTG,N2,N1)=trcg_SurfRunoff_flxM(NTG,N2,N1)+trcg_FloXSurRunoff_2D(NTG,N,NN,N2,N1)
     ENDDO
 
     !nutrient tracres
     DO NTN=ids_nut_beg,ids_nuts_end
-      trcn_TFloXSurRunoff_2D(NTN,N2,N1)=trcn_TFloXSurRunoff_2D(NTN,N2,N1)+trcn_FloXSurRunoff_2D(NTN,N,NN,N2,N1)
+      trcn_SurfRunoff_flxM(NTN,N2,N1)=trcn_SurfRunoff_flxM(NTN,N2,N1)+trcn_FloXSurRunoff_2D(NTN,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
 
       DO NTG=idg_beg,idg_end-1
-        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5,N4)
+        trcg_SurfRunoff_flxM(NTG,N2,N1)=trcg_SurfRunoff_flxM(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5,N4)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TFloXSurRunoff_2D(NTN,N2,N1)=trcn_TFloXSurRunoff_2D(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5,N4)
+        trcn_SurfRunoff_flxM(NTN,N2,N1)=trcn_SurfRunoff_flxM(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5,N4)
       ENDDO
 
     ENDIF 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       DO NTG=idg_beg,idg_end-1
-        trcg_TFloXSurRunoff(NTG,N2,N1)=trcg_TFloXSurRunoff(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5B,N4B)
+        trcg_SurfRunoff_flxM(NTG,N2,N1)=trcg_SurfRunoff_flxM(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5B,N4B)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TFloXSurRunoff_2D(NTN,N2,N1)=trcn_TFloXSurRunoff_2D(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5B,N4B)
+        trcn_SurfRunoff_flxM(NTN,N2,N1)=trcn_SurfRunoff_flxM(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5B,N4B)
       ENDDO
 
     ENDIF
@@ -360,22 +360,22 @@ implicit none
 !  if(NX==5)write(111,*)I+J/24.,'beg18',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 
   DO NTG=idg_beg,idg_end-1
-    dflx=-trcg_TFloXSurRunoff(NTG,NY,NX)
+    dflx=-trcg_SurfRunoff_flxM(NTG,NY,NX)
     call fixEXflux(trc_solml_vr(NTG,0,NY,NX),dflx)
-    trcg_TFloXSurRunoff(NTG,NY,NX)=-dflx
+    trcg_SurfRunoff_flxM(NTG,NY,NX)=-dflx
   ENDDO
 
 !  if(NX==5)write(111,*)I+J/24.,'beg19',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 
-!  !   write(116,*)I+J/24.,'beg5xxxx1',trc_solml_vr(ids_NO3,0,NY,NX),trcn_TFloXSurRunoff_2D(ids_NO3,NY,NX)
+!  !   write(116,*)I+J/24.,'beg5xxxx1',trc_solml_vr(ids_NO3,0,NY,NX),trcn_SurfRunoff_flxM(ids_NO3,NY,NX)
 
   DO NTU=ids_nut_beg,ids_nuts_end
-    dflx=-trcn_TFloXSurRunoff_2D(NTU,NY,NX)
+    dflx=-trcn_SurfRunoff_flxM(NTU,NY,NX)
     call fixEXflux(trc_solml_vr(NTU,0,NY,NX),dflx)
-    trcn_TFloXSurRunoff_2D(NTU,NY,NX)=-dflx
+    trcn_SurfRunoff_flxM(NTU,NY,NX)=-dflx
   ENDDO
 
-!  !   write(116,*)I+J/24.,'beg5xxxx2',trc_solml_vr(ids_NO3,0,NY,NX),trcn_TFloXSurRunoff_2D(ids_NO3,NY,NX)
+!  !   write(116,*)I+J/24.,'beg5xxxx2',trc_solml_vr(ids_NO3,0,NY,NX),trcn_SurfRunoff_flxM(ids_NO3,NY,NX)
 
 !  if(NX==5)write(111,*)I+J/24.,'beg20',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
 

@@ -193,7 +193,7 @@ implicit none
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
         DO idom=idom_beg,idom_end
-          OMRof(idom)=OMRof(idom)+XN*dom_2DFloXSurRunoff(idom,K,N,NN,N5,N4)
+          OMRof(idom)=OMRof(idom)+XN*DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D2575
       TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXR-OMRof(ielmc)-OMRof(idom_acetate)

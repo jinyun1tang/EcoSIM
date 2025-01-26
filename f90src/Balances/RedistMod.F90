@@ -1026,11 +1026,10 @@ module RedistMod
     D8560: DO K=1,jcplx
       do idom=idom_beg,idom_end
         DOM_vr(idom,K,L,NY,NX)=AZMAX1(DOM_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_vr(idom,K,L,NY,NX) &
-          +DOM_PoreTranspFlx(idom,K,L,NY,NX))
+          +DOM_Mac2MicPore_flx_vr(idom,K,L,NY,NX))
           
         DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flx(idom,K,L,NY,NX) &
-          -DOM_PoreTranspFlx(idom,K,L,NY,NX)
-
+          -DOM_Mac2MicPore_flx_vr(idom,K,L,NY,NX)
       enddo
     ENDDO D8560
     !
@@ -1049,15 +1048,15 @@ module RedistMod
             trcs_TransptMacP_vr(NTS,L,NY,NX) =trcs_TransptMacP_vr(NTS,L,NY,NX)*dval/dval0
           endif
         endif  
-        dval0 = trcs_Mac2MicXfer_vr(NTS,L,NY,NX)
+        dval0 = trcs_Mac2MicPore_flx_vr(NTS,L,NY,NX)
         dval  = dval0
         if(dval0<0._r8)then
-          trc_soHml_vr(NTS,L,NY,NX)=trc_soHml_vr(NTS,L,NY,NX)-trcs_Mac2MicXfer_vr(NTS,L,NY,NX)
+          trc_soHml_vr(NTS,L,NY,NX)=trc_soHml_vr(NTS,L,NY,NX)-trcs_Mac2MicPore_flx_vr(NTS,L,NY,NX)
         else
           dval=dval0
           call fixEXflux(trc_soHml_vr(NTS,L,NY,NX),dval)      
           if(dval<dval0)then
-            trcs_Mac2MicXfer_vr(NTS,L,NY,NX)=trcs_Mac2MicXfer_vr(NTS,L,NY,NX)*dval/dval0
+            trcs_Mac2MicPore_flx_vr(NTS,L,NY,NX)=trcs_Mac2MicPore_flx_vr(NTS,L,NY,NX)*dval/dval0
           endif
         endif  
       ENDDO
@@ -1073,7 +1072,7 @@ module RedistMod
     do idg=idg_beg,idg_NH3-1
       dval                      = trc_solml_vr(idg,L,NY,NX)
       trc_solml_vr(idg,L,NY,NX) = trc_solml_vr(idg,L,NY,NX)+trcs_TransptMicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX) &
-        +trcs_Irrig_vr(idg,L,NY,NX)+trcs_Mac2MicXfer_vr(idg,L,NY,NX)+trcg_ebu_flx_vr(idg,L,NY,NX)
+        +trcs_Irrig_vr(idg,L,NY,NX)+trcs_Mac2MicPore_flx_vr(idg,L,NY,NX)+trcg_ebu_flx_vr(idg,L,NY,NX)
 
        trc_solml_vr(idg,L,NY,NX)=fixnegmass(trc_solml_vr(idg,L,NY,NX))       
        if(trcs_RMicbUptake_vr(idg,L,NY,NX)<=0._r8)then
@@ -1095,7 +1094,7 @@ module RedistMod
         print*,idg,'xxx',L,dval,trc_solml_vr(idg,L,NY,NX)
         print*,trcs_TransptMicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX), &
           -trcs_RMicbUptake_vr(idg,L,NY,NX),-trcs_plant_uptake_vr(idg,L,NY,NX), &
-          +trcs_Irrig_vr(idg,L,NY,NX)+trcs_Mac2MicXfer_vr(idg,L,NY,NX) &
+          +trcs_Irrig_vr(idg,L,NY,NX)+trcs_Mac2MicPore_flx_vr(idg,L,NY,NX) &
           +trcg_ebu_flx_vr(idg,L,NY,NX)
       endif  
     enddo
@@ -1104,7 +1103,7 @@ module RedistMod
       +TR_NH3_soil_vr(L,NY,NX) &
       +trcs_TransptMicP_vr(idg_NH3,L,NY,NX)+Gas_Disol_Flx_vr(idg_NH3,L,NY,NX) &
       +trcs_Irrig_vr(idg_NH3,L,NY,NX) &
-      +trcs_Mac2MicXfer_vr(idg_NH3,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3,L,NY,NX)
+      +trcs_Mac2MicPore_flx_vr(idg_NH3,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3,L,NY,NX)
 
     trc_solml_vr(idg_NH3,L,NY,NX)=fixnegmass(trc_solml_vr(idg_NH3,L,NY,NX))
 
@@ -1114,7 +1113,7 @@ module RedistMod
       +Gas_Disol_Flx_vr(idg_NH3B,L,NY,NX)+trcg_ebu_flx_vr(idg_NH3B,L,NY,NX) &
       +trcs_TransptMicP_vr(idg_NH3B,L,NY,NX) &
       +trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX) &
-      +trcs_Irrig_vr(idg_NH3B,L,NY,NX)+trcs_Mac2MicXfer_vr(idg_NH3B,L,NY,NX)
+      +trcs_Irrig_vr(idg_NH3B,L,NY,NX)+trcs_Mac2MicPore_flx_vr(idg_NH3B,L,NY,NX)
  
     trc_solml_vr(idg_NH3B,L,NY,NX)=fixnegmass(trc_solml_vr(idg_NH3B,L,NY,NX))
     call fixEXflux(trc_solml_vr(idg_NH3B,L,NY,NX),trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))
@@ -1123,7 +1122,7 @@ module RedistMod
       trc_solml_vr(ids,L,NY,NX)=trc_solml_vr(ids,L,NY,NX) &
         +trcs_TransptMicP_vr(ids,L,NY,NX)  &
         +trcn_RChem_soil_vr(ids,L,NY,NX) &
-        +trcs_Irrig_vr(ids,L,NY,NX)+trcs_Mac2MicXfer_vr(ids,L,NY,NX)     
+        +trcs_Irrig_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flx_vr(ids,L,NY,NX)     
       trc_solml_vr(ids,L,NY,NX)=fixnegmass(trc_solml_vr(ids,L,NY,NX))
 
       if(RNutMicbTransf_vr(ids,L,NY,NX)>=0._r8)then
@@ -1145,7 +1144,7 @@ module RedistMod
       trc_solml_vr(ids,L,NY,NX)=trc_solml_vr(ids,L,NY,NX) &
         +trcs_TransptMicP_vr(ids,L,NY,NX) &
         +trcn_RChem_band_soil_vr(ids,L,NY,NX) &
-        +trcs_Irrig_vr(ids,L,NY,NX)+trcs_Mac2MicXfer_vr(ids,L,NY,NX)
+        +trcs_Irrig_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flx_vr(ids,L,NY,NX)
       trc_solml_vr(ids,L,NY,NX)=fixnegmass(trc_solml_vr(ids,L,NY,NX))
     
       if(RNutMicbTransf_vr(ids,L,NY,NX)>=0._r8)then
@@ -1199,9 +1198,9 @@ module RedistMod
     ENDDO
 
     RO2AquaSourcePrev_vr(L,NY,NX)   = trcs_TransptMicP_vr(idg_O2,L,NY,NX)+trcs_Irrig_vr(idg_O2,L,NY,NX) &
-      +trcs_Mac2MicXfer_vr(idg_O2,L,NY,NX)+trcg_ebu_flx_vr(idg_O2,L,NY,NX)
+      +trcs_Mac2MicPore_flx_vr(idg_O2,L,NY,NX)+trcg_ebu_flx_vr(idg_O2,L,NY,NX)
     RCH4PhysexchPrev_vr(L,NY,NX) = trcs_TransptMicP_vr(idg_CH4,L,NY,NX)+trcs_Irrig_vr(idg_CH4,L,NY,NX) &
-      +trcs_Mac2MicXfer_vr(idg_CH4,L,NY,NX)+trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
+      +trcs_Mac2MicPore_flx_vr(idg_CH4,L,NY,NX)+trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
     !
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
     !  watch out the following code for changes

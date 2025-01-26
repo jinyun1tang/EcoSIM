@@ -249,7 +249,7 @@ implicit none
     !water flux
     D8590: DO K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
-        TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)+dom_2DFloXSurRunoff(idom,K,N,NN,N2,N1)
+        TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)+DOM_FloXSurRunoff_2D(idom,K,N,NN,N2,N1)
       ENDDO
     ENDDO D8590
 
@@ -258,7 +258,7 @@ implicit none
       !water flux
       D8591: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
-          TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5,N4)
+          TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D8591
 
@@ -269,7 +269,7 @@ implicit none
 
         D8592: DO K=1,micpar%NumOfLitrCmplxs
           DO idom=idom_beg,idom_end
-            TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-dom_2DFloXSurRunoff(idom,K,N,NN,N5B,N4B)
+            TOMQRS(idom,K,N2,N1)=TOMQRS(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5B,N4B)
           enddo
         ENDDO D8592
       ENDIF

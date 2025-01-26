@@ -402,9 +402,9 @@ module Hour1Mod
       HydroSubsDINFlx_col(NY,NX)           = 0._r8
       HydroSubsDOPFlx_col(NY,NX)           = 0._r8
       HydroSubsDIPFlx_col(NY,NX)           = 0._r8
-      WatFlux4ErosionM_2DH(:,NY,NX)        = 0._r8
+      SurfRunoffWatFluxM_2DH(:,NY,NX)        = 0._r8
 
-      dom_2DFloXSurRunoff(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
+      DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
 
       trcg_FloXSurRunoff_2D(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0._r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0._r8
@@ -2382,7 +2382,7 @@ module Hour1Mod
 
     trcp_RChem_soil(idsp_beg_band:idsp_end,L,NY,NX)=0._r8
 
-    trcs_Mac2MicXfer_vr(ids_beg:ids_end,L,NY,NX)=0._r8
+    trcs_Mac2MicPore_flx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 
     DO NTSA=idsalt_beg,idsaltb_end
       trcSalt_TR(NTSA,L,NY,NX)=0._r8
@@ -2390,7 +2390,7 @@ module Hour1Mod
     ENDDO
 
     DO  K=1,jcplx
-      DOM_PoreTranspFlx(idom_beg:idom_end,K,L,NY,NX)=0._r8
+      DOM_Mac2MicPore_flx_vr(idom_beg:idom_end,K,L,NY,NX)=0._r8
     ENDDO
     TLIceThawMicP_vr(L,NY,NX)=0._r8
     TLIceThawMacP_vr(L,NY,NX)=0._r8

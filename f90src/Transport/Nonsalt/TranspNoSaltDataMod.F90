@@ -21,27 +21,27 @@ implicit none
   real(r8), allocatable :: RDOM_CumEcoProd_vr(:,:,:,:,:)
 
   real(r8), allocatable :: dom_FloXSurRunoff(:,:,:,:)
-  real(r8), allocatable :: RBGCSinkGasMM_vr(:,:,:,:)         !BGC sink for gaseous tracers at gas iteration MM
-  real(r8), allocatable :: RBGCSinkSoluteM_vr(:,:,:,:)       !BGC sink for solute tracers at heat iteration M
-  real(r8), allocatable :: trcg_advW_snvr(:,:,:,:)           !gas flow by water advection in snow                     !
-  real(r8), allocatable :: trcn_RBLS(:,:,:,:)                !
-  real(r8), allocatable :: DOM_Flo2LitrM(:,:,:,:)            !DOM flow into litter layer at iteration M [gC d-2]
-  real(r8), allocatable :: DOM_Flo2TopSoilM(:,:,:,:)         !DOM flow into topsoil layer at iteration M [gC d-2]
+  real(r8), allocatable :: RBGCSinkGasMM_vr(:,:,:,:)               !BGC sink for gaseous tracers at gas iteration MM
+  real(r8), allocatable :: RBGCSinkSoluteM_vr(:,:,:,:)             !BGC sink for solute tracers at heat iteration M
+  real(r8), allocatable :: trcg_advW_snvr(:,:,:,:)                 !gas flow by water advection in snow                     !
+  real(r8), allocatable :: trcn_RBLS(:,:,:,:)                      !
+  real(r8), allocatable :: DOM_Flo2LitrM(:,:,:,:)                  !DOM flow into litter layer at iteration M [gC d-2]
+  real(r8), allocatable :: DOM_Flo2TopSoilM(:,:,:,:)               !DOM flow into topsoil layer at iteration M [gC d-2]
   real(r8), allocatable :: trcg_RFL0(:,:,:)                        !
   real(r8), allocatable :: trcn_RFL0(:,:,:)                        !
   real(r8), allocatable :: trcs_RFL1(:,:,:)                        !
-  real(r8), allocatable :: DOM_XPoreTransp_flx(:,:,:,:,:)                    !
+  real(r8), allocatable :: DOM_Mac2MicPore_flxM_vr(:,:,:,:,:)      !DOM exchange from macropore and micropore
 
-  real(r8), allocatable ::  POSGL2(:,:,:)                      !
-  real(r8), allocatable ::  O2AquaDiffusvity2(:,:,:)                      !
-  real(r8), allocatable ::  dom_TFloXSurRunoff(:,:,:,:)                       !
+  real(r8), allocatable ::  POSGL2(:,:,:)                          !
+  real(r8), allocatable ::  O2AquaDiffusvity2(:,:,:)               !
+  real(r8), allocatable ::  DOM_SurfRunoff_flxM(:,:,:,:)           !DOM incoming flux to grid from surface runoff at iteration M [g d-2]
 
-  real(r8), allocatable ::  trcg_SnowDrift(:,:,:)                        !
-  real(r8), allocatable ::  trcn_SnowDrift(:,:,:)
-  real(r8), allocatable ::  trcg_TFloXSurRunoff(:,:,:)
-  real(r8), allocatable ::  trcn_TFloXSurRunoff_2D(:,:,:)
-  real(r8), allocatable ::  TR3MicPoreSolFlx_vr(:,:,:,:)          !total 3D micropore flux
-  real(r8), allocatable ::  TR3MacPoreSolFlx_vr(:,:,:,:)          !total 3D macropore flux
+  real(r8), allocatable ::  trcg_SnowDrift_flxM(:,:,:)             !gas incoming flux to grid from snow drift at iteration M [g d-2]
+  real(r8), allocatable ::  trcn_SnowDrift_flxM(:,:,:)             !nutrient incoming flux to grid from snow drift at iteration M [g d-2]
+  real(r8), allocatable ::  trcg_SurfRunoff_flxM(:,:,:)            !Gas incoming flux to grid from surface runoff at iteration M [g d-2]
+  real(r8), allocatable ::  trcn_SurfRunoff_flxM(:,:,:)            !Nutrient incoming flux to grid from surface runoff at iteration M [g d-2]
+  real(r8), allocatable ::  TR3MicPoreSolFlx_vr(:,:,:,:)           !total 3D micropore flux
+  real(r8), allocatable ::  TR3MacPoreSolFlx_vr(:,:,:,:)           !total 3D macropore flux
 
   real(r8), allocatable ::  GasDifctScaled_vr(:,:,:,:)            !time scaled gas diffusivity
   real(r8), allocatable ::  SoluteDifusivitytscaled_vr(:,:,:,:)
@@ -62,7 +62,7 @@ implicit none
   real(r8), allocatable ::  PARG_cef(:,:,:)                        !
 
   real(r8), allocatable ::  trcg_Ebu_vr(:,:,:,:)                      !
-  real(r8), allocatable ::  trcg_FloXSurRunoff(:,:,:)                       !
+  real(r8), allocatable ::  trcg_FloXSurRunoff_flxM(:,:,:)             !gas flux through runoff at iteration M [g d-2]
 
   real(r8), allocatable ::  trcn_FloXSurRunoff(:,:,:)                       !
   real(r8), allocatable ::  DOM_MacP2(:,:,:,:,:)                     !
@@ -74,24 +74,24 @@ implicit none
 
   real(r8), allocatable ::  trcg_TBLS_snvr(:,:,:,:)                      !
   real(r8), allocatable ::  trcn_TBLS(:,:,:,:)
-  real(r8), allocatable ::  dom_2DFloXSurRunoffM(:,:,:,:,:,:)                   !
+  real(r8), allocatable ::  DOM_2DFloXSurRunoff_flxM(:,:,:,:,:,:)                   !
   real(r8), allocatable ::  trcg_2DFloXSurRunoffM(:,:,:,:,:)                    !
 
   real(r8), allocatable :: trc_gasml2_vr(:,:,:,:)
   real(r8), allocatable :: trc_solml2_vr(:,:,:,:)
   real(r8), allocatable :: trc_soHml2_vr(:,:,:,:)
 
-  real(r8), allocatable ::  trcn_2DSnowDrift(:,:,:,:)                      !
-  real(r8), allocatable ::  trcg_2DSnowDrift(:,:,:,:)                      !
-  real(r8), allocatable ::  trcn_2DFloXSurRunoffM(:,:,:,:,:)                    !
+  real(r8), allocatable ::  trcn_SnowDrift_flxM_2D(:,:,:,:)                      !nutrient flux through snow drift at iteration M 
+  real(r8), allocatable ::  trcg_SnowDrift_flxM_2D(:,:,:,:)                      !gas flux through snow drift at iteration M 
+  real(r8), allocatable ::  trcn_2DFloXSurRunoffM(:,:,:,:,:)                     !
                   !
   real(r8), allocatable ::  RGas_Disol_FlxMM_vr(:,:,:,:)         !gas dissolution (>0 into aqueous phase)
   real(r8), allocatable ::  RGasADFlxMM_3D(:,:,:,:,:)            !3D gas flux advection + diffusion
   real(r8), allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)           !total 3D gas flux advection + diffusion
 
-  real(r8), allocatable :: R3PoreSoHFlx_3D(:,:,:,:,:)           !3D macropore flux
-  real(r8), allocatable :: R3PoreSolFlx_3D(:,:,:,:,:)           !3D micropore flux
-  real(r8), allocatable :: RMac2MicSolFlx_vr(:,:,:,:)           !Mac-mic pore exchange flux
+  real(r8), allocatable :: R3PoreSoHFlx_3D(:,:,:,:,:)            !3D macropore flux
+  real(r8), allocatable :: R3PoreSolFlx_3D(:,:,:,:,:)            !3D micropore flux
+  real(r8), allocatable :: trcs_Mac2MicPore_flxM_vr(:,:,:,:)     !Mac to micropore nutrient flux at iteration M [g d-2]
 !----------------------------------------------------------------------
 
 contains
@@ -115,16 +115,16 @@ contains
   allocate(trcg_RFL0(idg_beg:idg_NH3,JY,JX));      trcg_RFL0=0._r8
   allocate(trcn_RFL0(ids_nut_beg:ids_nuts_end,JY,JX));      trcn_RFL0=0._r8
   allocate(trcs_RFL1(ids_beg:ids_end,JY,JX));      trcs_RFL1=0._r8
-  allocate(DOM_XPoreTransp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_XPoreTransp_flx=0._r8
+  allocate(DOM_Mac2MicPore_flxM_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Mac2MicPore_flxM_vr=0._r8
   allocate(POSGL2(0:JZ,JY,JX)); POSGL2=0._r8
   allocate(O2AquaDiffusvity2(0:JZ,JY,JX)); O2AquaDiffusvity2=0._r8
 
-  allocate(dom_TFloXSurRunoff(idom_beg:idom_end,1:jcplx,JY,JX)); dom_TFloXSurRunoff=0._r8
+  allocate(DOM_SurfRunoff_flxM(idom_beg:idom_end,1:jcplx,JY,JX)); DOM_SurfRunoff_flxM=0._r8
 
-  allocate(trcg_SnowDrift(idg_beg:idg_NH3,JY,JX));      trcg_SnowDrift=0._r8
-  allocate(trcn_SnowDrift(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_SnowDrift=0._r8
-  allocate(trcg_TFloXSurRunoff(idg_beg:idg_NH3,JY,JX)); trcg_TFloXSurRunoff=0._r8
-  allocate(trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TFloXSurRunoff_2D=0._r8
+  allocate(trcg_SnowDrift_flxM(idg_beg:idg_NH3,JY,JX));      trcg_SnowDrift_flxM=0._r8
+  allocate(trcn_SnowDrift_flxM(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_SnowDrift_flxM=0._r8
+  allocate(trcg_SurfRunoff_flxM(idg_beg:idg_NH3,JY,JX)); trcg_SurfRunoff_flxM=0._r8
+  allocate(trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,JY,JX));trcn_SurfRunoff_flxM=0._r8
 
 
   allocate(GasDifctScaled_vr(idg_beg:idg_end,JZ,JY,JX)); GasDifctScaled_vr=0._r8
@@ -150,7 +150,7 @@ contains
   allocate(RBGCSinkSoluteM_vr(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkSoluteM_vr=0._r8
 
   allocate(trcg_Ebu_vr(idg_beg:idg_end,JZ,JY,JX));   trcg_Ebu_vr                        = 0._r8
-  allocate(trcg_FloXSurRunoff(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff           = 0._r8
+  allocate(trcg_FloXSurRunoff_flxM(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff_flxM           = 0._r8
   allocate(trcn_FloXSurRunoff(ids_nut_beg:ids_nuts_end,JV,JH));     trcn_FloXSurRunoff  = 0._r8
   allocate(DOM_MacP2(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_MacP2                     = 0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx = 0._r8
@@ -163,26 +163,26 @@ contains
   allocate(trcg_TBLS_snvr(idg_beg:idg_NH3,JS,JY,JX));   trcg_TBLS_snvr = 0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS     = 0._r8
 
-  allocate(dom_2DFloXSurRunoffM(idom_beg:idom_end,1:jcplx,2,2,JV,JH));dom_2DFloXSurRunoffM = 0._r8
+  allocate(DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_2DFloXSurRunoff_flxM = 0._r8
   allocate(trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,2,2,JV,JH));  trcg_2DFloXSurRunoffM       = 0._r8
 
   allocate(trc_gasml2_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2_vr(:,:,:,:) = 0._r8
   allocate(trc_solml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2_vr(:,:,:,:) = 0._r8
   allocate(trc_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2_vr(:,:,:,:) = 0._r8
 
-  allocate(trcg_2DSnowDrift(idg_beg:idg_NH3,2,JV,JH));    trcg_2DSnowDrift                    = 0._r8
+  allocate(trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,2,JV,JH));    trcg_SnowDrift_flxM_2D                    = 0._r8
   allocate(trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_2DFloXSurRunoffM = 0._r8
   allocate(RGasADFlxMM_3D(idg_beg:idg_NH3,3,JD,JV,JH));RGasADFlxMM_3D                             = 0._r8
   allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_Flx_vr                     = 0._r8
 
   allocate(RGas_Disol_FlxMM_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGas_Disol_FlxMM_vr = 0._r8
 
-  allocate(trcn_2DSnowDrift(ids_nut_beg:ids_nuts_end,2,JV,JH)); trcn_2DSnowDrift = 0._r8
+  allocate(trcn_SnowDrift_flxM_2D(ids_nut_beg:ids_nuts_end,2,JV,JH)); trcn_SnowDrift_flxM_2D = 0._r8
 
 
   allocate(R3PoreSoHFlx_3D(ids_beg:ids_end,3,JD,JV,JH));R3PoreSoHFlx_3D       = 0._r8
   allocate(R3PoreSolFlx_3D(ids_beg:ids_end,3,0:JD,JV,JH));R3PoreSolFlx_3D     = 0._r8
-  allocate(RMac2MicSolFlx_vr(ids_beg:ids_end,JZ,JY,JX));RMac2MicSolFlx_vr     = 0._r8
+  allocate(trcs_Mac2MicPore_flxM_vr(ids_beg:ids_end,JZ,JY,JX));trcs_Mac2MicPore_flxM_vr     = 0._r8
   allocate(TR3MicPoreSolFlx_vr(ids_beg:ids_end,JZ,JY,JX));TR3MicPoreSolFlx_vr = 0._r8
   allocate(TR3MacPoreSolFlx_vr(ids_beg:ids_end,JZ,JY,JX));TR3MacPoreSolFlx_vr = 0._r8
   allocate(trcg_VFloSnow(idg_beg:idg_end));trcg_VFloSnow                      = 0._r8
@@ -206,25 +206,25 @@ contains
   call destroy(DOM_MacpTranspFlxM_3D)
   call destroy(RBGCSinkSoluteM_vr)
   call destroy(dom_FloXSurRunoff)
-  call destroy(dom_2DFloXSurRunoffM)
+  call destroy(DOM_2DFloXSurRunoff_flxM)
   call destroy(DOM_Flo2LitrM)
   call destroy(DOM_Flo2TopSoilM)
   call destroy(trcg_VFloSnow)
   call destroy(trcs_RFL1)
   call destroy(trcn_RFL0)
-  call destroy(DOM_XPoreTransp_flx)
+  call destroy(DOM_Mac2MicPore_flxM_vr)
   call destroy(trcg_advW_snvr)
   call destroy(trcn_RBLS)
   call destroy(trcg_Ebu_vr)
   call destroy(RBGCSinkGasMM_vr)
   call destroy(POSGL2)
   call destroy(O2AquaDiffusvity2)
-  call destroy(trcg_FloXSurRunoff)
-  call destroy(dom_TFloXSurRunoff)
-  call destroy(trcg_TFloXSurRunoff)
-  call destroy(trcn_TFloXSurRunoff_2D)
-  call destroy(trcg_SnowDrift)
-  call destroy(trcn_SnowDrift)
+  call destroy(trcg_FloXSurRunoff_flxM)
+  call destroy(DOM_SurfRunoff_flxM)
+  call destroy(trcg_SurfRunoff_flxM)
+  call destroy(trcn_SurfRunoff_flxM)
+  call destroy(trcg_SnowDrift_flxM)
+  call destroy(trcn_SnowDrift_flxM)
   call destroy(TR3MicPoreSolFlx_vr)
   call destroy(trcg_VLWatMicP_vr)
   call destroy(trcn_FloXSurRunoff)
@@ -248,7 +248,7 @@ contains
   call destroy(trcg_TBLS_snvr)
   call destroy(trcn_TBLS)
   call destroy(trcg_RFL0)
-  call destroy(trcg_2DSnowDrift)
+  call destroy(trcg_SnowDrift_flxM_2D)
   call destroy(TR3MacPoreSolFlx_vr)
 
   call destroy(DOM_MacP2)
@@ -260,10 +260,10 @@ contains
   call destroy(trcn_soil_VFloSnow)
   call destroy(trcg_2DFloXSurRunoffM)
   call destroy(RGas_Disol_FlxMM_vr)
-  call destroy(trcn_2DSnowDrift)
+  call destroy(trcn_SnowDrift_flxM_2D)
   call destroy(R3PoreSoHFlx_3D)
   call destroy(R3PoreSolFlx_3D)
-  call destroy(RMac2MicSolFlx_vr)
+  call destroy(trcs_Mac2MicPore_flxM_vr)
 
   call destroy(DOM_Adv2MacP_flx)
   call destroy(DOM_Transp2Macp_flx)

@@ -775,10 +775,10 @@ implicit none
   TIceBySnowRedist(NY,NX)      = 0.0_r8
   THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
-  trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
+  trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
   trcg_QSS(idg_beg:idg_end-1,NY,NX)                      = 0.0_r8
   trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)               = 0.0_r8
-  trcg_TFloXSurRunoff(idg_beg:idg_end-1,NY,NX)           = 0.0_r8
+  trcg_SurfRunoff_flxM(idg_beg:idg_end-1,NY,NX)           = 0.0_r8
 
   DO  L=1,JS
     trcg_TBLS(idg_beg:idg_end-1,L,NY,NX)=0.0_r8

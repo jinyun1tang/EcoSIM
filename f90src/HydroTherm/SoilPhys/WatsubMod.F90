@@ -914,7 +914,7 @@ module WatsubMod
               .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                     ! it is soil
               !  NO runoff
               IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RechargSurf,0._r8) .OR. &
-                ABS(WatFlux4ErosionM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+                ABS(SurfRunoffWatFluxM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
 
                 !runoff
               ELSE
