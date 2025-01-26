@@ -96,7 +96,7 @@ implicit none
              dOrGM  = dOrGM-OrGM_beg
              tdOrGM = tdOrGM+dOrGM
           ELSE
-            trcs_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+            trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
             RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
             Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
           ENDIF
@@ -105,7 +105,7 @@ implicit none
           call DownwardMixOM(I,J,L,NY,NX,FracLitrMix_vr(L,NY,NX))
 
         ELSE
-          trcs_RMicbTransf_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+          trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
           RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
           Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
         ENDIF
@@ -387,12 +387,12 @@ implicit none
   tRHydlyBioReSOM_vr(1:NumPlantChemElms,L,NY,NX) = micflx%tRHydlyBioReSOM
   tRHydlySoprtOM_vr(1:NumPlantChemElms,L,NY,NX)  = micflx%tRHydlySoprtOM
 
-  trcs_RMicbTransf_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
-  trcs_RMicbTransf_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
-  trcs_RMicbTransf_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
-  trcs_RMicbTransf_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
-  trcs_RMicbTransf_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
-  trcs_RMicbTransf_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+  trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
+  trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
+  trcs_RMicbUptake_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
+  trcs_RMicbUptake_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
+  trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
+  trcs_RMicbUptake_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
   RNutMicbTransf_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNutMicbTransf_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
   RNutMicbTransf_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil

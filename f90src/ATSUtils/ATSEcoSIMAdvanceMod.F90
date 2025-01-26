@@ -110,7 +110,7 @@ implicit none
       Qinfl2MicP = Qinfl2MicPM+Qinfl2MicPM
       Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
-     !also update state variables for each M 
+      !also update state variables for iteration M 
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO

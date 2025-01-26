@@ -163,13 +163,10 @@ module BoundaryTranspMod
 !
             call OverLandTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
 !
-!     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
-!
-            
           ENDDO D9575
 !
 !     NET GAS AND SOLUTE FLUXES IN EACH GRID CELL
-!C
+!
 !     NET OVERLAND SOLUTE FLUX IN WATER
 !
           call NetTracerFlowOverLandMM(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)

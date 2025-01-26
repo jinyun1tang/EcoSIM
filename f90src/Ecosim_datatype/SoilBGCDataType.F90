@@ -40,7 +40,7 @@ implicit none
   real(r8),target,allocatable ::  MoistSensDecomp_vr(:,:,:)          !moisture dependence of microbial activity
   real(r8),target,allocatable ::  SurfGasDifFlx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink, [g d-2 t-1]
-  real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)              !soil gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)          !soil gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]
   real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)            !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)             !total fertilizer P amendment, [g d-2]
@@ -66,7 +66,7 @@ implicit none
   real(r8),target,allocatable ::  UION_col(:,:)                      !total soil ion content, [mol d-2]
   real(r8),target,allocatable ::  HydroIonFlx_CumYr_col(:,:)         !total subsurface ion flux, [mol d-2]
   real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcs_RMicbTransf_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_RMicbUptake_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)          !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoDOMProd_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
   real(r8),target,allocatable ::  RDOMMicProd_vr(:,:,:,:,:)          !microbial dom flux, > 0 into soil [g d-2 h-1]
@@ -94,15 +94,15 @@ implicit none
   real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)           !<0., active gas bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_col(:,:,:)            !vertically integrated ebullition flux [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)        !plant-aided gas transport flux [g d-2 h-1]
-  real(r8),target,allocatable ::  RProd_Hp_vr(:,:,:)                       !total H+ production
+  real(r8),target,allocatable ::  RProd_Hp_vr(:,:,:)                 !total H+ production 
   real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowSoiMacP_3D(:,:,:,:)       !water flux macropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatFlow2Soil_3D(:,:,:,:)          !convective heat flux micropore, [MJ d-2 h-1]
   real(r8),target,allocatable ::  CO2_Prod_TP_cumRes_col(:,:)        !Cumulative difference in CO2 belowground production and transport [gC d-2]
-  real(r8),target,allocatable ::  trcs_TransptMicP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_TransptMicP_3D(:,:,:,:,:)     !tracer solute transport in micropore [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)     !DOC flux micropore, [g d-2 h-1]
 
-  real(r8),target,allocatable ::  trcs_TransptMacP_3D(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcs_TransptMacP_3D(:,:,:,:,:)     !tracer solute transport in macropore [g d-2 h-1]
   real(r8),target,allocatable ::  Gas_3DAdvDif_Flx_vr(:,:,:,:,:)     !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_3DMacp_Transp_flx(:,:,:,:,:,:) !DOC flux macropore, [g d-2 h-1]
 
@@ -196,7 +196,7 @@ implicit none
   allocate(UION_col(JY,JX));        UION_col=0._r8
   allocate(HydroIonFlx_CumYr_col(JY,JX));      HydroIonFlx_CumYr_col=0._r8
   allocate(RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNutMicbTransf_vr=0._r8
-  allocate(trcs_RMicbTransf_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcs_RMicbTransf_vr=0._r8
+  allocate(trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcs_RMicbUptake_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
 
   allocate(REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));REcoDOMProd_vr=0._r8
@@ -344,7 +344,7 @@ implicit none
   call destroy(HeatFlow2Soil_3D)
   call destroy(DOM_MicpTransp_3D)
   call destroy(DOM_3DMacp_Transp_flx)
-  call destroy(trcs_RMicbTransf_vr)
+  call destroy(trcs_RMicbUptake_vr)
   end subroutine DestructSoilBGCData
 
 end module SoilBGCDataType

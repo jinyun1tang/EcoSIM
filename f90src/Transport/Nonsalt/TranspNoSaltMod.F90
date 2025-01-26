@@ -75,9 +75,10 @@ module TranspNoSaltMod
   integer :: MX,MM
   integer :: M
   real(r8) :: WaterFlow2Soil(3,JD,JV,JH)
-  real(r8) :: trcsol_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX)  !solute tracer flux due to irrigation
+  real(r8) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)  !solute tracer flux due to irrigation
   real(r8) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3,JY,JX)
   real(r8) :: RGasAtmDisol2SoilM(idg_beg:idg_end,JY,JX)
+
 !     execution begins here
   call PrintInfo('beg '//subname)
 !
@@ -86,7 +87,7 @@ module TranspNoSaltMod
 
   WaterFlow2Soil(:,:,:,:)=0._r8
 
-  call InitFluxStateVars(I,J,NHW,NHE,NVN,NVS,trcsol_Irrig_flx_vr)
+  call InitFluxStateVars(I,J,NHW,NHE,NVN,NVS,trcsol_Irrig_flxM_vr)
 
 !
 ! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
@@ -106,22 +107,21 @@ module TranspNoSaltMod
     call XBoundaryFluxMM(M,MX,NHW,NHE,NVN,NVS)
 
     ! UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
-    IF(MM.NE.NPG)call UpdateStateVarMM(I,J,M,MM,MX,NPG,NHW,NHE,NVN,NVS,trcsol_Irrig_flx_vr,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
+    IF(MM.NE.NPG)call UpdateStateVarMM(I,J,M,MM,MX,NPG,NHW,NHE,NVN,NVS,trcsol_Irrig_flxM_vr,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
 
     !MX records the M location in the moisture-heat calculation
     MX=M
   ENDDO
   call PrintInfo('end '//subname)
   
-  RETURN
   END subroutine TranspNoSalt
 !------------------------------------------------------------------------------------------
 
-  subroutine InitFluxStateVars(I,J,NHW,NHE,NVN,NVS,trcsol_Irrig_flx_vr)
+  subroutine InitFluxStateVars(I,J,NHW,NHE,NVN,NVS,trcsol_Irrig_flxM_vr)
   implicit none
 
   integer, intent(in) :: I, J,NHW,NHE,NVN,NVS
-  real(r8), intent(out) :: trcsol_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX)
+  real(r8), intent(out) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)   !solute flux due to irrigation
   character(len=*), parameter :: subname='InitFluxStateVars'
   integer :: NX,NY
 
@@ -141,67 +141,26 @@ module TranspNoSaltMod
 !
 !     dts_gas=1/number of cycles h-1 for gas flux calculations
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     R*SK2=total sink from nitro.f, uptake.f, solute.f
-!     RCO2NetUptkMicb=net soil CO2 uptake from nitro.f
-!     RCH4UptkAutor=net soil CH4 uptake from nitro.f
-!     RN2NetUptkMicb=total soil N2 production from nitro.f
-!     MicrbN2Fix=total N2 fixation from nitro.f
-!     RN2O=net soil N2O uptake from nitro.f
-!     RH2NetUptkMicb=net H2 uptake from nitro.f
-!     RNH4MicbTransfSoil_vr=net change in NH4 from nitro.f
-!     TR_NH4_soil,TR_NH3_soil_vr=NH4,NH3 dissolution from solute.f
-!     RNO3MicbTransfSoil_vr=net change in NO3 from nitro.f
-!     TRNO3=NO3 dissolution from solute.f
-!     RNO2MicbTransfSoil_vr=net change in NO2 from nitro.f
-!     TRNO2=NO2 dissolution from solute.f
-!     RH2PO4MicbTransfSoil_vr=net change in H2PO4 from nitro.f
-!     TR_H2PO4_soil=H2PO4 dissolution from solute.f
-!     RH1PO4MicbTransfSoil_vr=net change in HPO4 from nitro.f
-!     TR_H1PO4_soil=HPO4 dissolution from solute.f
 !
       call SurfaceSinksandSources(NY,NX)
 !
 !     INITIALIZE STATE VARIABLES FOR USE IN GAS, SOLUTE FLUX CALCULATIONS
-!
-!     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 content
-
-!     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4
 !     PH=pH
 !
-      call CopyStates4Transport(NY,NX)
+      call CopyLitterTracer4Transport(NY,NX)
 !
 !     INITIALIZE SURFACE SOLUTE FLUXES FROM ATMOSPHERE
 !
-!     X*FLS,X*FHS=hourly solute flux in macropores,micropores
-!
-      call SurfaceSolutefromAtms(NY,NX)
+      call ZeroSurfaceSoluteAtmosFlux(NY,NX)
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IN SNOWFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-!     SnoFalPrec,RainFalPrec_col=snow,rain
-!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
-!     X*BLS=hourly solute flux to snowpack
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
-!     C*R,C*Q=precipitation,irrigation solute concentrations
-!     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
-!
-      call HourlySoluteFluxes(I,J,NY,NX)
+      call PrecipitationSoluteInput(I,J,NY,NX)
+
 !     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
 !     ENTERED IN SITE FILE
-!
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     R*BLS,R*FL0,R*FL1,R*FL2=solute flux to snowpack,surface litter,soil surface non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
 !
       call SubHourlyFluxesFromSiteFile(NY,NX)
 !
@@ -209,19 +168,19 @@ module TranspNoSaltMod
 !
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
-      call ImportFluxFromOutsideModules(I,NY,NX,trcsol_Irrig_flx_vr)
+      call ImportFluxFromOtherModules(I,NY,NX,trcsol_Irrig_flxM_vr)
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine InitFluxStateVars
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateStateVarMM(I,J,M,MM,MX,NPG,NHW,NHE,NVN,NVS,trcsol_Irrig_flx_vr,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
+  subroutine UpdateStateVarMM(I,J,M,MM,MX,NPG,NHW,NHE,NVN,NVS,trcsol_Irrig_flxM_vr,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, MM
   integer, intent(in) :: MX,NPG, NHW, NHE, NVN, NVS
-  real(r8), intent(in) :: trcsol_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX)
+  real(r8), intent(in) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)
   REAL(R8), intent(in) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3,JY,JX)
   real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end,JY,JX)
 
@@ -239,7 +198,7 @@ module TranspNoSaltMod
         call UpdateSurfTracerM(NY,NX,RGasAtmDisol2LitrM(:,NY,NX),RGasAtmDisol2SoilM(:,NY,NX))
       ENDIF
 !
-      call UpdateSoilTracersMM(I,J,M,MX,NY,NX,trcsol_Irrig_flx_vr)
+      call UpdateSoilTracersMM(I,J,M,MX,NY,NX,trcsol_Irrig_flxM_vr)
 !
 !     GAS EXCHANGE IN SURFACE LITTER
 !
@@ -358,11 +317,11 @@ module TranspNoSaltMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSoilTracersMM(I,J,M,MX,NY,NX,trcsol_Irrig_flx_vr)
+  subroutine UpdateSoilTracersMM(I,J,M,MX,NY,NX,trcsol_Irrig_flxM_vr)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NY,NX,MX
-  real(r8), intent(in) :: trcsol_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX)
+  real(r8), intent(in) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)
   integer :: L,K,idg,ids,idom
 
 !     STATE VARIABLES FOR SOLUTES IN MICROPORES AND
@@ -382,11 +341,11 @@ module TranspNoSaltMod
 !     R*BBL=bubble flux
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
+
     IF(M.NE.MX)THEN
-      IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        
+      IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN        
         DO ids=ids_beg,ids_end
-          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+trcsol_Irrig_flx_vr(ids,L,NY,NX)
+          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+trcsol_Irrig_flxM_vr(ids,L,NY,NX)
         ENDDO
 
         DO idg=idg_beg,idg_end        
@@ -441,26 +400,28 @@ module TranspNoSaltMod
   integer, intent(in) :: NY, NX
 
   integer :: K,idom
-
+  !dts_gas=1/NPG with NPG=NPH*NPT
+  !dts_HeatWatTP=1/NPT  
   !no O2 below 
-  RBGCSinkG_vr(idg_CO2,0,NY,NX) = trcs_RMicbTransf_vr(idg_CO2,0,NY,NX)*dts_gas
-  RBGCSinkG_vr(idg_CH4,0,NY,NX) = trcs_RMicbTransf_vr(idg_CH4,0,NY,NX)*dts_gas
-  RBGCSinkG_vr(idg_N2,0,NY,NX)  = (trcs_RMicbTransf_vr(idg_N2,0,NY,NX)+Micb_N2Fixation_vr(0,NY,NX))*dts_gas
-  RBGCSinkG_vr(idg_N2O,0,NY,NX) = trcs_RMicbTransf_vr(idg_N2O,0,NY,NX)*dts_gas
-  RBGCSinkG_vr(idg_H2,0,NY,NX)  = trcs_RMicbTransf_vr(idg_H2,0,NY,NX)*dts_gas
-  RBGCSinkG_vr(idg_NH3,0,NY,NX) = 0.0_r8
 
-  RBGCSinkS_vr(idg_NH3,0,NY,NX)   = -TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP  
-  RBGCSinkS_vr(ids_NH4,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NH4,0,NY,NX)+trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS_vr(ids_NO3,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NO3,0,NY,NX)+trcn_RChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS_vr(ids_NO2,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NO2,0,NY,NX)+trcn_RChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS_vr(ids_H2PO4,0,NY,NX) = -(RNutMicbTransf_vr(ids_H2PO4,0,NY,NX)+trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkS_vr(ids_H1PO4,0,NY,NX) = -(RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)+trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkGasMM_vr(idg_CO2,0,NY,NX) = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)*dts_gas
+  RBGCSinkGasMM_vr(idg_CH4,0,NY,NX) = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)*dts_gas
+  RBGCSinkGasMM_vr(idg_N2,0,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,0,NY,NX)+Micb_N2Fixation_vr(0,NY,NX))*dts_gas
+  RBGCSinkGasMM_vr(idg_N2O,0,NY,NX) = trcs_RMicbUptake_vr(idg_N2O,0,NY,NX)*dts_gas
+  RBGCSinkGasMM_vr(idg_H2,0,NY,NX)  = trcs_RMicbUptake_vr(idg_H2,0,NY,NX)*dts_gas
+  RBGCSinkGasMM_vr(idg_NH3,0,NY,NX) = 0.0_r8
+
+  RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_NH4,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NH4,0,NY,NX)+trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_NO3,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NO3,0,NY,NX)+trcn_RChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_NO2,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NO2,0,NY,NX)+trcn_RChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_H2PO4,0,NY,NX) = -(RNutMicbTransf_vr(ids_H2PO4,0,NY,NX)+trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_H1PO4,0,NY,NX) = -(RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)+trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
 
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
 
-  subroutine CopyStates4Transport(NY,NX)
+  subroutine CopyLitterTracer4Transport(NY,NX)
   implicit none
 
   integer, intent(in) :: NY, NX
@@ -471,12 +432,6 @@ module TranspNoSaltMod
   DO idg=idg_beg,idg_NH3
     trc_solml2_vr(idg,0,NY,NX)=trc_solml_vr(idg,0,NY,NX)
   ENDDO
-  !reset DOM to value before the iteration
-  D9979: DO K=1,jcplx
-    DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)
-    ENDDO
-  ENDDO D9979
 
 ! exclude banded nutrient
   DO ids=ids_nut_beg,ids_nuts_end
@@ -490,10 +445,17 @@ module TranspNoSaltMod
   trc_solml2_vr(ids_NH4B,0,NY,NX)   = trc_solml2_vr(ids_NH4,0,NY,NX)
   trc_solml2_vr(idg_NH3B,0,NY,NX)   = trc_solml2_vr(idg_NH3,0,NY,NX)
 
-  end subroutine CopyStates4Transport
+  !reset DOM to value before the iteration
+  D9979: DO K=1,jcplx
+    DO idom=idom_beg,idom_end
+      DOM_MicP2(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)
+    ENDDO
+  ENDDO D9979
+
+  end subroutine CopyLitterTracer4Transport
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfaceSolutefromAtms(NY,NX)
+  subroutine ZeroSurfaceSoluteAtmosFlux(NY,NX)
   implicit none
   integer, intent(in) :: NY, NX
   integer :: K
@@ -505,16 +467,19 @@ module TranspNoSaltMod
     DOM_MicpTransp_3D(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
     DOM_3DMacp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
   ENDDO D8855
-  end subroutine SurfaceSolutefromAtms
+
+  end subroutine ZeroSurfaceSoluteAtmosFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine HourlySoluteFluxes(I,J,NY,NX)
+  subroutine PrecipitationSoluteInput(I,J,NY,NX)
   implicit none
 
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   integer :: idg
-  IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
+
+  IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. &   !snow fall
+    (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN !rainfall with snowpack
 
     DO idg=idg_beg,idg_end-1
       trcVolatile_Xbndl_flx_snvr(idg,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
@@ -538,26 +503,14 @@ module TranspNoSaltMod
 !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-  ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8.OR.IrrigSurface_col(NY,NX).GT.0.0_r8) &
-    .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
+  ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) & !Irrigation or rainfall
+    .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN     !no snowpack
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
 !
-!     PrecAtm_col,PRECI=snow+rain,irrigation
-!     X*BLS=hourly solute flux to snowpack
-!     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
-!     FLQGQ,FLQGI=water flux to soil surface from rain,irrigation
-!     C*R,C*Q=precipitation,irrigation solute concentrations
-!     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
-!
-    trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
-    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
+    trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1,NY,NX) = 0.0_r8
+    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX)      = 0.0_r8
     do idg=idg_beg,idg_NH3
       trcs_TransptMicP_3D(idg,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
         +Irrig2LitRSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
@@ -599,8 +552,8 @@ module TranspNoSaltMod
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
   ELSE
-    trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
-    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
+    trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1,NY,NX) = 0.0_r8
+    trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1,NY,NX)      = 0.0_r8
 
     trcs_TransptMicP_3D(idg_beg:idg_end-1,3,0,NY,NX)        = 0.0_r8
     trcs_TransptMicP_3D(ids_nut_beg:ids_nuts_end,3,0,NY,NX) = 0.0_r8
@@ -610,7 +563,7 @@ module TranspNoSaltMod
 
   trcs_TransptMacP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)=0.0_r8
 
-  end subroutine HourlySoluteFluxes
+  end subroutine PrecipitationSoluteInput
 !------------------------------------------------------------------------------------------
 
   subroutine SubHourlyFluxesFromSiteFile(NY,NX)
@@ -622,20 +575,22 @@ module TranspNoSaltMod
 
   DO  K=1,micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      RDOMFL0(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,0,NY,NX)*dts_HeatWatTP    
-      RDOMFL1(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+      DOM_Flo2LitrM(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,0,NY,NX)*dts_HeatWatTP    
+      DOM_Flo2TopSoilM(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
     ENDDO
   enddo
 
+  !gas flux into snow
   DO idg=idg_beg,idg_end-1
     trcg_advW_snvr(idg_CO2,1,NY,NX)=trcVolatile_Xbndl_flx_snvr(idg_CO2,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
+  !nutrient flux
   DO idn=ids_nut_beg,ids_nuts_end
     trcn_RBLS(idn,1,NY,NX)=trcn_Xbndl_flx(idn,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
-  DO idg=idg_beg,idg_end-1
+  DO idg=idg_beg,idg_NH3
     trcg_RFL0(idg,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
@@ -651,17 +606,10 @@ module TranspNoSaltMod
 !     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'
 !     + EQUILIBRIA REACTIONS IN 'SOLUTE' AT SUB-HOURLY TIME STEP
 !
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     *SGL*=solute diffusivity from hour1.f
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     PARR=boundary layer conductance above litter from watsub.f
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
   DO ids=ids_beg,ids_end
-    SoluteDifusvtytscal_vr(ids,0,NY,NX)=SoluteDifusvty_vr(ids,0,NY,NX)*dts_HeatWatTP
+    SoluteDifusivitytscaled_vr(ids,0,NY,NX)=SoluteDifusvty_vr(ids,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO idom=idom_beg,idom_end
@@ -670,57 +618,45 @@ module TranspNoSaltMod
 !
 !     INITIAL SOLUTES IN SNOWPACK
 !
-!     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
-!
   DO L=1,JS
-    trcg_solsml2_snvr(idg_beg:idg_end-1,L,NY,NX)        = trcg_solsml_snvr(idg_beg:idg_end-1,L,NY,NX)
+    trcg_solsml2_snvr(idg_beg:idg_NH3,L,NY,NX)          = trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)
     trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
   enddo
   end subroutine SubHourlyFluxesFromSiteFile
 !------------------------------------------------------------------------------------------
 
-  subroutine ImportFluxFromOutsideModules(I,NY,NX,trcsol_Irrig_flx_vr)
+  subroutine ImportFluxFromOtherModules(I,NY,NX,trcsol_Irrig_flxM_vr)
 
   implicit none
   integer, intent(in) ::  I,NY, NX
-  real(r8), intent(out) :: trcsol_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX)
+  real(r8), intent(out) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)
 
   integer :: L,K,idg,ids,idom
 
   DO L=NU(NY,NX),NL(NY,NX)
 
-    RBGCSinkG_vr(idg_CO2,L,NY,NX) = (trcs_RMicbTransf_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_gchem_soil_vr(L,NY,NX))*dts_gas
-    RBGCSinkG_vr(idg_CH4,L,NY,NX) = (trcs_RMicbTransf_vr(idg_CH4,L,NY,NX) +trcs_plant_uptake_vr(idg_CH4,L,NY,NX))*dts_gas
-    RBGCSinkG_vr(idg_N2,L,NY,NX)  = (trcs_RMicbTransf_vr(idg_N2,L,NY,NX)  +trcs_plant_uptake_vr(idg_N2,L,NY,NX)+Micb_N2Fixation_vr(L,NY,NX))*dts_gas
-    RBGCSinkG_vr(idg_N2O,L,NY,NX) = (trcs_RMicbTransf_vr(idg_N2O,L,NY,NX) +trcs_plant_uptake_vr(idg_N2O,L,NY,NX))*dts_gas
-    RBGCSinkG_vr(idg_H2,L,NY,NX)  = (trcs_RMicbTransf_vr(idg_H2,L,NY,NX)  +trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
-    RBGCSinkG_vr(idg_NH3,L,NY,NX) = -TR_NH3_geochem_vr(L,NY,NX)*dts_gas
+    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_gchem_soil_vr(L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_CH4,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CH4,L,NY,NX) +trcs_plant_uptake_vr(idg_CH4,L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_N2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,L,NY,NX)  +trcs_plant_uptake_vr(idg_N2,L,NY,NX)+Micb_N2Fixation_vr(L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_N2O,L,NY,NX) = (trcs_RMicbUptake_vr(idg_N2O,L,NY,NX) +trcs_plant_uptake_vr(idg_N2O,L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_H2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_H2,L,NY,NX)  +trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TR_NH3_geochem_vr(L,NY,NX)*dts_gas
 
-    RBGCSinkS_vr(ids_NH4,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NH4,L,NY,NX)-trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(idg_NH3,L,NY,NX)   = (-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_NO3,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO3,L,NY,NX)-trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_NO2,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO2,L,NY,NX)-trcn_RChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_H2PO4,L,NY,NX) = (-RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_H1PO4,L,NY,NX) = (-RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NH4,L,NY,NX)-trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)   = (-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO3,L,NY,NX)-trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO2,L,NY,NX)-trcn_RChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H1PO4,L,NY,NX) = (-RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
 
-    RBGCSinkS_vr(ids_NH4B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(idg_NH3B,L,NY,NX)   = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_NO3B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_NO2B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO2B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_H2PO4B,L,NY,NX) = (-RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkS_vr(ids_H1PO4B,L,NY,NX) = (-RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NH4B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX)   = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO3B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO2B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO2B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H2PO4B,L,NY,NX) = (-RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H1PO4B,L,NY,NX) = (-RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
-!
-!     FLU=subsurface water flux from watsub.f
-!     R*FLU,R*FBU=subsurface solute flux in non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     C*Q=irrigation solute concentrations
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     trcs_Irrig_vr(idg_CO2,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_CO2,NY,NX)
     trcs_Irrig_vr(idg_CH4,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcVolatile_irrig_conc(idg_CH4,NY,NX)
@@ -746,58 +682,38 @@ module TranspNoSaltMod
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
     DO ids=ids_beg,ids_end
-      trcsol_Irrig_flx_vr(ids,L,NY,NX)=trcs_Irrig_vr(ids,L,NY,NX)*dts_HeatWatTP
+      trcsol_Irrig_flxM_vr(ids,L,NY,NX)=trcs_Irrig_vr(ids,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
-!
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     dts_gas=1/number of cycles h-1 for gas flux calculations
-!     *SGL*=solute diffusivity from hour1.f
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
     DO idom=idom_beg,idom_end
       DOMdiffusivity2_vr(idom,L,NY,NX)=DOMdiffusivity_vr(idom,L,NY,NX)*dts_HeatWatTP
     enddo
 
     DO ids=ids_beg,ids_end
-      SoluteDifusvtytscal_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
+      SoluteDifusivitytscaled_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
     DO idg=idg_beg,idg_end
-      GasDifc_vrc(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
+      GasDifctScaled_vr(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
     ENDDO
 !
 !     STATE VARIABLES FOR GASES AND SOLUTES USED IN 'TranspNoSalt'
 !     TO STORE SUB-HOURLY CHANGES DURING FLUX CALCULATIONS
 !     INCLUDING TRANSFORMATIONS FROM NITRO.F, UPTAKE.F AND SOLUTE.F
-!
-!     CO2G,CH4G,OXYG,ZN3G,Z2GG,Z2OG,H2GG=gaseous CO2,CH4,O2,NH3,N2,N2O,H2
-!     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
-
-!     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores
-!     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in non-band micropores
-!     ZNH4B,ZNH3B,ZNO3B,ZNO2B,H1POB,H2POB=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band micropores
-!     CO2SH,CH4SH,OXYSH,Z2GSH,Z2OSH,H2GSH=aqueous CO2,CH4,O2,N2,N2O,H2 content in macropores
-!     ZNH4SH,ZNH3SH,ZNO3SH,ZNO2SH,H1PO4H,H2PO4H=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in non-band macropores
-!     ZNH4BH,ZNH3BH,ZNO3BH,ZNO2BH,H1POBH,H2POBH=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band macropores
-! exclude NH3B
-    DO idg=idg_beg,idg_end-1
+    ! exclude NH3B
+    DO idg=idg_beg,idg_NH3
       trc_gasml2_vr(idg,L,NY,NX)=trc_gasml_vr(idg,L,NY,NX)
     ENDDO
 
     !reset DOM to value before the iteration
     !Concern: RDOMMicProd_vr includes microbial modification of DOM
     !it does not include exchange among different complexes (as one kind of microbial priming). 
+
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
         DOM_MicP2(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)
-!        if(DOM_MicP2(idom,K,L,NY,NX)<0._r8)then
-!        print*,'nosaltmode',DOM_MicP2(idom,K,L,NY,NX),RDOMMicProd_vr(idom,K,L,NY,NX)
-!        endif
         DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
       ENDDO
     enddo
@@ -815,7 +731,7 @@ module TranspNoSaltMod
     ENDDO
 
   enddo
-  end subroutine ImportFluxFromOutsideModules
+  end subroutine ImportFluxFromOtherModules
 !
 
 end module TranspNoSaltMod

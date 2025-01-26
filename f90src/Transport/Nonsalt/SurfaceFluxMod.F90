@@ -51,10 +51,12 @@ contains
   real(r8) :: FLWRM1
   real(r8) :: trcs_cl1(ids_beg:ids_end)
   real(r8) :: trcs_cl2(ids_beg:ids_end)
-  real(r8) :: RFLs_adv(ids_beg:ids_end)
+  real(r8) :: solute_adv_flxM(ids_beg:ids_end)
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
   real(r8) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
 
 
 !     VLWatMicPM,VLWatMacPM,VLsoiAirPM,ReductVLsoiAirPM=micropore,macropore water volume, air volume and change in air volume
@@ -99,22 +101,20 @@ contains
 
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
-  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,RFLs_adv)
+  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv2MicP_flxM)
 !
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
 !     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  call LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,SDifFlx)
+  call LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,&
+    SDifFlx,DOM_Difus_Micp_flxM)
 
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
-!
-!     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
-!     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
-!
-  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,RFLs_adv,trcg_FloSno2LitR,trcn_FloSno2LitR)
+  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_FloSno2LitR,trcn_FloSno2LitR,&
+    DOM_Adv2MicP_flxM,DOM_Difus_Micp_flxM)
 
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
@@ -134,15 +134,23 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,RFLs_adv)
+  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv2MicP_flxM)
+  !
+  ! Description:
+  ! Litter and top soil tracer exchange by (upstream) advection
+  !
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
-  real(r8),intent(out) :: RFLs_adv(ids_beg:ids_end)
+  real(r8),intent(out) :: solute_adv_flxM(ids_beg:ids_end)
   real(r8),intent(out) :: FLWRM1    !water flow from litter to soil at iteration M
+  real(r8),intent(out) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
+
+  character(len=*), parameter :: subname='LitterSoilTracerXAdvectionM'
   REAL(R8) :: VFLW
   integer :: K,nnut,idom,idg,nnut1
 
+  call PrintInfo('beg '//subname)
   FLWRM1=WatFLo2LitrM(M,NY,NX)
 !
 !     FLWRM=litter-soil water flux from watsub.f
@@ -162,6 +170,7 @@ contains
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
+  !litter to soil
   IF(FLWRM1.GT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VLWatMicPM_vr(M,0,NY,NX)))
@@ -170,43 +179,29 @@ contains
     ENDIF
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,NY,NX))
+        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,NY,NX))
       ENDDO
     ENDDO
 
+    !all volatiles
     DO idg=idg_beg,idg_end
-      RFLs_adv(idg)=VFLW*AZMAX1(trc_solml2_vr(idg,0,NY,NX))
+      solute_adv_flxM(idg)=VFLW*AZMAX1(trc_solml2_vr(idg,0,NY,NX))
     enddo
 
     !from NH4 to H2PO4
     DO nnut=ids_nut_beg,ids_nuts_end
-      RFLs_adv(nnut)=VFLW*AZMAX1(trc_solml2_vr(nnut,0,NY,NX))*trcs_VLN_vr(nnut,NU(NY,NX),NY,NX)
+      solute_adv_flxM(nnut)=VFLW*AZMAX1(trc_solml2_vr(nnut,0,NY,NX))*trcs_VLN_vr(nnut,NU(NY,NX),NY,NX)
     ENDDO
 
     !from NH4B to ids_H2PO4B
     DO nnut=0,ids_nuts     
       nnut1=ids_NH4B+nnut
-      RFLs_adv(nnut1)=VFLW*AZMAX1(trc_solml2_vr(nnut+ids_NH4,0,NY,NX))*trcs_VLN_vr(nnut1,NU(NY,NX),NY,NX)
+      solute_adv_flxM(nnut1)=VFLW*AZMAX1(trc_solml2_vr(nnut+ids_NH4,0,NY,NX))*trcs_VLN_vr(nnut1,NU(NY,NX),NY,NX)
     ENDDO
 
-    RFLs_adv(idg_NH3B)=VFLW*AZMAX1(trc_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU(NY,NX),NY,NX)
+    solute_adv_flxM(idg_NH3B)=VFLW*AZMAX1(trc_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU(NY,NX),NY,NX)
 
-!
-!     IF WATER FLUX FROM 'WATSUB' IS TO RESIDUE FROM
-!     SOIL SURFACE THEN CONVECTIVE TRANSPORT IS THE PRODUCT
-!     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
-!     IN SOIL SURFACE
-!
-!     VLWatMicPM=micropore water-filled porosity from watsub.f
-!     RFL*=soil-litter convective solute flux
-!     *S2=soil solute content
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!
+! flow from soil to litter
   ELSE
     IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
@@ -215,29 +210,31 @@ contains
     ENDIF
     DO K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
       ENDDO
     ENDDO
 
     DO nnut=ids_beg,ids_end
-      RFLs_adv(nnut)=VFLW*AZMAX1(trc_solml2_vr(nnut,NU(NY,NX),NY,NX))
+      solute_adv_flxM(nnut)=VFLW*AZMAX1(trc_solml2_vr(nnut,NU(NY,NX),NY,NX))
     ENDDO
   ENDIF
   end subroutine LitterSoilTracerXAdvectionM
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,SDifFlx)
+  subroutine LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,&
+    SDifFlx,DOM_Difus_Micp_flxM)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
-  real(r8), intent(in) :: FLWRM1
+  real(r8), intent(in) :: FLWRM1                      !water flow from litter to soil
   real(r8), intent(in) :: trcs_cl1(ids_beg:ids_end)
   real(r8), intent(in) :: trcs_cl2(ids_beg:ids_end)
   real(r8), intent(in) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
   real(r8), intent(in) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
-
   real(r8), intent(out):: SDifFlx(ids_beg:ids_end)
+  real(r8), intent(out):: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
 
+  character(len=*), parameter :: subname='LitterSoilTracerDiffusionM'
   real(r8) :: TORT0,TORT1
   real(r8) :: DLYR0,DLYR1
   real(r8) :: DIFDOM(idom_beg:idom_end)
@@ -251,6 +248,7 @@ contains
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !
+  call PrintInfo('beg '//subname)
   IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
     .AND. (VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 !
@@ -282,8 +280,8 @@ contains
       DIFDOM(idom) = DIFDOM0*DIFDOM1/(DIFDOM0+DIFDOM1)*AREA(3,NU(NY,NX),NY,NX)
     ENDDO
     DO nnut=ids_beg,ids_end
-      DIF0        = (SoluteDifusvtytscal_vr(nnut,0,NY,NX)*TORT0+DISPN)
-      DIF1        = (SoluteDifusvtytscal_vr(nnut,NU(NY,NX),NY,NX)*TORT1+DISPN)
+      DIF0        = (SoluteDifusivitytscaled_vr(nnut,0,NY,NX)*TORT0+DISPN)
+      DIF1        = (SoluteDifusivitytscaled_vr(nnut,NU(NY,NX),NY,NX)*TORT1+DISPN)
       SDifc(nnut) = DIF0*DIF1/(DIF0+DIF1)*AREA(3,NU(NY,NX),NY,NX)
     ENDDO
 
@@ -299,10 +297,10 @@ contains
 !
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        Difus_Micp_flx_DOM(idom,K)=DIFDOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))
+        DOM_Difus_Micp_flxM(idom,K)=DIFDOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))
       ENDDO
     ENDDO
-!exclude NH3B and NH3
+    !exclude NH3B and NH3
     DO idg=idg_beg,idg_end-2
         SDifFlx(idg)=SDifc(idg)*(trcs_cl1(idg)-trcs_cl2(idg))
     ENDDO
@@ -312,24 +310,28 @@ contains
     ENDDO
   ELSE
     DO  K=1,jcplx
-      Difus_Micp_flx_DOM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Difus_Micp_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine LitterSoilTracerDiffusionM
-
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,RFLs_adv,trcg_FloSno2LitR,trcn_FloSno2LitR)
+  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_FloSno2LitR,trcn_FloSno2LitR,&
+    DOM_Adv2MicP_flxM,DOM_Difus_Micp_flxM)
   use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NY, NX
   real(r8), intent(in) :: SDifFlx(ids_beg:ids_end)
-  real(r8), intent(in) :: RFLs_adv(ids_beg:ids_end)
+  real(r8), intent(in) :: solute_adv_flxM(ids_beg:ids_end)
   real(r8), intent(in) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
   real(r8), intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
+  real(r8), intent(in) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(in) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+
   integer :: K,ntg,idom,nts
 
 !     R*FLS=convective + diffusive solute flux between litter, soil surface
@@ -345,36 +347,36 @@ contains
   !litter layer
   DO K=1,micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)=RDOMFL0(idom,K,NY,NX)-DOM_Adv2MicP_flx(idom,K)-Difus_Micp_flx_DOM(idom,K)
-      DOM_MicpTranspFlxM_3D(idom,K,3,NU(NY,NX),NY,NX)=RDOMFL1(idom,K,NY,NX)+DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)         = DOM_Flo2LitrM(idom,K,NY,NX)-DOM_Adv2MicP_flxM(idom,K)-DOM_Difus_Micp_flxM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,3,NU(NY,NX),NY,NX) = DOM_Flo2TopSoilM(idom,K,NY,NX)+DOM_Adv2MicP_flxM(idom,K)+DOM_Difus_Micp_flxM(idom,K)
     ENDDO
   ENDDO
 
   DO ntg=idg_beg,idg_NH3
-    R3PoreSolFlx_3D(ntg,3,0,NY,NX)=trcg_RFL0(ntg,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
+    R3PoreSolFlx_3D(ntg,3,0,NY,NX)=trcg_RFL0(ntg,NY,NX)+trcg_FloSno2LitR(ntg)-solute_adv_flxM(ntg)-SDifFlx(ntg)
   ENDDO
 
   do nts=ids_nut_beg,ids_nuts_end
-    R3PoreSolFlx_3D(nts,3,0,NY,NX)=trcn_RFL0(nts,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
+    R3PoreSolFlx_3D(nts,3,0,NY,NX)=trcn_RFL0(nts,NY,NX)+trcn_FloSno2LitR(nts)-solute_adv_flxM(nts)-SDifFlx(nts)
   enddo
-  R3PoreSolFlx_3D(idg_NH3,3,0,NY,NX)=R3PoreSolFlx_3D(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
-  R3PoreSolFlx_3D(ids_NH4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  R3PoreSolFlx_3D(ids_NO3,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)
-  R3PoreSolFlx_3D(ids_NO2,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)
-  R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  R3PoreSolFlx_3D(idg_NH3,3,0,NY,NX)=R3PoreSolFlx_3D(idg_NH3,3,0,NY,NX)-solute_adv_flxM(idg_NH3B)-SDifFlx(idg_NH3B)
+  R3PoreSolFlx_3D(ids_NH4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NH4,3,0,NY,NX)-solute_adv_flxM(ids_NH4B)-SDifFlx(ids_NH4B)
+  R3PoreSolFlx_3D(ids_NO3,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NO3,3,0,NY,NX)-solute_adv_flxM(ids_NO3B)-SDifFlx(ids_NO3B)
+  R3PoreSolFlx_3D(ids_NO2,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NO2,3,0,NY,NX)-solute_adv_flxM(ids_NO2B)-SDifFlx(ids_NO2B)
+  R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)-solute_adv_flxM(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)-solute_adv_flxM(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
   !top soil
   DO ntg=idg_beg,idg_NH3
-    R3PoreSolFlx_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_RFL1(ntg,NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
+    R3PoreSolFlx_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_RFL1(ntg,NY,NX)+trcg_VFloSnow(ntg)+solute_adv_flxM(ntg)+SDifFlx(ntg)
   ENDDO
 
   do nts=ids_nut_beg,ids_nuts_end
-    R3PoreSolFlx_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    R3PoreSolFlx_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_soil_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
 
   do nts=ids_nutb_beg,ids_nutb_end
-    R3PoreSolFlx_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    R3PoreSolFlx_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_band_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -385,42 +387,42 @@ contains
   DO K=1,micpar%NumOfLitrCmplxs
     do idom=idom_beg,idom_end
       DOM_MicpTransp_3D(idom,K,3,0,NY,NX)=DOM_MicpTransp_3D(idom,K,3,0,NY,NX) &
-        -DOM_Adv2MicP_flx(idom,K)-Difus_Micp_flx_DOM(idom,K)
+        -DOM_Adv2MicP_flxM(idom,K)-DOM_Difus_Micp_flxM(idom,K)
       DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)=DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX) &
-        +DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+        +DOM_Adv2MicP_flxM(idom,K)+DOM_Difus_Micp_flxM(idom,K)
     ENDDO
   ENDDO
 
   do ntg=idg_beg,idg_NH3
-    trcs_TransptMicP_3D(ntg,3,0,NY,NX)=trcs_TransptMicP_3D(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-RFLs_adv(ntg)-SDifFlx(ntg)
+    trcs_TransptMicP_3D(ntg,3,0,NY,NX)=trcs_TransptMicP_3D(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-solute_adv_flxM(ntg)-SDifFlx(ntg)
   ENDDO
 !  write(116,*)I+J/24.,M,'tp30',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_TransptMicP_3D(nts,3,0,NY,NX)=trcs_TransptMicP_3D(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-RFLs_adv(nts)-SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,0,NY,NX)=trcs_TransptMicP_3D(nts,3,0,NY,NX)+trcn_FloSno2LitR(nts)-solute_adv_flxM(nts)-SDifFlx(nts)
   enddo
 
-!  write(116,*)I+J/24.,M,'tp31',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),trcn_FloSno2LitR(ids_NO3),-RFLs_adv(ids_NO3),-SDifFlx(ids_NO3)
+!  write(116,*)I+J/24.,M,'tp31',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),trcn_FloSno2LitR(ids_NO3),-solute_adv_flxM(ids_NO3),-SDifFlx(ids_NO3)
 
-  trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)=trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)  
-  trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
-  trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)  
-  trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)-RFLs_adv(ids_NO2B)-SDifFlx(ids_NO2B)  
-  trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)=trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)-solute_adv_flxM(idg_NH3B)-SDifFlx(idg_NH3B)  
+  trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)-solute_adv_flxM(ids_NH4B)-SDifFlx(ids_NH4B)
+  trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)-solute_adv_flxM(ids_NO3B)-SDifFlx(ids_NO3B)  
+  trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)=trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)-solute_adv_flxM(ids_NO2B)-SDifFlx(ids_NO2B)  
+  trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)-solute_adv_flxM(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)=trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)-solute_adv_flxM(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
-!  write(116,*)I+J/24.,M,'tp32',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),-RFLs_adv(ids_NO3B),-SDifFlx(ids_NO3B)  
+!  write(116,*)I+J/24.,M,'tp32',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),-solute_adv_flxM(ids_NO3B),-SDifFlx(ids_NO3B)  
 
   do ntg=idg_beg,idg_NH3
-    trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
+    trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+solute_adv_flxM(ntg)+SDifFlx(ntg)
   enddo
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
 
   do nts=ids_nutb_beg,ids_nutb_end
-    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
   end subroutine SurfLayerNetTracerFluxM
 !------------------------------------------------------------------------------------------
@@ -434,6 +436,9 @@ contains
   real(r8) :: VLWatMacPS,VOLWT
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: SAdvFlx(ids_beg:ids_end)
+  real(r8) :: DOM_Adv2MicP_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: DOM_Difus_Micp_flxM(idom_beg:idom_end,1:jcplx)
+
 !
 !     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
@@ -456,7 +461,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))
       enddo
     ENDDO
 
@@ -480,7 +485,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
       enddo
     ENDDO
 
@@ -498,7 +503,7 @@ contains
 !
   ELSE
     DO  K=1,jcplx      
-      DOM_Adv2MicP_flx(idom_beg:idom_end,K)=0.0_r8
+      DOM_Adv2MicP_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO
     SAdvFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -524,7 +529,7 @@ contains
     DO K = 1, jcplx
       !diffusion flux in micropore
       do idom=idom_beg,idom_end
-        Difus_Micp_flx_DOM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))*VLWatMicPM_vr(M,NU(NY,NX),NY,NX) &
+        DOM_Difus_Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))*VLWatMicPM_vr(M,NU(NY,NX),NY,NX) &
           -AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
       enddo
     ENDDO
@@ -549,7 +554,7 @@ contains
 
   ELSE
     DO  K=1,jcplx
-      Difus_Micp_flx_DOM(idom_beg:idom_end,K)=0.0_r8
+      DOM_Difus_Micp_flxM(idom_beg:idom_end,K)=0.0_r8
     ENDDO
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
@@ -566,7 +571,7 @@ contains
 !
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flx(idom,K)+Difus_Micp_flx_DOM(idom,K)
+      DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)=DOM_Adv2MicP_flxM(idom,K)+DOM_Difus_Micp_flxM(idom,K)
     enddo
   ENDDO
 
@@ -959,7 +964,7 @@ contains
     TORT0 = TortMicPM_vr(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR_col(NY,NX)
 
     DO idg=idg_beg,idg_NH3
-      DFGcc(idg)=SoluteDifusvtytscal_vr(idg,0,NY,NX)*TORT0
+      DFGcc(idg)=SoluteDifusivitytscaled_vr(idg,0,NY,NX)*TORT0
     ENDDO
 
     DO  K=1,jcplx
@@ -983,12 +988,6 @@ contains
 !     FROM AQUEOUS DIFFUSIVITY AND BOUNDARY LAYER CONDUCTANCE
 !
 !     PARR=boundary layer conductance above litter surface from watsub.f
-!     C*E=atmospheric gas concentration from hour1.f
-!     C*Q=equilibrium gas concentration at litter surface
-!     S*L=solubility of gas in water from hour1.f
-!     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-!             :*ZN3*=NH3,*H2G*=H2
-!     DiffusivitySolutEff*=effective solute diffusivity
 !
     DO idg=idg_beg,idg_NH3
 !     SURFACE VOLATILIZATION-DISSOLUTION FROM DIFFERENCES
@@ -1120,7 +1119,7 @@ contains
 !     CONCENTRATIONS
 !include NH3B
     DO idg=idg_beg,idg_end
-      DiffusivitySolutEff = SoluteDifusvtytscal_vr(idg,NU(NY,NX),NY,NX)*TORT1
+      DiffusivitySolutEff = SoluteDifusivitytscaled_vr(idg,NU(NY,NX),NY,NX)*TORT1
       trc_gsolc           = (CondGasXSnowM_col(M,NY,NX)*AtmGasCgperm3(idg,NY,NX)*GasSolbility_vr(idg,NU(NY,NX),NY,NX) &
         +DiffusivitySolutEff*trcs_cl2(idg))/(DiffusivitySolutEff+CondGasXSnowM_col(M,NY,NX))
 
@@ -1130,13 +1129,14 @@ contains
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !     seven gas species plus aqueous NH3 in band
 
-      trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX) = trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX)+RGasAtmDisol2SoilM(idg)    
-
-      RGas_Dif_Atm2Soil_FlxMM(idg)=RGasAtmDisol2SoilM(idg)*dt_GasCyc
+      trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX) = trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX)+RGasAtmDisol2SoilM(idg)
+      
+      RGas_Dif_Atm2Soil_FlxMM(idg)           = RGasAtmDisol2SoilM(idg)*dt_GasCyc
     ENDDO
 
   ELSE
-    RGasAtmDisol2SoilM(idg_beg:idg_end)=0.0_r8
+    RGasAtmDisol2SoilM(idg_beg:idg_end)      = 0.0_r8
+    RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end) = 0._r8
   ENDIF
 
   call PrintInfo('end '//subname)
@@ -1331,7 +1331,7 @@ contains
     *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
 
   DO idg=idg_beg,idg_NH3
-    DifuscG_vr(idg,3,NU(NY,NX),NY,NX)=DFLG2*GasDifc_vrc(idg,NU(NY,NX),NY,NX)
+    DifuscG_vr(idg,3,NU(NY,NX),NY,NX)=DFLG2*GasDifctScaled_vr(idg,NU(NY,NX),NY,NX)
 !
 !     SURFACE GAS CONCENTRATIONS
 !
