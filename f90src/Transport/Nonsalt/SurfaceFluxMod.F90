@@ -53,6 +53,8 @@ contains
   real(r8) :: trcs_cl2(ids_beg:ids_end)
   real(r8) :: RFLs_adv(ids_beg:ids_end)
   real(r8) :: SDifFlx(ids_beg:ids_end)
+  real(r8) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
+  real(r8) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
 
 
 !     VLWatMicPM,VLWatMacPM,VLsoiAirPM,ReductVLsoiAirPM=micropore,macropore water volume, air volume and change in air volume
@@ -66,8 +68,8 @@ contains
 
   VLWatMicPMA_vr(NU(NY,NX),NY,NX)      = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
   VLWatMicPMB_vr(NU(NY,NX),NY,NX)      = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
-  VLWatMicPXA_vr(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMA_vr(NU(NY,NX),NY,NX)
-  VLWatMicPXB_vr(NU(NY,NX),NY,NX)         = natomw*VLWatMicPMB_vr(NU(NY,NX),NY,NX)
+  VLWatMicPXA_vr(NU(NY,NX),NY,NX)      = natomw*VLWatMicPMA_vr(NU(NY,NX),NY,NX)
+  VLWatMicPXB_vr(NU(NY,NX),NY,NX)      = natomw*VLWatMicPMB_vr(NU(NY,NX),NY,NX)
   VLsoiAirPMA(NU(NY,NX),NY,NX)         = VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
   VLsoiAirPMB(NU(NY,NX),NY,NX)         = VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
   CumReductVLsoiAirPM(NU(NY,NX),NY,NX) = ReductVLsoiAirPM(M,NU(NY,NX),NY,NX)*dt_GasCyc
@@ -91,19 +93,19 @@ contains
 !     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in litter
 !     C*1=solute concentration in litter
 !
-  call LitterAtmosExchangeM(I,J,M,NY,NX,trcs_cl1,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
+  call LitterAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP1,trcs_cl1,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
 
-  call SoilAtmosExchangeM(I,J,M,NY,NX,trcs_cl2,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
+  call SoilAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP2,trcs_cl2,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
 
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
-  call ConvectiveSurfaceSoluteFlux(I,J,M,NY,NX,FLWRM1,RFLs_adv)
+  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,RFLs_adv)
 !
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
 !     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  call LitterSurfSoilExchange(I,J,M,NY,NX,FLWRM1,trcs_cl1,trcs_cl2,SDifFlx)
+  call LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,SDifFlx)
 
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
@@ -112,32 +114,32 @@ contains
 !     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
 !     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
 !
-  call TotalPoreFluxAdjacentCell(I,J,M,NY,NX,SDifFlx,RFLs_adv,trcg_FloSno2LitR,trcn_FloSno2LitR)
+  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,RFLs_adv,trcg_FloSno2LitR,trcn_FloSno2LitR)
 
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-  call MacMicPoresTransfer(M,NY,NX)
+  call TopSoilMicMacPoreTracerXferM(M,NY,NX)
 
 !
 !     SOLUTE TRANSPORT FROM WATER OVERLAND FLOW
 !     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
 !     IN SOIL SURFACE LAYER
 !
-  call OverLandTracerTranspt(M,NY,NX,NHE,NHW,NVS,NVN)
+  call OverLandTracerTransptM(M,NY,NX,NHE,NHW,NVS,NVN)
 
   call PrintInfo('end '//subname)
   end subroutine SoluteFluxSurfaceM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ConvectiveSurfaceSoluteFlux(I,J,M,NY,NX,FLWRM1,RFLs_adv)
+  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,RFLs_adv)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
   real(r8),intent(out) :: RFLs_adv(ids_beg:ids_end)
-  real(r8),intent(out) :: FLWRM1
+  real(r8),intent(out) :: FLWRM1    !water flow from litter to soil at iteration M
   REAL(R8) :: VFLW
   integer :: K,nnut,idom,idg,nnut1
 
@@ -189,9 +191,6 @@ contains
 
     RFLs_adv(idg_NH3B)=VFLW*AZMAX1(trc_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU(NY,NX),NY,NX)
 
-!    write(117,*)I+J/24.,M,'NO3adv',RFLs_adv(ids_NO3),VFLW,AZMAX1(trc_solml2_vr(ids_NO3,0,NY,NX)),trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
-!    write(117,*)I+J/24.,M,'NO3Badv',RFLs_adv(ids_NO3B),VFLW,AZMAX1(trc_solml2_vr(ids_NO3B,0,NY,NX)),trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
-
 !
 !     IF WATER FLUX FROM 'WATSUB' IS TO RESIDUE FROM
 !     SOIL SURFACE THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -224,16 +223,19 @@ contains
       RFLs_adv(nnut)=VFLW*AZMAX1(trc_solml2_vr(nnut,NU(NY,NX),NY,NX))
     ENDDO
   ENDIF
-  end subroutine ConvectiveSurfaceSoluteFlux
+  end subroutine LitterSoilTracerXAdvectionM
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterSurfSoilExchange(I,J,M,NY,NX,FLWRM1,trcs_cl1,trcs_cl2,SDifFlx)
+  subroutine LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,SDifFlx)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
   real(r8), intent(in) :: FLWRM1
   real(r8), intent(in) :: trcs_cl1(ids_beg:ids_end)
   real(r8), intent(in) :: trcs_cl2(ids_beg:ids_end)
+  real(r8), intent(in) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(in) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+
   real(r8), intent(out):: SDifFlx(ids_beg:ids_end)
 
   real(r8) :: TORT0,TORT1
@@ -249,8 +251,8 @@ contains
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !
-  IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
-    .AND.(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
+  IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
+    .AND. (VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 !
 !     DIFFUSIVITIES IN RESIDUE AND SOIL SURFACE
 !
@@ -314,12 +316,12 @@ contains
     ENDDO
     SDifFlx(ids_beg:ids_end)=0._r8
   ENDIF
-  end subroutine LitterSurfSoilExchange
+  end subroutine LitterSoilTracerDiffusionM
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine TotalPoreFluxAdjacentCell(I,J,M,NY,NX,SDifFlx,RFLs_adv,trcg_FloSno2LitR,trcn_FloSno2LitR)
+  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,RFLs_adv,trcg_FloSno2LitR,trcn_FloSno2LitR)
   use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: I,J,M
@@ -340,6 +342,7 @@ contains
 !     RFL*=convective flux between surface litter and soil surface
 !     DFV*=diffusive solute flux between litter and soil surface
 !
+  !litter layer
   DO K=1,micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
       DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)=RDOMFL0(idom,K,NY,NX)-DOM_Adv2MicP_flx(idom,K)-Difus_Micp_flx_DOM(idom,K)
@@ -361,6 +364,7 @@ contains
   R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)-RFLs_adv(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
   R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)-RFLs_adv(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
+  !top soil
   DO ntg=idg_beg,idg_NH3
     R3PoreSolFlx_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_RFL1(ntg,NY,NX)+trcg_VFloSnow(ntg)+RFLs_adv(ntg)+SDifFlx(ntg)
   ENDDO
@@ -418,10 +422,10 @@ contains
   do nts=ids_nutb_beg,ids_nutb_end
     trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+RFLs_adv(nts)+SDifFlx(nts)
   enddo
-  end subroutine TotalPoreFluxAdjacentCell
+  end subroutine SurfLayerNetTracerFluxM
 !------------------------------------------------------------------------------------------
 
-  subroutine MacMicPoresTransfer(M,NY,NX)
+  subroutine TopSoilMicMacPoreTracerXferM(M,NY,NX)
   implicit none
 
   integer, intent(in) :: M, NY, NX
@@ -479,6 +483,7 @@ contains
         DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
       enddo
     ENDDO
+
     do idg=idg_beg,idg_NH3-1
       SAdvFlx(idg)=VFLW*AZMAX1(trc_solml2_vr(idg,NU(NY,NX),NY,NX))
     enddo
@@ -571,13 +576,6 @@ contains
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-!     X*FXS=hourly convective + diffusive solute flux between macropores and micropores
-!     R*FXS=total convective + diffusive solute flux between macropores and micropores
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
       DOM_PoreTranspFlx(idom,K,NU(NY,NX),NY,NX)=DOM_PoreTranspFlx(idom,K,NU(NY,NX),NY,NX)+DOM_XPoreTransp_flx(idom,K,NU(NY,NX),NY,NX)
@@ -588,11 +586,10 @@ contains
     trcs_Mac2MicXfer_vr(nnut,NU(NY,NX),NY,NX)=trcs_Mac2MicXfer_vr(nnut,NU(NY,NX),NY,NX)+RMac2MicSolFlx_vr(nnut,NU(NY,NX),NY,NX)
   ENDDO
 
-!
-  end subroutine MacMicPoresTransfer
+  end subroutine TopSoilMicMacPoreTracerXferM
 !------------------------------------------------------------------------------------------
 
-  subroutine OverLandTracerTranspt(M,NY,NX,NHE,NHW,NVS,NVN)
+  subroutine OverLandTracerTransptM(M,NY,NX,NHE,NHW,NVS,NVN)
   implicit none
 
   integer, intent(in) :: M, NY, NX, NHE, NHW, NVS, NVN
@@ -831,7 +828,7 @@ contains
       ENDIF
     ENDDO D4305
   ENDDO D4310
-  end subroutine OverLandTracerTranspt
+  end subroutine OverLandTracerTransptM
 !------------------------------------------------------------------------------------------
 
   subroutine LitterGasVolatilDissolMM(I,J,M,NY,NX,RGas_Dif_Atm2Litr_FlxMM)
@@ -890,8 +887,12 @@ contains
   integer, intent(in) :: M, NY, NX
   real(r8),intent(in) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8),intent(in) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
+
+  character(len=*), parameter :: subname='SurfSoilFluxGasDifAdvMM'
   real(r8) :: VFLW
   integer :: idg
+
+  call PrintInfo('beg '//subname)
 !
 !     AirFilledSoilPoreM_vr=air-filled porosity from watsub.f
 !     SoilBulkDensity_vr=bulk density
@@ -932,21 +933,26 @@ contains
     RGasADFlxMM_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX)    = 0.0_r8
     RGas_Disol_FlxMM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX) = 0.0_r8
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine SurfSoilFluxGasDifAdvMM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterAtmosExchangeM(I,J,M,NY,NX,trcs_cl1,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
+  subroutine LitterAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP1,trcs_cl1,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
   implicit none
   integer, intent(in) :: I,J,NY,NX,M
   real(r8),intent(out) :: trcs_cl1(ids_beg:ids_end)
   real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_end-1)
   real(r8),intent(out) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3)
-  integer :: K,ids,idg,idom
+  real(r8),intent(out) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
 
+  character(len=*), parameter :: subname = 'LitterAtmosExchangeM'
+  integer :: K,ids,idg,idom
   real(r8) :: trc_gasq(idg_beg:idg_NH3)
   real(r8) :: DFGcc(idg_beg:idg_NH3)
   real(r8) :: DLYR0,TORT0
+
+  call PrintInfo('beg '//subname)
 
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0 = AMAX1(ZERO2,DLYR_3D(3,0,NY,NX)) !vertical layer thickness
@@ -1005,17 +1011,19 @@ contains
   ELSE
     RGasAtmDisol2LitrM(idg_beg:idg_NH3)=0.0_r8
   ENDIF
-
+  call PrintInfo('end '//subname)
   end subroutine LitterAtmosExchangeM
 !------------------------------------------------------------------------------------------
-  subroutine SoilAtmosExchangeM(I,J,M,NY,NX,trcs_cl2,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
+  subroutine SoilAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP2,trcs_cl2,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
 
   implicit none
-  integer, intent(in) :: I,J  
-  integer, intent(in) :: M,NY,NX
+  integer,  intent(in) :: I,J  
+  integer,  intent(in) :: M,NY,NX
   real(r8), intent(out) :: trcs_cl2(ids_beg:ids_end)
   real(r8), intent(out) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)   !diffusive gas flux from atmosphere to soil
   real(r8), intent(out) :: RGasAtmDisol2SoilM(idg_beg:idg_end)        !gas dissolve from atmosphere to top soil
+  real(r8), intent(out) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+
   character(len=*), parameter :: subname='SoilAtmosExchangeM'
 
   real(r8) :: DLYR1,TORT1,VLWatMicPOA,VLWatMicPOB,VLWatMicPPA,VLWatMicPPB

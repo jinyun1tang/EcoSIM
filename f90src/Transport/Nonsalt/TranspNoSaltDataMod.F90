@@ -19,8 +19,6 @@ implicit none
   real(r8), allocatable :: DOM_Adv2MicP_flx(:,:)
   real(r8), allocatable :: Difus_Micp_flx_DOM(:,:)
   real(r8), allocatable :: Difus_Macp_flx_DOM(:,:)
-  real(r8), allocatable :: CDOM_MicP1(:,:)
-  real(r8), allocatable :: CDOM_MicP2(:,:)
   real(r8), allocatable :: DOM_MicP2(:,:,:,:,:)
   real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:)
   real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:)
@@ -136,8 +134,6 @@ contains
   allocate(trcg_TFloXSurRunoff(idg_beg:idg_NH3,JY,JX)); trcg_TFloXSurRunoff=0._r8
   allocate(trcn_TFloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TFloXSurRunoff_2D=0._r8
 
-  allocate(CDOM_MicP1(idom_beg:idom_end,1:jcplx)); CDOM_MicP1=0._r8
-  allocate(CDOM_MicP2(idom_beg:idom_end,1:jcplx)); CDOM_MicP2=0._r8
 
   allocate(GasDifc_vrc(idg_beg:idg_end,JZ,JY,JX)); GasDifc_vrc=0._r8
   allocate(SoluteDifusvtytscal_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvtytscal_vr=0._r8
@@ -216,8 +212,7 @@ contains
   call destroy(DifuscG_vr)
   call destroy(SoluteDifusvtytscal_vr)
   call destroy(DOM_MicP2)
-  call destroy(CDOM_MicP1)
-  call destroy(CDOM_MicP2)
+
   call destroy(RDOM_CumEcoProd_vr)
   call destroy(DOM_MicpTranspFlxM_3D)
   call destroy(DOM_MacpTranspFlxM_3D)

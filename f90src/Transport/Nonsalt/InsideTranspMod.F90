@@ -427,7 +427,8 @@ module InsideTranspMod
   real(r8) :: VLWatMicP2A,VLWatMicP2B,VLWatMicP3A,VLWatMicP3B,VLWatMicP4A,VLWatMicP4B
   real(r8) :: trcsolc1(ids_beg:ids_end)
   real(r8) :: trcsolc2(ids_beg:ids_end)
-
+  real(r8) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
+  real(r8) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
   real(r8) :: SDifc(ids_beg:ids_end),SDifFlx(ids_beg:ids_end)
   real(r8) :: DISPN,DIFOM(idom_beg:idom_end)
   real(r8) :: DLYR1,DLYR2,TORTL
