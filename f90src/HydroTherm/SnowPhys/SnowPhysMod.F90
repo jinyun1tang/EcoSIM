@@ -786,8 +786,9 @@ contains
         write(*,*)'dh, TK1X, TKSnow1',I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX)
         write(*,*)'VH, tair,TKSnow0',VLHeatCapSnowM1_snvr(L,NY,NX),TairK_col(NY,NX),TKSnow_snvr(L,NY,NX)
         write(*,*)'TKS_1, TKS_0',TKS_vr(NUM(NY,NX),NY,NX),TKS_vr(0,NY,NX),VLHeatCapSnowMin_col(NY,NX)
-        write(*,*)'mass0',vdry,vwat,vice
-        write(*,*)'masst',VLDrySnoWE0M_snvr(L,NY,NX),VLWatSnow0M_snvr(L,NY,NX),VLIceSnow0M_snvr(L,NY,NX)
+        write(*,*)'energy(ENGY0, NetHeat2LayL, HeatByFT ', ENGY0, NetHeat2LayL, HeatByFrezThaw
+        write(*,*)'mass0 (dry, wat, ice): ',vdry,vwat,vice
+        write(*,*)'masst (dry, wat, ice): ',VLDrySnoWE0M_snvr(L,NY,NX),VLWatSnow0M_snvr(L,NY,NX),VLIceSnow0M_snvr(L,NY,NX)
         write(*,*)'NYNX',NY,NX
         call endrun('crazy snow temperature '//trim(mod_filename),__LINE__)      
       endif

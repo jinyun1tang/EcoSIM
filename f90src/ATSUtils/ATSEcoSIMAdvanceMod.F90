@@ -54,6 +54,7 @@ implicit none
   real(r8) :: PrecAsRain(JY,JX)
   real(r8) :: PrecAsSnow(JY,JX)
   real(r8) :: VLTSoiPore
+  real(r8) :: VPS(JY,JX)
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
@@ -74,7 +75,6 @@ implicit none
     !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
     !AREA(3,2,NY,NX)         = a_AREA3(0,NY)
 
-
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX) = a_ATKA(NY)
     !CO2E_col(NY,NX)      = atm_co2
@@ -86,7 +86,12 @@ implicit none
     !H2GE_col(NY,NX)      = atm_H2
     TairK_col(NY,NX)      = tairc(NY)
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
-    VPA(NY,NX) = vpair(NY)/1.0e6_r8
+    !VPA(NY,NX) = vpair(NY)/1.0e6_r8
+
+    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
+    VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
+    !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
+    VPA(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
     !convert WindSpeedAtm_col from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)

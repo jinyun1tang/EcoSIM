@@ -11,7 +11,7 @@ program EcoATSTest
   type (BGCSizes) :: sizes
   integer :: NY, NX, L, ii
   integer :: ncells_per_col_, ncol
-  real, dimension(3) :: rain_array = (/1.0e-4, 1.0e-4, 0.0/)
+  real, dimension(4) :: rain_array = (/5.0e-4, 5.0e-4, 5.0e-4,0.0/)
 
   NX = 1
   NYS = 1
@@ -118,7 +118,7 @@ subroutine Init_ATSEcoSIM_driver()
     !p_rain(NY) = 0.0
     !p_rain(NY) = 3.e-8*1000.0_r8*3600.0_r8
     
-    vpair(NY) = 736.3
+    vpair(NY) = 700.0
     uwind(NY) = 1.1
     
     !swrad(NY) = 400.08
