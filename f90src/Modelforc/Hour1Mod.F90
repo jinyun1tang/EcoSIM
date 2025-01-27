@@ -827,8 +827,8 @@ module Hour1Mod
   HeatXfer2SnoLay_snvr(1:JS,NY,NX)                         = 0._r8
   XPhaseChangeHeatL_snvr(1:JS,NY,NX)                       = 0._r8
   HeatSource_vr(:,NY,NX)                                   = 0._r8
-  trcVolatile_Xbndl_flx_snvr(idg_beg:idg_end-1,1:JS,NY,NX) = 0._r8
-  trcn_Xbndl_flx(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
+  trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1:JS,NY,NX) = 0._r8
+  trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
   IF(salt_model)THEN
     trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
   ENDIF

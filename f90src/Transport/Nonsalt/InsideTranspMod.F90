@@ -60,7 +60,7 @@ module InsideTranspMod
   character(len=*), parameter :: subname='ModelTracerHydroFluxMM' 
   integer :: NY,NX
   real(r8) :: FLWRM1
-  real(r8) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
+  real(r8) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
   real(r8) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
   real(r8) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
@@ -77,14 +77,14 @@ module InsideTranspMod
       IF(M.NE.MX)THEN
         !this is a new iteration for moisture-temp update
  
-        call SnowSoluteDischargeM(M,NY,NX,trcg_FloSno2LitR,trcn_FloSno2LitR)
+        call SnowSoluteDischargeM(M,NY,NX,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR)
 !
 !     SOLUTE FLUXES AT SOIL SURFACE FROM SURFACE WATER
 !     CONTEnsolutes, WATER FLUXES 'WaterFlow2Soil' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
         call SoluteFluxSurfaceM(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
-          WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
+          WaterFlow2Soil,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
           RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2SoilM(:,NY,NX),RGasAtmDisol2LitrM(:,NY,NX))
 !
       ENDIF
@@ -176,23 +176,19 @@ module InsideTranspMod
   IF(M.NE.MX)THEN
     DO  L=1,JS
       trcg_TBLS_snvr(idg_beg:idg_NH3,L,NY,NX)     = 0._r8
-      trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
+      trcn_TBLS_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
     ENDDO
 
     DO L=NU(NY,NX),NL(NY,NX)    
       DO  K=1,jcplx
-        DOM_Transp2Micp_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
-        DOM_Transp2Macp_flx(idom_beg:idom_end,K,L,NY,NX)= 0.0_r8
+        DOM_Transp2Micp_flxM_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
+        DOM_Transp2Macp_flxM_vr(idom_beg:idom_end,K,L,NY,NX)= 0.0_r8
       ENDDO
 
-      TR3MicPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
-      TR3MacPoreSolFlx_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
+      trcs_Transp2Micp_flxM_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
+      trcs_Transp2Macp_flxM_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
 !
 !     ADD SOLUTE SINKS
-!
-!     R*SK2=total flux from nitro.f, uptake.f, solute.f
-!     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in non-band micropores
-!     ZNH4B,ZNH3B,ZNO3B,ZNO2B,H1POB,H2POB=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band micropores
 !
 !     include NH3 and band nutrients
       DO nsol=ids_nuts_beg,ids_nuts_end
@@ -208,7 +204,7 @@ module InsideTranspMod
   DO L=NU(NY,NX),NL(NY,NX)
 !
 !     SOIL GAS FLUX ACCUMULATORS
-    Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
+    Gas_AdvDif_FlxMM_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     DO idg=idg_beg,idg_NH3
       if(idg/=idg_NH3)then
         trc_solml2_vr(idg,L,NY,NX)=trc_solml2_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)
@@ -411,7 +407,7 @@ module InsideTranspMod
   ENDIF
 
   DO nsol=ids_beg,ids_end
-    R3PoreSolFlx_3D(nsol,N,N6,N5,N4)=trcs_adv_flx(nsol)
+    trcs_MicpTranspFlxM_3D(nsol,N,N6,N5,N4)=trcs_adv_flx(nsol)
   ENDDO
 
   end subroutine MicroporeSoluteAdvectionM
@@ -625,7 +621,7 @@ module InsideTranspMod
   ENDIF
 
   DO nsol=ids_beg,ids_end
-    R3PoreSolFlx_3D(nsol,N,N6,N5,N4)=R3PoreSolFlx_3D(nsol,N,N6,N5,N4)+SDifFlx(nsol)
+    trcs_MicpTranspFlxM_3D(nsol,N,N6,N5,N4)=trcs_MicpTranspFlxM_3D(nsol,N,N6,N5,N4)+SDifFlx(nsol)
   ENDDO
 
   end subroutine MicroporeSoluteDiffusionM
@@ -741,7 +737,7 @@ module InsideTranspMod
   ENDIF
 
   DO nsol=ids_beg,ids_end
-    R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)=trcs_RFH(nsol)
+    trcs_MacpTranspFlxM_3D(nsol,N,N6,N5,N4)=trcs_RFH(nsol)
   ENDDO
 
   end subroutine MacroporeSoluteAdvectionM
@@ -962,7 +958,7 @@ module InsideTranspMod
     SDifHFlx(ids_beg:ids_end)=0.0_r8
   ENDIF
   DO nsol = ids_beg,ids_end
-    R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)=R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)+SDifHFlx(nsol)
+    trcs_MacpTranspFlxM_3D(nsol,N,N6,N5,N4)=trcs_MacpTranspFlxM_3D(nsol,N,N6,N5,N4)+SDifHFlx(nsol)
   ENDDO
   end subroutine MacroporeSoluteDispersionM
 
@@ -1044,8 +1040,8 @@ module InsideTranspMod
   ENDDO D9755
 
   DO nsol=ids_beg,ids_end
-    trcs_TransptMicP_3D(nsol,N,N6,N5,N4)=trcs_TransptMicP_3D(nsol,N,N6,N5,N4)+R3PoreSolFlx_3D(nsol,N,N6,N5,N4)
-    trcs_TransptMacP_3D(nsol,N,N6,N5,N4)=trcs_TransptMacP_3D(nsol,N,N6,N5,N4)+R3PoreSoHFlx_3D(nsol,N,N6,N5,N4)
+    trcs_TransptMicP_3D(nsol,N,N6,N5,N4)=trcs_TransptMicP_3D(nsol,N,N6,N5,N4)+trcs_MicpTranspFlxM_3D(nsol,N,N6,N5,N4)
+    trcs_TransptMacP_3D(nsol,N,N6,N5,N4)=trcs_TransptMacP_3D(nsol,N,N6,N5,N4)+trcs_MacpTranspFlxM_3D(nsol,N,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifusTranspM
@@ -1320,15 +1316,11 @@ module InsideTranspMod
 !
 !     PROPORTIONAL REMOVAL OF EXCESS AQUEOUS GASES
 !
-!     R*BBL=bubble flux
-!     gas code:*CO*=CO2,*CH*=CH4,*OX*=O2,*NG*=N2,*N2*=N2O,*N3*=NH3,*HG*=H2
-!     V*G2=molar gas concentration
-!
       IF(VTGAS.GT.VTATM)THEN
         DVTGAS=0.5_r8*(VTATM-VTGAS)  !<0, bubbling occurs
         DO idg=idg_beg,idg_end
-          trcg_Ebu_vr(idg,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(idg)/VTGAS)*trcg_SLX(idg)  
-          IF(trcg_Ebu_vr(idg,N3,N2,N1)<1.e-10_r8)trcg_Ebu_vr(idg,N3,N2,N1)=0._r8
+          trcg_Ebu_flxM_vr(idg,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(idg)/VTGAS)*trcg_SLX(idg)  
+          IF(trcg_Ebu_flxM_vr(idg,N3,N2,N1)<1.e-10_r8)trcg_Ebu_flxM_vr(idg,N3,N2,N1)=0._r8
         ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1336,14 +1328,14 @@ module InsideTranspMod
 !     X*BBL=hourly bubble flux
 !
         DO idg=idg_beg,idg_end
-          trcg_ebu_flx_vr(idg,N3,N2,N1)=trcg_ebu_flx_vr(idg,N3,N2,N1)+trcg_Ebu_vr(idg,N3,N2,N1) !<0, ebullition
+          trcg_ebu_flx_vr(idg,N3,N2,N1)=trcg_ebu_flx_vr(idg,N3,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1) !<0, ebullition
         ENDDO
       ELSE
-        trcg_Ebu_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
+        trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
       ENDIF
     ELSE
       iFlagEbu=1
-      trcg_Ebu_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
+      trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
     ENDIF
 
   ENDIF
@@ -1582,9 +1574,9 @@ module InsideTranspMod
     DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N6,N5,N4)=0.0_r8
   ENDDO D9750
 
-  R3PoreSolFlx_3D(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
+  trcs_MicpTranspFlxM_3D(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
-  R3PoreSoHFlx_3D(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
+  trcs_MacpTranspFlxM_3D(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
   RGasADFlxMM_3D(idg_beg:idg_NH3,N,N6,N5,N4)=0.0_r8
   end subroutine ZeroTransport1MM
@@ -1604,8 +1596,8 @@ module InsideTranspMod
     DOM_MacpTranspFlxM_3D(idom_beg:idom_end,K,N,N3,N2,N1) = 0.0_r8
   ENDDO D9751
 
-  R3PoreSolFlx_3D(ids_beg:ids_end,N,N3,N2,N1) = 0.0_r8
-  R3PoreSoHFlx_3D(ids_beg:ids_end,N,N3,N2,N1) = 0.0_r8
+  trcs_MicpTranspFlxM_3D(ids_beg:ids_end,N,N3,N2,N1) = 0.0_r8
+  trcs_MacpTranspFlxM_3D(ids_beg:ids_end,N,N3,N2,N1) = 0.0_r8
   RGasADFlxMM_3D(idg_beg:idg_NH3,N,N3,N2,N1)    = 0.0_r8
   end subroutine ZeroTransport2MM
 end module InsideTranspMod

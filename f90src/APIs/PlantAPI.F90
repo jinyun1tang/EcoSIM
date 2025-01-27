@@ -670,7 +670,7 @@ implicit none
   plt_ew%TairK                        = TairK_col(NY,NX)
   plt_rad%LWRadGrnd                   = LWRadGrnd(NY,NX)
   plt_rad%LWRadSky_col                = LWRadSky_col(NY,NX)
-  plt_ew%VPA                          = VPA(NY,NX)
+  plt_ew%VPA                          = VPA_col(NY,NX)
   plt_distb%XCORP                     = XTillCorp_col(NY,NX)
   plt_site%SolarNoonHour_col          = SolarNoonHour_col(NY,NX)
   plt_site%ZEROS2                     = ZEROS2(NY,NX)

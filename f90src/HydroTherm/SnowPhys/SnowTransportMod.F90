@@ -65,13 +65,13 @@ implicit none
         !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
         !
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
-            -trcVolatile_Xbndl_flx_snvr(NTG,LS2,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_AquaAdv_flx_snvr(NTG,LS,N2,N1) &
+            -trcg_AquaAdv_flx_snvr(NTG,LS2,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
-            -trcn_Xbndl_flx(NTN,LS2,N2,N1)
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_AquaAdv_flx_snvr(NTN,LS,N2,N1) &
+            -trcn_AquaAdv_flx_snvr(NTN,LS2,N2,N1)
         ENDDO
         !
         !     NET SALT FLUXES THROUGH SNOWPACK
@@ -102,13 +102,13 @@ implicit none
 
         ! and NH3B
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1) &
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_AquaAdv_flx_snvr(NTG,LS,N2,N1) &
             -trcs_TransptMicP_3D(NTG,3,0,N2,N1)-trcs_TransptMicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
             -trcs_TransptMacP_3D(NTG,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1) &
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_AquaAdv_flx_snvr(NTN,LS,N2,N1) &
             -trcs_TransptMicP_3D(NTN,3,0,N2,N1)-trcs_TransptMicP_3D(NTN,3,NUM(N2,N1),N2,N1) &
             -trcs_TransptMacP_3D(NTN,3,NUM(N2,N1),N2,N1)
         ENDDO
@@ -144,11 +144,11 @@ implicit none
       IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcVolatile_Xbndl_flx_snvr(NTG,LS,N2,N1)
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_AquaAdv_flx_snvr(NTG,LS,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_Xbndl_flx(NTN,LS,N2,N1)
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_AquaAdv_flx_snvr(NTN,LS,N2,N1)
         ENDDO
 
         IF(salt_model)THEN

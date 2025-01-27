@@ -62,9 +62,9 @@ implicit none
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA_col(:,:)                           !air temperature, [oC]
   real(r8),target,allocatable ::  TairK_col(:,:)                         !air temperature, [K]
-  real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                            !wind speed, [m h-1]
-  real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
-  real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
+  real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                  !wind speed, [m h-1]
+  real(r8),target,allocatable ::  VPA_col(:,:)                           !atmospheric vapor concentration, [m3 m-3]
+  real(r8),target,allocatable ::  VPK_col(:,:)                           !atmospheric vapor pressure, [kPa]
   real(r8),target,allocatable ::  PBOT_col(:,:)                          !atmospheric pressure [kPa]
   real(r8),target,allocatable ::  DayLensCurr_col(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
@@ -199,7 +199,7 @@ implicit none
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
-  allocate(VPA(JY,JX));         VPA=0._r8
+  allocate(VPA_col(JY,JX));         VPA_col=0._r8
   allocate(VPK_col(JY,JX));         VPK_col=0._r8
   allocate(PBOT_col(JY,JX));        PBOT_col=1.01325E+02_r8
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
@@ -328,7 +328,7 @@ implicit none
   call destroy(TCA_col)
   call destroy(TairK_col)
   call destroy(WindSpeedAtm_col)
-  call destroy(VPA)
+  call destroy(VPA_col)
   call destroy(VPK_col)
   call destroy(PBOT_col)
   call destroy(DayLensCurr_col)

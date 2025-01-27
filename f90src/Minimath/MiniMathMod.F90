@@ -23,6 +23,7 @@ module minimathmod
   public :: fixEXflux
   public :: yearday,isletter
   public :: dssign
+  public :: flux_mass_limiter
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -392,6 +393,24 @@ module minimathmod
 
   end function isletter
 
+! ----------------------------------------------------------------------
 
-
+  function flux_mass_limiter(flux,massa,massb)result(ans)
+  !
+  !limit flux by massa and massb 
+  !assuming
+  !massa=massa+flux
+  !massb=massb-flux
+  implicit none
+  real(r8), intent(in) :: flux
+  real(r8), intent(in) :: massa
+  real(r8), intent(in) :: massb
+  
+  real(r8) :: ans
+  if(flux>0._r8)then
+    ans=AMIN1(flux,massb)-tiny_val
+  else 
+    ans=-AMIN1(-flux,massa)+tiny_val
+  endif
+  end function flux_mass_limiter
 end module minimathmod

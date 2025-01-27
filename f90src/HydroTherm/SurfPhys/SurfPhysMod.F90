@@ -237,7 +237,7 @@ contains
   !TKQ=temperature in canopy air, Kelvin
 
   !write(*,*) "For VPQ_col and TKQ calc:"
-  !write(*,*) "VPA(NY,NX) = ", VPA(NY,NX)
+  !write(*,*) "VPA_col(NY,NX) = ", VPA_col(NY,NX)
   !write(*,*) "TLEX_col(NY,NX) = ", TLEX_col(NY,NX)
   !write(*,*) "EvapLHTC = ", EvapLHTC
   !write(*,*) "NY = ", NY
@@ -248,7 +248,7 @@ contains
   !write(*,*) "TSHX_col(NY,NX) = ", TSHX_col(NY,NX)
   !write(*,*) "SpecHeatCapAir = ", SpecHeatCapAir
 
-  VPQ_col(NY,NX) = VPA(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
+  VPQ_col(NY,NX) = VPA_col(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
   TKQ_col(NY,NX) = TairK_col(NY,NX)-TSHX_col(NY,NX)/(SpecHeatCapAir*AREA(3,NUM(NY,NX),NY,NX))
 
   end subroutine SetCanopyProperty

@@ -33,13 +33,13 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SoluteFluxSurfaceM(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
-    WaterFlow2Soil,trcg_FloSno2LitR,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
+    WaterFlow2Soil,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
     RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2SoilM,RGasAtmDisol2LitrM)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX,M
   integer, intent(in) :: NHE,NHW,NVS,NVN
-  real(r8),intent(in) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
+  real(r8),intent(in) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
   real(r8),intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8),intent(inout) :: WaterFlow2Soil(3,JD,JV,JH)
   real(r8),intent(out) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
@@ -113,7 +113,7 @@ contains
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
-  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_FloSno2LitR,trcn_FloSno2LitR,&
+  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,&
     DOM_Adv_Mac2MicP_flxM,DOM_Difus_Mac2Micp_flxM)
 
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
@@ -319,7 +319,7 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_FloSno2LitR,trcn_FloSno2LitR,&
+  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,SDifFlx,solute_adv_flxM,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,&
     DOM_Adv_Mac2MicP_flxM,DOM_Difus_Mac2Micp_flxM)
   use EcoSiMParDataMod, only : micpar
   implicit none
@@ -327,7 +327,7 @@ contains
   integer, intent(in) :: NY, NX
   real(r8), intent(in) :: SDifFlx(ids_beg:ids_end)
   real(r8), intent(in) :: solute_adv_flxM(ids_beg:ids_end)
-  real(r8), intent(in) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
+  real(r8), intent(in) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
   real(r8), intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8), intent(in) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
   real(r8), intent(in) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
@@ -353,30 +353,30 @@ contains
   ENDDO
 
   DO ntg=idg_beg,idg_NH3
-    R3PoreSolFlx_3D(ntg,3,0,NY,NX)=trcg_RFL0(ntg,NY,NX)+trcg_FloSno2LitR(ntg)-solute_adv_flxM(ntg)-SDifFlx(ntg)
+    trcs_MicpTranspFlxM_3D(ntg,3,0,NY,NX)=trcg_RFL0(ntg,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(ntg)-solute_adv_flxM(ntg)-SDifFlx(ntg)
   ENDDO
 
   do nts=ids_nut_beg,ids_nuts_end
-    R3PoreSolFlx_3D(nts,3,0,NY,NX)=trcn_RFL0(nts,NY,NX)+trcn_FloSno2LitR(nts)-solute_adv_flxM(nts)-SDifFlx(nts)
+    trcs_MicpTranspFlxM_3D(nts,3,0,NY,NX)=trcn_RFL0(nts,NY,NX)+trcn_FloSno2LitR(nts)-solute_adv_flxM(nts)-SDifFlx(nts)
   enddo
-  R3PoreSolFlx_3D(idg_NH3,3,0,NY,NX)=R3PoreSolFlx_3D(idg_NH3,3,0,NY,NX)-solute_adv_flxM(idg_NH3B)-SDifFlx(idg_NH3B)
-  R3PoreSolFlx_3D(ids_NH4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NH4,3,0,NY,NX)-solute_adv_flxM(ids_NH4B)-SDifFlx(ids_NH4B)
-  R3PoreSolFlx_3D(ids_NO3,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NO3,3,0,NY,NX)-solute_adv_flxM(ids_NO3B)-SDifFlx(ids_NO3B)
-  R3PoreSolFlx_3D(ids_NO2,3,0,NY,NX)=R3PoreSolFlx_3D(ids_NO2,3,0,NY,NX)-solute_adv_flxM(ids_NO2B)-SDifFlx(ids_NO2B)
-  R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H1PO4,3,0,NY,NX)-solute_adv_flxM(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
-  R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)=R3PoreSolFlx_3D(ids_H2PO4,3,0,NY,NX)-solute_adv_flxM(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
+  trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)-solute_adv_flxM(idg_NH3B)-SDifFlx(idg_NH3B)
+  trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)-solute_adv_flxM(ids_NH4B)-SDifFlx(ids_NH4B)
+  trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)-solute_adv_flxM(ids_NO3B)-SDifFlx(ids_NO3B)
+  trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)-solute_adv_flxM(ids_NO2B)-SDifFlx(ids_NO2B)
+  trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)-solute_adv_flxM(ids_H1PO4B)-SDifFlx(ids_H1PO4B)
+  trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)-solute_adv_flxM(ids_H2PO4B)-SDifFlx(ids_H2PO4B)
 
   !top soil
   DO ntg=idg_beg,idg_NH3
-    R3PoreSolFlx_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_RFL1(ntg,NY,NX)+trcg_VFloSnow(ntg)+solute_adv_flxM(ntg)+SDifFlx(ntg)
+    trcs_MicpTranspFlxM_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_RFL1(ntg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(ntg)+solute_adv_flxM(ntg)+SDifFlx(ntg)
   ENDDO
 
   do nts=ids_nut_beg,ids_nuts_end
-    R3PoreSolFlx_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_soil_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
+    trcs_MicpTranspFlxM_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_AquaADV_Snow2Soil_flxM(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
 
   do nts=ids_nutb_beg,ids_nutb_end
-    R3PoreSolFlx_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_band_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
+    trcs_MicpTranspFlxM_3D(nts,3,NU(NY,NX),NY,NX)=trcs_RFL1(nts,NY,NX)+trcn_AquaADV_Snow2Band_flxM(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -394,7 +394,7 @@ contains
   ENDDO
 
   do ntg=idg_beg,idg_NH3
-    trcs_TransptMicP_3D(ntg,3,0,NY,NX)=trcs_TransptMicP_3D(ntg,3,0,NY,NX)+trcg_FloSno2LitR(ntg)-solute_adv_flxM(ntg)-SDifFlx(ntg)
+    trcs_TransptMicP_3D(ntg,3,0,NY,NX)=trcs_TransptMicP_3D(ntg,3,0,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(ntg)-solute_adv_flxM(ntg)-SDifFlx(ntg)
   ENDDO
 !  write(116,*)I+J/24.,M,'tp30',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)
 
@@ -414,15 +414,16 @@ contains
 !  write(116,*)I+J/24.,M,'tp32',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),-solute_adv_flxM(ids_NO3B),-SDifFlx(ids_NO3B)  
 
   do ntg=idg_beg,idg_NH3
-    trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)+trcg_VFloSnow(ntg)+solute_adv_flxM(ntg)+SDifFlx(ntg)
+    trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ntg,3,NU(NY,NX),NY,NX)+ &
+      trcg_AquaADV_Snow2Soil_flxM(ntg)+solute_adv_flxM(ntg)+SDifFlx(ntg)
   enddo
 
   do nts=ids_nut_beg,ids_nuts_end
-    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_soil_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_AquaADV_Snow2Soil_flxM(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
 
   do nts=ids_nutb_beg,ids_nutb_end
-    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_band_VFloSnow(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
+    trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(nts,3,NU(NY,NX),NY,NX)+trcn_AquaADV_Snow2Band_flxM(nts)+solute_adv_flxM(nts)+SDifFlx(nts)
   enddo
   end subroutine SurfLayerNetTracerFluxM
 !------------------------------------------------------------------------------------------
@@ -586,7 +587,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        dom_FloXSurRunoff(idom,K,N2,N1)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,N2,N1))
+        DOM_FloXSurRunoff_flxM(idom,K,N2,N1)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,N2,N1))
       enddo
     ENDDO
     DO idg=idg_beg,idg_NH3
@@ -594,14 +595,14 @@ contains
     ENDDO
 
     DO nnut=ids_nut_beg,ids_nuts_end
-      trcn_FloXSurRunoff(nnut,N2,N1)=VFLW*AZMAX1(trc_solml2_vr(nnut,0,N2,N1))
+      trcn_FloXSurRunoff_flxM(nnut,N2,N1)=VFLW*AZMAX1(trc_solml2_vr(nnut,0,N2,N1))
     ENDDO
   ELSE
     DO K=1,jcplx
-      dom_FloXSurRunoff(idom_beg:idom_end,K,N2,N1)=0.0_r8
+      DOM_FloXSurRunoff_flxM(idom_beg:idom_end,K,N2,N1)=0.0_r8
     ENDDO
     trcg_FloXSurRunoff_flxM(idg_beg:idg_NH3,N2,N1)     = 0.0_r8
-    trcn_FloXSurRunoff(ids_nut_beg:ids_nuts_end,N2,N1) = 0.0_r8
+    trcn_FloXSurRunoff_flxM(ids_nut_beg:ids_nuts_end,N2,N1) = 0.0_r8
   ENDIF
 !
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
@@ -637,16 +638,16 @@ contains
           FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
-              DOM_2DFloXSurRunoff_flxM(idom,K,N,2,N5,N4)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
+              DOM_FloXSurRof_flxM_2DH(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_flxM(idom,K,N2,N1)*FQRM
             enddo
           ENDDO
 
           DO idg=idg_beg,idg_NH3
-            trcg_2DFloXSurRunoffM(idg,N,2,N5,N4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
+            trcg_FloXSurRof_flxM_2DH(idg,N,2,N5,N4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
-            trcn_2DFloXSurRunoffM(nnut,N,2,N5,N4)=trcn_FloXSurRunoff(nnut,N2,N1)*FQRM
+            trcn_FloXSurRof_flxM_2DH(nnut,N,2,N5,N4)=trcn_FloXSurRunoff_flxM(nnut,N2,N1)*FQRM
           ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -656,23 +657,23 @@ contains
 !
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
-              DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)+DOM_2DFloXSurRunoff_flxM(idom,K,N,2,N5,N4)
+              DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)+DOM_FloXSurRof_flxM_2DH(idom,K,N,2,N5,N4)
             enddo
           ENDDO
           DO idg=idg_beg,idg_NH3
-            trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)=trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)+trcg_2DFloXSurRunoffM(idg,N,2,N5,N4)
+            trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)=trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)+trcg_FloXSurRof_flxM_2DH(idg,N,2,N5,N4)
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
-            trcn_FloXSurRunoff_2D(nnut,N,2,N5,N4)=trcn_FloXSurRunoff_2D(nnut,N,2,N5,N4)+trcn_2DFloXSurRunoffM(nnut,N,2,N5,N4)
+            trcn_FloXSurRunoff_2D(nnut,N,2,N5,N4)=trcn_FloXSurRunoff_2D(nnut,N,2,N5,N4)+trcn_FloXSurRof_flxM_2DH(nnut,N,2,N5,N4)
           ENDDO
         ELSE
           DO K=1,jcplx
-            DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
+            DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
           ENDDO
-          trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,2,N5,N4)=0.0_r8
+          trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,2,N5,N4)=0.0_r8
 
-          trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
+          trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
         ENDIF
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
@@ -682,52 +683,52 @@ contains
             FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             DO  K=1,jcplx
               do idom=idom_beg,idom_end
-                DOM_2DFloXSurRunoff_flxM(idom,K,N,1,N5B,N4B)=dom_FloXSurRunoff(idom,K,N2,N1)*FQRM
+                DOM_FloXSurRof_flxM_2DH(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_flxM(idom,K,N2,N1)*FQRM
               enddo
             ENDDO
 
             DO idg=idg_beg,idg_NH3
-              trcg_2DFloXSurRunoffM(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
+              trcg_FloXSurRof_flxM_2DH(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
             ENDDO
 
             DO nnut=ids_nut_beg,ids_nuts_end
-              trcn_2DFloXSurRunoffM(nnut,N,1,N5B,N4B)=trcn_FloXSurRunoff(nnut,N2,N1)*FQRM
+              trcn_FloXSurRof_flxM_2DH(nnut,N,1,N5B,N4B)=trcn_FloXSurRunoff_flxM(nnut,N2,N1)*FQRM
             ENDDO
 
             DO K=1,jcplx
               do idom=idom_beg,idom_end
-                DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)+DOM_2DFloXSurRunoff_flxM(idom,K,N,1,N5B,N4B)
+                DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)+DOM_FloXSurRof_flxM_2DH(idom,K,N,1,N5B,N4B)
               enddo
             ENDDO
 
             DO idg=idg_beg,idg_NH3
-              trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)+trcg_2DFloXSurRunoffM(idg,N,1,N5B,N4B)
+              trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)+trcg_FloXSurRof_flxM_2DH(idg,N,1,N5B,N4B)
             ENDDO
 
             DO nnut=ids_nut_beg,ids_nuts_end
-              trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)=trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)+trcn_2DFloXSurRunoffM(nnut,N,1,N5B,N4B)
+              trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)=trcn_FloXSurRunoff_2D(nnut,N,1,N5B,N4B)+trcn_FloXSurRof_flxM_2DH(nnut,N,1,N5B,N4B)
             ENDDO
           ELSE
             DO  K=1,jcplx
-              DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
+              DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
             ENDDO
-            trcg_2DFloXSurRunoffM(idg_beg:idg_end,N,1,N5B,N4B)          = 0.0_r8
-            trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
+            trcg_FloXSurRof_flxM_2DH(idg_beg:idg_end,N,1,N5B,N4B)          = 0.0_r8
+            trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
           ENDIF
         ENDIF
       ELSE
         DO K=1,jcplx
-          DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
+          DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
         ENDDO
-        trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,2,N5,N4)          = 0.0_r8
-        trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,2,N5,N4) = 0.0_r8
+        trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,2,N5,N4)          = 0.0_r8
+        trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,2,N5,N4) = 0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
           DO  K=1,jcplx
-            DOM_2DFloXSurRunoff_flxM(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
+            DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
           ENDDO
-          trcg_2DFloXSurRunoffM(idg_beg:idg_NH3,N,1,N5B,N4B)          = 0.0_r8
-          trcn_2DFloXSurRunoffM(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
+          trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,1,N5B,N4B)          = 0.0_r8
+          trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
         ENDIF
       ENDIF
 !
@@ -1097,13 +1098,15 @@ contains
   end subroutine SoilAtmosExchangeM
 !------------------------------------------------------------------------------------------
 
-  subroutine SnowSoluteDischargeM(M,NY,NX,trcg_FloSno2LitR,trcn_FloSno2LitR)
+  subroutine SnowSoluteDischargeM(M,NY,NX,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR)
 
   implicit none
 
   integer, intent(in) :: M, NY, NX
-  real(r8), intent(out) :: trcg_FloSno2LitR(idg_beg:idg_NH3)
+  real(r8), intent(out) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
   real(r8), intent(out) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
+
+  character(len=*), parameter :: subname='SnowSoluteDischargeM'
   integer :: ICHKL  !flag for dealing with the bottom snow layer
   integer :: L,L2
   real(r8) :: VFLWS,VFLWW,VFLWR
@@ -1111,13 +1114,7 @@ contains
   real(r8) :: VFLWNH4,VFLWPO4,VFLWPOB
   integer  :: idg,nnut
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
-!     VOLWSL=snowpack water content
-!     WatFlowInSnowM=snowpack water flux
-!     R*BLS=solute flux in snowpack
-!     X*BLS=hourly solute flux in snowpack
-!     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
-!
+  call PrintInfo('beg '//subname)
   ICHKL=0
   DO  L=1,JS
     IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
@@ -1131,30 +1128,21 @@ contains
           VFLWW=1.0_r8
         ENDIF
         DO idg=idg_beg,idg_NH3
-          trcg_advW_snvr(idg,L2,NY,NX) = trcg_solsml2_snvr(idg,L,NY,NX)*VFLWW
-          trcVolatile_Xbndl_flx_snvr(idg,L2,NY,NX) = trcVolatile_Xbndl_flx_snvr(idg,L2,NY,NX)+trcg_advW_snvr(idg,L2,NY,NX)
+          trcg_AquaAdv_flxM_snvr(idg,L2,NY,NX) = trcg_solsml2_snvr(idg,L,NY,NX)*VFLWW
+          trcg_AquaAdv_flx_snvr(idg,L2,NY,NX)  = trcg_AquaAdv_flx_snvr(idg,L2,NY,NX)+trcg_AquaAdv_flxM_snvr(idg,L2,NY,NX)
         ENDDO
 
         DO nnut=ids_nut_beg,ids_nuts_end
-          trcn_RBLS(nnut,L2,NY,NX)=trcn_solsml2_snvr(nnut,L,NY,NX)*VFLWW
-          trcn_Xbndl_flx(nnut,L2,NY,NX)=trcn_Xbndl_flx(nnut,L2,NY,NX)+trcn_RBLS(nnut,L2,NY,NX)
+          trcn_AquaAdv_flxM_snvr(nnut,L2,NY,NX) = trcn_solsml2_snvr(nnut,L,NY,NX)*VFLWW
+          trcn_AquaAdv_flx_snvr(nnut,L2,NY,NX)  = trcn_AquaAdv_flx_snvr(nnut,L2,NY,NX)+trcn_AquaAdv_flxM_snvr(nnut,L2,NY,NX)
         ENDDO
       ELSE
         IF(L.LT.JS)THEN
-          trcg_advW_snvr(idg_beg:idg_NH3,L2,NY,NX)=0.0_r8
-          trcn_RBLS(ids_nut_beg:ids_nuts_end,L2,NY,NX)=0.0_r8
+          trcg_AquaAdv_flxM_snvr(idg_beg:idg_NH3,L2,NY,NX)          = 0.0_r8
+          trcn_AquaAdv_flxM_snvr(ids_nut_beg:ids_nuts_end,L2,NY,NX) = 0.0_r8
         ENDIF
 !
 !     SNOWPACK SOLUTE DISCHARGE TO SURFACE LITTER, SOIL SURFACE
-!
-!     VOLWSL=snowpack water content
-!     WatFlowSno2LitRM_col,WatFlowSno2MicPM_col,WatFlowSno2MacPM_col=total water flux to litter,soil micropore,macropore
-!     CVRD,BARE=litter cover fraction,1-CVRD
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     R*S0=solute flux to surface litter
-!     R*S1,R*B1=solute flux to soil surface non-band,band
-!     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
 !
         IF(ICHKL.EQ.0)THEN
           IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1164,56 +1152,57 @@ contains
             VFLWR=FracSurfByLitR_col(NY,NX)
             VFLWS=FracSurfBareSoil_col(NY,NX)
           ENDIF
-          VFLWNH4=VFLWS*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
-          VFLWNHB=VFLWS*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
-          VFLWNO3=VFLWS*trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
-          VFLWNOB=VFLWS*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
-          VFLWPO4=VFLWS*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-          VFLWPOB=VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
+          VFLWNH4 = VFLWS*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
+          VFLWNHB = VFLWS*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
+          VFLWNO3 = VFLWS*trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
+          VFLWNOB = VFLWS*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
+          VFLWPO4 = VFLWS*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+          VFLWPOB = VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
           DO idg=idg_beg,idg_NH3
-            trcg_FloSno2LitR(idg)=trcg_solsml2_snvr(idg,L,NY,NX)*VFLWR
+            trcg_AquaADV_Snow2Litr_flxM(idg)=trcg_solsml2_snvr(idg,L,NY,NX)*VFLWR
           ENDDO
 
           DO nnut=ids_nut_beg,ids_nuts_end
             trcn_FloSno2LitR(nnut)=trcn_solsml2_snvr(nnut,L,NY,NX)*VFLWR
           ENDDO
 
-          trcg_VFloSnow(idg_CO2)  = trcg_solsml2_snvr(idg_CO2,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_CH4)  = trcg_solsml2_snvr(idg_CH4,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_O2)   = trcg_solsml2_snvr(idg_O2,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_N2)   = trcg_solsml2_snvr(idg_N2,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_N2O)  = trcg_solsml2_snvr(idg_N2O,L,NY,NX)*VFLWS
-          trcg_VFloSnow(idg_NH3)  = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
-          trcg_VFloSnow(idg_NH3B) = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
+          trcg_AquaADV_Snow2Soil_flxM(idg_CO2)  = trcg_solsml2_snvr(idg_CO2,L,NY,NX)*VFLWS
+          trcg_AquaADV_Snow2Soil_flxM(idg_CH4)  = trcg_solsml2_snvr(idg_CH4,L,NY,NX)*VFLWS
+          trcg_AquaADV_Snow2Soil_flxM(idg_O2)   = trcg_solsml2_snvr(idg_O2,L,NY,NX)*VFLWS
+          trcg_AquaADV_Snow2Soil_flxM(idg_N2)   = trcg_solsml2_snvr(idg_N2,L,NY,NX)*VFLWS
+          trcg_AquaADV_Snow2Soil_flxM(idg_N2O)  = trcg_solsml2_snvr(idg_N2O,L,NY,NX)*VFLWS
+          trcg_AquaADV_Snow2Soil_flxM(idg_NH3)  = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
+          trcg_AquaADV_Snow2Soil_flxM(idg_NH3B) = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
 
-          trcn_soil_VFloSnow(ids_NH4)    = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNH4
-          trcn_soil_VFloSnow(ids_NO3)    = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNO3
-          trcn_soil_VFloSnow(ids_H1PO4)  = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPO4
-          trcn_soil_VFloSnow(ids_H2PO4)  = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPO4
-          trcn_band_VFloSnow(ids_NH4B)   = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNHB
-          trcn_band_VFloSnow(ids_NO3B)   = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNOB
-          trcn_band_VFloSnow(ids_H1PO4B) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
-          trcn_band_VFloSnow(ids_H2PO4B) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
+          trcn_AquaADV_Snow2Soil_flxM(ids_NH4)    = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNH4
+          trcn_AquaADV_Snow2Soil_flxM(ids_NO3)    = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNO3
+          trcn_AquaADV_Snow2Soil_flxM(ids_H1PO4)  = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPO4
+          trcn_AquaADV_Snow2Soil_flxM(ids_H2PO4)  = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPO4
+          trcn_AquaADV_Snow2Band_flxM(ids_NH4B)   = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNHB
+          trcn_AquaADV_Snow2Band_flxM(ids_NO3B)   = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNOB
+          trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
+          trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
           ICHKL                          = 1
         ENDIF
       ENDIF
     ELSE
-      trcg_FloSno2LitR(idg_beg:idg_NH3)          = 0.0_r8
-      trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end) = 0.0_r8
-      trcg_VFloSnow(idg_beg:idg_end)             = 0.0_r8
+      trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)            = 0.0_r8
+      trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)   = 0.0_r8
+      trcg_AquaADV_Snow2Soil_flxM(idg_beg:idg_end) = 0.0_r8
 
-      trcn_soil_VFloSnow(ids_NH4)   = 0.0_r8
-      trcn_soil_VFloSnow(ids_NO3)   = 0.0_r8
-      trcn_soil_VFloSnow(ids_H1PO4) = 0.0_r8
-      trcn_soil_VFloSnow(ids_H2PO4) = 0.0_r8
-      trcn_band_VFloSnow(ids_NH4B)  = 0.0_r8
+      trcn_AquaADV_Snow2Soil_flxM(ids_NH4)   = 0.0_r8
+      trcn_AquaADV_Snow2Soil_flxM(ids_NO3)   = 0.0_r8
+      trcn_AquaADV_Snow2Soil_flxM(ids_H1PO4) = 0.0_r8
+      trcn_AquaADV_Snow2Soil_flxM(ids_H2PO4) = 0.0_r8
+      trcn_AquaADV_Snow2Band_flxM(ids_NH4B)  = 0.0_r8
 
-      trcn_band_VFloSnow(ids_NO3B)   = 0.0_r8
-      trcn_band_VFloSnow(ids_H1PO4B) = 0.0_r8
-      trcn_band_VFloSnow(ids_H2PO4B) = 0.0_r8
+      trcn_AquaADV_Snow2Band_flxM(ids_NO3B)   = 0.0_r8
+      trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B) = 0.0_r8
+      trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B) = 0.0_r8
     ENDIF
   ENDDO
+  call PrintInfo('end '//subname)
   end subroutine SnowSoluteDischargeM
 
 ! ----------------------------------------------------------------------
