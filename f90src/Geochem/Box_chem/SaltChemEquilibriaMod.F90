@@ -58,7 +58,7 @@ module SaltChemEquilibriaMod
   real(r8) :: Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity,Ca_2p_activity,CO3_2e_activity,HCO3_e_activity
   real(r8) :: H2PO4_1e_CaHPO4_dissolB_flx,H2PO4_1e_apatite_dissolB_flx
   real(r8) :: H2PO4_1e_CaH4P2O8_dissolB_flx,H2PO4_1e_FePO4_dissolB_flx,RSO4,RX1P,RX2P
-  real(r8) :: RXFE,RXCA,RXMG,RXNA,RXKA,RXHC,RXALO2,RXFEO2,RCanopyGasCO2_pft
+  real(r8) :: RXFE,RXCA,RXMG,RXNA,RXKA,RXHC,RXALO2,RXFEO2,RCO2Q
   real(r8) :: RXH1,RXH2,RXNB,Ca_2p_conc,OH_1e_conc,H1PO4_to_XHPO4_ROH_flx
   real(r8) :: H2PO4_1e_to_XH2PO4_ROH2_Bflx,H2PO4_1e_FePO4_dissol_flx
   real(r8) :: RALO1,RALO2,RALO3,RALO4,RNHB,RXH1B,RXN4
@@ -250,7 +250,7 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: TR_Ca_2p_soil
   real(r8), pointer :: TR_CaSO4_soil
   real(r8), pointer :: TR_CaSO4_precip_soil
-  real(r8), pointer :: TR_CO2_gchem_soil_vr
+  real(r8), pointer :: TR_CO2_gchem_soil
   real(r8), pointer :: TR_CO3_2e_soil
   real(r8), pointer :: TR_Fe_3p_soil
   real(r8), pointer :: TR_FeSO4_soil
@@ -481,7 +481,7 @@ module SaltChemEquilibriaMod
   TR_Ca_2p_soil                => solflx%TR_Ca_2p_soil
   TR_CaSO4_soil                => solflx%TR_CaSO4_soil
   TR_CaSO4_precip_soil         => solflx%TR_CaSO4_precip_soil
-  TR_CO2_gchem_soil_vr           => solflx%TR_CO2_gchem_soil_vr
+  TR_CO2_gchem_soil           => solflx%TR_CO2_gchem_soil
   TR_CO3_2e_soil               => solflx%TR_CO3_2e_soil
   TR_Fe_3p_soil                => solflx%TR_Fe_3p_soil
   TR_FeSO4_soil                => solflx%TR_FeSO4_soil
@@ -902,16 +902,17 @@ module SaltChemEquilibriaMod
       NR1=2
       SP=SHCAC2
     ENDIF
-    RHCAC3=0._r8
-    RHCACH=0._r8
-    RHCACO=0._r8
-    R1=AMAX1(ZERO,R1)
-    P1=AMAX1(ZERO,P1)
-    P2=AMAX1(ZERO,P2)
-    SPX=SP*R1**NR1
-    S0=P1+P2
-    S1=AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    RPCACX=AMAX1(-Precp_CaCO3_conc,TPDX*(S0-SQRT(S1)))
+    RHCAC3 = 0._r8
+    RHCACH = 0._r8
+    RHCACO = 0._r8
+    R1     = AMAX1(ZERO,R1)
+    P1     = AMAX1(ZERO,P1)
+    P2     = AMAX1(ZERO,P2)
+    SPX    = SP*R1**NR1
+    S0     = P1+P2
+    S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
+    RPCACX = AMAX1(-Precp_CaCO3_conc,TPDX*(S0-SQRT(S1)))
+
     IF(isclose(PX,CO3_2e_activity))THEN
       RHCAC3=RPCACX
     ELSEIF(isclose(PX,HCO3_e_activity))THEN
@@ -1372,7 +1373,7 @@ module SaltChemEquilibriaMod
   TR_SO4_2e_soil               = TR_SO4_2e_soil*VLWatMicPM
   TR_CO3_2e_soil               = TR_CO3_2e_soil*VLWatMicPM
   TR_HCO3_soil                 = TR_HCO3_soil*VLWatMicPM
-  TR_CO2_gchem_soil_vr         = TR_CO2_gchem_soil_vr*VLWatMicPM
+  TR_CO2_gchem_soil         = TR_CO2_gchem_soil*VLWatMicPM
   TR_AlOH_soil                 = TR_AlOH_soil*VLWatMicPM
   TR_AlO2H2_soil               = TR_AlO2H2_soil*VLWatMicPM
   TR_AlO3H3_soil               = TR_AlO3H3_soil*VLWatMicPM
@@ -1479,11 +1480,11 @@ module SaltChemEquilibriaMod
     +TR_CaOH_soil+TR_MgOH_soil &
     +3.0_r8*(TR_AlOH3_precip_soil+TR_FeOH3_precip_soil)
 !     IF(L.EQ.11)THEN
-!     WRITE(*,1111)'TR_CO2_gchem_soil_vr',I,J,L,M,TR_CO2_gchem_soil_vr,TR_CO3_2e_soil
+!     WRITE(*,1111)'TR_CO2_gchem_soil',I,J,L,M,TR_CO2_gchem_soil,TR_CO3_2e_soil
 !    2,TR_HCO3,TR_CaCO3_soil,TR_MgCO3_soil
 !    2,TR_NaCO3_soil,TR_CaHCO3_soil
 !    2,TR_MgHCO3_soil,TR_CaCO3_precip_soil,VLWatMicPM,RCO2
-!    3,RHCO,RHCACH,RCanopyGasCO2_pft,RCAH,RMGH,RHCO3,H_1p_activity,HCO3_e_activity,H2CO3_activity,DPCO2
+!    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,H_1p_activity,HCO3_e_activity,H2CO3_activity,DPCO2
 !     WRITE(*,1111)'TBION_soil',I,J,L,M,TBION_soil
 !     ENDIF
   end subroutine SummarizeIonFluxes
@@ -2219,12 +2220,12 @@ module SaltChemEquilibriaMod
     RNHB=0._r8
   ENDIF
 !
-! RCanopyGasCO2_pft=CO2-HCO3+H dissociation
+! RCO2Q=CO2-HCO3+H dissociation
 ! H2CO3 <-> HCO3(-) + H(+)
 
-  S0                = H_1p_activity+HCO3_e_activity+DPCO2
-  S1                = AZMAX1(S0**2-4.0_r8*(H_1p_activity*HCO3_e_activity-DPCO2*H2CO3_activity))
-  RCanopyGasCO2_pft = TSLX*(S0-SQRT(S1))
+  S0    = H_1p_activity+HCO3_e_activity+DPCO2
+  S1    = AZMAX1(S0**2-4.0_r8*(H_1p_activity*HCO3_e_activity-DPCO2*H2CO3_activity))
+  RCO2Q = TSLX*(S0-SQRT(S1))
 !
 !     RHCO3=HCO3-CO3+H dissociation
 ! HCO3(-) <-> CO3(--)+H(+)
@@ -2496,7 +2497,7 @@ module SaltChemEquilibriaMod
     +3.0_r8*(RHAL1+RHFE1-(RHA4P1+RHF4P1)*VLPO4 &
     -(RHF4B1+RHA4B1)*VLPOB)+4.0_r8*(RHCAH1*VLPO4+RHCHB1*VLPOB) &
     +7.0_r8*(RHCAH2*VLPO4+RHCHB2*VLPOB) &
-    +RHALO2+RHFEO2-RHALO4-RHFEO4+RHCACH-RCanopyGasCO2_pft-RHCO3 &
+    +RHALO2+RHFEO2-RHALO4-RHFEO4+RHCACH-RCO2Q-RHCO3 &
     +(RHA0P1-RHA2P1+RHA1P2-RHA3P2+RHF0P1-RHF2P1+RHF1P2-RHF3P2 &
     +RHCAD2-RXOH2-RXOH1-RH1P-H2PO4_e_to_HPO4_2e_flx-RH3P)*VLPO4 &
     +(RHA0B1-RHA2B1+RHA1B2-RHA3B2+RHF0B1-RHF2B1+RHF1B2-RHF3B2 &
@@ -2512,8 +2513,8 @@ module SaltChemEquilibriaMod
     -(-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx)*VLPO4-(-H2PO4_to_XH2PO4_ROH_Bflx-RXH1B)*VLPOB
   RSO4=-RPCASO-RALS-RFES-RCAS-RMGS-RNAS-RKAS
   RCO3=-RHCAC3-RHCO3-RCAC-RMGC-RNAC
-  RHCO=-RHCACH-RCanopyGasCO2_pft-RCAH-RMGH+RHCO3
-  RCO2=-RHCACO+RCanopyGasCO2_pft
+  RHCO=-RHCACH-RCO2Q-RCAH-RMGH+RHCO3
+  RCO2=-RHCACO+RCO2Q
   RAL1=-RHALO1+RALO1-RALO2-(RHA1P1+RHA1P2)*VLPO4-(RHA1B1+RHA1B2)*VLPOB
   RAL2=-RHALO2+RALO2-RALO3-(RHA2P1+RHA2P2)*VLPO4-(RHA2B1+RHA2B2)*VLPOB
   RAL3=-RHALO3+RALO3-RALO4-(RHA3P1+RHA3P2)*VLPO4-(RHA3B1+RHA3B2)*VLPOB
@@ -2686,7 +2687,7 @@ module SaltChemEquilibriaMod
 !     TR_NH4_soil,TR_NH4_band_soil=total NH4 flux in non-band,band
 !     TR_NH3_soil_vr,TR_NH3_band_soil=total NH3 flux in non-band,band
 !     TR_Al_3p_soil,TR_Fe_3p_soil,TR_H_p_soil,TR_Ca_2p_soil,TR_Mg_2p_soil,TR_Na_p_soil,TR_K_1p_soil,TR_OH_1e_soil=totalAl,Fe,H,Ca,Mg,Na,K,OH flux
-!     TR_SO4_2e_soil,TR_CO3_2e_soil,TR_HCO3,TR_CO2_gchem_soil_vr=total SO4,CO3,HCO3,CO2 flux
+!     TR_SO4_2e_soil,TR_CO3_2e_soil,TR_HCO3,TR_CO2_gchem_soil=total SO4,CO3,HCO3,CO2 flux
 !     TR_AlOH_soil,TR_AlO2H2_soil,TR_AlO3H3_soil,TR_AlO4H4_soil,TR_AlSO4_soil=total AlOH,AlOH2,AlOH3,AlOH4,AlSO4
 !     TR_FeOH_soil,TR_FeO2H2_soil,TR_FeO3H3_soil,TR_FeO4H4_soil,TR_FeSO4_soil=total FeOH,FeOH2,FeOH3,FeOH4,FeSO4
 !     TR_CaOH_soil,TR_CaCO3_soil,TR_CaHCO3_soil,TR_CaSO4_soil=total CaOH,CaCO3,CaHCO3,CaSO4 flux
@@ -2726,7 +2727,7 @@ module SaltChemEquilibriaMod
   TR_SO4_2e_soil               = TR_SO4_2e_soil+RSO4    !total SO4(2-) flux
   TR_CO3_2e_soil               = TR_CO3_2e_soil+RCO3    !total CO3(2-) flux
   TR_HCO3_soil                 = TR_HCO3_soil+RHCO    !total HCO3(2-) flux
-  TR_CO2_gchem_soil_vr           = TR_CO2_gchem_soil_vr+RCO2    !total CO2 flux due to dissociation
+  TR_CO2_gchem_soil           = TR_CO2_gchem_soil+RCO2    !total CO2 flux due to dissociation
   TR_AlOH_soil                 = TR_AlOH_soil+RAL1    !total Al(OH)(2+) flux
   TR_AlO2H2_soil               = TR_AlO2H2_soil+RAL2    !total Al(OH)2(+) flux
   TR_AlO3H3_soil               = TR_AlO3H3_soil+RAL3    !total Al(OH)3 flux

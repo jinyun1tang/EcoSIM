@@ -408,7 +408,7 @@ module TranspNoSaltMod
   RBGCSinkGasMM_vr(idg_H2,0,NY,NX)  = trcs_RMicbUptake_vr(idg_H2,0,NY,NX)*dts_gas
   RBGCSinkGasMM_vr(idg_NH3,0,NY,NX) = 0.0_r8
 
-  RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TR_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
   RBGCSinkSoluteM_vr(ids_NH4,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NH4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
   RBGCSinkSoluteM_vr(ids_NO3,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NO3,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
   RBGCSinkSoluteM_vr(ids_NO2,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NO2,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
@@ -632,15 +632,15 @@ module TranspNoSaltMod
 
   DO L=NU(NY,NX),NL(NY,NX)
 
-    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_gchem_soil_vr(L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_CH4,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CH4,L,NY,NX) +trcs_plant_uptake_vr(idg_CH4,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_N2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,L,NY,NX)  +trcs_plant_uptake_vr(idg_N2,L,NY,NX)+Micb_N2Fixation_vr(L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_N2O,L,NY,NX) = (trcs_RMicbUptake_vr(idg_N2O,L,NY,NX) +trcs_plant_uptake_vr(idg_N2O,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_H2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_H2,L,NY,NX)  +trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
-    RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TR_NH3_geochem_vr(L,NY,NX)*dts_gas
+    RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TR_gas_NH3_geochem_vr(L,NY,NX)*dts_gas  !geochemical NH3 source 
 
     RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)   = (-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)   = (-TR_sol_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO3,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO2,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP

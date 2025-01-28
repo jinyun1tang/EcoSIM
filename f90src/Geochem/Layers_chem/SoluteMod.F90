@@ -118,26 +118,29 @@ module SoluteMod
 !     TR_NH3_soil_vr,TR_NH3_band_soil=NH3 dissolution from urea in non-band,band
 !     TRNO3,TRNOB=NO3 dissolution in non-band,band
 !
-  TR_NH3_geochem_vr(L,NY,NX)                  = TR_NH3_geochem_vr(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
-  TR_NH3_soil_vr(L,NY,NX)                     = TR_NH3_soil_vr(L,NY,NX)+RSNUAA
+  TR_gas_NH3_geochem_vr(L,NY,NX)                  = TR_gas_NH3_geochem_vr(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
+  TR_sol_NH3_soil_vr(L,NY,NX)                     = TR_sol_NH3_soil_vr(L,NY,NX)+RSNUAA   !add to dissolved NH3
   trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+RSN4AA
+  trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
+
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+RSN4BA+RSN4BB
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+RSNUBA+RSNUBB
-  trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
+
   trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
 
-  TR_CO2_gchem_soil_vr(L,NY,NX)               = TR_CO2_gchem_soil_vr(L,NY,NX)*catomw
-  TR_NH3_geochem_vr(L,NY,NX)                  = TR_NH3_geochem_vr(L,NY,NX)*natomw
-  TR_NH3_soil_vr(L,NY,NX)                     = TR_NH3_soil_vr(L,NY,NX)*natomw  
-  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)*natomw
+  TR_CO2_geochem_soil_vr(L,NY,NX)           = TR_CO2_geochem_soil_vr(L,NY,NX)*catomw
+  TR_gas_NH3_geochem_vr(L,NY,NX)          = TR_gas_NH3_geochem_vr(L,NY,NX)*natomw
+  TR_sol_NH3_soil_vr(L,NY,NX)             = TR_sol_NH3_soil_vr(L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX) = trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)*patomw
+  trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX) = trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)*patomw
+
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)*natomw
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)*natomw
-  trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)*natomw
   trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)*natomw
-  trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)*natomw
   trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)*natomw
-  trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)     = trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)*patomw
-  trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)     = trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)*patomw
   trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)*patomw
   trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)*patomw
   end subroutine UpdateFertilizerBand
@@ -547,7 +550,7 @@ module SoluteMod
       DXNH4                                     = FVLNH4*trcx_solml_vr(idx_NH4,L,NY,NX)
       trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+DNH4S
       trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)-DNH4S
-      TR_NH3_soil_vr(L,NY,NX)                   = TR_NH3_soil_vr(L,NY,NX)+DNH3S
+      TR_sol_NH3_soil_vr(L,NY,NX)                   = TR_sol_NH3_soil_vr(L,NY,NX)+DNH3S
       trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX) = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)-DNH3S
       trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)       = trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)+DXNH4
       trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)      = trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)-DXNH4
@@ -1221,7 +1224,7 @@ module SoluteMod
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
 !
       trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)    = trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)+RN4S*VLWatMicPM_vr(NPH,0,NY,NX)
-      TR_NH3_soil_vr(0,NY,NX)                = TR_NH3_soil_vr(0,NY,NX)+RN3S*VLWatMicPM_vr(NPH,0,NY,NX)
+      TR_sol_NH3_soil_vr(0,NY,NX)                = TR_sol_NH3_soil_vr(0,NY,NX)+RN3S*VLWatMicPM_vr(NPH,0,NY,NX)
       trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX)  = trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX)+RHP1*VLWatMicPM_vr(NPH,0,NY,NX)
       trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX)  = trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX)+RHP2*VLWatMicPM_vr(NPH,0,NY,NX)
       trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)    = trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)+RXN4*VLWatMicPM_vr(NPH,0,NY,NX)
@@ -1235,10 +1238,10 @@ module SoluteMod
       FertN_soil_vr(ifert_urea,0,NY,NX)     = FertN_soil_vr(ifert_urea,0,NY,NX)-RSNUAA
       FertN_soil_vr(ifert_no3,0,NY,NX)      = FertN_soil_vr(ifert_no3,0,NY,NX)-RSNOAA
       trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)+RSN4AA
-      TR_NH3_soil_vr(0,NY,NX)               = TR_NH3_soil_vr(0,NY,NX)+RSN3AA+RSNUAA
+      TR_sol_NH3_soil_vr(0,NY,NX)               = TR_sol_NH3_soil_vr(0,NY,NX)+RSN3AA+RSNUAA
       trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)+RSNOAA
       trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)*natomw
-      TR_NH3_soil_vr(0,NY,NX)               = TR_NH3_soil_vr(0,NY,NX)*natomw
+      TR_sol_NH3_soil_vr(0,NY,NX)               = TR_sol_NH3_soil_vr(0,NY,NX)*natomw
       trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)*natomw
       trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX) = trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX)*patomw
       trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX) = trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX)*patomw

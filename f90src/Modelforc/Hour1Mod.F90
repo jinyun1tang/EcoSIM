@@ -846,8 +846,8 @@ module Hour1Mod
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)                 = 0._r8
   RProd_Hp_vr(0:NL(NY,NX),NY,NX)                                                    = 0._r8
   trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)              = 0._r8
-  TR_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
-  TR_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
+  TR_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
+  TR_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
   trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)              = 0._r8
   TPlantRootH2OUptake_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
@@ -2361,7 +2361,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
-    TR_CO2_gchem_soil_vr(L,NY,NX)               = 0._r8
+    TR_CO2_geochem_soil_vr(L,NY,NX)               = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8

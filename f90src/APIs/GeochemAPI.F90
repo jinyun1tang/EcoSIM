@@ -306,7 +306,7 @@ module GeochemAPI
 !  solflx%TR_Ca_2p_soil  =trcSalt_TR(idsalt_Ca,L,NY,NX)
 !  solflx%TR_CaSO4_soil =trcSalt_TR(idsalt_CaSO4,L,NY,NX)
 !  solflx%TR_CaSO4_precip_soil=trcp_RChem_soil(idsp_CaSO4,L,NY,NX)
-!  solflx%TR_CO2_gchem_soil_vr =TR_CO2_gchem_soil_vr(L,NY,NX)
+!  solflx%TR_CO2_geochem_soil_vr =TR_CO2_geochem_soil_vr(L,NY,NX)
 !  solflx%TR_CO3_2e_soil =trcSalt_TR(idsalt_CO3,L,NY,NX)
 !  solflx%TR_Fe_3p_soil  =trcSalt_TR(idsalt_Fe,L,NY,NX)
 !  solflx%TR_FeSO4_soil =trcSalt_TR(idsalt_FeSO4,L,NY,NX)
@@ -322,7 +322,7 @@ module GeochemAPI
 !  solflx%TR_Mg_2p_soil  =trcSalt_TR(idsalt_Mg,L,NY,NX)
 !  solflx%TR_MgSO4_soil =trcSalt_TR(idsalt_MgSO4,L,NY,NX)
 !  solflx%TR_NH3_band_soil =trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)
-!  solflx%TR_NH3_soil_vr =TR_NH3_soil_vr(L,NY,NX)
+!  solflx%TR_NH3_soil_vr =TR_sol_NH3_soil_vr(L,NY,NX)
 !  solflx%TR_NH4_band_soil =trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)
 !  solflx%TR_NH4_soil =trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)
 !  solflx%TR_Na_p_soil  =trcSalt_TR(idsalt_Na,L,NY,NX)
@@ -361,7 +361,7 @@ module GeochemAPI
 
   trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)         = solflx%TR_NH4_soil
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = solflx%TR_NH4_band_soil
-  TR_NH3_soil_vr(L,NY,NX)                     = solflx%TR_NH3_soil_vr
+  TR_sol_NH3_soil_vr(L,NY,NX)                     = solflx%TR_NH3_soil_vr
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = solflx%TR_NH3_band_soil
   trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)       = solflx%TR_H1PO4_soil
   trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)       = solflx%TR_H2PO4_soil
@@ -387,7 +387,7 @@ module GeochemAPI
   trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)       = solflx%TR_CaHPO4_precip_band_soil
   trcp_RChem_soil(idsp_HAB,L,NY,NX)           = solflx%TR_apatite_precip_band_soil
   trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)     = solflx%TR_CaH4P2O8_precip_band_soil
-  TR_CO2_gchem_soil_vr(L,NY,NX)                 = solflx%TR_CO2_gchem_soil_vr
+  TR_CO2_geochem_soil_vr(L,NY,NX)                 = solflx%TR_CO2_gchem_soil
   if(salt_model)then
     trcSalt_TR(idsalt_Al,L,NY,NX)        = solflx%TR_Al_3p_soil
     trcSalt_TR(idsalt_Fe,L,NY,NX)        = solflx%TR_Fe_3p_soil
