@@ -157,15 +157,20 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: TXCO2(JY,JX)   !what does TXCO2 mean, be careful?
+  
+  character(len=*), parameter :: subname='UpdateOutputVars'
   real(r8) :: VLSoilPoreMicPX   !maximal soil micropore allowed
-  integer  :: L
-  if(lverb)write(*,*)'UpdateOutputVars'
+  integer  :: L,idg
 
+  call PrintInfo('beg '//subname)
   Eco_NetRad_col(NY,NX)        = Eco_NetRad_col(NY,NX)+HeatByRad2Surf_col(NY,NX)
   Eco_Heat_Latent_col(NY,NX)   = Eco_Heat_Latent_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)
   Eco_Heat_Sens_col(NY,NX)     = Eco_Heat_Sens_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)
   Eco_Heat_GrndSurf_col(NY,NX) = Eco_Heat_GrndSurf_col(NY,NX)-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))
-  
+
+  do idg=idg_beg,idg_NH3
+    SurfGasEmisFlx_col(idg,NY,NX) = SurfGasEmisFlx_col(idg,NY,NX)+trcg_pltroot_flx_col(idg,NY,NX)
+  ENDDO
   Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
   Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmisFlx_col(idg_CO2,NY,NX)
@@ -175,8 +180,10 @@ module RedistMod
     +SurfGasEmisFlx_col(idg_CO2,NY,NX)+SurfGasEmisFlx_col(idg_CH4,NY,NX) &
     +TXCO2(NY,NX)-HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX)-HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
 
+
+  RootCO2Autor_col(NY,NX)=sum(RootCO2Autor_vr(1:JZ,NY,NX))  
   CO2_Prod_TP_cumRes_col(NY,NX)=CO2_Prod_TP_cumRes_col(NY,NX)+SurfGasEmisFlx_col(idg_CO2,NY,NX) &
-    -ECO_HR_CO2_col(NY,NX)-sum(RootCO2Autor_vr(1:JZ,NY,NX))
+    -ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
 
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
@@ -192,7 +199,7 @@ module RedistMod
   !     RESIDUE STATE VARIABLES WITHIN THE TILLAGE ZONE TO THE EXTENT
   !     ASSOCIATED IN 'DAY' WITH EACH TILLAGE EVENT ENTERED IN THE
   !     TILLAGE FILE
-  if(lverb)write(*,*)'tillage'
+
   call ApplyTillageMixing(I,J,NY,NX)
 
   !
@@ -213,6 +220,7 @@ module RedistMod
     ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
   ENDDO D9945
 
+  call PrintInfo('end '//subname)
   end subroutine UpdateOutputVars
 
 
@@ -414,7 +422,7 @@ module RedistMod
   SurfGasEmisFlx_col(idg_CO2,NY,NX) = SurfGasEmisFlx_col(idg_CO2,NY,NX)+CI
   SurfGasEmisFlx_col(idg_CH4,NY,NX) = SurfGasEmisFlx_col(idg_CH4,NY,NX)+CH
   SurfGas_CO2_lnd                   = SurfGas_CO2_lnd+CI+CH
-  TOMOU_lnds(ielmc)             = TOMOU_lnds(ielmc)+CO+CX
+  TOMOU_lnds(ielmc)                 = TOMOU_lnds(ielmc)+CO+CX
 
   SurfGasDifFlx_col(idg_CO2,NY,NX) = SurfGasDifFlx_col(idg_CO2,NY,NX)+CI
   SurfGasDifFlx_col(idg_CH4,NY,NX) = SurfGasDifFlx_col(idg_CH4,NY,NX)+CH
@@ -551,7 +559,7 @@ module RedistMod
   Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)+trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)
   SurfGasEmisFlx_col(idg_N2,NY,NX) = SurfGasEmisFlx_col(idg_N2,NY,NX)+trcs_RMicbUptake_vr(idg_N2,0,NY,NX)
 
-  do idg=idg_beg,idg_end-1
+  do idg=idg_beg,idg_NH3
     RGasFlxPrev_vr(idg,0,NY,NX)  = Gas_Disol_Flx_vr(idg,0,NY,NX)
   ENDDO
   !RO2AquaSourcePrev_vr:=soil surface O2 dissolution + aqueous O2 flux micropore, >0 into aqueous phase
@@ -1160,9 +1168,9 @@ module RedistMod
         endif
       endif  
     enddo
-    ECO_HR_CO2_vr(L,NY,NX)       = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX)
-    Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)+trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
-    ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+ trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)  
+    ECO_HR_CO2_vr(L,NY,NX)           = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX)
+    Eco_HR_CumYr_col(NY,NX)          = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)+trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
+    ECO_HR_CO2_col(NY,NX)            = ECO_HR_CO2_col(NY,NX)+ trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)
     SurfGasEmisFlx_col(idg_N2,NY,NX) = SurfGasEmisFlx_col(idg_N2,NY,NX)+trcs_RMicbUptake_vr(idg_N2,L,NY,NX)
 
     !
@@ -1241,10 +1249,10 @@ module RedistMod
       ENDIF
     ENDIF
     SurfGas_CO2_lnd   = SurfGas_CO2_lnd+gasflx(idg_CO2)+gasflx(idg_CH4)
-    COB               = tRootCO2Emis_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX)
+    COB               = tRootCO2Emis2Root_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX)
     TOMOU_lnds(ielmc) = TOMOU_lnds(ielmc)+COB
 
-    RootResp_CumYr_col(NY,NX)  = RootResp_CumYr_col(NY,NX)+tRootCO2Emis_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
+    RootResp_CumYr_col(NY,NX)  = RootResp_CumYr_col(NY,NX)+tRootCO2Emis2Root_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)
     HydroSubsDICFlx_col(NY,NX) = HydroSubsDICFlx_col(NY,NX)-catomw*Txchem_CO2_vr(L,NY,NX)
     TXCO2(NY,NX)               = TXCO2(NY,NX)+catomw*Txchem_CO2_vr(L,NY,NX)
     SurfGas_O2_lnd             = SurfGas_O2_lnd+gasflx(idg_O2)   !>0. into soil

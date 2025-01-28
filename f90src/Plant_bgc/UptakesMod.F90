@@ -279,8 +279,8 @@ module UptakesMod
         plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                            = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                             = 0.0_r8
         plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,N,L,NZ)               = 0.0_r8
-        plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_end-1,N,L,NZ)   = 0.0_r8
-        plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,N,L,NZ) = 0.0_r8
+        plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)   = 0.0_r8
+        plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,N,L,NZ) = 0.0_r8
       enddo
     enddo
   ENDDO D9984

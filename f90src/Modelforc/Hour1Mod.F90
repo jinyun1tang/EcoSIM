@@ -321,50 +321,34 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
-  integer :: NX, NY
+  integer :: NX, NY, idg
+
 !     begin_execution
 !
 !     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
 !     PRECIPITATION AND IRRIGATION FROM MIXING RATIOS READ IN 'READS'
 !
-!     C*E,C*R,C*Q=atmospheric,precipitation,irrigation solute concentrations
-!     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-!             :*ZN3*=NH3,*H2G*=H2
 !
 ! CSTRR: surface irrigation ion strength, [g m-3]
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-
+      !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
       AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
       AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
       AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
       AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
       AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
       AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3      
+      AtmGasCgperm3(idg_AR,NY,NX)  =  ARGE_col(NY,NX)*1.78E-02_r8*TREF/TairK_col(NY,NX)  !gAr/m3
       AtmGasCgperm3(idg_NH3,NY,NX)  = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
       AtmGasCgperm3(idg_NH3B,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
 
-      trcVolatile_rain_conc(idg_CO2,NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA_col(NY,NX)) &
-         /(EXP(ACTCG(idg_CO2)*CSTRR(NY,NX)))
-      trcVolatile_rain_conc(idg_CH4,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_CH4)*CSTRR(NY,NX)))
-      trcVolatile_rain_conc(idg_O2,NY,NX) = AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_O2)*CSTRR(NY,NX)))
-      trcVolatile_rain_conc(idg_N2,NY,NX) = AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_N2)*CSTRR(NY,NX)))
-      trcVolatile_rain_conc(idg_N2O,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_N2O)*CSTRR(NY,NX)))
-
-      trcVolatile_irrig_conc(idg_CO2,NY,NX) = AtmGasCgperm3(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_CO2)*CSTRQ(I,NY,NX)))
-      trcVolatile_irrig_conc(idg_CH4,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_CH4)*CSTRQ(I,NY,NX)))
-      trcVolatile_irrig_conc(idg_O2,NY,NX) = AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_O2)*CSTRQ(I,NY,NX)))
-      trcVolatile_irrig_conc(idg_N2,NY,NX) = AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_N2)*CSTRQ(I,NY,NX)))
-      trcVolatile_irrig_conc(idg_N2O,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA_col(NY,NX)) &
-        /(EXP(ACTCG(idg_N2O)*CSTRQ(I,NY,NX)))
+      DO idg=idg_beg,idg_NH3
+        trcVolatile_rain_conc(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
+           /(EXP(GasSechenovConst(idg)*CSTRR(NY,NX)))
+        trcVolatile_irrig_conc(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, TCA_col(NY,NX)) &
+          /(EXP(GasSechenovConst(idg)*CSTRQ(I,NY,NX)))
+      ENDDO
       GDD_col(NY,NX) = GDD_col(NY,NX)+TCA_col(NY,NX)/24._r8
     ENDDO
   ENDDO
@@ -406,7 +390,7 @@ module Hour1Mod
 
       DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
 
-      trcg_FloXSurRunoff_2D(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0._r8
+      trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)=0._r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0._r8
 
       DrySnoBySnoRedistrib_2DH(1:2,NY,NX)             = 0._r8
@@ -743,7 +727,8 @@ module Hour1Mod
 
   integer :: L
 !     begin_execution
-    
+
+  RootCO2Autor_col(NY,NX)                 = 0._r8
   QIceInflx_vr(:,NY,NX)                   = 0._r8
   QIceInflx_col(NY,NX)                    = 0._r8
   Rain2ExposedSurf_col(NY,NX)             = 0._r8
@@ -799,7 +784,7 @@ module Hour1Mod
   THeatSoiThaw_col(NY,NX)                  = 0._r8
   trcs_TransptMacP_3D(:,:,:,:,:) = 0._r8
   trcg_DisolEvap_Atm2Soil_flx(idg_beg:idg_end,NY,NX) = 0._r8
-  trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_end-1,NY,NX) = 0._r8
+  trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_NH3,NY,NX) = 0._r8
 
   TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
   CanopyWat_col(NY,NX)                             = 0._r8
@@ -811,7 +796,7 @@ module Hour1Mod
   HeatFlx2Canopy_col(NY,NX)                        = 0._r8
   CanopyHeatStor_col(NY,NX)                        = 0._r8
   
-  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) = 0._r8
+  TRootGasLossDisturb_pft(idg_beg:idg_NH3,NY,NX) = 0._r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0._r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0._r8
   PlantPopu_col(NY,NX)                                = 0._r8
@@ -827,7 +812,7 @@ module Hour1Mod
   HeatXfer2SnoLay_snvr(1:JS,NY,NX)                         = 0._r8
   XPhaseChangeHeatL_snvr(1:JS,NY,NX)                       = 0._r8
   HeatSource_vr(:,NY,NX)                                   = 0._r8
-  trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1:JS,NY,NX) = 0._r8
+  trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1:JS,NY,NX) = 0._r8
   trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
   IF(salt_model)THEN
     trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
@@ -1110,11 +1095,11 @@ module Hour1Mod
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
   IF(VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
 ! exclude NH3B,
-    DO idg=idg_beg,idg_end-1
+    DO idg=idg_beg,idg_NH3
       trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
     ENDDO
   ELSE
-    trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)=0._r8
+    trc_solcl_vr(idg_beg:idg_NH3,0,NY,NX)=0._r8
   ENDIF
 !
 !     TFACL=temperature effect on diffusivity
@@ -1551,7 +1536,7 @@ module Hour1Mod
     VWatLitRHoldCapcity_col(NY,NX)                 = 0._r8
     PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
     trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0._r8
-    trc_solcl_vr(idg_beg:idg_end-1,0,NY,NX)        = 0._r8
+    trc_solcl_vr(idg_beg:idg_NH3,0,NY,NX)        = 0._r8
   ENDIF
   end subroutine GetSurfResidualProperties
 
@@ -2312,19 +2297,19 @@ module Hour1Mod
 !     C*S=soil gas aqueous concentration
 !
     IF(ThetaAir_vr(L,NY,NX).GT.THETX)THEN
-      DO idg=idg_beg,idg_end-1
+      DO idg=idg_beg,idg_NH3
         trcg_gascl_vr(idg,L,NY,NX)=AZMAX1(trcg_gasml_vr(idg,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
       ENDDO
     ELSE
-      trcg_gascl_vr(idg_beg:idg_end-1,L,NY,NX)=0._r8
+      trcg_gascl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     ENDIF
 
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      DO idg=idg_beg,idg_end-1
+      DO idg=idg_beg,idg_NH3
         trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)/VLWatMicP_vr(L,NY,NX))
       ENDDO
     ELSE
-      trc_solcl_vr(idg_beg:idg_end-1,L,NY,NX)=0._r8
+      trc_solcl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     ENDIF
 !    print*,L,trcs_solml_vr(idg_CH4,L,NY,NX),VLWatMicP_vr(L,NY,NX)
 
@@ -2350,10 +2335,10 @@ module Hour1Mod
   DO L=NUI(NY,NX),NLI(NY,NX)
     FWatExMacP2MicP_vr(L,NY,NX)                     = 0._r8
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)   = 0._r8
-    tRootCO2Emis_vr(L,NY,NX)                        = 0._r8
-    trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)         = 0._r8
+    tRootCO2Emis2Root_vr(L,NY,NX)                        = 0._r8
+    trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = 0._r8
     tRO2MicrbUptk_vr(L,NY,NX)                       = 0._r8
-    trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX) = 0._r8
+    trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 
     trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
     trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = 0._r8
@@ -2424,7 +2409,7 @@ module Hour1Mod
     ! 5.56E+04_r8 := mole H2O / m3
     FH2O=5.56E+04_r8/(5.56E+04_r8+SolutesIonConc_vr(L,NY,NX))
     DO idg=idg_beg,idg_NH3
-      GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS(L,NY,NX))*EXP(-ACTCG(idg)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
+      GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS(L,NY,NX))*EXP(-GasSechenovConst(idg)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
     ENDDO
     GasSolbility_vr(idg_NH3B,L,NY,NX)=GasSolbility_vr(idg_NH3,L,NY,NX)
   ENDDO

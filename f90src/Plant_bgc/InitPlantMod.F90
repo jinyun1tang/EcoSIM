@@ -987,8 +987,8 @@ module InitPlantMod
       plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
-      plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)       = 0._r8
-      plt_rbgc%trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)       = 0._r8
+      plt_rbgc%trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)       = 0._r8
+      plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)       = 0._r8
       CCO2A                                                    = CCO2EI
       CCO2P                                             = 0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
       trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_pvr(N,L,NZ)

@@ -233,7 +233,7 @@ module TranspNoSaltMod
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
 !
-  DO idg=idg_beg,idg_end-1
+  DO idg=idg_beg,idg_NH3
     trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml2_snvr(idg,1,NY,NX)+trcg_SnowDrift_flxM(idg,NY,NX)
   ENDDO
 
@@ -242,7 +242,7 @@ module TranspNoSaltMod
   ENDDO
 
   DO  L=1,JS
-    DO idg=idg_beg,idg_end-1
+    DO idg=idg_beg,idg_NH3
       trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)+trcg_Aqua_flxM_snvr(idg,L,NY,NX)
     ENDDO
 
@@ -304,7 +304,7 @@ module TranspNoSaltMod
   ENDDO D9680
 
 !exclude NH3B
-  DO idg=idg_beg,idg_end-1
+  DO idg=idg_beg,idg_NH3
     trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)
   ENDDO
 
@@ -478,7 +478,7 @@ module TranspNoSaltMod
   IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. &   !snow fall
     (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN !rainfall with snowpack
 
-    DO idg=idg_beg,idg_end-1
+    DO idg=idg_beg,idg_NH3
       trcg_AquaAdv_flx_snvr(idg,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
         +Irrig2SoilSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
     ENDDO
@@ -506,7 +506,7 @@ module TranspNoSaltMod
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
 !
-    trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
+    trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1,NY,NX)        = 0.0_r8
     trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
     do idg=idg_beg,idg_NH3
       trcs_TransptMicP_3D(idg,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
@@ -549,10 +549,10 @@ module TranspNoSaltMod
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
   ELSE
-    trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
+    trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1,NY,NX)        = 0.0_r8
     trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
 
-    trcs_TransptMicP_3D(idg_beg:idg_end-1,3,0,NY,NX)        = 0.0_r8
+    trcs_TransptMicP_3D(idg_beg:idg_NH3,3,0,NY,NX)        = 0.0_r8
     trcs_TransptMicP_3D(ids_nut_beg:ids_nuts_end,3,0,NY,NX) = 0.0_r8
     trcs_TransptMicP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)  = 0.0_r8
 
@@ -631,7 +631,7 @@ module TranspNoSaltMod
   integer :: L,K,idg,ids,idom
 
   DO L=NU(NY,NX),NL(NY,NX)
-
+    
     RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_CH4,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CH4,L,NY,NX) +trcs_plant_uptake_vr(idg_CH4,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_N2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,L,NY,NX)  +trcs_plant_uptake_vr(idg_N2,L,NY,NX)+Micb_N2Fixation_vr(L,NY,NX))*dts_gas

@@ -802,7 +802,7 @@ implicit none
   real(r8), intent(in) :: FX,FY
   real(r8), intent(inout) :: CDPTHY(0:JZ)
   integer, intent(in) ::  IFLGL(0:JZ,6)
-  integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG,NTP
+  integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,idg,NTP
   integer :: NTX,NTF,MID,idom
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
@@ -878,13 +878,13 @@ implicit none
       trcp_saltpml_vr(NTP,L1,NY,NX)=trcp_saltpml_vr(NTP,L1,NY,NX)+FX*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
-    DO NTG=idg_beg,idg_NH3
-      trcg_gasml_vr(NTG,L1,NY,NX)=trcg_gasml_vr(NTG,L1,NY,NX)+FX*trcg_gasml_vr(NTG,L0,NY,NX)
+    DO idg=idg_beg,idg_NH3
+      trcg_gasml_vr(idg,L1,NY,NX)=trcg_gasml_vr(idg,L1,NY,NX)+FX*trcg_gasml_vr(idg,L0,NY,NX)
     ENDDO
   ENDIF
   !Exclude NH3 and NH3B, which are accounted in nutrients
-  DO NTG=idg_beg,idg_end-2
-    trcs_solml_vr(NTG,L1,NY,NX)=trcs_solml_vr(NTG,L1,NY,NX)+FX*trcs_solml_vr(NTG,L0,NY,NX)
+  DO idg=idg_beg,idg_end-2
+    trcs_solml_vr(idg,L1,NY,NX)=trcs_solml_vr(idg,L1,NY,NX)+FX*trcs_solml_vr(idg,L0,NY,NX)
   ENDDO
 
   IF(IFLGL(L,3).EQ.0)THEN
@@ -939,9 +939,9 @@ implicit none
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
         DO N=1,MY(NZ,NY,NX)
-          DO NTG=idg_beg,idg_end-1
-            trcg_rootml_pvr(NTG,N,L1,NZ,NY,NX) = trcg_rootml_pvr(NTG,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(NTG,N,L0,NZ,NY,NX)
-            trcs_rootml_pvr(NTG,N,L1,NZ,NY,NX) = trcs_rootml_pvr(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml_pvr(NTG,N,L0,NZ,NY,NX)
+          DO idg=idg_beg,idg_NH3
+            trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
+            trcs_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
           ENDDO
 
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
@@ -1055,13 +1055,13 @@ implicit none
       trcp_saltpml_vr(NTP,L0,NY,NX)=FY*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
-    DO NTG=idg_beg,idg_NH3
-      trcg_gasml_vr(NTG,L0,NY,NX)=FY*trcg_gasml_vr(NTG,L0,NY,NX)
+    DO idg=idg_beg,idg_NH3
+      trcg_gasml_vr(idg,L0,NY,NX)=FY*trcg_gasml_vr(idg,L0,NY,NX)
     ENDDO
   ENDIF
   !exclude NH3 and NH3B, which are accounted in nutrients
-  DO NTG=idg_beg,idg_end-2
-    trcs_solml_vr(NTG,L0,NY,NX)=FY*trcs_solml_vr(NTG,L0,NY,NX)
+  DO idg=idg_beg,idg_end-2
+    trcs_solml_vr(idg,L0,NY,NX)=FY*trcs_solml_vr(idg,L0,NY,NX)
   ENDDO
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
@@ -1115,9 +1115,9 @@ implicit none
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
         DO  N=1,MY(NZ,NY,NX)
-          DO NTG=idg_beg,idg_end-1
-            trcg_rootml_pvr(NTG,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(NTG,N,L0,NZ,NY,NX)
-            trcs_rootml_pvr(NTG,N,L0,NZ,NY,NX) = FY*trcs_rootml_pvr(NTG,N,L0,NZ,NY,NX)
+          DO idg=idg_beg,idg_NH3
+            trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
+            trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
           ENDDO
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
@@ -1173,7 +1173,7 @@ implicit none
   real(r8),intent(in) :: FO
   integer, intent(in) :: IFLGL(0:JZ,6)
 
-  integer :: K,N,M,NGL,NR,NZ,NE,NTG,MID,idom
+  integer :: K,N,M,NGL,NR,NZ,NE,idg,MID,idom
   real(r8) :: FXO,FRO
   real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
   real(r8) :: WTNDLE,FXEPOOLN
@@ -1274,14 +1274,14 @@ implicit none
         ENDIF
 
         DO  N=1,MY(NZ,NY,NX)
-          DO NTG=idg_beg,idg_end-1
-            FXGA                               = FRO*trcg_rootml_pvr(NTG,N,L0,NZ,NY,NX)
-            trcg_rootml_pvr(NTG,N,L1,NZ,NY,NX) = trcg_rootml_pvr(NTG,N,L1,NZ,NY,NX)+FXGA
-            trcg_rootml_pvr(NTG,N,L0,NZ,NY,NX) = trcg_rootml_pvr(NTG,N,L0,NZ,NY,NX)-FXGA
+          DO idg=idg_beg,idg_NH3
+            FXGA                               = FRO*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
+            trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FXGA
+            trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)-FXGA
 
-            FXGP                               = FRO*trcs_rootml_pvr(NTG,N,L0,NZ,NY,NX)
-            trcs_rootml_pvr(NTG,N,L1,NZ,NY,NX) = trcs_rootml_pvr(NTG,N,L1,NZ,NY,NX)+FXGP
-            trcs_rootml_pvr(NTG,N,L0,NZ,NY,NX) = trcs_rootml_pvr(NTG,N,L0,NZ,NY,NX)-FXGP
+            FXGP                               = FRO*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
+            trcs_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L1,NZ,NY,NX)+FXGP
+            trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)-FXGP
           ENDDO
 
           DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
@@ -1491,18 +1491,18 @@ implicit none
   real(r8), intent(in) :: FX,FWO
 
   real(r8) :: FXG
-  integer  :: NTG
+  integer  :: idg
 !
 !     SOIL GASEOUS GASES
 ! exclude NH3B, NH3
-  DO NTG=idg_beg,idg_NH3
-    FXG                        = FWO*trcg_gasml_vr(NTG,L0,NY,NX)
-    trcg_gasml_vr(NTG,L1,NY,NX) = trcg_gasml_vr(NTG,L1,NY,NX)+FXG
-    trcg_gasml_vr(NTG,L0,NY,NX) = trcg_gasml_vr(NTG,L0,NY,NX)-FXG
+  DO idg=idg_beg,idg_NH3
+    FXG                        = FWO*trcg_gasml_vr(idg,L0,NY,NX)
+    trcg_gasml_vr(idg,L1,NY,NX) = trcg_gasml_vr(idg,L1,NY,NX)+FXG
+    trcg_gasml_vr(idg,L0,NY,NX) = trcg_gasml_vr(idg,L0,NY,NX)-FXG
 
-    FXG                        = FWO*trcs_solml_vr(NTG,L0,NY,NX)
-    trcs_solml_vr(NTG,L1,NY,NX) = trcs_solml_vr(NTG,L1,NY,NX)+FXG
-    trcs_solml_vr(NTG,L0,NY,NX) = trcs_solml_vr(NTG,L0,NY,NX)-FXG
+    FXG                        = FWO*trcs_solml_vr(idg,L0,NY,NX)
+    trcs_solml_vr(idg,L1,NY,NX) = trcs_solml_vr(idg,L1,NY,NX)+FXG
+    trcs_solml_vr(idg,L0,NY,NX) = trcs_solml_vr(idg,L0,NY,NX)-FXG
   ENDDO
 
   end Subroutine MoveDisolvGas

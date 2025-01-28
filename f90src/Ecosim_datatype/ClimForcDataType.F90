@@ -89,12 +89,12 @@ implicit none
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE_col(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE_col(:,:)                          !atmospheric N2O concentration, [umol mol-1]
-  real(r8),target,allocatable ::  Z2GE_col(:,:)                          !atmospheric N2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  ZNH3E_col(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  H2GE_col(:,:)                          !atmospheric H2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
-
+  real(r8),target,allocatable ::  Z2GE_col(:,:)                      !atmospheric N2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  ZNH3E_col(:,:)                     !atmospheric NH3 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CH4E_col(:,:)                      !atmospheric CH4 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  H2GE_col(:,:)                      !atmospheric H2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CO2E_col(:,:)                      !atmospheric CO2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  ARGE_col(:,:)                      !atmospheric AR concentration, [umol mol-1]
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
@@ -231,7 +231,7 @@ implicit none
   allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
   allocate(H2GE_col(JY,JX));        H2GE_col=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
-
+  allocate(ARGE_col(JY,JX));        ARGE_col=0._r8
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
@@ -276,7 +276,7 @@ implicit none
   allocate(CCLR(JY,JX));        CCLR=0._r8
   allocate(CC3R(JY,JX));        CC3R=0._r8
   allocate(CHCR(JY,JX));        CHCR=0._r8
-  allocate(trcVolatile_rain_conc(idg_beg:idg_end-1,JY,JX));        trcVolatile_rain_conc=0._r8
+  allocate(trcVolatile_rain_conc(idg_beg:idg_NH3,JY,JX));        trcVolatile_rain_conc=0._r8
   allocate(CAL1R(JY,JX));       CAL1R=0._r8
   allocate(CAL2R(JY,JX));       CAL2R=0._r8
   allocate(CAL3R(JY,JX));       CAL3R=0._r8
@@ -342,6 +342,7 @@ implicit none
   call destroy(HUDX)
   call destroy(HUDN)
   call destroy(TWIND)
+  call destroy(ARGE_col)
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)

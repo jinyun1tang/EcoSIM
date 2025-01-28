@@ -81,7 +81,7 @@ module ChemTranspDataType
 
 
   allocate(trc_salt_rof_bounds(idsalt_beg:idsalt_end,2,2,JV,JH));   trc_salt_rof_bounds=0._r8
-  allocate(trcg_FloXSurRunoff_2D(idg_beg:idg_end-1,2,2,JV,JH));  trcg_FloXSurRunoff_2D=0._r8
+  allocate(trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,2,2,JV,JH));  trcg_FloXSurRunoff_2D=0._r8
   allocate(trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_FloXSurRunoff_2D=0._r8
   allocate(DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_FloXSurRunoff_2D=0._r8
 

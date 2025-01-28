@@ -30,22 +30,22 @@ module RootGasMod
   !local variables
   integer :: M,MX
   real(r8) :: B,C
-  real(r8) :: trcg_rootml_loc(idg_beg:idg_end-1)     !vol gaseous mass volatile in roots
-  real(r8) :: trcs_rootml_loc(idg_beg:idg_end-1)     !vol aqueous mass volatile in roots
+  real(r8) :: trcg_rootml_loc(idg_beg:idg_NH3)     !vol gaseous mass volatile in roots
+  real(r8) :: trcs_rootml_loc(idg_beg:idg_NH3)     !vol aqueous mass volatile in roots
   real(r8) :: trcaqu_conc_soi_loc(idg_beg:idg_end)   !aqueous volatile tracer concentration in soil
-  real(r8) :: trc_conc_root_loc(idg_beg:idg_end-1)   !aqueous tracer concentration in roots  [g m-3]
-  real(r8) :: GasDifc_loc(idg_beg:idg_end-1)
-  real(r8) :: SolDifc_loc(idg_beg:idg_end-1)
-  real(r8) :: trcg_gcon_loc(idg_beg:idg_end-1)       !gaseous volatile concentration in roots 
+  real(r8) :: trc_conc_root_loc(idg_beg:idg_NH3)   !aqueous tracer concentration in roots  [g m-3]
+  real(r8) :: GasDifc_tscaled(idg_beg:idg_NH3)
+  real(r8) :: SolDifc_tscaled(idg_beg:idg_NH3)
+  real(r8) :: trcg_gcon_loc(idg_beg:idg_NH3)       !gaseous volatile concentration in roots 
   real(r8) :: COXYR                             !aqueous O2 concentration at root surface used for uptake
-  real(r8) :: trcs_maxRootml_loc(idg_beg:idg_end-1)
+  real(r8) :: trcs_maxRootml_loc(idg_beg:idg_NH3)
   real(r8) :: DIFOP                             !aqueous diffusivity of O2 within root
   real(r8) :: DifAqueVolatile(idg_beg:idg_end)  !aqueous diffusivity from soil to root
   real(r8) :: DIFOX,DiffusivitySolutEffP
-  real(r8) :: DFAGas(idg_beg:idg_end-1)         !maximum volatile flux from atmosphere to roots
+  real(r8) :: DFAGas(idg_beg:idg_NH3)         !maximum volatile flux from atmosphere to roots
   real(r8) :: DFGP,ROxySoil2Uptk
   real(r8) :: trc_solml_loc(idg_beg:idg_end)
-  real(r8) :: trc_gasml_loc(idg_beg:idg_end-1)
+  real(r8) :: trc_gasml_loc(idg_beg:idg_NH3)
   real(r8) :: O2AquaDiffusvityP
   real(r8) :: RTVLWA  !root H2O vol for NH4
   real(r8) :: RTVLWB  !root H2O vol for NH4B
@@ -55,7 +55,7 @@ module RootGasMod
   real(r8) :: RTCR1,RTCR2
   real(r8) :: RTCRA   !root conductance scalar for gas transport between atmosphere and root inner space [m]
   real(r8) :: RTARRX
-  real(r8) :: RCO2PX                       !root CO2 gas efflux due to root respiration at time step for gas flux calculations
+  real(r8) :: RootCO2Prod_tscaled                       !root CO2 gas efflux due to root respiration at time step for gas flux calculations
   real(r8) :: RRADS
   real(r8) :: RSolUptkTransp(idg_beg:idg_end)   !volatile tracer uptake by transpiration
   real(r8) :: RootOxyUptakePerPlant
@@ -67,11 +67,11 @@ module RootGasMod
   real(r8) :: RDFAqueous(idg_beg:idg_end)
   real(r8) :: RUPOST   !total oyxgen uptake from soil by roots and other processes
   real(r8) :: RUPNTX  !total uptake of NH4 from soil into roots
-  real(r8) :: Root_gas2sol_flx(idg_beg:idg_end-1)    !gas dissolution into aqueous phase of the volatile tracers in roots
-  real(r8) :: trcg_air2root_flx(idg_beg:idg_end-1)   !diffusion flux of gas from atmosphere to inside roots
+  real(r8) :: Root_gas2sol_flx(idg_beg:idg_NH3)    !gas dissolution into aqueous phase of the volatile tracers in roots
+  real(r8) :: trcg_air2root_flx_loc(idg_beg:idg_NH3)   !diffusion flux of gas from atmosphere to inside roots
   real(r8) :: THETW1,THETM
   real(r8) :: RootOxyDemandPerPlant
-  real(r8) :: DisolvedGasVolume(idg_beg:idg_end-1),VLWatMicPMO,VLWatMicPMM,VLsoiAirPMM
+  real(r8) :: DisolvedGasVolume(idg_beg:idg_NH3),VLWatMicPMO,VLWatMicPMM,VLsoiAirPMM
   real(r8) :: VOLWSP,VLWatMicPMA,VLWatMicPMB,VOLWSA,VOLWSB
   real(r8) :: VOLWAqueous(idg_beg:idg_end)  !solubility scaled aqueous volume 
   real(r8) :: VOLPNH3,VOLPNH3B
@@ -196,14 +196,14 @@ module RootGasMod
 !     CG=CO2g,OG=O2g,CH=CH4g,Z2=N2Og,ZH=NH3g,HG=H2g
 !     CL=CO2s,OL=O2s,CQ=CH4s,ZV=N2Os,ZN=NH3s,HL=H2s
 !
-    do idg=idg_beg,idg_end-1
-      GasDifc_loc(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
-      SolDifc_loc(idg) = SoluteDifusvty_vr(idg,L)*dts_gas*FOXYX
+    do idg=idg_beg,idg_NH3
+      GasDifc_tscaled(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+      SolDifc_tscaled(idg) = SoluteDifusvty_vr(idg,L)*dts_gas*FOXYX
     enddo
     O2AquaDiffusvityP = SoluteDifusvty_vr(idg_O2,L)*dts_gas
 
     RGas_Disolv_flx(idg_beg:idg_end)    = 0.0_r8
-    Root_gas2sol_flx(idg_beg:idg_end-1) = 0.0_r8
+    Root_gas2sol_flx(idg_beg:idg_NH3)   = 0.0_r8
 !
 !     ROOT CONDUCTANCE TO GAS TRANSFER
 !
@@ -251,22 +251,22 @@ module RootGasMod
       DIFOP  = O2AquaDiffusvityP*RTARRX
       DO idg  = idg_beg, idg_NH3
         DisolvedGasVolume(idg) = RootVH2O_pvr(N,L,NZ)*GasSolbility_vr(idg,L)
-        DFAGas(idg)            = GasDifc_loc(idg)*RTCRA
+        DFAGas(idg)            = GasDifc_tscaled(idg)*RTCRA
       ENDDO
     ELSE
-      RTARRX                               = 0.0_r8
-      DIFOP                                = 0.0_r8
+      RTARRX                             = 0.0_r8
+      DIFOP                              = 0.0_r8
       DisolvedGasVolume(idg_beg:idg_NH3) = 0.0_r8
       DFAGas(idg_beg:idg_NH3)            = 0.0_r8
-      DFAGas(idg_O2)                       = AMIN1(1.e-12_r8,RootPoreVol_pvr(N,L,NZ))
+      DFAGas(idg_O2)                     = AMIN1(1.e-12_r8,RootPoreVol_pvr(N,L,NZ))
     ENDIF
 
     DO idg=idg_beg,idg_NH3
       RootGasConductance_pvr(idg,N,L,NZ) = AMIN1(DFAGas(idg),RootPoreVol_pvr(N,L,NZ))
     ENDDO
 
-    DFGP   = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
-    RCO2PX = -RootCO2Autor_pvr(N,L,NZ)*dts_gas
+    DFGP                = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
+    RootCO2Prod_tscaled = -RootCO2Autor_pvr(N,L,NZ)*dts_gas
 !
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
 !     AT SMALLER TIME STEP NPH
@@ -308,7 +308,7 @@ module RootGasMod
         RTARRX = RootAreaDivRadius_vr(N,L)/RRADS
 
         do idg    = idg_beg, idg_NH3
-          DifAqueVolatile(idg)=THETM*SolDifc_loc(idg)*RTARRX
+          DifAqueVolatile(idg)=THETM*SolDifc_tscaled(idg)*RTARRX
 
           if(idg/=idg_O2 .and. idg/=idg_CO2)then
             trc_gasml_loc(idg)=trcg_gascl_vr(idg,L)*VLsoiAirPMM
@@ -346,14 +346,14 @@ module RootGasMod
           enddo
           trcaqu_conc_soi_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),AZMAX1(trc_solml_loc(idg_O2)/VLWatMicPMO))
           IF(RootPoreVol_pvr(N,L,NZ).GT.ZERO)THEN
-            DO idg=idg_beg,idg_end-1
+            DO idg=idg_beg,idg_NH3
               trcg_gcon_loc(idg)=AZMAX1(trcg_rootml_loc(idg)/RootPoreVol_pvr(N,L,NZ))
             ENDDO
           ELSE
-            trcg_gcon_loc(idg_beg:idg_end-1)=0.0_r8
+            trcg_gcon_loc(idg_beg:idg_NH3)=0.0_r8
           ENDIF
 
-          do idg=idg_beg,idg_end-1
+          do idg=idg_beg,idg_NH3
             trc_conc_root_loc(idg)=AZMAX1(trcs_rootml_loc(idg)/RootVH2O_pvr(N,L,NZ))
           enddo
           trc_conc_root_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),trc_conc_root_loc(idg_O2))
@@ -411,11 +411,6 @@ module RootGasMod
 !     ROxySoil2Uptk,ROxyRoot2Uptk=aqueous O2 uptake from soil,root
 !     PP=PFT population
 !     RDFAqueous(:),RootUptkSoiSolute(:)=aqueous gas soil-root diffusion,root uptake, > 0 into soil
-!     RMF*=soil convective solute flux
-!     DIF*=aqueous diffusivity from soil to root
-!     C*S1=soil aqueous concentration non-band
-!     C*B1=soil aqueous concentration band
-!     C*P1=root aqueous concentration
 !
           ROxySoil2Uptk       = ROxySoil2UptkPerPlant*PlantPopulation_pft(NZ)
           ROxyRoot2Uptk       = ROxyRoot2UptkPerPlant*PlantPopulation_pft(NZ)
@@ -431,7 +426,7 @@ module RootGasMod
 
           IF(N.EQ.ipltroot)THEN
             !fluxes only involve roots
-            DO idg=idg_beg,idg_end-1
+            DO idg=idg_beg,idg_NH3
               if(idg/=idg_CO2 .and. idg/=idg_NH3 .and. idg/=idg_O2)then
                 !soil to root fluxes
                 RDFAqueous(idg) = RSolUptkTransp(idg)+DifAqueVolatile(idg)*(trcaqu_conc_soi_loc(idg)-trc_conc_root_loc(idg))
@@ -578,10 +573,10 @@ module RootGasMod
 !     C*E,C*A1=atmosphere,root gas concentration
 !     DF*A=root-atmosphere gas conductance
 !
-            trcs_maxRootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RCO2PX
+            trcs_maxRootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
             trcs_maxRootml_loc(idg_NH3) = trcs_rootml_loc(idg_NH3)+RUPNTX
 
-            DO idg=idg_beg,idg_end-1
+            DO idg=idg_beg,idg_NH3
               if(idg/=idg_CO2 .and. idg/=idg_NH3)then
                 if(idg==idg_O2)then
                   trcs_maxRootml_loc(idg)=trcs_rootml_loc(idg)-ROxyRoot2Uptk                
@@ -593,18 +588,18 @@ module RootGasMod
                 *DisolvedGasVolume(idg)-trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ)) &
                 /(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))
               !>0._r8 into root, <0._r8 into atmosphere, assuming specific rate 1/hr
-              trcg_air2root_flx(idg)=RootGasConductance_pvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
+              trcg_air2root_flx_loc(idg)=RootGasConductance_pvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
             enddo
           ELSE
-            Root_gas2sol_flx(idg_beg:idg_end-1)  = 0.0_r8
-            trcg_air2root_flx(idg_beg:idg_end-1) = 0.0_r8
+            Root_gas2sol_flx(idg_beg:idg_NH3)  = 0.0_r8
+            trcg_air2root_flx_loc(idg_beg:idg_NH3) = 0.0_r8
           ENDIF
 !
 !     UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS
 !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
 !
-          DO idg=idg_beg,idg_end-1
-            trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)+trcg_air2root_flx(idg)
+          DO idg=idg_beg,idg_NH3
+            trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)+trcg_air2root_flx_loc(idg)
             if(idg==idg_O2)then
               trcs_rootml_loc(idg) = trcs_rootml_loc(idg)+Root_gas2sol_flx(idg)-ROxyRoot2Uptk      !O2 is consumed.     
             else
@@ -612,7 +607,7 @@ module RootGasMod
             endif
           ENDDO
           !releas autotrophic respiration CO2 into roots
-          trcs_rootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RCO2PX
+          trcs_rootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
           trcs_rootml_loc(idg_NH3) = trcs_rootml_loc(idg_NH3)+RootUptkSoiSolute(idg_NH3B)
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
@@ -633,9 +628,9 @@ module RootGasMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
 !
-          DO idg=idg_beg,idg_end-1
+          DO idg=idg_beg,idg_NH3
             trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ) = trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)+Root_gas2sol_flx(idg)
-            trcg_air2root_flx_pvr(idg,N,L,NZ)    = trcg_air2root_flx_pvr(idg,N,L,NZ)+trcg_air2root_flx(idg)
+            trcg_air2root_flx_pvr(idg,N,L,NZ)    = trcg_air2root_flx_pvr(idg,N,L,NZ)+trcg_air2root_flx_loc(idg)
           ENDDO
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
@@ -644,7 +639,7 @@ module RootGasMod
 !     RootO2Uptk_pvr=root O2 uptake from root
 !     RO2UptkSoilM_vr=total O2 uptake from soil by all microbial,root popns
 !
-          RootCO2Emis_pvr(N,L,NZ) = RootCO2Emis_pvr(N,L,NZ)+RCO2PX+RootUptkSoiSolute(idg_CO2)
+          RootCO2Emis_pvr(N,L,NZ) = RootCO2Emis_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
           RootO2Uptk_pvr(N,L,NZ)  = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk  !uptake from O2 in roots
           RO2UptkSoilM_vr(M,L)    = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk    !uptake from soil O2 for respiration
         ENDDO D90

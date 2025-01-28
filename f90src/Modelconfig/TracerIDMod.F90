@@ -14,7 +14,8 @@ implicit none
   integer, parameter :: idg_N2 =4
   integer, parameter :: idg_N2O=5
   integer, parameter :: idg_H2 =6
-  integer, parameter :: idg_NH3=7
+  integer, parameter :: idg_AR =7
+  integer, parameter :: idg_NH3=8
   integer, parameter :: idg_beg = idg_CO2  
   character(len=10), allocatable :: trcs_names(:)
   integer  :: idg_NH3B

@@ -43,7 +43,7 @@ contains
   real(r8),intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8),intent(inout) :: WaterFlow2SoilMM_3D(3,JD,JV,JH)
   real(r8),intent(out) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
-  real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_end-1)
+  real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
   real(r8),intent(out) :: RGasAtmDisol2SoilM(idg_beg:idg_end)
   real(r8),intent(out) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3)
   character(len=*), parameter :: subname='SoluteFluxSurfaceM'
@@ -723,7 +723,7 @@ contains
   implicit none
 
   integer, intent(in) :: I,J, M,NY, NX
-  real(r8), intent(in) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_end-1)
+  real(r8), intent(in) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
   real(r8) :: VOLGas
   real(r8) :: trc_gascl
   integer  :: idg
@@ -815,7 +815,7 @@ contains
   implicit none
   integer, intent(in) :: I,J,NY,NX,M
   real(r8),intent(out) :: trcs_cl1(ids_beg:ids_end)
-  real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_end-1)
+  real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
   real(r8),intent(out) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3)
   real(r8),intent(out) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
 

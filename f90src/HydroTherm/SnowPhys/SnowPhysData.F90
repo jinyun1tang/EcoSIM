@@ -62,15 +62,15 @@ module SnowPhysData
   subroutine  InitSnowPhysData
   implicit none
 
-  allocate(trcg_TBLS(idg_beg:idg_end-1,JS,JY,JX));        trcg_TBLS=0._r8
+  allocate(trcg_TBLS(idg_beg:idg_NH3,JS,JY,JX));        trcg_TBLS=0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
   allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX));       trcSalt_TBLS=0._r8  
   allocate(trcSalt_TQS(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQS=0._r8  
   allocate(trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flxM=0._r8  
   allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQR=0._r8  
-  allocate(trcg_QSS(idg_beg:idg_end-1,JY,JX));            trcg_QSS=0._r8
+  allocate(trcg_QSS(idg_beg:idg_NH3,JY,JX));            trcg_QSS=0._r8
   allocate(trcn_QSS(ids_nut_beg:ids_nuts_end,JY,JX));trcn_QSS=0._r8
-  allocate(trcg_SurfRunoff_flxM(idg_beg:idg_end-1,JY,JX));      trcg_SurfRunoff_flxM=0._r8
+  allocate(trcg_SurfRunoff_flxM(idg_beg:idg_NH3,JY,JX));      trcg_SurfRunoff_flxM=0._r8
 
   allocate(TIceBySnowRedist(JY,JX));         TIceBySnowRedist=0._r8
   allocate(TWatBySnowRedist(JY,JX));         TWatBySnowRedist=0._r8

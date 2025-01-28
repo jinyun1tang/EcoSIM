@@ -156,7 +156,7 @@ module AqueChemDatatype
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
   allocate(TR_gas_NH3_geochem_vr(0:JZ,JY,JX));  TR_gas_NH3_geochem_vr=0._r8
   allocate(trcp_RChem_soil(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil=0._r8
-  allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
+  allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
   allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
   if(salt_model)then
     allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8

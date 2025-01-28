@@ -336,12 +336,12 @@ implicit none
           Root1stRadius_pvr(N,L,NZ)       = Root1stMaxRadius_pft(N,NZ)
           Root2ndRadius_pvr(N,L,NZ)       = Root2ndMaxRadius_pft(N,NZ)
           Root2ndAveLen_pvr(N,L,NZ)       = Root2ndAveLenMin
-          DO NTG=idg_beg,idg_end-1
+          DO NTG=idg_beg,idg_NH3
             RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ) &
               -(trcg_rootml_pvr(NTG,N,L,NZ)+trcs_rootml_pvr(NTG,N,L,NZ))
           ENDDO
-          trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
-          trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
+          trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)=0._r8
+          trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)=0._r8
         ENDIF
       !   call SumRootBiome(NZ,masst_finale)
       ENDIF
@@ -1850,7 +1850,7 @@ implicit none
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2, O2, CH4, N2O, NH3, H2
 !     FRTN=fraction of primary root sink strength in axis
 !
-        DO NTG=idg_beg,idg_end-1
+        DO NTG=idg_beg,idg_NH3
           RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-FRTN &
             *(trcg_rootml_pvr(idg_CO2,NN,LL,NZ)+trcs_rootml_pvr(idg_CO2,NN,LL,NZ))
           trcg_rootml_pvr(NTG,NN,LL,NZ) = (1.0_r8-FRTN)*trcg_rootml_pvr(NTG,NN,LL,NZ)

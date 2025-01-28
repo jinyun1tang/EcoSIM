@@ -115,7 +115,7 @@ contains
   allocate(fTgrowRootP_vr(JZ,JP,JY,JX));  fTgrowRootP_vr=0._r8
   allocate(RootrNC_pft(JP,JY,JX));     RootrNC_pft=0._r8
   allocate(RootrPC_pft(JP,JY,JX));     RootrPC_pft=0._r8
-  allocate(RootGasConductance_pvr(idg_beg:idg_end-1,jroots,JZ,JP,JY,JX));RootGasConductance_pvr=0._r8
+  allocate(RootGasConductance_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX));RootGasConductance_pvr=0._r8
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._r8
   allocate(RootRadialResist_pft(jroots,JP,JY,JX));   RootRadialResist_pft=0._r8
   allocate(RootAxialResist_pft(jroots,JP,JY,JX));   RootAxialResist_pft=0._r8
@@ -159,9 +159,9 @@ contains
   allocate(PSIRoot_pvr(jroots,JZ,JP,JY,JX));PSIRoot_pvr=0._r8
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._r8
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
-  allocate(trcg_rootml_pvr(idg_beg:idg_end-1,jroots,JZ,JP,JY,JX)); trcg_rootml_pvr =0._r8
-  allocate(trcs_rootml_pvr(idg_beg:idg_end-1,jroots,JZ,JP,JY,JX)); trcs_rootml_pvr =0._r8
-  allocate(TRootGasLossDisturb_pft(idg_beg:idg_end-1,JY,JX));TRootGasLossDisturb_pft=0._r8
+  allocate(trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcg_rootml_pvr =0._r8
+  allocate(trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcs_rootml_pvr =0._r8
+  allocate(TRootGasLossDisturb_pft(idg_beg:idg_NH3,JY,JX));TRootGasLossDisturb_pft=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootElms_pft(NumPlantChemElms,JP,JY,JX)); RootElms_pft=0._r8
   allocate(RootStrutElms_pft(NumPlantChemElms,JP,JY,JX));   RootStrutElms_pft=0._r8

@@ -189,7 +189,7 @@ module StarteMod
   implicit none
   integer, intent(in) :: K, I, L, NY, NX
   type(solutedtype), intent(in) :: solutevar
-  integer :: nsalts,ids
+  integer :: nsalts,ids,idg
 !
 !     SOLUTE CONCENTRATIONS IN PRECIPITATION
 !
@@ -386,33 +386,25 @@ module StarteMod
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
     trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI(NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trcg_gasml_vr(idg_CH4,L,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trcg_gasml_vr(idg_O2,L,NY,NX)  = AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trcg_gasml_vr(idg_N2,L,NY,NX)  = AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trcg_gasml_vr(idg_N2O,L,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trcg_gasml_vr(idg_NH3,L,NY,NX) = AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trcg_gasml_vr(idg_H2,L,NY,NX)  = AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    DO idg=idg_beg,idg_NH3
+      trcg_gasml_vr(idg,L,NY,NX) = AtmGasCgperm3(idg,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    ENDDO
 
 !   ExtWaterTablet0_col: external water table depth
     IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.ExtWaterTablet0_col(NY,NX))THEN
       ! above water table
       trcs_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
-        /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
+        /(EXP(GasSechenovConst(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     ELSE
       !below water table
       trcs_solml_vr(idg_O2,L,NY,NX)=0._r8
     ENDIF
 
-    trcs_solml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trcs_solml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trcs_solml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trcs_solml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trcs_solml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
+    
+    DO idg=idg_beg,idg_NH3-1  
+      trcs_solml_vr(idg,L,NY,NX)=AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, ATCA(NY,NX)) &
+        /(EXP(GasSechenovConst(idg)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
+    ENDDO  
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
@@ -566,7 +558,7 @@ module StarteMod
           enddo
         ENDIF
       ELSE
-        trcg_solsml_snvr(idg_beg:idg_end-1,L,NY,NX)        = 0._r8
+        trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)        = 0._r8
         trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK

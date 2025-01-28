@@ -141,7 +141,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
 
-  integer :: N,L,K,NTG,NE,idg,ids
+  integer :: N,L,K,idg,NE,ids
  
   associate(                                                       &
     NU                       => plt_site%NU,                       &
@@ -175,7 +175,7 @@ module ExtractsMod
     REcoO2DmndResp_vr        => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr    => plt_bgcr%tRootMycoExud2Soil_vr,    &
     tRO2MicrbUptk_vr         => plt_bgcr%tRO2MicrbUptk_vr,         &
-    tRootCO2Emis_vr          => plt_bgcr%tRootCO2Emis_vr,          &
+    tRootCO2Emis2Root_vr          => plt_bgcr%tRootCO2Emis2Root_vr,          &
     REcoH2PO4DmndBand_vr     => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
     TKS_vr                   => plt_ew%TKS_vr,                     &
@@ -222,9 +222,9 @@ module ExtractsMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
-      DO NTG=idg_beg,idg_NH3
-        trcg_rootml_pvr(NTG,N,L,NZ) = trcg_rootml_pvr(NTG,N,L,NZ)-trcg_Root_gas2aqu_flx_vr(NTG,N,L,NZ)+trcg_air2root_flx_pvr(NTG,N,L,NZ)
-        trcs_rootml_pvr(NTG,N,L,NZ) = trcs_rootml_pvr(NTG,N,L,NZ)+trcg_Root_gas2aqu_flx_vr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        trcg_rootml_pvr(idg,N,L,NZ) = trcg_rootml_pvr(idg,N,L,NZ)-trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)+trcg_air2root_flx_pvr(idg,N,L,NZ)
+        trcs_rootml_pvr(idg,N,L,NZ) = trcs_rootml_pvr(idg,N,L,NZ)+trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)
       ENDDO
 
       trcs_rootml_pvr(idg_CO2,N,L,NZ) = trcs_rootml_pvr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
@@ -239,8 +239,8 @@ module ExtractsMod
 !     TL*P=total root gas content, dissolved + gaseous phase
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
-      DO NTG=idg_beg,idg_end-1
-        trcg_root_vr(NTG,L)=trcg_root_vr(NTG,L)+trcs_rootml_pvr(NTG,N,L,NZ)+trcg_rootml_pvr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)
       ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
@@ -254,12 +254,13 @@ module ExtractsMod
 !     solute code:NH4=NH4,NO3=NO3,H2P=H2PO4,H1P=H1PO4 in non-band
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
-      DO NTG=idg_beg,idg_end-1
-        trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx_pvr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
 
-      tRootCO2Emis_vr(L) =tRootCO2Emis_vr(L)-RootCO2Emis_pvr(N,L,NZ)
+      tRootCO2Emis2Root_vr(L) =tRootCO2Emis2Root_vr(L)-RootCO2Emis_pvr(N,L,NZ)
       tRO2MicrbUptk_vr(L)=tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_vr(idg,N,L,NZ)
       ENDDO
@@ -283,24 +284,6 @@ module ExtractsMod
 !     TOTAL ROOT + MICROBIAL UPTAKE USED TO CALCULATE
 !     COMPETITION CONSTRAINTS
 !
-!     REcoO2DmndResp_vr=O2 demand by all microbial,root,myco populations
-!     REcoNH4DmndSoil_vr=NH4 demand in non-band by all microbial,root,myco populations
-!     REcoNO3DmndSoil_vr=NO3 demand in non-band by all microbial,root,myco populations
-!     REcoH2PO4DmndSoil_vr=H2PO4 demand in non-band by all microbial,root,myco populations
-!     REcoH1PO4DmndSoil_vr=HPO4 demand in non-band by all microbial,root,myco populations
-!     REcoNH4DmndBand_vr=NH4 demand in band by all microbial,root,myco populations
-!     REcoNO3DmndBand_vr=NO3 demand in band by all microbial,root,myco populations
-!     REcoH2PO4DmndBand_vr=H2PO4 demand in band by all microbial,root,myco populations
-!     REcoH1PO4DmndBand_vr=HPO4 demand in band by all microbial,root,myco populations
-!     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-!     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root population
-!     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root population
-!     RootH2PO4DmndSoil_pvr=H2PO4 demand in non-band by each root population
-!     RootH1PO4DmndSoil_pvr=HPO4 demand in non-band by each root population
-!     RootNH4DmndBand_pvr=NH4 demand in band by each root population
-!     RUNNXB=NO3 demand in band by each root population
-!     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root population
-!     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root population
 !
       REcoO2DmndResp_vr(L)=REcoO2DmndResp_vr(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
       REcoNH4DmndSoil_vr(L)=REcoNH4DmndSoil_vr(L)+RootNH4DmndSoil_pvr(N,L,NZ)
@@ -327,7 +310,7 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: L, NE,NB,NTG
+  integer :: L, NE,NB,idg
   real(r8) :: ENGYC
 
   associate(                                                         &
@@ -433,8 +416,8 @@ module ExtractsMod
     PlantElemntStoreLandscape(NE) = PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
   ENDDO
 
-  DO NTG=idg_beg,idg_end-1
-    TRootGasLossDisturb_pft(NTG)=TRootGasLossDisturb_pft(NTG)+RootGasLossDisturb_pft(NTG,NZ)
+  DO idg=idg_beg,idg_NH3
+    TRootGasLossDisturb_pft(idg)=TRootGasLossDisturb_pft(idg)+RootGasLossDisturb_pft(idg,NZ)
   ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION

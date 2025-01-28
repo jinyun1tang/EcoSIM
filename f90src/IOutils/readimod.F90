@@ -285,6 +285,7 @@ module readiMod
       CO2EI(NY,NX)              = aco2_ppm
       CH4E_col(NY,NX)           = ach4_ppm
       Z2OE_col(NY,NX)           = an2o_ppm
+      ARGE_col(NY,NX)           = arg_ppm
       ZNH3E_col(NY,NX)          = ZNH3EG
       KoppenClimZone_col(NY,NX) = IETYPG
       FlowDirIndicator(NY,NX)   = grid_mode

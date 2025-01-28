@@ -33,7 +33,7 @@ implicit none
   implicit none
   integer, intent(in) :: N1,N2,NY,NX,I,J
   integer :: LS, LS2
-  integer :: NTG,NTN,NTSA,NTS
+  integer :: idg,NTN,NTSA,NTS
 !     begin_execution
 !     NET WATER AND HEAT FLUXES THROUGH SNOWPACK
 !
@@ -64,9 +64,9 @@ implicit none
         !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
         !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
         !
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_AquaAdv_flx_snvr(NTG,LS,N2,N1) &
-            -trcg_AquaAdv_flx_snvr(NTG,LS2,N2,N1)
+        DO idg=idg_beg,idg_NH3
+          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
+            -trcg_AquaAdv_flx_snvr(idg,LS2,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -101,10 +101,10 @@ implicit none
       ELSE
 
         ! and NH3B
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_AquaAdv_flx_snvr(NTG,LS,N2,N1) &
-            -trcs_TransptMicP_3D(NTG,3,0,N2,N1)-trcs_TransptMicP_3D(NTG,3,NUM(N2,N1),N2,N1) &
-            -trcs_TransptMacP_3D(NTG,3,NUM(N2,N1),N2,N1)
+        DO idg=idg_beg,idg_NH3
+          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
+            -trcs_TransptMicP_3D(idg,3,0,N2,N1)-trcs_TransptMicP_3D(idg,3,NUM(N2,N1),N2,N1) &
+            -trcs_TransptMacP_3D(idg,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -143,8 +143,8 @@ implicit none
     ELSEIF(LS.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_AquaAdv_flx_snvr(NTG,LS,N2,N1)
+        DO idg=idg_beg,idg_NH3
+          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1)
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
@@ -210,13 +210,13 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
 
-  integer :: NTA,NTG,NTS
+  integer :: NTA,idg,NTS
 !     begin_execution
 !     OVERLAND SNOW REDISTRIBUTION
 !
   IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
-    DO NTG=idg_beg,idg_end-1
-      trcg_solsml_snvr(NTG,1,NY,NX)=trcg_solsml_snvr(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
+    DO idg=idg_beg,idg_NH3
+      trcg_solsml_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)+trcg_QSS(idg,NY,NX)
     ENDDO
 
     DO NTS=ids_nut_beg,ids_nuts_end
@@ -237,7 +237,7 @@ implicit none
 
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
-  integer :: NN,NTG,NTN,NTSA,idg
+  integer :: NN,idg,NTN,NTSA
 
   TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrySnoBySnoRedistrib_2DH(N,N2,N1)&
     -DrySnoBySnoRedistrib_2DH(N,N5,N4)
@@ -250,8 +250,8 @@ implicit none
 
   D1202: DO NN=1,2
     !gaseous tracers
-    DO NTG=idg_beg,idg_end-1
-      trcg_SurfRunoff_flxM(NTG,N2,N1)=trcg_SurfRunoff_flxM(NTG,N2,N1)+trcg_FloXSurRunoff_2D(NTG,N,NN,N2,N1)
+    DO idg=idg_beg,idg_NH3
+      trcg_SurfRunoff_flxM(idg,N2,N1)=trcg_SurfRunoff_flxM(idg,N2,N1)+trcg_FloXSurRunoff_2D(idg,N,NN,N2,N1)
     ENDDO
 
     !nutrient tracres
@@ -261,17 +261,18 @@ implicit none
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
 
-      DO NTG=idg_beg,idg_end-1
-        trcg_SurfRunoff_flxM(NTG,N2,N1)=trcg_SurfRunoff_flxM(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5,N4)
+      DO idg=idg_beg,idg_NH3
+        trcg_SurfRunoff_flxM(idg,N2,N1)=trcg_SurfRunoff_flxM(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5,N4)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
         trcn_SurfRunoff_flxM(NTN,N2,N1)=trcn_SurfRunoff_flxM(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5,N4)
       ENDDO
 
     ENDIF 
+
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-      DO NTG=idg_beg,idg_end-1
-        trcg_SurfRunoff_flxM(NTG,N2,N1)=trcg_SurfRunoff_flxM(NTG,N2,N1)-trcg_FloXSurRunoff_2D(NTG,N,NN,N5B,N4B)
+      DO idg=idg_beg,idg_NH3
+        trcg_SurfRunoff_flxM(idg,N2,N1)=trcg_SurfRunoff_flxM(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5B,N4B)
       ENDDO
       DO NTN=ids_nut_beg,ids_nuts_end
         trcn_SurfRunoff_flxM(NTN,N2,N1)=trcn_SurfRunoff_flxM(NTN,N2,N1)-trcn_FloXSurRunoff_2D(NTN,N,NN,N5B,N4B)
@@ -282,15 +283,6 @@ implicit none
 
   !
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
-  !
-  !     T*QRS=net overland solute flux from runoff
-  !     X*QRS=solute in runoff from TranspNoSalt.f
-  !     T*QSS=net overland solute flux from snowpack
-  !     X*QSS=solute in snowpack flux from TranspNoSalt.f
-  !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-  !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-  !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-  !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
   !
   do idg=idg_beg,idg_NH3
     trcg_QSS(idg,N2,N1) = trcg_QSS(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,N2,N1)-trcg_FloXSnow_2DH(idg,N,N5,N4)
@@ -352,17 +344,17 @@ implicit none
   implicit none 
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  integer :: NTSA,NTU,NTG
+  integer :: NTSA,NTU,idg
   real(r8) :: dflx
 
     !    SOLUTES
 !  exclude NH3B
 !  if(NX==5)write(111,*)I+J/24.,'beg18',trcs_solml_vr(ids_NH4,0,1,5),trcs_solml_vr(idg_NH3,0,1,5)
 
-  DO NTG=idg_beg,idg_end-1
-    dflx=-trcg_SurfRunoff_flxM(NTG,NY,NX)
-    call fixEXflux(trcs_solml_vr(NTG,0,NY,NX),dflx)
-    trcg_SurfRunoff_flxM(NTG,NY,NX)=-dflx
+  DO idg=idg_beg,idg_NH3
+    dflx=-trcg_SurfRunoff_flxM(idg,NY,NX)
+    call fixEXflux(trcs_solml_vr(idg,0,NY,NX),dflx)
+    trcg_SurfRunoff_flxM(idg,NY,NX)=-dflx
   ENDDO
 
 !  if(NX==5)write(111,*)I+J/24.,'beg19',trcs_solml_vr(ids_NH4,0,1,5),trcs_solml_vr(idg_NH3,0,1,5)

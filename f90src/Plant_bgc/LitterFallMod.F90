@@ -442,12 +442,12 @@ implicit none
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
-        DO NTG=idg_beg,idg_end-1
+        DO NTG=idg_beg,idg_NH3
           RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-trcg_rootml_pvr(NTG,N,L,NZ)&
             -trcs_rootml_pvr(NTG,N,L,NZ)
         ENDDO
-        trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
-        trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
+        trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)=0._r8
+        trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)=0._r8
       ENDDO
     ENDDO    
 !

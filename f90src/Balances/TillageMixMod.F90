@@ -134,7 +134,7 @@ module TillageMixMod
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_end-1,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
 
   CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
 

@@ -414,22 +414,23 @@ module InitSoluteMod
 !     INITIALIZE GASES
 !
 
-  CCO2X=CCO2M*gas_solubility(idg_CO2,ATCA)/(EXP(ACTCG(idg_CO2)*CSTRZ))*FH2O
-  CCO2Y=LOG(CCO2X)
-  CCO2Z=ABS(CCO2Y)
-  H2CO3_aqu_conc=CCO2X
-  FCO3=DPCO3*A0/(H_1p_conc**2._r8*A2)
-  FHCO=DPCO2*A0/(H_1p_conc*A1)
-  Z=ACTCG(idg_CO2)*(2.0E-03_r8*FCO3+0.5E-03_r8*FHCO)
-  DO  MM=1,25
+  CCO2X          = CCO2M*gas_solubility(idg_CO2,ATCA)/(EXP(GasSechenovConst(idg_CO2)*CSTRZ))*FH2O
+  CCO2Y          = LOG(CCO2X)
+  CCO2Z          = ABS(CCO2Y)
+  H2CO3_aqu_conc = CCO2X
+  FCO3           = DPCO3*A0/(H_1p_conc**2._r8*A2)
+  FHCO           = DPCO2*A0/(H_1p_conc*A1)
+  Z              = GasSechenovConst(idg_CO2)*(2.0E-03_r8*FCO3+0.5E-03_r8*FHCO)
+  DO MM   = 1, 25
     R=(LOG(H2CO3_aqu_conc)+Z*H2CO3_aqu_conc-CCO2Y)/CCO2Z
     IF(R.LT.1.0E-03_r8)exit
     H2CO3_aqu_conc=H2CO3_aqu_conc/SQRT(1.0_r8+R)
   ENDDO
-  CH4_aqu_conc=CCH4M*gas_solubility(idg_CH4,ATCA)/(EXP(ACTCG(idg_CH4)*CSTR1))*FH2O
-  O2_aqu_conc=COXYM*gas_solubility(idg_O2,ATCA)/(EXP(ACTCG(idg_O2)*CSTR1))*FH2O
-  N2_aqu_conc=CZ2GM*gas_solubility(idg_N2,ATCA)/(EXP(ACTCG(idg_N2)*CSTR1))*FH2O
-  N2O_aqu_conc=CZ2OM*gas_solubility(idg_N2O,ATCA)/(EXP(ACTCG(idg_N2O)*CSTR1))*FH2O
+
+  CH4_aqu_conc = CCH4M*gas_solubility(idg_CH4,ATCA)/(EXP(GasSechenovConst(idg_CH4)*CSTR1))*FH2O
+  O2_aqu_conc  = COXYM*gas_solubility(idg_O2,ATCA)/(EXP(GasSechenovConst(idg_O2)*CSTR1))*FH2O
+  N2_aqu_conc  = CZ2GM*gas_solubility(idg_N2,ATCA)/(EXP(GasSechenovConst(idg_N2)*CSTR1))*FH2O
+  N2O_aqu_conc = CZ2OM*gas_solubility(idg_N2O,ATCA)/(EXP(GasSechenovConst(idg_N2O)*CSTR1))*FH2O
 
   CO3_2e_conc=H2CO3_aqu_conc*DPCO3*A0/(H_1p_conc**2._r8*A2)
   HCO3_e_conc=H2CO3_aqu_conc*DPCO2*A0/(H_1p_conc*A1)
@@ -1517,22 +1518,22 @@ module InitSoluteMod
 !
 !     ION CONCENTRATIONS
 !
-  CCO2X=CCO2M*SCO2X/(EXP(ACTCG(idg_CO2)*CSTRZ))*EXP(0.843-0.0281*ATCA)*FH2O
+  CCO2X=CCO2M*SCO2X/(EXP(GasSechenovConst(idg_CO2)*CSTRZ))*EXP(0.843-0.0281*ATCA)*FH2O
   CCO2Y=LOG(CCO2X)
   CCO2Z=ABS(CCO2Y)
   H2CO3_aqu_conc=CCO2X
   FCO3=DPCO3*A0/(H_1p_activity**2*A2)
   FHCO=DPCO2*A0/(H_1p_activity*A1)
-  Z=ACTCG(idg_CO2)*(2.0E-03*FCO3+0.5E-03*FHCO)
+  Z=GasSechenovConst(idg_CO2)*(2.0E-03*FCO3+0.5E-03*FHCO)
   DO  MM=1,25
     R=(LOG(H2CO3_aqu_conc)+Z*H2CO3_aqu_conc-CCO2Y)/CCO2Z
     IF(R.LT.1.0E-03)exit
     H2CO3_aqu_conc=H2CO3_aqu_conc/SQRT(1.0_r8+R)
   ENDDO
-  CH4_aqu_conc=CCH4M*SCH4X/(EXP(ACTCG(idg_CH4)*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
-  O2_aqu_conc=COXYM*SOXYX/(EXP(ACTCG(idg_O2)*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
-  N2_aqu_conc=CZ2GM*SN2GX/(EXP(ACTCG(idg_N2)*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O
-  N2O_aqu_conc=CZ2OM*SN2OX/(EXP(ACTCG(idg_N2O)*CSTR1))*EXP(0.897-0.0299*ATCA)*FH2O
+  CH4_aqu_conc=CCH4M*SCH4X/(EXP(GasSechenovConst(idg_CH4)*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
+  O2_aqu_conc=COXYM*SOXYX/(EXP(GasSechenovConst(idg_O2)*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
+  N2_aqu_conc=CZ2GM*SN2GX/(EXP(GasSechenovConst(idg_N2)*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O
+  N2O_aqu_conc=CZ2OM*SN2OX/(EXP(GasSechenovConst(idg_N2O)*CSTR1))*EXP(0.897-0.0299*ATCA)*FH2O
   NH4_1p_conc=NH4_1p_conc+RN4S
   NH3_aqu_conc=NH3_aqu_conc+RN3S
   Al_3p_conc=Al_3p_conc+RAL

@@ -233,8 +233,8 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
 
-  plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)        = 0.0_r8
-  plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)     = 0.0_r8
+  plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
+  plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
   plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
   plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
   plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8

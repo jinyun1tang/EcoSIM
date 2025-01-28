@@ -526,7 +526,7 @@ implicit none
   !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
   !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
   !
-  DO NTG=idg_beg,idg_end-1
+  DO NTG=idg_beg,idg_NH3
     trcg_solsml_snvr(NTG,L,NY,NX)=trcg_solsml_snvr(NTG,L,NY,NX)+trcg_TBLS(NTG,L,NY,NX)
   ENDDO
 
@@ -534,15 +534,6 @@ implicit none
     trcn_solsml_snvr(NTN,L,NY,NX)=trcn_solsml_snvr(NTN,L,NY,NX)+trcn_TBLS(NTN,L,NY,NX)
   ENDDO
   !
-  !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-  !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-  !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-  !          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-  !          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-  !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-  !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-  !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-  !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
   !
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end
@@ -667,7 +658,7 @@ implicit none
           TCSnow_snvr(L1,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L1,NY,NX))
 !          chemicals
           !gas
-          DO NTG=idg_beg,idg_end-1
+          DO NTG=idg_beg,idg_NH3
             trcg_solsml_snvr(NTG,L1,NY,NX)=trcg_solsml_snvr(NTG,L1,NY,NX)+FX*trcg_solsml_snvr(NTG,L0,NY,NX)
           ENDDO
 
@@ -702,7 +693,7 @@ implicit none
           endif
           TCSnow_snvr(L0,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L0,NY,NX))
 !     chemicals
-          DO NTG=idg_beg,idg_end-1
+          DO NTG=idg_beg,idg_NH3
             trcg_solsml_snvr(NTG,L0,NY,NX)=FY*trcg_solsml_snvr(NTG,L0,NY,NX)
           ENDDO
           DO NTU=ids_nut_beg,ids_nuts_end
@@ -776,14 +767,13 @@ implicit none
   THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
   trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
-  trcg_QSS(idg_beg:idg_end-1,NY,NX)                      = 0.0_r8
+  trcg_QSS(idg_beg:idg_NH3,NY,NX)                      = 0.0_r8
   trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)               = 0.0_r8
-  trcg_SurfRunoff_flxM(idg_beg:idg_end-1,NY,NX)           = 0.0_r8
+  trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
 
   DO  L=1,JS
-    trcg_TBLS(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
+    trcg_TBLS(idg_beg:idg_NH3,L,NY,NX)=0.0_r8
     trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
-
   ENDDO
 
   IF(salt_model)THEN

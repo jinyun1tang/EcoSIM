@@ -81,7 +81,7 @@ implicit none
   HeatFlx2Canopy_col(NY,NX)                        = plt_ew%HeatFlx2Canopy_col
   CanopyWat_col(NY,NX)                             = plt_ew%CanopyWat_col
   CanopyHeatStor_col(NY,NX)                        = plt_ew%CanopyHeatStor_col
-  TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX) = plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)
+  TRootGasLossDisturb_pft(idg_beg:idg_NH3,NY,NX) = plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_NH3)
   Canopy_NEE_col(NY,NX)                            = plt_bgcr%Canopy_NEE_col
   TPlantRootH2OUptake_col(NY,NX)                   = plt_ew%TPlantRootH2OUptake_col
   FERT(17:19,I1,NY,NX) = plt_distb%FERT(17:19)
@@ -136,9 +136,9 @@ implicit none
       RootMassElm_vr(NE,L,NY,NX)=  sum(plt_biom%RootMassElm_pvr(NE,L,1:NP0(NY,NX)))
     ENDDO
     totRootLenDens_vr(L,NY,NX)                      = plt_morph%totRootLenDens_vr(L)
-    trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_end-1,L)
-    trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L)
-    tRootCO2Emis_vr(L,NY,NX)                        = plt_bgcr%tRootCO2Emis_vr(L)
+    trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)
+    trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
+    tRootCO2Emis2Root_vr(L,NY,NX)                        = plt_bgcr%tRootCO2Emis2Root_vr(L)
     tRO2MicrbUptk_vr(L,NY,NX)                       = plt_bgcr%tRO2MicrbUptk_vr(L)
     
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)
@@ -243,7 +243,7 @@ implicit none
     PSICanPDailyMin(NZ,NY,NX)                          = plt_ew%PSICanPDailyMin(NZ)
     CO2FixCL_pft(NZ,NY,NX)                             = plt_rbgc%CO2FixCL_pft(NZ)
     CO2FixLL_pft(NZ,NY,NX)                             = plt_rbgc%CO2FixLL_pft(NZ)
-    RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ,NY,NX) = plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)
+    RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ,NY,NX) = plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)
     MinCanPStomaResistH2O_pft(NZ,NY,NX)                = plt_photo%MinCanPStomaResistH2O_pft(NZ)
     H2OCuticleResist_pft(NZ,NY,NX)                     = plt_photo%H2OCuticleResist_pft(NZ)
     CO2CuticleResist_pft(NZ,NY,NX)                     = plt_photo%CO2CuticleResist_pft(NZ)
@@ -473,8 +473,8 @@ implicit none
         RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)    = plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)
         RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX) = plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ)
         RootProteinConc_rpvr(N,L,NZ,NY,NX)                         = plt_biom%RootProteinConc_rpvr(N,L,NZ)
-        trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)            = plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)
-        trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)            = plt_rbgc%trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)
+        trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX)            = plt_rbgc%trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)
+        trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX)            = plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)
         PSIRoot_pvr(N,L,NZ,NY,NX)                                  = plt_ew%PSIRoot_pvr(N,L,NZ)
         PSIRootOSMO_vr(N,L,NZ,NY,NX)                               = plt_ew%PSIRootOSMO_vr(N,L,NZ)
         PSIRootTurg_vr(N,L,NZ,NY,NX)                               = plt_ew%PSIRootTurg_vr(N,L,NZ)
@@ -493,7 +493,7 @@ implicit none
         RootCO2Autor_pvr(N,L,NZ,NY,NX)                             = plt_rbgc%RootCO2Autor_pvr(N,L,NZ)
         RootCO2Emis_pvr(N,L,NZ,NY,NX)                              = plt_rbgc%RootCO2Emis_pvr(N,L,NZ)
         RootO2Uptk_pvr(N,L,NZ,NY,NX)                               = plt_rbgc%RootO2Uptk_pvr(N,L,NZ)
-        RootGasConductance_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)     = plt_rbgc%RootGasConductance_pvr(idg_beg:idg_end-1,N,L,NZ)
+        RootGasConductance_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX)     = plt_rbgc%RootGasConductance_pvr(idg_beg:idg_NH3,N,L,NZ)
         RootUptkSoiSol_vr(idg_CO2,N,L,NZ,NY,NX)                    = plt_rbgc%RootUptkSoiSol_vr(idg_CO2,N,L,NZ)
         RootUptkSoiSol_vr(idg_O2,N,L,NZ,NY,NX)         = plt_rbgc%RootUptkSoiSol_vr(idg_O2,N,L,NZ)
         RootUptkSoiSol_vr(idg_CH4,N,L,NZ,NY,NX)        = plt_rbgc%RootUptkSoiSol_vr(idg_CH4,N,L,NZ)
@@ -649,7 +649,7 @@ implicit none
   plt_site%CO2EI                      = CO2EI(NY,NX)
   plt_bgcr%NetCO2Flx2Canopy_col       = NetCO2Flx2Canopy_col(NY,NX)
   plt_site%CO2E                       = CO2E_col(NY,NX)
-  plt_site%AtmGasc(idg_beg:idg_end-1) = AtmGasCgperm3(idg_beg:idg_end-1,NY,NX)
+  plt_site%AtmGasc(idg_beg:idg_NH3) = AtmGasCgperm3(idg_beg:idg_NH3,NY,NX)
   plt_site%DayLenthPrev               = DayLenthPrev_col(NY,NX)
   plt_site%DayLenthCurrent            = DayLensCurr_col(NY,NX)
   plt_ew%SnowDepth                    = SnowDepth_col(NY,NX)
@@ -715,7 +715,7 @@ implicit none
     plt_site%CumSoilThickness_vr(L)                   = CumSoilThickness_vr(L,NY,NX)
     plt_site%FracSoiAsMicP_vr(L)                      = FracSoiAsMicP_vr(L,NY,NX)
     plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)     = trcs_solml_vr(ids_beg:ids_end,L,NY,NX)
-    plt_soilchem%GasSolbility_vr(idg_beg:idg_end-1,L) = GasSolbility_vr(idg_beg:idg_end-1,L,NY,NX)
+    plt_soilchem%GasSolbility_vr(idg_beg:idg_NH3,L) = GasSolbility_vr(idg_beg:idg_NH3,L,NY,NX)
 
     plt_ew%TotalSoilH2OPSIMPa_vr(L)      = TotalSoilH2OPSIMPa_vr(L,NY,NX)
     plt_bgcr%RH2PO4EcoDmndSoilPrev_vr(L) = RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)
@@ -916,7 +916,7 @@ implicit none
   plt_rad%Eco_NetRad_col                                 = Eco_NetRad_col(NY,NX)
   plt_ew%VapXAir2Canopy_col                              = VapXAir2Canopy_col(NY,NX)
   plt_ew%Eco_Heat_Latent_col                             = Eco_Heat_Latent_col(NY,NX)
-  plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_end-1)    = TRootGasLossDisturb_pft(idg_beg:idg_end-1,NY,NX)
+  plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_NH3)    = TRootGasLossDisturb_pft(idg_beg:idg_NH3,NY,NX)
   plt_ew%Eco_Heat_GrndSurf_col                           = Eco_Heat_GrndSurf_col(NY,NX)
   plt_ew%QVegET_col                                        = QVegET_col(NY,NX)
   plt_ew%HeatFlx2Canopy_col                              = HeatFlx2Canopy_col(NY,NX)
@@ -963,11 +963,11 @@ implicit none
     ENDDO
   ENDDO
   DO L=1,NL(NY,NX)
-    plt_morph%totRootLenDens_vr(L)                     = totRootLenDens_vr(L,NY,NX)
-    plt_rbgc%trcg_root_vr(idg_beg:idg_end-1,L)         = trcg_root_vr(idg_beg:idg_end-1,L,NY,NX)
-    plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_end-1,L) = trcg_air2root_flx_vr(idg_beg:idg_end-1,L,NY,NX)
-    plt_bgcr%tRootCO2Emis_vr(L)                        = tRootCO2Emis_vr(L,NY,NX)
-    plt_bgcr%tRO2MicrbUptk_vr(L)                       = tRO2MicrbUptk_vr(L,NY,NX)
+    plt_morph%totRootLenDens_vr(L)                   = totRootLenDens_vr(L,NY,NX)
+    plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)         = trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)
+    plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
+    plt_bgcr%tRootCO2Emis2Root_vr(L)                 = tRootCO2Emis2Root_vr(L,NY,NX)
+    plt_bgcr%tRO2MicrbUptk_vr(L)                     = tRO2MicrbUptk_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO
@@ -1105,7 +1105,7 @@ implicit none
     plt_ew%PSICanopy_pft(NZ)                              = PSICanopy_pft(NZ,NY,NX)
     plt_ew%PSICanopyTurg_pft(NZ)                          = PSICanopyTurg_pft(NZ,NY,NX)
     plt_photo%CO2CuticleResist_pft(NZ)                    = CO2CuticleResist_pft(NZ,NY,NX)
-    plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ) = RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ,NY,NX)
+    plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ) = RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ,NY,NX)
     plt_ew%ReistanceCanopy_pft(NZ)                        = ReistanceCanopy_pft(NZ,NY,NX)
     plt_photo%CO2Solubility_pft(NZ)                       = CO2Solubility_pft(NZ,NY,NX)
     plt_morph%SeedDepth_pft(NZ)                           = SeedDepth_pft(NZ,NY,NX)
@@ -1264,8 +1264,8 @@ implicit none
     DO L=1,NL(NY,NX)
       DO N=1,MY(NZ,NY,NX)
         plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ) = RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
-        plt_rbgc%trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)         = trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
-        plt_rbgc%trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)         = trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX)
+        plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX)
+        plt_rbgc%trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX)
 
         plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
         plt_biom%RootProteinConc_rpvr(N,L,NZ)                         = RootProteinConc_rpvr(N,L,NZ,NY,NX)
@@ -1371,7 +1371,6 @@ implicit none
     ENDDO
   ENDDO
   end subroutine PlantAPISend
-
 
 !------------------------------------------------------------------------------------------
 

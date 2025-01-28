@@ -663,7 +663,7 @@ implicit none
   real(r8), pointer :: RGasFlxPrev_vr(:,:)             => null()   !net gaseous flux,                        [g d-2 h-1]
   real(r8), pointer :: RO2AquaSourcePrev_vr(:)        => null()   !net aqueous O2 flux,                        [g d-2 h-1]
   real(r8), pointer :: RO2EcoDmndPrev_vr(:)             => null()   !total root + microbial O2 uptake, [g d-2 h-1]
-  real(r8), pointer :: tRootCO2Emis_vr(:)               => null()   !total root CO2 flux,              [gC d-2 h-1]
+  real(r8), pointer :: tRootCO2Emis2Root_vr(:)               => null()   !total root CO2 flux,              [gC d-2 h-1]
   real(r8), pointer :: tRO2MicrbUptk_vr(:)              => null()   !total root internal O2 flux,      [g d-2 h-1]
   real(r8), pointer :: LitrfalStrutElms_vr(:,:,:,:)     => null() !total LitrFall element,             [g d-2 h-1]
   real(r8), pointer :: REcoDOMProd_vr(:,:,:)            => null()  !net microbial DOC flux,            [gC d-2 h-1]
@@ -766,10 +766,10 @@ implicit none
   implicit none
   class(plant_rootbgc_type) :: this
   allocate(this%trcs_plant_uptake_vr(ids_beg:ids_end,JZ1)); this%trcs_plant_uptake_vr=0._r8
-  allocate(this%trcg_rootml_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
-  allocate(this%trcs_rootml_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
-  allocate(this%RootGasConductance_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1)); this%RootGasConductance_pvr=0._r8
-  allocate(this%TRootGasLossDisturb_pft(idg_beg:idg_end-1));this%TRootGasLossDisturb_pft=spval
+  allocate(this%trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
+  allocate(this%trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
+  allocate(this%RootGasConductance_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootGasConductance_pvr=0._r8
+  allocate(this%TRootGasLossDisturb_pft(idg_beg:idg_NH3));this%TRootGasLossDisturb_pft=spval
   allocate(this%RO2UptkSoilM_vr(60,0:JZ1)); this%RO2UptkSoilM_vr=spval
   allocate(this%RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%RootMycoExudEUptk_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
@@ -794,11 +794,11 @@ implicit none
   allocate(this%NH3Dep2Can_brch(MaxNumBranches,JP1));this%NH3Dep2Can_brch=spval
   allocate(this%CO2FixCL_pft(JP1)); this%CO2FixCL_pft=spval
   allocate(this%CO2FixLL_pft(JP1)); this%CO2FixLL_pft=spval
-  allocate(this%trcg_air2root_flx_vr(idg_beg:idg_end-1,JZ1));this%trcg_air2root_flx_vr=spval
-  allocate(this%trcg_root_vr(idg_beg:idg_end-1,JZ1));this%trcg_root_vr=spval
+  allocate(this%trcg_air2root_flx_vr(idg_beg:idg_NH3,JZ1));this%trcg_air2root_flx_vr=spval
+  allocate(this%trcg_root_vr(idg_beg:idg_NH3,JZ1));this%trcg_root_vr=spval
 
-  allocate(this%trcg_air2root_flx_pvr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcg_air2root_flx_pvr=spval
-  allocate(this%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,jroots,JZ1,JP1));this%trcg_Root_gas2aqu_flx_vr=spval
+  allocate(this%trcg_air2root_flx_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_air2root_flx_pvr=spval
+  allocate(this%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_Root_gas2aqu_flx_vr=spval
   allocate(this%RootO2Dmnd4Resp_pvr(jroots,JZ1,JP1));this%RootO2Dmnd4Resp_pvr=spval
   allocate(this%RootNH4DmndSoil_pvr(jroots,JZ1,JP1));this%RootNH4DmndSoil_pvr=spval
   allocate(this%RootNH4DmndBand_pvr(jroots,JZ1,JP1));this%RootNH4DmndBand_pvr=spval
@@ -929,7 +929,7 @@ implicit none
 
   allocate(this%PlantElemntStoreLandscape(NumPlantChemElms));this%PlantElemntStoreLandscape=spval
   allocate(this%FracSoiAsMicP_vr(0:JZ1));this%FracSoiAsMicP_vr=spval
-  allocate(this%AtmGasc(idg_beg:idg_end-1));this%AtmGasc=spval
+  allocate(this%AtmGasc(idg_beg:idg_NH3));this%AtmGasc=spval
   allocate(this%DATAP(JP1)); this%DATAP=''
   allocate(this%DATA(30)); this%DATA=''
   allocate(this%AREA3(0:JZ1));this%AREA3=spval
@@ -979,7 +979,7 @@ implicit none
   implicit none
   class(plant_bgcrate_type) :: this
 
-  allocate(this%tRootCO2Emis_vr(JZ1)); this%tRootCO2Emis_vr=spval
+  allocate(this%tRootCO2Emis2Root_vr(JZ1)); this%tRootCO2Emis2Root_vr=spval
   allocate(this%tRO2MicrbUptk_vr(JZ1)); this%tRO2MicrbUptk_vr=spval
   allocate(this%RH2PO4EcoDmndSoilPrev_vr(0:JZ1)); this%RH2PO4EcoDmndSoilPrev_vr=spval
   allocate(this%RH2PO4EcoDmndBandPrev_vr(0:JZ1)); this%RH2PO4EcoDmndBandPrev_vr=spval
@@ -996,7 +996,7 @@ implicit none
   allocate(this%GrossCO2Fix_pft(JP1));this%GrossCO2Fix_pft=spval
   allocate(this%REcoDOMProd_vr(1:NumPlantChemElms,1:jcplx,0:JZ1));this%REcoDOMProd_vr=spval
   allocate(this%CO2NetFix_pft(JP1));this%CO2NetFix_pft=spval
-  allocate(this%RootGasLossDisturb_pft(idg_beg:idg_end-1,JP1));this%RootGasLossDisturb_pft=spval
+  allocate(this%RootGasLossDisturb_pft(idg_beg:idg_NH3,JP1));this%RootGasLossDisturb_pft=spval
   allocate(this%GrossResp_pft(JP1));this%GrossResp_pft=spval
   allocate(this%CanopyGrosRCO2_pft(JP1));this%CanopyGrosRCO2_pft=spval
   allocate(this%RootGrosRCO2_pft(JP1));this%RootGrosRCO2_pft=spval

@@ -104,7 +104,7 @@ module IrrigationDataType
 
   allocate(PHQ(366,JY,JX));     PHQ=0._r8
   allocate(NH4_irrig_conc(366,JY,JX));    NH4_irrig_conc=0._r8
-  allocate(trcVolatile_irrig_conc(idg_beg:idg_end-1,JY,JX));   trcVolatile_irrig_conc=0._r8
+  allocate(trcVolatile_irrig_conc(idg_beg:idg_NH3,JY,JX));   trcVolatile_irrig_conc=0._r8
   allocate(NO3_irrig_conc(366,JY,JX));    NO3_irrig_conc=0._r8
   allocate(H2PO4_irrig_conc(366,JY,JX));    H2PO4_irrig_conc=0._r8
   allocate(CALQ(366,JY,JX));    CALQ=0._r8
