@@ -200,7 +200,7 @@ implicit none
   fid_TR_Ca_2p_soil    =addone(itemp)
   fid_TR_CaSO4_soil   =addone(itemp)
   fid_TR_CaSO4_precip_soil  =addone(itemp)
-  fid_TR_CO2_gchem_soil_vr   =addone(itemp)
+  fid_TR_CO2_geochem_soil_vr   =addone(itemp)
   fid_TR_CO3_2e_soil   =addone(itemp)
   fid_TR_Fe_3p_soil    =addone(itemp)
   fid_TR_FeSO4_soil   =addone(itemp)
@@ -690,8 +690,8 @@ implicit none
   varl(fid_TR_CaSO4_precip_soil)='TR_CaSO4_precip_soil';varlnml(fid_TR_CaSO4_precip_soil)='total precipitated CaSO4 transformation'
   unitl(fid_TR_CaSO4_precip_soil)='mol d-2 h-1';vartypes(fid_TR_CaSO4_precip_soil)=var_flux_type
 
-  varl(fid_TR_CO2_gchem_soil_vr)='TR_CO2_gchem_soil_vr';varlnml(fid_TR_CO2_gchem_soil_vr)='total solute CO2 transformation'
-  unitl(fid_TR_CO2_gchem_soil_vr)='mol d-2 h-1';vartypes(fid_TR_CO2_gchem_soil_vr)=var_flux_type
+  varl(fid_TR_CO2_geochem_soil_vr)='TR_CO2_geochem_soil_vr';varlnml(fid_TR_CO2_geochem_soil_vr)='total solute CO2 transformation'
+  unitl(fid_TR_CO2_geochem_soil_vr)='mol d-2 h-1';vartypes(fid_TR_CO2_geochem_soil_vr)=var_flux_type
 
   varl(fid_TR_CO3_2e_soil)='TR_CO3_2e_soil';varlnml(fid_TR_CO3_2e_soil)='total solute CO3 transformation'
   unitl(fid_TR_CO3_2e_soil)='mol d-2 h-1';vartypes(fid_TR_CO3_2e_soil)=var_flux_type

@@ -133,7 +133,7 @@ implicit none
   integer :: fid_TR_SO4_2e_soil    !total solute SO4 transformation, [mol d-2 h-1]
   integer :: fid_TR_CO3_2e_soil    !total solute CO3 transformation, [mol d-2 h-1]
   integer :: fid_TR_HCO3    !total solute HCO3 transformation, [mol d-2 h-1]
-  integer :: fid_TR_CO2_gchem_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
+  integer :: fid_TR_CO2_geochem_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlOH_soil    !total solute AlOH transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO2H2_soil    !total solute AlOH2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO3H3_soil    !total solute AlOH3 transformation, [mol d-2 h-1]

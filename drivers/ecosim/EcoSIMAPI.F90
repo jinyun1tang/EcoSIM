@@ -9,7 +9,7 @@ module EcoSIMAPI
   use MicBGCAPI,       only: MicrobeModel,       MicAPI_Init,      MicAPI_cleanup
   use TranspNoSaltMod, only: TranspNoSalt
   use TranspSaltMod,   only: TranspSalt
-  use SoilBGCDataType, only: trc_soHml_vr,       trc_solml_vr
+  use SoilBGCDataType, only: trcs_soHml_vr,       trcs_solml_vr
   use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
   use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
   use WatsubMod,       only: watsub
@@ -155,7 +155,7 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp
@@ -222,6 +222,7 @@ contains
   ach4_ppm         = 1.144_r8
   an2o_ppm         = 0.270_r8
   ao2_ppm          = 0.209e6_r8
+  arg_ppm          = 0.00934e6_r8
   an2_ppm          = 0.78e6_r8
   anh3_ppm         = 5.e-3_r8
   atm_co2_fix      = -100._r8
