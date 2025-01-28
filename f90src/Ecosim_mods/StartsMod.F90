@@ -1066,11 +1066,8 @@ module StartsMod
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,PSIMN-LOGPSIMX
 !
       LOGPSIAtSat(NY,NX) = LOG(-PSIPS)
-      !ASG - 1/22 throws a floating point exception because PSI is positive?
-      !LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
-      !LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
-      LOGPSIFLD(NY,NX)   = LOG(PSIAtFldCapacity(NY,NX))
-      LOGPSIMN(NY,NX)    = LOG(PSIAtWiltPoint(NY,NX))      
+      LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
+      LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
       LOGPSIMXD(NY,NX)   = LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
       LOGPSIMND(NY,NX)   = LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
 
