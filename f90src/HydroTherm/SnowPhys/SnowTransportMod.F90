@@ -357,27 +357,27 @@ implicit none
 
     !    SOLUTES
 !  exclude NH3B
-!  if(NX==5)write(111,*)I+J/24.,'beg18',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+!  if(NX==5)write(111,*)I+J/24.,'beg18',trcs_solml_vr(ids_NH4,0,1,5),trcs_solml_vr(idg_NH3,0,1,5)
 
   DO NTG=idg_beg,idg_end-1
     dflx=-trcg_SurfRunoff_flxM(NTG,NY,NX)
-    call fixEXflux(trc_solml_vr(NTG,0,NY,NX),dflx)
+    call fixEXflux(trcs_solml_vr(NTG,0,NY,NX),dflx)
     trcg_SurfRunoff_flxM(NTG,NY,NX)=-dflx
   ENDDO
 
-!  if(NX==5)write(111,*)I+J/24.,'beg19',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+!  if(NX==5)write(111,*)I+J/24.,'beg19',trcs_solml_vr(ids_NH4,0,1,5),trcs_solml_vr(idg_NH3,0,1,5)
 
-!  !   write(116,*)I+J/24.,'beg5xxxx1',trc_solml_vr(ids_NO3,0,NY,NX),trcn_SurfRunoff_flxM(ids_NO3,NY,NX)
+!  !   write(116,*)I+J/24.,'beg5xxxx1',trcs_solml_vr(ids_NO3,0,NY,NX),trcn_SurfRunoff_flxM(ids_NO3,NY,NX)
 
   DO NTU=ids_nut_beg,ids_nuts_end
     dflx=-trcn_SurfRunoff_flxM(NTU,NY,NX)
-    call fixEXflux(trc_solml_vr(NTU,0,NY,NX),dflx)
+    call fixEXflux(trcs_solml_vr(NTU,0,NY,NX),dflx)
     trcn_SurfRunoff_flxM(NTU,NY,NX)=-dflx
   ENDDO
 
-!  !   write(116,*)I+J/24.,'beg5xxxx2',trc_solml_vr(ids_NO3,0,NY,NX),trcn_SurfRunoff_flxM(ids_NO3,NY,NX)
+!  !   write(116,*)I+J/24.,'beg5xxxx2',trcs_solml_vr(ids_NO3,0,NY,NX),trcn_SurfRunoff_flxM(ids_NO3,NY,NX)
 
-!  if(NX==5)write(111,*)I+J/24.,'beg20',trc_solml_vr(ids_NH4,0,1,5),trc_solml_vr(idg_NH3,0,1,5)
+!  if(NX==5)write(111,*)I+J/24.,'beg20',trcs_solml_vr(ids_NH4,0,1,5),trcs_solml_vr(idg_NH3,0,1,5)
 
   IF(salt_model)THEN
     DO NTSA=idsalt_beg,idsalt_end

@@ -54,7 +54,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  DOM_Mac2MicPore_flx_vr(:,:,:,:,:)       !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_Mac2MicPore_flx_vr(:,:,:,:)       !total non-salt solute micropore->macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_XFXS(:,:,:,:)              !total salt micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcn_RChem_soil_vr(:,:,:,:)        !total solute NH4 transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcn_GeoChem_soil_vr(:,:,:,:)        !total solute NH4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_NH3_soil_vr(:,:,:)              !total solute NH3 transformation non-band, [mol d-2 h-1]
 
   real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)   !total solute nutrient transformation band, [mol d-2 h-1]
@@ -129,7 +129,7 @@ module AqueChemDatatype
   allocate(DOM_Mac2MicPore_flx_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Mac2MicPore_flx_vr=0._r8
   allocate(trcs_Mac2MicPore_flx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Mac2MicPore_flx_vr=0._r8
 
-  allocate(trcn_RChem_soil_vr(ids_nut_beg:ids_nuts_end,0:JZ,JY,JX)); trcn_RChem_soil_vr=0._r8
+  allocate(trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:JZ,JY,JX)); trcn_GeoChem_soil_vr=0._r8
 
   allocate(TR_NH3_soil_vr(0:JZ,JY,JX));  TR_NH3_soil_vr=0._r8
 
@@ -237,7 +237,7 @@ module AqueChemDatatype
   call destroy(trcSaltIonNumber)
   call destroy(trcs_Mac2MicPore_flx_vr)
   call destroy(DOM_Mac2MicPore_flx_vr)
-  call destroy(trcn_RChem_soil_vr)
+  call destroy(trcn_GeoChem_soil_vr)
   end subroutine DestructAquaChem
 
 end module AqueChemDatatype

@@ -104,6 +104,7 @@ module minimathmod
   real(r8), intent(in) :: tempK
 
   real(r8) :: ans  !ton, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
+  
   ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat
 

@@ -267,17 +267,17 @@ implicit none
     call ncd_putvar(ncf,'mBiomeAutor',mBiomeAutor_vr(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
-      call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX))
-      call ncd_putvar(ncf,'ZNO3S',trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX))
-      call ncd_putvar(ncf,'ZNO2S',trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX))
-      call ncd_putvar(ncf,'H2PO4',trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX))
-      call ncd_putvar(ncf,'H1PO4',trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX))
+      call ncd_putvar(ncf,'ZNH4S',trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(ids_NH4B,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO3S',trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO3B,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO2S',trcs_solml_vr(ids_NO2,L,NY,NX)+trcs_solml_vr(ids_NO2B,L,NY,NX))
+      call ncd_putvar(ncf,'H2PO4',trcs_solml_vr(ids_H2PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX))
+      call ncd_putvar(ncf,'H1PO4',trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H1PO4B,L,NY,NX))
     else
-      call ncd_putvar(ncf,'ZNH4S',trc_solml_vr(ids_NH4,L,NY,NX))
-      call ncd_putvar(ncf,'ZNO3S',trc_solml_vr(ids_NO3,L,NY,NX))
-      call ncd_putvar(ncf,'ZNO2S',trc_solml_vr(ids_NO2,L,NY,NX))
-      call ncd_putvar(ncf,'H2PO4',trc_solml_vr(ids_H2PO4,L,NY,NX))
-      call ncd_putvar(ncf,'H1PO4',trc_solml_vr(ids_H1PO4,L,NY,NX))
+      call ncd_putvar(ncf,'ZNH4S',trcs_solml_vr(ids_NH4,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO3S',trcs_solml_vr(ids_NO3,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO2S',trcs_solml_vr(ids_NO2,L,NY,NX))
+      call ncd_putvar(ncf,'H2PO4',trcs_solml_vr(ids_H2PO4,L,NY,NX))
+      call ncd_putvar(ncf,'H1PO4',trcs_solml_vr(ids_H1PO4,L,NY,NX))
     endif
     call ncd_pio_closefile(ncf)
   endif

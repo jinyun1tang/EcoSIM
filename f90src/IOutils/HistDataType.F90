@@ -42,8 +42,8 @@ implicit none
   type, public :: histdata_type
   real(r8),pointer   :: h1D_tFIRE_CO2_col(:)     !CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tFIRE_CH4_col(:)     !CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cNH4_LITR_col(:)     !(trc_solml_vr(ids_NH4,0,NY,NX)+14.0*trcx_solml_vr(idx_NH4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)                            
+  real(r8),pointer   :: h1D_cNH4_LITR_col(:)     !(trcs_solml_vr(ids_NH4,0,NY,NX)+14.0*trcx_solml_vr(idx_NH4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
+  real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)                            
   real(r8),pointer   :: h1D_ECO_HVST_N_col(:)     !EcoHavstElmnt_CumYr_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NET_N_MIN_col(:)      !-NetNH4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITR_P_col(:)    !tLitrOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -67,7 +67,7 @@ implicit none
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
   real(r8),pointer   :: h1D_tSoilOrgP_col(:)
   real(r8),pointer   :: h1D_PO4_FIRE_col(:)       !PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trc_solml_vr(ids_H2PO4,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
+  real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trcs_solml_vr(ids_H2PO4,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
   real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml_vr(idx_HPO4,0,NY,NX)+trcx_solml_vr(idx_H2PO4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_P_col(:)     !EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -428,12 +428,12 @@ implicit none
   real(r8),pointer   :: h2D_VSICE_vr    (:,:)         !ThetaICEZ_vr(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_PsiO_vr(:,:)
-  real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trc_solml_vr(ids_NH4,1:JZ,NY,NX)+trc_solml_vr(ids_NH4B,1:JZ,NY,NX) &
+  real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trcs_solml_vr(ids_NH4,1:JZ,NY,NX)+trcs_solml_vr(ids_NH4B,1:JZ,NY,NX) &
                                                                   !+14.0*(trcx_solml_vr(idx_NH4,1:JZ,NY,NX)+trcx_solml_vr(idx_NH4B,1:JZ,NY,NX)))/VLSoilMicPMass_vr(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_RootH2OUP_vr(:,:)   !root water uptake flux                                 
-  real(r8),pointer   :: h2D_cNO3t_vr(:,:)       !(trc_solml_vr(ids_NO3,1:JZ,NY,NX)+trc_solml_vr(ids_NO3B,1:JZ,NY,NX) &
-                                                                  !+trc_solml_vr(ids_NO2,1,NY,NX)+trc_solml_vr(ids_NO2B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
-  real(r8),pointer   :: h2D_cPO4_vr(:,:)        !(trc_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trc_solml_vr(ids_H1PO4B,1,NY,NX)+trc_solml_vr(ids_H2PO4,1,NY,NX)+trc_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
+  real(r8),pointer   :: h2D_cNO3t_vr(:,:)       !(trcs_solml_vr(ids_NO3,1:JZ,NY,NX)+trcs_solml_vr(ids_NO3B,1:JZ,NY,NX) &
+                                                                  !+trcs_solml_vr(ids_NO2,1,NY,NX)+trcs_solml_vr(ids_NO2B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
+  real(r8),pointer   :: h2D_cPO4_vr(:,:)        !(trcs_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trcs_solml_vr(ids_H1PO4B,1,NY,NX)+trcs_solml_vr(ids_H2PO4,1,NY,NX)+trcs_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
   real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)     !31.0*(trcx_solml_vr(idx_HPO4,1,NY,NX)+trcx_solml_vr(idx_H2PO4,1,NY,NX)+trcx_solml_vr(idx_HPO4B,1,NY,NX)+trcx_solml_vr(idx_H2PO4B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
   real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:)         !ElectricConductivity_vr(1:JZ,NY,NX)
 
@@ -2499,13 +2499,13 @@ implicit none
       ncol=get_col(NY,NX)
       this%h1D_tFIRE_CO2_col(ncol)        =  CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tFIRE_CH4_col(ncol)        =  CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_cNH4_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+&
+      this%h1D_cNH4_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NH4,0,NY,NX)+&
         natomw*trcx_solml_vr(idx_NH4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
-      this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
-        trc_solml_vr(ids_NO2,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
+      this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NO3,0,NY,NX)+&
+        trcs_solml_vr(ids_NO2,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       
 !      if(this%h1D_cNO3_LITR_col(ncol)>1.e7*VLSoilMicPMass_vr(0,NY,NX))then                  
-!        write(112,*)I+J/24.,NY,NX,trc_solml_vr(idg_NH3,0,NY,NX),trc_solml_vr(ids_NO3,0,NY,NX),trc_solml_vr(ids_NO2,0,NY,NX),&
+!        write(112,*)I+J/24.,NY,NX,trcs_solml_vr(idg_NH3,0,NY,NX),trcs_solml_vr(ids_NO3,0,NY,NX),trcs_solml_vr(ids_NO2,0,NY,NX),&
 !          VLSoilMicPMass_vr(0,NY,NX)*million
 !      endif
 !      if(this%h1D_cNO3_LITR_col(ncol)>1.e8*VLSoilMicPMass_vr(0,NY,NX))then                  
@@ -2544,7 +2544,7 @@ implicit none
       this%h1D_tPREC_P_col(ncol)          = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
+      this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trcs_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_cEXCH_P_LITR_col(ncol)     =  patomw*safe_adb(trcx_solml_vr(idx_HPO4,0,NY,NX)+&
         trcx_solml_vr(idx_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_ECO_HVST_P_col(ncol) = EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2757,16 +2757,16 @@ implicit none
         this%h2D_PSI_vr(ncol,L)             = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_PsiO_vr(ncol,L)            = PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_RootH2OUP_vr(ncol,L)       = TPlantRootH2OUptake_vr(L,NY,NX)
-        this%h2D_cNH4t_vr(ncol,L)     = safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
+        this%h2D_cNH4t_vr(ncol,L)     = safe_adb(trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)),&
                                                VLSoilMicPMass_vr(L,NY,NX))
   
-        this%h2D_cNO3t_vr(ncol,L)= safe_adb(trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX) &
-                                               +trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX),&
+        this%h2D_cNO3t_vr(ncol,L)= safe_adb(trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO3B,L,NY,NX) &
+                                               +trcs_solml_vr(ids_NO2,L,NY,NX)+trcs_solml_vr(ids_NO2B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
 
-        this%h2D_cPO4_vr(ncol,L) = safe_adb(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX) &
-                                               +trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX),&
+        this%h2D_cPO4_vr(ncol,L) = safe_adb(trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H1PO4B,L,NY,NX) &
+                                               +trcs_solml_vr(ids_H2PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX),&
                                                VLWatMicP_vr(L,NY,NX))
         this%h2D_cEXCH_P_vr(ncol,L)= patomw*safe_adb(trcx_solml_vr(idx_HPO4,L,NY,NX)+trcx_solml_vr(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml_vr(idx_HPO4B,L,NY,NX)+trcx_solml_vr(idx_H2PO4B,L,NY,NX),&

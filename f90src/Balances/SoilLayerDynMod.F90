@@ -846,7 +846,7 @@ implicit none
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H2PO4B .and. NTU/=ids_H1PO4B)THEN
-      trc_solml_vr(NTU,L1,NY,NX)=trc_solml_vr(NTU,L1,NY,NX)+FX*trc_solml_vr(NTU,L0,NY,NX)
+      trcs_solml_vr(NTU,L1,NY,NX)=trcs_solml_vr(NTU,L1,NY,NX)+FX*trcs_solml_vr(NTU,L0,NY,NX)
     ENDIF
   ENDDO
 
@@ -857,8 +857,8 @@ implicit none
   ENDIF
 
   IF(L0.NE.0)THEN
-    trc_solml_vr(ids_H1PO4B,L1,NY,NX)=trc_solml_vr(ids_H1PO4B,L1,NY,NX)+FX*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
-    trc_solml_vr(ids_H2PO4B,L1,NY,NX)=trc_solml_vr(ids_H2PO4B,L1,NY,NX)+FX*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
+    trcs_solml_vr(ids_H1PO4B,L1,NY,NX)=trcs_solml_vr(ids_H1PO4B,L1,NY,NX)+FX*trcs_solml_vr(ids_H1PO4B,L0,NY,NX)
+    trcs_solml_vr(ids_H2PO4B,L1,NY,NX)=trcs_solml_vr(ids_H2PO4B,L1,NY,NX)+FX*trcs_solml_vr(ids_H2PO4B,L0,NY,NX)
 
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
@@ -878,13 +878,13 @@ implicit none
       trcp_saltpml_vr(NTP,L1,NY,NX)=trcp_saltpml_vr(NTP,L1,NY,NX)+FX*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
-    DO NTG=idg_beg,idg_end-1
-      trc_gasml_vr(NTG,L1,NY,NX)=trc_gasml_vr(NTG,L1,NY,NX)+FX*trc_gasml_vr(NTG,L0,NY,NX)
+    DO NTG=idg_beg,idg_NH3
+      trcg_gasml_vr(NTG,L1,NY,NX)=trcg_gasml_vr(NTG,L1,NY,NX)+FX*trcg_gasml_vr(NTG,L0,NY,NX)
     ENDDO
   ENDIF
   !Exclude NH3 and NH3B, which are accounted in nutrients
   DO NTG=idg_beg,idg_end-2
-    trc_solml_vr(NTG,L1,NY,NX)=trc_solml_vr(NTG,L1,NY,NX)+FX*trc_solml_vr(NTG,L0,NY,NX)
+    trcs_solml_vr(NTG,L1,NY,NX)=trcs_solml_vr(NTG,L1,NY,NX)+FX*trcs_solml_vr(NTG,L0,NY,NX)
   ENDDO
 
   IF(IFLGL(L,3).EQ.0)THEN
@@ -1026,7 +1026,7 @@ implicit none
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H1PO4B .and. NTU/=ids_H2PO4B)THEN
-      trc_solml_vr(NTU,L0,NY,NX)=FY*trc_solml_vr(NTU,L0,NY,NX)
+      trcs_solml_vr(NTU,L0,NY,NX)=FY*trcs_solml_vr(NTU,L0,NY,NX)
     ENDIF
   ENDDO
   IF(salt_model)THEN
@@ -1036,8 +1036,8 @@ implicit none
   ENDIF
 
   IF(L0.NE.0)THEN
-    trc_solml_vr(ids_H1PO4B,L0,NY,NX) = FY*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
-    trc_solml_vr(ids_H2PO4B,L0,NY,NX) = FY*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
+    trcs_solml_vr(ids_H1PO4B,L0,NY,NX) = FY*trcs_solml_vr(ids_H1PO4B,L0,NY,NX)
+    trcs_solml_vr(ids_H2PO4B,L0,NY,NX) = FY*trcs_solml_vr(ids_H2PO4B,L0,NY,NX)
     IF(salt_model)THEN
       DO NTSAB=idsaltb_beg,idsaltb_end
         trcSalt_solml_vr(NTSAB,L0,NY,NX)=FY*trcSalt_solml_vr(NTSAB,L0,NY,NX)
@@ -1055,13 +1055,13 @@ implicit none
       trcp_saltpml_vr(NTP,L0,NY,NX)=FY*trcp_saltpml_vr(NTP,L0,NY,NX)
     ENDDO
 
-    DO NTG=idg_beg,idg_end-1
-      trc_gasml_vr(NTG,L0,NY,NX)=FY*trc_gasml_vr(NTG,L0,NY,NX)
+    DO NTG=idg_beg,idg_NH3
+      trcg_gasml_vr(NTG,L0,NY,NX)=FY*trcg_gasml_vr(NTG,L0,NY,NX)
     ENDDO
   ENDIF
   !exclude NH3 and NH3B, which are accounted in nutrients
   DO NTG=idg_beg,idg_end-2
-    trc_solml_vr(NTG,L0,NY,NX)=FY*trc_solml_vr(NTG,L0,NY,NX)
+    trcs_solml_vr(NTG,L0,NY,NX)=FY*trcs_solml_vr(NTG,L0,NY,NX)
   ENDDO
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
@@ -1398,9 +1398,9 @@ implicit none
   IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
 
     DO NTS=ids_beg,ids_end
-      FXSH                       = FHO*trc_soHml_vr(NTS,L0,NY,NX)
-      trc_soHml_vr(NTS,L1,NY,NX) = trc_soHml_vr(NTS,L1,NY,NX)+FXSH
-      trc_soHml_vr(NTS,L0,NY,NX) = trc_soHml_vr(NTS,L0,NY,NX)-FXSH
+      FXSH                       = FHO*trcs_soHml_vr(NTS,L0,NY,NX)
+      trcs_soHml_vr(NTS,L1,NY,NX) = trcs_soHml_vr(NTS,L1,NY,NX)+FXSH
+      trcs_soHml_vr(NTS,L0,NY,NX) = trcs_soHml_vr(NTS,L0,NY,NX)-FXSH
     ENDDO
 
 !
@@ -1429,13 +1429,13 @@ implicit none
   real(r8) :: FXH1POB,FXH2POB
 
 ! only phosphrous is considered below because there is no gaseous phase.
-  FXH1POB                           = FWO*trc_solml_vr(ids_H1PO4B,L0,NY,NX)
-  trc_solml_vr(ids_H1PO4B,L1,NY,NX) = trc_solml_vr(ids_H1PO4B,L1,NY,NX)+FXH1POB
-  trc_solml_vr(ids_H1PO4B,L0,NY,NX) = trc_solml_vr(ids_H1PO4B,L0,NY,NX)-FXH1POB
+  FXH1POB                           = FWO*trcs_solml_vr(ids_H1PO4B,L0,NY,NX)
+  trcs_solml_vr(ids_H1PO4B,L1,NY,NX) = trcs_solml_vr(ids_H1PO4B,L1,NY,NX)+FXH1POB
+  trcs_solml_vr(ids_H1PO4B,L0,NY,NX) = trcs_solml_vr(ids_H1PO4B,L0,NY,NX)-FXH1POB
 
-  FXH2POB                           = FWO*trc_solml_vr(ids_H2PO4B,L0,NY,NX)
-  trc_solml_vr(ids_H2PO4B,L1,NY,NX) = trc_solml_vr(ids_H2PO4B,L1,NY,NX)+FXH2POB
-  trc_solml_vr(ids_H2PO4B,L0,NY,NX) = trc_solml_vr(ids_H2PO4B,L0,NY,NX)-FXH2POB
+  FXH2POB                           = FWO*trcs_solml_vr(ids_H2PO4B,L0,NY,NX)
+  trcs_solml_vr(ids_H2PO4B,L1,NY,NX) = trcs_solml_vr(ids_H2PO4B,L1,NY,NX)+FXH2POB
+  trcs_solml_vr(ids_H2PO4B,L0,NY,NX) = trcs_solml_vr(ids_H2PO4B,L0,NY,NX)-FXH2POB
 
   IF(salt_model)THEN
     DO NTSAB=idsaltb_beg,idsaltb_end
@@ -1495,21 +1495,15 @@ implicit none
 !
 !     SOIL GASEOUS GASES
 ! exclude NH3B, NH3
-  DO NTG=idg_beg,idg_end-2
-    FXG                        = FWO*trc_gasml_vr(NTG,L0,NY,NX)
-    trc_gasml_vr(NTG,L1,NY,NX) = trc_gasml_vr(NTG,L1,NY,NX)+FXG
-    trc_gasml_vr(NTG,L0,NY,NX) = trc_gasml_vr(NTG,L0,NY,NX)-FXG
+  DO NTG=idg_beg,idg_NH3
+    FXG                        = FWO*trcg_gasml_vr(NTG,L0,NY,NX)
+    trcg_gasml_vr(NTG,L1,NY,NX) = trcg_gasml_vr(NTG,L1,NY,NX)+FXG
+    trcg_gasml_vr(NTG,L0,NY,NX) = trcg_gasml_vr(NTG,L0,NY,NX)-FXG
 
-    FXG                        = FWO*trc_solml_vr(NTG,L0,NY,NX)
-    trc_solml_vr(NTG,L1,NY,NX) = trc_solml_vr(NTG,L1,NY,NX)+FXG
-    trc_solml_vr(NTG,L0,NY,NX) = trc_solml_vr(NTG,L0,NY,NX)-FXG
-
+    FXG                        = FWO*trcs_solml_vr(NTG,L0,NY,NX)
+    trcs_solml_vr(NTG,L1,NY,NX) = trcs_solml_vr(NTG,L1,NY,NX)+FXG
+    trcs_solml_vr(NTG,L0,NY,NX) = trcs_solml_vr(NTG,L0,NY,NX)-FXG
   ENDDO
-! add NH3
-  NTG                        = idg_NH3
-  FXG                        = FWO*trc_gasml_vr(NTG,L0,NY,NX)
-  trc_gasml_vr(NTG,L1,NY,NX) = trc_gasml_vr(NTG,L1,NY,NX)+FXG
-  trc_gasml_vr(NTG,L0,NY,NX) = trc_gasml_vr(NTG,L0,NY,NX)-FXG
 
   end Subroutine MoveDisolvGas
 
@@ -1542,9 +1536,9 @@ implicit none
 !
   DO NTS=ids_nuts_beg,ids_nuts_end
     if(NTS/=ids_H2PO4B .and. NTS/=ids_H1PO4B)THEN
-      FXNUT                      = FWO*trc_solml_vr(NTS,L0,NY,NX)
-      trc_solml_vr(NTS,L1,NY,NX) = trc_solml_vr(NTS,L1,NY,NX)+FXNUT
-      trc_solml_vr(NTS,L0,NY,NX) = trc_solml_vr(NTS,L0,NY,NX)-FXNUT
+      FXNUT                      = FWO*trcs_solml_vr(NTS,L0,NY,NX)
+      trcs_solml_vr(NTS,L1,NY,NX) = trcs_solml_vr(NTS,L1,NY,NX)+FXNUT
+      trcs_solml_vr(NTS,L0,NY,NX) = trcs_solml_vr(NTS,L0,NY,NX)-FXNUT
     ENDIF
   ENDDO
 

@@ -186,7 +186,7 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
-  integer :: K,idg,NTN,ids,idom
+  integer :: K,idg,idn,ids,idom
 
   IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0.0_r8) .OR. SurfRunoffWatFluxM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
@@ -228,8 +228,8 @@ module BoundaryTranspMod
         trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4)
       ENDDO
 
-      DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_FloXSurRunoff_2D(NTN,N,NN,M5,M4)=trcn_FloXSurRunoff_2D(NTN,N,NN,M5,M4)+trcn_FloXSurRof_flxM_2DH(NTN,N,NN,M5,M4)
+      DO idn=ids_nut_beg,ids_nuts_end
+        trcn_FloXSurRunoff_2D(idn,N,NN,M5,M4)=trcn_FloXSurRunoff_2D(idn,N,NN,M5,M4)+trcn_FloXSurRof_flxM_2DH(idn,N,NN,M5,M4)
       ENDDO
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
@@ -281,11 +281,12 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN
   integer, intent(in) :: M1,M2,M3
   integer, intent(in) :: M4,M5,M6
-  integer :: K,idg,NTN,ids,idom
+  integer :: K,idg,idn,ids,idom
   real(r8) :: VFLW
 
   IF(NN.EQ.1 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
     .OR. NN.EQ.2 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+
     IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
     ELSE
@@ -298,13 +299,8 @@ module BoundaryTranspMod
       enddo
     enddo
 
-    !exclude NH3 and NH3B
-    DO idg=idg_beg,idg_end-2
-      trcs_MicpTranspFlxM_3D(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(idg,M3,M2,M1))
-    ENDDo
-
-    DO NTN=ids_nuts_beg,ids_nuts_end
-      trcs_MicpTranspFlxM_3D(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2_vr(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+    DO idn=ids_beg,ids_end
+      trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4)=VFLW*AZMAX1(trcs_solml2_vr(idn,M3,M2,M1))*trcs_VLN_vr(idn,M3,M2,M1)
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
@@ -318,20 +314,13 @@ module BoundaryTranspMod
    !add irrigation flux
     DO ids=ids_nuts_beg,ids_nuts_end
       trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)=WaterFlow2MicPM_3D(M,N,M6,M5,M4) &
-        *trcn_irrig(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
+        *trcn_irrig_vr(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
     ENDDO
 
   ENDIF
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
-!     VLWatMacPM=macropore water-filled porosity from watsub.f
-!     RFH*S=solute diffusive flux through macropore
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
   IF(NN.EQ.1 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
     .OR. NN.EQ.2 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
@@ -345,13 +334,9 @@ module BoundaryTranspMod
         DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MacP2(idom,K,M3,M2,M1))
       enddo
     enddo
-   !exclude NH3
-    DO idg=idg_beg,idg_end-2
-      trcs_MacpTranspFlxM_3D(idg,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(idg,M3,M2,M1))
-    ENDDO
 
-    DO NTN=ids_nuts_beg,ids_nuts_end
-      trcs_MacpTranspFlxM_3D(NTN,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2_vr(NTN,M3,M2,M1))*trcs_VLN_vr(NTN,M3,M2,M1)
+    DO idn=ids_beg,ids_end
+      trcs_MacpTranspFlxM_3D(idn,N,M6,M5,M4)=VFLW*AZMAX1(trcs_soHml2_vr(idn,M3,M2,M1))*trcs_VLN_vr(idn,M3,M2,M1)
     ENDDO
 !
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
@@ -364,11 +349,6 @@ module BoundaryTranspMod
   ENDIF
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-!
-!     X*FLS,X*FLW,X*FLB=hourly solute flux in non-band,band micropores
-!     X*FHS,X*FHW,X*FHB=hourly solute flux in non-band,band macropores
-!     R*FLS,R*FLW,R*FLB=solute flux in non-band,band micropores
-!     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
@@ -391,7 +371,8 @@ module BoundaryTranspMod
   implicit none
 
   integer, intent(in) :: L,N, NN, M,MX 
-  integer, intent(in) :: N1, N2,N3, M1, M2,M3,M4, M5,M6
+  integer, intent(in) :: N1, N2,N3
+  integer, intent(in) :: M1, M2,M3,M4, M5,M6
   real(r8), intent(in):: RCHQF
   real(r8) :: FLGM,FQRM,VFLW
   integer :: K,idg
@@ -551,7 +532,7 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N1,N2,NY,NX
 
   integer :: LS,LS2
-  integer :: idg,NTN
+  integer :: idg,idn
 
   DO  LS=1,JS
     IF(VLSnowHeatCapM_snvr(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
@@ -561,38 +542,38 @@ module BoundaryTranspMod
 !
       IF(LS.LT.JS .AND. VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idg=idg_beg,idg_NH3
-          trcg_TBLS_snvr(idg,LS,N2,N1)=trcg_TBLS_snvr(idg,LS,N2,N1) &
+          trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
             +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)-trcg_AquaAdv_flxM_snvr(idg,LS2,N2,N1)
         ENDDO
 
-        DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS_snvr(NTN,LS,N2,N1)=trcn_TBLS_snvr(NTN,LS,N2,N1) &
-            +trcn_AquaAdv_flxM_snvr(NTN,LS,N2,N1)-trcn_AquaAdv_flxM_snvr(NTN,LS2,N2,N1)
+        DO idn=ids_nut_beg,ids_nuts_end
+          trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
+            +trcn_AquaAdv_flxM_snvr(idn,LS,N2,N1)-trcn_AquaAdv_flxM_snvr(idn,LS2,N2,N1)
         ENDDO
       ELSE
 !
 !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
 !
-    ! exclude NH3 and NH3B
+        ! exclude NH3 and NH3B
         DO idg=idg_beg,idg_NH3
-          trcg_TBLS_snvr(idg,LS,N2,N1)=trcg_TBLS_snvr(idg,LS,N2,N1) &
+          trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
             +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)-trcs_MicpTranspFlxM_3D(idg,3,0,N2,N1) &
             -trcs_MicpTranspFlxM_3D(idg,3,NUM(N2,N1),N2,N1)
   !    3-trcs_MacpTranspFlxM_3D(idg,3,NUM(N2,N1),N2,N1)
         ENDDO
 
-        trcg_TBLS_snvr(idg_NH3,LS,N2,N1)=trcg_TBLS_snvr(idg_NH3,LS,N2,N1) &
+        trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1) &
           -trcs_MicpTranspFlxM_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
 !    3-trcs_MacpTranspFlxM_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
 ! check trnsfr.f, loop 1205
-        DO NTN=0,ids_nuts
-          trcn_TBLS_snvr(ids_NH4+NTN,LS,N2,N1)=trcn_TBLS_snvr(ids_NH4+NTN,LS,N2,N1) &
-            +trcn_AquaAdv_flxM_snvr(ids_NH4+NTN,LS,N2,N1)-trcs_MicpTranspFlxM_3D(ids_NH4+NTN,3,0,N2,N1) &
-            -trcs_MicpTranspFlxM_3D(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
-            -trcs_MicpTranspFlxM_3D(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
-!    -trcs_MacpTranspFlxM_3D(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
-!    -trcs_MacpTranspFlxM_3D(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
+        DO idn=0,ids_nuts
+          trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1) &
+            +trcn_AquaAdv_flxM_snvr(ids_NH4+idn,LS,N2,N1)-trcs_MicpTranspFlxM_3D(ids_NH4+idn,3,0,N2,N1) &
+            -trcs_MicpTranspFlxM_3D(ids_NH4+idn,3,NUM(N2,N1),N2,N1) &
+            -trcs_MicpTranspFlxM_3D(ids_NH4B+idn,3,NUM(N2,N1),N2,N1)
+!    -trcs_MacpTranspFlxM_3D(ids_NH4+idn,3,NUM(N2,N1),N2,N1) &
+!    -trcs_MacpTranspFlxM_3D(ids_NH4B+idn,3,NUM(N2,N1),N2,N1)
         ENDDO
       ENDIF
     ENDIF

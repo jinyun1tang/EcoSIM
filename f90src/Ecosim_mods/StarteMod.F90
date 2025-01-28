@@ -321,16 +321,16 @@ module StarteMod
     COXU                           = 0._r8
     CNNU                           = solutevar%N2_aqu_conc
     CN2U                           = solutevar%N2O_aqu_conc
-    trcn_irrig(ids_NH4,L,NY,NX)    = solutevar%NH4_1p_conc
-    trcn_irrig(idg_NH3,L,NY,NX)    = solutevar%NH3_aqu_conc
-    trcn_irrig(ids_NO3,L,NY,NX)    = solutevar%CNOX
-    trcn_irrig(ids_NH4B,L,NY,NX)   = trcn_irrig(ids_NH4,L,NY,NX)
-    trcn_irrig(idg_NH3B,L,NY,NX)   = trcn_irrig(idg_NH3,L,NY,NX)
-    trcn_irrig(ids_NO3B,L,NY,NX)   = trcn_irrig(ids_NO3,L,NY,NX)
-    trcn_irrig(ids_H1PO4,L,NY,NX)  = solutevar%H1PO4_2e_conc
-    trcn_irrig(ids_H2PO4,L,NY,NX)  = solutevar%H2PO4_1e_conc
-    trcn_irrig(ids_H1PO4B,L,NY,NX) = trcn_irrig(ids_H1PO4,L,NY,NX)
-    trcn_irrig(ids_H2PO4B,L,NY,NX) = trcn_irrig(ids_H2PO4,L,NY,NX)
+    trcn_irrig_vr(ids_NH4,L,NY,NX)    = solutevar%NH4_1p_conc
+    trcn_irrig_vr(idg_NH3,L,NY,NX)    = solutevar%NH3_aqu_conc
+    trcn_irrig_vr(ids_NO3,L,NY,NX)    = solutevar%CNOX
+    trcn_irrig_vr(ids_NH4B,L,NY,NX)   = trcn_irrig_vr(ids_NH4,L,NY,NX)
+    trcn_irrig_vr(idg_NH3B,L,NY,NX)   = trcn_irrig_vr(idg_NH3,L,NY,NX)
+    trcn_irrig_vr(ids_NO3B,L,NY,NX)   = trcn_irrig_vr(ids_NO3,L,NY,NX)
+    trcn_irrig_vr(ids_H1PO4,L,NY,NX)  = solutevar%H1PO4_2e_conc
+    trcn_irrig_vr(ids_H2PO4,L,NY,NX)  = solutevar%H2PO4_1e_conc
+    trcn_irrig_vr(ids_H1PO4B,L,NY,NX) = trcn_irrig_vr(ids_H1PO4,L,NY,NX)
+    trcn_irrig_vr(ids_H2PO4B,L,NY,NX) = trcn_irrig_vr(ids_H2PO4,L,NY,NX)
 
     if(salt_model)then
       trcsalt_subirrig_conc(idsalt_Al,L,NY,NX)       = solutevar%Al_3p_conc
@@ -380,56 +380,56 @@ module StarteMod
 !   CCO2EI is set to the first year, because AtmGasCgperm3(idg_CO2,x)
 !   varies year by year, while other tracer gases are fixed year by year,
 !   this is not quite right for CH4, and N2O. However, the current implementation
-!   make sure the inexact restart run works. When exact restart is used, trc_gasml_vr
-!   and trc_solml_vr will be read from restart file, so that the following inconsistent
+!   make sure the inexact restart run works. When exact restart is used, trcg_gasml_vr
+!   and trcs_solml_vr will be read from restart file, so that the following inconsistent
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trc_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI(NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trc_gasml_vr(idg_CH4,L,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trc_gasml_vr(idg_O2,L,NY,NX)  = AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trc_gasml_vr(idg_N2,L,NY,NX)  = AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trc_gasml_vr(idg_N2O,L,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trc_gasml_vr(idg_NH3,L,NY,NX) = AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP_vr(L,NY,NX)
-    trc_gasml_vr(idg_H2,L,NY,NX)  = AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI(NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_CH4,L,NY,NX) = AtmGasCgperm3(idg_CH4,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_O2,L,NY,NX)  = AtmGasCgperm3(idg_O2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_N2,L,NY,NX)  = AtmGasCgperm3(idg_N2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_N2O,L,NY,NX) = AtmGasCgperm3(idg_N2O,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_NH3,L,NY,NX) = AtmGasCgperm3(idg_NH3,NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_H2,L,NY,NX)  = AtmGasCgperm3(idg_H2,NY,NX)*VLsoiAirP_vr(L,NY,NX)
 
 !   ExtWaterTablet0_col: external water table depth
     IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.ExtWaterTablet0_col(NY,NX))THEN
       ! above water table
-      trc_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
+      trcs_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     ELSE
       !below water table
-      trc_solml_vr(idg_O2,L,NY,NX)=0._r8
+      trcs_solml_vr(idg_O2,L,NY,NX)=0._r8
     ENDIF
 
-    trc_solml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
+    trcs_solml_vr(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trc_solml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
+    trcs_solml_vr(idg_CH4,L,NY,NX)=AtmGasCgperm3(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trc_solml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
+    trcs_solml_vr(idg_N2,L,NY,NX)=AtmGasCgperm3(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trc_solml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
+    trcs_solml_vr(idg_N2O,L,NY,NX)=AtmGasCgperm3(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    trc_solml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
+    trcs_solml_vr(idg_H2,L,NY,NX)=AtmGasCgperm3(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
       /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
-    trc_solml_vr(ids_NH4,L,NY,NX)  = trcn_irrig(ids_NH4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
-    trc_solml_vr(ids_NH4B,L,NY,NX) = trcn_irrig(ids_NH4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
-    trc_solml_vr(idg_NH3,L,NY,NX)  = trcn_irrig(idg_NH3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
-    trc_solml_vr(idg_NH3B,L,NY,NX) = trcn_irrig(idg_NH3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
-    trc_solml_vr(ids_NO3,L,NY,NX)  = trcn_irrig(ids_NO3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
-    trc_solml_vr(ids_NO3B,L,NY,NX) = trcn_irrig(ids_NO3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*natomw
+    trcs_solml_vr(ids_NH4,L,NY,NX)  = trcn_irrig_vr(ids_NH4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trcs_solml_vr(ids_NH4B,L,NY,NX) = trcn_irrig_vr(ids_NH4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trcs_solml_vr(idg_NH3,L,NY,NX)  = trcn_irrig_vr(idg_NH3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
+    trcs_solml_vr(idg_NH3B,L,NY,NX) = trcn_irrig_vr(idg_NH3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)*natomw
+    trcs_solml_vr(ids_NO3,L,NY,NX)  = trcn_irrig_vr(ids_NO3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
+    trcs_solml_vr(ids_NO3B,L,NY,NX) = trcn_irrig_vr(ids_NO3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)*natomw
 
-    trc_solml_vr(ids_H2PO4,L,NY,NX)  = trcn_irrig(ids_H2PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml_vr(ids_H2PO4B,L,NY,NX) = trcn_irrig(ids_H2PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
-    trc_solml_vr(ids_H1PO4,L,NY,NX)  = trcn_irrig(ids_H1PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml_vr(ids_H1PO4B,L,NY,NX) = trcn_irrig(ids_H1PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_solml_vr(ids_H2PO4,L,NY,NX)  = trcn_irrig_vr(ids_H2PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
+    trcs_solml_vr(ids_H2PO4B,L,NY,NX) = trcn_irrig_vr(ids_H2PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_solml_vr(ids_H1PO4,L,NY,NX)  = trcn_irrig_vr(ids_H1PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)*patomw
+    trcs_solml_vr(ids_H1PO4B,L,NY,NX) = trcn_irrig_vr(ids_H1PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)*patomw
 
-    trc_solml_vr(ids_NO2,L,NY,NX)  = 0._r8
-    trc_solml_vr(ids_NO2B,L,NY,NX) = 0._r8
+    trcs_solml_vr(ids_NO2,L,NY,NX)  = 0._r8
+    trcs_solml_vr(ids_NO2B,L,NY,NX) = 0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
@@ -449,7 +449,7 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
-    trc_soHml_vr(ids_beg:ids_end,L,NY,NX)=0._r8
+    trcs_soHml_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -496,7 +496,7 @@ module StarteMod
     SolutesIonStrenth_vr(L,NY,NX)           = 0._r8
     SolutesIonConc_vr(L,NY,NX)              = 0._r8
 ! the following line is quite interesting, Jinyun Tang, Nov 17, 2022
-    trc_solml_vr(ids_NH4,L,NY,NX)               = trc_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)
+    trcs_solml_vr(ids_NH4,L,NY,NX)               = trcs_solml_vr(ids_NH4,L,NY,NX)+0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)
     SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX) = SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)-0.5_r8*SolidOM_vr(ielmn,iprotein,k_manure,L,NY,NX)
   ENDIF
   end associate
@@ -514,7 +514,7 @@ module StarteMod
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 ! not restart run and first year
   IF(.not.is_restart().AND.is_first_year)THEN
-    trc_solml_vr(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
+    trcs_solml_vr(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
 
     trcx_solml_vr(idx_NH4,0,NY,NX)    = 0._r8
     trcx_solml_vr(idx_NH4B,0,NY,NX)   = 0._r8

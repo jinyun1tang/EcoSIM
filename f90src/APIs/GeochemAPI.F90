@@ -226,10 +226,10 @@ module GeochemAPI
   chemvar%GKCM              = GKCM(L,NY,NX)
   chemvar%GKCK              = GKCK(L,NY,NX)
   chemvar%GKCN              = GKCN(L,NY,NX)
-  chemvar%ZNO3S             = trc_solml_vr(ids_NO3,L,NY,NX)
-  chemvar%ZNO3B             = trc_solml_vr(ids_NO3B,L,NY,NX)
+  chemvar%ZNO3S             = trcs_solml_vr(ids_NO3,L,NY,NX)
+  chemvar%ZNO3B             = trcs_solml_vr(ids_NO3B,L,NY,NX)
   chemvar%RProd_Hp          = RProd_Hp_vr(L,NY,NX)
-  chemvar%CO2S              = trc_solml_vr(idg_CO2,L,NY,NX)
+  chemvar%CO2S              = trcs_solml_vr(idg_CO2,L,NY,NX)
   
   chemvar%XHY   = trcx_solml_vr(idx_Hp,L,NY,NX)
   chemvar%XAL   = trcx_solml_vr(idx_Al,L,NY,NX)
@@ -312,8 +312,8 @@ module GeochemAPI
 !  solflx%TR_FeSO4_soil =trcSalt_TR(idsalt_FeSO4,L,NY,NX)
 !  solflx%TR_H1PO4_band_soil =trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)
 !  solflx%TR_H2PO4_band_soil =trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)
-!  solflx%TR_H1PO4_soil =trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)
-!  solflx%TR_H2PO4_soil =trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)
+!  solflx%TR_H1PO4_soil =trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)
+!  solflx%TR_H2PO4_soil =trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)
 !  solflx%TR_H3PO4_band_soil =trcSalt_TR(idsalt_H3PO4B,L,NY,NX)
 !  solflx%TR_H3PO4_sorbed_soil =trcSalt_TR(idsalt_H3PO4,L,NY,NX)
 !  solflx%TR_H_p_soil  =trcSalt_TR(idsalt_Hp,L,NY,NX)
@@ -324,7 +324,7 @@ module GeochemAPI
 !  solflx%TR_NH3_band_soil =trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)
 !  solflx%TR_NH3_soil_vr =TR_NH3_soil_vr(L,NY,NX)
 !  solflx%TR_NH4_band_soil =trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)
-!  solflx%TR_NH4_soil =trcn_RChem_soil_vr(ids_NH4,L,NY,NX)
+!  solflx%TR_NH4_soil =trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)
 !  solflx%TR_Na_p_soil  =trcSalt_TR(idsalt_Na,L,NY,NX)
 !  solflx%TR_NaSO4_soil =trcSalt_TR(idsalt_NaSO4,L,NY,NX)
 !  solflx%TR_OH_1e_soil  =trcSalt_TR(idsalt_OH,L,NY,NX)
@@ -359,12 +359,12 @@ module GeochemAPI
   integer, intent(in) :: L,NY,NX
   type(solute_flx_type), intent(in) :: solflx
 
-  trcn_RChem_soil_vr(ids_NH4,L,NY,NX)         = solflx%TR_NH4_soil
+  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)         = solflx%TR_NH4_soil
   trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = solflx%TR_NH4_band_soil
   TR_NH3_soil_vr(L,NY,NX)                     = solflx%TR_NH3_soil_vr
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = solflx%TR_NH3_band_soil
-  trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)       = solflx%TR_H1PO4_soil
-  trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)       = solflx%TR_H2PO4_soil
+  trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)       = solflx%TR_H1PO4_soil
+  trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)       = solflx%TR_H2PO4_soil
   trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = solflx%TR_H1PO4_band_soil
   trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = solflx%TR_H2PO4_band_soil
   trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)         = solflx%TR_NH4_sorbed_soil

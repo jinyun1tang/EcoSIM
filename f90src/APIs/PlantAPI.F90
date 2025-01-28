@@ -701,20 +701,20 @@ implicit none
   ENDDO
   plt_allom%FracHour4LeafoffRemob(:) = FracHour4LeafoffRemob(:)
   DO L=1,NL(NY,NX)
-    plt_soilchem%trc_gasml_vr(idg_CO2,L) = trc_gasml_vr(idg_CO2,L,NY,NX)
-    plt_soilchem%trc_gasml_vr(idg_O2,L)  = trc_gasml_vr(idg_O2,L,NY,NX)
+    plt_soilchem%trcg_gasml_vr(idg_CO2,L) = trcg_gasml_vr(idg_CO2,L,NY,NX)
+    plt_soilchem%trcg_gasml_vr(idg_O2,L)  = trcg_gasml_vr(idg_O2,L,NY,NX)
   ENDDO
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)                                 = AREA(3,L,NY,NX)
-    plt_soilchem%SoilBulkDensity_vr(L)                 = SoilBulkDensity_vr(L,NY,NX)
+    plt_soilchem%SoilBulkDensity_vr(L)                = SoilBulkDensity_vr(L,NY,NX)
     plt_soilchem%trc_solcl_vr(ids_beg:ids_end,L)      = trc_solcl_vr(ids_beg:ids_end,L,NY,NX)
     plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L) = SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
-    plt_soilchem%trc_gascl_vr(idg_beg:idg_end,L)      = trc_gascl_vr(idg_beg:idg_end,L,NY,NX)
+    plt_soilchem%trcg_gascl_vr(idg_beg:idg_NH3,L)     = trcg_gascl_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_soilchem%CSoilOrgM_vr(ielmc,L)                = CSoilOrgM_vr(ielmc,L,NY,NX)
     plt_site%CumSoilThickness_vr(L)                   = CumSoilThickness_vr(L,NY,NX)
     plt_site%FracSoiAsMicP_vr(L)                      = FracSoiAsMicP_vr(L,NY,NX)
-    plt_soilchem%trc_solml_vr(ids_beg:ids_end,L)      = trc_solml_vr(ids_beg:ids_end,L,NY,NX)
+    plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)     = trcs_solml_vr(ids_beg:ids_end,L,NY,NX)
     plt_soilchem%GasSolbility_vr(idg_beg:idg_end-1,L) = GasSolbility_vr(idg_beg:idg_end-1,L,NY,NX)
 
     plt_ew%TotalSoilH2OPSIMPa_vr(L)      = TotalSoilH2OPSIMPa_vr(L,NY,NX)

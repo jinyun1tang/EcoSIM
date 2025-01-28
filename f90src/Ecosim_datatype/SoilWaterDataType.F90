@@ -63,7 +63,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RechargBottom_col(:,:)                    !lower subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  WaterFlow2MicPM_3D(:,:,:,:,:)             !micropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  WaterFlow2MacPM_3D(:,:,:,:,:)             !macropore water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  ReductVLsoiAirPM(:,:,:,:)                 !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
+  real(r8),target,allocatable ::  ReductVLsoiAirPM_vr(:,:,:,:)                 !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
   real(r8),target,allocatable ::  FWatExMacP2MicPM_vr(:,:,:,:)              !soil macropore - micropore water transfer, [g d-2 t-1]
   real(r8),target,allocatable ::  WatFlowSno2MicPM_col(:,:,:)               !meltwater flux into soil micropores
   real(r8),target,allocatable ::  WatFlowSno2MacPM_col(:,:,:)               !meltwater flux into soil macropores
@@ -184,7 +184,7 @@ module SoilWaterDataType
   allocate(RechargBottom_col(JY,JX));       RechargBottom_col=0._r8
   allocate(WaterFlow2MicPM_3D(60,3,JD,JV,JH));WaterFlow2MicPM_3D=0._r8
   allocate(WaterFlow2MacPM_3D(60,3,JD,JV,JH));WaterFlow2MacPM_3D=0._r8
-  allocate(ReductVLsoiAirPM(60,JZ,JY,JX));  ReductVLsoiAirPM=0._r8
+  allocate(ReductVLsoiAirPM_vr(60,JZ,JY,JX));  ReductVLsoiAirPM_vr=0._r8
   allocate(FWatExMacP2MicPM_vr(60,JZ,JY,JX)); FWatExMacP2MicPM_vr=0._r8
   allocate(WatFlowSno2MicPM_col(60,JY,JX));    WatFlowSno2MicPM_col=0._r8
   allocate(WatFlowSno2MacPM_col(60,JY,JX));    WatFlowSno2MacPM_col=0._r8
@@ -284,7 +284,7 @@ module SoilWaterDataType
   call destroy(RechargBottom_col)
   call destroy(WaterFlow2MicPM_3D)
   call destroy(WaterFlow2MacPM_3D)
-  call destroy(ReductVLsoiAirPM)
+  call destroy(ReductVLsoiAirPM_vr)
   call destroy(FWatExMacP2MicPM_vr)
   call destroy(WatFlowSno2MicPM_col)
   call destroy(WatFlowSno2MacPM_col)

@@ -2003,9 +2003,7 @@ module MicBGCMod
   D480: DO K=1,KL
     IF(SolidOMCK(K).GT.ZEROS)THEN
       DOSAK=DOSA(K)*AZMAX1(ROQC4HeterMicActCmpK(K))
-!      if(micfor%litrm)then
-!      write(114,*)I+J/24.,K,DOSAK
-!      endif
+
       D485: DO M=1,jsken
         SolidOMAct(M,K)=AMIN1(SolidOM(ielmc,M,K),SolidOMAct(M,K)+DOSAK*SolidOM(ielmc,M,K)/SolidOMCK(K))
       ENDDO D485
@@ -2131,7 +2129,7 @@ module MicBGCMod
           naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilHeter(NGL,K)
           naqfdiag%tRNO3MicrbTransfSoil   = naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfSoilHeter(NGL,K)
           naqfdiag%tRH2PO4MicrbTransfSoil = naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfSoilHeter(NGL,K)
-          naqfdiag%tRH1PO4MicrbTransfSoil = naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfSoilHeter(NGL,K)
+          naqfdiag%tRH1PO4MicrbTransfSoil = naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfSoilHeter(NGL,K)  !> 0 uptake 
           naqfdiag%tRNH4MicrbTransfBand   = naqfdiag%tRNH4MicrbTransfBand+RNH4TransfBandHeter(NGL,K)
           naqfdiag%tRNO3MicrbTransfBand   = naqfdiag%tRNO3MicrbTransfBand+RNO3TransfBandHeter(NGL,K)
           naqfdiag%tRH2PO4MicrbTransfBand = naqfdiag%tRH2PO4MicrbTransfBand+RH2PO4TransfBandHeter(NGL,K)
@@ -2307,7 +2305,7 @@ module MicBGCMod
   RNO3MicbTransfSoil=-naqfdiag%tRNO3MicrbTransfSoil-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
   RNO2MicbTransfSoil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
   RH2PO4MicbTransfSoil=-naqfdiag%tRH2PO4MicrbTransfSoil
-  RH1PO4MicbTransfSoil=-naqfdiag%tRH1PO4MicrbTransfSoil
+  RH1PO4MicbTransfSoil=-naqfdiag%tRH1PO4MicrbTransfSoil     !< 0 uptake
   RNH4MicbTransfBand=-naqfdiag%tRNH4MicrbTransfBand
   RNO3MicbTransfBand=-naqfdiag%tRNO3MicrbTransfBand-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
   RNO2MicbTransfBand=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
@@ -2674,9 +2672,9 @@ module MicBGCMod
   FSBSTC = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
   FSBSTA = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
   FSBST  = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
-  RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))
-  RGOCZ  = RGOCY*FSBSTC*FOCA(K)*TSensGrowth
-  RGOAZ  = RGOCY*FSBSTA*FOAA(K)*TSensGrowth
+  RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))*TSensGrowth
+  RGOCZ  = RGOCY*FSBSTC*FOCA(K)
+  RGOAZ  = RGOCY*FSBSTA*FOAA(K)
 
   !obtain kinetically unlimited DOM/acetate uptake 
   RGOCX = AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
@@ -3549,7 +3547,7 @@ module MicBGCMod
 !     H1POM,H1PBM=HPO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
-!     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
+!     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band uptake (> 0)
 !     NetPO4Mineralize=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
@@ -3765,12 +3763,11 @@ module MicBGCMod
 !     OMN=microbial N biomass
 !     RMOMK=effect of low microbial C concentration on mntc respn
 !
-  FPH=1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
-
-  RMOMX=RMOM*TempMaintRHeter(NGL,K)*FPH
-  MID1=micpar%get_micb_id(1,NGL)
-  RMaintDmndHeter(1,NGL,K)=mBiomeHeter(ielmn,MID1,K)*RMOMX*RMOMK(1)
-  RMaintDmndHeter(2,NGL,K)=OMN2(NGL,K)*RMOMX*RMOMK(2)
+  FPH                      = 1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
+  RMOMX                    = RMOM*TempMaintRHeter(NGL,K)*FPH
+  MID1                     = micpar%get_micb_id(1,NGL)
+  RMaintDmndHeter(1,NGL,K) = mBiomeHeter(ielmn,MID1,K)*RMOMX*RMOMK(1)
+  RMaintDmndHeter(2,NGL,K) = OMN2(NGL,K)*RMOMX*RMOMK(2)
 !
 !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
 !
@@ -3778,9 +3775,9 @@ module MicBGCMod
 !     RGrowthRespHeter=growth respiration
 !     RMaintDefcitcitHeter=senescence respiration
 !
-  RMaintRespHeter=RMaintDmndHeter(1,NGL,K)+RMaintDmndHeter(2,NGL,K)
-  RGrowthRespHeter=AZMAX1(RespGrossHeter(NGL,K)-RMaintRespHeter)
-  RMaintDefcitcitHeter=AZMAX1(RMaintRespHeter-RespGrossHeter(NGL,K))
+  RMaintRespHeter      = RMaintDmndHeter(1,NGL,K)+RMaintDmndHeter(2,NGL,K)
+  RGrowthRespHeter     = AZMAX1(RespGrossHeter(NGL,K)-RMaintRespHeter)
+  RMaintDefcitcitHeter = AZMAX1(RMaintRespHeter-RespGrossHeter(NGL,K))
 !
 !     N2 FIXATION: N=(6) AEROBIC, (7) ANAEROBIC
 !     FROM GROWTH RESPIRATION, FIXATION ENERGY REQUIREMENT,
@@ -3799,15 +3796,15 @@ module MicBGCMod
 !     RN2FixHeter=N2 fixation rate
 !
   IF(N.EQ.mid_aerob_N2Fixer .OR. N.EQ.mid_Anaerob_N2Fixer)THEN
-    MID3=micpar%get_micb_id(3,NGL)
-    RGN2P=AZMAX1(mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-mBiomeHeter(ielmn,MID3,K))/EN2F(N)
+    MID3  = micpar%get_micb_id(3,NGL)
+    RGN2P = AZMAX1(mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-mBiomeHeter(ielmn,MID3,K))/EN2F(N)
     IF(RGrowthRespHeter.GT.ZEROS)THEN
       Resp4NFixHeter(NGL,K)=AMIN1(RGrowthRespHeter*RGN2P/(RGrowthRespHeter+RGN2P) &
         *CZ2GS/(CZ2GS+ZFKM),OMGR*mBiomeHeter(ielmc,MID3,K))
       RN2FixHeter(NGL,K)=Resp4NFixHeter(NGL,K)*EN2F(N)  
     ELSE
-      Resp4NFixHeter(NGL,K)=0.0_r8
-      RN2FixHeter(NGL,K)=0._r8
+      Resp4NFixHeter(NGL,K) = 0.0_r8
+      RN2FixHeter(NGL,K)    = 0._r8
     ENDIF    
   ENDIF
   end associate

@@ -820,7 +820,7 @@ module StartsMod
   BandDepthNH4_col(:,:)          = 0.0_r8
   BandDepthNO3_col(:,:)          = 0.0_r8
   BandDepthPO4_col(:,:)          = 0.0_r8
-  trc_solml_vr(idg_O2,0,:,:)     = 0.0_r8
+  trcs_solml_vr(idg_O2,0,:,:)     = 0.0_r8
   FracSWRad2Grnd_col(:,:)        = 1.0_r8
   LWRadBySurf_col(:,:)           = 0.0_r8
   LWRadCanG(:,:)                 = 0.0_r8

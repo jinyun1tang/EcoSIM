@@ -18,10 +18,10 @@ implicit none
   real(r8),target,allocatable :: CPO4B(:,:,:)                        !PO4 concentration band micropore	[g m-3]
   real(r8),target,allocatable :: CPO4S(:,:,:)                        !PO4 concentration non-band micropore	[g m-3]
 
-  real(r8),target,allocatable :: trc_soHml_vr(:,:,:,:)               !solute mass in macropore [g d-2]
-  real(r8),target,allocatable :: trc_solml_vr(:,:,:,:)               !solute mass in micropore [g d-2]
+  real(r8),target,allocatable :: trcs_soHml_vr(:,:,:,:)               !solute mass in macropore [g d-2]
+  real(r8),target,allocatable :: trcs_solml_vr(:,:,:,:)               !solute mass in micropore [g d-2]
   real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)               !solute concentration in micropre [g m-3]
-  real(r8),target,allocatable :: trc_gascl_vr(:,:,:,:)               !gaseous concentation in micropore [g m-3]
+  real(r8),target,allocatable :: trcg_gascl_vr(:,:,:,:)               !gaseous concentation in micropore [g m-3]
   real(r8),target,allocatable :: tRHydlySOM_vr(:,:,:,:)              !solid SOM hydrolysis rate [g/m2/hr]
   real(r8),target,allocatable :: tRHydlyBioReSOM_vr(:,:,:,:)         !microbial residual hydrolysis rate [g/m2/hr]
   real(r8),target,allocatable :: tRHydlySoprtOM_vr(:,:,:,:)          !sorbed OM hydrolysis rate [g/m2/hr]
@@ -31,8 +31,8 @@ implicit none
   real(r8),target,allocatable ::  ZNHUI(:,:,:)                       !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0(:,:,:)                       !urea hydrolysis inhibition activity
 
-  real(r8),target,allocatable ::  trc_gasml_vr(:,:,:,:)              !layer mass of gases in micropores [g d-2]
-  real(r8),target,allocatable ::  trcVolatileMass_col(:,:,:)         !column integrated volatile tracer mass [g d-2]
+  real(r8),target,allocatable ::  trcg_gasml_vr(:,:,:,:)              !layer mass of gases in micropores [g d-2]
+  real(r8),target,allocatable ::  trcg_TotalMass_beg_col(:,:,:)       !column integrated volatile tracer mass at the begining of time step [g d-2]
   real(r8),target,allocatable ::  PH(:,:,:)                          !soil pH
   real(r8),target,allocatable ::  CEC_vr(:,:,:)                      !soil cation exchange capacity	[cmol kg-1]
   real(r8),target,allocatable ::  AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
@@ -65,7 +65,7 @@ implicit none
   real(r8),target,allocatable ::  PDRAIN_col(:,:)                    !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION_col(:,:)                      !total soil ion content, [mol d-2]
   real(r8),target,allocatable ::  HydroIonFlx_CumYr_col(:,:)         !total subsurface ion flux, [mol d-2]
-  real(r8),target,allocatable ::  RNutMicbTransf_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNut_MicbRelease_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_RMicbUptake_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)          !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoDOMProd_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
@@ -136,12 +136,12 @@ implicit none
   allocate(CNO3_vr(JZ,JY,JX));     CNO3_vr=0._r8
   allocate(CPO4_vr(JZ,JY,JX));     CPO4_vr=0._r8
   allocate(CO2_Prod_TP_cumRes_col(JY,JX)); CO2_Prod_TP_cumRes_col=0._r8
-  allocate(trcVolatileMass_col(idg_beg:idg_end,JY,JX)); trcVolatileMass_col=0._r8
-  allocate(trc_gasml_vr(idg_beg:idg_end,JZ,JY,JX)); trc_gasml_vr=0._r8
-  allocate(trc_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trc_soHml_vr=0._r8
-  allocate(trc_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml_vr=0._r8
+  allocate(trcg_TotalMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_beg_col=0._r8
+  allocate(trcg_gasml_vr(idg_beg:idg_NH3,JZ,JY,JX)); trcg_gasml_vr=0._r8
+  allocate(trcs_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trcs_soHml_vr=0._r8
+  allocate(trcs_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_solml_vr=0._r8
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
-  allocate(trc_gascl_vr(idg_beg:idg_end,0:JZ,JY,JX)); trc_gascl_vr=0._r8
+  allocate(trcg_gascl_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); trcg_gascl_vr=0._r8
   allocate(tRDIM2DOM_col(1:NumPlantChemElms,JY,JX)); tRDIM2DOM_col=0._r8
 
   allocate(tRHydlySOM_vr(1:NumPlantChemElms,0:JZ,JY,JX)); tRHydlySOM_vr=0._r8
@@ -195,7 +195,7 @@ implicit none
   allocate(PDRAIN_col(JY,JX));      PDRAIN_col=0._r8
   allocate(UION_col(JY,JX));        UION_col=0._r8
   allocate(HydroIonFlx_CumYr_col(JY,JX));      HydroIonFlx_CumYr_col=0._r8
-  allocate(RNutMicbTransf_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNutMicbTransf_vr=0._r8
+  allocate(RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNut_MicbRelease_vr=0._r8
   allocate(trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcs_RMicbUptake_vr=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
 
@@ -259,7 +259,7 @@ implicit none
   call destroy(tRHydlySOM_vr)
   call destroy(tRHydlyBioReSOM_vr)
   call destroy(tRHydlySoprtOM_vr)
-  call destroy(trc_gascl_vr)
+  call destroy(trcg_gascl_vr)
   call destroy(RCH4ProdAcetcl_vr)
   call destroy(RCH4ProdHydrog_vr)
   call destroy(RCH4Oxi_aero_vr)
@@ -269,12 +269,12 @@ implicit none
   call destroy(RN2ODeniProd_vr)
   call destroy(RN2OChemoProd_vr)
   call destroy(RN2ORedux_vr)
-  call destroy(trc_gasml_vr)
+  call destroy(trcg_gasml_vr)
   call destroy(CPO4B)
   call destroy(OxyDecompLimiter_vr)
   call destroy(RO2DecompUptk_vr)
-  call destroy(trc_solml_vr)
-  call destroy(trc_soHml_vr)
+  call destroy(trcs_solml_vr)
+  call destroy(trcs_soHml_vr)
 
   call destroy(ZNFNI)
   call destroy(ZNFN0)
@@ -311,14 +311,14 @@ implicit none
   call destroy(UION_col)
   call destroy(HydroIonFlx_CumYr_col)
   call destroy(Micb_N2Fixation_vr)
-  call destroy(RNutMicbTransf_vr)
+  call destroy(RNut_MicbRelease_vr)
   call destroy(REcoDOMProd_vr)
   call destroy(RDOMMicProd_vr)
   call destroy(TMicHeterActivity_vr)
   call destroy(VWatMicrobAct_vr)
   call destroy(TSens4MicbGrwoth_vr)
   call destroy(LitrfalStrutElms_vr)
-  call destroy(trcVolatileMass_col)
+  call destroy(trcg_TotalMass_beg_col)
   call destroy(SurfGasDifFlx_col)
   call destroy(SurfGasEmisFlx_col)
   call destroy(trcs_VLN_vr)

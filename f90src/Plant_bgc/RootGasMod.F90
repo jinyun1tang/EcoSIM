@@ -109,16 +109,16 @@ module RootGasMod
     RootGasConductance_pvr   => plt_rbgc%RootGasConductance_pvr,      &
     TScal4Difsvity_vr        => plt_soilchem%TScal4Difsvity_vr,       &
     trcs_VLN_vr              => plt_soilchem%trcs_VLN_vr,             &
-    trc_solml_vr             => plt_soilchem%trc_solml_vr,            &
-    trc_gascl_vr             => plt_soilchem%trc_gascl_vr,            &  !in: gas concentration from previous time step
+    trcs_solml_vr             => plt_soilchem%trcs_solml_vr,            &
+    trcg_gascl_vr             => plt_soilchem%trcg_gascl_vr,            &  !in: gas concentration from previous time step
     GasDifc_vr               => plt_soilchem%GasDifc_vr,              &  !in: gaseous diffusivity of volatile tracers
     SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,       &  !in: aqueous diffusivity of volatile tracers
     GasSolbility_vr          => plt_soilchem%GasSolbility_vr,         &
     trc_solcl_vr             => plt_soilchem%trc_solcl_vr,            &
     SoilWatAirDry_vr         => plt_soilchem%SoilWatAirDry_vr,        &
     VLSoilMicP_vr            => plt_soilchem%VLSoilMicP_vr,           &
-    AirFilledSoilPoreM_vr                   => plt_soilchem%AirFilledSoilPoreM_vr,                  &
-    trc_gasml_vr             => plt_soilchem%trc_gasml_vr,            & !
+    AirFilledSoilPoreM_vr    => plt_soilchem%AirFilledSoilPoreM_vr,   &
+    trcg_gasml_vr             => plt_soilchem%trcg_gasml_vr,          & !
     DiffusivitySolutEffM_vr  => plt_soilchem%DiffusivitySolutEffM_vr, &
     iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,        &
     RootPoreTortu4Gas        => plt_morph%RootPoreTortu4Gas,          &
@@ -152,27 +152,27 @@ module RootGasMod
 !     ROXYLX=diagnosed net O2 aqueous flux at time step of flux calculation
 !
 
-    DO idg=idg_beg,idg_end-1
+    DO idg=idg_beg,idg_NH3
       trcg_rootml_loc(idg) = AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_pvr(idg,N,L,NZ))
       trcs_rootml_loc(idg) = AMAX1(ZERO4Groth_pft(NZ),trcs_rootml_pvr(idg,N,L,NZ))
     ENDDO
 
     DO idg=idg_beg,idg_end
       if(idg==idg_CO2)then
-        trc_solml_loc(idg)=AMAX1(ZERO4Groth_pft(NZ),trc_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))
+        trc_solml_loc(idg)=AMAX1(ZERO4Groth_pft(NZ),trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))
       elseif(idg/=idg_O2)then
-        trc_solml_loc(idg)=trc_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
+        trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
       endif
     enddo
-    trc_solml_loc(idg_O2)=trc_solml_vr(idg_O2,L)*FOXYX
+    trc_solml_loc(idg_O2)=trcs_solml_vr(idg_O2,L)*FOXYX
 
 !  the two lines below may be redundant
 
 
     idg=idg_O2
-    trc_gasml_loc(idg)  = AMAX1(ZERO4Groth_pft(NZ),trc_gasml_vr(idg,L)*FOXYX)      
+    trc_gasml_loc(idg)  = AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg,L)*FOXYX)      
     idg=idg_CO2
-    trc_gasml_loc(idg)=AMAX1(ZERO4Groth_pft(NZ),trc_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))
+    trc_gasml_loc(idg)=AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))
     RTVLWA                = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
     RTVLWB                = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
 
@@ -307,11 +307,11 @@ module RootGasMod
         RRADS  = LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX = RootAreaDivRadius_vr(N,L)/RRADS
 
-        do idg    = idg_beg, idg_end-1
+        do idg    = idg_beg, idg_NH3
           DifAqueVolatile(idg)=THETM*SolDifc_loc(idg)*RTARRX
 
           if(idg/=idg_O2 .and. idg/=idg_CO2)then
-            trc_gasml_loc(idg)=trc_gascl_vr(idg,L)*VLsoiAirPMM
+            trc_gasml_loc(idg)=trcg_gascl_vr(idg,L)*VLsoiAirPMM
           endif          
         enddo
         DifAqueVolatile(idg_NH3)  = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
@@ -402,7 +402,7 @@ module RootGasMod
             ENDIF
           ENDIF
 !          write(113,*)I*1000+J,MX,M,RootOxyUptakePerPlant,ROxySoil2UptkPerPlant,DifAqueVolatile(idg_O2),DIFOP, &
-!            trcaqu_conc_soi_loc(idg_O2),trc_conc_root_loc(idg_O2),trc_solml_loc(idg_O2),trc_solml_vr(idg_O2,L),ROXYLX
+!            trcaqu_conc_soi_loc(idg_O2),trc_conc_root_loc(idg_O2),trc_solml_loc(idg_O2),trcs_solml_vr(idg_O2,L),ROXYLX
 !
 !     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
 !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION

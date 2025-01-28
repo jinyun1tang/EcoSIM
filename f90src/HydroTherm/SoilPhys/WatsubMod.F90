@@ -1363,7 +1363,7 @@ module WatsubMod
           VLsoiAirPM_vr(M+1,L,NY,NX) = VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX)+THETPI*(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))
 
           !change in soil air volume
-          ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)-VLsoiAirPM_vr(M+1,L,NY,NX)
+          ReductVLsoiAirPM_vr(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)-VLsoiAirPM_vr(M+1,L,NY,NX)
           AirFilledSoilPoreM_vr(M+1,L,NY,NX)         = AirFilledSoilPore_vr(L,NY,NX)
  !
         ELSE
@@ -1371,7 +1371,7 @@ module WatsubMod
           VLWatMicPM_vr(M+1,L,NY,NX)  = 0.0_r8
           VLWatMacPM_vr(M+1,L,NY,NX)  = 0.0_r8
           VLsoiAirPM_vr(M+1,L,NY,NX)  = 0.0_r8
-          ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)
+          ReductVLsoiAirPM_vr(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)
           AirFilledSoilPoreM_vr(M+1,L,NY,NX)         = 0.0_r8
         ENDIF
         dwat=dwat+VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE

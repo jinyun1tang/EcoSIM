@@ -5,6 +5,8 @@ module BalancesMod
   use EcoSimConst,    only: DENSICE
   use abortutils,     only: endrun
   use EcoSIMCtrlMod,  only: fixWaterLevel
+  use SoilBGCDataType
+  use GridDataType
   use SurfLitterDataType
   use CanopyDataType
   use SnowDataType
@@ -23,6 +25,7 @@ implicit none
   public :: BegCheckBalances
   public :: EndCheckBalances
   public :: SumUpStorage
+  public :: SummarizeTracers
 contains
 
   subroutine BegCheckBalances(I,J,NHW,NHE,NVN,NVS)  
@@ -235,4 +238,38 @@ contains
   ENDDO
   end subroutine EndCheckBalances 
 
+
+!------------------------------------------------------------------------------------------
+  subroutine SummarizeTracers(NHW,NHE,NVN,NVS,trcVolatileMass_col)
+  !
+  !Description
+  !sum up mass of tracers
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS  
+  real(r8), intent(out) :: trcVolatileMass_col(idg_beg:idg_end,JY,JX)
+  integer :: NY,NX
+  integer :: idg,L
+
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      trcVolatileMass_col(idg_beg:idg_end,NY,NX)=0._r8
+      DO L=NUI(NY,NX),NLI(NY,NX)
+        DO idg=idg_beg,idg_NH3
+          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) 
+        ENDDO
+
+        DO idg=idg_beg,idg_end
+          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) + trcs_soHml_vr(idg,L,NY,NX)
+        ENDDO
+      ENDDO
+
+      DO idg=idg_beg,idg_NH3
+        trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcs_solml_vr(idg,0,NY,NX)
+        DO L=1,JS
+          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+  end subroutine SummarizeTracers
 end module BalancesMod

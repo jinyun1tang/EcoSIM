@@ -77,7 +77,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  COCU(:,:,:,:)                     !subsurface irrigation  DOC concentration, [g m-3]
   real(r8),target,allocatable ::  CONU(:,:,:,:)                     !subsurface irrigation  DON concentration, [g m-3]
   real(r8),target,allocatable ::  COAU(:,:,:,:)                     !subsurface irrigation  acetate concentration, [g m-3]
-  real(r8),target,allocatable ::  trcn_irrig(:,:,:,:)               !subsurface irrigation  nutrient concentration, [g m-3]
+  real(r8),target,allocatable ::  trcn_irrig_vr(:,:,:,:)               !subsurface irrigation  nutrient concentration, [g m-3]
   real(r8),target,allocatable ::  CNZU(:,:,:)                       !subsurface irrigation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  trcsalt_subirrig_conc(:,:,:,:)     !subsurface irrigation  chemical concentration, [g m-3]
   real(r8),target,allocatable ::  COPU(:,:,:,:)                     !subsurface irrigation  DOP concentration, [g m-3]
@@ -164,7 +164,7 @@ module IrrigationDataType
   allocate(COCU(1:jcplx,JZ,JY,JX)); COCU=0._r8
   allocate(CONU(1:jcplx,JZ,JY,JX)); CONU=0._r8
   allocate(COAU(1:jcplx,JZ,JY,JX)); COAU=0._r8
-  allocate(trcn_irrig(ids_nuts_beg:ids_nuts_end,JZ,JY,JX)); trcn_irrig=0._r8
+  allocate(trcn_irrig_vr(ids_nuts_beg:ids_nuts_end,JZ,JY,JX)); trcn_irrig_vr=0._r8
   allocate(CNZU(JZ,JY,JX));     CNZU=0._r8
   allocate(trcsalt_subirrig_conc(idsalt_beg:idsalt_end,JZ,JY,JX));     trcsalt_subirrig_conc=0._r8
   allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
@@ -180,7 +180,7 @@ module IrrigationDataType
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcn_irrig)
+  call destroy(trcn_irrig_vr)
   call destroy(trcs_Irrig_vr)
   call destroy(PHQ)
   call destroy(NH4_irrig_conc)

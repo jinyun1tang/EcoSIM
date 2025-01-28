@@ -207,13 +207,13 @@ module TranspNoSaltMod
 !             :*ZN3*=NH3,*H2G*=H2
 !
       DO idg=idg_beg,idg_end
-        trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+RGas_Disol_FlxMM_vr(idg,0,NY,NX)
+        trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)+RGas_Disol_FlxMM_vr(idg,0,NY,NX)
       ENDDO
 
       DO L=NU(NY,NX),NL(NY,NX)
         DO ids=ids_beg,ids_end
-          trc_solml2_vr(ids,L,NY,NX)=fixnegmass(trc_solml2_vr(ids,L,NY,NX))
-          trc_soHml2_vr(ids,L,NY,NX)=fixnegmass(trc_soHml2_vr(ids,L,NY,NX),trc_solml2_vr(ids,L,NY,NX))
+          trcs_solml2_vr(ids,L,NY,NX)=fixnegmass(trcs_solml2_vr(ids,L,NY,NX))
+          trcs_soHml2_vr(ids,L,NY,NX)=fixnegmass(trcs_soHml2_vr(ids,L,NY,NX),trcs_solml2_vr(ids,L,NY,NX))
         ENDDO  
       ENDDO  
     ENDDO D9690
@@ -243,11 +243,11 @@ module TranspNoSaltMod
 
   DO  L=1,JS
     DO idg=idg_beg,idg_end-1
-      trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)+trcg_TBLS_snvr(idg,L,NY,NX)
+      trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)+trcg_Aqua_flxM_snvr(idg,L,NY,NX)
     ENDDO
 
     DO idn=ids_nut_beg,ids_nuts_end
-      trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)+trcn_TBLS_snvr(idn,L,NY,NX)
+      trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)+trcn_Aqua_flxM_snvr(idn,L,NY,NX)
     ENDDO
   ENDDO
   end subroutine UpdateSnowTracersM
@@ -284,17 +284,17 @@ module TranspNoSaltMod
 
   !exclude NH3B
   DO idg=idg_beg,idg_NH3
-    trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+RGasAtmDisol2LitrM(idg)
+    trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)+RGasAtmDisol2LitrM(idg)
   ENDDO
 
 ! band does not exist in litter layer
   DO ids=ids_beg,ids_end
-    trc_solml2_vr(ids,0,NY,NX)=trc_solml2_vr(ids,0,NY,NX)+trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)
+    trcs_solml2_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)+trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)
   ENDDO
 
 ! include NH3B
   DO idg=idg_beg,idg_end
-    trc_solml2_vr(idg,NU(NY,NX),NY,NX)=trc_solml2_vr(idg,NU(NY,NX),NY,NX)+RGasAtmDisol2SoilM(idg)
+    trcs_solml2_vr(idg,NU(NY,NX),NY,NX)=trcs_solml2_vr(idg,NU(NY,NX),NY,NX)+RGasAtmDisol2SoilM(idg)
   ENDDO
 
   D9680: DO K=1,jcplx
@@ -305,11 +305,11 @@ module TranspNoSaltMod
 
 !exclude NH3B
   DO idg=idg_beg,idg_end-1
-    trc_solml2_vr(idg,0,NY,NX)=trc_solml2_vr(idg,0,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)
+    trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)
   ENDDO
 
   DO ids=ids_nut_beg,ids_nuts_end
-    trc_solml2_vr(ids,0,NY,NX)=trc_solml2_vr(ids,0,NY,NX)+trcn_SurfRunoff_flxM(ids,NY,NX)
+    trcs_solml2_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)+trcn_SurfRunoff_flxM(ids,NY,NX)
   ENDDO
 
   end subroutine UpdateSurfTracerM
@@ -332,11 +332,11 @@ module TranspNoSaltMod
     DO L=NU(NY,NX),NL(NY,NX)    
       IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN        
         DO ids=ids_beg,ids_end
-          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+trcsol_Irrig_flxM_vr(ids,L,NY,NX)
+          trcs_solml2_vr(ids,L,NY,NX) = trcs_solml2_vr(ids,L,NY,NX)+trcsol_Irrig_flxM_vr(ids,L,NY,NX)
         ENDDO
 
         DO idg=idg_beg,idg_end        
-          trc_solml2_vr(idg,L,NY,NX)=trc_solml2_vr(idg,L,NY,NX)+trcg_Ebu_flxM_vr(idg,L,NY,NX)
+          trcs_solml2_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)+trcg_Ebu_flxM_vr(idg,L,NY,NX)
         ENDDO
 
         DO  K=1,jcplx
@@ -354,18 +354,18 @@ module TranspNoSaltMod
         ENDDO
 
         DO ids=ids_beg,ids_end
-          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX)
-          trc_solml2_vr(ids,L,NY,NX) = fixnegmass(trc_solml2_vr(ids,L,NY,NX))
+          trcs_solml2_vr(ids,L,NY,NX) = trcs_solml2_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX)
+          trcs_solml2_vr(ids,L,NY,NX) = fixnegmass(trcs_solml2_vr(ids,L,NY,NX))
           
-          trc_soHml2_vr(ids,L,NY,NX) = trc_soHml2_vr(ids,L,NY,NX)+trcs_Transp2Macp_flxM_vr(ids,L,NY,NX)
-          trc_soHml2_vr(ids,L,NY,NX) = fixnegmass(trc_soHml2_vr(ids,L,NY,NX))
+          trcs_soHml2_vr(ids,L,NY,NX) = trcs_soHml2_vr(ids,L,NY,NX)+trcs_Transp2Macp_flxM_vr(ids,L,NY,NX)
+          trcs_soHml2_vr(ids,L,NY,NX) = fixnegmass(trcs_soHml2_vr(ids,L,NY,NX))
 
 
           trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)=flux_mass_limiter(trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX),&
-            trc_solml2_vr(ids,L,NY,NX),trc_soHml2_vr(ids,L,NY,NX))
+            trcs_solml2_vr(ids,L,NY,NX),trcs_soHml2_vr(ids,L,NY,NX))
 
-          trc_solml2_vr(ids,L,NY,NX) = trc_solml2_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
-          trc_soHml2_vr(ids,L,NY,NX) = trc_soHml2_vr(ids,L,NY,NX)-trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
+          trcs_solml2_vr(ids,L,NY,NX) = trcs_solml2_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
+          trcs_soHml2_vr(ids,L,NY,NX) = trcs_soHml2_vr(ids,L,NY,NX)-trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -378,10 +378,10 @@ module TranspNoSaltMod
 !
     IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idg=idg_beg,idg_end
-        trc_solml2_vr(idg,L,NY,NX)=trc_solml2_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)
+        trcs_solml2_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)
       ENDDO
-
-      DO idg=idg_beg,idg_end-1
+      !there is no gas phase for idg_NH3B
+      DO idg=idg_beg,idg_NH3
         trc_gasml2_vr(idg,L,NY,NX)=trc_gasml2_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)-RGas_Disol_FlxMM_vr(idg,L,NY,NX)
       ENDDO
       trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX)
@@ -409,11 +409,11 @@ module TranspNoSaltMod
   RBGCSinkGasMM_vr(idg_NH3,0,NY,NX) = 0.0_r8
 
   RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TR_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
-  RBGCSinkSoluteM_vr(ids_NH4,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NH4,0,NY,NX)+trcn_RChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkSoluteM_vr(ids_NO3,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NO3,0,NY,NX)+trcn_RChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkSoluteM_vr(ids_NO2,0,NY,NX)   = -(RNutMicbTransf_vr(ids_NO2,0,NY,NX)+trcn_RChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkSoluteM_vr(ids_H2PO4,0,NY,NX) = -(RNutMicbTransf_vr(ids_H2PO4,0,NY,NX)+trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
-  RBGCSinkSoluteM_vr(ids_H1PO4,0,NY,NX) = -(RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)+trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_NH4,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NH4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_NO3,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NO3,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_NO2,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NO2,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_H2PO4,0,NY,NX) = -(RNut_MicbRelease_vr(ids_H2PO4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
+  RBGCSinkSoluteM_vr(ids_H1PO4,0,NY,NX) = -(RNut_MicbRelease_vr(ids_H1PO4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
 
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
@@ -427,20 +427,20 @@ module TranspNoSaltMod
 
 ! exclude banded nutrient
   DO idg=idg_beg,idg_NH3
-    trc_solml2_vr(idg,0,NY,NX)=trc_solml_vr(idg,0,NY,NX)
+    trcs_solml2_vr(idg,0,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
   ENDDO
 
 ! exclude banded nutrient
   DO ids=ids_nut_beg,ids_nuts_end
-    trc_solml2_vr(ids,0,NY,NX)=trc_solml_vr(ids,0,NY,NX)
+    trcs_solml2_vr(ids,0,NY,NX)=trcs_solml_vr(ids,0,NY,NX)
   ENDDO
 
-  trc_solml2_vr(ids_H1PO4B,0,NY,NX) = trc_solml2_vr(ids_H1PO4,0,NY,NX)
-  trc_solml2_vr(ids_H2PO4B,0,NY,NX) = trc_solml2_vr(ids_H2PO4,0,NY,NX)
-  trc_solml2_vr(ids_NO3B,0,NY,NX)   = trc_solml2_vr(ids_NO3,0,NY,NX)
-  trc_solml2_vr(ids_NO2B,0,NY,NX)   = trc_solml2_vr(ids_NO2,0,NY,NX)
-  trc_solml2_vr(ids_NH4B,0,NY,NX)   = trc_solml2_vr(ids_NH4,0,NY,NX)
-  trc_solml2_vr(idg_NH3B,0,NY,NX)   = trc_solml2_vr(idg_NH3,0,NY,NX)
+  trcs_solml2_vr(ids_H1PO4B,0,NY,NX) = trcs_solml2_vr(ids_H1PO4,0,NY,NX)
+  trcs_solml2_vr(ids_H2PO4B,0,NY,NX) = trcs_solml2_vr(ids_H2PO4,0,NY,NX)
+  trcs_solml2_vr(ids_NO3B,0,NY,NX)   = trcs_solml2_vr(ids_NO3,0,NY,NX)
+  trcs_solml2_vr(ids_NO2B,0,NY,NX)   = trcs_solml2_vr(ids_NO2,0,NY,NX)
+  trcs_solml2_vr(ids_NH4B,0,NY,NX)   = trcs_solml2_vr(ids_NH4,0,NY,NX)
+  trcs_solml2_vr(idg_NH3B,0,NY,NX)   = trcs_solml2_vr(idg_NH3,0,NY,NX)
 
   !reset DOM to value before the iteration
   D9979: DO K=1,jcplx
@@ -461,8 +461,8 @@ module TranspNoSaltMod
     IF(K.LE.micpar%NumOfPlantLitrCmplxs)THEN
       DOM_MicpTransp_3D(idom_beg:idom_end,K,3,0,NY,NX)=0.0_r8
     ENDIF
-    DOM_MicpTransp_3D(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
-    DOM_3DMacp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)=0.0_r8
+    DOM_MicpTransp_3D(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX)     = 0.0_r8
+    DOM_3DMacp_Transp_flx(idom_beg:idom_end,K,3,NU(NY,NX),NY,NX) = 0.0_r8
   ENDDO D8855
 
   end subroutine ZeroSurfaceSoluteAtmosFlux
@@ -483,10 +483,10 @@ module TranspNoSaltMod
         +Irrig2SoilSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
     ENDDO
 
-    trcn_AquaAdv_flx_snvr(ids_NH4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw
-    trcn_AquaAdv_flx_snvr(ids_NO3,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw
-    trcn_AquaAdv_flx_snvr(ids_H1PO4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*HPO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*HPO4_irrig_conc(I,NY,NX))*patomw
-    trcn_AquaAdv_flx_snvr(ids_H2PO4,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*H2PO4_irrig_conc(I,NY,NX))*patomw
+    trcn_AquaAdv_flx_snvr(ids_NH4,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NH4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NH4_irrig_conc(I,NY,NX))*natomw
+    trcn_AquaAdv_flx_snvr(ids_NO3,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NO3_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*NO3_irrig_conc(I,NY,NX))*natomw
+    trcn_AquaAdv_flx_snvr(ids_H1PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*HPO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*HPO4_irrig_conc(I,NY,NX))*patomw
+    trcn_AquaAdv_flx_snvr(ids_H2PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*H2PO4_rain_conc(NY,NX)+Irrig2SoilSurf(NY,NX)*H2PO4_irrig_conc(I,NY,NX))*patomw
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IF RAINFALL AND IRRIGATION IS ZERO IF SNOWPACK IS PRESENT
@@ -506,8 +506,8 @@ module TranspNoSaltMod
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
 !
-    trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1,NY,NX) = 0.0_r8
-    trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX)      = 0.0_r8
+    trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
+    trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
     do idg=idg_beg,idg_NH3
       trcs_TransptMicP_3D(idg,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*trcVolatile_rain_conc(idg,NY,NX) &
         +Irrig2LitRSurf(NY,NX)*trcVolatile_irrig_conc(idg,NY,NX)
@@ -549,8 +549,8 @@ module TranspNoSaltMod
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
   ELSE
-    trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1,NY,NX) = 0.0_r8
-    trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX)      = 0.0_r8
+    trcg_AquaAdv_flx_snvr(idg_beg:idg_end-1,1,NY,NX)        = 0.0_r8
+    trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
 
     trcs_TransptMicP_3D(idg_beg:idg_end-1,3,0,NY,NX)        = 0.0_r8
     trcs_TransptMicP_3D(ids_nut_beg:ids_nuts_end,3,0,NY,NX) = 0.0_r8
@@ -572,8 +572,8 @@ module TranspNoSaltMod
 
   DO  K=1,micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      DOM_Flo2LitrM(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,0,NY,NX)*dts_HeatWatTP    
-      DOM_Flo2TopSoilM(idom,K,NY,NX)=DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+      DOM_Flo2LitrM(idom,K,NY,NX)    = DOM_MicpTransp_3D(idom,K,3,0,NY,NX)*dts_HeatWatTP
+      DOM_Flo2TopSoilM(idom,K,NY,NX) = DOM_MicpTransp_3D(idom,K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
     ENDDO
   enddo
 
@@ -588,15 +588,15 @@ module TranspNoSaltMod
   ENDDO
 
   DO idg=idg_beg,idg_NH3
-    trcg_RFL0(idg,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)*dts_HeatWatTP
+    trcg_Precip2LitrM(idg,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   do ids=ids_nut_beg,ids_nuts_end
-    trcn_RFL0(ids,NY,NX)=trcs_TransptMicP_3D(ids,3,0,NY,NX)*dts_HeatWatTP
+    trcn_Precip2LitrM(ids,NY,NX)=trcs_TransptMicP_3D(ids,3,0,NY,NX)*dts_HeatWatTP
   enddo
 
   DO ids=ids_beg,ids_end
-    trcs_RFL1(ids,NY,NX)=trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    trcs_Precip2MicpM(ids,NY,NX)=trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   ENDDO
 !
 !     GAS AND SOLUTE SINKS AND SOURCES IN SOIL LAYERS FROM MICROBIAL
@@ -606,11 +606,11 @@ module TranspNoSaltMod
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
   DO ids=ids_beg,ids_end
-    SoluteDifusivitytscaled_vr(ids,0,NY,NX)=SoluteDifusvty_vr(ids,0,NY,NX)*dts_HeatWatTP
+    SoluteDifusivitytscaledM_vr(ids,0,NY,NX)=SoluteDifusvty_vr(ids,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO idom=idom_beg,idom_end
-    DOMdiffusivity2_vr(idom,0,NY,NX)=DOMdiffusivity_vr(idom,0,NY,NX)*dts_HeatWatTP
+    DOM_diffusivitytscaledM_vr(idom,0,NY,NX)=DOMdiffusivity_vr(idom,0,NY,NX)*dts_HeatWatTP
   enddo
 !
 !     INITIAL SOLUTES IN SNOWPACK
@@ -639,19 +639,19 @@ module TranspNoSaltMod
     RBGCSinkGasMM_vr(idg_H2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_H2,L,NY,NX)  +trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TR_NH3_geochem_vr(L,NY,NX)*dts_gas
 
-    RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NH4,L,NY,NX)-trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)   = (-TR_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO3,L,NY,NX)-trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO2,L,NY,NX)-trcn_RChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_H1PO4,L,NY,NX) = (-RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)-trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO3,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO2,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H1PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
 
-    RBGCSinkSoluteM_vr(ids_NH4B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NH4B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX)   = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_NO3B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_NO2B,L,NY,NX)   = (-RNutMicbTransf_vr(ids_NO2B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_H2PO4B,L,NY,NX) = (-RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(ids_H1PO4B,L,NY,NX) = (-RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO3B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_NO2B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO2B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H2PO4B,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(ids_H1PO4B,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -685,15 +685,15 @@ module TranspNoSaltMod
 !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
 !
     DO idom=idom_beg,idom_end
-      DOMdiffusivity2_vr(idom,L,NY,NX)=DOMdiffusivity_vr(idom,L,NY,NX)*dts_HeatWatTP
+      DOM_diffusivitytscaledM_vr(idom,L,NY,NX)=DOMdiffusivity_vr(idom,L,NY,NX)*dts_HeatWatTP
     enddo
 
     DO ids=ids_beg,ids_end
-      SoluteDifusivitytscaled_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
+      SoluteDifusivitytscaledM_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
     DO idg=idg_beg,idg_end
-      GasDifctScaled_vr(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
+      GasDifctScaledMM_vr(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
     ENDDO
 !
 !     STATE VARIABLES FOR GASES AND SOLUTES USED IN 'TranspNoSalt'
@@ -701,7 +701,7 @@ module TranspNoSaltMod
 !     INCLUDING TRANSFORMATIONS FROM NITRO.F, UPTAKE.F AND SOLUTE.F
     ! exclude NH3B
     DO idg=idg_beg,idg_NH3
-      trc_gasml2_vr(idg,L,NY,NX)=trc_gasml_vr(idg,L,NY,NX)
+      trc_gasml2_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)
     ENDDO
 
     !reset DOM to value before the iteration
@@ -710,20 +710,20 @@ module TranspNoSaltMod
 
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)
-        DOM_MacP2(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
+        DOM_MicP2(idom,K,L,NY,NX) = DOM_vr(idom,K,L,NY,NX)
+        DOM_MacP2(idom,K,L,NY,NX) = DOM_MacP_vr(idom,K,L,NY,NX)
       ENDDO
     enddo
     DO ids=ids_beg,ids_end
-      trc_solml2_vr(ids,L,NY,NX) = fixnegmass(trc_solml_vr(ids,L,NY,NX))
-      trc_soHml2_vr(ids,L,NY,NX) = fixnegmass(trc_soHml_vr(ids,L,NY,NX))
+      trcs_solml2_vr(ids,L,NY,NX) = fixnegmass(trcs_solml_vr(ids,L,NY,NX))    !micropore solute tracer
+      trcs_soHml2_vr(ids,L,NY,NX) = fixnegmass(trcs_soHml_vr(ids,L,NY,NX))    !macropore solute tracer
 
-      if(trc_solml2_vr(ids,L,NY,NX)<0._r8)then
-      write(*,*)'micv2 ',trcs_names(ids),L,trc_solml2_vr(ids,L,NY,NX),trc_solml_vr(ids,L,NY,NX)
-      stop
+      if(trcs_solml2_vr(ids,L,NY,NX)<0._r8)then
+        write(*,*)'micv2 ',trcs_names(ids),L,trcs_solml2_vr(ids,L,NY,NX),trcs_solml_vr(ids,L,NY,NX)
+        stop
       endif
-      if(trc_soHml_vr(ids,L,NY,NX)<0._r8)then
-      write(*,*)'macv2 ',trcs_names(ids),L,trc_soHml_vr(ids,L,NY,NX)
+      if(trcs_soHml_vr(ids,L,NY,NX)<0._r8)then
+        write(*,*)'macv2 ',trcs_names(ids),L,trcs_soHml_vr(ids,L,NY,NX)
       endif
     ENDDO
 

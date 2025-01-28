@@ -106,11 +106,11 @@ module TillageMixMod
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
 
   if(salt_model)then
     CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcSalt_solml_vr(idsalt_beg:idsalt_end,0:JZ,NY,NX),XCORP0)
@@ -134,7 +134,7 @@ module TillageMixMod
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trc_gasml_vr(idg_beg:idg_end-1,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_end-1,1:JZ,NY,NX))
 
   CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
 
@@ -301,7 +301,7 @@ module TillageMixMod
 
         ! solute
         DO NTS=ids_beg,ids_end
-          trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FracTillCorp*trc_soHml_vr(NTS,L,NY,NX)
+          trcs_solml_vr(NTS,L,NY,NX)=trcs_solml_vr(NTS,L,NY,NX)+FracTillCorp*trcs_soHml_vr(NTS,L,NY,NX)
         ENDDO
 
         call MixSoluteMacpore(L,NY,NX)
@@ -322,8 +322,8 @@ module TillageMixMod
           ENDDO
         ENDDO
 
-        if(trc_solml_vr(idg_O2,1,1,1)<0._r8)then
-          print*,'tillage problem',trc_solml_vr(idg_O2,1,1,1)
+        if(trcs_solml_vr(idg_O2,1,1,1)<0._r8)then
+          print*,'tillage problem',trcs_solml_vr(idg_O2,1,1,1)
           stop
         endif
 
@@ -362,7 +362,7 @@ module TillageMixMod
   integer :: NTS,NTSA
 
   DO NTS=ids_beg,ids_end
-    trc_soHml_vr(NTS,L,NY,NX)=XTillCorp_col(NY,NX)*trc_soHml_vr(NTS,L,NY,NX)
+    trcs_soHml_vr(NTS,L,NY,NX)=XTillCorp_col(NY,NX)*trcs_soHml_vr(NTS,L,NY,NX)
   ENDDO
 
   DO NTSA=idsalt_beg,idsalt_end

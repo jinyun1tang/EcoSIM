@@ -375,7 +375,7 @@ implicit none
   real(r8), pointer :: SoilResit4RootPentrate_vr(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: SoilBulkDensity_vr(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:) => null() !aqueous tracer concentration [g m-3]
-  real(r8), pointer :: trc_gascl_vr(:,:) => null() !gaseous tracer concentration [g m-3]
+  real(r8), pointer :: trcg_gascl_vr(:,:) => null() !gaseous tracer concentration [g m-3]
 
   real(r8), pointer :: CSoilOrgM_vr(:,:)    => null()  !soil organic C content [gC kg soil-1]
 
@@ -384,7 +384,7 @@ implicit none
   real(r8), pointer :: GasDifc_vr(:,:)=> null()  !gaseous diffusivity [m2 h-1]
   real(r8), pointer :: SoluteDifusvty_vr(:,:)=> null()  !aqueous diffusivity [m2 h-1]
 
-  real(r8), pointer :: trc_gasml_vr(:,:)=> null()!gas layer mass [g d-2]
+  real(r8), pointer :: trcg_gasml_vr(:,:)=> null()!gas layer mass [g d-2]
   real(r8), pointer :: GasSolbility_vr(:,:) => null() !gas solubility, [m3 m-3]
   real(r8), pointer :: THETW_vr(:)          => null()  !volumetric water content [m3 m-3]
   real(r8), pointer :: SoilWatAirDry_vr(:)          => null()  !air-dry water content, [m3 m-3]
@@ -396,7 +396,7 @@ implicit none
   real(r8), pointer :: VLMicP_vr(:)     => null()  !total volume in micropores [m3 d-2]
 
   real(r8), pointer :: DOM_vr(:,:,:)     => null()  !dissolved organic C micropore	[gC d-2]
-  real(r8), pointer :: trc_solml_vr(:,:) => null() !aqueous tracer [g d-2]
+  real(r8), pointer :: trcs_solml_vr(:,:) => null() !aqueous tracer [g d-2]
   contains
     procedure, public :: Init => plt_soilchem_init
     procedure, public :: Destroy => plt_soilchem_destroy
@@ -1449,10 +1449,10 @@ implicit none
   allocate(this%VLMicP_vr(0:JZ1));this%VLMicP_vr=spval
   allocate(this%trcs_VLN_vr(ids_nuts_beg:ids_nuts_end,0:JZ1));this%trcs_VLN_vr=spval
   allocate(this%DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ1));this%DOM_vr=spval
-  allocate(this%trc_solml_vr(ids_beg:ids_end,0:JZ1));this%trc_solml_vr=spval
+  allocate(this%trcs_solml_vr(ids_beg:ids_end,0:JZ1));this%trcs_solml_vr=spval
 
-  allocate(this%trc_gasml_vr(idg_beg:idg_end,0:JZ1));this%trc_gasml_vr=spval
-  allocate(this%trc_gascl_vr(idg_beg:idg_end,0:JZ1));this%trc_gascl_vr=spval
+  allocate(this%trcg_gasml_vr(idg_beg:idg_NH3,0:JZ1));this%trcg_gasml_vr=spval
+  allocate(this%trcg_gascl_vr(idg_beg:idg_NH3,0:JZ1));this%trcg_gascl_vr=spval
   allocate(this%CSoilOrgM_vr(1:NumPlantChemElms,0:JZ1));this%CSoilOrgM_vr=spval
 
   allocate(this%trc_solcl_vr(ids_beg:ids_end,0:jZ1));this%trc_solcl_vr=spval
