@@ -133,6 +133,8 @@ module InsideTranspMod
     PARGas_CefMM(idg_N2O,NY,NX) = PARGM*0.74_r8
     PARGas_CefMM(idg_NH3,NY,NX) = PARGM*1.02_r8
     PARGas_CefMM(idg_H2,NY,NX)  = PARGM*2.08_r8
+    PARGas_CefMM(idg_AR,NY,NX)  = PARGM*0.72_r8    
+    
 !
 !     RESET RUNOFF SOLUTE FLUX ACCUMULATORS
 !
@@ -1286,6 +1288,7 @@ module InsideTranspMod
       trcg_SLX(idg_N2O) =28.0_r8*GasSolbility_vr(idg_N2O,N3,N2,N1)
       trcg_SLX(idg_NH3) =natomw*GasSolbility_vr(idg_NH3,N3,N2,N1)
       trcg_SLX(idg_H2)  =2.0_r8*GasSolbility_vr(idg_H2,N3,N2,N1)
+      trcg_SLX(idg_AR)  =39.95_r8*GasSolbility_vr(idg_H2,N3,N2,N1)      
       trcg_SLX(idg_NH3B)=trcg_SLX(idg_NH3)
 !
 !     GASEOUS EQUIVALENT PARTIAL CONCENTRATIONS
@@ -1379,7 +1382,7 @@ module InsideTranspMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-  DO idg=idg_beg,idg_end
+  DO idg=idg_beg,idg_NH3
     CNDC1=DFLG2*GasDifctScaledMM_vr(idg,N3,N2,N1)
     CNDC2=DFLGL*GasDifctScaledMM_vr(idg,N6,N5,N4)
     GasDifuscoefMM_3D(idg,N,N6,N5,N4)=(CNDC1*CNDC2)/(CNDC1+CNDC2)
@@ -1554,7 +1557,7 @@ module InsideTranspMod
         Gas_Disol_Flx_vr(idg,N6,N5,N4)=Gas_Disol_Flx_vr(idg,N6,N5,N4)+RGas_Disol_FlxMM_vr(idg,N6,N5,N4)
       ENDDO
     ELSE
-      RGas_Disol_FlxMM_vr(idg_beg:idg_end,N6,N5,N4)=0.0_r8
+      RGas_Disol_FlxMM_vr(idg_beg:idg_NH3,N6,N5,N4)=0.0_r8
     ENDIF
   ENDIF
   end subroutine GasDissolutionMM

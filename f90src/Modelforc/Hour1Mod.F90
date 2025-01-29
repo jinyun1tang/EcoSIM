@@ -1339,6 +1339,7 @@ module Hour1Mod
     GasDifc_vr(idg_NH3,L,NY,NX)  = ZHSG*TFACG
     GasDifc_vr(idg_H2,L,NY,NX)   = HGSG*TFACG
     GasDifc_vr(idg_NH3B,L,NY,NX) = ZHSG*TFACG
+    GasDifc_vr(idg_AR,L,NY,NX)   = ARSG*TFACG
 
     SoluteDifusvty_vr(idg_CO2,L,NY,NX)   = CLSG*TFACL
     SoluteDifusvty_vr(idg_CH4,L,NY,NX)   = CQSG*TFACL
@@ -1347,6 +1348,7 @@ module Hour1Mod
     SoluteDifusvty_vr(idg_NH3,L,NY,NX)   = ZNSG*TFACL
     SoluteDifusvty_vr(idg_H2,L,NY,NX)    = HLSG*TFACL
     SoluteDifusvty_vr(idg_N2O,L,NY,NX)   = ZVSG*TFACL
+    SoluteDifusvty_vr(idg_AR,L,NY,NX)    = ARSL*TFACL
     SoluteDifusvty_vr(idg_NH3B,L,NY,NX)  = SoluteDifusvty_vr(idg_NH3,L,NY,NX)
     SoluteDifusvty_vr(ids_NO3,L,NY,NX)   = ZOSG*TFACL
     SoluteDifusvty_vr(ids_H1PO4,L,NY,NX) = POSG*TFACL

@@ -692,7 +692,7 @@ module TranspNoSaltMod
       SoluteDifusivitytscaledM_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
-    DO idg=idg_beg,idg_end
+    DO idg=idg_beg,idg_NH3
       GasDifctScaledMM_vr(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
     ENDDO
 !
