@@ -506,6 +506,7 @@ module StartsMod
     ENDIF
 
     TKS_vr(L,NY,NX) = ATKS(NY,NX)
+    TKS_vr(0,NY,NX) = 0.0
     TCS(L,NY,NX)    = ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
@@ -520,7 +521,15 @@ module StartsMod
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
-  
+ 
+  write(*,*) "InitSoilProfile ------------------------- "
+  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
+  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
+  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
+  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
+  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
+  write(*,*) "----------------------------------------- "
+
   call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
@@ -1015,6 +1024,8 @@ module StartsMod
 
   call InitAccumulators()
 
+  !For whatever reason this sets a temerature, so I need to reset it:
+  ATKS = 242.0
   ALTZG=0.0_r8
   LandScape1stSoiLayDepth=0.0_r8   !pay attention to how it is set for many-grid simulations
 
@@ -1098,7 +1109,8 @@ module StartsMod
 
       SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)                = ATCS(NY,NX)
-      TKS_vr(0,NY,NX)             = ATKS(NY,NX)
+     !TKS_vr(0,NY,NX)             = ATKS(NY,NX)
+      TKS_vr(0,NY,NX)             = 0.0
       TKSD(NY,NX)                 = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
 !
     ENDDO

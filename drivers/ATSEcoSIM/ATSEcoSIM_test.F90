@@ -103,11 +103,11 @@ subroutine Init_ATSEcoSIM_driver()
       !DV(NY,NX) = 0.316229
       a_CumDepz2LayerBot_vr(L,NY) = dist_tot
       dist_tot = dist_tot+dist_step
-      a_BKDSI(L,NY) = 26000.0/1.0e3_r8
+      a_BKDSI(L,NY) = 1.1*1.0e3_r8
       !a_CORGC(L,NY) = 0.0
       !a_CORGN(L,NY) = 0.0
       !a_CORGP(L,NY) = 0.0
-      a_WC(L,NY) = 2500.0
+      a_WC(L,NY) = 6.0e-4
       a_TEMP(L,NY) = 242.00
       a_MATP(L,NY) = -6.9
       a_PORO(L,NY) = 0.5
@@ -125,11 +125,11 @@ subroutine Init_ATSEcoSIM_driver()
     vpair(NY) = 47.0
     uwind(NY) = 1.1
     
-    !swrad(NY) = 400.08
-    !sunrad(NY) =  219.788
+    swrad(NY) = 400.08
+    sunrad(NY) =  219.788
 
-    swrad(NY) = 0.0
-    sunrad(NY) =  0.0
+    !swrad(NY) = 0.0
+    !sunrad(NY) =  0.0
 
   enddo
 

@@ -58,6 +58,7 @@ implicit none
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
+  I=1;J=1
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
