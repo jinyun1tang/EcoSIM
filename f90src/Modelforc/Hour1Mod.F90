@@ -170,7 +170,7 @@ module Hour1Mod
 !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
 !
       if(lverb)write(*,*)'RESET HOURLY ACCUMULATORS'
-      call SetHourlyAccumulators(NY,NX)
+      call SetHourlyDiagnostics(NY,NX)
 !
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
 !     AND BETWEEN SOILS AND PLANTS
@@ -719,13 +719,14 @@ module Hour1Mod
   end subroutine SetLiterSoilPropAftDisturb
 !------------------------------------------------------------------------------------------
 
-  subroutine SetHourlyAccumulators(NY,NX)
+  subroutine SetHourlyDiagnostics(NY,NX)
 !     implicit none
   integer, intent(in) :: NX,NY
 
   integer :: L
 !     begin_execution
 
+  Soil_Gas_pressure_vr(:,NY,NX)           =0._r8
   Gas_NetProd_col(:,NY,NX)                = 0._r8
   Gas_WetDeposition_col(:,NY,NX)          = 0._r8
   RootCO2Autor_col(NY,NX)                 = 0._r8
@@ -817,7 +818,7 @@ module Hour1Mod
   IF(salt_model)THEN
     trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
   ENDIF
-  end subroutine SetHourlyAccumulators
+  end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
 
   subroutine SetArrays4PlantSoilTransfer(NY,NX)

@@ -1,5 +1,6 @@
 set(MODELDIAGS_MOD_SOURCES
   BalancesMod.F90
+  SoilDiagsMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(ModelDiags ${MODELDIAGS_MOD_SOURCES})

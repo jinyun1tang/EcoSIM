@@ -17,6 +17,7 @@ module EcoSIMAPI
   use SoilWaterDataType
   use EcoSIMCtrlMod  
   use BalancesMod  
+  use SoilDiagsMod  
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -114,6 +115,8 @@ contains
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   if(do_timing)call end_timer('REDIST',t1)
 334   FORMAT(A8)
+
+  call DiagSoilGasPressure(I,J,NHW,NHE,NVN,NVS)    
 
   call EndCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
@@ -391,7 +394,9 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
         if(is_restart() .or. is_branch())then
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
-          call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
+
+          call SumUpTracerMass(I,J,NHW,NHE,NVN,NVS)
+          
         endif
       endif
       if(frectyp%lskip_loop)then

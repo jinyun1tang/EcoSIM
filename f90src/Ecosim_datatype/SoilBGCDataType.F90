@@ -30,8 +30,9 @@ implicit none
   real(r8),target,allocatable ::  ZNFN0_vr(:,:,:)                       !initial nitrification inhibition activity
   real(r8),target,allocatable ::  ZNHUI_vr(:,:,:)                       !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0_vr(:,:,:)                       !urea hydrolysis inhibition activity
-
-  real(r8),target,allocatable ::  trcg_gasml_vr(:,:,:,:)              !layer mass of gases in micropores [g d-2]
+  real(r8),target,allocatable ::  trcg_soilMass_col(:,:,:)           !column integrated volatile tracer mass in soil at the moment [g d-2]
+  real(r8),target,allocatable ::  trcg_soilMass_beg_col(:,:,:)           !column integrated volatile tracer mass in soil at the moment [g d-2]  
+  real(r8),target,allocatable ::  trcg_gasml_vr(:,:,:,:)             !layer mass of gases in micropores [g d-2]
   real(r8),target,allocatable ::  trcg_TotalMass_beg_col(:,:,:)      !column integrated volatile tracer mass at the begining of time step [g d-2]
   real(r8),target,allocatable ::  trcg_TotalMass_col(:,:,:)          !column integrated volatile tracer mass at the moment [g d-2]
   real(r8),target,allocatable ::  PH_vr(:,:,:)                       !soil pH
@@ -104,9 +105,9 @@ implicit none
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)     !DOC flux micropore, [g d-2 h-1]
   real(r8),target,allocatable ::  Gas_WetDeposition_col(:,:,:)       !wet gas deposition due to irrigation and rainfall [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_TransptMacP_3D(:,:,:,:,:)     !tracer solute transport in macropore [g d-2 h-1]
-  real(r8),target,allocatable ::  Gas_AdvDif_Flx_3D(:,:,:,:,:)     !3D gaseous fluxes, [g d-2 h-1]
+  real(r8),target,allocatable ::  Gas_AdvDif_Flx_3D(:,:,:,:,:)       !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_Macp_Transp_flx_3D(:,:,:,:,:,:) !DOC flux macropore, [g d-2 h-1]
-
+  real(r8),target,allocatable ::  Soil_Gas_pressure_vr(:,:,:)         !soil gas pressure, [Pa]
   real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)
   real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)
   real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)
@@ -136,6 +137,9 @@ implicit none
   allocate(CNH4_vr(JZ,JY,JX));     CNH4_vr=0._r8
   allocate(CNO3_vr(JZ,JY,JX));     CNO3_vr=0._r8
   allocate(CPO4_vr(JZ,JY,JX));     CPO4_vr=0._r8
+
+  allocate(trcg_soilMass_col(idg_beg:idg_end,JY,JX)); trcg_soilMass_col=0._r8
+  allocate(trcg_soilMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_soilMass_beg_col=0._r8
   allocate(Gas_Prod_TP_cumRes_col(idg_beg:idg_NH3,JY,JX)); Gas_Prod_TP_cumRes_col=0._r8
   allocate(trcg_TotalMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_beg_col=0._r8
   allocate(trcg_TotalMass_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_col=0._r8
@@ -156,6 +160,7 @@ implicit none
   allocate(ZNHU0_vr(0:JZ,JY,JX));  ZNHU0_vr=0._r8
   allocate(CPO4B_vr(0:JZ,JY,JX));CPO4B_vr(0:JZ,JY,JX)=0._r8
 
+  allocate(Soil_Gas_pressure_vr(1:JZ,JY,JX)); Soil_Gas_pressure_vr=0._r8  
   allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
   allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
   allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
@@ -284,7 +289,7 @@ implicit none
   call destroy(ZNFN0_vr)
   call destroy(ZNHUI_vr)
   call destroy(ZNHU0_vr)
-
+  call destroy(Soil_Gas_pressure_vr)
   call destroy(PH_vr)
   call destroy(CEC_vr)
   call destroy(AEC_vr)
@@ -329,7 +334,8 @@ implicit none
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)
   call destroy(trcg_DisolEvap_Atm2Litr_flx)
-
+  call destroy(trcg_soilMass_beg_col)
+  call destroy(trcg_soilMass_col)
   call destroy(BandWidthNH4_vr)
   call destroy(BandThicknessNH4_vr)
   call destroy(BandWidthNO3_vr)

@@ -154,6 +154,7 @@ implicit none
   real(r8),pointer   :: h1D_O2_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_CO2_DIF_flx_col(:)
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
+  real(r8),pointer   :: h1D_Ar_soilMass_col(:)
   real(r8),pointer   :: h1D_O2_FLX_col(:)        !SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
   real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
@@ -328,7 +329,7 @@ implicit none
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)       !
-
+  real(r8),pointer   :: h2D_Gas_Pressure_vr(:,:)
   real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   !aerobic heterotropic fungi
   real(r8),pointer   :: h2D_faculDenitC_vr(:,:)   !facultative denitrifier
@@ -542,6 +543,7 @@ implicit none
   allocate(this%h1D_OMN_LITR_col(beg_col:end_col))        ;this%h1D_OMN_LITR_col(:)=spval
   allocate(this%h1D_OMP_LITR_col(beg_col:end_col))        ;this%h1D_OMP_LITR_col(:)=spval
   allocate(this%h1D_Ar_mass_col(beg_col:end_col))         ;this%h1D_Ar_mass_col(:) = spval
+  allocate(this%h1D_Ar_soilMass_col(beg_col:end_col))     ;this%h1D_Ar_soilMass_col(:)=spval
   allocate(this%h1D_ATM_CO2_col(beg_col:end_col))         ;this%h1D_ATM_CO2_col(:)=spval
   allocate(this%h1D_ATM_CH4_col(beg_col:end_col))         ;this%h1D_ATM_CH4_col(:)=spval
   allocate(this%h1D_NBP_col(beg_col:end_col))             ;this%h1D_NBP_col(:)=spval
@@ -770,8 +772,9 @@ implicit none
   allocate(this%h1D_DOC_litr_col(beg_col:end_col));  this%h1D_DOC_litr_col(:)=spval
   allocate(this%h1D_DON_litr_col(beg_col:end_col)); this%h1D_DON_litr_col(:)=spval
   allocate(this%h1D_DOP_litr_col(beg_col:end_col)); this%h1D_DOP_litr_col(:)=spval
-  allocate(this%h1D_acetate_litr_col(beg_col:end_col)); this%h1D_acetate_litr_col(:)=spval
+  allocate(this%h1D_acetate_litr_col(beg_col:end_col)); this%h1D_acetate_litr_col(:)=spval  
   allocate(this%h1D_VHeatCap_litr_col(beg_col:end_col)); this%h1D_VHeatCap_litr_col(:)=spval
+!  allocate(this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)); this%h2D_Gas_Pressure_vr(:,:)=spval
   allocate(this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactC_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
   allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
@@ -1042,7 +1045,11 @@ implicit none
 
   data1d_ptr => this%h1D_Ar_mass_col(beg_col:end_col)
   call hist_addfld1d(fname='Ar_mass_col',units='g/m2',avgflag='A',&
-    long_name='total Ar mass of the soil column',ptr_col=data1d_ptr)      
+    long_name='total Ar mass of the soil column, include that in snow',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Ar_soilMass_col(beg_col:end_col)
+  call hist_addfld1d(fname='Ar_soil_mass_col',units='g/m2',avgflag='A',&
+    long_name='total Ar mass of the soil column, excluding that in snow',ptr_col=data1d_ptr)      
 
   IF(salt_model)THEN
     data1d_ptr => this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col) 
@@ -2115,6 +2122,10 @@ implicit none
   call hist_addfld2d(fname='Aerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Aerobic N2 fixer C biomass profile',ptr_col=data2d_ptr)      
 
+!  data2d_ptr =>  this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)
+!  call hist_addfld2d(fname='GAS_PRESSURE_vr',units='Pa',type2d='levsoi',avgflag='A',&
+!    long_name='Soil gas pressure profile',ptr_col=data2d_ptr)      
+
   data2d_ptr =>  this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Anaerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Anaerobic N2 fixer C biomass profile',ptr_col=data2d_ptr)      
@@ -2740,11 +2751,14 @@ implicit none
       this%h1D_Decomp_moist_FN_litr_col(ncol)  = MoistSensDecomp_vr(0,NY,NX)
       this%h1D_FracLitMix_litr_col(ncol)       = FracLitrMix_vr(0,NY,NX)
       this%h1D_Eco_HR_CO2_litr_col(ncol)       = ECO_HR_CO2_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_TSolidOMActC_litr_col(ncol)     = TSolidOMActC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-      this%h1D_TSolidOMActCDens_litr_col(ncol) = safe_adb(TSolidOMActC_vr(0,NY,NX),TSolidOMC_vr(0,NY,NX))  
+      this%h1D_TSolidOMActC_litr_col(ncol)     = TSolidOMActC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_TSolidOMActCDens_litr_col(ncol) = safe_adb(TSolidOMActC_vr(0,NY,NX),TSolidOMC_vr(0,NY,NX))
       this%h1D_tOMActCDens_litr_col(ncol)      = safe_adb(tOMActC_vr(0,NY,NX),(TSolidOMC_vr(0,NY,NX)+tOMActC_vr(0,NY,NX)))
-      this%h1D_Ar_mass_col(ncol) = trcg_TotalMass_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Ar_mass_col(ncol)               = trcg_TotalMass_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Ar_soilMass_col(ncol)           = trcg_soilMass_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+
       DO L=1,JZ        
+!        this%h2D_Gas_Pressure_vr(ncol,L)  = Soil_Gas_pressure_vr(L,NY,NX)
         DVOLL=DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
         
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

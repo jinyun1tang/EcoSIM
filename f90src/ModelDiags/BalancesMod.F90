@@ -48,6 +48,7 @@ contains
 
       DO idg=idg_beg,idg_end
         trcg_TotalMass_beg_col(idg,NY,NX) = trcg_TotalMass_col(idg,NY,NX)
+        trcg_soilMass_beg_col(idg,NY,NX) = trcg_soilMass_col(idg,NY,NX)
       enddo
     ENDDO
   ENDDO  
@@ -260,13 +261,18 @@ contains
       trcg_TotalMass_col(idg_beg:idg_end,NY,NX)=0._r8
       DO L=NUI(NY,NX),NLI(NY,NX)
         DO idg=idg_beg,idg_NH3
-          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) 
+          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcg_gasml_vr(idg,L,NY,NX)                  
         ENDDO
 
-        DO idg=idg_beg,idg_end
+        DO idg=idg_beg,idg_end  
           trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) + trcs_soHml_vr(idg,L,NY,NX)
         ENDDO
       ENDDO
+
+      DO idg=idg_beg,idg_end  
+        trcg_soilMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)
+      ENDDO    
+
       !Because idg_NH3B does not exist in snow
       DO idg=idg_beg,idg_NH3
         trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcs_solml_vr(idg,0,NY,NX)
