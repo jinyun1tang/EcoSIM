@@ -238,7 +238,7 @@ module SoluteMod
   real(r8), pointer :: BKVLPB
   real(r8), pointer :: VLWatMicPNB
   real(r8), pointer :: VLWatMicPPO
-  real(r8), pointer :: H1PO4_2e_conc
+  real(r8), pointer :: H1PO4_2e_aqua_mole_conc
   real(r8), pointer :: H1PO4_2e_band_conc
   real(r8), pointer :: H2PO4_1e_aqua_mole_conc
   real(r8), pointer :: H2PO4_1e_band_conc
@@ -298,7 +298,7 @@ module SoluteMod
   PrecpB_FePO4_con         => chemvar%PrecpB_FePO4_con
   H2PO4_1e_aqua_mole_conc            => chemvar%H2PO4_1e_aqua_mole_conc
   H1PO4_2e_band_conc       => chemvar%H1PO4_2e_band_conc
-  H1PO4_2e_conc            => chemvar%H1PO4_2e_conc
+  H1PO4_2e_aqua_mole_conc            => chemvar%H1PO4_2e_aqua_mole_conc
   XH2PO4_conc              => chemvar%XH2PO4_conc
   VLWatMicPNH              => chemvar%VLWatMicPNH
   BKVLNH                   => chemvar%BKVLNH
@@ -396,7 +396,7 @@ module SoluteMod
 !     RH1PO4MicbTransfSoil_vr,RH1PO4MicbTransfBand_vr=net change in HPO4 in band,non-band from nitro.f
 !     TRootHPO4Uptake_pft,TRootH2PO4Uptake_pft=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
 !     TUPH1B,TUPH2B=soil-root exch of HPO4,H2PO4 in band from uptake.f
-!     H1PO4_2e_conc,H2PO4_1e_aqua_mole_conc=HPO4,H2PO4 concentrations in non-band
+!     H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc=HPO4,H2PO4 concentrations in non-band
 !     H1PO4_2e_band_conc,H2PO4_1e_band_conc=HPO4,H2PO4 concentrations in band
 !     XROH1_conc,XROH1_conc,XROH2_conc=concn of adsorption sites R-,R-OH,R-OH2 in non-band
 !     XOH1B,XROH_band_conc,XROH2_band_conc=concn of adsorption sites R-,R-OH,R-OH2 in band
@@ -411,7 +411,7 @@ module SoluteMod
     VLWatMicPPX=patomw*VLWatMicPPO
     RH1PX=(RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))/VLWatMicPPX
     RH2PX=(RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))/VLWatMicPPX
-    H1PO4_2e_conc=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)/VLWatMicPPX+RH1PX)
+    H1PO4_2e_aqua_mole_conc=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)/VLWatMicPPX+RH1PX)
     H2PO4_1e_aqua_mole_conc=AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)/VLWatMicPPX+RH2PX)
     XOH_conc=AZMAX1(trcx_solml_vr(idx_OHe,L,NY,NX))/BKVLPO
     XROH1_conc=AZMAX1(trcx_solml_vr(idx_OH,L,NY,NX))/BKVLPO
@@ -426,7 +426,7 @@ module SoluteMod
   ELSE
     RH1PX=0._r8
     RH2PX=0._r8
-    H1PO4_2e_conc=0._r8
+    H1PO4_2e_aqua_mole_conc=0._r8
     H2PO4_1e_aqua_mole_conc=0._r8
     XOH_conc=0._r8
     XROH1_conc=0._r8
@@ -906,7 +906,7 @@ module SoluteMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8) :: Al_3p_aqua_mole_conc,CALX,Ca_2p_aqua_mole_conc,CaX_conc
-  real(r8) :: CCEC0,CO3_2e_conc
+  real(r8) :: CCEC0,CO3_2e_aqua_mole_conc
   real(r8) :: Fe_3p_aqua_mole_conc,CFEX
   real(r8) :: H2PO4_1e_AlPO4_eqv,H2PO4_1e_CaHPO4_eqv,H2PO4_1e_FePO4_eqv,H2PO4_1e_apatite_eqv,H2PO4_1e_CaH4P2O8_eqv
   real(r8) :: H2PO4_e_to_HPO4_2e_flx
@@ -918,7 +918,8 @@ module SoluteMod
   real(r8) :: CNHUA
   real(r8) :: CCO20
   real(r8) :: RH1PX,RH2PX,DUKD,DFNSA,RN3X,RN4X
-  real(r8) :: H1PO4_2e_conc,H2PO4_1e_aqua_mole_conc,NH3_aqua_mole_conc,NH4_1p_aqua_mole_conc,Precp_AlPO4_conc,Precp_CaHPO4_conc
+  real(r8) :: H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,NH3_aqua_mole_conc,NH4_1p_aqua_mole_conc
+  real(r8) :: Precp_AlPO4_conc,Precp_CaHPO4_conc
   real(r8) :: Precp_Ca5P3O12O3H3_conc,Precp_CaH4P2O8_conc,Precp_FePO4_conc,RNH4,H2PO4_1e_AlPO4_dissol_flx
   real(r8) :: H2PO4_1e_CaHPO4_dissol_flx,H2PO4_1e_apatite_dissol_flx,H2PO4_1e_CaH4P2O8_dissol_flx
   real(r8) :: H2PO4_1e_FePO4_dissol_flx,RXN4,XNH4_conc
@@ -1021,12 +1022,12 @@ module SoluteMod
 !     VLWatMicPMP=water volume
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
 !     RH1PO4MicbTransfSoil_vr=net change in HPO4 from nitro.f
-!     H1PO4_2e_conc,H2PO4_1e_aqua_mole_conc=HPO4,H2PO4 concentrations
+!     H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc=HPO4,H2PO4 concentrations
 !
       VLWatMicPMP   = patomw*VLWatMicPM_vr(NPH,0,NY,NX)
       RH1PX         = RNut_MicbRelease_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP
       RH2PX         = RNut_MicbRelease_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP
-      H1PO4_2e_conc = AZMAX1(trcs_solml_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
+      H1PO4_2e_aqua_mole_conc = AZMAX1(trcs_solml_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
       H2PO4_1e_aqua_mole_conc = AZMAX1(trcs_solml_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP+RH2PX)
     ELSE
       RN4X          = 0._r8
@@ -1036,7 +1037,7 @@ module SoluteMod
       XNH4_conc     = 0._r8
       RH1PX         = 0._r8
       RH2PX         = 0._r8
-      H1PO4_2e_conc = 0._r8
+      H1PO4_2e_aqua_mole_conc = 0._r8
       H2PO4_1e_aqua_mole_conc = 0._r8
     ENDIF
 !
@@ -1065,9 +1066,9 @@ module SoluteMod
     OH_1e_aqua_mole_conc  = AMAX1(ZERO,DPH2O/H_1p_aqua_mole_conc)
     Al_3p_aqua_mole_conc  = AMAX1(ZERO,SPALO/OH_1e_aqua_mole_conc**3._r8)
     Fe_3p_aqua_mole_conc  = AMAX1(ZERO,SPFEO/OH_1e_aqua_mole_conc**3_r8)
-    CCO20       = AMAX1(ZERO,trc_solcl_vr(idg_CO2,0,NY,NX)/catomw)
-    CO3_2e_conc = AMAX1(ZERO,CCO20*DPCO3/H_1p_aqua_mole_conc**2._r8)
-    Ca_2p_aqua_mole_conc  = AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_conc))
+    CCO20                 = AMAX1(ZERO,trc_solcl_vr(idg_CO2,0,NY,NX)/catomw)
+    CO3_2e_aqua_mole_conc = AMAX1(ZERO,CCO20*DPCO3/H_1p_aqua_mole_conc**2._r8)
+    Ca_2p_aqua_mole_conc  = AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_aqua_mole_conc))
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
@@ -1132,8 +1133,8 @@ module SoluteMod
 !     H2PO4_e_to_HPO4_2e_flx=H2PO4-H+HPO4 dissociation in litter
 !
     DP                     = DPH2P
-    S0                     = H1PO4_2e_conc+H_1p_aqua_mole_conc+DP
-    S1                     = AZMAX1(S0**2-4.0*(H1PO4_2e_conc*H_1p_aqua_mole_conc-DP*H2PO4_1e_aqua_mole_conc))
+    S0                     = H1PO4_2e_aqua_mole_conc+H_1p_aqua_mole_conc+DP
+    S1                     = AZMAX1(S0**2-4.0*(H1PO4_2e_aqua_mole_conc*H_1p_aqua_mole_conc-DP*H2PO4_1e_aqua_mole_conc))
     H2PO4_e_to_HPO4_2e_flx = TSL*(S0-SQRT(S1))
 !
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC, GAPON COEFFICIENTS

@@ -22,9 +22,9 @@ module SoluteChemDataType
     real(r8) :: Na_1p_aqua_mole_conc
     real(r8) :: K_1p_aqua_mole_conc
     real(r8) :: OH_1e_aqua_mole_conc
-    real(r8) :: SO4_2e_conc
+    real(r8) :: SO4_2e_aqua_mole_conc
     real(r8) :: Cl_e_conc
-    real(r8) :: CO3_2e_conc
+    real(r8) :: CO3_2e_aqua_mole_conc
     real(r8) :: HCO3_e_conc
     real(r8) :: AlOH_2p_aqua_mole_conc
     real(r8) :: AlO2H2_1p_aqua_mole_conc
@@ -48,7 +48,7 @@ module SoluteChemDataType
     real(r8) :: NaSO4_1e_aqua_mole_conc
     real(r8) :: KSO4_1e_aqua_mole_conc
     real(r8) :: H0PO4_3e_conc
-    real(r8) :: H1PO4_2e_conc
+    real(r8) :: H1PO4_2e_aqua_mole_conc
     real(r8) :: H2PO4_1e_aqua_mole_conc
     real(r8) :: H3PO4_conc
     real(r8) :: FeHPO4_p_conc
@@ -235,7 +235,7 @@ module SoluteChemDataType
   end type solute_flx_type
 
   type, public :: chem_var_type
-  real(r8) :: H1PO4_2e_conc
+  real(r8) :: H1PO4_2e_aqua_mole_conc
   real(r8) :: H1PO4_2e_band_conc
   real(r8) :: H2PO4_1e_aqua_mole_conc
   real(r8) :: H2PO4_1e_band_conc

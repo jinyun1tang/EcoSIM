@@ -32,8 +32,9 @@ implicit none
   real(r8),target,allocatable ::  ZNHU0_vr(:,:,:)                       !urea hydrolysis inhibition activity
 
   real(r8),target,allocatable ::  trcg_gasml_vr(:,:,:,:)              !layer mass of gases in micropores [g d-2]
-  real(r8),target,allocatable ::  trcg_TotalMass_beg_col(:,:,:)       !column integrated volatile tracer mass at the begining of time step [g d-2]
-  real(r8),target,allocatable ::  PH_vr(:,:,:)                          !soil pH
+  real(r8),target,allocatable ::  trcg_TotalMass_beg_col(:,:,:)      !column integrated volatile tracer mass at the begining of time step [g d-2]
+  real(r8),target,allocatable ::  trcg_TotalMass_col(:,:,:)          !column integrated volatile tracer mass at the moment [g d-2]
+  real(r8),target,allocatable ::  PH_vr(:,:,:)                       !soil pH
   real(r8),target,allocatable ::  CEC_vr(:,:,:)                      !soil cation exchange capacity	[cmol kg-1]
   real(r8),target,allocatable ::  AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
   real(r8),target,allocatable ::  TempSensDecomp_vr(:,:,:)           !temperature dependense of microbial activity
@@ -76,7 +77,7 @@ implicit none
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)   !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)               !effective volume fraction of nutrient solutes [0-1]
   real(r8),target,allocatable ::  tRDIM2DOM_col(:,:,:)               !conversion flux from DIM into DOM [g d-2 h-1]
-
+  real(r8),target,allocatable ::  Gas_NetProd_col(:,:,:)             !net production of gas [g d-2 h-1]
   real(r8),target,allocatable ::  OxyDecompLimiter_vr(:,:,:)         !decomposer oxygen limitation
   real(r8),target,allocatable ::  RO2DecompUptk_vr(:,:,:)            !decompoer oxygen uptake rate
   real(r8),target,allocatable ::  BandWidthNH4_vr(:,:,:)             !width of NH4 band, [m]
@@ -137,6 +138,7 @@ implicit none
   allocate(CPO4_vr(JZ,JY,JX));     CPO4_vr=0._r8
   allocate(Gas_Prod_TP_cumRes_col(idg_beg:idg_NH3,JY,JX)); Gas_Prod_TP_cumRes_col=0._r8
   allocate(trcg_TotalMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_beg_col=0._r8
+  allocate(trcg_TotalMass_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_col=0._r8
   allocate(trcg_gasml_vr(idg_beg:idg_NH3,JZ,JY,JX)); trcg_gasml_vr=0._r8
   allocate(trcs_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trcs_soHml_vr=0._r8
   allocate(trcs_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_solml_vr=0._r8
@@ -181,7 +183,7 @@ implicit none
   allocate(HydroSufDOPFlx_CumYr_col(JY,JX));       HydroSufDOPFlx_CumYr_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
-
+  allocate(Gas_NetProd_col(idg_beg:idg_NH3,JY,JX)); Gas_NetProd_col=0._r8
   allocate(RootResp_CumYr_col(JY,JX));        RootResp_CumYr_col=0._r8
   allocate(SedmErossLoss_CumYr_col(JY,JX));      SedmErossLoss_CumYr_col=0._r8
   allocate(HydroSufDICFlx_col(JY,JX));       HydroSufDICFlx_col=0._r8
@@ -248,6 +250,7 @@ implicit none
 
   implicit none
   
+  call destroy(Gas_NetProd_col)
   call destroy(Gas_WetDeposition_col)
   call destroy(Gas_Prod_TP_cumRes_col)
   call destroy(trcg_ebu_flx_col)
@@ -320,6 +323,7 @@ implicit none
   call destroy(TSens4MicbGrwoth_vr)
   call destroy(LitrfalStrutElms_vr)
   call destroy(trcg_TotalMass_beg_col)
+  call destroy(trcg_TotalMass_col)
   call destroy(SurfGasDifFlx_col)
   call destroy(SurfGasEmisFlx_col)
   call destroy(trcs_VLN_vr)

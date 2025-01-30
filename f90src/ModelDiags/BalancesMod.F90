@@ -24,8 +24,8 @@ implicit none
   __FILE__
   public :: BegCheckBalances
   public :: EndCheckBalances
-  public :: SumUpStorage
-  public :: SummarizeTracers
+  public :: SumUpTracerMass
+
 contains
 
   subroutine BegCheckBalances(I,J,NHW,NHE,NVN,NVS)  
@@ -34,7 +34,7 @@ contains
   !Prepare for next mass balance check
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  integer :: NY,NX
+  integer :: NY,NX,idg
   
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -45,6 +45,10 @@ contains
       SnowMassBeg_col(NY,NX)        = SnowMassEnd_col(NY,NX)
       LitWatMassBeg_col(NY,NX)      = LitWatMassEnd_col(NY,NX)
       SoilWatMassBeg_col(NY,NX)     = SoilWatMassEnd_col(NY,NX)
+
+      DO idg=idg_beg,idg_end
+        trcg_TotalMass_beg_col(idg,NY,NX) = trcg_TotalMass_col(idg,NY,NX)
+      enddo
     ENDDO
   ENDDO  
   end subroutine BegCheckBalances 
@@ -147,6 +151,8 @@ contains
 
   call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
 
+  call SummarizeTracers(NHW,NHE,NVN,NVS)
+
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
@@ -240,36 +246,50 @@ contains
 
 
 !------------------------------------------------------------------------------------------
-  subroutine SummarizeTracers(NHW,NHE,NVN,NVS,trcVolatileMass_col)
+  subroutine SummarizeTracers(NHW,NHE,NVN,NVS)
   !
   !Description
   !sum up mass of tracers
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS  
-  real(r8), intent(out) :: trcVolatileMass_col(idg_beg:idg_end,JY,JX)
   integer :: NY,NX
   integer :: idg,L
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      trcVolatileMass_col(idg_beg:idg_end,NY,NX)=0._r8
+      trcg_TotalMass_col(idg_beg:idg_end,NY,NX)=0._r8
       DO L=NUI(NY,NX),NLI(NY,NX)
         DO idg=idg_beg,idg_NH3
-          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) 
+          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) 
         ENDDO
 
         DO idg=idg_beg,idg_end
-          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) + trcs_soHml_vr(idg,L,NY,NX)
+          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) + trcs_soHml_vr(idg,L,NY,NX)
         ENDDO
       ENDDO
-
+      !Because idg_NH3B does not exist in snow
       DO idg=idg_beg,idg_NH3
-        trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcs_solml_vr(idg,0,NY,NX)
+        trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcs_solml_vr(idg,0,NY,NX)
         DO L=1,JS
-          trcVolatileMass_col(idg,NY,NX)=trcVolatileMass_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
+          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO
       ENDDO
     ENDDO
   ENDDO
   end subroutine SummarizeTracers
+
+!------------------------------------------------------------------------------------------
+
+  subroutine SumUpTracerMass(I,J,NHW,NHE,NVN,NVS)
+
+  implicit none 
+  integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+  integer :: NY,NX
+
+  call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
+
+  call SummarizeTracers(NHW,NHE,NVN,NVS)
+
+  end subroutine SumUpTracerMass
+
 end module BalancesMod

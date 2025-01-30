@@ -35,7 +35,7 @@ module ChemEquilibriaMod
 
   real(r8) :: Al_3p_aqua_mole_conc,CALX,Ca_2p_aqua_mole_conc
   real(r8) :: CaX_conc,CEC_conc
-  real(r8) :: H2CO3_aqua_mole_conc,CO3_2e_conc
+  real(r8) :: H2CO3_aqua_mole_conc,CO3_2e_aqua_mole_conc
   real(r8) :: CFEX,Fe_3p_aqua_mole_conc
   real(r8) :: H2PO4_1e_AlPO4_eqv,H2PO4_1e_CaHPO4_eqv,H2PO4_1e_FePO4_eqv,H2PO4_1e_apatite_eqv,H2PO4_1e_CaH4P2O8_eqv
   real(r8) :: H_1p_aqua_mole_conc,Na_1p_aqua_mole_conc,K_1p_aqua_mole_conc,Mg_2p_aqua_mole_conc,MgX_conc
@@ -83,7 +83,7 @@ module ChemEquilibriaMod
   real(r8), pointer :: ZKA
   real(r8), pointer :: CO2S
   real(r8), pointer :: CCA
-  real(r8), pointer :: H1PO4_2e_conc
+  real(r8), pointer :: H1PO4_2e_aqua_mole_conc
   real(r8), pointer :: H1PO4_2e_band_conc
   real(r8), pointer :: H2PO4_1e_aqua_mole_conc
   real(r8), pointer :: H2PO4_1e_band_conc
@@ -153,7 +153,7 @@ module ChemEquilibriaMod
   XNH4_conc                => chemvar%XNH4_conc
   XNH4_band_conc           => chemvar%XNH4_band_conc
   H1PO4_2e_band_conc       => chemvar%H1PO4_2e_band_conc
-  H1PO4_2e_conc            => chemvar%H1PO4_2e_conc
+  H1PO4_2e_aqua_mole_conc            => chemvar%H1PO4_2e_aqua_mole_conc
   H2PO4_1e_aqua_mole_conc            => chemvar%H2PO4_1e_aqua_mole_conc
   H2PO4_1e_band_conc       => chemvar%H2PO4_1e_band_conc
   XHPO4_band_conc          => chemvar%XHPO4_band_conc
@@ -291,15 +291,15 @@ module ChemEquilibriaMod
 !     CA CONCENTRATION FROM CURRENT CO2 CONCENTRATION
 ! H2CO3<-> CO3(2-)+2H(+) 
 ! ([CO3(2-)][H+]^2)/[H2CO3]=K
-  CO3_2e_conc=AMAX1(ZERO,H2CO3_aqua_mole_conc*DPCO3/H_1p_aqua_mole_conc**2._r8)
+  CO3_2e_aqua_mole_conc=AMAX1(ZERO,H2CO3_aqua_mole_conc*DPCO3/H_1p_aqua_mole_conc**2._r8)
 
 ! [Ca(2+)], CaCO3<->Ca(2+)+CO3(2-)
 ! [Ca(2+)][CO3(2-)]/[CaCO3(solid)]=K (SPCAC)
 ! 
   IF(CCA.LT.0.0_r8)THEN
-    Ca_2p_aqua_mole_conc=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_conc))
+    Ca_2p_aqua_mole_conc=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_aqua_mole_conc))
   ELSE
-    Ca_2p_aqua_mole_conc=AMAX1(ZERO,AMIN1(CCA,SPCAC/CO3_2e_conc))
+    Ca_2p_aqua_mole_conc=AMAX1(ZERO,AMIN1(CCA,SPCAC/CO3_2e_aqua_mole_conc))
   ENDIF
 
 !
@@ -396,7 +396,7 @@ module ChemEquilibriaMod
 !     X-HPO4(-)+ OH(-)<-> X-OH+HPO4(2-)
 !     [X-OH][HPO4(2-)]/([X-HPO4(-)][OH(-)])=K
       SPH1P=SXH1P*DPH2O/DPH2P
-      H1PO4_to_XHPO4_ROH_flx=TADA*(XROH1_conc*H1PO4_2e_conc-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
+      H1PO4_to_XHPO4_ROH_flx=TADA*(XROH1_conc*H1PO4_2e_aqua_mole_conc-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
     ELSE
       H2PO4_1e_to_XH2PO4_ROH2_flx=0._r8
       H2PO4_to_XH2PO4_ROH_flx=0._r8
@@ -415,8 +415,8 @@ module ChemEquilibriaMod
 !  (AB) <-> A+B,  (A+x)(B+x)/((AB)-x)=K
 !  x represents flux from H2PO4(-) dissolution
     DP=DPH2P
-    S0=H1PO4_2e_conc+H_1p_aqua_mole_conc+DP
-    S1=AMAX1(0._r8,S0**2-4.0_r8*(H1PO4_2e_conc*H_1p_aqua_mole_conc-DP*H2PO4_1e_aqua_mole_conc))
+    S0=H1PO4_2e_aqua_mole_conc+H_1p_aqua_mole_conc+DP
+    S1=AMAX1(0._r8,S0**2-4.0_r8*(H1PO4_2e_aqua_mole_conc*H_1p_aqua_mole_conc-DP*H2PO4_1e_aqua_mole_conc))
     H2PO4_e_to_HPO4_2e_flx=TSL*(S0-SQRT(S1))
   ELSE
     H2PO4_1e_AlPO4_dissol_flx=0._r8
@@ -783,7 +783,7 @@ module ChemEquilibriaMod
   write(*,*)'XROH1_conc' ,chemvar%XROH1_conc
   write(*,*)'XHPO4_conc' ,chemvar%XHPO4_conc
   write(*,*)'H1PO4_2e_band_conc' ,chemvar%H1PO4_2e_band_conc
-  write(*,*)'H1PO4_2e_conc' ,chemvar%H1PO4_2e_conc
+  write(*,*)'H1PO4_2e_aqua_mole_conc' ,chemvar%H1PO4_2e_aqua_mole_conc
   write(*,*)'H2PO4_1e_band_conc' ,chemvar%H2PO4_1e_band_conc
   write(*,*)'PrecpB_AlPO4_conc',chemvar%PrecpB_AlPO4_conc
   write(*,*)'PrecpB_FePO4_con',chemvar%PrecpB_FePO4_con

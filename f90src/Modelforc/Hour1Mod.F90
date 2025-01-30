@@ -11,7 +11,7 @@ module Hour1Mod
   use EcoSiMParDataMod,  only : micpar, pltpar
   use SoilBGCNLayMod,    only : sumORGMLayL
   use PlantMgmtDataType, only : NP
-  use BalancesMod,       only : SumUpStorage,BegCheckBalances,SummarizeTracers
+  use BalancesMod,       only : SumUpTracerMass,BegCheckBalances
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -155,7 +155,7 @@ module Hour1Mod
   if(lverb)write(*,*)'SetLiterSoilPropAftDisturb'
   call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS,dosum)
 
-  if(dosum) call SumUpStorage(I,J,NHW,NHE,NVN,NVS)  
+  if(dosum) call SumUpTracerMass(I,J,NHW,NHE,NVN,NVS)  
 
   call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
@@ -255,8 +255,6 @@ module Hour1Mod
   if(lverb)write(*,*)'ApplyFertilizerAtNoon'
 !     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
   call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
-
-  call SummarizeTracers(NHW,NHE,NVN,NVS,trcg_TotalMass_beg_col)
 
   END subroutine hour1
 !------------------------------------------------------------------------------------------
@@ -728,6 +726,7 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  Gas_NetProd_col(:,NY,NX)                = 0._r8
   Gas_WetDeposition_col(:,NY,NX)          = 0._r8
   RootCO2Autor_col(NY,NX)                 = 0._r8
   QIceInflx_vr(:,NY,NX)                   = 0._r8

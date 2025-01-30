@@ -182,9 +182,12 @@ module RedistMod
 
 
   RootCO2Autor_col(NY,NX)=sum(RootCO2Autor_vr(1:JZ,NY,NX))  
-  Gas_Prod_TP_cumRes_col(idg_CO2,NY,NX)=Gas_Prod_TP_cumRes_col(idg_CO2,NY,NX)+SurfGasEmisFlx_col(idg_CO2,NY,NX) &
-    -ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
-
+  Gas_NetProd_col(idg_CO2,NY,NX)=-ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
+  
+  DO idg=idg_beg,idg_NH3  
+    Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX) = Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX)+SurfGasEmisFlx_col(idg_Ar,NY,NX) &
+      +Gas_NetProd_col(idg,NY,NX)
+  ENDDO  
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
       IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS2(NY,NX))THEN
