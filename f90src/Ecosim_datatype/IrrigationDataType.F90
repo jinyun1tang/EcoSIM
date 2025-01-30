@@ -26,9 +26,9 @@ module IrrigationDataType
   real(r8),target,allocatable ::  DIRRA(:,:,:)                      !depth to which automatic irrigation applied, [m]
   real(r8),target,allocatable ::  TDIRI(:,:,:)                      !accumulated change  for irrigation, [-]
   real(r8),target,allocatable ::  PHQ(:,:,:)                        !surface irrigation  pH, [-]
-  real(r8),target,allocatable ::  NH4_irrig_conc(:,:,:)                       !surface irrigation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NO3_irrig_conc(:,:,:)                       !surface irrigation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  H2PO4_irrig_conc(:,:,:)                       !surface irrigation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH4_irrig_mole_conc(:,:,:)                       !surface irrigation  NH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NO3_irrig_mole_conc(:,:,:)                       !surface irrigation  NO3 concentration, [g m-3]
+  real(r8),target,allocatable ::  H2PO4_irrig_mole_conc(:,:,:)                       !surface irrigation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALQ(:,:,:)                       !surface irrigation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFEQ(:,:,:)                       !surface irrigation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYQ(:,:,:)                       !surface irrigation  H concentration, [g m-3]
@@ -63,7 +63,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CNASQ(:,:,:)                      !surface irrigation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASQ(:,:,:)                      !surface irrigation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PQ(:,:,:)                      !surface irrigation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  HPO4_irrig_conc(:,:,:)            !surface irrigation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_irrig_mole_conc(:,:,:)            !surface irrigation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PQ(:,:,:)                      !surface irrigation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PQ(:,:,:)                      !surface irrigation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PQ(:,:,:)                      !surface irrigation  FeH2PO4 concentration, [g m-3]
@@ -73,7 +73,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CM1PQ(:,:,:)                      !surface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CSTRQ(:,:,:)                      !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  CSTRR(:,:)                        !surface irrigation ion strength, [g m-3]
-  real(r8),target,allocatable ::  trcVolatile_irrig_conc(:,:,:)     !surface irrigation  volatile concentration, [g m-3]
+  real(r8),target,allocatable ::  trcg_irrig_mole_conc_col(:,:,:)   !surface irrigation  volatile concentration, [mol m-3]
   real(r8),target,allocatable ::  COCU(:,:,:,:)                     !subsurface irrigation  DOC concentration, [g m-3]
   real(r8),target,allocatable ::  CONU(:,:,:,:)                     !subsurface irrigation  DON concentration, [g m-3]
   real(r8),target,allocatable ::  COAU(:,:,:,:)                     !subsurface irrigation  acetate concentration, [g m-3]
@@ -103,10 +103,10 @@ module IrrigationDataType
   implicit none
 
   allocate(PHQ(366,JY,JX));     PHQ=0._r8
-  allocate(NH4_irrig_conc(366,JY,JX));    NH4_irrig_conc=0._r8
-  allocate(trcVolatile_irrig_conc(idg_beg:idg_NH3,JY,JX));   trcVolatile_irrig_conc=0._r8
-  allocate(NO3_irrig_conc(366,JY,JX));    NO3_irrig_conc=0._r8
-  allocate(H2PO4_irrig_conc(366,JY,JX));    H2PO4_irrig_conc=0._r8
+  allocate(NH4_irrig_mole_conc(366,JY,JX));    NH4_irrig_mole_conc=0._r8
+  allocate(trcg_irrig_mole_conc_col(idg_beg:idg_NH3,JY,JX));   trcg_irrig_mole_conc_col=0._r8
+  allocate(NO3_irrig_mole_conc(366,JY,JX));    NO3_irrig_mole_conc=0._r8
+  allocate(H2PO4_irrig_mole_conc(366,JY,JX));    H2PO4_irrig_mole_conc=0._r8
   allocate(CALQ(366,JY,JX));    CALQ=0._r8
   allocate(CFEQ(366,JY,JX));    CFEQ=0._r8
   allocate(CHYQ(366,JY,JX));    CHYQ=0._r8
@@ -141,7 +141,7 @@ module IrrigationDataType
   allocate(CNASQ(366,JY,JX));   CNASQ=0._r8
   allocate(CKASQ(366,JY,JX));   CKASQ=0._r8
   allocate(CH0PQ(366,JY,JX));   CH0PQ=0._r8
-  allocate(HPO4_irrig_conc(366,JY,JX));   HPO4_irrig_conc=0._r8
+  allocate(HPO4_irrig_mole_conc(366,JY,JX));   HPO4_irrig_mole_conc=0._r8
   allocate(CH3PQ(366,JY,JX));   CH3PQ=0._r8
   allocate(CF1PQ(366,JY,JX));   CF1PQ=0._r8
   allocate(CF2PQ(366,JY,JX));   CF2PQ=0._r8
@@ -183,9 +183,9 @@ module IrrigationDataType
   call destroy(trcn_irrig_vr)
   call destroy(trcs_Irrig_vr)
   call destroy(PHQ)
-  call destroy(NH4_irrig_conc)
-  call destroy(NO3_irrig_conc)
-  call destroy(H2PO4_irrig_conc)
+  call destroy(NH4_irrig_mole_conc)
+  call destroy(NO3_irrig_mole_conc)
+  call destroy(H2PO4_irrig_mole_conc)
   call destroy(CALQ)
   call destroy(CFEQ)
   call destroy(CHYQ)
@@ -220,7 +220,7 @@ module IrrigationDataType
   call destroy(CNASQ)
   call destroy(CKASQ)
   call destroy(CH0PQ)
-  call destroy(HPO4_irrig_conc)
+  call destroy(HPO4_irrig_mole_conc)
   call destroy(CH3PQ)
   call destroy(CF1PQ)
   call destroy(CF2PQ)
@@ -239,7 +239,7 @@ module IrrigationDataType
   call destroy(DIRRA)
   call destroy(TDIRI)
   call destroy(CSTRR)
-  call destroy(trcVolatile_irrig_conc)
+  call destroy(trcg_irrig_mole_conc_col)
   call destroy(trcsalt_subirrig_conc)
   call destroy(COCU)
   call destroy(CONU)

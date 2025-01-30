@@ -169,7 +169,7 @@ module StartsMod
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
       VHeatCapLitRMin_col(NY,NX) = VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPNX(NY,NX)              = VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX_col(NY,NX)              = VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
@@ -562,10 +562,10 @@ module StartsMod
   REcoH2PO4DmndBand_vr(0:L2,NY,NX) = 0.0_r8
   REcoH1PO4DmndBand_vr(0:L2,NY,NX) = 0.0_r8
   RNO2DmndBandChemo_vr(0:L2,NY,NX) = 0.0_r8
-  ZNHUI(0:L2,NY,NX)                = 0.0_r8
-  ZNHU0(0:L2,NY,NX)                = 0.0_r8
-  ZNFNI(0:L2,NY,NX)                = 0.0_r8
-  ZNFN0(0:L2,NY,NX)                = 0.0_r8
+  ZNHUI_vr(0:L2,NY,NX)                = 0.0_r8
+  ZNHU0_vr(0:L2,NY,NX)                = 0.0_r8
+  ZNFNI_vr(0:L2,NY,NX)                = 0.0_r8
+  ZNFN0_vr(0:L2,NY,NX)                = 0.0_r8
 
   BandWidthNH4_vr(1:L2,NY,NX)     = 0.0_r8
   BandThicknessNH4_vr(1:L2,NY,NX) = 0.0_r8
@@ -1085,7 +1085,7 @@ module StartsMod
 !     VHeatCapLitR,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
       VHeatCapLitRMin_col(NY,NX) = VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPNX(NY,NX)              = VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX_col(NY,NX)              = VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK

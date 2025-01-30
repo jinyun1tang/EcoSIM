@@ -1036,7 +1036,7 @@ module InsideTranspMod
     do idom=idom_beg,idom_end
       DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)=DOM_MicpTransp_3D(idom,K,N,N6,N5,N4) &
         +DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)
-      DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4)=DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4) &
+      DOM_Macp_Transp_flx_3D(idom,K,N,N6,N5,N4)=DOM_Macp_Transp_flx_3D(idom,K,N,N6,N5,N4) &
         +DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
     enddo
   ENDDO D9755
@@ -1484,7 +1484,7 @@ module InsideTranspMod
 !     X*FLG=hourly total convective+diffusive gas flux
 !
     DO idg=idg_beg,idg_NH3
-      Gas_3DAdvDif_Flx_vr(idg,N,N6,N5,N4)=Gas_3DAdvDif_Flx_vr(idg,N,N6,N5,N4)+RGasADFlxMM_3D(idg,N,N6,N5,N4)
+      Gas_AdvDif_Flx_3D(idg,N,N6,N5,N4)=Gas_AdvDif_Flx_3D(idg,N,N6,N5,N4)+RGasADFlxMM_3D(idg,N,N6,N5,N4)
     ENDDO
 
   ELSE

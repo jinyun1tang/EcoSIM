@@ -596,12 +596,12 @@ module IngridTranspMod
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux in non-band,band
 !
   DO nsalts=idsalt_beg,idsalt_end
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)+trcSaltSnoFlo2LitR(nsalts) &
+    trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)=trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)+trcSaltSnoFlo2LitR(nsalts) &
       -trcSalt_RFL(nsalts)-trcSalt_flx_diffus(nsalts)
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX) &
+    trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)=trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX) &
       +trcSaltSnoFlo2Soil(nsalts)+trcSalt_RFL(nsalts)+trcSalt_flx_diffus(nsalts)
   ENDDO
   end subroutine AccumHourlyTopsoilReisdueFlux
@@ -775,7 +775,7 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_XFXS(nsalts,NU(NY,NX),NY,NX)=trcSalt_XFXS(nsalts,NU(NY,NX),NY,NX)+trcSalt_RFXS(nsalts,NU(NY,NX),NY,NX)
+    trcSalt_XFXS_vr(nsalts,NU(NY,NX),NY,NX)=trcSalt_XFXS_vr(nsalts,NU(NY,NX),NY,NX)+trcSalt_RFXS(nsalts,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine AccumHourlyMicMacPoreFlux
 !------------------------------------------------------------------------------------------
@@ -1639,9 +1639,9 @@ module IngridTranspMod
 !
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,N,N6,N5,N4)=trcSalt3DFlo2Cell(nsalts,N,N6,N5,N4) &
+    trcSalt3DFlo2Cell_3D(nsalts,N,N6,N5,N4)=trcSalt3DFlo2Cell_3D(nsalts,N,N6,N5,N4) &
       +trcSalt3DFlo2CellM(nsalts,N,N6,N5,N4)
-    trcSalt_XFHS(nsalts,N,N6,N5,N4)=trcSalt_XFHS(nsalts,N,N6,N5,N4) &
+    trcSalt_XFHS_3D(nsalts,N,N6,N5,N4)=trcSalt_XFHS_3D(nsalts,N,N6,N5,N4) &
       +trcSalt_RFHS(nsalts,N,N6,N5,N4)
   ENDDO
   end subroutine SoluteAdvDifsMicMacpore
@@ -1682,7 +1682,7 @@ module IngridTranspMod
 !     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_XFXS(nsalts,N6,N5,N4)=trcSalt_XFXS(nsalts,N6,N5,N4)+trcSalt_RFXS(nsalts,N6,N5,N4)
+    trcSalt_XFXS_vr(nsalts,N6,N5,N4)=trcSalt_XFXS_vr(nsalts,N6,N5,N4)+trcSalt_RFXS(nsalts,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifsExchMicMacpore

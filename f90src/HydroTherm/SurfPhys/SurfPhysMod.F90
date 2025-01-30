@@ -682,7 +682,7 @@ contains
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
   IF(FracSurfSnoFree_col(NY,NX).GT.0.0_r8 .AND. (SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .OR. &
-    VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
+    VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.VHCPNX_col(NY,NX)))THEN
     if(lverb)write(*,*)'ExposedSoilFluxM'
     !Ground partically covered by snow, focus on litter-soil interaction     
     call ExposedSoilFluxM(I,J,M,NY,NX,CumNetWatFlow2LitR,CumNetHeatFlow2LitR,&
@@ -775,10 +775,9 @@ contains
 ! CND1,CNDL=hydraulic conductivity of source,destination layer
 ! HydroCond_3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
-
   !check litter temperature
   VLWatLitR=AMIN1(VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX),VLWatMicP1_vr(0,NY,NX))
-
+  if(VLWatLitR.LE.ZERO)return
   IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !top layer is soil
     IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1365,20 +1364,20 @@ contains
     Rain2LitRSurf_col(NY,NX) = 0.0_r8
     Irrig2LitRSurf(NY,NX)    = 0.0_r8
     Rain2SoilSurf_col(NY,NX) = PrecAtm_col(NY,NX)
-    Irrig2SoilSurf(NY,NX)    = IrrigSurface_col(NY,NX)
+    Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)
   ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
     .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
     Rain2LitRSurf_col(NY,NX) = RainThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
     Irrig2LitRSurf(NY,NX)    = RainThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
     Rain2SoilSurf_col(NY,NX) = PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
-    Irrig2SoilSurf(NY,NX)    = IrrigSurface_col(NY,NX)-Irrig2LitRSurf(NY,NX)
+    Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)-Irrig2LitRSurf(NY,NX)
   ELSE
     !no precipitation
     Rain2LitRSurf_col(NY,NX) = 0.0_r8
     Irrig2LitRSurf(NY,NX)    = 0.0_r8
     Rain2SoilSurf_col(NY,NX) = 0.0_r8
-    Irrig2SoilSurf(NY,NX)    = 0.0_r8
+    Irrig2SoilSurf_col(NY,NX)    = 0.0_r8
   ENDIF
 !
 !     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS

@@ -521,8 +521,8 @@ module WthrMod
       PrecAsSnow_col(NY,NX)   = PrecAsSnow_col(NY,NX)*TDPRC(N,NY,NX)
       PRECII_col(NY,NX)       = PRECII_col(NY,NX)*TDIRI(N,NY,NX)
       PRECUI_col(NY,NX)       = PRECUI_col(NY,NX)*TDIRI(N,NY,NX)
-      NH4_rain_conc(NY,NX)    = CN4RI(NY,NX)*TDCN4(N,NY,NX)
-      NO3_rain_conc(NY,NX)    = CNORI(NY,NX)*TDCNO(N,NY,NX)
+      NH4_rain_mole_conc(NY,NX)    = CN4RI(NY,NX)*TDCN4(N,NY,NX)
+      NO3_rain_mole_conc(NY,NX)    = CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
   end subroutine CorrectClimate

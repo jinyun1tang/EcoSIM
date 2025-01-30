@@ -125,15 +125,15 @@ implicit none
         IF(salt_model)THEN
           DO NTSA=idsalt_beg,idsalt_end
             trcSalt_TBLS(NTSA,LS,NY,NX)=trcSalt_TBLS(NTSA,LS,NY,NX)+trcSaltFlo2SnowLay(NTSA,LS,NY,NX) &
-              -trcSalt3DFlo2Cell(NTSA,3,0,N2,N1)-trcSalt3DFlo2Cell(NTSA,3,NUM(N2,N1),N2,N1) &
-              -trcSalt_XFHS(NTSA,3,NUM(N2,N1),N2,N1)
+              -trcSalt3DFlo2Cell_3D(NTSA,3,0,N2,N1)-trcSalt3DFlo2Cell_3D(NTSA,3,NUM(N2,N1),N2,N1) &
+              -trcSalt_XFHS_3D(NTSA,3,NUM(N2,N1),N2,N1)
           ENDDO
 
           !add band flux
           DO NTSA=0,idsalt_nuts
             trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+NTSA,LS,NY,NX) &
-              -trcSalt3DFlo2Cell(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
-              -trcSalt_XFHS(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
+              -trcSalt3DFlo2Cell_3D(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
+              -trcSalt_XFHS_3D(idsalt_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
           ENDDO
         ENDIF
       ENDIF

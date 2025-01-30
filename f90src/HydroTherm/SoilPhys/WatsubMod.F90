@@ -1384,7 +1384,7 @@ module WatsubMod
       !       NUM=new surface layer number after CO2CompenPoint_nodeete lake evaporation
       !       LakeSurfFlowMicP,LakeSurfFlowMacP,LakeSurfHeatFlux=lake surface water flux, heat flux if lake surface disappears
       ! NUM layer is pure water, and its heat capacity and thereby water is too little
-      IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO .AND. VHeatCapacity1_vr(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
+      IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO .AND. VHeatCapacity1_vr(NUM(NY,NX),NY,NX).LE.VHCPNX_col(NY,NX))THEN
         !the soil/water profile moves down        
         NUX=NUM(NY,NX)        
 !        if(I>=317 .and. J>=18)then
@@ -2080,7 +2080,7 @@ module WatsubMod
   !     HFLWL=total conductive+convective source-destination heat flux
   !
   
-  IF(VHeatCapacity1_vr(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
+  IF(VHeatCapacity1_vr(N3,N2,N1).GT.VHCPNX_col(NY,NX))THEN
     !surface layer and does not have significant snowpack
     IF(N3.EQ.NUM(NY,NX) .AND. VLHeatCapSnow_snvr(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       TK1X=TKSoil1_vr(N3,N2,N1)-(HeatByConvectVapFlux-HeatFluxAir2Soi)/VHeatCapacity1_vr(N3,N2,N1)

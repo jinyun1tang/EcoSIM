@@ -6192,10 +6192,10 @@ implicit none
        long_name='soil pH', units='none', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,PH,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,PH_vr,datrc_2d) 
   else
     !print*,'POROS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PH,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PH_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='PH', dim1name='column',dim2name='levsoi1',&
        long_name='soil pH', units='none', &
@@ -8144,9 +8144,9 @@ implicit none
     call restartvar(ncid, flag, varname='CFE', dim1name='column', &
       dim2name='levsoi',long_name='soil Fe content', units='mg Fe kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,CFE,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,CFE_vr,datrc_2d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CFE,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CFE_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='CFE', dim1name='column', &
       dim2name='levsoi',long_name='soil Fe content', units='mg Fe kg-1', interpinic_flag='skip',&
@@ -8158,9 +8158,9 @@ implicit none
     call restartvar(ncid, flag, varname='CCA', dim1name='column', &
       dim2name='levsoi',long_name='soil Ca content', units='mg Ca kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,CCA,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,CCA_vr,datrc_2d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CCA,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CCA_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='CCA', dim1name='column', &
       dim2name='levsoi',long_name='soil Ca content', units='mg Ca kg-1', interpinic_flag='skip',&
@@ -8172,12 +8172,54 @@ implicit none
     call restartvar(ncid, flag, varname='CAL', dim1name='column', &
       dim2name='levsoi',long_name='soil Al content', units='mg Al kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,CAL,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,CAL_vr,datrc_2d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CAL,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CAL_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='CAL', dim1name='column', &
       dim2name='levsoi',long_name='soil Al content', units='mg Al kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CSO4', dim1name='column', &
+      dim2name='levsoi',long_name='soil SO4 content', units='mg S kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CSO4_vr,datrc_2d)
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CSO4_vr,datrc_2d)  
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CSO4', dim1name='column', &
+      dim2name='levsoi',long_name='soil SO4 content', units='mg S kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CCL', dim1name='column', &
+      dim2name='levsoi',long_name='soil Cl content', units='mg Cl kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CCL_vr,datrc_2d)
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CSO4_vr,datrc_2d)  
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CCL', dim1name='column', &
+      dim2name='levsoi',long_name='soil Cl content', units='mg Cl kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CALOH', dim1name='column', &
+      dim2name='levsoi',long_name='soil AlOH content', units='mg Al kg-1', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,CALOH_vr,datrc_2d)
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CALOH_vr,datrc_2d)  
+    datpr2 => datrc_2d(1:ncols,1:JZ)    
+    call restartvar(ncid, flag, varname='CALOH', dim1name='column', &
+      dim2name='levsoi',long_name='soil ALOH content', units='mg Al kg-1', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
 
@@ -8262,10 +8304,10 @@ implicit none
       dim2name='levsoi1',long_name='current inhibition activity', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)     
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI_vr,datrc_2d)
   else
     !print*,'ZNHUI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNHUI_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNHUI', dim1name='column', &
       dim2name='levsoi1',long_name='current inhibition activity', &
@@ -8279,10 +8321,10 @@ implicit none
       dim2name='levsoi1',long_name='urea hydrolysis inhibition activity', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)     
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0,datrc_2d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0_vr,datrc_2d)
   else
     !print*,'ZNHU0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNHU0_vr,datrc_2d)  
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNHU0', dim1name='column', &
       dim2name='levsoi1',long_name='urea hydrolysis inhibition activity', &
@@ -8296,10 +8338,10 @@ implicit none
       dim2name='levsoi1',long_name='current nitrification inhibition activity', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)     
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI_vr,datrc_2d)  
   else
     !print*,'ZNFNI'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI,datrc_2d)    
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNFNI_vr,datrc_2d)    
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNFNI', dim1name='column', &
       dim2name='levsoi1',long_name='current nitrification inhibition activity', &
@@ -8313,10 +8355,10 @@ implicit none
       dim2name='levsoi1',long_name='initial nitrification inhibition activity', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)     
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0,datrc_2d)  
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0_vr,datrc_2d)  
   else
     !print*,'ZNFN0'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0,datrc_2d)    
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZNFN0_vr,datrc_2d)    
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
     call restartvar(ncid, flag, varname='ZNFN0', dim1name='column', &
       dim2name='levsoi1',long_name='initial nitrification inhibition activity', &
@@ -8483,10 +8525,10 @@ implicit none
       dim2name='levsoi',long_name='Ca-NH4 Gapon selectivity coefficient', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,GKC4,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKC4_vr,datrc_2d)    
   else
     !print*,'GKC4'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKC4,datrc_2d)      
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKC4_vr,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKC4', dim1name='column', &
       dim2name='levsoi',long_name='Ca-NH4 Gapon selectivity coefficient', &
@@ -8500,10 +8542,10 @@ implicit none
       dim2name='levsoi',long_name='Ca-H Gapon selectivity coefficient', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,GKCH,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCH_vr,datrc_2d)    
   else
     !print*,'GKCH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCH,datrc_2d)      
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCH_vr,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCH', dim1name='column', &
       dim2name='levsoi',long_name='Ca-H Gapon selectivity coefficient', &
@@ -8517,10 +8559,10 @@ implicit none
       dim2name='levsoi',long_name='Ca-Al Gapon selectivity coefficient', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,GKCA,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCA_vr,datrc_2d)    
   else
     !print*,'GKCA'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCA,datrc_2d)      
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCA_vr,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='GKCA', dim1name='column', &
       dim2name='levsoi',long_name='Ca-Al Gapon selectivity coefficient', &
@@ -8534,10 +8576,10 @@ implicit none
       dim2name='levsoi',long_name='Ca-Mg Gapon selectivity coefficient', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,GKCM,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCM_vr,datrc_2d)    
   else
     !print*,'GKCM'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCM,datrc_2d)      
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCM_vr,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCM', dim1name='column', &
       dim2name='levsoi',long_name='Ca-Mg Gapon selectivity coefficient', &
@@ -8551,10 +8593,10 @@ implicit none
       dim2name='levsoi',long_name='Ca-Na Gapon selectivity coefficient', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,GKCN,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCN_vr,datrc_2d)    
   else
     !print*,'GKCN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCN,datrc_2d)      
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCN_vr,datrc_2d)      
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCN', dim1name='column', &
       dim2name='levsoi',long_name='Ca-Na Gapon selectivity coefficient', &
@@ -8568,10 +8610,10 @@ implicit none
       dim2name='levsoi',long_name='Ca-K Gapon selectivity coefficient', &
       units='none', interpinic_flag='skip',&
       data=datpr2, missing_value=spval, fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,GKCK,datrc_2d)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,GKCK_vr,datrc_2d)    
   else
     !print*,'GKCK'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCK,datrc_2d)     
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GKCK_vr,datrc_2d)     
     datpr2 => datrc_2d(1:ncols,1:JZ)     
     call restartvar(ncid, flag, varname='GKCK', dim1name='column', &
       dim2name='levsoi',long_name='Ca-K Gapon selectivity coefficient', &

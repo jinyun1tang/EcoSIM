@@ -164,8 +164,8 @@ implicit none
   micfor%ZERO                = ZERO
   micfor%CCH4E               = AtmGasCgperm3(idg_CH4,NY,NX)
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
-  micfor%O2_irrig_conc       = trcVolatile_irrig_conc(idg_O2,NY,NX)
-  micfor%O2_rain_conc        = trcVolatile_rain_conc(idg_O2,NY,NX)
+  micfor%O2_irrig_conc       = trcg_irrig_mole_conc_col(idg_O2,NY,NX)
+  micfor%O2_rain_conc        = trcg_rain_mole_conc_col(idg_O2,NY,NX)
   micfor%Irrig2LitRSurf      = Irrig2LitRSurf(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)
@@ -179,7 +179,7 @@ implicit none
   micfor%FieldCapacity       = FieldCapacity_vr(L,NY,NX)
 
   micfor%THETW               = THETW_vr(L,NY,NX)
-  micfor%PH                  = PH(L,NY,NX)
+  micfor%PH                  = PH_vr(L,NY,NX)
   micfor%SoilMicPMassLayer            = VLSoilMicPMass_vr(L,NY,NX)
   micfor%VLSoilPoreMicP               = VLSoilPoreMicP_vr(L,NY,NX)
   micfor%TScal4Difsvity               = TScal4Difsvity_vr(L,NY,NX)
@@ -307,8 +307,8 @@ implicit none
 !  write(115,*)I+J/24.,L,micstt%COXYG,micstt%COXYS,VLsoiAirPM(1,L,NY,NX)
   micstt%O2GSolubility     = GasSolbility_vr(idg_O2,L,NY,NX)  
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
-  micstt%ZNFN0             = ZNFN0(L,NY,NX)
-  micstt%ZNFNI             = ZNFNI(L,NY,NX)
+  micstt%ZNFN0             = ZNFN0_vr(L,NY,NX)
+  micstt%ZNFNI             = ZNFNI_vr(L,NY,NX)
   DO K=1,jcplx
     DO idom=idom_beg,idom_end  
       micstt%DOM(idom,K) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
@@ -472,7 +472,7 @@ implicit none
   TSens4MicbGrwoth_vr(L,NY,NX)                   = micstt%TSens4MicbGrwoth
   VWatMicrobAct_vr(L,NY,NX)                      = micstt%VWatMicrobAct
   TMicHeterActivity_vr(L,NY,NX)                  = micstt%TMicHeterActivity
-  ZNFNI(L,NY,NX)                                 = micstt%ZNFNI
+  ZNFNI_vr(L,NY,NX)                                 = micstt%ZNFNI
   FracBulkSOMC_vr(1:jcplx,L,NY,NX)               = micstt%FracBulkSOMC(1:jcplx)
   DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)      = micstt%DOM(idom_beg:idom_end,1:jcplx)
   SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX) = micstt%SorbedOM(idom_beg:idom_end,1:jcplx)

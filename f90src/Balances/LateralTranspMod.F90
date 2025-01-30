@@ -597,7 +597,7 @@ implicit none
           DOM_Transp2Micp_vr(idom,K,N3,N2,N1)=DOM_Transp2Micp_vr(idom,K,N3,N2,N1) &
             +DOM_MicpTransp_3D(idom,K,N,N3,N2,N1)-DOM_MicpTransp_3D(idom,K,N,N6,N5,N4)
           DOM_Transp2Macp_flx(idom,K,N3,N2,N1)=DOM_Transp2Macp_flx(idom,K,N3,N2,N1) &
-            +DOM_3DMacp_Transp_flx(idom,K,N,N3,N2,N1)-DOM_3DMacp_Transp_flx(idom,K,N,N6,N5,N4)
+            +DOM_Macp_Transp_flx_3D(idom,K,N,N3,N2,N1)-DOM_Macp_Transp_flx_3D(idom,K,N,N6,N5,N4)
         enddo
       ENDDO D8585
 
@@ -616,7 +616,7 @@ implicit none
 !exclude NH3B
       DO NTG=idg_beg,idg_NH3
         Gas_AdvDif_Flx_vr(NTG,N3,N2,N1)=Gas_AdvDif_Flx_vr(NTG,N3,N2,N1) &
-          +Gas_3DAdvDif_Flx_vr(NTG,N,N3,N2,N1)-Gas_3DAdvDif_Flx_vr(NTG,N,N6,N5,N4)
+          +Gas_AdvDif_Flx_3D(NTG,N,N3,N2,N1)-Gas_AdvDif_Flx_3D(NTG,N,N6,N5,N4)
       ENDDO
 !
       !     NET SALT FLUXES BETWEEN ADJACENT GRID CELLS
@@ -637,9 +637,9 @@ implicit none
       IF(salt_model)THEN
         DO NTSA=idsalt_beg,idsaltb_end
           trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1) &
-            +trcSalt3DFlo2Cell(NTSA,N,N3,N2,N1)-trcSalt3DFlo2Cell(NTSA,N,N6,N5,N4)
+            +trcSalt3DFlo2Cell_3D(NTSA,N,N3,N2,N1)-trcSalt3DFlo2Cell_3D(NTSA,N,N6,N5,N4)
           trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1) &
-            +trcSalt_XFHS(NTSA,N,N3,N2,N1)-trcSalt_XFHS(NTSA,N,N6,N5,N4)
+            +trcSalt_XFHS_3D(NTSA,N,N3,N2,N1)-trcSalt_XFHS_3D(NTSA,N,N6,N5,N4)
         ENDDO
       ENDIF
     ELSE

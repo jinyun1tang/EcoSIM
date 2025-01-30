@@ -726,7 +726,7 @@ implicit none
   ELSEIF(NN.EQ.2)THEN
     !layer L is lost
     IF((L.EQ.NU(NY,NX) .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).LE.ZERO) &
-      .AND. (VHeatCapacity_vr(NU(NY,NX),NY,NX).LE.VHCPNX(NY,NX) &
+      .AND. (VHeatCapacity_vr(NU(NY,NX),NY,NX).LE.VHCPNX_col(NY,NX) &
       .OR. NUM(NY,NX).GT.NU(NY,NX)))THEN    !l# of layers is reduced
       
       NUX=NU(NY,NX)
@@ -757,7 +757,7 @@ implicit none
     !obtain the water exceeds litter layer water holding capacity
     XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-VLWatheldCapSurf_col(NY,NX))
     IF(L.EQ.NU(NY,NX) .AND. CumDepz2LayerBot_vr(0,NY,NX).GT.CumLitRDepz_col(NY,NX) &
-      .AND. XVOLWP.GT.(VLWatheldCapSurf_col(NY,NX)+VHCPNX(NY,NX)/cpw))THEN
+      .AND. XVOLWP.GT.(VLWatheldCapSurf_col(NY,NX)+VHCPNX_col(NY,NX)/cpw))THEN
           !     IF((SoilBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoilBulkDensity_vr(L,NY,NX).LE.ZERO))THEN
       !layer L is sinking    
@@ -1664,7 +1664,7 @@ implicit none
     FBO=AMIN1(0.1,FX*SoiBulkDensityt0_vr(L1,NY,NX)/SoiBulkDensityt0_vr(L0,NY,NX))
   ENDIF
 !     SoilBulkDensity_vr(L1,NY,NX)=(1.0-FO)*SoilBulkDensity_vr(L1,NY,NX)+FO*SoiBulkDensityt0_vr(L0,NY,NX)
-  PH(L1,NY,NX)      = (1.0_r8-FO)*PH(L1,NY,NX)+FO*PH(L0,NY,NX)
+  PH_vr(L1,NY,NX)      = (1.0_r8-FO)*PH_vr(L1,NY,NX)+FO*PH_vr(L0,NY,NX)
   FXSAND            = FBO*SAND(L0,NY,NX)
   SAND(L1,NY,NX)    = SAND(L1,NY,NX)+FXSAND
   SAND(L0,NY,NX)    = SAND(L0,NY,NX)-FXSAND

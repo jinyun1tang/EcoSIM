@@ -354,7 +354,7 @@ module BoundaryTranspMod
     do idom=idom_beg,idom_end
       DOM_MicpTransp_3D(idom,K,N,M6,M5,M4)=DOM_MicpTransp_3D(idom,K,N,M6,M5,M4) &
         +DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)
-      DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4)=DOM_3DMacp_Transp_flx(idom,K,N,M6,M5,M4) &
+      DOM_Macp_Transp_flx_3D(idom,K,N,M6,M5,M4)=DOM_Macp_Transp_flx_3D(idom,K,N,M6,M5,M4) &
         +DOM_MacpTranspFlxM_3D(idom,K,N,M6,M5,M4)
     enddo
   enddo
@@ -414,7 +414,7 @@ module BoundaryTranspMod
 !
     DO idg=idg_beg,idg_NH3
       RGasADFlxMM_3D(idg,N,M6,M5,M4)        = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
-      Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)   = Gas_3DAdvDif_Flx_vr(idg,N,M6,M5,M4)+RGasADFlxMM_3D(idg,N,M6,M5,M4)
+      Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)   = Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)+RGasADFlxMM_3D(idg,N,M6,M5,M4)
     ENDDO
   ELSE
     RGasADFlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8

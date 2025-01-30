@@ -138,11 +138,11 @@ module TranspSaltMod
 !     begin_execution
   DO nsalts=idsalt_beg,idsalt_end
     trcSaltFlo2SnowLay(nsalts,1,NY,NX)=0.0
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=0.0
+    trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)=0.0
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=0.0
+    trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)=0.0
   ENDDO
   end subroutine ZeroAtmosSoluteFlux
 !------------------------------------------------------------------------------------------
@@ -164,13 +164,13 @@ module TranspSaltMod
 !     X*FLS,X*FLB=hourly solute flux to micropores in non-band,band
 !
   DO nsalts=idsalt_beg,idsalt_end
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=0.0
+    trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)=0.0
     trcSaltFlo2SnowLay(nsalts,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)    
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)    
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=0.0
+    trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)=0.0
   ENDDO
   end subroutine AtmosSoluteFluxToSnowpack
 !------------------------------------------------------------------------------------------
@@ -206,21 +206,21 @@ module TranspSaltMod
 !
   DO nsalts=idsalt_beg,idsalt_end
     trcSaltFlo2SnowLay(nsalts,1,NY,NX)=0.0_r8
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+    trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
       +Irrig2LitRSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
   ENDDO
 
   DO nsalts=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
+    trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)
   ENDDO
   
   DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
     ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B  
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    trcSalt3DFlo2Cell(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
-      +Irrig2SoilSurf(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
+    trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcSalt3DFlo2Cell_3D(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(nsalts,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
   ENDDO
 
   end subroutine AtmosSoluteFluxToTopsoil
@@ -280,11 +280,11 @@ module TranspSaltMod
 !
   DO nsalts=idsalt_beg,idsalt_end
     trcSaltAdv2SowLay(nsalts,1,NY,NX) = trcSaltFlo2SnowLay(nsalts,1,NY,NX)*dts_HeatWatTP
-    trcSalt_RFL0(nsalts,NY,NX)        = trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)*dts_HeatWatTP
+    trcSalt_RFL0(nsalts,NY,NX)        = trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_RFL1(nsalts,NY,NX)=trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    trcSalt_RFL1(nsalts,NY,NX)=trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   ENDDO
 
   end subroutine GetSubHourFlux
@@ -309,7 +309,7 @@ module TranspSaltMod
 !
   D10: DO L=NU(NY,NX),NL(NY,NX)
     DO nsalts=idsalt_beg,idsaltb_end
-      trcSalt_solml2R(nsalts,L,NY,NX)=-trcSalt_TR(nsalts,L,NY,NX)*dts_HeatWatTP
+      trcSalt_solml2R(nsalts,L,NY,NX)=-trcSalt_TR_vr(nsalts,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
     trcSalt_solml2R(idsalt_Hp,L,NY,NX)=trcSalt_solml2R(idsalt_Hp,L,NY,NX)-(RProd_Hp_vr(L,NY,NX))*dts_HeatWatTP
@@ -617,8 +617,8 @@ module TranspSaltMod
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,N,M6,M5,M4)=trcSalt3DFlo2Cell(nsalts,N,M6,M5,M4)+trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)
-    trcSalt_XFHS(nsalts,N,M6,M5,M4)=trcSalt_XFHS(nsalts,N,M6,M5,M4)+trcSalt_RFHS(nsalts,N,M6,M5,M4)
+    trcSalt3DFlo2Cell_3D(nsalts,N,M6,M5,M4)=trcSalt3DFlo2Cell_3D(nsalts,N,M6,M5,M4)+trcSalt3DFlo2CellM(nsalts,N,M6,M5,M4)
+    trcSalt_XFHS_3D(nsalts,N,M6,M5,M4)=trcSalt_XFHS_3D(nsalts,N,M6,M5,M4)+trcSalt_RFHS(nsalts,N,M6,M5,M4)
   ENDDO
   end subroutine AccumFluxMacMicPores
 !------------------------------------------------------------------------------------------

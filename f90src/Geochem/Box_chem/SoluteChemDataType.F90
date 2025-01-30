@@ -7,55 +7,55 @@ module SoluteChemDataType
   __FILE__
 
   type, public :: solutedtype
-    real(r8) :: H2CO3_aqu_conc
-    real(r8) :: CH4_aqu_conc
-    real(r8) :: O2_aqu_conc
-    real(r8) :: N2_aqu_conc
-    real(r8) :: N2O_aqu_conc
-    real(r8) :: NH4_1p_conc
-    real(r8) :: NH3_aqu_conc
-    real(r8) :: Al_3p_conc
-    real(r8) :: Fe_3p_conc
-    real(r8) :: H_1p_conc
-    real(r8) :: Ca_2p_conc
-    real(r8) :: Mg_2p_conc
-    real(r8) :: Na_1p_conc
-    real(r8) :: K_1p_conc
-    real(r8) :: OH_1e_conc
+    real(r8) :: H2CO3_aqua_mole_conc
+    real(r8) :: CH4_aqua_mole_conc
+    real(r8) :: O2_aqua_mole_conc
+    real(r8) :: N2_aqua_mole_conc
+    real(r8) :: N2O_aqua_mole_conc
+    real(r8) :: NH4_1p_aqua_mole_conc
+    real(r8) :: NH3_aqua_mole_conc
+    real(r8) :: Al_3p_aqua_mole_conc
+    real(r8) :: Fe_3p_aqua_mole_conc
+    real(r8) :: H_1p_aqua_mole_conc
+    real(r8) :: Ca_2p_aqua_mole_conc
+    real(r8) :: Mg_2p_aqua_mole_conc
+    real(r8) :: Na_1p_aqua_mole_conc
+    real(r8) :: K_1p_aqua_mole_conc
+    real(r8) :: OH_1e_aqua_mole_conc
     real(r8) :: SO4_2e_conc
     real(r8) :: Cl_e_conc
     real(r8) :: CO3_2e_conc
     real(r8) :: HCO3_e_conc
-    real(r8) :: AlOH_2p_conc
-    real(r8) :: AlO2H2_1p_conc
+    real(r8) :: AlOH_2p_aqua_mole_conc
+    real(r8) :: AlO2H2_1p_aqua_mole_conc
     real(r8) :: AlO3H3_conc
-    real(r8) :: AlO4H4_1e_conc
-    real(r8) :: AlSO4_1p_conc
-    real(r8) :: FeOH_2p_conc
+    real(r8) :: AlO4H4_1e_aqua_mole_conc
+    real(r8) :: AlSO4_1p_aqua_mole_conc
+    real(r8) :: FeOH_2p_aqua_mole_conc
     real(r8) :: FeO2H2_p_conc
     real(r8) :: FeO3H3_conc
-    real(r8) :: FeO4H4_1e_conc
-    real(r8) :: FeSO4_1p_conc
+    real(r8) :: FeO4H4_1e_aqua_mole_conc
+    real(r8) :: FeSO4_1p_aqua_mole_conc
     real(r8) :: CaO2H2_conc
     real(r8) :: CaCO3_conc
-    real(r8) :: CaHCO3_1p_conc
+    real(r8) :: CaHCO3_1p_aqua_mole_conc
     real(r8) :: CaSO4_conc
-    real(r8) :: MgOH_1p_conc
+    real(r8) :: MgOH_1p_aqua_mole_conc
     real(r8) :: MgCO3_conc
-    real(r8) :: MgHCO3_1p_conc
+    real(r8) :: MgHCO3_1p_aqua_mole_conc
     real(r8) :: MgSO4_conc
-    real(r8) :: NaCO3_1e_conc
-    real(r8) :: NaSO4_1e_conc
-    real(r8) :: KSO4_1e_conc
+    real(r8) :: NaCO3_1e_aqua_mole_conc
+    real(r8) :: NaSO4_1e_aqua_mole_conc
+    real(r8) :: KSO4_1e_aqua_mole_conc
     real(r8) :: H0PO4_3e_conc
     real(r8) :: H1PO4_2e_conc
-    real(r8) :: H2PO4_1e_conc
+    real(r8) :: H2PO4_1e_aqua_mole_conc
     real(r8) :: H3PO4_conc
     real(r8) :: FeHPO4_p_conc
-    real(r8) :: FeH2PO4_2p_conc
+    real(r8) :: FeH2PO4_2p_aqua_mole_conc
     real(r8) :: CaPO4_1e_con
     real(r8) :: CaHPO4_conc
-    real(r8) :: CaH4P2O8_1p_conc
+    real(r8) :: CaH4P2O8_1p_aqua_mole_conc
     real(r8) :: MgHPO4_conc
     real(r8) :: CSTR1
     real(r8) :: CCO2M
@@ -181,7 +181,7 @@ module SoluteChemDataType
     real(r8) :: TR_AlSO4_soil
     real(r8) :: TR_FeOH_soil
     real(r8) :: TR_FeO2H2_soil
-    real(r8) :: TR_FeO3H3_soil
+    real(r8) :: TR_FeO3H3_soil_vr
     real(r8) :: TR_FeO4H4_soil
     real(r8) :: TR_FeSO4_soil
     real(r8) :: TR_CaOH_soil
@@ -237,11 +237,11 @@ module SoluteChemDataType
   type, public :: chem_var_type
   real(r8) :: H1PO4_2e_conc
   real(r8) :: H1PO4_2e_band_conc
-  real(r8) :: H2PO4_1e_conc
+  real(r8) :: H2PO4_1e_aqua_mole_conc
   real(r8) :: H2PO4_1e_band_conc
-  real(r8) :: NH3_aqu_conc
+  real(r8) :: NH3_aqua_mole_conc
   real(r8) :: NH3_aqu_band_conc
-  real(r8) :: NH4_1p_conc
+  real(r8) :: NH4_1p_aqua_mole_conc
   real(r8) :: NH4_1p_band_conc
   real(r8) :: Precp_AlPO4_conc
   real(r8) :: PrecpB_AlPO4_conc
@@ -421,7 +421,7 @@ contains
   solflx%TR_AlSO4_soil = 0._r8
   solflx%TR_FeOH_soil = 0._r8
   solflx%TR_FeO2H2_soil = 0._r8
-  solflx%TR_FeO3H3_soil = 0._r8
+  solflx%TR_FeO3H3_soil_vr = 0._r8
   solflx%TR_FeO4H4_soil = 0._r8
   solflx%TR_FeSO4_soil = 0._r8
   solflx%TR_CaOH_soil = 0._r8

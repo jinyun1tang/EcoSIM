@@ -785,7 +785,7 @@ contains
 !     X*FLG=hourly convective+diffusive gas flux
 !
     DO idg=idg_beg,idg_NH3
-      Gas_3DAdvDif_Flx_vr(idg,3,NU(NY,NX),NY,NX)=Gas_3DAdvDif_Flx_vr(idg,3,NU(NY,NX),NY,NX) &
+      Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX)=Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX) &
         +RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)
     ENDDO
 

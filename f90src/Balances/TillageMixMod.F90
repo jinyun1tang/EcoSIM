@@ -92,15 +92,15 @@ module TillageMixMod
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,CLAY(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKC4(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCA(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCA_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCM(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCM_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCN(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCN_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCK(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
 
@@ -249,10 +249,10 @@ module TillageMixMod
       enddo 
     ENDDO
 
-    TZNFNG = ZNFNI(0,NY,NX)*CORP0
-    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
-    ZNHUXI = AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
-    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
+    TZNFNG = ZNFNI_vr(0,NY,NX)*CORP0
+    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(0,NY,NX))
+    ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(0,NY,NX))
+    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(0,NY,NX))
 
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
@@ -269,10 +269,10 @@ module TillageMixMod
       FI1 = TL/DCORPZ
       TI1 = AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
 
-      ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
-      ZNHUXI = AMAX1(ZNHUXI,ZNHUI(L,NY,NX))
-      ZNFNX0 = AMAX1(ZNFNX0,ZNFN0(L,NY,NX))
-      TZNFNI = TZNFNI+ZNFNI(L,NY,NX)
+      ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(L,NY,NX))
+      ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(L,NY,NX))
+      ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(L,NY,NX))
+      TZNFNI = TZNFNI+ZNFNI_vr(L,NY,NX)
       LL=L      
     ENDDO D100
 !
@@ -327,24 +327,24 @@ module TillageMixMod
           stop
         endif
 
-        ZNHU0(L,NY,NX)=ZNHUX0
-        ZNHUI(L,NY,NX)=ZNHUXI
-        ZNFN0(L,NY,NX)=ZNFNX0
-        ZNFNI(L,NY,NX)=(TI1*ZNFNI(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI(L,NY,NX))+TX*ZNFNI(L,NY,NX)+FI1*TZNFNG)/FI1
-        TZNFN2=TZNFN2+ZNFNI(L,NY,NX)
+        ZNHU0_vr(L,NY,NX)=ZNHUX0
+        ZNHUI_vr(L,NY,NX)=ZNHUXI
+        ZNFN0_vr(L,NY,NX)=ZNFNX0
+        ZNFNI_vr(L,NY,NX)=(TI1*ZNFNI_vr(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI_vr(L,NY,NX))+TX*ZNFNI_vr(L,NY,NX)+FI1*TZNFNG)/FI1
+        TZNFN2=TZNFN2+ZNFNI_vr(L,NY,NX)
       ENDIF
     ENDDO D2000
 
 ! nitrogen inhibitor
-    ZNFN0(0,NY,NX) = ZNFNX0
-    ZNFNI(0,NY,NX) = ZNFNI(0,NY,NX)*XCORP0
+    ZNFN0_vr(0,NY,NX) = ZNFNX0
+    ZNFNI_vr(0,NY,NX) = ZNFNI_vr(0,NY,NX)*XCORP0
     TZNFN2         = TZNFN2+TZNFNG
     TZNFNI         = TZNFNI+TZNFNG
 
     DO  L=NU(NY,NX),LL
       IF(TZNFN2.GT.ZERO)THEN
-        ZNFNI(L,NY,NX) = ZNFNI(L,NY,NX)*TZNFNI/TZNFN2
-        ZNFNI(L,NY,NX) = ZNFNI(L,NY,NX)+0.5_r8*(ZNFN0(L,NY,NX)-ZNFNI(L,NY,NX))
+        ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)*TZNFNI/TZNFN2
+        ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)+0.5_r8*(ZNFN0_vr(L,NY,NX)-ZNFNI_vr(L,NY,NX))
       ENDIF
     ENDDO
 
