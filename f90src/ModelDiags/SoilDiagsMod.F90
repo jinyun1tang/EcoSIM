@@ -6,6 +6,7 @@ module SoilDiagsMod
   use abortutils,         only: endrun
   use TracerPropMod,      only: MolecularWeight
   use ChemTranspDataType, only: GasSolbility_vr
+  use EcoSIMCtrlDataType, only: ZEROS2
   use SoilBGCDataType
   use GridDataType
   use SurfLitterDataType
@@ -36,20 +37,27 @@ implicit none
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      DO L=NU(NY,NX),NL(NY,NX)    
-        do idg=idg_beg,idg_NH3
-          GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,L,NY,NX)*VLWatMicP_vr(L,NY,NX)  !conver into carbon g C/mol
-        enddo  
-        GasMassSolubility(idg_NH3B)=GasMassSolubility(idg_NH3)
+      DO L=NU(NY,NX),NL(NY,NX)
+        if(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          do idg=idg_beg,idg_NH3
+            GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,L,NY,NX)*VLWatMicP_vr(L,NY,NX)  !conver into carbon g C/mol
+          enddo  
+          GasMassSolubility(idg_NH3B)=GasMassSolubility(idg_NH3)
 
-        Soil_Gas_pressure_vr(L,NY,NX)=0._r8
-        do idg=idg_beg,idg_end
-          GasPres(idg)=trcs_solml_vr(idg,L,NY,NX)*RGasC*TKS_vr(L,NY,NX)/GasMassSolubility(idg)
-          Soil_Gas_pressure_vr(L,NY,NX)=Soil_Gas_pressure_vr(L,NY,NX)+GasPres(idg)
-        enddo
-        CO2_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CO2)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6
-        CH4_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CH4)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6
-        Ar_Gas_Frac_vr(L,NY,NX) = GasPres(idg_Ar)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6
+          Soil_Gas_pressure_vr(L,NY,NX)=0._r8
+          do idg=idg_beg,idg_end
+            GasPres(idg)=trcs_solml_vr(idg,L,NY,NX)*RGasC*TKS_vr(L,NY,NX)/GasMassSolubility(idg)
+            Soil_Gas_pressure_vr(L,NY,NX)=Soil_Gas_pressure_vr(L,NY,NX)+GasPres(idg)
+          enddo
+          CO2_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CO2)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
+          CH4_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CH4)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
+          Ar_Gas_Frac_vr(L,NY,NX)  = GasPres(idg_Ar)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
+        ELSE
+          Soil_Gas_pressure_vr(L,NY,NX) = 0._r8
+          CO2_Gas_Frac_vr(L,NY,NX)      = 0._r8
+          CH4_Gas_Frac_vr(L,NY,NX)      = 0._r8
+          Ar_Gas_Frac_vr(L,NY,NX)       = 0._r8
+        ENDIF
       ENDDO
     ENDDO
   ENDDO    
