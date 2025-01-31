@@ -1,7 +1,7 @@
 module BoundaryTranspMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: isclose, AZMAX1
-  use EcoSIMCtrlMod, only: PrintInfo
+  use DebugToolMod
   use GridConsts
   USE SoilPropertyDataType
   use TranspNoSaltDataMod

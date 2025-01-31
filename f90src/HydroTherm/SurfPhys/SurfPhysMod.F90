@@ -1,6 +1,11 @@
 module SurfPhysMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils, only : endrun
+!
+!Description
+! code for doing surface physics
+!
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
+  use DebugToolMod
   use GridDataType
   use HydroThermData
   use CanopyDataType

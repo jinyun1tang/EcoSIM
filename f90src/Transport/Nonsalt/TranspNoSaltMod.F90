@@ -5,7 +5,7 @@ module TranspNoSaltMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: destroy
   USE MiniMathMod,   ONLY: AZMAX1, fixnegmass, flux_mass_limiter
-  use EcoSIMCtrlMod, only: PrintInfo
+  use DebugToolMod
   use SOMDataType
   use ChemTranspDataType
   use GridConsts

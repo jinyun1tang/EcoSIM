@@ -7,7 +7,7 @@ module MicBGCAPI
   use MicStateTraitTypeMod, only: micsttype
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
-  use minimathmod,          only: AZMAX1
+  use minimathmod,          only: AZMAX1,safe_adb
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
@@ -96,18 +96,18 @@ implicit none
              dOrGM  = dOrGM-OrGM_beg
              tdOrGM = tdOrGM+dOrGM
           ELSE
-            trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+            trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
             RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
-            Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
+            Micb_N2Fixation_vr(L,NY,NX)                        = 0.0_r8
           ENDIF
   !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
 
           call DownwardMixOM(I,J,L,NY,NX,FracLitrMix_vr(L,NY,NX))
 
         ELSE
-          trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)   = 0.0_r8
+          trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
           RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
-          Micb_N2Fixation_vr(L,NY,NX)                      = 0.0_r8
+          Micb_N2Fixation_vr(L,NY,NX)                        = 0.0_r8
         ENDIF
       ENDDO D998
 !
@@ -178,21 +178,22 @@ implicit none
   micfor%POROS               = POROS_vr(L,NY,NX)
   micfor%FieldCapacity       = FieldCapacity_vr(L,NY,NX)
 
-  micfor%THETW               = THETW_vr(L,NY,NX)
-  micfor%PH                  = PH_vr(L,NY,NX)
-  micfor%SoilMicPMassLayer            = VLSoilMicPMass_vr(L,NY,NX)
-  micfor%VLSoilPoreMicP               = VLSoilPoreMicP_vr(L,NY,NX)
-  micfor%TScal4Difsvity               = TScal4Difsvity_vr(L,NY,NX)
-  micfor%VLNOB                        = trcs_VLN_vr(ids_NO3B,L,NY,NX)
-  micfor%VLNO3                        = trcs_VLN_vr(ids_NO3,L,NY,NX)
-  micfor%VLNH4                        = trcs_VLN_vr(ids_NH4,L,NY,NX)
-  micfor%VLNHB                        = trcs_VLN_vr(ids_NH4B,L,NY,NX)
-  micfor%VLPO4                        = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-  micfor%VLPOB                        = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+  micfor%THETW             = THETW_vr(L,NY,NX)
+  micfor%PH                = PH_vr(L,NY,NX)
+  micfor%SoilMicPMassLayer = VLSoilMicPMass_vr(L,NY,NX)
+  micfor%VLSoilPoreMicP    = VLSoilPoreMicP_vr(L,NY,NX)
+  micfor%TScal4Difsvity    = TScal4Difsvity_vr(L,NY,NX)
+  micfor%VLNOB             = trcs_VLN_vr(ids_NO3B,L,NY,NX)
+  micfor%VLNO3             = trcs_VLN_vr(ids_NO3,L,NY,NX)
+  micfor%VLNH4             = trcs_VLN_vr(ids_NH4,L,NY,NX)
+  micfor%VLNHB             = trcs_VLN_vr(ids_NH4B,L,NY,NX)
+  micfor%VLPO4             = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+  micfor%VLPOB             = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
 
   if(micfor%litrm)then
     micfor%TKS            = FracSurfByLitR_col(NY,NX)*TKS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TKS_vr(NU(NY,NX),NY,NX)
-    micfor%PSISoilMatricP = FracSurfByLitR_col(NY,NX)*PSISoilMatricP_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+    micfor%PSISoilMatricP = FracSurfByLitR_col(NY,NX)*PSISoilMatricP_vr(0,NY,NX)+ &
+      (1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU(NY,NX),NY,NX)
   else
     micfor%TKS            = TKS_vr(L,NY,NX)
     micfor%PSISoilMatricP = PSISoilMatricP_vr(L,NY,NX)
@@ -381,7 +382,7 @@ implicit none
   RN2OChemoProd_vr(L,NY,NX)                      = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
   RN2ONitProd_vr(L,NY,NX)                        = naqfdiag%TNitReduxNO2Soil+naqfdiag%TNitReduxNO2Band
   RN2ORedux_vr(L,NY,NX)                          = naqfdiag%TReduxN2O
-  OxyDecompLimiter_vr(L,NY,NX)                   = naqfdiag%tRO2UptkHeterG/naqfdiag%tRO2DmndHeterG
+  OxyDecompLimiter_vr(L,NY,NX)                   = safe_adb(naqfdiag%tRO2UptkHeterG,naqfdiag%tRO2DmndHeterG)
   RO2DecompUptk_vr(L,NY,NX)                      = naqfdiag%tRO2UptkHeterG
   tRHydlySOM_vr(1:NumPlantChemElms,L,NY,NX)      = micflx%tRHydlySOM
   tRHydlyBioReSOM_vr(1:NumPlantChemElms,L,NY,NX) = micflx%tRHydlyBioReSOM
@@ -405,7 +406,7 @@ implicit none
   RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand
   TempSensDecomp_vr(L,NY,NX)            = nmicdiag%TSensGrowth
   MoistSensDecomp_vr(L,NY,NX)           = nmicdiag%WatStressMicb
-  Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix
+  Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix    
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo
   NetNH4Mineralize_CumYr_col(NY,NX)     = NetNH4Mineralize_CumYr_col(NY,NX)+micflx%NetNH4Mineralize

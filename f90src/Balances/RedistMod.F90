@@ -5,6 +5,7 @@ module RedistMod
   use EcoSiMParDataMod,  only : micpar
   use SurfLitterPhysMod, only : UpdateLitRPhys
   use InitSOMBGCMOD    , only :  MicrobeByLitterFall
+  use DebugToolMod
   use SoilBGCNLayMod  
   use ElmIDMod
   use EcosimConst
@@ -80,7 +81,9 @@ module RedistMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: NY,NX,L,LG
+  character(len=*), parameter :: subname='redist'
+  integer :: NY,NX,L
+  integer :: LG        !the ebullition layer id
   real(r8) :: DORGC(JZ),DVLiceMicP_vr(JZ)
   real(r8) :: TXCO2(JY,JX)
   real(r8) :: DORGE_col(JY,JX)              !change of organic C due to surface erosion
@@ -89,7 +92,7 @@ module RedistMod
   real(r8) :: dWat,dHeat
 !     execution begins here
 
-  call PrintInfo('beg redist')
+  call PrintInfo('beg '//subname)
   curday=I
   curhour=J
   VOLISO = 0.0_r8
@@ -146,7 +149,7 @@ module RedistMod
     ENDDO D9990
   ENDDO D9995
 
-  call PrintInfo('end redist')
+  call PrintInfo('end '//subname)
 
   END subroutine redist
 

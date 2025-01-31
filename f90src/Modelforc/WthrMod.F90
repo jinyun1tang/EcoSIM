@@ -5,10 +5,11 @@ module WthrMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use MiniMathMod,       only: safe_adb, vapsat0, isclose
   use MiniFuncMod,       only: get_sun_declin
-  use EcoSIMCtrlMod,     only: etimer,   frectyp
+  use EcoSIMCtrlMod,     only: etimer, frectyp
   use PlantMgmtDataType, only: NP
   use MiniMathMod,       only: AZMAX1
   use UnitMod,           only: units
+  use DebugToolMod  
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -56,6 +57,8 @@ module WthrMod
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
+
+  character(len=*), parameter :: subname='WTHR'
   integer :: ITYPE,NX,NY,N,NZ,mon
   real(r8) :: PrecAsRain_col(JY,JX)
   real(r8) :: PrecAsSnow_col(JY,JX)
@@ -65,7 +68,7 @@ module WthrMod
   real(r8) :: VPS(JY,JX)
 
   !     execution begins here
-
+  call PrintInfo('beg '//subname)
   XJ=J
   DOY=I-1+XJ/24
   !
@@ -112,7 +115,7 @@ module WthrMod
   ENDDO
 
   call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col)
-
+  call PrintInfo('end '//subname)
   END subroutine wthr
 !------------------------------------------------------------------------------------------
 

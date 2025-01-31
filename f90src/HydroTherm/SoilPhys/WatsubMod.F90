@@ -11,8 +11,8 @@ module WatsubMod
   use abortutils,     only: endrun,   print_info
   use ElmIDMod,       only: iEastWestDirection,   iNorthSouthDirection, iVerticalDirection
   use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
-  use SnowBalanceMod, only : DebugSnowPrint  
   use PerturbationMod, only : check_Soil_Warming,is_warming_layerL  
+  use DebugToolMod
   use EcoSIMCtrlMod  
   use minimathmod      
   use RootDataType

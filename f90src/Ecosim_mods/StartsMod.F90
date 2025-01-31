@@ -3,13 +3,14 @@ module StartsMod
 ! Description:
 ! code to initalize soil variables
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : isclose, AZMAX1,AZMIN1
-  use EcoSiMParDataMod, only : micpar  
-  use SnowPhysMod, only : InitSnowLayers
-  use InitSOMBGCMod, only : InitSOMConsts,InitSOMProfile,InitSOMVars
-  use InitVegBGC, only : InitIrradianceGeometry  
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,       only: padr,          print_info,     check_bool
+  use minimathMod,      only: isclose,       AZMAX1,         AZMIN1
+  use EcoSiMParDataMod, only: micpar
+  use SnowPhysMod,      only: InitSnowLayers
+  use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
+  use InitVegBGC,       only: InitIrradianceGeometry
+  use DebugToolMod
   use EcosimConst
   use TracerIDMod
   use SnowDataType

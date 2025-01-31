@@ -1,13 +1,14 @@
 module EcoSIMCtrlMod
-  use ncdio_pio, only : file_desc_t
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use ecosim_Time_Mod, only : ecosim_time_type
-  use fileUtil, only :   datestrlen, iulog
-  use abortutils, only : endrun
+  use ncdio_pio,       only: file_desc_t
+  use data_kind_mod,   only: r8 => DAT_KIND_R8
+  use ecosim_Time_Mod, only: ecosim_time_type
+  use fileUtil,        only: datestrlen, iulog
+  use abortutils,      only: endrun
 implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
    __FILE__  
+  integer :: ldebug_day  = -1 
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
   logical :: first_topou   = .false.  !only simulate first topo unit
@@ -116,11 +117,5 @@ implicit none
   endif
   end function get_sim_len  
 
-  !-----------------------------------------------------------------------
-    subroutine PrintInfo(message)
-    implicit none
-    character(len=*), intent(in) :: message
 
-    if(lverb)write(iulog,*)message
-    end subroutine PrintInfo
 end module EcoSIMCtrlMod

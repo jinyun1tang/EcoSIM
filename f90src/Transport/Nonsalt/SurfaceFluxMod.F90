@@ -1,7 +1,7 @@
 module SurfaceFluxMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: AZMAX1, AZMIN1, isclose
-  use EcoSIMCtrlMod, only: PrintInfo
+  use DebugToolMod
   use GridDataType  
   use TranspNoSaltDataMod
   use SoilBGCDataType

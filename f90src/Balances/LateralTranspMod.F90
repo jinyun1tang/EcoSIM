@@ -1,6 +1,12 @@
 module LateralTranspMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  USE abortutils, only : endrun
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  USE abortutils,       only: endrun
+  use EcoSiMParDataMod, only: micpar
+  use minimathmod,      only: AZMAX1
+  use EcoSIMConfig,     only: jcplx => jcplxc, NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx
+  use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
+  use TracerPropMod,    only: MolecularWeight
+  use ClimForcDataType, only: PBOT_col
   use GridDataType
   use TFlxTypeMod
   use TracerIDMod
@@ -17,10 +23,6 @@ module LateralTranspMod
   use FlagDataType
   USE SoilHeatDataType
   use EcoSimConst
-  use EcoSiMParDataMod, only : micpar
-  use minimathmod , only : AZMAX1
-  use EcoSIMConfig, only : jcplx => jcplxc,NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx
-  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use ErosionBalMod
   use SnowBalanceMod
   use SnowTransportMod
@@ -39,13 +41,15 @@ implicit none
 
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  integer, intent(out) :: LG
+  integer, intent(out) :: LG       !lbubble deposition layer
 
-  integer :: L,N,LX
+  integer :: L,N
+  logical :: doBubble                    !potential bubbling detection flag
   integer :: N1,N2,N3,N4,N5,N6
   integer :: N4B,N5B
+  integer :: idg
   real(r8) :: VTATM,VTGAS
-  real(r8) :: trcg_VOLG(idg_beg:idg_end)
+  real(r8) :: trcg_VOLG(idg_beg:idg_end)   !mole of gas in layer [mol gas d-2]
   
 ! begin_execution
   if(lverb)write(*,*)'XGridTranspt'
@@ -53,13 +57,13 @@ implicit none
 
   call ZeroFluxAccumulators(NY,NX)
 
-  LG=0;LX=0
+  LG=0;doBubble=.false.
 
   D8575: DO L=NU(NY,NX),NL(NY,NX)
     !
     !     IDENTIFY LAYERS FOR BUBBLE FLUX TRANSFER
     !
-    !     LG=lowest soil layer with gas phase
+    !     
     !     V*G2=molar gas content
     !     *G=soil gas content
     !     VOLP=soil air-filled porosity
@@ -68,15 +72,12 @@ implicit none
     !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
     !             :*ZN3*=NH3,*H2G*=H2
 !
-    trcg_VOLG(idg_CO2) = trcg_gasml_vr(idg_CO2,L,NY,NX)/catomw
-    trcg_VOLG(idg_CH4) = trcg_gasml_vr(idg_CH4,L,NY,NX)/catomw
-    trcg_VOLG(idg_O2)  = trcg_gasml_vr(idg_O2,L,NY,NX)/32.0_r8
-    trcg_VOLG(idg_N2)  = trcg_gasml_vr(idg_N2,L,NY,NX)/28.0_r8
-    trcg_VOLG(idg_N2O) = trcg_gasml_vr(idg_N2O,L,NY,NX)/28.0_r8
-    trcg_VOLG(idg_NH3) = trcg_gasml_vr(idg_NH3,L,NY,NX)/natomw
-    trcg_VOLG(idg_H2)  = trcg_gasml_vr(idg_H2,L,NY,NX)/2.0_r8
+    DO idg=idg_beg,idg_NH3
+      trcg_VOLG(idg_CO2) = trcg_gasml_vr(idg_CO2,L,NY,NX)/MolecularWeight(idg)
+    ENDDO
 
-    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP_vr(L,NY,NX)/TKS_vr(L,NY,NX))
+    VTATM=AZMAX1(PBOT_col(NY,NX)*VLsoiAirP_vr(L,NY,NX)/(RgasC*TKS_vr(L,NY,NX)))*1.E3_r8 !mol gas/ d2
+
 !   NH3B does not have explicit gas species, so there is an inconsistency
 !   with respect to the actual ebullition calculation, which involves
 !   NH3B
@@ -86,9 +87,13 @@ implicit none
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
     !THETX minimum air-filled porosity
-    IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)LX=1
 
-    IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. LX.EQ.0)LG=L
+    !current layer has too small air volume (aka saturated), or gas pressure is greater than atmospheric pressure
+    IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)doBubble=.true.
+
+    !current layer has enough air, and there is not bubbling layer above, so set current layer
+    !as the bubble depsoition layer 
+    IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. (.not. doBubble))LG=L
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX

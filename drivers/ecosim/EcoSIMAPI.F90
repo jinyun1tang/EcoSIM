@@ -158,7 +158,7 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,ldebug_day
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp
@@ -178,6 +178,7 @@ contains
   NPXS         = 30   !number of cycles per hour for water, heat, solute flux calcns
   NPYS         = 20   !number of cycles per NPX for gas flux calculations
   
+  ldebug_day  =-1
   NCYC_LITR             = 20
   NCYC_SNOW             = 20
   grid_mode             = 3
@@ -268,7 +269,7 @@ contains
   endif
   do_rgres=do_regression_test
   LYRG=num_of_simdays
-  lverb=lverbose
+  lverb=lverbose  
   nmicbguilds=num_microbial_guilds
   if(.not.soichem_model)then
     salt_model=.false.
@@ -317,6 +318,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   integer :: idaz
   character(len=14) :: ymdhs
   logical :: rstwr, lnyr
+  logical :: lverb0
 ! begin_execution
 !
 ! READ INPUT DATA FOR SITE, SOILS AND MANAGEMENT IN 'READS'
@@ -375,9 +377,14 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
     call set_soil_warming(iYearCurrent,NHW,NHE,NVN,NVS)
   endif
-
+  lverb0 = lverb
   DazCurrYear=etimer%get_days_cur_year()
   DO I=1,DazCurrYear    
+    if(ldebug_day==I)then
+      lverb=.true.      
+    else
+      lverb=lverb0
+    endif  
     IF(do_rgres .and. I.eq.LYRG)RETURN
     !   UPDATE DAILY VARIABLES SUCH AS MANAGEMENT INPUTS
     !
@@ -406,7 +413,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     !
     !   UPDATE HOURLY VARIABLES IN 'HOUR1'
     !   set up climate forcing for the new hour
-      if(lverb)WRITE(*,333)'WTHR'
+
       if(do_timing)call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       if(do_timing)call end_timer('WTHR',t1)
@@ -419,7 +426,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
       if(lverb)write(*,*)'hist_update'
       call hist_ecosim%hist_update(I,J,bounds)
 
-      if(lverb)write(*,*)'hist_update_hbuf'
       call hist_update_hbuf(bounds)
 
       call etimer%update_time_stamp()
@@ -432,8 +438,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
       if(rstwr)then
         call restFile(flag='write')
-      endif
-      if(lverb)write(*,*)'end?',nlend
+      endif      
       if(nlend)exit
     END DO
 
@@ -441,8 +446,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !
     if(frectyp%lskip_loop)cycle
-    if(lverb)WRITE(*,333)'EXEC'
-    CALL EXEC(I)
 
     if(do_bgcforc_write)then
       call WriteBBGCFORC(I,IYRR)

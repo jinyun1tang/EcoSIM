@@ -2134,15 +2134,15 @@ implicit none
 
   data2d_ptr =>  this%h2D_CO2_Gas_ppmv_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='CO2_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
-    long_name='Soil gaseous CO2 profile',ptr_col=data2d_ptr)      
+    long_name='Equivalent soil gaseous CO2 profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_CH4_Gas_ppmv_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='CH4_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
-    long_name='Soil gaseous CH4 profile',ptr_col=data2d_ptr)      
+    long_name='Equivalent soil gaseous CH4 profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Ar_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
-    long_name='Soil gaseous Ar profile',ptr_col=data2d_ptr)      
+    long_name='Equivalent soil gaseous Ar profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Anaerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&

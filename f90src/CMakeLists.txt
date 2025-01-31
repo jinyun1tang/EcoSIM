@@ -1,6 +1,7 @@
 add_subdirectory(Utils)
 add_subdirectory(Minimath)
 add_subdirectory(Modelconfig)
+add_subdirectory(DebugTools)
 add_subdirectory(Mesh)
 add_subdirectory(Modelpars)
 add_subdirectory(Ecosim_datatype)

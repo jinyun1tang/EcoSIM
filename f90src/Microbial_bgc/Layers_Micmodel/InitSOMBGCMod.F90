@@ -4,7 +4,7 @@ module InitSOMBGCMOD
   use SoilBGCNLayMod,   only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
   use minimathmod,      only : AZMAX1,safe_adb
   use EcoSiMParDataMod, only : micpar
-  use EcoSIMCtrlMod   , only : PrintInfo  
+  use DebugToolMod
   use MicrobialDataType
   use SOMDataType
   use GridConsts

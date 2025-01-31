@@ -1,8 +1,10 @@
 module ErosionBalMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
+  use EcoSiMParDataMod, only: micpar
   use SoilPropertyDataType
   use RootDataType
-  use EcoSiMParDataMod, only : micpar
+  use DebugToolMod
   USE EcoSIMCtrlDataType
   use EcoSIMCtrlMod
   use MicrobialDataType
@@ -12,7 +14,6 @@ module ErosionBalMod
   USE AqueChemDatatype
   use FlagDataType
   use FertilizerDataType
-  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use TFlxTypeMod
 implicit none
   private
