@@ -306,7 +306,7 @@ module GeochemAPI
 !  solflx%TR_Ca_2p_soil  =trcSalt_TR_vr(idsalt_Ca,L,NY,NX)
 !  solflx%TR_CaSO4_soil =trcSalt_TR_vr(idsalt_CaSO4,L,NY,NX)
 !  solflx%TR_CaSO4_precip_soil=trcp_RChem_soil(idsp_CaSO4,L,NY,NX)
-!  solflx%TR_CO2_geochem_soil_vr =TR_CO2_geochem_soil_vr(L,NY,NX)
+!  solflx%TProd_CO2_geochem_soil_vr =TProd_CO2_geochem_soil_vr(L,NY,NX)
 !  solflx%TR_CO3_2e_soil =trcSalt_TR_vr(idsalt_CO3,L,NY,NX)
 !  solflx%TR_Fe_3p_soil  =trcSalt_TR_vr(idsalt_Fe,L,NY,NX)
 !  solflx%TR_FeSO4_soil =trcSalt_TR_vr(idsalt_FeSO4,L,NY,NX)
@@ -387,7 +387,7 @@ module GeochemAPI
   trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)       = solflx%TR_CaHPO4_precip_band_soil
   trcp_RChem_soil(idsp_HAB,L,NY,NX)           = solflx%TR_apatite_precip_band_soil
   trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)     = solflx%TR_CaH4P2O8_precip_band_soil
-  TR_CO2_geochem_soil_vr(L,NY,NX)                 = solflx%TR_CO2_gchem_soil
+  TProd_CO2_geochem_soil_vr(L,NY,NX)          = solflx%TR_CO2_gchem_soil
   if(salt_model)then
     trcSalt_TR_vr(idsalt_Al,L,NY,NX)        = solflx%TR_Al_3p_soil
     trcSalt_TR_vr(idsalt_Fe,L,NY,NX)        = solflx%TR_Fe_3p_soil

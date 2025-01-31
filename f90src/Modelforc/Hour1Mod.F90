@@ -2349,7 +2349,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
-    TR_CO2_geochem_soil_vr(L,NY,NX)               = 0._r8
+    TProd_CO2_geochem_soil_vr(L,NY,NX)               = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8

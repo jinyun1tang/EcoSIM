@@ -792,20 +792,21 @@ module WatsubMod
             str_dir='none'       
             IF(N.EQ.iEastWestDirection)THEN
               ! along the W-E direction
-              !front
+              !eastern
               N4  = NX+1; N5  = NY
-              !back
+              !western
               N4B = NX-1; N5B = NY
               N6  = L
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 !eastern boundary  |---|->
                 IF(NX.EQ.NHE)THEN                
-                  M1              = NX
-                  M2              = NY
-                  M3              = L
-                  M4              = NX+1
-                  M5              = NY
-                  M6              = L
+                  M1 = NX
+                  M2 = NY
+                  M3 = L
+                  !target
+                  M4 = NX+1
+                  M5 = NY
+                  M6 = L
                   XN              = -1.0_r8   !going out of eastern boundary
                   RechargSurf     = RechargEastSurf(M2,M1)
                   RechargSubSurf  = RechargEastSubSurf(M2,M1)
@@ -814,16 +815,18 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 !west boundary   -|-> |
                 IF(NX.EQ.NHW)THEN
-                  M1              = NX+1
-                  M2              = NY
-                  M3              = L
-                  M4              = NX
-                  M5              = NY
-                  M6              = L
-                  XN              = 1.0_r8    !coming in from western boundary
+                  
+                  M1 = NX+1
+                  M2 = NY
+                  M3 = L
+                  !target
+                  M4 = NX
+                  M5 = NY
+                  M6 = L
+                  XN = 1.0_r8    !coming in from western boundary
                   RechargSurf     = RechargWestSurf(M5,M4)
                   RechargSubSurf  = RechargWestSubSurf(M5,M4)
                   RechargRateWTBL = RechargRateWestWTBL(M5,M4)
@@ -834,11 +837,12 @@ module WatsubMod
               ENDIF
             ELSEIF(N.EQ.iNorthSouthDirection)THEN
               ! along the N-S direction
-              !
+              !south
               N4  = NX; N5  = NY+1
+              !north
               N4B = NX; N5B = NY-1
               N6  = L
-              IF(NN.EQ.1)THEN     !-----
+              IF(NN.EQ.iOutflow)THEN     !-----
                 !south boundary     \|/
                 IF(NY.EQ.NVS)THEN !-----
                   M1              = NX
@@ -855,17 +859,18 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN  !\|/
+              ELSEIF(NN.EQ.iInflow)THEN  !\|/
                 !north boundary     ----
                 IF(NY.EQ.NVN)THEN  !----
-                  M1              = NX
-                  M2              = NY+1
-                  M3              = L
-                  M4              = NX
-                  M5              = NY
-                  M6              = L
-                  XN              = 1.0_r8   !coming in from north boundary
-                  RechargSurf     = RechargNorthSurf(M5,M4)
+                  M1 = NX
+                  M2 = NY+1
+                  M3 = L
+                  !target
+                  M4          = NX
+                  M5          = NY
+                  M6          = L
+                  XN          = 1.0_r8   !coming in from north boundary
+                  RechargSurf = RechargNorthSurf(M5,M4)
                   RechargSubSurf  = RechargNorthSubSurf(M5,M4)
                   RechargRateWTBL = RechargRateNorthWTBL(M5,M4)
                   str_dir='north'
@@ -878,7 +883,7 @@ module WatsubMod
               N4 = NX
               N5 = NY
               N6 = L+1
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 !bottom
                 IF(L.EQ.NL(NY,NX))THEN
                   M1              = NX
@@ -894,7 +899,7 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 cycle
               ENDIF
             ENDIF
@@ -927,7 +932,7 @@ module WatsubMod
         !     QS,QW,QI=cumulative hourly snow,water,ice transfer
         !     HQS=cumulative hourly convective heat transfer from snow,water,ice transfer
         !      zero out for eastern and southern
-                IF(NN.EQ.1)THEN
+                IF(NN.EQ.iOutflow)THEN
                   DrySnoFlxBySnowRedistribut(N,M5,M4)  = 0.0_r8
                   WatFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8
                   IceFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8

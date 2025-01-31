@@ -269,7 +269,7 @@ implicit none
 
     ENDIF
 
-    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
       IF(IFLBH(N,NN,N5B,N4B).EQ.1)then
 
         D8592: DO K=1,micpar%NumOfLitrCmplxs
@@ -449,7 +449,7 @@ implicit none
         ENDDO D7375
 !     ENDIF
       ENDIF
-      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
         IF(ABS(cumSedErosion(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
           tErosionSedmLoss_col(N2,N1)   = tErosionSedmLoss_col(N2,N1)-cumSedErosion(N,NN,N5B,N4B)
           TSANER(N2,N1)             = TSANER(N2,N1)-XSANER(N,NN,N5B,N4B)

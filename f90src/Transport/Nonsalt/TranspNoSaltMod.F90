@@ -403,7 +403,7 @@ module TranspNoSaltMod
 
   RBGCSinkGasMM_vr(idg_CO2,0,NY,NX) = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)*dts_gas
   RBGCSinkGasMM_vr(idg_CH4,0,NY,NX) = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)*dts_gas
-  RBGCSinkGasMM_vr(idg_N2,0,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,0,NY,NX)+Micb_N2Fixation_vr(0,NY,NX))*dts_gas
+  RBGCSinkGasMM_vr(idg_N2,0,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,0,NY,NX))*dts_gas
   RBGCSinkGasMM_vr(idg_N2O,0,NY,NX) = trcs_RMicbUptake_vr(idg_N2O,0,NY,NX)*dts_gas
   RBGCSinkGasMM_vr(idg_H2,0,NY,NX)  = trcs_RMicbUptake_vr(idg_H2,0,NY,NX)*dts_gas
   RBGCSinkGasMM_vr(idg_NH3,0,NY,NX) = 0.0_r8
@@ -641,9 +641,9 @@ module TranspNoSaltMod
 
   DO L=NU(NY,NX),NL(NY,NX)
     
-    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_CH4,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CH4,L,NY,NX) +trcs_plant_uptake_vr(idg_CH4,L,NY,NX))*dts_gas
-    RBGCSinkGasMM_vr(idg_N2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,L,NY,NX)  +trcs_plant_uptake_vr(idg_N2,L,NY,NX)+Micb_N2Fixation_vr(L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_N2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_N2,L,NY,NX)  +trcs_plant_uptake_vr(idg_N2,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_N2O,L,NY,NX) = (trcs_RMicbUptake_vr(idg_N2O,L,NY,NX) +trcs_plant_uptake_vr(idg_N2O,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_H2,L,NY,NX)  = (trcs_RMicbUptake_vr(idg_H2,L,NY,NX)  +trcs_plant_uptake_vr(idg_H2,L,NY,NX))*dts_gas
     RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TR_gas_NH3_geochem_vr(L,NY,NX)*dts_gas  !geochemical NH3 source 

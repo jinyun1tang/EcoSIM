@@ -1225,7 +1225,7 @@ contains
     DO  NN=1,2
       IF(N.EQ.iDirectionEW)THEN
         !east-west
-        IF(NX.EQ.NHE .AND. NN.EQ.1 .OR. NX.EQ.NHW .AND. NN.EQ.2)THEN
+        IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
           !at the boundary
           cycle
         ELSE
@@ -1236,7 +1236,7 @@ contains
         ENDIF
       ELSEIF(N.EQ.iDirectionNS)THEN
         !south-north
-        IF(NY.EQ.NVS .AND. NN.EQ.1 .OR. NY.EQ.NVN .AND. NN.EQ.2)THEN
+        IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
           !at the boundary
           cycle
         ELSE
@@ -1249,7 +1249,7 @@ contains
       
       ALTS1=Altitude_grid(N2,N1)+SnowDepth_col(N2,N1)
 
-      IF(NN.EQ.1)THEN
+      IF(NN.EQ.iOutflow)THEN
         !east or south        
         ALTS2=Altitude_grid(N5,N4)+SnowDepth_col(N5,N4)
         
@@ -1283,7 +1283,7 @@ contains
       ENDIF
 
       !add west and south
-      IF(NN.EQ.2)THEN
+      IF(NN.EQ.iInflow)THEN
 
       ENDIF
     ENDDO

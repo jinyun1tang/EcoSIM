@@ -734,7 +734,7 @@ implicit none
     DO  NN=1,2
       IF(N.EQ.iEastWestDirection)THEN
         !east-west
-        IF((NX.EQ.NHE .AND. NN.EQ.1) .OR. (NX.EQ.NHW .AND. NN.EQ.2))THEN
+        IF((NX.EQ.NHE .AND. NN.EQ.iOutflow) .OR. (NX.EQ.NHW .AND. NN.EQ.iInflow))THEN
           !at the eastern/western boundary 
           cycle
         ELSE
@@ -745,7 +745,7 @@ implicit none
         ENDIF
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !south-north
-        IF((NY.EQ.NVS .AND. NN.EQ.1) .OR. (NY.EQ.NVN .AND. NN.EQ.2))THEN
+        IF((NY.EQ.NVS .AND. NN.EQ.iOutflow) .OR. (NY.EQ.NVN .AND. NN.EQ.iInflow))THEN
           !at the boundary
           cycle
         ELSE
@@ -776,7 +776,7 @@ implicit none
 !
 !     EAST OR SOUTH RUNOFF
 !
-        IF(NN.EQ.1)THEN
+        IF(NN.EQ.iOutflow)THEN
           !destination grid (N5,N4) elevation
           ALT2=Altitude_grid(N5,N4)+XVLMobileWaterLitR_col(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
           IF(ALT1.GT.ALT2)THEN
@@ -804,7 +804,7 @@ implicit none
 !
 !     WEST OR NORTH RUNOFF
 !
-        IF(NN.EQ.2)THEN
+        IF(NN.EQ.iInflow)THEN
           IF(N4B.GT.0 .AND. N5B.GT.0)THEN
             !destination grid (N5B,N4B) 
             ALTB = Altitude_grid(N5B,N4B)+XVLMobileWaterLitR_col(N5B,N4B)/AREA(3,NU(N5,N4B),N5B,N4B)
@@ -845,7 +845,7 @@ implicit none
       ENDIF
       IF(M.EQ.NPH)THEN
         IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
-        IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+        IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
           IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
         ENDIF
       ENDIF

@@ -822,7 +822,7 @@ module IngridTranspMod
   DO N=1,2
     DO  NN=1,2
       IF(N.EQ.1)THEN
-        IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
+        IF(NX.EQ.NHE.AND.NN.EQ.iOutflow.OR.NX.EQ.NHW.AND.NN.EQ.iInflow)THEN
           cycle
         ELSE
           N4=NX+1
@@ -831,7 +831,7 @@ module IngridTranspMod
           N5B=NY
         ENDIF
       ELSEIF(N.EQ.2)THEN
-        IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
+        IF(NY.EQ.NVS.AND.NN.EQ.iOutflow.OR.NY.EQ.NVN.AND.NN.EQ.iInflow)THEN
           cycle
         ELSE
           N4=NX
@@ -857,7 +857,7 @@ module IngridTranspMod
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
       IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-        IF(NN.EQ.1)THEN
+        IF(NN.EQ.iOutflow)THEN
           FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
 
           DO nsalts=idsalt_beg,idsalt_end
@@ -878,7 +878,7 @@ module IngridTranspMod
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        IF(NN.EQ.2)THEN
+        IF(NN.EQ.iInflow)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
             FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             DO nsalts=idsalt_beg,idsalt_end
@@ -922,7 +922,7 @@ module IngridTranspMod
 !     VOLS=volume of snowpack from watsub.f
 !     *W2=solute content of snowpack
 !
-      IF(NN.EQ.1)THEN
+      IF(NN.EQ.iOutflow)THEN
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !

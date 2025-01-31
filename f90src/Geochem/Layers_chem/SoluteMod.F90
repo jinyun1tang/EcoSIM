@@ -128,7 +128,7 @@ module SoluteMod
 
   trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
 
-  TR_CO2_geochem_soil_vr(L,NY,NX)           = TR_CO2_geochem_soil_vr(L,NY,NX)*catomw
+  TProd_CO2_geochem_soil_vr(L,NY,NX)           = TProd_CO2_geochem_soil_vr(L,NY,NX)*catomw
   TR_gas_NH3_geochem_vr(L,NY,NX)          = TR_gas_NH3_geochem_vr(L,NY,NX)*natomw
   TR_sol_NH3_soil_vr(L,NY,NX)             = TR_sol_NH3_soil_vr(L,NY,NX)*natomw
   trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)*natomw

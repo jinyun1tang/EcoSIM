@@ -224,26 +224,26 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                                                 &
-    ZERO                  => plt_site%ZERO,                  &
-    NP                    => plt_site%NP,                    &
-    MaxNumRootLays        => plt_site%MaxNumRootLays,        &
-    VLWatMicPM_vr         => plt_site%VLWatMicPM_vr,         &
-    ALT                   => plt_site%ALT,                   &
-    NU                    => plt_site%NU,                    &
-    NP0                   => plt_site%NP0,                   &
-    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,   &
-    PopuRootMycoC_pvr     => plt_biom% PopuRootMycoC_pvr,    &
-    VLMicP_vr             => plt_soilchem%VLMicP_vr,         &
-    VLiceMicP_vr          => plt_soilchem%VLiceMicP_vr,      &
-    SoilWatAirDry_vr              => plt_soilchem%SoilWatAirDry_vr,          &
-    SoilBulkDensity_vr     => plt_soilchem%SoilBulkDensity_vr, &
-    VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr,      &
-    VLSoilMicP_vr         => plt_soilchem%VLSoilMicP_vr,     &
-    CanopyStemArea_pft    => plt_morph%CanopyStemArea_pft,   &
-    MY                    => plt_morph%MY,                   &
-    CanopyLeafArea_pft    => plt_morph%CanopyLeafArea_pft,   &
-    RadNet2Canopy_pft     => plt_rad%RadNet2Canopy_pft,      &
+  associate(                                                  &
+    ZERO                  => plt_site%ZERO,                   &
+    NP                    => plt_site%NP,                     &
+    MaxNumRootLays        => plt_site%MaxNumRootLays,         &
+    VLWatMicPM_vr         => plt_site%VLWatMicPM_vr,          &
+    ALT                   => plt_site%ALT,                    &
+    NU                    => plt_site%NU,                     &
+    NP0                   => plt_site%NP0,                    &
+    TotalSoilH2OPSIMPa_vr => plt_ew%TotalSoilH2OPSIMPa_vr,    &
+    PopuRootMycoC_pvr     => plt_biom% PopuRootMycoC_pvr,     &
+    VLMicP_vr             => plt_soilchem%VLMicP_vr,          &
+    VLiceMicP_vr          => plt_soilchem%VLiceMicP_vr,       &
+    SoilWatAirDry_vr      => plt_soilchem%SoilWatAirDry_vr,   &
+    SoilBulkDensity_vr    => plt_soilchem%SoilBulkDensity_vr, &
+    VLWatMicP_vr          => plt_soilchem%VLWatMicP_vr,       &
+    VLSoilMicP_vr         => plt_soilchem%VLSoilMicP_vr,      &
+    CanopyStemArea_pft    => plt_morph%CanopyStemArea_pft,    &
+    MY                    => plt_morph%MY,                    &
+    CanopyLeafArea_pft    => plt_morph%CanopyLeafArea_pft,    &
+    RadNet2Canopy_pft     => plt_rad%RadNet2Canopy_pft,       &
     LWRadCanopy_pft       => plt_rad%LWRadCanopy_pft          &
   )
 !
@@ -275,11 +275,11 @@ module UptakesMod
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
-        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)                     = 0.0_r8
-        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                            = 0.0_r8
-        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                             = 0.0_r8
-        plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,N,L,NZ)               = 0.0_r8
-        plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)   = 0.0_r8
+        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)                   = 0.0_r8
+        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                          = 0.0_r8
+        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
+        plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,N,L,NZ)        = 0.0_r8
+        plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)    = 0.0_r8
         plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,N,L,NZ) = 0.0_r8
       enddo
     enddo

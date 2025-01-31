@@ -53,7 +53,7 @@ implicit none
       D9975: DO NN=1,2
         IF(N.EQ.iEastWestDirection)THEN
           !east-west direction
-          IF(NN.EQ.1)THEN
+          IF(NN.EQ.iOutflow)THEN
             IF(NX.EQ.NHE)THEN
               !eastern boundary
               N4 = NX+1
@@ -63,7 +63,7 @@ implicit none
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.2)THEN
+          ELSEIF(NN.EQ.iInflow)THEN
             IF(NX.EQ.NHW)THEN
               !western boundary
               N4 = NX
@@ -76,7 +76,7 @@ implicit none
           ENDIF
         ELSEIF(N.EQ.iNorthSouthDirection)THEN
           !north-south direction
-          IF(NN.EQ.1)THEN
+          IF(NN.EQ.iOutflow)THEN
             IF(NY.EQ.NVS)THEN
               !south boundary
               N4 = NX
@@ -86,7 +86,7 @@ implicit none
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.2)THEN
+          ELSEIF(NN.EQ.iInflow)THEN
             IF(NY.EQ.NVN)THEN
               !north boundary
               N4 = NX
@@ -99,7 +99,7 @@ implicit none
           ENDIF
         ELSEIF(N.EQ.iVerticalDirection)THEN
           !vertical direction
-          IF(NN.EQ.1)THEN
+          IF(NN.EQ.iOutflow)THEN
             IF(L.EQ.NL(NY,NX))THEN
               N4 = NX
               N5 = NY
@@ -108,7 +108,7 @@ implicit none
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.2)THEN
+          ELSEIF(NN.EQ.iInflow)THEN
             cycle
           ENDIF
         ENDIF

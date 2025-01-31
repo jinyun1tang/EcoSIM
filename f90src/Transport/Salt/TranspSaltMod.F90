@@ -654,7 +654,7 @@ module TranspSaltMod
       ENDDO
 
     ENDIF
-    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
       DO nsalts=idsalt_beg,idsalt_end
         trcSalt_TQR(nsalts,N2,N1)=trcSalt_TQR(nsalts,N2,N1)-trcSalt_RQR(nsalts,N,NN,N5B,N4B)
       ENDDO
@@ -801,7 +801,7 @@ module TranspSaltMod
               N4B=NX-1
               N5B=NY
               N6=L
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 IF(NX.EQ.NHE)THEN
                   M1=NX
                   M2=NY
@@ -816,7 +816,7 @@ module TranspSaltMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 IF(NX.EQ.NHW)THEN
                   M1=NX
                   M2=NY
@@ -838,7 +838,7 @@ module TranspSaltMod
               N4B=NX
               N5B=NY-1
               N6=L
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 IF(NY.EQ.NVS)THEN
                   M1=NX
                   M2=NY
@@ -853,7 +853,7 @@ module TranspSaltMod
                 ELSE
                   CYCLE
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 IF(NY.EQ.NVN)THEN
                   M1=NX
                   M2=NY
@@ -876,7 +876,7 @@ module TranspSaltMod
               N4=NX
               N5=NY
               N6=L+1
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 IF(L.EQ.NL(NY,NX))THEN
                   M1=NX
                   M2=NY
@@ -888,7 +888,7 @@ module TranspSaltMod
                 ELSE
                   CYCLE
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 CYCLE
               ENDIF
             ENDIF
@@ -922,16 +922,16 @@ module TranspSaltMod
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                IF((NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                IF((NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
 
                   call SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                ELSEIF((NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
                   call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
                 ELSE
                   call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
@@ -940,7 +940,7 @@ module TranspSaltMod
 !
 !     BOUNDARY SNOW FLUX
 !
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 call ZeroBoundarySnowFlux(N,M5,M4)
               ENDIF
             ENDIF
@@ -965,8 +965,8 @@ module TranspSaltMod
             IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
               IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
-                IF(NN.EQ.1.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.2.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.iOutflow.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0 &
+                  .OR.NN.EQ.iInflow.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMicropore(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -992,8 +992,8 @@ module TranspSaltMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-                IF(NN.EQ.1.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.2.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.iOutflow.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
+                  .OR.NN.EQ.iInflow.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMacropore(M,N,M1,M2,M3,M4,M5,M6)
 

@@ -50,11 +50,8 @@ module RedistMod
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  real(r8), pointer :: ThetaCX(:)
+  real(r8), pointer :: ThetaCX(:)   !water concentration in litter
 
-
-
-  integer :: curday, curhour
   public :: redist, InitRedist
   contains
 
@@ -93,8 +90,7 @@ module RedistMod
 !     execution begins here
 
   call PrintInfo('beg '//subname)
-  curday=I
-  curhour=J
+
   VOLISO = 0.0_r8
   TFLWT  = 0.0_r8
   VOLPT  = 0.0_r8
@@ -185,8 +181,8 @@ module RedistMod
     +TXCO2(NY,NX)-HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX)-HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
 
 
-  RootCO2Autor_col(NY,NX)=sum(RootCO2Autor_vr(1:JZ,NY,NX))  
-  Gas_NetProd_col(idg_CO2,NY,NX)=-ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
+  RootCO2Autor_col(NY,NX)        = sum(RootCO2Autor_vr(1:JZ,NY,NX))
+  Gas_NetProd_col(idg_CO2,NY,NX) = -ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
   
   DO idg=idg_beg,idg_NH3  
     Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX) = Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX)+SurfGasEmisFlx_col(idg_Ar,NY,NX) &
@@ -333,9 +329,6 @@ module RedistMod
     endif
   enddo
 
-!  write(112,*)I+J/24.,trcO2S,trcs_solml_vr(idg_O2,0,NY,NX),trcg_DisolEvap_Atm2Litr_flx(idg_O2,NY,NX), &
-!      trcs_TransptMicP_3D(idg_O2,3,0,NY,NX),Gas_Disol_Flx_vr(idg_O2,0,NY,NX),-trcs_RMicbUptake_vr(idg_O2,0,NY,NX)
-
   trcs_solml_vr(idg_N2,0,NY,NX) = trcs_solml_vr(idg_N2,0,NY,NX)-Micb_N2Fixation_vr(0,NY,NX)
   trcs_solml_vr(idg_N2,0,NY,NX) = fixnegmass(trcs_solml_vr(idg_N2,0,NY,NX))
   rval                         = trcs_solml_vr(idg_NH3,0,NY,NX)
@@ -349,8 +342,8 @@ module RedistMod
     trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX) = trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX)*pval
     trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)     = trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)*pval
     Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)          = Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)*pval
-    TR_sol_NH3_soil_vr(0,NY,NX)                    = TR_sol_NH3_soil_vr(0,NY,NX)*pval
-    trcs_solml_vr(idg_NH3,0,NY,NX)              = 0._r8
+    TR_sol_NH3_soil_vr(0,NY,NX)                = TR_sol_NH3_soil_vr(0,NY,NX)*pval
+    trcs_solml_vr(idg_NH3,0,NY,NX)             = 0._r8
   endif
   trcs_solml_vr(idg_NH3,0,NY,NX)=fixnegmass(trcs_solml_vr(idg_NH3,0,NY,NX))
 
@@ -1083,7 +1076,7 @@ module RedistMod
     !     MICROPORE-MACROPORE EXCHANGE,
     !
     trcs_solml_vr(idg_N2,L,NY,NX)  = trcs_solml_vr(idg_N2,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX)
-    trcs_solml_vr(idg_CO2,L,NY,NX) = trcs_solml_vr(idg_CO2,L,NY,NX)+TR_CO2_geochem_soil_vr(L,NY,NX)
+    trcs_solml_vr(idg_CO2,L,NY,NX) = trcs_solml_vr(idg_CO2,L,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)
 
     do idg=idg_beg,idg_NH3-1
       dval                      = trcs_solml_vr(idg,L,NY,NX)
@@ -1176,9 +1169,9 @@ module RedistMod
         endif
       endif  
     enddo
-    ECO_HR_CO2_vr(L,NY,NX)           = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX)
+    ECO_HR_CO2_vr(L,NY,NX)           = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
     Eco_HR_CumYr_col(NY,NX)          = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)+trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
-    ECO_HR_CO2_col(NY,NX)            = ECO_HR_CO2_col(NY,NX)+ trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)
+    ECO_HR_CO2_col(NY,NX)            = ECO_HR_CO2_col(NY,NX)+ ECO_HR_CO2_vr(L,NY,NX)
     SurfGasEmisFlx_col(idg_N2,NY,NX) = SurfGasEmisFlx_col(idg_N2,NY,NX)+trcs_RMicbUptake_vr(idg_N2,L,NY,NX)
 
     !
@@ -1257,7 +1250,7 @@ module RedistMod
       ENDIF
     ENDIF
     SurfGas_CO2_lnd   = SurfGas_CO2_lnd+gasflx(idg_CO2)+gasflx(idg_CH4)
-    COB               = tRootCO2Emis2Root_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TR_CO2_geochem_soil_vr(L,NY,NX)
+    COB               = tRootCO2Emis2Root_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
     TOMOU_lnds(ielmc) = TOMOU_lnds(ielmc)+COB
 
     RootResp_CumYr_col(NY,NX)  = RootResp_CumYr_col(NY,NX)+tRootCO2Emis2Root_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_CO2,L,NY,NX)

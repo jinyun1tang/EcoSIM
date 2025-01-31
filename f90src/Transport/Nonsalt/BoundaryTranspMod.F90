@@ -52,17 +52,18 @@ module BoundaryTranspMod
           D9575: DO  NN=1,2
             IF(N.EQ.iEastWestDirection)THEN
               !WEST-EAST
-              N4  = NX+1
+              N4  = NX+1  !right boundary
               N5  = NY
-              N4B = NX-1
+              N4B = NX-1  !left boundary
               N5B = NY
               N6  = L
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN   !eastward
                 !eastern boundary
                 IF(NX.EQ.NHE)THEN
                   M1 = NX
                   M2 = NY
                   M3 = L
+                  !target grid
                   M4 = NX+1
                   M5 = NY
                   M6 = L
@@ -73,16 +74,17 @@ module BoundaryTranspMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN  !west
                 !western boundary
                 IF(NX.EQ.NHW)THEN
-                  M1=NX
-                  M2=NY
-                  M3=L
-                  M4=NX
-                  M5=NY
-                  M6=L
-                  XN=1.0     !coming in
+                  M1 = NX
+                  M2 = NY
+                  M3 = L
+                  !
+                  M4 = NX
+                  M5 = NY
+                  M6 = L
+                  XN = 1.0     !coming in
                   RCHQF  = RechargWestSurf(M5,M4)
                   RCHGFU = RechargWestSubSurf(M5,M4)
                   RCHGFT = RechargRateWestWTBL(M5,M4)
@@ -92,17 +94,18 @@ module BoundaryTranspMod
               ENDIF
             ELSEIF(N.EQ.iNorthSouthDirection)THEN
               !NORTH-SOUTH
-              N4=NX
-              N5=NY+1
-              N4B=NX
-              N5B=NY-1
-              N6=L
-              IF(NN.EQ.1)THEN
-              ! southern boundary
+              N4  = NX
+              N5  = NY+1  !south boundary
+              N4B = NX
+              N5B = NY-1  !north boundary
+              N6  = L
+              IF(NN.EQ.iOutflow)THEN  !south
+                ! southern boundary
                 IF(NY.EQ.NVS)THEN
                   M1    = NX
                   M2    = NY
                   M3    = L
+                  !target grid
                   M4    = NX
                   M5    = NY+1
                   M6    = L
@@ -113,16 +116,17 @@ module BoundaryTranspMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
-              ! northern boundary
+              ELSEIF(NN.EQ.iInflow)THEN  !north
+                ! northern boundary
                 IF(NY.EQ.NVN)THEN
-                  M1=NX
-                  M2=NY
-                  M3=L
-                  M4=NX
-                  M5=NY
-                  M6=L
-                  XN=1.0_r8   !coming in
+                  M1 = NX
+                  M2 = NY
+                  M3 = L
+                  !target
+                  M4 = NX
+                  M5 = NY
+                  M6 = L
+                  XN = 1.0_r8   !coming in
                   RCHQF  = RechargNorthSurf(M5,M4)
                   RCHGFU = RechargNorthSubSurf(M5,M4)
                   RCHGFT = RechargRateNorthWTBL(M5,M4)
@@ -130,20 +134,22 @@ module BoundaryTranspMod
                   cycle
                 ENDIF
               ENDIF
-            ELSEIF(N.EQ.iVerticalDirection)THEN
-              !vertical
-              N1=NX
-              N2=NY
-              N3=L
-              N4=NX
-              N5=NY
-              N6=L+1
-              IF(NN.EQ.1)THEN
+            ELSEIF(N.EQ.iVerticalDirection)THEN !vertical
+              !source
+              N1 = NX
+              N2 = NY
+              N3 = L
+              !target
+              N4 = NX
+              N5 = NY
+              N6 = L+1
+              IF(NN.EQ.iOutflow)THEN
                 !lower boundary
                 IF(L.EQ.NL(NY,NX))THEN
                   M1=NX
                   M2=NY
                   M3=L
+                  !target grid
                   M4=NX
                   M5=NY
                   M6=L+1
@@ -151,7 +157,7 @@ module BoundaryTranspMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 !nothing for the upper boundary
                 cycle
               ENDIF
@@ -199,8 +205,8 @@ module BoundaryTranspMod
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    IF((NN.EQ.1 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.2 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    IF((NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
@@ -235,8 +241,8 @@ module BoundaryTranspMod
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    ELSEIF((NN.EQ.2 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.1 .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    ELSEIF((NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
         DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
@@ -266,7 +272,7 @@ module BoundaryTranspMod
 !
 !     BOUNDARY SNOW FLUX
 !
-  IF(NN.EQ.1)THEN
+  IF(NN.EQ.iOutflow)THEN
     trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,N,M5,M4) = 0.0_r8
     trcn_SnowDrift_flxM_2D(ids_NH4,N,M5,M4)         = 0.0_r8
     trcn_SnowDrift_flxM_2D(ids_NO3,N,M5,M4)         = 0.0_r8
@@ -284,8 +290,8 @@ module BoundaryTranspMod
   integer :: K,idg,idn,ids,idom
   real(r8) :: VFLW
 
-  IF(NN.EQ.1 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR. NN.EQ.2 .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+  IF(NN.EQ.iOutflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR. NN.EQ.iInflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
 
     IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
@@ -322,8 +328,8 @@ module BoundaryTranspMod
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
 !
-  IF(NN.EQ.1 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR. NN.EQ.2 .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+  IF(NN.EQ.iOutflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR. NN.EQ.iInflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
     IF(VLWatMacPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM_vr(M,M3,M2,M1)))
     ELSE
@@ -401,7 +407,7 @@ module BoundaryTranspMod
 !   dt_GasCyc=1/NPT, NPT is number of gas iterations per M
   FLGM=(WaterFlow2MicPM_3D(M,N,M6,M5,M4)+WaterFlow2MacPM_3D(M,N,M6,M5,M4))*dt_GasCyc
 
-  IF(NN.EQ.1 .AND. FLGM.LT.0.0_r8 .OR. NN.EQ.2 .AND. FLGM.GT.0.0_r8)THEN
+  IF(NN.EQ.iOutflow .AND. FLGM.LT.0.0_r8 .OR. NN.EQ.iInflow .AND. FLGM.GT.0.0_r8)THEN
     IF(VLsoiAirPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM_vr(M,M3,M2,M1)))
     ELSE
@@ -465,7 +471,7 @@ module BoundaryTranspMod
       ENDDO
     ENDIF
 
-    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_SurfRunoff_flxM(idom,K,N2,N1)=DOM_SurfRunoff_flxM(idom,K,N2,N1)-DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,N5B,N4B)

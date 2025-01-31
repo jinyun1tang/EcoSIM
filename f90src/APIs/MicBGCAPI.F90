@@ -392,7 +392,7 @@ implicit none
   trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
   trcs_RMicbUptake_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
   trcs_RMicbUptake_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
-  trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb
+  trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb+micflx%MicrbN2Fix
   trcs_RMicbUptake_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
   RNut_MicbRelease_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil

@@ -208,7 +208,7 @@ module ErosionMod
       DO  NN=1,2
         IF(N.EQ.1)THEN
           !east(NN=1)-west (NN=2) direction
-          IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
+          IF(NX.EQ.NHE.AND.NN.EQ.iOutflow.OR.NX.EQ.NHW.AND.NN.EQ.iInflow)THEN
             cycle
           ELSE
             !dest in the east
@@ -218,7 +218,7 @@ module ErosionMod
           ENDIF
         ELSEIF(N.EQ.2)THEN
           !south(NN=1)-north(NN=2) direction
-          IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
+          IF(NY.EQ.NVS.AND.NN.EQ.iOutflow.OR.NY.EQ.NVN.AND.NN.EQ.iInflow)THEN
             cycle
           ELSE
             !dest in the south 
@@ -228,7 +228,7 @@ module ErosionMod
           ENDIF
         ENDIF
         IF(BaseErosionRate(N2,N1).GT.ZEROS(N2,N1))THEN
-          IF(NN.EQ.1)THEN
+          IF(NN.EQ.iOutflow)THEN
             !well-defined dest grid          
             FERM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             SedErosionM(N,2,N5,N4)=BaseErosionRate(N2,N1)*FERM
@@ -237,7 +237,7 @@ module ErosionMod
             SedErosionM(N,2,N5,N4)=0._r8
           ENDIF
 
-          IF(NN.EQ.2)THEN
+          IF(NN.EQ.iInflow)THEN
             IF(N4B.GT.0.AND.N5B.GT.0)THEN
               !well-defined dest grid
               FERM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
@@ -319,7 +319,7 @@ module ErosionMod
         N5=NY
         N4B=NX-1
         N5B=NY
-        IF(NN.EQ.1)THEN
+        IF(NN.EQ.iOutflow)THEN
           IF(NX.EQ.NHE)THEN
             M1=NX
             M2=NY
@@ -330,7 +330,7 @@ module ErosionMod
           ELSE
             cycle
           ENDIF
-        ELSEIF(NN.EQ.2)THEN
+        ELSEIF(NN.EQ.iInflow)THEN
           IF(NX.EQ.NHW)THEN
             M1=NX
             M2=NY
@@ -347,7 +347,7 @@ module ErosionMod
         N5=NY+1
         N4B=NX
         N5B=NY-1
-        IF(NN.EQ.1)THEN
+        IF(NN.EQ.iOutflow)THEN
           IF(NY.EQ.NVS)THEN
             M1=NX
             M2=NY
@@ -358,7 +358,7 @@ module ErosionMod
           ELSE
             cycle
           ENDIF
-        ELSEIF(NN.EQ.2)THEN
+        ELSEIF(NN.EQ.iInflow)THEN
           IF(NY.EQ.NVN)THEN
             M1=NX
             M2=NY
@@ -381,13 +381,13 @@ module ErosionMod
         SedErosionM(N,NN,M5,M4)=0._r8
       ELSE
         IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-          IF((NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-            .OR.(NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+          IF((NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+            .OR.(NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
             FERM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             SedErosionM(N,NN,M5,M4)=BaseErosionRate(N2,N1)*FERM
             cumSedErosion(N,NN,M5,M4)=cumSedErosion(N,NN,M5,M4)+SedErosionM(N,NN,M5,M4)
-          ELSEIF((NN.EQ.2.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-            .OR.(NN.EQ.1.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+          ELSEIF((NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+            .OR.(NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
             SedErosionM(N,NN,M5,M4)=0._r8
           ELSE
             SedErosionM(N,NN,M5,M4)=0._r8
@@ -403,7 +403,7 @@ module ErosionMod
       IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
         TERSED(N2,N1)=TERSED(N2,N1)-SedErosionM(N,NN,N5,N4)
       ENDIF
-      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
+      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
         TERSED(N2,N1)=TERSED(N2,N1)-SedErosionM(N,NN,N5B,N4B)
       ENDIF
     ENDDO D1202
@@ -427,7 +427,7 @@ module ErosionMod
         DO  N=1,2
           DO  NN=1,2
             IF(N.EQ.1)THEN
-              IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
+              IF(NX.EQ.NHE.AND.NN.EQ.iOutflow.OR.NX.EQ.NHW.AND.NN.EQ.iInflow)THEN
                 cycle
               ELSE
                 N4=NX+1
@@ -436,7 +436,7 @@ module ErosionMod
                 N5B=NY
               ENDIF
             ELSEIF(N.EQ.2)THEN
-              IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
+              IF(NY.EQ.NVS.AND.NN.EQ.iOutflow.OR.NY.EQ.NVN.AND.NN.EQ.iInflow)THEN
                 cycle
               ELSE
                 N4=NX
@@ -456,7 +456,7 @@ module ErosionMod
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
 !
-            IF(NN.EQ.1)THEN
+            IF(NN.EQ.iOutflow)THEN
               FSEDER=AMIN1(1.0,cumSedErosion(N,2,N5,N4)/SoilMicPMassLayerMX(N2,N1))
               XSANER(N,2,N5,N4)=FSEDER*SAND(NU(N2,N1),N2,N1)
               XSILER(N,2,N5,N4)=FSEDER*SILT(NU(N2,N1),N2,N1)
@@ -616,7 +616,7 @@ module ErosionMod
                 ENDDO
               ENDDO
             ENDIF
-            IF(NN.EQ.2)THEN
+            IF(NN.EQ.iInflow)THEN
               IF(N4B.GT.0.AND.N5B.GT.0)THEN
                 FSEDER=AMIN1(1.0_r8,cumSedErosion(N,1,N5B,N4B)/SoilMicPMassLayerMX(N2,N1))
                 XSANER(N,1,N5B,N4B)=FSEDER*SAND(NU(N2,N1),N2,N1)
@@ -806,7 +806,7 @@ module ErosionMod
             IF(N.EQ.1)THEN
               N4=NX+1
               N5=NY
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 IF(NX.EQ.NHE)THEN
                   M1=NX
                   M2=NY
@@ -817,7 +817,7 @@ module ErosionMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 IF(NX.EQ.NHW)THEN
                   M1=NX
                   M2=NY
@@ -832,7 +832,7 @@ module ErosionMod
             ELSEIF(N.EQ.2)THEN
               N4=NX
               N5=NY+1
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 IF(NY.EQ.NVS)THEN
                   M1=NX
                   M2=NY
@@ -843,7 +843,7 @@ module ErosionMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 IF(NY.EQ.NVN)THEN
                   M1=NX
                   M2=NY

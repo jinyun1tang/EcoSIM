@@ -1646,6 +1646,8 @@ contains
   integer :: NY,NX
   real(r8) :: VLWatLitR,VLicelitR
   real(r8) :: Heatflxlitr
+
+  
 !     begin_execution
 
   DO  NX=NHW,NHE
@@ -1666,7 +1668,7 @@ contains
           N4  = NX
           N5  = NY+1    !south
           N4B = NX
-          N5B = NY-1   !north
+          N5B = NY-1    !north
         ENDIF
 
         DO  NN=1,2        
@@ -1691,6 +1693,7 @@ contains
             cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
 
             VLWatLitR=VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff_col(N2,N1)
+            !negative value correction
             if(VLWatLitR<0._r8)then
               VLWatLitR                            = VLWatLitR-tiny_wat            
               Heatflxlitr                          = safe_adb(VLWatLitR,WatFlx2LitRByRunoff_2DH(N,NN,N5,N4))*HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
@@ -1698,15 +1701,15 @@ contains
               HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4) = HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)+Heatflxlitr
               cumWatFlx2LitRByRunoff_col(N2,N1)    = cumWatFlx2LitRByRunoff_col(N2,N1)-VLWatLitR
               cumHeatFlx2LitRByRunoff_col(N2,N1)   = cumHeatFlx2LitRByRunoff_col(N2,N1)-Heatflxlitr
-              if(NN.EQ.2)then
+              if(NN.EQ.iInflow)then
                 XGridSurfRunoff_2DH(N,2,N5,N4)       = XGridSurfRunoff_2DH(N,2,N5,N4)+VLWatLitR
                 HeatXGridBySurfRunoff_2DH(N,2,N5,N4) = HeatXGridBySurfRunoff_2DH(N,2,N5,N4)+Heatflxlitr
               endif
             endif
           ENDIF
 
-          !going out
-          IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.1)THEN
+          !inner grid
+          IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
             !there is outflow in west and north
             cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
             cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
