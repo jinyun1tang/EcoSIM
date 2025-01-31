@@ -330,6 +330,9 @@ implicit none
   real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)       !
   real(r8),pointer   :: h2D_Gas_Pressure_vr(:,:)
+  real(r8),pointer   :: h2D_CO2_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_CH4_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_Ar_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   !aerobic heterotropic fungi
   real(r8),pointer   :: h2D_faculDenitC_vr(:,:)   !facultative denitrifier
@@ -774,7 +777,10 @@ implicit none
   allocate(this%h1D_DOP_litr_col(beg_col:end_col)); this%h1D_DOP_litr_col(:)=spval
   allocate(this%h1D_acetate_litr_col(beg_col:end_col)); this%h1D_acetate_litr_col(:)=spval  
   allocate(this%h1D_VHeatCap_litr_col(beg_col:end_col)); this%h1D_VHeatCap_litr_col(:)=spval
-!  allocate(this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)); this%h2D_Gas_Pressure_vr(:,:)=spval
+  allocate(this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)); this%h2D_Gas_Pressure_vr(:,:)=spval
+  allocate(this%h2D_CO2_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_CO2_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_CH4_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_CH4_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_Ar_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactC_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
   allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
@@ -2122,9 +2128,21 @@ implicit none
   call hist_addfld2d(fname='Aerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Aerobic N2 fixer C biomass profile',ptr_col=data2d_ptr)      
 
-!  data2d_ptr =>  this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)
-!  call hist_addfld2d(fname='GAS_PRESSURE_vr',units='Pa',type2d='levsoi',avgflag='A',&
-!    long_name='Soil gas pressure profile',ptr_col=data2d_ptr)      
+  data2d_ptr =>  this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='GAS_PRESSURE_vr',units='Pa',type2d='levsoi',avgflag='A',&
+    long_name='Soil gas pressure profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CO2_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CO2_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Soil gaseous CO2 profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CH4_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CH4_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Soil gaseous CH4 profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Ar_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Soil gaseous Ar profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Anaerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
@@ -2736,8 +2754,8 @@ implicit none
       this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_aero_litr_col(ncol)   = RCH4Oxi_aero_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RFermen_litr_col(ncol)        = RFerment_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_nh3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_n2oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
+      this%h1D_NH3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_N2oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
                                +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
 
       this%h1D_RootAR_col(ncol)                = 0._r8
@@ -2758,7 +2776,11 @@ implicit none
       this%h1D_Ar_soilMass_col(ncol)           = trcg_soilMass_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       DO L=1,JZ        
-!        this%h2D_Gas_Pressure_vr(ncol,L)  = Soil_Gas_pressure_vr(L,NY,NX)
+        this%h2D_Gas_Pressure_vr(ncol,L)  = Soil_Gas_pressure_vr(L,NY,NX)
+        this%h2D_CO2_Gas_ppmv_vr(ncol,L)  = CO2_Gas_Frac_vr(L,NY,NX)
+        this%h2D_CH4_Gas_ppmv_vr(ncol,L)  = CH4_Gas_Frac_vr(L,NY,NX)
+        this%h2D_Ar_Gas_ppmv_vr(ncol,L)   = Ar_Gas_Frac_vr(L,NY,NX)
+
         DVOLL=DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
         
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

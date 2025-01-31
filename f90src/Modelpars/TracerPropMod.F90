@@ -13,6 +13,7 @@ implicit none
   public :: gas_solubility
   public :: GramPerHr2umolPerSec
   public :: GasSechenovConst
+  public :: MolecularWeight
   contains
 
 !------------------------------------------------------------------------------------------
@@ -102,4 +103,31 @@ implicit none
     call endrun("tracer not defined in "//mod_filename,__LINE__)
   end select            
   end function GasSechenovConst
+
+!------------------------------------------------------------------------------------------
+
+  function MolecularWeight(gid)result(ans)  
+
+  implicit none
+  integer, intent(in) :: gid
+
+  real(r8) :: ans
+
+  select case(gid)
+  case (idg_CO2,idg_CH4)  !C-based
+    ans = 12._r8
+  case (idg_O2)           !O2-based
+    ans = 32._r8
+  case (idg_N2, idg_N2O)  !N-based
+    ans = 28._r8
+  case  (idg_NH3)         !N-based
+    ans =14._r8
+  case (idg_H2)  
+    ans =2._r8
+  case (idg_AR)
+    ans =39.95_r8
+  case default
+    call endrun("tracer not defined in "//mod_filename,__LINE__)
+  end select            
+  end function MolecularWeight
 end module TracerPropMod

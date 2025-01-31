@@ -3,6 +3,7 @@ module InsideTranspMod
   use abortutils,    only: destroy
   use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
   use EcoSIMCtrlMod, only: PrintInfo
+  use TracerPropMod, only: MolecularWeight
   use GridConsts
   use EcoSIMSolverPar
   use TranspNoSaltDataMod
@@ -235,7 +236,7 @@ module InsideTranspMod
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VLWatMacPS,VOLWT
 
-  integer :: iFlagEbu,N,L,K,LL
+  integer :: iDisableEbu,N,L,K,LL
   integer :: N1,N2,N3  !source grid index
   integer :: N4,N5,N6  !dest grid index
 
@@ -243,7 +244,7 @@ module InsideTranspMod
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     N6,N5,N4=L,NY,NX of destination grid cell
 !
-  iFlagEbu=0
+  iDisableEbu=ifalse
   D125: DO L=1,NL(NY,NX)
     !source
     N1=NX;N2=NY;N3=L    
@@ -341,7 +342,7 @@ module InsideTranspMod
 !
 !     CHECK FOR BUBBLING IF THE SUM OF ALL GASEOUS EQUIVALENT
 !     PARTIAL CONCENTRATIONS EXCEEDS ATMOSPHERIC PRESSURE
-    if(M.NE.MX)call BubbleEffluxM(M,N1,N2,N3,NY,NX,RGasAtmDisol2SoilM,iFlagEbu)
+    if(M.NE.MX)call BubbleEffluxM(M,N1,N2,N3,NY,NX,RGasAtmDisol2SoilM,iDisableEbu)
 
   ENDDO D125
   end subroutine TracerExchXGridsMM
@@ -1261,69 +1262,58 @@ module InsideTranspMod
   end subroutine MicMacPoresSoluteDifExchange
 
 ! ----------------------------------------------------------------------
-  subroutine BubbleEffluxM(M,N1,N2,N3,NY,NX,RGasAtmDisol2SoilM,iFlagEbu)
+  subroutine BubbleEffluxM(M,N1,N2,N3,NY,NX,RGasAtmDisol2SoilM,iDisableEbu)
   implicit none
   integer, intent(in) :: M,N1,N2,N3,NY,NX
-  real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end)
-  integer, intent(inout) :: iFlagEbu
+  real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end)  !newly dissolved gas 
+  integer, intent(inout) :: iDisableEbu                        !bubbling flag
   real(r8) :: THETW1
-  real(r8) :: trcg_SLX(idg_beg:idg_end)
-  real(r8) :: trcg_VOLG(idg_beg:idg_end)
+  real(r8) :: GasMassSolubility(idg_beg:idg_end)
+  real(r8) :: trcg_VOLG(idg_beg:idg_end)   !gas concentation corresponding to each volatile [mol d-2]
   integer  :: idg
   real(r8) :: VTATM,VTGAS,DVTGAS
+  real(r8) :: FracEbu                      !fraction removed through ebullition
 !
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     VLSoilMicP=micropore volume
-!     iFlagEbu=bubbling flag:0=enabled,1=disabled
 !     S*L=solubility of gas in water from hour1.f
 !
   IF(N3.GE.NUM(N2,N1))THEN
     THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
-    IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1).AND.iFlagEbu.EQ.0)THEN
+    IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1) .AND. iDisableEbu.EQ.ifalse)THEN
 
-      trcg_SLX(idg_CO2) =catomw*GasSolbility_vr(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
-      trcg_SLX(idg_CH4) =catomw*GasSolbility_vr(idg_CH4,N3,N2,N1)
-      trcg_SLX(idg_O2)  =32.0_r8*GasSolbility_vr(idg_O2,N3,N2,N1)
-      trcg_SLX(idg_N2)  =28.0_r8*GasSolbility_vr(idg_N2,N3,N2,N1)
-      trcg_SLX(idg_N2O) =28.0_r8*GasSolbility_vr(idg_N2O,N3,N2,N1)
-      trcg_SLX(idg_NH3) =natomw*GasSolbility_vr(idg_NH3,N3,N2,N1)
-      trcg_SLX(idg_H2)  =2.0_r8*GasSolbility_vr(idg_H2,N3,N2,N1)
-      trcg_SLX(idg_AR)  =39.95_r8*GasSolbility_vr(idg_H2,N3,N2,N1)      
-      trcg_SLX(idg_NH3B)=trcg_SLX(idg_NH3)
+      do idg=idg_beg,idg_NH3
+        GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,N3,N2,N1)  !conver into carbon g /mol
+      enddo        
+      GasMassSolubility(idg_NH3B)=GasMassSolubility(idg_NH3)
 !
 !     GASEOUS EQUIVALENT PARTIAL CONCENTRATIONS
 !
-!     V*G2=molar gas concentration
-!     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-!             :*ZN3*=NH3,*H2G*=H2
-!     R*DFS=gas exchange between atmosphere and soil surface water
-!
       IF(N3.EQ.NU(N2,N1))THEN
         DO idg=idg_beg,idg_end
-          trcg_VOLG(idg)=(trcs_solml2_vr(idg,N3,N2,N1)+RGasAtmDisol2SoilM(idg))/trcg_SLX(idg)
+          trcg_VOLG(idg)=AZMAX1(trcs_solml2_vr(idg,N3,N2,N1)+RGasAtmDisol2SoilM(idg))/GasMassSolubility(idg)    !mol/d2 
         ENDDO
       ELSE
         DO idg=idg_beg,idg_end
-          trcg_VOLG(idg)=trcs_solml2_vr(idg,N3,N2,N1)/trcg_SLX(idg)
+          trcg_VOLG(idg)=AZMAX1(trcs_solml2_vr(idg,N3,N2,N1))/GasMassSolubility(idg)
         ENDDO
       ENDIF
 !
 !     GASEOUS EQUIVALENT ATMOSPHERIC CONCENTRATION
 !
 !     VTATM=molar gas concentration at atmospheric pressure
-!     VTGAS=total molar gas concentration
-!
-      VTATM=AZMAX1(1.2194E+04_r8*VLWatMicPM_vr(M,N3,N2,N1)/TKS_vr(N3,N2,N1))
-
-      VTGAS=sum(trcg_VOLG(idg_beg:idg_end))
+!     VTGAS=total molar gas concentration     
+!    
+      VTATM = AZMAX1(PBOT_col(NY,NX)*VLWatMicPM_vr(M,N3,N2,N1)/(RGasC*TKS_vr(N3,N2,N1)))*1.E3_r8  !mol gas/ d2
+      VTGAS = sum(trcg_VOLG(idg_beg:idg_end))
 !
 !     PROPORTIONAL REMOVAL OF EXCESS AQUEOUS GASES
 !
       IF(VTGAS.GT.VTATM)THEN
-        DVTGAS=0.5_r8*(VTATM-VTGAS)  !<0, bubbling occurs
+        DVTGAS=0.5_r8*(VTATM-VTGAS)         !<0, bubbling occurs
+        FracEbu=AZMIN1(DVTGAS/VTGAS)
         DO idg=idg_beg,idg_end
-          trcg_Ebu_flxM_vr(idg,N3,N2,N1)=AZMIN1(DVTGAS*trcg_VOLG(idg)/VTGAS)*trcg_SLX(idg)  
-          IF(trcg_Ebu_flxM_vr(idg,N3,N2,N1)<1.e-10_r8)trcg_Ebu_flxM_vr(idg,N3,N2,N1)=0._r8
+          trcg_Ebu_flxM_vr(idg,N3,N2,N1)=FracEbu*trcg_VOLG(idg)*GasMassSolubility(idg)  
         ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1337,7 +1327,7 @@ module InsideTranspMod
         trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
       ENDIF
     ELSE
-      iFlagEbu=1
+      iDisableEbu=itrue
       trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
     ENDIF
 

@@ -108,15 +108,18 @@ implicit none
   real(r8),target,allocatable ::  Gas_AdvDif_Flx_3D(:,:,:,:,:)       !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_Macp_Transp_flx_3D(:,:,:,:,:,:) !DOC flux macropore, [g d-2 h-1]
   real(r8),target,allocatable ::  Soil_Gas_pressure_vr(:,:,:)         !soil gas pressure, [Pa]
-  real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)
-  real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)
-  real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)
-  real(r8),target,allocatable :: RFerment_vr(:,:,:)
-  real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)
-  real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)              !denitrification N2O production
-  real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)
-  real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production
-  real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2
+  real(r8),target,allocatable ::  CO2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous CO2 [ppmv]
+  real(r8),target,allocatable ::  Ar_Gas_frac_vr(:,:,:)               !volumetric concentation of Ar gas  [ppmv]
+  real(r8),target,allocatable ::  CH4_gas_frac_vr(:,:,:)              !volumetric concentation of CH4 gas [ppmv]
+  real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)             !Hydrogenotrophic CH4 production rate [gC d-2 h-1]
+  real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)             !Acetoclastic CH4 production rate [gC d-2 h-1]
+  real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)               !Aerobic CH4 oxidation rate [gC d-2 h-1]
+  real(r8),target,allocatable :: RFerment_vr(:,:,:)                   !Fermentation rate [gC d-2 h-1]
+  real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)                    !NH3 oxidation rate [gN d-2 h-1]
+  real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)              !denitrification N2O production [gN d-2 h-1]
+  real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)               !Nitrification N2O produciton rate [gN d-2 h-1]
+  real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production [gN d-2 h-1]
+  real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2  [gN d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -160,6 +163,9 @@ implicit none
   allocate(ZNHU0_vr(0:JZ,JY,JX));  ZNHU0_vr=0._r8
   allocate(CPO4B_vr(0:JZ,JY,JX));CPO4B_vr(0:JZ,JY,JX)=0._r8
 
+  allocate(CO2_Gas_Frac_vr(1:JZ,JY,JX)) ; CO2_Gas_Frac_vr = 0._r8
+  allocate(CH4_Gas_Frac_vr(1:JZ,JY,JX)) ; CH4_Gas_Frac_vr = 0._r8  
+  allocate(Ar_Gas_Frac_vr(1:JZ,JY,JX)) ; Ar_Gas_Frac_vr = 0._r8  
   allocate(Soil_Gas_pressure_vr(1:JZ,JY,JX)); Soil_Gas_pressure_vr=0._r8  
   allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
   allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
@@ -254,7 +260,10 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
-  
+
+  call destroy(CO2_Gas_Frac_vr)
+  call destroy(CH4_Gas_Frac_vr)  
+  call destroy(Ar_Gas_Frac_vr)
   call destroy(Gas_NetProd_col)
   call destroy(Gas_WetDeposition_col)
   call destroy(Gas_Prod_TP_cumRes_col)
