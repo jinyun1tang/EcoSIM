@@ -25,6 +25,7 @@ module ATSEcoSIMAdvanceMod
   use EcoSIMCtrlDataType
   use MiniMathMod
   use ClimForcDataType
+
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
@@ -55,6 +56,7 @@ implicit none
   real(r8) :: PrecAsSnow(JY,JX)
   real(r8) :: VLTSoiPore
   real(r8) :: VPS(JY,JX)
+  real(r8) :: EMM
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
@@ -96,8 +98,12 @@ implicit none
     !convert WindSpeedAtm_col from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
-    RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
-    LWRadSky_col(NY,NX) = sunrad(NY)*0.0036_r8
+    RadSWGrnd_col(NY,NX) = 0.0
+
+    !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
+    EMM = 0.5
+    SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
+    LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     RainH(NY,NX) = p_rain(NY)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
@@ -138,8 +144,9 @@ implicit none
     ENDIF
     RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    POROS_vr(0,NY,NX) = POROS_vr(1,NY,NX)
+    POROS_vr(0,NY,NX) = 1.0
   ENDDO
+
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
@@ -150,6 +157,8 @@ implicit none
 
   !Actually I update this just in the loop above??
   !call UpdateSoilMoistureFromATS(I,J,NHW,NHE,NVN,NVS)
+
+  VHeatCapacity1_vr(0,1,1) = 0.0
 
   !perhaps doesn't neeed to run NPH times
   DO M=1,NPH

@@ -177,24 +177,6 @@ contains
 ! LitrIceFlxThaw,LitrIceHeatFlxFrez=initialize surface litter freeze,thaw,latent heat
   LitrIceFlxThaw_col(NY,NX)     = 0.0_r8
   LitrIceHeatFlxFrez_col(NY,NX) = 0.0_r8
-
-  write(*,*) "CopySurfaceVars (BEFORE) ------------------------- "
-  write(*,*) "  THETPM(1,0,NY,NX): ", THETPM(1,0,NY,NX)
-  write(*,*) "  PSISM1_vr(0,NY,NX): ", PSISM1_vr(0,NY,NX)
-  write(*,*) "  PSISoilMatricP_vr(0,NY,NX): ", PSISoilMatricP_vr(0,NY,NX)
-  write(*,*) "  TKSoil1_vr(0,NY,NX): ", TKSoil1_vr(0,NY,NX)
-  write(*,*) "  TKS_vr(0,NY,NX): ", TKS_vr(0,NY,NX)
-  write(*,*) "  VHeatCapacity1_vr(0,NY,NX): ", VHeatCapacity1_vr(0,NY,NX)
-  write(*,*) "  VLMicP_vr(0,NY,NX): ", VLMicP_vr(0,NY,NX)
-  write(*,*) "  VLWatMicP1_vr(0,NY,NX): ", VLWatMicP1_vr(0,NY,NX)
-  write(*,*) "  VLiceMicP1_vr(0,NY,NX): ", VLiceMicP1_vr(0,NY,NX)
-  write(*,*) "  VLWatMicPM_vr(1,0,NY,NX): ", VLWatMicPM_vr(1,0,NY,NX)
-  write(*,*) "  VLsoiAirPM_vr(1,0,NY,NX): ", VLsoiAirPM_vr(1,0,NY,NX)
-  write(*,*) "  XVLMobileWaterLitR_col(NY,NX): ", XVLMobileWaterLitR_col(NY,NX)
-  write(*,*) "  FracSoiPAsWat_vr(0,NY,NX): ", FracSoiPAsWat_vr(0,NY,NX)
-  write(*,*) "  FracSoiPAsIce_vr(0,NY,NX): ", FracSoiPAsIce_vr(0,NY,NX)
-  write(*,*) "  FracSoilPoreAsAir_vr(0,NY,NX): ", FracSoilPoreAsAir_vr(0,NY,NX)
-  write(*,*) "----------------------------------------  "
 !
 ! ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
 !     FOR USE AT INTERNAL TIME STEP IN SURFACE LITTER
@@ -249,23 +231,6 @@ contains
   PSISM1_vr(0,NY,NX)  = PSISoilMatricP_vr(0,NY,NX)
   TKSoil1_vr(0,NY,NX) = TKS_vr(0,NY,NX)
 
-  write(*,*) "CopySurfaceVars (AFTER) ------------------------- "
-  write(*,*) "  THETPM(1,0,NY,NX): ", THETPM(1,0,NY,NX) 
-  write(*,*) "  PSISM1_vr(0,NY,NX): ", PSISM1_vr(0,NY,NX)
-  write(*,*) "  PSISoilMatricP_vr(0,NY,NX): ", PSISoilMatricP_vr(0,NY,NX)
-  write(*,*) "  TKSoil1_vr(0,NY,NX): ", TKSoil1_vr(0,NY,NX)
-  write(*,*) "  TKS_vr(0,NY,NX): ", TKS_vr(0,NY,NX)
-  write(*,*) "  VHeatCapacity1_vr(0,NY,NX): ", VHeatCapacity1_vr(0,NY,NX)
-  write(*,*) "  VLMicP_vr(0,NY,NX): ", VLMicP_vr(0,NY,NX)
-  write(*,*) "  VLWatMicP1_vr(0,NY,NX): ", VLWatMicP1_vr(0,NY,NX)    
-  write(*,*) "  VLiceMicP1_vr(0,NY,NX): ", VLiceMicP1_vr(0,NY,NX)
-  write(*,*) "  VLWatMicPM_vr(1,0,NY,NX): ", VLWatMicPM_vr(1,0,NY,NX)   
-  write(*,*) "  VLsoiAirPM_vr(1,0,NY,NX): ", VLsoiAirPM_vr(1,0,NY,NX)
-  write(*,*) "  XVLMobileWaterLitR_col(NY,NX): ", XVLMobileWaterLitR_col(NY,NX)
-  write(*,*) "  FracSoiPAsWat_vr(0,NY,NX): ", FracSoiPAsWat_vr(0,NY,NX)
-  write(*,*) "  FracSoiPAsIce_vr(0,NY,NX): ", FracSoiPAsIce_vr(0,NY,NX) 
-  write(*,*) "  FracSoilPoreAsAir_vr(0,NY,NX): ", FracSoilPoreAsAir_vr(0,NY,NX)
-  write(*,*) "----------------------------------------  "
   end subroutine CopySurfaceVars
 
 !------------------------------------------------------------------------------------------
@@ -356,6 +321,16 @@ contains
   LWRad2Snow_col(NY,NX) = THRYX*FracSurfAsSnow_col(NY,NX)*XNPS
   LWRad2Soil_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
   LWRad2LitR_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
+
+  !write(*,*) "Radiation Props: "
+  !write(*,*) "RadSWGrnd_col(NY,NX) = ", RadSWGrnd_col(NY,NX)
+  !write(*,*) "LWRadSky_col(NY,NX) = ", LWRadSky_col(NY,NX)
+  !write(*,*) "FracSurfAsSnow_col(NY,NX) = ", FracSurfAsSnow_col(NY,NX)
+  !write(*,*) "FracSWRad2Grnd_col(NY,NX) = ", FracSWRad2Grnd_col(NY,NX)
+  !write(*,*) "LWRadCanGPrev_col(NY,NX) = ", LWRadCanGPrev_col(NY,NX)
+  !write(*,*) "FracSurfSnoFree_col(NY,NX) = ", FracSurfSnoFree_col(NY,NX)
+  !write(*,*) "FracSurfBareSoil_col(NY,NX) = ", FracSurfBareSoil_col(NY,NX)
+  !write(*,*) "FracSurfByLitR_col(NY,NX) = ", FracSurfByLitR_col(NY,NX)
 
   ! SoilEmisivity,SnowEmisivity,SurfLitREmisivity=emissivities of surface soil, snow and litter
   !stefboltz_const is stefan-boltzman constant converted into [MJ /(m^2 K^4 h)]
@@ -840,7 +815,10 @@ contains
   VLWatLitR=AMIN1(VLWatMicP1_vr(0,NY,NX)+WatFLow2LitR_col(NY,NX),VLWatMicP1_vr(0,NY,NX))
 
   write(*,*) "(SurfLitrSoilWaterExchange) VLWatLitR: ", VLWatLitR
-
+  If(VLWatLitR.LE.ZERO)then
+    write(*,*) "No litter volume, skipping..."
+    return
+  endif
   IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     !top layer is soil
     IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1655,21 +1633,6 @@ contains
     PrecNet2SoiMacP,RainPrecHeatAir2LitR)
 
   if(lverb)write(*,*)'run AtmLandSurfExchangeM'
-  write(*,*) "BEFORE landsurfexchange -----------------------"
-  !write(*,*) "PrecAsSnow_col     : ", PrecAsSnow_col
-  write(*,*) "TairK_col          : ", TairK_col
-  write(*,*) "TCA_col            : ", TCA_col
-  !write(*,*) "VPS                : ", VPS
-  write(*,*) "VPK_col            : ", VPK_col
-  write(*,*) "WindSpeedAtm_col   : ", WindSpeedAtm_col
-  write(*,*) "VPA                : ", VPA
-  write(*,*) "PSIAtFldCapacity   : ", PSIAtFldCapacity
-  write(*,*) "PSIAtWiltPoint     : ", PSIAtWiltPoint
-  write(*,*) "TKSoil1_vr         : ", TKSoil1_vr(0,1,1)
-  write(*,*) "VHeatCapacity1_vr  : ", VHeatCapacity1_vr(0,1,1)
-  write(*,*) "PSISM1_vr          : ", PSISM1_vr(0,1,1)
-  write(*,*) "VLWatMicP1_vr      : ", VLWatMicP1_vr(0,1,1)
-  write(*,*) "-----------------------------------------------"
   ! updates ResistanceLitRLay
   call AtmLandSurfExchangeM(I,J,M,NY,NX,PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR,&
     ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
