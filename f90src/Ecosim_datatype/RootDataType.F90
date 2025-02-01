@@ -66,7 +66,7 @@ module RootDataType
   real(r8),target,allocatable ::  Root2ndRadius_pvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
-  real(r8),target,allocatable ::  AllPlantRootH2OUptake_vr(:,:,:,:,:)      !root water uptake, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  AllPlantRootH2OLoss_vr(:,:,:,:,:)      !root water uptake, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                   !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                   !root turgor water potential , [Mpa]
@@ -155,7 +155,7 @@ contains
   allocate(Root2ndRadius_pvr(jroots,JZ,JP,JY,JX));Root2ndRadius_pvr=0._r8
   allocate(Root1stSpecLen_pft(jroots,JP,JY,JX)); Root1stSpecLen_pft=0._r8
   allocate(Root2ndSpecLen_pft(jroots,JP,JY,JX)); Root2ndSpecLen_pft=0._r8
-  allocate(AllPlantRootH2OUptake_vr(jroots,JZ,JP,JY,JX));AllPlantRootH2OUptake_vr=0._r8
+  allocate(AllPlantRootH2OLoss_vr(jroots,JZ,JP,JY,JX));AllPlantRootH2OLoss_vr=0._r8
   allocate(PSIRoot_pvr(jroots,JZ,JP,JY,JX));PSIRoot_pvr=0._r8
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._r8
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
@@ -241,7 +241,7 @@ contains
   call destroy(Root1stSpecLen_pft)
   call destroy(Root2ndSpecLen_pft)
   call destroy(RootNodulElms_pft)
-  call destroy(AllPlantRootH2OUptake_vr)
+  call destroy(AllPlantRootH2OLoss_vr)
   call destroy(PSIRoot_pvr)
   call destroy(PSIRootOSMO_vr)
   call destroy(PSIRootTurg_vr)

@@ -580,9 +580,9 @@ implicit none
   real(r8), pointer :: PSIRoot_pvr(:,:,:)              => null()    !root total water potential,                                      [Mpa]
   real(r8), pointer :: PSIRootOSMO_vr(:,:,:)           => null()    !root osmotic water potential,                                    [Mpa]
   real(r8), pointer :: PSIRootTurg_vr(:,:,:)           => null()    !root turgor water potential,                                     [Mpa]
-  real(r8), pointer :: AllPlantRootH2OUptake_vr(:,:,:) => null()    !root water uptake,                                               [m2 d-2 h-1]
-  real(r8), pointer :: THeatRootUptake_vr(:)           => null()    !total root heat uptake,                                        [MJ d-2]
-  real(r8), pointer :: TPlantRootH2OUptake_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
+  real(r8), pointer :: AllPlantRootH2OLoss_vr(:,:,:) => null()    !root water uptake,                                               [m2 d-2 h-1]
+  real(r8), pointer :: THeatLossRoot2Soil_vr(:)           => null()    !total root heat uptake,                                        [MJ d-2]
+  real(r8), pointer :: TPlantRootH2OLoss_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
   real(r8), pointer :: WatHeldOnCanopy_pft(:)          => null()    !canopy surface water content,                                   [m3 d-2]
   real(r8), pointer :: CanopyBiomWater_pft(:)              => null()    !canopy water content,                                           [m3 d-2]
   real(r8), pointer :: VHeatCapCanopy_pft(:)           => null()    !canopy heat capacity,                                           [MJ d-2 K-1]
@@ -1108,7 +1108,7 @@ implicit none
   allocate(this%QdewCanopy_pft(JP1)); this%QdewCanopy_pft=spval
   allocate(this%ETCanopy_CumYr_pft(JP1));this%ETCanopy_CumYr_pft=spval
   allocate(this%ElvAdjstedSoilH2OPSIMPa_vr(0:JZ1));this%ElvAdjstedSoilH2OPSIMPa_vr=spval
-  allocate(this%THeatRootUptake_vr(0:JZ1));this%THeatRootUptake_vr=spval
+  allocate(this%THeatLossRoot2Soil_vr(0:JZ1));this%THeatLossRoot2Soil_vr=spval
   allocate(this%TKCanopy_pft(JP1));this%TKCanopy_pft=spval
   allocate(this%HeatXAir2PCan_pft(JP1));this%HeatXAir2PCan_pft=spval
   allocate(this%PrecIntcptByCanopy_pft(JP1));this%PrecIntcptByCanopy_pft=spval
@@ -1123,8 +1123,8 @@ implicit none
   allocate(this%PSIRoot_pvr(jroots,JZ1,JP1));this%PSIRoot_pvr=spval
   allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1));this%PSIRootOSMO_vr=spval
   allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1));this%PSIRootTurg_vr=spval
-  allocate(this%AllPlantRootH2OUptake_vr(jroots,JZ1,JP1));this%AllPlantRootH2OUptake_vr=spval
-  allocate(this%TPlantRootH2OUptake_vr(0:JZ1));this%TPlantRootH2OUptake_vr=spval
+  allocate(this%AllPlantRootH2OLoss_vr(jroots,JZ1,JP1));this%AllPlantRootH2OLoss_vr=spval
+  allocate(this%TPlantRootH2OLoss_vr(0:JZ1));this%TPlantRootH2OLoss_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
@@ -1145,7 +1145,7 @@ implicit none
 
 !  if(allocated(ETCanopy_CumYr_pft))deallocate(ETCanopy_CumYr_pft)
 !  if(allocated(PSIST))deallocate(PSIST)
-!  if(allocated(THeatRootUptake_vr))deallocate(THeatRootUptake_vr)
+!  if(allocated(THeatLossRoot2Soil_vr))deallocate(THeatLossRoot2Soil_vr)
 !  if(allocated(TKCanopy_pft))deallocate(TKCanopy_pft)
 !  if(allocated(HeatXAir2PCan_pft))deallocate(HeatXAir2PCan_pft)
 !  if(allocated(PrecIntcptByCanopy_pft))deallocate(PrecIntcptByCanopy_pft)
@@ -1160,8 +1160,8 @@ implicit none
 !  if(allocated(PSIRoot_pvr))deallocate(PSIRoot_pvr)
 !  if(allocated(PSIRootOSMO_vr))deallocate(PSIRootOSMO_vr)
 !  if(allocated(PSIRootTurg_vr))deallocate(PSIRootTurg_vr)
-!  if(allocated(AllPlantRootH2OUptake_vr))deallocate(AllPlantRootH2OUptake_vr)
-!  if(allocated(TAllPlantRootH2OUptake_vr))deallocate(TAllPlantRootH2OUptake_vr)
+!  if(allocated(AllPlantRootH2OLoss_vr))deallocate(AllPlantRootH2OLoss_vr)
+!  if(allocated(TAllPlantRootH2OLoss_vr))deallocate(TAllPlantRootH2OLoss_vr)
 !  if(allocated(Transpiration_pft))deallocate(Transpiration_pft)
 !  if(allocated(PSICanopyOsmo_pft))deallocate(PSICanopyOsmo_pft)
 !  if(allocated(TKS))deallocate(TKS)

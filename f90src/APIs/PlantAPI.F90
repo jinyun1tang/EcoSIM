@@ -120,8 +120,8 @@ implicit none
     REcoNO3DmndSoil_vr(L,NY,NX)        = plt_bgcr%REcoNO3DmndSoil_vr(L)
     REcoNH4DmndSoil_vr(L,NY,NX)        = plt_bgcr%REcoNH4DmndSoil_vr(L)
     REcoO2DmndResp_vr(L,NY,NX)         = plt_bgcr%REcoO2DmndResp_vr(L)
-    THeatRootUptake_vr(L,NY,NX)        = plt_ew%THeatRootUptake_vr(L)
-    TPlantRootH2OUptake_vr(L,NY,NX) = plt_ew%TPlantRootH2OUptake_vr(L)
+    THeatLossRoot2Soil_vr(L,NY,NX)        = plt_ew%THeatLossRoot2Soil_vr(L)
+    TPlantRootH2OLoss_vr(L,NY,NX) = plt_ew%TPlantRootH2OLoss_vr(L)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -547,7 +547,7 @@ implicit none
         RootOUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ,NY,NX) = plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ)
         RootCUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ,NY,NX) = plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ)
         RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)              = plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)
-        AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)         = plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)
+        AllPlantRootH2OLoss_vr(N,L,NZ,NY,NX)         = plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)          = plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)
         PopuRootMycoC_pvr(N,L,NZ,NY,NX)                = AZMAX1(plt_biom%PopuRootMycoC_pvr(N,L,NZ))
         RootProteinC_pvr(N,L,NZ,NY,NX)                 = plt_biom%RootProteinC_pvr(N,L,NZ)
@@ -953,8 +953,8 @@ implicit none
     plt_bgcr%REcoNO3DmndSoil_vr(L)   = REcoNO3DmndSoil_vr(L,NY,NX)
     plt_bgcr%REcoNH4DmndSoil_vr(L)   = REcoNH4DmndSoil_vr(L,NY,NX)
     plt_bgcr%REcoO2DmndResp_vr(L)    = REcoO2DmndResp_vr(L,NY,NX)
-    plt_ew%THeatRootUptake_vr(L)     = THeatRootUptake_vr(L,NY,NX)
-    plt_ew%TPlantRootH2OUptake_vr(L) = TPlantRootH2OUptake_vr(L,NY,NX)
+    plt_ew%THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L,NY,NX)
+    plt_ew%TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L,NY,NX)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -1297,7 +1297,7 @@ implicit none
         plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)   = RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)   = RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)   = RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_ew%AllPlantRootH2OUptake_vr(N,L,NZ)  = AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
+        plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)  = AllPlantRootH2OLoss_vr(N,L,NZ,NY,NX)
         plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)   = RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)
         plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)
         plt_biom%PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ,NY,NX)

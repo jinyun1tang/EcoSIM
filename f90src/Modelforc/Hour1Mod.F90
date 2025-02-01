@@ -836,8 +836,8 @@ module Hour1Mod
   TR_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
   trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)              = 0._r8
-  TPlantRootH2OUptake_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
-  THeatRootUptake_vr(0:NL(NY,NX),NY,NX)                                       = 0._r8
+  TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
+  THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                       = 0._r8
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
   RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)                            = 0._r8

@@ -322,7 +322,7 @@ module TranspSaltMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    FLWU(L,NY,NX)=TPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
+    FLWU(L,NY,NX)=TPlantRootH2OLoss_vr(L,NY,NX)*dts_HeatWatTP
 
     DO nsalts=idsalt_beg,idsalt_KSO4
       trcSalt_Irrig_vr(nsalts,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(nsalts,I,NY,NX)

@@ -175,14 +175,15 @@ module ExtractsMod
     REcoO2DmndResp_vr        => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr    => plt_bgcr%tRootMycoExud2Soil_vr,    &
     tRO2MicrbUptk_vr         => plt_bgcr%tRO2MicrbUptk_vr,         &
-    tRootCO2Emis2Root_vr          => plt_bgcr%tRootCO2Emis2Root_vr,          &
+    tRootCO2Emis2Root_vr     => plt_bgcr%tRootCO2Emis2Root_vr,     &
     REcoH2PO4DmndBand_vr     => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
+    TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
     TKS_vr                   => plt_ew%TKS_vr,                     &
-    THeatRootUptake_vr       => plt_ew%THeatRootUptake_vr,         &
-    TPlantRootH2OUptake_vr   => plt_ew%TPlantRootH2OUptake_vr,     &
-    AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr,   &
-    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col ,   &
+    THeatLossRoot2Soil_vr       => plt_ew%THeatLossRoot2Soil_vr,         &
+    TPlantRootH2OLoss_vr   => plt_ew%TPlantRootH2OLoss_vr,     &
+    AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
+    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col,    &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
@@ -199,9 +200,9 @@ module ExtractsMod
 !
 !     totRootLenDens_vr=total root length density
 !     RootLenDensPerPlant_pvr=PFT root length density per plant
-!     AllPlantRootH2OUptake_vr=total water uptake
-!     AllPlantRootH2OUptake_vr=PFT root water uptake
-!     THeatRootUptake_vr=total convective heat in root water uptake
+!     AllPlantRootH2OLoss_vr=total water uptake
+!     AllPlantRootH2OLoss_vr=PFT root water uptake
+!     THeatLossRoot2Soil_vr=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
@@ -211,9 +212,16 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OUptake_col   = TPlantRootH2OUptake_col+AllPlantRootH2OUptake_vr(N,L,NZ)
-      TPlantRootH2OUptake_vr(L) = TPlantRootH2OUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)
-      THeatRootUptake_vr(L)     = THeatRootUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS_vr(L)
+      TPlantRootH2OUptake_col   = TPlantRootH2OUptake_col+AllPlantRootH2OLoss_vr(N,L,NZ)
+      TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
+
+      !water lose from canopy to soil
+      if(AllPlantRootH2OLoss_vr(N,L,NZ)>0._r8)then
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
+      !water lose from soil to canopy  
+      else
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKS_vr(L)
+      endif
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !
