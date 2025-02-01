@@ -85,7 +85,7 @@ implicit none
 
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
-      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
+      CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
       POROS_vr(L,NY,NX)=a_PORO(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)

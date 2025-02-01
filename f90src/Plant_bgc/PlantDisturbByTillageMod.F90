@@ -28,7 +28,7 @@ contains
     inonfoliar                  => pltpar%inonfoliar,                     &
     icwood                      => pltpar%icwood,                         &
     ifoliar                     => pltpar%ifoliar,                        &
-    CanopyWater_pft             => plt_ew%CanopyWater_pft,                &
+    CanopyBiomWater_pft             => plt_ew%CanopyBiomWater_pft,                &
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
     iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft,        &
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft,        &
@@ -229,19 +229,19 @@ contains
   ENDDO D8975
 !
 !     PSICanopy_pft=canopy water potential
-!     CanopyWater_pft=water volume in canopy
+!     CanopyBiomWater_pft=water volume in canopy
 !     QH2OLoss_lnds,H2OLoss_CumYr_col=accumulated water loss for water balance calculation
 !
-  VOLWPX=CanopyWater_pft(NZ)
+  VOLWPX=CanopyBiomWater_pft(NZ)
   WVPLT=AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
 
   FDM=get_FDM(PSICanopy_pft(NZ))
 !        APSILT=ABS(PSICanopy_pft(NZ))
 !        FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
 
-  CanopyWater_pft(NZ)=ppmc*WVPLT/FDM
-  QH2OLoss_lnds=QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
-  H2OLoss_CumYr_col=H2OLoss_CumYr_col+VOLWPX-CanopyWater_pft(NZ)
+  CanopyBiomWater_pft(NZ)=ppmc*WVPLT/FDM
+  QH2OLoss_lnds=QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
+  H2OLoss_CumYr_col=H2OLoss_CumYr_col+VOLWPX-CanopyBiomWater_pft(NZ)
 !
 !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
 !

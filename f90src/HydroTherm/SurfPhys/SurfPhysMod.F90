@@ -109,10 +109,10 @@ contains
 !     AND SOC
 !
 !     Altitude_grid,ALT=current,initial elevation of ground surface
-!     CumDepz2LayerBot_vr(NUM(NY,NX)-1),=depth of ground surface
+!     CumDepz2LayBottom_vr(NUM(NY,NX)-1),=depth of ground surface
 !     EnergyImpact4Erosion=cumulative rainfall energy impact on soil surface
 !
-      Altitude_grid(NY,NX)        = ALT(NY,NX)-CumDepz2LayerBot_vr(NUM(NY,NX)-1,NY,NX)
+      Altitude_grid(NY,NX)        = ALT(NY,NX)-CumDepz2LayBottom_vr(NUM(NY,NX)-1,NY,NX)
       EnergyImpact4Erosion(NY,NX) = EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
       call CopySnowStates(I,J,NY,NX)
@@ -1252,7 +1252,7 @@ contains
 
   !grid elevation is higher than outside the grid, and in grid water layer higher than external water table
   !depth is counting downward
-  IF(ALT1.GT.ALT2 .AND. CumDepz2LayerBot_vr(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.ExtWaterTable_col(N2,N1))THEN
+  IF(ALT1.GT.ALT2 .AND. CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.ExtWaterTable_col(N2,N1))THEN
     !grid has more water than water table, 
     !out of grid (N2,N1), WatFlux4ErosionM is computed from surface physics model
     WatFlx2LitRByRunoff_2DH(N,NN,M5,M4)   = -XN*SurfRunoffWatFluxM_2DH(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
@@ -1261,9 +1261,9 @@ contains
     HeatXGridBySurfRunoff_2DH(N,NN,M5,M4) = HeatXGridBySurfRunoff_2DH(N,NN,M5,M4)+HeatFlx2LitRByRunoff_2DH(N,NN,M5,M4)
 ! RUNON
 ! water table in higher than grid surface (accouting for minimum water )
-  ELSEIF(CumDepz2LayerBot_vr(NU(N2,N1)-1,N2,N1)-DPTHW1.GT.ExtWaterTable_col(N2,N1))THEN
+  ELSEIF(CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1)-DPTHW1.GT.ExtWaterTable_col(N2,N1))THEN
     !elevation difference
-    VX                                    = AZMIN1((ExtWaterTable_col(N2,N1)-CumDepz2LayerBot_vr(NU(N2,N1)-1,N2,N1)+DPTHW1)*AREA(3,NUM(N2,N1),N2,N1))
+    VX                                    = AZMIN1((ExtWaterTable_col(N2,N1)-CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1)+DPTHW1)*AREA(3,NUM(N2,N1),N2,N1))
     SurfRunoffWatFluxM_2DH(M,N2,N1)         = VX*dts_wat
     RunoffVelocityM(M,N2,N1)               = 0.0_r8
     WatFlx2LitRByRunoff_2DH(N,NN,M5,M4)   = -XN*SurfRunoffWatFluxM_2DH(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
@@ -1647,7 +1647,7 @@ contains
   real(r8) :: VLWatLitR,VLicelitR
   real(r8) :: Heatflxlitr
 
-  
+
 !     begin_execution
 
   DO  NX=NHW,NHE

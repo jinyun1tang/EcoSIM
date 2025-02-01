@@ -378,8 +378,8 @@ module WthrMod
       !     PRECII_col,PRECUI=surface,subsurface irrigation
       !     RRIG=irrigation from soil management file in reads.f
       !
-!      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
-!      IF(WDPTHD.LE.CumDepz2LayerBot_vr(NU(NY,NX),NY,NX))THEN
+!      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
+!      IF(WDPTHD.LE.CumDepz2LayBottom_vr(NU(NY,NX),NY,NX))THEN
         PRECII_col(NY,NX) = RRIG(J,I,NY,NX)   !surface irrigation
         PRECUI_col(NY,NX) = 0.0_r8
 !      ELSE

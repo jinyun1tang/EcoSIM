@@ -194,7 +194,7 @@ module Hour1Mod
 
       call CalGasSolubility(NY,NX)
 
-      call GetSoilHydraulicVars(NY,NX)
+      call GetSoilHydraulicVars(I,J,NY,NX)
 
 !     CALCULATE ACTIVE LAYER DEPTH
       call DiagActiveLayerDepth(NY,NX)
@@ -643,7 +643,7 @@ module Hour1Mod
   IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
@@ -660,9 +660,9 @@ module Hour1Mod
     -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
 
   VWatStoreCapSurf_col(NY,NX)=AMAX1(VLWatheldCapSurf_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
-    CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
+    CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
 
-  SoiDepthMidLay_vr(NU(NY,NX),NY,NX)=CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR_3D(3,NU(NY,NX),NY,NX)
+  SoilDepthMidLay_vr(NU(NY,NX),NY,NX)=CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR_3D(3,NU(NY,NX),NY,NX)
   IF(VLSoilMicPMass_vr(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     CCLAY_vr(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
     CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
@@ -880,13 +880,13 @@ module Hour1Mod
 
       IF(THETPZ_vr(L).LT.THETPW .OR. L.EQ.NL(NY,NX))THEN
         FoundWaterTable=.true.
-        IF(SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN   !above external water table
+        IF(SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN   !above external water table
           D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
             IF(THETPZ_vr(LL).GE.THETPW .AND. LL.NE.NL(NY,NX))THEN
               !air-filled pore greater minimum, i.e. not saturated
               FoundWaterTable=.false.
               exit
-            ELSE IF(SoiDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
+            ELSE IF(SoilDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
               !current layer is lower than external water table
               exit
             ENDIF
@@ -899,31 +899,31 @@ module Hour1Mod
             IF(THETPZ_vr(L).GE.THETPW .AND. L.NE.NL(NY,NX))THEN !saturated and inside the hydrologically active zone
               !not bottom layer, saturated
               !PSIeqv in saturated layer
-              PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L+1,NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
+              PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L+1,NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
               THETWM   = THETWP*POROS_vr(L,NY,NX)
               THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
                 *PSD_vr(L,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
 
               IF(THETWM.GT.THETW1)THEN
                 THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
-                DepzIntWTBL_col(NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*(1.0_r8-THETPX)
+                DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*(1.0_r8-THETPX)
               ELSE
-                DepzIntWTBL_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
+                DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
               ENDIF
             ELSEIF(L.GT.NU(NY,NX))THEN
               !not bottom layer, and not topsoil layer, partially saturated
-              PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-SoiDepthMidLay_vr(L-1,NY,NX))
+              PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-SoilDepthMidLay_vr(L-1,NY,NX))
               THETWM   = THETWP*POROS_vr(L-1,NY,NX)
               THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
                 *PSD_vr(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
                 THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
-                DepzIntWTBL_col(NY,NX) = CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
+                DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
               ELSE
-                DepzIntWTBL_col(NY,NX)=CumDepz2LayerBot_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)
+                DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)
               ENDIF
             ELSE
-              DepzIntWTBL_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
+              DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
             ENDIF
           ENDIF
         ENDIF
@@ -1052,9 +1052,9 @@ module Hour1Mod
 
       if(.not. goto5701)then
         IF(VLPoreTot.GT.ZEROS2(NY,NX))THEN
-          ActiveLayDepZ_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*AMIN1(1.0_r8,VLiceTot/VLPoreTot)
+          ActiveLayDepZ_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*AMIN1(1.0_r8,VLiceTot/VLPoreTot)
         ELSE
-          ActiveLayDepZ_col(NY,NX)=CumDepz2LayerBot_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
+          ActiveLayDepZ_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
         ENDIF
         FoundActiveLayer=.true.
       else
@@ -1511,8 +1511,8 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
       ENDIF
       PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
-      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
-      TotalSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
+      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
@@ -1659,11 +1659,11 @@ module Hour1Mod
 !
   IF(OFC(1)+OFC(2).GT.0._r8)THEN
     DO  L=0,JZ
-      FDPTHM=FDPTH(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+      FDPTHM=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
       IF(FDPTHM.LE.0._r8)THEN
         LFDPTH=0
         exit
-      ELSEIF(CumDepz2LayerBot_vr(L,NY,NX).GE.FDPTHM)THEN
+      ELSEIF(CumDepz2LayBottom_vr(L,NY,NX).GE.FDPTHM)THEN
         LFDPTH=L
         exit
       ENDIF
@@ -1996,13 +1996,13 @@ module Hour1Mod
 !     CVRDF=fraction of fertilizer applied to surface litter
 !
   IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0._r8)THEN
-    FDPTHF=FDPTH(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    FDPTHF=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
     IF(FDPTHF.LE.0._r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
       CVRDF=1.0_r8-EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,0,NY,NX)))
     ELSE
       D65: DO L=NUI(NY,NX),JZ
-        IF(CumDepz2LayerBot_vr(L,NY,NX).GE.FDPTHF)THEN
+        IF(CumDepz2LayBottom_vr(L,NY,NX).GE.FDPTHF)THEN
           LFDPTH=L
           CVRDF=1.0_r8
           exit
@@ -2027,7 +2027,7 @@ module Hour1Mod
           BandThicknessNH4_vr(L,NY,NX)=DLYR_3D(3,L,NY,NX)
           BandWidthNH4_vr(L,NY,NX)=0._r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          BandThicknessNH4_vr(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CumDepz2LayerBot_vr(L-1,NY,NX))
+          BandThicknessNH4_vr(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
           BandWidthNH4_vr(L,NY,NX)=AMIN1(0.025_r8,ROWN(NY,NX))
         ELSE
           BandThicknessNH4_vr(L,NY,NX)=0._r8
@@ -2052,7 +2052,7 @@ module Hour1Mod
         trcx_solml_vr(idx_NH4,L,NY,NX)  = XN4T*trcs_VLN_vr(ids_NH4,L,NY,NX)
         trcx_solml_vr(idx_NH4B,L,NY,NX) = XN4T*trcs_VLN_vr(ids_NH4B,L,NY,NX)
       ENDDO D50
-      BandDepthNH4_col(NY,NX)=BandThicknessNH4_vr(LFDPTH,NY,NX)+CumDepz2LayerBot_vr(LFDPTH-1,NY,NX)
+      BandDepthNH4_col(NY,NX)=BandThicknessNH4_vr(LFDPTH,NY,NX)+CumDepz2LayBottom_vr(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     RESET WIDTH AND DEPTH OF NO3 FERTILIZER BAND IF NEW BAND
@@ -2071,7 +2071,7 @@ module Hour1Mod
           BandThicknessNO3_vr(L,NY,NX)=DLYR_3D(3,L,NY,NX)
           BandWidthNO3_vr(L,NY,NX)=0._r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          BandThicknessNO3_vr(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CumDepz2LayerBot_vr(L-1,NY,NX))
+          BandThicknessNO3_vr(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
           BandWidthNO3_vr(L,NY,NX)=AMIN1(0.01_r8,ROWO(NY,NX))
         ELSE
           BandThicknessNO3_vr(L,NY,NX)=0._r8
@@ -2095,7 +2095,7 @@ module Hour1Mod
         trcs_solml_vr(ids_NO3B,L,NY,NX)=ZNO3T*trcs_VLN_vr(ids_NO3B,L,NY,NX)
         trcs_solml_vr(ids_NO2B,L,NY,NX)=ZNO2T*trcs_VLN_vr(ids_NO2B,L,NY,NX)
       ENDDO D45
-      BandDepthNO3_col(NY,NX)=BandThicknessNO3_vr(LFDPTH,NY,NX)+CumDepz2LayerBot_vr(LFDPTH-1,NY,NX)
+      BandDepthNO3_col(NY,NX)=BandThicknessNO3_vr(LFDPTH,NY,NX)+CumDepz2LayBottom_vr(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     RESET WIDTH AND DEPTH OF PO4 FERTILIZER BAND IF NEW BAND
@@ -2113,7 +2113,7 @@ module Hour1Mod
           BandThicknessPO4_vr(L,NY,NX) = DLYR_3D(3,L,NY,NX)
           BandWidthPO4_vr(L,NY,NX)     = AMIN1(0.01,ROWP(NY,NX))
         ELSEIF(L.EQ.LFDPTH)THEN
-          BandThicknessPO4_vr(L,NY,NX) = AMAX1(0.01,FDPTHF-CumDepz2LayerBot_vr(L-1,NY,NX))
+          BandThicknessPO4_vr(L,NY,NX) = AMAX1(0.01,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
           BandWidthPO4_vr(L,NY,NX)     = AMIN1(0.01,ROWP(NY,NX))
         ELSE
           BandThicknessPO4_vr(L,NY,NX) = 0._r8
@@ -2198,7 +2198,7 @@ module Hour1Mod
         endif
 
       ENDDO
-      BandDepthPO4_col(NY,NX)=BandThicknessPO4_vr(LFDPTH,NY,NX)+CumDepz2LayerBot_vr(LFDPTH-1,NY,NX)
+      BandDepthPO4_col(NY,NX)=BandThicknessPO4_vr(LFDPTH,NY,NX)+CumDepz2LayBottom_vr(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     UPDATE STATE VARIABLES FOR BROADCAST AND BANDED FERTILIZER

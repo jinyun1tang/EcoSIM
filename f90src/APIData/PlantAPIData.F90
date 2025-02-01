@@ -217,7 +217,7 @@ implicit none
   real(r8), pointer :: HypoctoHeight_pft(:)        => null() !cotyledon height, [m]
   integer,  pointer :: iPlantNfixType_pft(:)        => null() !N2 fixation type
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
-  real(r8), pointer :: CanPHeight4WatUptake(:)        => null() !canopy height, [m]
+  real(r8), pointer :: CanopyHeight4WatUptake_pft(:)        => null() !canopy height, [m]
   real(r8), pointer :: CanopyHeightZ_col(:)  => null() !canopy layer height , [m]
   real(r8), pointer :: CanopyStemArea_pft(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_pft(:)        => null() !plant canopy leaf area, [m2 d-2]
@@ -523,6 +523,7 @@ implicit none
   real(r8), pointer :: RootBiomCPerPlant_pft(:) => null()   !root C per plant,       [g p-1]
   real(r8), pointer :: GrainStrutElms_pft(:,:)  => null()   !canopy grain element,   [g d-2]
   real(r8), pointer :: EarStrutElms_pft(:,:)    => null()   !canopy ear element,     [g d-2]
+  real(r8), pointer :: CanopyMassC_pft(:)       => null()   !Canopy biomass [gC d-2]
   contains
     procedure, public :: Init => plt_biom_init
     procedure, public :: Destroy => plt_biom_destroy
@@ -583,9 +584,9 @@ implicit none
   real(r8), pointer :: THeatRootUptake_vr(:)           => null()    !total root heat uptake,                                        [MJ d-2]
   real(r8), pointer :: TPlantRootH2OUptake_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
   real(r8), pointer :: WatHeldOnCanopy_pft(:)          => null()    !canopy surface water content,                                   [m3 d-2]
-  real(r8), pointer :: CanopyWater_pft(:)              => null()    !canopy water content,                                           [m3 d-2]
+  real(r8), pointer :: CanopyBiomWater_pft(:)              => null()    !canopy water content,                                           [m3 d-2]
   real(r8), pointer :: VHeatCapCanopy_pft(:)           => null()    !canopy heat capacity,                                           [MJ d-2 K-1]
-  real(r8), pointer :: TotalSoilH2OPSIMPa_vr(:)        => null()    !soil micropore total water potential [MPa]
+  real(r8), pointer :: ElvAdjstedSoilH2OPSIMPa_vr(:)        => null()    !soil micropore total water potential [MPa]
   real(r8), pointer :: ETCanopy_CumYr_pft(:)           => null()    !total transpiration,                                            [m H2O d-2]
   real(r8), pointer :: QdewCanopy_pft(:)               => null()    !dew fall on to canopy, [m3 H2O d-2 h-1]
   
@@ -1106,7 +1107,7 @@ implicit none
 
   allocate(this%QdewCanopy_pft(JP1)); this%QdewCanopy_pft=spval
   allocate(this%ETCanopy_CumYr_pft(JP1));this%ETCanopy_CumYr_pft=spval
-  allocate(this%TotalSoilH2OPSIMPa_vr(0:JZ1));this%TotalSoilH2OPSIMPa_vr=spval
+  allocate(this%ElvAdjstedSoilH2OPSIMPa_vr(0:JZ1));this%ElvAdjstedSoilH2OPSIMPa_vr=spval
   allocate(this%THeatRootUptake_vr(0:JZ1));this%THeatRootUptake_vr=spval
   allocate(this%TKCanopy_pft(JP1));this%TKCanopy_pft=spval
   allocate(this%HeatXAir2PCan_pft(JP1));this%HeatXAir2PCan_pft=spval
@@ -1118,7 +1119,7 @@ implicit none
   allocate(this%EvapTransLHeat_pft(JP1));this%EvapTransLHeat_pft=spval
   allocate(this%WatHeldOnCanopy_pft(JP1));this%WatHeldOnCanopy_pft=spval
   allocate(this%VHeatCapCanopy_pft(JP1));this%VHeatCapCanopy_pft=spval
-  allocate(this%CanopyWater_pft(JP1));this%CanopyWater_pft=spval
+  allocate(this%CanopyBiomWater_pft(JP1));this%CanopyBiomWater_pft=spval
   allocate(this%PSIRoot_pvr(jroots,JZ1,JP1));this%PSIRoot_pvr=spval
   allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1));this%PSIRootOSMO_vr=spval
   allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1));this%PSIRootTurg_vr=spval
@@ -1155,7 +1156,7 @@ implicit none
 !  if(allocated(EvapTransLHeat_pft))deallocate(EvapTransLHeat_pft)
 !  if(allocated(WatHeldOnCanopy_pft))deallocate(WatHeldOnCanopy_pft)
 !  if(allocated(VHeatCapCanopy_pft))deallocate(VHeatCapCanopy_pft)
-!  if(allocated(CanopyWater_pft))deallocate(CanopyWater_pft)
+!  if(allocated(CanopyBiomWater_pft))deallocate(CanopyBiomWater_pft)
 !  if(allocated(PSIRoot_pvr))deallocate(PSIRoot_pvr)
 !  if(allocated(PSIRootOSMO_vr))deallocate(PSIRootOSMO_vr)
 !  if(allocated(PSIRootTurg_vr))deallocate(PSIRootTurg_vr)
@@ -1337,6 +1338,7 @@ implicit none
   allocate(this%GrainStrutElms_pft(NumPlantChemElms,JP1));this%GrainStrutElms_pft=spval
   allocate(this%HuskStrutElms_pft(NumPlantChemElms,JP1));this%HuskStrutElms_pft=spval
   allocate(this%EarStrutElms_pft(NumPlantChemElms,JP1));this%EarStrutElms_pft=spval
+  allocate(this%CanopyMassC_pft(JP1)); this%CanopyMassC_pft=0._r8
   allocate(this%NodulStrutElms_pft(NumPlantChemElms,JP1));this%NodulStrutElms_pft=spval
   allocate(this%LeafChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafChemElmRemob_brch=spval
   allocate(this%PetioleChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemob_brch=spval
@@ -1842,7 +1844,7 @@ implicit none
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,NumOfCanopyLayers1,JP1));this%Root2ndXNum_rpvr=spval
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%MY(JP1));this%MY=0
-  allocate(this%CanPHeight4WatUptake(JP1));this%CanPHeight4WatUptake=spval
+  allocate(this%CanopyHeight4WatUptake_pft(JP1));this%CanopyHeight4WatUptake_pft=spval
   allocate(this%KLeafNumber_brch(MaxNumBranches,JP1));this%KLeafNumber_brch=0
   allocate(this%NumOfLeaves_brch(MaxNumBranches,JP1));this%NumOfLeaves_brch=spval
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;

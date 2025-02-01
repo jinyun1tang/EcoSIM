@@ -951,17 +951,17 @@ implicit none
 
   if(flag=='read')then    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanopyWater_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyBiomWater_pft', dim1name='pft',&
      long_name='plant canopy water content in dry matter', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyWater_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyBiomWater_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'CanopyWater_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyWater_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'CanopyBiomWater_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyBiomWater_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanopyWater_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyBiomWater_pft', dim1name='pft',&
      long_name='canopy water content in dry matter', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
   endif  
@@ -1067,6 +1067,22 @@ implicit none
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='CanopyLeafArea_pft', dim1name='pft',&
      long_name='plant leaf area', units='m2 d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
+  endif
+
+  if(flag=='read')then
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='CanopyMassC_pft', dim1name='pft',&
+     long_name='plant canopy biomass, leaf+petiole+stalk mass', units='gC d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyMassC_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyMassC_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+      IsPlantActive_pft=IsPlantActive_pft)    
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='CanopyMassC_pft', dim1name='pft',&
+     long_name='plant canopy biomass, leaf+petiole+stalk mass', units='gC d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
   endif
 
@@ -6086,16 +6102,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='CumDepz2LayerBot_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumDepz2LayBottom_vr', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CumDepz2LayerBot_vr,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumDepz2LayBottom_vr,datrc_2d) 
   else
-    !print*,'CumDepz2LayerBot_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumDepz2LayerBot_vr,datrc_2d)   
+    !print*,'CumDepz2LayBottom_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumDepz2LayBottom_vr,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CumDepz2LayerBot_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumDepz2LayBottom_vr', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    

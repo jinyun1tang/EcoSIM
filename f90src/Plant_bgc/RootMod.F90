@@ -1938,7 +1938,7 @@ implicit none
     RootCO2EmisPot_pvr     => plt_rbgc%RootCO2EmisPot_pvr,     &
     RootRespPotent_pvr     => plt_rbgc%RootRespPotent_pvr,     &
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr,       &
-    CanPHeight4WatUptake   => plt_morph%CanPHeight4WatUptake,  &
+    CanopyHeight4WatUptake_pft   => plt_morph%CanopyHeight4WatUptake_pft,  &
     MY                     => plt_morph%MY,                    &
     Root1stRadius_pvr      => plt_morph%Root1stRadius_pvr,     &
     Root1stDepz_pft        => plt_morph%Root1stDepz_pft,       &
@@ -2042,7 +2042,7 @@ implicit none
 !     RTDP1=primary root depth from soil surface
 !     RTDPP=primary root depth from canopy
 !     CumSoilThickness_vr=depth from soil surface to layer bottom
-!     CanPHeight4WatUptake=canopy height for water uptake
+!     CanopyHeight4WatUptake_pft=canopy height for water uptake
 !     RTSK=relative primary root sink strength
 !     Root1stSink_pvr=primary root sink strength
 !     RootPrimeAxsNum=number of primary root axes
@@ -2052,7 +2052,7 @@ implicit none
           IF(N.EQ.ipltroot)THEN
             IF(Root1stDepz_pft(N,NR,NZ).GT.CumSoilThickness_vr(L-1))THEN
               IF(Root1stDepz_pft(N,NR,NZ).LE.CumSoilThickness_vr(L))THEN
-                RTDPP                   = Root1stDepz_pft(N,NR,NZ)+CanPHeight4WatUptake(NZ)
+                RTDPP                   = Root1stDepz_pft(N,NR,NZ)+CanopyHeight4WatUptake_pft(NZ)
                 Root1stSink_pvr(N,L,NR) = RTSK(iPlantRootProfile_pft(NZ))&
                   *RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPP
                 RootSinkC(N)      = RootSinkC(N)+Root1stSink_pvr(N,L,NR)
@@ -2071,7 +2071,7 @@ implicit none
 !     DLYR=layer thickness
 !     SeedDepth_pft=seeding depth
 !     HypoctoHeight_pft=hypocotyledon height
-!     CanPHeight4WatUptake=canopy height for water uptake
+!     CanopyHeight4WatUptake_pft=canopy height for water uptake
 !     RTDPS=secondary root depth from canopy
 !     RTSKP,RTSKS=primary,secondary root sink strength
 !     RTN2=number of secondary root axes
@@ -2082,7 +2082,7 @@ implicit none
             Root1stLocDepz_vr(NR,L) = AZMAX1(Root1stDepz_pft(ipltroot,NR,NZ)-CumSoilThickness_vr(L-1)-RTDPX)
             Root1stLocDepz_vr(NR,L) = AZMAX1(AMIN1(DLYR3(L),Root1stLocDepz_vr(NR,L)) &
               -AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
-            RTDPS=AMAX1(SeedDepth_pft(NZ),CumSoilThickness_vr(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L)+CanPHeight4WatUptake(NZ)
+            RTDPS=AMAX1(SeedDepth_pft(NZ),CumSoilThickness_vr(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L)+CanopyHeight4WatUptake_pft(NZ)
 
             IF(RTDPS.GT.ZERO)THEN
               RTSKP = RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPS

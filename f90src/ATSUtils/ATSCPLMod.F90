@@ -46,7 +46,7 @@ contains
   
   call c_f_pointer(props%depth%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])
-  a_CumDepz2LayerBot_vr=data2D(:,:)
+  a_CumDepz2LayBottom_vr=data2D(:,:)
 
   call c_f_pointer(props%dz%data, cptr_temp)
   call c_f_pointer(cptr_temp,data2D,[(/size_col/),(/num_cols/)])

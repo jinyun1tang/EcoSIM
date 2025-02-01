@@ -685,8 +685,8 @@ module StartqMod
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
   FDM                          = get_FDM(PSICanopy_pft(NZ,NY,NX))
-  CanopyWater_pft(NZ,NY,NX)    = ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
-  VHeatCapCanopy_pft(NZ,NY,NX) = cpw*(ShootStrutElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyWater_pft(NZ,NY,NX))
+  CanopyBiomWater_pft(NZ,NY,NX)    = ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
+  VHeatCapCanopy_pft(NZ,NY,NX) = cpw*(ShootStrutElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyBiomWater_pft(NZ,NY,NX))
 
   ENGYX_pft(NZ,NY,NX)             = 0._r8
   DeltaTKC_pft(NZ,NY,NX)          = 0._r8
@@ -828,7 +828,7 @@ module StartqMod
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
 !     LeafPetolBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
+!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)

@@ -237,7 +237,7 @@ module RedistMod
 !     SolarNoonHour_col=hour of solar noon from weather file
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
-!     CumDepz2LayerBot_vr(NU=soil surface elevation
+!     CumDepz2LayBottom_vr(NU=soil surface elevation
 !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table from readi.f
 !     ExtWaterTable,ExtWaterTablet0_col=current,initial natural water table depth
 !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
@@ -250,15 +250,15 @@ module RedistMod
   if(lverb)write(*,*)'ModifyExWTBLByDisturbance'
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
     ! drainage is on
-    DCORPW                   = DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    DCORPW                   = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
     NatWtblDepz_col(NY,NX)   = DCORPW
     ExtWaterTablet0_col(NY,NX)   = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
-    ExtWaterTable_col(NY,NX) = ExtWaterTablet0_col(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX) = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.24)THEN
     ! drainage in on
-    DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
 
     IF(IDWaterTable_col(NY,NX).EQ.1)THEN  !stationary
       IDWaterTable_col(NY,NX)=3
@@ -278,9 +278,9 @@ module RedistMod
 !
   IF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
 
-    ExtWaterTable_col(NY,NX) = ExtWaterTablet0_col(NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX) = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
     ExtWaterTable_col(NY,NX) = ExtWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTablet0_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+      -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTablet0_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
 
   ENDIF
   !update mobile tile water table depth due to drainage

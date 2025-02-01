@@ -119,7 +119,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
+      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -180,7 +180,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TKSD(NY,NX)             = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
 !
     ENDDO
@@ -918,12 +918,12 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
 !     layer thickness:=bottom depth-upper depth
-      DLYRI_3D(3,L,NY,NX)=(CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(L-1,NY,NX))
+      DLYRI_3D(3,L,NY,NX)=(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX))
       call check_bool(DLYRI_3D(3,L,NY,NX)<0._r8,'negative soil layer thickness',__LINE__,mod_filename)
 
       DLYR_3D(3,L,NY,NX)           = DLYRI_3D(3,L,NY,NX)
-      SoiDepthMidLay_vr(L,NY,NX)   = 0.5_r8*(CumDepz2LayerBot_vr(L,NY,NX)+CumDepz2LayerBot_vr(L-1,NY,NX))
-      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)+DLYR_3D(3,NU(NY,NX),NY,NX)
+      SoilDepthMidLay_vr(L,NY,NX)  = 0.5_r8*(CumDepz2LayBottom_vr(L,NY,NX)+CumDepz2LayBottom_vr(L-1,NY,NX))
+      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)+DLYR_3D(3,NU(NY,NX),NY,NX)
       DPTHZ_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AREA(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
@@ -939,8 +939,8 @@ module StartsMod
     AREA(1,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
     AREA(2,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
   ENDDO
-  CumDepz2LayerBot_vr(0,NY,NX)  = CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
-  CumLitRDepz_col(NY,NX)        = CumDepz2LayerBot_vr(0,NY,NX)
+  CumDepz2LayBottom_vr(0,NY,NX)  = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
+  CumLitRDepz_col(NY,NX)        = CumDepz2LayBottom_vr(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR_3D(1,NL(NY,NX),NY,NX)*DLYR_3D(2,NL(NY,NX),NY,NX)
   call PrintInfo('end InitLayerDepths')
   end associate
@@ -1033,7 +1033,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayerBot_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
+      LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -1096,7 +1096,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)                = ATCS(NY,NX)
       TKS_vr(0,NY,NX)             = ATKS(NY,NX)
       TKSD(NY,NX)                 = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG

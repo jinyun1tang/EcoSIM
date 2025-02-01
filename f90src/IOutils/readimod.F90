@@ -420,7 +420,7 @@ module readiMod
     NLI(NV1,NH1)=NM(NV1,NH1)+NL2
     NL(NV1,NH1)=NLI(NV1,NH1)
 
-    call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayerBot_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayBottom_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity_vr(1:JZ,NV1,NH1))
@@ -536,7 +536,7 @@ module readiMod
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
-            CumDepz2LayerBot_vr(L,NY,NX) = CumDepz2LayerBot_vr(L,NV1,NH1)
+            CumDepz2LayBottom_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NV1,NH1)
             SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L,NV1,NH1)
             FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L,NV1,NH1)
             WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L,NV1,NH1)
@@ -622,9 +622,9 @@ module readiMod
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
             IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
-              CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L+1,NY,NX)-0.01_r8
+              CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.01_r8
             ELSE
-              CumDepz2LayerBot_vr(L,NY,NX)=CumDepz2LayerBot_vr(L+1,NY,NX)-0.02_r8
+              CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
               SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L+1,NY,NX)
@@ -824,7 +824,7 @@ module readiMod
   write(*,'(A,I2,A,I2)')'read data for layers from layer NU ',NU,' to layer NM ',NM
 
   write(*,*)'Depth to bottom of soil layer (m): CDPTH'
-  write(*,*)(CumDepz2LayerBot_vr(L,NY,NX),L=NU,NM)
+  write(*,*)(CumDepz2LayBottom_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0_vr'
   write(*,*)(SoiBulkDensityt0_vr(L,NY,NX),L=NU,NM)
 !

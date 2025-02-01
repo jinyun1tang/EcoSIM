@@ -863,7 +863,7 @@ module InitPlantMod
     TCelciusCanopy_pft    => plt_ew%TCelciusCanopy_pft,     &
     TKGroth_pft           => plt_pheno%TKGroth_pft,         &
     TCGroth_pft           => plt_pheno%TCGroth_pft,         &
-    CanopyWater_pft       => plt_ew%CanopyWater_pft,        &
+    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,        &
     QCanopyWat2Dist_col   => plt_ew%QCanopyWat2Dist_col,    &
     fTCanopyGroth_pft     => plt_pheno%fTCanopyGroth_pft,   &
     CanopyLeafShethC_pft  => plt_biom%CanopyLeafShethC_pft, &
@@ -892,9 +892,9 @@ module InitPlantMod
   Transpiration_pft(NZ)     = 0._r8
   FracPARads2Canopy_pft(NZ) = 0._r8
   FDM                       = get_FDM(PSICanopy_pft(NZ))
-  CanopyWater_pft(NZ)       = ppmc*CanopyLeafShethC_pft(NZ)/FDM
-  VHeatCapCanopy_pft(NZ)    = cpw*(ShootStrutElms_pft(ielmc,NZ)*SpecStalkVolume+CanopyWater_pft(NZ))
-  QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyWater_pft(NZ)
+  CanopyBiomWater_pft(NZ)       = ppmc*CanopyLeafShethC_pft(NZ)/FDM
+  VHeatCapCanopy_pft(NZ)    = cpw*(ShootStrutElms_pft(ielmc,NZ)*SpecStalkVolume+CanopyBiomWater_pft(NZ))
+  QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyBiomWater_pft(NZ)
   HeatCanopy2Dist_col       = HeatCanopy2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
 
   end associate
@@ -1061,7 +1061,7 @@ module InitPlantMod
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
 !     LeafPetolBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
+!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)

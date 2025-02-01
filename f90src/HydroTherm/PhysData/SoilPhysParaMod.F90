@@ -107,7 +107,7 @@ implicit none
   )
 
   DO L=NM+1,JZ
-    CumDepz2LayerBot_vr(L,NY,NX) = 2.0_r8*CumDepz2LayerBot_vr(L-1,NY,NX)-1.0_r8*CumDepz2LayerBot_vr(L-2,NY,NX)
+    CumDepz2LayBottom_vr(L,NY,NX) = 2.0_r8*CumDepz2LayBottom_vr(L-1,NY,NX)-1.0_r8*CumDepz2LayBottom_vr(L-2,NY,NX)
     SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L-1,NY,NX)
     FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L-1,NY,NX)
     WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L-1,NY,NX)

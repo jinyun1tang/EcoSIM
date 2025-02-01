@@ -73,7 +73,7 @@ implicit none
   real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
+  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
   real(r8),pointer   :: h1D_tLITR_N_col(:)       !litter N
   real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton profile 
   real(r8),pointer   :: h1D_RootAR_col(:)        !integrated Root autotrophic respiraiton
@@ -168,8 +168,8 @@ implicit none
   real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   real(r8),pointer   :: h1D_SURF_WTR_col(:)       !ThetaH2OZ_vr(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ICE_col(:)       !ThetaICEZ_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_CO2_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_AR_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_Soil_N2O_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2606,7 +2606,7 @@ implicit none
       this%h1D_ECO_HVST_P_col(ncol) = EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)  = -NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PSI_SURF_col(ncol)   = PSISoilMatricP_vr(0,NY,NX)
-      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
+      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol)    = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)  = FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)      = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2697,8 +2697,8 @@ implicit none
       this%h1D_SNOWPACK_col(ncol)         = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
       this%h1D_SURF_WTR_col(ncol)         = ThetaH2OZ_vr(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)         = ThetaICEZ_vr(0,NY,NX)
-      this%h1D_ACTV_LYR_col(ncol)         = -(ActiveLayDepZ_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-      this%h1D_WTR_TBL_col(ncol)          = -(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+      this%h1D_ACTV_LYR_col(ncol)         = -(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+      this%h1D_WTR_TBL_col(ncol)          = -(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
       this%h1D_Soil_N2O_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Soil_N2_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Soil_NH3_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2794,7 +2794,7 @@ implicit none
         this%h2D_DOC_vr(ncol,L)             = DOM(idom_doc)/DVOLL
         this%h2D_DON_vr(ncol,L)             = DOM(idom_don)/DVOLL
         this%h2D_DOP_vr(ncol,L)             = DOM(idom_dop)/DVOLL
-        this%h2D_BotDEPZ_vr(ncol,L)         = CumDepz2LayerBot_vr(L,NY,NX)
+        this%h2D_BotDEPZ_vr(ncol,L)         = CumDepz2LayBottom_vr(L,NY,NX)
         this%h2D_acetate_vr(ncol,L)         = DOM(idom_acetate)/DVOLL
         this%h2D_litrC_vr(ncol,L)           = litrOM_vr(ielmc,L,NY,NX)/DVOLL
         this%h2D_litrN_vr(ncol,L)           = litrOM_vr(ielmn,L,NY,NX)/DVOLL

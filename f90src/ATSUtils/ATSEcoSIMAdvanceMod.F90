@@ -79,7 +79,7 @@ implicit none
     LWRadSky_col(NY,NX)  = sunrad(NY)*0.0036_r8
     RainH(NY,NX)         = p_rain(NY)
     DO L=NU(NY,NX),NL(NY,NX)
-      CumDepz2LayerBot_vr(L,NY,NX) = a_CumDepz2LayerBot_vr(L,NY)
+      CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)

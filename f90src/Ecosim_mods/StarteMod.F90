@@ -391,7 +391,7 @@ module StarteMod
     ENDDO
 
 !   ExtWaterTablet0_col: external water table depth
-    IF(CumDepz2LayerBot_vr(L-1,NY,NX).LT.ExtWaterTablet0_col(NY,NX))THEN
+    IF(CumDepz2LayBottom_vr(L-1,NY,NX).LT.ExtWaterTablet0_col(NY,NX))THEN
       ! above water table
       trcs_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(GasSechenovConst(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)

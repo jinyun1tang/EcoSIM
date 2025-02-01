@@ -1,8 +1,9 @@
 module SoilHydroParaMod
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcoSiMParDataMod   , only : micpar
-  use minimathmod  , only : isclose,AZMAX1,AZMIN1  
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod, only: micpar
+  use minimathmod,      only: isclose, AZMAX1, AZMIN1
+  use DebugToolMod
   use EcoSimConst
   use SoilWaterDataType
   use SoilPropertyDataType
@@ -34,13 +35,15 @@ implicit none
 contains
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSoilHydraulicVars(NY,NX)
+  subroutine GetSoilHydraulicVars(I,J,NY,NX)
   !
   !DESCRIPTIONS
   !compute hydraulic properties
   !called in hour1.F90 before doing hydrology
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
+  character(len=*), parameter :: subname='GetSoilHydraulicVars'
   REAL(R8) :: FCX,FCLX
   real(r8) :: FCDX
   real(r8) :: PSDX
@@ -49,6 +52,8 @@ contains
   integer :: K,L
 
   ! begin_execution
+  call PrintInfo('beg '//subname)
+
   DO L=NUI(NY,NX),NLI(NY,NX)
   ! WATER POTENTIALS
   !
@@ -101,10 +106,10 @@ contains
 !
 !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
 !
-    PSISoilOsmotic_vr(L,NY,NX)     = -RGASC*1.E-6_r8*TKS_vr(L,NY,NX)*SolutesIonConc_vr(L,NY,NX)
-    PSIGrav_vr(L,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay_vr(L,NY,NX))
-    TotalSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
-
+    PSISoilOsmotic_vr(L,NY,NX)          = -RGASC*1.E-6_r8*TKS_vr(L,NY,NX)*SolutesIonConc_vr(L,NY,NX)
+    PSIGrav_vr(L,NY,NX)                 = mGravAccelerat*(ALT(NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
+    ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
+!    write(212,*)I+J/24.,L,ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX),PSISoilMatricP_vr(L,NY,NX)
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
 !
@@ -129,7 +134,7 @@ contains
     HydroCondMicP4RootUptake_vr(L,NY,NX)=0.5_r8*(HydroCond_3D(1,K,L,NY,NX)+HydroCond_3D(3,K,L,NY,NX))
     
   END DO
-  
+  call PrintInfo('end '//subname)
   end subroutine GetSoilHydraulicVars
 
 
@@ -342,7 +347,7 @@ contains
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
     !ExtWaterTablet0_col=external water table depth, [m]
-    IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
+    IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
     ELSEIF(isclose(THW_vr(L,NY,NX),1._r8))THEN
@@ -356,7 +361,7 @@ contains
       THETW_vr(L,NY,NX)=0.0_r8
     ENDIF
 
-    IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
+    IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
     ELSEIF(isclose(THI_vr(L,NY,NX),1._r8))THEN
       THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))

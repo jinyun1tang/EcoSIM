@@ -1621,7 +1621,7 @@ module PlantDisturbsMod
   real(r8) :: watflx,VHeatCapCanopyPrev,CanopyMassC
   associate(                                                          &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,     &
-    CanopyWater_pft           => plt_ew%CanopyWater_pft,              &
+    CanopyBiomWater_pft           => plt_ew%CanopyBiomWater_pft,              &
     QCanopyWat2Dist_col       => plt_ew%QCanopyWat2Dist_col,          &
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft,           &
     HeatCanopy2Dist_col       => plt_ew%HeatCanopy2Dist_col,          &
@@ -1666,23 +1666,23 @@ module PlantDisturbsMod
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
 !     StalkBiomassC_brch=stalk sapwood mass
 !     PSICanopy_pft=canopy water potential
-!     CanopyWater_pft=water volume in canopy
+!     CanopyBiomWater_pft=water volume in canopy
 !     QH2OLoss_lnds,H2OLoss_CumYr_col=accumulated water loss for water balance calculation
 !
     LeafPetolBiomassC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
     call SumPlantBranchBiome(NB,NZ)
 
-    VOLWPX              = CanopyWater_pft(NZ)
+    VOLWPX              = CanopyBiomWater_pft(NZ)
     VHeatCapCanopyPrev  = VHeatCapCanopy_pft(NZ)
     CanopyMassC         = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
     FDM                 = get_FDM(PSICanopy_pft(NZ))    !drymatter/water = fdm
-    CanopyWater_pft(NZ) = ppmc*CanopyMassC/FDM
-    watflx              = VOLWPX-CanopyWater_pft(NZ)
-    QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyWater_pft(NZ)
+    CanopyBiomWater_pft(NZ) = ppmc*CanopyMassC/FDM
+    watflx              = VOLWPX-CanopyBiomWater_pft(NZ)
+    QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
     H2OLoss_CumYr_col   = H2OLoss_CumYr_col+watflx
 
-    VHeatCapCanopy_pft(NZ)     = cpw*(CanopyMassC*SpecStalkVolume+CanopyWater_pft(NZ))
+    VHeatCapCanopy_pft(NZ)     = cpw*(CanopyMassC*SpecStalkVolume+CanopyBiomWater_pft(NZ))
     QCanopyWat2Dist_col = QCanopyWat2Dist_col+watflx
     HeatCanopy2Dist_col = HeatCanopy2Dist_col+(VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
 !
