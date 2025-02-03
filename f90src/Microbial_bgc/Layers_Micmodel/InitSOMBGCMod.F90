@@ -742,7 +742,7 @@ module InitSOMBGCMOD
   integer :: M,N,NGL,MID,NE,NN
   real(r8) :: FOSCI,FOSNI,FOSPI,tglds
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8), parameter :: scal=0.3_r8  
+  real(r8), parameter :: scal=0.5_r8  
   associate(                                               &
     rNCOMCa               => micpar%rNCOMCa,               &
     rPCOMCa               => micpar%rPCOMCa,               &

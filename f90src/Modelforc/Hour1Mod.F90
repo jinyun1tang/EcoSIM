@@ -601,14 +601,14 @@ module Hour1Mod
       VORGC                        = CORGCM*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
       VMINL                        = (CSILT(L,NY,NX)+CCLAY_vr(L,NY,NX))*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
       VSAND                        = CSAND_vr(L,NY,NX)*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
-      NumerSolidThermCond(L,NY,NX) = (1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
+      NumerSolidThermCond_vr(L,NY,NX) = (1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
         +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP_vr(L,NY,NX) &
         +0.514_r8*ROCK_vr(L,NY,NX)*1.056E-02_r8
-      DenomSolidThermCond(L,NY,NX)=(1.253_r8*VORGC+0.514_r8*VMINL+0.386_r8*VSAND) &
+      DenomSolidThermCond_vr(L,NY,NX)=(1.253_r8*VORGC+0.514_r8*VMINL+0.386_r8*VSAND) &
         *FracSoiAsMicP_vr(L,NY,NX)+0.514_r8*ROCK_vr(L,NY,NX)
     ELSE
-      NumerSolidThermCond(L,NY,NX) = 0._r8
-      DenomSolidThermCond(L,NY,NX) = 0._r8
+      NumerSolidThermCond_vr(L,NY,NX) = 0._r8
+      DenomSolidThermCond_vr(L,NY,NX) = 0._r8
     ENDIF
   ENDDO D9975
 

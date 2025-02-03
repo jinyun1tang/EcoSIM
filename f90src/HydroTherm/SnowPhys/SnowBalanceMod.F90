@@ -767,8 +767,8 @@ implicit none
   THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
   trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
-  trcg_QSS(idg_beg:idg_NH3,NY,NX)                      = 0.0_r8
-  trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)               = 0.0_r8
+  trcg_LossXSnowRedist_col(idg_beg:idg_NH3,NY,NX)                      = 0.0_r8
+  trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,NY,NX)               = 0.0_r8
   trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
 
   DO  L=1,JS
@@ -780,7 +780,7 @@ implicit none
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FROM SNOWPACK DRIFT
 !
     trcSalt_TQR(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
-    trcSalt_TQS(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
+    trcSalt_LossXSnowRedist_col(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
     DO  L=1,JS
       trcSalt_TBLS(idsalt_beg:idsalt_end,L,NY,NX)=0.0_r8
     ENDDO

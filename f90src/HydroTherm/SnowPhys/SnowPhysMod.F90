@@ -1812,10 +1812,10 @@ contains
   ! HeatCndFlxSno2Soi=snowpack-soil heat flux
   ! FracSoilAsAirt=air-filled pores (including macropores and micropores)
   WTHET2 = 1.467_r8-0.467_r8*FracSoilAsAirt(NUM(NY,NX),NY,NX)
-  TCNDS  = (NumerSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
+  TCNDS  = (NumerSolidThermCond_vr(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
     *2.067E-03_r8+0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
     +WTHET2*AirFilledSoilPore_vr(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
-    /(DenomSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
+    /(DenomSolidThermCond_vr(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
     +0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX) &
     +WTHET2*AirFilledSoilPore_vr(NUM(NY,NX),NY,NX))
 

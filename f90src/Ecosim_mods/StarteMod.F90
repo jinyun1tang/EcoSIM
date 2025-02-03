@@ -501,7 +501,7 @@ module StarteMod
   integer, intent(in) :: NY, NX
   real(R8) :: VOLWW
   integer :: nsalts
-  integer :: L
+  integer :: L,idg
 !
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 ! not restart run and first year
@@ -538,12 +538,10 @@ module StarteMod
     D9985: DO L=1,JS
       IF(VLHeatCapSnow_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
         VOLWW                             = VLWatSnow_snvr(L,NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
-        trcg_solsml_snvr(idg_CO2,L,NY,NX) = VOLWW*trcg_rain_mole_conc_col(idg_CO2,NY,NX)
-        trcg_solsml_snvr(idg_CH4,L,NY,NX) = VOLWW*trcg_rain_mole_conc_col(idg_CH4,NY,NX)
-        trcg_solsml_snvr(idg_O2,L,NY,NX)  = VOLWW*trcg_rain_mole_conc_col(idg_O2,NY,NX)
-        trcg_solsml_snvr(idg_N2,L,NY,NX)  = VOLWW*trcg_rain_mole_conc_col(idg_N2,NY,NX)
-        trcg_solsml_snvr(idg_N2O,L,NY,NX) = VOLWW*trcg_rain_mole_conc_col(idg_N2O,NY,NX)
-        trcg_solsml_snvr(idg_NH3,L,NY,NX) = VOLWW*trcg_rain_mole_conc_col(idg_NH3,NY,NX)*natomw
+
+        DO idg=idg_beg,idg_NH3
+          trcg_solsml_snvr(idg,L,NY,NX) = VOLWW*trcg_rain_mole_conc_col(idg,NY,NX)*MolecularWeight(idg)
+        ENDDO
 
         trcn_solsml_snvr(ids_NH4,L,NY,NX)   = VOLWW*NH4_rain_mole_conc(NY,NX)*natomw
         trcn_solsml_snvr(ids_NO3,L,NY,NX)   = VOLWW*NO3_rain_mole_conc(NY,NX)*natomw

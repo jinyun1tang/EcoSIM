@@ -215,17 +215,18 @@ implicit none
 !     OVERLAND SNOW REDISTRIBUTION
 !
   IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
+    !loss of dissolved gases from surface snow
     DO idg=idg_beg,idg_NH3
-      trcg_solsml_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)+trcg_QSS(idg,NY,NX)
+      trcg_solsml_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)+trcg_LossXSnowRedist_col(idg,NY,NX)
     ENDDO
 
     DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_solsml_snvr(NTS,1,NY,NX)=trcn_solsml_snvr(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
+      trcn_solsml_snvr(NTS,1,NY,NX)=trcn_solsml_snvr(NTS,1,NY,NX)+trcn_LossXSnowRedist_col(NTS,NY,NX)
     ENDDO
 
     IF(salt_model)THEN
       DO NTA=idsalt_beg,idsalt_end
-        trc_Saltml_snvr(NTA,1,NY,NX)=trc_Saltml_snvr(NTA,1,NY,NX)+trcSalt_TQS(NTA,NY,NX)
+        trc_Saltml_snvr(NTA,1,NY,NX)=trc_Saltml_snvr(NTA,1,NY,NX)+trcSalt_LossXSnowRedist_col(NTA,NY,NX)
       ENDDO
     ENDIF
   ENDIF
@@ -285,13 +286,13 @@ implicit none
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !
   do idg=idg_beg,idg_NH3
-    trcg_QSS(idg,N2,N1) = trcg_QSS(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,N2,N1)-trcg_FloXSnow_2DH(idg,N,N5,N4)
+    trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,N2,N1)-trcg_FloXSnow_2DH(idg,N,N5,N4)
   ENDDO
 
-  trcn_QSS(ids_NH4,N2,N1)=trcn_QSS(ids_NH4,N2,N1)+trcn_FloXSnow_2DH(ids_NH4,N,N2,N1)-trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)
-  trcn_QSS(ids_NO3,N2,N1)=trcn_QSS(ids_NO3,N2,N1)+trcn_FloXSnow_2DH(ids_NO3,N,N2,N1)-trcn_FloXSnow_2DH(ids_NO3,N,N5,N4)
-  trcn_QSS(ids_H1PO4,N2,N1)=trcn_QSS(ids_H1PO4,N2,N1)+trcn_FloXSnow_2DH(ids_H1PO4,N,N2,N1)-trcn_FloXSnow_2DH(ids_H1PO4,N,N5,N4)
-  trcn_QSS(ids_H2PO4,N2,N1)=trcn_QSS(ids_H2PO4,N2,N1)+trcn_FloXSnow_2DH(ids_H2PO4,N,N2,N1)-trcn_FloXSnow_2DH(ids_H2PO4,N,N5,N4)
+  trcn_LossXSnowRedist_col(ids_NH4,N2,N1)=trcn_LossXSnowRedist_col(ids_NH4,N2,N1)+trcn_FloXSnow_2DH(ids_NH4,N,N2,N1)-trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)
+  trcn_LossXSnowRedist_col(ids_NO3,N2,N1)=trcn_LossXSnowRedist_col(ids_NO3,N2,N1)+trcn_FloXSnow_2DH(ids_NO3,N,N2,N1)-trcn_FloXSnow_2DH(ids_NO3,N,N5,N4)
+  trcn_LossXSnowRedist_col(ids_H1PO4,N2,N1)=trcn_LossXSnowRedist_col(ids_H1PO4,N2,N1)+trcn_FloXSnow_2DH(ids_H1PO4,N,N2,N1)-trcn_FloXSnow_2DH(ids_H1PO4,N,N5,N4)
+  trcn_LossXSnowRedist_col(ids_H2PO4,N2,N1)=trcn_LossXSnowRedist_col(ids_H2PO4,N2,N1)+trcn_FloXSnow_2DH(ids_H2PO4,N,N2,N1)-trcn_FloXSnow_2DH(ids_H2PO4,N,N5,N4)
 
   !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
   !
@@ -333,7 +334,7 @@ implicit none
     ENDDO D1203
 
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_TQS(NTSA,N2,N1)=trcSalt_TQS(NTSA,N2,N1)+trcSalt_XQS(NTSA,N,N2,N1)-trcSalt_XQS(NTSA,N,N5,N4)
+      trcSalt_LossXSnowRedist_col(NTSA,N2,N1)=trcSalt_LossXSnowRedist_col(NTSA,N2,N1)+trcSalt_XQS(NTSA,N,N2,N1)-trcSalt_XQS(NTSA,N,N5,N4)
     ENDDO
   ENDIF
 

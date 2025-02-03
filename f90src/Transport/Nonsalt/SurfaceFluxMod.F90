@@ -674,15 +674,15 @@ contains
 !     subroutine SnowdriftTransport(M)
 !
       IF(NN.EQ.iOutflow)THEN
-!
-!     IF NO SNOW DRIFT THEN NO TRANSPORT
-!
+        !
+        !     IF NO SNOW DRIFT THEN NO TRANSPORT
+        !
         IF(ABS(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
           trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,N,N5,N4)          = 0.0_r8
           trcn_SnowDrift_flxM_2D(ids_nut_beg:ids_nuts_end,N,N5,N4) = 0.0_r8
           VFLW                                                     = 0._r8
-    !
-!     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
+          !
+          !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
         ELSEIF(DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
           IF(VcumSnoDWI_col(N2,N1).GT.ZEROS2(N2,N1))THEN
