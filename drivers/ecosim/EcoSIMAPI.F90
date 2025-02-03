@@ -51,7 +51,6 @@ contains
   !
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
-  !print*,'microbe model'
   if(microbial_model)then
     if(lverb)WRITE(*,334)'NIT'
     if(do_timing)call start_timer(t1)
@@ -402,7 +401,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
 
-          call SumUpTracerMass(I,J,NHW,NHE,NVN,NVS)
+          call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
           
         endif
       endif
@@ -522,7 +521,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
     category = 'state'
     name = 'soil temperature (oC)'
-    datv=TCS(1:12,NY,NX)
+    datv=TCS_vr(1:12,NY,NX)
     call regression%writedata(category,name,datv)
     write(*,*)'Finish regression file writing'
     call regression%CloseOutput()
