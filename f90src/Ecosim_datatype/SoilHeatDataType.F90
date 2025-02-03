@@ -16,7 +16,7 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  TLIceThawMacP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in macropores, [MJ/d-2/h]
   real(r8),target,allocatable ::  XPhaseChangeHeatL_snvr(:,:,:)      !hourly accumulated latent heat flux from freeze-thaw
   real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)            !soil heat capacity [MJ m-3 K-1]
-  real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
+  real(r8),target,allocatable ::  TCS_vr(:,:,:)                         !soil temperature [oC]
   real(r8),target,allocatable ::  HeatStore_col(:,:)                 !heat stored over the grid, including soil, litter and canopy, [MJ d-2]
   real(r8),target,allocatable ::  HeatSource_vr(:,:,:)               !heat source for warming
   real(r8),target,allocatable ::  NumerSolidThermCond(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
@@ -52,7 +52,7 @@ contains
   allocate(TLIceThawMacP_vr(JZ,JY,JX));    TLIceThawMacP_vr                  = 0._r8
   allocate(XPhaseChangeHeatL_snvr(JS,JY,JX));   XPhaseChangeHeatL_snvr = 0._r8
   allocate(VHeatCapacity_vr(0:JZ,JY,JX));   VHeatCapacity_vr           = 0._r8
-  allocate(TCS(0:JZ,JY,JX));    TCS                                    = 0._r8
+  allocate(TCS_vr(0:JZ,JY,JX));    TCS_vr                         = 0._r8
   allocate(NumerSolidThermCond(JZ,JY,JX));      NumerSolidThermCond    = 0._r8
   allocate(DenomSolidThermCond(JZ,JY,JX));      DenomSolidThermCond    = 0._r8
   allocate(THeatFlowCellSoil_vr(JZ,JY,JX));    THeatFlowCellSoil_vr          = 0._r8
@@ -83,7 +83,7 @@ contains
   call destroy(HeatStore_col)
   call destroy(XPhaseChangeHeatL_snvr)
   call destroy(VHeatCapacity_vr)
-  call destroy(TCS)
+  call destroy(TCS_vr)
   call destroy(NumerSolidThermCond)
   call destroy(DenomSolidThermCond)
   call destroy(THeatFlowCellSoil_vr)  

@@ -507,7 +507,7 @@ module StartsMod
     ENDIF
 
     TKS_vr(L,NY,NX) = ATKS(NY,NX)
-    TCS(L,NY,NX)    = ATCS(NY,NX)
+    TCS_vr(L,NY,NX)    = ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
@@ -1097,7 +1097,7 @@ module StartsMod
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
       SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)+1.0_r8)
-      TCS(0,NY,NX)                = ATCS(NY,NX)
+      TCS_vr(0,NY,NX)                = ATCS(NY,NX)
       TKS_vr(0,NY,NX)             = ATKS(NY,NX)
       TKSD(NY,NX)                 = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
 !

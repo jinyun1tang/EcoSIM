@@ -69,10 +69,10 @@ module UptakesMod
   real(r8) :: DIFF
   real(r8) :: PSIGravCanopyHeight               !gravitation potential at effective canopy height [MPa]
   real(r8) :: cumPRootH2OUptake,HeatEvapSens
-  real(r8) :: cumRootHeatUptake
+  real(r8) :: CumPlantHeatLoss2Soil
   real(r8) :: FDMP
   logical  :: HydroActivePlant
-  integer :: SoiLayerHasRoot_rvr(jroots,JZ1)
+  logical  :: SoiLayerHasRoot_rvr(jroots,JZ1)
 !     begin_execution
   associate(                                                       &
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,   &
@@ -183,7 +183,7 @@ module UptakesMod
 !     CONVERGENCE SOLUTION
 !
         NN=CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanopyMassC,&
-          TotalSoilPSIMPa_vr,VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,cumRootHeatUptake,&
+          TotalSoilPSIMPa_vr,VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,&
           HeatEvapSens,FDMP,SoilRootResistance_rvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,&
           WatAvail4Uptake_vr,TKCX,CNDT,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
 !
@@ -193,7 +193,7 @@ module UptakesMod
         call HandlingDivergence(I,J,NN,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP)
 
         call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist,SoiH2OResist,SoilRootResistance_rvr,&
-          TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,cumRootHeatUptake,HeatEvapSens,SoiLayerHasRoot_rvr)
+          TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
 !
 !     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
 !
@@ -615,7 +615,7 @@ module UptakesMod
   end subroutine HandlingDivergence
 !------------------------------------------------------------------------------
   function CanopyEnergyH2OIteration(I,J,NZ,FracGrndByPFT,CanopyMassC,TotalSoilPSIMPa_vr,&
-    VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,cumRootHeatUptake,HeatEvapSens,FDMP,&
+    VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,FDMP,&
     SoilRootResistance_rvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,WatAvail4Uptake_vr,TKCX,CNDT,&
     VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIGravCanopyHeight,SoiLayerHasRoot_rvr) result(NN)
 
@@ -632,10 +632,10 @@ module UptakesMod
   real(r8) , intent(in) :: VHeatCapCanopyPrev_pft    !canopy heat capacity at previous time step, MJ/K
   real(r8) , intent(in) :: PrecpHeatbyCanopy         !heat added to canopy by precipitation [MJ]
   real(r8) , intent(in) :: PSIGravCanopyHeight       !Graviational water potential at effective canopy height [MPa]
-  integer  , intent(in) :: SoiLayerHasRoot_rvr(jroots,JZ1)
+  logical  , intent(in) :: SoiLayerHasRoot_rvr(jroots,JZ1)
   real(r8) , intent(out):: VHeatCapCanopyAir,DIFF
   real(r8) , intent(out):: cumPRootH2OUptake
-  real(r8) , intent(out):: cumRootHeatUptake  
+  real(r8) , intent(out):: CumPlantHeatLoss2Soil  
   real(r8) , intent(out):: HeatEvapSens   !sensible heat due to evaporation/condensation  [MJ]
   real(r8) , intent(out):: FDMP
   real(r8) :: APSILT
@@ -732,7 +732,7 @@ module UptakesMod
   cumPRootH2OUptakePre = 0.0_r8
   SymplasmicWatPrev    = 0.0_r8
   DPSI_old             = 0._r8
-  cumRootHeatUptake    = 0._r8
+  CumPlantHeatLoss2Soil    = 0._r8
 ! DTmR_old             = 0._r8
 
   D4000: DO NN=1,MaxIterNum
@@ -827,7 +827,7 @@ module UptakesMod
 !     HeatSenAddStore=initial estimate of sensible+storage heat flux
 !     PrecpHeatbyCanopy=convective heat flux from precip to canopy
 !
-    HeatAdd2Can=RadNet2Canopy_pft(NZ)+EvapTransLHeat_pft(NZ)+HeatEvapSens+PrecpHeatbyCanopy-cumRootHeatUptake
+    HeatAdd2Can=RadNet2Canopy_pft(NZ)+EvapTransLHeat_pft(NZ)+HeatEvapSens+PrecpHeatbyCanopy-CumPlantHeatLoss2Soil
 !
 !     SOLVE FOR CANOPY TEMPERATURE CAUSED BY SENSIBLE + STORAGE HEAT
 !
@@ -882,12 +882,12 @@ module UptakesMod
 !     PSILC=height corrected canopy water potential 
 !     SoilRootResistance_rvr=total soil+root resistance
 !     cumPRootH2OUptake=total root water uptake from soil 
-!     cumRootHeatUptake (<0.), add heat to canopy 
+!     CumPlantHeatLoss2Soil (<0.), add heat to canopy 
 
-      cumRootHeatUptake=0._r8
+      CumPlantHeatLoss2Soil=0._r8
       D4200: DO N=1,MY(NZ)
         D4201: DO L=NU,MaxSoiL4Root_pft(NZ)
-          IF(SoiLayerHasRoot_rvr(N,L).EQ.itrue)THEN
+          IF(SoiLayerHasRoot_rvr(N,L))THEN
             !<0 active uptake
             AllPlantRootH2OLoss_vr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
               AMIN1((PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L), &
@@ -899,11 +899,11 @@ module UptakesMod
               AllPlantRootH2OLoss_vr(N,L,NZ)=0.1_r8*AllPlantRootH2OLoss_vr(N,L,NZ)
 
               !plant moves heat from canopy to soil,
-              cumRootHeatUptake=cumRootHeatUptake+cpw*AllPlantRootH2OLoss_vr(N,L,NZ)*TKC1
+              CumPlantHeatLoss2Soil=CumPlantHeatLoss2Soil+cpw*AllPlantRootH2OLoss_vr(N,L,NZ)*TKC1
 
             !plant/myco gains water from soil < 0
             else  
-              cumRootHeatUptake=cumRootHeatUptake+cpw*AllPlantRootH2OLoss_vr(N,L,NZ)*TKS_vr(L)
+              CumPlantHeatLoss2Soil=CumPlantHeatLoss2Soil+cpw*AllPlantRootH2OLoss_vr(N,L,NZ)*TKS_vr(L)
             ENDIF
             cumPRootH2OUptake=cumPRootH2OUptake+AllPlantRootH2OLoss_vr(N,L,NZ)
           ELSE
@@ -912,7 +912,6 @@ module UptakesMod
         enddo D4201
       ENDDO D4200
       !turn it off at the moment
-!      cumRootHeatUptake=0._r8      
 !
 !     TEST TRANSPIRATION - ROOT WATER UPTAKE VS. CHANGE IN CANOPY
 !     WATER STORAGE
@@ -1034,7 +1033,7 @@ module UptakesMod
   real(r8), intent(out) :: SoilRootResistance_rvr(jroots,JZ1)   !added soil and root resistance
   real(r8), intent(out) :: CNDT                   !total root conductance
   real(r8), intent(out) :: PSIGravCanopyHeight    !gravimetric water potential at CanopyHeight4WatUptake_pft, [MPa]
-  integer, intent(out) :: SoiLayerHasRoot_rvr(jroots,JZ1)
+  logical , intent(out) :: SoiLayerHasRoot_rvr(jroots,JZ1)
 
   character(len=*), parameter :: subname='CalcResistance'
   real(r8) :: FRADW,FRAD1,FRAD2
@@ -1094,14 +1093,16 @@ module UptakesMod
 !
   D3880: DO N=1,MY(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
-      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 &
-        .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2 &
-        .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND. HydroCondMicP4RootUptake_vr(L).GT.ZERO &
-        .AND. Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
-        .AND. Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
-        .AND. THETW_vr(L).GT.ZERO)THEN
-        SoiLayerHasRoot_rvr(N,L)=itrue
+
+      SoiLayerHasRoot_rvr(N,L)=VLSoilPoreMicP_vr(L).GT.ZEROS2        &  
+        .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2                         &
+        .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO                &
+        .AND. HydroCondMicP4RootUptake_vr(L).GT.ZERO                 &
+        .AND. Root1stXNumL_pvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ)  &
+        .AND. Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ)          &
+        .AND. THETW_vr(L).GT.ZERO
+      if(SoiLayerHasRoot_rvr(N,L))THEN
+        
         !
         !     SOIL HYDRAULIC RESISTANCE FROM RADIAL UPTAKE GEOMETRY
         !     AND SOIL HYDRAULIC CONDUCTIVITY
@@ -1155,9 +1156,7 @@ module UptakesMod
         RootResist(N,L)       = RootResistSoi(N,L)+RootResistPrimary(N,L)+RootResist2ndary(N,L)
         SoilRootResistance_rvr(N,L) = SoiH2OResist(N,L)+RootResist(N,L)
         CNDT                  = CNDT+1.0_r8/SoilRootResistance_rvr(N,L)
-        
-      ELSE
-        SoiLayerHasRoot_rvr(N,L)=ifalse
+
       ENDIF
     enddo
   ENDDO D3880
@@ -1268,7 +1267,7 @@ module UptakesMod
 !------------------------------------------------------------------------
 
   subroutine UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist,SoiH2OResist,SoilRootResistance_rvr,&
-    TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,cumRootHeatUptake,HeatEvapSens,SoiLayerHasRoot_rvr)
+    TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
   !
   !Description
   !Update canopy heat and water states after the numerical iterations.
@@ -1283,8 +1282,8 @@ module UptakesMod
   real(r8), intent(in) :: PrecpHeatbyCanopy
   real(r8), intent(in) :: cumPRootH2OUptake
   real(r8), intent(in) :: HeatEvapSens                     !sensible heat associated with evaporation [MJ/h]
-  real(r8), intent(in) :: cumRootHeatUptake
-  integer , intent(in) :: SoiLayerHasRoot_rvr(jroots,JZ1)  !indicator of root prescence
+  real(r8), intent(in) :: CumPlantHeatLoss2Soil
+  logical , intent(in) :: SoiLayerHasRoot_rvr(jroots,JZ1)  !indicator of root prescence
 
   character(len=*), parameter :: subname='UpdatePlantWaterVars'
   real(r8) :: CCPOLT,CanopyMassC
@@ -1346,7 +1345,7 @@ module UptakesMod
   !compute root pressure assuming zero water storage capacity in root, cf. Eq. (36) Grant (1998), Ecological modelling.
   D4505: DO N=1,MY(NZ)
     D4510: DO L=NU,MaxSoiL4Root_pft(NZ)
-      IF(SoiLayerHasRoot_rvr(N,L).EQ.itrue)THEN
+      IF(SoiLayerHasRoot_rvr(N,L))THEN
         PSIRoot_pvr(N,L,NZ)=AZMIN1((TotalSoilPSIMPa_vr(L)*RootResist(N,L) &
           +PSICanopy_pft(NZ)*SoiH2OResist(N,L))/SoilRootResistance_rvr(N,L))
       ELSE

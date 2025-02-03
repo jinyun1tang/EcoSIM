@@ -293,7 +293,7 @@ contains
   ELSE
     PathLenMacP(L,NY,NX)=1.0_r8
   ENDIF
-  VISCWL                    = VISCW*EXP(0.533_r8-0.0267_r8*TCS(L,NY,NX))
+  VISCWL                    = VISCW*EXP(0.533_r8-0.0267_r8*TCS_vr(L,NY,NX))
   HydroCondMacP_vr(L,NY,NX) = 3.6E+03_r8*PICON*MacPNumLayer(L,NY,NX)*MacPRadius(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
 !  write(*,*)L,SatHydroCondVert_vr(L,NY,NX),HydroCondMacP_vr(L,NY,NX)
   end subroutine SoilHydroProperty

@@ -508,7 +508,7 @@ implicit none
     TKS_vr(0,NY,NX) = TKS_vr(NUM(NY,NX),NY,NX)
   ENDIF
 
-  TCS(0,NY,NX)  = units%Kelvin2Celcius(TKS_vr(0,NY,NX))
+  TCS_vr(0,NY,NX)  = units%Kelvin2Celcius(TKS_vr(0,NY,NX))
   HEATIN_lnd    = HEATIN_lnd+TLitrIceHeatFlxFrez_col(NY,NX)
 
   end subroutine UpdateLitRPhys

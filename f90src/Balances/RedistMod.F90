@@ -188,12 +188,14 @@ module RedistMod
     Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX) = Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX)+SurfGasEmisFlx_col(idg_Ar,NY,NX) &
       +Gas_NetProd_col(idg,NY,NX)
   ENDDO  
-  IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
+
+  !the surface is lowered
+  IF(NU(NY,NX).GT.NUI(NY,NX))THEN  
     DO L=NUI(NY,NX),NU(NY,NX)-1
       IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS2(NY,NX))THEN
         !set default values
         TKS_vr(L,NY,NX) = TKS_vr(NU(NY,NX),NY,NX)
-        TCS(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+        TCS_vr(L,NY,NX) = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
       ENDIF
     ENDDO
   ENDIF
@@ -886,7 +888,7 @@ module RedistMod
       DVLWatMicP_vr(L,NY,NX) = VLWatMicP2_vr(L,NY,NX)+VLWatMacP2_vr(L,NY,NX)
       DVLiceMicP_vr(L)       = VLiceMicP2_vr(L,NY,NX)+VLiceMacP2_vr(L,NY,NX)
       TKS_vr(L,NY,NX)        = TairK_col(NY,NX)
-      TCS(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+      TCS_vr(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
 
     DO L=NUM(NY,NX),NL(NY,NX)
@@ -973,7 +975,7 @@ module RedistMod
       TVOLI               = TVOLI+VLiceMicP_vr(L,NY,NX)
       TVOLIH              = TVOLIH+VLiceMacP_vr(L,NY,NX)
       TENGY               = TENGY+ENGY
-      TCS(L,NY,NX)        = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+      TCS_vr(L,NY,NX)        = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
       VOLISO              = VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
       
     !    2-WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)

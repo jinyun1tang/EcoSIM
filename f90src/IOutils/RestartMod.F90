@@ -6548,10 +6548,10 @@ implicit none
        long_name='soil temperature', units='oC', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,TCS,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,TCS_vr,datrc_2d)     
   else
     !print*,'TCS'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TCS,datrc_2d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TCS_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
     call restartvar(ncid, flag, varname='TCS', dim1name='column',dim2name='levsoi1',&
        long_name='soil temperature', units='oC', &

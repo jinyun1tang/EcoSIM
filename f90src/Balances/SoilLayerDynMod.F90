@@ -834,7 +834,7 @@ implicit none
   ELSE
     TKS_vr(L1,NY,NX)=TKS_vr(L0,NY,NX)
   ENDIF
-  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
+  TCS_vr(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FX*FertN_soil_vr(NTF,L0,NY,NX)
@@ -1014,7 +1014,7 @@ implicit none
   ELSE
     TKS_vr(L0,NY,NX)=TKS_vr(L1,NY,NX)
   ENDIF
-  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
+  TCS_vr(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil_vr(NTF,L0,NY,NX)=FY*FertN_soil_vr(NTF,L0,NY,NX)
@@ -1759,13 +1759,13 @@ implicit none
   ELSE
     TKS_vr(L1,NY,NX)=TKS_vr(L,NY,NX)
   ENDIF
-  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
+  TCS_vr(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
   IF(VHeatCapacity_vr(L0,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS_vr(L0,NY,NX)=ENGY0/VHeatCapacity_vr(L0,NY,NX)
   ELSE
     TKS_vr(L0,NY,NX)=TKS_vr(L,NY,NX)
   ENDIF
-  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
+  TCS_vr(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
   end subroutine MoveHeatWat
 
 end module SoilLayerDynMod

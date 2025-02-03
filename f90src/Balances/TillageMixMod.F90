@@ -211,7 +211,7 @@ module TillageMixMod
       VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
       TKS_vr(L,NY,NX) = (ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)
-      TCS(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+      TCS_vr(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDIF
   ENDDO
 

@@ -989,7 +989,7 @@ module Hour1Mod
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
 
         ParticleDensitySurfLay(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
-        VISCWL                        = VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
+        VISCWL                        = VISCW*EXP(0.533_r8-0.0267_r8*TCS_vr(0,NY,NX))
         VLS(NY,NX)                    = 3.6E+03_r8*9.8_r8*(ParticleDensitySurfLay(NY,NX)-1.0_r8) &
           *(ppmc*D50)**2/(18.0_r8*VISCWL)
       ENDIF
@@ -2401,7 +2401,7 @@ module Hour1Mod
 
   L=0
   DO idg=idg_beg,idg_NH3
-    GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS(L,NY,NX))
+    GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS_vr(L,NY,NX))
   ENDDO
 
   GasSolbility_vr(idg_NH3B,L,NY,NX)=GasSolbility_vr(idg_NH3,L,NY,NX)
@@ -2412,7 +2412,7 @@ module Hour1Mod
     ! 5.56E+04_r8 := mole H2O / m3
     FH2O=5.56E+04_r8/(5.56E+04_r8+SolutesIonConc_vr(L,NY,NX))
     DO idg=idg_beg,idg_NH3
-      GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS(L,NY,NX))*EXP(-GasSechenovConst(idg)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
+      GasSolbility_vr(idg,L,NY,NX)=gas_solubility(idg,TCS_vr(L,NY,NX))*EXP(-GasSechenovConst(idg)*SolutesIonStrenth_vr(L,NY,NX))*FH2O
     ENDDO
     GasSolbility_vr(idg_NH3B,L,NY,NX)=GasSolbility_vr(idg_NH3,L,NY,NX)
   ENDDO

@@ -212,7 +212,7 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OUptake_col   = TPlantRootH2OUptake_col+AllPlantRootH2OLoss_vr(N,L,NZ)
+      TPlantRootH2OUptake_col = TPlantRootH2OUptake_col+AllPlantRootH2OLoss_vr(N,L,NZ)
       TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
 
       !water lose from canopy to soil

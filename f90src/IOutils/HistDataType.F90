@@ -89,7 +89,7 @@ implicit none
   real(r8),pointer   :: h1D_SUR_DIN_FLX_col(:)    !HydroSufDINFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIN_FLX_col(:)    !HydroSubsDINFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_tMICRO_N_col(:)        !tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS(0,NY,NX)
+  real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS_vr(0,NY,NX)
   real(r8),pointer   :: h1D_TEMP_surf_col(:)
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
   real(r8),pointer   :: h1D_FracBySnow_col(:)    !fraction ground covered by snow
@@ -418,7 +418,7 @@ implicit none
   real(r8),pointer   :: h2D_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_N2O_vr(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_NH3_vr(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS_vr(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_decomp_OStress_vr(:,:)    !decomposition oxygen stress
   real(r8),pointer   :: h2D_RO2Decomp_vr(:,:)
   real(r8),pointer   :: h2D_Decomp_temp_FN_vr(:,:)
@@ -2034,7 +2034,7 @@ implicit none
   call hist_addfld2d(fname='NH3w_conc_vr',units='gN/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous NH3 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)         !TCS(1:JZ,NY,NX)
+  data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)         !TCS_vr(1:JZ,NY,NX)
   call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='levsoi',avgflag='A',&
     long_name='soil temperature profile',ptr_col=data2d_ptr)      
 
@@ -2617,8 +2617,8 @@ implicit none
       stop
       endif      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
-      this%h1D_TEMP_surf_col(ncol)        = FracSurfByLitR_col(NY,NX)*TCS(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TCS(NU(NY,NX),NY,NX)
+      this%h1D_TEMP_LITR_col(ncol)        = TCS_vr(0,NY,NX)
+      this%h1D_TEMP_surf_col(ncol)        = FracSurfByLitR_col(NY,NX)*TCS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TCS_vr(NU(NY,NX),NY,NX)
       if(VcumSnowWE_col(NY,NX)<=ZEROS(NY,NX))then
         this%h1D_TEMP_SNOW_col(ncol)   = spval
       else
@@ -2809,7 +2809,7 @@ implicit none
         this%h2D_O2_vr(ncol,L)              = trc_solcl_vr(idg_O2,L,NY,NX)
         this%h2D_N2O_vr(ncol,L)             = trc_solcl_vr(idg_N2O,L,NY,NX)
         this%h2D_NH3_vr(ncol,L)             = trc_solcl_vr(idg_NH3,L,NY,NX)
-        this%h2D_TEMP_vr(ncol,L)            = TCS(L,NY,NX)
+        this%h2D_TEMP_vr(ncol,L)            = TCS_vr(L,NY,NX)
         this%h2D_decomp_OStress_vr(ncol,L)  = OxyDecompLimiter_vr(L,NY,NX)
         this%h2D_RO2Decomp_vr(ncol,L)       = RO2DecompUptk_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_Decomp_temp_FN_vr(ncol,L)  = TempSensDecomp_vr(L,NY,NX)
