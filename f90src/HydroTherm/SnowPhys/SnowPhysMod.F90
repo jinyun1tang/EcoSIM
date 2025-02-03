@@ -145,7 +145,7 @@ contains
 !     VLHeatCapSnowMin_col,=minimum heat capacities for solving
 !      snowpack water and heat fluxes
 !
-  VLHeatCapSnowMin_col(NY,NX)=VLHeatCapSnoMin*0.1
+  VLHeatCapSnowMin_col(NY,NX)=VLHeatCapSnoMin*AREA(3,NU(NY,NX),NY,NX)
 
   end subroutine InitSnowLayers
 

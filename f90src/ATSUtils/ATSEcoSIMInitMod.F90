@@ -53,7 +53,7 @@ implicit none
 
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
-  call set_ecosim_solver(1, 1, 1, 1)
+  call set_ecosim_solver(30, 10, 20, 20)
   call InitAlloc(NOMicrobeGuilds=1)
 
   !setting a few variables 

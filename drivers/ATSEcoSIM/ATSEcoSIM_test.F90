@@ -11,8 +11,10 @@ program EcoATSTest
   type (BGCSizes) :: sizes
   integer :: NY, NX, L, ii
   integer :: ncells_per_col_, ncol
-  real, dimension(6) :: rain_array = (/4.0e-4, 4.0e-4,4.0e-4, 4.0e-4, 4.0e-4, 0.0/)
+  real, dimension(25) :: rain_array
   !real, dimension(6) :: rain_array = (/1.0e-3, 1.0e-3,1.0e-3, 1.0e-3, 1.0e-3, 0.0/)
+
+  rain_array = 1.6e-5
 
   NX = 1
   NYS = 1
@@ -61,8 +63,8 @@ subroutine Init_ATSEcoSIM_driver()
   NYS = 1
   ncells_per_col_ = 100
   ncol = 1
-  dist_step = 0.1
-  dist_tot = 0.1 !IC or first layer is zero
+  dist_step = 1.0
+  dist_tot = 1.0 !IC or first layer is zero
 
   ! Initialize sizes structure
   sizes%num_components = 1
@@ -99,7 +101,7 @@ subroutine Init_ATSEcoSIM_driver()
 
   do NY=1,NYS
     do L=1,ncells_per_col_
-      a_AREA3(L,NY) = 0.1
+      a_AREA3(L,NY) = 1.0
       !DH(NY,NX) = 0.316229
       !DV(NY,NX) = 0.316229
       a_CumDepz2LayerBot_vr(L,NY) = dist_tot
@@ -114,7 +116,7 @@ subroutine Init_ATSEcoSIM_driver()
       a_PORO(L,NY) = 0.5
     enddo
     a_ASP(NY) = 0.0
-    tairc(NY) = 242.0
+    tairc(NY) = 242.13003959655759
     !double counting the conversions I think
     !vpair(NY) = 736.3/1.0e6_r8
     !uwind(NY) = 1.0*3600.0_r8
@@ -123,7 +125,7 @@ subroutine Init_ATSEcoSIM_driver()
     !p_rain(NY) = 0.0
     !p_rain(NY) = 3.e-8*1000.0_r8*3600.0_r8
     
-    vpair(NY) = 47.0
+    vpair(NY) = 3.9167352020740509E-002*1.0e3
     uwind(NY) = 1.1
     
     !swrad(NY) = 0.8

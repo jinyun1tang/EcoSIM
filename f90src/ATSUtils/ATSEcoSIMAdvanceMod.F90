@@ -101,9 +101,11 @@ implicit none
     RadSWGrnd_col(NY,NX) = 0.0
 
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
-    EMM = 0.5
+    EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+
+    write(*,*) "SkyLonwRad_col(NY,NX) = ", SkyLonwRad_col(NY,NX)
     RainH(NY,NX) = p_rain(NY)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
@@ -145,6 +147,7 @@ implicit none
     RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
+    write(*,*) "SnoFalPrec_col = ", SnoFalPrec_col(NY,NX)
   ENDDO
 
 
