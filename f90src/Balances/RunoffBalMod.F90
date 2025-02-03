@@ -258,7 +258,7 @@ implicit none
           +trc_salt_rof_bounds(idsalt_H3PO4,N,NN,N5,N4)+trc_salt_rof_bounds(idsalt_FeH2PO4,N,NN,N5,N4) &
           +trc_salt_rof_bounds(idsalt_CaH4P2O8,N,NN,N5,N4)) &
           +XN*5.0_r8*(trc_salt_rof_bounds(idsalt_AlOH4,N,NN,N5,N4)+trc_salt_rof_bounds(idsalt_FeOH4,N,NN,N5,N4))
-        PSS=PSS+XN*patomw*trcSalt_XQS(idsalt_H0PO4,N,N5,N4)
+        PSS=PSS+XN*patomw*trcSalt_FloXSnow_2DH(idsalt_H0PO4,N,N5,N4)
         TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
@@ -732,33 +732,33 @@ implicit none
       OXS                             = XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
       OXYGOU                          = OXYGOU-OXS
       IF(salt_model)THEN
-        PSS=XN*patomw*(trcSalt_XQS(idsalt_CaPO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_FeHPO4,N,N5,N4)+trcSalt_XQS(idsalt_CaHPO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_MgHPO4,N,N5,N4)+trcSalt_XQS(idsalt_H3PO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_FeH2PO4,N,N5,N4)+trcSalt_XQS(idsalt_CaH4P2O8,N,N5,N4))
+        PSS=XN*patomw*(trcSalt_FloXSnow_2DH(idsalt_CaPO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_FeHPO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaHPO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_MgHPO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_H3PO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_FeH2PO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaH4P2O8,N,N5,N4))
         TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
-        SS1=XN*(trcSalt_XQS(idsalt_Al,N,N5,N4)+trcSalt_XQS(idsalt_Fe,N,N5,N4) &
-          +trcSalt_XQS(idsalt_Hp,N,N5,N4)+trcSalt_XQS(idsalt_Ca,N,N5,N4) &
-          +trcSalt_XQS(idsalt_Mg,N,N5,N4)+trcSalt_XQS(idsalt_Na,N,N5,N4) &
-          +trcSalt_XQS(idsalt_K,N,N5,N4)+trcSalt_XQS(idsalt_OH,N,N5,N4) &
-          +trcSalt_XQS(idsalt_SO4,N,N5,N4)+trcSalt_XQS(idsalt_Cl,N,N5,N4) &
-          +trcSalt_XQS(idsalt_CO3,N,N5,N4)+trcSalt_XQS(idsalt_H0PO4,N,N5,N4))
-        SS2=XN*2.0*(trcSalt_XQS(idsalt_HCO3,N,N5,N4)+trcSalt_XQS(idsalt_AlOH,N,N5,N4) &
-          +trcSalt_XQS(idsalt_AlSO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_FeOH,N,N5,N4)+trcSalt_XQS(idsalt_FeSO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_CaOH,N,N5,N4)+trcSalt_XQS(idsalt_CaCO3,N,N5,N4) &
-          +trcSalt_XQS(idsalt_CaSO4,N,N5,N4)+trcSalt_XQS(idsalt_MgOH2,N,N5,N4)&
-          +trcSalt_XQS(idsalt_MgCO3,N,N5,N4)+trcSalt_XQS(idsalt_MgSO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_NaCO3,N,N5,N4)+trcSalt_XQS(idsalt_NaSO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_KSO4,N,N5,N4)+trcSalt_XQS(idsalt_CaPO4,N,N5,N4))
-        SS3=XN*3.0*(trcSalt_XQS(idsalt_AlOH2,N,N5,N4)+trcSalt_XQS(idsalt_FeOH2,N,N5,N4)&
-          +trcSalt_XQS(idsalt_CaHCO3,N,N5,N4) &
-          +trcSalt_XQS(idsalt_MgHCO3,N,N5,N4)+trcSalt_XQS(idsalt_FeHPO4,N,N5,N4) &
-          +trcSalt_XQS(idsalt_CaHPO4,N,N5,N4)+trcSalt_XQS(idsalt_MgHPO4,N,N5,N4))
-        SS4=XN*4.0*(trcSalt_XQS(idsalt_AlOH3,N,N5,N4)+trcSalt_XQS(idsalt_FeOH3,N,N5,N4) &
-          +trcSalt_XQS(idsalt_H3PO4,N,N5,N4)+trcSalt_XQS(idsalt_FeH2PO4,N,N5,N4)&
-          +trcSalt_XQS(idsalt_CaH4P2O8,N,N5,N4)) &
-          +XN*5.0*(trcSalt_XQS(idsalt_AlOH4,N,N5,N4)+trcSalt_XQS(idsalt_FeOH4,N,N5,N4))
+        SS1=XN*(trcSalt_FloXSnow_2DH(idsalt_Al,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Fe,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_Hp,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Ca,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_Mg,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Na,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_K,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_OH,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_SO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Cl,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_CO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_H0PO4,N,N5,N4))
+        SS2=XN*2.0*(trcSalt_FloXSnow_2DH(idsalt_HCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_AlOH,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_AlSO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_FeOH,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeSO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_CaOH,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaCO3,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_CaSO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgOH2,N,N5,N4)&
+          +trcSalt_FloXSnow_2DH(idsalt_MgCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgSO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_NaCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_NaSO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_KSO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaPO4,N,N5,N4))
+        SS3=XN*3.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH2,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH2,N,N5,N4)&
+          +trcSalt_FloXSnow_2DH(idsalt_CaHCO3,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_MgHCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeHPO4,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_CaHPO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgHPO4,N,N5,N4))
+        SS4=XN*4.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH3,N,N5,N4) &
+          +trcSalt_FloXSnow_2DH(idsalt_H3PO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeH2PO4,N,N5,N4)&
+          +trcSalt_FloXSnow_2DH(idsalt_CaH4P2O8,N,N5,N4)) &
+          +XN*5.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH4,N,N5,N4))
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
         HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR

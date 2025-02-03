@@ -24,8 +24,8 @@ implicit none
   __FILE__
   public :: BegCheckBalances
   public :: EndCheckBalances
-  public :: SumUpTracerMass
-
+  public :: SummarizeTracerMass
+  public :: SummarizeSnowMass
 contains
 
   subroutine BegCheckBalances(I,J,NHW,NHE,NVN,NVS)  
@@ -54,7 +54,7 @@ contains
   ENDDO  
   end subroutine BegCheckBalances 
 !------------------------------------------------------------------------------------------
-  subroutine SumUpStorage(I,J,NHW,NHE,NVN,NVS)  
+  subroutine SummarizeStorage(I,J,NHW,NHE,NVN,NVS)  
 
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
@@ -71,7 +71,20 @@ contains
 
     ENDDO
   ENDDO
-  end subroutine SumUpStorage
+  end subroutine SummarizeStorage
+!------------------------------------------------------------------------------------------
+
+  subroutine SummarizeSnowMass(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: L
+  SnowMassEnd_col(NY,NX)=0._r8
+  DO  L=1,JS
+    if(AMAX1(VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX))<=0._r8)cycle
+    SnowMassEnd_col(NY,NX) = SnowMassEnd_col(NY,NX)+VLDrySnoWE_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)*DENSICE
+  ENDDO
+
+  end subroutine SummarizeSnowMass
 !------------------------------------------------------------------------------------------
   subroutine SumUpWaterStorage(NY,NX)
 
@@ -150,7 +163,7 @@ contains
   real(r8) :: prec2SnoErr_test
   integer :: ii
 
-  call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
+  call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 
   call SummarizeTracers(NHW,NHE,NVN,NVS)
 
@@ -187,7 +200,7 @@ contains
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
 
       if(abs(WaterErr_test)>err_h2o)then
-        write(110,*)I+J/24.,'NY,NX, H2O conservation error',NY,NX,WaterErr_test,NU(NY,NX)
+        write(110,*)I*1000+J,'NY,NX, H2O conservation error',NY,NX,WaterErr_test,NU(NY,NX)
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
@@ -206,6 +219,7 @@ contains
         write(110,*)'CanopyWat_col    =',CanopyWat_col(NY,NX)
         write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX)
         write(110,*)'snofall          =',Prec2Snow_col(NY,NX),SnoFalPrec_col(NY,NX)
+        write(110,*)'nsnol_col        =',nsnol_col(NY,NX)
         write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
         write(110,*)'Snowxfer         =',QSnoWatXfer2Soil_col(NY,NX)+QSnoIceXfer2Soil_col(NY,NX)*DENSICE
         write(110,*)('-',ii=1,50)
@@ -286,16 +300,16 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SumUpTracerMass(I,J,NHW,NHE,NVN,NVS)
+  subroutine SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
 
   implicit none 
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   integer :: NY,NX
 
-  call SumUpStorage(I,J,NHW,NHE,NVN,NVS)
+  call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 
   call SummarizeTracers(NHW,NHE,NVN,NVS)
 
-  end subroutine SumUpTracerMass
+  end subroutine SummarizeTracerMass
 
 end module BalancesMod

@@ -251,10 +251,10 @@ module StartsMod
       ALTZ_col(NY,NX)=ALTZG
       IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
         ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
-        DTBLD(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+        DTBLD(NY,NX)               = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
       ELSE
-        ExtWaterTablet0_col(NY,NX)=0.0_r8
-        DTBLD(NY,NX)=0.0_r8
+        ExtWaterTablet0_col(NY,NX) = 0.0_r8
+        DTBLD(NY,NX)               = 0.0_r8
       ENDIF
       DepzIntWTBL_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
     ENDDO
@@ -263,11 +263,11 @@ module StartsMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       DO L=1,NL(NY,NX)
-        N1=NX
-        N2=NY
-        N3=L
+        N1 = NX
+        N2 = NY
+        N3 = L
         DO N=FlowDirIndicator(N2,N1),3
-          IF(N.EQ.1)THEN
+          IF(N.EQ.iEastWestDirection)THEN
             ! in direction x, west-east
             IF(NX.EQ.NHE)THEN
               cycle
@@ -276,7 +276,7 @@ module StartsMod
               N5=NY
               N6=L
             ENDIF
-          ELSEIF(N.EQ.2)THEN
+          ELSEIF(N.EQ.iNorthSouthDirection)THEN
             ! in direction y, north-south
             IF(NY.EQ.NVS)THEN
               cycle
@@ -285,7 +285,7 @@ module StartsMod
               N5=NY+1
               N6=L
             ENDIF
-          ELSEIF(N.EQ.3)THEN
+          ELSEIF(N.EQ.iVerticalDirection)THEN
             ! in vertical, up-down
             IF(L.EQ.NL(NY,NX))THEN
               cycle
@@ -295,16 +295,16 @@ module StartsMod
               N6=L+1
             ENDIF
           ENDIF
-          DIST(N,N6,N5,N4)=0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
-          XDPTH(N,N6,N5,N4)=AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
+          DIST(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
+          XDPTH(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?
           DISP(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
         ENDDO
 
         IF(L.EQ.NU(NY,NX))THEN
-          DIST(3,N3,N2,N1)=0.5_r8*DLYR_3D(3,N3,N2,N1)
-          XDPTH(3,N3,N2,N1)=AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
-          DISP(3,N3,N2,N1)=0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
+          DIST(3,N3,N2,N1)  = 0.5_r8*DLYR_3D(3,N3,N2,N1)
+          XDPTH(3,N3,N2,N1) = AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
+          DISP(3,N3,N2,N1)  = 0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
       ENDDO
     ENDDO

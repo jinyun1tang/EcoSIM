@@ -56,7 +56,7 @@ module SnowDataType
   real(r8),target, allocatable ::  SnowEngyEnd_col(:,:)
   real(r8),target, allocatable ::  SnowMassBeg_col(:,:)                       !snow mass H2O eqv [m3 H2O d-2]
   real(r8),target, allocatable ::  SnowMassEnd_col(:,:)                       !snow mass H2O eqv [m3 H2O d-2]
-  real(r8),target, allocatable ::  trcSalt_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_FloXSnow_2DH(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
   real(r8),target, allocatable ::  Prec2Snow_col(:,:)                         !precipiation to snow [m3 H2O d-2 h-1]
   real(r8),target, allocatable ::  PrecHeat2Snow_col(:,:)                     !precipitation heat to snow [MJ d-2 h-1]
   real(r8),target, allocatable ::  QSnowH2Oloss_col(:,:)                      !snow water eqv loss to other storage [m3 H2O d-2 h-1]
@@ -124,7 +124,7 @@ contains
     allocate(trc_Saltml_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trc_Saltml_snvr=0._r8
   endif
 
-  allocate(trcSalt_XQS(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_XQS=0._r8
+  allocate(trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_FloXSnow_2DH=0._r8
   end subroutine InitSnowData
 
 !----------------------------------------------------------------------
@@ -133,7 +133,7 @@ contains
   implicit none
   if(salt_model)then
     call destroy(trc_Saltml_snvr)
-    call destroy(trcSalt_XQS)
+    call destroy(trcSalt_FloXSnow_2DH)
   endif
 
   call destroy(QSnowHeatLoss_col)
@@ -187,7 +187,7 @@ contains
   call destroy(trcn_solsml_snvr)
   call destroy(THeatSnowThaw_col)
   if(salt_model)then
-    call destroy(trcSalt_XQS)
+    call destroy(trcSalt_FloXSnow_2DH)
   endif
   end subroutine DestructSnowData
 

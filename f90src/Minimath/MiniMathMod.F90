@@ -204,7 +204,11 @@ module minimathmod
 
   real(r8) :: ans
 
-  ans=AMAX1(0.0_r8,val)
+  if(val>=tiny_val)then
+    ans=val
+  else  
+    ans=0._r8
+  endif
 
   end function AZMAX1_s  
 !------------------------------------------------------------------------------------------

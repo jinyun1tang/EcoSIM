@@ -10,10 +10,10 @@ implicit none
   __FILE__
 
   real(r8), PARAMETER :: VFLWX=0.5_r8
-  real(r8),allocatable ::  AquaIonDifusivty2_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_RQR(:,:,:,:,:)                     !
-  real(r8),allocatable ::  trcSalt_RQ(:,:,:,:)                       !
-  real(r8),allocatable ::  trcSalt_RQR0(:,:,:)                        !
+  real(r8),allocatable ::  AquaIonDifusivty2_vr(:,:,:,:)                      !aqueous diffusivity of ions [m2/hr]
+  real(r8),allocatable ::  trcSalt_FloXSurRof_flxM_2DH(:,:,:,:,:)             !2D flow of salt through surface runoff at iteration M [g d-2]
+  real(r8),allocatable ::  trcSalt_RQ(:,:,:,:)                                !
+  real(r8),allocatable ::  trcSalt_FloXSurRof_flxM(:,:,:)                     !
 
   real(r8),allocatable ::  trcSalt_solml2(:,:,:,:)              !
   real(r8),allocatable ::  ZFE2(:,:,:)                        !
@@ -39,9 +39,9 @@ contains
   implicit none
   allocate(AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,JZ,JY,JX));   AquaIonDifusivty2_vr=0._r8
 
-  allocate(trcSalt_RQR(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_RQR=0._r8
+  allocate(trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_FloXSurRof_flxM_2DH=0._r8
   allocate(trcSalt_RQ(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_RQ=0._r8
-  allocate(trcSalt_RQR0(idsalt_beg:idsalt_end,JY,JX));     trcSalt_RQR0=0._r8
+  allocate(trcSalt_FloXSurRof_flxM(idsalt_beg:idsalt_end,JY,JX));     trcSalt_FloXSurRof_flxM=0._r8
   allocate(trcSaltAdv2SowLay(idsalt_beg:idsalt_end,JS,JY,JX));   trcSaltAdv2SowLay=0._r8
   allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_TBLS=0._r8
 
@@ -70,8 +70,8 @@ contains
 
   call destroy(POSGL2)
 
-
-  call destroy(trcSalt_RQR)
+  call destroy(trcSalt_FloXSurRof_flxM)
+  call destroy(trcSalt_FloXSurRof_flxM_2DH)
   call destroy(trcSalt_RFXS)
   end subroutine DestructTranspSaltData
 

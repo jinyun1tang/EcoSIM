@@ -144,16 +144,6 @@ module IngridTranspMod
 !
 !     QRM=runoff from watsub.f
 !     RQR*0=solute in runoff
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
 !     VLWatMicPM=litter water volume from watsub.f
 !     *S2=litter solute content
 !     N2,N1=NY,NX of source grid cell
@@ -798,10 +788,10 @@ module IngridTranspMod
     ENDIF
 
     DO nsalts=idsalt_beg,idsalt_end
-      trcSalt_RQR0(nsalts,N2,N1)=VFLW*AZMAX1(trcSalt_solml2(nsalts,0,N2,N1))
+      trcSalt_FloXSurRof_flxM(nsalts,N2,N1)=VFLW*AZMAX1(trcSalt_solml2(nsalts,0,N2,N1))
     ENDDO
   else
-    trcSalt_RQR0(idsalt_beg:idsalt_end,N2,N1)=0.0_r8
+    trcSalt_FloXSurRof_flxM(idsalt_beg:idsalt_end,N2,N1)=0.0_r8
   endif  
   end subroutine SoluteFluxBySurfaceOutflow
 
@@ -861,7 +851,7 @@ module IngridTranspMod
           FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
 
           DO nsalts=idsalt_beg,idsalt_end
-            trcSalt_RQR(nsalts,N,2,N5,N4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
+            trcSalt_FloXSurRof_flxM_2DH(nsalts,N,2,N5,N4)=trcSalt_FloXSurRof_flxM(nsalts,N2,N1)*FQRM
           ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -870,10 +860,10 @@ module IngridTranspMod
 !     RQR*=solute in runoff
 !
           DO nsalts=idsalt_beg,idsalt_end
-            trc_salt_rof_bounds(nsalts,N,2,N5,N4)=trc_salt_rof_bounds(nsalts,N,2,N5,N4)+trcSalt_RQR(nsalts,N,2,N5,N4)
+            trc_salt_rof_bounds(nsalts,N,2,N5,N4)=trc_salt_rof_bounds(nsalts,N,2,N5,N4)+trcSalt_FloXSurRof_flxM_2DH(nsalts,N,2,N5,N4)
           ENDDO
         ELSE
-          trcSalt_RQR(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
+          trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
         ENDIF
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
@@ -882,7 +872,7 @@ module IngridTranspMod
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
             FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             DO nsalts=idsalt_beg,idsalt_end
-              trcSalt_RQR(nsalts,N,1,N5B,N4B)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
+              trcSalt_FloXSurRof_flxM_2DH(nsalts,N,1,N5B,N4B)=trcSalt_FloXSurRof_flxM(nsalts,N2,N1)*FQRM
             ENDDO
       !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -891,17 +881,17 @@ module IngridTranspMod
 !     RQR*=solute in runoff
 !
             DO nsalts=idsalt_beg,idsalt_end
-              trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)=trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)+trcSalt_RQR(nsalts,N,1,N5B,N4B)
+              trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)=trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)+trcSalt_FloXSurRof_flxM_2DH(nsalts,N,1,N5B,N4B)
             ENDDO
           ELSE
-            trcSalt_RQR(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
+            trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
           ENDIF
         ENDIF
       ELSE
-        trcSalt_RQR(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
+        trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
-          trcSalt_RQR(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
+          trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
         ENDIF
       ENDIF
 !
@@ -961,7 +951,7 @@ module IngridTranspMod
 !     RQS*=solute in snow transfer
 !
         DO nsalts=idsalt_beg,idsalt_end
-          trcSalt_XQS(nsalts,N,N5,N4)=trcSalt_XQS(nsalts,N,N5,N4)+trcSalt_RQ(nsalts,N,N5,N4)
+          trcSalt_FloXSnow_2DH(nsalts,N,N5,N4)=trcSalt_FloXSnow_2DH(nsalts,N,N5,N4)+trcSalt_RQ(nsalts,N,N5,N4)
         ENDDO
       ENDIF
     enddo

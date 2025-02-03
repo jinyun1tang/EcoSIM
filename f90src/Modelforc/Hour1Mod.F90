@@ -11,7 +11,7 @@ module Hour1Mod
   use EcoSiMParDataMod,  only : micpar, pltpar
   use SoilBGCNLayMod,    only : sumORGMLayL
   use PlantMgmtDataType, only : NP
-  use BalancesMod,       only : SumUpTracerMass,BegCheckBalances
+  use BalancesMod,       only : SummarizeTracerMass,BegCheckBalances
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -155,7 +155,7 @@ module Hour1Mod
   if(lverb)write(*,*)'SetLiterSoilPropAftDisturb'
   call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS,dosum)
 
-  if(dosum) call SumUpTracerMass(I,J,NHW,NHE,NVN,NVS)  
+  if(dosum) call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)  
 
   call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
@@ -480,7 +480,7 @@ module Hour1Mod
     DO  NY=NVN,NVS+extragrid
 
       trc_salt_rof_bounds(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
-      trcSalt_XQS(idsalt_beg:idsalt_end,1:2,NY,NX)             = 0._r8
+      trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,NY,NX)             = 0._r8
 
       DO  L=1,NL(NY,NX)+1
         DO NSA=idsalt_beg,idsaltb_end
@@ -640,8 +640,10 @@ module Hour1Mod
 !     EHUM=fraction of microbial decompn product allocated to surface humus
 !     EPOC=fraction of SOC decomposition product allocated to surface POC
 !
+  !Stationary water table
   IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
+  !Mobile water table  
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
