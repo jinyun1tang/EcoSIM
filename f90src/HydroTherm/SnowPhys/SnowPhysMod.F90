@@ -392,22 +392,6 @@ contains
         !
         ! DISCHARGE OF MELTWATER AND ITS HEAT FROM LOWEST SNOWPACK LAYER
         ! TO RESIDUE, SURFACE SOIL MICROPORES AND MACROPORES
-        !
-        ! WatFloInSnoMax,WatFlowSno2LitR=porosity-unconstrained water flux to soil,litter
-        ! PtWatFlowSno2Soi,WatFlowSno2MicP,WatFlowSno2MacP=water flux to soil surface,
-        ! micropores,macropores
-        ! VOLP1,VOLPH1=air volumes of soil micropores,macropores
-        ! SoilFracAsMacP1,FGRD=macropore,micropore volume fractions
-        ! HeatFlowSno2SoiByWat,HeatFlowSno2LitrByWat=convective heat fluxes to soil,litter
-
-        ! THETY=hygroscopic water concentration
-        ! POROS=soil porosity
-        ! FC,WP,FCL,WPL=field capacity,wilting point, log(FC),log(WP)
-        ! FCI,WPI=FC,WP of ice
-        ! FracSoiPAsIce=ice concentration
-        ! BKVL=bulk density x volume of soil layer
-        ! VLitR=surface litter volume
-        ! FracSoiPAsWat=relative pore fraciton filled by water
       ELSE
         !dealing with residual snow
         !L==JS, or the layer L2 has insignificant snow, so layer L is directly interacting with litter and soil surface        
@@ -415,37 +399,30 @@ contains
           !
           !interaction with respect to litter layer and topsoil 
           !potential flow to soil
-          PtWatFlowSno2Soi=WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
           !first  flow to micro- and macropores
-          WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
-          WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
-          WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
-          HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
-          WatFlowSno2LitR       = WatFloInSnoMax-WatFlowSno2Soil              !this does not consider the abscence of litter layer
-          HeatFlowSno2LitrByWat = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2LitR
-
+          if(FracSurfByLitR_col(NY,NX)>1.e-3_r8)then
+            PtWatFlowSno2Soi      = WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
+            WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
+            WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
+            WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
+            HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
+            WatFlowSno2LitR       = WatFloInSnoMax-WatFlowSno2Soil
+            HeatFlowSno2LitrByWat = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2LitR
+          else
+            PtWatFlowSno2Soi      = WatFloInSnoMax
+            WatFlowSno2MicP       = PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX)
+            WatFlowSno2MacP       = PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX)
+            WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
+            HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
+            WatFlowSno2LitR       = 0._r8
+            HeatFlowSno2LitrByWat = 0._r8
+          endif
           call SnowTopSoilExch(dt_SnoHeat,M,L,NY,NX,VapCond1,VapSnoSrc,VLairSno1,TCND1W,&
             VapFlxSno2Soi1,HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS)
 
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
           !
-          ! CumVapFlxSno2Litr=snowpack-litter vapor flux
-          ! CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr=snowpack-litter convective,conductive heat fluxes
-          ! VapFlxSno2Soi1=snowpack-soil vapor flux
-          ! HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi=snowpack-soil convective,conductive heat fluxes
-          ! VHeatCapacity1_vr,VHeatCapLitR=current,minimum litter heat capacities
-          ! TK0X,TKXR,TK1X=snowpack,litter,soil temperatures
-          ! CNVR,VapCond1,VapCond2=litter,snowpack,soil vapor conductivity
-          ! THETP*,FracSoiPAsWat,FracSoiPAsIce=litter air,water,ice concentration
-          ! POROS,POROQ=litter porosity, tortuosity
-          ! CVRD=litter cover fraction
-          ! VaporDiffusivityLitR_col=litter vapor diffusivity
-          ! AvgVaporCondctSnowLitR,AvgVaporCondctSoilLitR=snowpack-litter,litter-soil vapor conductance
-          ! DLYRR,SnowThickL0_snvr,DLYR=litter,snowpack,soil depths
-          ! THETRR=dry litter concentration
-          ! TCNDR,TCND1W,TCNDS=litter,snowpack,soil thermal conductivity
-          ! AvgThermCondctSnoLitR,AvgThermCondctSoilLitR=snow-litter,litter-soil thermal conductance
           !
           CumVapFlxSno2Litr       = 0.0_r8
           CumHeatConvFlxSno2Litr  = 0.0_r8
@@ -455,7 +432,7 @@ contains
           cumHeatCndFlxLitr2Soi   = 0.0_r8
 
           !surface litter layer is active
-          IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
+          IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>1.e-3_r8)THEN
             !should the litter heat/water states be updated here?
             call SnowSurLitterExch(I,J,dt_SnoHeat,M,L,NY,NX,VapCond1,VapCond2,TCND1W,VLairSno1,PSISV1,TCNDS,&
               CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi,&
@@ -837,7 +814,7 @@ contains
   !     RAGX,RA=snowpack blr, h/m
   !     RAG,RAGW=isothermal blrs at ground,snowpack surfaces
   !
-  RI   = RichardsonNumber(RIB(NY,NX),TKQ_col(NY,NX),TKSnow1_snvr(1,NY,NX))
+  RI   = RichardsonNumber(RIB_col(NY,NX),TKQ_col(NY,NX),TKSnow1_snvr(1,NY,NX))
   RAGX = AMAX1(RAM,0.8_r8*ResistAreodynOverSnow_col(NY,NX), &
     AMIN1(1.2_r8*ResistAreodynOverSnow_col(NY,NX),ResistAreodynOverSoil_col(NY,NX)/(1.0_r8-10.0_r8*RI)))
   ResistAreodynOverSnow_col(NY,NX) = RAGX
@@ -1140,7 +1117,7 @@ contains
     ENGY1          = TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)
 
     !it is not a pond
-    IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN    
+    IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN    
       VLWatMicP1_vr(0,NY,NX)     = VLWatMicP1_vr(0,NY,NX)+FLWW
       VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
       VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
@@ -1225,7 +1202,7 @@ contains
     DO  NN=1,2
       IF(N.EQ.iDirectionEW)THEN
         !east-west
-        IF(NX.EQ.NHE .AND. NN.EQ.1 .OR. NX.EQ.NHW .AND. NN.EQ.2)THEN
+        IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
           !at the boundary
           cycle
         ELSE
@@ -1236,7 +1213,7 @@ contains
         ENDIF
       ELSEIF(N.EQ.iDirectionNS)THEN
         !south-north
-        IF(NY.EQ.NVS .AND. NN.EQ.1 .OR. NY.EQ.NVN .AND. NN.EQ.2)THEN
+        IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
           !at the boundary
           cycle
         ELSE
@@ -1249,7 +1226,7 @@ contains
       
       ALTS1=Altitude_grid(N2,N1)+SnowDepth_col(N2,N1)
 
-      IF(NN.EQ.1)THEN
+      IF(NN.EQ.iOutflow)THEN
         !east or south        
         ALTS2=Altitude_grid(N5,N4)+SnowDepth_col(N5,N4)
         
@@ -1283,7 +1260,7 @@ contains
       ENDIF
 
       !add west and south
-      IF(NN.EQ.2)THEN
+      IF(NN.EQ.iInflow)THEN
 
       ENDIF
     ENDDO
@@ -1426,7 +1403,7 @@ contains
 
     !AvgVaporCondctSnowLitR=snowpack-litter conductance
     !there is litter layer with sufficient moisture
-    IF(VLairSno1.GT.ZEROS2(NY,NX).AND.THETPM(M,0,NY,NX).GT.THETX)THEN      
+    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. AirFilledSoilPoreM_vr(M,0,NY,NX).GT.THETX)THEN      
       VapSnow0=vapsat(TK0X)  !*dssign(VLWatSnow0M_snvr(L,NY,NX)) !snow vapor pressure, saturated
       !snow -> residue vapor flux (>0)
       H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX) &
@@ -1663,26 +1640,27 @@ contains
 
   ! ThetaWLitR,THETW1=litter, soil water concentration
   ! VWatLitRHoldCapcity=litter water retention capacity
-  ! PSISM1_vr(0,PSISM1_vr(NUM=litter,soil water potentials
+  
+  IF(VLitR_col(NY,NX).LE.ZEROS(NY,NX))return
 
   IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1_vr(0,NY,NX))/VLitR_col(NY,NX)
     IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
       PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX) &
         *LOGPSIMND(NY,NX))))
-    ELSEIF(ThetaWLitR.LT.POROS0(NY,NX))THEN
+    ELSEIF(ThetaWLitR.LT.POROS0_col(NY,NX))THEN
       PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR))/PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX) &
         *LOGPSIMXD(NY,NX)))
     ELSE
-      ThetaWLitR=POROS0(NY,NX)
+      ThetaWLitR=POROS0_col(NY,NX)
       PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
     ENDIF
   ELSE
-    ThetaWLitR=POROS0(NY,NX)
-    PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
+    ThetaWLitR         = POROS0_col(NY,NX)
+    PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
   ENDIF
 
-  CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX),POROS_vr(0,NY,NX))
+  CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*AirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*AirFilledSoilPoreM_vr(M,0,NY,NX),POROS_vr(0,NY,NX))
 
   IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
     IF(VapCond1.GT.ZERO .AND. CNVR.GT.ZERO)THEN      
@@ -1697,11 +1675,11 @@ contains
       AvgVaporCondctSoilLitR=2.0_r8*VapCond2/(DLYR_3D(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))
     ENDIF
 
-    THETRR = AZMAX1(1.0_r8-FracSoilPoreAsAir_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
+    THETRR = AZMAX1(1.0_r8-AirFilledSoilPore_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
     TCNDR  = (0.779_r8*THETRR*9.050E-04_r8+0.622_r8*FracSoiPAsWat_vr(0,NY,NX) &
-      *2.067E-03_r8+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+FracSoilPoreAsAir_vr(0,NY,NX) &
+      *2.067E-03_r8+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+AirFilledSoilPore_vr(0,NY,NX) &
       *9.050E-05_r8)/(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX) &
-      +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+FracSoilPoreAsAir_vr(0,NY,NX))
+      +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+AirFilledSoilPore_vr(0,NY,NX))
 
     IF(TCND1W.GT.ZERO.AND.TCNDR.GT.ZERO)THEN
       AvgThermCondctSnoLitR=2.0_r8*TCND1W*TCNDR/(TCND1W*DLYRR_COL(NY,NX)+TCNDR*SnowThickL0_snvr(L,NY,NX))
@@ -1766,10 +1744,10 @@ contains
   ! dts_wat=time step for flux calculations
   ! VapFlxSno2Soi1,HeatConvFlxSno2Soi1=vapor flux and its convective heat flux
   !
-  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.THETPM(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
+  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
     VapSoiDest = vapsat(TKSoil1_vr(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoil1_vr(NUM(NY,NX),NY,NX)))
-    VapCond2   = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
-      *THETPM(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
+    VapCond2   = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)*POROQ &
+      *AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
 
     AvgVaporCondctSoilLitR = 2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR_3D(3,NUM(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
     H2OVapFlx              = AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)&
@@ -1812,12 +1790,12 @@ contains
   ! HeatCndFlxSno2Soi=snowpack-soil heat flux
   ! FracSoilAsAirt=air-filled pores (including macropores and micropores)
   WTHET2 = 1.467_r8-0.467_r8*FracSoilAsAirt(NUM(NY,NX),NY,NX)
-  TCNDS  = (NumerSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
+  TCNDS  = (NumerSolidThermCond_vr(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
     *2.067E-03_r8+0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
-    +WTHET2*FracSoilPoreAsAir_vr(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
-    /(DenomSolidThermCond(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
+    +WTHET2*AirFilledSoilPore_vr(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
+    /(DenomSolidThermCond_vr(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
     +0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX) &
-    +WTHET2*FracSoilPoreAsAir_vr(NUM(NY,NX),NY,NX))
+    +WTHET2*AirFilledSoilPore_vr(NUM(NY,NX),NY,NX))
 
   !the mean thermal conductivity
   IF(FracSurfBareSoil_col(NY,NX).GT.ZERO)THEN

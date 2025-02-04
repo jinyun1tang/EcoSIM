@@ -144,16 +144,6 @@ module IngridTranspMod
 !
 !     QRM=runoff from watsub.f
 !     RQR*0=solute in runoff
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
 !     VLWatMicPM=litter water volume from watsub.f
 !     *S2=litter solute content
 !     N2,N1=NY,NX of source grid cell
@@ -596,12 +586,12 @@ module IngridTranspMod
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux in non-band,band
 !
   DO nsalts=idsalt_beg,idsalt_end
-    trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)=trcSalt3DFlo2Cell(nsalts,3,0,NY,NX)+trcSaltSnoFlo2LitR(nsalts) &
+    trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)=trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)+trcSaltSnoFlo2LitR(nsalts) &
       -trcSalt_RFL(nsalts)-trcSalt_flx_diffus(nsalts)
   ENDDO
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX)=trcSalt3DFlo2Cell(nsalts,3,NU(NY,NX),NY,NX) &
+    trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX)=trcSalt3DFlo2Cell_3D(nsalts,3,NU(NY,NX),NY,NX) &
       +trcSaltSnoFlo2Soil(nsalts)+trcSalt_RFL(nsalts)+trcSalt_flx_diffus(nsalts)
   ENDDO
   end subroutine AccumHourlyTopsoilReisdueFlux
@@ -775,7 +765,7 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_XFXS(nsalts,NU(NY,NX),NY,NX)=trcSalt_XFXS(nsalts,NU(NY,NX),NY,NX)+trcSalt_RFXS(nsalts,NU(NY,NX),NY,NX)
+    trcSalt_XFXS_vr(nsalts,NU(NY,NX),NY,NX)=trcSalt_XFXS_vr(nsalts,NU(NY,NX),NY,NX)+trcSalt_RFXS(nsalts,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine AccumHourlyMicMacPoreFlux
 !------------------------------------------------------------------------------------------
@@ -790,18 +780,18 @@ module IngridTranspMod
   INTEGER :: nsalts
 !     begin_execution
 
-  IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+  IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM_vr(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,WatFlux4ErosionM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
 
     DO nsalts=idsalt_beg,idsalt_end
-      trcSalt_RQR0(nsalts,N2,N1)=VFLW*AZMAX1(trcSalt_solml2(nsalts,0,N2,N1))
+      trcSalt_FloXSurRof_flxM(nsalts,N2,N1)=VFLW*AZMAX1(trcSalt_solml2(nsalts,0,N2,N1))
     ENDDO
   else
-    trcSalt_RQR0(idsalt_beg:idsalt_end,N2,N1)=0.0_r8
+    trcSalt_FloXSurRof_flxM(idsalt_beg:idsalt_end,N2,N1)=0.0_r8
   endif  
   end subroutine SoluteFluxBySurfaceOutflow
 
@@ -822,7 +812,7 @@ module IngridTranspMod
   DO N=1,2
     DO  NN=1,2
       IF(N.EQ.1)THEN
-        IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
+        IF(NX.EQ.NHE.AND.NN.EQ.iOutflow.OR.NX.EQ.NHW.AND.NN.EQ.iInflow)THEN
           cycle
         ELSE
           N4=NX+1
@@ -831,7 +821,7 @@ module IngridTranspMod
           N5B=NY
         ENDIF
       ELSEIF(N.EQ.2)THEN
-        IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
+        IF(NY.EQ.NVS.AND.NN.EQ.iOutflow.OR.NY.EQ.NVN.AND.NN.EQ.iInflow)THEN
           cycle
         ELSE
           N4=NX
@@ -856,12 +846,12 @@ module IngridTranspMod
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(WatFlux4ErosionM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-        IF(NN.EQ.1)THEN
-          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/WatFlux4ErosionM_2DH(M,N2,N1)
+      IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+        IF(NN.EQ.iOutflow)THEN
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
 
           DO nsalts=idsalt_beg,idsalt_end
-            trcSalt_RQR(nsalts,N,2,N5,N4)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
+            trcSalt_FloXSurRof_flxM_2DH(nsalts,N,2,N5,N4)=trcSalt_FloXSurRof_flxM(nsalts,N2,N1)*FQRM
           ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -870,19 +860,19 @@ module IngridTranspMod
 !     RQR*=solute in runoff
 !
           DO nsalts=idsalt_beg,idsalt_end
-            trc_salt_rof_bounds(nsalts,N,2,N5,N4)=trc_salt_rof_bounds(nsalts,N,2,N5,N4)+trcSalt_RQR(nsalts,N,2,N5,N4)
+            trc_salt_rof_bounds(nsalts,N,2,N5,N4)=trc_salt_rof_bounds(nsalts,N,2,N5,N4)+trcSalt_FloXSurRof_flxM_2DH(nsalts,N,2,N5,N4)
           ENDDO
         ELSE
-          trcSalt_RQR(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
+          trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
         ENDIF
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        IF(NN.EQ.2)THEN
+        IF(NN.EQ.iInflow)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/WatFlux4ErosionM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
             DO nsalts=idsalt_beg,idsalt_end
-              trcSalt_RQR(nsalts,N,1,N5B,N4B)=trcSalt_RQR0(nsalts,N2,N1)*FQRM
+              trcSalt_FloXSurRof_flxM_2DH(nsalts,N,1,N5B,N4B)=trcSalt_FloXSurRof_flxM(nsalts,N2,N1)*FQRM
             ENDDO
       !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -891,17 +881,17 @@ module IngridTranspMod
 !     RQR*=solute in runoff
 !
             DO nsalts=idsalt_beg,idsalt_end
-              trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)=trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)+trcSalt_RQR(nsalts,N,1,N5B,N4B)
+              trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)=trc_salt_rof_bounds(nsalts,N,1,N5B,N4B)+trcSalt_FloXSurRof_flxM_2DH(nsalts,N,1,N5B,N4B)
             ENDDO
           ELSE
-            trcSalt_RQR(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
+            trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
           ENDIF
         ENDIF
       ELSE
-        trcSalt_RQR(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
+        trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,2,N5,N4)=0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
-          trcSalt_RQR(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
+          trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,1,N5B,N4B)=0.0_r8
         ENDIF
       ENDIF
 !
@@ -922,7 +912,7 @@ module IngridTranspMod
 !     VOLS=volume of snowpack from watsub.f
 !     *W2=solute content of snowpack
 !
-      IF(NN.EQ.1)THEN
+      IF(NN.EQ.iOutflow)THEN
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
@@ -961,7 +951,7 @@ module IngridTranspMod
 !     RQS*=solute in snow transfer
 !
         DO nsalts=idsalt_beg,idsalt_end
-          trcSalt_XQS(nsalts,N,N5,N4)=trcSalt_XQS(nsalts,N,N5,N4)+trcSalt_RQ(nsalts,N,N5,N4)
+          trcSalt_FloXSnow_2DH(nsalts,N,N5,N4)=trcSalt_FloXSnow_2DH(nsalts,N,N5,N4)+trcSalt_RQ(nsalts,N,N5,N4)
         ENDDO
       ENDIF
     enddo
@@ -1639,9 +1629,9 @@ module IngridTranspMod
 !
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell(nsalts,N,N6,N5,N4)=trcSalt3DFlo2Cell(nsalts,N,N6,N5,N4) &
+    trcSalt3DFlo2Cell_3D(nsalts,N,N6,N5,N4)=trcSalt3DFlo2Cell_3D(nsalts,N,N6,N5,N4) &
       +trcSalt3DFlo2CellM(nsalts,N,N6,N5,N4)
-    trcSalt_XFHS(nsalts,N,N6,N5,N4)=trcSalt_XFHS(nsalts,N,N6,N5,N4) &
+    trcSalt_XFHS_3D(nsalts,N,N6,N5,N4)=trcSalt_XFHS_3D(nsalts,N,N6,N5,N4) &
       +trcSalt_RFHS(nsalts,N,N6,N5,N4)
   ENDDO
   end subroutine SoluteAdvDifsMicMacpore
@@ -1682,7 +1672,7 @@ module IngridTranspMod
 !     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_XFXS(nsalts,N6,N5,N4)=trcSalt_XFXS(nsalts,N6,N5,N4)+trcSalt_RFXS(nsalts,N6,N5,N4)
+    trcSalt_XFXS_vr(nsalts,N6,N5,N4)=trcSalt_XFXS_vr(nsalts,N6,N5,N4)+trcSalt_RFXS(nsalts,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifsExchMicMacpore

@@ -22,6 +22,8 @@ module ChemTracerParsMod
 
 !
 
+  real(r8), parameter :: ARSG=6.8E-02_r8   !gaseous AR diffusivity	m2 h-1
+  real(r8), parameter :: ARSL=7.7E-06_r8   !aqueous AR diffusivity  m2 h-1
   real(r8), parameter :: CGSG=4.68E-02_r8  !gaseous CO2 diffusivity	m2 h-1
   real(r8), parameter :: CLSG=4.25E-06_r8  !aqueous CO2 diffusivity	m2 h-1
   real(r8), parameter :: CHSG=7.80E-02_r8  !gaseous CH4 diffusivity	m2 h-1
@@ -55,6 +57,8 @@ module ChemTracerParsMod
   real(r8), parameter :: CLSX=5.0E-06_r8  !aqueous Cl diffusivity	m2 h-1
   real(r8), parameter :: HGSG=5.57E-02_r8 !gaseous H2 diffusivity	m2 h-1
   real(r8), parameter :: HLSG=7.34E-06_r8 !aqueous H2 diffusivity	m2 h-1
+
+  real(r8), parameter :: SARX =3.421E-02_r8  !Ar solubility coefficient at 25oC
   real(r8), parameter :: SCO2X=7.391E-01_r8  !CO2 solubility coeficient at 25oC
   real(r8), parameter :: SCH4X=3.156E-02_r8  !CH4 solubility coeficient at 25oC
   real(r8), parameter :: SOXYX=2.925E-02_r8  !O2 solubility coeficient at 25oC
@@ -62,9 +66,6 @@ module ChemTracerParsMod
   real(r8), parameter :: SN2OX=5.241E-01_r8  !N2O solubility coeficient  at 25oC
   real(r8), parameter :: SNH3X=2.852E+02_r8  !NH3 solubility coeficient at 25oC
   real(r8), parameter :: SH2GX=3.156E-02_r8  !H2 solubility coeficient at 25oC
-
-
-  real(r8), parameter :: ACTCG(7)=real((/0.14,0.14,0.31,0.23,0.23,0.14,0.07/),r8)
 
 !  real(r8), parameter :: ACO2X=0.14_r8  !CO2 activity coefficient
 !  real(r8), parameter :: ACH4X=0.14_r8  !CH4 activity coefficient
@@ -74,5 +75,6 @@ module ChemTracerParsMod
 !  real(r8), parameter :: AH2GX=0.14_r8  !H2 activity coefficient
 !  real(r8), parameter :: ANH3X=0.07_r8  !NH3 activity coefficient
   real(r8), parameter :: VISCW=1.0E-06_r8 !water viscosity (Mg m-1 s)
+
 
 end module ChemTracerParsMod

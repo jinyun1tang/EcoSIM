@@ -53,11 +53,11 @@ implicit none
   real(r8), intent(inout) :: ystatesfl(nvars)
 
   !ZNH4S=ZNH4S+TR_NH4_soil*Natomw
-  ystatesfl(cid_NH4_1p_conc)=ystates0l(cid_NH4_1p_conc)+solflx%TR_NH4_soil/chemvar%VLWatMicPNH
+  ystatesfl(cid_NH4_1p_aqua_mole_conc)=ystates0l(cid_NH4_1p_aqua_mole_conc)+solflx%TR_NH4_soil/chemvar%VLWatMicPNH
   ystatesfl(fid_TR_NH4_soil)=solflx%TR_NH4_soil
 
   !ZNH3S=ZNH3S+TR_NH3_soil_vr*Natomw
-  ystatesfl(cid_NH3_aqu_conc)=ystates0l(cid_NH3_aqu_conc)+solflx%TR_NH3_soil_vr/chemvar%VLWatMicPNH
+  ystatesfl(cid_NH3_aqua_mole_conc)=ystates0l(cid_NH3_aqua_mole_conc)+solflx%TR_NH3_soil_vr/chemvar%VLWatMicPNH
   ystatesfl(fid_TR_NH3_soil_vr)=solflx%TR_NH3_soil_vr
 
   !XN4  =XN4+TR_NH4_sorbed_soil
@@ -84,11 +84,11 @@ implicit none
   ystatesfl(fid_TR_NH4_sorbed_band_soil)=solflx%TR_NH4_sorbed_band_soil
 
   !H1PO4=H1PO4+TR_H1PO4_soil*Patomw
-  ystatesfl(cid_H1PO4_2e_conc)=ystates0l(cid_H1PO4_2e_conc)+solflx%TR_H1PO4_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_H1PO4_2e_aqua_mole_conc)=ystates0l(cid_H1PO4_2e_aqua_mole_conc)+solflx%TR_H1PO4_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TR_H1PO4_soil)=solflx%TR_H1PO4_soil
 
   !H2PO4=H2PO4+TR_H2PO4_soil*Patomw
-  ystatesfl(cid_H2PO4_1e_conc)=ystates0l(cid_H2PO4_1e_conc)+solflx%TR_H2PO4_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_H2PO4_1e_aqua_mole_conc)=ystates0l(cid_H2PO4_1e_aqua_mole_conc)+solflx%TR_H2PO4_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TR_H2PO4_soil)=solflx%TR_H2PO4_soil
 
   !XOH1 =XOH1+TR_ROH_sorbed_soil
@@ -242,8 +242,8 @@ implicit none
   chemvar%XNH4_conc                = ystates0l(cid_XNH4_conc)
   chemvar%XNH4_band_conc           = ystates0l(cid_XNH4_band_conc)
   chemvar%H1PO4_2e_band_conc       = ystates0l(cid_H1PO4_2e_band_conc)  !H1POB
-  chemvar%H1PO4_2e_conc            = ystates0l(cid_H1PO4_2e_conc)  !H1PO4
-  chemvar%H2PO4_1e_conc            = ystates0l(cid_H2PO4_1e_conc)  !H2PO4
+  chemvar%H1PO4_2e_aqua_mole_conc            = ystates0l(cid_H1PO4_2e_aqua_mole_conc)  !H1PO4
+  chemvar%H2PO4_1e_aqua_mole_conc            = ystates0l(cid_H2PO4_1e_aqua_mole_conc)  !H2PO4
   chemvar%H2PO4_1e_band_conc       = ystates0l(cid_H2PO4_1e_band_conc)  !H2POB
   chemvar%XHPO4_band_conc          = ystates0l(cid_XHPO4_band_conc)
   chemvar%XH2PO4_band_conc         = ystates0l(cid_XH2PO4_band_conc)
@@ -252,9 +252,9 @@ implicit none
   chemvar%XROH2_band_conc          = ystates0l(cid_XROH2_band_conc)
   chemvar%XH2PO4_conc              = ystates0l(cid_XH2PO4_conc)
   chemvar%XROH2_conc               = ystates0l(cid_XROH2_conc)
-  chemvar%NH3_aqu_conc             = ystates0l(cid_NH3_aqu_conc)    !ZNH3S
+  chemvar%NH3_aqua_mole_conc             = ystates0l(cid_NH3_aqua_mole_conc)    !ZNH3S
   chemvar%NH3_aqu_band_conc        = ystates0l(cid_NH3_aqu_band_conc)    !ZNH3B
-  chemvar%NH4_1p_conc              = ystates0l(cid_NH4_1p_conc)    !ZNH4S
+  chemvar%NH4_1p_aqua_mole_conc              = ystates0l(cid_NH4_1p_aqua_mole_conc)    !ZNH4S
   chemvar%NH4_1p_band_conc         = ystates0l(cid_NH4_1p_band_conc)    !ZNH4B
   chemvar%Precp_AlPO4_conc         = ystates0l(cid_Precp_AlPO4_conc)
   chemvar%PrecpB_AlPO4_conc        = ystates0l(cid_PrecpB_AlPO4_conc)

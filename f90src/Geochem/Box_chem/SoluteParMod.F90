@@ -24,7 +24,7 @@ module SoluteParMod
 !     DPM1P=MgHPO4,DPCOH=R-COO,DPALO=R-AlOH2,DPFEO=R-FeOH2
 !
   real(r8), PARAMETER :: DPH2O=6.5E-09_r8     !=[H(+)][OH(-)] in the unit of mol/m3, 
-  real(r8), PARAMETER :: SPALO=6.5E-22_r8
+  real(r8), PARAMETER :: SPALO=6.5E-22_r8     !=
   real(r8), PARAMETER :: SPFEO=6.5E-27_r8
   real(r8), PARAMETER :: SPCAC=3.8E-03_r8
   real(r8), PARAMETER :: SPCAS=1.4E+01_r8

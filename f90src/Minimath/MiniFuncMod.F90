@@ -83,11 +83,13 @@ implicit none
   end function TortMacporeW
 
 !------------------------------------------------------------------------------------------
-  pure function fDiffusivitySolutEff(scalar,THETWA,Z3SR,is_litter)result(ans)
+  pure function fDiffusivitySolutEff(tempscalar,THETWA,Z3SR,is_litter)result(ans)
 !
+! Description
 ! compute coefficient for air-water gas transfer
+!
   implicit none
-  real(r8), intent(in) :: scalar               !rate scalar including temperature effect
+  real(r8), intent(in) :: tempscalar           !rate scalar including temperature effect
   real(r8), intent(in) :: THETWA               !relative saturation
   real(r8), intent(in) :: Z3SR                 !saturation threshold
   logical, optional, intent(in) :: is_litter   !indicator if it is litter layer
@@ -104,20 +106,21 @@ implicit none
   logical :: is_litter_loc
 ! Z1S,Z2SW,Z2SD,Z3SX=parameters for air-water gas transfers in soil
 ! Z1R,Z2RW,Z2RD,Z3RX=parameters for air-water gas transfers in litter
+
   is_litter_loc=.false.
   if(present(is_litter))is_litter_loc=is_litter
   if(is_litter_loc)then
     IF(THETWA.GT.Z3R)THEN
-      ans=AMAX1(0.0_r8,scalar/((Z1R**(-1._r8))*EXP(Z2RW*(THETWA-Z3R))))
+      ans=AMAX1(0.0_r8,tempscalar/((Z1R**(-1._r8))*EXP(Z2RW*(THETWA-Z3R))))
     ELSE
-      ans=AMIN1(1.0_r8,scalar/((Z1R**(-1._r8))*EXP(Z2RD*(THETWA-Z3R))))
+      ans=AMIN1(1.0_r8,tempscalar/((Z1R**(-1._r8))*EXP(Z2RD*(THETWA-Z3R))))
     ENDIF
   else
     Z3S=AMAX1(Z3SX,Z3SR)
     IF(THETWA.GT.Z3S)THEN
-      ans=AMAX1(0.0_r8,scalar/((Z1S**(-1._r8))*EXP(Z2SW*(THETWA-Z3S))))
+      ans=AMAX1(0.0_r8,tempscalar/((Z1S**(-1._r8))*EXP(Z2SW*(THETWA-Z3S))))
     ELSE
-      ans=AMIN1(1.0_r8,scalar/((Z1S**(-1._r8))*EXP(Z2SD*(THETWA-Z3S))))
+      ans=AMIN1(1.0_r8,tempscalar/((Z1S**(-1._r8))*EXP(Z2SD*(THETWA-Z3S))))
     ENDIF
   endif
   end function fDiffusivitySolutEff

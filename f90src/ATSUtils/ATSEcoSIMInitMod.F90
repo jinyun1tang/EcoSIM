@@ -11,7 +11,7 @@ module ATSEcoSIMInitMod
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr !need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
-      VPA, WindSpeedAtm_col, RainH
+      VPA_col, WindSpeedAtm_col, RainH
   use SoilPropertyDataType
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -79,13 +79,13 @@ implicit none
     !H2GE_col(NY,NX)=atm_H2
     TairK_col(NY,NX)=tairc(NY) !it's already in K??
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
-    VPA(NY,NX) = vpair(NY)/1.0e6_r8
+    VPA_col(NY,NX) = vpair(NY)/1.0e6_r8
     !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
 
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
-      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
+      CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
       POROS_vr(L,NY,NX)=a_PORO(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)

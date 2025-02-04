@@ -192,9 +192,9 @@ implicit none
         DIRRA(2,NY,NX) = WDPTHI
         D220: DO I     = 1, 366
           PHQ(IDY,NY,NX)                           = PHQX
-          NH4_irrig_conc(IDY,NY,NX)                = CN4QX/14.0_r8
-          NO3_irrig_conc(IDY,NY,NX)                = CNOQX/14.0_r8
-          H2PO4_irrig_conc(IDY,NY,NX)              = CPOQX/31.0_r8
+          NH4_irrig_mole_conc(IDY,NY,NX)                = CN4QX/14.0_r8
+          NO3_irrig_mole_conc(IDY,NY,NX)                = CNOQX/14.0_r8
+          H2PO4_irrig_mole_conc(IDY,NY,NX)              = CPOQX/31.0_r8
           trcsalt_irrig_conc(idsalt_Al,IDY,NY,NX)  = CALQX/27.0_r8
           trcsalt_irrig_conc(idsalt_Fe,IDY,NY,NX)  = CFEQX/55.8_r8
           trcsalt_irrig_conc(idsalt_Ca,IDY,NY,NX)  = CCAQX/40.0_r8
@@ -247,9 +247,9 @@ implicit none
 !           TRANSFER INPUTS TO MODEL ARRAYS
 !
           PHQ(IDY,NY,NX)=PHQX
-          NH4_irrig_conc(IDY,NY,NX)=CN4QX/14.0_r8
-          NO3_irrig_conc(IDY,NY,NX)=CNOQX/14.0_r8
-          H2PO4_irrig_conc(IDY,NY,NX)=CPOQX/31.0_r8
+          NH4_irrig_mole_conc(IDY,NY,NX)=CN4QX/14.0_r8
+          NO3_irrig_mole_conc(IDY,NY,NX)=CNOQX/14.0_r8
+          H2PO4_irrig_mole_conc(IDY,NY,NX)=CPOQX/31.0_r8
           trcsalt_irrig_conc(idsalt_Al,IDY,NY,NX)=CALQX/27.0_r8
           trcsalt_irrig_conc(idsalt_Fe,IDY,NY,NX)=CFEQX/55.8_r8
           trcsalt_irrig_conc(idsalt_Ca,IDY,NY,NX)=CCAQX/40.0_r8

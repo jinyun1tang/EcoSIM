@@ -107,7 +107,7 @@ implicit none
   )
 
   DO L=NM+1,JZ
-    CumDepz2LayerBot_vr(L,NY,NX) = 2.0_r8*CumDepz2LayerBot_vr(L-1,NY,NX)-1.0_r8*CumDepz2LayerBot_vr(L-2,NY,NX)
+    CumDepz2LayBottom_vr(L,NY,NX) = 2.0_r8*CumDepz2LayBottom_vr(L-1,NY,NX)-1.0_r8*CumDepz2LayBottom_vr(L-2,NY,NX)
     SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L-1,NY,NX)
     FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L-1,NY,NX)
     WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L-1,NY,NX)
@@ -118,7 +118,7 @@ implicit none
     CCLAY_vr(L,NY,NX)               = CCLAY_vr(L-1,NY,NX)
     SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L-1,NY,NX)
     ROCK_vr(L,NY,NX)             = ROCK_vr(L-1,NY,NX)
-    PH(L,NY,NX)                  = PH(L-1,NY,NX)
+    PH_vr(L,NY,NX)                  = PH_vr(L-1,NY,NX)
     CEC_vr(L,NY,NX)              = CEC_vr(L-1,NY,NX)
     AEC_vr(L,NY,NX)              = AEC_vr(L-1,NY,NX)
 
@@ -135,31 +135,31 @@ implicit none
 !       CSoilOrgM_vr(ielmn,L,NY,NX)=CSoilOrgM_vr(ielmn,L-1,NY,NX)
 !       CSoilOrgM_vr(ielmp,L,NY,NX)=CSoilOrgM_vr(ielmp,L-1,NY,NX)
 !     ENDIF
-    CNH4(L,NY,NX)             = CNH4(L-1,NY,NX)
-    CNO3(L,NY,NX)             = CNO3(L-1,NY,NX)
-    CPO4(L,NY,NX)             = CPO4(L-1,NY,NX)
-    CAL(L,NY,NX)              = CAL(L-1,NY,NX)
-    CFE(L,NY,NX)              = CFE(L-1,NY,NX)
-    CCA(L,NY,NX)              = CCA(L-1,NY,NX)
-    CMG(L,NY,NX)              = CMG(L-1,NY,NX)
-    CNA(L,NY,NX)              = CNA(L-1,NY,NX)
-    CKA(L,NY,NX)              = CKA(L-1,NY,NX)
-    CSO4(L,NY,NX)             = CSO4(L-1,NY,NX)
-    CCL(L,NY,NX)              = CCL(L-1,NY,NX)
-    CALOH(L,NY,NX)            = CALOH(L-1,NY,NX)
-    CFEOH(L,NY,NX)            = CFEOH(L-1,NY,NX)
-    CCACO(L,NY,NX)            = CCACO(L-1,NY,NX)
-    CCASO(L,NY,NX)            = CCASO(L-1,NY,NX)
-    CALPO(L,NY,NX)            = CALPO(L-1,NY,NX)
-    CFEPO(L,NY,NX)            = CFEPO(L-1,NY,NX)
-    CCAPD(L,NY,NX)            = CCAPD(L-1,NY,NX)
-    CCAPH(L,NY,NX)            = CCAPH(L-1,NY,NX)
-    GKC4(L,NY,NX)             = GKC4(L-1,NY,NX)
-    GKCH(L,NY,NX)             = GKCH(L-1,NY,NX)
-    GKCA(L,NY,NX)             = GKCA(L-1,NY,NX)
-    GKCM(L,NY,NX)             = GKCM(L-1,NY,NX)
-    GKCN(L,NY,NX)             = GKCN(L-1,NY,NX)
-    GKCK(L,NY,NX)             = GKCK(L-1,NY,NX)
+    CNH4_vr(L,NY,NX)             = CNH4_vr(L-1,NY,NX)
+    CNO3_vr(L,NY,NX)             = CNO3_vr(L-1,NY,NX)
+    CPO4_vr(L,NY,NX)             = CPO4_vr(L-1,NY,NX)
+    CAL_vr(L,NY,NX)              = CAL_vr(L-1,NY,NX)
+    CFE_vr(L,NY,NX)              = CFE_vr(L-1,NY,NX)
+    CCA_vr(L,NY,NX)              = CCA_vr(L-1,NY,NX)
+    CMG_vr(L,NY,NX)              = CMG_vr(L-1,NY,NX)
+    CNA_vr(L,NY,NX)              = CNA_vr(L-1,NY,NX)
+    CKA_vr(L,NY,NX)              = CKA_vr(L-1,NY,NX)
+    CSO4_vr(L,NY,NX)             = CSO4_vr(L-1,NY,NX)
+    CCL_vr(L,NY,NX)              = CCL_vr(L-1,NY,NX)
+    CALOH_vr(L,NY,NX)            = CALOH_vr(L-1,NY,NX)
+    CFEOH_vr(L,NY,NX)            = CFEOH_vr(L-1,NY,NX)
+    CCACO_vr(L,NY,NX)            = CCACO_vr(L-1,NY,NX)
+    CCASO_vr(L,NY,NX)            = CCASO_vr(L-1,NY,NX)
+    CALPO_vr(L,NY,NX)            = CALPO_vr(L-1,NY,NX)
+    CFEPO_vr(L,NY,NX)            = CFEPO_vr(L-1,NY,NX)
+    CCAPD_vr(L,NY,NX)            = CCAPD_vr(L-1,NY,NX)
+    CCAPH_vr(L,NY,NX)            = CCAPH_vr(L-1,NY,NX)
+    GKC4_vr(L,NY,NX)             = GKC4_vr(L-1,NY,NX)
+    GKCH_vr(L,NY,NX)             = GKCH_vr(L-1,NY,NX)
+    GKCA_vr(L,NY,NX)             = GKCA_vr(L-1,NY,NX)
+    GKCM_vr(L,NY,NX)             = GKCM_vr(L-1,NY,NX)
+    GKCN_vr(L,NY,NX)             = GKCN_vr(L-1,NY,NX)
+    GKCK_vr(L,NY,NX)             = GKCK_vr(L-1,NY,NX)
     THW_vr(L,NY,NX)           = THW_vr(L-1,NY,NX)
     THI_vr(L,NY,NX)           = THI_vr(L-1,NY,NX)
     ISOIL(1:4,L,NY,NX)        = ISOIL(1:4,L-1,NY,NX)
@@ -189,7 +189,7 @@ implicit none
   IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
     HeatDiffusByWat1     = AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3._r8
-    HeatDiffusByAir1     = AZMAX1(FracSoilPoreAsAir_vr(N3,N2,N1)-TRBA)**3._r8
+    HeatDiffusByAir1     = AZMAX1(AirFilledSoilPore_vr(N3,N2,N1)-TRBA)**3._r8
     RYLXW1               = DTKX*HeatDiffusByWat1
     RYLXA1               = DTKX*HeatDiffusByAir1
     RYLNW1               = AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
@@ -199,10 +199,10 @@ implicit none
     ThermalConducByWater = 2.067E-03_r8*XNUSW1
     ThermalConducByAir   = 9.050E-05_r8*XNUSA1
     WTHET1               = 1.467_r8-0.467_r8*FracSoilAsAirt(N3,N2,N1)
-    TCND1                = (NumerSolidThermCond(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)*ThermalConducByWater &
-      +0.611_r8*FracSoiPAsIce_vr(N3,N2,N1)*7.844E-03_r8+WTHET1*FracSoilPoreAsAir_vr(N3,N2,N1)*ThermalConducByAir) &
-      /(DenomSolidThermCond(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)+0.611_r8*FracSoiPAsIce_vr(N3,N2,N1) &
-      +WTHET1*FracSoilPoreAsAir_vr(N3,N2,N1))
+    TCND1                = (NumerSolidThermCond_vr(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)*ThermalConducByWater &
+      +0.611_r8*FracSoiPAsIce_vr(N3,N2,N1)*7.844E-03_r8+WTHET1*AirFilledSoilPore_vr(N3,N2,N1)*ThermalConducByAir) &
+      /(DenomSolidThermCond_vr(N3,N2,N1)+FracSoiPAsWat_vr(N3,N2,N1)+0.611_r8*FracSoiPAsIce_vr(N3,N2,N1) &
+      +WTHET1*AirFilledSoilPore_vr(N3,N2,N1))
   ELSE
     TCND1=0.0_r8
   ENDIF
