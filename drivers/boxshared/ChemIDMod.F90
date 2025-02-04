@@ -7,10 +7,10 @@ implicit none
   __FILE__
 
   integer :: cid_CO2S     !aqueous CO2  micropore	[g d-2]
-  integer :: cid_H1PO4_2e_conc    !soil aqueous HPO4 content micropore non-band, [mol m-3]
-  integer :: cid_H2PO4_1e_conc    !soil aqueous H2PO4 content micropore non-band, [mol m-3]
-  integer :: cid_NH3_aqu_conc     !soil NH3 concentration in non-band soil, [mol m-3]
-  integer :: cid_NH4_1p_conc     !soil NH4 concentration in non-band soil, [mol m-3]
+  integer :: cid_H1PO4_2e_aqua_mole_conc    !soil aqueous HPO4 content micropore non-band, [mol m-3]
+  integer :: cid_H2PO4_1e_aqua_mole_conc    !soil aqueous H2PO4 content micropore non-band, [mol m-3]
+  integer :: cid_NH3_aqua_mole_conc     !soil NH3 concentration in non-band soil, [mol m-3]
+  integer :: cid_NH4_1p_aqua_mole_conc     !soil NH4 concentration in non-band soil, [mol m-3]
   integer :: cid_ZNO3S    !NO3 mass non-band micropore, [g d-2]
   integer :: cid_ZHY      !soil aqueous H content micropore, [mol d-2]
   integer :: cid_ZOH      !soil aqueous OH content micropore, [mol d-2]
@@ -133,7 +133,7 @@ implicit none
   integer :: fid_TR_SO4_2e_soil    !total solute SO4 transformation, [mol d-2 h-1]
   integer :: fid_TR_CO3_2e_soil    !total solute CO3 transformation, [mol d-2 h-1]
   integer :: fid_TR_HCO3    !total solute HCO3 transformation, [mol d-2 h-1]
-  integer :: fid_TR_CO2_gchem_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
+  integer :: fid_TR_CO2_geochem_soil_vr    !total solute CO2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlOH_soil    !total solute AlOH transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO2H2_soil    !total solute AlOH2 transformation, [mol d-2 h-1]
   integer :: fid_TR_AlO3H3_soil    !total solute AlOH3 transformation, [mol d-2 h-1]
@@ -216,26 +216,26 @@ implicit none
   character(len=hist_unit_str_len),intent(inout) :: unitl(:)
   integer                         ,intent(inout) :: vartypes(:)
 
-  varl(cid_H1PO4_2e_conc)='H1PO4_2e_conc';varlnml(cid_H1PO4_2e_conc)='non-band soil aqueous HPO4 content micropore'
-  unitl(cid_H1PO4_2e_conc)='mol m-3';vartypes(cid_H1PO4_2e_conc)=var_state_type
+  varl(cid_H1PO4_2e_aqua_mole_conc)='H1PO4_2e_aqua_mole_conc';varlnml(cid_H1PO4_2e_aqua_mole_conc)='non-band soil aqueous HPO4 content micropore'
+  unitl(cid_H1PO4_2e_aqua_mole_conc)='mol m-3';vartypes(cid_H1PO4_2e_aqua_mole_conc)=var_state_type
 
   varl(cid_H1PO4_2e_band_conc)='H1PO4_2e_band_conc';varlnml(cid_H1PO4_2e_band_conc)='band soil aqueous HPO4 content micropore'
   unitl(cid_H1PO4_2e_band_conc)='mol m-3';vartypes(cid_H1PO4_2e_band_conc)=var_state_type
 
-  varl(cid_H2PO4_1e_conc)='H2PO4_1e_conc';varlnml(cid_H2PO4_1e_conc)='non-band soil micropore aqueous H2PO4 content'
-  unitl(cid_H2PO4_1e_conc)='mol m-3';vartypes(cid_H2PO4_1e_conc)=var_state_type
+  varl(cid_H2PO4_1e_aqua_mole_conc)='H2PO4_1e_aqua_mole_conc';varlnml(cid_H2PO4_1e_aqua_mole_conc)='non-band soil micropore aqueous H2PO4 content'
+  unitl(cid_H2PO4_1e_aqua_mole_conc)='mol m-3';vartypes(cid_H2PO4_1e_aqua_mole_conc)=var_state_type
 
   varl(cid_H2PO4_1e_band_conc)='H2PO4_1e_band_conc';varlnml(cid_H2PO4_1e_band_conc)='band soil micropore aqueous H2PO4 content'
   unitl(cid_H2PO4_1e_band_conc)='mol m-3';vartypes(cid_H2PO4_1e_band_conc)=var_state_type
 
-  varl(cid_NH3_aqu_conc) ='NH3_aqu_conc';varlnml(cid_NH3_aqu_conc)='non-band soil NH3 concentration'
-  unitl(cid_NH3_aqu_conc)='mol m-3';vartypes(cid_NH3_aqu_conc)=var_state_type
+  varl(cid_NH3_aqua_mole_conc) ='NH3_aqua_mole_conc';varlnml(cid_NH3_aqua_mole_conc)='non-band soil NH3 concentration'
+  unitl(cid_NH3_aqua_mole_conc)='mol m-3';vartypes(cid_NH3_aqua_mole_conc)=var_state_type
 
   varl(cid_NH3_aqu_band_conc) ='NH3_aqu_band_conc';varlnml(cid_NH3_aqu_band_conc)='band soil NH3 concentration'
   unitl(cid_NH3_aqu_band_conc)='mol m-3';vartypes(cid_NH3_aqu_band_conc)=var_state_type
 
-  varl(cid_NH4_1p_conc)  ='NH4_1p_conc';varlnml(cid_NH4_1p_conc)='non-band soil NH4 concentration'
-  unitl(cid_NH4_1p_conc)='mol m-3';vartypes(cid_NH4_1p_conc)=var_state_type
+  varl(cid_NH4_1p_aqua_mole_conc)  ='NH4_1p_aqua_mole_conc';varlnml(cid_NH4_1p_aqua_mole_conc)='non-band soil NH4 concentration'
+  unitl(cid_NH4_1p_aqua_mole_conc)='mol m-3';vartypes(cid_NH4_1p_aqua_mole_conc)=var_state_type
 
   varl(cid_NH4_1p_band_conc)  ='NH4_1p_band_conc';varlnml(cid_NH4_1p_band_conc)='band soil NH4 concentration'
   unitl(cid_NH4_1p_band_conc) ='mol m-3';vartypes(cid_NH4_1p_band_conc)=var_state_type

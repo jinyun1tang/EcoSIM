@@ -11,8 +11,8 @@ module WatsubMod
   use abortutils,     only: endrun,   print_info
   use ElmIDMod,       only: iEastWestDirection,   iNorthSouthDirection, iVerticalDirection
   use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
-  use SnowBalanceMod, only : DebugSnowPrint  
   use PerturbationMod, only : check_Soil_Warming,is_warming_layerL  
+  use DebugToolMod
   use EcoSIMCtrlMod  
   use minimathmod      
   use RootDataType
@@ -286,7 +286,7 @@ module WatsubMod
 
       !identify the layer where irrigation is applied
       D65: DO L=NUM(NY,NX),NL(NY,NX)
-        IF(CumDepz2LayerBot_vr(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
+        IF(CumDepz2LayBottom_vr(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
           LyrIrrig=L
           exit
         ENDIF
@@ -353,13 +353,13 @@ module WatsubMod
           !fraction as ice
           FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLTSoiPore)
           !fraction as air
-          FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
+          AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
         ELSE
           FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
           FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-          FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
+          AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
         ENDIF
-        THETPM(1,L,NY,NX)=FracSoilPoreAsAir_vr(L,NY,NX)
+        AirFilledSoilPoreM_vr(1,L,NY,NX)=AirFilledSoilPore_vr(L,NY,NX)
         IF(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           FracSoilAsAirt(L,NY,NX)=AZMAX1((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX)) &
             /(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)))
@@ -409,16 +409,16 @@ module WatsubMod
           HeatIrrigation1_vr(L,NY,NX)    = 0.0_r8
         ENDIF
         !lower than natural water table
-        IF(CumDepz2LayerBot_vr(L,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
+        IF(CumDepz2LayBottom_vr(L,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
           FracLayVolBelowExtWTBL_vr(L,NY,NX)=AMIN1(1.0_r8, &
-            AZMAX1(safe_adb(CumDepz2LayerBot_vr(L,NY,NX)-ExtWaterTable_col(NY,NX),DLYR_3D(3,L,NY,NX))))
+            AZMAX1(safe_adb(CumDepz2LayBottom_vr(L,NY,NX)-ExtWaterTable_col(NY,NX),DLYR_3D(3,L,NY,NX))))
         ELSE
           FracLayVolBelowExtWTBL_vr(L,NY,NX)=0.0_r8
         ENDIF
         !
-        IF(CumDepz2LayerBot_vr(L,NY,NX).GE.TileWaterTable_col(NY,NX))THEN
+        IF(CumDepz2LayBottom_vr(L,NY,NX).GE.TileWaterTable_col(NY,NX))THEN
           FracLayVolBelowTileWTBL_vr(L,NY,NX)=AMIN1(1.0_r8, &
-            AZMAX1(safe_adb(CumDepz2LayerBot_vr(L,NY,NX)-TileWaterTable_col(NY,NX),DLYR_3D(3,L,NY,NX))))
+            AZMAX1(safe_adb(CumDepz2LayBottom_vr(L,NY,NX)-TileWaterTable_col(NY,NX),DLYR_3D(3,L,NY,NX))))
         ELSE
           FracLayVolBelowTileWTBL_vr(L,NY,NX)=0.0_r8
         ENDIF
@@ -792,20 +792,21 @@ module WatsubMod
             str_dir='none'       
             IF(N.EQ.iEastWestDirection)THEN
               ! along the W-E direction
-              !front
+              !eastern
               N4  = NX+1; N5  = NY
-              !back
+              !western
               N4B = NX-1; N5B = NY
               N6  = L
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 !eastern boundary  |---|->
                 IF(NX.EQ.NHE)THEN                
-                  M1              = NX
-                  M2              = NY
-                  M3              = L
-                  M4              = NX+1
-                  M5              = NY
-                  M6              = L
+                  M1 = NX
+                  M2 = NY
+                  M3 = L
+                  !target
+                  M4 = NX+1
+                  M5 = NY
+                  M6 = L
                   XN              = -1.0_r8   !going out of eastern boundary
                   RechargSurf     = RechargEastSurf(M2,M1)
                   RechargSubSurf  = RechargEastSubSurf(M2,M1)
@@ -814,16 +815,18 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 !west boundary   -|-> |
                 IF(NX.EQ.NHW)THEN
-                  M1              = NX+1
-                  M2              = NY
-                  M3              = L
-                  M4              = NX
-                  M5              = NY
-                  M6              = L
-                  XN              = 1.0_r8    !coming in from western boundary
+                  
+                  M1 = NX+1
+                  M2 = NY
+                  M3 = L
+                  !target
+                  M4 = NX
+                  M5 = NY
+                  M6 = L
+                  XN = 1.0_r8    !coming in from western boundary
                   RechargSurf     = RechargWestSurf(M5,M4)
                   RechargSubSurf  = RechargWestSubSurf(M5,M4)
                   RechargRateWTBL = RechargRateWestWTBL(M5,M4)
@@ -834,11 +837,12 @@ module WatsubMod
               ENDIF
             ELSEIF(N.EQ.iNorthSouthDirection)THEN
               ! along the N-S direction
-              !
+              !south
               N4  = NX; N5  = NY+1
+              !north
               N4B = NX; N5B = NY-1
               N6  = L
-              IF(NN.EQ.1)THEN     !-----
+              IF(NN.EQ.iOutflow)THEN     !-----
                 !south boundary     \|/
                 IF(NY.EQ.NVS)THEN !-----
                   M1              = NX
@@ -855,17 +859,18 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN  !\|/
+              ELSEIF(NN.EQ.iInflow)THEN  !\|/
                 !north boundary     ----
                 IF(NY.EQ.NVN)THEN  !----
-                  M1              = NX
-                  M2              = NY+1
-                  M3              = L
-                  M4              = NX
-                  M5              = NY
-                  M6              = L
-                  XN              = 1.0_r8   !coming in from north boundary
-                  RechargSurf     = RechargNorthSurf(M5,M4)
+                  M1 = NX
+                  M2 = NY+1
+                  M3 = L
+                  !target
+                  M4          = NX
+                  M5          = NY
+                  M6          = L
+                  XN          = 1.0_r8   !coming in from north boundary
+                  RechargSurf = RechargNorthSurf(M5,M4)
                   RechargSubSurf  = RechargNorthSubSurf(M5,M4)
                   RechargRateWTBL = RechargRateNorthWTBL(M5,M4)
                   str_dir='north'
@@ -878,7 +883,7 @@ module WatsubMod
               N4 = NX
               N5 = NY
               N6 = L+1
-              IF(NN.EQ.1)THEN
+              IF(NN.EQ.iOutflow)THEN
                 !bottom
                 IF(L.EQ.NL(NY,NX))THEN
                   M1              = NX
@@ -894,7 +899,7 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.2)THEN
+              ELSEIF(NN.EQ.iInflow)THEN
                 cycle
               ENDIF
             ENDIF
@@ -910,11 +915,11 @@ module WatsubMod
 !           or the grid is a soil
 !           surface lateral flow 
             IF(L.EQ.NUM(N2,N1) .AND. N.NE.iVerticalDirection                           & ! lateral flow
-              .AND. (CumDepz2LayerBot_vr(NU(N2,N1)-1,N2,N1).LE.CumLitRDepz_col(N2,N1)  & ! in the soil
+              .AND. (CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1).LE.CumLitRDepz_col(N2,N1)  & ! in the soil
               .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                     ! it is soil
               !  NO runoff
               IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RechargSurf,0._r8) .OR. &
-                ABS(WatFlux4ErosionM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+                ABS(SurfRunoffWatFluxM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
 
                 !runoff
               ELSE
@@ -927,7 +932,7 @@ module WatsubMod
         !     QS,QW,QI=cumulative hourly snow,water,ice transfer
         !     HQS=cumulative hourly convective heat transfer from snow,water,ice transfer
         !      zero out for eastern and southern
-                IF(NN.EQ.1)THEN
+                IF(NN.EQ.iOutflow)THEN
                   DrySnoFlxBySnowRedistribut(N,M5,M4)  = 0.0_r8
                   WatFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8
                   IceFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8
@@ -987,7 +992,7 @@ module WatsubMod
         !     KoppenClimZone=Koppen climate zone
                 IF(N.EQ.iVerticalDirection .AND. KoppenClimZone_col(N2,N1).NE.-2)THEN
                 !heat flux going out (<0)
-                  HeatFlx=(TKSoil1_vr(N3,N2,N1)-TKSD(N2,N1))*TCNDG/(SoilHeatSrcDepth_col(N2,N1)-CumDepz2LayerBot_vr(N3,N2,N1)) &
+                  HeatFlx=(TKSoil1_vr(N3,N2,N1)-TKSD(N2,N1))*TCNDG/(SoilHeatSrcDepth_col(N2,N1)-CumDepz2LayBottom_vr(N3,N2,N1)) &
                     *AREA(N,N3,N2,N1)*dts_HeatWatTP
                   HeatFlow2Soili_3D(N,M6,M5,M4) = HeatFlow2Soili_3D(N,M6,M5,M4)+heatFlx                  
                   HeatSource_col(N2,N1)         = HeatSource_col(N2,N1)-HeatFlx
@@ -1243,7 +1248,7 @@ module WatsubMod
           VLTSoiPore                    = VLSoilMicP_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX)
           FracSoiPAsWat_vr(L,NY,NX)     = AZMAX1t((VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX))/VLTSoiPore)
           FracSoiPAsIce_vr(L,NY,NX)     = AZMAX1t((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLTSoiPore)
-          FracSoilPoreAsAir_vr(L,NY,NX) = AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
+          AirFilledSoilPore_vr(L,NY,NX) = AZMAX1t((VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX))/VLTSoiPore)
           
           IF(VLMicP1_vr(L,NY,NX)+VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             FracSoilAsAirt(L,NY,NX)=AZMAX1((VLairMicP1_vr(L,NY,NX)+ &
@@ -1363,16 +1368,16 @@ module WatsubMod
           VLsoiAirPM_vr(M+1,L,NY,NX) = VLairMicP1_vr(L,NY,NX)+VLairMacP1_vr(L,NY,NX)+THETPI*(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))
 
           !change in soil air volume
-          ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)-VLsoiAirPM_vr(M+1,L,NY,NX)
-          THETPM(M+1,L,NY,NX)         = FracSoilPoreAsAir_vr(L,NY,NX)
+          ReductVLsoiAirPM_vr(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)-VLsoiAirPM_vr(M+1,L,NY,NX)
+          AirFilledSoilPoreM_vr(M+1,L,NY,NX)         = AirFilledSoilPore_vr(L,NY,NX)
  !
         ELSE
           !layer L disappears
           VLWatMicPM_vr(M+1,L,NY,NX)  = 0.0_r8
           VLWatMacPM_vr(M+1,L,NY,NX)  = 0.0_r8
           VLsoiAirPM_vr(M+1,L,NY,NX)  = 0.0_r8
-          ReductVLsoiAirPM(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)
-          THETPM(M+1,L,NY,NX)         = 0.0_r8
+          ReductVLsoiAirPM_vr(M,L,NY,NX) = VLsoiAirPM_vr(M,L,NY,NX)
+          AirFilledSoilPoreM_vr(M+1,L,NY,NX)         = 0.0_r8
         ENDIF
         dwat=dwat+VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE
       ENDDO D9785
@@ -1384,7 +1389,7 @@ module WatsubMod
       !       NUM=new surface layer number after CO2CompenPoint_nodeete lake evaporation
       !       LakeSurfFlowMicP,LakeSurfFlowMacP,LakeSurfHeatFlux=lake surface water flux, heat flux if lake surface disappears
       ! NUM layer is pure water, and its heat capacity and thereby water is too little
-      IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO .AND. VHeatCapacity1_vr(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
+      IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO .AND. VHeatCapacity1_vr(NUM(NY,NX),NY,NX).LE.VHCPNX_col(NY,NX))THEN
         !the soil/water profile moves down        
         NUX=NUM(NY,NX)        
 !        if(I>=317 .and. J>=18)then
@@ -1484,9 +1489,9 @@ module WatsubMod
   real(r8) :: DPTHH
 
   IF(VLMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    DPTHH= CumDepz2LayerBot_vr(L,NY,NX)-(VLWatMacP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLMacP1_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
+    DPTHH= CumDepz2LayBottom_vr(L,NY,NX)-(VLWatMacP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))/VLMacP1_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
   ELSE
-    DPTHH=CumDepz2LayerBot_vr(L,NY,NX)
+    DPTHH=CumDepz2LayBottom_vr(L,NY,NX)
   ENDIF
 
   end function get_DPTHH
@@ -1509,15 +1514,15 @@ module WatsubMod
 !     TileWaterTableX=equilibrium water potential with artificial water table
 !     DoMicPDischarg2Tile=micropore discharge flag to artificial water table
 ! 
-  IF(IDWaterTable_col(NY,NX).GE.3 .AND. SoiDepthMidLay_vr(L,NY,NX).LT.TileWaterTable_col(NY,NX))THEN
-    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-TileWaterTable_col(NY,NX)))THEN
+  IF(IDWaterTable_col(NY,NX).GE.3 .AND. SoilDepthMidLay_vr(L,NY,NX).LT.TileWaterTable_col(NY,NX))THEN
+    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-TileWaterTable_col(NY,NX)))THEN
       DoMicPDischarg2Tile=.true.
       IF(L.LT.NL(NY,NX))THEN
         D9568: DO  LL=L+1,NL(NY,NX)
           TileWaterTableX=TileWaterTable_col(NY,NX)+PSISE_vr(LL,NY,NX)/mGravAccelerat
-          IF(SoiDepthMidLay_vr(LL,NY,NX).LT.TileWaterTableX)THEN
-            IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoiDepthMidLay_vr(LL,NY,NX)-TileWaterTableX) &
-              .AND.L.NE.NL(NY,NX)).OR.SoiDepthMidLay_vr(LL,NY,NX).GT.ActiveLayDepZ_col(NY,NX))THEN
+          IF(SoilDepthMidLay_vr(LL,NY,NX).LT.TileWaterTableX)THEN
+            IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoilDepthMidLay_vr(LL,NY,NX)-TileWaterTableX) &
+              .AND.L.NE.NL(NY,NX)).OR.SoilDepthMidLay_vr(LL,NY,NX).GT.ActiveLayDepZ_col(NY,NX))THEN
               DoMicPDischarg2Tile=.false.
             ENDIF
           ENDIF
@@ -1542,7 +1547,7 @@ module WatsubMod
     DoMacPDischarg2Tile=.true.
     IF(L.LT.NL(NY,NX))THEN
       D9569: DO  LL=L+1,NL(NY,NX)
-        IF(SoiDepthMidLay_vr(LL,NY,NX).LT.TileWaterTable_col(NY,NX))THEN
+        IF(SoilDepthMidLay_vr(LL,NY,NX).LT.TileWaterTable_col(NY,NX))THEN
           ! the layer is above tile drain water table
           IF(VLMacP1_vr(LL,NY,NX).LE.ZEROS(NY,NX))THEN
             ! no macropore flow
@@ -1578,17 +1583,17 @@ module WatsubMod
 !     DoMicPDischarg2ExtWTBL=micropore discharge flag to natural water table
 !  total water potential psi+rho*grav*h
 
-  IF(IDWaterTable_col(NY,NX).NE.0 .AND. SoiDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN
+  IF(IDWaterTable_col(NY,NX).NE.0 .AND. SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN
     !the layer mid-depth is lower than water table
-    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoiDepthMidLay_vr(L,NY,NX)-ExtWaterTable_col(NY,NX)))THEN
+    IF(PSISM1_vr(L,NY,NX).GT.mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-ExtWaterTable_col(NY,NX)))THEN
       DoMicPDischarg2ExtWTBL=.true.
       D9565: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
         !water level difference
         ExtWaterTableEquil=ExtWaterTable_col(NY,NX)+PSISE_vr(LL,NY,NX)/mGravAccelerat  
 
-        IF(SoiDepthMidLay_vr(LL,NY,NX).LT.ExtWaterTableEquil)THEN
-          IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoiDepthMidLay_vr(LL,NY,NX)-ExtWaterTableEquil) &
-            .AND. L.NE.NL(NY,NX)) .OR. SoiDepthMidLay_vr(LL,NY,NX).GT.ActiveLayDepZ_col(NY,NX))THEN
+        IF(SoilDepthMidLay_vr(LL,NY,NX).LT.ExtWaterTableEquil)THEN
+          IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoilDepthMidLay_vr(LL,NY,NX)-ExtWaterTableEquil) &
+            .AND. L.NE.NL(NY,NX)) .OR. SoilDepthMidLay_vr(LL,NY,NX).GT.ActiveLayDepZ_col(NY,NX))THEN
             DoMicPDischarg2ExtWTBL=.false.
           ENDIF
         ENDIF
@@ -1612,7 +1617,7 @@ module WatsubMod
     !active water table
     DoMacPDischarg2ExtWTBL=.true.
 !     DO 9566 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-!     IF(SoiDepthMidLay_vr(LL,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN
+!     IF(SoilDepthMidLay_vr(LL,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN
 !     IF(VLMacP1_vr(LL,NY,NX).LE.ZEROS(NY,NX))THEN
 !     DoMacPDischarg2ExtWTBL=1
 !     ENDIF
@@ -1670,9 +1675,9 @@ module WatsubMod
           TScal4Aquadifsvity             = TEFAQUDIF(TKSoil1_vr(L,NY,NX))
           Z3S                            = FieldCapacity_vr(L,NY,NX)/POROS_vr(L,NY,NX)
           scalar                         = TScal4Aquadifsvity*XNPD
-          DiffusivitySolutEff(M,L,NY,NX) = fDiffusivitySolutEff(scalar,THETWA,Z3S)          
+          DiffusivitySolutEffM_vr(M,L,NY,NX) = fDiffusivitySolutEff(scalar,THETWA,Z3S)          
         ELSE
-          DiffusivitySolutEff(M,L,NY,NX)=0.0_r8
+          DiffusivitySolutEffM_vr(M,L,NY,NX)=0.0_r8
         ENDIF
 
         !Pure water layer
@@ -2003,13 +2008,13 @@ module WatsubMod
   ConvectVapFlux       = 0._r8
   HeatByConvectVapFlux = 0._r8
   if(fixWaterLevel)return
-  IF(THETPM(M,N3,N2,N1).GT.THETX .AND. THETPM(M,N6,N5,N4).GT.THETX)THEN
+  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.THETX .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX)THEN
     TK11   = TKSoil1_vr(N3,N2,N1)
     TK12   = TKSoil1_vr(N6,N5,N4)
     VP1    = vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGASC*TK11))
     VPL    = vapsat(TK12)*EXP(18.0_r8*PSISVL/(RGASC*TK12))
-    CNV1   = WVapDifusvitySoil_vr(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS_vr(N3,N2,N1)
-    CNVL   = WVapDifusvitySoil_vr(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS_vr(N6,N5,N4)
+    CNV1   = WVapDifusvitySoil_vr(N3,N2,N1)*AirFilledSoilPoreM_vr(M,N3,N2,N1)*POROQ*AirFilledSoilPoreM_vr(M,N3,N2,N1)/POROS_vr(N3,N2,N1)
+    CNVL   = WVapDifusvitySoil_vr(N6,N5,N4)*AirFilledSoilPoreM_vr(M,N6,N5,N4)*POROQ*AirFilledSoilPoreM_vr(M,N6,N5,N4)/POROS_vr(N6,N5,N4)
     ATCNVL = 2.0_r8*CNV1*CNVL/(CNV1*DLYR_3D(N,N6,N5,N4)+CNVL*DLYR_3D(N,N3,N2,N1))
     !
     !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,
@@ -2080,7 +2085,7 @@ module WatsubMod
   !     HFLWL=total conductive+convective source-destination heat flux
   !
   
-  IF(VHeatCapacity1_vr(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
+  IF(VHeatCapacity1_vr(N3,N2,N1).GT.VHCPNX_col(NY,NX))THEN
     !surface layer and does not have significant snowpack
     IF(N3.EQ.NUM(NY,NX) .AND. VLHeatCapSnow_snvr(1,N2,N1).LE.VLHeatCapSnowMin_col(N2,N1))THEN
       TK1X=TKSoil1_vr(N3,N2,N1)-(HeatByConvectVapFlux-HeatFluxAir2Soi)/VHeatCapacity1_vr(N3,N2,N1)
@@ -2169,8 +2174,8 @@ module WatsubMod
   IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN
     PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
-      +mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)) &
-      -mGravAccelerat*AZMAX1(SoiDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1)))
+      +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)) &
+      -mGravAccelerat*AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1)))
 
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
     FLWT=PSISWT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-FracVolBelowWTBL)/(RechargSubSurf+1.0_r8) &
@@ -2264,16 +2269,16 @@ module WatsubMod
   !     HydroCond_3D=saturated hydraulic conductivity
   !     VLairMicP=air filled 
   !   lower than external water table, still inside the active layer
-      IF(SoiDepthMidLay_vr(N3,N2,N1).GE.ExtWaterTable_col(N2,N1)                      & !deeper than water table
+      IF(SoilDepthMidLay_vr(N3,N2,N1).GE.ExtWaterTable_col(N2,N1)                      & !deeper than water table
         .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)                    & !active layer deepd enough
-        .AND. SoiDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1)                 & !inside active layer
+        .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1)                 & !inside active layer
         .AND. (AirfMicP.GT.ZEROS2(N2,N1) .OR. SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)   & !able to accept water
         .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                        & !
         .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN
 
         PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
         PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
-          mGravAccelerat*(SoiDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
+          mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
 
         !outflow/drainage  (>0.)
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
@@ -2335,7 +2340,7 @@ module WatsubMod
 
       IF(DPTHH.GT.ExtWaterTable_col(N2,N1)                            & !deeper than water table
         .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)    & !active layer below water table
-        .AND. SoiDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1) & !midlayer depth above active water layer
+        .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1) & !midlayer depth above active water layer
         .AND. AirfMacP.GT.ZEROS2(N2,N1)                               & !macropore has air-filled fraction
         .AND. (.not.isclose(RechargRateWTBL,0.0_r8)))THEN               !recharge is on
 

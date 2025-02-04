@@ -62,9 +62,9 @@ implicit none
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA_col(:,:)                           !air temperature, [oC]
   real(r8),target,allocatable ::  TairK_col(:,:)                         !air temperature, [K]
-  real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                            !wind speed, [m h-1]
-  real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
-  real(r8),target,allocatable ::  VPK_col(:,:)                           !vapor pressure, [kPa]
+  real(r8),target,allocatable ::  WindSpeedAtm_col(:,:)                  !wind speed, [m h-1]
+  real(r8),target,allocatable ::  VPA_col(:,:)                           !atmospheric vapor concentration, [m3 m-3]
+  real(r8),target,allocatable ::  VPK_col(:,:)                           !atmospheric vapor pressure, [kPa]
   real(r8),target,allocatable ::  PBOT_col(:,:)                          !atmospheric pressure [kPa]
   real(r8),target,allocatable ::  DayLensCurr_col(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
@@ -89,12 +89,12 @@ implicit none
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE_col(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE_col(:,:)                          !atmospheric N2O concentration, [umol mol-1]
-  real(r8),target,allocatable ::  Z2GE_col(:,:)                          !atmospheric N2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  ZNH3E_col(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CH4E_col(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  H2GE_col(:,:)                          !atmospheric H2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CO2E_col(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
-
+  real(r8),target,allocatable ::  Z2GE_col(:,:)                      !atmospheric N2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  ZNH3E_col(:,:)                     !atmospheric NH3 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CH4E_col(:,:)                      !atmospheric CH4 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  H2GE_col(:,:)                      !atmospheric H2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  CO2E_col(:,:)                      !atmospheric CO2 concentration, [umol mol-1]
+  real(r8),target,allocatable ::  ARGE_col(:,:)                      !atmospheric AR concentration, [umol mol-1]
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
@@ -124,9 +124,9 @@ implicit none
   real(r8),target,allocatable ::  PHR(:,:)                           !precipitation pH, [-]
   real(r8),target,allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
   real(r8),target,allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  NH4_rain_conc(:,:)                 !precipitation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NO3_rain_conc(:,:)                 !precipitation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  H2PO4_rain_conc(:,:)               !precipitation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NH4_rain_mole_conc(:,:)                 !precipitation  NH4 concentration, [mol m-3]
+  real(r8),target,allocatable ::  NO3_rain_mole_conc(:,:)                 !precipitation  NO3 concentration, [mol m-3]
+  real(r8),target,allocatable ::  H2PO4_rain_mole_conc(:,:)               !precipitation  H2PO4 concentration, [mol m-3]
   real(r8),target,allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
@@ -139,7 +139,7 @@ implicit none
   real(r8),target,allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
   real(r8),target,allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
   real(r8),target,allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  trcVolatile_rain_conc(:,:,:)       !precipitation volatile concentration, [g m-3]
+  real(r8),target,allocatable ::  trcg_rain_mole_conc_col(:,:,:)       !precipitation volatile concentration, [g m-3]
   real(r8),target,allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
   real(r8),target,allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
   real(r8),target,allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
@@ -162,7 +162,7 @@ implicit none
   real(r8),target,allocatable ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  HPO4_rain_conc(:,:)                !precipitation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_rain_mole_conc(:,:)                !precipitation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
@@ -199,7 +199,7 @@ implicit none
   allocate(TCA_col(JY,JX));         TCA_col=0._r8
   allocate(TairK_col(JY,JX));         TairK_col=0._r8
   allocate(WindSpeedAtm_col(JY,JX));          WindSpeedAtm_col=0._r8
-  allocate(VPA(JY,JX));         VPA=0._r8
+  allocate(VPA_col(JY,JX));         VPA_col=0._r8
   allocate(VPK_col(JY,JX));         VPK_col=0._r8
   allocate(PBOT_col(JY,JX));        PBOT_col=1.01325E+02_r8
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
@@ -231,7 +231,7 @@ implicit none
   allocate(CH4E_col(JY,JX));        CH4E_col=0._r8
   allocate(H2GE_col(JY,JX));        H2GE_col=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
-
+  allocate(ARGE_col(JY,JX));        ARGE_col=0._r8
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
@@ -261,9 +261,9 @@ implicit none
   allocate(PHR(JY,JX));         PHR=0._r8
   allocate(CN4RI(JY,JX));       CN4RI=0._r8
   allocate(CNORI(JY,JX));       CNORI=0._r8
-  allocate(NH4_rain_conc(JY,JX));        NH4_rain_conc=0._r8
-  allocate(NO3_rain_conc(JY,JX));        NO3_rain_conc=0._r8
-  allocate(H2PO4_rain_conc(JY,JX));        H2PO4_rain_conc=0._r8
+  allocate(NH4_rain_mole_conc(JY,JX));        NH4_rain_mole_conc=0._r8
+  allocate(NO3_rain_mole_conc(JY,JX));        NO3_rain_mole_conc=0._r8
+  allocate(H2PO4_rain_mole_conc(JY,JX));        H2PO4_rain_mole_conc=0._r8
   allocate(CALR(JY,JX));        CALR=0._r8
   allocate(CFER(JY,JX));        CFER=0._r8
   allocate(CHYR(JY,JX));        CHYR=0._r8
@@ -276,7 +276,7 @@ implicit none
   allocate(CCLR(JY,JX));        CCLR=0._r8
   allocate(CC3R(JY,JX));        CC3R=0._r8
   allocate(CHCR(JY,JX));        CHCR=0._r8
-  allocate(trcVolatile_rain_conc(idg_beg:idg_end-1,JY,JX));        trcVolatile_rain_conc=0._r8
+  allocate(trcg_rain_mole_conc_col(idg_beg:idg_NH3,JY,JX));        trcg_rain_mole_conc_col=0._r8
   allocate(CAL1R(JY,JX));       CAL1R=0._r8
   allocate(CAL2R(JY,JX));       CAL2R=0._r8
   allocate(CAL3R(JY,JX));       CAL3R=0._r8
@@ -299,7 +299,7 @@ implicit none
   allocate(CNASR(JY,JX));       CNASR=0._r8
   allocate(CKASR(JY,JX));       CKASR=0._r8
   allocate(CH0PR(JY,JX));       CH0PR=0._r8
-  allocate(HPO4_rain_conc(JY,JX));       HPO4_rain_conc=0._r8
+  allocate(HPO4_rain_mole_conc(JY,JX));       HPO4_rain_mole_conc=0._r8
   allocate(CH3PR(JY,JX));       CH3PR=0._r8
   allocate(CF1PR(JY,JX));       CF1PR=0._r8
   allocate(CF2PR(JY,JX));       CF2PR=0._r8
@@ -328,7 +328,7 @@ implicit none
   call destroy(TCA_col)
   call destroy(TairK_col)
   call destroy(WindSpeedAtm_col)
-  call destroy(VPA)
+  call destroy(VPA_col)
   call destroy(VPK_col)
   call destroy(PBOT_col)
   call destroy(DayLensCurr_col)
@@ -342,6 +342,7 @@ implicit none
   call destroy(HUDX)
   call destroy(HUDN)
   call destroy(TWIND)
+  call destroy(ARGE_col)
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
   call destroy(TempOffset_col)
@@ -391,9 +392,9 @@ implicit none
   call destroy(PHR)
   call destroy(CN4RI)
   call destroy(CNORI)
-  call destroy(NH4_rain_conc)
-  call destroy(NO3_rain_conc)
-  call destroy(H2PO4_rain_conc)
+  call destroy(NH4_rain_mole_conc)
+  call destroy(NO3_rain_mole_conc)
+  call destroy(H2PO4_rain_mole_conc)
   call destroy(CALR)
   call destroy(CFER)
   call destroy(CHYR)
@@ -406,7 +407,7 @@ implicit none
   call destroy(CCLR)
   call destroy(CC3R)
   call destroy(CHCR)
-  call destroy(trcVolatile_rain_conc)
+  call destroy(trcg_rain_mole_conc_col)
   call destroy(CAL1R)
   call destroy(CAL2R)
   call destroy(CAL3R)
@@ -429,7 +430,7 @@ implicit none
   call destroy(CNASR)
   call destroy(CKASR)
   call destroy(CH0PR)
-  call destroy(HPO4_rain_conc)
+  call destroy(HPO4_rain_mole_conc)
   call destroy(CH3PR)
   call destroy(CF1PR)
   call destroy(CF2PR)

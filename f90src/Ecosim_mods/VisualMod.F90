@@ -133,7 +133,7 @@ module VisualMod
         TTSH=TTSH+Eco_Heat_Sens_col(NY,NX)
         TEco_Heat_GrndSurf_col=TEco_Heat_GrndSurf_col+Eco_Heat_GrndSurf_col(NY,NX)
         TTCO=TTCO+Eco_NEE_col(NY,NX)
-        TTCH=TTCH+SurfGasFlx_col(idg_CH4,NY,NX)
+        TTCH=TTCH+SurfGasEmisFlx_col(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
             SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP_vr(8,NY,NX) &
@@ -214,8 +214,8 @@ module VisualMod
           OUT(9)=-1.E-3_r8*Eco_AutoR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(10)=-1.E-3_r8*Eco_HR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(11)=1.E-3_r8*Eco_NBP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(12)=-1.E-3_r8*SurfGasFlx_col(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(13)=-1.E-3_r8*SurfGasFlx_col(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(12)=-1.E-3_r8*SurfGasEmisFlx_col(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(13)=-1.E-3_r8*SurfGasEmisFlx_col(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           OUT(15)=-Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
@@ -237,7 +237,7 @@ module VisualMod
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*Qrunoff_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*H2OLoss_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(46)=-(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
+          OUT(46)=-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth_col(NY,NX)
           OUT(48)=CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(49)=1.E-3_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -276,14 +276,14 @@ module VisualMod
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
       ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN
       WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth_col(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)) &
+      ,((-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)) &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2026  FORMAT(A8,3I6,100E12.4)
     ENDIF

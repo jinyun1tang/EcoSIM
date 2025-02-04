@@ -60,10 +60,10 @@ implicit none
   integer :: itemp
   itemp=0
   cid_CO2S     =addone(itemp)  !aqueous CO2  micropore	[g d-2]
-  cid_H1PO4_2e_conc    =addone(itemp)  !soil aqueous HPO4 content micropore non-band, [mol m-3]
-  cid_H2PO4_1e_conc    =addone(itemp)  !soil aqueous H2PO4 content micropore non-band, [mol m-3]
-  cid_NH3_aqu_conc     =addone(itemp)  !soil NH3 concentration in non-band soil, [mol m-3]
-  cid_NH4_1p_conc     =addone(itemp)  !soil NH4 concentration in non-band soil, [mol m-3]
+  cid_H1PO4_2e_aqua_mole_conc    =addone(itemp)  !soil aqueous HPO4 content micropore non-band, [mol m-3]
+  cid_H2PO4_1e_aqua_mole_conc    =addone(itemp)  !soil aqueous H2PO4 content micropore non-band, [mol m-3]
+  cid_NH3_aqua_mole_conc     =addone(itemp)  !soil NH3 concentration in non-band soil, [mol m-3]
+  cid_NH4_1p_aqua_mole_conc     =addone(itemp)  !soil NH4 concentration in non-band soil, [mol m-3]
   cid_ZNO3S    =addone(itemp)  !NO3 mass non-band micropore, [g d-2]
   cid_ZHY      =addone(itemp)  !soil aqueous H content micropore, [mol d-2]
   cid_ZOH      =addone(itemp)  !soil aqueous OH content micropore, [mol d-2]
@@ -200,7 +200,7 @@ implicit none
   fid_TR_Ca_2p_soil    =addone(itemp)
   fid_TR_CaSO4_soil   =addone(itemp)
   fid_TR_CaSO4_precip_soil  =addone(itemp)
-  fid_TR_CO2_gchem_soil_vr   =addone(itemp)
+  fid_TR_CO2_geochem_soil_vr   =addone(itemp)
   fid_TR_CO3_2e_soil   =addone(itemp)
   fid_TR_Fe_3p_soil    =addone(itemp)
   fid_TR_FeSO4_soil   =addone(itemp)
@@ -275,17 +275,17 @@ implicit none
   varl(cid_CO2S)='CO2S';varlnml(cid_CO2S)='aqueous CO2 concentration micropore';
   unitl(cid_CO2S)='gC d-2';vartypes(cid_CO2S)=var_state_type
 
-  varl(cid_H1PO4_2e_conc)='H1PO4_2e_conc';varlnml(cid_H1PO4_2e_conc)='non-band soil aqueous HPO4 content micropore'
-  unitl(cid_H1PO4_2e_conc)='mol m-3';vartypes(cid_H1PO4_2e_conc)=var_state_type
+  varl(cid_H1PO4_2e_aqua_mole_conc)='H1PO4_2e_aqua_mole_conc';varlnml(cid_H1PO4_2e_aqua_mole_conc)='non-band soil aqueous HPO4 content micropore'
+  unitl(cid_H1PO4_2e_aqua_mole_conc)='mol m-3';vartypes(cid_H1PO4_2e_aqua_mole_conc)=var_state_type
 
-  varl(cid_H2PO4_1e_conc)='H2PO4_1e_conc';varlnml(cid_H2PO4_1e_conc)='non-band soil micropore aqueous H2PO4 content'
-  unitl(cid_H2PO4_1e_conc)='mol m-3';vartypes(cid_H2PO4_1e_conc)=var_state_type
+  varl(cid_H2PO4_1e_aqua_mole_conc)='H2PO4_1e_aqua_mole_conc';varlnml(cid_H2PO4_1e_aqua_mole_conc)='non-band soil micropore aqueous H2PO4 content'
+  unitl(cid_H2PO4_1e_aqua_mole_conc)='mol m-3';vartypes(cid_H2PO4_1e_aqua_mole_conc)=var_state_type
 
-  varl(cid_NH3_aqu_conc) ='NH3_aqu_conc';varlnml(cid_NH3_aqu_conc)='non-band soil NH3 concentration'
-  unitl(cid_NH3_aqu_conc)='mol m-3';vartypes(cid_NH3_aqu_conc)=var_state_type
+  varl(cid_NH3_aqua_mole_conc) ='NH3_aqua_mole_conc';varlnml(cid_NH3_aqua_mole_conc)='non-band soil NH3 concentration'
+  unitl(cid_NH3_aqua_mole_conc)='mol m-3';vartypes(cid_NH3_aqua_mole_conc)=var_state_type
 
-  varl(cid_NH4_1p_conc)  ='NH4_1p_conc';varlnml(cid_NH4_1p_conc)='non-band soil NH4 concentration'
-  unitl(cid_NH4_1p_conc)='mol m-3';vartypes(cid_NH4_1p_conc)=var_state_type
+  varl(cid_NH4_1p_aqua_mole_conc)  ='NH4_1p_aqua_mole_conc';varlnml(cid_NH4_1p_aqua_mole_conc)='non-band soil NH4 concentration'
+  unitl(cid_NH4_1p_aqua_mole_conc)='mol m-3';vartypes(cid_NH4_1p_aqua_mole_conc)=var_state_type
 
   varl(cid_ZNO3S) = 'ZNO3S';varlnml(cid_ZNO3S)='non-band soil micropore NO3 mass'
   unitl(cid_ZNO3S)= 'g d-2';vartypes(cid_ZNO3S)=var_state_type
@@ -632,7 +632,7 @@ implicit none
   varl(fid_TR_AlO2H2_soil)='TR_AlO2H2_soil';varlnml(fid_TR_AlO2H2_soil)='total solute AlOH2 transformation'
   unitl(fid_TR_AlO2H2_soil)='mol d-2 h-1'; vartypes(fid_TR_AlO2H2_soil)=var_flux_type
 
-  varl(fid_TR_FeO3H3_soil)='TR_FeO3H3_soil';varlnml(fid_TR_FeO3H3_soil)='total solute FeOH3 transformation'
+  varl(fid_TR_FeO3H3_soil)='TR_FeO3H3_soil_vr';varlnml(fid_TR_FeO3H3_soil)='total solute FeOH3 transformation'
   unitl(fid_TR_FeO3H3_soil)='mol d-2 h-1';    vartypes(fid_TR_FeO3H3_soil)=var_flux_type
 
   varl(fid_TR_AlO3H3_soil)='TR_AlO3H3_soil';varlnml(fid_TR_AlO3H3_soil)='total solute AlOH3 transformation'
@@ -690,8 +690,8 @@ implicit none
   varl(fid_TR_CaSO4_precip_soil)='TR_CaSO4_precip_soil';varlnml(fid_TR_CaSO4_precip_soil)='total precipitated CaSO4 transformation'
   unitl(fid_TR_CaSO4_precip_soil)='mol d-2 h-1';vartypes(fid_TR_CaSO4_precip_soil)=var_flux_type
 
-  varl(fid_TR_CO2_gchem_soil_vr)='TR_CO2_gchem_soil_vr';varlnml(fid_TR_CO2_gchem_soil_vr)='total solute CO2 transformation'
-  unitl(fid_TR_CO2_gchem_soil_vr)='mol d-2 h-1';vartypes(fid_TR_CO2_gchem_soil_vr)=var_flux_type
+  varl(fid_TR_CO2_geochem_soil_vr)='TR_CO2_geochem_soil_vr';varlnml(fid_TR_CO2_geochem_soil_vr)='total solute CO2 transformation'
+  unitl(fid_TR_CO2_geochem_soil_vr)='mol d-2 h-1';vartypes(fid_TR_CO2_geochem_soil_vr)=var_flux_type
 
   varl(fid_TR_CO3_2e_soil)='TR_CO3_2e_soil';varlnml(fid_TR_CO3_2e_soil)='total solute CO3 transformation'
   unitl(fid_TR_CO3_2e_soil)='mol d-2 h-1';vartypes(fid_TR_CO3_2e_soil)=var_flux_type
@@ -888,11 +888,11 @@ implicit none
   real(r8), intent(out) :: ystatesfl(nvars)
 
   !ZNH4S=ZNH4S+TR_NH4_soil*Natomw
-  ystatesfl(cid_NH4_1p_conc)=ystates0l(cid_NH4_1p_conc)+solflx%TR_NH4_soil/chemvar%VLWatMicPNH
+  ystatesfl(cid_NH4_1p_aqua_mole_conc)=ystates0l(cid_NH4_1p_aqua_mole_conc)+solflx%TR_NH4_soil/chemvar%VLWatMicPNH
   ystatesfl(fid_TR_NH4_soil)=solflx%TR_NH4_soil
 
   !ZNH3S=ZNH3S+TR_NH3_soil_vr*Natomw
-  ystatesfl(cid_NH3_aqu_conc)=ystates0l(cid_NH3_aqu_conc)+solflx%TR_NH3_soil_vr/chemvar%VLWatMicPNH
+  ystatesfl(cid_NH3_aqua_mole_conc)=ystates0l(cid_NH3_aqua_mole_conc)+solflx%TR_NH3_soil_vr/chemvar%VLWatMicPNH
   ystatesfl(fid_TR_NH3_soil_vr)=solflx%TR_NH3_soil_vr
 
   !XN4  =XN4+TR_NH4_sorbed_soil
@@ -912,11 +912,11 @@ implicit none
   ystatesfl(fid_TR_NH4_sorbed_band_soil)=solflx%TR_NH4_sorbed_band_soil
 
   !H1PO4=H1PO4+TR_H1PO4_soil*Patomw
-  ystatesfl(cid_H1PO4_2e_conc)=ystates0l(cid_H1PO4_2e_conc)+solflx%TR_H1PO4_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_H1PO4_2e_aqua_mole_conc)=ystates0l(cid_H1PO4_2e_aqua_mole_conc)+solflx%TR_H1PO4_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TR_H1PO4_soil)=solflx%TR_H1PO4_soil
 
   !H2PO4=H2PO4+TR_H2PO4_soil*Patomw
-  ystatesfl(cid_H2PO4_1e_conc)=ystates0l(cid_H2PO4_1e_conc)+solflx%TR_H2PO4_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_H2PO4_1e_aqua_mole_conc)=ystates0l(cid_H2PO4_1e_aqua_mole_conc)+solflx%TR_H2PO4_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TR_H2PO4_soil)=solflx%TR_H2PO4_soil
 
   !XOH1 =XOH1+TR_ROH_sorbed_soil

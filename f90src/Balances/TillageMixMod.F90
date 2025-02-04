@@ -92,25 +92,25 @@ module TillageMixMod
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,CLAY(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKC4(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCA(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCA_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCM(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCM_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCN(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCN_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCK(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trc_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
 
   if(salt_model)then
     CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcSalt_solml_vr(idsalt_beg:idsalt_end,0:JZ,NY,NX),XCORP0)
@@ -134,7 +134,7 @@ module TillageMixMod
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trc_gasml_vr(idg_beg:idg_end-1,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
 
   CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
 
@@ -211,7 +211,7 @@ module TillageMixMod
       VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
       TKS_vr(L,NY,NX) = (ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)
-      TCS(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+      TCS_vr(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDIF
   ENDDO
 
@@ -249,10 +249,10 @@ module TillageMixMod
       enddo 
     ENDDO
 
-    TZNFNG = ZNFNI(0,NY,NX)*CORP0
-    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
-    ZNHUXI = AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
-    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0(0,NY,NX))
+    TZNFNG = ZNFNI_vr(0,NY,NX)*CORP0
+    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(0,NY,NX))
+    ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(0,NY,NX))
+    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(0,NY,NX))
 
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
@@ -269,10 +269,10 @@ module TillageMixMod
       FI1 = TL/DCORPZ
       TI1 = AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
 
-      ZNHUX0 = AMAX1(ZNHUX0,ZNHU0(L,NY,NX))
-      ZNHUXI = AMAX1(ZNHUXI,ZNHUI(L,NY,NX))
-      ZNFNX0 = AMAX1(ZNFNX0,ZNFN0(L,NY,NX))
-      TZNFNI = TZNFNI+ZNFNI(L,NY,NX)
+      ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(L,NY,NX))
+      ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(L,NY,NX))
+      ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(L,NY,NX))
+      TZNFNI = TZNFNI+ZNFNI_vr(L,NY,NX)
       LL=L      
     ENDDO D100
 !
@@ -301,7 +301,7 @@ module TillageMixMod
 
         ! solute
         DO NTS=ids_beg,ids_end
-          trc_solml_vr(NTS,L,NY,NX)=trc_solml_vr(NTS,L,NY,NX)+FracTillCorp*trc_soHml_vr(NTS,L,NY,NX)
+          trcs_solml_vr(NTS,L,NY,NX)=trcs_solml_vr(NTS,L,NY,NX)+FracTillCorp*trcs_soHml_vr(NTS,L,NY,NX)
         ENDDO
 
         call MixSoluteMacpore(L,NY,NX)
@@ -322,29 +322,29 @@ module TillageMixMod
           ENDDO
         ENDDO
 
-        if(trc_solml_vr(idg_O2,1,1,1)<0._r8)then
-          print*,'tillage problem',trc_solml_vr(idg_O2,1,1,1)
+        if(trcs_solml_vr(idg_O2,1,1,1)<0._r8)then
+          print*,'tillage problem',trcs_solml_vr(idg_O2,1,1,1)
           stop
         endif
 
-        ZNHU0(L,NY,NX)=ZNHUX0
-        ZNHUI(L,NY,NX)=ZNHUXI
-        ZNFN0(L,NY,NX)=ZNFNX0
-        ZNFNI(L,NY,NX)=(TI1*ZNFNI(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI(L,NY,NX))+TX*ZNFNI(L,NY,NX)+FI1*TZNFNG)/FI1
-        TZNFN2=TZNFN2+ZNFNI(L,NY,NX)
+        ZNHU0_vr(L,NY,NX)=ZNHUX0
+        ZNHUI_vr(L,NY,NX)=ZNHUXI
+        ZNFN0_vr(L,NY,NX)=ZNFNX0
+        ZNFNI_vr(L,NY,NX)=(TI1*ZNFNI_vr(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI_vr(L,NY,NX))+TX*ZNFNI_vr(L,NY,NX)+FI1*TZNFNG)/FI1
+        TZNFN2=TZNFN2+ZNFNI_vr(L,NY,NX)
       ENDIF
     ENDDO D2000
 
 ! nitrogen inhibitor
-    ZNFN0(0,NY,NX) = ZNFNX0
-    ZNFNI(0,NY,NX) = ZNFNI(0,NY,NX)*XCORP0
+    ZNFN0_vr(0,NY,NX) = ZNFNX0
+    ZNFNI_vr(0,NY,NX) = ZNFNI_vr(0,NY,NX)*XCORP0
     TZNFN2         = TZNFN2+TZNFNG
     TZNFNI         = TZNFNI+TZNFNG
 
     DO  L=NU(NY,NX),LL
       IF(TZNFN2.GT.ZERO)THEN
-        ZNFNI(L,NY,NX) = ZNFNI(L,NY,NX)*TZNFNI/TZNFN2
-        ZNFNI(L,NY,NX) = ZNFNI(L,NY,NX)+0.5_r8*(ZNFN0(L,NY,NX)-ZNFNI(L,NY,NX))
+        ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)*TZNFNI/TZNFN2
+        ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)+0.5_r8*(ZNFN0_vr(L,NY,NX)-ZNFNI_vr(L,NY,NX))
       ENDIF
     ENDDO
 
@@ -362,7 +362,7 @@ module TillageMixMod
   integer :: NTS,NTSA
 
   DO NTS=ids_beg,ids_end
-    trc_soHml_vr(NTS,L,NY,NX)=XTillCorp_col(NY,NX)*trc_soHml_vr(NTS,L,NY,NX)
+    trcs_soHml_vr(NTS,L,NY,NX)=XTillCorp_col(NY,NX)*trcs_soHml_vr(NTS,L,NY,NX)
   ENDDO
 
   DO NTSA=idsalt_beg,idsalt_end

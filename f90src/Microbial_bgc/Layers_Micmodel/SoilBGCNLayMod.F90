@@ -337,16 +337,21 @@ module SoilBGCNLayMod
   end subroutine sumORGMLayL
 !------------------------------------------------------------------------------------------
 
-  subroutine sumLitrOMLayL(L,NY,NX,ORGM)
+  subroutine sumLitrOMLayL(L,NY,NX,ORGM,I,J)
   !
   !sum up litter OM (DOM + litter OM) in layer L
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
-  integer :: K,N,NGL,M,MID,NE
+  integer , optional, intent(in) :: I,J  
+  integer :: K,N,NGL,M,MID,NE,idom
+  real(r8) :: DOM_micp(idom_beg:idom_end)
+  real(r8) :: DOM_macp(idom_beg:idom_end) 
+
 
   ORGM=0._r8
-
+  DOM_micp=0._r8
+  DOM_macp=0._r8
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
@@ -380,10 +385,16 @@ module SoilBGCNLayMod
     ENDDO
 
     !add dom
-    DO NE=1,NumPlantChemElms
-      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    DO idom=idom_beg,idom_end
+      DOM_micp(idom) = DOM_micp(idom) + DOM_vr(NE,K,L,NY,NX)
+      DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
     ENDDO
-    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    !add dom
+    DO NE=1,NumPlantChemElms
+      ORGM(NE)=ORGM(NE)+SorbedOM_vr(NE,K,L,NY,NX)
+    ENDDO
+    ORGM(ielmc)=ORGM(ielmc)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     !add solid organic matter
     DO  M=1,jsken
@@ -392,7 +403,9 @@ module SoilBGCNLayMod
       ENDDO  
     ENDDO  
   ENDDO    
-  
+  ORGM=ORGM+DOM_micp(1:NumPlantChemElms) + DOM_macp(1:NumPlantChemElms)
+
+  ORGM(ielmc)=ORGM(ielmc)+DOM_micp(idom_acetate) + DOM_macp(idom_acetate)
   end subroutine sumLitrOMLayL
 
 !------------------------------------------------------------------------------------------
@@ -403,9 +416,13 @@ module SoilBGCNLayMod
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
-  integer :: K,N,NGL,M,MID,NE
+  integer :: K,N,NGL,M,MID,NE,idom
+  real(r8) :: DOM_micp(idom_beg:idom_end)
+  real(r8) :: DOM_macp(idom_beg:idom_end) 
 
   ORGM=0._r8
+  DOM_micp=0._r8
+  DOM_macp=0._r8
 
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
@@ -439,11 +456,15 @@ module SoilBGCNLayMod
     ENDDO
 
     !add dom
+    DO idom=idom_beg,idom_end
+      DOM_micp(idom) = DOM_micp(idom) + DOM_vr(NE,K,L,NY,NX)
+      DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
+    ENDDO
     DO NE=1,NumPlantChemElms
-      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+      ORGM(NE)=ORGM(NE)++SorbedOM_vr(NE,K,L,NY,NX)
     ENDDO
     !add acetate
-    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    ORGM(ielmc)=ORGM(ielmc)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     !add solid organic matter
     DO  M=1,jsken
@@ -453,6 +474,11 @@ module SoilBGCNLayMod
     ENDDO  
   ENDDO    
 
+  ORGM=ORGM+DOM_micp(1:NumPlantChemElms) + DOM_macp(1:NumPlantChemElms)
+
+  ORGM(ielmc)=ORGM(ielmc) +DOM_micp(idom_acetate) + DOM_macp(idom_acetate)
+
+  
   end subroutine sumHumOMLayL
   
 
@@ -623,13 +649,19 @@ module SoilBGCNLayMod
   real(r8), intent(out):: DOM(idom_beg:idom_end)
 
   integer :: idom, K
-
-  DOM=0._r8
-  DO K=1,micpar%NumOfLitrCmplxs
+  real(r8) :: DOM_micp(idom_beg:idom_end)
+  real(r8) :: DOM_macp(idom_beg:idom_end) 
+  
+  DOM      = 0._r8
+  DOM_micp = 0._r8
+  DOM_macp = 0._r8
+  DO K = 1, micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      DOM(idom)=DOM(idom)+DOM_vr(idom,K,L,NY,NX)+DOM_MacP_vr(idom,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom)+DOM_vr(idom,K,L,NY,NX)
+      DOM_macp(idom) = DOM_macp(idom)+DOM_MacP_vr(idom,K,L,NY,NX)
     ENDDO
   ENDDO
+  DOM=DOM_micp+DOM_macp
 
   end subroutine sumDOML
 end module SoilBGCNLayMod

@@ -14,7 +14,9 @@ implicit none
   integer, parameter :: idg_N2 =4
   integer, parameter :: idg_N2O=5
   integer, parameter :: idg_H2 =6
-  integer, parameter :: idg_NH3=7
+  integer, parameter :: idg_AR =7
+  integer, parameter :: idg_NH3=8
+  integer, parameter :: idg_beg = idg_CO2  
   character(len=10), allocatable :: trcs_names(:)
   integer  :: idg_NH3B
   integer :: ids_NH4,ids_NH4B
@@ -27,7 +29,8 @@ implicit none
 ! with plant and soil organic matter
   integer :: idom_DOC,idom_DON,idom_DOP,idom_acetate
   integer :: idom_beg,idom_end
-  integer :: idg_beg,idg_end
+
+  integer :: idg_end
   integer :: ids_beg,ids_end
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
   integer :: ids_nutb_beg,ids_nutb_end
@@ -167,7 +170,7 @@ implicit none
   ifertn_beg=ifert_nh4;ifertn_end=ifert_no3
   ifertnb_beg=ifert_nh4_band;ifertnb_end=ifert_no3_band
 
-  idg_beg=idg_CO2; ids_beg=idg_beg
+  ids_beg=idg_beg
 ! for better array manipulation of land-atmosphere exchange,
 ! banded NH3 is considered as (potential) gas too. However, there
 ! is no banded gas NH3 concentration.

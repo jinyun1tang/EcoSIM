@@ -20,7 +20,8 @@ implicit none
   integer, parameter :: iEastWestDirection   = 1   !east-west direction
   integer, parameter :: iNorthSouthDirection = 2   !north-south direction
   integer, parameter :: iVerticalDirection   = 3   !vertical direction
-
+  integer, parameter :: iOutflow             = 1
+  integer, parameter :: iInflow              = 2
 ! soil properties
   integer, parameter :: isoi_fc    = 1   !field capacity
   integer, parameter :: isoi_wp    = 2   !wilting point

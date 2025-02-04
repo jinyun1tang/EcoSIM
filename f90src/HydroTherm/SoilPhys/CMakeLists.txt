@@ -12,6 +12,7 @@ target_include_directories(SoilPhys  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/Disturbances/

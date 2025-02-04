@@ -1,8 +1,10 @@
 module ErosionBalMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
+  use EcoSiMParDataMod, only: micpar
   use SoilPropertyDataType
   use RootDataType
-  use EcoSiMParDataMod, only : micpar
+  use DebugToolMod
   USE EcoSIMCtrlDataType
   use EcoSIMCtrlMod
   use MicrobialDataType
@@ -12,7 +14,6 @@ module ErosionBalMod
   USE AqueChemDatatype
   use FlagDataType
   use FertilizerDataType
-  use EcoSIMConfig, only : nlbiomcp=>NumLiveMicrbCompts
   use TFlxTypeMod
 implicit none
   private
@@ -29,7 +30,7 @@ implicit none
   !Sedimentation
   implicit none
   integer, intent(in) :: NY,NX
-
+  character(len=*), parameter :: subname = 'SinkSediments'
   integer :: L,LL,M,N,K,NGL,MID,idom,NE
   real(r8) :: FSINK,FSAN,FSIL,FCLA,FCEC,FAEC
   real(r8) :: FNX
@@ -46,6 +47,7 @@ implicit none
 ! VLS=hourly sinking rate from hour1.f
 ! FSINK=hourly rate for sediment sinking
 !
+  call PrintInfo('beg '//subname)
   D9885: DO L=NL(NY,NX)-1,1,-1
     IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
@@ -195,6 +197,8 @@ implicit none
       ENDDO D1900
     ENDIF
   ENDDO D9885
+
+  call PrintInfo('end '//subname)
   end subroutine SinkSediments
 !------------------------------------------------------------------------------------------
 

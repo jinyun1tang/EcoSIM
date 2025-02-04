@@ -90,7 +90,7 @@ implicit none
     HoursTooLowPsiCan_pft   => plt_pheno%HoursTooLowPsiCan_pft,   &
     HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft,       &
     SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft,    &
-    CanopyWater_pft         => plt_ew%CanopyWater_pft,            &
+    CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft,            &
     RootElms_pft            => plt_biom%RootElms_pft,             &
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
     PlantPopulation_pft     => plt_site%PlantPopulation_pft,      &    
@@ -112,9 +112,9 @@ implicit none
       NumOfBranches_pft(NZ)=0
     ENDIF
     HypoctoHeight_pft(NZ) = 0._r8
-    QH2OLoss_lnds         = QH2OLoss_lnds+CanopyWater_pft(NZ)
-    H2OLoss_CumYr_col     = H2OLoss_CumYr_col+CanopyWater_pft(NZ)
-    CanopyWater_pft(NZ)   = 0._r8
+    QH2OLoss_lnds         = QH2OLoss_lnds+CanopyBiomWater_pft(NZ)
+    H2OLoss_CumYr_col     = H2OLoss_CumYr_col+CanopyBiomWater_pft(NZ)
+    CanopyBiomWater_pft(NZ)   = 0._r8
 !
 !     RESET LIVING FLAGS
 !
@@ -442,12 +442,12 @@ implicit none
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
-        DO NTG=idg_beg,idg_end-1
+        DO NTG=idg_beg,idg_NH3
           RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-trcg_rootml_pvr(NTG,N,L,NZ)&
             -trcs_rootml_pvr(NTG,N,L,NZ)
         ENDDO
-        trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
-        trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ)=0._r8
+        trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)=0._r8
+        trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)=0._r8
       ENDDO
     ENDDO    
 !

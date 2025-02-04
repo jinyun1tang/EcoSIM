@@ -233,8 +233,8 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
 
-  plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)        = 0.0_r8
-  plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_end-1,1:NN,L1:L2,NZ)     = 0.0_r8
+  plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
+  plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
   plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
   plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
   plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
@@ -401,7 +401,7 @@ module NutUptakeMod
     RootNO3DmndBand_pvr    => plt_rbgc%RootNO3DmndBand_pvr,    &
     RootOUlmNutUptake_pvr  => plt_rbgc%RootOUlmNutUptake_pvr,  &
     SoluteDifusvty_vr      => plt_soilchem%SoluteDifusvty_vr,  &
-    trc_solml_vr           => plt_soilchem%trc_solml_vr,       &
+    trcs_solml_vr           => plt_soilchem%trcs_solml_vr,       &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr        &
@@ -464,7 +464,7 @@ module NutUptakeMod
     !     RootCUlmNutUptake_pvr=NO3 uptake in non-band unlimited by nonstructural C
 !
     ZNO3M=CminNO3Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NO3,L)
-    ZNO3X=AZMAX1(FNO3X*(trc_solml_vr(ids_NO3,L)-ZNO3M))
+    ZNO3X=AZMAX1(FNO3X*(trcs_solml_vr(ids_NO3,L)-ZNO3M))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CminNO3Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNO3
@@ -525,7 +525,7 @@ module NutUptakeMod
     !     RootCUlmNutUptake_pvr=NO3 uptake in band unlimited by nonstructural C
     !
     ZNOBM = CminNO3Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NO3B,L)
-    ZNOBX = AZMAX1(FNOBX*(trc_solml_vr(ids_NO3B,L)-ZNOBM))
+    ZNOBX = AZMAX1(FNOBX*(trcs_solml_vr(ids_NO3B,L)-ZNOBM))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CminNO3Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNOB
@@ -580,7 +580,7 @@ module NutUptakeMod
     SoluteDifusvty_vr      => plt_soilchem%SoluteDifusvty_vr,  &
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
-    trc_solml_vr           => plt_soilchem%trc_solml_vr,       &
+    trcs_solml_vr           => plt_soilchem%trcs_solml_vr,       &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr        &
   )
 ! ZNSGL=NH4 diffusivity
@@ -635,7 +635,7 @@ module NutUptakeMod
 !   RootCUlmNutUptake_pvr=NH4 uptake in non-band unlimited by nonstructural C
 !
     ZNH4M = CMinNH4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NH4,L)
-    ZNH4X = AZMAX1(FNH4X*(trc_solml_vr(ids_NH4,L)-ZNH4M))
+    ZNH4X = AZMAX1(FNH4X*(trcs_solml_vr(ids_NH4,L)-ZNH4M))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNH4
@@ -698,7 +698,7 @@ module NutUptakeMod
 !
 
     ZNHBM=CMinNH4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NH4B,L)
-    ZNHBX=AZMAX1(FNHBX*(trc_solml_vr(ids_NH4B,L)-ZNHBM))
+    ZNHBX=AZMAX1(FNHBX*(trcs_solml_vr(ids_NH4B,L)-ZNHBM))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNHB
@@ -756,7 +756,7 @@ module NutUptakeMod
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
-    trc_solml_vr           => plt_soilchem%trc_solml_vr        &
+    trcs_solml_vr           => plt_soilchem%trcs_solml_vr        &
   )
   !
   !     HPO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -801,7 +801,7 @@ module NutUptakeMod
     !     RootCUlmNutUptake_pvr=HPO4 uptake in non-band unlimited by nonstructural C
 
     H1POM=CMinPO4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_H1PO4,L)
-    H1POX=AZMAX1(FP14X*(trc_solml_vr(ids_H1PO4,L)-H1POM))
+    H1POX=AZMAX1(FP14X*(trcs_solml_vr(ids_H1PO4,L)-H1POM))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH1P
@@ -861,7 +861,7 @@ module NutUptakeMod
     !     RootCUlmNutUptake_pvr=HPO4 uptake in band unlimited by nonstructural C
 
     H1PXM = CMinPO4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_H1PO4B,L)
-    H1PXB = AZMAX1(FP1BX*(trc_solml_vr(ids_H1PO4B,L)-H1PXM))
+    H1PXB = AZMAX1(FP1BX*(trcs_solml_vr(ids_H1PO4B,L)-H1PXM))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
@@ -911,7 +911,7 @@ module NutUptakeMod
     RootH2PO4DmndSoil_pvr  => plt_rbgc%RootH2PO4DmndSoil_pvr,  &
     fTgrowRootP_vr         => plt_pheno%fTgrowRootP_vr,        &
     RootAreaPerPlant_pvr   => plt_morph%RootAreaPerPlant_pvr,  &
-    trc_solml_vr           => plt_soilchem%trc_solml_vr,       &
+    trcs_solml_vr           => plt_soilchem%trcs_solml_vr,       &
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr         &
@@ -958,7 +958,7 @@ module NutUptakeMod
       !     RootCUlmNutUptake_pvr=H2PO4 uptake in non-band unlimited by nonstructural C
 
       H2POM = CMinPO4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_H1PO4,L)
-      H2POX = AZMAX1(FPO4X*(trc_solml_vr(ids_H2PO4,L)-H2POM))
+      H2POX = AZMAX1(FPO4X*(trcs_solml_vr(ids_H2PO4,L)-H2POM))
 
       PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
       PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2P
@@ -1020,7 +1020,7 @@ module NutUptakeMod
     !     RootCUlmNutUptake_pvr=H2PO4 uptake in band unlimited by nonstructural C
 
     H2PXM=CMinPO4Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_H1PO4B,L)
-    H2PXB=AZMAX1(FPOBX*(trc_solml_vr(ids_H2PO4B,L)-H2PXM))
+    H2PXB=AZMAX1(FPOBX*(trcs_solml_vr(ids_H2PO4B,L)-H2PXM))
 
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
@@ -1138,7 +1138,7 @@ module NutUptakeMod
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
     ZEROS                     => plt_site%ZEROS,                      &
     ZERO                      => plt_site%ZERO,                       &
-    AllPlantRootH2OUptake_vr  => plt_ew%AllPlantRootH2OUptake_vr,     &
+    AllPlantRootH2OLoss_vr  => plt_ew%AllPlantRootH2OLoss_vr,     &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
     RootProteinConc_rpvr       => plt_biom%RootProteinConc_rpvr,        &
@@ -1197,7 +1197,7 @@ module NutUptakeMod
     FPUP=0.0_r8
   ENDIF
   !NN=0
-  PerPlantRootH2OUptake=AZMAX1(-AllPlantRootH2OUptake_vr(N,L,NZ)/PlantPopulation_pft(NZ))
+  PerPlantRootH2OUptake=AZMAX1(-AllPlantRootH2OLoss_vr(N,L,NZ)/PlantPopulation_pft(NZ))
   dtPerPlantRootH2OUptake=PerPlantRootH2OUptake*dts_gas
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG
