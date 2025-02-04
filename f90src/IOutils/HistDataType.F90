@@ -333,6 +333,7 @@ implicit none
   real(r8),pointer   :: h2D_CO2_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_CH4_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_Ar_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_O2_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   !aerobic heterotropic fungi
   real(r8),pointer   :: h2D_faculDenitC_vr(:,:)   !facultative denitrifier
@@ -413,11 +414,11 @@ implicit none
   real(r8),pointer   :: h2D_O2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_CO2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_RNITRIF_vr(:,:)
-  real(r8),pointer   :: h2D_CO2_vr(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_CH4_vr(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_N2O_vr(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_NH3_vr(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_CO2_vr(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_CH4_vr(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_N2O_vr(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_NH3_vr(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
   real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS_vr(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_decomp_OStress_vr(:,:)    !decomposition oxygen stress
   real(r8),pointer   :: h2D_RO2Decomp_vr(:,:)
@@ -746,13 +747,13 @@ implicit none
   allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
   allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc(:,:)=spval
   allocate(this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ))    ;this%h2D_RNITRIF_vr(:,:)=spval
-  allocate(this%h2D_CO2_vr(beg_col:end_col,1:JZ))        ;this%h2D_CO2_vr(:,:)=spval
+  allocate(this%h2D_Aqua_CO2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_CO2_vr(:,:)=spval
   allocate(this%h2D_O2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_O2_rootconduct_pvr(:,:)=spval
   allocate(this%h2D_CO2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_CO2_rootconduct_pvr(:,:)=spval
-  allocate(this%h2D_CH4_vr(beg_col:end_col,1:JZ))        ;this%h2D_CH4_vr(:,:)=spval
-  allocate(this%h2D_O2_vr(beg_col:end_col,1:JZ))         ;this%h2D_O2_vr(:,:)=spval
-  allocate(this%h2D_N2O_vr(beg_col:end_col,1:JZ))        ;this%h2D_N2O_vr(:,:)=spval
-  allocate(this%h2D_NH3_vr(beg_col:end_col,1:JZ))        ;this%h2D_NH3_vr(:,:)=spval
+  allocate(this%h2D_Aqua_CH4_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_CH4_vr(:,:)=spval
+  allocate(this%h2D_Aqua_O2_vr(beg_col:end_col,1:JZ))         ;this%h2D_Aqua_O2_vr(:,:)=spval
+  allocate(this%h2D_Aqua_N2O_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_N2O_vr(:,:)=spval
+  allocate(this%h2D_Aqua_NH3_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_NH3_vr(:,:)=spval
   allocate(this%h2D_TEMP_vr(beg_col:end_col,1:JZ))       ;this%h2D_TEMP_vr(:,:)=spval
   allocate(this%h1D_decomp_OStress_litr_col(beg_col:end_col)); this%h1D_decomp_OStress_litr_col(:)=spval
   allocate(this%h1D_Decomp_temp_FN_litr_col(beg_col:end_col)); this%h1D_Decomp_temp_FN_litr_col(:)=spval
@@ -781,6 +782,7 @@ implicit none
   allocate(this%h2D_CO2_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_CO2_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_CH4_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_CH4_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_Ar_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_O2_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_O2_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactC_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
   allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
@@ -2006,7 +2008,7 @@ implicit none
   call hist_addfld2d(fname='RNITRIF_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Nitrification rate from NH3 oxidation in each soil layer',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_CO2_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_CO2_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
   call hist_addfld2d(fname='CO2w_conc_vr',units='gC/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous CO2 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
@@ -2018,19 +2020,19 @@ implicit none
   call hist_addfld2d(fname='CO2_root_conductance_pvr',units='1/h',type2d='levsoi',avgflag='A',&
     long_name='Root conductance for CO2 gaseous in soil layer',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%h2D_CH4_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_CH4_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
   call hist_addfld2d(fname='CH4w_conc_vr',units='gC/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous CH4 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_O2_vr(beg_col:end_col,1:JZ)           !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_O2_vr(beg_col:end_col,1:JZ)           !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
   call hist_addfld2d(fname='O2w_conc_vr',units='g/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous O2 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_N2O_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_N2O_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
   call hist_addfld2d(fname='N2Ow_conc_vr',units='gN/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous N2O concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_NH3_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_NH3_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
   call hist_addfld2d(fname='NH3w_conc_vr',units='gN/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous NH3 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
@@ -2143,6 +2145,10 @@ implicit none
   data2d_ptr =>  this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Ar_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
     long_name='Equivalent soil gaseous Ar profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_O2_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='O2_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Equivalent soil gaseous O2 profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Anaerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
@@ -2780,7 +2786,8 @@ implicit none
         this%h2D_CO2_Gas_ppmv_vr(ncol,L)  = CO2_Gas_Frac_vr(L,NY,NX)
         this%h2D_CH4_Gas_ppmv_vr(ncol,L)  = CH4_Gas_Frac_vr(L,NY,NX)
         this%h2D_Ar_Gas_ppmv_vr(ncol,L)   = Ar_Gas_Frac_vr(L,NY,NX)
-
+        this%h2D_O2_Gas_ppmv_vr(ncol,L)   = O2_Gas_Frac_vr(L,NY,NX)
+        
         DVOLL=DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
         
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2804,11 +2811,11 @@ implicit none
         this%h2D_tSON_vr(ncol,L)            = SoilOrgM_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_tSOP_vr(ncol,L)            = SoilOrgM_vr(ielmp,L,NY,NX)/DVOLL
         this%h2D_VHeatCap_vr(ncol,L)        = VHeatCapacity_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_CO2_vr(ncol,L)             = trc_solcl_vr(idg_CO2,L,NY,NX)        
-        this%h2D_CH4_vr(ncol,L)             = trc_solcl_vr(idg_CH4,L,NY,NX)
-        this%h2D_O2_vr(ncol,L)              = trc_solcl_vr(idg_O2,L,NY,NX)
-        this%h2D_N2O_vr(ncol,L)             = trc_solcl_vr(idg_N2O,L,NY,NX)
-        this%h2D_NH3_vr(ncol,L)             = trc_solcl_vr(idg_NH3,L,NY,NX)
+        this%h2D_Aqua_CO2_vr(ncol,L)             = trc_solcl_vr(idg_CO2,L,NY,NX)        
+        this%h2D_Aqua_CH4_vr(ncol,L)             = trc_solcl_vr(idg_CH4,L,NY,NX)
+        this%h2D_Aqua_O2_vr(ncol,L)              = trc_solcl_vr(idg_O2,L,NY,NX)
+        this%h2D_Aqua_N2O_vr(ncol,L)             = trc_solcl_vr(idg_N2O,L,NY,NX)
+        this%h2D_Aqua_NH3_vr(ncol,L)             = trc_solcl_vr(idg_NH3,L,NY,NX)
         this%h2D_TEMP_vr(ncol,L)            = TCS_vr(L,NY,NX)
         this%h2D_decomp_OStress_vr(ncol,L)  = OxyDecompLimiter_vr(L,NY,NX)
         this%h2D_RO2Decomp_vr(ncol,L)       = RO2DecompUptk_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

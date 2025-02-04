@@ -109,6 +109,7 @@ implicit none
   real(r8),target,allocatable ::  DOM_Macp_Transp_flx_3D(:,:,:,:,:,:) !DOC flux macropore, [g d-2 h-1]
   real(r8),target,allocatable ::  Soil_Gas_pressure_vr(:,:,:)         !soil gas pressure, [Pa]
   real(r8),target,allocatable ::  CO2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous CO2 [ppmv]
+  real(r8),target,allocatable ::  O2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous O2 [ppmv]
   real(r8),target,allocatable ::  Ar_Gas_frac_vr(:,:,:)               !volumetric concentation of Ar gas  [ppmv]
   real(r8),target,allocatable ::  CH4_gas_frac_vr(:,:,:)              !volumetric concentation of CH4 gas [ppmv]
   real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)             !Hydrogenotrophic CH4 production rate [gC d-2 h-1]
@@ -162,7 +163,7 @@ implicit none
   allocate(ZNHUI_vr(0:JZ,JY,JX));  ZNHUI_vr  =0._r8
   allocate(ZNHU0_vr(0:JZ,JY,JX));  ZNHU0_vr=0._r8
   allocate(CPO4B_vr(0:JZ,JY,JX));CPO4B_vr(0:JZ,JY,JX)=0._r8
-
+  allocate(O2_Gas_Frac_vr(1:JZ,JY,JX)) ; O2_Gas_Frac_vr = 0._r8
   allocate(CO2_Gas_Frac_vr(1:JZ,JY,JX)) ; CO2_Gas_Frac_vr = 0._r8
   allocate(CH4_Gas_Frac_vr(1:JZ,JY,JX)) ; CH4_Gas_Frac_vr = 0._r8  
   allocate(Ar_Gas_Frac_vr(1:JZ,JY,JX)) ; Ar_Gas_Frac_vr = 0._r8  
@@ -260,7 +261,7 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
-
+  call destroy(O2_Gas_Frac_vr)
   call destroy(CO2_Gas_Frac_vr)
   call destroy(CH4_Gas_Frac_vr)  
   call destroy(Ar_Gas_Frac_vr)
