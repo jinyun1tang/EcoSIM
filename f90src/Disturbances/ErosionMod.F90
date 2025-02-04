@@ -149,7 +149,7 @@ module ErosionMod
     !     CONCENTRATION IN SURFACE WATER, MODIFIED BY SOIL COHESION
     !     FROM 'HOUR1'
     !
-          STPR=1.0E+02_r8*RunoffVelocityM(M,NY,NX)*ABS(SLOPE(0,NY,NX))
+          STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE(0,NY,NX))
           CSEDX=ParticleDensitySurfLay(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4_r8)**XER(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 

@@ -2445,14 +2445,14 @@ module Hour1Mod
       VWatLitRHoldCapcity_col(NY,NX) = AZMAX1(VWatLitRHoldCapcity0)
       VLitR_col(NY,NX)               = AZMAX1(VLitR0*ppmc)
 
-      IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(AMIN1(VLitR_col(NY,NX),VWatLitRHoldCapcity_col(NY,NX)).GT.ZEROS(NY,NX))THEN
         FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR_col(NY,NX)
       ELSE
         FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
-      ENDIF
-      POROS0_col(NY,NX)          = FVLitR
+      ENDIF      
+      POROS0_col(NY,NX)          = FVLitR      
       FieldCapacity_vr(0,NY,NX)  = 0.500_r8*FVLitR
-      WiltPoint_vr(0,NY,NX)      = 0.125_r8*FVLitR
+      WiltPoint_vr(0,NY,NX)      = 0.125_r8*FVLitR      
       LOGPOROS_vr(0,NY,NX)       = LOG(POROS0_col(NY,NX))
       LOGFldCapacity_vr(0,NY,NX) = LOG(FieldCapacity_vr(0,NY,NX))
       LOGWiltPoint_vr(0,NY,NX)   = LOG(WiltPoint_vr(0,NY,NX))

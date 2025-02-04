@@ -112,7 +112,7 @@ implicit none
 ! IF SNOWPACK DISAPPEARS
 
 ! intermediate disappearance
-  IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO)THEN    
+  IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).LE.ZERO .or. SoilOrgM_vr(ielmc,0,NY,NX)<=1.e-2_r8)THEN    
     VLWatMicP_vr(NUM(NY,NX),NY,NX) = VLWatMicP_vr(NUM(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
     VLiceMicP_vr(NUM(NY,NX),NY,NX) = VLiceMicP_vr(NUM(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
 
@@ -185,7 +185,7 @@ implicit none
       if(L/=1)TKSnow_snvr(L,NY,NX)=spval
     ENDDO D9770
 
-    IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO)THEN    
+    IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN    
       ENGY                      = TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
       VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+FLWW
       VLiceMicP_vr(0,NY,NX)     = VLiceMicP_vr(0,NY,NX)+FLWI+FLWS/DENSICE

@@ -406,11 +406,6 @@ module SoilBGCNLayMod
   ORGM=ORGM+DOM_micp(1:NumPlantChemElms) + DOM_macp(1:NumPlantChemElms)
 
   ORGM(ielmc)=ORGM(ielmc)+DOM_micp(idom_acetate) + DOM_macp(idom_acetate)
-  if(ORGM(ielmc)>0._r8)then
-    if(present(I) .and. present(J))then
-      write(114,*)I*1000+J,ORGM(ielmc),DOM_micp(idom_doc),DOM_micp(idom_acetate),DOM_macp(idom_doc), DOM_macp(idom_acetate)
-    endif
-  endif
   end subroutine sumLitrOMLayL
 
 !------------------------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 module SurfLitterPhysMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod, only : etimer  
+  use DebugToolMod
   use MiniMathMod
   use HydroThermData
   use SurfSoilDataType
@@ -266,8 +267,10 @@ implicit none
   VLWatMicP12        = VLWatMicP1_vr(NUM(NY,NX),NY,NX)
   TKS1               = TKSoil1_vr(NUM(NY,NX),NY,NX)
   dLWdTSoil          = 0._r8
+
   !embedded iteration, local time step size
   dt_litrHeat=dts_HeatWatTP/real(NPR,kind=r8)      !time step for litter flux calculation
+
   D5000: DO NN=1,NPR
 !    write(*,*)'HeatFluxAir2LitR  x',NN,HeatFluxAir2LitR
     IF(VLHeatCapcityLitR2.GT.VHeatCapLitRMin_col(NY,NX))THEN
@@ -519,23 +522,17 @@ implicit none
   !update litter physical properties by processes before surface runoff
   implicit none
   integer, intent(in) :: M,NY,NX,I,J
+
+  character(len=*), parameter :: subname='UpdateLitRBe4RunoffM'
   real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
   real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
   real(r8) :: VLWatMicP10,VLiceMicP10,VLWatLitR,VLicelitR
+
+
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
-  ! XVOLT,XVOLW=free water+ice,water in litter layer
-  ! VOLWM,VsoiPM=surface water,air content for use in TranspNoSalt.f
-  ! VWatLitRHoldCapcity=maximum water retention by litter
-  ! VHeatCapacity1_vr=volumetric heat capacity of litter
-  ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter
-  ! VWatLitRHoldCapcity=maximum water retention by litter
-  ! LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
-  ! VLitR=dry litter volume
-  ! THETWX,FracSoiPAsIce,FracSoiPAsAir=water,ice,air concentrations
-  ! VHeatCapacity1_vr=volumetric heat capacity of litter
-  ! TK1=litter temperature
-  ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff_col=litter total cond+conv,latent,runoff heat flux
+  call PrintInfo('beg '//subname)
+
   VLWatMicP10                   = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP10                   = VLiceMicP1_vr(0,NY,NX)
 
@@ -543,18 +540,13 @@ implicit none
   VLiceMicP1_vr(0,NY,NX)        = (VLiceMicP1_vr(0,NY,NX)-LitrIceFlxThaw_col(NY,NX)/DENSICE)
 
   VLairMicP1_vr(0,NY,NX)     = AZMAX1(VLPoreLitR_col(NY,NX)-VLWatMicP1_vr(0,NY,NX)-VLiceMicP1_vr(0,NY,NX))
+
   VLWatMicPM_vr(M+1,0,NY,NX) = VLWatMicP1_vr(0,NY,NX)
   VLsoiAirPM_vr(M+1,0,NY,NX) = VLairMicP1_vr(0,NY,NX)
 
 !  VLWatLitR  = VLWatMicP_vr(0,NY,NX)+TLitrIceFlxThaw_col(NY,NX)+WatFLo2LitR_col(NY,NX)+TXGridSurfRunoff_2DH(NY,NX)
 !  VLicelitR  = VLiceMicP_vr(0,NY,NX)-TLitrIceFlxThaw_col(NY,NX)/DENSICE
   
-!  if(abs(AZMAX1(VLWatLitR)-VLWatMicP1_vr(0,NY,NX))>tiny_wat)then
-!    if(VLWatLitR<0._r8)then
-!      call endrun(trim(mod_filename)//'at line',__LINE__)
-!    endif
-!  endif
-
   TVWatIceLitR                  = VLWatMicP1_vr(0,NY,NX)+VLiceMicP1_vr(0,NY,NX)
   XVLMobileWaterLitR_col(NY,NX) = AZMAX1(TVWatIceLitR-VWatLitRHoldCapcity_col(NY,NX))
   IF(TVWatIceLitR.GT.ZEROS(NY,NX))THEN
@@ -566,6 +558,7 @@ implicit none
     XVLMobileWatMicP(NY,NX) = 0.0_r8
     XVLiceMicP_col(NY,NX)   = 0.0_r8
   ENDIF
+
   XVLMobileWaterLitRM(M+1,NY,NX) = XVLMobileWaterLitR_col(NY,NX)
   XVLMobileWatMicPM(M+1,NY,NX)   = XVLMobileWatMicP(NY,NX)
   XVLiceMicPM(M+1,NY,NX)         = XVLiceMicP_col(NY,NX)
@@ -579,16 +572,17 @@ implicit none
     FracSoiPAsIce_vr(0,NY,NX)     = 0.0_r8
     AirFilledSoilPore_vr(0,NY,NX) = 1.0_r8
   ENDIF
+
   AirFilledSoilPoreM_vr(M+1,0,NY,NX)        = AirFilledSoilPore_vr(0,NY,NX)
-  VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
-  TK0Prev                    = TKSoil1_vr(0,NY,NX)                                 !residual temperature
+  VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                      !heat capacity
+  TK0Prev                    = TKSoil1_vr(0,NY,NX)                             !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
   VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoil1_vr(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRi_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
-    if(TKSoil1_vr(0,NY,NX)<100._r8 .or. TKSoil1_vr(0,NY,NX)>380._r8)then
-      write(*,*)'weird litter temp UpdateLitRBe4RunoffM=',TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX)
+    if(abs(TKSoil1_vr(0,NY,NX)-TairK_col(NY,NX))>35._r8)then
+      write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX)
       write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
       write(*,*)'engy',ENGYR/VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRi_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),&
         LitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX)
@@ -609,7 +603,7 @@ implicit none
 
 !  watflw(NY, NX)  = watflw(NY,NX)+WatFLow2LitR_col(NY,NX)
 !  waticefl(NY,NX) = waticefl(NY,NX)+LitrIceFlxThaw_col(NY,NX)
-
+  call PrintInfo('end '//subname)
   end subroutine UpdateLitRBe4RunoffM
 
 !------------------------------------------------------------------------------------------
@@ -625,19 +619,7 @@ implicit none
   integer :: K
 
   ! SURFACE RESIDUE WATER AND TEMPERATURE
-  !
-  ! XVOLT,XVOLW=free water+ice,water in litter layer
-  ! VOLWM,VsoiPM=surface water,air content for use in TranspNoSalt.f
-  ! VWatLitRHoldCapcity=maximum water retention by litter
-  ! VHeatCapacity1_vr=volumetric heat capacity of litter
-  ! VOLA1,VLWatMicP1,VLiceMicP1,VOLP1=pore,water,ice,air volumes of litter
-  ! VWatLitRHoldCapcity=maximum water retention by litter
-  ! LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
-  ! VLitR=dry litter volume
-  ! THETWX,FracSoiPAsIce,FracSoiPAsAir=water,ice,air concentrations
-  ! VHeatCapacity1_vr=volumetric heat capacity of litter
-  ! TK1=litter temperature
-  ! HFLWRL,LitrIceHeatFlxFrez,cumHeatFlx2LitRByRunoff_col=litter total cond+conv,latent,runoff heat flux
+  
   VLWatMicP10 = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP10 = VLiceMicP1_vr(0,NY,NX)
 
