@@ -19,7 +19,7 @@ disp_planttrait = .true.
 plant_model     = .false.
 microbial_model = .true.
 soichem_model   = .true.
-fixWaterLevel   = .true.
+fixWaterLevel   = .false.
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '18000101000000'

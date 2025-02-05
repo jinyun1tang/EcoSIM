@@ -1132,16 +1132,6 @@ module WatsubMod
 !
 
 ! IDWaterTable=water table flag
-! THETA1,THETAX=water content ahead,behind wetting front
-! K1,KL=pore water class ahead,behind wetting front
-! HydcondSrc,CNDL=hydraulic conductivity ahead,behind wetting front
-! KSatRedusByRainKinetEnergy=reduction in soil surface Ksat from rainfall energy impact
-! FLWL,WaterFlow2MicptX_3D=lower boundary micropore water flux
-! WaterFlow2Macpt_3D=lower boundary macropore water flux
-! HFLWL=convective heat from lower boundary water flux
-! XH,XN,dts_HeatWatTP=rate constant,direction indicator,time step
-! SLOPE=sin(vertical slope)=1
-! RCHG*=boundary flags
 
   RechargRate=RechargSubSurf*RechargRateWTBL
   !involve no water table or in vertical direction
@@ -1177,6 +1167,7 @@ module WatsubMod
   watflx                        = WaterFlow2Micpt_3D(N,M6,M5,M4)+WaterFlow2Macpt_3D(N,M6,M5,M4)
   heatflx                       = cpw*TKSoil1_vr(N3,N2,N1)*watflx
   HeatFlow2Soili_3D(N,M6,M5,M4) = heatflx
+  
   if(N3==M6 .and. N2==M5 .and. N1==M4)then
     QDrain_col(N2,N1)    = QDrain_col(N2,N1) - watflx
     QDrainM_col(N2,N1)   = QDrainM_col(N2,N1) - watflx
