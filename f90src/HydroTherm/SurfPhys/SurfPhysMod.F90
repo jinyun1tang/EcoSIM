@@ -1404,27 +1404,27 @@ contains
 !
 !     SnoFalPrec,RainFalPrec_col,PrecAtm_col,PRECI=snow,rain,snow+rain,irrigation
 !     VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
-!     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
+!     Rain2LitRSurf_col,Irrig2LitRSurf_col=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 &
     .AND. VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     !there is precipitation, there is significant snow layer
     Rain2LitRSurf_col(NY,NX) = 0.0_r8
-    Irrig2LitRSurf(NY,NX)    = 0.0_r8
+    Irrig2LitRSurf_col(NY,NX)    = 0.0_r8
     Rain2SoilSurf_col(NY,NX) = PrecAtm_col(NY,NX)
     Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)
   ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
     .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
     !there is insignificant snow layer
     Rain2LitRSurf_col(NY,NX) = RainThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
-    Irrig2LitRSurf(NY,NX)    = RainThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
+    Irrig2LitRSurf_col(NY,NX)    = RainThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
     Rain2SoilSurf_col(NY,NX) = PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
-    Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)-Irrig2LitRSurf(NY,NX)
+    Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)-Irrig2LitRSurf_col(NY,NX)
   ELSE
     !no precipitation
     Rain2LitRSurf_col(NY,NX) = 0.0_r8
-    Irrig2LitRSurf(NY,NX)    = 0.0_r8
+    Irrig2LitRSurf_col(NY,NX)    = 0.0_r8
     Rain2SoilSurf_col(NY,NX) = 0.0_r8
     Irrig2SoilSurf_col(NY,NX)    = 0.0_r8
   ENDIF

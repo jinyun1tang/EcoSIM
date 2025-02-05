@@ -404,7 +404,7 @@ module RedistMod
 ! FLQGQ: precipitation flux into soil surface
 ! Rain2LitRSurf_col: precipitation flux into surface litter
 ! FLQGI: irrifation flux into soil surface
-! Irrig2LitRSurf: irrigation flux into surface litter
+! Irrig2LitRSurf_col: irrigation flux into surface litter
 ! XCODFG: soil CO2 dissolution (+ve) - volatilization (-ve)
 ! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
 ! UCO2G: total soil CO2 flux, [g d-2]
@@ -415,7 +415,7 @@ module RedistMod
   do idg=idg_beg,idg_NH3
     Gas_WetDeposition_col(idg,NY,NX) = Gas_WetDeposition_col(idg,NY,NX)  &
       + (Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcg_rain_mole_conc_col(idg,NY,NX) &
-      + (Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX)+IrrigSubsurf_col(NY,NX))*trcg_irrig_mole_conc_col(idg,NY,NX) 
+      + (Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)+IrrigSubsurf_col(NY,NX))*trcg_irrig_mole_conc_col(idg,NY,NX) 
   ENDDO  
 
   CH=trcg_DisolEvap_Atm2Soil_flx(idg_CH4,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_CH4,NY,NX)+Gas_Disol_Flx_vr(idg_CH4,0,NY,NX)&
@@ -453,7 +453,7 @@ module RedistMod
   !
   ZSI=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
       *(NH4_rain_mole_conc(NY,NX)+trcg_rain_mole_conc_col(idg_NH3,NY,NX)+NO3_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX)) &
+      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
       *(NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX)))*14.0
 
   ZXB=-IrrigSubsurf_col(NY,NX)*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX))-IrrigSubsurf_col(NY,NX) &
@@ -462,7 +462,7 @@ module RedistMod
   TOMOU_lnds(ielmn) = TOMOU_lnds(ielmn)+ZXB
   ZGI               = (Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
       *(trcg_rain_mole_conc_col(idg_N2,NY,NX)+trcg_rain_mole_conc_col(idg_N2O,NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX))*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX)) &
+      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX))*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX)) &
       +trcg_DisolEvap_Atm2Soil_flx(idg_N2,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_N2O,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_NH3,NY,NX) &
       +trcg_DisolEvap_Atm2Soil_flx(idg_NH3B,NY,NX)+Gas_AdvDif_Flx_3D(idg_N2,3,NU(NY,NX),NY,NX) &
       +Gas_AdvDif_Flx_3D(idg_N2O,3,NU(NY,NX),NY,NX)+Gas_AdvDif_Flx_3D(idg_NH3,3,NU(NY,NX),NY,NX) &
@@ -493,7 +493,7 @@ module RedistMod
   !
   PI=patomw*((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
       *(H2PO4_rain_mole_conc(NY,NX)+HPO4_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX)) &
+      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
       *(H2PO4_irrig_mole_conc(I,NY,NX)+HPO4_irrig_mole_conc(I,NY,NX)))
   PXB               = -patomw*IrrigSubsurf_col(NY,NX)*(H2PO4_irrig_mole_conc(I,NY,NX)+HPO4_irrig_mole_conc(I,NY,NX))
   TPIN              = TPIN+PI
@@ -506,10 +506,10 @@ module RedistMod
   !
   SIN=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
       *(2.0_r8*NH4_rain_mole_conc(NY,NX)+trcg_rain_mole_conc_col(idg_NH3,NY,NX)+NO3_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX)) &
+      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
       *(2.0*NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX)))
   SGN=(2.0_r8*(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(trcg_rain_mole_conc_col(idg_N2,NY,NX)+trcg_rain_mole_conc_col(idg_N2O,NY,NX)) &
-      +2.0_r8*(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX))*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX)) &
+      +2.0_r8*(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX))*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX)) &
       +2.0_r8*(trcg_DisolEvap_Atm2Soil_flx(idg_N2,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_N2O,NY,NX))+trcg_DisolEvap_Atm2Soil_flx(idg_NH3,NY,NX) &
       +trcg_DisolEvap_Atm2Soil_flx(idg_NH3B,NY,NX)+2.0_r8*(Gas_AdvDif_Flx_3D(idg_N2,3,NU(NY,NX),NY,NX) &
       +Gas_AdvDif_Flx_3D(idg_N2O,3,NU(NY,NX),NY,NX))+Gas_AdvDif_Flx_3D(idg_NH3,3,NU(NY,NX),NY,NX) &
@@ -517,7 +517,7 @@ module RedistMod
       +2.0_r8*(Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX))+Gas_Disol_Flx_vr(idg_NH3,0,NY,NX) &
       +2.0_r8*(trcg_DisolEvap_Atm2Litr_flx(idg_N2,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_N2O,NY,NX))+trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX))/natomw
   SIP=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_rain_mole_conc(NY,NX)+2.0_r8*HPO4_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf(NY,NX))*(3.0_r8*H2PO4_irrig_mole_conc(I,NY,NX)+2.0_r8*HPO4_irrig_mole_conc(I,NY,NX)))
+      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_irrig_mole_conc(I,NY,NX)+2.0_r8*HPO4_irrig_mole_conc(I,NY,NX)))
   SNB=-IrrigSubsurf_col(NY,NX)*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX))-IrrigSubsurf_col(NY,NX) &
       *(2.0_r8*NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX))
       SPB=-IrrigSubsurf_col(NY,NX)*(3.0*H2PO4_irrig_mole_conc(I,NY,NX)+2.0*HPO4_irrig_mole_conc(I,NY,NX))
@@ -538,8 +538,8 @@ module RedistMod
     SIR=0._r8
     SII=0._r8
     do nsalts=idsalt_beg,idsalt_end
-      SIR = SIR+trcsalt_rain_conc(nsalts,NY,NX)*trcSaltIonNumber(nsalts)
-      SII = SII+trcsalt_irrig_conc(idsalt_Al,I,NY,NX)*trcSaltIonNumber(nsalts)
+      SIR = SIR+trcsalt_rain_mole_conc_col(nsalts,NY,NX)*trcSaltIonNumber(nsalts)
+      SII = SII+trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)*trcSaltIonNumber(nsalts)
     ENDDO  
     SIR    = SIR*PrecAtm_col(NY,NX)
     SBU    = -IrrigSubsurf_col(NY,NX)*SII
@@ -567,10 +567,10 @@ module RedistMod
   ENDDO
   !RO2AquaSourcePrev_vr:=soil surface O2 dissolution + aqueous O2 flux micropore, >0 into aqueous phase
   RO2AquaSourcePrev_vr(0,NY,NX)=trcg_DisolEvap_Atm2Litr_flx(idg_O2,NY,NX)+trcs_TransptMicP_3D(idg_O2,3,0,NY,NX) &
-    -(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_O2,NY,NX)+Irrig2LitRSurf(NY,NX)*trcg_irrig_mole_conc_col(idg_O2,NY,NX))
+    -(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_O2,NY,NX)+Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_O2,NY,NX))
 
   RCH4PhysexchPrev_vr(0,NY,NX)=trcg_DisolEvap_Atm2Litr_flx(idg_CH4,NY,NX)+trcs_TransptMicP_3D(idg_CH4,3,0,NY,NX) &
-    -(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_CH4,NY,NX)+Irrig2LitRSurf(NY,NX)*trcg_irrig_mole_conc_col(idg_CH4,NY,NX))
+    -(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_CH4,NY,NX)+Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_CH4,NY,NX))
     
   RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX) = RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_O2,NY,NX)
   RCH4PhysexchPrev_vr(NU(NY,NX),NY,NX)  = RCH4PhysexchPrev_vr(NU(NY,NX),NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_CH4,NY,NX)
@@ -803,7 +803,7 @@ module RedistMod
   INTEGER :: nsalts
 
   DO nsalts=idsalt_beg,idsalt_end
-    trcSalt_solml_vr(nsalts,0,NY,NX)=trcSalt_solml_vr(nsalts,0,NY,NX)+trcSalt3DFlo2Cell_3D(nsalts,3,0,NY,NX)
+    trcSalt_solml_vr(nsalts,0,NY,NX)=trcSalt_solml_vr(nsalts,0,NY,NX)+trcSalt_TransptMicP_3D(nsalts,3,0,NY,NX)
   ENDDO
 
   PSS=patomw*(trcSalt_solml_vr(idsalt_H0PO4,0,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,0,NY,NX)&
@@ -1409,7 +1409,7 @@ module RedistMod
   real(r8) :: PSS,SSS,SSH,SSF,SSX,SST,SSP
 
   DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_solml_vr(nsalts,L,NY,NX)=trcSalt_solml_vr(nsalts,L,NY,NX)+trcSalt_TR_vr(nsalts,L,NY,NX) &
+    trcSalt_solml_vr(nsalts,L,NY,NX)=trcSalt_solml_vr(nsalts,L,NY,NX)+trcSalt_RGeoChem_flx_vr(nsalts,L,NY,NX) &
       +trcSalt_Flo2MicP_vr(nsalts,L,NY,NX)+trcSalt_Irrig_vr(nsalts,L,NY,NX)+trcSalt_XFXS_vr(nsalts,L,NY,NX)
 
     trcSalt_soHml_vr(nsalts,L,NY,NX)=trcSalt_soHml_vr(nsalts,L,NY,NX)+trcSalt_Flo2MacP_vr(nsalts,L,NY,NX) &

@@ -675,25 +675,25 @@ module SoluteMod
         trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)-DZH1P
         trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)-DZH2P
 
-        trcSalt_TR_vr(idsalt_H0PO4,L,NY,NX)            = trcSalt_TR_vr(idsalt_H0PO4,L,NY,NX)+DZH0P
+        trcSalt_RGeoChem_flx_vr(idsalt_H0PO4,L,NY,NX)            = trcSalt_RGeoChem_flx_vr(idsalt_H0PO4,L,NY,NX)+DZH0P
         trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
         trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
-        trcSalt_TR_vr(idsalt_H3PO4,L,NY,NX)            = trcSalt_TR_vr(idsalt_H3PO4,L,NY,NX)+DZH3P
-        trcSalt_TR_vr(idsalt_FeHPO4,L,NY,NX)           = trcSalt_TR_vr(idsalt_FeHPO4,L,NY,NX)+DZF1P
-        trcSalt_TR_vr(idsalt_FeH2PO4,L,NY,NX)          = trcSalt_TR_vr(idsalt_FeH2PO4,L,NY,NX)+DZF2P
-        trcSalt_TR_vr(idsalt_CaPO4,L,NY,NX)            = trcSalt_TR_vr(idsalt_CaPO4,L,NY,NX)+DZC0P
-        trcSalt_TR_vr(idsalt_CaHPO4,L,NY,NX)           = trcSalt_TR_vr(idsalt_CaHPO4,L,NY,NX)+DZC1P
-        trcSalt_TR_vr(idsalt_CaH4P2O8,L,NY,NX)         = trcSalt_TR_vr(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
-        trcSalt_TR_vr(idsalt_MgHPO4,L,NY,NX)           = trcSalt_TR_vr(idsalt_MgHPO4,L,NY,NX)+DZM1P
-        trcSalt_TR_vr(idsalt_H0PO4B,L,NY,NX)           = trcSalt_TR_vr(idsalt_H0PO4B,L,NY,NX)-DZH0P
+        trcSalt_RGeoChem_flx_vr(idsalt_H3PO4,L,NY,NX)            = trcSalt_RGeoChem_flx_vr(idsalt_H3PO4,L,NY,NX)+DZH3P
+        trcSalt_RGeoChem_flx_vr(idsalt_FeHPO4,L,NY,NX)           = trcSalt_RGeoChem_flx_vr(idsalt_FeHPO4,L,NY,NX)+DZF1P
+        trcSalt_RGeoChem_flx_vr(idsalt_FeH2PO4,L,NY,NX)          = trcSalt_RGeoChem_flx_vr(idsalt_FeH2PO4,L,NY,NX)+DZF2P
+        trcSalt_RGeoChem_flx_vr(idsalt_CaPO4,L,NY,NX)            = trcSalt_RGeoChem_flx_vr(idsalt_CaPO4,L,NY,NX)+DZC0P
+        trcSalt_RGeoChem_flx_vr(idsalt_CaHPO4,L,NY,NX)           = trcSalt_RGeoChem_flx_vr(idsalt_CaHPO4,L,NY,NX)+DZC1P
+        trcSalt_RGeoChem_flx_vr(idsalt_CaH4P2O8,L,NY,NX)         = trcSalt_RGeoChem_flx_vr(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
+        trcSalt_RGeoChem_flx_vr(idsalt_MgHPO4,L,NY,NX)           = trcSalt_RGeoChem_flx_vr(idsalt_MgHPO4,L,NY,NX)+DZM1P
+        trcSalt_RGeoChem_flx_vr(idsalt_H0PO4B,L,NY,NX)           = trcSalt_RGeoChem_flx_vr(idsalt_H0PO4B,L,NY,NX)-DZH0P
 
-        trcSalt_TR_vr(idsalt_H3PO4B,L,NY,NX)           = trcSalt_TR_vr(idsalt_H3PO4B,L,NY,NX)-DZH3P
-        trcSalt_TR_vr(idsalt_FeHPO4B,L,NY,NX)          = trcSalt_TR_vr(idsalt_FeHPO4B,L,NY,NX)-DZF1P
-        trcSalt_TR_vr(idsalt_FeH2PO4B,L,NY,NX)         = trcSalt_TR_vr(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
-        trcSalt_TR_vr(idsalt_CaPO4B,L,NY,NX)           = trcSalt_TR_vr(idsalt_CaPO4B,L,NY,NX)-DZC0P
-        trcSalt_TR_vr(idsalt_CaHPO4B,L,NY,NX)          = trcSalt_TR_vr(idsalt_CaHPO4B,L,NY,NX)-DZC1P
-        trcSalt_TR_vr(idsalt_CaH4P2O8B,L,NY,NX)        = trcSalt_TR_vr(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
-        trcSalt_TR_vr(idsalt_MgHPO4B,L,NY,NX)      = trcSalt_TR_vr(idsalt_MgHPO4B,L,NY,NX)-DZM1P
+        trcSalt_RGeoChem_flx_vr(idsalt_H3PO4B,L,NY,NX)           = trcSalt_RGeoChem_flx_vr(idsalt_H3PO4B,L,NY,NX)-DZH3P
+        trcSalt_RGeoChem_flx_vr(idsalt_FeHPO4B,L,NY,NX)          = trcSalt_RGeoChem_flx_vr(idsalt_FeHPO4B,L,NY,NX)-DZF1P
+        trcSalt_RGeoChem_flx_vr(idsalt_FeH2PO4B,L,NY,NX)         = trcSalt_RGeoChem_flx_vr(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
+        trcSalt_RGeoChem_flx_vr(idsalt_CaPO4B,L,NY,NX)           = trcSalt_RGeoChem_flx_vr(idsalt_CaPO4B,L,NY,NX)-DZC0P
+        trcSalt_RGeoChem_flx_vr(idsalt_CaHPO4B,L,NY,NX)          = trcSalt_RGeoChem_flx_vr(idsalt_CaHPO4B,L,NY,NX)-DZC1P
+        trcSalt_RGeoChem_flx_vr(idsalt_CaH4P2O8B,L,NY,NX)        = trcSalt_RGeoChem_flx_vr(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
+        trcSalt_RGeoChem_flx_vr(idsalt_MgHPO4B,L,NY,NX)      = trcSalt_RGeoChem_flx_vr(idsalt_MgHPO4B,L,NY,NX)-DZM1P
         
         trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)+DXOH0
         trcx_TRSoilChem_vr(idx_OH,L,NY,NX)      = trcx_TRSoilChem_vr(idx_OH,L,NY,NX)+DXOH1

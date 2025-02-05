@@ -137,12 +137,12 @@ module TranspSaltMod
   integer :: idsalt
 !     begin_execution
   DO idsalt=idsalt_beg,idsalt_end
-    trcSaltFlo2SnowLay(idsalt,1,NY,NX)=0.0
-    trcSalt3DFlo2Cell_3D(idsalt,3,0,NY,NX)=0.0
+    trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX)=0.0
+    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=0.0
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX)=0.0
+    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=0.0
   ENDDO
   end subroutine ZeroAtmosSoluteFlux
 !------------------------------------------------------------------------------------------
@@ -164,13 +164,13 @@ module TranspSaltMod
 !     X*FLS,X*FLB=hourly solute flux to micropores in non-band,band
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt3DFlo2Cell_3D(idsalt,3,0,NY,NX)=0.0
-    trcSaltFlo2SnowLay(idsalt,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX)    
+    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=0.0
+    trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)    
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX)=0.0
+    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=0.0
   ENDDO
   end subroutine AtmosSoluteFluxToSnowpack
 !------------------------------------------------------------------------------------------
@@ -188,39 +188,24 @@ module TranspSaltMod
 !     IN SNOWFALL AND IRRIGATION IS ZERO IF SNOWPACK IS ABSENT
 !
 !     PrecAtm_col,PRECI=snow+rain,irrigation
-!     X*BLS=hourly solute flux to snowpack
-!     X*FLS,X*FLB=hourly solute flux to surface litter,soil surface micropore non-band,band
-!     Rain2LitRSurf_col,Irrig2LitRSurf=water flux to surface litter from rain,irrigation
-!     FLQGQ,FLQGI=water flux to soil surface from rain,irrigation
-!     C*R,C*Q=precipitation,irrigation solute concentrations
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
 !
-  DO idsalt=idsalt_beg,idsalt_end
-    trcSaltFlo2SnowLay(idsalt,1,NY,NX)=0.0_r8
-    trcSalt3DFlo2Cell_3D(idsalt,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_conc(idsalt,NY,NX) &
-      +Irrig2LitRSurf(NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX)
+  trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,1,NY,NX)=0.0_r8
+  DO idsalt=idsalt_beg,idsalt_end    
+    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2LitRSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
   ENDDO
 
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX)
+    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
   ENDDO
   
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B  
-    trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    trcSalt3DFlo2Cell_3D(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_conc(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
+    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcSalt_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
   ENDDO
 
   end subroutine AtmosSoluteFluxToTopsoil
@@ -260,12 +245,12 @@ module TranspSaltMod
 
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSaltAdv2SowLay(idsalt,1,NY,NX) = trcSaltFlo2SnowLay(idsalt,1,NY,NX)*dts_HeatWatTP
-    trcSalt_RFL0(idsalt,NY,NX)        = trcSalt3DFlo2Cell_3D(idsalt,3,0,NY,NX)*dts_HeatWatTP
+    trcSalt_AquaAdv_flxM_snvr(idsalt,1,NY,NX) = trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX)*dts_HeatWatTP
+    trcSalt_Precip2LitrM(idsalt,NY,NX)        = trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFL1(idsalt,NY,NX)=trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    trcSalt_Precip2MicpM(idsalt,NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   ENDDO
 
   end subroutine GetSubHourFlux
@@ -290,29 +275,24 @@ module TranspSaltMod
 !
   D10: DO L=NU(NY,NX),NL(NY,NX)
     DO idsalt=idsalt_beg,idsaltb_end
-      trcSalt_solml2R(idsalt,L,NY,NX)=-trcSalt_TR_vr(idsalt,L,NY,NX)*dts_HeatWatTP
+      trcSalt_RGeoChem_flxM_vr(idsalt,L,NY,NX)=-trcSalt_RGeoChem_flx_vr(idsalt,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
-    trcSalt_solml2R(idsalt_Hp,L,NY,NX)=trcSalt_solml2R(idsalt_Hp,L,NY,NX)-(RProd_Hp_vr(L,NY,NX))*dts_HeatWatTP
+    trcSalt_RGeoChem_flxM_vr(idsalt_Hp,L,NY,NX)=trcSalt_RGeoChem_flxM_vr(idsalt_Hp,L,NY,NX)-(RProd_Hp_vr(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
-!     FLU=subsurface water flux from watsub.f
-!     R*FLU,R*FBU=subsurface solute flux in non-band,band
-!     C*Q=irrigation solute concentrations
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
     FLWU(L,NY,NX)=TPlantRootH2OLoss_vr(L,NY,NX)*dts_HeatWatTP
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_Irrig_vr(idsalt,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX)
+      trcSalt_Irrig_vr(idsalt,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
     ENDDO
 
     DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
       ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_Irrig_vr(idsalt,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-      trcSalt_Irrig_vr(ids,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_conc(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+      trcSalt_Irrig_vr(idsalt,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+      trcSalt_Irrig_vr(ids,L,NY,NX)    = FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     ENDDO
 
 !
@@ -587,7 +567,7 @@ module TranspSaltMod
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell_3D(idsalt,N,M6,M5,M4)=trcSalt3DFlo2Cell_3D(idsalt,N,M6,M5,M4)+trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)
+    trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)=trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)+trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)
     trcSalt_XFHS_3D(idsalt,N,M6,M5,M4)=trcSalt_XFHS_3D(idsalt,N,M6,M5,M4)+trcSalt_RFHS(idsalt,N,M6,M5,M4)
   ENDDO
   end subroutine AccumFluxMacMicPores
@@ -668,14 +648,14 @@ module TranspSaltMod
       IF(LS.LT.JS.AND.VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idsalt=idsalt_beg,idsalt_end
           trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX) &
-            +trcSaltAdv2SowLay(idsalt,LS,NY,NX)-trcSaltAdv2SowLay(idsalt,LS2,NY,NX)
+            +trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX)-trcSalt_AquaAdv_flxM_snvr(idsalt,LS2,NY,NX)
         ENDDO
       ELSE
   !
   !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
   !
         DO idsalt=idsalt_beg,idsalt_end
-          trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX)+trcSaltAdv2SowLay(idsalt,LS,NY,NX) &
+          trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX) &
             -trcSalt3DFlo2CellM(idsalt,3,0,N2,N1)-trcSalt3DFlo2CellM(idsalt,3,NUM(N2,N1),N2,N1)
         ENDDO
 

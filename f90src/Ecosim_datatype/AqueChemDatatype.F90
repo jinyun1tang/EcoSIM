@@ -38,7 +38,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCN_vr(:,:,:)                        !Ca-Na Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCK_vr(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
-  real(r8),target,allocatable :: trcsalt_rain_conc(:,:,:)            !salt tracer concentration in rain [g m-3]
+  real(r8),target,allocatable :: trcsalt_rain_mole_conc_col(:,:,:)            !salt tracer concentration in rain [g m-3]
   real(r8),target,allocatable :: trcSalt_solml_vr(:,:,:,:)           !soil aqueous salt content micropre, [mol d-2]
   real(r8),target,allocatable :: trcx_solml_vr(:,:,:,:)              !exchangeable tracers, [mol d-2]
   real(r8),target,allocatable :: trcp_saltpml_vr(:,:,:,:)            !salt precipitate in micropore
@@ -49,7 +49,7 @@ module AqueChemDatatype
 
   real(r8),target,allocatable :: trcSalt_soHml_vr(:,:,:,:)
   real(r8),target,allocatable :: trcSalt_XFHS_3D(:,:,:,:,:)
-  real(r8),target,allocatable :: trcSalt3DFlo2Cell_3D(:,:,:,:,:)
+  real(r8),target,allocatable :: trcSalt_TransptMicP_3D(:,:,:,:,:)
   real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
   real(r8),target,allocatable ::  DOM_Mac2MicPore_flx_vr(:,:,:,:,:)       !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_Mac2MicPore_flx_vr(:,:,:,:)       !total non-salt solute micropore->macropore transfer, [g d-2 h-1]
@@ -58,7 +58,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TR_sol_NH3_soil_vr(:,:,:)          !total solute NH3 transformation non-band, [mol d-2 h-1]
 
   real(r8),target,allocatable ::  trcn_RChem_band_soil_vr(:,:,:,:)   !total solute nutrient transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcSalt_TR_vr(:,:,:,:)                !total salt solute transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_RGeoChem_flx_vr(:,:,:,:)                !total salt solute transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TR_HCO3_col(:,:,:)                 !total solute HCO3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TProd_CO2_geochem_soil_vr(:,:,:)        !total solute CO2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2O(:,:,:)                       !total solute H2O transformation, [mol d-2 h-1]
@@ -81,7 +81,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  trcp_RChem_soil(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_AquaAdv_flx_snvr(:,:,:,:)
   real(r8),target,allocatable ::  trcn_AquaAdv_flx_snvr(:,:,:,:)
-  real(r8),target,allocatable ::  trcSaltFlo2SnowLay(:,:,:,:)
+  real(r8),target,allocatable ::  trcSalt_AquaAdv_flx_snvr(:,:,:,:)
 
   private :: InitAllocate
   contains
@@ -159,15 +159,15 @@ module AqueChemDatatype
   allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
   allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
   if(salt_model)then
-    allocate(trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,JS,JY,JX)); trcSaltFlo2SnowLay=0._r8
-    allocate(trcSalt3DFlo2Cell_3D(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2Cell_3D=0._r8
+    allocate(trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_AquaAdv_flx_snvr=0._r8
+    allocate(trcSalt_TransptMicP_3D(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_TransptMicP_3D=0._r8
     allocate(trcSalt_XFHS_3D(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS_3D=0._r8
     allocate(trcSalt_solml_vr(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml_vr=0._r8
-    allocate(trcsalt_rain_conc(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_conc=0._r8
+    allocate(trcsalt_rain_mole_conc_col(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_mole_conc_col=0._r8
     allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
     allocate(trcSalt_soHml_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml_vr=0._r8
     allocate(trcSalt_XFXS_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS_vr=0._r8
-    allocate(trcSalt_TR_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_TR_vr=0._r8
+    allocate(trcSalt_RGeoChem_flx_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_RGeoChem_flx_vr=0._r8
   endif
 
   end subroutine InitAllocate
@@ -200,17 +200,17 @@ module AqueChemDatatype
   call destroy(GKCN_vr)
   call destroy(GKCK_vr)
 
-  call destroy(trcSalt_TR_vr)
+  call destroy(trcSalt_RGeoChem_flx_vr)
   call destroy(trcx_solml_vr)
   call destroy(trcSalt_solml_vr)
-  call destroy(trcsalt_rain_conc)
+  call destroy(trcsalt_rain_mole_conc_col)
   call destroy(trcSalt_soHml_vr)
   call destroy(trcp_saltpml_vr)
   call destroy(ElectricConductivity_vr)
   call destroy(SolutesIonStrenth_vr)
   call destroy(SolutesIonConc_vr)
   call destroy(trcSalt_XFXS_vr)
-  call destroy(trcSalt3DFlo2Cell_3D)
+  call destroy(trcSalt_TransptMicP_3D)
   call destroy(trcSalt_XFHS_3D)
   call destroy(TR_sol_NH3_soil_vr)
   call destroy(trcn_RChem_band_soil_vr)

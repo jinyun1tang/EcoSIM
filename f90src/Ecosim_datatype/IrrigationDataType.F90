@@ -85,7 +85,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  HeatIrrigation_vr(:,:,:)          !convective heat due to underground irrigation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcs_Irrig_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
   real(r8),target,allocatable ::  trcSalt_Irrig_vr(:,:,:,:)          !aqueous salt flux due to underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable :: trcsalt_irrig_conc(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
+  real(r8),target,allocatable :: trcsalt_irrig_mole_conc_col(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
   private :: InitAllocate
   contains
 
@@ -172,7 +172,7 @@ module IrrigationDataType
   allocate(HeatIrrigation_vr(JZ,JY,JX));    HeatIrrigation_vr=0._r8
   allocate(trcs_Irrig_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Irrig_vr=0._r8
   allocate(trcSalt_Irrig_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Irrig_vr=0._r8
-  allocate(trcsalt_irrig_conc(idsalt_beg:idsaltb_end,366,JY,JX))
+  allocate(trcsalt_irrig_mole_conc_col(idsalt_beg:idsaltb_end,366,JY,JX))
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------

@@ -642,7 +642,7 @@ implicit none
       IF(salt_model)THEN
         DO NTSA=idsalt_beg,idsaltb_end
           trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1) &
-            +trcSalt3DFlo2Cell_3D(NTSA,N,N3,N2,N1)-trcSalt3DFlo2Cell_3D(NTSA,N,N6,N5,N4)
+            +trcSalt_TransptMicP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMicP_3D(NTSA,N,N6,N5,N4)
           trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1) &
             +trcSalt_XFHS_3D(NTSA,N,N3,N2,N1)-trcSalt_XFHS_3D(NTSA,N,N6,N5,N4)
         ENDDO

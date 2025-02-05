@@ -514,22 +514,22 @@ module TranspNoSaltMod
     trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
     do idg=idg_beg,idg_NH3
       trcs_TransptMicP_3D(idg,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
-        +Irrig2LitRSurf(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)
+        +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)
       trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
         +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)
     ENDDO
 
     trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
-      +Irrig2LitRSurf(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
+      +Irrig2LitRSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
     trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
-      +Irrig2LitRSurf(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw
+      +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw
     trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
-      +Irrig2LitRSurf(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
+      +Irrig2LitRSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
     trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)=0.0_r8
     trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
-      +Irrig2LitRSurf(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
+      +Irrig2LitRSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
     trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
-      +Irrig2LitRSurf(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
+      +Irrig2LitRSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
 
     trcs_TransptMicP_3D(ids_NH4,3,NU(NY,NX),NY,NX)=((Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
       +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw)*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)

@@ -166,7 +166,7 @@ implicit none
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
   micfor%O2_irrig_conc       = trcg_irrig_mole_conc_col(idg_O2,NY,NX)
   micfor%O2_rain_conc        = trcg_rain_mole_conc_col(idg_O2,NY,NX)
-  micfor%Irrig2LitRSurf      = Irrig2LitRSurf(NY,NX)
+  micfor%Irrig2LitRSurf_col      = Irrig2LitRSurf_col(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)
   micfor%VLitR               = VLitR_col(NY,NX)

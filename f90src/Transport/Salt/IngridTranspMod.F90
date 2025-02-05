@@ -190,7 +190,7 @@ module IngridTranspMod
 !
   DO L=NU(NY,NX),NL(NY,NX)
     DO idsalt=idsalt_beg,idsaltb_end
-      trcSalt_solml2(idsalt,L,NY,NX)=trcSalt_solml2(idsalt,L,NY,NX)-trcSalt_solml2R(idsalt,L,NY,NX)
+      trcSalt_solml2(idsalt,L,NY,NX)=trcSalt_solml2(idsalt,L,NY,NX)-trcSalt_RGeoChem_flxM_vr(idsalt,L,NY,NX)
     ENDDO
   ENDDO
   end subroutine SoluteSinksInSoil
@@ -228,15 +228,15 @@ module IngridTranspMod
         ENDIF
 
         DO idsalt=idsalt_beg,idsalt_end
-          trcSaltAdv2SowLay(idsalt,L2,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)*VFLWW
-          trcSaltFlo2SnowLay(idsalt,L2,NY,NX)=trcSaltFlo2SnowLay(idsalt,L2,NY,NX)+trcSaltAdv2SowLay(idsalt,L2,NY,NX)
+          trcSalt_AquaAdv_flxM_snvr(idsalt,L2,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)*VFLWW
+          trcSalt_AquaAdv_flx_snvr(idsalt,L2,NY,NX)=trcSalt_AquaAdv_flx_snvr(idsalt,L2,NY,NX)+trcSalt_AquaAdv_flxM_snvr(idsalt,L2,NY,NX)
         ENDDO
 
       ELSE
         !bottom snow layer or insignificant snow layer
         IF(L.LT.JS)THEN
           !insignificant snow layer
-          trcSaltAdv2SowLay(idsalt_beg:idsalt_end,L2,NY,NX)=0.0_r8
+          trcSalt_AquaAdv_flxM_snvr(idsalt_beg:idsalt_end,L2,NY,NX)=0.0_r8
         ENDIF
 !
 !     SNOWPACK SOLUTE DISCHARGE TO SURFACE LITTER, SOIL SURFACE
@@ -555,12 +555,12 @@ module IngridTranspMod
 !     DFV*=diffusive solute flux between litter and soil surface
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt3DFlo2CellM(idsalt,3,0,NY,NX)=trcSalt_RFL0(idsalt,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
+    trcSalt3DFlo2CellM(idsalt,3,0,NY,NX)=trcSalt_Precip2LitrM(idsalt,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
       -trcSalt_RFL(idsalt)-trcSalt_flx_diffus(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2CellM(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_RFL1(idsalt,NY,NX) &
+    trcSalt3DFlo2CellM(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_Precip2MicpM(idsalt,NY,NX) &
       +trcSaltSnoFlo2Soil(idsalt)+trcSalt_RFL(idsalt)+trcSalt_flx_diffus(idsalt)
   ENDDO
 
@@ -586,12 +586,12 @@ module IngridTranspMod
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux in non-band,band
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt3DFlo2Cell_3D(idsalt,3,0,NY,NX)=trcSalt3DFlo2Cell_3D(idsalt,3,0,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
+    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
       -trcSalt_RFL(idsalt)-trcSalt_flx_diffus(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt3DFlo2Cell_3D(idsalt,3,NU(NY,NX),NY,NX) &
+    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX) &
       +trcSaltSnoFlo2Soil(idsalt)+trcSalt_RFL(idsalt)+trcSalt_flx_diffus(idsalt)
   ENDDO
   end subroutine AccumHourlyTopsoilReisdueFlux
@@ -1584,7 +1584,7 @@ module IngridTranspMod
 !
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2Cell_3D(idsalt,N,N6,N5,N4)=trcSalt3DFlo2Cell_3D(idsalt,N,N6,N5,N4) &
+    trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4)=trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4) &
       +trcSalt3DFlo2CellM(idsalt,N,N6,N5,N4)
     trcSalt_XFHS_3D(idsalt,N,N6,N5,N4)=trcSalt_XFHS_3D(idsalt,N,N6,N5,N4) &
       +trcSalt_RFHS(idsalt,N,N6,N5,N4)

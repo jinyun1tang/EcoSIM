@@ -23,7 +23,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   TLitrIceFlxThaw_col(:,:)          !water from ice thaw in surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez_col(:,:)      !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
   real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)            !precipitation flux into surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   Irrig2LitRSurf(:,:)               !irrigation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   Irrig2LitRSurf_col(:,:)               !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0_col(:,:)                   !litter porosity, [m3 pore m-3 litr]
   real(r8) ,target,allocatable ::   RC0(:,:,:)                        !surface litter in each complex,	[g d-2]
   real(r8) ,target,allocatable ::   RC0ff(:,:)
@@ -66,7 +66,7 @@ module SurfLitterDataType
   allocate(TLitrIceFlxThaw_col(JY,JX));        TLitrIceFlxThaw_col=0._r8
   allocate(TLitrIceHeatFlxFrez_col(JY,JX));       TLitrIceHeatFlxFrez_col=0._r8
   allocate(Rain2LitRSurf_col(JY,JX));        Rain2LitRSurf_col=0._r8
-  allocate(Irrig2LitRSurf(JY,JX));        Irrig2LitRSurf=0._r8
+  allocate(Irrig2LitRSurf_col(JY,JX));        Irrig2LitRSurf_col=0._r8
   allocate(POROS0_col(JY,JX));       POROS0_col=0._r8
   allocate(RC0(1:NumOfLitrCmplxs,JY,JX));      Rc0=0._r8
   allocate(RC0ff(JY,JX)); RC0ff=0._r8
@@ -95,7 +95,7 @@ module SurfLitterDataType
   call destroy(TLitrIceFlxThaw_col)
   call destroy(TLitrIceHeatFlxFrez_col)
   call destroy(Rain2LitRSurf_col)
-  call destroy(Irrig2LitRSurf)
+  call destroy(Irrig2LitRSurf_col)
   call destroy(POROS0_col)
   call destroy(RC0)
   call destroy(RC0ff)

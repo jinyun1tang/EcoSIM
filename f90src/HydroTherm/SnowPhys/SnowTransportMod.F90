@@ -91,8 +91,8 @@ implicit none
         !
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_TBLS(idsalt,LS,N2,N1)=trcSalt_TBLS(idsalt,LS,N2,N1)+trcSaltFlo2SnowLay(idsalt,LS,N2,N1)&
-              -trcSaltFlo2SnowLay(idsalt,LS2,N2,N1)
+            trcSalt_TBLS(idsalt,LS,N2,N1)=trcSalt_TBLS(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)&
+              -trcSalt_AquaAdv_flx_snvr(idsalt,LS2,N2,N1)
           ENDDO
         ENDIF
         !
@@ -124,15 +124,15 @@ implicit none
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX)+trcSaltFlo2SnowLay(idsalt,LS,NY,NX) &
-              -trcSalt3DFlo2Cell_3D(idsalt,3,0,N2,N1)-trcSalt3DFlo2Cell_3D(idsalt,3,NUM(N2,N1),N2,N1) &
+            trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,NY,NX) &
+              -trcSalt_TransptMicP_3D(idsalt,3,0,N2,N1)-trcSalt_TransptMicP_3D(idsalt,3,NUM(N2,N1),N2,N1) &
               -trcSalt_XFHS_3D(idsalt,3,NUM(N2,N1),N2,N1)
           ENDDO
 
           !add band flux
           DO idsalt=0,idsalt_nuts
             trcSalt_TBLS(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+idsalt,LS,NY,NX) &
-              -trcSalt3DFlo2Cell_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1) &
+              -trcSalt_TransptMicP_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1) &
               -trcSalt_XFHS_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1)
           ENDDO
         ENDIF
@@ -153,7 +153,7 @@ implicit none
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_TBLS(idsalt,LS,N2,N1)=trcSalt_TBLS(idsalt,LS,N2,N1)+trcSaltFlo2SnowLay(idsalt,LS,N2,N1)
+            trcSalt_TBLS(idsalt,LS,N2,N1)=trcSalt_TBLS(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)
           ENDDO
         ENDIF
       ENDIF

@@ -475,7 +475,7 @@ module Hour1Mod
 
       DO  L=1,NL(NY,NX)+1
         DO NSA=idsalt_beg,idsaltb_end
-          trcSalt3DFlo2Cell_3D(NSA,1:3,L,NY,NX) = 0._r8
+          trcSalt_TransptMicP_3D(NSA,1:3,L,NY,NX) = 0._r8
           trcSalt_XFHS_3D(NSA,1:3,L,NY,NX)      = 0._r8
         ENDDO
       ENDDO
@@ -809,7 +809,7 @@ module Hour1Mod
   trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1:JS,NY,NX) = 0._r8
   trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
   IF(salt_model)THEN
-    trcSaltFlo2SnowLay(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
+    trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
   ENDIF
   end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
@@ -2366,7 +2366,7 @@ module Hour1Mod
     trcs_Mac2MicPore_flx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 
     DO NTSA=idsalt_beg,idsaltb_end
-      trcSalt_TR_vr(NTSA,L,NY,NX)=0._r8
+      trcSalt_RGeoChem_flx_vr(NTSA,L,NY,NX)=0._r8
       trcSalt_XFXS_vr(NTSA,L,NY,NX)=0._r8
     ENDDO
 

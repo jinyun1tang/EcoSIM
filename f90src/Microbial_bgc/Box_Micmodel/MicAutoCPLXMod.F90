@@ -163,8 +163,8 @@ module MicAutoCPLXMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! O2AquaDiffusvity=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
+! Rain2LitRSurf,Irrig2LitRSurf_col=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf_col
 !
   RO2UptkAutor(NGL)=0.0_r8
 
@@ -641,7 +641,7 @@ module MicAutoCPLXMod
     COXYE                 => micfor%COXYE,                 &
     O2_rain_conc          => micfor%O2_rain_conc,          &
     O2_irrig_conc         => micfor%O2_irrig_conc,         &
-    Irrig2LitRSurf        => micfor%Irrig2LitRSurf,        &
+    Irrig2LitRSurf_col        => micfor%Irrig2LitRSurf_col,        &
     Rain2LitRSurf         => micfor%Rain2LitRSurf,         &
     litrm                 => micfor%litrm,                 &
     O2AquaDiffusvity      => micfor%O2AquaDiffusvity,      &
@@ -682,7 +682,7 @@ module MicAutoCPLXMod
       ELSE
         OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
         ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
-          +Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
+          +Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
