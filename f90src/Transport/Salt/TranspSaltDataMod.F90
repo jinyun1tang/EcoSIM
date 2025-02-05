@@ -12,18 +12,16 @@ implicit none
   real(r8), PARAMETER :: VFLWX=0.5_r8
   real(r8),allocatable ::  AquaIonDifusivty2_vr(:,:,:,:)                      !aqueous diffusivity of ions [m2/hr]
   real(r8),allocatable ::  trcSalt_FloXSurRof_flxM_2DH(:,:,:,:,:)             !2D flow of salt through surface runoff at iteration M [g d-2]
-  real(r8),allocatable ::  trcSalt_RQ(:,:,:,:)                                !
+  real(r8),allocatable ::  trcSalt_SnowDrift_flxM_2D(:,:,:,:)                 !salt flux through snow drift at iteration M [g d-2]
   real(r8),allocatable ::  trcSalt_FloXSurRof_flxM(:,:,:)                     !
 
-  real(r8),allocatable ::  trcSalt_solml2(:,:,:,:)              !
-  real(r8),allocatable ::  ZFE2(:,:,:)                        !
-  real(r8),allocatable ::  ZHCO32(:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_solml2R(:,:,:,:)                       !
-  real(r8),allocatable ::  trcSaltAdv2SowLay(:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_solml2(:,:,:,:)                            !
+  real(r8),allocatable ::  trcSalt_solml2R(:,:,:,:)                           !
+  real(r8),allocatable ::  trcSaltAdv2SowLay(:,:,:,:)                         !
 
   real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)
 
-  real(r8),allocatable ::  POSGL2(:,:,:)                      !
+  real(r8),allocatable ::  SoluteDifusivitytscaledM_vr(:,:,:)                      !
   real(r8),allocatable ::  trcSalt3DFlo2CellM(:,:,:,:,:)                    !
   real(r8),allocatable ::  trcSalt_RFHS(:,:,:,:,:)                    !
   real(r8),allocatable ::  trcSalt_soHml2(:,:,:,:)                       !
@@ -40,12 +38,12 @@ contains
   allocate(AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,JZ,JY,JX));   AquaIonDifusivty2_vr=0._r8
 
   allocate(trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_FloXSurRof_flxM_2DH=0._r8
-  allocate(trcSalt_RQ(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_RQ=0._r8
+  allocate(trcSalt_SnowDrift_flxM_2D(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_SnowDrift_flxM_2D=0._r8
   allocate(trcSalt_FloXSurRof_flxM(idsalt_beg:idsalt_end,JY,JX));     trcSalt_FloXSurRof_flxM=0._r8
   allocate(trcSaltAdv2SowLay(idsalt_beg:idsalt_end,JS,JY,JX));   trcSaltAdv2SowLay=0._r8
   allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_TBLS=0._r8
 
-  allocate(POSGL2(JZ,JY,JX));   POSGL2=0._r8
+  allocate(SoluteDifusivitytscaledM_vr(JZ,JY,JX));   SoluteDifusivitytscaledM_vr=0._r8
   allocate(trcSalt3DFlo2CellM(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2CellM=0._r8
   allocate(trcSalt_RFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH)); trcSalt_RFHS=0._r8
   allocate(trcSalt_soHml2(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2=0._r8
@@ -66,9 +64,9 @@ contains
   call destroy(trcSalt_solml2)
   call destroy(trcSalt_solml2R)
 
-  call destroy(trcSalt_RQ)
+  call destroy(trcSalt_SnowDrift_flxM_2D)
 
-  call destroy(POSGL2)
+  call destroy(SoluteDifusivitytscaledM_vr)
 
   call destroy(trcSalt_FloXSurRof_flxM)
   call destroy(trcSalt_FloXSurRof_flxM_2DH)

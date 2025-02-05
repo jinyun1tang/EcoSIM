@@ -233,22 +233,12 @@ module TranspSaltMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: L,NTA
+  integer :: L,idsalt
 !     begin_execution
-!
-!     Z*W=solute content in snowpacl
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-C
+
   D20: DO L=1,JS
-    DO NTA=idsalt_beg,idsalt_end
-      trc_Saltml2_snvr(NTA,L,NY,NX)=trc_Saltml_snvr(NTA,L,NY,NX)
+    DO idsalt=idsalt_beg,idsalt_end
+      trc_Saltml2_snvr(idsalt,L,NY,NX)=trc_Saltml_snvr(idsalt,L,NY,NX)
     ENDDO
   ENDDO D20
   end subroutine InitSolutesInSnowpack
@@ -341,7 +331,7 @@ module TranspSaltMod
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
 !                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    POSGL2(L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+    SoluteDifusivitytscaledM_vr(L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
 
     AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,L,NY,NX)=AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,L,NY,NX)*dts_HeatWatTP
 !
@@ -438,7 +428,7 @@ module TranspSaltMod
   implicit none
   integer, intent(in) :: N,M5,M4
 !     begin_execution
-  trcSalt_RQ(idsalt_beg:idsalt_end,N,M5,M4)=0.0
+  trcSalt_SnowDrift_flxM_2D(idsalt_beg:idsalt_end,N,M5,M4)=0.0
 
   end subroutine ZeroBoundarySnowFlux
 !------------------------------------------------------------------------------------------
@@ -656,7 +646,7 @@ module TranspSaltMod
 !     RQS*=solute flux in snow transfer
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_TQ(idsalt,N2,N1)=trcSalt_TQ(idsalt,N2,N1)+trcSalt_RQ(idsalt,N,N2,N1)-trcSalt_RQ(idsalt,N,N5,N4)
+    trcSalt_TQ(idsalt,N2,N1)=trcSalt_TQ(idsalt,N2,N1)+trcSalt_SnowDrift_flxM_2D(idsalt,N,N2,N1)-trcSalt_SnowDrift_flxM_2D(idsalt,N,N5,N4)
   ENDDO
   end subroutine NetOverloadFLuxInSnow
 !------------------------------------------------------------------------------------------
@@ -916,8 +906,8 @@ module TranspSaltMod
             IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
               IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
-                IF(NN.EQ.iOutflow.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.iInflow.AND.WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.iOutflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0 &
+                  .OR. NN.EQ.iInflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMicropore(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -933,8 +923,8 @@ module TranspSaltMod
 !     VLWatMacPM=macropore water-filled porosity from watsub.f
 !     RFH*S=solute diffusive flux through macropore
 
-                IF(NN.EQ.iOutflow.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.iInflow.AND.WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.iOutflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
+                  .OR. NN.EQ.iInflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMacropore(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -988,28 +978,16 @@ module TranspSaltMod
 !     Description:
 !
   integer, intent(in) :: NY,NX
-  integer :: L,NTA
+  integer :: L,idsalt
 !     begin_execution
-!     *W2=solute content of snowpack
-!     TQS*=net overland solute flux in snow
-!     T*BLS=net solute flux in snowpack
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
+
 !
-  DO NTA=idsalt_beg,idsalt_end
-    trc_Saltml2_snvr(NTA,1,NY,NX)=trc_Saltml2_snvr(NTA,1,NY,NX)+trcSalt_TQ(NTA,NY,NX)
+  DO idsalt=idsalt_beg,idsalt_end
+    trc_Saltml2_snvr(idsalt,1,NY,NX)=trc_Saltml2_snvr(idsalt,1,NY,NX)+trcSalt_TQ(idsalt,NY,NX)
   ENDDO
   D9670: DO L=1,JS
-    DO NTA=idsalt_beg,idsalt_end
-      trc_Saltml2_snvr(NTA,L,NY,NX)=trc_Saltml2_snvr(NTA,L,NY,NX)+trcSalt_TBLS(NTA,L,NY,NX)
+    DO idsalt=idsalt_beg,idsalt_end
+      trc_Saltml2_snvr(idsalt,L,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)+trcSalt_TBLS(idsalt,L,NY,NX)
     ENDDO
   ENDDO D9670
   end subroutine UpdateSoluteInSnow
