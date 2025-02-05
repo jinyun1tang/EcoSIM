@@ -1108,7 +1108,6 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
-      SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayerBot_vr(NL(NY,NX),NY,NX)+1.0_r8)
       SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)+1.0_r8)
       TCS_vr(0,NY,NX)             = ATCS(NY,NX)
       TKS_vr(0,NY,NX)             = ATKS(NY,NX)

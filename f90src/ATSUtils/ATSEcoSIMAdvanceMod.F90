@@ -15,11 +15,11 @@ module ATSEcoSIMAdvanceMod
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
-      VPA_col, WindSpeedAtm_col, RainH  
+      VPA_col, WindSpeedAtm_col, RainH, VPK_col  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, FracSoilPoreAsAir_vr, VLairMicP1_vr!need the only as some vars
+      FracSoiPAsIce_vr, AirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
@@ -97,7 +97,7 @@ implicit none
     !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
-    VPA(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
+    VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
     !convert WindSpeedAtm_col from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
@@ -133,11 +133,11 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
+        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF    
     ENDDO
     IF(TCA_col(NY,NX).GT.TSNOW)THEN
@@ -171,9 +171,15 @@ implicit none
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
-      Qinfl2MicP = Qinfl2MicPM+Qinfl2MicPM
-      Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
+      do NY=1, NYS
+        if (abs(Qinfl2MicPM(NY,NX)) < 1.0e-30) Qinfl2MicPM(NY,NX)=0.0
+        if (abs(Hinfl2SoilM(NY,NX)) < 1.0e-30) Hinfl2SoilM(NY,NX)=0.0
+        if (abs(Qinfl2MicP(NY,NX)) < 1.0e-30) Qinfl2MicP(NY,NX)=0.0
+        if (abs(Hinfl2Soil(NY,NX)) < 1.0e-30) Hinfl2Soil(NY,NX)=0.0
+      enddo
 
+      Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
+      Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
       !also update state variables for iteration M 
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
@@ -182,8 +188,8 @@ implicit none
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
   
-  Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
-  Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
+  !Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
+  !Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
   write(*,*) "Heat and water souces: "
   write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
@@ -235,11 +241,11 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        FracSoilPoreAsAir_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        FracSoilPoreAsAir_vr(L,NY,NX)=0.0_r8
+        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF
       !write(*,*) "NY, NX ", NY, NX
       !write(*,*) "FracSoiPAsWat_vr(L,NY,NX): ", FracSoiPAsWat_vr(L,NY,NX)

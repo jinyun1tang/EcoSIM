@@ -9,10 +9,10 @@ module ATSEcoSIMInitMod
   use EcoSIMCtrlMod
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, FracSoilPoreAsAir_vr!need the only as some vars
+      FracSoiPAsIce_vr, AirFilledSoilPore_vr!need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
-      VPA_col, WindSpeedAtm_col, RainH
+      VPA_col, WindSpeedAtm_col, RainH, VPK_col
   use SoilPropertyDataType
   use SurfLitterDataType
   use EcoSIMConfig
@@ -90,7 +90,7 @@ implicit none
     !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
-    VPA(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
+    VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
     
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
 
@@ -98,7 +98,7 @@ implicit none
     if(VGeomLayer_vr(0,NY,NX).EQ.0.0)then
       VGeomLayer_vr(0,NY,NX) = 0.1
     endif
-    POROS0(NY,NX) = 0.5
+    POROS0_col(NY,NX) = 0.5
     
 
     DO L=NU(NY,NX),NL(NY,NX)

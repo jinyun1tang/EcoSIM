@@ -54,7 +54,7 @@ contains
 
   data_ptr = props%depth%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_CumDepz2LayerBot_vr = data2D(:,:)
+  a_CumDepz2LayBottom_vr = data2D(:,:)
 
   data_ptr = props%dz%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])

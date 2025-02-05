@@ -92,7 +92,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
   allocate(a_TEMP(ncells_per_col_, ncol))
-  allocate(a_CumDepz2LayerBot_vr(ncells_per_col_, ncol))
+  allocate(a_CumDepz2LayBottom_vr(ncells_per_col_, ncol))
   allocate(a_AREA3(ncells_per_col_, ncol))
   allocate(a_BKDSI(ncells_per_col_, ncol))
   allocate(a_WC(ncells_per_col_, ncol))
@@ -104,7 +104,7 @@ subroutine Init_ATSEcoSIM_driver()
       a_AREA3(L,NY) = 1.0
       !DH(NY,NX) = 0.316229
       !DV(NY,NX) = 0.316229
-      a_CumDepz2LayerBot_vr(L,NY) = dist_tot
+      a_CumDepz2LayBottom_vr(L,NY) = dist_tot
       dist_tot = dist_tot+dist_step
       a_BKDSI(L,NY) = 1.1*1.0e3_r8
       !a_CORGC(L,NY) = 0.0
