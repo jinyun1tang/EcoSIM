@@ -321,8 +321,8 @@ module TranspSaltMod
 !
 !
     DO idsalt=idsalt_beg,idsaltb_end
-      trcSalt_solml2(idsalt,L,NY,NX)=trcSalt_solml_vr(idsalt,L,NY,NX)
-      trcSalt_soHml2(idsalt,L,NY,NX)=trcSalt_soHml_vr(idsalt,L,NY,NX)
+      trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml_vr(idsalt,L,NY,NX)
+      trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml_vr(idsalt,L,NY,NX)
     ENDDO
 
   ENDDO D10
@@ -394,7 +394,7 @@ module TranspSaltMod
 
   D9855: DO L=1,JS
     DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_TBLS(idsalt,L,NY,NX)=0.0
+      trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)=0.0
     ENDDO
   ENDDO D9855
   end subroutine InitFluxAccumulatorsInSnowpack
@@ -507,13 +507,13 @@ module TranspSaltMod
     VFLW=0.0_r8
   ENDIF
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(idsalt,M3,M2,M1))
+    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,M3,M2,M1))
   ENDDO
 
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(idsalt,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
-    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2(ids,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
+    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
+    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(ids,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteLossSubsurfMicropore
 !------------------------------------------------------------------------------------------
@@ -532,14 +532,14 @@ module TranspSaltMod
     VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM_vr(M,M3,M2,M1)))
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_RFHS(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(idsalt,M3,M2,M1))
+      trcSalt_RFHS(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,M3,M2,M1))
     ENDDO
 
     DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
       ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_RFHS(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(idsalt,M3,M2,M1)) &
+      trcSalt_RFHS(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,M3,M2,M1)) &
         *trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
-      trcSalt_RFHS(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2(ids,M3,M2,M1)) &
+      trcSalt_RFHS(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(ids,M3,M2,M1)) &
         *trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
     ENDDO
 
@@ -647,7 +647,7 @@ module TranspSaltMod
   !
       IF(LS.LT.JS.AND.VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idsalt=idsalt_beg,idsalt_end
-          trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX) &
+          trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX)=trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX) &
             +trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX)-trcSalt_AquaAdv_flxM_snvr(idsalt,LS2,NY,NX)
         ENDDO
       ELSE
@@ -655,12 +655,12 @@ module TranspSaltMod
   !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
   !
         DO idsalt=idsalt_beg,idsalt_end
-          trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX) &
+          trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX)=trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX) &
             -trcSalt3DFlo2CellM(idsalt,3,0,N2,N1)-trcSalt3DFlo2CellM(idsalt,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO idsalt=0,idsalt_nuts
-          trcSalt_TBLS(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+idsalt,LS,NY,NX) &
+          trcSalt_Aqua_flxM_snvr(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_Aqua_flxM_snvr(idsalt_H0PO4+idsalt,LS,NY,NX) &
             -trcSalt3DFlo2CellM(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1)
         ENDDO
       ENDIF
@@ -766,9 +766,9 @@ module TranspSaltMod
                   M5 = NY
                   M6 = L
                   XN = 1.0  !in from the boundary
-                  RCHQF=RechargWestSurf(M5,M4)
-                  RCHGFU=RechargWestSubSurf(M5,M4)
-                  RCHGFT=RechargRateWestWTBL(M5,M4)
+                  RCHQF  = RechargWestSurf(M5,M4)
+                  RCHGFU = RechargWestSubSurf(M5,M4)
+                  RCHGFT = RechargRateWestWTBL(M5,M4)
                 ELSE
                   CYCLE
                 ENDIF
@@ -788,9 +788,9 @@ module TranspSaltMod
                   M5=NY+1
                   M6=L
                   XN=-1.0_r8  !out of the boundary
-                  RCHQF=RechargSouthSurf(M2,M1)
-                  RCHGFU=RechargSouthSubSurf(M2,M1)
-                  RCHGFT=RechargRateSouthWTBL(M2,M1)
+                  RCHQF  = RechargSouthSurf(M2,M1)
+                  RCHGFU = RechargSouthSubSurf(M2,M1)
+                  RCHGFT = RechargRateSouthWTBL(M2,M1)
                 ELSE
                   CYCLE
                 ENDIF
@@ -803,9 +803,9 @@ module TranspSaltMod
                   M5=NY
                   M6=L
                   XN=1.0_r8  !in from the boundary
-                  RCHQF=RechargNorthSurf(M5,M4)
-                  RCHGFU=RechargNorthSubSurf(M5,M4)
-                  RCHGFT=RechargRateNorthWTBL(M5,M4)
+                  RCHQF  = RechargNorthSurf(M5,M4)
+                  RCHGFU = RechargNorthSubSurf(M5,M4)
+                  RCHGFT = RechargRateNorthWTBL(M5,M4)
                 ELSE
                   CYCLE
                 ENDIF
@@ -840,9 +840,6 @@ module TranspSaltMod
 !
 !     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
 !     RUNOFF IN 'WATSUB' AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
-!
-!     QRM =runoff from watsub.f
-!     RQR*=solute in runoff
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
               IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8) &
@@ -967,7 +964,7 @@ module TranspSaltMod
   ENDDO
   D9670: DO L=1,JS
     DO idsalt=idsalt_beg,idsalt_end
-      trc_Saltml2_snvr(idsalt,L,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)+trcSalt_TBLS(idsalt,L,NY,NX)
+      trc_Saltml2_snvr(idsalt,L,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)+trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)
     ENDDO
   ENDDO D9670
   end subroutine UpdateSoluteInSnow
@@ -991,7 +988,7 @@ module TranspSaltMod
 
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_solml2(idsalt,0,NY,NX)=trcSalt_solml2(idsalt,0,NY,NX) &
+    trcSalt_solml2_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX) &
       +trcSalt_TQR(idsalt,NY,NX)+trcSalt3DFlo2CellM(idsalt,3,0,NY,NX)
   ENDDO
   end subroutine UpdateSoluteInResidue
@@ -1009,10 +1006,10 @@ module TranspSaltMod
   D9685: DO L=NU(NY,NX),NL(NY,NX)
     IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idsalt=idsalt_beg,idsaltb_end
-        trcSalt_solml2(idsalt,L,NY,NX)=trcSalt_solml2(idsalt,L,NY,NX) &
+        trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml2_vr(idsalt,L,NY,NX) &
           +trcSalt_Flo2MicP_vr(idsalt,L,NY,NX)+trcSalt_RFXS(idsalt,L,NY,NX) &
           +trcSalt_RFLZ(idsalt,L,NY,NX)
-        trcSalt_soHml2(idsalt,L,NY,NX)=trcSalt_soHml2(idsalt,L,NY,NX) &
+        trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml2_vr(idsalt,L,NY,NX) &
           +trcSalt_Flo2MacP_vr(idsalt,L,NY,NX)-trcSalt_RFXS(idsalt,L,NY,NX)
       ENDDO
 

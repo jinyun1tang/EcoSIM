@@ -15,16 +15,15 @@ implicit none
   real(r8),allocatable ::  trcSalt_SnowDrift_flxM_2D(:,:,:,:)                 !salt flux through snow drift at iteration M [g d-2]
   real(r8),allocatable ::  trcSalt_FloXSurRof_flxM(:,:,:)                     !salt through surface runoff at iteration M [g d-2]
 
-  real(r8),allocatable ::  trcSalt_solml2(:,:,:,:)                            !copy of salt tracers for transport
+  real(r8),allocatable ::  trcSalt_solml2_vr(:,:,:,:)                         !copy of salt tracers for transport [g d-2]
   real(r8),allocatable ::  trcSalt_RGeoChem_flxM_vr(:,:,:,:)                  !salt reduction due to geochemistry [g d-2]
   real(r8),allocatable ::  trcSalt_AquaAdv_flxM_snvr(:,:,:,:)                 !salt advection by water advection in snow at iteration M [g d-2]
 
-  real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)
-
+  real(r8),allocatable ::  trcSalt_Aqua_flxM_snvr(:,:,:,:)                    !Aquatic salt flow into snow layer at iteration M [g d-2]
   real(r8),allocatable ::  SoluteDifusivitytscaledM_vr(:,:,:)                 !time scaled solute diffusivity
   real(r8),allocatable ::  trcSalt3DFlo2CellM(:,:,:,:,:)                      !
   real(r8),allocatable ::  trcSalt_RFHS(:,:,:,:,:)                            !
-  real(r8),allocatable ::  trcSalt_soHml2(:,:,:,:)                            !
+  real(r8),allocatable ::  trcSalt_soHml2_vr(:,:,:,:)                         !copy of salt in macropore [g d-2]
   real(r8),allocatable ::  trcSalt_RFXS(:,:,:,:)                              !
   real(r8),allocatable ::  trc_Saltml2_snvr(:,:,:,:)                          ! snowpack salt dissolved tracers
   real(r8),allocatable ::  trcSalt_Precip2LitrM(:,:,:)                        !wet precipiation gas flux to litter at iteration M [g d-2]
@@ -41,12 +40,12 @@ contains
   allocate(trcSalt_SnowDrift_flxM_2D(idsalt_beg:idsaltb_end,2,JV,JH));     trcSalt_SnowDrift_flxM_2D=0._r8
   allocate(trcSalt_FloXSurRof_flxM(idsalt_beg:idsalt_end,JY,JX));     trcSalt_FloXSurRof_flxM=0._r8
   allocate(trcSalt_AquaAdv_flxM_snvr(idsalt_beg:idsalt_end,JS,JY,JX));   trcSalt_AquaAdv_flxM_snvr=0._r8
-  allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_TBLS=0._r8
+  allocate(trcSalt_Aqua_flxM_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_Aqua_flxM_snvr=0._r8
 
   allocate(SoluteDifusivitytscaledM_vr(JZ,JY,JX));   SoluteDifusivitytscaledM_vr=0._r8
   allocate(trcSalt3DFlo2CellM(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2CellM=0._r8
   allocate(trcSalt_RFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH)); trcSalt_RFHS=0._r8
-  allocate(trcSalt_soHml2(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2=0._r8
+  allocate(trcSalt_soHml2_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2_vr=0._r8
   allocate(trcSalt_RFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFXS=0._r8
 
   allocate(trc_Saltml2_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trc_Saltml2_snvr=0._r8
@@ -60,14 +59,13 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(trcSalt_soHml2_vr)
+  call destroy(trcSalt_Aqua_flxM_snvr)
   call destroy(trcSalt3DFlo2CellM)
-  call destroy(trcSalt_solml2)
+  call destroy(trcSalt_solml2_vr)
   call destroy(trcSalt_RGeoChem_flxM_vr)
-
   call destroy(trcSalt_SnowDrift_flxM_2D)
-
   call destroy(SoluteDifusivitytscaledM_vr)
-
   call destroy(trcSalt_FloXSurRof_flxM)
   call destroy(trcSalt_FloXSurRof_flxM_2DH)
   call destroy(trcSalt_RFXS)
