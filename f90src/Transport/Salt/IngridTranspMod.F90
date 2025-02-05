@@ -555,12 +555,12 @@ module IngridTranspMod
 !     DFV*=diffusive solute flux between litter and soil surface
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt3DFlo2CellM(idsalt,3,0,NY,NX)=trcSalt_Precip2LitrM(idsalt,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
+    trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)=trcSalt_Precip2LitrM(idsalt,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
       -trcSalt_RFL(idsalt)-trcSalt_flx_diffus(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2CellM(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_Precip2MicpM(idsalt,NY,NX) &
+    trcSalt_MicpTranspFlxM_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_Precip2MicpM(idsalt,NY,NX) &
       +trcSaltSnoFlo2Soil(idsalt)+trcSalt_RFL(idsalt)+trcSalt_flx_diffus(idsalt)
   ENDDO
 
@@ -992,7 +992,7 @@ module IngridTranspMod
 !     RFL*=convective flux through micropores
 !     DFV*=diffusive solute flux through micropores
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2CellM(idsalt,N,N6,N5,N4)=trcSalt_RFL(idsalt)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_RFL(idsalt)
   ENDDO
   end subroutine SoluteAdvMicropore
 !------------------------------------------------------------------------------------------
@@ -1163,7 +1163,7 @@ module IngridTranspMod
 !     DFV*=diffusive solute flux through micropores
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt3DFlo2CellM(idsalt,N,N6,N5,N4)=trcSalt3DFlo2CellM(idsalt,N,N6,N5,N4)+trcSalt_flx_diffus(idsalt)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_flx_diffus(idsalt)
   ENDDO
 
   end subroutine SoluteDifsMicropore
@@ -1585,7 +1585,7 @@ module IngridTranspMod
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4)=trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4) &
-      +trcSalt3DFlo2CellM(idsalt,N,N6,N5,N4)
+      +trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)
     trcSalt_XFHS_3D(idsalt,N,N6,N5,N4)=trcSalt_XFHS_3D(idsalt,N,N6,N5,N4) &
       +trcSalt_RFHS(idsalt,N,N6,N5,N4)
   ENDDO
@@ -1722,7 +1722,7 @@ module IngridTranspMod
         ELSEIF(N.NE.3)THEN
           THETW1(N3,N2,N1)=0.0_r8
           THETW1(N6,N5,N4)=0.0_r8
-          trcSalt3DFlo2CellM(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
+          trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
 
           trcSalt_RFHS(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
         ENDIF
@@ -1730,7 +1730,7 @@ module IngridTranspMod
         THETW1(N3,N2,N1)=0.0_r8
         THETW1(N6,N5,N4)=0.0_r8
 
-        trcSalt3DFlo2CellM(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
+        trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
         trcSalt_RFHS(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
       ENDIF
     enddo

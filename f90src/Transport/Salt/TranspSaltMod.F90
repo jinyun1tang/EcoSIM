@@ -480,12 +480,12 @@ module TranspSaltMod
 
   VFLOW=WaterFlow2MicPM_3D(M,N,M6,M5,M4)
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(idsalt,M3,M2,M1)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)=VFLOW*trcSalt_irrig_vr(idsalt,M3,M2,M1)
   ENDDO
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(idsalt,M3,M2,M1)*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
-    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLOW*trcsalt_subirrig_conc(idsalt,M3,M2,M1)*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4) = VFLOW*trcSalt_irrig_vr(idsalt,M3,M2,M1)*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
+    trcSalt_MicpTranspFlxM_3D(ids,N,M6,M5,M4)    = VFLOW*trcSalt_irrig_vr(idsalt,M3,M2,M1)*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteGainSubsurfMicropore
 !------------------------------------------------------------------------------------------
@@ -507,13 +507,13 @@ module TranspSaltMod
     VFLW=0.0_r8
   ENDIF
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,M3,M2,M1))
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,M3,M2,M1))
   ENDDO
 
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-    trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
-    trcSalt3DFlo2CellM(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(ids,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
+    trcSalt_MicpTranspFlxM_3D(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_solml2_vr(ids,M3,M2,M1))*trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
   ENDDO
   end subroutine SoluteLossSubsurfMicropore
 !------------------------------------------------------------------------------------------
@@ -567,7 +567,7 @@ module TranspSaltMod
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)=trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)+trcSalt3DFlo2CellM(idsalt,N,M6,M5,M4)
+    trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)=trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)+trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)
     trcSalt_XFHS_3D(idsalt,N,M6,M5,M4)=trcSalt_XFHS_3D(idsalt,N,M6,M5,M4)+trcSalt_RFHS(idsalt,N,M6,M5,M4)
   ENDDO
   end subroutine AccumFluxMacMicPores
@@ -656,12 +656,12 @@ module TranspSaltMod
   !
         DO idsalt=idsalt_beg,idsalt_end
           trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX)=trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX) &
-            -trcSalt3DFlo2CellM(idsalt,3,0,N2,N1)-trcSalt3DFlo2CellM(idsalt,3,NUM(N2,N1),N2,N1)
+            -trcSalt_MicpTranspFlxM_3D(idsalt,3,0,N2,N1)-trcSalt_MicpTranspFlxM_3D(idsalt,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO idsalt=0,idsalt_nuts
           trcSalt_Aqua_flxM_snvr(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_Aqua_flxM_snvr(idsalt_H0PO4+idsalt,LS,NY,NX) &
-            -trcSalt3DFlo2CellM(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1)
+            -trcSalt_MicpTranspFlxM_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1)
         ENDDO
       ENDIF
     ENDIF
@@ -698,7 +698,7 @@ module TranspSaltMod
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO idsalt=idsalt_beg,idsaltb_end
         trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1) &
-          +trcSalt3DFlo2CellM(idsalt,N,N3,N2,N1)-trcSalt3DFlo2CellM(idsalt,N,N6,N5,N4)
+          +trcSalt_MicpTranspFlxM_3D(idsalt,N,N3,N2,N1)-trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)
         trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1) &
           +trcSalt_RFHS(idsalt,N,N3,N2,N1)-trcSalt_RFHS(idsalt,N,N6,N5,N4)
       ENDDO
@@ -989,7 +989,7 @@ module TranspSaltMod
 !
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_solml2_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX) &
-      +trcSalt_TQR(idsalt,NY,NX)+trcSalt3DFlo2CellM(idsalt,3,0,NY,NX)
+      +trcSalt_TQR(idsalt,NY,NX)+trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)
   ENDDO
   end subroutine UpdateSoluteInResidue
 !------------------------------------------------------------------------------------------

@@ -21,7 +21,7 @@ implicit none
 
   real(r8),allocatable ::  trcSalt_Aqua_flxM_snvr(:,:,:,:)                    !Aquatic salt flow into snow layer at iteration M [g d-2]
   real(r8),allocatable ::  SoluteDifusivitytscaledM_vr(:,:,:)                 !time scaled solute diffusivity
-  real(r8),allocatable ::  trcSalt3DFlo2CellM(:,:,:,:,:)                      !
+  real(r8),allocatable ::  trcSalt_MicpTranspFlxM_3D(:,:,:,:,:)                      !
   real(r8),allocatable ::  trcSalt_RFHS(:,:,:,:,:)                            !
   real(r8),allocatable ::  trcSalt_soHml2_vr(:,:,:,:)                         !copy of salt in macropore [g d-2]
   real(r8),allocatable ::  trcSalt_RFXS(:,:,:,:)                              !
@@ -43,7 +43,7 @@ contains
   allocate(trcSalt_Aqua_flxM_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_Aqua_flxM_snvr=0._r8
 
   allocate(SoluteDifusivitytscaledM_vr(JZ,JY,JX));   SoluteDifusivitytscaledM_vr=0._r8
-  allocate(trcSalt3DFlo2CellM(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt3DFlo2CellM=0._r8
+  allocate(trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_MicpTranspFlxM_3D=0._r8
   allocate(trcSalt_RFHS(idsalt_beg:idsaltb_end,3,JD,JV,JH)); trcSalt_RFHS=0._r8
   allocate(trcSalt_soHml2_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_soHml2_vr=0._r8
   allocate(trcSalt_RFXS(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFXS=0._r8
@@ -61,7 +61,7 @@ contains
 
   call destroy(trcSalt_soHml2_vr)
   call destroy(trcSalt_Aqua_flxM_snvr)
-  call destroy(trcSalt3DFlo2CellM)
+  call destroy(trcSalt_MicpTranspFlxM_3D)
   call destroy(trcSalt_solml2_vr)
   call destroy(trcSalt_RGeoChem_flxM_vr)
   call destroy(trcSalt_SnowDrift_flxM_2D)
