@@ -30,7 +30,7 @@ implicit none
   real(r8) :: RNO2MicbTransfBand
   real(r8) :: RH2PO4MicbTransfBand
   real(r8) :: RH1PO4MicbTransfBand
-  real(r8) :: MicrbN2Fix
+  real(r8) :: MicrbN2Fix                  !>0 N fixation
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo
   real(r8) :: CDOMuptk1

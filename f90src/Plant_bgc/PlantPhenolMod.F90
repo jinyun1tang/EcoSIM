@@ -420,7 +420,7 @@ module PlantPhenolMod
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          &
   )
-  plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_end-1,NZ)=0.0_r8
+  plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)=0.0_r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
   MaxSoiL4Root_pft(NZ)=NIXBotRootLayer_pft(NZ)
   NGTopRootLayer_pft(NZ)=MIN(MaxSoiL4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))

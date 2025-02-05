@@ -23,6 +23,7 @@ module minimathmod
   public :: fixEXflux
   public :: yearday,isletter
   public :: dssign
+  public :: flux_mass_limiter
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -103,6 +104,7 @@ module minimathmod
   real(r8), intent(in) :: tempK
 
   real(r8) :: ans  !ton, i.e. (ans*10^3=kg/m3) in terms vapor concentration, 2.173~18/8.314
+  
   ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat
 
@@ -202,7 +204,11 @@ module minimathmod
 
   real(r8) :: ans
 
-  ans=AMAX1(0.0_r8,val)
+  if(val>=tiny_val)then
+    ans=val
+  else  
+    ans=0._r8
+  endif
 
   end function AZMAX1_s  
 !------------------------------------------------------------------------------------------
@@ -392,6 +398,24 @@ module minimathmod
 
   end function isletter
 
+! ----------------------------------------------------------------------
 
-
+  function flux_mass_limiter(flux,massa,massb)result(ans)
+  !
+  !limit flux by massa and massb 
+  !assuming
+  !massa=massa+flux
+  !massb=massb-flux
+  implicit none
+  real(r8), intent(in) :: flux
+  real(r8), intent(in) :: massa
+  real(r8), intent(in) :: massb
+  
+  real(r8) :: ans
+  if(flux>0._r8)then
+    ans=AMIN1(flux,massb)-tiny_val
+  else 
+    ans=-AMIN1(-flux,massa)+tiny_val
+  endif
+  end function flux_mass_limiter
 end module minimathmod

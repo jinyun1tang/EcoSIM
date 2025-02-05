@@ -102,14 +102,14 @@ module SoluteMod
 !     RSNUBB=rate of banded urea fertilizer dissolution in band
 !     RSNOBB=rate of banded NO3 fertilizer dissolution in band
 !
-  FertN_soil_vr(ifert_nh4,L,NY,NX)=FertN_soil_vr(ifert_nh4,L,NY,NX)-RSN4AA-RSN4BA
-  FertN_soil_vr(ifert_nh3,L,NY,NX)=FertN_soil_vr(ifert_nh3,L,NY,NX)-RSN3AA-RSN3BA
-  FertN_soil_vr(ifert_urea,L,NY,NX)=FertN_soil_vr(ifert_urea,L,NY,NX)-RSNUAA-RSNUBA
-  FertN_soil_vr(ifert_no3,L,NY,NX)=FertN_soil_vr(ifert_no3,L,NY,NX)-RSNOAA-RSNOBA
-  FertN_Band_vr(ifert_nh4_band,L,NY,NX)=FertN_Band_vr(ifert_nh4_band,L,NY,NX)-RSN4BB
-  FertN_Band_vr(ifert_nh3_band,L,NY,NX)=FertN_Band_vr(ifert_nh3_band,L,NY,NX)-RSN3BB
-  FertN_Band_vr(ifert_urea_band,L,NY,NX)=FertN_Band_vr(ifert_urea_band,L,NY,NX)-RSNUBB
-  FertN_Band_vr(ifert_no3_band,L,NY,NX)=FertN_Band_vr(ifert_no3_band,L,NY,NX)-RSNOBB
+  FertN_soil_vr(ifert_nh4,L,NY,NX)       = FertN_soil_vr(ifert_nh4,L,NY,NX)-RSN4AA-RSN4BA
+  FertN_soil_vr(ifert_nh3,L,NY,NX)       = FertN_soil_vr(ifert_nh3,L,NY,NX)-RSN3AA-RSN3BA
+  FertN_soil_vr(ifert_urea,L,NY,NX)      = FertN_soil_vr(ifert_urea,L,NY,NX)-RSNUAA-RSNUBA
+  FertN_soil_vr(ifert_no3,L,NY,NX)       = FertN_soil_vr(ifert_no3,L,NY,NX)-RSNOAA-RSNOBA
+  FertN_Band_vr(ifert_nh4_band,L,NY,NX)  = FertN_Band_vr(ifert_nh4_band,L,NY,NX)-RSN4BB
+  FertN_Band_vr(ifert_nh3_band,L,NY,NX)  = FertN_Band_vr(ifert_nh3_band,L,NY,NX)-RSN3BB
+  FertN_Band_vr(ifert_urea_band,L,NY,NX) = FertN_Band_vr(ifert_urea_band,L,NY,NX)-RSNUBB
+  FertN_Band_vr(ifert_no3_band,L,NY,NX)  = FertN_Band_vr(ifert_no3_band,L,NY,NX)-RSNOBB
 !
 !     ADD FERTILIZER DISSOLUTION TO ION FLUXES AND CONVERT TO MASS
 !
@@ -118,27 +118,31 @@ module SoluteMod
 !     TR_NH3_soil_vr,TR_NH3_band_soil=NH3 dissolution from urea in non-band,band
 !     TRNO3,TRNOB=NO3 dissolution in non-band,band
 !
-  TR_NH3_geochem_vr(L,NY,NX)=TR_NH3_geochem_vr(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
-  trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+RSN4AA
-  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+RSN4BA+RSN4BB
-  TR_NH3_soil_vr(L,NY,NX)=TR_NH3_soil_vr(L,NY,NX)+RSNUAA
-  trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)=trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+RSNUBA+RSNUBB
-  trcn_RChem_soil_vr(ids_NO3,L,NY,NX)=trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
-  trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
-  TR_CO2_gchem_soil_vr(L,NY,NX)=TR_CO2_gchem_soil_vr(L,NY,NX)*catomw
-  TR_NH3_geochem_vr(L,NY,NX)=TR_NH3_geochem_vr(L,NY,NX)*natomw
-  trcn_RChem_soil_vr(ids_NH4,L,NY,NX)=trcn_RChem_soil_vr(ids_NH4,L,NY,NX)*natomw
-  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)*natomw
-  TR_NH3_soil_vr(L,NY,NX)=TR_NH3_soil_vr(L,NY,NX)*natomw
-  trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)=trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)*natomw
-  trcn_RChem_soil_vr(ids_NO3,L,NY,NX)=trcn_RChem_soil_vr(ids_NO3,L,NY,NX)*natomw
-  trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)*natomw
-  trcn_RChem_soil_vr(ids_NO2,L,NY,NX)=trcn_RChem_soil_vr(ids_NO2,L,NY,NX)*natomw
-  trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)*natomw
-  trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)=trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)*patomw
-  trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)=trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)*patomw
-  trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)*patomw
-  trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)=trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)*patomw
+  TR_gas_NH3_geochem_vr(L,NY,NX)                  = TR_gas_NH3_geochem_vr(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
+  TR_sol_NH3_soil_vr(L,NY,NX)                     = TR_sol_NH3_soil_vr(L,NY,NX)+RSNUAA   !add to dissolved NH3
+  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+RSN4AA
+  trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+RSNOAA
+
+  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+RSN4BA+RSN4BB
+  trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+RSNUBA+RSNUBB
+
+  trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+RSNOBA+RSNOBB
+
+  TProd_CO2_geochem_soil_vr(L,NY,NX)           = TProd_CO2_geochem_soil_vr(L,NY,NX)*catomw
+  TR_gas_NH3_geochem_vr(L,NY,NX)          = TR_gas_NH3_geochem_vr(L,NY,NX)*natomw
+  TR_sol_NH3_soil_vr(L,NY,NX)             = TR_sol_NH3_soil_vr(L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)*natomw
+  trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX) = trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)*patomw
+  trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX) = trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)*patomw
+
+  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)*natomw
+  trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)*natomw
+  trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)*natomw
+  trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)*natomw
+  trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)*patomw
+  trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)*patomw
   end subroutine UpdateFertilizerBand
 
 !------------------------------------------------------------------------
@@ -170,11 +174,11 @@ module SoluteMod
 !     ZNHU0,ZNHUI=initial,current inhibition activity
 !     RNHUI=rate constants for decline in urea hydrolysis inhibition
 !
-  IF(ZNHU0(L,NY,NX).GT.ZEROS(NY,NX).AND.ZNHUI(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    ZNHUI(L,NY,NX)=ZNHUI(L,NY,NX)-RNHUI(IUTYP(NY,NX))*ZNHUI(L,NY,NX) &
-      *AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI(L,NY,NX)/ZNHU0(L,NY,NX))
+  IF(ZNHU0_vr(L,NY,NX).GT.ZEROS(NY,NX).AND.ZNHUI_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    ZNHUI_vr(L,NY,NX)=ZNHUI_vr(L,NY,NX)-RNHUI(IUTYP(NY,NX))*ZNHUI_vr(L,NY,NX) &
+      *AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI_vr(L,NY,NX)/ZNHU0_vr(L,NY,NX))
   ELSE
-    ZNHUI(L,NY,NX)=0._r8
+    ZNHUI_vr(L,NY,NX)=0._r8
   ENDIF
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN NON-BAND
@@ -195,7 +199,7 @@ module SoluteMod
     CNHUA=0._r8
   ENDIF
   DFNSA=CNHUA/(CNHUA+DUKD)
-  RSNUA=AMIN1(FertN_soil_vr(ifert_urea,L,NY,NX),SPNHU*TMicHeterActivity_vr(L,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUA=AMIN1(FertN_soil_vr(ifert_urea,L,NY,NX),SPNHU*TMicHeterActivity_vr(L,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI_vr(L,NY,NX))
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN BAND
 !
@@ -214,7 +218,7 @@ module SoluteMod
     CNHUB=0._r8
   ENDIF
   DFNSB=CNHUB/(CNHUB+DUKD)
-  RSNUB=AMIN1(FertN_Band_vr(ifert_urea_band,L,NY,NX),SPNHU*TMicHeterActivity_vr(L,NY,NX)*DFNSB*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUB=AMIN1(FertN_Band_vr(ifert_urea_band,L,NY,NX),SPNHU*TMicHeterActivity_vr(L,NY,NX)*DFNSB*TSens4MicbGrwoth_vr(L,NY,NX))*(1.0-ZNHUI_vr(L,NY,NX))
 
   end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
@@ -234,13 +238,13 @@ module SoluteMod
   real(r8), pointer :: BKVLPB
   real(r8), pointer :: VLWatMicPNB
   real(r8), pointer :: VLWatMicPPO
-  real(r8), pointer :: H1PO4_2e_conc
+  real(r8), pointer :: H1PO4_2e_aqua_mole_conc
   real(r8), pointer :: H1PO4_2e_band_conc
-  real(r8), pointer :: H2PO4_1e_conc
+  real(r8), pointer :: H2PO4_1e_aqua_mole_conc
   real(r8), pointer :: H2PO4_1e_band_conc
-  real(r8), pointer :: NH3_aqu_conc
+  real(r8), pointer :: NH3_aqua_mole_conc
   real(r8), pointer :: NH3_aqu_band_conc
-  real(r8), pointer :: NH4_1p_conc
+  real(r8), pointer :: NH4_1p_aqua_mole_conc
   real(r8), pointer :: NH4_1p_band_conc
   real(r8), pointer :: Precp_AlPO4_conc
   real(r8), pointer :: PrecpB_AlPO4_conc
@@ -278,9 +282,9 @@ module SoluteMod
   H2PO4_1e_band_conc       => chemvar%H2PO4_1e_band_conc
   XNH4_conc                => chemvar%XNH4_conc
   XNH4_band_conc           => chemvar%XNH4_band_conc
-  NH3_aqu_conc             => chemvar%NH3_aqu_conc
+  NH3_aqua_mole_conc             => chemvar%NH3_aqua_mole_conc
   NH3_aqu_band_conc        => chemvar%NH3_aqu_band_conc
-  NH4_1p_conc              => chemvar%NH4_1p_conc
+  NH4_1p_aqua_mole_conc              => chemvar%NH4_1p_aqua_mole_conc
   NH4_1p_band_conc         => chemvar%NH4_1p_band_conc
   Precp_AlPO4_conc         => chemvar%Precp_AlPO4_conc
   PrecpB_AlPO4_conc        => chemvar%PrecpB_AlPO4_conc
@@ -292,9 +296,9 @@ module SoluteMod
   PrecpB_CaH4P2O8_conc     => chemvar%PrecpB_CaH4P2O8_conc
   Precp_FePO4_conc         => chemvar%Precp_FePO4_conc
   PrecpB_FePO4_con         => chemvar%PrecpB_FePO4_con
-  H2PO4_1e_conc            => chemvar%H2PO4_1e_conc
+  H2PO4_1e_aqua_mole_conc            => chemvar%H2PO4_1e_aqua_mole_conc
   H1PO4_2e_band_conc       => chemvar%H1PO4_2e_band_conc
-  H1PO4_2e_conc            => chemvar%H1PO4_2e_conc
+  H1PO4_2e_aqua_mole_conc            => chemvar%H1PO4_2e_aqua_mole_conc
   XH2PO4_conc              => chemvar%XH2PO4_conc
   VLWatMicPNH              => chemvar%VLWatMicPNH
   BKVLNH                   => chemvar%BKVLNH
@@ -351,29 +355,29 @@ module SoluteMod
 !     TRootNH4Uptake_pft,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
 !     TUPNHB,TUPN3B=soil-root exchange of NH4,NH3 in band from uptake.f
 !     RNH4MicbTransfSoil_vr,RNH4MicbTransfBand_vr=net change in NH4 in band,non-band from nitro.f
-!     NH4_1p_conc,NH3_aqu_conc,NH4_1p_band_conc,NH3_aqu_band_conc=total NH4,NH3 concentration in non-band,band
+!     NH4_1p_aqua_mole_conc,NH3_aqua_mole_conc,NH4_1p_band_conc,NH3_aqu_band_conc=total NH4,NH3 concentration in non-band,band
 !     XNH4_conc,XNH4_band_conc=adsorbed NH4 concentration in non-band,band
 !
   IF(VLWatMicPNH.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX=natomw*VLWatMicPNH
-    RN4X=(-trcs_plant_uptake_vr(ids_NH4,L,NY,NX)+RNutMicbTransf_vr(ids_NH4,L,NY,NX)+natomw*RSN4AA)/VLWatMicPNX
+    RN4X=(-trcs_plant_uptake_vr(ids_NH4,L,NY,NX)+RNut_MicbRelease_vr(ids_NH4,L,NY,NX)+natomw*RSN4AA)/VLWatMicPNX
     RN3X=(-trcs_plant_uptake_vr(idg_NH3,L,NY,NX)+natomw*RSNUAA)/VLWatMicPNX
-    NH4_1p_conc=AZMAX1(trc_solml_vr(ids_NH4,L,NY,NX)/VLWatMicPNX+RN4X)
-    NH3_aqu_conc=AZMAX1(trc_solml_vr(idg_NH3,L,NY,NX)/VLWatMicPNX+RN3X)
+    NH4_1p_aqua_mole_conc=AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)/VLWatMicPNX+RN4X)
+    NH3_aqua_mole_conc=AZMAX1(trcs_solml_vr(idg_NH3,L,NY,NX)/VLWatMicPNX+RN3X)
     XNH4_conc=AZMAX1(trcx_solml_vr(idx_NH4,L,NY,NX)/BKVLNH)
   ELSE
     RN4X=0._r8
     RN3X=0._r8
-    NH4_1p_conc=0._r8
-    NH3_aqu_conc=0._r8
+    NH4_1p_aqua_mole_conc=0._r8
+    NH3_aqua_mole_conc=0._r8
     XNH4_conc=0._r8
   ENDIF
   IF(VLWatMicPNB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX=natomw*VLWatMicPNB
-    RNBX=(-trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)+RNutMicbTransf_vr(ids_NH4B,L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VLWatMicPNX
+    RNBX=(-trcs_plant_uptake_vr(ids_NH4B,L,NY,NX)+RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VLWatMicPNX
     R3BX=(-trcs_plant_uptake_vr(idg_NH3B,L,NY,NX)+natomw*(RSNUBA+RSNUBB))/VLWatMicPNX
-    NH4_1p_band_conc=AZMAX1(trc_solml_vr(ids_NH4B,L,NY,NX)/VLWatMicPNX+RNBX)
-    NH3_aqu_band_conc=AZMAX1(trc_solml_vr(idg_NH3B,L,NY,NX)/VLWatMicPNX+R3BX)
+    NH4_1p_band_conc=AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)/VLWatMicPNX+RNBX)
+    NH3_aqu_band_conc=AZMAX1(trcs_solml_vr(idg_NH3B,L,NY,NX)/VLWatMicPNX+R3BX)
     XNH4_band_conc=AZMAX1(trcx_solml_vr(idx_NH4B,L,NY,NX)/BKVLNB)
   ELSE
     RNBX=0._r8
@@ -392,7 +396,7 @@ module SoluteMod
 !     RH1PO4MicbTransfSoil_vr,RH1PO4MicbTransfBand_vr=net change in HPO4 in band,non-band from nitro.f
 !     TRootHPO4Uptake_pft,TRootH2PO4Uptake_pft=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
 !     TUPH1B,TUPH2B=soil-root exch of HPO4,H2PO4 in band from uptake.f
-!     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations in non-band
+!     H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc=HPO4,H2PO4 concentrations in non-band
 !     H1PO4_2e_band_conc,H2PO4_1e_band_conc=HPO4,H2PO4 concentrations in band
 !     XROH1_conc,XROH1_conc,XROH2_conc=concn of adsorption sites R-,R-OH,R-OH2 in non-band
 !     XOH1B,XROH_band_conc,XROH2_band_conc=concn of adsorption sites R-,R-OH,R-OH2 in band
@@ -405,10 +409,10 @@ module SoluteMod
 !
   IF(VLWatMicPPO.GT.ZEROS2(NY,NX))THEN
     VLWatMicPPX=patomw*VLWatMicPPO
-    RH1PX=(RNutMicbTransf_vr(ids_H1PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))/VLWatMicPPX
-    RH2PX=(RNutMicbTransf_vr(ids_H2PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))/VLWatMicPPX
-    H1PO4_2e_conc=AZMAX1(trc_solml_vr(ids_H1PO4,L,NY,NX)/VLWatMicPPX+RH1PX)
-    H2PO4_1e_conc=AZMAX1(trc_solml_vr(ids_H2PO4,L,NY,NX)/VLWatMicPPX+RH2PX)
+    RH1PX=(RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))/VLWatMicPPX
+    RH2PX=(RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))/VLWatMicPPX
+    H1PO4_2e_aqua_mole_conc=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)/VLWatMicPPX+RH1PX)
+    H2PO4_1e_aqua_mole_conc=AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)/VLWatMicPPX+RH2PX)
     XOH_conc=AZMAX1(trcx_solml_vr(idx_OHe,L,NY,NX))/BKVLPO
     XROH1_conc=AZMAX1(trcx_solml_vr(idx_OH,L,NY,NX))/BKVLPO
     XROH2_conc=AZMAX1(trcx_solml_vr(idx_OHp,L,NY,NX))/BKVLPO
@@ -422,8 +426,8 @@ module SoluteMod
   ELSE
     RH1PX=0._r8
     RH2PX=0._r8
-    H1PO4_2e_conc=0._r8
-    H2PO4_1e_conc=0._r8
+    H1PO4_2e_aqua_mole_conc=0._r8
+    H2PO4_1e_aqua_mole_conc=0._r8
     XOH_conc=0._r8
     XROH1_conc=0._r8
     XROH2_conc=0._r8
@@ -437,10 +441,10 @@ module SoluteMod
   ENDIF
   IF(VLWatMicPPB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPPX=patomw*VLWatMicPPB
-    RH1BX=(RNutMicbTransf_vr(ids_H1PO4B,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))/VLWatMicPPX
-    RH2BX=(RNutMicbTransf_vr(ids_H2PO4B,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))/VLWatMicPPX
-    H1PO4_2e_band_conc=AZMAX1(trc_solml_vr(ids_H1PO4B,L,NY,NX)/VLWatMicPPX+RH1BX)
-    H2PO4_1e_band_conc=AZMAX1(trc_solml_vr(ids_H2PO4B,L,NY,NX)/VLWatMicPPX+RH2BX)
+    RH1BX=(RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))/VLWatMicPPX
+    RH2BX=(RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))/VLWatMicPPX
+    H1PO4_2e_band_conc=AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)/VLWatMicPPX+RH1BX)
+    H2PO4_1e_band_conc=AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)/VLWatMicPPX+RH2BX)
     XROH1_band_conc=AZMAX1(trcx_solml_vr(idx_OHeB,L,NY,NX))/BKVLPB
     XROH_band_conc=AZMAX1(trcx_solml_vr(idx_OHB,L,NY,NX))/BKVLPB
     XROH2_band_conc=AZMAX1(trcx_solml_vr(idx_OHpB,L,NY,NX))/BKVLPB
@@ -485,7 +489,7 @@ module SoluteMod
 !     DPNH4=NH4 fertilizer band depth
 !
   IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayerBot_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
 !
@@ -502,7 +506,7 @@ module SoluteMod
 !     DPFLW=change in NH4 fertilizer band depth
 !     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
 !
-      IF(CumDepz2LayerBot_vr(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
+      IF(CumDepz2LayBottom_vr(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
         DPFLW                        = FLWD+DWNH4
         BandDepthNH4_col(NY,NX)      = BandDepthNH4_col(NY,NX)+DPFLW
         BandThicknessNH4_vr(L,NY,NX) = BandThicknessNH4_vr(L,NY,NX)+DPFLW
@@ -541,12 +545,12 @@ module SoluteMod
 !
 !     DNH4S,DNH3S,DXNH4=transfer of NH4,NH3,exchangeable NH4
 !
-      DNH4S                                     = FVLNH4*trc_solml_vr(ids_NH4,L,NY,NX)/natomw
-      DNH3S                                     = FVLNH4*trc_solml_vr(idg_NH3,L,NY,NX)/natomw
+      DNH4S                                     = FVLNH4*trcs_solml_vr(ids_NH4,L,NY,NX)/natomw
+      DNH3S                                     = FVLNH4*trcs_solml_vr(idg_NH3,L,NY,NX)/natomw
       DXNH4                                     = FVLNH4*trcx_solml_vr(idx_NH4,L,NY,NX)
-      trcn_RChem_soil_vr(ids_NH4,L,NY,NX)       = trcn_RChem_soil_vr(ids_NH4,L,NY,NX)+DNH4S
+      trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+DNH4S
       trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)-DNH4S
-      TR_NH3_soil_vr(L,NY,NX)                   = TR_NH3_soil_vr(L,NY,NX)+DNH3S
+      TR_sol_NH3_soil_vr(L,NY,NX)                   = TR_sol_NH3_soil_vr(L,NY,NX)+DNH3S
       trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX) = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)-DNH3S
       trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)       = trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)+DXNH4
       trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)      = trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)-DXNH4
@@ -561,10 +565,10 @@ module SoluteMod
       trcs_VLN_vr(idg_NH3,L,NY,NX)  = trcs_VLN_vr(ids_NH4,L,NY,NX)
       trcs_VLN_vr(idg_NH3B,L,NY,NX) = trcs_VLN_vr(ids_NH4B,L,NY,NX)
 
-      trc_solml_vr(ids_NH4,L,NY,NX)   = trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX)
-      trc_solml_vr(idg_NH3,L,NY,NX)   = trc_solml_vr(idg_NH3,L,NY,NX)+trc_solml_vr(idg_NH3B,L,NY,NX)
-      trc_solml_vr(ids_NH4B,L,NY,NX)  = 0._r8
-      trc_solml_vr(idg_NH3B,L,NY,NX)  = 0._r8
+      trcs_solml_vr(ids_NH4,L,NY,NX)   = trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(ids_NH4B,L,NY,NX)
+      trcs_solml_vr(idg_NH3,L,NY,NX)   = trcs_solml_vr(idg_NH3,L,NY,NX)+trcs_solml_vr(idg_NH3B,L,NY,NX)
+      trcs_solml_vr(ids_NH4B,L,NY,NX)  = 0._r8
+      trcs_solml_vr(idg_NH3B,L,NY,NX)  = 0._r8
       trcx_solml_vr(idx_NH4,L,NY,NX)  = trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)
       trcx_solml_vr(idx_NH4B,L,NY,NX) = 0._r8
     ENDIF
@@ -588,7 +592,7 @@ module SoluteMod
 !     DPPO4=H2PO4 fertilizer band depth
 !
   IF(IFPOB(NY,NX).EQ.1 .AND. ROWP(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayerBot_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
 !
 !     PO4 BAND WIDTH
 !     DWPO4=change in H2PO4 fertilizer band width
@@ -604,7 +608,7 @@ module SoluteMod
 !     DPFLW=change in H2PO4 fertilizer band depth
 !     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
 !
-      IF(CumDepz2LayerBot_vr(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
+      IF(CumDepz2LayBottom_vr(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
         DPFLW                        = FLWD+DWPO4
         BandDepthPO4_col(NY,NX)      = BandDepthPO4_col(NY,NX)+DPFLW
         BandThicknessPO4_vr(L,NY,NX) = BandThicknessPO4_vr(L,NY,NX)+DPFLW
@@ -646,8 +650,8 @@ module SoluteMod
 !     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
 !
       IF(salt_model)THEN
-        DZH1P = FVLPO4*trc_solml_vr(ids_H1PO4,L,NY,NX)/patomw
-        DZH2P = FVLPO4*trc_solml_vr(ids_H2PO4,L,NY,NX)/patomw
+        DZH1P = FVLPO4*trcs_solml_vr(ids_H1PO4,L,NY,NX)/patomw
+        DZH2P = FVLPO4*trcs_solml_vr(ids_H2PO4,L,NY,NX)/patomw
 
         DZH0P = FVLPO4*trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)
         DZH3P = FVLPO4*trcSalt_solml_vr(idsalt_H3PO4,L,NY,NX)
@@ -671,25 +675,25 @@ module SoluteMod
         trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX)-DZH1P
         trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX)-DZH2P
 
-        trcSalt_TR(idsalt_H0PO4,L,NY,NX)            = trcSalt_TR(idsalt_H0PO4,L,NY,NX)+DZH0P
-        trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
-        trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
-        trcSalt_TR(idsalt_H3PO4,L,NY,NX)            = trcSalt_TR(idsalt_H3PO4,L,NY,NX)+DZH3P
-        trcSalt_TR(idsalt_FeHPO4,L,NY,NX)           = trcSalt_TR(idsalt_FeHPO4,L,NY,NX)+DZF1P
-        trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)          = trcSalt_TR(idsalt_FeH2PO4,L,NY,NX)+DZF2P
-        trcSalt_TR(idsalt_CaPO4,L,NY,NX)            = trcSalt_TR(idsalt_CaPO4,L,NY,NX)+DZC0P
-        trcSalt_TR(idsalt_CaHPO4,L,NY,NX)           = trcSalt_TR(idsalt_CaHPO4,L,NY,NX)+DZC1P
-        trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)         = trcSalt_TR(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
-        trcSalt_TR(idsalt_MgHPO4,L,NY,NX)           = trcSalt_TR(idsalt_MgHPO4,L,NY,NX)+DZM1P
-        trcSalt_TR(idsalt_H0PO4B,L,NY,NX)           = trcSalt_TR(idsalt_H0PO4B,L,NY,NX)-DZH0P
+        trcSalt_TR_vr(idsalt_H0PO4,L,NY,NX)            = trcSalt_TR_vr(idsalt_H0PO4,L,NY,NX)+DZH0P
+        trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
+        trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
+        trcSalt_TR_vr(idsalt_H3PO4,L,NY,NX)            = trcSalt_TR_vr(idsalt_H3PO4,L,NY,NX)+DZH3P
+        trcSalt_TR_vr(idsalt_FeHPO4,L,NY,NX)           = trcSalt_TR_vr(idsalt_FeHPO4,L,NY,NX)+DZF1P
+        trcSalt_TR_vr(idsalt_FeH2PO4,L,NY,NX)          = trcSalt_TR_vr(idsalt_FeH2PO4,L,NY,NX)+DZF2P
+        trcSalt_TR_vr(idsalt_CaPO4,L,NY,NX)            = trcSalt_TR_vr(idsalt_CaPO4,L,NY,NX)+DZC0P
+        trcSalt_TR_vr(idsalt_CaHPO4,L,NY,NX)           = trcSalt_TR_vr(idsalt_CaHPO4,L,NY,NX)+DZC1P
+        trcSalt_TR_vr(idsalt_CaH4P2O8,L,NY,NX)         = trcSalt_TR_vr(idsalt_CaH4P2O8,L,NY,NX)+DZC2P
+        trcSalt_TR_vr(idsalt_MgHPO4,L,NY,NX)           = trcSalt_TR_vr(idsalt_MgHPO4,L,NY,NX)+DZM1P
+        trcSalt_TR_vr(idsalt_H0PO4B,L,NY,NX)           = trcSalt_TR_vr(idsalt_H0PO4B,L,NY,NX)-DZH0P
 
-        trcSalt_TR(idsalt_H3PO4B,L,NY,NX)           = trcSalt_TR(idsalt_H3PO4B,L,NY,NX)-DZH3P
-        trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)          = trcSalt_TR(idsalt_FeHPO4B,L,NY,NX)-DZF1P
-        trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)         = trcSalt_TR(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
-        trcSalt_TR(idsalt_CaPO4B,L,NY,NX)           = trcSalt_TR(idsalt_CaPO4B,L,NY,NX)-DZC0P
-        trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)          = trcSalt_TR(idsalt_CaHPO4B,L,NY,NX)-DZC1P
-        trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)        = trcSalt_TR(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
-        trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)      = trcSalt_TR(idsalt_MgHPO4B,L,NY,NX)-DZM1P
+        trcSalt_TR_vr(idsalt_H3PO4B,L,NY,NX)           = trcSalt_TR_vr(idsalt_H3PO4B,L,NY,NX)-DZH3P
+        trcSalt_TR_vr(idsalt_FeHPO4B,L,NY,NX)          = trcSalt_TR_vr(idsalt_FeHPO4B,L,NY,NX)-DZF1P
+        trcSalt_TR_vr(idsalt_FeH2PO4B,L,NY,NX)         = trcSalt_TR_vr(idsalt_FeH2PO4B,L,NY,NX)-DZF2P
+        trcSalt_TR_vr(idsalt_CaPO4B,L,NY,NX)           = trcSalt_TR_vr(idsalt_CaPO4B,L,NY,NX)-DZC0P
+        trcSalt_TR_vr(idsalt_CaHPO4B,L,NY,NX)          = trcSalt_TR_vr(idsalt_CaHPO4B,L,NY,NX)-DZC1P
+        trcSalt_TR_vr(idsalt_CaH4P2O8B,L,NY,NX)        = trcSalt_TR_vr(idsalt_CaH4P2O8B,L,NY,NX)-DZC2P
+        trcSalt_TR_vr(idsalt_MgHPO4B,L,NY,NX)      = trcSalt_TR_vr(idsalt_MgHPO4B,L,NY,NX)-DZM1P
         
         trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)     = trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)+DXOH0
         trcx_TRSoilChem_vr(idx_OH,L,NY,NX)      = trcx_TRSoilChem_vr(idx_OH,L,NY,NX)+DXOH1
@@ -712,8 +716,8 @@ module SoluteMod
         trcp_RChem_soil(idsp_HAB,L,NY,NX)       = trcp_RChem_soil(idsp_HAB,L,NY,NX)-DPCHP
         trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX) = trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)-DPCMP
       ELSE
-        DZH1P                                 = FVLPO4*trc_solml_vr(ids_H1PO4,L,NY,NX)/patomw
-        DZH2P                                 = FVLPO4*trc_solml_vr(ids_H2PO4,L,NY,NX)/patomw
+        DZH1P                                 = FVLPO4*trcs_solml_vr(ids_H1PO4,L,NY,NX)/patomw
+        DZH2P                                 = FVLPO4*trcs_solml_vr(ids_H2PO4,L,NY,NX)/patomw
         DXOH1                                 = FVLPO4*trcx_solml_vr(idx_OH,L,NY,NX)
         DXOH2                                 = FVLPO4*trcx_solml_vr(idx_OHp,L,NY,NX)
         DXH2P                                 = FVLPO4*trcx_solml_vr(idx_H2PO4,L,NY,NX)
@@ -722,8 +726,8 @@ module SoluteMod
         DPCDP                                 = FVLPO4*trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)
         DPCHP                                 = FVLPO4*trcp_saltpml_vr(idsp_HA,L,NY,NX)
         DPCMP                                 = FVLPO4*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)
-        trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
-        trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_RChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
+        trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)+DZH1P
+        trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+DZH2P
         trcx_TRSoilChem_vr(idx_OH,L,NY,NX)          = trcx_TRSoilChem_vr(idx_OH,L,NY,NX)+DXOH1
         trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)         = trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)+DXOH2
         trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)       = trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)+DXH2P
@@ -754,10 +758,10 @@ module SoluteMod
       trcs_VLN_vr(ids_H2PO4B,L,NY,NX) = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
       trcs_VLN_vr(ids_H2PO4,L,NY,NX)  = trcs_VLN_vr(ids_H1PO4,L,NY,NX)
 
-      trc_solml_vr(ids_H1PO4,L,NY,NX)  = trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX)
-      trc_solml_vr(ids_H2PO4,L,NY,NX)  = trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX)
-      trc_solml_vr(ids_H1PO4B,L,NY,NX) = 0._r8
-      trc_solml_vr(ids_H2PO4B,L,NY,NX) = 0._r8
+      trcs_solml_vr(ids_H1PO4,L,NY,NX)  = trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H1PO4B,L,NY,NX)
+      trcs_solml_vr(ids_H2PO4,L,NY,NX)  = trcs_solml_vr(ids_H2PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX)
+      trcs_solml_vr(ids_H1PO4B,L,NY,NX) = 0._r8
+      trcs_solml_vr(ids_H2PO4B,L,NY,NX) = 0._r8
       IF(salt_model)THEN
         trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)     = trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_H0PO4B,L,NY,NX)
         trcSalt_solml_vr(idsalt_H3PO4,L,NY,NX)     = trcSalt_solml_vr(idsalt_H3PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4B,L,NY,NX)
@@ -816,7 +820,7 @@ module SoluteMod
 !
   IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
 
-    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayerBot_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
 !
 !     NO3 BAND WIDTH
 !
@@ -833,7 +837,7 @@ module SoluteMod
 !     DPFLW=change in NO3 fertilizer band depth
 !     BandDepthNO3_col,DPNOB=total,layer NO3 fertilizer band depth
 !
-      IF(CumDepz2LayerBot_vr(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
+      IF(CumDepz2LayBottom_vr(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
         DPFLW                        = FLWD+DWNO3
         BandDepthNO3_col(NY,NX)      = BandDepthNO3_col(NY,NX)+DPFLW
         BandThicknessNO3_vr(L,NY,NX) = BandThicknessNO3_vr(L,NY,NX)+DPFLW
@@ -872,10 +876,10 @@ module SoluteMod
 !
 !     DNO3S,DNO2S=transfer of NO3,NO2
 !
-      DNO3S                                     = FVLNO3*trc_solml_vr(ids_NO3,L,NY,NX)/natomw
-      DNO2S                                     = FVLNO3*trc_solml_vr(ids_NO2,L,NY,NX)/natomw
-      trcn_RChem_soil_vr(ids_NO3,L,NY,NX)       = trcn_RChem_soil_vr(ids_NO3,L,NY,NX)+DNO3S
-      trcn_RChem_soil_vr(ids_NO2,L,NY,NX)       = trcn_RChem_soil_vr(ids_NO2,L,NY,NX)+DNO2S
+      DNO3S                                     = FVLNO3*trcs_solml_vr(ids_NO3,L,NY,NX)/natomw
+      DNO2S                                     = FVLNO3*trcs_solml_vr(ids_NO2,L,NY,NX)/natomw
+      trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+DNO3S
+      trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)       = trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)+DNO2S
       trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)-DNO3S
       trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)-DNO2S
     ELSE
@@ -889,10 +893,10 @@ module SoluteMod
       trcs_VLN_vr(ids_NO2,L,NY,NX)  = trcs_VLN_vr(ids_NO3,L,NY,NX)
       trcs_VLN_vr(ids_NO2B,L,NY,NX) = trcs_VLN_vr(ids_NO3B,L,NY,NX)
 
-      trc_solml_vr(ids_NO3,L,NY,NX)  = trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX)
-      trc_solml_vr(ids_NO2,L,NY,NX)  = trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX)
-      trc_solml_vr(ids_NO3B,L,NY,NX) = 0._r8
-      trc_solml_vr(ids_NO2B,L,NY,NX) = 0._r8
+      trcs_solml_vr(ids_NO3,L,NY,NX)  = trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO3B,L,NY,NX)
+      trcs_solml_vr(ids_NO2,L,NY,NX)  = trcs_solml_vr(ids_NO2,L,NY,NX)+trcs_solml_vr(ids_NO2B,L,NY,NX)
+      trcs_solml_vr(ids_NO3B,L,NY,NX) = 0._r8
+      trcs_solml_vr(ids_NO2B,L,NY,NX) = 0._r8
     ENDIF
   ENDIF
   end subroutine UpdateNO3FertilizerBandinfo
@@ -901,12 +905,12 @@ module SoluteMod
   subroutine UpdateSoluteinSurfaceResidue(NX,NY)
   implicit none
   integer, intent(in) :: NY,NX
-  real(r8) :: Al_3p_conc,CALX,Ca_2p_conc,CaX_conc
-  real(r8) :: CCEC0,CO3_2e_conc
-  real(r8) :: Fe_3p_conc,CFEX
+  real(r8) :: Al_3p_aqua_mole_conc,CALX,Ca_2p_aqua_mole_conc,CaX_conc
+  real(r8) :: CCEC0,CO3_2e_aqua_mole_conc
+  real(r8) :: Fe_3p_aqua_mole_conc,CFEX
   real(r8) :: H2PO4_1e_AlPO4_eqv,H2PO4_1e_CaHPO4_eqv,H2PO4_1e_FePO4_eqv,H2PO4_1e_apatite_eqv,H2PO4_1e_CaH4P2O8_eqv
   real(r8) :: H2PO4_e_to_HPO4_2e_flx
-  real(r8) :: H_1p_conc,OH_1e_conc,DP
+  real(r8) :: H_1p_aqua_mole_conc,OH_1e_aqua_mole_conc,DP
   real(r8) :: FX,S0,S1,XALQ,XCAQ,XCAX
   real(r8) :: XFEQ,XHYQ,XN4Q,XTLQ
   real(r8) :: VLWatMicPMX,VLWatMicPMP,BulkSoilMass
@@ -914,7 +918,8 @@ module SoluteMod
   real(r8) :: CNHUA
   real(r8) :: CCO20
   real(r8) :: RH1PX,RH2PX,DUKD,DFNSA,RN3X,RN4X
-  real(r8) :: H1PO4_2e_conc,H2PO4_1e_conc,NH3_aqu_conc,NH4_1p_conc,Precp_AlPO4_conc,Precp_CaHPO4_conc
+  real(r8) :: H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,NH3_aqua_mole_conc,NH4_1p_aqua_mole_conc
+  real(r8) :: Precp_AlPO4_conc,Precp_CaHPO4_conc
   real(r8) :: Precp_Ca5P3O12O3H3_conc,Precp_CaH4P2O8_conc,Precp_FePO4_conc,RNH4,H2PO4_1e_AlPO4_dissol_flx
   real(r8) :: H2PO4_1e_CaHPO4_dissol_flx,H2PO4_1e_apatite_dissol_flx,H2PO4_1e_CaH4P2O8_dissol_flx
   real(r8) :: H2PO4_1e_FePO4_dissol_flx,RXN4,XNH4_conc
@@ -944,12 +949,12 @@ module SoluteMod
 !     ZNHU0,ZNHUI=initial,current inhibition activity
 !     RNHUI=rate constant for decline in urea hydrolysis inhibition
 !
-    IF(ZNHU0(0,NY,NX).GT.ZEROS(NY,NX).AND.ZNHUI(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      ZNHUI(0,NY,NX)=ZNHUI(0,NY,NX)-TSens4MicbGrwoth_vr(0,NY,NX)**0.25_r8 &
-        *RNHUI(IUTYP(NY,NX))*ZNHUI(0,NY,NX) &
-        *AMAX1(RNHUI(IUTYP(NY,NX)),1.0_r8-ZNHUI(0,NY,NX)/ZNHU0(0,NY,NX))
+    IF(ZNHU0_vr(0,NY,NX).GT.ZEROS(NY,NX).AND.ZNHUI_vr(0,NY,NX).GT.ZEROS(NY,NX))THEN
+      ZNHUI_vr(0,NY,NX)=ZNHUI_vr(0,NY,NX)-TSens4MicbGrwoth_vr(0,NY,NX)**0.25_r8 &
+        *RNHUI(IUTYP(NY,NX))*ZNHUI_vr(0,NY,NX) &
+        *AMAX1(RNHUI(IUTYP(NY,NX)),1.0_r8-ZNHUI_vr(0,NY,NX)/ZNHU0_vr(0,NY,NX))
     ELSE
-      ZNHUI(0,NY,NX)=0._r8
+      ZNHUI_vr(0,NY,NX)=0._r8
     ENDIF
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN SURFACE RESIDUE
@@ -966,7 +971,7 @@ module SoluteMod
       CNHUA = FertN_soil_vr(ifert_urea,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
       DFNSA = CNHUA/(CNHUA+DUKD)
       RSNUA = AMIN1(FertN_soil_vr(ifert_urea,0,NY,NX),SPNHU*TMicHeterActivity_vr(0,NY,NX)*DFNSA*TSens4MicbGrwoth_vr(0,NY,NX))&
-        *(1.0_r8-ZNHUI(0,NY,NX))
+        *(1.0_r8-ZNHUI_vr(0,NY,NX))
     ELSE
       RSNUA=0._r8
     ENDIF
@@ -997,15 +1002,15 @@ module SoluteMod
 !     VLWatMicPNH=water volume
 !     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln
 !     RNH4MicbTransfSoil_vr=net change in NH4 from nitro.f
-!     NH4_1p_conc,NH3_aqu_conc=total NH4,NH3 concentration
+!     NH4_1p_aqua_mole_conc,NH3_aqua_mole_conc=total NH4,NH3 concentration
 !     XNH4_conc=adsorbed NH4 concentration
 !
     IF(VLWatMicPM_vr(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
       VLWatMicPMX  = natomw*VLWatMicPM_vr(NPH,0,NY,NX)
-      RN4X         = (RNutMicbTransf_vr(ids_NH4,0,NY,NX)+natomw*RSN4AA)/VLWatMicPMX
+      RN4X         = (RNut_MicbRelease_vr(ids_NH4,0,NY,NX)+natomw*RSN4AA)/VLWatMicPMX
       RN3X         = natomw*RSNUAA/VLWatMicPMX
-      NH4_1p_conc  = AMAX1(ZERO,trc_solml_vr(ids_NH4,0,NY,NX)/VLWatMicPMX+RN4X)
-      NH3_aqu_conc = AMAX1(ZERO,trc_solml_vr(idg_NH3,0,NY,NX)/VLWatMicPMX+RN3X)
+      NH4_1p_aqua_mole_conc  = AMAX1(ZERO,trcs_solml_vr(ids_NH4,0,NY,NX)/VLWatMicPMX+RN4X)
+      NH3_aqua_mole_conc = AMAX1(ZERO,trcs_solml_vr(idg_NH3,0,NY,NX)/VLWatMicPMX+RN3X)
       IF(BulkSoilMass.GT.ZEROS(NY,NX))THEN
         XNH4_conc=AMAX1(ZERO,trcx_solml_vr(idx_NH4,0,NY,NX)/BulkSoilMass)
       ELSE
@@ -1017,23 +1022,23 @@ module SoluteMod
 !     VLWatMicPMP=water volume
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
 !     RH1PO4MicbTransfSoil_vr=net change in HPO4 from nitro.f
-!     H1PO4_2e_conc,H2PO4_1e_conc=HPO4,H2PO4 concentrations
+!     H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc=HPO4,H2PO4 concentrations
 !
       VLWatMicPMP   = patomw*VLWatMicPM_vr(NPH,0,NY,NX)
-      RH1PX         = RNutMicbTransf_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP
-      RH2PX         = RNutMicbTransf_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP
-      H1PO4_2e_conc = AZMAX1(trc_solml_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
-      H2PO4_1e_conc = AZMAX1(trc_solml_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP+RH2PX)
+      RH1PX         = RNut_MicbRelease_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP
+      RH2PX         = RNut_MicbRelease_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP
+      H1PO4_2e_aqua_mole_conc = AZMAX1(trcs_solml_vr(ids_H1PO4,0,NY,NX)/VLWatMicPMP+RH1PX)
+      H2PO4_1e_aqua_mole_conc = AZMAX1(trcs_solml_vr(ids_H2PO4,0,NY,NX)/VLWatMicPMP+RH2PX)
     ELSE
       RN4X          = 0._r8
       RN3X          = 0._r8
-      NH4_1p_conc   = 0._r8
-      NH3_aqu_conc  = 0._r8
+      NH4_1p_aqua_mole_conc   = 0._r8
+      NH3_aqua_mole_conc  = 0._r8
       XNH4_conc     = 0._r8
       RH1PX         = 0._r8
       RH2PX         = 0._r8
-      H1PO4_2e_conc = 0._r8
-      H2PO4_1e_conc = 0._r8
+      H1PO4_2e_aqua_mole_conc = 0._r8
+      H2PO4_1e_aqua_mole_conc = 0._r8
     ENDIF
 !
 !     PHOSPHORUS TRANSFORMATIONS IN SURFACE RESIDUE
@@ -1057,63 +1062,63 @@ module SoluteMod
 !
 !     CALCULATE H2PO4 COPRECIPITATES FRPM LITTER PH
 !
-    H_1p_conc   = AMAX1(ZERO,10.0_r8**(-(PH(0,NY,NX)-3.0_r8)))
-    OH_1e_conc  = AMAX1(ZERO,DPH2O/H_1p_conc)
-    Al_3p_conc  = AMAX1(ZERO,SPALO/OH_1e_conc**3._r8)
-    Fe_3p_conc  = AMAX1(ZERO,SPFEO/OH_1e_conc**3_r8)
-    CCO20       = AMAX1(ZERO,trc_solcl_vr(idg_CO2,0,NY,NX)/catomw)
-    CO3_2e_conc = AMAX1(ZERO,CCO20*DPCO3/H_1p_conc**2._r8)
-    Ca_2p_conc  = AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_conc))
+    H_1p_aqua_mole_conc   = AMAX1(ZERO,10.0_r8**(-(PH_vr(0,NY,NX)-3.0_r8)))
+    OH_1e_aqua_mole_conc  = AMAX1(ZERO,DPH2O/H_1p_aqua_mole_conc)
+    Al_3p_aqua_mole_conc  = AMAX1(ZERO,SPALO/OH_1e_aqua_mole_conc**3._r8)
+    Fe_3p_aqua_mole_conc  = AMAX1(ZERO,SPFEO/OH_1e_aqua_mole_conc**3_r8)
+    CCO20                 = AMAX1(ZERO,trc_solcl_vr(idg_CO2,0,NY,NX)/catomw)
+    CO3_2e_aqua_mole_conc = AMAX1(ZERO,CCO20*DPCO3/H_1p_aqua_mole_conc**2._r8)
+    Ca_2p_aqua_mole_conc  = AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CO3_2e_aqua_mole_conc))
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
-!     H2PO4_1e_AlPO4_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_AlPO4_eqv,H2PO4_1e_aqua_mole_conc=equilibrium,current H2PO4 concentration in litter
 !     SYA0P2=solubility product derived from SPALO
 !     H2PO4_1e_AlPO4_dissol_flx=H2PO4 dissolution from AlPO4 in litter
 !
-    H2PO4_1e_AlPO4_eqv        = SYA0P2/(Al_3p_conc*OH_1e_conc**2)
+    H2PO4_1e_AlPO4_eqv        = SYA0P2/(Al_3p_aqua_mole_conc*OH_1e_aqua_mole_conc**2)
     H2PO4_1e_AlPO4_dissol_flx = AMIN1(AZMAX1(4.0E-08*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_AlPO4_conc),&
-      AMAX1(-Precp_AlPO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_AlPO4_eqv)))
+      AMAX1(-Precp_AlPO4_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_AlPO4_eqv)))
 !
 !     IRON PHOSPHATE (STRENGITE)
 !
-!     H2PO4_1e_FePO4_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_FePO4_eqv,H2PO4_1e_aqua_mole_conc=equilibrium,current H2PO4 concentration in litter
 !     SYF0P2=solubility product derived from SPALO
 !     H2PO4_1e_FePO4_dissol_flx=H2PO4 dissolution from FePO4 in litter
 !
-    H2PO4_1e_FePO4_eqv        = SYF0P2/(Fe_3p_conc*OH_1e_conc**2)
+    H2PO4_1e_FePO4_eqv        = SYF0P2/(Fe_3p_aqua_mole_conc*OH_1e_aqua_mole_conc**2)
     H2PO4_1e_FePO4_dissol_flx = AMIN1(AZMAX1(2.0E-06*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_FePO4_conc),&
-      AMAX1(-Precp_FePO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_FePO4_eqv)))
+      AMAX1(-Precp_FePO4_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_FePO4_eqv)))
 !
 !     DICALCIUM PHOSPHATE
 !
-!     H2PO4_1e_CaHPO4_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_CaHPO4_eqv,H2PO4_1e_aqua_mole_conc=equilibrium,current H2PO4 concentration in litter
 !     SYCAD2=solubility product derived from SPALO
 !     H2PO4_1e_CaHPO4_dissol_flx=H2PO4 dissolution from CaHPO4 in litter
 !   CaHPO4.H2O <->HPO4(-)+Ca(2+)+OH(-) 
-    H2PO4_1e_CaHPO4_eqv        = SYCAD2/(Ca_2p_conc*OH_1e_conc)
+    H2PO4_1e_CaHPO4_eqv        = SYCAD2/(Ca_2p_aqua_mole_conc*OH_1e_aqua_mole_conc)
     H2PO4_1e_CaHPO4_dissol_flx = AMIN1(AMAX1(0-.0,5.0E-05*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_CaHPO4_conc),&
-      AMAX1(-Precp_CaHPO4_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_CaHPO4_eqv)))
+      AMAX1(-Precp_CaHPO4_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_CaHPO4_eqv)))
 !
 !     HYDROXYAPATITE
 !
-!     H2PO4_1e_apatite_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_apatite_eqv,H2PO4_1e_aqua_mole_conc=equilibrium,current H2PO4 concentration in litter
 !     SYCAH2=solubility product derived from SPALO
 !     H2PO4_1e_apatite_dissol_flx=H2PO4 dissolution from apatite in litter
 !
-    H2PO4_1e_apatite_eqv        = (SYCAH2/(Ca_2p_conc**5_r8*OH_1e_conc**7))**0.333_r8
+    H2PO4_1e_apatite_eqv        = (SYCAH2/(Ca_2p_aqua_mole_conc**5_r8*OH_1e_aqua_mole_conc**7))**0.333_r8
     H2PO4_1e_apatite_dissol_flx = AMIN1(AZMAX1(5.0E-05_r8*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_Ca5P3O12O3H3_conc),&
-      AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(H2PO4_1e_conc-H2PO4_1e_apatite_eqv)))
+      AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_apatite_eqv)))
 !
 !     MONOCALCIUM PHOSPHATE
 !
-!     H2PO4_1e_CaH4P2O8_eqv,H2PO4_1e_conc=equilibrium,current H2PO4 concentration in litter
+!     H2PO4_1e_CaH4P2O8_eqv,H2PO4_1e_aqua_mole_conc=equilibrium,current H2PO4 concentration in litter
 !     SPCAM=solubility product for Ca(H2PO4)2
 !     H2PO4_1e_CaH4P2O8_dissol_flx=H2PO4 dissolution from Ca(H2PO4)2 in litter
 !
-    H2PO4_1e_CaH4P2O8_eqv        = SQRT(SPCAM/Ca_2p_conc)
+    H2PO4_1e_CaH4P2O8_eqv        = SQRT(SPCAM/Ca_2p_aqua_mole_conc)
     H2PO4_1e_CaH4P2O8_dissol_flx = AMIN1(AZMAX1(5.0E-05_r8*SoilOrgM_vr(ielmc,0,NY,NX)-Precp_CaH4P2O8_conc),&
-      AMAX1(-Precp_CaH4P2O8_conc*SPPO4,TPD*(H2PO4_1e_conc-H2PO4_1e_CaH4P2O8_eqv)))
+      AMAX1(-Precp_CaH4P2O8_conc*SPPO4,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_CaH4P2O8_eqv)))
 
 !
 !     PHOSPHORUS ANION EXCHANGE IN SURFACE REDISUE
@@ -1128,8 +1133,8 @@ module SoluteMod
 !     H2PO4_e_to_HPO4_2e_flx=H2PO4-H+HPO4 dissociation in litter
 !
     DP                     = DPH2P
-    S0                     = H1PO4_2e_conc+H_1p_conc+DP
-    S1                     = AZMAX1(S0**2-4.0*(H1PO4_2e_conc*H_1p_conc-DP*H2PO4_1e_conc))
+    S0                     = H1PO4_2e_aqua_mole_conc+H_1p_aqua_mole_conc+DP
+    S1                     = AZMAX1(S0**2-4.0*(H1PO4_2e_aqua_mole_conc*H_1p_aqua_mole_conc-DP*H2PO4_1e_aqua_mole_conc))
     H2PO4_e_to_HPO4_2e_flx = TSL*(S0-SQRT(S1))
 !
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC, GAPON COEFFICIENTS
@@ -1149,21 +1154,21 @@ module SoluteMod
     ELSE
       CCEC0=ZERO
     ENDIF
-    CALX     = AMAX1(ZERO,Al_3p_conc)**0.333_r8
-    CFEX     = AMAX1(ZERO,Fe_3p_conc)**0.333_r8
-    CaX_conc = AMAX1(ZERO,Ca_2p_conc)**0.500_r8
+    CALX     = AMAX1(ZERO,Al_3p_aqua_mole_conc)**0.333_r8
+    CFEX     = AMAX1(ZERO,Fe_3p_aqua_mole_conc)**0.333_r8
+    CaX_conc = AMAX1(ZERO,Ca_2p_aqua_mole_conc)**0.500_r8
 !
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
 !     CONCENTRATIONS
 !
-    XCAX=CCEC0/(1.0_r8+GKC4(NU(NY,NX),NY,NX)*NH4_1p_conc/CaX_conc &
-      +GKCH(NU(NY,NX),NY,NX)*H_1p_conc/CaX_conc &
-      +GKCA(NU(NY,NX),NY,NX)*CALX/CaX_conc &
-      +GKCA(NU(NY,NX),NY,NX)*CFEX/CaX_conc)
-    XN4Q = XCAX*NH4_1p_conc*GKC4(NU(NY,NX),NY,NX)
-    XHYQ = XCAX*H_1p_conc*GKCH(NU(NY,NX),NY,NX)
-    XALQ = XCAX*CALX*GKCA(NU(NY,NX),NY,NX)
-    XFEQ = XCAX*CFEX*GKCA(NU(NY,NX),NY,NX)
+    XCAX=CCEC0/(1.0_r8+GKC4_vr(NU(NY,NX),NY,NX)*NH4_1p_aqua_mole_conc/CaX_conc &
+      +GKCH_vr(NU(NY,NX),NY,NX)*H_1p_aqua_mole_conc/CaX_conc &
+      +GKCA_vr(NU(NY,NX),NY,NX)*CALX/CaX_conc &
+      +GKCA_vr(NU(NY,NX),NY,NX)*CFEX/CaX_conc)
+    XN4Q = XCAX*NH4_1p_aqua_mole_conc*GKC4_vr(NU(NY,NX),NY,NX)
+    XHYQ = XCAX*H_1p_aqua_mole_conc*GKCH_vr(NU(NY,NX),NY,NX)
+    XALQ = XCAX*CALX*GKCA_vr(NU(NY,NX),NY,NX)
+    XFEQ = XCAX*CFEX*GKCA_vr(NU(NY,NX),NY,NX)
     XCAQ = XCAX*CaX_conc
     XTLQ = XN4Q+XHYQ+XALQ+XFEQ+XCAQ
     IF(XTLQ.GT.ZERO)THEN
@@ -1181,7 +1186,7 @@ module SoluteMod
 !     DPN4=NH4 dissociation constant
 !
     RXN4 = TADC0*(XN4Q-XNH4_conc)
-    RNH4 = (H_1p_conc*NH3_aqu_conc-DPN4*NH4_1p_conc)/(DPN4+H_1p_conc)
+    RNH4 = (H_1p_aqua_mole_conc*NH3_aqua_mole_conc-DPN4*NH4_1p_aqua_mole_conc)/(DPN4+H_1p_aqua_mole_conc)
 
   ELSE
     RSN4AA                       = 0._r8
@@ -1219,10 +1224,10 @@ module SoluteMod
 !     TR_AlPO4_precip_soil,TR_FePO4_precip_soil,TR_CaHPO4_precip_soil,TR_apatite_precip_soil,TR_CaH4P2O8_precip_soil
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
 !
-      trcn_RChem_soil_vr(ids_NH4,0,NY,NX)    = trcn_RChem_soil_vr(ids_NH4,0,NY,NX)+RN4S*VLWatMicPM_vr(NPH,0,NY,NX)
-      TR_NH3_soil_vr(0,NY,NX)                = TR_NH3_soil_vr(0,NY,NX)+RN3S*VLWatMicPM_vr(NPH,0,NY,NX)
-      trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)  = trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)+RHP1*VLWatMicPM_vr(NPH,0,NY,NX)
-      trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)  = trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)+RHP2*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)    = trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)+RN4S*VLWatMicPM_vr(NPH,0,NY,NX)
+      TR_sol_NH3_soil_vr(0,NY,NX)                = TR_sol_NH3_soil_vr(0,NY,NX)+RN3S*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX)  = trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX)+RHP1*VLWatMicPM_vr(NPH,0,NY,NX)
+      trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX)  = trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX)+RHP2*VLWatMicPM_vr(NPH,0,NY,NX)
       trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)    = trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)+RXN4*VLWatMicPM_vr(NPH,0,NY,NX)
       trcp_RChem_soil(idsp_AlPO4,0,NY,NX)    = trcp_RChem_soil(idsp_AlPO4,0,NY,NX)+H2PO4_1e_AlPO4_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
       trcp_RChem_soil(idsp_FePO4,0,NY,NX)    = trcp_RChem_soil(idsp_FePO4,0,NY,NX)+H2PO4_1e_FePO4_dissol_flx*VLWatMicPM_vr(NPH,0,NY,NX)
@@ -1233,15 +1238,15 @@ module SoluteMod
       FertN_soil_vr(ifert_nh3,0,NY,NX)      = FertN_soil_vr(ifert_nh3,0,NY,NX)-RSN3AA
       FertN_soil_vr(ifert_urea,0,NY,NX)     = FertN_soil_vr(ifert_urea,0,NY,NX)-RSNUAA
       FertN_soil_vr(ifert_no3,0,NY,NX)      = FertN_soil_vr(ifert_no3,0,NY,NX)-RSNOAA
-      trcn_RChem_soil_vr(ids_NH4,0,NY,NX)   = trcn_RChem_soil_vr(ids_NH4,0,NY,NX)+RSN4AA
-      TR_NH3_soil_vr(0,NY,NX)               = TR_NH3_soil_vr(0,NY,NX)+RSN3AA+RSNUAA
-      trcn_RChem_soil_vr(ids_NO3,0,NY,NX)   = trcn_RChem_soil_vr(ids_NO3,0,NY,NX)+RSNOAA
-      trcn_RChem_soil_vr(ids_NH4,0,NY,NX)   = trcn_RChem_soil_vr(ids_NH4,0,NY,NX)*natomw
-      TR_NH3_soil_vr(0,NY,NX)               = TR_NH3_soil_vr(0,NY,NX)*natomw
-      trcn_RChem_soil_vr(ids_NO3,0,NY,NX)   = trcn_RChem_soil_vr(ids_NO3,0,NY,NX)*natomw
-      trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX) = trcn_RChem_soil_vr(ids_H1PO4,0,NY,NX)*patomw
-      trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX) = trcn_RChem_soil_vr(ids_H2PO4,0,NY,NX)*patomw
-!     WRITE(*,9989)'TR_NH4_soil',I,J,trcn_RChem_soil_vr(ids_NH4,0,NY,NX)
+      trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)+RSN4AA
+      TR_sol_NH3_soil_vr(0,NY,NX)               = TR_sol_NH3_soil_vr(0,NY,NX)+RSN3AA+RSNUAA
+      trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)+RSNOAA
+      trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)*natomw
+      TR_sol_NH3_soil_vr(0,NY,NX)               = TR_sol_NH3_soil_vr(0,NY,NX)*natomw
+      trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)   = trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX)*natomw
+      trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX) = trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX)*patomw
+      trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX) = trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX)*patomw
+!     WRITE(*,9989)'TR_NH4_soil',I,J,trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX)
 !    2,RN4S,RNH4,RXN4,RSN4AA,VLWatMicPM_vr(NPH,0,NY,NX)
 !    3,SPNH4,FertN_soil_vr(ifert_nh4,0,NY,NX),ThetaWLitR
 !9989  FORMAT(A8,2I4,12E12.4)

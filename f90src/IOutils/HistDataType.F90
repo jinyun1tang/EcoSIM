@@ -42,8 +42,8 @@ implicit none
   type, public :: histdata_type
   real(r8),pointer   :: h1D_tFIRE_CO2_col(:)     !CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tFIRE_CH4_col(:)     !CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cNH4_LITR_col(:)     !(trc_solml_vr(ids_NH4,0,NY,NX)+14.0*trcx_solml_vr(idx_NH4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trc_solml_vr(ids_NO3,0,NY,NX)+trc_solml_vr(ids_NO2,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)                            
+  real(r8),pointer   :: h1D_cNH4_LITR_col(:)     !(trcs_solml_vr(ids_NH4,0,NY,NX)+14.0*trcx_solml_vr(idx_NH4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
+  real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)                            
   real(r8),pointer   :: h1D_ECO_HVST_N_col(:)     !EcoHavstElmnt_CumYr_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NET_N_MIN_col(:)      !-NetNH4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tLITR_P_col(:)    !tLitrOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -67,13 +67,13 @@ implicit none
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
   real(r8),pointer   :: h1D_tSoilOrgP_col(:)
   real(r8),pointer   :: h1D_PO4_FIRE_col(:)       !PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trc_solml_vr(ids_H2PO4,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
+  real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trcs_solml_vr(ids_H2PO4,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
   real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml_vr(idx_HPO4,0,NY,NX)+trcx_solml_vr(idx_H2PO4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
   real(r8),pointer   :: h1D_ECO_HVST_P_col(:)     !EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
+  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
   real(r8),pointer   :: h1D_tLITR_N_col(:)       !litter N
   real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton profile 
   real(r8),pointer   :: h1D_RootAR_col(:)        !integrated Root autotrophic respiraiton
@@ -89,7 +89,7 @@ implicit none
   real(r8),pointer   :: h1D_SUR_DIN_FLX_col(:)    !HydroSufDINFlx_CumYr_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_SUB_DIN_FLX_col(:)    !HydroSubsDINFlx_col(NY,NX)/TAREA
   real(r8),pointer   :: h1D_tMICRO_N_col(:)        !tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS(0,NY,NX)
+  real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS_vr(0,NY,NX)
   real(r8),pointer   :: h1D_TEMP_surf_col(:)
   real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
   real(r8),pointer   :: h1D_FracBySnow_col(:)    !fraction ground covered by snow
@@ -143,16 +143,19 @@ implicit none
   real(r8),pointer   :: h1D_ECO_Heat2G_col(:)     !Eco_Heat_GrndSurf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_O2_LITR_col(:)       !trc_solcl_vr(idg_O2,0,NY,NX)
   real(r8),pointer   :: h1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
-  real(r8),pointer   :: h1D_SOIL_CO2_FLX_col(:)  !SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
+  real(r8),pointer   :: h1D_SOIL_AR_FLX_COL(:)   !
+  real(r8),pointer   :: h1D_SOIL_CO2_FLX_col(:)  !SurfGasEmisFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
   real(r8),pointer   :: h1D_ECO_CO2_FLX_col(:)   !Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
-  real(r8),pointer   :: h1D_CH4_FLX_col(:)       !SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
+  real(r8),pointer   :: h1D_CH4_FLX_col(:)       !SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
   real(r8),pointer   :: h1D_CH4_EBU_flx_col(:)
+  real(r8),pointer   :: h1D_CO2_TPR_err_col(:)
   real(r8),pointer   :: h1D_CH4_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_CO2_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_O2_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_CO2_DIF_flx_col(:)
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
-  real(r8),pointer   :: h1D_O2_FLX_col(:)        !SurfGasFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
+  real(r8),pointer   :: h1D_Ar_soilMass_col(:)
+  real(r8),pointer   :: h1D_O2_FLX_col(:)        !SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
   real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CANET_col(:)         !canopy evaportranspiration
@@ -165,12 +168,14 @@ implicit none
   real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   real(r8),pointer   :: h1D_SURF_WTR_col(:)       !ThetaH2OZ_vr(0,NY,NX)
   real(r8),pointer   :: h1D_SURF_ICE_col(:)       !ThetaICEZ_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: h1D_sN2O_FLX_col(:)        !SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_sN2G_FLX_col(:)        !SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_sNH3_FLX_col(:)        !SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_sH2_Flx_col(:)
+  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_CO2_WetDep_FLX_col(:)
+  real(r8),pointer   :: h1D_AR_WetDep_FLX_col(:)
+  real(r8),pointer   :: h1D_Soil_N2O_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Soil_N2_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Soil_NH3_FLX_col(:)        !SurfGasEmisFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Soil_H2_Flx_col(:)
   real(r8),pointer   :: h1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
   real(r8),pointer   :: h1D_PAR_CAN_ptc(:)        !PAR absorbed by Canopy, umol /m2/s
   real(r8),pointer   :: h1D_PAR_col(:)            !incoming PAR, umol/s
@@ -317,13 +322,18 @@ implicit none
   real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)   !
   real(r8),pointer   :: h1D_CFIX_lmtf_ptc(:)
   real(r8),pointer   :: h1D_MainBranchNO_ptc(:)
+  real(r8),pointer   :: h1D_Ar_mass_col(:)         !column integrated mass of tracer Ar
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   real(r8),pointer    :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                       !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
   real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)       !
-
+  real(r8),pointer   :: h2D_Gas_Pressure_vr(:,:)
+  real(r8),pointer   :: h2D_CO2_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_CH4_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_Ar_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_O2_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   !aerobic heterotropic fungi
   real(r8),pointer   :: h2D_faculDenitC_vr(:,:)   !facultative denitrifier
@@ -357,6 +367,7 @@ implicit none
   real(r8),pointer   :: h1D_NH3oxi_litr_col(:)
   real(r8),pointer   :: h1D_N2oprod_litr_col(:)
   real(r8),pointer   :: h1D_RDECOMPC_SOM_litr_col(:)
+  real(r8),pointer   :: h1D_MicrobAct_litr_col(:)
   real(r8),pointer   :: h1D_RDECOMPC_BReSOM_litr_col(:)
   real(r8),pointer   :: h1D_RDECOMPC_SorpSOM_litr_col(:)
 
@@ -375,6 +386,7 @@ implicit none
   real(r8),pointer   :: h2D_RDECOMPC_SOM_vr(:,:)
   real(r8),pointer   :: h2D_RDECOMPC_BReSOM_vr(:,:)
   real(r8),pointer   :: h2D_RDECOMPC_SorpSOM_vr(:,:)
+  real(r8),pointer   :: h2D_MicrobAct_vr(:,:)
 
   real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)     !aerobic heterotropic bacteria
   real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   !aerobic heterotropic fungi
@@ -402,12 +414,12 @@ implicit none
   real(r8),pointer   :: h2D_O2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_CO2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_RNITRIF_vr(:,:)
-  real(r8),pointer   :: h2D_CO2_vr(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_CH4_vr(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_N2O_vr(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_NH3_vr(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_CO2_vr(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_CH4_vr(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_N2O_vr(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_Aqua_NH3_vr(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS_vr(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_decomp_OStress_vr(:,:)    !decomposition oxygen stress
   real(r8),pointer   :: h2D_RO2Decomp_vr(:,:)
   real(r8),pointer   :: h2D_Decomp_temp_FN_vr(:,:)
@@ -425,12 +437,12 @@ implicit none
   real(r8),pointer   :: h2D_VSICE_vr    (:,:)         !ThetaICEZ_vr(1:JZ,NY,NX)  
   real(r8),pointer   :: h2D_PSI_vr(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_PsiO_vr(:,:)
-  real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trc_solml_vr(ids_NH4,1:JZ,NY,NX)+trc_solml_vr(ids_NH4B,1:JZ,NY,NX) &
+  real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trcs_solml_vr(ids_NH4,1:JZ,NY,NX)+trcs_solml_vr(ids_NH4B,1:JZ,NY,NX) &
                                                                   !+14.0*(trcx_solml_vr(idx_NH4,1:JZ,NY,NX)+trcx_solml_vr(idx_NH4B,1:JZ,NY,NX)))/VLSoilMicPMass_vr(1:JZ,NY,NX)
   real(r8),pointer   :: h2D_RootH2OUP_vr(:,:)   !root water uptake flux                                 
-  real(r8),pointer   :: h2D_cNO3t_vr(:,:)       !(trc_solml_vr(ids_NO3,1:JZ,NY,NX)+trc_solml_vr(ids_NO3B,1:JZ,NY,NX) &
-                                                                  !+trc_solml_vr(ids_NO2,1,NY,NX)+trc_solml_vr(ids_NO2B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
-  real(r8),pointer   :: h2D_cPO4_vr(:,:)        !(trc_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trc_solml_vr(ids_H1PO4B,1,NY,NX)+trc_solml_vr(ids_H2PO4,1,NY,NX)+trc_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
+  real(r8),pointer   :: h2D_cNO3t_vr(:,:)       !(trcs_solml_vr(ids_NO3,1:JZ,NY,NX)+trcs_solml_vr(ids_NO3B,1:JZ,NY,NX) &
+                                                                  !+trcs_solml_vr(ids_NO2,1,NY,NX)+trcs_solml_vr(ids_NO2B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
+  real(r8),pointer   :: h2D_cPO4_vr(:,:)        !(trcs_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trcs_solml_vr(ids_H1PO4B,1,NY,NX)+trcs_solml_vr(ids_H2PO4,1,NY,NX)+trcs_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
   real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)     !31.0*(trcx_solml_vr(idx_HPO4,1,NY,NX)+trcx_solml_vr(idx_H2PO4,1,NY,NX)+trcx_solml_vr(idx_HPO4B,1,NY,NX)+trcx_solml_vr(idx_H2PO4B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
   real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:)         !ElectricConductivity_vr(1:JZ,NY,NX)
 
@@ -507,7 +519,9 @@ implicit none
   allocate(this%h1D_cPO4_LITR_col(beg_col:end_col))      ;this%h1D_cPO4_LITR_col(:)=spval
   allocate(this%h1D_cEXCH_P_LITR_col(beg_col:end_col))   ;this%h1D_cEXCH_P_LITR_col(:)=spval
   allocate(this%h1D_NET_P_MIN_col(beg_col:end_col))      ;this%h1D_NET_P_MIN_col(:)=spval
-
+  allocate(this%h1D_Soil_N2_FLX_col(beg_col:end_col))   ;this%h1D_Soil_N2_FLX_col(:)=spval
+  allocate(this%h1D_Soil_NH3_FLX_col(beg_col:end_col))  ;this%h1D_Soil_NH3_FLX_col(:)=spval
+  allocate(this%h1D_Soil_H2_Flx_col(beg_col:end_col))   ;this%h1D_Soil_H2_Flx_col(:)=spval
   allocate(this%h1D_PSI_SURF_col(beg_col:end_col))       ;this%h1D_PSI_SURF_col(:)=spval
   allocate(this%h1D_SURF_ELEV_col(beg_col:end_col))      ;this%h1D_SURF_ELEV_col(:)=spval
   allocate(this%h1D_tLITR_C_col(beg_col:end_col));this%h1D_tLITR_C_col(:)=spval
@@ -532,11 +546,17 @@ implicit none
   allocate(this%h1D_OMC_LITR_col(beg_col:end_col))        ;this%h1D_OMC_LITR_col(:)=spval
   allocate(this%h1D_OMN_LITR_col(beg_col:end_col))        ;this%h1D_OMN_LITR_col(:)=spval
   allocate(this%h1D_OMP_LITR_col(beg_col:end_col))        ;this%h1D_OMP_LITR_col(:)=spval
-
+  allocate(this%h1D_Ar_mass_col(beg_col:end_col))         ;this%h1D_Ar_mass_col(:) = spval
+  allocate(this%h1D_Ar_soilMass_col(beg_col:end_col))     ;this%h1D_Ar_soilMass_col(:)=spval
   allocate(this%h1D_ATM_CO2_col(beg_col:end_col))         ;this%h1D_ATM_CO2_col(:)=spval
   allocate(this%h1D_ATM_CH4_col(beg_col:end_col))         ;this%h1D_ATM_CH4_col(:)=spval
   allocate(this%h1D_NBP_col(beg_col:end_col))             ;this%h1D_NBP_col(:)=spval
-
+  allocate(this%h1D_CO2_WetDep_FLX_col(beg_col:end_col)) ; this%h1D_CO2_WetDep_FLX_col(:)=spval
+  allocate(this%h1D_Ar_WetDep_FLX_col(beg_col:end_col)) ; this%h1D_Ar_WetDep_FLX_col(:)=spval
+  allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col)) ; this%h1D_RUNOFF_FLX_col(:)=spval
+  allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))    ;this%h1D_SEDIMENT_FLX_col(:)=spval
+  allocate(this%h1D_QDISCHG_FLX_col(beg_col:end_col))      ;this%h1D_QDISCHG_FLX_col(:)=spval
+  allocate(this%h1D_HeatDISCHG_FLX_col(beg_col:end_col))  ; this%h1D_HeatDISCHG_FLX_col(:)=spval
   allocate(this%h1D_ECO_LAI_col(beg_col:end_col))         ;this%h1D_ECO_LAI_col(:)=spval
   allocate(this%h1D_Eco_GPP_CumYr_col(beg_col:end_col))         ;this%h1D_Eco_GPP_CumYr_col(:)=spval
   allocate(this%h1D_ECO_RA_col(beg_col:end_col))          ;this%h1D_ECO_RA_col(:)=spval
@@ -573,9 +593,11 @@ implicit none
   allocate(this%h1D_O2_LITR_col(beg_col:end_col))         ;this%h1D_O2_LITR_col(:)=spval
   allocate(this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc))         ;this%h1D_MIN_LWP_ptc(:)=spval
   allocate(this%h1D_SOIL_CO2_FLX_col(beg_col:end_col))    ;this%h1D_SOIL_CO2_FLX_col(:)=spval
+  allocate(this%h1D_SOIL_AR_FLX_COL(beg_col:end_col))     ;this%h1D_SOIL_AR_FLX_COL(:)=spval
   allocate(this%h1D_ECO_CO2_FLX_col(beg_col:end_col))     ;this%h1D_ECO_CO2_FLX_col(:)=spval
   allocate(this%h1D_CH4_FLX_col(beg_col:end_col))         ;this%h1D_CH4_FLX_col(:)=spval
   allocate(this%h1D_CH4_EBU_flx_col(beg_col:end_col))     ;this%h1D_CH4_EBU_flx_col(:)=spval
+  allocate(this%h1D_CO2_TPR_err_col(beg_col:end_col))    ; this%h1D_CO2_TPR_err_col(:)=spval
   allocate(this%h1D_CH4_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CH4_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_CO2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CO2_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_O2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_O2_PLTROOT_flx_col(:)=spval
@@ -593,25 +615,17 @@ implicit none
   allocate(this%h1D_SURF_ICE_col(beg_col:end_col))        ;this%h1D_SURF_ICE_col(:)=spval
   allocate(this%h1D_ACTV_LYR_col(beg_col:end_col))        ;this%h1D_ACTV_LYR_col(:)=spval
   allocate(this%h1D_WTR_TBL_col(beg_col:end_col))         ;this%h1D_WTR_TBL_col(:)=spval
-  allocate(this%h1D_sN2O_FLX_col(beg_col:end_col))        ;this%h1D_sN2O_FLX_col(:)=spval
-  allocate(this%h1D_sN2G_FLX_col(beg_col:end_col))        ;this%h1D_sN2G_FLX_col(:)=spval
-  allocate(this%h1D_sNH3_FLX_col(beg_col:end_col))        ;this%h1D_sNH3_FLX_col(:)=spval
-  allocate(this%h1D_sH2_Flx_col(beg_col:end_col))         ;this%h1D_sH2_Flx_col(:)=spval
-  allocate(this%h1D_VHeatCap_litr_col(beg_col:end_col))   ;this%h1D_VHeatCap_litr_col(:)=spval
-  allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col))      ;this%h1D_RUNOFF_FLX_col(:)=spval
-  allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))    ;this%h1D_SEDIMENT_FLX_col(:)=spval
-  allocate(this%h1D_QDISCHG_FLX_col(beg_col:end_col))      ;this%h1D_QDISCHG_FLX_col(:)=spval
-  allocate(this%h1D_HeatDISCHG_FLX_col(beg_col:end_col))  ; this%h1D_HeatDISCHG_FLX_col(:)=spval
-  allocate(this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc))         ;this%h1D_LEAF_PC_ptc(:)=spval
-  allocate(this%h1D_CAN_RN_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RN_ptc(:)=spval
-  allocate(this%h1D_CAN_LE_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_LE_ptc(:)=spval
-  allocate(this%h1D_CAN_H_ptc(beg_ptc:end_ptc))           ;this%h1D_CAN_H_ptc(:)=spval
+  allocate(this%h1D_Soil_N2O_FLX_col(beg_col:end_col))        ;this%h1D_Soil_N2O_FLX_col(:)=spval
   allocate(this%h1D_CAN_G_ptc(beg_ptc:end_ptc))           ;this%h1D_CAN_G_ptc(:)=spval
   allocate(this%h1D_CAN_TEMPC_ptc(beg_ptc:end_ptc))        ;this%h1D_CAN_TEMPC_ptc(:)=spval
   allocate(this%h1D_CAN_TEMPFN_ptc(beg_ptc:end_ptc))      ;this%h1D_CAN_TEMPFN_ptc(:)=spval
   allocate(this%h1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_CAN_CO2_FLX_ptc(:)=spval
   allocate(this%h1D_CAN_GPP_ptc(beg_ptc:end_ptc))         ;this%h1D_CAN_GPP_ptc(:)=spval
   allocate(this%h1D_CAN_RA_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RA_ptc(:)=spval
+  allocate(this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc))         ;this%h1D_LEAF_PC_ptc(:)=spval
+  allocate(this%h1D_CAN_RN_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RN_ptc(:)=spval
+  allocate(this%h1D_CAN_LE_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_LE_ptc(:)=spval
+  allocate(this%h1D_CAN_H_ptc(beg_ptc:end_ptc))           ;this%h1D_CAN_H_ptc(:)=spval  
   allocate(this%h1D_CAN_GROWTH_ptc(beg_ptc:end_ptc))      ;this%h1D_CAN_GROWTH_ptc(:)=spval
   allocate(this%h1D_cTNC_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNC_ptc(:)=spval
   allocate(this%h1D_cTNN_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNN_ptc(:)=spval
@@ -733,13 +747,13 @@ implicit none
   allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
   allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc(:,:)=spval
   allocate(this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ))    ;this%h2D_RNITRIF_vr(:,:)=spval
-  allocate(this%h2D_CO2_vr(beg_col:end_col,1:JZ))        ;this%h2D_CO2_vr(:,:)=spval
+  allocate(this%h2D_Aqua_CO2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_CO2_vr(:,:)=spval
   allocate(this%h2D_O2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_O2_rootconduct_pvr(:,:)=spval
   allocate(this%h2D_CO2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_CO2_rootconduct_pvr(:,:)=spval
-  allocate(this%h2D_CH4_vr(beg_col:end_col,1:JZ))        ;this%h2D_CH4_vr(:,:)=spval
-  allocate(this%h2D_O2_vr(beg_col:end_col,1:JZ))         ;this%h2D_O2_vr(:,:)=spval
-  allocate(this%h2D_N2O_vr(beg_col:end_col,1:JZ))        ;this%h2D_N2O_vr(:,:)=spval
-  allocate(this%h2D_NH3_vr(beg_col:end_col,1:JZ))        ;this%h2D_NH3_vr(:,:)=spval
+  allocate(this%h2D_Aqua_CH4_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_CH4_vr(:,:)=spval
+  allocate(this%h2D_Aqua_O2_vr(beg_col:end_col,1:JZ))         ;this%h2D_Aqua_O2_vr(:,:)=spval
+  allocate(this%h2D_Aqua_N2O_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_N2O_vr(:,:)=spval
+  allocate(this%h2D_Aqua_NH3_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_NH3_vr(:,:)=spval
   allocate(this%h2D_TEMP_vr(beg_col:end_col,1:JZ))       ;this%h2D_TEMP_vr(:,:)=spval
   allocate(this%h1D_decomp_OStress_litr_col(beg_col:end_col)); this%h1D_decomp_OStress_litr_col(:)=spval
   allocate(this%h1D_Decomp_temp_FN_litr_col(beg_col:end_col)); this%h1D_Decomp_temp_FN_litr_col(:)=spval
@@ -762,8 +776,13 @@ implicit none
   allocate(this%h1D_DOC_litr_col(beg_col:end_col));  this%h1D_DOC_litr_col(:)=spval
   allocate(this%h1D_DON_litr_col(beg_col:end_col)); this%h1D_DON_litr_col(:)=spval
   allocate(this%h1D_DOP_litr_col(beg_col:end_col)); this%h1D_DOP_litr_col(:)=spval
-  allocate(this%h1D_acetate_litr_col(beg_col:end_col)); this%h1D_acetate_litr_col(:)=spval
-
+  allocate(this%h1D_acetate_litr_col(beg_col:end_col)); this%h1D_acetate_litr_col(:)=spval  
+  allocate(this%h1D_VHeatCap_litr_col(beg_col:end_col)); this%h1D_VHeatCap_litr_col(:)=spval
+  allocate(this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)); this%h2D_Gas_Pressure_vr(:,:)=spval
+  allocate(this%h2D_CO2_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_CO2_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_CH4_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_CH4_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_Ar_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_O2_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_O2_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactC_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
   allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
@@ -811,10 +830,12 @@ implicit none
   allocate(this%h2D_RDECOMPC_SOM_vr(beg_col:end_col,1:JZ)); this%h2D_RDECOMPC_SOM_vr(:,:)=spval
   allocate(this%h2D_RDECOMPC_BReSOM_vr(beg_col:end_col,1:JZ));this%h2D_RDECOMPC_BReSOM_vr(:,:)=spval
   allocate(this%h2D_RDECOMPC_SorpSOM_vr(beg_col:end_col,1:JZ));this%h2D_RDECOMPC_SorpSOM_vr(:,:)=spval
+  allocate(this%h2D_MicrobAct_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobAct_vr(:,:)=spval
 
   allocate(this%h1D_RDECOMPC_SOM_litr_col(beg_col:end_col)); this%h1D_RDECOMPC_SOM_litr_col(:)=spval
   allocate(this%h1D_RDECOMPC_BReSOM_litr_col(beg_col:end_col));this%h1D_RDECOMPC_BReSOM_litr_col(:)=spval
   allocate(this%h1D_RDECOMPC_SorpSOM_litr_col(beg_col:end_col));this%h1D_RDECOMPC_SorpSOM_litr_col(:)=spval
+  allocate(this%h1D_MicrobAct_litr_col(beg_col:end_col)); this%h1D_MicrobAct_litr_col(:)=spval
 
   allocate(this%h2D_AeroHrBactP_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactP_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungP_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungP_vr(:,:)=spval
@@ -1030,6 +1051,13 @@ implicit none
   call hist_addfld1d(fname='Qdrain_col',units='mm H2O/hr',avgflag='A',&
     long_name='Drainage water flux out (>0) of the soil column',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_Ar_mass_col(beg_col:end_col)
+  call hist_addfld1d(fname='Ar_mass_col',units='g/m2',avgflag='A',&
+    long_name='total Ar mass of the soil column, include that in snow',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Ar_soilMass_col(beg_col:end_col)
+  call hist_addfld1d(fname='Ar_soil_mass_col',units='g/m2',avgflag='A',&
+    long_name='total Ar mass of the soil column, excluding that in snow',ptr_col=data1d_ptr)      
 
   IF(salt_model)THEN
     data1d_ptr => this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col) 
@@ -1293,7 +1321,13 @@ implicit none
 
   data1d_ptr => this%h1D_SOIL_CO2_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SOIL_CO2_FLX',units='umol C/m2/s',avgflag='A',&
-    long_name='soil CO2 flux (< 0 into atmosphere)',ptr_col=data1d_ptr)      
+    long_name='soil CO2 flux (< 0 into atmosphere), '// &
+    'excluding wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_SOIL_AR_FLX_COL(beg_col:end_col)
+  call hist_addfld1d(fname='SOIL_AR_FLX',units='umol Ar/m2/s',avgflag='A',&
+    long_name='soil Ar flux (< 0 into atmosphere), '// &
+    'excluding wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_ECO_CO2_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='ECO_NEE_CO2',units='umol C/m2/s',avgflag='A',&
@@ -1301,11 +1335,16 @@ implicit none
 
   data1d_ptr => this%h1D_CH4_FLX_col(beg_col:end_col)     
   call hist_addfld1d(fname='SOIL_CH4_FLX',units='umol C/m2/s',avgflag='A',&
-    long_name='soil CH4 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+    long_name='soil CH4 flux (<0 into atmosphere), '// &
+    'excluding wet deposition from rainfall and surface irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_EBU_flx_col(beg_col:end_col)     
   call hist_addfld1d(fname='CH4_EBU_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 ebullition flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_CO2_TPR_err_col(beg_col:end_col)
+  call hist_addfld1d(fname='CumCO2_Transpt_Residual',units='g C/m2',avgflag='A',&
+    long_name='Cumulative difference between soil CO2 production and surface CO2 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CH4_PLTROOT_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='CH4_PLTROOT_FLX',units='umol C/m2/s',avgflag='A',&
@@ -1371,7 +1410,7 @@ implicit none
   call hist_addfld1d(fname='WTR_TBL',units='m',avgflag='A',&
     long_name='internal water table depth',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_sN2O_FLX_col(beg_col:end_col)      
+  data1d_ptr => this%h1D_Soil_N2O_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='sN2O_FLX',units='g/m2/hr',avgflag='A',&
     long_name='soil N2O flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
@@ -1380,17 +1419,30 @@ implicit none
     long_name='Direct plus diffusive incoming photosynthetic photon flux density',&
     ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_sN2G_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='SOIL_N2_FLX',units='g/m2/hr',&
-    avgflag='A',long_name='soil N2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+  data1d_ptr => this%h1D_CO2_WetDep_FLX_col(beg_col:end_col)
+  call hist_addfld1d(fname='CO2_WetDep_FLX',units='gC/m2/hr',&
+    avgflag='A',long_name='Wet deposition CO2 flux to soil, '// &
+    'from rainfall and irrigation',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_sNH3_FLX_col(beg_col:end_col)       
+  data1d_ptr => this%h1D_AR_WetDep_FLX_col(beg_col:end_col)
+  call hist_addfld1d(fname='Ar_WetDep_FLX',units='gAr/m2/hr',&
+    avgflag='A',long_name='Wet deposition Ar flux to soil, '// &
+    'from rainfall and irrigation',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Soil_N2_FLX_col(beg_col:end_col)      
+  call hist_addfld1d(fname='SOIL_N2_FLX',units='gN/m2/hr',&
+    avgflag='A',long_name='soil N2 flux (<0 into atmosphere), '// &
+    'excluding wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Soil_NH3_FLX_col(beg_col:end_col)       
   call hist_addfld1d(fname='SOIL_NH3_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='soil NH3 flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+    long_name='soil NH3 flux (<0 into atmosphere), '// &
+    'excluding wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_sH2_Flx_col(beg_col:end_col)       
-  call hist_addfld1d(fname='SOIL_H2_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='soil H2 flux (<0 into atmosphere)',ptr_col=data1d_ptr)  
+  data1d_ptr => this%h1D_Soil_H2_Flx_col(beg_col:end_col)       
+  call hist_addfld1d(fname='SOIL_H2_FLX',units='gH/m2/hr',avgflag='A',&
+    long_name='soil H2 flux (<0 into atmosphere), '// &
+    'excluding wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)  
 
   data1d_ptr => this%h1D_VHeatCap_litr_col(beg_col:end_col)
   call hist_addfld1d(fname='vHeatCap_litr',units='MJ/m3/K',avgflag='A',&
@@ -1851,15 +1903,19 @@ implicit none
 
   data1d_ptr => this%h1D_RDECOMPC_SOM_litr_col(beg_col:end_col)
   call hist_addfld1d(fname='RDecompC_SOM_litr',units='gC/m2/hr',avgflag='A',&
-    long_name='hydrolysis of SOM C in litter layer',ptr_col=data1d_ptr)      
+    long_name='Hydrolysis of SOM C in litter layer',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_MicrobAct_litr_col(beg_col:end_col)
+  call hist_addfld1d(fname='MicrobAct_litr',units='gC/m2/hr',avgflag='A',&
+    long_name='Respiration-based micoribal activity for hydrolysis in litter layer',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_RDECOMPC_BReSOM_litr_col(beg_col:end_col)
   call hist_addfld1d(fname='RDecompC_BReSOM_litr',units='gC/m2/hr',avgflag='A',&
-    long_name='hydrolysis of microbial residual OM C in litter layer',ptr_col=data1d_ptr)      
+    long_name='Hydrolysis of microbial residual OM C in litter layer',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_RDECOMPC_SorpSOM_litr_col(beg_col:end_col)
   call hist_addfld1d(fname='RDecompC_SorpSOM_litr',units='gC/m2/hr',avgflag='A',&
-    long_name='hydrolysis of adsorbed OM C in litter layer',ptr_col=data1d_ptr)      
+    long_name='Hydrolysis of adsorbed OM C in litter layer',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='LITRf_P_FLX_pft',units='gP/m2/hr',avgflag='A',&
@@ -1952,7 +2008,7 @@ implicit none
   call hist_addfld2d(fname='RNITRIF_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Nitrification rate from NH3 oxidation in each soil layer',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_CO2_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_CO2_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
   call hist_addfld2d(fname='CO2w_conc_vr',units='gC/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous CO2 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
@@ -1964,23 +2020,23 @@ implicit none
   call hist_addfld2d(fname='CO2_root_conductance_pvr',units='1/h',type2d='levsoi',avgflag='A',&
     long_name='Root conductance for CO2 gaseous in soil layer',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%h2D_CH4_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_CH4_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
   call hist_addfld2d(fname='CH4w_conc_vr',units='gC/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous CH4 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_O2_vr(beg_col:end_col,1:JZ)           !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_O2_vr(beg_col:end_col,1:JZ)           !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
   call hist_addfld2d(fname='O2w_conc_vr',units='g/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous O2 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_N2O_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_N2O_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
   call hist_addfld2d(fname='N2Ow_conc_vr',units='gN/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous N2O concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_NH3_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
+  data2d_ptr => this%h2D_Aqua_NH3_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
   call hist_addfld2d(fname='NH3w_conc_vr',units='gN/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous NH3 concentration in soil micropre water',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)         !TCS(1:JZ,NY,NX)
+  data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)         !TCS_vr(1:JZ,NY,NX)
   call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='levsoi',avgflag='A',&
     long_name='soil temperature profile',ptr_col=data2d_ptr)      
 
@@ -2073,6 +2129,26 @@ implicit none
   data2d_ptr =>  this%h2D_aeroN2fixC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Aerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Aerobic N2 fixer C biomass profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_Gas_Pressure_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='GAS_PRESSURE_vr',units='Pa',type2d='levsoi',avgflag='A',&
+    long_name='Soil gas pressure profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CO2_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CO2_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Equivalent soil gaseous CO2 profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_CH4_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CH4_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Equivalent soil gaseous CH4 profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_Ar_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Ar_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Equivalent soil gaseous Ar profile',ptr_col=data2d_ptr)      
+
+  data2d_ptr =>  this%h2D_O2_Gas_ppmv_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='O2_gas_ppmv_vr',units='ppmv',type2d='levsoi',avgflag='A',&
+    long_name='Equivalent soil gaseous O2 profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Anaerobic_N2fixerC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
@@ -2183,17 +2259,21 @@ implicit none
   call hist_addfld2d(fname='Hygrogen_methanogenN_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
     long_name='Hydrogenotrophic methanogen N biomass profile',ptr_col=data2d_ptr)      
 
+  data2d_ptr =>  this%h2D_MicrobAct_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='MicrobAct_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis',ptr_col=data2d_ptr)      
+
   data2d_ptr =>  this%h2D_RDECOMPC_SOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_SOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved hydrolysis of solid OM C',ptr_col=data2d_ptr)      
+    long_name='Layer resolved Hydrolysis of solid OM C',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_RDECOMPC_BReSOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_BReSOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved hydrolysis of microbial residual OM C',ptr_col=data2d_ptr)      
+    long_name='Layer resolved Hydrolysis of microbial residual OM C',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_RDECOMPC_SorpSOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_SorpSOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved hydrolysis of adsorbed OM C',ptr_col=data2d_ptr)      
+    long_name='Layer resolved Hydrolysis of adsorbed OM C',ptr_col=data2d_ptr)      
 
 !------
   data2d_ptr =>  this%h2D_AeroHrBactP_vr(beg_col:end_col,1:JZ)
@@ -2319,7 +2399,7 @@ implicit none
 
   data2d_ptr => this%h2D_RootH2OUP_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RootH2OUptake_vr',units='mmH2O/hr',type2d='levsoi',avgflag='A',&
-    long_name='soil water taken up by root',ptr_col=data2d_ptr)      
+    long_name='soil water taken up by root (<0)',ptr_col=data2d_ptr)      
   
   data2d_ptr => this%h2D_cNH4t_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='cNH4t_vr',units='gN/Mg soil',type2d='levsoi',avgflag='A',&
@@ -2456,6 +2536,7 @@ implicit none
 
 !----------------------------------------------------------------------
   subroutine hist_update(this,I,J,bounds)
+  use TracerPropMod, only : GramPerHr2umolPerSec
   implicit none
   class(histdata_type) :: this
   integer, intent(in) :: I,J
@@ -2468,8 +2549,7 @@ implicit none
   real(r8),parameter :: MJ2W=1.e6_r8/secs1hour
   real(r8),parameter :: m2mm=1000._r8
   real(r8),parameter :: million=1.e6_r8
-  real(r8),parameter :: gC1hour2umol1sec=1.e6_r8/(12._r8*3600._r8)
-  real(r8),parameter :: gO1hour2umol1sec=1.e6_r8/(32._r8*3600._r8)
+
   character(len=15) :: grow_stage_str(11)=(/'Planting      ','Emergence     ','Floral_init   ', &
                                             'Jointing      ','Elongation    ','Heading       ', &
                                             'Anthesis      ','Seed_fill     ','See_no_set    ', &
@@ -2481,13 +2561,13 @@ implicit none
       ncol=get_col(NY,NX)
       this%h1D_tFIRE_CO2_col(ncol)        =  CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tFIRE_CH4_col(ncol)        =  CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_cNH4_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NH4,0,NY,NX)+&
+      this%h1D_cNH4_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NH4,0,NY,NX)+&
         natomw*trcx_solml_vr(idx_NH4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
-      this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trc_solml_vr(ids_NO3,0,NY,NX)+&
-        trc_solml_vr(ids_NO2,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
+      this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NO3,0,NY,NX)+&
+        trcs_solml_vr(ids_NO2,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       
 !      if(this%h1D_cNO3_LITR_col(ncol)>1.e7*VLSoilMicPMass_vr(0,NY,NX))then                  
-!        write(112,*)I+J/24.,NY,NX,trc_solml_vr(idg_NH3,0,NY,NX),trc_solml_vr(ids_NO3,0,NY,NX),trc_solml_vr(ids_NO2,0,NY,NX),&
+!        write(112,*)I+J/24.,NY,NX,trcs_solml_vr(idg_NH3,0,NY,NX),trcs_solml_vr(ids_NO3,0,NY,NX),trcs_solml_vr(ids_NO2,0,NY,NX),&
 !          VLSoilMicPMass_vr(0,NY,NX)*million
 !      endif
 !      if(this%h1D_cNO3_LITR_col(ncol)>1.e8*VLSoilMicPMass_vr(0,NY,NX))then                  
@@ -2526,13 +2606,13 @@ implicit none
       this%h1D_tPREC_P_col(ncol)          = tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trc_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
+      this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trcs_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_cEXCH_P_LITR_col(ncol)     =  patomw*safe_adb(trcx_solml_vr(idx_HPO4,0,NY,NX)+&
         trcx_solml_vr(idx_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_ECO_HVST_P_col(ncol) = EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)  = -NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PSI_SURF_col(ncol)   = PSISoilMatricP_vr(0,NY,NX)
-      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
+      this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol)    = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AMENDED_N_col(ncol)  = FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)      = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2543,8 +2623,8 @@ implicit none
       stop
       endif      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_TEMP_LITR_col(ncol)        = TCS(0,NY,NX)
-      this%h1D_TEMP_surf_col(ncol)        = FracSurfByLitR_col(NY,NX)*TCS(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TCS(NU(NY,NX),NY,NX)
+      this%h1D_TEMP_LITR_col(ncol)        = TCS_vr(0,NY,NX)
+      this%h1D_TEMP_surf_col(ncol)        = FracSurfByLitR_col(NY,NX)*TCS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TCS_vr(NU(NY,NX),NY,NX)
       if(VcumSnowWE_col(NY,NX)<=ZEROS(NY,NX))then
         this%h1D_TEMP_SNOW_col(ncol)   = spval
       else
@@ -2598,18 +2678,19 @@ implicit none
       this%h1D_Eco_HeatSen_col(ncol)      = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_Heat2G_col(ncol)       = Eco_Heat_GrndSurf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_O2_LITR_col(ncol)          = trc_solcl_vr(idg_O2,0,NY,NX)
-      this%h1D_SOIL_CO2_FLX_col(ncol)     = SurfGasFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_ECO_CO2_FLX_col(ncol)      = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1d_CAN_NEE_col(ncol)          = Canopy_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_CH4_FLX_col(ncol)          = SurfGasFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_O2_FLX_col(ncol)           = SurfGasFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gO1hour2umol1sec
-      this%h1D_CH4_EBU_flx_col(ncol)      = trcg_ebu_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_CH4_PLTROOT_flx_col(ncol)  = trcg_pltroot_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_CO2_PLTROOT_flx_col(ncol)  = trcg_pltroot_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_O2_PLTROOT_flx_col(ncol)   = trcg_pltroot_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gO1hour2umol1sec      
-      this%h1D_CO2_DIF_flx_col(ncol)      = SurfGasDifflx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
-      this%h1D_CH4_DIF_flx_col(ncol)      = SurfGasDifflx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec      
-
+      this%h1D_SOIL_CO2_FLX_col(ncol)     = SurfGasEmisFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_SOIL_AR_FLX_COL(ncol)      = SurfGasEmisFlx_col(idg_AR,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_AR)
+      this%h1D_ECO_CO2_FLX_col(ncol)      = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1d_CAN_NEE_col(ncol)          = Canopy_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_CH4_FLX_col(ncol)          = SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_O2_FLX_col(ncol)           = SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
+      this%h1D_CH4_EBU_flx_col(ncol)      = trcg_ebu_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
+      this%h1D_CH4_PLTROOT_flx_col(ncol)  = trcg_pltroot_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
+      this%h1D_CO2_PLTROOT_flx_col(ncol)  = trcg_pltroot_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_O2_PLTROOT_flx_col(ncol)   = trcg_pltroot_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
+      this%h1D_CO2_DIF_flx_col(ncol)      = SurfGasDifFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_CH4_DIF_flx_col(ncol)      = SurfGasDifFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)      
+      this%h1D_CO2_TPR_err_col(ncol)      = Gas_Prod_TP_cumRes_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_LITR_col(ncol)         = trc_solcl_vr(idg_CO2,0,NY,NX)
       this%h1D_EVAPN_col(ncol)            = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CANET_col(ncol)            = QVegET_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
@@ -2622,15 +2703,17 @@ implicit none
       this%h1D_SNOWPACK_col(ncol)         = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA(3,NU(NY,NX),NY,NX))
       this%h1D_SURF_WTR_col(ncol)         = ThetaH2OZ_vr(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)         = ThetaICEZ_vr(0,NY,NX)
-      this%h1D_ACTV_LYR_col(ncol)         = -(ActiveLayDepZ_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-      this%h1D_WTR_TBL_col(ncol)          = -(DepzIntWTBL_col(NY,NX)-CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX))
-      this%h1D_sN2O_FLX_col(ncol)         = SurfGasFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_sN2G_FLX_col(ncol)         = SurfGasFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_sNH3_FLX_col(ncol)         = SurfGasFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_sH2_Flx_col(ncol)          = SurfGasFlx_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ACTV_LYR_col(ncol)         = -(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+      this%h1D_WTR_TBL_col(ncol)          = -(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+      this%h1D_Soil_N2O_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Soil_N2_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Soil_NH3_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Soil_H2_Flx_col(ncol)          = SurfGasEmisFlx_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PAR_col(ncol)              = RadPARSolarBeam_col(NY,NX)
       this%h1D_VHeatCap_litr_col(ncol)    = VHeatCapacity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-
+      this%h1D_AR_WetDep_FLX_col(ncol)    = Gas_WetDeposition_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_CO2_WetDep_FLX_col(ncol)   = Gas_WetDeposition_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      
       call sumMicBiomLayL(0,NY,NX,micBE)      
       this%h2D_MicroBiomeE_litr_col(ncol,1:NumPlantChemElms) =micBE/AREA(3,NU(NY,NX),NY,NX)  
 
@@ -2677,12 +2760,13 @@ implicit none
       this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_aero_litr_col(ncol)   = RCH4Oxi_aero_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RFermen_litr_col(ncol)        = RFerment_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_nh3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_n2oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
+      this%h1D_NH3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_N2oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
                                +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
 
       this%h1D_RootAR_col(ncol)                = 0._r8
       this%h1D_decomp_OStress_litr_col(ncol)   = OxyDecompLimiter_vr(0,NY,NX)
+      this%h1D_MicrobAct_litr_col(ncol)        = TMicHeterActivity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RO2Decomp_litr_col(ncol)        = RO2DecompUptk_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RDECOMPC_SOM_litr_col(ncol)     = tRHydlySOM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_RDECOMPC_BReSOM_litr_col(ncol)  = tRHydlyBioReSOM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2691,11 +2775,19 @@ implicit none
       this%h1D_Decomp_moist_FN_litr_col(ncol)  = MoistSensDecomp_vr(0,NY,NX)
       this%h1D_FracLitMix_litr_col(ncol)       = FracLitrMix_vr(0,NY,NX)
       this%h1D_Eco_HR_CO2_litr_col(ncol)       = ECO_HR_CO2_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_TSolidOMActC_litr_col(ncol)     = TSolidOMActC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-      this%h1D_TSolidOMActCDens_litr_col(ncol) = safe_adb(TSolidOMActC_vr(0,NY,NX),TSolidOMC_vr(0,NY,NX))  
+      this%h1D_TSolidOMActC_litr_col(ncol)     = TSolidOMActC_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_TSolidOMActCDens_litr_col(ncol) = safe_adb(TSolidOMActC_vr(0,NY,NX),TSolidOMC_vr(0,NY,NX))
       this%h1D_tOMActCDens_litr_col(ncol)      = safe_adb(tOMActC_vr(0,NY,NX),(TSolidOMC_vr(0,NY,NX)+tOMActC_vr(0,NY,NX)))
-      
+      this%h1D_Ar_mass_col(ncol)               = trcg_TotalMass_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Ar_soilMass_col(ncol)           = trcg_soilMass_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+
       DO L=1,JZ        
+        this%h2D_Gas_Pressure_vr(ncol,L)  = Soil_Gas_pressure_vr(L,NY,NX)
+        this%h2D_CO2_Gas_ppmv_vr(ncol,L)  = CO2_Gas_Frac_vr(L,NY,NX)
+        this%h2D_CH4_Gas_ppmv_vr(ncol,L)  = CH4_Gas_Frac_vr(L,NY,NX)
+        this%h2D_Ar_Gas_ppmv_vr(ncol,L)   = Ar_Gas_Frac_vr(L,NY,NX)
+        this%h2D_O2_Gas_ppmv_vr(ncol,L)   = O2_Gas_Frac_vr(L,NY,NX)
+        
         DVOLL=DLYR_3D(3,L,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
         
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2709,7 +2801,7 @@ implicit none
         this%h2D_DOC_vr(ncol,L)             = DOM(idom_doc)/DVOLL
         this%h2D_DON_vr(ncol,L)             = DOM(idom_don)/DVOLL
         this%h2D_DOP_vr(ncol,L)             = DOM(idom_dop)/DVOLL
-        this%h2D_BotDEPZ_vr(ncol,L)         = CumDepz2LayerBot_vr(L,NY,NX)
+        this%h2D_BotDEPZ_vr(ncol,L)         = CumDepz2LayBottom_vr(L,NY,NX)
         this%h2D_acetate_vr(ncol,L)         = DOM(idom_acetate)/DVOLL
         this%h2D_litrC_vr(ncol,L)           = litrOM_vr(ielmc,L,NY,NX)/DVOLL
         this%h2D_litrN_vr(ncol,L)           = litrOM_vr(ielmn,L,NY,NX)/DVOLL
@@ -2719,35 +2811,35 @@ implicit none
         this%h2D_tSON_vr(ncol,L)            = SoilOrgM_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_tSOP_vr(ncol,L)            = SoilOrgM_vr(ielmp,L,NY,NX)/DVOLL
         this%h2D_VHeatCap_vr(ncol,L)        = VHeatCapacity_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_CO2_vr(ncol,L)             = trc_solcl_vr(idg_CO2,L,NY,NX)
-        this%h2D_CH4_vr(ncol,L)             = trc_solcl_vr(idg_CH4,L,NY,NX)
-        this%h2D_O2_vr(ncol,L)              = trc_solcl_vr(idg_O2,L,NY,NX)
-        this%h2D_N2O_vr(ncol,L)             = trc_solcl_vr(idg_N2O,L,NY,NX)
-        this%h2D_NH3_vr(ncol,L)             = trc_solcl_vr(idg_NH3,L,NY,NX)
-        this%h2D_TEMP_vr(ncol,L)            = TCS(L,NY,NX)
+        this%h2D_Aqua_CO2_vr(ncol,L)             = trc_solcl_vr(idg_CO2,L,NY,NX)        
+        this%h2D_Aqua_CH4_vr(ncol,L)             = trc_solcl_vr(idg_CH4,L,NY,NX)
+        this%h2D_Aqua_O2_vr(ncol,L)              = trc_solcl_vr(idg_O2,L,NY,NX)
+        this%h2D_Aqua_N2O_vr(ncol,L)             = trc_solcl_vr(idg_N2O,L,NY,NX)
+        this%h2D_Aqua_NH3_vr(ncol,L)             = trc_solcl_vr(idg_NH3,L,NY,NX)
+        this%h2D_TEMP_vr(ncol,L)            = TCS_vr(L,NY,NX)
         this%h2D_decomp_OStress_vr(ncol,L)  = OxyDecompLimiter_vr(L,NY,NX)
         this%h2D_RO2Decomp_vr(ncol,L)       = RO2DecompUptk_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_Decomp_temp_FN_vr(ncol,L)  = TempSensDecomp_vr(L,NY,NX)
         this%h2D_FracLitMix_vr(ncol,L)      = FracLitrMix_vr(L,NY,NX)
         this%h2D_Decomp_Moist_FN_vr(ncol,L) = MoistSensDecomp_vr(L,NY,NX)
         this%h2D_HeatFlow_vr(ncol,L)        = THeatFlowCellSoil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h2D_HeatUptk_vr(ncol,L)        = THeatRootUptake_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_HeatUptk_vr(ncol,L)        = THeatLossRoot2Soil_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_VSPore_vr(ncol,L)          = POROS_vr(L,NY,NX)
         this%h2D_VSM_vr    (ncol,L)         = ThetaH2OZ_vr(L,NY,NX)
         this%h2D_VSICE_vr  (ncol,L)         = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)             = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_PsiO_vr(ncol,L)            = PSISoilOsmotic_vr(L,NY,NX)
-        this%h2D_RootH2OUP_vr(ncol,L)       = TPlantRootH2OUptake_vr(L,NY,NX)
-        this%h2D_cNH4t_vr(ncol,L)     = safe_adb(trc_solml_vr(ids_NH4,L,NY,NX)+trc_solml_vr(ids_NH4B,L,NY,NX) &
+        this%h2D_RootH2OUP_vr(ncol,L)       = TPlantRootH2OLoss_vr(L,NY,NX)
+        this%h2D_cNH4t_vr(ncol,L)     = safe_adb(trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)),&
                                                VLSoilMicPMass_vr(L,NY,NX))
   
-        this%h2D_cNO3t_vr(ncol,L)= safe_adb(trc_solml_vr(ids_NO3,L,NY,NX)+trc_solml_vr(ids_NO3B,L,NY,NX) &
-                                               +trc_solml_vr(ids_NO2,L,NY,NX)+trc_solml_vr(ids_NO2B,L,NY,NX),&
+        this%h2D_cNO3t_vr(ncol,L)= safe_adb(trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO3B,L,NY,NX) &
+                                               +trcs_solml_vr(ids_NO2,L,NY,NX)+trcs_solml_vr(ids_NO2B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
 
-        this%h2D_cPO4_vr(ncol,L) = safe_adb(trc_solml_vr(ids_H1PO4,L,NY,NX)+trc_solml_vr(ids_H1PO4B,L,NY,NX) &
-                                               +trc_solml_vr(ids_H2PO4,L,NY,NX)+trc_solml_vr(ids_H2PO4B,L,NY,NX),&
+        this%h2D_cPO4_vr(ncol,L) = safe_adb(trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H1PO4B,L,NY,NX) &
+                                               +trcs_solml_vr(ids_H2PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX),&
                                                VLWatMicP_vr(L,NY,NX))
         this%h2D_cEXCH_P_vr(ncol,L)= patomw*safe_adb(trcx_solml_vr(idx_HPO4,L,NY,NX)+trcx_solml_vr(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml_vr(idx_HPO4B,L,NY,NX)+trcx_solml_vr(idx_H2PO4B,L,NY,NX),&
@@ -2793,6 +2885,7 @@ implicit none
         this%h2D_RDECOMPC_SOM_vr(ncol,L)    = tRHydlySOM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RDECOMPC_BReSOM_vr(ncol,L) = tRHydlyBioReSOM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RDECOMPC_SorpSOM_vr(ncol,L) = tRHydlySoprtOM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%h2D_MicrobAct_vr(ncol,L) = TMicHeterActivity_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
         !anaerobic N2 fixer
         call SumMicbGroup(L,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)
@@ -2831,9 +2924,8 @@ implicit none
         this%h2D_n2oprod_vr(ncol,L)          = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
                                +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
         this%h2D_RootAR_vr(ncol,L) = -RootCO2Autor_vr(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_RootAR_col(ncol)  = this%h1D_RootAR_col(ncol)-RootCO2Autor_vr(L,NY,NX)
       ENDDO
-      this%h1D_RootAR_col(ncol) = this%h1D_RootAR_col(ncol)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_RootAR_col(ncol)  = -RootCO2Autor_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)      
       
       DO NZ=1,NP0(NY,NX)
         nptc=get_pft(NZ,NY,NX)
@@ -2855,7 +2947,7 @@ implicit none
         this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
         this%h1D_CAN_TEMPFN_ptc(nptc)    = fTCanopyGroth_pft(NZ,NY,NX)
-        this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*gC1hour2umol1sec
+        this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
         this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)        = CanopyGrosRCO2_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_GROWTH_ptc(nptc)    = canopy_growth_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

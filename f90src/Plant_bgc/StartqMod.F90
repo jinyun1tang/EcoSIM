@@ -685,8 +685,8 @@ module StartqMod
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
   FDM                          = get_FDM(PSICanopy_pft(NZ,NY,NX))
-  CanopyWater_pft(NZ,NY,NX)    = ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
-  VHeatCapCanopy_pft(NZ,NY,NX) = cpw*(ShootStrutElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyWater_pft(NZ,NY,NX))
+  CanopyBiomWater_pft(NZ,NY,NX)    = ppmc*CanopyLeafShethC_pft(NZ,NY,NX)/FDM
+  VHeatCapCanopy_pft(NZ,NY,NX) = cpw*(ShootStrutElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyBiomWater_pft(NZ,NY,NX))
 
   ENGYX_pft(NZ,NY,NX)             = 0._r8
   DeltaTKC_pft(NZ,NY,NX)          = 0._r8
@@ -733,7 +733,7 @@ module StartqMod
   ENDDO  
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
-      AllPlantRootH2OUptake_vr(N,L,NZ,NY,NX)                     = 0._r8
+      AllPlantRootH2OLoss_vr(N,L,NZ,NY,NX)                     = 0._r8
       PSIRoot_pvr(N,L,NZ,NY,NX)                                  = -0.01_r8
       PSIRootOSMO_vr(N,L,NZ,NY,NX)                               = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)                               = AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
@@ -780,8 +780,8 @@ module StartqMod
       RootCO2Emis_pvr(N,L,NZ,NY,NX)                   = 0._r8
       COXYA                                           = AtmGasCgperm3(idg_O2,NY,NX)
       COXYP                                           = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA(NY,NX))*OXYE_col(NY,NX)
-      trcg_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX) = 0._r8
-      trcs_rootml_pvr(idg_beg:idg_end-1,N,L,NZ,NY,NX) = 0._r8
+      trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
+      trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
       trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYA*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYP*RootVH2O_pvr(N,L,NZ,NY,NX)
       RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)            = 1.0_r8
@@ -828,7 +828,7 @@ module StartqMod
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
 !     LeafPetolBiomassC_brch=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
+!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)

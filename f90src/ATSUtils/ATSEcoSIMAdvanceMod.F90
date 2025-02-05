@@ -15,7 +15,7 @@ module ATSEcoSIMAdvanceMod
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
-      VPA, WindSpeedAtm_col, RainH  
+      VPA_col, WindSpeedAtm_col, RainH  
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
@@ -38,6 +38,7 @@ implicit none
   use GridMod           , only : SetMeshATS
   use SurfPhysMod       , only : RunSurfacePhysModelM, StageSurfacePhysModel, UpdateSurfaceAtM, &
       SetHourlyAccumulatorsATS
+  use SnowBalanceMod    , only : SnowMassUpdate
   use StartsMod         , only : set_ecosim_solver
   use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
   implicit none
@@ -58,6 +59,8 @@ implicit none
   real(r8) :: VPS(JY,JX)
   real(r8) :: EMM
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
+  real(r8) :: Qinfl2MicPM(JY,JX)
+  real(r8) :: Hinfl2SoilM(JY,JX)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
@@ -109,7 +112,7 @@ implicit none
     RainH(NY,NX) = p_rain(NY)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
-      CumDepz2LayerBot_vr(L,NY,NX) = a_CumDepz2LayerBot_vr(L,NY)
+      CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
@@ -166,19 +169,27 @@ implicit none
   !perhaps doesn't neeed to run NPH times
   DO M=1,NPH
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
-      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicP,Hinfl2Soil)
+      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
-     !also update state variables for each M 
+      Qinfl2MicP = Qinfl2MicPM+Qinfl2MicPM
+      Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
+
+      !also update state variables for iteration M 
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
+  do NY=1,NYS
+    call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
+  ENDDO
+  
+  Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
+  Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
-  Do NY=1,NYS
-    call SnowMassUpdate(I,J,NY,NX) 
-  enddo
-  !write(*,*) "after run: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
-
-  !write(*,*) "Heat and water souces: "
+  write(*,*) "Heat and water souces: "
+  write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
+  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
+  write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
+  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !Convert heat and water flux from EcoSIM units (flux/ hr)

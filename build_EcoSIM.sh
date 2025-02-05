@@ -240,11 +240,22 @@ mkdir -p ./local
 if [ -L ./local/bin ]; then
   rm ./local/bin
 fi
+mkdir ./local/bin
 
 build_path=$(realpath "$ecosim_build_dir/local/bin")
 
-ln -s $build_path ./local/bin
+for file in $(find "$build_path" -type f); do
+    basename=$(basename "$file")
+    link_path="./local/bin/$basename"
 
+    # Create the symlink only if it doesn't exist
+    if [ ! -e "$link_path" ]; then
+        ln -s "$file" "$link_path"
+        echo "Created symlink: $link_path"
+    else
+        echo "Symlink for $basename already exists."
+    fi
+done
 
 if [ "$regression_test" -eq 1 ]; then
   make -C ./regression-tests test --no-print-directory ${MAKEFLAGS} compiler=gnu;

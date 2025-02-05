@@ -141,7 +141,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
 
-  integer :: N,L,K,NTG,NE,idg,ids
+  integer :: N,L,K,idg,NE,ids
  
   associate(                                                       &
     NU                       => plt_site%NU,                       &
@@ -175,14 +175,15 @@ module ExtractsMod
     REcoO2DmndResp_vr        => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr    => plt_bgcr%tRootMycoExud2Soil_vr,    &
     tRO2MicrbUptk_vr         => plt_bgcr%tRO2MicrbUptk_vr,         &
-    tRootCO2Emis_vr          => plt_bgcr%tRootCO2Emis_vr,          &
+    tRootCO2Emis2Root_vr     => plt_bgcr%tRootCO2Emis2Root_vr,     &
     REcoH2PO4DmndBand_vr     => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
+    TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
     TKS_vr                   => plt_ew%TKS_vr,                     &
-    THeatRootUptake_vr       => plt_ew%THeatRootUptake_vr,         &
-    TPlantRootH2OUptake_vr   => plt_ew%TPlantRootH2OUptake_vr,     &
-    AllPlantRootH2OUptake_vr => plt_ew%AllPlantRootH2OUptake_vr,   &
-    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col ,   &
+    THeatLossRoot2Soil_vr       => plt_ew%THeatLossRoot2Soil_vr,         &
+    TPlantRootH2OLoss_vr   => plt_ew%TPlantRootH2OLoss_vr,     &
+    AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
+    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col,    &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
@@ -199,9 +200,9 @@ module ExtractsMod
 !
 !     totRootLenDens_vr=total root length density
 !     RootLenDensPerPlant_pvr=PFT root length density per plant
-!     AllPlantRootH2OUptake_vr=total water uptake
-!     AllPlantRootH2OUptake_vr=PFT root water uptake
-!     THeatRootUptake_vr=total convective heat in root water uptake
+!     AllPlantRootH2OLoss_vr=total water uptake
+!     AllPlantRootH2OLoss_vr=PFT root water uptake
+!     THeatLossRoot2Soil_vr=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
@@ -211,9 +212,16 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OUptake_col   = TPlantRootH2OUptake_col+AllPlantRootH2OUptake_vr(N,L,NZ)
-      TPlantRootH2OUptake_vr(L) = TPlantRootH2OUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)
-      THeatRootUptake_vr(L)     = THeatRootUptake_vr(L)+AllPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS_vr(L)
+      TPlantRootH2OUptake_col = TPlantRootH2OUptake_col+AllPlantRootH2OLoss_vr(N,L,NZ)
+      TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
+
+      !water lose from canopy to soil
+      if(AllPlantRootH2OLoss_vr(N,L,NZ)>0._r8)then
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
+      !water lose from soil to canopy  
+      else
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKS_vr(L)
+      endif
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !
@@ -222,9 +230,9 @@ module ExtractsMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
-      DO NTG=idg_beg,idg_NH3
-        trcg_rootml_pvr(NTG,N,L,NZ) = trcg_rootml_pvr(NTG,N,L,NZ)-trcg_Root_gas2aqu_flx_vr(NTG,N,L,NZ)+trcg_air2root_flx_pvr(NTG,N,L,NZ)
-        trcs_rootml_pvr(NTG,N,L,NZ) = trcs_rootml_pvr(NTG,N,L,NZ)+trcg_Root_gas2aqu_flx_vr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        trcg_rootml_pvr(idg,N,L,NZ) = trcg_rootml_pvr(idg,N,L,NZ)-trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)+trcg_air2root_flx_pvr(idg,N,L,NZ)
+        trcs_rootml_pvr(idg,N,L,NZ) = trcs_rootml_pvr(idg,N,L,NZ)+trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)
       ENDDO
 
       trcs_rootml_pvr(idg_CO2,N,L,NZ) = trcs_rootml_pvr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
@@ -239,8 +247,8 @@ module ExtractsMod
 !     TL*P=total root gas content, dissolved + gaseous phase
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
-      DO NTG=idg_beg,idg_end-1
-        trcg_root_vr(NTG,L)=trcg_root_vr(NTG,L)+trcs_rootml_pvr(NTG,N,L,NZ)+trcg_rootml_pvr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)
       ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
@@ -254,12 +262,13 @@ module ExtractsMod
 !     solute code:NH4=NH4,NO3=NO3,H2P=H2PO4,H1P=H1PO4 in non-band
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
-      DO NTG=idg_beg,idg_end-1
-        trcg_air2root_flx_vr(NTG,L)=trcg_air2root_flx_vr(NTG,L)+trcg_air2root_flx_pvr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
 
-      tRootCO2Emis_vr(L) =tRootCO2Emis_vr(L)-RootCO2Emis_pvr(N,L,NZ)
+      tRootCO2Emis2Root_vr(L) =tRootCO2Emis2Root_vr(L)-RootCO2Emis_pvr(N,L,NZ)
       tRO2MicrbUptk_vr(L)=tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_vr(idg,N,L,NZ)
       ENDDO
@@ -283,24 +292,6 @@ module ExtractsMod
 !     TOTAL ROOT + MICROBIAL UPTAKE USED TO CALCULATE
 !     COMPETITION CONSTRAINTS
 !
-!     REcoO2DmndResp_vr=O2 demand by all microbial,root,myco populations
-!     REcoNH4DmndSoil_vr=NH4 demand in non-band by all microbial,root,myco populations
-!     REcoNO3DmndSoil_vr=NO3 demand in non-band by all microbial,root,myco populations
-!     REcoH2PO4DmndSoil_vr=H2PO4 demand in non-band by all microbial,root,myco populations
-!     REcoH1PO4DmndSoil_vr=HPO4 demand in non-band by all microbial,root,myco populations
-!     REcoNH4DmndBand_vr=NH4 demand in band by all microbial,root,myco populations
-!     REcoNO3DmndBand_vr=NO3 demand in band by all microbial,root,myco populations
-!     REcoH2PO4DmndBand_vr=H2PO4 demand in band by all microbial,root,myco populations
-!     REcoH1PO4DmndBand_vr=HPO4 demand in band by all microbial,root,myco populations
-!     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-!     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root population
-!     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root population
-!     RootH2PO4DmndSoil_pvr=H2PO4 demand in non-band by each root population
-!     RootH1PO4DmndSoil_pvr=HPO4 demand in non-band by each root population
-!     RootNH4DmndBand_pvr=NH4 demand in band by each root population
-!     RUNNXB=NO3 demand in band by each root population
-!     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root population
-!     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root population
 !
       REcoO2DmndResp_vr(L)=REcoO2DmndResp_vr(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
       REcoNH4DmndSoil_vr(L)=REcoNH4DmndSoil_vr(L)+RootNH4DmndSoil_pvr(N,L,NZ)
@@ -327,7 +318,7 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: L, NE,NB,NTG
+  integer :: L, NE,NB,idg
   real(r8) :: ENGYC
 
   associate(                                                         &
@@ -349,7 +340,7 @@ module ExtractsMod
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,          &
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft,         &
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft,          &
-    CanopyWater_pft           => plt_ew%CanopyWater_pft,             &
+    CanopyBiomWater_pft           => plt_ew%CanopyBiomWater_pft,             &
     Eco_Heat_GrndSurf_col     => plt_ew%Eco_Heat_GrndSurf_col,       &
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft,           &
     EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft,          &
@@ -396,7 +387,7 @@ module ExtractsMod
 !     Canopy_NEE_col=total net CO2 fixation
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     CanopyWat_col,WatHeldOnCanopy=total water volume in canopy,on canopy surfaces
-!     CanopyWater_pft,WatHeldOnCanopy_pft=PFT water volume in canopy,on canopy surfaces
+!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=PFT water volume in canopy,on canopy surfaces
 !     QVegET_col,VapXAir2Canopy_col=total water flux to,from canopy,canopy surfaces
 !     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     CanopyHeatStor_col=total canopy water heat content
@@ -416,7 +407,7 @@ module ExtractsMod
   Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
   Canopy_NEE_col         = Canopy_NEE_col+CO2NetFix_pft(NZ)
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  CanopyWat_col          = CanopyWat_col+CanopyWater_pft(NZ)
+  CanopyWat_col          = CanopyWat_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
   QVegET_col               = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
@@ -433,8 +424,8 @@ module ExtractsMod
     PlantElemntStoreLandscape(NE) = PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
   ENDDO
 
-  DO NTG=idg_beg,idg_end-1
-    TRootGasLossDisturb_pft(NTG)=TRootGasLossDisturb_pft(NTG)+RootGasLossDisturb_pft(NTG,NZ)
+  DO idg=idg_beg,idg_NH3
+    TRootGasLossDisturb_pft(idg)=TRootGasLossDisturb_pft(idg)+RootGasLossDisturb_pft(idg,NZ)
   ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION

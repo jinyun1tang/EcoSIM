@@ -5,10 +5,11 @@ module WthrMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use MiniMathMod,       only: safe_adb, vapsat0, isclose
   use MiniFuncMod,       only: get_sun_declin
-  use EcoSIMCtrlMod,     only: etimer,   frectyp
+  use EcoSIMCtrlMod,     only: etimer, frectyp
   use PlantMgmtDataType, only: NP
   use MiniMathMod,       only: AZMAX1
   use UnitMod,           only: units
+  use DebugToolMod  
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -56,6 +57,8 @@ module WthrMod
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
+
+  character(len=*), parameter :: subname='WTHR'
   integer :: ITYPE,NX,NY,N,NZ,mon
   real(r8) :: PrecAsRain_col(JY,JX)
   real(r8) :: PrecAsSnow_col(JY,JX)
@@ -65,7 +68,7 @@ module WthrMod
   real(r8) :: VPS(JY,JX)
 
   !     execution begins here
-
+  call PrintInfo('beg '//subname)
   XJ=J
   DOY=I-1+XJ/24
   !
@@ -112,7 +115,7 @@ module WthrMod
   ENDDO
 
   call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col)
-
+  call PrintInfo('end '//subname)
   END subroutine wthr
 !------------------------------------------------------------------------------------------
 
@@ -375,8 +378,8 @@ module WthrMod
       !     PRECII_col,PRECUI=surface,subsurface irrigation
       !     RRIG=irrigation from soil management file in reads.f
       !
-!      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayerBot_vr(NU(NY,NX)-1,NY,NX)
-!      IF(WDPTHD.LE.CumDepz2LayerBot_vr(NU(NY,NX),NY,NX))THEN
+!      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
+!      IF(WDPTHD.LE.CumDepz2LayBottom_vr(NU(NY,NX),NY,NX))THEN
         PRECII_col(NY,NX) = RRIG(J,I,NY,NX)   !surface irrigation
         PRECUI_col(NY,NX) = 0.0_r8
 !      ELSE
@@ -521,8 +524,8 @@ module WthrMod
       PrecAsSnow_col(NY,NX)   = PrecAsSnow_col(NY,NX)*TDPRC(N,NY,NX)
       PRECII_col(NY,NX)       = PRECII_col(NY,NX)*TDIRI(N,NY,NX)
       PRECUI_col(NY,NX)       = PRECUI_col(NY,NX)*TDIRI(N,NY,NX)
-      NH4_rain_conc(NY,NX)    = CN4RI(NY,NX)*TDCN4(N,NY,NX)
-      NO3_rain_conc(NY,NX)    = CNORI(NY,NX)*TDCNO(N,NY,NX)
+      NH4_rain_mole_conc(NY,NX)    = CN4RI(NY,NX)*TDCN4(N,NY,NX)
+      NO3_rain_mole_conc(NY,NX)    = CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
   end subroutine CorrectClimate
@@ -548,10 +551,10 @@ module WthrMod
         RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
       TAMX(NY,NX)  = AMAX1(TAMX(NY,NX),TCA_col(NY,NX))          !celcius
       TAMN(NY,NX)  = AMIN1(TAMN(NY,NX),TCA_col(NY,NX))          !celcius
-      HUDX(NY,NX)  = AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity,                     vapor pressure, KPa
-      HUDN(NY,NX)  = AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity,                     vapor pressure, KPa
-      TWIND(NY,NX) = TWIND(NY,NX)+WindSpeedAtm_col(NY,NX)      !wind speed,                            m/hr
-      VPA(NY,NX)   = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)    !atmospheric vapor concentration, [m3 m-3],       2.173E-03_r8 = 18g/mol/(8.3142)
+      HUDX(NY,NX)  = AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
+      HUDN(NY,NX)  = AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
+      TWIND(NY,NX) = TWIND(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]
+      VPA_col(NY,NX)   = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)    !atmospheric vapor concentration, [m3 m-3],       2.173E-03_r8 = 18g/mol/(8.3142)
 !
       !     WATER AND HEAT INPUTS TO GRID CELLS
       !

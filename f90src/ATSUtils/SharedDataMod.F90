@@ -17,7 +17,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
-  real(r8), allocatable :: a_CumDepz2LayerBot_vr(:,:)   !dpeth (from surfce to bottom)
+  real(r8), allocatable :: a_CumDepz2LayBottom_vr(:,:)   !dpeth (from surfce to bottom)
   real(r8), allocatable :: a_Volume(:,:)   !volume
   real(r8), allocatable :: a_dz(:,:)      !distance between layers  
   real(r8), allocatable :: a_AreaZ(:,:)   !Area normal to z axis
@@ -83,7 +83,7 @@ Module SharedDataMod
     allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
     !allocate(a_AreaZ(ncells_per_col_,ncol))   !actually need to allocate area
     !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
-    !allocate(a_CumDepz2LayerBot_vr(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
+    !allocate(a_CumDepz2LayBottom_vr(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
     !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
     !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
     allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
@@ -151,7 +151,7 @@ Module SharedDataMod
   call destroy(a_BKDSI)
   call destroy(a_MATP)
   call destroy(a_AreaZ)
-  call destroy(a_CumDepz2LayerBot_vr)
+  call destroy(a_CumDepz2LayBottom_vr)
   call destroy(a_FC)
   call destroy(a_WP)
   call destroy(a_FHOL)

@@ -184,9 +184,9 @@ module readsmod
       D125: DO I=1,366
         RRIG(1:24,I,NY,NX)=0.0_r8
         PHQ(I,NY,NX)=7.0_r8
-        NH4_irrig_conc(I,NY,NX)=0.0_r8
-        NO3_irrig_conc(I,NY,NX)=0.0_r8
-        H2PO4_irrig_conc(I,NY,NX)=0.0_r8
+        NH4_irrig_mole_conc(I,NY,NX)=0.0_r8
+        NO3_irrig_mole_conc(I,NY,NX)=0.0_r8
+        H2PO4_irrig_mole_conc(I,NY,NX)=0.0_r8
 
         WDPTH(I,NY,NX)=0.0_r8
         ROWI(I,NY,NX)=0.0_r8
@@ -326,9 +326,9 @@ module readsmod
       PHR(NY,NX)=PHRG
       CN4RI(NY,NX)=CN4RIG
       CNORI(NY,NX)=CNORIG
-      NH4_rain_conc(NY,NX)=CN4RIG
-      NO3_rain_conc(NY,NX)=CNORIG
-      H2PO4_rain_conc(NY,NX)=CPORG
+      NH4_rain_mole_conc(NY,NX)=CN4RIG
+      NO3_rain_mole_conc(NY,NX)=CNORIG
+      H2PO4_rain_mole_conc(NY,NX)=CPORG
 
     ENDDO D8975
   ENDDO D8970

@@ -11,8 +11,8 @@ module ATSEcoSIMInitMod
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
       FracSoiPAsIce_vr, FracSoilPoreAsAir_vr!need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
-  use ClimForcDataType, only : LWRadSky_col, TairK_col, VPK_col,  &
-      VPA, WindSpeedAtm_col, RainH
+  use ClimForcDataType, only : LWRadSky_col, TairK_col, &
+      VPA_col, WindSpeedAtm_col, RainH
   use SoilPropertyDataType
   use SurfLitterDataType
   use EcoSIMConfig
@@ -103,7 +103,7 @@ implicit none
 
     DO L=NU(NY,NX),NL(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
-      CumDepz2LayerBot_vr(L,NY,NX)=a_CumDepz2LayerBot_vr(L,NY)
+      CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
       POROS_vr(L,NY,NX)=a_PORO(L,NY)
       AREA(3,L,NY,NX)=a_AREA3(L,NY)
       !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
