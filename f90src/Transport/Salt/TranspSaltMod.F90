@@ -35,35 +35,10 @@ module TranspSaltMod
 
   real(r8) :: RCHQF,RCHGFU,RCHGFT
   real(r8) :: XN
-  real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
-
-  real(r8),allocatable ::  trcSalt_TQ(:,:,:)                         !
-
-!----------------------------------------------------------------------
-
-
 
   public :: TranspSalt
-  public :: initTranspSalt
-  public :: destructTranspSalt
   contains
-!----------------------------------------------------------------------
-  subroutine DestructTranspSalt
-  use abortutils, only : destroy
-  implicit none
 
-
-
-  end subroutine DestructTranspSalt
-
-!----------------------------------------------------------------------
-
-  subroutine initTranspSalt()
-  implicit none
-
-  allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));       trcSalt_TQR=0._r8
-  
-  end subroutine InitTranspSalt
 !----------------------------------------------------------------------
   SUBROUTINE TranspSalt(I,J,NHW,NHE,NVN,NVS)
 !
@@ -78,6 +53,8 @@ module TranspSaltMod
 
   integer :: NX,NY,L,M
   real(r8) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
+  real(r8) :: trcSalt_FloXSurRof_flxM_col(idsalt_beg:idsalt_end,JY,JX)
+  real(r8) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
 !     execution begins here
 
 !
@@ -95,10 +72,9 @@ module TranspSaltMod
 !
 !     BOUNDARY SOLUTE AND GAS FLUXES
 !
-    call SaltXGridTransptM(M,NHW,NHE,NVN,NVS)
+    call SaltXGridTransptM(M,NHW,NHE,NVN,NVS,trcSalt_FloXSurRof_flxM_col,trcSalt_SnowDrift_flxM_col)
 !
-!
-    call UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
+    call UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr,trcSalt_FloXSurRof_flxM_col,trcSalt_SnowDrift_flxM_col)
 
   ENDDO D30
   RETURN
@@ -285,13 +261,9 @@ module TranspSaltMod
 !
 !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
 !
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     *SGL*=solute diffusivity from hour1.f
-!     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
-!                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    SoluteDifusivitytscaledM_vr(L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
 
-    AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,L,NY,NX)=AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,L,NY,NX)*dts_HeatWatTP
+    SoluteDifusivitytscaledM_vr(L,NY,NX)                 = SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+    AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,L,NY,NX) = AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,L,NY,NX)*dts_HeatWatTP
 !
 !     STATE VARIABLES FOR SOLUTES USED IN 'TranspSalt'
 !     TO STORE SUB-HOURLY CHANGES DURING FLUX CALCULATIONS
@@ -546,60 +518,50 @@ module TranspSaltMod
   end subroutine AccumFluxMacMicPores
 !------------------------------------------------------------------------------------------
 
-  subroutine NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B)
+  subroutine NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B,trcSalt_FloXSurRof_flxM_col)
 !
 !     Description:
 !
-  integer, intent(in) :: M,N,N1,N2,N4,N5,N4B,N5B
+  integer , intent(in) :: M,N,N1,N2,N4,N5,N4B,N5B
+  real(r8), intent(inout) :: trcSalt_FloXSurRof_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   integer :: NN,idsalt
 !     begin_execution
 !
-!     TQR*=net overland solute flux
-!     RQR*=overland solute flux
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
+
   D1202: DO NN=1,2
     DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_TQR(idsalt,N2,N1)=trcSalt_TQR(idsalt,N2,N1)+trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N2,N1)
+      trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)=trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)+trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
       DO idsalt=idsalt_beg,idsalt_end
-        trcSalt_TQR(idsalt,N2,N1)=trcSalt_TQR(idsalt,N2,N1)-trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N5,N4)
+        trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)=trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)-trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N5,N4)
       ENDDO
 
     ENDIF
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
       DO idsalt=idsalt_beg,idsalt_end
-        trcSalt_TQR(idsalt,N2,N1)=trcSalt_TQR(idsalt,N2,N1)-trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N5B,N4B)
+        trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)=trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)-trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   ENDDO D1202
   end subroutine NetOverloadFluxInWater
 !------------------------------------------------------------------------------------------
 
-  subroutine NetOverloadFLuxInSnow(N,N1,N2,N4,N5)
+  subroutine NetOverloadFLuxInSnow(N,N1,N2,N4,N5, trcSalt_SnowDrift_flxM_col)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5
-
+  real(r8), intent(inout) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   integer :: idsalt
 !     begin_execution
 !     TQS*=net solute flux in snow transfer
 !     RQS*=solute flux in snow transfer
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_TQ(idsalt,N2,N1)=trcSalt_TQ(idsalt,N2,N1)+trcSalt_SnowDrift_flxM_2D(idsalt,N,N2,N1)-trcSalt_SnowDrift_flxM_2D(idsalt,N,N5,N4)
+    trcSalt_SnowDrift_flxM_col(idsalt,N2,N1)=trcSalt_SnowDrift_flxM_col(idsalt,N2,N1)+trcSalt_SnowDrift_flxM_2D(idsalt,N,N2,N1)-trcSalt_SnowDrift_flxM_2D(idsalt,N,N5,N4)
   ENDDO
   end subroutine NetOverloadFLuxInSnow
 !------------------------------------------------------------------------------------------
@@ -684,14 +646,17 @@ module TranspSaltMod
   end subroutine TotFluxInMacMicPores
 !------------------------------------------------------------------------------------------
 
-  subroutine SaltXGridTransptM(M,NHW,NHE,NVN,NVS)
+  subroutine SaltXGridTransptM(M,NHW,NHE,NVN,NVS,trcSalt_FloXSurRof_flxM_col, trcSalt_SnowDrift_flxM_col)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
+  real(r8), intent(out) :: trcSalt_FloXSurRof_flxM_col(idsalt_beg:idsalt_end,JY,JX)  
+  real(r8), intent(out) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   integer :: NY,NX,L,N1,N2,N3,N4,N5,N6,N4B,N5B,N,NN
   integer :: M1,M2,M3,M4,M5,M6
+
 !     begin_execution
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     M6,M5,M4=L,NY,NX of destination grid cell
@@ -699,6 +664,8 @@ module TranspSaltMod
 
   D9595: DO NX=NHW,NHE
     D9590: DO NY=NVN,NVS
+      trcSalt_FloXSurRof_flxM_col(idsalt_beg:idsalt_end,NY,NX) =0._r8    
+      trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,NY,NX)=0.0
       D9585: DO L=NU(NY,NX),NL(NY,NX)
         !source grid
         N1=NX;N2=NY;N3=L
@@ -898,10 +865,10 @@ module TranspSaltMod
 !
 !     NET OVERLAND SOLUTE FLUX IN WATER
 !
-              call NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B)
+              call NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B,trcSalt_FloXSurRof_flxM_col)
 !
 !     NET OVERLAND SOLUTE FLUX IN SNOW
-              call NetOverloadFLuxInSnow(N,N1,N2,N4,N5)
+              call NetOverloadFLuxInSnow(N,N1,N2,N4,N5, trcSalt_SnowDrift_flxM_col)
 !
             ELSEIF(N.EQ.3)THEN
 !     NET SOLUTE FLUX IN SNOWPACK
@@ -957,13 +924,16 @@ module TranspSaltMod
   end subroutine UpdateSaltLitrM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
+  subroutine UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr,trcSalt_FloXSurRof_flxM_col,&
+      trcSalt_SnowDrift_flxM_col)
 !
 !     Description:
 !
   implicit none
   integer , intent(in) :: M,NHW,NHE,NVN,NVS
   real(r8), intent(in) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
+  real(r8), intent(in) :: trcSalt_FloXSurRof_flxM_col(idsalt_beg:idsalt_end,JY,JX)
+  real(r8), intent(in) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   integer :: L,idsalt,NY,NX
 
 !     begin_execution
@@ -973,7 +943,7 @@ module TranspSaltMod
     D9690: DO NY=NVN,NVS
 
       DO idsalt=idsalt_beg,idsalt_end
-        trc_Saltml2_snvr(idsalt,1,NY,NX)=trc_Saltml2_snvr(idsalt,1,NY,NX)+trcSalt_TQ(idsalt,NY,NX)
+        trc_Saltml2_snvr(idsalt,1,NY,NX)=trc_Saltml2_snvr(idsalt,1,NY,NX)+trcSalt_SnowDrift_flxM_col(idsalt,NY,NX)
       ENDDO
 
       D9670: DO L=1,JS
@@ -984,7 +954,7 @@ module TranspSaltMod
 
       DO idsalt=idsalt_beg,idsalt_end
         trcSalt_solml2_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX) &
-          +trcSalt_TQR(idsalt,NY,NX)+trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)
+          +trcSalt_FloXSurRof_flxM_col(idsalt,NY,NX)+trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)
       ENDDO
 
       D9685: DO L=NU(NY,NX),NL(NY,NX)
@@ -996,7 +966,6 @@ module TranspSaltMod
             trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml2_vr(idsalt,L,NY,NX) &
               +trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)-trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX)
           ENDDO
-
         ENDIF
       ENDDO D9685
     ENDDO D9690
@@ -1008,9 +977,11 @@ module TranspSaltMod
   subroutine InitFluxArraysM(NHW,NHE,NVN,NVS)
 
   implicit none
-  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer , intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX
+
+
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 !
@@ -1037,9 +1008,7 @@ module TranspSaltMod
   integer, intent(in) :: NY,NX
 !     begin_execution
 !
-  trcSalt_TQR(idsalt_beg:idsalt_end,NY,NX)=0.0
 
-  trcSalt_TQ(idsalt_beg:idsalt_end,NY,NX)=0.0
   end subroutine InitFluxAccumlatorsByRunoff
 !------------------------------------------------------------------------------------------
 
