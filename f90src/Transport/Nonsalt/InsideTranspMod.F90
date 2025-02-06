@@ -139,11 +139,6 @@ module InsideTranspMod
 !
 !     RESET RUNOFF SOLUTE FLUX ACCUMULATORS
 !
-!     R*SK2=total sink from nitro.f, uptake.f, solute.f
-!     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in micropores
-!     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
-!     ZN3G=gaseous NH3
 !
 
     DO  K=1,jcplx
@@ -1001,18 +996,6 @@ module InsideTranspMod
 !     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
 !     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
 !
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,R*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,R*FHB=convective + diffusive solute flux through macropores in non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     RFL*=convective flux through micropores
-!     DFV*=diffusive solute flux through micropores
-!     RFH*=convective flux through macropores
-!     DFH*=diffusive solute flux through macropores
 !
   D9765: DO K=1,jcplx
     do idom=idom_beg,idom_end
@@ -1024,14 +1007,6 @@ module InsideTranspMod
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-!     X*FLS=hourly convective + diffusive solute flux through micropores
-!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band
-!     X*FHS=hourly convective + diffusive solute flux through macropores
-!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,X*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,X*FHB=convective + diffusive solute flux through macropores in non-band,band
 !
   D9755: DO K=1,jcplx
     do idom=idom_beg,idom_end

@@ -89,34 +89,17 @@ module TranspSaltMod
 !
   D30: DO M=1,NPH
 !
-    call InitFluxArrays(NHW,NHE,NVN,NVS)
+    call InitFluxArraysM(NHW,NHE,NVN,NVS)
 
-    call SaltModelSoluteHydroFlux(I,M,NHW,NHE,NVN,NVS)
+    call SaltHydroTranpModelM(I,M,NHW,NHE,NVN,NVS)
 !
 !     BOUNDARY SOLUTE AND GAS FLUXES
 !
-    call SaltModelInternalFlux(M,NHW,NHE,NVN,NVS)
+    call SaltXGridTransptM(M,NHW,NHE,NVN,NVS)
 !
-!     UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
 !
-    D9695: DO NX=NHW,NHE
-      D9690: DO NY=NVN,NVS
-!
-!     STATE VARIABLES FOR SOLUTES IN MICROPORES AND MACROPORES IN
-!     SOIL SURFACE LAYER FROM OVERLAND FLOW
-!
-        call UpdateSoluteInSnow(NY,NX)
-!
-!     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE FROM OVERLAND
-!     FLOW AND SURFACE FLUX
-        call UpdateSoluteInResidue(NY,NX)
-!
-!     STATE VARIABLES FOR GASES AND FOR SOLUTES IN MICROPORES AND
-!     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, EQUILIBRIUM
-!     REACTIONS IN SOLUTE
-        call UpdateSoluteInMicMacpores(NY,NX,trcSalt_Irrig_flxM_vr)
-      ENDDO D9690
-    ENDDO D9695
+    call UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
+
   ENDDO D30
   RETURN
 
@@ -701,7 +684,7 @@ module TranspSaltMod
   end subroutine TotFluxInMacMicPores
 !------------------------------------------------------------------------------------------
 
-  subroutine SaltModelInternalFlux(M,NHW,NHE,NVN,NVS)
+  subroutine SaltXGridTransptM(M,NHW,NHE,NVN,NVS)
 !
 !     Description:
 !
@@ -937,10 +920,10 @@ module TranspSaltMod
       ENDDO D9585
     ENDDO D9590
   ENDDO D9595
-  end subroutine SaltModelInternalFlux
+  end subroutine SaltXGridTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSoluteInSnow(NY,NX)
+  subroutine UpdateSaltSnowM(NY,NX)
 !
 !     Description:
 !
@@ -949,18 +932,11 @@ module TranspSaltMod
 !     begin_execution
 
 !
-  DO idsalt=idsalt_beg,idsalt_end
-    trc_Saltml2_snvr(idsalt,1,NY,NX)=trc_Saltml2_snvr(idsalt,1,NY,NX)+trcSalt_TQ(idsalt,NY,NX)
-  ENDDO
-  D9670: DO L=1,JS
-    DO idsalt=idsalt_beg,idsalt_end
-      trc_Saltml2_snvr(idsalt,L,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)+trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)
-    ENDDO
-  ENDDO D9670
-  end subroutine UpdateSoluteInSnow
+
+  end subroutine UpdateSaltSnowM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSoluteInResidue(NY,NX)
+  subroutine UpdateSaltLitrM(NY,NX)
 !
 !     Description:
 !
@@ -977,40 +953,59 @@ module TranspSaltMod
 !     TQR*=net overland solute flux
 
 !
-  DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_solml2_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX) &
-      +trcSalt_TQR(idsalt,NY,NX)+trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)
-  ENDDO
-  end subroutine UpdateSoluteInResidue
+
+  end subroutine UpdateSaltLitrM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSoluteInMicMacpores(NY,NX,trcSalt_Irrig_flxM_vr)
+  subroutine UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
 !
 !     Description:
 !
   implicit none
-  integer, intent(in) :: NY,NX
+  integer , intent(in) :: M,NHW,NHE,NVN,NVS
   real(r8), intent(in) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
-  integer :: L,idsalt
+  integer :: L,idsalt,NY,NX
+
 !     begin_execution
 !
-  D9685: DO L=NU(NY,NX),NL(NY,NX)
-    IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      DO idsalt=idsalt_beg,idsaltb_end
-        trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml2_vr(idsalt,L,NY,NX) &
-          +trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX) &
-          +trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)
-        trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml2_vr(idsalt,L,NY,NX) &
-          +trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)-trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX)
+
+  D9695: DO NX=NHW,NHE
+    D9690: DO NY=NVN,NVS
+
+      DO idsalt=idsalt_beg,idsalt_end
+        trc_Saltml2_snvr(idsalt,1,NY,NX)=trc_Saltml2_snvr(idsalt,1,NY,NX)+trcSalt_TQ(idsalt,NY,NX)
       ENDDO
 
-    ENDIF
-  ENDDO D9685
-  end subroutine UpdateSoluteInMicMacpores
+      D9670: DO L=1,JS
+        DO idsalt=idsalt_beg,idsalt_end
+          trc_Saltml2_snvr(idsalt,L,NY,NX)=trc_Saltml2_snvr(idsalt,L,NY,NX)+trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)
+        ENDDO
+      ENDDO D9670
+
+      DO idsalt=idsalt_beg,idsalt_end
+        trcSalt_solml2_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX) &
+          +trcSalt_TQR(idsalt,NY,NX)+trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)
+      ENDDO
+
+      D9685: DO L=NU(NY,NX),NL(NY,NX)
+        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          DO idsalt=idsalt_beg,idsaltb_end
+            trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml2_vr(idsalt,L,NY,NX) &
+              +trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX) &
+              +trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)
+            trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml2_vr(idsalt,L,NY,NX) &
+              +trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)-trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX)
+          ENDDO
+
+        ENDIF
+      ENDDO D9685
+    ENDDO D9690
+  ENDDO D9695  
+  end subroutine UpdateSaltTranspM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitFluxArrays(NHW,NHE,NVN,NVS)
+  subroutine InitFluxArraysM(NHW,NHE,NVN,NVS)
 
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1029,7 +1024,7 @@ module TranspSaltMod
       call InitFluxAccumulatorsInSoil(NY,NX)
     ENDDO
   ENDDO
-  end subroutine InitFluxArrays
+  end subroutine InitFluxArraysM
 
 
 !------------------------------------------------------------------------------------------

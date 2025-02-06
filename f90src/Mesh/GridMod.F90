@@ -86,7 +86,7 @@ contains
     bounds%NHE =1
     bounds%NVS =1
   endif  
-
+  JZ=20
   bounds%begg=1;bounds%endg=bounds%ngrid
   bounds%begt=1;bounds%endt=bounds%ntopou
   nextra_grid=1

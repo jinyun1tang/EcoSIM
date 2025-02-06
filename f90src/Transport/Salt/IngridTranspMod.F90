@@ -17,13 +17,13 @@ module IngridTranspMod
   __FILE__
 
   real(r8), PARAMETER :: XFRS=0.05_r8
-  public :: SaltModelSoluteHydroFlux
+  public :: SaltHydroTranpModelM
   contains
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SaltModelSoluteHydroFlux(I,M,NHW,NHE,NVN,NVS)
+  subroutine SaltHydroTranpModelM(I,M,NHW,NHE,NVN,NVS)
 !
 !     Description:
 !
@@ -35,7 +35,7 @@ module IngridTranspMod
   real(r8) :: trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: trcSaltSnoFlo2LitR(idsalt_beg:idsalt_end)
-  real(r8) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)
 !     begin_execution
 
@@ -43,12 +43,12 @@ module IngridTranspMod
     DO  NY=NVN,NVS
 !
 !     ADD SINKS FROM SOLUTE.F
-      call SoluteSinksInSoil(NY,NX)
+      call SaltGeochemSinksM(NY,NX)
 !
 !     SOLUTE FLUXES FROM MELTING SNOWPACK TO
 !     SOIL SURFACE FROM SNOWMELT IN 'WATSUB' AND
 !     CONCENTRATIONS IN SNOWPACK
-      call SoluteFluxInSnowpack(M,NY,NX,trcSaltSnoFlo2Soil,trcSaltSnoFlo2LitR)
+      call SnowSaltTranptM(M,NY,NX,trcSaltSnoFlo2Soil,trcSaltSnoFlo2LitR)
 !
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
@@ -56,10 +56,10 @@ module IngridTranspMod
 !
 
       IF(FLWRM1.GT.0.0_r8)THEN
-        call Residue2TopsoilSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
+        call Litr2SoilAdvTransptM(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
 !
       ELSE
-        call Topsoil2ResidueSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
+        call Soil2LitrAdvTransptM(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
       ENDIF
 !
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
@@ -69,21 +69,21 @@ module IngridTranspMod
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !
-      IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
-        .AND.(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
+      IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
+        .AND. (VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 
-        call TopsoilResidueSolutedifusExch(M,NY,NX,FLWRM1,trcSalt_flx_diffus)
+        call Litr2SoilDifusTransptM(M,NY,NX,FLWRM1,trcSalt_flx_diffusM)
       ELSE
-        trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8
+        trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)=0.0_r8
       ENDIF
 !
 !     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
 !     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
 
-      call TopsoilResidueFluxAdvPlusDifus(NY,NX,trcSaltSnoFlo2Soil,&
-        trcSalt_Adv2MicP_flx,trcSaltSnoFlo2LitR,trcSalt_flx_diffus)
+      call LitrSoilAdvDifusTransptM(NY,NX,trcSaltSnoFlo2Soil,&
+        trcSalt_Adv2MicP_flx,trcSaltSnoFlo2LitR,trcSalt_flx_diffusM)
 !
-      call AccumHourlyTopsoilReisdueFlux(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffus,&
+      call AccumLitrSoilSaltTranspFluxM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,&
         trcSaltSnoFlo2LitR,trcSaltSnoFlo2Soil)
 !
 !     MACROPORE-MICROPORE SOLUTE EXCHANGE IN SOIL
@@ -94,12 +94,12 @@ module IngridTranspMod
 !     MACROPORE TO MICROPORE TRANSFER
 !
       IF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).GT.0.0)THEN
-        call MacToMicPoreSoluteAdvExchange(M,NY,NX)
+        call MacPoreSaltAdvExM(M,NY,NX)
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
       ELSEIF(FWatExMacP2MicPM_vr(M,NU(NY,NX),NY,NX).LT.0.0)THEN
-        call MicToMacPoreSoluteAdvExchange(M,NY,NX)
+        call MicPoreSaltAdvExM(M,NY,NX)
 !
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
@@ -111,16 +111,14 @@ module IngridTranspMod
 !     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
 !
       IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-        call MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_Difus_Mac2Micp_flxM)
+        call MacMicPoreSaltDifusExM(M,NY,NX,trcSalt_Difus_Mac2Micp_flxM)
       ELSE
         trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)=0.0_r8
       ENDIF
 !
-!     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
-!      call MacMicPoreFluxAdvPlusDifus(NY,NX,trcSalt_Difus_Mac2Micp_flxM,trcSalt_Adv2MicP_flx)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-      call AccumHourlyMicMacPoreFlux(NY,NX)
+      call AccumMicMacPoreSaltTranspM(NY,NX)
 !
 !     SOLUTE TRANSPORT FROM WATER OVERLAND FLOW
 !     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
@@ -129,20 +127,20 @@ module IngridTranspMod
 !
       N1=NX;N2=NY
 
-      call SoluteFluxBySurfaceOutflow(M,N1,N2)
+      call SaltFlowThruLitrRofM(M,N1,N2)
 !
-      call UpdateSoluteInSurfNeighbors(M,N1,N2,NY,NX,NHW,NHE,NVN,NVS)
+      call SaltFlowThruSnowRofM(M,N1,N2,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
-      call UpdateSoluteInSubsurfNeighbors(M,NY,NX,NHW,NHE,NVN,NVS)
+      call SaltExchXGridsM(M,NY,NX,NHW,NHE,NVN,NVS)
 
     ENDDO
   ENDDO
-  end subroutine SaltModelSoluteHydroFlux
+  end subroutine SaltHydroTranpModelM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SoluteSinksInSoil(NY,NX)
+  subroutine SaltGeochemSinksM(NY,NX)
 !
 !     Description:
 !
@@ -153,16 +151,15 @@ module IngridTranspMod
 !     begin_execution
 !
 
-!
   DO L=NU(NY,NX),NL(NY,NX)
     DO idsalt=idsalt_beg,idsaltb_end
       trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml2_vr(idsalt,L,NY,NX)-trcSalt_RGeoChem_flxM_vr(idsalt,L,NY,NX)
     ENDDO
   ENDDO
-  end subroutine SoluteSinksInSoil
+  end subroutine SaltGeochemSinksM
 !------------------------------------------------------------------------------------------
 
-  subroutine SoluteFluxInSnowpack(M,NY,NX,trcSaltSnoFlo2Soil,trcSaltSnoFlo2LitR)
+  subroutine SnowSaltTranptM(M,NY,NX,trcSaltSnoFlo2Soil,trcSaltSnoFlo2LitR)
 !
 !     Description:
 !
@@ -248,10 +245,10 @@ module IngridTranspMod
       trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)=0.0_r8
     ENDIF
   ENDDO
-  end subroutine SoluteFluxInSnowpack
+  end subroutine SnowSaltTranptM
 !------------------------------------------------------------------------------------------
 
-  subroutine Residue2TopsoilSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
+  subroutine Litr2SoilAdvTransptM(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
 !
 !     Description:
 !
@@ -281,15 +278,13 @@ module IngridTranspMod
 
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B  
-    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX)) &
-      *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    trcSalt_Adv2MicP_flx(ids)=VFLW*AZMAX1(trcSalt_solml2_vr(ids,0,NY,NX)) &
-      *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
+    trcSalt_Adv2MicP_flx(idsalt) = VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcSalt_Adv2MicP_flx(ids)    = VFLW*AZMAX1(trcSalt_solml2_vr(ids,0,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
-  end subroutine Residue2TopsoilSoluteAdvExch
+  end subroutine Litr2SoilAdvTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine Topsoil2ResidueSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
+  subroutine Soil2LitrAdvTransptM(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
 !
 !     Description:
 !
@@ -316,17 +311,17 @@ module IngridTranspMod
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX))
   ENDDO
-  end subroutine Topsoil2ResidueSoluteAdvExch
+  end subroutine Soil2LitrAdvTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine TopsoilResidueSolutedifusExch(M,NY,NX,FLWRM1,trcSalt_flx_diffus)
+  subroutine Litr2SoilDifusTransptM(M,NY,NX,FLWRM1,trcSalt_flx_diffusM)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),intent(in) :: FLWRM1
-  real(r8),intent(out) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8),intent(out) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   real(r8) :: DLYR1,DLYR2,TORTL,DISPN,DIFPO,DIFAL,DIFFE,DIFCA,DIFMG,DIFNA,DIFKA
   real(r8) :: trcSaltDiffConductance(idsalt_beg:idsalt_KSO4)
   real(r8) :: trcSalt_conc_src(idsalt_beg:idsaltb_end)    !tracer solute concentration in source cell
@@ -338,8 +333,6 @@ module IngridTranspMod
 !
 !     MICROPORE CONCENTRATIONS FROM WATER IN RESIDUE AND SOIL SURFACE
 !
-!     C*1,C*2=solute concentration in litter, soil
-!     Z*1,Z*2=solute content in litter, soil
 !
   VOLWPA=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   VOLWPB=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
@@ -373,12 +366,12 @@ module IngridTranspMod
 !     DIFFUSIVITIES IN RESIDUE AND SOIL SURFACE
 !
 !
-  DLYR0=AMAX1(ZERO2,DLYR_3D(3,0,NY,NX))
-  TORT0=TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR_col(NY,NX)
-  DLYR1=AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
-  TORT1=TortMicPM_vr(M,NU(NY,NX),NY,NX)
-  TORTL=AMIN1(1.0_r8,(TORT0+TORT1)/(DLYR0+DLYR1))
-  DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
+  DLYR0 = AMAX1(ZERO2,DLYR_3D(3,0,NY,NX))
+  TORT0 = TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR_col(NY,NX)
+  DLYR1 = AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
+  TORT1 = TortMicPM_vr(M,NU(NY,NX),NY,NX)
+  TORTL = AMIN1(1.0_r8,(TORT0+TORT1)/(DLYR0+DLYR1))
+  DISPN = DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
 
   DIFPO=(SoluteDifusivitytscaledM_vr(NU(NY,NX),NY,NX)*TORTL+DISPN)*AREA(3,NU(NY,NX),NY,NX)
 
@@ -414,23 +407,23 @@ module IngridTranspMod
 !
 
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_flx_diffus(idsalt)=trcSaltDiffConductance(idsalt)*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))
+    trcSalt_flx_diffusM(idsalt)=trcSaltDiffConductance(idsalt)*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))
   ENDDO
 
   DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-    trcSalt_flx_diffus(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt)) &
+    trcSalt_flx_diffusM(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt)) &
       *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO idsalt=0,idsalt_nuts
-    trcSalt_flx_diffus(idsalt_H0PO4B+idsalt)=DIFPO*(trcSalt_conc_src(idsalt_H0PO4+idsalt)&
+    trcSalt_flx_diffusM(idsalt_H0PO4B+idsalt)=DIFPO*(trcSalt_conc_src(idsalt_H0PO4+idsalt)&
       -trcSalt_conc_dest(idsalt_H0PO4B+idsalt))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
-  end subroutine TopsoilResidueSolutedifusExch
+  end subroutine Litr2SoilDifusTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine TopsoilResidueFluxAdvPlusDifus(NY,NX,trcSaltSnoFlo2Soil,&
-    trcSalt_Adv2MicP_flx,trcSaltSnoFlo2LitR,trcSalt_flx_diffus)
+  subroutine LitrSoilAdvDifusTransptM(NY,NX,trcSaltSnoFlo2Soil,&
+    trcSalt_Adv2MicP_flx,trcSaltSnoFlo2LitR,trcSalt_flx_diffusM)
 !
 !     Description:
 !
@@ -439,33 +432,33 @@ module IngridTranspMod
   real(r8), intent(in) :: trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSaltSnoFlo2LitR(idsalt_beg:idsalt_end)
-  real(r8), intent(in) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8), intent(in) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   integer :: idsalt
 !     begin_execution
 !
 !
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)=trcSalt_Precip2LitrM(idsalt,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
-      -trcSalt_Adv2MicP_flx(idsalt)-trcSalt_flx_diffus(idsalt)
+      -trcSalt_Adv2MicP_flx(idsalt)-trcSalt_flx_diffusM(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_MicpTranspFlxM_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_Precip2MicpM(idsalt,NY,NX) &
-      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffus(idsalt)
+      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffusM(idsalt)
   ENDDO
 
-  end subroutine TopsoilResidueFluxAdvPlusDifus
+  end subroutine LitrSoilAdvDifusTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine AccumHourlyTopsoilReisdueFlux(NY,NX,trcSalt_Adv2MicP_flx,&
-    trcSalt_flx_diffus,trcSaltSnoFlo2LitR,trcSaltSnoFlo2Soil)
+  subroutine AccumLitrSoilSaltTranspFluxM(NY,NX,trcSalt_Adv2MicP_flx,&
+    trcSalt_flx_diffusM,trcSaltSnoFlo2LitR,trcSaltSnoFlo2Soil)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: NY,NX
   REAL(R8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
-  real(r8), intent(in) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8), intent(in) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSaltSnoFlo2LitR(idsalt_beg:idsalt_end)
   real(r8), intent(in) :: trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)
   integer :: idsalt
@@ -477,17 +470,17 @@ module IngridTranspMod
 !
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
-      -trcSalt_Adv2MicP_flx(idsalt)-trcSalt_flx_diffus(idsalt)
+      -trcSalt_Adv2MicP_flx(idsalt)-trcSalt_flx_diffusM(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX) &
-      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffus(idsalt)
+      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffusM(idsalt)
   ENDDO
-  end subroutine AccumHourlyTopsoilReisdueFlux
+  end subroutine AccumLitrSoilSaltTranspFluxM
 !------------------------------------------------------------------------------------------
 
-  subroutine MacToMicPoreSoluteAdvExchange(M,NY,NX)
+  subroutine MacPoreSaltAdvExM(M,NY,NX)
 !
 !     Description:
 !
@@ -521,10 +514,10 @@ module IngridTranspMod
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Adv2MacP_flx(idsalt)
   ENDDO
-  end subroutine MacToMicPoreSoluteAdvExchange
+  end subroutine MacPoreSaltAdvExM
 !------------------------------------------------------------------------------------------
 
-  subroutine MicToMacPoreSoluteAdvExchange(M,NY,NX)
+  subroutine MicPoreSaltAdvExM(M,NY,NX)
 !
 !     Description:
 !
@@ -557,11 +550,11 @@ module IngridTranspMod
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Adv2MicP_flx(idsalt)
   ENDDO
-  end subroutine MicToMacPoreSoluteAdvExchange
+  end subroutine MicPoreSaltAdvExM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_Difus_Mac2Micp_flxM)
+  subroutine MacMicPoreSaltDifusExM(M,NY,NX,trcSalt_Difus_Mac2Micp_flxM)
 !
 !     Description:
 !
@@ -573,9 +566,9 @@ module IngridTranspMod
 !     begin_execution
 !
 
-  VLWatMicPMNU=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
-  VOLWHS=AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM_vr(M,NU(NY,NX),NY,NX))
-  VOLWT=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VOLWHS
+  VLWatMicPMNU = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
+  VOLWHS       = AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM_vr(M,NU(NY,NX),NY,NX))
+  VOLWT        = VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VOLWHS
 
   DO idsalt=idsalt_beg,idsalt_KSO4
     trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
@@ -597,11 +590,11 @@ module IngridTranspMod
     trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)+trcSalt_Difus_Mac2Micp_flxM(idsalt)
   ENDDO
 
-  end subroutine MacMicPoreSoluteDifusExchange
+  end subroutine MacMicPoreSaltDifusExM
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AccumHourlyMicMacPoreFlux(NY,NX)
+  subroutine AccumMicMacPoreSaltTranspM(NY,NX)
 !
 !     Description:
 !
@@ -614,10 +607,10 @@ module IngridTranspMod
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_XFXS_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_XFXS_vr(idsalt,NU(NY,NX),NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)
   ENDDO
-  end subroutine AccumHourlyMicMacPoreFlux
+  end subroutine AccumMicMacPoreSaltTranspM
 !------------------------------------------------------------------------------------------
 
-  subroutine SoluteFluxBySurfaceOutflow(M,N1,N2)
+  subroutine SaltFlowThruLitrRofM(M,N1,N2)
 !
 !     Description:
 !
@@ -640,12 +633,12 @@ module IngridTranspMod
   else
     trcSalt_FloXSurRof_flxM(idsalt_beg:idsalt_end,N2,N1)=0.0_r8
   endif  
-  end subroutine SoluteFluxBySurfaceOutflow
+  end subroutine SaltFlowThruLitrRofM
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSoluteInSurfNeighbors(M,N1,N2,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine SaltFlowThruSnowRofM(M,N1,N2,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     Description:
 !
@@ -773,7 +766,7 @@ module IngridTranspMod
       ENDIF
     enddo
   enddo
-  end subroutine UpdateSoluteInSurfNeighbors
+  end subroutine SaltFlowThruSnowRofM
 !------------------------------------------------------------------------------------------
    subroutine SoluteAdvMicropore(M,N,N1,N2,N3,N4,N5,N6)
    implicit none
@@ -852,7 +845,7 @@ module IngridTranspMod
   real(r8) :: trcSaltDiffConductance(idsalt_beg:idsalt_KSO4)
   real(r8) :: trcSalt_conc_src(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_conc_dest(idsalt_beg:idsaltb_end)
-  real(r8) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   integer :: idsalt
 !     DIFFUSIVE FLUXES OF SOLUTES BETWEEN CURRENT AND
 !     ADJACENT GRID CELL MICROPORES FROM AQUEOUS DIFFUSIVITIES
@@ -959,24 +952,24 @@ module IngridTranspMod
 !
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_flx_diffus(idsalt)=trcSaltDiffConductance(idsalt)*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))
+      trcSalt_flx_diffusM(idsalt)=trcSaltDiffConductance(idsalt)*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoiL_end
-      trcSalt_flx_diffus(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_flx_diffusM(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_flx_diffus(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+      trcSalt_flx_diffusM(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
-    trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8
+    trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)=0.0_r8
   ENDIF
 !     RFL*=convective flux through micropores
 !     DFV*=diffusive solute flux through micropores
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_flx_diffus(idsalt)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_flx_diffusM(idsalt)
   ENDDO
 
   end subroutine SoluteDifsMicropore
@@ -1084,7 +1077,7 @@ module IngridTranspMod
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: DLYR1,DLYR2,TORTL,DISPN,DIFPO,DIFAL,DIFFE,DIFCA,DIFMG,DIFNA,DIFKA
   real(r8) :: trcSaltDiffConductance(idsalt_beg:idsalt_KSO4)
-  real(r8) :: trcSalt_DFH(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_MacPore_Diffus(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_conc_src(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_conc_dest(idsalt_beg:idsaltb_end)
   integer  :: idsalt
@@ -1152,29 +1145,29 @@ module IngridTranspMod
 !
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_DFH(idsalt)=trcSaltDiffConductance(idsalt)*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))
+      trcSalt_MacPore_Diffus(idsalt)=trcSaltDiffConductance(idsalt)*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_DFH(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_MacPore_Diffus(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_DFH(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+      trcSalt_MacPore_Diffus(idsalt)=DIFPO*(trcSalt_conc_src(idsalt)-trcSalt_conc_dest(idsalt))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
-    trcSalt_DFH(idsalt_beg:idsaltb_end)=0._r8
+    trcSalt_MacPore_Diffus(idsalt_beg:idsaltb_end)=0._r8
   ENDIF
 !     RFH*=convective flux through macropores
 !     DFH*=diffusive solute flux through macropores
 !
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_DFH(idsalt)
+    trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_MacPore_Diffus(idsalt)
   ENDDO
   end subroutine SoluteDifsMacropore
 !----------------------------------------------------------------------
-  subroutine SoluteAdvExchMicMacpores(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
+  subroutine SaltAdvXMicMacporesM(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
   implicit none
   integer, intent(in) :: M,N,NY,NX,N1,N2,N3,N4,N5,N6
 
@@ -1233,7 +1226,7 @@ module IngridTranspMod
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)=trcSalt_Adv2MicP_flx(idsalt)
   ENDDO
-  end subroutine SoluteAdvExchMicMacpores
+  end subroutine SaltAdvXMicMacporesM
 !----------------------------------------------------------------------
   subroutine SoluteDifsExchMicMacpores(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
   implicit none
@@ -1300,35 +1293,29 @@ module IngridTranspMod
   ENDDO
   end subroutine SoluteAdvDifsMicMacpore
 !----------------------------------------------------------------------
-  subroutine SoluteAdvDifsExchMicMacpore(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
+  subroutine SaltAdvDifuXMicMacporesM(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
   implicit none
   integer, intent(in) :: M,N,NY,NX,N1,N2,N3,N4,N5,N6
 
   integer :: idsalt
 
-  call SoluteAdvExchMicMacpores(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
+  call SaltAdvXMicMacporesM(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
 !
   call SoluteDifsExchMicMacpores(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
-
 
 !
 !     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
 !
 !
-
-!
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-!
-!     X*FXS,X*FXB= hourly convective + diffusive solute flux between macro- and micropore in non-band,band
-!     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_XFXS_vr(idsalt,N6,N5,N4)=trcSalt_XFXS_vr(idsalt,N6,N5,N4)+trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)
   ENDDO
 
-  end subroutine SoluteAdvDifsExchMicMacpore
+  end subroutine SaltAdvDifuXMicMacporesM
 !----------------------------------------------------------------------
-  subroutine UpdateSoluteInSubsurfNeighbors(M,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine SaltExchXGridsM(M,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     Description:
 !
@@ -1406,40 +1393,23 @@ module IngridTranspMod
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
           IF(N.EQ.iVerticalDirection)THEN
-             call SoluteAdvDifsExchMicMacpore(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
+             call SaltAdvDifuXMicMacporesM(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
           ENDIF
         ELSEIF(N.NE.iVerticalDirection)THEN
           THETW1(N3,N2,N1)=0.0_r8
           THETW1(N6,N5,N4)=0.0_r8
           trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
-
           trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
         ENDIF
       ELSE
-        THETW1(N3,N2,N1)=0.0_r8
-        THETW1(N6,N5,N4)=0.0_r8
+        THETW1(N3,N2,N1) = 0.0_r8
+        THETW1(N6,N5,N4) = 0.0_r8
 
         trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
         trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
       ENDIF
     enddo
   enddo
-  end subroutine UpdateSoluteInSubsurfNeighbors
-!------------------------------------------------------------------------------------------
+  end subroutine SaltExchXGridsM
 
-  subroutine MacMicPoreFluxAdvPlusDifus(NY,NX,trcSalt_Difus_Mac2Micp_flxM,trcSalt_Adv2MicP_flx)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: NY,NX
-  real(r8), intent(in) :: trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)
-  real(r8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
-  integer :: idsalt
-!     begin_execution
-!
-  DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Adv2MicP_flx(idsalt)+trcSalt_Difus_Mac2Micp_flxM(idsalt)
-  ENDDO
-  end subroutine MacMicPoreFluxAdvPlusDifus
 end module IngridTranspMod
