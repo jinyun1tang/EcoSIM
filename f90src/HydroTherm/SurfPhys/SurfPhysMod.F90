@@ -564,8 +564,9 @@ contains
   VaporSoi1  = vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGASC*TKX1))
 
   !evaporation, no more than what is available, g H2O
-  !VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol*dts_wat))   
-  VapXAir2TopLay=0.0
+  if(TopLayWatVol<1.0e-30) TopLayWatVol=0.0
+  VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol*dts_wat))   
+  !VapXAir2TopLay=0.0
 
   !latent heat > 0 into soil/ground
   LatentHeatEvapAir2Grnd=VapXAir2TopLay*EvapLHTC
@@ -578,7 +579,7 @@ contains
   ENDIF
 
   !take away water from evaporation
-  !TopLayWatVol=TopLayWatVol+VapXAir2TopLay
+  TopLayWatVol=TopLayWatVol+VapXAir2TopLay
 !
 ! SOLVE FOR SOIL SURFACE TEMPERATURE AT WHICH ENERGY
 ! BALANCE OCCURS, SOLVE LATENT, SENSIBLE AND STORAGE HEAT FLUXES
