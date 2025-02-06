@@ -625,26 +625,12 @@ implicit none
       ENDDO
 !
       !     NET SALT FLUXES BETWEEN ADJACENT GRID CELLS
-      !
-      !     T*FLS,T*FHS=net convective+diffusive solute flux through micropores,macropores
-      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from TranspSalt.f
-      !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-      !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-      !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-      !          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-      !          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-      !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-      !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-      !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-      !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-      !          :*1=non-band,*B=band
-!
       IF(salt_model)THEN
         DO NTSA=idsalt_beg,idsaltb_end
           trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1) &
             +trcSalt_TransptMicP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMicP_3D(NTSA,N,N6,N5,N4)
           trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1) &
-            +trcSalt_XFHS_3D(NTSA,N,N3,N2,N1)-trcSalt_XFHS_3D(NTSA,N,N6,N5,N4)
+            +trcSalt_TransptMacP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMacP_3D(NTSA,N,N6,N5,N4)
         ENDDO
       ENDIF
     ELSE

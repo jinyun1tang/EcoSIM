@@ -1171,13 +1171,6 @@ module InsideTranspMod
 !
 !     TOTAL CONVECTIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
 !
-!     R*FXS,R*FXB=total convective + diffusive solute flux between macro- and micropore in non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     RFL*=convective flux between macro- and micropore
-!     DFV*=diffusive solute flux between macro- and micropore
 !
 
   DO  K=1,jcplx

@@ -299,7 +299,7 @@ module RedistMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8), intent(in) :: dWat,dHeat
-  integer :: L,K,LS,NTP,NTX,nsalts,NE
+  integer :: L,K,LS,NTP,NTX,idsalt,NE
   real(r8):: vhcp1s
   real(r8) :: CI,CH,CO,CX
   real(r8) :: OI,OO
@@ -537,9 +537,9 @@ module RedistMod
   IF(salt_model)THEN
     SIR=0._r8
     SII=0._r8
-    do nsalts=idsalt_beg,idsalt_end
-      SIR = SIR+trcsalt_rain_mole_conc_col(nsalts,NY,NX)*trcSaltIonNumber(nsalts)
-      SII = SII+trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)*trcSaltIonNumber(nsalts)
+    do idsalt=idsalt_beg,idsalt_end
+      SIR = SIR+trcsalt_rain_mole_conc_col(idsalt,NY,NX)*trcSaltIonNumber(idsalt)
+      SII = SII+trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)*trcSaltIonNumber(idsalt)
     ENDDO  
     SIR    = SIR*PrecAtm_col(NY,NX)
     SBU    = -IrrigSubsurf_col(NY,NX)*SII
@@ -800,10 +800,10 @@ module RedistMod
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: TDisolPi_lnd
   real(r8) :: SSS,PSS
-  INTEGER :: nsalts
+  INTEGER :: idsalt
 
-  DO nsalts=idsalt_beg,idsalt_end
-    trcSalt_solml_vr(nsalts,0,NY,NX)=trcSalt_solml_vr(nsalts,0,NY,NX)+trcSalt_TransptMicP_3D(nsalts,3,0,NY,NX)
+  DO idsalt=idsalt_beg,idsalt_end
+    trcSalt_solml_vr(idsalt,0,NY,NX)=trcSalt_solml_vr(idsalt,0,NY,NX)+trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)
   ENDDO
 
   PSS=patomw*(trcSalt_solml_vr(idsalt_H0PO4,0,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,0,NY,NX)&
@@ -813,8 +813,8 @@ module RedistMod
     +trcSalt_solml_vr(idsalt_CaH4P2O8,0,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4,0,NY,NX))
   TDisolPi_lnd=TDisolPi_lnd+PSS
   SSS=0._r8
-  do nsalts=idsalt_beg,idsalt_end
-    SSS=SSS+trcSalt_solml_vr(nsalts,0,NY,NX)*trcSaltIonNumber(nsalts)
+  do idsalt=idsalt_beg,idsalt_end
+    SSS=SSS+trcSalt_solml_vr(idsalt,0,NY,NX)*trcSaltIonNumber(idsalt)
   enddo
 
   TION=TION+SSS
@@ -1403,17 +1403,17 @@ module RedistMod
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(inout) :: TDisolPi_lnd
-  integer  :: NTP,nsalts
+  integer  :: NTP,idsalt
   real(r8) :: ECHY,ECOH,ECAL,ECFE,ECCA,ECMG,ECNA,ECKA,ECCO,ECHC
   real(r8) :: ECNO,ECSO,ECCL
   real(r8) :: PSS,SSS,SSH,SSF,SSX,SST,SSP
 
-  DO nsalts=idsalt_beg,idsaltb_end
-    trcSalt_solml_vr(nsalts,L,NY,NX)=trcSalt_solml_vr(nsalts,L,NY,NX)+trcSalt_RGeoChem_flx_vr(nsalts,L,NY,NX) &
-      +trcSalt_Flo2MicP_vr(nsalts,L,NY,NX)+trcSalt_Irrig_vr(nsalts,L,NY,NX)+trcSalt_XFXS_vr(nsalts,L,NY,NX)
+  DO idsalt=idsalt_beg,idsaltb_end
+    trcSalt_solml_vr(idsalt,L,NY,NX)=trcSalt_solml_vr(idsalt,L,NY,NX)+trcSalt_RGeoChem_flx_vr(idsalt,L,NY,NX) &
+      +trcSalt_Flo2MicP_vr(idsalt,L,NY,NX)+trcSalt_Irrig_vr(idsalt,L,NY,NX)+trcSalt_XFXS_vr(idsalt,L,NY,NX)
 
-    trcSalt_soHml_vr(nsalts,L,NY,NX)=trcSalt_soHml_vr(nsalts,L,NY,NX)+trcSalt_Flo2MacP_vr(nsalts,L,NY,NX) &
-      -trcSalt_XFXS_vr(nsalts,L,NY,NX)
+    trcSalt_soHml_vr(idsalt,L,NY,NX)=trcSalt_soHml_vr(idsalt,L,NY,NX)+trcSalt_Flo2MacP_vr(idsalt,L,NY,NX) &
+      -trcSalt_XFXS_vr(idsalt,L,NY,NX)
   ENDDO
   trcSalt_solml_vr(idsalt_AlOH2,L,NY,NX)=trcSalt_solml_vr(idsalt_AlOH2,L,NY,NX)-TR_AlO2H2_sorbed_soil_vr(L,NY,NX)
   trcSalt_solml_vr(idsalt_FeOH2,L,NY,NX)=trcSalt_solml_vr(idsalt_FeOH2,L,NY,NX)-TR_FeO2H2_sorbed_soil_vr(L,NY,NX)
@@ -1435,8 +1435,8 @@ module RedistMod
   ENDDO
 
   PSS=0._r8
-  DO nsalts=idsalt_psoil_beg,idsalt_pband_end
-    PSS=PSS+trcSalt_solml_vr(nsalts,L,NY,NX)+trcSalt_soHml_vr(nsalts,L,NY,NX)
+  DO idsalt=idsalt_psoil_beg,idsalt_pband_end
+    PSS=PSS+trcSalt_solml_vr(idsalt,L,NY,NX)+trcSalt_soHml_vr(idsalt,L,NY,NX)
   ENDDO
   PSS=PSS*patomw  
 
@@ -1444,9 +1444,9 @@ module RedistMod
 
   SSS=0._r8
   SSH=0._r8
-  DO nsalts=idsalt_beg,idsaltb_end
-    SSS=SSS+trcSalt_solml_vr(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
-    SSH=SSH+trcSalt_soHml_vr(idsalt_Al,L,NY,NX)*trcSaltIonNumber(nsalts)
+  DO idsalt=idsalt_beg,idsaltb_end
+    SSS=SSS+trcSalt_solml_vr(idsalt,L,NY,NX)*trcSaltIonNumber(idsalt)
+    SSH=SSH+trcSalt_soHml_vr(idsalt_Al,L,NY,NX)*trcSaltIonNumber(idsalt)
   ENDDO
 
  

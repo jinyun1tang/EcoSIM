@@ -48,7 +48,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  SolutesIonConc_vr(:,:,:)           !solution ion concentratiom, [mol m-3]
 
   real(r8),target,allocatable :: trcSalt_soHml_vr(:,:,:,:)
-  real(r8),target,allocatable :: trcSalt_XFHS_3D(:,:,:,:,:)
+  real(r8),target,allocatable :: trcSalt_TransptMacP_3D(:,:,:,:,:)
   real(r8),target,allocatable :: trcSalt_TransptMicP_3D(:,:,:,:,:)
   real(r8),target,allocatable :: trcSaltIonNumber(:)                 !number of ions when the salt is fully dissociated
   real(r8),target,allocatable ::  DOM_Mac2MicPore_flx_vr(:,:,:,:,:)       !total DOC micropore-macropore transfer, [g d-2 h-1]
@@ -161,7 +161,7 @@ module AqueChemDatatype
   if(salt_model)then
     allocate(trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_AquaAdv_flx_snvr=0._r8
     allocate(trcSalt_TransptMicP_3D(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_TransptMicP_3D=0._r8
-    allocate(trcSalt_XFHS_3D(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_XFHS_3D=0._r8
+    allocate(trcSalt_TransptMacP_3D(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_TransptMacP_3D=0._r8
     allocate(trcSalt_solml_vr(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml_vr=0._r8
     allocate(trcsalt_rain_mole_conc_col(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_mole_conc_col=0._r8
     allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
@@ -211,7 +211,7 @@ module AqueChemDatatype
   call destroy(SolutesIonConc_vr)
   call destroy(trcSalt_XFXS_vr)
   call destroy(trcSalt_TransptMicP_3D)
-  call destroy(trcSalt_XFHS_3D)
+  call destroy(trcSalt_TransptMacP_3D)
   call destroy(TR_sol_NH3_soil_vr)
   call destroy(trcn_RChem_band_soil_vr)
   call destroy(TR_HCO3_col)

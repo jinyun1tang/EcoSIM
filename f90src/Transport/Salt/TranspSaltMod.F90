@@ -38,9 +38,7 @@ module TranspSaltMod
   real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
 
   real(r8),allocatable ::  trcSalt_TQ(:,:,:)                         !
-  real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_RFLZ(:,:,:,:)                      !
+
 !----------------------------------------------------------------------
 
 
@@ -54,8 +52,6 @@ module TranspSaltMod
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcSalt_TQR)
-  call destroy(trcSalt_Flo2MicP_vr)
 
 
   end subroutine DestructTranspSalt
@@ -66,9 +62,7 @@ module TranspSaltMod
   implicit none
 
   allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));       trcSalt_TQR=0._r8
-  allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MicP_vr=0._r8
-  allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Flo2MacP_vr=0._r8
-  allocate(trcSalt_RFLZ(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_RFLZ=0._r8
+  
   end subroutine InitTranspSalt
 !----------------------------------------------------------------------
   SUBROUTINE TranspSalt(I,J,NHW,NHE,NVN,NVS)
@@ -83,12 +77,13 @@ module TranspSaltMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NX,NY,L,M
+  real(r8) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
 !     execution begins here
 
 !
 !     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 !
-  call SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS)
+  call SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
 !
 !     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 !
@@ -119,7 +114,7 @@ module TranspSaltMod
 !     STATE VARIABLES FOR GASES AND FOR SOLUTES IN MICROPORES AND
 !     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, EQUILIBRIUM
 !     REACTIONS IN SOLUTE
-        call UpdateSoluteInMicMacpores(NY,NX)
+        call UpdateSoluteInMicMacpores(NY,NX,trcSalt_Irrig_flxM_vr)
       ENDDO D9690
     ENDDO D9695
   ENDDO D30
@@ -256,13 +251,13 @@ module TranspSaltMod
   end subroutine GetSubHourFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSubHourlyFluxByLayer(I,NY,NX)
+  subroutine GetSubHourlyFluxByLayer(I,NY,NX,trcSalt_Irrig_flxM_vr)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: I,NY,NX
-
+  real(r8), intent(out) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
   integer :: L,idsalt,ids
   real(r8) :: FLWU(JZ,JY,JX)
 
@@ -302,7 +297,7 @@ module TranspSaltMod
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
     DO idsalt=idsalt_beg,idsaltb_end
-      trcSalt_RFLZ(idsalt,L,NY,NX)=trcSalt_Irrig_vr(idsalt,L,NY,NX)*dts_HeatWatTP
+      trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)=trcSalt_Irrig_vr(idsalt,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
@@ -329,13 +324,13 @@ module TranspSaltMod
   end subroutine GetSubHourlyFluxByLayer
 !------------------------------------------------------------------------------------------
 
-  subroutine SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS)
+  subroutine SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
-
+  real(r8), intent(out) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
   integer :: NY,NX
 !     begin_execution
 
@@ -377,7 +372,7 @@ module TranspSaltMod
       call InitSolutesInSnowpack(NY,NX)
 !
 !     SOLUTE FLUXES FROM SOLUTE.F
-      call GetSubHourlyFluxByLayer(I,NY,NX)
+      call GetSubHourlyFluxByLayer(I,NY,NX,trcSalt_Irrig_flxM_vr)
 
     ENDDO D9990
   ENDDO D9995
@@ -532,20 +527,20 @@ module TranspSaltMod
     VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM_vr(M,M3,M2,M1)))
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_RFHS(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,M3,M2,M1))
+      trcSalt_MacpTranspFlxM_3D(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,M3,M2,M1))
     ENDDO
 
     DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
       ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_RFHS(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,M3,M2,M1)) &
+      trcSalt_MacpTranspFlxM_3D(idsalt,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,M3,M2,M1)) &
         *trcs_VLN_vr(ids_H1PO4,M3,M2,M1)
-      trcSalt_RFHS(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(ids,M3,M2,M1)) &
+      trcSalt_MacpTranspFlxM_3D(ids,N,M6,M5,M4)=VFLW*AZMAX1(trcSalt_soHml2_vr(ids,M3,M2,M1)) &
         *trcs_VLN_vr(ids_H1PO4B,M3,M2,M1)
     ENDDO
 
   ELSE
     VFLW=0.0_r8
-    trcSalt_RFHS(idsalt_beg:idsaltb_end,N,M6,M5,M4)=0._r8
+    trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,M6,M5,M4)=0._r8
   ENDIF
 
   end subroutine SoluteLossSubsurfMacropore
@@ -561,14 +556,9 @@ module TranspSaltMod
   integer :: idsalt
 !     begin_execution
 !
-!     X*FLS,X*FLW,X*FLB=hourly solute flux in non-band,band micropores
-!     X*FHS,X*FHW,X*FHB=hourly solute flux in non-band,band macropores
-!     R*FLS,R*FLW,R*FLB=solute flux in non-band,band micropores
-!     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
-!
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)=trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)+trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)
-    trcSalt_XFHS_3D(idsalt,N,M6,M5,M4)=trcSalt_XFHS_3D(idsalt,N,M6,M5,M4)+trcSalt_RFHS(idsalt,N,M6,M5,M4)
+    trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4) = trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)+trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)
+    trcSalt_TransptMacP_3D(idsalt,N,M6,M5,M4) = trcSalt_TransptMacP_3D(idsalt,N,M6,M5,M4)+trcSalt_MacpTranspFlxM_3D(idsalt,N,M6,M5,M4)
   ENDDO
   end subroutine AccumFluxMacMicPores
 !------------------------------------------------------------------------------------------
@@ -697,15 +687,15 @@ module TranspSaltMod
 
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO idsalt=idsalt_beg,idsaltb_end
-        trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1) &
+        trcSalt_Transp2Micp_flxM_vr(idsalt,N3,N2,N1)=trcSalt_Transp2Micp_flxM_vr(idsalt,N3,N2,N1) &
           +trcSalt_MicpTranspFlxM_3D(idsalt,N,N3,N2,N1)-trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)
-        trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1) &
-          +trcSalt_RFHS(idsalt,N,N3,N2,N1)-trcSalt_RFHS(idsalt,N,N6,N5,N4)
+        trcSalt_Transp2Macp_flxM_vr(idsalt,N3,N2,N1)=trcSalt_Transp2Macp_flxM_vr(idsalt,N3,N2,N1) &
+          +trcSalt_MacpTranspFlxM_3D(idsalt,N,N3,N2,N1)-trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)
       ENDDO
 
     ELSE
-      trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
-      trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
+      trcSalt_Transp2Micp_flxM_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
+      trcSalt_Transp2Macp_flxM_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
     ENDIF
   ENDIF
   end subroutine TotFluxInMacMicPores
@@ -909,7 +899,7 @@ module TranspSaltMod
 !
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
 !
-                  trcSalt_RFHS(idsalt_beg:idsaltb_end,N,M6,M5,M4)=0.0_r8
+                  trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,M6,M5,M4)=0.0_r8
                 ENDIF
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -994,12 +984,13 @@ module TranspSaltMod
   end subroutine UpdateSoluteInResidue
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSoluteInMicMacpores(NY,NX)
+  subroutine UpdateSoluteInMicMacpores(NY,NX,trcSalt_Irrig_flxM_vr)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: NY,NX
+  real(r8), intent(in) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
   integer :: L,idsalt
 !     begin_execution
 !
@@ -1007,10 +998,10 @@ module TranspSaltMod
     IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idsalt=idsalt_beg,idsaltb_end
         trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml2_vr(idsalt,L,NY,NX) &
-          +trcSalt_Flo2MicP_vr(idsalt,L,NY,NX)+trcSalt_RFXS(idsalt,L,NY,NX) &
-          +trcSalt_RFLZ(idsalt,L,NY,NX)
+          +trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX) &
+          +trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)
         trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml2_vr(idsalt,L,NY,NX) &
-          +trcSalt_Flo2MacP_vr(idsalt,L,NY,NX)-trcSalt_RFXS(idsalt,L,NY,NX)
+          +trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)-trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX)
       ENDDO
 
     ENDIF
@@ -1066,8 +1057,8 @@ module TranspSaltMod
   integer :: L
 
   D9885: DO L=NU(NY,NX),NL(NY,NX)
-    trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
-    trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+    trcSalt_Transp2Micp_flxM_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
+    trcSalt_Transp2Macp_flxM_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
   ENDDO D9885
   end subroutine InitFluxAccumulatorsInSoil
 

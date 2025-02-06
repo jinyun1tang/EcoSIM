@@ -476,7 +476,7 @@ module Hour1Mod
       DO  L=1,NL(NY,NX)+1
         DO NSA=idsalt_beg,idsaltb_end
           trcSalt_TransptMicP_3D(NSA,1:3,L,NY,NX) = 0._r8
-          trcSalt_XFHS_3D(NSA,1:3,L,NY,NX)      = 0._r8
+          trcSalt_TransptMacP_3D(NSA,1:3,L,NY,NX)      = 0._r8
         ENDDO
       ENDDO
     ENDDO

@@ -33,9 +33,10 @@ module IngridTranspMod
   integer :: NY,NX,N1,N2
   real(r8) :: FLWRM1
   real(r8) :: trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)
-  real(r8) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: trcSaltSnoFlo2LitR(idsalt_beg:idsalt_end)
   real(r8) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)
 !     begin_execution
 
   DO NX=NHW,NHE
@@ -53,13 +54,12 @@ module IngridTranspMod
 !
       FLWRM1=WatFLo2LitrM(M,NY,NX)
 !
-!     FLWRM=litter-soil water flux from watsub.f
 
       IF(FLWRM1.GT.0.0_r8)THEN
-        call Residue2TopsoilSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_RFL)
+        call Residue2TopsoilSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
 !
       ELSE
-        call Topsoil2ResidueSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_RFL)
+        call Topsoil2ResidueSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
       ENDIF
 !
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
@@ -81,31 +81,15 @@ module IngridTranspMod
 !     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
 
       call TopsoilResidueFluxAdvPlusDifus(NY,NX,trcSaltSnoFlo2Soil,&
-        trcSalt_RFL,trcSaltSnoFlo2LitR,trcSalt_flx_diffus)
+        trcSalt_Adv2MicP_flx,trcSaltSnoFlo2LitR,trcSalt_flx_diffus)
 !
-      call AccumHourlyTopsoilReisdueFlux(NY,NX,trcSalt_RFL,trcSalt_flx_diffus,&
+      call AccumHourlyTopsoilReisdueFlux(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffus,&
         trcSaltSnoFlo2LitR,trcSaltSnoFlo2Soil)
 !
 !     MACROPORE-MICROPORE SOLUTE EXCHANGE IN SOIL
 !     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-!     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
-!     RFL*=convective macropore-micropore solute transfer
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     *H2,*2=macropore,micropore solute content
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
@@ -120,20 +104,20 @@ module IngridTranspMod
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
       ELSE
-        trcSalt_RFL(idsalt_beg:idsaltb_end)=0.0_r8
+        trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)=0.0_r8
       ENDIF
 !
 !     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
 !     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
 !
       IF(VLWatMacPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-        call MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_flx_diffus)
+        call MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_Difus_Mac2Micp_flxM)
       ELSE
-        trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8
+        trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)=0.0_r8
       ENDIF
 !
 !     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
-!      call MacMicPoreFluxAdvPlusDifus(NY,NX,trcSalt_flx_diffus,trcSalt_RFL)
+!      call MacMicPoreFluxAdvPlusDifus(NY,NX,trcSalt_Difus_Mac2Micp_flxM,trcSalt_Adv2MicP_flx)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
       call AccumHourlyMicMacPoreFlux(NY,NX)
@@ -141,14 +125,6 @@ module IngridTranspMod
 !     SOLUTE TRANSPORT FROM WATER OVERLAND FLOW
 !     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
 !     IN SOIL SURFACE LAYER
-!
-!     QRM=runoff from watsub.f
-!     RQR*0=solute in runoff
-!     VLWatMicPM=litter water volume from watsub.f
-!     *S2=litter solute content
-!     N2,N1=NY,NX of source grid cell
-!     N5,N4=NY,NX of destination grid cell
-!     X*QRS=accumulated hourly solute in runoff
 !
 !
       N1=NX;N2=NY
@@ -176,17 +152,7 @@ module IngridTranspMod
   integer :: L,idsalt
 !     begin_execution
 !
-!     RZ*2=solute flux at time step for flux calculations
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
+
 !
   DO L=NU(NY,NX),NL(NY,NX)
     DO idsalt=idsalt_beg,idsaltb_end
@@ -285,14 +251,14 @@ module IngridTranspMod
   end subroutine SoluteFluxInSnowpack
 !------------------------------------------------------------------------------------------
 
-  subroutine Residue2TopsoilSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_RFL)
+  subroutine Residue2TopsoilSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),intent(in) :: FLWRM1
-  real(r8),intent(out) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8),intent(out) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: VFLW
   integer :: idsalt,ids
 
@@ -303,21 +269,6 @@ module IngridTranspMod
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN RESIDUE
 !
-!     VLWatMicPM=litter water volume
-!     RFL*=soil-litter convective solute flux
-!     Z*2=litter solute content
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
   IF(VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VLWatMicPM_vr(M,0,NY,NX)))
@@ -325,27 +276,27 @@ module IngridTranspMod
     VFLW=VFLWX
   ENDIF
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))
+    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))
   ENDDO
 
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B  
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX)) &
+    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX)) &
       *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    trcSalt_RFL(ids)=VFLW*AZMAX1(trcSalt_solml2_vr(ids,0,NY,NX)) &
+    trcSalt_Adv2MicP_flx(ids)=VFLW*AZMAX1(trcSalt_solml2_vr(ids,0,NY,NX)) &
       *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine Residue2TopsoilSoluteAdvExch
 !------------------------------------------------------------------------------------------
 
-  subroutine Topsoil2ResidueSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_RFL)
+  subroutine Topsoil2ResidueSoluteAdvExch(M,NY,NX,FLWRM1,trcSalt_Adv2MicP_flx)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),intent(in) :: FLWRM1
-  real(r8),intent(out) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8),intent(out) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   integer :: idsalt
   real(r8) :: VFLW
 
@@ -355,22 +306,7 @@ module IngridTranspMod
 !     SOIL SURFACE THEN CONVECTIVE TRANSPORT IS THE PRODUCT
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN SOIL SURFACE
-!
-!     VLWatMicPM=litter water volume
-!     RFL*=soil-litter convective solute flux
-!     Z*2=soil solute content
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
+
   IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)))
   ELSE
@@ -378,7 +314,7 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX))
+    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX))
   ENDDO
   end subroutine Topsoil2ResidueSoluteAdvExch
 !------------------------------------------------------------------------------------------
@@ -436,24 +372,6 @@ module IngridTranspMod
 !
 !     DIFFUSIVITIES IN RESIDUE AND SOIL SURFACE
 !
-!     DLYR0,DLYR1=litter, soil surface thickness
-!     TORT=tortuosity from hour1.f
-!     CVRD,BARE=litter cover fraction,1-CVRD
-!     DISP=dispersivity parameter
-!     FLWRM=litter-soil water flux from watsub.f
-!     DIF*=aqueous diffusivity-dispersivity in soil surface
-!     *SGL*=solute diffusivity from hour1.f
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
   DLYR0=AMAX1(ZERO2,DLYR_3D(3,0,NY,NX))
   TORT0=TortMicPM_vr(M,0,NY,NX)*FracSurfByLitR_col(NY,NX)
@@ -493,19 +411,6 @@ module IngridTranspMod
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
-!     DFV*S,DFV*B=diffusive solute flux between litter and soil surface in non-band,band
-!     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     C*1,C*2=solute concentration in litter,soil surface
 !
 
   DO idsalt=idsalt_beg,idsalt_KSO4
@@ -525,56 +430,41 @@ module IngridTranspMod
 !------------------------------------------------------------------------------------------
 
   subroutine TopsoilResidueFluxAdvPlusDifus(NY,NX,trcSaltSnoFlo2Soil,&
-    trcSalt_RFL,trcSaltSnoFlo2LitR,trcSalt_flx_diffus)
+    trcSalt_Adv2MicP_flx,trcSaltSnoFlo2LitR,trcSalt_flx_diffus)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(in) :: trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)
-  real(r8), intent(in) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSaltSnoFlo2LitR(idsalt_beg:idsalt_end)
   real(r8), intent(in) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
   integer :: idsalt
 !     begin_execution
 !
-!     R*FLS=convective + diffusive solute flux between litter, soil surface
-!     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     R*FL0,R*FL1=convective flux into surface litter, soil surface
-!     RFL*=convective flux between surface litter and soil surface
-!     DFV*=diffusive solute flux between litter and soil surface
 !
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)=trcSalt_Precip2LitrM(idsalt,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
-      -trcSalt_RFL(idsalt)-trcSalt_flx_diffus(idsalt)
+      -trcSalt_Adv2MicP_flx(idsalt)-trcSalt_flx_diffus(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_MicpTranspFlxM_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_Precip2MicpM(idsalt,NY,NX) &
-      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_RFL(idsalt)+trcSalt_flx_diffus(idsalt)
+      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffus(idsalt)
   ENDDO
 
   end subroutine TopsoilResidueFluxAdvPlusDifus
 !------------------------------------------------------------------------------------------
 
-  subroutine AccumHourlyTopsoilReisdueFlux(NY,NX,trcSalt_RFL,&
+  subroutine AccumHourlyTopsoilReisdueFlux(NY,NX,trcSalt_Adv2MicP_flx,&
     trcSalt_flx_diffus,trcSaltSnoFlo2LitR,trcSaltSnoFlo2Soil)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: NY,NX
-  REAL(R8), intent(in) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  REAL(R8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSaltSnoFlo2LitR(idsalt_beg:idsalt_end)
   real(r8), intent(in) :: trcSaltSnoFlo2Soil(idsalt_beg:idsaltb_end)
@@ -587,12 +477,12 @@ module IngridTranspMod
 !
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)+trcSaltSnoFlo2LitR(idsalt) &
-      -trcSalt_RFL(idsalt)-trcSalt_flx_diffus(idsalt)
+      -trcSalt_Adv2MicP_flx(idsalt)-trcSalt_flx_diffus(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX) &
-      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_RFL(idsalt)+trcSalt_flx_diffus(idsalt)
+      +trcSaltSnoFlo2Soil(idsalt)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffus(idsalt)
   ENDDO
   end subroutine AccumHourlyTopsoilReisdueFlux
 !------------------------------------------------------------------------------------------
@@ -603,7 +493,7 @@ module IngridTranspMod
 !
   implicit none
   integer, intent(in) :: M,NY,NX
-  real(r8) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: VFLW
   integer :: idsalt
 !     begin_execution
@@ -615,21 +505,21 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))
+    trcSalt_Adv2MacP_flx(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))
   ENDDO
 
   DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX)) &
+    trcSalt_Adv2MacP_flx(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX)) &
       *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO idsalt=idsalt_pband_beg,idsalt_pband_end
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX)) &
+    trcSalt_Adv2MacP_flx(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX)) &
       *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFXS(idsalt,NU(NY,NX),NY,NX)=trcSalt_RFL(idsalt)
+    trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Adv2MacP_flx(idsalt)
   ENDDO
   end subroutine MacToMicPoreSoluteAdvExchange
 !------------------------------------------------------------------------------------------
@@ -640,7 +530,7 @@ module IngridTranspMod
 !
   implicit none
   integer, intent(in) :: M,NY,NX
-  real(r8) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   integer :: idsalt
   real(r8) :: VFLW
 !     begin_execution
@@ -651,91 +541,60 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_RFL(idsalt_Al)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt_Al,NU(NY,NX),NY,NX))
+    trcSalt_Adv2MicP_flx(idsalt_Al)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt_Al,NU(NY,NX),NY,NX))
   ENDDO
 
   DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX)) &
+    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX)) &
       *trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO idsalt=idsalt_pband_beg,idsalt_pband_end
-    trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX)) &
+    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX)) &
       *trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFXS(idsalt,NU(NY,NX),NY,NX)=trcSalt_RFL(idsalt)
+    trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Adv2MicP_flx(idsalt)
   ENDDO
   end subroutine MicToMacPoreSoluteAdvExchange
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_flx_diffus)
+  subroutine MacMicPoreSoluteDifusExchange(M,NY,NX,trcSalt_Difus_Mac2Micp_flxM)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: M,NY,NX
-  real(r8), intent(out) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8), intent(out) :: trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)
   real(r8) :: VOLWHS,VOLWT,VLWatMicPMNU
   integer :: idsalt
 !     begin_execution
 !
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
-!     XFRS*VOLT=maximum macropore volume for solute transfer
-!     DFV*=diffusive macropore-micropore solute transfer
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     *H2,*2=macropore,micropore solute content
+
   VLWatMicPMNU=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
   VOLWHS=AMIN1(XFRS*VGeomLayer_vr(NU(NY,NX),NY,NX),VLWatMacPM_vr(M,NU(NY,NX),NY,NX))
   VOLWT=VLWatMicPM_vr(M,NU(NY,NX),NY,NX)+VOLWHS
 
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_flx_diffus(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
+    trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
       -AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
   ENDDO
 
   DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-    trcSalt_flx_diffus(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
+    trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
       -AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO idsalt=idsalt_pband_beg,idsalt_pband_end
-    trcSalt_flx_diffus(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
+    trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,NU(NY,NX),NY,NX))*VLWatMicPMNU &
       -AZMAX1(trcSalt_solml2_vr(idsalt,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
-
-!
-!     R*FXS=convective + diffusive solute flux between macropores and micropores
-!     RFL*=convective flux between macropores and micropores
-!     DFV*=diffusive solute flux between macropores and micropores
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
 !
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFXS(idsalt,NU(NY,NX),NY,NX)=trcSalt_RFXS(idsalt,NU(NY,NX),NY,NX)+trcSalt_flx_diffus(idsalt)
+    trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)+trcSalt_Difus_Mac2Micp_flxM(idsalt)
   ENDDO
 
   end subroutine MacMicPoreSoluteDifusExchange
@@ -751,21 +610,9 @@ module IngridTranspMod
   INTEGER :: idsalt
 !     begin_execution
 !
-!     X*FXS=hourly convective + diffusive solute flux between macropores and micropores
-!     R*FXS=total convective + diffusive solute flux between macropores and micropores
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
 !
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_XFXS_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_XFXS_vr(idsalt,NU(NY,NX),NY,NX)+trcSalt_RFXS(idsalt,NU(NY,NX),NY,NX)
+    trcSalt_XFXS_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_XFXS_vr(idsalt,NU(NY,NX),NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine AccumHourlyMicMacPoreFlux
 !------------------------------------------------------------------------------------------
@@ -933,7 +780,7 @@ module IngridTranspMod
    integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
    real(r8) :: VFLW
    integer :: idsalt
-   real(r8) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+   real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
 !
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -954,15 +801,15 @@ module IngridTranspMod
     ENDIF
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-        trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N3,N2,N1))
+        trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N3,N2,N1))
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N3,N2,N1))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N3,N2,N1))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N3,N2,N1))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N3,N2,N1))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
     ENDDO
 !
 !     IF MICROPORE WATER FLUX FROM 'WATSUB' IS TO CURRENT FROM
@@ -977,22 +824,22 @@ module IngridTranspMod
       VFLW=-VFLWX
     ENDIF
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ENDIF
 
 !     RFL*=convective flux through micropores
 !     DFV*=diffusive solute flux through micropores
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_RFL(idsalt)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_Adv2MicP_flx(idsalt)
   ENDDO
   end subroutine SoluteAdvMicropore
 !------------------------------------------------------------------------------------------
@@ -1022,18 +869,6 @@ module IngridTranspMod
 !     MICROPORE CONCENTRATIONS FROM WATER-FILLED POROSITY
 !     IN CURRENT AND ADJACENT GRID CELLS
 !
-!     C*1,C*2=solute concentration in source,destination layer
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     *S2,*B2=soil solute content in non-band,band
 !
     VLWPA1=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
     VLWPB1=VLWatMicPM_vr(M,N3,N2,N1)*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
@@ -1084,28 +919,6 @@ module IngridTranspMod
     ENDIF
 !
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MICROPORES
-!
-!     DLYR=soil layer thickness
-!     TORT=micropore tortuosity from hour1.f
-!     DISP=dispersivity parameter
-!     FLWM=water flux through soil micropore from watsub.f
-!     DIF*=aqueous diffusivity-dispersivity through micropore
-!     *SGL2=solute diffusivity from hour1.f
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     XDPTH=cross-sectional area/distance between layers
-!     C*1,C*2=micropore solute concentration in source,destination layer
-!     DFV*=diffusive solute transfer through soil micropore
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
 
     DLYR1=AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
@@ -1183,24 +996,6 @@ module IngridTranspMod
 !     OF WATER FLUX AND MACROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN CURRENT GRID CELL
 !
-!     VLWatMacPM=macropore water-filled porosity from watsub.f
-!     VOLWAH=macropore porosity
-!     RFH*=solute diffusive flux through macropore
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     *SH2,*BH2=macropore solute content in non-band,band
-!     R*FXS=convective + diffusive solute flux between macropores and micropores
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!
     IF(VLWatMacPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
     ELSE
@@ -1212,17 +1007,17 @@ module IngridTranspMod
     IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
       DO idsalt=idsalt_beg,idsalt_KSO4
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
-          -AZMIN1(trcSalt_RFXS(idsalt,NU(N2,N1),N2,N1))))
+          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(N2,N1),N2,N1))))
       ENDDO
 
       DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
-          -AZMIN1(trcSalt_RFXS(idsalt,NU(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
       ENDDO
 
       DO idsalt=idsalt_pband_beg,idsalt_pband_end
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
-          -AZMIN1(trcSalt_RFXS(idsalt,NU(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
       ENDDO
 !
 !     OTHERWISE
@@ -1259,6 +1054,7 @@ module IngridTranspMod
     DO idsalt=idsalt_beg,idsalt_KSO4
       trcSalt_RFH(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))
     ENDDO
+
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
       trcSalt_RFH(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4)) &
         *trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
@@ -1274,12 +1070,10 @@ module IngridTranspMod
   ELSE
     trcSalt_RFH(idsalt_beg:idsaltb_end)=0.0_r8
   ENDIF
-!     RFH*=convective flux through macropores
-!     DFH*=diffusive solute flux through macropores
 !
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFHS(idsalt,N,N6,N5,N4)=trcSalt_RFH(idsalt)
+    trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_RFH(idsalt)
   ENDDO
 
   end subroutine SoluteAdvMacropore
@@ -1308,20 +1102,6 @@ module IngridTranspMod
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
-!     C*H1,C*H2=macropore solute concentration in source,destination layer
-!     *H2=macropore solute content
-!     VLWatMacPM=macropore water content
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!
     DO idsalt=idsalt_beg,idsaltb_end
       trcSalt_conc_src(idsalt)=AZMAX1(trcSalt_soHml2_vr(idsalt,N3,N2,N1)/VLWatMacPM_vr(M,N3,N2,N1))
       trcSalt_conc_dest(idsalt)=AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4))
@@ -1329,33 +1109,17 @@ module IngridTranspMod
 !
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MACROPORES
 !
-!     DLYR=soil layer thickness
-!     TortMacPM_vr=macropore tortuosity from hour1.f
-!     DISP=dispersivity parameter
-!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
-!     DIF*=aqueous diffusivity-dispersivity through macropore
-!     *SGL2=solute diffusivity from hour1.f
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
 !     XDPTH=cross-sectional area/distance between layers
 !     C*H1,C*H2=macropore solute concentration in source,destination layer
 !     DFH*=diffusive solute transfer through soil macropore
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    DLYR1=AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
-    DLYR2=AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
-    TORTL=(TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
-    DIFPO=(SoluteDifusivitytscaledM_vr(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
+    DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
+    DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
+    TORTL = (TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    DISPN = DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DIFPO = (SoluteDifusivitytscaledM_vr(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
     DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Al,idsalt_AlOH,idsalt_AlOH2,idsalt_AlOH3,idsalt_AlOH4,idsalt_AlSO4/))=DIFAL
@@ -1406,7 +1170,7 @@ module IngridTranspMod
 !
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFHS(idsalt,N,N6,N5,N4)=trcSalt_RFHS(idsalt,N,N6,N5,N4)+trcSalt_DFH(idsalt)
+    trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_DFH(idsalt)
   ENDDO
   end subroutine SoluteDifsMacropore
 !----------------------------------------------------------------------
@@ -1416,27 +1180,10 @@ module IngridTranspMod
 
   real(r8) :: VFLW
   integer :: idsalt
-  real(r8) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
-!
-!     FWatExMacP2MicPM_vr=macro-micropore water transfer from watsub.f
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
-!     RFL*=convective macropore-micropore solute transfer
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     *H2,*2=macropore,micropore solute content
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
@@ -1447,15 +1194,15 @@ module IngridTranspMod
       VFLW=VFLWX
     ENDIF
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
 !
 !     MICROPORE TO MACROPORE TRANSFER
@@ -1467,24 +1214,24 @@ module IngridTranspMod
       VFLW=-VFLWX
     ENDIF
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_RFL(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 !
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
   ELSE
-    trcSalt_RFL(idsalt_beg:idsaltb_end)=0.0_r8
+    trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)=0.0_r8
   ENDIF
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFXS(idsalt,N6,N5,N4)=trcSalt_RFL(idsalt)
+    trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)=trcSalt_Adv2MicP_flx(idsalt)
   ENDDO
   end subroutine SoluteAdvExchMicMacpores
 !----------------------------------------------------------------------
@@ -1493,47 +1240,32 @@ module IngridTranspMod
   integer, intent(in) :: M,N,NY,NX,N1,N2,N3,N4,N5,N6
   real(r8) :: VOLWHS,VOLWT
   integer :: idsalt
-  real(r8) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)
 !     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
 !     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
-!
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
-!     DFV*S,DFV*B=diffusive solute flux between macro- and micropore in non-band,band
-!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     *2,*H2=solute content of micropores,macropores
 !
   IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
     VOLWHS=AMIN1(XFRS*VGeomLayer_vr(N6,N5,N4),VLWatMacPM_vr(M,N6,N5,N4))
     VOLWT=VLWatMicPM_vr(M,N6,N5,N4)+VOLWHS
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_flx_diffus(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
+      trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
         -AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*VOLWHS)/VOLWT
     ENDDO
 
     DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-      trcSalt_flx_diffus(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
+      trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
         -AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_flx_diffus(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
+      trcSalt_Difus_Mac2Micp_flxM(idsalt)=dts_HeatWatTP*(AZMAX1(trcSalt_soHml2_vr(idsalt,N6,N5,N4))*VLWatMicPM_vr(M,N6,N5,N4) &
         -AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE
-    trcSalt_flx_diffus(idsalt_beg:idsaltb_end)=0.0_r8
+    trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)=0.0_r8
   ENDIF
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFXS(idsalt,N6,N5,N4)=trcSalt_RFXS(idsalt,N6,N5,N4)+trcSalt_flx_diffus(idsalt)
+    trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)=trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)+trcSalt_Difus_Mac2Micp_flxM(idsalt)
   ENDDO
   end subroutine SoluteDifsExchMicMacpores
 !----------------------------------------------------------------------
@@ -1556,38 +1288,15 @@ module IngridTranspMod
 !     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT
 !     FLUXES = CONVECTIVE + DIFFUSIVE FLUXES
 !
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,R*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,R*FHB=convective + diffusive solute flux through macropores in non-band,band
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-!     X*FLS=hourly convective + diffusive solute flux through micropores
-!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band
-!     X*FHS=hourly convective + diffusive solute flux through macropores
-!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,X*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,X*FHB=convective + diffusive solute flux through macropores in non-band,band
 !
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4)=trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4) &
       +trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)
-    trcSalt_XFHS_3D(idsalt,N,N6,N5,N4)=trcSalt_XFHS_3D(idsalt,N,N6,N5,N4) &
-      +trcSalt_RFHS(idsalt,N,N6,N5,N4)
+    trcSalt_TransptMacP_3D(idsalt,N,N6,N5,N4)=trcSalt_TransptMacP_3D(idsalt,N,N6,N5,N4) &
+      +trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)
   ENDDO
   end subroutine SoluteAdvDifsMicMacpore
 !----------------------------------------------------------------------
@@ -1605,19 +1314,6 @@ module IngridTranspMod
 !
 !     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
 !
-!     R*FXS,R*FXB=total convective + diffusive solute flux between macro- and micropore in non-band,band
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!     RFL*=convective flux between macro- and micropore
-!     DFV*=diffusive solute flux between macro- and micropore
 !
 
 !
@@ -1627,7 +1323,7 @@ module IngridTranspMod
 !     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_XFXS_vr(idsalt,N6,N5,N4)=trcSalt_XFXS_vr(idsalt,N6,N5,N4)+trcSalt_RFXS(idsalt,N6,N5,N4)
+    trcSalt_XFXS_vr(idsalt,N6,N5,N4)=trcSalt_XFXS_vr(idsalt,N6,N5,N4)+trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)
   ENDDO
 
   end subroutine SoluteAdvDifsExchMicMacpore
@@ -1657,7 +1353,7 @@ module IngridTranspMod
 !
     DO  N=FlowDirIndicator(N2,N1),3
 
-      IF(N.EQ.1)THEN
+      IF(N.EQ.iEastWestDirection)THEN
         !west-east
         IF(NX.EQ.NHE)THEN
           cycle
@@ -1666,7 +1362,7 @@ module IngridTranspMod
           N5=NY
           N6=L
         ENDIF
-      ELSEIF(N.EQ.2)THEN
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !north-south
         IF(NY.EQ.NVS)THEN
           cycle
@@ -1675,7 +1371,7 @@ module IngridTranspMod
           N5=NY+1
           N6=L
         ENDIF
-      ELSEIF(N.EQ.3)THEN
+      ELSEIF(N.EQ.iVerticalDirection)THEN
         !vertical
         IF(L.EQ.NL(NY,NX))THEN
           cycle
@@ -1696,13 +1392,6 @@ module IngridTranspMod
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
 !     WATER CONTENTS AND WATER FLUXES 'FLQM' FROM 'WATSUB'
 !
-!     VLSoilPoreMicP_vr,VLSoilMicP=soil volume excluding rock, macropore
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
-!     THETW=volumetric water content
-!     FLPM=change in air volume
-!     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
       IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
@@ -1716,55 +1405,41 @@ module IngridTranspMod
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-          IF(N.EQ.3)THEN
+          IF(N.EQ.iVerticalDirection)THEN
              call SoluteAdvDifsExchMicMacpore(M,N,NY,NX,N1,N2,N3,N4,N5,N6)
           ENDIF
-        ELSEIF(N.NE.3)THEN
+        ELSEIF(N.NE.iVerticalDirection)THEN
           THETW1(N3,N2,N1)=0.0_r8
           THETW1(N6,N5,N4)=0.0_r8
           trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
 
-          trcSalt_RFHS(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
+          trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
         ENDIF
       ELSE
         THETW1(N3,N2,N1)=0.0_r8
         THETW1(N6,N5,N4)=0.0_r8
 
         trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
-        trcSalt_RFHS(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
+        trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
       ENDIF
     enddo
   enddo
   end subroutine UpdateSoluteInSubsurfNeighbors
 !------------------------------------------------------------------------------------------
 
-  subroutine MacMicPoreFluxAdvPlusDifus(NY,NX,trcSalt_flx_diffus,trcSalt_RFL)
+  subroutine MacMicPoreFluxAdvPlusDifus(NY,NX,trcSalt_Difus_Mac2Micp_flxM,trcSalt_Adv2MicP_flx)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: NY,NX
-  real(r8), intent(in) :: trcSalt_flx_diffus(idsalt_beg:idsaltb_end)
-  real(r8), intent(in) :: trcSalt_RFL(idsalt_beg:idsaltb_end)
+  real(r8), intent(in) :: trcSalt_Difus_Mac2Micp_flxM(idsalt_beg:idsaltb_end)
+  real(r8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   integer :: idsalt
 !     begin_execution
 !
-!     R*FXS=convective + diffusive solute flux between macropores and micropores
-!     RFL*=convective flux between macropores and micropores
-!     DFV*=diffusive solute flux between macropores and micropores
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_RFXS(idsalt,NU(NY,NX),NY,NX)=trcSalt_RFL(idsalt)+trcSalt_flx_diffus(idsalt)
+    trcSalt_Mac2MicPore_flxM_vr(idsalt,NU(NY,NX),NY,NX)=trcSalt_Adv2MicP_flx(idsalt)+trcSalt_Difus_Mac2Micp_flxM(idsalt)
   ENDDO
   end subroutine MacMicPoreFluxAdvPlusDifus
 end module IngridTranspMod
