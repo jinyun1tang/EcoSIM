@@ -508,7 +508,6 @@ module StartsMod
 
     TKS_vr(L,NY,NX) = ATKS(NY,NX)
     TCS_vr(L,NY,NX)    = ATCS(NY,NX)
-    TKS_vr(0,NY,NX) = 0.0
     !
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
@@ -612,8 +611,8 @@ module StartsMod
 ! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
 ! ASP_col=aspect angle in degree
   ALTY=0.0_r8
-  !write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-  ! 'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
+  write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
+   'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
 1112    FORMAT(2A4,4A6,25A12)
   D9985: DO NX=NHW,NHE
@@ -1112,7 +1111,7 @@ module StartsMod
       TCS_vr(0,NY,NX)             = ATCS(NY,NX)
       TKS_vr(0,NY,NX)             = ATKS(NY,NX)
       TKSD(NY,NX)                 = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
-      TKS_vr(0,NY,NX)             = 0.0
+      TKS_vr(0,NY,NX)             = ATCS(NY,NX)+273.15_r8
 !
     ENDDO
   ENDDO

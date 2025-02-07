@@ -21,7 +21,7 @@ function status_message()
 
 ############# EDIT THESE! ##################
 
-debug=1
+debug=0
 mpi=0
 shared=0
 verbose=1

@@ -744,7 +744,7 @@ module Hour1Mod
   QSnowH2Oloss_col(NY,NX)                 = 0._r8
   PrecHeat2Snow_col(NY,NX)                = 0._r8
   Prec2Snow_col(NY,NX)                    = 0._r8
-  ECO_HR_CO2_vr(:,NX,NX)                  = 0._r8
+  ECO_HR_CO2_vr(:,NY,NX)                  = 0._r8
   ECO_HR_CO2_col(NY,NX)                   = 0._r8
   ECO_HR_CH4_col(NY,NX)                   = 0._r8
   Eco_RadSW_col(NY,NX)                    = 0._r8

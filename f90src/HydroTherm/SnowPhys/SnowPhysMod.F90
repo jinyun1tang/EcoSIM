@@ -84,13 +84,16 @@ contains
   VcumWatSnow_col(NY,NX)   = 0.0_r8
   VcumIceSnow_col(NY,NX)   = 0.0_r8
   VcumSnoDWI_col(NY,NX)    = VcumDrySnoWE_col(NY,NX)/NewSnowDens_col(NY,NX)+VcumWatSnow_col(NY,NX)+VcumIceSnow_col(NY,NX)
-  write(*,*) "----------------------------------------------------"
-  write(*,*) "BEFORE initializing snow layers the snow status is: "
-  write(*,*) "SnowDepth_col(NY,NX) = ", SnowDepth_col(NY,NX)
-  write(*,*) "NewSnowDens_col(NY,NX) = ", NewSnowDens_col(NY,NX)
-  write(*,*) "DH, DV = ", DH(NY,NX), DV(NY,NX)
-  write(*,*) "Vdrysnow, Vwatsnow, VIceSnow  = ", VcumDrySnoWE_col(NY,NX), VcumWatSnow_col(NY,NX), VcumIceSnow_col(NY,NX) 
-  write(*,*) "----------------------------------------------------"
+
+  if(lverb)then
+    write(*,*) "----------------------------------------------------"
+    write(*,*) "BEFORE initializing snow layers the snow status is: "
+    write(*,*) "SnowDepth_col(NY,NX) = ", SnowDepth_col(NY,NX)
+    write(*,*) "NewSnowDens_col(NY,NX) = ", NewSnowDens_col(NY,NX)
+    write(*,*) "DH, DV = ", DH(NY,NX), DV(NY,NX)
+    write(*,*) "Vdrysnow, Vwatsnow, VIceSnow  = ", VcumDrySnoWE_col(NY,NX), VcumWatSnow_col(NY,NX), VcumIceSnow_col(NY,NX) 
+    write(*,*) "----------------------------------------------------"
+  endif
 !  VOLSWI=0.0_r8
   
   !build the snow profile, topdown

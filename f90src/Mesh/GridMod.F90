@@ -116,6 +116,7 @@ contains
       ENDDO
     ENDDO
   ENDDO
+  JZ=20
   !read JZ from input data?
   JH=JX+nextra_grid
   JV=JY+nextra_grid
