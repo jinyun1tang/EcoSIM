@@ -95,7 +95,6 @@ module Hour1Mod
   real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
   real(r8) :: DPTH0           !water+ice thickness in litter
 
-  real(r8) :: tPBOT,tmp
   integer :: NZ,NR,K
   logical :: dosum
 !     execution begins here
@@ -125,17 +124,6 @@ module Hour1Mod
   if(lverb)write(*,*)'set atms gas conc'
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS  
-
-      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
-      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
 
       IF(J.EQ.1)THEN
         NumActivePlants(NY,NX)=0
@@ -320,7 +308,7 @@ module Hour1Mod
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NX, NY, idg
-
+  real(r8) :: tPBOT,tmp
 !     begin_execution
 !
 !     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
@@ -331,15 +319,18 @@ module Hour1Mod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
-      AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
-      AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
-      AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
-      AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3      
-      AtmGasCgperm3(idg_AR,NY,NX)  =  ARGE_col(NY,NX)*1.78E-02_r8*TREF/TairK_col(NY,NX)  !gAr/m3
-      AtmGasCgperm3(idg_NH3,NY,NX)  = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
-      AtmGasCgperm3(idg_NH3B,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
+      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
+      tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
+      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
+      
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp !gC/m3
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp !gC/m3
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp !gO/m3
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp !gN/m3
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp !gN/m3 
+      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gN/m3
 
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
