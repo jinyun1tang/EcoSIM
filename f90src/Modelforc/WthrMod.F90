@@ -224,7 +224,7 @@ module WthrMod
   real(r8), intent(out) :: VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
-  
+
   DO  NX=NHW,NHE
     DO NY=NVN,NVS
  !

@@ -710,6 +710,10 @@ implicit none
       ENDIF
     ENDDO D325
   ENDIF
+
+  !write(*,*) "SnowpackLayering After first do loop - ", NX, NY
+  !write(*,*) "VLHeatCapSnow_snvr(1,NY,NX) = ", VLHeatCapSnow_snvr(1,NY,NX)
+  !write(*,*) "VLHeatCapSnow_snvr(5,NY,NX) = ", VLHeatCapSnow_snvr(5,NY,NX)
   !update volumetric snow heat capacity
   nsnol_col(NY,NX)=0
   DO L=1,JS
@@ -752,7 +756,10 @@ implicit none
       endif
     endif 
   ENDDO  
-  
+
+  !write(*,*) "End SnowpackLayering - ", NX, NY
+  !write(*,*) "VLHeatCapSnow_snvr(1,NY,NX) = ", VLHeatCapSnow_snvr(1,NY,NX)
+  !write(*,*) "VLHeatCapSnow_snvr(5,NY,NX) = ", VLHeatCapSnow_snvr(5,NY,NX)
   end subroutine SnowpackLayering
 
 !------------------------------------------------------------------------------------------

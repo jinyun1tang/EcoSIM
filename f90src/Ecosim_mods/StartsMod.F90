@@ -508,6 +508,7 @@ module StartsMod
 
     TKS_vr(L,NY,NX) = ATKS(NY,NX)
     TCS_vr(L,NY,NX)    = ATCS(NY,NX)
+    TKS_vr(0,NY,NX) = 0.0
     !
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
@@ -521,7 +522,15 @@ module StartsMod
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
-  
+ 
+  write(*,*) "InitSoilProfile ------------------------- "
+  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
+  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
+  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
+  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
+  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
+  write(*,*) "----------------------------------------- "
+
   call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
@@ -603,8 +612,8 @@ module StartsMod
 ! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
 ! ASP_col=aspect angle in degree
   ALTY=0.0_r8
-  write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-    'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
+  !write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
+  ! 'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
 1112    FORMAT(2A4,4A6,25A12)
   D9985: DO NX=NHW,NHE
@@ -906,6 +915,7 @@ module StartsMod
       VGeomLayert0_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)
       VLSoilMicPMass_vr(L,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
+      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX)
       DLYRI_3D(3,L,NY,NX) = VLSoilPoreMicP_vr(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR_3D(3,L,NY,NX)  = DLYRI_3D(3,L,NY,NX)
     ELSE
@@ -1015,6 +1025,8 @@ module StartsMod
 
   call InitAccumulators()
 
+  !For whatever reason this sets a temerature, so I need to reset it:
+  ATKS = 242.0
   ALTZG=0.0_r8
   LandScape1stSoiLayDepth=0.0_r8   !pay attention to how it is set for many-grid simulations
 
@@ -1097,9 +1109,10 @@ module StartsMod
 !     TKSD=deep source/sink temperature from geothermal flux(K)
 
       SoilHeatSrcDepth_col(NY,NX) = AMAX1(10.0_r8,CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)+1.0_r8)
-      TCS_vr(0,NY,NX)                = ATCS(NY,NX)
+      TCS_vr(0,NY,NX)             = ATCS(NY,NX)
       TKS_vr(0,NY,NX)             = ATKS(NY,NX)
       TKSD(NY,NX)                 = ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth_col(NY,NX)/TCNDG
+      TKS_vr(0,NY,NX)             = 0.0
 !
     ENDDO
   ENDDO
@@ -1114,6 +1127,13 @@ module StartsMod
   tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
+
+ !do NY=1,NYS
+ !   DO L=NU(NY,NX),NL(NY,NX)
+ !     AREA(3,L,NY,NX)=a_AREA3(L,NY)
+ !     write(*,*) "Before InitSnowLayers AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
+ !   ENDDO
+ ! ENDDO
 
 !     INITIALIZE SNOWPACK LAYERS
   DO  NX=NHW,NHE

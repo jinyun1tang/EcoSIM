@@ -21,10 +21,10 @@ function status_message()
 
 ############# EDIT THESE! ##################
 
-debug=0
+debug=1
 mpi=0
 shared=0
-verbose=0
+verbose=1
 sanitize=0
 regression_test=0
 

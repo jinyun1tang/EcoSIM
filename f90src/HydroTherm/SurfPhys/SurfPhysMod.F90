@@ -46,6 +46,7 @@ implicit none
   public :: StageSurfacePhysModel
   public :: RunSurfacePhysModelM
   public :: AggregateSurfRunoffFluxM
+  public :: SetHourlyAccumulatorsATS
   public :: writeSurfDiagnosis
   !
   public :: SurfaceRunoff
@@ -74,6 +75,41 @@ implicit none
 
 contains
 
+  subroutine SetHourlyAccumulatorsATS(NY,NX)
+!     implicit none
+  integer, intent(in) :: NX,NY
+
+  integer :: L
+!     begin_execution
+
+  WatFLo2Litr_col(NY,NX)                      = 0.0_r8
+  HeatFLo2LitrByWat_col(NY,NX)                = 0.0_r8
+  TLitrIceFlxThaw_col(NY,NX)                  = 0.0_r8
+  TLitrIceHeatFlxFrez_col(NY,NX)              = 0.0_r8
+  HeatByRad2Surf_col(NY,NX)               = 0.0_r8
+  HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
+  HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
+  HeatNet2Surf_col(NY,NX)                 = 0.0_r8
+  VapXAir2GSurf_col(NY,NX)                = 0.0_r8
+
+  !TFLWCI(NY,NX)           = 0.0_r8
+  PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
+
+! zero arrays in the snow layers
+  WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2MacP_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2Soi_snvr(1:JS,NY,NX)   = 0.0_r8
+  WatConvSno2LitR_snvr(1:JS,NY,NX)   = 0.0_r8
+  HeatConvSno2LitR_snvr(1:JS,NY,NX)  = 0.0_r8
+  SnoXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  WatXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  IceXfer2SnoLay_snvr(1:JS,NY,NX)    = 0.0_r8
+  HeatXfer2SnoLay_snvr(1:JS,NY,NX)   = 0.0_r8
+  XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0.0_r8
+
+  end subroutine SetHourlyAccumulatorsATS  
+
   subroutine StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   use SnowPhysMod, only : CopySnowStates
@@ -88,7 +124,7 @@ contains
   !be careful about the following, consider move to another location.
   if(ATS_cpl_mode) then 
     DO NX=NHW,NHE
-      DO NY=NVN,NHE  
+      DO NY=NVN,NVS  
          NUM(NY,NX)=1 
       enddo
     enddo
@@ -150,7 +186,6 @@ contains
   call PrintInfo('beg '//subname)
   LitrIceFlxThaw_col(NY,NX)     = 0.0_r8
   LitrIceHeatFlxFrez_col(NY,NX) = 0.0_r8
-
 !
 ! ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
 !     FOR USE AT INTERNAL TIME STEP IN SURFACE LITTER
@@ -292,12 +327,23 @@ contains
   LWRad2Soil_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
   LWRad2LitR_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
 
+  !write(*,*) "Radiation Props: "
+  !write(*,*) "RadSWGrnd_col(NY,NX) = ", RadSWGrnd_col(NY,NX)
+  !write(*,*) "LWRadSky_col(NY,NX) = ", LWRadSky_col(NY,NX)
+  !write(*,*) "FracSurfAsSnow_col(NY,NX) = ", FracSurfAsSnow_col(NY,NX)
+  !write(*,*) "FracSWRad2Grnd_col(NY,NX) = ", FracSWRad2Grnd_col(NY,NX)
+  !write(*,*) "LWRadCanGPrev_col(NY,NX) = ", LWRadCanGPrev_col(NY,NX)
+  !write(*,*) "FracSurfSnoFree_col(NY,NX) = ", FracSurfSnoFree_col(NY,NX)
+  !write(*,*) "FracSurfBareSoil_col(NY,NX) = ", FracSurfBareSoil_col(NY,NX)
+  !write(*,*) "FracSurfByLitR_col(NY,NX) = ", FracSurfByLitR_col(NY,NX)
+
   ! SoilEmisivity,SnowEmisivity,SurfLitREmisivity=emissivities of surface soil, snow and litter
   !stefboltz_const is stefan-boltzman constant converted into [MJ /(m^2 K^4 h)]
   Stefboltz_area          = stefboltz_const*AREA(3,NUM(NY,NX),NY,NX)
   LWEmscefSnow_col(NY,NX) = SnowEmisivity*Stefboltz_area*FracSurfAsSnow_col(NY,NX)*dts_HeatWatTP
   LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
   LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP
+  write(*,*) "LWEmscefSnow_col = ", LWEmscefSnow_col(NY,NX)
 !
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
@@ -518,7 +564,9 @@ contains
   VaporSoi1  = vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGASC*TKX1))
 
   !evaporation, no more than what is available, g H2O
+  if(TopLayWatVol<1.0e-30) TopLayWatVol=0.0
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol*dts_wat))   
+  !VapXAir2TopLay=0.0
 
   !latent heat > 0 into soil/ground
   LatentHeatEvapAir2Grnd=VapXAir2TopLay*EvapLHTC
@@ -790,7 +838,11 @@ contains
     K1                 = MAX(1,MIN(100,INT(100.0_r8*(AZMAX1(POROS_vr(NUM(NY,NX),NY,NX)-THETW1))/POROS_vr(NUM(NY,NX),NY,NX))+1))
     CNDR               = HydroCond_3D(3,K0,0,NY,NX)
     CND1               = HydroCond_3D(3,K1,NUM(NY,NX),NY,NX)*RainEkReducedKsat
-    DarcyCondLitR2Soil = 2.0_r8*CNDR*CND1/(CNDR*DLYR_3D(3,NUM(NY,NX),NY,NX)+CND1*DLYRR_COL(NY,NX))
+    if(ats_cpl_mode)then
+      DarcyCondLitR2Soil = 0.0
+    else
+      DarcyCondLitR2Soil = 2.0_r8*CNDR*CND1/(CNDR*DLYR_3D(3,NUM(NY,NX),NY,NX)+CND1*DLYRR_COL(NY,NX))
+    endif
     PSIST0             = PSISM1_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)
     PSIST1             = PSISM1_vr(NUM(NY,NX),NY,NX)+PSIGrav_vr(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
     DarcyFlxLitR2Soil  = DarcyCondLitR2Soil*(PSIST0-PSIST1)*AREA(3,NUM(NY,NX),NY,NX)*FracEffAsLitR_col(NY,NX)*dts_HeatWatTP
@@ -1584,7 +1636,7 @@ contains
     PrecNet2SoiMacP,RainPrecHeatAir2LitR)
 
   if(lverb)write(*,*)'run AtmLandSurfExchangeM'
-! updates ResistanceLitRLay
+  ! updates ResistanceLitRLay
   call AtmLandSurfExchangeM(I,J,M,NY,NX,PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR,&
     ResistanceLitRLay,TopLayWatVol,LatentHeatAir2Sno,&
     HeatSensEvapAir2Snow,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
