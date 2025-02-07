@@ -628,13 +628,13 @@ contains
 
       ELSEIF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 
-        write(*,*) "Heat Xfer before litter and soil fluxes (HeatX2SnoLay_snvr(L,NY,NX)) ", HeatX2SnoLay_snvr(L,NY,NX)
+!        write(*,*) "Heat Xfer before litter and soil fluxes (HeatX2SnoLay_snvr(L,NY,NX)) ", HeatX2SnoLay_snvr(L,NY,NX)
         NetSno2LayL                  = SnoX2SnoLay_snvr(L,NY,NX)
         NetWat2LayL                  = WatX2SnoLay_snvr(L,NY,NX)-TotSnoWatFlow2Litr-TotWatXFlx2SoiMicP-WatFlowSno2MacP
         NetIce2LayL                  = IceX2SnoLay_snvr(L,NY,NX)
         NetHeat2LayL                 = HeatX2SnoLay_snvr(L,NY,NX)-TotSnoHeatFlow2Litr-TotHeatFlow2Soi
-        write(*,*) "Heat flow to liter (TotSnoHeatFlow2Litr) ", TotSnoHeatFlow2Litr
-        write(*,*) "Heat flow to soil  (TotHeatFlow2Soi) ", TotHeatFlow2Soi
+!        write(*,*) "Heat flow to liter (TotSnoHeatFlow2Litr) ", TotSnoHeatFlow2Litr
+!        write(*,*) "Heat flow to soil  (TotHeatFlow2Soi) ", TotHeatFlow2Soi
 
        if(VOLW0X < -NetWat2LayL)then
          dNetWat2LayL              = -AZMAX1(VOLW0X,tinyw)*mscal+NetWat2LayL
@@ -754,10 +754,10 @@ contains
 
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
         TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
-        write(*,*) "Inital energy (ENGY0): ", ENGY0
-        write(*,*) "NetHeat2LayL: ", NetHeat2LayL
-        write(*,*) "HeatByFrezThaw: ", HeatByFrezThaw
-        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX): ", VLHeatCapSnowM1_snvr(L,NY,NX)
+!        write(*,*) "Inital energy (ENGY0): ", ENGY0
+!        write(*,*) "NetHeat2LayL: ", NetHeat2LayL
+!        write(*,*) "HeatByFrezThaw: ", HeatByFrezThaw
+!        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX): ", VLHeatCapSnowM1_snvr(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
         TKSnow1_snvr(L,NY,NX)=TairK_col(NY,NX)
       ELSE
@@ -836,10 +836,9 @@ contains
   RadNet2Sno2          = RFLX0-LWRadSno1                            !net radiation
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySnow
 
-  write(*,*) "Incoming radiation (RFLX0) = ", RFLX0
-  write(*,*) "emitted radiation (LWRadSno1) = ", LWRadSno1
-  write(*,*) "RadNet2Sno2 = ", RadNet2Sno2
-
+!  write(*,*) "Incoming radiation (RFLX0) = ", RFLX0
+!  write(*,*) "emitted radiation (LWRadSno1) = ", LWRadSno1
+!  write(*,*) "RadNet2Sno2 = ", RadNet2Sno2
 
   !
   !     AERODYNAMIC RESISTANCE ABOVE SNOWPACK INCLUDING
@@ -928,12 +927,11 @@ contains
   QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)-EvapSublimation2-EVAPW2
   RainPrec2Sno_col(NY,NX)  = RainPrec2Sno_col(NY,NX)+Rainfall
 
-  write(*,*) "Amount of energy in falling snow (HeatSnofall2Snow): ", HeatSnofall2Snow
-  write(*,*) "Energy from radiation (Radnet2Snow)                : ", Radnet2Snow
-  write(*,*) "Canopy temp (TKQ): ", TKQ_col
-  write(*,*) "TKSnow1_snvr: ", TKSnow1_snvr(1,NY,NX)
-  write(*,*) "Heat transfer from temp difference (HeatSensAir2Sno2): ", HeatSensAir2Sno2
-
+!  write(*,*) "Amount of energy in falling snow (HeatSnofall2Snow): ", HeatSnofall2Snow
+!  write(*,*) "Energy from radiation (Radnet2Snow)                : ", Radnet2Snow
+!  write(*,*) "Canopy temp (TKQ): ", TKQ_col
+!  write(*,*) "TKSnow1_snvr: ", TKSnow1_snvr(1,NY,NX)
+!  write(*,*) "Heat transfer from temp difference (HeatSensAir2Sno2): ", HeatSensAir2Sno2
 
   if(WatFlowInSnowM_snvr(M,1,NY,NX)>0._r8 .and. isclose(TCSnow_snvr(1,NY,NX),spval))then
     TCSnow_snvr(1,NY,NX)=units%Kelvin2Celcius(TairK_col(NY,NX))  

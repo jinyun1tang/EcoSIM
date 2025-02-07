@@ -331,6 +331,20 @@ type, public :: Cumlate_Flux_Diag_type
   this%TReduxN2O              = 0.0_r8
   this%TFixN2                 = 0.0_r8
   this%tCH4OxiAero            = 0._r8
+  this%tRO2UptkHeterG     = 0._r8
+  this%tRO2DmndHeterG     = 0._r8
+  this%TDeniReduxNO2Band  = 0._r8
+  this%TDeniReduxNO2Soil  = 0._r8
+  this%TNitReduxNO2Band   = 0._r8
+  this%TNitReduxNO2Soil   = 0._r8
+  this%tRNH3Oxi           = 0._r8
+  this%RNO2ReduxSoilChemo = 0._r8
+  this%RNO2ReduxBandChemo = 0._r8
+  this%RN2OProdSoilChemo  = 0._r8
+  this%RN2OProdBandChemo  = 0._r8
+  this%RNO3ProdSoilChemo  = 0._r8
+  this%RNO3ProdBandChemo  = 0._r8
+  this%RNO2ReduxChemo     = 0._r8  
   end subroutine nit_aqmf_diag
 !------------------------------------------------------------------------------------------
 

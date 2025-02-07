@@ -977,14 +977,14 @@ module Hour1Mod
         CCLAY_vr(NU(NY,NX),NY,NX)              = 0._r8
       ENDIF
       
-      IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-        D50=1.0_r8*CCLAY_vr(NU(NY,NX),NY,NX)+10._r8*CSILT(NU(NY,NX),NY,NX) &
-          +100._r8*CSAND_vr(NU(NY,NX),NY,NX)+100._r8*CORGM
-        ZD50                    = 0.041*(ppmc*D50)**0.167_r8
-        SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
+      D50=1.0_r8*CCLAY_vr(NU(NY,NX),NY,NX)+10._r8*CSILT(NU(NY,NX),NY,NX) &
+        +100._r8*CSAND_vr(NU(NY,NX),NY,NX)+100._r8*CORGM
+      ZD50                    = 0.041*(ppmc*D50)**0.167_r8
+      SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
+      IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
         CER(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
-
+        print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY_vr(NU(NY,NX),NY,NX)+CORGM) &
           +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU(NY,NX),NY,NX)))

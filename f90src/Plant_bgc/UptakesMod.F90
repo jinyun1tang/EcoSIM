@@ -807,12 +807,17 @@ module UptakesMod
       EX                     = 0.0_r8
       HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TairK               !enthalpy of condensed water add to canopy, MJ/(h)
     !canopy lose water, and there is canopy-held water  
-    ELSEIF(EX.LE.0.0_r8 .AND. WatHeldOnCanopy_pft(NZ).GT.0.0_r8)THEN
-      !evaporation, and there is water stored in canopy
-      !VapXAir2Canopy_pft <0._r8, off canopy as evaporation, cannot be more than WatHeldOnCanopy_pft(NZ)
-      VapXAir2Canopy_pft(NZ) = AMAX1(EX*CanopyBndlResist_pft(NZ)/(CanopyBndlResist_pft(NZ)+RZ),-WatHeldOnCanopy_pft(NZ))
-      EX                     = EX-VapXAir2Canopy_pft(NZ)                !demand for transpiration
-      HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TKC1          !enthalpy of evaporated water leaving canopy
+    ELSEIF(EX.LE.0.0_r8)THEN 
+      if(WatHeldOnCanopy_pft(NZ).GT.0.0_r8)THEN
+        !evaporation, and there is water stored in canopy
+        !VapXAir2Canopy_pft <0._r8, off canopy as evaporation, cannot be more than WatHeldOnCanopy_pft(NZ)
+        VapXAir2Canopy_pft(NZ) = AMAX1(EX*CanopyBndlResist_pft(NZ)/(CanopyBndlResist_pft(NZ)+RZ),-WatHeldOnCanopy_pft(NZ))
+        EX                     = EX-VapXAir2Canopy_pft(NZ)                !demand for transpiration
+        HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TKC1          !enthalpy of evaporated water leaving canopy
+      ELSE
+        VapXAir2Canopy_pft(NZ) =0._r8
+        HeatEvapSens = 0._r8  
+      ENDIF
     ENDIF
 
     !Transpiration_pft<0 means canopy lose water through transpiration
@@ -1040,7 +1045,7 @@ module UptakesMod
   real(r8) :: RSSL,RTAR2
   integer :: N, L
   associate(                                                                 &
-    DPTHZ_vr                    => plt_site%DPTHZ_vr,                        &
+    CumSoilThickMidL_vr                    => plt_site%CumSoilThickMidL_vr,                        &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft,             &
     VLWatMicPM_vr               => plt_site%VLWatMicPM_vr,                   &
     ZERO                        => plt_site%ZERO,                            &
@@ -1140,7 +1145,7 @@ module UptakesMod
         !     Root1stXNumL_pvr,Root2ndXNum_pvr=number of primary,secondary axes
 !
         FRAD1                  = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8
-        RootResistPrimary(N,L) = RootAxialResist_pft(N,NZ)*DPTHZ_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
+        RootResistPrimary(N,L) = RootAxialResist_pft(N,NZ)*CumSoilThickMidL_vr(L)/(FRAD1*Root1stXNumL_pvr(ipltroot,L,NZ)) &
           +RootAxialResist_pft(ipltroot,NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(ipltroot,L,NZ))
 
         FRAD2                = (Root2ndRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4._r8

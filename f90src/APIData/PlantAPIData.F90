@@ -75,7 +75,7 @@ implicit none
   real(r8), pointer :: PPX_pft(:)                      => null()    !plant population, [m-2]
   logical , pointer :: flag_pft_active(:)          => null()
   real(r8), pointer :: PlantPopulation_pft(:)      => null()    !plant population, [d-2]
-  real(r8), pointer :: DPTHZ_vr(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8), pointer :: CumSoilThickMidL_vr(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FracSoiAsMicP_vr(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
   real(r8), pointer :: VLWatMicPM_vr(:,:) => null()    !soil micropore water content, [m3 d-2]
@@ -937,7 +937,7 @@ implicit none
   allocate(this%DLYR3(0:JZ1)); this%DLYR3=spval
   allocate(this%ElmBalanceCum_pft(NumPlantChemElms,JP1));this%ElmBalanceCum_pft=spval
   allocate(this%CumSoilThickness_vr(0:JZ1));this%CumSoilThickness_vr=spval
-  allocate(this%DPTHZ_vr(0:JZ1));this%DPTHZ_vr=spval
+  allocate(this%CumSoilThickMidL_vr(0:JZ1));this%CumSoilThickMidL_vr=spval
   allocate(this%PPI_pft(JP1));this%PPI_pft=spval
   allocate(this%PPatSeeding_pft(JP1));this%PPatSeeding_pft=spval
   allocate(this%PPX_pft(JP1));this%PPX_pft=spval

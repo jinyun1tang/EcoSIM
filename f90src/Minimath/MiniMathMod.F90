@@ -280,8 +280,12 @@ module minimathmod
     return     
   endif
 
-  ac=a/c;bc=b/c    
-  ans=abs((ac-bc)/(ac+bc))<tiny_val
+  if(abs(a+b)<1.e-20_r8)then
+    ans=.false.
+  else  
+    ac=a/c;bc=b/c    
+    ans=abs((ac-bc)/(ac+bc))<tiny_val
+  endif
   end function isclose
 
 ! ----------------------------------------------------------------------

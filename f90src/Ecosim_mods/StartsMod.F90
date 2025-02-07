@@ -933,7 +933,7 @@ module StartsMod
       DLYR_3D(3,L,NY,NX)           = DLYRI_3D(3,L,NY,NX)
       SoilDepthMidLay_vr(L,NY,NX)  = 0.5_r8*(CumDepz2LayBottom_vr(L,NY,NX)+CumDepz2LayBottom_vr(L-1,NY,NX))
       CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)+DLYR_3D(3,NU(NY,NX),NY,NX)
-      DPTHZ_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
+      CumSoilThickMidL_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AREA(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)

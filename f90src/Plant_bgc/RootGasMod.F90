@@ -83,7 +83,7 @@ module RootGasMod
     RootStrutElms_pft        => plt_biom%RootStrutElms_pft,           &
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,              &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,         &
-    DPTHZ_vr                 => plt_site%DPTHZ_vr,                    &
+    CumSoilThickMidL_vr                 => plt_site%CumSoilThickMidL_vr,                    &
     AtmGasc                  => plt_site%AtmGasc,                     &  !in: atmospheric gaseous concentration
     ZEROS                    => plt_site%ZEROS,                       &
     ZERO                     => plt_site%ZERO,                        &
@@ -218,7 +218,7 @@ module RootGasMod
 !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       !primary roots conductance scalar
-      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ_vr(L)
+      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar
       RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
@@ -573,17 +573,15 @@ module RootGasMod
 !     C*E,C*A1=atmosphere,root gas concentration
 !     DF*A=root-atmosphere gas conductance
 !
-            trcs_maxRootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
-            trcs_maxRootml_loc(idg_NH3) = trcs_rootml_loc(idg_NH3)+RUPNTX
 
+            trcs_maxRootml_loc(idg_CO2) = AZMAX1(trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled)
+            trcs_maxRootml_loc(idg_NH3) = AZMAX1(trcs_rootml_loc(idg_NH3)+RUPNTX)
+            trcs_maxRootml_loc(idg_O2)=AZMAX1(trcs_rootml_loc(idg_O2)-ROxyRoot2Uptk)
             DO idg=idg_beg,idg_NH3
-              if(idg/=idg_CO2 .and. idg/=idg_NH3)then
-                if(idg==idg_O2)then
-                  trcs_maxRootml_loc(idg)=trcs_rootml_loc(idg)-ROxyRoot2Uptk                
-                else
-                  trcs_maxRootml_loc(idg)=trcs_rootml_loc(idg)+RootUptkSoiSolute(idg)
-                endif
+              if(idg/=idg_CO2 .and. idg/=idg_NH3 .and. idg/=idg_O2)then
+                trcs_maxRootml_loc(idg)=trcs_rootml_loc(idg)+RootUptkSoiSolute(idg)
               endif
+              
               Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg)) &
                 *DisolvedGasVolume(idg)-trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ)) &
                 /(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))
