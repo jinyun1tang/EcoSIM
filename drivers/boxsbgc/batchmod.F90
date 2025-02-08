@@ -139,7 +139,7 @@ contains
   micfor%COXYE =forc%COXYE
   micfor%O2_irrig_conc  =0._r8      !oxygen concentration in surface irrigation
   micfor%O2_rain_conc  =0._r8      !oxygen concentration in precipitation
-  micfor%Irrig2LitRSurf =0._r8      !irrigation flux into surface litter
+  micfor%Irrig2LitRSurf_col =0._r8      !irrigation flux into surface litter
   micfor%Rain2LitRSurf =0._r8      !precipitation flux into surface litter
   micfor%TempOffset=forc%TempOffset
   micfor%VLitR  =forc%VLitR
