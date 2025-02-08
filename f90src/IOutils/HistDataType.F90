@@ -4,10 +4,11 @@ module HistDataType
 ! when output is done with netcdf, no id is needed.
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use data_const_mod,   only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
-  use SoilBGCNLayMod,   only: SumMicbGroup,              sumDOML, sumMicBiomLayL
+  use SoilBGCNLayMod,   only: SumMicbGroup, sumDOML, sumMicBiomLayL
   use UnitMod,          only: units
-  use MiniMathMod,      only: safe_adb,                  AZMAX1
-  use EcoSiMParDataMod, only: pltpar,                    micpar
+  use MiniMathMod,      only: safe_adb,     AZMAX1
+  use EcoSiMParDataMod, only: pltpar,       micpar
+  use DebugToolMod,     only: DebugPrint
   use GridConsts
   use GridMod
   use HistFileMod
@@ -2709,7 +2710,7 @@ implicit none
       this%h1D_Soil_N2_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Soil_NH3_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Soil_H2_Flx_col(ncol)          = SurfGasEmisFlx_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_PAR_col(ncol)              = RadPARSolarBeam_col(NY,NX)
+      this%h1D_PAR_col(ncol)              = RadPARSolarBeam_col(NY,NX)      
       this%h1D_VHeatCap_litr_col(ncol)    = VHeatCapacity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AR_WetDep_FLX_col(ncol)    = Gas_WetDeposition_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_WetDep_FLX_col(ncol)   = Gas_WetDeposition_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

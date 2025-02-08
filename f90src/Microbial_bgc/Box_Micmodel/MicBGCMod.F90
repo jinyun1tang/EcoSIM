@@ -4,20 +4,21 @@ module MicBGCMod
 ! codes to do soil biological transfOMBioResduations
 !
 ! USES:
-  use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,    only: endrun, destroy
-  use EcoSIMCtrlMod     , only : etimer  
-  use TracerIDMod
-  use MicAutoCPLXMod
-  use minimathmod, only: safe_adb, AZMAX1
-  use EcosimConst
-  use EcoSIMSolverPar
-  use NitroPars
-  use MicrobeDiagTypes
+  use data_kind_mod,        only: r8 => DAT_KIND_R8
+  use abortutils,           only: endrun,   destroy
+  use EcoSIMCtrlMod,        only: etimer
+  use minimathmod,          only: safe_adb, AZMAX1
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
   use EcoSiMParDataMod,     only: micpar
+  use DebugToolMod,         only: DebugPrint
+  use TracerIDMod
+  use MicAutoCPLXMod
+  use EcosimConst
+  use EcoSIMSolverPar
+  use NitroPars
+  use MicrobeDiagTypes
   use MicrobMathFuncMod
   use MicrobMathFuncMod
   implicit none
@@ -786,9 +787,9 @@ module MicBGCMod
 !           GrowthEnvScalHeter=combined temp and water stress effect on growth respiration
 !           TempMaintRHeter=temperature effect on maintenance respiration
           IF(N.EQ.mid_Aerob_Fungi)THEN
-            WatStressMicb=EXP(0.1_r8*PSISoilMatricP)
+            WatStressMicb=EXP(0.1_r8*AMAX1(PSISoilMatricP,-500._r8))
           ELSE
-            WatStressMicb=EXP(0.2_r8*PSISoilMatricP)
+            WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
           ENDIF
           OXKX                      = OXKM
           GrowthEnvScalHeter(NGL,K) = TSensGrowth*WatStressMicb
@@ -2790,7 +2791,8 @@ module MicBGCMod
 !     RFOMP=O2-unlimited respiration of DOC
 !     ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
-  OXYI  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*(-COXYS+2.5_r8)))
+
+  OXYI  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*AMAX1(-COXYS+2.5_r8,-50._r8)))
   FSBST = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
   RGOFY = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXF*WatStressMicb*OMActHeter(NGL,K))
   RGOFZ = RGOFY*FSBST*TSensGrowth

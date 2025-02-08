@@ -698,7 +698,7 @@ implicit none
     plt_soilchem%HydroCondMicP4RootUptake_vr(L) = HydroCondMicP4RootUptake_vr(L,NY,NX)
     plt_soilchem%GasDifc_vr(idg_beg:idg_end,L)  = GasDifc_vr(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%SoilResit4RootPentrate_vr(L)   = SoilResit4RootPentrate_vr(L,NY,NX)
-    plt_site%DPTHZ_vr(L)                        = DPTHZ_vr(L,NY,NX)
+    plt_site%CumSoilThickMidL_vr(L)                        = CumSoilThickMidL_vr(L,NY,NX)
   ENDDO
   plt_allom%FracHour4LeafoffRemob(:) = FracHour4LeafoffRemob(:)
   DO L=1,NL(NY,NX)

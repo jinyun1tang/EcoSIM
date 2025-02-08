@@ -231,9 +231,9 @@ implicit none
       !   call SumRootBiome(NZ,masst_inital)
 
         IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
-          fRootGrowPSISense_pvr(N,L,NZ)=EXP(0.05_r8*PSIRoot_pvr(N,L,NZ))
+          fRootGrowPSISense_pvr(N,L,NZ)=EXP(0.05_r8*AMAX1(PSIRoot_pvr(N,L,NZ),-5000._r8))
         ELSE
-          fRootGrowPSISense_pvr(N,L,NZ)=EXP(0.10_r8*PSIRoot_pvr(N,L,NZ))
+          fRootGrowPSISense_pvr(N,L,NZ)=EXP(0.10_r8*AMAX1(PSIRoot_pvr(N,L,NZ),-5000._r8))
         ENDIF  
         
         call GrowRootMycoAxes(I,J,N,L,L1,NZ,NRX,iRootXsUpdateFlag,TFN6_vr,&

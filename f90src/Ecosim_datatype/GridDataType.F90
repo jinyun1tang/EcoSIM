@@ -14,7 +14,7 @@ implicit none
   real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
   real(r8),target,allocatable ::  SoilDepthMidLay_vr(:,:,:)                        !depth to middle of soil layer [m]
   real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
-  real(r8),target,allocatable ::  DPTHZ_vr(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  CumSoilThickMidL_vr(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
   real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
   real(r8),target,allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
   integer,target,allocatable ::  NU(:,:)                             !soil surface layer number
@@ -43,7 +43,7 @@ contains
   allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
   allocate(SoilDepthMidLay_vr(JZ,JY,JX));     SoilDepthMidLay_vr=0._r8
   allocate(CumSoilThickness_vr(0:JZ,JY,JX)); CumSoilThickness_vr=0._r8
-  allocate(DPTHZ_vr(JZ,JY,JX));    DPTHZ_vr=0._r8
+  allocate(CumSoilThickMidL_vr(JZ,JY,JX));    CumSoilThickMidL_vr=0._r8
   allocate(AREA(3,0:JZ,JY,JX)); AREA=0._r8
   allocate(DIST(3,JD,JV,JH));   DIST=0._r8
   allocate(NU(JY,JX));          NU=0
@@ -73,7 +73,7 @@ contains
   call destroy(XDPTH)
   call destroy(SoilDepthMidLay_vr)
   call destroy(CumSoilThickness_vr)
-  call destroy(DPTHZ_vr)
+  call destroy(CumSoilThickMidL_vr)
   call destroy(AREA)
   call destroy(DIST)
   call destroy(NU)

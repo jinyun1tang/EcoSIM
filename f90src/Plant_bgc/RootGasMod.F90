@@ -78,12 +78,13 @@ module RootGasMod
   real(r8) :: X
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB
   integer  :: idg
+  
 !     begin_execution
   associate(                                                          &
     RootStrutElms_pft        => plt_biom%RootStrutElms_pft,           &
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,              &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,         &
-    DPTHZ_vr                 => plt_site%DPTHZ_vr,                    &
+    CumSoilThickMidL_vr      => plt_site%CumSoilThickMidL_vr,         &
     AtmGasc                  => plt_site%AtmGasc,                     &  !in: atmospheric gaseous concentration
     ZEROS                    => plt_site%ZEROS,                       &
     ZERO                     => plt_site%ZERO,                        &
@@ -109,8 +110,8 @@ module RootGasMod
     RootGasConductance_pvr   => plt_rbgc%RootGasConductance_pvr,      &
     TScal4Difsvity_vr        => plt_soilchem%TScal4Difsvity_vr,       &
     trcs_VLN_vr              => plt_soilchem%trcs_VLN_vr,             &
-    trcs_solml_vr             => plt_soilchem%trcs_solml_vr,            &
-    trcg_gascl_vr             => plt_soilchem%trcg_gascl_vr,            &  !in: gas concentration from previous time step
+    trcs_solml_vr            => plt_soilchem%trcs_solml_vr,           &
+    trcg_gascl_vr            => plt_soilchem%trcg_gascl_vr,           &  !in: gas concentration from previous time step
     GasDifc_vr               => plt_soilchem%GasDifc_vr,              &  !in: gaseous diffusivity of volatile tracers
     SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,       &  !in: aqueous diffusivity of volatile tracers
     GasSolbility_vr          => plt_soilchem%GasSolbility_vr,         &
@@ -118,7 +119,7 @@ module RootGasMod
     SoilWatAirDry_vr         => plt_soilchem%SoilWatAirDry_vr,        &
     VLSoilMicP_vr            => plt_soilchem%VLSoilMicP_vr,           &
     AirFilledSoilPoreM_vr    => plt_soilchem%AirFilledSoilPoreM_vr,   &
-    trcg_gasml_vr             => plt_soilchem%trcg_gasml_vr,          & !
+    trcg_gasml_vr            => plt_soilchem%trcg_gasml_vr,           & !
     DiffusivitySolutEffM_vr  => plt_soilchem%DiffusivitySolutEffM_vr, &
     iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,        &
     RootPoreTortu4Gas        => plt_morph%RootPoreTortu4Gas,          &
@@ -158,21 +159,17 @@ module RootGasMod
     ENDDO
 
     DO idg=idg_beg,idg_end
-      if(idg==idg_CO2)then
-        trc_solml_loc(idg)=AMAX1(ZERO4Groth_pft(NZ),trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))
-      elseif(idg/=idg_O2)then
+      if(idg/=idg_O2 .and. idg/=idg_CO2)then
         trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
       endif
     enddo
+    trc_solml_loc(idg_CO2)=AMAX1(ZERO4Groth_pft(NZ),trcs_solml_vr(idg_CO2,L)*FracPRoot4Uptake(N,L,NZ))
     trc_solml_loc(idg_O2)=trcs_solml_vr(idg_O2,L)*FOXYX
 
 !  the two lines below may be redundant
 
-
-    idg=idg_O2
-    trc_gasml_loc(idg)  = AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg,L)*FOXYX)      
-    idg=idg_CO2
-    trc_gasml_loc(idg)=AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))
+    trc_gasml_loc(idg_O2)  = AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg_O2,L)*FOXYX)      
+    trc_gasml_loc(idg_CO2)=AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg_CO2,L)*FracPRoot4Uptake(N,L,NZ))
     RTVLWA                = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
     RTVLWB                = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
 
@@ -184,17 +181,10 @@ module RootGasMod
       endif
     ENDDO
     
-
     ROXYLX                = RO2AquaSourcePrev_vr(L)*FOXYX*dts_gas   !>0 into dissolved phase
-
     RootOxyDemandPerPlant = RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)
 !
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
-!
-!     *SGL1=diffusivity
-!     RootPoreTortu4Gas=tortuosity effect of root porosity on diffusivity
-!     CG=CO2g,OG=O2g,CH=CH4g,Z2=N2Og,ZH=NH3g,HG=H2g
-!     CL=CO2s,OL=O2s,CQ=CH4s,ZV=N2Os,ZN=NH3s,HL=H2s
 !
     do idg=idg_beg,idg_NH3
       GasDifc_tscaled(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
@@ -218,7 +208,7 @@ module RootGasMod
 !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot(L,NZ).GT.ZERO)THEN
       !primary roots conductance scalar
-      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/DPTHZ_vr(L)
+      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar
       RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
@@ -232,17 +222,6 @@ module RootGasMod
 !
 !     VARIABLES USED TO CALCULATE ROOT GAS TRANSFER
 !     BETWEEN AQUEOUS AND GASEOUS PHASES
-!
-!     RootLenPerPlant_pvr=root,myco length per plant
-!     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
-!     RTARR=root surface area/radius for uptake
-!     RootRaidus_rpft=path length for radial diffusion within root
-!     RootVH2O_pvr=root,myco aqueous volume
-!     S*L=solubility of gas in water from hour1.f:
-!     CO2=CO2,OXY=O2,CH4=CH4,N2O=N2O,NH3=NH3,H2G=H2
-!     DF*A=root-atmosphere gas conductance
-!     DFGP=rate const for equilibrn of gas concn in gaseous-aqueous phases
-!     RootCO2Autor_pvr=root CO2 flux from grosub.f
 !
 
     IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
@@ -573,17 +552,15 @@ module RootGasMod
 !     C*E,C*A1=atmosphere,root gas concentration
 !     DF*A=root-atmosphere gas conductance
 !
-            trcs_maxRootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
-            trcs_maxRootml_loc(idg_NH3) = trcs_rootml_loc(idg_NH3)+RUPNTX
 
+            trcs_maxRootml_loc(idg_CO2) = AZMAX1(trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled)
+            trcs_maxRootml_loc(idg_NH3) = AZMAX1(trcs_rootml_loc(idg_NH3)+RUPNTX)
+            trcs_maxRootml_loc(idg_O2)  = AZMAX1(trcs_rootml_loc(idg_O2)-ROxyRoot2Uptk)
             DO idg=idg_beg,idg_NH3
-              if(idg/=idg_CO2 .and. idg/=idg_NH3)then
-                if(idg==idg_O2)then
-                  trcs_maxRootml_loc(idg)=trcs_rootml_loc(idg)-ROxyRoot2Uptk                
-                else
-                  trcs_maxRootml_loc(idg)=trcs_rootml_loc(idg)+RootUptkSoiSolute(idg)
-                endif
+              if(idg/=idg_CO2 .and. idg/=idg_NH3 .and. idg/=idg_O2)then
+                trcs_maxRootml_loc(idg)=AZMAX1(trcs_rootml_loc(idg)+RootUptkSoiSolute(idg))
               endif
+              
               Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg)) &
                 *DisolvedGasVolume(idg)-trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ)) &
                 /(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))

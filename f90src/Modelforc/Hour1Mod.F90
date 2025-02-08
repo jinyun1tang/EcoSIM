@@ -95,7 +95,6 @@ module Hour1Mod
   real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
   real(r8) :: DPTH0           !water+ice thickness in litter
 
-  real(r8) :: tPBOT,tmp
   integer :: NZ,NR,K
   logical :: dosum
 !     execution begins here
@@ -125,17 +124,6 @@ module Hour1Mod
   if(lverb)write(*,*)'set atms gas conc'
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS  
-
-      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
-      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
 
       IF(J.EQ.1)THEN
         NumActivePlants(NY,NX)=0
@@ -320,7 +308,7 @@ module Hour1Mod
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NX, NY, idg
-
+  real(r8) :: tPBOT,tmp
 !     begin_execution
 !
 !     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
@@ -331,15 +319,18 @@ module Hour1Mod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
-      AtmGasCgperm3(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TairK_col(NY,NX)  !gC/m3
-      AtmGasCgperm3(idg_O2 ,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TairK_col(NY,NX)  !gO/m3
-      AtmGasCgperm3(idg_N2 ,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
-      AtmGasCgperm3(idg_N2O,NY,NX)  = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TairK_col(NY,NX)  !gN/m3
-      AtmGasCgperm3(idg_H2 ,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*TREF/TairK_col(NY,NX)  !gH/m3      
-      AtmGasCgperm3(idg_AR,NY,NX)  =  ARGE_col(NY,NX)*1.78E-02_r8*TREF/TairK_col(NY,NX)  !gAr/m3
-      AtmGasCgperm3(idg_NH3,NY,NX)  = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
-      AtmGasCgperm3(idg_NH3B,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TairK_col(NY,NX) !gN/m3
+      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
+      tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
+      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
+      
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp !gC/m3
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp !gC/m3
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp !gO/m3
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp !gN/m3
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp !gN/m3 
+      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gN/m3
 
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
@@ -744,7 +735,7 @@ module Hour1Mod
   QSnowH2Oloss_col(NY,NX)                 = 0._r8
   PrecHeat2Snow_col(NY,NX)                = 0._r8
   Prec2Snow_col(NY,NX)                    = 0._r8
-  ECO_HR_CO2_vr(:,NX,NX)                  = 0._r8
+  ECO_HR_CO2_vr(:,NY,NX)                  = 0._r8
   ECO_HR_CO2_col(NY,NX)                   = 0._r8
   ECO_HR_CH4_col(NY,NX)                   = 0._r8
   Eco_RadSW_col(NY,NX)                    = 0._r8
@@ -977,14 +968,14 @@ module Hour1Mod
         CCLAY_vr(NU(NY,NX),NY,NX)              = 0._r8
       ENDIF
       
-      IF(iErosionMode.EQ.ieros_frzthawsom.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-        D50=1.0_r8*CCLAY_vr(NU(NY,NX),NY,NX)+10._r8*CSILT(NU(NY,NX),NY,NX) &
-          +100._r8*CSAND_vr(NU(NY,NX),NY,NX)+100._r8*CORGM
-        ZD50                    = 0.041*(ppmc*D50)**0.167_r8
-        SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
+      D50=1.0_r8*CCLAY_vr(NU(NY,NX),NY,NX)+10._r8*CSILT(NU(NY,NX),NY,NX) &
+        +100._r8*CSAND_vr(NU(NY,NX),NY,NX)+100._r8*CORGM
+      ZD50                    = 0.041*(ppmc*D50)**0.167_r8
+      SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
+      IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
         CER(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
-
+        print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY_vr(NU(NY,NX),NY,NX)+CORGM) &
           +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU(NY,NX),NY,NX)))
@@ -2227,42 +2218,42 @@ module Hour1Mod
     CACX=CAC*AREA(3,LFDPTH,NY,NX)/40._r8
     CASX=CAS*AREA(3,LFDPTH,NY,NX)/40._r8
 
-    FertN_soil_vr(ifert_nh4,LFDPTH,NY,NX)=FertN_soil_vr(ifert_nh4,LFDPTH,NY,NX)+Z4AX*CVRDF
-    FertN_soil_vr(ifert_urea,LFDPTH,NY,NX)=FertN_soil_vr(ifert_urea,LFDPTH,NY,NX)+ZUAX*CVRDF
-    FertN_soil_vr(ifert_no3,LFDPTH,NY,NX)=FertN_soil_vr(ifert_no3,LFDPTH,NY,NX)+ZOAX*CVRDF
+    FertN_soil_vr(ifert_nh4,LFDPTH,NY,NX)  = AZMAX1(FertN_soil_vr(ifert_nh4,LFDPTH,NY,NX)+Z4AX*CVRDF)
+    FertN_soil_vr(ifert_urea,LFDPTH,NY,NX) = AZMAX1(FertN_soil_vr(ifert_urea,LFDPTH,NY,NX)+ZUAX*CVRDF)
+    FertN_soil_vr(ifert_no3,LFDPTH,NY,NX)  = AZMAX1(FertN_soil_vr(ifert_no3,LFDPTH,NY,NX)+ZOAX*CVRDF)
 
-    FertN_Band_vr(ifert_nh4_band,LFDPTH,NY,NX)=FertN_Band_vr(ifert_nh4_band,LFDPTH,NY,NX)+Z4BX*CVRDF
-    FertN_Band_vr(ifert_urea_band,LFDPTH,NY,NX)=FertN_Band_vr(ifert_urea_band,LFDPTH,NY,NX)+ZUBX*CVRDF
-    FertN_Band_vr(ifert_no3_band,LFDPTH,NY,NX)=FertN_Band_vr(ifert_no3_band,LFDPTH,NY,NX)+ZOBX*CVRDF
+    FertN_Band_vr(ifert_nh4_band,LFDPTH,NY,NX)  = AZMAX1(FertN_Band_vr(ifert_nh4_band,LFDPTH,NY,NX)+Z4BX*CVRDF)
+    FertN_Band_vr(ifert_urea_band,LFDPTH,NY,NX) = AZMAX1(FertN_Band_vr(ifert_urea_band,LFDPTH,NY,NX)+ZUBX*CVRDF)
+    FertN_Band_vr(ifert_no3_band,LFDPTH,NY,NX)  = AZMAX1(FertN_Band_vr(ifert_no3_band,LFDPTH,NY,NX)+ZOBX*CVRDF)
 
     trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
     trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
     trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
     trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF
     IF(LFDPTH.EQ.0)THEN
-      FertN_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)=FertN_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)+Z4AX*BAREF
-      FertN_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)=FertN_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)+Z3AX
-      FertN_soil_vr(ifert_urea,NU(NY,NX),NY,NX)=FertN_soil_vr(ifert_urea,NU(NY,NX),NY,NX)+ZUAX*BAREF
-      FertN_soil_vr(ifert_no3,NU(NY,NX),NY,NX)=FertN_soil_vr(ifert_no3,NU(NY,NX),NY,NX)+ZOAX*BAREF
+      FertN_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)=AZMAX1(FertN_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)+Z4AX*BAREF)
+      FertN_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)=AZMAX1(FertN_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)+Z3AX)
+      FertN_soil_vr(ifert_urea,NU(NY,NX),NY,NX)=AZMAX1(FertN_soil_vr(ifert_urea,NU(NY,NX),NY,NX)+ZUAX*BAREF)
+      FertN_soil_vr(ifert_no3,NU(NY,NX),NY,NX)=AZMAX1(FertN_soil_vr(ifert_no3,NU(NY,NX),NY,NX)+ZOAX*BAREF)
 
-      FertN_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)=FertN_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)+Z4BX*BAREF
-      FertN_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)=FertN_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)+Z3BX
-      FertN_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)=FertN_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)+ZUBX*BAREF
-      FertN_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)=FertN_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)+ZOBX*BAREF
+      FertN_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)=AZMAX1(FertN_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)+Z4BX*BAREF)
+      FertN_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)=AZMAX1(FertN_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)+Z3BX)
+      FertN_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)=AZMAX1(FertN_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)+ZUBX*BAREF)
+      FertN_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)=AZMAX1(FertN_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)+ZOBX*BAREF)
 
       trcp_saltpml_vr(idsp_CaH4P2O8,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8,NU(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
       trcp_saltpml_vr(idsp_CaH4P2O8B,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8B,NU(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
       trcp_saltpml_vr(idsp_HA,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_HA,NU(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
       trcp_saltpml_vr(idsp_HAB,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_HAB,NU(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF
     ELSE
-      FertN_soil_vr(ifert_nh3,LFDPTH,NY,NX)=FertN_soil_vr(ifert_nh3,LFDPTH,NY,NX)+Z3AX*CVRDF
-      FertN_Band_vr(ifert_nh3_band,LFDPTH,NY,NX)=FertN_Band_vr(ifert_nh3_band,LFDPTH,NY,NX)+Z3BX*CVRDF
+      FertN_soil_vr(ifert_nh3,LFDPTH,NY,NX)      = AZMAX1(FertN_soil_vr(ifert_nh3,LFDPTH,NY,NX)+Z3AX*CVRDF)
+      FertN_Band_vr(ifert_nh3_band,LFDPTH,NY,NX) = AZMAX1(FertN_Band_vr(ifert_nh3_band,LFDPTH,NY,NX)+Z3BX*CVRDF)
     ENDIF
     trcp_saltpml_vr(idsp_CaCO3,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaCO3,NU(NY,NX),NY,NX)+CACX
     trcp_saltpml_vr(idsp_CaSO4,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaSO4,NU(NY,NX),NY,NX)+CASX
-    TZIN=TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
-    TPIN=TPIN+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
-    TIONIN=TIONIN+2.0_r8*(CACX+CASX)
+    TZIN   = TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
+    TPIN   = TPIN+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
+    TIONIN = TIONIN+2.0_r8*(CACX+CASX)
     FertNFlx_CumYr_col(NY,NX)=FertNFlx_CumYr_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
     FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
   ENDIF

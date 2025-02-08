@@ -211,11 +211,18 @@ if (ATS_ECOSIM)
         set(ECOSIM_TPLS "${ECOSIM_TPLS} ${CURL_LIBRARY}")
     endif()
 
-    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -fPIC")
-
+    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -ldl -lz -lcurl -lhdf5 -lnetcdf -lnetcdff")
+    
 else()
     add_subdirectory(3rd-partylibs)
+    
+    #string(REPLACE "-ffpe-trap=invalid" "" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
 endif()
+
+#string(REPLACE "-ffpe-trap=invalid" "" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
+#message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+#message(STATUS "CMAKE_C_FLAGS: ${CMAKE_C_FLAGS}")
+#message(STATUS "CMAKE_Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
 
 if (NOT ECOSIM_HAVE_NETCDF)
   list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
