@@ -315,8 +315,7 @@ implicit none
       micstt%DOM(idom,K) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
     ENDDO
   ENDDO
-  print*,I,J,L,SolidOM_vr(ielmc,1,1:jcplx,L,NY,NX)
-  pause
+
   micstt%SorbedOM(idom_beg:idom_end,1:jcplx)               = SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SolidOMAct(1:jsken,1:jcplx)                       = SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)
   micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)       = SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)
