@@ -33,9 +33,6 @@ module TranspSaltMod
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
 
-  real(r8) :: RCHQF,RCHGFU,RCHGFT
-  real(r8) :: XN
-
   public :: TranspSalt
   contains
 
@@ -351,32 +348,7 @@ module TranspSaltMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ZeroBoundarySnowFlux(N,M5,M4)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: N,M5,M4
-!     begin_execution
-  trcSalt_SnowDrift_flxM_2D(idsalt_beg:idsalt_end,N,M5,M4)=0.0
-
-  end subroutine ZeroBoundarySnowFlux
-!------------------------------------------------------------------------------------------
-
-  subroutine ZeroRechargeSoluteFlux(N,NN,M5,M4)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: N,NN,M5,M4
-!     begin_execution
-
-  trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
-
-  end subroutine ZeroRechargeSoluteFlux
-!------------------------------------------------------------------------------------------
-
-  subroutine SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
+  subroutine SaltExportXBoundaryM(N1,N2,M,N,NN,M5,M4)
 !
 !     Description:
 !
@@ -400,20 +372,8 @@ module TranspSaltMod
   DO idsalt=idsalt_beg,idsalt_end
     trc_salt_rof_bounds(idsalt,N,NN,M5,M4)=trc_salt_rof_bounds(idsalt,N,NN,M5,M4)+trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,M5,M4)
   ENDDO
-  end subroutine SoluteExportThruBoundary
-!------------------------------------------------------------------------------------------
+  end subroutine SaltExportXBoundaryM
 
-  subroutine ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: N,NN,M5,M4
-!     begin_execution
-
-  trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
-
-  end subroutine ZeroSoluteInfluxThruBoundary
 !------------------------------------------------------------------------------------------
 
   subroutine SoluteGainSubsurfMicropore(M3,M2,M1,M,N,M6,M5,M4)
@@ -502,7 +462,7 @@ module TranspSaltMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AccumFluxMacMicPores(N,M6,M5,M4)
+  subroutine AccumMacMicPoresFlxM(N,M6,M5,M4)
 !
 !     Description:
 !
@@ -515,10 +475,10 @@ module TranspSaltMod
     trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4) = trcSalt_TransptMicP_3D(idsalt,N,M6,M5,M4)+trcSalt_MicpTranspFlxM_3D(idsalt,N,M6,M5,M4)
     trcSalt_TransptMacP_3D(idsalt,N,M6,M5,M4) = trcSalt_TransptMacP_3D(idsalt,N,M6,M5,M4)+trcSalt_MacpTranspFlxM_3D(idsalt,N,M6,M5,M4)
   ENDDO
-  end subroutine AccumFluxMacMicPores
+  end subroutine AccumMacMicPoresFlxM
 !------------------------------------------------------------------------------------------
 
-  subroutine NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B,trcSalt_FloXSurRof_flxM_col)
+  subroutine AccumRofSaltFlxM(M,N,N1,N2,N4,N5,N4B,N5B,trcSalt_FloXSurRof_flxM_col)
 !
 !     Description:
 !
@@ -545,10 +505,10 @@ module TranspSaltMod
       ENDDO
     ENDIF
   ENDDO D1202
-  end subroutine NetOverloadFluxInWater
+  end subroutine AccumRofSaltFlxM
 !------------------------------------------------------------------------------------------
 
-  subroutine NetOverloadFLuxInSnow(N,N1,N2,N4,N5, trcSalt_SnowDrift_flxM_col)
+  subroutine AccumSnowDriftSaltFlxM(N,N1,N2,N4,N5, trcSalt_SnowDrift_flxM_col)
 !
 !     Description:
 !
@@ -556,17 +516,16 @@ module TranspSaltMod
   integer, intent(in) :: N,N1,N2,N4,N5
   real(r8), intent(inout) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   integer :: idsalt
+
 !     begin_execution
-!     TQS*=net solute flux in snow transfer
-!     RQS*=solute flux in snow transfer
 !
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_SnowDrift_flxM_col(idsalt,N2,N1)=trcSalt_SnowDrift_flxM_col(idsalt,N2,N1)+trcSalt_SnowDrift_flxM_2D(idsalt,N,N2,N1)-trcSalt_SnowDrift_flxM_2D(idsalt,N,N5,N4)
   ENDDO
-  end subroutine NetOverloadFLuxInSnow
+  end subroutine AccumSnowDriftSaltFlxM
 !------------------------------------------------------------------------------------------
 
-  subroutine NetFluxInSnowpack(M,NY,NX,N1,N2)
+  subroutine AccumSaltTranspInSnowM(M,NY,NX,N1,N2)
 !
 !     Description:
 !
@@ -601,10 +560,10 @@ module TranspSaltMod
       ENDIF
     ENDIF
   ENDDO D1205
-  end subroutine NetFluxInSnowpack
+  end subroutine AccumSaltTranspInSnowM
 !------------------------------------------------------------------------------------------
 
-  subroutine TotFluxInMacMicPores(N,N1,N2,N3,N4,N5,NY,NX,N6)
+  subroutine AccumSoilPoreSaltTranspM(N,N1,N2,N3,N4,N5,NY,NX,N6)
 !
 !     Description:
 !
@@ -612,15 +571,9 @@ module TranspSaltMod
   integer, intent(in) :: N,N1,N2,N3,N4,N5,NY,NX
   integer, intent(inout) :: N6
   integer :: LL,idsalt
+
 !     begin_execution
 !
-!     T*FLS=net convective + diffusive solute flux through micropores
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,R*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     T*FHS=net convective + diffusive solute flux through macropores
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,R*FHB=convective + diffusive solute flux through macropores in non-band,band
-
 
   IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
     D1200: DO LL=N6,NL(NY,NX)
@@ -643,7 +596,7 @@ module TranspSaltMod
       trcSalt_Transp2Macp_flxM_vr(idsalt_beg:idsaltb_end,N3,N2,N1)=0.0
     ENDIF
   ENDIF
-  end subroutine TotFluxInMacMicPores
+  end subroutine AccumSoilPoreSaltTranspM
 !------------------------------------------------------------------------------------------
 
   subroutine SaltXGridTransptM(M,NHW,NHE,NVN,NVS,trcSalt_FloXSurRof_flxM_col, trcSalt_SnowDrift_flxM_col)
@@ -656,6 +609,8 @@ module TranspSaltMod
   real(r8), intent(out) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   integer :: NY,NX,L,N1,N2,N3,N4,N5,N6,N4B,N5B,N,NN
   integer :: M1,M2,M3,M4,M5,M6
+  real(r8) :: RCHQF,RCHGFU,RCHGFT
+  real(r8) :: XN
 
 !     begin_execution
 !     N3,N2,N1=L,NY,NX of source grid cell
@@ -677,11 +632,11 @@ module TranspSaltMod
         D9580: DO N=FlowDirIndicator(NY,NX),3
           D9575: DO NN=1,2
             IF(N.EQ.iEastWestDirection)THEN
-              N4=NX+1
-              N5=NY
-              N4B=NX-1
-              N5B=NY
-              N6=L
+              N4  = NX+1
+              N5  = NY
+              N4B = NX-1
+              N5B = NY
+              N6  = L
               IF(NN.EQ.iOutflow)THEN
                 IF(NX.EQ.NHE)THEN
                   M1 = NX
@@ -782,43 +737,38 @@ module TranspSaltMod
 !     RUNOFF IN 'WATSUB' AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-              IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0.0_r8) &
-                .OR.SurfRunoffWatFluxM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
-                call ZeroRechargeSoluteFlux(N,NN,M5,M4)
+              IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0.0_r8) &
+                .OR. SurfRunoffWatFluxM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
+                trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0_r8
               ELSE
 !
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                IF((NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                IF((NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
 
-                  call SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
+                  call SaltExportXBoundaryM(N1,N2,M,N,NN,M5,M4)
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
                 ELSEIF((NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
                   .OR.(NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-                  call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
+                  trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
                 ELSE
-                  call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
+                  trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
                 ENDIF
               ENDIF
 !
 !     BOUNDARY SNOW FLUX
 !
               IF(NN.EQ.iOutflow)THEN
-                call ZeroBoundarySnowFlux(N,M5,M4)
+                trcSalt_SnowDrift_flxM_2D(idsalt_beg:idsalt_end,N,M5,M4)=0.0
               ENDIF
             ENDIF
 !
 !     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
-!
-!     WaterFlow2MicPM_3D=water flux through soil micropore from watsub.f
-!     VLWatMicPM=micropore water-filled porosity from watsub.f
-!     R*FLS=convective solute flux through micropores
-!     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
 !
             IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
@@ -836,10 +786,6 @@ module TranspSaltMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-!     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
-!     VLWatMacPM=macropore water-filled porosity from watsub.f
-!     RFH*S=solute diffusive flux through macropore
-
                 IF(NN.EQ.iOutflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0 &
                   .OR. NN.EQ.iInflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0)THEN
 
@@ -853,7 +799,7 @@ module TranspSaltMod
                 ENDIF
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-                call AccumFluxMacMicPores(N,M6,M5,M4)
+                call AccumMacMicPoresFlxM(N,M6,M5,M4)
               ENDIF
             ENDIF
           ENDDO D9575
@@ -861,28 +807,25 @@ module TranspSaltMod
 !     TOTAL SOLUTE FLUXES IN EACH GRID CELL
 !
           IF(L.EQ.NUM(N2,N1))THEN
-            IF(N.NE.3)THEN
+            IF(N.NE.iVerticalDirection)THEN
 !
 !     NET OVERLAND SOLUTE FLUX IN WATER
 !
-              call NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B,trcSalt_FloXSurRof_flxM_col)
+              call AccumRofSaltFlxM(M,N,N1,N2,N4,N5,N4B,N5B,trcSalt_FloXSurRof_flxM_col)
 !
 !     NET OVERLAND SOLUTE FLUX IN SNOW
-              call NetOverloadFLuxInSnow(N,N1,N2,N4,N5, trcSalt_SnowDrift_flxM_col)
+              call AccumSnowDriftSaltFlxM(N,N1,N2,N4,N5, trcSalt_SnowDrift_flxM_col)
 !
-            ELSEIF(N.EQ.3)THEN
+            ELSEIF(N.EQ.iVerticalDirection)THEN
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VLSnowHeatCapM,VLHeatCapSnowMin_col=current,minimum volumetric heat capacity of snowpack
-!     T*BLS=net solute flux in snowpack
-!     R*BLS=solute flux in snowpack
-              call NetFluxInSnowpack(M,NY,NX,N1,N2)
+              call AccumSaltTranspInSnowM(M,NY,NX,N1,N2)
             ENDIF
           ENDIF
 !
 !     TOTAL SOLUTE FLUX IN MICROPORES AND MACROPORES
 !
-          call TotFluxInMacMicPores(N,N1,N2,N3,N4,N5,NY,NX,N6)
+          call AccumSoilPoreSaltTranspM(N,N1,N2,N3,N4,N5,NY,NX,N6)
         ENDDO D9580
       ENDDO D9585
     ENDDO D9590

@@ -517,7 +517,7 @@ module StartsMod
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
-  
+  print*,'RC0ff(NY,NX)',RC0ff(NY,NX)
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
