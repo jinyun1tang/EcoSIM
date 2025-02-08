@@ -556,11 +556,11 @@ module grosubsMod
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
     Stomata_Stress    = 1.0_r8
-    WaterStress4Groth = EXP(0.05_r8*PSICanopy_pft(NZ))
+    WaterStress4Groth = EXP(0.05_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ELSE
     !others
     Stomata_Stress    = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
-    WaterStress4Groth = EXP(0.10_r8*PSICanopy_pft(NZ))
+    WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
 !  write(119,*)I*1000+J,Stomata_Stress,RCS(NZ),PSICanopyTurg_pft(NZ),PSICanopy_pft(NZ),plt_ew%PSICanopyOsmo_pft(NZ)
   CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))

@@ -102,14 +102,14 @@ module SoluteMod
 !     RSNUBB=rate of banded urea fertilizer dissolution in band
 !     RSNOBB=rate of banded NO3 fertilizer dissolution in band
 !
-  FertN_soil_vr(ifert_nh4,L,NY,NX)       = FertN_soil_vr(ifert_nh4,L,NY,NX)-RSN4AA-RSN4BA
-  FertN_soil_vr(ifert_nh3,L,NY,NX)       = FertN_soil_vr(ifert_nh3,L,NY,NX)-RSN3AA-RSN3BA
-  FertN_soil_vr(ifert_urea,L,NY,NX)      = FertN_soil_vr(ifert_urea,L,NY,NX)-RSNUAA-RSNUBA
-  FertN_soil_vr(ifert_no3,L,NY,NX)       = FertN_soil_vr(ifert_no3,L,NY,NX)-RSNOAA-RSNOBA
-  FertN_Band_vr(ifert_nh4_band,L,NY,NX)  = FertN_Band_vr(ifert_nh4_band,L,NY,NX)-RSN4BB
-  FertN_Band_vr(ifert_nh3_band,L,NY,NX)  = FertN_Band_vr(ifert_nh3_band,L,NY,NX)-RSN3BB
-  FertN_Band_vr(ifert_urea_band,L,NY,NX) = FertN_Band_vr(ifert_urea_band,L,NY,NX)-RSNUBB
-  FertN_Band_vr(ifert_no3_band,L,NY,NX)  = FertN_Band_vr(ifert_no3_band,L,NY,NX)-RSNOBB
+  FertN_soil_vr(ifert_nh4,L,NY,NX)       = AZMAX1(FertN_soil_vr(ifert_nh4,L,NY,NX)-RSN4AA-RSN4BA)
+  FertN_soil_vr(ifert_nh3,L,NY,NX)       = AZMAX1(FertN_soil_vr(ifert_nh3,L,NY,NX)-RSN3AA-RSN3BA)
+  FertN_soil_vr(ifert_urea,L,NY,NX)      = AZMAX1(FertN_soil_vr(ifert_urea,L,NY,NX)-RSNUAA-RSNUBA)
+  FertN_soil_vr(ifert_no3,L,NY,NX)       = AZMAX1(FertN_soil_vr(ifert_no3,L,NY,NX)-RSNOAA-RSNOBA)
+  FertN_Band_vr(ifert_nh4_band,L,NY,NX)  = AZMAX1(FertN_Band_vr(ifert_nh4_band,L,NY,NX)-RSN4BB)
+  FertN_Band_vr(ifert_nh3_band,L,NY,NX)  = AZMAX1(FertN_Band_vr(ifert_nh3_band,L,NY,NX)-RSN3BB)
+  FertN_Band_vr(ifert_urea_band,L,NY,NX) = AZMAX1(FertN_Band_vr(ifert_urea_band,L,NY,NX)-RSNUBB)
+  FertN_Band_vr(ifert_no3_band,L,NY,NX)  = AZMAX1(FertN_Band_vr(ifert_no3_band,L,NY,NX)-RSNOBB)
 !
 !     ADD FERTILIZER DISSOLUTION TO ION FLUXES AND CONVERT TO MASS
 !

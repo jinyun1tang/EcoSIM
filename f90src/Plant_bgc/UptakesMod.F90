@@ -135,29 +135,21 @@ module UptakesMod
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
 !
+      CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
+      VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*SpecStalkVolume+WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
+
       HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
         .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
-        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))                 !active root
+        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
+        .and. VHeatCapCanopyPrev_pft>0._r8
 
       IF(HydroActivePlant)THEN  
 !
         call CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootAreaDivRadius_vr,RootResist,RootResistSoi,&
           RootResistPrimary,RootResist2ndary,SoiH2OResist,SoilRootResistance_rvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
 !
-!     INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
-!     BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
-!
-!     PSICanopy_pft=initial estimate of total canopy water potential
-!     PrecIntcptByCanopy_pft,PrecpHeatbyCanopy=convective water,heat flux from precip to canopy
-!     FTHRM,LWRad2Canopy=LW emitted,absorbed by canopy
-!     FracGrndByPFT=fraction of ground area AREA occupied by PFT
-!     CCPOLT=total nonstructural canopy C,N,P concentration
-!     CCPOLP,CZPOLP,CPPOLP=nonstructural C,N,P concn in canopy
-!     OSWT=molar mass of CCPOLT
-!     TKCX=intermediate estimate of TKC_pftused in convergence solution
-!     CanopyMassC=leaf+petiole+stalk mass, gC
-!     SpecStalkVolume=specific stalk volume
-!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in canopy,on canopy surfaces, m3 H2O
+!       INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
+!       BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
 !
         PSICanopy_pft(NZ)      = AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
         Transpiration_pft(NZ)  = 0.0_r8
@@ -174,11 +166,7 @@ module UptakesMod
           FracGrndByPFT=1.0_r8/NP
         ENDIF
 
-        TKCX                   = TKC_pft(NZ)
-        CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
-!        write(211,*)I+J/24.,NZ,CanopyMassC-CanopyMassC_pft(NZ)
-
-        VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*SpecStalkVolume+WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
+        TKCX   = TKC_pft(NZ)
 !
 !     CONVERGENCE SOLUTION
 !
@@ -658,8 +646,6 @@ module UptakesMod
   integer  :: IC
   logical :: LIterationExit
   real(r8) :: DPSI_old
-!  real(r8) :: DTmR_old,DTmR
-!  real(r8) :: dfTmRdP
   character(len=64) :: fmt
 !     return variables
   integer :: NN
@@ -684,7 +670,7 @@ module UptakesMod
     Transpiration_pft         => plt_ew%Transpiration_pft,            &  !ton H2O/d2
     PSICanopy_pft             => plt_ew%PSICanopy_pft,                &  !canopy total water potential [MPa]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,          &  !water held in canopy biomass [m3 d-2]
-    AllPlantRootH2OLoss_vr  => plt_ew%AllPlantRootH2OLoss_vr,     &
+    AllPlantRootH2OLoss_vr    => plt_ew%AllPlantRootH2OLoss_vr,       &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,           &
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft,          &
@@ -724,16 +710,15 @@ module UptakesMod
   EffGrndAreaByPFT4Heat = FracGrndByPFT*AREA3(NU)*1.25E-03_r8        !1.25e-3 is heat capacity of air [MJ/(m3 K)], assuming air volume is not affected by plant mass
   RA1                   = ReistanceCanopy_pft(NZ)
 
-  IC                   = 0
-  XC                   = 0.5_r8   !learning/updating rate for canopy temperature, not used now
-  LIterationExit       = .false.
-  PSICanPPre           = 0.0_r8
-  PTransPre            = 0.0_r8
-  cumPRootH2OUptakePre = 0.0_r8
-  SymplasmicWatPrev    = 0.0_r8
-  DPSI_old             = 0._r8
-  CumPlantHeatLoss2Soil    = 0._r8
-! DTmR_old             = 0._r8
+  IC                    = 0
+  XC                    = 0.5_r8   !learning/updating rate for canopy temperature, not used now
+  LIterationExit        = .false.
+  PSICanPPre            = 0.0_r8
+  PTransPre             = 0.0_r8
+  cumPRootH2OUptakePre  = 0.0_r8
+  SymplasmicWatPrev     = 0.0_r8
+  DPSI_old              = 0._r8
+  CumPlantHeatLoss2Soil = 0._r8
 
   D4000: DO NN=1,MaxIterNum
 !
@@ -797,7 +782,7 @@ module UptakesMod
 !     VAP=latent heat of evaporation
 !     EvapConductCanopy=aerodynamic conductance
 
-    VPC = vapsat(tkc1)*EXP(18.0_r8*PSICanopy_pft(NZ)/(RGASC*TKC1))  !ton H2O/m3
+    VPC = vapsat(tkc1)*EXP(18.0_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8)/(RGASC*TKC1))  !ton H2O/m3
     EX  = EvapConductCanopy*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3] = [ton H2O/(h*m2)]
     
     !Dew condensation to canopy >0 to canopy
@@ -940,7 +925,7 @@ module UptakesMod
       IF(.not.isclose(cumPRootH2OUptake,0.0_r8))THEN
         DIFF=ABS((DIFFU-DIFFZ)/cumPRootH2OUptake)
       ELSE
-        DIFF=ABS((DIFFU-DIFFZ)/SymplasmicWat)
+        DIFF=ABS((DIFFU-DIFFZ)/AMAX1(SymplasmicWat,1.e-14_r8))
       ENDIF
 
       !the relative difference is small enough
