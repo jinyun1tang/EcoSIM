@@ -84,13 +84,6 @@ contains
   VcumWatSnow_col(NY,NX)   = 0.0_r8
   VcumIceSnow_col(NY,NX)   = 0.0_r8
   VcumSnoDWI_col(NY,NX)    = VcumDrySnoWE_col(NY,NX)/NewSnowDens_col(NY,NX)+VcumWatSnow_col(NY,NX)+VcumIceSnow_col(NY,NX)
-  write(*,*) "----------------------------------------------------"
-  write(*,*) "BEFORE initializing snow layers the snow status is: "
-  write(*,*) "SnowDepth_col(NY,NX) = ", SnowDepth_col(NY,NX)
-  write(*,*) "NewSnowDens_col(NY,NX) = ", NewSnowDens_col(NY,NX)
-  write(*,*) "DH, DV = ", DH(NY,NX), DV(NY,NX)
-  write(*,*) "Vdrysnow, Vwatsnow, VIceSnow  = ", VcumDrySnoWE_col(NY,NX), VcumWatSnow_col(NY,NX), VcumIceSnow_col(NY,NX) 
-  write(*,*) "----------------------------------------------------"
 !  VOLSWI=0.0_r8
   
   !build the snow profile, topdown
@@ -429,18 +422,6 @@ contains
           call SnowTopSoilExch(dt_SnoHeat,M,L,NY,NX,VapCond1,VapSnoSrc,VLairSno1,TCND1W,&
             VapFlxSno2Soi1,HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS)
 
-          !write(*,*) "After SnowTopSoilExch: -----------------------------"
-          !write(*,*) "M, L, NY, NX ", M, L, NY, NX
-          !write(*,*) "VapCond1: ", VapCond1
-          !write(*,*) "VapSnoSrc: ", VapSnoSrc
-          !write(*,*) "TCND1W: ", TCND1W
-          !write(*,*) "VapFlxSno2Soi1: ", VapFlxSno2Soi1
-          !write(*,*) "HeatConvFlxSno2Soi1: ", HeatConvFlxSno2Soi1
-          !write(*,*) "HeatCndFlxSno2Soi: ", HeatCndFlxSno2Soi
-          !write(*,*) "VapCond2: ", VapCond2
-          !write(*,*) "PSISV1: ", PSISV1
-          !write(*,*) "TCNDS: ", TCNDS
-          !write(*,*) "----------------------------------------------------"
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
           !
@@ -577,6 +558,8 @@ contains
   IceFall             = Ice2Snowt_col(NY,NX)*XNPS
   HeatSnofall2Snow    = PrecHeat2Snowt_col(NY,NX)*XNPS
 
+
+  write(*,*) "Running Solve Snowpack with NPS: ", NPS
   D3000: DO MM = 1, NPS
     call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,LatentHeatAir2Sno,&
       HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
@@ -625,13 +608,10 @@ contains
 
       ELSEIF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 
-        write(*,*) "Heat Xfer before litter and soil fluxes (HeatX2SnoLay_snvr(L,NY,NX)) ", HeatX2SnoLay_snvr(L,NY,NX)
         NetSno2LayL                  = SnoX2SnoLay_snvr(L,NY,NX)
         NetWat2LayL                  = WatX2SnoLay_snvr(L,NY,NX)-TotSnoWatFlow2Litr-TotWatXFlx2SoiMicP-WatFlowSno2MacP
         NetIce2LayL                  = IceX2SnoLay_snvr(L,NY,NX)
         NetHeat2LayL                 = HeatX2SnoLay_snvr(L,NY,NX)-TotSnoHeatFlow2Litr-TotHeatFlow2Soi
-        write(*,*) "Heat flow to liter (TotSnoHeatFlow2Litr) ", TotSnoHeatFlow2Litr
-        write(*,*) "Heat flow to soil  (TotHeatFlow2Soi) ", TotHeatFlow2Soi
 
        if(VOLW0X < -NetWat2LayL)then
          dNetWat2LayL              = -AZMAX1(VOLW0X,tinyw)*mscal+NetWat2LayL
@@ -751,10 +731,6 @@ contains
 
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
         TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
-        write(*,*) "Inital energy (ENGY0): ", ENGY0
-        write(*,*) "NetHeat2LayL: ", NetHeat2LayL
-        write(*,*) "HeatByFrezThaw: ", HeatByFrezThaw
-        write(*,*) "VLHeatCapSnowM1_snvr(L,NY,NX): ", VLHeatCapSnowM1_snvr(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
         TKSnow1_snvr(L,NY,NX)=TairK_col(NY,NX)
       ELSE
@@ -832,11 +808,6 @@ contains
   LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4._r8/real(NPS,kind=r8)         !emitting longwave radiation,
   RadNet2Sno2          = RFLX0-LWRadSno1                            !net radiation
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySnow
-
-  write(*,*) "Incoming radiation (RFLX0) = ", RFLX0
-  write(*,*) "emitted radiation (LWRadSno1) = ", LWRadSno1
-  write(*,*) "RadNet2Sno2 = ", RadNet2Sno2
-
 
   !
   !     AERODYNAMIC RESISTANCE ABOVE SNOWPACK INCLUDING
@@ -924,13 +895,6 @@ contains
   PrecHeat2Snow_col(NY,NX) = PrecHeat2Snow_col(NY,NX)+HeatSnofall2Snow
   QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)-EvapSublimation2-EVAPW2
   RainPrec2Sno_col(NY,NX)  = RainPrec2Sno_col(NY,NX)+Rainfall
-
-  write(*,*) "Amount of energy in falling snow (HeatSnofall2Snow): ", HeatSnofall2Snow
-  write(*,*) "Energy from radiation (Radnet2Snow)                : ", Radnet2Snow
-  write(*,*) "Canopy temp (TKQ): ", TKQ_col
-  write(*,*) "TKSnow1_snvr: ", TKSnow1_snvr(1,NY,NX)
-  write(*,*) "Heat transfer from temp difference (HeatSensAir2Sno2): ", HeatSensAir2Sno2
-
 
   if(WatFlowInSnowM_snvr(M,1,NY,NX)>0._r8 .and. isclose(TCSnow_snvr(1,NY,NX),spval))then
     TCSnow_snvr(1,NY,NX)=units%Kelvin2Celcius(TairK_col(NY,NX))  

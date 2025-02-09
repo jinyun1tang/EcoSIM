@@ -44,7 +44,7 @@ implicit none
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size  
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test 
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
@@ -64,7 +64,7 @@ implicit none
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
-
+  NPH_Test=1
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
   NX=1
@@ -167,7 +167,8 @@ implicit none
   VHeatCapacity1_vr(0,1,1) = 0.0
 
   !perhaps doesn't neeed to run NPH times
-  DO M=1,NPH
+  !Setting to 1 without resetting the timescale
+  DO M=1,NPH_Test
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
@@ -191,11 +192,6 @@ implicit none
   !Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
   !Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
-  write(*,*) "Heat and water souces: "
-  write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
-  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
-  write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
-  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !Convert heat and water flux from EcoSIM units (flux/ hr)
@@ -207,14 +203,8 @@ implicit none
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
 
-  !DO NY=1, NYS
-  !  call SnowMassUpdate(I,J,NY,NX)
-  !  call SnowpackLayering(I,J,NY,NX)
-  !ENDDO
-
-  write(*,*) "snow_depth = ", surf_snow_depth(1) 
-  write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 
-  write(*,*) "Q_w ", surf_w_source(1) , " m/s"
+  write(*,*) "Variables for ATS: snow_depth, Q_e, Q_w: ", surf_snow_depth(1), &
+        surf_e_source(1), surf_w_source(1)  
 
   !open(unit=10, file="fluxes.txt", status="unknown", position="append")
   !write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"

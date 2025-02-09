@@ -704,7 +704,7 @@ contains
   Radnet2Snow          = 0._r8
   cumNetHeatFlow2Soil   = 0._r8
   HeatFluxAir2Soi1     = 0._r8
-  
+  write(*,*) "(AtmLandSurfExchangeM) VLHeatCapSnowMin_col, ", VLSnowHeatCapM_snvr(M,1,NY,NX)  
   !solve for energy balance over significant snow layer 
   IF(VLSnowHeatCapM_snvr(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
