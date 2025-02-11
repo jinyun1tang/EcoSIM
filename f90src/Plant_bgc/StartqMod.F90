@@ -88,7 +88,7 @@ module StartqMod
       D9986: DO NZ=NP(NY,NX)+1,JP
         SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
         LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
-        StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
+        StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
@@ -108,19 +108,19 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
 
-  iYearPlanting_pft(NZ,NY,NX)=iPlantingYear_pft(NZ,NY,NX)   !planting year
-  iDayPlanting_pft(NZ,NY,NX)=iPlantingDay_pft(NZ,NY,NX) !planting day
-  iYearPlantHarvest_pft(NZ,NY,NX)=iHarvestYear_pft(NZ,NY,NX)
-  iDayPlantHarvest_pft(NZ,NY,NX)=iHarvestDay_pft(NZ,NY,NX)
-  PPI_pft(NZ,NY,NX)=PPatSeeding_pft(NZ,NY,NX)
-  PPX_pft(NZ,NY,NX)=PPI_pft(NZ,NY,NX)
-  ClumpFactor_pft(NZ,NY,NX)=ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
+  iYearPlanting_pft(NZ,NY,NX)     = iPlantingYear_pft(NZ,NY,NX)   !planting year
+  iDayPlanting_pft(NZ,NY,NX)      = iPlantingDay_pft(NZ,NY,NX) !planting day
+  iYearPlantHarvest_pft(NZ,NY,NX) = iHarvestYear_pft(NZ,NY,NX)
+  iDayPlantHarvest_pft(NZ,NY,NX)  = iHarvestDay_pft(NZ,NY,NX)
+  PPI_pft(NZ,NY,NX)               = PPatSeeding_pft(NZ,NY,NX)
+  PPX_pft(NZ,NY,NX)               = PPI_pft(NZ,NY,NX)
+  ClumpFactor_pft(NZ,NY,NX)       = ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
-  H2OCuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)/3600.0_r8
-  CO2CuticleResist_pft(NZ,NY,NX)=CuticleResist_pft(NZ,NY,NX)*1.56_r8
-  rCNNonstRemob_pft(NZ,NY,NX)=2.5_r8
-  rCPNonstRemob_pft(NZ,NY,NX)=25.0_r8
-  RootFracRemobilizableBiom(NZ,NY,NX)=AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
+  H2OCuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
+  CO2CuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)*1.56_r8
+  rCNNonstRemob_pft(NZ,NY,NX)         = 2.5_r8
+  rCPNonstRemob_pft(NZ,NY,NX)         = 25.0_r8
+  RootFracRemobilizableBiom(NZ,NY,NX) = AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
     ,RootrPC_pft(NZ,NY,NX)*rCPNonstRemob_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I(NZ,NY,NX)=2.10E+05_r8
@@ -138,18 +138,18 @@ module StartqMod
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
 
-  associate(                       &
-    iprotein         => pltpar%iprotein  ,&
-    icarbhyro        => pltpar%icarbhyro ,&
-    icellulos        => pltpar%icellulos ,&
-    ilignin          =>  pltpar%ilignin   , &
-    NumLitterGroups  => pltpar%NumLitterGroups , &
-    inonstruct       => pltpar%inonstruct, &
-    ifoliar          => pltpar%ifoliar , &
-    inonfoliar       => pltpar%inonfoliar, &
-    istalk           => pltpar%istalk  , &
-    iroot            => pltpar%iroot   , &
-    icwood           => pltpar%icwood    &
+  associate(                                   &
+    iprotein        => pltpar%iprotein,        &
+    icarbhyro       => pltpar%icarbhyro,       &
+    icellulos       => pltpar%icellulos,       &
+    ilignin         => pltpar%ilignin,         &
+    NumLitterGroups => pltpar%NumLitterGroups, &
+    inonstruct      => pltpar%inonstruct,      &
+    ifoliar         => pltpar%ifoliar,         &
+    inonfoliar      => pltpar%inonfoliar,      &
+    istalk          => pltpar%istalk,          &
+    iroot           => pltpar%iroot,           &
+    icwood          => pltpar%icwood           &
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -336,23 +336,24 @@ module StartqMod
 !     CONCURRENT NODE GROWTH
 !
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-!     NumCogrothNode_pft=number of concurrently growing nodes
+!     NumCogrowthNode_pft=number of concurrently growing nodes
 !
+  ! deciduous (0) or shallow root (not tree)
   IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
     (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
-    ! deciduous or shallow root
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
-!
+
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
-      NumCoGrothNode_pft(NZ,NY,NX)=3
+      NumCoGrowthNode_pft(NZ,NY,NX)=3
     ELSEIF(MatureGroup_pft(NZ,NY,NX).LE.15)THEN
-      NumCogrothNode_pft(NZ,NY,NX)=4
+      NumCogrowthNode_pft(NZ,NY,NX)=4
     ELSE
-      NumCoGrothNode_pft(NZ,NY,NX)=5
+      NumCoGrowthNode_pft(NZ,NY,NX)=5
     ENDIF
+  !non-deciduous  
   ELSE
-    FracGroth2Node_pft(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
-    NumCoGrothNode_pft(NZ,NY,NX)=24
+    FracGroth2Node_pft(NZ,NY,NX) =AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
+    NumCoGrowthNode_pft(NZ,NY,NX)=24
   ENDIF
   end associate
   end subroutine PlantLitterFractions
@@ -545,7 +546,7 @@ module StartqMod
   LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)       = 0._r8
   
   D25: DO NB=1,MaxNumBranches
-    StalkBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
+    StalkLiveBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
     LeafPetolBiomassC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
     SeedNumSet_brch(NB,NZ,NY,NX)         = 0._r8
@@ -563,9 +564,9 @@ module StartqMod
     ENDDO D5
 
     DO K=0,MaxNodesPerBranch
-      LeafAreaNode_brch(K,NB,NZ,NY,NX)                          = 0._r8
+      LeafNodeArea_brch(K,NB,NZ,NY,NX)                          = 0._r8
       LiveInterNodeHight_brch(K,NB,NZ,NY,NX)                    = 0._r8
-      InternodeHeightDying_brch(K,NB,NZ,NY,NX)                  = 0._r8
+      InternodeHeightDead_brch(K,NB,NZ,NY,NX)                  = 0._r8
       PetoleLensNode_brch(K,NB,NZ,NY,NX)                        = 0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = 0._r8
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8

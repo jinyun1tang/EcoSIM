@@ -99,6 +99,7 @@ module WatsubMod
   real(r8) :: HeatInfl2Soil(JY,JX)
   real(r8) :: Qinfl2MacP_col(JY,JX)
   real(r8) :: twatmass0(JY,JX)
+  integer  :: NUX0(JY,JX)
 !  real(r8) :: dtime
 ! begin_execution
 
@@ -119,6 +120,7 @@ module WatsubMod
   D3320: DO M=1,NPH
     DO NX=NHW,NHE
       DO  NY=NVN,NVS
+        NUX0(NY,NX)                  = NUM(NY,NX)
         QDischarM_col(NY,NX)         = 0._r8
         QDrainM_col(NY,NX)           = 0._r8
         Qinflx2SoilM_col(NY,NX)      = 0._r8
@@ -163,7 +165,8 @@ module WatsubMod
     ELSE
       call UpdateFluxAtExit(I,J,NHW,NHE,NVN,NVS)
     ENDIF
-    call checkMassBalance(I,J,M,NHW,NHE,NVN,NVS,twatmass0)
+
+    call checkMassBalance(I,J,M,NHW,NHE,NVN,NVS,twatmass0,NUX0)
 
   ENDDO D3320
   call PrintInfo('end watsub')
@@ -172,27 +175,32 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------  
 
-  subroutine checkMassBalance(I,J,M,NHW,NHE,NVN,NVS,twatmass0)
+  subroutine checkMassBalance(I,J,M,NHW,NHE,NVN,NVS,twatmass0,NUX0)
 
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8),intent(inout) :: twatmass0(JY,JX)
+  integer, intent(in)    :: NUX0(JY,JX)
   real(r8)  :: twatmass1(JY,JX)
 
-  real(r8) :: dwat
+  real(r8) :: dwat,dwat0
   integer :: NY,NX,L
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
      twatmass1(NY,NX)=0._r8
+     dwat0=0._r8
+     DO L=NUX0(NY,NX),NUM(NY,NX)-1
+       dwat0=dwat0 + VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE
+     ENDDO
       D131: DO L=NUM(NY,NX),NL(NY,NX)
         twatmass1(NY,NX)=twatmass1(NY,NX)+VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE
       ENDDO D131
       if(fixWaterLevel)then
         dwat=twatmass0(NY,NX)-twatmass1(NY,NX)
       else
-        dwat=twatmass0(NY,NX)-twatmass1(NY,NX)+Qinflx2Soil_col(NY,NX)-QDischar_col(NY,NX)-QDrain_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)
+        dwat=twatmass0(NY,NX)-twatmass1(NY,NX)+Qinflx2Soil_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)-QDischar_col(NY,NX)-QDrain_col(NY,NX)
       endif
 !      dwat=twatmass0(NY,NX)-twatmass1(NY,NX)+Qinflx2SoilM_col(NY,NX)-QDischarM_col(NY,NX)-QDrainM_col(NY,NX)+QWatIntLaterFlowM_col(NY,NX)
 !      if(I==141 .and. J>=13)then
@@ -210,6 +218,8 @@ module WatsubMod
 !        endif  
 !        write(213,*)NY,NX,NUM(NY,NX),NU(NY,NX),VLWatMicP_vr(1,NY,NX),VLWatMicP1_vr(1,NY,NX),H2OFlow2TopSoiMicP_col(NY,NX)  
 !      endif
+!       if(I>=156)write(211,*)I*1000+J,NY,NX,M,'wat',NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
+!          QDischar_col(NY,NX),QDrain_col(NY,NX),dwat0
 
       if(abs(dwat)>1.e-4_r8)then
         write(211,*)I+J/24.,NY,NX,M,'wat',NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
@@ -679,7 +689,7 @@ module WatsubMod
             !
             !     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TranspNoSalt.F
             !
-                FILM(M,N6,N5,N4)=FilmThickness(PSISoilMatricPtmp_vr(N6,N5,N4))
+                FILMM_vr(M,N6,N5,N4)=FilmThickness(PSISoilMatricPtmp_vr(N6,N5,N4))
               ENDIF
             ELSEIF(N.NE.iVerticalDirection)THEN
               WaterFlow2Micpt_3D(N,N6,N5,N4)   = 0.0_r8

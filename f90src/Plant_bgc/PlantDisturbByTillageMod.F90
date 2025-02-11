@@ -77,8 +77,8 @@ contains
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,           &
     LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &
     SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch,     &
-    StalkBiomassC_brch          => plt_biom%StalkBiomassC_brch,           &
-    LeafAreaNode_brch           => plt_morph%LeafAreaNode_brch,           &
+    StalkLiveBiomassC_brch          => plt_biom%StalkLiveBiomassC_brch,           &
+    LeafNodeArea_brch           => plt_morph%LeafNodeArea_brch,           &
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch,           &
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch,     &
     SeedNumSet_brch             => plt_morph%SeedNumSet_brch,             &
@@ -175,7 +175,7 @@ contains
   !
 
     ShootC4NonstC_brch(NB,NZ) = ShootC4NonstC_brch(NB,NZ)*XHVST
-    StalkBiomassC_brch(NB,NZ) = StalkBiomassC_brch(NB,NZ)*XHVST
+    StalkLiveBiomassC_brch(NB,NZ) = StalkLiveBiomassC_brch(NB,NZ)*XHVST
     DO NE=1,NumPlantChemElms
       CanopyNonstElms_brch(NE,NB,NZ)      = CanopyNonstElms_brch(NE,NB,NZ)*XHVST
       CanopyNodulNonstElms_brch(NE,NB,NZ) = CanopyNodulNonstElms_brch(NE,NB,NZ)*XHVST
@@ -197,7 +197,7 @@ contains
     LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
     LeafPetolBiomassC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
     CanopyLeafShethC_pft(NZ)       = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
-    CanopyStalkC_pft(NZ)           = CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
+    CanopyStalkC_pft(NZ)           = CanopyStalkC_pft(NZ)+StalkLiveBiomassC_brch(NB,NZ)
     D8970: DO K=0,MaxNodesPerBranch1
       IF(K.NE.0)THEN
         CPOOL3_node(K,NB,NZ)                = CPOOL3_node(K,NB,NZ)*XHVST
@@ -205,14 +205,14 @@ contains
         CMassCO2BundleSheath_node(K,NB,NZ)  = CMassCO2BundleSheath_node(K,NB,NZ)*XHVST
         CMassHCO3BundleSheath_node(K,NB,NZ) = CMassHCO3BundleSheath_node(K,NB,NZ)*XHVST
       ENDIF
-      LeafAreaNode_brch(K,NB,NZ)=LeafAreaNode_brch(K,NB,NZ)*XHVST
+      LeafNodeArea_brch(K,NB,NZ)=LeafNodeArea_brch(K,NB,NZ)*XHVST
 
       LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*XHVST
   !     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
 
       PetoleProteinCNode_brch(K,NB,NZ)=PetoleProteinCNode_brch(K,NB,NZ)*XHVST
   !     LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ)*XHVST
-  !     InternodeHeightDying_brch(K,NB,NZ)=InternodeHeightDying_brch(K,NB,NZ)*XHVST
+  !     InternodeHeightDead_brch(K,NB,NZ)=InternodeHeightDead_brch(K,NB,NZ)*XHVST
       DO NE=1,NumPlantChemElms
         InternodeStrutElms_brch(NE,K,NB,NZ) = InternodeStrutElms_brch(NE,K,NB,NZ)*XHVST
         LeafElmntNode_brch(NE,K,NB,NZ)      = LeafElmntNode_brch(NE,K,NB,NZ)*XHVST

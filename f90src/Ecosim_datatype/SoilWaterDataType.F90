@@ -27,7 +27,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLWatMicPM_vr(:,:,:,:)                    !soil micropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacPM_vr(:,:,:,:)                    !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM_vr(:,:,:,:)                    !soil air content, [m3 d-2]
-  real(r8),target,allocatable ::  FILM(:,:,:,:)                             !soil water film thickness , [m]
+  real(r8),target,allocatable ::  FILMM_vr(:,:,:,:)                         !soil water film thickness , [m]
   real(r8),target,allocatable ::  WaterTBLSlope_col(:,:)                    !slope of water table relative to surface slope, [-]
   real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                     !depth of artificial water table
   real(r8),target,allocatable ::  TileWaterTable_col(:,:)                   !artificial water table depth, [m]
@@ -148,7 +148,7 @@ module SoilWaterDataType
   allocate(VLWatMicPM_vr(60,0:JZ,JY,JX));VLWatMicPM_vr=0._r8
   allocate(VLWatMacPM_vr(60,JZ,JY,JX));VLWatMacPM_vr=0._r8
   allocate(VLsoiAirPM_vr(60,0:JZ,JY,JX));VLsoiAirPM_vr=0._r8
-  allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
+  allocate(FILMM_vr(60,0:JZ,JY,JX));FILMM_vr=0._r8
   allocate(WaterTBLSlope_col(JY,JX));       WaterTBLSlope_col=0._r8
   allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
   allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
@@ -248,7 +248,7 @@ module SoilWaterDataType
   call destroy(VLWatMicPM_vr)
   call destroy(VLWatMacPM_vr)
   call destroy(VLsoiAirPM_vr)
-  call destroy(FILM)
+  call destroy(FILMM_vr)
   call destroy(WaterTBLSlope_col)
   call destroy(WtblDepzTile_col)
   call destroy(TileWaterTable_col)

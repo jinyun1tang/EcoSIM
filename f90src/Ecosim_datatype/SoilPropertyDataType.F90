@@ -23,7 +23,7 @@ implicit none
    integer  ,target,allocatable ::  MacPNumLayer(:,:,:)                 !number of macropores
    real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity [m3 m-3]
    real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	[m3 d-2]
-   real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                !micropore volume [m3 d-2]
+   real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                !volume of micropores [m3 d-2]
    real(r8) ,target,allocatable ::  VLSoilMicPMass_vr(:,:,:)            !mass of soil layer	[Mg d-2]
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMn(:,:)            !minimum soil layer mass [Mg d-2]
    real(r8) ,target,allocatable ::  SoilMicPMassLayerMX(:,:)            !maximum soil layer mass [Mg d-2]

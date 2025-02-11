@@ -3,6 +3,7 @@ module NutUptakeMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: safe_adb, vapsat, AZMAX1,dssign
   use TracerPropMod, only: gas_solubility
+  use DebugToolMod, only : PrintInfo
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -31,6 +32,7 @@ module NutUptakeMod
   real(r8), intent(in) :: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
   real(r8), intent(in) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1),RootAreaDivRadius_vr(jroots,JZ1)
+  
   real(r8)  :: PopPlantO2Uptake,PopPlantO2Demand
 
   associate(                                                  &
@@ -38,7 +40,7 @@ module NutUptakeMod
     ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft         &    
   )
 
-  call CanopyNH3Flux(NZ,FDMP)
+  call FoliarNutrientInterception(NZ,FDMP)
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
@@ -58,11 +60,13 @@ module NutUptakeMod
   end subroutine PlantNutientO2Uptake
 !------------------------------------------------------------------------
 
-  subroutine CanopyNH3Flux(NZ,FDMP)
+  subroutine FoliarNutrientInterception(NZ,FDMP)
 
   implicit none
   integer, intent(in) :: NZ
   real(r8), intent(in):: FDMP
+
+  character(len=*), parameter :: subname='FoliarNutrientInterception'
   real(r8) :: FNH3P
   real(r8) :: CNH3P
   real(r8) :: SNH3P
@@ -86,6 +90,8 @@ module NutUptakeMod
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft,      &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        &
   )
+
+  call PrintInfo('beg '//subname)
   !
   !     NH3 EXCHANGE BETWEEN CANOPY AND ATMOSPHERE FROM NH3
   !     CONCENTRATION DIFFERENCES 'AtmGasc(idg_NH3)' (ATMOSPHERE FROM 'READS') AND
@@ -119,8 +125,9 @@ module NutUptakeMod
   ELSE
     NH3Dep2Can_brch(1:NumOfBranches_pft(NZ),NZ)=0.0_r8
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
-  end subroutine CanopyNH3Flux
+  end subroutine FoliarNutrientInterception
 
 !------------------------------------------------------------------------------------------
 
@@ -138,6 +145,7 @@ module NutUptakeMod
   real(r8), intent(out) :: PopPlantO2Uptake
   real(r8), intent(out) :: PopPlantO2Demand
 
+  character(len=*), parameter :: subname='RootMycoO2NutrientUptake'
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
   integer :: N,L
@@ -159,6 +167,7 @@ module NutUptakeMod
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
+  call PrintInfo('beg '//subname)
   call ZeroUptake(NZ)
 
   PopPlantO2Uptake = 0._r8
@@ -219,7 +228,7 @@ module NutUptakeMod
 
     ENDDO D950
   ENDDO D955
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake
 !------------------------------------------------------------------------
@@ -1130,6 +1139,8 @@ module NutUptakeMod
   real(r8), intent(out) :: FCUP,FZUP,FPUP,FWSRT
   real(r8), intent(out) :: PerPlantRootH2OUptake,dtPerPlantRootH2OUptake
   real(r8), intent(out) :: FOXYX
+
+  character(len=*), parameter :: subname='GetUptakeCapcity'
   real(r8) :: dss
   associate(                                                          &
     RO2EcoDmndPrev_vr         => plt_bgcr%RO2EcoDmndPrev_vr,          &
@@ -1138,13 +1149,13 @@ module NutUptakeMod
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
     ZEROS                     => plt_site%ZEROS,                      &
     ZERO                      => plt_site%ZERO,                       &
-    AllPlantRootH2OLoss_vr  => plt_ew%AllPlantRootH2OLoss_vr,     &
+    AllPlantRootH2OLoss_vr    => plt_ew%AllPlantRootH2OLoss_vr,       &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
-    RootProteinConc_rpvr       => plt_biom%RootProteinConc_rpvr,        &
+    RootProteinConc_rpvr      => plt_biom%RootProteinConc_rpvr,       &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
-    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,   &
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr,  &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr     &
   )
   !
@@ -1156,6 +1167,7 @@ module NutUptakeMod
   !     RootProteinC_pvr,WTRTL=protein content,mass
   !     FWSRT=protein concentration relative to 5%
   !
+  call PrintInfo('beg '//subname)
   IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     RootProteinConc_rpvr(N,L,NZ)=AMIN1(RootFracRemobilizableBiom(NZ),RootProteinC_pvr(N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
     FWSRT=RootProteinConc_rpvr(N,L,NZ)/0.05_r8
@@ -1240,6 +1252,7 @@ module NutUptakeMod
   ELSE
     FOXYX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine GetUptakeCapcity
 !------------------------------------------------------------------------
@@ -1352,7 +1365,7 @@ module NutUptakeMod
     VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr,  &
     REcoDOMProd_vr         => plt_bgcr%REcoDOMProd_vr,         &
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
+    RootMycoExudEUptk_pvr  => plt_rbgc%RootMycoExudEUptk_pvr,  &
     RootMycoExudElms_pft   => plt_rbgc%RootMycoExudElms_pft,   &
     RootHPO4Uptake_pft     => plt_rbgc%RootHPO4Uptake_pft,     &
     RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft,    &
@@ -1400,8 +1413,8 @@ module NutUptakeMod
 
           DO N=1,MY(NZ)
             DO NE=1,NumPlantChemElms
-              RootMycoExudElms_pft(NE,NZ)=RootMycoExudElms_pft(NE,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)        
-              RootMycoNonstElms_rpvr(NE,N,L,NZ)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
+              RootMycoExudElms_pft(NE,NZ)       = RootMycoExudElms_pft(NE,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
+              RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
             ENDDO
           ENDDO
         endif

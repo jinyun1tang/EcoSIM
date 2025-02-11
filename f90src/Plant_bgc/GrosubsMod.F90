@@ -626,7 +626,7 @@ module grosubsMod
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     GrainStrutElms_brch       => plt_biom%GrainStrutElms_brch,       &
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch,        &
-    StalkBiomassC_brch        => plt_biom%StalkBiomassC_brch,        &
+    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch,        &
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch,      &
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft,        &
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft,         &
@@ -669,22 +669,16 @@ module grosubsMod
 !
 !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
 !
-!     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
-!     WTSHTB,WTSHTN,WTSHTP=branch total C,N,P mass
-!     StalkRsrvElms_brch,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-!     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-!     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
-!     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
-!     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
-!     WTRVC,WTRVN,WTRVP=storage C,N,P
-!     LeafAreaLive_brch=branch leaf area
-!     CanopyStalkArea_lbrch=total branch stalk surface area in each layer
-!     SeedNumSet_brch=seed set number
 !
   call SumPlantBiom(I,J,NZ,'Accumstates')
-  
+
+  DO NB=1,NumOfBranches_pft(NZ)    
+    if(isclose(LeafPetolBiomassC_brch(NB,NZ),0._r8))then
+      LeafStrutElms_brch(1:NumPlantChemElms,NB,NZ) = 0._r8
+      PetoleStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
+      LeafAreaLive_brch(NB,NZ)                     = 0._r8
+    endif
+ ENDDO  
   DO NE=1,NumPlantChemElms
     CanopyNonstElms_pft(NE,NZ) = sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     StalkRsrvElms_pft(NE,NZ)   = sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
@@ -699,14 +693,15 @@ module grosubsMod
     !sum structural biomass
   ENDDO
 
-  CanopyStalkC_pft(NZ)                         = sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopyStalkC_pft(NZ)                         = sum(StalkLiveBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ)                     = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopySeedNum_pft(NZ)                        = sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafArea_pft(NZ)                       = sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyStemArea_pft(NZ)                       = sum(CanopyStalkArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
-  CanopyStemAreaZ_pft(1:NumOfCanopyLayers1,NZ) = 0._r8
 
+  
   DO NB=1,NumOfBranches_pft(NZ)
+        
     DO L=1,NumOfCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO

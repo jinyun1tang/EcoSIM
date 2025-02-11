@@ -271,6 +271,7 @@ module Hour1Mod
   DO  NZ=1,NP(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
       *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
+      
     prec2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
     PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(prec2canopy_pft,CanopyWatHeldCap-WatHeldOnCanopy_pft(NZ,NY,NX)))
     Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+prec2canopy_pft
@@ -765,7 +766,7 @@ module Hour1Mod
   SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
   SurfGasDifFlx_col(idg_beg:idg_NH3,NY,NX)           = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
-  HeatFLo2LitrByWat_col(NY,NX)                       = 0._r8
+  HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8
   TLitrIceFlxThaw_col(NY,NX)                         = 0._r8
   TLitrIceHeatFlxFrez_col(NY,NX)                     = 0._r8
   HeatByRad2Surf_col(NY,NX)                          = 0._r8

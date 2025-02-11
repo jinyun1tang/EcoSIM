@@ -141,7 +141,7 @@ module UptakesMod
       HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
         .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
         .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
-        .and. VHeatCapCanopyPrev_pft>0._r8
+        .and. CanopyMassC>0._r8
 
       IF(HydroActivePlant)THEN  
 !
@@ -191,7 +191,6 @@ module UptakesMod
 
       Air_Heat_Latent_store_col = Air_Heat_Latent_store_col+EvapTransLHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col+HeatXAir2PCan_pft(NZ)*CanopyBndlResist_pft(NZ)
-
       
       call SetCanopyGrowthFuncs(I,J,NZ)
     
@@ -334,7 +333,7 @@ module UptakesMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft,       &
     LeafAUnshaded_zsec        => plt_photo%LeafAUnshaded_zsec,        &
-    LeafAreaNode_brch         => plt_morph%LeafAreaNode_brch,         &
+    LeafNodeArea_brch         => plt_morph%LeafNodeArea_brch,         &
     KMinNumLeaf4GroAlloc_brch => plt_morph%KMinNumLeaf4GroAlloc_brch, &
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft,          & !input:
     ClumpFactorNow_pft        => plt_morph%ClumpFactorNow_pft,        &
@@ -354,12 +353,12 @@ module UptakesMod
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
-!     LeafAreaNode_brch=leaf area
+!     LeafNodeArea_brch=leaf area
 !     LeafProteinCNode_brch=leaf protein content
 !     LeafAUnshaded_zsec,LeafAreaZsec_brch=unself-shaded,total leaf surface area
 !     ClumpFactorNow_pft=clumping factor from PFT file
 !
-      IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
         KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
       ENDIF
 
@@ -925,7 +924,7 @@ module UptakesMod
       IF(.not.isclose(cumPRootH2OUptake,0.0_r8))THEN
         DIFF=ABS((DIFFU-DIFFZ)/cumPRootH2OUptake)
       ELSE
-        DIFF=ABS((DIFFU-DIFFZ)/AMAX1(SymplasmicWat,1.e-14_r8))
+        DIFF=ABS(DIFFU-DIFFZ)/SymplasmicWat
       ENDIF
 
       !the relative difference is small enough
@@ -1030,7 +1029,7 @@ module UptakesMod
   real(r8) :: RSSL,RTAR2
   integer :: N, L
   associate(                                                                 &
-    CumSoilThickMidL_vr                    => plt_site%CumSoilThickMidL_vr,                        &
+    CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr,             &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft,             &
     VLWatMicPM_vr               => plt_site%VLWatMicPM_vr,                   &
     ZERO                        => plt_site%ZERO,                            &
@@ -1358,6 +1357,8 @@ module UptakesMod
 
   implicit none
   integer, intent(in) :: I,J,NZ
+
+  character(len=*), parameter :: subname='SetCanopyGrowthFuncs'
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                                              &
@@ -1383,6 +1384,7 @@ module UptakesMod
   !     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE
   !     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
   !
+  call PrintInfo('beg '//subname)
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     !before seed emergence
     TKGroth_pft(NZ)=TKS_vr(NU)
@@ -1424,6 +1426,7 @@ module UptakesMod
   ELSE
     ChillHours_pft(NZ)=AZMAX1(ChillHours_pft(NZ)-1.0_r8)
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine SetCanopyGrowthFuncs
 

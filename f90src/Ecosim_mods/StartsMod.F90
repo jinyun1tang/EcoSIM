@@ -941,8 +941,7 @@ module StartsMod
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
       VLSoilMicPMass_vr(L,NY,NX) = SoilBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-!      write(112,*)'bkvl',L,SoilBulkDensity_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX),FracSoiAsMicP_vr(L,NY,NX),&
-!        AREA(3,L,NY,NX),DLYR_3D(3,L,NY,NX)
+
       totRootLenDens_vr(L,NY,NX) = 0.0_r8
     ENDIF
     AREA(1,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
@@ -982,9 +981,9 @@ module StartsMod
 
   XNPV      = XNPR*XNPS
   XNPD      = 600.0_r8*dts_gas                     !600. is adjustable
-  dts_wat   = AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
+  dts_wat   = AMIN1(1.0_r8,10.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno   = dts_wat*XNPS
-  XNPB      = dts_wat*XNPR      !vapor flux in litter iteration
+  XNPB      = dts_wat*XNPR                         !vapor flux in litter iteration
   dt_watvap = dts_wat*XNPV
 
   end subroutine set_ecosim_solver

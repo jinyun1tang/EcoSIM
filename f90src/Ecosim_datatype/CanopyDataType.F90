@@ -132,7 +132,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyStemAreaZ_pft(:,:,:,:)               !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_pft(:,:,:,:)          !canopy nodule nonstructural element, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulElms_pft(:,:,:,:)               !canopy nodule elemental biomass [g d-2]
-  real(r8),target,allocatable ::  StalkBiomassC_brch(:,:,:,:)                !branch active stalk C, [g d-2]
+  real(r8),target,allocatable ::  StalkLiveBiomassC_brch(:,:,:,:)                !branch active stalk C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_brch(:,:,:,:,:)            !branch nonstructural element, [g d-2]
   real(r8),target,allocatable ::  LeafPetolBiomassC_brch(:,:,:,:)            !plant branch leaf + sheath C, [g d-2]
   real(r8),target,allocatable ::  ShootStrutElms_brch(:,:,:,:,:)             !branch shoot C, [g d-2]
@@ -295,7 +295,7 @@ module CanopyDataType
   allocate(CanopyStemAreaZ_pft(NumOfCanopyLayers,JP,JY,JX)); CanopyStemAreaZ_pft=0._r8
   allocate(CanopyNodulElms_pft(NumPlantChemElms,JP,JY,JX));CanopyNodulElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
-  allocate(StalkBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkBiomassC_brch=0._r8
+  allocate(StalkLiveBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkLiveBiomassC_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
   allocate(ShootC4NonstC_brch(MaxNumBranches,JP,JY,JX));ShootC4NonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
@@ -459,7 +459,7 @@ module CanopyDataType
   call destroy(CanopyStemAreaZ_pft)
   call destroy(CanopyNodulNonstElms_pft)
   call destroy(CanopyNodulElms_pft)
-  call destroy(StalkBiomassC_brch)
+  call destroy(StalkLiveBiomassC_brch)
   call destroy(CanopyNonstElms_brch)
   call destroy(ShootC4NonstC_brch)
   call destroy(LeafPetolBiomassC_brch)

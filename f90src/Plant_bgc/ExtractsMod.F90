@@ -180,10 +180,9 @@ module ExtractsMod
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
     TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
     TKS_vr                   => plt_ew%TKS_vr,                     &
-    THeatLossRoot2Soil_vr       => plt_ew%THeatLossRoot2Soil_vr,         &
-    TPlantRootH2OLoss_vr   => plt_ew%TPlantRootH2OLoss_vr,     &
+    THeatLossRoot2Soil_vr    => plt_ew%THeatLossRoot2Soil_vr,      &
+    TPlantRootH2OLoss_vr     => plt_ew%TPlantRootH2OLoss_vr,       &
     AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
-    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col,    &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
@@ -212,7 +211,6 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OUptake_col = TPlantRootH2OUptake_col+AllPlantRootH2OLoss_vr(N,L,NZ)
       TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
 
       !water lose from canopy to soil

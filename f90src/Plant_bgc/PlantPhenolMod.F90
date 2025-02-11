@@ -272,7 +272,7 @@ module PlantPhenolMod
     NumRootAxes_pft            => plt_morph%NumRootAxes_pft,            &
     MainBranchNum_pft          => plt_morph%MainBranchNum_pft,          &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
-    NumCogrothNode_pft         => plt_morph%NumCogrothNode_pft,         &
+    NumCogrowthNode_pft         => plt_morph%NumCogrowthNode_pft,         &
     BranchNumber_pft           => plt_morph%BranchNumber_pft,           &
     BranchNumber_brch          => plt_morph%BranchNumber_brch,          &
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft,         &
@@ -294,7 +294,7 @@ module PlantPhenolMod
 ! iPlantBranchState_brch=branch life flag:0=living,1=dead
 ! PSTG=node number
 ! FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-! NumCogrothNode_pft=number of concurrently growing nodes
+! NumCogrowthNode_pft=number of concurrently growing nodes
 ! ShootNodeNumAtPlanting_pft,GROUP=node number at planting,floral initiation
 ! IBTYP: setup for phenologically-driven above-ground turnover
 
@@ -313,7 +313,7 @@ module PlantPhenolMod
             D120: DO NB=1,MaxNumBranches
               IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
                 IF(NB.EQ.MainBranchNum_pft(NZ) .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-                  .GT.BranchNumber_pft(NZ)+NumCogrothNode_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+                  .GT.BranchNumber_pft(NZ)+NumCogrowthNode_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
                   !initiate a new branch
                   BranchNumber_pft(NZ)          = BranchNumber_pft(NZ)+1
                   NumOfBranches_pft(NZ)         = MIN(BranchNumMax(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
@@ -502,10 +502,10 @@ module PlantPhenolMod
     CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft, &
     ShootStrutElms_pft  => plt_biom%ShootStrutElms_pft,  &
     HypoctoHeight_pft   => plt_morph%HypoctoHeight_pft,  &
-    VHeatCapCanopy_pft    => plt_ew%VHeatCapCanopy_pft,      &
+    VHeatCapCanopy_pft  => plt_ew%VHeatCapCanopy_pft,    &
     Root1stDepz_pft     => plt_morph%Root1stDepz_pft,    &
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft,    &
-    WatHeldOnCanopy_pft    => plt_ew%WatHeldOnCanopy_pft,      &
+    WatHeldOnCanopy_pft => plt_ew%WatHeldOnCanopy_pft,   &
     CanopyStemArea_pft  => plt_morph%CanopyStemArea_pft, &
     SeedDepth_pft       => plt_morph%SeedDepth_pft,      &
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch &

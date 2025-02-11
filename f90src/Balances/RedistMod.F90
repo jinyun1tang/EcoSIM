@@ -880,8 +880,10 @@ module RedistMod
       ENDIF
     ENDDO  
   else
+    dWAT=0._r8
     DO L=NU(NY,NX),NUM(NY,NX)-1
       !volume change=initial-final
+      dwat=dwat+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
       VLWatMicP_vr(L,NY,NX)  = 0._r8
       VLWatMacP_vr(L,NY,NX)  = 0._r8
       VLiceMicP_vr(L,NY,NX)  = 0._r8
@@ -891,7 +893,7 @@ module RedistMod
       TKS_vr(L,NY,NX)        = TairK_col(NY,NX)
       TCS_vr(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
-
+    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
     DO L=NUM(NY,NX),NL(NY,NX)
       
       !micropore
@@ -912,7 +914,7 @@ module RedistMod
 
       VLWatMicP_vr(L,NY,NX)  = VLWatMicP_vr(L,NY,NX)+TPlantRootH2OLoss_vr(L,NY,NX)
       VLWatMicPX_vr(L,NY,NX) = VLWatMicPX_vr(L,NY,NX)+TPlantRootH2OLoss_vr(L,NY,NX)
-      tplantH2O = tplantH2O+TPlantRootH2OLoss_vr(L,NY,NX) 
+      TPlantRootH2OUptake_col(NY,NX) = TPlantRootH2OUptake_col(NY,NX)+TPlantRootH2OLoss_vr(L,NY,NX) 
 
       TKSX                      = TKS_vr(L,NY,NX)
       VHeatCapacityX            = VHeatCapacity_vr(L,NY,NX)
@@ -1600,7 +1602,6 @@ module RedistMod
       ENDDO
       
       SoilOrgM_vr(ielmc,0,NY,NX)   = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
-      if(SoilOrgM_vr(ielmc,0,NY,NX)>0._r8)write(113,*)I*1000+J,SoilOrgM_vr(ielmc,0,NY,NX),M,K,LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
       HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
@@ -1608,7 +1609,7 @@ module RedistMod
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
       QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
       CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
-      HeatFLo2LitrByWat_col(NY,NX) = HeatFLo2LitrByWat_col(NY,NX)+HRAINR
+      HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
 
       dWat                         = dWat + RAINR
       dHeat                        = dHeat + HRAINR

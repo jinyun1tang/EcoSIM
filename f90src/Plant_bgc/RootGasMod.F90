@@ -1,6 +1,7 @@
 module RootGasMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod  , only : safe_adb,vapsat,AZMAX1,AZMIN1
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1
+  use DebugToolMod
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -27,6 +28,8 @@ module RootGasMod
   real(r8), intent(in) :: dtPerPlantRootH2OUptake   !root water uptake 
   real(r8), intent(in) :: FOXYX
   real(r8), intent(out):: PopPlantO2Uptake_vr
+
+  character(len=*), parameter :: subname='RootSoilGasExchange'
   !local variables
   integer :: M,MX
   real(r8) :: B,C
@@ -91,7 +94,7 @@ module RootGasMod
     VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,               &
     VLsoiAirPM_vr            => plt_site%VLsoiAirPM_vr,               &
     TortMicPM_vr             => plt_site%TortMicPM_vr,                &
-    FILM                     => plt_site%FILM,                        &
+    FILMM_vr                 => plt_site%FILMM_vr,                    &
     RGasFlxPrev_vr           => plt_bgcr%RGasFlxPrev_vr,              &
     RO2AquaSourcePrev_vr     => plt_bgcr%RO2AquaSourcePrev_vr,        &
     RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,              & !out: O2 uptake from O2 inside root
@@ -137,6 +140,7 @@ module RootGasMod
     MainBranchNum_pft        => plt_morph%MainBranchNum_pft           &
   )
   
+  call PrintInfo('beg '//subname)
   IF(RootRespPotent_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
     .AND.FOXYX.GT.ZERO4Uptk_pft(NZ))THEN
 !
@@ -263,7 +267,7 @@ module RootGasMod
 !     VOLX=soil volume excluding rock,macropores
 !     THETW1=soil water concentration
 !     TortMicPM_vr=soil tortuosity
-!     FILM=soil water film thickness
+!     FILMM_vr=soil water FILMM_vr thickness
 !     FineRootRadius=root radius
 !     RRADS=path length for radial diffusion from soil to root
 !     DIF*=aqueous diffusivity from soil to root:OL=O2,CL=CH4
@@ -271,6 +275,7 @@ module RootGasMod
 !     C*G=soil gaseous concentration
 !     VOLW*,VOLP*=VLWatMicPMM,VLsoiAirPMM*gas solubility
 !
+
       VLWatMicPMO = VLWatMicPM_vr(M,L)*FOXYX
       VLWatMicPMM = VLWatMicPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
       VLsoiAirPMM = VLsoiAirPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
@@ -283,7 +288,7 @@ module RootGasMod
 
       IF(THETW1.GT.SoilWatAirDry_vr(L) .AND. FracPRoot4Uptake(N,L,NZ).GT.ZERO4Uptk_pft(NZ))THEN
         THETM  = TortMicPM_vr(M,L)*THETW1
-        RRADS  = LOG((FILM(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
+        RRADS  = LOG((FILMM_vr(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX = RootAreaDivRadius_vr(N,L)/RRADS
 
         do idg    = idg_beg, idg_NH3
@@ -316,7 +321,6 @@ module RootGasMod
 !     RootVH2O_pvr,RootPoreVol_pvr=root aqueous,gaseous volume
 !     RMF*=soil convective solute flux:COS=CO2,OXS=O2,CHS=CH4,
 !     N2S=N2O,NHS=NH3 non-band,NHB=NH3 band,HGS=H2
-!     dtPerPlantRootH2OUptake=water uptake
 !
         D90: DO MX=1,NPT
           trc_solml_loc(idg_O2)=trc_solml_loc(idg_O2)+ROXYLX
@@ -572,9 +576,10 @@ module RootGasMod
             trcg_air2root_flx_loc(idg_beg:idg_NH3) = 0.0_r8
           ENDIF
 !
-!     UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS
+!    !UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS'
 !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
 !
+          
           DO idg=idg_beg,idg_NH3
             trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)+trcg_air2root_flx_loc(idg)
             if(idg==idg_O2)then
@@ -587,7 +592,7 @@ module RootGasMod
           trcs_rootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
           trcs_rootml_loc(idg_NH3) = trcs_rootml_loc(idg_NH3)+RootUptkSoiSolute(idg_NH3B)
 !
-!     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
+!     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
 !
 !     RCO2S=soil-root gas exchange
 !
@@ -599,7 +604,7 @@ module RootGasMod
             endif  
           enddo
 !
-!     ACCUMULATE ROOT-ATMOSPHERE GAS EXCHANGE TO HOURLY TIME SCALE
+!     ACCUMULATE ROOT-ATMOSPHERE GAS EXCHANGE TO HOURLY TIME SCALE'
 !
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !     R*FLA=root gaseous-atmosphere CO2 exchange
@@ -610,7 +615,7 @@ module RootGasMod
             trcg_air2root_flx_pvr(idg,N,L,NZ)    = trcg_air2root_flx_pvr(idg,N,L,NZ)+trcg_air2root_flx_loc(idg)
           ENDDO
 !
-!     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
+!     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
 !
 !     RCO2P=root CO2 emission into root
 !     RootO2Uptk_pvr=root O2 uptake from root
@@ -619,11 +624,12 @@ module RootGasMod
           RootCO2Emis_pvr(N,L,NZ) = RootCO2Emis_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
           RootO2Uptk_pvr(N,L,NZ)  = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk  !uptake from O2 in roots
           RO2UptkSoilM_vr(M,L)    = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk    !uptake from soil O2 for respiration
-        ENDDO D90
+        ENDDO D90        
       ENDIF
+
     ENDDO D99
 !
-!     O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO
+!     O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'
 !     OF ROOT O2 UPTAKE 'RO2UptkHeterT' TO ROOT O2 DEMAND 'RootO2Dmnd4Resp_pvr'
 !
 !     RO2UptkHeterT=O2 uptake from soil+root by each root,myco population
@@ -641,6 +647,7 @@ module RootGasMod
       RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine RootSoilGasExchange
 
