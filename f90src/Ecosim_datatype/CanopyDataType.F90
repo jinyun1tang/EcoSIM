@@ -105,7 +105,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  PrecIntcptByCanopy_pft(:,:,:)              !water flux into plant canopy, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WatHeldOnCanopy_pft(:,:,:)                 !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  TKC_pft(:,:,:)                             !canopy temperature after energy iteration, [K]
-  real(r8),target,allocatable ::  TCelciusCanopy_pft(:,:,:)                  !canopy temperature, [oC]
+  real(r8),target,allocatable ::  TdegCCanopy_pft(:,:,:)                  !canopy temperature, [oC]
   real(r8),target,allocatable ::  DeltaTKC_pft(:,:,:)                        !change in canopy temperature, [K]
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature during canopy energy iteration, [K]
   real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                     !minimum sink strength for nonstructural C transfer, [g d-2]
@@ -270,7 +270,7 @@ module CanopyDataType
   allocate(PrecIntcptByCanopy_pft(JP,JY,JX));     PrecIntcptByCanopy_pft=0._r8
   allocate(WatHeldOnCanopy_pft(JP,JY,JX));    WatHeldOnCanopy_pft=0._r8
   allocate(TKC_pft(JP,JY,JX));      TKC_pft=0._r8
-  allocate(TCelciusCanopy_pft(JP,JY,JX));      TCelciusCanopy_pft=0._r8
+  allocate(TdegCCanopy_pft(JP,JY,JX));      TdegCCanopy_pft=0._r8
   allocate(DeltaTKC_pft(JP,JY,JX));     DeltaTKC_pft=0._r8
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
   allocate(CPOOL3_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3_node=0._r8
@@ -433,7 +433,7 @@ module CanopyDataType
   call destroy(PrecIntcptByCanopy_pft)
   call destroy(WatHeldOnCanopy_pft)
   call destroy(TKC_pft)
-  call destroy(TCelciusCanopy_pft)
+  call destroy(TdegCCanopy_pft)
   call destroy(DeltaTKC_pft)
   call destroy(TKCanopy_pft)
   call destroy(CPOOL3_node)

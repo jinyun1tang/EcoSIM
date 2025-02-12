@@ -273,7 +273,7 @@ implicit none
     PlantN2Fix_CumYr_pft(NZ,NY,NX)             = plt_bgcr%PlantN2Fix_CumYr_pft(NZ)
     TKC_pft(NZ,NY,NX)                              = plt_ew%TKC_pft(NZ)
 
-    TCelciusCanopy_pft(NZ,NY,NX)               = plt_ew%TCelciusCanopy_pft(NZ)
+    TdegCCanopy_pft(NZ,NY,NX)               = plt_ew%TdegCCanopy_pft(NZ)
     LWRadCanopy_pft(NZ,NY,NX)                  = plt_rad%LWRadCanopy_pft(NZ)
     TKCanopy_pft(NZ,NY,NX)                     = plt_ew%TKCanopy_pft(NZ)
     TKGroth_pft(NZ,NY,NX)                      = plt_pheno%TKGroth_pft(NZ)
@@ -1039,7 +1039,7 @@ implicit none
     plt_photo%ChillHours_pft(NZ) = ChillHours_pft(NZ,NY,NX)
     plt_ew%PSICanopyOsmo_pft(NZ) = PSICanopyOsmo_pft(NZ,NY,NX)
 
-    plt_ew%TCelciusCanopy_pft(NZ)           = TCelciusCanopy_pft(NZ,NY,NX)
+    plt_ew%TdegCCanopy_pft(NZ)           = TdegCCanopy_pft(NZ,NY,NX)
     plt_allom%RootFracRemobilizableBiom(NZ) = RootFracRemobilizableBiom(NZ,NY,NX)
     plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)
     plt_biom%RootBiomCPerPlant_pft(NZ)      = RootBiomCPerPlant_pft(NZ,NY,NX)

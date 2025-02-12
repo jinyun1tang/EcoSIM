@@ -250,7 +250,7 @@ module UptakesMod
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
 !     TKC_pft(NZ)=TairK+DeltaTKC_pft(NZ)
-!     TCelciusCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
+!     TdegCCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
     ARLSC   = ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     RadNet2Canopy_pft(NZ)                                = 0.0_r8
     plt_ew%EvapTransLHeat_pft(NZ)                         = 0.0_r8
@@ -533,7 +533,7 @@ module UptakesMod
    TairK                     => plt_ew%TairK,                        &
    TKS_vr                    => plt_ew%TKS_vr,                       &
    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
-   TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
+   TdegCCanopy_pft        => plt_ew%TdegCCanopy_pft,           &
    AllPlantRootH2OLoss_vr  => plt_ew%AllPlantRootH2OLoss_vr,     &
    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr,               &
    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft,            &
@@ -569,7 +569,7 @@ module UptakesMod
       plt_ew%VapXAir2Canopy_pft(NZ) = 0.0_r8
       plt_ew%Transpiration_pft(NZ)  = 0.0_r8
       TKC_pft(NZ)                   = TairK+DeltaTKC_pft(NZ)
-      TCelciusCanopy_pft(NZ)        = units%Kelvin2Celcius(TKC_pft(NZ))
+      TdegCCanopy_pft(NZ)        = units%Kelvin2Celcius(TKC_pft(NZ))
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
@@ -657,7 +657,7 @@ module UptakesMod
     AREA3                     => plt_site%AREA3,                      &
     QdewCanopy_pft            => plt_ew%QdewCanopy_pft,               &
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft,                 &
-    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
+    TdegCCanopy_pft        => plt_ew%TdegCCanopy_pft,           &
     PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKC_pft                   => plt_ew%TKC_pft,                      &
@@ -1002,7 +1002,7 @@ module UptakesMod
 !     DeltaTKC_pft=TKC-TairK for next hour
 !
   TKC_pft(NZ)            = TKCanopy_pft(NZ)
-  TCelciusCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
+  TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
   DeltaTKC_pft(NZ)       = TKC_pft(NZ)-TairK
 
   end associate
@@ -1171,7 +1171,7 @@ module UptakesMod
 ! begin_execution
   associate(                                                          &
     QdewCanopy_pft            => plt_ew%QdewCanopy_pft,               &
-    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,           &
+    TdegCCanopy_pft        => plt_ew%TdegCCanopy_pft,           &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKSnow                    => plt_ew%TKSnow,                       &
     TKC_pft                   => plt_ew%TKC_pft,                      &
@@ -1224,7 +1224,7 @@ module UptakesMod
   ELSE
     TKC_pft(NZ)=TKSnow
   ENDIF
-  TCelciusCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
+  TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
   FTHRM                  = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
   LWRadCanopy_pft(NZ)    = FTHRM*TKC_pft(NZ)**4._r8
   PSICanopy_pft(NZ)      = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
@@ -1362,7 +1362,7 @@ module UptakesMod
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                                              &
-    TCelciusCanopy_pft  => plt_ew%TCelciusCanopy_pft,     &
+    TdegCCanopy_pft  => plt_ew%TdegCCanopy_pft,     &
     TairK               => plt_ew%TairK,                  &
     TKC_pft             => plt_ew%TKC_pft,                &
     TKS_vr              => plt_ew%TKS_vr,                 &
@@ -1421,7 +1421,7 @@ module UptakesMod
   !     TCChill4Seed_pft=chilling temperature from PFT file
   !     CHILL=accumulated chilling hours used to limit CO2 fixn in stomate.f
   !
-  IF(TCelciusCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
+  IF(TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
     ChillHours_pft(NZ)=AMIN1(24.0_r8,ChillHours_pft(NZ)+1.0_r8)
   ELSE
     ChillHours_pft(NZ)=AZMAX1(ChillHours_pft(NZ)-1.0_r8)

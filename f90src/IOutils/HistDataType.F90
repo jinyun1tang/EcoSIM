@@ -211,7 +211,7 @@ implicit none
   real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransLHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TCelciusCanopy_pft(NZ,NY,NX)
+  real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TdegCCanopy_pft(NZ,NY,NX)
   real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTCanopyGroth_pft(NZ,NY,NX), canopy temperature growth function/stress
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),  gross CO2 fixation, gC m-2/hr
@@ -2946,7 +2946,7 @@ implicit none
         this%h1D_CAN_LE_ptc(nptc)        = MJ2W*EvapTransLHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%h1D_CAN_TEMPC_ptc(nptc)     = TCelciusCanopy_pft(NZ,NY,NX)
+        this%h1D_CAN_TEMPC_ptc(nptc)     = TdegCCanopy_pft(NZ,NY,NX)
         this%h1D_CAN_TEMPFN_ptc(nptc)    = fTCanopyGroth_pft(NZ,NY,NX)
         this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
         this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

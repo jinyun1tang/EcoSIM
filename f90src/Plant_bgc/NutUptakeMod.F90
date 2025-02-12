@@ -74,7 +74,7 @@ module NutUptakeMod
   integer :: NB
 
   associate(                                                         &
-    TCelciusCanopy_pft        => plt_ew%TCelciusCanopy_pft,          &
+    TdegCCanopy_pft        => plt_ew%TdegCCanopy_pft,          &
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
@@ -97,8 +97,8 @@ module NutUptakeMod
   !     CONCENTRATION DIFFERENCES 'AtmGasc(idg_NH3)' (ATMOSPHERE FROM 'READS') AND
   !     'CNH3P' (CANOPY), AND FROM STOMATAL + BOUNDARY LAYER RESISTANCE
   !
-  !     SNH3P =NH3 solubility at TCelciusCanopy_pft
-  !     TCelciusCanopy_pft=canopy temperature (oC)
+  !     SNH3P =NH3 solubility at TdegCCanopy_pft
+  !     TdegCCanopy_pft=canopy temperature (oC)
   !     FDMP,FNH3P=canopy dry matter content,NH3 concentration
   !     LeafAreaLive_brch,CanopyLeafArea_pft=branch,canopy leaf area
   !     CNH3P,AtmGasc(idg_NH3)=gaseous NH3 concentration in branch,atmosphere
@@ -107,7 +107,7 @@ module NutUptakeMod
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
   !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
   !
-  SNH3P = gas_solubility(idg_NH3,TCelciusCanopy_pft(NZ))
+  SNH3P = gas_solubility(idg_NH3,TdegCCanopy_pft(NZ))
   FNH3P = 1.0E-04_r8*FDMP
   if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)

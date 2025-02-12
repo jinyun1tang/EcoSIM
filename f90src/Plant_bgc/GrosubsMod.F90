@@ -626,7 +626,7 @@ module grosubsMod
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
     GrainStrutElms_brch       => plt_biom%GrainStrutElms_brch,       &
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch,        &
-    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch,        &
+    StalkLiveBiomassC_brch    => plt_biom%StalkLiveBiomassC_brch,    &
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch,      &
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft,        &
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft,         &
@@ -638,10 +638,10 @@ module grosubsMod
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft,          &
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft,        &
     CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,      &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
     CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft,       &
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     PlantN2Fix_CumYr_pft      => plt_bgcr%PlantN2Fix_CumYr_pft,      &
     PlantExudElm_CumYr_pft    => plt_rbgc%PlantExudElm_CumYr_pft,    &
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft,        &

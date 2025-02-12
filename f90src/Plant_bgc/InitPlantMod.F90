@@ -860,7 +860,7 @@ module InitPlantMod
     PSICanopyOsmo_pft     => plt_ew%PSICanopyOsmo_pft,      &
     ENGYX_pft             => plt_ew%ENGYX_pft,              &
     DeltaTKC_pft          => plt_ew%DeltaTKC_pft,           &
-    TCelciusCanopy_pft    => plt_ew%TCelciusCanopy_pft,     &
+    TdegCCanopy_pft    => plt_ew%TdegCCanopy_pft,     &
     TKGroth_pft           => plt_pheno%TKGroth_pft,         &
     TCGroth_pft           => plt_pheno%TCGroth_pft,         &
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,        &
@@ -874,16 +874,16 @@ module InitPlantMod
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
 !     VHeatCapCanopy_pft=canopy heat capacity (MJ m-3 K-1)
-!     TCelciusCanopy_pft,TKC=canopy temperature for growth (oC,K)
+!     TdegCCanopy_pft,TKC=canopy temperature for growth (oC,K)
 !     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
   VHeatCapCanopy_pft(NZ)    = cpw*ShootStrutElms_pft(ielmc,NZ)*10.0E-06
   ENGYX_pft(NZ)             = 0._r8
   DeltaTKC_pft(NZ)          = 0._r8
-  TCelciusCanopy_pft(NZ)    = ATCA
-  TKC_pft(NZ)               = units%Celcius2Kelvin(TCelciusCanopy_pft(NZ))
-  TCGroth_pft(NZ)           = TCelciusCanopy_pft(NZ)
+  TdegCCanopy_pft(NZ)    = ATCA
+  TKC_pft(NZ)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ))
+  TCGroth_pft(NZ)           = TdegCCanopy_pft(NZ)
   TKGroth_pft(NZ)           = units%Celcius2Kelvin(TCGroth_pft(NZ))
   fTCanopyGroth_pft(NZ)     = 1.0
   PSICanopy_pft(NZ)         = -1.0E-03

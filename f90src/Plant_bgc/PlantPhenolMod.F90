@@ -83,7 +83,7 @@ module PlantPhenolMod
         call FindMainBranchNumber(NZ)
 
         !   if(I>176)print*,'stageplant'
-        call stage_plant_phenology(I,J,NZ)
+        call StagePlantPhenology(I,J,NZ)
 
         !   if(I>176)print*,'testplantem'
         call TestPlantEmergence(I,J,NZ)
@@ -391,7 +391,7 @@ module PlantPhenolMod
   end associate
   end subroutine FindMainBranchNumber
 !------------------------------------------------------------------------------------------
-  subroutine stage_plant_phenology(I,J,NZ)
+  subroutine StagePlantPhenology(I,J,NZ)
   implicit none
   integer, intent(in) :: I,J,NZ
 
@@ -407,7 +407,7 @@ module PlantPhenolMod
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
-    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,  &
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr, &
     ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,   &
@@ -489,7 +489,7 @@ module PlantPhenolMod
   ENDDO D190
 
   end associate
-  end subroutine stage_plant_phenology
+  end subroutine StagePlantPhenology
 !------------------------------------------------------------------------------------------
   subroutine TestPlantEmergence(I,J,NZ)
   implicit none
@@ -520,12 +520,11 @@ module PlantPhenolMod
 ! Root1stDepz_pft=primary root depth
 ! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
 !
-  ShootArea=0._r8
+  
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk = (HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_pft(ipltroot,1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
-
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanopy_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))

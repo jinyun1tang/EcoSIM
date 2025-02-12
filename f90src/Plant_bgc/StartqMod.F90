@@ -681,7 +681,7 @@ module StartqMod
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
 !     VHeatCapCanopy_pft=canopy heat capacity (MJ m-3 K-1)
-!     TCelciusCanopy_pft,TKC=canopy temperature for growth (oC,K)
+!     TdegCCanopy_pft,TKC=canopy temperature for growth (oC,K)
 !     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
@@ -691,9 +691,9 @@ module StartqMod
 
   ENGYX_pft(NZ,NY,NX)             = 0._r8
   DeltaTKC_pft(NZ,NY,NX)          = 0._r8
-  TCelciusCanopy_pft(NZ,NY,NX)    = ATCA(NY,NX)
-  TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TCelciusCanopy_pft(NZ,NY,NX))
-  TCGroth_pft(NZ,NY,NX)           = TCelciusCanopy_pft(NZ,NY,NX)
+  TdegCCanopy_pft(NZ,NY,NX)    = ATCA(NY,NX)
+  TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
+  TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
   TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
   fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
   PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8

@@ -569,7 +569,7 @@ implicit none
   real(r8), pointer :: ReistanceCanopy_pft(:)          => null()    !canopy roughness height,                                      [m]
   real(r8), pointer :: TKS_vr(:)                       => null()    !mean annual soil temperature,                                 [K]
   real(r8), pointer :: PSICanPDailyMin(:)              => null()    !minimum daily canopy water potential,                         [MPa]
-  real(r8), pointer :: TCelciusCanopy_pft(:)           => null()    !canopy temperature,                                           [oC]
+  real(r8), pointer :: TdegCCanopy_pft(:)           => null()    !canopy temperature,                                           [oC]
   real(r8), pointer :: DeltaTKC_pft(:)                 => null()    !change in canopy temperature,                                 [K]
   real(r8), pointer :: ENGYX_pft(:)                    => null()    !canopy heat storage from previous time step,                  [MJ d-2]
   real(r8), pointer :: TKC_pft(:)                      => null()    !canopy temperature,                                           [K]
@@ -1116,7 +1116,7 @@ implicit none
   allocate(this%DeltaTKC_pft(JP1));this%DeltaTKC_pft=spval
   allocate(this%TKC_pft(JP1));this%TKC_pft=spval
   allocate(this%ENGYX_pft(JP1));this%ENGYX_pft=spval
-  allocate(this%TCelciusCanopy_pft(JP1));this%TCelciusCanopy_pft=spval
+  allocate(this%TdegCCanopy_pft(JP1));this%TdegCCanopy_pft=spval
   allocate(this%PSICanPDailyMin(JP1));this%PSICanPDailyMin=spval
 
   end subroutine plt_ew_init
@@ -1154,7 +1154,7 @@ implicit none
 !  if(allocated(DeltaTKC_pft))deallocate(DeltaTKC_pft)
 !  if(allocated(TKC))deallocate(TKC)
 !  if(allocated(ENGYX_pft))deallocate(ENGYX_pft)
-!  if(allocated(TCelciusCanopy_pft))deallocate(TCelciusCanopy_pft)
+!  if(allocated(TdegCCanopy_pft))deallocate(TdegCCanopy_pft)
 
   end subroutine plt_ew_destroy
 

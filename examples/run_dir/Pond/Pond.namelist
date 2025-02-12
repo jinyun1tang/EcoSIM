@@ -14,6 +14,7 @@ clm_hour_file_in   = '../../../examples/inputs/Pond/lake_clim_20230203.nc'
 clm_factor_in      = 'NO'
 atm_ghg_in         = '../../../input_data/fatm_hist_GHGs_1750-2022.nc'
 
+!ldebug_day=9
 lverbose        = .false.
 plant_model     = .true.
 microbial_model = .true.
