@@ -22,4 +22,4 @@ jobs:
     - name: ecosim build
       run: |
         echo "Building EcoSIM"
-        bash build_EcoSIM.sh --CC=`which gcc` --CXX=`which g++` --FC=`which gfortran` --debug
+        bash build_EcoSIM.sh --debug
