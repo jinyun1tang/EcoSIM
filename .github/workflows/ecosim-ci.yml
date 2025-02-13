@@ -1,0 +1,25 @@
+name: EcoSIM CI
+
+on: [workflow_dispatch, push, pull_request]
+
+env:
+  # Customizing build type
+  BUILD_TYPE: DEBUG
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: package-install
+      run: |
+        sudo apt-get -qq update
+        sudo apt -qq install gfortran libopenmpi-dev libhdf5-openmpi-dev hdf5-helpers cmake
+
+    - uses: actions/checkout@v4
+    
+    - name: ecosim build
+      run: |
+        echo "Building "
+	bash build_EcoSIM.sh --CC=`which gcc` --CXX=`which g++` --FC=`which gfortran` --debug
