@@ -4,6 +4,7 @@ module SnowBalanceMod
   use abortutils,     only: endrun
   use EcoSIMCtrlMod,  only: lverb,snowRedist_model,fixWaterLevel
   use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d  
+  use DebugToolMod
   use SoilPropertyDataType
   use SurfLitterDataType
   use SOMDataType
@@ -553,6 +554,8 @@ implicit none
   !
   implicit none
   integer, intent(in) :: I,J,NY,NX
+
+  character(len=*), parameter :: subname='SnowpackLayering'
   real(r8) :: FX,FY
   integer :: L,L1,L0
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
@@ -566,16 +569,17 @@ implicit none
 ! from surface to bottom, and modify the bottom layer
 ! there is snow
 
-  if(lverb)write(*,*)'SnowpackLayering'
+  call PrintInfo('beg '//subname)
 
   IF(VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     D325: DO L=1,JS-1
 
       IF(VLSnoDWIprev_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        !compute the free volume/thickness: DDLYXS
-        DDLYXS=(VLSnoDWIMax_col(L,NY,NX)-VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX) &
+        !compute excessive thickness for layer L: DDLYXS
+        DDLYXS=(VLSnoDWIMax_snvr(L,NY,NX)-VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX) &
           -VLWatSnow_snvr(L,NY,NX)-VLIceSnow_snvr(L,NY,NX))/AREA(3,L,NY,NX)
 
+        !snow is expanding from layer L into L+1, or layer L is shrinking, but L+1 has snow
         IF(DDLYXS.LT.-ZERO .OR. SnowThickL_snvr(L+1,NY,NX).GT.ZERO)THEN
           !current volume is greater than allowed, or next layer exists   
           !case 1: DDLYXS< 0, layer L extends into layer L+1, DDLYRS<0: amount of expand layer L into layer L+1
@@ -622,7 +626,7 @@ implicit none
           !expanding L into L+1
           L1=L+1
           L0=L
-          IF(VLSnoDWIprev_snvr(L0,NY,NX).LT.VLSnoDWIMax_col(L0,NY,NX))THEN
+          IF(VLSnoDWIprev_snvr(L0,NY,NX).LT.VLSnoDWIMax_snvr(L0,NY,NX))THEN
             FX=0.0_r8
           ELSE
             !FX fraction to be donated from L0 to L1
@@ -632,7 +636,7 @@ implicit none
 !   donor L0, target L1
         IF(FX.GT.0.0_r8)THEN
           FY=1.0_r8-FX
-!          print*,'relay',L0,L1,FX,FY,DDLYRS,DDLYXS,-ZERO,SnowThickL_snvr(L+1,NY,NX),VLSnoDWIprev_snvr(L0,NY,NX),VLSnoDWIMax_col(L0,NY,NX)
+!          print*,'relay',L0,L1,FX,FY,DDLYRS,DDLYXS,-ZERO,SnowThickL_snvr(L+1,NY,NX),VLSnoDWIprev_snvr(L0,NY,NX),VLSnoDWIMax_snvr(L0,NY,NX)
 !
 !     TARGET SNOW LAYER
 !         volume/mass
@@ -711,9 +715,6 @@ implicit none
     ENDDO D325
   ENDIF
 
-  !write(*,*) "SnowpackLayering After first do loop - ", NX, NY
-  !write(*,*) "VLHeatCapSnow_snvr(1,NY,NX) = ", VLHeatCapSnow_snvr(1,NY,NX)
-  !write(*,*) "VLHeatCapSnow_snvr(5,NY,NX) = ", VLHeatCapSnow_snvr(5,NY,NX)
   !update volumetric snow heat capacity
   nsnol_col(NY,NX)=0
   DO L=1,JS
@@ -757,9 +758,7 @@ implicit none
     endif 
   ENDDO  
 
-  !write(*,*) "End SnowpackLayering - ", NX, NY
-  !write(*,*) "VLHeatCapSnow_snvr(1,NY,NX) = ", VLHeatCapSnow_snvr(1,NY,NX)
-  !write(*,*) "VLHeatCapSnow_snvr(5,NY,NX) = ", VLHeatCapSnow_snvr(5,NY,NX)
+  call PrintInfo('end '//subname)
   end subroutine SnowpackLayering
 
 !------------------------------------------------------------------------------------------

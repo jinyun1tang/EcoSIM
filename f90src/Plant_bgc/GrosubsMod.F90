@@ -680,28 +680,27 @@ module grosubsMod
     endif
  ENDDO  
   DO NE=1,NumPlantChemElms
-    CanopyNonstElms_pft(NE,NZ) = sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    StalkRsrvElms_pft(NE,NZ)   = sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    ShootStrutElms_pft(NE,NZ)  = sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    PetoleStrutElms_pft(NE,NZ) = sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    StalkStrutElms_pft(NE,NZ)  = sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    LeafStrutElms_pft(NE,NZ)   = sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    HuskStrutElms_pft(NE,NZ)   = sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    GrainStrutElms_pft(NE,NZ)  = sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-    EarStrutElms_pft(NE,NZ)    = sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
+    CanopyNonstElms_pft(NE,NZ) = AZMAX1(sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    StalkRsrvElms_pft(NE,NZ)   = AZMAX1(sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    ShootStrutElms_pft(NE,NZ)  = AZMAX1(sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    PetoleStrutElms_pft(NE,NZ) = AZMAX1(sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    StalkStrutElms_pft(NE,NZ)  = AZMAX1(sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    LeafStrutElms_pft(NE,NZ)   = AZMAX1(sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    HuskStrutElms_pft(NE,NZ)   = AZMAX1(sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    GrainStrutElms_pft(NE,NZ)  = AZMAX1(sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    EarStrutElms_pft(NE,NZ)    = AZMAX1(sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
     !root state variables
     !sum structural biomass
   ENDDO
 
-  CanopyStalkC_pft(NZ)                         = sum(StalkLiveBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyLeafShethC_pft(NZ)                     = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopySeedNum_pft(NZ)                        = sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyLeafArea_pft(NZ)                       = sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ))
-  CanopyStemArea_pft(NZ)                       = sum(CanopyStalkArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ))
+  CanopyStalkC_pft(NZ)     = AZMAX1(sum(StalkLiveBiomassC_brch(1:NumOfBranches_pft(NZ),NZ)))
+  CanopyLeafShethC_pft(NZ) = AZMAX1(sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ)))
+  CanopySeedNum_pft(NZ)    = AZMAX1(sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ)))
+  CanopyLeafArea_pft(NZ)   = AZMAX1(sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ)))
+  CanopyStemArea_pft(NZ)   = AZMAX1(sum(CanopyStalkArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ)))
 
   
-  DO NB=1,NumOfBranches_pft(NZ)
-        
+  DO NB=1,NumOfBranches_pft(NZ)        
     DO L=1,NumOfCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
@@ -733,11 +732,6 @@ module grosubsMod
 !
 !     ACCUMULATE TOTAL SOIL-PLANT C,N,P EXCHANGE
 !
-!     HCUPTK,HZUPTK,HPUPTK=net PFT root-soil C,N,P exchange
-!     UPOMC,UPOMN,UPOMP=net PFT root-soil nonstructl C,N,P exchange
-!     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
-!     RootN2Fix_pft=PFT N2 fixation
-!     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
 !     PlantRootSoilElmNetX_pft= > 0 taking from soil 
   PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=RootMycoExudElms_pft(1:NumPlantChemElms,NZ)

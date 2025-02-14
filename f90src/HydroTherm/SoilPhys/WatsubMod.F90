@@ -221,9 +221,9 @@ module WatsubMod
 !       if(I>=156)write(211,*)I*1000+J,NY,NX,M,'wat',NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
 !          QDischar_col(NY,NX),QDrain_col(NY,NX),dwat0
 
+!      if(I==358 .and. J==12)write(211,*)I+J/24.,NY,NX,M,'wat',NUX0(NY,NX),NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
+!          QDischar_col(NY,NX),QDrain_col(NY,NX)
       if(abs(dwat)>1.e-4_r8)then
-        write(211,*)I+J/24.,NY,NX,M,'wat',NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
-          QDischar_col(NY,NX),QDrain_col(NY,NX)
         call endrun('soil H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif
 
@@ -917,7 +917,7 @@ module WatsubMod
 !     BOUNDARY SURFACE RUNOFF DEPENDING ON ASPECT, SLOPE
 !     VELOCITY, HYDRAULIC RADIUS AND SURFACE WATER STORAGE
 !
-!     CDPTH,CumLitRDepz_col=current,initial surface elevation
+!     CDPTH,CumLitRDepzInit_col=current,initial surface elevation
 !     BKDS=bulk density
 !     XGridRunoffFlag,RCHQ*=runoff boundary flags
 
@@ -925,7 +925,7 @@ module WatsubMod
 !           or the grid is a soil
 !           surface lateral flow 
             IF(L.EQ.NUM(N2,N1) .AND. N.NE.iVerticalDirection                           & ! lateral flow
-              .AND. (CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1).LE.CumLitRDepz_col(N2,N1)  & ! in the soil
+              .AND. (CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1).LE.CumLitRDepzInit_col(N2,N1)  & ! in the soil
               .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                     ! it is soil
               !  NO runoff
               IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RechargSurf,0._r8) .OR. &

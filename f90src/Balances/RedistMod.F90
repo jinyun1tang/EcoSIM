@@ -138,8 +138,9 @@ module RedistMod
 
       call SnowpackLayering(I,J,NY,NX)
 
+!      if(I==358 .and. J==12)write(211,*)'bef',NY,NX,NU(NY,NX),NUM(NY,NX),erosion_model
       call UpdateSoilGrids(I,J,NY,NX,DORGC,DVLiceMicP_vr)
-
+!      if(I==358 .and. J==12)write(211,*)'aff',NY,NX,NU(NY,NX),NUM(NY,NX)
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
 
     ENDDO D9990
@@ -893,7 +894,8 @@ module RedistMod
       TKS_vr(L,NY,NX)        = TairK_col(NY,NX)
       TCS_vr(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
-    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
+
+!    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
     DO L=NUM(NY,NX),NL(NY,NX)
       
       !micropore

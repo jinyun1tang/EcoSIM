@@ -885,7 +885,7 @@ module StartsMod
 !     begin_execution
   call PrintInfo('beg InitLayerDepths')
 
-  DO  L=0,NL(NY,NX)
+  D111: DO   L=0,NL(NY,NX)
 !
 ! LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
 
@@ -946,9 +946,9 @@ module StartsMod
     ENDIF
     AREA(1,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
     AREA(2,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
-  ENDDO
-  CumDepz2LayBottom_vr(0,NY,NX)  = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
-  CumLitRDepz_col(NY,NX)        = CumDepz2LayBottom_vr(0,NY,NX)
+  ENDDO D111
+  CumDepz2LayBottom_vr(0,NY,NX) = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
+  CumLitRDepzInit_col(NY,NX)    = CumDepz2LayBottom_vr(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR_3D(1,NL(NY,NX),NY,NX)*DLYR_3D(2,NL(NY,NX),NY,NX)
   call PrintInfo('end InitLayerDepths')
   end associate
