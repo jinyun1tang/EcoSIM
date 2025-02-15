@@ -7,7 +7,7 @@ env:
   BUILD_TYPE: DEBUG
 
 jobs:
-  build:
+  build-ubuntu:
     runs-on: ubuntu-latest
     
     steps:
@@ -25,9 +25,14 @@ jobs:
     
     - name: ecosim-build
       shell: bash
+      continue-on-error: true      
       run: |
         echo "Building EcoSIM"
         bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran` --debug
+
+    - name: did-build-ubuntu-fail
+      run: |
+        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
 
   build-rocky:
     runs-on: ubuntu-latest
@@ -44,6 +49,7 @@ jobs:
         dnf -qq -y install gcc-gfortran gcc-c++
         dnf -qq -y install cmake
         dnf -qq -y install which
+	dnf -qq -y install git
 #        if/when system hdf5 is needed
 #        dnf install -y dnf-plugins-core
 #        dnf install -y epel-release
@@ -61,7 +67,6 @@ jobs:
         echo "Building EcoSIM"
         bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran` --debug
 
-    - name: finish-build-rocky
+    - name: did-build-rocky-fail
       run: |
-        cat /SSD4/ecosim/EcoSIM/build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
-
+        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
