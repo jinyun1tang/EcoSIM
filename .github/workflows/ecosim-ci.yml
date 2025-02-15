@@ -2,9 +2,9 @@ name: EcoSIM CI
 
 on: [workflow_dispatch, push, pull_request]
 
-env:
+#env:
   # Customizing build type
-  BUILD_TYPE: DEBUG
+  # BUILD_TYPE: DEBUG
 
 jobs:
   build-ubuntu:
@@ -27,14 +27,15 @@ jobs:
     
     - name: ecosim-build
       shell: bash
-      continue-on-error: true      
       run: |
         echo "Building EcoSIM"
-        bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran` --debug
-
-    - name: did-build-ubuntu-fail
-      run: |
-        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
+        bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran`
+#
+#       continue-on-error: true
+#
+#    - name: did-build-ubuntu-fail
+#      run: |
+#        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
 
   build-rocky:
     runs-on: ubuntu-latest
@@ -66,11 +67,11 @@ jobs:
     
     - name: ecosim-build-rocky
       shell: bash
-      continue-on-error: true
       run: |
         echo "Building EcoSIM"
-        bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran` --debug
+        bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran`
 
-    - name: did-build-rocky-fail
-      run: |
-        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
+#      continue-on-error: true
+#    - name: did-build-rocky-fail
+#      run: |
+#        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
