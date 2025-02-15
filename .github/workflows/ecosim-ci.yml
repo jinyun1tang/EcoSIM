@@ -16,7 +16,7 @@ jobs:
       run: |
         sudo apt-get -qq update
         sudo apt -qq -y install gfortran cmake
-        sudo apt -qq -y install curl 
+        sudo apt -qq -y install libcurl4 libcurl4-gnutls-dev curl 
         sudo apt -qq -y install autoconf automake
 #        if/when system hdf5 is needed	
 #	 sudo apt -qq -y libhdf5-openmpi-dev
