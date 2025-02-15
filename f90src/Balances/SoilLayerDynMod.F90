@@ -200,6 +200,7 @@ implicit none
   
 !  if(I==312 .and. J==22)write(211,*)twat,(L,VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,&
 !    L=NU(NY,NX),NL(NY,NX))  
+!  write(111,*)I*1000+J,NY,NX,(L,CumDepz2LayBottom_vr(L,NY,NX),L=NU(NY,NX),NL(NY,NX))
   call PrintInfo('end '//subname)
   end subroutine UpdateSoilGrids
 !------------------------------------------------------------------------------------------

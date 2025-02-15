@@ -7,6 +7,7 @@ module LateralTranspMod
   use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
   use TracerPropMod,    only: MolecularWeight
   use ClimForcDataType, only: PBOT_col
+  use DebugToolMod
   use GridDataType
   use TFlxTypeMod
   use TracerIDMod
@@ -43,6 +44,7 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer, intent(out) :: LG       !lbubble deposition layer
 
+  character(len=*), parameter :: subname='XGridTranspt'
   integer :: L,N
   logical :: doBubble                    !potential bubbling detection flag
   integer :: N1,N2,N3,N4,N5,N6
@@ -50,9 +52,11 @@ implicit none
   integer :: idg
   real(r8) :: VTATM,VTGAS
   real(r8) :: trcg_VOLG(idg_beg:idg_end)   !mole of gas in layer [mol gas d-2]
-  
+  real(r8) :: dPond
+
 ! begin_execution
-  if(lverb)write(*,*)'XGridTranspt'
+  call PrintInfo('beg '//subname)
+
   call ZeroFluxArrays(NY,NX)
 
   call ZeroFluxAccumulators(NY,NX)
@@ -63,20 +67,22 @@ implicit none
     !
     !     IDENTIFY LAYERS FOR BUBBLE FLUX TRANSFER
     !
-    !     
-    !     V*G2=molar gas content
-    !     *G=soil gas content
-    !     VOLP=soil air-filled porosity
-    !     VTATM=molar gas content at atmospheric pressure
-    !     VTGAS=total molar gas contest
-    !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-    !             :*ZN3*=NH3,*H2G*=H2
 !
     DO idg=idg_beg,idg_NH3
       trcg_VOLG(idg_CO2) = trcg_gasml_vr(idg_CO2,L,NY,NX)/MolecularWeight(idg)
     ENDDO
 
-    VTATM=AZMAX1(PBOT_col(NY,NX)*VLsoiAirP_vr(L,NY,NX)/(RgasC*TKS_vr(L,NY,NX)))*1.E3_r8 !mol gas/ d2
+    if(iPondFlag_col(NY,NX))then 
+      if(SoilBulkDensity_vr(L,NY,NX).LE.ZERO)then
+        !still in the ponding water, \rho*g*h,  1.e3*10
+        dPond=(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*10._r8
+      else
+        !in the soil
+        dPond=(CumDepz2LayBottom_vr(iPondBotLev_col(NY,NX),NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*10._r8
+      endif  
+    endif  
+
+    VTATM=AZMAX1((PBOT_col(NY,NX)+dPond)*VLsoiAirP_vr(L,NY,NX)/(RgasC*TKS_vr(L,NY,NX)))*1.E3_r8 !mol gas/ d2
 
 !   NH3B does not have explicit gas species, so there is an inconsistency
 !   with respect to the actual ebullition calculation, which involves
@@ -156,6 +162,8 @@ implicit none
     WatIceThawMacP_vr(N3,N2,N1) = WatIceThawMacP_vr(N3,N2,N1)+TLIceThawMacP_vr(N3,N2,N1)
     THeatSoiThaw_vr(N3,N2,N1)   = THeatSoiThaw_vr(N3,N2,N1)+TLPhaseChangeHeat2Soi_vr(N3,N2,N1)
   ENDDO D8575
+
+  call PrintInfo('end '//subname)
   end subroutine XGridTranspt
 
 !------------------------------------------------------------------------------------------

@@ -1,10 +1,11 @@
 module RedistMod
-  use data_kind_mod,     only : r8 => DAT_KIND_R8
-  use abortutils,        only : padr,     print_info, endrun, destroy
-  use minimathmod,       only : safe_adb, AZMAX1, fixEXflux, fixnegmass, isclose
-  use EcoSiMParDataMod,  only : micpar
-  use SurfLitterPhysMod, only : UpdateLitRPhys
-  use InitSOMBGCMOD    , only :  MicrobeByLitterFall
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use abortutils,        only: padr,     print_info, endrun,    destroy
+  use minimathmod,       only: safe_adb, AZMAX1,     fixEXflux, fixnegmass, isclose
+  use EcoSiMParDataMod,  only: micpar
+  use SurfLitterPhysMod, only: UpdateLitRPhys
+  use InitSOMBGCMOD,     only: MicrobeByLitterFall
+  use TracerPropMod,     only: MolecularWeight
   use DebugToolMod
   use SoilBGCNLayMod  
   use ElmIDMod
@@ -180,7 +181,6 @@ module RedistMod
   Eco_NBP_CumYr_col(NY,NX)         = Eco_NBP_CumYr_col(NY,NX)+Canopy_NEE_col(NY,NX) &
     +SurfGasEmisFlx_col(idg_CO2,NY,NX)+SurfGasEmisFlx_col(idg_CH4,NY,NX) &
     +TXCO2(NY,NX)-HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX)-HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
-
 
   RootCO2Autor_col(NY,NX)        = sum(RootCO2Autor_vr(1:JZ,NY,NX))
   Gas_NetProd_col(idg_CO2,NY,NX) = -ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
@@ -410,45 +410,36 @@ module RedistMod
 ! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
 ! UCO2G: total soil CO2 flux, [g d-2]
 ! HCO2G: hourly soil CO2 flux, [g d-2 h-1]
-  CI=trcg_DisolEvap_Atm2Soil_flx(idg_CO2,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_CO2,NY,NX)+Gas_Disol_Flx_vr(idg_CO2,0,NY,NX) &
-    +Gas_AdvDif_Flx_3D(idg_CO2,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_CO2,NY,NX) 
 
   do idg=idg_beg,idg_NH3
     Gas_WetDeposition_col(idg,NY,NX) = Gas_WetDeposition_col(idg,NY,NX)  &
       + (Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcg_rain_mole_conc_col(idg,NY,NX) &
       + (Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)+IrrigSubsurf_col(NY,NX))*trcg_irrig_mole_conc_col(idg,NY,NX) 
+    Gas_WetDeposition_col(idg,NY,NX) = Gas_WetDeposition_col(idg,NY,NX)*MolecularWeight(idg)  
+
+    SurfGasDifFlx_col(idg,NY,NX) = SurfGasDifFlx_col(idg,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX) &
+      +trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX)+Gas_Disol_Flx_vr(idg,0,NY,NX)+Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX)    
   ENDDO  
+  SurfGasDifFlx_col(idg_NH3,NY,NX) = SurfGasDifFlx_col(idg_NH3,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_NH3B,NY,NX)
 
-  CH=trcg_DisolEvap_Atm2Soil_flx(idg_CH4,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_CH4,NY,NX)+Gas_Disol_Flx_vr(idg_CH4,0,NY,NX)&
-    +Gas_AdvDif_Flx_3D(idg_CH4,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_CH4,NY,NX)
-    
-  CO                                = -IrrigSubsurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_CO2,NY,NX)*catomw
-  CX                                = -IrrigSubsurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_CH4,NY,NX)*catomw
-  SurfGasEmisFlx_col(idg_CO2,NY,NX) = SurfGasEmisFlx_col(idg_CO2,NY,NX)+CI
-  SurfGasEmisFlx_col(idg_CH4,NY,NX) = SurfGasEmisFlx_col(idg_CH4,NY,NX)+CH
-  SurfGas_CO2_lnd                   = SurfGas_CO2_lnd+CI+CH
-  TOMOU_lnds(ielmc)                 = TOMOU_lnds(ielmc)+CO+CX
+  do idg=idg_beg,idg_NH3
+    SurfGasEmisFlx_col(idg,NY,NX) = SurfGasEmisFlx_col(idg,NY,NX)+SurfGasDifFlx_col(idg,NY,NX)+TRootGasLossDisturb_pft(idg,NY,NX)
+  enddo
+  SurfGasEmisFlx_col(idg_N2,NY,NX)  = SurfGasEmisFlx_col(idg_N2,NY,NX)+Micb_N2Fixation_vr(0,NY,NX)
 
-  SurfGasDifFlx_col(idg_CO2,NY,NX) = SurfGasDifFlx_col(idg_CO2,NY,NX)+CI
-  SurfGasDifFlx_col(idg_CH4,NY,NX) = SurfGasDifFlx_col(idg_CH4,NY,NX)+CH
-
+  CO                = -IrrigSubsurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_CO2,NY,NX)*catomw
+  CX                = -IrrigSubsurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_CH4,NY,NX)*catomw
+  SurfGas_CO2_lnd   = SurfGas_CO2_lnd+SurfGasEmisFlx_col(idg_CO2,NY,NX)
+  TOMOU_lnds(ielmc) = TOMOU_lnds(ielmc)+CO+CX
   !
   !     SURFACE BOUNDARY O2 FLUXES
   !
-  OI=trcg_DisolEvap_Atm2Soil_flx(idg_O2,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_O2,NY,NX)&
-    +Gas_AdvDif_Flx_3D(idg_O2,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_O2,NY,NX) &
-    +Gas_Disol_Flx_vr(idg_O2,0,NY,NX)
-  SurfGas_O2_lnd                  = SurfGas_O2_lnd+OI
-  OO                              = trcs_RMicbUptake_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_O2,NY,NX)
-  OXYGOU                          = OXYGOU+OO
-  SurfGasEmisFlx_col(idg_O2,NY,NX)    = SurfGasEmisFlx_col(idg_O2,NY,NX)+OI
-  SurfGasDifFlx_col(idg_O2,NY,NX) = SurfGasDifFlx_col(idg_O2,NY,NX)+OI
-  HI                              = trcg_DisolEvap_Atm2Soil_flx(idg_H2,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_H2,NY,NX) &
-    +Gas_AdvDif_Flx_3D(idg_H2,3,NU(NY,NX),NY,NX)+TRootGasLossDisturb_pft(idg_H2,NY,NX)+Gas_Disol_Flx_vr(idg_H2,0,NY,NX)
-  SurfGas_H2_lnd                  = SurfGas_H2_lnd+HI
-  SurfGasDifFlx_col(idg_H2,NY,NX) = HI
-  HO                              = trcs_RMicbUptake_vr(idg_H2,0,NY,NX)
-  H2GOU                           = H2GOU+HO
+  SurfGas_O2_lnd = SurfGas_O2_lnd+SurfGasEmisFlx_col(idg_O2,NY,NX)
+  OO             = trcs_RMicbUptake_vr(idg_O2,0,NY,NX)-IrrigSubsurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_O2,NY,NX)*MolecularWeight(idg_O2)
+  OXYGOU         = OXYGOU+OO
+
+  SurfGas_H2_lnd = SurfGas_H2_lnd+SurfGasEmisFlx_col(idg_H2,NY,NX)
+  H2GOU          = H2GOU+trcs_RMicbUptake_vr(idg_H2,0,NY,NX)
   !
   !     SURFACE BOUNDARY N2, N2O, NH3, NH4, NO3, AND DON FLUXES
   !
@@ -480,15 +471,9 @@ module RedistMod
 
   ZNGGIN = trcg_DisolEvap_Atm2Soil_flx(idg_N2,NY,NX)+Gas_AdvDif_Flx_3D(idg_N2,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX)
   ZN2OIN = trcg_DisolEvap_Atm2Soil_flx(idg_N2O,NY,NX)+Gas_AdvDif_Flx_3D(idg_N2O,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)
-  ZNH3IN = trcg_DisolEvap_Atm2Soil_flx(idg_NH3,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_NH3B,NY,NX)+Gas_AdvDif_Flx_3D(idg_NH3,3,NU(NY,NX),NY,NX) &
+  ZNH3IN = trcg_DisolEvap_Atm2Soil_flx(idg_NH3,NY,NX)+Gas_AdvDif_Flx_3D(idg_NH3,3,NU(NY,NX),NY,NX) &
     +Gas_Disol_Flx_vr(idg_NH3,0,NY,NX)
 
-  SurfGasDifFlx_col(idg_NH3,NY,NX)  = ZNH3IN
-  SurfGasEmisFlx_col(idg_N2,NY,NX)  = SurfGasEmisFlx_col(idg_N2,NY,NX)+ZNGGIN
-  SurfGasEmisFlx_col(idg_N2O,NY,NX) = SurfGasEmisFlx_col(idg_N2O,NY,NX)+ZN2OIN
-  SurfGasEmisFlx_col(idg_NH3,NY,NX) = SurfGasEmisFlx_col(idg_NH3,NY,NX)+ZNH3IN
-  SurfGasEmisFlx_col(idg_N2,NY,NX)  = SurfGasEmisFlx_col(idg_N2,NY,NX)+Micb_N2Fixation_vr(0,NY,NX)
-  SurfGasEmisFlx_col(idg_H2,NY,NX)  = SurfGasEmisFlx_col(idg_H2,NY,NX)+HI
   !
   !     SURFACE BOUNDARY PO4 AND DOP FLUXES
   !
@@ -558,6 +543,7 @@ module RedistMod
       DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+DOM_MicpTransp_3D(idom,K,3,0,NY,NX)
     enddo
   ENDDO D9680
+
   ECO_HR_CO2_vr(0,NY,NX)       = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)
   ECO_HR_CO2_col(NY,NX)        = ECO_HR_CO2_col(NY,NX)+trcs_RMicbUptake_vr(idg_CO2,0,NY,NX) 
   Eco_HR_CumYr_col(NY,NX)      = Eco_HR_CumYr_col(NY,NX)+trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)+trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)
@@ -1214,6 +1200,7 @@ module RedistMod
 
     RO2AquaSourcePrev_vr(L,NY,NX)   = trcs_TransptMicP_vr(idg_O2,L,NY,NX)+trcs_Irrig_vr(idg_O2,L,NY,NX) &
       +trcs_Mac2MicPore_flx_vr(idg_O2,L,NY,NX)+trcg_ebu_flx_vr(idg_O2,L,NY,NX)
+      
     RCH4PhysexchPrev_vr(L,NY,NX) = trcs_TransptMicP_vr(idg_CH4,L,NY,NX)+trcs_Irrig_vr(idg_CH4,L,NY,NX) &
       +trcs_Mac2MicPore_flx_vr(idg_CH4,L,NY,NX)+trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
     !

@@ -1,5 +1,6 @@
 module PlantDisturbByTillageMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use DebugToolMod
   use PlantAPIData
   use ElmIDMod
   use PlantMathFuncMod
@@ -12,11 +13,13 @@ module PlantDisturbByTillageMod
   public :: RemoveBiomByTillage
 contains
 !--------------------------------------------------------------------------------
-  subroutine RemoveShootByTillage(I,J,NZ,XHVST,XHVST1)        
+  subroutine RemoveShootByTillage(I,J,NZ,XHVST)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(in) :: XHVST,XHVST1
-
+  real(r8), intent(in) :: XHVST
+  
+  character(len=*), parameter :: subname='RemoveShootByTillage'
+  real(r8) :: XHVST1
   real(r8) :: WVPLT
   integer :: M,NB,NE,K,L
   real(r8) :: FDM,VOLWPX  
@@ -28,7 +31,7 @@ contains
     inonfoliar                  => pltpar%inonfoliar,                     &
     icwood                      => pltpar%icwood,                         &
     ifoliar                     => pltpar%ifoliar,                        &
-    CanopyBiomWater_pft             => plt_ew%CanopyBiomWater_pft,                &
+    CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft,            &
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
     iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft,        &
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft,        &
@@ -77,7 +80,7 @@ contains
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch,           &
     LeafPetolBiomassC_brch      => plt_biom%LeafPetolBiomassC_brch,       &
     SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch,     &
-    StalkLiveBiomassC_brch          => plt_biom%StalkLiveBiomassC_brch,           &
+    StalkLiveBiomassC_brch      => plt_biom%StalkLiveBiomassC_brch,       &
     LeafNodeArea_brch           => plt_morph%LeafNodeArea_brch,           &
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch,           &
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch,     &
@@ -86,13 +89,14 @@ contains
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,        &
     CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft          &
   )
-
+  call PrintInfo('beg '//subname)
 !     PPX,PP=PFT population per m2,grid cell
 !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
 !     VHeatCapCanopy_pft=canopy heat capacity
 
+  XHVST1                    = 1._r8-XHVST
   FracPARads2Canopy_pft(NZ) = FracPARads2Canopy_pft(NZ)*XHVST
-  VHeatCapCanopy_pft(NZ)      = VHeatCapCanopy_pft(NZ)*XHVST
+  VHeatCapCanopy_pft(NZ)    = VHeatCapCanopy_pft(NZ)*XHVST
   CanopyLeafShethC_pft(NZ)  = 0._r8
   CanopyStalkC_pft(NZ)      = 0._r8
 !
@@ -109,20 +113,8 @@ contains
 !
 !     LitrFall FROM BRANCHES DURING TILLAGE
 !
-!     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
 !     XHVST=fraction of PFT remaining after disturbance
-!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
-!     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     ShootC4NonstC_brch=total C4 nonstructural C in branch
-!     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-!     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
-!     FWODB=C woody fraction in other organs:0=woody,1=non-woody
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-!     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
-!     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
-!     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
@@ -174,7 +166,7 @@ contains
   !     PLANT STATE VARIABLES REMAINING AFTER TILLAGE
   !
 
-    ShootC4NonstC_brch(NB,NZ) = ShootC4NonstC_brch(NB,NZ)*XHVST
+    ShootC4NonstC_brch(NB,NZ)     = ShootC4NonstC_brch(NB,NZ)*XHVST
     StalkLiveBiomassC_brch(NB,NZ) = StalkLiveBiomassC_brch(NB,NZ)*XHVST
     DO NE=1,NumPlantChemElms
       CanopyNonstElms_brch(NE,NB,NZ)      = CanopyNonstElms_brch(NE,NB,NZ)*XHVST
@@ -260,6 +252,7 @@ contains
     iDayPlantHarvest_pft(NZ)  = I
     iYearPlantHarvest_pft(NZ) = iYearCurrent
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   END subroutine RemoveShootByTillage
 
@@ -271,9 +264,10 @@ contains
   !REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
   implicit none
   integer , intent(in) :: I,J,NZ
-  integer :: L,K,M,N,NR,NE,NB,NTG
-  real(r8) :: XHVST,XHVST1
+  integer :: L,K,M,N,NR,NE,NB
+  real(r8) :: XHVST
   REAL(R8) :: APSILT
+
 !     begin_execution
   associate(                                                              &
     iSoilDisturbType_col        => plt_distb%iSoilDisturbType_col,        &
@@ -301,15 +295,14 @@ contains
 
     IF(iSoilDisturbType_col.LE.10 .OR. NZ.NE.1)THEN
       IF(I.GT.iDayPlanting_pft(NZ) .OR. iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
-        XHVST=XCORP
-        PPX_pft(NZ)=PPX_pft(NZ)*XHVST
-        PlantPopulation_pft(NZ)=PlantPopulation_pft(NZ)*XHVST
-        XHVST1=1._r8-XHVST
+        XHVST                   = XCORP
+        PPX_pft(NZ)             = PPX_pft(NZ)*XHVST
+        PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*XHVST
         
-        call RemoveShootByTillage(I,J,NZ,XHVST,XHVST1)
+        call RemoveShootByTillage(I,J,NZ,XHVST)
 
 !     LitrFall FROM ROOTS DURING TILLAGE
-        call RemoveRootsByTillage(I,J,NZ,XHVST,XHVST1)
+        call RemoveRootsByTillage(I,J,NZ,XHVST)
 
       ENDIF
     ENDIF
@@ -317,11 +310,14 @@ contains
   end associate
   end subroutine RemoveBiomByTillage
 !------------------------------------------------------------------------------------------
-  subroutine RemoveRootsByTillage(I,J,NZ,XHVST,XHVST1)
+  subroutine RemoveRootsByTillage(I,J,NZ,XHVST)
   implicit none        
   integer, intent(in) :: I,J,NZ
-  real(r8),intent(in) :: XHVST,XHVST1
-  integer :: L,N,M,NE,NR,NTG
+  real(r8),intent(in) :: XHVST
+
+  character(len=*), parameter :: subname='RemoveRootsByTillage'
+  real(r8) :: XHVST1
+  integer :: L,N,M,NE,NR,idg
 
   associate(                                                            &
     MaxNumRootLays             => plt_site%MaxNumRootLays,              &
@@ -337,8 +333,8 @@ contains
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs,         &
     SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft,       &
     RootMyco2ndStrutElms_rpvr  => plt_biom%RootMyco2ndStrutElms_rpvr,   &
-    RootNodulNonstElms_rpvr     => plt_biom%RootNodulNonstElms_rpvr,      &
-    RootNodulStrutElms_rpvr     => plt_biom%RootNodulStrutElms_rpvr,      &
+    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,     &
+    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,     &
     FracRootStalkElmAlloc2Litr => plt_allom%FracRootStalkElmAlloc2Litr, &
     FracRootElmAlloc2Litr      => plt_allom%FracRootElmAlloc2Litr,      &
     QH2OLoss_lnds              => plt_site%QH2OLoss_lnds,               &
@@ -362,7 +358,7 @@ contains
     iPlantNfixType_pft         => plt_morph%iPlantNfixType_pft,         &
     RootLenPerPlant_pvr        => plt_morph%RootLenPerPlant_pvr,        &
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr,           &
-    Root2ndLen_rpvr             => plt_morph%Root2ndLen_rpvr,             &
+    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,            &
     Root2ndXNum_pvr            => plt_morph%Root2ndXNum_pvr,            &
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft,         &
     NumRootAxes_pft            => plt_morph%NumRootAxes_pft             &
@@ -375,6 +371,8 @@ contains
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !
+  call PrintInfo('beg '//subname)
+  XHVST1=1._r8-XHVST
   
   DO NR=1,NumRootAxes_pft(NZ)
     DO N=1,MY(NZ)
@@ -412,11 +410,12 @@ contains
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
 
-      DO NTG=idg_beg,idg_NH3
-        RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-XHVST1 &
-          *(trcg_rootml_pvr(NTG,N,L,NZ)+trcs_rootml_pvr(NTG,N,L,NZ))
-        trcg_rootml_pvr(NTG,N,L,NZ) = XHVST*trcg_rootml_pvr(NTG,N,L,NZ)
-        trcs_rootml_pvr(NTG,N,L,NZ) = XHVST*trcs_rootml_pvr(NTG,N,L,NZ)
+      DO idg=idg_beg,idg_NH3
+        RootGasLossDisturb_pft(idg,NZ)=RootGasLossDisturb_pft(idg,NZ)-XHVST1 &
+          *(trcg_rootml_pvr(idg,N,L,NZ)+trcs_rootml_pvr(idg,N,L,NZ))
+
+        trcg_rootml_pvr(idg,N,L,NZ) = XHVST*trcg_rootml_pvr(idg,N,L,NZ)
+        trcs_rootml_pvr(idg,N,L,NZ) = XHVST*trcs_rootml_pvr(idg,N,L,NZ)
       ENDDO
 !
 !     ROOT STATE VARIABLES REMAINING AFTER TILLAGE
@@ -507,6 +506,7 @@ contains
     ENDDO D6400
     SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*XHVST
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine RemoveRootsByTillage        
 

@@ -572,7 +572,7 @@ module RootGasMod
               trcg_air2root_flx_loc(idg)=RootGasConductance_pvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
             enddo
           ELSE
-            Root_gas2sol_flx(idg_beg:idg_NH3)  = 0.0_r8
+            Root_gas2sol_flx(idg_beg:idg_NH3)      = 0.0_r8
             trcg_air2root_flx_loc(idg_beg:idg_NH3) = 0.0_r8
           ENDIF
 !

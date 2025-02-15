@@ -149,11 +149,14 @@ implicit none
   real(r8),pointer   :: h1D_ECO_CO2_FLX_col(:)   !Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
   real(r8),pointer   :: h1D_CH4_FLX_col(:)       !SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
   real(r8),pointer   :: h1D_CH4_EBU_flx_col(:)
+  real(r8),pointer   :: h1D_Ar_EBU_flx_col(:)
   real(r8),pointer   :: h1D_CO2_TPR_err_col(:)
+  real(r8),pointer   :: h1D_AR_PLTROOT_flx_col(:)  
   real(r8),pointer   :: h1D_CH4_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_CO2_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_O2_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_CO2_DIF_flx_col(:)
+  real(r8),pointer   :: h1D_Ar_DIF_flx_col(:)
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
   real(r8),pointer   :: h1D_Ar_soilMass_col(:)
   real(r8),pointer   :: h1D_O2_FLX_col(:)        !SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
@@ -598,12 +601,15 @@ implicit none
   allocate(this%h1D_ECO_CO2_FLX_col(beg_col:end_col))     ;this%h1D_ECO_CO2_FLX_col(:)=spval
   allocate(this%h1D_CH4_FLX_col(beg_col:end_col))         ;this%h1D_CH4_FLX_col(:)=spval
   allocate(this%h1D_CH4_EBU_flx_col(beg_col:end_col))     ;this%h1D_CH4_EBU_flx_col(:)=spval
+  allocate(this%h1D_Ar_EBU_flx_col(beg_col:end_col))      ;this%h1D_Ar_EBU_flx_col(:)=spval
   allocate(this%h1D_CO2_TPR_err_col(beg_col:end_col))    ; this%h1D_CO2_TPR_err_col(:)=spval
   allocate(this%h1D_CH4_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CH4_PLTROOT_flx_col(:)=spval
+  allocate(this%h1D_AR_PLTROOT_flx_col(beg_col:end_col)); this%h1D_AR_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_CO2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CO2_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_O2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_O2_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_CO2_DIF_flx_col(beg_col:end_col)); this%h1D_CO2_DIF_flx_col(:)=spval
   allocate(this%h1D_CH4_DIF_flx_col(beg_col:end_col)); this%h1D_CH4_DIF_flx_col(:)=spval  
+  allocate(this%h1D_Ar_DIF_flx_col(beg_col:end_col)); this%h1D_Ar_DIF_flx_col(:)=spval
   allocate(this%h1D_O2_FLX_col(beg_col:end_col))          ;this%h1D_O2_FLX_col(:)=spval
   allocate(this%h1D_CO2_LITR_col(beg_col:end_col))        ;this%h1D_CO2_LITR_col(:)=spval
   allocate(this%h1D_EVAPN_col(beg_col:end_col))           ;this%h1D_EVAPN_col(:)=spval
@@ -1343,6 +1349,10 @@ implicit none
   call hist_addfld1d(fname='CH4_EBU_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 ebullition flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_Ar_EBU_flx_col(beg_col:end_col)     
+  call hist_addfld1d(fname='Ar_EBU_FLX',units='umol Ar/m2/s',avgflag='A',&
+    long_name='soil Ar ebullition flux (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_CO2_TPR_err_col(beg_col:end_col)
   call hist_addfld1d(fname='CumCO2_Transpt_Residual',units='g C/m2',avgflag='A',&
     long_name='Cumulative difference between soil CO2 production and surface CO2 flux',ptr_col=data1d_ptr)      
@@ -1350,6 +1360,10 @@ implicit none
   data1d_ptr => this%h1D_CH4_PLTROOT_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='CH4_PLTROOT_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 flux through plants(<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_AR_PLTROOT_flx_col(beg_col:end_col)
+  call hist_addfld1d(fname='AR_PLTROOT_FLX',units='umol Ar/m2/s',avgflag='A',&
+    long_name='soil AR flux through plants(<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_PLTROOT_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_PLTROOT_FLX',units='umol C/m2/s',avgflag='A',&
@@ -1366,6 +1380,10 @@ implicit none
   data1d_ptr => this%h1D_CH4_DIF_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='CH4_DIF_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 flux through advection+diffusion (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Ar_DIF_flx_col(beg_col:end_col)
+  call hist_addfld1d(fname='AR_DIF_FLX',units='umol Ar/m2/s',avgflag='A',&
+    long_name='soil Ar flux through advection+diffusion (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_O2_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='SOIL_O2_FLX',units='umol O2/m2/s',avgflag='A',&
@@ -2686,11 +2704,14 @@ implicit none
       this%h1D_CH4_FLX_col(ncol)          = SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_O2_FLX_col(ncol)           = SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
       this%h1D_CH4_EBU_flx_col(ncol)      = trcg_ebu_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
+      this%h1D_Ar_EBU_flx_col(ncol)       = trcg_ebu_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)
+      this%h1D_AR_PLTROOT_flx_col(ncol)   = trcg_pltroot_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)
       this%h1D_CH4_PLTROOT_flx_col(ncol)  = trcg_pltroot_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
       this%h1D_CO2_PLTROOT_flx_col(ncol)  = trcg_pltroot_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_O2_PLTROOT_flx_col(ncol)   = trcg_pltroot_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
       this%h1D_CO2_DIF_flx_col(ncol)      = SurfGasDifFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_CH4_DIF_flx_col(ncol)      = SurfGasDifFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)      
+      this%h1D_Ar_DIF_flx_col(ncol)       = SurfGasDifFlx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)      
       this%h1D_CO2_TPR_err_col(ncol)      = Gas_Prod_TP_cumRes_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_LITR_col(ncol)         = trc_solcl_vr(idg_CO2,0,NY,NX)
       this%h1D_EVAPN_col(ncol)            = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
