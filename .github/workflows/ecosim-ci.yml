@@ -49,7 +49,7 @@ jobs:
         dnf -qq -y install gcc-gfortran gcc-c++
         dnf -qq -y install cmake
         dnf -qq -y install which
-	dnf -qq -y install git
+        dnf -qq -y install git
 #        if/when system hdf5 is needed
 #        dnf install -y dnf-plugins-core
 #        dnf install -y epel-release
