@@ -16,6 +16,8 @@ jobs:
       run: |
         sudo apt-get -qq update
         sudo apt -qq -y install gfortran cmake
+        sudo apt -qq -y install curl 
+        sudo apt -qq -y install autoconf automake
 #        if/when system hdf5 is needed	
 #	 sudo apt -qq -y libhdf5-openmpi-dev
 
@@ -50,6 +52,8 @@ jobs:
         dnf -qq -y install cmake
         dnf -qq -y install which
         dnf -qq -y install git
+        dnf -qq -y install curl curl-devel
+        dnf -qq -y install autoconf automake libtool libxml2-devel
 #        if/when system hdf5 is needed
 #        dnf install -y dnf-plugins-core
 #        dnf install -y epel-release
