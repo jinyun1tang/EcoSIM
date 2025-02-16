@@ -75,7 +75,7 @@ module StarteMod
               solutevar%CNOZ = NO3_irrig_mole_conc(I,NY,NX)
               solutevar%CPOZ = H2PO4_irrig_mole_conc(I,NY,NX)
               if(salt_model)then
-                solutevar%CALZ = trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)
+                solutevar%Al_mole_conc = trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)
                 solutevar%CFEZ = trcsalt_irrig_mole_conc_col(idsalt_Fe,I,NY,NX)
                 solutevar%CCAZ = trcsalt_irrig_mole_conc_col(idsalt_Ca,I,NY,NX)
                 solutevar%CMGZ = trcsalt_irrig_mole_conc_col(idsalt_Mg,I,NY,NX)
@@ -97,7 +97,7 @@ module StarteMod
                   solutevar%CNOZ       = NO3_rain_mole_conc(NY,NX)
                   solutevar%CPOZ       = H2PO4_rain_mole_conc(NY,NX)
                   if(salt_model)then
-                    solutevar%CALZ = trcsalt_rain_mole_conc_col(idsalt_Al,NY,NX)
+                    solutevar%Al_mole_conc = trcsalt_rain_mole_conc_col(idsalt_Al,NY,NX)
                     solutevar%CFEZ = trcsalt_rain_mole_conc_col(idsalt_Fe,NY,NX)
                     solutevar%CCAZ = trcsalt_rain_mole_conc_col(idsalt_Ca,NY,NX)
                     solutevar%CMGZ = trcsalt_rain_mole_conc_col(idsalt_Mg,NY,NX)
@@ -135,12 +135,12 @@ module StarteMod
                   solutevar%CFEOHX               = CFEOH_vr(L,NY,NX)
                   solutevar%CCACOX               = CCACO_vr(L,NY,NX)
                   solutevar%CCASOX               = CCASO_vr(L,NY,NX)
-                  solutevar%H_1p_aqua_mole_conc            = 10.0_r8**(-(PH_vr(L,NY,NX)-3.0_r8))
+                  solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(PH_vr(L,NY,NX)-3.0_r8))
                   solutevar%CNOZ                 = CNO3_vr(L,NY,NX)
                   solutevar%CPOZ                 = CPO4_vr(L,NY,NX)
-                  solutevar%OH_1e_aqua_mole_conc           = DPH2O/solutevar%H_1p_aqua_mole_conc
+                  solutevar%OH_1e_aqua_mole_conc = DPH2O/solutevar%H_1p_aqua_mole_conc
                   solutevar%CN4Z                 = solutevar%CN4X
-                  solutevar%CALZ                 = solutevar%CALX
+                  solutevar%Al_mole_conc                 = solutevar%CALX
                   solutevar%CFEZ                 = solutevar%CFEX
                   solutevar%CCAZ                 = solutevar%CaX_conc
                   solutevar%CMGZ                 = solutevar%MgX_conc
@@ -249,23 +249,23 @@ module StarteMod
       trcsalt_rain_mole_conc_col(idsalt_CaH4P2O8,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
       trcsalt_rain_mole_conc_col(idsalt_MgHPO4,NY,NX)   = solutevar%MgHPO4_conc
     endif
-    HPO4_rain_mole_conc(NY,NX)  = solutevar%H1PO4_2e_aqua_mole_conc
-    H2PO4_rain_mole_conc(NY,NX) = solutevar%H2PO4_1e_aqua_mole_conc
-    CSTRR(NY,NX)           = solutevar%CSTR1
+    HPO4_rain_mole_conc(NY,NX)      = solutevar%H1PO4_2e_aqua_mole_conc
+    H2PO4_rain_mole_conc(NY,NX)     = solutevar%H2PO4_1e_aqua_mole_conc
+    SurfIrrig_IonStrenth_col(NY,NX) = solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN IRRIGATION
 !
-  ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
+  ELSEIF(K.EQ.micpar%k_manure .AND. L.EQ.1)THEN
   ! manure, top layer
     trcg_irrig_mole_conc_col(idg_CO2,NY,NX) = solutevar%H2CO3_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_CH4,NY,NX) = solutevar%CH4_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_O2,NY,NX)  = solutevar%O2_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_N2,NY,NX)  = solutevar%N2_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_N2O,NY,NX) = solutevar%N2O_aqua_mole_conc
-    NH4_irrig_mole_conc(I,NY,NX)                 = solutevar%NH4_1p_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_NH3,NY,NX) = solutevar%NH3_aqua_mole_conc
-    HPO4_irrig_mole_conc(I,NY,NX)                = solutevar%H1PO4_2e_aqua_mole_conc
-    H2PO4_irrig_mole_conc(I,NY,NX)               = solutevar%H2PO4_1e_aqua_mole_conc
+    NH4_irrig_mole_conc(I,NY,NX)            = solutevar%NH4_1p_aqua_mole_conc
+    HPO4_irrig_mole_conc(I,NY,NX)           = solutevar%H1PO4_2e_aqua_mole_conc
+    H2PO4_irrig_mole_conc(I,NY,NX)          = solutevar%H2PO4_1e_aqua_mole_conc
     CSTRQ(I,NY,NX)                          = solutevar%CSTR1
     if(salt_model)then
       trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)       = solutevar%Al_3p_aqua_mole_conc

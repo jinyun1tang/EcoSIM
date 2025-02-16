@@ -1,9 +1,16 @@
 module SnowTransportMod
+!
+!code to do water and tracer transport in snowpack
+!
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use data_const_mod, only: spval => DAT_CONST_SPVAL
-  use EcoSimConst,    only: DENSICE
+  use EcoSimConst,    only: DENSICE, natomw, patomw
   use EcoSIMCtrlMod,  only: lverb
   use MiniMathMod,    only: fixEXflux
+  use TracerPropMod,  only: MolecularWeight
+  use ClimForcDataType
+  use IrrigationDataType
+  use SurfSoilDataType
   use SnowPhysData
   use GridDataType
   use SnowDataType
@@ -24,6 +31,7 @@ implicit none
   public :: MassFluxThruSnowRunoff
   public :: DiagSnowChemMass
   public :: OverlandFlowThruSnow
+  public :: TracerThruSnowfall
   contains
 !------------------------------------------------------------------------------------------
 
@@ -65,33 +73,21 @@ implicit none
         !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
         !
         DO idg=idg_beg,idg_NH3
-          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
+          trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
             -trcg_AquaAdv_flx_snvr(idg,LS2,N2,N1)
         ENDDO
 
         DO idn=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(idn,LS,N2,N1)=trcn_TBLS(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
+          trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
             -trcn_AquaAdv_flx_snvr(idn,LS2,N2,N1)
         ENDDO
         !
         !     NET SALT FLUXES THROUGH SNOWPACK
         !
-        !     T*BLS=net solute flux in snowpack
-        !     X*BLS=solute flux in snowpack from TranspSalt.f
-        !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-        !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-        !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-        !          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-        !          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-        !          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-        !          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-        !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-        !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH4P2O8+,*M1P*=MgHPO4,*COO*=COOH-
-        !          :*1=non-band,*B=band
         !
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_TBLS(idsalt,LS,N2,N1)=trcSalt_TBLS(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)&
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)&
               -trcSalt_AquaAdv_flx_snvr(idsalt,LS2,N2,N1)
           ENDDO
         ENDIF
@@ -102,36 +98,36 @@ implicit none
 
         ! and NH3B
         DO idg=idg_beg,idg_NH3
-          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
+          trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
             -trcs_TransptMicP_3D(idg,3,0,N2,N1)-trcs_TransptMicP_3D(idg,3,NUM(N2,N1),N2,N1) &
             -trcs_TransptMacP_3D(idg,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO idn=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(idn,LS,N2,N1)=trcn_TBLS(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
+          trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
             -trcs_TransptMicP_3D(idn,3,0,N2,N1)-trcs_TransptMicP_3D(idn,3,NUM(N2,N1),N2,N1) &
             -trcs_TransptMacP_3D(idn,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         !add band flux
-        trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
+        trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1) &
           -trcs_TransptMicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
         DO NTS=0,ids_nuts
-          trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
+          trcn_AquaAdv_NetFlx_snvr(ids_NH4+NTS,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(ids_NH4+NTS,LS,N2,N1) &
             -trcs_TransptMicP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_TBLS(idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,NY,NX) &
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,NY,NX)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,NY,NX) &
               -trcSalt_TransptMicP_3D(idsalt,3,0,N2,N1)-trcSalt_TransptMicP_3D(idsalt,3,NUM(N2,N1),N2,N1) &
               -trcSalt_TransptMacP_3D(idsalt,3,NUM(N2,N1),N2,N1)
           ENDDO
 
           !add band flux
           DO idsalt=0,idsalt_nuts
-            trcSalt_TBLS(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_TBLS(idsalt_H0PO4+idsalt,LS,NY,NX) &
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,NY,NX) &
               -trcSalt_TransptMicP_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1) &
               -trcSalt_TransptMacP_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1)
           ENDDO
@@ -144,16 +140,16 @@ implicit none
       IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO idg=idg_beg,idg_NH3
-          trcg_TBLS(idg,LS,N2,N1)=trcg_TBLS(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1)
+          trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1)
         ENDDO
 
         DO idn=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(idn,LS,N2,N1)=trcn_TBLS(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1)
+          trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1)
         ENDDO
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_TBLS(idsalt,LS,N2,N1)=trcSalt_TBLS(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)
           ENDDO
         ENDIF
       ENDIF
@@ -371,4 +367,28 @@ implicit none
     ENDDO
   ENDIF
   end subroutine OverlandFlowThruSnow
+!------------------------------------------------------------------------------------------
+
+  subroutine TracerThruSnowfall(I,J,NY,NX)
+  implicit none
+
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NY,NX
+  integer :: idg
+
+  DO idg=idg_beg,idg_NH3
+    trcg_AquaAdv_flx_snvr(idg,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
+  ENDDO
+
+  trcn_AquaAdv_flx_snvr(ids_NH4,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+    +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
+  trcn_AquaAdv_flx_snvr(ids_NO3,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+    +Irrig2SoilSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
+  trcn_AquaAdv_flx_snvr(ids_H1PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
+    +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
+  trcn_AquaAdv_flx_snvr(ids_H2PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+    +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
+  end subroutine TracerThruSnowfall
+
 end module SnowTransportMod

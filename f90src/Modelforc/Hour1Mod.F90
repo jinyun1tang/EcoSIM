@@ -316,7 +316,7 @@ module Hour1Mod
 !     PRECIPITATION AND IRRIGATION FROM MIXING RATIOS READ IN 'READS'
 !
 !
-! CSTRR: surface irrigation ion strength, [g m-3]
+! SurfIrrig_IonStrenth_col: surface irrigation ion strength, [g m-3]
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
@@ -335,7 +335,7 @@ module Hour1Mod
 
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
-           /(EXP(GasSechenovConst(idg)*CSTRR(NY,NX)))
+           /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX)))
         trcg_irrig_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, TCA_col(NY,NX)) &
           /(EXP(GasSechenovConst(idg)*CSTRQ(I,NY,NX)))
       ENDDO
@@ -521,7 +521,7 @@ module Hour1Mod
     !     BKVL=soil mass
     !     C*=concentration,ORGC=SOC,SAND=sand,SILT=silt,CLAY=clay
     !     ParticleDens=particle density
-    !     ParticleDensitySurfLay=particle density of surface layer for use in erosion.f
+    !     PrtcleDensitySurfLay_col=particle density of surface layer for use in erosion.f
     !     POROS=porosity used in diffusivity
     !     VOLA,VOLW,VOLI,VOLP=total,water-,ice-,air-filled micropore volume
     !     VOLAH,VOLWH,VOLIH,VOLPH=total,water-,ice-,air-filled macropore volume
@@ -982,9 +982,9 @@ module Hour1Mod
           +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU(NY,NX),NY,NX)))
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
 
-        ParticleDensitySurfLay(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
+        PrtcleDensitySurfLay_col(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
         VISCWL                        = VISCW*EXP(0.533_r8-0.0267_r8*TCS_vr(0,NY,NX))
-        VLS(NY,NX)                    = 3.6E+03_r8*9.8_r8*(ParticleDensitySurfLay(NY,NX)-1.0_r8) &
+        VLS_col(NY,NX)                    = 3.6E+03_r8*9.8_r8*(PrtcleDensitySurfLay_col(NY,NX)-1.0_r8) &
           *(ppmc*D50)**2/(18.0_r8*VISCWL)
       ENDIF
     ENDDO

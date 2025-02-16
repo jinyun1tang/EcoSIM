@@ -518,29 +518,23 @@ implicit none
   implicit none
   integer, intent(in) :: L,NY,NX
 
-  integer :: NTG,NTN,NTSA
+  integer :: idg,idn,idsalt
   !     begin_execution
   !     SNOWPACK SOLUTE CONTENT
-  !
-  !     *W2=solute content of snowpack
-  !     T*BLS=net solute flux in snowpack
-  !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-  !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
-  !
-  DO NTG=idg_beg,idg_NH3
-    trcg_solsml_snvr(NTG,L,NY,NX)=trcg_solsml_snvr(NTG,L,NY,NX)+trcg_TBLS(NTG,L,NY,NX)
+
+  DO idg=idg_beg,idg_NH3
+    trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX)
   ENDDO
 
-  DO NTN =ids_nut_beg,ids_nuts_end
-    trcn_solsml_snvr(NTN,L,NY,NX)=trcn_solsml_snvr(NTN,L,NY,NX)+trcn_TBLS(NTN,L,NY,NX)
+  DO idn =ids_nut_beg,ids_nuts_end
+    trcn_solsml_snvr(idn,L,NY,NX)=trcn_solsml_snvr(idn,L,NY,NX)+trcn_AquaAdv_NetFlx_snvr(idn,L,NY,NX)
   ENDDO
   !
   !
   IF(salt_model)THEN
-    DO NTSA=idsalt_beg,idsalt_end
-      trc_Saltml_snvr(NTSA,L,NY,NX)=trc_Saltml_snvr(NTSA,L,NY,NX)+trcSalt_TBLS(NTSA,L,NY,NX)
+    DO idsalt=idsalt_beg,idsalt_end
+      trc_Saltml_snvr(idsalt,L,NY,NX)=trc_Saltml_snvr(idsalt,L,NY,NX)+trcSalt_AquaAdv_NetFlx_snvr(idsalt,L,NY,NX)
     ENDDO
-
   ENDIF
 
   end subroutine UpdateSoluteInSnow
@@ -550,7 +544,7 @@ implicit none
   subroutine SnowpackLayering(I,J,NY,NX)
   !
   !Description:
-  !Relayering snow after mass update 
+  !Relayering (by division or combination) snow after mass update 
   !
   implicit none
   integer, intent(in) :: I,J,NY,NX
@@ -561,7 +555,7 @@ implicit none
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: DDLYXS,DDLYRS
   real(r8) :: DDLYXX,VOLSLX
-  integer :: IFLGLS,NTN,NTG,NTU,NTSA
+  integer :: IFLGLS,idn,idg,NTU,idsalt
   integer, parameter :: inochange=0
   integer, parameter :: iexpand=1
   integer, parameter :: ishrink=2
@@ -613,8 +607,8 @@ implicit none
       IF(ABS(DDLYRS).GT.ZERO)THEN
         IF(DDLYRS.GT.0.0_r8)THEN
           !incoporating L+1 into L
-          L1=L
-          L0=L+1
+          L1 = L     !dest
+          L0 = L+1   !source
           IF(DDLYRS.LT.DDLYXS)THEN
             !full L0 into L1
             FX=1.0_r8
@@ -624,8 +618,8 @@ implicit none
           ENDIF
         ELSE
           !expanding L into L+1
-          L1=L+1
-          L0=L
+          L1 = L+1  !dest
+          L0 = L    !source
           IF(VLSnoDWIprev_snvr(L0,NY,NX).LT.VLSnoDWIMax_snvr(L0,NY,NX))THEN
             FX=0.0_r8
           ELSE
@@ -636,7 +630,6 @@ implicit none
 !   donor L0, target L1
         IF(FX.GT.0.0_r8)THEN
           FY=1.0_r8-FX
-!          print*,'relay',L0,L1,FX,FY,DDLYRS,DDLYXS,-ZERO,SnowThickL_snvr(L+1,NY,NX),VLSnoDWIprev_snvr(L0,NY,NX),VLSnoDWIMax_snvr(L0,NY,NX)
 !
 !     TARGET SNOW LAYER
 !         volume/mass
@@ -662,18 +655,18 @@ implicit none
           TCSnow_snvr(L1,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L1,NY,NX))
 !          chemicals
           !gas
-          DO NTG=idg_beg,idg_NH3
-            trcg_solsml_snvr(NTG,L1,NY,NX)=trcg_solsml_snvr(NTG,L1,NY,NX)+FX*trcg_solsml_snvr(NTG,L0,NY,NX)
+          DO idg=idg_beg,idg_NH3
+            trcg_solsml_snvr(idg,L1,NY,NX)=trcg_solsml_snvr(idg,L1,NY,NX)+FX*trcg_solsml_snvr(idg,L0,NY,NX)
           ENDDO
 
           !nutrients
-          DO NTN=ids_nut_beg,ids_nuts_end
-            trcn_solsml_snvr(NTN,L1,NY,NX)=trcn_solsml_snvr(NTN,L1,NY,NX)+FX*trcn_solsml_snvr(NTN,L0,NY,NX)
+          DO idn=ids_nut_beg,ids_nuts_end
+            trcn_solsml_snvr(idn,L1,NY,NX)=trcn_solsml_snvr(idn,L1,NY,NX)+FX*trcn_solsml_snvr(idn,L0,NY,NX)
           ENDDO
           !salt
           IF(salt_model)THEN
-            DO NTSA=idsalt_beg,idsalt_end
-              trc_Saltml_snvr(NTSA,L1,NY,NX)=trc_Saltml_snvr(NTSA,L1,NY,NX)+FX*trc_Saltml_snvr(NTSA,L0,NY,NX)
+            DO idsalt=idsalt_beg,idsalt_end
+              trc_Saltml_snvr(idsalt,L1,NY,NX)=trc_Saltml_snvr(idsalt,L1,NY,NX)+FX*trc_Saltml_snvr(idsalt,L0,NY,NX)
             ENDDO
           ENDIF
 !
@@ -697,16 +690,16 @@ implicit none
           endif
           TCSnow_snvr(L0,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L0,NY,NX))
 !     chemicals
-          DO NTG=idg_beg,idg_NH3
-            trcg_solsml_snvr(NTG,L0,NY,NX)=FY*trcg_solsml_snvr(NTG,L0,NY,NX)
+          DO idg=idg_beg,idg_NH3
+            trcg_solsml_snvr(idg,L0,NY,NX)=FY*trcg_solsml_snvr(idg,L0,NY,NX)
           ENDDO
           DO NTU=ids_nut_beg,ids_nuts_end
             trcn_solsml_snvr(NTU,L0,NY,NX)=FY*trcn_solsml_snvr(NTU,L0,NY,NX)
           ENDDO
 
           IF(salt_model)THEN
-            DO NTSA=idsalt_beg,idsalt_end
-              trc_Saltml_snvr(NTSA,L0,NY,NX)=FY*trc_Saltml_snvr(NTSA,L0,NY,NX)
+            DO idsalt=idsalt_beg,idsalt_end
+              trc_Saltml_snvr(idsalt,L0,NY,NX)=FY*trc_Saltml_snvr(idsalt,L0,NY,NX)
             ENDDO
 
           ENDIF
@@ -772,14 +765,14 @@ implicit none
   TIceBySnowRedist(NY,NX)      = 0.0_r8
   THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
-  trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
-  trcg_LossXSnowRedist_col(idg_beg:idg_NH3,NY,NX)                      = 0.0_r8
-  trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,NY,NX)               = 0.0_r8
-  trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
+  trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX)     = 0.0_r8
+  trcg_LossXSnowRedist_col(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
+  trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
+  trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)              = 0.0_r8
 
   DO  L=1,JS
-    trcg_TBLS(idg_beg:idg_NH3,L,NY,NX)=0.0_r8
-    trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
+    trcg_AquaAdv_NetFlx_snvr(idg_beg:idg_NH3,L,NY,NX)          = 0.0_r8
+    trcn_AquaAdv_NetFlx_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0.0_r8
   ENDDO
 
   IF(salt_model)THEN
@@ -788,7 +781,7 @@ implicit none
     trcSalt_TQR(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
     trcSalt_LossXSnowRedist_col(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
     DO  L=1,JS
-      trcSalt_TBLS(idsalt_beg:idsalt_end,L,NY,NX)=0.0_r8
+      trcSalt_AquaAdv_NetFlx_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0.0_r8
     ENDDO
   endif
   end subroutine ZeroSnowArrays

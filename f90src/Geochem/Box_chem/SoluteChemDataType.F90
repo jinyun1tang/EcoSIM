@@ -73,7 +73,7 @@ module SoluteChemDataType
     real(r8) :: CCASOX
     real(r8) :: CN4X
     real(r8) :: CPOZ
-    real(r8) :: CALZ
+    real(r8) :: Al_mole_conc
     real(r8) :: CFEZ
     real(r8) :: CCAZ
     real(r8) :: CMGZ
@@ -131,6 +131,8 @@ module SoluteChemDataType
     real(r8) :: GKCM
     real(r8) :: ZEROS
     real(r8) :: VLWatMicP
+  contains
+    procedure, public :: SetZero => solute_SetZero
   end type solutedtype
 
   type, public :: solute_flx_type
@@ -231,7 +233,7 @@ module SoluteChemDataType
     real(r8) :: TBION_soil
     real(r8) :: Txchem_CO2_soil
   contains
-    procedure, public :: SetZero
+    procedure, public :: SetZero 
   end type solute_flx_type
 
   type, public :: chem_var_type
@@ -369,6 +371,138 @@ module SoluteChemDataType
   real(r8) :: BKVLNZ
   end type chem_var_type
 contains
+
+  subroutine solute_SetZero(this)
+  implicit none
+  class(solutedtype)  :: this
+
+  this%H2CO3_aqua_mole_conc       = 0._r8
+  this%CH4_aqua_mole_conc         = 0._r8
+  this%O2_aqua_mole_conc          = 0._r8
+  this%N2_aqua_mole_conc          = 0._r8
+  this%N2O_aqua_mole_conc         = 0._r8
+  this%NH4_1p_aqua_mole_conc      = 0._r8
+  this%NH3_aqua_mole_conc         = 0._r8
+  this%Al_3p_aqua_mole_conc       = 0._r8
+  this%Fe_3p_aqua_mole_conc       = 0._r8
+  this%H_1p_aqua_mole_conc        = 0._r8
+  this%Ca_2p_aqua_mole_conc       = 0._r8
+  this%Mg_2p_aqua_mole_conc       = 0._r8
+  this%Na_1p_aqua_mole_conc       = 0._r8
+  this%K_1p_aqua_mole_conc        = 0._r8
+  this%OH_1e_aqua_mole_conc       = 0._r8
+  this%SO4_2e_aqua_mole_conc      = 0._r8
+  this%Cl_e_conc                  = 0._r8
+  this%CO3_2e_aqua_mole_conc      = 0._r8
+  this%HCO3_e_conc                = 0._r8
+  this%AlOH_2p_aqua_mole_conc     = 0._r8
+  this%AlO2H2_1p_aqua_mole_conc   = 0._r8
+  this%AlO3H3_conc                = 0._r8
+  this%AlO4H4_1e_aqua_mole_conc   = 0._r8
+  this%AlSO4_1p_aqua_mole_conc    = 0._r8
+  this%FeOH_2p_aqua_mole_conc     = 0._r8
+  this%FeO2H2_p_conc              = 0._r8
+  this%FeO3H3_conc                = 0._r8
+  this%FeO4H4_1e_aqua_mole_conc   = 0._r8
+  this%FeSO4_1p_aqua_mole_conc    = 0._r8
+  this%CaO2H2_conc                = 0._r8
+  this%CaCO3_conc                 = 0._r8
+  this%CaHCO3_1p_aqua_mole_conc   = 0._r8
+  this%CaSO4_conc                 = 0._r8
+  this%MgOH_1p_aqua_mole_conc     = 0._r8
+  this%MgCO3_conc                 = 0._r8
+  this%MgHCO3_1p_aqua_mole_conc   = 0._r8
+  this%MgSO4_conc                 = 0._r8
+  this%NaCO3_1e_aqua_mole_conc    = 0._r8
+  this%NaSO4_1e_aqua_mole_conc    = 0._r8
+  this%KSO4_1e_aqua_mole_conc     = 0._r8
+  this%H0PO4_3e_conc              = 0._r8
+  this%H1PO4_2e_aqua_mole_conc    = 0._r8
+  this%H2PO4_1e_aqua_mole_conc    = 0._r8
+  this%H3PO4_conc                 = 0._r8
+  this%FeHPO4_p_conc              = 0._r8
+  this%FeH2PO4_2p_aqua_mole_conc  = 0._r8
+  this%CaPO4_1e_con               = 0._r8
+  this%CaHPO4_conc                = 0._r8
+  this%CaH4P2O8_1p_aqua_mole_conc = 0._r8
+  this%MgHPO4_conc                = 0._r8
+  this%CSTR1                      = 0._r8
+  this%CCO2M                      = 0._r8
+  this%CCH4M                      = 0._r8
+  this%COXYM                      = 0._r8
+  this%CZ2GM                      = 0._r8
+  this%CZ2OM                      = 0._r8
+  this%CN4Z                       = 0._r8
+  this%CNOZ                       = 0._r8
+  this%CNAZ                       = 0._r8
+  this%CKAZ                       = 0._r8
+  this%CSOZ                       = 0._r8
+  this%CCLZ                       = 0._r8
+  this%CNOX                       = 0._r8
+  this%CCASOX                     = 0._r8
+  this%CN4X                       = 0._r8
+  this%CPOZ                       = 0._r8
+  this%Al_mole_conc                       = 0._r8
+  this%CFEZ                       = 0._r8
+  this%CCAZ                       = 0._r8
+  this%CMGZ                       = 0._r8
+  this%CALX                       = 0._r8
+  this%CFEX                       = 0._r8
+  this%CaX_conc                   = 0._r8
+  this%MgX_conc                   = 0._r8
+  this%CNAX                       = 0._r8
+  this%CKAX                       = 0._r8
+  this%CSOX                       = 0._r8
+  this%CCLX                       = 0._r8
+  this%CALPOX                     = 0._r8
+  this%CFEPOX                     = 0._r8
+  this%CCAPDX                     = 0._r8
+  this%CCAPHX                     = 0._r8
+  this%CALOHX                     = 0._r8
+  this%CFEOHX                     = 0._r8
+  this%CCACOX                     = 0._r8
+  this%XNH4_conc                  = 0._r8
+  this%XHY1                       = 0._r8
+  this%XAl_conc                   = 0._r8
+  this%XFe_conc                   = 0._r8
+  this%XCa_conc                   = 0._r8
+  this%Precp_Ca5P3O12O3H3_conc    = 0._r8
+  this%XMg_conc                   = 0._r8
+  this%XNa_conc                   = 0._r8
+  this%XK_conc                    = 0._r8
+  this%XHC1                       = 0._r8
+  this%XAlO2H2_conc               = 0._r8
+  this%XFeO2H2_conc               = 0._r8
+  this%XOH_conc                   = 0._r8
+  this%XROH1_conc                 = 0._r8
+  this%XROH2_conc                 = 0._r8
+  this%XHPO4_conc                 = 0._r8
+  this%XH2PO4_conc                = 0._r8
+  this%Precp_AlO3H3_conc          = 0._r8
+  this%Precp_FeO3H3_conc          = 0._r8
+  this%Precp_CaCO3_conc           = 0._r8
+  this%Precp_CaSO4_conc           = 0._r8
+  this%Precp_AlPO4_conc           = 0._r8
+  this%Precp_FePO4_conc           = 0._r8
+  this%Precp_CaHPO4_conc          = 0._r8
+  this%FH2O                       = 0._r8
+  this%ATCA                       = 0._r8
+  this%XAEC                       = 0._r8
+  this%CEC                        = 0._r8
+  this%ORGC                       = 0._r8
+  this%VLPO4                      = 0._r8
+  this%XCEC                       = 0._r8
+  this%GKC4                       = 0._r8
+  this%GKCA                       = 0._r8
+  this%GKCH                       = 0._r8
+  this%GKCK                       = 0._r8
+  this%GKCN                       = 0._r8
+  this%GKCM                       = 0._r8
+  this%ZEROS                      = 0._r8
+  this%VLWatMicP                  = 0._r8
+
+  end subroutine solute_SetZero
+!------------------------------------------------------------------------------------------
 
   subroutine SetZero(solflx)
   implicit none

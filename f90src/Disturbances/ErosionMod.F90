@@ -138,7 +138,7 @@ module ErosionMod
           IF(SEDX.GT.ZEROS(NY,NX))THEN
             CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
         
-            DEPI=AMAX1(-SEDX,VLS(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
+            DEPI=AMAX1(-SEDX,VLS_col(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
               *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
             RDTSED(NY,NX)=RDTSED(NY,NX)+DEPI
           ENDIF
@@ -150,7 +150,7 @@ module ErosionMod
     !     FROM 'HOUR1'
     !
           STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE(0,NY,NX))
-          CSEDX=ParticleDensitySurfLay(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4_r8)**XER(NY,NX)
+          CSEDX=PrtcleDensitySurfLay_col(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4_r8)**XER(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 
           IF(CSEDX.GT.CSEDD)THEN
@@ -159,7 +159,7 @@ module ErosionMod
               *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
           ELSE
             IF(SEDX.GT.ZEROS(NY,NX))THEN
-              DETI=AMAX1(-SEDX,VLS(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
+              DETI=AMAX1(-SEDX,VLS_col(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
                 *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
             ELSE
               DETI=0._r8

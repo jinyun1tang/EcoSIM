@@ -72,7 +72,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CC2PQ(:,:,:)                      !surface irrigation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PQ(:,:,:)                      !surface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CSTRQ(:,:,:)                      !surface irrigation ion strength, [g m-3]
-  real(r8),target,allocatable ::  CSTRR(:,:)                        !surface irrigation ion strength, [g m-3]
+  real(r8),target,allocatable ::  SurfIrrig_IonStrenth_col(:,:)                        !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  trcg_irrig_mole_conc_col(:,:,:)   !surface irrigation  volatile concentration, [mol m-3]
   real(r8),target,allocatable ::  COCU(:,:,:,:)                     !subsurface irrigation  DOC concentration, [g m-3]
   real(r8),target,allocatable ::  CONU(:,:,:,:)                     !subsurface irrigation  DON concentration, [g m-3]
@@ -159,7 +159,7 @@ module IrrigationDataType
   allocate(CIRRA(JY,JX));       CIRRA=0._r8
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
   allocate(TDIRI(12,JY,JX));    TDIRI=0._r8
-  allocate(CSTRR(JY,JX));       CSTRR=0._r8
+  allocate(SurfIrrig_IonStrenth_col(JY,JX));       SurfIrrig_IonStrenth_col=0._r8
   allocate(COCU(1:jcplx,JZ,JY,JX)); COCU=0._r8
   allocate(CONU(1:jcplx,JZ,JY,JX)); CONU=0._r8
   allocate(COAU(1:jcplx,JZ,JY,JX)); COAU=0._r8
@@ -236,7 +236,7 @@ module IrrigationDataType
   call destroy(CIRRA)
   call destroy(DIRRA)
   call destroy(TDIRI)
-  call destroy(CSTRR)
+  call destroy(SurfIrrig_IonStrenth_col)
   call destroy(trcg_irrig_mole_conc_col)
   call destroy(trcSalt_irrig_vr)
   call destroy(COCU)

@@ -55,7 +55,7 @@ implicit none
         IF(DLYR_3D(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
       ENDDO D9880
 
-      FSINK=AMIN1(1.0_r8,VLS(NY,NX)/DLYR_3D(3,L,NY,NX))
+      FSINK=AMIN1(1.0_r8,VLS_col(NY,NX)/DLYR_3D(3,L,NY,NX))
 !
 !     SOIL MINERALS
 !
