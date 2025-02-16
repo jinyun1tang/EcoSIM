@@ -426,29 +426,29 @@ module Hour1Mod
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     DO NX=NHW,NHE+extragrid
       DO NY=NVN,NVS+extragrid
-        cumSedErosion(1:2,1:2,NY,NX)=0._r8
-        XSANER(1:2,1:2,NY,NX)=0._r8
-        XSILER(1:2,1:2,NY,NX)=0._r8
-        XCLAER(1:2,1:2,NY,NX)=0._r8
-        XNH4ER(1:2,1:2,NY,NX)=0._r8
-        XNH3ER(1:2,1:2,NY,NX)=0._r8
-        XNHUER(1:2,1:2,NY,NX)=0._r8
-        XNO3ER(1:2,1:2,NY,NX)=0._r8
-        XNH4EB(1:2,1:2,NY,NX)=0._r8
-        XNH3EB(1:2,1:2,NY,NX)=0._r8
-        XNHUEB(1:2,1:2,NY,NX)=0._r8
-        XNO3EB(1:2,1:2,NY,NX)=0._r8
+        cumSed_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XSand_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XSilt_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XClay_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XNH4Soil_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XNH3Soil_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XUreaSoil_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XNO3Soil_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XNH4Band_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XNH3Band_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XUreaBand_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        XNO3Band_Eros_2D(1:2,1:2,NY,NX)=0._r8
 
-        trcx_XER(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
-        trcp_ER(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
+        trcx_Eros_2D(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
+        trcp_Eros_2D(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
 
         OMEERhetr(:,:,:,1:2,1:2,NY,NX) = 0._r8
         OMEERauto(:,:,1:2,1:2,NY,NX)   = 0._r8
 
-        ORMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
-        OSAER(:,:,1:2,1:2,NY,NX)                    = 0._r8
-        OHMER(1:NumPlantChemElms,:,1:2,1:2,NY,NX)   = 0._r8
-        OSMER(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
+        OMBioResdu_Eros_2D(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
+        SolidOMAct_Eros_2D(:,:,1:2,1:2,NY,NX)                    = 0._r8
+        SorbedOM_Eros_2D(1:NumPlantChemElms,:,1:2,1:2,NY,NX)   = 0._r8
+        SolidOM_Eros_2D(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
       ENDDO
     ENDDO
   ENDIF

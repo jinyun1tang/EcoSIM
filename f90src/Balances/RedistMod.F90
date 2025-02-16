@@ -592,7 +592,7 @@ module RedistMod
     !
     D8570: DO K=1,micpar%NumOfLitrCmplxs    
       DO idom=idom_beg,idom_end
-        DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+TOMQRS(idom,K,NY,NX)
+        DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+TOMQRS_col(idom,K,NY,NX)
       ENDDO
     ENDDO D8570
 !
@@ -621,9 +621,9 @@ module RedistMod
     !
     !     SOIL MINERAL FRACTIONS
     !
-    SAND(NU(NY,NX),NY,NX) = SAND(NU(NY,NX),NY,NX)+TSANER(NY,NX)
-    SILT(NU(NY,NX),NY,NX) = SILT(NU(NY,NX),NY,NX)+TSILER(NY,NX)
-    CLAY(NU(NY,NX),NY,NX) = CLAY(NU(NY,NX),NY,NX)+TCLAER(NY,NX)
+    SAND(NU(NY,NX),NY,NX) = SAND(NU(NY,NX),NY,NX)+TSandEros_col(NY,NX)
+    SILT(NU(NY,NX),NY,NX) = SILT(NU(NY,NX),NY,NX)+TSiltEros_col(NY,NX)
+    CLAY(NU(NY,NX),NY,NX) = CLAY(NU(NY,NX),NY,NX)+TCLAYEros_col(NY,NX)
     !
     !     FERTILIZER POOLS
 !
@@ -639,14 +639,14 @@ module RedistMod
     !   EXCHANGEABLE CATIONS AND ANIONS
 !
     DO NTX=idx_beg,idx_end
-      trcx_solml_vr(NTX,NU(NY,NX),NY,NX)=trcx_solml_vr(NTX,NU(NY,NX),NY,NX)+trcx_TER(NTX,NY,NX)
+      trcx_solml_vr(NTX,NU(NY,NX),NY,NX)=trcx_solml_vr(NTX,NU(NY,NX),NY,NX)+trcx_TER_col(NTX,NY,NX)
     ENDDO
 
 !
 !     PRECIPITATES
 !
     DO NTP=idsp_beg,idsp_end
-      trcp_saltpml_vr(NTP,NU(NY,NX),NY,NX)=trcp_saltpml_vr(NTP,NU(NY,NX),NY,NX)+trcp_TER(NTP,NY,NX)
+      trcp_saltpml_vr(NTP,NU(NY,NX),NY,NX)=trcp_saltpml_vr(NTP,NU(NY,NX),NY,NX)+trcp_TER_col(NTP,NY,NX)
     ENDDO
 !
 !   ORGANIC CONSTITUENTS
@@ -658,10 +658,10 @@ module RedistMod
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
-              mBiomeHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)=mBiomeHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr(NE,MID,K,NY,NX)
+              mBiomeHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)=mBiomeHeter_vr(NE,MID,K,NU(NY,NX),NY,NX)+TOMEERhetr_col(NE,MID,K,NY,NX)
             ENDDO
-            DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOMEERhetr(ielmc,MID,K,NY,NX)
-            DORGP        = DORGP+TOMEERhetr(ielmp,MID,K,NY,NX)
+            DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOMEERhetr_col(ielmc,MID,K,NY,NX)
+            DORGP        = DORGP+TOMEERhetr_col(ielmp,MID,K,NY,NX)
           enddo
         enddo
       enddo
@@ -672,10 +672,10 @@ module RedistMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            mBiomeAutor_vr(NE,MID,NU(NY,NX),NY,NX)=mBiomeAutor_vr(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto(NE,MID,NY,NX)
+            mBiomeAutor_vr(NE,MID,NU(NY,NX),NY,NX)=mBiomeAutor_vr(NE,MID,NU(NY,NX),NY,NX)+TOMEERauto_col(NE,MID,NY,NX)
           ENDDO
-          DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOMEERauto(ielmc,MID,NY,NX)
-          DORGP        = DORGP+TOMEERauto(ielmp,MID,NY,NX)
+          DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOMEERauto_col(ielmc,MID,NY,NX)
+          DORGP        = DORGP+TOMEERauto_col(ielmp,MID,NY,NX)
         enddo
       enddo
     enddo
@@ -683,23 +683,23 @@ module RedistMod
     D9275: DO K=1,jcplx
       D9270: DO M=1,ndbiomcp
         DO NE=1,NumPlantChemElms
-          OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)=OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)+TORMER(NE,M,K,NY,NX)
+          OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)=OMBioResdu_vr(NE,M,K,NU(NY,NX),NY,NX)+TORMER_col(NE,M,K,NY,NX)
         ENDDO
-        DORGE_col(NY,NX) = DORGE_col(NY,NX)+TORMER(ielmc,M,K,NY,NX)
-        DORGP        = DORGP+TORMER(ielmp,M,K,NY,NX)
+        DORGE_col(NY,NX) = DORGE_col(NY,NX)+TORMER_col(ielmc,M,K,NY,NX)
+        DORGP        = DORGP+TORMER_col(ielmp,M,K,NY,NX)
       ENDDO D9270
       DO idom=idom_beg,idom_end
-        SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)=SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)+TOHMER(idom,K,NY,NX)
+        SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)=SorbedOM_vr(idom,K,NU(NY,NX),NY,NX)+TOHMER_col(idom,K,NY,NX)
       ENDDO
-      DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOHMER(idom_doc,K,NY,NX)+TOHMER(idom_acetate,K,NY,NX)
-      DORGP  = DORGP+TOHMER(idom_dop,K,NY,NX)
+      DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOHMER_col(idom_doc,K,NY,NX)+TOHMER_col(idom_acetate,K,NY,NX)
+      DORGP  = DORGP+TOHMER_col(idom_dop,K,NY,NX)
       D9265: DO M  = 1, jsken
-        SolidOMAct_vr(M,K,NU(NY,NX),NY,NX)=SolidOMAct_vr(M,K,NU(NY,NX),NY,NX)+TOSAER(M,K,NY,NX)
+        SolidOMAct_vr(M,K,NU(NY,NX),NY,NX)=SolidOMAct_vr(M,K,NU(NY,NX),NY,NX)+TOSAER_col(M,K,NY,NX)
         DO NE=1,NumPlantChemElms
-          SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)=SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)+TOSMER(NE,M,K,NY,NX)
+          SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)=SolidOM_vr(NE,M,K,NU(NY,NX),NY,NX)+TOSMER_col(NE,M,K,NY,NX)
         ENDDO
-        DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOSMER(ielmc,M,K,NY,NX)
-        DORGP        = DORGP+TOSMER(ielmp,M,K,NY,NX)
+        DORGE_col(NY,NX) = DORGE_col(NY,NX)+TOSMER_col(ielmc,M,K,NY,NX)
+        DORGP        = DORGP+TOSMER_col(ielmp,M,K,NY,NX)
       ENDDO D9265
     ENDDO D9275
   ENDIF
@@ -1200,7 +1200,7 @@ module RedistMod
 
     RO2AquaSourcePrev_vr(L,NY,NX)   = trcs_TransptMicP_vr(idg_O2,L,NY,NX)+trcs_Irrig_vr(idg_O2,L,NY,NX) &
       +trcs_Mac2MicPore_flx_vr(idg_O2,L,NY,NX)+trcg_ebu_flx_vr(idg_O2,L,NY,NX)
-      
+
     RCH4PhysexchPrev_vr(L,NY,NX) = trcs_TransptMicP_vr(idg_CH4,L,NY,NX)+trcs_Irrig_vr(idg_CH4,L,NY,NX) &
       +trcs_Mac2MicPore_flx_vr(idg_CH4,L,NY,NX)+trcg_ebu_flx_vr(idg_CH4,L,NY,NX)
     !

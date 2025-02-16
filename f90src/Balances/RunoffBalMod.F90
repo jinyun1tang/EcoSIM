@@ -303,8 +303,8 @@ implicit none
 !     TSedmErossLoss_lnds,SedmErossLoss_CumYr_col=cumulative sediment loss through lateral and lower boundaries
 !
       IF(N.NE.3.AND.iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-        IF(ABS(cumSedErosion(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
-          ER                             = XN*cumSedErosion(N,NN,N5,N4)
+        IF(ABS(cumSed_Eros_2D(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
+          ER                             = XN*cumSed_Eros_2D(N,NN,N5,N4)
           TSedmErossLoss_lnds            = TSedmErossLoss_lnds-ER
           SedmErossLoss_CumYr_col(NY,NX) = SedmErossLoss_CumYr_col(NY,NX)-ER
 !
@@ -323,17 +323,17 @@ implicit none
 !         MICROBIAL C IN RUNOFF SEDIMENT
 !
           MXE(ielmc)=0.0_r8
-          MXE(ielmn)=XN*natomw*(trcx_XER(idx_NH4,N,NN,N5,N4)+trcx_XER(idx_NH4B,N,NN,N5,N4))
-          ZPE=XN*natomw*(XNH4ER(N,NN,N5,N4)+XNH3ER(N,NN,N5,N4) &
-            +XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4)+XNH4EB(N,NN,N5,N4) &
-            +XNH3EB(N,NN,N5,N4)+XNHUEB(N,NN,N5,N4)+XNO3EB(N,NN,N5,N4))
-          MXE(ielmp)=XN*patomw*(trcx_XER(idx_HPO4,N,NN,N5,N4)+trcx_XER(idx_H2PO4,N,NN,N5,N4) &
-            +trcx_XER(idx_HPO4B,N,NN,N5,N4)+trcx_XER(idx_H2PO4B,N,NN,N5,N4))
-          PPE=XN*patomw*(1._r8*(trcp_ER(idsp_AlPO4,N,NN,N5,N4)+trcp_ER(idsp_FePO4,N,NN,N5,N4) &
-            +trcp_ER(idsp_CaHPO4,N,NN,N5,N4)+trcp_ER(idsp_AlPO4B,N,NN,N5,N4) &
-            +trcp_ER(idsp_FePO4B,N,NN,N5,N4)+trcp_ER(idsp_CaHPO4B,N,NN,N5,N4)) &
-            +2.0_r8*(trcp_ER(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_ER(idsp_CaH4P2O8B,N,NN,N5,N4)) &
-            +3.0_r8*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4)))
+          MXE(ielmn)=XN*natomw*(trcx_Eros_2D(idx_NH4,N,NN,N5,N4)+trcx_Eros_2D(idx_NH4B,N,NN,N5,N4))
+          ZPE=XN*natomw*(XNH4Soil_Eros_2D(N,NN,N5,N4)+XNH3Soil_Eros_2D(N,NN,N5,N4) &
+            +XUreaSoil_Eros_2D(N,NN,N5,N4)+XNO3Soil_Eros_2D(N,NN,N5,N4)+XNH4Band_Eros_2D(N,NN,N5,N4) &
+            +XNH3Band_Eros_2D(N,NN,N5,N4)+XUreaBand_Eros_2D(N,NN,N5,N4)+XNO3Band_Eros_2D(N,NN,N5,N4))
+          MXE(ielmp)=XN*patomw*(trcx_Eros_2D(idx_HPO4,N,NN,N5,N4)+trcx_Eros_2D(idx_H2PO4,N,NN,N5,N4) &
+            +trcx_Eros_2D(idx_HPO4B,N,NN,N5,N4)+trcx_Eros_2D(idx_H2PO4B,N,NN,N5,N4))
+          PPE=XN*patomw*(1._r8*(trcp_Eros_2D(idsp_AlPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_FePO4,N,NN,N5,N4) &
+            +trcp_Eros_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_AlPO4B,N,NN,N5,N4) &
+            +trcp_Eros_2D(idsp_FePO4B,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
+            +2.0_r8*(trcp_Eros_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
+            +3.0_r8*(trcp_Eros_2D(idsp_HA,N,NN,N5,N4)+trcp_Eros_2D(idsp_HAB,N,NN,N5,N4)))
           MOE(:)=0.0_r8
           
           D3580: DO K=1,jcplx
@@ -365,19 +365,19 @@ implicit none
           D3575: DO K=1,jcplx
             D3570: DO M=1,ndbiomcp
               DO NE=1,NumPlantChemElms
-                MOE(NE)=MOE(NE)+XN*ORMER(NE,M,K,N,NN,N5,N4)
+                MOE(NE)=MOE(NE)+XN*OMBioResdu_Eros_2D(NE,M,K,N,NN,N5,N4)
               ENDDO
             ENDDO D3570
 !
         !   DOC, ADSORBED AND HUMUS C IN RUNOFF SEDIMENT
 !
             DO NE=1,NumPlantChemElms            
-              MOE(NE)=MOE(NE)+XN*OHMER(NE,K,N,NN,N5,N4)
+              MOE(NE)=MOE(NE)+XN*SorbedOM_Eros_2D(NE,K,N,NN,N5,N4)
             ENDDO
-            MOE(ielmc)=MOE(ielmc)+XN*OHMER(idom_acetate,K,N,NN,N5,N4)
+            MOE(ielmc)=MOE(ielmc)+XN*SorbedOM_Eros_2D(idom_acetate,K,N,NN,N5,N4)
             D3565: DO M=1,jsken
               DO NE=1,NumPlantChemElms            
-                MOE(NE)=MOE(NE)+XN*OSMER(NE,M,K,N,NN,N5,N4)
+                MOE(NE)=MOE(NE)+XN*SolidOM_Eros_2D(NE,M,K,N,NN,N5,N4)
               ENDDO
             ENDDO D3565
           ENDDO D3575
@@ -396,7 +396,7 @@ implicit none
           HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
 !     WRITE(*,6635)'MOE(ielmp)',I,J,N4,N5,N,NN
 !    2,MOE(ielmc),MXE(ielmc),MOE(ielmn),MXE(ielmn),ZPE
-!    3,MOE(ielmp),MXE(ielmp),PPE,TOMOU_lnds(ielmp),cumSedErosion(N,NN,N5,N4)
+!    3,MOE(ielmp),MXE(ielmp),PPE,TOMOU_lnds(ielmp),cumSed_Eros_2D(N,NN,N5,N4)
 !    3,XN,TOMOU_lnds(ielmc),TOMOU_lnds(ielmn),TOMOU_lnds(ielmp)
 !6635  FORMAT(A8,6I4,20F17.8)
 !
@@ -422,26 +422,26 @@ implicit none
 !         TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
-            SEF=XN*(XNH3ER(N,NN,N5,N4)+XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4) &
-              +XNH3EB(N,NN,N5,N4)+XNHUEB(N,NN,N5,N4)+XNO3EB(N,NN,N5,N4)) &
-              +2.0*(XNH4ER(N,NN,N5,N4)+XNH4EB(N,NN,N5,N4))
-            SEX=XN*(trcx_XER(idx_Hp,N,NN,N5,N4)+trcx_XER(idx_Al,N,NN,N5,N4) &
-              +trcx_XER(idx_Fe,N,NN,N5,N4)+trcx_XER(idx_Ca,N,NN,N5,N4)+trcx_XER(idx_Mg,N,NN,N5,N4) &
-              +trcx_XER(idx_Na,N,NN,N5,N4)+trcx_XER(idx_K,N,NN,N5,N4)+trcx_XER(idx_COOH,N,NN,N5,N4) &
-              +trcx_XER(idx_OHe,N,NN,N5,N4)+trcx_XER(idx_OHeB,N,NN,N5,N4)) &
-              +XN*2.0*(trcx_XER(idx_NH4,N,NN,N5,N4)+trcx_XER(idx_NH4B,N,NN,N5,N4) &
-              +trcx_XER(idx_OH,N,NN,N5,N4)+trcx_XER(idx_OHB,N,NN,N5,N4)) &
-              +XN*3.0*(trcx_XER(idx_AlOH2,N,NN,N5,N4)+trcx_XER(idx_FeOH2,N,NN,N5,N4) &
-              +trcx_XER(idx_OHp,N,NN,N5,N4)+trcx_XER(idx_OHpB,N,NN,N5,N4) &
-              +trcx_XER(idx_HPO4,N,NN,N5,N4)+trcx_XER(idx_HPO4B,N,NN,N5,N4)) &
-              +XN*4.0*(trcx_XER(idx_H2PO4,N,NN,N5,N4)+trcx_XER(idx_H2PO4B,N,NN,N5,N4))
-            SEP=XN*2.0*(trcp_ER(idsp_CaCO3,N,NN,N5,N4)+trcp_ER(idsp_CaSO4,N,NN,N5,N4) &
-              +trcp_ER(idsp_AlPO4,N,NN,N5,N4)+trcp_ER(idsp_FePO4,N,NN,N5,N4) &
-              +trcp_ER(idsp_AlPO4B,N,NN,N5,N4)+trcp_ER(idsp_FePO4B,N,NN,N5,N4)) &
-              +XN*3.0*(trcp_ER(idsp_CaHPO4,N,NN,N5,N4)+trcp_ER(idsp_CaHPO4B,N,NN,N5,N4)) &
-              +XN*4.0*(trcp_ER(idsp_AlOH3,N,NN,N5,N4)+trcp_ER(idsp_FeOH3,N,NN,N5,N4)) &
-              +XN*7.0*(trcp_ER(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_ER(idsp_CaH4P2O8B,N,NN,N5,N4)) &
-              +XN*9.0*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4))
+            SEF=XN*(XNH3Soil_Eros_2D(N,NN,N5,N4)+XUreaSoil_Eros_2D(N,NN,N5,N4)+XNO3Soil_Eros_2D(N,NN,N5,N4) &
+              +XNH3Band_Eros_2D(N,NN,N5,N4)+XUreaBand_Eros_2D(N,NN,N5,N4)+XNO3Band_Eros_2D(N,NN,N5,N4)) &
+              +2.0*(XNH4Soil_Eros_2D(N,NN,N5,N4)+XNH4Band_Eros_2D(N,NN,N5,N4))
+            SEX=XN*(trcx_Eros_2D(idx_Hp,N,NN,N5,N4)+trcx_Eros_2D(idx_Al,N,NN,N5,N4) &
+              +trcx_Eros_2D(idx_Fe,N,NN,N5,N4)+trcx_Eros_2D(idx_Ca,N,NN,N5,N4)+trcx_Eros_2D(idx_Mg,N,NN,N5,N4) &
+              +trcx_Eros_2D(idx_Na,N,NN,N5,N4)+trcx_Eros_2D(idx_K,N,NN,N5,N4)+trcx_Eros_2D(idx_COOH,N,NN,N5,N4) &
+              +trcx_Eros_2D(idx_OHe,N,NN,N5,N4)+trcx_Eros_2D(idx_OHeB,N,NN,N5,N4)) &
+              +XN*2.0*(trcx_Eros_2D(idx_NH4,N,NN,N5,N4)+trcx_Eros_2D(idx_NH4B,N,NN,N5,N4) &
+              +trcx_Eros_2D(idx_OH,N,NN,N5,N4)+trcx_Eros_2D(idx_OHB,N,NN,N5,N4)) &
+              +XN*3.0*(trcx_Eros_2D(idx_AlOH2,N,NN,N5,N4)+trcx_Eros_2D(idx_FeOH2,N,NN,N5,N4) &
+              +trcx_Eros_2D(idx_OHp,N,NN,N5,N4)+trcx_Eros_2D(idx_OHpB,N,NN,N5,N4) &
+              +trcx_Eros_2D(idx_HPO4,N,NN,N5,N4)+trcx_Eros_2D(idx_HPO4B,N,NN,N5,N4)) &
+              +XN*4.0*(trcx_Eros_2D(idx_H2PO4,N,NN,N5,N4)+trcx_Eros_2D(idx_H2PO4B,N,NN,N5,N4))
+            SEP=XN*2.0*(trcp_Eros_2D(idsp_CaCO3,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaSO4,N,NN,N5,N4) &
+              +trcp_Eros_2D(idsp_AlPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_FePO4,N,NN,N5,N4) &
+              +trcp_Eros_2D(idsp_AlPO4B,N,NN,N5,N4)+trcp_Eros_2D(idsp_FePO4B,N,NN,N5,N4)) &
+              +XN*3.0*(trcp_Eros_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
+              +XN*4.0*(trcp_Eros_2D(idsp_AlOH3,N,NN,N5,N4)+trcp_Eros_2D(idsp_FeOH3,N,NN,N5,N4)) &
+              +XN*7.0*(trcp_Eros_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
+              +XN*9.0*(trcp_Eros_2D(idsp_HA,N,NN,N5,N4)+trcp_Eros_2D(idsp_HAB,N,NN,N5,N4))
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
             HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SET

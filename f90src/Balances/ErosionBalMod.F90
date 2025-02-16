@@ -207,29 +207,29 @@ implicit none
   integer, intent(in) :: NY,NX
 
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-    tErosionSedmLoss_col(NY,NX)   = 0.0_r8
-    TSANER(NY,NX)             = 0.0_r8
-    TSILER(NY,NX)             = 0.0_r8
-    TCLAER(NY,NX)             = 0.0_r8
-    TNH4Eros_col(NY,NX)       = 0.0_r8
-    TNH3Eros_col(NY,NX)       = 0.0_r8
-    TNUreaEros_col(NY,NX)     = 0.0_r8
-    TNO3Eros_col(NY,NX)       = 0.0_r8
-    TNH4ErosBand_col(NY,NX)   = 0.0_r8
-    TNH3ErosBand_col(NY,NX)   = 0.0_r8
-    TNUreaErosBand_col(NY,NX) = 0.0_r8
-    TNO3ErosBand_col(NY,NX)   = 0.0_r8
+    tErosionSedmLoss_col(NY,NX) = 0.0_r8
+    TSandEros_col(NY,NX)        = 0.0_r8
+    TSiltEros_col(NY,NX)        = 0.0_r8
+    TCLAYEros_col(NY,NX)        = 0.0_r8
+    TNH4Eros_col(NY,NX)         = 0.0_r8
+    TNH3Eros_col(NY,NX)         = 0.0_r8
+    TNUreaEros_col(NY,NX)       = 0.0_r8
+    TNO3Eros_col(NY,NX)         = 0.0_r8
+    TNH4ErosBand_col(NY,NX)     = 0.0_r8
+    TNH3ErosBand_col(NY,NX)     = 0.0_r8
+    TNUreaErosBand_col(NY,NX)   = 0.0_r8
+    TNO3ErosBand_col(NY,NX)     = 0.0_r8
 
-    trcx_TER(idx_beg:idx_end,NY,NX)   = 0.0_r8
-    trcp_TER(idsp_beg:idsp_end,NY,NX) = 0.0_r8
+    trcx_TER_col(idx_beg:idx_end,NY,NX)   = 0.0_r8
+    trcp_TER_col(idsp_beg:idsp_end,NY,NX) = 0.0_r8
 
-    TOMEERhetr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,NY,NX) = 0.0_r8
-    TOMEERauto(1:NumPlantChemElms,1:NumLiveAutoBioms,NY,NX)          = 0.0_r8
+    TOMEERhetr_col(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,NY,NX) = 0.0_r8
+    TOMEERauto_col(1:NumPlantChemElms,1:NumLiveAutoBioms,NY,NX)          = 0.0_r8
 
-    TORMER(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,NY,NX) = 0.0_r8
-    TOHMER(idom_beg:idom_end,1:jcplx,NY,NX)             = 0.0_r8
-    TOSMER(1:NumPlantChemElms,1:jsken,1:jcplx,NY,NX)    = 0.0_r8
-    TOSAER(1:jsken,1:jcplx,NY,NX)                       = 0.0_r8
+    TORMER_col(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,NY,NX) = 0.0_r8
+    TOHMER_col(idom_beg:idom_end,1:jcplx,NY,NX)             = 0.0_r8
+    TOSMER_col(1:NumPlantChemElms,1:jsken,1:jcplx,NY,NX)    = 0.0_r8
+    TOSAER_col(1:jsken,1:jcplx,NY,NX)                       = 0.0_r8
   ENDIF
   end subroutine ZeroErosionArray
 
