@@ -108,8 +108,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 
-    write(*,*) "SkyLonwRad_col(NY,NX) = ", SkyLonwRad_col(NY,NX)
-    RainH(NY,NX) = p_rain(NY)
+    RainH(NY,NX) = p_rain(NY)*3600.0  !(convert m/s into m/hr
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
@@ -150,14 +149,13 @@ implicit none
     RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
-    write(*,*) "SnoFalPrec_col = ", SnoFalPrec_col(NY,NX)
   ENDDO
 
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  !write(*,*) "before stage: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
+  write(*,*) "(ATSEcoSIMAdvance) RAINH  = ", RAINH(1,1), " m/hr,  AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -188,7 +186,8 @@ implicit none
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
-  
+ 
+  write(*,*) "(ATSEcoSIMAdvance after surf bal) Q_w = ", Qinfl2MicPM(NY,NX), " m/hr"  
   !Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
   !Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
@@ -203,8 +202,7 @@ implicit none
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
 
-  write(*,*) "Variables for ATS: snow_depth, Q_e, Q_w: ", surf_snow_depth(1), &
-        surf_e_source(1), surf_w_source(1)  
+  write(*,*) "(ATSEcoSIMAdvance post conv) Q_w ", surf_w_source(1), " snow_depth = " , surf_snow_depth(1), " m" 
 
   !open(unit=10, file="fluxes.txt", status="unknown", position="append")
   !write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"

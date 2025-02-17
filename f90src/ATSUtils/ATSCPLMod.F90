@@ -70,7 +70,7 @@ contains
 
   data_ptr = state%water_content%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_WC = data2D(:,:)
+  a_WC = data2D(:,:)*2.32e-7
 
   data_ptr = props%volume%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -86,7 +86,7 @@ contains
 
   data_ptr = state%bulk_density%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_BKDSI = data2D(:,:)
+  a_BKDSI = data2D(:,:)*0.0408
 
   data_ptr = state%matric_pressure%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -140,7 +140,7 @@ contains
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
 
-  a_MATP(:,:) = 100.0
+  a_MATP(:,:) = -6.9
 
   !do i = 1, size_col
   !  a_MATP(i, 1) = 100.0
@@ -165,6 +165,20 @@ contains
 
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
+
+  write(*,*) "(ATSCPL) parameters"
+  write(*,*) "a_BKDSI: ", a_BKDSI(1,1)
+  write(*,*) "a_WC: ", a_WC(1,1)
+  write(*,*) "a_TEMP: ", a_TEMP(1,1)
+  write(*,*) "a_MATP: ", a_MATP(1,1)
+  write(*,*) "a_PORO: ", a_PORO(1,1)
+  write(*,*) "a_ASP: ", a_ASP(1)
+  write(*,*) "tairc: ", tairc(1)
+  write(*,*) "vpair: ", vpair(1)
+  write(*,*) "uwind: ", uwind(1)
+  write(*,*) "pressure_at_field_capacity: ", pressure_at_field_capacity
+  write(*,*) "pressure_at_wilting_point: ", pressure_at_wilting_point
+  write(*,*) "heat_capacity: ", heat_capacity
 
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
@@ -202,6 +216,7 @@ contains
   !call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
   !data2D(:,:)=a_SSES
 
+  write(*,*) "(In EcoSIM2ATSData) snow_depth, Q_e, Q_w ", surf_snow_depth(1), surf_e_source(1), surf_w_source(1)
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
 
