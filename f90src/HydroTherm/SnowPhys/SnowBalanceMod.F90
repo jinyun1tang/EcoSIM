@@ -23,6 +23,7 @@ module SnowBalanceMod
   use AqueChemDatatype
   use SoilBGCDataType
   use ChemTranspDataType  
+  use SnowTransportMod, only : SoluteTransportThruSnow
   use UnitMod, only : units
 implicit none
 
@@ -99,7 +100,7 @@ implicit none
 
     call UpdateSnowLayerL(I,J,L,NY,NX,VOLSWI)
 
-    call UpdateSoluteInSnow(L,NY,NX)
+    call SoluteTransportThruSnow(L,NY,NX)
     
   ENDDO D9780
 
@@ -512,32 +513,6 @@ implicit none
   ENDIF  
   TCSnow_snvr(L,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L,NY,NX))
   end subroutine UpdateSnowLayerL
-!------------------------------------------------------------------------------------------
-
-  subroutine UpdateSoluteInSnow(L,NY,NX)
-  implicit none
-  integer, intent(in) :: L,NY,NX
-
-  integer :: idg,idn,idsalt
-  !     begin_execution
-  !     SNOWPACK SOLUTE CONTENT
-
-  DO idg=idg_beg,idg_NH3
-    trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX)
-  ENDDO
-
-  DO idn =ids_nut_beg,ids_nuts_end
-    trcn_solsml_snvr(idn,L,NY,NX)=trcn_solsml_snvr(idn,L,NY,NX)+trcn_AquaAdv_NetFlx_snvr(idn,L,NY,NX)
-  ENDDO
-  !
-  !
-  IF(salt_model)THEN
-    DO idsalt=idsalt_beg,idsalt_end
-      trc_Saltml_snvr(idsalt,L,NY,NX)=trc_Saltml_snvr(idsalt,L,NY,NX)+trcSalt_AquaAdv_NetFlx_snvr(idsalt,L,NY,NX)
-    ENDDO
-  ENDIF
-
-  end subroutine UpdateSoluteInSnow
 
 !------------------------------------------------------------------------------------------
 
@@ -555,7 +530,7 @@ implicit none
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: DDLYXS,DDLYRS
   real(r8) :: DDLYXX,VOLSLX
-  integer :: IFLGLS,idn,idg,NTU,idsalt
+  integer :: IFLGLS,idn,idg,idsalt
   integer, parameter :: inochange=0
   integer, parameter :: iexpand=1
   integer, parameter :: ishrink=2
@@ -591,6 +566,7 @@ implicit none
           DDLYRS = DDLYXS
           IFLGLS = ishrink         !shrink
         ENDIF
+      !layer L previously has nothing  
       ELSE
         !current layer is empty, do nothing
         DDLYRS = 0.0_r8      !no change
@@ -689,12 +665,13 @@ implicit none
             call endrun(trim(mod_filename)//' at line',__LINE__)    
           endif
           TCSnow_snvr(L0,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L0,NY,NX))
+
 !     chemicals
           DO idg=idg_beg,idg_NH3
             trcg_solsml_snvr(idg,L0,NY,NX)=FY*trcg_solsml_snvr(idg,L0,NY,NX)
           ENDDO
-          DO NTU=ids_nut_beg,ids_nuts_end
-            trcn_solsml_snvr(NTU,L0,NY,NX)=FY*trcn_solsml_snvr(NTU,L0,NY,NX)
+          DO idn=ids_nut_beg,ids_nuts_end
+            trcn_solsml_snvr(idn,L0,NY,NX)=FY*trcn_solsml_snvr(idn,L0,NY,NX)
           ENDDO
 
           IF(salt_model)THEN
@@ -765,10 +742,10 @@ implicit none
   TIceBySnowRedist(NY,NX)      = 0.0_r8
   THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
-  trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX)     = 0.0_r8
+  trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,NY,NX)     = 0.0_r8
   trcg_LossXSnowRedist_col(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
   trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
-  trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)              = 0.0_r8
+  trcg_SurfRunoff_flx(idg_beg:idg_NH3,NY,NX)              = 0.0_r8
 
   DO  L=1,JS
     trcg_AquaAdv_NetFlx_snvr(idg_beg:idg_NH3,L,NY,NX)          = 0.0_r8
@@ -778,7 +755,7 @@ implicit none
   IF(salt_model)THEN
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FROM SNOWPACK DRIFT
 !
-    trcSalt_TQR(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
+    trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
     trcSalt_LossXSnowRedist_col(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
     DO  L=1,JS
       trcSalt_AquaAdv_NetFlx_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0.0_r8

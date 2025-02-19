@@ -145,8 +145,8 @@ module InsideTranspMod
       DOM_SurfRunoff_flxM(idom_beg:idom_end,K,NY,NX)=0.0_r8
     ENDDO
 
-    trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
-    trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
+    trcg_SurfRunoff_flx(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
+    trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
     trcg_SnowDrift_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
     trcn_SnowDrift_flxM(ids_nut_beg:ids_nuts_end,NY,NX)  = 0.0_r8
 

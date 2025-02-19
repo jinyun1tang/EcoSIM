@@ -522,13 +522,13 @@ module StartsMod
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
  
-  write(*,*) "InitSoilProfile ------------------------- "
-  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
-  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
-  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
-  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
-  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
-  write(*,*) "----------------------------------------- "
+!  write(*,*) "InitSoilProfile ------------------------- "
+!  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
+!  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
+!  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
+!  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
+!  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
+!  write(*,*) "----------------------------------------- "
 
   call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
@@ -745,11 +745,11 @@ module StartsMod
   !
   CRAIN_lnd           = 0.0_r8
   HEATIN_lnd          = 0.0_r8
-  SurfGas_CO2_lnd     = 0.0_r8
-  SurfGas_O2_lnd      = 0.0_r8
-  SurfGas_H2_lnd      = 0.0_r8
+  SurfGas_lnd(idg_CO2)     = 0.0_r8
+  SurfGas_lnd(idg_O2)      = 0.0_r8
+  SurfGas_lnd(idg_H2)      = 0.0_r8
   TZIN                = 0.0_r8
-  SurfGas_N2_lnd      = 0.0_r8
+  SurfGas_lnd(idg_N2)      = 0.0_r8
   TPIN                = 0.0_r8
   tAmendOrgC_lnd      = 0.0_r8
   TORGN               = 0.0_r8

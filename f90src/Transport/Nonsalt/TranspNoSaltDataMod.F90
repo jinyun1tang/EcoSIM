@@ -36,8 +36,8 @@ implicit none
 
   real(r8), allocatable ::  trcg_SnowDrift_flxM(:,:,:)             !gas incoming flux to grid from snow drift at iteration M [g d-2]
   real(r8), allocatable ::  trcn_SnowDrift_flxM(:,:,:)             !nutrient incoming flux to grid from snow drift at iteration M [g d-2]
-  real(r8), allocatable ::  trcg_SurfRunoff_flxM(:,:,:)            !Gas incoming flux to grid from surface runoff at iteration M [g d-2]
-  real(r8), allocatable ::  trcn_SurfRunoff_flxM(:,:,:)            !Nutrient incoming flux to grid from surface runoff at iteration M [g d-2]
+  real(r8), allocatable ::  trcg_SurfRunoff_flx(:,:,:)            !Gas incoming flux to grid from surface runoff at iteration M [g d-2]
+  real(r8), allocatable ::  trcn_SurfRunoff_flx(:,:,:)            !Nutrient incoming flux to grid from surface runoff at iteration M [g d-2]
   real(r8), allocatable ::  trcs_Transp2Micp_flxM_vr(:,:,:,:)      !total 3D micropore flux at iteration M [g d-2]
   real(r8), allocatable ::  trcs_Transp2Macp_flxM_vr(:,:,:,:)      !total 3D macropore flux at iteration M [g d-2]
 
@@ -109,8 +109,8 @@ contains
 
   allocate(trcg_SnowDrift_flxM(idg_beg:idg_NH3,JY,JX));      trcg_SnowDrift_flxM=0._r8
   allocate(trcn_SnowDrift_flxM(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_SnowDrift_flxM=0._r8
-  allocate(trcg_SurfRunoff_flxM(idg_beg:idg_NH3,JY,JX)); trcg_SurfRunoff_flxM=0._r8
-  allocate(trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,JY,JX));trcn_SurfRunoff_flxM=0._r8
+  allocate(trcg_SurfRunoff_flx(idg_beg:idg_NH3,JY,JX)); trcg_SurfRunoff_flx=0._r8
+  allocate(trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,JY,JX));trcn_SurfRunoff_flx=0._r8
 
   allocate(GasDifctScaledMM_vr(idg_beg:idg_end,JZ,JY,JX)); GasDifctScaledMM_vr=0._r8
   allocate(SoluteDifusivitytscaledM_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusivitytscaledM_vr=0._r8
@@ -197,8 +197,8 @@ contains
   call destroy(RBGCSinkGasMM_vr)
   call destroy(trcg_FloXSurRunoff_flxM)
   call destroy(DOM_SurfRunoff_flxM)
-  call destroy(trcg_SurfRunoff_flxM)
-  call destroy(trcn_SurfRunoff_flxM)
+  call destroy(trcg_SurfRunoff_flx)
+  call destroy(trcn_SurfRunoff_flx)
   call destroy(trcg_SnowDrift_flxM)
   call destroy(trcn_SnowDrift_flxM)
   call destroy(trcs_Transp2Micp_flxM_vr)

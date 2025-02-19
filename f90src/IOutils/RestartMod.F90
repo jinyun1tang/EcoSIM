@@ -4254,7 +4254,27 @@ implicit none
 
   call restartvar(ncid, flag, varname='SurfGas_O2_lnd', &
        long_name='total surface O2 flux', units='g d-2', &
-       interpinic_flag='skip', data=SurfGas_O2_lnd, missing_value=spval, &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_O2), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_CO2_lnd', &
+       long_name='total surface CO2 flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_CO2), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_Ar_lnd', &
+       long_name='total surface Ar flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_Ar), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_H2_lnd', &
+       long_name='total surface H2 flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_H2), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_CH4_lnd', &
+       long_name='total surface CH4 flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_CH4), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='tAmendOrgC_lnd', &
@@ -4270,16 +4290,6 @@ implicit none
   call restartvar(ncid, flag, varname='TORGP', &
        long_name='total organic P amendment', units='g d-2', &
        interpinic_flag='skip', data=TORGP, missing_value=spval, &
-       fill_value=spval)
-
-  call restartvar(ncid, flag, varname='SurfGas_N2_lnd', &
-       long_name='total surface N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=SurfGas_N2_lnd, missing_value=spval, &
-       fill_value=spval)
-
-  call restartvar(ncid, flag, varname='SurfGas_CO2_lnd', &
-       long_name='total surface CO2 flux', units='g d-2', &
-       interpinic_flag='skip', data=SurfGas_CO2_lnd, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='QH2OLoss_lnds', &

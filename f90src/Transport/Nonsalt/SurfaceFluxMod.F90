@@ -712,7 +712,6 @@ contains
             trcn_FloXSnow_2DH(idn,N,N5,N4)      = trcn_FloXSnow_2DH(idn,N,N5,N4)+trcn_SnowDrift_flxM_2D(idn,N,N5,N4)
           ENDDO
         endif  
-
       ENDIF
     ENDDO D4305
   ENDDO D4310

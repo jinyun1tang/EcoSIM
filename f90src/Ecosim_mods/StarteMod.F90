@@ -205,7 +205,7 @@ module StarteMod
     trcg_rain_mole_conc_col(idg_N2,NY,NX)  = solutevar%N2_aqua_mole_conc
     trcg_rain_mole_conc_col(idg_N2O,NY,NX) = solutevar%N2O_aqua_mole_conc
     trcg_rain_mole_conc_col(idg_NH3,NY,NX) = solutevar%NH3_aqua_mole_conc
-    NH4_rain_mole_conc(NY,NX)                   = solutevar%NH4_1p_aqua_mole_conc    
+    NH4_rain_mole_conc(NY,NX)              = solutevar%NH4_1p_aqua_mole_conc    
     if(salt_model)then
       trcsalt_rain_mole_conc_col(idsalt_Al,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
       trcsalt_rain_mole_conc_col(idsalt_Fe,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
@@ -316,8 +316,8 @@ module StarteMod
 ! U means surface irrigation
 ! first year and not a restart run
   ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart()).AND.is_first_year)THEN
-    CCOU                           = solutevar%H2CO3_aqua_mole_conc
-    CCHU                           = solutevar%CH4_aqua_mole_conc
+    CCOU                           = solutevar%H2CO3_aqua_mole_conc*catomw
+    CCHU                           = solutevar%CH4_aqua_mole_conc*catomw
     COXU                           = 0._r8
     CNNU                           = solutevar%N2_aqua_mole_conc
     CN2U                           = solutevar%N2O_aqua_mole_conc
@@ -445,8 +445,8 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
-    trcx_solml_vr(idx_NH4,L,NY,NX)    = solutevar%XNH4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-    trcx_solml_vr(idx_NH4B,L,NY,NX)   = solutevar%XNH4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
+    trcx_solml_vr(idx_NH4,L,NY,NX)    = solutevar%XNH4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+    trcx_solml_vr(idx_NH4B,L,NY,NX)   = solutevar%XNH4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
     trcx_solml_vr(idx_Hp,L,NY,NX)     = solutevar%XHY1*VLSoilMicPMass_vr(L,NY,NX)
     trcx_solml_vr(idx_Al,L,NY,NX)     = solutevar%XAl_conc*VLSoilMicPMass_vr(L,NY,NX)
     trcx_solml_vr(idx_Fe,L,NY,NX)     = solutevar%XFe_conc*VLSoilMicPMass_vr(L,NY,NX)

@@ -107,7 +107,7 @@ module InitSoluteMod
   real(r8), pointer :: CALOHX
   real(r8), pointer :: CFEOHX
   real(r8), pointer :: CCACOX
-  real(r8), pointer :: XNH4_conc
+  real(r8), pointer :: XNH4_mole_conc
   real(r8), pointer :: XHY1
   real(r8), pointer :: XAl_conc
   real(r8), pointer :: XFe_conc
@@ -305,7 +305,7 @@ module InitSoluteMod
   CALOHX                     => solutevar%CALOHX
   CFEOHX                     => solutevar%CFEOHX
   CCACOX                     => solutevar%CCACOX
-  XNH4_conc                  => solutevar%XNH4_conc
+  XNH4_mole_conc                  => solutevar%XNH4_mole_conc
   XHY1                       => solutevar%XHY1
   XAl_conc                   => solutevar%XAl_conc
   XFe_conc                   => solutevar%XFe_conc
@@ -600,7 +600,7 @@ module InitSoluteMod
     ELSE
       FX=0._r8
     ENDIF
-    XNH4_conc=CN4X
+    XNH4_mole_conc=CN4X
     XHY1=FX*XHYQ
     XAl_conc=FX*XALQ/3.0_r8
     XFe_conc=FX*XFEQ/3.0_r8
@@ -1299,7 +1299,7 @@ module InitSoluteMod
       XMGQ=FX*XMGQ/2.0_r8
       XNAQ=FX*XNAQ
       XKAQ=FX*XKAQ
-      RXN4=TAD*AMIN1((XN4Q-XNH4_conc)*NH4_1p_activity/XN4Q,NH4_1p_aqua_mole_conc)
+      RXN4=TAD*AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_activity/XN4Q,NH4_1p_aqua_mole_conc)
       RXHY=TAD*AMIN1((XHYQ-XHY1)*H_1p_activity/XHYQ,H_1p_aqua_mole_conc)
       RXAL=TAD*AMIN1((XALQ-XAl_conc)*AALX/XALQ,Al_3p_aqua_mole_conc)
       RXFE=TAD*AMIN1((XFEQ-XFe_conc)*AFEX/XFEQ,Fe_3p_aqua_mole_conc)
@@ -1307,7 +1307,7 @@ module InitSoluteMod
       RXMG=TAD*AMIN1((XMGQ-XMg_conc)*AMGX/XMGQ,Mg_2p_aqua_mole_conc)
       RXNA=TAD*AMIN1((XNAQ-XNa_conc)*Na_1p_activity/XNAQ,Na_1p_aqua_mole_conc)
       RXKA=TAD*AMIN1((XKAQ-XK_conc)*K_1p_activity/XKAQ,K_1p_aqua_mole_conc)
-      XNH4_conc=XNH4_conc+RXN4
+      XNH4_mole_conc=XNH4_mole_conc+RXN4
       XHY1=XHY1+RXHY
       XAl_conc=XAl_conc+RXAL
       XFe_conc=XFe_conc+RXFE
@@ -1700,8 +1700,8 @@ module InitSoluteMod
         FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
-      RXN4=TSL*AMIN1((XN4Q-XNH4_conc)*NH4_1p_aqua_mole_conc/XN4Q,NH4_1p_aqua_mole_conc)
-      XNH4_conc=XNH4_conc+RXN4
+      RXN4=TSL*AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_aqua_mole_conc/XN4Q,NH4_1p_aqua_mole_conc)
+      XNH4_mole_conc=XNH4_mole_conc+RXN4
     ELSE
       RXN4=0._r8
     ENDIF

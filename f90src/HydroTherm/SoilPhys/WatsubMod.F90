@@ -2246,132 +2246,103 @@ module WatsubMod
   real(r8),intent(in) :: XN   !flow direction, > 0 (in), < 0 (out)
   real(r8),intent(inout):: AirfMicP   !air-filled space in grid (N3,N2,N1)
   real(r8),intent(inout) :: VOLPX2,AirfMacP
-  character(len=*),intent(in) :: str_dir
+  character(len=*),intent(in) :: str_dir  
 !  logical, intent(in) :: donot_drain
+
+  character(len=*), parameter :: subname='RechargeFromExtWaterTBL'
   real(r8) :: FLWU,FLWUL,FLWUX,FLWUH,FLWUHL  
   real(r8) :: PSISUT,PSISUTH,PSISWD
   real(r8) :: heatflx,watflx,watflxu
 
+  call PrintInfo('beg '//subname)
   !     MICROPORE RECHARGE BELOW WATER TABLE
-  !
-  !     ActiveLayDepZ_col=active layer depth
-  !     AirfMicP=micropore air volume
-  !     PSISWD=water potential from water table slope
-  !     XN,RCHG*=direction indicator,boundary flag
-  !     SLOPE=sin(lateral slope)
-  !     DLYR=layer width
-  !     WaterTBLSlope_col=water table slope
-  !     PSISUT=water potential driving micropore recharge (>0 discharge)
-  !     PSISoilAirEntry,PSISO=matric,osmotic water potential
-  !     DPTH,ExtWaterTable=depth to layer midpoint,natural water table
-  !     FLWU,FLWUL=micropore recharge unltd,ltd by micropore air volume
-  !     FLWL=micropore recharge from natural water table
-  !     HFLWL=convective heat from recharge from natural water table
-  !     HydroCond_3D=saturated hydraulic conductivity
-  !     VLairMicP=air filled 
-  !   lower than external water table, still inside the active layer
-      IF(SoilDepthMidLay_vr(N3,N2,N1).GE.ExtWaterTable_col(N2,N1)                      & !deeper than water table
-        .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)                    & !active layer deepd enough
-        .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1)                 & !inside active layer
-        .AND. (AirfMicP.GT.ZEROS2(N2,N1) .OR. SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)   & !able to accept water
-        .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                        & !
-        .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN
 
-        PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
-        PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
-          mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
+  IF(SoilDepthMidLay_vr(N3,N2,N1).GE.ExtWaterTable_col(N2,N1)                      & !deeper than water table
+    .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)                     & !active layer deepd enough
+    .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1)                 & !inside active layer
+    .AND. (AirfMicP.GT.ZEROS2(N2,N1) .OR. SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)    & !able to accept water
+    .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                         & !source grid is unsaturated
+    .AND. (.not.isclose(RechargRateWTBL,0._r8)))THEN                                 !water exchange with watertable enabled
 
-        !outflow/drainage  (>0.)
-        IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
+    PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
+    PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
+      mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
 
-        FLWU = PSISUT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*FracLayVolBelowExtWTBL_vr(N3,N2,N1) &
-          /(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
+    !outflow/drainage  (>0.)
+    IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
 
-        !within a time step, the incoming flow cannot exceed avaiable air-filled pores   
-        IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO)THEN
-          FLWUL = AMIN1(FLWU,AirfMicP)
-          FLWUX = AMIN1(FLWU,VOLPX2)
-        ELSE
-          FLWUL = FLWU
-          FLWUX = FLWU
-        ENDIF
-        watflx                 = XN*FLWUL
-        watflxu                = XN*FLWUX
-        heatflx                = cpw*TKSoil1_vr(N3,N2,N1)*watflx
+    FLWU = PSISUT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*FracLayVolBelowExtWTBL_vr(N3,N2,N1) &
+      /(RechargSubSurf+1.0)*RechargRateWTBL*dts_HeatWatTP
+
+    !within a time step, the incoming flow cannot exceed avaiable air-filled pores   
+    IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO)THEN
+      FLWUL = AMIN1(FLWU,AirfMicP)
+      FLWUX = AMIN1(FLWU,VOLPX2)
+    ELSE
+      FLWUL = FLWU
+      FLWUX = FLWU
+    ENDIF
+    watflx                 = XN*FLWUL
+    watflxu                = XN*FLWUX
+    heatflx                = cpw*TKSoil1_vr(N3,N2,N1)*watflx
 !        if(donot_drain)then
 
 !        else
-          if(N3==M6 .and. N2==M5 .and. N1==M4)then
-            QDischar_col(N2,N1)    = QDischar_col(N2,N1)-watflx
-            QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)-watflx
-            HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)-heatflx
-          else
-            QDischar_col(N2,N1)    = QDischar_col(N2,N1)+watflx
-            QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)+watflx
-            HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)+heatflx
-          endif
-          WaterFlow2Micpt_3D(N,M6,M5,M4)  = WaterFlow2Micpt_3D(N,M6,M5,M4)+watflx
-          WaterFlow2MicptX_3D(N,M6,M5,M4) = WaterFlow2MicptX_3D(N,M6,M5,M4)+watflxu
-          HeatFlow2Soili_3D(N,M6,M5,M4)   = HeatFlow2Soili_3D(N,M6,M5,M4)+heatflx
-          AirfMicP                        = AirfMicP-XN*watflx
-          VOLPX2                          = VOLPX2-XN*watflxu
+      if(N3==M6 .and. N2==M5 .and. N1==M4)then
+        QDischar_col(N2,N1)    = QDischar_col(N2,N1)-watflx
+        QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)-watflx
+        HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)-heatflx
+      else
+        QDischar_col(N2,N1)    = QDischar_col(N2,N1)+watflx
+        QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)+watflx
+        HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)+heatflx
+      endif
+      WaterFlow2Micpt_3D(N,M6,M5,M4)  = WaterFlow2Micpt_3D(N,M6,M5,M4)+watflx
+      WaterFlow2MicptX_3D(N,M6,M5,M4) = WaterFlow2MicptX_3D(N,M6,M5,M4)+watflxu
+      HeatFlow2Soili_3D(N,M6,M5,M4)   = HeatFlow2Soili_3D(N,M6,M5,M4)+heatflx
+      AirfMicP                        = AirfMicP-XN*watflx
+      VOLPX2                          = VOLPX2-XN*watflxu
 !        endif
 
 !        if(I>=267 .and. J>=23)write(214,*)I+J/24.,M,N3,N2,N1,M6,M5,M4,'dis1'//str_dir,watflx,XN,N !,donot_drain
-      ENDIF
+  ENDIF
 !
-      !     MACROPORE RECHARGE BELOW WATER TABLE
-      !
-      !     PSISWD=water potential from water table slope
-      !     XN,RCHG*=direction indicator,boundary flag
-      !     SLOPE=sin(lateral slope)
-      !     DLYR=layer width
-      !     WaterTBLSlope_col=water table slope
-      !     PSISUTH=water potential driving macropore recharge
-      !     PSISO=osmotic water potential
-      !     DPTHH,ExtWaterTable=depth to layer macropore water,natural water table
-      !     DepzIntWTBL_col=depth to internal water table
-      !     HydroCondMacP1=macropore hydraulic conductivity
-      !     FLWUH,FLWUHL=macropore recharge unltd,ltd by macropore air volume
-      !     WaterFlow2Macpt_3D=macropore discharge to natural water table
-      !     HFLWL=convective heat from discharge to natural water table
-      !     HydroCond_3D=saturated hydraulic conductivity
-      !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
-      !     Deeper than external water table, inside active layer
+  !     MACROPORE RECHARGE BELOW WATER TABLE
 
-      IF(DPTHH.GT.ExtWaterTable_col(N2,N1)                            & !deeper than water table
-        .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)    & !active layer below water table
-        .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1) & !midlayer depth above active water layer
-        .AND. AirfMacP.GT.ZEROS2(N2,N1)                               & !macropore has air-filled fraction
-        .AND. (.not.isclose(RechargRateWTBL,0.0_r8)))THEN               !recharge is on
 
-        PSISWD  = XN*0.005*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
-        PSISUTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable_col(N2,N1))
+  IF(DPTHH.GT.ExtWaterTable_col(N2,N1)                            & !deeper than water table
+    .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)    & !active layer below water table
+    .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1) & !midlayer depth above active water layer
+    .AND. AirfMacP.GT.ZEROS2(N2,N1)                               & !macropore has air-filled fraction
+    .AND. (.not.isclose(RechargRateWTBL,0.0_r8)))THEN               !recharge is on
 
-        !outflow/drainage
-        IF(PSISUTH.GT.0.0_r8)PSISUTH = PSISUTH+PSISWD
-        FLWUH  = PSISUTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1)*FracLayVolBelowExtWTBL_vr(N3,N2,N1) &
-          /(RechargSubSurf+1.0_r8)*RechargRateWTBL*dts_HeatWatTP
-        !is *dts_wat needed below?  
-        FLWUHL                         = AMIN1(FLWUH,AirfMacP)
-        watflx                         = XN*FLWUHL
-        heatflx                        = cpw*TKSoil1_vr(N3,N2,N1)*watflx
-        WaterFlow2Macpt_3D(N,M6,M5,M4) = WaterFlow2Macpt_3D(N,M6,M5,M4)+watflx
-        HeatFlow2Soili_3D(N,M6,M5,M4)  = HeatFlow2Soili_3D(N,M6,M5,M4)+heatflx
-        AirfMacP                       = AirfMacP-XN*watflx
+    PSISWD  = XN*0.005*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
+    PSISUTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable_col(N2,N1))
+
+    !outflow/drainage
+    IF(PSISUTH.GT.0.0_r8)PSISUTH = PSISUTH+PSISWD
+    FLWUH  = PSISUTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1)*FracLayVolBelowExtWTBL_vr(N3,N2,N1) &
+      /(RechargSubSurf+1.0_r8)*RechargRateWTBL*dts_HeatWatTP
+    !is *dts_wat needed below?  
+    FLWUHL                         = AMIN1(FLWUH,AirfMacP)
+    watflx                         = XN*FLWUHL
+    heatflx                        = cpw*TKSoil1_vr(N3,N2,N1)*watflx
+    WaterFlow2Macpt_3D(N,M6,M5,M4) = WaterFlow2Macpt_3D(N,M6,M5,M4)+watflx
+    HeatFlow2Soili_3D(N,M6,M5,M4)  = HeatFlow2Soili_3D(N,M6,M5,M4)+heatflx
+    AirfMacP                       = AirfMacP-XN*watflx
 
 !        write(214,*)I+J/24.,'dis2',watflx,XN*watflx        
-        if(N3==M6 .and. N2==M5 .and. N1==M4)then
-          QDischar_col(N2,N1)    = QDischar_col(N2,N1)-watflx
-          QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)-watflx
-          HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)-heatflx
-        else
-          QDischar_col(N2,N1)    = QDischar_col(N2,N1)+watflx
-          QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)+watflx
-          HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)+heatflx
-        endif
-      ENDIF
-      
+    if(N3==M6 .and. N2==M5 .and. N1==M4)then
+      QDischar_col(N2,N1)    = QDischar_col(N2,N1)-watflx
+      QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)-watflx
+      HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)-heatflx
+    else
+      QDischar_col(N2,N1)    = QDischar_col(N2,N1)+watflx
+      QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)+watflx
+      HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)+heatflx
+    endif
+  ENDIF
+  call PrintInfo('end '//subname)    
   end SUBROUTINE RechargeFromExtWaterTBL
 !------------------------------------------------------------------------------------------
 

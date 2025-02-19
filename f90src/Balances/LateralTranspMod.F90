@@ -141,7 +141,7 @@ implicit none
           !
         ELSEIF(N.EQ.iVerticalDirection)THEN
           !vertical direction
-          call VerticalSaltFluxThruSnowpack(I,J,N1,N2,NY,NX)
+          call SaltPercolThruSnow(I,J,N1,N2,NY,NX)
         ENDIF
 !
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT

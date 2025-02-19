@@ -370,7 +370,7 @@ module TranspSaltMod
 !     RQR*=solute in runoff
 !
   DO idsalt=idsalt_beg,idsalt_end
-    trc_salt_rof_bounds(idsalt,N,NN,M5,M4)=trc_salt_rof_bounds(idsalt,N,NN,M5,M4)+trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,M5,M4)
+    trcSalt_FloXSurRunoff_2D(idsalt,N,NN,M5,M4)=trcSalt_FloXSurRunoff_2D(idsalt,N,NN,M5,M4)+trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,M5,M4)
   ENDDO
   end subroutine SaltExportXBoundaryM
 

@@ -20,7 +20,7 @@ module minimathmod
   public :: GetMolAirPerm3
   public :: fSiLU
   public :: fixnegmass
-  public :: fixEXflux
+  public :: fixEXConsumpFlux
   public :: yearday,isletter
   public :: dssign
   public :: flux_mass_limiter
@@ -352,7 +352,7 @@ module minimathmod
   end function fixnegmass
 ! ----------------------------------------------------------------------
 
-  subroutine fixEXflux(mass,consum_flux,ldebug)
+  subroutine fixEXConsumpFlux(mass,consum_flux,ldebug)
   implicit none
   real(r8), intent(inout) :: mass
   real(r8), intent(inout) :: consum_flux
@@ -368,7 +368,7 @@ module minimathmod
   else
     mass=mass-consum_flux  
   endif
-  end subroutine fixEXflux
+  end subroutine fixEXConsumpFlux
 
 ! ----------------------------------------------------------------------
 

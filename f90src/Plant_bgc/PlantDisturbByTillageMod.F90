@@ -344,7 +344,7 @@ contains
     inonstruct                 => pltpar%inonstruct,                    &
     iroot                      => pltpar%iroot,                         &
     icwood                     => pltpar%icwood,                        &
-    RootGasLossDisturb_pft     => plt_bgcr%RootGasLossDisturb_pft,      &
+    RootGasLossDisturb_pft     => plt_bgcr%RootGasLossDisturb_pft,      & !<0 into atmosphere
     LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr,        &
     RootCO2Autor_pvr           => plt_rbgc%RootCO2Autor_pvr,            &
     RootRespPotent_pvr         => plt_rbgc%RootRespPotent_pvr,          &

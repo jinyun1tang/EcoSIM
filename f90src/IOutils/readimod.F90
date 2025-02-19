@@ -412,9 +412,9 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
     
-    NU(NV1,NH1)=NUI(NV1,NH1)
-    NK(NV1,NH1)=MaxNumRootLays(NV1,NH1)+1
-    NM(NV1,NH1)=MaxNumRootLays(NV1,NH1)+NL1
+    NU(NV1,NH1) = NUI(NV1,NH1)
+    NK(NV1,NH1) = MaxNumRootLays(NV1,NH1)+1
+    NM(NV1,NH1) = MaxNumRootLays(NV1,NH1)+NL1
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
     NLI(NV1,NH1)=NM(NV1,NH1)+NL2

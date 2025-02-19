@@ -471,7 +471,7 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trc_salt_rof_bounds(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
+      trcSalt_FloXSurRunoff_2D(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
       trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,NY,NX)             = 0._r8
 
       DO  L=1,NL(NY,NX)+1
@@ -737,8 +737,9 @@ module Hour1Mod
   PrecHeat2Snow_col(NY,NX)                = 0._r8
   Prec2Snow_col(NY,NX)                    = 0._r8
   ECO_HR_CO2_vr(:,NY,NX)                  = 0._r8
+  ECO_HR_CH4_vr(:,NY,NX)                  = 0._r8  
   ECO_HR_CO2_col(NY,NX)                   = 0._r8
-  ECO_HR_CH4_col(NY,NX)                   = 0._r8
+  ECO_HR_CH4_col(NY,NX)                   = 0._r8  
   Eco_RadSW_col(NY,NX)                    = 0._r8
   RootCO2Autor_vr(:,NY,NX)                = 0._r8
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -763,6 +764,7 @@ module Hour1Mod
   QDrain_col(NY,NX)                       = 0._r8
   HeatDrain_col(NY,NX)                    = 0._r8
 
+  GasHydroLossFlx_col(idg_beg:idg_end,NY,NX)         = 0._r8
   SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
   SurfGasDifFlx_col(idg_beg:idg_NH3,NY,NX)           = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
@@ -826,8 +828,8 @@ module Hour1Mod
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)                 = 0._r8
   RProd_Hp_vr(0:NL(NY,NX),NY,NX)                                                    = 0._r8
   trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)              = 0._r8
-  TR_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
-  TR_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
+  TRChem_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
+  TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
   trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)              = 0._r8
   TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
@@ -2349,16 +2351,16 @@ module Hour1Mod
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8
     trcx_TRSoilChem_vr(idx_OHeB:idx_end,L,NY,NX)=0._r8
 
-    TR_H_p_sorbed_soil_vr(L,NY,NX)       = 0._r8
-    TR_Al_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TR_Fe_sorbed_soil_vr(L,NY,NX)     = 0._r8
-    TR_Ca_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TR_Mg_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TR_Na_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TR_K_sorbed_soil_vr(L,NY,NX)         = 0._r8
-    TR_HCO3_sorbed_soil_vr(L,NY,NX)      = 0._r8
-    TR_AlO2H2_sorbed_soil_vr(L,NY,NX)    = 0._r8
-    TR_FeO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
+    TRChem_H_p_sorbed_soil_vr(L,NY,NX)       = 0._r8
+    TRChem_Al_sorbed_soil_vr(L,NY,NX)        = 0._r8
+    TRChem_Fe_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_Ca_sorbed_soil_vr(L,NY,NX)        = 0._r8
+    TRChem_Mg_sorbed_soil_vr(L,NY,NX)        = 0._r8
+    TRChem_Na_sorbed_soil_vr(L,NY,NX)        = 0._r8
+    TRChem_K_sorbed_soil_vr(L,NY,NX)         = 0._r8
+    TRChem_HCO3_sorbed_soil_vr(L,NY,NX)      = 0._r8
+    TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)    = 0._r8
+    TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
 
     trcp_RChem_soil(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0._r8
 
