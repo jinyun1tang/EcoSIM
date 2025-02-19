@@ -447,7 +447,7 @@ implicit none
     SineSunInclAngle_col     => plt_rad%SineSunInclAngle_col,       &
     RadPARbyCanopy_pft       => plt_rad%RadPARbyCanopy_pft,         &
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,            &
-    LeafAreaNode_brch        => plt_morph%LeafAreaNode_brch,        &
+    LeafNodeArea_brch        => plt_morph%LeafNodeArea_brch,        &
     RubiscoActivity_brch     => plt_photo%RubiscoActivity_brch      &
   )
 
@@ -464,11 +464,11 @@ implicit none
           CH2O3(K) = 0._r8
           CH2O4(K) = 0._r8
 
-          IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+          IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS
 !
-!             LeafAreaNode_brch,CanopyLeafArea_lpft=leaf area
+!             LeafNodeArea_brch,CanopyLeafArea_lpft=leaf area
 !             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
 !             Vmax4PEPCarboxy_pft=PEP carboxylation rate unlimited by CO2
 !

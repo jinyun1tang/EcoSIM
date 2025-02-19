@@ -11,29 +11,30 @@ module EcosimBGCFluxType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  Eco_NetRad_col(:,:)                           !ecosystem net radiation, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  Eco_Heat_Latent_col(:,:)                           !ecosystem latent heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  Eco_Heat_Sens_col(:,:)                           !ecosystem sensible heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  Eco_Heat_GrndSurf_col(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  Eco_GPP_CumYr_col(:,:)                          !cumulative ecosystem GPP, [g d-2]
-  real(r8),target,allocatable ::  Eco_AutoR_CumYr_col(:,:)                        !cumulative ecosystem autotrophic respiration, [gC d-2]
-  real(r8),target,allocatable ::  Eco_NPP_CumYr_col(:,:)                          !cumulative ecosystem NPP, [gC d-2]
-  real(r8),target,allocatable ::  Eco_HR_CumYr_col(:,:)                          !cumulative ecosystem heterotrophic respiration, [gC d-2]
-  real(r8),target,allocatable ::  ECO_HR_CO2_col(:,:)                            !heterotrophic respiration as CO2, [gC d-2 hr-1]
-  real(r8),target,allocatable ::  ECO_HR_CO2_vr(:,:,:)                           !Vertically resolved heterotrophic respiraiton as CO2 [gC/d2/hr]
-  real(r8),target,allocatable ::  ECO_HR_CH4_col(:,:)                            !heterotrophic respiration as CH4, [gC d-2]
-  real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_col(:,:,:)                      !ecosystem harvest , [g d-2]
-  real(r8),target,allocatable ::  NetNH4Mineralize_CumYr_col(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),target,allocatable ::  NetPO4Mineralize_CumYr_col(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),target,allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
-  real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                         !total net CO2 fixation
-  real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                       !total LitrFall element, [g d-2 h-1]
-  real(r8),target,allocatable ::  ECO_ER_col(:,:)                          !ecosystem respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  Eco_NBP_CumYr_col(:,:)                          !total NBP, [g d-2]
+  real(r8),target,allocatable ::  Eco_NetRad_col(:,:)                               !ecosystem net radiation, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Eco_Heat_Latent_col(:,:)                          !ecosystem latent heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Eco_Heat_Sens_col(:,:)                            !ecosystem sensible heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Eco_Heat_GrndSurf_col(:,:)                        !ecosystem storage heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  Eco_GPP_CumYr_col(:,:)                            !cumulative ecosystem GPP, [g d-2]
+  real(r8),target,allocatable ::  Eco_AutoR_CumYr_col(:,:)                          !cumulative ecosystem autotrophic respiration, [gC d-2]
+  real(r8),target,allocatable ::  Eco_NPP_CumYr_col(:,:)                            !cumulative ecosystem NPP, [gC d-2]
+  real(r8),target,allocatable ::  Eco_HR_CumYr_col(:,:)                             !cumulative ecosystem heterotrophic respiration, [gC d-2]
+  real(r8),target,allocatable ::  ECO_HR_CO2_col(:,:)                               !heterotrophic respiration as CO2, [gC d-2 hr-1]
+  real(r8),target,allocatable ::  ECO_HR_CO2_vr(:,:,:)                              !Vertically resolved heterotrophic respiraiton as CO2 [gC/d2/hr]
+  real(r8),target,allocatable ::  ECO_HR_CH4_vr(:,:,:)                              !heterotrophic respiration as CH4, [gC d-2]  
+  real(r8),target,allocatable ::  ECO_HR_CH4_col(:,:)                               !heterotrophic respiration as CH4, [gC d-2]
+  real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_col(:,:,:)                    !ecosystem harvest , [g d-2]
+  real(r8),target,allocatable ::  NetNH4Mineralize_CumYr_col(:,:)                   !total NH4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  NetPO4Mineralize_CumYr_col(:,:)                   !total H2PO4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  GPP(:,:)                                          !gross primary productivity, [g d-2 h-1]
+  real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                               !total net CO2 fixation
+  real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                      !total LitrFall element, [g d-2 h-1]
+  real(r8),target,allocatable ::  ECO_ER_col(:,:)                                   !ecosystem respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  Eco_NBP_CumYr_col(:,:)                            !total NBP, [g d-2]
   real(r8),target,allocatable ::  REcoH1PO4DmndSoil_vr(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                   !HPO4 demand in non-band by all microbial,root,myco populations
   real(r8),target,allocatable ::  REcoH1PO4DmndBand_vr(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                   !HPO4 demand in band by all microbial,root,myco populations
 !----------------------------------------------------------------------
 
 contains
@@ -50,6 +51,7 @@ contains
   allocate(Eco_HR_CumYr_col(JY,JX));        Eco_HR_CumYr_col=0._r8
   allocate(ECO_HR_CO2_col(JY,JX));          ECO_HR_CO2_col=0._r8
   allocate(ECO_HR_CO2_vr(0:JZ,JY,JX));     ECO_HR_CO2_vr=0._r8
+  allocate(ECO_HR_CH4_vr(0:JZ,JY,JX));     ECO_HR_CH4_vr=0._r8  
   allocate(ECO_HR_CH4_col(JY,JX));          ECO_HR_CH4_col=0._r8
   allocate(EcoHavstElmnt_CumYr_col(NumPlantChemElms,JY,JX));      EcoHavstElmnt_CumYr_col=0._r8
   allocate(NetNH4Mineralize_CumYr_col(JY,JX));      NetNH4Mineralize_CumYr_col=0._r8
@@ -79,6 +81,7 @@ contains
   call destroy(Eco_HR_CumYr_col)
   call destroy(ECO_HR_CO2_col)
   call destroy(ECO_HR_CO2_vr)
+  call destroy(ECO_HR_CH4_vr)  
   call destroy(ECO_HR_CH4_col)
   call destroy(EcoHavstElmnt_CumYr_col)
   call destroy(NetNH4Mineralize_CumYr_col)

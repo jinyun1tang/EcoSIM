@@ -3163,7 +3163,7 @@ module MicBGCMod
     COXYE                  => micfor%COXYE,                  &
     RO2GasXchangePrev      => micfor%RO2GasXchangePrev,      &
     RO2AquaXchangePrev     => micfor%RO2AquaXchangePrev,     &
-    Irrig2LitRSurf         => micfor%Irrig2LitRSurf,         &
+    Irrig2LitRSurf_col         => micfor%Irrig2LitRSurf_col,         &
     Rain2LitRSurf          => micfor%Rain2LitRSurf,          &
     litrm                  => micfor%litrm,                  &
     O2AquaDiffusvity       => micfor%O2AquaDiffusvity,       &
@@ -3202,7 +3202,7 @@ module MicBGCMod
         ROXYLX = RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
         OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
+        ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       if(OXYS <= 0._r8 .and. ROXYLX < 0._r8)then 
         ROXYLX=0._r8

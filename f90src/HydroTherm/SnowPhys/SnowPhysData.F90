@@ -8,16 +8,16 @@ module SnowPhysData
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
 
-  real(r8),allocatable ::  trcg_TBLS(:,:,:,:)
-  real(r8),allocatable ::  trcn_TBLS(:,:,:,:)
-  real(r8),allocatable ::  trcSalt_TBLS(:,:,:,:)                      !
+  real(r8),allocatable ::  trcg_AquaAdv_NetFlx_snvr(:,:,:,:)
+  real(r8),allocatable ::  trcn_AquaAdv_NetFlx_snvr(:,:,:,:)
+  real(r8),allocatable ::  trcSalt_AquaAdv_NetFlx_snvr(:,:,:,:)                      !
   real(r8),allocatable ::  TDrysnoBySnowRedist(:,:)                           !
   real(r8),allocatable ::  trcSalt_LossXSnowRedist_col(:,:,:)  
-  real(r8),allocatable ::  trcn_SurfRunoff_flxM(:,:,:)                        !
-  real(r8),allocatable ::  trcSalt_TQR(:,:,:)                         !
+  real(r8),allocatable ::  trcn_SurfRunoff_flx(:,:,:)                        !
+  real(r8),allocatable ::  trcSalt_SurfRunoff_flx(:,:,:)                         !
   real(r8),allocatable ::  trcg_LossXSnowRedist_col(:,:,:)
   real(r8),allocatable ::  trcn_LossXSnowRedist_col(:,:,:)
-  real(r8),allocatable ::  trcg_SurfRunoff_flxM(:,:,:)                        !
+  real(r8),allocatable ::  trcg_SurfRunoff_flx(:,:,:)                        !
   real(r8),allocatable ::  XSnowThawMassL_snvr(:,:,:)              !hourly convective heat flux from snow transfer
   real(r8),allocatable ::  XIceThawMassL_snvr(:,:,:)                      !hourly convective heat flux from ice transfer  
   real(r8),allocatable ::  THeatBySnowRedist_col(:,:)                          !
@@ -62,15 +62,15 @@ module SnowPhysData
   subroutine  InitSnowPhysData
   implicit none
 
-  allocate(trcg_TBLS(idg_beg:idg_NH3,JS,JY,JX));        trcg_TBLS=0._r8
-  allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
-  allocate(trcSalt_TBLS(idsalt_beg:idsalt_end,JS,JY,JX));       trcSalt_TBLS=0._r8  
+  allocate(trcg_AquaAdv_NetFlx_snvr(idg_beg:idg_NH3,JS,JY,JX));        trcg_AquaAdv_NetFlx_snvr=0._r8
+  allocate(trcn_AquaAdv_NetFlx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_NetFlx_snvr=0._r8
+  allocate(trcSalt_AquaAdv_NetFlx_snvr(idsalt_beg:idsalt_end,JS,JY,JX));       trcSalt_AquaAdv_NetFlx_snvr=0._r8  
   allocate(trcSalt_LossXSnowRedist_col(idsalt_beg:idsalt_end,JY,JX));           trcSalt_LossXSnowRedist_col=0._r8  
-  allocate(trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flxM=0._r8  
-  allocate(trcSalt_TQR(idsalt_beg:idsalt_end,JY,JX));           trcSalt_TQR=0._r8  
+  allocate(trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flx=0._r8  
+  allocate(trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,JY,JX));           trcSalt_SurfRunoff_flx=0._r8  
   allocate(trcg_LossXSnowRedist_col(idg_beg:idg_NH3,JY,JX));            trcg_LossXSnowRedist_col=0._r8
   allocate(trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,JY,JX));trcn_LossXSnowRedist_col=0._r8
-  allocate(trcg_SurfRunoff_flxM(idg_beg:idg_NH3,JY,JX));      trcg_SurfRunoff_flxM=0._r8
+  allocate(trcg_SurfRunoff_flx(idg_beg:idg_NH3,JY,JX));      trcg_SurfRunoff_flx=0._r8
 
   allocate(TIceBySnowRedist(JY,JX));         TIceBySnowRedist=0._r8
   allocate(TWatBySnowRedist(JY,JX));         TWatBySnowRedist=0._r8
@@ -117,15 +117,15 @@ module SnowPhysData
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcg_TBLS)
-  call destroy(trcn_TBLS)
-  call destroy(trcSalt_TBLS)
-  call destroy(trcn_SurfRunoff_flxM)  
-  call destroy(trcSalt_TQR)
+  call destroy(trcg_AquaAdv_NetFlx_snvr)
+  call destroy(trcn_AquaAdv_NetFlx_snvr)
+  call destroy(trcSalt_AquaAdv_NetFlx_snvr)
+  call destroy(trcn_SurfRunoff_flx)  
+  call destroy(trcSalt_SurfRunoff_flx)
   call destroy(tEnGYM_snvr)
   call destroy(trcg_LossXSnowRedist_col)
   call destroy(trcn_LossXSnowRedist_col)  
-  call destroy(trcg_SurfRunoff_flxM)
+  call destroy(trcg_SurfRunoff_flx)
   call destroy(TWatBySnowRedist)  
   call destroy(cumWatFlx2LitRByRunoff_col)
   call destroy(cumDrySnoFlxByRedistribut)

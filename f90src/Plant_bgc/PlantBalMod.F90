@@ -213,7 +213,7 @@ implicit none
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch,        &
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch,         &
     CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
-    StalkBiomassC_brch         => plt_biom%StalkBiomassC_brch,          &
+    StalkLiveBiomassC_brch         => plt_biom%StalkLiveBiomassC_brch,          &
     CanopyLeafShethC_pft       => plt_biom%CanopyLeafShethC_pft,        &
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
     StalkRsrvElms_brch         => plt_biom%StalkRsrvElms_brch,          &
@@ -236,7 +236,7 @@ implicit none
       +CanopyNonstElms_brch(NE,NB,NZ)
     
   ENDDO
-!  CanopyStalkC_pft(NZ)     = sum(StalkBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+!  CanopyStalkC_pft(NZ)     = sum(StalkLiveBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
 
   !add C4 specific reserve carbon

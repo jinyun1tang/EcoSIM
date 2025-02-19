@@ -7,9 +7,10 @@ module SoilWaterDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  real(r8),target,allocatable ::  TXGridSurfRunoff_2DH(:,:)                           !
-  real(r8),target,allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)                          !
-
+  real(r8),target,allocatable ::  TXGridSurfRunoff_2DH(:,:)                 !
+  real(r8),target,allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)           !
+  logical, target,allocatable ::  iPondFlag_col(:,:)                        !
+  integer, target,allocatable ::  iPondBotLev_col(:,:)                      !Bottom level ID
   real(r8),target,allocatable ::  ThetaAir_vr(:,:,:)                        !air concentration [m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP_vr(:,:,:)                       !soil air content [m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                           !volumetric water content [m3 m-3]
@@ -27,7 +28,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLWatMicPM_vr(:,:,:,:)                    !soil micropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLWatMacPM_vr(:,:,:,:)                    !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM_vr(:,:,:,:)                    !soil air content, [m3 d-2]
-  real(r8),target,allocatable ::  FILM(:,:,:,:)                             !soil water film thickness , [m]
+  real(r8),target,allocatable ::  FILMM_vr(:,:,:,:)                         !soil water film thickness , [m]
   real(r8),target,allocatable ::  WaterTBLSlope_col(:,:)                    !slope of water table relative to surface slope, [-]
   real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                     !depth of artificial water table
   real(r8),target,allocatable ::  TileWaterTable_col(:,:)                   !artificial water table depth, [m]
@@ -43,8 +44,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  HydroCond_3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                   !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake_vr(:,:,:)        !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
-  real(r8),target,allocatable ::  SurfRunoffWatFluxM_2DH(:,:,:)               !runoff water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  RunoffVelocityM_col(:,:,:)                     !runoff velocity, [m t-1]
+  real(r8),target,allocatable ::  SurfRunoffWatFluxM_2DH(:,:,:)             !runoff water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  RunoffVelocityM_col(:,:,:)                !runoff velocity, [m t-1]
   integer,target,allocatable ::  IFLBM(:,:,:,:,:)                           !flag for directional surface runoff
   logical,target,allocatable ::  XGridRunoffFlag(:,:,:,:)                   !enables or disables boundary water flux depending on aspect, [-]
   integer,target,allocatable ::  IFLBH(:,:,:,:)                             !flag for directional runoff, related to IFLBM
@@ -63,46 +64,46 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RechargBottom_col(:,:)                    !lower subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  WaterFlow2MicPM_3D(:,:,:,:,:)             !micropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  WaterFlow2MacPM_3D(:,:,:,:,:)             !macropore water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  ReductVLsoiAirPM_vr(:,:,:,:)                 !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
+  real(r8),target,allocatable ::  ReductVLsoiAirPM_vr(:,:,:,:)              !change in soil air volume for layer from last to current iteration, [g d-2 t-1] >0, shrink
   real(r8),target,allocatable ::  FWatExMacP2MicPM_vr(:,:,:,:)              !soil macropore - micropore water transfer, [g d-2 t-1]
   real(r8),target,allocatable ::  WatFlowSno2MicPM_col(:,:,:)               !meltwater flux into soil micropores
   real(r8),target,allocatable ::  WatFlowSno2MacPM_col(:,:,:)               !meltwater flux into soil macropores
-  real(r8),target,allocatable ::  AirFilledSoilPoreM_vr(:,:,:,:)                        !air-filled soil porosity, [m3 m-3]
+  real(r8),target,allocatable ::  AirFilledSoilPoreM_vr(:,:,:,:)            !air-filled soil porosity, [m3 m-3]
   real(r8),target,allocatable ::  TortMicPM_vr(:,:,:,:)                     !soil tortuosity, []
-  real(r8),target,allocatable ::  TortMacPM_vr(:,:,:,:)                    !macropore tortuosity, []
-  real(r8),target,allocatable ::  DiffusivitySolutEffM_vr(:,:,:,:)                     !coefficient for dissolution - volatilization, []
-  real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
-  real(r8),target,allocatable ::  PSISE_vr(:,:,:)                      !soil water potential at saturation, [Mpa]
-  real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                      !soil water potential at air entry, [Mpa]
-  real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                      !osmotic soil water potential , [Mpa]
-  real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                      !gravimetric soil water potential , [Mpa]
-  real(r8),target,allocatable ::  SoilWatAirDry_vr(:,:,:)                      !air-dry water content, [m3 m-3]
-  real(r8),target,allocatable ::  ThetaSat_vr(:,:,:)                      !micropore class water content
-  real(r8),target,allocatable ::  WaterFlowSoiMicPX_3D(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
-  real(r8),target,allocatable ::  EvapoTransp_col(:,:)              !evapotranspiration
-  real(r8),target,allocatable ::  QEvap_CumYr_col(:,:)                        !total evaporation, [m3 d-2]
-  real(r8),target,allocatable ::  QRain_CumYr_col(:,:)                        !total precipitation, [m3 d-2]
-  real(r8),target,allocatable ::  Qrunoff_CumYr_col(:,:)                         !total surface runoff, [m3 d-2]
-  real(r8),target,allocatable ::  WatMass_col(:,:)                !total soil water content, [m3 d-2]
-  real(r8),target,allocatable ::  H2OLoss_CumYr_col(:,:)                        !total subsurface water flux, [m3 d-2]
-  real(r8),target,allocatable ::  QDrain_col(:,:)                       !total water drainage below root zone, [m3 d-2]
-  real(r8),target,allocatable ::  XGridSurfRunoff_2DH(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HeatXGridBySurfRunoff_2DH(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  TortMacPM_vr(:,:,:,:)                     !macropore tortuosity, []
+  real(r8),target,allocatable ::  DiffusivitySolutEffM_vr(:,:,:,:)          !coefficient for dissolution - volatilization, []
+  real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)          !soil hydraulic resistance, [MPa h m-2]
+  real(r8),target,allocatable ::  PSISE_vr(:,:,:)                           !soil water potential at saturation, [Mpa]
+  real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                    !soil water potential at air entry, [Mpa]
+  real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                  !osmotic soil water potential , [Mpa]
+  real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                         !gravimetric soil water potential , [Mpa]
+  real(r8),target,allocatable ::  SoilWatAirDry_vr(:,:,:)                   !air-dry water content, [m3 m-3]
+  real(r8),target,allocatable ::  ThetaSat_vr(:,:,:)                        !micropore class water content
+  real(r8),target,allocatable ::  WaterFlowSoiMicPX_3D(:,:,:,:)             !unsaturated water flux , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  EvapoTransp_col(:,:)                      !evapotranspiration
+  real(r8),target,allocatable ::  QEvap_CumYr_col(:,:)                      !total evaporation, [m3 d-2]
+  real(r8),target,allocatable ::  QRain_CumYr_col(:,:)                      !total precipitation, [m3 d-2]
+  real(r8),target,allocatable ::  Qrunoff_CumYr_col(:,:)                    !total surface runoff, [m3 d-2]
+  real(r8),target,allocatable ::  WatMass_col(:,:)                          !total soil water content, [m3 d-2]
+  real(r8),target,allocatable ::  H2OLoss_CumYr_col(:,:)                    !total subsurface water flux, [m3 d-2]
+  real(r8),target,allocatable ::  QDrain_col(:,:)                           !total water drainage below root zone, [m3 d-2]
+  real(r8),target,allocatable ::  XGridSurfRunoff_2DH(:,:,:,:)              !soil surface runoff water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  HeatXGridBySurfRunoff_2DH(:,:,:,:)        !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  QRunSurf_col(:,:)                         !runoff from surface water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  QDischar_col(:,:)                !water discharge, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  QflxSurfRunoffM_2DH(:,:,:,:,:)        !surface runoff,
-  real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)
-  real(r8),target,allocatable ::  SoilWatMassBeg_col(:,:)
-  real(r8),target,allocatable ::  SoilWatMassEnd_col(:,:)
-  real(r8),target,allocatable ::  Rain2Soil_col(:,:)               !water flow into soil due to precipitation (+ surface irrigation), [m3 H2O/d2/h]
+  real(r8),target,allocatable ::  QDischar_col(:,:)                         !water discharge, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QflxSurfRunoffM_2DH(:,:,:,:,:)            !surface runoff in iteration M,
+  real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)                      !infiltration into soil [m3 d-2 h-1]
+  real(r8),target,allocatable ::  SoilWatMassBeg_col(:,:)                   !soil water mass at the begnining of time step
+  real(r8),target,allocatable ::  SoilWatMassEnd_col(:,:)                   !soil water mass at the end of time step
+  real(r8),target,allocatable ::  Rain2Soil_col(:,:)                        !water flow into soil due to precipitation (+ surface irrigation), [m3 H2O/d2/h]
   real(r8),target,allocatable ::  QdewCanopy_CumYr_pft(:,:,:)
   real(r8),target,allocatable :: QSnoWatXfer2Soil_col(:,:)
   real(r8),target,allocatable :: QSnoIceXfer2Soil_col(:,:)
-  real(r8),target,allocatable :: PrecipAtm2LandSurf_col(:,:)       !precipiation from atmosphere to land surface 
-  real(r8),target,allocatable :: RainPrecThrufall_col(:,:)
-  real(r8),target,allocatable :: RainPrec2Sno_col(:,:)
-  real(r8),target,allocatable :: Rain2ExposedSurf_col(:,:)
-  real(r8),target,allocatable :: QWatIntLaterFlow_col(:,:)         !Internal lateral flow between grids
+  real(r8),target,allocatable :: PrecipAtm2LandSurf_col(:,:)                !precipiation from atmosphere to land surface 
+  real(r8),target,allocatable :: RainPrecThrufall_col(:,:)                  !precipitation through canopy [m3 H2O d-2 h-1]
+  real(r8),target,allocatable :: RainPrec2Sno_col(:,:)                      !rainfall to snow [m3 H2O d-2 h-1]
+  real(r8),target,allocatable :: Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface [m3 H2O d-2 h-1]
+  real(r8),target,allocatable :: QWatIntLaterFlow_col(:,:)                  !Internal lateral flow between grids [m3 H2O d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -118,6 +119,8 @@ module SoilWaterDataType
 
   implicit none
 
+  allocate(iPondBotLev_col(JY,JX)); iPondBotLev_col=0
+  allocate(iPondFlag_col(JY,JX)); iPondFlag_col =.false.
   allocate(QWatIntLaterFlow_col(JY,JX)); QWatIntLaterFlow_col=0._r8
   allocate(Rain2ExposedSurf_col(JY,JX)); Rain2ExposedSurf_col=0._r8
   allocate(RainPrec2Sno_col(JY,JX)); RainPrec2Sno_col = 0._r8
@@ -148,7 +151,7 @@ module SoilWaterDataType
   allocate(VLWatMicPM_vr(60,0:JZ,JY,JX));VLWatMicPM_vr=0._r8
   allocate(VLWatMacPM_vr(60,JZ,JY,JX));VLWatMacPM_vr=0._r8
   allocate(VLsoiAirPM_vr(60,0:JZ,JY,JX));VLsoiAirPM_vr=0._r8
-  allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
+  allocate(FILMM_vr(60,0:JZ,JY,JX));FILMM_vr=0._r8
   allocate(WaterTBLSlope_col(JY,JX));       WaterTBLSlope_col=0._r8
   allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
   allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
@@ -220,6 +223,8 @@ module SoilWaterDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(iPondBotLev_col)
+  call destroy(iPondFlag_col)
   call destroy(QWatIntLaterFlow_col)
   call destroy(Rain2ExposedSurf_col)
   call destroy(RainPrec2Sno_col)
@@ -248,7 +253,7 @@ module SoilWaterDataType
   call destroy(VLWatMicPM_vr)
   call destroy(VLWatMacPM_vr)
   call destroy(VLsoiAirPM_vr)
-  call destroy(FILM)
+  call destroy(FILMM_vr)
   call destroy(WaterTBLSlope_col)
   call destroy(WtblDepzTile_col)
   call destroy(TileWaterTable_col)

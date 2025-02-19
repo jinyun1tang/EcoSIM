@@ -461,7 +461,7 @@ module SoilBGCNLayMod
       DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
     ENDDO
     DO NE=1,NumPlantChemElms
-      ORGM(NE)=ORGM(NE)++SorbedOM_vr(NE,K,L,NY,NX)
+      ORGM(NE)=ORGM(NE)+SorbedOM_vr(NE,K,L,NY,NX)
     ENDDO
     !add acetate
     ORGM(ielmc)=ORGM(ielmc)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    

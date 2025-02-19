@@ -550,12 +550,12 @@
     LeafElmntNode_brch       => plt_biom%LeafElmntNode_brch,        &
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,            &
     LeafProteinCNode_brch    => plt_biom%LeafProteinCNode_brch,     &
-    LeafAreaNode_brch        => plt_morph%LeafAreaNode_brch         &
+    LeafNodeArea_brch        => plt_morph%LeafNodeArea_brch         &
   )
   DO K=1,MaxNodesPerBranch1
-    IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ)&
+    IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ)&
       .AND.LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      ProteinPerLeafArea=LeafProteinCNode_brch(K,NB,NZ)/LeafAreaNode_brch(K,NB,NZ)
+      ProteinPerLeafArea=LeafProteinCNode_brch(K,NB,NZ)/LeafNodeArea_brch(K,NB,NZ)
     ELSE
       ProteinPerLeafArea=0.0_r8
     ENDIF
@@ -650,7 +650,7 @@
 !     FOR EACH NODE
 !
 !     iPlantBranchState_brch=branch life flag:0=living,1=dead
-!     LeafAreaNode_brch,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
+!     LeafNodeArea_brch,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
 !     ProteinPerLeafArea=leaf protein surficial density
 !
   if(lverb)write(*,*)NB,NZ,'PhotosisOnLiveBranch'

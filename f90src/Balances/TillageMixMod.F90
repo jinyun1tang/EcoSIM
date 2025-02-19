@@ -6,6 +6,7 @@ module TillageMixMod
   use minimathmod,      only : AZMAX1
   use SoilBGCNLayMod,   only : sumLitrOMLayL, sumORGMLayL
   use EcoSIMCtrlMod,    only : salt_model
+  use DebugToolMod
   use EcosimConst
   use SOMDataType
   USE GridDataType
@@ -35,6 +36,7 @@ module TillageMixMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
+  character(len=*), parameter :: subname='ApplyTillageMixing'
   integer :: K,N,M,L,LL,NGL,NTS
   real(r8) :: TDOMH(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
   real(r8) :: FracTillCorp,CORP0,XCORP0,DCORPZ
@@ -51,6 +53,7 @@ module TillageMixMod
 
 !     begin_execution
 !
+  call PrintInfo('beg '//subname)
   !DCORP=soil mixing fraction with tillage
   !XCORP=factor for surface litter incorporation and soil mixing
 
@@ -211,7 +214,6 @@ module TillageMixMod
       VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
       TKS_vr(L,NY,NX) = (ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)
-      TCS_vr(L,NY,NX)    = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDIF
   ENDDO
 
@@ -224,130 +226,131 @@ module TillageMixMod
 !     EXTENT OF MIXING
 
     !
-    FracTillCorp                = 1.0_r8-XTillCorp_col(NY,NX)
+  FracTillCorp                = 1.0_r8-XTillCorp_col(NY,NX)
 
 !
 !     TEMPORARY ACCUMULATORS
 !
-    TNFNIH            = 0.0_r8
-    TZNFN2       = 0.0_r8
-    TZNFNI       = 0.0_r8
-    ZNHUX0       = 0.0_r8
-    ZNHUXI       = 0.0_r8
-    ZNFNX0       = 0.0_r8
+  TNFNIH            = 0.0_r8
+  TZNFN2       = 0.0_r8
+  TZNFNI       = 0.0_r8
+  ZNHUX0       = 0.0_r8
+  ZNHUXI       = 0.0_r8
+  ZNFNX0       = 0.0_r8
 
 !   CORP0: Fraction of material being mixed
-    CORP0=1.0_r8-XCORP0   
+  CORP0=1.0_r8-XCORP0   
 
-    DO K=1,micpar%NumOfLitrCmplxs
-      DO idom=idom_beg,idom_end
-        TDOMH(idom,K)  = DOM_MacP_vr(idom,K,0,NY,NX)*CORP0
-  !
-  !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
-  !
-        DOM_MacP_vr(idom,K,0,NY,NX) = DOM_MacP_vr(idom,K,0,NY,NX)*XCORP0
-      enddo 
-    ENDDO
+  DO K=1,micpar%NumOfLitrCmplxs
+    DO idom=idom_beg,idom_end
+      TDOMH(idom,K)  = DOM_MacP_vr(idom,K,0,NY,NX)*CORP0
+!
+!     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
+!
+      DOM_MacP_vr(idom,K,0,NY,NX) = DOM_MacP_vr(idom,K,0,NY,NX)*XCORP0
+    enddo 
+  ENDDO
 
-    TZNFNG = ZNFNI_vr(0,NY,NX)*CORP0
-    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(0,NY,NX))
-    ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(0,NY,NX))
-    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(0,NY,NX))
+  TZNFNG = ZNFNI_vr(0,NY,NX)*CORP0
+  ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(0,NY,NX))
+  ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(0,NY,NX))
+  ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(0,NY,NX))
 
 !
 !     REDISTRIBUTE SOIL STATE VARIABLES DURING TILLAGE
 !
 !     ACCUMULATE SOIL STATE VARIABLES WITHIN TILLAGE MIXING ZONE
 !
-    D100: DO L=NU(NY,NX),NL(NY,NX)
-      !if current layer is within the tillage depth
-      tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX).LT.DCORPZ .AND. DLYR_3D(3,L,NY,NX).GT.ZERO
-      if(.not.tillTestL)exit
+  D100: DO L=NU(NY,NX),NL(NY,NX)
+    !if current layer is within the tillage depth
+    tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX).LT.DCORPZ .AND. DLYR_3D(3,L,NY,NX).GT.ZERO
+    if(.not.tillTestL)exit
 !     TL: fraction of layer L over the tillage zone
 !     TI: fraction of layer L being tilled
-      TL = AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
-      FI1 = TL/DCORPZ
-      TI1 = AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
+    TL = AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
+    FI1 = TL/DCORPZ
+    TI1 = AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
 
-      ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(L,NY,NX))
-      ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(L,NY,NX))
-      ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(L,NY,NX))
-      TZNFNI = TZNFNI+ZNFNI_vr(L,NY,NX)
-      LL=L      
-    ENDDO D100
+    ZNHUX0 = AMAX1(ZNHUX0,ZNHU0_vr(L,NY,NX))
+    ZNHUXI = AMAX1(ZNHUXI,ZNHUI_vr(L,NY,NX))
+    ZNFNX0 = AMAX1(ZNFNX0,ZNFN0_vr(L,NY,NX))
+    TZNFNI = TZNFNI+ZNFNI_vr(L,NY,NX)
+    LL=L      
+  ENDDO D100
 !
 !     CHANGE SOIL STATE VARIABLES IN TILLAGE MIXING ZONE
 !     TO ACCOUNT FOR REDISTRIBUTION FROM MIXING
 !   but non-P related precipitated species are not mixed, Jinyun Tang, Nov 30,2022
 !   LL is the last layer tilled. 
 
-    D2000: DO  L=NU(NY,NX),LL
-      IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
-        !TL: soil thickness in tillage zone
-        !TI: fraction of current layer being tilled.
-        !FI: fraction of current layer over the overall mixing zone
-        !TX: fraction of current layer not tilled
-        TL=AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
-        FI1=TL/DCORPZ
-        TI1=AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
-        TX=AZMAX1(1.0_r8-TI1)
-        
+  D2000: DO  L=NU(NY,NX),LL
+    IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
+      !TL: soil thickness in tillage zone
+      !TI: fraction of current layer being tilled.
+      !FI: fraction of current layer over the overall mixing zone
+      !TX: fraction of current layer not tilled
+      TL=AMIN1(DLYR_3D(3,L,NY,NX),DCORPZ-(CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)))
+      FI1=TL/DCORPZ
+      TI1=AMIN1(TL/DLYR_3D(3,L,NY,NX),1._r8)
+      TX=AZMAX1(1.0_r8-TI1)
+      
 !     SoilFracAsMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
 
-        !SALT
-        DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
-        ENDDO
+      !SALT
+      DO NTSA=idsalt_beg,idsalt_end
+        trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
+      ENDDO
 
-        ! solute
-        DO NTS=ids_beg,ids_end
-          trcs_solml_vr(NTS,L,NY,NX)=trcs_solml_vr(NTS,L,NY,NX)+FracTillCorp*trcs_soHml_vr(NTS,L,NY,NX)
-        ENDDO
+      ! solute
+      DO NTS=ids_beg,ids_end
+        trcs_solml_vr(NTS,L,NY,NX)=trcs_solml_vr(NTS,L,NY,NX)+FracTillCorp*trcs_soHml_vr(NTS,L,NY,NX)
+      ENDDO
 
-        call MixSoluteMacpore(L,NY,NX)
+      call MixSoluteMacpore(L,NY,NX)
 
-        DO  K=1,jcplx
-          DO idom=idom_beg,idom_end
-            DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
-            DOM_MacP_vr(idom,K,L,NY,NX)=XTillCorp_col(NY,NX)*DOM_MacP_vr(idom,K,L,NY,NX)
-          ENDDO  
-        ENDDO
+      DO  K=1,jcplx
+        DO idom=idom_beg,idom_end
+          DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
+          DOM_MacP_vr(idom,K,L,NY,NX)=XTillCorp_col(NY,NX)*DOM_MacP_vr(idom,K,L,NY,NX)
+        ENDDO  
+      ENDDO
 !
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-        DO K=1,micpar%NumOfLitrCmplxs
-          DO idom=idom_beg,idom_end
-            DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+FI1*TDOMH(idom,K)
-          ENDDO
+      DO K=1,micpar%NumOfLitrCmplxs
+        DO idom=idom_beg,idom_end
+          DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)+FI1*TDOMH(idom,K)
         ENDDO
+      ENDDO
 
-        if(trcs_solml_vr(idg_O2,1,1,1)<0._r8)then
-          print*,'tillage problem',trcs_solml_vr(idg_O2,1,1,1)
-          stop
-        endif
+      if(trcs_solml_vr(idg_O2,1,1,1)<0._r8)then
+        print*,'tillage problem',trcs_solml_vr(idg_O2,1,1,1)
+        stop
+      endif
 
-        ZNHU0_vr(L,NY,NX)=ZNHUX0
-        ZNHUI_vr(L,NY,NX)=ZNHUXI
-        ZNFN0_vr(L,NY,NX)=ZNFNX0
-        ZNFNI_vr(L,NY,NX)=(TI1*ZNFNI_vr(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI_vr(L,NY,NX))+TX*ZNFNI_vr(L,NY,NX)+FI1*TZNFNG)/FI1
-        TZNFN2=TZNFN2+ZNFNI_vr(L,NY,NX)
-      ENDIF
-    ENDDO D2000
+      ZNHU0_vr(L,NY,NX)=ZNHUX0
+      ZNHUI_vr(L,NY,NX)=ZNHUXI
+      ZNFN0_vr(L,NY,NX)=ZNFNX0
+      ZNFNI_vr(L,NY,NX)=(TI1*ZNFNI_vr(L,NY,NX)+FracTillCorp*(FI1*TZNFNI-TI1*ZNFNI_vr(L,NY,NX))+TX*ZNFNI_vr(L,NY,NX)+FI1*TZNFNG)/FI1
+      TZNFN2=TZNFN2+ZNFNI_vr(L,NY,NX)
+    ENDIF
+  ENDDO D2000
 
 ! nitrogen inhibitor
-    ZNFN0_vr(0,NY,NX) = ZNFNX0
-    ZNFNI_vr(0,NY,NX) = ZNFNI_vr(0,NY,NX)*XCORP0
-    TZNFN2         = TZNFN2+TZNFNG
-    TZNFNI         = TZNFNI+TZNFNG
+  ZNFN0_vr(0,NY,NX) = ZNFNX0
+  ZNFNI_vr(0,NY,NX) = ZNFNI_vr(0,NY,NX)*XCORP0
+  TZNFN2         = TZNFN2+TZNFNG
+  TZNFNI         = TZNFNI+TZNFNG
 
-    DO  L=NU(NY,NX),LL
-      IF(TZNFN2.GT.ZERO)THEN
-        ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)*TZNFNI/TZNFN2
-        ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)+0.5_r8*(ZNFN0_vr(L,NY,NX)-ZNFNI_vr(L,NY,NX))
-      ENDIF
-    ENDDO
+  DO  L=NU(NY,NX),LL
+    IF(TZNFN2.GT.ZERO)THEN
+      ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)*TZNFNI/TZNFN2
+      ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)+0.5_r8*(ZNFN0_vr(L,NY,NX)-ZNFNI_vr(L,NY,NX))
+    ENDIF
+  ENDDO
 
+  call PrintInfo('end '//subname)
   end subroutine ApplyTillageMixing
 
 

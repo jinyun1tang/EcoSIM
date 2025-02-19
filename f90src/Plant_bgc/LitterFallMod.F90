@@ -748,7 +748,7 @@ implicit none
     HuskStrutElms_brch        => plt_biom%HuskStrutElms_brch,        &
     EarStrutElms_brch         => plt_biom%EarStrutElms_brch,         &
     GrainStrutElms_brch       => plt_biom%GrainStrutElms_brch,       &
-    StalkBiomassC_brch        => plt_biom%StalkBiomassC_brch,        &
+    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch,        &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     SenecStalkStrutElms_brch  => plt_biom%SenecStalkStrutElms_brch,  &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
@@ -785,7 +785,7 @@ implicit none
 
   D8835: DO NB=1,NumOfBranches_pft(NZ)
     ShootC4NonstC_brch(NB,NZ)                           = 0._r8
-    StalkBiomassC_brch(NB,NZ)                           = 0._r8
+    StalkLiveBiomassC_brch(NB,NZ)                           = 0._r8
     CanopyNodulStrutElms_brch(1:NumPlantChemElms,NB,NZ) = 0._r8
     HuskStrutElms_brch(1:NumPlantChemElms,NB,NZ)        = 0._r8
     EarStrutElms_brch(1:NumPlantChemElms,NB,NZ)         = 0._r8
@@ -838,7 +838,7 @@ implicit none
     LeafElmntNode_brch         => plt_biom%LeafElmntNode_brch,          &
     StalkRsrvElms_brch         => plt_biom%StalkRsrvElms_brch,          &
     SenecStalkStrutElms_brch   => plt_biom%SenecStalkStrutElms_brch,    &
-    StalkBiomassC_brch         => plt_biom%StalkBiomassC_brch,          &
+    StalkLiveBiomassC_brch         => plt_biom%StalkLiveBiomassC_brch,          &
     GrainStrutElms_brch        => plt_biom%GrainStrutElms_brch,         &
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
     HuskStrutElms_brch         => plt_biom%HuskStrutElms_brch,          &
@@ -860,9 +860,9 @@ implicit none
     LeafAreaLive_brch          => plt_morph%LeafAreaLive_brch,          &
     CanopyStalkArea_lbrch      => plt_morph%CanopyStalkArea_lbrch,      &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
-    LeafAreaNode_brch          => plt_morph%LeafAreaNode_brch,          &
+    LeafNodeArea_brch          => plt_morph%LeafNodeArea_brch,          &
     PetoleLensNode_brch        => plt_morph%PetoleLensNode_brch,        &
-    InternodeHeightDying_brch  => plt_morph%InternodeHeightDying_brch,  &
+    InternodeHeightDead_brch  => plt_morph%InternodeHeightDead_brch,  &
     LeafAreaZsec_brch          => plt_morph%LeafAreaZsec_brch,          &
     LiveInterNodeHight_brch    => plt_morph%LiveInterNodeHight_brch,    &
     CanopyLeafAreaZ_pft        => plt_morph%CanopyLeafAreaZ_pft,        &
@@ -906,7 +906,7 @@ implicit none
   HuskStrutElms_brch(1:NumPlantChemElms,NB,NZ)        = 0._r8
   EarStrutElms_brch(1:NumPlantChemElms,NB,NZ)         = 0._r8
   GrainStrutElms_brch(1:NumPlantChemElms,NB,NZ)       = 0._r8
-  StalkBiomassC_brch(NB,NZ)                           = 0._r8
+  StalkLiveBiomassC_brch(NB,NZ)                           = 0._r8
   LeafPetolBiomassC_brch(NB,NZ)                       = 0._r8
   PotentialSeedSites_brch(NB,NZ)                      = 0._r8
   SeedNumSet_brch(NB,NZ)                              = 0._r8
@@ -921,9 +921,9 @@ implicit none
       CMassCO2BundleSheath_node(K,NB,NZ)  = 0._r8
       CMassHCO3BundleSheath_node(K,NB,NZ) = 0._r8
     ENDIF
-    LeafAreaNode_brch(K,NB,NZ)                          = 0._r8
+    LeafNodeArea_brch(K,NB,NZ)                          = 0._r8
     LiveInterNodeHight_brch(K,NB,NZ)                    = 0._r8
-    InternodeHeightDying_brch(K,NB,NZ)                  = 0._r8
+    InternodeHeightDead_brch(K,NB,NZ)                  = 0._r8
     PetoleLensNode_brch(K,NB,NZ)                        = 0._r8
     LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
     PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8

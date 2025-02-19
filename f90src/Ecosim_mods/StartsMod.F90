@@ -517,18 +517,18 @@ module StartsMod
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
-  
+  print*,'RC0ff(NY,NX)',RC0ff(NY,NX)
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
  
-  write(*,*) "InitSoilProfile ------------------------- "
-  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
-  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
-  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
-  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
-  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
-  write(*,*) "----------------------------------------- "
+!  write(*,*) "InitSoilProfile ------------------------- "
+!  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
+!  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
+!  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
+!  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
+!  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
+!  write(*,*) "----------------------------------------- "
 
   call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
@@ -745,11 +745,11 @@ module StartsMod
   !
   CRAIN_lnd           = 0.0_r8
   HEATIN_lnd          = 0.0_r8
-  SurfGas_CO2_lnd     = 0.0_r8
-  SurfGas_O2_lnd      = 0.0_r8
-  SurfGas_H2_lnd      = 0.0_r8
+  SurfGas_lnd(idg_CO2)     = 0.0_r8
+  SurfGas_lnd(idg_O2)      = 0.0_r8
+  SurfGas_lnd(idg_H2)      = 0.0_r8
   TZIN                = 0.0_r8
-  SurfGas_N2_lnd      = 0.0_r8
+  SurfGas_lnd(idg_N2)      = 0.0_r8
   TPIN                = 0.0_r8
   tAmendOrgC_lnd      = 0.0_r8
   TORGN               = 0.0_r8
@@ -885,7 +885,7 @@ module StartsMod
 !     begin_execution
   call PrintInfo('beg InitLayerDepths')
 
-  DO  L=0,NL(NY,NX)
+  D111: DO   L=0,NL(NY,NX)
 !
 ! LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
 
@@ -941,15 +941,14 @@ module StartsMod
 !     bulk density is defined only for soil with micropores
 !     bulk soil mass evaluated as micropore volume
       VLSoilMicPMass_vr(L,NY,NX) = SoilBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-!      write(112,*)'bkvl',L,SoilBulkDensity_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX),FracSoiAsMicP_vr(L,NY,NX),&
-!        AREA(3,L,NY,NX),DLYR_3D(3,L,NY,NX)
+
       totRootLenDens_vr(L,NY,NX) = 0.0_r8
     ENDIF
     AREA(1,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
     AREA(2,L,NY,NX) = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
-  ENDDO
-  CumDepz2LayBottom_vr(0,NY,NX)  = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
-  CumLitRDepz_col(NY,NX)        = CumDepz2LayBottom_vr(0,NY,NX)
+  ENDDO D111
+  CumDepz2LayBottom_vr(0,NY,NX) = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
+  CumLitRDepzInit_col(NY,NX)    = CumDepz2LayBottom_vr(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)  = DLYR_3D(1,NL(NY,NX),NY,NX)*DLYR_3D(2,NL(NY,NX),NY,NX)
   call PrintInfo('end InitLayerDepths')
   end associate
@@ -982,9 +981,9 @@ module StartsMod
 
   XNPV      = XNPR*XNPS
   XNPD      = 600.0_r8*dts_gas                     !600. is adjustable
-  dts_wat   = AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
+  dts_wat   = AMIN1(1.0_r8,10.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno   = dts_wat*XNPS
-  XNPB      = dts_wat*XNPR      !vapor flux in litter iteration
+  XNPB      = dts_wat*XNPR                         !vapor flux in litter iteration
   dt_watvap = dts_wat*XNPV
 
   end subroutine set_ecosim_solver

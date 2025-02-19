@@ -16,23 +16,12 @@ implicit none
   real(r8),allocatable ::  trcs_TransptMicP_vr(:,:,:,:)                      !
   real(r8),allocatable ::  trcs_TransptMacP_vr(:,:,:,:)                      !
 
-  real(r8),allocatable ::  TCOQSS(:,:)                        !
-  real(r8),allocatable ::  TCHQSS(:,:)                        !
-  real(r8),allocatable ::  TOXQSS(:,:)                        !
-  real(r8),allocatable ::  TNGQSS(:,:)                        !
-  real(r8),allocatable ::  TN2QSS(:,:)                        !
-  real(r8),allocatable ::  TN4QSS(:,:)                        !
-  real(r8),allocatable ::  TN3QSS(:,:)                        !
-  real(r8),allocatable ::  TNOQSS(:,:)                        !
-  real(r8),allocatable ::  TPOQSS(:,:)                        !
-  real(r8),allocatable ::  TP1QSS(:,:)                        !
-
   real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)                      !
   real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)                      !
 
-  real(r8),allocatable ::  TSANER(:,:)                        !
-  real(r8),allocatable ::  TSILER(:,:)                        !
-  real(r8),allocatable ::  TCLAER(:,:)                        !
+  real(r8),allocatable ::  TSandEros_col(:,:)                        !
+  real(r8),allocatable ::  TSiltEros_col(:,:)                        !
+  real(r8),allocatable ::  TCLAYEros_col(:,:)                        !
   real(r8),allocatable ::  TNH4Eros_col(:,:)                        !
   real(r8),allocatable ::  TNH3Eros_col(:,:)                        !
   real(r8),allocatable ::  TNUreaEros_col(:,:)                        !
@@ -41,8 +30,8 @@ implicit none
   real(r8),allocatable ::  TNH3ErosBand_col(:,:)                        !
   real(r8),allocatable ::  TNUreaErosBand_col(:,:)                        !
   real(r8),allocatable ::  TNO3ErosBand_col(:,:)                        !
-  real(r8),allocatable ::  trcx_TER(:,:,:)                         !
-  real(r8),allocatable ::  trcp_TER(:,:,:)                        !
+  real(r8),allocatable ::  trcx_TER_col(:,:,:)                         !
+  real(r8),allocatable ::  trcp_TER_col(:,:,:)                        !
   real(r8),allocatable ::  tErosionSedmLoss_col(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)                       !
@@ -58,17 +47,17 @@ implicit none
   real(r8),allocatable ::  VLWatMacP2_vr(:,:,:)                       !local copy of soil water in macropore
   real(r8),allocatable ::  VLiceMacP2_vr(:,:,:)                       !local copy of soil ice in macropore
 
-  real(r8),allocatable :: TOMEERhetr(:,:,:,:,:)
+  real(r8),allocatable :: TOMEERhetr_col(:,:,:,:,:)
 
-  real(r8),allocatable :: TOMEERauto(:,:,:,:)
+  real(r8),allocatable :: TOMEERauto_col(:,:,:,:)
  
   real(r8),allocatable ::  DOM_Transp2Micp_vr(:,:,:,:,:)
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
-  real(r8),allocatable ::  TOMQRS(:,:,:,:)
-  real(r8),allocatable ::  TORMER(:,:,:,:,:)
-  real(r8),allocatable ::  TOHMER(:,:,:,:)
-  real(r8),allocatable ::  TOSMER(:,:,:,:,:)
-  real(r8),allocatable ::  TOSAER(:,:,:,:)
+  real(r8),allocatable ::  TOMQRS_col(:,:,:,:)
+  real(r8),allocatable ::  TORMER_col(:,:,:,:,:)
+  real(r8),allocatable ::  TOHMER_col(:,:,:,:)
+  real(r8),allocatable ::  TOSMER_col(:,:,:,:,:)
+  real(r8),allocatable ::  TOSAER_col(:,:,:,:)
 
   real(r8) :: TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
   DATA TDORGC,TDayLenthPrevC/0.0,0.0/
@@ -86,29 +75,12 @@ implicit none
   allocate(trcs_TransptMacP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_TransptMacP_vr=0._r8
   allocate(Gas_AdvDif_Flx_vr(idg_beg:idg_NH3,JZ,JY,JX));   Gas_AdvDif_Flx_vr=0._r8
 
-
-!  allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
-!  allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
-!  allocate(TFLWI(JS,JY,JX));    TFLWI=0._r8
-!  allocate(THFLWW(JS,JY,JX));   THFLWW=0._r8
-
-  allocate(TCOQSS(JY,JX));      TCOQSS=0._r8
-  allocate(TCHQSS(JY,JX));      TCHQSS=0._r8
-  allocate(TOXQSS(JY,JX));      TOXQSS=0._r8
-  allocate(TNGQSS(JY,JX));      TNGQSS=0._r8
-  allocate(TN2QSS(JY,JX));      TN2QSS=0._r8
-  allocate(TN4QSS(JY,JX));      TN4QSS=0._r8
-  allocate(TN3QSS(JY,JX));      TN3QSS=0._r8
-  allocate(TNOQSS(JY,JX));      TNOQSS=0._r8
-  allocate(TPOQSS(JY,JX));      TPOQSS=0._r8
-  allocate(TP1QSS(JY,JX));      TP1QSS=0._r8
-
   allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MicP_vr=0._r8
   allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MacP_vr=0._r8
 
-  allocate(TSANER(JY,JX));      TSANER=0._r8
-  allocate(TSILER(JY,JX));      TSILER=0._r8
-  allocate(TCLAER(JY,JX));      TCLAER=0._r8
+  allocate(TSandEros_col(JY,JX));      TSandEros_col=0._r8
+  allocate(TSiltEros_col(JY,JX));      TSiltEros_col=0._r8
+  allocate(TCLAYEros_col(JY,JX));      TCLAYEros_col=0._r8
   allocate(TNH4Eros_col(JY,JX));      TNH4Eros_col=0._r8
   allocate(TNH3Eros_col(JY,JX));      TNH3Eros_col=0._r8
   allocate(TNUreaEros_col(JY,JX));      TNUreaEros_col=0._r8
@@ -118,8 +90,8 @@ implicit none
   allocate(TNUreaErosBand_col(JY,JX));      TNUreaErosBand_col=0._r8
   allocate(TNO3ErosBand_col(JY,JX));      TNO3ErosBand_col=0._r8
 
-  allocate(trcx_TER(idx_beg:idx_end,JY,JX));    trcx_TER=0._r8
-  allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
+  allocate(trcx_TER_col(idx_beg:idx_end,JY,JX));    trcx_TER_col=0._r8
+  allocate(trcp_TER_col(idsp_beg:idsp_end,JY,JX));      trcp_TER_col=0._r8
   allocate(trcs_TransptMicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_TransptMicP_vr=0._r8
 
   allocate(tErosionSedmLoss_col(JY,JX));      tErosionSedmLoss_col=0._r8
@@ -133,17 +105,17 @@ implicit none
   allocate(VLiceMicP2_vr(JZ,JY,JX));    VLiceMicP2_vr=0._r8
   allocate(VLWatMacP2_vr(JZ,JY,JX));   VLWatMacP2_vr=0._r8
   allocate(VLiceMacP2_vr(JZ,JY,JX));   VLiceMacP2_vr=0._r8
-  allocate(TOMEERhetr(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr=0._r8
+  allocate(TOMEERhetr_col(NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,JY,JX)); TOMEERhetr_col=0._r8
 
-  allocate(TOMEERauto(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto=0._r8
+  allocate(TOMEERauto_col(NumPlantChemElms,1:NumLiveAutoBioms,JY,JX));TOMEERauto_col=0._r8
 
   allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_vr=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
-  allocate(TOMQRS(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS=0._r8
-  allocate(TORMER(NumPlantChemElms,ndbiomcp,1:jcplx,JY,JX));TORMER=0._r8
-  allocate(TOHMER(idom_beg:idom_end,1:jcplx,JY,JX));TOHMER=0._r8
-  allocate(TOSMER(NumPlantChemElms,jsken,1:jcplx,JY,JX));TOSMER=0._r8
-  allocate(TOSAER(jsken,1:jcplx,JY,JX));TOSAER=0._r8
+  allocate(TOMQRS_col(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS_col=0._r8
+  allocate(TORMER_col(NumPlantChemElms,ndbiomcp,1:jcplx,JY,JX));TORMER_col=0._r8
+  allocate(TOHMER_col(idom_beg:idom_end,1:jcplx,JY,JX));TOHMER_col=0._r8
+  allocate(TOSMER_col(NumPlantChemElms,jsken,1:jcplx,JY,JX));TOSMER_col=0._r8
+  allocate(TOSAER_col(jsken,1:jcplx,JY,JX));TOSAER_col=0._r8
 
   end subroutine InitTflxType
 
@@ -154,15 +126,14 @@ implicit none
 
   implicit none
 
-  call destroy(trcx_TER)
-
-  call destroy(TOMEERhetr)
-  call destroy(TOMEERauto)
-  call destroy(TOMQRS)
-  call destroy(TORMER)
-  call destroy(TOHMER)
-  call destroy(TOSMER)
-  call destroy(TOSAER)
+  call destroy(trcx_TER_col)
+  call destroy(TOMEERhetr_col)
+  call destroy(TOMEERauto_col)
+  call destroy(TOMQRS_col)
+  call destroy(TORMER_col)
+  call destroy(TOHMER_col)
+  call destroy(TOSMER_col)
+  call destroy(TOSAER_col)
   call destroy(trcSalt_Flo2MicP_vr)
   call destroy(trcs_TransptMicP_vr)
   call destroy(trcSalt_Flo2MacP_vr)
@@ -173,20 +144,9 @@ implicit none
 
   call destroy(trcs_TransptMacP_vr)
 
-  call destroy(TCOQSS)
-  call destroy(TCHQSS)
-  call destroy(TOXQSS)
-  call destroy(TNGQSS)
-  call destroy(TN2QSS)
-  call destroy(TN4QSS)
-  call destroy(TN3QSS)
-  call destroy(TNOQSS)
-  call destroy(TPOQSS)
-  call destroy(TP1QSS)
-
-  call destroy(TSANER)
-  call destroy(TSILER)
-  call destroy(TCLAER)
+  call destroy(TSandEros_col)
+  call destroy(TSiltEros_col)
+  call destroy(TCLAYEros_col)
   call destroy(TNH4Eros_col)
   call destroy(TNH3Eros_col)
   call destroy(TNUreaEros_col)
@@ -208,7 +168,7 @@ implicit none
   call destroy(VLiceMacP2_vr)
   call destroy(DOM_Transp2Micp_vr)
   call destroy(DOM_Transp2Macp_flx)
-  call destroy(trcp_TER)
+  call destroy(trcp_TER_col)
   call destroy(Gas_AdvDif_Flx_vr)
 
   end subroutine DestructTflxType

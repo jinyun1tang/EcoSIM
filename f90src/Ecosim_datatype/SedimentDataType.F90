@@ -10,31 +10,31 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable ::  TSED(:,:)                         !erosion rate [Mg d-2 t-1]
-  real(r8),target,allocatable ::  SoilDetachability4Erosion1(:,:)                         !soil detachment, [-]
-  real(r8),target,allocatable ::  SoilDetachability4Erosion2(:,:)                         !soil detachability
+  real(r8),target,allocatable ::  SoilDetachability4Erosion1(:,:)   !soil detachment, [-]
+  real(r8),target,allocatable ::  SoilDetachability4Erosion2(:,:)   !soil detachability
   real(r8),target,allocatable ::  CER(:,:)                          !soil detachment/deposition, [-]
   real(r8),target,allocatable ::  XER(:,:)                          !soil detachment/deposition, [-]
-  real(r8),target,allocatable ::  ParticleDensitySurfLay(:,:)       !particle density of surface layer
-  real(r8),target,allocatable ::  VLS(:,:)                          !hourly sinking rate
+  real(r8),target,allocatable ::  PrtcleDensitySurfLay_col(:,:)       !particle density of surface layer
+  real(r8),target,allocatable ::  VLS_col(:,:)                          !hourly sinking rate
   real(r8),target,allocatable ::  SED(:,:)                          !sediment transport, [Mg d-2 h-1]
-  real(r8),target,allocatable ::  XSANER(:,:,:,:)                   !total sand erosion , [Mg d-2 h-1]
-  real(r8),target,allocatable ::  XSILER(:,:,:,:)                   !total silt erosion , [Mg d-2 h-1]
-  real(r8),target,allocatable ::  XCLAER(:,:,:,:)                   !total clay erosion , [Mg d-2 h-1]
-  real(r8),target,allocatable ::  XNH4ER(:,:,:,:)                   !total NH4 fertilizer erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNH3ER(:,:,:,:)                   !total NH3 fertilizer erosion non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNHUER(:,:,:,:)                   !total urea fertilizer erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNO3ER(:,:,:,:)                   !total NO3 fertilizer erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNH4EB(:,:,:,:)                   !total NH4 fertilizer erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNH3EB(:,:,:,:)                   !total NH3 fertilizer erosion band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNHUEB(:,:,:,:)                   !total urea fertilizer erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNO3EB(:,:,:,:)                   !total NO3 fertilizer erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  trcx_XER(:,:,:,:,:)               !total adsorbed sediment erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  trcp_ER(:,:,:,:,:)                !total adsorbed ALOH3  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  cumSedErosion(:,:,:,:)            !sediment erosion, [Mg d-2 h-1]
-  real(r8),target,allocatable ::  ORMER(:,:,:,:,:,:,:)                !microbial residue C  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OHMER(:,:,:,:,:,:)                  !adsorbed C  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OSMER(:,:,:,:,:,:,:)                !humus C  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  OSAER(:,:,:,:,:,:)                !colonized humus C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  XSand_Eros_2D(:,:,:,:)            !total sand erosion , [Mg d-2 h-1]
+  real(r8),target,allocatable ::  XSilt_Eros_2D(:,:,:,:)            !total silt erosion , [Mg d-2 h-1]
+  real(r8),target,allocatable ::  XClay_Eros_2D(:,:,:,:)            !total clay erosion , [Mg d-2 h-1]
+  real(r8),target,allocatable ::  XNH4Soil_Eros_2D(:,:,:,:)         !total NH4 fertilizer erosion non-band , [g d-2 h-1]
+  real(r8),target,allocatable ::  XNH3Soil_Eros_2D(:,:,:,:)         !total NH3 fertilizer erosion non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  XUreaSoil_Eros_2D(:,:,:,:)        !total urea fertilizer erosion non-band , [g d-2 h-1]
+  real(r8),target,allocatable ::  XNO3Soil_Eros_2D(:,:,:,:)         !total NO3 fertilizer erosion non-band , [g d-2 h-1]
+  real(r8),target,allocatable ::  XNH4Band_Eros_2D(:,:,:,:)         !total NH4 fertilizer erosion band , [g d-2 h-1]
+  real(r8),target,allocatable ::  XNH3Band_Eros_2D(:,:,:,:)         !total NH3 fertilizer erosion band, [g d-2 h-1]
+  real(r8),target,allocatable ::  XUreaBand_Eros_2D(:,:,:,:)        !total urea fertilizer erosion band , [g d-2 h-1]
+  real(r8),target,allocatable ::  XNO3Band_Eros_2D(:,:,:,:)         !total NO3 fertilizer erosion band , [g d-2 h-1]
+  real(r8),target,allocatable ::  trcx_Eros_2D(:,:,:,:,:)           !total adsorbed sediment erosion non-band , [g d-2 h-1]
+  real(r8),target,allocatable ::  trcp_Eros_2D(:,:,:,:,:)           !total adsorbed ALOH3  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  cumSed_Eros_2D(:,:,:,:)           !sediment erosion, [Mg d-2 h-1]
+  real(r8),target,allocatable ::  OMBioResdu_Eros_2D(:,:,:,:,:,:,:) !microbial residue C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  SorbedOM_Eros_2D(:,:,:,:,:,:)     !adsorbed C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  SolidOM_Eros_2D(:,:,:,:,:,:,:)    !humus C  erosion , [g d-2 h-1]
+  real(r8),target,allocatable ::  SolidOMAct_Eros_2D(:,:,:,:,:,:)   !colonized humus C  erosion , [g d-2 h-1]
   private :: InitAllocate
 
   contains
@@ -57,27 +57,27 @@ implicit none
   allocate(SoilDetachability4Erosion2(JY,JX));        SoilDetachability4Erosion2=0._r8
   allocate(CER(JY,JX));         CER=0._r8
   allocate(XER(JY,JX));         XER=0._r8
-  allocate(ParticleDensitySurfLay(JY,JX));      ParticleDensitySurfLay=0._r8
-  allocate(VLS(JY,JX));         VLS=0._r8
+  allocate(PrtcleDensitySurfLay_col(JY,JX));      PrtcleDensitySurfLay_col=0._r8
+  allocate(VLS_col(JY,JX));         VLS_col=0._r8
   allocate(SED(JY,JX));         SED=0._r8
-  allocate(XSANER(2,2,JV,JH));  XSANER=0._r8
-  allocate(XSILER(2,2,JV,JH));  XSILER=0._r8
-  allocate(XCLAER(2,2,JV,JH));  XCLAER=0._r8
-  allocate(XNH4ER(2,2,JV,JH));  XNH4ER=0._r8
-  allocate(XNH3ER(2,2,JV,JH));  XNH3ER=0._r8
-  allocate(XNHUER(2,2,JV,JH));  XNHUER=0._r8
-  allocate(XNO3ER(2,2,JV,JH));  XNO3ER=0._r8
-  allocate(XNH4EB(2,2,JV,JH));  XNH4EB=0._r8
-  allocate(XNH3EB(2,2,JV,JH));  XNH3EB=0._r8
-  allocate(XNHUEB(2,2,JV,JH));  XNHUEB=0._r8
-  allocate(XNO3EB(2,2,JV,JH));  XNO3EB=0._r8
-  allocate(trcx_XER(idx_beg:idx_end,2,2,JV,JH));   trcx_XER=0._r8
-  allocate(trcp_ER(idsp_beg:idsp_end,2,2,JV,JH));  trcp_ER=0._r8
-  allocate(cumSedErosion(2,2,JV,JH));  cumSedErosion=0._r8
-  allocate(ORMER(NumPlantChemElms,ndbiomcp,1:jcplx,2,2,JV,JH));ORMER=0._r8
-  allocate(OHMER(idom_beg:idom_end,1:jcplx,2,2,JV,JH));OHMER=0._r8
-  allocate(OSMER(NumPlantChemElms,jsken,1:jcplx,2,2,JV,JH));OSMER=0._r8
-  allocate(OSAER(jsken,1:jcplx,2,2,JV,JH));OSAER=0._r8
+  allocate(XSand_Eros_2D(2,2,JV,JH));  XSand_Eros_2D=0._r8
+  allocate(XSilt_Eros_2D(2,2,JV,JH));  XSilt_Eros_2D=0._r8
+  allocate(XClay_Eros_2D(2,2,JV,JH));  XClay_Eros_2D=0._r8
+  allocate(XNH4Soil_Eros_2D(2,2,JV,JH));  XNH4Soil_Eros_2D=0._r8
+  allocate(XNH3Soil_Eros_2D(2,2,JV,JH));  XNH3Soil_Eros_2D=0._r8
+  allocate(XUreaSoil_Eros_2D(2,2,JV,JH));  XUreaSoil_Eros_2D=0._r8
+  allocate(XNO3Soil_Eros_2D(2,2,JV,JH));  XNO3Soil_Eros_2D=0._r8
+  allocate(XNH4Band_Eros_2D(2,2,JV,JH));  XNH4Band_Eros_2D=0._r8
+  allocate(XNH3Band_Eros_2D(2,2,JV,JH));  XNH3Band_Eros_2D=0._r8
+  allocate(XUreaBand_Eros_2D(2,2,JV,JH));  XUreaBand_Eros_2D=0._r8
+  allocate(XNO3Band_Eros_2D(2,2,JV,JH));  XNO3Band_Eros_2D=0._r8
+  allocate(trcx_Eros_2D(idx_beg:idx_end,2,2,JV,JH));   trcx_Eros_2D=0._r8
+  allocate(trcp_Eros_2D(idsp_beg:idsp_end,2,2,JV,JH));  trcp_Eros_2D=0._r8
+  allocate(cumSed_Eros_2D(2,2,JV,JH));  cumSed_Eros_2D=0._r8
+  allocate(OMBioResdu_Eros_2D(NumPlantChemElms,ndbiomcp,1:jcplx,2,2,JV,JH));OMBioResdu_Eros_2D=0._r8
+  allocate(SorbedOM_Eros_2D(idom_beg:idom_end,1:jcplx,2,2,JV,JH));SorbedOM_Eros_2D=0._r8
+  allocate(SolidOM_Eros_2D(NumPlantChemElms,jsken,1:jcplx,2,2,JV,JH));SolidOM_Eros_2D=0._r8
+  allocate(SolidOMAct_Eros_2D(jsken,1:jcplx,2,2,JV,JH));SolidOMAct_Eros_2D=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -86,32 +86,32 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
-  call destroy(trcp_ER)
-  call destroy(trcx_XER)
+  call destroy(trcp_Eros_2D)
+  call destroy(trcx_Eros_2D)
   call destroy(TSED)
   call destroy(SoilDetachability4Erosion1)
   call destroy(SoilDetachability4Erosion2)
   call destroy(CER)
   call destroy(XER)
-  call destroy(ParticleDensitySurfLay)
-  call destroy(VLS)
+  call destroy(PrtcleDensitySurfLay_col)
+  call destroy(VLS_col)
   call destroy(SED)
-  call destroy(XSANER)
-  call destroy(XSILER)
-  call destroy(XCLAER)
-  call destroy(XNH4ER)
-  call destroy(XNH3ER)
-  call destroy(XNHUER)
-  call destroy(XNO3ER)
-  call destroy(XNH4EB)
-  call destroy(XNH3EB)
-  call destroy(XNHUEB)
-  call destroy(XNO3EB)
-  call destroy(cumSedErosion)
-  call destroy(ORMER)
-  call destroy(OHMER)
-  call destroy(OSMER)
-  call destroy(OSAER)
+  call destroy(XSand_Eros_2D)
+  call destroy(XSilt_Eros_2D)
+  call destroy(XClay_Eros_2D)
+  call destroy(XNH4Soil_Eros_2D)
+  call destroy(XNH3Soil_Eros_2D)
+  call destroy(XUreaSoil_Eros_2D)
+  call destroy(XNO3Soil_Eros_2D)
+  call destroy(XNH4Band_Eros_2D)
+  call destroy(XNH3Band_Eros_2D)
+  call destroy(XUreaBand_Eros_2D)
+  call destroy(XNO3Band_Eros_2D)
+  call destroy(cumSed_Eros_2D)
+  call destroy(OMBioResdu_Eros_2D)
+  call destroy(SorbedOM_Eros_2D)
+  call destroy(SolidOM_Eros_2D)
+  call destroy(SolidOMAct_Eros_2D)
   end subroutine DestructSedimentData
 
 

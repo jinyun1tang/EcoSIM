@@ -1,6 +1,8 @@
 module BoundaryTranspMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: isclose, AZMAX1
+  use TracerPropMod, only: MolecularWeight
+  use ClimForcDataType
   use DebugToolMod
   use GridConsts
   USE SoilPropertyDataType
@@ -188,6 +190,7 @@ module BoundaryTranspMod
 !------------------------------------------------------------------------------------------
 
   subroutine SurfTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
+
   implicit none
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
@@ -224,12 +227,12 @@ module BoundaryTranspMod
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-!
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_FloXSurRunoff_2D(idom,K,N,NN,M5,M4)=DOM_FloXSurRunoff_2D(idom,K,N,NN,M5,M4)+DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,M5,M4)
         enddo
       enddo
+
       DO idg=idg_beg,idg_NH3
         trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4)
       ENDDO
@@ -247,13 +250,9 @@ module BoundaryTranspMod
         DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
 
-      trcg_FloXSurRof_flxM_2DH(idg_CO2,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCOU
-      trcg_FloXSurRof_flxM_2DH(idg_CH4,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CCHU
-      trcg_FloXSurRof_flxM_2DH(idg_O2,N,NN,M5,M4)  = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*COXU
-      trcg_FloXSurRof_flxM_2DH(idg_N2,N,NN,M5,M4)  = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CNNU
-      trcg_FloXSurRof_flxM_2DH(idg_N2O,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*CN2U
-      trcg_FloXSurRof_flxM_2DH(idg_H2,N,NN,M5,M4)  = 0.0_r8
-      trcg_FloXSurRof_flxM_2DH(idg_NH3,N,NN,M5,M4) = 0.0_r8
+      DO idg=idg_beg,idg_NH3
+        trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*trcg_rain_mole_conc_col(idg,M5,M4)*MolecularWeight(idg)
+      ENDDO
 
       trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
 
@@ -279,6 +278,7 @@ module BoundaryTranspMod
     trcn_SnowDrift_flxM_2D(ids_H1PO4,N,M5,M4)       = 0.0_r8
     trcn_SnowDrift_flxM_2D(ids_H2PO4,N,M5,M4)       = 0.0_r8
   ENDIF
+
   end subroutine SurfTracerRunoffXYM
 ! ----------------------------------------------------------------------
 
@@ -326,7 +326,6 @@ module BoundaryTranspMod
   ENDIF
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
-!
 !
   IF(NN.EQ.iOutflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
     .OR. NN.EQ.iInflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
@@ -447,11 +446,11 @@ module BoundaryTranspMod
     enddo
 
     DO idg=idg_beg,idg_NH3
-      trcg_SurfRunoff_flxM(idg,N2,N1)=trcg_SurfRunoff_flxM(idg,N2,N1)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,N2,N1)
+      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,N2,N1)
     ENDDO
 
     DO ids=ids_nut_beg,ids_nuts_end
-      trcn_SurfRunoff_flxM(ids,N2,N1)=trcn_SurfRunoff_flxM(ids,N2,N1)+trcn_FloXSurRof_flxM_2DH(ids,N,NN,N2,N1)
+      trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)+trcn_FloXSurRof_flxM_2DH(ids,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
@@ -463,11 +462,11 @@ module BoundaryTranspMod
       enddo
 
       DO idg=idg_beg,idg_NH3
-        trcg_SurfRunoff_flxM(idg,N2,N1)=trcg_SurfRunoff_flxM(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5,N4)
+        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5,N4)
       ENDDO
 
       DO ids=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flxM(ids,N2,N1)=trcn_SurfRunoff_flxM(ids,N2,N1)-trcn_FloXSurRof_flxM_2DH(ids,N,NN,N5,N4)
+        trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)-trcn_FloXSurRof_flxM_2DH(ids,N,NN,N5,N4)
       ENDDO
     ENDIF
 
@@ -478,11 +477,11 @@ module BoundaryTranspMod
         enddo
       enddo
       DO idg=idg_beg,idg_NH3
-        trcg_SurfRunoff_flxM(idg,N2,N1)=trcg_SurfRunoff_flxM(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5B,N4B)
+        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5B,N4B)
       ENDDO
 
       DO ids=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flxM(ids,N2,N1)=trcn_SurfRunoff_flxM(ids,N2,N1)-trcn_FloXSurRof_flxM_2DH(ids,N,NN,N5B,N4B)
+        trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)-trcn_FloXSurRof_flxM_2DH(ids,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   enddo

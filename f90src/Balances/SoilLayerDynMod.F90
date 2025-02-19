@@ -7,6 +7,7 @@ module SoilLayerDynMod
   use minimathmod,       only: AZMAX1
   use UnitMod,           only: units
   use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
+  use DebugToolMod
   USE TFlxTypeMod      
   use RootDataType
   use GridDataType
@@ -36,13 +37,16 @@ implicit none
   real(r8) :: WDPOBDL,WDNOBD1,WDPOBD0,WDPOBD1
   real(r8) :: WDNHBDL,WDNHBD0,WDNHBD1,WDNOBDL,WDNOBD0
   real(r8), PARAMETER :: ZEROC=0.1E-03_r8
-  integer, parameter :: ist_water  = 0   !pond water
-  integer, parameter :: ist_soil   = 1   !soil column
-  integer, parameter :: ich_nochng = 0   !no change in layer thickness
-  integer, parameter :: ich_watlev = 1
-  integer, parameter :: ich_frzthaw= 4
-  integer, parameter :: ich_erosion= 5
-  integer, parameter :: ich_somloss= 6
+  integer, parameter :: ist_water   = 0   !pond water
+  integer, parameter :: ist_soil    = 1   !soil column
+  integer, parameter :: ich_nochng  = 0   !no change in layer thickness
+  integer, parameter :: ich_watlev  = 1
+  integer, parameter :: ich_frzthaw = 4
+  integer, parameter :: ich_erosion = 5
+  integer, parameter :: ich_sombgc  = 6
+  integer, parameter :: iInnerNode  = 1
+  integer, parameter :: iPondShrink = 2
+  integer, parameter :: iPondGrow   = 3
 
   public :: UpdateSoilGrids
   public :: CopyLocalSoilWaterStates
@@ -75,9 +79,10 @@ implicit none
   real(r8),intent(in) :: DORGC_vr(JZ)          !change in organic matter, initial-final
   REAL(R8),INTENT(IN) :: DVLiceMicP_vr(JZ)  !change in ice volume, initial-final
 
+  character(len=*), parameter :: subname = 'UpdateSoilGrids'
   real(r8) :: SoilLayBotEdgeNew_vr(0:JZ)   !edge location after mass update of different processes
   real(r8) :: SoilLayBotEdgeOld_vr(JZ)     !edge location before mass update
-  integer  :: IFLGL(0:JZ,6)   !flag for soil thickness change by different processes
+  integer  :: IFLGL(0:JZ,6)                !flag for soil thickness change by different processes
   real(r8) :: DDLYRX(3)
   integer :: NN,K,M,N,NR,NZ,L
   integer :: L0,L1,NUX,ICHKL,NGL
@@ -85,13 +90,15 @@ implicit none
   real(r8) :: FBO
   real(r8) :: FHO,FWO,FXVOLW
   real(r8) :: FO
-  real(r8) :: DDLYRY(JZ)
+  real(r8) :: DDLYRY(JZ)                   !change in layer thickness compared to the initial layer thickness
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: XVOLWP   !volume of mobile water in litter layer
+  real(r8) :: twat
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
-  if(lverb)write(*,*)'UpdateSoilGrids'
+  call PrintInfo('beg '//subname)
+
   IF(.not. erosion_model)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
 
@@ -101,19 +108,26 @@ implicit none
   !
   !     RECALCULATE SOIL LAYER THICKNESS
   !
+  twat=0._r8
+  DO L=NU(NY,NX),NL(NY,NX)
+    twat=twat+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
+  ENDDO
+
+!  if(I==312 .and. J==22)write(211,*)twat,(L,VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,&
+!    L=NU(NY,NX),NL(NY,NX))
+
   ICHKL=0
   D245: DO L=NU(NY,NX),NL(NY,NX)-1
     !up -> down
     D230: DO NN=1,3
 
-      call UpdateLayerThickness(NN,L,NY,NX,ICHKL,NUX,SoilLayBotEdgeOld_vr,SoilLayBotEdgeNew_vr,IFLGL,DDLYRX,DDLYRY,XVOLWP)
+      call DiagLayerThickChange(I,J,NN,L,NY,NX,ICHKL,NUX,SoilLayBotEdgeOld_vr,SoilLayBotEdgeNew_vr,IFLGL,DDLYRX,DDLYRY,XVOLWP)
       !
       !     TRANSFER STATE VARIABLES BETWEEN LAYERS
-      !
-      !     IF(IFLGL(L,NN).EQ.1)THEN
-      IF(ABS(DDLYRX(NN)).GT.ZERO)THEN
-        !L0,L1: target and source layers
-        call ComputeLayerAllocFs(L,NN,NY,NX,NUX,DDLYRX,IFLGL,FX,FO,L1,L0)
+      !      
+      IF(ABS(DDLYRX(NN)).GT.ZERO)THEN   !surface layer has change
+        !L0,L1: source and target layers
+        call ComputeLayerAllocFs(I,J,L,NN,NY,NX,NUX,DDLYRX,IFLGL,FX,FO,L1,L0)
 
         IF(FX.GT.ZERO)THEN
           iResetSoilProf_col(NY,NX)=itrue
@@ -123,16 +137,15 @@ implicit none
           ! Layer L0 is pond
           IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO)THEN
             call UpdateLayerMaterials(L,L0,L1,NY,NX,NN,FX,FY,SoilLayBotEdgeNew_vr,IFLGL)
-          !layer L0 is soil  
+            !layer L0 is soil  
           ELSE
-
-      !     MOVE ALL MATTER WITH CHANGES IN LAYER DEPTHS
-      !
+            ! MOVE ALL MATTER WITH CHANGES IN LAYER DEPTHS
+            !
             IF(L0.NE.0)THEN
               call MoveFertMinerals(L,L0,L1,NY,NX,FX,FO)
             ENDIF
-
-            call MoveHeatWat(L,L0,L1,NY,NX,FO,FX,XVOLWP,FWO)
+!            if(I==312 .and. J==22)write(211,*)'movehat, L,L0,L1,FO,FX',L,L0,L1,FO,FX,XVOLWP
+            call MoveHeatWat(I,J,L,L0,L1,NY,NX,FO,FX,XVOLWP,FWO)
             !
             !     SOIL FERTILIZER
             !
@@ -150,11 +163,11 @@ implicit none
             ! SOIL ORGANIC MATTER
             call MoveSOM(L0,L1,L,NY,NX,FO,IFLGL)
 
-            IF(NN.EQ.1)THEN
-              IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO.AND.SoilBulkDensity_vr(L1,NY,NX).LE.ZERO &
-                .AND.VLWatMicP_vr(L0,NY,NX)+VLiceMicP_vr(L0,NY,NX).LE.ZEROS(NY,NX))THEN
+            IF(NN.EQ.iInnerNode)THEN
+              IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO .AND. SoilBulkDensity_vr(L1,NY,NX).LE.ZERO & !L0 and L1 are both water
+                .AND. VLWatMicP_vr(L0,NY,NX)+VLiceMicP_vr(L0,NY,NX).LE.ZEROS(NY,NX))THEN
                 CumDepz2LayBottom_vr(L1,NY,NX) = CumDepz2LayBottom_vr(L0,NY,NX)
-                SoilLayBotEdgeNew_vr(L1)                    = SoilLayBotEdgeNew_vr(L0)
+                SoilLayBotEdgeNew_vr(L1)       = SoilLayBotEdgeNew_vr(L0)
               ENDIF
             ENDIF
 
@@ -168,17 +181,27 @@ implicit none
             ENDIF
             IF(L.EQ.NL(NY,NX)-1 .AND. CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)-CumDepz2LayBottom_vr(L,NY,NX).LE.ZEROC)THEN
               CumDepz2LayBottom_vr(L,NY,NX)         = CumDepz2LayBottom_vr(L,NY,NX)+DLYR_3D(3,NL(NY,NX),NY,NX)
-              SoilLayBotEdgeNew_vr(L)                            = SoilLayBotEdgeNew_vr(L)+DLYR_3D(3,NL(NY,NX),NY,NX)
+              SoilLayBotEdgeNew_vr(L)               = SoilLayBotEdgeNew_vr(L)+DLYR_3D(3,NL(NY,NX),NY,NX)
               CumDepz2LayBottom_vr(NL(NY,NX),NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)
-              SoilLayBotEdgeNew_vr(NL(NY,NX))                    = SoilLayBotEdgeNew_vr(L)
-              DLYR_3D(3,NL(NY,NX),NY,NX)           = 0.0_r8
-              NL(NY,NX)                            = L
+              SoilLayBotEdgeNew_vr(NL(NY,NX))       = SoilLayBotEdgeNew_vr(L)
+              DLYR_3D(3,NL(NY,NX),NY,NX)            = 0.0_r8
+              NL(NY,NX)                             = L
             ENDIF
           ENDIF
         ENDIF
       ENDIF
     ENDDO D230
+!    if(I==312 .and. J==22)write(211,*)'laybot',L,NU(NY,NX),NUM(NY,NX),CumDepz2LayBottom_vr(L,NY,NX)
   ENDDO D245
+  twat=0._r8
+  DO L=NU(NY,NX),NL(NY,NX)
+    twat=twat+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
+  ENDDO
+  
+!  if(I==312 .and. J==22)write(211,*)twat,(L,VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,&
+!    L=NU(NY,NX),NL(NY,NX))  
+!  write(111,*)I*1000+J,NY,NX,(L,CumDepz2LayBottom_vr(L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+  call PrintInfo('end '//subname)
   end subroutine UpdateSoilGrids
 !------------------------------------------------------------------------------------------
   subroutine ComputeLayerEdgeChange(I,J,LX,NY,NX,itoplyr_type,DVLiceMicP_vr,DORGC_vr,DDLYX,DDLYR,IFLGL)
@@ -192,223 +215,272 @@ implicit none
   real(r8), intent(inout) :: DDLYX(0:JZ,6)       !displacement of layer upper edge
   real(r8), intent(inout) :: DDLYR(0:JZ,6)       !displacement of layer lower edge
   integer , intent(inout) :: IFLGL(0:JZ,6)       !flag of change type
-  real(r8) :: DLYR_XMicP            !layer thickness (accounting for freeze-thaw) exceeds the grid thickness
-  real(r8) :: DDLEqv_OrgC,DDLEqv_Erosion
-  real(r8) :: DDLWatEqv_IceMicP
-  real(r8) :: DENSJ,DLEqv_MicP
 
     !     POND, from water to soil
     ! a layer is made up of soil micropores+macropores and solid materials (can be zero).
 
   ! Current layer is in water pond
   IF(SoilBulkDensity_vr(LX,NY,NX).LE.ZERO)THEN  
-    !==================================================
-    !Pond
-    !==================================================
-    ! Layer below is soil, or the pond is already evaporated
-    IF(SoilBulkDensity_vr(LX+1,NY,NX).GT.ZERO .OR. itoplyr_type.EQ.ist_soil)THEN   
-      !Compute the excessive layer thickness minus the previous layer thickness    
-      DLYR_XMicP           = DLYR_3D(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
-      DDLYR(LX,ich_watlev) = DDLYX(LX+1,ich_watlev)              !Make a copy of the next layer
-      DDLYX(LX,ich_watlev) = DLYR_XMicP+DDLYX(LX+1,ich_watlev)   !Combine the excessive thickness to layer below
-      IFLGL(LX,ich_watlev) = 2                                   !Mark the change type
+!    if(I==312 .and. J==22)write(211,*)'water',LX
+    call ComputePondEdgeChange(I,J,LX,NY,NX,itoplyr_type,DDLYX,DDLYR,IFLGL)
 
-    !Layer LX+1 above is pond water
-    ELSE        
-      !DLYR_XMicP: non-micropore soil equivalent depth
-      !DLYRI: initial water layer thickness, [m]
-      !Current layer: Compute the excessive layer thickness minus the initial layer thickness   
-      !DLYR_XMicP> 0, shrinking, DLYR_XMicP < 0, expanding, compared to initial layer thickness
-      DLYR_XMicP=DLYRI_3D(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
-
-      !Next layer thickness DLEqv_MicP: water+ice total thickness
-      DLEqv_MicP=(VLWatMicP_vr(LX+1,NY,NX)+VLiceMicP_vr(LX+1,NY,NX))/AREA(3,LX,NY,NX)
-
-      !Current layer is expanding (due to expansion or addition), 
-      !Or current layer is non-shrinking, but the layer below has meaningful thickness
-      IF(DLYR_XMicP.LT.-ZERO .OR. DLEqv_MicP.GT.ZERO)THEN
-        DDLYR(LX,ich_watlev) = AMIN1(DDLYX(LX+1,ich_watlev),DLEqv_MicP)   !lower displacement as the minimum
-        DDLYX(LX,ich_watlev) = DLYR_XMicP+DDLYX(LX+1,ich_watlev)          !Combine the excessive thickness to layer below
-
-        !Layer below has significant thickness
-        IF(DLEqv_MicP.GT.ZERO)THEN
-          IFLGL(LX,ich_watlev)=1
-        !Layer below has no significant thickness
-        ELSE
-          IFLGL(LX,ich_watlev)=2
-        ENDIF
-        !Current layer is shrinking and the layer below does not have meaningful thickness
-      ELSE   
-        DDLYR(LX,ich_watlev) = DDLYX(LX+1,ich_watlev)               !copy the thickness of layer below        
-        !DLYR_XMicP > 0, shrinking, DLYR_XMicP < 0 expanding
-        DLYR_XMicP           = DLYR_3D(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
-        DDLYX(LX,ich_watlev) = DLYR_XMicP+DDLYX(LX+1,ich_watlev)    !Combine the excessive thickness to layer below
-        IFLGL(LX,ich_watlev) = 2
-      ENDIF
-    ENDIF
-
-    !Reach the top layer or the layer above is soil or litter
-    IF(LX.EQ.NU(NY,NX) .OR. SoilBulkDensity_vr(LX-1,NY,NX).GT.ZERO)THEN
-      DDLYX(LX-1,ich_watlev) = DDLYX(LX,ich_watlev)         !copy the current layer thickness to layer above
-      DDLYR(LX-1,ich_watlev) = DDLYX(LX,ich_watlev)         !
-      IFLGL(LX-1,ich_watlev) = 1
-    ENDIF
-    DDLYX(LX,ich_frzthaw) = 0.0_r8
-    DDLYR(LX,ich_frzthaw) = 0.0_r8
-    IFLGL(LX,ich_frzthaw) = ich_nochng
-    DDLYX(LX,ich_erosion) = 0.0_r8
-    DDLYR(LX,ich_erosion) = 0.0_r8
-    IFLGL(LX,ich_erosion) = ich_nochng
-    DDLYX(LX,ich_somloss) = 0.0_r8
-    DDLYR(LX,ich_somloss) = 0.0_r8
-    IFLGL(LX,ich_somloss) = ich_nochng
     !==================================================
     !Current layer is SOIL
     !==================================================
   ELSE
+!    if(I==312 .and. J==22)write(211,*)'soil',LX
+    call FreezeThawSoilEdgeChange(I,J,LX,NY,NX,DVLiceMicP_vr,DDLYX,DDLYR,IFLGL)
 
-    !     FREEZE-THAW
-    !DVLiceMicP: change in ice volume, initial-final
-    !DENSICE: mass density of ice, g/cm3
-    !DENSJ:  void volume added per unit addition of ice (with respect to ice)
-    !the change is put to layer thickness
-    !DDLWatEqv_IceMicP: added thickness change
-    ! 4: there is volume change due to freeze-thaw
-    IF(ABS(DVLiceMicP_vr(LX)).GT.ZEROS(NY,NX))THEN
-      DENSJ             = 1._r8-DENSICE
-      DDLWatEqv_IceMicP = DVLiceMicP_vr(LX)*DENSJ/AREA(3,LX,NY,NX)
+    call ErosionSoilEdgeChange(I,J,LX,NY,NX,DDLYX,DDLYR,IFLGL)
 
-      !Current is layer is at the bottom
-      IF(LX.EQ.NL(NY,NX))THEN
-        !save lower edge displacement for layer LX
-        DDLYR(LX,ich_frzthaw) = 0.0_r8
-        !save upper edge displacement for layer LX
-        DDLYX(LX,ich_frzthaw) = DDLWatEqv_IceMicP
-
-        IFLGL(LX,ich_frzthaw) = ich_nochng
-      !not at the bottom
-      ELSE
-        !obtain the lower edge displacement for layer LX as the upper edge displacement of layer LX+1
-        DDLYR(LX,ich_frzthaw)=DDLYX(LX+1,ich_frzthaw)
-        !    2+DLYRI_3D(3,LX,NY,NX)-DLYR_3D(3,LX,NY,NX)
-        !save upper edge displacement for layer LX
-        DDLYX(LX,ich_frzthaw)=DDLWatEqv_IceMicP+DDLYR(LX,ich_frzthaw)
-        IFLGL(LX,ich_frzthaw)=ich_nochng
-
-        !top soil layer or layer above is water
-        IF(LX.EQ.NU(NY,NX) .OR. SoilBulkDensity_vr(LX-1,NY,NX).LE.ZERO)THEN
-          !upper edge displacement
-          DDLYX(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
-          !lower edge displacement 
-          DDLYR(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
-          !    2+DLYRI_3D(3,LX,NY,NX)-DLYR_3D(3,LX,NY,NX)
-          IFLGL(LX-1,ich_frzthaw)=ich_nochng
-        ENDIF
-      ENDIF
-    ! no freezing-induced change in ice volume 
-    ELSE        
-      DDLWatEqv_IceMicP=0.0_r8
-      IF(LX.EQ.NL(NY,NX))THEN
-        DDLYX(LX,ich_frzthaw) = 0.0_r8
-        DDLYR(LX,ich_frzthaw) = 0.0_r8
-        IFLGL(LX,ich_frzthaw) = ich_nochng
-      ELSE
-        DDLYX(LX,ich_frzthaw) = DDLYX(LX+1,ich_frzthaw)
-        DDLYR(LX,ich_frzthaw) = DDLYX(LX+1,ich_frzthaw)
-        IFLGL(LX,ich_frzthaw) = ich_nochng
-        IF(LX.EQ.NU(NY,NX))THEN
-          DDLYX(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
-          DDLYR(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
-          IFLGL(LX-1,ich_frzthaw) = ich_nochng
-        ENDIF
-      ENDIF
-    ENDIF
-
-    !total change in ice volume
-!      TDVOLI=TDVOLI+DVLiceMicP_vr(LX)
-!      TDLYXF=TDLYXF+DDLWatEqv_IceMicP
-    !========================================================================================
-    !     EROSION model is on
-    !========================================================================================
-    IF((iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
-      .AND. ABS(tErosionSedmLoss_col(NY,NX)).GT.ZEROS(NY,NX))THEN
-!  5:  layer thickness change due to sediment erosion
-      !Bottom layer
-      IF(LX.EQ.NL(NY,NX))THEN
-!         total soil layer reduction due to erosion
-        DDLEqv_Erosion        = -tErosionSedmLoss_col(NY,NX)/(SoilMicPMassLayerMX(NY,NX)/VLSoilPoreMicP_vr(NU(NY,NX),NY,NX))
-        DDLYX(LX,ich_erosion) = DDLEqv_Erosion
-        DDLYR(LX,ich_erosion) = DDLEqv_Erosion
-        IFLGL(LX,ich_erosion) = 1
-      !do nothing to layers other than bottom  
-      ELSE
-        DDLYX(LX,ich_erosion) = 0.0_r8
-        DDLYR(LX,ich_erosion) = 0.0_r8
-        IFLGL(LX,ich_erosion) = ich_nochng
-      ENDIF
-    ELSE
-        DDLYX(LX,ich_erosion) = 0.0_r8
-        DDLYR(LX,ich_erosion) = 0.0_r8
-        IFLGL(LX,ich_erosion) = ich_nochng
-    ENDIF
-
-    !========================================================================================
-    ! Soil layer thickness is changed due to addition/removal of organic matter
-    !========================================================================================
-    ! SOC GAIN OR LOSS, i.e. DORGC_vr(LX) significantly non-zero
-    ! SoilFracAsMacP: macropore fraction
-    ! DDLEqv_OrgC: soil thickness added due to change in organic matter,
-    ! keeping macropore fraction
-    ! SoiBulkDensityt0_vr: initial bulk density,
-    IF((iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
-      .AND. ABS(DORGC_vr(LX)).GT.ZEROS(NY,NX))THEN
-
-      DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX))*SoiBulkDensityt0_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
-
-      ! obtain diagnostics only for NX==1
-!        IF(NX.EQ.1)THEN
-!          TDORGC=TDORGC+DORGC_vr(LX)
-!          TDayLenthPrevC=TDayLenthPrevC+DDLEqv_OrgC
-!        ENDIF
-
-      ! bottom layer, or layer below is water (how is this possible)
-      IF(LX.EQ.NL(NY,NX) .OR. SoilBulkDensity_vr(LX+1,NY,NX).LE.ZERO)THEN
-        DDLYX(LX,ich_somloss) = DDLEqv_OrgC
-        DDLYR(LX,ich_somloss) = 0.0_r8
-        IFLGL(LX,ich_somloss) = 1
-      !not bottom layer and layer below is also soil
-      ELSE          
-        DDLYX(LX,ich_somloss) = DDLEqv_OrgC+DDLYX(LX+1,ich_somloss)
-        DDLYR(LX,ich_somloss) = DDLYX(LX+1,ich_somloss)+DLYRI_3D(3,LX,NY,NX)-DLYR_3D(3,LX,NY,NX)
-        IFLGL(LX,ich_somloss) = 1
-        ! top layer, the layer right above is water
-        IF(LX.EQ.NU(NY,NX).OR.SoilBulkDensity_vr(LX-1,NY,NX).LE.ZERO)THEN
-          DDLYX(LX-1,ich_somloss) = DDLYX(LX,ich_somloss)
-          DDLYR(LX-1,ich_somloss) = DDLYX(LX,ich_somloss)
-          !    2+DLYRI_3D(3,LX,NY,NX)-DLYR_3D(3,LX,NY,NX)
-          IFLGL(LX-1,ich_somloss)=1
-        ENDIF
-      ENDIF
-    !erosion model if off or current layer som change cause no change  
-    ELSE
-      ! bottom layer
-      IF(LX.EQ.NL(NY,NX))THEN
-        DDLYX(LX,ich_somloss) = 0.0_r8
-        DDLYR(LX,ich_somloss) = 0.0_r8
-        IFLGL(LX,ich_somloss) = ich_nochng
-      !non-bottom layer  
-      ELSE
-        DDLYX(LX,ich_somloss) = DDLYX(LX+1,ich_somloss)
-        DDLYR(LX,ich_somloss) = DDLYX(LX+1,ich_somloss)
-        IFLGL(LX,ich_somloss) = ich_nochng
-      ENDIF
-    ENDIF
-    DDLYX(LX,ich_watlev) = 0.0_r8
-    DDLYR(LX,ich_watlev) = 0.0_r8
-    IFLGL(LX,ich_watlev) = ich_nochng
+    call SOMBGCSoilEdgeChange(I,J,LX,NY,NX,DORGC_vr,DDLYX,DDLYR,IFLGL)
+    !no edge displacement due to change in ponding water
+    DDLYX(LX,ich_watlev) = 0.0_r8;DDLYR(LX,ich_watlev) = 0.0_r8;IFLGL(LX,ich_watlev) = ich_nochng
   ENDIF
 
   end subroutine ComputeLayerEdgeChange
+!------------------------------------------------------------------------------------------
+
+  subroutine SOMBGCSoilEdgeChange(I,J,LX,NY,NX,DORGC_vr,DDLYX,DDLYR,IFLGL)
+  ! Soil layer thickness is changed due to addition/removal of organic matter
+  implicit none
+  integer,  intent(in) :: I,J
+  integer,  intent(in) :: LX,NY,NX  
+  real(r8), intent(in) :: DORGC_vr(JZ)             !change in SOM, initial - final    
+  real(r8), intent(inout) :: DDLYX(0:JZ,6)       !displacement of layer upper edge
+  real(r8), intent(inout) :: DDLYR(0:JZ,6)       !displacement of layer lower edge
+  integer , intent(inout) :: IFLGL(0:JZ,6)       !flag of change type
+
+  real(r8) :: DDLEqv_OrgC   !soil thickness added due to change in organic matter
+
+  ! SOC GAIN OR LOSS, i.e. DORGC_vr(LX) significantly non-zero
+  ! keeping macropore fraction
+  ! SoiBulkDensityt0_vr: initial bulk density,
+
+  IF((iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
+    .AND. ABS(DORGC_vr(LX)).GT.ZEROS(NY,NX))THEN
+
+!    DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX))*SoiBulkDensityt0_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
+    !use the new definition, dVol/area
+    DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/(SoiBulkDensityt0_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
+
+    ! LX is bottom layer, or is litter layer
+    IF(LX.EQ.NL(NY,NX) .OR. SoilBulkDensity_vr(LX+1,NY,NX).LE.ZERO)THEN 
+      DDLYX(LX,ich_sombgc) = DDLEqv_OrgC
+      DDLYR(LX,ich_sombgc) = 0.0_r8
+      IFLGL(LX,ich_sombgc) = 1
+      !not bottom layer or litter layer
+    ELSE          
+      DDLYX(LX,ich_sombgc) = DDLEqv_OrgC+DDLYX(LX+1,ich_sombgc)
+      DDLYR(LX,ich_sombgc) = DDLYX(LX+1,ich_sombgc)  !+DLYRI_3D(3,LX,NY,NX)-DLYR_3D(3,LX,NY,NX)
+      IFLGL(LX,ich_sombgc) = 1
+      ! top layer, the layer right above is water
+      IF(LX.EQ.NU(NY,NX) .OR. SoilBulkDensity_vr(LX-1,NY,NX).LE.ZERO)THEN
+        DDLYX(LX-1,ich_sombgc) = DDLYX(LX,ich_sombgc)
+        DDLYR(LX-1,ich_sombgc) = DDLYX(LX,ich_sombgc)
+        IFLGL(LX-1,ich_sombgc)=1
+      ENDIF
+    ENDIF
+  !erosion model if off or current layer som change cause no change  
+  ELSE
+    ! bottom layer
+    IF(LX.EQ.NL(NY,NX))THEN
+      DDLYX(LX,ich_sombgc) = 0.0_r8
+      DDLYR(LX,ich_sombgc) = 0.0_r8
+      IFLGL(LX,ich_sombgc) = ich_nochng
+    !non-bottom layer  
+    ELSE
+      DDLYX(LX,ich_sombgc) = DDLYX(LX+1,ich_sombgc)
+      DDLYR(LX,ich_sombgc) = DDLYX(LX+1,ich_sombgc)
+      IFLGL(LX,ich_sombgc) = ich_nochng
+    ENDIF
+  ENDIF
+  end subroutine SOMBGCSoilEdgeChange  
+!------------------------------------------------------------------------------------------  
+
+  subroutine ErosionSoilEdgeChange(I,J,LX,NY,NX,DDLYX,DDLYR,IFLGL)
+  implicit none
+  integer,  intent(in) :: I,J
+  integer,  intent(in) :: LX,NY,NX
+  real(r8), intent(inout) :: DDLYX(0:JZ,6)       !displacement of layer upper edge
+  real(r8), intent(inout) :: DDLYR(0:JZ,6)       !displacement of layer lower edge
+  integer , intent(inout) :: IFLGL(0:JZ,6)       !flag of change type
+
+  real(r8) :: DDLEqv_Erosion
+  !========================================================================================
+  !     EROSION model is on
+  !========================================================================================
+  IF((iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
+    .AND. ABS(tErosionSedmLoss_col(NY,NX)).GT.ZEROS(NY,NX))THEN
+!  5:  layer thickness change due to sediment erosion
+    !Bottom layer
+    IF(LX.EQ.NL(NY,NX))THEN
+!         total soil layer reduction due to erosion
+      DDLEqv_Erosion        = -tErosionSedmLoss_col(NY,NX)/(SoilMicPMassLayerMX(NY,NX)/VLSoilPoreMicP_vr(NU(NY,NX),NY,NX))
+      DDLYX(LX,ich_erosion) = DDLEqv_Erosion
+      DDLYR(LX,ich_erosion) = DDLEqv_Erosion
+      IFLGL(LX,ich_erosion) = 1
+    !do nothing to layers other than bottom  
+    ELSE
+      DDLYX(LX,ich_erosion) = 0.0_r8
+      DDLYR(LX,ich_erosion) = 0.0_r8
+      IFLGL(LX,ich_erosion) = ich_nochng
+    ENDIF
+  ELSE
+      DDLYX(LX,ich_erosion) = 0.0_r8
+      DDLYR(LX,ich_erosion) = 0.0_r8
+      IFLGL(LX,ich_erosion) = ich_nochng
+  ENDIF
+  end subroutine ErosionSoilEdgeChange
+
+!------------------------------------------------------------------------------------------
+  subroutine FreezeThawSoilEdgeChange(I,J,LX,NY,NX,DVLiceMicP_vr,DDLYX,DDLYR,IFLGL)
+  !
+  !Layer LX is soil
+  implicit none
+  integer,  intent(in) :: I,J
+  integer,  intent(in) :: LX,NY,NX
+  REAL(R8), INTENT(IN) :: DVLiceMicP_vr(JZ)      !change in ice volume, final - initial  
+  real(r8), intent(inout) :: DDLYX(0:JZ,6)       !displacement of layer upper edge
+  real(r8), intent(inout) :: DDLYR(0:JZ,6)       !displacement of layer lower edge
+  integer , intent(inout) :: IFLGL(0:JZ,6)       !flag of change type
+
+  character(len=*), parameter :: subname='FreezeThawSoilEdgeChange'
+  real(r8) :: DENSJ,DDLWatEqv_IceMicP
+
+  call PrintInfo('beg '//subname)
+  !     FREEZE-THAW
+  !DVLiceMicP: change in ice volume, initial-final
+  !DENSICE: mass density of ice, g/cm3
+  !DENSJ:  void volume added per unit addition of ice (with respect to ice)
+  !the change is put to layer thickness
+  !DDLWatEqv_IceMicP: added thickness change
+
+  ! 4: there is volume change due to freeze-thaw
+  IF(ABS(DVLiceMicP_vr(LX)).GT.ZEROS(NY,NX))THEN
+    DENSJ             = 1._r8-DENSICE
+
+    !thickness change due to freeze-thaw
+    DDLWatEqv_IceMicP = DVLiceMicP_vr(LX)*DENSJ/AREA(3,LX,NY,NX)   
+
+    !Layer LX is at the bottom
+    IF(LX.EQ.NL(NY,NX))THEN
+      !save lower edge displacement for layer LX
+      DDLYR(LX,ich_frzthaw) = 0.0_r8
+      DDLYX(LX,ich_frzthaw) = DDLWatEqv_IceMicP
+      IFLGL(LX,ich_frzthaw) = ich_nochng
+     !not the bottom layer
+    ELSE
+      !obtain the lower edge displacement for layer LX as the upper edge displacement of layer LX+1
+      DDLYR(LX,ich_frzthaw)=DDLYX(LX+1,ich_frzthaw)
+      
+      !save upper edge displacement for layer LX
+      DDLYX(LX,ich_frzthaw)=DDLWatEqv_IceMicP+DDLYR(LX,ich_frzthaw)
+      IFLGL(LX,ich_frzthaw)=ich_nochng
+
+      !layer LX is top soil layer or it is the first soil layer below water
+      IF(LX.EQ.NU(NY,NX) .OR. SoilBulkDensity_vr(LX-1,NY,NX).LE.ZERO)THEN
+        DDLYX(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
+        DDLYR(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
+        IFLGL(LX-1,ich_frzthaw)=ich_nochng
+      ENDIF
+    ENDIF
+  ! no freezing-induced change in ice volume 
+  ELSE        
+    DDLWatEqv_IceMicP=0.0_r8
+    IF(LX.EQ.NL(NY,NX))THEN
+      DDLYX(LX,ich_frzthaw) = 0.0_r8
+      DDLYR(LX,ich_frzthaw) = 0.0_r8
+      IFLGL(LX,ich_frzthaw) = ich_nochng
+    ELSE
+      DDLYX(LX,ich_frzthaw) = DDLYX(LX+1,ich_frzthaw)
+      DDLYR(LX,ich_frzthaw) = DDLYX(LX+1,ich_frzthaw)
+      IFLGL(LX,ich_frzthaw) = ich_nochng
+      IF(LX.EQ.NU(NY,NX))THEN
+        DDLYX(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
+        DDLYR(LX-1,ich_frzthaw) = DDLYX(LX,ich_frzthaw)
+        IFLGL(LX-1,ich_frzthaw) = ich_nochng
+      ENDIF
+    ENDIF
+  ENDIF
+  call PrintInfo('end '//subname)
+  end subroutine FreezeThawSoilEdgeChange
+
+!------------------------------------------------------------------------------------------
+  subroutine ComputePondEdgeChange(I,J,LX,NY,NX,itoplyr_type,DDLYX,DDLYR,IFLGL)
+  !
+  ! Current layer LX is water
+  implicit none
+  integer,  intent(in) :: I,J
+  integer,  intent(in) :: NY,NX  
+  integer,  intent(in) :: LX                     !ID of the layer to be analyzed
+  integer,  intent(in) :: itoplyr_type           !surface layer type: 0 water, 1 soil    
+  real(r8), intent(inout) :: DDLYX(0:JZ,6)       !displacement of upper edge of layer LX
+  real(r8), intent(inout) :: DDLYR(0:JZ,6)       !displacement of lower edge of layer LX
+  integer , intent(inout) :: IFLGL(0:JZ,6)       !flag of change type
+
+  character(len=*), parameter :: subname='ComputePondEdgeChange'
+  real(r8) :: DLYR_XMicP            !layer thickness (accounting for freeze-thaw) exceeds the grid thickness
+  real(r8) :: DLEqv_MicP
+
+  call PrintInfo('beg '//subname)
+
+  ! next Layer is soil, or the pond is already evaporated
+  IF(SoilBulkDensity_vr(LX+1,NY,NX).GT.ZERO .OR. itoplyr_type.EQ.ist_soil)THEN   
+    !Compute the excessive layer thickness minus the previous layer thickness    
+    DLYR_XMicP           = DLYR_3D(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
+    DDLYR(LX,ich_watlev) = DDLYX(LX+1,ich_watlev)                 !Make a copy of the next layer
+    DDLYX(LX,ich_watlev) = DLYR_XMicP+DDLYX(LX+1,ich_watlev)      !accumulate the edge displacement from layer below
+    IFLGL(LX,ich_watlev) = 2                                      !Mark the change type, pond shrinking
+
+    !Layer LX+1 is also pond water
+  ELSE        
+    !DLYR_XMicP: non-micropore soil equivalent depth
+    !DLYRI: initial water layer thickness, [m]
+    !Current layer: Compute the excessive layer thickness minus the initial layer thickness   
+    !DLYR_XMicP> 0, shrinking, DLYR_XMicP < 0, expanding, compared to initial layer thickness
+
+    DLYR_XMicP=DLYRI_3D(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
+
+    !Next layer thickness DLEqv_MicP: water+ice total thickness
+    DLEqv_MicP=(VLWatMicP_vr(LX+1,NY,NX)+VLiceMicP_vr(LX+1,NY,NX))/AREA(3,LX,NY,NX)
+
+    !Current layer is expanding (due to expansion or addition), 
+    !Or current layer is non-shrinking, but the layer below has meaningful water thickness
+    IF(DLYR_XMicP.LT.-ZERO .OR. DLEqv_MicP.GT.ZERO)THEN
+      DDLYR(LX,ich_watlev) = AMIN1(DDLYX(LX+1,ich_watlev),DLEqv_MicP)   !lower displacement as the minimum
+      DDLYX(LX,ich_watlev) = DLYR_XMicP+DDLYX(LX+1,ich_watlev)          !Combine the excessive thickness to layer below
+
+      !Layer below has significant thickness
+      IF(DLEqv_MicP.GT.ZERO)THEN
+        IFLGL(LX,ich_watlev)=1
+        !Layer below has no significant thickness
+      ELSE
+        IFLGL(LX,ich_watlev)=2
+      ENDIF
+      !Current layer is shrinking and the layer below does not have meaningful thickness
+    ELSE   
+      DDLYR(LX,ich_watlev) = DDLYX(LX+1,ich_watlev)               !copy the thickness of layer below        
+      !DLYR_XMicP > 0, shrinking, DLYR_XMicP < 0 expanding
+      DLYR_XMicP           = DLYR_3D(3,LX,NY,NX)-(VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
+      DDLYX(LX,ich_watlev) = DLYR_XMicP+DDLYX(LX+1,ich_watlev)    !Combine the excessive thickness to layer below
+      IFLGL(LX,ich_watlev) = 2
+    ENDIF
+  ENDIF
+
+  !Reach the top layer or the layer above is soil or litter
+  IF(LX.EQ.NU(NY,NX) .OR. SoilBulkDensity_vr(LX-1,NY,NX).GT.ZERO)THEN   !current is top layer, layer above is litter
+    DDLYX(LX-1,ich_watlev) = DDLYX(LX,ich_watlev)                       !copy the current layer thickness to layer above
+    DDLYR(LX-1,ich_watlev) = DDLYX(LX,ich_watlev)                       !
+    IFLGL(LX-1,ich_watlev) = 1
+  ENDIF
+
+  DDLYX(LX,ich_frzthaw) = 0.0_r8;DDLYR(LX,ich_frzthaw) = 0.0_r8;IFLGL(LX,ich_frzthaw) = ich_nochng
+  DDLYX(LX,ich_erosion) = 0.0_r8;DDLYR(LX,ich_erosion) = 0.0_r8;IFLGL(LX,ich_erosion) = ich_nochng
+  DDLYX(LX,ich_sombgc)  = 0.0_r8;DDLYR(LX,ich_sombgc)  = 0.0_r8;IFLGL(LX,ich_sombgc)  = ich_nochng
+
+  call PrintInfo('end '//subname)
+  end subroutine ComputePondEdgeChange    
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateLayerEdges(I,J,NY,NX,DORGC_vr,DVLiceMicP_vr,SoilLayBotEdgeOld_vr,SoilLayBotEdgeNew_vr,IFLGL)
@@ -417,14 +489,14 @@ implicit none
 ! IFLGL: c1, ponding water, c2, pond disappear, c3, pond reappare, c4: freeze-thaw, c5: erosion, c6: som change
   implicit none
   integer,  intent(in) :: I,J
-  integer,  intent(in) :: NY,NX                 !column location
-  REAL(R8), INTENT(IN) :: DVLiceMicP_vr(JZ)     !change in ice volume, final - initial
+  integer,  intent(in) :: NY,NX                          !column location
+  REAL(R8), INTENT(IN) :: DVLiceMicP_vr(JZ)              !change in ice volume, final - initial
   real(r8), intent(in) :: DORGC_vr(JZ)                   !change in SOM, initial - final
   real(r8), intent(out) :: SoilLayBotEdgeOld_vr(JZ)      !location of layer lower edge before thickness update
   real(r8), intent(out) :: SoilLayBotEdgeNew_vr(0:JZ)    !cumulative depth after thickness update
-  integer , intent(out) :: IFLGL(0:JZ,6)        !flag of change type
-  real(r8) :: DDLYX(0:JZ,6)                     !displacement of layer upper edge
-  real(r8) :: DDLYR(0:JZ,6)                     !displacement of layer lower edge
+  integer , intent(out) :: IFLGL(0:JZ,6)                 !flag of change type
+  real(r8) :: DDLYX(0:JZ,6)                              !displacement of layer upper edge
+  real(r8) :: DDLYR(0:JZ,6)                              !displacement of layer lower edge
   integer  :: LX,LY,LL,NN,L
   real(r8) :: DLYR
   integer  :: itoplyr_type          !surface layer type: 0 water, 1 soil  
@@ -433,7 +505,7 @@ implicit none
   !Current surface is water layer
   IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).LE.ZERO)THEN
     itoplyr_type=ist_water     
-  !Current surface layer is soil
+    !Current surface layer is soil
   ELSE    
     itoplyr_type=ist_soil
   ENDIF
@@ -471,6 +543,7 @@ implicit none
             !move lower edge of layer LX
             CumDepz2LayBottom_vr(LX,NY,NX) = CumDepz2LayBottom_vr(LX,NY,NX)+DDLYR(LX,NN)
             SoilLayBotEdgeNew_vr(LX)       = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
+
             !Not top layer
             IF(LX.NE.NU(NY,NX) .AND. IFLGL(LX,ich_watlev).EQ.2)THEN
               !update upper edge of all layers above LX
@@ -481,12 +554,13 @@ implicit none
               !reset upper edge displacement to zero
               DDLYX(LX,NN)=0.0_r8
             ENDIF
+
             !LX is top layer
             IF(LX.EQ.NU(NY,NX))THEN
               !Thickness of layer LX
-              DLYR                            = (VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
+              DLYR                             = (VLWatMicP_vr(LX,NY,NX)+VLiceMicP_vr(LX,NY,NX))/AREA(3,LX,NY,NX)
               CumDepz2LayBottom_vr(LX-1,NY,NX) = CumDepz2LayBottom_vr(LX,NY,NX)-DLYR
-              SoilLayBotEdgeNew_vr(LX-1)                    = SoilLayBotEdgeNew_vr(LX)-DLYR
+              SoilLayBotEdgeNew_vr(LX-1)       = SoilLayBotEdgeNew_vr(LX)-DLYR
             ENDIF
           ENDIF
         !========================================================================================
@@ -500,12 +574,12 @@ implicit none
           IF(NN.EQ.ich_frzthaw)THEN
             !update lower edge of layer LX
             CumDepz2LayBottom_vr(LX,NY,NX) = CumDepz2LayBottom_vr(LX,NY,NX)+DDLYR(LX,NN)
-            SoilLayBotEdgeNew_vr(LX)                    = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
+            SoilLayBotEdgeNew_vr(LX)       = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
             !LX is top layer
             IF(LX.EQ.NU(NY,NX))THEN
               !update lower edge of layer LX-1
               CumDepz2LayBottom_vr(LX-1,NY,NX) = CumDepz2LayBottom_vr(LX-1,NY,NX)+DDLYR(LX-1,NN)
-              SoilLayBotEdgeNew_vr(LX-1)                    = SoilLayBotEdgeNew_vr(LX-1)+DDLYR(LX-1,NN)
+              SoilLayBotEdgeNew_vr(LX-1)       = SoilLayBotEdgeNew_vr(LX-1)+DDLYR(LX-1,NN)
             ENDIF
           ENDIF
 
@@ -514,20 +588,20 @@ implicit none
           !================================================
           IF(NN.EQ.ich_erosion .AND. IFLGL(LX,NN).EQ.1)THEN
             CumDepz2LayBottom_vr(LX,NY,NX) = CumDepz2LayBottom_vr(LX,NY,NX)+DDLYR(LX,NN)
-            SoilLayBotEdgeNew_vr(LX)                    = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
+            SoilLayBotEdgeNew_vr(LX)       = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
 
             IF(LX.EQ.NU(NY,NX))THEN
               CumDepz2LayBottom_vr(LX-1,NY,NX) = CumDepz2LayBottom_vr(LX-1,NY,NX)+DDLYR(LX,NN)
-              SoilLayBotEdgeNew_vr(LX-1)                    = SoilLayBotEdgeNew_vr(LX-1)+DDLYR(LX,NN)
+              SoilLayBotEdgeNew_vr(LX-1)       = SoilLayBotEdgeNew_vr(LX-1)+DDLYR(LX,NN)
             ENDIF
           ENDIF
 
           !================================================
           ! SET SOIL LAYER DEPTHS FOR CHANGES IN SOC
           !================================================
-          IF(NN.EQ.ich_somloss .AND. IFLGL(LX,NN).EQ.1)THEN
+          IF(NN.EQ.ich_sombgc .AND. IFLGL(LX,NN).EQ.1)THEN
             CumDepz2LayBottom_vr(LX,NY,NX) = CumDepz2LayBottom_vr(LX,NY,NX)+DDLYR(LX,NN)
-            SoilLayBotEdgeNew_vr(LX)                    = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
+            SoilLayBotEdgeNew_vr(LX)       = SoilLayBotEdgeNew_vr(LX)+DDLYR(LX,NN)
 
             !Top layer or layer above is ponding water
             IF(LX.EQ.NU(NY,NX) .OR. SoilBulkDensity_vr(LX-1,NY,NX).LE.ZERO)THEN
@@ -539,13 +613,12 @@ implicit none
                   !Layer LY+1 is ponding water
                   IF(SoilBulkDensity_vr(LY+1,NY,NX).LE.ZERO)THEN
                     CumDepz2LayBottom_vr(LY,NY,NX) = CumDepz2LayBottom_vr(LY,NY,NX)+DDLYR(LX-1,NN)
-                    SoilLayBotEdgeNew_vr(LY)                    = SoilLayBotEdgeNew_vr(LY)+DDLYR(LX-1,NN)
+                    SoilLayBotEdgeNew_vr(LY)       = SoilLayBotEdgeNew_vr(LY)+DDLYR(LX-1,NN)
                   ENDIF
                 ENDDO
               ENDIF
             ENDIF
           ENDIF
-
         ENDIF
       ENDIF
     ENDDO D200
@@ -556,22 +629,25 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-
-  subroutine ComputeLayerAllocFs(L,NN,NY,NX,NUX,DDLYRX,IFLGL,FX,FO,L1,L0)
+  subroutine ComputeLayerAllocFs(I,J,L,NN,NY,NX,NUX,DDLYRX,IFLGL,FX,FO,L1,L0)
 
   implicit none
-  integer, intent(in) :: NN
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NN       !type of layer change
   integer, intent(in) :: NUX      !old top layer index
   integer, intent(in) :: L,NY,NX
   real(r8),intent(in) :: DDLYRX(3)
   integer, intent(in) :: IFLGL(0:JZ,6)
-  real(r8), intent(out) :: FX
-  real(r8), intent(out) :: FO
+  real(r8), intent(out) :: FX        !allocation coefficient for water
+  real(r8), intent(out) :: FO        !allocation coefficient for organic material
   integer, intent(out) :: L1   !source
   integer, intent(out) :: L0   !target
+  character(len=*), parameter :: subname='ComputeLayerAllocFs'
+
   real(r8) :: DLEqv_MicP
 
 ! begin_execution
+  call PrintInfo('beg '//subname)
   IF(DDLYRX(NN).GT.ZERO)THEN
 !
 !     LAYERS MOVE DOWN (FX>0.), pond drys up
@@ -585,7 +661,7 @@ implicit none
     ENDIF
 
     IF((SoilBulkDensity_vr(L,NY,NX).LE.ZERO .AND. IFLGL(L,ich_watlev).EQ.2) &
-        .OR. (DLYR_3D(3,L0,NY,NX).LE.ZEROC .AND. IFLGL(L,ich_somloss).EQ.1))THEN
+        .OR. (DLYR_3D(3,L0,NY,NX).LE.ZEROC .AND. IFLGL(L,ich_sombgc).EQ.1))THEN
       FX = 1.0_r8
       FO = 1.0_r8
     ELSE
@@ -621,7 +697,8 @@ implicit none
       L1 = NU(NY,NX)
       L0 = 0
     ENDIF
-    !Layer L0 is pond
+
+    !Layer L0 is pond water
     IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO)THEN
       !Thickness of layer L0
       DLEqv_MicP=(VLWatMicP_vr(L0,NY,NX)+VLiceMicP_vr(L0,NY,NX))/AREA(3,L0,NY,NX)
@@ -633,7 +710,9 @@ implicit none
         FO = 0.0_r8
       ENDIF
     ELSE
-      IF(DLYR_3D(3,L,NY,NX).GT.ZERO.AND.DLYR_3D(3,L0,NY,NX).GT.ZERO)THEN
+      !
+!      if(I==312 .and. J==22)write(211,*)'compaff L1,L0,L',L1,L0,L,DLYR_3D(3,L,NY,NX),DLYR_3D(3,L0,NY,NX),DDLYRX(NN)
+      IF(DLYR_3D(3,L,NY,NX).GT.ZERO .AND. DLYR_3D(3,L0,NY,NX).GT.ZERO)THEN
         FX = AMIN1(1.0,-DDLYRX(NN)/DLYR_3D(3,L,NY,NX))
         FO = AMIN1(1.0,-DDLYRX(NN)/DLYR_3D(3,L0,NY,NX))
       ELSE
@@ -641,25 +720,30 @@ implicit none
         FO = 0.0_r8
       ENDIF
     ENDIF
+!    if(I==312 .and. J==22)write(211,*)'compuaf',L0,L1,L,FX,FO       
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine ComputeLayerAllocFs
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateLayerThickness(NN,L,NY,NX,ICHKL,NUX,SoilLayBotEdgeOld_vr,SoilLayBotEdgeNew_vr,IFLGL,DDLYRX,DDLYRY,XVOLWP)
+  subroutine DiagLayerThickChange(I,J,NN,L,NY,NX,ICHKL,NUX,SoilLayBotEdgeOld_vr,SoilLayBotEdgeNew_vr,IFLGL,DDLYRX,DDLYRY,XVOLWP)
   !
   !update layer L thickness, up-> down
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NN
   integer, intent(in) :: L                 !current layer index
   integer, intent(in) :: NY,NX             !current horizontal location
   real(r8), intent(in) :: SoilLayBotEdgeOld_vr(JZ)       !layer edge location before update 
   integer, intent(inout) :: ICHKL
-  integer , intent(out) :: NUX              !old top layer index
+  integer , intent(out) :: NUX                            !old top layer index
   real(r8), intent(inout) :: SoilLayBotEdgeNew_vr(0:JZ)   !layer edge location after update
-  integer , intent(inout) :: IFLGL(0:JZ,6)  !edge change flag due to different processes
-  real(r8), intent(out)   :: DDLYRX(3)
-  real(r8), intent(inout) :: DDLYRY(JZ)     !change in layer thickness compared to the initial layer thickness
-  real(r8), intent(out) :: XVOLWP           !volume of mobile water
+  integer , intent(inout) :: IFLGL(0:JZ,6)                !edge change flag due to different processes
+  real(r8), intent(out)   :: DDLYRX(3)                    !thickness change of the surface layer
+  real(r8), intent(inout) :: DDLYRY(JZ)                   !change in layer thickness compared to the initial layer thickness
+  real(r8), intent(out)   :: XVOLWP                       !volume of surface mobile water [m3/d2]
+
+
   real(r8) :: DLYR0
   real(r8) :: DLYRXX
 
@@ -667,9 +751,11 @@ implicit none
 
 ! begin_execution
   NUX=0
-  IF(NN.EQ.1)THEN
-    DLYR_3D(3,L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX) !current layer depth
-    DLYRXX             = DLYR_3D(3,L,NY,NX)                                            !make a copy of layer thickness
+  IF(NN.EQ.iInnerNode)THEN
+    !layer L thickness
+    DLYR_3D(3,L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX) 
+    !make a copy of layer thickness
+    DLYRXX             = DLYR_3D(3,L,NY,NX)                                           
 
     !layer L has not change, but L+1 has change
     IF(IFLGL(L,ich_watlev).EQ.ich_nochng .AND. IFLGL(L+1,ich_watlev).NE.ich_nochng)THEN
@@ -678,10 +764,10 @@ implicit none
       IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO)THEN         !layer L is ponding water
         DDLYRY(L)=DLYRI_3D(3,L,NY,NX)-DLYR_3D(3,L,NY,NX)  !reduction of layer thickness
       ELSE
-        DDLYRY(L)=0.0_r8                                  !no change
+        DDLYRY(L)=0.0_r8                                  !no change for soil layer
       ENDIF
       ICHKL=1
-    !layer L has change, and (layer L+1 has no change, or layer L shrinked)  
+      !layer L has change, and (layer L+1 has no change, or layer L shrinked)  
     ELSEIF(IFLGL(L,ich_watlev).EQ.2 .AND. (IFLGL(L+1,ich_watlev).EQ.ich_nochng .OR. DLYR_3D(3,L,NY,NX).LE.DLYRI_3D(3,L,NY,NX)))THEN
       DDLYRX(NN)=0.0_r8
 
@@ -703,11 +789,10 @@ implicit none
       ENDIF
     ENDIF
 
-    CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)+DDLYRY(L)
-  !     SoilLayBotEdgeNew_vr(L)=SoilLayBotEdgeNew_vr(L)+DDLYRY(L)
-    DLYR_3D(3,L,NY,NX)           = DLYR_3D(3,L,NY,NX)+DDLYRY(L)
+    CumDepz2LayBottom_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)+DDLYRY(L)
+    DLYR_3D(3,L,NY,NX)            = DLYR_3D(3,L,NY,NX)+DDLYRY(L)
     SoilDepthMidLay_vr(L,NY,NX)   = 0.5_r8*(CumDepz2LayBottom_vr(L,NY,NX)+CumDepz2LayBottom_vr(L-1,NY,NX))
-    CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
+    CumSoilThickness_vr(L,NY,NX)  = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
 
     !layer L is rigth next to the bottom layer
     IF(L.EQ.NL(NY,NX)-1)THEN
@@ -719,24 +804,22 @@ implicit none
     !layer L is at top 
     IF(L.EQ.NU(NY,NX))THEN
       CumSoilThickMidL_vr(L,NY,NX)=0.5_r8*CumSoilThickness_vr(L,NY,NX)  !layer middle thickness
-    !     DDLYRX(NN)=DDLYRX(NN)+DDLYR(L,5)
     ELSE
       CumSoilThickMidL_vr(L,NY,NX)=0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
     ENDIF
 
     !current layer is soil 
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-    !     DDLYRX(NN)=CumDepz2LayBottom_vr(L,NY,NX)-SoilLayBotEdgeOld_vr(L)
       DDLYRX(NN)=SoilLayBotEdgeNew_vr(L)-SoilLayBotEdgeOld_vr(L)
     ENDIF
 !
 !     RESET POND SURFACE LAYER NUMBER IF LOST TO EVAPORATION
 !
-  ELSEIF(NN.EQ.2)THEN
+  ELSEIF(NN.EQ.iPondShrink)THEN
     !layer L is lost
-    IF((L.EQ.NU(NY,NX) .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).LE.ZERO) & !layer L is pond water
+    IF((L.EQ.NU(NY,NX) .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).LE.ZERO) & !layer NU is pond water
       .AND. (VHeatCapacity_vr(NU(NY,NX),NY,NX).LE.VHCPNX_col(NY,NX)       & !current layer is dried out
-      .OR. NUM(NY,NX).GT.NU(NY,NX)))THEN                                    !lsurface is moving down
+      .OR. NUM(NY,NX).GT.NU(NY,NX)))THEN                                    !layer surface is moving down
       
       NUX=NU(NY,NX)
       DO LL=NUX+1,NL(NY,NX)
@@ -748,7 +831,7 @@ implicit none
           !layer NUX is in pond
           IF(SoilBulkDensity_vr(NUX,NY,NX).LE.ZERO)THEN
             VGeomLayer_vr(NUX,NY,NX)     = AREA(3,NUX,NY,NX)*DLYR_3D(3,NUX,NY,NX)
-            VLSoilPoreMicP_vr(NUX,NY,NX) = VGeomLayer_vr(NUX,NY,NX)*FracSoiAsMicP_vr(NUX,NY,NX)
+            VLSoilPoreMicP_vr(NUX,NY,NX) = VGeomLayer_vr(NUX,NY,NX)
           ENDIF
           exit
         ENDIF
@@ -761,35 +844,44 @@ implicit none
 !
 !     RESET POND SURFACE LAYER NUMBER IF GAIN FROM PRECIPITATION
 !
-  ELSEIF(NN.EQ.3)THEN
-    !CumLitRDepz_col is the initial litter layer bottom
-    !obtain the water exceeds litter layer water holding capacity
+  ELSEIF(NN.EQ.iPondGrow)THEN
+    !CumLitRDepzInit_col is the initial litter layer bottom
+
+    !obtain the water volume exceeding the litter layer water holding capacity
     XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-VLWatheldCapSurf_col(NY,NX))
-    IF(L.EQ.NU(NY,NX) .AND. CumDepz2LayBottom_vr(0,NY,NX).GT.CumLitRDepz_col(NY,NX) &
-      .AND. XVOLWP.GT.(VLWatheldCapSurf_col(NY,NX)+VHCPNX_col(NY,NX)/cpw))THEN
+    IF(L.EQ.NU(NY,NX) .AND. CumDepz2LayBottom_vr(0,NY,NX).GT.CumLitRDepzInit_col(NY,NX) & !layer NU is lower than its intial depth
+      .AND. XVOLWP.GT.(VLWatheldCapSurf_col(NY,NX)+VHCPNX_col(NY,NX)/cpw))THEN            !sufficient surface ponding water
           !     IF((SoilBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoilBulkDensity_vr(L,NY,NX).LE.ZERO))THEN
       !layer L is sinking    
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO .AND. NU(NY,NX).GT.NUI(NY,NX))THEN
-        NU(NY,NX)               = NUI(NY,NX)
-        NUM(NY,NX)              = NUI(NY,NX)
-        DDLYRX(NN)              = (VLWatheldCapSurf_col(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
-        IFLGL(L,NN)             = 1
-        DLYR0                   = (AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))+VLitR_col(NY,NX))/AREA(3,0,NY,NX)
+        NU(NY,NX)                  = NUI(NY,NX)
+        NUM(NY,NX)                 = NUI(NY,NX)
+        !get amount removed thickness from litter layer
+        DDLYRX(NN)                 = -XVOLWP/AREA(3,0,NY,NX)
+        IFLGL(L,NN)                = 1
+        !obtain litter layer thickness
+        DLYR0                      = (AZMAX1(VLWatMicP_vr(0,NY,NX)+VLiceMicP_vr(0,NY,NX)-VWatLitRHoldCapcity_col(NY,NX))+VLitR_col(NY,NX))/AREA(3,0,NY,NX)
+        !update litter layer thickness
         DLYR_3D(3,0,NY,NX)         = DLYR0+DDLYRX(NN)
+        !update the topsoil/water layer
         DLYR_3D(3,NU(NY,NX),NY,NX) = DLYR_3D(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
 
-        IF(L.GT.2)THEN
+        IF(L.GT.2)THEN          
+          !set to upper edge of layer L
           DO LL=L-2,NU(NY,NX),-1
             CumDepz2LayBottom_vr(LL,NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)
-            SoilLayBotEdgeNew_vr(LL)                    = SoilLayBotEdgeNew_vr(L-1)
+            SoilLayBotEdgeNew_vr(LL)       = SoilLayBotEdgeNew_vr(L-1)
           ENDDO
         ENDIF
-        CumDepz2LayBottom_vr(0,NY,NX)         = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
-        SoilLayBotEdgeNew_vr(0)                            = SoilLayBotEdgeNew_vr(NU(NY,NX))-DLYR_3D(3,NU(NY,NX),NY,NX)
-        SoilDepthMidLay_vr(NU(NY,NX),NY,NX)   = 0.5_r8*(CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)+CumDepz2LayBottom_vr(0,NY,NX))
+        CumDepz2LayBottom_vr(0,NY,NX)        = CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-DLYR_3D(3,NU(NY,NX),NY,NX)
+        SoilLayBotEdgeNew_vr(0)              = SoilLayBotEdgeNew_vr(NU(NY,NX))-DLYR_3D(3,NU(NY,NX),NY,NX)
+        SoilDepthMidLay_vr(NU(NY,NX),NY,NX)  = 0.5_r8*(CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)+CumDepz2LayBottom_vr(0,NY,NX))
         CumSoilThickness_vr(NU(NY,NX),NY,NX) = DLYR_3D(3,NU(NY,NX),NY,NX)
-        CumSoilThickMidL_vr(NU(NY,NX),NY,NX)            = 0.5_r8*CumSoilThickness_vr(NU(NY,NX),NY,NX)
+        CumSoilThickMidL_vr(NU(NY,NX),NY,NX) = 0.5_r8*CumSoilThickness_vr(NU(NY,NX),NY,NX)
+!        if(I==312 .and. J==22)write(211,*)'reset DLYR0, DLYRnew',DLYR0,DLYR_3D(3,0,NY,NX),NUM(NY,NX),XVOLWP,L,DLYR_3D(3,NU(NY,NX),NY,NX),DDLYRX(NN),&
+!          CumDepz2LayBottom_vr(0,NY,NX),CumDepz2LayBottom_vr(L-1,NY,NX),CumDepz2LayBottom_vr(L,NY,NX)
+
       ELSE
         DDLYRX(NN)  = 0.0_r8
         IFLGL(L,NN) = ich_nochng
@@ -799,15 +891,15 @@ implicit none
       IFLGL(L,NN) = ich_nochng
     ENDIF
   ENDIF
-  end subroutine UpdateLayerThickness
+  end subroutine DiagLayerThickChange
 !------------------------------------------------------------------------------------------
 
   subroutine UpdateLayerMaterials(L,L0,L1,NY,NX,NN,FX,FY,SoilLayBotEdgeNew_vr,IFLGL)
   implicit none
   integer, intent(in) :: L
-  integer, intent(in) :: L0  !layer L0 is pond
-  integer, intent(in) :: L1  !source
-  integer, intent(in) :: NY,NX,NN
+  integer, intent(in) :: L0  !source layer
+  integer, intent(in) :: L1  !target layer
+  integer, intent(in) :: NY,NX,NN 
   real(r8), intent(in) :: FX,FY
   real(r8), intent(inout) :: SoilLayBotEdgeNew_vr(0:JZ)
   integer, intent(in) ::  IFLGL(0:JZ,6)
@@ -816,6 +908,7 @@ implicit none
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
 
+  !none-litter layer
   IF(L0.NE.0)THEN
     SAND(L1,NY,NX)                  = SAND(L1,NY,NX)+FX*SAND(L0,NY,NX)
     SILT(L1,NY,NX)                  = SILT(L1,NY,NX)+FX*SILT(L0,NY,NX)
@@ -824,12 +917,13 @@ implicit none
     trcx_solml_vr(idx_AEC,L1,NY,NX) = trcx_solml_vr(idx_AEC,L1,NY,NX)+FX*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
 
-  VLWatMicP_vr(L1,NY,NX)          = VLWatMicP_vr(L1,NY,NX)+FX*VLWatMicP_vr(L0,NY,NX)
-  VLiceMicP_vr(L1,NY,NX)          = VLiceMicP_vr(L1,NY,NX)+FX*VLiceMicP_vr(L0,NY,NX)
-  VLsoiAirP_vr(L1,NY,NX)          = VLsoiAirP_vr(L1,NY,NX)+FX*VLsoiAirP_vr(L0,NY,NX)
-  VLMicP_vr(L1,NY,NX)             = VLMicP_vr(L1,NY,NX)+FX*VLMicP_vr(L0,NY,NX)
+  VLWatMicP_vr(L1,NY,NX)          = VLWatMicP_vr(L1,NY,NX) +FX*VLWatMicP_vr(L0,NY,NX)
+  VLiceMicP_vr(L1,NY,NX)          = VLiceMicP_vr(L1,NY,NX) +FX*VLiceMicP_vr(L0,NY,NX)
+  VLsoiAirP_vr(L1,NY,NX)          = VLsoiAirP_vr(L1,NY,NX) +FX*VLsoiAirP_vr(L0,NY,NX)
+  VLMicP_vr(L1,NY,NX)             = VLMicP_vr(L1,NY,NX)    +FX*VLMicP_vr(L0,NY,NX)
   VLSoilMicP_vr(L1,NY,NX)         = VLSoilMicP_vr(L1,NY,NX)+FX*VLSoilMicP_vr(L0,NY,NX)
   VLWatMicPX_vr(L1,NY,NX)         = VLWatMicP_vr(L1,NY,NX)
+
   ENGY1                           = VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)
   ENGY0                           = VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)
   ENGY1                           = ENGY1+FX*ENGY0
@@ -989,9 +1083,9 @@ implicit none
       ENDIF
     ENDDO
   ENDIF
-  !
+  !===================================================  
   ! SOURCE POND LAYER
-  !
+  !===================================================
   IF(L0.NE.0)THEN
     SAND(L0,NY,NX)                  = FY*SAND(L0,NY,NX)
     SILT(L0,NY,NX)                  = FY*SILT(L0,NY,NX)
@@ -1011,6 +1105,7 @@ implicit none
   VLWatMicPX_vr(L0,NY,NX)         = VLWatMicP_vr(L0,NY,NX)
   ENGY0                           = FY*ENGY0
   VHeatCapacitySoilM_vr(L0,NY,NX) = FY*VHeatCapacitySoilM_vr(L0,NY,NX)
+
   IF(L0.NE.0)THEN
     VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM_vr(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP_vr(L0,NY,NX)) &
@@ -1072,6 +1167,7 @@ implicit none
   DO idg=idg_beg,idg_end-2
     trcs_solml_vr(idg,L0,NY,NX)=FY*trcs_solml_vr(idg,L0,NY,NX)
   ENDDO
+
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
        DO N=1,NumMicbFunGrupsPerCmplx
@@ -1167,7 +1263,7 @@ implicit none
     IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO .AND. SoilBulkDensity_vr(L1,NY,NX).LE.ZERO &
       .AND. VLWatMicP_vr(L0,NY,NX)+VLiceMicP_vr(L0,NY,NX).LE.ZEROS(NY,NX))THEN
       CumDepz2LayBottom_vr(L1,NY,NX) = CumDepz2LayBottom_vr(L0,NY,NX)
-      SoilLayBotEdgeNew_vr(L1)                    = SoilLayBotEdgeNew_vr(L0)
+      SoilLayBotEdgeNew_vr(L1)       = SoilLayBotEdgeNew_vr(L0)
     ENDIF
   ENDIF
   end subroutine UpdateLayerMaterials
@@ -1710,20 +1806,21 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MoveHeatWat(L,L0,L1,NY,NX,FO,FX,XVOLWP,FWO)
+  subroutine MoveHeatWat(I,J,L,L0,L1,NY,NX,FO,FX,XVOLWP,FWO)
   implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: L,NY,NX
-  integer, intent(in) :: L0    !upper layer
-  integer, intent(in) :: L1    !lower layer
+  integer, intent(in) :: L0    !source layer
+  integer, intent(in) :: L1    !target layer
   real(r8), intent(in) :: FO
   real(r8), intent(in) :: FX
   real(r8), intent(in) :: XVOLWP
-  real(r8), intent(out):: FWO
+  real(r8), intent(out):: FWO      !mixing fraction of organic material
   real(r8) :: FXVOLW
   real(r8) :: FXENGY,FXVOLI,FXVLSoilMicP,FXVOLWX,FXVHCM
   real(r8) :: ENGY0,ENGY1
 
-  IF(L0.EQ.L .OR. (L0>0 .and. POROSI_vr(L0,NY,NX).LE.ZERO))THEN
+  IF(L0.EQ.L .OR. POROSI_vr(L0,NY,NX).LE.ZERO)THEN
     FWO=FO
   ELSE
     FWO=AMIN1(0.5,FO*POROSI_vr(L1,NY,NX)/POROSI_vr(L0,NY,NX))
@@ -1734,8 +1831,11 @@ implicit none
 !             FXSCNH=FWO*SatHydroCondHrzn_vr(L0,NY,NX)
 !             SatHydroCondHrzn_vr(L1,NY,NX)=SatHydroCondHrzn_vr(L1,NY,NX)+FXSCNH
 !             SatHydroCondHrzn_vr(L0,NY,NX)=SatHydroCondHrzn_vr(L0,NY,NX)-FXSCNH
+
   IF(L0.EQ.0)THEN
-    FXVOLW=FX*AZMAX1(XVOLWP-VLWatheldCapSurf_col(NY,NX))
+    FXVOLW=FX*AZMAX1(XVOLWP+VLWatheldCapSurf_col(NY,NX))
+    Qinflx2Soil_col(NY,NX) = Qinflx2Soil_col(NY,NX)+FXVOLW
+!    if(I==312 .and. J==22)write(211,*)'mvwat',FX,FO,FXVOLW,XVOLWP,VLWatheldCapSurf_col(NY,NX)    
   ELSE
     FXVOLW=FWO*VLWatMicP_vr(L0,NY,NX)
   ENDIF

@@ -73,7 +73,7 @@ module SoluteChemDataType
     real(r8) :: CCASOX
     real(r8) :: CN4X
     real(r8) :: CPOZ
-    real(r8) :: CALZ
+    real(r8) :: Al_mole_conc
     real(r8) :: CFEZ
     real(r8) :: CCAZ
     real(r8) :: CMGZ
@@ -92,7 +92,7 @@ module SoluteChemDataType
     real(r8) :: CALOHX
     real(r8) :: CFEOHX
     real(r8) :: CCACOX
-    real(r8) :: XNH4_conc
+    real(r8) :: XNH4_mole_conc
     real(r8) :: XHY1
     real(r8) :: XAl_conc
     real(r8) :: XFe_conc
@@ -131,107 +131,109 @@ module SoluteChemDataType
     real(r8) :: GKCM
     real(r8) :: ZEROS
     real(r8) :: VLWatMicP
+  contains
+    procedure, public :: SetZero => solute_SetZero
   end type solutedtype
 
   type, public :: solute_flx_type
-    real(r8) :: TR_NH4_soil
-    real(r8) :: TR_NH4_band_soil
-    real(r8) :: TR_NH3_soil_vr
-    real(r8) :: TR_NH3_band_soil
-    real(r8) :: TR_H1PO4_soil
-    real(r8) :: TR_H2PO4_soil
-    real(r8) :: TR_H1PO4_band_soil
-    real(r8) :: TR_H2PO4_band_soil
-    real(r8) :: TR_NH4_sorbed_soil
-    real(r8) :: TR_NH4_sorbed_band_soil
-    real(r8) :: TR_ROH_sorbed_soil
-    real(r8) :: TR_ROH2_sorbed_soil
-    real(r8) :: TR_RHPO4_sorbed_soil
-    real(r8) :: TR_RH2PO4_sorbed_soil
-    real(r8) :: TR_ROH_sorbed_band_soil
-    real(r8) :: TR_ROH2_sorbed_band_soil
-    real(r8) :: TR_RHPO4_sorbed_band_soil
-    real(r8) :: TR_RH2PO4_sorbed_band_soil
-    real(r8) :: TR_AlPO4_precip_soil
-    real(r8) :: TR_FePO4_precip_soil
-    real(r8) :: TR_CaHPO4_precip_soil
-    real(r8) :: TR_apatite_precip_soil
-    real(r8) :: TR_CaH4P2O8_precip_soil
-    real(r8) :: TR_AlPO4_precip_band_soil
-    real(r8) :: TR_FePO4_precip_band_soil
-    real(r8) :: TR_CaHPO4_precip_band_soil
-    real(r8) :: TR_apatite_precip_band_soil
-    real(r8) :: TR_CaH4P2O8_precip_band_soil
-    real(r8) :: TR_Al_3p_soil
-    real(r8) :: TR_Fe_3p_soil
-    real(r8) :: TR_H_p_soil
-    real(r8) :: TR_Ca_2p_soil
-    real(r8) :: TR_Mg_2p_soil
-    real(r8) :: TR_Na_p_soil
-    real(r8) :: TR_K_1p_soil
-    real(r8) :: TR_OH_1e_soil
-    real(r8) :: TR_SO4_2e_soil
-    real(r8) :: TR_CO3_2e_soil
-    real(r8) :: TR_HCO3_soil
-    real(r8) :: TR_CO2_gchem_soil
-    real(r8) :: TR_AlOH_soil
-    real(r8) :: TR_AlO2H2_soil
-    real(r8) :: TR_AlO3H3_soil
-    real(r8) :: TR_AlO4H4_soil
-    real(r8) :: TR_AlSO4_soil
-    real(r8) :: TR_FeOH_soil
-    real(r8) :: TR_FeO2H2_soil
-    real(r8) :: TR_FeO3H3_soil_vr
-    real(r8) :: TR_FeO4H4_soil
-    real(r8) :: TR_FeSO4_soil
-    real(r8) :: TR_CaOH_soil
-    real(r8) :: TR_CaCO3_soil
-    real(r8) :: TR_CaHCO3_soil
-    real(r8) :: TR_CaSO4_soil
-    real(r8) :: TR_MgOH_soil
-    real(r8) :: TR_MgCO3_soil
-    real(r8) :: TR_MgHCO3_soil
-    real(r8) :: TR_MgSO4_soil
-    real(r8) :: TR_NaCO3_soil
-    real(r8) :: TR_NaSO4_soil
-    real(r8) :: TR_KSO4_soil
-    real(r8) :: TR_PO4_soil
-    real(r8) :: TR_H3PO4_sorbed_soil
-    real(r8) :: TR_FeHPO4_soil
-    real(r8) :: TR_FeH2PO4_soil
-    real(r8) :: TR_CaPO4_soil
-    real(r8) :: TR_CaHPO4_soil
-    real(r8) :: TR_CaH4P2O8_soil
-    real(r8) :: TR_MgHPO4_soil
-    real(r8) :: TR_PO4_band_soil
-    real(r8) :: TR_H3PO4_band_soil
-    real(r8) :: TR_FeHPO4_band_soil
-    real(r8) :: TR_FeH2PO4_band_soil
-    real(r8) :: TR_CaPO4_band_soil
-    real(r8) :: TR_CaHPO4_band_soil
-    real(r8) :: TR_CaH4P2O8_band_soil
-    real(r8) :: TR_MgHPO4_band_soil
-    real(r8) :: TR_H_p_sorbed_soil
-    real(r8) :: TR_Al_sorbed_soil
-    real(r8) :: TR_Fe_sorbed_soil
-    real(r8) :: TR_Ca_sorbed_soil
-    real(r8) :: TR_Mg_sorbed_soil
-    real(r8) :: TR_Na_sorbed_soil
-    real(r8) :: TR_K_sorbed_soil
-    real(r8) :: TR_HCO3_sorbed_soil
-    real(r8) :: TR_AlO2H2_sorbed_soil
-    real(r8) :: TR_FeO2H2_sorbed_soil
-    real(r8) :: TR_RO_sorbed_soil
-    real(r8) :: TR_RO_sorbed_band_soil
-    real(r8) :: TR_AlOH3_precip_soil
-    real(r8) :: TR_FeOH3_precip_soil
-    real(r8) :: TR_CaCO3_precip_soil
-    real(r8) :: TR_CaSO4_precip_soil
+    real(r8) :: TRChem_NH4_soil
+    real(r8) :: TRChem_NH4_band_soil
+    real(r8) :: TRChem_NH3_soil_vr
+    real(r8) :: TRChem_NH3_band_soil
+    real(r8) :: TRChem_H1PO4_soil
+    real(r8) :: TRChem_H2PO4_soil
+    real(r8) :: TRChem_H1PO4_band_soil
+    real(r8) :: TRChem_H2PO4_band_soil
+    real(r8) :: TRChem_NH4_sorbed_soil
+    real(r8) :: TRChem_NH4_sorbed_band_soil
+    real(r8) :: TRChem_ROH_sorbed_soil
+    real(r8) :: TRChem_ROH2_sorbed_soil
+    real(r8) :: TRChem_RHPO4_sorbed_soil
+    real(r8) :: TRChem_RH2PO4_sorbed_soil
+    real(r8) :: TRChem_ROH_sorbed_band_soil
+    real(r8) :: TRChem_ROH2_sorbed_band_soil
+    real(r8) :: TRChem_RHPO4_sorbed_band_soil
+    real(r8) :: TRChem_RH2PO4_sorbed_band_soil
+    real(r8) :: TRChem_AlPO4_precip_soil
+    real(r8) :: TRChem_FePO4_precip_soil
+    real(r8) :: TRChem_CaHPO4_precip_soil
+    real(r8) :: TRChem_apatite_precip_soil
+    real(r8) :: TRChem_CaH4P2O8_precip_soil
+    real(r8) :: TRChem_AlPO4_precip_band_soil
+    real(r8) :: TRChem_FePO4_precip_band_soil
+    real(r8) :: TRChem_CaHPO4_precip_band_soil
+    real(r8) :: TRChem_apatite_precip_band_soil
+    real(r8) :: TRChem_CaH4P2O8_precip_band_soil
+    real(r8) :: TRChem_Al_3p_soil
+    real(r8) :: TRChem_Fe_3p_soil
+    real(r8) :: TRChem_H_p_soil
+    real(r8) :: TRChem_Ca_2p_soil
+    real(r8) :: TRChem_Mg_2p_soil
+    real(r8) :: TRChem_Na_p_soil
+    real(r8) :: TRChem_K_1p_soil
+    real(r8) :: TRChem_OH_1e_soil
+    real(r8) :: TRChem_SO4_2e_soil
+    real(r8) :: TRChem_CO3_2e_soil
+    real(r8) :: TRChem_HCO3_soil
+    real(r8) :: TRChem_CO2_gchem_soil
+    real(r8) :: TRChem_AlOH_soil
+    real(r8) :: TRChem_AlO2H2_soil
+    real(r8) :: TRChem_AlO3H3_soil
+    real(r8) :: TRChem_AlO4H4_soil
+    real(r8) :: TRChem_AlSO4_soil
+    real(r8) :: TRChem_FeOH_soil
+    real(r8) :: TRChem_FeO2H2_soil
+    real(r8) :: TRChem_FeO3H3_soil_vr
+    real(r8) :: TRChem_FeO4H4_soil
+    real(r8) :: TRChem_FeSO4_soil
+    real(r8) :: TRChem_CaOH_soil
+    real(r8) :: TRChem_CaCO3_soil
+    real(r8) :: TRChem_CaHCO3_soil
+    real(r8) :: TRChem_CaSO4_soil
+    real(r8) :: TRChem_MgOH_soil
+    real(r8) :: TRChem_MgCO3_soil
+    real(r8) :: TRChem_MgHCO3_soil
+    real(r8) :: TRChem_MgSO4_soil
+    real(r8) :: TRChem_NaCO3_soil
+    real(r8) :: TRChem_NaSO4_soil
+    real(r8) :: TRChem_KSO4_soil
+    real(r8) :: TRChem_PO4_soil
+    real(r8) :: TRChem_H3PO4_sorbed_soil
+    real(r8) :: TRChem_FeHPO4_soil
+    real(r8) :: TRChem_FeH2PO4_soil
+    real(r8) :: TRChem_CaPO4_soil
+    real(r8) :: TRChem_CaHPO4_soil
+    real(r8) :: TRChem_CaH4P2O8_soil
+    real(r8) :: TRChem_MgHPO4_soil
+    real(r8) :: TRChem_PO4_band_soil
+    real(r8) :: TRChem_H3PO4_band_soil
+    real(r8) :: TRChem_FeHPO4_band_soil
+    real(r8) :: TRChem_FeH2PO4_band_soil
+    real(r8) :: TRChem_CaPO4_band_soil
+    real(r8) :: TRChem_CaHPO4_band_soil
+    real(r8) :: TRChem_CaH4P2O8_band_soil
+    real(r8) :: TRChem_MgHPO4_band_soil
+    real(r8) :: TRChem_H_p_sorbed_soil
+    real(r8) :: TRChem_Al_sorbed_soil
+    real(r8) :: TRChem_Fe_sorbed_soil
+    real(r8) :: TRChem_Ca_sorbed_soil
+    real(r8) :: TRChem_Mg_sorbed_soil
+    real(r8) :: TRChem_Na_sorbed_soil
+    real(r8) :: TRChem_K_sorbed_soil
+    real(r8) :: TRChem_HCO3_sorbed_soil
+    real(r8) :: TRChem_AlO2H2_sorbed_soil
+    real(r8) :: TRChem_FeO2H2_sorbed_soil
+    real(r8) :: TRChem_RO_sorbed_soil
+    real(r8) :: TRChem_RO_sorbed_band_soil
+    real(r8) :: TRChem_AlOH3_precip_soil
+    real(r8) :: TRChem_FeOH3_precip_soil
+    real(r8) :: TRChem_CaCO3_precip_soil
+    real(r8) :: TRChem_CaSO4_precip_soil
     real(r8) :: TRH2O_soil
     real(r8) :: TBION_soil
     real(r8) :: Txchem_CO2_soil
   contains
-    procedure, public :: SetZero
+    procedure, public :: SetZero 
   end type solute_flx_type
 
   type, public :: chem_var_type
@@ -353,7 +355,7 @@ module SoluteChemDataType
   real(r8) :: XHPO4_conc
   real(r8) :: XROH2_band_conc
   real(r8) :: XH2PO4_conc
-  real(r8) :: XNH4_conc
+  real(r8) :: XNH4_mole_conc
   real(r8) :: XNH4_band_conc
   real(r8) :: XROH1_conc
   real(r8) :: XROH2_conc
@@ -370,103 +372,235 @@ module SoluteChemDataType
   end type chem_var_type
 contains
 
+  subroutine solute_SetZero(this)
+  implicit none
+  class(solutedtype)  :: this
+
+  this%H2CO3_aqua_mole_conc       = 0._r8
+  this%CH4_aqua_mole_conc         = 0._r8
+  this%O2_aqua_mole_conc          = 0._r8
+  this%N2_aqua_mole_conc          = 0._r8
+  this%N2O_aqua_mole_conc         = 0._r8
+  this%NH4_1p_aqua_mole_conc      = 0._r8
+  this%NH3_aqua_mole_conc         = 0._r8
+  this%Al_3p_aqua_mole_conc       = 0._r8
+  this%Fe_3p_aqua_mole_conc       = 0._r8
+  this%H_1p_aqua_mole_conc        = 0._r8
+  this%Ca_2p_aqua_mole_conc       = 0._r8
+  this%Mg_2p_aqua_mole_conc       = 0._r8
+  this%Na_1p_aqua_mole_conc       = 0._r8
+  this%K_1p_aqua_mole_conc        = 0._r8
+  this%OH_1e_aqua_mole_conc       = 0._r8
+  this%SO4_2e_aqua_mole_conc      = 0._r8
+  this%Cl_e_conc                  = 0._r8
+  this%CO3_2e_aqua_mole_conc      = 0._r8
+  this%HCO3_e_conc                = 0._r8
+  this%AlOH_2p_aqua_mole_conc     = 0._r8
+  this%AlO2H2_1p_aqua_mole_conc   = 0._r8
+  this%AlO3H3_conc                = 0._r8
+  this%AlO4H4_1e_aqua_mole_conc   = 0._r8
+  this%AlSO4_1p_aqua_mole_conc    = 0._r8
+  this%FeOH_2p_aqua_mole_conc     = 0._r8
+  this%FeO2H2_p_conc              = 0._r8
+  this%FeO3H3_conc                = 0._r8
+  this%FeO4H4_1e_aqua_mole_conc   = 0._r8
+  this%FeSO4_1p_aqua_mole_conc    = 0._r8
+  this%CaO2H2_conc                = 0._r8
+  this%CaCO3_conc                 = 0._r8
+  this%CaHCO3_1p_aqua_mole_conc   = 0._r8
+  this%CaSO4_conc                 = 0._r8
+  this%MgOH_1p_aqua_mole_conc     = 0._r8
+  this%MgCO3_conc                 = 0._r8
+  this%MgHCO3_1p_aqua_mole_conc   = 0._r8
+  this%MgSO4_conc                 = 0._r8
+  this%NaCO3_1e_aqua_mole_conc    = 0._r8
+  this%NaSO4_1e_aqua_mole_conc    = 0._r8
+  this%KSO4_1e_aqua_mole_conc     = 0._r8
+  this%H0PO4_3e_conc              = 0._r8
+  this%H1PO4_2e_aqua_mole_conc    = 0._r8
+  this%H2PO4_1e_aqua_mole_conc    = 0._r8
+  this%H3PO4_conc                 = 0._r8
+  this%FeHPO4_p_conc              = 0._r8
+  this%FeH2PO4_2p_aqua_mole_conc  = 0._r8
+  this%CaPO4_1e_con               = 0._r8
+  this%CaHPO4_conc                = 0._r8
+  this%CaH4P2O8_1p_aqua_mole_conc = 0._r8
+  this%MgHPO4_conc                = 0._r8
+  this%CSTR1                      = 0._r8
+  this%CCO2M                      = 0._r8
+  this%CCH4M                      = 0._r8
+  this%COXYM                      = 0._r8
+  this%CZ2GM                      = 0._r8
+  this%CZ2OM                      = 0._r8
+  this%CN4Z                       = 0._r8
+  this%CNOZ                       = 0._r8
+  this%CNAZ                       = 0._r8
+  this%CKAZ                       = 0._r8
+  this%CSOZ                       = 0._r8
+  this%CCLZ                       = 0._r8
+  this%CNOX                       = 0._r8
+  this%CCASOX                     = 0._r8
+  this%CN4X                       = 0._r8
+  this%CPOZ                       = 0._r8
+  this%Al_mole_conc               = 0._r8
+  this%CFEZ                       = 0._r8
+  this%CCAZ                       = 0._r8
+  this%CMGZ                       = 0._r8
+  this%CALX                       = 0._r8
+  this%CFEX                       = 0._r8
+  this%CaX_conc                   = 0._r8
+  this%MgX_conc                   = 0._r8
+  this%CNAX                       = 0._r8
+  this%CKAX                       = 0._r8
+  this%CSOX                       = 0._r8
+  this%CCLX                       = 0._r8
+  this%CALPOX                     = 0._r8
+  this%CFEPOX                     = 0._r8
+  this%CCAPDX                     = 0._r8
+  this%CCAPHX                     = 0._r8
+  this%CALOHX                     = 0._r8
+  this%CFEOHX                     = 0._r8
+  this%CCACOX                     = 0._r8
+  this%XNH4_mole_conc             = 0._r8
+  this%XHY1                       = 0._r8
+  this%XAl_conc                   = 0._r8
+  this%XFe_conc                   = 0._r8
+  this%XCa_conc                   = 0._r8
+  this%Precp_Ca5P3O12O3H3_conc    = 0._r8
+  this%XMg_conc                   = 0._r8
+  this%XNa_conc                   = 0._r8
+  this%XK_conc                    = 0._r8
+  this%XHC1                       = 0._r8
+  this%XAlO2H2_conc               = 0._r8
+  this%XFeO2H2_conc               = 0._r8
+  this%XOH_conc                   = 0._r8
+  this%XROH1_conc                 = 0._r8
+  this%XROH2_conc                 = 0._r8
+  this%XHPO4_conc                 = 0._r8
+  this%XH2PO4_conc                = 0._r8
+  this%Precp_AlO3H3_conc          = 0._r8
+  this%Precp_FeO3H3_conc          = 0._r8
+  this%Precp_CaCO3_conc           = 0._r8
+  this%Precp_CaSO4_conc           = 0._r8
+  this%Precp_AlPO4_conc           = 0._r8
+  this%Precp_FePO4_conc           = 0._r8
+  this%Precp_CaHPO4_conc          = 0._r8
+  this%FH2O                       = 0._r8
+  this%ATCA                       = 0._r8
+  this%XAEC                       = 0._r8
+  this%CEC                        = 0._r8
+  this%ORGC                       = 0._r8
+  this%VLPO4                      = 0._r8
+  this%XCEC                       = 0._r8
+  this%GKC4                       = 0._r8
+  this%GKCA                       = 0._r8
+  this%GKCH                       = 0._r8
+  this%GKCK                       = 0._r8
+  this%GKCN                       = 0._r8
+  this%GKCM                       = 0._r8
+  this%ZEROS                      = 0._r8
+  this%VLWatMicP                  = 0._r8
+
+  end subroutine solute_SetZero
+!------------------------------------------------------------------------------------------
+
   subroutine SetZero(solflx)
   implicit none
   class(solute_flx_type)  :: solflx
 
-  solflx%TR_NH4_soil = 0._r8
-  solflx%TR_NH4_band_soil = 0._r8
-  solflx%TR_NH3_soil_vr = 0._r8
-  solflx%TR_NH3_band_soil = 0._r8
-  solflx%TR_H1PO4_soil = 0._r8
-  solflx%TR_H2PO4_soil = 0._r8
-  solflx%TR_H1PO4_band_soil = 0._r8
-  solflx%TR_H2PO4_band_soil = 0._r8
-  solflx%TR_NH4_sorbed_soil = 0._r8
-  solflx%TR_NH4_sorbed_band_soil = 0._r8
-  solflx%TR_ROH_sorbed_soil = 0._r8
-  solflx%TR_ROH2_sorbed_soil = 0._r8
-  solflx%TR_RHPO4_sorbed_soil = 0._r8
-  solflx%TR_RH2PO4_sorbed_soil = 0._r8
-  solflx%TR_ROH_sorbed_band_soil = 0._r8
-  solflx%TR_ROH2_sorbed_band_soil = 0._r8
-  solflx%TR_RHPO4_sorbed_band_soil = 0._r8
-  solflx%TR_RH2PO4_sorbed_band_soil = 0._r8
-  solflx%TR_AlPO4_precip_soil= 0._r8
-  solflx%TR_FePO4_precip_soil= 0._r8
-  solflx%TR_CaHPO4_precip_soil= 0._r8
-  solflx%TR_apatite_precip_soil= 0._r8
-  solflx%TR_CaH4P2O8_precip_soil= 0._r8
-  solflx%TR_AlPO4_precip_band_soil= 0._r8
-  solflx%TR_FePO4_precip_band_soil= 0._r8
-  solflx%TR_CaHPO4_precip_band_soil= 0._r8
-  solflx%TR_apatite_precip_band_soil= 0._r8
-  solflx%TR_CaH4P2O8_precip_band_soil= 0._r8
-  solflx%TR_Al_3p_soil  = 0._r8
-  solflx%TR_Fe_3p_soil  = 0._r8
-  solflx%TR_H_p_soil  = 0._r8
-  solflx%TR_Ca_2p_soil  = 0._r8
-  solflx%TR_Mg_2p_soil  = 0._r8
-  solflx%TR_Na_p_soil  = 0._r8
-  solflx%TR_K_1p_soil  = 0._r8
-  solflx%TR_OH_1e_soil  = 0._r8
-  solflx%TR_SO4_2e_soil = 0._r8
-  solflx%TR_CO3_2e_soil = 0._r8
-  solflx%TR_HCO3_soil = 0._r8
-  solflx%TR_CO2_gchem_soil = 0._r8
-  solflx%TR_AlOH_soil = 0._r8
-  solflx%TR_AlO2H2_soil = 0._r8
-  solflx%TR_AlO3H3_soil = 0._r8
-  solflx%TR_AlO4H4_soil = 0._r8
-  solflx%TR_AlSO4_soil = 0._r8
-  solflx%TR_FeOH_soil = 0._r8
-  solflx%TR_FeO2H2_soil = 0._r8
-  solflx%TR_FeO3H3_soil_vr = 0._r8
-  solflx%TR_FeO4H4_soil = 0._r8
-  solflx%TR_FeSO4_soil = 0._r8
-  solflx%TR_CaOH_soil = 0._r8
-  solflx%TR_CaCO3_soil = 0._r8
-  solflx%TR_CaHCO3_soil = 0._r8
-  solflx%TR_CaSO4_soil = 0._r8
-  solflx%TR_MgOH_soil = 0._r8
-  solflx%TR_MgCO3_soil = 0._r8
-  solflx%TR_MgHCO3_soil = 0._r8
-  solflx%TR_MgSO4_soil = 0._r8
-  solflx%TR_NaCO3_soil = 0._r8
-  solflx%TR_NaSO4_soil = 0._r8
-  solflx%TR_KSO4_soil = 0._r8
-  solflx%TR_PO4_soil = 0._r8
-  solflx%TR_H3PO4_sorbed_soil = 0._r8
-  solflx%TR_FeHPO4_soil = 0._r8
-  solflx%TR_FeH2PO4_soil = 0._r8
-  solflx%TR_CaPO4_soil = 0._r8
-  solflx%TR_CaHPO4_soil = 0._r8
-  solflx%TR_CaH4P2O8_soil = 0._r8
-  solflx%TR_MgHPO4_soil = 0._r8
-  solflx%TR_PO4_band_soil = 0._r8
-  solflx%TR_H3PO4_band_soil = 0._r8
-  solflx%TR_FeHPO4_band_soil = 0._r8
-  solflx%TR_FeH2PO4_band_soil = 0._r8
-  solflx%TR_CaPO4_band_soil = 0._r8
-  solflx%TR_CaHPO4_band_soil = 0._r8
-  solflx%TR_CaH4P2O8_band_soil = 0._r8
-  solflx%TR_MgHPO4_band_soil = 0._r8
-  solflx%TR_H_p_sorbed_soil = 0._r8
-  solflx%TR_Al_sorbed_soil = 0._r8
-  solflx%TR_Fe_sorbed_soil = 0._r8
-  solflx%TR_Ca_sorbed_soil = 0._r8
-  solflx%TR_Mg_sorbed_soil = 0._r8
-  solflx%TR_Na_sorbed_soil = 0._r8
-  solflx%TR_K_sorbed_soil = 0._r8
-  solflx%TR_HCO3_sorbed_soil = 0._r8
-  solflx%TR_AlO2H2_sorbed_soil= 0._r8
-  solflx%TR_FeO2H2_sorbed_soil= 0._r8
-  solflx%TR_RO_sorbed_soil = 0._r8
-  solflx%TR_RO_sorbed_band_soil = 0._r8
-  solflx%TR_AlOH3_precip_soil= 0._r8
-  solflx%TR_FeOH3_precip_soil= 0._r8
-  solflx%TR_CaCO3_precip_soil= 0._r8
-  solflx%TR_CaSO4_precip_soil= 0._r8
+  solflx%TRChem_NH4_soil = 0._r8
+  solflx%TRChem_NH4_band_soil = 0._r8
+  solflx%TRChem_NH3_soil_vr = 0._r8
+  solflx%TRChem_NH3_band_soil = 0._r8
+  solflx%TRChem_H1PO4_soil = 0._r8
+  solflx%TRChem_H2PO4_soil = 0._r8
+  solflx%TRChem_H1PO4_band_soil = 0._r8
+  solflx%TRChem_H2PO4_band_soil = 0._r8
+  solflx%TRChem_NH4_sorbed_soil = 0._r8
+  solflx%TRChem_NH4_sorbed_band_soil = 0._r8
+  solflx%TRChem_ROH_sorbed_soil = 0._r8
+  solflx%TRChem_ROH2_sorbed_soil = 0._r8
+  solflx%TRChem_RHPO4_sorbed_soil = 0._r8
+  solflx%TRChem_RH2PO4_sorbed_soil = 0._r8
+  solflx%TRChem_ROH_sorbed_band_soil = 0._r8
+  solflx%TRChem_ROH2_sorbed_band_soil = 0._r8
+  solflx%TRChem_RHPO4_sorbed_band_soil = 0._r8
+  solflx%TRChem_RH2PO4_sorbed_band_soil = 0._r8
+  solflx%TRChem_AlPO4_precip_soil= 0._r8
+  solflx%TRChem_FePO4_precip_soil= 0._r8
+  solflx%TRChem_CaHPO4_precip_soil= 0._r8
+  solflx%TRChem_apatite_precip_soil= 0._r8
+  solflx%TRChem_CaH4P2O8_precip_soil= 0._r8
+  solflx%TRChem_AlPO4_precip_band_soil= 0._r8
+  solflx%TRChem_FePO4_precip_band_soil= 0._r8
+  solflx%TRChem_CaHPO4_precip_band_soil= 0._r8
+  solflx%TRChem_apatite_precip_band_soil= 0._r8
+  solflx%TRChem_CaH4P2O8_precip_band_soil= 0._r8
+  solflx%TRChem_Al_3p_soil  = 0._r8
+  solflx%TRChem_Fe_3p_soil  = 0._r8
+  solflx%TRChem_H_p_soil  = 0._r8
+  solflx%TRChem_Ca_2p_soil  = 0._r8
+  solflx%TRChem_Mg_2p_soil  = 0._r8
+  solflx%TRChem_Na_p_soil  = 0._r8
+  solflx%TRChem_K_1p_soil  = 0._r8
+  solflx%TRChem_OH_1e_soil  = 0._r8
+  solflx%TRChem_SO4_2e_soil = 0._r8
+  solflx%TRChem_CO3_2e_soil = 0._r8
+  solflx%TRChem_HCO3_soil = 0._r8
+  solflx%TRChem_CO2_gchem_soil = 0._r8
+  solflx%TRChem_AlOH_soil = 0._r8
+  solflx%TRChem_AlO2H2_soil = 0._r8
+  solflx%TRChem_AlO3H3_soil = 0._r8
+  solflx%TRChem_AlO4H4_soil = 0._r8
+  solflx%TRChem_AlSO4_soil = 0._r8
+  solflx%TRChem_FeOH_soil = 0._r8
+  solflx%TRChem_FeO2H2_soil = 0._r8
+  solflx%TRChem_FeO3H3_soil_vr = 0._r8
+  solflx%TRChem_FeO4H4_soil = 0._r8
+  solflx%TRChem_FeSO4_soil = 0._r8
+  solflx%TRChem_CaOH_soil = 0._r8
+  solflx%TRChem_CaCO3_soil = 0._r8
+  solflx%TRChem_CaHCO3_soil = 0._r8
+  solflx%TRChem_CaSO4_soil = 0._r8
+  solflx%TRChem_MgOH_soil = 0._r8
+  solflx%TRChem_MgCO3_soil = 0._r8
+  solflx%TRChem_MgHCO3_soil = 0._r8
+  solflx%TRChem_MgSO4_soil = 0._r8
+  solflx%TRChem_NaCO3_soil = 0._r8
+  solflx%TRChem_NaSO4_soil = 0._r8
+  solflx%TRChem_KSO4_soil = 0._r8
+  solflx%TRChem_PO4_soil = 0._r8
+  solflx%TRChem_H3PO4_sorbed_soil = 0._r8
+  solflx%TRChem_FeHPO4_soil = 0._r8
+  solflx%TRChem_FeH2PO4_soil = 0._r8
+  solflx%TRChem_CaPO4_soil = 0._r8
+  solflx%TRChem_CaHPO4_soil = 0._r8
+  solflx%TRChem_CaH4P2O8_soil = 0._r8
+  solflx%TRChem_MgHPO4_soil = 0._r8
+  solflx%TRChem_PO4_band_soil = 0._r8
+  solflx%TRChem_H3PO4_band_soil = 0._r8
+  solflx%TRChem_FeHPO4_band_soil = 0._r8
+  solflx%TRChem_FeH2PO4_band_soil = 0._r8
+  solflx%TRChem_CaPO4_band_soil = 0._r8
+  solflx%TRChem_CaHPO4_band_soil = 0._r8
+  solflx%TRChem_CaH4P2O8_band_soil = 0._r8
+  solflx%TRChem_MgHPO4_band_soil = 0._r8
+  solflx%TRChem_H_p_sorbed_soil = 0._r8
+  solflx%TRChem_Al_sorbed_soil = 0._r8
+  solflx%TRChem_Fe_sorbed_soil = 0._r8
+  solflx%TRChem_Ca_sorbed_soil = 0._r8
+  solflx%TRChem_Mg_sorbed_soil = 0._r8
+  solflx%TRChem_Na_sorbed_soil = 0._r8
+  solflx%TRChem_K_sorbed_soil = 0._r8
+  solflx%TRChem_HCO3_sorbed_soil = 0._r8
+  solflx%TRChem_AlO2H2_sorbed_soil= 0._r8
+  solflx%TRChem_FeO2H2_sorbed_soil= 0._r8
+  solflx%TRChem_RO_sorbed_soil = 0._r8
+  solflx%TRChem_RO_sorbed_band_soil = 0._r8
+  solflx%TRChem_AlOH3_precip_soil= 0._r8
+  solflx%TRChem_FeOH3_precip_soil= 0._r8
+  solflx%TRChem_CaCO3_precip_soil= 0._r8
+  solflx%TRChem_CaSO4_precip_soil= 0._r8
   solflx%TRH2O_soil = 0._r8
   solflx%TBION_soil = 0._r8
   solflx%Txchem_CO2_soil = 0._r8
