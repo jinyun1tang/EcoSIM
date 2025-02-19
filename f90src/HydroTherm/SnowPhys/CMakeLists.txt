@@ -15,6 +15,7 @@ target_include_directories(SnowPhys  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SnowPhys PARENT_SCOPE)

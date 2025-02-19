@@ -180,10 +180,9 @@ module ExtractsMod
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
     TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
     TKS_vr                   => plt_ew%TKS_vr,                     &
-    THeatLossRoot2Soil_vr       => plt_ew%THeatLossRoot2Soil_vr,         &
-    TPlantRootH2OLoss_vr   => plt_ew%TPlantRootH2OLoss_vr,     &
+    THeatLossRoot2Soil_vr    => plt_ew%THeatLossRoot2Soil_vr,      &
+    TPlantRootH2OLoss_vr     => plt_ew%TPlantRootH2OLoss_vr,       &
     AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
-    TPlantRootH2OUptake_col  => plt_ew%TPlantRootH2OUptake_col,    &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
@@ -212,7 +211,6 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OUptake_col = TPlantRootH2OUptake_col+AllPlantRootH2OLoss_vr(N,L,NZ)
       TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
 
       !water lose from canopy to soil
@@ -340,7 +338,7 @@ module ExtractsMod
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,          &
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft,         &
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft,          &
-    CanopyBiomWater_pft           => plt_ew%CanopyBiomWater_pft,             &
+    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,         &
     Eco_Heat_GrndSurf_col     => plt_ew%Eco_Heat_GrndSurf_col,       &
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft,           &
     EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft,          &
@@ -351,7 +349,7 @@ module ExtractsMod
     Eco_Heat_Sens_col         => plt_ew%Eco_Heat_Sens_col,           &
     VapXAir2Canopy_col        => plt_ew%VapXAir2Canopy_col,          &
     CanopyHeatStor_col        => plt_ew%CanopyHeatStor_col,          &
-    QVegET_col                  => plt_ew%QVegET_col,                    &
+    QVegET_col                => plt_ew%QVegET_col,                  &
     HeatFlx2Canopy_col        => plt_ew%HeatFlx2Canopy_col,          &
     LWRadCanG                 => plt_ew%LWRadCanG,                   &
     TairK                     => plt_ew%TairK,                       &

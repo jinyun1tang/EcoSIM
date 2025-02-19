@@ -30,7 +30,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  RCH4PhysexchPrev_vr(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2AquaSourcePrev_vr(:,:,:)                      !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AquaIonDifusivty_vr(:,:,:,:)
-  real(r8),target,allocatable ::  trc_salt_rof_bounds(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_FloXSurRunoff_2D(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_FloXSurRunoff_2D(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_FloXSurRunoff_2D(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_FloXSurRunoff_2D(:,:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
@@ -80,7 +80,7 @@ module ChemTranspDataType
   endif
 
 
-  allocate(trc_salt_rof_bounds(idsalt_beg:idsalt_end,2,2,JV,JH));   trc_salt_rof_bounds=0._r8
+  allocate(trcSalt_FloXSurRunoff_2D(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_FloXSurRunoff_2D=0._r8
   allocate(trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,2,2,JV,JH));  trcg_FloXSurRunoff_2D=0._r8
   allocate(trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_FloXSurRunoff_2D=0._r8
   allocate(DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_FloXSurRunoff_2D=0._r8
@@ -94,7 +94,7 @@ module ChemTranspDataType
 
   implicit none
 
-  call destroy(trc_salt_rof_bounds)
+  call destroy(trcSalt_FloXSurRunoff_2D)
   call destroy(GasDifc_vr)
   call destroy(SoluteDifusvty_vr)
   call destroy(TScal4Difsvity_vr)

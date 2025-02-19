@@ -239,15 +239,15 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datip_1d
-    call restartvar(ncid, flag, varname='NumCogrothNode_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NumCogrowthNode_pft', dim1name='pft',&
        long_name='Number of growing plant nodes', units='none', interpinic_flag='skip', &
        data=dat1pr, missing_value=ispval, fill_value=ispval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,NumCogrothNode_pft,datip_1d)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,NumCogrowthNode_pft,datip_1d)
   else 
     !print*,'iPlantState_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NumCogrothNode_pft,datip_1d)  
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,NumCogrowthNode_pft,datip_1d)  
     dat1pr => datip_1d
-    call restartvar(ncid, flag, varname='NumCogrothNode_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NumCogrowthNode_pft', dim1name='pft',&
        long_name='Number of growing plant nodes', units='none', interpinic_flag='skip', &
        data=dat1pr, missing_value=ispval, fill_value=ispval)    
   endif
@@ -818,17 +818,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TCelciusCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TdegCCanopy_pft', dim1name='pft',&
      long_name='canopy temperature', units='oC', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,TCelciusCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,TdegCCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'TCelciusCanopy_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TCelciusCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
+    !print*,'TdegCCanopy_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,TdegCCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='TCelciusCanopy_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='TdegCCanopy_pft', dim1name='pft',&
      long_name='canopy temperature', units='oC', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
   endif  
@@ -2529,17 +2529,17 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='StalkBiomassC_brch', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='StalkLiveBiomassC_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkLiveBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'StalkBiomassC_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants,&
+    !print*,'StalkLiveBiomassC_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,StalkLiveBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='StalkBiomassC_brch', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='StalkLiveBiomassC_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
@@ -3061,11 +3061,11 @@ implicit none
     call restartvar(ncid, flag, varname='ARLF', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafAreaNode_brch,datrp_3d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafNodeArea_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
     !print*,'ARLF'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafAreaNode_brch,datrp_3d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,LeafNodeArea_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='ARLF', dim1name='pft',dim2name='nodes1',&
@@ -3177,17 +3177,17 @@ implicit none
 
   if(flag=='read')then 
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='InternodeHeightDying_brch', dim1name='pft',dim2name='nodes1',&
+    call restartvar(ncid, flag, varname='InternodeHeightDead_brch', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='senescing internode height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,InternodeHeightDying_brch,datrp_3d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,InternodeHeightDead_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'InternodeHeightDying_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,InternodeHeightDying_brch,datrp_3d,NumActivePlants=NumActivePlants,&
+    !print*,'InternodeHeightDead_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,InternodeHeightDead_brch,datrp_3d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='InternodeHeightDying_brch', dim1name='pft',dim2name='nodes1',&
+    call restartvar(ncid, flag, varname='InternodeHeightDead_brch', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='senescing internode height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
@@ -4254,7 +4254,27 @@ implicit none
 
   call restartvar(ncid, flag, varname='SurfGas_O2_lnd', &
        long_name='total surface O2 flux', units='g d-2', &
-       interpinic_flag='skip', data=SurfGas_O2_lnd, missing_value=spval, &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_O2), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_CO2_lnd', &
+       long_name='total surface CO2 flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_CO2), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_Ar_lnd', &
+       long_name='total surface Ar flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_Ar), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_H2_lnd', &
+       long_name='total surface H2 flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_H2), missing_value=spval, &
+       fill_value=spval)
+
+  call restartvar(ncid, flag, varname='SurfGas_CH4_lnd', &
+       long_name='total surface CH4 flux', units='g d-2', &
+       interpinic_flag='skip', data=SurfGas_lnd(idg_CH4), missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='tAmendOrgC_lnd', &
@@ -4270,16 +4290,6 @@ implicit none
   call restartvar(ncid, flag, varname='TORGP', &
        long_name='total organic P amendment', units='g d-2', &
        interpinic_flag='skip', data=TORGP, missing_value=spval, &
-       fill_value=spval)
-
-  call restartvar(ncid, flag, varname='SurfGas_N2_lnd', &
-       long_name='total surface N2 flux', units='g d-2', &
-       interpinic_flag='skip', data=SurfGas_N2_lnd, missing_value=spval, &
-       fill_value=spval)
-
-  call restartvar(ncid, flag, varname='SurfGas_CO2_lnd', &
-       long_name='total surface CO2 flux', units='g d-2', &
-       interpinic_flag='skip', data=SurfGas_CO2_lnd, missing_value=spval, &
        fill_value=spval)
 
   call restartvar(ncid, flag, varname='QH2OLoss_lnds', &

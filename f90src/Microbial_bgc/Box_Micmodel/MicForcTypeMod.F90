@@ -17,7 +17,7 @@ module MicForcTypeMod
   real(r8) :: COXYE
   real(r8) :: O2_irrig_conc
   real(r8) :: O2_rain_conc
-  real(r8) :: Irrig2LitRSurf
+  real(r8) :: Irrig2LitRSurf_col
   real(r8) :: Rain2LitRSurf
   real(r8) :: TempOffset
   real(r8) :: VLitR
@@ -54,7 +54,7 @@ module MicForcTypeMod
   real(r8) :: RO2EcoDmndPrev
   real(r8) :: RO2GasXchangePrev
   real(r8) :: RCH4PhysexchPrev
-  real(r8) :: RCH4F
+  real(r8) :: RCH4GasXchangePrev
   real(r8) :: RNH4EcoDmndSoilPrev
   real(r8) :: RNH4EcoDmndBandPrev
   real(r8) :: RNO3EcoDmndSoilPrev

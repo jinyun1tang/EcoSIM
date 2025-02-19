@@ -139,19 +139,14 @@ module InsideTranspMod
 !
 !     RESET RUNOFF SOLUTE FLUX ACCUMULATORS
 !
-!     R*SK2=total sink from nitro.f, uptake.f, solute.f
-!     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in micropores
-!     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
-!     ZN3G=gaseous NH3
 !
 
     DO  K=1,jcplx
       DOM_SurfRunoff_flxM(idom_beg:idom_end,K,NY,NX)=0.0_r8
     ENDDO
 
-    trcg_SurfRunoff_flxM(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
-    trcn_SurfRunoff_flxM(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
+    trcg_SurfRunoff_flx(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
+    trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
     trcg_SnowDrift_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
     trcn_SnowDrift_flxM(ids_nut_beg:ids_nuts_end,NY,NX)  = 0.0_r8
 
@@ -232,6 +227,8 @@ module InsideTranspMod
   integer, intent(in) :: M,MX, NY, NX, NHE, NVS
   real(r8), intent(inout) :: WaterFlow2SoilMM_3D(3,JD,JV,JH)
   real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end)
+
+  character(len=*), parameter :: subname='TracerExchXGridsMM'
   real(r8) :: VFLW
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VLWatMacPS,VOLWT
@@ -241,6 +238,7 @@ module InsideTranspMod
   integer :: N4,N5,N6  !dest grid index
 
 ! begin_execution
+  call PrintInfo('beg '//subname)
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     N6,N5,N4=L,NY,NX of destination grid cell
 !
@@ -258,18 +256,18 @@ module InsideTranspMod
         IF(NX.EQ.NHE)THEN
           cycle
         ELSE
-          N4=NX+1
-          N5=NY
-          N6=L
+          N4 = NX+1
+          N5 = NY
+          N6 = L
         ENDIF
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !NORTH-SOUTH
         IF(NY.EQ.NVS)THEN
           cycle
         ELSE
-          N4=NX
-          N5=NY+1
-          N6=L
+          N4 = NX
+          N5 = NY+1
+          N6 = L
         ENDIF
       ELSEIF(N.EQ.iVerticalDirection)THEN
         !VERTICAL
@@ -291,12 +289,7 @@ module InsideTranspMod
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
 !     WATER CONTEnsolutes AND WATER FLUXES 'WaterFlow2SoilMM_3D' FROM 'WATSUB'
-!
-!     VLSoilPoreMicP_vr,VLSoilMicP=soil volume excluding rock, macropore
-!     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-!     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
-!     THETW=volumetric water content
+
 !     ReductVLsoiAirPM=change in air volume
 !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
 !
@@ -309,8 +302,8 @@ module InsideTranspMod
             VLWatMicPXA_vr(N6,N5,N4) = natomw*VLWatMicPMA_vr(N6,N5,N4)
             VLWatMicPXB_vr(N6,N5,N4) = natomw*VLWatMicPMB_vr(N6,N5,N4)
 
-            VLsoiAirPMA_vr(N6,N5,N4)      = VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
-            VLsoiAirPMB_vr(N6,N5,N4)      = VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
+            VLsoiAirPMA_vr(N6,N5,N4)          = VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4,N6,N5,N4)
+            VLsoiAirPMB_vr(N6,N5,N4)          = VLsoiAirPM_vr(M,N6,N5,N4)*trcs_VLN_vr(ids_NH4B,N6,N5,N4)
             CumReductVLsoiAirPMM_vr(N6,N5,N4) = ReductVLsoiAirPM_vr(M,N6,N5,N4)*dt_GasCyc
 !
             WaterFlow2SoilMM_3D(N,N6,N5,N4)=(WaterFlow2MicPM_3D(M,N,N6,N5,N4) &
@@ -343,8 +336,8 @@ module InsideTranspMod
 !     CHECK FOR BUBBLING IF THE SUM OF ALL GASEOUS EQUIVALENT
 !     PARTIAL CONCENTRATIONS EXCEEDS ATMOSPHERIC PRESSURE
     if(M.NE.MX)call BubbleEffluxM(M,N1,N2,N3,NY,NX,RGasAtmDisol2SoilM,iDisableEbu)
-
   ENDDO D125
+  call PrintInfo('end '//subname)
   end subroutine TracerExchXGridsMM
 
 ! ----------------------------------------------------------------------
@@ -1001,18 +994,6 @@ module InsideTranspMod
 !     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
 !     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
 !
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,R*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,R*FHB=convective + diffusive solute flux through macropores in non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     RFL*=convective flux through micropores
-!     DFV*=diffusive solute flux through micropores
-!     RFH*=convective flux through macropores
-!     DFH*=diffusive solute flux through macropores
 !
   D9765: DO K=1,jcplx
     do idom=idom_beg,idom_end
@@ -1024,14 +1005,6 @@ module InsideTranspMod
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-!     X*FLS=hourly convective + diffusive solute flux through micropores
-!     X*FLW,X*FLB= hourly convective + diffusive solute flux through micropores in non-band,band
-!     X*FHS=hourly convective + diffusive solute flux through macropores
-!     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band
-!     R*FLS=convective + diffusive solute flux through micropores
-!     R*FLW,X*FLB=convective + diffusive solute flux through micropores in non-band,band
-!     R*FHS=convective + diffusive solute flux through macropores
-!     R*FHW,X*FHB=convective + diffusive solute flux through macropores in non-band,band
 !
   D9755: DO K=1,jcplx
     do idom=idom_beg,idom_end
@@ -1171,13 +1144,6 @@ module InsideTranspMod
 !
 !     TOTAL CONVECTIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
 !
-!     R*FXS,R*FXB=total convective + diffusive solute flux between macro- and micropore in non-band,band
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     RFL*=convective flux between macro- and micropore
-!     DFV*=diffusive solute flux between macro- and micropore
 !
 
   DO  K=1,jcplx
@@ -1267,17 +1233,22 @@ module InsideTranspMod
   integer, intent(in) :: M,N1,N2,N3,NY,NX
   real(r8), intent(in) :: RGasAtmDisol2SoilM(idg_beg:idg_end)  !newly dissolved gas 
   integer, intent(inout) :: iDisableEbu                        !bubbling flag
+
+  character(len=*), parameter :: subname='BubbleEffluxM'  
   real(r8) :: THETW1
   real(r8) :: GasMassSolubility(idg_beg:idg_end)
   real(r8) :: trcg_VOLG(idg_beg:idg_end)   !gas concentation corresponding to each volatile [mol d-2]
   integer  :: idg
   real(r8) :: VTATM,VTGAS,DVTGAS
   real(r8) :: FracEbu                      !fraction removed through ebullition
+  real(r8) :: dPond
 !
 !     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     VLSoilMicP=micropore volume
 !     S*L=solubility of gas in water from hour1.f
 !
+  call PrintInfo('beg '//subname)
+  dPond=0._r8
   IF(N3.GE.NUM(N2,N1))THEN
     THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
     IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1) .AND. iDisableEbu.EQ.ifalse)THEN
@@ -1304,21 +1275,28 @@ module InsideTranspMod
 !     VTATM=molar gas concentration at atmospheric pressure
 !     VTGAS=total molar gas concentration     
 !    
-      VTATM = AZMAX1(PBOT_col(NY,NX)*VLWatMicPM_vr(M,N3,N2,N1)/(RGasC*TKS_vr(N3,N2,N1)))*1.E3_r8  !mol gas/ d2
+      if(iPondFlag_col(N2,N1))then 
+        if(SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)then
+          !still in the ponding water, \rho*g*h,  1.e3*10
+          dPond=(CumDepz2LayBottom_vr(N3,N2,N1)-CumDepz2LayBottom_vr(NUM(N2,N1)-1,N2,N1))*10._r8
+        else
+          !in the soil
+          dPond=(CumDepz2LayBottom_vr(iPondBotLev_col(N2,N1),N2,N1)-CumDepz2LayBottom_vr(NUM(N2,N1)-1,N2,N1))*10._r8
+        endif  
+      endif  
+      VTATM = AZMAX1((PBOT_col(NY,NX)+dPond)*VLWatMicPM_vr(M,N3,N2,N1)/(RGasC*TKS_vr(N3,N2,N1)))*1.E3_r8  !mol gas/ d2
       VTGAS = sum(trcg_VOLG(idg_beg:idg_end))
 !
 !     PROPORTIONAL REMOVAL OF EXCESS AQUEOUS GASES
 !
       IF(VTGAS.GT.VTATM)THEN
-        DVTGAS=0.5_r8*(VTATM-VTGAS)         !<0, bubbling occurs
-        FracEbu=AZMIN1(DVTGAS/VTGAS)
+        DVTGAS  = 0.5_r8*(VTATM-VTGAS)         !<0, bubbling occurs
+        FracEbu = AZMIN1(DVTGAS/VTGAS)
         DO idg=idg_beg,idg_end
           trcg_Ebu_flxM_vr(idg,N3,N2,N1)=FracEbu*trcg_VOLG(idg)*GasMassSolubility(idg)  
         ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-!
-!     X*BBL=hourly bubble flux
 !
         DO idg=idg_beg,idg_end
           trcg_ebu_flx_vr(idg,N3,N2,N1)=trcg_ebu_flx_vr(idg,N3,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1) !<0, ebullition
@@ -1330,8 +1308,8 @@ module InsideTranspMod
       iDisableEbu=itrue
       trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
     ENDIF
-
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine BubbleEffluxM
 ! ----------------------------------------------------------------------
 

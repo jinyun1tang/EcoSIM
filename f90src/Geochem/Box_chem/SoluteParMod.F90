@@ -37,8 +37,8 @@ module SoluteParMod
   real(r8), PARAMETER :: SXOH1=1.1E-06_r8
   real(r8), PARAMETER :: SXH2P=2.0E+07_r8
   real(r8), PARAMETER :: SXH1P=2.0E+07_r8
-  real(r8), PARAMETER :: DPCO2=4.2E-04_r8
-  real(r8), PARAMETER :: DPHCO=5.6E-08_r8
+  real(r8), PARAMETER :: DPCO2=4.2E-04_r8  !CO2 + H2O -> HCO3(-) + H(+), [mol/m3]
+  real(r8), PARAMETER :: DPHCO=5.6E-08_r8  !HCO3(-)   -> CO3(2-) + H(+), [mol/m3]
   real(r8), PARAMETER :: DPN4=5.7E-07_r8
   real(r8), PARAMETER :: DPAL1=4.6E-07_r8
   real(r8), PARAMETER :: DPAL2=7.3E-07_r8

@@ -1,13 +1,15 @@
 module EcoSimSumDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ElmIDMod
+  use TracerIDMod
   implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
   real(r8) :: TSoilH2G_lnd                             !total soil N2	g d-2
-  real(r8) :: SurfGas_H2_lnd                           !total soil H2 g d-2
+  real(r8), target, allocatable :: SurfGas_lnd(:)      !total soil gas g d-2
+  real(r8), target, allocatable :: PlantElemntStoreLandscape(:)    !total plant element (C,N,P, etc) balance	g d-2  
   real(r8) :: H2GOU                                    !cumulative H2 loss through lateral and lower boundaries
   real(r8) :: TION                                     !total soil ion content	mol d-2
   real(r8) :: TIONIN                                   !total surface ion flux	mol d-2
@@ -22,15 +24,11 @@ module EcoSimSumDataType
   real(r8) :: TDisolNH4_lnd    !total soil NH4 content	g d-2
   real(r8) :: tNO3_lnd    !total soil NO3 content	g d-2
   real(r8) :: TDisolPi_lnd    !total soil PO4 content	g d-2
-  real(r8), pointer :: PlantElemntStoreLandscape(:)    !total plant element (C,N,P, etc) balance	g d-2
   real(r8) :: CRAIN_lnd    !total precipitation	m3 d-2
   real(r8) :: HEATIN_lnd   !total surface heat flux	MJ d-2
-  real(r8) :: SurfGas_O2_lnd   !total surface O2 flux	g d-2
   real(r8) :: tAmendOrgC_lnd    !total organic C amendment	g d-2
   real(r8) :: TORGN    !total organic N amendment	g d-2
   real(r8) :: TORGP    !total organic P amendment	g d-2
-  real(r8) :: SurfGas_CO2_lnd   !total surface CO2 flux	g d-2
-  real(r8) :: SurfGas_N2_lnd   !total surface N2 flux	g d-2
   real(r8) :: QH2OLoss_lnds   !total subsurface water flux	m3 d-2
   real(r8) :: CEVAP    !total evaporation	m3 d-2
   real(r8) :: CRUN     !total surface runoff	m3 d-2
@@ -56,7 +54,7 @@ module EcoSimSumDataType
 !----------------------------------------------------------------------
   subroutine InitAllocate
   implicit none
-
+  allocate(SurfGas_lnd(idg_beg:idg_NH3))
   allocate(PlantElemntStoreLandscape(NumPlantChemElms)); PlantElemntStoreLandscape=0._r8
   end subroutine InitAllocate
 
@@ -65,5 +63,6 @@ module EcoSimSumDataType
   use abortutils, only : destroy
   implicit none
   call destroy(PlantElemntStoreLandscape)
+  call destroy(SurfGas_lnd)
   end subroutine DestructEcoSimSum
 end module EcoSimSumDataType

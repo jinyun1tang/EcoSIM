@@ -524,7 +524,7 @@ module PlantDisturbsMod
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs,         &
     CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
     CanopyLeafShethC_pft       => plt_biom%CanopyLeafShethC_pft,        &
-    StalkBiomassC_brch         => plt_biom%StalkBiomassC_brch,          &
+    StalkLiveBiomassC_brch         => plt_biom%StalkLiveBiomassC_brch,          &
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch,         &
     ShootStrutElms_brch        => plt_biom%ShootStrutElms_brch,         &
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
@@ -547,7 +547,6 @@ module PlantDisturbsMod
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col,          &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
     CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft,         &
-    LiveInterNodeHight_brch    => plt_morph%LiveInterNodeHight_brch,    &
     CanopyStalkArea_lbrch      => plt_morph%CanopyStalkArea_lbrch,      &
     ClumpFactor_pft            => plt_morph%ClumpFactor_pft,            &
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col          &
@@ -634,7 +633,7 @@ module PlantDisturbsMod
     D9840: DO NB=1,NumOfBranches_pft(NZ)
       CanopyLeafShethC_pft(NZ)     = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
       StalkStrutElms_pft(ielmc,NZ) = StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
-      CanopyStalkC_pft(NZ)         = CanopyStalkC_pft(NZ)+StalkBiomassC_brch(NB,NZ)
+      CanopyStalkC_pft(NZ)         = CanopyStalkC_pft(NZ)+StalkLiveBiomassC_brch(NB,NZ)
       D9830: DO L=1,NumOfCanopyLayers1
         CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
       ENDDO D9830
@@ -804,9 +803,9 @@ module PlantDisturbsMod
     FracCanopyHeightCut_pft   => plt_distb%FracCanopyHeightCut_pft,   &
     THIN_pft                  => plt_distb%THIN_pft,                  &
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch,         &
-    InternodeHeightDying_brch => plt_morph%InternodeHeightDying_brch, &
+    InternodeHeightDead_brch => plt_morph%InternodeHeightDead_brch, &
     FracBiomHarvsted          => plt_distb%FracBiomHarvsted,          &
-    StalkBiomassC_brch        => plt_biom%StalkBiomassC_brch,         &
+    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch,         &
     StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch,        &
     LiveInterNodeHight_brch   => plt_morph%LiveInterNodeHight_brch,   &
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft,          &
@@ -885,13 +884,13 @@ module PlantDisturbsMod
     SenecStalkStrutElms_brch(NE,NB,NZ) = FrcLeafMassLeft*SenecStalkStrutElms_brch(NE,NB,NZ)
   ENDDO
 
-  StalkBiomassC_brch(NB,NZ)=FrcLeafMassLeft*StalkBiomassC_brch(NB,NZ)
+  StalkLiveBiomassC_brch(NB,NZ)=FrcLeafMassLeft*StalkLiveBiomassC_brch(NB,NZ)
 !
 !     CUT STALK NODES
 !
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-!     InternodeHeightDying_brch,LiveInterNodeHight_brch=stalk height,stalk internode length
+!     InternodeHeightDead_brch,LiveInterNodeHight_brch=stalk height,stalk internode length
 !     FHGTK=fraction of internode length not harvested
 !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
 !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
@@ -902,10 +901,10 @@ module PlantDisturbsMod
 !
   D9820: DO K=MaxNodesPerBranch1,0,-1
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-      IF(InternodeHeightDying_brch(K,NB,NZ).GT.ZERO)THEN
+      IF(InternodeHeightDead_brch(K,NB,NZ).GT.ZERO)THEN
         IF(iHarvstType_pft(NZ).NE.iharvtyp_pruning)THEN
           FHGTK=AZMAX1(AMIN1(1.0_r8,(LiveInterNodeHight_brch(K,NB,NZ)-FracCanopyHeightCut_pft(NZ))/&
-            InternodeHeightDying_brch(K,NB,NZ)))
+            InternodeHeightDead_brch(K,NB,NZ)))
         ELSE
           FHGTK=0._r8
         ENDIF
@@ -928,7 +927,7 @@ module PlantDisturbsMod
       InternodeStrutElms_brch(NE,K,NB,NZ)=FHVSETS*InternodeStrutElms_brch(NE,K,NB,NZ)
     ENDDO
     IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.isclose(THIN_pft(NZ),0._r8))THEN
-      InternodeHeightDying_brch(K,NB,NZ) = FHVSETS*InternodeHeightDying_brch(K,NB,NZ)
+      InternodeHeightDead_brch(K,NB,NZ) = FHVSETS*InternodeHeightDead_brch(K,NB,NZ)
       LiveInterNodeHight_brch(K,NB,NZ)   = AMIN1(LiveInterNodeHight_brch(K,NB,NZ),FracCanopyHeightCut_pft(NZ))
     ENDIF
 
@@ -1259,7 +1258,7 @@ module PlantDisturbsMod
   ENDIF
 
   D9805: DO K=MaxNodesPerBranch1,0,-1
-    IF(LiveInterNodeHight_brch(K,NB,NZ).GT.0.0) RMedInternodeLen=AMAX1(RMedInternodeLen,LiveInterNodeHight_brch(K,NB,NZ))
+    IF(LiveInterNodeHight_brch(K,NB,NZ).GT.0.0_r8) RMedInternodeLen=AMAX1(RMedInternodeLen,LiveInterNodeHight_brch(K,NB,NZ))
 !
 !     HARVESTED SHEATH OR PETIOLE C,N,P
 !
@@ -1516,7 +1515,7 @@ module PlantDisturbsMod
     LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
     CanopyLeafCLyr_pft       => plt_biom%CanopyLeafCLyr_pft,       &
     LeafAreaLive_brch        => plt_morph%LeafAreaLive_brch,       &
-    LeafAreaNode_brch        => plt_morph%LeafAreaNode_brch,       &
+    LeafNodeArea_brch        => plt_morph%LeafNodeArea_brch,       &
     LeafProteinCNode_brch    => plt_biom%LeafProteinCNode_brch,    &
     LeafStrutElms_brch       => plt_biom%LeafStrutElms_brch,       &
     CanopyLeafAreaZ_pft      => plt_morph%CanopyLeafAreaZ_pft,     &
@@ -1581,20 +1580,20 @@ module PlantDisturbsMod
 !     ACCUMULATE REMAINING BRANCH LEAF AREA, C, N, P
 !
 !     WGLF=leaf node C mass
-!     LeafAreaLive_brch,LeafAreaNode_brch=branch,node leaf area
+!     LeafAreaLive_brch,LeafNodeArea_brch=branch,node leaf area
 !     LeafProteinCNode_brch=leaf protein mass
 !
     LeafCbfCut_brch=LeafCbfCut_brch+LeafElmntNode_brch(ielmc,K,NB,NZ)
     DO NE=1,NumPlantChemElms
       LeafStrutElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ)-LeafElmntNode_brch(NE,K,NB,NZ)+LeafElmNodeK_brch(NE)
     ENDDO
-    LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)-LeafAreaNode_brch(K,NB,NZ)+ARLFG
-    IF(LeafAreaNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*ARLFG/LeafAreaNode_brch(K,NB,NZ)
+    LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)-LeafNodeArea_brch(K,NB,NZ)+ARLFG
+    IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*ARLFG/LeafNodeArea_brch(K,NB,NZ)
     ELSE
       LeafProteinCNode_brch(K,NB,NZ)=0._r8
     ENDIF
-    LeafAreaNode_brch(K,NB,NZ)=ARLFG
+    LeafNodeArea_brch(K,NB,NZ)=ARLFG
 
     DO NE=1,NumPlantChemElms
       LeafElmntNode_brch(NE,K,NB,NZ)=LeafElmNodeK_brch(NE)
@@ -1664,7 +1663,7 @@ module PlantDisturbsMod
 !     ShootC4NonstC_brch=total C4 nonstructural C in branch
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
-!     StalkBiomassC_brch=stalk sapwood mass
+!     StalkLiveBiomassC_brch=stalk sapwood mass
 !     PSICanopy_pft=canopy water potential
 !     CanopyBiomWater_pft=water volume in canopy
 !     QH2OLoss_lnds,H2OLoss_CumYr_col=accumulated water loss for water balance calculation

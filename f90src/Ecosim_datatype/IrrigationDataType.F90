@@ -72,20 +72,19 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CC2PQ(:,:,:)                      !surface irrigation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PQ(:,:,:)                      !surface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CSTRQ(:,:,:)                      !surface irrigation ion strength, [g m-3]
-  real(r8),target,allocatable ::  CSTRR(:,:)                        !surface irrigation ion strength, [g m-3]
+  real(r8),target,allocatable ::  SurfIrrig_IonStrenth_col(:,:)                        !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  trcg_irrig_mole_conc_col(:,:,:)   !surface irrigation  volatile concentration, [mol m-3]
   real(r8),target,allocatable ::  COCU(:,:,:,:)                     !subsurface irrigation  DOC concentration, [g m-3]
   real(r8),target,allocatable ::  CONU(:,:,:,:)                     !subsurface irrigation  DON concentration, [g m-3]
   real(r8),target,allocatable ::  COAU(:,:,:,:)                     !subsurface irrigation  acetate concentration, [g m-3]
-  real(r8),target,allocatable ::  trcn_irrig_vr(:,:,:,:)               !subsurface irrigation  nutrient concentration, [g m-3]
+  real(r8),target,allocatable ::  trcn_irrig_vr(:,:,:,:)            !subsurface irrigation  nutrient concentration, [g m-3]
   real(r8),target,allocatable ::  CNZU(:,:,:)                       !subsurface irrigation  Al concentration, [g m-3]
-  real(r8),target,allocatable ::  trcsalt_subirrig_conc(:,:,:,:)     !subsurface irrigation  chemical concentration, [g m-3]
+  real(r8),target,allocatable ::  trcSalt_irrig_vr(:,:,:,:)         !subsurface irrigation  chemical concentration, [g m-3]
   real(r8),target,allocatable ::  COPU(:,:,:,:)                     !subsurface irrigation  DOP concentration, [g m-3]
   real(r8),target,allocatable ::  FWatIrrigate2MicP_vr(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatIrrigation_vr(:,:,:)          !convective heat due to underground irrigation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcs_Irrig_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcSalt_Irrig_vr(:,:,:,:)          !aqueous salt flux due to underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable :: trcsalt_irrig_conc(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
+  real(r8),target,allocatable :: trcsalt_irrig_mole_conc_col(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
   private :: InitAllocate
   contains
 
@@ -160,19 +159,18 @@ module IrrigationDataType
   allocate(CIRRA(JY,JX));       CIRRA=0._r8
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
   allocate(TDIRI(12,JY,JX));    TDIRI=0._r8
-  allocate(CSTRR(JY,JX));       CSTRR=0._r8
+  allocate(SurfIrrig_IonStrenth_col(JY,JX));       SurfIrrig_IonStrenth_col=0._r8
   allocate(COCU(1:jcplx,JZ,JY,JX)); COCU=0._r8
   allocate(CONU(1:jcplx,JZ,JY,JX)); CONU=0._r8
   allocate(COAU(1:jcplx,JZ,JY,JX)); COAU=0._r8
   allocate(trcn_irrig_vr(ids_nuts_beg:ids_nuts_end,JZ,JY,JX)); trcn_irrig_vr=0._r8
   allocate(CNZU(JZ,JY,JX));     CNZU=0._r8
-  allocate(trcsalt_subirrig_conc(idsalt_beg:idsalt_end,JZ,JY,JX));     trcsalt_subirrig_conc=0._r8
+  allocate(trcSalt_irrig_vr(idsalt_beg:idsalt_end,JZ,JY,JX));     trcSalt_irrig_vr=0._r8
   allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
   allocate(FWatIrrigate2MicP_vr(JZ,JY,JX));      FWatIrrigate2MicP_vr=0._r8
   allocate(HeatIrrigation_vr(JZ,JY,JX));    HeatIrrigation_vr=0._r8
   allocate(trcs_Irrig_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Irrig_vr=0._r8
-  allocate(trcSalt_Irrig_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Irrig_vr=0._r8
-  allocate(trcsalt_irrig_conc(idsalt_beg:idsaltb_end,366,JY,JX))
+  allocate(trcsalt_irrig_mole_conc_col(idsalt_beg:idsaltb_end,366,JY,JX))
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -238,9 +236,9 @@ module IrrigationDataType
   call destroy(CIRRA)
   call destroy(DIRRA)
   call destroy(TDIRI)
-  call destroy(CSTRR)
+  call destroy(SurfIrrig_IonStrenth_col)
   call destroy(trcg_irrig_mole_conc_col)
-  call destroy(trcsalt_subirrig_conc)
+  call destroy(trcSalt_irrig_vr)
   call destroy(COCU)
   call destroy(CONU)
   call destroy(COAU)

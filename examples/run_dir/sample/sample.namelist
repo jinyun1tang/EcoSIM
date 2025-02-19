@@ -43,7 +43,7 @@ hist_nhtfrq=-24
 
 !namelist for timer
 &ecosim_time
-rest_opt='never'  !'ndays','nmonths','nyears'
+rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
 stop_n=20            !this shall overwrite what is set in forc_periods

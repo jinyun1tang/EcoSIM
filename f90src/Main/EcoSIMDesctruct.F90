@@ -11,7 +11,6 @@ module EcoSIMDesctruct
   use EcoSimSumDataType   , only : DestructEcoSimSum
   use FlagDataType        , only : DestructFlagData
   use WatsubDataMod       , only : DestructWatSubData
-  use TranspSaltMod       , only : DestructTranspSalt
   use ErosionMod          , only : DestructErosion
   use SoilHeatDatatype    , only : DestructSoilHeatData
   use SoilPhysDataType    , only : DestructSoilPhysData
@@ -81,9 +80,7 @@ module EcoSIMDesctruct
 
   call DestructFlagData
 
-  if(salt_model)then
-    call DestructTranspSalt
-  else
+  if(.not.salt_model)then
     call DestructTranspNoSalt
   endif
   call DestructEcoSIMCtrlData

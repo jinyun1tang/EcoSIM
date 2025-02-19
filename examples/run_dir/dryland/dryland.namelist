@@ -21,7 +21,6 @@ disp_planttrait=.true.
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '20010101000000'
-
 continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2001,2006,1,2001,2002,0,2001,2006,0
@@ -40,7 +39,7 @@ hist_nhtfrq=-24
 
 !namelist for timer
 &ecosim_time
-rest_opt='never'  !'ndays','nmonths','nyears'
+rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
 stop_n=100            !this shall overwrite what is set in forc_periods

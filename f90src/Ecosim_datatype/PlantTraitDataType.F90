@@ -46,7 +46,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SinePetioleAngle_pft(:,:,:)                       !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  ReistanceCanopy_pft(:,:,:)                         !canopy roughness height, [m]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)                       !canopy height, [m]
-  real(r8),target,allocatable ::  LeafAreaNode_brch(:,:,:,:,:)                    !leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafNodeArea_brch(:,:,:,:,:)                    !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)                   !sheath height, [m]
   real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                     !branch leaf area, [m2 d-2]
@@ -56,7 +56,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)                     !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                        !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)             !plant population, [d-2]
-  real(r8),target,allocatable ::  InternodeHeightDying_brch(:,:,:,:,:)                  !internode height, [m]
+  real(r8),target,allocatable ::  InternodeHeightDead_brch(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  CNLF(:,:,:)                        !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  CPLF(:,:,:)                        !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  CNSHE(:,:,:)                       !sheath N:C ratio, [g g-1]
@@ -142,7 +142,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                        !rate of node initiation, [h-1 at 25 oC]
   real(r8),target,allocatable ::  NodeLenPergC(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FracGroth2Node_pft(:,:,:)                        !parameter for allocation of growth to nodes, [-]
-  integer,target,allocatable ::  NumCogrothNode_pft(:,:,:)                         !number of concurrently growing nodes
+  integer,target,allocatable ::  NumCogrowthNode_pft(:,:,:)                         !number of concurrently growing nodes
   real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
@@ -206,7 +206,7 @@ contains
   allocate(ReistanceCanopy_pft(JP,JY,JX));      ReistanceCanopy_pft=0._r8
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
-  allocate(LeafAreaNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaNode_brch=0._r8
+  allocate(LeafNodeArea_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafNodeArea_brch=0._r8
   allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
   allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
@@ -216,7 +216,7 @@ contains
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
-  allocate(InternodeHeightDying_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDying_brch=0._r8
+  allocate(InternodeHeightDead_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDead_brch=0._r8
   allocate(CNLF(JP,JY,JX));     CNLF=0._r8
   allocate(CPLF(JP,JY,JX));     CPLF=0._r8
   allocate(CNSHE(JP,JY,JX));    CNSHE=0._r8
@@ -302,7 +302,7 @@ contains
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
   allocate(NodeLenPergC(JP,JY,JX));     NodeLenPergC=0._r8
   allocate(FracGroth2Node_pft(JP,JY,JX));     FracGroth2Node_pft=0._r8
-  allocate(NumCogrothNode_pft(JP,JY,JX));     NumCogrothNode_pft=0
+  allocate(NumCogrowthNode_pft(JP,JY,JX));     NumCogrowthNode_pft=0
   allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
@@ -362,7 +362,7 @@ contains
   call destroy(SinePetioleAngle_pft)
   call destroy(ReistanceCanopy_pft)
   call destroy(CanopyHeight4WatUptake_pft)
-  call destroy(LeafAreaNode_brch)
+  call destroy(LeafNodeArea_brch)
   call destroy(PetoleLensNode_brch)
   call destroy(LiveInterNodeHight_brch)
   call destroy(LeafAreaLive_brch)
@@ -372,7 +372,7 @@ contains
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
-  call destroy(InternodeHeightDying_brch)
+  call destroy(InternodeHeightDead_brch)
   call destroy(PARTS_brch)
   call destroy(CNLF)
   call destroy(CPLF)
@@ -459,7 +459,7 @@ contains
   call destroy(RefNodeInitRate_pft)
   call destroy(NodeLenPergC)
   call destroy(FracGroth2Node_pft)
-  call destroy(NumCogrothNode_pft)
+  call destroy(NumCogrowthNode_pft)
   call destroy(PSICanPDailyMin)
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)

@@ -139,7 +139,7 @@ contains
   micfor%COXYE =forc%COXYE
   micfor%O2_irrig_conc  =0._r8      !oxygen concentration in surface irrigation
   micfor%O2_rain_conc  =0._r8      !oxygen concentration in precipitation
-  micfor%Irrig2LitRSurf =0._r8      !irrigation flux into surface litter
+  micfor%Irrig2LitRSurf_col =0._r8      !irrigation flux into surface litter
   micfor%Rain2LitRSurf =0._r8      !precipitation flux into surface litter
   micfor%TempOffset=forc%TempOffset
   micfor%VLitR  =forc%VLitR
@@ -344,7 +344,7 @@ contains
   cid_NH3_aqu_band_conc       = addone(itemp)
   cid_NH4_1p_aqua_mole_conc   = addone(itemp)
   cid_NH4_1p_band_conc        = addone(itemp)
-  cid_XNH4_conc               = addone(itemp)
+  cid_XNH4_mole_conc               = addone(itemp)
   cid_XNH4_band_conc          = addone(itemp)
   cid_XHPO4_band_conc         = addone(itemp)
   cid_XH2PO4_band_conc        = addone(itemp)
@@ -365,35 +365,35 @@ contains
   cid_Precp_FePO4_conc         = addone(itemp)
   cid_PrecpB_FePO4_con         = addone(itemp)
 
-  fid_TR_NH4_soil                  = addone(itemp)
-  fid_TR_NH4_band_soil             = addone(itemp)
-  fid_TR_NH3_soil_vr               = addone(itemp)
-  fid_TR_NH3_band_soil             = addone(itemp)
-  fid_TR_H1PO4_soil                = addone(itemp)
-  fid_TR_H2PO4_soil                = addone(itemp)
-  fid_TR_H1PO4_band_soil           = addone(itemp)
-  fid_TR_H2PO4_band_soil           = addone(itemp)
-  fid_TR_NH4_sorbed_soil           = addone(itemp)
-  fid_TR_NH4_sorbed_band_soil      = addone(itemp)
-  fid_TR_ROH_sorbed_soil           = addone(itemp)
-  fid_TR_ROH2_sorbed_soil          = addone(itemp)
-  fid_TR_RHPO4_sorbed_soil         = addone(itemp)
-  fid_TR_RH2PO4_sorbed_soil        = addone(itemp)
-  fid_TR_ROH_sorbed_band_soil      = addone(itemp)
-  fid_TR_ROH2_sorbed_band_soil     = addone(itemp)
-  fid_TR_RHPO4_sorbed_band_soil    = addone(itemp)
-  fid_TR_RH2PO4_sorbed_band_soil   = addone(itemp)
-  fid_TR_AlPO4_precip_soil         = addone(itemp)
-  fid_TR_FePO4_precip_soil         = addone(itemp)
-  fid_TR_CaHPO4_precip_soil        = addone(itemp)
-  fid_TR_apatite_precip_soil       = addone(itemp)
-  fid_TR_CaH4P2O8_precip_soil      = addone(itemp)
-  fid_TR_AlPO4_precip_band_soil    = addone(itemp)
-  fid_TR_FePO4_precip_band_soil    = addone(itemp)
-  fid_TR_CaHPO4_precip_band_soil   = addone(itemp)
-  fid_TR_apatite_precip_band_soil  = addone(itemp)
-  fid_TR_CaH4P2O8_precip_band_soil = addone(itemp)
-  fid_TR_Al_3p_soil                = addone(itemp)
+  fid_TRChem_NH4_soil                  = addone(itemp)
+  fid_TRChem_NH4_band_soil             = addone(itemp)
+  fid_TRChem_NH3_soil_vr               = addone(itemp)
+  fid_TRChem_NH3_band_soil             = addone(itemp)
+  fid_TRChem_H1PO4_soil                = addone(itemp)
+  fid_TRChem_H2PO4_soil                = addone(itemp)
+  fid_TRChem_H1PO4_band_soil           = addone(itemp)
+  fid_TRChem_H2PO4_band_soil           = addone(itemp)
+  fid_TRChem_NH4_sorbed_soil           = addone(itemp)
+  fid_TRChem_NH4_sorbed_band_soil      = addone(itemp)
+  fid_TRChem_ROH_sorbed_soil           = addone(itemp)
+  fid_TRChem_ROH2_sorbed_soil          = addone(itemp)
+  fid_TRChem_RHPO4_sorbed_soil         = addone(itemp)
+  fid_TRChem_RH2PO4_sorbed_soil        = addone(itemp)
+  fid_TRChem_ROH_sorbed_band_soil      = addone(itemp)
+  fid_TRChem_ROH2_sorbed_band_soil     = addone(itemp)
+  fid_TRChem_RHPO4_sorbed_band_soil    = addone(itemp)
+  fid_TRChem_RH2PO4_sorbed_band_soil   = addone(itemp)
+  fid_TRChem_AlPO4_precip_soil         = addone(itemp)
+  fid_TRChem_FePO4_precip_soil         = addone(itemp)
+  fid_TRChem_CaHPO4_precip_soil        = addone(itemp)
+  fid_TRChem_apatite_precip_soil       = addone(itemp)
+  fid_TRChem_CaH4P2O8_precip_soil      = addone(itemp)
+  fid_TRChem_AlPO4_precip_band_soil    = addone(itemp)
+  fid_TRChem_FePO4_precip_band_soil    = addone(itemp)
+  fid_TRChem_CaHPO4_precip_band_soil   = addone(itemp)
+  fid_TRChem_apatite_precip_band_soil  = addone(itemp)
+  fid_TRChem_CaH4P2O8_precip_band_soil = addone(itemp)
+  fid_TRChem_Al_3p_soil                = addone(itemp)
 
   cid_oqc_b=addone(itemp);cid_oqc_e=cid_oqc_b+jcplx;itemp=cid_oqc_e
   cid_oqn_b=addone(itemp);cid_oqn_e=cid_oqn_b+jcplx;itemp=cid_oqn_e
@@ -538,14 +538,14 @@ contains
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
-  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%RNH4MicbTransfBand
-  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TR_NH3_soil_vr)+micflx%RNH4MicbTransfSoil
-  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TR_NH3_band_soil)+micflx%RNH4MicbTransfBand
-  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TR_NH4_soil)+micflx%RNH4MicbTransfSoil
-  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TR_H1PO4_band_soil)+micflx%RH1PO4MicbTransfBand
-  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TR_H1PO4_soil)+micflx%RH1PO4MicbTransfSoil
-  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TR_H2PO4_band_soil)+micflx%RH2PO4MicbTransfBand
-  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TR_H2PO4_soil)+micflx%RH2PO4MicbTransfSoil
+  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TRChem_NH3_band_soil)+micflx%RNH4MicbTransfBand
+  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TRChem_NH3_soil_vr)+micflx%RNH4MicbTransfSoil
+  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TRChem_NH3_band_soil)+micflx%RNH4MicbTransfBand
+  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TRChem_NH4_soil)+micflx%RNH4MicbTransfSoil
+  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TRChem_H1PO4_band_soil)+micflx%RH1PO4MicbTransfBand
+  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TRChem_H1PO4_soil)+micflx%RH1PO4MicbTransfSoil
+  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TRChem_H2PO4_band_soil)+micflx%RH2PO4MicbTransfBand
+  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TRChem_H2PO4_soil)+micflx%RH2PO4MicbTransfSoil
   ystatesfl(cid_ZNO3B)=ystates0l(cid_ZNO3B)+micflx%RNO3MicbTransfBand
   ystatesfl(cid_ZNO3S)=ystates0l(cid_ZNO3S)+micflx%RNO3MicbTransfSoil
   ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%RNO2MicbTransfBand
@@ -1658,7 +1658,7 @@ contains
 !    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_N2,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX)
 !    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_N2O,L,NY,NX)
 !    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_H2,L,NY,NX)
-!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TR_sol_NH3_soil_vr(L,NY,NX)
+!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TRChem_sol_NH3_soil_vr(L,NY,NX)
 
 !    CO2G(L,NY,NX)=CO2G(L,NY,NX)-XCODFG(L,NY,NX)+XCOFLG
 !    CH4G(L,NY,NX)=CH4G(L,NY,NX)-XCHDFG(L,NY,NX)+XCHFLG

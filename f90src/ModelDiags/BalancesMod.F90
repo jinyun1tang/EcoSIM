@@ -161,7 +161,8 @@ contains
   real(r8) :: precipErr_test
   real(r8) :: prec2expSErr_test
   real(r8) :: prec2SnoErr_test
-  integer :: ii
+  real(r8) :: tracer_mass_err(idg_beg:idg_end)
+  integer :: ii,idg
 
   call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 
@@ -198,9 +199,10 @@ contains
         +HeatSource_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
         +PrecHeat_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
-
+      write(110,*)('=',ii=1,50)
+      write(110,*)I*1000+J,'NY,NX ',NY,NX
       if(abs(WaterErr_test)>err_h2o)then
-        write(110,*)I*1000+J,'NY,NX, H2O conservation error',NY,NX,WaterErr_test,NU(NY,NX)
+        write(110,*)I*1000+J,'NY,NX',NY,NX
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
@@ -209,15 +211,17 @@ contains
         write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)    
         write(110,*)'PrecIntceptByCan =',PrecIntceptByCanopy_col(NY,NX)   
         write(110,*)'plant evap       =',QVegET_col(NY,NX)
-        write(110,*)'root uptake      =',TPlantRootH2OUptake_col(NY,NX)
         write(110,*)'run on           =',QRunSurf_col(NY,NX)
+        write(110,*)'Qinflx2Soil_col  =',Qinflx2Soil_col(NY,NX)
+        write(110,*)'QWatIntLaterflow =',QWatIntLaterFlow_col(NY,NX)
         write(110,*)'drain            =',QDrain_col(NY,NX)
         write(110,*)'discharge        =',QDischar_col(NY,NX)
+        write(110,*)'root uptake      =',TPlantRootH2OUptake_col(NY,NX)        
         write(110,*)'SnowMassBeg,end  =',SnowMassBeg_col(NY,NX),SnowMassEnd_col(NY,NX)
         write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)
         write(110,*)'WatHeldOnCanopy  =',WatHeldOnCanopy_col(NY,NX)
         write(110,*)'CanopyWat_col    =',CanopyWat_col(NY,NX)
-        write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX)
+        write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX),NU(NY,NX)
         write(110,*)'snofall          =',Prec2Snow_col(NY,NX),SnoFalPrec_col(NY,NX)
         write(110,*)'nsnol_col        =',nsnol_col(NY,NX)
         write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
@@ -235,6 +239,17 @@ contains
         call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif
 
+      DO idg=idg_beg,idg_NH3        
+        tracer_mass_err(idg) = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
+          -trcg_TotalMass_col(idg,NY,NX)
+      enddo      
+
+      if(abs(tracer_mass_err(idg))>1.e-4_r8)then
+        write(110,*)('-',ii=1,50)
+        write(110,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg_ar,NY,NX),trcg_TotalMass_col(idg_ar,NY,NX),&
+          trcg_TotalMass_beg_col(idg_ar,NY,NX)-trcg_TotalMass_col(idg_ar,NY,NX)
+        write(110,*)'mass_err Ar     =',tracer_mass_err(idg_ar),SurfGasEmisFlx_col(idg_ar,NY,NX)
+      endif
       cycle      
       if(abs(HeatErr_test)>err_engy)then
         write(110,*)('-',ii=1,50)
@@ -275,11 +290,12 @@ contains
       trcg_TotalMass_col(idg_beg:idg_end,NY,NX)=0._r8
       DO L=NUI(NY,NX),NLI(NY,NX)
         DO idg=idg_beg,idg_NH3
-          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcg_gasml_vr(idg,L,NY,NX)                  
+          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcg_gasml_vr(idg,L,NY,NX)+trcg_root_vr(idg,L,NY,NX)                  
         ENDDO
 
         DO idg=idg_beg,idg_end  
-          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) + trcs_soHml_vr(idg,L,NY,NX)
+          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) &
+            + trcs_soHml_vr(idg,L,NY,NX)
         ENDDO
       ENDDO
 
@@ -289,8 +305,10 @@ contains
 
       !Because idg_NH3B does not exist in snow
       DO idg=idg_beg,idg_NH3
+        !add litter
         trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcs_solml_vr(idg,0,NY,NX)
-        DO L=1,JS
+        !add now
+        DO L=1,nsnol_col(NY,NX)          
           trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO
       ENDDO

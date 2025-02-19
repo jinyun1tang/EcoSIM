@@ -41,8 +41,9 @@ implicit none
   real(r8),target,allocatable ::  TempSensDecomp_vr(:,:,:)           !temperature dependense of microbial activity
   real(r8),target,allocatable ::  MoistSensDecomp_vr(:,:,:)          !moisture dependence of microbial activity
   real(r8),target,allocatable ::  SurfGasDifFlx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
-  real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink, [g d-2 t-1]
-  real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)          !soil gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink, [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)          !surface gas flux, including diffusion, ebullition, wet deposition and plant transp [g d-2 h-1]
+  real(r8),target,allocatable ::  GasHydroLossFlx_col(:,:,:)         !hydrological loss of volatile tracers [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]
   real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)            !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)             !total fertilizer P amendment, [g d-2]
@@ -182,6 +183,7 @@ implicit none
   allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
+  allocate(GasHydroLossFlx_col(idg_beg:idg_end,JY,JX)); GasHydroLossFlx_col=0._r8
   allocate(SurfGasEmisFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmisFlx_col=0._r8
   allocate(SurfGasDifFlx_col(idg_beg:idg_NH3,JY,JX)); SurfGasDifFlx_col=0._r8
   allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
@@ -341,6 +343,7 @@ implicit none
   call destroy(trcg_TotalMass_col)
   call destroy(SurfGasDifFlx_col)
   call destroy(SurfGasEmisFlx_col)
+  call destroy(GasHydroLossFlx_col)
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)
   call destroy(trcg_DisolEvap_Atm2Litr_flx)

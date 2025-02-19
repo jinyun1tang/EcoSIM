@@ -163,8 +163,8 @@ module MicAutoCPLXMod
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! O2AquaDiffusvity=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf,Irrig2LitRSurf=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf
+! Rain2LitRSurf,Irrig2LitRSurf_col=surface water flux from precipitation, irrigation
+! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf_col
 !
   RO2UptkAutor(NGL)=0.0_r8
 
@@ -641,7 +641,7 @@ module MicAutoCPLXMod
     COXYE                 => micfor%COXYE,                 &
     O2_rain_conc          => micfor%O2_rain_conc,          &
     O2_irrig_conc         => micfor%O2_irrig_conc,         &
-    Irrig2LitRSurf        => micfor%Irrig2LitRSurf,        &
+    Irrig2LitRSurf_col        => micfor%Irrig2LitRSurf_col,        &
     Rain2LitRSurf         => micfor%Rain2LitRSurf,         &
     litrm                 => micfor%litrm,                 &
     O2AquaDiffusvity      => micfor%O2AquaDiffusvity,      &
@@ -682,7 +682,7 @@ module MicAutoCPLXMod
       ELSE
         OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
         ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
-          +Irrig2LitRSurf*O2_irrig_conc)*dts_gas*FOXYX
+          +Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -1275,7 +1275,7 @@ module MicAutoCPLXMod
     CH4S                 => micstt%CH4S,                &
     CH4AquaSolubility    => micstt%CH4AquaSolubility,   &
     RCH4PhysexchPrev     => micfor%RCH4PhysexchPrev,    &
-    RCH4F                => micfor%RCH4F,               &
+    RCH4GasXchangePrev   => micfor%RCH4GasXchangePrev,  &
     RO2DmndAutort        => micflx%RO2DmndAutort        &
   )
 !     begin_execution
@@ -1289,7 +1289,7 @@ module MicAutoCPLXMod
 !     TFNG=temperature+water effect,FBiomStoiScalarAutorr=N,P limitation
 !     OMA=active biomass,VMX4=specific respiration rate
 !     RCH4PhysexchPrev=total aqueous CH4 exchange from previous hour
-!     RCH4F=total gaseous CH4 exchange from previous hour
+!     RCH4GasXchangePrev=total gaseous CH4 exchange from previous hour
 !     tCH4ProdAceto+tCH4ProdH2=total CH4 generated from methanogenesis
 !     dts_gas=1.0/(NPH*NPT)
 !     CH4G1,CH4S1=CH4 gaseous, aqueous amounts
@@ -1305,7 +1305,7 @@ module MicAutoCPLXMod
   ECHZ   = EH4X
   VMXA   = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*OMActAutor(NGL)*VMX4
   RCH4L1 = RCH4PhysexchPrev*dts_gas
-  RCH4F1 = RCH4F*dts_gas
+  RCH4F1 = RCH4GasXchangePrev*dts_gas
   RCH4S1 = (naqfdiag%tCH4ProdAceto+naqfdiag%tCH4ProdH2)*dts_gas
 
   IF(litrm)THEN

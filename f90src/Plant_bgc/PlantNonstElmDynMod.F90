@@ -40,7 +40,7 @@ module PlantNonstElmDynMod
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
     iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch,     &
     Hours2LeafOut_brch      => plt_pheno%Hours2LeafOut_brch,      &
-    StalkBiomassC_brch      => plt_biom%StalkBiomassC_brch,       &
+    StalkLiveBiomassC_brch      => plt_biom%StalkLiveBiomassC_brch,       &
     StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch,       &
     LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch,   &
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
@@ -106,7 +106,7 @@ module PlantNonstElmDynMod
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
 !
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-!     StalkBiomassC_brch=stalk sapwood mass
+!     StalkLiveBiomassC_brch=stalk sapwood mass
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     iPlantCalendar_brch(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
 ! the algorithm below is different from that for within canopy transfer between different branches
@@ -120,7 +120,7 @@ module PlantNonstElmDynMod
   D330: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
       IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-        TotStalkMassC=TotStalkMassC+StalkBiomassC_brch(NB,NZ)
+        TotStalkMassC=TotStalkMassC+StalkLiveBiomassC_brch(NB,NZ)
         DO NE=1,NumPlantChemElms
           TotStalkRsrv_loc(NE)=TotStalkRsrv_loc(NE)+StalkRsrvElms_brch(NE,NB,NZ)
         ENDDO
@@ -134,7 +134,7 @@ module PlantNonstElmDynMod
     D335: DO NB=1,NumOfBranches_pft(NZ)
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-          StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*TotStalkMassC
+          StalkRsrvGradt=TotStalkRsrv_loc(ielmc)*StalkLiveBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*TotStalkMassC
           XFRE(ielmc)=0.1_r8*StalkRsrvGradt/TotStalkMassC            
           StalkRsrvElms_brch(ielmc,NB,NZ)=StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
           sumchk2=sumchk2+StalkRsrvElms_brch(ielmc,NB,NZ)
@@ -568,13 +568,13 @@ module PlantNonstElmDynMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &  
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &    
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch,         &    
-    StalkBiomassC_brch        => plt_biom%StalkBiomassC_brch          &
+    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch          &
   )
 
-  IF(StalkBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND. StalkRsrvElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-    CWTRSV = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ)/StalkBiomassC_brch(NB,NZ))
-    CWTRSN = AZMAX1(StalkRsrvElms_brch(ielmn,NB,NZ)/StalkBiomassC_brch(NB,NZ))
-    CWTRSP = AZMAX1(StalkRsrvElms_brch(ielmp,NB,NZ)/StalkBiomassC_brch(NB,NZ))
+  IF(StalkLiveBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND. StalkRsrvElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    CWTRSV = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ)/StalkLiveBiomassC_brch(NB,NZ))
+    CWTRSN = AZMAX1(StalkRsrvElms_brch(ielmn,NB,NZ)/StalkLiveBiomassC_brch(NB,NZ))
+    CWTRSP = AZMAX1(StalkRsrvElms_brch(ielmp,NB,NZ)/StalkLiveBiomassC_brch(NB,NZ))
     CNR    = CWTRSV/(CWTRSV+CWTRSN/CNKI)
     CPR    = CWTRSV/(CWTRSV+CWTRSP/CPKI)
   ELSE
@@ -631,13 +631,13 @@ module PlantNonstElmDynMod
     LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch,   &
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
     CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch,     &
-    StalkBiomassC_brch      => plt_biom%StalkBiomassC_brch        &
+    StalkLiveBiomassC_brch      => plt_biom%StalkLiveBiomassC_brch        &
   )  
 
-  ShootBiomC_brch=LeafPetolBiomassC_brch(NB,NZ)+StalkBiomassC_brch(NB,NZ)
+  ShootBiomC_brch=LeafPetolBiomassC_brch(NB,NZ)+StalkLiveBiomassC_brch(NB,NZ)
   CPOOLT=CanopyNonstElms_brch(ielmc,NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
   IF(ShootBiomC_brch.GT.ZERO4Groth_pft(NZ))THEN
-    CPOOLD=(CanopyNonstElms_brch(ielmc,NB,NZ)*StalkBiomassC_brch(NB,NZ) &
+    CPOOLD=(CanopyNonstElms_brch(ielmc,NB,NZ)*StalkLiveBiomassC_brch(NB,NZ) &
       -StalkRsrvElms_brch(ielmc,NB,NZ)*LeafPetolBiomassC_brch(NB,NZ))/ShootBiomC_brch
     XFRE(ielmc)=FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD
     CanopyNonstElms_brch(ielmc,NB,NZ)=CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
@@ -671,7 +671,7 @@ module PlantNonstElmDynMod
     NU                      => plt_site%NU,                       &
     ZEROS2                  => plt_site%ZEROS2,                   &
     k_woody_litr            => pltpar%k_woody_litr,               &
-    StalkBiomassC_brch      => plt_biom%StalkBiomassC_brch,       &
+    StalkLiveBiomassC_brch      => plt_biom%StalkLiveBiomassC_brch,       &
     StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch,       &
     VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr,    &
     RootMycoActiveBiomC_pvr => plt_biom%RootMycoActiveBiomC_pvr,  &
@@ -684,9 +684,9 @@ module PlantNonstElmDynMod
   D2050: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
       WTRTRX = AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_woody_litr))
-      WTPLTX = WTRTRX+StalkBiomassC_brch(NB,NZ)
+      WTPLTX = WTRTRX+StalkLiveBiomassC_brch(NB,NZ)
       IF(WTPLTX.GT.ZERO4Groth_pft(NZ))THEN
-        CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*StalkBiomassC_brch(NB,NZ) &
+        CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*StalkLiveBiomassC_brch(NB,NZ) &
           -StalkRsrvElms_brch(ielmc,NB,NZ)*WTRTRX)/WTPLTX
         XFRE(ielmc)                                 = AZMAX1(FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD)
         RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)-XFRE(ielmc)

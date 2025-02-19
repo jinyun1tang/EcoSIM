@@ -183,7 +183,7 @@ module InitPlantMod
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,       &
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft,        &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,        &
-    NumCogrothNode_pft        => plt_morph%NumCogrothNode_pft         &
+    NumCogrowthNode_pft        => plt_morph%NumCogrowthNode_pft         &
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -372,22 +372,22 @@ module InitPlantMod
 !     CONCURRENT NODE GROWTH
 !
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-!     NumCogrothNode_pft=number of concurrently growing nodes
+!     NumCogrowthNode_pft=number of concurrently growing nodes
 !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2!
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     FracGroth2Node_pft(NZ)=1.0_r8
     IF(MatureGroup_pft(NZ).LE.10)THEN
-      NumCogrothNode_pft(NZ)=3
+      NumCogrowthNode_pft(NZ)=3
     ELSEIF(MatureGroup_pft(NZ).LE.15)THEN
-      NumCogrothNode_pft(NZ)=4
+      NumCogrowthNode_pft(NZ)=4
     ELSE
-      NumCogrothNode_pft(NZ)=5
+      NumCogrowthNode_pft(NZ)=5
     ENDIF
   ELSE
     !not grasslike plant
     FracGroth2Node_pft(NZ)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ))
-    NumCogrothNode_pft(NZ)=24
+    NumCogrowthNode_pft(NZ)=24
   ENDIF
   end associate
   end subroutine PlantLitterFraction
@@ -618,7 +618,7 @@ module InitPlantMod
     CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft,               &
     CanopyStemAreaZ_pft               => plt_morph%CanopyStemAreaZ_pft,               &
     LeafAreaZsec_brch                 => plt_morph%LeafAreaZsec_brch,                 &
-    LeafAreaNode_brch                 => plt_morph%LeafAreaNode_brch,                 &
+    LeafNodeArea_brch                 => plt_morph%LeafNodeArea_brch,                 &
     CanPBranchHeight                  => plt_morph%CanPBranchHeight,                  &
     HypoctoHeight_pft                 => plt_morph%HypoctoHeight_pft,                 &
     BranchNumber_brch                 => plt_morph%BranchNumber_brch,                 &
@@ -697,7 +697,7 @@ module InitPlantMod
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)     = 0._r8
 
   D25: DO NB=1,MaxNumBranches
-    plt_biom%StalkBiomassC_brch(NB,NZ)       = 0._r8
+    plt_biom%StalkLiveBiomassC_brch(NB,NZ)       = 0._r8
     plt_biom%LeafPetolBiomassC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
     SeedNumSet_brch(NB,NZ)                   = 0._r8
@@ -713,9 +713,9 @@ module InitPlantMod
       enddo
     ENDDO D5
     DO K=0,MaxNodesPerBranch1
-      LeafAreaNode_brch(K,NB,NZ)                                   = 0._r8
+      LeafNodeArea_brch(K,NB,NZ)                                   = 0._r8
       LiveInterNodeHight_brch(K,NB,NZ)                             = 0._r8
-      plt_morph%InternodeHeightDying_brch(K,NB,NZ)                 = 0._r8
+      plt_morph%InternodeHeightDead_brch(K,NB,NZ)                 = 0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
       plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
@@ -860,7 +860,7 @@ module InitPlantMod
     PSICanopyOsmo_pft     => plt_ew%PSICanopyOsmo_pft,      &
     ENGYX_pft             => plt_ew%ENGYX_pft,              &
     DeltaTKC_pft          => plt_ew%DeltaTKC_pft,           &
-    TCelciusCanopy_pft    => plt_ew%TCelciusCanopy_pft,     &
+    TdegCCanopy_pft    => plt_ew%TdegCCanopy_pft,     &
     TKGroth_pft           => plt_pheno%TKGroth_pft,         &
     TCGroth_pft           => plt_pheno%TCGroth_pft,         &
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,        &
@@ -874,16 +874,16 @@ module InitPlantMod
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
 !     VHeatCapCanopy_pft=canopy heat capacity (MJ m-3 K-1)
-!     TCelciusCanopy_pft,TKC=canopy temperature for growth (oC,K)
+!     TdegCCanopy_pft,TKC=canopy temperature for growth (oC,K)
 !     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
   VHeatCapCanopy_pft(NZ)    = cpw*ShootStrutElms_pft(ielmc,NZ)*10.0E-06
   ENGYX_pft(NZ)             = 0._r8
   DeltaTKC_pft(NZ)          = 0._r8
-  TCelciusCanopy_pft(NZ)    = ATCA
-  TKC_pft(NZ)               = units%Celcius2Kelvin(TCelciusCanopy_pft(NZ))
-  TCGroth_pft(NZ)           = TCelciusCanopy_pft(NZ)
+  TdegCCanopy_pft(NZ)    = ATCA
+  TKC_pft(NZ)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ))
+  TCGroth_pft(NZ)           = TdegCCanopy_pft(NZ)
   TKGroth_pft(NZ)           = units%Celcius2Kelvin(TCGroth_pft(NZ))
   fTCanopyGroth_pft(NZ)     = 1.0
   PSICanopy_pft(NZ)         = -1.0E-03

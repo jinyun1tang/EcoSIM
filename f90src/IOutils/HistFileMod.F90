@@ -1932,7 +1932,7 @@ implicit none
        numdims    = tape(t)%hlist(f)%field%numdims
        num2d      = tape(t)%hlist(f)%field%num2d
        nt         = tape(t)%ntimes
-
+       
        if (mode == 'define') then
 
           select case (avgflag)
