@@ -238,7 +238,7 @@ cd ../../
 
 mkdir -p ./local
 if [ -L ./local/bin ]; then
-  rm ./local/bin
+  rm -rf ./local/bin
 fi
 mkdir ./local/bin
 
