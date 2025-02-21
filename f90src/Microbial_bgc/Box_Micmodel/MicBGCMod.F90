@@ -1125,7 +1125,7 @@ module MicBGCMod
   RNO2ReduxChemo     = 0.10_r8*(RNO2ReduxSoilChemo+RNO2ReduxBandChemo)
   RNO2DmndSoilChemo  = VMXC4S
   RNO2DmndBandChemo  = VMXC4B
-
+  write(*,*)'ZNO2S*FNO2,VMXC4S',ZNO2S,FNO2,VMXC4S
   end associate
   end subroutine ChemoDenitrification
 !------------------------------------------------------------------------------------------
@@ -1941,12 +1941,25 @@ module MicBGCMod
           mBiomeHeter(ielmp,MID3,K)=mBiomeHeter(ielmp,MID3,K)+DOMuptk4GrothHeter(ielmp,NGL,K) &
             +RH2PO4TransfSoilHeter(NGL,K)+RH2PO4TransfBandHeter(NGL,K)+RH1PO4TransfSoilHeter(NGL,K) &
             +RH1PO4TransfBandHeter(NGL,K)
-
+         
+          if(micstt%lay==1)then
+            write(311,*)'domnc',NGL,K,DOMuptk4GrothHeter(ielmn,NGL,K),CGROMC,safe_adb(DOMuptk4GrothHeter(ielmn,NGL,K),CGROMC),&
+              safe_adb(DOMuptk4GrothHeter(ielmn,NGL,K), DOMuptk4GrothHeter(ielmc,NGL,K))      
+          elseif(micstt%lay==2)then
+            write(312,*)'domnc',NGL,K,DOMuptk4GrothHeter(ielmn,NGL,K),CGROMC,safe_adb(DOMuptk4GrothHeter(ielmn,NGL,K),CGROMC),&      
+              safe_adb(DOMuptk4GrothHeter(ielmn,NGL,K), DOMuptk4GrothHeter(ielmc,NGL,K))      
+          elseif(micstt%lay==3)then
+            write(313,*)'domnc',NGL,K,DOMuptk4GrothHeter(ielmn,NGL,K),CGROMC,safe_adb(DOMuptk4GrothHeter(ielmn,NGL,K),CGROMC),&      
+              safe_adb(DOMuptk4GrothHeter(ielmn,NGL,K), DOMuptk4GrothHeter(ielmc,NGL,K))      
+          endif
           !fix negative microbial N  by immobilization
           if(mBiomeHeter(ielmn,MID3,K)<0._r8)then
             RNH4TransfSoilHeter(NGL,K) = RNH4TransfSoilHeter(NGL,K)-mBiomeHeter(ielmn,MID3,K)
             NetNH4Mineralize           = NetNH4Mineralize-mBiomeHeter(ielmn,MID3,K)
             mBiomeHeter(ielmn,MID3,K)  = 0._r8
+            if(micstt%lay==2)then
+              write(235,*)'negb',NGL,K,RNH4TransfSoilHeter(NGL,K),-mBiomeHeter(ielmn,MID3,K)       
+            endif
           endif            
           !fix negative P biomass by immobilization
           if(mBiomeHeter(ielmp,MID3,K)<0._r8)then
@@ -2142,6 +2155,9 @@ module MicBGCMod
             naqfdiag%tRH2PO4MicrbTransfSoil = naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfLitrHeter(NGL,K)
             naqfdiag%tRH1PO4MicrbTransfSoil = naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfLitrHeter(NGL,K)
           ENDIF
+          if(micstt%Lay==2)then
+            write(214,*)'NH4trnsh',NGL,K,RNH4TransfSoilHeter(NGL,K)       
+          endif
           naqfdiag%tRCO2MicrbProd    = naqfdiag%tRCO2MicrbProd+RCO2ProdHeter(NGL,K)
           naqfdiag%tRCH4MicrbProd    = naqfdiag%tRCH4MicrbProd+RCH4ProdHeter(NGL,K)
           naqfdiag%tRNOxMicrbRedux   = naqfdiag%tRNOxMicrbRedux+RNOxReduxRespDenitLim(NGL,K)
@@ -2176,6 +2192,9 @@ module MicBGCMod
         naqfdiag%tRH2PO4MicrbTransfBand = naqfdiag%tRH2PO4MicrbTransfBand+RH2PO4TransfBandAutor(NGL)
         naqfdiag%tRH1PO4MicrbTransfBand = naqfdiag%tRH1PO4MicrbTransfBand+RH1PO4TransfBandAutor(NGL)
         naqfdiag%TFixN2                 = naqfdiag%TFixN2+RN2FixAutor(NGL)
+        if(micstt%Lay==2)then
+          write(214,*)'NH4trnsa',NGL,RNH4TransfSoilAutor(NGL)      
+        endif
         IF(Lsurf)THEN
           naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfLitrAutor(NGL)
           naqfdiag%tRNO3MicrbTransfSoil   = naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfLitrAutor(NGL)
@@ -2311,18 +2330,29 @@ module MicBGCMod
   RNO3MicbTransfBand=-naqfdiag%tRNO3MicrbTransfBand-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
   RNO2MicbTransfBand=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2Band-RNO2ReduxBandChemo
 
+
+  write(*,*)'NO3',naqfdiag%tRNO3MicrbTransfSoil,naqfdiag%TReduxNO3Soil,RNO3ProdSoilChemo
+  if(micstt%Lay==2)then
+    write(118,*)'NO2',naqfdiag%TReduxNO3Soil,-naqfdiag%TReduxNO2Soil,-RNO2ReduxSoilChemo
+    write(211,*)'NH41',-naqfdiag%tRNH4MicrbTransfSoil
+  endif  
+
   !mid_AmmoniaOxidBacter=1, mid_NitriteOxidBacter=2, mid_AerobicMethanotrofBacter=3
   DO NGL=JGniA(mid_AmmoniaOxidBacter),JGnfA(mid_AmmoniaOxidBacter)
     RNH4MicbTransfSoil=RNH4MicbTransfSoil-RSOxidSoilAutor(NGL)
     RNO2MicbTransfSoil=RNO2MicbTransfSoil+RSOxidSoilAutor(NGL)
     RNH4MicbTransfBand=RNH4MicbTransfBand-RSOxidBandAutor(NGL)
-
+    if(micstt%Lay==2)then
+      write(118,*)'NGL',NGL,RSOxidSoilAutor(NGL)
+      write(211,*)'nauto',-RSOxidSoilAutor(NGL)
+    endif  
   ENDDO
   DO NGL=JGniA(mid_NitriteOxidBacter),JGnfA(mid_NitriteOxidBacter)
     RNO3MicbTransfSoil=RNO3MicbTransfSoil+RSOxidSoilAutor(NGL)
     RNO2MicbTransfSoil=RNO2MicbTransfSoil-RSOxidSoilAutor(NGL)
     RNO3MicbTransfBand=RNO3MicbTransfBand+RSOxidBandAutor(NGL)
     RNO2MicbTransfBand=RNO2MicbTransfBand-RSOxidBandAutor(NGL)
+    if(micstt%Lay==2)write(118,*)'ngl no3, no2',-RSOxidSoilAutor(NGL)
   ENDDO
 
   RH2PO4MicbTransfBand = -naqfdiag%tRH2PO4MicrbTransfBand
@@ -2791,7 +2821,6 @@ module MicBGCMod
 !     RFOMP=O2-unlimited respiration of DOC
 !     ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
-
   OXYI  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*AMAX1(-COXYS+2.5_r8,-50._r8)))
   FSBST = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
   RGOFY = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXF*WatStressMicb*OMActHeter(NGL,K))
@@ -3445,7 +3474,15 @@ module MicBGCMod
     RNH4DmndBandHeter(NGL,K)   = 0.0_r8
     RNH4TransfSoilHeter(NGL,K) = RINHP*FNH4S
     RNH4TransfBandHeter(NGL,K) = RINHP*FNHBS
+    if(micstt%Lay==1)then
+      write(234,*)'realNH4',NGL,K, RINHP,FNH4S,mBiomeHeter(ielmc,MID3,K),rNCOMC(3,NGL,K),mBiomeHeter(ielmn,MID3,K)/mBiomeHeter(ielmc,MID3,K)      
+    elseif(micstt%Lay==2)then        
+      write(235,*)'realNH4',NGL,K, RINHP,FNH4S,mBiomeHeter(ielmc,MID3,K),rNCOMC(3,NGL,K),mBiomeHeter(ielmn,MID3,K)/mBiomeHeter(ielmc,MID3,K)       
+    elseif(micstt%Lay==3)then
+      write(236,*)'realNH4',NGL,K, RINHP,FNH4S,mBiomeHeter(ielmc,MID3,K),rNCOMC(3,NGL,K),mBiomeHeter(ielmn,MID3,K)/mBiomeHeter(ielmc,MID3,K)      
+    endif
   ENDIF
+
   NetNH4Mineralize=NetNH4Mineralize+(RNH4TransfSoilHeter(NGL,K)+RNH4TransfBandHeter(NGL,K))
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL

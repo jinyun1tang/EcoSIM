@@ -3,7 +3,7 @@ module TranspNoSaltMod
 ! Description:
 !
   use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use abortutils,       only: destroy
+  use abortutils,       only: destroy,endrun
   USE MiniMathMod,      ONLY: AZMAX1, fixnegmass, flux_mass_limiter
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
@@ -357,6 +357,12 @@ module TranspNoSaltMod
 
           trcs_solml2_vr(ids,L,NY,NX) = trcs_solml2_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
           trcs_soHml2_vr(ids,L,NY,NX) = trcs_soHml2_vr(ids,L,NY,NX)-trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
+          if(abs(trcs_solml2_vr(ids,L,NY,NX))>1.e10)then
+            write(*,*)ids,L,NY,NX
+            write(*,*)trcs_solml2_vr(ids,L,NY,NX),trcs_Transp2Micp_flxM_vr(ids,L,NY,NX),&
+              trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
+            call endrun(trim(mod_filename)//' at line',__LINE__)        
+          endif
         ENDDO
       ENDIF
     ENDDO
@@ -632,7 +638,11 @@ module TranspNoSaltMod
     RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO2,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_H1PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
-
+    if(L<=3)then
+      write(115,*)L,NY,NX,ids_NH4,RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX),RNut_MicbRelease_vr(ids_NH4,L,NY,NX),trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX),trcs_plant_uptake_vr(ids_NH4,L,NY,NX)       
+      write(116,*)L,NY,NX,ids_NO3,RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX),RNut_MicbRelease_vr(ids_NO3,L,NY,NX),trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX),trcs_plant_uptake_vr(ids_NO3,L,NY,NX)
+      write(117,*)L,NY,NX,ids_NO2,RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX),RNut_MicbRelease_vr(ids_NO2,L,NY,NX),trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)
+    endif
     RBGCSinkSoluteM_vr(ids_NH4B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX)   = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_NO3B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP

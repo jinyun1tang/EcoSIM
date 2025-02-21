@@ -68,6 +68,7 @@ implicit none
   real(r8) :: TSolidOMActC
   real(r8) :: TSolidOMC
   real(r8) :: tOMActC
+  integer  :: Lay
   real(r8),allocatable :: FracBulkSOMC(:)
   real(r8),allocatable :: DOM(:,:)
   real(r8),allocatable :: SorbedOM(:,:)

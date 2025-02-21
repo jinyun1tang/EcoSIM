@@ -1554,7 +1554,7 @@ module Hour1Mod
   D8990: DO NX=NHW,NHE
     D8995: DO NY=NVN,NVS
       IF(J.EQ.INT(SolarNoonHour_col(NY,NX)))THEN
-        if(lverb)write(iulog,*)'ApplyMineralFertilizer'
+        write(114,*)'ApplyMineralFertilizer'
         call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
 !
 !     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
@@ -2005,6 +2005,7 @@ module Hour1Mod
         ENDIF
       ENDDO D65
     ENDIF
+    write(114,*)'aaplyfert',LFDPTH     
     BAREF=1.0_r8-CVRDF
 !
 !     RESET WIDTH AND DEPTH OF NH4 FERTILIZER BAND IF NEW BAND

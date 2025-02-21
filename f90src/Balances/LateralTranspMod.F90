@@ -599,6 +599,11 @@ implicit none
           +trcs_TransptMicP_3D(NTS,N,N3,N2,N1)-trcs_TransptMicP_3D(NTS,N,N6,N5,N4)
         trcs_TransptMacP_vr(NTS,N3,N2,N1)=trcs_TransptMacP_vr(NTS,N3,N2,N1) &
           +trcs_TransptMacP_3D(NTS,N,N3,N2,N1)-trcs_TransptMacP_3D(NTS,N,N6,N5,N4)
+        if(abs(trcs_TransptMicP_vr(NTS,N3,N2,N1))>1.e10)then
+           write(*,*)NTS,N3,N2,N1,N
+           write(*,*)trcs_TransptMicP_3D(NTS,N,N3,N2,N1),trcs_TransptMicP_3D(NTS,N,N6,N5,N4)
+           call endrun(trim(mod_filename)//' at line',__LINE__)
+        endif
       ENDDO
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS

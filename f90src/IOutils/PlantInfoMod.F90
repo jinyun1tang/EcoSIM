@@ -262,7 +262,7 @@ implicit none
               read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
               READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
-
+              LPY=0
               if(isLeap(iyr) .and. IMO.GT.2)LPY=1
               !obtain the ordinal day
               IF(IMO.EQ.1)then

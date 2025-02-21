@@ -1,6 +1,6 @@
 module InsideTranspMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,    only: destroy
+  use abortutils,    only: destroy,endrun
   use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
   use TracerPropMod, only: MolecularWeight
   use DebugToolMod  
@@ -191,6 +191,10 @@ module InsideTranspMod
 !     include NH3 and band nutrients
       DO ids=ids_nuts_beg,ids_nuts_end
         trcs_solml2_vr(ids,L,NY,NX)=trcs_solml2_vr(ids,L,NY,NX)-RBGCSinkSoluteM_vr(ids,L,NY,NX)
+        if(abs(trcs_solml2_vr(ids,L,NY,NX))>1.e10)then
+          write(*,*)ids,L,NY,NX,trcs_solml2_vr(ids,L,NY,NX),RBGCSinkSoluteM_vr(ids,L,NY,NX)
+          call endrun(trim(mod_filename)//' at line',__LINE__)
+        endif
       ENDDO
       !add oxygen uptake here
       RBGCSinkGasMM_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
@@ -404,6 +408,11 @@ module InsideTranspMod
 
   DO ids=ids_beg,ids_end
     trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)=trcs_adv_flx(ids)
+    if(abs(trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4))>1.e10)then
+      write(*,*)ids,N,N6,N5,N4,trcs_adv_flx(ids)
+      write(*,*)VFLW,trcs_solml2_vr(ids,N6,N5,N4),trcs_solml2_vr(ids,N3,N2,N1)
+      call endrun(trim(mod_filename)//' at line',__LINE__)
+    endif
   ENDDO
 
   end subroutine MicroporeSoluteAdvectionM
@@ -618,6 +627,10 @@ module InsideTranspMod
 
   DO ids=ids_beg,ids_end
     trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)=trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)+SDifFlx(ids)
+    if(abs(trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4))>1.e10)then
+      write(*,*)ids,N,N6,N5,N4,trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4),SDifFlx(ids)      
+      call endrun(trim(mod_filename)//' at line',__LINE__)
+    endif
   ENDDO
 
   end subroutine MicroporeSoluteDiffusionM
@@ -1018,6 +1031,10 @@ module InsideTranspMod
   DO ids=ids_beg,ids_end
     trcs_TransptMicP_3D(ids,N,N6,N5,N4)=trcs_TransptMicP_3D(ids,N,N6,N5,N4)+trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
     trcs_TransptMacP_3D(ids,N,N6,N5,N4)=trcs_TransptMacP_3D(ids,N,N6,N5,N4)+trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)
+    if(abs(trcs_TransptMicP_3D(ids,N,N6,N5,N4))>1.e10)then
+      write(*,*)ids,N,N6,N5,N4,trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)       
+      call endrun(trim(mod_filename)//' at line',__LINE__)         
+    endif
   ENDDO
 
   end subroutine SoluteAdvDifusTranspM

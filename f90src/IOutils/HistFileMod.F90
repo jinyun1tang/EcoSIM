@@ -2000,6 +2000,7 @@ implicit none
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=hist1do, ncid=nfid(t), nt=nt)
           else
+             call PrintInfo(varname)
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=histo, ncid=nfid(t), nt=nt)
           end if
