@@ -778,6 +778,9 @@ module MicAutoCPLXMod
   RO2Uptk4RespAutor(NGL) = RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
   RSOxidSoilAutor(NGL)   = RVOXPA*fLimO2Autor(NGL)
   RSOxidBandAutor(NGL)   = RVOXPB*fLimO2Autor(NGL)
+  if(micstt%Lay==2)then
+    write(120,*)'auto1',RVOXPA,fLimO2Autor(NGL)      
+  endif
   end associate
   end subroutine AerobicAutorO2Uptake
 
@@ -899,6 +902,9 @@ module MicAutoCPLXMod
   !NH4 oxidation by NO2(-)
   RSOxidSoilAutor(NGL)=RSOxidSoilAutor(NGL)+0.333_r8*RNO2ReduxAutorSoil(NGL)
   RSOxidBandAutor(NGL)=RSOxidBandAutor(NGL)+0.333_r8*RNO2ReduxAutorBand(NGL)
+  if(micstt%Lay==2)then
+   write(120,*)'auto2',RSOxidSoilAutor(NGL),0.333_r8*RNO2ReduxAutorSoil(NGL)       
+  endif
 !     TRN2ON=TRN2ON+RNO2ReduxAutorSoil(NGL)+RNO2ReduxAutorBand(NGL)
   end associate
   end subroutine AutotrophDenitrificCatabolism
@@ -1032,6 +1038,9 @@ module MicAutoCPLXMod
   RGOMP                  = AZMAX1(RVOXP*ECNH*ECHZ)
   RNH3OxidAutor(NGL)     = VMX4S
   RNH3OxidAutorBand(NGL) = VMX4B
+  if(micstt%lay==2)then
+    write(121,*)'RVOXPA',VMXA,FCN4S,FNH4,ZNH4S,ZNFN4S,RNNH4      
+  endif
 !
 !     O2 DEMAND FROM NH3 OXIDATION
 !

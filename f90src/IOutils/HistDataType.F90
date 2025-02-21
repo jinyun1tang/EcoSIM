@@ -2884,7 +2884,12 @@ implicit none
         this%h2D_cNO3t_vr(ncol,L)= safe_adb(trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO3B,L,NY,NX) &
                                                +trcs_solml_vr(ids_NO2,L,NY,NX)+trcs_solml_vr(ids_NO2B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
-
+        if(I>=51)then                               
+          write(*,*)I*1000+J,NY,NX,L        
+          write(*,*)trcs_solml_vr(ids_NO3,L,NY,NX),trcs_solml_vr(ids_NO3B,L,NY,NX), &
+                    trcs_solml_vr(ids_NO2,L,NY,NX),trcs_solml_vr(ids_NO2B,L,NY,NX), &
+                    VLSoilMicPMass_vr(L,NY,NX)
+        endif
         this%h2D_cPO4_vr(ncol,L) = safe_adb(trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H1PO4B,L,NY,NX) &
                                                +trcs_solml_vr(ids_H2PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX),&
                                                VLWatMicP_vr(L,NY,NX))

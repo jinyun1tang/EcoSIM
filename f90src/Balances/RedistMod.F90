@@ -1134,6 +1134,13 @@ module RedistMod
           trcs_plant_uptake_vr(ids,L,NY,NX) = trcs_plant_uptake_vr(ids,L,NY,NX)*pval
         endif
       endif
+      if(trcs_solml_vr(ids,L,NY,NX)>1.e10)then
+        write(*,*)NY,NX,L,ids,ids_NO2,ids_NO3
+        write(*,*)trcs_TransptMicP_vr(ids,L,NY,NX),  &
+          trcn_GeoChem_soil_vr(ids,L,NY,NX), &
+          trcs_Irrig_vr(ids,L,NY,NX),trcs_Mac2MicPore_flx_vr(ids,L,NY,NX)
+        call endrun(trim(mod_filename)//' at line',__LINE__)  
+      endif
     ENDDO
  
     do ids=ids_NH4B,ids_nutb_end

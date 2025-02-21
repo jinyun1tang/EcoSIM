@@ -1,5 +1,6 @@
 module BoundaryTranspMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,        only: endrun
   use minimathmod,   only: isclose, AZMAX1
   use TracerPropMod, only: MolecularWeight
   use ClimForcDataType
@@ -367,6 +368,10 @@ module BoundaryTranspMod
   DO ids=ids_beg,ids_end
     trcs_TransptMicP_3D(ids,N,M6,M5,M4)=trcs_TransptMicP_3D(ids,N,M6,M5,M4)+trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)
     trcs_TransptMacP_3D(ids,N,M6,M5,M4)=trcs_TransptMacP_3D(ids,N,M6,M5,M4)+trcs_MacpTranspFlxM_3D(ids,N,M6,M5,M4)
+    if(abs(trcs_TransptMicP_3D(ids,N,M6,M5,M4))>1.e10)then
+      write(*,*)ids,N,M6,M5,M4,trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)
+      call endrun(trim(mod_filename)//' at line',__LINE__)
+    endif
   ENDDO
 
   end subroutine BoundaryRunoffandSnowZM
