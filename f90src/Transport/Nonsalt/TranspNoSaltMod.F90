@@ -638,11 +638,7 @@ module TranspNoSaltMod
     RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO2,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_H1PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))*dts_HeatWatTP
-    if(L<=3)then
-      write(115,*)L,NY,NX,ids_NH4,RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX),RNut_MicbRelease_vr(ids_NH4,L,NY,NX),trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX),trcs_plant_uptake_vr(ids_NH4,L,NY,NX)       
-      write(116,*)L,NY,NX,ids_NO3,RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX),RNut_MicbRelease_vr(ids_NO3,L,NY,NX),trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX),trcs_plant_uptake_vr(ids_NO3,L,NY,NX)
-      write(117,*)L,NY,NX,ids_NO2,RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX),RNut_MicbRelease_vr(ids_NO2,L,NY,NX),trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX)
-    endif
+
     RBGCSinkSoluteM_vr(ids_NH4B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4B,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX)   = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_NO3B,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO3B,L,NY,NX)-trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3B,L,NY,NX))*dts_HeatWatTP

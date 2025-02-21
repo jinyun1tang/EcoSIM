@@ -307,14 +307,7 @@ implicit none
   micstt%CH2GS             = AZMAX1(trc_solcl_vr(idg_H2,L,NY,NX))
   micstt%CCH4G             = AZMAX1(trcg_gascl_vr(idg_CH4,L,NY,NX))
   micstt%Lay               = L
-  if(L<=3)then
-    write(113,*)'CNO2S',L,NY,NX,trc_solcl_vr(ids_NO2,L,NY,NX),trcs_solml_vr(ids_NO2,L,NY,NX),&
-      trc_solcl_vr(ids_NO3,L,NY,NX),trcs_solml_vr(ids_NO3,L,NY,NX)
-  endif
-  if(abs(trcs_solml_vr(ids_NO2,L,NY,NX))>100.)then
-    write(*,*)I*1000+J
-    call endrun(trim(mod_filename)//' at line',__LINE__)        
-  endif
+
 !  write(115,*)I+J/24.,L,micstt%COXYG,micstt%COXYS,VLsoiAirPM(1,L,NY,NX)
   micstt%O2GSolubility     = GasSolbility_vr(idg_O2,L,NY,NX)  
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
@@ -399,11 +392,6 @@ implicit none
   tRHydlyBioReSOM_vr(1:NumPlantChemElms,L,NY,NX) = micflx%tRHydlyBioReSOM
   tRHydlySoprtOM_vr(1:NumPlantChemElms,L,NY,NX)  = micflx%tRHydlySoprtOM
 
-  write(*,*)L,NY,NX
-  write(*,*)'NO3, NO2',micflx%RNO3MicbTransfSoil,micflx%RNO2MicbTransfSoil
-  if(abs(micflx%RNO2MicbTransfSoil)>1.e3)then
-    call endrun(trim(mod_filename)//' at line',__LINE__)        
-  endif
   trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
   trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
   trcs_RMicbUptake_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb

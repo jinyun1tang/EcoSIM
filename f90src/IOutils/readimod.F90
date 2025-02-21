@@ -2,15 +2,17 @@ module readiMod
 !!
 ! code to read site, topographic data
 !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils   , only : endrun
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,       only: endrun
+  use fileUtil,         only: open_safe, check_read
+  use minimathmod,      only: isclose,   AZMAX1, safe_adb
+  use MiniFuncMod,      only: GetDayLength
+  use EcoSIMConfig,     only: column_mode
+  use EcoSiMParDataMod, only: micpar
+  use SoilHydroParaMod, only: ComputeSoilHydroPars
+  use SoilPhysParaMod,  only: SetDeepSoil
   use ncdio_pio
   use EcoSIMCtrlMod
-  use fileUtil     , only : open_safe, check_read
-  use minimathmod  , only : isclose, AZMAX1
-  use MiniFuncMod  , only : GetDayLength
-  use EcoSIMConfig , only : column_mode
-  use EcoSiMParDataMod, only : micpar
   use SOMDataType
   use CanopyRadDataType
   use EcosimConst
@@ -29,8 +31,6 @@ module readiMod
   use SoilBGCDataType
   use AqueChemDatatype
   use GridDataType
-  use SoilHydroParaMod, only : ComputeSoilHydroPars
-  use SoilPhysParaMod, only : SetDeepSoil
   implicit none
   private
 
@@ -601,7 +601,16 @@ module readiMod
 
           ENDDO
         ENDIF
-
+        DO L=1,NL(NY,NX)
+          if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
+            write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
+            call endrun(trim(mod_filename)//' at line',__LINE__)  
+          endif
+          if(CSoilOrgM_vr(ielmp,L,NY,NX)>CSoilOrgM_vr(ielmn,L,NY,NX))then
+            write(iulog,*)'Likely too larger P/N ratio',safe_adb(CSoilOrgM_vr(ielmp,L,NY,NX),CSoilOrgM_vr(ielmn,L,NY,NX)), 'in L,NY,NX',L,NY,NX
+            call endrun(trim(mod_filename)//' at line',__LINE__)  
+          endif
+        ENDDO
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
         endif

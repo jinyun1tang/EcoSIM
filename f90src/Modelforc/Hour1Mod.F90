@@ -12,6 +12,7 @@ module Hour1Mod
   use SoilBGCNLayMod,    only : sumORGMLayL
   use PlantMgmtDataType, only : NP
   use BalancesMod,       only : SummarizeTracerMass,BegCheckBalances
+  use DebugToolMod
   use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
@@ -1554,7 +1555,7 @@ module Hour1Mod
   D8990: DO NX=NHW,NHE
     D8995: DO NY=NVN,NVS
       IF(J.EQ.INT(SolarNoonHour_col(NY,NX)))THEN
-        write(114,*)'ApplyMineralFertilizer'
+
         call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
 !
 !     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
@@ -1923,6 +1924,8 @@ module Hour1Mod
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(out) :: OFC(2),OFN(2),OFP(2)
   integer, intent(out) :: LFDPTH
+
+  character(len=*), parameter :: subname='ApplyMineralFertilizer'
   real(r8) :: BAREF
   real(r8) :: CVRDF
   real(r8) :: CAC
@@ -1953,6 +1956,7 @@ module Hour1Mod
 !     *A,*B=broadcast,banded
 !     Z4,Z3,ZU,ZO=NH4,NH3,urea,NO3
 !
+  call PrintInfo('beg '//subname)
   Z4A=FERT(1,I,NY,NX)
   Z3A=FERT(2,I,NY,NX)
   ZUA=FERT(3,I,NY,NX)
@@ -2005,7 +2009,7 @@ module Hour1Mod
         ENDIF
       ENDDO D65
     ENDIF
-    write(114,*)'aaplyfert',LFDPTH     
+
     BAREF=1.0_r8-CVRDF
 !
 !     RESET WIDTH AND DEPTH OF NH4 FERTILIZER BAND IF NEW BAND
@@ -2261,6 +2265,8 @@ module Hour1Mod
     FertNFlx_CumYr_col(NY,NX)=FertNFlx_CumYr_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
     FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
   ENDIF
+
+  call PrintInfo('end '//subname)  
   end subroutine ApplyMineralFertilizer
 !------------------------------------------------------------------------------------------
 
