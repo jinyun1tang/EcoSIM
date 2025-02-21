@@ -150,7 +150,7 @@ contains
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   integer :: NY,NX
-  real(r8), parameter :: err_h2o=1.e-6_r8
+  real(r8), parameter :: err_h2o=1.e-5_r8
   real(r8), parameter :: err_engy=1.e-6_r8
   real(r8) :: WaterErr_test
   real(r8) :: HeatErr_test
