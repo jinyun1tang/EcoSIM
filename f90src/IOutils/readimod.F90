@@ -602,14 +602,16 @@ module readiMod
           ENDDO
         ENDIF
         DO L=1,NL(NY,NX)
-          if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
-            write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
-            call endrun(trim(mod_filename)//' at line',__LINE__)  
-          endif
-          if(CSoilOrgM_vr(ielmp,L,NY,NX)>CSoilOrgM_vr(ielmn,L,NY,NX))then
-            write(iulog,*)'Likely too larger P/N ratio',safe_adb(CSoilOrgM_vr(ielmp,L,NY,NX),CSoilOrgM_vr(ielmn,L,NY,NX)), 'in L,NY,NX',L,NY,NX
-            call endrun(trim(mod_filename)//' at line',__LINE__)  
-          endif
+          if(CSoilOrgM_vr(ielmc,L,NY,NX) > 0._r8)then 
+            if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
+              write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
+              call endrun(trim(mod_filename)//' at line',__LINE__)  
+            endif
+            if(CSoilOrgM_vr(ielmp,L,NY,NX)>CSoilOrgM_vr(ielmn,L,NY,NX))then
+              write(iulog,*)'Likely too larger P/N ratio',safe_adb(CSoilOrgM_vr(ielmp,L,NY,NX),CSoilOrgM_vr(ielmn,L,NY,NX)), 'in L,NY,NX',L,NY,NX
+              call endrun(trim(mod_filename)//' at line',__LINE__)  
+            endif
+          endif  
         ENDDO
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))

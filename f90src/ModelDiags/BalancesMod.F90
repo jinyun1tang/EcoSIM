@@ -199,9 +199,10 @@ contains
         +HeatSource_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
         +PrecHeat_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
-      write(110,*)('=',ii=1,50)
-      write(110,*)I*1000+J,'NY,NX ',NY,NX
+
       if(abs(WaterErr_test)>err_h2o)then
+        write(110,*)('=',ii=1,50)
+        write(110,*)I*1000+J,'NY,NX ',NY,NX
         write(110,*)I*1000+J,'NY,NX',NY,NX
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
