@@ -522,7 +522,7 @@ contains
   real(r8) :: tNetWat2LayL,vwat,vdry,vice
   real(r8) :: dt_SnoHeat   !time step size for snow model iteration
   real(r8) :: cphwat,vhcp0,dNetWat2LayL
-  real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow
+  real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow,snowLMass
   real(r8), parameter :: mscal=1._r8-1.e-8_r8,tinyw=1.e-14_r8,tinyw0=1.e-16_r8
   real(r8), parameter :: mscal1=1.0001_r8
   real(r8) :: tinyw1
@@ -561,13 +561,18 @@ contains
 
 
   D3000: DO MM = 1, NPS
-    call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,LatentHeatAir2Sno,&
-      HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
 
-    call SnowPackIterationMM(dt_snoHeat,I,J,M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
-      TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
-      CumWatXFlx2SoiMicP,CumSnowWatFLow2LitR,CumNetHeatFlow2LitR,cumNetHeatFlow2Soil)
+    snowLMass=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
 
+    if(snowLMass>0._r8)then
+
+      call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,snowLMass,HeatSnofall2Snow,LatentHeatAir2Sno,&
+        HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
+
+      call SnowPackIterationMM(dt_snoHeat,I,J,M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
+        TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
+        CumWatXFlx2SoiMicP,CumSnowWatFLow2LitR,CumNetHeatFlow2LitR,cumNetHeatFlow2Soil)
+    endif
 !
 !     ACCUMULATE SNOWPACK FLUXES TO LONGER TIME STEP FOR
 !     LITTER, SOIL FLUX CALCULATIONS
@@ -764,13 +769,14 @@ contains
 
   end subroutine SolveSnowpackM
 !------------------------------------------------------------------------------------------
-  subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,&
+  subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,snowLMass,HeatSnofall2Snow,&
     LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
   implicit none  
   integer, intent(in) :: I,J
   integer, intent(in) :: M    !soil heat-flow iteration id
   integer, intent(in) :: NY,NX
   real(r8),intent(in) :: HeatSnofall2Snow,IceFall,SnoFall,Rainfall
+  real(r8),intent(in) :: snowLMass
   real(r8), intent(inout) :: LatentHeatAir2Sno
   real(r8), intent(inout) :: HeatSensEvapAir2Snow    !cumulated heat by vapor advection from air to snow [MJ]
   real(r8), intent(inout) :: HeatNetFlx2Snow,Radnet2Snow
@@ -796,9 +802,6 @@ contains
   real(r8) :: NetHeatAir2Snow,SnofallRain
   real(r8) :: SnofallDry,Snofallice
   real(r8) :: RadSWbySnow                                !shortwave radiation absorbed by snow [MJ]
-  real(r8) :: snowLMass
-
-  snowLMass=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
 
   SnowAlbedo=(0.85_r8*(VLDrySnoWE0M_snvr(1,NY,NX)+SnoFall)+0.30_r8*(VLIceSnow0M_snvr(1,NY,NX)+IceFall) &
     +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/snowLMass
