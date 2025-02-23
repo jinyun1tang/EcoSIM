@@ -91,7 +91,7 @@ module StarteMod
               IF(I.EQ.1)then
                 IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
 !     INITIALIZE RAINFALL, top layer
-                  solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(PHR(NY,NX)-3.0_r8))
+                  solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(pH_rain_col(NY,NX)-3.0_r8))
                   solutevar%OH_1e_aqua_mole_conc = DPH2O/solutevar%H_1p_aqua_mole_conc
                   solutevar%CN4Z       = NH4_rain_mole_conc(NY,NX)
                   solutevar%CNOZ       = NO3_rain_mole_conc(NY,NX)
