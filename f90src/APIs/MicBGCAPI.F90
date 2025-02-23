@@ -409,7 +409,7 @@ implicit none
   RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbTransfBand
   RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand
   TempSensDecomp_vr(L,NY,NX)            = nmicdiag%TSensGrowth
-  MoistSensDecomp_vr(L,NY,NX)           = nmicdiag%WatStressMicb
+  MoistSensDecomp_vr(L,NY,NX)           = AZMAX1(nmicdiag%WatStressMicb)
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix    
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo

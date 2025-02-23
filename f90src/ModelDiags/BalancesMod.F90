@@ -203,7 +203,6 @@ contains
       if(abs(WaterErr_test)>err_h2o)then
         write(110,*)('=',ii=1,50)
         write(110,*)I*1000+J,'NY,NX ',NY,NX
-        write(110,*)I*1000+J,'NY,NX',NY,NX
         write(110,*)'init H2O         =',WaterErr_col(NY,NX)
         write(110,*)'final H2O        =',WatMass_col(NY,NX)
         write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)

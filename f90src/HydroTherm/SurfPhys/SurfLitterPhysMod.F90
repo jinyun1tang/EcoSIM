@@ -34,9 +34,34 @@ implicit none
   public :: UpdateLitRPhys
   public :: LateralGridsHdryoExch
   public :: UpdateLitRBe4RunoffM
-  public :: UpdateLitRAftRunoff
+  public :: UpdateLitRAftRunoffM
+  public :: PartLitSoilFractionM
   contains
 
+!------------------------------------------------------------------------------------------
+  subroutine PartLitSoilFractionM(I,J,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
+
+  !if there is heat-wise significant litter layer
+  IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
+    if(SoilOrgM_vr(ielmc,0,NY,NX).GT.1.e-2_r8 .or. XVLMobileWaterLitR_col(NY,NX) > 0._r8)then
+      FracSurfBareSoil_col(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,0,NY,NX))),&
+        XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
+    else
+      FracSurfBareSoil_col(NY,NX)=1._r8
+    endif
+
+!    if(FracSurfBareSoil_col(NY,NX)+ZEROL>1._r8)FracSurfBareSoil_col(NY,NX)=1._r8
+  ELSE
+    FracSurfBareSoil_col(NY,NX)=1.0_r8
+  ENDIF
+
+  FracSurfByLitR_col(NY,NX)=1.0_r8-FracSurfBareSoil_col(NY,NX)
+
+!  if(I>=66)write(*,*)'FracSurfByLitR_col(NY,NX)',FracSurfByLitR_col(NY,NX),XVLMobileWaterLitR_col(NY,NX),&
+!    VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX)
+  end subroutine PartLitSoilFractionM
 
 !------------------------------------------------------------------------------------------
   subroutine SurfLitREnergyBalanceM(I,J,M,NY,NX,PSISV1,Prec2LitR2,RainHeat2LitR2,&
@@ -107,7 +132,7 @@ implicit none
   ! THERMAL CONDUCTIVITY BETWEEN SURFACE RESIDUE AND SOIL SURFACE
   !
   
-  IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
+  IF(FracSurfByLitR_col(NY,NX).GT.ZEROL)THEN
   ! litter layer
   ! albedo
     LitRAlbedo=(0.20_r8*VLSoilMicPMass_vr(0,NY,NX)+0.06_r8*VLWatMicP1_vr(0,NY,NX)+0.30_r8 &
@@ -461,7 +486,7 @@ implicit none
   real(r8) :: tkspre,ENGYR,VLWatMicPr,VLiceMicPr
   real(r8) :: ENGYZ,HeatByLitrMassChange,HS
 
-  IF(FracSurfByLitR_col(NY,NX).LE.ZERO)return
+  IF(FracSurfByLitR_col(NY,NX).LE.ZEROL)return
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
   !
@@ -576,14 +601,16 @@ implicit none
   TK0Prev                    = TKSoil1_vr(0,NY,NX)                             !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
   VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
-
+  
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoil1_vr(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
+!    if(I>=66)print*,TK0Prev,TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX),FracSurfByLitR_col(NY,NX),&
+!      LWRad2LitR_col(NY,NX),LWRad2Snow_col(NY,NX),LWRad2Soil_col(NY,NX)
     if(TKSoil1_vr(0,NY,NX)<200._r8 .or. abs(TKSoil1_vr(0,NY,NX)-TK0Prev)>60._r8)then
       write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX)
       write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
       write(*,*)'engy',ENGYR/VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRM_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),&
-        LitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX)
+        LitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),XVLMobileWaterLitR_col(NY,NX)
       write(*,*)'cpo',cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitRMin_col(NY,NX) 
       write(*,*)'cpw',cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
       write(*,*)'watflw',ENGYR,WatFLo2LitRM_col(NY,NX),HeatFLoByWat2LitRM_col(NY,NX),HeatFLoByWat2LitRM_col(NY,NX)/(WatFLo2LitRM_col(NY,NX)*cpw)
@@ -605,7 +632,7 @@ implicit none
   end subroutine UpdateLitRBe4RunoffM
 
 !------------------------------------------------------------------------------------------
-  subroutine UpdateLitRAftRunoff(I,J,M,NY,NX)
+  subroutine UpdateLitRAftRunoffM(I,J,M,NY,NX)
   !
   !Description
   !Update litter water after computing runoff
@@ -668,7 +695,7 @@ implicit none
     TKSoil1_vr(0,NY,NX)=(ENGYR+cumHeatFlx2LitRByRunoff_col(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
 !    write(*,'(50A)')('-',K=1,50)
 !    write(*,*)I,J,M,NY,NX
-!    write(*,*)'weird litter temp UpdateLitRAftRunoff  =',TKSoil1_vr(0,NY,NX),TK0Prev,VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
+!    write(*,*)'weird litter temp UpdateLitRAftRunoffM  =',TKSoil1_vr(0,NY,NX),TK0Prev,VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
 !    write(*,*)'engyr',ENGYR/VHeatCapacity1_vr(0,NY,NX),cumHeatFlx2LitRByRunoff_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX)
 !    write(*,*)'cpo',cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX) 
 !    write(*,*)'cpw',SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP10,VLiceMicP10,VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
@@ -686,7 +713,7 @@ implicit none
   VLiceMicP_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)
   VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   
-  end subroutine UpdateLitRAftRunoff
+  end subroutine UpdateLitRAftRunoffM
 
 !------------------------------------------------------------------------------------------
 

@@ -330,7 +330,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%TReduxNO2Band          = 0.0_r8
   this%TReduxN2O              = 0.0_r8
   this%TFixN2                 = 0.0_r8
-  this%tCH4OxiAero            = 0._r8
+  this%tCH4OxiAero            = 0.0_r8
 
   this%tRO2UptkHeterG     = 0._r8
   this%tRO2DmndHeterG     = 0._r8

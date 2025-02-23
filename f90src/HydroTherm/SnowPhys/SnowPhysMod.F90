@@ -403,7 +403,7 @@ contains
           !interaction with respect to litter layer and topsoil 
           !potential flow to soil
           !first  flow to micro- and macropores
-          if(FracSurfByLitR_col(NY,NX)>1.e-3_r8)then
+          if(FracSurfByLitR_col(NY,NX)>ZEROL)then
             PtWatFlowSno2Soi      = WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
             WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
             WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
@@ -435,7 +435,7 @@ contains
           cumHeatCndFlxLitr2Soi   = 0.0_r8
 
           !surface litter layer is active
-          IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>1.e-3_r8)THEN
+          IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>ZEROL)THEN
             !should the litter heat/water states be updated here?
             call SnowSurLitterExch(I,J,dt_SnoHeat,M,L,NY,NX,VapCond1,VapCond2,TCND1W,VLairSno1,PSISV1,TCNDS,&
               CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi,&
@@ -1675,7 +1675,7 @@ contains
 
   CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*AirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*AirFilledSoilPoreM_vr(M,0,NY,NX),POROS_vr(0,NY,NX))
 
-  IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
+  IF(FracSurfByLitR_col(NY,NX).GT.ZEROL)THEN
     IF(VapCond1.GT.ZERO .AND. CNVR.GT.ZERO)THEN      
       AvgVaporCondctSnowLitR=2.0_r8*CNVR*VapCond1/(VapCond1*DLYRR_COL(NY,NX)+CNVR*SnowThickL0_snvr(L,NY,NX))
     ELSE
