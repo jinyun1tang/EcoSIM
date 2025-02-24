@@ -92,14 +92,17 @@ module Hour1Mod
 
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
+
+  character(len=*), parameter :: subname='hour1'
   integer :: L,NX,NY
   real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
   real(r8) :: DPTH0           !water+ice thickness in litter
 
   integer :: NZ,NR,K
   logical :: dosum
+
 !     execution begins here
-!  write(111,*)'xxxxxx',I,J,CanopyLeafArea_lpft(1,25,1,1,1,5)
+  call PrintInfo('beg '//subname)
 !
   if(lverb)write(*,*)'ResetLndscapeAccumlators'
   call ResetLndscapeAccumlators()
@@ -245,6 +248,7 @@ module Hour1Mod
 !     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
   call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
 
+  call PrintInfo('end '//subname)
   END subroutine hour1
 !------------------------------------------------------------------------------------------
 

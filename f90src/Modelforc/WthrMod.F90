@@ -420,33 +420,7 @@ module WthrMod
     N=4
   ENDIF
   !
-  !     MONTHLY CHANGES
-  !
-  !     IF(I.GT.0.AND.I.LE.31)THEN
-  !     N=1
-  !     ELSEIF(I.GT.31.AND.I.LE.59)THEN
-  !     N=2
-  !     ELSEIF(I.GT.59.AND.I.LE.90)THEN
-  !     N=3
-  !     ELSEIF(I.GT.90.AND.I.LE.120)THEN
-  !     N=4
-  !     ELSEIF(I.GT.120.AND.I.LE.151)THEN
-  !     N=5
-  !     ELSEIF(I.GT.151.AND.I.LE.181)THEN
-  !     N=6
-  !     ELSEIF(I.GT.181.AND.I.LE.212)THEN
-  !     N=7
-  !     ELSEIF(I.GT.212.AND.I.LE.243)THEN
-  !     N=8
-  !     ELSEIF(I.GT.243.AND.I.LE.273)THEN
-  !     N=9
-  !     ELSEIF(I.GT.273.AND.I.LE.304)THEN
-  !     N=10
-  !     ELSEIF(I.GT.304.AND.I.LE.334)THEN
-  !     N=11
-  !     ELSE
-  !     N=12
-  !     ENDIF
+
   D9925: DO NX=NHW,NHE
     D9920: DO NY=NVN,NVS
 !
