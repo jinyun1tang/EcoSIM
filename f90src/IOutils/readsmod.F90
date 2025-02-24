@@ -30,13 +30,54 @@ module readsmod
   integer, save :: yearhi  =0
 
   type, public :: clime_type
-    real(r8) :: airTC
-    real(r8) :: vapKpa
-    real(r8) :: WindMS
-    real(r8) :: AtmKPa
+    real(r8) :: AirT_C      !air temperature, C
+    real(r8) :: vap_Kpa     !vapor pressure, kPa
+    real(r8) :: Wind_ms     !wind speed, m/s
+    real(r8) :: Atm_kPa     !atmospheric vapor pressure kPa
+    real(r8) :: Rain_mmhr   !rainfall mm/m2/hr
+    real(r8) :: SRAD_Wm2    !solar radiation, W m-2
   end type clime_type
 
+  type(clime_type), public :: clim_var
   contains
+
+!------------------------------------------------------------------------------------------
+
+  subroutine SetConstClimeForcing()
+
+  implicit none
+  
+  IWTHR=2          !set as hourly forcing
+  TMP_hrly(:,:)   = clim_var%airT_C
+  WINDH(:,:)      = clim_var%Wind_ms * 3600._r8    ![m/s]->[m/hour]
+  DWPTH(:,:)      = clim_var%vap_kpa               !
+  RAINH(:,:)      = clim_var%Rain_mmhr * 1.e-3_r8  ![mm/hr]->[m/hr]
+  SWRad_hrly(:,:) = clim_var%SRAD_Wm2 *3600.e-6_r8 ![W/m2]->[MJ/m2]
+  PBOT_hrly(:,:)  = clim_var%Atm_kPa
+
+  WindMesureHeight_col(:,:) = 0.5_r8
+  SolarNoonHour_col(:,:)    = 12._r8
+  pH_rain_col(:,:)          = 7._r8
+  CN4RI(:,:)                = 0._r8
+  CNORI(:,:)                = 0._r8
+  NH4_rain_mole_conc(:,:)   = 0._r8
+  NO3_rain_mole_conc(:,:)   = 0._r8
+  H2PO4_rain_mole_conc(:,:) = 0._r8
+
+  if(salt_model)then
+    trcsalt_rain_mole_conc_col(idsalt_Al,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Fe,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Ca,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Mg,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Na,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_K,:,:)   = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_SO4,:,:) = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Cl,:,:)  = 0._r8
+  endif
+
+  end subroutine SetConstClimeForcing
+
+!------------------------------------------------------------------------------------------
 
   SUBROUTINE ReadClimSoilForcing(yearc,yeari,NHW,NHE,NVN,NVS)
 !
@@ -125,6 +166,7 @@ module readsmod
 ! READ WEATHER DATA
   if(fixClime)then
     !set constatnt climate forcing
+    call SetConstClimeForcing()
   else
     IF(is_first_year)THEN
       L=1
@@ -157,14 +199,13 @@ module readsmod
         FDPTH(I,NY,NX)=0.0_r8
       ENDDO D40
       D125: DO I=1,366
-        RRIG(1:24,I,NY,NX)=0.0_r8
-        PHQ(I,NY,NX)=7.0_r8
-        NH4_irrig_mole_conc(I,NY,NX)=0.0_r8
-        NO3_irrig_mole_conc(I,NY,NX)=0.0_r8
-        H2PO4_irrig_mole_conc(I,NY,NX)=0.0_r8
-
-        WDPTH(I,NY,NX)=0.0_r8
-        ROWI(I,NY,NX)=0.0_r8
+        RRIG(1:24,I,NY,NX)             = 0.0_r8
+        PHQ(I,NY,NX)                   = 7.0_r8
+        NH4_irrig_mole_conc(I,NY,NX)   = 0.0_r8
+        NO3_irrig_mole_conc(I,NY,NX)   = 0.0_r8
+        H2PO4_irrig_mole_conc(I,NY,NX) = 0.0_r8
+        WDPTH(I,NY,NX)                 = 0.0_r8
+        ROWI(I,NY,NX)                  = 0.0_r8
       ENDDO D125
     ENDDO D9985
   ENDDO D9980
@@ -295,6 +336,7 @@ module readsmod
   PHRG   = atmf%PHRG
   Z0G    = atmf%Z0G
   ZNOONG = atmf%ZNOONG
+
   D8970: DO NX=NHW,NHE
     D8975: DO NY=NVN,NVS
       WindMesureHeight_col(NY,NX) = Z0G         !windspeed meast height
