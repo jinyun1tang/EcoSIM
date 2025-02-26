@@ -61,7 +61,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootH2PO4Uptake_pft(:,:,:)                     !total root uptake of PO4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootHPO4Uptake_pft(:,:,:)                      !total root uptake of HPO4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pft(:,:,:)                           !total root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootGasLossDisturb_pft(:,:,:,:)                !gas flux from root disturbance [g d-2 h-1]
+  real(r8),target,allocatable ::  RootGasLossDisturb_pft(:,:,:,:)                !gas flux from root disturbance (<0 into atmosphere) [g d-2 h-1]
   real(r8),target,allocatable ::  RootOUlmNutUptake_pvr(:,:,:,:,:,:)             !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCUlmNutUptake_pvr(:,:,:,:,:,:)             !root uptake of NH4 non-band unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2EmisPot_pvr(:,:,:,:,:)                  !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
@@ -339,6 +339,7 @@ module PlantDataRateType
   call destroy(RAcetateEcoDmndK_vr)
   call destroy(RAcetateEcoDmndPrev_vr)
   call destroy(TRootH2Flx_col)
+  call destroy(RootGasLossDisturb_pft)
   call destroy(trcs_plant_uptake_vr)
   call destroy(RootCO2Autor_vr)
   end subroutine DestructPlantRates

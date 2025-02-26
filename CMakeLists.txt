@@ -212,12 +212,9 @@ if (ATS_ECOSIM)
     endif()
 
     set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -ldl -lz -lcurl -lhdf5 -lnetcdf -lnetcdff")
-
+    
 else()
     add_subdirectory(3rd-partylibs)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffpe-trap=invalid,zero,overflow,underflow")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -ffpe-trap=invalid,zero,overflow,underflow")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -ffpe-trap=invalid,zero,overflow,underflow")
     
     #string(REPLACE "-ffpe-trap=invalid" "" CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}")
 endif()

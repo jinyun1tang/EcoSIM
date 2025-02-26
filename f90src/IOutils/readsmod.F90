@@ -197,14 +197,14 @@ module readsmod
     DO NX=NHW,NHE
       DO NY=NVN,NVS
         DO I=1,366
-          trcsalt_irrig_conc(idsalt_Al,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_Na,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_K,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)=0.0_r8
-          trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)=0.0_r8  
+          trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Fe,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Ca,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Mg,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Na,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_K,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_SO4,I,NY,NX)=0.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Cl,I,NY,NX)=0.0_r8  
         ENDDO
       ENDDO  
     ENDDO   
@@ -336,14 +336,14 @@ module readsmod
   if(salt_model)then
     DO NX=NHW,NHE
       DO NY=NVN,NVS
-        trcsalt_rain_conc(idsalt_Al,NY,NX)=CALRG
-        trcsalt_rain_conc(idsalt_Fe,NY,NX)=CFERG
-        trcsalt_rain_conc(idsalt_Ca,NY,NX)=CCARG
-        trcsalt_rain_conc(idsalt_Mg,NY,NX)=CMGRG
-        trcsalt_rain_conc(idsalt_Na,NY,NX)=CNARG
-        trcsalt_rain_conc(idsalt_K,NY,NX)=CKARG
-        trcsalt_rain_conc(idsalt_SO4,NY,NX)=CSORG
-        trcsalt_rain_conc(idsalt_Cl,NY,NX)=CCLRG  
+        trcsalt_rain_mole_conc_col(idsalt_Al,NY,NX)=CALRG
+        trcsalt_rain_mole_conc_col(idsalt_Fe,NY,NX)=CFERG
+        trcsalt_rain_mole_conc_col(idsalt_Ca,NY,NX)=CCARG
+        trcsalt_rain_mole_conc_col(idsalt_Mg,NY,NX)=CMGRG
+        trcsalt_rain_mole_conc_col(idsalt_Na,NY,NX)=CNARG
+        trcsalt_rain_mole_conc_col(idsalt_K,NY,NX)=CKARG
+        trcsalt_rain_mole_conc_col(idsalt_SO4,NY,NX)=CSORG
+        trcsalt_rain_mole_conc_col(idsalt_Cl,NY,NX)=CCLRG  
       ENDDO
     ENDDO    
   endif

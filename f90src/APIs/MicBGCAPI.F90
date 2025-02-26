@@ -166,7 +166,7 @@ implicit none
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
   micfor%O2_irrig_conc       = trcg_irrig_mole_conc_col(idg_O2,NY,NX)
   micfor%O2_rain_conc        = trcg_rain_mole_conc_col(idg_O2,NY,NX)
-  micfor%Irrig2LitRSurf      = Irrig2LitRSurf(NY,NX)
+  micfor%Irrig2LitRSurf_col      = Irrig2LitRSurf_col(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)
   micfor%VLitR               = VLitR_col(NY,NX)
@@ -203,21 +203,21 @@ implicit none
     micfor%PSISoilMatricP  = LtHeatIceMelt*(micfor%TKS-Tref)/micfor%TKS
   endif
   
-  micfor%O2AquaDiffusvity             = SoluteDifusvty_vr(idg_O2,L,NY,NX)
-  micfor%ORGC                         = SoilOrgM_vr(ielmc,L,NY,NX)
-  micfor%RNO2EcoUptkSoilPrev          = RNO2EcoUptkSoilPrev_vr(L,NY,NX)
-  micfor%RN2OEcoUptkSoilPrev          = RN2OEcoUptkSoilPrev_vr(L,NY,NX)
-  micfor%RNO2EcoUptkBandPrev          = RNO2EcoUptkBandPrev_vr(L,NY,NX)
-  micfor%RO2EcoDmndPrev               = RO2EcoDmndPrev_vr(L,NY,NX)
-  micfor%RO2GasXchangePrev            = RGasFlxPrev_vr(idg_O2,L,NY,NX)
-  micfor%RCH4F                        = RGasFlxPrev_vr(idg_CH4,L,NY,NX)
-  micfor%RCH4PhysexchPrev             = RCH4PhysexchPrev_vr(L,NY,NX)
-  micfor%RNH4EcoDmndBandPrev          = RNH4EcoDmndBandPrev_vr(L,NY,NX)
-  micfor%RNO3EcoDmndBandPrev          = RNO3EcoDmndBandPrev_vr(L,NY,NX)
-  micfor%RH2PO4EcoDmndBandPrev        = RH2PO4EcoDmndBandPrev_vr(L,NY,NX)
-  micfor%RH1PO4EcoDmndBandPrev        = RH1PO4EcoDmndBandPrev_vr(L,NY,NX)
-  micfor%RO2AquaXchangePrev           = RO2AquaSourcePrev_vr(L,NY,NX)
-  micfor%RDOMEcoDmndPrev(1:jcplx)     = RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
+  micfor%O2AquaDiffusvity         = SoluteDifusvty_vr(idg_O2,L,NY,NX)
+  micfor%ORGC                     = SoilOrgM_vr(ielmc,L,NY,NX)
+  micfor%RNO2EcoUptkSoilPrev      = RNO2EcoUptkSoilPrev_vr(L,NY,NX)
+  micfor%RN2OEcoUptkSoilPrev      = RN2OEcoUptkSoilPrev_vr(L,NY,NX)
+  micfor%RNO2EcoUptkBandPrev      = RNO2EcoUptkBandPrev_vr(L,NY,NX)
+  micfor%RO2EcoDmndPrev           = RO2EcoDmndPrev_vr(L,NY,NX)
+  micfor%RO2GasXchangePrev        = RGasFlxPrev_vr(idg_O2,L,NY,NX)
+  micfor%RCH4GasXchangePrev       = RGasFlxPrev_vr(idg_CH4,L,NY,NX)
+  micfor%RCH4PhysexchPrev         = RCH4PhysexchPrev_vr(L,NY,NX)
+  micfor%RNH4EcoDmndBandPrev      = RNH4EcoDmndBandPrev_vr(L,NY,NX)
+  micfor%RNO3EcoDmndBandPrev      = RNO3EcoDmndBandPrev_vr(L,NY,NX)
+  micfor%RH2PO4EcoDmndBandPrev    = RH2PO4EcoDmndBandPrev_vr(L,NY,NX)
+  micfor%RH1PO4EcoDmndBandPrev    = RH1PO4EcoDmndBandPrev_vr(L,NY,NX)
+  micfor%RO2AquaXchangePrev       = RO2AquaSourcePrev_vr(L,NY,NX)
+  micfor%RDOMEcoDmndPrev(1:jcplx) = RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
 
 !  write(201,*)I+J/24.,L,RDOMEcoDmndPrev_vr(1:jcplx,L,NY,NX)
   micfor%RAcetateEcoDmndPrev(1:jcplx) = RAcetateEcoDmndPrev_vr(1:jcplx,L,NY,NX)
@@ -274,7 +274,7 @@ implicit none
     micfor%SoilMicPMassLayer0=VLSoilMicPMass_vr(0,NY,NX)
   endif
   micfor%DiffusivitySolutEff(1:NPH) = DiffusivitySolutEffM_vr(1:NPH,L,NY,NX)
-  micfor%FILM(1:NPH)                = FILM(1:NPH,L,NY,NX)
+  micfor%FILM(1:NPH)                = FILMM_vr(1:NPH,L,NY,NX)
   micfor%THETPM(1:NPH)              = AirFilledSoilPoreM_vr(1:NPH,L,NY,NX)
   micfor%VLWatMicPM(1:NPH)          = VLWatMicPM_vr(1:NPH,L,NY,NX)
   micfor%TortMicPM(1:NPH)           = TortMicPM_vr(1:NPH,L,NY,NX)
@@ -315,6 +315,7 @@ implicit none
       micstt%DOM(idom,K) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
     ENDDO
   ENDDO
+
   micstt%SorbedOM(idom_beg:idom_end,1:jcplx)               = SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)
   micstt%SolidOMAct(1:jsken,1:jcplx)                       = SolidOMAct_vr(1:jsken,1:jcplx,L,NY,NX)
   micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:jcplx)       = SolidOM_vr(1:NumPlantChemElms,1:jsken,1:jcplx,L,NY,NX)

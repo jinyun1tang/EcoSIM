@@ -14,12 +14,14 @@ macro(set_up_compilers)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-discarded-qualifiers")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-sign-conversion -Wno-maybe-uninitialized")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -ffpe-trap=invalid,zero,overflow,underflow")
 
     if (BUILD_SHARED_LIBS)
       set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
       set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fPIC")
     endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffpe-trap=invalid,zero,overflow,underflow")
 
     if (LINUX EQUAL 1)
       # Counter some of GCC's more recent stinginess on Linux.
@@ -57,7 +59,7 @@ macro(set_up_compilers)
 
     endif()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdefault-real-8 -fdefault-double-8")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-variable -ffpe-trap=invalid")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-variable -ffpe-trap=invalid,zero,overflow,underflow")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-parameter -Wno-unused-function")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wuninitialized -Wno-unused-dummy-argument")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")

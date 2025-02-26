@@ -344,6 +344,7 @@ module ncdio_pio
   readvar = .true.
 
   ret = nf90_inq_varid (ncid%fh, varname, vardesc%varid)
+
   if (ret/=nf90_noerr) then
     readvar = .false.
     if(log_err)then

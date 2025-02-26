@@ -9,20 +9,21 @@ module InitEcoSIM
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
   public :: InitModules
-  public :: InitModules2
   contains
 
   subroutine InitModules(NOMicrobeGuilds)
-  use PlantDisturbsMod     , only : InitPlantDisturbance
-  use UptakesMod           , only : InitUptake
-  use WatsubMod            , only : initWatsub
-  use SoilBGCNLayMod            , only : InitNitro
-  use RedistMod            , only : InitRedist
-  use ErosionMod           , only : InitErosion
-  use Hour1Mod             , only : InitHour1
-  use HistDataType         , only : hist_ecosim
-  use InitAllocMod         , only : InitAlloc
-  use UnitMod              , only : units
+
+  use PlantDisturbsMod, only: InitPlantDisturbance
+  use UptakesMod,       only: InitUptake
+  use WatsubMod,        only: initWatsub
+  use SoilBGCNLayMod,   only: InitNitro
+  use RedistMod,        only: InitRedist
+  use ErosionMod,       only: InitErosion
+  use Hour1Mod,         only: InitHour1
+  use HistDataType,     only: hist_ecosim
+  use InitAllocMod,     only: InitAlloc
+  use UnitMod,          only: units
+  use TranspNoSaltMod,  only: InitTranspNoSalt
   use GridConsts
   implicit  none
 
@@ -45,30 +46,11 @@ module InitEcoSIM
 
   call InitHour1(micpar%NumOfLitrCmplxs)
 
-  call InitModules2
+  call InitTranspNoSalt
 
   call hist_ecosim%Init(bounds)
 
   end subroutine InitModules
-
-!------------------------------------------------------------------------------------------
-
-  subroutine InitModules2
-
-  use TranspSaltMod   , only : InitTranspSalt
-  use TranspNoSaltMod    , only : InitTranspNoSalt
-
-  implicit none
-
-
-  if(salt_model)then
-    call InitTranspSalt
-  else
-    call InitTranspNoSalt
-  endif
-
-
-  end subroutine InitModules2
 
 
 end module InitEcoSIM

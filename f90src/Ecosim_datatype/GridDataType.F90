@@ -14,7 +14,7 @@ implicit none
   real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
   real(r8),target,allocatable ::  SoilDepthMidLay_vr(:,:,:)                        !depth to middle of soil layer [m]
   real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
-  real(r8),target,allocatable ::  DPTHZ_vr(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  CumSoilThickMidL_vr(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
   real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
   real(r8),target,allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
   integer,target,allocatable ::  NU(:,:)                             !soil surface layer number
@@ -24,7 +24,7 @@ implicit none
   integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
   integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number
   integer,target,allocatable ::  NUM(:,:)                            !new surface layer number
-  real(r8),target,allocatable ::  CumLitRDepz_col(:,:)               !initial position of the bottom of liter layer [m]
+  real(r8),target,allocatable ::  CumLitRDepzInit_col(:,:)               !initial position of the bottom of liter layer [m]
   REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
   real(r8),target,allocatable ::  DH(:,:)                            !EW width of the grid cells, [m]
   real(r8),target,allocatable ::  DV(:,:)                            !NS width of the grid cells, [m]
@@ -43,7 +43,7 @@ contains
   allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
   allocate(SoilDepthMidLay_vr(JZ,JY,JX));     SoilDepthMidLay_vr=0._r8
   allocate(CumSoilThickness_vr(0:JZ,JY,JX)); CumSoilThickness_vr=0._r8
-  allocate(DPTHZ_vr(JZ,JY,JX));    DPTHZ_vr=0._r8
+  allocate(CumSoilThickMidL_vr(JZ,JY,JX));    CumSoilThickMidL_vr=0._r8
   allocate(AREA(3,0:JZ,JY,JX)); AREA=0._r8
   allocate(DIST(3,JD,JV,JH));   DIST=0._r8
   allocate(NU(JY,JX));          NU=0
@@ -53,7 +53,7 @@ contains
   allocate(NLI(JV,JH));         NLI=0
   allocate(NL(JV,JH));          NL=0
   allocate(NUM(JY,JX));         NUM=0
-  allocate(CumLitRDepz_col(JY,JX));      CumLitRDepz_col=0._r8
+  allocate(CumLitRDepzInit_col(JY,JX));      CumLitRDepzInit_col=0._r8
   allocate(ALAT(JY,JX));        ALAT=0._r8
   allocate(DH(JY,JX));          DH=0._r8
   allocate(DV(JY,JX));          DV=0._r8
@@ -73,7 +73,7 @@ contains
   call destroy(XDPTH)
   call destroy(SoilDepthMidLay_vr)
   call destroy(CumSoilThickness_vr)
-  call destroy(DPTHZ_vr)
+  call destroy(CumSoilThickMidL_vr)
   call destroy(AREA)
   call destroy(DIST)
   call destroy(NU)
@@ -83,7 +83,7 @@ contains
   call destroy(NLI)
   call destroy(NL)
   call destroy(NUM)
-  call destroy(CumLitRDepz_col)
+  call destroy(CumLitRDepzInit_col)
   call destroy(ALAT)
   call destroy(DH)
   call destroy(DV)

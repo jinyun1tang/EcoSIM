@@ -59,6 +59,7 @@ contains
   real(r8), optional, intent(out) :: XSW  !total water equivalent snow 
   real(r8) :: DLYRSI
   real(r8) :: VOLSWI
+  !reference snow thickness [m]
   real(r8), parameter :: cumSnowDepzRef_col(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
   !the maximum snow layer is 1.0 m.
   integer :: L
@@ -96,7 +97,7 @@ contains
       DLYRSI                   = cumSnowDepzRef_col(L)-cumSnowDepzRef_col(L-1)
       SnowThickL_snvr(L,NY,NX) = AMIN1(DLYRSI,AZMAX1(SnowDepth_col(NY,NX)-cumSnowDepzRef_col(L-1)))
     ENDIF
-    VLSnoDWIMax_col(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
+    VLSnoDWIMax_snvr(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !maximum snow volume alloed in layer L
 
     if(SnowThickL_snvr(L,NY,NX) .GT. ZEROS(NY,NX))then
       !there is meaningful snow

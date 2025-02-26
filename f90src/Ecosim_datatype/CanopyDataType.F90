@@ -105,7 +105,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  PrecIntcptByCanopy_pft(:,:,:)              !water flux into plant canopy, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WatHeldOnCanopy_pft(:,:,:)                 !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  TKC_pft(:,:,:)                             !canopy temperature after energy iteration, [K]
-  real(r8),target,allocatable ::  TCelciusCanopy_pft(:,:,:)                  !canopy temperature, [oC]
+  real(r8),target,allocatable ::  TdegCCanopy_pft(:,:,:)                  !canopy temperature, [oC]
   real(r8),target,allocatable ::  DeltaTKC_pft(:,:,:)                        !change in canopy temperature, [K]
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature during canopy energy iteration, [K]
   real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                     !minimum sink strength for nonstructural C transfer, [g d-2]
@@ -132,7 +132,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyStemAreaZ_pft(:,:,:,:)               !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_pft(:,:,:,:)          !canopy nodule nonstructural element, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulElms_pft(:,:,:,:)               !canopy nodule elemental biomass [g d-2]
-  real(r8),target,allocatable ::  StalkBiomassC_brch(:,:,:,:)                !branch active stalk C, [g d-2]
+  real(r8),target,allocatable ::  StalkLiveBiomassC_brch(:,:,:,:)                !branch active stalk C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_brch(:,:,:,:,:)            !branch nonstructural element, [g d-2]
   real(r8),target,allocatable ::  LeafPetolBiomassC_brch(:,:,:,:)            !plant branch leaf + sheath C, [g d-2]
   real(r8),target,allocatable ::  ShootStrutElms_brch(:,:,:,:,:)             !branch shoot C, [g d-2]
@@ -270,7 +270,7 @@ module CanopyDataType
   allocate(PrecIntcptByCanopy_pft(JP,JY,JX));     PrecIntcptByCanopy_pft=0._r8
   allocate(WatHeldOnCanopy_pft(JP,JY,JX));    WatHeldOnCanopy_pft=0._r8
   allocate(TKC_pft(JP,JY,JX));      TKC_pft=0._r8
-  allocate(TCelciusCanopy_pft(JP,JY,JX));      TCelciusCanopy_pft=0._r8
+  allocate(TdegCCanopy_pft(JP,JY,JX));      TdegCCanopy_pft=0._r8
   allocate(DeltaTKC_pft(JP,JY,JX));     DeltaTKC_pft=0._r8
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
   allocate(CPOOL3_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3_node=0._r8
@@ -295,7 +295,7 @@ module CanopyDataType
   allocate(CanopyStemAreaZ_pft(NumOfCanopyLayers,JP,JY,JX)); CanopyStemAreaZ_pft=0._r8
   allocate(CanopyNodulElms_pft(NumPlantChemElms,JP,JY,JX));CanopyNodulElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
-  allocate(StalkBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkBiomassC_brch=0._r8
+  allocate(StalkLiveBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkLiveBiomassC_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
   allocate(ShootC4NonstC_brch(MaxNumBranches,JP,JY,JX));ShootC4NonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
@@ -433,7 +433,7 @@ module CanopyDataType
   call destroy(PrecIntcptByCanopy_pft)
   call destroy(WatHeldOnCanopy_pft)
   call destroy(TKC_pft)
-  call destroy(TCelciusCanopy_pft)
+  call destroy(TdegCCanopy_pft)
   call destroy(DeltaTKC_pft)
   call destroy(TKCanopy_pft)
   call destroy(CPOOL3_node)
@@ -459,7 +459,7 @@ module CanopyDataType
   call destroy(CanopyStemAreaZ_pft)
   call destroy(CanopyNodulNonstElms_pft)
   call destroy(CanopyNodulElms_pft)
-  call destroy(StalkBiomassC_brch)
+  call destroy(StalkLiveBiomassC_brch)
   call destroy(CanopyNonstElms_brch)
   call destroy(ShootC4NonstC_brch)
   call destroy(LeafPetolBiomassC_brch)

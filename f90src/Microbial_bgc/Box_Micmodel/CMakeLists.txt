@@ -17,6 +17,7 @@ target_include_directories(Box_Micmodel  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/   
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};Box_Micmodel PARENT_SCOPE)

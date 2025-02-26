@@ -88,7 +88,7 @@ module InitSoluteMod
   real(r8), pointer :: CCASOX
   real(r8), pointer :: CN4X
   real(r8), pointer :: CPOZ
-  real(r8), pointer :: CALZ
+  real(r8), pointer :: Al_mole_conc
   real(r8), pointer :: CFEZ
   real(r8), pointer :: CCAZ
   real(r8), pointer :: CMGZ
@@ -107,7 +107,7 @@ module InitSoluteMod
   real(r8), pointer :: CALOHX
   real(r8), pointer :: CFEOHX
   real(r8), pointer :: CCACOX
-  real(r8), pointer :: XNH4_conc
+  real(r8), pointer :: XNH4_mole_conc
   real(r8), pointer :: XHY1
   real(r8), pointer :: XAl_conc
   real(r8), pointer :: XFe_conc
@@ -220,130 +220,130 @@ module InitSoluteMod
   integer, parameter :: MRXN1=1000
   integer :: M
 !     begin_execution
-  H2CO3_aqua_mole_conc          => solutevar%H2CO3_aqua_mole_conc
-  CH4_aqua_mole_conc            => solutevar%CH4_aqua_mole_conc
-  O2_aqua_mole_conc             => solutevar%O2_aqua_mole_conc
-  N2_aqua_mole_conc             => solutevar%N2_aqua_mole_conc
-  N2O_aqua_mole_conc            => solutevar%N2O_aqua_mole_conc
-  NH4_1p_aqua_mole_conc             => solutevar%NH4_1p_aqua_mole_conc
-  NH3_aqua_mole_conc            => solutevar%NH3_aqua_mole_conc
-  Al_3p_aqua_mole_conc              => solutevar%Al_3p_aqua_mole_conc
-  Fe_3p_aqua_mole_conc              => solutevar%Fe_3p_aqua_mole_conc
-  H_1p_aqua_mole_conc               => solutevar%H_1p_aqua_mole_conc
-  Ca_2p_aqua_mole_conc              => solutevar%Ca_2p_aqua_mole_conc
-  Mg_2p_aqua_mole_conc              => solutevar%Mg_2p_aqua_mole_conc
-  Na_1p_aqua_mole_conc              => solutevar%Na_1p_aqua_mole_conc
-  K_1p_aqua_mole_conc               => solutevar%K_1p_aqua_mole_conc
-  OH_1e_aqua_mole_conc              => solutevar%OH_1e_aqua_mole_conc
-  SO4_2e_aqua_mole_conc             => solutevar%SO4_2e_aqua_mole_conc
-  Cl_e_conc               => solutevar%Cl_e_conc
-  CO3_2e_aqua_mole_conc             => solutevar%CO3_2e_aqua_mole_conc
-  HCO3_e_conc             => solutevar%HCO3_e_conc
-  AlOH_2p_aqua_mole_conc            => solutevar%AlOH_2p_aqua_mole_conc
-  AlO2H2_1p_aqua_mole_conc          => solutevar%AlO2H2_1p_aqua_mole_conc
-  AlO3H3_conc             => solutevar%AlO3H3_conc
-  AlO4H4_1e_aqua_mole_conc          => solutevar%AlO4H4_1e_aqua_mole_conc
-  AlSO4_1p_aqua_mole_conc           => solutevar%AlSO4_1p_aqua_mole_conc
-  FeOH_2p_aqua_mole_conc            => solutevar%FeOH_2p_aqua_mole_conc
-  FeO2H2_p_conc           => solutevar%FeO2H2_p_conc
-  FeO3H3_conc             => solutevar%FeO3H3_conc
-  FeO4H4_1e_aqua_mole_conc          => solutevar%FeO4H4_1e_aqua_mole_conc
-  FeSO4_1p_aqua_mole_conc           => solutevar%FeSO4_1p_aqua_mole_conc
-  CaO2H2_conc             => solutevar%CaO2H2_conc
-  CaCO3_conc              => solutevar%CaCO3_conc
-  CaHCO3_1p_aqua_mole_conc          => solutevar%CaHCO3_1p_aqua_mole_conc
-  CaSO4_conc              => solutevar%CaSO4_conc
-  MgOH_1p_aqua_mole_conc            => solutevar%MgOH_1p_aqua_mole_conc
-  MgCO3_conc              => solutevar%MgCO3_conc
-  MgHCO3_1p_aqua_mole_conc          => solutevar%MgHCO3_1p_aqua_mole_conc
-  MgSO4_conc              => solutevar%MgSO4_conc
-  NaCO3_1e_aqua_mole_conc           => solutevar%NaCO3_1e_aqua_mole_conc
-  NaSO4_1e_aqua_mole_conc           => solutevar%NaSO4_1e_aqua_mole_conc
-  KSO4_1e_aqua_mole_conc            => solutevar%KSO4_1e_aqua_mole_conc
-  H0PO4_3e_conc           => solutevar%H0PO4_3e_conc
-  H1PO4_2e_aqua_mole_conc           => solutevar%H1PO4_2e_aqua_mole_conc
-  H2PO4_1e_aqua_mole_conc           => solutevar%H2PO4_1e_aqua_mole_conc
-  H3PO4_conc              => solutevar%H3PO4_conc
-  FeHPO4_p_conc           => solutevar%FeHPO4_p_conc
-  FeH2PO4_2p_aqua_mole_conc         => solutevar%FeH2PO4_2p_aqua_mole_conc
-  CaPO4_1e_con            => solutevar%CaPO4_1e_con
-  CaHPO4_conc             => solutevar%CaHPO4_conc
-  CaH4P2O8_1p_aqua_mole_conc        => solutevar%CaH4P2O8_1p_aqua_mole_conc
-  MgHPO4_conc             => solutevar%MgHPO4_conc
-  CSTR1                   => solutevar%CSTR1
-  CCO2M                   => solutevar%CCO2M
-  CCH4M                   => solutevar%CCH4M
-  COXYM                   => solutevar%COXYM
-  CZ2GM                   => solutevar%CZ2GM
-  CZ2OM                   => solutevar%CZ2OM
-  CN4Z                    => solutevar%CN4Z
-  CNOZ                    => solutevar%CNOZ
-  CNAZ                    => solutevar%CNAZ
-  CKAZ                    => solutevar%CKAZ
-  CSOZ                    => solutevar%CSOZ
-  CCLZ                    => solutevar%CCLZ
-  CNOX                    => solutevar%CNOX
-  CCASOX                  => solutevar%CCASOX
-  CN4X                    => solutevar%CN4X
-  CPOZ                    => solutevar%CPOZ
-  CALZ                    => solutevar%CALZ
-  CFEZ                    => solutevar%CFEZ
-  CCAZ                    => solutevar%CCAZ
-  CMGZ                    => solutevar%CMGZ
-  CALX                    => solutevar%CALX
-  CFEX                    => solutevar%CFEX
-  CaX_conc                => solutevar%CaX_conc
-  MgX_conc                => solutevar%MgX_conc
-  CNAX                    => solutevar%CNAX
-  CKAX                    => solutevar%CKAX
-  CSOX                    => solutevar%CSOX
-  CCLX                    => solutevar%CCLX
-  CALPOX                  => solutevar%CALPOX
-  CFEPOX                  => solutevar%CFEPOX
-  CCAPDX                  => solutevar%CCAPDX
-  CCAPHX                  => solutevar%CCAPHX
-  CALOHX                  => solutevar%CALOHX
-  CFEOHX                  => solutevar%CFEOHX
-  CCACOX                  => solutevar%CCACOX
-  XNH4_conc               => solutevar%XNH4_conc
-  XHY1                    => solutevar%XHY1
-  XAl_conc                => solutevar%XAl_conc
-  XFe_conc                => solutevar%XFe_conc
-  XCa_conc                => solutevar%XCa_conc
-  Precp_Ca5P3O12O3H3_conc => solutevar%Precp_Ca5P3O12O3H3_conc
-  XMg_conc                => solutevar%XMg_conc
-  XNa_conc                => solutevar%XNa_conc
-  XK_conc                 => solutevar%XK_conc
-  XHC1                    => solutevar%XHC1
-  XAlO2H2_conc            => solutevar%XAlO2H2_conc
-  XFeO2H2_conc            => solutevar%XFeO2H2_conc
-  XOH_conc                => solutevar%XOH_conc
-  XROH1_conc              => solutevar%XROH1_conc
-  XROH2_conc              => solutevar%XROH2_conc
-  XHPO4_conc              => solutevar%XHPO4_conc
-  XH2PO4_conc             => solutevar%XH2PO4_conc
-  Precp_AlO3H3_conc       => solutevar%Precp_AlO3H3_conc
-  Precp_FeO3H3_conc       => solutevar%Precp_FeO3H3_conc
-  Precp_CaCO3_conc        => solutevar%Precp_CaCO3_conc
-  Precp_CaSO4_conc        => solutevar%Precp_CaSO4_conc
-  Precp_AlPO4_conc        => solutevar%Precp_AlPO4_conc
-  Precp_FePO4_conc        => solutevar%Precp_FePO4_conc
-  Precp_CaHPO4_conc       => solutevar%Precp_CaHPO4_conc
-  FH2O                    => solutevar%FH2O
-  ATCA                    => solutevar%ATCA
-  XAEC                    => solutevar%XAEC
-  CEC                     => solutevar%CEC
-  ORGC                    => solutevar%ORGC
-  VLPO4                   => solutevar%VLPO4
-  XCEC                    => solutevar%XCEC
-  GKC4                    => solutevar%GKC4
-  GKCA                    => solutevar%GKCA
-  GKCH                    => solutevar%GKCH
-  GKCK                    => solutevar%GKCK
-  GKCN                    => solutevar%GKCN
-  GKCM                    => solutevar%GKCM
-  ZEROS                   => solutevar%ZEROS
-  VLWatMicP               => solutevar%VLWatMicP
+  H2CO3_aqua_mole_conc       => solutevar%H2CO3_aqua_mole_conc
+  CH4_aqua_mole_conc         => solutevar%CH4_aqua_mole_conc
+  O2_aqua_mole_conc          => solutevar%O2_aqua_mole_conc
+  N2_aqua_mole_conc          => solutevar%N2_aqua_mole_conc
+  N2O_aqua_mole_conc         => solutevar%N2O_aqua_mole_conc
+  NH4_1p_aqua_mole_conc      => solutevar%NH4_1p_aqua_mole_conc
+  NH3_aqua_mole_conc         => solutevar%NH3_aqua_mole_conc
+  Al_3p_aqua_mole_conc       => solutevar%Al_3p_aqua_mole_conc
+  Fe_3p_aqua_mole_conc       => solutevar%Fe_3p_aqua_mole_conc
+  H_1p_aqua_mole_conc        => solutevar%H_1p_aqua_mole_conc
+  Ca_2p_aqua_mole_conc       => solutevar%Ca_2p_aqua_mole_conc
+  Mg_2p_aqua_mole_conc       => solutevar%Mg_2p_aqua_mole_conc
+  Na_1p_aqua_mole_conc       => solutevar%Na_1p_aqua_mole_conc
+  K_1p_aqua_mole_conc        => solutevar%K_1p_aqua_mole_conc
+  OH_1e_aqua_mole_conc       => solutevar%OH_1e_aqua_mole_conc
+  SO4_2e_aqua_mole_conc      => solutevar%SO4_2e_aqua_mole_conc
+  Cl_e_conc                  => solutevar%Cl_e_conc
+  CO3_2e_aqua_mole_conc      => solutevar%CO3_2e_aqua_mole_conc
+  HCO3_e_conc                => solutevar%HCO3_e_conc
+  AlOH_2p_aqua_mole_conc     => solutevar%AlOH_2p_aqua_mole_conc
+  AlO2H2_1p_aqua_mole_conc   => solutevar%AlO2H2_1p_aqua_mole_conc
+  AlO3H3_conc                => solutevar%AlO3H3_conc
+  AlO4H4_1e_aqua_mole_conc   => solutevar%AlO4H4_1e_aqua_mole_conc
+  AlSO4_1p_aqua_mole_conc    => solutevar%AlSO4_1p_aqua_mole_conc
+  FeOH_2p_aqua_mole_conc     => solutevar%FeOH_2p_aqua_mole_conc
+  FeO2H2_p_conc              => solutevar%FeO2H2_p_conc
+  FeO3H3_conc                => solutevar%FeO3H3_conc
+  FeO4H4_1e_aqua_mole_conc   => solutevar%FeO4H4_1e_aqua_mole_conc
+  FeSO4_1p_aqua_mole_conc    => solutevar%FeSO4_1p_aqua_mole_conc
+  CaO2H2_conc                => solutevar%CaO2H2_conc
+  CaCO3_conc                 => solutevar%CaCO3_conc
+  CaHCO3_1p_aqua_mole_conc   => solutevar%CaHCO3_1p_aqua_mole_conc
+  CaSO4_conc                 => solutevar%CaSO4_conc
+  MgOH_1p_aqua_mole_conc     => solutevar%MgOH_1p_aqua_mole_conc
+  MgCO3_conc                 => solutevar%MgCO3_conc
+  MgHCO3_1p_aqua_mole_conc   => solutevar%MgHCO3_1p_aqua_mole_conc
+  MgSO4_conc                 => solutevar%MgSO4_conc
+  NaCO3_1e_aqua_mole_conc    => solutevar%NaCO3_1e_aqua_mole_conc
+  NaSO4_1e_aqua_mole_conc    => solutevar%NaSO4_1e_aqua_mole_conc
+  KSO4_1e_aqua_mole_conc     => solutevar%KSO4_1e_aqua_mole_conc
+  H0PO4_3e_conc              => solutevar%H0PO4_3e_conc
+  H1PO4_2e_aqua_mole_conc    => solutevar%H1PO4_2e_aqua_mole_conc
+  H2PO4_1e_aqua_mole_conc    => solutevar%H2PO4_1e_aqua_mole_conc
+  H3PO4_conc                 => solutevar%H3PO4_conc
+  FeHPO4_p_conc              => solutevar%FeHPO4_p_conc
+  FeH2PO4_2p_aqua_mole_conc  => solutevar%FeH2PO4_2p_aqua_mole_conc
+  CaPO4_1e_con               => solutevar%CaPO4_1e_con
+  CaHPO4_conc                => solutevar%CaHPO4_conc
+  CaH4P2O8_1p_aqua_mole_conc => solutevar%CaH4P2O8_1p_aqua_mole_conc
+  MgHPO4_conc                => solutevar%MgHPO4_conc
+  CSTR1                      => solutevar%CSTR1
+  CCO2M                      => solutevar%CCO2M
+  CCH4M                      => solutevar%CCH4M
+  COXYM                      => solutevar%COXYM
+  CZ2GM                      => solutevar%CZ2GM
+  CZ2OM                      => solutevar%CZ2OM
+  CN4Z                       => solutevar%CN4Z
+  CNOZ                       => solutevar%CNOZ
+  CNAZ                       => solutevar%CNAZ
+  CKAZ                       => solutevar%CKAZ
+  CSOZ                       => solutevar%CSOZ
+  CCLZ                       => solutevar%CCLZ
+  CNOX                       => solutevar%CNOX
+  CCASOX                     => solutevar%CCASOX
+  CN4X                       => solutevar%CN4X
+  CPOZ                       => solutevar%CPOZ
+  Al_mole_conc                       => solutevar%Al_mole_conc
+  CFEZ                       => solutevar%CFEZ
+  CCAZ                       => solutevar%CCAZ
+  CMGZ                       => solutevar%CMGZ
+  CALX                       => solutevar%CALX
+  CFEX                       => solutevar%CFEX
+  CaX_conc                   => solutevar%CaX_conc
+  MgX_conc                   => solutevar%MgX_conc
+  CNAX                       => solutevar%CNAX
+  CKAX                       => solutevar%CKAX
+  CSOX                       => solutevar%CSOX
+  CCLX                       => solutevar%CCLX
+  CALPOX                     => solutevar%CALPOX
+  CFEPOX                     => solutevar%CFEPOX
+  CCAPDX                     => solutevar%CCAPDX
+  CCAPHX                     => solutevar%CCAPHX
+  CALOHX                     => solutevar%CALOHX
+  CFEOHX                     => solutevar%CFEOHX
+  CCACOX                     => solutevar%CCACOX
+  XNH4_mole_conc                  => solutevar%XNH4_mole_conc
+  XHY1                       => solutevar%XHY1
+  XAl_conc                   => solutevar%XAl_conc
+  XFe_conc                   => solutevar%XFe_conc
+  XCa_conc                   => solutevar%XCa_conc
+  Precp_Ca5P3O12O3H3_conc    => solutevar%Precp_Ca5P3O12O3H3_conc
+  XMg_conc                   => solutevar%XMg_conc
+  XNa_conc                   => solutevar%XNa_conc
+  XK_conc                    => solutevar%XK_conc
+  XHC1                       => solutevar%XHC1
+  XAlO2H2_conc               => solutevar%XAlO2H2_conc
+  XFeO2H2_conc               => solutevar%XFeO2H2_conc
+  XOH_conc                   => solutevar%XOH_conc
+  XROH1_conc                 => solutevar%XROH1_conc
+  XROH2_conc                 => solutevar%XROH2_conc
+  XHPO4_conc                 => solutevar%XHPO4_conc
+  XH2PO4_conc                => solutevar%XH2PO4_conc
+  Precp_AlO3H3_conc          => solutevar%Precp_AlO3H3_conc
+  Precp_FeO3H3_conc          => solutevar%Precp_FeO3H3_conc
+  Precp_CaCO3_conc           => solutevar%Precp_CaCO3_conc
+  Precp_CaSO4_conc           => solutevar%Precp_CaSO4_conc
+  Precp_AlPO4_conc           => solutevar%Precp_AlPO4_conc
+  Precp_FePO4_conc           => solutevar%Precp_FePO4_conc
+  Precp_CaHPO4_conc          => solutevar%Precp_CaHPO4_conc
+  FH2O                       => solutevar%FH2O
+  ATCA                       => solutevar%ATCA
+  XAEC                       => solutevar%XAEC
+  CEC                        => solutevar%CEC
+  ORGC                       => solutevar%ORGC
+  VLPO4                      => solutevar%VLPO4
+  XCEC                       => solutevar%XCEC
+  GKC4                       => solutevar%GKC4
+  GKCA                       => solutevar%GKCA
+  GKCH                       => solutevar%GKCH
+  GKCK                       => solutevar%GKCK
+  GKCN                       => solutevar%GKCN
+  GKCM                       => solutevar%GKCM
+  ZEROS                      => solutevar%ZEROS
+  VLWatMicP                  => solutevar%VLWatMicP
 
   call InitEquilibria(K,BulkSoilMass)
 !
@@ -382,7 +382,7 @@ module InitSoluteMod
 !
 !     INITIALIZE SOLUTE EQUILIBRIA
 !
-  cation_3p_aqua_mole_conc=AZMAX1(CALZ)+AZMAX1(CFEZ)
+  cation_3p_aqua_mole_conc=AZMAX1(Al_mole_conc)+AZMAX1(CFEZ)
   anion_3e_conc=0._r8
   cation_2p_aqua_mole_conc=AZMAX1(CCAZ)+CMGZ
   anion_2e_aqua_mole_conc=CSOZ
@@ -445,10 +445,10 @@ module InitSoluteMod
     NH4_1p_aqua_mole_conc=ZERO
     NH3_aqua_mole_conc=ZERO
   ENDIF
-  IF(CALZ.LT.0.0_r8)THEN
+  IF(Al_mole_conc.LT.0.0_r8)THEN
     Al_3p_aqua_mole_conc=AMIN1(CALMX,SPALO/(OH_1e_aqua_mole_conc**3*A3))
   ELSE
-    Al_3p_aqua_mole_conc=AMIN1(CALZ,SPALO/(OH_1e_aqua_mole_conc**3*A3))
+    Al_3p_aqua_mole_conc=AMIN1(Al_mole_conc,SPALO/(OH_1e_aqua_mole_conc**3*A3))
   ENDIF
   IF(CFEZ.LT.0.0_r8)THEN
     Fe_3p_aqua_mole_conc=AMIN1(CFEMX,SPFEO/(OH_1e_aqua_mole_conc**3*A3))
@@ -600,7 +600,7 @@ module InitSoluteMod
     ELSE
       FX=0._r8
     ENDIF
-    XNH4_conc=CN4X
+    XNH4_mole_conc=CN4X
     XHY1=FX*XHYQ
     XAl_conc=FX*XALQ/3.0_r8
     XFe_conc=FX*XFEQ/3.0_r8
@@ -659,50 +659,50 @@ module InitSoluteMod
   integer :: MM
 
 ! begin_execution
-  H2CO3_aqua_mole_conc=AMAX1(ZERO,H2CO3_aqua_mole_conc)
-  CO3_2e_aqua_mole_conc=H2CO3_aqua_mole_conc*DPCO3*A0/(H_1p_aqua_mole_conc**2*A2)
-  HCO3_e_conc=H2CO3_aqua_mole_conc*DPCO2*A0/(H_1p_aqua_mole_conc*A1)
-  NH4_1p_aqua_mole_conc=AMAX1(ZERO,NH4_1p_aqua_mole_conc)
-  NH3_aqua_mole_conc=AMAX1(ZERO,NH3_aqua_mole_conc)
-  Al_3p_aqua_mole_conc=AMAX1(ZERO,Al_3p_aqua_mole_conc)
-  Fe_3p_aqua_mole_conc=AMAX1(ZERO,Fe_3p_aqua_mole_conc)
-  Ca_2p_aqua_mole_conc=AMAX1(ZERO,Ca_2p_aqua_mole_conc)
-  Ca_2p_aqua_mole_conc=AMIN1(Ca_2p_aqua_mole_conc,SPCAC/(CO3_2e_aqua_mole_conc*A2**2))
-  Mg_2p_aqua_mole_conc=AMAX1(ZERO,Mg_2p_aqua_mole_conc)
-  Na_1p_aqua_mole_conc=AMAX1(ZERO,Na_1p_aqua_mole_conc)
-  K_1p_aqua_mole_conc=AMAX1(ZERO,K_1p_aqua_mole_conc)
-  SO4_2e_aqua_mole_conc=AMAX1(ZERO,SO4_2e_aqua_mole_conc)
-  AlOH_2p_aqua_mole_conc=AMAX1(ZERO,AlOH_2p_aqua_mole_conc)
-  AlO2H2_1p_aqua_mole_conc=AMAX1(ZERO,AlO2H2_1p_aqua_mole_conc)
-  AlO3H3_conc=AMAX1(ZERO,AlO3H3_conc)
-  AlO4H4_1e_aqua_mole_conc=AMAX1(ZERO,AlO4H4_1e_aqua_mole_conc)
-  AlSO4_1p_aqua_mole_conc=AMAX1(ZERO,AlSO4_1p_aqua_mole_conc)
-  FeOH_2p_aqua_mole_conc=AMAX1(ZERO,FeOH_2p_aqua_mole_conc)
-  FeO2H2_p_conc=AMAX1(ZERO,FeO2H2_p_conc)
-  FeO3H3_conc=AMAX1(ZERO,FeO3H3_conc)
-  FeO4H4_1e_aqua_mole_conc=AMAX1(ZERO,FeO4H4_1e_aqua_mole_conc)
-  FeSO4_1p_aqua_mole_conc=AMAX1(ZERO,FeSO4_1p_aqua_mole_conc)
-  CaO2H2_conc=AMAX1(ZERO,CaO2H2_conc)
-  CaCO3_conc=AMAX1(ZERO,CaCO3_conc)
-  CaHCO3_1p_aqua_mole_conc=AMAX1(ZERO,CaHCO3_1p_aqua_mole_conc)
-  CaSO4_conc=AMAX1(ZERO,CaSO4_conc)
-  MgOH_1p_aqua_mole_conc=AMAX1(ZERO,MgOH_1p_aqua_mole_conc)
-  MgCO3_conc=AMAX1(ZERO,MgCO3_conc)
-  MgHCO3_1p_aqua_mole_conc=AMAX1(ZERO,MgHCO3_1p_aqua_mole_conc)
-  MgSO4_conc=AMAX1(ZERO,MgSO4_conc)
-  NaCO3_1e_aqua_mole_conc=AMAX1(ZERO,NaCO3_1e_aqua_mole_conc)
-  NaSO4_1e_aqua_mole_conc=AMAX1(ZERO,NaSO4_1e_aqua_mole_conc)
-  KSO4_1e_aqua_mole_conc=AMAX1(ZERO,KSO4_1e_aqua_mole_conc)
-  H0PO4_3e_conc=AMAX1(ZERO,H0PO4_3e_conc)
-  H1PO4_2e_aqua_mole_conc=AMAX1(ZERO,H1PO4_2e_aqua_mole_conc)
-  H2PO4_1e_aqua_mole_conc=AMAX1(ZERO,H2PO4_1e_aqua_mole_conc)
-  H3PO4_conc=AMAX1(ZERO,H3PO4_conc)
-  FeHPO4_p_conc=AMAX1(ZERO,FeHPO4_p_conc)
-  FeH2PO4_2p_aqua_mole_conc=AMAX1(ZERO,FeH2PO4_2p_aqua_mole_conc)
-  CaPO4_1e_con=AMAX1(ZERO,CaPO4_1e_con)
-  CaHPO4_conc=AMAX1(ZERO,CaHPO4_conc)
-  CaH4P2O8_1p_aqua_mole_conc=AMAX1(ZERO,CaH4P2O8_1p_aqua_mole_conc)
-  MgHPO4_conc=AMAX1(ZERO,MgHPO4_conc)
+  H2CO3_aqua_mole_conc       = AMAX1(ZERO,H2CO3_aqua_mole_conc)
+  CO3_2e_aqua_mole_conc      = H2CO3_aqua_mole_conc*DPCO3*A0/(H_1p_aqua_mole_conc**2*A2)
+  HCO3_e_conc                = H2CO3_aqua_mole_conc*DPCO2*A0/(H_1p_aqua_mole_conc*A1)
+  NH4_1p_aqua_mole_conc      = AMAX1(ZERO,NH4_1p_aqua_mole_conc)
+  NH3_aqua_mole_conc         = AMAX1(ZERO,NH3_aqua_mole_conc)
+  Al_3p_aqua_mole_conc       = AMAX1(ZERO,Al_3p_aqua_mole_conc)
+  Fe_3p_aqua_mole_conc       = AMAX1(ZERO,Fe_3p_aqua_mole_conc)
+  Ca_2p_aqua_mole_conc       = AMAX1(ZERO,Ca_2p_aqua_mole_conc)
+  Ca_2p_aqua_mole_conc       = AMIN1(Ca_2p_aqua_mole_conc,SPCAC/(CO3_2e_aqua_mole_conc*A2**2))
+  Mg_2p_aqua_mole_conc       = AMAX1(ZERO,Mg_2p_aqua_mole_conc)
+  Na_1p_aqua_mole_conc       = AMAX1(ZERO,Na_1p_aqua_mole_conc)
+  K_1p_aqua_mole_conc        = AMAX1(ZERO,K_1p_aqua_mole_conc)
+  SO4_2e_aqua_mole_conc      = AMAX1(ZERO,SO4_2e_aqua_mole_conc)
+  AlOH_2p_aqua_mole_conc     = AMAX1(ZERO,AlOH_2p_aqua_mole_conc)
+  AlO2H2_1p_aqua_mole_conc   = AMAX1(ZERO,AlO2H2_1p_aqua_mole_conc)
+  AlO3H3_conc                = AMAX1(ZERO,AlO3H3_conc)
+  AlO4H4_1e_aqua_mole_conc   = AMAX1(ZERO,AlO4H4_1e_aqua_mole_conc)
+  AlSO4_1p_aqua_mole_conc    = AMAX1(ZERO,AlSO4_1p_aqua_mole_conc)
+  FeOH_2p_aqua_mole_conc     = AMAX1(ZERO,FeOH_2p_aqua_mole_conc)
+  FeO2H2_p_conc              = AMAX1(ZERO,FeO2H2_p_conc)
+  FeO3H3_conc                = AMAX1(ZERO,FeO3H3_conc)
+  FeO4H4_1e_aqua_mole_conc   = AMAX1(ZERO,FeO4H4_1e_aqua_mole_conc)
+  FeSO4_1p_aqua_mole_conc    = AMAX1(ZERO,FeSO4_1p_aqua_mole_conc)
+  CaO2H2_conc                = AMAX1(ZERO,CaO2H2_conc)
+  CaCO3_conc                 = AMAX1(ZERO,CaCO3_conc)
+  CaHCO3_1p_aqua_mole_conc   = AMAX1(ZERO,CaHCO3_1p_aqua_mole_conc)
+  CaSO4_conc                 = AMAX1(ZERO,CaSO4_conc)
+  MgOH_1p_aqua_mole_conc     = AMAX1(ZERO,MgOH_1p_aqua_mole_conc)
+  MgCO3_conc                 = AMAX1(ZERO,MgCO3_conc)
+  MgHCO3_1p_aqua_mole_conc   = AMAX1(ZERO,MgHCO3_1p_aqua_mole_conc)
+  MgSO4_conc                 = AMAX1(ZERO,MgSO4_conc)
+  NaCO3_1e_aqua_mole_conc    = AMAX1(ZERO,NaCO3_1e_aqua_mole_conc)
+  NaSO4_1e_aqua_mole_conc    = AMAX1(ZERO,NaSO4_1e_aqua_mole_conc)
+  KSO4_1e_aqua_mole_conc     = AMAX1(ZERO,KSO4_1e_aqua_mole_conc)
+  H0PO4_3e_conc              = AMAX1(ZERO,H0PO4_3e_conc)
+  H1PO4_2e_aqua_mole_conc    = AMAX1(ZERO,H1PO4_2e_aqua_mole_conc)
+  H2PO4_1e_aqua_mole_conc    = AMAX1(ZERO,H2PO4_1e_aqua_mole_conc)
+  H3PO4_conc                 = AMAX1(ZERO,H3PO4_conc)
+  FeHPO4_p_conc              = AMAX1(ZERO,FeHPO4_p_conc)
+  FeH2PO4_2p_aqua_mole_conc  = AMAX1(ZERO,FeH2PO4_2p_aqua_mole_conc)
+  CaPO4_1e_con               = AMAX1(ZERO,CaPO4_1e_con)
+  CaHPO4_conc                = AMAX1(ZERO,CaHPO4_conc)
+  CaH4P2O8_1p_aqua_mole_conc = AMAX1(ZERO,CaH4P2O8_1p_aqua_mole_conc)
+  MgHPO4_conc                = AMAX1(ZERO,MgHPO4_conc)
 !
 !     ION ACTIVITY COEFFICIENTS
 !
@@ -1299,7 +1299,7 @@ module InitSoluteMod
       XMGQ=FX*XMGQ/2.0_r8
       XNAQ=FX*XNAQ
       XKAQ=FX*XKAQ
-      RXN4=TAD*AMIN1((XN4Q-XNH4_conc)*NH4_1p_activity/XN4Q,NH4_1p_aqua_mole_conc)
+      RXN4=TAD*AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_activity/XN4Q,NH4_1p_aqua_mole_conc)
       RXHY=TAD*AMIN1((XHYQ-XHY1)*H_1p_activity/XHYQ,H_1p_aqua_mole_conc)
       RXAL=TAD*AMIN1((XALQ-XAl_conc)*AALX/XALQ,Al_3p_aqua_mole_conc)
       RXFE=TAD*AMIN1((XFEQ-XFe_conc)*AFEX/XFEQ,Fe_3p_aqua_mole_conc)
@@ -1307,7 +1307,7 @@ module InitSoluteMod
       RXMG=TAD*AMIN1((XMGQ-XMg_conc)*AMGX/XMGQ,Mg_2p_aqua_mole_conc)
       RXNA=TAD*AMIN1((XNAQ-XNa_conc)*Na_1p_activity/XNAQ,Na_1p_aqua_mole_conc)
       RXKA=TAD*AMIN1((XKAQ-XK_conc)*K_1p_activity/XKAQ,K_1p_aqua_mole_conc)
-      XNH4_conc=XNH4_conc+RXN4
+      XNH4_mole_conc=XNH4_mole_conc+RXN4
       XHY1=XHY1+RXHY
       XAl_conc=XAl_conc+RXAL
       XFe_conc=XFe_conc+RXFE
@@ -1530,52 +1530,52 @@ module InitSoluteMod
     IF(R.LT.1.0E-03)exit
     H2CO3_aqua_mole_conc=H2CO3_aqua_mole_conc/SQRT(1.0_r8+R)
   ENDDO
-  CH4_aqua_mole_conc=CCH4M*SCH4X/(EXP(GasSechenovConst(idg_CH4)*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
-  O2_aqua_mole_conc=COXYM*SOXYX/(EXP(GasSechenovConst(idg_O2)*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
-  N2_aqua_mole_conc=CZ2GM*SN2GX/(EXP(GasSechenovConst(idg_N2)*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O
-  N2O_aqua_mole_conc=CZ2OM*SN2OX/(EXP(GasSechenovConst(idg_N2O)*CSTR1))*EXP(0.897-0.0299*ATCA)*FH2O
-  NH4_1p_aqua_mole_conc=NH4_1p_aqua_mole_conc+RN4S
-  NH3_aqua_mole_conc=NH3_aqua_mole_conc+RN3S
-  Al_3p_aqua_mole_conc=Al_3p_aqua_mole_conc+RAL
-  Fe_3p_aqua_mole_conc=Fe_3p_aqua_mole_conc+RFE
-  Ca_2p_aqua_mole_conc=Ca_2p_aqua_mole_conc+RCA
-  Mg_2p_aqua_mole_conc=Mg_2p_aqua_mole_conc+RMG
-  Na_1p_aqua_mole_conc=Na_1p_aqua_mole_conc+RNA
-  K_1p_aqua_mole_conc=K_1p_aqua_mole_conc+RKA
-  SO4_2e_aqua_mole_conc=SO4_2e_aqua_mole_conc+RSO4
-  CO3_2e_aqua_mole_conc=H2CO3_aqua_mole_conc*DPCO3*A0/(H_1p_activity**2*A2)
-  HCO3_e_conc=H2CO3_aqua_mole_conc*DPCO2*A0/(H_1p_activity*A1)
-  AlOH_2p_aqua_mole_conc=AlOH_2p_aqua_mole_conc+RAL1
-  AlO2H2_1p_aqua_mole_conc=AlO2H2_1p_aqua_mole_conc+RAL2
-  AlO3H3_conc=AlO3H3_conc+RAL3
-  AlO4H4_1e_aqua_mole_conc=AlO4H4_1e_aqua_mole_conc+RAL4
-  AlSO4_1p_aqua_mole_conc=AlSO4_1p_aqua_mole_conc+RALS
-  FeOH_2p_aqua_mole_conc=FeOH_2p_aqua_mole_conc+RFE1
-  FeO2H2_p_conc=FeO2H2_p_conc+RFE2
-  FeO3H3_conc=FeO3H3_conc+RFE3
-  FeO4H4_1e_aqua_mole_conc=FeO4H4_1e_aqua_mole_conc+RFE4
-  FeSO4_1p_aqua_mole_conc=FeSO4_1p_aqua_mole_conc+RFES
-  CaO2H2_conc=CaO2H2_conc+RCAO
-  CaCO3_conc=CaCO3_conc+RCAC
-  CaHCO3_1p_aqua_mole_conc=CaHCO3_1p_aqua_mole_conc+RCAH
-  CaSO4_conc=CaSO4_conc+RCAS
-  MgOH_1p_aqua_mole_conc=MgOH_1p_aqua_mole_conc+RMGO
-  MgCO3_conc=MgCO3_conc+RMGC
-  MgHCO3_1p_aqua_mole_conc=MgHCO3_1p_aqua_mole_conc+RMGH
-  MgSO4_conc=MgSO4_conc+RMGS
-  NaCO3_1e_aqua_mole_conc=NaCO3_1e_aqua_mole_conc+RNAC
-  NaSO4_1e_aqua_mole_conc=NaSO4_1e_aqua_mole_conc+RNAS
-  KSO4_1e_aqua_mole_conc=KSO4_1e_aqua_mole_conc+RKAS
-  H0PO4_3e_conc=H0PO4_3e_conc+RHP0
-  H1PO4_2e_aqua_mole_conc=H1PO4_2e_aqua_mole_conc+RHP1
-  H2PO4_1e_aqua_mole_conc=H2PO4_1e_aqua_mole_conc+RHP2
-  H3PO4_conc=H3PO4_conc+RHP3
-  FeHPO4_p_conc=FeHPO4_p_conc+RF1P
-  FeH2PO4_2p_aqua_mole_conc=FeH2PO4_2p_aqua_mole_conc+RF2P
-  CaPO4_1e_con=CaPO4_1e_con+RC0P
-  CaHPO4_conc=CaHPO4_conc+RC1P
-  CaH4P2O8_1p_aqua_mole_conc=CaH4P2O8_1p_aqua_mole_conc+RC2P
-  MgHPO4_conc=MgHPO4_conc+RM1P
+  CH4_aqua_mole_conc    = CCH4M*SCH4X/(EXP(GasSechenovConst(idg_CH4)*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
+  O2_aqua_mole_conc     = COXYM*SOXYX/(EXP(GasSechenovConst(idg_O2)*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
+  N2_aqua_mole_conc     = CZ2GM*SN2GX/(EXP(GasSechenovConst(idg_N2)*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O
+  N2O_aqua_mole_conc    = CZ2OM*SN2OX/(EXP(GasSechenovConst(idg_N2O)*CSTR1))*EXP(0.897-0.0299*ATCA)*FH2O
+  NH4_1p_aqua_mole_conc = NH4_1p_aqua_mole_conc+RN4S
+  NH3_aqua_mole_conc    = NH3_aqua_mole_conc+RN3S
+  Al_3p_aqua_mole_conc  = Al_3p_aqua_mole_conc+RAL
+  Fe_3p_aqua_mole_conc  = Fe_3p_aqua_mole_conc+RFE
+  Ca_2p_aqua_mole_conc  = Ca_2p_aqua_mole_conc+RCA
+  Mg_2p_aqua_mole_conc  = Mg_2p_aqua_mole_conc+RMG
+  Na_1p_aqua_mole_conc  = Na_1p_aqua_mole_conc+RNA
+  K_1p_aqua_mole_conc   = K_1p_aqua_mole_conc+RKA
+  SO4_2e_aqua_mole_conc    = SO4_2e_aqua_mole_conc+RSO4
+  CO3_2e_aqua_mole_conc    = H2CO3_aqua_mole_conc*DPCO3*A0/(H_1p_activity**2*A2)
+  HCO3_e_conc              = H2CO3_aqua_mole_conc*DPCO2*A0/(H_1p_activity*A1)
+  AlOH_2p_aqua_mole_conc   = AlOH_2p_aqua_mole_conc+RAL1
+  AlO2H2_1p_aqua_mole_conc = AlO2H2_1p_aqua_mole_conc+RAL2
+  AlO3H3_conc              = AlO3H3_conc+RAL3
+  AlO4H4_1e_aqua_mole_conc = AlO4H4_1e_aqua_mole_conc+RAL4
+  AlSO4_1p_aqua_mole_conc  = AlSO4_1p_aqua_mole_conc+RALS
+  FeOH_2p_aqua_mole_conc   = FeOH_2p_aqua_mole_conc+RFE1
+  FeO2H2_p_conc            = FeO2H2_p_conc+RFE2
+  FeO3H3_conc              = FeO3H3_conc+RFE3
+  FeO4H4_1e_aqua_mole_conc = FeO4H4_1e_aqua_mole_conc+RFE4
+  FeSO4_1p_aqua_mole_conc  = FeSO4_1p_aqua_mole_conc+RFES
+  CaO2H2_conc              = CaO2H2_conc+RCAO
+  CaCO3_conc               = CaCO3_conc+RCAC
+  CaHCO3_1p_aqua_mole_conc = CaHCO3_1p_aqua_mole_conc+RCAH
+  CaSO4_conc               = CaSO4_conc+RCAS
+  MgOH_1p_aqua_mole_conc   = MgOH_1p_aqua_mole_conc+RMGO
+  MgCO3_conc               = MgCO3_conc+RMGC
+  MgHCO3_1p_aqua_mole_conc   = MgHCO3_1p_aqua_mole_conc+RMGH
+  MgSO4_conc                 = MgSO4_conc+RMGS
+  NaCO3_1e_aqua_mole_conc    = NaCO3_1e_aqua_mole_conc+RNAC
+  NaSO4_1e_aqua_mole_conc    = NaSO4_1e_aqua_mole_conc+RNAS
+  KSO4_1e_aqua_mole_conc     = KSO4_1e_aqua_mole_conc+RKAS
+  H0PO4_3e_conc              = H0PO4_3e_conc+RHP0
+  H1PO4_2e_aqua_mole_conc    = H1PO4_2e_aqua_mole_conc+RHP1
+  H2PO4_1e_aqua_mole_conc    = H2PO4_1e_aqua_mole_conc+RHP2
+  H3PO4_conc                 = H3PO4_conc+RHP3
+  FeHPO4_p_conc              = FeHPO4_p_conc+RF1P
+  FeH2PO4_2p_aqua_mole_conc  = FeH2PO4_2p_aqua_mole_conc+RF2P
+  CaPO4_1e_con               = CaPO4_1e_con+RC0P
+  CaHPO4_conc                = CaHPO4_conc+RC1P
+  CaH4P2O8_1p_aqua_mole_conc = CaH4P2O8_1p_aqua_mole_conc+RC2P
+  MgHPO4_conc                = MgHPO4_conc+RM1P
 !  IF(K.EQ.micpar%k_POM.AND.(M/1)*1.EQ.M)THEN
 !     WRITE(*,1112)'A1I',I,NX,NY,L,K,M,A1,A2,A3,FSTR2,CSTR1
 !    2,CSTR2,cation_3p_aqua_mole_conc,anion_3e_conc,cation_2p_aqua_mole_conc,anion_2e_aqua_mole_conc,cation_1p_aqua_mole_conc,CA1,VLWatMicP
@@ -1700,8 +1700,8 @@ module InitSoluteMod
         FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
-      RXN4=TSL*AMIN1((XN4Q-XNH4_conc)*NH4_1p_aqua_mole_conc/XN4Q,NH4_1p_aqua_mole_conc)
-      XNH4_conc=XNH4_conc+RXN4
+      RXN4=TSL*AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_aqua_mole_conc/XN4Q,NH4_1p_aqua_mole_conc)
+      XNH4_mole_conc=XNH4_mole_conc+RXN4
     ELSE
       RXN4=0._r8
     ENDIF

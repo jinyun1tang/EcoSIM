@@ -1266,6 +1266,7 @@ implicit none
     !
     ! !USES:
     use GridConsts, only : bounds_type
+    use EcoSIMCtrlMod, only: lverb    
     implicit none
     !
     ! !ARGUMENTS:
@@ -1303,6 +1304,7 @@ implicit none
     hpindex        =  tape(t)%hlist(f)%field%hpindex
     field          => esmptr_rs(hpindex)%ptr
     call PrintInfo('beg '//subname)
+    if(lverb)print*,tape(t)%hlist(f)%field%name
     ! set variables to check weights when allocate all pfts
 
        ! For data defined on the pft, col, and landunit we need to check if a point is active
@@ -1930,7 +1932,7 @@ implicit none
        numdims    = tape(t)%hlist(f)%field%numdims
        num2d      = tape(t)%hlist(f)%field%num2d
        nt         = tape(t)%ntimes
-
+       
        if (mode == 'define') then
 
           select case (avgflag)

@@ -40,6 +40,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: tRNO3MicrbTransfBand
     real(r8) :: tRH2PO4MicrbTransfBand
     real(r8) :: tRH1PO4MicrbTransfBand
+
     real(r8) :: tRO2UptkHeterG   !total oxygen uptake by heterotrophs
     real(r8) :: tRO2DmndHeterG   !total oxygen demand by heterotrophs
     real(r8) :: tRCO2MicrbProd
@@ -312,7 +313,6 @@ type, public :: Cumlate_Flux_Diag_type
   this%tRNH4MicrbTransfSoil   = 0._r8
   this%tRH2PO4MicrbTransfSoil = 0._r8
   this%tRNO3MicrbTransfSoil   = 0.0_r8
-  this%tRH2PO4MicrbTransfSoil = 0.0_r8
   this%tRH1PO4MicrbTransfSoil = 0.0_r8
   this%tRNH4MicrbTransfBand   = 0.0_r8
   this%tRNO3MicrbTransfBand   = 0.0_r8
@@ -331,6 +331,22 @@ type, public :: Cumlate_Flux_Diag_type
   this%TReduxN2O              = 0.0_r8
   this%TFixN2                 = 0.0_r8
   this%tCH4OxiAero            = 0._r8
+
+  this%tRO2UptkHeterG     = 0._r8
+  this%tRO2DmndHeterG     = 0._r8
+  this%TDeniReduxNO2Band  = 0._r8
+  this%TDeniReduxNO2Soil  = 0._r8
+  this%TNitReduxNO2Band   = 0._r8
+  this%TNitReduxNO2Soil   = 0._r8
+  this%tRNH3Oxi           = 0._r8
+  this%RNO2ReduxSoilChemo = 0._r8
+  this%RNO2ReduxBandChemo = 0._r8
+  this%RN2OProdSoilChemo  = 0._r8
+  this%RN2OProdBandChemo  = 0._r8
+  this%RNO3ProdSoilChemo  = 0._r8
+  this%RNO3ProdBandChemo  = 0._r8
+  this%RNO2ReduxChemo     = 0._r8
+
   end subroutine nit_aqmf_diag
 !------------------------------------------------------------------------------------------
 

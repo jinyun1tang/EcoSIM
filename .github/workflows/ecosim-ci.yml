@@ -1,0 +1,77 @@
+name: EcoSIM CI
+
+on: [workflow_dispatch, push, pull_request]
+
+#env:
+  # Customizing build type
+  # BUILD_TYPE: DEBUG
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-latest
+    
+    steps:
+
+    - name: package-install
+      run: |
+        sudo apt-get -qq update
+        sudo apt -qq -y install gfortran cmake
+        sudo apt -qq -y install libcurl4 libcurl4-gnutls-dev curl 
+        sudo apt -qq -y install autoconf automake
+#        if/when system hdf5 is needed	
+#	 sudo apt -qq -y libhdf5-openmpi-dev
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: ecosim-build
+      shell: bash
+      run: |
+        echo "Building EcoSIM"
+        bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran`
+#
+#       continue-on-error: true
+#
+#    - name: did-build-ubuntu-fail
+#      run: |
+#        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log
+
+  build-rocky:
+    runs-on: ubuntu-latest
+    
+    container:
+      image: rockylinux/rockylinux:8.10
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: package-install-rocky
+      run: |
+        cat /etc/os-release
+        dnf -qq -y update
+        dnf -qq -y install gcc-gfortran gcc-c++
+        dnf -qq -y install cmake
+        dnf -qq -y install which
+        dnf -qq -y install git
+        dnf -qq -y install curl curl-devel
+        dnf -qq -y install autoconf automake libtool libxml2-devel
+#        if/when system hdf5 is needed
+#        dnf install -y dnf-plugins-core
+#        dnf install -y epel-release
+#        dnf config-manager -y --set-enabled powertools
+#        dnf install -y hdf5 hdf5-devel hdf5-static
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: ecosim-build-rocky
+      shell: bash
+      run: |
+        echo "Building EcoSIM"
+        bash build_EcoSIM.sh CC=`which gcc` CXX=`which g++` FC=`which gfortran`
+
+#      continue-on-error: true
+#    - name: did-build-rocky-fail
+#      run: |
+#        cat build/Linux-x86_64-double-Debug/3rd-partylibs/netcdf_c_config*.log

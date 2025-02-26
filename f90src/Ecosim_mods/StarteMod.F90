@@ -75,14 +75,14 @@ module StarteMod
               solutevar%CNOZ = NO3_irrig_mole_conc(I,NY,NX)
               solutevar%CPOZ = H2PO4_irrig_mole_conc(I,NY,NX)
               if(salt_model)then
-                solutevar%CALZ = trcsalt_irrig_conc(idsalt_Al,I,NY,NX)
-                solutevar%CFEZ = trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)
-                solutevar%CCAZ = trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)
-                solutevar%CMGZ = trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)
-                solutevar%CNAZ = trcsalt_irrig_conc(idsalt_Na,I,NY,NX)
-                solutevar%CKAZ = trcsalt_irrig_conc(idsalt_K,I,NY,NX)
-                solutevar%CSOZ = trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)
-                solutevar%CCLZ = trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)
+                solutevar%Al_mole_conc = trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)
+                solutevar%CFEZ = trcsalt_irrig_mole_conc_col(idsalt_Fe,I,NY,NX)
+                solutevar%CCAZ = trcsalt_irrig_mole_conc_col(idsalt_Ca,I,NY,NX)
+                solutevar%CMGZ = trcsalt_irrig_mole_conc_col(idsalt_Mg,I,NY,NX)
+                solutevar%CNAZ = trcsalt_irrig_mole_conc_col(idsalt_Na,I,NY,NX)
+                solutevar%CKAZ = trcsalt_irrig_mole_conc_col(idsalt_K,I,NY,NX)
+                solutevar%CSOZ = trcsalt_irrig_mole_conc_col(idsalt_SO4,I,NY,NX)
+                solutevar%CCLZ = trcsalt_irrig_mole_conc_col(idsalt_Cl,I,NY,NX)
               endif
 
               solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(PHQ(I,NY,NX)-3.0_r8))
@@ -97,14 +97,14 @@ module StarteMod
                   solutevar%CNOZ       = NO3_rain_mole_conc(NY,NX)
                   solutevar%CPOZ       = H2PO4_rain_mole_conc(NY,NX)
                   if(salt_model)then
-                    solutevar%CALZ = trcsalt_rain_conc(idsalt_Al,NY,NX)
-                    solutevar%CFEZ = trcsalt_rain_conc(idsalt_Fe,NY,NX)
-                    solutevar%CCAZ = trcsalt_rain_conc(idsalt_Ca,NY,NX)
-                    solutevar%CMGZ = trcsalt_rain_conc(idsalt_Mg,NY,NX)
-                    solutevar%CNAZ = trcsalt_rain_conc(idsalt_Na,NY,NX)
-                    solutevar%CKAZ = trcsalt_rain_conc(idsalt_K,NY,NX)
-                    solutevar%CSOZ = trcsalt_rain_conc(idsalt_SO4,NY,NX)
-                    solutevar%CCLZ = trcsalt_rain_conc(idsalt_Cl,NY,NX)
+                    solutevar%Al_mole_conc = trcsalt_rain_mole_conc_col(idsalt_Al,NY,NX)
+                    solutevar%CFEZ = trcsalt_rain_mole_conc_col(idsalt_Fe,NY,NX)
+                    solutevar%CCAZ = trcsalt_rain_mole_conc_col(idsalt_Ca,NY,NX)
+                    solutevar%CMGZ = trcsalt_rain_mole_conc_col(idsalt_Mg,NY,NX)
+                    solutevar%CNAZ = trcsalt_rain_mole_conc_col(idsalt_Na,NY,NX)
+                    solutevar%CKAZ = trcsalt_rain_mole_conc_col(idsalt_K,NY,NX)
+                    solutevar%CSOZ = trcsalt_rain_mole_conc_col(idsalt_SO4,NY,NX)
+                    solutevar%CCLZ = trcsalt_rain_mole_conc_col(idsalt_Cl,NY,NX)
                   endif
 !               ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart()).AND.is_first_year)THEN
 !
@@ -135,12 +135,12 @@ module StarteMod
                   solutevar%CFEOHX               = CFEOH_vr(L,NY,NX)
                   solutevar%CCACOX               = CCACO_vr(L,NY,NX)
                   solutevar%CCASOX               = CCASO_vr(L,NY,NX)
-                  solutevar%H_1p_aqua_mole_conc            = 10.0_r8**(-(PH_vr(L,NY,NX)-3.0_r8))
+                  solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(PH_vr(L,NY,NX)-3.0_r8))
                   solutevar%CNOZ                 = CNO3_vr(L,NY,NX)
                   solutevar%CPOZ                 = CPO4_vr(L,NY,NX)
-                  solutevar%OH_1e_aqua_mole_conc           = DPH2O/solutevar%H_1p_aqua_mole_conc
+                  solutevar%OH_1e_aqua_mole_conc = DPH2O/solutevar%H_1p_aqua_mole_conc
                   solutevar%CN4Z                 = solutevar%CN4X
-                  solutevar%CALZ                 = solutevar%CALX
+                  solutevar%Al_mole_conc                 = solutevar%CALX
                   solutevar%CFEZ                 = solutevar%CFEX
                   solutevar%CCAZ                 = solutevar%CaX_conc
                   solutevar%CMGZ                 = solutevar%MgX_conc
@@ -205,110 +205,110 @@ module StarteMod
     trcg_rain_mole_conc_col(idg_N2,NY,NX)  = solutevar%N2_aqua_mole_conc
     trcg_rain_mole_conc_col(idg_N2O,NY,NX) = solutevar%N2O_aqua_mole_conc
     trcg_rain_mole_conc_col(idg_NH3,NY,NX) = solutevar%NH3_aqua_mole_conc
-    NH4_rain_mole_conc(NY,NX)                   = solutevar%NH4_1p_aqua_mole_conc    
+    NH4_rain_mole_conc(NY,NX)              = solutevar%NH4_1p_aqua_mole_conc    
     if(salt_model)then
-      trcsalt_rain_conc(idsalt_Al,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_Fe,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_Hp,NY,NX)       = solutevar%H_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_Ca,NY,NX)       = solutevar%Ca_2p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_Mg,NY,NX)       = solutevar%Mg_2p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_Na,NY,NX)       = solutevar%Na_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_K,NY,NX)        = solutevar%K_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_OH,NY,NX)       = solutevar%OH_1e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_SO4,NY,NX)      = solutevar%SO4_2e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_Cl,NY,NX)       = solutevar%Cl_e_conc
-      trcsalt_rain_conc(idsalt_CO3,NY,NX)      = solutevar%CO3_2e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_HCO3,NY,NX)     = solutevar%HCO3_e_conc
-      trcsalt_rain_conc(idsalt_AlOH,NY,NX)     = solutevar%AlOH_2p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_AlOH2,NY,NX)    = solutevar%AlO2H2_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_AlOH3,NY,NX)    = solutevar%AlO3H3_conc
-      trcsalt_rain_conc(idsalt_AlOH4,NY,NX)    = solutevar%AlO4H4_1e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_AlSO4,NY,NX)    = solutevar%AlSO4_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_FeOH,NY,NX)     = solutevar%FeOH_2p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_FeOH2,NY,NX)    = solutevar%FeO2H2_p_conc
-      trcsalt_rain_conc(idsalt_FeOH3,NY,NX)    = solutevar%FeO3H3_conc
-      trcsalt_rain_conc(idsalt_FeOH4,NY,NX)    = solutevar%FeO4H4_1e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_FeSO4,NY,NX)    = solutevar%FeSO4_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_CaOH,NY,NX)     = solutevar%CaO2H2_conc
-      trcsalt_rain_conc(idsalt_CaCO3,NY,NX)    = solutevar%CaCO3_conc
-      trcsalt_rain_conc(idsalt_CaHCO3,NY,NX)   = solutevar%CaHCO3_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_CaSO4,NY,NX)    = solutevar%CaSO4_conc
-      trcsalt_rain_conc(idsalt_MgOH2,NY,NX)    = solutevar%MgOH_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_MgCO3,NY,NX)    = solutevar%MgCO3_conc
-      trcsalt_rain_conc(idsalt_MgHCO3,NY,NX)   = solutevar%MgHCO3_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_MgSO4,NY,NX)    = solutevar%MgSO4_conc
-      trcsalt_rain_conc(idsalt_NaCO3,NY,NX)    = solutevar%NaCO3_1e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_NaSO4,NY,NX)    = solutevar%NaSO4_1e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_KSO4,NY,NX)     = solutevar%KSO4_1e_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_H0PO4,NY,NX)    = solutevar%H0PO4_3e_conc
-      trcsalt_rain_conc(idsalt_H3PO4,NY,NX)    = solutevar%H3PO4_conc
-      trcsalt_rain_conc(idsalt_FeHPO4,NY,NX)   = solutevar%FeHPO4_p_conc
-      trcsalt_rain_conc(idsalt_FeH2PO4,NY,NX)  = solutevar%FeH2PO4_2p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_CaPO4,NY,NX)    = solutevar%CaPO4_1e_con
-      trcsalt_rain_conc(idsalt_CaHPO4,NY,NX)   = solutevar%CaHPO4_conc
-      trcsalt_rain_conc(idsalt_CaH4P2O8,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
-      trcsalt_rain_conc(idsalt_MgHPO4,NY,NX)   = solutevar%MgHPO4_conc
+      trcsalt_rain_mole_conc_col(idsalt_Al,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_Fe,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_Hp,NY,NX)       = solutevar%H_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_Ca,NY,NX)       = solutevar%Ca_2p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_Mg,NY,NX)       = solutevar%Mg_2p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_Na,NY,NX)       = solutevar%Na_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_K,NY,NX)        = solutevar%K_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_OH,NY,NX)       = solutevar%OH_1e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_SO4,NY,NX)      = solutevar%SO4_2e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_Cl,NY,NX)       = solutevar%Cl_e_conc
+      trcsalt_rain_mole_conc_col(idsalt_CO3,NY,NX)      = solutevar%CO3_2e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_HCO3,NY,NX)     = solutevar%HCO3_e_conc
+      trcsalt_rain_mole_conc_col(idsalt_AlOH,NY,NX)     = solutevar%AlOH_2p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_AlOH2,NY,NX)    = solutevar%AlO2H2_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_AlOH3,NY,NX)    = solutevar%AlO3H3_conc
+      trcsalt_rain_mole_conc_col(idsalt_AlOH4,NY,NX)    = solutevar%AlO4H4_1e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_AlSO4,NY,NX)    = solutevar%AlSO4_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeOH,NY,NX)     = solutevar%FeOH_2p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeOH2,NY,NX)    = solutevar%FeO2H2_p_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeOH3,NY,NX)    = solutevar%FeO3H3_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeOH4,NY,NX)    = solutevar%FeO4H4_1e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeSO4,NY,NX)    = solutevar%FeSO4_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_CaOH,NY,NX)     = solutevar%CaO2H2_conc
+      trcsalt_rain_mole_conc_col(idsalt_CaCO3,NY,NX)    = solutevar%CaCO3_conc
+      trcsalt_rain_mole_conc_col(idsalt_CaHCO3,NY,NX)   = solutevar%CaHCO3_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_CaSO4,NY,NX)    = solutevar%CaSO4_conc
+      trcsalt_rain_mole_conc_col(idsalt_MgOH2,NY,NX)    = solutevar%MgOH_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_MgCO3,NY,NX)    = solutevar%MgCO3_conc
+      trcsalt_rain_mole_conc_col(idsalt_MgHCO3,NY,NX)   = solutevar%MgHCO3_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_MgSO4,NY,NX)    = solutevar%MgSO4_conc
+      trcsalt_rain_mole_conc_col(idsalt_NaCO3,NY,NX)    = solutevar%NaCO3_1e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_NaSO4,NY,NX)    = solutevar%NaSO4_1e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_KSO4,NY,NX)     = solutevar%KSO4_1e_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_H0PO4,NY,NX)    = solutevar%H0PO4_3e_conc
+      trcsalt_rain_mole_conc_col(idsalt_H3PO4,NY,NX)    = solutevar%H3PO4_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeHPO4,NY,NX)   = solutevar%FeHPO4_p_conc
+      trcsalt_rain_mole_conc_col(idsalt_FeH2PO4,NY,NX)  = solutevar%FeH2PO4_2p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_CaPO4,NY,NX)    = solutevar%CaPO4_1e_con
+      trcsalt_rain_mole_conc_col(idsalt_CaHPO4,NY,NX)   = solutevar%CaHPO4_conc
+      trcsalt_rain_mole_conc_col(idsalt_CaH4P2O8,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
+      trcsalt_rain_mole_conc_col(idsalt_MgHPO4,NY,NX)   = solutevar%MgHPO4_conc
     endif
-    HPO4_rain_mole_conc(NY,NX)  = solutevar%H1PO4_2e_aqua_mole_conc
-    H2PO4_rain_mole_conc(NY,NX) = solutevar%H2PO4_1e_aqua_mole_conc
-    CSTRR(NY,NX)           = solutevar%CSTR1
+    HPO4_rain_mole_conc(NY,NX)      = solutevar%H1PO4_2e_aqua_mole_conc
+    H2PO4_rain_mole_conc(NY,NX)     = solutevar%H2PO4_1e_aqua_mole_conc
+    SurfIrrig_IonStrenth_col(NY,NX) = solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN IRRIGATION
 !
-  ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
+  ELSEIF(K.EQ.micpar%k_manure .AND. L.EQ.1)THEN
   ! manure, top layer
     trcg_irrig_mole_conc_col(idg_CO2,NY,NX) = solutevar%H2CO3_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_CH4,NY,NX) = solutevar%CH4_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_O2,NY,NX)  = solutevar%O2_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_N2,NY,NX)  = solutevar%N2_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_N2O,NY,NX) = solutevar%N2O_aqua_mole_conc
-    NH4_irrig_mole_conc(I,NY,NX)                 = solutevar%NH4_1p_aqua_mole_conc
     trcg_irrig_mole_conc_col(idg_NH3,NY,NX) = solutevar%NH3_aqua_mole_conc
-    HPO4_irrig_mole_conc(I,NY,NX)                = solutevar%H1PO4_2e_aqua_mole_conc
-    H2PO4_irrig_mole_conc(I,NY,NX)               = solutevar%H2PO4_1e_aqua_mole_conc
+    NH4_irrig_mole_conc(I,NY,NX)            = solutevar%NH4_1p_aqua_mole_conc
+    HPO4_irrig_mole_conc(I,NY,NX)           = solutevar%H1PO4_2e_aqua_mole_conc
+    H2PO4_irrig_mole_conc(I,NY,NX)          = solutevar%H2PO4_1e_aqua_mole_conc
     CSTRQ(I,NY,NX)                          = solutevar%CSTR1
     if(salt_model)then
-      trcsalt_irrig_conc(idsalt_Al,I,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_Fe,I,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_Hp,I,NY,NX)       = solutevar%H_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_Ca,I,NY,NX)       = solutevar%Ca_2p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_Mg,I,NY,NX)       = solutevar%Mg_2p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_Na,I,NY,NX)       = solutevar%Na_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_K,I,NY,NX)        = solutevar%K_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_OH,I,NY,NX)       = solutevar%OH_1e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_SO4,I,NY,NX)      = solutevar%SO4_2e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_Cl,I,NY,NX)       = solutevar%Cl_e_conc
-      trcsalt_irrig_conc(idsalt_CO3,I,NY,NX)      = solutevar%CO3_2e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_HCO3,I,NY,NX)     = solutevar%HCO3_e_conc
-      trcsalt_irrig_conc(idsalt_AlOH,I,NY,NX)     = solutevar%AlOH_2p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_AlOH2,I,NY,NX)    = solutevar%AlO2H2_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_AlOH3,I,NY,NX)    = solutevar%AlO3H3_conc
-      trcsalt_irrig_conc(idsalt_AlOH4,I,NY,NX)    = solutevar%AlO4H4_1e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_AlSO4,I,NY,NX)    = solutevar%AlSO4_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_FeOH,I,NY,NX)     = solutevar%FeOH_2p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_FeOH2,I,NY,NX)    = solutevar%FeO2H2_p_conc
-      trcsalt_irrig_conc(idsalt_FeOH3,I,NY,NX)    = solutevar%FeO3H3_conc
-      trcsalt_irrig_conc(idsalt_FeOH4,I,NY,NX)    = solutevar%FeO4H4_1e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_FeSO4,I,NY,NX)    = solutevar%FeSO4_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_CaOH,I,NY,NX)     = solutevar%CaO2H2_conc
-      trcsalt_irrig_conc(idsalt_CaCO3,I,NY,NX)    = solutevar%CaCO3_conc
-      trcsalt_irrig_conc(idsalt_CaHCO3,I,NY,NX)   = solutevar%CaHCO3_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_CaSO4,I,NY,NX)    = solutevar%CaSO4_conc
-      trcsalt_irrig_conc(idsalt_MgOH2,I,NY,NX)    = solutevar%MgOH_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_MgCO3,I,NY,NX)    = solutevar%MgCO3_conc
-      trcsalt_irrig_conc(idsalt_MgHCO3,I,NY,NX)   = solutevar%MgHCO3_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_MgSO4,I,NY,NX)    = solutevar%MgSO4_conc
-      trcsalt_irrig_conc(idsalt_NaCO3,I,NY,NX)    = solutevar%NaCO3_1e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_NaSO4,I,NY,NX)    = solutevar%NaSO4_1e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_KSO4,I,NY,NX)     = solutevar%KSO4_1e_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_H0PO4,I,NY,NX)    = solutevar%H0PO4_3e_conc
-      trcsalt_irrig_conc(idsalt_H3PO4,I,NY,NX)    = solutevar%H3PO4_conc
-      trcsalt_irrig_conc(idsalt_FeHPO4,I,NY,NX)   = solutevar%FeHPO4_p_conc
-      trcsalt_irrig_conc(idsalt_FeH2PO4,I,NY,NX)  = solutevar%FeH2PO4_2p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_CaPO4,I,NY,NX)    = solutevar%CaPO4_1e_con
-      trcsalt_irrig_conc(idsalt_CaHPO4,I,NY,NX)   = solutevar%CaHPO4_conc
-      trcsalt_irrig_conc(idsalt_CaH4P2O8,I,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
-      trcsalt_irrig_conc(idsalt_MgHPO4,I,NY,NX)   = solutevar%MgHPO4_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Fe,I,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Hp,I,NY,NX)       = solutevar%H_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Ca,I,NY,NX)       = solutevar%Ca_2p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Mg,I,NY,NX)       = solutevar%Mg_2p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Na,I,NY,NX)       = solutevar%Na_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_K,I,NY,NX)        = solutevar%K_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_OH,I,NY,NX)       = solutevar%OH_1e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_SO4,I,NY,NX)      = solutevar%SO4_2e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_Cl,I,NY,NX)       = solutevar%Cl_e_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CO3,I,NY,NX)      = solutevar%CO3_2e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_HCO3,I,NY,NX)     = solutevar%HCO3_e_conc
+      trcsalt_irrig_mole_conc_col(idsalt_AlOH,I,NY,NX)     = solutevar%AlOH_2p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_AlOH2,I,NY,NX)    = solutevar%AlO2H2_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_AlOH3,I,NY,NX)    = solutevar%AlO3H3_conc
+      trcsalt_irrig_mole_conc_col(idsalt_AlOH4,I,NY,NX)    = solutevar%AlO4H4_1e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_AlSO4,I,NY,NX)    = solutevar%AlSO4_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeOH,I,NY,NX)     = solutevar%FeOH_2p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeOH2,I,NY,NX)    = solutevar%FeO2H2_p_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeOH3,I,NY,NX)    = solutevar%FeO3H3_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeOH4,I,NY,NX)    = solutevar%FeO4H4_1e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeSO4,I,NY,NX)    = solutevar%FeSO4_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CaOH,I,NY,NX)     = solutevar%CaO2H2_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CaCO3,I,NY,NX)    = solutevar%CaCO3_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CaHCO3,I,NY,NX)   = solutevar%CaHCO3_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CaSO4,I,NY,NX)    = solutevar%CaSO4_conc
+      trcsalt_irrig_mole_conc_col(idsalt_MgOH2,I,NY,NX)    = solutevar%MgOH_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_MgCO3,I,NY,NX)    = solutevar%MgCO3_conc
+      trcsalt_irrig_mole_conc_col(idsalt_MgHCO3,I,NY,NX)   = solutevar%MgHCO3_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_MgSO4,I,NY,NX)    = solutevar%MgSO4_conc
+      trcsalt_irrig_mole_conc_col(idsalt_NaCO3,I,NY,NX)    = solutevar%NaCO3_1e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_NaSO4,I,NY,NX)    = solutevar%NaSO4_1e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_KSO4,I,NY,NX)     = solutevar%KSO4_1e_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_H0PO4,I,NY,NX)    = solutevar%H0PO4_3e_conc
+      trcsalt_irrig_mole_conc_col(idsalt_H3PO4,I,NY,NX)    = solutevar%H3PO4_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeHPO4,I,NY,NX)   = solutevar%FeHPO4_p_conc
+      trcsalt_irrig_mole_conc_col(idsalt_FeH2PO4,I,NY,NX)  = solutevar%FeH2PO4_2p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CaPO4,I,NY,NX)    = solutevar%CaPO4_1e_con
+      trcsalt_irrig_mole_conc_col(idsalt_CaHPO4,I,NY,NX)   = solutevar%CaHPO4_conc
+      trcsalt_irrig_mole_conc_col(idsalt_CaH4P2O8,I,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
+      trcsalt_irrig_mole_conc_col(idsalt_MgHPO4,I,NY,NX)   = solutevar%MgHPO4_conc
     endif
 !
 !     SOLUTE CONCENTRATIONS IN SOIL
@@ -316,8 +316,8 @@ module StarteMod
 ! U means surface irrigation
 ! first year and not a restart run
   ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart()).AND.is_first_year)THEN
-    CCOU                           = solutevar%H2CO3_aqua_mole_conc
-    CCHU                           = solutevar%CH4_aqua_mole_conc
+    CCOU                           = solutevar%H2CO3_aqua_mole_conc*catomw
+    CCHU                           = solutevar%CH4_aqua_mole_conc*catomw
     COXU                           = 0._r8
     CNNU                           = solutevar%N2_aqua_mole_conc
     CN2U                           = solutevar%N2O_aqua_mole_conc
@@ -333,47 +333,47 @@ module StarteMod
     trcn_irrig_vr(ids_H2PO4B,L,NY,NX) = trcn_irrig_vr(ids_H2PO4,L,NY,NX)
 
     if(salt_model)then
-      trcsalt_subirrig_conc(idsalt_Al,L,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_Fe,L,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_Hp,L,NY,NX)       = solutevar%H_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_Ca,L,NY,NX)       = solutevar%Ca_2p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_Mg,L,NY,NX)       = solutevar%Mg_2p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_Na,L,NY,NX)       = solutevar%Na_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_K,L,NY,NX)        = solutevar%K_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_OH,L,NY,NX)       = solutevar%OH_1e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_SO4,L,NY,NX)      = solutevar%SO4_2e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_Cl,L,NY,NX)       = solutevar%Cl_e_conc
-      trcsalt_subirrig_conc(idsalt_CO3,L,NY,NX)      = solutevar%CO3_2e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_HCO3,L,NY,NX)     = solutevar%HCO3_e_conc
-      trcsalt_subirrig_conc(idsalt_AlOH,L,NY,NX)     = solutevar%AlOH_2p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_AlOH2,L,NY,NX)    = solutevar%AlO2H2_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_AlOH3,L,NY,NX)    = solutevar%AlO3H3_conc
-      trcsalt_subirrig_conc(idsalt_AlOH4,L,NY,NX)    = solutevar%AlO4H4_1e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_AlSO4,L,NY,NX)    = solutevar%AlSO4_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_FeOH,L,NY,NX)     = solutevar%FeOH_2p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_FeOH2,L,NY,NX)    = solutevar%FeO2H2_p_conc
-      trcsalt_subirrig_conc(idsalt_FeOH3,L,NY,NX)    = solutevar%FeO3H3_conc
-      trcsalt_subirrig_conc(idsalt_FeOH4,L,NY,NX)    = solutevar%FeO4H4_1e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_FeSO4,L,NY,NX)    = solutevar%FeSO4_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_CaOH,L,NY,NX)     = solutevar%CaO2H2_conc
-      trcsalt_subirrig_conc(idsalt_CaCO3,L,NY,NX)    = solutevar%CaCO3_conc
-      trcsalt_subirrig_conc(idsalt_CaHCO3,L,NY,NX)   = solutevar%CaHCO3_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_CaSO4,L,NY,NX)    = solutevar%CaSO4_conc
-      trcsalt_subirrig_conc(idsalt_MgOH2,L,NY,NX)    = solutevar%MgOH_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_MgCO3,L,NY,NX)    = solutevar%MgCO3_conc
-      trcsalt_subirrig_conc(idsalt_MgHCO3,L,NY,NX)   = solutevar%MgHCO3_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_MgSO4,L,NY,NX)    = solutevar%MgSO4_conc
-      trcsalt_subirrig_conc(idsalt_NaCO3,L,NY,NX)    = solutevar%NaCO3_1e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_NaSO4,L,NY,NX)    = solutevar%NaSO4_1e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_KSO4,L,NY,NX)     = solutevar%KSO4_1e_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_H0PO4,L,NY,NX)    = solutevar%H0PO4_3e_conc
-      trcsalt_subirrig_conc(idsalt_H3PO4,L,NY,NX)    = solutevar%H3PO4_conc
-      trcsalt_subirrig_conc(idsalt_FeHPO4,L,NY,NX)   = solutevar%FeHPO4_p_conc
-      trcsalt_subirrig_conc(idsalt_FeH2PO4,L,NY,NX)  = solutevar%FeH2PO4_2p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_CaPO4,L,NY,NX)    = solutevar%CaPO4_1e_con
-      trcsalt_subirrig_conc(idsalt_CaHPO4,L,NY,NX)   = solutevar%CaHPO4_conc
-      trcsalt_subirrig_conc(idsalt_CaH4P2O8,L,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
-      trcsalt_subirrig_conc(idsalt_MgHPO4,L,NY,NX)   = solutevar%MgHPO4_conc
+      trcSalt_irrig_vr(idsalt_Al,L,NY,NX)       = solutevar%Al_3p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_Fe,L,NY,NX)       = solutevar%Fe_3p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_Hp,L,NY,NX)       = solutevar%H_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_Ca,L,NY,NX)       = solutevar%Ca_2p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_Mg,L,NY,NX)       = solutevar%Mg_2p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_Na,L,NY,NX)       = solutevar%Na_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_K,L,NY,NX)        = solutevar%K_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_OH,L,NY,NX)       = solutevar%OH_1e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_SO4,L,NY,NX)      = solutevar%SO4_2e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_Cl,L,NY,NX)       = solutevar%Cl_e_conc
+      trcSalt_irrig_vr(idsalt_CO3,L,NY,NX)      = solutevar%CO3_2e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_HCO3,L,NY,NX)     = solutevar%HCO3_e_conc
+      trcSalt_irrig_vr(idsalt_AlOH,L,NY,NX)     = solutevar%AlOH_2p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_AlOH2,L,NY,NX)    = solutevar%AlO2H2_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_AlOH3,L,NY,NX)    = solutevar%AlO3H3_conc
+      trcSalt_irrig_vr(idsalt_AlOH4,L,NY,NX)    = solutevar%AlO4H4_1e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_AlSO4,L,NY,NX)    = solutevar%AlSO4_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_FeOH,L,NY,NX)     = solutevar%FeOH_2p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_FeOH2,L,NY,NX)    = solutevar%FeO2H2_p_conc
+      trcSalt_irrig_vr(idsalt_FeOH3,L,NY,NX)    = solutevar%FeO3H3_conc
+      trcSalt_irrig_vr(idsalt_FeOH4,L,NY,NX)    = solutevar%FeO4H4_1e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_FeSO4,L,NY,NX)    = solutevar%FeSO4_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_CaOH,L,NY,NX)     = solutevar%CaO2H2_conc
+      trcSalt_irrig_vr(idsalt_CaCO3,L,NY,NX)    = solutevar%CaCO3_conc
+      trcSalt_irrig_vr(idsalt_CaHCO3,L,NY,NX)   = solutevar%CaHCO3_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_CaSO4,L,NY,NX)    = solutevar%CaSO4_conc
+      trcSalt_irrig_vr(idsalt_MgOH2,L,NY,NX)    = solutevar%MgOH_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_MgCO3,L,NY,NX)    = solutevar%MgCO3_conc
+      trcSalt_irrig_vr(idsalt_MgHCO3,L,NY,NX)   = solutevar%MgHCO3_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_MgSO4,L,NY,NX)    = solutevar%MgSO4_conc
+      trcSalt_irrig_vr(idsalt_NaCO3,L,NY,NX)    = solutevar%NaCO3_1e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_NaSO4,L,NY,NX)    = solutevar%NaSO4_1e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_KSO4,L,NY,NX)     = solutevar%KSO4_1e_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_H0PO4,L,NY,NX)    = solutevar%H0PO4_3e_conc
+      trcSalt_irrig_vr(idsalt_H3PO4,L,NY,NX)    = solutevar%H3PO4_conc
+      trcSalt_irrig_vr(idsalt_FeHPO4,L,NY,NX)   = solutevar%FeHPO4_p_conc
+      trcSalt_irrig_vr(idsalt_FeH2PO4,L,NY,NX)  = solutevar%FeH2PO4_2p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_CaPO4,L,NY,NX)    = solutevar%CaPO4_1e_con
+      trcSalt_irrig_vr(idsalt_CaHPO4,L,NY,NX)   = solutevar%CaHPO4_conc
+      trcSalt_irrig_vr(idsalt_CaH4P2O8,L,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
+      trcSalt_irrig_vr(idsalt_MgHPO4,L,NY,NX)   = solutevar%MgHPO4_conc
     endif
 !
 !   INITIAL STATE VARIABLES FOR GAS IN SOIL
@@ -427,13 +427,13 @@ module StarteMod
 !
     if(salt_model)then
       do nsalts=idsalt_beg,idsalt_KSO4
-        trcSalt_solml_vr(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)
+        trcSalt_solml_vr(nsalts,L,NY,NX)=trcSalt_irrig_vr(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)
       ENDDO
 
       DO nsalts=idsalt_H0PO4,idsalt_MgHPO4
         ids=nsalts-idsalt_H0PO4+idsalt_H0PO4B
-        trcSalt_solml_vr(nsalts,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcSalt_solml_vr(ids,L,NY,NX)=trcsalt_subirrig_conc(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+        trcSalt_solml_vr(nsalts,L,NY,NX)=trcSalt_irrig_vr(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+        trcSalt_solml_vr(ids,L,NY,NX)=trcSalt_irrig_vr(nsalts,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
       ENDDO
       trcSalt_soHml_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0._r8
     endif
@@ -445,8 +445,8 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
-    trcx_solml_vr(idx_NH4,L,NY,NX)    = solutevar%XNH4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
-    trcx_solml_vr(idx_NH4B,L,NY,NX)   = solutevar%XNH4_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
+    trcx_solml_vr(idx_NH4,L,NY,NX)    = solutevar%XNH4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
+    trcx_solml_vr(idx_NH4B,L,NY,NX)   = solutevar%XNH4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
     trcx_solml_vr(idx_Hp,L,NY,NX)     = solutevar%XHY1*VLSoilMicPMass_vr(L,NY,NX)
     trcx_solml_vr(idx_Al,L,NY,NX)     = solutevar%XAl_conc*VLSoilMicPMass_vr(L,NY,NX)
     trcx_solml_vr(idx_Fe,L,NY,NX)     = solutevar%XFe_conc*VLSoilMicPMass_vr(L,NY,NX)
@@ -552,7 +552,7 @@ module StarteMod
 !
         IF(salt_model)THEN
           do nsalts=idsalt_beg,idsalt_end
-            trc_Saltml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_conc(nsalts,NY,NX)
+            trc_Saltml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_mole_conc_col(nsalts,NY,NX)
           enddo
         ENDIF
       ELSE
