@@ -202,6 +202,7 @@ implicit none
   trcs_names(idg_CO2)    = 'CO2';trcs_names(idg_CH4)     = 'CH4'
   trcs_names(idg_O2)     = 'O2'; trcs_names(idg_N2)      = 'N2'
   trcs_names(idg_N2O)    = 'N2O';trcs_names(idg_H2)      = 'H2'
+  trcs_names(idg_Ar)     = 'Ar'
   trcs_names(idg_NH3)    = 'NH3';trcs_names(idg_NH3B)    = 'NH3B'
   trcs_names(ids_NH4B)   = 'NH4B';trcs_names(ids_NO3B)   = 'NO3B'
   trcs_names(ids_NO2B)   = 'NO2B';trcs_names(ids_H1PO4B) = 'H1PO4B'

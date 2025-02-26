@@ -33,7 +33,7 @@ module ExtractsMod
 
       call TotalLeafArea(NZ)
 
-      call TotalGasandSoluteUptake(NZ)
+      call TotalGasandSoluteUptake(I,J,NZ)
 
       call CanopyFluxesandFixation(NZ)
 
@@ -133,13 +133,13 @@ module ExtractsMod
   end subroutine TotalLeafArea
 !------------------------------------------------------------------------------------------
 
-  subroutine TotalGasandSoluteUptake(NZ)
+  subroutine TotalGasandSoluteUptake(I,J,NZ)
 !
 !     TOTAL GAS AND SOLUTE UPTAKE BY ALL PLANT SPECIES
 !
 
   implicit none
-  integer, intent(in) :: NZ
+  integer, intent(in) :: I,J,NZ
 
   integer :: N,L,K,idg,NE,ids
  
@@ -221,31 +221,11 @@ module ExtractsMod
         THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKS_vr(L)
       endif
 !
-!     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
-!
-!     *A,*P=PFT root gaseous, aqueous gas content
-!     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
-!     R*FLA=root gaseous-atmosphere CO2 exchange
-!     R*DFA=root aqueous-gaseous CO2 exchange
-!
-      DO idg=idg_beg,idg_NH3
-        trcg_rootml_pvr(idg,N,L,NZ) = trcg_rootml_pvr(idg,N,L,NZ)-trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)+trcg_air2root_flx_pvr(idg,N,L,NZ)
-        trcs_rootml_pvr(idg,N,L,NZ) = trcs_rootml_pvr(idg,N,L,NZ)+trcg_Root_gas2aqu_flx_vr(idg,N,L,NZ)
-      ENDDO
-
-      trcs_rootml_pvr(idg_CO2,N,L,NZ) = trcs_rootml_pvr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
-      trcs_rootml_pvr(idg_O2,N,L,NZ)  = trcs_rootml_pvr(idg_O2,N,L,NZ) -RootO2Uptk_pvr(N,L,NZ)
-      trcs_rootml_pvr(idg_CH4,N,L,NZ) = trcs_rootml_pvr(idg_CH4,N,L,NZ)+RootUptkSoiSol_pvr(idg_CH4,N,L,NZ)
-      trcs_rootml_pvr(idg_N2O,N,L,NZ) = trcs_rootml_pvr(idg_N2O,N,L,NZ)+RootUptkSoiSol_pvr(idg_N2O,N,L,NZ)
-      trcs_rootml_pvr(idg_H2,N,L,NZ)  = trcs_rootml_pvr(idg_H2,N,L,NZ) +RootUptkSoiSol_pvr(idg_H2,N,L,NZ)
-      trcs_rootml_pvr(idg_Ar,N,L,NZ)  = trcs_rootml_pvr(idg_Ar,N,L,NZ) +RootUptkSoiSol_pvr(idg_Ar,N,L,NZ) 
-      trcs_rootml_pvr(idg_NH3,N,L,NZ) = trcs_rootml_pvr(idg_NH3,N,L,NZ)+RootUptkSoiSol_pvr(idg_NH3,N,L,NZ)+RootUptkSoiSol_pvr(idg_NH3B,N,L,NZ)
-!
 !     TOTAL ROOT GAS CONTENTS
 !
 !
       DO idg=idg_beg,idg_NH3
-        trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)
+        trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
       ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
