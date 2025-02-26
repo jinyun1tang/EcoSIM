@@ -19,7 +19,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootMycoExudEUptk_pvr(:,:,:,:,:,:,:)           !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootUptkSoiSol_vr(:,:,:,:,:,:)                 !aqueous H2 flux from roots to soil water, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootUptkSoiSol_pvr(:,:,:,:,:,:)                 !aqueous H2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)               !root uptake of H2PO4 non-band
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)               !root uptake of H2PO4 band
   real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)               !HPO4 demand in non-band by each root population
@@ -173,7 +173,7 @@ module PlantDataRateType
   allocate(RootO2Dmnd4Resp_pvr(jroots,JZ,JP,JY,JX));RootO2Dmnd4Resp_pvr=0._r8
   allocate(trcg_air2root_flx_pvr(idg_beg:idg_NH3,2,JZ,JP,JY,JX));trcg_air2root_flx_pvr=0._r8
   allocate(trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,2,JZ,JP,JY,JX));trcg_Root_gas2aqu_flx_vr=0._r8
-  allocate(RootUptkSoiSol_vr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RootUptkSoiSol_vr=0._r8
+  allocate(RootUptkSoiSol_pvr(idg_beg:idg_end,jroots,JZ,JP,JY,JX));RootUptkSoiSol_pvr=0._r8
   allocate(RootCO2Emis_pvr(jroots,JZ,JP,JY,JX));RootCO2Emis_pvr=0._r8
   allocate(RootO2Uptk_pvr(jroots,JZ,JP,JY,JX));RootO2Uptk_pvr=0._r8
   allocate(RootRespPotent_pvr(jroots,JZ,JP,JY,JX));RootRespPotent_pvr=0._r8
@@ -252,7 +252,7 @@ module PlantDataRateType
   call destroy(SurfLitrfalStrutElms_CumYr_pft)
   call destroy(RootMycoExudEUptk_pvr)
   call destroy(RootNutUptake_pvr)
-  call destroy(RootUptkSoiSol_vr)
+  call destroy(RootUptkSoiSol_pvr)
   call destroy(RootN2Fix_pvr)
   call destroy(RootH2PO4DmndSoil_pvr)
   call destroy(RootH2PO4DmndBand_pvr)

@@ -79,7 +79,7 @@ implicit none
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)   !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)               !effective volume fraction of nutrient solutes [0-1]
   real(r8),target,allocatable ::  tRDIM2DOM_col(:,:,:)               !conversion flux from DIM into DOM [g d-2 h-1]
-  real(r8),target,allocatable ::  Gas_NetProd_col(:,:,:)             !net production of gas [g d-2 h-1]
+  real(r8),target,allocatable ::  RGasNetProd_col(:,:,:)             !net production of gas [g d-2 h-1]
   real(r8),target,allocatable ::  OxyDecompLimiter_vr(:,:,:)         !decomposer oxygen limitation
   real(r8),target,allocatable ::  RO2DecompUptk_vr(:,:,:)            !decompoer oxygen uptake rate
   real(r8),target,allocatable ::  BandWidthNH4_vr(:,:,:)             !width of NH4 band, [m]
@@ -197,7 +197,7 @@ implicit none
   allocate(HydroSufDOPFlx_CumYr_col(JY,JX));       HydroSufDOPFlx_CumYr_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
-  allocate(Gas_NetProd_col(idg_beg:idg_NH3,JY,JX)); Gas_NetProd_col=0._r8
+  allocate(RGasNetProd_col(idg_beg:idg_NH3,JY,JX)); RGasNetProd_col=0._r8
   allocate(RootResp_CumYr_col(JY,JX));        RootResp_CumYr_col=0._r8
   allocate(SedmErossLoss_CumYr_col(JY,JX));      SedmErossLoss_CumYr_col=0._r8
   allocate(HydroSufDICFlx_col(JY,JX));       HydroSufDICFlx_col=0._r8
@@ -267,7 +267,7 @@ implicit none
   call destroy(CO2_Gas_Frac_vr)
   call destroy(CH4_Gas_Frac_vr)  
   call destroy(Ar_Gas_Frac_vr)
-  call destroy(Gas_NetProd_col)
+  call destroy(RGasNetProd_col)
   call destroy(Gas_WetDeposition_col)
   call destroy(Gas_Prod_TP_cumRes_col)
   call destroy(trcg_ebu_flx_col)

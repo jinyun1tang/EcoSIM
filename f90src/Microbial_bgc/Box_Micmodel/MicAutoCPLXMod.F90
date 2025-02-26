@@ -129,22 +129,22 @@ module MicAutoCPLXMod
 !
 !
   if (N.eq.mid_AmmoniaOxidBacter)then
-!   NH3 OXIDIZERS
+    ! NH3 OXIDIZERS
     call NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,&
       RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
   elseif (N.eq.mid_NitriteOxidBacter)then
-!     NO2 OXIDIZERS
+    ! NO2 OXIDIZERS
     call NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
   elseif (N.eq.mid_H2GenoMethanogArchea)then
-!     H2TROPHIC METHANOGENS
+    ! H2TROPHIC METHANOGENS
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
 
   elseif (N.eq.mid_AerobicMethanotrofBacter)then
-!     METHANOTROPHS
+    ! METHANOTROPHS
     call MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
       RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
   else
@@ -447,8 +447,6 @@ module MicAutoCPLXMod
   !for aerobic methanotrophs, the following equals to CH4 uptake for biomass
   DOMuptk4GrothAutor(ielmc,NGL)=CGOMX+CGOMD
 
-!  if(micfor%litrm .and. N.eq.micpar%mid_AerobicMethanotrofBacter)write(113,*)I+J/24.,RespGrossAutor(NGL),DOMuptk4GrothAutor(ielmc,NGL)
-
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
 !
@@ -641,7 +639,7 @@ module MicAutoCPLXMod
     COXYE                 => micfor%COXYE,                 &
     O2_rain_conc          => micfor%O2_rain_conc,          &
     O2_irrig_conc         => micfor%O2_irrig_conc,         &
-    Irrig2LitRSurf_col        => micfor%Irrig2LitRSurf_col,        &
+    Irrig2LitRSurf_col    => micfor%Irrig2LitRSurf_col,    &
     Rain2LitRSurf         => micfor%Rain2LitRSurf,         &
     litrm                 => micfor%litrm,                 &
     O2AquaDiffusvity      => micfor%O2AquaDiffusvity,      &
@@ -1257,6 +1255,7 @@ module MicAutoCPLXMod
   real(r8) :: FSBST
   real(r8) :: RVOXP1
   real(r8) :: VMXA
+  real(r8) :: pscal
   REAL(R8) :: VOLWPM
 
   associate(                                            &
@@ -1288,8 +1287,6 @@ module MicAutoCPLXMod
 !
 !     ECHZ=growth respiration efficiency
 !     VMXA=potential oxidation
-!     TFNG=temperature+water effect,FBiomStoiScalarAutorr=N,P limitation
-!     OMA=active biomass,VMX4=specific respiration rate
 !     RCH4PhysexchPrev=total aqueous CH4 exchange from previous hour
 !     RCH4GasXchangePrev=total gaseous CH4 exchange from previous hour
 !     tCH4ProdAceto+tCH4ProdH2=total CH4 generated from methanogenesis
@@ -1353,11 +1350,19 @@ module MicAutoCPLXMod
         !the respiration yield of CH2O, CH4+O2 -> CH2O + H2O (molar basis)
         RGOMP1=RVOXP1*ECHO*ECHZ
         !
-        CH4S1=CH4S1-RVOXP1-RGOMP1
+        if(abs(RVOXP1+RGOMP1)>0._r8)then
+          pscal=CH4S1/(RVOXP1+RGOMP1)
+          if(pscal < 1._r8)then
+            RVOXP1=RVOXP1*pscal
+            RGOMP1=RGOMP1*pscal
+          endif
+          CH4S1=CH4S1-RVOXP1-RGOMP1
+        endif
 
         !dissolution-vaporization
         IF(THETPM(M).GT.THETX)THEN
           RCHDF=DiffusivitySolutEff(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
+          RCHDF=AMAX1(AMIN1(CH4G1,RCHDF),-CH4S1)
         ELSE
           RCHDF=0.0_r8
         ENDIF

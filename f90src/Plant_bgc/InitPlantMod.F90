@@ -995,7 +995,7 @@ module InitPlantMod
       trcs_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2P*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)   = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
-      plt_rbgc%RootUptkSoiSol_vr(idg_CO2,N,L,NZ)             = 0._r8
+      plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)             = 0._r8
       plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                  = 0._r8
       COXYA                                             = COXYE
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE

@@ -154,7 +154,7 @@ module ExtractsMod
     trcg_Root_gas2aqu_flx_vr => plt_rbgc%trcg_Root_gas2aqu_flx_vr, &
     trcg_air2root_flx_pvr    => plt_rbgc%trcg_air2root_flx_pvr,    &
     RootCO2Emis_pvr          => plt_rbgc%RootCO2Emis_pvr,          &
-    RootUptkSoiSol_vr        => plt_rbgc%RootUptkSoiSol_vr,        &
+    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,        &
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr,        &
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr,     &
     trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
@@ -235,15 +235,14 @@ module ExtractsMod
 
       trcs_rootml_pvr(idg_CO2,N,L,NZ) = trcs_rootml_pvr(idg_CO2,N,L,NZ)+RootCO2Emis_pvr(N,L,NZ)
       trcs_rootml_pvr(idg_O2,N,L,NZ)  = trcs_rootml_pvr(idg_O2,N,L,NZ) -RootO2Uptk_pvr(N,L,NZ)
-      trcs_rootml_pvr(idg_CH4,N,L,NZ) = trcs_rootml_pvr(idg_CH4,N,L,NZ)+RootUptkSoiSol_vr(idg_CH4,N,L,NZ)
-      trcs_rootml_pvr(idg_N2O,N,L,NZ) = trcs_rootml_pvr(idg_N2O,N,L,NZ)+RootUptkSoiSol_vr(idg_N2O,N,L,NZ)
-      trcs_rootml_pvr(idg_H2,N,L,NZ)  = trcs_rootml_pvr(idg_H2,N,L,NZ) +RootUptkSoiSol_vr(idg_H2,N,L,NZ)
-      trcs_rootml_pvr(idg_NH3,N,L,NZ) = trcs_rootml_pvr(idg_NH3,N,L,NZ)+RootUptkSoiSol_vr(idg_NH3,N,L,NZ)+RootUptkSoiSol_vr(idg_NH3B,N,L,NZ)
+      trcs_rootml_pvr(idg_CH4,N,L,NZ) = trcs_rootml_pvr(idg_CH4,N,L,NZ)+RootUptkSoiSol_pvr(idg_CH4,N,L,NZ)
+      trcs_rootml_pvr(idg_N2O,N,L,NZ) = trcs_rootml_pvr(idg_N2O,N,L,NZ)+RootUptkSoiSol_pvr(idg_N2O,N,L,NZ)
+      trcs_rootml_pvr(idg_H2,N,L,NZ)  = trcs_rootml_pvr(idg_H2,N,L,NZ) +RootUptkSoiSol_pvr(idg_H2,N,L,NZ)
+      trcs_rootml_pvr(idg_Ar,N,L,NZ)  = trcs_rootml_pvr(idg_Ar,N,L,NZ) +RootUptkSoiSol_pvr(idg_Ar,N,L,NZ) 
+      trcs_rootml_pvr(idg_NH3,N,L,NZ) = trcs_rootml_pvr(idg_NH3,N,L,NZ)+RootUptkSoiSol_pvr(idg_NH3,N,L,NZ)+RootUptkSoiSol_pvr(idg_NH3B,N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
-!     TL*P=total root gas content, dissolved + gaseous phase
-!     *A,*P=PFT root gaseous, aqueous gas content
 !
       DO idg=idg_beg,idg_NH3
         trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)
@@ -251,24 +250,15 @@ module ExtractsMod
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
 !
-!     T*FLA=total root gaseous-atmosphere CO2 exchange
-!     R*FLA=PFT root gaseous-atmosphere CO2 exchange
-!     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
-!     TUP*S,TUP*B=total root-soil gas, solute exchange in non-band,band
-!     RUP*S,RUP*B*=PFT root-soil gas, solute exchange in non-band,band
-!     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
-!     solute code:NH4=NH4,NO3=NO3,H2P=H2PO4,H1P=H1PO4 in non-band
-!                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
-!
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
 
-      tRootCO2Emis2Root_vr(L) =tRootCO2Emis2Root_vr(L)-RootCO2Emis_pvr(N,L,NZ)
-      tRO2MicrbUptk_vr(L)=tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+      tRootCO2Emis2Root_vr(L) = tRootCO2Emis2Root_vr(L)-RootCO2Emis_pvr(N,L,NZ)
+      tRO2MicrbUptk_vr(L)     = tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
       DO idg=idg_beg,idg_end
-        trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_vr(idg,N,L,NZ)
+        trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       ENDDO
 
       do ids=ids_NH4B,ids_nuts_end
