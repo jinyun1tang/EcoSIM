@@ -166,20 +166,6 @@ contains
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
 
-  write(*,*) "(ATSCPL) parameters"
-  write(*,*) "a_BKDSI: ", a_BKDSI(1,1)
-  write(*,*) "a_WC: ", a_WC(1,1)
-  write(*,*) "a_TEMP: ", a_TEMP(1,1)
-  write(*,*) "a_MATP: ", a_MATP(1,1)
-  write(*,*) "a_PORO: ", a_PORO(1,1)
-  write(*,*) "a_ASP: ", a_ASP(1)
-  write(*,*) "tairc: ", tairc(1)
-  write(*,*) "vpair: ", vpair(1)
-  write(*,*) "uwind: ", uwind(1)
-  write(*,*) "pressure_at_field_capacity: ", pressure_at_field_capacity
-  write(*,*) "pressure_at_wilting_point: ", pressure_at_wilting_point
-  write(*,*) "heat_capacity: ", heat_capacity
-
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
@@ -287,10 +273,12 @@ contains
 
     type (BGCSizes), intent(out) :: sizes
 
+    write(*,*) "(SetBGCSizes): N_cells, N_cols ", sizes%ncells_per_col_, sizes%num_columns
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
     sizes%num_columns = 1
 
+    write(*,*) "(SetBGCSizes f): N_cells, N_cols ", sizes%ncells_per_col_, sizes%num_columns
   end subroutine SetBGCSizes
 
 !-----------------------------------------------------------------------------------------
