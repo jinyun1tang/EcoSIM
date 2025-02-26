@@ -1690,9 +1690,9 @@ implicit none
           BandThicknessNH4_vr(L1,NY,NX) = BandThicknessNH4_vr(L1,NY,NX)+FXDPNHB
           BandThicknessNH4_vr(L0,NY,NX) = BandThicknessNH4_vr(L0,NY,NX)-FXDPNHB
         ENDIF
-        trcs_VLN_vr(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNH4_vr(L1,NY,NX) &
+        trcs_VLN_vr(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNH4_vr(L1,NY,NX) &
           /ROWN(NY,NX)*BandThicknessNH4_vr(L1,NY,NX)/DLYR_3D(3,L1,NY,NX)))
-        trcs_VLN_vr(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNH4_vr(L0,NY,NX) &
+        trcs_VLN_vr(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNH4_vr(L0,NY,NX) &
           /ROWN(NY,NX)*BandThicknessNH4_vr(L0,NY,NX)/DLYR_3D(3,L0,NY,NX)))
         trcs_VLN_vr(ids_NH4,L1,NY,NX) = 1.0_r8-trcs_VLN_vr(ids_NH4B,L1,NY,NX)
         trcs_VLN_vr(ids_NH4,L0,NY,NX) = 1.0_r8-trcs_VLN_vr(ids_NH4B,L0,NY,NX)

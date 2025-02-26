@@ -5,6 +5,7 @@ module BalancesMod
   use EcoSimConst,    only: DENSICE
   use abortutils,     only: endrun
   use EcoSIMCtrlMod,  only: fixWaterLevel
+  use AqueChemDatatype, only: trcg_mass_cumerr_col
   use SoilBGCDataType
   use GridDataType
   use SurfLitterDataType
@@ -241,14 +242,19 @@ contains
 
       DO idg=idg_beg,idg_NH3        
         tracer_mass_err(idg) = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
-          -trcg_TotalMass_col(idg,NY,NX)
+          -trcg_TotalMass_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)
+        trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err(idg) 
       enddo      
 
-      if(abs(tracer_mass_err(idg))>1.e-4_r8)then
-        write(110,*)('-',ii=1,50)
-        write(110,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg_ar,NY,NX),trcg_TotalMass_col(idg_ar,NY,NX),&
+      if(abs(tracer_mass_err(idg_ar))>1.e-4_r8)then
+        write(111,*)('-',ii=1,50)
+        write(111,*)I*1000+J
+        write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg_ar,NY,NX),trcg_TotalMass_col(idg_ar,NY,NX),&
           trcg_TotalMass_beg_col(idg_ar,NY,NX)-trcg_TotalMass_col(idg_ar,NY,NX)
-        write(110,*)'mass_err Ar     =',tracer_mass_err(idg_ar),SurfGasEmisFlx_col(idg_ar,NY,NX)
+        write(111,*)'mass_err Ar     =',tracer_mass_err(idg_ar)
+        write(111,*)'surf emis       =',SurfGasEmisFlx_col(idg_ar,NY,NX)
+        write(111,*)'GasHydroloss    =',GasHydroLossFlx_col(idg_ar,NY,NX)
+        write(111,*)'RGasNetProd     =',RGasNetProd_col(idg_ar,NY,NX)
       endif
       cycle      
       if(abs(HeatErr_test)>err_engy)then

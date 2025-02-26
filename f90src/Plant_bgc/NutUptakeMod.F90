@@ -74,7 +74,7 @@ module NutUptakeMod
   integer :: NB
 
   associate(                                                         &
-    TdegCCanopy_pft        => plt_ew%TdegCCanopy_pft,          &
+    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft,             &
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
@@ -244,7 +244,7 @@ module NutUptakeMod
 
   plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
-  plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
+  plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
   plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
   plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
   plt_rbgc%RAutoRootO2Limter_rpvr(1:NN,L1:L2,NZ)                          = 1.0_r8
@@ -410,7 +410,7 @@ module NutUptakeMod
     RootNO3DmndBand_pvr    => plt_rbgc%RootNO3DmndBand_pvr,    &
     RootOUlmNutUptake_pvr  => plt_rbgc%RootOUlmNutUptake_pvr,  &
     SoluteDifusvty_vr      => plt_soilchem%SoluteDifusvty_vr,  &
-    trcs_solml_vr           => plt_soilchem%trcs_solml_vr,       &
+    trcs_solml_vr          => plt_soilchem%trcs_solml_vr,      &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr        &
@@ -765,7 +765,7 @@ module NutUptakeMod
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
-    trcs_solml_vr           => plt_soilchem%trcs_solml_vr        &
+    trcs_solml_vr          => plt_soilchem%trcs_solml_vr        &
   )
   !
   !     HPO4 UPTAKE IN NON-BAND SOIL ZONE

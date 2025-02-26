@@ -280,16 +280,16 @@ module GeochemAPI
   trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)        = solflx%TRChem_ROH2_sorbed_band_soil
   trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)       = solflx%TRChem_RHPO4_sorbed_band_soil
   trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)      = solflx%TRChem_RH2PO4_sorbed_band_soil
-  trcp_RChem_soil(idsp_AlPO4,L,NY,NX)         = solflx%TRChem_AlPO4_precip_soil
-  trcp_RChem_soil(idsp_FePO4,L,NY,NX)         = solflx%TRChem_FePO4_precip_soil
-  trcp_RChem_soil(idsp_CaHPO4,L,NY,NX)        = solflx%TRChem_CaHPO4_precip_soil
-  trcp_RChem_soil(idsp_HA,L,NY,NX)            = solflx%TRChem_apatite_precip_soil
-  trcp_RChem_soil(idsp_CaH4P2O8,L,NY,NX)      = solflx%TRChem_CaH4P2O8_precip_soil
-  trcp_RChem_soil(idsp_AlPO4B,L,NY,NX)        = solflx%TRChem_AlPO4_precip_band_soil
-  trcp_RChem_soil(idsp_FePO4B,L,NY,NX)        = solflx%TRChem_FePO4_precip_band_soil
-  trcp_RChem_soil(idsp_CaHPO4B,L,NY,NX)       = solflx%TRChem_CaHPO4_precip_band_soil
-  trcp_RChem_soil(idsp_HAB,L,NY,NX)           = solflx%TRChem_apatite_precip_band_soil
-  trcp_RChem_soil(idsp_CaH4P2O8B,L,NY,NX)     = solflx%TRChem_CaH4P2O8_precip_band_soil
+  trcp_RChem_soil_vr(idsp_AlPO4,L,NY,NX)         = solflx%TRChem_AlPO4_precip_soil
+  trcp_RChem_soil_vr(idsp_FePO4,L,NY,NX)         = solflx%TRChem_FePO4_precip_soil
+  trcp_RChem_soil_vr(idsp_CaHPO4,L,NY,NX)        = solflx%TRChem_CaHPO4_precip_soil
+  trcp_RChem_soil_vr(idsp_HA,L,NY,NX)            = solflx%TRChem_apatite_precip_soil
+  trcp_RChem_soil_vr(idsp_CaH4P2O8,L,NY,NX)      = solflx%TRChem_CaH4P2O8_precip_soil
+  trcp_RChem_soil_vr(idsp_AlPO4B,L,NY,NX)        = solflx%TRChem_AlPO4_precip_band_soil
+  trcp_RChem_soil_vr(idsp_FePO4B,L,NY,NX)        = solflx%TRChem_FePO4_precip_band_soil
+  trcp_RChem_soil_vr(idsp_CaHPO4B,L,NY,NX)       = solflx%TRChem_CaHPO4_precip_band_soil
+  trcp_RChem_soil_vr(idsp_HAB,L,NY,NX)           = solflx%TRChem_apatite_precip_band_soil
+  trcp_RChem_soil_vr(idsp_CaH4P2O8B,L,NY,NX)     = solflx%TRChem_CaH4P2O8_precip_band_soil
   TProd_CO2_geochem_soil_vr(L,NY,NX)          = solflx%TRChem_CO2_gchem_soil*catomw
   if(salt_model)then
     trcSalt_RGeoChem_flx_vr(idsalt_Al,L,NY,NX)        = solflx%TRChem_Al_3p_soil
@@ -353,11 +353,11 @@ module GeochemAPI
   TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX)    = solflx%TRChem_FeO2H2_sorbed_soil
   trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)  = solflx%TRChem_RO_sorbed_soil
   trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX) = solflx%TRChem_RO_sorbed_band_soil
-  trcp_RChem_soil(idsp_AlOH3,L,NY,NX)  = solflx%TRChem_AlOH3_precip_soil
-  trcp_RChem_soil(idsp_FeOH3,L,NY,NX)  = solflx%TRChem_FeOH3_precip_soil
-  trcp_RChem_soil(idsp_CaCO3,L,NY,NX)  = solflx%TRChem_CaCO3_precip_soil
-  trcp_RChem_soil(idsp_CaSO4,L,NY,NX)  = solflx%TRChem_CaSO4_precip_soil
-  TRH2O(L,NY,NX)                       = solflx%TRH2O_soil
+  trcp_RChem_soil_vr(idsp_AlOH3,L,NY,NX)  = solflx%TRChem_AlOH3_precip_soil
+  trcp_RChem_soil_vr(idsp_FeOH3,L,NY,NX)  = solflx%TRChem_FeOH3_precip_soil
+  trcp_RChem_soil_vr(idsp_CaCO3,L,NY,NX)  = solflx%TRChem_CaCO3_precip_soil
+  trcp_RChem_soil_vr(idsp_CaSO4,L,NY,NX)  = solflx%TRChem_CaSO4_precip_soil
+  TRChem_H2O_vr(L,NY,NX)                       = solflx%TRH2O_soil
   TBION_vr(L,NY,NX)                    = solflx%TBION_soil
   Txchem_CO2_vr(L,NY,NX)               = solflx%Txchem_CO2_soil
   end subroutine GeochemAPIRecv

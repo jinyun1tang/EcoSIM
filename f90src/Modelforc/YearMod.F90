@@ -1,5 +1,6 @@
   module YearMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use AqueChemDatatype
   use EcosimConst
   use EcoSIMCtrlMod
   use GridConsts
@@ -53,6 +54,7 @@
         !to be revised for GDD 
         Gas_Prod_TP_cumRes_col(:,NY,NX)     = 0._r8
         QdewCanopy_CumYr_pft(:,NY,NX)     = 0._r8
+        trcg_mass_cumerr_col(:,NY,NX)     = 0._r8
         GDD_col(NY,NX)                    = 0._r8
         AmendCFlx_CumYr_col(NY,NX)        = 0._r8
         LiterfalOrgM_col(:,NY,NX)         = 0._r8

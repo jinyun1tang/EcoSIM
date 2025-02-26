@@ -712,7 +712,7 @@ implicit none
   real(r8), pointer :: KmNH4Root_pft(:,:)                => null()  !Km for root NH4 uptake,                                         [g m-3]
   real(r8), pointer :: RootCO2Emis_pvr(:,:,:)            => null()  !aqueous CO2 flux from roots to root water,                      [g d-2 h-1]
   real(r8), pointer :: RootO2Uptk_pvr(:,:,:)             => null()  !aqueous O2 flux from roots to root water,                       [g d-2 h-1]
-  real(r8), pointer :: RootUptkSoiSol_vr(:,:,:,:)             => null()  !aqueous CO2 flux from roots to soil water,                      [g d-2 h-1]
+  real(r8), pointer :: RootUptkSoiSol_pvr(:,:,:,:)             => null()  !aqueous CO2 flux from roots to soil water,                      [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx_pvr(:,:,:,:)   => null()  !gaseous tracer flux through roots,                              [g d-2 h-1]
   real(r8), pointer :: trcg_Root_gas2aqu_flx_vr(:,:,:,:) => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots,     [g d-2 h-1]
   real(r8), pointer :: RootO2Dmnd4Resp_pvr(:,:,:)        => null()  !root  O2 demand from respiration,                               [g d-2 h-1]
@@ -822,7 +822,7 @@ implicit none
   allocate(this%KmNH4Root_pft(jroots,JP1));this%KmNH4Root_pft=spval
   allocate(this%RootCO2Emis_pvr(jroots,JZ1,JP1));this%RootCO2Emis_pvr=spval
   allocate(this%RootO2Uptk_pvr(jroots,JZ1,JP1));this%RootO2Uptk_pvr=spval
-  allocate(this%RootUptkSoiSol_vr(idg_beg:idg_end,jroots,JZ1,JP1));this%RootUptkSoiSol_vr=spval
+  allocate(this%RootUptkSoiSol_pvr(idg_beg:idg_end,jroots,JZ1,JP1));this%RootUptkSoiSol_pvr=spval
   end subroutine plt_rootbgc_init
 !----------------------------------------------------------------------
 

@@ -191,11 +191,11 @@ module RedistMod
   ECO_HR_CH4_col(NY,NX)          = sum(ECO_HR_CH4_vr(0:JZ,NY,NX))
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
   RootCO2Autor_col(NY,NX)        = sum(RootCO2Autor_vr(1:JZ,NY,NX))
-  Gas_NetProd_col(idg_CO2,NY,NX) = -ECO_HR_CO2_col(NY,NX)-RootCO2Autor_col(NY,NX)
+  RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)-RootCO2Autor_col(NY,NX)
 
   DO idg=idg_beg,idg_NH3  
     Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX) &
-      +Gas_NetProd_col(idg,NY,NX)
+      +RGasNetProd_col(idg,NY,NX)
   ENDDO  
 
   !the surface is lowered
@@ -374,7 +374,7 @@ module RedistMod
   ENDDO
 
   DO idsp=idsp_psoi_beg,idsp_psoi_end
-    trcp_saltpml_vr(idsp,0,NY,NX)=trcp_saltpml_vr(idsp,0,NY,NX)+trcp_RChem_soil(idsp,0,NY,NX)
+    trcp_saltpml_vr(idsp,0,NY,NX)=trcp_saltpml_vr(idsp,0,NY,NX)+trcp_RChem_soil_vr(idsp,0,NY,NX)
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine UpdateSurfaceTracers  
@@ -563,7 +563,9 @@ module RedistMod
   ENDIF
   !========================================================================
   !
-
+  DO idg=idg_beg,idg_NH3-1
+    RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,0,NY,NX)
+  ENDDO
   ECO_HR_CO2_vr(0,NY,NX)       = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)
   ECO_HR_CH4_vr(L,NY,NX)       = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)  
 
@@ -1165,6 +1167,11 @@ module RedistMod
       endif  
     enddo
 
+    DO idg=idg_beg,idg_NH3-1
+      RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,L,NY,NX)
+    ENDDO
+    RGasNetProd_col(idg_CO2,NY,NX)=RGasNetProd_col(idg_CO2,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)
+
     ECO_HR_CO2_vr(L,NY,NX) = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
     ECO_HR_CH4_vr(L,NY,NX) = trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
 
@@ -1183,7 +1190,7 @@ module RedistMod
     !     PRECIPITATES FROM PRECIPITATION-DISSOLUTION REACTIONS
     !
     DO idsp=idsp_p_beg,idsp_p_end
-      trcp_saltpml_vr(idsp,L,NY,NX)=trcp_saltpml_vr(idsp,L,NY,NX)+trcp_RChem_soil(idsp,L,NY,NX)
+      trcp_saltpml_vr(idsp,L,NY,NX)=trcp_saltpml_vr(idsp,L,NY,NX)+trcp_RChem_soil_vr(idsp,L,NY,NX)
     ENDDO
     !
     !
@@ -1271,7 +1278,7 @@ module RedistMod
       +RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX) &
       -trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX)))/patomw
 
-    SSB=TRH2O(L,NY,NX)+Txchem_CO2_vr(L,NY,NX)+RProd_Hp_vr(L,NY,NX)+TBION_vr(L,NY,NX)
+    SSB=TRChem_H2O_vr(L,NY,NX)+Txchem_CO2_vr(L,NY,NX)+RProd_Hp_vr(L,NY,NX)+TBION_vr(L,NY,NX)
     TIONOU=TIONOU-SSB
 
     !     HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSB
@@ -1413,7 +1420,7 @@ module RedistMod
 
 ! all non-P precipitates
   DO idsp=idsp_beg,idsp_p_beg-1
-    trcp_saltpml_vr(idsp,L,NY,NX)=trcp_saltpml_vr(idsp,L,NY,NX)+trcp_RChem_soil(idsp,L,NY,NX)
+    trcp_saltpml_vr(idsp,L,NY,NX)=trcp_saltpml_vr(idsp,L,NY,NX)+trcp_RChem_soil_vr(idsp,L,NY,NX)
   ENDDO
 
   PSS=0._r8

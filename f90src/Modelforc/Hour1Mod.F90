@@ -370,17 +370,17 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      QWatIntLaterFlow_col(NY,NX)          = 0._r8
-      QCanopyWat2Dist_col(NY,NX)           = 0._r8
-      HeatCanopy2Dist_col(NY,NX)           = 0._r8
-      HydroSufDOCFlx_col(NY,NX)            = 0._r8
-      HydroSubsDOCFlx_col(NY,NX)           = 0._r8
-      HydroSufDICFlx_col(NY,NX)            = 0._r8
-      HydroSubsDICFlx_col(NY,NX)           = 0._r8
-      HydroSubsDONFlx_col(NY,NX)           = 0._r8
-      HydroSubsDINFlx_col(NY,NX)           = 0._r8
-      HydroSubsDOPFlx_col(NY,NX)           = 0._r8
-      HydroSubsDIPFlx_col(NY,NX)           = 0._r8
+      QWatIntLaterFlow_col(NY,NX)            = 0._r8
+      QCanopyWat2Dist_col(NY,NX)             = 0._r8
+      HeatCanopy2Dist_col(NY,NX)             = 0._r8
+      HydroSufDOCFlx_col(NY,NX)              = 0._r8
+      HydroSubsDOCFlx_col(NY,NX)             = 0._r8
+      HydroSufDICFlx_col(NY,NX)              = 0._r8
+      HydroSubsDICFlx_col(NY,NX)             = 0._r8
+      HydroSubsDONFlx_col(NY,NX)             = 0._r8
+      HydroSubsDINFlx_col(NY,NX)             = 0._r8
+      HydroSubsDOPFlx_col(NY,NX)             = 0._r8
+      HydroSubsDIPFlx_col(NY,NX)             = 0._r8
       SurfRunoffWatFluxM_2DH(:,NY,NX)        = 0._r8
 
       DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
@@ -725,8 +725,8 @@ module Hour1Mod
   integer :: L
 !     begin_execution
 
+  RGasNetProd_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   Soil_Gas_pressure_vr(:,NY,NX)           =0._r8
-  Gas_NetProd_col(:,NY,NX)                = 0._r8
   Gas_WetDeposition_col(:,NY,NX)          = 0._r8
   RootCO2Autor_col(NY,NX)                 = 0._r8
   QIceInflx_vr(:,NY,NX)                   = 0._r8
@@ -837,7 +837,7 @@ module Hour1Mod
   TRChem_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
   TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
-  trcp_RChem_soil(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)              = 0._r8
+  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)              = 0._r8
   TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
   THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                       = 0._r8
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
@@ -2304,9 +2304,6 @@ module Hour1Mod
 !
 !     GAS CONCENTRATIONS
 !
-!     C*G=soil gas gaseous concentration
-!     C*S=soil gas aqueous concentration
-!
     IF(ThetaAir_vr(L,NY,NX).GT.THETX)THEN
       DO idg=idg_beg,idg_NH3
         trcg_gascl_vr(idg,L,NY,NX)=AZMAX1(trcg_gasml_vr(idg,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
@@ -2374,9 +2371,9 @@ module Hour1Mod
     TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)    = 0._r8
     TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
 
-    trcp_RChem_soil(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0._r8
+    trcp_RChem_soil_vr(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0._r8
 
-    trcp_RChem_soil(idsp_beg_band:idsp_end,L,NY,NX)=0._r8
+    trcp_RChem_soil_vr(idsp_beg_band:idsp_end,L,NY,NX)=0._r8
 
     trcs_Mac2MicPore_flx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 

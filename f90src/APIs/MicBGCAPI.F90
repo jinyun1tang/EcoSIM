@@ -398,6 +398,13 @@ implicit none
   trcs_RMicbUptake_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
   trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb+micflx%MicrbN2Fix
   trcs_RMicbUptake_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+  !artificial source
+  if(L>0 .and. L<5)then
+    trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = -0.01_r8
+  else
+    trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = 0._r8
+  endif  
+  
   RNut_MicbRelease_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil
@@ -408,6 +415,7 @@ implicit none
   RNut_MicbRelease_vr(ids_NO2B,L,NY,NX)   = micflx%RNO2MicbTransfBand
   RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbTransfBand
   RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand
+  
   TempSensDecomp_vr(L,NY,NX)            = nmicdiag%TSensGrowth
   MoistSensDecomp_vr(L,NY,NX)           = AZMAX1(nmicdiag%WatStressMicb)
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix    
