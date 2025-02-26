@@ -76,6 +76,8 @@ module InsideTranspMod
 
       call ResetFluxAccumulatorsMM(I,J,M,NY,NX,MX)
 
+      call ApplyTracerBGCSinkMM(I,J,M,NY,NX,MX)
+
       IF(M.NE.MX)THEN
         !this is a new iteration for moisture-temp update
  
@@ -135,10 +137,8 @@ module InsideTranspMod
     PARGas_CefMM(idg_NH3,NY,NX) = PARGM*1.02_r8
     PARGas_CefMM(idg_H2,NY,NX)  = PARGM*2.08_r8
     PARGas_CefMM(idg_AR,NY,NX)  = PARGM*0.72_r8    
-    
-!
+!    
 !     RESET RUNOFF SOLUTE FLUX ACCUMULATORS
-!
 !
 
     DO  K=1,jcplx
@@ -149,81 +149,86 @@ module InsideTranspMod
     trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8
     trcg_SnowDrift_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
     trcn_SnowDrift_flxM(ids_nut_beg:ids_nuts_end,NY,NX)  = 0.0_r8
-
-!   because NH3 is gas-aqua dual phase
-    trcs_solml2_vr(idg_NH3,0,NY,NX)=trcs_solml2_vr(idg_NH3,0,NY,NX)-RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)
-
-!   exclude nutrients in band
-    DO ids=ids_nut_beg,ids_nuts_end
-      trcs_solml2_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)-RBGCSinkSoluteM_vr(ids,0,NY,NX)
-    ENDDO
-    RBGCSinkGasMM_vr(idg_O2,0,NY,NX)=RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
   ENDIF
 
-  DO idg=idg_beg,idg_NH3
-    if(idg/=idg_NH3)then
-      trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)-RBGCSinkGasMM_vr(idg,0,NY,NX)
-    ELSE
-      trc_gasml2_vr(idg_NH3,0,NY,NX)=trc_gasml2_vr(idg_NH3,0,NY,NX)-RBGCSinkGasMM_vr(idg_NH3,0,NY,NX)
-    ENDIF
-  ENDDO
-
-!
-!     INITIALIZE SNOWPACK NET FLUX ACCUMULATORS
 !
   IF(M.NE.MX)THEN
+!   INITIALIZE SNOWPACK NET FLUX ACCUMULATORS
     DO  L=1,JS
       trcg_Aqua_flxM_snvr(idg_beg:idg_NH3,L,NY,NX)          = 0._r8
       trcn_Aqua_flxM_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
     ENDDO
-
+    !fluxes in soil
     DO L=NU(NY,NX),NL(NY,NX)    
       DO  K=1,jcplx
         DOM_Transp2Micp_flxM_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
         DOM_Transp2Macp_flxM_vr(idom_beg:idom_end,K,L,NY,NX)= 0.0_r8
       ENDDO
-
       trcs_Transp2Micp_flxM_vr(ids_beg:ids_end,L,NY,NX) = 0.0_r8
       trcs_Transp2Macp_flxM_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
-!
-!     ADD SOLUTE SINKS
-!
-!     include NH3 and band nutrients
-      DO ids=ids_nuts_beg,ids_nuts_end
-        trcs_solml2_vr(ids,L,NY,NX)=trcs_solml2_vr(ids,L,NY,NX)-RBGCSinkSoluteM_vr(ids,L,NY,NX)
-        if(abs(trcs_solml2_vr(ids,L,NY,NX))>1.e10)then
-          write(*,*)ids,L,NY,NX,trcs_solml2_vr(ids,L,NY,NX),RBGCSinkSoluteM_vr(ids,L,NY,NX)
-          call endrun(trim(mod_filename)//' at line',__LINE__)
-        endif
-      ENDDO
-      !add oxygen uptake here
-      RBGCSinkGasMM_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
     ENDDO  
   ENDIF
 !
-!     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
+!     SOIL GAS FLUX ACCUMULATORS
 !
   DO L=NU(NY,NX),NL(NY,NX)
-!
-!     SOIL GAS FLUX ACCUMULATORS
-    Gas_AdvDif_FlxMM_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
-    DO idg=idg_beg,idg_NH3
-      if(idg/=idg_NH3)then
-        trcs_solml2_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)
-        if(abs(trcs_solml2_vr(idg,L,NY,NX))>1.e10)then
-          write(*,*)trcs_names(idg),L,NY,NX,trcs_solml2_vr(idg,L,NY,NX),RBGCSinkGasMM_vr(idg,L,NY,NX)
-          call endrun(trim(mod_filename)//' at line',__LINE__)
-        endif
 
-      else
-        trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RBGCSinkGasMM_vr(idg_NH3,L,NY,NX)
-      endif
-      
+    DO idg=idg_beg,idg_NH3-1
+      Gas_AdvDif_FlxMM_vr(idg,L,NY,NX) = 0._r8
+    ENDDO    
+    Gas_AdvDif_FlxMM_vr(idg_NH3,L,NY,NX) = 0._r8
+    
+  ENDDO
+  end subroutine ResetFluxAccumulatorsMM
+!------------------------------------------------------------------------------------------
+  subroutine ApplyTracerBGCSinkMM(I,J,M,NY,NX,MX)
+  implicit none
+  integer, intent(in) :: I,J  
+  integer, intent(in) :: M, NY, NX,MX
+
+  integer :: L,ids,idg
+  logical :: lbegIterM   !flag for the begining of iteration M
+  
+  lbegIterM=M.NE.MX  
+  IF(lbegIterM)THEN
+    !first round of iteration M
+    ! because NH3 is gas-aqua dual phase
+    trcs_solml2_vr(idg_NH3,0,NY,NX)=trcs_solml2_vr(idg_NH3,0,NY,NX)-RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)
+
+   ! exclude nutrients in band
+    DO ids=ids_nut_beg,ids_nuts_end
+      trcs_solml2_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)-RBGCSinkSoluteM_vr(ids,0,NY,NX)
+    ENDDO
+    RBGCSinkGasMM_vr(idg_O2,0,NY,NX)=RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
+
+    ! ADD SOLUTE SINKS
+    DO L=NU(NY,NX),NL(NY,NX)    
+      ! include NH3 and band nutrients
+      DO ids=ids_nuts_beg,ids_nuts_end
+        trcs_solml2_vr(ids,L,NY,NX)=trcs_solml2_vr(ids,L,NY,NX)-RBGCSinkSoluteM_vr(ids,L,NY,NX)
+      ENDDO
+      !first round of iteration M
+      !add oxygen uptake here
+      RBGCSinkGasMM_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
+    ENDDO
+  ENDIF
+
+  trc_gasml2_vr(idg_NH3,0,NY,NX)=AZMAX1(trc_gasml2_vr(idg_NH3,0,NY,NX)-RBGCSinkGasMM_vr(idg_NH3,0,NY,NX))  
+  DO idg=idg_beg,idg_NH3-1
+    trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)-RBGCSinkGasMM_vr(idg,0,NY,NX)
+  ENDDO
+
+  DO L=NU(NY,NX),NL(NY,NX)
+    !gaseous NH3 is consumed through geochemistry
+    trc_gasml2_vr(idg_NH3,L,NY,NX)  = AZMAX1(trc_gasml2_vr(idg_NH3,L,NY,NX)-RBGCSinkGasMM_vr(idg_NH3,L,NY,NX))    
+
+    !other gases are taken from aqueous phases
+    DO idg=idg_beg,idg_NH3-1
+      trcs_solml2_vr(idg,L,NY,NX) = AZMAX1(trcs_solml2_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX))
     ENDDO
 
   ENDDO
-  end subroutine ResetFluxAccumulatorsMM
-
+  end subroutine ApplyTracerBGCSinkMM
 
 !------------------------------------------------------------------------------------------
 

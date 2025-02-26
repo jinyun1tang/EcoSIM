@@ -241,6 +241,7 @@ module ExtractsMod
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       ENDDO
 
+      !Nutrients are sorted according to band|soil
       do ids=ids_NH4B,ids_nuts_end
         trcs_plant_uptake_vr(ids,L)=trcs_plant_uptake_vr(ids,L)+RootNutUptake_pvr(ids,N,L,NZ)
       ENDDO
@@ -261,15 +262,15 @@ module ExtractsMod
 !     COMPETITION CONSTRAINTS
 !
 !
-      REcoO2DmndResp_vr(L)=REcoO2DmndResp_vr(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
-      REcoNH4DmndSoil_vr(L)=REcoNH4DmndSoil_vr(L)+RootNH4DmndSoil_pvr(N,L,NZ)
-      REcoNO3DmndSoil_vr(L)=REcoNO3DmndSoil_vr(L)+RootNO3DmndSoil_pvr(N,L,NZ)
-      REcoH2PO4DmndSoil_vr(L)=REcoH2PO4DmndSoil_vr(L)+RootH2PO4DmndSoil_pvr(N,L,NZ)
-      REcoH1PO4DmndSoil_vr(L)=REcoH1PO4DmndSoil_vr(L)+RootH1PO4DmndSoil_pvr(N,L,NZ)
-      REcoNH4DmndBand_vr(L)=REcoNH4DmndBand_vr(L)+RootNH4DmndBand_pvr(N,L,NZ)
-      REcoNO3DmndBand_vr(L)=REcoNO3DmndBand_vr(L)+RootNO3DmndBand_pvr(N,L,NZ)
-      REcoH2PO4DmndBand_vr(L)=REcoH2PO4DmndBand_vr(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
-      REcoH1PO4DmndBand_vr(L)=REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
+      REcoO2DmndResp_vr(L)    = REcoO2DmndResp_vr(L)+RootO2Dmnd4Resp_pvr(N,L,NZ)
+      REcoNH4DmndSoil_vr(L)   = REcoNH4DmndSoil_vr(L)+RootNH4DmndSoil_pvr(N,L,NZ)
+      REcoNO3DmndSoil_vr(L)   = REcoNO3DmndSoil_vr(L)+RootNO3DmndSoil_pvr(N,L,NZ)
+      REcoH2PO4DmndSoil_vr(L) = REcoH2PO4DmndSoil_vr(L)+RootH2PO4DmndSoil_pvr(N,L,NZ)
+      REcoH1PO4DmndSoil_vr(L) = REcoH1PO4DmndSoil_vr(L)+RootH1PO4DmndSoil_pvr(N,L,NZ)
+      REcoNH4DmndBand_vr(L)   = REcoNH4DmndBand_vr(L)+RootNH4DmndBand_pvr(N,L,NZ)
+      REcoNO3DmndBand_vr(L)   = REcoNO3DmndBand_vr(L)+RootNO3DmndBand_pvr(N,L,NZ)
+      REcoH2PO4DmndBand_vr(L) = REcoH2PO4DmndBand_vr(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
+      REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
   ENDDO
   end associate
@@ -377,7 +378,7 @@ module ExtractsMod
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanopyWat_col          = CanopyWat_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
-  QVegET_col               = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
   ENGYC                  = VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   CanopyHeatStor_col     = CanopyHeatStor_col+ENGYC

@@ -99,7 +99,7 @@ module TranspNoSaltMod
   MX=0
   DO  MM=1,NPG
     !compute the ordinal number of the intermediate forcing used for 
-    !current iteration
+    !current iteration in the moisture-heat iteration
     M=MIN(NPH,INT((MM-1)*dt_GasCyc)+1)
 
     call ModelTracerHydroFluxMM(I,J,M,MX,NHW, NHE, NVN, NVS,WaterFlow2Soil,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
@@ -113,6 +113,7 @@ module TranspNoSaltMod
     !MX records the M location in the moisture-heat calculation
     MX=M
   ENDDO
+
   call PrintInfo('end '//subname)
   
   END subroutine TranspNoSalt
@@ -313,13 +314,12 @@ module TranspNoSaltMod
   integer, intent(in) :: M,NY,NX,MX
   real(r8), intent(in) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)
   integer :: L,K,idg,ids,idom
+  logical :: lbegIterM
 
-!     STATE VARIABLES FOR SOLUTES IN MICROPORES AND
-!     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, MICROBIAL
-!     AND ROOT EXCHANGE IN 'NITRO' AND 'UPTAKE', AND EQUILIBRIUM
-!     REACTIONS IN 'SOLUTE'
+  !begin_execution
 
-  IF(M.NE.MX)THEN
+  lbegIterM=M.NE.MX
+  IF(lbegIterM)THEN
     DO L=NU(NY,NX),NL(NY,NX)    
       IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN        
         DO ids=ids_beg,ids_end
@@ -345,18 +345,15 @@ module TranspNoSaltMod
         ENDDO
 
         DO ids=ids_beg,ids_end
-          trcs_solml2_vr(ids,L,NY,NX) = trcs_solml2_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX)
-          trcs_solml2_vr(ids,L,NY,NX) = fixnegmass(trcs_solml2_vr(ids,L,NY,NX))
-          
-          trcs_soHml2_vr(ids,L,NY,NX) = trcs_soHml2_vr(ids,L,NY,NX)+trcs_Transp2Macp_flxM_vr(ids,L,NY,NX)
-          trcs_soHml2_vr(ids,L,NY,NX) = fixnegmass(trcs_soHml2_vr(ids,L,NY,NX))
-
+          trcs_solml2_vr(ids,L,NY,NX) = AZMAX1(trcs_solml2_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX))          
+          trcs_soHml2_vr(ids,L,NY,NX) = AZMAX1(trcs_soHml2_vr(ids,L,NY,NX)+trcs_Transp2Macp_flxM_vr(ids,L,NY,NX))
 
           trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)=flux_mass_limiter(trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX),&
             trcs_solml2_vr(ids,L,NY,NX),trcs_soHml2_vr(ids,L,NY,NX))
 
           trcs_solml2_vr(ids,L,NY,NX) = trcs_solml2_vr(ids,L,NY,NX)+trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
           trcs_soHml2_vr(ids,L,NY,NX) = trcs_soHml2_vr(ids,L,NY,NX)-trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
+
           if(abs(trcs_solml2_vr(ids,L,NY,NX))>1.e10)then
             write(*,*)ids,L,NY,NX
             write(*,*)trcs_solml2_vr(ids,L,NY,NX),trcs_Transp2Micp_flxM_vr(ids,L,NY,NX),&
@@ -374,14 +371,17 @@ module TranspNoSaltMod
 !     MICROBIAL AND ROOT EXCHANGE IN 'NITRO' AND 'UPTAKE'
 !
     IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      DO idg=idg_beg,idg_end
-        trcs_solml2_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)
+      DO idg=idg_beg,idg_NH3
+        trcs_solml2_vr(idg,L,NY,NX) = trcs_solml2_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)
+        trc_gasml2_vr(idg,L,NY,NX)  = trc_gasml2_vr(idg,L,NY,NX)-RGas_Disol_FlxMM_vr(idg,L,NY,NX)
       ENDDO
+      trcs_solml2_vr(idg_NH3B,L,NY,NX) = trcs_solml2_vr(idg_NH3B,L,NY,NX)+RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX)
+      trc_gasml2_vr(idg_NH3,L,NY,NX)   = trc_gasml2_vr(idg_NH3,L,NY,NX)  -RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX)
+
       !there is no gas phase for idg_NH3B
       DO idg=idg_beg,idg_NH3
-        trc_gasml2_vr(idg,L,NY,NX)=trc_gasml2_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)-RGas_Disol_FlxMM_vr(idg,L,NY,NX)
+        trc_gasml2_vr(idg,L,NY,NX)=trc_gasml2_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)
       ENDDO
-      trc_gasml2_vr(idg_NH3,L,NY,NX)=trc_gasml2_vr(idg_NH3,L,NY,NX)-RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX)
     ENDIF
   ENDDO D9685
   end subroutine UpdateSoilTracersMM
@@ -623,6 +623,7 @@ module TranspNoSaltMod
   DO L=NU(NY,NX),NL(NY,NX)
     
     RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX))*dts_gas
+
     DO idg=idg_beg,idg_NH3-1
       if(idg/=idg_CO2 .and. idg/=idg_O2)then
         RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)+trcs_plant_uptake_vr(idg,L,NY,NX))*dts_gas

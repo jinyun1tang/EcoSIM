@@ -175,28 +175,28 @@ implicit none
 ! banded NH3 is considered as (potential) gas too. However, there
 ! is no banded gas NH3 concentration.
 
-  idg_NH3B=idg_NH3+1
-  idg_end=idg_NH3B;
+  idg_NH3B = idg_NH3+1
+  idg_end  = idg_NH3B;
 
-  ids_nuts_beg=idg_NH3;  !the first nutrient tracer, including band
-  ids_end=idg_end        !initalize the solute counter
-  ids_NH4B=addone(ids_end);
-  ids_NO3B=addone(ids_end);
-  ids_NO2B=addone(ids_end);
-  ids_H1PO4B=addone(ids_end);
-  ids_H2PO4B=addone(ids_end);
-  ids_nuts=ids_H2PO4B-ids_NH4B
+  ids_nuts_beg = idg_NH3;  !the first nutrient tracer, including band
+  ids_end      = idg_end        !initalize the solute counter
+  ids_NH4B     = addone(ids_end);
+  ids_NO3B     = addone(ids_end);
+  ids_NO2B     = addone(ids_end);
+  ids_H1PO4B   = addone(ids_end);
+  ids_H2PO4B   = addone(ids_end);
+  ids_nuts     = ids_H2PO4B-ids_NH4B
 
   ids_nutb_beg=idg_NH3B;ids_nutb_end=ids_H2PO4B
 
-  ids_NH4=addone(ids_end);
-  ids_NO3=addone(ids_end);
-  ids_NO2=addone(ids_end);
-  ids_H1PO4=addone(ids_end);
-  ids_H2PO4=addone(ids_end);
+  ids_NH4   = addone(ids_end);
+  ids_NO3   = addone(ids_end);
+  ids_NO2   = addone(ids_end);
+  ids_H1PO4 = addone(ids_end);
+  ids_H2PO4 = addone(ids_end);
 
-  ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
-  ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
+  ids_nut_beg  = ids_NH4;  !the first non-band non-gaseous nutrient tracer
+  ids_nuts_end = ids_H2PO4;!the last non-band nutrient tracer
 
   allocate(trcs_names(ids_beg:ids_end))
   trcs_names(idg_CO2)    = 'CO2';trcs_names(idg_CH4)     = 'CH4'
