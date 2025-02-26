@@ -127,6 +127,8 @@ implicit none
   real(r8),pointer   :: h1D_trcg_Ar_cumerr_col(:)
   real(r8),pointer   :: h1D_trcg_CO2_cumerr_col(:)
   real(r8),pointer   :: h1D_trcg_CH4_cumerr_col(:)
+  real(r8),pointer   :: h1D_trcg_O2_cumerr_col(:)
+  real(r8),pointer   :: h1D_trcg_N2_cumerr_col(:)
   real(r8),pointer   :: h1D_ECO_RADSW_col(:)
   real(r8),pointer   :: h1d_CAN_NEE_col(:)
   real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
@@ -585,6 +587,8 @@ implicit none
   allocate(this%h1D_tPRECIP_col(beg_col:end_col))          ;this%h1D_tPRECIP_col(:)=spval
   allocate(this%h1D_ECO_ET_col(beg_col:end_col))              ;this%h1D_ECO_ET_col(:)=spval
   allocate(this%h1D_trcg_Ar_cumerr_col(beg_col:end_col)); this%h1D_trcg_Ar_cumerr_col(:)=spval
+  allocate(this%h1D_trcg_N2_cumerr_col(beg_col:end_col)); this%h1D_trcg_N2_cumerr_col(:)=spval
+  allocate(this%h1D_trcg_O2_cumerr_col(beg_col:end_col)); this%h1D_trcg_O2_cumerr_col(:)=spval
   allocate(this%h1D_trcg_CO2_cumerr_col(beg_col:end_col)); this%h1D_trcg_CO2_cumerr_col(:)=spval
   allocate(this%h1D_trcg_CH4_cumerr_col(beg_col:end_col)); this%h1D_trcg_CH4_cumerr_col(:)=spval
   allocate(this%h1d_CAN_NEE_col(beg_col:end_col))        ; this%h1d_CAN_NEE_col(:)=spval
@@ -1264,6 +1268,14 @@ implicit none
   data1d_ptr => this%h1D_trcg_Ar_cumerr_col(beg_col:end_col)
   call hist_addfld1d(fname='Ar_cumerr_col',units='gAr/m2',avgflag='A',&
     long_name='cumulative mass error for Ar',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_trcg_O2_cumerr_col(beg_col:end_col)
+  call hist_addfld1d(fname='O2_cumerr_col',units='gO/m2',avgflag='A',&
+    long_name='cumulative mass error for O2',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_trcg_N2_cumerr_col(beg_col:end_col)
+  call hist_addfld1d(fname='N2_cumerr_col',units='gN/m2',avgflag='A',&
+    long_name='cumulative mass error for N2',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_trcg_CO2_cumerr_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_cumerr_col',units='gC/m2',avgflag='A',&
@@ -2714,6 +2726,8 @@ implicit none
       this%h1D_trcg_Ar_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_trcg_CO2_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_trcg_CH4_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_trcg_O2_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_trcg_N2_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_RADSW_col(ncol)        = MJ2W*Eco_RadSW_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)         = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)         = trc_solcl_vr(idg_NH3,0,NY,NX)

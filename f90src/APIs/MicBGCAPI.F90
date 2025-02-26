@@ -371,7 +371,7 @@ implicit none
   type(Microbe_Diag_type), intent(in) :: nmicdiag
 
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
-  integer :: NE,idom,K
+  integer :: NE,idom,K,idg
   
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
@@ -398,13 +398,14 @@ implicit none
   trcs_RMicbUptake_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
   trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb+micflx%MicrbN2Fix
   trcs_RMicbUptake_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+
   !artificial source
   if(L>0 .and. L<5)then
     trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = -0.01_r8
   else
     trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = 0._r8
   endif  
-  
+
   RNut_MicbRelease_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil

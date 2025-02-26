@@ -41,7 +41,7 @@ implicit none
   real(r8),target,allocatable ::  TempSensDecomp_vr(:,:,:)           !temperature dependense of microbial activity
   real(r8),target,allocatable ::  MoistSensDecomp_vr(:,:,:)          !moisture dependence of microbial activity
   real(r8),target,allocatable ::  SurfGasDifFlx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
-  real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink, [g d-2 h-1]
+  real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink in soil due to plant and microbial respiration, [g d-2]
   real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)          !surface gas flux, including diffusion, ebullition, wet deposition and plant transp [g d-2 h-1]
   real(r8),target,allocatable ::  GasHydroLossFlx_col(:,:,:)         !hydrological loss of volatile tracers [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]

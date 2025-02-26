@@ -3134,7 +3134,7 @@ module MicBGCMod
   real(r8) :: COXYS1,DIFOX
   real(r8) :: B,C,O2AquaDiffusvity1
   real(r8) :: OXYG1,OXYS1
-  real(r8) :: RUPMX
+  real(r8) :: RUPMAX
   real(r8) :: ROXYFX !dissolution flux
   real(r8) :: ROXYLX
   real(r8) :: RRADO,RMPOX
@@ -3196,7 +3196,7 @@ module MicBGCMod
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX             = RO2DmndHeter(NGL,K)*dts_gas
+      RUPMAX            = RO2DmndHeter(NGL,K)*dts_gas
       ROXYFX            = RO2GasXchangePrev*dts_gas*FOXYX
       O2AquaDiffusvity1 = O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
@@ -3247,7 +3247,7 @@ module MicBGCMod
           if(OXYS1<=ZEROS)then
             RMPOX=0.0_r8            
           else
-            RMPOX=TranspBasedsubstrateUptake(COXYS1,DIFOX, OXKX, RUPMX, ZEROS)
+            RMPOX=TranspBasedsubstrateUptake(COXYS1,DIFOX, OXKX, RUPMAX, ZEROS)
           endif  
   
           !apply the uptake
