@@ -1,11 +1,12 @@
 module BalancesMod
-  use data_kind_mod,  only: r8 => DAT_KIND_R8
-  use CanopyDataType, only: QVegET_col
-  use GridDataType,   only: NU, NL
-  use EcoSimConst,    only: DENSICE
-  use abortutils,     only: endrun
-  use EcoSIMCtrlMod,  only: fixWaterLevel
-  use AqueChemDatatype, only: trcg_mass_cumerr_col
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use CanopyDataType,    only: QVegET_col
+  use GridDataType,      only: NU,               NL
+  use EcoSimConst,       only: DENSICE
+  use abortutils,        only: endrun
+  use EcoSIMCtrlMod,     only: fixWaterLevel
+  use AqueChemDatatype,  only: trcg_mass_cumerr_col
+  use PlantMgmtDataType, only: iDayPlanting_pft, iDayPlantHarvest_pft
   use SoilBGCDataType
   use GridDataType
   use SurfLitterDataType
@@ -167,7 +168,7 @@ contains
 
   call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 
-  call SummarizeTracers(NHW,NHE,NVN,NVS)
+  call SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -235,27 +236,27 @@ contains
         write(110,*)'SnowMassErr_test =',SnowMassErr_test        
         write(110,*)'literH2Oerr_test =',literH2Oerr_test,LitWatMassBeg_col(NY,NX),LitWatMassEnd_col(NY,NX)
         write(110,*)'SoilWatErr_test  =',SoilWatErr_test
-        write(110,*)('=',ii=1,50)
         if(abs(SoilWatErr_test)>1.e-4_r8) &
         call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif
 
-      DO idg=idg_beg,idg_NH3        
+      DO idg=idg_beg,idg_NH3-1        
         tracer_mass_err(idg) = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
           -trcg_TotalMass_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)
         trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err(idg) 
+
+        if(abs(tracer_mass_err(idg))>1.e-2_r8)then
+          write(111,*)('-',ii=1,50)
+          write(111,*)I*1000+J,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX)
+          write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
+            trcg_TotalMass_beg_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
+          write(111,*)'mass_err        =',tracer_mass_err(idg)
+          write(111,*)'surf emis       =',SurfGasEmisFlx_col(idg,NY,NX)
+          write(111,*)'GasHydroloss    =',GasHydroLossFlx_col(idg,NY,NX)
+          write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX)
+        endif
       enddo      
 
-      if(abs(tracer_mass_err(idg_ar))>1.e-4_r8)then
-        write(111,*)('-',ii=1,50)
-        write(111,*)I*1000+J
-        write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg_ar,NY,NX),trcg_TotalMass_col(idg_ar,NY,NX),&
-          trcg_TotalMass_beg_col(idg_ar,NY,NX)-trcg_TotalMass_col(idg_ar,NY,NX)
-        write(111,*)'mass_err Ar     =',tracer_mass_err(idg_ar)
-        write(111,*)'surf emis       =',SurfGasEmisFlx_col(idg_ar,NY,NX)
-        write(111,*)'GasHydroloss    =',GasHydroLossFlx_col(idg_ar,NY,NX)
-        write(111,*)'RGasNetProd     =',RGasNetProd_col(idg_ar,NY,NX)
-      endif
       cycle      
       if(abs(HeatErr_test)>err_engy)then
         write(110,*)('-',ii=1,50)
@@ -282,42 +283,58 @@ contains
 
 
 !------------------------------------------------------------------------------------------
-  subroutine SummarizeTracers(NHW,NHE,NVN,NVS)
+  subroutine SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
   !
   !Description
   !sum up mass of tracers
   implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS  
   integer :: NY,NX
   integer :: idg,L
+  real(r8) :: trcg_snow(idg_beg:idg_NH3)
+  real(r8) :: trcg_root(idg_beg:idg_NH3)
+  real(r8) :: trcg_soil(idg_beg:idg_end)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       trcg_TotalMass_col(idg_beg:idg_end,NY,NX)=0._r8
+      trcg_snow=0._r8
+      trcg_root=0._r8
+      trcg_soil=0._r8
       DO L=NUI(NY,NX),NLI(NY,NX)
+
         DO idg=idg_beg,idg_NH3
-          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcg_gasml_vr(idg,L,NY,NX)+trcg_root_vr(idg,L,NY,NX)                  
+          trcg_soil(idg)=trcg_soil(idg) + trcg_gasml_vr(idg,L,NY,NX)
+          trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)                  
         ENDDO
 
         DO idg=idg_beg,idg_end  
-          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX) + trcs_solml_vr(idg,L,NY,NX) &
-            + trcs_soHml_vr(idg,L,NY,NX)
+          trcg_soil(idg)=trcg_soil(idg) + trcs_solml_vr(idg,L,NY,NX) + trcs_soHml_vr(idg,L,NY,NX)
         ENDDO
       ENDDO
 
       DO idg=idg_beg,idg_end  
-        trcg_soilMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)
+        trcg_soilMass_col(idg,NY,NX)=trcg_soil(idg)
       ENDDO    
 
       !Because idg_NH3B does not exist in snow
       DO idg=idg_beg,idg_NH3
         !add litter
-        trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcs_solml_vr(idg,0,NY,NX)
+        trcg_soil(idg)=trcg_soil(idg)+trcs_solml_vr(idg,0,NY,NX)
         !add now
         DO L=1,nsnol_col(NY,NX)          
-          trcg_TotalMass_col(idg,NY,NX)=trcg_TotalMass_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
+          trcg_snow(idg)=trcg_snow(idg)+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO
+      ENDDO    
+      
+      DO idg=idg_beg,idg_NH3
+        trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soil(idg)
       ENDDO
+      if(I==302 .and. J>=10)then
+        write(103,*)I*1000+J,trcs_names(idg_Ar),trcg_snow(idg_Ar),trcg_root(idg_Ar),trcg_soil(idg_Ar)
+      endif
+      trcg_TotalMass_col(idg_NH3B,NY,NX)=trcg_soilMass_col(idg_NH3B,NY,NX)
     ENDDO
   ENDDO
   end subroutine SummarizeTracers
@@ -332,7 +349,7 @@ contains
 
   call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 
-  call SummarizeTracers(NHW,NHE,NVN,NVS)
+  call SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
 
   end subroutine SummarizeTracerMass
 

@@ -1013,6 +1013,11 @@ module RedistMod
   
   DORGC                       = 0._r8
   THeatRootRelease_col(NY,NX) = 0._r8
+  !update hydrological loss 
+  DO idg=idg_beg,idg_end
+    GasHydroLossFlx_col(idg,NY,NX)=GasHydroLossFlx_col(idg,NY,NX)-trcs_TransptMicP_3D(idg,3,NL(NY,NX)+1,NY,NX) &
+      -trcs_TransptMacP_3D(idg,3,NL(NY,NX)+1,NY,NX)
+  enddo
 
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !

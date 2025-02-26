@@ -578,12 +578,6 @@ implicit none
       !
       !     NET SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
       !
-      !     T*FLS,T*FHS=net convective+diffusive solute flux through micropores,macropores
-      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from TranspNoSalt.f
-      !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-      !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-      !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-      !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
       D8585: DO K=1,jcplx
         do idom=idom_beg,idom_end
