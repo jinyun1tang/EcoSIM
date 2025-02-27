@@ -1362,13 +1362,14 @@ module UptakesMod
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                                              &
-    TdegCCanopy_pft  => plt_ew%TdegCCanopy_pft,     &
+    TdegCCanopy_pft     => plt_ew%TdegCCanopy_pft,        &
     TairK               => plt_ew%TairK,                  &
     TKC_pft             => plt_ew%TKC_pft,                &
     TKS_vr              => plt_ew%TKS_vr,                 &
     PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &
+    MaxNumRootLays      => plt_site%MaxNumRootLays ,      &
     ChillHours_pft      => plt_photo%ChillHours_pft,      &
     TempOffset_pft      => plt_pheno%TempOffset_pft,      &
     TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft,    &
@@ -1410,7 +1411,7 @@ module UptakesMod
   TKGO                  = TKGroth_pft(NZ)+TempOffset_pft(NZ)
   fTCanopyGroth_pft(NZ) = calc_canopy_grow_tempf(TKGO)
 
-  D100: DO L=NU,MaxSoiL4Root_pft(NZ)
+  D100: DO L=NU,MaxNumRootLays
     TKSO                 = TKS_vr(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ) = calc_root_grow_tempf(TKSO)
   ENDDO D100

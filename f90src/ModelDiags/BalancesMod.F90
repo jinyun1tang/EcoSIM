@@ -245,7 +245,7 @@ contains
           -trcg_TotalMass_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)
         trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err(idg) 
 
-        if(abs(tracer_mass_err(idg))>1.e-2_r8 .and. (idg==idg_O2))then
+        if(abs(tracer_mass_err(idg))>1.e-2_r8 .and. (idg==idg_CO2))then
           write(111,*)('-',ii=1,50)
           write(111,*)I*1000+J,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX)
           write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
@@ -254,6 +254,8 @@ contains
           write(111,*)'surf emis       =',SurfGasEmisFlx_col(idg,NY,NX)
           write(111,*)'GasHydroloss    =',GasHydroLossFlx_col(idg,NY,NX)
           write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX)
+          if(abs(tracer_mass_err(idg))>10._r8) &
+            call endrun('tracer'//trcs_names(idg)//' error test failure in '//trim(mod_filename)//' at line',__LINE__)
         endif
       enddo      
 

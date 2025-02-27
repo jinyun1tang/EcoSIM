@@ -448,12 +448,12 @@ module grosubsMod
 
   D9: DO N=1,MY(NZ)
     D6: DO L=NU,MaxNumRootLays
-      RootProteinC_pvr(N,L,NZ)=0._r8
-      Root1stXNumL_pvr(N,L,NZ)=0._r8
-      Root2ndXNum_pvr(N,L,NZ)=0._r8
-      RootRespPotent_pvr(N,L,NZ)=0._r8
-      RootCO2EmisPot_pvr(N,L,NZ)=0._r8
-      RootCO2Autor_pvr(N,L,NZ)=0._r8
+      RootProteinC_pvr(N,L,NZ)   = 0._r8
+      Root1stXNumL_pvr(N,L,NZ)   = 0._r8
+      Root2ndXNum_pvr(N,L,NZ)    = 0._r8
+      RootRespPotent_pvr(N,L,NZ) = 0._r8
+      RootCO2EmisPot_pvr(N,L,NZ) = 0._r8
+      RootCO2Autor_pvr(N,L,NZ)   = 0._r8
     ENDDO D6
   ENDDO D9
 !

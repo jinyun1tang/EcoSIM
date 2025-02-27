@@ -1,15 +1,16 @@
 module PlantMod
-  use data_kind_mod,   only: r8 => DAT_KIND_R8
-  use grosubsMod,      only: GrowPlants
-  use PlantPhenolMod,  only: hfuncs
-  use UptakesMod,      only: RootUptakes
-  use PlantDisturbMod, only: PrepLandscapeGrazing
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use grosubsMod,        only: GrowPlants
+  use PlantPhenolMod,    only: hfuncs
+  use UptakesMod,        only: RootUptakes
+  use PlantDisturbMod,   only: PrepLandscapeGrazing
+  use PlantMgmtDataType, only: NP
+  use EcoSIMCtrlMod,     only: lverb
   use EcoSimSumDataType
-  use EcoSIMCtrlMod, only : lverb
   use PlantAPIData  
   use PlantAPI
+  use PlantCanAPI
   use ExtractsMod
-  use PlantMgmtDataType, only : NP
   use PlantBalMod
 implicit none
   private
@@ -21,8 +22,9 @@ implicit none
   contains
 
   subroutine PlantModel(I,J,NHW,NHE,NVN,NVS)
-
-
+  !
+  !run the plant biogeochemistry model
+  !
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS

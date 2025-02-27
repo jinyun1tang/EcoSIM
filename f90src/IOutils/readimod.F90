@@ -417,8 +417,8 @@ module readiMod
     NM(NV1,NH1) = MaxNumRootLays(NV1,NH1)+NL1
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
-    NLI(NV1,NH1)=NM(NV1,NH1)+NL2
-    NL(NV1,NH1)=NLI(NV1,NH1)
+    NLI(NV1,NH1) = NM(NV1,NH1)+NL2
+    NL(NV1,NH1)  = NLI(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayBottom_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))

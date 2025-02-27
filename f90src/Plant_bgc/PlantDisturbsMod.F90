@@ -1817,7 +1817,7 @@ module PlantDisturbsMod
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
+    Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr,          &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
@@ -1833,8 +1833,8 @@ module PlantDisturbsMod
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,        &
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,        &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    &
   )
 !
