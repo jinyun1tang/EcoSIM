@@ -99,7 +99,7 @@ module RootGasMod
     FILMM_vr                 => plt_site%FILMM_vr,                    &
     RGasFlxPrev_vr           => plt_bgcr%RGasFlxPrev_vr,              &
     RO2AquaSourcePrev_vr     => plt_bgcr%RO2AquaSourcePrev_vr,        &
-    RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,              & !out: O2 uptake from O2 inside root
+    RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,              & !out: O2 uptake from inside root O2
     RAutoRootO2Limter_rpvr   => plt_rbgc%RAutoRootO2Limter_rpvr,      &
     ZERO4Uptk_pft            => plt_rbgc%ZERO4Uptk_pft,               &
     RootRespPotent_pvr       => plt_rbgc%RootRespPotent_pvr,          &
@@ -165,9 +165,6 @@ module RootGasMod
     DO idg=idg_beg,idg_end
       if(idg/=idg_O2 .and. idg/=idg_CO2)then
         trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
-        if(trc_solml_loc(idg)>1.e10_r8)then
-          write(*,*)trcs_names(idg),N,L,trcs_solml_vr(idg,L),FracPRoot4Uptake(N,L,NZ)          
-        endif
       endif
     enddo
     trc_solml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trcs_solml_vr(idg_CO2,L)*FracPRoot4Uptake(N,L,NZ))
@@ -606,11 +603,6 @@ module RootGasMod
             else
               RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+RootUptkSoiSolute(idg)
             endif
-            if(abs(RootUptkSoiSol_pvr(idg,N,L,NZ))>1.e10)then
-              write(*,*)trcs_names(idg),N,L,NZ,ROxySoil2Uptk,RootUptkSoiSolute(idg)
-              write(*,*)'root-soil gas exch'
-              stop
-            endif  
           enddo
 !
 !     ACCUMULATE ROOT-ATMOSPHERE GAS EXCHANGE TO HOURLY TIME SCALE'

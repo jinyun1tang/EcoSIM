@@ -190,9 +190,9 @@ module RedistMod
   ECO_HR_CO2_col(NY,NX)          = sum(ECO_HR_CO2_vr(0:JZ,NY,NX))
   ECO_HR_CH4_col(NY,NX)          = sum(ECO_HR_CH4_vr(0:JZ,NY,NX))
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
-  RootCO2Autor_col(NY,NX)        = sum(RootCO2Autor_vr(1:JZ,NY,NX))
+  RootCO2Autor_col(NY,NX)        = sum(RootCO2Autor_vr(NUI(NY,NX):NLI(NY,NX),NY,NX))
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)-RootCO2Autor_col(NY,NX)
-
+  if(abs(RGasNetProd_col(idg_CO2,NY,NX))>1.e10)write(*,*)'ar',RootCO2Autor_col(NY,NX)
   DO idg=idg_beg,idg_NH3  
     Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX) &
       +RGasNetProd_col(idg,NY,NX)
@@ -1176,7 +1176,8 @@ module RedistMod
       RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,L,NY,NX)
     ENDDO
     RGasNetProd_col(idg_CO2,NY,NX)=RGasNetProd_col(idg_CO2,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)
-
+    if(abs(RGasNetProd_col(idg_CO2,NY,NX))>1.e10)&
+      write(*,*)TProd_CO2_geochem_soil_vr(L,NY,NX),trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)
     ECO_HR_CO2_vr(L,NY,NX) = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
     ECO_HR_CH4_vr(L,NY,NX) = trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
 

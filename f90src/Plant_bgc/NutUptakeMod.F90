@@ -52,7 +52,7 @@ module NutUptakeMod
   call SumNutrientUptake(NZ)
 
   IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN
-    PlantO2Stress_pft(NZ)=PopPlantO2Uptake/PopPlantO2Demand
+    PlantO2Stress_pft(NZ)=AZMAX1(PopPlantO2Uptake)/PopPlantO2Demand
   ELSE
     PlantO2Stress_pft(NZ)=1.0_r8
   ENDIF    
