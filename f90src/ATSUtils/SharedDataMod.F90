@@ -70,8 +70,8 @@ Module SharedDataMod
     integer, intent(in) :: ncol  !NUMBER of cols
     !set # of soil layers
     !JZSOI=JZs
-    !write(*,*) "In Shared data before setting: "
-    !write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    write(*,*) "(InitSharedData) JX, JY, JZ, N_cells, N_cols: ", JX, JY, JZ, &
+            ncells_per_col_, ncol
     
     JX=1;JY=ncol
     JZ = ncells_per_col_
@@ -93,8 +93,8 @@ Module SharedDataMod
     allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
     !allocate(a_PORO(ncells_per_col_,ncol))
     !allocate(a_AREA3(ncells_per_col_))
-    allocate(a_NU(ncells_per_col_))
-    allocate(a_NL(ncells_per_col_))
+    allocate(a_NU(ncol))
+    allocate(a_NL(ncol))
     !allocate(a_ASP(ncells_per_col_))
     allocate(a_ALT(ncells_per_col_))
     !allocate(tairc(1:ncells_per_col_))
@@ -139,6 +139,8 @@ Module SharedDataMod
     a_NU=1
     a_NL=ncells_per_col_
 
+    write(*,*) "(InitSharedData f) JX, JY, JZ, N_cells, N_cols: ", JX, JY, JZ, &
+        ncells_per_col_, ncol
   end subroutine InitSharedData
 
 !------------------------------------------------------------------------------------------

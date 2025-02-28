@@ -8,23 +8,23 @@ git clone --recursive git@github.com:jinyun1tang/EcoSIM.git
 
 ## Building
 
-use the script to build the code:
+Use the script in the root directory to build the code:
 
 sh build_EcoSIM.sh
 
-you can also run as a bash script:
+or run it as a bash script:
 
 ./build_EcoSIM.sh
 
-This should build and link all the required tpls
+This should do everything including building and linking all the required tpls, and configuring, building and linking EcoSIM itself.
 
 The executable will be found in ./build/bin/ecosim.f90.x
 
-This has been tested with gcc on multiple systems, but not intel compilers
+This has been tested with gcc on multiple systems, but not intel compilers. See the .github/workflow/ecosim-ci.yml file for examples. You will need cmake to use the build_EcoSIM.sh script.  
 
-## additional options
+## Additional options
 
-Opening the build_EcoSIM.sh script there are some opttional parameters you can set:
+The build_EcoSIM.sh script lets you set some opttional parameters:
 
 debug=0
 mpi=0
@@ -46,7 +46,7 @@ You can also set options via the command line, for example:
 
 ./build_EcoSIM.sh CC=/path/to/cc CXX=/path/to/cxx FC=/path/to/fortran --debug --regression_test
 
-run
+Run
 
 ./build_EcoSIM.sh --help 
 

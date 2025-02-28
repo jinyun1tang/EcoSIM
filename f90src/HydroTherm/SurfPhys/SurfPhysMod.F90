@@ -327,23 +327,12 @@ contains
   LWRad2Soil_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
   LWRad2LitR_col(NY,NX) = THRYX*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*XNPR  
 
-  !write(*,*) "Radiation Props: "
-  !write(*,*) "RadSWGrnd_col(NY,NX) = ", RadSWGrnd_col(NY,NX)
-  !write(*,*) "LWRadSky_col(NY,NX) = ", LWRadSky_col(NY,NX)
-  !write(*,*) "FracSurfAsSnow_col(NY,NX) = ", FracSurfAsSnow_col(NY,NX)
-  !write(*,*) "FracSWRad2Grnd_col(NY,NX) = ", FracSWRad2Grnd_col(NY,NX)
-  !write(*,*) "LWRadCanGPrev_col(NY,NX) = ", LWRadCanGPrev_col(NY,NX)
-  !write(*,*) "FracSurfSnoFree_col(NY,NX) = ", FracSurfSnoFree_col(NY,NX)
-  !write(*,*) "FracSurfBareSoil_col(NY,NX) = ", FracSurfBareSoil_col(NY,NX)
-  !write(*,*) "FracSurfByLitR_col(NY,NX) = ", FracSurfByLitR_col(NY,NX)
-
   ! SoilEmisivity,SnowEmisivity,SurfLitREmisivity=emissivities of surface soil, snow and litter
   !stefboltz_const is stefan-boltzman constant converted into [MJ /(m^2 K^4 h)]
   Stefboltz_area          = stefboltz_const*AREA(3,NUM(NY,NX),NY,NX)
   LWEmscefSnow_col(NY,NX) = SnowEmisivity*Stefboltz_area*FracSurfAsSnow_col(NY,NX)*dts_HeatWatTP
   LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
   LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP
-  !write(*,*) "LWEmscefSnow_col = ", LWEmscefSnow_col(NY,NX)
 !
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
@@ -592,32 +581,6 @@ contains
   tHeatAir2Grnd    = Radnet2Grnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd !net energy into soil, subtracting latent heat and sensible heat
   HeatFluxAir2Soi  = tHeatAir2Grnd+HeatSensVapAir2Grnd !total heat plus convective heat > 0 to ground
 
-  !write(*,*) "printing heat flux vars: "
-  !write(*,*) "CdSoiEvap:", CdSoiEvap
-  !write(*,*) "CdSoiHSens:", CdSoiHSens
-  !write(*,*) "TKX1:", TKX1
-  !write(*,*) "VaporSoi1:", VaporSoi1
-  !write(*,*) "VapXAir2TopLay:", VapXAir2TopLay
-  !write(*,*) "LatentHeatEvapAir2Grnd:", LatentHeatEvapAir2Grnd
-  !write(*,*) "HeatSensVapAir2Grnd:", HeatSensVapAir2Grnd
-  !write(*,*) "TopLayWatVol:", TopLayWatVol
-  !write(*,*) "HeatSensAir2Grnd:", HeatSensAir2Grnd
-  !write(*,*) "tHeatAir2Grnd:", tHeatAir2Grnd
-  !write(*,*) "HeatFluxAir2Soi:", HeatFluxAir2Soi 
-  !write(*,*) "AScaledCdWOverSoil_col(NY,NX):", AScaledCdWOverSoil_col(NY,NX)
-  !write(*,*) "RAa:", RAa
-  !write(*,*) "RZ:", RZ
-  !write(*,*) "AScaledCdHOverSoil_col(NY,NX):", AScaledCdHOverSoil_col(NY,NX)
-  !write(*,*) "VPQ_col(NY,NX):", VPQ_col(NY,NX)
-  !write(*,*) "PSISV1:", PSISV1
-  !write(*,*) "RGASC:", RGASC
-  !write(*,*) "EvapLHTC:", EvapLHTC
-  !write(*,*) "cpw:", cpw
-  !write(*,*) "TKQ_col(NY,NX):", TKQ_col(NY,NX)
-  !write(*,*) "Radnet2Grnd:", Radnet2Grnd
-  !write(*,*) "dts_wat:", dts_wat
-  !write(*,*) "NUM(NY,NX):", NUM(NY,NX)
-
   end subroutine SoilSRFEnerbyBalance
 
 !------------------------------------------------------------------------------------------
@@ -710,7 +673,6 @@ contains
   Radnet2Snow          = 0._r8
   cumNetHeatFlow2Soil   = 0._r8
   HeatFluxAir2Soi1     = 0._r8
-  
   !solve for energy balance over significant snow layer 
   IF(VLSnowHeatCapM_snvr(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 !   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
@@ -727,7 +689,6 @@ contains
   HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)   = cumNetHeatFlow2Soil
   WatFLo2LitRM_col(NY,NX)                 = CumNetWatFlow2LitR
   HeatFLoByWat2LitRM_col(NY,NX)           = CumNetHeatFlow2LitR
-
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
@@ -1550,6 +1511,8 @@ contains
     VLSnowHeatCap0 = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
 
     VLDrySnoWE0_snvr(1,NY,NX)      = VLDrySnoWE0_snvr(1,NY,NX)+SnowFallt_col(NY,NX)
+    write(*,*) "(SumAftEnergyBalanceM) VLDrySnoWE0: ", VLDrySnoWE0_snvr(1,NY,NX)
+    
     VLIceSnow0_snvr(1,NY,NX)       = VLIceSnow0_snvr(1,NY,NX)+Ice2Snowt_col(NY,NX)
     VLWatSnow0_snvr(1,NY,NX)       = VLWatSnow0_snvr(1,NY,NX)+Rain2Snowt_col(NY,NX)
     VLSnowHeatCap                  = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
