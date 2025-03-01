@@ -994,7 +994,7 @@ implicit none
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft,        &
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft,     &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    SoilBulkDensity_vr         => plt_soilchem%SoilBulkDensity_vr,     &
+    SoilBulkDensity_vr        => plt_soilchem%SoilBulkDensity_vr,    &
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,    &
     C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch     &
   )  
@@ -1060,7 +1060,6 @@ implicit none
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     fRootGrowPSISense=growth function of root water potential
 !
-! Rmaint1st_CO2 = AZMAX1(RmSpecPlant*RootMyco1stElm_raxs(ielmn,N,NR,NZ))*TFN6_vr(L)
       Rmaint1st_CO2 = AZMAX1(RmSpecPlant*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ))*TFN6_vr(L)
       IF(is_root_shallow(iPlantRootProfile_pft(NZ)).OR.&
         iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
@@ -1196,17 +1195,17 @@ implicit none
           ELSE
             FRCO2=1.0_r8-TFRCO2
           ENDIF
-          TFRCO2=TFRCO2+FRCO2
-          RootRespPotent_pvr(N,LL,NZ)=RootRespPotent_pvr(N,LL,NZ)+RCO2T1st_OUltd*FRCO2
-          RootCO2EmisPot_pvr(N,LL,NZ)=RootCO2EmisPot_pvr(N,LL,NZ)+RCO2T1st_Oltd*FRCO2
-          RootCO2Autor_pvr(N,LL,NZ)=RootCO2Autor_pvr(N,LL,NZ)-RCO2T1st_Oltd*FRCO2
-          RCO2flxt=RCO2flxt-RCO2T1st_Oltd*FRCO2
+          TFRCO2                      = TFRCO2+FRCO2
+          RootRespPotent_pvr(N,LL,NZ) = RootRespPotent_pvr(N,LL,NZ)+RCO2T1st_OUltd*FRCO2
+          RootCO2EmisPot_pvr(N,LL,NZ) = RootCO2EmisPot_pvr(N,LL,NZ)+RCO2T1st_Oltd*FRCO2
+          RootCO2Autor_pvr(N,LL,NZ)   = RootCO2Autor_pvr(N,LL,NZ)-RCO2T1st_Oltd*FRCO2
+          RCO2flxt                    = RCO2flxt-RCO2T1st_Oltd*FRCO2
         ENDDO D5100
       ELSE
-        RootRespPotent_pvr(N,L,NZ)=RootRespPotent_pvr(N,L,NZ)+RCO2T1st_OUltd
-        RootCO2EmisPot_pvr(N,L,NZ)=RootCO2EmisPot_pvr(N,L,NZ)+RCO2T1st_Oltd
-        RootCO2Autor_pvr(N,L,NZ)=RootCO2Autor_pvr(N,L,NZ)-RCO2T1st_Oltd
-        RCO2flxt=RCO2flxt-RCO2T1st_Oltd
+        RootRespPotent_pvr(N,L,NZ) = RootRespPotent_pvr(N,L,NZ)+RCO2T1st_OUltd
+        RootCO2EmisPot_pvr(N,L,NZ) = RootCO2EmisPot_pvr(N,L,NZ)+RCO2T1st_Oltd
+        RootCO2Autor_pvr(N,L,NZ)   = RootCO2Autor_pvr(N,L,NZ)-RCO2T1st_Oltd
+        RCO2flxt                   = RCO2flxt-RCO2T1st_Oltd
       ENDIF
 !
 !     ALLOCATE ANY NEGATIVE PRIMARY ROOT C,N,P GROWTH TO SECONDARY

@@ -409,10 +409,10 @@ module StartsMod
     !
     PSISE_vr(L,NY,NX)               = PSIPS
     PSISoilAirEntry(L,NY,NX)        = -1.5E-03_r8
-    RGasFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
-    RGasFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
+    RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
+    RGasTranspFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
     RO2AquaSourcePrev_vr(L,NY,NX)   = 0.0_r8
-    RGasFlxPrev_vr(idg_CH4,L,NY,NX) = 0.0_r8
+    RGasTranspFlxPrev_vr(idg_CH4,L,NY,NX) = 0.0_r8
     RCH4PhysexchPrev_vr(L,NY,NX)    = 0.0_r8
 
     IF(L.GT.0)THEN

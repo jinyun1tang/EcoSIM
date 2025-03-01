@@ -43,13 +43,13 @@ fixClime    = .true.
 
 !namelist for timer
 &ecosim_time
-rest_opt='nyears'  !'ndays','nmonths','nyears'
-rest_frq=1
-delta_time=3600.
-stop_option='nyears' !run by nyears, nmonths, ndays,
-stop_n=2            !this shall overwrite what is set in forc_periods
-diag_frq=1
-diag_opt='nsteps'
+rest_opt    = 'nyears'  !'ndays',      'nmonths', 'nyears'
+rest_frq    = 1
+delta_time  = 3600.
+stop_option = 'ndays' !run by nyears, nmonths,   ndays,
+stop_n      = 144            !this shall overwrite what is set in forc_periods
+diag_frq    = 1
+diag_opt    = 'nsteps'
 /
 
 

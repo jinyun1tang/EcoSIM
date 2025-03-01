@@ -173,7 +173,20 @@ implicit none
        long_name='Roughness height', units='m', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
   endif
-
+  
+  if(flag=='read')then
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
+       long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
+       data=datpr1, missing_value=spval, fill_value=spval)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+  else     
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
+       long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
+       data=datpr1, missing_value=spval, fill_value=spval)
+  endif
 
   if(flag=='read')then
     dat1pr=>datic_1d
@@ -6675,16 +6688,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RGasFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
+    call restartvar(ncid, flag, varname='RGasTranspFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
        dim3name='levsoi1',long_name='net gaseous flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RGasFlxPrev_vr,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RGasTranspFlxPrev_vr,datrc_3d)     
   else
     !print*,'RO2GasXchangePrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RGasFlxPrev_vr,datrc_3d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RGasTranspFlxPrev_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RGasFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
+    call restartvar(ncid, flag, varname='RGasTranspFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
        dim3name='levsoi1',long_name='net gaseous flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  

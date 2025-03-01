@@ -171,7 +171,6 @@ module Hour1Mod
 !
 !     IF SOC FLAG IS SET
 !
-
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
         call UpdateTotalSOC(NY,NX)
       ENDIF
@@ -724,7 +723,7 @@ module Hour1Mod
 
   integer :: L
 !     begin_execution
-
+  RootCO2AutorPrev_col(NY,NX) = RootCO2Autor_col(NY,NX)
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   Soil_Gas_pressure_vr(:,NY,NX)           =0._r8
   Gas_WetDeposition_col(:,NY,NX)          = 0._r8
@@ -771,7 +770,7 @@ module Hour1Mod
 
   GasHydroLossFlx_col(idg_beg:idg_end,NY,NX)         = 0._r8
   SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
-  SurfGasDifFlx_col(idg_beg:idg_NH3,NY,NX)           = 0._r8
+  GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)           = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
   HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8
   TLitrIceFlxThaw_col(NY,NX)                         = 0._r8
@@ -832,14 +831,14 @@ module Hour1Mod
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL(NY,NX),NY,NX) = 0._r8
   HeatSource_col(NY,NX)                                                       = 0._r8
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)                 = 0._r8
-  RProd_Hp_vr(0:NL(NY,NX),NY,NX)                                                    = 0._r8
-  trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)              = 0._r8
-  TRChem_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                           = 0._r8
-  TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                        = 0._r8
+  RProd_Hp_vr(0:NL(NY,NX),NY,NX)                                              = 0._r8
+  trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)            = 0._r8
+  TRChem_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
+  TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
-  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)              = 0._r8
-  TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
-  THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                       = 0._r8
+  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)           = 0._r8
+  TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                     = 0._r8
+  THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
   RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)                            = 0._r8
@@ -2345,7 +2344,7 @@ module Hour1Mod
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)   = 0._r8
     tRootCO2Emis2Root_vr(L,NY,NX)                        = 0._r8
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = 0._r8
-    tRO2MicrbUptk_vr(L,NY,NX)                       = 0._r8
+    RUptkRootO2_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 
     trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
@@ -2393,7 +2392,7 @@ module Hour1Mod
 
   ENDDO
   trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
-  trcg_pltroot_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
+  trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
   end subroutine ZeroHourlyArrays
 
 !------------------------------------------------------------------------------------------
