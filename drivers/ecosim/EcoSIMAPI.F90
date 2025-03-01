@@ -36,7 +36,8 @@ contains
 
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
-  !print*,'hour1'
+  
+  !do surface energy and water processes
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
 
   if(do_timing)call end_timer('HOUR1',t1)

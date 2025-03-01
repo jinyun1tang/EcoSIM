@@ -7,7 +7,7 @@ module MicBGCMod
   use data_kind_mod,        only: r8 => DAT_KIND_R8
   use abortutils,           only: endrun,   destroy
   use EcoSIMCtrlMod,        only: etimer
-  use minimathmod,          only: safe_adb, AZMAX1
+  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
@@ -2124,7 +2124,7 @@ module MicBGCMod
     REcoDOMProd                  => micflx%REcoDOMProd                   &
   )
   D650: DO K=1,jcplx
-    IF(.not.litrm.OR.(K.NE.k_POM .AND. K.NE.k_humus))THEN
+    IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       DO N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGnio(N),JGnfo(N)
           naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilHeter(NGL,K)
@@ -2214,7 +2214,7 @@ module MicBGCMod
 !     ALLOCATE AGGREGATED TRANSFOMBioResduATIONS INTO ARRAYS TO UPDATE
 !     STATE VARIABLES IN 'REDIST'
 !
-!     RCO2NetUptkMicb=net CO2 uptake
+!     RCO2NetUptkMicb=net CO2 uptake, < 0 producig CO2
 !     tRCO2MicrbProd total CO2 emission by heterotrophs reducing O2
 !     tRNOxMicrbRedux=total CO2 emission by denitrifiers reducing NOx
 !     RSOxidSoilAutor(3)=CH4 oxidation
@@ -2348,11 +2348,12 @@ module MicBGCMod
     micfor,naqfdiag,nmicf,nmics,micflx)
   implicit none
   integer, intent(in) :: NGL,N,K
-  real(r8), intent(out):: FOXYX   !fraction of demand over all demand
-  real(r8), intent(out):: FNH4X
-  real(r8),intent(out) :: FNB3X,FNB4X,FNO3X
-  real(r8),intent(out) :: FPO4X,FPOBX,FP14X,FP1BX
-  real(r8),intent(out) :: FOQC,FOQA
+  real(r8), intent(out):: FOXYX                  !fraction of O2 demand over all plant+microbial demand
+  real(r8), intent(out):: FNH4X,FNB4X            !fraction of NH4 demand over all plant+microbial demand, soil/band 
+  real(r8),intent(out) :: FNO3X,FNB3X            !fraction of NO3 demand over all plant+microbial demand, soil/band
+  real(r8),intent(out) :: FPO4X,FPOBX            !fraction of H2PO4 demand over all plant+microbial demand, soil/band
+  real(r8), intent(out):: FP14X,FP1BX            !fraction of H1PO4 demand over all plant+microbial demand, soil/band
+  real(r8),intent(out) :: FOQC,FOQA              !fraction of DOC or acetate demand over all microbial demand, soil/band
   type(micforctype), intent(in) :: micfor
   type(Cumlate_Flux_Diag_type),INTENT(INOUT)::  naqfdiag
   type(Microbe_State_type), intent(inout) :: nmics
@@ -3045,24 +3046,24 @@ module MicBGCMod
   ELSE
     FVMXDX=0.0_r8
   ENDIF
-  VMXD2S=VMXDXS*FVMXDX
-  VMXD2B=VMXDXB*FVMXDX
-  OQCZ2=AZMAX1(OQCZ3-RNOxReduxRespDenitLim3)
-  OQCD2=OQCZ2/eQNO2toOxy
-  OQCD2S=OQCD2*FNO3S
-  OQCD2B=OQCD2*FNO3B
-  ZNO2SX=(ZNO2S+RNO3ReduxHeterSoil(NGL,K))*FNO2
-  ZNO2BX=(ZNO2B+RNO3ReduxHeterBand(NGL,K))*FNB2
-  RNO2UptkSoil=AZMAX1(AMIN1(ZNO2SX,VMXD2S))
-  RNO2UptkBand=AZMAX1(AMIN1(ZNO2BX,VMXD2B))
-  RNO2ReduxHeterSoil(NGL,K)=AZMAX1(AMIN1(VMXD2S,OQCD2S,ZNO2SX))
-  RNO2ReduxHeterBand(NGL,K)=AZMAX1(AMIN1(VMXD2B,OQCD2B,ZNO2BX))
-  RDN2X=RNO2UptkSoil+RNO2UptkBand
-  RDN2T=RNO2ReduxHeterSoil(NGL,K)+RNO2ReduxHeterBand(NGL,K)
-  RGOM2X=eQNO2toOxy*RDN2X
-  RNOxReduxRespDenitLim2=eQNO2toOxy*RDN2T
-  RNO2DmndReduxSoilHeter(NGL,K)=VMXD2S
-  RNO2DmndReduxBandHeter(NGL,K)=VMXD2B
+  VMXD2S                        = VMXDXS*FVMXDX
+  VMXD2B                        = VMXDXB*FVMXDX
+  OQCZ2                         = AZMAX1(OQCZ3-RNOxReduxRespDenitLim3)
+  OQCD2                         = OQCZ2/eQNO2toOxy
+  OQCD2S                        = OQCD2*FNO3S
+  OQCD2B                        = OQCD2*FNO3B
+  ZNO2SX                        = (ZNO2S+RNO3ReduxHeterSoil(NGL,K))*FNO2
+  ZNO2BX                        = (ZNO2B+RNO3ReduxHeterBand(NGL,K))*FNB2
+  RNO2UptkSoil                  = AZMAX1(AMIN1(ZNO2SX,VMXD2S))
+  RNO2UptkBand                  = AZMAX1(AMIN1(ZNO2BX,VMXD2B))
+  RNO2ReduxHeterSoil(NGL,K)     = AZMAX1(AMIN1(VMXD2S,OQCD2S,ZNO2SX))
+  RNO2ReduxHeterBand(NGL,K)     = AZMAX1(AMIN1(VMXD2B,OQCD2B,ZNO2BX))
+  RDN2X                         = RNO2UptkSoil+RNO2UptkBand
+  RDN2T                         = RNO2ReduxHeterSoil(NGL,K)+RNO2ReduxHeterBand(NGL,K)
+  RGOM2X                        = eQNO2toOxy*RDN2X
+  RNOxReduxRespDenitLim2        = eQNO2toOxy*RDN2T
+  RNO2DmndReduxSoilHeter(NGL,K) = VMXD2S
+  RNO2DmndReduxBandHeter(NGL,K) = VMXD2B
 !
 !     FACTOR TO CONSTRAIN N2O UPAKE AMONG COMPETING MICROBIAL
 !     AND ROOT POPULATIONS
@@ -3101,14 +3102,14 @@ module MicBGCMod
   ELSE
     FVMXDX=0.0_r8
   ENDIF
-  VMXD1S=VMXDXS*FVMXDX
-  OQCZ1=AZMAX1(OQCZ2-RNOxReduxRespDenitLim2)
-  OQCD1=OQCZ1/eQN2OtoOxy
-  Z2OSX=(Z2OS+RDN2T)*FN2O
-  RDN2OX=AZMAX1(AMIN1(Z2OSX,VMXD1S))
-  RN2OReduxHeter(NGL,K)=AZMAX1(AMIN1(VMXD1S,OQCD1,Z2OSX))
-  RGOM1X=eQN2OtoOxy*RDN2OX
-  RNOxReduxRespDenitLim1=eQN2OtoOxy*RN2OReduxHeter(NGL,K)
+  VMXD1S                 = VMXDXS*FVMXDX
+  OQCZ1                  = AZMAX1(OQCZ2-RNOxReduxRespDenitLim2)
+  OQCD1                  = OQCZ1/eQN2OtoOxy
+  Z2OSX                  = (Z2OS+RDN2T)*FN2O
+  RDN2OX                 = AZMAX1(AMIN1(Z2OSX,VMXD1S))
+  RN2OReduxHeter(NGL,K)  = AZMAX1(AMIN1(VMXD1S,OQCD1,Z2OSX))
+  RGOM1X                 = eQN2OtoOxy*RDN2OX
+  RNOxReduxRespDenitLim1 = eQN2OtoOxy*RN2OReduxHeter(NGL,K)
   RNOxReduxRespDenitUlm(NGL,K)=RGOM3X+RGOM2X+RGOM1X
   RNOxReduxRespDenitLim(NGL,K)=RNOxReduxRespDenitLim3+RNOxReduxRespDenitLim2+RNOxReduxRespDenitLim1
   RN2ODmndReduxHeter(NGL,K)=VMXD1S
@@ -3142,7 +3143,7 @@ module MicBGCMod
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
   real(r8) :: X
-  real(r8) :: VOLWPM
+  real(r8) :: VOLWPM,VOLOXM
   real(r8) :: dsignO2
   ! begin_execution
   associate(                                                 &
@@ -3165,7 +3166,7 @@ module MicBGCMod
     COXYE                  => micfor%COXYE,                  &
     RO2GasXchangePrev      => micfor%RO2GasXchangePrev,      &
     RO2AquaXchangePrev     => micfor%RO2AquaXchangePrev,     &
-    Irrig2LitRSurf_col         => micfor%Irrig2LitRSurf_col,         &
+    Irrig2LitRSurf_col     => micfor%Irrig2LitRSurf_col,     &
     Rain2LitRSurf          => micfor%Rain2LitRSurf,          &
     litrm                  => micfor%litrm,                  &
     O2AquaDiffusvity       => micfor%O2AquaDiffusvity,       &
@@ -3197,19 +3198,21 @@ module MicBGCMod
       !     POPULATION
       !
       RUPMAX            = RO2DmndHeter(NGL,K)*dts_gas
-      ROXYFX            = RO2GasXchangePrev*dts_gas*FOXYX
+      ROXYFX            = -RO2GasXchangePrev*dts_gas*FOXYX
       O2AquaDiffusvity1 = O2AquaDiffusvity*dts_gas
+
       IF(.not.litrm)THEN
         OXYG1  = OXYG*FOXYX
-        ROXYLX = RO2AquaXchangePrev*dts_gas*FOXYX
+        ROXYLX = -RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
+        !litter layer
         OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
+        ROXYLX = -(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc+Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
-      if(OXYS <= 0._r8 .and. ROXYLX < 0._r8)then 
-        ROXYLX=0._r8
-      endif        
       OXYS1=OXYS*FOXYX
+
+      if(OXYS1 <= 0._r8 .and. ROXYLX > 0._r8)ROXYLX=0._r8      
+      IF(OXYG1 <=0._r8 .and. ROXYFX>0._R8)ROXYFX=0._r8        
 !
       !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
 !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
@@ -3237,13 +3240,14 @@ module MicBGCMod
         VOLWOX = VLWatMicPM(M)*O2GSolubility
         VOLPOX = VLsoiAirPM(M)
         VOLWPM = VOLWOX+VOLPOX
-
+        VOLOXM = VLWatMicPM(M)*FOXYX
         D425: DO MX=1,NPT
-          OXYG1  = OXYG1+ROXYFX
-          OXYS1  = OXYS1+ROXYLX
-          COXYS1 = AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
+          call fixEXConsumpFlux(OXYG1,ROXYFX)
+          call fixEXConsumpFlux(OXYS1,ROXYLX)
 
-          !obtain uptake flux
+          COXYS1 = AMIN1(COXYE*O2GSolubility,safe_adb(OXYS1,VOLOXM))
+
+          !obtain O2 uptake flux
           if(OXYS1<=ZEROS)then
             RMPOX=0.0_r8            
           else
@@ -3251,11 +3255,12 @@ module MicBGCMod
           endif  
   
           !apply the uptake
-          OXYS1=OXYS1-RMPOX
+          call fixEXConsumpFlux(OXYS1,RMPOX)
 
           !apply dissolution-volatilization
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=AMAX1(AMIN1(ROXDFQ,OXYG1),-OXYS1)
           ELSE
             ROXDFQ=0.0_r8
           ENDIF

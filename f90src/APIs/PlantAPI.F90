@@ -139,7 +139,7 @@ implicit none
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
     tRootCO2Emis2Root_vr(L,NY,NX)                 = plt_bgcr%tRootCO2Emis2Root_vr(L)
-    tRO2MicrbUptk_vr(L,NY,NX)                     = plt_bgcr%tRO2MicrbUptk_vr(L)
+    RUptkRootO2_vr(L,NY,NX)                     = plt_bgcr%RUptkRootO2_vr(L)
     
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)
     DO  K=1,jcplx
@@ -553,9 +553,10 @@ implicit none
         RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)           = plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)
         RootCO2Autor_vr(L,NY,NX)                       = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)
       ENDDO
+      RootCO2Autor_col(NY,NX) = RootCO2Autor_col(NY,NX)+RootCO2Autor_vr(L,NY,NX)
     ENDDO
 
-    DO NR=1,NumOfCanopyLayers
+    DO NR=1,pltpar%MaxNumRootAxes
       NIXBotRootLayer_rpft(NR,NZ,NY,NX)=plt_morph%NIXBotRootLayer_rpft(NR,NZ)
       DO N=1,MY(NZ,NY,NX)
         RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)
@@ -705,34 +706,34 @@ implicit none
     plt_soilchem%trcg_gasml_vr(idg_beg:idg_NH3,L) = trcg_gasml_vr(idg_beg:idg_NH3,L,NY,NX)
   ENDDO
 
-  DO L=0,NL(NY,NX)
-    plt_site%AREA3(L)                                 = AREA(3,L,NY,NX)
-    plt_soilchem%SoilBulkDensity_vr(L)                = SoilBulkDensity_vr(L,NY,NX)
-    plt_soilchem%trc_solcl_vr(ids_beg:ids_end,L)      = trc_solcl_vr(ids_beg:ids_end,L,NY,NX)
-    plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L) = SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
-    plt_soilchem%trcg_gascl_vr(idg_beg:idg_NH3,L)     = trcg_gascl_vr(idg_beg:idg_NH3,L,NY,NX)
-    plt_soilchem%CSoilOrgM_vr(ielmc,L)                = CSoilOrgM_vr(ielmc,L,NY,NX)
-    plt_site%CumSoilThickness_vr(L)                   = CumSoilThickness_vr(L,NY,NX)
-    plt_site%FracSoiAsMicP_vr(L)                      = FracSoiAsMicP_vr(L,NY,NX)
-    plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)     = trcs_solml_vr(ids_beg:ids_end,L,NY,NX)
-    plt_soilchem%GasSolbility_vr(idg_beg:idg_NH3,L) = GasSolbility_vr(idg_beg:idg_NH3,L,NY,NX)
-
-    plt_ew%ElvAdjstedSoilH2OPSIMPa_vr(L)      = ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX)
-    plt_bgcr%RH2PO4EcoDmndSoilPrev_vr(L) = RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)
-    plt_bgcr%RH2PO4EcoDmndBandPrev_vr(L) = RH2PO4EcoDmndBandPrev_vr(L,NY,NX)
-    plt_bgcr%RH1PO4EcoDmndSoilPrev_vr(L) = RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)
-    plt_bgcr%RH1PO4EcoDmndBandPrev_vr(L) = RH1PO4EcoDmndBandPrev_vr(L,NY,NX)
-    plt_bgcr%RNO3EcoDmndSoilPrev_vr(L)   = RNO3EcoDmndSoilPrev_vr(L,NY,NX)
-    plt_bgcr%RNH4EcoDmndSoilPrev_vr(L)   = RNH4EcoDmndSoilPrev_vr(L,NY,NX)
-    plt_bgcr%RNH4EcoDmndBandPrev_vr(L)   = RNH4EcoDmndBandPrev_vr(L,NY,NX)
-    plt_bgcr%RNO3EcoDmndBandPrev_vr(L)   = RNO3EcoDmndBandPrev_vr(L,NY,NX)
-    plt_bgcr%RGasFlxPrev_vr(idg_beg:idg_NH3,L) = RGasFlxPrev_vr(idg_beg:idg_NH3,L,NY,NX)
-    plt_bgcr%RO2AquaSourcePrev_vr(L)           = RO2AquaSourcePrev_vr(L,NY,NX)
-    plt_bgcr%RO2EcoDmndPrev_vr(L)              = RO2EcoDmndPrev_vr(L,NY,NX)
-    plt_ew%TKS_vr(L)                           = TKS_vr(L,NY,NX)
-
+  plt_site%CumSoilThickness_vr(0)                       = CumSoilThickness_vr(0,NY,NX)
+  DO L=1,NK(NY,NX)
+    plt_site%CumSoilThickness_vr(L)                       = CumSoilThickness_vr(L,NY,NX)
+    plt_site%AREA3(L)                                     = AREA(3,L,NY,NX)
+    plt_soilchem%SoilBulkDensity_vr(L)                    = SoilBulkDensity_vr(L,NY,NX)
+    plt_soilchem%trc_solcl_vr(ids_beg:ids_end,L)          = trc_solcl_vr(ids_beg:ids_end,L,NY,NX)
+    plt_soilchem%SoluteDifusvty_vr(ids_beg:ids_end,L)     = SoluteDifusvty_vr(ids_beg:ids_end,L,NY,NX)
+    plt_soilchem%trcg_gascl_vr(idg_beg:idg_NH3,L)         = trcg_gascl_vr(idg_beg:idg_NH3,L,NY,NX)
+    plt_soilchem%CSoilOrgM_vr(ielmc,L)                    = CSoilOrgM_vr(ielmc,L,NY,NX)
+    plt_site%FracSoiAsMicP_vr(L)                          = FracSoiAsMicP_vr(L,NY,NX)
+    plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)         = trcs_solml_vr(ids_beg:ids_end,L,NY,NX)
+    plt_soilchem%GasSolbility_vr(idg_beg:idg_NH3,L)       = GasSolbility_vr(idg_beg:idg_NH3,L,NY,NX)
+!    plt_soilchem%trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L) = trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)
+    plt_ew%ElvAdjstedSoilH2OPSIMPa_vr(L)                  = ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX)
+    plt_bgcr%RH2PO4EcoDmndSoilPrev_vr(L)                  = RH2PO4EcoDmndSoilPrev_vr(L,NY,NX)
+    plt_bgcr%RH2PO4EcoDmndBandPrev_vr(L)                  = RH2PO4EcoDmndBandPrev_vr(L,NY,NX)
+    plt_bgcr%RH1PO4EcoDmndSoilPrev_vr(L)                  = RH1PO4EcoDmndSoilPrev_vr(L,NY,NX)
+    plt_bgcr%RH1PO4EcoDmndBandPrev_vr(L)                  = RH1PO4EcoDmndBandPrev_vr(L,NY,NX)
+    plt_bgcr%RNO3EcoDmndSoilPrev_vr(L)                    = RNO3EcoDmndSoilPrev_vr(L,NY,NX)
+    plt_bgcr%RNH4EcoDmndSoilPrev_vr(L)                    = RNH4EcoDmndSoilPrev_vr(L,NY,NX)
+    plt_bgcr%RNH4EcoDmndBandPrev_vr(L)                    = RNH4EcoDmndBandPrev_vr(L,NY,NX)
+    plt_bgcr%RNO3EcoDmndBandPrev_vr(L)                    = RNO3EcoDmndBandPrev_vr(L,NY,NX)
+    plt_bgcr%RGasTranspFlxPrev_vr(idg_beg:idg_NH3,L)      = RGasTranspFlxPrev_vr(idg_beg:idg_NH3,L,NY,NX)
+    plt_bgcr%RO2AquaSourcePrev_vr(L)                      = RO2AquaSourcePrev_vr(L,NY,NX)
+    plt_bgcr%RO2EcoDmndPrev_vr(L)                         = RO2EcoDmndPrev_vr(L,NY,NX)
+    plt_ew%TKS_vr(L)                                      = TKS_vr(L,NY,NX)
     plt_soilchem%THETW_vr(L)               = THETW_vr(L,NY,NX)
-    plt_soilchem%SoilWatAirDry_vr(L)               = SoilWatAirDry_vr(L,NY,NX)
+    plt_soilchem%SoilWatAirDry_vr(L)       = SoilWatAirDry_vr(L,NY,NX)
     plt_soilchem%TScal4Difsvity_vr(L)      = TScal4Difsvity_vr(L,NY,NX)
     plt_soilchem%VLSoilPoreMicP_vr(L)      = VLSoilPoreMicP_vr(L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_H1PO4B,L) = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
@@ -745,8 +746,7 @@ implicit none
     plt_soilchem%trcs_VLN_vr(ids_NO3B,L)   = trcs_VLN_vr(ids_NO3B,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NH4,L)    = trcs_VLN_vr(ids_NH4,L,NY,NX)
     plt_soilchem%trcs_VLN_vr(ids_NH4B,L)   = trcs_VLN_vr(ids_NH4B,L,NY,NX)
-
-    plt_site%DLYR3(L)     =DLYR_3D(3,L,NY,NX)
+    plt_site%DLYR3(L)                      = DLYR_3D(3,L,NY,NX)
     DO K=1,jcplx
       plt_soilchem%FracBulkSOMC_vr(K,L)          = FracBulkSOMC_vr(K,L,NY,NX)
       plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L) = DOM_vr(idom_doc:idom_dop,K,L,NY,NX)
@@ -967,7 +967,7 @@ implicit none
     plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)         = trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_bgcr%tRootCO2Emis2Root_vr(L)                 = tRootCO2Emis2Root_vr(L,NY,NX)
-    plt_bgcr%tRO2MicrbUptk_vr(L)                     = tRO2MicrbUptk_vr(L,NY,NX)
+    plt_bgcr%RUptkRootO2_vr(L)                     = RUptkRootO2_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO
@@ -1321,7 +1321,7 @@ implicit none
       plt_morph%RootRaidus_rpft(N,NZ)       = RootRaidus_rpft(N,NZ,NY,NX)
       plt_morph%Root2ndSpecLen_pft(N,NZ)    = Root2ndSpecLen_pft(N,NZ,NY,NX)
     ENDDO
-    DO NR=1,NumOfCanopyLayers
+    DO NR=1,pltpar%MaxNumRootAxes
       plt_morph%NIXBotRootLayer_rpft(NR,NZ)=NIXBotRootLayer_rpft(NR,NZ,NY,NX)
       DO L=1,NK(NY,NX)
         DO N=1,MY(NZ,NY,NX)

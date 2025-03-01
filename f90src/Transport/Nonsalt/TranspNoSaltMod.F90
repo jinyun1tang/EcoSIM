@@ -627,9 +627,9 @@ module TranspNoSaltMod
     DO idg=idg_beg,idg_NH3-1
       if(idg/=idg_CO2 .and. idg/=idg_O2)then
         RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)+trcs_plant_uptake_vr(idg,L,NY,NX))*dts_gas
-        if(abs(RBGCSinkGasMM_vr(idg,L,NY,NX))>1.e10_r8)then
-          write(*,*)trcs_names(idg),L,NY,NX,trcs_RMicbUptake_vr(idg,L,NY,NX),trcs_plant_uptake_vr(idg,L,NY,NX)
-        endif
+!        if(abs(RBGCSinkGasMM_vr(idg,L,NY,NX))>1.e10_r8)then
+!          write(*,*)trcs_names(idg),L,NY,NX,trcs_RMicbUptake_vr(idg,L,NY,NX),trcs_plant_uptake_vr(idg,L,NY,NX)
+!        endif
       endif
     enddo
     RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TRChem_gas_NH3_geochem_vr(L,NY,NX)*dts_gas  !geochemical NH3 source 

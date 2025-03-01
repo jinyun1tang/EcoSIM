@@ -1,14 +1,14 @@
 module MicAutoCPLXMod
 ! USES:
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : safe_adb,AZMAX1
-  use MicForcTypeMod, only : micforctype
-  use MicFluxTypeMod, only: micfluxtype
-  use MicStateTraitTypeMod, only : micsttype
+  use data_kind_mod,        only: r8 => DAT_KIND_R8
+  use minimathmod,          only: safe_adb, AZMAX1, fixEXConsumpFlux
+  use MicForcTypeMod,       only: micforctype
+  use MicFluxTypeMod,       only: micfluxtype
+  use MicStateTraitTypeMod, only: micsttype
+  use EcoSiMParDataMod,     only: micpar
   use MicrobeDiagTypes
   use ElmIDMod
   use TracerIDMod
-  use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar
   use EcoSimConst
   use NitroPars
@@ -617,7 +617,7 @@ module MicAutoCPLXMod
   real(r8) :: RRADO,RMPOX,ROXDFQ
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
-  real(r8) :: X
+  real(r8) :: X,VOLOXM
   real(r8) :: VOLWPM
 
   ! begin_execution
@@ -671,17 +671,18 @@ module MicAutoCPLXMod
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=RO2DmndAutor(NGL)*dts_gas    !
-      RO2DmndX=RO2GasXchangePrev*dts_gas*FOXYX    !O2 demand
-      O2AquaDiffusvity1=O2AquaDiffusvity*dts_gas
+      RUPMX             = RO2DmndAutor(NGL)*dts_gas    !
+      RO2DmndX          = -RO2GasXchangePrev*dts_gas*FOXYX    !O2 demand
+      O2AquaDiffusvity1 = O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
         OXYG1  = OXYG*FOXYX
-        ROXYLX = RO2AquaXchangePrev*dts_gas*FOXYX
+        ROXYLX = -RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
         OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
+        ROXYLX = -(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
           +Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
+      if(OXYG1<=0._r8 .and. ROXYLX>0._r8)ROXYLX=0._r8
       OXYS1=OXYS*FOXYX
 !
       !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
@@ -710,12 +711,12 @@ module MicAutoCPLXMod
         VOLWOX = VLWatMicPM(M)*O2GSolubility
         VOLPOX = VLsoiAirPM(M)
         VOLWPM = VOLWOX+VOLPOX
-
-!oxygen uptake in the layer
+        VOLOXM = VLWatMicPM(M)*FOXYX
+        !oxygen uptake in the layer
         DO  MX=1,NPT
-          OXYG1  = OXYG1+RO2DmndX
-          OXYS1  = OXYS1+ROXYLX
-          COXYS1 = AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
+          call fixEXConsumpFlux(OXYG1,RO2DmndX)
+          call fixEXConsumpFlux(OXYS1,ROXYLX)
+          COXYS1 = AMIN1(COXYE*O2GSolubility,safe_adb(OXYS1,VOLOXM))
 
           !solve for uptake flux
           IF(OXYS1<=ZEROS)THEN
@@ -729,6 +730,7 @@ module MicAutoCPLXMod
           !apply volatilization-dissolution
           IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=AMAX1(AMIN1(OXYG1,ROXDFQ),-OXYS1)
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
@@ -1970,6 +1972,7 @@ module MicAutoCPLXMod
           DO NE=1,NumPlantChemElms
             mBiomeAutor(NE,MID3)=mBiomeAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
           ENDDO
+          !C is respired as CO2 while N and P are recycled.
           mBiomeAutor(ielmn,MID3) = mBiomeAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
           mBiomeAutor(ielmp,MID3) = mBiomeAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
           RCO2ProdAutor(NGL)      = RCO2ProdAutor(NGL)+RMaintDefcitRecycOMAutor(ielmc,M,NGL)

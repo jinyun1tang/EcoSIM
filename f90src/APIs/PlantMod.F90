@@ -48,25 +48,28 @@ implicit none
       call ZeroGrosub()  
 
       if(lverb)WRITE(*,333)'HFUNC'
-      !phenological update, determine living/active branches
+
 !     DO NZ=1,NP(NY,NX)
 !       call SumPlantBiom(I,J,NZ,'bfHFUNCS')
 !     ENDDO
-      
+      !Phenological update, determine living/active branches      
       CALL HFUNCs(I,J)
 
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
 !      ENDDO
-      !predict uptake fluxes of nutrients and O2
+
+      !Predict uptake fluxes of nutrients and O2
       if(lverb)write(*,*)'uptake'
       CALL ROOTUPTAKES(I,J)
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
 !      ENDDO
-      !do growth of active branches
+
+      !Do growth of active branches and roots
       if(lverb)write(*,*)'grosub'
       CALL GROWPLANTS(I,J)
+
       if(lverb)write(*,*)'EXTRACT'
       !aggregate varaibles
       CALL EXTRACTs(I,J)

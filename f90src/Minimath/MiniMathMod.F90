@@ -3,8 +3,10 @@ module minimathmod
 ! Description:
 ! Some small subroutines/function to do safe math.
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use fileUtil,      only: iulog
   use EcoSimConst
+
   implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -352,21 +354,38 @@ module minimathmod
   end function fixnegmass
 ! ----------------------------------------------------------------------
 
-  subroutine fixEXConsumpFlux(mass,consum_flux,ldebug)
+  subroutine fixEXConsumpFlux(mass,consum_flux,dsgn)
   implicit none
   real(r8), intent(inout) :: mass
   real(r8), intent(inout) :: consum_flux
-  logical, optional, intent(in) :: ldebug
-  logical :: lldebug
+  integer, optional, intent(in) :: dsgn
+  integer :: dsgnl
 
-  lldebug=.false.
-  if(present(ldebug))lldebug=ldebug
-  if(lldebug)write(116,*)'mass<consum_flux',mass,consum_flux
-  if(mass<consum_flux)then
-    consum_flux=mass
-    mass=0._r8
-  else
-    mass=mass-consum_flux  
+  dsgnl=1
+  if(present(dsgn))dsgnl=dsgn
+
+
+  !cut off too small mass
+  if(abs(mass)<1.e-12_r8)mass=0._r8    
+  !return for zero flux
+  if(isclose(consum_flux,0._r8))return
+
+  !udpate as mass=mass-flux
+  if(dsgn>0)then  
+    if(mass<consum_flux)then
+      consum_flux = mass
+      mass        = 0._r8
+    else
+      mass=mass-consum_flux  
+    endif
+  !update as mass=mass+flux
+  else  
+    if(mass<-consum_flux)then  
+      consum_flux = -mass
+      mass        = 0._r8
+    else
+      mass=mass+consum_flux
+    endif
   endif
   end subroutine fixEXConsumpFlux
 

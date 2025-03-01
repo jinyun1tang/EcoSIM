@@ -154,7 +154,7 @@ module ExtractsMod
     trcg_Root_gas2aqu_flx_vr => plt_rbgc%trcg_Root_gas2aqu_flx_vr, &
     trcg_air2root_flx_pvr    => plt_rbgc%trcg_air2root_flx_pvr,    &
     RootCO2Emis_pvr          => plt_rbgc%RootCO2Emis_pvr,          &
-    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,        &
+    RootUptkSoiSol_pvr       => plt_rbgc%RootUptkSoiSol_pvr,       &
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr,        &
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr,     &
     trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
@@ -174,7 +174,7 @@ module ExtractsMod
     REcoNH4DmndBand_vr       => plt_bgcr%REcoNH4DmndBand_vr,       &
     REcoO2DmndResp_vr        => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr    => plt_bgcr%tRootMycoExud2Soil_vr,    &
-    tRO2MicrbUptk_vr         => plt_bgcr%tRO2MicrbUptk_vr,         &
+    RUptkRootO2_vr           => plt_bgcr%RUptkRootO2_vr,           &
     tRootCO2Emis2Root_vr     => plt_bgcr%tRootCO2Emis2Root_vr,     &
     REcoH2PO4DmndBand_vr     => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
@@ -235,7 +235,7 @@ module ExtractsMod
       ENDDO
 
       tRootCO2Emis2Root_vr(L) = tRootCO2Emis2Root_vr(L)-RootCO2Emis_pvr(N,L,NZ)
-      tRO2MicrbUptk_vr(L)     = tRO2MicrbUptk_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+      RUptkRootO2_vr(L)       = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)

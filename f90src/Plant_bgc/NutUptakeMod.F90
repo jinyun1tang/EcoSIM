@@ -44,7 +44,6 @@ module NutUptakeMod
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
-
   call RootMycoO2NutrientUptake(I,J,NZ,PathLen_pvr,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr &
     ,PopPlantO2Uptake,PopPlantO2Demand)
@@ -1217,35 +1216,6 @@ module NutUptakeMod
   !     IN BAND AND NON-BAND SOIL ZONES FROM DEMAND CALCULATED
   !     IN PREVIOUS HOUR
   !
-  !     RO2EcoDmndPrev_vr=O2 demand by all microbial,root,myco populations
-  !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-  !     FOXYX=fraction of RO2EcoDmndPrev_vr by each root,myco population
-  !     RNH4EcoDmndSoilPrev_vr=NH4 demand in non-band by all microbial,root,myco populations
-  !     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root,myco population
-  !     FNH4X=fraction of RNH4EcoDmndSoilPrev_vr by each root,myco populn
-  !     RNH4EcoDmndBandPrev_vr=NH4 demand in band by all microbial,root,myco populations
-  !     RootNH4DmndBand_pvr=NH4 demand in band by each root,myco population
-  !     FNHBX=fraction of RNH4EcoDmndBandPrev_vr by each root,myco populn
-  !     RNO3EcoDmndSoilPrev_vr=NO3 demand in non-band by all microbial,root,myco populations
-  !     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root,myco population
-  !     FNO3X=fraction of RNO3EcoDmndSoilPrev_vr by each root,myco populn
-  !     RNO3EcoDmndBandPrev_vr=NO3 demand in band by all microbial,root,myco populations
-  !     RUNNXB=NO3 demand in band by each root,myco population
-  !     FNOBX=fraction of RNO3EcoDmndBandPrev_vr by each root,myco populn
-  !     RH2PO4EcoDmndSoilPrev_vr=H2PO4 demand in non-band by all microbial,root,myco populations
-  !     RootH2PO4DmndSoil_pvr=H2PO4 demand in non-band by each root,myco population
-  !     FPO4X=fraction of RH2PO4EcoDmndSoilPrev_vr by each root,myco populn
-  !     RH2PO4EcoDmndBandPrev_vr=H2PO4 demand in band by all microbial,root,myco populations
-  !     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root,myco population
-  !     FPOBX=fraction of RH2PO4EcoDmndBandPrev_vr by each root,myco populn
-  !     RH1PO4EcoDmndSoilPrev_vr=HPO4 demand in non-band by all microbial,root,myco populations
-  !     RootH1PO4DmndSoil_pvr=HPO4 demand in non-band by each root,myco population
-  !     FP14X=fraction of RH1PO4EcoDmndSoilPrev_vr by each root,myco populn
-  !     RH1PO4EcoDmndBandPrev_vr=HPO4 demand in band by all microbial,root,myco populations
-  !     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root,myco population
-  !     FP1BX=fraction of RH1PO4EcoDmndBandPrev_vr by each root,myco populn
-  !     MinFracPRoot4Uptake_pvr=minimum uptake fraction
-  !     FracPRoot4Uptake=PFT fraction of biome root mass
   !
   IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
     FOXYX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
@@ -1278,7 +1248,7 @@ module NutUptakeMod
     ZEROS2                 => plt_site%ZEROS2,                 &
     VLWatMicPM_vr          => plt_site%VLWatMicPM_vr,          &
     RootVH2O_pvr           => plt_morph%RootVH2O_pvr,          &
-    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
+    RootMycoExudEUptk_pvr  => plt_rbgc%RootMycoExudEUptk_pvr,  &
     FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr,    &
     DOM_vr                 => plt_soilchem%DOM_vr              &
   )

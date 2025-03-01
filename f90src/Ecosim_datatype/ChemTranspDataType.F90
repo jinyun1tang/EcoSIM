@@ -26,7 +26,7 @@ module ChemTranspDataType
 
   real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                   !solubility of gases
 
-  real(r8),target,allocatable ::  RGasFlxPrev_vr(:,:,:,:)                    !net gaseous flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RGasTranspFlxPrev_vr(:,:,:,:)                    !net gaseous flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4PhysexchPrev_vr(:,:,:)                 !net aqueous CH4 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2AquaSourcePrev_vr(:,:,:)                !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AquaIonDifusivty_vr(:,:,:,:)
@@ -70,7 +70,7 @@ module ChemTranspDataType
   allocate(Gas_Disol_Flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); Gas_Disol_Flx_vr=0._r8
   
   allocate(RCH4PhysexchPrev_vr(0:JZ,JY,JX));  RCH4PhysexchPrev_vr=0._r8
-  allocate(RGasFlxPrev_vr(idg_beg:idg_end,0:JZ,JY,JX));  RGasFlxPrev_vr=0._r8
+  allocate(RGasTranspFlxPrev_vr(idg_beg:idg_end,0:JZ,JY,JX));  RGasTranspFlxPrev_vr=0._r8
   allocate(RO2AquaSourcePrev_vr(0:JZ,JY,JX));  RO2AquaSourcePrev_vr=0._r8
 
   if(lsalt_model)then
@@ -109,7 +109,7 @@ module ChemTranspDataType
   call destroy(trcg_FloXSurRunoff_2D)
   call destroy(GasSolbility_vr)
   call destroy(AquaIonDifusivty_vr)
-  call destroy(RGasFlxPrev_vr)
+  call destroy(RGasTranspFlxPrev_vr)
   call destroy(RCH4PhysexchPrev_vr)
   call destroy(RO2AquaSourcePrev_vr)
   call destroy(DOM_FloXSurRunoff_2D)

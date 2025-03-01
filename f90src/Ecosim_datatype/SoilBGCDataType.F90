@@ -40,7 +40,7 @@ implicit none
   real(r8),target,allocatable ::  AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
   real(r8),target,allocatable ::  TempSensDecomp_vr(:,:,:)           !temperature dependense of microbial activity
   real(r8),target,allocatable ::  MoistSensDecomp_vr(:,:,:)          !moisture dependence of microbial activity
-  real(r8),target,allocatable ::  SurfGasDifFlx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
+  real(r8),target,allocatable ::  GasDiff2Surf_flx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink in soil due to plant and microbial respiration, [g d-2]
   real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)          !surface gas flux, including diffusion, ebullition, wet deposition and plant transp [g d-2 h-1]
   real(r8),target,allocatable ::  GasHydroLossFlx_col(:,:,:)         !hydrological loss of volatile tracers [g d-2 h-1]
@@ -96,7 +96,7 @@ implicit none
   real(r8),target,allocatable ::  trcg_DisolEvap_Atm2Litr_flx(:,:,:) !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_vr(:,:,:,:)           !<0., active gas bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_ebu_flx_col(:,:,:)            !vertically integrated ebullition flux [g d-2 h-1]
-  real(r8),target,allocatable ::  trcg_pltroot_flx_col(:,:,:)        !plant-aided gas transport flux [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_air2root_flx_col(:,:,:)        !plant-aided gas transport flux [g d-2 h-1]
   real(r8),target,allocatable ::  RProd_Hp_vr(:,:,:)                 !total H+ production 
   real(r8),target,allocatable ::  WaterFlowSoiMicP_3D(:,:,:,:)       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowSoiMacP_3D(:,:,:,:)       !water flux macropore, [m3 d-2 h-1]
@@ -185,7 +185,7 @@ implicit none
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
   allocate(GasHydroLossFlx_col(idg_beg:idg_end,JY,JX)); GasHydroLossFlx_col=0._r8
   allocate(SurfGasEmisFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmisFlx_col=0._r8
-  allocate(SurfGasDifFlx_col(idg_beg:idg_NH3,JY,JX)); SurfGasDifFlx_col=0._r8
+  allocate(GasDiff2Surf_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_flx_col=0._r8
   allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
   allocate(FertNFlx_CumYr_col(JY,JX));      FertNFlx_CumYr_col=0._r8
   allocate(FerPFlx_CumYr_col(JY,JX));      FerPFlx_CumYr_col=0._r8
@@ -241,7 +241,7 @@ implicit none
   allocate(trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_NH3,JY,JX));      trcg_DisolEvap_Atm2Litr_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
   allocate(trcg_ebu_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_ebu_flx_col=0._r8
-  allocate(trcg_pltroot_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_pltroot_flx_col=0._r8
+  allocate(trcg_air2root_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_air2root_flx_col=0._r8
 
   allocate(RProd_Hp_vr(0:JZ,JY,JX));  RProd_Hp_vr=0._r8
   allocate(WaterFlowSoiMicP_3D(3,JD,JV,JH));    WaterFlowSoiMicP_3D=0._r8
@@ -271,7 +271,7 @@ implicit none
   call destroy(Gas_WetDeposition_col)
   call destroy(Gas_Prod_TP_cumRes_col)
   call destroy(trcg_ebu_flx_col)
-  call destroy(trcg_pltroot_flx_col)
+  call destroy(trcg_air2root_flx_col)
   call destroy(tRDIM2DOM_col)
   call destroy(CNH4_vr)
   call destroy(CNO3_vr)
@@ -341,7 +341,7 @@ implicit none
   call destroy(LitrfalStrutElms_vr)
   call destroy(trcg_TotalMass_beg_col)
   call destroy(trcg_TotalMass_col)
-  call destroy(SurfGasDifFlx_col)
+  call destroy(GasDiff2Surf_flx_col)
   call destroy(SurfGasEmisFlx_col)
   call destroy(GasHydroLossFlx_col)
   call destroy(trcs_VLN_vr)

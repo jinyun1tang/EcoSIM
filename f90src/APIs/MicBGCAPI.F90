@@ -167,7 +167,7 @@ implicit none
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
   micfor%O2_irrig_conc       = trcg_irrig_mole_conc_col(idg_O2,NY,NX)
   micfor%O2_rain_conc        = trcg_rain_mole_conc_col(idg_O2,NY,NX)
-  micfor%Irrig2LitRSurf_col      = Irrig2LitRSurf_col(NY,NX)
+  micfor%Irrig2LitRSurf_col  = Irrig2LitRSurf_col(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)
   micfor%VLitR               = VLitR_col(NY,NX)
@@ -210,8 +210,8 @@ implicit none
   micfor%RN2OEcoUptkSoilPrev      = RN2OEcoUptkSoilPrev_vr(L,NY,NX)
   micfor%RNO2EcoUptkBandPrev      = RNO2EcoUptkBandPrev_vr(L,NY,NX)
   micfor%RO2EcoDmndPrev           = RO2EcoDmndPrev_vr(L,NY,NX)
-  micfor%RO2GasXchangePrev        = RGasFlxPrev_vr(idg_O2,L,NY,NX)
-  micfor%RCH4GasXchangePrev       = RGasFlxPrev_vr(idg_CH4,L,NY,NX)
+  micfor%RO2GasXchangePrev        = RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)
+  micfor%RCH4GasXchangePrev       = RGasTranspFlxPrev_vr(idg_CH4,L,NY,NX)
   micfor%RCH4PhysexchPrev         = RCH4PhysexchPrev_vr(L,NY,NX)
   micfor%RNH4EcoDmndBandPrev      = RNH4EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RNO3EcoDmndBandPrev      = RNO3EcoDmndBandPrev_vr(L,NY,NX)
@@ -327,9 +327,10 @@ implicit none
   micstt%CPOSC(1:jsken,1:jcplx)                            = CPOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
   micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
+
   if(.not.micfor%litrm)then
     micfor%AEC  = AEC_vr(L,NY,NX)
-    micstt%OXYG = trcg_gasml_vr(idg_O2,L,NY,NX)
+    micstt%OXYG = AZMAX1(trcg_gasml_vr(idg_O2,L,NY,NX))
   endif
   micflx%RNO2DmndSoilChemo=RNO2DmndSoilChemo_vr(L,NY,NX)
   micflx%RNO2DmndBandChemo=RNO2DmndBandChemo_vr(L,NY,NX)

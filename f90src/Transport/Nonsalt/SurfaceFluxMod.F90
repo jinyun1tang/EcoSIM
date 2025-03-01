@@ -996,8 +996,7 @@ contains
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !     seven gas species plus aqueous NH3 in band
 
-      trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX) = trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX)+RGasAtmDisol2SoilM(idg)
-      
+      trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX) = trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX)+RGasAtmDisol2SoilM(idg)      
       RGas_Dif_Atm2Soil_FlxMM(idg)           = RGasAtmDisol2SoilM(idg)*dt_GasCyc
     ENDDO
 

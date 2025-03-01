@@ -245,7 +245,7 @@ contains
           -trcg_TotalMass_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)
         trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err(idg) 
 
-        if(abs(tracer_mass_err(idg))>1.e-2_r8 .and. (idg==idg_CO2))then
+        if(abs(tracer_mass_err(idg))>1.e-1_r8)then
           write(111,*)('-',ii=1,50)
           write(111,*)I*1000+J,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX)
           write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
@@ -333,6 +333,9 @@ contains
       DO idg=idg_beg,idg_NH3
         trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soil(idg)
       ENDDO
+      if(I==135 .and. J>=10)then
+        write(115,*)I*1000+J,trcs_names(idg_O2),trcg_snow(idg_O2),trcg_root(idg_O2),trcg_soil(idg_O2)
+      endif
       trcg_TotalMass_col(idg_NH3B,NY,NX)=trcg_soilMass_col(idg_NH3B,NY,NX)
     ENDDO
   ENDDO
