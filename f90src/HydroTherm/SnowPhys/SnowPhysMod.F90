@@ -729,10 +729,6 @@ contains
       VLHeatCapSnowM1_snvr(L,NY,NX) = cps*VLDrySnoWE0M_snvr(L,NY,NX)+cpw*VLWatSnow0M_snvr(L,NY,NX)+cpi*VLIceSnow0M_snvr(L,NY,NX)
       TK1X                          = TKSnow1_snvr(L,NY,NX)
 
-      if(M.EQ.1.AND.NX.EQ.1.AND.NY.EQ.1)then
-        write(*,*) "(SnowMassUpdate) L, dVdry, dVwat, dVice = ", L, vdry-VOLS0X, vwat-VOLW0X, vice-VOLI0X
-      endif
-
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
         TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
       ELSEIF(L.EQ.1)THEN
@@ -1099,11 +1095,6 @@ contains
       ELSE
         TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
       ENDIF
-
-      if(NY.EQ.1.AND.NX.EQ.1)then
-        write(*,*) "(UpdateSnowAtM) Vdry = ", VLDrySnoWE0_snvr(1,NY,NX), " m, Vwat = ", VLWatSnow0_snvr(1,NY,NX), &
-              " m, Vice = ", VLIceSnow0_snvr(1,NY,NX)
-      endif
     endif  
   ENDIF
 
@@ -1569,9 +1560,7 @@ contains
 ! TK0,TKW=snowpack temperature
 !
 !  print*,'TKS_vr(0,NY,NX)=',TKS_vr(0,NY,NX)
-  write(*,*) "(CopySnowStates) L, VLDrySnoWE_snvr, SnowThickL_snvr, TKSnow_snvr "
   D60: DO L=1,JS
-    write(*,*) "  ", L, VLDrySnoWE_snvr(L,NY,NX), SnowThickL_snvr(L,NY,NX), TKSnow_snvr(L,NY,NX)
     VLDrySnoWE0_snvr(L,NY,NX)      = VLDrySnoWE_snvr(L,NY,NX)
     VLIceSnow0_snvr(L,NY,NX)       = VLIceSnow_snvr(L,NY,NX)
     VLWatSnow0_snvr(L,NY,NX)       = VLWatSnow_snvr(L,NY,NX)

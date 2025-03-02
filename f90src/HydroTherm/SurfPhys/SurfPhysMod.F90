@@ -275,18 +275,6 @@ contains
   !VPQ_col=vapor pressure in canopy air, 
   !TKQ=temperature in canopy air, Kelvin
 
-  !write(*,*) "For VPQ_col and TKQ calc:"
-  !write(*,*) "VPA_col(NY,NX) = ", VPA_col(NY,NX)
-  !write(*,*) "TLEX_col(NY,NX) = ", TLEX_col(NY,NX)
-  !write(*,*) "EvapLHTC = ", EvapLHTC
-  !write(*,*) "NY = ", NY
-  !write(*,*) "NX = ", NX
-  !write(*,*) "NUM(NY,NX) = ", NUM(NY,NX)
-  !write(*,*) "AREA(3,NUM(NY,NX),NY,NX) = ", AREA(3,NUM(NY,NX),NY,NX)
-  !write(*,*) "TairK_col(NY,NX) = ", TairK_col(NY,NX)
-  !write(*,*) "TSHX_col(NY,NX) = ", TSHX_col(NY,NX)
-  !write(*,*) "SpecHeatCapAir = ", SpecHeatCapAir
-
   VPQ_col(NY,NX) = VPA_col(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA(3,NUM(NY,NX),NY,NX))
   TKQ_col(NY,NX) = TairK_col(NY,NX)-TSHX_col(NY,NX)/(SpecHeatCapAir*AREA(3,NUM(NY,NX),NY,NX))
 
@@ -1511,7 +1499,6 @@ contains
     VLSnowHeatCap0 = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
 
     VLDrySnoWE0_snvr(1,NY,NX)      = VLDrySnoWE0_snvr(1,NY,NX)+SnowFallt_col(NY,NX)
-    write(*,*) "(SumAftEnergyBalanceM) VLDrySnoWE0: ", VLDrySnoWE0_snvr(1,NY,NX)
     
     VLIceSnow0_snvr(1,NY,NX)       = VLIceSnow0_snvr(1,NY,NX)+Ice2Snowt_col(NY,NX)
     VLWatSnow0_snvr(1,NY,NX)       = VLWatSnow0_snvr(1,NY,NX)+Rain2Snowt_col(NY,NX)
