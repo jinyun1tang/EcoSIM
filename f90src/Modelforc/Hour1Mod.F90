@@ -162,7 +162,7 @@ module Hour1Mod
 !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
 !
       if(lverb)write(*,*)'RESET HOURLY ACCUMULATORS'
-      call SetHourlyDiagnostics(NY,NX)
+      call SetHourlyDiagnostics(I,J,NY,NX)
 !
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
 !     AND BETWEEN SOILS AND PLANTS
@@ -415,11 +415,11 @@ module Hour1Mod
         WaterFlowSoiMicPX_3D(1:3,L,NY,NX) = 0._r8
         WaterFlowSoiMacP_3D(1:3,L,NY,NX)  = 0._r8
         HeatFlow2Soil_3D(1:3,L,NY,NX)     = 0._r8
-
-        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0._r8
-        Gas_AdvDif_Flx_3D(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
-
-        DOM_Macp_Transp_flx_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0._r8
+        RootCO2Ar2Soil_vr(L,NY,NX)        = 0._r8
+        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX)                 = 0._r8
+        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)              = 0._r8
+        Gas_AdvDif_Flx_3D(idg_beg:idg_end,1:3,L,NY,NX)                = 0._r8
+        DOM_Macp_Transp_flx_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX) = 0._r8
 
       ENDDO
     ENDDO
@@ -717,15 +717,16 @@ module Hour1Mod
   end subroutine SetLiterSoilPropAftDisturb
 !------------------------------------------------------------------------------------------
 
-  subroutine SetHourlyDiagnostics(NY,NX)
-!     implicit none
+  subroutine SetHourlyDiagnostics(I,J,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J
   integer, intent(in) :: NX,NY
 
   integer :: L
 !     begin_execution
-  RootCO2AutorPrev_col(NY,NX) = RootCO2Autor_col(NY,NX)
-  RGasNetProd_col(idg_beg:idg_NH3,NY,NX) = 0._r8
-  Soil_Gas_pressure_vr(:,NY,NX)           =0._r8
+  RootCO2AutorPrev_col(NY,NX)             = RootCO2Autor_col(NY,NX)
+  RGasNetProd_col(idg_beg:idg_NH3,NY,NX)  = 0._r8
+  Soil_Gas_pressure_vr(:,NY,NX)           = 0._r8
   Gas_WetDeposition_col(:,NY,NX)          = 0._r8
   RootCO2Autor_col(NY,NX)                 = 0._r8
   QIceInflx_vr(:,NY,NX)                   = 0._r8
@@ -741,9 +742,9 @@ module Hour1Mod
   PrecHeat2Snow_col(NY,NX)                = 0._r8
   Prec2Snow_col(NY,NX)                    = 0._r8
   ECO_HR_CO2_vr(:,NY,NX)                  = 0._r8
-  ECO_HR_CH4_vr(:,NY,NX)                  = 0._r8  
+  ECO_HR_CH4_vr(:,NY,NX)                  = 0._r8
   ECO_HR_CO2_col(NY,NX)                   = 0._r8
-  ECO_HR_CH4_col(NY,NX)                   = 0._r8  
+  ECO_HR_CH4_col(NY,NX)                   = 0._r8
   Eco_RadSW_col(NY,NX)                    = 0._r8
   RootCO2Autor_vr(:,NY,NX)                = 0._r8
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -2303,7 +2304,7 @@ module Hour1Mod
 !
 !     GAS CONCENTRATIONS
 !
-    IF(ThetaAir_vr(L,NY,NX).GT.THETX)THEN
+    IF(ThetaAir_vr(L,NY,NX).GT.AirFillPore_Min)THEN
       DO idg=idg_beg,idg_NH3
         trcg_gascl_vr(idg,L,NY,NX)=AZMAX1(trcg_gasml_vr(idg,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
       ENDDO
@@ -2339,10 +2340,12 @@ module Hour1Mod
   integer :: K,L,NTSA
 !     begin_execution
 
+  RootN2Fix_col(NY,NX) =0._r8
   DO L=NUI(NY,NX),NLI(NY,NX)
-    FWatExMacP2MicP_vr(L,NY,NX)                     = 0._r8
-    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX)   = 0._r8
-    tRootCO2Emis2Root_vr(L,NY,NX)                        = 0._r8
+    RootN2Fix_vr(L,NY,NX)                         = 0._r8
+    FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
+    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
+    tRootCO2Emis2Root_vr(L,NY,NX)                 = 0._r8
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = 0._r8
     RUptkRootO2_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
@@ -2353,7 +2356,7 @@ module Hour1Mod
     trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
     trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
     trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
-    TProd_CO2_geochem_soil_vr(L,NY,NX)               = 0._r8
+    TProd_CO2_geochem_soil_vr(L,NY,NX)          = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 
     trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8

@@ -36,7 +36,7 @@ module EcosimConst
   real(r8), parameter :: FrcAsCH4byFire=0.01_r8                    !fraction of combusted C released as CH4
   real(r8), parameter :: PSIHY=-2500.0_r8                 !hygroscopic water potential, very dry (but not air dry) [MPa]
   real(r8), parameter :: OXKM=0.080_r8                    !Km for heterotrophic O2 uptake
-  real(r8), parameter :: THETX=1.0E-03_r8                 !minimum air-filled porosity for gas transfer	[m3 m-3]
+  real(r8), parameter :: AirFillPore_Min=1.0E-03_r8                 !minimum air-filled porosity for gas transfer	[m3 m-3]
   real(r8), parameter :: THETPI=0.00_r8          !air content of ice	-
   real(r8), parameter :: DENSICE=0.92_r8-THETPI  !ice density g/cm3, ton/m3
   real(r8), parameter :: ZW=0.01_r8              !snowpack surface roughness [m]

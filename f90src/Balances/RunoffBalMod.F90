@@ -23,11 +23,11 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: RunoffBal
+  public :: RunThruGridBounds
 
   contains
 
-  subroutine RunoffBal(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine RunThruGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
   integer :: N
@@ -59,7 +59,7 @@ implicit none
               N4 = NX+1
               N5 = NY
               N6 = L
-              XN = -1.0_r8   !going out
+              XN = -1.0_r8   !going out of eastern boundary
             ELSE
               cycle
             ENDIF
@@ -69,7 +69,7 @@ implicit none
               N4 = NX
               N5 = NY
               N6 = L
-              XN = 1.0_r8    !coming in
+              XN = 1.0_r8    !coming in from western boundary
             ELSE
               cycle
             ENDIF
@@ -82,7 +82,7 @@ implicit none
               N4 = NX
               N5 = NY+1
               N6 = L
-              XN = -1.0_r8   !going out
+              XN = -1.0_r8   !going out of southern boundary
             ELSE
               cycle
             ENDIF
@@ -92,7 +92,7 @@ implicit none
               N4 = NX
               N5 = NY
               N6 = L
-              XN = 1.0_r8       !coming in
+              XN = 1.0_r8       !coming in from northern boundary
             ELSE
               cycle
             ENDIF
@@ -104,7 +104,7 @@ implicit none
               N4 = NX
               N5 = NY
               N6 = L+1
-              XN = -1.0_r8       !going out
+              XN = -1.0_r8       !going out from layer L into L+1
             ELSE
               cycle
             ENDIF
@@ -125,7 +125,7 @@ implicit none
     ENDDO D9980
   ENDDO D9985
 
-  end subroutine RunoffBal
+  end subroutine RunThruGridBounds
 
 !------------------------------------------------------------------------------------------
 

@@ -9,7 +9,6 @@ module InitVegBGC
   public :: InitIrradianceGeometry
   contains
 
-
 !------------------------------------------------------------------------------------------
   subroutine InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   use CanopyRadDataType

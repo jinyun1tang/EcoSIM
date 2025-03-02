@@ -280,6 +280,8 @@ implicit none
     LitrfalStrutElms_pvr  => plt_bgcr%LitrfalStrutElms_pvr   &
   )  
   
+  plt_rbgc%trcs_plant_uptake_vr=0._r8
+
   D9980: DO NZ=1,NP0
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs

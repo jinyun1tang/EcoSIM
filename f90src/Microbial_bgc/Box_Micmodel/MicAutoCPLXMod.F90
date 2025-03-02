@@ -728,7 +728,7 @@ module MicAutoCPLXMod
           !apply the uptake flux
           OXYS1=OXYS1-RMPOX
           !apply volatilization-dissolution
-          IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
+          IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
             ROXDFQ=AMAX1(AMIN1(OXYG1,ROXDFQ),-OXYS1)
           ELSE
@@ -1362,7 +1362,7 @@ module MicAutoCPLXMod
         endif
 
         !dissolution-vaporization
-        IF(THETPM(M).GT.THETX)THEN
+        IF(THETPM(M).GT.AirFillPore_Min)THEN
           RCHDF=DiffusivitySolutEff(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
           RCHDF=AMAX1(AMIN1(CH4G1,RCHDF),-CH4S1)
         ELSE

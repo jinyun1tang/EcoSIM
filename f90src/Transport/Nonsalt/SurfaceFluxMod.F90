@@ -769,7 +769,7 @@ contains
 !     AirFilledSoilPoreM_vr=air-filled porosity from watsub.f
 !     SoilBulkDensity_vr=bulk density
 !
-  IF(AirFilledSoilPoreM_vr(M,NU(NY,NX),NY,NX).GT.THETX .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(AirFilledSoilPoreM_vr(M,NU(NY,NX),NY,NX).GT.AirFillPore_Min .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
 !
     call TopSoilGasDifussionMM(M,NY,NX)
 

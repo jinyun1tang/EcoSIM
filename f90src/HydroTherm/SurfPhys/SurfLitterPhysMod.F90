@@ -379,7 +379,7 @@ implicit none
       ! THETPM: air-filled porosity
 
       ! Water flux by evaporation
-      IF(AirFilledSoilPoreM_vr(M,0,NY,NX).GT.THETX .AND. AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
+      IF(AirFilledSoilPoreM_vr(M,0,NY,NX).GT.AirFillPore_Min .AND. AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.AirFillPore_Min)THEN
         FLVC = CdVaporLit2Soil*(VapLitR-VaporSoi1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
         VPY  = (VapLitR*VLsoiAirPM_vr(M,0,NY,NX)+VaporSoi1*VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))/(VLsoiAirPM_vr(M,0,NY,NX)+VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))
         FLVX = (VapLitR-VPY)*VLsoiAirPM_vr(M,0,NY,NX)*XNPB

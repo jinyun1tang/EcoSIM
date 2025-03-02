@@ -108,7 +108,7 @@ module RedistMod
 !
 !     RUNOFF AND SUBSURFACE BOUNDARY FLUXES
 !
-      call RunoffBal(I,J,NY,NX,NHW,NHE,NVN,NVS)
+      call RunThruGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     CHANGE EXTERNAL WATER TABLE DEPTH THROUGH DISTURBANCE
 !
@@ -191,7 +191,7 @@ module RedistMod
   ECO_HR_CH4_col(NY,NX)          = sum(ECO_HR_CH4_vr(0:JZ,NY,NX))
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)-RootCO2AutorPrev_col(NY,NX)
-  if(abs(RGasNetProd_col(idg_CO2,NY,NX))>1.e10)write(*,*)'ar',RootCO2AutorPrev_col(NY,NX)
+  
   DO idg=idg_beg,idg_NH3  
     Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX) &
       +RGasNetProd_col(idg,NY,NX)
@@ -560,7 +560,7 @@ module RedistMod
   DO idg=idg_beg,idg_NH3-1
     RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,0,NY,NX)
   ENDDO
-
+  
   ECO_HR_CO2_vr(0,NY,NX)       = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)
   ECO_HR_CH4_vr(L,NY,NX)       = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)  
 
@@ -1064,14 +1064,16 @@ module RedistMod
     !     EXCHANGE, EQUILIBRIUM REACTIONS, GAS EXCHANGE,
     !     MICROPORE-MACROPORE EXCHANGE,
     !
+
     call fixEXConsumpFlux(trcs_solml_vr(idg_N2,L,NY,NX), Micb_N2Fixation_vr(L,NY,NX))
 
+    trcs_solml_vr(idg_CO2,L,NY,NX)=trcs_solml_vr(idg_CO2,L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)+trcs_deadroot2soil_vr(idg_CO2,L,NY,NX)
     call fixEXConsumpFlux(trcs_solml_vr(idg_CO2,L,NY,NX), TProd_CO2_geochem_soil_vr(L,NY,NX),-1)
 
     do idg=idg_beg,idg_NH3-1
 
       trcs_solml_vr(idg,L,NY,NX) = trcs_solml_vr(idg,L,NY,NX)+trcs_TransptMicP_vr(idg,L,NY,NX)+Gas_Disol_Flx_vr(idg,L,NY,NX) &
-        +trcs_Irrig_vr(idg,L,NY,NX)+trcg_ebu_flx_vr(idg,L,NY,NX)
+        +trcs_Irrig_vr(idg,L,NY,NX)+trcg_ebu_flx_vr(idg,L,NY,NX)+trcs_deadroot2soil_vr(idg,L,NY,NX)
 
        trcs_solml_vr(idg,L,NY,NX)=fixnegmass(trcs_solml_vr(idg,L,NY,NX))    
 
@@ -1162,9 +1164,10 @@ module RedistMod
     DO idg=idg_beg,idg_NH3-1
       RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,L,NY,NX)
     ENDDO
-    RGasNetProd_col(idg_CO2,NY,NX)=RGasNetProd_col(idg_CO2,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)
-    if(abs(RGasNetProd_col(idg_CO2,NY,NX))>1.e10)&
-      write(*,*)TProd_CO2_geochem_soil_vr(L,NY,NX),trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)
+    RootN2Fix_col(NY,NX) =RootN2Fix_col(NY,NX)+RootN2Fix_vr(L,NY,NX)
+    RGasNetProd_col(idg_CO2,NY,NX)= RGasNetProd_col(idg_CO2,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)
+    RGasNetProd_col(idg_N2,NY,NX) = RGasNetProd_col(idg_N2,NY,NX)-RootN2Fix_vr(L,NY,NX)
+    
     RGasNetProd_col(idg_O2,NY,NX) = RGasNetProd_col(idg_O2,NY,NX)-RUptkRootO2_vr(L,NY,NX)-trcs_plant_uptake_vr(idg_O2,L,NY,NX)
     ECO_HR_CO2_vr(L,NY,NX)        = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
     ECO_HR_CH4_vr(L,NY,NX)        = trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)

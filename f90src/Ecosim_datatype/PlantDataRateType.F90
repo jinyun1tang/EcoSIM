@@ -18,7 +18,9 @@ module PlantDataRateType
   real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
   real(r8),target,allocatable ::  RootMycoExudEUptk_pvr(:,:,:,:,:,:,:)           !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [gN d-2 h-1]
+  real(r8),target,allocatable ::  RootN2Fix_vr(:,:,:)                            !vertical profile of root N2 fixation, [gN d-2 h-1]
+  real(r8),target,allocatable ::  RootN2Fix_col(:,:)                             !root N2 fixation, [gN d-2 h-1]
   real(r8),target,allocatable ::  RootUptkSoiSol_pvr(:,:,:,:,:,:)                 !aqueous H2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)               !root uptake of H2PO4 non-band
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)               !root uptake of H2PO4 band
@@ -115,6 +117,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootCO2Autor_col(:,:)                          !current time step root autotrophic respiraiton [gC d-2 h-1]  
   real(r8),target,allocatable ::  RootCO2AutorPrev_col(:,:)                      !previous time step root autotrophic respiraiton [gC d-2 h-1]  
   real(r8),target,allocatable ::  fRootGrowPSISense_pvr(:,:,:,:,:)               !moisture dependence scalar for root growth [none]
+  real(r8),target,allocatable ::  RootCO2Ar2Soil_vr(:,:,:)                       !autotrophic root respiration released to soil [gC d-2 h-1]
+  real(r8),target,allocatable :: trcs_deadroot2soil_vr(:,:,:,:)                  !gases released to soil due to dying roots ([g d-2 h-1])
   private :: InitAllocate
   contains
 
@@ -134,6 +138,7 @@ module PlantDataRateType
   integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots    !number of root types, root,mycos
 
+  allocate(trcs_deadroot2soil_vr(idg_beg:idg_NH3,JZ,JY,JX)); trcs_deadroot2soil_vr=0._r8
   allocate(TPlantRootH2OUptake_col(JY,JX)); TPlantRootH2OUptake_col=0._r8
   allocate(CanopyGrosRCO2_pft(JP,JY,JX)); CanopyGrosRCO2_pft=0._r8
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
@@ -145,6 +150,8 @@ module PlantDataRateType
   allocate(RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));RootMycoExudEUptk_pvr=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
   allocate(RootN2Fix_pvr(JZ,JP,JY,JX)); RootN2Fix_pvr=0._r8
+  allocate(RootN2Fix_vr(JZ,JY,JX)); RootN2Fix_vr=0._r8
+  allocate(RootN2Fix_col(JY,JX)); RootN2Fix_col=0._r8  
   allocate(RootH2PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH2PO4DmndSoil_pvr=0._r8
   allocate(RootH2PO4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootH2PO4DmndBand_pvr=0._r8
   allocate(RootH1PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndSoil_pvr=0._r8
@@ -236,6 +243,7 @@ module PlantDataRateType
   allocate(RAcetateEcoDmndPrev_vr(1:jcplx,0:JZ,JY,JX));RAcetateEcoDmndPrev_vr=0._r8
   allocate(TRootH2Flx_col(JY,JX));       TRootH2Flx_col=0._r8
   allocate(RootCO2Autor_vr(JZ,JY,JX));   RootCO2Autor_vr=0._r8
+  allocate(RootCO2Ar2Soil_vr(JZ,JY,JX)); RootCO2Ar2Soil_vr=0._r8
   allocate(RootCO2Autor_col(JY,JX));     RootCO2Autor_col=0._r8
   allocate(RootCO2AutorPrev_col(JY,JX)); RootCO2AutorPrev_col=0._r8
   end subroutine InitAllocate
@@ -245,6 +253,8 @@ module PlantDataRateType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(trcs_deadroot2soil_vr)
+  call destroy(RootCO2Ar2Soil_vr)
   call destroy(RootCO2Autor_col)
   call destroy(RootCO2AutorPrev_col)
   call destroy(TPlantRootH2OUptake_col)
@@ -257,6 +267,8 @@ module PlantDataRateType
   call destroy(RootNutUptake_pvr)
   call destroy(RootUptkSoiSol_pvr)
   call destroy(RootN2Fix_pvr)
+  call destroy(RootN2Fix_vr)
+  call destroy(RootN2Fix_col)
   call destroy(RootH2PO4DmndSoil_pvr)
   call destroy(RootH2PO4DmndBand_pvr)
   call destroy(RootH1PO4DmndSoil_pvr)

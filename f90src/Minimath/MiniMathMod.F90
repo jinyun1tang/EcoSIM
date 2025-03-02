@@ -371,7 +371,7 @@ module minimathmod
   if(isclose(consum_flux,0._r8))return
 
   !udpate as mass=mass-flux
-  if(dsgn>0)then  
+  if(dsgnl>0)then  
     if(mass<consum_flux)then
       consum_flux = mass
       mass        = 0._r8

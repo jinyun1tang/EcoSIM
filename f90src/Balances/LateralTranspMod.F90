@@ -92,14 +92,14 @@ implicit none
 
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
-    !THETX minimum air-filled porosity
+    !AirFillPore_Min minimum air-filled porosity
 
     !current layer has too small air volume (aka saturated), or gas pressure is greater than atmospheric pressure
-    IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)doBubble=.true.
+    IF(ThetaAir_vr(L,NY,NX).LT.AirFillPore_Min .OR. VTGAS.GT.VTATM)doBubble=.true.
 
     !current layer has enough air, and there is not bubbling layer above, so set current layer
     !as the bubble depsoition layer 
-    IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. (.not. doBubble))LG=L
+    IF(ThetaAir_vr(L,NY,NX).GE.AirFillPore_Min .AND. (.not. doBubble))LG=L
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX

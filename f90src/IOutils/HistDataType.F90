@@ -182,6 +182,7 @@ implicit none
   real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: h1D_CO2_WetDep_FLX_col(:)
+  real(r8),pointer   :: h1D_RootN_Fix_col(:)
   real(r8),pointer   :: h1D_AR_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_Soil_N2O_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_N2_SEMIS_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -567,6 +568,7 @@ implicit none
   allocate(this%h1D_ATM_CH4_col(beg_col:end_col))         ;this%h1D_ATM_CH4_col(:)=spval
   allocate(this%h1D_NBP_col(beg_col:end_col))             ;this%h1D_NBP_col(:)=spval
   allocate(this%h1D_CO2_WetDep_FLX_col(beg_col:end_col)) ; this%h1D_CO2_WetDep_FLX_col(:)=spval
+  allocate(this%h1D_RootN_Fix_col(beg_col:end_col)); this%h1D_RootN_Fix_col(:)=spval
   allocate(this%h1D_Ar_WetDep_FLX_col(beg_col:end_col)) ; this%h1D_Ar_WetDep_FLX_col(:)=spval
   allocate(this%h1D_RUNOFF_FLX_col(beg_col:end_col)) ; this%h1D_RUNOFF_FLX_col(:)=spval
   allocate(this%h1D_SEDIMENT_FLX_col(beg_col:end_col))    ;this%h1D_SEDIMENT_FLX_col(:)=spval
@@ -1491,6 +1493,10 @@ implicit none
   call hist_addfld1d(fname='CO2_WetDep_FLX',units='gC/m2/hr',&
     avgflag='A',long_name='Wet deposition CO2 flux to soil, '// &
     'from rainfall and irrigation (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_RootN_Fix_col(beg_col:end_col)
+  call hist_addfld1d(fname='Root_N_FIX',units='gN/m2/hr',&
+    avgflag='A',long_name='Root N fixation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_AR_WetDep_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='Ar_WetDep_FLX',units='gAr/m2/hr',&
@@ -2786,7 +2792,7 @@ implicit none
       this%h1D_VHeatCap_litr_col(ncol)    = VHeatCapacity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AR_WetDep_FLX_col(ncol)    = Gas_WetDeposition_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_WetDep_FLX_col(ncol)   = Gas_WetDeposition_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      
+      this%h1D_RootN_Fix_col(ncol)  = RootN2Fix_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       call sumMicBiomLayL(0,NY,NX,micBE)      
       this%h2D_MicroBiomeE_litr_col(ncol,1:NumPlantChemElms) =micBE/AREA(3,NU(NY,NX),NY,NX)  
 

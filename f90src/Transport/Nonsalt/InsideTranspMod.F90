@@ -1,8 +1,9 @@
 module InsideTranspMod
-  use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,    only: destroy,endrun
-  use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
-  use TracerPropMod, only: MolecularWeight
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use abortutils,        only: destroy,  endrun
+  use minimathmod,       only: safe_adb, AZMAX1, AZMIN1
+  use TracerPropMod,     only: MolecularWeight
+  use PlantDataRateType, only: trcs_deadroot2soil_vr
   use DebugToolMod  
   use GridConsts
   use EcoSIMSolverPar
@@ -209,7 +210,7 @@ module InsideTranspMod
       ENDDO
       !first round of iteration M
       !add oxygen uptake here
-      RBGCSinkGasMM_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc
+      RBGCSinkGasMM_vr(idg_O2,L,NY,NX)=RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
     ENDDO
   ENDIF
 
@@ -221,7 +222,7 @@ module InsideTranspMod
   DO L=NU(NY,NX),NL(NY,NX)
     !gaseous NH3 is consumed through geochemistry
     trc_gasml2_vr(idg_NH3,L,NY,NX)  = AZMAX1(trc_gasml2_vr(idg_NH3,L,NY,NX)-RBGCSinkGasMM_vr(idg_NH3,L,NY,NX))    
-
+    
     !other gases are taken from aqueous phases
     DO idg=idg_beg,idg_NH3-1
       trcs_solml2_vr(idg,L,NY,NX) = AZMAX1(trcs_solml2_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX))
@@ -1349,22 +1350,21 @@ module InsideTranspMod
   real(r8) :: trc_gasc1(idg_beg:idg_end)
   real(r8) :: trc_gasc2(idg_beg:idg_end)
 
-  real(r8) :: CNDC1
-  real(r8) :: CNDC2
-  real(r8) :: DFLG2,DFLGL
+  real(r8) :: CNDC1   !conductance in source grid
+  real(r8) :: CNDC2   !conductance in destination grid
+  real(r8) :: DFLG2   !air-filled porosity effect on gaseous diffusivity in source
+  real(r8) :: DFLGL   !air-filled porosity effect on gaseous diffusivity in destination
   integer :: idg
 
 !     GASEOUS DIFFUSIVITIES
 !
-!     DFLG2,DFLGL=air-filled porosity effect on gaseous diffusivity in source,destination layer
+!     DFLG2,DFLGL= in source,destination layer
 !     POROQ=Penman Water Linear Reduction tortuosity from starts.f
 !     POROS=total porosity
 !     DLYR=soil layer thickness
 !     D*G=gaseous diffusivity in soil
 !     CND*1,CND*2=gaseous conductance in source,destination layer
 !     *SGL2= gaseous diffusivity in air
-!     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-!             :*ZN3*=NH3,*H2G*=H2
 !
   DFLG2=2.0_r8*AZMAX1(AirFilledSoilPoreM_vr(M,N3,N2,N1))*POROQ*AirFilledSoilPoreM_vr(M,N3,N2,N1)/POROS_vr(N3,N2,N1) &
     *AREA(N,N3,N2,N1)/DLYR_3D(N,N3,N2,N1)
@@ -1375,9 +1375,6 @@ module InsideTranspMod
 !
 !     GASOUS CONDUCTANCES
 !
-!     D*G=gaseous diffusivity in soil
-!     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-!             :*ZN3*=NH3,*H2G*=H2
 !
   DO idg=idg_beg,idg_NH3
     CNDC1=DFLG2*GasDifctScaledMM_vr(idg,N3,N2,N1)
@@ -1387,13 +1384,6 @@ module InsideTranspMod
 !
 !     GASEOUS CONCENTRATIONS FROM AIR-FILLED POROSITY
 !     IN CURRENT AND ADJACENT GRID CELLS
-!
-!     C*G1,C*G2=gaseous concentration in source,destination layer
-!     *G2=gaseous content
-!     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
-!             :*ZN3*=NH3,*H2G*=H2
-!     VLsoiAirPM=air-filled porosity
-!
 !
 !     DIFFUSIVE GAS TRANSFER DRIVEN BY GAS CONCENTRATIONS IN
 !     ADJACENT GRID CELLS
@@ -1412,7 +1402,8 @@ module InsideTranspMod
 
 
 ! ----------------------------------------------------------------------
-  subroutine GasAdvectionMM(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2SoilMM_3D)
+  subroutine UpstreamGasAdvectionMM(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2SoilMM_3D)
+
   implicit none
   real(r8), intent(in) :: WaterFlow2SoilMM_3D(3,JD,JV,JH)
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
@@ -1426,15 +1417,14 @@ module InsideTranspMod
 !
 !     by assuming volume conservation, gases and water flow in opposite direction
 !     WaterFlow2SoilMM_3D=total water flux into soil micropore+macropore from watsub.f
-!     VLsoiAirPM=air-filled porosity
-!     RFL*G=convective gas flux
-!     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
-!     *G2=gaseous content
 !
   FLQW=WaterFlow2SoilMM_3D(N,N6,N5,N4)
+  !flow out of dest grid
   IF(FLQW.GT.0.0_r8)THEN
-    IF(VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VLsoiAirPM_vr(M,N6,N5,N4)))
+    !dest grid is not saturated
+    IF(VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN   
+      VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VLsoiAirPM_vr(M,N6,N5,N4)))   !negative flow 
+    !dest grid is aturated  
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1442,6 +1432,7 @@ module InsideTranspMod
       RGasAdv                       = VFLW*AZMAX1(trc_gasml2_vr(idg,N6,N5,N4))
       RGasADFlxMM_3D(idg,N,N6,N5,N4) = RGasADFlxMM_3D(idg,N,N6,N5,N4)+RGasAdv
     ENDDO
+  !flow out of source grid  
   ELSE
     IF(VLsoiAirPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       VFLW=-AZMIN1(AMAX1(-VFLWX,FLQW/VLsoiAirPM_vr(M,N3,N2,N1)))
@@ -1454,7 +1445,7 @@ module InsideTranspMod
     ENDDO
   ENDIF
 
-  end subroutine GasAdvectionMM
+  end subroutine UpstreamGasAdvectionMM
 
 ! ----------------------------------------------------------------------
   subroutine GasTransportMM(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2SoilMM_3D)
@@ -1466,19 +1457,17 @@ module InsideTranspMod
 
 !     AirFilledSoilPoreM_vr,VLsoiAirPM=air-filled porosity,volume from watsub.f
 
-  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.THETX .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX &
-    .AND.VLsoiAirPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
-    .AND.VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.AirFillPore_Min .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.AirFillPore_Min &
+    .AND. VLsoiAirPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1) &       !source grid is not saturated
+    .AND. VLsoiAirPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN    !dest grid is not saturated
 
 !     TOTAL SOIL GAS FLUX FROM DIFFUSIVE
     call GasDiffusionMM(M,N,N1,N2,N3,N4,N5,N6)
 
 !     TOTAL SOIL GAS FLUX FROM CONVECTIVE FLUX
-    call GasAdvectionMM(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2SoilMM_3D)
+    call UpstreamGasAdvectionMM(M,N,N1,N2,N3,N4,N5,N6,WaterFlow2SoilMM_3D)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-!
-!     X*FLG=hourly total convective+diffusive gas flux
 !
     DO idg=idg_beg,idg_NH3
       Gas_AdvDif_Flx_3D(idg,N,N6,N5,N4)=Gas_AdvDif_Flx_3D(idg,N,N6,N5,N4)+RGasADFlxMM_3D(idg,N,N6,N5,N4)
@@ -1517,7 +1506,7 @@ module InsideTranspMod
 !     VLWatMicP*=equivalent aqueous volume for gas
 !
   IF(N.EQ.iVerticalDirection)THEN
-    IF(AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX)THEN
+    IF(AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.AirFillPore_Min)THEN
       do idg=idg_beg,idg_NH3-1
         RGas_Disol_FlxMM_vr(idg,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
          (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg,N6,N5,N4))*trcg_VLWatMicP_vr(idg,N6,N5,N4) &
