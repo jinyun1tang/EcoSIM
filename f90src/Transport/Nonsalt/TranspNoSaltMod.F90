@@ -622,20 +622,18 @@ module TranspNoSaltMod
 
   DO L=NU(NY,NX),NL(NY,NX)
     
-    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX))*dts_gas
+    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX) &
+      -TProd_CO2_geochem_soil_vr(L,NY,NX)-RootCO2Ar2Soil_vr(L,NY,NX)- trcs_deadroot2soil_vr(idg_CO2,L,NY,NX))*dts_gas
 
     DO idg=idg_beg,idg_NH3-1
       if(idg/=idg_CO2 .and. idg/=idg_O2)then
-        RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)+trcs_plant_uptake_vr(idg,L,NY,NX))*dts_gas
-!        if(abs(RBGCSinkGasMM_vr(idg,L,NY,NX))>1.e10_r8)then
-!          write(*,*)trcs_names(idg),L,NY,NX,trcs_RMicbUptake_vr(idg,L,NY,NX),trcs_plant_uptake_vr(idg,L,NY,NX)
-!        endif
+        RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)+trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
       endif
     enddo
     RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TRChem_gas_NH3_geochem_vr(L,NY,NX)*dts_gas  !geochemical NH3 source 
 
     RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP
-    RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)   = (-TRChem_sol_NH3_soil_vr(L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+    RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)   = (-TRChem_sol_NH3_soil_vr(L,NY,NX)-trcs_deadroot2soil_vr(idg_NH3,L,NY,NX)+trcs_plant_uptake_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_NO3,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO3,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO3,L,NY,NX)+trcs_plant_uptake_vr(ids_NO3,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_NO2,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NO2,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NO2,L,NY,NX))*dts_HeatWatTP
     RBGCSinkSoluteM_vr(ids_H2PO4,L,NY,NX) = (-RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)+trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))*dts_HeatWatTP

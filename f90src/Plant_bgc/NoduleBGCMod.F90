@@ -497,8 +497,6 @@ module NoduleBGCMod
 !     NON-STRUCTURAL C CONCENTRATION, MICROBIAL C:N:P FACTOR,
 !     AND TEMPERATURE
 !
-!     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
-!     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !     NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmn),NodulNonstElmConc(ielmp)=nonstructural C,N,P concn in bacteria
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     FCNPF=N,P constraint to bacterial activity

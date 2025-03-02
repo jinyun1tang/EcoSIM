@@ -114,7 +114,7 @@ module RootGasMod
     trcg_air2root_flx_pvr    => plt_rbgc%trcg_air2root_flx_pvr,       & !output: atmospheric gas flux to root gas concentration
     trcg_Root_gas2aqu_flx_vr => plt_rbgc%trcg_Root_gas2aqu_flx_vr,    & !output: gaseous to aqueous dissolution inside root
     RootUptkSoiSol_pvr       => plt_rbgc%RootUptkSoiSol_pvr,          &  !out: aqueous tracer uptake from soil into roots
-    RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr,            &
+    RootCO2AutorX_pvr        => plt_rbgc%RootCO2AutorX_pvr,           & !input: root respiration from previous time step [gC d-2 h-1]
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,             &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,             &
     RootGasConductance_pvr   => plt_rbgc%RootGasConductance_pvr,      &
@@ -253,7 +253,8 @@ module RootGasMod
 
     DFGP                = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
     !The root respiration below is from the previous time step
-    RootCO2Prod_tscaled = -RootCO2Autor_pvr(N,L,NZ)*dts_gas
+    RootCO2Prod_tscaled = -RootCO2AutorX_pvr(N,L,NZ)*dts_gas
+
 !
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
 !     AT SMALLER TIME STEP NPH
@@ -450,7 +451,7 @@ module RootGasMod
 
 !     VLWatMicPMM,VLsoiAirPMM=soil micropore water,air volume
 !         
-          IF(AirFilledSoilPoreM_vr(M,L).GT.THETX)THEN
+          IF(AirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min)THEN
             DiffusivitySolutEffP     = FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
             RGas_Disolv_flx(idg_CO2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))*VOLWAqueous(idg_CO2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RootUptkSoiSolute(idg_CO2))*VLsoiAirPMM) &
@@ -500,9 +501,9 @@ module RootGasMod
 !     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
           DO idg=idg_beg,idg_NH3
             trc_gasml_loc(idg)  = trc_gasml_loc(idg)-RGas_Disolv_flx(idg)+RGasTranspFlxPrev(idg)
-            if(trc_gasml_loc(idg)<0._r8)then
-              write(117,*)(I*1000+J)*10+N,'gas ',trcs_names(idg),trc_gasml_loc(idg),RGas_Disolv_flx(idg),RGasTranspFlxPrev(idg)
-            endif
+!            if(trc_gasml_loc(idg)<0._r8)then
+!              write(117,*)(I*1000+J)*10+N,'gas ',trcs_names(idg),trc_gasml_loc(idg),RGas_Disolv_flx(idg),RGasTranspFlxPrev(idg)
+!            endif
           ENDDO
 
           trc_gasml_loc(idg_NH3)  = trc_gasml_loc(idg_NH3)-RGas_Disolv_flx(idg_NH3B)
@@ -556,7 +557,7 @@ module RootGasMod
 
           DO idg=idg_beg,idg_NH3
             trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)
-            
+
             call fixEXConsumpFlux(trcg_rootml_loc(idg),trcg_air2root_flx_loc(idg),-1)
 
             if(idg==idg_O2)then
@@ -616,9 +617,9 @@ module RootGasMod
         dtrc_err(idg)=dtrc_err(idg)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       endif      
     ENDDO
-    if(I==135 .and. J>=10)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
-      trcg_rootml_beg(idg_CO2),trcs_rootml_beg(idg_CO2),RootUptkSoiSol_pvr(idg_CO2,N,L,NZ),&
-      trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)
+!    if(I==135 .and. J>=10)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
+!      trcg_rootml_beg(idg_CO2),trcs_rootml_beg(idg_CO2),RootUptkSoiSol_pvr(idg_CO2,N,L,NZ),&
+!      trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'

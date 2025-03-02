@@ -726,7 +726,7 @@ module StartsMod
   !     NPT=number of cycles per water iteration for gas flux calculations
   !     NPG=number of cycles per hour for gas flux calculations
   !     NPR,NPS=number of cycles NPH-1 for litter, snowpack flux calculns
-  !     THETX=minimum air-filled porosity for gas flux calculations
+  !     AirFillPore_Min=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSICE=ice porosity,density
   !     BulkDensLitR=surface litter bulk density, Mg m-3
 

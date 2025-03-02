@@ -60,6 +60,7 @@ implicit none
   integer :: MaxNumRootLays         !maximum root layer number
   integer :: NP         !number of plant species
   integer :: NU         !soil surface layer number
+  integer :: NK
   integer :: DazCurrYear       !number of days in current year
   integer :: iYearCurrent       !current year
 
@@ -723,7 +724,7 @@ implicit none
   real(r8), pointer :: RAutoRootO2Limter_rpvr(:,:,:)      => null()  !O2 constraint to root respiration,                              []
   real(r8), pointer :: trcg_rootml_pvr(:,:,:,:)          => null() !root gas content,                                                [g d-2]
   real(r8), pointer :: trcs_rootml_pvr(:,:,:,:)          => null() !root aqueous content,                                            [g d-2]
-  real(r8), pointer :: RootGasConductance_pvr(:,:,:,:)   => null()
+  real(r8), pointer :: RootGasConductance_pvr(:,:,:,:)   => null()  !Conductance for gas diffusion                                   [m3 d-2 h-1]
   real(r8), pointer :: NH3Dep2Can_brch(:,:)              => null()  !gaseous NH3 flux fron root disturbance band,                    [g d-2 h-1]
   real(r8), pointer :: RootNutUptake_pvr(:,:,:,:)        => null()  !root uptake of Nutrient band,                                   [g d-2 h-1]
   real(r8), pointer :: RootOUlmNutUptake_pvr(:,:,:,:)    => null()  !root uptake of NH4 band unconstrained by O2,                    [g d-2 h-1]
@@ -731,13 +732,16 @@ implicit none
   real(r8), pointer :: RootRespPotent_pvr(:,:,:)         => null()  !root respiration unconstrained by O2,                           [g d-2 h-1]
   real(r8), pointer :: RootCO2EmisPot_pvr(:,:,:)         => null()  !root CO2 efflux unconstrained by root nonstructural C,          [g d-2 h-1]
   real(r8), pointer :: RootCO2Autor_pvr(:,:,:)           => null()  !root respiration constrained by O2,                             [g d-2 h-1]
+  real(r8), pointer :: RootCO2AutorX_pvr(:,:,:)          => null()  !root respiration from previous time step,                       [g d-2 h-1]
   real(r8), pointer :: PlantExudElm_CumYr_pft(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve),          [gC d-2 ]
   real(r8), pointer :: trcg_root_vr(:,:)                 => null()   !total root internal gas flux,                                  [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx_vr(:,:)         => null()   !total internal root gas flux,                                  [gC d-2 h-1]
   real(r8), pointer :: CO2FixCL_pft(:)                   => null()   !Rubisco-limited CO2 fixation
   real(r8), pointer :: CO2FixLL_pft(:)                   => null()   !Light-limited CO2 fixation
-  real(r8), pointer :: RootUptk_N_CumYr_pft(:)           => null()
-  real(r8), pointer :: RootUptk_P_CumYr_pft(:)           => null()
+  real(r8), pointer :: RootUptk_N_CumYr_pft(:)           => null()  !cumulative plant N uptake [gN d-2]
+  real(r8), pointer :: RootUptk_P_CumYr_pft(:)           => null()  !cumulative plant P uptake [gP d-2]
+  real(r8), pointer :: RootCO2Ar2Soil_pvr(:,:)           => null()  !root respiration released to soil [gC d-2 h-1]
+  real(r8), pointer :: trcs_deadroot2soil_pvr(:,:,:)     => null()  !gases released to soil upong dying roots [g d-2 h-1]
   contains
     procedure, public :: Init => plt_rootbgc_init
     procedure, public :: Destroy  => plt_rootbgc_destroy
@@ -785,6 +789,9 @@ implicit none
   allocate(this%RootRespPotent_pvr(jroots,JZ1,JP1)); this%RootRespPotent_pvr=spval
   allocate(this%RootCO2EmisPot_pvr(jroots,JZ1,JP1)); this%RootCO2EmisPot_pvr=spval
   allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=spval
+  allocate(this%trcs_deadroot2soil_pvr(idg_beg:idg_NH3,JZ1,JP1));this%trcs_deadroot2soil_pvr=0._r8
+  allocate(this%RootCO2Ar2Soil_pvr(JZ1,JP1)); this%RootCO2Ar2Soil_pvr=0._r8
+  allocate(this%RootCO2AutorX_pvr(jroots,JZ1,JP1)); this%RootCO2AutorX_pvr=spval
   allocate(this%RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1)); this%RootNutUptake_pvr=0._r8
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval
   allocate(this%RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootCUlmNutUptake_pvr=spval
@@ -989,7 +996,7 @@ implicit none
   allocate(this%NetPrimProduct_pft(JP1));this%NetPrimProduct_pft=spval
   allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
   allocate(this%tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ1));this%tRootMycoExud2Soil_vr=spval
-  allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=spval
+  allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=0._r8
   allocate(this%CanopyRespC_CumYr_pft(JP1));this%CanopyRespC_CumYr_pft=spval
   allocate(this%REcoH1PO4DmndBand_vr(0:JZ1));this%REcoH1PO4DmndBand_vr=spval
   allocate(this%REcoNO3DmndSoil_vr(0:JZ1));this%REcoNO3DmndSoil_vr=spval

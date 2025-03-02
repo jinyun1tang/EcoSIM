@@ -147,7 +147,8 @@ module NutUptakeMod
   character(len=*), parameter :: subname='RootMycoO2NutrientUptake'
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
-  integer :: N,L
+  real(r8) :: RootCO2Ar,RootCO2ArB
+  integer :: N,L,idg
 !     begin_execution
   associate(                                                      &
     THETW_vr                => plt_soilchem%THETW_vr,             &
@@ -162,7 +163,11 @@ module NutUptakeMod
     RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr,     &
     MY                      => plt_morph%MY,                      &
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
+    trcs_deadroot2soil_pvr  => plt_rbgc%trcs_deadroot2soil_pvr,   &
+    trcg_rootml_pvr         => plt_rbgc%trcg_rootml_pvr,          &
+    trcs_rootml_pvr         => plt_rbgc%trcs_rootml_pvr,          &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
+    RootCO2Ar2Soil_pvr      => plt_rbgc%RootCO2Ar2Soil_pvr,       &
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
@@ -171,13 +176,13 @@ module NutUptakeMod
 
   PopPlantO2Uptake = 0._r8
   PopPlantO2Demand = 0._r8
-
+  RootCO2Ar        = 0._r8
+  RootCO2ArB       = 0._r8
   D955: DO N  = 1, MY(NZ)
     D950: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
         .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. THETW_vr(L).GT.ZERO)THEN
 
-!        if(I>176)print*,'getuptkcp',L
         call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FCUP,FZUP,FPUP,&
           FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
@@ -193,10 +198,10 @@ module NutUptakeMod
 
         call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
           RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
-
+        
         PopPlantO2Demand = PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
         PopPlantO2Uptake = PopPlantO2Uptake+PopPlantO2Uptake_vr
-!        if(I>176)print*,'rootexud'
+       
         call RootExudates(I,J,N,L,NZ)
 !
 !     NUTRIENT UPTAKE
@@ -222,11 +227,18 @@ module NutUptakeMod
             RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
         ENDIF
       ELSE
-
+        RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
+        DO idg=idg_beg,idg_NH3
+          trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcg_rootml_pvr(idg,N,L,NZ)
+          trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcs_rootml_pvr(idg,N,L,NZ)
+          trcg_rootml_pvr(idg,N,L,NZ)      = 0._r8
+          trcs_rootml_pvr(idg,N,L,NZ)      = 0._r8
+        ENDDO
       ENDIF
 
     ENDDO D950
   ENDDO D955
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake

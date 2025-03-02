@@ -1992,7 +1992,7 @@ module WatsubMod
   !     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
   !
   
-  !     THETPM,THETX=current, minimum air-filled porosity
+  !     THETPM,AirFillPore_Min=current, minimum air-filled porosity
   !     TK11,TK12=interim soil temperature in source,destination
   !     VP1,VPL=vapor concentration in source,destination
   !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
@@ -2009,7 +2009,7 @@ module WatsubMod
   ConvectVapFlux       = 0._r8
   HeatByConvectVapFlux = 0._r8
   if(fixWaterLevel)return
-  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.THETX .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX)THEN
+  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.AirFillPore_Min .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.AirFillPore_Min)THEN
     TK11   = TKSoil1_vr(N3,N2,N1)
     TK12   = TKSoil1_vr(N6,N5,N4)
     VP1    = vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGASC*TK11))

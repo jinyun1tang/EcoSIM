@@ -175,8 +175,8 @@ implicit none
           !
           !     RESET LOWER LAYER NUMBER WITH EROSION
           !
-          IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-            IF(L.EQ.NL(NY,NX).AND.DLYR_3D(3,L,NY,NX).GT.DLYRI_3D(3,L,NY,NX))THEN
+          IF(iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
+            IF(L.EQ.NL(NY,NX) .AND. DLYR_3D(3,L,NY,NX).GT.DLYRI_3D(3,L,NY,NX))THEN
               NL(NY,NX)=MIN(NLI(NY,NX),NL(NY,NX)+1)
             ENDIF
             IF(L.EQ.NL(NY,NX)-1 .AND. CumDepz2LayBottom_vr(NL(NY,NX),NY,NX)-CumDepz2LayBottom_vr(L,NY,NX).LE.ZEROC)THEN

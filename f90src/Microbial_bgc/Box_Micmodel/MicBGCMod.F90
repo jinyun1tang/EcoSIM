@@ -3258,7 +3258,7 @@ module MicBGCMod
           call fixEXConsumpFlux(OXYS1,RMPOX)
 
           !apply dissolution-volatilization
-          IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
+          IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
             ROXDFQ=AMAX1(AMIN1(ROXDFQ,OXYG1),-OXYS1)
           ELSE

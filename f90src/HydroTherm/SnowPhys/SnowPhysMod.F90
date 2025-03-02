@@ -1416,7 +1416,7 @@ contains
 
     !AvgVaporCondctSnowLitR=snowpack-litter conductance
     !there is litter layer with sufficient moisture
-    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. AirFilledSoilPoreM_vr(M,0,NY,NX).GT.THETX)THEN      
+    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. AirFilledSoilPoreM_vr(M,0,NY,NX).GT.AirFillPore_Min)THEN      
       VapSnow0=vapsat(TK0X)  !*dssign(VLWatSnow0M_snvr(L,NY,NX)) !snow vapor pressure, saturated
       !snow -> residue vapor flux (>0)
       H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX) &
@@ -1757,7 +1757,7 @@ contains
   ! dts_wat=time step for flux calculations
   ! VapFlxSno2Soi1,HeatConvFlxSno2Soi1=vapor flux and its convective heat flux
   !
-  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
+  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.AirFillPore_Min)THEN
     VapSoiDest = vapsat(TKSoil1_vr(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoil1_vr(NUM(NY,NX),NY,NX)))
     VapCond2   = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)*POROQ &
       *AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)

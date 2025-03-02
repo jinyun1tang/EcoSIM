@@ -166,6 +166,7 @@ module ExtractsMod
     RootNH4DmndBand_pvr      => plt_rbgc%RootNH4DmndBand_pvr,      &
     RootH1PO4DmndSoil_pvr    => plt_rbgc%RootH1PO4DmndSoil_pvr,    &
     trcs_plant_uptake_vr     => plt_rbgc%trcs_plant_uptake_vr,     &
+    RootN2Fix_pvr            => plt_bgcr%RootN2Fix_pvr,            &
     REcoNO3DmndSoil_vr       => plt_bgcr%REcoNO3DmndSoil_vr,       &
     REcoNH4DmndSoil_vr       => plt_bgcr%REcoNH4DmndSoil_vr,       &
     REcoH2PO4DmndSoil_vr     => plt_bgcr%REcoH2PO4DmndSoil_vr,     &
@@ -190,8 +191,11 @@ module ExtractsMod
     MY                       => plt_morph%MY,                      &
     MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
   )
+  
+  DO L=NU,MaxSoiL4Root_pft(NZ)
+    trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
+  ENDDO
 
-  trcs_plant_uptake_vr=0._r8
   DO N=1,MY(NZ)
     DO L=NU,MaxSoiL4Root_pft(NZ)
 !
@@ -301,7 +305,6 @@ module ExtractsMod
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
     ETCanopy_CumYr_pft        => plt_ew%ETCanopy_CumYr_pft,          &
     TRootH2Flx_col            => plt_bgcr%TRootH2Flx_col,            &
-    trcs_plant_uptake_vr      => plt_rbgc%trcs_plant_uptake_vr,      &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
     TRootGasLossDisturb_pft   => plt_rbgc%TRootGasLossDisturb_pft,   &
     Transpiration_pft         => plt_ew%Transpiration_pft,           &
@@ -339,9 +342,6 @@ module ExtractsMod
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft,            &
     Eco_NetRad_col            => plt_rad%Eco_NetRad_col              &
   )
-  DO L=NU,MaxSoiL4Root_pft(NZ)
-    trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
-  ENDDO
 !
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
