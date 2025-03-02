@@ -6,10 +6,10 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  integer :: JX=6
-  integer :: JY=4
+  integer :: JX
+  integer :: JY
   integer :: JX0,JY0
-  integer :: JZ=20
+  integer :: JZ
   integer :: JH
   integer :: JV
   integer :: JD
