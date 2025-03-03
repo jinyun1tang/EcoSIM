@@ -44,7 +44,7 @@ implicit none
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size  
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test 
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
@@ -64,7 +64,7 @@ implicit none
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
-
+  NPH_Test=1
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
   NX=1
@@ -108,8 +108,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 
-    write(*,*) "SkyLonwRad_col(NY,NX) = ", SkyLonwRad_col(NY,NX)
-    RainH(NY,NX) = p_rain(NY)
+    RainH(NY,NX) = p_rain(NY)*3600.0  !(convert m/s into m/hr
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
@@ -150,14 +149,13 @@ implicit none
     RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
-    write(*,*) "SnoFalPrec_col = ", SnoFalPrec_col(NY,NX)
   ENDDO
 
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  !write(*,*) "before stage: SnoFalPrec(NY,NX) = ", SnoFalPrec(1,1), " AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
+  write(*,*) "(ATSEcoSIMAdvance) RAINH  = ", RAINH(1,1), " m/hr,  AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -167,7 +165,8 @@ implicit none
   VHeatCapacity1_vr(0,1,1) = 0.0
 
   !perhaps doesn't neeed to run NPH times
-  DO M=1,NPH
+  !Setting to 1 without resetting the timescale
+  DO M=1,NPH_Test
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
@@ -187,15 +186,11 @@ implicit none
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
-  
+ 
+  write(*,*) "(ATSEcoSIMAdvance after surf bal) Q_w = ", Qinfl2MicPM(NY,NX), " m/hr"  
   !Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
   !Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
-  write(*,*) "Heat and water souces: "
-  write(*,*) "Hinfl2Soil = ", Hinfl2Soil, " MJ"
-  write(*,*) "HeatFluxAir2Soi = ", HeatFluxAir2Soi
-  write(*,*) "Qinfl2MicP = ", Qinfl2MicP 
-  write(*,*) "Timestep in EcoSIM: ", dts_HeatWatTP, " hr"
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !Convert heat and water flux from EcoSIM units (flux/ hr)
@@ -207,14 +202,7 @@ implicit none
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
 
-  !DO NY=1, NYS
-  !  call SnowMassUpdate(I,J,NY,NX)
-  !  call SnowpackLayering(I,J,NY,NX)
-  !ENDDO
-
-  write(*,*) "snow_depth = ", surf_snow_depth(1) 
-  write(*,*) "Q_e = ", surf_e_source(1) , " MJ/s" 
-  write(*,*) "Q_w ", surf_w_source(1) , " m/s"
+  write(*,*) "(ATSEcoSIMAdvance post conv) Q_w ", surf_w_source(1), " snow_depth = " , surf_snow_depth(1), " m" 
 
   !open(unit=10, file="fluxes.txt", status="unknown", position="append")
   !write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"
