@@ -2651,12 +2651,16 @@ module MicBGCMod
 !     ENERGY YIELDS OF O2 REDOX REACTIONS
 !     E* = growth respiration efficiency calculated in PARAMETERS
 !
+  IF(N.EQ.mid_Aerob_Fungi)THEN
+    call AerobicFungiCatabolism(I,J,NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
+    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+    return
+  endif
+
   IF(N.EQ.mid_Aerob_HeteroBacter)THEN
     EO2Q=EO2X
   ELSEIF(N.EQ.mid_Facult_DenitBacter)THEN
     EO2Q=EO2D
-  ELSEIF(N.EQ.mid_Aerob_Fungi)THEN
-    EO2Q=EO2G
   ELSEIF(N.EQ.mid_aerob_N2Fixer)THEN
     EO2Q=ENFX
   ENDIF
@@ -2717,6 +2721,100 @@ module MicBGCMod
 !
   end associate
   end subroutine AerobicHeterotrophCatabolism
+!------------------------------------------------------------------------------------------
+
+  subroutine AerobicFungiCatabolism(I,J,NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
+    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NGL,N,K
+  REAL(R8), INTENT(IN) :: FOQC,FOQA
+  real(r8), intent(in) :: WatStressMicb  !moisture sensivity of microbial activity
+  real(r8), intent(in) :: TSensGrowth    !temperature sensitivity of microbial activity
+  real(r8), intent(out) :: ECHZ
+  real(r8), intent(out) :: RGOMP  !total DOC/acetate C uptake for potential respiraiton
+  REAL(R8), INTENT(OUT) :: FGOCP,FGOAP
+  real(r8), intent(out) :: RGOCP  !oxygen-unlimited DOC-based respiraiton
+  type(micforctype), intent(in) :: micfor
+  type(micsttype), intent(inout) :: micstt
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(OMCplx_State_type),intent(inout):: ncplxs
+  type(micfluxtype), intent(inout) :: micflx
+
+  real(r8) :: EO2Q
+  real(r8) :: FSBSTC,FSBSTA
+  real(r8) :: RGOCY,RGOCZ,RGOAZ
+  real(r8) :: RGOCX,RGOAX
+  real(r8) :: RGOAP
+  real(r8) :: FSBST
+!     begin_execution
+  associate(                                                 &
+    OMActHeter             => nmics%OMActHeter,              &
+    FBiomStoiScalarHeter   => nmics%FBiomStoiScalarHeter,    &
+    RO2Dmnd4RespHeter      => nmicf%RO2Dmnd4RespHeter,       &
+    RO2DmndHeter           => nmicf%RO2DmndHeter,            &
+    ROQC4HeterMicrobAct    => nmicf%ROQC4HeterMicrobAct,     &
+    ZEROS                  => micfor%ZEROS,                  &
+    DOM                    => micstt%DOM,                    &
+    mid_Aerob_HeteroBacter => micpar%mid_Aerob_HeteroBacter, &
+    mid_Facult_DenitBacter => micpar%mid_Facult_DenitBacter, &
+    mid_Aerob_Fungi        => micpar%mid_Aerob_Fungi,        &
+    mid_aerob_N2Fixer      => micpar%mid_aerob_N2Fixer,      &
+    RO2DmndHetert          => micflx%RO2DmndHetert,          &
+    RDOCUptkHeter          => micflx%RDOCUptkHeter,          &
+    RAcetateUptkHeter      => micflx%RAcetateUptkHeter,      &
+    tRGOXP                 => micflx%tRGOXP,                 &
+    tRGOZP                 => micflx%tRGOZP,                 &
+    FOCA                   => ncplxs%FOCA,                   &
+    FOAA                   => ncplxs%FOAA,                   &
+    CDOM                   => ncplxs%CDOM                    &
+  )
+
+  EO2Q=EO2G
+  FSBSTC = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
+  FSBSTA = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
+  FSBST  = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
+  RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))*TSensGrowth
+  RGOCZ  = RGOCY*FSBSTC*FOCA(K)
+  RGOAZ  = RGOCY*FSBSTA*FOAA(K)
+
+  !obtain kinetically unlimited DOM/acetate uptake 
+  RGOCX = AZMAX1(DOM(idom_doc,K)*FOQC*EO2Q)
+  RGOAX = AZMAX1(DOM(idom_acetate,K)*FOQA*EO2A)
+  !obtain the final uptake
+  RGOCP  = AMIN1(RGOCX,RGOCZ)
+  RGOAP  = AMIN1(RGOAX,RGOAZ)
+  RGOMP  = RGOCP+RGOAP
+  tRGOXP = tRGOXP+RGOCX+RGOAX
+  tRGOZP = tRGOZP+RGOCZ+RGOAZ
+  IF(RGOMP.GT.ZEROS)THEN
+    FGOCP = RGOCP/RGOMP
+    FGOAP = RGOAP/RGOMP
+  ELSE
+    FGOCP = 1.0_r8
+    FGOAP = 0.0_r8
+  ENDIF
+!
+! ENERGY YIELD AND O2 DEMAND FROM DOC AND ACETATE OXIDATION
+! BY HETEROTROPHIC AEROBES
+
+! ECHZ=growth respiration yield, averaged over acetate and DOC/glucose
+! RO2Dmnd4RespHeter,RO2DmndHeter,RO2DmndHetert=O2 demand from DOC,DOA oxidation
+! RDOCUptkHeter,RAcetateUptkHeter=DOC,DOA demand from DOC,DOA oxidation
+! ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
+! CH2O+O2 -> CO2 + H2O, (32/12.=2.667)
+  ECHZ                     = EO2Q*FGOCP+EO2A*FGOAP
+  RO2Dmnd4RespHeter(NGL,K) = 2.667_r8*RGOMP
+  RO2DmndHeter(NGL,K)      = RO2Dmnd4RespHeter(NGL,K)
+  !make a copy for flux limiter 
+  RO2DmndHetert(NGL,K)       = RO2DmndHeter(NGL,K)
+  RDOCUptkHeter(NGL,K)       = RGOCZ
+  RAcetateUptkHeter(NGL,K)   = RGOAZ
+  ROQC4HeterMicrobAct(NGL,K) = RGOCY  
+  end associate
+  end subroutine AerobicFungiCatabolism  
 !------------------------------------------------------------------------------------------
 
   subroutine AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
@@ -3430,11 +3528,11 @@ module MicBGCMod
 !     RNH4TransfSoilHeter,RNH4TransfBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
 !     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
 ! update may be needed, May 17th, 2023, jyt.
-  FNH4S=VLNH4
-  FNHBS=VLNHB
-  MID3=micpar%get_micb_id(3,NGL)
-  RINHP=(mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-mBiomeHeter(ielmn,MID3,K))
-  RNiDemand=RNiDemand+RINHP
+  FNH4S     = VLNH4
+  FNHBS     = VLNHB
+  MID3      = micpar%get_micb_id(3,NGL)
+  RINHP     = (mBiomeHeter(ielmc,MID3,K)*rNCOMC(3,NGL,K)-mBiomeHeter(ielmn,MID3,K))
+  RNiDemand = RNiDemand+RINHP
   !immobilization
   IF(RINHP.GT.0.0_r8)THEN
     CNH4X                      = AZMAX1(CNH4S-Z4MN)
@@ -3475,9 +3573,9 @@ module MicBGCMod
 !     RNO3TransfSoilHeter,RNO3TransfBandHeter=substrate-limited NO3 immobiln in non-band, band
 !     NetNH4Mineralize=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
-  FNO3S=VLNO3
-  FNO3B=VLNOB
-  RINOP=AZMAX1(RINHP-RNH4TransfSoilHeter(NGL,K)-RNH4TransfBandHeter(NGL,K))
+  FNO3S = VLNO3
+  FNO3B = VLNOB
+  RINOP = AZMAX1(RINHP-RNH4TransfSoilHeter(NGL,K)-RNH4TransfBandHeter(NGL,K))
   !immobilization
   IF(RINOP.GT.0.0_r8)THEN
     CNO3X                      = AZMAX1(CNO3S-ZOMN)
@@ -3912,26 +4010,26 @@ module MicBGCMod
 !     rCNDOM,rCPDOM=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
-!  write(*,*)'bf cgom',N,K,ECHZ,ENOX
-  CGOMX=AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZ
-  CGOMD=RNOxReduxRespDenitLim(NGL,K)/ENOX
+  CGOMX     = AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZ
+  CGOMD     = RNOxReduxRespDenitLim(NGL,K)/ENOX
   CDOMuptk1 = CDOMuptk1+CGOMX
   CDOMuptk2 = CDOMuptk2+CGOMD
   tROMT     = tROMT+RMaintRespHeter
   tGROMO    = tGROMO+RespGrossHeter(NGL,K)
-  DOMuptk4GrothHeter(ielmc,NGL,K)=CGOMX+CGOMD
-!  write(*,*)'CGOMX',N,K,CGOMX
-  RAnabolDOCUptkHeter(NGL,K)=CGOMX*FGOCP+CGOMD
-  RAnabolAcetUptkHeter(NGL,K)=CGOMX*FGOAP
-  CGOXC=RAnabolDOCUptkHeter(NGL,K)+RAnabolAcetUptkHeter(NGL,K)
+
+  DOMuptk4GrothHeter(ielmc,NGL,K) = CGOMX+CGOMD
+  RAnabolDOCUptkHeter(NGL,K)      = CGOMX*FGOCP+CGOMD
+  RAnabolAcetUptkHeter(NGL,K)     = CGOMX*FGOAP
+  CGOXC                           = RAnabolDOCUptkHeter(NGL,K)+RAnabolAcetUptkHeter(NGL,K)
+
   !obtain organic nutrient uptake
   DOMuptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCNDOM(K)/FCN(NGL,K)))
   DOMuptk4GrothHeter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCPDOM(K)/FCP(NGL,K)))
 
-  TDOMUptkHeter(idom_doc,K)=TDOMUptkHeter(idom_doc,K)+RAnabolDOCUptkHeter(NGL,K)
-  TDOMUptkHeter(idom_acetate,K)=TDOMUptkHeter(idom_acetate,K)+RAnabolAcetUptkHeter(NGL,K)
-  TDOMUptkHeter(idom_don,K)=TDOMUptkHeter(idom_don,K)+DOMuptk4GrothHeter(ielmn,NGL,K)
-  TDOMUptkHeter(idom_dop,K)=TDOMUptkHeter(idom_dop,K)+DOMuptk4GrothHeter(ielmp,NGL,K)
+  TDOMUptkHeter(idom_doc,K)     = TDOMUptkHeter(idom_doc,K)+RAnabolDOCUptkHeter(NGL,K)
+  TDOMUptkHeter(idom_acetate,K) = TDOMUptkHeter(idom_acetate,K)+RAnabolAcetUptkHeter(NGL,K)
+  TDOMUptkHeter(idom_don,K)     = TDOMUptkHeter(idom_don,K)+DOMuptk4GrothHeter(ielmn,NGL,K)
+  TDOMUptkHeter(idom_dop,K)     = TDOMUptkHeter(idom_dop,K)+DOMuptk4GrothHeter(ielmp,NGL,K)
 
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE/nonstructural TO ACTIVE BIOMASS
