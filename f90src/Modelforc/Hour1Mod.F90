@@ -2027,20 +2027,20 @@ module Hour1Mod
     IF((Z4B+Z3B+ZUB.GT.0._r8).OR.((trcs_solml_vr(ids_NH4B,LFDPTH,NY,NX).GT.0._r8 &
       .OR.trcs_solml_vr(idg_NH3B,LFDPTH,NY,NX).GT.0._r8).AND.IFNHB(NY,NX).EQ.0))THEN
       IFNHB(NY,NX)=1
-      ROWN(NY,NX)=ROWI(I,NY,NX)
+      ROWSpaceNH4_col(NY,NX)=ROWI(I,NY,NX)
       D50: DO L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           BandThicknessNH4_vr(L,NY,NX)=DLYR_3D(3,L,NY,NX)
           BandWidthNH4_vr(L,NY,NX)=0._r8
         ELSEIF(L.EQ.LFDPTH)THEN
           BandThicknessNH4_vr(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
-          BandWidthNH4_vr(L,NY,NX)=AMIN1(0.025_r8,ROWN(NY,NX))
+          BandWidthNH4_vr(L,NY,NX)=AMIN1(0.025_r8,ROWSpaceNH4_col(NY,NX))
         ELSE
           BandThicknessNH4_vr(L,NY,NX)=0._r8
           BandWidthNH4_vr(L,NY,NX)=0._r8
         ENDIF
         IF(DLYR_3D(3,L,NY,NX).GT.ZERO2)THEN
-          trcs_VLN_vr(ids_NH4B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNH4_vr(L,NY,NX)/ROWN(NY,NX) &
+          trcs_VLN_vr(ids_NH4B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNH4_vr(L,NY,NX)/ROWSpaceNH4_col(NY,NX) &
             *BandThicknessNH4_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX))
         ELSE
           trcs_VLN_vr(ids_NH4B,L,NY,NX)=0._r8
@@ -2071,20 +2071,20 @@ module Hour1Mod
     IF((Z4B+Z3B+ZUB+ZOB.GT.0._r8).OR.((trcs_solml_vr(ids_NO3B,LFDPTH,NY,NX).GT.0._r8 &
       .OR.trcs_solml_vr(ids_NO2B,LFDPTH,NY,NX).GT.0._r8).AND.IFNOB(NY,NX).EQ.0))THEN
       IFNOB(NY,NX)=1
-      ROWO(NY,NX)=ROWI(I,NY,NX)
+      ROWSpaceNO3_col(NY,NX)=ROWI(I,NY,NX)
       D45: DO L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           BandThicknessNO3_vr(L,NY,NX)=DLYR_3D(3,L,NY,NX)
           BandWidthNO3_vr(L,NY,NX)=0._r8
         ELSEIF(L.EQ.LFDPTH)THEN
           BandThicknessNO3_vr(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
-          BandWidthNO3_vr(L,NY,NX)=AMIN1(0.01_r8,ROWO(NY,NX))
+          BandWidthNO3_vr(L,NY,NX)=AMIN1(0.01_r8,ROWSpaceNO3_col(NY,NX))
         ELSE
           BandThicknessNO3_vr(L,NY,NX)=0._r8
           BandWidthNO3_vr(L,NY,NX)=0._r8
         ENDIF
         IF(DLYR_3D(3,L,NY,NX).GT.ZERO2)THEN
-          trcs_VLN_vr(ids_NO3B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNO3_vr(L,NY,NX)/ROWO(NY,NX) &
+          trcs_VLN_vr(ids_NO3B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNO3_vr(L,NY,NX)/ROWSpaceNO3_col(NY,NX) &
             *BandThicknessNO3_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX))
         ELSE
           trcs_VLN_vr(ids_NO3B,L,NY,NX)=0._r8
@@ -2113,20 +2113,20 @@ module Hour1Mod
 !
     IF((PMB.GT.0.0).OR.(trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX).GT.0._r8.AND.IFPOB(NY,NX).EQ.0))THEN
       IFPOB(NY,NX)=1
-      ROWP(NY,NX)=ROWI(I,NY,NX)
+      ROWSpacePO4_col(NY,NX)=ROWI(I,NY,NX)
       DO  L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           BandThicknessPO4_vr(L,NY,NX) = DLYR_3D(3,L,NY,NX)
-          BandWidthPO4_vr(L,NY,NX)     = AMIN1(0.01,ROWP(NY,NX))
+          BandWidthPO4_vr(L,NY,NX)     = AMIN1(0.01,ROWSpacePO4_col(NY,NX))
         ELSEIF(L.EQ.LFDPTH)THEN
           BandThicknessPO4_vr(L,NY,NX) = AMAX1(0.01,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
-          BandWidthPO4_vr(L,NY,NX)     = AMIN1(0.01,ROWP(NY,NX))
+          BandWidthPO4_vr(L,NY,NX)     = AMIN1(0.01,ROWSpacePO4_col(NY,NX))
         ELSE
           BandThicknessPO4_vr(L,NY,NX) = 0._r8
           BandWidthPO4_vr(L,NY,NX)     = 0._r8
         ENDIF
         IF(DLYR_3D(3,L,NY,NX).GT.ZERO2)THEN
-          trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=AMIN1(0.999_r8,BandWidthPO4_vr(L,NY,NX)/ROWP(NY,NX) &
+          trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=AMIN1(0.999_r8,BandWidthPO4_vr(L,NY,NX)/ROWSpacePO4_col(NY,NX) &
           *BandThicknessPO4_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX))
         ELSE
           trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=0._r8

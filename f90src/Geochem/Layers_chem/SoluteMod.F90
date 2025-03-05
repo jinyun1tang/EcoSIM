@@ -488,7 +488,7 @@ module SoluteMod
 !     ROWN=NH4 fertilizer band row width
 !     DPNH4=NH4 fertilizer band depth
 !
-  IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
+  IF(IFNHB(NY,NX).EQ.1.AND.ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
     IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
@@ -499,7 +499,7 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWNH4                    = 0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      BandWidthNH4_vr(L,NY,NX) = AMIN1(ROWN(NY,NX),AMAX1(0.025,BandWidthNH4_vr(L,NY,NX))+DWNH4)
+      BandWidthNH4_vr(L,NY,NX) = AMIN1(ROWSpaceNH4_col(NY,NX),AMAX1(0.025,BandWidthNH4_vr(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
 !
@@ -531,7 +531,7 @@ module SoluteMod
       XVLNH4=trcs_VLN_vr(ids_NH4,L,NY,NX)
       IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
         trcs_VLN_vr(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNH4_vr(L,NY,NX) &
-          /ROWN(NY,NX)*BandThicknessNH4_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX)))
+          /ROWSpaceNH4_col(NY,NX)*BandThicknessNH4_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_NH4B,L,NY,NX)=0._r8
       ENDIF
@@ -591,7 +591,7 @@ module SoluteMod
 !     ROWP=H2PO4 fertilizer band row width
 !     DPPO4=H2PO4 fertilizer band depth
 !
-  IF(IFPOB(NY,NX).EQ.1 .AND. ROWP(NY,NX).GT.0.0)THEN
+  IF(IFPOB(NY,NX).EQ.1 .AND. ROWSpacePO4_col(NY,NX).GT.0.0)THEN
     IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
 !
 !     PO4 BAND WIDTH
@@ -601,7 +601,7 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWPO4=0.5*SQRT(SoluteDifusvty_vr(ids_H1PO4,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      BandWidthPO4_vr(L,NY,NX)=AMIN1(ROWP(NY,NX),BandWidthPO4_vr(L,NY,NX)+DWPO4)
+      BandWidthPO4_vr(L,NY,NX)=AMIN1(ROWSpacePO4_col(NY,NX),BandWidthPO4_vr(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
 !
@@ -634,7 +634,7 @@ module SoluteMod
       XVLPO4=trcs_VLN_vr(ids_H1PO4,L,NY,NX)
       IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
         trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthPO4_vr(L,NY,NX) &
-          /ROWP(NY,NX)*BandThicknessPO4_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX)))
+          /ROWSpacePO4_col(NY,NX)*BandThicknessPO4_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_H1PO4B,L,NY,NX)=0._r8
       ENDIF
@@ -818,7 +818,7 @@ module SoluteMod
 !     ROWO=NO3 fertilizer band row width
 !     DPNO3=NO3 fertilizer band depth
 !
-  IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
+  IF(IFNOB(NY,NX).EQ.1.AND.ROWSpaceNO3_col(NY,NX).GT.0.0)THEN
 
     IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
 !
@@ -830,7 +830,7 @@ module SoluteMod
 !     TortMicPM_vr=tortuosity
 !
       DWNO3=0.5_r8*SQRT(SoluteDifusvty_vr(ids_NO3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
-      BandWidthNO3_vr(L,NY,NX)=AMIN1(ROWO(NY,NX),BandWidthNO3_vr(L,NY,NX)+DWNO3)
+      BandWidthNO3_vr(L,NY,NX)=AMIN1(ROWSpaceNO3_col(NY,NX),BandWidthNO3_vr(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH
 !
@@ -862,7 +862,7 @@ module SoluteMod
       XVLNO3=trcs_VLN_vr(ids_NO3,L,NY,NX)
       IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
         trcs_VLN_vr(ids_NO3B,L,NY,NX)=AZMAX1(AMIN1(0.999,BandWidthNO3_vr(L,NY,NX) &
-          /ROWO(NY,NX)*BandThicknessNO3_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX)))
+          /ROWSpaceNO3_col(NY,NX)*BandThicknessNO3_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX)))
       ELSE
         trcs_VLN_vr(ids_NO3B,L,NY,NX)=0._r8
       ENDIF

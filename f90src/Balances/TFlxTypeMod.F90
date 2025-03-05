@@ -13,55 +13,49 @@ implicit none
 
   public
 
-  real(r8),allocatable ::  trcs_TransptMicP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  trcs_TransptMacP_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  trcs_TransptMicP_vr(:,:,:,:)             !net tracer flux into the grid cell through micropore flow (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  trcs_TransptMacP_vr(:,:,:,:)             !net tracer flux into the grid cell through macropore flow (<0 loss) [g d-2 h-1] 
+  real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)             !net salt flux into the grid cell through micropore flow (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)             !net salt flux into the grid cell through macropore flow (<0 loss) [mol d-2 h-1]
 
-  real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)                      !
-  real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  TSandEros_col(:,:)                       !column sand loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TSiltEros_col(:,:)                       !column silt loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TCLAYEros_col(:,:)                       !column clay loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TNH4Eros_col(:,:)                        !column NH4 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNH3Eros_col(:,:)                        !column NH3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNUreaEros_col(:,:)                      !column Urea loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNO3Eros_col(:,:)                        !column NO3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNH4ErosBand_col(:,:)                    !column band NH4 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNH3ErosBand_col(:,:)                    !column band NH3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNUreaErosBand_col(:,:)                  !column band urea loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNO3ErosBand_col(:,:)                    !column band NO3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  trcx_TER_col(:,:,:)                      !column exchangeable cation loss through erosion (<0 loss)[mol d-2 h-1]
+  real(r8),allocatable ::  trcp_TER_col(:,:,:)                      !column precipitated salt loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  tErosionSedmLoss_col(:,:)                !column sediment loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)               !
+  real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)              !
+  real(r8),allocatable ::  TWatFlowCellMacP_vr(:,:,:)               !
 
-  real(r8),allocatable ::  TSandEros_col(:,:)                        !
-  real(r8),allocatable ::  TSiltEros_col(:,:)                        !
-  real(r8),allocatable ::  TCLAYEros_col(:,:)                        !
-  real(r8),allocatable ::  TNH4Eros_col(:,:)                        !
-  real(r8),allocatable ::  TNH3Eros_col(:,:)                        !
-  real(r8),allocatable ::  TNUreaEros_col(:,:)                        !
-  real(r8),allocatable ::  TNO3Eros_col(:,:)                        !
-  real(r8),allocatable ::  TNH4ErosBand_col(:,:)                        !
-  real(r8),allocatable ::  TNH3ErosBand_col(:,:)                        !
-  real(r8),allocatable ::  TNUreaErosBand_col(:,:)                        !
-  real(r8),allocatable ::  TNO3ErosBand_col(:,:)                        !
-  real(r8),allocatable ::  trcx_TER_col(:,:,:)                         !
-  real(r8),allocatable ::  trcp_TER_col(:,:,:)                        !
-  real(r8),allocatable ::  tErosionSedmLoss_col(:,:)                        !
-  real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)                        !
-  real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)                       !
-  real(r8),allocatable ::  TWatFlowCellMacP_vr(:,:,:)                       !
+  real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)               !gas flux into the grid through advection and diffusion [g d-2 h-1]
 
-  real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)                      !
+  real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                 !water added due to ice thaw to the grid mairopore (>0 thaw) [m3 H2O d-2 h-1]
+  real(r8),allocatable ::  THeatSoiThaw_vr(:,:,:)                   !heat released due to water freezing in the grid (>0 release) [MJ d-2 h-1]
+  real(r8),allocatable ::  WatIceThawMacP_vr(:,:,:)                 !water added due to ice thaw to the grid macropore (>0 thaw) [m3 H2O d-2 h-1]
+  real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                     !local copy of soil water in micropore
+  real(r8),allocatable ::  VLiceMicP2_vr(:,:,:)                     !local copy of soil ice in micropore
+  real(r8),allocatable ::  VLWatMacP2_vr(:,:,:)                     !local copy of soil water in macropore
+  real(r8),allocatable ::  VLiceMacP2_vr(:,:,:)                     !local copy of soil ice in macropore
 
-  real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                       !
-  real(r8),allocatable ::  THeatSoiThaw_vr(:,:,:)                      !
-  real(r8),allocatable ::  WatIceThawMacP_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                       !local copy of soil water in micropore
-  real(r8),allocatable ::  VLiceMicP2_vr(:,:,:)                       !local copy of soil ice in micropore
-  real(r8),allocatable ::  VLWatMacP2_vr(:,:,:)                       !local copy of soil water in macropore
-  real(r8),allocatable ::  VLiceMacP2_vr(:,:,:)                       !local copy of soil ice in macropore
-
-  real(r8),allocatable :: TOMEERhetr_col(:,:,:,:,:)
-
-  real(r8),allocatable :: TOMEERauto_col(:,:,:,:)
+  real(r8),allocatable :: TOMEERhetr_col(:,:,:,:,:)                 !hetetroph biomass loss due to erosion [g d-2 h-1]
+  real(r8),allocatable :: TOMEERauto_col(:,:,:,:)                   !autotroph biomass loss due to erosion [g d-2 h-1]
  
-  real(r8),allocatable ::  DOM_Transp2Micp_vr(:,:,:,:,:)
-  real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)
-  real(r8),allocatable ::  TOMQRS_col(:,:,:,:)
-  real(r8),allocatable ::  TORMER_col(:,:,:,:,:)
-  real(r8),allocatable ::  TOHMER_col(:,:,:,:)
-  real(r8),allocatable ::  TOSMER_col(:,:,:,:,:)
-  real(r8),allocatable ::  TOSAER_col(:,:,:,:)
-
-  real(r8) :: TDLYXF,TDayLenthPrevC,TDVOLI,TDORGC
-  DATA TDORGC,TDayLenthPrevC/0.0,0.0/
-  DATA TDVOLI,TDLYXF/0.0,0.0/
+  real(r8),allocatable ::  DOM_Transp2Micp_vr(:,:,:,:,:)            !DOM added to the grid cell due to micropore transport [g d-2 h-1]
+  real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)           !DOM added to the grid cell due to macropore transport [g d-2 h-1]
+  real(r8),allocatable ::  TOMQRS_col(:,:,:,:)                      !DOM added (>0) to the litter layer due to surface runoff [g d-2 h-1]
+  real(r8),allocatable ::  TORMER_col(:,:,:,:,:)                    !Microbial residue loss due to erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TOHMER_col(:,:,:,:)                      !sorbed OM loss due to erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TOSMER_col(:,:,:,:,:)                    !total solid OM loss due to erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TOSAER_col(:,:,:,:)                      !active solid OM loss due to erosion (<0 loss) [g d-2 h-1]
 
 
   contains
