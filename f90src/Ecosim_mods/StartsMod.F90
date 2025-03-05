@@ -517,19 +517,11 @@ module StartsMod
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
-  print*,'RC0ff(NY,NX)',RC0ff(NY,NX)
+
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
  
-!  write(*,*) "InitSoilProfile ------------------------- "
-!  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
-!  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
-!  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
-!  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
-!  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
-!  write(*,*) "----------------------------------------- "
-
   call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------

@@ -518,7 +518,7 @@ implicit none
   integer, intent(in) :: N1,N2,N3   !source grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(inout) :: N6
-  integer :: LL,K,NTSA,NTS,idg,idom
+  integer :: LL,K,idsalt,ids,idg,idom
 
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
@@ -588,17 +588,22 @@ implicit none
         enddo
       ENDDO D8585
 
-      DO NTS=ids_beg,ids_end
-        trcs_TransptMicP_vr(NTS,N3,N2,N1)=trcs_TransptMicP_vr(NTS,N3,N2,N1) &
-          +trcs_TransptMicP_3D(NTS,N,N3,N2,N1)-trcs_TransptMicP_3D(NTS,N,N6,N5,N4)
-        trcs_TransptMacP_vr(NTS,N3,N2,N1)=trcs_TransptMacP_vr(NTS,N3,N2,N1) &
-          +trcs_TransptMacP_3D(NTS,N,N3,N2,N1)-trcs_TransptMacP_3D(NTS,N,N6,N5,N4)
-        if(abs(trcs_TransptMicP_vr(NTS,N3,N2,N1))>1.e10)then
-           write(*,*)NTS,N3,N2,N1,N
-           write(*,*)trcs_TransptMicP_3D(NTS,N,N3,N2,N1),trcs_TransptMicP_3D(NTS,N,N6,N5,N4)
+      DO ids=ids_beg,ids_end
+        trcs_TransptMicP_vr(ids,N3,N2,N1)=trcs_TransptMicP_vr(ids,N3,N2,N1) &
+          +trcs_TransptMicP_3D(ids,N,N3,N2,N1)-trcs_TransptMicP_3D(ids,N,N6,N5,N4)
+        trcs_TransptMacP_vr(ids,N3,N2,N1)=trcs_TransptMacP_vr(ids,N3,N2,N1) &
+          +trcs_TransptMacP_3D(ids,N,N3,N2,N1)-trcs_TransptMacP_3D(ids,N,N6,N5,N4)
+          
+        if(abs(trcs_TransptMicP_vr(ids,N3,N2,N1))>1.e10)then
+           write(*,*)ids,N3,N2,N1,N
+           write(*,*)trcs_TransptMicP_3D(ids,N,N3,N2,N1),trcs_TransptMicP_3D(ids,N,N6,N5,N4)
            call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDDO
+
+      if(N.NE.3)THEN
+      
+      ENDIF
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS
       !exclude NH3B
@@ -609,11 +614,11 @@ implicit none
 !
       !     NET SALT FLUXES BETWEEN ADJACENT GRID CELLS
       IF(salt_model)THEN
-        DO NTSA=idsalt_beg,idsaltb_end
-          trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1) &
-            +trcSalt_TransptMicP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMicP_3D(NTSA,N,N6,N5,N4)
-          trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1) &
-            +trcSalt_TransptMacP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMacP_3D(NTSA,N,N6,N5,N4)
+        DO idsalt=idsalt_beg,idsaltb_end
+          trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1) &
+            +trcSalt_TransptMicP_3D(idsalt,N,N3,N2,N1)-trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4)
+          trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1) &
+            +trcSalt_TransptMacP_3D(idsalt,N,N3,N2,N1)-trcSalt_TransptMacP_3D(idsalt,N,N6,N5,N4)
         ENDDO
       ENDIF
     ELSE

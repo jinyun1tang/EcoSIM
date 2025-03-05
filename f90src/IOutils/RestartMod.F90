@@ -5479,16 +5479,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ROWN', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNH4_col', dim1name='column',&
        long_name='row spacing of NH4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNH4_col,datrc_1d) 
   else
-    !print*,'ROWN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d)   
+    !print*,'ROWSpaceNH4_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNH4_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ROWN', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNH4_col', dim1name='column',&
        long_name='row spacing of NH4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5496,16 +5496,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ROWO', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNO3_col', dim1name='column',&
        long_name='row spacing of NO3 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNO3_col,datrc_1d) 
   else
-    !print*,'ROWO'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d)   
+    !print*,'ROWSpaceNO3_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNO3_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ROWO', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNO3_col', dim1name='column',&
        long_name='row spacing of NO3 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5513,16 +5513,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ROWP', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpacePO4_col', dim1name='column',&
        long_name='row spacing of PO4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpacePO4_col,datrc_1d) 
   else
-    !print*,'ROWP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d)   
+    !print*,'ROWSpacePO4_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpacePO4_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ROWP', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpacePO4_col', dim1name='column',&
        long_name='row spacing of PO4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

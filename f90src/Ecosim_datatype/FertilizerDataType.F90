@@ -8,17 +8,17 @@ module FertilizerDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: FertN_soil_vr(:,:,:,:)
-  real(r8),target,allocatable :: FertN_Band_vr(:,:,:,:)
+  real(r8),target,allocatable :: FertN_soil_vr(:,:,:,:)      !fertilizer in soil [mol d-2]
+  real(r8),target,allocatable :: FertN_Band_vr(:,:,:,:)      !fertilizer in band [mol d-2]
 
-  real(r8),target,allocatable :: DepzCorp_col(:,:,:)                  !soil mixing fraction with tillage, [-]
-  real(r8),target,allocatable :: FERT(:,:,:,:)                !fertilizer application, [g m-2]
-  real(r8),target,allocatable :: FDPTH(:,:,:)                  !depth of fertilizer application, [m]
-  real(r8),target,allocatable :: ROWI(:,:,:)                   !row spacing of fertilizer band, [m]
+  real(r8),target,allocatable :: DepzCorp_col(:,:,:)         !soil mixing fraction with tillage, [-]
+  real(r8),target,allocatable :: FERT(:,:,:,:)               !fertilizer application, [g m-2]
+  real(r8),target,allocatable :: FDPTH(:,:,:)                !depth of fertilizer application, [m]
+  real(r8),target,allocatable :: ROWI(:,:,:)                 !row spacing of fertilizer band, [m]
 
-  real(r8),target,allocatable :: ROWN(:,:)                       !row spacing of NH4 fertilizer band, [m]
-  real(r8),target,allocatable :: ROWO(:,:)                       !row spacing of NO3 fertilizer band, [m]
-  real(r8),target,allocatable :: ROWP(:,:)                       !row spacing of PO4 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWSpaceNH4_col(:,:)        !row spacing of NH4 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWSpaceNO3_col(:,:)        !row spacing of NO3 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWSpacePO4_col(:,:)                   !row spacing of PO4 fertilizer band, [m]
 
   private :: InitAllocate
 
@@ -36,9 +36,9 @@ module FertilizerDataType
 
   implicit none
 
-  allocate(ROWN(JY,JX)) ;ROWN=0._r8                      !row spacing of NH4 fertilizer band, [m]
-  allocate(ROWO(JY,JX)) ;ROWO=0._r8                      !row spacing of NO3 fertilizer band, [m]
-  allocate(ROWP(JY,JX)) ;ROWP=0._r8                      !row spacing of PO4 fertilizer band, [m]
+  allocate(ROWSpaceNH4_col(JY,JX)) ;ROWSpaceNH4_col=0._r8                      !row spacing of NH4 fertilizer band, [m]
+  allocate(ROWSpaceNO3_col(JY,JX)) ;ROWSpaceNO3_col=0._r8                      !row spacing of NO3 fertilizer band, [m]
+  allocate(ROWSpacePO4_col(JY,JX)) ;ROWSpacePO4_col=0._r8                      !row spacing of PO4 fertilizer band, [m]
 
   allocate(DepzCorp_col(366,JY,JX)) ;DepzCorp_col=0._r8                 !soil mixing fraction with tillage, [-]
   allocate(FERT(20,366,JY,JX)); FERT=0._r8                !fertilizer application, [g m-2]
@@ -58,9 +58,9 @@ module FertilizerDataType
   call destroy(FertN_soil_vr)
   call destroy(FertN_Band_vr)
 
-  call destroy(ROWN)                       !row spacing of NH4 fertilizer band, [m]
-  call destroy(ROWO)                       !row spacing of NO3 fertilizer band, [m]
-  call destroy(ROWP)                       !row spacing of PO4 fertilizer band, [m]
+  call destroy(ROWSpaceNH4_col)                       !row spacing of NH4 fertilizer band, [m]
+  call destroy(ROWSpaceNO3_col)                       !row spacing of NO3 fertilizer band, [m]
+  call destroy(ROWSpacePO4_col)                       !row spacing of PO4 fertilizer band, [m]
 
   call destroy(DepzCorp_col)                  !soil mixing fraction with tillage, [-]
   call destroy(FERT)                !fertilizer application, [g m-2]
