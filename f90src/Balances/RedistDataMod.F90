@@ -1,4 +1,4 @@
-module TFlxTypeMod
+module RedistDataMod
 
   use GridDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
@@ -17,6 +17,8 @@ implicit none
   real(r8),allocatable ::  trcs_TransptMacP_vr(:,:,:,:)             !net tracer flux into the grid cell through macropore flow (<0 loss) [g d-2 h-1] 
   real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)             !net salt flux into the grid cell through micropore flow (<0 loss) [mol d-2 h-1]
   real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)             !net salt flux into the grid cell through macropore flow (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  trcn_SurfRunoff_flx(:,:,:)               !nutrient tracer loss through surface runoff [g d-2 h-1]
+  real(r8),allocatable ::  trcSalt_SurfRunoff_flx(:,:,:)            !salt tracer loss through surface runoff [mol d-2 h-1]
 
   real(r8),allocatable ::  TSandEros_col(:,:)                       !column sand loss through erosion (<0 loss) [g d-2 h-1]
   real(r8),allocatable ::  TSiltEros_col(:,:)                       !column silt loss through erosion (<0 loss) [g d-2 h-1]
@@ -35,7 +37,7 @@ implicit none
   real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)               !
   real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)              !
   real(r8),allocatable ::  TWatFlowCellMacP_vr(:,:,:)               !
-
+  real(r8),allocatable ::  trcg_SurfRunoff_flx(:,:,:)               !
   real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)               !gas flux into the grid through advection and diffusion [g d-2 h-1]
 
   real(r8),allocatable ::  WatIceThawMicP_vr(:,:,:)                 !water added due to ice thaw to the grid mairopore (>0 thaw) [m3 H2O d-2 h-1]
@@ -51,7 +53,7 @@ implicit none
  
   real(r8),allocatable ::  DOM_Transp2Micp_vr(:,:,:,:,:)            !DOM added to the grid cell due to micropore transport [g d-2 h-1]
   real(r8),allocatable ::  DOM_Transp2Macp_flx(:,:,:,:,:)           !DOM added to the grid cell due to macropore transport [g d-2 h-1]
-  real(r8),allocatable ::  TOMQRS_col(:,:,:,:)                      !DOM added (>0) to the litter layer due to surface runoff [g d-2 h-1]
+  real(r8),allocatable ::  DOM_SurfRunoff_flx(:,:,:,:)                      !DOM added (>0) to the litter layer due to surface runoff [g d-2 h-1]
   real(r8),allocatable ::  TORMER_col(:,:,:,:,:)                    !Microbial residue loss due to erosion (<0 loss) [g d-2 h-1]
   real(r8),allocatable ::  TOHMER_col(:,:,:,:)                      !sorbed OM loss due to erosion (<0 loss) [g d-2 h-1]
   real(r8),allocatable ::  TOSMER_col(:,:,:,:,:)                    !total solid OM loss due to erosion (<0 loss) [g d-2 h-1]
@@ -71,7 +73,8 @@ implicit none
 
   allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MicP_vr=0._r8
   allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MacP_vr=0._r8
-
+  allocate(trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flx=0._r8  
+  allocate(trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,JY,JX));           trcSalt_SurfRunoff_flx=0._r8  
   allocate(TSandEros_col(JY,JX));      TSandEros_col=0._r8
   allocate(TSiltEros_col(JY,JX));      TSiltEros_col=0._r8
   allocate(TCLAYEros_col(JY,JX));      TCLAYEros_col=0._r8
@@ -83,6 +86,7 @@ implicit none
   allocate(TNH3ErosBand_col(JY,JX));      TNH3ErosBand_col=0._r8
   allocate(TNUreaErosBand_col(JY,JX));      TNUreaErosBand_col=0._r8
   allocate(TNO3ErosBand_col(JY,JX));      TNO3ErosBand_col=0._r8
+  allocate(trcg_SurfRunoff_flx(idg_beg:idg_NH3,JY,JX));      trcg_SurfRunoff_flx=0._r8
 
   allocate(trcx_TER_col(idx_beg:idx_end,JY,JX));    trcx_TER_col=0._r8
   allocate(trcp_TER_col(idsp_beg:idsp_end,JY,JX));      trcp_TER_col=0._r8
@@ -105,7 +109,7 @@ implicit none
 
   allocate(DOM_Transp2Micp_vr(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Micp_vr=0._r8
   allocate(DOM_Transp2Macp_flx(idom_beg:idom_end,1:jcplx,JZ,JY,JX));DOM_Transp2Macp_flx=0._r8
-  allocate(TOMQRS_col(idom_beg:idom_end,1:jcplx,JY,JX));TOMQRS_col=0._r8
+  allocate(DOM_SurfRunoff_flx(idom_beg:idom_end,1:jcplx,JY,JX));DOM_SurfRunoff_flx=0._r8
   allocate(TORMER_col(NumPlantChemElms,ndbiomcp,1:jcplx,JY,JX));TORMER_col=0._r8
   allocate(TOHMER_col(idom_beg:idom_end,1:jcplx,JY,JX));TOHMER_col=0._r8
   allocate(TOSMER_col(NumPlantChemElms,jsken,1:jcplx,JY,JX));TOSMER_col=0._r8
@@ -123,7 +127,7 @@ implicit none
   call destroy(trcx_TER_col)
   call destroy(TOMEERhetr_col)
   call destroy(TOMEERauto_col)
-  call destroy(TOMQRS_col)
+  call destroy(DOM_SurfRunoff_flx)
   call destroy(TORMER_col)
   call destroy(TOHMER_col)
   call destroy(TOSMER_col)
@@ -164,6 +168,9 @@ implicit none
   call destroy(DOM_Transp2Macp_flx)
   call destroy(trcp_TER_col)
   call destroy(Gas_AdvDif_Flx_vr)
+  call destroy(trcg_SurfRunoff_flx)
+  call destroy(trcn_SurfRunoff_flx)  
+  call destroy(trcSalt_SurfRunoff_flx)
 
   end subroutine DestructTflxType
-end module TFlxTypeMod
+end module RedistDataMod

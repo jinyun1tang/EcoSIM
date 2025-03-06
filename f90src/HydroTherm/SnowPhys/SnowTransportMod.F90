@@ -28,9 +28,8 @@ implicit none
   __FILE__
 
   public :: SaltPercolThruSnow  
-  public :: MassFluxThruSnowRunoff
+  public :: XGridSnowTracerRunoff
   public :: DiagSnowChemMass
-  public :: OverlandFlowThruSnow
   public :: TracerThruSnowfall
   public :: SoluteTransportThruSnow
   contains
@@ -216,48 +215,21 @@ implicit none
   end subroutine ChemicalBySnowRedistribution
 
 !------------------------------------------------------------------------------------------
-  subroutine MassFluxThruSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
-
+  subroutine XGridSnowTracerRunoff(N,N1,N2,N4,N5,N4B,N5B)
+  !
+  !Cross-grid tracer runoff in the snow
+  !
   implicit none
-  integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
+  integer, intent(in) :: N        !direction indicator, N=3: vertical, otherwise:horizontal
+  integer, intent(in) :: N1,N2    !current grid
+  integer, intent(in) :: N4,N5    !front
+  integer, intent(in) :: N4B,N5B  !back
   integer :: NN,idg,idn,idsalt
 
   TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrySnoBySnoRedistrib_2DH(N,N2,N1)-DrySnoBySnoRedistrib_2DH(N,N5,N4)
   TWatBySnowRedist(N2,N1)      = TWatBySnowRedist(N2,N1)+WatBySnowRedistrib_2DH(N,N2,N1)-WatBySnowRedistrib_2DH(N,N5,N4)
   TIceBySnowRedist(N2,N1)      = TIceBySnowRedist(N2,N1)+IceBySnowRedistrib_2DH(N,N2,N1)-IceBySnowRedistrib_2DH(N,N5,N4)
   THeatBySnowRedist_col(N2,N1) = THeatBySnowRedist_col(N2,N1)+HeatBySnowRedistrib_2DH(N,N2,N1)-HeatBySnowRedistrib_2DH(N,N5,N4)
-
-  D1202: DO NN=1,2
-    !gaseous tracers
-    DO idg=idg_beg,idg_NH3
-      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_FloXSurRunoff_2D(idg,N,NN,N2,N1)
-    ENDDO
-
-    !nutrient tracres
-    DO idn=ids_nut_beg,ids_nuts_end
-      trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)+trcn_FloXSurRunoff_2D(idn,N,NN,N2,N1)
-    ENDDO
-
-    IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
-
-      DO idg=idg_beg,idg_NH3
-        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5,N4)
-      ENDDO
-      DO idn=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5,N4)
-      ENDDO
-
-    ENDIF 
-
-    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
-      DO idg=idg_beg,idg_NH3
-        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5B,N4B)
-      ENDDO
-      DO idn=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5B,N4B)
-      ENDDO
-    ENDIF
-  ENDDO D1202
   !
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !
@@ -275,66 +247,14 @@ implicit none
   !
 !
   IF(salt_model)THEN
-    D1203: DO NN=1,2
-      DO idsalt=idsalt_beg,idsalt_end
-        trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)+trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N2,N1)
-      ENDDO
-
-      IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
-! runoff direction
-        DO idsalt=idsalt_beg,idsalt_end
-          trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)-trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N5,N4)
-        ENDDO
-      ENDIF
-
-      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
-        DO idsalt=idsalt_beg,idsalt_end
-          trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)-trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N5B,N4B)
-        ENDDO
-      ENDIF
-    ENDDO D1203
-
     DO idsalt=idsalt_beg,idsalt_end
       trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1) &
         +trcSalt_FloXSnow_2DH(idsalt,N,N2,N1)-trcSalt_FloXSnow_2DH(idsalt,N,N5,N4)
     ENDDO
   ENDIF
 
-  end subroutine MassFluxThruSnowRunoff
-!------------------------------------------------------------------------------------------
+  end subroutine XGridSnowTracerRunoff
 
-  subroutine OverlandFlowThruSnow(I,J,NY,NX)
-  implicit none 
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NY,NX
-  integer :: idsalt,idn,idg
-  real(r8) :: dflx
-
-    !    SOLUTES
-!  exclude NH3B
-
-  DO idg=idg_beg,idg_NH3
-    dflx=-trcg_SurfRunoff_flx(idg,NY,NX)
-    call fixEXConsumpFlux(trcs_solml_vr(idg,0,NY,NX),dflx)
-    trcg_SurfRunoff_flx(idg,NY,NX)=-dflx
-    GasHydroLossFlx_col(idg,NY,NX)=GasHydroLossFlx_col(idg,NY,NX)+trcg_SurfRunoff_flx(idg,NY,NX)
-  ENDDO
-
-  DO idn=ids_nut_beg,ids_nuts_end
-    dflx=-trcn_SurfRunoff_flx(idn,NY,NX)
-    call fixEXConsumpFlux(trcs_solml_vr(idn,0,NY,NX),dflx)
-    trcn_SurfRunoff_flx(idn,NY,NX)=-dflx
-  ENDDO
-
-
-  IF(salt_model)THEN
-    DO idsalt=idsalt_beg,idsalt_end
-      dflx=-trcSalt_SurfRunoff_flx(idsalt,NY,NX)
-      call fixEXConsumpFlux(trcSalt_solml_vr(idsalt,0,NY,NX),dflx)
-      trcSalt_SurfRunoff_flx(idsalt,NY,NX)=-dflx
-    ENDDO
-  ENDIF
-  end subroutine OverlandFlowThruSnow
 !------------------------------------------------------------------------------------------
 
   subroutine TracerThruSnowfall(I,J,NY,NX)

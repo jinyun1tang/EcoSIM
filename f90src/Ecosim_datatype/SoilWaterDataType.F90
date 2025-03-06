@@ -35,7 +35,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  DTBLD(:,:)                                !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepzIntWTBL_col(:,:)                      !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0_col(:,:)                  !initial external water table depth, elevation corrected [m]
-  real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                    !current external water table depth, elevation corrected [m]
+  real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                    !current external water table depth, elevation corrected (>0 lower than soil surface) [m]
   real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                      !external water table depth, [m]
   real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)              !total energy impact for erosion
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                !excess water+ice

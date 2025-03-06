@@ -447,35 +447,23 @@ implicit none
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
 !     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
+
   IF(FlowDirIndicator(NY,NX).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     HO           = XN*HeatFlow2Soil_3D(N,N6,N5,N4)
     HeatOut_lnds = HeatOut_lnds-HO
     WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowSoiMacP_3D(N,N6,N5,N4))   !XN<0, going out grid
 
     IF(abs(WO)>0._r8)THEN
+
       QH2OLoss_lnds            = QH2OLoss_lnds-WO
       H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
 !
-!     SUBSURFACE BOUNDARY FLUXES OF CO2 AND DOC
-!
-!     X*FLS,X*FHS=solute flux in macropores,micropores from TranspNoSalt.f
-!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
-!     TOMOU_lnds(ielmc)=cumulative C loss through lateral and lower boundaries
-!     HydroSubsDOCFlx_col,HydroSubsDICFlx_col=dissolved organic,inorganic C loss through subsurface boundaries
-!
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
-!
-!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
-!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
-!     TOMOU_lnds(ielmn)=cumulative N loss through lateral and lower boundaries
-!     HydroSubsDONFlx_col,HydroSubsDINFlx_col=dissolved organic,inorganic N loss through subsurface boundaries
-!
-!     SUBSURFACE BOUNDARY FLUXES OF PO4 AND DOP
-!
-!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
-!     TOMOU_lnds(ielmp)=cumulative P loss through lateral and lower boundaries
-!     HydroSubsDOPFlx_col,HydroSubsDIPFlx_col=dissolved organic,inorganic P loss through subsurface boundaries
-!
+      if(N.NE.iVerticalDirection)THEN
+
+      endif
+
+!!
       MOD=0.0_r8
 
       D450: DO K=1,jcplx

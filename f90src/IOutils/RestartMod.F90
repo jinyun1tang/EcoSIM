@@ -4781,16 +4781,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='VLWatheldCapSurf_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='VLWatHeldCapSurf_col', dim1name='column',&
        long_name='soil surface water retention capacity', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatheldCapSurf_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatHeldCapSurf_col,datrc_1d) 
   else
-    !print*,'VLWatheldCapSurf_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatheldCapSurf_col,datrc_1d)   
+    !print*,'VLWatHeldCapSurf_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatHeldCapSurf_col,datrc_1d)   
     datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='VLWatheldCapSurf_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='VLWatHeldCapSurf_col', dim1name='column',&
        long_name='soil surface water retention capacity', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

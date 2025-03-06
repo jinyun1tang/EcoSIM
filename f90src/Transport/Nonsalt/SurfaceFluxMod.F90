@@ -127,7 +127,7 @@ contains
 !     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
 !     IN SOIL SURFACE LAYER
 !
-  call OverLandTracerTransptM(M,NY,NX,NHE,NHW,NVS,NVN)
+  call LateralXGridTracerTransptM(M,NY,NX,NHE,NHW,NVS,NVN)
 
   call PrintInfo('end '//subname)
   end subroutine SoluteFluxSurfaceM
@@ -402,7 +402,6 @@ contains
   real(r8) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
   real(r8) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
-
   call PrintInfo('beg '//subname)
 !
 !     MACROPORE TO MICROPORE TRANSFER
@@ -506,7 +505,10 @@ contains
   end subroutine TopSoilMicMacPoreTracerXferM
 !------------------------------------------------------------------------------------------
 
-  subroutine OverLandTracerTransptM(M,NY,NX,NHE,NHW,NVS,NVN)
+  subroutine LateralXGridTracerTransptM(M,NY,NX,NHE,NHW,NVS,NVN)
+  !
+  !Description:
+  !Do inter-grid lateral transport at the surface
   implicit none
 
   integer, intent(in) :: M, NY, NX, NHE, NHW, NVS, NVN
@@ -517,7 +519,6 @@ contains
   N1=NX;N2=NY
   IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM_vr(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
       VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
@@ -548,7 +549,7 @@ contains
     D4305: DO NN=1,2
       IF(N.EQ.iEastWestDirection)THEN
         !east-west
-        IF((NX.EQ.NHE.AND.NN.EQ.iOutflow) .OR. (NX.EQ.NHW.AND.NN.EQ.iInflow))THEN
+        IF((NX.EQ.NHE .AND. NN.EQ.iOutflow) .OR. (NX.EQ.NHW .AND. NN.EQ.iInflow))THEN
           cycle
         ELSE
           N4  = NX+1
@@ -558,7 +559,7 @@ contains
         ENDIF
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !south-north
-        IF((NY.EQ.NVS.AND.NN.EQ.iOutflow) .OR. (NY.EQ.NVN.AND.NN.EQ.iInflow))THEN
+        IF((NY.EQ.NVS .AND. NN.EQ.iOutflow) .OR. (NY.EQ.NVN .AND. NN.EQ.iInflow))THEN
           cycle
         ELSE
           N4  = NX
@@ -588,9 +589,6 @@ contains
           ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-!
-!     XQR*=hourly solute in runoff
-!     RQR*=solute in runoff
 !
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
@@ -715,7 +713,7 @@ contains
       ENDIF
     ENDDO D4305
   ENDDO D4310
-  end subroutine OverLandTracerTransptM
+  end subroutine LateralXGridTracerTransptM
 !------------------------------------------------------------------------------------------
 
   subroutine LitterGasVolatilDissolMM(I,J,M,NY,NX,RGas_Dif_Atm2Litr_FlxMM)

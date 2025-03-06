@@ -109,7 +109,7 @@ module NitroPars
   real(r8) :: RCCY
   real(r8) :: FPRIM
   real(r8) :: FPRIMM
-  real(r8) :: OMGR
+  real(r8) :: OMGR     !reserve turnover rate [1/h]
   real(r8) :: OQKI
   real(r8) :: H2KI
   real(r8) :: OAKI
@@ -207,7 +207,7 @@ module NitroPars
   RCCY   = 0.833_r8
   FPRIM  = 5.0E-02_r8
   FPRIMM = ppmc
-  OMGR   = 2.5E-01_r8
+  OMGR   = 2.5E-01_r8  !
   OQKI   = 1.2E+03_r8
   H2KI   = 1.0_r8
   OAKI   = 12.0_r8
