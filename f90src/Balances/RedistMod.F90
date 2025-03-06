@@ -14,7 +14,7 @@ module RedistMod
   use GridDataType
   use ErosionBalMod
   use RunoffBalMod
-  use TFlxTypeMod
+  use RedistDataMod
   use SoilLayerDynMod
   use SOMDataType
   USE SoilPropertyDataType
@@ -167,7 +167,7 @@ module RedistMod
 
   DO idg=idg_beg,idg_NH3
     SurfGasEmisFlx_col(idg,NY,NX) = trcg_air2root_flx_col(idg,NY,NX) + trcg_ebu_flx_col(idg,NY,NX) &
-      + GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX) + &
+      + GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX) &
       + TRootGasLossDisturb_pft(idg,NY,NX)
     SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmisFlx_col(idg,NY,NX)
   ENDDO
@@ -410,7 +410,7 @@ module RedistMod
   !
   WI                       = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux    = rain/snowfall + irrigation
   CRAIN_lnd                = CRAIN_lnd+WI
-  QRain_CumYr_col(NY,NX)   = WI
+  QRain_CumYr_col(NY,NX)   = QRain_CumYr_col(NY,NX)+WI
   WO                       = VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
   CEVAP                    = CEVAP-WO
   QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
@@ -586,7 +586,7 @@ module RedistMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
 
-  integer :: K,idom
+  integer :: K,idom,idg,idn,idsalt
   !     begin_execution
   !
   if(lverb)write(*,*)'OverlandFlow'
@@ -596,11 +596,24 @@ module RedistMod
     !
     D8570: DO K=1,micpar%NumOfLitrCmplxs    
       DO idom=idom_beg,idom_end
-        DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+TOMQRS_col(idom,K,NY,NX)
+        DOM_vr(idom,K,0,NY,NX)=DOM_vr(idom,K,0,NY,NX)+DOM_SurfRunoff_flx(idom,K,NY,NX)
       ENDDO
     ENDDO D8570
 !
-    call OverlandFlowThruSnow(I,J,NY,NX)
+    DO idg=idg_beg,idg_NH3    
+      call fixEXConsumpFlux(trcs_solml_vr(idg,0,NY,NX),trcg_SurfRunoff_flx(idg,NY,NX),-1)    
+      GasHydroLossFlx_col(idg,NY,NX)=GasHydroLossFlx_col(idg,NY,NX)+trcg_SurfRunoff_flx(idg,NY,NX)
+    ENDDO
+
+    DO idn=ids_nut_beg,ids_nuts_end    
+      call fixEXConsumpFlux(trcs_solml_vr(idn,0,NY,NX),trcn_SurfRunoff_flx(idn,NY,NX),-1)    
+    ENDDO
+
+    IF(salt_model)THEN
+      DO idsalt=idsalt_beg,idsalt_end
+        call fixEXConsumpFlux(trcSalt_solml_vr(idsalt,0,NY,NX),trcSalt_SurfRunoff_flx(idsalt,NY,NX),-1)
+      ENDDO
+    ENDIF
 
   ENDIF
   end subroutine OverlandFlow

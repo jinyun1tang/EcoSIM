@@ -242,7 +242,7 @@ contains
 
       !Turn off the tracer mass conservation check momentarily, due to complication of 
       !grid change. It will be turned on when a safe strategy will be figured out later.
-      return
+      
       DO idg=idg_beg,idg_NH3-1        
         tracer_mass_err(idg) = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
           -trcg_TotalMass_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)

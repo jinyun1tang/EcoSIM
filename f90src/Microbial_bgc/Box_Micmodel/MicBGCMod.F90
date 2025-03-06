@@ -4068,8 +4068,10 @@ module MicBGCMod
 !     CGOMS,CGONS,CGOPS=transfer from nonstructural to structural C,N,P
 !     FL=partitioning between labile and resistant microbial components
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
-! M=1:labile, 2, resistant
+
   CGOMZ=GrowthEnvScalHeter(NGL,K)*OMGR*AZMAX1(mBiomeHeter(ielmc,MID3,K))
+  
+! M=1:labile, 2, resistant
   D745: DO M=1,2
     NonstX2stBiomHeter(ielmc,M,NGL,K)=FL(M)*CGOMZ
     IF(mBiomeHeter(ielmc,MID3,K).GT.ZEROS)THEN

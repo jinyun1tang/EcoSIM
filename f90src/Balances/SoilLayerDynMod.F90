@@ -8,7 +8,7 @@ module SoilLayerDynMod
   use UnitMod,           only: units
   use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
   use DebugToolMod
-  USE TFlxTypeMod      
+  USE RedistDataMod      
   use RootDataType
   use GridDataType
   USE EcoSIMCtrlDataType
@@ -848,9 +848,9 @@ implicit none
     !CumLitRDepzInit_col is the initial litter layer bottom
 
     !obtain the water volume exceeding the litter layer water holding capacity
-    XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-VLWatheldCapSurf_col(NY,NX))
+    XVOLWP=AZMAX1(VLWatMicP_vr(0,NY,NX)-VLWatHeldCapSurf_col(NY,NX))
     IF(L.EQ.NU(NY,NX) .AND. CumDepz2LayBottom_vr(0,NY,NX).GT.CumLitRDepzInit_col(NY,NX) & !layer NU is lower than its intial depth
-      .AND. XVOLWP.GT.(VLWatheldCapSurf_col(NY,NX)+VHCPNX_col(NY,NX)/cpw))THEN            !sufficient surface ponding water
+      .AND. XVOLWP.GT.(VLWatHeldCapSurf_col(NY,NX)+VHCPNX_col(NY,NX)/cpw))THEN            !sufficient surface ponding water
           !     IF((SoilBulkDensity_vr(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(SoilBulkDensity_vr(L,NY,NX).LE.ZERO))THEN
       !layer L is sinking    
@@ -1833,9 +1833,9 @@ implicit none
 !             SatHydroCondHrzn_vr(L0,NY,NX)=SatHydroCondHrzn_vr(L0,NY,NX)-FXSCNH
 
   IF(L0.EQ.0)THEN
-    FXVOLW=FX*AZMAX1(XVOLWP+VLWatheldCapSurf_col(NY,NX))
+    FXVOLW=FX*AZMAX1(XVOLWP+VLWatHeldCapSurf_col(NY,NX))
     Qinflx2Soil_col(NY,NX) = Qinflx2Soil_col(NY,NX)+FXVOLW
-!    if(I==312 .and. J==22)write(211,*)'mvwat',FX,FO,FXVOLW,XVOLWP,VLWatheldCapSurf_col(NY,NX)    
+!    if(I==312 .and. J==22)write(211,*)'mvwat',FX,FO,FXVOLW,XVOLWP,VLWatHeldCapSurf_col(NY,NX)    
   ELSE
     FXVOLW=FWO*VLWatMicP_vr(L0,NY,NX)
   ENDIF

@@ -302,6 +302,7 @@ implicit none
         TotPopuRoot1stLen_rpvr = TotRoot1stLen*PlantPopulation_pft(NZ)
         TotPopuRootLen         = TotRoot2ndLen+TotPopuRoot1stLen_rpvr
         WTRTT                  = Root2ndC+Root1stC
+        
         IF(TotPopuRootLen.GT.ZERO4Groth_pft(NZ) .AND. WTRTT.GT.ZERO4Groth_pft(NZ) &
           .AND. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
           RootLenPerPlant_pvr(N,L,NZ)=TotPopuRootLen/PlantPopulation_pft(NZ)

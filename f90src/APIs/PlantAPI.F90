@@ -597,6 +597,7 @@ implicit none
         enddo
       enddo
     ENDDO
+    
     !the following needs to be updated 
     Root1stMaxRadius_pft(2,NZ,NY,NX) = plt_morph%Root1stMaxRadius_pft(2,NZ)
     Root2ndMaxRadius_pft(2,NZ,NY,NX) = plt_morph%Root2ndMaxRadius_pft(2,NZ)

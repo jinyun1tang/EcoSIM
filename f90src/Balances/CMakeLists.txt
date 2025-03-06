@@ -1,5 +1,5 @@
 set(BALANCES_MOD_SOURCES
-  TFlxTypeMod.F90
+  RedistDataMod.F90
   LateralTranspMod.F90
   SoilLayerDynMod.F90
   RunoffBalMod.F90

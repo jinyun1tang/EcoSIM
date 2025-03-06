@@ -32,7 +32,7 @@ implicit none
 
   public :: SurfLitREnergyBalanceM
   public :: UpdateLitRPhys
-  public :: LateralGridsHdryoExch
+  public :: XGridsLateralHydryoExch
   public :: UpdateLitRBe4RunoffM
   public :: UpdateLitRAftRunoffM
   public :: PartLitSoilFractionM
@@ -47,7 +47,7 @@ implicit none
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     if(SoilOrgM_vr(ielmc,0,NY,NX).GT.1.e-2_r8 .or. XVLMobileWaterLitR_col(NY,NX) > 0._r8)then
       FracSurfBareSoil_col(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,0,NY,NX))),&
-        XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
+        XVLMobileWaterLitR_col(NY,NX)/VLWatHeldCapSurf_col(NY,NX)))
     else
       FracSurfBareSoil_col(NY,NX)=1._r8
     endif
@@ -589,7 +589,7 @@ implicit none
     FracSoiPAsWat_vr(0,NY,NX)     = AZMIN1(1._r8,AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)))
     FracSoiPAsIce_vr(0,NY,NX)     = AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX))
     AirFilledSoilPore_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
-      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatHeldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)     = 0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)     = 0.0_r8
@@ -678,7 +678,7 @@ implicit none
     FracSoiPAsWat_vr(0,NY,NX)     = AZMIN1(1._r8,AZMAX1t(VLWatMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)))
     FracSoiPAsIce_vr(0,NY,NX)     = AZMIN1(1._r8,AZMAX1t(VLiceMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)))
     AirFilledSoilPore_vr(0,NY,NX) = AZMAX1t(VLairMicP1_vr(0,NY,NX)/VLitR_col(NY,NX)) &
-      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatheldCapSurf_col(NY,NX)))
+      *AZMAX1t((1.0_r8-XVLMobileWaterLitR_col(NY,NX)/VLWatHeldCapSurf_col(NY,NX)))
   ELSE
     FracSoiPAsWat_vr(0,NY,NX)     = 0.0_r8
     FracSoiPAsIce_vr(0,NY,NX)     = 0.0_r8
@@ -717,9 +717,11 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LateralGridsHdryoExch(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
+  subroutine XGridsLateralHydryoExch(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
   !
-  !between grid horizontal water flow
+  !Description: 
+  !Horizontal water flow between inner grids
+  !
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
@@ -742,7 +744,7 @@ implicit none
       IF(N.EQ.iEastWestDirection)THEN
         !east-west
         IF((NX.EQ.NHE .AND. NN.EQ.iOutflow) .OR. (NX.EQ.NHW .AND. NN.EQ.iInflow))THEN
-          !at the eastern/western boundary 
+          !do nothing at the eastern/western boundary 
           cycle
         ELSE
           N4  = NX+1   !right/east
@@ -753,7 +755,7 @@ implicit none
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !south-north
         IF((NY.EQ.NVS .AND. NN.EQ.iOutflow) .OR. (NY.EQ.NVN .AND. NN.EQ.iInflow))THEN
-          !at the boundary
+          !do nothing at the boundary
           cycle
         ELSE
           N4  = NX
@@ -765,7 +767,6 @@ implicit none
 !
 !     ELEVATION OF EACH PAIR OF ADJACENT GRID CELLS
 !
-!     XVOLT,XVOLW=excess water+ice,water in destination grid cell
 !     ALT1,ALT2=elevation of source,destination
 !     QRQ1=equilibrium runoff
 !     WatFlx2LitRByRunoff,HeatFlx2LitRByRunoff=runoff, convective heat from runoff
@@ -780,14 +781,16 @@ implicit none
         ! there is runoff
         ! source grid elevation
         ALT1=Altitude_grid(N2,N1)+XVLMobileWaterLitR_col(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
-!
-!     EAST OR SOUTH RUNOFF
-!
+   
+        ! EAST OR SOUTH RUNOFF
+
         IF(NN.EQ.iOutflow)THEN
           !destination grid (N5,N4) elevation
           ALT2=Altitude_grid(N5,N4)+XVLMobileWaterLitR_col(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
+
+          !out flow from source grid into dest grid, AZMAX1 ensures upstream flow,
           IF(ALT1.GT.ALT2)THEN
-            !out flow from source grid into dest grid, AZMAX1 ensures upstream flow,
+            
             QRQ1=AZMAX1((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5,N4),N5,N4) &  
               -XVLMobileWaterLitR_col(N5,N4)*AREA(3,NUM(N2,N1),N2,N1) &
               +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &            
@@ -808,9 +811,9 @@ implicit none
             IFLBM(M,N,2,N5,N4)                  = 0
           ENDIF
         ENDIF
-!
-!     WEST OR NORTH RUNOFF
-!
+
+        !  WEST OR NORTH RUNOFF
+
         IF(NN.EQ.iInflow)THEN
           IF(N4B.GT.0 .AND. N5B.GT.0)THEN
             !destination grid (N5B,N4B) 
@@ -828,12 +831,11 @@ implicit none
               HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B)+HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
               QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)     = WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
               IFLBM(M,N,1,N5B,N4B)                   = 1
-
             ELSE
               WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = 0.0_r8
               HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
               QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)    = 0.0_r8
-              IFLBM(M,N,1,N5B,N4B)                  = 1
+              IFLBM(M,N,1,N5B,N4B)                  = 0
             ENDIF
           ENDIF
         ENDIF
@@ -850,6 +852,7 @@ implicit none
           IFLBM(M,N,1,N5B,N4B)                  = 0
         ENDIF
       ENDIF
+
       IF(M.EQ.NPH)THEN
         IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
         IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
@@ -860,7 +863,7 @@ implicit none
     ENDDO  
   ENDDO
   
-  end subroutine LateralGridsHdryoExch
+  end subroutine XGridsLateralHydryoExch
 
 
 end module SurfLitterPhysMod

@@ -14,7 +14,7 @@ module ErosionBalMod
   USE AqueChemDatatype
   use FlagDataType
   use FertilizerDataType
-  use TFlxTypeMod
+  use RedistDataMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
