@@ -212,71 +212,72 @@ implicit none
 
   
   idom_beg=1;idom_end=0
-  idom_doc=addone(idom_end)
-  idom_don=addone(idom_end)
-  idom_dop=addone(idom_end)
-  idom_acetate=addone(idom_end)
+  idom_doc     = addone(idom_end)
+  idom_don     = addone(idom_end)
+  idom_dop     = addone(idom_end)
+  idom_acetate = addone(idom_end)
 
   idsalt_beg=1;idsalt_end=0  
   if(lsalt_model)then
-    idsalt_Al=addone(idsalt_end)
-    idsalt_Fe=addone(idsalt_end)
-    idsalt_Hp=addone(idsalt_end)
-    idsalt_Ca=addone(idsalt_end)
-    idsalt_Mg=addone(idsalt_end)
-    idsalt_Na=addone(idsalt_end)
-    idsalt_K=addone(idsalt_end)
-    idsalt_OH=addone(idsalt_end)
-    idsalt_SO4=addone(idsalt_end)
-    idsalt_Cl=addone(idsalt_end)
-    idsalt_CO3=addone(idsalt_end)
-    idsalt_HCO3=addone(idsalt_end)
-    idsalt_mend=idsalt_end
-    idsalt_AlOH=addone(idsalt_end)
-    idsalt_AlOH2=addone(idsalt_end)
-    idsalt_AlOH3=addone(idsalt_end)
-    idsalt_AlOH4=addone(idsalt_end)
-    idsalt_AlSO4=addone(idsalt_end)
-    idsalt_FeOH =addone(idsalt_end)
-    idsalt_FeOH2=addone(idsalt_end)
-    idsalt_FeOH3=addone(idsalt_end)
-    idsalt_FeOH4=addone(idsalt_end)
-    idsalt_FeSO4=addone(idsalt_end)
-    idsalt_CaOH=addone(idsalt_end)
-    idsalt_CaCO3=addone(idsalt_end)
-    idsalt_CaHCO3=addone(idsalt_end)
-    idsalt_CaSO4 =addone(idsalt_end)
-    idsalt_MgOH2 =addone(idsalt_end)
-    idsalt_MgCO3 =addone(idsalt_end)
-    idsalt_MgHCO3=addone(idsalt_end)
-    idsalt_MgSO4 =addone(idsalt_end)
-    idsalt_NaCO3 =addone(idsalt_end)
-    idsalt_NaSO4 =addone(idsalt_end)
-    idsalt_KSO4  =addone(idsalt_end)
+    idsalt_Al     = addone(idsalt_end)
+    idsalt_Fe     = addone(idsalt_end)
+    idsalt_Hp     = addone(idsalt_end)
+    idsalt_Ca     = addone(idsalt_end)
+    idsalt_Mg     = addone(idsalt_end)
+    idsalt_Na     = addone(idsalt_end)
+    idsalt_K      = addone(idsalt_end)
+    idsalt_OH     = addone(idsalt_end)
+    idsalt_SO4    = addone(idsalt_end)
+    idsalt_Cl     = addone(idsalt_end)
+    idsalt_CO3    = addone(idsalt_end)
+    idsalt_HCO3   = addone(idsalt_end)
+    idsalt_mend   = idsalt_end
+    idsalt_AlOH   = addone(idsalt_end)
+    idsalt_AlOH2  = addone(idsalt_end)
+    idsalt_AlOH3  = addone(idsalt_end)
+    idsalt_AlOH4  = addone(idsalt_end)
+    idsalt_AlSO4  = addone(idsalt_end)
+    idsalt_FeOH   = addone(idsalt_end)
+    idsalt_FeOH2  = addone(idsalt_end)
+    idsalt_FeOH3  = addone(idsalt_end)
+    idsalt_FeOH4  = addone(idsalt_end)
+    idsalt_FeSO4  = addone(idsalt_end)
+    idsalt_CaOH   = addone(idsalt_end)
+    idsalt_CaCO3  = addone(idsalt_end)
+    idsalt_CaHCO3 = addone(idsalt_end)
+    idsalt_CaSO4  = addone(idsalt_end)
+    idsalt_MgOH2  = addone(idsalt_end)
+    idsalt_MgCO3  = addone(idsalt_end)
+    idsalt_MgHCO3 = addone(idsalt_end)
+    idsalt_MgSO4  = addone(idsalt_end)
+    idsalt_NaCO3  = addone(idsalt_end)
+    idsalt_NaSO4  = addone(idsalt_end)
+    idsalt_KSO4   = addone(idsalt_end)
 
-    idsalt_H0PO4 =addone(idsalt_end)
-    idsalt_H3PO4 =addone(idsalt_end)
-    idsalt_FeHPO4=addone(idsalt_end)
-    idsalt_FeH2PO4=addone(idsalt_end)
-    idsalt_CaPO4 =addone(idsalt_end)
-    idsalt_CaHPO4=addone(idsalt_end)
-    idsalt_CaH4P2O8=addone(idsalt_end)
-    idsalt_MgHPO4=addone(idsalt_end)
-    idsalt_end=idsalt_MgHPO4
-    idsaltb_beg=idsalt_end+1
-    idsaltb_end=idsaltb_beg
+    idsalt_H0PO4    = addone(idsalt_end)
+    idsalt_H3PO4    = addone(idsalt_end)
+    idsalt_FeHPO4   = addone(idsalt_end)
+    idsalt_FeH2PO4  = addone(idsalt_end)
+    idsalt_CaPO4    = addone(idsalt_end)
+    idsalt_CaHPO4   = addone(idsalt_end)
+    idsalt_CaH4P2O8 = addone(idsalt_end)
+    idsalt_MgHPO4   = addone(idsalt_end)
+
+    idsalt_end  = idsalt_MgHPO4
+    idsaltb_beg = idsalt_end+1
+    idsaltb_end = idsaltb_beg
     idsalt_psoil_beg=idsalt_H0PO4;idsalt_psoil_end=idsalt_MgHPO4
 
     idsalt_nuts=idsalt_MgHPO4-idsalt_H0PO4
 
-    idsalt_H0PO4B=addone(idsaltb_end)   ! PO4
-    idsalt_H3PO4B=addone(idsaltb_end)  ! H3PO4
-    idsalt_FeHPO4B=addone(idsaltb_end)  ! FeHPO4
-    idsalt_FeH2PO4B=addone(idsaltb_end) ! FeH2PO4
-    idsalt_CaPO4B=addone(idsaltb_end)   ! CaPO4
-    idsalt_CaHPO4B=addone(idsaltb_end)  ! CaHPO4
-    idsalt_CaH4P2O8B=addone(idsaltb_end) ! CaH4P2O8
-    idsalt_MgHPO4B =addone(idsaltb_end)! MgHPO4
+    idsalt_H0PO4B    = addone(idsaltb_end)   ! PO4
+    idsalt_H3PO4B    = addone(idsaltb_end)  ! H3PO4
+    idsalt_FeHPO4B   = addone(idsaltb_end)  ! FeHPO4
+    idsalt_FeH2PO4B  = addone(idsaltb_end) ! FeH2PO4
+    idsalt_CaPO4B    = addone(idsaltb_end)   ! CaPO4
+    idsalt_CaHPO4B   = addone(idsaltb_end)  ! CaHPO4
+    idsalt_CaH4P2O8B = addone(idsaltb_end) ! CaH4P2O8
+    idsalt_MgHPO4B   = addone(idsaltb_end)! MgHPO4
     idsalt_pband_beg=idsalt_H0PO4B;idsalt_pband_end=idsalt_MgHPO4B
 
     idsaltb_end=idsalt_MgHPO4B

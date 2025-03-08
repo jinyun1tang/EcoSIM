@@ -112,7 +112,7 @@ contains
 
   subroutine StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
-  use SnowPhysMod, only : CopySnowStates
+  use SnowPhysMod, only : StageSnowModel
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8),dimension(:,:),intent(OUT) :: ResistanceLitRLay(JY,JX)
@@ -151,7 +151,7 @@ contains
       Altitude_grid(NY,NX)        = ALT(NY,NX)-CumDepz2LayBottom_vr(NUM(NY,NX)-1,NY,NX)
       EnergyImpact4Erosion(NY,NX) = EnergyImpact4Erosion(NY,NX)*(1.0_r8-FEnergyImpact4Erosion)
 
-      call CopySnowStates(I,J,NY,NX)
+      call StageSnowModel(I,J,NY,NX)
       
       call CopySurfaceVars(I,J,NY,NX)
       
@@ -1336,6 +1336,7 @@ contains
 !     TFLWC=canopy intercepted precipitation
 !     FSNW=fraction of snow cover
 !     PrecIntceptByCanopy_col=precipitation intercepted by plant canopy
+
 ! partition throughfall 
   IF(PrecRainAndIrrig_col(NY,NX).GT.0.0_r8 .OR. SnoFalPrec_col(NY,NX).GT.0.0_r8)THEN
   ! there is precipitation
@@ -1375,26 +1376,28 @@ contains
 !     Rain2LitRSurf_col,Irrig2LitRSurf_col=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
+  !there is precipitation, there is significant snow layer
   IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 &
-    .AND. VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
-    !there is precipitation, there is significant snow layer
-    Rain2LitRSurf_col(NY,NX) = 0.0_r8
-    Irrig2LitRSurf_col(NY,NX)    = 0.0_r8
-    Rain2SoilSurf_col(NY,NX) = PrecAtm_col(NY,NX)
-    Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)
+    .AND. VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN     
+    Rain2LitRSurf_col(NY,NX)  = 0.0_r8
+    Irrig2LitRSurf_col(NY,NX) = 0.0_r8
+    Rain2SoilSurf_col(NY,NX)  = PrecAtm_col(NY,NX)
+    Irrig2SoilSurf_col(NY,NX) = IrrigSurface_col(NY,NX)
+
+  !there is insignificant snow layer and precipiation
   ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
-    .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
-    !there is insignificant snow layer
-    Rain2LitRSurf_col(NY,NX) = RainThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
-    Irrig2LitRSurf_col(NY,NX)    = RainThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
-    Rain2SoilSurf_col(NY,NX) = PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
-    Irrig2SoilSurf_col(NY,NX)    = IrrigSurface_col(NY,NX)-Irrig2LitRSurf_col(NY,NX)
+    .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN  
+    Rain2LitRSurf_col(NY,NX)  = RainThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
+    Irrig2LitRSurf_col(NY,NX) = RainThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
+    Rain2SoilSurf_col(NY,NX)  = PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
+    Irrig2SoilSurf_col(NY,NX) = IrrigSurface_col(NY,NX)-Irrig2LitRSurf_col(NY,NX)
+  !no precipiation  
   ELSE
     !no precipitation
-    Rain2LitRSurf_col(NY,NX) = 0.0_r8
-    Irrig2LitRSurf_col(NY,NX)    = 0.0_r8
-    Rain2SoilSurf_col(NY,NX) = 0.0_r8
-    Irrig2SoilSurf_col(NY,NX)    = 0.0_r8
+    Rain2LitRSurf_col(NY,NX)  = 0.0_r8
+    Irrig2LitRSurf_col(NY,NX) = 0.0_r8
+    Rain2SoilSurf_col(NY,NX)  = 0.0_r8
+    Irrig2SoilSurf_col(NY,NX) = 0.0_r8
   ENDIF
 !
 !     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS

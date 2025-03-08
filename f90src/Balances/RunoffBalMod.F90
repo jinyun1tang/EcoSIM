@@ -23,11 +23,11 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: RunThruGridBounds
+  public :: RunXGridBounds
 
   contains
 
-  subroutine RunThruGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine RunXGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
   integer :: N
@@ -125,7 +125,7 @@ implicit none
     ENDDO D9980
   ENDDO D9985
 
-  end subroutine RunThruGridBounds
+  end subroutine RunXGridBounds
 
 !------------------------------------------------------------------------------------------
 

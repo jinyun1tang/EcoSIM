@@ -37,21 +37,21 @@ module SnowPhysData
   real(r8),allocatable ::  XSnowThawMassLM_snvr(:,:,:)
   real(r8),allocatable ::  XIceThawMassLM_snvr(:,:,:)
   real(r8),allocatable ::  tEnGYM_snvr(:,:,:)  
-  real(r8),allocatable ::  CumSno2SnowL_snvr(:,:,:)                       !
-  real(r8),allocatable ::  CumWat2SnowL_snvr(:,:,:)                       !
-  real(r8),allocatable ::  CumIce2SnowL_snvr(:,:,:)                       !
-  real(r8),allocatable ::  CumHeat2SnowL_snvr(:,:,:)                      !
-  real(r8),allocatable ::  XPhaseChangeHeatLM_snvr(:,:,:)                       !
-  real(r8),allocatable ::  WatX2SnoLay_snvr(:,:,:)                       !
-  real(r8),allocatable ::  SnoX2SnoLay_snvr(:,:,:)                       !
-  real(r8),allocatable ::  IceX2SnoLay_snvr(:,:,:)                       !
-  real(r8),allocatable ::  HeatX2SnoLay_snvr(:,:,:)                      !
-  real(r8),allocatable ::  VLDrySnoWE0M_snvr(:,:,:)                !dry snow layer volume during iteration
-  real(r8),allocatable ::  VLDrySnoWE0_snvr(:,:,:)                 !dry snow layer volume before update
-  real(r8),allocatable ::  VLIceSnow0_snvr(:,:,:)                  !snow-held ice layer volume before update
-  real(r8),allocatable ::  VLWatSnow0_snvr(:,:,:)                       !snow-held water layer volume before update
-  real(r8),allocatable ::  VLSnoDWI1_snvr(:,:,:)                   !
-  real(r8),allocatable ::  SnowThickL0_snvr(:,:,:)                      !
+  real(r8),allocatable ::  CumSno2SnowL_snvr(:,:,:)                !
+  real(r8),allocatable ::  CumWat2SnowL_snvr(:,:,:)                !
+  real(r8),allocatable ::  CumIce2SnowL_snvr(:,:,:)                !
+  real(r8),allocatable ::  CumHeat2SnowL_snvr(:,:,:)               !cumulative heat into snow layer [MJ d-2]
+  real(r8),allocatable ::  XPhaseChangeHeatLM_snvr(:,:,:)          !heat released due to ice/liquid phase change [MJ d-2]
+  real(r8),allocatable ::  WatX2SnoLay_snvr(:,:,:)                 !liquid water flux into snow layer [m3 d-2]
+  real(r8),allocatable ::  SnoX2SnoLay_snvr(:,:,:)                 !dry snow flux into snow layer [m3 d-2]
+  real(r8),allocatable ::  IceX2SnoLay_snvr(:,:,:)                 !ice flux into snow layer  [m3 d-2]
+  real(r8),allocatable ::  HeatX2SnoLay_snvr(:,:,:)                !heat flux into snow layer [MJ d-2]
+  real(r8),allocatable ::  VLDrySnoWE0M_snvr(:,:,:)                !dry snow layer volume during iteration [m3 d-2]
+  real(r8),allocatable ::  VLDrySnoWE0_snvr(:,:,:)                 !dry snow layer volume before update [m3 d-2]
+  real(r8),allocatable ::  VLIceSnow0_snvr(:,:,:)                  !snow-held ice layer volume before update [m3 d-2]
+  real(r8),allocatable ::  VLWatSnow0_snvr(:,:,:)                  !snow-held water layer volume before update [m3 d-2]
+  real(r8),allocatable ::  VLSnoDWI1_snvr(:,:,:)                   !total snow volume during iteration [m3 d-2] 
+  real(r8),allocatable ::  SnowThickL0_snvr(:,:,:)                 !snow thickness of each layer [m]
   public :: InitSnowPhysData
   public :: DestructSnowPhysData
   contains

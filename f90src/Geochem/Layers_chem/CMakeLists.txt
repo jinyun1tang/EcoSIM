@@ -12,7 +12,6 @@ target_include_directories(Layers_chem  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
-  ${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/
   ${CMAKE_BINARY_DIR}/f90src/Geochem/Box_chem/
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/)

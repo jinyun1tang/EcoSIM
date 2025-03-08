@@ -552,7 +552,7 @@ module StarteMod
 !
         IF(salt_model)THEN
           do nsalts=idsalt_beg,idsalt_end
-            trc_Saltml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_mole_conc_col(nsalts,NY,NX)
+            trcSalt_ml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_mole_conc_col(nsalts,NY,NX)
           enddo
         ENDIF
       ELSE
@@ -562,7 +562,7 @@ module StarteMod
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
         IF(salt_model)THEN
-          trc_Saltml_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0._r8
+          trcSalt_ml_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0._r8
         ENDIF
       ENDIF
     ENDDO D9985
