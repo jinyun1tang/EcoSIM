@@ -132,7 +132,7 @@ implicit none
         N6 = L+1
       ENDIF
 !
-!
+      !top soil layer/land surface
       IF(L.EQ.NUM(N2,N1))THEN
         !top layer runoff
         IF(N.NE.iVerticalDirection)THEN
@@ -145,7 +145,7 @@ implicit none
           !
         ELSEIF(N.EQ.iVerticalDirection)THEN
           !vertical direction
-          call SaltPercolThruSnow(I,J,N1,N2,NY,NX)
+          call SaltPercolThruSnow(I,J,N1,N2)
         ENDIF
 !
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT
@@ -258,13 +258,16 @@ implicit none
   integer, intent(in) :: N1,N2    !current grid
   integer, intent(in) :: N4,N5    !front
   integer, intent(in) :: N4B,N5B  !back
+
+  character(len=*), parameter :: subname='XGridTracerRunoff'
   integer :: NN,idg,idn,idsalt
   
+  call PrintInfo('beg '//subname)
   !NN=1:iOutflow, 2:iInflow
   D1202: DO NN=1,2
     !gaseous tracers
     DO idg=idg_beg,idg_NH3
-      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_FloXSurRunoff_2D(idg,N,NN,N2,N1)
+      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_FloXSurRunoff_2D(idg,N,NN,N2,N1)      
     ENDDO
 
     !nutrient tracres
@@ -313,6 +316,7 @@ implicit none
       ENDIF
     ENDDO D1203
   endif
+  call PrintInfo('end '//subname)
   end subroutine XGridTracerRunoff
 !------------------------------------------------------------------------------------------
 
@@ -637,16 +641,8 @@ implicit none
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDIF
-      !     IF(N1.EQ.1.AND.N3.EQ.1)THEN
-      !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
-      !    2,TWatFlowCellMicP_vr(N3,N2,N1),WaterFlowSoiMicP_3D(N,N3,N2,N1),WaterFlowSoiMicP_3D(N,N6,N5,N4),LakeSurfFlowMicP_col(N5,N4)
-      !    3,THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
-      !    2,LakeSurfHeatFlux_col(N5,N4),VLWatMicP_vr(N3,N2,N1)
-!6632  FORMAT(A8,10I4,12E16.8)
-      !     ENDIF
       !
       !     NET SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
-      !
       !
       D8585: DO K=1,jcplx
         do idom=idom_beg,idom_end
@@ -662,14 +658,15 @@ implicit none
           +trcs_TransptMicP_3D(ids,N,N3,N2,N1)-trcs_TransptMicP_3D(ids,N,N6,N5,N4)
         trcs_TransptMacP_vr(ids,N3,N2,N1)=trcs_TransptMacP_vr(ids,N3,N2,N1) &
           +trcs_TransptMacP_3D(ids,N,N3,N2,N1)-trcs_TransptMacP_3D(ids,N,N6,N5,N4)
-          
+
         if(abs(trcs_TransptMicP_vr(ids,N3,N2,N1))>1.e10)then
            write(*,*)ids,N3,N2,N1,N
            write(*,*)trcs_TransptMicP_3D(ids,N,N3,N2,N1),trcs_TransptMicP_3D(ids,N,N6,N5,N4)
            call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDDO
-      !summarize lateral tracer flow
+      
+      !summarize subsurface lateral tracer flow
       if(N.NE.iVerticalDirection)then
         DO idg=idg_beg,idg_end
           GasHydroLossFlx_col(idg,N2,N1)=GasHydroLossFlx_col(idg,N2,N1) + &

@@ -26,6 +26,7 @@ module minimathmod
   public :: yearday,isletter
   public :: dssign
   public :: flux_mass_limiter
+  public :: AZERO
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -198,6 +199,20 @@ module minimathmod
   endif
   end function AZMIN1d
 
+!------------------------------------------------------------------------------------------
+  pure function AZERO(val)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+
+  real(r8) :: ans
+
+  if(abs(val)>=tiny_val)then
+    ans=val
+  else  
+    ans=0._r8
+  endif
+
+  end function AZERO
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)

@@ -4,10 +4,12 @@ module SnowTransportMod
 !
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use data_const_mod, only: spval => DAT_CONST_SPVAL
+  use abortutils,     only: endrun
   use EcoSimConst,    only: DENSICE, natomw, patomw
   use EcoSIMCtrlMod,  only: lverb
-  use MiniMathMod,    only: fixEXConsumpFlux
+  use MiniMathMod,    only: fixEXConsumpFlux,AZERO
   use TracerPropMod,  only: MolecularWeight
+  use DebugToolMod
   use ClimForcDataType
   use IrrigationDataType
   use SurfSoilDataType
@@ -27,35 +29,41 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  public :: SaltPercolThruSnow  
+  public :: SaltPercolThruSnow
   public :: XGridSnowTracerRunoff
   public :: DiagSnowChemMass
-  public :: TracerThruSnowfall
+  public :: TracerFall2Snowpack
   public :: SoluteTransportThruSnow
+  public :: SaltFall2Snowpack
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine SaltPercolThruSnow(I,J,N1,N2,NY,NX)
+  subroutine SaltPercolThruSnow(I,J,N1,N2)
   !
   !update solute due to snow flux
   implicit none
-  integer, intent(in) :: N1,N2,NY,NX,I,J
+  integer, intent(in) :: I,J
+  integer, intent(in) :: N1,N2
+
+  character(len=*), parameter :: subname='SaltPercolThruSnow'
   integer :: LS, LS2
   integer :: idg,idn,idsalt,ids
-!     begin_execution
-!     NET WATER AND HEAT FLUXES THROUGH SNOWPACK
-!  
-  D1205: DO LS=1,JS
 
-    IF(VLHeatCapSnow_snvr(LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+!     begin_execution
+   call PrintInfo('beg '//subname)
+
+  ! NET WATER AND HEAT FLUXES THROUGH SNOWPACK  
+  ! from top to bottom of snow layer 
+  D1205: DO LS=1,JS
+    !layer LS has significant snow
+    IF(VLHeatCapSnow_snvr(LS,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
       !id of next snow layer
       LS2=MIN(JS,LS+1)
-!
-!     IF LOWER LAYER IS IN THE SNOWPACK
-!
+      
+      ! Not surface layer, and is heat significant
       IF(LS.LT.JS .AND. VLHeatCapSnow_snvr(LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
-        !not surface layer, and is heat significant
-        !     NET SOLUTE FLUXES THROUGH SNOWPACK
+        
+        ! NET SOLUTE FLUXES THROUGH SNOWPACK
         DO idg=idg_beg,idg_NH3
           trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
             -trcg_AquaAdv_flx_snvr(idg,LS2,N2,N1)
@@ -76,50 +84,46 @@ implicit none
           ENDDO
         ENDIF
         !
-        !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
+        ! IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
         !
       ELSE
 
         ! and NH3B
         DO idg=idg_beg,idg_NH3
           trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
-            -trcs_TransptMicP_3D(idg,3,0,N2,N1)-trcs_TransptMicP_3D(idg,3,NUM(N2,N1),N2,N1) &
-            -trcs_TransptMacP_3D(idg,3,NUM(N2,N1),N2,N1)
+            -trcg_AquaADV_Snow2Litr_flx(idg,N2,N1)-trcg_AquaADV_Snow2Soil_flx(idg,N2,N1)
         ENDDO
 
         DO idn=ids_nut_beg,ids_nuts_end
           trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
-            -trcs_TransptMicP_3D(idn,3,0,N2,N1)-trcs_TransptMicP_3D(idn,3,NUM(N2,N1),N2,N1) &
-            -trcs_TransptMacP_3D(idn,3,NUM(N2,N1),N2,N1)
+            -trcn_AquaADV_Snow2Litr_flx(idn,N2,N1)-trcn_AquaADV_Snow2Soil_flx(idn,N2,N1) 
         ENDDO
 
         !add band flux
-        trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1) &
-          -trcs_TransptMicP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
+        trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)-trcg_AquaADV_Snow2Soil_flx(idg_NH3B,N2,N1)
 
         DO ids=0,ids_nuts
           trcn_AquaAdv_NetFlx_snvr(ids_NH4+ids,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(ids_NH4+ids,LS,N2,N1) &
-            -trcs_TransptMicP_3D(ids_NH4B+ids,3,NUM(N2,N1),N2,N1)-trcs_TransptMacP_3D(ids_NH4B+ids,3,NUM(N2,N1),N2,N1)
+            -trcn_AquaADV_Snow2Band_flx(ids_NH4B+ids,N2,N1)
         ENDDO
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,NY,NX)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,NY,NX)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,NY,NX) &
-              -trcSalt_TransptMicP_3D(idsalt,3,0,N2,N1)-trcSalt_TransptMicP_3D(idsalt,3,NUM(N2,N1),N2,N1) &
-              -trcSalt_TransptMacP_3D(idsalt,3,NUM(N2,N1),N2,N1)
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1) &
+              -trcSalt_AquaADV_Snow2Litr_flx(idsalt,N2,N1)-trcSalt_AquaADV_Snow2Soil_flx(idsalt,N2,N1)
+
           ENDDO
 
           !add band flux
           DO idsalt=0,idsalt_nuts
-            trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,NY,NX)=trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,NY,NX) &
-              -trcSalt_TransptMicP_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1) &
-              -trcSalt_TransptMacP_3D(idsalt_H0PO4B+idsalt,3,NUM(N2,N1),N2,N1)
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,N2,N1) &
+              -trcSalt_AquaADV_Snow2Soil_flx(idsalt_H0PO4B+idsalt,N2,N1)
           ENDDO
         ENDIF
       ENDIF
-!
-!     WATER,GAS,SOLUTE,SALT FLUXES INTO SNOWPACK SURFACE
-!
+ 
+      ! layer LS does not have significant snow
+      ! WATER,GAS,SOLUTE,SALT FLUXES INTO SNOWPACK SURFACE   
     ELSEIF(LS.EQ.1)THEN
       IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
@@ -138,8 +142,8 @@ implicit none
         ENDIF
       ENDIF
     ENDIF
-
   ENDDO D1205
+  call PrintInfo('end '//subname)
   end subroutine SaltPercolThruSnow
 
 !------------------------------------------------------------------------------------------
@@ -176,7 +180,7 @@ implicit none
       IF(salt_model)THEN
         SSW=0._r8
         do nsalts=idsalt_beg,idsalt_end
-          SSW=SSW+trc_Saltml_snvr(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
+          SSW=SSW+trcSalt_ml_snvr(nsalts,L,NY,NX)*trcSaltIonNumber(nsalts)
         ENDDO  
         TION=TION+SSW
       ENDIF
@@ -195,6 +199,7 @@ implicit none
 !     OVERLAND SNOW REDISTRIBUTION
 !
   IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
+    write(*,*)I*1000+J,'snowredist'
     !loss of dissolved gases from surface snow
     DO idg=idg_beg,idg_NH3
       trcg_solsml_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)+trcg_LossXSnowRedist_col(idg,NY,NX)
@@ -207,7 +212,7 @@ implicit none
 
     IF(salt_model)THEN
       DO idsalt=idsalt_beg,idsalt_end
-        trc_Saltml_snvr(idsalt,1,NY,NX)=trc_Saltml_snvr(idsalt,1,NY,NX)+trcSalt_LossXSnowRedist_col(idsalt,NY,NX)
+        trcSalt_ml_snvr(idsalt,1,NY,NX)=trcSalt_ml_snvr(idsalt,1,NY,NX)+trcSalt_LossXSnowRedist_col(idsalt,NY,NX)
       ENDDO
     ENDIF
   ENDIF
@@ -257,7 +262,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine TracerThruSnowfall(I,J,NY,NX)
+  subroutine TracerFall2Snowpack(I,J,NY,NX)
   implicit none
 
   integer, intent(in) :: I,J
@@ -277,12 +282,29 @@ implicit none
     +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
   trcn_AquaAdv_flx_snvr(ids_H2PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
-  end subroutine TracerThruSnowfall
+
+  end subroutine TracerFall2Snowpack
 
 !------------------------------------------------------------------------------------------
-
-  subroutine SoluteTransportThruSnow(L,NY,NX)
+  subroutine SaltFall2Snowpack(I,NY,NX)
   implicit none
+  integer, intent(in) :: I,NY,NX
+
+  integer :: idsalt
+
+  if(salt_model)then
+    DO idsalt=idsalt_beg,idsalt_end
+      trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX) = Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+        +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)    
+    ENDDO
+  endif
+
+  end subroutine SaltFall2Snowpack
+!------------------------------------------------------------------------------------------
+
+  subroutine SoluteTransportThruSnow(I,J,L,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J  
   integer, intent(in) :: L,NY,NX
 
   integer :: idg,idn,idsalt
@@ -290,8 +312,13 @@ implicit none
   !     SNOWPACK SOLUTE CONTENT
 
   DO idg=idg_beg,idg_NH3
-    trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX)
+    trcg_solsml_snvr(idg,L,NY,NX)=AZERO(trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX))
   ENDDO
+
+  if(trcg_solsml_snvr(idg_O2,L,NY,NX)<0._r8)then
+    write(116,*)I*1000+J,'snow',L,trcg_solsml_snvr(idg_O2,L,NY,NX),SnowThickL_snvr(L,NY,NX),trcg_AquaAdv_NetFlx_snvr(idg_O2,L,NY,NX)  
+    call endrun('negative tracer in '//trim(mod_filename)//' at line',__LINE__)
+  endif
 
   DO idn =ids_nut_beg,ids_nuts_end
     trcn_solsml_snvr(idn,L,NY,NX)=trcn_solsml_snvr(idn,L,NY,NX)+trcn_AquaAdv_NetFlx_snvr(idn,L,NY,NX)
@@ -300,7 +327,7 @@ implicit none
   !
   IF(salt_model)THEN
     DO idsalt=idsalt_beg,idsalt_end
-      trc_Saltml_snvr(idsalt,L,NY,NX)=trc_Saltml_snvr(idsalt,L,NY,NX)+trcSalt_AquaAdv_NetFlx_snvr(idsalt,L,NY,NX)
+      trcSalt_ml_snvr(idsalt,L,NY,NX)=trcSalt_ml_snvr(idsalt,L,NY,NX)+trcSalt_AquaAdv_NetFlx_snvr(idsalt,L,NY,NX)
     ENDDO
   ENDIF
 

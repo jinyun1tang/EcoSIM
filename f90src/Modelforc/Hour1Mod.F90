@@ -768,6 +768,11 @@ module Hour1Mod
   PrecHeat_col(NY,NX)                     = 0._r8
   QDrain_col(NY,NX)                       = 0._r8
   HeatDrain_col(NY,NX)                    = 0._r8
+  trcg_AquaADV_Snow2Litr_flx(:,NY,NX)     = 0._r8
+  trcn_AquaADV_Snow2Litr_flx(:,NY,NX)     = 0._r8
+  trcn_AquaADV_Snow2Soil_flx(:,NY,NX)     = 0._r8
+  trcn_AquaADV_Snow2Band_flx(:,NY,NX)     = 0._r8
+  trcg_AquaADV_Snow2Soil_flx(:,NY,NX)     = 0._r8
 
   GasHydroLossFlx_col(idg_beg:idg_end,NY,NX)         = 0._r8
   SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
@@ -817,8 +822,11 @@ module Hour1Mod
   MoistSensDecomp_vr(:,NY,NX)        = 0._r8
   trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1:JS,NY,NX) = 0._r8
   trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
+  
   IF(salt_model)THEN
     trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
+    trcSalt_AquaADV_Snow2Litr_flx(:,NY,NX)=0._r8
+    trcSalt_AquaADV_Snow2Soil_flx(:,NY,NX)=0._r8    
   ENDIF
   end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
@@ -2381,7 +2389,7 @@ module Hour1Mod
 
     DO NTSA=idsalt_beg,idsaltb_end
       trcSalt_RGeoChem_flx_vr(NTSA,L,NY,NX)=0._r8
-      trcSalt_XFXS_vr(NTSA,L,NY,NX)=0._r8
+      trcSalt_Mac2MicPore_flx_vr(NTSA,L,NY,NX)=0._r8
     ENDDO
 
     DO  K=1,jcplx

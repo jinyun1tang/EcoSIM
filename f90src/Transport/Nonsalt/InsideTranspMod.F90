@@ -63,8 +63,6 @@ module InsideTranspMod
   character(len=*), parameter :: subname='ModelTracerHydroFluxMM' 
   integer :: NY,NX
   real(r8) :: FLWRM1
-  real(r8) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
-  real(r8) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
   real(r8) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
 
@@ -82,14 +80,13 @@ module InsideTranspMod
       IF(M.NE.MX)THEN
         !this is a new iteration for moisture-temp update
  
-        call SnowSoluteDischargeM(M,NY,NX,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR)
+        call SnowSoluteDischargeM(I,J,M,NY,NX)
 !
 !     SOLUTE FLUXES AT SOIL SURFACE FROM SURFACE WATER
 !     CONTEnsolutes, WATER FLUXES 'WaterFlow2SoilMM_3D' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
-        call SoluteFluxSurfaceM(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
-          WaterFlow2SoilMM_3D,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
+        call SoluteFluxSurfaceM(I,J,M,NY,NX,NHE,NHW,NVS,NVN, WaterFlow2SoilMM_3D,RGas_Dif_Atm2Soil_FlxMM,&
           RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2SoilM(:,NY,NX),RGasAtmDisol2LitrM(:,NY,NX))
 !
       ENDIF

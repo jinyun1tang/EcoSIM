@@ -53,7 +53,7 @@ module AqueChemDatatype
   real(r8),target,allocatable :: trcSaltIonNumber(:)                    !number of ions when the salt is fully dissociated
   real(r8),target,allocatable ::  DOM_Mac2MicPore_flx_vr(:,:,:,:,:)     !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_Mac2MicPore_flx_vr(:,:,:,:)      !total non-salt solute micropore->macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcSalt_XFXS_vr(:,:,:,:)              !total salt micropore-macropore transfer non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_Mac2MicPore_flx_vr(:,:,:,:)              !total salt micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_GeoChem_soil_vr(:,:,:,:)         !total solute NH4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRChem_sol_NH3_soil_vr(:,:,:)         !total solute NH3 transformation non-band, [mol d-2 h-1]
 
@@ -162,7 +162,7 @@ module AqueChemDatatype
     allocate(trcsalt_rain_mole_conc_col(idsalt_beg:idsalt_end,JY,JX));trcsalt_rain_mole_conc_col=0._r8
     allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
     allocate(trcSalt_soHml_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml_vr=0._r8
-    allocate(trcSalt_XFXS_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_XFXS_vr=0._r8
+    allocate(trcSalt_Mac2MicPore_flx_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Mac2MicPore_flx_vr=0._r8
     allocate(trcSalt_RGeoChem_flx_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_RGeoChem_flx_vr=0._r8
   endif
 
@@ -205,7 +205,7 @@ module AqueChemDatatype
   call destroy(ElectricConductivity_vr)
   call destroy(SolutesIonStrenth_vr)
   call destroy(SolutesIonConc_vr)
-  call destroy(trcSalt_XFXS_vr)
+  call destroy(trcSalt_Mac2MicPore_flx_vr)
   call destroy(trcSalt_TransptMicP_3D)
   call destroy(trcSalt_TransptMacP_3D)
   call destroy(TRChem_sol_NH3_soil_vr)

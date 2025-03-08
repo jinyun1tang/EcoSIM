@@ -17,7 +17,6 @@ target_include_directories(Nonsalt  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
-  ${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/
   ${CMAKE_BINARY_DIR}/f90src/APIs/
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/

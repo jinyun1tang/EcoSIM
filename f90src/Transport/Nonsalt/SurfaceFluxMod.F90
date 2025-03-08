@@ -33,14 +33,12 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SoluteFluxSurfaceM(I,J,M,NY,NX,NHE,NHW,NVS,NVN,&
-    WaterFlow2SoilMM_3D,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,RGas_Dif_Atm2Soil_FlxMM,&
+    WaterFlow2SoilMM_3D,RGas_Dif_Atm2Soil_FlxMM,&
     RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2SoilM,RGasAtmDisol2LitrM)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX,M
   integer, intent(in) :: NHE,NHW,NVS,NVN
-  real(r8),intent(in) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
-  real(r8),intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
   real(r8),intent(inout) :: WaterFlow2SoilMM_3D(3,JD,JV,JH)
   real(r8),intent(out) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)
   real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
@@ -49,12 +47,12 @@ contains
   character(len=*), parameter :: subname='SoluteFluxSurfaceM'
 
   real(r8) :: FLWRM1
-  real(r8) :: trcs_cl1(ids_beg:ids_end)
-  real(r8) :: trcs_cl2(ids_beg:ids_end)
-  real(r8) :: solute_adv_flxM(ids_beg:ids_end)
+  real(r8) :: trcs_cl_litr(ids_beg:ids_end)
+  real(r8) :: trcs_cl_soil(ids_beg:ids_end)
+  real(r8) :: litR_solute_adv_flxM(ids_beg:ids_end)
   real(r8) :: trcs_Dif_flxM(ids_beg:ids_end)
-  real(r8) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
-  real(r8) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+  real(r8) :: CDOM_MicP_litr(idom_beg:idom_end,1:jcplx)
+  real(r8) :: CDOM_MicP_soil(idom_beg:idom_end,1:jcplx)
   real(r8) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
   real(r8) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
@@ -95,25 +93,25 @@ contains
 !     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in litter
 !     C*1=solute concentration in litter
 !
-  call LitterAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP1,trcs_cl1,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
+  call LitterAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP_litr,trcs_cl_litr,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
 
-  call SoilAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP2,trcs_cl2,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
+  call SoilAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP_soil,trcs_cl_soil,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
 
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
-  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv_Mac2MicP_flxM)
+  call LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,litR_solute_adv_flxM,DOM_Adv_Mac2MicP_flxM)
 !
 !     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
 !     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  call LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,&
+  call LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP_litr,CDOM_MicP_soil,FLWRM1,trcs_cl_litr,trcs_cl_soil,&
     trcs_Dif_flxM,DOM_Difus_Mac2Micp_flxM)
 
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
-  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_flxM,solute_adv_flxM,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,&
+  call SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_flxM,litR_solute_adv_flxM,&
     DOM_Adv_Mac2MicP_flxM,DOM_Difus_Mac2Micp_flxM)
 
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
@@ -134,7 +132,7 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,solute_adv_flxM,DOM_Adv_Mac2MicP_flxM)
+  subroutine LitterSoilTracerXAdvectionM(I,J,M,NY,NX,FLWRM1,litR_solute_adv_flxM,DOM_Adv_Mac2MicP_flxM)
   !
   ! Description:
   ! Litter and top soil tracer exchange by (upstream) advection
@@ -142,7 +140,7 @@ contains
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
-  real(r8),intent(out) :: solute_adv_flxM(ids_beg:ids_end)
+  real(r8),intent(out) :: litR_solute_adv_flxM(ids_beg:ids_end)
   real(r8),intent(out) :: FLWRM1    !water flow from litter to soil at iteration M
   real(r8),intent(out) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
 
@@ -175,21 +173,21 @@ contains
 
     !all volatiles
     DO idg=idg_beg,idg_end
-      solute_adv_flxM(idg)=VFLW*AZMAX1(trcs_solml2_vr(idg,0,NY,NX))
+      litR_solute_adv_flxM(idg)=VFLW*AZMAX1(trcs_solml2_vr(idg,0,NY,NX))
     enddo
 
     !from NH4 to H2PO4
     DO idn=ids_nut_beg,ids_nuts_end
-      solute_adv_flxM(idn)=VFLW*AZMAX1(trcs_solml2_vr(idn,0,NY,NX))*trcs_VLN_vr(idn,NU(NY,NX),NY,NX)
+      litR_solute_adv_flxM(idn)=VFLW*AZMAX1(trcs_solml2_vr(idn,0,NY,NX))*trcs_VLN_vr(idn,NU(NY,NX),NY,NX)
     ENDDO
 
     !from NH4B to ids_H2PO4B
     DO idn=0,ids_nuts     
       idn1=ids_NH4B+idn
-      solute_adv_flxM(idn1)=VFLW*AZMAX1(trcs_solml2_vr(idn+ids_NH4,0,NY,NX))*trcs_VLN_vr(idn1,NU(NY,NX),NY,NX)
+      litR_solute_adv_flxM(idn1)=VFLW*AZMAX1(trcs_solml2_vr(idn+ids_NH4,0,NY,NX))*trcs_VLN_vr(idn1,NU(NY,NX),NY,NX)
     ENDDO
 
-    solute_adv_flxM(idg_NH3B)=VFLW*AZMAX1(trcs_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU(NY,NX),NY,NX)
+    litR_solute_adv_flxM(idg_NH3B)=VFLW*AZMAX1(trcs_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU(NY,NX),NY,NX)
 
 ! flow from soil to litter
   ELSE
@@ -205,22 +203,22 @@ contains
     ENDDO
 
     DO idn=ids_beg,ids_end
-      solute_adv_flxM(idn)=VFLW*AZMAX1(trcs_solml2_vr(idn,NU(NY,NX),NY,NX))
+      litR_solute_adv_flxM(idn)=VFLW*AZMAX1(trcs_solml2_vr(idn,NU(NY,NX),NY,NX))
     ENDDO
   ENDIF
   end subroutine LitterSoilTracerXAdvectionM
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP1,CDOM_MicP2,FLWRM1,trcs_cl1,trcs_cl2,&
+  subroutine LitterSoilTracerDiffusionM(I,J,M,NY,NX,CDOM_MicP_litr,CDOM_MicP_soil,FLWRM1,trcs_cl_litr,trcs_cl_soil,&
     trcs_Dif_flxM,DOM_Difus_Mac2Micp_flxM)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
-  real(r8), intent(in) :: FLWRM1                      !water flow from litter to soil
-  real(r8), intent(in) :: trcs_cl1(ids_beg:ids_end)
-  real(r8), intent(in) :: trcs_cl2(ids_beg:ids_end)
-  real(r8), intent(in) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
-  real(r8), intent(in) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(in) :: FLWRM1                         !water flow from litter to soil
+  real(r8), intent(in) :: trcs_cl_litr(ids_beg:ids_end)
+  real(r8), intent(in) :: trcs_cl_soil(ids_beg:ids_end)
+  real(r8), intent(in) :: CDOM_MicP_litr(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(in) :: CDOM_MicP_soil(idom_beg:idom_end,1:jcplx)
   real(r8), intent(out):: trcs_Dif_flxM(ids_beg:ids_end)
   real(r8), intent(out):: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
@@ -265,16 +263,16 @@ contains
 !
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Difus_Mac2Micp_flxM(idom,K)=DIFDOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))
+        DOM_Difus_Mac2Micp_flxM(idom,K)=DIFDOM(idom)*(CDOM_MicP_litr(idom,K)-CDOM_MicP_soil(idom,K))
       ENDDO
     ENDDO
     !exclude NH3B and NH3
     DO idg=idg_beg,idg_end-2
-        trcs_Dif_flxM(idg)=SDifc(idg)*(trcs_cl1(idg)-trcs_cl2(idg))
+        trcs_Dif_flxM(idg)=SDifc(idg)*(trcs_cl_litr(idg)-trcs_cl_soil(idg))
     ENDDO
 
     DO idn=ids_nuts_beg,ids_nuts_end
-      trcs_Dif_flxM(idn)=SDifc(idn)*(trcs_cl1(idn)-trcs_cl2(idn))*trcs_VLN_vr(idn,NU(NY,NX),NY,NX)
+      trcs_Dif_flxM(idn)=SDifc(idn)*(trcs_cl_litr(idn)-trcs_cl_soil(idn))*trcs_VLN_vr(idn,NU(NY,NX),NY,NX)
     ENDDO
   ELSE
     DO  K=1,jcplx
@@ -287,16 +285,14 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_flxM,solute_adv_flxM,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR,&
+  subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_flxM,litR_solute_adv_flxM,&
     DOM_Adv_Mac2MicP_flxM,DOM_Difus_Mac2Micp_flxM)
   use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NY, NX
   real(r8), intent(in) :: trcs_Dif_flxM(ids_beg:ids_end)
-  real(r8), intent(in) :: solute_adv_flxM(ids_beg:ids_end)
-  real(r8), intent(in) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
-  real(r8), intent(in) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
+  real(r8), intent(in) :: litR_solute_adv_flxM(ids_beg:ids_end)
   real(r8), intent(in) :: DOM_Adv_Mac2MicP_flxM(idom_beg:idom_end,1:jcplx)
   real(r8), intent(in) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
   character(len=*), parameter :: subname ='SurfLayerNetTracerFluxM'
@@ -312,30 +308,33 @@ contains
   ENDDO
 
   DO idg=idg_beg,idg_NH3
-    trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)=trcg_Precip2LitrM(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg)-solute_adv_flxM(idg)-trcs_Dif_flxM(idg)
+    trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)=trcg_Precip2LitrM(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)-litR_solute_adv_flxM(idg)-trcs_Dif_flxM(idg)
   ENDDO
 
   do ids=ids_nut_beg,ids_nuts_end
-    trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)=trcn_Precip2LitrM(ids,NY,NX)+trcn_FloSno2LitR(ids)-solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
+    trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)=trcn_Precip2LitrM(ids,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(ids,NY,NX)-litR_solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
   enddo
-  trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)-solute_adv_flxM(idg_NH3B)-trcs_Dif_flxM(idg_NH3B)
-  trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)-solute_adv_flxM(ids_NH4B)-trcs_Dif_flxM(ids_NH4B)
-  trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)-solute_adv_flxM(ids_NO3B)-trcs_Dif_flxM(ids_NO3B)
-  trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)-solute_adv_flxM(ids_NO2B)-trcs_Dif_flxM(ids_NO2B)
-  trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)-solute_adv_flxM(ids_H1PO4B)-trcs_Dif_flxM(ids_H1PO4B)
-  trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)-solute_adv_flxM(ids_H2PO4B)-trcs_Dif_flxM(ids_H2PO4B)
+  trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)-litR_solute_adv_flxM(idg_NH3B)-trcs_Dif_flxM(idg_NH3B)
+  trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)-litR_solute_adv_flxM(ids_NH4B)-trcs_Dif_flxM(ids_NH4B)
+  trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO3B)-trcs_Dif_flxM(ids_NO3B)
+  trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO2B)-trcs_Dif_flxM(ids_NO2B)
+  trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H1PO4B)-trcs_Dif_flxM(ids_H1PO4B)
+  trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H2PO4B)-trcs_Dif_flxM(ids_H2PO4B)
 
   !top soil
   DO idg=idg_beg,idg_NH3
-    trcs_MicpTranspFlxM_3D(idg,3,NU(NY,NX),NY,NX)=trcs_Precip2MicpM(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(idg)+solute_adv_flxM(idg)+trcs_Dif_flxM(idg)
+    trcs_MicpTranspFlxM_3D(idg,3,NU(NY,NX),NY,NX)=trcs_Precip2MicpM(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX) &
+      +litR_solute_adv_flxM(idg)+trcs_Dif_flxM(idg)
   ENDDO
 
   do ids=ids_nut_beg,ids_nuts_end
-    trcs_MicpTranspFlxM_3D(ids,3,NU(NY,NX),NY,NX)=trcs_Precip2MicpM(ids,NY,NX)+trcn_AquaADV_Snow2Soil_flxM(ids)+solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
+    trcs_MicpTranspFlxM_3D(ids,3,NU(NY,NX),NY,NX)=trcs_Precip2MicpM(ids,NY,NX)+trcn_AquaADV_Snow2Soil_flxM(ids,NY,NX) &
+      +litR_solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
   enddo
 
   do ids=ids_nutb_beg,ids_nutb_end
-    trcs_MicpTranspFlxM_3D(ids,3,NU(NY,NX),NY,NX)=trcs_Precip2MicpM(ids,NY,NX)+trcn_AquaADV_Snow2Band_flxM(ids)+solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
+    trcs_MicpTranspFlxM_3D(ids,3,NU(NY,NX),NY,NX)=trcs_Precip2MicpM(ids,NY,NX)+trcn_AquaADV_Snow2Band_flxM(ids,NY,NX) &
+      +litR_solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
   enddo
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -353,36 +352,34 @@ contains
   ENDDO
 
   do idg=idg_beg,idg_NH3
-    trcs_TransptMicP_3D(idg,3,0,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg)-solute_adv_flxM(idg)-trcs_Dif_flxM(idg)
+    trcs_TransptMicP_3D(idg,3,0,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)-litR_solute_adv_flxM(idg)-trcs_Dif_flxM(idg)
   ENDDO
 !  write(116,*)I+J/24.,M,'tp30',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)
 
   do ids=ids_nut_beg,ids_nuts_end
-    trcs_TransptMicP_3D(ids,3,0,NY,NX)=trcs_TransptMicP_3D(ids,3,0,NY,NX)+trcn_FloSno2LitR(ids)-solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
+    trcs_TransptMicP_3D(ids,3,0,NY,NX)=trcs_TransptMicP_3D(ids,3,0,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(ids,NY,NX)-litR_solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
   enddo
 
-!  write(116,*)I+J/24.,M,'tp31',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX),trcn_FloSno2LitR(ids_NO3),-solute_adv_flxM(ids_NO3),-trcs_Dif_flxM(ids_NO3)
-
-  trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)   = trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)-solute_adv_flxM(idg_NH3B)-trcs_Dif_flxM(idg_NH3B)
-  trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)   = trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)-solute_adv_flxM(ids_NH4B)-trcs_Dif_flxM(ids_NH4B)
-  trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)   = trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)-solute_adv_flxM(ids_NO3B)-trcs_Dif_flxM(ids_NO3B)
-  trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)   = trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)-solute_adv_flxM(ids_NO2B)-trcs_Dif_flxM(ids_NO2B)
-  trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX) = trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)-solute_adv_flxM(ids_H1PO4B)-trcs_Dif_flxM(ids_H1PO4B)
-  trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX) = trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)-solute_adv_flxM(ids_H2PO4B)-trcs_Dif_flxM(ids_H2PO4B)
+  trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)   = trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)-litR_solute_adv_flxM(idg_NH3B)-trcs_Dif_flxM(idg_NH3B)
+  trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)   = trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)-litR_solute_adv_flxM(ids_NH4B)-trcs_Dif_flxM(ids_NH4B)
+  trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)   = trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO3B)-trcs_Dif_flxM(ids_NO3B)
+  trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)   = trcs_TransptMicP_3D(ids_NO2,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO2B)-trcs_Dif_flxM(ids_NO2B)
+  trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX) = trcs_TransptMicP_3D(ids_H1PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H1PO4B)-trcs_Dif_flxM(ids_H1PO4B)
+  trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX) = trcs_TransptMicP_3D(ids_H2PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H2PO4B)-trcs_Dif_flxM(ids_H2PO4B)
 
   do idg=idg_beg,idg_NH3
     trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)+ &
-      trcg_AquaADV_Snow2Soil_flxM(idg)+solute_adv_flxM(idg)+trcs_Dif_flxM(idg)
+      trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)+litR_solute_adv_flxM(idg)+trcs_Dif_flxM(idg)
   enddo
 
   do ids=ids_nut_beg,ids_nuts_end
     trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX) &
-      +trcn_AquaADV_Snow2Soil_flxM(ids)+solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
+      +trcn_AquaADV_Snow2Soil_flxM(ids,NY,NX)+litR_solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
   enddo
 
   do ids=ids_nutb_beg,ids_nutb_end
     trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX) &
-      +trcn_AquaADV_Snow2Band_flxM(ids)+solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
+      +trcn_AquaADV_Snow2Band_flxM(ids,NY,NX)+litR_solute_adv_flxM(ids)+trcs_Dif_flxM(ids)
   enddo
   call PrintInfo('end '//subname)
   end subroutine SurfLayerNetTracerFluxM
@@ -808,13 +805,13 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine LitterAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP1,trcs_cl1,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
+  subroutine LitterAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP_litr,trcs_cl_litr,RGas_Dif_Atm2Litr_FlxMM,RGasAtmDisol2LitrM)
   implicit none
   integer, intent(in) :: I,J,NY,NX,M
-  real(r8),intent(out) :: trcs_cl1(ids_beg:ids_end)
+  real(r8),intent(out) :: trcs_cl_litr(ids_beg:ids_end)
   real(r8),intent(out) :: RGas_Dif_Atm2Litr_FlxMM(idg_beg:idg_NH3)
   real(r8),intent(out) :: RGasAtmDisol2LitrM(idg_beg:idg_NH3)
-  real(r8),intent(out) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
+  real(r8),intent(out) :: CDOM_MicP_litr(idom_beg:idom_end,1:jcplx)
 
   character(len=*), parameter :: subname = 'LitterAtmosExchangeM'
   integer :: K,ids,idg,idom
@@ -834,16 +831,16 @@ contains
 
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        CDOM_MicP1(idom,K)=AZMAX1(DOM_MicP2(idom,K,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
+        CDOM_MicP_litr(idom,K)=AZMAX1(DOM_MicP2(idom,K,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
       enddo
     ENDDO
 
     !temporary solute concentration
     DO ids=ids_beg,ids_end
       if(ids==idg_O2)then
-        trcs_cl1(ids)=AZMAX1(trcs_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
+        trcs_cl_litr(ids)=AZMAX1(trcs_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
       else
-        trcs_cl1(ids)=AZMAX1(trcs_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
+        trcs_cl_litr(ids)=AZMAX1(trcs_solml2_vr(ids,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
       endif
     ENDDO
 !
@@ -861,9 +858,9 @@ contains
 !     RGasAtmDisol2LitrM: dissolution into water
       !equivalent dissolved gas concentration
       trc_gasq(idg)=(PARR_col(NY,NX)*GasSolbility_vr(idg,0,NY,NX)*AtmGasCgperm3(idg,NY,NX) &
-        +DFGcc(idg)*trcs_cl1(idg))/(DFGcc(idg)+PARR_col(NY,NX))
+        +DFGcc(idg)*trcs_cl_litr(idg))/(DFGcc(idg)+PARR_col(NY,NX))
 
-      RGasAtmDisol2LitrM(idg)=(trc_gasq(idg)-trcs_cl1(idg))*AMIN1(VLWatMicPM_vr(M,0,NY,NX),DFGcc(idg))
+      RGasAtmDisol2LitrM(idg)=(trc_gasq(idg)-trcs_cl_litr(idg))*AMIN1(VLWatMicPM_vr(M,0,NY,NX),DFGcc(idg))
 !
 !     ACCUMULATE HOURLY FLUXES, dissolve into water
 !      
@@ -878,15 +875,15 @@ contains
   call PrintInfo('end '//subname)
   end subroutine LitterAtmosExchangeM
 !------------------------------------------------------------------------------------------
-  subroutine SoilAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP2,trcs_cl2,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
+  subroutine SoilAtmosExchangeM(I,J,M,NY,NX,CDOM_MicP_soil,trcs_cl_soil,RGas_Dif_Atm2Soil_FlxMM,RGasAtmDisol2SoilM)
 
   implicit none
   integer,  intent(in) :: I,J  
   integer,  intent(in) :: M,NY,NX
-  real(r8), intent(out) :: trcs_cl2(ids_beg:ids_end)
+  real(r8), intent(out) :: trcs_cl_soil(ids_beg:ids_end)
   real(r8), intent(out) :: RGas_Dif_Atm2Soil_FlxMM(idg_beg:idg_end)   !diffusive gas flux from atmosphere to soil
   real(r8), intent(out) :: RGasAtmDisol2SoilM(idg_beg:idg_end)        !gas dissolve from atmosphere to top soil
-  real(r8), intent(out) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+  real(r8), intent(out) :: CDOM_MicP_soil(idom_beg:idom_end,1:jcplx)
 
   character(len=*), parameter :: subname='SoilAtmosExchangeM'
 
@@ -915,58 +912,58 @@ contains
 
     D8910: DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        CDOM_MicP2(idom,K)=AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
+        CDOM_MicP_soil(idom,K)=AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
       enddo
     ENDDO D8910
 
    !excldue  NH3 and NH3B
-    DO idg=idg_beg,idg_end-2
-      trcs_cl2(idg)=trcs_solml2_vr(idg,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
+    DO idg=idg_beg,idg_NH3-1
+      trcs_cl_soil(idg)=trcs_solml2_vr(idg,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX)
     ENDDO
 
     IF(VLWatMicPMA_vr(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(idg_NH3) = AZMAX1(trcs_solml2_vr(idg_NH3,NU(NY,NX),NY,NX)/VLWatMicPMA_vr(NU(NY,NX),NY,NX))
-      trcs_cl2(ids_NH4) = AZMAX1(trcs_solml2_vr(ids_NH4,NU(NY,NX),NY,NX)/VLWatMicPMA_vr(NU(NY,NX),NY,NX))
+      trcs_cl_soil(idg_NH3) = AZMAX1(trcs_solml2_vr(idg_NH3,NU(NY,NX),NY,NX)/VLWatMicPMA_vr(NU(NY,NX),NY,NX))
+      trcs_cl_soil(ids_NH4) = AZMAX1(trcs_solml2_vr(ids_NH4,NU(NY,NX),NY,NX)/VLWatMicPMA_vr(NU(NY,NX),NY,NX))
     ELSE
-      trcs_cl2(idg_NH3) = 0.0_r8
-      trcs_cl2(ids_NH4) = 0.0_r8
+      trcs_cl_soil(idg_NH3) = 0.0_r8
+      trcs_cl_soil(ids_NH4) = 0.0_r8
     ENDIF
 
     IF(VLWatMicPOA.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_NO3) = AZMAX1(trcs_solml2_vr(ids_NO3,NU(NY,NX),NY,NX)/VLWatMicPOA)
-      trcs_cl2(ids_NO2) = AZMAX1(trcs_solml2_vr(ids_NO2,NU(NY,NX),NY,NX)/VLWatMicPOA)
+      trcs_cl_soil(ids_NO3) = AZMAX1(trcs_solml2_vr(ids_NO3,NU(NY,NX),NY,NX)/VLWatMicPOA)
+      trcs_cl_soil(ids_NO2) = AZMAX1(trcs_solml2_vr(ids_NO2,NU(NY,NX),NY,NX)/VLWatMicPOA)
     ELSE
-      trcs_cl2(ids_NO3) = 0.0_r8
-      trcs_cl2(ids_NO2) = 0.0_r8
+      trcs_cl_soil(ids_NO3) = 0.0_r8
+      trcs_cl_soil(ids_NO2) = 0.0_r8
     ENDIF
     IF(VLWatMicPPA.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_H1PO4) = AZMAX1(trcs_solml2_vr(ids_H1PO4,NU(NY,NX),NY,NX)/VLWatMicPPA)
-      trcs_cl2(ids_H2PO4) = AZMAX1(trcs_solml2_vr(ids_H2PO4,NU(NY,NX),NY,NX)/VLWatMicPPA)
+      trcs_cl_soil(ids_H1PO4) = AZMAX1(trcs_solml2_vr(ids_H1PO4,NU(NY,NX),NY,NX)/VLWatMicPPA)
+      trcs_cl_soil(ids_H2PO4) = AZMAX1(trcs_solml2_vr(ids_H2PO4,NU(NY,NX),NY,NX)/VLWatMicPPA)
     ELSE
-      trcs_cl2(ids_H1PO4) = 0.0_r8
-      trcs_cl2(ids_H2PO4) = 0.0_r8
+      trcs_cl_soil(ids_H1PO4) = 0.0_r8
+      trcs_cl_soil(ids_H2PO4) = 0.0_r8
     ENDIF
     IF(VLWatMicPMB_vr(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(idg_NH3B) = AZMAX1(trcs_solml2_vr(idg_NH3B,NU(NY,NX),NY,NX)/VLWatMicPMB_vr(NU(NY,NX),NY,NX))
-      trcs_cl2(ids_NH4B) = AZMAX1(trcs_solml2_vr(ids_NH4B,NU(NY,NX),NY,NX)/VLWatMicPMB_vr(NU(NY,NX),NY,NX))
+      trcs_cl_soil(idg_NH3B) = AZMAX1(trcs_solml2_vr(idg_NH3B,NU(NY,NX),NY,NX)/VLWatMicPMB_vr(NU(NY,NX),NY,NX))
+      trcs_cl_soil(ids_NH4B) = AZMAX1(trcs_solml2_vr(ids_NH4B,NU(NY,NX),NY,NX)/VLWatMicPMB_vr(NU(NY,NX),NY,NX))
     ELSE
-      trcs_cl2(idg_NH3B) = trcs_cl2(idg_NH3)
-      trcs_cl2(ids_NH4B) = trcs_cl2(ids_NH4)
+      trcs_cl_soil(idg_NH3B) = trcs_cl_soil(idg_NH3)
+      trcs_cl_soil(ids_NH4B) = trcs_cl_soil(ids_NH4)
     ENDIF
 
     IF(VLWatMicPOB.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_NO3B) = AZMAX1(trcs_solml2_vr(ids_NO3B,NU(NY,NX),NY,NX)/VLWatMicPOB)
-      trcs_cl2(ids_NO2)  = AZMAX1(trcs_solml2_vr(ids_NO2B,NU(NY,NX),NY,NX)/VLWatMicPOB)
+      trcs_cl_soil(ids_NO3B) = AZMAX1(trcs_solml2_vr(ids_NO3B,NU(NY,NX),NY,NX)/VLWatMicPOB)
+      trcs_cl_soil(ids_NO2)  = AZMAX1(trcs_solml2_vr(ids_NO2B,NU(NY,NX),NY,NX)/VLWatMicPOB)
     ELSE
-      trcs_cl2(ids_NO3B) = trcs_cl2(ids_NO3)
-      trcs_cl2(ids_NO2)  = trcs_cl2(ids_NO2)
+      trcs_cl_soil(ids_NO3B) = trcs_cl_soil(ids_NO3)
+      trcs_cl_soil(ids_NO2)  = trcs_cl_soil(ids_NO2)
     ENDIF
     IF(VLWatMicPPB.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_H1PO4B) = AZMAX1(trcs_solml2_vr(ids_H1PO4B,NU(NY,NX),NY,NX)/VLWatMicPPB)
-      trcs_cl2(ids_H2PO4B) = AZMAX1(trcs_solml2_vr(ids_H2PO4B,NU(NY,NX),NY,NX)/VLWatMicPPB)
+      trcs_cl_soil(ids_H1PO4B) = AZMAX1(trcs_solml2_vr(ids_H1PO4B,NU(NY,NX),NY,NX)/VLWatMicPPB)
+      trcs_cl_soil(ids_H2PO4B) = AZMAX1(trcs_solml2_vr(ids_H2PO4B,NU(NY,NX),NY,NX)/VLWatMicPPB)
     ELSE
-      trcs_cl2(ids_H1PO4B) = trcs_cl2(ids_H1PO4)
-      trcs_cl2(ids_H2PO4B) = trcs_cl2(ids_H2PO4)
+      trcs_cl_soil(ids_H1PO4B) = trcs_cl_soil(ids_H1PO4)
+      trcs_cl_soil(ids_H2PO4B) = trcs_cl_soil(ids_H2PO4)
     ENDIF
 !
 !     EQUILIBRIUM CONCENTRATIONS AT SOIL SURFACE AT WHICH
@@ -986,9 +983,9 @@ contains
     DO idg=idg_beg,idg_end
       DiffusivitySolutEff = SoluteDifusivitytscaledM_vr(idg,NU(NY,NX),NY,NX)*TORT1
       trc_gsolc           = (CondGasXSnowM_col(M,NY,NX)*AtmGasCgperm3(idg,NY,NX)*GasSolbility_vr(idg,NU(NY,NX),NY,NX) &
-        +DiffusivitySolutEff*trcs_cl2(idg))/(DiffusivitySolutEff+CondGasXSnowM_col(M,NY,NX))
+        +DiffusivitySolutEff*trcs_cl_soil(idg))/(DiffusivitySolutEff+CondGasXSnowM_col(M,NY,NX))
 
-      RGasAtmDisol2SoilM(idg)=(trc_gsolc-trcs_cl2(idg)) &
+      RGasAtmDisol2SoilM(idg)=(trc_gsolc-trcs_cl_soil(idg)) &
         *AMIN1(VLWatMicPM_vr(M,NU(NY,NX),NY,NX)*trcs_VLN_vr(idg,NU(NY,NX),NY,NX),DiffusivitySolutEff)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1007,16 +1004,14 @@ contains
   end subroutine SoilAtmosExchangeM
 !------------------------------------------------------------------------------------------
 
-  subroutine SnowSoluteDischargeM(M,NY,NX,trcg_AquaADV_Snow2Litr_flxM,trcn_FloSno2LitR)
+  subroutine SnowSoluteDischargeM(I,J,M,NY,NX)
 
   implicit none
-
+  integer, intent(in) :: I,J
   integer, intent(in) :: M, NY, NX
-  real(r8), intent(out) :: trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)
-  real(r8), intent(out) :: trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)
 
   character(len=*), parameter :: subname='SnowSoluteDischargeM'
-  integer :: ICHKL  !flag for dealing with the bottom snow layer
+  logical :: ICHKL  !flag for dealing with the bottom snow layer
   integer :: L,L2
   real(r8) :: VFLWS,VFLWW,VFLWR
   real(r8) :: VFLWNOB,VFLWNO3,VFLWNHB
@@ -1024,18 +1019,30 @@ contains
   integer  :: idg,idn
 !
   call PrintInfo('beg '//subname)
-  ICHKL=0
+  
+  !initialize with zeros
+  trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3,NY,NX)           = 0.0_r8
+  trcn_AquaADV_Snow2Litr_flxM(ids_nut_beg:ids_nuts_end,NY,NX)  = 0.0_r8
+  trcg_AquaADV_Snow2Soil_flxM(idg_beg:idg_end,NY,NX)           = 0.0_r8
+  trcn_AquaADV_Snow2Soil_flxM(ids_nut_beg:ids_nuts_end,NY,NX)  = 0.0_r8
+  trcn_AquaADV_Snow2Band_flxM(ids_nutb_beg:ids_nutb_end,NY,NX) = 0.0_r8
+
+  ICHKL=.false.
   DO  L=1,JS
-    IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+
+    IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
       L2=MIN(JS,L+1)
+
+      !inner layers
       IF(L.LT.JS .AND. VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        !water flow from L to L2
+        
         IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
           !no water is layer L, all water is gone to L2
         ELSE          
           VFLWW=1.0_r8
         ENDIF
+
         DO idg=idg_beg,idg_NH3
           trcg_AquaAdv_flxM_snvr(idg,L2,NY,NX) = trcg_solsml2_snvr(idg,L,NY,NX)*VFLWW
           trcg_AquaAdv_flx_snvr(idg,L2,NY,NX)  = trcg_AquaAdv_flx_snvr(idg,L2,NY,NX)+trcg_AquaAdv_flxM_snvr(idg,L2,NY,NX)
@@ -1045,6 +1052,7 @@ contains
           trcn_AquaAdv_flxM_snvr(idn,L2,NY,NX) = trcn_solsml2_snvr(idn,L,NY,NX)*VFLWW
           trcn_AquaAdv_flx_snvr(idn,L2,NY,NX)  = trcn_AquaAdv_flx_snvr(idn,L2,NY,NX)+trcn_AquaAdv_flxM_snvr(idn,L2,NY,NX)
         ENDDO
+        !L == JS: bottom layer or L<LS and next layer has no significant snow
       ELSE
         IF(L.LT.JS)THEN
           trcg_AquaAdv_flxM_snvr(idg_beg:idg_NH3,L2,NY,NX)          = 0.0_r8
@@ -1053,7 +1061,7 @@ contains
 !
 !     SNOWPACK SOLUTE DISCHARGE TO SURFACE LITTER, SOIL SURFACE
 !
-        IF(ICHKL.EQ.0)THEN
+        IF(.not.ICHKL)THEN
           IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM_col(M,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
             VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM_col(M,NY,NX)+WatFlowSno2MacPM_col(M,NY,NX))/VLWatSnow_snvr(L,NY,NX)))
@@ -1069,48 +1077,50 @@ contains
           VFLWPOB = VFLWS*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
           DO idg=idg_beg,idg_NH3
-            trcg_AquaADV_Snow2Litr_flxM(idg)=trcg_solsml2_snvr(idg,L,NY,NX)*VFLWR
+            trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)*VFLWR
+            trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)=trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)
           ENDDO
 
           DO idn=ids_nut_beg,ids_nuts_end
-            trcn_FloSno2LitR(idn)=trcn_solsml2_snvr(idn,L,NY,NX)*VFLWR
+            trcn_AquaADV_Snow2Litr_flxM(idn,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)*VFLWR
+            trcn_AquaADV_Snow2Litr_flx(idn,NY,NX)=trcn_AquaADV_Snow2Litr_flx(idn,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(idn,NY,NX)
           ENDDO
 
-          trcg_AquaADV_Snow2Soil_flxM(idg_CO2)  = trcg_solsml2_snvr(idg_CO2,L,NY,NX)*VFLWS
-          trcg_AquaADV_Snow2Soil_flxM(idg_CH4)  = trcg_solsml2_snvr(idg_CH4,L,NY,NX)*VFLWS
-          trcg_AquaADV_Snow2Soil_flxM(idg_O2)   = trcg_solsml2_snvr(idg_O2,L,NY,NX)*VFLWS
-          trcg_AquaADV_Snow2Soil_flxM(idg_N2)   = trcg_solsml2_snvr(idg_N2,L,NY,NX)*VFLWS
-          trcg_AquaADV_Snow2Soil_flxM(idg_N2O)  = trcg_solsml2_snvr(idg_N2O,L,NY,NX)*VFLWS
-          trcg_AquaADV_Snow2Soil_flxM(idg_NH3)  = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
-          trcg_AquaADV_Snow2Soil_flxM(idg_NH3B) = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
+          DO idg=idg_beg,idg_NH3-1
+            trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)  = trcg_solsml2_snvr(idg,L,NY,NX)*VFLWS
+          ENDDO
+          trcg_AquaADV_Snow2Soil_flxM(idg_NH3,NY,NX)  = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
+          trcg_AquaADV_Snow2Soil_flxM(idg_NH3B,NY,NX) = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
 
-          trcn_AquaADV_Snow2Soil_flxM(ids_NH4)    = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNH4
-          trcn_AquaADV_Snow2Soil_flxM(ids_NO3)    = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNO3
-          trcn_AquaADV_Snow2Soil_flxM(ids_H1PO4)  = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPO4
-          trcn_AquaADV_Snow2Soil_flxM(ids_H2PO4)  = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPO4
-          trcn_AquaADV_Snow2Band_flxM(ids_NH4B)   = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNHB
-          trcn_AquaADV_Snow2Band_flxM(ids_NO3B)   = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNOB
-          trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
-          trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
-          ICHKL                          = 1
+          DO idg=idg_beg,idg_end
+            trcg_AquaADV_Snow2Soil_flx(idg,NY,NX) = trcg_AquaADV_Snow2Soil_flx(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)
+          enddo
+
+          trcn_AquaADV_Snow2Soil_flxM(ids_NO2,NY,NX)    = 0._r8
+          trcn_AquaADV_Snow2Soil_flxM(ids_NH4,NY,NX)    = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNH4
+          trcn_AquaADV_Snow2Soil_flxM(ids_NO3,NY,NX)    = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNO3
+          trcn_AquaADV_Snow2Soil_flxM(ids_H1PO4,NY,NX)  = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPO4
+          trcn_AquaADV_Snow2Soil_flxM(ids_H2PO4,NY,NX)  = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPO4
+
+          trcn_AquaADV_Snow2Band_flxM(ids_NO2B,NY,NX)   = 0._r8
+          trcn_AquaADV_Snow2Band_flxM(ids_NH4B,NY,NX)   = trcn_solsml2_snvr(ids_NH4,L,NY,NX)*VFLWNHB
+          trcn_AquaADV_Snow2Band_flxM(ids_NO3B,NY,NX)   = trcn_solsml2_snvr(ids_NO3,L,NY,NX)*VFLWNOB
+          trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B,NY,NX) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
+          trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B,NY,NX) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
+
+          DO idn=ids_nut_beg,ids_nuts_end
+            trcn_AquaADV_Snow2Soil_flx(idn,NY,NX) = trcn_AquaADV_Snow2Soil_flx(idn,NY,NX)+trcn_AquaADV_Snow2Soil_flxM(idn,NY,NX)
+          ENDDO
+
+          DO idn=ids_nutb_beg,ids_nutb_end
+            trcn_AquaADV_Snow2Band_flx(idn,NY,NX) = trcn_AquaADV_Snow2Band_flx(idn,NY,NX)+trcn_AquaADV_Snow2Band_flxM(idn,NY,NX)
+          ENDDO
+          ICHKL = .true.
         ENDIF
       ENDIF
-    ELSE
-      trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3)            = 0.0_r8
-      trcn_FloSno2LitR(ids_nut_beg:ids_nuts_end)   = 0.0_r8
-      trcg_AquaADV_Snow2Soil_flxM(idg_beg:idg_end) = 0.0_r8
-
-      trcn_AquaADV_Snow2Soil_flxM(ids_NH4)   = 0.0_r8
-      trcn_AquaADV_Snow2Soil_flxM(ids_NO3)   = 0.0_r8
-      trcn_AquaADV_Snow2Soil_flxM(ids_H1PO4) = 0.0_r8
-      trcn_AquaADV_Snow2Soil_flxM(ids_H2PO4) = 0.0_r8
-      trcn_AquaADV_Snow2Band_flxM(ids_NH4B)  = 0.0_r8
-
-      trcn_AquaADV_Snow2Band_flxM(ids_NO3B)   = 0.0_r8
-      trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B) = 0.0_r8
-      trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B) = 0.0_r8
     ENDIF
   ENDDO
+
   call PrintInfo('end '//subname)
   end subroutine SnowSoluteDischargeM
 

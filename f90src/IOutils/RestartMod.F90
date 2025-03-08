@@ -7238,10 +7238,10 @@ implicit none
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &
          interpinic_flag='skip', data=datpr3, missing_value=spval, &
          fill_value=spval)  
-        call cpcol(flag,NHW,NHE,NVN,NVS,trc_Saltml_snvr,datrc_3d)      
+        call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_ml_snvr,datrc_3d)      
     else
       !print*,'trcs_solsml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trc_Saltml_snvr,datrc_3d)        
+      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_ml_snvr,datrc_3d)        
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JS)    
       call restartvar(ncid, flag, varname='trcs_solsml', dim1name='column',dim2name='satracers',&
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &

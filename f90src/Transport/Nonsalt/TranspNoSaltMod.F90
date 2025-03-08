@@ -7,7 +7,7 @@ module TranspNoSaltMod
   USE MiniMathMod,      ONLY: AZMAX1, fixnegmass, flux_mass_limiter
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
-  use SnowTransportMod, only: TracerThruSnowfall
+  use SnowTransportMod, only: TracerFall2Snowpack
   use DebugToolMod
   use SOMDataType
   use ChemTranspDataType
@@ -105,7 +105,7 @@ module TranspNoSaltMod
     call ModelTracerHydroFluxMM(I,J,M,MX,NHW, NHE, NVN, NVS,WaterFlow2Soil,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
 
     !   BOUNDARY SOLUTE AND GAS FLUXES
-    call XBoundaryFluxMM(M,MX,NHW,NHE,NVN,NVS)
+    call XBoundaryFluxMM(I,J,M,MX,NHW,NHE,NVN,NVS)
 
     ! UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
     IF(MM.NE.NPG)call UpdateStateVarMM(I,J,M,MM,MX,NPG,NHW,NHE,NVN,NVS,trcsol_Irrig_flxM_vr,RGasAtmDisol2LitrM,RGasAtmDisol2SoilM)
@@ -164,13 +164,13 @@ module TranspNoSaltMod
 !     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
 !     ENTERED IN SITE FILE
 !
-      call SubHourlyFluxesFromSiteFile(NY,NX)
+      call GetSubHourlyFluxes(I,J,NY,NX)
 !
 !     SOLUTE FLUXES FROM WATSUB.F, NITRO.F, UPTAKE.F, SOLUTE.F
 !
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
-      call ImportFluxFromOtherModules(I,NY,NX,trcsol_Irrig_flxM_vr)
+      call ImportFluxFromOtherModules(I,J,NY,NX,trcsol_Irrig_flxM_vr)
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
@@ -193,9 +193,10 @@ module TranspNoSaltMod
   !only execute before the last gas iteration
   D9695: DO NX=NHW,NHE
     D9690: DO NY=NVN,NVS
+
       IF(M.NE.MX)THEN
         ! STATE VARIABLES FOR SOLUTES IN SNOWPACK
-        call UpdateSnowTracersM(NY,NX)
+        call UpdateSnowTracersM(I,J,M,NY,NX)
 
         call UpdateSurfTracerM(NY,NX,RGasAtmDisol2LitrM(:,NY,NX),RGasAtmDisol2SoilM(:,NY,NX))
       ENDIF
@@ -225,16 +226,13 @@ module TranspNoSaltMod
   end subroutine UpdateStateVarMM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSnowTracersM(NY,NX)
+  subroutine UpdateSnowTracersM(I,J,M,NY,NX)
   implicit none
+  integer, intent(in) :: I,J,M
   integer, intent(in) :: NY,NX
   integer :: L,idg,idn
+  real(r8) :: b
 !
-!     *W2=solute content of snowpack
-!     TQS*=net overland solute flux in snow
-!     T*BLS=net solute flux in snowpack
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
 !
   DO idg=idg_beg,idg_NH3
     trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml2_snvr(idg,1,NY,NX)+trcg_SnowDrift_flxM(idg,NY,NX)
@@ -248,6 +246,7 @@ module TranspNoSaltMod
     DO idg=idg_beg,idg_NH3
       trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)+trcg_Aqua_flxM_snvr(idg,L,NY,NX)
     ENDDO
+
 
     DO idn=ids_nut_beg,ids_nuts_end
       trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)+trcn_Aqua_flxM_snvr(idn,L,NY,NX)
@@ -473,7 +472,7 @@ module TranspNoSaltMod
     (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. &  !rainfall and significant snowpack
      VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN !rainfall with snowpack
 
-    call TracerThruSnowfall(I,J,NY,NX)
+    call TracerFall2Snowpack(I,J,NY,NX)
 
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IF RAINFALL AND IRRIGATION IS ZERO IF SNOWPACK IS PRESENT
@@ -553,10 +552,10 @@ module TranspNoSaltMod
   end subroutine PrecipitationSoluteInput
 !------------------------------------------------------------------------------------------
 
-  subroutine SubHourlyFluxesFromSiteFile(NY,NX)
+  subroutine GetSubHourlyFluxes(I,J,NY,NX)
   use EcoSiMParDataMod, only : micpar
   implicit none
-
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY, NX
   INTEGER :: K,L,ids,idg,idn,idom
 
@@ -569,7 +568,7 @@ module TranspNoSaltMod
 
   !gas flux into snow
   DO idg=idg_beg,idg_NH3
-    trcg_AquaAdv_flxM_snvr(idg_CO2,1,NY,NX)=trcg_AquaAdv_flx_snvr(idg_CO2,1,NY,NX)*dts_HeatWatTP
+    trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)=trcg_AquaAdv_flx_snvr(idg,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
   !nutrient flux
@@ -609,13 +608,14 @@ module TranspNoSaltMod
     trcg_solsml2_snvr(idg_beg:idg_NH3,L,NY,NX)          = trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)
     trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
   enddo
-  end subroutine SubHourlyFluxesFromSiteFile
+  end subroutine GetSubHourlyFluxes
 !------------------------------------------------------------------------------------------
 
-  subroutine ImportFluxFromOtherModules(I,NY,NX,trcsol_Irrig_flxM_vr)
+  subroutine ImportFluxFromOtherModules(I,J,NY,NX,trcsol_Irrig_flxM_vr)
 
   implicit none
-  integer, intent(in) ::  I,NY, NX
+  integer, intent(in) ::  I,J
+  integer, intent(in) ::  NY, NX
   real(r8), intent(out) :: trcsol_Irrig_flxM_vr(ids_beg:ids_end,JZ,JY,JX)
 
   integer :: L,K,idg,ids,idom
@@ -707,12 +707,13 @@ module TranspNoSaltMod
         DOM_MacP2(idom,K,L,NY,NX) = AZMAX1(DOM_MacP_vr(idom,K,L,NY,NX))
       ENDDO
     enddo
+
     DO ids=ids_beg,ids_end
       trcs_solml2_vr(ids,L,NY,NX) = fixnegmass(trcs_solml_vr(ids,L,NY,NX))    !micropore solute tracer
       trcs_soHml2_vr(ids,L,NY,NX) = fixnegmass(trcs_soHml_vr(ids,L,NY,NX))    !macropore solute tracer
 
       if(trcs_solml2_vr(ids,L,NY,NX)<0._r8)then
-        write(*,*)'micv2 ',trcs_names(ids),L,trcs_solml2_vr(ids,L,NY,NX),trcs_solml_vr(ids,L,NY,NX)
+        write(*,*)I*1000+J,'micv2 ',trcs_names(ids),L,trcs_solml2_vr(ids,L,NY,NX),trcs_solml_vr(ids,L,NY,NX)
         stop
       endif
       if(trcs_soHml_vr(ids,L,NY,NX)<0._r8)then

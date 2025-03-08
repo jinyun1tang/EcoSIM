@@ -308,6 +308,7 @@ contains
       trcg_snow=0._r8
       trcg_root=0._r8
       trcg_soil=0._r8
+
       DO L=NUI(NY,NX),NLI(NY,NX)
 
         DO idg=idg_beg,idg_NH3
@@ -337,8 +338,8 @@ contains
       DO idg=idg_beg,idg_NH3
         trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soil(idg)
       ENDDO
-!      if(I==134)then
-!        write(115,*)I*1000+J,trcs_names(idg_N2),trcg_snow(idg_N2),trcg_root(idg_N2),trcg_soil(idg_N2)
+!      if(I==68 .and. J>=15)then        
+        write(115,*)I*1000+J,VcumSnowWE_col(NY,NX),trcs_names(idg_O2),trcg_snow(idg_O2),trcg_root(idg_O2),trcg_soil(idg_O2)
 !      endif
       trcg_TotalMass_col(idg_NH3B,NY,NX)=trcg_soilMass_col(idg_NH3B,NY,NX)
     ENDDO
