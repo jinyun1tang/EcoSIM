@@ -267,7 +267,7 @@ contains
       ENDDO
     ENDDO
     !exclude NH3B and NH3
-    DO idg=idg_beg,idg_end-2
+    DO idg=idg_beg,idg_NH3-1
         trcs_Dif_flxM(idg)=SDifc(idg)*(trcs_cl_litr(idg)-trcs_cl_soil(idg))
     ENDDO
 
@@ -354,7 +354,6 @@ contains
   do idg=idg_beg,idg_NH3
     trcs_TransptMicP_3D(idg,3,0,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)-litR_solute_adv_flxM(idg)-trcs_Dif_flxM(idg)
   ENDDO
-!  write(116,*)I+J/24.,M,'tp30',trcs_TransptMicP_3D(ids_NO3,3,0,NY,NX)
 
   do ids=ids_nut_beg,ids_nuts_end
     trcs_TransptMicP_3D(ids,3,0,NY,NX)=trcs_TransptMicP_3D(ids,3,0,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(ids,NY,NX)-litR_solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
@@ -953,10 +952,10 @@ contains
 
     IF(VLWatMicPOB.GT.ZEROS2(NY,NX))THEN
       trcs_cl_soil(ids_NO3B) = AZMAX1(trcs_solml2_vr(ids_NO3B,NU(NY,NX),NY,NX)/VLWatMicPOB)
-      trcs_cl_soil(ids_NO2)  = AZMAX1(trcs_solml2_vr(ids_NO2B,NU(NY,NX),NY,NX)/VLWatMicPOB)
+      trcs_cl_soil(ids_NO2B)  = AZMAX1(trcs_solml2_vr(ids_NO2B,NU(NY,NX),NY,NX)/VLWatMicPOB)
     ELSE
       trcs_cl_soil(ids_NO3B) = trcs_cl_soil(ids_NO3)
-      trcs_cl_soil(ids_NO2)  = trcs_cl_soil(ids_NO2)
+      trcs_cl_soil(ids_NO2B) = trcs_cl_soil(ids_NO2)
     ENDIF
     IF(VLWatMicPPB.GT.ZEROS2(NY,NX))THEN
       trcs_cl_soil(ids_H1PO4B) = AZMAX1(trcs_solml2_vr(ids_H1PO4B,NU(NY,NX),NY,NX)/VLWatMicPPB)

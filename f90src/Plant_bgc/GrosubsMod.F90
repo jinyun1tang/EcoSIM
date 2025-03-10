@@ -414,9 +414,9 @@ module grosubsMod
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,           &
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,   &
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft,       &
-    trcs_deadroot2soil_pvr      => plt_rbgc%trcs_deadroot2soil_pvr,       &
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr,             &
     RootCO2Ar2Soil_pvr          => plt_rbgc%RootCO2Ar2Soil_pvr,           &
+    RootCO2Ar2Root_pvr          => plt_rbgc%RootCO2Ar2Root_pvr,           &
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr,           &
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr,           &
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr     ,           &
@@ -461,8 +461,8 @@ module grosubsMod
       RootCO2Autor_pvr(N,L,NZ)   = 0._r8
     ENDDO D9
     RootN2Fix_pvr(L,NZ)            = 0._r8
-    trcs_deadroot2soil_pvr(:,L,NZ) = 0._r8
     RootCO2Ar2Soil_pvr(L,NZ)       = 0._r8
+    RootCO2Ar2Root_pvr(L,NZ)       = 0._r8
   ENDDO D6
 
 !

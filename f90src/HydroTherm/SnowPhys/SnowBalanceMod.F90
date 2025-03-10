@@ -3,7 +3,7 @@ module SnowBalanceMod
   use data_const_mod, only: spval => DAT_CONST_SPVAL
   use abortutils,     only: endrun
   use EcoSIMCtrlMod,  only: lverb,snowRedist_model,fixWaterLevel
-  use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d  
+  use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d ,AZERO 
   use DebugToolMod
   use SoilPropertyDataType
   use SurfLitterDataType
@@ -635,17 +635,17 @@ implicit none
 !          chemicals
           !gas
           DO idg=idg_beg,idg_NH3
-            trcg_solsml_snvr(idg,L1,NY,NX)=trcg_solsml_snvr(idg,L1,NY,NX)+FX*trcg_solsml_snvr(idg,L0,NY,NX)
+            trcg_solsml_snvr(idg,L1,NY,NX)=AZERO(trcg_solsml_snvr(idg,L1,NY,NX)+FX*trcg_solsml_snvr(idg,L0,NY,NX))
           ENDDO
 
           !nutrients
           DO idn=ids_nut_beg,ids_nuts_end
-            trcn_solsml_snvr(idn,L1,NY,NX)=trcn_solsml_snvr(idn,L1,NY,NX)+FX*trcn_solsml_snvr(idn,L0,NY,NX)
+            trcn_solsml_snvr(idn,L1,NY,NX)=AZERO(trcn_solsml_snvr(idn,L1,NY,NX)+FX*trcn_solsml_snvr(idn,L0,NY,NX))
           ENDDO
           !salt
           IF(salt_model)THEN
             DO idsalt=idsalt_beg,idsalt_end
-              trcSalt_ml_snvr(idsalt,L1,NY,NX)=trcSalt_ml_snvr(idsalt,L1,NY,NX)+FX*trcSalt_ml_snvr(idsalt,L0,NY,NX)
+              trcSalt_ml_snvr(idsalt,L1,NY,NX)=AZERO(trcSalt_ml_snvr(idsalt,L1,NY,NX)+FX*trcSalt_ml_snvr(idsalt,L0,NY,NX))
             ENDDO
           ENDIF
 !

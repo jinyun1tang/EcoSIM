@@ -35,6 +35,8 @@ implicit none
   real(r8),target,allocatable ::  trcg_gasml_vr(:,:,:,:)             !layer mass of gases in micropores [g d-2]
   real(r8),target,allocatable ::  trcg_TotalMass_beg_col(:,:,:)      !column integrated volatile tracer mass at the begining of time step [g d-2]
   real(r8),target,allocatable ::  trcg_TotalMass_col(:,:,:)          !column integrated volatile tracer mass at the moment [g d-2]
+  real(r8),target,allocatable ::  trcg_rootMass_col(:,:,:)           !column integrated volatile tracer mass in roots [g d-2]
+  real(r8),target,allocatable ::  trcg_rootMass_beg_col(:,:,:)           !column integrated volatile tracer mass in roots [g d-2]
   real(r8),target,allocatable ::  PH_vr(:,:,:)                       !soil pH
   real(r8),target,allocatable ::  CEC_vr(:,:,:)                      !soil cation exchange capacity	[cmol kg-1]
   real(r8),target,allocatable ::  AEC_vr(:,:,:)                      !soil anion exchange capacity	[cmol kg-1]
@@ -148,6 +150,8 @@ implicit none
   allocate(Gas_Prod_TP_cumRes_col(idg_beg:idg_NH3,JY,JX)); Gas_Prod_TP_cumRes_col=0._r8
   allocate(trcg_TotalMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_beg_col=0._r8
   allocate(trcg_TotalMass_col(idg_beg:idg_end,JY,JX)); trcg_TotalMass_col=0._r8
+  allocate(trcg_rootMass_beg_col(idg_beg:idg_NH3,JY,JX)); trcg_rootMass_beg_col=0._r8
+  allocate(trcg_rootMass_col(idg_beg:idg_NH3,JY,JX)); trcg_rootMass_col=0._r8
   allocate(trcg_gasml_vr(idg_beg:idg_NH3,JZ,JY,JX)); trcg_gasml_vr=0._r8
   allocate(trcs_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trcs_soHml_vr=0._r8
   allocate(trcs_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_solml_vr=0._r8
@@ -341,6 +345,8 @@ implicit none
   call destroy(LitrfalStrutElms_vr)
   call destroy(trcg_TotalMass_beg_col)
   call destroy(trcg_TotalMass_col)
+  call destroy(trcg_rootMass_beg_col)
+  call destroy(trcg_rootMass_col)
   call destroy(GasDiff2Surf_flx_col)
   call destroy(SurfGasEmisFlx_col)
   call destroy(GasHydroLossFlx_col)

@@ -58,10 +58,15 @@ implicit none
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
 !      ENDDO
+!      if(I==140 .and. J>=20)write(116,*)'bfrootupk',I*1000+J        
+!      call SumPlantRootGas(I,J)
 
       !Predict uptake fluxes of nutrients and O2
       if(lverb)write(*,*)'uptake'
       CALL ROOTUPTAKES(I,J)
+!      if(I==140 .and. J>=20)write(116,*)'afrootupk',I*1000+J         
+!      call SumPlantRootGas(I,J)
+
 !      DO NZ=1,NP(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
 !      ENDDO
@@ -71,8 +76,10 @@ implicit none
       CALL GROWPLANTS(I,J)
 
       if(lverb)write(*,*)'EXTRACT'
+
       !aggregate varaibles
       CALL EXTRACTs(I,J)
+!      if(I==140 .and. J>=20)write(116,*)'afextract'        
 
       call ExitPlantBalance(I,J,NP(NY,NX))
 

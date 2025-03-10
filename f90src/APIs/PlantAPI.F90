@@ -52,7 +52,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: NB,NR,NZ,K,L,M,N,I1,NE,idg
+  integer :: NB,NR,NZ,K,L,M,N,I1,NE,idg,ids
 
   I1=I+1;if(I1>DazCurrYear)I1=1
   NumActivePlants(NY,NX)                              = plt_site%NumActivePlants
@@ -81,7 +81,7 @@ implicit none
   HeatFlx2Canopy_col(NY,NX)                        = plt_ew%HeatFlx2Canopy_col
   CanopyWat_col(NY,NX)                             = plt_ew%CanopyWat_col
   CanopyHeatStor_col(NY,NX)                        = plt_ew%CanopyHeatStor_col
-  TRootGasLossDisturb_pft(idg_beg:idg_NH3,NY,NX) = plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_NH3)
+  TRootGasLossDisturb_col(idg_beg:idg_NH3,NY,NX) = plt_rbgc%TRootGasLossDisturb_col(idg_beg:idg_NH3)
   Canopy_NEE_col(NY,NX)                            = plt_bgcr%Canopy_NEE_col
   TPlantRootH2OUptake_col(NY,NX)                   = plt_ew%TPlantRootH2OUptake_col
   FERT(17:19,I1,NY,NX) = plt_distb%FERT(17:19)
@@ -138,10 +138,13 @@ implicit none
     totRootLenDens_vr(L,NY,NX)                    = plt_morph%totRootLenDens_vr(L)
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
-    tRootCO2Emis2Root_vr(L,NY,NX)                 = plt_bgcr%tRootCO2Emis2Root_vr(L)
+    RootCO2Emis2Root_vr(L,NY,NX)                 = plt_bgcr%RootCO2Emis2Root_vr(L)
     RUptkRootO2_vr(L,NY,NX)                     = plt_bgcr%RUptkRootO2_vr(L)
     
     trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L)
+    DO ids=ids_beg,ids_end
+      trcs_plant_uptake_col(ids,NY,NX) = trcs_plant_uptake_col(ids,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX)
+    enddo
     DO  K=1,jcplx
       tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)=plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)
     ENDDO
@@ -554,7 +557,8 @@ implicit none
         RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)           = plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)
         RootCO2Autor_vr(L,NY,NX)                       = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)
       ENDDO
-      RootCO2Ar2Soil_vr(L,NY,NX)                     = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)   
+      RootCO2Ar2Soil_vr(L,NY,NX)                       = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)   
+      RootCO2Ar2Root_vr(L,NY,NX)                       = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Root_pvr(L,NZ)
       do idg=idg_beg,idg_NH3
         trcs_deadroot2soil_vr(idg,L,NY,NX)    = trcs_deadroot2soil_vr(idg,L,NY,NX) + plt_rbgc%trcs_deadroot2soil_pvr(idg,L,NZ)
       ENDDO
@@ -923,7 +927,7 @@ implicit none
   plt_rad%Eco_NetRad_col                                 = Eco_NetRad_col(NY,NX)
   plt_ew%VapXAir2Canopy_col                              = VapXAir2Canopy_col(NY,NX)
   plt_ew%Eco_Heat_Latent_col                             = Eco_Heat_Latent_col(NY,NX)
-  plt_rbgc%TRootGasLossDisturb_pft(idg_beg:idg_NH3)    = TRootGasLossDisturb_pft(idg_beg:idg_NH3,NY,NX)
+  plt_rbgc%TRootGasLossDisturb_col(idg_beg:idg_NH3)    = TRootGasLossDisturb_col(idg_beg:idg_NH3,NY,NX)
   plt_ew%Eco_Heat_GrndSurf_col                           = Eco_Heat_GrndSurf_col(NY,NX)
   plt_ew%QVegET_col                                        = QVegET_col(NY,NX)
   plt_ew%HeatFlx2Canopy_col                              = HeatFlx2Canopy_col(NY,NX)
@@ -973,7 +977,7 @@ implicit none
     plt_morph%totRootLenDens_vr(L)                   = totRootLenDens_vr(L,NY,NX)
     plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)         = trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
-    plt_bgcr%tRootCO2Emis2Root_vr(L)                 = tRootCO2Emis2Root_vr(L,NY,NX)
+    plt_bgcr%RootCO2Emis2Root_vr(L)                 = RootCO2Emis2Root_vr(L,NY,NX)
     plt_bgcr%RUptkRootO2_vr(L)                     = RUptkRootO2_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)

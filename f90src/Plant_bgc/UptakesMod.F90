@@ -4,6 +4,7 @@ module UptakesMod
   use StomatesMod   , only : StomatalDynamics
   use EcoSIMCtrlMod , only : etimer, lverb  
   use UnitMod       , only : units  
+  use PlantBalMod   , only : SumPlantRootGas
   use GrosubPars
   use minimathmod
   use DebugToolMod
@@ -199,6 +200,7 @@ module UptakesMod
 
     ENDIF
   ENDDO
+
   call PrintInfo('end '//subname)
   RETURN
   end associate
@@ -270,10 +272,10 @@ module UptakesMod
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
-        plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                   = 0.0_r8
+        plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                     = 0.0_r8
         plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                          = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
-        plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)        = 0.0_r8
+        plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8
         plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)    = 0.0_r8
         plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,N,L,NZ) = 0.0_r8
       enddo
@@ -563,13 +565,13 @@ module UptakesMod
 
     IF(DIFF.GT.0.5_r8)THEN
       plt_rad%RadNet2Canopy_pft(NZ) = 0.0_r8
-      plt_ew%EvapTransLHeat_pft(NZ)  = 0.0_r8
+      plt_ew%EvapTransLHeat_pft(NZ) = 0.0_r8
       plt_ew%HeatXAir2PCan_pft(NZ)  = 0.0_r8
       plt_ew%HeatStorCanopy_pft(NZ) = 0.0_r8
       plt_ew%VapXAir2Canopy_pft(NZ) = 0.0_r8
       plt_ew%Transpiration_pft(NZ)  = 0.0_r8
       TKC_pft(NZ)                   = TairK+DeltaTKC_pft(NZ)
-      TdegCCanopy_pft(NZ)        = units%Kelvin2Celcius(TKC_pft(NZ))
+      TdegCCanopy_pft(NZ)           = units%Kelvin2Celcius(TKC_pft(NZ))
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))

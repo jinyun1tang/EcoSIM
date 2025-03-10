@@ -19,6 +19,7 @@ implicit none
   public :: SumPlantBranchBiome
   public :: EnterPlantBalance
   public :: ExitPlantBalance
+  public :: SumPlantRootGas
   logical,save  :: lfile(2)=.true.
   contains
 
@@ -96,6 +97,42 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
+  subroutine SumPlantRootGas(I,J)
+
+  implicit none
+  integer, intent(in) :: I,J
+  integer :: NZ ,L,N,idg,K
+  real(r8) :: trcg(idg_beg:idg_NH3)
+  associate(                                                       &
+    NU                       => plt_site%NU,                       &  
+    trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
+    trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
+    trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
+    MY                       => plt_morph%MY,                      &
+    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
+  )
+  trcg_root_vr(idg_beg:idg_NH3,:)         = 0._r8
+
+  trcg(:)=0._r8
+  DO NZ=1,plt_site%NP  
+    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle
+
+    DO L=NU,MaxSoiL4Root_pft(NZ)
+      DO N=1,MY(NZ)  
+        DO idg=idg_beg,idg_NH3
+          trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
+        ENDDO        
+      ENDDO  
+      DO idg=idg_beg,idg_NH3
+        trcg(idg)=trcg(idg)+trcg_root_vr(idg,L)
+      ENDDO
+    ENDDO
+!    if(I==140 .and. J>=20)write(116,*)'MaxSoiL4Root_pft(NZ)',MaxSoiL4Root_pft(NZ)
+  ENDDO
+!  if(I==140 .and. J>=20)write(116,*)trcg(idg_N2),'N2'
+  end associate
+  end subroutine SumPlantRootGas
+!------------------------------------------------------------------------------------------
 
   subroutine SumPlantBiomStates(I,J,NZ,header)
   implicit none

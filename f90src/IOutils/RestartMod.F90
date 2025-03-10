@@ -6652,6 +6652,24 @@ implicit none
   endif  
 
   if(flag=='read')then
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ)    
+    call restartvar(ncid, flag, varname='trcg_root_vr', dim1name='column',dim2name='gastrcs',&
+       dim3name='levsoi',long_name='layer mass of gases in roots', units='g d-2', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
+       fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_root_vr,datrc_3d)     
+  else
+    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,trcg_root_vr,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ)        
+    call restartvar(ncid, flag, varname='trcg_root_vr', dim1name='column',dim2name='gastrcs',&
+       dim3name='levsoi',long_name='layer mass of gases in roots', units='g d-2', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
+       fill_value=spval)   
+  endif  
+
+
+
+  if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)        
     call restartvar(ncid, flag, varname='trcs_solml_vr', dim1name='column',dim2name='soltrcs',&
        dim3name='levsoi1',long_name='solute mass in micropore', units='g d-2', &

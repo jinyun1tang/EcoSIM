@@ -6,6 +6,7 @@ module ExtractsMod
 !
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: AZMAX1
+  use PlantBalMod, only : SumPlantRootGas
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -27,6 +28,8 @@ module ExtractsMod
   integer :: NZ
 
   call TotalLitrFall()
+
+  call SumPlantRootGas(I,J)
 
   DO NZ=1,plt_site%NP
     IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
@@ -157,7 +160,6 @@ module ExtractsMod
     RootUptkSoiSol_pvr       => plt_rbgc%RootUptkSoiSol_pvr,       &
     RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr,        &
     trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr,     &
-    trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
     RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
     RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
     RootNH4DmndSoil_pvr      => plt_rbgc%RootNH4DmndSoil_pvr,      &
@@ -176,7 +178,7 @@ module ExtractsMod
     REcoO2DmndResp_vr        => plt_bgcr%REcoO2DmndResp_vr,        &
     tRootMycoExud2Soil_vr    => plt_bgcr%tRootMycoExud2Soil_vr,    &
     RUptkRootO2_vr           => plt_bgcr%RUptkRootO2_vr,           &
-    tRootCO2Emis2Root_vr     => plt_bgcr%tRootCO2Emis2Root_vr,     &
+    RootCO2Emis2Root_vr     => plt_bgcr%RootCO2Emis2Root_vr,     &
     REcoH2PO4DmndBand_vr     => plt_bgcr%REcoH2PO4DmndBand_vr,     &
     REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
     TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
@@ -184,8 +186,6 @@ module ExtractsMod
     THeatLossRoot2Soil_vr    => plt_ew%THeatLossRoot2Soil_vr,      &
     TPlantRootH2OLoss_vr     => plt_ew%TPlantRootH2OLoss_vr,       &
     AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
-    trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
-    trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
     totRootLenDens_vr        => plt_morph%totRootLenDens_vr,       &
     MY                       => plt_morph%MY,                      &
@@ -193,11 +193,7 @@ module ExtractsMod
   )
   
   DO L=NU,MaxSoiL4Root_pft(NZ)
-    trcs_plant_uptake_vr(idg_N2,L)=trcs_plant_uptake_vr(idg_N2,L)+RootN2Fix_pvr(L,NZ)
-  ENDDO
-
-  DO N=1,MY(NZ)
-    DO L=NU,MaxSoiL4Root_pft(NZ)
+    DO N=1,MY(NZ)  
 !
 !     TOTAL ROOT DENSITY
 !
@@ -225,20 +221,13 @@ module ExtractsMod
         THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKS_vr(L)
       endif
 !
-!     TOTAL ROOT GAS CONTENTS
-!
-!
-      DO idg=idg_beg,idg_NH3
-        trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
-      ENDDO
-!
 !     TOTAL ROOT BOUNDARY GAS FLUXES
 !
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
 
-      tRootCO2Emis2Root_vr(L) = tRootCO2Emis2Root_vr(L)-RootCO2Emis_pvr(N,L,NZ)
+      RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RootCO2Emis_pvr(N,L,NZ)
       RUptkRootO2_vr(L)       = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
       DO idg=idg_beg,idg_end
@@ -276,6 +265,7 @@ module ExtractsMod
       REcoH2PO4DmndBand_vr(L) = REcoH2PO4DmndBand_vr(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
       REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
+
   ENDDO
   end associate
   end subroutine TotalGasandSoluteUptake
@@ -306,7 +296,7 @@ module ExtractsMod
     ETCanopy_CumYr_pft        => plt_ew%ETCanopy_CumYr_pft,          &
     TRootH2Flx_col            => plt_bgcr%TRootH2Flx_col,            &
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft,  &
-    TRootGasLossDisturb_pft   => plt_rbgc%TRootGasLossDisturb_pft,   &
+    TRootGasLossDisturb_col   => plt_rbgc%TRootGasLossDisturb_col,   &
     Transpiration_pft         => plt_ew%Transpiration_pft,           &
     PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft,      &
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,          &
@@ -367,7 +357,7 @@ module ExtractsMod
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
 !     BALC,BALN,BALP=PFT C,N,P balance
-!     TRootGasLossDisturb_pft=total loss of root CO2, O2, CH4, N2O, NH3, H2
+!     TRootGasLossDisturb_col=total loss of root CO2, O2, CH4, N2O, NH3, H2
 !     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
   Eco_NetRad_col         = Eco_NetRad_col+RadNet2Canopy_pft(NZ)
@@ -394,7 +384,7 @@ module ExtractsMod
   ENDDO
 
   DO idg=idg_beg,idg_NH3
-    TRootGasLossDisturb_pft(idg)=TRootGasLossDisturb_pft(idg)+RootGasLossDisturb_pft(idg,NZ)
+    TRootGasLossDisturb_col(idg)=TRootGasLossDisturb_col(idg)+RootGasLossDisturb_pft(idg,NZ)
   ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION

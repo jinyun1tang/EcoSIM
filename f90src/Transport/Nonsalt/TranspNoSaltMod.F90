@@ -4,7 +4,7 @@ module TranspNoSaltMod
 !
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: destroy,endrun
-  USE MiniMathMod,      ONLY: AZMAX1, fixnegmass, flux_mass_limiter
+  USE MiniMathMod,      ONLY: AZMAX1, fixnegmass, flux_mass_limiter,AZERO
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
   use SnowTransportMod, only: TracerFall2Snowpack
@@ -244,12 +244,11 @@ module TranspNoSaltMod
 
   DO  L=1,JS
     DO idg=idg_beg,idg_NH3
-      trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)+trcg_Aqua_flxM_snvr(idg,L,NY,NX)
+      trcg_solsml2_snvr(idg,L,NY,NX)=AZERO(trcg_solsml2_snvr(idg,L,NY,NX)+trcg_Aqua_flxM_snvr(idg,L,NY,NX))
     ENDDO
 
-
     DO idn=ids_nut_beg,ids_nuts_end
-      trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)+trcn_Aqua_flxM_snvr(idn,L,NY,NX)
+      trcn_solsml2_snvr(idn,L,NY,NX)=AZERO(trcn_solsml2_snvr(idn,L,NY,NX)+trcn_Aqua_flxM_snvr(idn,L,NY,NX))
     ENDDO
   ENDDO
   end subroutine UpdateSnowTracersM
@@ -498,7 +497,7 @@ module TranspNoSaltMod
       trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
         +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)
     ENDDO
-
+    
     trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
       +Irrig2LitRSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
     trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
@@ -626,10 +625,12 @@ module TranspNoSaltMod
       -TProd_CO2_geochem_soil_vr(L,NY,NX)-RootCO2Ar2Soil_vr(L,NY,NX)- trcs_deadroot2soil_vr(idg_CO2,L,NY,NX))*dts_gas
 
     DO idg=idg_beg,idg_NH3-1
-      if(idg/=idg_CO2 .and. idg/=idg_O2)then
+      if(idg/=idg_CO2 .and. idg/=idg_O2)then      
         RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)+trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
       endif
     enddo
+    RBGCSinkGasMM_vr(idg_N2,L,NY,NX)=RBGCSinkGasMM_vr(idg_N2,L,NY,NX)+RootN2Fix_vr(L,NY,NX)*dts_gas
+
     RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TRChem_gas_NH3_geochem_vr(L,NY,NX)*dts_gas  !geochemical NH3 source 
 
     RBGCSinkSoluteM_vr(ids_NH4,L,NY,NX)   = (-RNut_MicbRelease_vr(ids_NH4,L,NY,NX)-trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)+trcs_plant_uptake_vr(ids_NH4,L,NY,NX))*dts_HeatWatTP

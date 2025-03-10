@@ -556,6 +556,8 @@ module RootGasMod
           trcs_rootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
 
           DO idg=idg_beg,idg_NH3
+            Root_gas2sol_flx(idg)=AMAX1(AMIN1(trcg_rootml_loc(idg),Root_gas2sol_flx(idg)),-trcs_rootml_loc(idg))
+
             trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)
 
             call fixEXConsumpFlux(trcg_rootml_loc(idg),trcg_air2root_flx_loc(idg),-1)
@@ -579,7 +581,7 @@ module RootGasMod
 !
           DO idg=idg_beg,idg_end
             if(idg==idg_O2)then
-              RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+ROxySoil2Uptk
+              RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+ROxySoil2Uptk     !O2 is consumed, not added to roots
             else
               RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+RootUptkSoiSolute(idg)
             endif
@@ -613,13 +615,21 @@ module RootGasMod
         +trcg_air2root_flx_pvr(idg,N,L,NZ)
       if(idg==idg_O2)then
         dtrc_err(idg)=dtrc_err(idg)-RootO2Uptk_pvr(N,L,NZ)
+      elseif(idg==idg_CO2)then
+        dtrc_err(idg)=dtrc_err(idg)+RootCO2Emis_pvr(N,L,NZ)
       else
         dtrc_err(idg)=dtrc_err(idg)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       endif      
     ENDDO
-!    if(I==135 .and. J>=10)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
-!      trcg_rootml_beg(idg_CO2),trcs_rootml_beg(idg_CO2),RootUptkSoiSol_pvr(idg_CO2,N,L,NZ),&
-!      trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)
+!    if(J>=22)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
+!      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
+!      RootCO2Emis_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)
+!    if(I==140 .and. J>=20)then        
+!      idg=idg_N2
+!      write(116,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
+!        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
+!        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
+!    endif
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'

@@ -661,7 +661,7 @@ implicit none
   real(r8), pointer :: RGasTranspFlxPrev_vr(:,:)             => null()   !net gaseous flux,                        [g d-2 h-1]
   real(r8), pointer :: RO2AquaSourcePrev_vr(:)        => null()   !net aqueous O2 flux,                        [g d-2 h-1]
   real(r8), pointer :: RO2EcoDmndPrev_vr(:)             => null()   !total root + microbial O2 uptake, [g d-2 h-1]
-  real(r8), pointer :: tRootCO2Emis2Root_vr(:)               => null()   !total root CO2 flux,              [gC d-2 h-1]
+  real(r8), pointer :: RootCO2Emis2Root_vr(:)               => null()   !total root CO2 flux,              [gC d-2 h-1]
   real(r8), pointer :: RUptkRootO2_vr(:)              => null()   !total root internal O2 flux,      [g d-2 h-1]
   real(r8), pointer :: LitrfalStrutElms_vr(:,:,:,:)     => null() !total LitrFall element,             [g d-2 h-1]
   real(r8), pointer :: REcoDOMProd_vr(:,:,:)            => null()  !net microbial DOC flux,            [gC d-2 h-1]
@@ -686,7 +686,7 @@ implicit none
 
   type, public :: plant_rootbgc_type
   real(r8), pointer :: canopy_growth_pft(:)              => null()  !canopy growth flux [g d-2]
-  real(r8), pointer :: TRootGasLossDisturb_pft(:)        => null()  !total root gas content [g d-2]
+  real(r8), pointer :: TRootGasLossDisturb_col(:)        => null()  !total root gas content [g d-2]
   real(r8), pointer :: trcs_plant_uptake_vr(:,:)         => null()   !total root-soil solute flux non-band,                          [g d-2 h-1]
   real(r8), pointer :: RootMycoExudElms_pft(:,:)         => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pft(:)                  => null()  !total root N2 fixation,                                         [g d-2 h-1]
@@ -741,6 +741,7 @@ implicit none
   real(r8), pointer :: RootUptk_N_CumYr_pft(:)           => null()  !cumulative plant N uptake [gN d-2]
   real(r8), pointer :: RootUptk_P_CumYr_pft(:)           => null()  !cumulative plant P uptake [gP d-2]
   real(r8), pointer :: RootCO2Ar2Soil_pvr(:,:)           => null()  !root respiration released to soil [gC d-2 h-1]
+  real(r8), pointer :: RootCO2Ar2Root_pvr(:,:)           => null()  !root respiration released to root [gC d-2 h-1]
   real(r8), pointer :: trcs_deadroot2soil_pvr(:,:,:)     => null()  !gases released to soil upong dying roots [g d-2 h-1]
   contains
     procedure, public :: Init => plt_rootbgc_init
@@ -770,7 +771,7 @@ implicit none
   allocate(this%trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
   allocate(this%trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
   allocate(this%RootGasConductance_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootGasConductance_pvr=0._r8
-  allocate(this%TRootGasLossDisturb_pft(idg_beg:idg_NH3));this%TRootGasLossDisturb_pft=spval
+  allocate(this%TRootGasLossDisturb_col(idg_beg:idg_NH3));this%TRootGasLossDisturb_col=spval
   allocate(this%RO2UptkSoilM_vr(60,0:JZ1)); this%RO2UptkSoilM_vr=spval
   allocate(this%RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%RootMycoExudEUptk_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
@@ -791,6 +792,7 @@ implicit none
   allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=spval
   allocate(this%trcs_deadroot2soil_pvr(idg_beg:idg_NH3,JZ1,JP1));this%trcs_deadroot2soil_pvr=0._r8
   allocate(this%RootCO2Ar2Soil_pvr(JZ1,JP1)); this%RootCO2Ar2Soil_pvr=0._r8
+  allocate(this%RootCO2Ar2Root_pvr(JZ1,JP1)); this%RootCO2Ar2Root_pvr=0._r8
   allocate(this%RootCO2AutorX_pvr(jroots,JZ1,JP1)); this%RootCO2AutorX_pvr=spval
   allocate(this%RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1)); this%RootNutUptake_pvr=0._r8
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval
@@ -966,7 +968,7 @@ implicit none
   implicit none
   class(plant_bgcrate_type) :: this
 
-  allocate(this%tRootCO2Emis2Root_vr(JZ1)); this%tRootCO2Emis2Root_vr=spval
+  allocate(this%RootCO2Emis2Root_vr(JZ1)); this%RootCO2Emis2Root_vr=spval
   allocate(this%RUptkRootO2_vr(JZ1)); this%RUptkRootO2_vr=spval
   allocate(this%RH2PO4EcoDmndSoilPrev_vr(0:JZ1)); this%RH2PO4EcoDmndSoilPrev_vr=spval
   allocate(this%RH2PO4EcoDmndBandPrev_vr(0:JZ1)); this%RH2PO4EcoDmndBandPrev_vr=spval

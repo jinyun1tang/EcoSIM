@@ -587,7 +587,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
-  integer, intent(in) :: N1,N2,N3   !source grid indices
+  integer, intent(in) :: N1,N2,N3   !source soil grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(inout) :: N6      !vertical layer 
   integer :: LL,K,idsalt,ids,idg,idom
