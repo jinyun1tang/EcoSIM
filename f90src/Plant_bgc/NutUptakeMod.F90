@@ -181,7 +181,8 @@ module NutUptakeMod
   RootCO2Ar        = 0._r8
   RootCO2ArB       = 0._r8
   trcs_deadroot2soil_pvr(:,:,NZ) = 0._r8  
-
+  RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
+  RootCO2Ar2Root_pvr(:,NZ)       = 0._r8
   D950: DO L=NU,NK
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO) then
 
@@ -232,10 +233,12 @@ module NutUptakeMod
               RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
           ENDIF
           RootCO2Ar2Root_pvr(L,NZ)=RootCO2Ar2Root_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
+          RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         ENDIF
       ENDDO D955      
     ELSE
       D956: DO N  = 1, MY(NZ)    
+        RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         DO idg=idg_beg,idg_NH3
           trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcg_rootml_pvr(idg,N,L,NZ)
@@ -246,7 +249,7 @@ module NutUptakeMod
       ENDDO D956
     ENDIF
   ENDDO D950
-
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake

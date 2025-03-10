@@ -1,7 +1,7 @@
 module BalancesMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use CanopyDataType,    only: QVegET_col
-  use GridDataType,      only: NU,               NL
+  use GridDataType,      only: NU, NL
   use EcoSimConst,       only: DENSICE
   use abortutils,        only: endrun
   use EcoSIMCtrlMod,     only: fixWaterLevel
@@ -29,6 +29,7 @@ implicit none
   public :: EndCheckBalances
   public :: SummarizeTracerMass
   public :: SummarizeSnowMass
+  public :: SummarizeTracers
 contains
 
   subroutine BegCheckBalances(I,J,NHW,NHE,NVN,NVS)  
@@ -281,9 +282,22 @@ contains
           write(111,*)'GasHydroloss     =',GasHydroLossFlx_col(idg,NY,NX)
           if(idg==idg_N2)then
             write(111,*)'RGasNetProd,Nfix=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX)
+          elseif(idg==idg_CO2)then
+            write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX),-RootCO2AutorPrev_col(NY,NX)  
           else
             write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX)
           endif
+          write(111,*)'------------------'
+          write(111,*)'soil beg_end mass=',trcg_soilMass_beg_col(idg,NY,NX), trcg_soilMass_col(idg,NY,NX),&
+            trcg_soilMass_beg_col(idg,NY,NX)-trcg_soilMass_col(idg,NY,NX)
+          write(111,*)'soil2atm         =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX)  
+          
+          if(idg==idg_CO2)then
+            write(111,*)'ar2soil          =',RootCO2Ar2Soil_col(NY,NX)
+          endif    
+          write(111,*)'soil loss        =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX) &
+              -trcs_plant_uptake_col(idg,NY,NX) 
+          
           write(111,*)'=================='
           write(111,*)'root beg_end mass=',trcg_rootMass_beg_col(idg,NY,NX),trcg_rootMass_col(idg,NY,NX),&
             trcg_rootMass_beg_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX)
@@ -292,7 +306,8 @@ contains
           if(idg==idg_O2)then
             write(111,*)'plt_uptake       =',-RUptkRootO2_col(NY,NX)
           elseif(idg==idg_CO2)then
-            write(111,*)'plt_uptake       =',RootCO2Emis2Root_col(NY,NX)
+            write(111,*)'tplt2root,soi2root =',RootCO2Emis2Root_col(NY,NX),trcs_plant_uptake_col(idg_CO2,NY,NX)
+            write(111,*)'ar2root            =',RootCO2Ar2Root_col(NY,NX)
           else
             write(111,*)'plt_uptake       =',trcs_plant_uptake_col(idg,NY,NX)
           endif
@@ -365,9 +380,10 @@ contains
         ENDDO
       ENDDO
 
-      DO idg=idg_beg,idg_end  
-        trcg_soilMass_col(idg,NY,NX)=trcg_soil(idg)
+      DO idg=idg_beg,idg_NH3  
+        trcg_soilMass_col(idg,NY,NX)=trcg_soil(idg)+trcg_litr(idg)
       ENDDO    
+      trcg_soilMass_col(idg_NH3B,NY,NX)=trcg_soil(idg_NH3B)
 
       !Because idg_NH3B does not exist in snow
       !add now      
@@ -378,12 +394,13 @@ contains
       ENDDO    
 
       DO idg=idg_beg,idg_NH3
-        trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soil(idg)+trcg_litr(idg)
+        trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soil(idg)
       ENDDO
-      if(I==141 .and. J>=2)then        
 
-      idg=idg_CO2
-        write(115,*)I*1000+J,VcumSnowWE_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soil(idg),NY,NX
+      if(I==141 .and. J>=2)then        
+        idg=idg_CO2
+        write(115,*)I*1000+J,'snowv     trcname     snow   litr  root  soil'
+        write(115,*)VcumSnowWE_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soil(idg)+trcg_litr(idg),NY,NX
       DO L=NUI(NY,NX),NLI(NY,NX)
         write(115,*)L,trcg_gasml_vr(idg,L,NY,NX),trcs_solml_vr(idg,L,NY,NX), trcs_soHml_vr(idg,L,NY,NX)
       ENDDO  

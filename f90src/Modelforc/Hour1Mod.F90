@@ -339,9 +339,9 @@ module Hour1Mod
 
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
-           /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX)))
+           /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX))*MolecularWeight(idg))
         trcg_irrig_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, TCA_col(NY,NX)) &
-          /(EXP(GasSechenovConst(idg)*CSTRQ(I,NY,NX)))
+          /(EXP(GasSechenovConst(idg)*CSTRQ(I,NY,NX))*MolecularWeight(idg))
       ENDDO
       GDD_col(NY,NX) = GDD_col(NY,NX)+TCA_col(NY,NX)/24._r8
     ENDDO
@@ -775,10 +775,11 @@ module Hour1Mod
   trcn_AquaADV_Snow2Soil_flx(:,NY,NX)     = 0._r8
   trcn_AquaADV_Snow2Band_flx(:,NY,NX)     = 0._r8
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)     = 0._r8
-
+  RootCO2Ar2Soil_col(NY,NX)  =0._r8
+  RootCO2Ar2Root_col(NY,NX)=0._r8
   GasHydroLossFlx_col(idg_beg:idg_end,NY,NX)         = 0._r8
   SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
-  GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)           = 0._r8
+  GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
   HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8
   TLitrIceFlxThaw_col(NY,NX)                         = 0._r8

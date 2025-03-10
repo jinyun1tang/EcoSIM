@@ -121,7 +121,9 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootCO2AutorPrev_col(:,:)                      !previous time step root autotrophic respiraiton [gC d-2 h-1]  
   real(r8),target,allocatable ::  fRootGrowPSISense_pvr(:,:,:,:,:)               !moisture dependence scalar for root growth [none]
   real(r8),target,allocatable ::  RootCO2Ar2Soil_vr(:,:,:)                       !autotrophic root respiration released to soil [gC d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Ar2Soil_col(:,:)                        !total autotrophic root respiraiton released to soil [gC d-2 h-1]
   real(r8),target,allocatable ::  RootCO2Ar2Root_vr(:,:,:)                       !autotrophic root respiration released to root [gC d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Ar2Root_col(:,:)                        !total autotrophic root respiration released to root [gC d-2 h-1]
   real(r8),target,allocatable ::  trcs_deadroot2soil_vr(:,:,:,:)                 !gases released to soil due to dying roots ([g d-2 h-1])
   real(r8),target,allocatable ::  trcs_deadroot2soil_col(:,:,:)                  !gas released to soil due to dying roots [g d-2 h-1]
   private :: InitAllocate
@@ -253,6 +255,8 @@ module PlantDataRateType
   allocate(TRootH2Flx_col(JY,JX));       TRootH2Flx_col=0._r8
   allocate(RootCO2Autor_vr(JZ,JY,JX));   RootCO2Autor_vr=0._r8
   allocate(RootCO2Ar2Soil_vr(JZ,JY,JX)); RootCO2Ar2Soil_vr=0._r8
+  allocate(RootCO2Ar2Soil_col(JY,JX)); RootCO2Ar2Soil_col=0._r8
+  allocate(RootCO2Ar2Root_col(JY,JX)); RootCO2Ar2Root_col=0._r8
   allocate(RootCO2Ar2Root_vr(JZ,JY,JX)); RootCO2Ar2Root_vr=0._r8
   allocate(RootCO2Autor_col(JY,JX));     RootCO2Autor_col=0._r8
   allocate(RootCO2AutorPrev_col(JY,JX)); RootCO2AutorPrev_col=0._r8
@@ -265,6 +269,8 @@ module PlantDataRateType
 
   call destroy(trcs_deadroot2soil_vr)
   call destroy(RootCO2Ar2Soil_vr)
+  call destroy(RootCO2Ar2Soil_col)
+  call destroy(RootCO2Ar2Root_col)
   call destroy(RootCO2Ar2Root_vr)
   call destroy(RootCO2Autor_col)
   call destroy(RootCO2AutorPrev_col)

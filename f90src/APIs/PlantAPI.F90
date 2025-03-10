@@ -562,7 +562,6 @@ implicit none
       do idg=idg_beg,idg_NH3
         trcs_deadroot2soil_vr(idg,L,NY,NX)    = trcs_deadroot2soil_vr(idg,L,NY,NX) + plt_rbgc%trcs_deadroot2soil_pvr(idg,L,NZ)
       ENDDO
-      RootCO2Autor_col(NY,NX) = RootCO2Autor_col(NY,NX)+RootCO2Autor_vr(L,NY,NX)
     ENDDO
 
     DO NR=1,pltpar%MaxNumRootAxes
@@ -631,7 +630,11 @@ implicit none
       Root2ndXSecArea_pft(N,NZ,NY,NX)                      = plt_morph%Root2ndXSecArea_pft(N,NZ)
     enDDO
   ENDDO
-
+  DO  L=NUI(NY,NX),NK(NY,NX)
+    RootCO2Autor_col(NY,NX)   = RootCO2Autor_col(NY,NX)+RootCO2Autor_vr(L,NY,NX)
+    RootCO2Ar2Root_col(NY,NX) = RootCO2Ar2Root_col(NY,NX)+ RootCO2Ar2Root_vr(L,NY,NX)
+    RootCO2Ar2Soil_col(NY,NX) = RootCO2Ar2Soil_col(NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)
+  ENDDO    
   end subroutine PlantAPIRecv
 
 
@@ -1281,12 +1284,11 @@ implicit none
         plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
         plt_biom%RootProteinConc_rpvr(N,L,NZ)                         = RootProteinConc_rpvr(N,L,NZ,NY,NX)
 
-        plt_ew%PSIRoot_pvr(N,L,NZ)                                = PSIRoot_pvr(N,L,NZ,NY,NX)
-        plt_ew%PSIRootOSMO_vr(N,L,NZ)                             = PSIRootOSMO_vr(N,L,NZ,NY,NX)
-        plt_ew%PSIRootTurg_vr(N,L,NZ)                             = PSIRootTurg_vr(N,L,NZ,NY,NX)
-        plt_rbgc%RootRespPotent_pvr(N,L,NZ)                       = RootRespPotent_pvr(N,L,NZ,NY,NX)
+        plt_ew%PSIRoot_pvr(N,L,NZ)                = PSIRoot_pvr(N,L,NZ,NY,NX)
+        plt_ew%PSIRootOSMO_vr(N,L,NZ)             = PSIRootOSMO_vr(N,L,NZ,NY,NX)
+        plt_ew%PSIRootTurg_vr(N,L,NZ)             = PSIRootTurg_vr(N,L,NZ,NY,NX)
+        plt_rbgc%RootRespPotent_pvr(N,L,NZ)       = RootRespPotent_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootCO2EmisPot_pvr(N,L,NZ)       = RootCO2EmisPot_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootCO2Autor_pvr(N,L,NZ)         = RootCO2Autor_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ,NY,NX)
         plt_morph%Root1stXNumL_pvr(N,L,NZ)        = Root1stXNumL_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndXNum_pvr(N,L,NZ)         = Root2ndXNum_pvr(N,L,NZ,NY,NX)

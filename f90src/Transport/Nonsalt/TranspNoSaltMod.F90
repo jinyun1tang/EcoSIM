@@ -491,11 +491,12 @@ module TranspNoSaltMod
 !
     trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1,NY,NX)          = 0.0_r8
     trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
+    
     do idg=idg_beg,idg_NH3
-      trcs_TransptMicP_3D(idg,3,0,NY,NX) = Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
-        +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)
-      trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
-        +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)
+      trcs_TransptMicP_3D(idg,3,0,NY,NX) = (Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+        +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
+      trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+        +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
     ENDDO
     
     trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
@@ -649,13 +650,10 @@ module TranspNoSaltMod
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
-    trcs_Irrig_vr(idg_CO2,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg_CO2,NY,NX)
-    trcs_Irrig_vr(idg_CH4,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg_CH4,NY,NX)
-    trcs_Irrig_vr(idg_O2,L,NY,NX)  = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg_O2,NY,NX)
-    trcs_Irrig_vr(idg_N2,L,NY,NX)  = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg_N2,NY,NX)
-    trcs_Irrig_vr(idg_N2O,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg_N2O,NY,NX)
-    trcs_Irrig_vr(idg_H2,L,NY,NX)  = 0.0_r8
-
+    do idg=idg_beg,idg_NH3
+      trcs_Irrig_vr(idg,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX)*MolecularWeight(idg)
+    ENDDO
+    
     trcs_Irrig_vr(ids_NH4,L,NY,NX)    = FWatIrrigate2MicP_vr(L,NY,NX)*NH4_irrig_mole_conc(I,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
     trcs_Irrig_vr(idg_NH3,L,NY,NX)    = FWatIrrigate2MicP_vr(L,NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)*natomw
     trcs_Irrig_vr(ids_NO3,L,NY,NX)    = FWatIrrigate2MicP_vr(L,NY,NX)*NO3_irrig_mole_conc(I,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)*natomw
