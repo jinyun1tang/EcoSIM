@@ -93,9 +93,9 @@ module RedistMod
 
   call PrintInfo('beg '//subname)
 
-  if(I==141 .and. J>=2)write(115,*)'beredist'       
-  call SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
-  if(I==141 .and. J>=2)write(115,*)'============'
+  
+!  call SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
+
   VOLISO = 0.0_r8
   TFLWT  = 0.0_r8
   VOLPT  = 0.0_r8
@@ -149,7 +149,7 @@ module RedistMod
 
     ENDDO D9990
   ENDDO D9995
-  if(I==141 .and. J>=2)write(115,*)'afredist'
+
   call PrintInfo('end '//subname)
 
   END subroutine redist
@@ -318,24 +318,12 @@ module RedistMod
 
   call PrintInfo('beg '//subname)
 
-  if(I==141 .and. J>=2)then  
-    idg=idg_CO2      
-    write(115,*)'litteradd',I*1000+J,trcs_solml_vr(idg,0,NY,NX),trcs_TransptMicP_3D(idg,3,0,NY,NX), &
-      Gas_Disol_Flx_vr(idg,0,NY,NX),-trcs_RMicbUptake_vr(idg,0,NY,NX),trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX)
-  endif
-
   do idg=idg_beg,idg_NH3-1
     trcs_solml_vr(idg,0,NY,NX)=trcs_solml_vr(idg,0,NY,NX)+trcs_TransptMicP_3D(idg,3,0,NY,NX) &
       +Gas_Disol_Flx_vr(idg,0,NY,NX)-trcs_RMicbUptake_vr(idg,0,NY,NX)
-
     call fixEXConsumpFlux(trcs_solml_vr(idg,0,NY,NX),trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX),-1)
+    trcs_RMicbUptake_col(idg,NY,NX)=trcs_RMicbUptake_col(idg,NY,NX)+trcs_RMicbUptake_vr(idg,0,NY,NX)
   enddo
-
-  if(I==141 .and. J>=2)then  
-    idg=idg_CO2      
-    write(115,*)'littafadd',I*1000+J,trcs_solml_vr(idg,0,NY,NX),trcs_TransptMicP_3D(idg,3,0,NY,NX), &
-      Gas_Disol_Flx_vr(idg,0,NY,NX),-trcs_RMicbUptake_vr(idg,0,NY,NX),trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX)
-  endif
 
   rval                         = trcs_solml_vr(idg_NH3,0,NY,NX)
   dflx                         = trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX)+trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX) &
@@ -444,12 +432,6 @@ module RedistMod
 !
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
 
-  if(I==141 .and. J>=2)then        
-    idg=idg_CO2
-    write(115,*)I*1000+J,GasDiff2Surf_flx_col(idg,NY,NX),trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX), &
-      trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX),Gas_Disol_Flx_vr(idg,0,NY,NX),Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX),'bf'    
-  endif
-
   do idg=idg_beg,idg_NH3
     Gas_WetDeposition_col(idg,NY,NX) = Gas_WetDeposition_col(idg,NY,NX)  &
       + (Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcg_rain_mole_conc_col(idg,NY,NX) &
@@ -460,11 +442,6 @@ module RedistMod
       +trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX)+Gas_Disol_Flx_vr(idg,0,NY,NX)+Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX)    
   ENDDO  
 
-  if(I==141 .and. J>=2)then        
-    idg=idg_CO2
-    write(115,*)I*1000+J,GasDiff2Surf_flx_col(idg,NY,NX),trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX), &
-      trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX),Gas_Disol_Flx_vr(idg,0,NY,NX),Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX),'af'    
-  endif
 
   GasDiff2Surf_flx_col(idg_NH3,NY,NX) = GasDiff2Surf_flx_col(idg_NH3,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_NH3B,NY,NX)
 
@@ -1055,6 +1032,12 @@ module RedistMod
       -trcs_TransptMacP_3D(idg,3,NL(NY,NX)+1,NY,NX)
   enddo
 
+  if(I==137 .and. J<=2)then
+    write(111,*)'uptk',I*1000+J,trcs_names(idg_CH4),'bfreset',trcs_plant_uptake_col(idg_CH4,NY,NX)
+    write(112,*)'bfuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
+    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+    write(112,*)(trcs_solml_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+  endif  
   trcs_plant_uptake_col(:,NY,NX)=0._r8
 
   D125: DO L=NU(NY,NX),NL(NY,NX)
@@ -1106,9 +1089,6 @@ module RedistMod
     !     EXCHANGE, EQUILIBRIUM REACTIONS, GAS EXCHANGE,
     !     MICROPORE-MACROPORE EXCHANGE,
     !
-
-    call fixEXConsumpFlux(trcs_solml_vr(idg_N2,L,NY,NX), Micb_N2Fixation_vr(L,NY,NX))
-
     trcs_solml_vr(idg_CO2,L,NY,NX)=trcs_solml_vr(idg_CO2,L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)
     call fixEXConsumpFlux(trcs_solml_vr(idg_CO2,L,NY,NX), TProd_CO2_geochem_soil_vr(L,NY,NX),-1)
 
@@ -1170,6 +1150,7 @@ module RedistMod
           endif            
         endif
       endif
+      trcs_RMicbUptake_col(idg,NY,NX)=trcs_RMicbUptake_col(idg,NY,NX)+trcs_RMicbUptake_vr(idg,L,NY,NX)
     enddo
 
     trcs_solml_vr(idg_NH3,L,NY,NX)=trcs_solml_vr(idg_NH3,L,NY,NX)+TRChem_sol_NH3_soil_vr(L,NY,NX)+trcs_deadroot2soil_vr(idg_NH3,L,NY,NX)
@@ -1241,6 +1222,7 @@ module RedistMod
         endif
       endif  
     enddo
+
     DO ids=ids_beg,ids_end
       trcs_plant_uptake_col(ids,NY,NX)=trcs_plant_uptake_col(ids,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX)
     ENDDO
@@ -1465,7 +1447,10 @@ module RedistMod
     IF(salt_model)call UpdateSaltIonInSoilLayers(L,NY,NX,TDisolPi_lnd)
 
   ENDDO D125
-
+  if(I==137 .and. J<=2)then
+    write(112,*)'afuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
+    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+  endif
   call PrintInfo('end '//subname)
 
   end subroutine UpdateChemInSoilLays

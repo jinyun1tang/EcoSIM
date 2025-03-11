@@ -17,6 +17,7 @@ module NutUptakeMod
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
   public :: PlantNutientO2Uptake
+  public :: ZeroNutrientUptake
   contains
 
 !------------------------------------------------------------------------
@@ -174,15 +175,13 @@ module NutUptakeMod
   )
 
   call PrintInfo('beg '//subname)
-  call ZeroUptake(NZ)
 
   PopPlantO2Uptake = 0._r8
   PopPlantO2Demand = 0._r8
   RootCO2Ar        = 0._r8
   RootCO2ArB       = 0._r8
   trcs_deadroot2soil_pvr(:,:,NZ) = 0._r8  
-  RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
-  RootCO2Ar2Root_pvr(:,NZ)       = 0._r8
+
   D950: DO L=NU,NK
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO) then
 
@@ -232,9 +231,9 @@ module NutUptakeMod
             call UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
               RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
           ENDIF
-          RootCO2Ar2Root_pvr(L,NZ)=RootCO2Ar2Root_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
           RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         ENDIF
+!        if(I==140 .and. J<=2)write(116,*)'rootgas',(I*1000+J)*100+N,L,plt_rbgc%trcg_air2root_flx_pvr(idg_CH4,N,L,NZ)
       ENDDO D955      
     ELSE
       D956: DO N  = 1, MY(NZ)    
@@ -249,12 +248,12 @@ module NutUptakeMod
       ENDDO D956
     ENDIF
   ENDDO D950
-  
+
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake
 !------------------------------------------------------------------------
-  subroutine ZeroUptake(NZ)
+  subroutine ZeroNutrientUptake(NZ)
 
   implicit none
   integer, intent(in) :: NZ
@@ -262,8 +261,9 @@ module NutUptakeMod
   integer :: K, L1,L2,NN
   !     begin_execution
 
-  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
-
+  L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%MY(NZ)
+  plt_rbgc%RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
+  plt_rbgc%RootCO2Ar2Root_pvr(:,NZ)       = 0._r8
   plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
   plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
@@ -303,7 +303,7 @@ module NutUptakeMod
   plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)               = 0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)               = 0.0_r8
   plt_bgcr%RootN2Fix_pvr(L1:L2,NZ)                                       = 0.0_r8
-  end subroutine ZeroUptake
+  end subroutine ZeroNutrientUptake
 
 !------------------------------------------------------------------------
 

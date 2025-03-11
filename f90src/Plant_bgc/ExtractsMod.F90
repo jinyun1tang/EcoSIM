@@ -148,6 +148,8 @@ module ExtractsMod
  
   associate(                                                       &
     NU                       => plt_site%NU,                       &
+    NK                       => plt_site%NK,                       &    
+    MaxNumRootLays           => plt_site%MaxNumRootLays         ,  &
     AREA3                    => plt_site%AREA3,                    &
     PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
     RootH1PO4DmndBand_pvr    => plt_rbgc%RootH1PO4DmndBand_pvr,    &
@@ -192,7 +194,7 @@ module ExtractsMod
     MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
   )
   
-  DO L=NU,MaxSoiL4Root_pft(NZ)
+  DO L=NU,MaxNumRootLays
     DO N=1,MY(NZ)  
 !
 !     TOTAL ROOT DENSITY
@@ -233,6 +235,7 @@ module ExtractsMod
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       ENDDO
+!      if(I==140 .and. J<=2)write(111,*)'uptk',I*1000+J,trcs_names(idg_CH4),L,trcg_air2root_flx_vr(idg_CH4,L),trcs_plant_uptake_vr(idg_CH4,L)
 
       !Nutrients are sorted according to band|soil
       do ids=ids_NH4B,ids_nuts_end

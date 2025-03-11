@@ -727,6 +727,7 @@ module Hour1Mod
   integer :: L
 !     begin_execution
   RootCO2AutorPrev_col(NY,NX)             = RootCO2Autor_col(NY,NX)
+  trcs_RMicbUptake_col(:,NY,NX)           = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)  = 0._r8
   Soil_Gas_pressure_vr(:,NY,NX)           = 0._r8
   Gas_WetDeposition_col(:,NY,NX)          = 0._r8

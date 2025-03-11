@@ -143,12 +143,15 @@ module RootGasMod
     RootPorosity_pft         => plt_morph%RootPorosity_pft,           &
     Root1stXNumL_pvr         => plt_morph%Root1stXNumL_pvr,           &
     NGTopRootLayer_pft       => plt_morph%NGTopRootLayer_pft,         &
+    RootCO2Ar2Soil_pvr       => plt_rbgc%RootCO2Ar2Soil_pvr,          &
+    RootCO2Ar2Root_pvr       => plt_rbgc%RootCO2Ar2Root_pvr,          &    
     MainBranchNum_pft        => plt_morph%MainBranchNum_pft           &
   )
   
   call PrintInfo('beg '//subname)
   IF(RootRespPotent_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
     .AND.FOXYX.GT.ZERO4Uptk_pft(NZ))THEN
+    RootCO2Ar2Root_pvr(L,NZ)=RootCO2Ar2Root_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
 !
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
 !     (CO2, O2, CH4, N2, N2O, NH3, H2, Ar)
@@ -621,15 +624,15 @@ module RootGasMod
         dtrc_err(idg)=dtrc_err(idg)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       endif      
     ENDDO
-!    if(J>=22)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
+!    if(I==134 .and. J<=3)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
 !      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
-!      RootCO2Emis_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)
-!    if(I==140 .and. J>=20)then        
-!      idg=idg_N2
-!      write(116,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
-!        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
-!        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
-!    endif
+!      RootCO2Emis_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2Root_pvr(L,NZ)
+    if(I==137 .and. J==1)then        
+      idg=idg_CH4
+      write(116,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
+        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
+        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
+    endif
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'
@@ -639,6 +642,7 @@ module RootGasMod
     !to be used in next iteration
     RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE
+    RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)  
     PopPlantO2Uptake_vr=0.0_r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
       RAutoRootO2Limter_rpvr(N,L,NZ)=RAutoRootO2Limter_rpvr(N,L-1,NZ)

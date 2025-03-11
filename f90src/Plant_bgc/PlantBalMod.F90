@@ -115,8 +115,7 @@ implicit none
 
   trcg(:)=0._r8
   DO NZ=1,plt_site%NP  
-    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle
-
+    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle    
     DO L=NU,MaxSoiL4Root_pft(NZ)
       DO N=1,MY(NZ)  
         DO idg=idg_beg,idg_NH3
@@ -127,7 +126,7 @@ implicit none
         trcg(idg)=trcg(idg)+trcg_root_vr(idg,L)
       ENDDO
     ENDDO
-!    if(I==140 .and. J>=20)write(116,*)'MaxSoiL4Root_pft(NZ)',MaxSoiL4Root_pft(NZ)
+!    if(I==140 .and. J<=2)write(116,*)I*1000+J,MaxSoiL4Root_pft(NZ),trcg(idg_CH4)
   ENDDO
 !  if(I==140 .and. J>=20)write(116,*)trcg(idg_N2),'N2'
   end associate

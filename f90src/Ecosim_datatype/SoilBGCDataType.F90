@@ -70,8 +70,9 @@ implicit none
   real(r8),target,allocatable ::  PDRAIN_col(:,:)                    !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION_col(:,:)                      !total soil ion content, [mol d-2]
   real(r8),target,allocatable ::  HydroIonFlx_CumYr_col(:,:)         !total subsurface ion flux, [mol d-2]
-  real(r8),target,allocatable ::  RNut_MicbRelease_vr(:,:,:,:)         !total nutrient exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNut_MicbRelease_vr(:,:,:,:)       !total nutrient exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_RMicbUptake_vr(:,:,:,:)       !microbial gases transformation, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_RMicbUptake_col(:,:,:)        !total microbial gases transformation, [g d-2 h-1]
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)          !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoDOMProd_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
   real(r8),target,allocatable ::  RDOMMicProd_vr(:,:,:,:,:)          !microbial dom flux, > 0 into soil [g d-2 h-1]
@@ -217,6 +218,7 @@ implicit none
   allocate(HydroIonFlx_CumYr_col(JY,JX));      HydroIonFlx_CumYr_col=0._r8
   allocate(RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,0:JZ,JY,JX)); RNut_MicbRelease_vr=0._r8
   allocate(trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,0:JZ,JY,JX)); trcs_RMicbUptake_vr=0._r8
+  allocate(trcs_RMicbUptake_col(idg_beg:idg_NH3-1,JY,JX)); trcs_RMicbUptake_col=0._r8
   allocate(Micb_N2Fixation_vr(0:JZ,JY,JX));  Micb_N2Fixation_vr=0._r8
 
   allocate(REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));REcoDOMProd_vr=0._r8
@@ -375,6 +377,7 @@ implicit none
   call destroy(DOM_MicpTransp_3D)
   call destroy(DOM_Macp_Transp_flx_3D)
   call destroy(trcs_RMicbUptake_vr)
+  call destroy(trcs_RMicbUptake_col)
   end subroutine DestructSoilBGCData
 
 end module SoilBGCDataType

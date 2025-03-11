@@ -259,7 +259,7 @@ contains
         trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err(idg) 
 
         tracer_rootmass_err(idg) = trcg_rootMass_beg_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX) &
-          +trcg_air2root_flx_col(idg,NY,NX)-trcs_deadroot2soil_col(idg,NY,NX)
+          +trcg_air2root_flx_col(idg,NY,NX)-trcs_deadroot2soil_col(idg,NY,NX)+TRootGasLossDisturb_col(idg,NY,NX)
 
         if(idg==idg_O2)then
           tracer_rootmass_err(idg) = tracer_rootmass_err(idg)-RUptkRootO2_col(NY,NX)
@@ -269,7 +269,7 @@ contains
           tracer_rootmass_err(idg) = tracer_rootmass_err(idg)+trcs_plant_uptake_col(idg,NY,NX)
         endif
 
-        if(AMAX1(abs(tracer_mass_err(idg)),abs(tracer_rootmass_err(idg)))>1.e-4_r8)then
+        if(AMAX1(abs(tracer_mass_err(idg)),abs(tracer_rootmass_err(idg)))>1.e-5_r8)then
           write(111,*)('-',ii=1,50)
           write(111,*)I*1000+J,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX)
           write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
@@ -281,11 +281,11 @@ contains
           write(111,*)'surf emis        =',SurfGasEmisFlx_col(idg,NY,NX)
           write(111,*)'GasHydroloss     =',GasHydroLossFlx_col(idg,NY,NX)
           if(idg==idg_N2)then
-            write(111,*)'RGasNetProd,Nfix=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX)
+            write(111,*)'RGasNetProd,rNfix,mup=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
           elseif(idg==idg_CO2)then
             write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX),-RootCO2AutorPrev_col(NY,NX)  
           else
-            write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX)
+            write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
           endif
           write(111,*)'------------------'
           write(111,*)'soil beg_end mass=',trcg_soilMass_beg_col(idg,NY,NX), trcg_soilMass_col(idg,NY,NX),&
@@ -302,14 +302,15 @@ contains
           write(111,*)'root beg_end mass=',trcg_rootMass_beg_col(idg,NY,NX),trcg_rootMass_col(idg,NY,NX),&
             trcg_rootMass_beg_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX)
           write(111,*)'root trcmass_err =',tracer_rootmass_err(idg)
-          write(111,*)'pltairtp         =',trcg_air2root_flx_col(idg,NY,NX)                    
+          write(111,*)'pltair2root      =',trcg_air2root_flx_col(idg,NY,NX)     
+
           if(idg==idg_O2)then
             write(111,*)'plt_uptake       =',-RUptkRootO2_col(NY,NX)
           elseif(idg==idg_CO2)then
             write(111,*)'tplt2root,soi2root =',RootCO2Emis2Root_col(NY,NX),trcs_plant_uptake_col(idg_CO2,NY,NX)
             write(111,*)'ar2root            =',RootCO2Ar2Root_col(NY,NX)
           else
-            write(111,*)'plt_uptake       =',trcs_plant_uptake_col(idg,NY,NX)
+            write(111,*)'plt_soiluptake     =',trcs_plant_uptake_col(idg,NY,NX)
           endif
           write(111,*)'deadroot2soil    =',trcs_deadroot2soil_col(idg,NY,NX)
 
@@ -394,17 +395,17 @@ contains
       ENDDO    
 
       DO idg=idg_beg,idg_NH3
-        trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soil(idg)
+        trcg_TotalMass_col(idg,NY,NX)=trcg_snow(idg)+trcg_root(idg)+trcg_soilMass_col(idg,NY,NX)
       ENDDO
 
-      if(I==141 .and. J>=2)then        
-        idg=idg_CO2
-        write(115,*)I*1000+J,'snowv     trcname     snow   litr  root  soil'
-        write(115,*)VcumSnowWE_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soil(idg)+trcg_litr(idg),NY,NX
-      DO L=NUI(NY,NX),NLI(NY,NX)
-        write(115,*)L,trcg_gasml_vr(idg,L,NY,NX),trcs_solml_vr(idg,L,NY,NX), trcs_soHml_vr(idg,L,NY,NX)
-      ENDDO  
-      endif
+!      if(I==117 .and. J>=17)then        
+!        idg=idg_N2
+!        write(115,*)I*1000+J,'snowv     trcname     snow   litr  root  soil'
+!        write(115,*)VcumSnowWE_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soilMass_col(idg,NY,NX),NY,NX
+!      DO L=NUI(NY,NX),NLI(NY,NX)
+!        write(115,*)L,trcg_gasml_vr(idg,L,NY,NX),trcs_solml_vr(idg,L,NY,NX), trcs_soHml_vr(idg,L,NY,NX)
+!      ENDDO  
+!      endif
       trcg_TotalMass_col(idg_NH3B,NY,NX)=trcg_soilMass_col(idg_NH3B,NY,NX)
 
       DO idg=idg_beg,idg_NH3

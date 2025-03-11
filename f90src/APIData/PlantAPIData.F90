@@ -827,7 +827,7 @@ implicit none
   allocate(this%KmNH4Root_pft(jroots,JP1));this%KmNH4Root_pft=spval
   allocate(this%RootCO2Emis_pvr(jroots,JZ1,JP1));this%RootCO2Emis_pvr=spval
   allocate(this%RootO2Uptk_pvr(jroots,JZ1,JP1));this%RootO2Uptk_pvr=spval
-  allocate(this%RootUptkSoiSol_pvr(idg_beg:idg_end,jroots,JZ1,JP1));this%RootUptkSoiSol_pvr=spval
+  allocate(this%RootUptkSoiSol_pvr(idg_beg:idg_end,jroots,JZ1,JP1));this%RootUptkSoiSol_pvr=0._r8
   end subroutine plt_rootbgc_init
 !----------------------------------------------------------------------
 
@@ -969,7 +969,7 @@ implicit none
   class(plant_bgcrate_type) :: this
 
   allocate(this%RootCO2Emis2Root_vr(JZ1)); this%RootCO2Emis2Root_vr=spval
-  allocate(this%RUptkRootO2_vr(JZ1)); this%RUptkRootO2_vr=spval
+  allocate(this%RUptkRootO2_vr(JZ1)); this%RUptkRootO2_vr=0._r8
   allocate(this%RH2PO4EcoDmndSoilPrev_vr(0:JZ1)); this%RH2PO4EcoDmndSoilPrev_vr=spval
   allocate(this%RH2PO4EcoDmndBandPrev_vr(0:JZ1)); this%RH2PO4EcoDmndBandPrev_vr=spval
   allocate(this%RH1PO4EcoDmndSoilPrev_vr(0:JZ1)); this%RH1PO4EcoDmndSoilPrev_vr=spval

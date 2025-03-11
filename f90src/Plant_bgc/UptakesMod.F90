@@ -223,7 +223,8 @@ module UptakesMod
   associate(                                                         &
     ZERO                       => plt_site%ZERO,                     &
     NP                         => plt_site%NP,                       &
-    MaxNumRootLays             => plt_site%MaxNumRootLays,           &
+    NK                         => plt_site%NK,                       &
+    MaxNumRootLays             => plt_site%MaxNumRootLays          , &
     VLWatMicPM_vr              => plt_site%VLWatMicPM_vr,            &
     ALT                        => plt_site%ALT,                      &
     NU                         => plt_site%NU,                       &
@@ -251,6 +252,8 @@ module UptakesMod
 
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
+    call ZeroNutrientUptake(NZ)
+
 !     TKC_pft(NZ)=TairK+DeltaTKC_pft(NZ)
 !     TdegCCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
     ARLSC   = ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
@@ -283,8 +286,9 @@ module UptakesMod
   ENDDO D9984
 !
 ! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics 
-  D9000: DO L=NU,MaxNumRootLays
+  D9000: DO L=NU,NK
     !remove elevation dependence
+    plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L) =0._r8    
     TotalSoilPSIMPa_vr(L)=ElvAdjstedSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
     IF(SoilBulkDensity_vr(L).GT.ZERO)THEN
       WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)-SoilWatAirDry_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake
