@@ -92,32 +92,42 @@ implicit none
         DO idg=idg_beg,idg_NH3
           trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
             -trcg_AquaADV_Snow2Litr_flx(idg,N2,N1)-trcg_AquaADV_Snow2Soil_flx(idg,N2,N1)
+          trcg_snowMassloss_col(idg,N2,N1)  =trcg_snowMassloss_col(idg,N2,N1)+trcg_AquaADV_Snow2Litr_flx(idg,N2,N1)&
+            +trcg_AquaADV_Snow2Soil_flx(idg,N2,N1)
         ENDDO
 
         DO idn=ids_nut_beg,ids_nuts_end
           trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
             -trcn_AquaADV_Snow2Litr_flx(idn,N2,N1)-trcn_AquaADV_Snow2Soil_flx(idn,N2,N1) 
+          trcn_snowMassloss_col(idn,N2,N1)  =trcn_snowMassloss_col(idn,N2,N1)+ &
+            trcn_AquaADV_Snow2Litr_flx(idn,N2,N1)+trcn_AquaADV_Snow2Soil_flx(idn,N2,N1) 
         ENDDO
 
         !add band flux
         trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)-trcg_AquaADV_Snow2Soil_flx(idg_NH3B,N2,N1)
-
+        trcg_snowMassloss_col(idg_NH3,N2,N1)=trcg_snowMassloss_col(idg_NH3,N2,N1)+trcg_AquaADV_Snow2Soil_flx(idg_NH3B,N2,N1)
         DO ids=0,ids_nuts
           trcn_AquaAdv_NetFlx_snvr(ids_NH4+ids,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(ids_NH4+ids,LS,N2,N1) &
             -trcn_AquaADV_Snow2Band_flx(ids_NH4B+ids,N2,N1)
+          trcn_snowMassloss_col(ids_NH4+ids,N2,N1) = trcn_snowMassloss_col(ids_NH4+ids,N2,N1)  +  &
+            trcn_AquaADV_Snow2Band_flx(ids_NH4B+ids,N2,N1)
         ENDDO
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
             trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1) &
               -trcSalt_AquaADV_Snow2Litr_flx(idsalt,N2,N1)-trcSalt_AquaADV_Snow2Soil_flx(idsalt,N2,N1)
-
+            trcSalt_snowMassloss_col(idsalt,N2,N1) = trcSalt_snowMassloss_col(idsalt,N2,N1) + &
+              trcSalt_AquaADV_Snow2Litr_flx(idsalt,N2,N1)+trcSalt_AquaADV_Snow2Soil_flx(idsalt,N2,N1)
           ENDDO
 
           !add band flux
           DO idsalt=0,idsalt_nuts
             trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,N2,N1) &
               -trcSalt_AquaADV_Snow2Soil_flx(idsalt_H0PO4B+idsalt,N2,N1)
+
+            trcSalt_snowMassloss_col(idsalt_H0PO4+idsalt,N2,N1) =trcSalt_snowMassloss_col(idsalt_H0PO4+idsalt,N2,N1) + &
+              trcSalt_AquaADV_Snow2Soil_flx(idsalt_H0PO4B+idsalt,N2,N1)
           ENDDO
         ENDIF
       ENDIF
@@ -125,22 +135,49 @@ implicit none
       ! layer LS does not have significant snow
       ! WATER,GAS,SOLUTE,SALT FLUXES INTO SNOWPACK SURFACE   
     ELSEIF(LS.EQ.1)THEN
-      IF(abs(SnoXfer2SnoLay_snvr(LS,N2,N1))>0._r8)THEN
 
         DO idg=idg_beg,idg_NH3
-          trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1)
+          trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg,LS,N2,N1)+trcg_AquaAdv_flx_snvr(idg,LS,N2,N1) &
+            -trcg_AquaADV_Snow2Litr_flx(idg,N2,N1)-trcg_AquaADV_Snow2Soil_flx(idg,N2,N1)
+          trcg_snowMassloss_col(idg,N2,N1)  =trcg_snowMassloss_col(idg,N2,N1)+trcg_AquaADV_Snow2Litr_flx(idg,N2,N1)&
+            +trcg_AquaADV_Snow2Soil_flx(idg,N2,N1)          
         ENDDO
 
         DO idn=ids_nut_beg,ids_nuts_end
-          trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1)
+          trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(idn,LS,N2,N1)+trcn_AquaAdv_flx_snvr(idn,LS,N2,N1) &
+            -trcn_AquaADV_Snow2Litr_flx(idn,N2,N1)-trcn_AquaADV_Snow2Soil_flx(idn,N2,N1) 
+          trcn_snowMassloss_col(idn,N2,N1)  =trcn_snowMassloss_col(idn,N2,N1)+ &
+            trcn_AquaADV_Snow2Litr_flx(idn,N2,N1)+trcn_AquaADV_Snow2Soil_flx(idn,N2,N1) 
+        ENDDO
+
+        !add band flux
+        trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)=trcg_AquaAdv_NetFlx_snvr(idg_NH3,LS,N2,N1)-trcg_AquaADV_Snow2Soil_flx(idg_NH3B,N2,N1)
+        trcg_snowMassloss_col(idg_NH3,N2,N1)=trcg_snowMassloss_col(idg_NH3,N2,N1)+trcg_AquaADV_Snow2Soil_flx(idg_NH3B,N2,N1)
+        DO ids=0,ids_nuts
+          trcn_AquaAdv_NetFlx_snvr(ids_NH4+ids,LS,N2,N1)=trcn_AquaAdv_NetFlx_snvr(ids_NH4+ids,LS,N2,N1) &
+            -trcn_AquaADV_Snow2Band_flx(ids_NH4B+ids,N2,N1)
+          trcn_snowMassloss_col(ids_NH4+ids,N2,N1) = trcn_snowMassloss_col(ids_NH4+ids,N2,N1)  +  &
+            trcn_AquaADV_Snow2Band_flx(ids_NH4B+ids,N2,N1)
         ENDDO
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1)
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt,LS,N2,N1)+trcSalt_AquaAdv_flx_snvr(idsalt,LS,N2,N1) &
+              -trcSalt_AquaADV_Snow2Litr_flx(idsalt,N2,N1)-trcSalt_AquaADV_Snow2Soil_flx(idsalt,N2,N1)
+            trcSalt_snowMassloss_col(idsalt,N2,N1) = trcSalt_snowMassloss_col(idsalt,N2,N1) + &
+              trcSalt_AquaADV_Snow2Litr_flx(idsalt,N2,N1)+trcSalt_AquaADV_Snow2Soil_flx(idsalt,N2,N1)            
+          ENDDO
+
+          !add band flux
+          DO idsalt=0,idsalt_nuts
+            trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,N2,N1)=trcSalt_AquaAdv_NetFlx_snvr(idsalt_H0PO4+idsalt,LS,N2,N1) &
+              -trcSalt_AquaADV_Snow2Soil_flx(idsalt_H0PO4B+idsalt,N2,N1)
+
+            trcSalt_snowMassloss_col(idsalt_H0PO4+idsalt,N2,N1) =trcSalt_snowMassloss_col(idsalt_H0PO4+idsalt,N2,N1) + &
+              trcSalt_AquaADV_Snow2Soil_flx(idsalt_H0PO4B+idsalt,N2,N1)
           ENDDO
         ENDIF
-      ENDIF
+      
     ENDIF
   ENDDO D1205
   call PrintInfo('end '//subname)
@@ -312,6 +349,10 @@ implicit none
   !     SNOWPACK SOLUTE CONTENT
 
   DO idg=idg_beg,idg_NH3
+!    if(idg==idg_O2 .and. I==32)&
+!      write(111,*)I*1000+J,'snotp',trcg_solsml_snvr(idg,L,NY,NX),trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX),&
+!        trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX)
+
     trcg_solsml_snvr(idg,L,NY,NX)=AZERO(trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX))
   ENDDO
 

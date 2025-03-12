@@ -68,19 +68,32 @@ module SnowDataType
   real(r8),target, allocatable ::  trcn_AquaADV_Snow2Band_flx(:,:,:)       !aqueous nutrient tracer from snow to band soil [g d-2 h-1]
   real(r8),target, allocatable ::  trcSalt_AquaADV_Snow2Soil_flx(:,:,:)    !salt flux from snow to soil [mol d-2 h-1]
   real(r8),target, allocatable ::  trcSalt_AquaADV_Snow2Litr_flx(:,:,:)    !salt flux from snow to litter [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcg_snowMass_beg_col(:,:,:)            !total mass of valatile tracer in snow at previous time step [g d-2]
+  real(r8),target, allocatable ::  trcg_snowMass_col(:,:,:)                !total mass of valatile tracer in snow [g d-2]
+  real(r8),target, allocatable ::  trcg_snowMassloss_col(:,:,:)            !total volatile mass of tracer loss from snow [g d-2 h-1]
+  real(r8),target, allocatable ::  trcn_snowMassloss_col(:,:,:)            !total nutrient mass of tracer loss from snow [g d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_snowMassloss_col(:,:,:)         !total salt mass of tracer loss from snow [g d-2 h-1]
+  real(r8),target,allocatable ::   trcg_AquaAdv_flx_snvr(:,:,:,:)        !aqueous volatile tracer flux in snow [g/d2/h]
+  real(r8),target,allocatable ::   trcn_AquaAdv_flx_snvr(:,:,:,:)        !aqueous nutrient tracer flux in snow [g/d2/h]
+  real(r8),target,allocatable ::   trcSalt_AquaAdv_flx_snvr(:,:,:,:)     !aqueous salt tracer flux through snow [g/d2/h]  
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSnowData
 
   implicit none
+  allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
+  allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
+  allocate(trcg_snowMassloss_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMassloss_col=0._r8
+  allocate(trcn_snowMassloss_col(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_snowMassloss_col=0._r8
 
   allocate(trcg_AquaADV_Snow2Litr_flx(idg_beg:idg_NH3,JY,JX)) ;trcg_AquaADV_Snow2Litr_flx=0._r8 
   allocate(trcn_AquaADV_Snow2Litr_flx(ids_nut_beg:ids_nuts_end,JY,JX));trcn_AquaADV_Snow2Litr_flx=0._r8
   allocate(trcn_AquaADV_Snow2Soil_flx(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_AquaADV_Snow2Soil_flx=0._r8
   allocate(trcn_AquaADV_Snow2Band_flx(ids_nutb_beg:ids_nutb_end,JY,JX)); trcn_AquaADV_Snow2Band_flx=0._r8
   allocate(trcg_AquaADV_Snow2Soil_flx(idg_beg:idg_end,JY,JX)); trcg_AquaADV_Snow2Soil_flx=0._r8
-
+  allocate(trcg_snowMass_beg_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMass_beg_col=0._r8
+  allocate(trcg_snowMass_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMass_col=0._r8
   allocate(QSnowHeatLoss_col(JY,JX)); QSnowHeatLoss_col=0._r8
   allocate(QSnowH2Oloss_col(JY,JX)); QSnowH2Oloss_col=0._r8
   allocate(PrecHeat2Snow_col(JY,JX)); PrecHeat2Snow_col=0._r8
@@ -138,6 +151,8 @@ contains
     allocate(trcSalt_AquaADV_Snow2Litr_flx(idsalt_beg:idsalt_end,JY,JX));  trcSalt_AquaADV_Snow2Litr_flx=0._r8
     allocate(trcSalt_AquaADV_Snow2Soil_flx(idsalt_beg:idsaltb_end,JY,JX)); trcSalt_AquaADV_Snow2Soil_flx=0._r8
     allocate(trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_FloXSnow_2DH=0._r8
+    allocate(trcSalt_snowMassloss_col(idsalt_beg:idsalt_end,JY,JX)); trcSalt_snowMassloss_col=0._r8
+    allocate(trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_AquaAdv_flx_snvr=0._r8    
   endif
 
 
@@ -152,12 +167,18 @@ contains
     call destroy(trcSalt_FloXSnow_2DH)
     call destroy(trcSalt_AquaADV_Snow2Litr_flx)
     call destroy(trcSalt_AquaADV_Snow2Soil_flx)
+    call destroy(trcSalt_snowMassloss_col)
+    call destroy(trcSalt_AquaAdv_flx_snvr)
   endif
+
+  call destroy(trcg_AquaAdv_flx_snvr)
+  call destroy(trcn_AquaAdv_flx_snvr)
 
   call destroy(trcn_AquaADV_Snow2Soil_flx)
   call destroy(trcn_AquaADV_Snow2Band_flx)
   call destroy(trcg_AquaADV_Snow2Soil_flx)
-
+  call destroy(trcg_snowMassloss_col)
+  call destroy(trcn_snowMassloss_col)
   call destroy(trcg_AquaADV_Snow2Litr_flx)
   call destroy(trcn_AquaADV_Snow2Litr_flx)
   call destroy(QSnowHeatLoss_col)
@@ -210,6 +231,8 @@ contains
   call destroy(trcn_FloXSnow_2DH)
   call destroy(trcn_solsml_snvr)
   call destroy(THeatSnowThaw_col)
+  call destroy(trcg_snowMass_col)
+  call destroy(trcg_snowMass_beg_col)
 
   end subroutine DestructSnowData
 

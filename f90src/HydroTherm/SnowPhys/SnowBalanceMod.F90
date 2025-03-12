@@ -1,9 +1,10 @@
 module SnowBalanceMod
-  use data_kind_mod,  only: r8 => DAT_KIND_R8
-  use data_const_mod, only: spval => DAT_CONST_SPVAL
-  use abortutils,     only: endrun
-  use EcoSIMCtrlMod,  only: lverb,snowRedist_model,fixWaterLevel
-  use minimathmod,    only: AZMAX1, isclose, AZMIN1,AZMAX1d ,AZERO 
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use data_const_mod,   only: spval => DAT_CONST_SPVAL
+  use abortutils,       only: endrun
+  use SnowTransportMod, only: SoluteTransportThruSnow
+  use EcoSIMCtrlMod,    only: lverb,snowRedist_model,fixWaterLevel
+  use minimathmod,      only: AZMAX1, isclose, AZMIN1,AZMAX1d ,AZERO 
   use DebugToolMod
   use SoilPropertyDataType
   use SurfLitterDataType
@@ -23,7 +24,7 @@ module SnowBalanceMod
   use AqueChemDatatype
   use SoilBGCDataType
   use ChemTranspDataType  
-  use SnowTransportMod, only : SoluteTransportThruSnow
+
   use UnitMod, only : units
 implicit none
 
@@ -533,16 +534,21 @@ implicit none
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: DDLYXS,DDLYRS
   real(r8) :: DDLYXX,VOLSLX
+  
   integer :: IFLGLS,idn,idg,idsalt
   integer, parameter :: inochange=0
   integer, parameter :: iexpand=1
   integer, parameter :: ishrink=2
+  integer :: nsnol_beg_col
+
 !     begin_execution
 ! from surface to bottom, and modify the bottom layer
 ! there is snow
 
   call PrintInfo('beg '//subname)
+  nsnol_beg_col=nsnol_col(NY,NX)
 
+!  write(111,*)'nsnol_col=',nsnol_col(NY,NX)
   IF(VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
     D325: DO L=1,JS-1
 
@@ -616,6 +622,7 @@ implicit none
           VLWatSnow_snvr(L1,NY,NX)    = VLWatSnow_snvr(L1,NY,NX)+FX*VLWatSnow_snvr(L0,NY,NX)
           VLIceSnow_snvr(L1,NY,NX)    = VLIceSnow_snvr(L1,NY,NX)+FX*VLIceSnow_snvr(L0,NY,NX)
           VLSnoDWIprev_snvr(L1,NY,NX) = VLDrySnoWE_snvr(L1,NY,NX)/SnoDens_snvr(L1,NY,NX)+VLWatSnow_snvr(L1,NY,NX)+VLIceSnow_snvr(L1,NY,NX)
+          
 !         energy
           ENGY1X                       = VLHeatCapSnow_snvr(L1,NY,NX)*TKSnow_snvr(L1,NY,NX)
           ENGY0X                       = VLHeatCapSnow_snvr(L0,NY,NX)*TKSnow_snvr(L0,NY,NX)
@@ -632,6 +639,7 @@ implicit none
             call endrun(trim(mod_filename)//' at line',__LINE__)    
           endif
           TCSnow_snvr(L1,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L1,NY,NX))
+          !------------------------------------------------------------
 !          chemicals
           !gas
           DO idg=idg_beg,idg_NH3
@@ -648,6 +656,7 @@ implicit none
               trcSalt_ml_snvr(idsalt,L1,NY,NX)=AZERO(trcSalt_ml_snvr(idsalt,L1,NY,NX)+FX*trcSalt_ml_snvr(idsalt,L0,NY,NX))
             ENDDO
           ENDIF
+          !------------------------------------------------------------
 !
 !     SOURCE SNOW LAYER
 !         volume/mass
@@ -669,7 +678,8 @@ implicit none
           endif
           TCSnow_snvr(L0,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L0,NY,NX))
 
-!     chemicals
+          !------------------------------------------------------------
+          !   chemicals
           DO idg=idg_beg,idg_NH3
             trcg_solsml_snvr(idg,L0,NY,NX)=FY*trcg_solsml_snvr(idg,L0,NY,NX)
           ENDDO
@@ -681,8 +691,8 @@ implicit none
             DO idsalt=idsalt_beg,idsalt_end
               trcSalt_ml_snvr(idsalt,L0,NY,NX)=FY*trcSalt_ml_snvr(idsalt,L0,NY,NX)
             ENDDO
-
           ENDIF
+          !------------------------------------------------------------          
         ENDIF
       ENDIF
     ENDDO D325
@@ -691,7 +701,6 @@ implicit none
   !update volumetric snow heat capacity
   nsnol_col(NY,NX)=0
   DO L=1,JS
-!     if(I>=138.and.I<140)print*,I+J/24.,'layering',L,VLDrySnoWE_snvr(L,NY,NX),VLWatSnow_snvr(L,NY,NX),VLIceSnow_snvr(L,NY,NX),TKSnow_snvr(L,NY,NX)
     if(TKSnow_snvr(L,NY,NX)/=spval)then
       VLHeatCapSnow_snvr(L,NY,NX)=cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
       if(VLHeatCapSnow_snvr(L,NY,NX)>ZEROS(NY,NX))then
@@ -711,6 +720,7 @@ implicit none
         TKSnow_snvr(L,NY,NX)=TairK_col(NY,NX) 
       endif  
     endif  
+
     !move up to handel loss of surface layer, this should rarely occur, but round off error may trigger it
     if(L>1 .and. VLHeatCapSnow_snvr(L,NY,NX)>=ZEROS(NY,NX))then
       if (TKSnow_snvr(L-1,NY,NX)==spval)then
@@ -727,10 +737,61 @@ implicit none
         VLHeatCapSnow_snvr(L,NY,NX) = 0._r8
         TKSnow_snvr(L,NY,NX)        = spval
         SnoDens_snvr(L,NY,NX)       = NewSnowDens_col(NY,NX)
+
+        DO idg=idg_beg,idg_NH3
+          trcg_solsml_snvr(idg,L-1,NY,NX) = trcg_solsml_snvr(idg,L,NY,NX)
+          trcg_solsml_snvr(idg,L,NY,NX)   = 0._r8
+        ENDDO
+        DO idn=ids_nut_beg,ids_nuts_end
+          trcn_solsml_snvr(idn,L-1,NY,NX) = trcn_solsml_snvr(idn,L,NY,NX)
+          trcn_solsml_snvr(idn,L,NY,NX)   = 0._r8
+        ENDDO
+
+        IF(salt_model)THEN
+          DO idsalt=idsalt_beg,idsalt_end
+            trcSalt_ml_snvr(idsalt,L-1,NY,NX) = trcSalt_ml_snvr(idsalt,L,NY,NX)
+            trcSalt_ml_snvr(idsalt,L,NY,NX)   = 0._r8
+          ENDDO
+        ENDIF        
       endif
     endif 
   ENDDO  
+!  if(I==19 .and. I>=10)write(115,*)I*1000+J,'nsnol_beg_col',nsnol_beg_col,nsnol_col(NY,NX),trcs_solml_vr(idg_O2,0,NY,NX),&
+!    trcg_solsml_snvr(idg_O2,1,NY,NX)
+  if(nsnol_beg_col>0 .and. nsnol_col(NY,NX)==0)then
+    !add all tracers to litter layer 
+    DO L=1,nsnol_beg_col
+      DO idg=idg_beg,idg_NH3
+        if(trcg_solsml_snvr(idg,L,NY,NX)>0._r8)then 
+          trcs_solml_vr(idg,0,NY,NX)       = trcs_solml_vr(idg,0,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
+          trcg_snowMassloss_col(idg,NY,NX) = trcg_snowMassloss_col(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
+          trcg_solsml_snvr(idg,L,NY,NX)    = 0._r8
+        endif
+      ENDDO
 
+      do idn=ids_nut_beg,ids_nuts_end  
+        if(trcn_solsml_snvr(idn,L,NY,NX)>0._r8)then
+          trcs_solml_vr(idn,0,NY,NX)       = trcs_solml_vr(idn,0,NY,NX)+trcn_solsml_snvr(idn,L,NY,NX)
+          trcn_snowMassloss_col(idn,NY,NX) = trcn_snowMassloss_col(idn,NY,NX)+trcn_solsml_snvr(idn,L,NY,NX)
+          trcn_solsml_snvr(idn,L,NY,NX)    = 0._r8
+        endif
+      ENDDO  
+
+      IF(salt_model)THEN
+        DO idsalt=idsalt_beg,idsalt_end
+          if(trcSalt_ml_snvr(idsalt,L,NY,NX)>0._r8) then
+            trcSalt_solml_vr(idsalt,0,NY,NX)       = trcSalt_solml_vr(idsalt,0,NY,NX)+trcSalt_ml_snvr(idsalt,L,NY,NX)
+            trcSalt_snowMassloss_col(idsalt,NY,NX) = trcSalt_snowMassloss_col(idsalt,NY,NX)+trcSalt_ml_snvr(idsalt,L,NY,NX)
+            trcSalt_ml_snvr(idsalt,L,NY,NX)        = 0._r8
+          endif
+        ENDDO
+      ENDIF        
+    ENDDO
+  endif
+
+!  if(I==19 .and. I>=10)write(115,*)I*1000+J,'nsnol_afe_col',nsnol_beg_col,nsnol_col(NY,NX),trcs_solml_vr(idg_O2,0,NY,NX),&  
+!    trcg_solsml_snvr(idg_O2,1,NY,NX)
+!  write(111,*)'nsnol_col=',nsnol_col(NY,NX)
   call PrintInfo('end '//subname)
   end subroutine SnowpackLayering
 

@@ -354,7 +354,8 @@ contains
   do idg=idg_beg,idg_NH3
     trcs_TransptMicP_3D(idg,3,0,NY,NX)=trcs_TransptMicP_3D(idg,3,0,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)-litR_solute_adv_flxM(idg)-trcs_Dif_flxM(idg)
   ENDDO
-
+!  if(I==19 .and. J>=14)write(115,*)(I*1000+J)*100+M,'lit',trcs_TransptMicP_3D(idg_O2,3,0,NY,NX),&
+!    trcg_AquaADV_Snow2Litr_flxM(idg_O2,NY,NX),-litR_solute_adv_flxM(idg_O2)-trcs_Dif_flxM(idg_O2)
   do ids=ids_nut_beg,ids_nuts_end
     trcs_TransptMicP_3D(ids,3,0,NY,NX)=trcs_TransptMicP_3D(ids,3,0,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(ids,NY,NX)-litR_solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
   enddo
@@ -370,6 +371,8 @@ contains
     trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)+ &
       trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)+litR_solute_adv_flxM(idg)+trcs_Dif_flxM(idg)
   enddo
+!  if(I==19 .and. J>=14)write(115,*)(I*1000+J)*100+M,'top',trcs_TransptMicP_3D(idg_O2,3,NU(NY,NX),NY,NX), &
+!      trcg_AquaADV_Snow2Soil_flxM(idg_O2,NY,NX),litR_solute_adv_flxM(idg_O2)+trcs_Dif_flxM(idg_O2)
 
   do ids=ids_nut_beg,ids_nuts_end
     trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)=trcs_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX) &
@@ -1088,6 +1091,7 @@ contains
           DO idg=idg_beg,idg_NH3-1
             trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)  = trcg_solsml2_snvr(idg,L,NY,NX)*VFLWS
           ENDDO
+
           trcg_AquaADV_Snow2Soil_flxM(idg_NH3,NY,NX)  = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNH4
           trcg_AquaADV_Snow2Soil_flxM(idg_NH3B,NY,NX) = trcg_solsml2_snvr(idg_NH3,L,NY,NX)*VFLWNHB
 
@@ -1119,7 +1123,8 @@ contains
       ENDIF
     ENDIF
   ENDDO
-
+!  if(I==19 .and. J>=14)write(111,*)(I*1000+J)*100+M,'sno2soil',trcg_AquaADV_Snow2Soil_flx(idg_O2,NY,NX),&
+!    trcg_AquaADV_Snow2Litr_flx(idg_O2,NY,NX)
   call PrintInfo('end '//subname)
   end subroutine SnowSoluteDischargeM
 

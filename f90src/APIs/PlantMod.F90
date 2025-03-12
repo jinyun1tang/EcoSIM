@@ -5,7 +5,12 @@ module PlantMod
   use UptakesMod,        only: RootUptakes
   use PlantDisturbMod,   only: PrepLandscapeGrazing
   use PlantMgmtDataType, only: NP
+  use MiniMathMod,       only: fixEXConsumpFlux
   use EcoSIMCtrlMod,     only: lverb
+  use TracerIDMod
+  use GridDataType
+  use PlantDataRateType
+  use SoilBGCDataType
   use EcoSimSumDataType
   use PlantAPIData  
   use PlantAPI
@@ -84,6 +89,8 @@ implicit none
       call ExitPlantBalance(I,J,NP(NY,NX))
 
       call PlantAPIRecv(I,J,NY,NX)
+
+      call ApplyRootUptake2GasTracers(I,J,NY,NX)
     ENDDO
   ENDDO
   PlantElemntStoreLandscape(:)=plt_site%PlantElemntStoreLandscape(:)
@@ -106,5 +113,33 @@ implicit none
   call PlantAPICanMRecv(NY,NX)
 
   end subroutine PlantCanopyRadsModel
+!------------------------------------------------------------------------------------------
 
+  subroutine ApplyRootUptake2GasTracers(I,J,NY,NX)
+
+  implicit none
+  integer,intent(in) :: I,J,NY,NX
+  integer :: L,idg
+  real(r8):: dmass
+
+  DO L=NU(NY,NX),NL(NY,NX)
+    do idg=idg_beg,idg_NH3-1            
+      if (trcs_solml_vr(idg,L,NY,NX)>trcs_plant_uptake_vr(idg,L,NY,NX))then
+        trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_plant_uptake_vr(idg,L,NY,NX)
+      else
+        dmass=trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_solml_vr(idg,L,NY,NX)
+        trcs_solml_vr(idg,L,NY,NX)=0._r8        
+        if(dmass > trcg_gasml_vr(idg,L,NY,NX))then
+          dmass=dmass-trcg_gasml_vr(idg,L,NY,NX)
+          trcg_gasml_vr(idg,L,NY,NX)=0._r8
+          trcs_plant_uptake_vr(idg,L,NY,NX)=trcs_plant_uptake_vr(idg,L,NY,NX)-dmass
+        else
+          trcg_gasml_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)-dmass
+        endif
+      endif
+
+    enddo
+  ENDDO
+
+  end subroutine ApplyRootUptake2GasTracers
 end module PlantMod

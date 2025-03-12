@@ -173,6 +173,7 @@ module RedistMod
     SurfGasEmisFlx_col(idg,NY,NX) = trcg_air2root_flx_col(idg,NY,NX) + trcg_ebu_flx_col(idg,NY,NX) &
       + GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX) &
       + TRootGasLossDisturb_col(idg,NY,NX)
+
     SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmisFlx_col(idg,NY,NX)
   ENDDO
 
@@ -229,11 +230,11 @@ module RedistMod
     VLiceMacP_vr(L,NY,NX) = AZMAX1(VLiceMacP_vr(L,NY,NX))
     VLSoilPoreMicPX       = AREA(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
-    ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX), &
-      VLWatMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
+    TCS_vr(L,NY,NX)       = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+    ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),&
+      VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
     ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX), &
       VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
-    TCS_vr(L,NY,NX) = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
 
   ENDDO D9945
 
@@ -317,13 +318,20 @@ module RedistMod
   real(r8) :: dflx,dval,pval,rval
 
   call PrintInfo('beg '//subname)
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'bfsurf',trcs_solml_vr(idg_O2,0,NY,NX)
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'surfflx',trcs_TransptMicP_3D(idg_O2,3,0,NY,NX), &
+!      Gas_Disol_Flx_vr(idg_O2,0,NY,NX),-trcs_RMicbUptake_vr(idg_O2,0,NY,NX),&
+!      trcs_TransptMicP_3D(idg_O2,3,NU(NY,NX),NY,NX)
 
   do idg=idg_beg,idg_NH3-1
     trcs_solml_vr(idg,0,NY,NX)=trcs_solml_vr(idg,0,NY,NX)+trcs_TransptMicP_3D(idg,3,0,NY,NX) &
       +Gas_Disol_Flx_vr(idg,0,NY,NX)-trcs_RMicbUptake_vr(idg,0,NY,NX)
     call fixEXConsumpFlux(trcs_solml_vr(idg,0,NY,NX),trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX),-1)
+
     trcs_RMicbUptake_col(idg,NY,NX)=trcs_RMicbUptake_col(idg,NY,NX)+trcs_RMicbUptake_vr(idg,0,NY,NX)
   enddo
+
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'afsurf',trcs_solml_vr(idg_O2,0,NY,NX)
 
   rval                         = trcs_solml_vr(idg_NH3,0,NY,NX)
   dflx                         = trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX)+trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX) &
@@ -350,6 +358,9 @@ module RedistMod
     call fixEXConsumpFlux(trcs_solml_vr(ids,0,NY,NX),trcs_TransptMicP_3D(ids,3,0,NY,NX),-1)
 
   enddo  
+
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'bfsoil',sum(trcs_solml_vr(idg_O2,NU(NY,NX):NL(NY,NX),NY,NX))+&
+!    sum(trcg_gasml_vr(idg_O2,NU(NY,NX):NL(NY,NX),NY,NX))
 
 !update aqueous concentrations
   DO idg=idg_beg,idg_end
@@ -1032,12 +1043,12 @@ module RedistMod
       -trcs_TransptMacP_3D(idg,3,NL(NY,NX)+1,NY,NX)
   enddo
 
-  if(I==137 .and. J<=2)then
-    write(111,*)'uptk',I*1000+J,trcs_names(idg_CH4),'bfreset',trcs_plant_uptake_col(idg_CH4,NY,NX)
-    write(112,*)'bfuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
-    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-    write(112,*)(trcs_solml_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-  endif  
+!  if(I==140 .and. J<=2)then
+!    write(111,*)'uptk',I*1000+J,trcs_names(idg_CH4),'bfreset',trcs_plant_uptake_col(idg_CH4,NY,NX)
+!    write(112,*)'bfuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
+!    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+!    write(112,*)(trcs_solml_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+!  endif  
   trcs_plant_uptake_col(:,NY,NX)=0._r8
 
   D125: DO L=NU(NY,NX),NL(NY,NX)
@@ -1110,44 +1121,24 @@ module RedistMod
 
       call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),trcs_TransptMicP_vr(idg,L,NY,NX),-1) 
 
-       !
-       !The corrected of trcs_plant_uptake_vr(idg,L,NY,NX) may cause mass conservation error, but it is a price has to be paid
-       !to ensure physical consistency.       
       if(trcs_RMicbUptake_vr(idg,L,NY,NX)<=0._r8)then
          !production
         trcs_solml_vr(idg,L,NY,NX) = trcs_solml_vr(idg,L,NY,NX)-trcs_RMicbUptake_vr(idg,L,NY,NX)
         if(idg==idg_N2)then
-          dval0                      = trcs_plant_uptake_vr(idg,L,NY,NX) + RootN2Fix_vr(L,NY,NX)
-          dval                       = dval0
-          call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),dval)
-          if(dval<dval0)then
-            pval                              = dval/dval0
-            trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
-            RootN2Fix_vr(L,NY,NX)             = RootN2Fix_vr(L,NY,NX)*pval
-          endif
-        else
-          call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),trcs_plant_uptake_vr(idg,L,NY,NX))
+          call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),RootN2Fix_vr(L,NY,NX))
         endif
       else
         if(idg==idg_N2)then
-          dval0 = trcs_plant_uptake_vr(idg,L,NY,NX) + trcs_RMicbUptake_vr(idg,L,NY,NX)+RootN2Fix_vr(L,NY,NX)
+          dval0 = trcs_RMicbUptake_vr(idg,L,NY,NX)+RootN2Fix_vr(L,NY,NX)
           dval  = dval0
           call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),dval)
           if(dval<dval0)then
             pval                              = dval/dval0
-            trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
             trcs_RMicbUptake_vr(idg,L,NY,NX)  = trcs_RMicbUptake_vr(idg,L,NY,NX)*pval
             RootN2Fix_vr(L,NY,NX)             = RootN2Fix_vr(L,NY,NX)*pval
           endif
         else
-          dval0 = trcs_plant_uptake_vr(idg,L,NY,NX) + trcs_RMicbUptake_vr(idg,L,NY,NX)
-          dval  = dval0
-          call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),dval)
-          if(dval<dval0)then
-            pval                              = dval/dval0
-            trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
-            trcs_RMicbUptake_vr(idg,L,NY,NX)  = trcs_RMicbUptake_vr(idg,L,NY,NX)*pval
-          endif            
+          call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),trcs_RMicbUptake_vr(idg,L,NY,NX))
         endif
       endif
       trcs_RMicbUptake_col(idg,NY,NX)=trcs_RMicbUptake_col(idg,NY,NX)+trcs_RMicbUptake_vr(idg,L,NY,NX)
@@ -1169,9 +1160,9 @@ module RedistMod
       dval  = dval0
       call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),dval)
       if(dval/=dval0)then
-        pval=dval/dval0
-        trcs_TransptMicP_vr(idg,L,NY,NX)=trcs_TransptMicP_vr(idg,L,NY,NX)*pval
-        trcs_plant_uptake_vr(idg,L,NY,NX)=trcs_plant_uptake_vr(idg,L,NY,NX)*pval
+        pval                              = dval/dval0
+        trcs_TransptMicP_vr(idg,L,NY,NX)  = trcs_TransptMicP_vr(idg,L,NY,NX)*pval
+        trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
       endif
     ENDDO
 
@@ -1447,10 +1438,14 @@ module RedistMod
     IF(salt_model)call UpdateSaltIonInSoilLayers(L,NY,NX,TDisolPi_lnd)
 
   ENDDO D125
-  if(I==137 .and. J<=2)then
-    write(112,*)'afuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
-    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-  endif
+!  if(I==137 .and. J<=2)then
+!    write(112,*)'afuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
+!    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+!  endif
+
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'afsoil',sum(trcs_solml_vr(idg_O2,NU(NY,NX):NL(NY,NX),NY,NX))+&
+!    sum(trcg_gasml_vr(idg_O2,NU(NY,NX):NL(NY,NX),NY,NX))
+
   call PrintInfo('end '//subname)
 
   end subroutine UpdateChemInSoilLays

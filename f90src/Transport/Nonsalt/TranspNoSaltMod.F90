@@ -114,6 +114,7 @@ module TranspNoSaltMod
     MX=M
   ENDDO
 
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'afttransp',trcs_TransptMicP_3D(idg_O2,3,0,1,1) 
   call PrintInfo('end '//subname)
   
   END subroutine TranspNoSalt
@@ -467,10 +468,12 @@ module TranspNoSaltMod
   integer, intent(in) :: NY,NX
   integer :: idg
 
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'prec2grnd'
   IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR.   &   !snow fall
     (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. &  !rainfall and significant snowpack
      VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN !rainfall with snowpack
 
+!    if(I==19 .and. J>=14)write(111,*)I*1000+J,'add2snow'
     call TracerFall2Snowpack(I,J,NY,NX)
 
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
@@ -498,7 +501,8 @@ module TranspNoSaltMod
       trcs_TransptMicP_3D(idg,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
         +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
     ENDDO
-    
+!    if(I==19 .and. J>=14)write(115,*)I*1000+J,'add2grnd',trcs_TransptMicP_3D(idg_O2,3,0,NY,NX)
+
     trcs_TransptMicP_3D(ids_NH4,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
       +Irrig2LitRSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
     trcs_TransptMicP_3D(idg_NH3,3,0,NY,NX)=(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
@@ -546,7 +550,7 @@ module TranspNoSaltMod
     trcs_TransptMicP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)  = 0.0_r8
 
   ENDIF
-
+!  if(I==19 .and. J>=14)write(115,*)I*1000+J,'transp',trcs_TransptMicP_3D(idg_O2,3,0,NY,NX) 
   trcs_TransptMacP_3D(ids_beg:ids_end,3,NU(NY,NX),NY,NX)=0.0_r8
 
   end subroutine PrecipitationSoluteInput
@@ -622,12 +626,12 @@ module TranspNoSaltMod
 
   DO L=NU(NY,NX),NL(NY,NX)
     
-    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) +trcs_plant_uptake_vr(idg_CO2,L,NY,NX) &
+    RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = (trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)  &
       -TProd_CO2_geochem_soil_vr(L,NY,NX)-RootCO2Ar2Soil_vr(L,NY,NX)- trcs_deadroot2soil_vr(idg_CO2,L,NY,NX))*dts_gas
 
     DO idg=idg_beg,idg_NH3-1
       if(idg/=idg_CO2 .and. idg/=idg_O2)then      
-        RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)+trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
+        RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
       endif
     enddo
     RBGCSinkGasMM_vr(idg_N2,L,NY,NX)=RBGCSinkGasMM_vr(idg_N2,L,NY,NX)+RootN2Fix_vr(L,NY,NX)*dts_gas

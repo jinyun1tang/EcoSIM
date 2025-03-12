@@ -79,9 +79,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TBION_vr(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRChem_gas_NH3_geochem_vr(:,:,:)      !total gaseous NH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcp_RChem_soil_vr(:,:,:,:)           !total precipitated P containing transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  trcg_AquaAdv_flx_snvr(:,:,:,:)        !aqueous volatile tracer flux in snow [g/d2/h]
-  real(r8),target,allocatable ::  trcn_AquaAdv_flx_snvr(:,:,:,:)        !aqueous nutrient tracer flux in snow [g/d2/h]
-  real(r8),target,allocatable ::  trcSalt_AquaAdv_flx_snvr(:,:,:,:)     !aqueous salt tracer flux through snow [g/d2/h]
+
   real(r8),target,allocatable ::  trcg_mass_cumerr_col(:,:,:)           !cumlative volatile tracer error [g/d2]
   private :: InitAllocate
   contains
@@ -152,10 +150,9 @@ module AqueChemDatatype
   allocate(TBION_vr(0:JZ,JY,JX));  TBION_vr=0._r8
   allocate(TRChem_gas_NH3_geochem_vr(0:JZ,JY,JX));  TRChem_gas_NH3_geochem_vr=0._r8
   allocate(trcp_RChem_soil_vr(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil_vr=0._r8
-  allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
-  allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
+
   if(salt_model)then
-    allocate(trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_AquaAdv_flx_snvr=0._r8
+
     allocate(trcSalt_TransptMicP_3D(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_TransptMicP_3D=0._r8
     allocate(trcSalt_TransptMacP_3D(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_TransptMacP_3D=0._r8
     allocate(trcSalt_solml_vr(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml_vr=0._r8

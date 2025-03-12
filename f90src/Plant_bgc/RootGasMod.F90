@@ -504,9 +504,6 @@ module RootGasMod
 !     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
           DO idg=idg_beg,idg_NH3
             trc_gasml_loc(idg)  = trc_gasml_loc(idg)-RGas_Disolv_flx(idg)+RGasTranspFlxPrev(idg)
-!            if(trc_gasml_loc(idg)<0._r8)then
-!              write(117,*)(I*1000+J)*10+N,'gas ',trcs_names(idg),trc_gasml_loc(idg),RGas_Disolv_flx(idg),RGasTranspFlxPrev(idg)
-!            endif
           ENDDO
 
           trc_gasml_loc(idg_NH3)  = trc_gasml_loc(idg_NH3)-RGas_Disolv_flx(idg_NH3B)
@@ -516,9 +513,6 @@ module RootGasMod
           DO idg=idg_beg,idg_end
             if(idg==idg_O2)then
               trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_Disolv_flx(idg)-ROxySoil2Uptk
-              if(trc_solml_loc(idg)<0._r8)then
-                write(117,*)(I*1000+J)*10+N,'aqua ',trcs_names(idg),tcopy,trc_solml_loc(idg),RGas_Disolv_flx(idg),ROxySoil2Uptk,ROXYLX
-              endif
             else
               trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_Disolv_flx(idg)-RootUptkSoiSolute(idg)
             endif
@@ -627,12 +621,12 @@ module RootGasMod
 !    if(I==134 .and. J<=3)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
 !      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
 !      RootCO2Emis_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2Root_pvr(L,NZ)
-    if(I==137 .and. J==1)then        
-      idg=idg_CH4
-      write(116,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
-        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
-        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
-    endif
+!    if(I==137 .and. J==1)then        
+!      idg=idg_CH4
+!      write(116,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
+!        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
+!        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
+!    endif
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'
