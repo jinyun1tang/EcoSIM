@@ -240,7 +240,7 @@ module TranspNoSaltMod
   ENDDO
 
   DO idn=ids_nut_beg,ids_nuts_end
-    trcn_solsml2_snvr(idn,1,NY,NX)=trcn_solsml2_snvr(idn,1,NY,NX)+trcn_SnowDrift_flxM(idn,NY,NX)
+    trcn_solsml2_snvr(idn,1,NY,NX)=AZERO(trcn_solsml2_snvr(idn,1,NY,NX)+trcn_SnowDrift_flxM(idn,NY,NX))
   ENDDO
 
   DO  L=1,JS
