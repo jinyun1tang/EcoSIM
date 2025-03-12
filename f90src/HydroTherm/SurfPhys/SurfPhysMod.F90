@@ -1203,10 +1203,10 @@ contains
   ENDIF
 
   IF(ENGYD+ENGYB.GT.ZERO)THEN
-    MobileH2OSurf                  = 1.0E+03_r8*AZMAX1(XVLMobileWaterLitR_col(NY,NX)-VWatStoreCapSurf_col(NY,NX))/AREA(3,NUM(NY,NX),NY,NX)
+    MobileH2OSurf                  = AMIN1(1.0E+03_r8*AZMAX1(XVLMobileWaterLitR_col(NY,NX)-VWatStoreCapSurf_col(NY,NX))/AREA(3,NUM(NY,NX),NY,NX),20._r8)
     EnergyImpact4ErosionM(M,NY,NX) = (ENGYD*PrecDirect2Grnd_col(NY,NX)+ENGYB*PrecIndirect2Grnd_col(NY,NX))*EXP(-2.0_r8*MobileH2OSurf) &
       *FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
-    EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)+EnergyImpact4ErosionM(M,NY,NX)
+    EnergyImpact4Erosion(NY,NX)=EnergyImpact4Erosion(NY,NX)+AZERO(EnergyImpact4ErosionM(M,NY,NX))
   ELSE
     EnergyImpact4ErosionM(M,NY,NX)=0.0_r8
   ENDIF

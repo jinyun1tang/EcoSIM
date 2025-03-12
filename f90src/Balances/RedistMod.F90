@@ -452,7 +452,11 @@ module RedistMod
     GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX) &
       +trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX)+Gas_Disol_Flx_vr(idg,0,NY,NX)+Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX)    
   ENDDO  
-
+!  if(I==10 .and. J>=10)then
+!    idg=idg_CO2
+!    write(116,*)I*1000+J,'difc',GasDiff2Surf_flx_col(idg,NY,NX),trcg_DisolEvap_Atm2Soil_flx(idg,NY,NX), &
+!      trcg_DisolEvap_Atm2Litr_flx(idg,NY,NX),Gas_Disol_Flx_vr(idg,0,NY,NX),Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX)    
+!  endif
 
   GasDiff2Surf_flx_col(idg_NH3,NY,NX) = GasDiff2Surf_flx_col(idg_NH3,NY,NX)+trcg_DisolEvap_Atm2Soil_flx(idg_NH3B,NY,NX)
 
@@ -1251,8 +1255,8 @@ module RedistMod
     !
     !     GASES FROM VOLATILIZATION-DISSOLUTION AND GAS TRANSFER
 !
-    DO idg=idg_beg,idg_NH3
-      trcg_gasml_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)+Gas_AdvDif_Flx_vr(idg,L,NY,NX)
+    DO idg=idg_beg,idg_NH3      
+      call fixEXConsumpFlux(trcg_gasml_vr(idg,L,NY,NX),Gas_AdvDif_Flx_vr(idg,L,NY,NX),-1)
     ENDDO
 
     trcg_gasml_vr(idg_NH3,L,NY,NX)   = trcg_gasml_vr(idg_NH3,L,NY,NX)+TRChem_gas_NH3_geochem_vr(L,NY,NX)

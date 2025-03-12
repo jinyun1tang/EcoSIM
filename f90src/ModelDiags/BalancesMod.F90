@@ -419,14 +419,14 @@ contains
       ENDDO
       trcg_TotalMass_col(idg_NH3B,NY,NX)=trcg_soilMass_col(idg_NH3B,NY,NX)
 
-      if(I==19 .and. J>=14)then        
-        idg=idg_O2
-        write(115,*)I*1000+J,'nsnol_col     trcname     snow   litr  root  soil'
-        write(115,*)nsnol_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soilMass_col(idg,NY,NX),NY,NX
-      DO L=NUI(NY,NX),NL(NY,NX)
-        write(115,*)L,trcg_gasml_vr(idg,L,NY,NX),trcs_solml_vr(idg,L,NY,NX), trcs_soHml_vr(idg,L,NY,NX)
-      ENDDO  
-      endif
+!      if(I==10 .and. J>=10)then 
+!        idg=idg_CO2
+!        write(115,*)I*1000+J,'nsnol_col     trcname     snow   litr  root  soil'
+!        write(115,*)nsnol_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soilMass_col(idg,NY,NX),NY,NX
+!      DO L=NUI(NY,NX),NL(NY,NX)
+!        write(115,*)L,trcg_gasml_vr(idg,L,NY,NX),trcs_solml_vr(idg,L,NY,NX), trcs_soHml_vr(idg,L,NY,NX)
+!      ENDDO  
+!      endif
 
     ENDDO
   ENDDO

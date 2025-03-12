@@ -546,14 +546,14 @@ module BoundaryTranspMod
             -trcg_AquaADV_Snow2Soil_flxM(idg,N2,N1)
         ENDDO
 
-        if(I==9 .and. J>=23)then
-          write(120,*)'netflx1',LS,trcg_AquaAdv_flx_snvr(idg_O2,LS,N2,N1),-trcg_AquaADV_Snow2Litr_flx(idg_O2,N2,N1), &
-            -trcg_AquaADV_Snow2Soil_flx(idg_O2,N2,N1),trcg_Aqua_flxM_snvr(idg_O2,LS,N2,N1),trcg_solsml2_snvr(idg_O2,LS,N2,N1)
+!        if(I==9 .and. J>=23)then
+!          write(120,*)'netflx1',LS,trcg_AquaAdv_flx_snvr(idg_O2,LS,N2,N1),-trcg_AquaADV_Snow2Litr_flx(idg_O2,N2,N1), &
+!            -trcg_AquaADV_Snow2Soil_flx(idg_O2,N2,N1),trcg_Aqua_flxM_snvr(idg_O2,LS,N2,N1),trcg_solsml2_snvr(idg_O2,LS,N2,N1)
 
-          write(120,*)'netflx2',LS,trcg_AquaAdv_flxM_snvr(idg_O2,LS,N2,N1), &
-            -trcg_AquaADV_Snow2Litr_flxM(idg_O2,N2,N1), &
-            -trcg_AquaADV_Snow2Soil_flxM(idg_O2,N2,N1)  
-        endif    
+!          write(120,*)'netflx2',LS,trcg_AquaAdv_flxM_snvr(idg_O2,LS,N2,N1), &
+!            -trcg_AquaADV_Snow2Litr_flxM(idg_O2,N2,N1), &
+!            -trcg_AquaADV_Snow2Soil_flxM(idg_O2,N2,N1)  
+!        endif    
 
         trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1) &
           -trcg_AquaADV_Snow2Soil_flxM(idg_NH3B,N2,N1)
