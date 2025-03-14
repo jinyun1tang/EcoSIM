@@ -581,7 +581,7 @@ contains
   tHeatAir2Grnd    = Radnet2Grnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd !net energy into soil, subtracting latent heat and sensible heat
   HeatFluxAir2Soi  = tHeatAir2Grnd+HeatSensVapAir2Grnd !total heat plus convective heat > 0 to ground
 
-  end subroutine SoilSRFEnerbyBalance
+  end subroutine SoilSRFEnerbyBalanceM
 
 !------------------------------------------------------------------------------------------
 
