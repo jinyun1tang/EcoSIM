@@ -11,6 +11,7 @@ module MicBGCAPI
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
+  use abortutils,           only: endrun
   use EcoSIMSolverPar  
   use TracerIDMod
   use SoilBGCDataType
@@ -166,7 +167,7 @@ implicit none
   micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
   micfor%O2_irrig_conc       = trcg_irrig_mole_conc_col(idg_O2,NY,NX)
   micfor%O2_rain_conc        = trcg_rain_mole_conc_col(idg_O2,NY,NX)
-  micfor%Irrig2LitRSurf_col      = Irrig2LitRSurf_col(NY,NX)
+  micfor%Irrig2LitRSurf_col  = Irrig2LitRSurf_col(NY,NX)
   micfor%Rain2LitRSurf       = Rain2LitRSurf_col(NY,NX)
   micfor%TempOffset          = TempOffset_col(NY,NX)
   micfor%VLitR               = VLitR_col(NY,NX)
@@ -209,8 +210,8 @@ implicit none
   micfor%RN2OEcoUptkSoilPrev      = RN2OEcoUptkSoilPrev_vr(L,NY,NX)
   micfor%RNO2EcoUptkBandPrev      = RNO2EcoUptkBandPrev_vr(L,NY,NX)
   micfor%RO2EcoDmndPrev           = RO2EcoDmndPrev_vr(L,NY,NX)
-  micfor%RO2GasXchangePrev        = RGasFlxPrev_vr(idg_O2,L,NY,NX)
-  micfor%RCH4GasXchangePrev       = RGasFlxPrev_vr(idg_CH4,L,NY,NX)
+  micfor%RO2GasXchangePrev        = RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)
+  micfor%RCH4GasXchangePrev       = RGasTranspFlxPrev_vr(idg_CH4,L,NY,NX)
   micfor%RCH4PhysexchPrev         = RCH4PhysexchPrev_vr(L,NY,NX)
   micfor%RNH4EcoDmndBandPrev      = RNH4EcoDmndBandPrev_vr(L,NY,NX)
   micfor%RNO3EcoDmndBandPrev      = RNO3EcoDmndBandPrev_vr(L,NY,NX)
@@ -305,6 +306,8 @@ implicit none
   micstt%CZ2GS             = AZMAX1(trc_solcl_vr(idg_N2,L,NY,NX))
   micstt%CH2GS             = AZMAX1(trc_solcl_vr(idg_H2,L,NY,NX))
   micstt%CCH4G             = AZMAX1(trcg_gascl_vr(idg_CH4,L,NY,NX))
+  micstt%Lay               = L
+
 !  write(115,*)I+J/24.,L,micstt%COXYG,micstt%COXYS,VLsoiAirPM(1,L,NY,NX)
   micstt%O2GSolubility     = GasSolbility_vr(idg_O2,L,NY,NX)  
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
@@ -324,9 +327,10 @@ implicit none
   micstt%CPOSC(1:jsken,1:jcplx)                            = CPOSC(1:jsken,1:jcplx,L,NY,NX)
   micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx)=mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:jcplx,L,NY,NX)
   micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
+
   if(.not.micfor%litrm)then
     micfor%AEC  = AEC_vr(L,NY,NX)
-    micstt%OXYG = trcg_gasml_vr(idg_O2,L,NY,NX)
+    micstt%OXYG = AZMAX1(trcg_gasml_vr(idg_O2,L,NY,NX))
   endif
   micflx%RNO2DmndSoilChemo=RNO2DmndSoilChemo_vr(L,NY,NX)
   micflx%RNO2DmndBandChemo=RNO2DmndBandChemo_vr(L,NY,NX)
@@ -368,7 +372,7 @@ implicit none
   type(Microbe_Diag_type), intent(in) :: nmicdiag
 
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
-  integer :: NE,idom,K
+  integer :: NE,idom,K,idg
   
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
@@ -395,6 +399,14 @@ implicit none
   trcs_RMicbUptake_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
   trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb+micflx%MicrbN2Fix
   trcs_RMicbUptake_vr(idg_N2O,L,NY,NX)  = micflx%RN2ONetUptkMicb
+
+  !artificial source
+  if(L>0 .and. L<5)then
+    trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = -0.01_r8
+  else
+    trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = 0._r8
+  endif  
+
   RNut_MicbRelease_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
   RNut_MicbRelease_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil
@@ -405,8 +417,9 @@ implicit none
   RNut_MicbRelease_vr(ids_NO2B,L,NY,NX)   = micflx%RNO2MicbTransfBand
   RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbTransfBand
   RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand
+  
   TempSensDecomp_vr(L,NY,NX)            = nmicdiag%TSensGrowth
-  MoistSensDecomp_vr(L,NY,NX)           = nmicdiag%WatStressMicb
+  MoistSensDecomp_vr(L,NY,NX)           = AZMAX1(nmicdiag%WatStressMicb)
   Micb_N2Fixation_vr(L,NY,NX)           = micflx%MicrbN2Fix    
   RNO2DmndSoilChemo_vr(L,NY,NX)         = micflx%RNO2DmndSoilChemo
   RNO2DmndBandChemo_vr(L,NY,NX)         = micflx%RNO2DmndBandChemo

@@ -14,7 +14,7 @@ module ErosionBalMod
   USE AqueChemDatatype
   use FlagDataType
   use FertilizerDataType
-  use TFlxTypeMod
+  use RedistDataMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -78,9 +78,9 @@ implicit none
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3
 !
       DO NTF=ifertn_beg,ifertn_end
-        FNX                         = FSINK*FertN_soil_vr(NTF,L,NY,NX)
-        FertN_soil_vr(NTF,L,NY,NX)  = FertN_soil_vr(NTF,L,NY,NX)-FNX
-        FertN_soil_vr(NTF,LL,NY,NX) = FertN_soil_vr(NTF,LL,NY,NX)+FNX
+        FNX                         = FSINK*FertN_mole_soil_vr(NTF,L,NY,NX)
+        FertN_mole_soil_vr(NTF,L,NY,NX)  = FertN_mole_soil_vr(NTF,L,NY,NX)-FNX
+        FertN_mole_soil_vr(NTF,LL,NY,NX) = FertN_mole_soil_vr(NTF,LL,NY,NX)+FNX
       ENDDO
 !
 !     EXCHANGEABLE CATIONS AND ANIONS

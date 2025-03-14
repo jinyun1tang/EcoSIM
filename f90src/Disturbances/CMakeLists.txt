@@ -3,6 +3,7 @@ set(DISTURB_MOD_SOURCES
   PerturbationMod.F90
   PlantDisturbMod.F90
   SoilDisturbMod.F90
+  FertilizerMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(disturb_mods ${DISTURB_MOD_SOURCES})
@@ -10,6 +11,7 @@ add_ecosim_library(disturb_mods ${DISTURB_MOD_SOURCES})
 target_include_directories(disturb_mods  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/

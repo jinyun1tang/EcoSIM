@@ -1,5 +1,6 @@
 set(APIS_SOURCES
 	PlantAPI.F90
+  PlantCanAPI.F90
   PlantMod.F90
   MicBGCAPI.F90
   GeochemAPI.F90
@@ -14,6 +15,7 @@ target_include_directories(APIs PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/    
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/APIData/
@@ -28,7 +30,6 @@ target_include_directories(APIs PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Transport/Salt
   ${CMAKE_BINARY_DIR}/f90src/Geochem/Box_chem
   ${CMAKE_BINARY_DIR}/f90src/Geochem/Layers_chem)
-
 
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};APIs PARENT_SCOPE)

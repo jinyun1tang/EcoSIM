@@ -402,6 +402,7 @@ module grosubsMod
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft,              &
     PlantPopulation_pft         => plt_site%PlantPopulation_pft,          &
     NU                          => plt_site%NU,                           &
+    NK                          => plt_site%NK,                           &
     MaxNumRootLays              => plt_site%MaxNumRootLays,               &
     TempOffset_pft              => plt_pheno%TempOffset_pft,              &
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,               &
@@ -416,6 +417,7 @@ module grosubsMod
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr,             &
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr,           &
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr,           &
+    RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr     ,           &
     RootrNC_pft                 => plt_allom%RootrNC_pft,                 &
     RootrPC_pft                 => plt_allom%RootrPC_pft,                 &
     FracHour4LeafoffRemob       => plt_allom%FracHour4LeafoffRemob,       &
@@ -446,16 +448,19 @@ module grosubsMod
     CanopyStemAreaZ_pft(L,NZ)=0._r8
   ENDDO D2
 
-  D9: DO N=1,MY(NZ)
-    D6: DO L=NU,MaxNumRootLays
-      RootProteinC_pvr(N,L,NZ)=0._r8
-      Root1stXNumL_pvr(N,L,NZ)=0._r8
-      Root2ndXNum_pvr(N,L,NZ)=0._r8
-      RootRespPotent_pvr(N,L,NZ)=0._r8
-      RootCO2EmisPot_pvr(N,L,NZ)=0._r8
-      RootCO2Autor_pvr(N,L,NZ)=0._r8
-    ENDDO D6
-  ENDDO D9
+
+  D6: DO L=1,NK
+    D9: DO N=1,MY(NZ)    
+      RootProteinC_pvr(N,L,NZ)   = 0._r8
+      Root1stXNumL_pvr(N,L,NZ)   = 0._r8
+      Root2ndXNum_pvr(N,L,NZ)    = 0._r8
+      RootRespPotent_pvr(N,L,NZ) = 0._r8
+      RootCO2EmisPot_pvr(N,L,NZ) = 0._r8
+      RootCO2Autor_pvr(N,L,NZ)   = 0._r8
+    ENDDO D9
+    RootN2Fix_pvr(L,NZ)          = 0._r8
+  ENDDO D6
+
 !
 !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     WTSTK,WVSTK=stalk,sapwood mass

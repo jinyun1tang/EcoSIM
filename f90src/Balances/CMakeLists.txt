@@ -1,5 +1,5 @@
 set(BALANCES_MOD_SOURCES
-  TFlxTypeMod.F90
+  RedistDataMod.F90
   LateralTranspMod.F90
   SoilLayerDynMod.F90
   RunoffBalMod.F90
@@ -21,8 +21,9 @@ target_include_directories(balances  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/
   ${CMAKE_BINARY_DIR}/f90src/Disturbances/  
+  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/    
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
-  ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/Box_Micmodel
+  ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/Box_Micmodel  
   ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/Layers_Micmodel)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};balances PARENT_SCOPE)

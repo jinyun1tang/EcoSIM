@@ -36,7 +36,8 @@ contains
 
   if(lverb)WRITE(*,334)'HOUR1'
   if(do_timing)call start_timer(t1)
-  !print*,'hour1'
+  
+  !do surface energy and water processes
   CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
 
   if(do_timing)call end_timer('HOUR1',t1)
@@ -131,6 +132,7 @@ contains
   use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
   use fileUtil       , only : iulog,ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
+  use readsmod       , only : clim_var
   use EcoSIMCtrlMod
   use HistFileMod
   implicit none
@@ -148,7 +150,7 @@ contains
   integer :: num_microbial_guilds
   integer :: do_doy,do_year,do_layer
   character(len=64) :: bgc_fname
-
+  real(r8) :: airT_C,Wind_ms,vap_Kpa,Rain_mmhr,SRAD_Wm2,Atm_kPa
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
@@ -160,12 +162,13 @@ contains
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,ldebug_day
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date,do_timing,warming_exp
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
     bgc_fname
 
+  namelist /FixClimForc/airT_C,Wind_ms,vap_Kpa,Rain_mmhr,SRAD_Wm2,Atm_kPa
   !local variables
   character(len=256) :: ioerror_msg
   integer :: rc, fu
@@ -176,7 +179,8 @@ contains
   continue_run = .false.
   NPXS         = 30   !number of cycles per hour for water, heat, solute flux calcns
   NPYS         = 20   !number of cycles per NPX for gas flux calculations
-  
+
+
   ldebug_day  =-1
   NCYC_LITR             = 20
   NCYC_SNOW             = 20
@@ -254,7 +258,6 @@ contains
     write(iulog,bbgcforc)
     write(iulog, *)
     write(iulog, *) '--------------------'
-
   endif
   erosion_model=iErosionMode>=0
   read(start_date,'(I4)')year0
@@ -275,6 +278,28 @@ contains
   endif
 
   call config_soil_warming(warming_exp)
+
+  if(fixClime)then
+
+    read(nml_buffer, nml=FixClimForc, iostat=nml_error, iomsg=ioerror_msg)
+    if (nml_error /= 0) then
+      write(iulog,'(a)')"ERROR reading FixClimForc namelist ",nml_error,ioerror_msg
+      call endrun('stopped in '//trim(mod_filename), __LINE__)
+    end if
+    if(.true.)then
+      write(iulog, *) '--------------------'
+      write(iulog,FixClimForc)
+      write(iulog, *)
+      write(iulog, *) '--------------------'
+    endif
+    clim_var%airT_C    = airT_C
+    clim_var%Wind_ms   = Wind_ms
+    clim_var%vap_kpa   = vap_Kpa
+    clim_var%Rain_mmhr = Rain_mmhr
+    clim_var%SRAD_Wm2  = SRAD_Wm2
+    clim_var%Atm_kPa   = Atm_kPa
+  endif
+
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
@@ -329,7 +354,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 
   if(do_timing)call init_timer(outdir)
 
-  if(lverb)WRITE(*,333)'READS: read climate forcing'
   CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
 
   !temporary set up for setting mass balance check

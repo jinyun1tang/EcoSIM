@@ -23,11 +23,11 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: RunoffBal
+  public :: RunXGridBounds
 
   contains
 
-  subroutine RunoffBal(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine RunXGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
   integer :: N
@@ -59,7 +59,7 @@ implicit none
               N4 = NX+1
               N5 = NY
               N6 = L
-              XN = -1.0_r8   !going out
+              XN = -1.0_r8   !going out of eastern boundary
             ELSE
               cycle
             ENDIF
@@ -69,7 +69,7 @@ implicit none
               N4 = NX
               N5 = NY
               N6 = L
-              XN = 1.0_r8    !coming in
+              XN = 1.0_r8    !coming in from western boundary
             ELSE
               cycle
             ENDIF
@@ -82,7 +82,7 @@ implicit none
               N4 = NX
               N5 = NY+1
               N6 = L
-              XN = -1.0_r8   !going out
+              XN = -1.0_r8   !going out of southern boundary
             ELSE
               cycle
             ENDIF
@@ -92,7 +92,7 @@ implicit none
               N4 = NX
               N5 = NY
               N6 = L
-              XN = 1.0_r8       !coming in
+              XN = 1.0_r8       !coming in from northern boundary
             ELSE
               cycle
             ENDIF
@@ -104,7 +104,7 @@ implicit none
               N4 = NX
               N5 = NY
               N6 = L+1
-              XN = -1.0_r8       !going out
+              XN = -1.0_r8       !going out from layer L into L+1
             ELSE
               cycle
             ENDIF
@@ -125,7 +125,7 @@ implicit none
     ENDDO D9980
   ENDDO D9985
 
-  end subroutine RunoffBal
+  end subroutine RunXGridBounds
 
 !------------------------------------------------------------------------------------------
 
@@ -447,35 +447,23 @@ implicit none
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
 !     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
 !
+
   IF(FlowDirIndicator(NY,NX).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     HO           = XN*HeatFlow2Soil_3D(N,N6,N5,N4)
     HeatOut_lnds = HeatOut_lnds-HO
     WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowSoiMacP_3D(N,N6,N5,N4))   !XN<0, going out grid
 
     IF(abs(WO)>0._r8)THEN
+
       QH2OLoss_lnds            = QH2OLoss_lnds-WO
       H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
 !
-!     SUBSURFACE BOUNDARY FLUXES OF CO2 AND DOC
-!
-!     X*FLS,X*FHS=solute flux in macropores,micropores from TranspNoSalt.f
-!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
-!     TOMOU_lnds(ielmc)=cumulative C loss through lateral and lower boundaries
-!     HydroSubsDOCFlx_col,HydroSubsDICFlx_col=dissolved organic,inorganic C loss through subsurface boundaries
-!
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
-!
-!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
-!     X*FLG=convective+diffusive gas flux from TranspNoSalt.f
-!     TOMOU_lnds(ielmn)=cumulative N loss through lateral and lower boundaries
-!     HydroSubsDONFlx_col,HydroSubsDINFlx_col=dissolved organic,inorganic N loss through subsurface boundaries
-!
-!     SUBSURFACE BOUNDARY FLUXES OF PO4 AND DOP
-!
-!     X*FLS,X*FHS,X*FLB,X*FHB=solute flux in macropores,micropores in non-band,band from TranspNoSalt.f
-!     TOMOU_lnds(ielmp)=cumulative P loss through lateral and lower boundaries
-!     HydroSubsDOPFlx_col,HydroSubsDIPFlx_col=dissolved organic,inorganic P loss through subsurface boundaries
-!
+      if(N.NE.iVerticalDirection)THEN
+
+      endif
+
+!!
       MOD=0.0_r8
 
       D450: DO K=1,jcplx

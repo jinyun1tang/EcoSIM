@@ -422,8 +422,8 @@ module PlantPhenolMod
   )
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)=0.0_r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
-  MaxSoiL4Root_pft(NZ)=NIXBotRootLayer_pft(NZ)
-  NGTopRootLayer_pft(NZ)=MIN(MaxSoiL4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
+  MaxSoiL4Root_pft(NZ)   = NIXBotRootLayer_pft(NZ)
+  NGTopRootLayer_pft(NZ) = MIN(MaxSoiL4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
 
 !
 ! TOTAL PLANT NON-STRUCTURAL C, N, P

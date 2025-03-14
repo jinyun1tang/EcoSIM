@@ -5,7 +5,7 @@ module WthrMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use MiniMathMod,       only: safe_adb, vapsat0, isclose
   use MiniFuncMod,       only: get_sun_declin
-  use EcoSIMCtrlMod,     only: etimer, frectyp
+  use EcoSIMCtrlMod,     only: etimer, frectyp,fixClime
   use PlantMgmtDataType, only: NP
   use MiniMathMod,       only: AZMAX1
   use UnitMod,           only: units
@@ -291,8 +291,14 @@ module WthrMod
         AZI=SIN(ALAT(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
         DEC=COS(ALAT(NY,NX)*RadianPerDegree)*COS(DECLIN*RadianPerDegree)
         !check eq.(11.1) in Campbell and Norman, 1998, p168.
-        SineSunInclAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
-        SineSunInclAnglNxtHour_col(NY,NX) = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
+        if(fixClime)then
+          !always assume the light is from zenith when using fixed climate forcing.
+          SineSunInclAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-11.5_r8)))
+          SineSunInclAnglNxtHour_col(NY,NX) = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-12.5_r8)))
+        else
+          SineSunInclAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
+          SineSunInclAnglNxtHour_col(NY,NX) = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
+        endif  
 
         !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
         IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclAngle_col(NY,NX)=0.0_r8
@@ -420,33 +426,7 @@ module WthrMod
     N=4
   ENDIF
   !
-  !     MONTHLY CHANGES
-  !
-  !     IF(I.GT.0.AND.I.LE.31)THEN
-  !     N=1
-  !     ELSEIF(I.GT.31.AND.I.LE.59)THEN
-  !     N=2
-  !     ELSEIF(I.GT.59.AND.I.LE.90)THEN
-  !     N=3
-  !     ELSEIF(I.GT.90.AND.I.LE.120)THEN
-  !     N=4
-  !     ELSEIF(I.GT.120.AND.I.LE.151)THEN
-  !     N=5
-  !     ELSEIF(I.GT.151.AND.I.LE.181)THEN
-  !     N=6
-  !     ELSEIF(I.GT.181.AND.I.LE.212)THEN
-  !     N=7
-  !     ELSEIF(I.GT.212.AND.I.LE.243)THEN
-  !     N=8
-  !     ELSEIF(I.GT.243.AND.I.LE.273)THEN
-  !     N=9
-  !     ELSEIF(I.GT.273.AND.I.LE.304)THEN
-  !     N=10
-  !     ELSEIF(I.GT.304.AND.I.LE.334)THEN
-  !     N=11
-  !     ELSE
-  !     N=12
-  !     ENDIF
+
   D9925: DO NX=NHW,NHE
     D9920: DO NY=NVN,NVS
 !

@@ -33,7 +33,7 @@ implicit none
 !  print*,'SetChemVar'
   call SetChemVar(forc,micfor,nvars, ystates0l, chemvar)
 !  print*,'NoSaltChemEquilibria'
-  call NoSaltChemEquilibria(chemvar,solflx)
+  call NoSaltChemEquilibria(0,0,0,0,0,chemvar,solflx)
 !  print*,'RetrieveYstatef'
   call RetrieveYstatef(nvars, ystates0l, ystatesfl, chemvar, solflx)
 
@@ -53,12 +53,12 @@ implicit none
   real(r8), intent(inout) :: ystatesfl(nvars)
 
   !ZNH4S=ZNH4S+TRChem_NH4_soil*Natomw
-  ystatesfl(cid_NH4_1p_aqua_mole_conc)=ystates0l(cid_NH4_1p_aqua_mole_conc)+solflx%TRChem_NH4_soil/chemvar%VLWatMicPNH
-  ystatesfl(fid_TRChem_NH4_soil)=solflx%TRChem_NH4_soil
+  ystatesfl(cid_NH4_1p_aqua_mole_conc)=ystates0l(cid_NH4_1p_aqua_mole_conc)+solflx%TRChem_NH4_soil_mole/chemvar%VLWatMicPNH
+  ystatesfl(fid_TRChem_NH4_soil)=solflx%TRChem_NH4_soil_mole
 
   !ZNH3S=ZNH3S+TRChem_NH3_soil_vr*Natomw
-  ystatesfl(cid_NH3_aqua_mole_conc)=ystates0l(cid_NH3_aqua_mole_conc)+solflx%TRChem_NH3_soil_vr/chemvar%VLWatMicPNH
-  ystatesfl(fid_TRChem_NH3_soil_vr)=solflx%TRChem_NH3_soil_vr
+  ystatesfl(cid_NH3_aqua_mole_conc)=ystates0l(cid_NH3_aqua_mole_conc)+solflx%TRChem_NH3_soil_mole/chemvar%VLWatMicPNH
+  ystatesfl(fid_TRChem_NH3_soil_vr)=solflx%TRChem_NH3_soil_mole
 
   !XN4  =XN4+TRChem_NH4_sorbed_soil
   ystatesfl(cid_XNH4_mole_conc)=ystates0l(cid_XNH4_mole_conc)+solflx%TRChem_NH4_sorbed_soil/chemvar%VLWatMicPNH

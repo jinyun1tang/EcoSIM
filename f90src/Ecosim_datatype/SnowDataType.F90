@@ -9,23 +9,23 @@ module SnowDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target, allocatable ::  VLSnowHeatCapM_snvr(:,:,:,:)            !volumetric heat capacity of snowpack
-  real(r8),target, allocatable ::  WatFlowInSnowM_snvr(:,:,:,:)            !snowpack water flux
+  real(r8),target, allocatable ::  VLSnowHeatCapM_snvr(:,:,:,:)            !volumetric heat capacity of snowpack [MJ/K d-2]
+  real(r8),target, allocatable ::  WatFlowInSnowM_snvr(:,:,:,:)            !snowpack water flux [m3 d-2 h-1]
   real(r8),target, allocatable ::  DrySnoFlxBySnoRedistM_2DH(:,:,:,:)      !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  SoilAlbedo_col(:,:)                     !snowpack albedo
   real(r8),target, allocatable ::  NewSnowDens_col(:,:)                    !new snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  TCSnow_snvr(:,:,:)                      !snow temperature, [oC]
   real(r8),target, allocatable ::  TKSnow_snvr(:,:,:)                      !snow temperature, [K]
   real(r8),target, allocatable ::  VLHeatCapSnow_snvr(:,:,:)               !snowpack heat capacity, [MJ m-3 K-1]
-  real(r8),target, allocatable ::  VLDrySnoWE_snvr(:,:,:)                  !water equivalent dry snow in snowpack layer
-  real(r8),target, allocatable ::  VLWatSnow_snvr(:,:,:)                   !snow water volume in snowpack layer
-  real(r8),target, allocatable ::  VLIceSnow_snvr(:,:,:)                   !snow ice volume in snowpack layer
-  real(r8),target, allocatable ::  VLSnoDWIprev_snvr(:,:,:)                !snow volume in snowpack layer
+  real(r8),target, allocatable ::  VLDrySnoWE_snvr(:,:,:)                  !water equivalent dry snow in snowpack layer [m3 d-2]
+  real(r8),target, allocatable ::  VLWatSnow_snvr(:,:,:)                   !snow water volume in snowpack layer [m3 d-2]
+  real(r8),target, allocatable ::  VLIceSnow_snvr(:,:,:)                   !snow ice volume in snowpack layer [m3 d-2]
+  real(r8),target, allocatable ::  VLSnoDWIprev_snvr(:,:,:)                !snow volume in snowpack layer [m3 d-2]
   real(r8),target, allocatable ::  SnoDens_snvr(:,:,:)                     !snowpack density, [Mg m-3]
-  real(r8),target, allocatable ::  SnowThickL_snvr(:,:,:)                  !snowpack layer thickness
-  real(r8),target, allocatable ::  WatXfer2SnoLay_snvr(:,:,:)              !hourly snow water transfer
-  real(r8),target, allocatable ::  SnoXfer2SnoLay_snvr(:,:,:)              !hourly snow transfer
-  real(r8),target, allocatable ::  IceXfer2SnoLay_snvr(:,:,:)              !hourly snow ice transfer
+  real(r8),target, allocatable ::  SnowThickL_snvr(:,:,:)                  !snowpack layer thickness [m]
+  real(r8),target, allocatable ::  WatXfer2SnoLay_snvr(:,:,:)              !hourly snow water transfer [m3 d-2 h-1]
+  real(r8),target, allocatable ::  SnoXfer2SnoLay_snvr(:,:,:)              !hourly snow transfer to each layer       [m d-2 h-1]
+  real(r8),target, allocatable ::  IceXfer2SnoLay_snvr(:,:,:)              !hourly snow ice transfer to each layer   [m d-2 h-1]
   real(r8),target, allocatable ::  HeatXfer2SnoLay_snvr(:,:,:)             !hourly convective heat flux from water transfer
   integer ,target, allocatable ::  nsnol_col(:,:)                          !number of snow layers in column
   real(r8),target, allocatable ::  cumSnowDepz_col(:,:,:)                  !cumulative depth to bottom of snowpack layer
@@ -51,7 +51,7 @@ module SnowDataType
   real(r8),target, allocatable ::  THeatSnowThaw_col(:,:)                  !total heat associated with phase change in snow [MJ/d2/h]
   real(r8),target, allocatable ::  trcg_solsml_snvr(:,:,:,:)               ! Disolved volatile tracers in snow [g d-2]
   real(r8),target, allocatable ::  trcn_solsml_snvr(:,:,:,:)               ! Dissolved nutrient tracers in snow [g d-2]
-  real(r8),target, allocatable ::  trc_Saltml_snvr(:,:,:,:)                ! snowpack salt dissolved tracers
+  real(r8),target, allocatable ::  trcSalt_ml_snvr(:,:,:,:)                ! snowpack salt dissolved tracers
   real(r8),target, allocatable ::  SnowEngyBeg_col(:,:)
   real(r8),target, allocatable ::  SnowEngyEnd_col(:,:)
   real(r8),target, allocatable ::  SnowMassBeg_col(:,:)                    !snow mass H2O eqv [m3 H2O d-2]
@@ -60,13 +60,40 @@ module SnowDataType
   real(r8),target, allocatable ::  Prec2Snow_col(:,:)                      !precipiation to snow [m3 H2O d-2 h-1]
   real(r8),target, allocatable ::  PrecHeat2Snow_col(:,:)                  !precipitation heat to snow [MJ d-2 h-1]
   real(r8),target, allocatable ::  QSnowH2Oloss_col(:,:)                   !snow water eqv loss to other storage [m3 H2O d-2 h-1]
-  real(r8),target, allocatable :: QSnowHeatLoss_col(:,:)
+  real(r8),target, allocatable ::  QSnowHeatLoss_col(:,:)
+  real(r8),target, allocatable ::  trcg_AquaADV_Snow2Litr_flx(:,:,:)       !aqeuous volatile tracer from snow to litter [g d-2 h-1]
+  real(r8),target, allocatable ::  trcn_AquaADV_Snow2Litr_flx(:,:,:)       !aqeuous nutrient tracer from snow to litter [g d-2 h-1]
+  real(r8),target, allocatable ::  trcg_AquaADV_Snow2Soil_flx(:,:,:)       !aqueous volatile tracer from snow to soil [g d-2 h-1]
+  real(r8),target, allocatable ::  trcn_AquaADV_Snow2Soil_flx(:,:,:)       !aqueous nutrient tracer from snow to soil [g d-2 h-1]
+  real(r8),target, allocatable ::  trcn_AquaADV_Snow2Band_flx(:,:,:)       !aqueous nutrient tracer from snow to band soil [g d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_AquaADV_Snow2Soil_flx(:,:,:)    !salt flux from snow to soil [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_AquaADV_Snow2Litr_flx(:,:,:)    !salt flux from snow to litter [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcg_snowMass_beg_col(:,:,:)            !total mass of valatile tracer in snow at previous time step [g d-2]
+  real(r8),target, allocatable ::  trcg_snowMass_col(:,:,:)                !total mass of valatile tracer in snow [g d-2]
+  real(r8),target, allocatable ::  trcg_snowMassloss_col(:,:,:)            !total volatile mass of tracer loss from snow [g d-2 h-1]
+  real(r8),target, allocatable ::  trcn_snowMassloss_col(:,:,:)            !total nutrient mass of tracer loss from snow [g d-2 h-1]
+  real(r8),target, allocatable ::  trcSalt_snowMassloss_col(:,:,:)         !total salt mass of tracer loss from snow [g d-2 h-1]
+  real(r8),target,allocatable ::   trcg_AquaAdv_flx_snvr(:,:,:,:)        !aqueous volatile tracer flux in snow [g/d2/h]
+  real(r8),target,allocatable ::   trcn_AquaAdv_flx_snvr(:,:,:,:)        !aqueous nutrient tracer flux in snow [g/d2/h]
+  real(r8),target,allocatable ::   trcSalt_AquaAdv_flx_snvr(:,:,:,:)     !aqueous salt tracer flux through snow [g/d2/h]  
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSnowData
 
   implicit none
+  allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
+  allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
+  allocate(trcg_snowMassloss_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMassloss_col=0._r8
+  allocate(trcn_snowMassloss_col(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_snowMassloss_col=0._r8
+
+  allocate(trcg_AquaADV_Snow2Litr_flx(idg_beg:idg_NH3,JY,JX)) ;trcg_AquaADV_Snow2Litr_flx=0._r8 
+  allocate(trcn_AquaADV_Snow2Litr_flx(ids_nut_beg:ids_nuts_end,JY,JX));trcn_AquaADV_Snow2Litr_flx=0._r8
+  allocate(trcn_AquaADV_Snow2Soil_flx(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_AquaADV_Snow2Soil_flx=0._r8
+  allocate(trcn_AquaADV_Snow2Band_flx(ids_nutb_beg:ids_nutb_end,JY,JX)); trcn_AquaADV_Snow2Band_flx=0._r8
+  allocate(trcg_AquaADV_Snow2Soil_flx(idg_beg:idg_end,JY,JX)); trcg_AquaADV_Snow2Soil_flx=0._r8
+  allocate(trcg_snowMass_beg_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMass_beg_col=0._r8
+  allocate(trcg_snowMass_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMass_col=0._r8
   allocate(QSnowHeatLoss_col(JY,JX)); QSnowHeatLoss_col=0._r8
   allocate(QSnowH2Oloss_col(JY,JX)); QSnowH2Oloss_col=0._r8
   allocate(PrecHeat2Snow_col(JY,JX)); PrecHeat2Snow_col=0._r8
@@ -114,17 +141,21 @@ contains
   allocate(IceBySnowRedistrib_2DH(2,JV,JH));        IceBySnowRedistrib_2DH=0._r8
   allocate(HeatBySnowRedistrib_2DH(2,JV,JH));       HeatBySnowRedistrib_2DH=0._r8
   allocate(trcg_FloXSnow_2DH(idg_beg:idg_NH3,2,JV,JH));    trcg_FloXSnow_2DH=0._r8
-
   allocate(trcn_FloXSnow_2DH(ids_nut_beg:ids_nuts_end,2,JV,JH));    trcn_FloXSnow_2DH=0._r8
 
 ! exclude NH3B
   allocate(trcg_solsml_snvr(idg_beg:idg_NH3,JS,JY,JX));trcg_solsml_snvr=0._r8
   allocate(trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_solsml_snvr=0._r8
   if(salt_model)then
-    allocate(trc_Saltml_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trc_Saltml_snvr=0._r8
+    allocate(trcSalt_ml_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_ml_snvr=0._r8
+    allocate(trcSalt_AquaADV_Snow2Litr_flx(idsalt_beg:idsalt_end,JY,JX));  trcSalt_AquaADV_Snow2Litr_flx=0._r8
+    allocate(trcSalt_AquaADV_Snow2Soil_flx(idsalt_beg:idsaltb_end,JY,JX)); trcSalt_AquaADV_Snow2Soil_flx=0._r8
+    allocate(trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_FloXSnow_2DH=0._r8
+    allocate(trcSalt_snowMassloss_col(idsalt_beg:idsalt_end,JY,JX)); trcSalt_snowMassloss_col=0._r8
+    allocate(trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,JS,JY,JX)); trcSalt_AquaAdv_flx_snvr=0._r8    
   endif
 
-  allocate(trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,2,JV,JH));     trcSalt_FloXSnow_2DH=0._r8
+
   end subroutine InitSnowData
 
 !----------------------------------------------------------------------
@@ -132,10 +163,24 @@ contains
   use abortutils, only : destroy
   implicit none
   if(salt_model)then
-    call destroy(trc_Saltml_snvr)
+    call destroy(trcSalt_ml_snvr)
     call destroy(trcSalt_FloXSnow_2DH)
+    call destroy(trcSalt_AquaADV_Snow2Litr_flx)
+    call destroy(trcSalt_AquaADV_Snow2Soil_flx)
+    call destroy(trcSalt_snowMassloss_col)
+    call destroy(trcSalt_AquaAdv_flx_snvr)
   endif
 
+  call destroy(trcg_AquaAdv_flx_snvr)
+  call destroy(trcn_AquaAdv_flx_snvr)
+
+  call destroy(trcn_AquaADV_Snow2Soil_flx)
+  call destroy(trcn_AquaADV_Snow2Band_flx)
+  call destroy(trcg_AquaADV_Snow2Soil_flx)
+  call destroy(trcg_snowMassloss_col)
+  call destroy(trcn_snowMassloss_col)
+  call destroy(trcg_AquaADV_Snow2Litr_flx)
+  call destroy(trcn_AquaADV_Snow2Litr_flx)
   call destroy(QSnowHeatLoss_col)
   call destroy(QSnowH2Oloss_col)
   call destroy(PrecHeat2Snow_col)
@@ -186,9 +231,9 @@ contains
   call destroy(trcn_FloXSnow_2DH)
   call destroy(trcn_solsml_snvr)
   call destroy(THeatSnowThaw_col)
-  if(salt_model)then
-    call destroy(trcSalt_FloXSnow_2DH)
-  endif
+  call destroy(trcg_snowMass_col)
+  call destroy(trcg_snowMass_beg_col)
+
   end subroutine DestructSnowData
 
 end module SnowDataType

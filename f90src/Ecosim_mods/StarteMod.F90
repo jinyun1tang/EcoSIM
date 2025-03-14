@@ -91,7 +91,7 @@ module StarteMod
               IF(I.EQ.1)then
                 IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
 !     INITIALIZE RAINFALL, top layer
-                  solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(PHR(NY,NX)-3.0_r8))
+                  solutevar%H_1p_aqua_mole_conc  = 10.0_r8**(-(pH_rain_col(NY,NX)-3.0_r8))
                   solutevar%OH_1e_aqua_mole_conc = DPH2O/solutevar%H_1p_aqua_mole_conc
                   solutevar%CN4Z       = NH4_rain_mole_conc(NY,NX)
                   solutevar%CNOZ       = NO3_rain_mole_conc(NY,NX)
@@ -552,7 +552,7 @@ module StarteMod
 !
         IF(salt_model)THEN
           do nsalts=idsalt_beg,idsalt_end
-            trc_Saltml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_mole_conc_col(nsalts,NY,NX)
+            trcSalt_ml_snvr(nsalts,L,NY,NX)=VOLWW*trcsalt_rain_mole_conc_col(nsalts,NY,NX)
           enddo
         ENDIF
       ELSE
@@ -562,7 +562,7 @@ module StarteMod
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
         IF(salt_model)THEN
-          trc_Saltml_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0._r8
+          trcSalt_ml_snvr(idsalt_beg:idsalt_end,L,NY,NX)=0._r8
         ENDIF
       ENDIF
     ENDDO D9985

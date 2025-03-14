@@ -13,11 +13,8 @@ module SnowPhysData
   real(r8),allocatable ::  trcSalt_AquaAdv_NetFlx_snvr(:,:,:,:)                      !
   real(r8),allocatable ::  TDrysnoBySnowRedist(:,:)                           !
   real(r8),allocatable ::  trcSalt_LossXSnowRedist_col(:,:,:)  
-  real(r8),allocatable ::  trcn_SurfRunoff_flx(:,:,:)                        !
-  real(r8),allocatable ::  trcSalt_SurfRunoff_flx(:,:,:)                         !
   real(r8),allocatable ::  trcg_LossXSnowRedist_col(:,:,:)
   real(r8),allocatable ::  trcn_LossXSnowRedist_col(:,:,:)
-  real(r8),allocatable ::  trcg_SurfRunoff_flx(:,:,:)                        !
   real(r8),allocatable ::  XSnowThawMassL_snvr(:,:,:)              !hourly convective heat flux from snow transfer
   real(r8),allocatable ::  XIceThawMassL_snvr(:,:,:)                      !hourly convective heat flux from ice transfer  
   real(r8),allocatable ::  THeatBySnowRedist_col(:,:)                          !
@@ -40,21 +37,21 @@ module SnowPhysData
   real(r8),allocatable ::  XSnowThawMassLM_snvr(:,:,:)
   real(r8),allocatable ::  XIceThawMassLM_snvr(:,:,:)
   real(r8),allocatable ::  tEnGYM_snvr(:,:,:)  
-  real(r8),allocatable ::  CumSno2SnowL_snvr(:,:,:)                       !
-  real(r8),allocatable ::  CumWat2SnowL_snvr(:,:,:)                       !
-  real(r8),allocatable ::  CumIce2SnowL_snvr(:,:,:)                       !
-  real(r8),allocatable ::  CumHeat2SnowL_snvr(:,:,:)                      !
-  real(r8),allocatable ::  XPhaseChangeHeatLM_snvr(:,:,:)                       !
-  real(r8),allocatable ::  WatX2SnoLay_snvr(:,:,:)                       !
-  real(r8),allocatable ::  SnoX2SnoLay_snvr(:,:,:)                       !
-  real(r8),allocatable ::  IceX2SnoLay_snvr(:,:,:)                       !
-  real(r8),allocatable ::  HeatX2SnoLay_snvr(:,:,:)                      !
-  real(r8),allocatable ::  VLDrySnoWE0M_snvr(:,:,:)                !dry snow layer volume during iteration
-  real(r8),allocatable ::  VLDrySnoWE0_snvr(:,:,:)                 !dry snow layer volume before update
-  real(r8),allocatable ::  VLIceSnow0_snvr(:,:,:)                  !snow-held ice layer volume before update
-  real(r8),allocatable ::  VLWatSnow0_snvr(:,:,:)                       !snow-held water layer volume before update
-  real(r8),allocatable ::  VLSnoDWI1_snvr(:,:,:)                   !
-  real(r8),allocatable ::  SnowThickL0_snvr(:,:,:)                      !
+  real(r8),allocatable ::  CumSno2SnowL_snvr(:,:,:)                !
+  real(r8),allocatable ::  CumWat2SnowL_snvr(:,:,:)                !
+  real(r8),allocatable ::  CumIce2SnowL_snvr(:,:,:)                !
+  real(r8),allocatable ::  CumHeat2SnowL_snvr(:,:,:)               !cumulative heat into snow layer [MJ d-2]
+  real(r8),allocatable ::  XPhaseChangeHeatLM_snvr(:,:,:)          !heat released due to ice/liquid phase change [MJ d-2]
+  real(r8),allocatable ::  WatX2SnoLay_snvr(:,:,:)                 !liquid water flux into snow layer [m3 d-2]
+  real(r8),allocatable ::  SnoX2SnoLay_snvr(:,:,:)                 !dry snow flux into snow layer [m3 d-2]
+  real(r8),allocatable ::  IceX2SnoLay_snvr(:,:,:)                 !ice flux into snow layer  [m3 d-2]
+  real(r8),allocatable ::  HeatX2SnoLay_snvr(:,:,:)                !heat flux into snow layer [MJ d-2]
+  real(r8),allocatable ::  VLDrySnoWE0M_snvr(:,:,:)                !dry snow layer volume during iteration [m3 d-2]
+  real(r8),allocatable ::  VLDrySnoWE0_snvr(:,:,:)                 !dry snow layer volume before update [m3 d-2]
+  real(r8),allocatable ::  VLIceSnow0_snvr(:,:,:)                  !snow-held ice layer volume before update [m3 d-2]
+  real(r8),allocatable ::  VLWatSnow0_snvr(:,:,:)                  !snow-held water layer volume before update [m3 d-2]
+  real(r8),allocatable ::  VLSnoDWI1_snvr(:,:,:)                   !total snow volume during iteration [m3 d-2] 
+  real(r8),allocatable ::  SnowThickL0_snvr(:,:,:)                 !snow thickness of each layer [m]
   public :: InitSnowPhysData
   public :: DestructSnowPhysData
   contains
@@ -66,11 +63,9 @@ module SnowPhysData
   allocate(trcn_AquaAdv_NetFlx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_NetFlx_snvr=0._r8
   allocate(trcSalt_AquaAdv_NetFlx_snvr(idsalt_beg:idsalt_end,JS,JY,JX));       trcSalt_AquaAdv_NetFlx_snvr=0._r8  
   allocate(trcSalt_LossXSnowRedist_col(idsalt_beg:idsalt_end,JY,JX));           trcSalt_LossXSnowRedist_col=0._r8  
-  allocate(trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flx=0._r8  
-  allocate(trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,JY,JX));           trcSalt_SurfRunoff_flx=0._r8  
+
   allocate(trcg_LossXSnowRedist_col(idg_beg:idg_NH3,JY,JX));            trcg_LossXSnowRedist_col=0._r8
   allocate(trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,JY,JX));trcn_LossXSnowRedist_col=0._r8
-  allocate(trcg_SurfRunoff_flx(idg_beg:idg_NH3,JY,JX));      trcg_SurfRunoff_flx=0._r8
 
   allocate(TIceBySnowRedist(JY,JX));         TIceBySnowRedist=0._r8
   allocate(TWatBySnowRedist(JY,JX));         TWatBySnowRedist=0._r8
@@ -120,12 +115,10 @@ module SnowPhysData
   call destroy(trcg_AquaAdv_NetFlx_snvr)
   call destroy(trcn_AquaAdv_NetFlx_snvr)
   call destroy(trcSalt_AquaAdv_NetFlx_snvr)
-  call destroy(trcn_SurfRunoff_flx)  
-  call destroy(trcSalt_SurfRunoff_flx)
   call destroy(tEnGYM_snvr)
   call destroy(trcg_LossXSnowRedist_col)
   call destroy(trcn_LossXSnowRedist_col)  
-  call destroy(trcg_SurfRunoff_flx)
+
   call destroy(TWatBySnowRedist)  
   call destroy(cumWatFlx2LitRByRunoff_col)
   call destroy(cumDrySnoFlxByRedistribut)

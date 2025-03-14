@@ -4,6 +4,7 @@ module UptakesMod
   use StomatesMod   , only : StomatalDynamics
   use EcoSIMCtrlMod , only : etimer, lverb  
   use UnitMod       , only : units  
+  use PlantBalMod   , only : SumPlantRootGas
   use GrosubPars
   use minimathmod
   use DebugToolMod
@@ -199,6 +200,7 @@ module UptakesMod
 
     ENDIF
   ENDDO
+
   call PrintInfo('end '//subname)
   RETURN
   end associate
@@ -221,7 +223,8 @@ module UptakesMod
   associate(                                                         &
     ZERO                       => plt_site%ZERO,                     &
     NP                         => plt_site%NP,                       &
-    MaxNumRootLays             => plt_site%MaxNumRootLays,           &
+    NK                         => plt_site%NK,                       &
+    MaxNumRootLays             => plt_site%MaxNumRootLays          , &
     VLWatMicPM_vr              => plt_site%VLWatMicPM_vr,            &
     ALT                        => plt_site%ALT,                      &
     NU                         => plt_site%NU,                       &
@@ -249,6 +252,8 @@ module UptakesMod
 
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
+    call ZeroNutrientUptake(NZ)
+
 !     TKC_pft(NZ)=TairK+DeltaTKC_pft(NZ)
 !     TdegCCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
     ARLSC   = ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
@@ -270,10 +275,10 @@ module UptakesMod
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
-        plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                   = 0.0_r8
+        plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                     = 0.0_r8
         plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                          = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
-        plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,N,L,NZ)        = 0.0_r8
+        plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8
         plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)    = 0.0_r8
         plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,N,L,NZ) = 0.0_r8
       enddo
@@ -281,8 +286,9 @@ module UptakesMod
   ENDDO D9984
 !
 ! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics 
-  D9000: DO L=NU,MaxNumRootLays
+  D9000: DO L=NU,NK
     !remove elevation dependence
+    plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L) =0._r8    
     TotalSoilPSIMPa_vr(L)=ElvAdjstedSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
     IF(SoilBulkDensity_vr(L).GT.ZERO)THEN
       WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)-SoilWatAirDry_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake
@@ -483,14 +489,14 @@ module UptakesMod
             FracPrimRootOccupiedLay_pvr(L,NZ)=0.0_r8
           ENDIF
         ENDIF
-
       ENDIF
+
       IF(AllRootC_vr(L).GT.ZEROS)THEN
         FracPRoot4Uptake_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)/AllRootC_vr(L)
       ELSE
         FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
       ENDIF
-      MinFracPRoot4Uptake_pvr(N,L,NZ)=AMIN1(FMN,AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ)))
+      MinFracPRoot4Uptake_pvr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ))
 
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracPrimRootOccupiedLay_pvr(L,NZ).GT.ZERO)THEN
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
@@ -563,13 +569,13 @@ module UptakesMod
 
     IF(DIFF.GT.0.5_r8)THEN
       plt_rad%RadNet2Canopy_pft(NZ) = 0.0_r8
-      plt_ew%EvapTransLHeat_pft(NZ)  = 0.0_r8
+      plt_ew%EvapTransLHeat_pft(NZ) = 0.0_r8
       plt_ew%HeatXAir2PCan_pft(NZ)  = 0.0_r8
       plt_ew%HeatStorCanopy_pft(NZ) = 0.0_r8
       plt_ew%VapXAir2Canopy_pft(NZ) = 0.0_r8
       plt_ew%Transpiration_pft(NZ)  = 0.0_r8
       TKC_pft(NZ)                   = TairK+DeltaTKC_pft(NZ)
-      TdegCCanopy_pft(NZ)        = units%Kelvin2Celcius(TKC_pft(NZ))
+      TdegCCanopy_pft(NZ)           = units%Kelvin2Celcius(TKC_pft(NZ))
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
@@ -1362,13 +1368,14 @@ module UptakesMod
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                                              &
-    TdegCCanopy_pft  => plt_ew%TdegCCanopy_pft,     &
+    TdegCCanopy_pft     => plt_ew%TdegCCanopy_pft,        &
     TairK               => plt_ew%TairK,                  &
     TKC_pft             => plt_ew%TKC_pft,                &
     TKS_vr              => plt_ew%TKS_vr,                 &
     PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &
+    MaxNumRootLays      => plt_site%MaxNumRootLays ,      &
     ChillHours_pft      => plt_photo%ChillHours_pft,      &
     TempOffset_pft      => plt_pheno%TempOffset_pft,      &
     TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft,    &
@@ -1410,7 +1417,7 @@ module UptakesMod
   TKGO                  = TKGroth_pft(NZ)+TempOffset_pft(NZ)
   fTCanopyGroth_pft(NZ) = calc_canopy_grow_tempf(TKGO)
 
-  D100: DO L=NU,MaxSoiL4Root_pft(NZ)
+  D100: DO L=NU,MaxNumRootLays
     TKSO                 = TKS_vr(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ) = calc_root_grow_tempf(TKSO)
   ENDDO D100

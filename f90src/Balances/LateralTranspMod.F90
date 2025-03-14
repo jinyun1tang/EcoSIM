@@ -9,7 +9,7 @@ module LateralTranspMod
   use ClimForcDataType, only: PBOT_col
   use DebugToolMod
   use GridDataType
-  use TFlxTypeMod
+  use RedistDataMod
   use TracerIDMod
   use SoilBGCDataType
   use SoilWaterDataType
@@ -38,8 +38,9 @@ implicit none
 
   subroutine XGridTranspt(I,J,NY,NX,LG)
   !
+  ! Description:
   ! Energy and material transport across grids
-
+  !
   implicit none
   integer, intent(in) :: I,J,NY,NX
   integer, intent(out) :: LG       !lbubble deposition layer
@@ -52,7 +53,7 @@ implicit none
   integer :: idg
   real(r8) :: VTATM,VTGAS
   real(r8) :: trcg_VOLG(idg_beg:idg_end)   !mole of gas in layer [mol gas d-2]
-  real(r8) :: dPond
+  real(r8) :: dPond                        !hydrostatic pressure due to ponding water
 
 ! begin_execution
   call PrintInfo('beg '//subname)
@@ -73,6 +74,7 @@ implicit none
     ENDDO
 
     if(iPondFlag_col(NY,NX))then 
+      !grid is a pond
       if(SoilBulkDensity_vr(L,NY,NX).LE.ZERO)then
         !still in the ponding water, \rho*g*h,  1.e3*10
         dPond=(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*10._r8
@@ -92,14 +94,14 @@ implicit none
 
     !air-concentration insignificant, or total gas volume > allwed air
     !LX==1, then too less air, or gas pressure > atmosphere
-    !THETX minimum air-filled porosity
+    !AirFillPore_Min minimum air-filled porosity
 
     !current layer has too small air volume (aka saturated), or gas pressure is greater than atmospheric pressure
-    IF(ThetaAir_vr(L,NY,NX).LT.THETX .OR. VTGAS.GT.VTATM)doBubble=.true.
+    IF(ThetaAir_vr(L,NY,NX).LT.AirFillPore_Min .OR. VTGAS.GT.VTATM)doBubble=.true.
 
     !current layer has enough air, and there is not bubbling layer above, so set current layer
     !as the bubble depsoition layer 
-    IF(ThetaAir_vr(L,NY,NX).GE.THETX .AND. (.not. doBubble))LG=L
+    IF(ThetaAir_vr(L,NY,NX).GE.AirFillPore_Min .AND. (.not. doBubble))LG=L
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
@@ -113,7 +115,7 @@ implicit none
       IF(N.EQ.iEastWestDirection)THEN 
         N4  = NX+1   !east
         N5  = NY
-        N4B = NX-1  !west
+        N4B = NX-1   !west
         N5B = NY
         N6  = L
       !Exchange in the y direction, north-south 
@@ -121,7 +123,7 @@ implicit none
         N4  = NX
         N5  = NY+1    !south
         N4B = NX
-        N5B = NY-1   !north
+        N5B = NY-1    !north
         N6  = L
       !Vertical  
       ELSEIF(N.EQ.iVerticalDirection)THEN       
@@ -130,25 +132,27 @@ implicit none
         N6 = L+1
       ENDIF
 !
-!
+      !top soil layer/land surface
       IF(L.EQ.NUM(N2,N1))THEN
         !top layer runoff
         IF(N.NE.iVerticalDirection)THEN
           !horizontal exchange
-          call OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
+          call XGridDOMRunoff(N,N1,N2,N4,N5,N4B,N5B)
 
-          call MassFluxThruSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
+          call XGridTracerRunoff(N,N1,N2,N4,N5,N4B,N5B)
+
+          call XGridSnowTracerRunoff(N,N1,N2,N4,N5,N4B,N5B)
           !
         ELSEIF(N.EQ.iVerticalDirection)THEN
           !vertical direction
-          call SaltPercolThruSnow(I,J,N1,N2,NY,NX)
+          call SaltPercolThruSnow(I,J,N1,N2)
         ENDIF
 !
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT
-        call TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
+        call SumSedmentTranspFlux(N,N1,N2,N4,N5,N4B,N5B)
       ENDIF
 !
-      call FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
+      call FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6)
     ENDDO D8580
 !
 !     NET FREEZE-THAW
@@ -179,8 +183,12 @@ implicit none
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
   D9960: DO K=1,micpar%NumOfLitrCmplxs
-    TOMQRS_col(idom_beg:idom_end,K,NY,NX)=0.0_r8
+    DOM_SurfRunoff_flx(idom_beg:idom_end,K,NY,NX)=0.0_r8
   ENDDO D9960
+
+  trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,NY,NX)     = 0.0_r8
+  trcg_SurfRunoff_flx(idg_beg:idg_NH3,NY,NX)              = 0.0_r8
+  if(salt_model) trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
   end subroutine ZeroRunoffArray
 
 !------------------------------------------------------------------------------------------
@@ -243,8 +251,80 @@ implicit none
   end subroutine ZeroFluxAccumulators
 
 !------------------------------------------------------------------------------------------
+  subroutine XGridTracerRunoff(N,N1,N2,N4,N5,N4B,N5B)
 
-  subroutine OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
+  implicit none
+  integer, intent(in) :: N        !direction indicator, N=3: vertical, otherwise:horizontal
+  integer, intent(in) :: N1,N2    !current grid
+  integer, intent(in) :: N4,N5    !front
+  integer, intent(in) :: N4B,N5B  !back
+
+  character(len=*), parameter :: subname='XGridTracerRunoff'
+  integer :: NN,idg,idn,idsalt
+  
+  call PrintInfo('beg '//subname)
+  !NN=1:iOutflow, 2:iInflow
+  D1202: DO NN=1,2
+    !gaseous tracers
+    DO idg=idg_beg,idg_NH3
+      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_FloXSurRunoff_2D(idg,N,NN,N2,N1)      
+    ENDDO
+
+    !nutrient tracres
+    DO idn=ids_nut_beg,ids_nuts_end
+      trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)+trcn_FloXSurRunoff_2D(idn,N,NN,N2,N1)
+    ENDDO
+
+    IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
+
+      DO idg=idg_beg,idg_NH3
+        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5,N4)
+      ENDDO
+      DO idn=ids_nut_beg,ids_nuts_end
+        trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5,N4)
+      ENDDO
+
+    ENDIF 
+
+    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
+      DO idg=idg_beg,idg_NH3
+        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5B,N4B)
+      ENDDO
+      DO idn=ids_nut_beg,ids_nuts_end
+        trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5B,N4B)
+      ENDDO
+    ENDIF
+  ENDDO D1202
+
+  if(salt_model)then
+    D1203: DO NN=1,2
+      DO idsalt=idsalt_beg,idsalt_end
+        trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)+trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N2,N1)
+      ENDDO
+
+      IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
+! runoff direction
+        DO idsalt=idsalt_beg,idsalt_end
+          trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)-trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N5,N4)
+        ENDDO
+      ENDIF
+
+      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
+        DO idsalt=idsalt_beg,idsalt_end
+          trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)-trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N5B,N4B)
+        ENDDO
+      ENDIF
+    ENDDO D1203
+  endif
+  call PrintInfo('end '//subname)
+  end subroutine XGridTracerRunoff
+!------------------------------------------------------------------------------------------
+
+  subroutine XGridDOMRunoff(N,N1,N2,N4,N5,N4B,N5B)
+  !
+  !Description
+  !Inner grid runoff
+  !
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
 
@@ -252,17 +332,13 @@ implicit none
   !     begin_execution
   !     NET WATER, SNOW AND HEAT FLUXES FROM RUNOFF
   !
-  !     TXGridSurfRunoff_2DH,TQS,TQW,TQI=net water and snowpack snow,water,ice runoff
-  !     THeatXGridBySurfRunoff_2DH,THQS=net convective heat from surface water and snow runoff
-  !     QR,HQR=runoff, convective heat from runoff from watsub.f
-  !     QS,QW,QI=snow,water,ice transfer from watsub.f
-  !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
-  !
+  !NN=1:iOutflow, 2:iInflow
   D1202: DO NN=1,2
+        
     !water flux
     D8590: DO K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
-        TOMQRS_col(idom,K,N2,N1)=TOMQRS_col(idom,K,N2,N1)+DOM_FloXSurRunoff_2D(idom,K,N,NN,N2,N1)
+        DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)+DOM_FloXSurRunoff_2D(idom,K,N,NN,N2,N1)
       ENDDO
     ENDDO D8590
 
@@ -271,42 +347,42 @@ implicit none
       !water flux
       D8591: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
-          TOMQRS_col(idom,K,N2,N1)=TOMQRS_col(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
+          DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D8591
 
     ENDIF
 
     IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
-      IF(IFLBH(N,NN,N5B,N4B).EQ.1)then
-
-        D8592: DO K=1,micpar%NumOfLitrCmplxs
-          DO idom=idom_beg,idom_end
-            TOMQRS_col(idom,K,N2,N1)=TOMQRS_col(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5B,N4B)
-          enddo
-        ENDDO D8592
-      ENDIF
-
+      D8592: DO K=1,micpar%NumOfLitrCmplxs
+        DO idom=idom_beg,idom_end
+          DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5B,N4B)
+        enddo
+      ENDDO D8592
     ENDIF
   ENDDO D1202
 
-  end subroutine OMH2OFluxesFromRunoff
+  end subroutine XGridDOMRunoff
 !------------------------------------------------------------------------------------------
 
-  subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4,N5,N4B,N5B,NY,NX)
-    implicit none
-    integer, intent(in) :: N   !direction of calculation
-    integer, intent(in) :: N1,N2,N4,N5,N4B,N5B,NY,NX
+  subroutine SumSedmentTranspFlux(N,N1,N2,N4,N5,N4B,N5B)
+  implicit none
+  integer, intent(in) :: N       !direction of calculation, west-east, or north-south
+  integer, intent(in) :: N1,N2   !current grid
+  integer, intent(in) :: N4,N5   !front grid (->east or ->south)
+  integer, intent(in) :: N4B,N5B !back grid  (<-west or <-north)
 
-    integer :: M,K,NO,NN,NGL,NTX,NTP,MID,NE,idom
+  integer :: M,K,NO,NN,NGL,idx,NTP,MID,NE,idom
 !     begin_execution
 !
 !
   IF(N.NE.iVerticalDirection .AND. (iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros))THEN
     !horizontal direction
+    !
     D9350: DO NN=1,2
-      IF(ABS(cumSed_Eros_2D(N,NN,N2,N1)).GT.ZEROS(N2,N1) &
-        .OR.ABS(cumSed_Eros_2D(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN
+      IF(ABS(cumSed_Eros_2D(N,NN,N2,N1)).GT.ZEROS(N2,N1) &             !grid (N2,N1) has erosion removal
+        .OR. ABS(cumSed_Eros_2D(N,NN,N5,N4)).GT.ZEROS(N5,N4))THEN      !grid (N5,N4) has erosion removal
+
         !incoming from south or east grid 
         tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)+cumSed_Eros_2D(N,NN,N2,N1)
         TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)+XSand_Eros_2D(N,NN,N2,N1)
@@ -321,8 +397,8 @@ implicit none
         TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)+XUreaBand_Eros_2D(N,NN,N2,N1)
         TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)+XNO3Band_Eros_2D(N,NN,N2,N1)
 
-        DO NTX=idx_beg,idx_end
-          trcx_TER_col(NTX,N2,N1)=trcx_TER_col(NTX,N2,N1)+trcx_Eros_2D(NTX,N,NN,N2,N1)
+        DO idx=idx_beg,idx_end
+          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)+trcx_Eros_2D(idx,N,NN,N2,N1)
         ENDDO
 
         DO NTP=idsp_beg,idsp_end
@@ -353,7 +429,6 @@ implicit none
           enddo
         enddo
 
-
         D9375: DO K=1,jcplx
           D9370: DO M=1,ndbiomcp
             DO NE=1,NumPlantChemElms
@@ -371,23 +446,22 @@ implicit none
           ENDDO D9365
         ENDDO D9375
 
-!     IF(NN.EQ.2)THEN
 !       outgoing
-        tErosionSedmLoss_col(N2,N1)=tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5,N4)
-        TSandEros_col(N2,N1)             = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
-        TSiltEros_col(N2,N1)      = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
-        TCLAYEros_col(N2,N1)      = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
-        TNH4Eros_col(N2,N1)       = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5,N4)
-        TNH3Eros_col(N2,N1)       = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5,N4)
-        TNUreaEros_col(N2,N1)     = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5,N4)
-        TNO3Eros_col(N2,N1)       = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5,N4)
-        TNH4ErosBand_col(N2,N1)   = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5,N4)
-        TNH3ErosBand_col(N2,N1)   = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5,N4)
-        TNUreaErosBand_col(N2,N1) = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5,N4)
-        TNO3ErosBand_col(N2,N1)   = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5,N4)
+        tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5,N4)
+        TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
+        TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
+        TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
+        TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5,N4)
+        TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5,N4)
+        TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5,N4)
+        TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5,N4)
+        TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5,N4)
+        TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5,N4)
+        TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5,N4)
+        TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5,N4)
 
-        DO NTX=idx_beg,idx_end
-          trcx_TER_col(NTX,N2,N1)=trcx_TER_col(NTX,N2,N1)-trcx_Eros_2D(NTX,N,NN,N5,N4)
+        DO idx=idx_beg,idx_end
+          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5,N4)
         ENDDO
 
         DO NTP=idsp_beg,idsp_end
@@ -406,7 +480,6 @@ implicit none
             enddo
           enddo
         ENDDO
-
 
         DO  NO=1,NumMicbFunGrupsPerCmplx
           DO  M=1,nlbiomcp
@@ -435,14 +508,14 @@ implicit none
             ENDDO
           ENDDO D7365
         ENDDO D7375
-!     ENDIF
       ENDIF
-      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
+
+      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
         IF(ABS(cumSed_Eros_2D(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
           tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5B,N4B)
-          TSandEros_col(N2,N1)               = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)
-          TSiltEros_col(N2,N1)               = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5B,N4B)
-          TCLAYEros_col(N2,N1)               = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5B,N4B)
+          TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)
+          TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5B,N4B)
+          TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5B,N4B)
           TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5B,N4B)
           TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5B,N4B)
           TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5B,N4B)
@@ -452,8 +525,8 @@ implicit none
           TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5B,N4B)
           TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5B,N4B)
 
-          DO NTX=idx_beg,idx_end
-            trcx_TER_col(NTX,N2,N1)=trcx_TER_col(NTX,N2,N1)-trcx_Eros_2D(NTX,N,NN,N5B,N4B)
+          DO idx=idx_beg,idx_end
+            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5B,N4B)
           ENDDO
 
           DO NTP=idsp_beg,idsp_end
@@ -504,21 +577,20 @@ implicit none
       ENDIF
     ENDDO D9350
   ENDIF
-  end subroutine TotalFluxFromSedmentTransp
+  end subroutine SumSedmentTranspFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6,NY,NX)
+  subroutine FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6)
   !
   !Description
-  !Flow across grids
+  !Flow across grids, can be in any of the three directions
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
-  integer, intent(in) :: NY,NX      !geophysical location
-  integer, intent(in) :: N1,N2,N3   !source grid indices
+  integer, intent(in) :: N1,N2,N3   !source soil grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
-  integer, intent(inout) :: N6
-  integer :: LL,K,NTSA,NTS,idg,idom
+  integer, intent(inout) :: N6      !vertical layer 
+  integer :: LL,K,idsalt,ids,idg,idom
 
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
@@ -542,8 +614,8 @@ implicit none
     ENDDO D1200
 
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      IF(N3.EQ.NU(N2,N1) .AND. N.EQ.iVerticalDirection)THEN      
-        !vertical direction, source is at soil surface
+      !vertical direction transport, source is at soil surface
+      IF(N3.EQ.NU(N2,N1) .AND. N.EQ.iVerticalDirection)THEN              
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP_col(N5,N4)
         TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX_3D(N,N3,N2,N1)-LakeSurfFlowMicPX_col(N5,N4)
         TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)
@@ -555,6 +627,7 @@ implicit none
           write(*,*)'Ns=',N1,n2,n3,n4,n5
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
+        !not vertical direction or source grid is not at surface
       ELSE
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
         TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX_3D(N,N3,N2,N1)-WaterFlowSoiMicPX_3D(N,N6,N5,N4)
@@ -568,22 +641,8 @@ implicit none
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDIF
-      !     IF(N1.EQ.1.AND.N3.EQ.1)THEN
-      !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
-      !    2,TWatFlowCellMicP_vr(N3,N2,N1),WaterFlowSoiMicP_3D(N,N3,N2,N1),WaterFlowSoiMicP_3D(N,N6,N5,N4),LakeSurfFlowMicP_col(N5,N4)
-      !    3,THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
-      !    2,LakeSurfHeatFlux_col(N5,N4),VLWatMicP_vr(N3,N2,N1)
-!6632  FORMAT(A8,10I4,12E16.8)
-      !     ENDIF
       !
       !     NET SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
-      !
-      !     T*FLS,T*FHS=net convective+diffusive solute flux through micropores,macropores
-      !     X*FLS,X*FHS=convective+diffusive solute flux through micropores, macropores from TranspNoSalt.f
-      !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-      !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-      !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-      !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
       D8585: DO K=1,jcplx
         do idom=idom_beg,idom_end
@@ -594,12 +653,28 @@ implicit none
         enddo
       ENDDO D8585
 
-      DO NTS=ids_beg,ids_end
-        trcs_TransptMicP_vr(NTS,N3,N2,N1)=trcs_TransptMicP_vr(NTS,N3,N2,N1) &
-          +trcs_TransptMicP_3D(NTS,N,N3,N2,N1)-trcs_TransptMicP_3D(NTS,N,N6,N5,N4)
-        trcs_TransptMacP_vr(NTS,N3,N2,N1)=trcs_TransptMacP_vr(NTS,N3,N2,N1) &
-          +trcs_TransptMacP_3D(NTS,N,N3,N2,N1)-trcs_TransptMacP_3D(NTS,N,N6,N5,N4)
+      DO ids=ids_beg,ids_end
+        trcs_TransptMicP_vr(ids,N3,N2,N1)=trcs_TransptMicP_vr(ids,N3,N2,N1) &
+          +trcs_TransptMicP_3D(ids,N,N3,N2,N1)-trcs_TransptMicP_3D(ids,N,N6,N5,N4)
+        trcs_TransptMacP_vr(ids,N3,N2,N1)=trcs_TransptMacP_vr(ids,N3,N2,N1) &
+          +trcs_TransptMacP_3D(ids,N,N3,N2,N1)-trcs_TransptMacP_3D(ids,N,N6,N5,N4)
+
+        if(abs(trcs_TransptMicP_vr(ids,N3,N2,N1))>1.e10)then
+           write(*,*)ids,N3,N2,N1,N
+           write(*,*)trcs_TransptMicP_3D(ids,N,N3,N2,N1),trcs_TransptMicP_3D(ids,N,N6,N5,N4)
+           call endrun(trim(mod_filename)//' at line',__LINE__)
+        endif
       ENDDO
+      
+      !summarize subsurface lateral tracer flow
+      if(N.NE.iVerticalDirection)then
+        DO idg=idg_beg,idg_end
+          GasHydroLossFlx_col(idg,N2,N1)=GasHydroLossFlx_col(idg,N2,N1) + &
+           trcs_TransptMicP_3D(idg,N,N3,N2,N1)-trcs_TransptMicP_3D(idg,N,N6,N5,N4) + &
+           trcs_TransptMacP_3D(idg,N,N3,N2,N1)-trcs_TransptMacP_3D(idg,N,N6,N5,N4) + &
+           Gas_AdvDif_Flx_3D(idg,N,N3,N2,N1)-Gas_AdvDif_Flx_3D(idg,N,N6,N5,N4)
+        enddo
+      endif
 !
       !     NET GAS FLUXES BETWEEN ADJACENT GRID CELLS
       !exclude NH3B
@@ -610,11 +685,11 @@ implicit none
 !
       !     NET SALT FLUXES BETWEEN ADJACENT GRID CELLS
       IF(salt_model)THEN
-        DO NTSA=idsalt_beg,idsaltb_end
-          trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MicP_vr(NTSA,N3,N2,N1) &
-            +trcSalt_TransptMicP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMicP_3D(NTSA,N,N6,N5,N4)
-          trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1)=trcSalt_Flo2MacP_vr(NTSA,N3,N2,N1) &
-            +trcSalt_TransptMacP_3D(NTSA,N,N3,N2,N1)-trcSalt_TransptMacP_3D(NTSA,N,N6,N5,N4)
+        DO idsalt=idsalt_beg,idsaltb_end
+          trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MicP_vr(idsalt,N3,N2,N1) &
+            +trcSalt_TransptMicP_3D(idsalt,N,N3,N2,N1)-trcSalt_TransptMicP_3D(idsalt,N,N6,N5,N4)
+          trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1)=trcSalt_Flo2MacP_vr(idsalt,N3,N2,N1) &
+            +trcSalt_TransptMacP_3D(idsalt,N,N3,N2,N1)-trcSalt_TransptMacP_3D(idsalt,N,N6,N5,N4)
         ENDDO
       ENDIF
     ELSE

@@ -135,7 +135,7 @@ contains
   this%kiname(2)   = 'cellulose'
   this%kiname(3)   = 'lignin'
   this%cplxname(1) = 'woodylitr'
-  this%cplxname(2) = 'nwoodylit'
+  this%cplxname(2) = 'folialitr'
   this%cplxname(3) = 'manure'
   this%cplxname(4) = 'pom'
   this%cplxname(5) = 'humus'
