@@ -314,12 +314,13 @@ contains
   do ids=ids_nut_beg,ids_nuts_end
     trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)=trcn_Precip2LitrM(ids,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(ids,NY,NX)-litR_solute_adv_flxM(ids)-trcs_Dif_flxM(ids)
   enddo
-  trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)-litR_solute_adv_flxM(idg_NH3B)-trcs_Dif_flxM(idg_NH3B)
-  trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)-litR_solute_adv_flxM(ids_NH4B)-trcs_Dif_flxM(ids_NH4B)
-  trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO3B)-trcs_Dif_flxM(ids_NO3B)
-  trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO2B)-trcs_Dif_flxM(ids_NO2B)
-  trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H1PO4B)-trcs_Dif_flxM(ids_H1PO4B)
-  trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H2PO4B)-trcs_Dif_flxM(ids_H2PO4B)
+
+  trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)   = trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)-litR_solute_adv_flxM(idg_NH3B)-trcs_Dif_flxM(idg_NH3B)
+  trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)   = trcs_MicpTranspFlxM_3D(ids_NH4,3,0,NY,NX)-litR_solute_adv_flxM(ids_NH4B)-trcs_Dif_flxM(ids_NH4B)
+  trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)   = trcs_MicpTranspFlxM_3D(ids_NO3,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO3B)-trcs_Dif_flxM(ids_NO3B)
+  trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)   = trcs_MicpTranspFlxM_3D(ids_NO2,3,0,NY,NX)-litR_solute_adv_flxM(ids_NO2B)-trcs_Dif_flxM(ids_NO2B)
+  trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX) = trcs_MicpTranspFlxM_3D(ids_H1PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H1PO4B)-trcs_Dif_flxM(ids_H1PO4B)
+  trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX) = trcs_MicpTranspFlxM_3D(ids_H2PO4,3,0,NY,NX)-litR_solute_adv_flxM(ids_H2PO4B)-trcs_Dif_flxM(ids_H2PO4B)
 
   !top soil
   DO idg=idg_beg,idg_NH3
@@ -782,7 +783,7 @@ contains
 !
     DO idg=idg_beg,idg_NH3
       Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX)=Gas_AdvDif_Flx_3D(idg,3,NU(NY,NX),NY,NX) &
-        +RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)
+        +Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)
     ENDDO
 
     IF(VLWatMicPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -799,7 +800,7 @@ contains
       RGas_Disol_FlxMM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX)=0.0_r8
     ENDIF
   ELSE
-    RGasADFlxMM_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX)    = 0.0_r8
+    Gas_AdvDif_FlxMM_3D(idg_beg:idg_NH3,3,NU(NY,NX),NY,NX)    = 0.0_r8
     RGas_Disol_FlxMM_vr(idg_beg:idg_end,NU(NY,NX),NY,NX) = 0.0_r8
   ENDIF
   call PrintInfo('end '//subname)
@@ -1164,7 +1165,7 @@ contains
 !     TOTAL SOIL GAS FLUX + CONVECTIVE FLUX
 !
   DO idg=idg_beg,idg_NH3
-    RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)=RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)+RGas_Adv_flxMM(idg)
+    Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)+RGas_Adv_flxMM(idg)
   ENDDO
   end subroutine TopSoilGasAdvectionMM
 
@@ -1223,7 +1224,7 @@ contains
 !     DFV*G=diffusive gas flux
 !     RFL*G=convective gas flux
 
-    RGasADFlxMM_3D(idg,3,NU(NY,NX),NY,NX)=DFV_g
+    Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)=DFV_g
   ENDDO
 
   end subroutine TopSoilGasDifussionMM

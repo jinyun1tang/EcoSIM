@@ -123,7 +123,7 @@ implicit none
   real(r8):: dmass
 
   DO L=NU(NY,NX),NL(NY,NX)
-    do idg=idg_beg,idg_NH3-1            
+    do idg=idg_beg,idg_NH3            
       if (trcs_solml_vr(idg,L,NY,NX)>trcs_plant_uptake_vr(idg,L,NY,NX))then
         trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_plant_uptake_vr(idg,L,NY,NX)
       else
@@ -137,8 +137,23 @@ implicit none
           trcg_gasml_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)-dmass
         endif
       endif
-
     enddo
+
+    idg=idg_NH3B
+    if (trcs_solml_vr(idg,L,NY,NX)>trcs_plant_uptake_vr(idg,L,NY,NX))then
+      trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_plant_uptake_vr(idg,L,NY,NX)
+    else
+      dmass=trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_solml_vr(idg,L,NY,NX)
+      trcs_solml_vr(idg,L,NY,NX)=0._r8        
+      !deficit greater than gas concentration
+      if(dmass > trcg_gasml_vr(idg_NH3,L,NY,NX))then
+        dmass=dmass-trcg_gasml_vr(idg_NH3,L,NY,NX)
+        trcg_gasml_vr(idg_NH3,L,NY,NX)=0._r8
+        trcs_plant_uptake_vr(idg,L,NY,NX)=trcs_plant_uptake_vr(idg,L,NY,NX)-dmass
+      else
+        trcg_gasml_vr(idg_NH3,L,NY,NX)=trcg_gasml_vr(idg_NH3,L,NY,NX)-dmass
+      endif
+    endif
   ENDDO
 
   end subroutine ApplyRootUptake2GasTracers

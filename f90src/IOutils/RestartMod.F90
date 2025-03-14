@@ -8125,30 +8125,30 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitro,1:JZ+1)    
-    call restartvar(ncid, flag, varname='FertN_soil_vr', dim1name='column',dim2name='fertN',&
+    call restartvar(ncid, flag, varname='FertN_mole_soil_vr', dim1name='column',dim2name='fertN',&
       dim3name='levsoi1',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_soil_vr,datrc_3d)
   else
-    !print*,'FertN_soil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)  
+    !print*,'FertN_mole_soil_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_soil_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitro,1:JZ+1)    
-    call restartvar(ncid, flag, varname='FertN_soil_vr', dim1name='column',dim2name='fertN', &
+    call restartvar(ncid, flag, varname='FertN_mole_soil_vr', dim1name='column',dim2name='fertN', &
       dim3name='levsoi1',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)      
   endif  
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitrob,1:JZ)    
-    call restartvar(ncid, flag, varname='FertN_Band_vr', dim1name='column',dim2name='fertNb',&
+    call restartvar(ncid, flag, varname='FertN_mole_Band_vr', dim1name='column',dim2name='fertNb',&
       dim3name='levsoi',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_Band_vr,datrc_3d)
   else
-    !print*,'FertN_Band_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)  
+    !print*,'FertN_mole_Band_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_Band_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitrob,1:JZ)    
-    call restartvar(ncid, flag, varname='FertN_Band_vr', dim1name='column',dim2name='fertNb',&
+    call restartvar(ncid, flag, varname='FertN_mole_Band_vr', dim1name='column',dim2name='fertNb',&
       dim3name='levsoi',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)   
   endif  

@@ -940,11 +940,11 @@ implicit none
   TCS_vr(L1,NY,NX)=units%Kelvin2Celcius(TKS_vr(L1,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
-    FertN_soil_vr(NTF,L1,NY,NX)=FertN_soil_vr(NTF,L1,NY,NX)+FX*FertN_soil_vr(NTF,L0,NY,NX)
+    FertN_mole_soil_vr(NTF,L1,NY,NX)=FertN_mole_soil_vr(NTF,L1,NY,NX)+FX*FertN_mole_soil_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTF=ifertnb_beg,ifertnb_end
-    FertN_Band_vr(NTF,L1,NY,NX)=FertN_Band_vr(NTF,L1,NY,NX)+FX*FertN_Band_vr(NTF,L0,NY,NX)
+    FertN_mole_Band_vr(NTF,L1,NY,NX)=FertN_mole_Band_vr(NTF,L1,NY,NX)+FX*FertN_mole_Band_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTU=ids_nuts_beg,ids_nuts_end
@@ -1121,11 +1121,11 @@ implicit none
   TCS_vr(L0,NY,NX)=units%Kelvin2Celcius(TKS_vr(L0,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
-    FertN_soil_vr(NTF,L0,NY,NX)=FY*FertN_soil_vr(NTF,L0,NY,NX)
+    FertN_mole_soil_vr(NTF,L0,NY,NX)=FY*FertN_mole_soil_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTF=ifertnb_beg,ifertnb_end
-    FertN_Band_vr(NTF,L0,NY,NX)=FY*FertN_Band_vr(NTF,L0,NY,NX)
+    FertN_mole_Band_vr(NTF,L0,NY,NX)=FY*FertN_mole_Band_vr(NTF,L0,NY,NX)
   ENDDO
 
   DO NTU=ids_nuts_beg,ids_nuts_end
@@ -1624,16 +1624,16 @@ implicit none
 
 ! begin_execution
   DO NTF=ifertn_beg,ifertn_end
-    FXZN                        = AMIN1(FX*FertN_soil_vr(NTF,L,NY,NX),FertN_soil_vr(NTF,L0,NY,NX))
-    FertN_soil_vr(NTF,L1,NY,NX) = FertN_soil_vr(NTF,L1,NY,NX)+FXZN
-    FertN_soil_vr(NTF,L0,NY,NX) = FertN_soil_vr(NTF,L0,NY,NX)-FXZN
+    FXZN                        = AMIN1(FX*FertN_mole_soil_vr(NTF,L,NY,NX),FertN_mole_soil_vr(NTF,L0,NY,NX))
+    FertN_mole_soil_vr(NTF,L1,NY,NX) = FertN_mole_soil_vr(NTF,L1,NY,NX)+FXZN
+    FertN_mole_soil_vr(NTF,L0,NY,NX) = FertN_mole_soil_vr(NTF,L0,NY,NX)-FXZN
   ENDDO
 
   IF (L0>0) then
     DO NTF=ifertnb_beg,ifertnb_end
-      FXZN                        = AMIN1(FX*FertN_Band_vr(NTF,L,NY,NX),FertN_Band_vr(NTF,L0,NY,NX))
-      FertN_Band_vr(NTF,L1,NY,NX) = FertN_Band_vr(NTF,L1,NY,NX)+FXZN
-      FertN_Band_vr(NTF,L0,NY,NX) = FertN_Band_vr(NTF,L0,NY,NX)-FXZN
+      FXZN                        = AMIN1(FX*FertN_mole_Band_vr(NTF,L,NY,NX),FertN_mole_Band_vr(NTF,L0,NY,NX))
+      FertN_mole_Band_vr(NTF,L1,NY,NX) = FertN_mole_Band_vr(NTF,L1,NY,NX)+FXZN
+      FertN_mole_Band_vr(NTF,L0,NY,NX) = FertN_mole_Band_vr(NTF,L0,NY,NX)-FXZN
     ENDDO
   endif
 !

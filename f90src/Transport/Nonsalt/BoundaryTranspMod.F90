@@ -286,6 +286,10 @@ module BoundaryTranspMod
 
     DO idn=ids_beg,ids_end
       trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4)=VFLW*AZMAX1(trcs_solml2_vr(idn,M3,M2,M1))*trcs_VLN_vr(idn,M3,M2,M1)
+      if(abs(trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4))>1.e3)then
+        write(*,*)VFLW,trcs_solml2_vr(idn,M3,M2,M1),trcs_VLN_vr(idn,M3,M2,M1)
+        call endrun(trim(mod_filename)//' at line',__LINE__)                
+      endif
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
@@ -294,12 +298,17 @@ module BoundaryTranspMod
     DO  K=1,jcplx
       DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
-    trcs_MicpTranspFlxM_3D(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
+    trcs_MicpTranspFlxM_3D(idg_beg:idg_NH3-1,N,M6,M5,M4)=0.0_r8
 
    !add irrigation flux
     DO ids=ids_nuts_beg,ids_nuts_end
       trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)=WaterFlow2MicPM_3D(M,N,M6,M5,M4) &
         *trcn_irrig_vr(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
+      if(abs(trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4))>1.e3)then
+        write(*,*)WaterFlow2MicPM_3D(M,N,M6,M5,M4), &
+        trcn_irrig_vr(ids,M3,M2,M1),trcs_VLN_vr(ids,M3,M2,M1)
+        call endrun(trim(mod_filename)//' at line',__LINE__)                
+      endif        
     ENDDO
 
   ENDIF
@@ -402,11 +411,11 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
     DO idg=idg_beg,idg_NH3
-      RGasADFlxMM_3D(idg,N,M6,M5,M4)        = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
-      Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)   = Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)+RGasADFlxMM_3D(idg,N,M6,M5,M4)
+      Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4)    = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
+      Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4) = Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)+Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4)
     ENDDO
   ELSE
-    RGasADFlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
+    Gas_AdvDif_FlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
   ENDIF
 
   end subroutine XBoundaryTracerFlowMM
@@ -605,6 +614,11 @@ module BoundaryTranspMod
           +trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
         trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1)=trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1) &
           +trcs_MacpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)
+        if(abs(trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1))>1.e10)then
+          write(*,*)N,N3,N2,N1,N6,N5,N4,trcs_names(ids)
+          write(*,*)trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1),-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
+          call endrun(trim(mod_filename)//' at line',__LINE__)                
+        endif  
       ENDDO
     ELSE
       DO  K=1,jcplx
@@ -624,7 +638,7 @@ module BoundaryTranspMod
 !
   IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
-      Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)=Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)+RGasADFlxMM_3D(idg,N,N3,N2,N1)-RGasADFlxMM_3D(idg,N,N6,N5,N4)
+      Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)=Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)+Gas_AdvDif_FlxMM_3D(idg,N,N3,N2,N1)-Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)
     ENDDO
   ELSE
     Gas_AdvDif_FlxMM_vr(idg_beg:idg_NH3,N3,N2,N1)=0._r8

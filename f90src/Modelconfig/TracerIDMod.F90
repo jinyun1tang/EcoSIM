@@ -2,6 +2,7 @@ module TracerIDMod
 ! !
 ! code to initialize tracers
   use MiniMathMod, only : addone
+  use data_kind_mod,    only: r8 => DAT_KIND_R8  
   use ElmIDMod
 implicit none
   save
@@ -147,6 +148,7 @@ implicit none
   integer :: ids_nuts
   integer :: idsalt_nuts
 
+  real(r8), allocatable :: tracerSolc_max(:)  !maximum tracer concentration, solublity, g/m3 H2O
   type, public :: trc_def_type
    integer :: NGasTracers    !number of gas tracers
    integer :: NSolutTracers    !number of solute tracers
@@ -197,6 +199,16 @@ implicit none
 
   ids_nut_beg  = ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end = ids_H2PO4;!the last non-band nutrient tracer
+
+  allocate(tracerSolc_max(ids_beg:ids_end));tracerSolc_max=1.e3_r8; !set a large enough number by default
+
+  tracerSolc_max(idg_NH3)=320._r8*14._r8/(1.e-3_r8*17._r8)   !based on NH3 solublity at 25C 
+  tracerSolc_max(ids_NH4)=370._r8*14._r8/(1.e-3_r8*53.49_r8) !based on NH4Cl solubility at 25oC
+  tracerSolc_max(ids_NO3)=912_r8*14._r8/(1.e-3_r8*84.995_r8)    !based on NaNO3 solubility at 25oC 
+
+  tracerSolc_max(idg_NH3B)=tracerSolc_max(idg_NH3)
+  tracerSolc_max(ids_NH4B)=tracerSolc_max(ids_NH4)
+  tracerSolc_max(ids_NO3B)=tracerSolc_max(ids_NO3)
 
   allocate(trcs_names(ids_beg:ids_end))
   trcs_names(idg_CO2)    = 'CO2';trcs_names(idg_CH4)     = 'CH4'

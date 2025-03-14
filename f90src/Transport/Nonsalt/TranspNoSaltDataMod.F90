@@ -74,7 +74,7 @@ implicit none
   real(r8), allocatable ::  trcn_SnowDrift_flxM_2D(:,:,:,:)             !nutrient flux through snow drift at iteration M [g d-2]
   real(r8), allocatable ::  trcg_SnowDrift_flxM_2D(:,:,:,:)             !gas flux through snow drift at iteration M  [g d-2]                  
   real(r8), allocatable ::  RGas_Disol_FlxMM_vr(:,:,:,:)                !gas dissolution (>0 into aqueous phase) at iteration MM [g d-2]
-  real(r8), allocatable ::  RGasADFlxMM_3D(:,:,:,:,:)                   !3D gas flux advection + diffusion at iteration MM [g d-2]
+  real(r8), allocatable ::  Gas_AdvDif_FlxMM_3D(:,:,:,:,:)                   !3D gas flux advection + diffusion at iteration MM [g d-2]
   real(r8), allocatable ::  Gas_AdvDif_FlxMM_vr(:,:,:,:)                !total 3D gas flux advection + diffusion at iteration MM [g d-2]
   real(r8), allocatable :: trcs_MacpTranspFlxM_3D(:,:,:,:,:)            !solute 3D macropore flux at iteration M [g d-2]
   real(r8), allocatable :: trcs_MicpTranspFlxM_3D(:,:,:,:,:)            !solute 3D micropore flux at iteration M [g d-2]
@@ -155,7 +155,7 @@ contains
 
   allocate(trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,2,JV,JH));    trcg_SnowDrift_flxM_2D                    = 0._r8
   allocate(trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_FloXSurRof_flxM_2DH = 0._r8
-  allocate(RGasADFlxMM_3D(idg_beg:idg_NH3,3,JD,JV,JH));RGasADFlxMM_3D                             = 0._r8
+  allocate(Gas_AdvDif_FlxMM_3D(idg_beg:idg_NH3,3,JD,JV,JH));Gas_AdvDif_FlxMM_3D                             = 0._r8
   allocate(Gas_AdvDif_FlxMM_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_FlxMM_vr                     = 0._r8
 
   allocate(RGas_Disol_FlxMM_vr(idg_beg:idg_end,0:JZ,JY,JX)); RGas_Disol_FlxMM_vr = 0._r8
@@ -218,7 +218,7 @@ contains
   call destroy(VLWatMicPXB_vr)
   call destroy(PARGas_CefMM)
   call destroy(DOM_diffusivitytscaledM_vr)
-  call destroy(RGasADFlxMM_3D)
+  call destroy(Gas_AdvDif_FlxMM_3D)
   call destroy(trcg_solsml2_snvr)
   call destroy(trcn_solsml2_snvr)
   call destroy(trcn_FloXSurRof_flxM_2DH)

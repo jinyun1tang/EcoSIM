@@ -662,14 +662,14 @@ module RedistMod
     !
     !     FERTILIZER POOLS
 !
-    FertN_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)       = FertN_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)+TNH4Eros_col(NY,NX)
-    FertN_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)       = FertN_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)+TNH3Eros_col(NY,NX)
-    FertN_soil_vr(ifert_urea,NU(NY,NX),NY,NX)      = FertN_soil_vr(ifert_urea,NU(NY,NX),NY,NX)+TNUreaEros_col(NY,NX)
-    FertN_soil_vr(ifert_no3,NU(NY,NX),NY,NX)       = FertN_soil_vr(ifert_no3,NU(NY,NX),NY,NX)+TNO3Eros_col(NY,NX)
-    FertN_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)  = FertN_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)+TNH4ErosBand_col(NY,NX)
-    FertN_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)  = FertN_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)+TNH3ErosBand_col(NY,NX)
-    FertN_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX) = FertN_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)+TNUreaErosBand_col(NY,NX)
-    FertN_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)  = FertN_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)+TNO3ErosBand_col(NY,NX)
+    FertN_mole_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)+TNH4Eros_col(NY,NX)
+    FertN_mole_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)+TNH3Eros_col(NY,NX)
+    FertN_mole_soil_vr(ifert_urea,NU(NY,NX),NY,NX)      = FertN_mole_soil_vr(ifert_urea,NU(NY,NX),NY,NX)+TNUreaEros_col(NY,NX)
+    FertN_mole_soil_vr(ifert_no3,NU(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_no3,NU(NY,NX),NY,NX)+TNO3Eros_col(NY,NX)
+    FertN_mole_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_nh4_band,NU(NY,NX),NY,NX)+TNH4ErosBand_col(NY,NX)
+    FertN_mole_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_nh3_band,NU(NY,NX),NY,NX)+TNH3ErosBand_col(NY,NX)
+    FertN_mole_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX) = FertN_mole_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)+TNUreaErosBand_col(NY,NX)
+    FertN_mole_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)+TNO3ErosBand_col(NY,NX)
 !
     !   EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -794,14 +794,14 @@ module RedistMod
   stop
   endif
   Z4X             = natomw*trcx_solml_vr(idx_NH4,0,NY,NX)
-  Z4F             = natomw*(FertN_soil_vr(ifert_nh4,0,NY,NX)+FertN_soil_vr(ifert_urea,0,NY,NX)+FertN_soil_vr(ifert_nh3,0,NY,NX))
+  Z4F             = natomw*(FertN_mole_soil_vr(ifert_nh4,0,NY,NX)+FertN_mole_soil_vr(ifert_urea,0,NY,NX)+FertN_mole_soil_vr(ifert_nh3,0,NY,NX))
   TDisolNH4_lnd   = TDisolNH4_lnd+Z4S+Z4X+Z4F
   tNH4_col(NY,NX) = tNH4_col(NY,NX)+Z4S+Z4X
   if(tNH4_col(NY,NX)<0._r8)then
     write(*,*)'770',Z4S,Z4X
   endif
   ZOS             = trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX)
-  ZOF             = natomw*FertN_soil_vr(ifert_no3,0,NY,NX)
+  ZOF             = natomw*FertN_mole_soil_vr(ifert_no3,0,NY,NX)
   tNO3_lnd        = tNO3_lnd+ZOS+ZOF
   tNO3_col(NY,NX) = tNO3_col(NY,NX)+ZOS
 
@@ -1047,12 +1047,6 @@ module RedistMod
       -trcs_TransptMacP_3D(idg,3,NL(NY,NX)+1,NY,NX)
   enddo
 
-!  if(I==140 .and. J<=2)then
-!    write(111,*)'uptk',I*1000+J,trcs_names(idg_CH4),'bfreset',trcs_plant_uptake_col(idg_CH4,NY,NX)
-!    write(112,*)'bfuptk',I*1000+J,trcs_plant_uptake_col(idg_CH4,NY,NX),sum(trcs_plant_uptake_vr(idg_CH4,NU(NY,NX):NL(NY,NX),NY,NX))
-!    write(112,*)(trcs_plant_uptake_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-!    write(112,*)(trcs_solml_vr(idg_CH4,L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-!  endif  
   trcs_plant_uptake_col(:,NY,NX)=0._r8
 
   D125: DO L=NU(NY,NX),NL(NY,NX)
@@ -1147,7 +1141,7 @@ module RedistMod
       endif
       trcs_RMicbUptake_col(idg,NY,NX)=trcs_RMicbUptake_col(idg,NY,NX)+trcs_RMicbUptake_vr(idg,L,NY,NX)
     enddo
-
+    
     trcs_solml_vr(idg_NH3,L,NY,NX)=trcs_solml_vr(idg_NH3,L,NY,NX)+TRChem_sol_NH3_soil_vr(L,NY,NX)+trcs_deadroot2soil_vr(idg_NH3,L,NY,NX)
     trcs_solml_vr(idg_NH3B,L,NY,NX)=trcs_solml_vr(idg_NH3B,L,NY,NX)+trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)
 
@@ -1160,14 +1154,7 @@ module RedistMod
       
       call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),trcg_ebu_flx_vr(idg,L,NY,NX),-1)
       
-      dval0 = trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_TransptMicP_vr(idg,L,NY,NX)
-      dval  = dval0
-      call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),dval)
-      if(dval/=dval0)then
-        pval                              = dval/dval0
-        trcs_TransptMicP_vr(idg,L,NY,NX)  = trcs_TransptMicP_vr(idg,L,NY,NX)*pval
-        trcs_plant_uptake_vr(idg,L,NY,NX) = trcs_plant_uptake_vr(idg,L,NY,NX)*pval
-      endif
+      call fixEXConsumpFlux(trcs_solml_vr(idg,L,NY,NX),trcs_TransptMicP_vr(idg,L,NY,NX))
     ENDDO
 
     DO ids=ids_nut_beg,ids_nuts_end
@@ -1188,8 +1175,8 @@ module RedistMod
           trcs_plant_uptake_vr(ids,L,NY,NX) = trcs_plant_uptake_vr(ids,L,NY,NX)*pval
         endif
       endif
-      if(trcs_solml_vr(ids,L,NY,NX)>1.e10)then
-        write(*,*)NY,NX,L,ids,ids_NO2,ids_NO3
+      if(trcs_solml_vr(ids,L,NY,NX)>1.e10 .or. trcs_solml_vr(ids,L,NY,NX)<0._r8)then
+        write(*,*)NY,NX,L,trcs_names(ids)
         write(*,*)trcs_TransptMicP_vr(ids,L,NY,NX),  &
           trcn_GeoChem_soil_vr(ids,L,NY,NX), &
           trcs_Irrig_vr(ids,L,NY,NX)
@@ -1254,7 +1241,7 @@ module RedistMod
     !
     !
     !     GASES FROM VOLATILIZATION-DISSOLUTION AND GAS TRANSFER
-!
+
     DO idg=idg_beg,idg_NH3      
       call fixEXConsumpFlux(trcg_gasml_vr(idg,L,NY,NX),Gas_AdvDif_Flx_vr(idg,L,NY,NX),-1)
     ENDDO
@@ -1406,9 +1393,9 @@ module RedistMod
     endif
 
     Z4X=natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX))
-    Z4F=natomw*(FertN_soil_vr(ifert_nh4,L,NY,NX)+FertN_soil_vr(ifert_urea,L,NY,NX) &
-      +FertN_soil_vr(ifert_nh3,L,NY,NX)+FertN_Band_vr(ifert_nh4_band,L,NY,NX) &
-      +FertN_Band_vr(ifert_urea_band,L,NY,NX)+FertN_Band_vr(ifert_nh3_band,L,NY,NX))
+    Z4F=natomw*(FertN_mole_soil_vr(ifert_nh4,L,NY,NX)+FertN_mole_soil_vr(ifert_urea,L,NY,NX) &
+      +FertN_mole_soil_vr(ifert_nh3,L,NY,NX)+FertN_mole_Band_vr(ifert_nh4_band,L,NY,NX) &
+      +FertN_mole_Band_vr(ifert_urea_band,L,NY,NX)+FertN_mole_Band_vr(ifert_nh3_band,L,NY,NX))
 
     TSoilH2G_lnd    = TSoilH2G_lnd+HS
     TSoilO2G_lnd    = TSoilO2G_lnd+OS
@@ -1416,7 +1403,7 @@ module RedistMod
     TDisolNH4_lnd   = TDisolNH4_lnd+Z4S+Z4X+Z4F
     tNH4_col(NY,NX) = tNH4_col(NY,NX)+Z4S+Z4X
 
-    ZOF             = natomw*(FertN_soil_vr(ifert_no3,L,NY,NX)+FertN_soil_vr(ifert_no3,L,NY,NX))
+    ZOF             = natomw*(FertN_mole_soil_vr(ifert_no3,L,NY,NX)+FertN_mole_soil_vr(ifert_no3,L,NY,NX))
     tNO3_lnd        = tNO3_lnd+ZOS+ZOF
     tNO3_col(NY,NX) = tNO3_col(NY,NX)+ZOS
 
@@ -1508,11 +1495,11 @@ module RedistMod
  
 !     TOTAL FERILIZER,EXCHANGEABLE CATIONS AND ANIONS, PRECIPITATES
 !
-  SSF=FertN_soil_vr(ifert_nh3,L,NY,NX)+FertN_soil_vr(ifert_urea,L,NY,NX) &
-    +FertN_soil_vr(ifert_no3,L,NY,NX) &
-    +FertN_Band_vr(ifert_nh3_band,L,NY,NX)+FertN_Band_vr(ifert_urea_band,L,NY,NX) &
-    +FertN_Band_vr(ifert_no3_band,L,NY,NX) &
-    +2.0_r8*(FertN_soil_vr(ifert_nh4,L,NY,NX)+FertN_Band_vr(ifert_nh4_band,L,NY,NX))
+  SSF=FertN_mole_soil_vr(ifert_nh3,L,NY,NX)+FertN_mole_soil_vr(ifert_urea,L,NY,NX) &
+    +FertN_mole_soil_vr(ifert_no3,L,NY,NX) &
+    +FertN_mole_Band_vr(ifert_nh3_band,L,NY,NX)+FertN_mole_Band_vr(ifert_urea_band,L,NY,NX) &
+    +FertN_mole_Band_vr(ifert_no3_band,L,NY,NX) &
+    +2.0_r8*(FertN_mole_soil_vr(ifert_nh4,L,NY,NX)+FertN_mole_Band_vr(ifert_nh4_band,L,NY,NX))
 
   SSX=trcx_solml_vr(idx_Hp,L,NY,NX)+trcx_solml_vr(idx_Al,L,NY,NX) &
     +trcx_solml_vr(idx_Fe,L,NY,NX)+trcx_solml_vr(idx_Ca,L,NY,NX)+trcx_solml_vr(idx_Mg,L,NY,NX) &

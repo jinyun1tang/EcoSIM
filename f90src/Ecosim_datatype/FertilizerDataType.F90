@@ -8,8 +8,8 @@ module FertilizerDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: FertN_soil_vr(:,:,:,:)      !fertilizer in soil [mol d-2]
-  real(r8),target,allocatable :: FertN_Band_vr(:,:,:,:)      !fertilizer in band [mol d-2]
+  real(r8),target,allocatable :: FertN_mole_soil_vr(:,:,:,:)      !fertilizer in soil [mol d-2]
+  real(r8),target,allocatable :: FertN_mole_Band_vr(:,:,:,:)      !fertilizer in band [mol d-2]
 
   real(r8),target,allocatable :: DepzCorp_col(:,:,:)         !soil mixing fraction with tillage, [-]
   real(r8),target,allocatable :: FERT(:,:,:,:)               !fertilizer application, [g m-2]
@@ -45,8 +45,8 @@ module FertilizerDataType
   allocate(FDPTH(366,JY,JX)); FDPTH=0._r8                  !depth of fertilizer application, [m]
   allocate(ROWI(366,JY,JX)) ;ROWI=0._r8                  !row spacing of fertilizer band, [m]
 
-  allocate(FertN_soil_vr(ifertn_beg:ifertn_end,0:JZ,JY,JX)); FertN_soil_vr=0._r8
-  allocate(FertN_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,JY,JX)); FertN_Band_vr=0._r8
+  allocate(FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,JY,JX)); FertN_mole_soil_vr=0._r8
+  allocate(FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,JY,JX)); FertN_mole_Band_vr=0._r8
 
   end subroutine InitAllocate
 !-------------------------------------------------------
@@ -55,8 +55,8 @@ module FertilizerDataType
 
   implicit none
 
-  call destroy(FertN_soil_vr)
-  call destroy(FertN_Band_vr)
+  call destroy(FertN_mole_soil_vr)
+  call destroy(FertN_mole_Band_vr)
 
   call destroy(ROWSpaceNH4_col)                       !row spacing of NH4 fertilizer band, [m]
   call destroy(ROWSpaceNO3_col)                       !row spacing of NO3 fertilizer band, [m]

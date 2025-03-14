@@ -235,12 +235,12 @@ module ExtractsMod
       DO idg=idg_beg,idg_end
         trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       ENDDO
-!      if(I==140 .and. J<=2)write(111,*)'uptk',I*1000+J,trcs_names(idg_CH4),L,trcg_air2root_flx_vr(idg_CH4,L),trcs_plant_uptake_vr(idg_CH4,L)
 
       !Nutrients are sorted according to band|soil
       do ids=ids_NH4B,ids_nuts_end
         trcs_plant_uptake_vr(ids,L)=trcs_plant_uptake_vr(ids,L)+RootNutUptake_pvr(ids,N,L,NZ)
       ENDDO
+
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !

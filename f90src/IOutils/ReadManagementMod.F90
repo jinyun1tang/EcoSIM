@@ -191,10 +191,10 @@ implicit none
         DIRRA(1,NY,NX) = DIRRX
         DIRRA(2,NY,NX) = WDPTHI
         D220: DO I     = 1, 366
-          PHQ(IDY,NY,NX)                           = PHQX
-          NH4_irrig_mole_conc(IDY,NY,NX)                = CN4QX/14.0_r8
-          NO3_irrig_mole_conc(IDY,NY,NX)                = CNOQX/14.0_r8
-          H2PO4_irrig_mole_conc(IDY,NY,NX)              = CPOQX/31.0_r8
+          PHQ(IDY,NY,NX)                                    = PHQX
+          NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8
+          NO3_irrig_mole_conc(IDY,NY,NX)                    = CNOQX/14.0_r8
+          H2PO4_irrig_mole_conc(IDY,NY,NX)                  = CPOQX/31.0_r8
           trcsalt_irrig_mole_conc_col(idsalt_Al,IDY,NY,NX)  = CALQX/27.0_r8
           trcsalt_irrig_mole_conc_col(idsalt_Fe,IDY,NY,NX)  = CFEQX/55.8_r8
           trcsalt_irrig_mole_conc_col(idsalt_Ca,IDY,NY,NX)  = CCAQX/40.0_r8
@@ -246,18 +246,18 @@ implicit none
 !
 !           TRANSFER INPUTS TO MODEL ARRAYS
 !
-          PHQ(IDY,NY,NX)=PHQX
-          NH4_irrig_mole_conc(IDY,NY,NX)=CN4QX/14.0_r8
-          NO3_irrig_mole_conc(IDY,NY,NX)=CNOQX/14.0_r8
-          H2PO4_irrig_mole_conc(IDY,NY,NX)=CPOQX/31.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Al,IDY,NY,NX)=CALQX/27.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Fe,IDY,NY,NX)=CFEQX/55.8_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Ca,IDY,NY,NX)=CCAQX/40.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Mg,IDY,NY,NX)=CMGQX/24.3_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Na,IDY,NY,NX)=CNAQX/23.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_K,IDY,NY,NX)=CKAQX/39.1_r8
-          trcsalt_irrig_mole_conc_col(idsalt_SO4,IDY,NY,NX)=CSOQX/32.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Cl,IDY,NY,NX)=CCLQX/35.5_r8
+          PHQ(IDY,NY,NX)                                    = PHQX
+          NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8
+          NO3_irrig_mole_conc(IDY,NY,NX)                    = CNOQX/14.0_r8
+          H2PO4_irrig_mole_conc(IDY,NY,NX)                  = CPOQX/31.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Al,IDY,NY,NX)  = CALQX/27.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Fe,IDY,NY,NX)  = CFEQX/55.8_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Ca,IDY,NY,NX)  = CCAQX/40.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Mg,IDY,NY,NX)  = CMGQX/24.3_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Na,IDY,NY,NX)  = CNAQX/23.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_K,IDY,NY,NX)   = CKAQX/39.1_r8
+          trcsalt_irrig_mole_conc_col(idsalt_SO4,IDY,NY,NX) = CSOQX/32.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Cl,IDY,NY,NX)  = CCLQX/35.5_r8
           WDPTH(IDY,NY,NX)=WDPTHI
         ENDDO D8960
       ENDDO D8965
@@ -347,35 +347,35 @@ implicit none
 !
 !         NH4,NH3,UREA,NO3 BROADCAST (A) AND BANDED (B)
 !
-        FERT(ifert_nh4,IDY,NY,NX)=Z4A        !NH4 broadcast
-        FERT(ifert_nh3,IDY,NY,NX)=Z3A        !NH3 broadcast
-        FERT(ifert_urea,IDY,NY,NX)=ZUA        !Urea broadcast
-        FERT(ifert_no3,IDY,NY,NX)=ZOA        !NO3 broadcast
-        FERT(ifert_nh4_band,IDY,NY,NX)=Z4B        !NH4 band
-        FERT(ifert_nh3_band,IDY,NY,NX)=Z3B        !NH3 band
-        FERT(ifert_urea_band,IDY,NY,NX)=ZUB        !Urea band
-        FERT(ifert_no3_band,IDY,NY,NX)=ZOB        !NO3 band
+        FERT(ifert_nh4,IDY,NY,NX)       = Z4A        !NH4 broadcast
+        FERT(ifert_nh3,IDY,NY,NX)       = Z3A        !NH3 broadcast
+        FERT(ifert_urea,IDY,NY,NX)      = ZUA        !Urea broadcast
+        FERT(ifert_no3,IDY,NY,NX)       = ZOA        !NO3 broadcast
+        FERT(ifert_nh4_band,IDY,NY,NX)  = Z4B        !NH4 band
+        FERT(ifert_nh3_band,IDY,NY,NX)  = Z3B        !NH3 band
+        FERT(ifert_urea_band,IDY,NY,NX) = ZUB        !Urea band
+        FERT(ifert_no3_band,IDY,NY,NX)  = ZOB        !NO3 band
 !
 !         MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE BROADCAST (A)
 !         AND BANDED (B)
 !
-        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)  = PMA        !PM broadcast
+        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)      = PMA        !PM broadcast
         FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = PMB        !PM band
-        FERT(ifert_P_apatite,IDY,NY,NX) = PHA        !
+        FERT(ifert_P_apatite,IDY,NY,NX)         = PHA        !
 !
 !         LIME AND GYPSUM
 !
-        FERT(ifert_Ca_lime,IDY,NY,NX)=CAC
-        FERT(ifert_Ca_gypsum,IDY,NY,NX)=CAS
+        FERT(ifert_Ca_lime,IDY,NY,NX)   = CAC
+        FERT(ifert_Ca_gypsum,IDY,NY,NX) = CAS
 !
 !         PLANT AND ANIMAL RESIDUE C, N AND P
 !
-        FERT(ifert_plant_resC,IDY,NY,NX)=RSC1
-        FERT(ifert_plant_resN,IDY,NY,NX)=RSN1
-        FERT(ifert_plant_resP,IDY,NY,NX)=RSP1
-        FERT(ifert_plant_manuC,IDY,NY,NX)=RSC2
-        FERT(ifert_plant_manuN,IDY,NY,NX)=RSN2
-        FERT(ifert_plant_manuP,IDY,NY,NX)=RSP2
+        FERT(ifert_plant_resC,IDY,NY,NX)  = RSC1
+        FERT(ifert_plant_resN,IDY,NY,NX)  = RSN1
+        FERT(ifert_plant_resP,IDY,NY,NX)  = RSP1
+        FERT(ifert_plant_manuC,IDY,NY,NX) = RSC2
+        FERT(ifert_plant_manuN,IDY,NY,NX) = RSN2
+        FERT(ifert_plant_manuP,IDY,NY,NX) = RSP2
 !
 !         DEPTH AND WIDTH OF APPLICATION
 !

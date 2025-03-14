@@ -725,6 +725,10 @@ contains
   WatFLo2LitRM_col(NY,NX)                  = WatFLo2LitRM_col(NY,NX)+NetWatFlxAir2LitR
   HeatFLoByWat2LitRM_col(NY,NX)            = HeatFLoByWat2LitRM_col(NY,NX)+CumHeatSensAir2LitR
 
+!  if(I==149 .and. J==10 .and. NX==1)then 
+!    write(120,*)(I*1000+J)*100+M,'wat2',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitRM_col(NY,NX),NetWatFlxAir2LitR,CumHeatSensAir2LitR
+!  endif
+
   call PrintInfo('end '//subname)  
   end subroutine AtmLandSurfExchangeM
 !------------------------------------------------------------------------------------------
@@ -860,6 +864,11 @@ contains
     WatFLo2LitRM_col(NY,NX)                = WatFLo2LitRM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
     HeatFLoByWat2LitRM_col(NY,NX)          = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
     WatFLo2LitrM(M,NY,NX)                  = WatDarcyFloLitR2SoiMicP
+
+!    if(I==149 .and. J==10 .and. NX==1)then 
+!      write(120,*)(I*1000+J)*100+M,'wat3',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitRM_col(NY,NX)
+!    endif
+
     !soil to litter
   ELSE
     !top layer is water
@@ -870,6 +879,11 @@ contains
     WatFLo2LitRM_col(NY,NX)                = WatFLo2LitRM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
     HeatFLoByWat2LitRM_col(NY,NX)          = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
     WatFLo2LitrM(M,NY,NX)                  = WatDarcyFloLitR2SoiMicP
+
+!    if(I==149 .and. J==10 .and. NX==1)then 
+!      write(120,*)(I*1000+J)*100+M,'wat4',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitRM_col(NY,NX)
+!    endif
+
   ENDIF
 
 !     OVERLAND FLOW INTO SOIL MACROPORES WHEN WATER STORAGE CAPACITY
@@ -886,9 +900,7 @@ contains
     HeatFlowLitR2MacP                      = WatFlowLitR2MacP*cpw*TKSoil1_vr(0,NY,NX)*HeatAdv_scal
     WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX) = WaterFlow2Macpt_3D(3,NUM(NY,NX),NY,NX)+WatFlowLitR2MacP
     HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)+HeatFlowLitR2MacP
-!    if(HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)>10._r8)then
-!      write(*,*)'HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX)x=',HeatFlow2Soili_3D(3,NUM(NY,NX),NY,NX),HeatFlowLitR2MacP
-!    endif
+
     WatFLo2LitRM_col(NY,NX)       = WatFLo2LitRM_col(NY,NX)-WatFlowLitR2MacP
     HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlowLitR2MacP
   ENDIF
@@ -935,6 +947,9 @@ contains
   ELSE
     TK1X=TKSoil1_vr(0,NY,NX)
   ENDIF
+!  if(I==149 .and. J==10 .and. NX==1)then
+!    write(118,*)(I*1000+J)*100+M,TK1X,TKSoil1_vr(0,NY,NX),WatFLo2LitRM_col(NY,NX),HeatFLoByWat2LitRM_col(NY,NX)      
+!  endif
 
   !do freeze thaw of litter water
   IF((TK1X.LT.TFREEZ .AND. VLWatMicP1_vr(0,NY,NX).GT.ZERO*VGeomLayer_vr(0,NY,NX)) &
@@ -1491,6 +1506,11 @@ contains
   !total water and heat fluxes to litter
   NetWatFlxAir2LitR   = RainPrecAir2LitR+VapXAir2LitR-EvapLitR2Soi1
   CumHeatSensAir2LitR = RainPrecHeatAir2LitR+HeatFluxAir2LitR-HeatSensVapLitR2Soi1-HeatSensLitR2Soi1
+!  if(I==149 .and. J==10 .and. NX==1)then
+!    write(121,*)(I*1000+J)*100+J,NetWatFlxAir2LitR,CumHeatSensAir2LitR
+!    write(121,*)RainPrecAir2LitR,VapXAir2LitR,EvapLitR2Soi1
+!    write(121,*)RainPrecHeatAir2LitR,HeatFluxAir2LitR,-HeatSensVapLitR2Soi1,-HeatSensLitR2Soi1
+!  endif
   FLWVLS              = (VLWatMicP1_vr(NUM(NY,NX),NY,NX)-VLWatMicPX1_vr(NUM(NY,NX),NY,NX))*dts_HeatWatTP
 !
 ! GENERATE NEW SNOWPACK

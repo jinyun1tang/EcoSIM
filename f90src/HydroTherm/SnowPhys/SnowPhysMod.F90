@@ -1122,6 +1122,7 @@ contains
     VLIceSnow0_snvr(1,NY,NX)  = 0._r8
  
     !add ice and water to litter layer
+    tk1pres        = TKSoil1_vr(0,NY,NX)
     ENGY1          = TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)
 
     !it is not a pond
@@ -1130,6 +1131,9 @@ contains
       VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
       VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
       TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
+!      if(I==149 .and. J==10 .and. NX==1)then
+!        write(114,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),tk1pres
+!      endif
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else 

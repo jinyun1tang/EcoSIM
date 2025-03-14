@@ -421,11 +421,13 @@ module RootGasMod
               RDXAqueous(idg_NH3)=0.0_r8
             ENDIF
 
+
             IF(RDFAqueous(idg_NH3).GT.0.0_r8)THEN
               RootUptkSoiSolute(idg_NH3)=AMIN1(AZMAX1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopulation_pft(NZ))
             ELSE
               RootUptkSoiSolute(idg_NH3)=AMAX1(AZMIN1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopulation_pft(NZ))
             ENDIF
+
 
             RDFAqueous(idg_NH3B)=RSolUptkTransp(idg_NH3B)+DifAqueVolatile(idg_NH3B)*(trcaqu_conc_soi_loc(idg_NH3B)-trc_conc_root_loc(idg_NH3))
             IF(VOLWSB.GT.ZERO4Groth_pft(NZ))THEN
@@ -621,12 +623,13 @@ module RootGasMod
 !    if(I==134 .and. J<=3)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
 !      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
 !      RootCO2Emis_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2Root_pvr(L,NZ)
-!    if(I==137 .and. J==1)then        
+!    if(I>=206 .and. L==5)then        
 !      idg=idg_CH4
-!      write(116,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
+!      write(136,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
 !        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
 !        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
 !    endif
+
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'

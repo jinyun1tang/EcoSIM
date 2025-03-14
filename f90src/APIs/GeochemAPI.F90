@@ -3,6 +3,7 @@ module GeochemAPI
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use SoluteChemDataType, only: solute_flx_type, chem_var_type
   use EcoSimConst,        only: catomw
+  use DebugToolMod
   use SoluteMod
   use AqueChemDatatype
   use SoilPropertyDataType
@@ -36,58 +37,58 @@ module GeochemAPI
   type(chem_var_type) :: chemvar
 
 
-    chemvar%ZMG=0._r8
-    chemvar%ZNA=0._r8
-    chemvar%ZKA=0._r8
-    chemvar%ZMG=0._r8
-    chemvar%ZNA=0._r8
-    chemvar%ZKA=0._r8
-    chemvar%ZHY=0._r8
-    chemvar%ZOH=0._r8
-    chemvar%ZAL=0._r8
-    chemvar%ZFE=0._r8
-    chemvar%ZCA=0._r8
-    chemvar%ZSO4=0._r8
-    chemvar%ZCL=0._r8
-    chemvar%ZCO3=0._r8
-    chemvar%ZHCO3=0._r8
-    chemvar%ZALOH1=0._r8
-    chemvar%ZALOH2=0._r8
-    chemvar%ZALOH3=0._r8
-    chemvar%ZALOH4=0._r8
-    chemvar%ZALS=0._r8
-    chemvar%ZFEOH1=0._r8
-    chemvar%ZFEOH2=0._r8
-    chemvar%ZFEOH3=0._r8
-    chemvar%ZFEOH4=0._r8
-    chemvar%ZFES=0._r8
-    chemvar%ZCAO=0._r8
-    chemvar%ZCAC=0._r8
-    chemvar%ZCAH=0._r8
-    chemvar%ZCAS=0._r8
-    chemvar%ZMGO=0._r8
-    chemvar%ZMGC=0._r8
-    chemvar%ZMGH=0._r8
-    chemvar%ZMGS=0._r8
-    chemvar%ZNAC=0._r8
-    chemvar%ZNAS=0._r8
-    chemvar%ZKAS=0._r8
-    chemvar%H0PO4=0._r8
-    chemvar%H3PO4=0._r8
-    chemvar%ZFE1P=0._r8
-    chemvar%ZFE2P=0._r8
-    chemvar%ZCA0P=0._r8
-    chemvar%ZCA1P=0._r8
-    chemvar%ZCA2P=0._r8
-    chemvar%ZMG1P=0._r8
-    chemvar%H0POB=0._r8
-    chemvar%H3POB=0._r8
-    chemvar%ZFE1PB=0._r8
-    chemvar%ZFE2PB=0._r8
-    chemvar%ZCA0PB=0._r8
-    chemvar%ZCA1PB=0._r8
-    chemvar%ZCA2PB=0._r8
-    chemvar%ZMG1PB=0._r8
+    chemvar%ZMG    = 0._r8
+    chemvar%ZNA    = 0._r8
+    chemvar%ZKA    = 0._r8
+    chemvar%ZMG    = 0._r8
+    chemvar%ZNA    = 0._r8
+    chemvar%ZKA    = 0._r8
+    chemvar%ZHY    = 0._r8
+    chemvar%ZOH    = 0._r8
+    chemvar%ZAL    = 0._r8
+    chemvar%ZFE    = 0._r8
+    chemvar%ZCA    = 0._r8
+    chemvar%ZSO4   = 0._r8
+    chemvar%ZCL    = 0._r8
+    chemvar%ZCO3   = 0._r8
+    chemvar%ZHCO3  = 0._r8
+    chemvar%ZALOH1 = 0._r8
+    chemvar%ZALOH2 = 0._r8
+    chemvar%ZALOH3 = 0._r8
+    chemvar%ZALOH4 = 0._r8
+    chemvar%ZALS   = 0._r8
+    chemvar%ZFEOH1 = 0._r8
+    chemvar%ZFEOH2 = 0._r8
+    chemvar%ZFEOH3 = 0._r8
+    chemvar%ZFEOH4 = 0._r8
+    chemvar%ZFES   = 0._r8
+    chemvar%ZCAO   = 0._r8
+    chemvar%ZCAC   = 0._r8
+    chemvar%ZCAH   = 0._r8
+    chemvar%ZCAS   = 0._r8
+    chemvar%ZMGO   = 0._r8
+    chemvar%ZMGC   = 0._r8
+    chemvar%ZMGH   = 0._r8
+    chemvar%ZMGS   = 0._r8
+    chemvar%ZNAC   = 0._r8
+    chemvar%ZNAS   = 0._r8
+    chemvar%ZKAS   = 0._r8
+    chemvar%H0PO4  = 0._r8
+    chemvar%H3PO4  = 0._r8
+    chemvar%ZFE1P  = 0._r8
+    chemvar%ZFE2P  = 0._r8
+    chemvar%ZCA0P  = 0._r8
+    chemvar%ZCA1P  = 0._r8
+    chemvar%ZCA2P  = 0._r8
+    chemvar%ZMG1P  = 0._r8
+    chemvar%H0POB  = 0._r8
+    chemvar%H3POB  = 0._r8
+    chemvar%ZFE1PB = 0._r8
+    chemvar%ZFE2PB = 0._r8
+    chemvar%ZCA0PB = 0._r8
+    chemvar%ZCA1PB = 0._r8
+    chemvar%ZCA2PB = 0._r8
+    chemvar%ZMG1PB = 0._r8
 
 !     begin_execution
   NPI=INT(NPH/2)
@@ -128,11 +129,11 @@ module GeochemAPI
             chemvar%BKVLPB=chemvar%VLWatMicPPB
           ENDIF
 
-          call UpdateSoilFertlizer(L,NY,NX,chemvar)
+          call UpdateSoilFertlizer(I,J,L,NY,NX,chemvar)
 
           call GeochemAPISend(L,NY,NX,chemvar,solflx)
 
-          call GeoChemEquilibria(chemvar, solflx)
+          call GeoChemEquilibria(I,J,L,NY,NX,chemvar, solflx)
 
           call GeochemAPIRecv(L,NY,NX,solflx)
 
@@ -261,10 +262,13 @@ module GeochemAPI
   implicit none
   integer, intent(in) :: L,NY,NX
   type(solute_flx_type), intent(in) :: solflx
+  character(len=*), parameter :: subname='GeochemAPIRecv'
 
-  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = solflx%TRChem_NH4_soil
-  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = solflx%TRChem_NH4_band_soil
-  TRChem_sol_NH3_soil_vr(L,NY,NX)             = solflx%TRChem_NH3_soil_vr
+  call PrintInfo('beg '//subname)
+
+  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       = solflx%TRChem_NH4_soil_mole
+  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = solflx%TRChem_NH4_band_soil_mole
+  TRChem_sol_NH3_soil_vr(L,NY,NX)             = solflx%TRChem_NH3_soil_mole
   trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = solflx%TRChem_NH3_band_soil
   trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)     = solflx%TRChem_H1PO4_soil
   trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)     = solflx%TRChem_H2PO4_soil
@@ -341,25 +345,27 @@ module GeochemAPI
     trcSalt_RGeoChem_flx_vr(idsalt_CaH4P2O8B,L,NY,NX) = solflx%TRChem_CaH4P2O8_band_soil
     trcSalt_RGeoChem_flx_vr(idsalt_MgHPO4B,L,NY,NX)   = solflx%TRChem_MgHPO4_band_soil
   endif
-  TRChem_H_p_sorbed_soil_vr(L,NY,NX)       = solflx%TRChem_H_p_sorbed_soil
-  TRChem_Al_sorbed_soil_vr(L,NY,NX)        = solflx%TRChem_Al_sorbed_soil
-  TRChem_Fe_sorbed_soil_vr(L,NY,NX)        = solflx%TRChem_Fe_sorbed_soil
-  TRChem_Ca_sorbed_soil_vr(L,NY,NX)        = solflx%TRChem_Ca_sorbed_soil
-  TRChem_Mg_sorbed_soil_vr(L,NY,NX)        = solflx%TRChem_Mg_sorbed_soil
-  TRChem_Na_sorbed_soil_vr(L,NY,NX)        = solflx%TRChem_Na_sorbed_soil
-  TRChem_K_sorbed_soil_vr(L,NY,NX)         = solflx%TRChem_K_sorbed_soil
-  TRChem_HCO3_sorbed_soil_vr(L,NY,NX)      = solflx%TRChem_HCO3_sorbed_soil
-  TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)    = solflx%TRChem_AlO2H2_sorbed_soil
-  TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX)    = solflx%TRChem_FeO2H2_sorbed_soil
-  trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)  = solflx%TRChem_RO_sorbed_soil
-  trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX) = solflx%TRChem_RO_sorbed_band_soil
-  trcp_RChem_soil_vr(idsp_AlOH3,L,NY,NX)  = solflx%TRChem_AlOH3_precip_soil
-  trcp_RChem_soil_vr(idsp_FeOH3,L,NY,NX)  = solflx%TRChem_FeOH3_precip_soil
-  trcp_RChem_soil_vr(idsp_CaCO3,L,NY,NX)  = solflx%TRChem_CaCO3_precip_soil
-  trcp_RChem_soil_vr(idsp_CaSO4,L,NY,NX)  = solflx%TRChem_CaSO4_precip_soil
-  TRChem_H2O_vr(L,NY,NX)                       = solflx%TRH2O_soil
-  TBION_vr(L,NY,NX)                    = solflx%TBION_soil
-  Txchem_CO2_vr(L,NY,NX)               = solflx%Txchem_CO2_soil
+  TRChem_H_p_sorbed_soil_vr(L,NY,NX)     = solflx%TRChem_H_p_sorbed_soil
+  TRChem_Al_sorbed_soil_vr(L,NY,NX)      = solflx%TRChem_Al_sorbed_soil
+  TRChem_Fe_sorbed_soil_vr(L,NY,NX)      = solflx%TRChem_Fe_sorbed_soil
+  TRChem_Ca_sorbed_soil_vr(L,NY,NX)      = solflx%TRChem_Ca_sorbed_soil
+  TRChem_Mg_sorbed_soil_vr(L,NY,NX)      = solflx%TRChem_Mg_sorbed_soil
+  TRChem_Na_sorbed_soil_vr(L,NY,NX)      = solflx%TRChem_Na_sorbed_soil
+  TRChem_K_sorbed_soil_vr(L,NY,NX)       = solflx%TRChem_K_sorbed_soil
+  TRChem_HCO3_sorbed_soil_vr(L,NY,NX)    = solflx%TRChem_HCO3_sorbed_soil
+  TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)  = solflx%TRChem_AlO2H2_sorbed_soil
+  TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX)  = solflx%TRChem_FeO2H2_sorbed_soil
+  trcx_TRSoilChem_vr(idx_OHe,L,NY,NX)    = solflx%TRChem_RO_sorbed_soil
+  trcx_TRSoilChem_vr(idx_OHeB,L,NY,NX)   = solflx%TRChem_RO_sorbed_band_soil
+  trcp_RChem_soil_vr(idsp_AlOH3,L,NY,NX) = solflx%TRChem_AlOH3_precip_soil
+  trcp_RChem_soil_vr(idsp_FeOH3,L,NY,NX) = solflx%TRChem_FeOH3_precip_soil
+  trcp_RChem_soil_vr(idsp_CaCO3,L,NY,NX) = solflx%TRChem_CaCO3_precip_soil
+  trcp_RChem_soil_vr(idsp_CaSO4,L,NY,NX) = solflx%TRChem_CaSO4_precip_soil
+  TRChem_H2O_vr(L,NY,NX)                 = solflx%TRH2O_soil
+  TBION_vr(L,NY,NX)                      = solflx%TBION_soil
+  Txchem_CO2_vr(L,NY,NX)                 = solflx%Txchem_CO2_soil
+
+  call PrintInfo('end '//subname)
   end subroutine GeochemAPIRecv
 
 end module GeochemAPI

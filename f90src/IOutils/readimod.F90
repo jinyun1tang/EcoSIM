@@ -466,12 +466,12 @@ module readiMod
     call ncd_getvar(grid_nfid, 'CCACO',ntp,CCACO_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CCASO',ntp,CCASO_vr(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'GKC4',ntp,GKC4_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCH',ntp,GKCH_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCA',ntp,GKCA_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCM',ntp,GKCM_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCN',ntp,GKCN_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCK',ntp,GKCK_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'GKC4',ntp,GKC4_vr(1:JZ,NV1,NH1))  !Gapon coeff for NH4(+)
+    call ncd_getvar(grid_nfid, 'GKCH',ntp,GKCH_vr(1:JZ,NV1,NH1))  !Gapon coeff for H(+)
+    call ncd_getvar(grid_nfid, 'GKCA',ntp,GKCA_vr(1:JZ,NV1,NH1))  !Gapon coeff for Al(3+)
+    call ncd_getvar(grid_nfid, 'GKCM',ntp,GKCM_vr(1:JZ,NV1,NH1))  !Gapon coeff for Mg(2+)
+    call ncd_getvar(grid_nfid, 'GKCN',ntp,GKCN_vr(1:JZ,NV1,NH1))  !Gapon coeff for Na(+)
+    call ncd_getvar(grid_nfid, 'GKCK',ntp,GKCK_vr(1:JZ,NV1,NH1))  !Gapon coeff for K(+)
 
     call ncd_getvar(grid_nfid, 'THW',ntp,THW_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'THI',ntp,THI_vr(1:JZ,NV1,NH1))

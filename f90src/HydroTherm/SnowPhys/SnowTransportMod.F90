@@ -7,7 +7,7 @@ module SnowTransportMod
   use abortutils,     only: endrun
   use EcoSimConst,    only: DENSICE, natomw, patomw
   use EcoSIMCtrlMod,  only: lverb
-  use MiniMathMod,    only: fixEXConsumpFlux,AZERO
+  use MiniMathMod,    only: fixEXConsumpFlux,AZERO,AZMAX1
   use TracerPropMod,  only: MolecularWeight
   use DebugToolMod
   use ClimForcDataType
@@ -236,7 +236,7 @@ implicit none
 !     OVERLAND SNOW REDISTRIBUTION
 !
   IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
-    write(*,*)I*1000+J,'snowredist'
+
     !loss of dissolved gases from surface snow
     DO idg=idg_beg,idg_NH3
       trcg_solsml_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)+trcg_LossXSnowRedist_col(idg,NY,NX)
@@ -343,17 +343,17 @@ implicit none
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: L,NY,NX
-
+  character(len=*), parameter :: subname='SoluteTransportThruSnow'
   integer :: idg,idn,idsalt
   !     begin_execution
   !     SNOWPACK SOLUTE CONTENT
 
+  call PrintInfo('beg '//subname)
   DO idg=idg_beg,idg_NH3
-!    if(idg==idg_O2 .and. I==32)&
-!      write(111,*)I*1000+J,'snotp',trcg_solsml_snvr(idg,L,NY,NX),trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX),&
-!        trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX)
 
-    trcg_solsml_snvr(idg,L,NY,NX)=AZERO(trcg_solsml_snvr(idg,L,NY,NX)+trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX))
+    call fixEXConsumpFlux(trcg_solsml_snvr(idg,L,NY,NX),trcg_AquaAdv_NetFlx_snvr(idg,L,NY,NX),-1)
+    !trcg_solsml_snvr(idg,L,NY,NX)=AZERO(trcg_solsml_snvr(idg,L,NY,NX))
+    trcg_solsml_snvr(idg,L,NY,NX)=AZMAX1(trcg_solsml_snvr(idg,L,NY,NX))
   ENDDO
 
   if(trcg_solsml_snvr(idg_O2,L,NY,NX)<0._r8)then
@@ -362,16 +362,19 @@ implicit none
   endif
 
   DO idn =ids_nut_beg,ids_nuts_end
-    trcn_solsml_snvr(idn,L,NY,NX)=trcn_solsml_snvr(idn,L,NY,NX)+trcn_AquaAdv_NetFlx_snvr(idn,L,NY,NX)
+    call fixEXConsumpFlux(trcn_solsml_snvr(idn,L,NY,NX),trcn_AquaAdv_NetFlx_snvr(idn,L,NY,NX),-1)
+    trcn_solsml_snvr(idn,L,NY,NX)=AZMAX1(trcn_solsml_snvr(idn,L,NY,NX))
+    trcn_solsml_snvr(idn,L,NY,NX)=AZERO(trcn_solsml_snvr(idn,L,NY,NX))
   ENDDO
   !
   !
   IF(salt_model)THEN
     DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_ml_snvr(idsalt,L,NY,NX)=trcSalt_ml_snvr(idsalt,L,NY,NX)+trcSalt_AquaAdv_NetFlx_snvr(idsalt,L,NY,NX)
+      call fixEXConsumpFlux(trcSalt_ml_snvr(idsalt,L,NY,NX),trcSalt_AquaAdv_NetFlx_snvr(idsalt,L,NY,NX),-1)
+      trcSalt_ml_snvr(idsalt,L,NY,NX)=AZERO(trcSalt_ml_snvr(idsalt,L,NY,NX))
     ENDDO
   ENDIF
-
+  call PrintInfo('end '//subname)
   end subroutine SoluteTransportThruSnow
 
 end module SnowTransportMod

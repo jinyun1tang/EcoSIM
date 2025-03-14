@@ -53,12 +53,12 @@ module TranspSaltMod
   real(r8) :: trcSalt_Irrig_flxM_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)
   real(r8) :: trcSalt_FloXSurRof_flxM_col(idsalt_beg:idsalt_end,JY,JX)
   real(r8) :: trcSalt_SnowDrift_flxM_col(idsalt_beg:idsalt_end,JY,JX)
-!     execution begins here
 
+!     execution begins here
 !
 !     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 !
-  call SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
+  call InitSaltTransportModel(I,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
 !
 !     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 !
@@ -90,34 +90,15 @@ module TranspSaltMod
 
 !     begin_execution
   DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX)=0.0_r8
-    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=0.0_r8
+    trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX) = 0.0_r8
+    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX) = 0.0_r8
   ENDDO
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=0.0_r8
   ENDDO
   end subroutine ZeroAtmosSoluteFlux
-!------------------------------------------------------------------------------------------
 
-  subroutine AtmosSoluteFluxToSnowpack(I,NY,NX)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: I,NY,NX
-  integer :: idsalt
-
-!     begin_execution
-
-!
-!     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
-!     IN RAINFALL AND IRRIGATION ARE ZERO IF SNOWPACK IS PRESENT
-!
-!     X*FLS,X*FLB=hourly solute flux to micropores in non-band,band
-!
-
-  end subroutine AtmosSoluteFluxToSnowpack
 !------------------------------------------------------------------------------------------
 
   subroutine AtmosSoluteFluxToTopsoil(I,NY,NX)
@@ -272,7 +253,7 @@ module TranspSaltMod
   end subroutine GetSubHourlyFluxByLayer
 !------------------------------------------------------------------------------------------
 
-  subroutine SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
+  subroutine InitSaltTransportModel(I,NHW,NHE,NVN,NVS,trcSalt_Irrig_flxM_vr)
 !
 !     Description:
 !
@@ -325,7 +306,7 @@ module TranspSaltMod
 
     ENDDO D9990
   ENDDO D9995
-  end subroutine SaltModelSoluteFlux
+  end subroutine InitSaltTransportModel
 !------------------------------------------------------------------------------------------
 
   subroutine InitFluxAccumulatorsInSnowpack(NY,NX)
@@ -336,11 +317,7 @@ module TranspSaltMod
   integer, intent(in) :: NY,NX
   integer :: L,idsalt
 
-  D9855: DO L=1,JS
-    DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)=0.0
-    ENDDO
-  ENDDO D9855
+
   end subroutine InitFluxAccumulatorsInSnowpack
 
 !------------------------------------------------------------------------------------------
@@ -886,50 +863,30 @@ module TranspSaltMod
   integer , intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX
-
+  integer :: L, idsalt
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 !
-!     INITIALIZE SOLUTE RUNOFF NET FLUX ACCUMULATORS
-      call InitFluxAccumlatorsByRunoff(NY,NX)
-!
 !     INITIALIZE SNOWPACK NET FLUX ACCUMULATORS
-      call InitFluxAccumulatorsInSnowpack(NY,NX)
+!
+      D9855: DO L=1,JS
+        DO idsalt=idsalt_beg,idsalt_end
+          trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)=0.0
+        ENDDO
+      ENDDO D9855
 !
 !     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
-      call InitFluxAccumulatorsInSoil(NY,NX)
+!
+      D9885: DO L=NU(NY,NX),NL(NY,NX)
+        DO idsalt=idsalt_beg,idsalt_end      
+          trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)=0.0_r8
+          trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)=0.0_r8
+        enddo
+      ENDDO D9885      
     ENDDO
   ENDDO
   end subroutine InitFluxArraysM
 
-
-!------------------------------------------------------------------------------------------
-
-  subroutine InitFluxAccumlatorsByRunoff(NY,NX)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: NY,NX
-!     begin_execution
-!
-
-  end subroutine InitFluxAccumlatorsByRunoff
-!------------------------------------------------------------------------------------------
-
-  subroutine InitFluxAccumulatorsInSoil(NY,NX)
-!
-!     Description:
-!
-  implicit none
-  integer, intent(in) :: NY,NX
-  integer :: L
-
-  D9885: DO L=NU(NY,NX),NL(NY,NX)
-    trcSalt_Transp2Micp_flxM_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
-    trcSalt_Transp2Macp_flxM_vr(idsalt_beg:idsaltb_end,L,NY,NX)=0.0_r8
-  ENDDO D9885
-  end subroutine InitFluxAccumulatorsInSoil
 
 end module TranspSaltMod

@@ -152,6 +152,7 @@ implicit none
   integer, intent(in) :: NY,NX,I,J
   logical, intent(in) :: test_exist
   real(r8),intent(out):: QWatinfl2Mic,QHeatInfl2Soil
+  character(len=*), parameter :: subname='SnowpackDisapper'
   integer :: L
   real(r8) :: tksx
   real(r8) :: FLWS,FLWW,FLWI
@@ -159,6 +160,7 @@ implicit none
 !     begin_execution
 !
 
+  call PrintInfo('beg '//subname)
   IF(VLHeatCapSnow_snvr(1,NY,NX).GT.0.0_r8 .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX) &
     .AND. TairK_col(NY,NX).GT.TFICE)THEN
 
@@ -233,8 +235,8 @@ implicit none
         QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)+HeatFlo2Surface
       endif
     endif
-
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine SnowpackDisapper
 !------------------------------------------------------------------------------------------
   subroutine DealHighTempSnow(I,J,L,NY,NX)
@@ -365,6 +367,7 @@ implicit none
   implicit none
   integer, intent(in) :: L,NY,NX,I,J
   real(r8), intent(inout) :: VOLSWI
+  character(len=*), parameter :: subname='UpdateSnowLayerL'
   real(r8) :: TKWX,VHCPWZ(JZ,JY,JX)
   real(r8) :: ENGYW
   real(r8) :: VOLSF,TCASF
@@ -377,6 +380,7 @@ implicit none
   real(r8), parameter :: tinyw=1.e-13_r8
 ! begin_execution
 
+  call PrintInfo('beg '//subname)
   !the line below is a hack, and likely a better snow layering scheme is needed.
   if(L.eq.1.and.isclose(TCSnow_snvr(1,NY,NX),spval))then
     TCSnow_snvr(1,NY,NX)=units%Kelvin2Celcius(TairK_col(NY,NX))    
@@ -516,6 +520,7 @@ implicit none
     ENDIF
   ENDIF  
   TCSnow_snvr(L,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L,NY,NX))
+  call PrintInfo('end '//subname)
   end subroutine UpdateSnowLayerL
 
 !------------------------------------------------------------------------------------------

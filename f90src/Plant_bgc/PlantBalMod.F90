@@ -156,13 +156,13 @@ implicit none
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch, &
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
     StandDeadKCompElms_pft    => plt_biom%StandDeadKCompElms_pft,    &
-    ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch  ,     &
+    ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch,       &
     RootElms_pft              => plt_biom%RootElms_pft,              &
     ShootElms_pft             => plt_biom%ShootElms_pft              &
   )
@@ -249,7 +249,7 @@ implicit none
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch,        &
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch,         &
     CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
-    StalkLiveBiomassC_brch         => plt_biom%StalkLiveBiomassC_brch,          &
+    StalkLiveBiomassC_brch     => plt_biom%StalkLiveBiomassC_brch,      &
     CanopyLeafShethC_pft       => plt_biom%CanopyLeafShethC_pft,        &
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
     StalkRsrvElms_brch         => plt_biom%StalkRsrvElms_brch,          &
