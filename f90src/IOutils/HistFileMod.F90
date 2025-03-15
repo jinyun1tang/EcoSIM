@@ -10,7 +10,7 @@ module HistFileMod
   use ElmIDMod          , only : NumPlantChemElms  
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
-  use EcoSIMCtrlMod     , only : etimer
+  use EcoSIMCtrlMod     , only : etimer,lverb  
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use DebugToolMod
 implicit none
@@ -1995,11 +1995,15 @@ implicit none
           end if
 
           ! Write history output.  Always output land and ocean runoff on xy grid.
-
+          call PrintInfo(varname)
           if (numdims == 1) then
+             if(lverb)print*,hist1do(beg1d_out:end1d_out)
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=hist1do, ncid=nfid(t), nt=nt)
           else
+!             if(lverb)then
+!               write(*,*)varname,histo(1,:)
+!             endif
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=histo, ncid=nfid(t), nt=nt)
           end if

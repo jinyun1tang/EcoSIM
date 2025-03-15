@@ -44,7 +44,7 @@ implicit none
   public :: ZeroSnowFluxM  
   public :: PrepIterSnowLayerM
   public :: InitSnowAccumsM
-  public :: CopySnowStates
+  public :: StageSnowModel
   public :: SolveSnowpackM
   public :: SumSnowDriftByRunoffM
   public :: UpdateSnowAtM
@@ -80,7 +80,7 @@ contains
 
   if(present(XSW))XSW=0._r8
   cumSnowDepz_col(0,NY,NX) = 0.0_r8
-  NewSnowDens_col(NY,NX)   = 0.10_r8
+  NewSnowDens_col(NY,NX)   = 0.10_r8   ![Mg m-3]
   VcumDrySnoWE_col(NY,NX)  = SnowDepth_col(NY,NX)*NewSnowDens_col(NY,NX)*DH(NY,NX)*DV(NY,NX)
   VcumWatSnow_col(NY,NX)   = 0.0_r8
   VcumIceSnow_col(NY,NX)   = 0.0_r8
@@ -403,7 +403,7 @@ contains
           !interaction with respect to litter layer and topsoil 
           !potential flow to soil
           !first  flow to micro- and macropores
-          if(FracSurfByLitR_col(NY,NX)>1.e-3_r8)then
+          if(FracSurfByLitR_col(NY,NX)>ZEROL)then
             PtWatFlowSno2Soi      = WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
             WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
             WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
@@ -435,7 +435,7 @@ contains
           cumHeatCndFlxLitr2Soi   = 0.0_r8
 
           !surface litter layer is active
-          IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>1.e-3_r8)THEN
+          IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>ZEROL)THEN
             !should the litter heat/water states be updated here?
             call SnowSurLitterExch(I,J,dt_SnoHeat,M,L,NY,NX,VapCond1,VapCond2,TCND1W,VLairSno1,PSISV1,TCNDS,&
               CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi,&
@@ -510,7 +510,7 @@ contains
   real(r8), intent(out) :: CumNetHeatFlow2LitR
   real(r8), intent(out) :: cumNetHeatFlow2Soil
   real(r8), intent(out) :: CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP
-  integer :: MM,L,L2,nsnl
+  integer :: MM,L,L2
 
   real(r8) :: TotWatXFlx2SoiMicP,TotHeatFlow2Soi  
   real(r8) :: ENGY0,FVOLI0,FVOLS0
@@ -522,7 +522,7 @@ contains
   real(r8) :: tNetWat2LayL,vwat,vdry,vice
   real(r8) :: dt_SnoHeat   !time step size for snow model iteration
   real(r8) :: cphwat,vhcp0,dNetWat2LayL
-  real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow
+  real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow,snowLMass
   real(r8), parameter :: mscal=1._r8-1.e-8_r8,tinyw=1.e-14_r8,tinyw0=1.e-16_r8
   real(r8), parameter :: mscal1=1.0001_r8
   real(r8) :: tinyw1
@@ -561,13 +561,18 @@ contains
 
 
   D3000: DO MM = 1, NPS
-    call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,LatentHeatAir2Sno,&
-      HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
 
-    call SnowPackIterationMM(dt_snoHeat,I,J,M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
-      TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
-      CumWatXFlx2SoiMicP,CumSnowWatFLow2LitR,CumNetHeatFlow2LitR,cumNetHeatFlow2Soil)
+    snowLMass=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
 
+    if(snowLMass>0._r8)then
+
+      call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,snowLMass,HeatSnofall2Snow,LatentHeatAir2Sno,&
+        HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
+
+      call SnowPackIterationMM(dt_snoHeat,I,J,M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
+        TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,&
+        CumWatXFlx2SoiMicP,CumSnowWatFLow2LitR,CumNetHeatFlow2LitR,cumNetHeatFlow2Soil)
+    endif
 !
 !     ACCUMULATE SNOWPACK FLUXES TO LONGER TIME STEP FOR
 !     LITTER, SOIL FLUX CALCULATIONS
@@ -596,16 +601,16 @@ contains
         NetWat2LayL  = WatX2SnoLay_snvr(L,NY,NX)-WatX2SnoLay_snvr(L2,NY,NX)
         NetIce2LayL  = IceX2SnoLay_snvr(L,NY,NX)-IceX2SnoLay_snvr(L2,NY,NX)
         NetHeat2LayL = HeatX2SnoLay_snvr(L,NY,NX)-HeatX2SnoLay_snvr(L2,NY,NX)
-!
-!     IF AT BOTTOM OF SNOWPACK
-!      Vn=V+Net < 0,  
-       if(VOLW0X < -NetWat2LayL)then
-         dNetWat2LayL                = -AZMAX1(VOLW0X,tinyw)*mscal+NetWat2LayL
-         NetWat2LayL                 = NetWat2LayL-dNetWat2LayL
-         WatX2SnoLay_snvr(L2,NY,NX)  = WatX2SnoLay_snvr(L2,NY,NX)+dNetWat2LayL
-         HeatX2SnoLay_snvr(L2,NY,NX) = HeatX2SnoLay_snvr(L2,NY,NX)+dNetWat2LayL*cpw*TKSnow1_snvr(L,NY,NX)
-       endif
-
+        !
+        !     IF AT BOTTOM OF SNOWPACK
+        !      Vn=V+Net < 0,  
+        if(VOLW0X < -NetWat2LayL)then
+          dNetWat2LayL                = -AZMAX1(VOLW0X,tinyw)*mscal+NetWat2LayL
+          NetWat2LayL                 = NetWat2LayL-dNetWat2LayL
+          WatX2SnoLay_snvr(L2,NY,NX)  = WatX2SnoLay_snvr(L2,NY,NX)+dNetWat2LayL
+          HeatX2SnoLay_snvr(L2,NY,NX) = HeatX2SnoLay_snvr(L2,NY,NX)+dNetWat2LayL*cpw*TKSnow1_snvr(L,NY,NX)
+        endif
+      !layer L2 has insignificant snow, or L==JS, and layer L has significant snow
       ELSEIF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
 
         NetSno2LayL                  = SnoX2SnoLay_snvr(L,NY,NX)
@@ -613,12 +618,12 @@ contains
         NetIce2LayL                  = IceX2SnoLay_snvr(L,NY,NX)
         NetHeat2LayL                 = HeatX2SnoLay_snvr(L,NY,NX)-TotSnoHeatFlow2Litr-TotHeatFlow2Soi
 
-       if(VOLW0X < -NetWat2LayL)then
-         dNetWat2LayL              = -AZMAX1(VOLW0X,tinyw)*mscal+NetWat2LayL
-         NetWat2LayL               = NetWat2LayL-dNetWat2LayL         
-         WatX2SnoLay_snvr(L,NY,NX) = WatX2SnoLay_snvr(L,NY,NX)-dNetWat2LayL
-         HeatX2SnoLay_snvr(L,NY,NX)=HeatX2SnoLay_snvr(L,NY,NX)-dNetWat2LayL*cpw*TKSnow1_snvr(L,NY,NX)         
-       endif
+        if(VOLW0X < -NetWat2LayL)then
+          dNetWat2LayL              = -AZMAX1(VOLW0X,tinyw)*mscal+NetWat2LayL
+          NetWat2LayL               = NetWat2LayL-dNetWat2LayL         
+          WatX2SnoLay_snvr(L,NY,NX) = WatX2SnoLay_snvr(L,NY,NX)-dNetWat2LayL
+          HeatX2SnoLay_snvr(L,NY,NX)=HeatX2SnoLay_snvr(L,NY,NX)-dNetWat2LayL*cpw*TKSnow1_snvr(L,NY,NX)         
+        endif
 
       ELSE
         NetSno2LayL  = 0.0_r8
@@ -764,13 +769,14 @@ contains
 
   end subroutine SolveSnowpackM
 !------------------------------------------------------------------------------------------
-  subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,HeatSnofall2Snow,&
+  subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,snowLMass,HeatSnofall2Snow,&
     LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
   implicit none  
   integer, intent(in) :: I,J
   integer, intent(in) :: M    !soil heat-flow iteration id
   integer, intent(in) :: NY,NX
   real(r8),intent(in) :: HeatSnofall2Snow,IceFall,SnoFall,Rainfall
+  real(r8),intent(in) :: snowLMass
   real(r8), intent(inout) :: LatentHeatAir2Sno
   real(r8), intent(inout) :: HeatSensEvapAir2Snow    !cumulated heat by vapor advection from air to snow [MJ]
   real(r8), intent(inout) :: HeatNetFlx2Snow,Radnet2Snow
@@ -796,9 +802,6 @@ contains
   real(r8) :: NetHeatAir2Snow,SnofallRain
   real(r8) :: SnofallDry,Snofallice
   real(r8) :: RadSWbySnow                                !shortwave radiation absorbed by snow [MJ]
-  real(r8) :: snowLMass
-
-  snowLMass=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
 
   SnowAlbedo=(0.85_r8*(VLDrySnoWE0M_snvr(1,NY,NX)+SnoFall)+0.30_r8*(VLIceSnow0M_snvr(1,NY,NX)+IceFall) &
     +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/snowLMass
@@ -961,18 +964,19 @@ contains
   !the use of tinyw_val may introduce extra snow mass unphysically
   D9780: DO L=1,JS
     vdry=VLDrySnoWE0_snvr(L,NY,NX); vwat=VLWatSnow0_snvr(L,NY,NX); vice=VLIceSnow0_snvr(L,NY,NX)
+    ENGY0                     = VLSnowHeatCapM_snvr(M,L,NY,NX)*TKSnow0_snvr(L,NY,NX)
+    TKX                       = TKSnow0_snvr(L,NY,NX)
     VLDrySnoWE0_snvr(L,NY,NX) = AZMAX1d(VLDrySnoWE0_snvr(L,NY,NX)+CumSno2SnowLM_snvr(L,NY,NX)-XSnowThawMassLM_snvr(L,NY,NX),tinyw_val)
     VLIceSnow0_snvr(L,NY,NX)  = AZMAX1d(VLIceSnow0_snvr(L,NY,NX)+CumIce2SnowLM_snvr(L,NY,NX)-XIceThawMassLM_snvr(L,NY,NX)/DENSICE,tinyw_val)
     VLWatSnow0_snvr(L,NY,NX)  = AZMAX1d(VLWatSnow0_snvr(L,NY,NX)+CumWat2SnowLM_snvr(L,NY,NX) &
       +XSnowThawMassLM_snvr(L,NY,NX)+XIceThawMassLM_snvr(L,NY,NX),tinyw_val)
-    ENGY0                            = VLSnowHeatCapM_snvr(M,L,NY,NX)*TKSnow0_snvr(L,NY,NX)
-    TKX                              = TKSnow0_snvr(L,NY,NX)
+
     VLSnowHeatCapM_snvr(M+1,L,NY,NX) = cps*VLDrySnoWE0_snvr(L,NY,NX)+cpw*VLWatSnow0_snvr(L,NY,NX)+cpi*VLIceSnow0_snvr(L,NY,NX)
 
     ActiveSnow_test = VLSnowHeatCapM_snvr(M+1,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8
     IF(ActiveSnow_test)THEN
       TKSnow0_snvr(L,NY,NX)=(ENGY0+CumHeat2SnowLM_snvr(L,NY,NX)+XPhaseChangeHeatLM_snvr(L,NY,NX))/VLSnowHeatCapM_snvr(M+1,L,NY,NX)
-      !top layer snow  
+      !no active snow, reset top layer snow  temperature to air temperature, (it introduces energy error though)
     ELSEIF(L.EQ.1)THEN
       TKSnow0_snvr(L,NY,NX)=TairK_col(NY,NX)
     ELSE
@@ -1118,6 +1122,7 @@ contains
     VLIceSnow0_snvr(1,NY,NX)  = 0._r8
  
     !add ice and water to litter layer
+    tk1pres        = TKSoil1_vr(0,NY,NX)
     ENGY1          = TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)
 
     !it is not a pond
@@ -1126,6 +1131,9 @@ contains
       VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
       VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
       TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
+!      if(I==149 .and. J==10 .and. NX==1)then
+!        write(114,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),tk1pres
+!      endif
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else 
@@ -1413,7 +1421,7 @@ contains
 
     !AvgVaporCondctSnowLitR=snowpack-litter conductance
     !there is litter layer with sufficient moisture
-    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. AirFilledSoilPoreM_vr(M,0,NY,NX).GT.THETX)THEN      
+    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. AirFilledSoilPoreM_vr(M,0,NY,NX).GT.AirFillPore_Min)THEN      
       VapSnow0=vapsat(TK0X)  !*dssign(VLWatSnow0M_snvr(L,NY,NX)) !snow vapor pressure, saturated
       !snow -> residue vapor flux (>0)
       H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX) &
@@ -1546,7 +1554,7 @@ contains
   end subroutine SnowSurfLitRIteration
 
 !------------------------------------------------------------------------------------------
-  subroutine CopySnowStates(I,J,NY,NX)
+  subroutine StageSnowModel(I,J,NY,NX)
   implicit none
   integer, intent(in) :: NY,NX,I,J
 
@@ -1577,7 +1585,7 @@ contains
     XIceThawMassL_snvr(L,NY,NX)  = 0._r8
   ENDDO D60  
 
-  end subroutine CopySnowStates
+  end subroutine StageSnowModel
 !------------------------------------------------------------------------------------------
 
   subroutine UpdateSoilWaterPotential(NY,NX)
@@ -1672,7 +1680,7 @@ contains
 
   CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*AirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*AirFilledSoilPoreM_vr(M,0,NY,NX),POROS_vr(0,NY,NX))
 
-  IF(FracSurfByLitR_col(NY,NX).GT.ZERO)THEN
+  IF(FracSurfByLitR_col(NY,NX).GT.ZEROL)THEN
     IF(VapCond1.GT.ZERO .AND. CNVR.GT.ZERO)THEN      
       AvgVaporCondctSnowLitR=2.0_r8*CNVR*VapCond1/(VapCond1*DLYRR_COL(NY,NX)+CNVR*SnowThickL0_snvr(L,NY,NX))
     ELSE
@@ -1754,7 +1762,7 @@ contains
   ! dts_wat=time step for flux calculations
   ! VapFlxSno2Soi1,HeatConvFlxSno2Soi1=vapor flux and its convective heat flux
   !
-  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.THETX)THEN
+  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.AirFillPore_Min)THEN
     VapSoiDest = vapsat(TKSoil1_vr(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoil1_vr(NUM(NY,NX),NY,NX)))
     VapCond2   = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)*POROQ &
       *AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)

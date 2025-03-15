@@ -1,7 +1,9 @@
 module BoundaryTranspMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,        only: endrun
   use minimathmod,   only: isclose, AZMAX1
   use TracerPropMod, only: MolecularWeight
+  use AqueChemDatatype
   use ClimForcDataType
   use DebugToolMod
   use GridConsts
@@ -26,15 +28,16 @@ module BoundaryTranspMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine XBoundaryFluxMM(M,MX,NHW,NHE,NVN,NVS)
+  subroutine XBoundaryFluxMM(I,J,M,MX,NHW,NHE,NVN,NVS)
   implicit none
-
+  integer, intent(in) :: I,J
   integer, intent(in) :: M,MX,NHW, NHE, NVN, NVS
 
   character(len=*), parameter :: subname='XBoundaryFluxMM'
   integer :: NY,NX,L
-  integer :: N1,N2,N3,N4,N5,N6,NN,N
-  integer :: N4B,N5B,M1,M2,M3,M4,M5,M6
+  integer :: NN,N
+  integer :: N1,N2,N3,N4,N5,N6,N4B,N5B  !inner grids
+  integer :: M1,M2,M3,M4,M5,M6          !boundary exchange
   real(r8) :: RCHQF,RCHGFU,RCHGFT,XN
 
 
@@ -44,6 +47,7 @@ module BoundaryTranspMod
 !
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+
       D9585: DO L=NU(NY,NX),NL(NY,NX)
         N1=NX;N2=NY;N3=L
 !
@@ -62,13 +66,9 @@ module BoundaryTranspMod
               IF(NN.EQ.iOutflow)THEN   !eastward
                 !eastern boundary
                 IF(NX.EQ.NHE)THEN
-                  M1 = NX
-                  M2 = NY
-                  M3 = L
+                  M1 = NX;M2 = NY;M3 = L
                   !target grid
-                  M4 = NX+1
-                  M5 = NY
-                  M6 = L
+                  M4 = NX+1;M5 = NY;M6 = L
                   XN = -1.0    !going out
                   RCHQF  = RechargEastSurf(M2,M1)
                   RCHGFU = RechargEastSubSurf(M2,M1)
@@ -79,13 +79,9 @@ module BoundaryTranspMod
               ELSEIF(NN.EQ.iInflow)THEN  !west
                 !western boundary
                 IF(NX.EQ.NHW)THEN
-                  M1 = NX
-                  M2 = NY
-                  M3 = L
+                  M1 = NX;M2 = NY;M3 = L
                   !
-                  M4 = NX
-                  M5 = NY
-                  M6 = L
+                  M4 = NX;M5 = NY;M6 = L
                   XN = 1.0     !coming in
                   RCHQF  = RechargWestSurf(M5,M4)
                   RCHGFU = RechargWestSubSurf(M5,M4)
@@ -104,13 +100,8 @@ module BoundaryTranspMod
               IF(NN.EQ.iOutflow)THEN  !south
                 ! southern boundary
                 IF(NY.EQ.NVS)THEN
-                  M1    = NX
-                  M2    = NY
-                  M3    = L
-                  !target grid
-                  M4    = NX
-                  M5    = NY+1
-                  M6    = L
+                  M1 = NX;M2 = NY;M3   = L   !source grid
+                  M4 = NX;M5 = NY+1;M6 = L  !target grid
                   XN    = -1.0_r8    !going out
                   RCHQF  = RechargSouthSurf(M2,M1)
                   RCHGFU = RechargSouthSubSurf(M2,M1)
@@ -121,13 +112,8 @@ module BoundaryTranspMod
               ELSEIF(NN.EQ.iInflow)THEN  !north
                 ! northern boundary
                 IF(NY.EQ.NVN)THEN
-                  M1 = NX
-                  M2 = NY
-                  M3 = L
-                  !target
-                  M4 = NX
-                  M5 = NY
-                  M6 = L
+                  M1 = NX;M2 = NY;M3 = L !source                   
+                  M4 = NX;M5 = NY;M6 = L !target
                   XN = 1.0_r8   !coming in
                   RCHQF  = RechargNorthSurf(M5,M4)
                   RCHGFU = RechargNorthSubSurf(M5,M4)
@@ -138,23 +124,12 @@ module BoundaryTranspMod
               ENDIF
             ELSEIF(N.EQ.iVerticalDirection)THEN !vertical
               !source
-              N1 = NX
-              N2 = NY
-              N3 = L
-              !target
-              N4 = NX
-              N5 = NY
-              N6 = L+1
-              IF(NN.EQ.iOutflow)THEN
-                !lower boundary
-                IF(L.EQ.NL(NY,NX))THEN
-                  M1=NX
-                  M2=NY
-                  M3=L
-                  !target grid
-                  M4=NX
-                  M5=NY
-                  M6=L+1
+              N1 = NX;N2 = NY;N3 = L    !source
+              N4 = NX;N5 = NY;N6 = L+1  !target
+              IF(NN.EQ.iOutflow)THEN                
+                IF(L.EQ.NL(NY,NX))THEN      !lower boundary
+                  M1 = NX;M2 = NY;M3 = L    !source grid
+                  M4 = NX;M5 = NY;M6 = L+1  !target grid
                   XN=-1.0_r8  !going out
                 ELSE
                   cycle
@@ -167,14 +142,14 @@ module BoundaryTranspMod
             
 !     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
 !     RUNOFF IN 'WATSUB' AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
-!
-            call OverLandTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
+!           
+            call XBoundaryTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
 !
           ENDDO D9575
           !
           !     NET OVERLAND SOLUTE FLUX IN WATER
           !
-            IF(M.NE.MX)call NetTracerFlowOverLandM(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)
+            IF(M.NE.MX)call XGridNetTracerFlowM(I,J,L,N,M,N1,N2,N4B,N5B,N4,N5)
 !
 !     TOTAL SOLUTE FLUX IN MICROPORES AND MACROPORES
 !
@@ -183,13 +158,14 @@ module BoundaryTranspMod
           ENDIF
         ENDDO D9580
       ENDDO D9585
+
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine XBoundaryFluxMM
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
+  subroutine XBoundaryTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
 
   implicit none
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
@@ -209,7 +185,8 @@ module BoundaryTranspMod
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
     IF((NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      .OR. (NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+
       FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
@@ -279,10 +256,12 @@ module BoundaryTranspMod
     trcn_SnowDrift_flxM_2D(ids_H2PO4,N,M5,M4)       = 0.0_r8
   ENDIF
 
-  end subroutine SurfTracerRunoffXYM
+  end subroutine XBoundaryTracerRunoffXYM
 ! ----------------------------------------------------------------------
 
-  subroutine BoundaryRunoffandSnowZM(M,N,NN,M1,M2,M3,M4,M5,M6)
+  subroutine XBoundaryTracerTranspM(M,N,NN,M1,M2,M3,M4,M5,M6)
+  !
+  !tracer advection across the boundaries in 3 different directions
   implicit none
   integer, intent(in) :: M,N,NN
   integer, intent(in) :: M1,M2,M3
@@ -307,6 +286,10 @@ module BoundaryTranspMod
 
     DO idn=ids_beg,ids_end
       trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4)=VFLW*AZMAX1(trcs_solml2_vr(idn,M3,M2,M1))*trcs_VLN_vr(idn,M3,M2,M1)
+      if(abs(trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4))>1.e3)then
+        write(*,*)VFLW,trcs_solml2_vr(idn,M3,M2,M1),trcs_VLN_vr(idn,M3,M2,M1)
+        call endrun(trim(mod_filename)//' at line',__LINE__)                
+      endif
     ENDDO
 !
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
@@ -315,12 +298,17 @@ module BoundaryTranspMod
     DO  K=1,jcplx
       DOM_MicpTranspFlxM_3D(idom_beg:idom_end,K,N,M6,M5,M4)=0.0_r8
     enddo
-    trcs_MicpTranspFlxM_3D(idg_beg:idg_end-2,N,M6,M5,M4)=0.0_r8
+    trcs_MicpTranspFlxM_3D(idg_beg:idg_NH3-1,N,M6,M5,M4)=0.0_r8
 
    !add irrigation flux
     DO ids=ids_nuts_beg,ids_nuts_end
       trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)=WaterFlow2MicPM_3D(M,N,M6,M5,M4) &
         *trcn_irrig_vr(ids,M3,M2,M1)*trcs_VLN_vr(ids,M3,M2,M1)
+      if(abs(trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4))>1.e3)then
+        write(*,*)WaterFlow2MicPM_3D(M,N,M6,M5,M4), &
+        trcn_irrig_vr(ids,M3,M2,M1),trcs_VLN_vr(ids,M3,M2,M1)
+        call endrun(trim(mod_filename)//' at line',__LINE__)                
+      endif        
     ENDDO
 
   ENDIF
@@ -367,12 +355,17 @@ module BoundaryTranspMod
   DO ids=ids_beg,ids_end
     trcs_TransptMicP_3D(ids,N,M6,M5,M4)=trcs_TransptMicP_3D(ids,N,M6,M5,M4)+trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)
     trcs_TransptMacP_3D(ids,N,M6,M5,M4)=trcs_TransptMacP_3D(ids,N,M6,M5,M4)+trcs_MacpTranspFlxM_3D(ids,N,M6,M5,M4)
+    
+    if(abs(trcs_TransptMicP_3D(ids,N,M6,M5,M4))>1.e10)then
+      write(*,*)ids,N,M6,M5,M4,trcs_MicpTranspFlxM_3D(ids,N,M6,M5,M4)
+      call endrun(trim(mod_filename)//' at line',__LINE__)
+    endif
   ENDDO
 
-  end subroutine BoundaryRunoffandSnowZM
+  end subroutine XBoundaryTracerTranspM
 
 ! ----------------------------------------------------------------------
-  subroutine OverLandTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
+  subroutine XBoundaryTracerFlowMM(L,N,NN,M,MX,N1,N2,N3,M1,M2,M3,M4,M5,M6,RCHQF)
   implicit none
 
   integer, intent(in) :: L,N, NN, M,MX 
@@ -386,12 +379,12 @@ module BoundaryTranspMod
 !
   IF(M.NE.MX)THEN
     IF(L.EQ.NUM(M2,M1) .AND. N.NE.iVerticalDirection)THEN
-      call SurfTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
+      call XBoundaryTracerRunoffXYM(M,N,NN,N1,N2,M4,M5,RCHQF)
     ENDIF
 !
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(FlowDirIndicator(M2,M1).NE.3 .OR. N.EQ.iVerticalDirection)THEN        
-        call BoundaryRunoffandSnowZM(M,N,NN,M1,M2,M3,M4,M5,M6)
+        call XBoundaryTracerTranspM(M,N,NN,M1,M2,M3,M4,M5,M6)
       ENDIF
     ENDIF
 !
@@ -418,14 +411,14 @@ module BoundaryTranspMod
 !     X*FLG=hourly convective gas flux
 !
     DO idg=idg_beg,idg_NH3
-      RGasADFlxMM_3D(idg,N,M6,M5,M4)        = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
-      Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)   = Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)+RGasADFlxMM_3D(idg,N,M6,M5,M4)
+      Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4)    = VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
+      Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4) = Gas_AdvDif_Flx_3D(idg,N,M6,M5,M4)+Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4)
     ENDDO
   ELSE
-    RGasADFlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
+    Gas_AdvDif_FlxMM_3D(idg_beg:idg_NH3,N,M6,M5,M4)=0.0_r8
   ENDIF
 
-  end subroutine OverLandTracerFlowMM
+  end subroutine XBoundaryTracerFlowMM
 !------------------------------------------------------------------------------------------
 
   subroutine NetOverlandFluxXYM(M,N,N1,N2,N4,N5,N4B,N5B)
@@ -454,12 +447,12 @@ module BoundaryTranspMod
     ENDDO
 
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-      DO  K=1,jcplx
+      D9551: DO  K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_SurfRunoff_flxM(idom,K,N2,N1)=DOM_SurfRunoff_flxM(idom,K,N2,N1) &
             -DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,N5,N4)
         enddo
-      enddo
+      enddo D9551
 
       DO idg=idg_beg,idg_NH3
         trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5,N4)
@@ -503,18 +496,11 @@ module BoundaryTranspMod
 
 !------------------------------------------------------------------------------------------
 !
-  subroutine NetTracerFlowOverLandM(L,N,M,MX,NY,NX,N1,N2,N4B,N5B,N4,N5)
+  subroutine XGridNetTracerFlowM(I,J,L,N,M,N1,N2,N4B,N5B,N4,N5)
   implicit none
 
-  integer, intent(in) :: L,N, M, MX,NY,NX,N1,N2,N4B,N5B,N4,N5
+  integer, intent(in) :: I,J,L,N, M,N1,N2,N4B,N5B,N4,N5
   integer :: NN,K,LS,LS2
-!
-!     TQR*=net overland solute flux
-!     RQR*=overland solute flux
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
 
   IF(L.EQ.NUM(N2,N1))THEN
@@ -525,26 +511,28 @@ module BoundaryTranspMod
     !     NET SOLUTE FLUX IN SNOWPACK
     ELSEIF(N.EQ.iVerticalDirection)THEN
       ! vertical direction
-      call NetOverlandFluxZM(M,N1,N2,NY,NX)
+      call NetOverlandFluxZM(I,J,M,N1,N2)
     ENDIF
   ENDIF
 
-  end subroutine NetTracerFlowOverLandM
+  end subroutine XGridNetTracerFlowM
 !------------------------------------------------------------------------------------------
 
-  subroutine NetOverlandFluxZM(M,N1,N2,NY,NX)
+  subroutine NetOverlandFluxZM(I,J,M,N1,N2)
   implicit none
-  integer, intent(in) :: M,N1,N2,NY,NX
+  integer, intent(in) :: I,J
+  integer, intent(in) :: M,N1,N2
 
   integer :: LS,LS2
   integer :: idg,idn
 
+
   DO  LS=1,JS
-    IF(VLSnowHeatCapM_snvr(M,LS,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+
+    IF(VLSnowHeatCapM_snvr(M,LS,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1)*1.e-4_r8)THEN
       LS2=MIN(JS,LS+1)
-!
-!     IF LOWER LAYER IS IN THE SNOWPACK
-!
+
+      ! NEXT LAYER IS IN THE SNOWPACK   
       IF(LS.LT.JS .AND. VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
         DO idg=idg_beg,idg_NH3
           trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
@@ -555,34 +543,42 @@ module BoundaryTranspMod
           trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
             +trcn_AquaAdv_flxM_snvr(idn,LS,N2,N1)-trcn_AquaAdv_flxM_snvr(idn,LS2,N2,N1)
         ENDDO
+
+        ! NEXT LAYER IS THE LITTER AND SOIL SURFACE
       ELSE
-!
-!     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
-!
+
         ! exclude NH3 and NH3B
         DO idg=idg_beg,idg_NH3
           trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
-            +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)-trcs_MicpTranspFlxM_3D(idg,3,0,N2,N1) &
-            -trcs_MicpTranspFlxM_3D(idg,3,NUM(N2,N1),N2,N1)
-  !    3-trcs_MacpTranspFlxM_3D(idg,3,NUM(N2,N1),N2,N1)
+            +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)   &
+            -trcg_AquaADV_Snow2Litr_flxM(idg,N2,N1) &
+            -trcg_AquaADV_Snow2Soil_flxM(idg,N2,N1)
         ENDDO
 
+!        if(I==9 .and. J>=23)then
+!          write(120,*)'netflx1',LS,trcg_AquaAdv_flx_snvr(idg_O2,LS,N2,N1),-trcg_AquaADV_Snow2Litr_flx(idg_O2,N2,N1), &
+!            -trcg_AquaADV_Snow2Soil_flx(idg_O2,N2,N1),trcg_Aqua_flxM_snvr(idg_O2,LS,N2,N1),trcg_solsml2_snvr(idg_O2,LS,N2,N1)
+
+!          write(120,*)'netflx2',LS,trcg_AquaAdv_flxM_snvr(idg_O2,LS,N2,N1), &
+!            -trcg_AquaADV_Snow2Litr_flxM(idg_O2,N2,N1), &
+!            -trcg_AquaADV_Snow2Soil_flxM(idg_O2,N2,N1)  
+!        endif    
+
         trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1) &
-          -trcs_MicpTranspFlxM_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
-!    3-trcs_MacpTranspFlxM_3D(idg_NH3B,3,NUM(N2,N1),N2,N1)
+          -trcg_AquaADV_Snow2Soil_flxM(idg_NH3B,N2,N1)
 
 ! check trnsfr.f, loop 1205
         DO idn=0,ids_nuts
           trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1) &
-            +trcn_AquaAdv_flxM_snvr(ids_NH4+idn,LS,N2,N1)-trcs_MicpTranspFlxM_3D(ids_NH4+idn,3,0,N2,N1) &
-            -trcs_MicpTranspFlxM_3D(ids_NH4+idn,3,NUM(N2,N1),N2,N1) &
-            -trcs_MicpTranspFlxM_3D(ids_NH4B+idn,3,NUM(N2,N1),N2,N1)
-!    -trcs_MacpTranspFlxM_3D(ids_NH4+idn,3,NUM(N2,N1),N2,N1) &
-!    -trcs_MacpTranspFlxM_3D(ids_NH4B+idn,3,NUM(N2,N1),N2,N1)
+            +trcn_AquaAdv_flxM_snvr(ids_NH4+idn,LS,N2,N1)   &
+            -trcn_AquaADV_Snow2Litr_flxM(ids_NH4+idn,N2,N1) &
+            -trcn_AquaADV_Snow2Soil_flxM(ids_NH4+idn,N2,N1) &
+            -trcn_AquaADV_Snow2Band_flxM(ids_NH4B+idn,N2,N1)
         ENDDO
       ENDIF
     ENDIF
   enddo
+
   end subroutine NetOverlandFluxZM
 !------------------------------------------------------------------------------------------
 
@@ -618,8 +614,12 @@ module BoundaryTranspMod
           +trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
         trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1)=trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1) &
           +trcs_MacpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)
+        if(abs(trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1))>1.e10)then
+          write(*,*)N,N3,N2,N1,N6,N5,N4,trcs_names(ids)
+          write(*,*)trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1),-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
+          call endrun(trim(mod_filename)//' at line',__LINE__)                
+        endif  
       ENDDO
-
     ELSE
       DO  K=1,jcplx
         DOM_Transp2Micp_flxM_vr(idom_beg:idom_end,K,N3,N2,N1)  = 0.0_r8
@@ -638,7 +638,7 @@ module BoundaryTranspMod
 !
   IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
-      Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)=Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)+RGasADFlxMM_3D(idg,N,N3,N2,N1)-RGasADFlxMM_3D(idg,N,N6,N5,N4)
+      Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)=Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)+Gas_AdvDif_FlxMM_3D(idg,N,N3,N2,N1)-Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)
     ENDDO
   ELSE
     Gas_AdvDif_FlxMM_vr(idg_beg:idg_NH3,N3,N2,N1)=0._r8

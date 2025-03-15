@@ -1,0 +1,63 @@
+&regression_test
+ cells   =           0
+/
+
+&ecosim
+case_name          = 'gh_dray'
+prefix             = '../../inputs/dryland_maize/'
+do_regression_test = .false.
+pft_file_in        = '../../../input_data/ecosim_pftpar_20240723.nc'
+grid_file_in       = '../../../examples/inputs/climeConst/climeConst_grid_20250223.nc'
+pft_mgmt_in        = '../../../examples/inputs/dryland_maize/dryland_pft_20230509.nc'
+soil_mgmt_in       = '../../../examples/inputs/dryland_maize/dryland_soilmgmt_20230210.nc'
+clm_hour_file_in   = '../../../examples/inputs/dryland_maize/dryland_clm_20230203.nc'
+clm_factor_in      = 'NO'
+atm_ghg_in         = '../../../input_data/fatm_hist_GHGs_1750-2022.nc'
+atm_co2_fix        = 370.
+lverbose           = .false.
+grid_mode          = 1
+plant_model        = .true.
+microbial_model    = .false.
+soichem_model      = .true.
+disp_planttrait    = .true.
+
+!set up output variable lists
+!set up the first year of simulation
+start_date   = '20010101000000'
+continue_run = .false.
+!set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
+forc_periods=2001,2006,1,2001,2002,0,2001,2006,0
+
+!set up solvers
+NPXS      = 30, 30, 30   !number of cycles per hour for water, heat, solute flux calcns
+NPYS      = 10, 10, 10   !number of cycles per NPX for gas flux calcns
+NCYC_LITR = 30
+NCYC_SNOW = 20
+!set up output frequency
+hist_mfilt  = 8760
+hist_nhtfrq = -24
+fixClime    = .true.
+/
+&bbgcforc
+/
+
+!namelist for timer
+&ecosim_time
+rest_opt    = 'nyears'  !'ndays',      'nmonths', 'nyears'
+rest_frq    = 1
+delta_time  = 3600.
+stop_option = 'ndays' !run by nyears, nmonths,   ndays,
+stop_n      = 144            !this shall overwrite what is set in forc_periods
+diag_frq    = 1
+diag_opt    = 'nsteps'
+/
+
+
+&FixClimForc
+airT_C    = 20.0
+Wind_ms   = 0.5
+vap_Kpa   = 2.0
+Rain_mmhr = 0.0
+SRAD_Wm2  = 20.
+Atm_kPa   = 1.01325e5
+/

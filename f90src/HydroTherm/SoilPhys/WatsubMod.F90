@@ -763,9 +763,9 @@ module WatsubMod
   real(r8) :: FINHX,THETAX  
   real(r8) :: AirfMicP,VOLPX2,AirfMacP
   real(r8) :: XN,THETA1,HeatFlx
-  real(r8) :: VOLP1X,VLWatMacP1X,VOLPH1X
+  real(r8) :: VOLP1X,VLWatMacP1X,VOLPH1X  
   character(len=20) :: str_dir
-  logical :: donot_drain
+  logical :: donot_drain,lZeroRunoff
 
 !     begin_execution
 !     AirfMicP,AirfMacP=air-filled porosity in micropores,macropores
@@ -801,23 +801,16 @@ module WatsubMod
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!     
             str_dir='none'       
             IF(N.EQ.iEastWestDirection)THEN
-              ! along the W-E direction
-              !eastern
-              N4  = NX+1; N5  = NY
-              !western
-              N4B = NX-1; N5B = NY
+              ! along the W-E direction              
+              N4  = NX+1; N5  = NY  !eastern
+              N4B = NX-1; N5B = NY  !western
               N6  = L
               IF(NN.EQ.iOutflow)THEN
                 !eastern boundary  |---|->
                 IF(NX.EQ.NHE)THEN                
-                  M1 = NX
-                  M2 = NY
-                  M3 = L
-                  !target
-                  M4 = NX+1
-                  M5 = NY
-                  M6 = L
-                  XN              = -1.0_r8   !going out of eastern boundary
+                  M1 = NX; M2  = NY; M3 = L  !source
+                  M4 = NX+1;M5 = NY;M6  = L  !target
+                  XN = -1.0_r8               !going out of eastern boundary
                   RechargSurf     = RechargEastSurf(M2,M1)
                   RechargSubSurf  = RechargEastSubSurf(M2,M1)
                   RechargRateWTBL = RechargRateEastWTBL(M2,M1)
@@ -827,16 +820,10 @@ module WatsubMod
                 ENDIF
               ELSEIF(NN.EQ.iInflow)THEN
                 !west boundary   -|-> |
-                IF(NX.EQ.NHW)THEN
-                  
-                  M1 = NX+1
-                  M2 = NY
-                  M3 = L
-                  !target
-                  M4 = NX
-                  M5 = NY
-                  M6 = L
-                  XN = 1.0_r8    !coming in from western boundary
+                IF(NX.EQ.NHW)THEN                  
+                  M1 = NX+1;M2 = NY; M3 = L  !source                  
+                  M4 = NX; M5 = NY; M6 = L   !target
+                  XN = 1.0_r8                !coming in from western boundary
                   RechargSurf     = RechargWestSurf(M5,M4)
                   RechargSubSurf  = RechargWestSubSurf(M5,M4)
                   RechargRateWTBL = RechargRateWestWTBL(M5,M4)
@@ -846,21 +833,15 @@ module WatsubMod
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.iNorthSouthDirection)THEN
-              ! along the N-S direction
-              !south
-              N4  = NX; N5  = NY+1
-              !north
-              N4B = NX; N5B = NY-1
+              ! along the N-S direction              
+              N4  = NX; N5  = NY+1 !south
+              N4B = NX; N5B = NY-1 !north
               N6  = L
               IF(NN.EQ.iOutflow)THEN     !-----
                 !south boundary     \|/
                 IF(NY.EQ.NVS)THEN !-----
-                  M1              = NX
-                  M2              = NY
-                  M3              = L
-                  M4              = NX
-                  M5              = NY+1
-                  M6              = L
+                  M1 = NX; M2 = NY; M3   = L   !source
+                  M4 = NX; M5 = NY+1; M6 = L   !target
                   XN              = -1.0_r8    !going out of south boundary
                   RechargSurf     = RechargSouthSurf(M2,M1)
                   RechargSubSurf  = RechargSouthSubSurf(M2,M1)
@@ -872,15 +853,10 @@ module WatsubMod
               ELSEIF(NN.EQ.iInflow)THEN  !\|/
                 !north boundary     ----
                 IF(NY.EQ.NVN)THEN  !----
-                  M1 = NX
-                  M2 = NY+1
-                  M3 = L
-                  !target
-                  M4          = NX
-                  M5          = NY
-                  M6          = L
-                  XN          = 1.0_r8   !coming in from north boundary
-                  RechargSurf = RechargNorthSurf(M5,M4)
+                  M1 = NX; M2 = NY+1; M3 = L !source grid 
+                  M4 = NX;M5  = NY; M6   = L !target grid
+                  XN          = 1.0_r8       !coming in from north boundary
+                  RechargSurf     = RechargNorthSurf(M5,M4)
                   RechargSubSurf  = RechargNorthSubSurf(M5,M4)
                   RechargRateWTBL = RechargRateNorthWTBL(M5,M4)
                   str_dir='north'
@@ -896,12 +872,8 @@ module WatsubMod
               IF(NN.EQ.iOutflow)THEN
                 !bottom
                 IF(L.EQ.NL(NY,NX))THEN
-                  M1              = NX
-                  M2              = NY
-                  M3              = L
-                  M4              = NX
-                  M5              = NY
-                  M6              = L+1
+                  M1 = NX; M2 = NY; M3  = L   !source
+                  M4 = NX; M5 = NY; M6 = L+1  !target
                   XN              = -1.0_r8    !going out lower boundary
                   RechargSubSurf  = RechargBottom_col(M2,M1)
                   RechargRateWTBL = 1.0_r8
@@ -924,24 +896,25 @@ module WatsubMod
 !           top soil layer and surface soil layer is active, litter layer is lower than its initial thickness 
 !           or the grid is a soil
 !           surface lateral flow 
-            IF(L.EQ.NUM(N2,N1) .AND. N.NE.iVerticalDirection                           & ! lateral flow
+            IF(L.EQ.NUM(N2,N1) .AND. N.NE.iVerticalDirection                                & ! lateral flow at surface
               .AND. (CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1).LE.CumLitRDepzInit_col(N2,N1)  & ! in the soil
-              .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                     ! it is soil
-              !  NO runoff
-              IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RechargSurf,0._r8) .OR. &
-                ABS(SurfRunoffWatFluxM_2DH(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+              .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                         ! it is soil
 
-                !runoff
-              ELSE
-                call SurfaceRunoff(I,J,M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
-!
-        !     BOUNDARY SNOW FLUX
-        !
-        !     DrySnoFlxBySnowRedistribut,WatFlxBySnowRedistribut,IceFlxBySnowRedistribut=snow,water,ice transfer
-        !     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
-        !     QS,QW,QI=cumulative hourly snow,water,ice transfer
-        !     HQS=cumulative hourly convective heat transfer from snow,water,ice transfer
-        !      zero out for eastern and southern
+              !  NO runoff
+              lZeroRunoff=.not.XGridRunoffFlag(NN,N,N2,N1)   &              !Runoff flag is off
+                .OR. isclose(RechargSurf,0._r8)              &              !Allowed runoff rate is zero
+                .OR. ABS(SurfRunoffWatFluxM_2DH(M,N2,N1)).LT.ZEROS(N2,N1)   !Runoff from infiltration partition is inisignificant
+
+               !do runoff
+              IF(.not.LZeroRunoff)then
+                call XBoundSurfaceRunoff(I,J,M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
+                !
+                !     BOUNDARY SNOW FLUX
+                !
+                !  DrySnoFlxBySnowRedistribut,WatFlxBySnowRedistribut,IceFlxBySnowRedistribut=snow,water,ice transfer
+                !  HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
+
+                ! Zero out for eastern and southern
                 IF(NN.EQ.iOutflow)THEN
                   DrySnoFlxBySnowRedistribut(N,M5,M4)  = 0.0_r8
                   WatFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8
@@ -1992,7 +1965,7 @@ module WatsubMod
   !     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
   !
   
-  !     THETPM,THETX=current, minimum air-filled porosity
+  !     THETPM,AirFillPore_Min=current, minimum air-filled porosity
   !     TK11,TK12=interim soil temperature in source,destination
   !     VP1,VPL=vapor concentration in source,destination
   !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
@@ -2009,7 +1982,7 @@ module WatsubMod
   ConvectVapFlux       = 0._r8
   HeatByConvectVapFlux = 0._r8
   if(fixWaterLevel)return
-  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.THETX .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.THETX)THEN
+  IF(AirFilledSoilPoreM_vr(M,N3,N2,N1).GT.AirFillPore_Min .AND. AirFilledSoilPoreM_vr(M,N6,N5,N4).GT.AirFillPore_Min)THEN
     TK11   = TKSoil1_vr(N3,N2,N1)
     TK12   = TKSoil1_vr(N6,N5,N4)
     VP1    = vapsat(TK11)*EXP(18.0_r8*PSISV1/(RGASC*TK11))

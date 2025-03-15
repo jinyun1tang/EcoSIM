@@ -17,6 +17,7 @@ module NutUptakeMod
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
   public :: PlantNutientO2Uptake
+  public :: ZeroNutrientUptake
   contains
 
 !------------------------------------------------------------------------
@@ -44,7 +45,6 @@ module NutUptakeMod
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
-
   call RootMycoO2NutrientUptake(I,J,NZ,PathLen_pvr,FineRootRadius,&
     FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FracSoiLayByPrimRoot,RootAreaDivRadius_vr &
     ,PopPlantO2Uptake,PopPlantO2Demand)
@@ -52,7 +52,7 @@ module NutUptakeMod
   call SumNutrientUptake(NZ)
 
   IF(PopPlantO2Demand.GT.ZERO4Groth_pft(NZ))THEN
-    PlantO2Stress_pft(NZ)=PopPlantO2Uptake/PopPlantO2Demand
+    PlantO2Stress_pft(NZ)=AZMAX1(PopPlantO2Uptake)/PopPlantO2Demand
   ELSE
     PlantO2Stress_pft(NZ)=1.0_r8
   ENDIF    
@@ -74,7 +74,7 @@ module NutUptakeMod
   integer :: NB
 
   associate(                                                         &
-    TdegCCanopy_pft        => plt_ew%TdegCCanopy_pft,          &
+    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft,             &
     NU                        => plt_site%NU,                        &
     AREA3                     => plt_site%AREA3,                     &
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch,           &
@@ -148,13 +148,15 @@ module NutUptakeMod
   character(len=*), parameter :: subname='RootMycoO2NutrientUptake'
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,PerPlantRootH2OUptake
   real(r8) :: dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr
-  integer :: N,L
+  real(r8) :: RootCO2Ar,RootCO2ArB
+  integer :: N,L,idg
 !     begin_execution
   associate(                                                      &
     THETW_vr                => plt_soilchem%THETW_vr,             &
     VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr,    &
     ZEROS2                  => plt_site%ZEROS2,                   &
     NU                      => plt_site%NU,                       &
+    NK                      => plt_site%NK,                       &    
     ZERO                    => plt_site%ZERO,                     &
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
     RootO2Dmnd4Resp_pvr     => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
@@ -163,24 +165,31 @@ module NutUptakeMod
     RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr,     &
     MY                      => plt_morph%MY,                      &
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
+    trcs_deadroot2soil_pvr  => plt_rbgc%trcs_deadroot2soil_pvr,   &
+    trcg_rootml_pvr         => plt_rbgc%trcg_rootml_pvr,          &
+    trcs_rootml_pvr         => plt_rbgc%trcs_rootml_pvr,          &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
+    RootCO2Ar2Soil_pvr      => plt_rbgc%RootCO2Ar2Soil_pvr,       &
+    RootCO2Ar2Root_pvr      => plt_rbgc%RootCO2Ar2Root_pvr,       &
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
   call PrintInfo('beg '//subname)
-  call ZeroUptake(NZ)
 
   PopPlantO2Uptake = 0._r8
   PopPlantO2Demand = 0._r8
+  RootCO2Ar        = 0._r8
+  RootCO2ArB       = 0._r8
+  trcs_deadroot2soil_pvr(:,:,NZ) = 0._r8  
 
-  D955: DO N  = 1, MY(NZ)
-    D950: DO L=NU,MaxSoiL4Root_pft(NZ)
-      IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO &
-        .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. THETW_vr(L).GT.ZERO)THEN
+  D950: DO L=NU,NK
+    IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO) then
 
-!        if(I>176)print*,'getuptkcp',L
-        call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FCUP,FZUP,FPUP,&
-          FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
+      D955: DO N  = 1, MY(NZ)
+        if(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+
+          call GetUptakeCapcity(N,L,NZ,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,FCUP,FZUP,FPUP,&
+            FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
 !
 !     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
@@ -190,15 +199,15 @@ module NutUptakeMod
 !     RootVH2O_pvr=root or myco aqueous volume
 !     FOXYX=fraction of total O2 demand from previous hour
 !
-        RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
+          RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
 
-        call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
-          RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
-
-        PopPlantO2Demand = PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
-        PopPlantO2Uptake = PopPlantO2Uptake+PopPlantO2Uptake_vr
-!        if(I>176)print*,'rootexud'
-        call RootExudates(I,J,N,L,NZ)
+          call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
+            RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
+        
+          PopPlantO2Demand = PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
+          PopPlantO2Uptake = PopPlantO2Uptake+PopPlantO2Uptake_vr
+       
+          call RootExudates(I,J,N,L,NZ)
 !
 !     NUTRIENT UPTAKE
 !
@@ -207,32 +216,44 @@ module NutUptakeMod
 !     FWSRT=protein concentration relative to 5%
 !     RootLenPerPlant_pvr=root,myco length per plant
 !
-        IF(RAutoRootO2Limter_rpvr(N,L,NZ).GT.ZERO .AND. FCUP.GT.ZERO .AND. FWSRT.GT.ZERO &
-          .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+          IF(RAutoRootO2Limter_rpvr(N,L,NZ).GT.ZERO .AND. FCUP.GT.ZERO .AND. FWSRT.GT.ZERO &
+            .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
 !         
 !          if(I>176)print*,'uptakemin'
-          call UptakeMineralNitrogen(I,J,N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
-            RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
+            call UptakeMineralNitrogen(I,J,N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
+              RootAreaDivRadius_vr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake)
 !
 !     FPUP=limitn to active uptake respiration from CPPOLR
 !         
 !          if(I>176)print*,'uptakeppp'
-          call UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
-            RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
+            call UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,MinFracPRoot4Uptake_pvr,&
+              RootAreaDivRadius_vr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake)
+          ENDIF
+          RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         ENDIF
-      ELSE
+!        if(I==140 .and. J<=2)write(116,*)'rootgas',(I*1000+J)*100+N,L,plt_rbgc%trcg_air2root_flx_pvr(idg_CH4,N,L,NZ)
+      ENDDO D955      
+    ELSE
+      D956: DO N  = 1, MY(NZ)    
+        RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
+        RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
+        DO idg=idg_beg,idg_NH3
+          trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcg_rootml_pvr(idg,N,L,NZ)
+          trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcs_rootml_pvr(idg,N,L,NZ)
+          trcg_rootml_pvr(idg,N,L,NZ)      = 0._r8
+          trcs_rootml_pvr(idg,N,L,NZ)      = 0._r8
+        ENDDO
+      ENDDO D956
+    ENDIF
+  ENDDO D950
 
-      ENDIF
-
-    ENDDO D950
-  ENDDO D955
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake
 !------------------------------------------------------------------------
-  subroutine ZeroUptake(NZ)
+  subroutine ZeroNutrientUptake(NZ)
 
   implicit none
   integer, intent(in) :: NZ
@@ -240,11 +261,12 @@ module NutUptakeMod
   integer :: K, L1,L2,NN
   !     begin_execution
 
-  L1=plt_site%NU;L2=plt_morph%MaxSoiL4Root_pft(NZ);NN=plt_morph%MY(NZ)
-
+  L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%MY(NZ)
+  plt_rbgc%RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
+  plt_rbgc%RootCO2Ar2Root_pvr(:,NZ)       = 0._r8
   plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
-  plt_rbgc%RootUptkSoiSol_vr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
+  plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
   plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
   plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
   plt_rbgc%RAutoRootO2Limter_rpvr(1:NN,L1:L2,NZ)                          = 1.0_r8
@@ -281,7 +303,7 @@ module NutUptakeMod
   plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)               = 0.0_r8
   plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)               = 0.0_r8
   plt_bgcr%RootN2Fix_pvr(L1:L2,NZ)                                       = 0.0_r8
-  end subroutine ZeroUptake
+  end subroutine ZeroNutrientUptake
 
 !------------------------------------------------------------------------
 
@@ -410,7 +432,7 @@ module NutUptakeMod
     RootNO3DmndBand_pvr    => plt_rbgc%RootNO3DmndBand_pvr,    &
     RootOUlmNutUptake_pvr  => plt_rbgc%RootOUlmNutUptake_pvr,  &
     SoluteDifusvty_vr      => plt_soilchem%SoluteDifusvty_vr,  &
-    trcs_solml_vr           => plt_soilchem%trcs_solml_vr,       &
+    trcs_solml_vr          => plt_soilchem%trcs_solml_vr,      &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr        &
@@ -765,7 +787,7 @@ module NutUptakeMod
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr,        &
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr,       &
-    trcs_solml_vr           => plt_soilchem%trcs_solml_vr        &
+    trcs_solml_vr          => plt_soilchem%trcs_solml_vr        &
   )
   !
   !     HPO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -1217,35 +1239,6 @@ module NutUptakeMod
   !     IN BAND AND NON-BAND SOIL ZONES FROM DEMAND CALCULATED
   !     IN PREVIOUS HOUR
   !
-  !     RO2EcoDmndPrev_vr=O2 demand by all microbial,root,myco populations
-  !     RootO2Dmnd4Resp_pvr=O2 demand by each root,myco population
-  !     FOXYX=fraction of RO2EcoDmndPrev_vr by each root,myco population
-  !     RNH4EcoDmndSoilPrev_vr=NH4 demand in non-band by all microbial,root,myco populations
-  !     RootNH4DmndSoil_pvr=NH4 demand in non-band by each root,myco population
-  !     FNH4X=fraction of RNH4EcoDmndSoilPrev_vr by each root,myco populn
-  !     RNH4EcoDmndBandPrev_vr=NH4 demand in band by all microbial,root,myco populations
-  !     RootNH4DmndBand_pvr=NH4 demand in band by each root,myco population
-  !     FNHBX=fraction of RNH4EcoDmndBandPrev_vr by each root,myco populn
-  !     RNO3EcoDmndSoilPrev_vr=NO3 demand in non-band by all microbial,root,myco populations
-  !     RootNO3DmndSoil_pvr=NO3 demand in non-band by each root,myco population
-  !     FNO3X=fraction of RNO3EcoDmndSoilPrev_vr by each root,myco populn
-  !     RNO3EcoDmndBandPrev_vr=NO3 demand in band by all microbial,root,myco populations
-  !     RUNNXB=NO3 demand in band by each root,myco population
-  !     FNOBX=fraction of RNO3EcoDmndBandPrev_vr by each root,myco populn
-  !     RH2PO4EcoDmndSoilPrev_vr=H2PO4 demand in non-band by all microbial,root,myco populations
-  !     RootH2PO4DmndSoil_pvr=H2PO4 demand in non-band by each root,myco population
-  !     FPO4X=fraction of RH2PO4EcoDmndSoilPrev_vr by each root,myco populn
-  !     RH2PO4EcoDmndBandPrev_vr=H2PO4 demand in band by all microbial,root,myco populations
-  !     RootH2PO4DmndBand_pvr=H2PO4 demand in band by each root,myco population
-  !     FPOBX=fraction of RH2PO4EcoDmndBandPrev_vr by each root,myco populn
-  !     RH1PO4EcoDmndSoilPrev_vr=HPO4 demand in non-band by all microbial,root,myco populations
-  !     RootH1PO4DmndSoil_pvr=HPO4 demand in non-band by each root,myco population
-  !     FP14X=fraction of RH1PO4EcoDmndSoilPrev_vr by each root,myco populn
-  !     RH1PO4EcoDmndBandPrev_vr=HPO4 demand in band by all microbial,root,myco populations
-  !     RootH1PO4DmndBand_pvr=HPO4 demand in band by each root,myco population
-  !     FP1BX=fraction of RH1PO4EcoDmndBandPrev_vr by each root,myco populn
-  !     MinFracPRoot4Uptake_pvr=minimum uptake fraction
-  !     FracPRoot4Uptake=PFT fraction of biome root mass
   !
   IF(RO2EcoDmndPrev_vr(L).GT.ZEROS)THEN
     FOXYX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ)/RO2EcoDmndPrev_vr(L))
@@ -1278,7 +1271,7 @@ module NutUptakeMod
     ZEROS2                 => plt_site%ZEROS2,                 &
     VLWatMicPM_vr          => plt_site%VLWatMicPM_vr,          &
     RootVH2O_pvr           => plt_morph%RootVH2O_pvr,          &
-    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
+    RootMycoExudEUptk_pvr  => plt_rbgc%RootMycoExudEUptk_pvr,  &
     FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr,    &
     DOM_vr                 => plt_soilchem%DOM_vr              &
   )

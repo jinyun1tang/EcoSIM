@@ -19,6 +19,7 @@ implicit none
   public :: SumPlantBranchBiome
   public :: EnterPlantBalance
   public :: ExitPlantBalance
+  public :: SumPlantRootGas
   logical,save  :: lfile(2)=.true.
   contains
 
@@ -96,6 +97,41 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
+  subroutine SumPlantRootGas(I,J)
+
+  implicit none
+  integer, intent(in) :: I,J
+  integer :: NZ ,L,N,idg,K
+  real(r8) :: trcg(idg_beg:idg_NH3)
+  associate(                                                       &
+    NU                       => plt_site%NU,                       &  
+    trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
+    trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
+    trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
+    MY                       => plt_morph%MY,                      &
+    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
+  )
+  trcg_root_vr(idg_beg:idg_NH3,:)         = 0._r8
+
+  trcg(:)=0._r8
+  DO NZ=1,plt_site%NP  
+    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle    
+    DO L=NU,MaxSoiL4Root_pft(NZ)
+      DO N=1,MY(NZ)  
+        DO idg=idg_beg,idg_NH3
+          trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
+        ENDDO        
+      ENDDO  
+      DO idg=idg_beg,idg_NH3
+        trcg(idg)=trcg(idg)+trcg_root_vr(idg,L)
+      ENDDO
+    ENDDO
+!    if(I==140 .and. J<=2)write(116,*)I*1000+J,MaxSoiL4Root_pft(NZ),trcg(idg_CH4)
+  ENDDO
+!  if(I==140 .and. J>=20)write(116,*)trcg(idg_N2),'N2'
+  end associate
+  end subroutine SumPlantRootGas
+!------------------------------------------------------------------------------------------
 
   subroutine SumPlantBiomStates(I,J,NZ,header)
   implicit none
@@ -120,13 +156,13 @@ implicit none
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch, &
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft,    &
     StandDeadKCompElms_pft    => plt_biom%StandDeadKCompElms_pft,    &
-    ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch  ,     &
+    ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch,       &
     RootElms_pft              => plt_biom%RootElms_pft,              &
     ShootElms_pft             => plt_biom%ShootElms_pft              &
   )
@@ -213,7 +249,7 @@ implicit none
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch,        &
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch,         &
     CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
-    StalkLiveBiomassC_brch         => plt_biom%StalkLiveBiomassC_brch,          &
+    StalkLiveBiomassC_brch     => plt_biom%StalkLiveBiomassC_brch,      &
     CanopyLeafShethC_pft       => plt_biom%CanopyLeafShethC_pft,        &
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
     StalkRsrvElms_brch         => plt_biom%StalkRsrvElms_brch,          &
@@ -280,6 +316,8 @@ implicit none
     LitrfalStrutElms_pvr  => plt_bgcr%LitrfalStrutElms_pvr   &
   )  
   
+  plt_rbgc%trcs_plant_uptake_vr=0._r8
+
   D9980: DO NZ=1,NP0
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs

@@ -848,7 +848,7 @@ implicit none
     if(isleap(yearc))LYR=1
     DO II=1,366
       DO JJ=1,24
-        SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
+        SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600.e-6_r8  !convert from W/m2 to MJ/m^2/hour
         WINDH(JJ,II)=WINDH(JJ,II)*3600._r8        !convert from m/s to m/hour
         RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
       enddo
@@ -993,8 +993,9 @@ implicit none
   end subroutine get_clm_years
 !-----------------------------------------------------------------------
   function get_forc_step_type(yeari)result(iclmtype)
-!  yearf1<=year<yearf2, daily climate forcing
-!  yearf2<year, hourly climate forcing
+  !
+  !  yearf1<=year<yearf2, daily climate forcing
+  !  yearf2<year, hourly climate forcing
   implicit none
   integer, intent(in) :: yeari  ! current year of forcing data
   integer :: iclmtype

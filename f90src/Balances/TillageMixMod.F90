@@ -105,9 +105,9 @@ module TillageMixMod
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
 
   CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 

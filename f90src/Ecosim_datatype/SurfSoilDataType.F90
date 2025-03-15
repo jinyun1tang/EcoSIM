@@ -18,7 +18,7 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  HeatNet2Surf_col(:,:)                  !total ground heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  VapXAir2GSurf_col(:,:)                 !negative of total evaporation at ground surface, [m3 d-2 t-1]
   real(r8),target,allocatable ::  VWatStoreCapSurf_col(:,:)              !surface water storage capacity, [m3 d-2]
-  real(r8),target,allocatable ::  VLWatheldCapSurf_col(:,:)              !soil surface water retention capacity
+  real(r8),target,allocatable ::  VLWatHeldCapSurf_col(:,:)              !soil surface water retention capacity
   real(r8),target,allocatable ::  VHCPNX_col(:,:)                        !minimum heat capacities,[MJ k-1 d-2]
   real(r8),target,allocatable ::  CondGasXSnowM_col(:,:,:)               !area upscaled soil surface boundary layer conductance, [m d-2]
   real(r8),target,allocatable ::  Rain2SoilSurf_col(:,:)                 !precipitation flux into soil surface , [m3 d-2 h-1]
@@ -44,7 +44,7 @@ contains
   allocate(VapXAir2GSurf_col(JY,JX));          VapXAir2GSurf_col       = 0._r8
   allocate(FracSurfBareSoil_col(JY,JX));      FracSurfBareSoil_col     = 0._r8
   allocate(VWatStoreCapSurf_col(JY,JX));       VWatStoreCapSurf_col            = 0._r8
-  allocate(VLWatheldCapSurf_col(JY,JX));       VLWatheldCapSurf_col        = 0._r8
+  allocate(VLWatHeldCapSurf_col(JY,JX));       VLWatHeldCapSurf_col        = 0._r8
   allocate(VHCPNX_col(JY,JX));      VHCPNX_col                                 = 0._r8
   allocate(CondGasXSnowM_col(60,JY,JX));     CondGasXSnowM_col                                   = 0._r8
   allocate(Rain2SoilSurf_col(JY,JX));       Rain2SoilSurf_col          = 0._r8
@@ -70,7 +70,7 @@ contains
   call destroy(VapXAir2GSurf_col)
   call destroy(FracSurfBareSoil_col)
   call destroy(VWatStoreCapSurf_col)
-  call destroy(VLWatheldCapSurf_col)
+  call destroy(VLWatHeldCapSurf_col)
   call destroy(VHCPNX_col)
   call destroy(CondGasXSnowM_col)
   call destroy(Rain2SoilSurf_col)

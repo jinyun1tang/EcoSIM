@@ -2,15 +2,17 @@ module readiMod
 !!
 ! code to read site, topographic data
 !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils   , only : endrun
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,       only: endrun
+  use fileUtil,         only: open_safe, check_read
+  use minimathmod,      only: isclose,   AZMAX1, safe_adb
+  use MiniFuncMod,      only: GetDayLength
+  use EcoSIMConfig,     only: column_mode
+  use EcoSiMParDataMod, only: micpar
+  use SoilHydroParaMod, only: ComputeSoilHydroPars
+  use SoilPhysParaMod,  only: SetDeepSoil
   use ncdio_pio
   use EcoSIMCtrlMod
-  use fileUtil     , only : open_safe, check_read
-  use minimathmod  , only : isclose, AZMAX1
-  use MiniFuncMod  , only : GetDayLength
-  use EcoSIMConfig , only : column_mode
-  use EcoSiMParDataMod, only : micpar
   use SOMDataType
   use CanopyRadDataType
   use EcosimConst
@@ -29,8 +31,6 @@ module readiMod
   use SoilBGCDataType
   use AqueChemDatatype
   use GridDataType
-  use SoilHydroParaMod, only : ComputeSoilHydroPars
-  use SoilPhysParaMod, only : SetDeepSoil
   implicit none
   private
 
@@ -417,8 +417,8 @@ module readiMod
     NM(NV1,NH1) = MaxNumRootLays(NV1,NH1)+NL1
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
-    NLI(NV1,NH1)=NM(NV1,NH1)+NL2
-    NL(NV1,NH1)=NLI(NV1,NH1)
+    NLI(NV1,NH1) = NM(NV1,NH1)+NL2
+    NL(NV1,NH1)  = NLI(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayBottom_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
@@ -466,12 +466,12 @@ module readiMod
     call ncd_getvar(grid_nfid, 'CCACO',ntp,CCACO_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CCASO',ntp,CCASO_vr(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'GKC4',ntp,GKC4_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCH',ntp,GKCH_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCA',ntp,GKCA_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCM',ntp,GKCM_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCN',ntp,GKCN_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'GKCK',ntp,GKCK_vr(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'GKC4',ntp,GKC4_vr(1:JZ,NV1,NH1))  !Gapon coeff for NH4(+)
+    call ncd_getvar(grid_nfid, 'GKCH',ntp,GKCH_vr(1:JZ,NV1,NH1))  !Gapon coeff for H(+)
+    call ncd_getvar(grid_nfid, 'GKCA',ntp,GKCA_vr(1:JZ,NV1,NH1))  !Gapon coeff for Al(3+)
+    call ncd_getvar(grid_nfid, 'GKCM',ntp,GKCM_vr(1:JZ,NV1,NH1))  !Gapon coeff for Mg(2+)
+    call ncd_getvar(grid_nfid, 'GKCN',ntp,GKCN_vr(1:JZ,NV1,NH1))  !Gapon coeff for Na(+)
+    call ncd_getvar(grid_nfid, 'GKCK',ntp,GKCK_vr(1:JZ,NV1,NH1))  !Gapon coeff for K(+)
 
     call ncd_getvar(grid_nfid, 'THW',ntp,THW_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'THI',ntp,THI_vr(1:JZ,NV1,NH1))
@@ -601,7 +601,18 @@ module readiMod
 
           ENDDO
         ENDIF
-
+        DO L=1,NL(NY,NX)
+          if(CSoilOrgM_vr(ielmc,L,NY,NX) > 0._r8)then 
+            if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
+              write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
+              call endrun(trim(mod_filename)//' at line',__LINE__)  
+            endif
+            if(CSoilOrgM_vr(ielmp,L,NY,NX)>CSoilOrgM_vr(ielmn,L,NY,NX))then
+              write(iulog,*)'Likely too larger P/N ratio',safe_adb(CSoilOrgM_vr(ielmp,L,NY,NX),CSoilOrgM_vr(ielmn,L,NY,NX)), 'in L,NY,NX',L,NY,NX
+              call endrun(trim(mod_filename)//' at line',__LINE__)  
+            endif
+          endif  
+        ENDDO
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
         endif

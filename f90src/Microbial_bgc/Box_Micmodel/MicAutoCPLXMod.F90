@@ -1,14 +1,14 @@
 module MicAutoCPLXMod
 ! USES:
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : safe_adb,AZMAX1
-  use MicForcTypeMod, only : micforctype
-  use MicFluxTypeMod, only: micfluxtype
-  use MicStateTraitTypeMod, only : micsttype
+  use data_kind_mod,        only: r8 => DAT_KIND_R8
+  use minimathmod,          only: safe_adb, AZMAX1, fixEXConsumpFlux
+  use MicForcTypeMod,       only: micforctype
+  use MicFluxTypeMod,       only: micfluxtype
+  use MicStateTraitTypeMod, only: micsttype
+  use EcoSiMParDataMod,     only: micpar
   use MicrobeDiagTypes
   use ElmIDMod
   use TracerIDMod
-  use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar
   use EcoSimConst
   use NitroPars
@@ -129,22 +129,22 @@ module MicAutoCPLXMod
 !
 !
   if (N.eq.mid_AmmoniaOxidBacter)then
-!   NH3 OXIDIZERS
+    ! NH3 OXIDIZERS
     call NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,&
       RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
   elseif (N.eq.mid_NitriteOxidBacter)then
-!     NO2 OXIDIZERS
+    ! NO2 OXIDIZERS
     call NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,naqfdiag,nmicf,nmics,micflx)
 
   elseif (N.eq.mid_H2GenoMethanogArchea)then
-!     H2TROPHIC METHANOGENS
+    ! H2TROPHIC METHANOGENS
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx)
 
   elseif (N.eq.mid_AerobicMethanotrofBacter)then
-!     METHANOTROPHS
+    ! METHANOTROPHS
     call MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
       RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
   else
@@ -447,8 +447,6 @@ module MicAutoCPLXMod
   !for aerobic methanotrophs, the following equals to CH4 uptake for biomass
   DOMuptk4GrothAutor(ielmc,NGL)=CGOMX+CGOMD
 
-!  if(micfor%litrm .and. N.eq.micpar%mid_AerobicMethanotrofBacter)write(113,*)I+J/24.,RespGrossAutor(NGL),DOMuptk4GrothAutor(ielmc,NGL)
-
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE TO ACTIVE BIOMASS
 !
@@ -619,7 +617,7 @@ module MicAutoCPLXMod
   real(r8) :: RRADO,RMPOX,ROXDFQ
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
-  real(r8) :: X
+  real(r8) :: X,VOLOXM
   real(r8) :: VOLWPM
 
   ! begin_execution
@@ -641,7 +639,7 @@ module MicAutoCPLXMod
     COXYE                 => micfor%COXYE,                 &
     O2_rain_conc          => micfor%O2_rain_conc,          &
     O2_irrig_conc         => micfor%O2_irrig_conc,         &
-    Irrig2LitRSurf_col        => micfor%Irrig2LitRSurf_col,        &
+    Irrig2LitRSurf_col    => micfor%Irrig2LitRSurf_col,    &
     Rain2LitRSurf         => micfor%Rain2LitRSurf,         &
     litrm                 => micfor%litrm,                 &
     O2AquaDiffusvity      => micfor%O2AquaDiffusvity,      &
@@ -673,17 +671,18 @@ module MicAutoCPLXMod
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=RO2DmndAutor(NGL)*dts_gas    !
-      RO2DmndX=RO2GasXchangePrev*dts_gas*FOXYX    !O2 demand
-      O2AquaDiffusvity1=O2AquaDiffusvity*dts_gas
+      RUPMX             = RO2DmndAutor(NGL)*dts_gas    !
+      RO2DmndX          = -RO2GasXchangePrev*dts_gas*FOXYX    !O2 demand
+      O2AquaDiffusvity1 = O2AquaDiffusvity*dts_gas
       IF(.not.litrm)THEN
         OXYG1  = OXYG*FOXYX
-        ROXYLX = RO2AquaXchangePrev*dts_gas*FOXYX
+        ROXYLX = -RO2AquaXchangePrev*dts_gas*FOXYX
       ELSE
         OXYG1  = COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX = (RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
+        ROXYLX = -(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
           +Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
       ENDIF
+      if(OXYG1<=0._r8 .and. ROXYLX>0._r8)ROXYLX=0._r8
       OXYS1=OXYS*FOXYX
 !
       !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
@@ -712,12 +711,12 @@ module MicAutoCPLXMod
         VOLWOX = VLWatMicPM(M)*O2GSolubility
         VOLPOX = VLsoiAirPM(M)
         VOLWPM = VOLWOX+VOLPOX
-
-!oxygen uptake in the layer
+        VOLOXM = VLWatMicPM(M)*FOXYX
+        !oxygen uptake in the layer
         DO  MX=1,NPT
-          OXYG1  = OXYG1+RO2DmndX
-          OXYS1  = OXYS1+ROXYLX
-          COXYS1 = AMIN1(COXYE*O2GSolubility,AZMAX1(safe_adb(OXYS1,(VLWatMicPM(M)*FOXYX))))
+          call fixEXConsumpFlux(OXYG1,RO2DmndX)
+          call fixEXConsumpFlux(OXYS1,ROXYLX)
+          COXYS1 = AMIN1(COXYE*O2GSolubility,safe_adb(OXYS1,VOLOXM))
 
           !solve for uptake flux
           IF(OXYS1<=ZEROS)THEN
@@ -729,8 +728,9 @@ module MicAutoCPLXMod
           !apply the uptake flux
           OXYS1=OXYS1-RMPOX
           !apply volatilization-dissolution
-          IF(THETPM(M).GT.THETX.AND.VOLPOX.GT.ZEROS)THEN
+          IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=AMAX1(AMIN1(OXYG1,ROXDFQ),-OXYS1)
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
@@ -778,6 +778,7 @@ module MicAutoCPLXMod
   RO2Uptk4RespAutor(NGL) = RO2Dmnd4RespAutor(NGL)*fLimO2Autor(NGL)
   RSOxidSoilAutor(NGL)   = RVOXPA*fLimO2Autor(NGL)
   RSOxidBandAutor(NGL)   = RVOXPB*fLimO2Autor(NGL)
+
   end associate
   end subroutine AerobicAutorO2Uptake
 
@@ -899,6 +900,7 @@ module MicAutoCPLXMod
   !NH4 oxidation by NO2(-)
   RSOxidSoilAutor(NGL)=RSOxidSoilAutor(NGL)+0.333_r8*RNO2ReduxAutorSoil(NGL)
   RSOxidBandAutor(NGL)=RSOxidBandAutor(NGL)+0.333_r8*RNO2ReduxAutorBand(NGL)
+
 !     TRN2ON=TRN2ON+RNO2ReduxAutorSoil(NGL)+RNO2ReduxAutorBand(NGL)
   end associate
   end subroutine AutotrophDenitrificCatabolism
@@ -1255,6 +1257,7 @@ module MicAutoCPLXMod
   real(r8) :: FSBST
   real(r8) :: RVOXP1
   real(r8) :: VMXA
+  real(r8) :: pscal
   REAL(R8) :: VOLWPM
 
   associate(                                            &
@@ -1286,8 +1289,6 @@ module MicAutoCPLXMod
 !
 !     ECHZ=growth respiration efficiency
 !     VMXA=potential oxidation
-!     TFNG=temperature+water effect,FBiomStoiScalarAutorr=N,P limitation
-!     OMA=active biomass,VMX4=specific respiration rate
 !     RCH4PhysexchPrev=total aqueous CH4 exchange from previous hour
 !     RCH4GasXchangePrev=total gaseous CH4 exchange from previous hour
 !     tCH4ProdAceto+tCH4ProdH2=total CH4 generated from methanogenesis
@@ -1351,11 +1352,19 @@ module MicAutoCPLXMod
         !the respiration yield of CH2O, CH4+O2 -> CH2O + H2O (molar basis)
         RGOMP1=RVOXP1*ECHO*ECHZ
         !
-        CH4S1=CH4S1-RVOXP1-RGOMP1
+        if(abs(RVOXP1+RGOMP1)>0._r8)then
+          pscal=CH4S1/(RVOXP1+RGOMP1)
+          if(pscal < 1._r8)then
+            RVOXP1=RVOXP1*pscal
+            RGOMP1=RGOMP1*pscal
+          endif
+          CH4S1=CH4S1-RVOXP1-RGOMP1
+        endif
 
         !dissolution-vaporization
-        IF(THETPM(M).GT.THETX)THEN
+        IF(THETPM(M).GT.AirFillPore_Min)THEN
           RCHDF=DiffusivitySolutEff(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
+          RCHDF=AMAX1(AMIN1(CH4G1,RCHDF),-CH4S1)
         ELSE
           RCHDF=0.0_r8
         ENDIF
@@ -1366,7 +1375,7 @@ module MicAutoCPLXMod
       ENDDO D325
     ENDIF
   ENDDO D320
-  RVOXPA = RCH4Oxid
+  RVOXPA = AZMAX1(RCH4Oxid)
   RVOXPB = 0.0_r8
 !
 !     O2 DEMAND FROM CH4 OXIDATION
@@ -1963,6 +1972,7 @@ module MicAutoCPLXMod
           DO NE=1,NumPlantChemElms
             mBiomeAutor(NE,MID3)=mBiomeAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
           ENDDO
+          !C is respired as CO2 while N and P are recycled.
           mBiomeAutor(ielmn,MID3) = mBiomeAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
           mBiomeAutor(ielmp,MID3) = mBiomeAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)
           RCO2ProdAutor(NGL)      = RCO2ProdAutor(NGL)+RMaintDefcitRecycOMAutor(ielmc,M,NGL)

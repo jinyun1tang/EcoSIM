@@ -35,7 +35,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  DTBLD(:,:)                                !depth of artificial water table adjusted for elevation
   real(r8),target,allocatable ::  DepzIntWTBL_col(:,:)                      !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0_col(:,:)                  !initial external water table depth, elevation corrected [m]
-  real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                    !current external water table depth, elevation corrected [m]
+  real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                    !current external water table depth, elevation corrected (>0 lower than soil surface) [m]
   real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                      !external water table depth, [m]
   real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)              !total energy impact for erosion
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                !excess water+ice
@@ -97,13 +97,14 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  SoilWatMassEnd_col(:,:)                   !soil water mass at the end of time step
   real(r8),target,allocatable ::  Rain2Soil_col(:,:)                        !water flow into soil due to precipitation (+ surface irrigation), [m3 H2O/d2/h]
   real(r8),target,allocatable ::  QdewCanopy_CumYr_pft(:,:,:)
-  real(r8),target,allocatable :: QSnoWatXfer2Soil_col(:,:)
-  real(r8),target,allocatable :: QSnoIceXfer2Soil_col(:,:)
-  real(r8),target,allocatable :: PrecipAtm2LandSurf_col(:,:)                !precipiation from atmosphere to land surface 
-  real(r8),target,allocatable :: RainPrecThrufall_col(:,:)                  !precipitation through canopy [m3 H2O d-2 h-1]
-  real(r8),target,allocatable :: RainPrec2Sno_col(:,:)                      !rainfall to snow [m3 H2O d-2 h-1]
-  real(r8),target,allocatable :: Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface [m3 H2O d-2 h-1]
-  real(r8),target,allocatable :: QWatIntLaterFlow_col(:,:)                  !Internal lateral flow between grids [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  QSnoWatXfer2Soil_col(:,:)
+  real(r8),target,allocatable ::  QSnoIceXfer2Soil_col(:,:)
+  real(r8),target,allocatable ::  PrecipAtm2LandSurf_col(:,:)                !precipiation from atmosphere to land surface 
+  real(r8),target,allocatable ::  RainPrecThrufall_col(:,:)                  !precipitation through canopy [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  RainPrec2Sno_col(:,:)                      !rainfall to snow [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  QWatIntLaterFlow_col(:,:)                  !Internal lateral flow between grids [m3 H2O d-2 h-1]
+
   private :: InitAllocate
   contains
 

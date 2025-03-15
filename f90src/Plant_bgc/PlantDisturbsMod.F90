@@ -524,7 +524,7 @@ module PlantDisturbsMod
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs,         &
     CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
     CanopyLeafShethC_pft       => plt_biom%CanopyLeafShethC_pft,        &
-    StalkLiveBiomassC_brch         => plt_biom%StalkLiveBiomassC_brch,          &
+    StalkLiveBiomassC_brch     => plt_biom%StalkLiveBiomassC_brch,      &
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch,         &
     ShootStrutElms_brch        => plt_biom%ShootStrutElms_brch,         &
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch,      &
@@ -558,6 +558,7 @@ module PlantDisturbsMod
   IF((iHarvstType_pft(NZ).GE.iharvtyp_none .AND. J.EQ.INT(SolarNoonHour_col) &
     .AND. iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
     .OR. (iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo))THEN
+
 !
 !     ACCUMULATE ALL HARVESTED MATERIAL ABOVE CUTTING HEIGHT
 !     ACCOUNTING FOR HARVEST EFFICIENCY ENTERED IN 'READQ'
@@ -650,16 +651,6 @@ module PlantDisturbsMod
 !     CORGC=SOC concentration
 !     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     EFIRE=combustion  of N,P relative to C
-!     FrcLeafMassNotHarvst(ielmc),FrcLeafMassNotHarvst(ielmn),FrcLeafMassNotHarvst(ielmp)=fraction of root layer C,N,P not removed by disturbance
-!     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
-!     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
-!     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
-!     CO2ByFire_CumYr_pft,CH4ByFire_CumYr_pft,O2ByFire_CumYr_pft,NH3byFire_CumYr_pft,N2ObyFire_CumYr_pft,PO4byFire_CumYr_pft=CO2,CH4,O2,NH3,N2O,PO4 emission from disturbance
-!     CO2NetFix_pft=PFT net CO2 fixation
-!     Eco_NBP_CumYr_col=total net biome productivity
-!     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
-!     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
-!     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
       FracLeftThin=1.0_r8-THIN_pft(NZ)
@@ -1453,13 +1444,6 @@ module PlantDisturbsMod
 !
 !     FrcLeafMassLeft=fraction of leaf node mass not harvested
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanopyLeafArea_lpft,CanopyStalkArea_lbrch=leaf,stalk node area in canopy layer
-!     LeafElmntRemoval(ielmc),LeafElmntRemoval(ielmn),LeafElmntRemoval(ielmp)=harvested leaf C,N,P
-!     LeafElmntHarv2Litr(ielmc),LeafElmntHarv2Litr(ielmn),LeafElmntHarv2Litr(ielmp)=harvested leaf C,N,P to litter
-!     WoodyElmntRemoval(ielmc),WoodyElmntRemoval(ielmn),WoodyElmntRemoval(ielmp)=harvested woody C,N,P
-!     WoodyElmntHarv2Litr(ielmc),WoodyElmntHarv2Litr(ielmn),WoodyElmntHarv2Litr(ielmp)=harvested woody C,N,P to litter
-!     FWODB=C woody fraction in other organs:0=woody,1=non-woody
-!     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !
 
           HvestedLeafCLayer_brch = HvestedLeafCLayer_brch-(1._r8-FrcLeafMassLeft)*LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
@@ -1731,7 +1715,7 @@ module PlantDisturbsMod
   real(r8), intent(out):: XHVST1
   real(r8) :: FrcMassNotHarvst(NumPlantChemElms)
   real(r8) :: FFIRE(NumPlantChemElms)
-  integer  :: NR,NTG,M,NE
+  integer  :: NR,idg,M,NE
 
   associate(                                                         &
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
@@ -1772,6 +1756,7 @@ module PlantDisturbsMod
       LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
         +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
     ENDDO
+
     !nonstructural root biomass
     call RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
@@ -1782,6 +1767,7 @@ module PlantDisturbsMod
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+&
           (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
       ENDDO
+
       !woody roots
       call RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
@@ -1791,6 +1777,7 @@ module PlantDisturbsMod
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
           +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
       ENDDO
+
       !fine roots
       CALL RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
@@ -1803,12 +1790,13 @@ module PlantDisturbsMod
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
-  DO NTG=idg_beg,idg_NH3
-    RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ)-XHVST1 &
-      *(trcg_rootml_pvr(idg_CO2,N,L,NZ)+trcs_rootml_pvr(idg_CO2,N,L,NZ))
-    trcg_rootml_pvr(NTG,N,L,NZ)=FracLeftThin*trcg_rootml_pvr(NTG,N,L,NZ)
-    trcs_rootml_pvr(NTG,N,L,NZ)=FracLeftThin*trcs_rootml_pvr(NTG,N,L,NZ)
+  DO idg=idg_beg,idg_NH3
+    RootGasLossDisturb_pft(idg,NZ)=RootGasLossDisturb_pft(idg,NZ)-XHVST1 &
+      *(trcg_rootml_pvr(idg,N,L,NZ)+trcs_rootml_pvr(idg,N,L,NZ))
+    trcg_rootml_pvr(idg,N,L,NZ)=FracLeftThin*trcg_rootml_pvr(idg,N,L,NZ)
+    trcs_rootml_pvr(idg,N,L,NZ)=FracLeftThin*trcs_rootml_pvr(idg,N,L,NZ)
   ENDDO
+
   end associate          
   end subroutine RootMaterialRemovalL
 
@@ -1829,7 +1817,7 @@ module PlantDisturbsMod
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
+    Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr,          &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
@@ -1845,8 +1833,8 @@ module PlantDisturbsMod
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr,        &
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,        &
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    &
   )
 !
