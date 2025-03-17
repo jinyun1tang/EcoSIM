@@ -1259,7 +1259,7 @@ implicit none
     ENDDO
   ENDIF
 
-  IF(NN.EQ.iOutflow)THEN
+  IF(NN.EQ.iFront)THEN
     IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO .AND. SoilBulkDensity_vr(L1,NY,NX).LE.ZERO &
       .AND. VLWatMicP_vr(L0,NY,NX)+VLiceMicP_vr(L0,NY,NX).LE.ZEROS(NY,NX))THEN
       CumDepz2LayBottom_vr(L1,NY,NX) = CumDepz2LayBottom_vr(L0,NY,NX)

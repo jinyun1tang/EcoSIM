@@ -112,11 +112,11 @@ module StartsMod
       !     ALT=surface elevation relative to maximum
       !     ALTZG=minimum surface elevation in landscape
       !CDPTH: depth to bottom of soil layer
-      ALT(NY,NX)=ALT(NY,NX)-ALTY
+      ALT_col(NY,NX)=ALT_col(NY,NX)-ALTY
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
-        ALTZG=ALT(NY,NX)
+        ALTZG=ALT_col(NY,NX)
       ELSE
-        ALTZG=MIN(ALTZG,ALT(NY,NX))
+        ALTZG=MIN(ALTZG,ALT_col(NY,NX))
       ENDIF
       !
       LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)) !topsoil layer depth
@@ -234,7 +234,7 @@ module StartsMod
 !     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
 !
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
-    SED(:,:)=0.0_r8
+    SED_col(:,:)=0.0_r8
   ENDIF
 !
 !     INITIALIZE GRID CELL DIMENSIONS
@@ -250,8 +250,8 @@ module StartsMod
     DO  NY=NVN,NVS
       ALTZ_col(NY,NX)=ALTZG
       IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
-        DTBLD(NY,NX)               = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+        DTBLD(NY,NX)               = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
       ELSE
         ExtWaterTablet0_col(NY,NX) = 0.0_r8
         DTBLD(NY,NX)               = 0.0_r8
@@ -263,39 +263,34 @@ module StartsMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       DO L=1,NL(NY,NX)
-        N1 = NX
-        N2 = NY
-        N3 = L
+        N1 = NX;N2 = NY;N3 = L
+
         DO N=FlowDirIndicator(N2,N1),3
-          IF(N.EQ.iEastWestDirection)THEN
+          IF(N.EQ.iWestEastDirection)THEN
             ! in direction x, west-east
             IF(NX.EQ.NHE)THEN
               cycle
             ELSE
-              N4=NX+1
-              N5=NY
-              N6=L
+              N4=NX+1;N5=NY;N6=L
             ENDIF
           ELSEIF(N.EQ.iNorthSouthDirection)THEN
             ! in direction y, north-south
             IF(NY.EQ.NVS)THEN
               cycle
             ELSE
-              N4=NX
-              N5=NY+1
-              N6=L
+              N4=NX;N5=NY+1;N6=L
             ENDIF
           ELSEIF(N.EQ.iVerticalDirection)THEN
             ! in vertical, up-down
             IF(L.EQ.NL(NY,NX))THEN
               cycle
             ELSE
-              N4=NX
-              N5=NY
-              N6=L+1
+              N4=NX;N5=NY;N6=L+1
             ENDIF
           ENDIF
+          !distance between the center of grids (N3,N2,N1) and (N6,N5,N4)
           DIST(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
+          !
           XDPTH(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?
           DISP_3D(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
@@ -615,8 +610,8 @@ module StartsMod
       GroundSurfAzimuth_col(NY,NX)      = ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)    = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)  = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
-      SLOPE(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
-      SLOPE(iEastWestDirection,NY,NX)   = -SLOPE(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
+      SLOPE(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
+      SLOPE(iWestEastDirection,NY,NX)   = -SLOPE(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
       SLOPE(iNorthSouthDirection,NY,NX) = SLOPE(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
 
       !aspect angle 
@@ -648,11 +643,11 @@ module StartsMod
       !In the vertical direction, for general treatment of flow against slope. 
       SLOPE(3,NY,NX)=-1.0_r8
 
-      IF(.not.isclose(SLOPE(iEastWestDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
-        FSLOPE(iEastWestDirection,NY,NX)   = ABS(SLOPE(iEastWestDirection,NY,NX))/(ABS(SLOPE(iEastWestDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
-        FSLOPE(iNorthSouthDirection,NY,NX) = ABS(SLOPE(iNorthSouthDirection,NY,NX))/(ABS(SLOPE(iEastWestDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))
+      IF(.not.isclose(SLOPE(iWestEastDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
+        FSLOPE(iWestEastDirection,NY,NX)   = ABS(SLOPE(iWestEastDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
+        FSLOPE(iNorthSouthDirection,NY,NX) = ABS(SLOPE(iNorthSouthDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))
       ELSE
-        FSLOPE(iEastWestDirection,NY,NX)   = 0.5_r8
+        FSLOPE(iWestEastDirection,NY,NX)   = 0.5_r8
         FSLOPE(iNorthSouthDirection,NY,NX) = 0.5_r8
       ENDIF
 
@@ -669,27 +664,27 @@ module StartsMod
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
           !(west, north) corner
-          ALT(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
+          ALT_col(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
         ELSE
           !west boundary
-          ALT(NY,NX)=ALT(NY-1,NX) &
-            +1.0_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX) &
+          ALT_col(NY,NX)=ALT_col(NY-1,NX) &
+            +1.0_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX) &
             +0.5_r8*DV(NY-1,NX)*(SLOPE(iNorthSouthDirection,NY-1,NX)) &
             +0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
         ENDIF
       ELSE
         IF(NY.EQ.NVN)THEN
           !north boundary
-          ALT(NY,NX)=ALT(NY,NX-1) &
-            +0.5_r8*DH(NY,NX-1)*SLOPE(iEastWestDirection,NY,NX-1) &
-            +0.5_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX) &
+          ALT_col(NY,NX)=ALT_col(NY,NX-1) &
+            +0.5_r8*DH(NY,NX-1)*SLOPE(iWestEastDirection,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX) &
             +0.5_r8*DV(NY,NX-1)*SLOPE(iNorthSouthDirection,NY,NX-1) &
             +0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
         ELSE
-          ALT(NY,NX)=(ALT(NY,NX-1) &
-            +0.5_r8*DH(NY,NX-1)*SLOPE(iEastWestDirection,NY,NX-1) &
-            +0.5_r8*DH(NY,NX)*SLOPE(iEastWestDirection,NY,NX) &
-            +ALT(NY-1,NX) &
+          ALT_col(NY,NX)=(ALT_col(NY,NX-1) &
+            +0.5_r8*DH(NY,NX-1)*SLOPE(iWestEastDirection,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX) &
+            +ALT_col(NY-1,NX) &
             +0.5_r8*DV(NY-1,NX)*SLOPE(iNorthSouthDirection,NY-1,NX) &
             +0.5_r8*DV(NY,N)*SLOPE(iNorthSouthDirection,NY,NX))/2.0
         ENDIF
@@ -697,13 +692,13 @@ module StartsMod
 
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
         !(west,north) corner
-        ALTY=ALT(NY,NX)
+        ALTY=ALT_col(NY,NX)
       ELSE
-        ALTY=MAX(ALTY,ALT(NY,NX))
+        ALTY=MAX(ALTY,ALT_col(NY,NX))
       ENDIF
       WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
-        ,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL(NY,NX) &
-        ,SLOPE(0,NY,NX),SLOPE(iEastWestDirection,NY,NX),SLOPE(iNorthSouthDirection,NY,NX) &
+        ,ALT_col(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
+        ,SLOPE(0,NY,NX),SLOPE(iWestEastDirection,NY,NX),SLOPE(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
     ENDDO D9980
@@ -1028,11 +1023,11 @@ module StartsMod
       !     ALT=surface elevation relative to maximum
       !     ALTZG=minimum surface elevation in landscape
       !CDPTH: depth to bottom of soil layer
-      ALT(NY,NX)=ALT(NY,NX)-ALTY
+      ALT_col(NY,NX)=ALT_col(NY,NX)-ALTY
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
-        ALTZG=ALT(NY,NX)
+        ALTZG=ALT_col(NY,NX)
       ELSE
-        ALTZG=MIN(ALTZG,ALT(NY,NX))
+        ALTZG=MIN(ALTZG,ALT_col(NY,NX))
       ENDIF
       !
       LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)) !topsoil layer depth

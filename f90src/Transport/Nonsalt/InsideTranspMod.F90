@@ -266,7 +266,7 @@ module InsideTranspMod
 !
     D120: DO N=FlowDirIndicator(N2,N1),3
 
-      IF(N.EQ.iEastWestDirection)THEN
+      IF(N.EQ.iWestEastDirection)THEN
         !WEST-EAST
         IF(NX.EQ.NHE)THEN
           cycle
@@ -388,7 +388,7 @@ module InsideTranspMod
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,N3,N2,N1))
+        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,N3,N2,N1))
       enddo
     ENDDO
 
@@ -409,7 +409,7 @@ module InsideTranspMod
     ENDIF
     D9815: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,N6,N5,N4))
+        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,N6,N5,N4))
       enddo
     ENDDO D9815
     DO ids=ids_beg,ids_end
@@ -442,7 +442,7 @@ module InsideTranspMod
   real(r8) :: trcsolc1(ids_beg:ids_end)
   real(r8) :: trcsolc2(ids_beg:ids_end)
   real(r8) :: CDOM_MicP1(idom_beg:idom_end,1:jcplx)
-  real(r8) :: CDOM_MicP2(idom_beg:idom_end,1:jcplx)
+  real(r8) :: CDOM_MicP2_vr(idom_beg:idom_end,1:jcplx)
   real(r8) :: SDifc(ids_beg:ids_end),SDifFlx(ids_beg:ids_end)
   real(r8) :: DISPN,DIFOM(idom_beg:idom_end)
   real(r8) :: DLYR1,DLYR2,TORTL
@@ -483,9 +483,9 @@ module InsideTranspMod
     D9810: DO K=1,jcplx
       do idom=idom_beg,idom_end
         !source
-        CDOM_MicP1(idom,K)=AZMAX1(DOM_MicP2(idom,K,N3,N2,N1)/VLWatMicPM_vr(M,N3,N2,N1))
+        CDOM_MicP1(idom,K)=AZMAX1(DOM_MicP2_vr(idom,K,N3,N2,N1)/VLWatMicPM_vr(M,N3,N2,N1))
         !dest
-        CDOM_MicP2(idom,K)=AZMAX1(DOM_MicP2(idom,K,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
+        CDOM_MicP2_vr(idom,K)=AZMAX1(DOM_MicP2_vr(idom,K,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
       enddo
     ENDDO D9810
 
@@ -625,7 +625,7 @@ module InsideTranspMod
 !
     D9805: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Difus_Mac2Micp_flxM(idom,K)=DIFOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2(idom,K))        
+        DOM_Difus_Mac2Micp_flxM(idom,K)=DIFOM(idom)*(CDOM_MicP1(idom,K)-CDOM_MicP2_vr(idom,K))        
       enddo
     ENDDO D9805
 
@@ -1155,7 +1155,7 @@ module InsideTranspMod
 
     D9965: DO K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,N6,N5,N4))
+        DOM_Adv2MicP_flx(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,N6,N5,N4))
       enddo
     ENDDO D9965
 !exclude NH3 and NH3B
@@ -1220,7 +1220,7 @@ module InsideTranspMod
     D9955: DO K=1,jcplx
       do idom=idom_beg,idom_end
         DOM_Difus_Mac2Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,N6,N5,N4)) &
-          *VLWatMicPM_vr(M,N6,N5,N4)-AZMAX1(DOM_MicP2(idom,K,N6,N5,N4))*VLWatMacPS)/VOLWT
+          *VLWatMicPM_vr(M,N6,N5,N4)-AZMAX1(DOM_MicP2_vr(idom,K,N6,N5,N4))*VLWatMacPS)/VOLWT
       enddo
     ENDDO D9955
 

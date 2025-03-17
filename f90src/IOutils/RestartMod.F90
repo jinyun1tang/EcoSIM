@@ -4543,17 +4543,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='TSED', dim1name='column',&
-       long_name='erosion rate', units='Mg d-2 h-1', &
+    call restartvar(ncid, flag, varname='TSED_col', dim1name='column',&
+       long_name='Erosion rate', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,TSED_col,datrc_1d)
   else
     !print*,'TSED'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TSED_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='TSED', dim1name='column',&
-       long_name='erosion rate', units='Mg d-2 h-1', &
+    call restartvar(ncid, flag, varname='TSED_col', dim1name='column',&
+       long_name='Erosion rate', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
   endif  
@@ -5598,16 +5598,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='SED', dim1name='column',&
+    call restartvar(ncid, flag, varname='SED_col', dim1name='column',&
        long_name='sediment transport', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SED_col,datrc_1d) 
   else
     !print*,'SED'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SED_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='SED', dim1name='column',&
+    call restartvar(ncid, flag, varname='SED_col', dim1name='column',&
        long_name='sediment transport', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

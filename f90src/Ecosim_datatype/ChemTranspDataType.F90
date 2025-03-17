@@ -33,7 +33,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  trcSalt_FloXSurRunoff_2D(:,:,:,:,:)        !total Al in runoff, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_FloXSurRunoff_2D(:,:,:,:,:)           !surface runoff gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_FloXSurRunoff_2D(:,:,:,:,:)           !surface runoff nutrient flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  DOM_FloXSurRunoff_2D(:,:,:,:,:,:)          !surface runoff DOC flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  DOM_FloXSurRunoff_2DH(:,:,:,:,:,:)          !surface runoff DOC flux, [g d-2 h-1]
   private :: InitAllocate
 
   contains
@@ -81,7 +81,7 @@ module ChemTranspDataType
   allocate(trcSalt_FloXSurRunoff_2D(idsalt_beg:idsalt_end,2,2,JV,JH));   trcSalt_FloXSurRunoff_2D=0._r8
   allocate(trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,2,2,JV,JH));  trcg_FloXSurRunoff_2D=0._r8
   allocate(trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_FloXSurRunoff_2D=0._r8
-  allocate(DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_FloXSurRunoff_2D=0._r8
+  allocate(DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_FloXSurRunoff_2DH=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -112,6 +112,6 @@ module ChemTranspDataType
   call destroy(RGasTranspFlxPrev_vr)
   call destroy(RCH4PhysexchPrev_vr)
   call destroy(RO2AquaSourcePrev_vr)
-  call destroy(DOM_FloXSurRunoff_2D)
+  call destroy(DOM_FloXSurRunoff_2DH)
   end subroutine DestructChemTranspData
 end module ChemTranspDataType

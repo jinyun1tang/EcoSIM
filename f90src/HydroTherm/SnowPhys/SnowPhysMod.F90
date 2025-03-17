@@ -1183,17 +1183,16 @@ contains
 !------------------------------------------------------------------------------------------
   subroutine SnowRedistributionM(M,NY,NX,NHE,NHW,NVS,NVN)
 !
-! SNOW redistribution
+! SNOW redistribution between inside grids
 ! currently, it does consider wind effect
+! Some update is needed to make sure it is correct
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
   integer  :: N1,N2   !reference grid
 
   integer :: N,NN,N4,N5,N4B,N5B
-  real(r8) :: ALTS1,ALTS2
+  real(r8) :: ALTS1,ALTS2,ALTSB
   real(r8) :: QSX,SnowDepthLateralGradient
-  integer, parameter :: iDirectionEW=1   !east-west direction
-  integer, parameter :: iDirectionNS=2   !north-south direction
 !
 !     SNOW REDISTRIBUTION FROM SNOWPACK
 !
@@ -1209,50 +1208,47 @@ contains
 !     QS,WatBySnowRedistrib,IceBySnowRedistrib=hourly-accumulated snow,water,ice transfer
 !     HeatBySnowRedistrib_2DH=hourly-accumd convective heat from snow,water,ice transfer
 !     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
+
   N1=NX;N2=NY
   DO  N=1,2
     DO  NN=1,2
-      IF(N.EQ.iDirectionEW)THEN
-        !east-west
-        IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
+      IF(N.EQ.iWestEastDirection)THEN
+        !skip the boundaries        
+        IF(NX.EQ.NHE .AND. NN.EQ.iFront .OR. (NX.EQ.NHW .AND. NN.EQ.iBehind))THEN
           !at the boundary
           cycle
         ELSE
-          N4=NX+1   !east
-          N5=NY
-          N4B=NX-1  !west grid
-          N5B=NY
+          N4=NX+1 ;N5=NY
+          N4B=NX-1;N5B=NY
         ENDIF
-      ELSEIF(N.EQ.iDirectionNS)THEN
-        !south-north
-        IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
-          !at the boundary
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN
+        !skip the boundariers
+        IF(NY.EQ.NVS .AND. NN.EQ.iFront .OR. (NY.EQ.NVN .AND. NN.EQ.iBehind))THEN          
           cycle
         ELSE
-          N4=NX
-          N5=NY+1   !north grid
-          N4B=NX
-          N5B=NY-1  !south grid
+          N4=NX;N5=NY+1   !north grid
+          N4B=NX;N5B=NY-1  !south grid
         ENDIF
       ENDIF
       
-      ALTS1=Altitude_grid(N2,N1)+SnowDepth_col(N2,N1)
-
-      IF(NN.EQ.iOutflow)THEN
-        !east or south        
-        ALTS2=Altitude_grid(N5,N4)+SnowDepth_col(N5,N4)
-        
+      ALTS1=Altitude_col(N2,N1)+SnowDepth_col(N2,N1)
+      !check grid (N5,N4)
+      IF(NN.EQ.iFront)THEN
+               
+        ALTS2=Altitude_col(N5,N4)+SnowDepth_col(N5,N4)        
         SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST(N,NU(N5,N4),N5,N4)
+
         !QSX>0, grid (N2,N1) loses mass
         QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
 
-        IF(SnowDepthLateralGradient.GT.0.0_r8.AND.SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+        !using the upstream approach
+        IF(SnowDepthLateralGradient.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
           DrySnoFlxBySnowRedistribut(N,N5,N4) = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
           WatFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
           IceFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
           HeatFlxBySnowRedistribut(N,N5,N4)   = TKSnow0_snvr(1,N2,N1)*(cps*DrySnoFlxBySnowRedistribut(N,N5,N4) &
             +cpw*WatFlxBySnowRedistribut(N,N5,N4)+cpi*IceFlxBySnowRedistribut(N,N5,N4))
-        ELSEIF(SnowDepthLateralGradient.LT.0.0_r8.AND.SnowDepth_col(N5,N4).GT.MinSnowDepth)THEN
+        ELSEIF(SnowDepthLateralGradient.LT.0.0_r8 .AND. SnowDepth_col(N5,N4).GT.MinSnowDepth)THEN
           DrySnoFlxBySnowRedistribut(N,N5,N4) = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N5,N4))
           WatFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLWatSnow0_snvr(1,N5,N4))
           IceFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLIceSnow0_snvr(1,N5,N4))
@@ -1264,15 +1260,45 @@ contains
           IceFlxBySnowRedistribut(N,N5,N4)    = 0.0_r8
           HeatFlxBySnowRedistribut(N,N5,N4)   = 0.0_r8
         ENDIF
+
         DrySnoBySnoRedistrib_2DH(N,N5,N4)    = DrySnoBySnoRedistrib_2DH(N,N5,N4)+DrySnoFlxBySnowRedistribut(N,N5,N4)
         WatBySnowRedistrib_2DH(N,N5,N4)      = WatBySnowRedistrib_2DH(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
         IceBySnowRedistrib_2DH(N,N5,N4)      = IceBySnowRedistrib_2DH(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
         HeatBySnowRedistrib_2DH(N,N5,N4)     = HeatBySnowRedistrib_2DH(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
         DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4) = DrySnoFlxBySnowRedistribut(N,N5,N4)
-      ENDIF
 
-      !add west and south
-      IF(NN.EQ.iInflow)THEN
+      ELSEIF(NN.EQ.iBehind)THEN
+        return
+        ALTSB=Altitude_col(N5,N4)+SnowDepth_col(N5B,N4B)        
+        SnowDepthLateralGradient=(ALTS1-ALTSB)/DIST(N,NU(N5B,N4B),N5B,N4B)
+
+        !MOVE from (N2,N1) to (N5B,N4B)
+        IF(SnowDepthLateralGradient.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+          DrySnoFlxBySnowRedistribut(N,N5B,N4B) = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
+          WatFlxBySnowRedistribut(N,N5B,N4B)    = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
+          IceFlxBySnowRedistribut(N,N5B,N4B)    = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
+          HeatFlxBySnowRedistribut(N,N5B,N4B)   = TKSnow0_snvr(1,N2,N1)*(cps*DrySnoFlxBySnowRedistribut(N,N5B,N4B) &
+            +cpw*WatFlxBySnowRedistribut(N,N5B,N4B)+cpi*IceFlxBySnowRedistribut(N,N5B,N4B))
+
+        !move from (N5B,N4B) to (N2,N1)
+        ELSEIF(SnowDepthLateralGradient.LT.0.0_r8 .AND. SnowDepth_col(N5B,N4B).GT.MinSnowDepth)THEN
+          DrySnoFlxBySnowRedistribut(N,N5B,N4B) = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N5B,N4B))
+          WatFlxBySnowRedistribut(N,N5B,N4B)    = QSX*AZMAX1(VLWatSnow0_snvr(1,N5B,N4B))
+          IceFlxBySnowRedistribut(N,N5B,N4B)    = QSX*AZMAX1(VLIceSnow0_snvr(1,N5B,N4B))
+          HeatFlxBySnowRedistribut(N,N5B,N4B)   = TKSnow0_snvr(1,N5B,N4B)*(cps*DrySnoFlxBySnowRedistribut(N,N5B,N4B) &
+            +cpw*WatFlxBySnowRedistribut(N,N5B,N4B)+cpi*IceFlxBySnowRedistribut(N,N5B,N4B))
+        ELSE
+          DrySnoFlxBySnowRedistribut(N,N5B,N4B) = 0.0_r8
+          WatFlxBySnowRedistribut(N,N5B,N4B)    = 0.0_r8
+          IceFlxBySnowRedistribut(N,N5B,N4B)    = 0.0_r8
+          HeatFlxBySnowRedistribut(N,N5B,N4B)   = 0.0_r8
+        ENDIF
+
+        DrySnoBySnoRedistrib_2DH(N,N5B,N4B)    = DrySnoBySnoRedistrib_2DH(N,N5B,N4B)+DrySnoFlxBySnowRedistribut(N,N5B,N4B)
+        WatBySnowRedistrib_2DH(N,N5B,N4B)      = WatBySnowRedistrib_2DH(N,N5B,N4B)+WatFlxBySnowRedistribut(N,N5B,N4B)
+        IceBySnowRedistrib_2DH(N,N5B,N4B)      = IceBySnowRedistrib_2DH(N,N5B,N4B)+IceFlxBySnowRedistribut(N,N5B,N4B)
+        HeatBySnowRedistrib_2DH(N,N5B,N4B)     = HeatBySnowRedistrib_2DH(N,N5B,N4B)+HeatFlxBySnowRedistribut(N,N5B,N4B)
+        DrySnoFlxBySnoRedistM_2DH(M,N,N5B,N4B) = DrySnoFlxBySnowRedistribut(N,N5B,N4B)
 
       ENDIF
     ENDDO
@@ -1281,7 +1307,7 @@ contains
 
 !------------------------------------------------------------------------------------------
   subroutine SumSnowDriftByRunoffM(M,N,N1,N2,N4,N5,N4B,N5B)
-  use SoilWaterDataType, only : IFLBM
+  use SoilWaterDataType, only : IFLBM_2DH
   implicit none 
   integer, intent(in) :: M,N
   integer, intent(in) :: N1,N2

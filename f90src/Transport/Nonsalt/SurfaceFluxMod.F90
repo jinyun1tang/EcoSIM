@@ -167,7 +167,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,0,NY,NX))
       ENDDO
     ENDDO
 
@@ -198,7 +198,7 @@ contains
     ENDIF
     DO K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,NU(NY,NX),NY,NX))
       ENDDO
     ENDDO
 
@@ -432,7 +432,7 @@ contains
     ENDIF
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))
+        DOM_Adv_Mac2MicP_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,NU(NY,NX),NY,NX))
       enddo
     ENDDO
 
@@ -459,7 +459,7 @@ contains
       !diffusion flux in micropore
       do idom=idom_beg,idom_end
         DOM_Difus_Mac2Micp_flxM(idom,K)=dts_HeatWatTP*(AZMAX1(DOM_MacP2(idom,K,NU(NY,NX),NY,NX))*VLWatMicPM_vr(M,NU(NY,NX),NY,NX) &
-          -AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
+          -AZMAX1(DOM_MicP2_vr(idom,K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
       enddo
     ENDDO
 
@@ -517,15 +517,15 @@ contains
   integer :: idom
 !
   N1=NX;N2=NY
-  IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+  IF(SurfRunoffPotentM_col(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM_vr(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,SurfRunoffPotentM_col(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_FloXSurRunoff_flxM(idom,K,N2,N1)=VFLW*AZMAX1(DOM_MicP2(idom,K,0,N2,N1))
+        DOM_FloXSurRunoff_flxM(idom,K,N2,N1)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,0,N2,N1))
       enddo
     ENDDO
     DO idg=idg_beg,idg_NH3
@@ -547,9 +547,9 @@ contains
 !
   D4310: DO N=1,2
     D4305: DO NN=1,2
-      IF(N.EQ.iEastWestDirection)THEN
+      IF(N.EQ.iWestEastDirection)THEN
         !east-west
-        IF((NX.EQ.NHE .AND. NN.EQ.iOutflow) .OR. (NX.EQ.NHW .AND. NN.EQ.iInflow))THEN
+        IF((NX.EQ.NHE .AND. NN.EQ.iFront) .OR. (NX.EQ.NHW .AND. NN.EQ.iBehind))THEN
           cycle
         ELSE
           N4  = NX+1
@@ -559,7 +559,7 @@ contains
         ENDIF
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
         !south-north
-        IF((NY.EQ.NVS .AND. NN.EQ.iOutflow) .OR. (NY.EQ.NVN .AND. NN.EQ.iInflow))THEN
+        IF((NY.EQ.NVS .AND. NN.EQ.iFront) .OR. (NY.EQ.NVN .AND. NN.EQ.iBehind))THEN
           cycle
         ELSE
           N4  = NX
@@ -571,9 +571,9 @@ contains
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-        IF(NN.EQ.iOutflow)THEN
-          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+      IF(SurfRunoffPotentM_col(M,N2,N1).GT.ZEROS(N2,N1))THEN
+        IF(NN.EQ.iFront)THEN
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffPotentM_col(M,N2,N1)
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
               DOM_FloXSurRof_flxM_2DH(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_flxM(idom,K,N2,N1)*FQRM
@@ -581,41 +581,41 @@ contains
           ENDDO
 
           DO idg=idg_beg,idg_NH3
-            trcg_FloXSurRof_flxM_2DH(idg,N,2,N5,N4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
+            trcg_SurRof_flxM_2DH(idg,N,2,N5,N4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
           ENDDO
 
           DO idn=ids_nut_beg,ids_nuts_end
-            trcn_FloXSurRof_flxM_2DH(idn,N,2,N5,N4)=trcn_FloXSurRunoff_flxM(idn,N2,N1)*FQRM
+            trcn_SurRof_flxM_2DH(idn,N,2,N5,N4)=trcn_FloXSurRunoff_flxM(idn,N2,N1)*FQRM
           ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
           DO  K=1,jcplx
             do idom=idom_beg,idom_end
-              DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_2D(idom,K,N,2,N5,N4)+DOM_FloXSurRof_flxM_2DH(idom,K,N,2,N5,N4)
+              DOM_FloXSurRunoff_2DH(idom,K,N,2,N5,N4)=DOM_FloXSurRunoff_2DH(idom,K,N,2,N5,N4)+DOM_FloXSurRof_flxM_2DH(idom,K,N,2,N5,N4)
             enddo
           ENDDO
           DO idg=idg_beg,idg_NH3
-            trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)=trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)+trcg_FloXSurRof_flxM_2DH(idg,N,2,N5,N4)
+            trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)=trcg_FloXSurRunoff_2D(idg,N,2,N5,N4)+trcg_SurRof_flxM_2DH(idg,N,2,N5,N4)
           ENDDO
 
           DO idn=ids_nut_beg,ids_nuts_end
-            trcn_FloXSurRunoff_2D(idn,N,2,N5,N4)=trcn_FloXSurRunoff_2D(idn,N,2,N5,N4)+trcn_FloXSurRof_flxM_2DH(idn,N,2,N5,N4)
+            trcn_FloXSurRunoff_2D(idn,N,2,N5,N4)=trcn_FloXSurRunoff_2D(idn,N,2,N5,N4)+trcn_SurRof_flxM_2DH(idn,N,2,N5,N4)
           ENDDO
         ELSE
           DO K=1,jcplx
             DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
           ENDDO
-          trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,2,N5,N4)=0.0_r8
+          trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,N,2,N5,N4)=0.0_r8
 
-          trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
+          trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
         ENDIF
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        IF(NN.EQ.iInflow)THEN
+        IF(NN.EQ.iBehind)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffPotentM_col(M,N2,N1)
             DO  K=1,jcplx
               do idom=idom_beg,idom_end
                 DOM_FloXSurRof_flxM_2DH(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_flxM(idom,K,N2,N1)*FQRM
@@ -623,47 +623,47 @@ contains
             ENDDO
 
             DO idg=idg_beg,idg_NH3
-              trcg_FloXSurRof_flxM_2DH(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
+              trcg_SurRof_flxM_2DH(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
             ENDDO
 
             DO idn=ids_nut_beg,ids_nuts_end
-              trcn_FloXSurRof_flxM_2DH(idn,N,1,N5B,N4B)=trcn_FloXSurRunoff_flxM(idn,N2,N1)*FQRM
+              trcn_SurRof_flxM_2DH(idn,N,1,N5B,N4B)=trcn_FloXSurRunoff_flxM(idn,N2,N1)*FQRM
             ENDDO
 
             DO K=1,jcplx
               do idom=idom_beg,idom_end
-                DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_2D(idom,K,N,1,N5B,N4B)+DOM_FloXSurRof_flxM_2DH(idom,K,N,1,N5B,N4B)
+                DOM_FloXSurRunoff_2DH(idom,K,N,1,N5B,N4B)=DOM_FloXSurRunoff_2DH(idom,K,N,1,N5B,N4B)+DOM_FloXSurRof_flxM_2DH(idom,K,N,1,N5B,N4B)
               enddo
             ENDDO
 
             DO idg=idg_beg,idg_NH3
-              trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)+trcg_FloXSurRof_flxM_2DH(idg,N,1,N5B,N4B)
+              trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)=trcg_FloXSurRunoff_2D(idg,N,1,N5B,N4B)+trcg_SurRof_flxM_2DH(idg,N,1,N5B,N4B)
             ENDDO
 
             DO idn=ids_nut_beg,ids_nuts_end
-              trcn_FloXSurRunoff_2D(idn,N,1,N5B,N4B)=trcn_FloXSurRunoff_2D(idn,N,1,N5B,N4B)+trcn_FloXSurRof_flxM_2DH(idn,N,1,N5B,N4B)
+              trcn_FloXSurRunoff_2D(idn,N,1,N5B,N4B)=trcn_FloXSurRunoff_2D(idn,N,1,N5B,N4B)+trcn_SurRof_flxM_2DH(idn,N,1,N5B,N4B)
             ENDDO
           ELSE
             DO  K=1,jcplx
               DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
             ENDDO
-            trcg_FloXSurRof_flxM_2DH(idg_beg:idg_end,N,1,N5B,N4B)          = 0.0_r8
-            trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
+            trcg_SurRof_flxM_2DH(idg_beg:idg_end,N,1,N5B,N4B)          = 0.0_r8
+            trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
           ENDIF
         ENDIF
       ELSE
         DO K=1,jcplx
           DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,2,N5,N4)=0.0_r8
         ENDDO
-        trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,2,N5,N4)          = 0.0_r8
-        trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,2,N5,N4) = 0.0_r8
+        trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,N,2,N5,N4)          = 0.0_r8
+        trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,2,N5,N4) = 0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
           DO  K=1,jcplx
             DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,1,N5B,N4B)=0.0_r8
           ENDDO
-          trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,1,N5B,N4B)          = 0.0_r8
-          trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
+          trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,N,1,N5B,N4B)          = 0.0_r8
+          trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B) = 0.0_r8
         ENDIF
       ENDIF
 !
@@ -671,7 +671,7 @@ contains
 !
 !     subroutine SnowdriftTransport(M)
 !
-      IF(NN.EQ.iOutflow)THEN
+      IF(NN.EQ.iFront)THEN
         !
         !     IF NO SNOW DRIFT THEN NO TRANSPORT
         !
@@ -834,7 +834,7 @@ contains
 
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        CDOM_MicP_litr(idom,K)=AZMAX1(DOM_MicP2(idom,K,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
+        CDOM_MicP_litr(idom,K)=AZMAX1(DOM_MicP2_vr(idom,K,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
       enddo
     ENDDO
 
@@ -915,7 +915,7 @@ contains
 
     D8910: DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        CDOM_MicP_soil(idom,K)=AZMAX1(DOM_MicP2(idom,K,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
+        CDOM_MicP_soil(idom,K)=AZMAX1(DOM_MicP2_vr(idom,K,NU(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU(NY,NX),NY,NX))
       enddo
     ENDDO D8910
 

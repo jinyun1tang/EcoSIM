@@ -618,9 +618,9 @@ module IngridTranspMod
   INTEGER :: idsalt
 !     begin_execution
 
-  IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+  IF(SurfRunoffPotentM_col(M,N2,N1).GT.ZEROS(N2,N1))THEN
     IF(VLWatMicPM_vr(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,SurfRunoffWatFluxM_2DH(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
+      VFLW=AMIN1(VFLWX,SurfRunoffPotentM_col(M,N2,N1)/VLWatMicPM_vr(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -649,8 +649,8 @@ module IngridTranspMod
 !
   DO N=1,2
     DO  NN=1,2
-      IF(N.EQ.iEastWestDirection)THEN
-        IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
+      IF(N.EQ.iWestEastDirection)THEN
+        IF(NX.EQ.NHE .AND. NN.EQ.iFront .OR. NX.EQ.NHW .AND. NN.EQ.iBehind)THEN
           cycle
         ELSE
           N4  = NX+1  !eastward
@@ -659,7 +659,7 @@ module IngridTranspMod
           N5B = NY
         ENDIF
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
-        IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
+        IF(NY.EQ.NVS .AND. NN.EQ.iFront .OR. NY.EQ.NVN .AND. NN.EQ.iBehind)THEN
           cycle
         ELSE
           N4  = NX
@@ -672,9 +672,9 @@ module IngridTranspMod
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-      IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-        IF(NN.EQ.iOutflow)THEN
-          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+      IF(SurfRunoffPotentM_col(M,N2,N1).GT.ZEROS(N2,N1))THEN
+        IF(NN.EQ.iFront)THEN
+          FQRM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffPotentM_col(M,N2,N1)
 
           DO idsalt=idsalt_beg,idsalt_end
             trcSalt_FloXSurRof_flxM_2DH(idsalt,N,2,N5,N4)=trcSalt_FloXSurRof_flxM(idsalt,N2,N1)*FQRM
@@ -691,10 +691,10 @@ module IngridTranspMod
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
 !
-        IF(NN.EQ.iInflow)THEN
+        IF(NN.EQ.iBehind)THEN
           !legitimate inner grid
           IF(N4B.GT.0 .AND. N5B.GT.0)THEN
-            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+            FQRM=QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)/SurfRunoffPotentM_col(M,N2,N1)
             DO idsalt=idsalt_beg,idsalt_end
               trcSalt_FloXSurRof_flxM_2DH(idsalt,N,1,N5B,N4B)=trcSalt_FloXSurRof_flxM(idsalt,N2,N1)*FQRM
             ENDDO
@@ -723,7 +723,7 @@ module IngridTranspMod
 !     VOLS=volume of snowpack from watsub.f
 !     *W2=solute content of snowpack
 !
-      IF(NN.EQ.iOutflow)THEN
+      IF(NN.EQ.iFront)THEN
 !
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
@@ -1337,7 +1337,7 @@ module IngridTranspMod
 !
     DO  N=FlowDirIndicator(N2,N1),3
 
-      IF(N.EQ.iEastWestDirection)THEN
+      IF(N.EQ.iWestEastDirection)THEN
         !west-east
         IF(NX.EQ.NHE)THEN
           cycle

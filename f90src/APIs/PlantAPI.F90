@@ -658,7 +658,7 @@ implicit none
   plt_site%ATCA                       = ATCA(NY,NX)
   plt_morph%LeafStalkArea_col         = LeafStalkArea_col(NY,NX)
   plt_morph%CanopyLeafArea_col        = CanopyLeafArea_col(NY,NX)
-  plt_site%ALT                        = ALT(NY,NX)
+  plt_site%ALT                        = ALT_col(NY,NX)
   plt_site%CCO2EI                     = CCO2EI(NY,NX)
   plt_site%CO2EI                      = CO2EI(NY,NX)
   plt_bgcr%NetCO2Flx2Canopy_col       = NetCO2Flx2Canopy_col(NY,NX)

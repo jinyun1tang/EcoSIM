@@ -23,11 +23,14 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: RunXGridBounds
+  public :: XGridBoundRunoffs
 
   contains
 
-  subroutine RunXGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine XGridBoundRunoffs(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  !
+  !Diagnose fluxes across the landscape boundariers 
+  !N-W-S-E, and bottom
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
   integer :: N
@@ -51,71 +54,57 @@ implicit none
     N1=NX;N2=NY
     D9980: DO N=FlowDirIndicator(NY,NX),3
       D9975: DO NN=1,2
-        IF(N.EQ.iEastWestDirection)THEN
-          !east-west direction
-          IF(NN.EQ.iOutflow)THEN
-            IF(NX.EQ.NHE)THEN
-              !eastern boundary
-              N4 = NX+1
-              N5 = NY
-              N6 = L
+
+        IF(N.EQ.iWestEastDirection)THEN !east-west direction
+          
+          IF(NN.EQ.iFront)THEN
+            IF(NX.EQ.NHE)THEN !eastern boundary              
+              N4 = NX+1;N5 = NY;N6 = L
               XN = -1.0_r8   !going out of eastern boundary
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.iInflow)THEN
-            IF(NX.EQ.NHW)THEN
-              !western boundary
-              N4 = NX
-              N5 = NY
-              N6 = L
-              XN = 1.0_r8    !coming in from western boundary
+          ELSEIF(NN.EQ.iBehind)THEN
+            IF(NX.EQ.NHW)THEN  !western boundary              
+              N4 = NX;N5 = NY;N6 = L
+              XN = 1.0_r8       !coming in from western boundary
             ELSE
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.iNorthSouthDirection)THEN
-          !north-south direction
-          IF(NN.EQ.iOutflow)THEN
-            IF(NY.EQ.NVS)THEN
-              !south boundary
-              N4 = NX
-              N5 = NY+1
-              N6 = L
-              XN = -1.0_r8   !going out of southern boundary
+        ELSEIF(N.EQ.iNorthSouthDirection)THEN  !north-south direction          
+          IF(NN.EQ.iFront)THEN
+            IF(NY.EQ.NVS)THEN  !south boundary              
+              N4 = NX;N5 = NY+1;N6 = L
+              XN = -1.0_r8      !going out of southern boundary
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.iInflow)THEN
-            IF(NY.EQ.NVN)THEN
-              !north boundary
-              N4 = NX
-              N5 = NY
-              N6 = L
+          ELSEIF(NN.EQ.iBehind)THEN
+            IF(NY.EQ.NVN)THEN  !north boundary              
+              N4 = NX;N5 = NY;N6 = L
               XN = 1.0_r8       !coming in from northern boundary
             ELSE
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.iVerticalDirection)THEN
-          !vertical direction
-          IF(NN.EQ.iOutflow)THEN
-            IF(L.EQ.NL(NY,NX))THEN
-              N4 = NX
-              N5 = NY
-              N6 = L+1
+        ELSEIF(N.EQ.iVerticalDirection)THEN !vertical direction
+          
+          IF(NN.EQ.iFront)THEN  
+            IF(L.EQ.NL(NY,NX))THEN  !at the bottom
+              N4 = NX;N5 = NY;N6 = L+1
               XN = -1.0_r8       !going out from layer L into L+1
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.iInflow)THEN
+          ELSEIF(NN.EQ.iBehind)THEN
             cycle
           ENDIF
         ENDIF
 !
-        call RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
+        call XBoundarySurfRunoffs(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
-        call SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
+        call XBoundarySubSurfRunoffs(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
 
     !     WATER, HEAT, SOLUTES IN SNOW DRIFT
         call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
@@ -125,11 +114,11 @@ implicit none
     ENDDO D9980
   ENDDO D9985
 
-  end subroutine RunXGridBounds
+  end subroutine XGridBoundRunoffs
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
+  subroutine XBoundarySurfRunoffs(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: L   !vertical layer
@@ -185,7 +174,7 @@ implicit none
       OMRof(:)=0.0_r8
       D2575: DO K=1,jcplx
         DO idom=idom_beg,idom_end
-          OMRof(idom)=OMRof(idom)+XN*DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
+          OMRof(idom)=OMRof(idom)+XN*DOM_FloXSurRunoff_2DH(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D2575
       TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXR-OMRof(ielmc)-OMRof(idom_acetate)
@@ -420,10 +409,10 @@ implicit none
       ENDIF
     ENDIF
   ENDIF
-  end subroutine RunoffXBoundaryFluxes
+  end subroutine XBoundarySurfRunoffs
 !------------------------------------------------------------------------------------------
 
-  subroutine SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
+  subroutine XBoundarySubSurfRunoffs(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
   !
   !Description
   !Subsurface across boundary flow
@@ -644,7 +633,7 @@ implicit none
 !      SG=SG+trcs_TransptMicP_3D(idg_H2,N,N6,N5,N4)+Gas_AdvDif_Flx_3D(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
-  end subroutine SubsurfXBoundaryFlow
+  end subroutine XBoundarySubSurfRunoffs
 
 !------------------------------------------------------------------------------------------
 

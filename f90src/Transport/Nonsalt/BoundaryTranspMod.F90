@@ -56,14 +56,14 @@ module BoundaryTranspMod
 !
         D9580: DO  N=FlowDirIndicator(NY,NX),3
           D9575: DO  NN=1,2
-            IF(N.EQ.iEastWestDirection)THEN
+            IF(N.EQ.iWestEastDirection)THEN
               !WEST-EAST
               N4  = NX+1  !right boundary
               N5  = NY
               N4B = NX-1  !left boundary
               N5B = NY
               N6  = L
-              IF(NN.EQ.iOutflow)THEN   !eastward
+              IF(NN.EQ.iFront)THEN   !eastward
                 !eastern boundary
                 IF(NX.EQ.NHE)THEN
                   M1 = NX;M2 = NY;M3 = L
@@ -76,7 +76,7 @@ module BoundaryTranspMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN  !west
+              ELSEIF(NN.EQ.iBehind)THEN  !west
                 !western boundary
                 IF(NX.EQ.NHW)THEN
                   M1 = NX;M2 = NY;M3 = L
@@ -97,7 +97,7 @@ module BoundaryTranspMod
               N4B = NX
               N5B = NY-1  !north boundary
               N6  = L
-              IF(NN.EQ.iOutflow)THEN  !south
+              IF(NN.EQ.iFront)THEN  !south
                 ! southern boundary
                 IF(NY.EQ.NVS)THEN
                   M1 = NX;M2 = NY;M3   = L   !source grid
@@ -109,7 +109,7 @@ module BoundaryTranspMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN  !north
+              ELSEIF(NN.EQ.iBehind)THEN  !north
                 ! northern boundary
                 IF(NY.EQ.NVN)THEN
                   M1 = NX;M2 = NY;M3 = L !source                   
@@ -126,7 +126,7 @@ module BoundaryTranspMod
               !source
               N1 = NX;N2 = NY;N3 = L    !source
               N4 = NX;N5 = NY;N6 = L+1  !target
-              IF(NN.EQ.iOutflow)THEN                
+              IF(NN.EQ.iFront)THEN                
                 IF(L.EQ.NL(NY,NX))THEN      !lower boundary
                   M1 = NX;M2 = NY;M3 = L    !source grid
                   M4 = NX;M5 = NY;M6 = L+1  !target grid
@@ -134,7 +134,7 @@ module BoundaryTranspMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN
+              ELSEIF(NN.EQ.iBehind)THEN
                 !nothing for the upper boundary
                 cycle
               ENDIF
@@ -173,21 +173,22 @@ module BoundaryTranspMod
   real(r8) :: FQRM
   integer :: K,idg,idn,ids,idom
 
-  IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0.0_r8) .OR. SurfRunoffWatFluxM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
+  IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0.0_r8) .OR. SurfRunoffPotentM_col(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
       DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
     ENDDO
-    trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,NN,M5,M4)          = 0.0_r8
-    trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4) = 0.0_r8
+    trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,N,NN,M5,M4)          = 0.0_r8
+    trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4) = 0.0_r8
   ELSE
 !
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
-!
-    IF((NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR. (NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    ! iFront  :=1
+    ! iBehind  :=2
+    IF((NN.EQ.iFront .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR. (NN.EQ.iBehind .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
 
-      FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+      FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffPotentM_col(M,N2,N1)
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
           DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,M5,M4)=DOM_FloXSurRunoff_flxM(idom,K,N2,N1)*FQRM
@@ -195,60 +196,60 @@ module BoundaryTranspMod
       enddo
 
       DO idg=idg_beg,idg_NH3
-        trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
+        trcg_SurRof_flxM_2DH(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_flxM(idg,N2,N1)*FQRM
       ENDDO
 
       DO ids=ids_nut_beg,ids_nuts_end
-        trcn_FloXSurRof_flxM_2DH(ids,N,NN,M5,M4)=trcn_FloXSurRunoff_flxM(ids,N2,N1)*FQRM
+        trcn_SurRof_flxM_2DH(ids,N,NN,M5,M4)=trcn_FloXSurRunoff_flxM(ids,N2,N1)*FQRM
       ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
-          DOM_FloXSurRunoff_2D(idom,K,N,NN,M5,M4)=DOM_FloXSurRunoff_2D(idom,K,N,NN,M5,M4)+DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,M5,M4)
+          DOM_FloXSurRunoff_2DH(idom,K,N,NN,M5,M4)=DOM_FloXSurRunoff_2DH(idom,K,N,NN,M5,M4)+DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,M5,M4)
         enddo
       enddo
 
       DO idg=idg_beg,idg_NH3
-        trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4)
+        trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)+trcg_SurRof_flxM_2DH(idg,N,NN,M5,M4)
       ENDDO
 
       DO idn=ids_nut_beg,ids_nuts_end
-        trcn_FloXSurRunoff_2D(idn,N,NN,M5,M4)=trcn_FloXSurRunoff_2D(idn,N,NN,M5,M4)+trcn_FloXSurRof_flxM_2DH(idn,N,NN,M5,M4)
+        trcn_FloXSurRunoff_2D(idn,N,NN,M5,M4)=trcn_FloXSurRunoff_2D(idn,N,NN,M5,M4)+trcn_SurRof_flxM_2DH(idn,N,NN,M5,M4)
       ENDDO
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-    ELSEIF((NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-      .OR.(NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+    ELSEIF((NN.EQ.iBehind .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+      .OR.(NN.EQ.iFront .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       DO  K=1,jcplx
         DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
 
       DO idg=idg_beg,idg_NH3
-        trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*trcg_rain_mole_conc_col(idg,M5,M4)*MolecularWeight(idg)
+        trcg_SurRof_flxM_2DH(idg,N,NN,M5,M4) = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)*trcg_rain_mole_conc_col(idg,M5,M4)*MolecularWeight(idg)
       ENDDO
 
-      trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+      trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
 
       DO idg=idg_beg,idg_NH3
-        trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,M5,M4)
+        trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)=trcg_FloXSurRunoff_2D(idg,N,NN,M5,M4)+trcg_SurRof_flxM_2DH(idg,N,NN,M5,M4)
       ENDDO
     ELSE
       DO  K=1,jcplx
         DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,K,N,NN,M5,M4)=0.0_r8
       enddo
-      trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,N,NN,M5,M4)          = 0.0_r8
-      trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4) = 0.0_r8
+      trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,N,NN,M5,M4)          = 0.0_r8
+      trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,N,NN,M5,M4) = 0.0_r8
     ENDIF
 
   ENDIF
 !
 !     BOUNDARY SNOW FLUX
 !
-  IF(NN.EQ.iOutflow)THEN
+  IF(NN.EQ.iFront)THEN
     trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,N,M5,M4) = 0.0_r8
     trcn_SnowDrift_flxM_2D(ids_NH4,N,M5,M4)         = 0.0_r8
     trcn_SnowDrift_flxM_2D(ids_NO3,N,M5,M4)         = 0.0_r8
@@ -269,8 +270,8 @@ module BoundaryTranspMod
   integer :: K,idg,idn,ids,idom
   real(r8) :: VFLW
 
-  IF(NN.EQ.iOutflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR. NN.EQ.iInflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+  IF(NN.EQ.iFront .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR. NN.EQ.iBehind .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
 
     IF(VLWatMicPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,M6,M5,M4)/VLWatMicPM_vr(M,M3,M2,M1)))
@@ -280,12 +281,13 @@ module BoundaryTranspMod
 
     DO  K=1,jcplx
       do idom=idom_beg,idom_end
-        DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2(idom,K,M3,M2,M1))
+        DOM_MicpTranspFlxM_3D(idom,K,N,M6,M5,M4)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,M3,M2,M1))
       enddo
     enddo
 
     DO idn=ids_beg,ids_end
       trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4)=VFLW*AZMAX1(trcs_solml2_vr(idn,M3,M2,M1))*trcs_VLN_vr(idn,M3,M2,M1)
+
       if(abs(trcs_MicpTranspFlxM_3D(idn,N,M6,M5,M4))>1.e3)then
         write(*,*)VFLW,trcs_solml2_vr(idn,M3,M2,M1),trcs_VLN_vr(idn,M3,M2,M1)
         call endrun(trim(mod_filename)//' at line',__LINE__)                
@@ -315,8 +317,8 @@ module BoundaryTranspMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-  IF(NN.EQ.iOutflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-    .OR. NN.EQ.iInflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+  IF(NN.EQ.iFront .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+    .OR. NN.EQ.iBehind .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
     IF(VLWatMacPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,M6,M5,M4)/VLWatMacPM_vr(M,M3,M2,M1)))
     ELSE
@@ -399,7 +401,7 @@ module BoundaryTranspMod
 !   dt_GasCyc=1/NPT, NPT is number of gas iterations per M
   FLGM=(WaterFlow2MicPM_3D(M,N,M6,M5,M4)+WaterFlow2MacPM_3D(M,N,M6,M5,M4))*dt_GasCyc
 
-  IF(NN.EQ.iOutflow .AND. FLGM.LT.0.0_r8 .OR. NN.EQ.iInflow .AND. FLGM.GT.0.0_r8)THEN
+  IF(NN.EQ.iFront .AND. FLGM.LT.0.0_r8 .OR. NN.EQ.iBehind .AND. FLGM.GT.0.0_r8)THEN
     IF(VLsoiAirPM_vr(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM_vr(M,M3,M2,M1)))
     ELSE
@@ -439,14 +441,14 @@ module BoundaryTranspMod
     enddo
 
     DO idg=idg_beg,idg_NH3
-      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_FloXSurRof_flxM_2DH(idg,N,NN,N2,N1)
+      trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)+trcg_SurRof_flxM_2DH(idg,N,NN,N2,N1)
     ENDDO
 
     DO ids=ids_nut_beg,ids_nuts_end
-      trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)+trcn_FloXSurRof_flxM_2DH(ids,N,NN,N2,N1)
+      trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)+trcn_SurRof_flxM_2DH(ids,N,NN,N2,N1)
     ENDDO
 
-    IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
+    IF(IFLBM_2DH(M,N,NN,N5,N4).EQ.0)THEN
       D9551: DO  K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_SurfRunoff_flxM(idom,K,N2,N1)=DOM_SurfRunoff_flxM(idom,K,N2,N1) &
@@ -455,26 +457,26 @@ module BoundaryTranspMod
       enddo D9551
 
       DO idg=idg_beg,idg_NH3
-        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5,N4)
+        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_SurRof_flxM_2DH(idg,N,NN,N5,N4)
       ENDDO
 
       DO ids=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)-trcn_FloXSurRof_flxM_2DH(ids,N,NN,N5,N4)
+        trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)-trcn_SurRof_flxM_2DH(ids,N,NN,N5,N4)
       ENDDO
     ENDIF
 
-    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
+    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iFront)THEN
       DO  K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_SurfRunoff_flxM(idom,K,N2,N1)=DOM_SurfRunoff_flxM(idom,K,N2,N1)-DOM_FloXSurRof_flxM_2DH(idom,K,N,NN,N5B,N4B)
         enddo
       enddo
       DO idg=idg_beg,idg_NH3
-        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRof_flxM_2DH(idg,N,NN,N5B,N4B)
+        trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_SurRof_flxM_2DH(idg,N,NN,N5B,N4B)
       ENDDO
 
       DO ids=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)-trcn_FloXSurRof_flxM_2DH(ids,N,NN,N5B,N4B)
+        trcn_SurfRunoff_flx(ids,N2,N1)=trcn_SurfRunoff_flx(ids,N2,N1)-trcn_SurRof_flxM_2DH(ids,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   enddo
@@ -609,9 +611,13 @@ module BoundaryTranspMod
             +DOM_MacpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
         enddo
       enddo
+      !
+      !incoming flux (N3,N2,N1), outgoing flux (N6,N5,N4), N is direction
+      !
       DO ids=ids_beg,ids_end
         trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1)=trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1) &
           +trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
+
         trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1)=trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1) &
           +trcs_MacpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)
         if(abs(trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1))>1.e10)then

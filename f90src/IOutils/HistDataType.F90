@@ -1478,7 +1478,7 @@ implicit none
 
   data1d_ptr => this%h1D_WTR_TBL_col(beg_col:end_col)      
   call hist_addfld1d(fname='WTR_TBL',units='m',avgflag='A',&
-    long_name='internal water table depth',ptr_col=data1d_ptr)      
+    long_name='internal water table depth (<0 below soil surface)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Soil_N2O_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='sN2O_FLX',units='g/m2/hr',avgflag='A',&
@@ -2460,7 +2460,7 @@ implicit none
 
   data2d_ptr => this%h2D_VSM_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
   call hist_addfld2d(fname='rWatFLP_vr',units='m3 H2O/m3 soil pore',type2d='levsoi',avgflag='A',&
-    long_name='Fraction of soil porosity filled by water',ptr_col=data2d_ptr)      
+    long_name='Fraction of soil porosity filled by water (relative saturation)',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%h2D_VSICE_vr(beg_col:end_col,1:JZ)        
   call hist_addfld2d(fname='rIceFLP_vr',units='m3 ice/m3 soil pore',type2d='levsoi',avgflag='A',&

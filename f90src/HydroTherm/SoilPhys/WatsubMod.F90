@@ -9,7 +9,7 @@ module WatsubMod
   use data_kind_mod,  only: r8 => DAT_KIND_R8
   use data_const_mod, only: GravAcceleration=>DAT_CONST_G
   use abortutils,     only: endrun,   print_info
-  use ElmIDMod,       only: iEastWestDirection,   iNorthSouthDirection, iVerticalDirection
+  use ElmIDMod,       only: iWestEastDirection,   iNorthSouthDirection, iVerticalDirection
   use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
   use PerturbationMod, only : check_Soil_Warming,is_warming_layerL  
   use DebugToolMod
@@ -140,8 +140,7 @@ module WatsubMod
     if(lverb)write(*,*)'subsurface 3D flow'    
     call Subsurface3DInternalFlowM(I,J,M,NHW,NHE,NVN,NVS,RainEkReducedKsat,HeatFluxAir2Soi)
 
-    if(lverb)write(*,*)'LateralWatHeatExchIterateM'    
-    call LateralWatHeatExchIterateM(I,J,M,NHW,NHE,NVN,NVS,RainEkReducedKsat)
+    call XBoundaryFlowM(I,J,M,NHW,NHE,NVN,NVS,RainEkReducedKsat)
 
 !   update states and fluxes
     DO NX=NHW,NHE
@@ -461,7 +460,7 @@ module WatsubMod
         D40: DO N=FlowDirIndicator(NY,NX),3
           N1=NX;N2=NY;N3=L
 ! in the EW direction
-          IF(N.EQ.iEastWestDirection)THEN
+          IF(N.EQ.iWestEastDirection)THEN
             IF(NX.EQ.NHE)THEN
               cycle
             ELSE
@@ -515,12 +514,13 @@ module WatsubMod
   subroutine Subsurface3DInternalFlowM(I,J,M,NHW,NHE,NVN,NVS,KSatRedusByRainKinetEnergy,HeatFluxAir2Soi)
   !
   !Description
-  !Internal 3D flow
+  !3D flow between internal grids 
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in)  :: M,NHW,NHE,NVN,NVS
   real(r8), dimension(:,:),intent(in) :: KSatRedusByRainKinetEnergy(:,:)
   real(r8), dimension(:,:),intent(in) :: HeatFluxAir2Soi(:,:)
+  character(len=*), parameter :: subname='Subsurface3DInternalFlowM'
   integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL,NY,NX
   real(r8) :: WTHET1,FCDX,FCLX,FCX
   real(r8) :: PSISV1,TKY,PSDX
@@ -533,6 +533,8 @@ module WatsubMod
   real(r8) :: HeatByFlowMacP,HeatByWatFlowMicP,HFLWS,THETA1,THETAL  
   logical  :: LInvalidMacP     !disable macropore?
   !     begin_execution
+
+  call PrintInfo('beg '//subname)
   !
   !     WATER AND ENERGY TRANSFER THROUGH SOIL PROFILE
   !
@@ -545,25 +547,23 @@ module WatsubMod
   !If waterlevel is fixed, like shallow lake, without considering the change
   !of water depth due to hydrological fluxes 
   
-  DO NX=NHW,NHE
-    DO NY=NVN,NVS
+  DO NX=NHW,NHE    !sweep from west to east
+    DO NY=NVN,NVS  !sweep from north to south
 
       LInvalidMacP=.false.
-      D4400: DO L=1,NL(NY,NX)
+      D4400: DO L=1,NL(NY,NX)  !sweep from top to bottom
         N1=NX;N2=NY;N3=L
     !
     !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
     !
         D4320: DO N=FlowDirIndicator(N2,N1),3
-          IF(N.EQ.iEastWestDirection)THEN            
+          IF(N.EQ.iWestEastDirection)THEN            
             !west to east
-            IF(NX.EQ.NHE)THEN
+            IF(NX.EQ.NHE)THEN  !skip the eastern boundary
               !east boundary
               cycle
             ELSE
-              N4=NX+1
-              N5=NY
-              N6=L  
+              N4=NX+1;N5=NY;N6=L  
           !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
           !
           !     IF(N2.EQ.2.AND.(N1.EQ.2.OR.N1.EQ.3).AND.L.LE.15)THEN
@@ -572,32 +572,28 @@ module WatsubMod
             ENDIF
           ELSEIF(N.EQ.iNorthSouthDirection)THEN
             !north to south
-            IF(NY.EQ.NVS)THEN
+            IF(NY.EQ.NVS)THEN  !skip ther southern boundary
               !south boundary
               cycle
             ELSE
-              N4=NX
-              N5=NY+1
-              N6=L
+              N4=NX;N5=NY+1;N6=L
     !
-          !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
-          !
-          !     IF(N1.EQ.3.AND.(N2.EQ.1.OR.N2.EQ.2).AND.L.LE.15)THEN
-          !     CYCLE
-          !     ENDIF
-          !
-          !     END ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
-          !
+              !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
+              !
+              !     IF(N1.EQ.3.AND.(N2.EQ.1.OR.N2.EQ.2).AND.L.LE.15)THEN
+              !     CYCLE
+              !     ENDIF
+              !
+              !     END ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
+              !
             ENDIF
           ELSEIF(N.EQ.iVerticalDirection)THEN
             !bottom layer
-            IF(L.EQ.NL(NY,NX))THEN
+            IF(L.EQ.NL(NY,NX))THEN !skip the bottom boundary
               cycle
             ELSE
               !destination is layer below
-              N4=NX
-              N5=NY
-              N6=L+1
+              N4=NX;N5=NY;N6=L+1
             ENDIF
           ENDIF
 !
@@ -609,6 +605,7 @@ module WatsubMod
               exit
             ENDIF
           ENDDO D1100
+
           ! source grid at surface, make a copy of the destination layer number
           IF(N3.EQ.NU(N2,N1))N6X(N2,N1)=N6
       !
@@ -621,8 +618,8 @@ module WatsubMod
       !     VLSoilPoreMicP_vrI=soil volume excluding rock, macropore
       !
           IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-            !Both source and destination grids are legitimate
-            !Source top layer is matched to destination top layer 
+            !make sure both source and destination grids are legitimate
+            !and match the source top layer to the destination top layer 
             IF(N3.GE.NUM(N2,N1) .AND. N6.GE.NUM(N5,N4) .AND. N3.LE.NL(N2,N1) .AND. N6.LE.NL(N5,N4))THEN
 
               call CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatricPtmp_vr(N3,N2,N1),THETA1)
@@ -640,57 +637,52 @@ module WatsubMod
               !
               !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
               
-              call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,&
+              call MicroporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,&
                 KSatRedusByRainKinetEnergy(NY,NX),PredDarcyFlowMax,WatDarcyFlowMicP,&
                 HeatByDarcyFlowMicP,PSISV1,PSISVL)          
                 
-              call MacporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,WaterMacpFlow,HeatByFlowMacP,LInvalidMacP)
+              call MacroporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,WaterMacpFlow,HeatByFlowMacP,LInvalidMacP)
 
               call WaterVaporFlow(M,N,N1,N2,N3,N4,N5,N6,PSISV1,PSISVL,ConvectVapFlux,&
                 HeatByConvectVapFlux)
-
-          !
-          !     FLWL=total water+vapor flux to destination
-          !     WaterFlow2MicptX_3D=total unsaturated water+vapor flux to destination
-          !     HeatByWatFlowMicP=total convective heat flux from water+vapor flux
-          !
+          
+              !     WaterFlow2MicptX_3D=total unsaturated water+vapor flux to destination
+              !     HeatByWatFlowMicP=total convective heat flux from water+vapor flux          
               WaterFlow2Micpt_3D(N,N6,N5,N4)  = WatDarcyFlowMicP+ConvectVapFlux
               WaterFlow2MicptX_3D(N,N6,N5,N4) = PredDarcyFlowMax+ConvectVapFlux
-              WaterFlow2Macpt_3D(N,N6,N5,N4)  = WaterMacpFlow              
+              WaterFlow2Macpt_3D(N,N6,N5,N4)  = WaterMacpFlow
               HeatFlow2Soili_3D(N,N6,N5,N4)   = HeatByDarcyFlowMicP+HeatByConvectVapFlux+HeatByFlowMacP
-!              if(N6==16)then
-!              write(411,*)I+J/24.,M,'heatdarcy',HeatByDarcyFlowMicP,HeatByConvectVapFlux,HeatByFlowMacP,N6,N5,N4,N
-!              endif
               WaterFlow2Micptl_3D(N,N6,N5,N4) = WaterFlow2Micpt_3D(N,N6,N5,N4)
               WaterFlow2Macptl_3D(N,N6,N5,N4) = WaterFlow2Macpt_3D(N,N6,N5,N4)
-          !   compute heat flux by conduction
+
+              !   compute heat flux by conduction
               call Solve4HeatByConduction(I,J,M,N,NY,NX,N1,N2,N3,N4,N5,N6,HeatByConvectVapFlux,HeatFluxAir2Soi(NY,NX))
 
-          !
-          !     TOTAL WATER, VAPOR AND HEAT FLUXES
-          !
-          !     FLW,FLWX,FLWH=total water flux through micropores,macropores
-          !     HFLW=total heat flux
-          !     WaterFlow2MicPM_3D=water flux used for solute flux calculations in TranspNoSalt.f
-          !
+              !
+              !     TOTAL WATER, VAPOR AND HEAT FLUXES
+              !
+              !     FLW,FLWX,FLWH=total water flux through micropores,macropores
+              !     HFLW=total heat flux
+              !     WaterFlow2MicPM_3D=water flux used for solute flux calculations in TranspNoSalt.f
+              !
               if(.not.fixWaterLevel)then
                 WaterFlowSoiMicP_3D(N,N6,N5,N4)  = WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlow2Micpt_3D(N,N6,N5,N4)
                 WaterFlowSoiMicPX_3D(N,N6,N5,N4) = WaterFlowSoiMicPX_3D(N,N6,N5,N4)+WaterFlow2MicptX_3D(N,N6,N5,N4)
                 WaterFlowSoiMacP_3D(N,N6,N5,N4)  = WaterFlowSoiMacP_3D(N,N6,N5,N4)+WaterFlow2Macpt_3D(N,N6,N5,N4)
               endif
               HeatFlow2Soil_3D(N,N6,N5,N4)     = HeatFlow2Soil_3D(N,N6,N5,N4)+HeatFlow2Soili_3D(N,N6,N5,N4)
+
               if(N.NE.iVerticalDirection)then
                 QWatIntLaterFlow_col(N2,N1)  = QWatIntLaterFlow_col(N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)-WaterFlow2Macpt_3D(N,N6,N5,N4)
                 QWatIntLaterFlowM_col(N2,N1) = QWatIntLaterFlowM_col(N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)-WaterFlow2Macpt_3D(N,N6,N5,N4)
               endif
               WaterFlow2MicPM_3D(M,N,N6,N5,N4) = WaterFlow2Micpt_3D(N,N6,N5,N4)
               WaterFlow2MacPM_3D(M,N,N6,N5,N4) = WaterFlow2Macpt_3D(N,N6,N5,N4)                            
+
               IF(N.EQ.iVerticalDirection)THEN
-            !
-            !     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TranspNoSalt.F
-            !
                 FILMM_vr(M,N6,N5,N4)=FilmThickness(PSISoilMatricPtmp_vr(N6,N5,N4))
               ENDIF
+            !the destination grid is not legtimate, which only occurs for lateral flow  
             ELSEIF(N.NE.iVerticalDirection)THEN
               WaterFlow2Micpt_3D(N,N6,N5,N4)   = 0.0_r8
               WaterFlow2MicptX_3D(N,N6,N5,N4)  = 0.0_r8
@@ -735,11 +727,11 @@ module WatsubMod
       ENDDO  
     ENDDO
   ENDDO
-
+  call PrintInfo('end '//subname)
   end subroutine Subsurface3DInternalFlowM
 !------------------------------------------------------------------------------------------
 
-  subroutine LateralWatHeatExchIterateM(I,J,M,NHW,NHE,NVN,NVS,RainEkReducedKsat)
+  subroutine XBoundaryFlowM(I,J,M,NHW,NHE,NVN,NVS,RainEkReducedKsat)
   !
   !Description
   ! boundary flow involes exchange with external water table, and through tile drainage
@@ -747,11 +739,13 @@ module WatsubMod
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
   real(r8),intent(in) :: RainEkReducedKsat(JY,JX)
+  character(len=*), parameter :: subname='XBoundaryFlowM'
   integer :: NY,NX
   integer :: L,LL
   integer :: N,NN,N1,N2,N3
-  integer :: N4,N5,N4B,N5B,N6           !grid indices for snow redistribution
-  integer :: M1,M2,M3,M4,M5,M6,K1,KL
+  integer :: N4,N5,N4B,N5B,N6           !internal grids, grid indices for snow redistribution
+  integer :: M1,M2,M3,M4,M5,M6          !for boundary grids
+  integer :: K1,KL
   logical :: DoMacPDischarg2Tile
   logical :: DoMicPDischarg2ExtWTBL
   logical :: DoMacPDischarg2ExtWTBL
@@ -768,21 +762,23 @@ module WatsubMod
   logical :: donot_drain,lZeroRunoff
 
 !     begin_execution
+  call PrintInfo('beg '//subname)
 !     AirfMicP,AirfMacP=air-filled porosity in micropores,macropores
-  D9595: DO  NX=NHW,NHE
-    D9590: DO  NY=NVN,NVS
-!      write(110,*)I+J/24.,M,FlowDirIndicator(NY,NX)
-      D9585: DO L=NUM(NY,NX),NL(NY,NX)
+  D9595: DO  NX=NHW,NHE                !from west to east
+    D9590: DO  NY=NVN,NVS              !from north to south
+      D9585: DO L=NUM(NY,NX),NL(NY,NX) !from top to bottom
 
         AirfMicP = VLMicP1_vr(L,NY,NX)-VLWatMicP1_vr(L,NY,NX)-VLiceMicP1_vr(L,NY,NX)
         VOLPX2   = AirfMicP
         AirfMacP = VLMacP1_vr(L,NY,NX)-VLWatMacP1_vr(L,NY,NX)-VLiceMacP1_vr(L,NY,NX)
         DPTHH    = get_DPTHH(L,NY,NX)
 
-        ! configure water table info
+        !-----------------------------------
+        ! configure water table info, should the exchange to water table be limited only to boundary grids?
         call Config4WaterTableDrain(L,NY,NX,DPTHH,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL)
 
         call Config4TileDrainage(L,NY,NX,DPTHH,DoMicPDischarg2Tile,DoMacPDischarg2Tile)
+        !-----------------------------------
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
@@ -795,34 +791,33 @@ module WatsubMod
 !     LOCATE EXTERNAL BOUNDARIES
 !
         D9580: DO N=FlowDirIndicator(NY,NX),3
-          D9575: DO NN=1,2
+          D9575: DO NN=1,2   !go from iFront=1, to iBehind=2
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !            !Locate the boundary 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!     
             str_dir='none'       
-            IF(N.EQ.iEastWestDirection)THEN
+            IF(N.EQ.iWestEastDirection)THEN
               ! along the W-E direction              
               N4  = NX+1; N5  = NY  !eastern
               N4B = NX-1; N5B = NY  !western
               N6  = L
-              IF(NN.EQ.iOutflow)THEN
-                !eastern boundary  |---|->
-                IF(NX.EQ.NHE)THEN                
-                  M1 = NX; M2  = NY; M3 = L  !source
-                  M4 = NX+1;M5 = NY;M6  = L  !target
-                  XN = -1.0_r8               !going out of eastern boundary
+              IF(NN.EQ.iFront)THEN            !target grid is on the front of (N2,N1)    
+                IF(NX.EQ.NHE)THEN             !eastern boundary, outflow  |---|->             
+                  M1 = NX;  M2  = NY; M3 = L  !source
+                  M4 = NX+1;M5 = NY;  M6 = L  !target
+                  XN = -1.0_r8                !going out of eastern boundary
                   RechargSurf     = RechargEastSurf(M2,M1)
                   RechargSubSurf  = RechargEastSubSurf(M2,M1)
                   RechargRateWTBL = RechargRateEastWTBL(M2,M1)
                   str_dir='east'
+                  !do nothing if not on the boundary  
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN
-                !west boundary   -|-> |
-                IF(NX.EQ.NHW)THEN                  
-                  M1 = NX+1;M2 = NY; M3 = L  !source                  
-                  M4 = NX; M5 = NY; M6 = L   !target
+              ELSEIF(NN.EQ.iBehind)THEN                
+                IF(NX.EQ.NHW)THEN            !western boundary, inflow   -|-> |      
+                  M1 = NX+1;M2 = NY; M3 = L  !source on the east of the boundary                 
+                  M4 = NX; M5 = NY; M6 = L   !target on the boundary
                   XN = 1.0_r8                !coming in from western boundary
                   RechargSurf     = RechargWestSurf(M5,M4)
                   RechargSubSurf  = RechargWestSubSurf(M5,M4)
@@ -837,9 +832,8 @@ module WatsubMod
               N4  = NX; N5  = NY+1 !south
               N4B = NX; N5B = NY-1 !north
               N6  = L
-              IF(NN.EQ.iOutflow)THEN     !-----
-                !south boundary     \|/
-                IF(NY.EQ.NVS)THEN !-----
+              IF(NN.EQ.iFront)THEN             !-----                
+                IF(NY.EQ.NVS)THEN              !southern boundary, outflow     \|/ !-----
                   M1 = NX; M2 = NY; M3   = L   !source
                   M4 = NX; M5 = NY+1; M6 = L   !target
                   XN              = -1.0_r8    !going out of south boundary
@@ -850,11 +844,10 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN  !\|/
-                !north boundary     ----
-                IF(NY.EQ.NVN)THEN  !----
-                  M1 = NX; M2 = NY+1; M3 = L !source grid 
-                  M4 = NX;M5  = NY; M6   = L !target grid
+              ELSEIF(NN.EQ.iBehind)THEN      !current grid (NY,NX) is behind 
+                IF(NY.EQ.NVN)THEN            !northern boundary, inflow     ----
+                  M1 = NX; M2 = NY+1; M3 = L !source grid south of the boundary 
+                  M4 = NX;M5  = NY; M6   = L !target grid on the boundary
                   XN          = 1.0_r8       !coming in from north boundary
                   RechargSurf     = RechargNorthSurf(M5,M4)
                   RechargSubSurf  = RechargNorthSubSurf(M5,M4)
@@ -864,12 +857,9 @@ module WatsubMod
                   cycle
                 ENDIF
               ENDIF
-            ELSEIF(N.EQ.iVerticalDirection)THEN
-! in the vertical direction
-              N4 = NX
-              N5 = NY
-              N6 = L+1
-              IF(NN.EQ.iOutflow)THEN
+            ELSEIF(N.EQ.iVerticalDirection)THEN              
+              N4 = NX;N5 = NY;N6 = L+1
+              IF(NN.EQ.iFront)THEN
                 !bottom
                 IF(L.EQ.NL(NY,NX))THEN
                   M1 = NX; M2 = NY; M3  = L   !source
@@ -881,7 +871,8 @@ module WatsubMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN
+              !surface infiltration is done in another case
+              ELSEIF(NN.EQ.iBehind)THEN
                 cycle
               ENDIF
             ENDIF
@@ -896,18 +887,18 @@ module WatsubMod
 !           top soil layer and surface soil layer is active, litter layer is lower than its initial thickness 
 !           or the grid is a soil
 !           surface lateral flow 
-            IF(L.EQ.NUM(N2,N1) .AND. N.NE.iVerticalDirection                                & ! lateral flow at surface
+            IF(L.EQ.NUM(N2,N1) .AND. N.NE.iVerticalDirection                                & ! do lateral flow at surface
               .AND. (CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1).LE.CumLitRDepzInit_col(N2,N1)  & ! in the soil
-              .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                         ! it is soil
+              .OR. SoilBulkDensity_vr(NUI(N2,N1),N2,N1).GT.ZERO))THEN                         ! it is soil, not a pond
 
               !  NO runoff
               lZeroRunoff=.not.XGridRunoffFlag(NN,N,N2,N1)   &              !Runoff flag is off
                 .OR. isclose(RechargSurf,0._r8)              &              !Allowed runoff rate is zero
-                .OR. ABS(SurfRunoffWatFluxM_2DH(M,N2,N1)).LT.ZEROS(N2,N1)   !Runoff from infiltration partition is inisignificant
+                .OR. ABS(SurfRunoffPotentM_col(M,N2,N1)).LT.ZEROS(N2,N1)   !Runoff from infiltration partition is inisignificant
 
                !do runoff
               IF(.not.LZeroRunoff)then
-                call XBoundSurfaceRunoff(I,J,M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
+                call XBoundSurfaceRunoffM(I,J,M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
                 !
                 !     BOUNDARY SNOW FLUX
                 !
@@ -915,7 +906,7 @@ module WatsubMod
                 !  HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
 
                 ! Zero out for eastern and southern
-                IF(NN.EQ.iOutflow)THEN
+                IF(NN.EQ.iFront)THEN
                   DrySnoFlxBySnowRedistribut(N,M5,M4)  = 0.0_r8
                   WatFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8
                   IceFlxBySnowRedistribut(N,M5,M4)     = 0.0_r8
@@ -928,8 +919,9 @@ module WatsubMod
           ! BOUNDARY SUBSURFACE WATER AND HEAT TRANSFER DEPENDING
           ! ON LEVEL OF WATER TABLE
 !
-            IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
-              IF(FlowDirIndicator(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
+            IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(NY,NX))THEN   !current grid has legitimate soil pore
+              IF(FlowDirIndicator(N2,N1).NE.iVerticalDirection  &  !the grid allows lateral water flow
+                .OR. N.EQ.iVerticalDirection)THEN                  !or the grid sweeping is donward 
                 !including lateral connection or woking on vertical direction
 
                 ! IF NO WATER TABLE
@@ -965,16 +957,15 @@ module WatsubMod
 
                 ENDIF
 !
-        !     SUBSURFACE HEAT SOURCE/SINK
-        !
-        !     HFLWL=heat flux across lower boundary
-        !     TK1=lower boundary soil temperature
-        !     TKSD=deep source/sink temperature from geothermal flux
-        !     TCNDG=thermal conductivity below lower boundary
-        !     SoilHeatSrcDepth_col,CDPTH=depth of thermal sink/source, lower boundary
-        !     KoppenClimZone=Koppen climate zone
+                !     SUBSURFACE HEAT SOURCE/SINK
+                !     HFLWL=heat flux across lower boundary
+                !     TK1=lower boundary soil temperature
+                !     TKSD=deep source/sink temperature from geothermal flux
+                !     TCNDG=thermal conductivity below lower boundary
+                !     SoilHeatSrcDepth_col,CDPTH=depth of thermal sink/source, lower boundary
+                !     KoppenClimZone=Koppen climate zone
                 IF(N.EQ.iVerticalDirection .AND. KoppenClimZone_col(N2,N1).NE.-2)THEN
-                !heat flux going out (<0)
+                  !heat flux going out (<0)
                   HeatFlx=(TKSoil1_vr(N3,N2,N1)-TKSD(N2,N1))*TCNDG/(SoilHeatSrcDepth_col(N2,N1)-CumDepz2LayBottom_vr(N3,N2,N1)) &
                     *AREA(N,N3,N2,N1)*dts_HeatWatTP
                   HeatFlow2Soili_3D(N,M6,M5,M4) = HeatFlow2Soili_3D(N,M6,M5,M4)+heatFlx                  
@@ -988,9 +979,7 @@ module WatsubMod
                   WaterFlow2MicPM_3D(M,N,M6,M5,M4) = WaterFlow2Micpt_3D(N,M6,M5,M4)
                   WaterFlow2MacPM_3D(M,N,M6,M5,M4) = WaterFlow2Macpt_3D(N,M6,M5,M4)
                 endif
-!                if(M6==16)then
-!                write(411,*)I+J/24.,HeatFlow2Soili_3D(N,M6,M5,M4),heatFlx,M6,M6,M4
-!                endif
+
                 HeatFlow2Soil_3D(N,M6,M5,M4)     = HeatFlow2Soil_3D(N,M6,M5,M4)+HeatFlow2Soili_3D(N,M6,M5,M4)
               ENDIF
             ELSE
@@ -1049,17 +1038,17 @@ module WatsubMod
           ENDIF
         ENDDO D9580  !loop boundaries through 3 directions
 !
-!     INFILTRATION OF WATER FROM MACROPORES INTO MICROPORES
-!
-!     VLWatMacP1=macropore volume
-!     FINHX,FINHL=macro-micropore transfer unltd,ltd by water,air volume
-!     FWatExMacP2MicPM_vr=macro-micropore transfer for use in TranspNoSalt.f
-!     HydroCond_3D=hydraulic conductivity
-!     PSISE,PSISoilAirEntry=air entry,matric water potentials
-!     PHOL,MacPRadius=path length between,radius of macropores from hour1.f
-!     dts_HeatWatTP=time step
-!     VLWatMicP1X,VOLP1X=current micropore water,air volume
-!     VLWatMacP1X,VOLPH1X=current macropore water,air volume
+        !     INFILTRATION OF WATER FROM MACROPORES INTO MICROPORES
+        !
+        !     VLWatMacP1=macropore volume
+        !     FINHX,FINHL=macro-micropore transfer unltd,ltd by water,air volume
+        !     FWatExMacP2MicPM_vr=macro-micropore transfer for use in TranspNoSalt.f
+        !     HydroCond_3D=hydraulic conductivity
+        !     PSISE,PSISoilAirEntry=air entry,matric water potentials
+        !     PHOL,MacPRadius=path length between,radius of macropores from hour1.f
+        !     dts_HeatWatTP=time step
+        !     VLWatMicP1X,VOLP1X=current micropore water,air volume
+        !     VLWatMacP1X,VOLPH1X=current macropore water,air volume
 !
         IF(VLWatMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
           !south-north direction, is it true?
@@ -1094,8 +1083,8 @@ module WatsubMod
       ENDDO D9585  !loop vertically through layers
     ENDDO D9590
   ENDDO D9595
-
-  end subroutine LateralWatHeatExchIterateM
+  call PrintInfo('end '//subname)
+  end subroutine XBoundaryFlowM
 !------------------------------------------------------------------------------------------
 
   subroutine BoundaryDrain(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargSubSurf,RechargRateWTBL)    
@@ -1109,11 +1098,13 @@ module WatsubMod
   real(r8), intent(in) :: RainEkReducedKsat 
   real(r8), intent(in) :: XN        !direction
   real(r8), intent(in) :: RechargSubSurf,RechargRateWTBL
+  character(len=*), parameter :: subname='BoundaryDrain'
   real(r8) :: THETA1,THETAX,HydcondSrc,RechargRate
   real(r8) :: watflx,heatflx
   integer :: K1,KL
 !
 
+  call PrintInfo('beg '//subname)
 ! IDWaterTable=water table flag
 
   RechargRate=RechargSubSurf*RechargRateWTBL
@@ -1160,7 +1151,7 @@ module WatsubMod
     QDrainM_col(N2,N1)   = QDrainM_col(N2,N1) + watflx
     HeatDrain_col(N2,N1) = HeatDrain_col(N2,N1)+heatflx
   endif
-  
+  call PrintInfo('end '//subname)
   end subroutine BoundaryDrain
 
 !------------------------------------------------------------------------------------------
@@ -1609,12 +1600,14 @@ module WatsubMod
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
+  character(len=*),parameter :: subname='InitSoil3DModelIterateM'
   integer :: NY,NX,L
   real(r8) :: THETWT,TScal4Aquadifsvity,THETWA
   real(r8) :: VLSoiPorAvail   !avaiable pore space for air + water, excluding ice
   real(r8) :: VLWatSoi,scalar
   real(r8) :: THETWH,Z3S
 
+  call PrintInfo('beg '//subname)
   WaterFlow2Micptl_3D=0._r8  
   WaterFlow2Macptl_3D=0._r8        
 
@@ -1672,10 +1665,11 @@ module WatsubMod
       ENDDO D9885
     ENDDO
   ENDDO
+  call PrintInfo('end '//subname)
   end subroutine InitSoil3DModelIterateM
 
 !------------------------------------------------------------------------------------------
-  subroutine MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,KSatRedusByRainKinetEnergy,&
+  subroutine MicroporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,KSatRedusByRainKinetEnergy,&
     PredDarcyFlowMax,WatDarcyFlowMicP,HeatByDarcyFlowMicP,PSISV1,PSISVL)          
   implicit none
   integer, intent(in)  :: NY,NX,N
@@ -1881,9 +1875,9 @@ module WatsubMod
   VLWatMicP2_vr(N3,N2,N1)         = VLWatMicP2_vr(N3,N2,N1)-WatDarcyFlowMicP
   VLWatMicP2_vr(N6,N5,N4)         = VLWatMicP2_vr(N6,N5,N4)+WatDarcyFlowMicP
 
-  end subroutine MicporeDarcyFlow
+  end subroutine MicroporeDarcyFlow
 !------------------------------------------------------------------------------------------
-  subroutine MacporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,WaterMacpFlow,HeatByFlowMacP,LInvalidMacP)
+  subroutine MacroporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,WaterMacpFlow,HeatByFlowMacP,LInvalidMacP)
   implicit none
   integer, intent(in) :: NY,NX,M,N
   integer, intent(in) :: N1,N2,N3   !source grid
@@ -1951,7 +1945,7 @@ module WatsubMod
     HeatByFlowMacP=cpw*TKSoil1_vr(N6,N5,N4)*WaterMacpFlow
   ENDIF
 
-  end subroutine MacporeFLow
+  end subroutine MacroporeFLow
 !------------------------------------------------------------------------------------------
 
   subroutine WaterVaporFlow(M,N,N1,N2,N3,N4,N5,N6,PSISV1,PSISVL,ConvectVapFlux,HeatByConvectVapFlux)
@@ -1960,6 +1954,8 @@ module WatsubMod
   REAL(R8), intent(in) :: PSISV1,PSISVL
   real(r8), intent(out) :: ConvectVapFlux
   real(r8), intent(out) :: HeatByConvectVapFlux
+
+  character(len=*), parameter :: subname='WaterVaporFlow'
   real(r8) :: TK11,TK12,VP1,VPL,VPY,CNV1,CNVL
   REAL(R8) :: ATCNVL,PotentialVaporFlux,MaxVaporFlux
   !     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
@@ -1979,6 +1975,8 @@ module WatsubMod
   !     dts_wat=time step for flux calculations
   !     ConvectVapFlux,ConvectiveHeatFlux=vapor flux and its convective heat flux
 !
+  call PrintInfo('beg '//subname)
+
   ConvectVapFlux       = 0._r8
   HeatByConvectVapFlux = 0._r8
   if(fixWaterLevel)return
@@ -2010,6 +2008,7 @@ module WatsubMod
     ConvectVapFlux       = 0.0_r8
     HeatByConvectVapFlux = 0.0_r8
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine WaterVaporFlow  
 !------------------------------------------------------------------------------------------
 
