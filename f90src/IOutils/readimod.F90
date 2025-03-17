@@ -276,7 +276,7 @@ module readiMod
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
       ALAT(NY,NX)               = ALATG
-      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
+      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
       ALTI(NY,NX)               = ALTIG
       ATCAI(NY,NX)              = ATCAG
       IDWaterTable_col(NY,NX)   = iWaterTabelMode
@@ -379,7 +379,7 @@ module readiMod
 !     SURFACE SLOPES AND ASPECTS
 !
         ASP_col(NY,NX)       = ASPX
-        SL(NY,NX)            = SL0
+        SL_col(NY,NX)            = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
@@ -809,7 +809,7 @@ module readiMod
   write(*,'(40A)')('-',ll=1,40)
   write(*,*)'NY, NX =',NY,NX
   write(*,*)'Aspect (o): ASPX',ASP_col(NY,NX)
-  write(*,*)'Slope (o): SL0',SL(NY,NX)
+  write(*,*)'Slope (o): SL0',SL_col(NY,NX)
   write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth_col(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 

@@ -363,7 +363,10 @@ module Hour1Mod
 
   XGridSurfRunoff_2DH(1:2,1:2,:,:)       = 0._r8
   HeatXGridBySurfRunoff_2DH(1:2,1:2,:,:) = 0._r8
-
+  IFLB_2DH                               = -1
+  IFLBM_2DH                              = -1
+  IFLBSM_2DH                             = -1
+  IFLBS_2DH                              = -1
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 !
@@ -380,9 +383,9 @@ module Hour1Mod
       HydroSubsDINFlx_col(NY,NX)             = 0._r8
       HydroSubsDOPFlx_col(NY,NX)             = 0._r8
       HydroSubsDIPFlx_col(NY,NX)             = 0._r8
-      SurfRunoffWatFluxM_2DH(:,NY,NX)        = 0._r8
+      SurfRunoffPotentM_col(:,NY,NX)        = 0._r8
 
-      DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
+      DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
 
       trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)=0._r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0._r8
@@ -1529,7 +1532,7 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
       ENDIF
       PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
-      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
       ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS

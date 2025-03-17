@@ -43,7 +43,7 @@ implicit none
   real(r8),allocatable ::  VLHeatCapacityB_vr(:,:,:)             !
   real(r8),allocatable ::  ResistAreodynOverSoil_col(:,:)        ! aerodynamic resistance over soil, [m]
   real(r8),allocatable ::  AScaledCdWOverSnow_col(:,:)           ! area scaled latent heat flux conductance over snow, [m^2 h]
-  real(r8),allocatable ::  Altitude_grid(:,:)                    ! grid altitude [m]
+  real(r8),allocatable ::  Altitude_col(:,:)                    ! grid altitude [m]
   real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
   real(r8),allocatable ::  RadSW2Sno_col(:,:)                   !short wave radiation on snow [MJ]  
   real(r8),allocatable ::  WatFlx2LitRByRunoff_2DH(:,:,:,:)      !surface runoff flux  
@@ -105,7 +105,7 @@ implicit none
   allocate(VLHeatCapacityB_vr(JZ,JY,JX));   VLHeatCapacityB_vr=0._r8  
   allocate(ResistAreodynOverSoil_col(JY,JX));         ResistAreodynOverSoil_col=0._r8
   allocate(AScaledCdWOverSnow_col(JY,JX));       AScaledCdWOverSnow_col=0._r8
-  allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
+  allocate(Altitude_col(JY,JX));        Altitude_col=0._r8  
   allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8  
   allocate(RadSW2Sno_col(JY,JX));       RadSW2Sno_col=0._r8  
   allocate(WatFlx2LitRByRunoff_2DH(2,2,JV,JH));     WatFlx2LitRByRunoff_2DH=0._r8  
@@ -172,7 +172,7 @@ implicit none
   call destroy(VLHeatCapacityB_vr)  
   call destroy(ResistAreodynOverSoil_col)
   call destroy(AScaledCdWOverSnow_col)
-  call destroy(Altitude_grid)
+  call destroy(Altitude_col)
   call destroy(VLiceMacP1_vr)
   call destroy(RadSW2Sno_col)
   call destroy(HeatFlx2LitRByRunoff_2DH)    

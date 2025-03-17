@@ -269,7 +269,7 @@ module TranspNoSaltMod
 !
   DO  K=1,jcplx
     DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)
+      DOM_MicP2_vr(idom,K,0,NY,NX)=DOM_MicP2_vr(idom,K,0,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)
     ENDDO
   ENDDO
 
@@ -290,7 +290,7 @@ module TranspNoSaltMod
 
   D9680: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=DOM_MicP2(idom,K,0,NY,NX)+DOM_SurfRunoff_flxM(idom,K,NY,NX)
+      DOM_MicP2_vr(idom,K,0,NY,NX)=DOM_MicP2_vr(idom,K,0,NY,NX)+DOM_SurfRunoff_flxM(idom,K,NY,NX)
     ENDDO
   ENDDO D9680
 
@@ -331,13 +331,13 @@ module TranspNoSaltMod
 
         DO  K=1,jcplx
           DO idom=idom_beg,idom_end
-            DOM_MicP2(idom,K,L,NY,NX) = DOM_MicP2(idom,K,L,NY,NX)+DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)
+            DOM_MicP2_vr(idom,K,L,NY,NX) = DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)
             DOM_MacP2(idom,K,L,NY,NX) = DOM_MacP2(idom,K,L,NY,NX)+DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX)
 
             DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)=flux_mass_limiter(DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX),&
-              DOM_MicP2(idom,K,L,NY,NX),DOM_MacP2(idom,K,L,NY,NX))
+              DOM_MicP2_vr(idom,K,L,NY,NX),DOM_MacP2(idom,K,L,NY,NX))
 
-            DOM_MicP2(idom,K,L,NY,NX) = DOM_MicP2(idom,K,L,NY,NX)+DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
+            DOM_MicP2_vr(idom,K,L,NY,NX) = DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
             DOM_MacP2(idom,K,L,NY,NX) = DOM_MacP2(idom,K,L,NY,NX)-DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
 
           ENDDO
@@ -438,7 +438,7 @@ module TranspNoSaltMod
   !reset DOM to value before the iteration
   D9979: DO K=1,jcplx
     DO idom=idom_beg,idom_end
-      DOM_MicP2(idom,K,0,NY,NX)=AZMAX1(DOM_vr(idom,K,0,NY,NX))
+      DOM_MicP2_vr(idom,K,0,NY,NX)=AZMAX1(DOM_vr(idom,K,0,NY,NX))
     ENDDO
   ENDDO D9979
 
@@ -704,7 +704,7 @@ module TranspNoSaltMod
 
     DO  K=1,jcplx
       DO idom=idom_beg,idom_end
-        DOM_MicP2(idom,K,L,NY,NX) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
+        DOM_MicP2_vr(idom,K,L,NY,NX) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
         DOM_MacP2(idom,K,L,NY,NX) = AZMAX1(DOM_MacP_vr(idom,K,L,NY,NX))
       ENDDO
     enddo

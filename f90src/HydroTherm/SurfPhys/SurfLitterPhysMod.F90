@@ -32,7 +32,7 @@ implicit none
 
   public :: SurfLitREnergyBalanceM
   public :: UpdateLitRPhys
-  public :: XGridsLateralHydryoExch
+  public :: XGridsSurfRunoffM
   public :: UpdateLitRBe4RunoffM
   public :: UpdateLitRAftRunoffM
   public :: PartLitSoilFractionM
@@ -414,10 +414,6 @@ implicit none
       TKY   = (TKXR*VLHeatCapcityLitR2+TK1X*VLHeatCapacity2)/(VLHeatCapcityLitR2+VLHeatCapacity2)   !equilibrium temperature
       HFLWX = (TKXR-TKY)*VLHeatCapcityLitR2*XNPB                                                    !sensible heat flux > 0 into soil
       HFLWC = CdTLit2Soil*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dt_litrHeat
-!      if(I==149 .and. J==10 .and. NX==1)then
-!        write(123,*)((I*1000+J)*100+M)*100+NN,'TK1X,TKS1,TKXR,TKR1,TKR0,TKY=',TK1X,TKS1,TKXR,TKR1,TKR0,TKY
-!        write(124,*)((I*1000+J)*100+M)*100+NN,'HeatSensVapLitR2Soi2=',HeatSensVapLitR2Soi2,EvapLitR2Soi2
-!      endif
 
       IF(HFLWC.GE.0.0_r8)THEN
         !heat from litter to soil
@@ -489,10 +485,7 @@ implicit none
     tk1pre             = TKR1
     TKR1               = (ENGYR+HeatFluxAir2LitR2+RainHeat2LitR2-tHeatLitR2Soil2)/VLHeatCapcityLitR2
     TKS1               = (ENGYS+tHeatLitR2Soil2+dLWSoil)/VLHeatCapacity2
-!    if(I==149 .and. J==10 .and. NX==1)then
-!      write(125,*)((I*1000+J)*100+M)*100+NN,TKR1,TKS1,ENGYR/VLHeatCapcityLitR2,&
-!        HeatFluxAir2LitR2/VLHeatCapcityLitR2,RainHeat2LitR2/VLHeatCapcityLitR2,-tHeatLitR2Soil2/VLHeatCapcityLitR2,dWLitR
-!    endif
+
   ENDDO D5000
   call PrintInfo('end '//subname)
 
@@ -544,10 +537,7 @@ implicit none
     !when there are still significant heat capacity of the residual layer
     tkspre          = TKS_vr(0,NY,NX)
     TKS_vr(0,NY,NX) = (ENGYZ+HeatByLitrMassChange +dHeat)/VHeatCapacity_vr(0,NY,NX)
-!    if(I==149)THEN
-!      write(112,*)I*1000+J,TKS_vr(0,NY,NX),tkspre ,TairK_col(NY,NX),TKS_vr(NU(NY,NX),NY,NX)
-!      WRITE(112,*)VHeatCapacity_vr(0,NY,NX)-VHeatCapacityLitrX,HeatByLitrMassChange,dHeat
-!    ENDIF  
+
     if(TKS_vr(0,NY,NX)<100._r8 .or. (TKS_vr(0,NY,NX)>360._r8 .and. VHeatCapacity_vr(0,NY,NX)>2._r8*VHeatCapLitRMin_col(NY,NX)))then
       write(*,*)I,J,NY,NX,TKS_vr(0,NY,NX),tkspre,TairK_col(NY,NX)
       write(*,*)'WatFLo2Litr =',WatFLo2LitR_col(NY,NX),VHeatCapacity_vr(0,NY,NX),5._r8*VHeatCapLitRMin_col(NY,NX)
@@ -756,11 +746,15 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine XGridsLateralHydryoExch(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
+  subroutine XGridsSurfRunoffM(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
   !
   !Description: 
-  !Horizontal water flow between inner grids
-  !
+  !Horizontal water flow between insider grids
+  !Identify the upstream flow for each grid
+  !Consequently, for each grid (N2,N1)
+  !in each direction as specified by N, 
+  !water flows out from (N2,N1) to its forward grid (N5,N4) with NN=iBehind
+  !and/or flows out from (N2,N1) to its backward grid (N5B,N4B) with NN=iFront
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
@@ -769,38 +763,38 @@ implicit none
   real(r8) :: ALT1,ALT2,ALTB
   real(r8) :: QRQ1  !equilibrium outgoing water flux
   real(r8) :: VLWatLitR,VLWatLitR1
-  integer, parameter :: idirew=1
-  integer, parameter :: idirns=2
 
 !     begin_execution
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-
+  
   N1=NX;N2=NY
+  DO  N=1,2     !1:iWestEastDirection, 2:iNorthSouthDirection
+    DO  NN=1,2  !Denotes the position of (N2,N1) relative to the target grid, iFront  :=1; iBehind  :=2, 
+      IF(N.EQ.iWestEastDirection)THEN
 
-  DO  N=1,2
-    DO  NN=1,2
-      IF(N.EQ.iEastWestDirection)THEN
-        !east-west
-        IF((NX.EQ.NHE .AND. NN.EQ.iOutflow) .OR. (NX.EQ.NHW .AND. NN.EQ.iInflow))THEN
-          !do nothing at the eastern/western boundary 
+        !do nothing at the boundary
+        IF((NX.EQ.NHE .AND. NN.EQ.iFront)    &      !at the eastern edge, there is no grid forward to (N2,N1)
+          .OR. (NX.EQ.NHW .AND. NN.EQ.iBehind))THEN !at the western edge, there is no grid backward to (N2,N1)
           cycle
+          !do something when 
+          !a: (N2,N1) is an internal grid, 
+          !b: (N2,N1) is at the eastern edge, do western flow
+          !c: (N2,N1) is at the western edge, do eastern flow
+          !
         ELSE
-          N4  = NX+1   !right/east
-          N5  = NY
-          N4B = NX-1   !left/west
-          N5B = NY
+          N4  = NX+1;N5  = NY  !right/east
+          N4B = NX-1;N5B = NY  !left/west
         ENDIF
       ELSEIF(N.EQ.iNorthSouthDirection)THEN
-        !south-north
-        IF((NY.EQ.NVS .AND. NN.EQ.iOutflow) .OR. (NY.EQ.NVN .AND. NN.EQ.iInflow))THEN
-          !do nothing at the boundary
+        !
+        !do nothing at the boundary 
+        IF((NY.EQ.NVS .AND. NN.EQ.iFront)  &       !at the southern edge, there is no grid forward to (N2,N1)
+         .OR. (NY.EQ.NVN .AND. NN.EQ.iBehind))THEN !at the northern edge, there is no grid backward to (N2,N1)
           cycle
         ELSE
-          N4  = NX
-          N5  = NY+1  !upper/south
-          N4B = NX
-          N5B = NY-1  !lower/north
+          N4  = NX;N5  = NY+1  !upper/south
+          N4B = NX;N5B = NY-1  !lower/north
         ENDIF
       ENDIF
 !
@@ -813,96 +807,88 @@ implicit none
 !     WatFlux4ErosionM=runoff water flux
 !     FSLOPE=partitions surface water flow in (N=1)EW,(N=2)NS direction
 !     XVLMobileWaterLitR_col: mobile water
-!     IFLBM=runoff direction (0 = E or S, 1 = W or N)
+!     IFLBM_2DH=runoff direction (0 = E or S, 1 = W or N)
 
-!     there is water moving
-      IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
+!     There is water for runoff
+      IF(SurfRunoffPotentM_col(M,N2,N1).GT.ZEROS(N2,N1))THEN
         ! there is runoff
+        ! check neighbor grids by considering (N2,N1) either as the backward grid (compared to (N5,N4)), &
+        ! or the forward grid (compared to (N5B,N4B)). 
         ! source grid elevation
-        ALT1=Altitude_grid(N2,N1)+XVLMobileWaterLitR_col(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
+        ALT1=Altitude_col(N2,N1)+XVLMobileWaterLitR_col(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
    
         ! EAST OR SOUTH RUNOFF
+        ! 
+        IF(NN.EQ.iFront)THEN  !check forward grid (N5,N4), i.e. (N2,N1) is backward of grid (N5,N4)
+          !destination grid (N5,N4) elevation, in south or east
+          ALT2=Altitude_col(N5,N4)+XVLMobileWaterLitR_col(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
 
-        IF(NN.EQ.iOutflow)THEN
-          !destination grid (N5,N4) elevation
-          ALT2=Altitude_grid(N5,N4)+XVLMobileWaterLitR_col(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
-
-          !out flow from source grid into dest grid, AZMAX1 ensures upstream flow,
-          IF(ALT1.GT.ALT2)THEN
-            
-            QRQ1=AZMAX1((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5,N4),N5,N4) &  
-              -XVLMobileWaterLitR_col(N5,N4)*AREA(3,NUM(N2,N1),N2,N1) &
-              +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &            
+          !Flow from (behind) grid (N2,N1) to the (front) grid (N5,N4), 
+          IF(ALT1.GT.ALT2)THEN 
+            QRQ1=AZMAX1((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5,N4),N5,N4)) &            
               /(AREA(3,NUM(N2,N1),N2,N1)+AREA(3,NU(N5,N4),N5,N4))
 
-            !assign flux to target
-            WatFlx2LitRByRunoff_2DH(N,2,N5,N4)   = AMIN1(QRQ1,SurfRunoffWatFluxM_2DH(M,N2,N1))*FSLOPE(N,N2,N1)
-            HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)  = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
-            XGridSurfRunoff_2DH(N,2,N5,N4)       = XGridSurfRunoff_2DH(N,2,N5,N4)+WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
-            HeatXGridBySurfRunoff_2DH(N,2,N5,N4) = HeatXGridBySurfRunoff_2DH(N,2,N5,N4)+HeatFlx2LitRByRunoff_2DH(N,2,N5,N4)
-            QflxSurfRunoffM_2DH(M,N,2,N5,N4)     = WatFlx2LitRByRunoff_2DH(N,2,N5,N4)
-            IFLBM(M,N,iInflow,N5,N4)             = 0
-
+            !assign flux to target, note FSLOPE(N,N2,N1)>0._r8
+            WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)   = AMIN1(QRQ1,SurfRunoffPotentM_col(M,N2,N1))*FSLOPE(N,N2,N1)  !>0
+            HeatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)  = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)
+            XGridSurfRunoff_2DH(N,iBehind,N5,N4)       = XGridSurfRunoff_2DH(N,iBehind,N5,N4)+WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)
+            HeatXGridBySurfRunoff_2DH(N,iBehind,N5,N4) = HeatXGridBySurfRunoff_2DH(N,iBehind,N5,N4)+HeatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)
+            QflxSurfRunoffM_2DH(M,N,iBehind,N5,N4)     = WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)
+            IFLBM_2DH(M,N,iBehind,N5,N4)               = 0
+            IFLB_2DH(N,NN,N5,N4)                       = IFLBM_2DH(M,N,NN,N5,N4)
           ELSE
-            WatFlx2LitRByRunoff_2DH(N,2,N5,N4)  = 0.0_r8
-            HeatFlx2LitRByRunoff_2DH(N,2,N5,N4) = 0.0_r8
-            QflxSurfRunoffM_2DH(M,N,2,N5,N4)    = 0.0_r8
-            IFLBM(M,N,iInflow,N5,N4)            = 0
+            WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)  = 0.0_r8
+            HeatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4) = 0.0_r8
+            QflxSurfRunoffM_2DH(M,N,iBehind,N5,N4)    = 0.0_r8
+            IFLBM_2DH(M,N,iBehind,N5,N4)              = -1
           ENDIF
-        ENDIF
-
+          
         !  WEST OR NORTH RUNOFF
+        !
+        ELSEIF(NN.EQ.iBehind)THEN  !check backward grid (N5B,N4B), i.e. (N2,N1) is forward of (N5B,N4B)
 
-        IF(NN.EQ.iInflow)THEN
-          IF(N4B.GT.0 .AND. N5B.GT.0)THEN
-            !destination grid (N5B,N4B) 
-            ALTB = Altitude_grid(N5B,N4B)+XVLMobileWaterLitR_col(N5B,N4B)/AREA(3,NU(N5,N4B),N5B,N4B)
-            
-            IF(ALT1.GT.ALTB)THEN
-              QRQ1 = AZMAX1((ALT1-ALTB)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B) &
-                -XVLMobileWaterLitR_col(N5B,N4B)*AREA(3,NUM(N2,N1),N2,N1) &
-                +XVLMobileWaterLitR_col(N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B)) &
+          IF(N4B.GT.0 .AND. N5B.GT.0)THEN !it is a legtimate grid            
+            ALTB = Altitude_col(N5B,N4B)+XVLMobileWaterLitR_col(N5B,N4B)/AREA(3,NU(N5,N4B),N5B,N4B)            
+
+            !Flow from the (front) grid (N2,N1) to the (behind) grid (N5B,N4B) 
+            IF(ALT1.GT.ALTB)THEN  
+              QRQ1 = AZMAX1((ALT1-ALTB)*AREA(3,NUM(N2,N1),N2,N1)*AREA(3,NU(N5B,N4B),N5B,N4B)) &
                 /(AREA(3,NUM(N2,N1),N2,N1)+AREA(3,NU(N5B,N4B),N5B,N4B))
               !assign flux to target
-              WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)   = AMIN1(QRQ1,SurfRunoffWatFluxM_2DH(M,N2,N1))*FSLOPE(N,N2,N1)
-              HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
-              XGridSurfRunoff_2DH(N,1,N5B,N4B)       = XGridSurfRunoff_2DH(N,1,N5B,N4B)+WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
-              HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B)+HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
-              QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)     = WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)
-              IFLBM(M,N,iOutflow,N5B,N4B)            = 1
+              WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)   = AMIN1(QRQ1,SurfRunoffPotentM_col(M,N2,N1))*FSLOPE(N,N2,N1)  !>0
+              HeatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)  = cpw*TKSoil1_vr(0,N2,N1)*WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)
+              XGridSurfRunoff_2DH(N,iFront,N5B,N4B)       = XGridSurfRunoff_2DH(N,iFront,N5B,N4B)+WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)
+              HeatXGridBySurfRunoff_2DH(N,iFront,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,iFront,N5B,N4B)+HeatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)
+              QflxSurfRunoffM_2DH(M,N,iFront,N5B,N4B)     = WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)
+              IFLBM_2DH(M,N,iFront,N5B,N4B)               = 1
+              IFLB_2DH(N,NN,N5B,N4B)                      = IFLBM_2DH(M,N,NN,N5B,N4B)
             ELSE
-              WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = 0.0_r8
-              HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
-              QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)    = 0.0_r8
-              IFLBM(M,N,iOutflow,N5B,N4B)           = 0
+              WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)  = 0.0_r8
+              HeatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B) = 0.0_r8
+              QflxSurfRunoffM_2DH(M,N,iFront,N5B,N4B)    = 0.0_r8
+              IFLBM_2DH(M,N,iFront,N5B,N4B)              = -1
             ENDIF
           ENDIF
         ENDIF
+      !no potential runoff   
       ELSE
         !there is no runoff
-        WatFlx2LitRByRunoff_2DH(N,2,N5,N4)  = 0.0_r8
-        HeatFlx2LitRByRunoff_2DH(N,2,N5,N4) = 0.0_r8
-        QflxSurfRunoffM_2DH(M,N,2,N5,N4)    = 0.0_r8
-        IFLBM(M,N,2,N5,N4)                  = 0
+        WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)  = 0.0_r8
+        HeatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4) = 0.0_r8
+        QflxSurfRunoffM_2DH(M,N,iBehind,N5,N4)    = 0.0_r8
+        IFLBM_2DH(M,N,iBehind,N5,N4)              = -1
+
         IF(N4B.GT.0 .AND. N5B.GT.0)THEN
-          WatFlx2LitRByRunoff_2DH(N,1,N5B,N4B)  = 0.0_r8
-          HeatFlx2LitRByRunoff_2DH(N,1,N5B,N4B) = 0.0_r8
-          QflxSurfRunoffM_2DH(M,N,1,N5B,N4B)    = 0.0_r8
-          IFLBM(M,N,1,N5B,N4B)                  = 0
+          WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)  = 0.0_r8
+          HeatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B) = 0.0_r8
+          QflxSurfRunoffM_2DH(M,N,iFront,N5B,N4B)    = 0.0_r8
+          IFLBM_2DH(M,N,iFront,N5B,N4B)              = -1
         ENDIF
       ENDIF
-
-      IF(M.EQ.NPH)THEN
-        IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)
-        IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
-          IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
-        ENDIF
-      ENDIF
-
     ENDDO  
   ENDDO
   
-  end subroutine XGridsLateralHydryoExch
+  end subroutine XGridsSurfRunoffM
 
 
 end module SurfLitterPhysMod

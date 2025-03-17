@@ -125,7 +125,7 @@
           LitrfalStrutElms_CumYr_pft(:,NZ,NY,NX)     = 0._r8
         ENDDO D960
         IF(iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
-          TSED(NY,NX)=0._r8
+          TSED_col(NY,NX)=0._r8
         ENDIF
       ENDIF
     ENDDO D950

@@ -112,7 +112,7 @@ module RedistMod
 !
 !     RUNOFF AND SUBSURFACE BOUNDARY FLUXES
 !
-      call RunXGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
+      call XGridBoundRunoffs(I,J,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     CHANGE EXTERNAL WATER TABLE DEPTH THROUGH DISTURBANCE
 !
@@ -269,7 +269,7 @@ module RedistMod
     ! drainage is on
     DCORPW                     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
     NatWtblDepz_col(NY,NX)     = DCORPW
-    ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+    ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
     ExtWaterTable_col(NY,NX)   = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
   ENDIF
 
@@ -283,7 +283,7 @@ module RedistMod
       IDWaterTable_col(NY,NX)=4
     ENDIF
     WtblDepzTile_col(NY,NX)   = DCORPW
-    DTBLD(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+    DTBLD(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
     TileWaterTable_col(NY,NX) = DTBLD(NY,NX)
   ENDIF
 !
@@ -652,7 +652,7 @@ module RedistMod
   if(lverb)write(*,*)'SoilErosion'
   IF((iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
     .AND. ABS(tErosionSedmLoss_col(NY,NX)).GT.ZEROS(NY,NX))THEN
-    TSED(NY,NX)=TSED(NY,NX)+tErosionSedmLoss_col(NY,NX)
+    TSED_col(NY,NX)=TSED_col(NY,NX)+tErosionSedmLoss_col(NY,NX)
     !
     !     SOIL MINERAL FRACTIONS
     !

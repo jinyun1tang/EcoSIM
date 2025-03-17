@@ -332,7 +332,7 @@ module TranspSaltMod
   integer :: idsalt
 !     begin_execution
 
-  FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+  FQRM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffPotentM_col(M,N2,N1)
 
   DO idsalt=idsalt_beg,idsalt_end
     trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,M5,M4)=trcSalt_FloXSurRof_flxM(idsalt,N2,N1)*FQRM
@@ -468,13 +468,13 @@ module TranspSaltMod
       trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)=trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)+trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N2,N1)
     ENDDO
 
-    IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
+    IF(IFLBM_2DH(M,N,NN,N5,N4).EQ.0)THEN
       DO idsalt=idsalt_beg,idsalt_end
         trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)=trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)-trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N5,N4)
       ENDDO
-
     ENDIF
-    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iOutflow)THEN
+
+    IF(N4B.GT.0.AND.N5B.GT.0 .AND. NN.EQ.iFront)THEN
       DO idsalt=idsalt_beg,idsalt_end
         trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)=trcSalt_FloXSurRof_flxM_col(idsalt,N2,N1)-trcSalt_FloXSurRof_flxM_2DH(idsalt,N,NN,N5B,N4B)
       ENDDO
@@ -603,11 +603,11 @@ module TranspSaltMod
         !locate dest grid
         D9580: DO N=FlowDirIndicator(NY,NX),3
           D9575: DO NN=1,2
-            IF(N.EQ.iEastWestDirection)THEN
+            IF(N.EQ.iWestEastDirection)THEN
               N4  = NX+1;N5  = NY
               N4B = NX-1;N5B = NY
               N6  = L
-              IF(NN.EQ.iOutflow)THEN
+              IF(NN.EQ.iFront)THEN
                 IF(NX.EQ.NHE)THEN               !on the eastern boundary
                   M1 = NX;M2   = NY;M3 = L
                   M4 = NX+1;M5 = NY;M6 = L
@@ -618,7 +618,7 @@ module TranspSaltMod
                 ELSE
                   cycle
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN
+              ELSEIF(NN.EQ.iBehind)THEN
                 IF(NX.EQ.NHW)THEN             !on the western boundary
                   M1 = NX;M2 = NY;M3 = L
                   M4 = NX;M5 = NY;M6 = L
@@ -634,7 +634,7 @@ module TranspSaltMod
               N4  = NX;N5  = NY+1
               N4B = NX;N5B = NY-1
               N6=L
-              IF(NN.EQ.iOutflow)THEN          
+              IF(NN.EQ.iFront)THEN          
                 IF(NY.EQ.NVS)THEN             !on the southern boundary
                   M1 = NX;M2 = NY;M3   = L
                   M4 = NX;M5 = NY+1;M6 = L
@@ -645,7 +645,7 @@ module TranspSaltMod
                 ELSE
                   CYCLE
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN
+              ELSEIF(NN.EQ.iBehind)THEN
                 IF(NY.EQ.NVN)THEN      !on the northern boundary
                   M1=NX;M2=NY;M3=L
                   M4=NX;M5=NY;M6=L
@@ -660,7 +660,7 @@ module TranspSaltMod
             ELSEIF(N.EQ.iVerticalDirection)THEN
               N1 = NX;N2 = NY;N3 = L
               N4 = NX;N5 = NY;N6 = L+1
-              IF(NN.EQ.iOutflow)THEN
+              IF(NN.EQ.iFront)THEN
                 IF(L.EQ.NL(NY,NX))THEN        !at the bottom boundary
                   M1 = NX;M2 = NY;M3 = L
                   M4 = NX;M5 = NY;M6 = L+1
@@ -668,7 +668,7 @@ module TranspSaltMod
                 ELSE
                   CYCLE
                 ENDIF
-              ELSEIF(NN.EQ.iInflow)THEN
+              ELSEIF(NN.EQ.iBehind)THEN
                 CYCLE
               ENDIF
             ENDIF
@@ -683,22 +683,22 @@ module TranspSaltMod
             IF(L.EQ.NUM(M2,M1) .AND. N.NE.iVerticalDirection)THEN
               !No surface runoff
               IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0.0_r8) &
-                .OR. SurfRunoffWatFluxM_2DH(M,N2,N1).LE.ZEROS(N2,N1))THEN
+                .OR. SurfRunoffPotentM_col(M,N2,N1).LE.ZEROS(N2,N1))THEN
                 trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0_r8
               ELSE
                 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
                 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 
-                IF((NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR.(NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                IF((NN.EQ.iFront .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR.(NN.EQ.iBehind .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
 
                   call SaltExportXBoundaryM(N1,N2,M,N,NN,M5,M4)
 !
                   !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
                   !     AND BOUNDARY CONDITIONS SET IN SITE FILE
 !
-                ELSEIF((NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-                  .OR. (NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+                ELSEIF((NN.EQ.iBehind .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+                  .OR. (NN.EQ.iFront .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
                   trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
                 ELSE
                   trcSalt_FloXSurRof_flxM_2DH(idsalt_beg:idsalt_end,N,NN,M5,M4)=0.0
@@ -707,7 +707,7 @@ module TranspSaltMod
               !
               !     BOUNDARY SNOW FLUX
 !
-              IF(NN.EQ.iOutflow)THEN
+              IF(NN.EQ.iFront)THEN
                 trcSalt_SnowDrift_flxM_2D(idsalt_beg:idsalt_end,N,M5,M4)=0.0
               ENDIF
             ENDIF
@@ -718,8 +718,8 @@ module TranspSaltMod
 
               IF(FlowDirIndicator(M2,M1).NE.3 .OR. N.EQ.iVerticalDirection)THEN
 
-                IF(NN.EQ.iOutflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-                  .OR. NN.EQ.iInflow .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+                IF(NN.EQ.iFront .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+                  .OR. NN.EQ.iBehind .AND. WaterFlow2MicPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
 
                   call SoluteMicporeLossXBoundaryM(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -731,8 +731,8 @@ module TranspSaltMod
                 !
                 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
                 !
-                IF(NN.EQ.iOutflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
-                  .OR. NN.EQ.iInflow .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
+                IF(NN.EQ.iFront .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).GT.0.0_r8 &
+                  .OR. NN.EQ.iBehind .AND. WaterFlow2MacPM_3D(M,N,M6,M5,M4).LT.0.0_r8)THEN
 
                   call SoluteMacporeLossXBoundaryM(M,N,M1,M2,M3,M4,M5,M6)
 

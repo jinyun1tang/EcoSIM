@@ -111,24 +111,19 @@ implicit none
   ! source
     N1=NX;N2=NY;N3=L
     D8580: DO N=FlowDirIndicator(NY,NX),3
-      !Exchange in the x direction, west-east        
-      IF(N.EQ.iEastWestDirection)THEN 
-        N4  = NX+1   !east
-        N5  = NY
-        N4B = NX-1   !west
-        N5B = NY
+      
+      IF(N.EQ.iWestEastDirection)THEN 
+        N4  = NX+1;N5  = NY
+        N4B = NX-1;N5B = NY
         N6  = L
-      !Exchange in the y direction, north-south 
+      
       ELSEIF(N.EQ.iNorthSouthDirection)THEN  
-        N4  = NX
-        N5  = NY+1    !south
-        N4B = NX
-        N5B = NY-1    !north
+        N4  = NX;N5  = NY+1    !south
+        N4B = NX;N5B = NY-1    !north
         N6  = L
       !Vertical  
       ELSEIF(N.EQ.iVerticalDirection)THEN       
-        N4 = NX
-        N5 = NY
+        N4 = NX;N5 = NY
         N6 = L+1
       ENDIF
 !
@@ -263,7 +258,7 @@ implicit none
   integer :: NN,idg,idn,idsalt
   
   call PrintInfo('beg '//subname)
-  !NN=1:iOutflow, 2:iInflow
+  !NN=1:iFront, 2:iBehind
   D1202: DO NN=1,2
     !gaseous tracers
     DO idg=idg_beg,idg_NH3
@@ -275,7 +270,7 @@ implicit none
       trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)+trcn_FloXSurRunoff_2D(idn,N,NN,N2,N1)
     ENDDO
 
-    IF(IFLBH(N,NN,N5,N4).EQ.0)THEN    
+    IF(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN    
 
       DO idg=idg_beg,idg_NH3
         trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5,N4)
@@ -285,8 +280,8 @@ implicit none
       ENDDO
 
     ENDIF 
-
-    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
+    !active grid (N5B,N4B) behind (N2,N1)
+    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN 
       DO idg=idg_beg,idg_NH3
         trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5B,N4B)
       ENDDO
@@ -302,14 +297,14 @@ implicit none
         trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)+trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N2,N1)
       ENDDO
 
-      IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
+!      IF(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN
 ! runoff direction
         DO idsalt=idsalt_beg,idsalt_end
           trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)-trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N5,N4)
         ENDDO
-      ENDIF
+!      ENDIF
 
-      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
+      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
         DO idsalt=idsalt_beg,idsalt_end
           trcSalt_SurfRunoff_flx(idsalt,N2,N1)=trcSalt_SurfRunoff_flx(idsalt,N2,N1)-trcSalt_FloXSurRunoff_2D(idsalt,N,NN,N5B,N4B)
         ENDDO
@@ -332,31 +327,31 @@ implicit none
   !     begin_execution
   !     NET WATER, SNOW AND HEAT FLUXES FROM RUNOFF
   !
-  !NN=1:iOutflow, 2:iInflow
+  !NN=1:iFront, 2:iBehind
   D1202: DO NN=1,2
         
     !water flux
     D8590: DO K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
-        DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)+DOM_FloXSurRunoff_2D(idom,K,N,NN,N2,N1)
+        DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)+DOM_FloXSurRunoff_2DH(idom,K,N,NN,N2,N1)
       ENDDO
     ENDDO D8590
 
-    IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
+    IF(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
       !water flux
       D8591: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
-          DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
+          DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2DH(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D8591
 
     ENDIF
 
-    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
+    IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
       D8592: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
-          DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2D(idom,K,N,NN,N5B,N4B)
+          DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2DH(idom,K,N,NN,N5B,N4B)
         enddo
       ENDDO D8592
     ENDIF
@@ -510,7 +505,7 @@ implicit none
         ENDDO D7375
       ENDIF
 
-      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iOutflow)THEN
+      IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
         IF(ABS(cumSed_Eros_2D(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
           tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5B,N4B)
           TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)

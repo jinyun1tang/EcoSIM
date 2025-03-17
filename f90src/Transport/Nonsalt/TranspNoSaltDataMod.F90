@@ -13,7 +13,7 @@ implicit none
   real(r8), allocatable :: trcn_AquaADV_Snow2Band_flxM(:,:,:)     !nutrient advection flux from snow to top band soil at iteration M [g d-2]
   real(r8), allocatable :: trcn_AquaADV_Snow2Soil_flxM(:,:,:)     !nutrient advection flux from snow to top soil at iteration M [g d-2]
   
-  real(r8), allocatable :: DOM_MicP2(:,:,:,:,:)               !copy of DOM in micropore for transport iteration [g d-2]
+  real(r8), allocatable :: DOM_MicP2_vr(:,:,:,:,:)               !copy of DOM in micropore for transport iteration [g d-2]
   real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:) !3D DOM transport through micropores at iteration M [g d-2]
   real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:) !3D DOM transport through macropores at iteration M [g d-2]
   real(r8), allocatable :: DOM_Transp2Micp_flxM_vr(:,:,:,:,:) !DOM transport to micropore at iteration M [g d-2]
@@ -66,8 +66,8 @@ implicit none
   real(r8), allocatable ::  trcg_Aqua_flxM_snvr(:,:,:,:)                !Aquatic gas flow into snow layer at iteration M [g d-2]
   real(r8), allocatable ::  trcn_Aqua_flxM_snvr(:,:,:,:)                !Aquatic nutrient flow into snow layer at iteration M [g d-2]
   real(r8), allocatable ::  DOM_FloXSurRof_flxM_2DH(:,:,:,:,:,:)        !2D flow of DOM through surface runoff at iteration M [g d-2]
-  real(r8), allocatable ::  trcg_FloXSurRof_flxM_2DH(:,:,:,:,:)         !2D flow of gas through surface runoff at iteration M [g d-2]
-  real(r8), allocatable ::  trcn_FloXSurRof_flxM_2DH(:,:,:,:,:)         !2D flow of nutrient through surface runoff at iteration M [g d-2]
+  real(r8), allocatable ::  trcg_SurRof_flxM_2DH(:,:,:,:,:)         !2D flow of gas through surface runoff at iteration M [g d-2]
+  real(r8), allocatable ::  trcn_SurRof_flxM_2DH(:,:,:,:,:)         !2D flow of nutrient through surface runoff at iteration M [g d-2]
   real(r8), allocatable :: trc_gasml2_vr(:,:,:,:)                       !copy of gas tracer for transport [g d-2]
   real(r8), allocatable :: trcs_solml2_vr(:,:,:,:)                       !copy of solute tracer in micropore for transport [g d-2]
   real(r8), allocatable :: trcs_soHml2_vr(:,:,:,:)                       !copy of solute tracer in macropore for transport [g d-2]
@@ -94,7 +94,7 @@ contains
   allocate(trcg_AquaADV_Snow2Litr_flxM(idg_beg:idg_NH3,JY,JX));   trcg_AquaADV_Snow2Litr_flxM=0._r8
   allocate(trcn_AquaADV_Snow2Litr_flxM(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_AquaADV_Snow2Litr_flxM=0._r8
   allocate(DOM_FloXSurRunoff_flxM(idom_beg:idom_end,1:jcplx,JV,JH));    DOM_FloXSurRunoff_flxM=0._r8
-  allocate(DOM_MicP2(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));    DOM_MicP2=0._r8
+  allocate(DOM_MicP2_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));    DOM_MicP2_vr=0._r8
   allocate(RDOM_CumEcoProd_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));  RDOM_CumEcoProd_vr=0._r8
   allocate(DOM_MicpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTranspFlxM_3D=0._r8
   allocate(DOM_MacpTranspFlxM_3D(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));  DOM_MacpTranspFlxM_3D=0._r8
@@ -147,14 +147,14 @@ contains
   allocate(trcn_Aqua_flxM_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_Aqua_flxM_snvr     = 0._r8
 
   allocate(DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_FloXSurRof_flxM_2DH = 0._r8
-  allocate(trcg_FloXSurRof_flxM_2DH(idg_beg:idg_NH3,2,2,JV,JH));  trcg_FloXSurRof_flxM_2DH       = 0._r8
+  allocate(trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,2,2,JV,JH));  trcg_SurRof_flxM_2DH       = 0._r8
 
   allocate(trc_gasml2_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); trc_gasml2_vr(:,:,:,:) = 0._r8
   allocate(trcs_solml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_solml2_vr(:,:,:,:) = 0._r8
   allocate(trcs_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_soHml2_vr(:,:,:,:) = 0._r8
 
   allocate(trcg_SnowDrift_flxM_2D(idg_beg:idg_NH3,2,JV,JH));    trcg_SnowDrift_flxM_2D                    = 0._r8
-  allocate(trcn_FloXSurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_FloXSurRof_flxM_2DH = 0._r8
+  allocate(trcn_SurRof_flxM_2DH(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_SurRof_flxM_2DH = 0._r8
   allocate(Gas_AdvDif_FlxMM_3D(idg_beg:idg_NH3,3,JD,JV,JH));Gas_AdvDif_FlxMM_3D                             = 0._r8
   allocate(Gas_AdvDif_FlxMM_vr(idg_beg:idg_NH3,JZ,JY,JH));Gas_AdvDif_FlxMM_vr                     = 0._r8
 
@@ -182,7 +182,7 @@ contains
   call destroy(GasDifctScaledMM_vr)
   call destroy(GasDifuscoefMM_3D)
   call destroy(SoluteDifusivitytscaledM_vr)
-  call destroy(DOM_MicP2)
+  call destroy(DOM_MicP2_vr)
 
   call destroy(RDOM_CumEcoProd_vr)
   call destroy(DOM_MicpTranspFlxM_3D)
@@ -221,7 +221,7 @@ contains
   call destroy(Gas_AdvDif_FlxMM_3D)
   call destroy(trcg_solsml2_snvr)
   call destroy(trcn_solsml2_snvr)
-  call destroy(trcn_FloXSurRof_flxM_2DH)
+  call destroy(trcn_SurRof_flxM_2DH)
   call destroy(trcg_Aqua_flxM_snvr)
   call destroy(trcn_Aqua_flxM_snvr)
   call destroy(trcg_Precip2LitrM)
@@ -235,7 +235,7 @@ contains
   call destroy(trcs_soHml2_vr)
   call destroy(trcn_AquaADV_Snow2Band_flxM)
   call destroy(trcn_AquaADV_Snow2Soil_flxM)
-  call destroy(trcg_FloXSurRof_flxM_2DH)
+  call destroy(trcg_SurRof_flxM_2DH)
   call destroy(RGas_Disol_FlxMM_vr)
   call destroy(trcn_SnowDrift_flxM_2D)
   call destroy(trcs_MacpTranspFlxM_3D)

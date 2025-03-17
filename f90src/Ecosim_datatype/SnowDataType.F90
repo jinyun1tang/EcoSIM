@@ -73,9 +73,11 @@ module SnowDataType
   real(r8),target, allocatable ::  trcg_snowMassloss_col(:,:,:)            !total volatile mass of tracer loss from snow [g d-2 h-1]
   real(r8),target, allocatable ::  trcn_snowMassloss_col(:,:,:)            !total nutrient mass of tracer loss from snow [g d-2 h-1]
   real(r8),target, allocatable ::  trcSalt_snowMassloss_col(:,:,:)         !total salt mass of tracer loss from snow [g d-2 h-1]
-  real(r8),target,allocatable ::   trcg_AquaAdv_flx_snvr(:,:,:,:)        !aqueous volatile tracer flux in snow [g/d2/h]
-  real(r8),target,allocatable ::   trcn_AquaAdv_flx_snvr(:,:,:,:)        !aqueous nutrient tracer flux in snow [g/d2/h]
-  real(r8),target,allocatable ::   trcSalt_AquaAdv_flx_snvr(:,:,:,:)     !aqueous salt tracer flux through snow [g/d2/h]  
+  real(r8),target,allocatable ::   trcg_AquaAdv_flx_snvr(:,:,:,:)          !aqueous volatile tracer flux in snow [g/d2/h]
+  real(r8),target,allocatable ::   trcn_AquaAdv_flx_snvr(:,:,:,:)          !aqueous nutrient tracer flux in snow [g/d2/h]
+  real(r8),target,allocatable ::   trcSalt_AquaAdv_flx_snvr(:,:,:,:)       !aqueous salt tracer flux through snow [g/d2/h]  
+  integer, target,allocatable ::   IFLBSM_2DH(:,:,:,:,:)                   !flag for snow redistribution in intermediate iterations
+  integer, target,allocatable ::   IFLBS_2DH(:,:,:,:)                      !flag for snow redistribution
 !----------------------------------------------------------------------
 
 contains
@@ -86,6 +88,8 @@ contains
   allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
   allocate(trcg_snowMassloss_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMassloss_col=0._r8
   allocate(trcn_snowMassloss_col(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_snowMassloss_col=0._r8
+  allocate(IFLBSM_2DH(60,2,2,JY,JX));IFLBSM_2DH=-1
+  allocate(IFLBS_2DH(2,2,JY,JX));IFLBS_2DH=-1
 
   allocate(trcg_AquaADV_Snow2Litr_flx(idg_beg:idg_NH3,JY,JX)) ;trcg_AquaADV_Snow2Litr_flx=0._r8 
   allocate(trcn_AquaADV_Snow2Litr_flx(ids_nut_beg:ids_nuts_end,JY,JX));trcn_AquaADV_Snow2Litr_flx=0._r8
@@ -173,7 +177,8 @@ contains
 
   call destroy(trcg_AquaAdv_flx_snvr)
   call destroy(trcn_AquaAdv_flx_snvr)
-
+  call destroy(IFLBSM_2DH)
+  call destroy(IFLBS_2DH)
   call destroy(trcn_AquaADV_Snow2Soil_flx)
   call destroy(trcn_AquaADV_Snow2Band_flx)
   call destroy(trcg_AquaADV_Snow2Soil_flx)
