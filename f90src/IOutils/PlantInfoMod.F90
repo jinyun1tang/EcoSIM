@@ -145,7 +145,7 @@ implicit none
         DO NZ=1,MIN(NS,NP(NY,NX))
           tstr=trim(pft_pltinfo(NZ))
           if (tstr .EQ. "") then
-            tstr = "01010000 0.0 0.0"
+            cycle
           endif
           read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
           read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)

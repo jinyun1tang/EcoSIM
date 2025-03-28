@@ -730,9 +730,7 @@ module readiMod
           SatHydroCondVert_vr(L,NY,NX)=0.098_r8*SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           SatHydroCondHrzn_vr(L,NY,NX)=0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           CCLAY_vr(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT(L,NY,NX)))
-          CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
-          CSoilOrgM_vr(ielmn,L,NY,NX)=CSoilOrgM_vr(ielmn,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
-          CSoilOrgM_vr(ielmp,L,NY,NX)=CSoilOrgM_vr(ielmp,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
+          CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C (C is input as Kg/Mg soil, N and P are input as g/Mg soil)
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI_vr(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)
