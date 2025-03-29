@@ -144,6 +144,9 @@ implicit none
       DO NY=NV1,NV2
         DO NZ=1,MIN(NS,NP(NY,NX))
           tstr=trim(pft_pltinfo(NZ))
+          if (tstr .EQ. "") then
+            cycle
+          endif
           read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
           read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
           PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),ppmc)
