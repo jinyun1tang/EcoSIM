@@ -17,10 +17,11 @@ implicit none
 
   real(r8),target,allocatable :: CPO4B_vr(:,:,:)                        !PO4 concentration band micropore	[g m-3]
   real(r8),target,allocatable :: CPO4S_vr(:,:,:)                        !PO4 concentration non-band micropore	[g m-3]
-
+  real(r8),target,allocatable :: DOM_transpFlx_2DH(:,:,:,:)           !subsurface lateral DOM fluxes, [g d-2 h-1]
+  real(r8),target,allocatable :: trcs_transpFlx_2DH(:,:,:)            !subsurface lateral tracer fluxes, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_soHml_vr(:,:,:,:)               !solute mass in macropore [g d-2]
   real(r8),target,allocatable :: trcs_solml_vr(:,:,:,:)               !solute mass in micropore [g d-2]
-  real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)               !solute concentration in micropre [g m-3]
+  real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                !solute concentration in micropre [g m-3]
   real(r8),target,allocatable :: trcg_gascl_vr(:,:,:,:)               !gaseous concentation in micropore [g m-3]
   real(r8),target,allocatable :: tRHydlySOM_vr(:,:,:,:)              !solid SOM hydrolysis rate [g/m2/hr]
   real(r8),target,allocatable :: tRHydlyBioReSOM_vr(:,:,:,:)         !microbial residual hydrolysis rate [g/m2/hr]
@@ -108,9 +109,6 @@ implicit none
   real(r8),target,allocatable ::  trcs_TransptMicP_3D(:,:,:,:,:)     !tracer solute transport in micropore [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)     !DOC flux micropore, [g d-2 h-1]
   real(r8),target,allocatable ::  Gas_WetDeposition_col(:,:,:)       !wet gas deposition due to irrigation and rainfall [g d-2 h-1]
-  real(r8),target,allocatable ::  trcs_TransptMacP_3D(:,:,:,:,:)     !tracer solute transport in macropore [g d-2 h-1]
-  real(r8),target,allocatable ::  Gas_AdvDif_Flx_3D(:,:,:,:,:)       !3D gaseous fluxes, [g d-2 h-1]
-  real(r8),target,allocatable ::  DOM_Macp_Transp_flx_3D(:,:,:,:,:,:) !DOC flux macropore, [g d-2 h-1]
   real(r8),target,allocatable ::  Soil_Gas_pressure_vr(:,:,:)         !soil gas pressure, [Pa]
   real(r8),target,allocatable ::  CO2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous CO2 [ppmv]
   real(r8),target,allocatable ::  O2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous O2 [ppmv]
@@ -125,6 +123,8 @@ implicit none
   real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)               !Nitrification N2O produciton rate [gN d-2 h-1]
   real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production [gN d-2 h-1]
   real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2  [gN d-2 h-1]
+  real(r8),target,allocatable :: DOM_draing_col(:,:,:)               !DOM loss through subsurface drainage [g d-2 h-1]
+  real(r8),target,allocatable :: trcs_draing_col(:,:,:)              !solute loss through subsurface drainage [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -142,10 +142,13 @@ implicit none
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
+  allocate(DOM_draing_col(idom_beg:idom_end,JY,JX));DOM_draing_col=0._r8
+  allocate(trcs_draing_col(ids_beg:ids_end,JY,JX));trcs_draing_col=0._r8
   allocate(CNH4_vr(JZ,JY,JX));     CNH4_vr=0._r8
   allocate(CNO3_vr(JZ,JY,JX));     CNO3_vr=0._r8
   allocate(CPO4_vr(JZ,JY,JX));     CPO4_vr=0._r8
-
+  allocate(DOM_transpFlx_2DH(idom_beg:idom_end,jcplx,JY,JX)); DOM_transpFlx_2DH=0._r8
+  allocate(trcs_transpFlx_2DH(ids_beg:ids_end,JY,JX)); trcs_transpFlx_2DH=0._r8
   allocate(trcg_soilMass_col(idg_beg:idg_end,JY,JX)); trcg_soilMass_col=0._r8
   allocate(trcg_soilMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_soilMass_beg_col=0._r8
   allocate(Gas_Prod_TP_cumRes_col(idg_beg:idg_NH3,JY,JX)); Gas_Prod_TP_cumRes_col=0._r8
@@ -254,12 +257,9 @@ implicit none
   allocate(WaterFlowSoiMacP_3D(3,JD,JV,JH));   WaterFlowSoiMacP_3D=0._r8
   allocate(HeatFlow2Soil_3D(3,JD,JV,JH));   HeatFlow2Soil_3D=0._r8
 
-  allocate(trcs_TransptMicP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_TransptMicP_3D=0._r8
-  allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:JD,JV,JH));DOM_MicpTransp_3D=0._r8
-  allocate(Gas_AdvDif_Flx_3D(idg_beg:idg_end,3,JD,JV,JH));Gas_AdvDif_Flx_3D=0._r8
-  allocate(trcs_TransptMacP_3D(ids_beg:ids_end,3,0:JD,JV,JH));trcs_TransptMacP_3D=0._r8
+  allocate(trcs_TransptMicP_3D(ids_beg:ids_end,3,0:1,JV,JH));trcs_TransptMicP_3D=0._r8
+  allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:1,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(CPO4S_vr(JZ,JY,JX));CPO4S_vr(JZ,JY,JX)=0._r8
-  allocate(DOM_Macp_Transp_flx_3D(idom_beg:idom_end,1:jcplx,3,JD,JV,JH));DOM_Macp_Transp_flx_3D=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -269,6 +269,11 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
+
+  call destroy(DOM_draing_col)
+  call destroy(trcs_draing_col)
+  call destroy(DOM_transpFlx_2DH)
+  call destroy(trcs_transpFlx_2DH)
   call destroy(O2_Gas_Frac_vr)
   call destroy(CO2_Gas_Frac_vr)
   call destroy(CH4_Gas_Frac_vr)  
@@ -375,7 +380,6 @@ implicit none
   call destroy(WaterFlowSoiMacP_3D)
   call destroy(HeatFlow2Soil_3D)
   call destroy(DOM_MicpTransp_3D)
-  call destroy(DOM_Macp_Transp_flx_3D)
   call destroy(trcs_RMicbUptake_vr)
   call destroy(trcs_RMicbUptake_col)
   end subroutine DestructSoilBGCData

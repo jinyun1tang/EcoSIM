@@ -12,7 +12,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   PARR_col(:,:)                     !surface litter boundary layer conductance, [m t-1]
   integer  ,target,allocatable ::   iLitrType_col(:,:,:)              !surface litter type:1 = plant, 2 = manure
   real(r8) ,target,allocatable ::   XTillCorp_col(:,:)                !factor for surface litter incorporation and soil mixing
-  real(r8) ,target,allocatable ::   WatFLo2LitrM(:,:,:)               !water transfer between soil surface and surface litter, [g d-2 t-1]
+  real(r8) ,target,allocatable ::   WatFLoLitr2SoilM_col(:,:,:)               !water transfer between soil surface and surface litter, [g d-2 t-1]
   real(r8) ,target,allocatable ::   WatFlowSno2LitRM_col(:,:,:)       !meltwater flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   FracSurfByLitR_col(:,:)           !fraction of soil surface covered by surface litter, [-]
   real(r8) ,target,allocatable ::   HeatFLoByWat2LitR_col(:,:)        !net heat transfer to surface litter, [MJ d-2 t-1]
@@ -55,7 +55,7 @@ module SurfLitterDataType
   allocate(PARR_col(JY,JX));         PARR_col=0._r8
   allocate(iLitrType_col(2,JY,JX));      iLitrType_col=0
   allocate(XTillCorp_col(JY,JX));        XTillCorp_col=0._r8
-  allocate(WatFLo2LitrM(60,JY,JX));     WatFLo2LitrM=0._r8
+  allocate(WatFLoLitr2SoilM_col(60,JY,JX));     WatFLoLitr2SoilM_col=0._r8
   allocate(WatFlowSno2LitRM_col(60,JY,JX));     WatFlowSno2LitRM_col=0._r8
   allocate(FracSurfByLitR_col(JY,JX));         FracSurfByLitR_col=0._r8
   allocate(HeatFLoByWat2LitR_col(JY,JX));        HeatFLoByWat2LitR_col=0._r8
@@ -84,7 +84,7 @@ module SurfLitterDataType
   call destroy(PARR_col)
   call destroy(iLitrType_col)
   call destroy(XTillCorp_col)
-  call destroy(WatFLo2LitrM)
+  call destroy(WatFLoLitr2SoilM_col)
   call destroy(WatFlowSno2LitRM_col)
   call destroy(FracSurfByLitR_col)
   call destroy(HeatFLoByWat2LitR_col)

@@ -359,7 +359,7 @@ module ErosionMod
 !     IN 'WATSUB' TIMES BOUNDARY SEDIMENT CONCENTRATION IN
 !     SURFACE WATER
 !
-      IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0._r8) &
+      IF(.not.XGridRunoffFlag_2DH(NN,N,N2,N1) .OR. isclose(RCHQF,0._r8) &
         .OR. BaseErosionRate(N2,N1).LE.ZEROS(N2,N1))THEN
         SedErosionM(N,NN,M5,M4)=0._r8
       ELSE
@@ -804,7 +804,7 @@ module ErosionMod
                 ENDIF
               ENDIF
             ENDIF
-            IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0._r8) &
+            IF(.not.XGridRunoffFlag_2DH(NN,N,N2,N1).OR.isclose(RCHQF,0._r8) &
               .OR. ABS(cumSed_Eros_2D(N,NN,M5,M4)).LE.ZEROS(N2,N1))THEN
               XSand_Eros_2D(N,NN,M5,M4)=0._r8
               XSilt_Eros_2D(N,NN,M5,M4)=0._r8

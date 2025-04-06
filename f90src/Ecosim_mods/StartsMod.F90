@@ -219,7 +219,7 @@ module StartsMod
   !     ExtWaterTablet0_col,DTBLD=depth of natural,artificial water table adjusted for elevn
   !     DepzIntWTBL_col=depth to internal water table
   !     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
-  !     XDPTH=x-section area/distance in solute flux calculations (m2/m)
+  !     XDPTH_3D=x-section area/distance in solute flux calculations (m2/m)
   !     DISP=dispersivity parameter in solute flux calculations (m2 h-1)
   !
   implicit none
@@ -265,7 +265,7 @@ module StartsMod
       DO L=1,NL(NY,NX)
         N1 = NX;N2 = NY;N3 = L
 
-        DO N=FlowDirIndicator(N2,N1),3
+        DO N=FlowDirIndicator_col(N2,N1),3
           IF(N.EQ.iWestEastDirection)THEN
             ! in direction x, west-east
             IF(NX.EQ.NHE)THEN
@@ -291,14 +291,14 @@ module StartsMod
           !distance between the center of grids (N3,N2,N1) and (N6,N5,N4)
           DIST(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
           !
-          XDPTH(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
+          XDPTH_3D(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?
           DISP_3D(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
         ENDDO
 
         IF(L.EQ.NU(NY,NX))THEN
           DIST(3,N3,N2,N1)  = 0.5_r8*DLYR_3D(3,N3,N2,N1)
-          XDPTH(3,N3,N2,N1) = AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
+          XDPTH_3D(3,N3,N2,N1) = AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
           DISP_3D(3,N3,N2,N1)  = 0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
       ENDDO
@@ -595,7 +595,7 @@ module StartsMod
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
-! XGridRunoffFlag=runoff boundary flags:0=not possible,1=possible
+! XGridRunoffFlag_2DH=runoff boundary flags:0=not possible,1=possible
 ! ASP_col=aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
@@ -617,38 +617,38 @@ module StartsMod
       !aspect angle 
       IF(ASP_col(NY,NX).GE.0.0_r8 .AND. ASP_col(NY,NX).LT.90.0_r8)THEN
       ! face the northeast
-        XGridRunoffFlag(1,1,NY,NX) = .true.    !west->east
-        XGridRunoffFlag(2,1,NY,NX) = .false.
-        XGridRunoffFlag(1,2,NY,NX) = .false.
-        XGridRunoffFlag(2,2,NY,NX) = .true.    !south->north
+        XGridRunoffFlag_2DH(1,1,NY,NX) = .true.    !west->east
+        XGridRunoffFlag_2DH(2,1,NY,NX) = .false.
+        XGridRunoffFlag_2DH(1,2,NY,NX) = .false.
+        XGridRunoffFlag_2DH(2,2,NY,NX) = .true.    !south->north
       ELSEIF(ASP_col(NY,NX).GE.90.0_r8.AND.ASP_col(NY,NX).LT.180.0_r8)THEN
       ! face the northwest
-        XGridRunoffFlag(1,1,NY,NX) = .false.
-        XGridRunoffFlag(2,1,NY,NX) = .true.   !east -> west
-        XGridRunoffFlag(1,2,NY,NX) = .false.
-        XGridRunoffFlag(2,2,NY,NX) = .true.   !south -> north
+        XGridRunoffFlag_2DH(1,1,NY,NX) = .false.
+        XGridRunoffFlag_2DH(2,1,NY,NX) = .true.   !east -> west
+        XGridRunoffFlag_2DH(1,2,NY,NX) = .false.
+        XGridRunoffFlag_2DH(2,2,NY,NX) = .true.   !south -> north
       ELSEIF(ASP_col(NY,NX).GE.180.0_r8.AND.ASP_col(NY,NX).LT.270.0_r8)THEN
       !face the southwest
-        XGridRunoffFlag(1,1,NY,NX) = .false.
-        XGridRunoffFlag(2,1,NY,NX) = .true.  !east -> west
-        XGridRunoffFlag(1,2,NY,NX) = .true.  !north -> south
-        XGridRunoffFlag(2,2,NY,NX) = .false.
+        XGridRunoffFlag_2DH(1,1,NY,NX) = .false.
+        XGridRunoffFlag_2DH(2,1,NY,NX) = .true.  !east -> west
+        XGridRunoffFlag_2DH(1,2,NY,NX) = .true.  !north -> south
+        XGridRunoffFlag_2DH(2,2,NY,NX) = .false.
       ELSEIF(ASP_col(NY,NX).GE.270.0_r8.AND.ASP_col(NY,NX).LE.360.0_r8)THEN
       ! face the southeast
-        XGridRunoffFlag(1,1,NY,NX) = .true.  !west->east
-        XGridRunoffFlag(2,1,NY,NX) = .false.
-        XGridRunoffFlag(1,2,NY,NX) = .true.  !north->south
-        XGridRunoffFlag(2,2,NY,NX) = .false.
+        XGridRunoffFlag_2DH(1,1,NY,NX) = .true.  !west->east
+        XGridRunoffFlag_2DH(2,1,NY,NX) = .false.
+        XGridRunoffFlag_2DH(1,2,NY,NX) = .true.  !north->south
+        XGridRunoffFlag_2DH(2,2,NY,NX) = .false.
       ENDIF
       !In the vertical direction, for general treatment of flow against slope. 
       SLOPE(3,NY,NX)=-1.0_r8
 
       IF(.not.isclose(SLOPE(iWestEastDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
-        FSLOPE(iWestEastDirection,NY,NX)   = ABS(SLOPE(iWestEastDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
-        FSLOPE(iNorthSouthDirection,NY,NX) = ABS(SLOPE(iNorthSouthDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))
+        FSLOPE_2DH(iWestEastDirection,NY,NX)   = ABS(SLOPE(iWestEastDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
+        FSLOPE_2DH(iNorthSouthDirection,NY,NX) = ABS(SLOPE(iNorthSouthDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))
       ELSE
-        FSLOPE(iWestEastDirection,NY,NX)   = 0.5_r8
-        FSLOPE(iNorthSouthDirection,NY,NX) = 0.5_r8
+        FSLOPE_2DH(iWestEastDirection,NY,NX)   = 0.5_r8
+        FSLOPE_2DH(iNorthSouthDirection,NY,NX) = 0.5_r8
       ENDIF
 
 !    compute incident sky angle at ground surface
@@ -696,7 +696,7 @@ module StartsMod
       ELSE
         ALTY=MAX(ALTY,ALT_col(NY,NX))
       ENDIF
-      WRITE(*,1111)NX,NY,((XGridRunoffFlag(NN,N,NY,NX),NN=1,2),N=1,2) &
+      WRITE(*,1111)NX,NY,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT_col(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
         ,SLOPE(0,NY,NX),SLOPE(iWestEastDirection,NY,NX),SLOPE(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)

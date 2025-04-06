@@ -335,9 +335,9 @@ implicit none
       OQN1=AMIN1(0.1_r8*OSNX,OSNI-OSNX)
       OQP1=AMIN1(0.1_r8*OSPX,OSPI-OSPX)
 
-      DOM_vr(idom_doc,K,LFDPTH,NY,NX)=DOM_vr(idom_doc,K,LFDPTH,NY,NX)+OQC1
-      DOM_vr(idom_don,K,LFDPTH,NY,NX)=DOM_vr(idom_don,K,LFDPTH,NY,NX)+OQN1
-      DOM_vr(idom_dop,K,LFDPTH,NY,NX)=DOM_vr(idom_dop,K,LFDPTH,NY,NX)+OQP1
+      DOM_MicP_vr(idom_doc,K,LFDPTH,NY,NX)=DOM_MicP_vr(idom_doc,K,LFDPTH,NY,NX)+OQC1
+      DOM_MicP_vr(idom_don,K,LFDPTH,NY,NX)=DOM_MicP_vr(idom_don,K,LFDPTH,NY,NX)+OQN1
+      DOM_MicP_vr(idom_dop,K,LFDPTH,NY,NX)=DOM_MicP_vr(idom_dop,K,LFDPTH,NY,NX)+OQP1
 !
 !     REMAINDER DISTRIBUTED TO RESIDUE FRACTIONS
 !

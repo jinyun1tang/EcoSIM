@@ -186,7 +186,7 @@ module ExtractsMod
     TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
     TKS_vr                   => plt_ew%TKS_vr,                     &
     THeatLossRoot2Soil_vr    => plt_ew%THeatLossRoot2Soil_vr,      &
-    TPlantRootH2OLoss_vr     => plt_ew%TPlantRootH2OLoss_vr,       &
+    TH2OLoss2PlantRoo_vr     => plt_ew%TH2OLoss2PlantRoo_vr,       &
     AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
     RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
     totRootLenDens_vr        => plt_morph%totRootLenDens_vr,       &
@@ -213,7 +213,7 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
+      TH2OLoss2PlantRoo_vr(L) = TH2OLoss2PlantRoo_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
 
       !water lose from canopy to soil
       if(AllPlantRootH2OLoss_vr(N,L,NZ)>0._r8)then

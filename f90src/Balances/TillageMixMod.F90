@@ -141,9 +141,9 @@ module TillageMixMod
 
   CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_MicP_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_MicP_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
   CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SorbedOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
@@ -310,7 +310,7 @@ module TillageMixMod
 
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
-          DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
+          DOM_MicP_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
           DOM_MacP_vr(idom,K,L,NY,NX)=XTillCorp_col(NY,NX)*DOM_MacP_vr(idom,K,L,NY,NX)
         ENDDO  
       ENDDO

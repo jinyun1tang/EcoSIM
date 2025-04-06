@@ -36,7 +36,8 @@ module minimathmod
     module procedure AZMIN1_s
     module procedure AZMIN1_d
   end interface AZMIN1
-
+  
+  public :: get_flux_scalar
   public :: addone
   public :: RichardsonNumber
   real(r8), parameter :: tiny_val=1.e-14_r8
@@ -456,4 +457,21 @@ module minimathmod
     ans=-AMIN1(-flux,massa)+tiny_val
   endif
   end function flux_mass_limiter
+
+! ----------------------------------------------------------------------
+  subroutine get_flux_scalar(x0,flux,x1,pscal)
+  implicit none
+  real(r8), intent(in) :: x0,flux
+  real(r8), intent(out):: x1
+  real(r8), intent(inout):: pscal
+  real(r8) :: p1
+
+  x1=x0+flux
+  if(isclose(flux,0._r8))return
+  if(x1<0._r8)then
+    p1=safe_adb(-x0,flux)
+    pscal=AMIN1(1._r8,pscal,p1)
+  endif
+
+  end subroutine get_flux_scalar
 end module minimathmod

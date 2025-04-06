@@ -806,10 +806,10 @@ implicit none
   integer, intent(in) :: NY,NX
   integer :: L
 
-  TDrysnoBySnowRedist(NY,NX)   = 0.0_r8
-  TWatBySnowRedist(NY,NX)      = 0.0_r8
-  TIceBySnowRedist(NY,NX)      = 0.0_r8
-  THeatBySnowRedist_col(NY,NX) = 0.0_r8
+  TDrysnoByRedist_col(NY,NX)   = 0.0_r8
+  TWatSnoByRedist_col(NY,NX)      = 0.0_r8
+  TIceSnoByRedist_col(NY,NX)      = 0.0_r8
+  THeatSnoByRedist_col(NY,NX) = 0.0_r8
 
   trcg_LossXSnowRedist_col(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
   trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8

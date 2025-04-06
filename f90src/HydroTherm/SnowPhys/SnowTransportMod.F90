@@ -235,7 +235,7 @@ implicit none
 !     begin_execution
 !     OVERLAND SNOW REDISTRIBUTION
 !
-  IF(abs(TDrysnoBySnowRedist(NY,NX))>0._r8)THEN
+  IF(abs(TDrysnoByRedist_col(NY,NX))>0._r8)THEN
 
     !loss of dissolved gases from surface snow
     DO idg=idg_beg,idg_NH3
@@ -266,35 +266,89 @@ implicit none
   integer, intent(in) :: N1,N2    !current grid
   integer, intent(in) :: N4,N5    !front
   integer, intent(in) :: N4B,N5B  !back
+  character(len=*), parameter :: subname='XGridSnowTracerRunoff'
   integer :: NN,idg,idn,idsalt
 
-  TDrysnoBySnowRedist(N2,N1)   = TDrysnoBySnowRedist(N2,N1)+DrySnoBySnoRedistrib_2DH(N,N2,N1)-DrySnoBySnoRedistrib_2DH(N,N5,N4)
-  TWatBySnowRedist(N2,N1)      = TWatBySnowRedist(N2,N1)+WatBySnowRedistrib_2DH(N,N2,N1)-WatBySnowRedistrib_2DH(N,N5,N4)
-  TIceBySnowRedist(N2,N1)      = TIceBySnowRedist(N2,N1)+IceBySnowRedistrib_2DH(N,N2,N1)-IceBySnowRedistrib_2DH(N,N5,N4)
-  THeatBySnowRedist_col(N2,N1) = THeatBySnowRedist_col(N2,N1)+HeatBySnowRedistrib_2DH(N,N2,N1)-HeatBySnowRedistrib_2DH(N,N5,N4)
+
   !
   !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
   !
-  do idg=idg_beg,idg_NH3
-    trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)+&
-      trcg_FloXSnow_2DH(idg,N,N2,N1)-trcg_FloXSnow_2DH(idg,N,N5,N4)
+  call PrintInfo('beg '//subname)
+
+  DO NN=1,2
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)+DrySnoByRedistrib_2DH(N,NN,N2,N1)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)+WatSnoByRedist_2DH(N,NN,N2,N1)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)+IceSnoBySnowRedist_2DH(N,NN,N2,N1)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)+HeatSnoByRedist_2DH(N,NN,N2,N1)
+
+    do idg=idg_beg,idg_NH3
+      trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,NN,N2,N1)
+    ENDDO
+    
+    DO idn=ids_nut_beg,ids_nuts_end
+      trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1)+trcn_FloXSnow_2DH(idn,N,NN,N2,N1)
+    ENDDO  
+
+    !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
+    !
+    !
+    IF(salt_model)THEN
+      DO idsalt=idsalt_beg,idsalt_end
+        trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1)+trcSalt_FloXSnow_2DH(idsalt,N,NN,N2,N1)
+      ENDDO
+    ENDIF
   ENDDO
 
-  DO idn=ids_nut_beg,ids_nuts_end
-    trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1) &
-      +trcn_FloXSnow_2DH(idn,N,N2,N1)-trcn_FloXSnow_2DH(idn,N,N5,N4)
-  ENDDO  
+  if(IFLBS_2DH(N,iBehind,N5,N4).EQ.0)then
 
-  !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
-  !
-!
-  IF(salt_model)THEN
-    DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1) &
-        +trcSalt_FloXSnow_2DH(idsalt,N,N2,N1)-trcSalt_FloXSnow_2DH(idsalt,N,N5,N4)
+    TDrysnoByRedist_col(N2,N1)   = TDrysnoByRedist_col(N2,N1)-DrySnoByRedistrib_2DH(N,iBehind,N5,N4)
+    TWatSnoByRedist_col(N2,N1)      = TWatSnoByRedist_col(N2,N1)-WatSnoByRedist_2DH(N,iBehind,N5,N4)
+    TIceSnoByRedist_col(N2,N1)      = TIceSnoByRedist_col(N2,N1)-IceSnoBySnowRedist_2DH(N,iBehind,N5,N4)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoByRedist_2DH(N,iBehind,N5,N4)
+
+    do idg=idg_beg,idg_NH3
+      trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)-trcg_FloXSnow_2DH(idg,N,iBehind,N5,N4)
     ENDDO
-  ENDIF
+    
+    DO idn=ids_nut_beg,ids_nuts_end
+      trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1)-trcn_FloXSnow_2DH(idn,N,iBehind,N5,N4)
+    ENDDO  
+    !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
+    !
+    IF(salt_model)THEN
+      DO idsalt=idsalt_beg,idsalt_end
+        trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1)-trcSalt_FloXSnow_2DH(idsalt,N,iBehind,N5,N4)
+      ENDDO
+    ENDIF
 
+  endif
+
+  IF(N5B.GT.0 .AND. N4B.GT.0)then
+    IF(IFLBS_2DH(N,iFront,N5B,N4B).EQ.1)then
+
+      TDrysnoByRedist_col(N2,N1)   = TDrysnoByRedist_col(N2,N1)-DrySnoByRedistrib_2DH(N,iFront,N5B,N4B)
+      TWatSnoByRedist_col(N2,N1)      = TWatSnoByRedist_col(N2,N1)-WatSnoByRedist_2DH(N,iFront,N5B,N4B)
+      TIceSnoByRedist_col(N2,N1)      = TIceSnoByRedist_col(N2,N1)-IceSnoBySnowRedist_2DH(N,iFront,N5B,N4B)
+      THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoByRedist_2DH(N,iFront,N5B,N4B)
+
+      do idg=idg_beg,idg_NH3
+        trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)-trcg_FloXSnow_2DH(idg,N,iFront,N5B,N4B)
+      ENDDO
+      
+      DO idn=ids_nut_beg,ids_nuts_end
+        trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1)-trcn_FloXSnow_2DH(idn,N,iFront,N5B,N4B)
+      ENDDO  
+      !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
+      !
+      IF(salt_model)THEN
+        DO idsalt=idsalt_beg,idsalt_end
+          trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1)-trcSalt_FloXSnow_2DH(idsalt,N,iFront,N5B,N4B)
+        ENDDO
+      ENDIF
+
+    endif
+  endif  
+  call PrintInfo('end '//subname)
   end subroutine XGridSnowTracerRunoff
 
 !------------------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 set(NONSALT_MOD_SOURCES
   TranspNoSaltDataMod.F90
-  SurfaceFluxMod.F90
-  InsideTranspMod.F90
-  BoundaryTranspMod.F90
+  InitNoSaltTransportMod.F90  
+  TranspNoSaltFastMod.F90
+  TranspNoSaltSlowMod.F90
 	TranspNoSaltMod.F90
 )
 include(add_ecosim_library)

@@ -198,7 +198,7 @@ module SoilDisturbMod
 !     REMOVE DOC, DON, DOP
 !
             DO idom=idom_beg,idom_end
-              rmDOM(idom)=DCORPC*DOM_vr(idom,K,L,NY,NX)
+              rmDOM(idom)=DCORPC*DOM_MicP_vr(idom,K,L,NY,NX)
             enddo
 
             ONX=EFIRE(1,iSoilDisturbType_col(I,NY,NX))*rmDOM(ielmn)
@@ -211,7 +211,7 @@ module SoilDisturbMod
               OPL(1,K)=OPL(1,K)+rmDOM(ielmp)-OPX
             ENDIF
             DO idom=idom_beg,idom_end
-              DOM_vr(idom,K,L,NY,NX)=DOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
+              DOM_MicP_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)-rmDOM(idom)
             enddo
 
             OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)            
@@ -258,10 +258,10 @@ module SoilDisturbMod
               SorbedOM_vr(idom,K,L,NY,NX)=SorbedOM_vr(idom,K,L,NY,NX)-rmDOM(idom)
             enddo
 
-            dOMelm(ielmc)=dOMelm(ielmc)+DOM_vr(idom_doc,K,L,NY,NX)+DOM_MacP_vr(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
-              +DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
-            dOMelm(ielmn)=dOMelm(ielmn)+DOM_vr(idom_don,K,L,NY,NX)+DOM_MacP_vr(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
-            dOMelm(ielmp)=dOMelm(ielmp)+DOM_vr(idom_dop,K,L,NY,NX)+DOM_MacP_vr(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
+            dOMelm(ielmc)=dOMelm(ielmc)+DOM_MicP_vr(idom_doc,K,L,NY,NX)+DOM_MacP_vr(idom_doc,K,L,NY,NX)+SorbedOM_vr(ielmc,K,L,NY,NX) &
+              +DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
+            dOMelm(ielmn)=dOMelm(ielmn)+DOM_MicP_vr(idom_don,K,L,NY,NX)+DOM_MacP_vr(idom_don,K,L,NY,NX)+SorbedOM_vr(ielmn,K,L,NY,NX)
+            dOMelm(ielmp)=dOMelm(ielmp)+DOM_MicP_vr(idom_dop,K,L,NY,NX)+DOM_MacP_vr(idom_dop,K,L,NY,NX)+SorbedOM_vr(ielmp,K,L,NY,NX)
 
             OMelm(ielmc)=OMelm(ielmc)+rmDOM(idom_doc)+rmDOM(idom_acetate)
             OMelm(ielmn)=OMelm(ielmn)+ONX

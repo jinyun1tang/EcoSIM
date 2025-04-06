@@ -371,7 +371,7 @@ implicit none
   real(r8), pointer :: FracBulkSOMC_vr(:,:)           => null()  !fraction of total organic C in complex, [-]
   real(r8), pointer :: ElmAllocmat4Litr(:,:,:,:)      => null() !litter kinetic fraction, [-]
   real(r8), pointer :: TScal4Difsvity_vr(:)           => null()  !temperature effect on diffusivity
-  real(r8), pointer :: AirFilledSoilPoreM_vr(:,:)     => null()  !soil air-filled porosity, [m3 m-3]
+  real(r8), pointer :: FracAirFilledSoilPoreM_vr(:,:)     => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEffM_vr(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: SoilResit4RootPentrate_vr(:)   => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: SoilBulkDensity_vr(:)          => null()  !soil bulk density, [Mg m-3]
@@ -392,7 +392,7 @@ implicit none
   real(r8), pointer :: VLWatMicP_vr(:)                => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VLMicP_vr(:)                   => null()  !total volume in micropores [m3 d-2]
 !  real(r8), pointer :: trcs_RMicbUptake_vr(:,:)       => null()  !microbial uptake of dissolved gas tracers [g d-2 h-1] 
-  real(r8), pointer :: DOM_vr(:,:,:)                  => null()  !dissolved organic C micropore	[gC d-2]
+  real(r8), pointer :: DOM_MicP_vr(:,:,:)                  => null()  !dissolved organic C micropore	[gC d-2]
   real(r8), pointer :: trcs_solml_vr(:,:)             => null() !aqueous tracer [g d-2]
   contains
     procedure, public :: Init => plt_soilchem_init
@@ -579,7 +579,7 @@ implicit none
   real(r8), pointer :: PSIRootTurg_vr(:,:,:)           => null()    !root turgor water potential,                                     [Mpa]
   real(r8), pointer :: AllPlantRootH2OLoss_vr(:,:,:) => null()    !root water uptake,                                               [m2 d-2 h-1]
   real(r8), pointer :: THeatLossRoot2Soil_vr(:)           => null()    !total root heat uptake,                                        [MJ d-2]
-  real(r8), pointer :: TPlantRootH2OLoss_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
+  real(r8), pointer :: TH2OLoss2PlantRoo_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
   real(r8), pointer :: WatHeldOnCanopy_pft(:)          => null()    !canopy surface water content,                                   [m3 d-2]
   real(r8), pointer :: CanopyBiomWater_pft(:)              => null()    !canopy water content,                                           [m3 d-2]
   real(r8), pointer :: VHeatCapCanopy_pft(:)           => null()    !canopy heat capacity,                                           [MJ d-2 K-1]
@@ -1112,7 +1112,7 @@ implicit none
   allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1));this%PSIRootOSMO_vr=spval
   allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1));this%PSIRootTurg_vr=spval
   allocate(this%AllPlantRootH2OLoss_vr(jroots,JZ1,JP1));this%AllPlantRootH2OLoss_vr=spval
-  allocate(this%TPlantRootH2OLoss_vr(0:JZ1));this%TPlantRootH2OLoss_vr=spval
+  allocate(this%TH2OLoss2PlantRoo_vr(0:JZ1));this%TH2OLoss2PlantRoo_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
@@ -1431,14 +1431,14 @@ implicit none
   allocate(this%FracBulkSOMC_vr(1:jcplx,0:JZ1));this%FracBulkSOMC_vr=spval
   allocate(this%ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP1));this%ElmAllocmat4Litr=spval
   allocate(this%TScal4Difsvity_vr(0:JZ1));this%TScal4Difsvity_vr=spval
-  allocate(this%AirFilledSoilPoreM_vr(60,0:JZ1));this%AirFilledSoilPoreM_vr=spval
+  allocate(this%FracAirFilledSoilPoreM_vr(60,0:JZ1));this%FracAirFilledSoilPoreM_vr=spval
   allocate(this%DiffusivitySolutEffM_vr(60,0:JZ1));this%DiffusivitySolutEffM_vr=spval
   allocate(this%VLSoilMicP_vr(0:JZ1));this%VLSoilMicP_vr=spval
   allocate(this%VLiceMicP_vr(0:JZ1));this%VLiceMicP_vr=spval
   allocate(this%VLWatMicP_vr(0:JZ1));this%VLWatMicP_vr=spval
   allocate(this%VLMicP_vr(0:JZ1));this%VLMicP_vr=spval
   allocate(this%trcs_VLN_vr(ids_nuts_beg:ids_nuts_end,0:JZ1));this%trcs_VLN_vr=spval
-  allocate(this%DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ1));this%DOM_vr=spval
+  allocate(this%DOM_MicP_vr(idom_beg:idom_end,1:jcplx,0:JZ1));this%DOM_MicP_vr=spval
   allocate(this%trcs_solml_vr(ids_beg:ids_end,0:JZ1));this%trcs_solml_vr=spval
 !  allocate(this%trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,1:jZ1)); this%trcs_RMicbUptake_vr=spval
   allocate(this%trcg_gasml_vr(idg_beg:idg_NH3,0:JZ1));this%trcg_gasml_vr=spval
@@ -1469,7 +1469,7 @@ implicit none
 
 !  if(allocated(ElmAllocmat4Litr))deallocate(ElmAllocmat4Litr)
 !  if(allocated(TScal4Difsvity_vr))deallocate(TScal4Difsvity_vr)
-!  if(allocated(AirFilledSoilPoreM_vr))deallocate(AirFilledSoilPoreM_vr)
+!  if(allocated(FracAirFilledSoilPoreM_vr))deallocate(FracAirFilledSoilPoreM_vr)
 !  if(allocated(DiffusivitySolutEff))deallocate(DiffusivitySolutEff)
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
 !  if(allocated(O2GSolubility))deallocate(O2GSolubility)

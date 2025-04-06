@@ -1929,7 +1929,7 @@ implicit none
 
   data1d_ptr => this%h1D_stomatal_stress_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='STOMATAL_STRESS_pft',units='none',avgflag='A',&
-    long_name='stomatal stress from root turogr [0-1 stress]',ptr_patch=data1d_ptr)      
+    long_name='stomatal stress from root turogr [0->1 increasing stress]',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CANDew_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Canopy_DEW_pft',units='mm H2O/m2',avgflag='A',&
@@ -2911,7 +2911,7 @@ implicit none
         this%h2D_VSICE_vr  (ncol,L)         = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)             = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_PsiO_vr(ncol,L)            = PSISoilOsmotic_vr(L,NY,NX)
-        this%h2D_RootH2OUP_vr(ncol,L)       = TPlantRootH2OLoss_vr(L,NY,NX)
+        this%h2D_RootH2OUP_vr(ncol,L)       = TH2OLoss2PlantRoo_vr(L,NY,NX)
         this%h2D_cNH4t_vr(ncol,L)           = safe_adb(trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(ids_NH4B,L,NY,NX) &
                                                +natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX)),&
                                                VLSoilMicPMass_vr(L,NY,NX))

@@ -1021,7 +1021,7 @@ implicit none
         ENDDO
       ENDDO
       DO idom=idom_beg,idom_end
-        DOM_vr(idom,K,L1,NY,NX)      = DOM_vr(idom,K,L1,NY,NX)+FX*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MicP_vr(idom,K,L1,NY,NX)      = DOM_MicP_vr(idom,K,L1,NY,NX)+FX*DOM_MicP_vr(idom,K,L0,NY,NX)
         DOM_MacP_vr(idom,K,L1,NY,NX) = DOM_MacP_vr(idom,K,L1,NY,NX)+FX*DOM_MacP_vr(idom,K,L0,NY,NX)
         SorbedOM_vr(idom,K,L1,NY,NX) = SorbedOM_vr(idom,K,L1,NY,NX)+FX*SorbedOM_vr(idom,K,L0,NY,NX)
       enddo
@@ -1200,7 +1200,7 @@ implicit none
         ENDDO
       ENDDO
       do idom=idom_beg,idom_end
-        DOM_vr(idom,K,L0,NY,NX)      = FY*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MicP_vr(idom,K,L0,NY,NX)      = FY*DOM_MicP_vr(idom,K,L0,NY,NX)
         DOM_MacP_vr(idom,K,L0,NY,NX) = FY*DOM_MacP_vr(idom,K,L0,NY,NX)
         SorbedOM_vr(idom,K,L0,NY,NX) = FY*SorbedOM_vr(idom,K,L0,NY,NX)
       enddo
@@ -1339,9 +1339,9 @@ implicit none
       ENDDO
 
       DO idom=idom_beg,idom_end
-        FXOQC                   = FXO*DOM_vr(idom,K,L0,NY,NX)
-        DOM_vr(idom,K,L1,NY,NX) = DOM_vr(idom,K,L1,NY,NX)+FXOQC
-        DOM_vr(idom,K,L0,NY,NX) = DOM_vr(idom,K,L0,NY,NX)-FXOQC
+        FXOQC                   = FXO*DOM_MicP_vr(idom,K,L0,NY,NX)
+        DOM_MicP_vr(idom,K,L1,NY,NX) = DOM_MicP_vr(idom,K,L1,NY,NX)+FXOQC
+        DOM_MicP_vr(idom,K,L0,NY,NX) = DOM_MicP_vr(idom,K,L0,NY,NX)-FXOQC
       enddo
 
       IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN

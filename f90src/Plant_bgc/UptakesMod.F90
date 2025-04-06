@@ -53,8 +53,8 @@ module UptakesMod
   real(r8) :: TotalSoilPSIMPa_vr(JZ1)    !total soil matric pressure, removing elevation adjustment [MPa]
   real(r8) :: PathLen_pvr(jroots,JZ1)
   real(r8) :: FineRootRadius_rvr(jroots,JZ1)
-  real(r8) :: RootResist(jroots,JZ1)
-  real(r8) :: RootResistSoi(jroots,JZ1)
+  real(r8) :: RootResist_rvr(jroots,JZ1)
+  real(r8) :: RootResistSoi_rvr(jroots,JZ1)
   real(r8) :: RootResistPrimary(jroots,JZ1)
   real(r8) :: RootResist2ndary(jroots,JZ1)
   real(r8) :: SoiH2OResist(jroots,JZ1)
@@ -98,7 +98,6 @@ module UptakesMod
     AREA3                     => plt_site%AREA3,                   &
     ZEROS                     => plt_site%ZEROS,                   &
     CanopyMassC_pft           => plt_biom%CanopyMassC_pft,         &
-    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,      &
     ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,        &
     CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,    &
     CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft,        &
@@ -146,7 +145,7 @@ module UptakesMod
 
       IF(HydroActivePlant)THEN  
 !
-        call CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootAreaDivRadius_vr,RootResist,RootResistSoi,&
+        call CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootAreaDivRadius_vr,RootResist_rvr,RootResistSoi_rvr,&
           RootResistPrimary,RootResist2ndary,SoiH2OResist,SoilRootResistance_rvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
 !
 !       INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
@@ -181,7 +180,7 @@ module UptakesMod
 !
         call HandlingDivergence(I,J,NN,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP)
 
-        call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist,SoiH2OResist,SoilRootResistance_rvr,&
+        call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist_rvr,SoiH2OResist,SoilRootResistance_rvr,&
           TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
 !
 !     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
@@ -1015,14 +1014,14 @@ module UptakesMod
   end function CanopyEnergyH2OIteration
 !------------------------------------------------------------------------
   subroutine CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootAreaDivRadius_vr,&
-    RootResist,RootResistSoi,RootResistPrimary,RootResist2ndary,SoiH2OResist,&
+    RootResist_rvr,RootResistSoi_rvr,RootResistPrimary,RootResist2ndary,SoiH2OResist,&
     SoilRootResistance_rvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
 
   implicit none
   integer, intent(in)   :: NZ
   real(r8), intent(in)  :: PathLen_pvr(jroots,JZ1),FineRootRadius_rvr(jroots,JZ1)
   real(r8), intent(in)  :: RootAreaDivRadius_vr(jroots,JZ1)
-  real(r8), intent(out) :: RootResist(jroots,JZ1),RootResistSoi(jroots,JZ1)
+  real(r8), intent(out) :: RootResist_rvr(jroots,JZ1),RootResistSoi_rvr(jroots,JZ1)
   real(r8), intent(out) :: RootResistPrimary(jroots,JZ1),RootResist2ndary(jroots,JZ1)
   real(r8), intent(out) :: SoiH2OResist(jroots,JZ1)
   real(r8), intent(out) :: SoilRootResistance_rvr(jroots,JZ1)   !added soil and root resistance
@@ -1115,12 +1114,12 @@ module UptakesMod
         !
         !     Root2ndRadius_pvr=secondary root radius
         !     RootLenPerPlant_pvr=root length per plant
-        !     RootResistSoi=radial resistance
+        !     RootResistSoi_rvr=radial resistance
         !     RootRadialResist_pft=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !
         RTAR2              = TwoPiCON*Root2ndRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
-        RootResistSoi(N,L) = RootRadialResist_pft(N,NZ)/RTAR2*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
+        RootResistSoi_rvr(N,L) = RootRadialResist_pft(N,NZ)/RTAR2*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
@@ -1148,8 +1147,8 @@ module UptakesMod
         !     CNDT=total soil+root conductance for all layers
         ! assuming all roots work in parallel
 
-        RootResist(N,L)       = RootResistSoi(N,L)+RootResistPrimary(N,L)+RootResist2ndary(N,L)
-        SoilRootResistance_rvr(N,L) = SoiH2OResist(N,L)+RootResist(N,L)
+        RootResist_rvr(N,L)       = RootResistSoi_rvr(N,L)+RootResistPrimary(N,L)+RootResist2ndary(N,L)
+        SoilRootResistance_rvr(N,L) = SoiH2OResist(N,L)+RootResist_rvr(N,L)
         CNDT                  = CNDT+1.0_r8/SoilRootResistance_rvr(N,L)
 
       ENDIF
@@ -1261,7 +1260,7 @@ module UptakesMod
   end subroutine HandleBareSoil
 !------------------------------------------------------------------------
 
-  subroutine UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist,SoiH2OResist,SoilRootResistance_rvr,&
+  subroutine UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist_rvr,SoiH2OResist,SoilRootResistance_rvr,&
     TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
   !
   !Description
@@ -1270,7 +1269,7 @@ module UptakesMod
   integer, intent(in) :: NZ
   real(r8), intent(in) :: VHeatCapCanopyAir
   real(r8), intent(in) :: TotalSoilPSIMPa_vr(JZ1)    !Elevation adjusted soil water potential [MPa]
-  real(r8), intent(in) :: RootResist(jroots,JZ1)
+  real(r8), intent(in) :: RootResist_rvr(jroots,JZ1)
   real(r8), intent(in) :: SoiH2OResist(jroots,JZ1)
   real(r8), intent(in) :: SoilRootResistance_rvr(jroots,JZ1)
   real(r8), intent(in) :: TKCX,VHeatCapCanopyPrev_pft
@@ -1341,7 +1340,7 @@ module UptakesMod
   D4505: DO N=1,MY(NZ)
     D4510: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(SoiLayerHasRoot_rvr(N,L))THEN
-        PSIRoot_pvr(N,L,NZ)=AZMIN1((TotalSoilPSIMPa_vr(L)*RootResist(N,L) &
+        PSIRoot_pvr(N,L,NZ)=AZMIN1((TotalSoilPSIMPa_vr(L)*RootResist_rvr(N,L) &
           +PSICanopy_pft(NZ)*SoiH2OResist(N,L))/SoilRootResistance_rvr(N,L))
       ELSE
         PSIRoot_pvr(N,L,NZ)=TotalSoilPSIMPa_vr(L)

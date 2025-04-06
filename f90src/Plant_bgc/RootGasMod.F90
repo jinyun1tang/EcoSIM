@@ -18,7 +18,7 @@ module RootGasMod
 !------------------------------------------------------------------------
 
   subroutine RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
-    RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,PopPlantO2Uptake_vr)
+    RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake_vr)
   !
   !In the gas exchange between soil and roots, only O2 and CO2 involve active biochemical production/consumption
   !the other gases undergo physical exchange according to different water volumes inside/outside the roots.
@@ -31,6 +31,8 @@ module RootGasMod
   real(r8), intent(in) :: RootAreaDivRadius_vr(jroots,JZ1)
   real(r8), intent(in) :: dtPerPlantRootH2OUptake   !root water uptake 
   real(r8), intent(in) :: FOXYX
+  real(r8), intent(inout) :: trc_solml_loc(idg_beg:idg_end)    !local copy of aqueous phase of the volatile tracers
+  real(r8), intent(inout) :: trc_gasml_loc(idg_beg:idg_NH3)    !local copy of gaesous phase of the volatile tracers  
   real(r8), intent(out):: PopPlantO2Uptake_vr
 
   character(len=*), parameter :: subname='RootSoilGasExchange'
@@ -51,8 +53,7 @@ module RootGasMod
   real(r8) :: DIFOX,DiffusivitySolutEffP
   real(r8) :: DFAGas(idg_beg:idg_NH3)           !maximum volatile flux from atmosphere to roots
   real(r8) :: DFGP,ROxySoil2Uptk
-  real(r8) :: trc_solml_loc(idg_beg:idg_end)    !local copy of aqueous phase of the volatile tracers
-  real(r8) :: trc_gasml_loc(idg_beg:idg_NH3)    !local copy of gaesous phase of the volatile tracers
+
   real(r8) :: O2AquaDiffusvityP
   real(r8) :: RTVLWA  !root H2O vol for NH4
   real(r8) :: RTVLWB  !root H2O vol for NH4B
@@ -120,15 +121,13 @@ module RootGasMod
     RootGasConductance_pvr   => plt_rbgc%RootGasConductance_pvr,      &
     TScal4Difsvity_vr        => plt_soilchem%TScal4Difsvity_vr,       &
     trcs_VLN_vr              => plt_soilchem%trcs_VLN_vr,             &
-    trcs_solml_vr            => plt_soilchem%trcs_solml_vr,           &
-    trcg_gasml_vr            => plt_soilchem%trcg_gasml_vr,           &  !
     GasDifc_vr               => plt_soilchem%GasDifc_vr,              &  !in: gaseous diffusivity of volatile tracers
     SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,       &  !in: aqueous diffusivity of volatile tracers
     GasSolbility_vr          => plt_soilchem%GasSolbility_vr,         &
     trc_solcl_vr             => plt_soilchem%trc_solcl_vr,            &
     SoilWatAirDry_vr         => plt_soilchem%SoilWatAirDry_vr,        &
     VLSoilMicP_vr            => plt_soilchem%VLSoilMicP_vr,           &
-    AirFilledSoilPoreM_vr    => plt_soilchem%AirFilledSoilPoreM_vr,   &
+    FracAirFilledSoilPoreM_vr    => plt_soilchem%FracAirFilledSoilPoreM_vr,   &
     DiffusivitySolutEffM_vr  => plt_soilchem%DiffusivitySolutEffM_vr, &
     iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,        &
     RootPoreTortu4Gas        => plt_morph%RootPoreTortu4Gas,          &
@@ -171,23 +170,6 @@ module RootGasMod
       trcs_rootml_beg(idg) = trcs_rootml_pvr(idg,N,L,NZ)
     ENDDO
 
-    DO idg=idg_beg,idg_end
-      if(idg/=idg_O2)then
-        trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
-      endif
-    enddo
-    trc_solml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2))
-    trc_solml_loc(idg_O2)  = trcs_solml_vr(idg_O2,L)*FOXYX
-
-!  the two lines below may be redundant
-
-    DO idg=idg_beg,idg_NH3
-      if(idg/=idg_O2)then
-        trc_gasml_loc(idg)=AZMAX1(trcg_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))     
-      endif          
-    enddo
-    trc_gasml_loc(idg_O2)  = AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg_O2,L)*FOXYX)
-    trc_gasml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))
 
     RTVLWA = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
     RTVLWB = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
@@ -456,7 +438,7 @@ module RootGasMod
 
 !     VLWatMicPMM,VLsoiAirPMM=soil micropore water,air volume
 !         
-          IF(AirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min)THEN
+          IF(FracAirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min)THEN
             DiffusivitySolutEffP     = FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
             RGas_Disolv_flx(idg_CO2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))*VOLWAqueous(idg_CO2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RootUptkSoiSolute(idg_CO2))*VLsoiAirPMM) &
