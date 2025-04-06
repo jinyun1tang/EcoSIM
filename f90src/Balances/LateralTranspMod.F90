@@ -66,9 +66,8 @@ implicit none
 
   D8575: DO L=NU(NY,NX),NL(NY,NX)
     !
-    !     IDENTIFY LAYERS FOR BUBBLE FLUX TRANSFER
+    !  IDENTIFY LAYERS FOR BUBBLE FLUX TRANSFER
     !
-!
     DO idg=idg_beg,idg_NH3
       trcg_VOLG(idg_CO2) = trcg_gasml_vr(idg_CO2,L,NY,NX)/MolecularWeight(idg)
     ENDDO
@@ -103,20 +102,17 @@ implicit none
     !as the bubble depsoition layer 
     IF(ThetaAir_vr(L,NY,NX).GE.AirFillPore_Min .AND. (.not. doBubble))LG=L
 
-!
+  !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
   !
-  !     N3,N2,N1=L,NY,NX of source grid cell
-  !     N6,N5,N4=L,NY,NX of destination grid cell
   ! source
     N1=NX;N2=NY;N3=L
-    D8580: DO N=FlowDirIndicator(NY,NX),3
+    D8580: DO N=FlowDirIndicator_col(NY,NX),3
       
       IF(N.EQ.iWestEastDirection)THEN 
         N4  = NX+1;N5  = NY
         N4B = NX-1;N5B = NY
-        N6  = L
-      
+        N6  = L      
       ELSEIF(N.EQ.iNorthSouthDirection)THEN  
         N4  = NX;N5  = NY+1    !south
         N4B = NX;N5B = NY-1    !north
@@ -146,17 +142,12 @@ implicit none
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT
         call SumSedmentTranspFlux(N,N1,N2,N4,N5,N4B,N5B)
       ENDIF
-!
+      !
       call FlowXGrids(I,J,N,N1,N2,N3,N4,N5,N6)
     ENDDO D8580
-!
-!     NET FREEZE-THAW
-!
-!     WatIceThawMicP,WatIceThawMacP_vr=net freeze-thaw flux in micropores,macropores
-!     THeatSoiThaw=net freeze-thaw latent heat flux
-!     THAW,TLIceThawMacP=freeze-thaw flux in micropores,macropores from watsub.f
-!     TLPhaseChangeHeat2Soi=freeze-thaw latent heat flux from watsub.f
-
+    !
+    !     NET FREEZE-THAW
+    !
     WatIceThawMicP_vr(N3,N2,N1) = WatIceThawMicP_vr(N3,N2,N1)+TLIceThawMicP_vr(N3,N2,N1)
     WatIceThawMacP_vr(N3,N2,N1) = WatIceThawMacP_vr(N3,N2,N1)+TLIceThawMacP_vr(N3,N2,N1)
     THeatSoiThaw_vr(N3,N2,N1)   = THeatSoiThaw_vr(N3,N2,N1)+TLPhaseChangeHeat2Soi_vr(N3,N2,N1)
@@ -271,15 +262,14 @@ implicit none
     ENDDO
 
     IF(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN    
-
       DO idg=idg_beg,idg_NH3
         trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5,N4)
       ENDDO
       DO idn=ids_nut_beg,ids_nuts_end
         trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5,N4)
       ENDDO
-
     ENDIF 
+
     !active grid (N5B,N4B) behind (N2,N1)
     IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN 
       DO idg=idg_beg,idg_NH3
@@ -345,7 +335,6 @@ implicit none
           DOM_SurfRunoff_flx(idom,K,N2,N1)=DOM_SurfRunoff_flx(idom,K,N2,N1)-DOM_FloXSurRunoff_2DH(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D8591
-
     ENDIF
 
     IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
@@ -442,67 +431,69 @@ implicit none
         ENDDO D9375
 
 !       outgoing
-        tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5,N4)
-        TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
-        TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
-        TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
-        TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5,N4)
-        TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5,N4)
-        TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5,N4)
-        TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5,N4)
-        TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5,N4)
-        TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5,N4)
-        TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5,N4)
-        TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5,N4)
+        if(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN
+          tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5,N4)
+          TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
+          TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
+          TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
+          TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5,N4)
+          TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5,N4)
+          TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5,N4)
+          TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5,N4)
+          TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5,N4)
+          TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5,N4)
+          TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5,N4)
+          TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5,N4)
 
-        DO idx=idx_beg,idx_end
-          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5,N4)
-        ENDDO
+          DO idx=idx_beg,idx_end
+            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5,N4)
+          ENDDO
 
-        DO NTP=idsp_beg,idsp_end
-          trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_2D(NTP,N,NN,N5,N4)
-        ENDDO
+          DO NTP=idsp_beg,idsp_end
+            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_2D(NTP,N,NN,N5,N4)
+          ENDDO
 
-        DO  K=1,jcplx
+          DO  K=1,jcplx
+            DO  NO=1,NumMicbFunGrupsPerCmplx
+              DO NGL=JGnio(NO),JGnfo(NO)
+                DO  M=1,nlbiomcp
+                  MID=micpar%get_micb_id(M,NGL)
+                  DO NE=1,NumPlantChemElms
+                    TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)-OMEERhetr(NE,MID,K,N,NN,N5,N4)
+                  ENDDO  
+                enddo
+              enddo
+            enddo
+          ENDDO
+
           DO  NO=1,NumMicbFunGrupsPerCmplx
-            DO NGL=JGnio(NO),JGnfo(NO)
-              DO  M=1,nlbiomcp
-                MID=micpar%get_micb_id(M,NGL)
-                DO NE=1,NumPlantChemElms
-                  TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)-OMEERhetr(NE,MID,K,N,NN,N5,N4)
+            DO  M=1,nlbiomcp
+              DO NGL=JGniA(NO),JGnfA(NO)
+                MID=micpar%get_micb_id(M,NGL)   
+                DO NE=1,NumPlantChemElms         
+                  TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)-OMEERauto(NE,MID,N,NN,N5,N4)
                 ENDDO  
               enddo
             enddo
           enddo
-        ENDDO
 
-        DO  NO=1,NumMicbFunGrupsPerCmplx
-          DO  M=1,nlbiomcp
-            DO NGL=JGniA(NO),JGnfA(NO)
-              MID=micpar%get_micb_id(M,NGL)   
-              DO NE=1,NumPlantChemElms         
-                TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)-OMEERauto(NE,MID,N,NN,N5,N4)
-              ENDDO  
-            enddo
-          enddo
-        enddo
-
-        D7375: DO K=1,jcplx
-          D7370: DO M=1,ndbiomcp
-            DO NE=1,NumPlantChemElms
-              TORMER_col(NE,M,K,N2,N1)=TORMER_col(NE,M,K,N2,N1)-OMBioResdu_Eros_2D(NE,M,K,N,NN,N5,N4)
+          D7375: DO K=1,jcplx
+            D7370: DO M=1,ndbiomcp
+              DO NE=1,NumPlantChemElms
+                TORMER_col(NE,M,K,N2,N1)=TORMER_col(NE,M,K,N2,N1)-OMBioResdu_Eros_2D(NE,M,K,N,NN,N5,N4)
+              ENDDO
+            ENDDO D7370
+            DO idom=idom_beg,idom_end
+              TOHMER_col(idom,K,N2,N1)=TOHMER_col(idom,K,N2,N1)-SorbedOM_Eros_2D(idom,K,N,NN,N5,N4)
             ENDDO
-          ENDDO D7370
-          DO idom=idom_beg,idom_end
-            TOHMER_col(idom,K,N2,N1)=TOHMER_col(idom,K,N2,N1)-SorbedOM_Eros_2D(idom,K,N,NN,N5,N4)
-          ENDDO
-          D7365: DO M=1,jsken
-            TOSAER_col(M,K,N2,N1)=TOSAER_col(M,K,N2,N1)-SolidOMAct_Eros_2D(M,K,N,NN,N5,N4)   
-            DO NE=1,NumPlantChemElms       
-              TOSMER_col(NE,M,K,N2,N1)=TOSMER_col(NE,M,K,N2,N1)-SolidOM_Eros_2D(NE,M,K,N,NN,N5,N4)
-            ENDDO
-          ENDDO D7365
-        ENDDO D7375
+            D7365: DO M=1,jsken
+              TOSAER_col(M,K,N2,N1)=TOSAER_col(M,K,N2,N1)-SolidOMAct_Eros_2D(M,K,N,NN,N5,N4)   
+              DO NE=1,NumPlantChemElms       
+                TOSMER_col(NE,M,K,N2,N1)=TOSMER_col(NE,M,K,N2,N1)-SolidOM_Eros_2D(NE,M,K,N,NN,N5,N4)
+              ENDDO
+            ENDDO D7365
+          ENDDO D7375
+        ENDIF
       ENDIF
 
       IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
@@ -585,18 +576,16 @@ implicit none
   integer, intent(in) :: N1,N2,N3   !source soil grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(inout) :: N6      !vertical layer 
+  character(len=*), parameter :: subname='FlowXGrids'
   integer :: LL,K,idsalt,ids,idg,idom
 
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
   !     GRID CELLS
   !
-  !     TFLW,TWatFlowCellMacP_vr,TWatFlowCellMacP_vr=net micropore,macropore water flux, heat flux
-  !     FLW,FLWH,HFLW=micropore,macropore water flux, heat flux from watsub.f
-  !     LakeSurfFlowMicP,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
-  !     when FlowDirIndicator /=3, it means lateral exchange is consdiered
+  call PrintInfo('beg '//subname)
 
-  IF(FlowDirIndicator(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
+  IF(FlowDirIndicator_col(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     !locate the vertical layer for the dest grid
     D1200: DO LL=N6,NL(N5,N4)
       !modify the dest grid vertical location if needed
@@ -711,6 +700,7 @@ implicit none
       ENDIF
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine FlowXGrids
 
 end module LateralTranspMod

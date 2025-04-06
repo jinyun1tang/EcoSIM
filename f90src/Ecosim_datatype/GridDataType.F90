@@ -11,7 +11,7 @@ implicit none
   real(r8),target,allocatable ::  CumDepz2LayBottom_vr(:,:,:)                       !depth to bottom of soil layer [m]
   real(r8),target,allocatable ::  DLYR_3D(:,:,:,:)                      !thickness of soil layer [m]
   real(r8),target,allocatable ::  DLYRI_3D(:,:,:,:)                     !thickness of soil layer in 3 directions [m]
-  real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
+  real(r8),target,allocatable ::  XDPTH_3D(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
   real(r8),target,allocatable ::  SoilDepthMidLay_vr(:,:,:)                        !depth to middle of soil layer [m]
   real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8),target,allocatable ::  CumSoilThickMidL_vr(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
@@ -28,7 +28,7 @@ implicit none
   REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
   real(r8),target,allocatable ::  DH(:,:)                            !EW width of the grid cells, [m]
   real(r8),target,allocatable ::  DV(:,:)                            !NS width of the grid cells, [m]
-  integer,target,allocatable ::  FlowDirIndicator(:,:)               !dimension of low
+  integer,target,allocatable ::  FlowDirIndicator_col(:,:)               !dimension of low
   integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
 !----------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ contains
   allocate(CumDepz2LayBottom_vr(0:JZ,JY,JX));  CumDepz2LayBottom_vr=0._r8
   allocate(DLYR_3D(3,0:JZ,JY,JX)); DLYR_3D=0._r8
   allocate(DLYRI_3D(3,0:JZ,JY,JX));DLYRI_3D=0._r8
-  allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
+  allocate(XDPTH_3D(3,JZ,JY,JX));  XDPTH_3D=0._r8
   allocate(SoilDepthMidLay_vr(JZ,JY,JX));     SoilDepthMidLay_vr=0._r8
   allocate(CumSoilThickness_vr(0:JZ,JY,JX)); CumSoilThickness_vr=0._r8
   allocate(CumSoilThickMidL_vr(JZ,JY,JX));    CumSoilThickMidL_vr=0._r8
@@ -57,7 +57,7 @@ contains
   allocate(ALAT(JY,JX));        ALAT=0._r8
   allocate(DH(JY,JX));          DH=0._r8
   allocate(DV(JY,JX));          DV=0._r8
-  allocate(FlowDirIndicator(JY,JX));         FlowDirIndicator=3   !vertical by default
+  allocate(FlowDirIndicator_col(JY,JX));         FlowDirIndicator_col=3   !vertical by default
   allocate(LSG(JZ,JY,JX));      LSG=0
 
   end subroutine InitGridData
@@ -70,7 +70,7 @@ contains
   call destroy(CumDepz2LayBottom_vr)
   call destroy(DLYR_3D)
   call destroy(DLYRI_3D)
-  call destroy(XDPTH)
+  call destroy(XDPTH_3D)
   call destroy(SoilDepthMidLay_vr)
   call destroy(CumSoilThickness_vr)
   call destroy(CumSoilThickMidL_vr)
@@ -87,7 +87,7 @@ contains
   call destroy(ALAT)
   call destroy(DH)
   call destroy(DV)
-  call destroy(FlowDirIndicator)
+  call destroy(FlowDirIndicator_col)
   call destroy(LSG)
   end subroutine DestructGridData
 

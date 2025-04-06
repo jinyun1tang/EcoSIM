@@ -90,7 +90,7 @@ implicit none
 
       call PlantAPIRecv(I,J,NY,NX)
 
-      call ApplyRootUptake2GasTracers(I,J,NY,NX)
+
     ENDDO
   ENDDO
   PlantElemntStoreLandscape(:)=plt_site%PlantElemntStoreLandscape(:)
@@ -114,7 +114,8 @@ implicit none
 
   end subroutine PlantCanopyRadsModel
 !------------------------------------------------------------------------------------------
-
+!
+! the following subroutine will be removed
   subroutine ApplyRootUptake2GasTracers(I,J,NY,NX)
 
   implicit none

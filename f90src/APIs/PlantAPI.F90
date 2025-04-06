@@ -121,7 +121,7 @@ implicit none
     REcoNH4DmndSoil_vr(L,NY,NX)        = plt_bgcr%REcoNH4DmndSoil_vr(L)
     REcoO2DmndResp_vr(L,NY,NX)         = plt_bgcr%REcoO2DmndResp_vr(L)
     THeatLossRoot2Soil_vr(L,NY,NX)        = plt_ew%THeatLossRoot2Soil_vr(L)
-    TPlantRootH2OLoss_vr(L,NY,NX) = plt_ew%TPlantRootH2OLoss_vr(L)
+    TH2OLoss2PlantRoo_vr(L,NY,NX) = plt_ew%TH2OLoss2PlantRoo_vr(L)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -468,8 +468,11 @@ implicit none
 
     DO  L=NUI(NY,NX),NK(NY,NX)
 
+      trcs_solml_vr(ids_beg:ids_end,L,NY,NX)=plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)         
+      trcg_gasml_vr(idg_beg:idg_NH3,L,NY,NX)=plt_soilchem%trcg_gasml_vr(idg_beg:idg_NH3,L) 
+
       DO K=1,jcplx      
-        DOM_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L)
+        DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
       ENDDO
 
       DO N=1,pltpar%jroots
@@ -763,7 +766,7 @@ implicit none
     plt_site%DLYR3(L)                      = DLYR_3D(3,L,NY,NX)
     DO K=1,jcplx
       plt_soilchem%FracBulkSOMC_vr(K,L)          = FracBulkSOMC_vr(K,L,NY,NX)
-      plt_soilchem%DOM_vr(idom_doc:idom_dop,K,L) = DOM_vr(idom_doc:idom_dop,K,L,NY,NX)
+      plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L) = DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -966,7 +969,7 @@ implicit none
     plt_bgcr%REcoNH4DmndSoil_vr(L)   = REcoNH4DmndSoil_vr(L,NY,NX)
     plt_bgcr%REcoO2DmndResp_vr(L)    = REcoO2DmndResp_vr(L,NY,NX)
     plt_ew%THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L,NY,NX)
-    plt_ew%TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L,NY,NX)
+    plt_ew%TH2OLoss2PlantRoo_vr(L) = TH2OLoss2PlantRoo_vr(L,NY,NX)
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -1381,7 +1384,7 @@ implicit none
   DO L=1,NK(NY,NX)
     DO M=1,NPH
       plt_rbgc%RO2UptkSoilM_vr(M,L)           = RO2UptkSoilM_vr(M,L,NY,NX)
-      plt_soilchem%AirFilledSoilPoreM_vr(M,L) = AirFilledSoilPoreM_vr(M,L,NY,NX)
+      plt_soilchem%FracAirFilledSoilPoreM_vr(M,L) = FracAirFilledSoilPoreM_vr(M,L,NY,NX)
     ENDDO
   ENDDO
   end subroutine PlantAPISend

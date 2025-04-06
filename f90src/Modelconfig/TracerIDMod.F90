@@ -283,13 +283,13 @@ implicit none
     idsalt_nuts=idsalt_MgHPO4-idsalt_H0PO4
 
     idsalt_H0PO4B    = addone(idsaltb_end)   ! PO4
-    idsalt_H3PO4B    = addone(idsaltb_end)  ! H3PO4
-    idsalt_FeHPO4B   = addone(idsaltb_end)  ! FeHPO4
-    idsalt_FeH2PO4B  = addone(idsaltb_end) ! FeH2PO4
+    idsalt_H3PO4B    = addone(idsaltb_end)   ! H3PO4
+    idsalt_FeHPO4B   = addone(idsaltb_end)   ! FeHPO4
+    idsalt_FeH2PO4B  = addone(idsaltb_end)   ! FeH2PO4
     idsalt_CaPO4B    = addone(idsaltb_end)   ! CaPO4
-    idsalt_CaHPO4B   = addone(idsaltb_end)  ! CaHPO4
-    idsalt_CaH4P2O8B = addone(idsaltb_end) ! CaH4P2O8
-    idsalt_MgHPO4B   = addone(idsaltb_end)! MgHPO4
+    idsalt_CaHPO4B   = addone(idsaltb_end)   ! CaHPO4
+    idsalt_CaH4P2O8B = addone(idsaltb_end)   ! CaH4P2O8
+    idsalt_MgHPO4B   = addone(idsaltb_end)   ! MgHPO4
     idsalt_pband_beg=idsalt_H0PO4B;idsalt_pband_end=idsalt_MgHPO4B
 
     idsaltb_end=idsalt_MgHPO4B

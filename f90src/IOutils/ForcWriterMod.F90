@@ -254,7 +254,7 @@ implicit none
     call ncd_putvar(ncf,'BKDS',SoilBulkDensity_vr(L,NY,NX))
 
     call ncd_putvar(ncf,'FracBulkSOMC_vr',FracBulkSOMC_vr(:,L,NY,NX))
-    call ncd_putvar(ncf,'OQM',DOM_vr(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OQM',DOM_MicP_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OHM',SorbedOM_vr(:,:,L,NY,NX))
 
     call ncd_putvar(ncf,'CNOSC',CNOSC(:,:,L,NY,NX))

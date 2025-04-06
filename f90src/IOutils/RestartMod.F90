@@ -7971,15 +7971,15 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)               
-    call restartvar(ncid, flag, varname='DOM_vr', dim1name='column',dim2name='ndoms',&
+    call restartvar(ncid, flag, varname='DOM_MicP_vr', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic C micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MicP_vr,datrc_4d)     
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MicP_vr,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='DOM_vr', dim1name='column',dim2name='ndoms',&
+    call restartvar(ncid, flag, varname='DOM_MicP_vr', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      

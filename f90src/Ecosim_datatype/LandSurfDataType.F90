@@ -24,7 +24,6 @@ module LandSurfDataType
   real(r8),target,allocatable ::  ALTZ_col(:,:)                          !Altitude, [m]
   real(r8),target,allocatable ::  SL_col(:,:)                            !Slope, [o]
   real(r8),target,allocatable ::  ASP_col(:,:)                           !Aspect , [o]
-  real(r8),target,allocatable ::  trcg_DisolEvap_Atm2Soil_flx(:,:,:)     !Surface-atmosphere gas exchange through diffusion, >0 into soil [g d-2 h-1]
 
 !----------------------------------------------------------------------
 
@@ -48,7 +47,6 @@ contains
   allocate(SL_col(JY,JX));          SL_col=0._r8
   allocate(ASP_col(JY,JX));         ASP_col=0._r8
 
-  allocate(trcg_DisolEvap_Atm2Soil_flx(idg_beg:idg_end,JY,JX)); trcg_DisolEvap_Atm2Soil_flx=0._r8
   end subroutine InitLandSurfData
 
 !----------------------------------------------------------------------

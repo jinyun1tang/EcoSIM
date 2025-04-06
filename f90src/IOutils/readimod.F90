@@ -288,7 +288,7 @@ module readiMod
       ARGE_col(NY,NX)           = arg_ppm
       ZNH3E_col(NY,NX)          = ZNH3EG
       KoppenClimZone_col(NY,NX) = IETYPG
-      FlowDirIndicator(NY,NX)   = grid_mode
+      FlowDirIndicator_col(NY,NX)   = grid_mode
       NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
       WtblDepzTile_col(NY,NX)   = WTBLDepz_tile
       WaterTBLSlope_col(NY,NX)  = DTBLGG

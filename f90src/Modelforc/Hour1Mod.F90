@@ -385,30 +385,25 @@ module Hour1Mod
       HydroSubsDIPFlx_col(NY,NX)             = 0._r8
       SurfRunoffPotentM_col(:,NY,NX)        = 0._r8
 
-      DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
+      DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX) = 0._r8
+      trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)           = 0._r8
+      trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)  = 0._r8
 
-      trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)=0._r8
-      trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0._r8
-
-      DrySnoBySnoRedistrib_2DH(1:2,NY,NX)             = 0._r8
-      WatBySnowRedistrib_2DH(1:2,NY,NX)            = 0._r8
-      IceBySnowRedistrib_2DH(1:2,NY,NX)            = 0._r8
-      HeatBySnowRedistrib_2DH(1:2,NY,NX)           = 0._r8
-      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,NY,NX) = 0._r8
-
-      trcn_FloXSnow_2DH(ids_NH4,1:2,NY,NX)   = 0._r8
-      trcn_FloXSnow_2DH(ids_NO3,1:2,NY,NX)   = 0._r8
-      trcn_FloXSnow_2DH(ids_H1PO4,1:2,NY,NX) = 0._r8
-      trcn_FloXSnow_2DH(ids_H2PO4,1:2,NY,NX) = 0._r8
+      DrySnoByRedistrib_2DH(1:2,1:2,NY,NX)                      = 0._r8
+      WatSnoByRedist_2DH(1:2,1:2,NY,NX)                         = 0._r8
+      IceSnoBySnowRedist_2DH(1:2,1:2,NY,NX)                     = 0._r8
+      HeatSnoByRedist_2DH(1:2,1:2,NY,NX)                        = 0._r8
+      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,1:2,NY,NX)          = 0._r8
+      trcn_FloXSnow_2DH(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX) = 0._r8
 !
 !
 !     GAS AND SOLUTE FLUXES
 !
+      trcs_TransptMicP_3D(ids_beg:ids_end,1:3,:,NY,NX)=0._r8
+      DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,:,NY,NX)=0._r8
+
       DO  L=0,NL(NY,NX)+1
-
-        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0._r8
-
-        DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0._r8
+        RGasTranspFlxPrev_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
@@ -421,11 +416,7 @@ module Hour1Mod
         HeatFlow2Soil_3D(1:3,L,NY,NX)     = 0._r8
         RootCO2Ar2Soil_vr(L,NY,NX)        = 0._r8
         RootCO2Ar2Root_vr(L,NY,NX)        = 0._r8
-        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX)                 = 0._r8
-        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)              = 0._r8
-        Gas_AdvDif_Flx_3D(idg_beg:idg_end,1:3,L,NY,NX)                = 0._r8
-        DOM_Macp_Transp_flx_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX) = 0._r8
-
+        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX)                 = 0._r8        
       ENDDO
     ENDDO
   ENDDO
@@ -471,7 +462,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: N,NX,NY,L,NN,NSA
+  integer :: N,NX,NY,L,NN,idsalt
   integer :: extragrid
 !     begin_execution
 
@@ -481,12 +472,12 @@ module Hour1Mod
     DO  NY=NVN,NVS+extragrid
 
       trcSalt_FloXSurRunoff_2D(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
-      trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,NY,NX)             = 0._r8
+      trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)     = 0._r8
 
-      DO  L=1,NL(NY,NX)+1
-        DO NSA=idsalt_beg,idsaltb_end
-          trcSalt_TransptMicP_3D(NSA,1:3,L,NY,NX) = 0._r8
-          trcSalt_TransptMacP_3D(NSA,1:3,L,NY,NX)      = 0._r8
+      DO L = 1, NL(NY,NX)+1
+        DO idsalt=idsalt_beg,idsaltb_end
+          trcSalt_TransptMicP_3D(idsalt,1:3,L,NY,NX) = 0._r8
+          trcSalt_TransptMacP_3D(idsalt,1:3,L,NY,NX) = 0._r8
         ENDDO
       ENDDO
     ENDDO
@@ -729,9 +720,16 @@ module Hour1Mod
 
   integer :: L
 !     begin_execution
-  RootCO2AutorPrev_col(NY,NX)                = RootCO2Autor_col(NY,NX)
 
-  trcg_snowMassloss_col(:,NY,NX)             = 0._r8
+  RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
+  DOM_transpFlx_2DH(:,:,NY,NX)    = 0._r8
+  trcs_transpFlx_2DH(:,NY,NX)     = 0._r8
+  trcg_snowMassloss_col(:,NY,NX)  = 0._r8
+  trcn_SnowDrift_flx_col(:,NY,NX) = 0._r8
+  trcg_SnowDrift_flx_col(:,NY,NX) = 0._r8
+  DOM_draing_col(:,NY,NX)         = 0._r8
+  trcs_draing_col(:,NY,NX)        = 0._r8
+
   trcn_snowMassloss_col(:,NY,NX)             = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)              = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
@@ -799,10 +797,8 @@ module Hour1Mod
   VapXAir2GSurf_col(NY,NX)                           = 0._r8
   THeatSnowThaw_col(NY,NX)                           = 0._r8
   THeatSoiThaw_col(NY,NX)                            = 0._r8
-  trcs_TransptMacP_3D(:,:,:,:,:)                     = 0._r8
-  trcg_DisolEvap_Atm2Soil_flx(idg_beg:idg_end,NY,NX) = 0._r8
-  trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_NH3,NY,NX) = 0._r8
-
+  RO2AquaSourcePrev_vr(:,NY,NX)                    = 0._r8
+  RCH4PhysexchPrev_vr(:,NY,NX)                     = 0._r8
   TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
   CanopyWat_col(NY,NX)                             = 0._r8
   WatHeldOnCanopy_col(NY,NX)                       = 0._r8
@@ -838,6 +834,7 @@ module Hour1Mod
     trcSalt_AquaADV_Snow2Litr_flx(:,NY,NX) = 0._r8
     trcSalt_AquaADV_Snow2Soil_flx(:,NY,NX) = 0._r8
     trcSalt_snowMassloss_col(:,NY,NX)      = 0._r8
+    trcSalt_SnowDrift_flx_col(:,NY,NX)     = 0._r8    
   ENDIF
   end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
@@ -857,7 +854,7 @@ module Hour1Mod
   TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)           = 0._r8
-  TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                     = 0._r8
+  TH2OLoss2PlantRoo_vr(0:NL(NY,NX),NY,NX)                                     = 0._r8
   THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8

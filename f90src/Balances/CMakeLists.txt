@@ -1,8 +1,8 @@
 set(BALANCES_MOD_SOURCES
   RedistDataMod.F90
-  LateralTranspMod.F90
+#  LateralTranspMod.F90
   SoilLayerDynMod.F90
-  RunoffBalMod.F90
+#  RunoffBalMod.F90
   ErosionBalMod.F90
 	RedistMod.F90
   TillageMixMod.F90
