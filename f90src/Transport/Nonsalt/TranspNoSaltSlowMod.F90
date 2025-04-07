@@ -126,36 +126,38 @@ implicit none
       !to litter
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
-          DOM_MicP2_vr(idom,K,0,NY,NX)=DOM_MicP_vr(idom,K,0,NY,NX)
+          DOM_MicP2_vr(idom,K,0,NY,NX)=AZERO(DOM_MicP_vr(idom,K,0,NY,NX))
         ENDDO
       ENDDO
 
       !exclude NH3B
       DO idg=idg_beg,idg_NH3
-        trcs_solml2_vr(idg,0,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
+        trcs_solml2_vr(idg,0,NY,NX)=AZERO(trcs_solml_vr(idg,0,NY,NX))
       ENDDO
       
       DO ids=ids_nut_beg,ids_nuts_end
-        trcs_solml2_vr(ids,0,NY,NX)=trcs_solml_vr(ids,0,NY,NX)
+        trcs_solml2_vr(ids,0,NY,NX)=AZERO(trcs_solml_vr(ids,0,NY,NX))
       ENDDO
 
       DO L=NU(NY,NX),NL(NY,NX)    
         DO ids=ids_beg,ids_end
-          trcs_solml2_vr(ids,L,NY,NX) = trcs_solml_vr(ids,L,NY,NX)
-          trcs_soHml2_vr(ids,L,NY,NX) = trcs_soHml_vr(ids,L,NY,NX)
+          trcs_solml2_vr(ids,L,NY,NX) = AZERO(trcs_solml_vr(ids,L,NY,NX))
+          trcs_soHml2_vr(ids,L,NY,NX) = AZERO(trcs_soHml_vr(ids,L,NY,NX))
         ENDDO
 
         DO  K=1,jcplx
           DO idom=idom_beg,idom_end
-            DOM_MicP2_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)
-            DOM_MacP2_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
+            DOM_MicP2_vr(idom,K,L,NY,NX)=AZERO(DOM_MicP_vr(idom,K,L,NY,NX))
+            DOM_MacP2_vr(idom,K,L,NY,NX)=AZERO(DOM_MacP_vr(idom,K,L,NY,NX))
           ENDDO
         ENDDO
       ENDDO
 
       DO L=1,JS
         trcg_solsml2_snvr(idg_beg:idg_NH3,L,NY,NX)          = trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)
-        trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
+        DO ids=ids_nut_beg,ids_nuts_end
+          trcn_solsml2_snvr(ids,L,NY,NX) = AZERO(trcn_solsml_snvr(ids,L,NY,NX))
+        ENDDO        
       enddo
     ENDDO
   ENDDO    
@@ -195,8 +197,8 @@ implicit none
 
           DO idg=idg_beg,idg_end     
             if(dpscal(idg)>tiny_p)then
-              flux=trcsol_Irrig_flxM_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX) + &
-                trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)      
+              flux=trcsol_Irrig_flxM_vr(idg,L,NY,NX)+trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + &
+                trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX)      
               flux=flux*dpscal(idg)        
               call get_flux_scalar(trcs_solml2_vr(idg,L,NY,NX),flux,trcs_solml_vr(idg,L,NY,NX),pscal(idg))
             endif
@@ -297,8 +299,7 @@ implicit none
       RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX)   =RO2AquaSourcePrev_vr(NU(NY,NX),NY,NX)+ppscal(idg_O2)*(RGasAtmDisol2SoilM_col(idg_O2,NY,NX) &
         - trcs_Precip2MicpM(idg_O2,NY,NX))
 
-      idg=idg_NH3B
-      GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+RGasAtmDisol2SoilM_col(idg,NY,NX)*ppscal(idg)              
+      GasDiff2Surf_flx_col(idg_NH3,NY,NX) = GasDiff2Surf_flx_col(idg_NH3,NY,NX)+RGasAtmDisol2SoilM_col(idg_NH3B,NY,NX)*ppscal(idg_NH3B)              
       
       DO idg=idg_beg,idg_NH3        
         GasHydroLossFlx_col(idg,NY,NX)=GasHydroLossFlx_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)*ppscal(idg)
@@ -2175,7 +2176,7 @@ implicit none
                   trcg_ebu_flx_col(idg,N2,N1) = trcg_ebu_flx_col(idg,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)                
                 endif
               else
-                 trcg_gasml_vr(idg,N3,N2,N1)=trcg_gasml_vr(idg,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                 trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)
               endif              
             ENDDO
             RO2AquaSourcePrev_vr(N3,N2,N1) = RO2AquaSourcePrev_vr(N3,N2,N1)+trcg_Ebu_flxM_vr(idg_O2,N3,N2,N1)
@@ -2191,7 +2192,6 @@ implicit none
       ENDDO  
     ENDDO
   ENDDO  
-
 
   call PrintInfo('end '//subname)
   end subroutine BubbleEffluxM
@@ -2253,37 +2253,38 @@ implicit none
         trcn_SurfRunoff_flxM(ids,N2,N1)=trcn_SurfRunoff_flxM(ids,N2,N1)-trcn_SurRof_flxM_2DH(ids,N,NN,N5B,N4B)
       ENDDO
     ENDIF
-  enddo
-  !---------------
-  !     NET OVERLAND SOLUTE FLUX IN SNOW
-  !
-  DO idg=idg_beg,idg_NH3
-    trcg_SnowDrift_flxM(idg,N2,N1)=trcg_SnowDrift_flxM(idg,N2,N1)+trcg_SnowDrift_flxM_2D(idg,N,NN,N2,N1)
+  
+    !---------------
+    !     NET OVERLAND SOLUTE FLUX IN SNOW
+    !
+    DO idg=idg_beg,idg_NH3
+      trcg_SnowDrift_flxM(idg,N2,N1)=trcg_SnowDrift_flxM(idg,N2,N1)+trcg_SnowDrift_flxM_2D(idg,N,NN,N2,N1)
+    ENDDO
+
+    do ids=ids_nut_beg,ids_nuts_end
+      trcn_SnowDrift_flxM(ids,N2,N1)=trcn_SnowDrift_flxM(ids,N2,N1)+trcn_SnowDrift_flxM_2D(ids,N,NN,N2,N1)
+    enddo
+
+    if(IFLBSM_2DH(M,N,NN,N5,N4).EQ.0)then
+      DO idg=idg_beg,idg_NH3
+        trcg_SnowDrift_flxM(idg,N2,N1)=trcg_SnowDrift_flxM(idg,N2,N1)-trcg_SnowDrift_flxM_2D(idg,N,NN,N5,N4)
+      ENDDO
+
+      do ids=ids_nut_beg,ids_nuts_end
+        trcn_SnowDrift_flxM(ids,N2,N1)=trcn_SnowDrift_flxM(ids,N2,N1)-trcn_SnowDrift_flxM_2D(ids,N,NN,N5,N4)
+      enddo
+    endif
+
+    IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iFront)THEN
+      DO idg=idg_beg,idg_NH3
+        trcg_SnowDrift_flxM(idg,N2,N1)=trcg_SnowDrift_flxM(idg,N2,N1)-trcg_SnowDrift_flxM_2D(idg,N,NN,N5B,N4B)
+      ENDDO
+
+      do ids=ids_nut_beg,ids_nuts_end
+        trcn_SnowDrift_flxM(ids,N2,N1)=trcn_SnowDrift_flxM(ids,N2,N1)-trcn_SnowDrift_flxM_2D(ids,N,NN,N5B,N4B)
+      enddo
+    ENDIF
   ENDDO
-
-  do ids=ids_nut_beg,ids_nuts_end
-    trcn_SnowDrift_flxM(ids,N2,N1)=trcn_SnowDrift_flxM(ids,N2,N1)+trcn_SnowDrift_flxM_2D(ids,N,NN,N2,N1)
-  enddo
-
-  if(IFLBSM_2DH(M,N,NN,N5,N4).EQ.0)then
-    DO idg=idg_beg,idg_NH3
-      trcg_SnowDrift_flxM(idg,N2,N1)=trcg_SnowDrift_flxM(idg,N2,N1)-trcg_SnowDrift_flxM_2D(idg,N,NN,N5,N4)
-    ENDDO
-
-    do ids=ids_nut_beg,ids_nuts_end
-      trcn_SnowDrift_flxM(ids,N2,N1)=trcn_SnowDrift_flxM(ids,N2,N1)-trcn_SnowDrift_flxM_2D(ids,N,NN,N5,N4)
-    enddo
-  endif
-
-  IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.iFront)THEN
-    DO idg=idg_beg,idg_NH3
-      trcg_SnowDrift_flxM(idg,N2,N1)=trcg_SnowDrift_flxM(idg,N2,N1)-trcg_SnowDrift_flxM_2D(idg,N,NN,N5B,N4B)
-    ENDDO
-
-    do ids=ids_nut_beg,ids_nuts_end
-      trcn_SnowDrift_flxM(ids,N2,N1)=trcn_SnowDrift_flxM(ids,N2,N1)-trcn_SnowDrift_flxM_2D(ids,N,NN,N5B,N4B)
-    enddo
-  ENDIF
   call PrintInfo('end '//subname)
   end subroutine TracerThruRofSnowXYM
 
@@ -2761,7 +2762,7 @@ implicit none
      !exclude NH3B
       DO idg=idg_beg,idg_NH3-1
         if(dpscal(idg)>tiny_p)then
-          flux = RGasAtmDisol2LitrM_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)+trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)
+          flux = RGasAtmDisol2LitrM_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)+trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)
           flux=flux*dpscal(idg)
           call get_flux_scalar(trcs_solml2_vr(idg,0,NY,NX),flux,trcs_solml_vr(idg,0,NY,NX),pscal(idg))
         endif
@@ -2789,8 +2790,8 @@ implicit none
       IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN            
         DO idg=idg_beg,idg_NH3-1
           if(dpscal(idg)>tiny_p)then
-            flux=RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(ids,L,NY,NX) & 
-              +trcs_Transp2Micp_flxM_vr(ids,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)       
+            flux=RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(idg,L,NY,NX) & 
+              +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX)       
             flux=flux*dpscal(idg)    
             call get_flux_scalar(trcs_solml2_vr(idg,L,NY,NX),flux,trcs_solml_vr(idg,L,NY,NX),pscal(idg))
           endif
@@ -2798,8 +2799,8 @@ implicit none
 
         DO idg=idg_NH3,idg_NH3B
           if(dpscal(idg)>tiny_p)then
-            flux=RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(ids,L,NY,NX) & 
-              +trcs_Transp2Micp_flxM_vr(ids,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)-RBGCSinkSoluteM_vr(ids,L,NY,NX)       
+            flux=RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(idg,L,NY,NX) & 
+              +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX)-RBGCSinkSoluteM_vr(idg,L,NY,NX)       
             flux=flux*dpscal(idg)    
             call get_flux_scalar(trcs_solml2_vr(idg,L,NY,NX),flux,trcs_solml_vr(idg,L,NY,NX),pscal(idg))
           endif

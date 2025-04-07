@@ -127,7 +127,6 @@ module RedistMod
       call HandleSurfaceBoundary(I,J,NY,NX,dWat,dHeat)
 
 !     OVERLAND FLOW
-      call OverlandTracerFlow(I,J,NY,NX)
 
       call SoilErosion(NY,NX,DORGE_col)
 !
@@ -440,11 +439,11 @@ module RedistMod
 !      +trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX)
 !  SurfGas_lnd(idg_N2)=SurfGas_lnd(idg_N2)+ZGI
 
-  ZDRAIN_col(NY,NX)=ZDRAIN_col(NY,NX)+trcs_TransptMicP_3D(ids_NH4,3,NK(NY,NX),NY,NX) &
-      +trcs_TransptMicP_3D(idg_NH3,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NO3,3,NK(NY,NX),NY,NX) &
-      +trcs_TransptMicP_3D(ids_NO2,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NH4B,3,NK(NY,NX),NY,NX) &
-      +trcs_TransptMicP_3D(idg_NH3B,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NO3B,3,NK(NY,NX),NY,NX) &
-      +trcs_TransptMicP_3D(ids_NO2B,3,NK(NY,NX),NY,NX)
+!  ZDRAIN_col(NY,NX)=ZDRAIN_col(NY,NX)+trcs_TransptMicP_3D(ids_NH4,3,NK(NY,NX),NY,NX) &
+!      +trcs_TransptMicP_3D(idg_NH3,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NO3,3,NK(NY,NX),NY,NX) &
+!      +trcs_TransptMicP_3D(ids_NO2,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NH4B,3,NK(NY,NX),NY,NX) &
+!      +trcs_TransptMicP_3D(idg_NH3B,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_NO3B,3,NK(NY,NX),NY,NX) &
+!      +trcs_TransptMicP_3D(ids_NO2B,3,NK(NY,NX),NY,NX)
 
 !  ZNGGIN = trcg_DisolEvap_Atm2Soil_flx(idg_N2,NY,NX)+Gas_AdvDif_Flx_3D(idg_N2,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX)
 !  ZN2OIN = trcg_DisolEvap_Atm2Soil_flx(idg_N2O,NY,NX)+Gas_AdvDif_Flx_3D(idg_N2O,3,NU(NY,NX),NY,NX)+Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)
@@ -454,24 +453,24 @@ module RedistMod
   !
   !     SURFACE BOUNDARY PO4 AND DOP FLUXES
   !
-  PI=patomw*((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
-      *(H2PO4_rain_mole_conc(NY,NX)+HPO4_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
-      *(H2PO4_irrig_mole_conc(I,NY,NX)+HPO4_irrig_mole_conc(I,NY,NX)))
+!  PI=patomw*((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
+!      *(H2PO4_rain_mole_conc(NY,NX)+HPO4_rain_mole_conc(NY,NX)) &
+!      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
+!      *(H2PO4_irrig_mole_conc(I,NY,NX)+HPO4_irrig_mole_conc(I,NY,NX)))
 
-  PXB               = -patomw*IrrigSubsurf_col(NY,NX)*(H2PO4_irrig_mole_conc(I,NY,NX)+HPO4_irrig_mole_conc(I,NY,NX))
-  TPIN              = TPIN+PI
-  TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)+PXB
-  PDRAIN_col(NY,NX) = PDRAIN_col(NY,NX)+trcs_TransptMicP_3D(ids_H2PO4,3,NK(NY,NX),NY,NX) &
-      +trcs_TransptMicP_3D(ids_H2PO4B,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_H1PO4,3,NK(NY,NX),NY,NX) &
-      +trcs_TransptMicP_3D(ids_H1PO4B,3,NK(NY,NX),NY,NX)
+!  PXB               = -patomw*IrrigSubsurf_col(NY,NX)*(H2PO4_irrig_mole_conc(I,NY,NX)+HPO4_irrig_mole_conc(I,NY,NX))
+!  TPIN              = TPIN+PI
+!  TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)+PXB
+!  PDRAIN_col(NY,NX) = PDRAIN_col(NY,NX)+trcs_TransptMicP_3D(ids_H2PO4,3,NK(NY,NX),NY,NX) &
+!      +trcs_TransptMicP_3D(ids_H2PO4B,3,NK(NY,NX),NY,NX)+trcs_TransptMicP_3D(ids_H1PO4,3,NK(NY,NX),NY,NX) &
+!      +trcs_TransptMicP_3D(ids_H1PO4B,3,NK(NY,NX),NY,NX)
   !
   !     SURFACE BOUNDARY ION FLUXES
   !
-  SIN=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
-      *(2.0_r8*NH4_rain_mole_conc(NY,NX)+trcg_rain_mole_conc_col(idg_NH3,NY,NX)+NO3_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
-      *(2.0*NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX)))
+!  SIN=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX)) &
+!      *(2.0_r8*NH4_rain_mole_conc(NY,NX)+trcg_rain_mole_conc_col(idg_NH3,NY,NX)+NO3_rain_mole_conc(NY,NX)) &
+!      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)) &
+!      *(2.0*NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX)))
 
 !  SGN= 2.0_r8*(Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(trcg_rain_mole_conc_col(idg_N2,NY,NX)+trcg_rain_mole_conc_col(idg_N2O,NY,NX)) &
 !      +2.0_r8*(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX))*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX)) &
@@ -482,15 +481,15 @@ module RedistMod
 !      +2.0_r8*(Gas_Disol_Flx_vr(idg_N2O,0,NY,NX)+Gas_Disol_Flx_vr(idg_N2,0,NY,NX))+Gas_Disol_Flx_vr(idg_NH3,0,NY,NX) &
 !      +2.0_r8*(trcg_DisolEvap_Atm2Litr_flx(idg_N2,NY,NX)+trcg_DisolEvap_Atm2Litr_flx(idg_N2O,NY,NX))+trcg_DisolEvap_Atm2Litr_flx(idg_NH3,NY,NX))/natomw
 
-  SIP=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_rain_mole_conc(NY,NX)+2.0_r8*HPO4_rain_mole_conc(NY,NX)) &
-      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_irrig_mole_conc(I,NY,NX)+2.0_r8*HPO4_irrig_mole_conc(I,NY,NX)))
-  SNB=-IrrigSubsurf_col(NY,NX)*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX))-IrrigSubsurf_col(NY,NX) &
-      *(2.0_r8*NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX))
+!  SIP=((Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_rain_mole_conc(NY,NX)+2.0_r8*HPO4_rain_mole_conc(NY,NX)) &
+!      +(Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX))*(3.0_r8*H2PO4_irrig_mole_conc(I,NY,NX)+2.0_r8*HPO4_irrig_mole_conc(I,NY,NX)))
+!  SNB=-IrrigSubsurf_col(NY,NX)*(trcg_irrig_mole_conc_col(idg_N2,NY,NX)+trcg_irrig_mole_conc_col(idg_N2O,NY,NX))-IrrigSubsurf_col(NY,NX) &
+!      *(2.0_r8*NH4_irrig_mole_conc(I,NY,NX)+trcg_irrig_mole_conc_col(idg_NH3,NY,NX)+NO3_irrig_mole_conc(I,NY,NX))
 
-  SPB=-IrrigSubsurf_col(NY,NX)*(3.0*H2PO4_irrig_mole_conc(I,NY,NX)+2.0*HPO4_irrig_mole_conc(I,NY,NX))
-  SNM0=(2.0_r8*RNut_MicbRelease_vr(ids_NH4,0,NY,NX)+RNut_MicbRelease_vr(ids_NO3,0,NY,NX)+RNut_MicbRelease_vr(ids_NO2,0,NY,NX) &
-      -2.0_r8*Micb_N2Fixation_vr(0,NY,NX))/natomw
-  SPM0=(2.0_r8*RNut_MicbRelease_vr(ids_H1PO4,0,NY,NX)+3.0_r8*RNut_MicbRelease_vr(ids_H2PO4,0,NY,NX))/patomw
+!  SPB=-IrrigSubsurf_col(NY,NX)*(3.0*H2PO4_irrig_mole_conc(I,NY,NX)+2.0*HPO4_irrig_mole_conc(I,NY,NX))
+!  SNM0=(2.0_r8*RNut_MicbRelease_vr(ids_NH4,0,NY,NX)+RNut_MicbRelease_vr(ids_NO3,0,NY,NX)+RNut_MicbRelease_vr(ids_NO2,0,NY,NX) &
+!      -2.0_r8*Micb_N2Fixation_vr(0,NY,NX))/natomw
+!  SPM0=(2.0_r8*RNut_MicbRelease_vr(ids_H1PO4,0,NY,NX)+3.0_r8*RNut_MicbRelease_vr(ids_H2PO4,0,NY,NX))/patomw
   !
   !     ACCUMULATE PLANT LitrFall FLUXES
   !
@@ -502,20 +501,20 @@ module RedistMod
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
   IF(salt_model)THEN
-    SIR=0._r8
-    SII=0._r8
-    do idsalt=idsalt_beg,idsalt_end
-      SIR = SIR+trcsalt_rain_mole_conc_col(idsalt,NY,NX)*trcSaltIonNumber(idsalt)
-      SII = SII+trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)*trcSaltIonNumber(idsalt)
-    ENDDO  
-    SIR    = SIR*PrecAtm_col(NY,NX)
-    SBU    = -IrrigSubsurf_col(NY,NX)*SII
-    SII    = SII*IrrigSurface_col(NY,NX)
-    TIONIN = TIONIN+SIR+SII
+!    SIR=0._r8
+!    SII=0._r8
+!    do idsalt=idsalt_beg,idsalt_end
+!      SIR = SIR+trcsalt_rain_mole_conc_col(idsalt,NY,NX)*trcSaltIonNumber(idsalt)
+!      SII = SII+trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)*trcSaltIonNumber(idsalt)
+!    ENDDO  
+!    SIR    = SIR*PrecAtm_col(NY,NX)
+!    SBU    = -IrrigSubsurf_col(NY,NX)*SII
+!    SII    = SII*IrrigSurface_col(NY,NX)
+!    TIONIN = TIONIN+SIR+SII
     !
     !     SUBSURFACE BOUNDARY SALT FLUXES FROM SUBSURFACE IRRIGATION
     !
-    TIONOU=TIONOU+SBU
+!    TIONOU=TIONOU+SBU
   ENDIF
   !========================================================================
   !
@@ -528,27 +527,7 @@ module RedistMod
 
   call PrintInfo('end '//subname)
   end subroutine HandleSurfaceBoundary
-!------------------------------------------------------------------------------------------
 
-  subroutine OverlandTracerFlow(I,J,NY,NX)
-  implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NY,NX
-  character(len=*), parameter :: subname='OverlandTracerFlow'
-  integer :: K,idom,idg,idn,idsalt
-  !     begin_execution
-  !
-  call PrintInfo('beg '//subname)
-  IF(ABS(TXGridSurfRunoff_2DH(NY,NX)).GT.ZEROS(NY,NX))THEN
-
-    IF(salt_model)THEN
-      DO idsalt=idsalt_beg,idsalt_end
-        call fixEXConsumpFlux(trcSalt_solml_vr(idsalt,0,NY,NX),trcSalt_SurfRunoff_flx(idsalt,NY,NX),-1)
-      ENDDO
-    ENDIF
-  ENDIF
-  call PrintInfo('end '//subname)
-  end subroutine OverlandTracerFlow
 !------------------------------------------------------------------------------------------
 
   subroutine SoilErosion(NY,NX,DORGE_col)
@@ -704,16 +683,14 @@ module RedistMod
   TGasN_lnd           = TGasN_lnd+ZG
   Z4S                 = trcs_solml_vr(ids_NH4,0,NY,NX)+trcs_solml_vr(idg_NH3,0,NY,NX)
   if(Z4S<0._r8)then
-  write(*,*)'redistsurfnh4',NY,NX,trcs_solml_vr(ids_NH4,0,NY,NX),trcs_solml_vr(idg_NH3,0,NY,NX)
-  stop
+    write(*,*)'redistsurfnh4',NY,NX,trcs_solml_vr(ids_NH4,0,NY,NX),trcs_solml_vr(idg_NH3,0,NY,NX)
+    stop
   endif
   Z4X             = natomw*trcx_solml_vr(idx_NH4,0,NY,NX)
   Z4F             = natomw*(FertN_mole_soil_vr(ifert_nh4,0,NY,NX)+FertN_mole_soil_vr(ifert_urea,0,NY,NX)+FertN_mole_soil_vr(ifert_nh3,0,NY,NX))
   TDisolNH4_lnd   = TDisolNH4_lnd+Z4S+Z4X+Z4F
   tNH4_col(NY,NX) = tNH4_col(NY,NX)+Z4S+Z4X
-  if(tNH4_col(NY,NX)<0._r8)then
-    write(*,*)'770',Z4S,Z4X
-  endif
+
   ZOS             = trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX)
   ZOF             = natomw*FertN_mole_soil_vr(ifert_no3,0,NY,NX)
   tNO3_lnd        = tNO3_lnd+ZOS+ZOF

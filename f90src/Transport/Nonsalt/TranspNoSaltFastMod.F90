@@ -25,13 +25,14 @@ implicit none
   __FILE__
 
   public :: TransptFastNoSaltMM
+  public :: BackCopyStateVars  
   contains
 
 
   subroutine TransptFastNoSaltMM(I,J,M,NHE,NHW,NVS,NVN)
 
   !Description:
-  !update trcs_solml2_vr and trc_gasml2_vr
+  !update trcs_solml2_vr and trcg_gasml2_vr
   implicit none
   integer, intent(in) :: I,J,M,NHE,NHW,NVS,NVN
   character(len=*), parameter :: subname='TransptFastNoSaltMM'
@@ -62,7 +63,7 @@ implicit none
     call copyStateVars(NHE,NHW,NVS,NVN)
 
     dpscal_max=0._r8
-    DO ids=ids_beg,ids_end
+    DO ids=idg_beg,idg_end
       dpscal(ids)=dpscal(ids)*(1._r8-pscal(ids))
       dpscal_max=AMAX1(dpscal_max,dpscal(ids))
     enddo
@@ -80,7 +81,7 @@ implicit none
       DO idg=idg_beg,idg_NH3      
        trcs_solml2_vr(idg,0,NY,NX) = trcs_solml_vr(idg,0,NY,NX)
        DO L=NU(NY,NX),NL(NY,NX)
-         trc_gasml2_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)
+         trcg_gasml2_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)
        ENDDO
       enddo
 
@@ -93,6 +94,37 @@ implicit none
     ENDDO
   ENDDO
   end subroutine copyStateVars
+
+!------------------------------------------------------------------------------------------
+  subroutine BackCopyStateVars(I,J,NHE,NHW,NVS,NVN)
+  implicit none
+  integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
+  integer :: NY,NX,idg,L,ids
+
+  DO NY=NHW,NHE
+    DO  NX=NVN,NVS
+      DO idg=idg_beg,idg_NH3      
+       trcs_solml_vr(idg,0,NY,NX)=AZERO(trcs_solml2_vr(idg,0,NY,NX))
+       DO L=NU(NY,NX),NL(NY,NX)
+         trcg_gasml_vr(idg,L,NY,NX)=AZERO(trcg_gasml2_vr(idg,L,NY,NX))
+       ENDDO
+      enddo
+
+      DO idg=idg_beg,idg_end 
+        DO L=NU(NY,NX),NL(NY,NX)    
+          trcs_solml_vr(idg,L,NY,NX)=AZERO(trcs_solml2_vr(idg,L,NY,NX))
+        ENDDO
+      enddo
+
+      DO L=1,JS
+        DO idg=idg_beg,idg_NH3
+          trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)   = AZERO(trcg_solsml2_snvr(idg,L,NY,NX))
+        ENDDO
+      enddo
+    ENDDO
+  ENDDO
+  end subroutine BackCopyStateVars
+
 !------------------------------------------------------------------------------------------
   subroutine AccumSlowFluxesMM(I,J,NHE,NHW,NVS,NVN,dpscal,pscal)
   implicit none
@@ -123,9 +155,9 @@ implicit none
       DO idg=idg_beg,idg_NH3          
         GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+(RGas_Disol_FlxMM_vr(idg,0,NY,NX) &
           +Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX))*ppscal(idg)
-
         L=0
-        RGasTranspFlxPrev_vr(idg,L,NY,NX)  =RGasTranspFlxPrev_vr(idg,L,NY,NX)+ Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)*ppscal(idg)           
+        RGasTranspFlxPrev_vr(idg,L,NY,NX)  =RGasTranspFlxPrev_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,0,NY,NX)*ppscal(idg)
+
         DO L=NU(NY,NX),NL(NY,NX)
           RGasTranspFlxPrev_vr(idg,L,NY,NX)  =RGasTranspFlxPrev_vr(idg,L,NY,NX)+ Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)*ppscal(idg)   
         ENDDO
@@ -243,7 +275,7 @@ implicit none
     ENDIF
     
     DO idg=idg_beg,idg_NH3
-      RGas_Adv_flxMM(idg)=VFLW*AZMAX1(trc_gasml2_vr(idg,NU(NY,NX),NY,NX))
+      RGas_Adv_flxMM(idg)=VFLW*AZMAX1(trcg_gasml2_vr(idg,NU(NY,NX),NY,NX))
     ENDDO
   ELSE
     !topsoil gains tracers
@@ -301,21 +333,21 @@ implicit none
     IF(FracAirFilledSoilPoreM_vr(M,N6,N5,N4).GT.AirFillPore_Min)THEN
       do idg=idg_beg,idg_NH3-1
         RGas_Disol_FlxMM_vr(idg,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
-         (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg,N6,N5,N4))*trcg_VLWatMicP_vr(idg,N6,N5,N4) &
+         (AMAX1(ZEROS(N5,N4),trcg_gasml2_vr(idg,N6,N5,N4))*trcg_VLWatMicP_vr(idg,N6,N5,N4) &
           -trcs_solml2_vr(idg,N6,N5,N4)*VLsoiAirPM_vr(M,N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg,N6,N5,N4)+VLsoiAirPM_vr(M,N6,N5,N4))
       enddo    
 
       IF(VLsoiAirPMA_vr(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXA_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
         RGas_Disol_FlxMM_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
-         (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
+         (AMAX1(ZEROS(N5,N4),trcg_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
           -trcs_solml2_vr(idg_NH3,N6,N5,N4)*VLsoiAirPMA_vr(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4)+VLsoiAirPMA_vr(N6,N5,N4))
       ENDIF
 
       IF(VLsoiAirPMB_vr(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXB_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
         RGas_Disol_FlxMM_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
-          (AMAX1(ZEROS(N5,N4),trc_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
+          (AMAX1(ZEROS(N5,N4),trcg_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
           -trcs_solml2_vr(idg_NH3B,N6,N5,N4)*VLsoiAirPMB_vr(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4)+VLsoiAirPMB_vr(N6,N5,N4))
       ENDIF
@@ -353,7 +385,7 @@ implicit none
       VFLW=-VFLWX
     ENDIF
     DO idg=idg_beg,idg_NH3
-      RGasAdv                             = VFLW*AZMAX1(trc_gasml2_vr(idg,N6,N5,N4))
+      RGasAdv                             = VFLW*AZMAX1(trcg_gasml2_vr(idg,N6,N5,N4))
       Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)+RGasAdv
     ENDDO
   !flow out of source grid  
@@ -364,7 +396,7 @@ implicit none
       VFLW=VFLWX
     ENDIF
     DO idg=idg_beg,idg_NH3
-      RGasAdv                             = VFLW*AZMAX1(trc_gasml2_vr(idg,N3,N2,N1))
+      RGasAdv                             = VFLW*AZMAX1(trcg_gasml2_vr(idg,N3,N2,N1))
       Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)+RGasAdv
     ENDDO
   ENDIF
@@ -504,7 +536,7 @@ implicit none
     ! HOURLY GAS FLUX FOR USE IN REDIST.F
     !
     DO idg=idg_beg,idg_NH3
-      Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4) = Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4)+VFLW*AZMAX1(trc_gasml2_vr(idg,M3,M2,M1))
+      Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4) = Gas_AdvDif_FlxMM_3D(idg,N,M6,M5,M4)+VFLW*AZMAX1(trcg_gasml2_vr(idg,M3,M2,M1))
     ENDDO
   ENDIF
 
@@ -565,8 +597,8 @@ implicit none
     !
     !diffusion flux
     !
-    trc_gasc1(idg)                      = AZMAX1(trc_gasml2_vr(idg,N3,N2,N1)/VLsoiAirPM_vr(M,N3,N2,N1))
-    trc_gasc2(idg)                      = AZMAX1(trc_gasml2_vr(idg,N6,N5,N4)/VLsoiAirPM_vr(M,N6,N5,N4))
+    trc_gasc1(idg)                      = AZMAX1(trcg_gasml2_vr(idg,N3,N2,N1)/VLsoiAirPM_vr(M,N3,N2,N1))
+    trc_gasc2(idg)                      = AZMAX1(trcg_gasml2_vr(idg,N6,N5,N4)/VLsoiAirPM_vr(M,N6,N5,N4))
     Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)+GasDifuscoefMM_3D*(trc_gasc1(idg)-trc_gasc2(idg))
   ENDDO
   call PrintInfo('end '//subname)
@@ -596,7 +628,7 @@ implicit none
 !
 !     SURFACE GAS CONCENTRATIONS
 !
-    trcg_cl2=AZMAX1(trc_gasml2_vr(idg,NU(NY,NX),NY,NX)/VLsoiAirPM_vr(M,NU(NY,NX),NY,NX))
+    trcg_cl2=AZMAX1(trcg_gasml2_vr(idg,NU(NY,NX),NY,NX)/VLsoiAirPM_vr(M,NU(NY,NX),NY,NX))
 !
 !     EQUILIBRIUM CONCENTRATIONS AT SOIL SURFACE AT WHICH
 !     GASEOUS DIFFUSION THROUGH SOIL SURFACE LAYER = GASEOUS
@@ -682,7 +714,7 @@ implicit none
           if(dpscal(idg)>tiny_p)then
             flux=-RGas_Disol_FlxMM_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)
             flux=flux*dpscal(idg)
-            call get_flux_scalar(trc_gasml2_vr(idg,L,NY,NX),flux, trcg_gasml_vr(idg,L,NY,NX),pscal(idg))
+            call get_flux_scalar(trcg_gasml2_vr(idg,L,NY,NX),flux, trcg_gasml_vr(idg,L,NY,NX),pscal(idg))
           endif
         ENDDO
 
@@ -691,7 +723,7 @@ implicit none
         if(dpscal(idg)>tiny_p)then
           flux=-RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX)-RBGCSinkGasMM_vr(idg_NH3,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)   
           flux=flux*dpscal(idg) 
-          call get_flux_scalar(trc_gasml2_vr(idg_NH3,L,NY,NX),flux, trcg_gasml_vr(idg_NH3,L,NY,NX),pscal(idg))  
+          call get_flux_scalar(trcg_gasml2_vr(idg_NH3,L,NY,NX),flux, trcg_gasml_vr(idg_NH3,L,NY,NX),pscal(idg))  
         endif
       ENDDO
     ENDDO
@@ -732,7 +764,7 @@ implicit none
         !source
         N1=NX;N2=NY;N3=L    
         IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))then
-          call GasDissolutionMM(M,N,N3,N2,N1)        
+          call GasDissolutionMM(M,N,N1,N2,N3)        
         endif  
         !
         !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS

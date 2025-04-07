@@ -75,7 +75,7 @@ implicit none
   real(r8), allocatable ::  DOM_FloXSurRof_flxM_2DH(:,:,:,:,:,:)        !2D flow of DOM through surface runoff at iteration M [g d-2]
   real(r8), allocatable ::  trcg_SurRof_flxM_2DH(:,:,:,:,:)             !2D flow of gas through surface runoff at iteration M [g d-2]
   real(r8), allocatable ::  trcn_SurRof_flxM_2DH(:,:,:,:,:)             !2D flow of nutrient through surface runoff at iteration M [g d-2]
-  real(r8), allocatable :: trc_gasml2_vr(:,:,:,:)                       !copy of gas tracer for transport [g d-2]
+  real(r8), allocatable :: trcg_gasml2_vr(:,:,:,:)                       !copy of gas tracer for transport [g d-2]
   real(r8), allocatable :: trcs_solml2_vr(:,:,:,:)                      !copy of solute tracer in micropore for transport [g d-2]
   real(r8), allocatable :: trcs_soHml2_vr(:,:,:,:)                      !copy of solute tracer in macropore for transport [g d-2]
   real(r8), allocatable ::  trcn_SnowDrift_flxM_2D(:,:,:,:,:)           !nutrient flux through snow drift at iteration M [g d-2]
@@ -164,7 +164,7 @@ contains
   allocate(DOM_FloXSurRof_flxM_2DH(idom_beg:idom_end,1:jcplx,2,2,JV,JH));DOM_FloXSurRof_flxM_2DH = 0._r8
   allocate(trcg_SurRof_flxM_2DH(idg_beg:idg_NH3,2,2,JV,JH));  trcg_SurRof_flxM_2DH       = 0._r8
 
-  allocate(trc_gasml2_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); trc_gasml2_vr(:,:,:,:) = 0._r8
+  allocate(trcg_gasml2_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); trcg_gasml2_vr(:,:,:,:) = 0._r8
   allocate(trcs_solml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_solml2_vr(:,:,:,:) = 0._r8
   allocate(trcs_soHml2_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_soHml2_vr(:,:,:,:) = 0._r8
 
@@ -250,7 +250,7 @@ contains
 
   call destroy(DOM_MacP2_vr)
   call destroy(Gas_AdvDif_FlxMM_vr)
-  call destroy(trc_gasml2_vr)
+  call destroy(trcg_gasml2_vr)
   call destroy(trcs_solml2_vr)
   call destroy(trcs_soHml2_vr)
   call destroy(trcn_AquaADV_Snow2Band_flxM)
