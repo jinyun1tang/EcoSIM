@@ -308,7 +308,7 @@ module InitNoSaltTransportMod
         !     INCLUDING TRANSFORMATIONS FROM NITRO.F, UPTAKE.F AND SOLUTE.F
         ! exclude NH3B
         DO idg=idg_beg,idg_NH3
-          trc_gasml2_vr(idg,L,NY,NX)=AZERO(trcg_gasml_vr(idg,L,NY,NX))
+          trcg_gasml2_vr(idg,L,NY,NX)=AZERO(trcg_gasml_vr(idg,L,NY,NX))
         ENDDO
 
         !reset DOM to value before the iteration

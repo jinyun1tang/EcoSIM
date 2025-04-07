@@ -78,9 +78,7 @@ module TranspNoSaltMod
 !     execution begins here
   call PrintInfo('beg '//subname)
 !
-!
   call InitTranspNoSaltModel(I,J,NHW,NHE,NVN,NVS)
-
 !
 ! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 ! NPH=NPX,NPT=NPY
@@ -102,6 +100,7 @@ module TranspNoSaltMod
     !Do bubbling
     call BubbleEffluxM(I,J,M,NHE,NHW,NVS,NVN)
   ENDDO
+  call BackCopyStateVars(I,J,NHE,NHW,NVS,NVN)
 
   call PrintInfo('end '//subname)
   
