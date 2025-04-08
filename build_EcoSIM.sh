@@ -148,6 +148,7 @@ fi
 if [ -n "$ATS_ECOSIM" ]; then
     echo "Building ATS-EcoSIM"
     CONFIG_FLAGS="${CONFIG_FLAGS} -DATS_ECOSIM=1" 
+    BUILDDIR="./"
     #Having this automatically set to use mpi compilers
     if [ "$mpi" -eq 0 ]; then
     	mpi=1
