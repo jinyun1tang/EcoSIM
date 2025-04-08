@@ -43,6 +43,7 @@ contains
    write(*,fmt)vnames,'=',vals
 
    end subroutine DebugPrint_real_arr
+
   !-----------------------------------------------------------------------
 
    subroutine DebugPrint_real_sp(vname,val)

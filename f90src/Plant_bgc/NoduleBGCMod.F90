@@ -441,34 +441,34 @@ module NoduleBGCMod
   real(r8) :: RCCC,RCCN,RCCP
   integer  :: NE
 !     begin_execution
-  associate(                                                   &
-    NU                     => plt_site%NU,                     &
-    AREA3                  => plt_site%AREA3,                  &
-    ZERO                   => plt_site%ZERO,                   &
-    fTgrowRootP_vr         => plt_pheno%fTgrowRootP_vr,        &
-    NoduGrowthYield_pft    => plt_allom%NoduGrowthYield_pft,   &
-    NodulerNC_pft          => plt_allom%NodulerNC_pft,         &
-    NodulerPC_pft          => plt_allom%NodulerPC_pft,         &
-    k_fine_litr            => pltpar%k_fine_litr,              &
-    iroot                  => pltpar%iroot,                    &
-    fRootGrowPSISense_pvr  => plt_pheno%fRootGrowPSISense_pvr, &
-    RootRespPotent_pvr     => plt_rbgc%RootRespPotent_pvr,     &
-    RootCO2EmisPot_pvr     => plt_rbgc%RootCO2EmisPot_pvr,     &
+  associate(                                                     &
+    NU                      => plt_site%NU,                      &
+    AREA3                   => plt_site%AREA3,                   &
+    ZERO                    => plt_site%ZERO,                    &
+    fTgrowRootP_vr          => plt_pheno%fTgrowRootP_vr,         &
+    NoduGrowthYield_pft     => plt_allom%NoduGrowthYield_pft,    &
+    NodulerNC_pft           => plt_allom%NodulerNC_pft,          &
+    NodulerPC_pft           => plt_allom%NodulerPC_pft,          &
+    k_fine_litr             => pltpar%k_fine_litr,               &
+    iroot                   => pltpar%iroot,                     &
+    fRootGrowPSISense_pvr   => plt_pheno%fRootGrowPSISense_pvr,  &
+    RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,      &
+    RootCO2EmisPot_pvr      => plt_rbgc%RootCO2EmisPot_pvr,      &
     RAutoRootO2Limter_rpvr  => plt_rbgc%RAutoRootO2Limter_rpvr,  &
-    RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr,       &
-    NodulInfectElms_pft    => plt_bgcr%NodulInfectElms_pft,    &
-    LitrfalStrutElms_pvr   => plt_bgcr%LitrfalStrutElms_pvr,   &
-    RootN2Fix_pft          => plt_rbgc%RootN2Fix_pft,          &
-    RootN2Fix_pvr          => plt_bgcr%RootN2Fix_pvr,          &
-    PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr,     &
+    RootCO2Autor_pvr        => plt_rbgc%RootCO2Autor_pvr,        &
+    NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft,     &
+    LitrfalStrutElms_pvr    => plt_bgcr%LitrfalStrutElms_pvr,    &
+    RootN2Fix_pft           => plt_rbgc%RootN2Fix_pft,           &
+    RootN2Fix_pvr           => plt_bgcr%RootN2Fix_pvr,           &
+    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr,      &
     RootNodulStrutElms_rpvr => plt_biom%RootNodulStrutElms_rpvr, &
-    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft,         &
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,          &
     RootNodulNonstElms_rpvr => plt_biom%RootNodulNonstElms_rpvr, &
-    ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft,       &
-    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr, &
-    ElmAllocmat4Litr       => plt_soilchem%ElmAllocmat4Litr,   &
-    iPlantNfixType_pft     => plt_morph%iPlantNfixType_pft,    &
-    NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    &
+    ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft,        &
+    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr,  &
+    ElmAllocmat4Litr        => plt_soilchem%ElmAllocmat4Litr,    &
+    iPlantNfixType_pft      => plt_morph%iPlantNfixType_pft,     &
+    NIXBotRootLayer_pft     => plt_morph%NIXBotRootLayer_pft     &
   )
 !     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
@@ -497,8 +497,6 @@ module NoduleBGCMod
 !     NON-STRUCTURAL C CONCENTRATION, MICROBIAL C:N:P FACTOR,
 !     AND TEMPERATURE
 !
-!     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
-!     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !     NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmn),NodulNonstElmConc(ielmp)=nonstructural C,N,P concn in bacteria
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     FCNPF=N,P constraint to bacterial activity
@@ -613,10 +611,10 @@ module NoduleBGCMod
 !     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
 !     NodulElmDecayRecyc(ielmc),NodulElmDecayRecyc(ielmn),NodulElmDecayRecyc(ielmp)=bacterial C,N,P decomposition to recycling
 !
-        RCCC=RCCZN+CCC*RCCYN
-        RCCN=CNC*RCCXN
-        RCCP=CPC*RCCQN
-        SPNDX=SPNDL*SQRT(fTgrowRootP_vr(L,NZ)*fRootGrowPSISense_pvr(ipltroot,L,NZ))
+        RCCC  = RCCZN+CCC*RCCYN
+        RCCN  = CNC*RCCXN
+        RCCP  = CPC*RCCQN
+        SPNDX = SPNDL*SQRT(fTgrowRootP_vr(L,NZ)*fRootGrowPSISense_pvr(ipltroot,L,NZ))
         DO NE=1,NumPlantChemElms
           NoduleElmDecayLoss(NE)=SPNDX*RootNodulStrutElms_rpvr(NE,L,NZ)
         ENDDO
@@ -684,15 +682,6 @@ module NoduleBGCMod
         ENDIF
 !
 !     TOTAL NODULE RESPIRATION
-!
-!     RCO2TM,RCO2T=total C respiration unlimited,limited by O2
-!     GrossResp_pft,CanopyRespC_CumYr_pft=total,above-ground PFT respiration
-!     Rmaint=bacterial maintenance respiration
-!     RespNonst_Oltd=respiration from non-structural C
-!     NoduleCResp=bacterial respiration for growth and N2 fixation
-!     NodulELmSenes2Recyc(ielmc)=bacterial C senescence to recycling
-!     RootCO2Autor_pvr=total root respiration
-!     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
         RCO2TM=AMIN1(Rmaint,RespNonst_OUltd)+RGNDLM+NodulELmSenes2Recyc(ielmc)
         RCO2T=AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)

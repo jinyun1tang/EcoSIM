@@ -3247,8 +3247,8 @@ module PlantBranchMod
   IF(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8)THEN
     ZPOOLB = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
     PPOOLB = AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
-    RFN1=ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG)
-    RFP1=PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG)
+    RFN1   = ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG)
+    RFP1   = PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG)
     FNP    = AMIN1(RFN1,RFP1)
     IF(RCO2YM.GT.0.0_r8)THEN
       RCO2GM=AMIN1(RCO2YM,FNP)
@@ -3257,9 +3257,6 @@ module PlantBranchMod
     ENDIF
     IF(RCO2Y.GT.0.0_r8)THEN
       RgroCO2_ltd=AMIN1(RCO2Y,FNP*RAutoRootO2Limter_rpvr(ipltroot,NGTopRootLayer_pft(NZ),NZ))
-!      write(123,*)I+J/24.,RCO2Y,RFN1*RAutoRootO2Limter_rpvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),&
-!        RFP1*RAutoRootO2Limter_rpvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),DMSHD,&
-!        RAutoRootO2Limter_rpvr(ipltroot,NGTopRootLayer_pft(NZ),NZ),RCO2CM
     ELSE
       RgroCO2_ltd=0._r8
     ENDIF
@@ -3308,7 +3305,6 @@ module PlantBranchMod
   RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RCO2TM
   RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+Rauto_brch
   RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)   = RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)-Rauto_brch
-
   call PrintInfo('end '//subname)
   end associate
   end subroutine ComputRAutoB4Emergence

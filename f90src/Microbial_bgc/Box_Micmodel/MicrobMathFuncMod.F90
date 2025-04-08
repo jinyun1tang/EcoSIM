@@ -39,7 +39,7 @@ implicit none
   real(r8), intent(in) :: diffusc !diffusion coefficient
   real(r8), intent(in) :: KM      !half saturation parameter
   real(r8), intent(in) :: V_max   !maximum uptake rate
-  real(r8), optional, intent(in) :: zeros
+  real(r8), optional, intent(in) :: zeros !threshold for active uptake
   real(r8) :: uptake
   real(r8) :: X,B,C
   real(r8) :: zero1

@@ -1,10 +1,11 @@
 module readsmod
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils , only : endrun
-  use fileUtil   , only : open_safe
-  use minimathmod, only : isLeap,AZMAX1
-  use EcoSIMCtrlMod, only : lverb, salt_model  
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
+  use fileUtil,      only: open_safe
+  use minimathmod,   only: isLeap, AZMAX1
+  use EcoSIMCtrlMod, only: lverb,  salt_model, fixClime
+  use DebugToolMod
   use GridConsts
   use FlagDataType
   use FertilizerDataType
@@ -27,11 +28,60 @@ module readsmod
 
   public :: ReadClimSoilForcing
   integer, save :: yearhi  =0
+
+  type, public :: clime_type
+    real(r8) :: AirT_C      !air temperature, C
+    real(r8) :: vap_Kpa     !vapor pressure, kPa
+    real(r8) :: Wind_ms     !wind speed, m/s
+    real(r8) :: Atm_kPa     !atmospheric vapor pressure kPa
+    real(r8) :: Rain_mmhr   !rainfall mm/m2/hr
+    real(r8) :: SRAD_Wm2    !solar radiation, W m-2
+  end type clime_type
+
+  type(clime_type), public :: clim_var
   contains
+
+!------------------------------------------------------------------------------------------
+
+  subroutine SetConstClimeForcing()
+
+  implicit none
+  
+  IWTHR=2          !set as hourly forcing
+  TMP_hrly(:,:)   = clim_var%airT_C
+  WINDH(:,:)      = clim_var%Wind_ms * 3600._r8    ![m/s]->[m/hour]
+  DWPTH(:,:)      = clim_var%vap_kpa               !
+  RAINH(:,:)      = clim_var%Rain_mmhr * 1.e-3_r8  ![mm/hr]->[m/hr]
+  SWRad_hrly(:,:) = clim_var%SRAD_Wm2 *3600.e-6_r8 ![W/m2]->[MJ/m2]
+  PBOT_hrly(:,:)  = clim_var%Atm_kPa
+
+  WindMesureHeight_col(:,:) = 0.5_r8
+  SolarNoonHour_col(:,:)    = 12._r8
+  pH_rain_col(:,:)          = 7._r8
+  CN4RI(:,:)                = 0._r8
+  CNORI(:,:)                = 0._r8
+  NH4_rain_mole_conc(:,:)   = 0._r8
+  NO3_rain_mole_conc(:,:)   = 0._r8
+  H2PO4_rain_mole_conc(:,:) = 0._r8
+
+  if(salt_model)then
+    trcsalt_rain_mole_conc_col(idsalt_Al,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Fe,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Ca,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Mg,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Na,:,:)  = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_K,:,:)   = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_SO4,:,:) = 0._r8
+    trcsalt_rain_mole_conc_col(idsalt_Cl,:,:)  = 0._r8
+  endif
+
+  end subroutine SetConstClimeForcing
+
+!------------------------------------------------------------------------------------------
 
   SUBROUTINE ReadClimSoilForcing(yearc,yeari,NHW,NHE,NVN,NVS)
 !
-! THIS SUBROUTINE ReadClimSoilForcing ALL SOIL AND PLANT MANAGEMENT INPUT FILES
+! THIS SUBROUTINE read ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
   use ReadManagementMod, only : ReadManagementFiles
   use EcoSIMCtrlMod, only : soil_mgmt_in
@@ -40,25 +90,22 @@ module readsmod
   integer, intent(in) :: yeari   !current data year
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
+  character(len=*), parameter :: subname='ReadClimSoilForcing'
   CHARACTER(len=1) :: TTYPE
   integer :: kk,N,L,NY,NX,NZ,K
   integer :: LL,J
   integer :: LPY,IX
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
-  integer :: IDATE,IDY,IFLG3,I,ICHECK
+  integer :: IDY,IFLG3,I,ICHECK
 
 ! begin_execution
+  call PrintInfo('beg '//subname)
 
   ICLM=0
   call ReadClimateCorrections(yeari)
-
-!
-! OPTIONS(4, AND LAND MANAGEMENT(9, FILES FROM
-! FILE NAMES IN DATA ARRAYS LOADED IN MAIN.F
 !
 ! PREFIX=path for files in current or higher level directory
-!
 !
 ! ARTIFICIAL SOIL WARMING
 !
@@ -67,20 +114,6 @@ module readsmod
 ! TKSZ=temperature used to calculate additional heat flux
 ! for warming in watsub.f
 !
-! OPEN(6,FILE='soiltemp',STATUS='OLD')
-!23   READ(6,'(F8.3,4X,A8,I8,50E16.7E3)',END=27)DOY,CDATE,J,2,(OUT(L),L=1,33)
-! IF(J.EQ.24)THEN
-!   I=INT(DOY)
-! ELSE
-!   I=INT(DOY)+1
-! ENDIF
-! DO 24 L=1,20
-!   TKSZ(I,J,L)=OUT(L+13)+4.0+TC2K
-!24    CONTINUE
-! GO TO 23
-!27    CONTINUE
-!
-
 ! generating checkpoint files,resuming from earlier checkpt files
 ! DRAD,DTMPX,DTMPN,DHUM,DPREC,DIRRI,DWIND,DCNR4,DCNOR
 ! =annual changes in radiation,max+min temperature,humidity,
@@ -129,35 +162,19 @@ module readsmod
 ! DATA(1)=site file name
 ! W,N=water+heat,nutrient checkpoint files
 !
-  IF(is_first_year)THEN
-    idate=yearc
 
-    WRITE(CHARY,'(I4)')IDATE
-    OUTW='W'//DATA1(1)(1:2)//CHARY(1:4)
-    OUTN='N'//DATA1(1)(1:2)//CHARY(1:4)
-    OPEN(21,FILE=trim(outdir)//OUTW,STATUS='UNKNOWN')
-    OPEN(22,FILE=trim(outdir)//OUTN,STATUS='UNKNOWN')
-  ENDIF
-
-  IF(is_first_year)THEN
-    L=1
-  ELSE
-    L=2
-  ENDIF
-
-!
 ! READ WEATHER DATA
-!
-! DATAC(3=weather file
-! TTYPE,CTYPE=time step,calendar format
-! NI,NN=number of time,weather data variables
-! IVAR,VAR=time,weather variable type
-! TYP=weather variable units
-! IDAT,DAT=time,weather variable
-!
-
-  if(yearhi/=yeari)call ReadClimateForc(yearc,yeari,L,NHW,NHE,NVN,NVS)
-
+  if(fixClime)then
+    !set constatnt climate forcing
+    call SetConstClimeForcing()
+  else
+    IF(is_first_year)THEN
+      L=1
+    ELSE
+      L=2
+    ENDIF
+    if(yearhi/=yeari)call ReadClimateForc(yearc,yeari,L,NHW,NHE,NVN,NVS)
+  endif
   yearhi=yeari
 
 !
@@ -165,9 +182,9 @@ module readsmod
 !
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
-      ROWN(NY,NX)=0.0_r8
-      ROWO(NY,NX)=0.0_r8
-      ROWP(NY,NX)=0.0_r8
+      ROWSpaceNH4_col(NY,NX)=0.0_r8
+      ROWSpaceNO3_col(NY,NX)=0.0_r8
+      ROWSpacePO4_col(NY,NX)=0.0_r8
       D325: DO I=1,366
         iSoilDisturbType_col(I,NY,NX)=0
         DepzCorp_col(I,NY,NX)=0.0_r8
@@ -182,14 +199,13 @@ module readsmod
         FDPTH(I,NY,NX)=0.0_r8
       ENDDO D40
       D125: DO I=1,366
-        RRIG(1:24,I,NY,NX)=0.0_r8
-        PHQ(I,NY,NX)=7.0_r8
-        NH4_irrig_mole_conc(I,NY,NX)=0.0_r8
-        NO3_irrig_mole_conc(I,NY,NX)=0.0_r8
-        H2PO4_irrig_mole_conc(I,NY,NX)=0.0_r8
-
-        WDPTH(I,NY,NX)=0.0_r8
-        ROWI(I,NY,NX)=0.0_r8
+        RRIG(1:24,I,NY,NX)             = 0.0_r8
+        PHQ(I,NY,NX)                   = 7.0_r8
+        NH4_irrig_mole_conc(I,NY,NX)   = 0.0_r8
+        NO3_irrig_mole_conc(I,NY,NX)   = 0.0_r8
+        H2PO4_irrig_mole_conc(I,NY,NX) = 0.0_r8
+        WDPTH(I,NY,NX)                 = 0.0_r8
+        ROWI(I,NY,NX)                  = 0.0_r8
       ENDDO D125
     ENDDO D9985
   ENDDO D9980
@@ -220,6 +236,7 @@ module readsmod
   IMNG=1
 
   call GetAtmGts(yearc,NHW,NHE,NVN,NVS)
+  call PrintInfo('end '//subname)
 
   RETURN
   END subroutine ReadClimSoilForcing
@@ -266,15 +283,15 @@ module readsmod
   call ncd_pio_closefile(clm_factor_nfid)
 
   DO N=2,12
-    DRAD(N)=DRAD(1)
-    DTMPX(N)=DTMPX(1)
-    DTMPN(N)=DTMPN(1)
-    DHUM(N)=DHUM(1)
-    DPREC(N)=DPREC(1)
-    DIRRI(N)=DIRRI(1)
-    DWIND(N)=DWIND(1)
-    DCN4R(N)=DCN4R(1)
-    DCNOR(N)=DCNOR(1)
+    DRAD(N)  = DRAD(1)
+    DTMPX(N) = DTMPX(1)
+    DTMPN(N) = DTMPN(1)
+    DHUM(N)  = DHUM(1)
+    DPREC(N) = DPREC(1)
+    DIRRI(N) = DIRRI(1)
+    DWIND(N) = DWIND(1)
+    DCN4R(N) = DCN4R(1)
+    DCNOR(N) = DCNOR(1)
   ENDDO
 
   end subroutine ReadClimateCorrections
@@ -287,7 +304,7 @@ module readsmod
   integer, intent(in) :: L
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: Z0G,ZNOONG
-  real(r8) :: PHRG
+  real(r8) :: PHRG             !pH of precipitation
   real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
   real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
   type(atm_forc_type) :: atmf
@@ -303,33 +320,33 @@ module readsmod
 !
 ! CALCULATE PRECIPITATION CONCENTRATIONS IN MOLE UNITS
 !
-  CN4RIG=atmf%CN4RIG/natomw
-  CNORIG=atmf%CNORIG/natomw
-  CN4RG=CN4RIG
-  CNORG=CNORIG
-  CPORG=atmf%CPORG/31.0_r8
-  CALRG=atmf%CALRG/27.0_r8
-  CFERG=atmf%CFERG/55.8_r8
-  CCARG=atmf%CCARG/40.0_r8
-  CMGRG=atmf%CMGRG/24.3_r8
-  CNARG=atmf%CNARG/23.0_r8
-  CKARG=atmf%CKARG/39.1_r8
-  CSORG=atmf%CSORG/32.0_r8
-  CCLRG=atmf%CCLRG/35.5_r8
-  PHRG=atmf%PHRG
-  Z0G=atmf%Z0G
-  ZNOONG=atmf%ZNOONG
+  CN4RIG = atmf%CN4RIG/natomw
+  CNORIG = atmf%CNORIG/natomw
+  CN4RG  = CN4RIG
+  CNORG  = CNORIG
+  CPORG  = atmf%CPORG/31.0_r8
+  CALRG  = atmf%CALRG/27.0_r8
+  CFERG  = atmf%CFERG/55.8_r8
+  CCARG  = atmf%CCARG/40.0_r8
+  CMGRG  = atmf%CMGRG/24.3_r8
+  CNARG  = atmf%CNARG/23.0_r8
+  CKARG  = atmf%CKARG/39.1_r8
+  CSORG  = atmf%CSORG/32.0_r8
+  CCLRG  = atmf%CCLRG/35.5_r8
+  PHRG   = atmf%PHRG
+  Z0G    = atmf%Z0G
+  ZNOONG = atmf%ZNOONG
+
   D8970: DO NX=NHW,NHE
     D8975: DO NY=NVN,NVS
-      WindMesureHeight_col(NY,NX)=Z0G         !windspeed meast height
-      SolarNoonHour_col(NY,NX)=ZNOONG
-      PHR(NY,NX)=PHRG
-      CN4RI(NY,NX)=CN4RIG
-      CNORI(NY,NX)=CNORIG
-      NH4_rain_mole_conc(NY,NX)=CN4RIG
-      NO3_rain_mole_conc(NY,NX)=CNORIG
-      H2PO4_rain_mole_conc(NY,NX)=CPORG
-
+      WindMesureHeight_col(NY,NX) = Z0G         !windspeed meast height
+      SolarNoonHour_col(NY,NX)    = ZNOONG
+      pH_rain_col(NY,NX)           = PHRG
+      CN4RI(NY,NX)                = CN4RIG
+      CNORI(NY,NX)                = CNORIG
+      NH4_rain_mole_conc(NY,NX)   = CN4RIG
+      NO3_rain_mole_conc(NY,NX)   = CNORIG
+      H2PO4_rain_mole_conc(NY,NX) = CPORG
     ENDDO D8975
   ENDDO D8970
 

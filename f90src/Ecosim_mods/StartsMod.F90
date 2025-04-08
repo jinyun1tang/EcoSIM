@@ -298,13 +298,13 @@ module StartsMod
           DIST(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
           XDPTH(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?
-          DISP(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
+          DISP_3D(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
         ENDDO
 
         IF(L.EQ.NU(NY,NX))THEN
           DIST(3,N3,N2,N1)  = 0.5_r8*DLYR_3D(3,N3,N2,N1)
           XDPTH(3,N3,N2,N1) = AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
-          DISP(3,N3,N2,N1)  = 0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
+          DISP_3D(3,N3,N2,N1)  = 0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
       ENDDO
     ENDDO
@@ -409,10 +409,10 @@ module StartsMod
     !
     PSISE_vr(L,NY,NX)               = PSIPS
     PSISoilAirEntry(L,NY,NX)        = -1.5E-03_r8
-    RGasFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
-    RGasFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
+    RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
+    RGasTranspFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
     RO2AquaSourcePrev_vr(L,NY,NX)   = 0.0_r8
-    RGasFlxPrev_vr(idg_CH4,L,NY,NX) = 0.0_r8
+    RGasTranspFlxPrev_vr(idg_CH4,L,NY,NX) = 0.0_r8
     RCH4PhysexchPrev_vr(L,NY,NX)    = 0.0_r8
 
     IF(L.GT.0)THEN
@@ -517,19 +517,11 @@ module StartsMod
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
-  print*,'RC0ff(NY,NX)',RC0ff(NY,NX)
+
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
  
-!  write(*,*) "InitSoilProfile ------------------------- "
-!  write(*,*) "  RSC: ", RSC(1,0,NY,NX) 
-!  write(*,*) "  RSN: ", RSN(1,0,NY,NX) 
-!  write(*,*) "  RSP: ", RSP(1,0,NY,NX) 
-!  write(*,*) "  SoilOrgM_vir: ", SoilOrgM_vr(ielmc,0,NY,NX)
-!  write(*,*) "  TKS_vr:       ", TKS_vr(0,NY,NX)
-!  write(*,*) "----------------------------------------- "
-
   call PrintInfo('end InitSoilProfile')
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
@@ -542,8 +534,8 @@ module StartsMod
 
 ! begin_execution
   L2=NL(NY,NX)
-  FertN_soil_vr(ifertn_beg:ifertn_end,0:L2,NY,NX)   = 0._r8
-  FertN_Band_vr(ifertnb_beg:ifertnb_end,1:L2,NY,NX) = 0._r8
+  FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:L2,NY,NX)   = 0._r8
+  FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:L2,NY,NX) = 0._r8
   trcs_VLN_vr(ids_NH4,0:L2,NY,NX)                   = 1.0_r8
   trcs_VLN_vr(idg_NH3,0:L2,NY,NX)                   = trcs_VLN_vr(ids_NH4,0:L2,NY,NX)
   trcs_VLN_vr(ids_NO3,0:L2,NY,NX)                   = 1.0_r8
@@ -726,7 +718,7 @@ module StartsMod
   !     NPT=number of cycles per water iteration for gas flux calculations
   !     NPG=number of cycles per hour for gas flux calculations
   !     NPR,NPS=number of cycles NPH-1 for litter, snowpack flux calculns
-  !     THETX=minimum air-filled porosity for gas flux calculations
+  !     AirFillPore_Min=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSICE=ice porosity,density
   !     BulkDensLitR=surface litter bulk density, Mg m-3
 

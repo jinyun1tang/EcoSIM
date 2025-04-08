@@ -81,11 +81,11 @@ module ErosionMod
   !
   !     INTERNAL SEDIMENT FLUXES
   !
-    call InternalSedimentFluxes(NHW, NHE,NVN,NVS)
+    call LateralXGridSedmentFlux(NHW, NHE,NVN,NVS)
   !
   !     EXTERNAL BOUNDARY SEDIMENT FLUXES
   !
-    if(.not.column_mode)call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
+    if(.not.column_mode)call XBoundErosionFlux(NHW,NHE,NVN,NVS)
   ENDIF
   END subroutine erosion
 !---------------------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ module ErosionMod
       DO  NN=1,2
         IF(N.EQ.1)THEN
           !east(NN=1)-west (NN=2) direction
-          IF(NX.EQ.NHE.AND.NN.EQ.iOutflow.OR.NX.EQ.NHW.AND.NN.EQ.iInflow)THEN
+          IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
             cycle
           ELSE
             !dest in the east
@@ -218,7 +218,7 @@ module ErosionMod
           ENDIF
         ELSEIF(N.EQ.2)THEN
           !south(NN=1)-north(NN=2) direction
-          IF(NY.EQ.NVS.AND.NN.EQ.iOutflow.OR.NY.EQ.NVN.AND.NN.EQ.iInflow)THEN
+          IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
             cycle
           ELSE
             !dest in the south 
@@ -230,9 +230,9 @@ module ErosionMod
         IF(BaseErosionRate(N2,N1).GT.ZEROS(N2,N1))THEN
           IF(NN.EQ.iOutflow)THEN
             !well-defined dest grid          
-            FERM=QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
-            SedErosionM(N,2,N5,N4)=BaseErosionRate(N2,N1)*FERM
-            cumSed_Eros_2D(N,2,N5,N4)=cumSed_Eros_2D(N,2,N5,N4)+SedErosionM(N,2,N5,N4)
+            FERM                      = QflxSurfRunoffM_2DH(M,N,2,N5,N4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+            SedErosionM(N,2,N5,N4)    = BaseErosionRate(N2,N1)*FERM
+            cumSed_Eros_2D(N,2,N5,N4) = cumSed_Eros_2D(N,2,N5,N4)+SedErosionM(N,2,N5,N4)
           ELSE
             SedErosionM(N,2,N5,N4)=0._r8
           ENDIF
@@ -314,7 +314,7 @@ module ErosionMod
 
   D9580: DO  N=1,2
     D9575: DO  NN=1,2
-      IF(N.EQ.1)THEN
+      IF(N.EQ.iEastWestDirection)THEN
         N4=NX+1
         N5=NY
         N4B=NX-1
@@ -342,29 +342,31 @@ module ErosionMod
             cycle
           ENDIF
         ENDIF
-      ELSEIF(N.EQ.2)THEN
-        N4=NX
-        N5=NY+1
-        N4B=NX
-        N5B=NY-1
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN
+        N4  = NX
+        N5  = NY+1
+        N4B = NX
+        N5B = NY-1
         IF(NN.EQ.iOutflow)THEN
+          !south boundary
           IF(NY.EQ.NVS)THEN
-            M1=NX
-            M2=NY
-            M4=NX
-            M5=NY+1
-            XN=-1.0_r8
+            M1 = NX
+            M2 = NY
+            M4 = NX
+            M5 = NY+1
+            XN = -1.0_r8
             RCHQF=RechargSouthSurf(M2,M1)
           ELSE
             cycle
           ENDIF
         ELSEIF(NN.EQ.iInflow)THEN
+          !north boundary
           IF(NY.EQ.NVN)THEN
-            M1=NX
-            M2=NY
-            M4=NX
-            M5=NY
-            XN=1.0_r8
+            M1 = NX
+            M2 = NY
+            M4 = NX
+            M5 = NY
+            XN = 1.0_r8
             RCHQF=RechargNorthSurf(M5,M4)
           ELSE
             cycle
@@ -376,16 +378,16 @@ module ErosionMod
 !     IN 'WATSUB' TIMES BOUNDARY SEDIMENT CONCENTRATION IN
 !     SURFACE WATER
 !
-      IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0._r8) &
-        .OR.BaseErosionRate(N2,N1).LE.ZEROS(N2,N1))THEN
+      IF(.not.XGridRunoffFlag(NN,N,N2,N1) .OR. isclose(RCHQF,0._r8) &
+        .OR. BaseErosionRate(N2,N1).LE.ZEROS(N2,N1))THEN
         SedErosionM(N,NN,M5,M4)=0._r8
       ELSE
         IF(SurfRunoffWatFluxM_2DH(M,N2,N1).GT.ZEROS(N2,N1))THEN
-          IF((NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
-            .OR.(NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-            FERM=QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
-            SedErosionM(N,NN,M5,M4)=BaseErosionRate(N2,N1)*FERM
-            cumSed_Eros_2D(N,NN,M5,M4)=cumSed_Eros_2D(N,NN,M5,M4)+SedErosionM(N,NN,M5,M4)
+          IF((NN.EQ.iOutflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
+            .OR. (NN.EQ.iInflow .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+            FERM                       = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffWatFluxM_2DH(M,N2,N1)
+            SedErosionM(N,NN,M5,M4)    = BaseErosionRate(N2,N1)*FERM
+            cumSed_Eros_2D(N,NN,M5,M4) = cumSed_Eros_2D(N,NN,M5,M4)+SedErosionM(N,NN,M5,M4)
           ELSEIF((NN.EQ.iInflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
             .OR.(NN.EQ.iOutflow.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
             SedErosionM(N,NN,M5,M4)=0._r8
@@ -411,7 +413,7 @@ module ErosionMod
   end subroutine XBoundSedTransp
 !------------------------------------------------------------------------------------------
 
-  subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
+  subroutine LateralXGridSedmentFlux(NHW, NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -426,17 +428,17 @@ module ErosionMod
         N2=NY
         DO  N=1,2
           DO  NN=1,2
-            IF(N.EQ.1)THEN
-              IF(NX.EQ.NHE.AND.NN.EQ.iOutflow.OR.NX.EQ.NHW.AND.NN.EQ.iInflow)THEN
+            IF(N.EQ.iEastWestDirection)THEN
+              IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
                 cycle
               ELSE
-                N4=NX+1
-                N5=NY
-                N4B=NX-1
-                N5B=NY
+                N4  = NX+1
+                N5  = NY
+                N4B = NX-1
+                N5B = NY
               ENDIF
-            ELSEIF(N.EQ.2)THEN
-              IF(NY.EQ.NVS.AND.NN.EQ.iOutflow.OR.NY.EQ.NVN.AND.NN.EQ.iInflow)THEN
+            ELSEIF(N.EQ.iNorthSouthDirection)THEN
+              IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
                 cycle
               ELSE
                 N4=NX
@@ -453,9 +455,6 @@ module ErosionMod
 !
 !     SOIL MINERALS
 !
-!     *ER=sediment flux from erosion.f
-!     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
-!
             IF(NN.EQ.iOutflow)THEN
               FSEDER=AMIN1(1.0,cumSed_Eros_2D(N,2,N5,N4)/SoilMicPMassLayerMX(N2,N1))
               XSand_Eros_2D(N,2,N5,N4)=FSEDER*SAND(NU(N2,N1),N2,N1)
@@ -465,29 +464,19 @@ module ErosionMod
 !     FERTILIZER POOLS
 !
 !     *ER=sediment flux from erosion.f
-!     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
-!                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-              XNH4Soil_Eros_2D(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
-              XNH3Soil_Eros_2D(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
-              XUreaSoil_Eros_2D(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
-              XNO3Soil_Eros_2D(N,2,N5,N4)=FSEDER*FertN_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
+              XUreaSoil_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
 
-              XNH4Band_Eros_2D(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
-              XNH3Band_Eros_2D(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
-              XUreaBand_Eros_2D(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
-              XNO3Band_Eros_2D(N,2,N5,N4)=FSEDER*FertN_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
+              XNH4Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XUreaBand_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
-!
 !     sediment code
-!       :XN4,XNB=adsorbed NH4 in non-band,band
-!       :XHY,XAL,XFE,XCA,XMG,XNA,XKA,XHC,AL2,FE2
-!        =adsorbed H,Al,Fe,Ca,Mg,Na,K,HCO3,AlOH2,FeOH2
-!       :XOH0,XOH1,XOH2=adsorbed R-,R-OH,R-OH2 in non-band
-!       :XOH0B,XOH1B,XOH2B=adsorption sites R-,R-OH,R-OH2 in band
-!       :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
-!       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
               DO NTX=idx_beg,idx_end
                 trcx_Eros_2D(NTX,N,2,N5,N4)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
@@ -496,12 +485,6 @@ module ErosionMod
 !     PRECIPITATES
 !
 !     sediment code
-!       :PALO,PFEO=precip AlOH,FeOH
-!       :PCAC,PCAS=precip CaCO3,CaSO4
-!       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
-!       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !
               DO NTP=idsp_beg,idsp_end
                 trcp_Eros_2D(NTP,N,2,N5,N4)   =FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
@@ -556,14 +539,14 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4Soil_Eros_2D(N,2,N5,N4)=0._r8
-              XNH3Soil_Eros_2D(N,2,N5,N4)=0._r8
-              XUreaSoil_Eros_2D(N,2,N5,N4)=0._r8
-              XNO3Soil_Eros_2D(N,2,N5,N4)=0._r8
-              XNH4Band_Eros_2D(N,2,N5,N4)=0._r8
-              XNH3Band_Eros_2D(N,2,N5,N4)=0._r8
-              XUreaBand_Eros_2D(N,2,N5,N4)=0._r8
-              XNO3Band_Eros_2D(N,2,N5,N4)=0._r8
+              XNH4Soil_Eros_2D(N,2,N5,N4)  = 0._r8
+              XNH3Soil_Eros_2D(N,2,N5,N4)  = 0._r8
+              XUreaSoil_Eros_2D(N,2,N5,N4) = 0._r8
+              XNO3Soil_Eros_2D(N,2,N5,N4)  = 0._r8
+              XNH4Band_Eros_2D(N,2,N5,N4)  = 0._r8
+              XNH3Band_Eros_2D(N,2,N5,N4)  = 0._r8
+              XUreaBand_Eros_2D(N,2,N5,N4) = 0._r8
+              XNO3Band_Eros_2D(N,2,N5,N4)  = 0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -619,35 +602,24 @@ module ErosionMod
             IF(NN.EQ.iInflow)THEN
               IF(N4B.GT.0.AND.N5B.GT.0)THEN
                 FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,1,N5B,N4B)/SoilMicPMassLayerMX(N2,N1))
-                XSand_Eros_2D(N,1,N5B,N4B)=FSEDER*SAND(NU(N2,N1),N2,N1)
-                XSilt_Eros_2D(N,1,N5B,N4B)=FSEDER*SILT(NU(N2,N1),N2,N1)
-                XClay_Eros_2D(N,1,N5B,N4B)=FSEDER*CLAY(NU(N2,N1),N2,N1)
+                XSand_Eros_2D(N,1,N5B,N4B) = FSEDER*SAND(NU(N2,N1),N2,N1)
+                XSilt_Eros_2D(N,1,N5B,N4B) = FSEDER*SILT(NU(N2,N1),N2,N1)
+                XClay_Eros_2D(N,1,N5B,N4B) = FSEDER*CLAY(NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
-!     *ER=sediment flux from erosion.f
-!     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
-!                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
-!
-                XNH4Soil_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
-                XNH3Soil_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
-                XUreaSoil_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
-                XNO3Soil_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
-                XNH4Band_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
-                XNH3Band_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
-                XUreaBand_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
-                XNO3Band_Eros_2D(N,1,N5B,N4B)=FSEDER*FertN_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
+                XNH4Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
+                XNH3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
+                XUreaSoil_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
+                XNO3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
+                XNH4Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
+                XNH3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
+                XUreaBand_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
+                XNO3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
 !     sediment code
-!       :XN4,XNB=adsorbed NH4 in non-band,band
-!       :XHY,XAL,XFE,XCA,XMG,XNA,XKA,XHC,AL2,FE2
-!        =adsorbed H,Al,Fe,Ca,Mg,Na,K,HCO3,AlOH2,FeOH2
-!       :XOH0,XOH1,XOH2=adsorbed R-,R-OH,R-OH2 in non-band
-!       :XOH0B,XOH1B,XOH2B=adsorption sites R-,R-OH,R-OH2 in band
-!       :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
-!       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
                 DO NTX=idx_beg,idx_end
                   trcx_Eros_2D(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml_vr(NTX,NU(N2,N1),N2,N1)
@@ -656,13 +628,6 @@ module ErosionMod
 !     PRECIPITATES
 !
 !     sediment code
-!       :PALO,PFEO=precip AlOH,FeOH
-!       :PCAC,PCAS=precip CaCO3,CaSO4
-!       :PALP,PFEP=precip AlPO4,FEPO4 in non-band
-!       :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!       :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
-!       :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
-!
                 DO NTP=idsp_beg,idsp_end
                   trcp_Eros_2D(NTP,N,1,N5B,N4B)=FSEDER*trcp_saltpml_vr(NTP,NU(N2,N1),N2,N1)
                 ENDDO
@@ -709,20 +674,20 @@ module ErosionMod
                   ENDDO
                 ENDDO
               ELSE
-                XSand_Eros_2D(N,1,N5B,N4B)=0._r8
-                XSilt_Eros_2D(N,1,N5B,N4B)=0._r8
-                XClay_Eros_2D(N,1,N5B,N4B)=0._r8
+                XSand_Eros_2D(N,1,N5B,N4B) = 0._r8
+                XSilt_Eros_2D(N,1,N5B,N4B) = 0._r8
+                XClay_Eros_2D(N,1,N5B,N4B) = 0._r8
 !
 !     FERTILIZER POOLS
 !
-                XNH4Soil_Eros_2D(N,1,N5B,N4B)=0._r8
-                XNH3Soil_Eros_2D(N,1,N5B,N4B)=0._r8
-                XUreaSoil_Eros_2D(N,1,N5B,N4B)=0._r8
-                XNO3Soil_Eros_2D(N,1,N5B,N4B)=0._r8
-                XNH4Band_Eros_2D(N,1,N5B,N4B)=0._r8
-                XNH3Band_Eros_2D(N,1,N5B,N4B)=0._r8
-                XUreaBand_Eros_2D(N,1,N5B,N4B)=0._r8
-                XNO3Band_Eros_2D(N,1,N5B,N4B)=0._r8
+                XNH4Soil_Eros_2D(N,1,N5B,N4B)  = 0._r8
+                XNH3Soil_Eros_2D(N,1,N5B,N4B)  = 0._r8
+                XUreaSoil_Eros_2D(N,1,N5B,N4B) = 0._r8
+                XNO3Soil_Eros_2D(N,1,N5B,N4B)  = 0._r8
+                XNH4Band_Eros_2D(N,1,N5B,N4B)  = 0._r8
+                XNH3Band_Eros_2D(N,1,N5B,N4B)  = 0._r8
+                XUreaBand_Eros_2D(N,1,N5B,N4B) = 0._r8
+                XNO3Band_Eros_2D(N,1,N5B,N4B)  = 0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -780,10 +745,10 @@ module ErosionMod
         ENDDO
     ENDDO
   ENDDO
-  end subroutine InternalSedimentFluxes
+  end subroutine LateralXGridSedmentFlux
 !----------------------------------------------------------------------------------------------
 
-  subroutine ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
+  subroutine XBoundErosionFlux(NHW,NHE,NVN,NVS)
   implicit none
 
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -803,42 +768,42 @@ module ErosionMod
         N2=NY
         D8980: DO  N=1,2
           D8975: DO  NN=1,2
-            IF(N.EQ.1)THEN
+            IF(N.EQ.iEastWestDirection)THEN
               N4=NX+1
               N5=NY
               IF(NN.EQ.iOutflow)THEN
                 IF(NX.EQ.NHE)THEN
-                  M1=NX
-                  M2=NY
-                  M4=NX+1
-                  M5=NY
-                  XN=-1.0_r8
-                  RCHQF=RechargEastSurf(M2,M1)
+                  M1    = NX
+                  M2    = NY
+                  M4    = NX+1
+                  M5    = NY
+                  XN    = -1.0_r8
+                  RCHQF = RechargEastSurf(M2,M1)
                 ELSE
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.iInflow)THEN
                 IF(NX.EQ.NHW)THEN
-                  M1=NX
-                  M2=NY
-                  M4=NX
-                  M5=NY
-                  XN=1.0_r8
+                  M1 = NX
+                  M2 = NY
+                  M4 = NX
+                  M5 = NY
+                  XN = 1.0_r8
                   RCHQF=RechargWestSurf(M5,M4)
                 ELSE
                   cycle
                 ENDIF
               ENDIF
-            ELSEIF(N.EQ.2)THEN
+            ELSEIF(N.EQ.iNorthSouthDirection)THEN
               N4=NX
               N5=NY+1
               IF(NN.EQ.iOutflow)THEN
                 IF(NY.EQ.NVS)THEN
-                  M1=NX
-                  M2=NY
-                  M4=NX
-                  M5=NY+1
-                  XN=-1.0_r8
+                  M1 = NX
+                  M2 = NY
+                  M4 = NX
+                  M5 = NY+1
+                  XN = -1.0_r8
                   RCHQF=RechargSouthSurf(M2,M1)
                 ELSE
                   cycle
@@ -857,7 +822,7 @@ module ErosionMod
               ENDIF
             ENDIF
             IF(.not.XGridRunoffFlag(NN,N,N2,N1).OR.isclose(RCHQF,0._r8) &
-              .OR.ABS(cumSed_Eros_2D(N,NN,M5,M4)).LE.ZEROS(N2,N1))THEN
+              .OR. ABS(cumSed_Eros_2D(N,NN,M5,M4)).LE.ZEROS(N2,N1))THEN
               XSand_Eros_2D(N,NN,M5,M4)=0._r8
               XSilt_Eros_2D(N,NN,M5,M4)=0._r8
               XClay_Eros_2D(N,NN,M5,M4)=0._r8
@@ -935,14 +900,14 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
-              XNH3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
-              XUreaSoil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
-              XNO3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
-              XNH4Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
-              XNH3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
-              XUreaBand_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
-              XNO3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
+              XNH4Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_nh3,NU(N2,N1),N2,N1)
+              XUreaSoil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XUreaBand_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -1004,7 +969,7 @@ module ErosionMod
     ENDDO
   ENDDO
 
-  end subroutine ExternalSedimentFluxes
+  end subroutine XBoundErosionFlux
 
 !------------------------------------------------------------------------------------------
   subroutine DestructErosion()

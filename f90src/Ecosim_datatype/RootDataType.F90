@@ -72,7 +72,7 @@ module RootDataType
   real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                   !root turgor water potential , [Mpa]
   real(r8),target,allocatable ::  trcg_rootml_pvr(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  trcs_rootml_pvr(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
-  real(r8),target,allocatable ::  TRootGasLossDisturb_pft(:,:,:)                 !total root gas content, [g d-2]
+  real(r8),target,allocatable ::  TRootGasLossDisturb_col(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
   real(r8),target,allocatable ::  RootElms_pft(:,:,:,:)                     !plant root element, [g d-2]
   real(r8),target,allocatable ::  RootStrutElms_pft(:,:,:,:)                    !plant root structural element, [g d-2]
@@ -140,18 +140,18 @@ contains
   allocate(RootPoreTortu4Gas(jroots,JP,JY,JX));  RootPoreTortu4Gas=0._r8
   allocate(RootNodulNonstElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_rpvr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
-  allocate(Root1stLen_rpvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root1stLen_rpvr=0._r8
-  allocate(Root2ndLen_rpvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndLen_rpvr=0._r8
+  allocate(Root1stLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root1stLen_rpvr=0._r8
+  allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._r8
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
   allocate(Root1stXNumL_pvr(jroots,JZ,JP,JY,JX));Root1stXNumL_pvr=0._r8
   allocate(Root2ndXNum_pvr(jroots,JZ,JP,JY,JX));Root2ndXNum_pvr=0._r8
-  allocate(Root2ndXNum_rpvr(jroots,JZ,NumOfCanopyLayers,JP,JY,JX));Root2ndXNum_rpvr=0._r8
+  allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._r8
   allocate(Root2ndAveLen_pvr(jroots,JZ,JP,JY,JX));Root2ndAveLen_pvr=0._r8
   allocate(RootAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootAreaPerPlant_pvr=0._r8
   allocate(RootVH2O_pvr(jroots,JZ,JP,JY,JX));RootVH2O_pvr=0._r8
   allocate(Root1stRadius_pvr(jroots,JZ,JP,JY,JX));Root1stRadius_pvr=0._r8
   allocate(RootPoreVol_pvr(jroots,JZ,JP,JY,JX));RootPoreVol_pvr=0._r8
-  allocate(Root1stDepz_pft(jroots,NumOfCanopyLayers,JP,JY,JX));Root1stDepz_pft=0._r8
+  allocate(Root1stDepz_pft(jroots,MaxNumRootAxes,JP,JY,JX));Root1stDepz_pft=0._r8
   allocate(Root2ndRadius_pvr(jroots,JZ,JP,JY,JX));Root2ndRadius_pvr=0._r8
   allocate(Root1stSpecLen_pft(jroots,JP,JY,JX)); Root1stSpecLen_pft=0._r8
   allocate(Root2ndSpecLen_pft(jroots,JP,JY,JX)); Root2ndSpecLen_pft=0._r8
@@ -161,13 +161,13 @@ contains
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
   allocate(trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcg_rootml_pvr =0._r8
   allocate(trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcs_rootml_pvr =0._r8
-  allocate(TRootGasLossDisturb_pft(idg_beg:idg_NH3,JY,JX));TRootGasLossDisturb_pft=0._r8
+  allocate(TRootGasLossDisturb_col(idg_beg:idg_NH3,JY,JX));TRootGasLossDisturb_col=0._r8
   allocate(RootBiomCPerPlant_pft(JP,JY,JX));    RootBiomCPerPlant_pft=0._r8
   allocate(RootElms_pft(NumPlantChemElms,JP,JY,JX)); RootElms_pft=0._r8
   allocate(RootStrutElms_pft(NumPlantChemElms,JP,JY,JX));   RootStrutElms_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
-  allocate(RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));RootMyco1stStrutElms_rpvr=0._r8
-  allocate(RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ,NumOfCanopyLayers,JP,JY,JX));RootMyco2ndStrutElms_rpvr=0._r8
+  allocate(RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco1stStrutElms_rpvr=0._r8
+  allocate(RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco2ndStrutElms_rpvr=0._r8
   allocate( PopuRootMycoC_pvr(jroots,JZ,JP,JY,JX)); PopuRootMycoC_pvr=0._r8
   allocate(RootNodulStrutElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodulStrutElms_rpvr=0._r8
   allocate(NodulStrutElms_pft(NumPlantChemElms,JP,JY,JX));  NodulStrutElms_pft=0._r8
@@ -247,7 +247,7 @@ contains
   call destroy(PSIRootTurg_vr)
   call destroy(trcg_rootml_pvr)
   call destroy(trcs_rootml_pvr)
-  call destroy(TRootGasLossDisturb_pft)
+  call destroy(TRootGasLossDisturb_col)
   call destroy(RootBiomCPerPlant_pft)
   call destroy(RootElms_pft)
   call destroy(RootStrutElms_pft)

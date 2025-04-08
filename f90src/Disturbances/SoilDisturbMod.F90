@@ -324,7 +324,7 @@ module SoilDisturbMod
           trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
-            FertN_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_soil_vr(NTF,L,NY,NX)
+            FertN_mole_soil_vr(NTF,L,NY,NX)=DCORPC1*FertN_mole_soil_vr(NTF,L,NY,NX)
           ENDDO
         ENDIF
         SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=dOMelm(1:NumPlantChemElms)

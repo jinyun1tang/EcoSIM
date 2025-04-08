@@ -2,6 +2,7 @@ module TracerIDMod
 ! !
 ! code to initialize tracers
   use MiniMathMod, only : addone
+  use data_kind_mod,    only: r8 => DAT_KIND_R8  
   use ElmIDMod
 implicit none
   save
@@ -147,6 +148,7 @@ implicit none
   integer :: ids_nuts
   integer :: idsalt_nuts
 
+  real(r8), allocatable :: tracerSolc_max(:)  !maximum tracer concentration, solublity, g/m3 H2O
   type, public :: trc_def_type
    integer :: NGasTracers    !number of gas tracers
    integer :: NSolutTracers    !number of solute tracers
@@ -175,33 +177,44 @@ implicit none
 ! banded NH3 is considered as (potential) gas too. However, there
 ! is no banded gas NH3 concentration.
 
-  idg_NH3B=idg_NH3+1
-  idg_end=idg_NH3B;
+  idg_NH3B = idg_NH3+1
+  idg_end  = idg_NH3B;
 
-  ids_nuts_beg=idg_NH3;  !the first nutrient tracer, including band
-  ids_end=idg_end        !initalize the solute counter
-  ids_NH4B=addone(ids_end);
-  ids_NO3B=addone(ids_end);
-  ids_NO2B=addone(ids_end);
-  ids_H1PO4B=addone(ids_end);
-  ids_H2PO4B=addone(ids_end);
-  ids_nuts=ids_H2PO4B-ids_NH4B
+  ids_nuts_beg = idg_NH3;  !the first nutrient tracer, including band
+  ids_end      = idg_end        !initalize the solute counter
+  ids_NH4B     = addone(ids_end);
+  ids_NO3B     = addone(ids_end);
+  ids_NO2B     = addone(ids_end);
+  ids_H1PO4B   = addone(ids_end);
+  ids_H2PO4B   = addone(ids_end);
+  ids_nuts     = ids_H2PO4B-ids_NH4B
 
   ids_nutb_beg=idg_NH3B;ids_nutb_end=ids_H2PO4B
 
-  ids_NH4=addone(ids_end);
-  ids_NO3=addone(ids_end);
-  ids_NO2=addone(ids_end);
-  ids_H1PO4=addone(ids_end);
-  ids_H2PO4=addone(ids_end);
+  ids_NH4   = addone(ids_end);
+  ids_NO3   = addone(ids_end);
+  ids_NO2   = addone(ids_end);
+  ids_H1PO4 = addone(ids_end);
+  ids_H2PO4 = addone(ids_end);
 
-  ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
-  ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
+  ids_nut_beg  = ids_NH4;  !the first non-band non-gaseous nutrient tracer
+  ids_nuts_end = ids_H2PO4;!the last non-band nutrient tracer
+
+  allocate(tracerSolc_max(ids_beg:ids_end));tracerSolc_max=1.e3_r8; !set a large enough number by default
+
+  tracerSolc_max(idg_NH3)=320._r8*14._r8/(1.e-3_r8*17._r8)   !based on NH3 solublity at 25C 
+  tracerSolc_max(ids_NH4)=370._r8*14._r8/(1.e-3_r8*53.49_r8) !based on NH4Cl solubility at 25oC
+  tracerSolc_max(ids_NO3)=912_r8*14._r8/(1.e-3_r8*84.995_r8)    !based on NaNO3 solubility at 25oC 
+
+  tracerSolc_max(idg_NH3B)=tracerSolc_max(idg_NH3)
+  tracerSolc_max(ids_NH4B)=tracerSolc_max(ids_NH4)
+  tracerSolc_max(ids_NO3B)=tracerSolc_max(ids_NO3)
 
   allocate(trcs_names(ids_beg:ids_end))
   trcs_names(idg_CO2)    = 'CO2';trcs_names(idg_CH4)     = 'CH4'
   trcs_names(idg_O2)     = 'O2'; trcs_names(idg_N2)      = 'N2'
   trcs_names(idg_N2O)    = 'N2O';trcs_names(idg_H2)      = 'H2'
+  trcs_names(idg_Ar)     = 'Ar'
   trcs_names(idg_NH3)    = 'NH3';trcs_names(idg_NH3B)    = 'NH3B'
   trcs_names(ids_NH4B)   = 'NH4B';trcs_names(ids_NO3B)   = 'NO3B'
   trcs_names(ids_NO2B)   = 'NO2B';trcs_names(ids_H1PO4B) = 'H1PO4B'
@@ -211,71 +224,72 @@ implicit none
 
   
   idom_beg=1;idom_end=0
-  idom_doc=addone(idom_end)
-  idom_don=addone(idom_end)
-  idom_dop=addone(idom_end)
-  idom_acetate=addone(idom_end)
+  idom_doc     = addone(idom_end)
+  idom_don     = addone(idom_end)
+  idom_dop     = addone(idom_end)
+  idom_acetate = addone(idom_end)
 
   idsalt_beg=1;idsalt_end=0  
   if(lsalt_model)then
-    idsalt_Al=addone(idsalt_end)
-    idsalt_Fe=addone(idsalt_end)
-    idsalt_Hp=addone(idsalt_end)
-    idsalt_Ca=addone(idsalt_end)
-    idsalt_Mg=addone(idsalt_end)
-    idsalt_Na=addone(idsalt_end)
-    idsalt_K=addone(idsalt_end)
-    idsalt_OH=addone(idsalt_end)
-    idsalt_SO4=addone(idsalt_end)
-    idsalt_Cl=addone(idsalt_end)
-    idsalt_CO3=addone(idsalt_end)
-    idsalt_HCO3=addone(idsalt_end)
-    idsalt_mend=idsalt_end
-    idsalt_AlOH=addone(idsalt_end)
-    idsalt_AlOH2=addone(idsalt_end)
-    idsalt_AlOH3=addone(idsalt_end)
-    idsalt_AlOH4=addone(idsalt_end)
-    idsalt_AlSO4=addone(idsalt_end)
-    idsalt_FeOH =addone(idsalt_end)
-    idsalt_FeOH2=addone(idsalt_end)
-    idsalt_FeOH3=addone(idsalt_end)
-    idsalt_FeOH4=addone(idsalt_end)
-    idsalt_FeSO4=addone(idsalt_end)
-    idsalt_CaOH=addone(idsalt_end)
-    idsalt_CaCO3=addone(idsalt_end)
-    idsalt_CaHCO3=addone(idsalt_end)
-    idsalt_CaSO4 =addone(idsalt_end)
-    idsalt_MgOH2 =addone(idsalt_end)
-    idsalt_MgCO3 =addone(idsalt_end)
-    idsalt_MgHCO3=addone(idsalt_end)
-    idsalt_MgSO4 =addone(idsalt_end)
-    idsalt_NaCO3 =addone(idsalt_end)
-    idsalt_NaSO4 =addone(idsalt_end)
-    idsalt_KSO4  =addone(idsalt_end)
+    idsalt_Al     = addone(idsalt_end)
+    idsalt_Fe     = addone(idsalt_end)
+    idsalt_Hp     = addone(idsalt_end)
+    idsalt_Ca     = addone(idsalt_end)
+    idsalt_Mg     = addone(idsalt_end)
+    idsalt_Na     = addone(idsalt_end)
+    idsalt_K      = addone(idsalt_end)
+    idsalt_OH     = addone(idsalt_end)
+    idsalt_SO4    = addone(idsalt_end)
+    idsalt_Cl     = addone(idsalt_end)
+    idsalt_CO3    = addone(idsalt_end)
+    idsalt_HCO3   = addone(idsalt_end)
+    idsalt_mend   = idsalt_end
+    idsalt_AlOH   = addone(idsalt_end)
+    idsalt_AlOH2  = addone(idsalt_end)
+    idsalt_AlOH3  = addone(idsalt_end)
+    idsalt_AlOH4  = addone(idsalt_end)
+    idsalt_AlSO4  = addone(idsalt_end)
+    idsalt_FeOH   = addone(idsalt_end)
+    idsalt_FeOH2  = addone(idsalt_end)
+    idsalt_FeOH3  = addone(idsalt_end)
+    idsalt_FeOH4  = addone(idsalt_end)
+    idsalt_FeSO4  = addone(idsalt_end)
+    idsalt_CaOH   = addone(idsalt_end)
+    idsalt_CaCO3  = addone(idsalt_end)
+    idsalt_CaHCO3 = addone(idsalt_end)
+    idsalt_CaSO4  = addone(idsalt_end)
+    idsalt_MgOH2  = addone(idsalt_end)
+    idsalt_MgCO3  = addone(idsalt_end)
+    idsalt_MgHCO3 = addone(idsalt_end)
+    idsalt_MgSO4  = addone(idsalt_end)
+    idsalt_NaCO3  = addone(idsalt_end)
+    idsalt_NaSO4  = addone(idsalt_end)
+    idsalt_KSO4   = addone(idsalt_end)
 
-    idsalt_H0PO4 =addone(idsalt_end)
-    idsalt_H3PO4 =addone(idsalt_end)
-    idsalt_FeHPO4=addone(idsalt_end)
-    idsalt_FeH2PO4=addone(idsalt_end)
-    idsalt_CaPO4 =addone(idsalt_end)
-    idsalt_CaHPO4=addone(idsalt_end)
-    idsalt_CaH4P2O8=addone(idsalt_end)
-    idsalt_MgHPO4=addone(idsalt_end)
-    idsalt_end=idsalt_MgHPO4
-    idsaltb_beg=idsalt_end+1
-    idsaltb_end=idsaltb_beg
+    idsalt_H0PO4    = addone(idsalt_end)
+    idsalt_H3PO4    = addone(idsalt_end)
+    idsalt_FeHPO4   = addone(idsalt_end)
+    idsalt_FeH2PO4  = addone(idsalt_end)
+    idsalt_CaPO4    = addone(idsalt_end)
+    idsalt_CaHPO4   = addone(idsalt_end)
+    idsalt_CaH4P2O8 = addone(idsalt_end)
+    idsalt_MgHPO4   = addone(idsalt_end)
+
+    idsalt_end  = idsalt_MgHPO4
+    idsaltb_beg = idsalt_end+1
+    idsaltb_end = idsaltb_beg
     idsalt_psoil_beg=idsalt_H0PO4;idsalt_psoil_end=idsalt_MgHPO4
 
     idsalt_nuts=idsalt_MgHPO4-idsalt_H0PO4
 
-    idsalt_H0PO4B=addone(idsaltb_end)   ! PO4
-    idsalt_H3PO4B=addone(idsaltb_end)  ! H3PO4
-    idsalt_FeHPO4B=addone(idsaltb_end)  ! FeHPO4
-    idsalt_FeH2PO4B=addone(idsaltb_end) ! FeH2PO4
-    idsalt_CaPO4B=addone(idsaltb_end)   ! CaPO4
-    idsalt_CaHPO4B=addone(idsaltb_end)  ! CaHPO4
-    idsalt_CaH4P2O8B=addone(idsaltb_end) ! CaH4P2O8
-    idsalt_MgHPO4B =addone(idsaltb_end)! MgHPO4
+    idsalt_H0PO4B    = addone(idsaltb_end)   ! PO4
+    idsalt_H3PO4B    = addone(idsaltb_end)  ! H3PO4
+    idsalt_FeHPO4B   = addone(idsaltb_end)  ! FeHPO4
+    idsalt_FeH2PO4B  = addone(idsaltb_end) ! FeH2PO4
+    idsalt_CaPO4B    = addone(idsaltb_end)   ! CaPO4
+    idsalt_CaHPO4B   = addone(idsaltb_end)  ! CaHPO4
+    idsalt_CaH4P2O8B = addone(idsaltb_end) ! CaH4P2O8
+    idsalt_MgHPO4B   = addone(idsaltb_end)! MgHPO4
     idsalt_pband_beg=idsalt_H0PO4B;idsalt_pband_end=idsalt_MgHPO4B
 
     idsaltb_end=idsalt_MgHPO4B

@@ -173,7 +173,20 @@ implicit none
        long_name='Roughness height', units='m', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
   endif
-
+  
+  if(flag=='read')then
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
+       long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
+       data=datpr1, missing_value=spval, fill_value=spval)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+  else     
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
+       long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
+       data=datpr1, missing_value=spval, fill_value=spval)
+  endif
 
   if(flag=='read')then
     dat1pr=>datic_1d
@@ -4768,16 +4781,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='VLWatheldCapSurf_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='VLWatHeldCapSurf_col', dim1name='column',&
        long_name='soil surface water retention capacity', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatheldCapSurf_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLWatHeldCapSurf_col,datrc_1d) 
   else
-    !print*,'VLWatheldCapSurf_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatheldCapSurf_col,datrc_1d)   
+    !print*,'VLWatHeldCapSurf_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLWatHeldCapSurf_col,datrc_1d)   
     datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='VLWatheldCapSurf_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='VLWatHeldCapSurf_col', dim1name='column',&
        long_name='soil surface water retention capacity', units='m3 d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5466,16 +5479,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ROWN', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNH4_col', dim1name='column',&
        long_name='row spacing of NH4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNH4_col,datrc_1d) 
   else
-    !print*,'ROWN'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWN,datrc_1d)   
+    !print*,'ROWSpaceNH4_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNH4_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ROWN', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNH4_col', dim1name='column',&
        long_name='row spacing of NH4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5483,16 +5496,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ROWO', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNO3_col', dim1name='column',&
        long_name='row spacing of NO3 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNO3_col,datrc_1d) 
   else
-    !print*,'ROWO'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWO,datrc_1d)   
+    !print*,'ROWSpaceNO3_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpaceNO3_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ROWO', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpaceNO3_col', dim1name='column',&
        long_name='row spacing of NO3 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5500,16 +5513,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ROWP', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpacePO4_col', dim1name='column',&
        long_name='row spacing of PO4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpacePO4_col,datrc_1d) 
   else
-    !print*,'ROWP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWP,datrc_1d)   
+    !print*,'ROWSpacePO4_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ROWSpacePO4_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ROWP', dim1name='column',&
+    call restartvar(ncid, flag, varname='ROWSpacePO4_col', dim1name='column',&
        long_name='row spacing of PO4 fertilizer band', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -6639,6 +6652,24 @@ implicit none
   endif  
 
   if(flag=='read')then
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ)    
+    call restartvar(ncid, flag, varname='trcg_root_vr', dim1name='column',dim2name='gastrcs',&
+       dim3name='levsoi',long_name='layer mass of gases in roots', units='g d-2', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
+       fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcg_root_vr,datrc_3d)     
+  else
+    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,trcg_root_vr,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ)        
+    call restartvar(ncid, flag, varname='trcg_root_vr', dim1name='column',dim2name='gastrcs',&
+       dim3name='levsoi',long_name='layer mass of gases in roots', units='g d-2', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
+       fill_value=spval)   
+  endif  
+
+
+
+  if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)        
     call restartvar(ncid, flag, varname='trcs_solml_vr', dim1name='column',dim2name='soltrcs',&
        dim3name='levsoi1',long_name='solute mass in micropore', units='g d-2', &
@@ -6675,16 +6706,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RGasFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
+    call restartvar(ncid, flag, varname='RGasTranspFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
        dim3name='levsoi1',long_name='net gaseous flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RGasFlxPrev_vr,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RGasTranspFlxPrev_vr,datrc_3d)     
   else
     !print*,'RO2GasXchangePrev_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RGasFlxPrev_vr,datrc_3d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RGasTranspFlxPrev_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NGasTracers,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RGasFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
+    call restartvar(ncid, flag, varname='RGasTranspFlxPrev_vr', dim1name='column',dim2name='gastrcs',&
        dim3name='levsoi1',long_name='net gaseous flux', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)  
@@ -7225,10 +7256,10 @@ implicit none
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &
          interpinic_flag='skip', data=datpr3, missing_value=spval, &
          fill_value=spval)  
-        call cpcol(flag,NHW,NHE,NVN,NVS,trc_Saltml_snvr,datrc_3d)      
+        call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_ml_snvr,datrc_3d)      
     else
       !print*,'trcs_solsml'
-      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trc_Saltml_snvr,datrc_3d)        
+      if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_ml_snvr,datrc_3d)        
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JS)    
       call restartvar(ncid, flag, varname='trcs_solsml', dim1name='column',dim2name='satracers',&
          dim3name='levsno',long_name='snowpack salt dissolved tracers', units='mol d-2', &
@@ -8094,30 +8125,30 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitro,1:JZ+1)    
-    call restartvar(ncid, flag, varname='FertN_soil_vr', dim1name='column',dim2name='fertN',&
+    call restartvar(ncid, flag, varname='FertN_mole_soil_vr', dim1name='column',dim2name='fertN',&
       dim3name='levsoi1',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_soil_vr,datrc_3d)
   else
-    !print*,'FertN_soil_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_soil_vr,datrc_3d)  
+    !print*,'FertN_mole_soil_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_soil_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitro,1:JZ+1)    
-    call restartvar(ncid, flag, varname='FertN_soil_vr', dim1name='column',dim2name='fertN', &
+    call restartvar(ncid, flag, varname='FertN_mole_soil_vr', dim1name='column',dim2name='fertN', &
       dim3name='levsoi1',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)      
   endif  
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitrob,1:JZ)    
-    call restartvar(ncid, flag, varname='FertN_Band_vr', dim1name='column',dim2name='fertNb',&
+    call restartvar(ncid, flag, varname='FertN_mole_Band_vr', dim1name='column',dim2name='fertNb',&
       dim3name='levsoi',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)   
-    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_Band_vr,datrc_3d)
   else
-    !print*,'FertN_Band_vr'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_Band_vr,datrc_3d)  
+    !print*,'FertN_mole_Band_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertN_mole_Band_vr,datrc_3d)  
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NFertNitrob,1:JZ)    
-    call restartvar(ncid, flag, varname='FertN_Band_vr', dim1name='column',dim2name='fertNb',&
+    call restartvar(ncid, flag, varname='FertN_mole_Band_vr', dim1name='column',dim2name='fertNb',&
       dim3name='levsoi',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)   
   endif  

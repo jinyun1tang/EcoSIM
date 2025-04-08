@@ -7,21 +7,22 @@ case_name='dryland_maize'
 prefix='../../inputs/dryland_maize/'
 do_regression_test=.false.
 pft_file_in='../../../input_data/ecosim_pftpar_20240723.nc'
-grid_file_in='../../../examples/inputs/dryland_maize/dryland_grid_20230221.nc'
+grid_file_in='../../../examples/inputs/dryland_maize/dryland_grid_20230221_norun.nc'
 pft_mgmt_in='../../../examples/inputs/dryland_maize/dryland_pft_20230509.nc'
 soil_mgmt_in='../../../examples/inputs/dryland_maize/dryland_soilmgmt_20230210.nc'
 clm_hour_file_in='../../../examples/inputs/dryland_maize/dryland_clm_20230203.nc'
 clm_factor_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
-atm_co2_fix=370.
-lverbose=.false.
-grid_mode=1
-plant_model=.true.
-disp_planttrait=.true.
+atm_co2_fix     = 370.
+lverbose        = .false.
+grid_mode       = 1
+plant_model     = .false.
+microbial_model = .false.
+disp_planttrait = .true.
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '20010101000000'
-continue_run=.false.
+continue_run=.true.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2001,2006,1,2001,2002,0,2001,2006,0
 
@@ -39,7 +40,7 @@ hist_nhtfrq=-24
 
 !namelist for timer
 &ecosim_time
-rest_opt='nyears'  !'ndays','nmonths','nyears'
+rest_opt='nmonths'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
 stop_n=100            !this shall overwrite what is set in forc_periods
