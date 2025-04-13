@@ -32,9 +32,8 @@ implicit none
   public :: SaltPercolThruSnow
   public :: XGridSnowTracerRunoff
   public :: DiagSnowChemMass
-  public :: TracerFall2Snowpack
   public :: SoluteTransportThruSnow
-  public :: SaltFall2Snowpack
+
   contains
 !------------------------------------------------------------------------------------------
 
@@ -351,46 +350,6 @@ implicit none
   call PrintInfo('end '//subname)
   end subroutine XGridSnowTracerRunoff
 
-!------------------------------------------------------------------------------------------
-
-  subroutine TracerFall2Snowpack(I,J,NY,NX)
-  implicit none
-
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NY,NX
-  integer :: idg
-
-  DO idg=idg_beg,idg_NH3
-    trcg_AquaAdv_flx_snvr(idg,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
-  ENDDO
-
-  trcn_AquaAdv_flx_snvr(ids_NH4,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
-  trcn_AquaAdv_flx_snvr(ids_NO3,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
-  trcn_AquaAdv_flx_snvr(ids_H1PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
-  trcn_AquaAdv_flx_snvr(ids_H2PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
-
-  end subroutine TracerFall2Snowpack
-
-!------------------------------------------------------------------------------------------
-  subroutine SaltFall2Snowpack(I,NY,NX)
-  implicit none
-  integer, intent(in) :: I,NY,NX
-
-  integer :: idsalt
-
-  if(salt_model)then
-    DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX) = Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-        +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)    
-    ENDDO
-  endif
-
-  end subroutine SaltFall2Snowpack
 !------------------------------------------------------------------------------------------
 
   subroutine SoluteTransportThruSnow(I,J,L,NY,NX)

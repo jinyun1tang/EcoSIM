@@ -835,7 +835,7 @@ implicit none
             HeatXGridBySurfRunoff_2DH(N,iBehind,N5,N4) = HeatXGridBySurfRunoff_2DH(N,iBehind,N5,N4)+HeatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)
             QflxSurfRunoffM_2DH(M,N,iBehind,N5,N4)     = WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)
             IFLBM_2DH(M,N,iBehind,N5,N4)               = 0
-            IFLB_2DH(N,NN,N5,N4)                       = IFLBM_2DH(M,N,NN,N5,N4)
+            IFLB_2DH(N,iBehind,N5,N4)                  = IFLBM_2DH(M,N,iBehind,N5,N4)
           ELSE
             WatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4)  = 0.0_r8
             HeatFlx2LitRByRunoff_2DH(N,iBehind,N5,N4) = 0.0_r8
@@ -861,7 +861,7 @@ implicit none
               HeatXGridBySurfRunoff_2DH(N,iFront,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,iFront,N5B,N4B)+HeatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)
               QflxSurfRunoffM_2DH(M,N,iFront,N5B,N4B)     = WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)
               IFLBM_2DH(M,N,iFront,N5B,N4B)               = 1
-              IFLB_2DH(N,NN,N5B,N4B)                      = IFLBM_2DH(M,N,NN,N5B,N4B)
+              IFLB_2DH(N,iFront,N5B,N4B)                  = IFLBM_2DH(M,N,iFront,N5B,N4B)
             ELSE
               WatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B)  = 0.0_r8
               HeatFlx2LitRByRunoff_2DH(N,iFront,N5B,N4B) = 0.0_r8

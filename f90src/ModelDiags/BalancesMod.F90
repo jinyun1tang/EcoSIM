@@ -273,7 +273,7 @@ contains
         endif
         
         tracer_snowmass_err=trcg_snowMass_beg_col(idg,NY,NX)-trcg_snowMass_col(idg,NY,NX) + &
-          trcg_AquaAdv_flx_snvr(idg,1,NY,NX)-trcg_snowMassloss_col(idg,NY,NX)
+          trcg_AquaADV_Snow2Soil_flx(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)-trcg_snowMassloss_col(idg,NY,NX)
         if(AMAX1(abs(tracer_mass_err),abs(tracer_rootmass_err))>1.e-5_r8)then
           write(111,*)('-',ii=1,50)
           write(111,*)I*1000+J,NY,NX,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX)

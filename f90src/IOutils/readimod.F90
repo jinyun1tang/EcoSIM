@@ -296,7 +296,7 @@ module readiMod
       RechargNorthSurf(NY,NX) = RCHQNG
       RechargEastSurf(NY,NX)  = RCHQEG
       RechargSouthSurf(NY,NX) = RCHQSG
-      RechargWestSurf(NY,NX)  = RCHQWG
+      RechargWestSurf(NY,NX)  = RCHQWG 
 
       RechargNorthSubSurf(NY,NX) = RCHGNUG
       RechargEastSubSurf(NY,NX)  = RCHGEUG

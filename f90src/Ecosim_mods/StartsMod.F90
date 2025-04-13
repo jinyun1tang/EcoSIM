@@ -136,6 +136,7 @@ module StartsMod
       AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
       AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -645,7 +646,7 @@ module StartsMod
 
       IF(.not.isclose(SLOPE(iWestEastDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
         FSLOPE_2DH(iWestEastDirection,NY,NX)   = ABS(SLOPE(iWestEastDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
-        FSLOPE_2DH(iNorthSouthDirection,NY,NX) = ABS(SLOPE(iNorthSouthDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))
+        FSLOPE_2DH(iNorthSouthDirection,NY,NX) = 1._r8-FSLOPE_2DH(iWestEastDirection,NY,NX)
       ELSE
         FSLOPE_2DH(iWestEastDirection,NY,NX)   = 0.5_r8
         FSLOPE_2DH(iNorthSouthDirection,NY,NX) = 0.5_r8

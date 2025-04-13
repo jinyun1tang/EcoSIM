@@ -172,7 +172,7 @@ implicit none
     DOM_SurfRunoff_flx(idom_beg:idom_end,K,NY,NX)=0.0_r8
   ENDDO D9960
 
-  trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,NY,NX)     = 0.0_r8
+  trcn_SurfRunoff_flx_col(ids_nut_beg:ids_nuts_end,NY,NX)     = 0.0_r8
   trcg_SurfRunoff_flx(idg_beg:idg_NH3,NY,NX)              = 0.0_r8
   if(salt_model) trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,NY,NX)=0.0_r8
   end subroutine ZeroRunoffArray
@@ -258,7 +258,7 @@ implicit none
 
     !nutrient tracres
     DO idn=ids_nut_beg,ids_nuts_end
-      trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)+trcn_FloXSurRunoff_2D(idn,N,NN,N2,N1)
+      trcn_SurfRunoff_flx_col(idn,N2,N1)=trcn_SurfRunoff_flx_col(idn,N2,N1)+trcn_FloXSurRunoff_2D(idn,N,NN,N2,N1)
     ENDDO
 
     IF(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN    
@@ -266,7 +266,7 @@ implicit none
         trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5,N4)
       ENDDO
       DO idn=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5,N4)
+        trcn_SurfRunoff_flx_col(idn,N2,N1)=trcn_SurfRunoff_flx_col(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5,N4)
       ENDDO
     ENDIF 
 
@@ -276,7 +276,7 @@ implicit none
         trcg_SurfRunoff_flx(idg,N2,N1)=trcg_SurfRunoff_flx(idg,N2,N1)-trcg_FloXSurRunoff_2D(idg,N,NN,N5B,N4B)
       ENDDO
       DO idn=ids_nut_beg,ids_nuts_end
-        trcn_SurfRunoff_flx(idn,N2,N1)=trcn_SurfRunoff_flx(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5B,N4B)
+        trcn_SurfRunoff_flx_col(idn,N2,N1)=trcn_SurfRunoff_flx_col(idn,N2,N1)-trcn_FloXSurRunoff_2D(idn,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   ENDDO D1202
