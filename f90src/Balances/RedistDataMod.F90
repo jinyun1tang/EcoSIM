@@ -17,7 +17,6 @@ implicit none
   real(r8),allocatable ::  trcs_TransptMacP_vr(:,:,:,:)             !net tracer flux into the grid cell through macropore flow (<0 loss) [g d-2 h-1] 
   real(r8),allocatable ::  trcSalt_Flo2MicP_vr(:,:,:,:)             !net salt flux into the grid cell through micropore flow (<0 loss) [mol d-2 h-1]
   real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)             !net salt flux into the grid cell through macropore flow (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  trcn_SurfRunoff_flx(:,:,:)               !nutrient tracer loss through surface runoff [g d-2 h-1]
   real(r8),allocatable ::  trcSalt_SurfRunoff_flx(:,:,:)            !salt tracer loss through surface runoff [mol d-2 h-1]
 
   real(r8),allocatable ::  TSandEros_col(:,:)                       !column sand loss through erosion (<0 loss) [g d-2 h-1]
@@ -73,7 +72,6 @@ implicit none
 
   allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MicP_vr=0._r8
   allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MacP_vr=0._r8
-  allocate(trcn_SurfRunoff_flx(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flx=0._r8  
   allocate(trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,JY,JX));           trcSalt_SurfRunoff_flx=0._r8  
   allocate(TSandEros_col(JY,JX));      TSandEros_col=0._r8
   allocate(TSiltEros_col(JY,JX));      TSiltEros_col=0._r8
@@ -169,7 +167,6 @@ implicit none
   call destroy(trcp_TER_col)
   call destroy(Gas_AdvDif_Flx_vr)
   call destroy(trcg_SurfRunoff_flx)
-  call destroy(trcn_SurfRunoff_flx)  
   call destroy(trcSalt_SurfRunoff_flx)
 
   end subroutine DestructTflxType

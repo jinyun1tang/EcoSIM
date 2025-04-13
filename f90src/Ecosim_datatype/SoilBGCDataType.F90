@@ -18,7 +18,7 @@ implicit none
   real(r8),target,allocatable :: CPO4B_vr(:,:,:)                        !PO4 concentration band micropore	[g m-3]
   real(r8),target,allocatable :: CPO4S_vr(:,:,:)                        !PO4 concentration non-band micropore	[g m-3]
   real(r8),target,allocatable :: DOM_transpFlx_2DH(:,:,:,:)           !subsurface lateral DOM fluxes, [g d-2 h-1]
-  real(r8),target,allocatable :: trcs_transpFlx_2DH(:,:,:)            !subsurface lateral tracer fluxes, [g d-2 h-1]
+  real(r8),target,allocatable :: trcs_SubsurTransp_flx_2DH(:,:,:)            !subsurface lateral tracer fluxes, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_soHml_vr(:,:,:,:)               !solute mass in macropore [g d-2]
   real(r8),target,allocatable :: trcs_solml_vr(:,:,:,:)               !solute mass in micropore [g d-2]
   real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                !solute concentration in micropre [g m-3]
@@ -26,7 +26,7 @@ implicit none
   real(r8),target,allocatable :: tRHydlySOM_vr(:,:,:,:)              !solid SOM hydrolysis rate [g/m2/hr]
   real(r8),target,allocatable :: tRHydlyBioReSOM_vr(:,:,:,:)         !microbial residual hydrolysis rate [g/m2/hr]
   real(r8),target,allocatable :: tRHydlySoprtOM_vr(:,:,:,:)          !sorbed OM hydrolysis rate [g/m2/hr]
-
+  real(r8),target,allocatable ::  trcn_SurfRunoff_flx_col(:,:,:)    !nutrient tracer loss through surface runoff [g d-2 h-1]
   real(r8),target,allocatable ::  ZNFNI_vr(:,:,:)                       !current nitrification inhibition activity
   real(r8),target,allocatable ::  ZNFN0_vr(:,:,:)                       !initial nitrification inhibition activity
   real(r8),target,allocatable ::  ZNHUI_vr(:,:,:)                       !current inhibition activity
@@ -148,7 +148,7 @@ implicit none
   allocate(CNO3_vr(JZ,JY,JX));     CNO3_vr=0._r8
   allocate(CPO4_vr(JZ,JY,JX));     CPO4_vr=0._r8
   allocate(DOM_transpFlx_2DH(idom_beg:idom_end,jcplx,JY,JX)); DOM_transpFlx_2DH=0._r8
-  allocate(trcs_transpFlx_2DH(ids_beg:ids_end,JY,JX)); trcs_transpFlx_2DH=0._r8
+  allocate(trcs_SubsurTransp_flx_2DH(ids_beg:ids_end,JY,JX)); trcs_SubsurTransp_flx_2DH=0._r8
   allocate(trcg_soilMass_col(idg_beg:idg_end,JY,JX)); trcg_soilMass_col=0._r8
   allocate(trcg_soilMass_beg_col(idg_beg:idg_end,JY,JX)); trcg_soilMass_beg_col=0._r8
   allocate(Gas_Prod_TP_cumRes_col(idg_beg:idg_NH3,JY,JX)); Gas_Prod_TP_cumRes_col=0._r8
@@ -166,7 +166,7 @@ implicit none
   allocate(tRHydlySOM_vr(1:NumPlantChemElms,0:JZ,JY,JX)); tRHydlySOM_vr=0._r8
   allocate(tRHydlyBioReSOM_vr(1:NumPlantChemElms,0:JZ,JY,JX));tRHydlyBioReSOM_vr=0._r8
   allocate(tRHydlySoprtOM_vr(1:NumPlantChemElms,0:JZ,JY,JX));      tRHydlySoprtOM_vr=0._r8
-
+  allocate(trcn_SurfRunoff_flx_col(ids_nut_beg:ids_nuts_end,JY,JX));     trcn_SurfRunoff_flx_col=0._r8  
   allocate(ZNFNI_vr(0:JZ,JY,JX));  ZNFNI_vr=0._r8
   allocate(ZNFN0_vr(0:JZ,JY,JX));  ZNFN0_vr=0._r8
   allocate(ZNHUI_vr(0:JZ,JY,JX));  ZNHUI_vr  =0._r8
@@ -273,7 +273,7 @@ implicit none
   call destroy(DOM_draing_col)
   call destroy(trcs_draing_col)
   call destroy(DOM_transpFlx_2DH)
-  call destroy(trcs_transpFlx_2DH)
+  call destroy(trcs_SubsurTransp_flx_2DH)
   call destroy(O2_Gas_Frac_vr)
   call destroy(CO2_Gas_Frac_vr)
   call destroy(CH4_Gas_Frac_vr)  
@@ -307,7 +307,7 @@ implicit none
   call destroy(RO2DecompUptk_vr)
   call destroy(trcs_solml_vr)
   call destroy(trcs_soHml_vr)
-
+  call destroy(trcn_SurfRunoff_flx_col)  
   call destroy(ZNFNI_vr)
   call destroy(ZNFN0_vr)
   call destroy(ZNHUI_vr)

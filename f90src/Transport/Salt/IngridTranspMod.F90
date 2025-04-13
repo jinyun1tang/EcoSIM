@@ -20,6 +20,7 @@ module IngridTranspMod
 
   real(r8), PARAMETER :: XFRS=0.05_r8
   public :: GetSaltTranspFlxM
+  public :: SaltFall2Snowpack
   contains
 
 !------------------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ module IngridTranspMod
   implicit none
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
 
-  integer :: NY,NX,N1,N2
+  integer :: NY,NX
   real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   
@@ -84,10 +85,8 @@ module IngridTranspMod
       ENDIF
       !      
       call MacMicPoreSaltDifusExM(M,NY,NX)
-            !
-      N1=NX;N2=NY
-
-      call SaltFlowThruLitrRofM(M,N1,N2)
+      !
+      call SaltFlowThruLitrRofM(M,NX,NY)
     ENDDO
   ENDDO
   end subroutine SurfaceSaltFluxM
@@ -554,7 +553,6 @@ module IngridTranspMod
 
         DO idsalt=idsalt_beg,idsalt_end
           trcSalt_AquaAdv_flxM_snvr(idsalt,L2,NY,NX) = trcSalt_ml2_snvr(idsalt,L,NY,NX)*VFLWW
-          trcSalt_AquaAdv_flx_snvr(idsalt,L2,NY,NX)  = trcSalt_AquaAdv_flx_snvr(idsalt,L2,NY,NX)+trcSalt_AquaAdv_flxM_snvr(idsalt,L2,NY,NX)
         ENDDO
 
         !bottom snow layer or L2 has insignificant snow layer
@@ -1576,7 +1574,7 @@ module IngridTranspMod
             ENDIF
           ENDIF
 
-          DO LL=N6,NL(NY,NX)
+          DO LL=N6,NL(N5,N4)
             IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
               N6=LL
               exit
@@ -1609,4 +1607,19 @@ module IngridTranspMod
   call PrintInfo('end '//subname)
   end subroutine SaltTranspXInterGridsM
 
+!------------------------------------------------------------------------------------------
+  subroutine SaltFall2Snowpack(I,NY,NX)
+  implicit none
+  integer, intent(in) :: I,NY,NX
+
+  integer :: idsalt
+
+  if(salt_model)then
+    DO idsalt=idsalt_beg,idsalt_end
+      trcSalt_AquaAdv_flxM_snvr(idsalt,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+        +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*dts_HeatWatTP
+    ENDDO
+  endif
+
+  end subroutine SaltFall2Snowpack
 end module IngridTranspMod

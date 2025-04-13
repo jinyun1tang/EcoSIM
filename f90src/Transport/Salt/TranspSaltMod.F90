@@ -3,7 +3,6 @@ module TranspSaltMod
 ! Description:
 !
   use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use SnowTransportMod, only: SaltFall2Snowpack
   use minimathmod  
   use DebugToolMod
   use SOMDataType
@@ -142,15 +141,10 @@ module TranspSaltMod
   integer, intent(in) :: NY,NX
   integer :: idsalt
 
-!     begin_execution
-  DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX) = 0.0_r8
-    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX) = 0.0_r8
-  ENDDO
+  trcSalt_Precip2LitrM(:,NY,NX) = 0._r8
 
-  DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=0.0_r8
-  ENDDO
+  trcSalt_Precip2MicpM(:,NY,NX) = 0._r8
+
   end subroutine ZeroAtmosSoluteFlux
 
 !------------------------------------------------------------------------------------------
@@ -168,29 +162,25 @@ module TranspSaltMod
 !     begin_execution
   call PrintInfo('beg '//subname)
   !
-
-  trcSalt_TransptMicP_3D(idsalt_beg:idsalt_end,3,0,NY,NX)         = 0.0_r8
-  trcSalt_TransptMicP_3D(idsalt_beg:idsalt_end,3,NU(NY,NX),NY,NX) = 0.0_r8
-  trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,1,NY,NX)         = 0.0_r8
-
   DO idsalt=idsalt_beg,idsalt_end    
-    trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)=Rain2LitRSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-      +Irrig2LitRSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
+    trcSalt_Precip2LitrM(idsalt,NY,NX)   =(Rain2LitRSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2LitRSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*dts_HeatWatTP  
   ENDDO
 
+
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
+    trcSalt_Precip2MicpM(idsalt,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*dts_HeatWatTP
   ENDDO
   
   DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B  
     !soil 
-    trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcSalt_Precip2MicpM(idsalt,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*dts_HeatWatTP
     !band   
-    trcSalt_TransptMicP_3D(ids,3,NU(NY,NX),NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)    
+    trcSalt_Precip2MicpM(ids,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*dts_HeatWatTP    
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine AtmosSoluteFluxToTopsoil
@@ -210,15 +200,6 @@ module TranspSaltMod
 !     begin_execution
 !
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
-!
-  DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_AquaAdv_flxM_snvr(idsalt,1,NY,NX) = trcSalt_AquaAdv_flx_snvr(idsalt,1,NY,NX)*dts_HeatWatTP
-    trcSalt_Precip2LitrM(idsalt,NY,NX)        = trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)*dts_HeatWatTP
-  ENDDO
-
-  DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_Precip2MicpM(idsalt,NY,NX)=trcSalt_TransptMicP_3D(idsalt,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
-  ENDDO
 
   D10: DO L=NU(NY,NX),NL(NY,NX)
     DO idsalt=idsalt_beg,idsaltb_end
@@ -301,8 +282,9 @@ module TranspSaltMod
 
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
-
       !
+      call ZeroAtmosSoluteFlux(NY,NX)      
+
       IF(SnoFalPrec_col(NY,NX).GT.0.0.OR.(RainFalPrec_col(NY,NX).GT.0.0 &
         .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
 
@@ -320,9 +302,6 @@ module TranspSaltMod
         !
         !     NO SOLUTE FLUXES FROM ATMOSPHERE
         !
-      ELSE
-        !no precipitation
-        call ZeroAtmosSoluteFlux(NY,NX)
       ENDIF
       !
       !     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP

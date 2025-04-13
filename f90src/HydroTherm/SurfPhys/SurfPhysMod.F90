@@ -1309,8 +1309,8 @@ contains
     XGridSurfRunoff_2DH(N,NN,M5,M4)       = XGridSurfRunoff_2DH(N,NN,M5,M4)+WatFlx2LitRByRunoff_2DH(N,NN,M5,M4)
     HeatXGridBySurfRunoff_2DH(N,NN,M5,M4) = HeatXGridBySurfRunoff_2DH(N,NN,M5,M4)+HeatFlx2LitRByRunoff_2DH(N,NN,M5,M4)
 
-    !when NN=iBehind, (M5,M4)=(N2,N1), so plus 
-    !when NN=iFront, (M5,M4) differs from (N2,N1), so minus
+    !when NN=iBehind, (M5,M4)=(N2,N1), so plus (>0._r8)
+    !when NN=iFront, (M5,M4) differs from (N2,N1), so minus (<0)
   ELSE
     WatFlx2LitRByRunoff_2DH(N,NN,M5,M4)  = 0.0_r8
     HeatFlx2LitRByRunoff_2DH(N,NN,M5,M4) = 0.0_r8
@@ -1743,6 +1743,7 @@ contains
           endif
 
           ! grid (N2,N1) is behind grid (N5,N4), NN=iBehind for internal grid
+          !this includes outgoing boundary fluxes
           IF(IFLBM_2DH(M,N,NN,N5,N4).EQ.0)THEN
             !there is outflow in east or south
             cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)

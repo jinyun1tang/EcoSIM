@@ -470,7 +470,7 @@ module minimathmod
   if(isclose(flux,0._r8))return
   if(x1<0._r8)then
     p1=safe_adb(-x0,flux)
-    pscal=AMIN1(1._r8,pscal,p1)
+    pscal=AMIN1(0.999_r8,pscal,p1) 
   endif
 
   end subroutine get_flux_scalar

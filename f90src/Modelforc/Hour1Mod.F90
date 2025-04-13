@@ -399,7 +399,6 @@ module Hour1Mod
 !
 !     GAS AND SOLUTE FLUXES
 !
-      trcs_TransptMicP_3D(ids_beg:ids_end,1:3,:,NY,NX)=0._r8
       DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,:,NY,NX)=0._r8
 
       DO  L=0,NL(NY,NX)+1
@@ -723,7 +722,7 @@ module Hour1Mod
 
   RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
   DOM_transpFlx_2DH(:,:,NY,NX)    = 0._r8
-  trcs_transpFlx_2DH(:,NY,NX)     = 0._r8
+  trcs_SubsurTransp_flx_2DH(:,NY,NX)     = 0._r8
   trcg_snowMassloss_col(:,NY,NX)  = 0._r8
   trcn_SnowDrift_flx_col(:,NY,NX) = 0._r8
   trcg_SnowDrift_flx_col(:,NY,NX) = 0._r8
@@ -783,6 +782,7 @@ module Hour1Mod
   RootCO2Ar2Soil_col(NY,NX)                  = 0._r8
   RootCO2Ar2Root_col(NY,NX)                  = 0._r8
   GasHydroLossFlx_col(idg_beg:idg_end,NY,NX) = 0._r8
+  trcn_SurfRunoff_flx_col(:,NY,NX)               = 0._r8
   SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
   GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
@@ -1632,6 +1632,7 @@ module Hour1Mod
   RootN2Fix_col(NY,NX)        = 0._r8
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
+  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)=0._r8
   trcs_plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
   DO L=NUI(NY,NX),NLI(NY,NX)
     RootN2Fix_vr(L,NY,NX)                         = 0._r8

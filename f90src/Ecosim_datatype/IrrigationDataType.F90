@@ -84,7 +84,8 @@ module IrrigationDataType
   real(r8),target,allocatable ::  FWatIrrigate2MicP_vr(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatIrrigation_vr(:,:,:)          !convective heat due to underground irrigation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcs_Irrig_flx_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable :: trcsalt_irrig_mole_conc_col(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
+  real(r8),target,allocatable ::  trcsalt_irrig_mole_conc_col(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
+  real(r8),target,allocatable ::  trcs_irrig_flx_col(:,:,:)         !tracer flux through irrigation [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -102,6 +103,7 @@ module IrrigationDataType
   implicit none
 
   allocate(PHQ(366,JY,JX));     PHQ=0._r8
+  allocate(trcs_irrig_flx_col(ids_beg:ids_end,JY,JX)); trcs_irrig_flx_col=0._r8
   allocate(NH4_irrig_mole_conc(366,JY,JX));    NH4_irrig_mole_conc=0._r8
   allocate(trcg_irrig_mole_conc_col(idg_beg:idg_NH3,JY,JX));   trcg_irrig_mole_conc_col=0._r8
   allocate(NO3_irrig_mole_conc(366,JY,JX));    NO3_irrig_mole_conc=0._r8
@@ -178,6 +180,7 @@ module IrrigationDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(trcs_irrig_flx_col)
   call destroy(trcn_irrig_vr)
   call destroy(trcs_Irrig_flx_vr)
   call destroy(PHQ)
