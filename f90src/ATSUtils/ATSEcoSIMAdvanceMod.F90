@@ -61,6 +61,7 @@ implicit none
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
+  real(r8) :: VLWat_test(JZ,JY,JX)  
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
@@ -117,12 +118,14 @@ implicit none
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
+      VLWat_test(L,NY,NX)          = a_WC_rev(L,NY)/(a_LDENS(L,NY)*AREA(3,NU(NY,NX),NY,NX))
       VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0
-      PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)
+      !Convert Matric Pressure from ATS [Pa] to EcoSIM [MPa]
+      PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)/1.0e6
       POROS_vr(L,NY,NX)            = a_PORO(L,NY)
       !AREA3(L,NY,NX)              = a_AREA3(L,NY)
       VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
@@ -150,7 +153,6 @@ implicit none
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
-
 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point

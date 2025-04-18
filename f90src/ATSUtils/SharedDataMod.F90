@@ -17,6 +17,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
+  real(r8), allocatable :: a_LDENS(:,:)   !ATS liquid density (mols)
   real(r8), allocatable :: a_CumDepz2LayBottom_vr(:,:)   !dpeth (from surfce to bottom)
   real(r8), allocatable :: a_Volume(:,:)   !volume
   real(r8), allocatable :: a_dz(:,:)      !distance between layers  
@@ -35,6 +36,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_ALT(:)       !Altitude
   real(r8), allocatable :: a_ATKA(:)
   real(r8), allocatable :: a_WC(:,:)      !Soil water content
+  real(r8), allocatable :: a_WC_rev(:,:)  !Soil water content testing
   real(r8), allocatable :: a_LSAT(:,:)    !liquid saturation
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
   real(r8), allocatable :: a_HCOND(:,:)   !hydraulic conductivity
@@ -151,11 +153,14 @@ Module SharedDataMod
   call destroy(a_csand)
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
+  call destroy(a_LDENS)
   call destroy(a_MATP)
   call destroy(a_AreaZ)
   call destroy(a_CumDepz2LayBottom_vr)
   call destroy(a_FC)
   call destroy(a_WP)
+  call destroy(a_WC)
+  call destroy(a_WC_rev)
   call destroy(a_FHOL)
   call destroy(a_ROCK)
   call destroy(a_CORGC)

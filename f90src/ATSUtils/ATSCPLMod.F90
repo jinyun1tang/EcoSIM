@@ -71,6 +71,7 @@ contains
   data_ptr = state%water_content%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_WC = data2D(:,:)*2.32e-7
+  a_WC_rev = data2D(:,:)
 
   data_ptr = props%volume%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -86,7 +87,11 @@ contains
 
   data_ptr = state%bulk_density%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_BKDSI = data2D(:,:)*0.0408
+  a_BKDSI = data2D(:,:)
+
+  data_ptr = state%liquid_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_LDENS = data2D(:,:)  
 
   data_ptr = state%matric_pressure%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -140,8 +145,7 @@ contains
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
 
-  a_MATP(:,:) = -6.9
-
+  !a_MATP(:,:) = -6.9
   !do i = 1, size_col
   !  a_MATP(i, 1) = 100.0
   !end do
