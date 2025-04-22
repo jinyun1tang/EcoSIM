@@ -77,10 +77,6 @@ implicit none
   do NY=1,NYS
     NU(NY,NX)               = a_NU(NY)
     NL(NY,NX)               = a_NL(NY)
-    !a_AREA3(0,NY)           = 1.0_r8
-    !AREA(3,0,NY,NX)         = a_AREA3(0,NY)
-    !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
-    !AREA(3,2,NY,NX)         = a_AREA3(0,NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean(NY,NX) = a_ATKA(NY)
@@ -118,8 +114,8 @@ implicit none
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
-      VLWat_test(L,NY,NX)          = a_WC_rev(L,NY)/(a_LDENS(L,NY)*AREA(3,NU(NY,NX),NY,NX))
-      VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)
+      VLWatMicP1_vr(L,NY,NX)       = a_WC_rev(L,NY)/a_LDENS(L,NY)
+      !VLWatMicP1_vr(L,NY,NX)      = a_WC(L,NY)
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
@@ -190,8 +186,6 @@ implicit none
   ENDDO
  
   write(*,*) "(ATSEcoSIMAdvance after surf bal) Q_w = ", Qinfl2MicPM(NY,NX), " m/hr"  
-  !Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
-  !Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
@@ -199,16 +193,10 @@ implicit none
     !to ATS units (flux / s)
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP*3600._r8)
-    !write(*,*) "After conversion ", surf_e_source(NY) , " MJ/s" 
-    !write(*,*) "Water conversion ", surf_w_source(NY) , " m/s"
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
 
   write(*,*) "(ATSEcoSIMAdvance post conv) Q_w ", surf_w_source(1), " snow_depth = " , surf_snow_depth(1), " m" 
-
-  !open(unit=10, file="fluxes.txt", status="unknown", position="append")
-  !write(10,*) "prec = ", RAINH(1,1), " m/s", " Q_e = ", surf_e_source(1), " MJ/s", " Q_w = ", surf_w_source(1), " m/s"
-  !close(10)
 
   end subroutine RunEcoSIMSurfaceBalance
 
