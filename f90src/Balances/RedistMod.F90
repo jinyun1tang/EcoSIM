@@ -8,6 +8,7 @@ module RedistMod
   use TracerPropMod,     only: MolecularWeight
   use BalancesMod,       only: SummarizeTracers
   use DebugToolMod
+  use LateralTranspMod
   use SoilBGCNLayMod  
   use ElmIDMod
   use EcosimConst
@@ -120,7 +121,7 @@ module RedistMod
 
       call CopyLocalSoilWaterStates(NY,NX)
 
-!      call XGridTranspt(I,J,NY,NX,LG)
+      call XGridTranspt(I,J,NY,NX,LG)
 
       call SnowMassUpdate(I,J,NY,NX)
 
@@ -169,9 +170,8 @@ module RedistMod
   call PrintInfo('beg '//subname)
 
   DO idg=idg_beg,idg_NH3
-    SurfGasEmisFlx_col(idg,NY,NX) = trcg_air2root_flx_col(idg,NY,NX) + trcg_ebu_flx_col(idg,NY,NX) &
-      + GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX) &
-      + TRootGasLossDisturb_col(idg,NY,NX)
+    SurfGasEmisFlx_col(idg,NY,NX) = SurfGasEmisFlx_col(idg,NY,NX)     &
+      + TRootGasLossDisturb_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)
 
     SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmisFlx_col(idg,NY,NX)
   ENDDO
@@ -808,8 +808,9 @@ module RedistMod
       TKS_vr(L,NY,NX)        = TairK_col(NY,NX)
       TCS_vr(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
-
+    !write(*,*)'here'
 !    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
+    
     DO L=NUM(NY,NX),NL(NY,NX)
       
       !micropore

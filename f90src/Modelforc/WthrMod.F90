@@ -351,13 +351,11 @@ module WthrMod
       !     RadLWClm=longwave radiation
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
-!
-      IF(RadLWClm(J,I).GT.0.0_r8)THEN
-        !     SkyLonwRad_col(NY,NX)=EMM*(stefboltz_const*TairK_col(NY,NX)**4)
-        !     SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
-        SkyLonwRad_col(NY,NX)=RadLWClm(J,I)
-      ELSE
+
         SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8 
+
+      IF(RadLWClm(J,I).GT.0.0_r8)THEN
+        SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
       ENDIF
 !      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK_col(NY,NX),TCA_col(NY,NX)
 !

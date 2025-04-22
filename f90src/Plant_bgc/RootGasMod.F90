@@ -51,27 +51,27 @@ module RootGasMod
   real(r8) :: DIFOP                             !aqueous diffusivity of O2 within root
   real(r8) :: DifAqueVolatile(idg_beg:idg_end)  !aqueous diffusivity from soil to root
   real(r8) :: DIFOX,DiffusivitySolutEffP
-  real(r8) :: DFAGas(idg_beg:idg_NH3)           !maximum volatile flux from atmosphere to roots
+  real(r8) :: DFAGas(idg_beg:idg_NH3)                  !maximum volatile flux from atmosphere to roots
   real(r8) :: DFGP,ROxySoil2Uptk
 
   real(r8) :: O2AquaDiffusvityP
   real(r8) :: RTVLWA  !root H2O vol for NH4
   real(r8) :: RTVLWB  !root H2O vol for NH4B
-  real(r8) :: RGasTranspFlxPrev(idg_beg:idg_NH3)            !diagnosed increment gas flux
+  real(r8) :: RGasTranspFlxPrev(idg_beg:idg_NH3)       !diagnosed increment gas flux
   real(r8) :: ROXYLX
-  real(r8) :: RGas_Disolv_flx(idg_beg:idg_end)   !gas dissolution into aqueous concentration in soil
+  real(r8) :: RGas_DisolvSoil_flx(idg_beg:idg_end)     !gas dissolution into aqueous concentration in soil
   real(r8) :: RTCR1,RTCR2
-  real(r8) :: RTCRA   !root conductance scalar for gas transport between atmosphere and root inner space [m]
+  real(r8) :: RTCRA                                    !root conductance scalar for gas transport between atmosphere and root inner space [m]
   real(r8) :: RTARRX
-  real(r8) :: RootCO2Prod_tscaled                       !root CO2 gas efflux due to root respiration at time step for gas flux calculations
+  real(r8) :: RootCO2Prod_tscaled                      !root CO2 gas efflux due to root respiration at time step for gas flux calculations
   real(r8) :: RRADS
-  real(r8) :: RSolUptkTransp(idg_beg:idg_end)   !volatile tracer uptake by transpiration
+  real(r8) :: RSolUptkTransp(idg_beg:idg_end)          !volatile tracer uptake by transpiration
   real(r8) :: RootOxyUptakePerPlant
-  real(r8) :: ROxySoil2UptkPerPlant               !aqueous O2 uptake flux from soil due to diffusion and transpiration-aided-advection
-  real(r8) :: ROxyRoot2UptkPerPlant               !aqueous O2 diffusion uptake flux from inside roots
-  real(r8) :: ROxyRoot2Uptk                       !oyxgen uptake by root, [gO/d2]
-  real(r8) :: RootUptkSoiSolute(idg_beg:idg_end)  !root uptake of aqueous volatile from soil to inside roots
-  real(r8) :: RDXAqueous(idg_beg:idg_end)         !maximum fluxes can be taken by roots
+  real(r8) :: ROxySoil2UptkPerPlant                    !aqueous O2 uptake flux from soil due to diffusion and transpiration-aided-advection
+  real(r8) :: ROxyRoot2UptkPerPlant                    !aqueous O2 diffusion uptake flux from inside roots
+  real(r8) :: ROxyRoot2Uptk                            !oyxgen uptake by root, [gO/d2]
+  real(r8) :: RootUptkSoiSolute(idg_beg:idg_end)       !root uptake of aqueous volatile from soil to inside roots
+  real(r8) :: RDXAqueous(idg_beg:idg_end)              !maximum fluxes can be taken by roots
   real(r8) :: RDFAqueous(idg_beg:idg_end)
   real(r8) :: RUPOST   !total oyxgen uptake from soil by roots and other processes
   real(r8) :: RUPNTX  !total uptake of NH4 from soil into roots
@@ -193,8 +193,8 @@ module RootGasMod
     enddo
     O2AquaDiffusvityP = SoluteDifusvty_vr(idg_O2,L)*dts_gas
 
-    RGas_Disolv_flx(idg_beg:idg_end)    = 0.0_r8
-    Root_gas2sol_flx(idg_beg:idg_NH3)   = 0.0_r8
+    RGas_DisolvSoil_flx(idg_beg:idg_end) = 0.0_r8
+    Root_gas2sol_flx(idg_beg:idg_NH3)    = 0.0_r8
 !
 !     ROOT CONDUCTANCE TO GAS TRANSFER
 !
@@ -440,65 +440,65 @@ module RootGasMod
 !         
           IF(FracAirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min)THEN
             DiffusivitySolutEffP     = FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
-            RGas_Disolv_flx(idg_CO2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))*VOLWAqueous(idg_CO2) &
+            RGas_DisolvSoil_flx(idg_CO2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))*VOLWAqueous(idg_CO2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RootUptkSoiSolute(idg_CO2))*VLsoiAirPMM) &
               /(VOLWAqueous(idg_CO2)+VLsoiAirPMM)
 
             RUPOST                  = ROxySoil2Uptk+ROXYLX
-            RGas_Disolv_flx(idg_O2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_O2))*VOLWAqueous(idg_O2) &
+            RGas_DisolvSoil_flx(idg_O2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_O2))*VOLWAqueous(idg_O2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_O2))-RUPOST)*VLsoiAirPMM)/(VOLWAqueous(idg_O2)+VLsoiAirPMM)
 
             IF(N.EQ.ipltroot)THEN
               DO idg=idg_beg,idg_NH3-1
                 if(idg/=idg_CO2 .and. idg/=idg_O2)then
-                  RGas_Disolv_flx(idg)=DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg))*VOLWAqueous(idg) &
+                  RGas_DisolvSoil_flx(idg)=DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg))*VOLWAqueous(idg) &
                     -(AMAX1(ZEROS,trc_solml_loc(idg))-RootUptkSoiSolute(idg))*VLsoiAirPMM)/(VOLWAqueous(idg)+VLsoiAirPMM)
                 endif
               ENDDO
 
               IF(VOLWAqueous(idg_NH3)+VOLPNH3.GT.ZERO4Groth_pft(NZ))THEN
                 ZH3GA               = trc_gasml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
-                RGas_Disolv_flx(idg_NH3) = AMIN1(RootUptkSoiSolute(idg_NH3),AMAX1(-RootUptkSoiSolute(idg_NH3) &
+                RGas_DisolvSoil_flx(idg_NH3) = AMIN1(RootUptkSoiSolute(idg_NH3),AMAX1(-RootUptkSoiSolute(idg_NH3) &
                   ,DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),ZH3GA)*VOLWAqueous(idg_NH3) &
                   -(AMAX1(ZEROS,trc_solml_loc(idg_NH3))-RootUptkSoiSolute(idg_NH3))*VOLPNH3) &
                   /(VOLWAqueous(idg_NH3)+VOLPNH3)))
               ELSE
-                RGas_Disolv_flx(idg_NH3)=0.0_r8
+                RGas_DisolvSoil_flx(idg_NH3)=0.0_r8
               ENDIF
 
               IF(VOLWAqueous(idg_NH3B)+VOLPNH3B.GT.ZERO4Groth_pft(NZ))THEN
                 ZH3GB                     = trc_gasml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
-                RGas_Disolv_flx(idg_NH3B) = AMIN1(RootUptkSoiSolute(idg_NH3B),AMAX1(-RootUptkSoiSolute(idg_NH3B) &
+                RGas_DisolvSoil_flx(idg_NH3B) = AMIN1(RootUptkSoiSolute(idg_NH3B),AMAX1(-RootUptkSoiSolute(idg_NH3B) &
                   ,DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),ZH3GB)*VOLWAqueous(idg_NH3B)   &
                   -(AMAX1(ZEROS,trc_solml_loc(idg_NH3B))-RootUptkSoiSolute(idg_NH3B))*VOLPNH3B)  &
                   /(VOLWAqueous(idg_NH3B)+VOLPNH3B)))
               ELSE
-                RGas_Disolv_flx(idg_NH3B)=0.0_r8
+                RGas_DisolvSoil_flx(idg_NH3B)=0.0_r8
               ENDIF
             ELSE
               DO idg=idg_beg,idg_NH3
-                if(idg/=idg_CO2 .and. idg/=idg_O2)RGas_Disolv_flx(idg)=0.0_r8
+                if(idg/=idg_CO2 .and. idg/=idg_O2)RGas_DisolvSoil_flx(idg)=0.0_r8
               ENDDO
             ENDIF
           ELSE
-            RGas_Disolv_flx(idg_beg:idg_end)=0.0_r8
+            RGas_DisolvSoil_flx(idg_beg:idg_end)=0.0_r8
           ENDIF
 !
 !     UPDATE GASEOUS, AQUEOUS GAS CONTENTS AND CONCENTRATIONS
 !     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
           DO idg=idg_beg,idg_NH3
-            trc_gasml_loc(idg)  = trc_gasml_loc(idg)-RGas_Disolv_flx(idg)+RGasTranspFlxPrev(idg)
+            trc_gasml_loc(idg)  = trc_gasml_loc(idg)-RGas_DisolvSoil_flx(idg)+RGasTranspFlxPrev(idg)
           ENDDO
 
-          trc_gasml_loc(idg_NH3)  = trc_gasml_loc(idg_NH3)-RGas_Disolv_flx(idg_NH3B)
-          call fixEXConsumpFlux(trc_gasml_loc(idg_NH3),RGas_Disolv_flx(idg_NH3B))
+          trc_gasml_loc(idg_NH3)  = trc_gasml_loc(idg_NH3)-RGas_DisolvSoil_flx(idg_NH3B)
+          call fixEXConsumpFlux(trc_gasml_loc(idg_NH3),RGas_DisolvSoil_flx(idg_NH3B))
 
           !aqueous concentrations in soil
           DO idg=idg_beg,idg_end
             if(idg==idg_O2)then
-              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_Disolv_flx(idg)-ROxySoil2Uptk
+              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-ROxySoil2Uptk
             else
-              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_Disolv_flx(idg)-RootUptkSoiSolute(idg)
+              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-RootUptkSoiSolute(idg)
             endif
           enddo
           !

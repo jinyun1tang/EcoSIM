@@ -225,7 +225,7 @@ contains
         write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)    
         write(110,*)'PrecIntceptByCan =',PrecIntceptByCanopy_col(NY,NX)   
         write(110,*)'plant evap       =',QVegET_col(NY,NX)
-        write(110,*)'run on           =',QRunSurf_col(NY,NX)
+        write(110,*)'run on           =',QRunSurf_col(NY,NX),WatFLo2LitR_col(NY,NX)
         write(110,*)'Qinflx2Soil_col  =',Qinflx2Soil_col(NY,NX)
         write(110,*)'QWatIntLaterflow =',QWatIntLaterFlow_col(NY,NX)
         write(110,*)'drain            =',QDrain_col(NY,NX)
@@ -255,11 +255,17 @@ contains
       !Turn off the tracer mass conservation check momentarily, due to complication of 
       !grid change. It will be turned on when a safe strategy will be figured out later.
       
-      DO idg=idg_beg,idg_NH3-1        
-        tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
-          +RGasNetProd_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
-
-        trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err 
+      DO idg=idg_beg,idg_NH3        
+        if(idg==idg_NH3)then
+          tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
+            +RGasNetProd_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
+          tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX)
+          trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err         
+        else
+          tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
+            +RGasNetProd_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
+          trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err 
+        endif
 
         tracer_rootmass_err = trcg_rootMass_beg_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX) &
           +trcg_air2root_flx_col(idg,NY,NX)-trcs_deadroot2soil_col(idg,NY,NX)+TRootGasLossDisturb_col(idg,NY,NX)
@@ -280,11 +286,11 @@ contains
           write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
             trcg_TotalMass_beg_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
           write(111,*)'mass_err         =',tracer_mass_err
-          write(111,*)'surf emis        =',SurfGasEmisFlx_col(idg,NY,NX)
           write(111,*)'gasdif,ebu       =',GasDiff2Surf_flx_col(idg,NY,NX),trcg_ebu_flx_col(idg,NY,NX)
           write(111,*)'phenoflx         =',TRootGasLossDisturb_col(idg,NY,NX)
           write(111,*)'wedepo           =',Gas_WetDeposition_col(idg,NY,NX)          
-          write(111,*)'---'
+          write(111,*)'----------------------'
+          write(111,*)'surf emis        =',SurfGasEmisFlx_col(idg,NY,NX)          
           write(111,*)'GasHydroloss     =',GasHydroLossFlx_col(idg,NY,NX)
           if(idg==idg_N2)then
             write(111,*)'RGasNetProd,rNfix,mup=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
@@ -381,6 +387,7 @@ contains
       DO idg=idg_beg,idg_NH3
         trcg_litr(idg)=trcs_solml_vr(idg,0,NY,NX)
       enddo
+      trcg_litr(idg_NH3)=trcg_litr(idg_NH3)+trcs_solml_vr(idg_NH3B,0,NY,NX)
       !note NL may change due to soil relayering, which can be tested using
       !by comparing the values of NL and NLI      
       DO L=NUI(NY,NX),NL(NY,NX)

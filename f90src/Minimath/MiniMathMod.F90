@@ -206,8 +206,8 @@ module minimathmod
   real(r8), intent(in) :: val
 
   real(r8) :: ans
-
-  if(abs(val)>=tiny_val)then
+  real(r8), parameter :: tiny_val1=1.e-13_r8
+  if(abs(val)>=tiny_val1)then
     ans=val
   else  
     ans=0._r8
@@ -466,11 +466,13 @@ module minimathmod
   real(r8), intent(inout):: pscal
   real(r8) :: p1
 
-  x1=x0+flux
+  x1=x0
   if(isclose(flux,0._r8))return
+  if(pscal>1.e-6_r8)x1=x1+flux  
   if(x1<0._r8)then
     p1=safe_adb(-x0,flux)
     pscal=AMIN1(0.999_r8,pscal,p1) 
+    x1=0._r8
   endif
 
   end subroutine get_flux_scalar

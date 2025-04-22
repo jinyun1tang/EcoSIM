@@ -129,6 +129,8 @@ implicit none
   real(r8),pointer   :: h1D_trcg_CH4_cumerr_col(:)
   real(r8),pointer   :: h1D_trcg_O2_cumerr_col(:)
   real(r8),pointer   :: h1D_trcg_N2_cumerr_col(:)
+  real(r8),pointer   :: h1D_trcg_NH3_cumerr_col(:)
+  real(r8),pointer   :: h1D_trcg_H2_cumerr_col(:)
   real(r8),pointer   :: h1D_ECO_RADSW_col(:)
   real(r8),pointer   :: h1d_CAN_NEE_col(:)
   real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
@@ -165,6 +167,7 @@ implicit none
   real(r8),pointer   :: h1D_CO2_DIF_flx_col(:)
   real(r8),pointer   :: h1D_Ar_DIF_flx_col(:)
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
+  real(r8),pointer   :: h1D_NH3_DIF_flx_col(:)
   real(r8),pointer   :: h1D_Ar_soilMass_col(:)
   real(r8),pointer   :: h1D_O2_SEMIS_FLX_col(:)     !SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
@@ -588,6 +591,8 @@ implicit none
   allocate(this%h1D_tSTANDING_DEAD_P_col(beg_col:end_col));this%h1D_tSTANDING_DEAD_P_col=spval  
   allocate(this%h1D_tPRECIP_col(beg_col:end_col))          ;this%h1D_tPRECIP_col(:)=spval
   allocate(this%h1D_ECO_ET_col(beg_col:end_col))              ;this%h1D_ECO_ET_col(:)=spval
+  allocate(this%h1D_trcg_NH3_cumerr_col(beg_col:end_col)); this%h1D_trcg_NH3_cumerr_col(:)=spval
+  allocate(this%h1D_trcg_H2_cumerr_col(beg_col:end_col)); this%h1D_trcg_H2_cumerr_col(:)=spval
   allocate(this%h1D_trcg_Ar_cumerr_col(beg_col:end_col)); this%h1D_trcg_Ar_cumerr_col(:)=spval
   allocate(this%h1D_trcg_N2_cumerr_col(beg_col:end_col)); this%h1D_trcg_N2_cumerr_col(:)=spval
   allocate(this%h1D_trcg_O2_cumerr_col(beg_col:end_col)); this%h1D_trcg_O2_cumerr_col(:)=spval
@@ -628,6 +633,7 @@ implicit none
   allocate(this%h1D_O2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_O2_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_CO2_DIF_flx_col(beg_col:end_col)); this%h1D_CO2_DIF_flx_col(:)=spval
   allocate(this%h1D_CH4_DIF_flx_col(beg_col:end_col)); this%h1D_CH4_DIF_flx_col(:)=spval  
+  allocate(this%h1D_NH3_DIF_flx_col(beg_col:end_col)); this%h1D_NH3_DIF_flx_col(:)=spval
   allocate(this%h1D_Ar_DIF_flx_col(beg_col:end_col)); this%h1D_Ar_DIF_flx_col(:)=spval
   allocate(this%h1D_O2_SEMIS_FLX_col(beg_col:end_col))          ;this%h1D_O2_SEMIS_FLX_col(:)=spval
   allocate(this%h1D_CO2_LITR_col(beg_col:end_col))        ;this%h1D_CO2_LITR_col(:)=spval
@@ -1279,6 +1285,14 @@ implicit none
   call hist_addfld1d(fname='N2_cumerr_col',units='gN/m2',avgflag='A',&
     long_name='cumulative mass error for N2',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_trcg_NH3_cumerr_col(beg_col:end_col)
+  call hist_addfld1d(fname='NH3_cumerr_col',units='gN/m2',avgflag='A',&
+    long_name='cumulative mass error for NH3',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_trcg_H2_cumerr_col(beg_col:end_col)
+  call hist_addfld1d(fname='H2_cumerr_col',units='gH/m2',avgflag='A',&
+    long_name='cumulative mass error for H2',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_trcg_CO2_cumerr_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_cumerr_col',units='gC/m2',avgflag='A',&
     long_name='cumulative mass error for CO2',ptr_col=data1d_ptr)      
@@ -1431,6 +1445,10 @@ implicit none
   data1d_ptr => this%h1D_CH4_DIF_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='CH4_DIF_FLX',units='umol C/m2/s',avgflag='A',&
     long_name='soil CH4 flux through advection+diffusion (<0 into atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_NH3_DIF_flx_col(beg_col:end_col)
+  call hist_addfld1d(fname='NH3_DIF_FLX',units='umol N/m2/s',avgflag='A',&
+    long_name='soil NH3 flux through advection+diffusion (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Ar_DIF_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='Ar_DIF_FLX',units='umol Ar/m2/s',avgflag='A',&
@@ -2734,6 +2752,9 @@ implicit none
       this%h1D_trcg_CH4_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_trcg_O2_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_trcg_N2_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_trcg_NH3_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_trcg_H2_cumerr_col(ncol)   = trcg_mass_cumerr_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+
       this%h1D_ECO_RADSW_col(ncol)        = MJ2W*Eco_RadSW_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_N2O_LITR_col(ncol)         = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)         = trc_solcl_vr(idg_NH3,0,NY,NX)
@@ -2767,7 +2788,8 @@ implicit none
       this%h1D_O2_PLTROOT_flx_col(ncol)   = trcg_air2root_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
       this%h1D_CO2_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_CH4_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)      
-      this%h1D_Ar_DIF_flx_col(ncol)       = GasDiff2Surf_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)      
+      this%h1D_Ar_DIF_flx_col(ncol)       = GasDiff2Surf_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)  
+      this%h1D_NH3_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_NH3)    
       this%h1D_CO2_TPR_err_col(ncol)      = Gas_Prod_TP_cumRes_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Ar_TPR_err_col(ncol)       = Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_LITR_col(ncol)         = trc_solcl_vr(idg_CO2,0,NY,NX)

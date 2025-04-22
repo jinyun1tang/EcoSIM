@@ -220,7 +220,8 @@ module WatsubMod
 !       if(I>=156)write(211,*)I*1000+J,NY,NX,M,'wat',NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
 !          QDischar_col(NY,NX),QDrain_col(NY,NX),dwat0
 
-!      if(I==358 .and. J==12)write(211,*)I+J/24.,NY,NX,M,'wat',NUX0(NY,NX),NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
+      !if(I==358 .and. J==12)
+!      write(311,*)I+J/24.,NY,NX,M,'wat',NUX0(NY,NX),NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
 !          QDischar_col(NY,NX),QDrain_col(NY,NX)
       if(abs(dwat)>1.e-4_r8)then
         call endrun('soil H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)

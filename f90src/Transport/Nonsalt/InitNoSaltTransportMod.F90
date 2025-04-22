@@ -73,8 +73,8 @@ module InitNoSaltTransportMod
       trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1,NY,NX)          = 0.0_r8
       trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
 
-      trcg_Precip2LitrM(idg_beg:idg_NH3,NY,NX)=0._r8
-      trcs_Precip2MicpM(ids_beg:ids_end,NY,NX)=0._r8
+      trcg_Precip2LitrM_col(idg_beg:idg_NH3,NY,NX)=0._r8
+      trcs_Precip2MicpM_col(ids_beg:ids_end,NY,NX)=0._r8
 
     ENDDO
   ENDDO      
@@ -386,62 +386,62 @@ module InitNoSaltTransportMod
   trcn_AquaAdv_flxM_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
     
   do idg=idg_beg,idg_NH3
-    trcg_Precip2LitrM(idg,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+    trcg_Precip2LitrM_col(idg,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
       +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
 
-    trcs_Precip2MicpM(idg,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+    trcs_Precip2MicpM_col(idg,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
       +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
   ENDDO
 
-  trcg_Precip2LitrM(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+  trcg_Precip2LitrM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
 
-  trcg_Precip2LitrM(idg_NH3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
+  trcg_Precip2LitrM_col(idg_NH3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw
 
-  trcg_Precip2LitrM(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+  trcg_Precip2LitrM_col(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
 
-  trcg_Precip2LitrM(ids_NO2,NY,NX)=0.0_r8
+  trcg_Precip2LitrM_col(ids_NO2,NY,NX)=0.0_r8
 
-  trcg_Precip2LitrM(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
+  trcg_Precip2LitrM_col(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
 
-  trcg_Precip2LitrM(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+  trcg_Precip2LitrM_col(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
 
-  trcs_Precip2MicpM(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(idg_NH3,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
+  trcs_Precip2MicpM_col(idg_NH3,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw*trcs_VLN_vr(ids_NH4,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw*trcs_VLN_vr(ids_NO3,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_NO2,NY,NX)=0.0_r8
+  trcs_Precip2MicpM_col(ids_NO2,NY,NX)=0.0_r8
 
-  trcs_Precip2MicpM(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_NH4B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_NH4B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(idg_NH3B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
+  trcs_Precip2MicpM_col(idg_NH3B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw*trcs_VLN_vr(ids_NH4B,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_NO3B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_NO3B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw*trcs_VLN_vr(ids_NO3B,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_NO2B,NY,NX)=0.0_r8
+  trcs_Precip2MicpM_col(ids_NO2B,NY,NX)=0.0_r8
 
-  trcs_Precip2MicpM(ids_H1PO4B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_H1PO4B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
-  trcs_Precip2MicpM(ids_H2PO4B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+  trcs_Precip2MicpM_col(ids_H2PO4B,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
 
   end subroutine TracerFall2Grnd            

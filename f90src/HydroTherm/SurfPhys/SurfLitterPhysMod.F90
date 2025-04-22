@@ -524,10 +524,6 @@ implicit none
   ENGYZ                = VHeatCapacityLitrX*TKS_vr(0,NY,NX)
 
   !update water, ice content and heat capacity of residue
-!  if(etimer%get_curr_yearAD()<=1981)then  
-!  write(118,*)I+J/24.,VLWatMicP_vr(0,NY,NX),WatFLo2LitR_col(NY,NX),TLitrIceFlxThaw_col(NY,NX), &
-!    WatInByRunoff,PrecRainAndIrrig_col(NY,NX),FracSurfByLitR_col(NY,NX)
-!  endif
 
   VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+dWat
   VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
@@ -734,9 +730,7 @@ implicit none
   ELSE
     TKSoil1_vr(0,NY,NX)=TKSoil1_vr(NUM(NY,NX),NY,NX)
   ENDIF
-!  if(I==149 .and. J==10 .and. NX==1)then
-!    write(113,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),TK0Prev,TKS_vr(0,NY,NX),TKS_vr(NU(NY,NX),NY,NX),TairK_col(NY,NX),NY,NX
-!  endif
+
   TKS_vr(0,NY,NX)           = TKSoil1_vr(0,NY,NX)
   VLWatMicP_vr(0,NY,NX)     = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)
