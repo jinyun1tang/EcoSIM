@@ -56,7 +56,7 @@ implicit none
 
   dpscal_max=1._r8
   iterm=0
-  DO while(dpscal_max>1.e-2_r8)
+  DO while(dpscal_max>1.e-2_r8 .and. iterm<3)
     iterm=iterm+1
     pscal=1.000_r8
     call ZeroFluxesM(I,J,M,NHE,NHW,NVS,NVN)  
@@ -75,8 +75,6 @@ implicit none
 
     call AccumSlowFluxesM(I,J,M,NHE,NHW,NVS,NVN,dpscal,dpscal_dom,pscal,pscal1_dom)
 
-    call copyStateVars(I,J,M,NHE,NHW,NVS,NVN,iterm)
-
     dpscal_max=0._r8
     DO ids=ids_beg,ids_end      
       if(pscal(ids)>1.e-6_r8)then
@@ -91,7 +89,7 @@ implicit none
       dpscal_dom(idom)=dpscal_dom(idom)*(1._r8-pscal1_dom(idom))
       dpscal_max=AMAX1(dpscal_max,dpscal_dom(idom))
     ENDDO
-    
+
 !    if(iterm>200)stop
   ENDDO
 
@@ -231,6 +229,7 @@ implicit none
                 TranspNetSoil_slow_flxM_col(idg,NY,NX)=TranspNetSoil_slow_flxM_col(idg,NY,NX)+ &
                   trcsol_Irrig_flxM_vr(idg,L,NY,NX)+trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) +&
                   trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)
+                  trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)
               endif  
 
               if(trcs_solml_vr(idg,L,NY,NX)<0._r8)then
@@ -251,7 +250,8 @@ implicit none
               if(lfupdate)then
                 TranspNetSoil_slow_flxM_col(idg,NY,NX)=TranspNetSoil_slow_flxM_col(idg,NY,NX)+ &
                   trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX) &
-                  -RBGCSinkSoluteM_vr(idg,L,NY,NX)      
+                  -RBGCSinkSoluteM_vr(idg,L,NY,NX)   
+                trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)     
               endif  
 
             endif
@@ -264,6 +264,7 @@ implicit none
             if(lflux .and. dpscal(ids)>tiny_p)then          
               flux=flux*dpscal(ids)   
               call get_flux_scalar(trcs_solml2_vr(ids,L,NY,NX),flux,trcs_solml_vr(ids,L,NY,NX),pscal(ids))            
+              if(lfupdate)trcs_solml2_vr(ids,L,NY,NX)=trcs_solml_vr(ids,L,NY,NX)
             endif
           ENDDO
 
@@ -277,6 +278,10 @@ implicit none
                 flux=DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX) - DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
                 flux=flux*dpscal_dom(idom)
                 call get_flux_scalar(DOM_MacP2_vr(idom,K,L,NY,NX),flux, DOM_MacP_vr(idom,K,L,NY,NX),pscal_dom(idom))
+                if(lfupdate)then
+                  DOM_MicP2_vr(idom,K,L,NY,NX)= DOM_MicP_vr(idom,K,L,NY,NX)
+                  DOM_MacP2_vr(idom,K,L,NY,NX)= DOM_MacP_vr(idom,K,L,NY,NX)
+                endif
               endif
             ENDDO
           ENDDO
@@ -287,6 +292,7 @@ implicit none
             if(lflux .and. dpscal(ids)>tiny_p)then          
               flux=flux*dpscal(ids)   
               call get_flux_scalar(trcs_soHml2_vr(ids,L,NY,NX),flux, trcs_soHml_vr(ids,L,NY,NX),pscal(ids))            
+              if(lfupdate)trcs_soHml2_vr(ids,L,NY,NX)=trcs_soHml_vr(ids,L,NY,NX)
             endif
           enddo
         ENDIF
@@ -2924,6 +2930,7 @@ implicit none
           if(lflux .and. dpscal_dom(idom)>tiny_p)then  
             flux=flux*dpscal_dom(idom)
             call get_flux_scalar(DOM_MicP2_vr(idom,K,0,NY,NX),flux,DOM_MicP_vr(idom,K,0,NY,NX),pscal_dom(idom))
+            if(lfupdate)DOM_MicP2_vr(idom,K,0,NY,NX)=DOM_MicP_vr(idom,K,0,NY,NX)
           endif
         ENDDO
       ENDDO
@@ -2940,6 +2947,7 @@ implicit none
             write(193,*)(I*1000+J)*100+M,trcs_names(idg),trcs_solml2_vr(idg,0,NY,NX),flux,trcs_solml_vr(idg,0,NY,NX),pscal(idg)
             call endrun(trim(mod_filename)//' at line',__LINE__)
           endif
+          if(lfupdate)trcs_solml2_vr(idg,0,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
         endif
       ENDDO
 
@@ -2950,6 +2958,7 @@ implicit none
       if(lflux .and. dpscal(idg)>tiny_p)then          
         flux=flux*dpscal(idg)
         call get_flux_scalar(trcs_solml2_vr(idg,0,NY,NX),flux,trcs_solml_vr(idg,0,NY,NX),pscal(idg))
+        if(lfupdate)trcs_solml2_vr(idg,0,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
       endif
 
       DO ids=ids_nut_beg,ids_nuts_end        
@@ -2958,6 +2967,7 @@ implicit none
         if(lflux .and. dpscal(ids)>tiny_p)then          
           flux=flux*dpscal(ids)
           call get_flux_scalar(trcs_solml2_vr(ids,0,NY,NX),flux,trcs_solml_vr(ids,0,NY,NX),pscal(ids))
+          if(lfupdate)trcs_solml2_vr(ids,0,NY,NX)=trcs_solml_vr(ids,0,NY,NX)
         endif
       ENDDO
 
@@ -2978,6 +2988,7 @@ implicit none
               call endrun(trim(mod_filename)//' at line',__LINE__)
             endif  
             if(lfupdate)then
+              trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)
               TranspNetSoil_slow_flxM_col(idg,NY,NX)=TranspNetSoil_slow_flxM_col(idg,NY,NX)+ &
                 RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(idg,L,NY,NX) & 
                 +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)
@@ -2994,6 +3005,7 @@ implicit none
             flux=flux*dpscal(idg)    
             call get_flux_scalar(trcs_solml2_vr(idg,L,NY,NX),flux,trcs_solml_vr(idg,L,NY,NX),pscal(idg))
             if(lfupdate)then
+              trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)
               TranspNetSoil_slow_flxM_col(idg,NY,NX)=TranspNetSoil_slow_flxM_col(idg,NY,NX)+ &
                 RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(idg,L,NY,NX) & 
                 +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Transp2Macp_flxM_vr(idg,L,NY,NX) &
@@ -3009,6 +3021,7 @@ implicit none
           if(lflux .and. dpscal(ids)>tiny_p)then          
             flux=flux*dpscal(ids)     
             call get_flux_scalar(trcs_solml2_vr(ids,L,NY,NX),flux,trcs_solml_vr(ids,L,NY,NX),pscal(ids))
+            if(lfupdate)trcs_solml2_vr(ids,L,NY,NX)=trcs_solml_vr(ids,L,NY,NX)
           endif
         ENDDO
 
@@ -3018,6 +3031,7 @@ implicit none
           if(lflux .and. dpscal(ids)>tiny_p)then          
             flux=flux*dpscal(ids)     
             call get_flux_scalar(trcs_soHml2_vr(ids,L,NY,NX), flux, trcs_soHml_vr(ids,L,NY,NX), pscal(ids))
+            if(lfupdate)trcs_soHml2_vr(ids,L,NY,NX)=trcs_soHml_vr(ids,L,NY,NX)
           endif
         ENDDO
 
@@ -3031,6 +3045,11 @@ implicit none
               flux=DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX) - DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
               flux=flux*dpscal_dom(idom)
               call get_flux_scalar(DOM_MacP2_vr(idom,K,L,NY,NX), flux, DOM_MacP_vr(idom,K,L,NY,NX),pscal_dom(idom))
+
+              if(lfupdate)then
+                DOM_MicP2_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)
+                DOM_MacP2_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
+              endif
             endif
           ENDDO
         ENDDO
@@ -3072,6 +3091,7 @@ implicit none
         if(lflux .and. dpscal(idg)>tiny_p)then          
           flux=flux*dpscal(idg)     
           call get_flux_scalar(trcg_solsml2_snvr(idg,1,NY,NX),flux,trcg_solsml_snvr(idg,1,NY,NX),pscal(idg))
+          if(lfupdate)trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)
         endif
       ENDDO
 
@@ -3081,6 +3101,7 @@ implicit none
         if(lflux .and. dpscal(idn)>tiny_p)then          
           flux=flux*dpscal(idn)   
           call get_flux_scalar(trcn_solsml2_snvr(idn,1,NY,NX),flux,trcn_solsml_snvr(idn,1,NY,NX),pscal(idn))
+          if(lfupdate)trcn_solsml2_snvr(idn,1,NY,NX)=trcn_solsml_snvr(idn,1,NY,NX)
         endif
       ENDDO
 
@@ -3097,6 +3118,7 @@ implicit none
                 call endrun(trim(mod_filename)//' at line',__LINE__)
               endif  
             endif
+            if(lfupdate)trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)
           endif  
         ENDDO
 
@@ -3106,6 +3128,7 @@ implicit none
           if(lflux .and. dpscal(idn)>tiny_p)then          
             flux=flux*dpscal(idn)             
             call get_flux_scalar(trcn_solsml2_snvr(idn,L,NY,NX),flux,trcn_solsml2_snvr(idn,L,NY,NX),pscal(idn))
+            if(lfupdate)trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)
           endif  
         ENDDO
       ENDDO

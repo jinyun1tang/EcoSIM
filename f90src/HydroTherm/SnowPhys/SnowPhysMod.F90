@@ -116,7 +116,7 @@ contains
       SnoDens_snvr(L,NY,NX)      = NewSnowDens_col(NY,NX)
       VLSnoDWIprev_snvr(L,NY,NX) = VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)
       cumSnowDepz_col(L,NY,NX)    = cumSnowDepz_col(L-1,NY,NX)+SnowThickL_snvr(L,NY,NX)
-      TKSnow_snvr(L,NY,NX)        = AMIN1(Tref,TairKClimMean(NY,NX))
+      TKSnow_snvr(L,NY,NX)        = AMIN1(Tref,TairKClimMean_col(NY,NX))
       TCSnow_snvr(L,NY,NX)        = TKSnow_snvr(L,NY,NX)-Tref
       VLHeatCapSnow_snvr(L,NY,NX) = cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
     ELSE

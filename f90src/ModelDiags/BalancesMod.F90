@@ -296,6 +296,8 @@ contains
             write(111,*)'RGasNetProd,rNfix,mup=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
           elseif(idg==idg_CO2)then
             write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX),-RootCO2AutorPrev_col(NY,NX)  
+          elseif(idg==idg_NH3)then
+            write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX)
           else
             write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
           endif
@@ -332,8 +334,8 @@ contains
           endif
           write(111,*)'deadroot2soil    =',trcs_deadroot2soil_col(idg,NY,NX)
 
-!          if(abs(tracer_mass_err)>1.e-1_r8) &
-!            call endrun('tracer'//trcs_names(idg)//' error test failure in '//trim(mod_filename)//' at line',__LINE__)
+          if(abs(tracer_mass_err)>1.e-3_r8) &
+            call endrun('tracer'//trcs_names(idg)//' error test failure in '//trim(mod_filename)//' at line',__LINE__)
         endif
       enddo      
 

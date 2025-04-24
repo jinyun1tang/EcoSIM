@@ -517,10 +517,6 @@ module RedistMod
 !    TIONOU=TIONOU+SBU
   ENDIF
   !========================================================================
-  !
-  DO idg=idg_beg,idg_NH3-1
-    RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,0,NY,NX)
-  ENDDO
   
   ECO_HR_CO2_vr(0,NY,NX)       = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)
   ECO_HR_CH4_vr(L,NY,NX)       = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)  
@@ -969,15 +965,11 @@ module RedistMod
       trcs_plant_uptake_col(ids,NY,NX)=trcs_plant_uptake_col(ids,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX)
     ENDDO
 
-    DO idg=idg_beg,idg_NH3-1
-      RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)-trcs_RMicbUptake_vr(idg,L,NY,NX)
-    ENDDO
+
     RootN2Fix_col(NY,NX) =RootN2Fix_col(NY,NX)+RootN2Fix_vr(L,NY,NX)
-    RGasNetProd_col(idg_CO2,NY,NX)= RGasNetProd_col(idg_CO2,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)
-    RGasNetProd_col(idg_N2,NY,NX) = RGasNetProd_col(idg_N2,NY,NX)-RootN2Fix_vr(L,NY,NX)
     
     RUptkRootO2_col(NY,NX) = RUptkRootO2_col(NY,NX)+RUptkRootO2_vr(L,NY,NX)
-    RGasNetProd_col(idg_O2,NY,NX) = RGasNetProd_col(idg_O2,NY,NX)-RUptkRootO2_vr(L,NY,NX)-trcs_plant_uptake_vr(idg_O2,L,NY,NX)
+    RGasNetProd_col(idg_O2,NY,NX) = RGasNetProd_col(idg_O2,NY,NX)-RUptkRootO2_vr(L,NY,NX)
     ECO_HR_CO2_vr(L,NY,NX)        = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
     ECO_HR_CH4_vr(L,NY,NX)        = trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
 

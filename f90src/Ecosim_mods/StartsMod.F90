@@ -10,6 +10,7 @@ module StartsMod
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
   use InitVegBGC,       only: InitIrradianceGeometry
+  use TracerPropMod,    only : gas_solubility
   use DebugToolMod
   use EcosimConst
   use TracerIDMod
@@ -74,7 +75,7 @@ module StartsMod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: NY,NX,L,NGL
+  integer :: NY,NX,L,idg
   REAL(R8) :: ALTY
   real(r8) :: ALTZG
   real(r8) :: tPBOT,XWS
@@ -128,15 +129,20 @@ module StartsMod
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+
+      DO idg=idg_beg,idg_NH3
+        trcs_solcoef(idg,NY,NX)= AMAX1(AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,ATCA(NY,NX))*1.e-2_r8,1.e-10_r8)
+      ENDDO  
+
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -186,6 +192,7 @@ module StartsMod
 !
     ENDDO
   ENDDO
+
 
 !
 !     INITIALIZE COMMUNITY CANOPY
@@ -327,7 +334,7 @@ module StartsMod
   implicit none
   integer, intent(in) :: NY,NX
   REAL(R8),INTENT(IN) :: LandScape1stSoiLayDepth
-  integer  :: L,M,K,N,KK,NN,NGL
+  integer  :: L,M,K,N,KK,NN
   real(r8) :: CORGCM,HCX,TORGC
   real(r8) :: CORGL,TORGLL,FCX
   REAL(R8) :: PTDS
@@ -777,7 +784,7 @@ module StartsMod
   NumActivePlants(:,:)    = 0
   ATCA(:,:)               = ATCAI(:,:)
   ATCS(:,:)               = ATCAI(:,:)
-  TairKClimMean(:,:)      = units%Celcius2Kelvin(ATCA)
+  TairKClimMean_col(:,:)      = units%Celcius2Kelvin(ATCA)
   ATKS(:,:)               = units%Celcius2Kelvin(ATCS)
   QRain_CumYr_col(:,:)    = 0.0_r8
 
@@ -1038,17 +1045,17 @@ module StartsMod
 !     C*E=atmospheric concentration (g m-3)
 !     *E=atmospheric concentration from readi.f (umol mol-1)
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
-!     TairKClimMean=mean annual air temperature (K)
+!     TairKClimMean_col=mean annual air temperature (K)
 !     tPBOT = # atmosphere
       tPBOT=1._r8   
-      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !

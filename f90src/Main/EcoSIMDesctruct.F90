@@ -48,6 +48,7 @@ module EcoSIMDesctruct
   use HydroThermData      , only : DestructHydroThermData
   use BalanceCheckDataType, only : DestructBalanceCheckData
   use PerturbationMod     , only : destructSoilWarming
+  use TracerIDMod         , only : CleanUpTracerIDs
   implicit none
 
   call DestructMicrobialData
@@ -122,6 +123,8 @@ module EcoSIMDesctruct
   call DestructBalanceCheckData
 
   call destructSoilWarming()
+
+  call CleanUpTracerIDs
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

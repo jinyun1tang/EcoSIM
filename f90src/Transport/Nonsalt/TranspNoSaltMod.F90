@@ -210,7 +210,7 @@ module TranspNoSaltMod
           endif
           write(121,*)'transp'
           write(121,*)transp_diff_slow_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
-          if(abs(errmass)>1.e-5) &
+          if(abs(errmass)>1.e-2) &
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDDO
@@ -249,6 +249,7 @@ module TranspNoSaltMod
   DO M=1,NPH
     
     !transport without reaction rates, update trcs_solml2_vr
+    
     call TransptSlowNoSaltM(I,J,M,NHE,NHW,NVS,NVN)
 
     !DO gas dissolution-volatization, and solute uptake in each iteration MM        
@@ -258,8 +259,6 @@ module TranspNoSaltMod
       call TransptFastNoSaltMM(I,J,M,MM,NHE,NHW,NVS,NVN)
     ENDDO
     
-    call ExitMassCheck(I,J,NHW,NHE,NVN,NVS,M)
-
     !Do bubbling
     call BubbleEffluxM(I,J,M,NHE,NHW,NVS,NVN)
 

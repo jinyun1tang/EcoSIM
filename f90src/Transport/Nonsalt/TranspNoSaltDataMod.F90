@@ -109,8 +109,10 @@ implicit none
   real(r8), allocatable :: Gas_Snowloss_col(:,:,:)                      !tracer loss from snow [g d-2 h-1]
   real(r8), allocatable :: trcg_mass_beg2(:,:,:)                        !initial tracer mass check in fast transport
   real(r8), allocatable :: trcg_netflx2soil_col(:,:,:)                  !net tracer flux into soil during gas transport
-  real(r8), allocatable :: TranspNetSoil_fast_flx_col(:,:,:)                !
+  real(r8), allocatable :: TranspNetSoil_fast_flx_col(:,:,:)            !
   real(r8), allocatable :: RGas_Disol_FlxM_vr(:,:,:,:)
+  real(r8), allocatable :: RGasSinkScalar_vr(:,:,:,:)                   !BGC sink scalar for numerical stability, [none]
+
 !----------------------------------------------------------------------
 
 contains
@@ -120,6 +122,8 @@ contains
   integer :: NumOfLitrCmplxs
 
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
+
+  allocate(RGasSinkScalar_vr(idg_beg:idg_NH3,0:JZ,JY,JX));RGasSinkScalar_vr=1._r8
   allocate(RGas_Disol_FlxM_vr(idg_beg:idg_NH3,JZ,JY,JX));RGas_Disol_FlxM_vr=0._r8
   allocate(TranspNetSoil_flx2_col(idg_beg:idg_NH3,JY,JX)); TranspNetSoil_flx2_col=0._r8
   allocate(trcg_mass_beg2(idg_beg:idg_NH3,JY,JX)); trcg_mass_beg2=0._r8
@@ -230,6 +234,7 @@ contains
   allocate(TranspNetSoil_fast_flxM_col(idg_beg:idg_NH3,JY,JX)); TranspNetSoil_fast_flxM_col=0._r8
   allocate(TranspNetSoil_slow_flxM_col(idg_beg:idg_end,JY,JX)); TranspNetSoil_slow_flxM_col=0._r8
   allocate(trcg_netflx2soil_col(idg_beg:idg_NH3,JY,JX)); trcg_netflx2soil_col=0._r8
+
   end subroutine InitTransfrData
 
 !----------------------------------------------------------------------
@@ -237,6 +242,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(RGasSinkScalar_vr)
   call destroy(RGas_Disol_FlxM_vr)
   call destroy(TranspNetSoil_flx2_col)
   call destroy(TranspNetSoil_fast_flx_col)  

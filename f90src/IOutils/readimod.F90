@@ -286,7 +286,7 @@ module readiMod
       CH4E_col(NY,NX)           = ach4_ppm
       Z2OE_col(NY,NX)           = an2o_ppm
       ARGE_col(NY,NX)           = arg_ppm
-      ZNH3E_col(NY,NX)          = ZNH3EG
+      ZNH3E_col(NY,NX)          = anh3_ppm
       KoppenClimZone_col(NY,NX) = IETYPG
       FlowDirIndicator_col(NY,NX)   = grid_mode
       NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
@@ -312,7 +312,7 @@ module readiMod
       DH(NY,NX)                   = DHI(NX)
       DV(NY,NX)                   = DVI(NY)
       CO2E_col(NY,NX)             = CO2EI(NY,NX)
-      H2GE_col(NY,NX)                 = 1.0E-03_r8
+      H2GE_col(NY,NX)             = ah2_ppm
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
