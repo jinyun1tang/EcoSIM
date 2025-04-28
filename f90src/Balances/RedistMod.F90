@@ -104,6 +104,7 @@ module RedistMod
   
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
+
       Txchem_CO2_col(NY,NX) = 0.0_r8
       DORGE_col(NY,NX)      = 0.0_r8
 
@@ -394,10 +395,10 @@ module RedistMod
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
 
   do idg=idg_beg,idg_NH3
-    Gas_WetDeposition_col(idg,NY,NX) = Gas_WetDeposition_col(idg,NY,NX)  &
+    Gas_WetDeposit_flx_col(idg,NY,NX) = Gas_WetDeposit_flx_col(idg,NY,NX)  &
       + (Rain2SoilSurf_col(NY,NX)+Rain2LitRSurf_col(NY,NX))*trcg_rain_mole_conc_col(idg,NY,NX) &
       + (Irrig2SoilSurf_col(NY,NX)+Irrig2LitRSurf_col(NY,NX)+IrrigSubsurf_col(NY,NX))*trcg_irrig_mole_conc_col(idg,NY,NX) 
-    Gas_WetDeposition_col(idg,NY,NX) = Gas_WetDeposition_col(idg,NY,NX)*MolecularWeight(idg)  
+    Gas_WetDeposit_flx_col(idg,NY,NX) = Gas_WetDeposit_flx_col(idg,NY,NX)*MolecularWeight(idg)  
   
   ENDDO  
 

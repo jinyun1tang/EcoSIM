@@ -726,14 +726,15 @@ module Hour1Mod
   trcg_snowMassloss_col(:,NY,NX)  = 0._r8
   trcn_SnowDrift_flx_col(:,NY,NX) = 0._r8
   trcg_SnowDrift_flx_col(:,NY,NX) = 0._r8
-  DOM_draing_col(:,NY,NX)         = 0._r8
+  DOM_draing_col(:,:,NY,NX)         = 0._r8
   trcs_draing_col(:,NY,NX)        = 0._r8
+  DOM_SurfRunoff_flx_col(:,:,NY,NX) =0._r8
 
   trcn_snowMassloss_col(:,NY,NX)             = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)              = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
   Soil_Gas_pressure_vr(:,NY,NX)              = 0._r8
-  Gas_WetDeposition_col(:,NY,NX)             = 0._r8
+  Gas_WetDeposit_flx_col(:,NY,NX)             = 0._r8
   RootCO2Autor_col(NY,NX)                    = 0._r8
   QIceInflx_vr(:,NY,NX)                      = 0._r8
   QIceInflx_col(NY,NX)                       = 0._r8

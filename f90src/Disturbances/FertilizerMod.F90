@@ -722,10 +722,11 @@ implicit none
     FertN_mole_Band_vr(ifert_urea_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_urea_band,LFDPTH,NY,NX)+ZUBX*CVRDF)
     FertN_mole_Band_vr(ifert_no3_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_no3_band,LFDPTH,NY,NX)+ZOBX*CVRDF)
 
-    trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
-    trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
-    trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
-    trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)=trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF
+    trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)  = trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
+    trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX) = trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
+    trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)        = trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
+    trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)       = trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF
+
     IF(LFDPTH.EQ.0)THEN
       FertN_mole_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_nh4,NU(NY,NX),NY,NX)+Z4AX*BAREF)
       FertN_mole_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_nh3,NU(NY,NX),NY,NX)+Z3AX)
@@ -737,10 +738,10 @@ implicit none
       FertN_mole_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_urea_band,NU(NY,NX),NY,NX)+ZUBX*BAREF)
       FertN_mole_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_no3_band,NU(NY,NX),NY,NX)+ZOBX*BAREF)
 
-      trcp_saltpml_vr(idsp_CaH4P2O8,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8,NU(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
-      trcp_saltpml_vr(idsp_CaH4P2O8B,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaH4P2O8B,NU(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
-      trcp_saltpml_vr(idsp_HA,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_HA,NU(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
-      trcp_saltpml_vr(idsp_HAB,NU(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_HAB,NU(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF
+      trcp_saltpml_vr(idsp_CaH4P2O8,NU(NY,NX),NY,NX)  = trcp_saltpml_vr(idsp_CaH4P2O8,NU(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
+      trcp_saltpml_vr(idsp_CaH4P2O8B,NU(NY,NX),NY,NX) = trcp_saltpml_vr(idsp_CaH4P2O8B,NU(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
+      trcp_saltpml_vr(idsp_HA,NU(NY,NX),NY,NX)        = trcp_saltpml_vr(idsp_HA,NU(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
+      trcp_saltpml_vr(idsp_HAB,NU(NY,NX),NY,NX)       = trcp_saltpml_vr(idsp_HAB,NU(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF
     ELSE
       FertN_mole_soil_vr(ifert_nh3,LFDPTH,NY,NX)      = AZMAX1(FertN_mole_soil_vr(ifert_nh3,LFDPTH,NY,NX)+Z3AX*CVRDF)
       FertN_mole_Band_vr(ifert_nh3_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_nh3_band,LFDPTH,NY,NX)+Z3BX*CVRDF)

@@ -7,8 +7,9 @@ module SnowPhysMod
 ! codes for snow physics
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL  
-  use abortutils   , only : endrun   
-  use EcoSIMCtrlMod,  only: fixWaterLevel  
+  use abortutils,    only: endrun
+  use EcoSIMCtrlMod, only: fixWaterLevel
+  use DebugToolMod,  only: PrintInfo
   use SnowDataType
   use SurfLitterDataType
   use SOMDataType
@@ -1188,6 +1189,7 @@ contains
 ! Some update is needed to make sure it is correct
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
+  character(len=*), parameter :: subname='SnowRedistributionM'
   integer  :: N1,N2   !reference grid
 
   integer :: N,NN,N4,N5,N4B,N5B
@@ -1208,7 +1210,7 @@ contains
 !     QS,WatBySnowRedistrib,IceBySnowRedistrib=hourly-accumulated snow,water,ice transfer
 !     HeatSnoByRedist_2DH=hourly-accumd convective heat from snow,water,ice transfer
 !     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
-
+  call PrintInfo('beg '//subname)
   N1=NX;N2=NY
   DO  N=1,2
     DO  NN=1,2
@@ -1232,14 +1234,14 @@ contains
       ENDIF
       
       ALTS1=Altitude_col(N2,N1)+SnowDepth_col(N2,N1)
-      !check grid (N5,N4)
-      IF(NN.EQ.iFront)THEN
-               
+
+      IF(NN.EQ.iFront)THEN               
+
         ALTS2=Altitude_col(N5,N4)+SnowDepth_col(N5,N4)        
-        SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST(N,NU(N5,N4),N5,N4)
+        SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST_3D(N,NU(N5,N4),N5,N4)
 
         !QSX>0, grid (N2,N1) loses mass
-        QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
+        QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST_3D(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
 
         !using the upstream approach
         IF(SnowDepthLateralGradient.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
@@ -1263,9 +1265,14 @@ contains
         ENDIF
 
       ELSEIF(NN.EQ.iBehind)THEN
-        
+
         ALTSB=Altitude_col(N5,N4)+SnowDepth_col(N5B,N4B)        
-        SnowDepthLateralGradient=(ALTS1-ALTSB)/DIST(N,NU(N5B,N4B),N5B,N4B)
+        return
+        !will revise later
+        print*,'there',N,N5B,N4B,NU(N5B,N4B)
+        print*,DIST_3D(N,NU(N5B,N4B),N5B,N4B)
+        print*,ALTS1,ALTSB
+        SnowDepthLateralGradient=(ALTS1-ALTSB)/DIST_3D(N,NU(N5B,N4B),N5B,N4B)
 
         !MOVE from (N2,N1) to (N5B,N4B)
         IF(SnowDepthLateralGradient.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
@@ -1291,6 +1298,7 @@ contains
       ENDIF
     ENDDO
   ENDDO    
+  call PrintInfo('end '//subname)
   end subroutine SnowRedistributionM
 
 !------------------------------------------------------------------------------------------

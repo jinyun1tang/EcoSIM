@@ -761,7 +761,7 @@ contains
   implicit none
   integer, intent(in) :: I,J,M,NY,NX
   real(r8),intent(in) :: RainEkReducedKsat
-
+  character(len=*), parameter :: subname='SurfLitrSoilWaterExchangeM'
   real(r8) :: THETW1,ThetaWLitR,PSIST1
   real(r8) :: PSIST0,HeatFlxLitR2Soi,FLQZ,DarcyFlxLitR2Soil
   real(r8) :: WatDarcyFloLitR2SoiMicP,FLQ2,CNDR,DarcyCondLitR2Soil
@@ -792,6 +792,7 @@ contains
 ! CND1,CNDL=hydraulic conductivity of source,destination layer
 ! HydroCond_3D=lateral(1,2),vertical(3) micropore hydraulic conductivity
 !
+  call PrintInfo('beg '//subname)
   !check litter temperature
   VLWatLitR=AMIN1(VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX),VLWatMicP1_vr(0,NY,NX))
   if(VLWatLitR.LE.ZERO)return
@@ -904,7 +905,7 @@ contains
     WatFLo2LitrM_col(NY,NX)       = WatFLo2LitrM_col(NY,NX)-WatFlowLitR2MacP
     HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlowLitR2MacP
   ENDIF
-
+  call PrintInfo('end '//subname)
   end subroutine SurfLitrSoilWaterExchangeM
 !------------------------------------------------------------------------------------------
 
@@ -914,6 +915,7 @@ contains
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NY,NX
+  character(len=*), parameter :: subname='InfilSRFRoffPartitionM'
   integer :: N1,N2
   real(r8) :: LitrIceHeatFlxFrezPt,TK1X,ENGYR,VLWatMicP1X,VLHeatCapacityX
   real(r8) :: TFREEZ,TFLX,VWatExcess
@@ -937,6 +939,7 @@ contains
 !     LitrIceHeatFlxFrezPt,TFLX=unltd,ltd latent heat from freeze-thaw
 !     LitrIceHeatFlxFrez,LitrIceFlxThaw=litter water,latent heat flux from freeze-thaw
 ! using Clausius-Clapeyron equation for freezing temeprature calculation
+  call PrintInfo('beg '//subname)
   TFREEZ          = -9.0959E+04_r8/(PSISM1_vr(0,NY,NX)-LtHeatIceMelt)
   VLWatMicP1X     = AZMAX1(VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX))
   ENGYR           = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)
@@ -1006,6 +1009,7 @@ contains
     RunoffVelocityM_col(M,N2,N1)   = 0.0_r8
     SurfRunoffPotentM_col(M,N2,N1) = 0.0_r8
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine InfilSRFRoffPartitionM
 !------------------------------------------------------------------------------------------
 
@@ -1470,8 +1474,7 @@ contains
       !update snow state variables
       call UpdateSnowAtM(I,J,M,NY,NX)
       
-!      if(FracSurfSnoFree_col(NY,NX)>ZEROL)then
-      call UpdateLitRAftRunoffM(I,J,M,NY,NX)
+      if(FracSurfSnoFree_col(NY,NX)>ZEROL)call UpdateLitRAftRunoffM(I,J,M,NY,NX)
       
     ENDDO D9790
   ENDDO D9795
@@ -1600,7 +1603,6 @@ contains
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol_col(NY,NX),VapXAir2TopLay)
 
-      if(lverb)write(*,*)'CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE'
       call SurfLitrSoilWaterExchangeM(I,J,M,NY,NX,RainEkReducedKsat(NY,NX))
 
       call InfilSRFRoffPartitionM(I,J,M,NY,NX)

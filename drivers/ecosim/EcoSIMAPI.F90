@@ -310,7 +310,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !
   use data_kind_mod,   only: r8 => DAT_KIND_R8
   use DayMod,          only: day
-  use ExecMod,         only: exec
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts

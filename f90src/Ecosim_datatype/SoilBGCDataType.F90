@@ -108,7 +108,7 @@ implicit none
   real(r8),target,allocatable ::  Gas_Prod_TP_cumRes_col(:,:,:)      !Cumulative difference in gas belowground production and surface flux [g d-2]
   real(r8),target,allocatable ::  trcs_TransptMicP_3D(:,:,:,:,:)     !tracer solute transport in micropore [g d-2 h-1]
   real(r8),target,allocatable ::  DOM_MicpTransp_3D(:,:,:,:,:,:)     !DOC flux micropore, [g d-2 h-1]
-  real(r8),target,allocatable ::  Gas_WetDeposition_col(:,:,:)       !wet gas deposition due to irrigation and rainfall [g d-2 h-1]
+  real(r8),target,allocatable ::  Gas_WetDeposit_flx_col(:,:,:)       !wet gas deposition due to irrigation and rainfall [g d-2 h-1]
   real(r8),target,allocatable ::  Soil_Gas_pressure_vr(:,:,:)         !soil gas pressure, [Pa]
   real(r8),target,allocatable ::  CO2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous CO2 [ppmv]
   real(r8),target,allocatable ::  O2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous O2 [ppmv]
@@ -123,8 +123,9 @@ implicit none
   real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)               !Nitrification N2O produciton rate [gN d-2 h-1]
   real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production [gN d-2 h-1]
   real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2  [gN d-2 h-1]
-  real(r8),target,allocatable :: DOM_draing_col(:,:,:)               !DOM loss through subsurface drainage [g d-2 h-1]
+  real(r8),target,allocatable :: DOM_draing_col(:,:,:,:)             !DOM loss through subsurface drainage [g d-2 h-1]
   real(r8),target,allocatable :: trcs_draing_col(:,:,:)              !solute loss through subsurface drainage [g d-2 h-1]
+  real(r8),target,allocatable :: DOM_SurfRunoff_flx_col(:,:,:,:)     !DOM loss through surface runoff [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -142,7 +143,8 @@ implicit none
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(DOM_draing_col(idom_beg:idom_end,JY,JX));DOM_draing_col=0._r8
+  allocate(DOM_SurfRunoff_flx_col(idom_beg:idom_end,jcplx,JY,JX)); DOM_SurfRunoff_flx_col=0._r8
+  allocate(DOM_draing_col(idom_beg:idom_end,jcplx,JY,JX));DOM_draing_col=0._r8
   allocate(trcs_draing_col(ids_beg:ids_end,JY,JX));trcs_draing_col=0._r8
   allocate(CNH4_vr(JZ,JY,JX));     CNH4_vr=0._r8
   allocate(CNO3_vr(JZ,JY,JX));     CNO3_vr=0._r8
@@ -162,7 +164,7 @@ implicit none
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
   allocate(trcg_gascl_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); trcg_gascl_vr=0._r8
   allocate(tRDIM2DOM_col(1:NumPlantChemElms,JY,JX)); tRDIM2DOM_col=0._r8
-  allocate(Gas_WetDeposition_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDeposition_col=0._r8
+  allocate(Gas_WetDeposit_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDeposit_flx_col=0._r8
   allocate(tRHydlySOM_vr(1:NumPlantChemElms,0:JZ,JY,JX)); tRHydlySOM_vr=0._r8
   allocate(tRHydlyBioReSOM_vr(1:NumPlantChemElms,0:JZ,JY,JX));tRHydlyBioReSOM_vr=0._r8
   allocate(tRHydlySoprtOM_vr(1:NumPlantChemElms,0:JZ,JY,JX));      tRHydlySoprtOM_vr=0._r8
@@ -270,6 +272,7 @@ implicit none
 
   implicit none
 
+  call destroy(DOM_SurfRunoff_flx_col)
   call destroy(DOM_draing_col)
   call destroy(trcs_draing_col)
   call destroy(DOM_transpFlx_2DH)
@@ -279,7 +282,7 @@ implicit none
   call destroy(CH4_Gas_Frac_vr)  
   call destroy(Ar_Gas_Frac_vr)
   call destroy(RGasNetProd_col)
-  call destroy(Gas_WetDeposition_col)
+  call destroy(Gas_WetDeposit_flx_col)
   call destroy(Gas_Prod_TP_cumRes_col)
   call destroy(trcg_ebu_flx_col)
   call destroy(trcg_air2root_flx_col)

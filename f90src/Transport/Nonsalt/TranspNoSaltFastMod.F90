@@ -43,7 +43,7 @@ implicit none
   integer :: ids,iterm
 
   call PrintInfo('beg '//subname)
-!  call EnterMassCheck(I,J,NHE,NHW,NVS,NVN)
+  call EnterMassCheck(I,J,NHE,NHW,NVS,NVN)
   dpscal=1._r8
   dpscal_max=1._r8
   iterm=0
@@ -79,7 +79,7 @@ implicit none
     
 !    write(*,*)(I*1000+J)*100+M,MM,iterm,dpscal_max,dpscal(idg_H2),pscal(idg_H2)
   ENDDO
-!  call ExitMassCheck(I,J,M,NHE,NHW,NVS,NVN,MM)
+  call ExitMassCheck(I,J,M,NHE,NHW,NVS,NVN,MM)
   call PrintInfo('end '//subname)
   end subroutine TransptFastNoSaltMM
 !------------------------------------------------------------------------------------------
@@ -90,20 +90,20 @@ implicit none
 
   integer :: NY,NX,idg,L
 
-  DO NY=NHW,NHE
-    DO  NX=NVN,NVS
-      trcg_mass_beg2(:,NY,NX)=0._r8
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+      trcg_mass_begf(:,NY,NX)=0._r8
       trcg_netflx2soil_col(:,NY,NX)=0._r8      
       TranspNetSoil_fast_flx_col(:,NY,NX)=0._r8
       RGas_Disol_FlxM_vr(:,:,NY,NX)=0._r8
       DO idg=idg_beg,idg_NH3
         DO L=NU(NY,NX),NL(NY,NX)
-          trcg_mass_beg2(idg,NY,NX)=trcg_mass_beg2(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
+          trcg_mass_begf(idg,NY,NX)=trcg_mass_begf(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
         ENDDO 
       ENDDO
       idg=idg_NH3
       DO L=NU(NY,NX),NL(NY,NX)
-        trcg_mass_beg2(idg,NY,NX)=trcg_mass_beg2(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)+trcs_solml2_vr(idg_NH3B,L,NY,NX)
+        trcg_mass_begf(idg,NY,NX)=trcg_mass_begf(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)+trcs_solml2_vr(idg_NH3B,L,NY,NX)
       ENDDO       
     ENDDO  
   ENDDO
@@ -120,8 +120,8 @@ implicit none
   real(r8) :: dmass,err
 
 
-  DO NY=NHW,NHE
-    DO  NX=NVN,NVS
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
       trcg_mass_now=0._r8
       DO idg=idg_beg,idg_NH3
         DO L=NU(NY,NX),NL(NY,NX)
@@ -133,14 +133,10 @@ implicit none
         trcg_mass_now(idg)=trcg_mass_now(idg)+trcs_solml_vr(idg_NH3B,L,NY,NX)
       ENDDO
       DO idg=idg_beg,idg_NH3
-        dmass=trcg_mass_now(idg)-trcg_mass_beg2(idg,NY,NX)
+        dmass=trcg_mass_now(idg)-trcg_mass_begf(idg,NY,NX)
         err=dmass-trcg_netflx2soil_col(idg,NY,NX)
 
-        if(idg==idg_CO2 .and. I==1 .and. J==1)then
-          write(133,*)(I*1000+J)*100+M,trcs_names(idg)
-          write(133,*)'init/final mass=',trcg_mass_beg2(idg,NY,NX),trcg_mass_now(idg)
-          write(133,*)'dmass,         =',dmass,TranspNetSoil_fast_flx_col(idg,NY,NX),trcg_netflx2soil_col(idg,NY,NX)
-          write(133,*)'err            =',err
+!        if(idg==idg_CO2 .and. I==1 .and. J==1)then
 !          write(144,*)('-',L=1,50)          
 !          write(144,*)(I*1000+J)*100+M,trcs_names(idg),iterm
 !          write(144,*)trcg_VLWatMicP_vr(idg_CO2,NU(NY,NX):NL(NY,NX),NY,NX)
@@ -148,10 +144,14 @@ implicit none
 !         write(144,*)RGas_Disol_FlxM_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
 !         write(144,*)trcs_solml_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
 
-!          if(abs(err)>1.e-8_r8)then
-!            call endrun(trim(mod_filename)//' at line',__LINE__)          
-!          endif
-        endif
+          if(abs(err)>1.e-5_r8)then
+            write(133,*)(I*1000+J)*100+M,trcs_names(idg)
+            write(133,*)'init/final mass=',trcg_mass_begf(idg,NY,NX),trcg_mass_now(idg)
+            write(133,*)'dmass,         =',dmass,TranspNetSoil_fast_flx_col(idg,NY,NX),trcg_netflx2soil_col(idg,NY,NX)
+            write(133,*)'err            =',err
+            call endrun(trim(mod_filename)//' at line',__LINE__)          
+          endif
+!        endif
       ENDDO
 
     ENDDO  
@@ -163,8 +163,8 @@ implicit none
   integer, intent(in) :: NHE,NHW,NVS,NVN
   integer :: NY,NX,idg,L
 
-  DO NY=NHW,NHE
-    DO  NX=NVN,NVS
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3      
        trcs_solml2_vr(idg,0,NY,NX) = AZERO(trcs_solml_vr(idg,0,NY,NX))
        DO L=NU(NY,NX),NL(NY,NX)
@@ -237,8 +237,8 @@ implicit none
   integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
   integer :: NY,NX,idg,L,ids
 
-  DO NY=NHW,NHE
-    DO  NX=NVN,NVS
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3      
        trcs_solml_vr(idg,0,NY,NX)=AZERO(trcs_solml2_vr(idg,0,NY,NX))
        DO L=NU(NY,NX),NL(NY,NX)
@@ -281,10 +281,10 @@ implicit none
     call FastUpdateStateVarsMM(I,J,M,NHW, NHE, NVN, NVS,ppscal)
   endif
 
-  DO NY=NHW,NHE
-    DO  NX=NVN,NVS
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3   
-        if(ppscal(idg)>tiny_p)then       
+        if(ppscal(idg)>tiny_p)then     
           GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+(RGas_Disol_FlxMM_vr(idg,0,NY,NX) &
             +Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX))*ppscal(idg)
 

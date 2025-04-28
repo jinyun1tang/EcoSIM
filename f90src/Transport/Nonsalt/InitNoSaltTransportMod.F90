@@ -150,7 +150,7 @@ module InitNoSaltTransportMod
         TranspNetSoil_flx_col(idg,NY,NX)                   = 0._r8
         TranspNetSoil_flx2_col(idg,NY,NX)                  = 0._r8
         Gas_WetDepo2Snow_col(idg,NY,NX)                    = 0._r8
-        Gas_Snowloss_col(idg,NY,NX)                        = 0._r8
+        Gas_Snowloss_flx_col(idg,NY,NX)                        = 0._r8
         transp_diff_slow_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
       ENDDO
 

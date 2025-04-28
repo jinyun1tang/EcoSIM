@@ -752,6 +752,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
+  character(len=*), parameter :: subname='XGridsSurfRunoffM'
   integer :: N1,N2   !source grid, with which the lateral exchange is computed 
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALT1,ALT2,ALTB
@@ -761,7 +762,7 @@ implicit none
 !     begin_execution
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-  
+  call PrintInfo('beg '//subname)
   N1=NX;N2=NY
   DO  N=1,2     !1:iWestEastDirection, 2:iNorthSouthDirection
     DO  NN=1,2  !Denotes the position of (N2,N1) relative to the target grid, iFront  :=1; iBehind  :=2, 
@@ -881,7 +882,7 @@ implicit none
       ENDIF
     ENDDO  
   ENDDO
-  
+  call PrintInfo('end '//subname)
   end subroutine XGridsSurfRunoffM
 
 

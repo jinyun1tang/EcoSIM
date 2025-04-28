@@ -288,7 +288,7 @@ contains
           write(111,*)'mass_err         =',tracer_mass_err
           write(111,*)'gasdif,ebu       =',GasDiff2Surf_flx_col(idg,NY,NX),trcg_ebu_flx_col(idg,NY,NX)
           write(111,*)'phenoflx         =',TRootGasLossDisturb_col(idg,NY,NX)
-          write(111,*)'wedepo           =',Gas_WetDeposition_col(idg,NY,NX)          
+          write(111,*)'wedepo           =',Gas_WetDeposit_flx_col(idg,NY,NX)          
           write(111,*)'----------------------'
           write(111,*)'surf emis        =',SurfGasEmisFlx_col(idg,NY,NX)          
           write(111,*)'GasHydroloss     =',GasHydroLossFlx_col(idg,NY,NX)
@@ -310,12 +310,12 @@ contains
           write(111,*)'------------------'
           write(111,*)'soil beg_end mass=',trcg_soilMass_beg_col(idg,NY,NX), trcg_soilMass_col(idg,NY,NX),&
             trcg_soilMass_beg_col(idg,NY,NX)-trcg_soilMass_col(idg,NY,NX)
-          write(111,*)'soil2atm         =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX)  
+          write(111,*)'soil2atm         =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX)  
           
           if(idg==idg_CO2)then
             write(111,*)'ar2soil          =',RootCO2Ar2Soil_col(NY,NX)
           endif    
-          write(111,*)'soil loss        =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposition_col(idg,NY,NX) &
+          write(111,*)'soil loss        =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX) &
               -trcs_plant_uptake_col(idg,NY,NX) 
           
           write(111,*)'=================='

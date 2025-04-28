@@ -297,17 +297,17 @@ module StartsMod
             ENDIF
           ENDIF
           !distance between the center of grids (N3,N2,N1) and (N6,N5,N4)
-          DIST(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
+          DIST_3D(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
           !
-          XDPTH_3D(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
+          XDPTH_3D(N,N6,N5,N4) = AREA(N,N3,N2,N1)/DIST_3D(N,N6,N5,N4)
           !1.07 is a scaling parameter for dispersion calculation, reference?
-          DISP_3D(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
+          DISP_3D(N,N6,N5,N4)=0.20_r8*DIST_3D(N,N6,N5,N4)**1.07_r8
         ENDDO
 
         IF(L.EQ.NU(NY,NX))THEN
-          DIST(3,N3,N2,N1)  = 0.5_r8*DLYR_3D(3,N3,N2,N1)
-          XDPTH_3D(3,N3,N2,N1) = AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
-          DISP_3D(3,N3,N2,N1)  = 0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
+          DIST_3D(3,N3,N2,N1)  = 0.5_r8*DLYR_3D(3,N3,N2,N1)
+          XDPTH_3D(3,N3,N2,N1) = AREA(3,N3,N2,N1)/DIST_3D(3,N3,N2,N1)
+          DISP_3D(3,N3,N2,N1)  = 0.20_r8*DIST_3D(3,N3,N2,N1)**1.07_r8
         ENDIF
       ENDDO
     ENDDO
