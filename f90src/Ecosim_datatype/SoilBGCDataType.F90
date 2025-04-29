@@ -45,8 +45,8 @@ implicit none
   real(r8),target,allocatable ::  MoistSensDecomp_vr(:,:,:)          !moisture dependence of microbial activity
   real(r8),target,allocatable ::  GasDiff2Surf_flx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink in soil due to plant and microbial respiration, [g d-2]
-  real(r8),target,allocatable ::  SurfGasEmisFlx_col(:,:,:)          !surface gas flux, including diffusion, ebullition, wet deposition and plant transp [g d-2 h-1]
-  real(r8),target,allocatable ::  GasHydroLossFlx_col(:,:,:)         !hydrological loss of volatile tracers [g d-2 h-1]
+  real(r8),target,allocatable ::  SurfGasEmiss_flx_col(:,:,:)          !surface gas flux, including diffusion, ebullition, wet deposition and plant transp [g d-2 h-1]
+  real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)         !hydrological loss of volatile tracers [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]
   real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)            !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)             !total fertilizer P amendment, [g d-2]
@@ -193,8 +193,8 @@ implicit none
   allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
-  allocate(GasHydroLossFlx_col(idg_beg:idg_end,JY,JX)); GasHydroLossFlx_col=0._r8
-  allocate(SurfGasEmisFlx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmisFlx_col=0._r8
+  allocate(GasHydroLoss_flx_col(idg_beg:idg_end,JY,JX)); GasHydroLoss_flx_col=0._r8
+  allocate(SurfGasEmiss_flx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmiss_flx_col=0._r8
   allocate(GasDiff2Surf_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_flx_col=0._r8
   allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
   allocate(FertNFlx_CumYr_col(JY,JX));      FertNFlx_CumYr_col=0._r8
@@ -358,8 +358,8 @@ implicit none
   call destroy(trcg_rootMass_beg_col)
   call destroy(trcg_rootMass_col)
   call destroy(GasDiff2Surf_flx_col)
-  call destroy(SurfGasEmisFlx_col)
-  call destroy(GasHydroLossFlx_col)
+  call destroy(SurfGasEmiss_flx_col)
+  call destroy(GasHydroLoss_flx_col)
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)
   call destroy(trcg_DisolEvap_Atm2Litr_flx)

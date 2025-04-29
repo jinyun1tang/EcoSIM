@@ -257,12 +257,12 @@ contains
       
       DO idg=idg_beg,idg_NH3        
         if(idg==idg_NH3)then
-          tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
+          tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
             +RGasNetProd_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
           tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX)
           trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err         
         else
-          tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
+          tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
             +RGasNetProd_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
           trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err 
         endif
@@ -290,8 +290,8 @@ contains
           write(111,*)'phenoflx         =',TRootGasLossDisturb_col(idg,NY,NX)
           write(111,*)'wedepo           =',Gas_WetDeposit_flx_col(idg,NY,NX)          
           write(111,*)'----------------------'
-          write(111,*)'surf emis        =',SurfGasEmisFlx_col(idg,NY,NX)          
-          write(111,*)'GasHydroloss     =',GasHydroLossFlx_col(idg,NY,NX)
+          write(111,*)'surf emis        =',SurfGasEmiss_flx_col(idg,NY,NX)          
+          write(111,*)'GasHydroloss     =',GasHydroLoss_flx_col(idg,NY,NX)
           if(idg==idg_N2)then
             write(111,*)'RGasNetProd,rNfix,mup=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
           elseif(idg==idg_CO2)then
@@ -308,14 +308,14 @@ contains
           write(111,*)'tracersnowfall   =',trcg_AquaAdv_flx_snvr(idg,1,NY,NX)
           write(111,*)'snowmass err     =',tracer_snowmass_err
           write(111,*)'------------------'
-          write(111,*)'soil beg_end mass=',trcg_soilMass_beg_col(idg,NY,NX), trcg_soilMass_col(idg,NY,NX),&
+          write(111,*)'soil beg_end mass dmass=',trcg_soilMass_beg_col(idg,NY,NX), trcg_soilMass_col(idg,NY,NX),&
             trcg_soilMass_beg_col(idg,NY,NX)-trcg_soilMass_col(idg,NY,NX)
           write(111,*)'soil2atm         =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX)  
           
           if(idg==idg_CO2)then
             write(111,*)'ar2soil          =',RootCO2Ar2Soil_col(NY,NX)
           endif    
-          write(111,*)'soil loss        =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX) &
+          write(111,*)'col loss        =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX) &
               -trcs_plant_uptake_col(idg,NY,NX) 
           
           write(111,*)'=================='

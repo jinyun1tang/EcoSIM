@@ -119,7 +119,7 @@ module TranspNoSaltMod
       trcs_mass_now(:)=0._r8
       DO idg=idg_beg,idg_NH3
 
-        SurfGasEmisFlx_col(idg,NY,NX) =  trcg_ebu_flx_col(idg,NY,NX) &
+        SurfGasEmiss_flx_col(idg,NY,NX) =  trcg_ebu_flx_col(idg,NY,NX) &
           + GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX) 
 
         mass_litr=trcs_solml_vr(idg,0,NY,NX)
@@ -142,7 +142,7 @@ module TranspNoSaltMod
 
         trcs_mass_now(idg)=mass_snow+mass_litr+mass_soil
         errmass=trcs_mass_beg(idg,NY,NX)-trcs_mass_now(idg)  &
-          +SurfGasEmisFlx_col(idg,NY,NX)+GasHydroLossFlx_col(idg,NY,NX) &
+          +SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
           +RGasNetProd_col(idg,NY,NX)
 
         if(abs(errmass)>1.e-5)then
@@ -196,8 +196,8 @@ module TranspNoSaltMod
           write(121,*)'ebu         =',trcg_ebu_flx_col(idg,NY,NX)
           write(121,*)'dif         =',GasDiff2Surf_flx_col(idg,NY,NX)
           write(121,*)'--------------------------'
-          write(121,*)'surfemis  =',SurfGasEmisFlx_col(idg,NY,NX)          
-          write(121,*)'hydloss   =',GasHydroLossFlx_col(idg,NY,NX)
+          write(121,*)'surfemis  =',SurfGasEmiss_flx_col(idg,NY,NX)          
+          write(121,*)'hydloss   =',GasHydroLoss_flx_col(idg,NY,NX)
           write(121,*)'netpro    =',RGasNetProd_col(idg,NY,NX),RGasNetProdSoil_col(idg,NY,NX)          
           write(121,*)'--------------------------'          
           write(121,*)'latloss=',trcs_SubsurTransp_flx_2DH(idg,NY,NX)

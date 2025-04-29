@@ -153,9 +153,9 @@ implicit none
   real(r8),pointer   :: h1D_O2_LITR_col(:)       !trc_solcl_vr(idg_O2,0,NY,NX)
   real(r8),pointer   :: h1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
   real(r8),pointer   :: h1D_AR_SEMIS_FLX_col(:)   !
-  real(r8),pointer   :: h1D_CO2_SEMIS_FLX_col(:)  !SurfGasEmisFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
+  real(r8),pointer   :: h1D_CO2_SEMIS_FLX_col(:)  !SurfGasEmiss_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
   real(r8),pointer   :: h1D_ECO_CO2_FLX_col(:)   !Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
-  real(r8),pointer   :: h1D_CH4_SEMIS_FLX_col(:)       !SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
+  real(r8),pointer   :: h1D_CH4_SEMIS_FLX_col(:)       !SurfGasEmiss_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
   real(r8),pointer   :: h1D_CH4_EBU_flx_col(:)
   real(r8),pointer   :: h1D_Ar_EBU_flx_col(:)
   real(r8),pointer   :: h1D_CO2_TPR_err_col(:)
@@ -169,7 +169,7 @@ implicit none
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
   real(r8),pointer   :: h1D_NH3_DIF_flx_col(:)
   real(r8),pointer   :: h1D_Ar_soilMass_col(:)
-  real(r8),pointer   :: h1D_O2_SEMIS_FLX_col(:)     !SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
+  real(r8),pointer   :: h1D_O2_SEMIS_FLX_col(:)     !SurfGasEmiss_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
   real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_CANET_col(:)         !canopy evaportranspiration
@@ -187,9 +187,9 @@ implicit none
   real(r8),pointer   :: h1D_CO2_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_RootN_Fix_col(:)
   real(r8),pointer   :: h1D_AR_WetDep_FLX_col(:)
-  real(r8),pointer   :: h1D_Soil_N2O_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_N2_SEMIS_FLX_col(:)        !SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NH3_SEMIS_FLX_col(:)        !SurfGasEmisFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_Soil_N2O_FLX_col(:)        !SurfGasEmiss_flx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_N2_SEMIS_FLX_col(:)        !SurfGasEmiss_flx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_NH3_SEMIS_FLX_col(:)        !SurfGasEmiss_flx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: h1D_H2_SEMIS_FLX_col(:)
   real(r8),pointer   :: h1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
   real(r8),pointer   :: h1D_PAR_CAN_ptc(:)        !PAR absorbed by Canopy, umol /m2/s
@@ -2707,7 +2707,7 @@ implicit none
       this%h1D_tNO3_col(ncol)       = tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tRAD_col(ncol)       = TRAD(NY,NX)
       if(this%h1D_tNH4X_col(ncol)<0._r8)then
-        write(*,*)'negative',this%h1D_tNH4X_col(ncol),this%h1D_tNO3_col(ncol)
+        write(*,*)'negative tNH4X',this%h1D_tNH4X_col(ncol),this%h1D_tNO3_col(ncol)
         stop
       endif      
       this%h1D_tMICRO_N_col(ncol)         = tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -2774,12 +2774,12 @@ implicit none
       this%h1D_Eco_HeatSen_col(ncol)      = Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_Heat2G_col(ncol)       = Eco_Heat_GrndSurf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_O2_LITR_col(ncol)          = trc_solcl_vr(idg_O2,0,NY,NX)
-      this%h1D_CO2_SEMIS_FLX_col(ncol)    = SurfGasEmisFlx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
-      this%h1D_AR_SEMIS_FLX_col(ncol)     = SurfGasEmisFlx_col(idg_AR,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_AR)
+      this%h1D_CO2_SEMIS_FLX_col(ncol)    = SurfGasEmiss_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_AR_SEMIS_FLX_col(ncol)     = SurfGasEmiss_flx_col(idg_AR,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_AR)
       this%h1D_ECO_CO2_FLX_col(ncol)      = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1d_CAN_NEE_col(ncol)          = Canopy_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
-      this%h1D_CH4_SEMIS_FLX_col(ncol)    = SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
-      this%h1D_O2_SEMIS_FLX_col(ncol)     = SurfGasEmisFlx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
+      this%h1D_CH4_SEMIS_FLX_col(ncol)    = SurfGasEmiss_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_O2_SEMIS_FLX_col(ncol)     = SurfGasEmiss_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
       this%h1D_CH4_EBU_flx_col(ncol)      = trcg_ebu_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
       this%h1D_Ar_EBU_flx_col(ncol)       = trcg_ebu_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)
       this%h1D_AR_PLTROOT_flx_col(ncol)   = trcg_air2root_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)
@@ -2806,10 +2806,10 @@ implicit none
       this%h1D_SURF_ICE_col(ncol)         = ThetaICEZ_vr(0,NY,NX)
       this%h1D_ACTV_LYR_col(ncol)         = -(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
       this%h1D_WTR_TBL_col(ncol)          = -(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
-      this%h1D_Soil_N2O_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_N2_SEMIS_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_NH3_SEMIS_FLX_col(ncol)         = SurfGasEmisFlx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_H2_SEMIS_FLX_col(ncol)          = SurfGasEmisFlx_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_Soil_N2O_FLX_col(ncol)         = SurfGasEmiss_flx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_N2_SEMIS_FLX_col(ncol)         = SurfGasEmiss_flx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_NH3_SEMIS_FLX_col(ncol)         = SurfGasEmiss_flx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_H2_SEMIS_FLX_col(ncol)          = SurfGasEmiss_flx_col(idg_H2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_PAR_col(ncol)              = RadPARSolarBeam_col(NY,NX)      
       this%h1D_VHeatCap_litr_col(ncol)    = VHeatCapacity_vr(0,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_AR_WetDep_FLX_col(ncol)    = Gas_WetDeposit_flx_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

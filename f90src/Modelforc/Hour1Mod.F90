@@ -782,9 +782,9 @@ module Hour1Mod
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)        = 0._r8
   RootCO2Ar2Soil_col(NY,NX)                  = 0._r8
   RootCO2Ar2Root_col(NY,NX)                  = 0._r8
-  GasHydroLossFlx_col(idg_beg:idg_end,NY,NX) = 0._r8
+  GasHydroLoss_flx_col(idg_beg:idg_end,NY,NX) = 0._r8
   trcn_SurfRunoff_flx_col(:,NY,NX)               = 0._r8
-  SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
+  SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
   GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
   HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8

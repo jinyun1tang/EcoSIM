@@ -239,7 +239,7 @@ implicit none
     !loss of dissolved gases from surface snow
     DO idg=idg_beg,idg_NH3
       trcg_solsml_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)+trcg_LossXSnowRedist_col(idg,NY,NX)
-      GasHydroLossFlx_col(idg,NY,NX)=GasHydroLossFlx_col(idg,NY,NX)+trcg_LossXSnowRedist_col(idg,NY,NX)
+      GasHydroLoss_flx_col(idg,NY,NX)=GasHydroLoss_flx_col(idg,NY,NX)+trcg_LossXSnowRedist_col(idg,NY,NX)
     ENDDO
 
     DO ids=ids_nut_beg,ids_nuts_end

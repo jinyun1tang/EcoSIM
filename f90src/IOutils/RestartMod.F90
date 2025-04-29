@@ -4814,16 +4814,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)    
-    call restartvar(ncid, flag, varname='SurfGasEmisFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasEmiss_flx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmisFlx_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmiss_flx_col,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmisFlx_col,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmiss_flx_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
-    call restartvar(ncid, flag, varname='SurfGasEmisFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasEmiss_flx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    

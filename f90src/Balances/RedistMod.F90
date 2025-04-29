@@ -171,10 +171,10 @@ module RedistMod
   call PrintInfo('beg '//subname)
 
   DO idg=idg_beg,idg_NH3
-    SurfGasEmisFlx_col(idg,NY,NX) = SurfGasEmisFlx_col(idg,NY,NX)     &
+    SurfGasEmiss_flx_col(idg,NY,NX) = SurfGasEmiss_flx_col(idg,NY,NX)     &
       + TRootGasLossDisturb_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)
 
-    SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmisFlx_col(idg,NY,NX)
+    SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmiss_flx_col(idg,NY,NX)
   ENDDO
 
   Eco_NetRad_col(NY,NX)        = Eco_NetRad_col(NY,NX)+HeatByRad2Surf_col(NY,NX)
@@ -184,11 +184,11 @@ module RedistMod
 
   Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
-  Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmisFlx_col(idg_CO2,NY,NX)
-  ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmisFlx_col(idg_CO2,NY,NX)
+  Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_flx_col(idg_CO2,NY,NX)
+  ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_flx_col(idg_CO2,NY,NX)
   Eco_NPP_CumYr_col(NY,NX)         = Eco_GPP_CumYr_col(NY,NX)+Eco_AutoR_CumYr_col(NY,NX)
   Eco_NBP_CumYr_col(NY,NX)         = Eco_NBP_CumYr_col(NY,NX)+Eco_NEE_col(NY,NX) &
-    +SurfGasEmisFlx_col(idg_CH4,NY,NX) +Txchem_CO2_col(NY,NX) &
+    +SurfGasEmiss_flx_col(idg_CH4,NY,NX) +Txchem_CO2_col(NY,NX) &
     -HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX) &
     -HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
 
@@ -198,7 +198,7 @@ module RedistMod
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)+RootCO2Ar2Root_col(NY,NX)+RootCO2Ar2Soil_col(NY,NX)
   
   DO idg=idg_beg,idg_NH3  
-    Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmisFlx_col(idg,NY,NX) &
+    Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmiss_flx_col(idg,NY,NX) &
       +RGasNetProd_col(idg,NY,NX)
   ENDDO  
 
@@ -322,7 +322,6 @@ module RedistMod
   do idg=idg_beg,idg_NH3-1
     trcs_RMicbUptake_col(idg,NY,NX)=trcs_RMicbUptake_col(idg,NY,NX)+trcs_RMicbUptake_vr(idg,0,NY,NX)
   enddo
-
   
   trcx_solml_vr(idx_NH4,0,NY,NX)=trcx_solml_vr(idx_NH4,0,NY,NX)+trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)
 
@@ -687,7 +686,10 @@ module RedistMod
   Z4F             = natomw*(FertN_mole_soil_vr(ifert_nh4,0,NY,NX)+FertN_mole_soil_vr(ifert_urea,0,NY,NX)+FertN_mole_soil_vr(ifert_nh3,0,NY,NX))
   TDisolNH4_lnd   = TDisolNH4_lnd+Z4S+Z4X+Z4F
   tNH4_col(NY,NX) = tNH4_col(NY,NX)+Z4S+Z4X
-
+  if(Z4X<0._r8)then
+    write(*,*)'Z4X',Z4X
+    stop
+  endif
   ZOS             = trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX)
   ZOF             = natomw*FertN_mole_soil_vr(ifert_no3,0,NY,NX)
   tNO3_lnd        = tNO3_lnd+ZOS+ZOF
@@ -1110,7 +1112,10 @@ module RedistMod
     TGasN_lnd       = TGasN_lnd+ZG
     TDisolNH4_lnd   = TDisolNH4_lnd+Z4S+Z4X+Z4F
     tNH4_col(NY,NX) = tNH4_col(NY,NX)+Z4S+Z4X
-
+    if(tNH4_col(NY,NX)<0._r8)then
+      write(*,*)'Z4S+Z4X',Z4S,Z4X
+      stop
+    endif
     ZOF             = natomw*(FertN_mole_soil_vr(ifert_no3,L,NY,NX)+FertN_mole_soil_vr(ifert_no3,L,NY,NX))
     tNO3_lnd        = tNO3_lnd+ZOS+ZOF
     tNO3_col(NY,NX) = tNO3_col(NY,NX)+ZOS

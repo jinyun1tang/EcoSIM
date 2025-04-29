@@ -263,7 +263,7 @@ module MicBGCMod
     rCPDOM                    => ncplxs%rCPDOM,                    &
     CDOM                      => ncplxs%CDOM,                      &
     OMBioResduK               => ncplxs%OMBioResduK,               &
-    SolidOMCK                  => ncplxs%SolidOMCK,                  &
+    SolidOMCK                 => ncplxs%SolidOMCK,                 &
     SolidOMActK               => ncplxs%SolidOMActK,               &
     tMaxNActMicrbK            => ncplxs%tMaxNActMicrbK,            &
     tMaxPActMicrbK            => ncplxs%tMaxPActMicrbK,            &
