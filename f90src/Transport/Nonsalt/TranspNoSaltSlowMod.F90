@@ -60,7 +60,7 @@ implicit none
   DO while(dpscal_max>1.e-2_r8 .and. iterm<3)
     iterm=iterm+1
     pscal=1.000_r8
-
+!    write(555,*)'============================'
     call ZeroFluxesM(I,J,M,NHE,NHW,NVS,NVN)  
 
     call SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN)
@@ -92,10 +92,9 @@ implicit none
       dpscal_max=AMAX1(dpscal_max,dpscal_dom(idom))
     ENDDO
 
-    call ExitMassCheck(I,J,M,NHE,NHW,NVS,NVN,iterm)
 !    if(iterm>200)stop
   ENDDO
-
+  call ExitMassCheck(I,J,M,NHE,NHW,NVS,NVN,iterm)
   call PrintInfo('end '//subname)
   end subroutine TransptSlowNoSaltM
 !------------------------------------------------------------------------------------------
@@ -109,27 +108,27 @@ implicit none
   integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
 
   integer :: NY,NX,idg,L,K,idom
-
+!  write(555,*)'enter'
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      trcg_mass_begs(:,NY,NX)          = 0._r8
-      DOM_mass_begs(:,:,NY,NX)         = 0._r8
-      DOM_Hydroloss_slow_flx_col(:,:,NY,NX)     = 0._r8
-      TranspNetDOM_flx_col(:,:,NY,NX)  = 0._r8
-      TranspNetDOM_flx2_col(:,:,NY,NX) = 0._r8
-      GasDiff2Surf_slow_flx_col(:,NY,NX)     = 0._r8
-      Gas_WetDeposit_slow_flx_col(:,NY,NX)   = 0._r8
-      Gas_WetDepo2Snow_slow_flx_col(:,NY,NX) = 0._r8
-      Gas_Snowloss_slow_flx_col(:,NY,NX)     = 0._r8
-      trcs_NetFlow2Litr_slow_flx_col(:,NY,NX)=0._r8
-      trcs_hydrloss_slow_flx_col(:,NY,NX) = 0._r8
-      trcs_NetProd_slow_flx_col(:,NY,NX)  = 0._r8
-      trcg_mass_snow_begs(:,NY,NX)        = 0._r8
-      trcg_mass_soil_begs(:,NY,NX)        = 0._r8
-      trcs_netflow2soil_slow_flx_col(:,NY,NX)=0._r8
+      trcg_mass_begs(:,NY,NX)               = 0._r8
+      DOM_mass_begs(:,:,NY,NX)              = 0._r8
+      DOM_Hydroloss_slow_flx_col(:,:,NY,NX) = 0._r8
+      TranspNetDOM_flx_col(:,:,NY,NX)       = 0._r8
+      TranspNetDOM_flx2_col(:,:,NY,NX)      = 0._r8
+      GasDiff2Surf_slow_flx_col(:,NY,NX)      = 0._r8
+      Gas_WetDeposit_slow_flx_col(:,NY,NX)    = 0._r8
+      Gas_WetDepo2Snow_slow_flx_col(:,NY,NX)  = 0._r8
+      Gas_Snowloss_slow_flx_col(:,NY,NX)      = 0._r8
+      trcs_NetFlow2Litr_slow_flx_col(:,NY,NX) = 0._r8
+      trcs_hydrloss_slow_flx_col(:,NY,NX)     = 0._r8
+      trcs_NetProd_slow_flx_col(:,NY,NX)      = 0._r8
+      trcg_mass_snow_begs(:,NY,NX)            = 0._r8
+      trcg_mass_soil_begs(:,NY,NX)            = 0._r8
+      trcs_netflow2soil_slow_flx_col(:,NY,NX) = 0._r8
 
       DO idg=idg_beg,idg_NH3
-        DO L=1,JS
+        DO L=1,nsnol_col(NY,NX)
           trcg_mass_snow_begs(idg,NY,NX)=trcg_mass_snow_begs(idg,NY,NX)+trcg_solsml2_snvr(idg,L,NY,NX)
         ENDDO
 
@@ -188,7 +187,7 @@ implicit none
       trcg_mass_soil_now=0._r8
 
       DO idg=idg_beg,idg_NH3
-        DO L=1,JS
+        DO L=1,nsnol_col(NY,NX)
           trcg_mass_snow_now(idg)=trcg_mass_snow_now(idg)+trcg_solsml2_snvr(idg,L,NY,NX)
         ENDDO
 
@@ -232,9 +231,9 @@ implicit none
         endif
         if(abs(err)>1.e-5)then
           write(201,*)('-',L=1,50)
-          write(201,*)(I*1000+J)*10+M,iterm,trcs_names(idg),NY,NX
+          write(201,*)(I*1000+J)*10+M,'iterm=',iterm,trcs_names(idg),NY,NX,'slow'
           write(201,*)'beg/end total mass',trcg_mass_begs(idg,NY,NX),trcg_mass_now(idg)
-          write(201,*)'err=',err
+          write(201,*)'err=',err,'nsnol_col=',nsnol_col(NY,NX)
           write(201,*)'beg/end snow mass=',trcg_mass_snow_begs(idg,NY,NX),trcg_mass_snow_now(idg),trcg_mass_snow_begs(idg,NY,NX)-trcg_mass_snow_now(idg)
           write(201,*)'beg/end litr mass=',trcg_mass_litr_begs(idg,NY,NX),trcg_mass_litr_now(idg),trcg_mass_litr_begs(idg,NY,NX)-trcg_mass_litr_now(idg)
           write(201,*)'beg/end soil mass=',trcg_mass_soil_begs(idg,NY,NX),trcg_mass_soil_now(idg),trcg_mass_soil_begs(idg,NY,NX)-trcg_mass_soil_now(idg)
@@ -243,7 +242,8 @@ implicit none
           write(201,*)'netflx2litr=',trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)
           write(201,*)'dep2sno =',Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)
           write(201,*)'snowloss=',-Gas_Snowloss_slow_flx_col(idg,NY,NX)
-
+          write(201,*)'snowdrift=',trcg_SnowDrift_flx_col(idg,NY,NX)
+          write(201,*)'snow mass=',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
           if(idg==idg_NH3)then
             write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
             write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
@@ -353,7 +353,7 @@ implicit none
         ENDDO
       ENDDO
 
-      DO L=1,JS
+      DO L=1,nsnol_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           trcg_solsml2_snvr(idg,L,NY,NX)  = AZERO(trcg_solsml_snvr(idg,L,NY,NX))
         ENDDO
@@ -563,14 +563,16 @@ implicit none
             +trcg_AquaAdv_flxM_snvr(idg,1,NY,NX))
 
           Gas_WetDeposit_slow_flx_col(idg,NY,NX)= Gas_WetDeposit_slow_flx_col(idg,NY,NX)+flux
-
-          Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)=Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)+ppscal(idg) &
-            *trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)
-
+!          if(idg==idg_O2 .and. NY==1 .and. NX==1)then
+!            write(555,*)'snow flux p',flux,ppscal(idg),'prec',trcg_Precip2LitrM_col(idg,NY,NX),trcs_Precip2MicpM_col(idg,NY,NX), & 
+!              trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)
+!          endif
           Gas_WetDeposit_flx_col(idg,NY,NX)= Gas_WetDeposit_flx_col(idg,NY,NX)+ flux
 
-          Gas_WetDepo2Snow_col(idg,NY,NX) = Gas_WetDepo2Snow_col(idg,NY,NX)+ ppscal(idg) &
-            *trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)
+          flux=ppscal(idg) *trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)
+          Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)=Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)+flux
+
+          Gas_WetDepo2Snow_col(idg,NY,NX) = Gas_WetDepo2Snow_col(idg,NY,NX)+ flux
 
           flux=ppscal(idg)*(trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX) &
             -trcg_SnowDrift_flxM(idg,NY,NX))
@@ -1700,7 +1702,7 @@ implicit none
     DO  NY=NVN,NVS
 
       LCHKBOTML=.false.
-      DO  L=1,JS
+      DO  L=1,nsnol_col(NY,NX)
         !check having meaningful snow mass
         IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
           !next layer index
@@ -2802,13 +2804,15 @@ implicit none
   integer :: idg,idn
 
   call PrintInfo('beg '//subname)
-  DO  LS=1,JS
 
-    IF(VLSnowHeatCapM_snvr(M,LS,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1)*1.e-4_r8)THEN
+  DO  LS=1,nsnol_col(N2,N1)
+
+    IF(VLSnowHeatCapM_snvr(1,1,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1)*1.e-4_r8)THEN
       LS2=MIN(JS,LS+1)
 
       ! NEXT LAYER IS IN THE SNOWPACK   
-      IF(LS.LT.JS .AND. VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1))THEN
+      IF(LS.LT.nsnol_col(N2,N1) .AND. VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1)*1.e-4_r8)THEN
+
         DO idg=idg_beg,idg_NH3
           trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
             +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)-trcg_AquaAdv_flxM_snvr(idg,LS2,N2,N1)
@@ -2828,6 +2832,12 @@ implicit none
             +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)   &
             -trcg_AquaADV_Snow2Litr_flxM(idg,N2,N1) &
             -trcg_AquaADV_Snow2Soil_flxM(idg,N2,N1)
+!          if(idg==idg_O2 .and. N2==1 .and. N1==1)then
+!            write(333,*)LS,LS2,VLSnowHeatCapM_snvr(M,LS2,N2,N1),VLHeatCapSnowMin_col(N2,N1)
+!            write(333,*)(I*1000+J)*10+M,LS,trcg_solsml2_snvr(idg,1:LS,N2,N1),'aqua',trcg_Aqua_flxM_snvr(idg,LS,N2,N1),&
+!              trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1),trcg_AquaADV_Snow2Litr_flxM(idg,N2,N1),&
+!              trcg_AquaADV_Snow2Soil_flxM(idg,N2,N1)
+!          endif  
         ENDDO
 
         trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1) &
@@ -3407,6 +3417,7 @@ implicit none
   else
     pscal=1.000_r8
     lfupdate=.true.
+!    write(555,*)'snowup'
   endif  
 
   DO NX=NHW,NHE
@@ -3418,7 +3429,13 @@ implicit none
         if(lflux .and. dpscal(idg)>tiny_p)then          
           flux=flux*dpscal(idg)     
           call get_flux_scalar(trcg_solsml2_snvr(idg,1,NY,NX),flux,trcg_solsml_snvr(idg,1,NY,NX),pscal(idg))
-          if(lfupdate)trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)
+          if(lfupdate)then
+!            if(NY==1 .AND. NX==1 .AND. idg==idg_O2)then
+!              write(555,*)1,trcg_solsml2_snvr(idg,1,NY,NX),trcg_solsml_snvr(idg,1,NY,NX),'flux',flux,dpscal(idg),pscal(idg)
+!              write(555,*)'trcg',flux,trcg_SnowDrift_flxM(idg,NY,NX),trcg_Aqua_flxM_snvr(idg,1,NY,NX)
+!            endif
+            trcg_solsml2_snvr(idg,1,NY,NX)=trcg_solsml_snvr(idg,1,NY,NX)
+          endif  
         endif
       ENDDO
 
@@ -3432,7 +3449,7 @@ implicit none
         endif
       ENDDO
 
-      DO  L=2,JS
+      DO  L=2,nsnol_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           flux=trcg_Aqua_flxM_snvr(idg,L,NY,NX)        
           lflux=.true. .or. .not.isclose(flux,0._r8)
@@ -3445,7 +3462,12 @@ implicit none
                 call endrun(trim(mod_filename)//' at line',__LINE__)
               endif  
             endif
-            if(lfupdate)trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)
+            if(lfupdate)then
+!              if(idg==idg_O2 .and. NY==1 .and. NX==1)then
+!                write(555,*)L,trcg_solsml2_snvr(idg,L,NY,NX),trcg_solsml_snvr(idg,L,NY,NX),trcg_Aqua_flxM_snvr(idg,L,NY,NX),dpscal(idg),pscal(idg)
+!              endif
+              trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)
+            endif
           endif  
         ENDDO
 

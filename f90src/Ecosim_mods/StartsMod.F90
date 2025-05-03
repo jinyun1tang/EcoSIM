@@ -776,7 +776,7 @@ module StartsMod
   TDCN4(:,:,:) = 1.0_r8
   TDCNO(:,:,:) = 1.0_r8
 
-  IUTYP(:,:)              = 0
+  iUreaHydInhibitorType_col(:,:)              = 0
   IFNHB(:,:)              = 0
   IFNOB(:,:)              = 0
   IFPOB(:,:)              = 0

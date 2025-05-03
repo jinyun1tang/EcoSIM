@@ -99,13 +99,13 @@ module SaltChemEquilibriaMod
 
   real(r8), pointer :: CO2S     !aqueous CO2  micropore	[g d-2]
   real(r8), pointer :: H1PO4_2e_aqua_mole_conc    !soil aqueous HPO4 content micropore non-band, [mol m-3]
-  real(r8), pointer :: H1PO4_2e_band_conc    !soil aqueous HPO4 content micropore band, [mol m-3]
+  real(r8), pointer :: H1PO4_2e_band_mole_conc    !soil aqueous HPO4 content micropore band, [mol m-3]
   real(r8), pointer :: H2PO4_1e_aqua_mole_conc    !soil aqueous H2PO4 content micropore non-band, [mol m-3]
-  real(r8), pointer :: H2PO4_1e_band_conc    !soil aqueous H2PO4 content micropore  band, [mol m-3]
+  real(r8), pointer :: H2PO4_1e_band_mole_conc    !soil aqueous H2PO4 content micropore  band, [mol m-3]
   real(r8), pointer :: NH3_aqua_mole_conc     !soil NH3 concentration in non-band soil, [mol m-3]
-  real(r8), pointer :: NH3_aqu_band_conc     !soil NH3 concentration in band soil, [mol m-3]
+  real(r8), pointer :: NH3_aqu_band_mole_conc     !soil NH3 concentration in band soil, [mol m-3]
   real(r8), pointer :: NH4_1p_aqua_mole_conc     !soil NH4 concentration in non-band soil, [mol m-3]
-  real(r8), pointer :: NH4_1p_band_conc     !soil NH4 concentration in band soil, [mol m-3]
+  real(r8), pointer :: NH4_1p_band_mole_conc     !soil NH4 concentration in band soil, [mol m-3]
   real(r8), pointer :: ZNO3S    !NO3 mass non-band micropore, [g d-2]
   real(r8), pointer :: ZNO3B    !NO3 mass band micropore, [g d-2]
   real(r8), pointer :: ZHY      !soil aqueous H content micropore, [mol d-2]
@@ -157,16 +157,16 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: ZCA1PB   !soil aqueous CaHPO4 content micropore band, [mol d-2]
   real(r8), pointer :: ZCA2PB   !soil aqueous CaH4P2O8 content micropore band, [mol d-2]
   real(r8), pointer :: ZMG1PB   !soil aqueous MgHPO4 content micropore band, [mol d-2]
-  real(r8), pointer :: Precp_AlPO4_conc   !precipitated AlPO4 non-band, [mol m-3]
-  real(r8), pointer :: PrecpB_AlPO4_conc   !precipitated AlPO4 band soil, [mol m-3]
-  real(r8), pointer :: Precp_CaHPO4_conc   !precipitated CaHPO4 non-band soil, [mol m-3]
-  real(r8), pointer :: PrecpB_CaHPO4_conc   !precipitated CaHPO4 band soil, [mol m-3]
-  real(r8), pointer :: Precp_Ca5P3O12O3H3_conc   !precipitated Ca5(PO4)3OH hydroxyapatite non-band soil, [mol m-3]
-  real(r8), pointer :: PrecpB_Ca5P3O12O3H3_conc   !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
-  real(r8), pointer :: Precp_CaH4P2O8_conc   !precipitated Ca(H2PO4)2 non-band soil, [mol m-3]
-  real(r8), pointer :: PrecpB_CaH4P2O8_conc   !precipitated CaH4P2O8 band soil, [mol m-3]
-  real(r8), pointer :: Precp_FePO4_conc   !precipitated FePO4 non-band soil, [mol m-3]
-  real(r8), pointer :: PrecpB_FePO4_con   !precipitated FePO4 band soil, [mol m-3]
+  real(r8), pointer :: Precp_AlPO4_mole_conc   !precipitated AlPO4 non-band, [mol m-3]
+  real(r8), pointer :: PrecpB_AlPO4_mole_conc   !precipitated AlPO4 band soil, [mol m-3]
+  real(r8), pointer :: Precp_CaHPO4_mole_conc   !precipitated CaHPO4 non-band soil, [mol m-3]
+  real(r8), pointer :: PrecpB_CaHPO4_mole_conc   !precipitated CaHPO4 band soil, [mol m-3]
+  real(r8), pointer :: Precp_Ca5P3O12O3H3_mole_conc   !precipitated Ca5(PO4)3OH hydroxyapatite non-band soil, [mol m-3]
+  real(r8), pointer :: PrecpB_Ca5P3O12O3H3_mole_conc   !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
+  real(r8), pointer :: Precp_CaH4P2O8_mole_conc   !precipitated Ca(H2PO4)2 non-band soil, [mol m-3]
+  real(r8), pointer :: PrecpB_CaH4P2O8_mole_conc   !precipitated CaH4P2O8 band soil, [mol m-3]
+  real(r8), pointer :: Precp_FePO4_mole_conc   !precipitated FePO4 non-band soil, [mol m-3]
+  real(r8), pointer :: PrecpB_FePO4_mole_conc   !precipitated FePO4 band soil, [mol m-3]
   real(r8), pointer :: PALOH    !precipitated Al(OH)3, [mol d-2]
   real(r8), pointer :: PFEOH    !precipitated Fe(OH)3, [mol d-2]
   real(r8), pointer :: PCACO    !precipitated CaCO3, [mol d-2]
@@ -179,20 +179,20 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: XNA      !exchangeable Na, [mol d-2]
   real(r8), pointer :: XKA      !exchangeable K, [mol d-2]
   real(r8), pointer :: XHC      !exchangeable COOH , [mol d-2]
-  real(r8), pointer :: XROH1_conc    !exchangeable OH  non-band, [mol d-2]
+  real(r8), pointer :: XROH1_mole_conc    !exchangeable OH  non-band, [mol d-2]
   real(r8), pointer :: XALO2    !exchangeable AlOH2 , [mol d-2]
   real(r8), pointer :: XFEO2    !exchangeable Fe(OH)2, [mol d-2]
   real(r8), pointer :: XNH4_mole_conc     !exchangeable NH4 non-band soil, [mol d-2]
-  real(r8), pointer :: XNH4_band_conc     !exchangeable NH4 band soil, [mol d-2]
-  real(r8), pointer :: XROH1_band_conc    !exchangeable OH- band, [mol d-2]
-  real(r8), pointer :: XOH_conc    !exchangeable OH- non-band, [mol d-2]
-  real(r8), pointer :: XHPO4_band_conc    !exchangeable HPO4 concentration band-soil, [mol m-3]
-  real(r8), pointer :: XH2PO4_band_conc    !exchangeable H2PO4 concentration band-soil, [mol m-3]
-  real(r8), pointer :: XROH_band_conc    !exchangeable OH band-soil, [mol m-3]
-  real(r8), pointer :: XHPO4_conc    !exchangeable HPO4  non-band, [mol m-3]
-  real(r8), pointer :: XROH2_band_conc    !exchangeable OH2 band-soil, [mol m-3]
-  real(r8), pointer :: XROH2_conc    !exchangeable OH2  non-band soil, [mol m-3]
-  real(r8), pointer :: XH2PO4_conc    !exchangeable H2PO4  non-band soil, [mol m-3]
+  real(r8), pointer :: XNH4_band_mole_conc     !exchangeable NH4 band soil, [mol d-2]
+  real(r8), pointer :: XROH1_band_mole_conc    !exchangeable OH- band, [mol d-2]
+  real(r8), pointer :: XOH_mole_conc    !exchangeable OH- non-band, [mol d-2]
+  real(r8), pointer :: XHPO4_band_mole_conc    !exchangeable HPO4 concentration band-soil, [mol m-3]
+  real(r8), pointer :: XH2PO4_band_mole_conc    !exchangeable H2PO4 concentration band-soil, [mol m-3]
+  real(r8), pointer :: XROH_band_mole_conc    !exchangeable OH band-soil, [mol m-3]
+  real(r8), pointer :: XHPO4_mole_conc    !exchangeable HPO4  non-band, [mol m-3]
+  real(r8), pointer :: XROH2_band_mole_conc    !exchangeable OH2 band-soil, [mol m-3]
+  real(r8), pointer :: XROH2_mole_conc    !exchangeable OH2  non-band soil, [mol m-3]
+  real(r8), pointer :: XH2PO4_mole_conc    !exchangeable H2PO4  non-band soil, [mol m-3]
 
 ! fluxes
   real(r8), pointer :: TRChem_CaCO3_precip_soil   !total precipitated CaCO3 transformation, [mol d-2 h-1]
@@ -310,34 +310,34 @@ module SaltChemEquilibriaMod
   VLWatMicPNH              => chemvar%VLWatMicPNH
   VLWatMicPPB              => chemvar%VLWatMicPPB
   VLWatMicPPO              => chemvar%VLWatMicPPO
-  XROH1_conc               => chemvar%XROH1_conc
-  XROH2_conc               => chemvar%XROH2_conc
+  XROH1_mole_conc               => chemvar%XROH1_mole_conc
+  XROH2_mole_conc               => chemvar%XROH2_mole_conc
   XNH4_mole_conc                => chemvar%XNH4_mole_conc
-  XNH4_band_conc           => chemvar%XNH4_band_conc
+  XNH4_band_mole_conc           => chemvar%XNH4_band_mole_conc
   H1PO4_2e_aqua_mole_conc            => chemvar%H1PO4_2e_aqua_mole_conc
-  H1PO4_2e_band_conc       => chemvar%H1PO4_2e_band_conc
+  H1PO4_2e_band_mole_conc       => chemvar%H1PO4_2e_band_mole_conc
   H2PO4_1e_aqua_mole_conc            => chemvar%H2PO4_1e_aqua_mole_conc
-  H2PO4_1e_band_conc       => chemvar%H2PO4_1e_band_conc
-  XHPO4_band_conc          => chemvar%XHPO4_band_conc
-  XH2PO4_band_conc         => chemvar%XH2PO4_band_conc
-  XROH_band_conc           => chemvar%XROH_band_conc
-  XHPO4_conc               => chemvar%XHPO4_conc
-  XROH2_band_conc          => chemvar%XROH2_band_conc
-  XH2PO4_conc              => chemvar%XH2PO4_conc
+  H2PO4_1e_band_mole_conc       => chemvar%H2PO4_1e_band_mole_conc
+  XHPO4_band_mole_conc          => chemvar%XHPO4_band_mole_conc
+  XH2PO4_band_mole_conc         => chemvar%XH2PO4_band_mole_conc
+  XROH_band_mole_conc           => chemvar%XROH_band_mole_conc
+  XHPO4_mole_conc               => chemvar%XHPO4_mole_conc
+  XROH2_band_mole_conc          => chemvar%XROH2_band_mole_conc
+  XH2PO4_mole_conc              => chemvar%XH2PO4_mole_conc
   NH3_aqua_mole_conc             => chemvar%NH3_aqua_mole_conc
-  NH3_aqu_band_conc        => chemvar%NH3_aqu_band_conc
+  NH3_aqu_band_mole_conc        => chemvar%NH3_aqu_band_mole_conc
   NH4_1p_aqua_mole_conc              => chemvar%NH4_1p_aqua_mole_conc
-  NH4_1p_band_conc         => chemvar%NH4_1p_band_conc
-  Precp_AlPO4_conc         => chemvar%Precp_AlPO4_conc
-  PrecpB_AlPO4_conc        => chemvar%PrecpB_AlPO4_conc
-  Precp_CaHPO4_conc        => chemvar%Precp_CaHPO4_conc
-  PrecpB_CaHPO4_conc       => chemvar%PrecpB_CaHPO4_conc
-  Precp_Ca5P3O12O3H3_conc  => chemvar%Precp_Ca5P3O12O3H3_conc
-  PrecpB_Ca5P3O12O3H3_conc => chemvar%PrecpB_Ca5P3O12O3H3_conc
-  Precp_CaH4P2O8_conc      => chemvar%Precp_CaH4P2O8_conc
-  PrecpB_CaH4P2O8_conc      => chemvar%PrecpB_CaH4P2O8_conc
-  Precp_FePO4_conc         => chemvar%Precp_FePO4_conc
-  PrecpB_FePO4_con         => chemvar%PrecpB_FePO4_con
+  NH4_1p_band_mole_conc         => chemvar%NH4_1p_band_mole_conc
+  Precp_AlPO4_mole_conc         => chemvar%Precp_AlPO4_mole_conc
+  PrecpB_AlPO4_mole_conc        => chemvar%PrecpB_AlPO4_mole_conc
+  Precp_CaHPO4_mole_conc        => chemvar%Precp_CaHPO4_mole_conc
+  PrecpB_CaHPO4_mole_conc       => chemvar%PrecpB_CaHPO4_mole_conc
+  Precp_Ca5P3O12O3H3_mole_conc  => chemvar%Precp_Ca5P3O12O3H3_mole_conc
+  PrecpB_Ca5P3O12O3H3_mole_conc => chemvar%PrecpB_Ca5P3O12O3H3_mole_conc
+  Precp_CaH4P2O8_mole_conc      => chemvar%Precp_CaH4P2O8_mole_conc
+  PrecpB_CaH4P2O8_mole_conc      => chemvar%PrecpB_CaH4P2O8_mole_conc
+  Precp_FePO4_mole_conc         => chemvar%Precp_FePO4_mole_conc
+  PrecpB_FePO4_mole_conc         => chemvar%PrecpB_FePO4_mole_conc
   ZNO3S                    => chemvar%ZNO3S
   ZNO3B                    => chemvar%ZNO3B
   VLWatMicPM               => chemvar%VLWatMicPM
@@ -423,8 +423,8 @@ module SaltChemEquilibriaMod
   GKCM                     => chemvar%GKCM
   GKCK                     => chemvar%GKCK
   GKCN                     => chemvar%GKCN
-  XROH1_band_conc          => chemvar%XROH1_band_conc
-  XOH_conc                 => chemvar%XOH_conc
+  XROH1_band_mole_conc          => chemvar%XROH1_band_mole_conc
+  XOH_mole_conc                 => chemvar%XOH_mole_conc
 
   TRChem_CaCO3_precip_soil         => solflx%TRChem_CaCO3_precip_soil
   TRChem_NaCO3_soil                => solflx%TRChem_NaCO3_soil
@@ -962,9 +962,9 @@ module SaltChemEquilibriaMod
 !     IF(J.EQ.24)THEN
 !     WRITE(*,1119)'GAPON',I,J,L,M,H0PO4_3e_conc,Al_3p_aqua_mole_conc,Fe_3p_aqua_mole_conc,H0PO4_3e_conc*A3*Al_3p_aqua_mole_conc*A3
 !    2,SPALP,H0PO4_3e_conc*A3*Fe_3p_aqua_mole_conc*A3,SPFEP
-!    6,SPOH2,XROH1_conc*H_1p_aqua_mole_conc*A1/XROH2_conc,SPOH1,XOH_conc*H_1p_aqua_mole_conc*A1/XROH1_conc
-!    7,SPH2P,XROH2_conc*H2PO4_1e_aqua_mole_conc*A1/XH2PO4_conc,SXH2P,XROH1_conc*H2PO4_1e_aqua_mole_conc/(XH2PO4_conc*OH_1e_aqua_mole_conc)
-!    8,SPH1P,XROH1_conc*H1PO4_2e_aqua_mole_conc*A2/(XHPO4_conc*OH_1e_aqua_mole_conc*A1)
+!    6,SPOH2,XROH1_mole_conc*H_1p_aqua_mole_conc*A1/XROH2_mole_conc,SPOH1,XOH_mole_conc*H_1p_aqua_mole_conc*A1/XROH1_mole_conc
+!    7,SPH2P,XROH2_mole_conc*H2PO4_1e_aqua_mole_conc*A1/XH2PO4_mole_conc,SXH2P,XROH1_mole_conc*H2PO4_1e_aqua_mole_conc/(XH2PO4_mole_conc*OH_1e_aqua_mole_conc)
+!    8,SPH1P,XROH1_mole_conc*H1PO4_2e_aqua_mole_conc*A2/(XHPO4_mole_conc*OH_1e_aqua_mole_conc*A1)
 !    9,OH_1e_aqua_mole_conc*A1,H_1p_aqua_mole_conc*A1
 !1119  FORMAT(A8,4I4,24E11.3)
 !     WRITE(*,1119)'CATION',I,J,L,M,CEC_conc,XNH4_mole_conc+XHY1+3*XAl_conc+2*(XCa_conc+XMg_conc)
@@ -1067,7 +1067,7 @@ module SaltChemEquilibriaMod
     SPX    = SP*R1**NR1/P3**NP3
     S0     = P1+P2
     S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
@@ -1094,7 +1094,7 @@ module SaltChemEquilibriaMod
       ENDIF
     ENDIF
 !     IF(I.EQ.180.AND.J.EQ.12)THEN
-!     WRITE(*,1112)'ALPO4',I,J,L,M,Precp_AlPO4_conc,Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity
+!     WRITE(*,1112)'ALPO4',I,J,L,M,Precp_AlPO4_mole_conc,Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity
 !    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_AlPO4_dissol_flx,RHA0P1,RHA1P1,RHA2P1,RHA3P1
 !    3,RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,SP,SPX,Al_3p_activity*H0PO4_3e_activity
 !    4,SPALP,H0PO4_3e_conc,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc
@@ -1182,7 +1182,7 @@ module SaltChemEquilibriaMod
     SPX    = SP*R1**NR1/P3**NP3
     S0     = P1+P2
     S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
@@ -1209,7 +1209,7 @@ module SaltChemEquilibriaMod
       ENDIF
     ENDIF
 !     IF(I.EQ.180.AND.J.EQ.12)THEN
-!     WRITE(*,1112)'FEPO4',I,J,L,M,Precp_FePO4_conc,Fe_3p_activity,FeOH_2p_activity, &
+!     WRITE(*,1112)'FEPO4',I,J,L,M,Precp_FePO4_mole_conc,Fe_3p_activity,FeOH_2p_activity, &
 !       FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity,&
 !       H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,&
 !       H2PO4_1e_FePO4_dissol_flx,RHF0P1,RHF1P1,RHF2P1,RHF3P1,&
@@ -1239,14 +1239,14 @@ module SaltChemEquilibriaMod
     SPX    = SP*R1**NR1
     S0     = P1+P2
     S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
     ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
       RHCAD2=H2PO4_1e_CaHPO4_dissol_flx
     ENDIF
 !     IF((M/10)*10.EQ.M)THEN
-!     WRITE(*,1112)'CAPO4',I,J,L,M,Precp_CaH4P2O8_conc,Precp_CaHPO4_conc,Ca_2p_aqua_mole_conc
+!     WRITE(*,1112)'CAPO4',I,J,L,M,Precp_CaH4P2O8_mole_conc,Precp_CaHPO4_mole_conc,Ca_2p_aqua_mole_conc
 !    2,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,H_1p_aqua_mole_conc,OH_1e_aqua_mole_conc,H2PO4_1e_CaHPO4_dissol_flx,RPCAD1,RHCAD2,R1,P1,P2,P3
 !    3,SP,Z,FX,Y,X,TX,A2,Ca_2p_aqua_mole_conc*A2*H1PO4_2e_aqua_mole_conc*A2,SPCAD
 !     ENDIF
@@ -1271,7 +1271,7 @@ module SaltChemEquilibriaMod
     P1     = AMAX1(ZERO,P1)
     P2     = AMAX1(ZERO,P2)
     SPX    = (SP*R1**NR1/P1**5)**0.333_r8
-    H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_conc,TPDX*(P2-SPX))
+    H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_mole_conc,TPDX*(P2-SPX))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RHCAH1=H2PO4_1e_apatite_dissol_flx
     ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
@@ -1280,10 +1280,10 @@ module SaltChemEquilibriaMod
 !     IF((I/10)*10.EQ.I.AND.J.EQ.12)THEN
 !     WRITE(*,1112)'A1',I,L,K,M,A1,A2,A3,FSTR2,CSTR1
 !    2,CSTR2,cation_3p_aqua_mole_conc,anion_3e_conc,cation_2p_aqua_mole_conc,CA2,cation_1p_aqua_mole_conc,CA1,VLWatMicPM
-!     WRITE(*,1112)'APATITE',I,J,L,M,Precp_Ca5P3O12O3H3_conc,Ca_2p_activity,XCa_conc
+!     WRITE(*,1112)'APATITE',I,J,L,M,Precp_Ca5P3O12O3H3_mole_conc,Ca_2p_activity,XCa_conc
 !    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_apatite_dissol_flx,RHCAH1,RHCAH2
 !    3,SP,SPX,Ca_2p_activity**5*H0PO4_3e_activity**3*OH_1e_activity,SPCAH,SHCAH1,SHCAH2
-!    3,H0PO4_3e_conc,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,XOH_conc,XROH1_conc,XROH2_conc,XHPO4_conc,XH2PO4_conc
+!    3,H0PO4_3e_conc,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,XOH_mole_conc,XROH1_mole_conc,XROH2_mole_conc,XHPO4_mole_conc,XH2PO4_mole_conc
 !    4,RHA0P1,RHA1P1,RHA2P1,RHA3P1
 !    2,RHA4P1,RHF0P1,RHF1P1,RHF2P1
 !    3,RHF3P1,RHF4P1,RPCAD1,3.0_r8*RHCAH1
@@ -1303,7 +1303,7 @@ module SaltChemEquilibriaMod
     SPX                          = SPCAM
     S0                           = P1+P2
     S1                           = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaH4P2O8_dissol_flx = AMAX1(-Precp_CaH4P2O8_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_CaH4P2O8_dissol_flx = AMAX1(-Precp_CaH4P2O8_mole_conc,TPDX*(S0-SQRT(S1)))
   ELSE
     H2PO4_1e_AlPO4_dissol_flx    = 0._r8
     H2PO4_1e_FePO4_dissol_flx    = 0._r8
@@ -1482,9 +1482,9 @@ module SaltChemEquilibriaMod
 !     begin_execution
 
   NH4_1p_aqua_mole_conc      = AMAX1(ZERO,NH4_1p_aqua_mole_conc)
-  NH4_1p_band_conc           = AMAX1(ZERO,NH4_1p_band_conc)
+  NH4_1p_band_mole_conc           = AMAX1(ZERO,NH4_1p_band_mole_conc)
   NH3_aqua_mole_conc         = AMAX1(ZERO,NH3_aqua_mole_conc)
-  NH3_aqu_band_conc          = AMAX1(ZERO,NH3_aqu_band_conc)
+  NH3_aqu_band_mole_conc          = AMAX1(ZERO,NH3_aqu_band_mole_conc)
   H_1p_aqua_mole_conc        = AMAX1(ZERO,10.0_r8**(-(PH-3.0)))
   OH_1e_aqua_mole_conc       = AMAX1(ZERO,DPH2O/H_1p_aqua_mole_conc)
   CO3_2e_aqua_mole_conc      = AMAX1(ZERO,CO3_2e_aqua_mole_conc)
@@ -1529,8 +1529,8 @@ module SaltChemEquilibriaMod
   CaH4P2O8_1p_aqua_mole_conc = AMAX1(ZERO,CaH4P2O8_1p_aqua_mole_conc)
   MgHPO4_conc                = AMAX1(ZERO,MgHPO4_conc)
   H0PO4_3e_band_conc         = AMAX1(ZERO,H0PO4_3e_band_conc)
-  H1PO4_2e_band_conc         = AMAX1(ZERO,H1PO4_2e_band_conc)
-  H2PO4_1e_band_conc         = AMAX1(ZERO,H2PO4_1e_band_conc)
+  H1PO4_2e_band_mole_conc         = AMAX1(ZERO,H1PO4_2e_band_mole_conc)
+  H2PO4_1e_band_mole_conc         = AMAX1(ZERO,H2PO4_1e_band_mole_conc)
   H3PO4_band_conc            = AMAX1(ZERO,H3PO4_band_conc)
   FeHPO4_1p_band_conc        = AMAX1(ZERO,FeHPO4_1p_band_conc)
   FeH2PO4_2p_band_conc       = AMAX1(ZERO,FeH2PO4_2p_band_conc)
@@ -1556,13 +1556,13 @@ module SaltChemEquilibriaMod
   cation_3p_aqua_mole_conc=Al_3p_aqua_mole_conc+Fe_3p_aqua_mole_conc
   anion_3e_conc=H0PO4_3e_conc*VLPO4+H0PO4_3e_band_conc*VLPOB
   cation_2p_aqua_mole_conc=Ca_2p_aqua_mole_conc+Mg_2p_aqua_mole_conc+AlOH_2p_aqua_mole_conc+FeOH_2p_aqua_mole_conc+FeH2PO4_2p_aqua_mole_conc*VLPO4+FeH2PO4_2p_band_conc*VLPOB
-  anion_2e_aqua_mole_conc=SO4_2e_aqua_mole_conc+CO3_2e_aqua_mole_conc+H1PO4_2e_aqua_mole_conc*VLPO4+H1PO4_2e_band_conc*VLPOB
-  cation_1p_aqua_mole_conc=NH4_1p_aqua_mole_conc*VLNH4+NH4_1p_band_conc*VLNHB+H_1p_aqua_mole_conc+Na_1p_aqua_mole_conc+K_1p_aqua_mole_conc &
+  anion_2e_aqua_mole_conc=SO4_2e_aqua_mole_conc+CO3_2e_aqua_mole_conc+H1PO4_2e_aqua_mole_conc*VLPO4+H1PO4_2e_band_mole_conc*VLPOB
+  cation_1p_aqua_mole_conc=NH4_1p_aqua_mole_conc*VLNH4+NH4_1p_band_mole_conc*VLNHB+H_1p_aqua_mole_conc+Na_1p_aqua_mole_conc+K_1p_aqua_mole_conc &
     +AlO2H2_1p_aqua_mole_conc+FeO2H2_p_conc+AlSO4_1p_aqua_mole_conc+FeSO4_1p_aqua_mole_conc+CaO2H2_conc+CaHCO3_1p_aqua_mole_conc+MgOH_1p_aqua_mole_conc+MgHCO3_1p_aqua_mole_conc &
     +(FeHPO4_p_conc+CaH4P2O8_1p_aqua_mole_conc)*VLPO4+(FeHPO4_1p_band_conc+CaH4P2O8_1p_band_conc)*VLPOB
   anion_1e_aqua_mole_conc=NO3_1e_aqua_mole_conc*VLNO3+NO3_1e_band_conc*VLNOB+OH_1e_aqua_mole_conc+HCO3_e_conc+Cl_e_conc &
     +AlO4H4_1e_aqua_mole_conc+FeO4H4_1e_aqua_mole_conc+NaCO3_1e_aqua_mole_conc+NaSO4_1e_aqua_mole_conc+KSO4_1e_aqua_mole_conc+(H2PO4_1e_aqua_mole_conc+CaPO4_1e_con)*VLPO4 &
-    +(H2PO4_1e_band_conc+CaPO4_1e_band_conc)*VLPOB
+    +(H2PO4_1e_band_mole_conc+CaPO4_1e_band_conc)*VLPOB
   CSTR1=AZMAX1(0.5E-03_r8*(9.0_r8*(cation_3p_aqua_mole_conc+anion_3e_conc) &
     +4.0_r8*(cation_2p_aqua_mole_conc+anion_2e_aqua_mole_conc)+cation_1p_aqua_mole_conc+anion_1e_aqua_mole_conc))
 
@@ -1617,8 +1617,8 @@ module SaltChemEquilibriaMod
   CaH4P2O8_1p_activity      = CaH4P2O8_1p_aqua_mole_conc*A1
   MgHPO4_activity           = MgHPO4_conc*A0
   H0PO4_3e_band_activity    = H0PO4_3e_band_conc*A3
-  H1PO4_2e_band_activity    = H1PO4_2e_band_conc*A2
-  H2PO4_1e_band_activity    = H2PO4_1e_band_conc*A1
+  H1PO4_2e_band_activity    = H1PO4_2e_band_mole_conc*A2
+  H2PO4_1e_band_activity    = H2PO4_1e_band_mole_conc*A1
   H3PO4_band_activity       = H3PO4_band_conc*A0
   FeHPO4_1p_band_activity   = FeHPO4_1p_band_conc*A1
   FeH2PO4_2p_band_activity  = FeH2PO4_2p_band_conc*A2
@@ -1627,9 +1627,9 @@ module SaltChemEquilibriaMod
   CaH4P2O8_1p_band_activity = CaH4P2O8_1p_band_conc*A1
   MgHPO4_band_activity      = MgHPO4_band_conc*A0
   NH4_1p_activity           = NH4_1p_aqua_mole_conc*A1
-  NH4_1p_band_activity      = NH4_1p_band_conc*A1
+  NH4_1p_band_activity      = NH4_1p_band_mole_conc*A1
   NH3_activity              = NH3_aqua_mole_conc*A0
-  NH3_band_activity         = NH3_aqu_band_conc*A0
+  NH3_band_activity         = NH3_aqu_band_mole_conc*A0
   Mg_2p_activity            = Mg_2p_aqua_mole_conc*A2
   Na_1p_activity            = Na_1p_aqua_mole_conc*A1
   K_1p_activity             = K_1p_aqua_mole_conc*A1
@@ -1738,7 +1738,7 @@ module SaltChemEquilibriaMod
     SPX                        = SP*R1**NR1/P3**NP3
     S0                         = P1+P2
     S1                         = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_AlPO4_dissolB_flx = AMAX1(-PrecpB_AlPO4_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_AlPO4_dissolB_flx = AMAX1(-PrecpB_AlPO4_mole_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_band_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
         RHA0B1=H2PO4_1e_AlPO4_dissolB_flx
@@ -1845,7 +1845,7 @@ module SaltChemEquilibriaMod
     SPX    = SP*R1**NR1/P3**NP3
     S0     = P1+P2
     S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_FePO4_dissolB_flx=AMAX1(-PrecpB_FePO4_con,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_FePO4_dissolB_flx=AMAX1(-PrecpB_FePO4_mole_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_band_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
         RHF0B1=H2PO4_1e_FePO4_dissolB_flx
@@ -1894,7 +1894,7 @@ module SaltChemEquilibriaMod
     SPX=SP*R1**NR1
     S0=P1+P2
     S1=AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaHPO4_dissolB_flx=AMAX1(-PrecpB_CaHPO4_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_CaHPO4_dissolB_flx=AMAX1(-PrecpB_CaHPO4_mole_conc,TPDX*(S0-SQRT(S1)))
     IF(isclose(PX,H1PO4_2e_band_activity))THEN
       RPCDB1=H2PO4_1e_CaHPO4_dissolB_flx
     ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
@@ -1921,7 +1921,7 @@ module SaltChemEquilibriaMod
     P1=AMAX1(ZERO,P1)
     P2=AMAX1(ZERO,P2)
     SPX=(SP*R1**NR1/P1**5._r8)**0.333_r8
-    H2PO4_1e_apatite_dissolB_flx=AMAX1(-PrecpB_Ca5P3O12O3H3_conc,TPDX*(P2-SPX))
+    H2PO4_1e_apatite_dissolB_flx=AMAX1(-PrecpB_Ca5P3O12O3H3_mole_conc,TPDX*(P2-SPX))
     IF(isclose(PX,H1PO4_2e_band_activity))THEN
       RHCHB1=H2PO4_1e_apatite_dissolB_flx
     ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
@@ -1937,7 +1937,7 @@ module SaltChemEquilibriaMod
     SPX=SPCAM
     S0=P1+P2
     S1=AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaH4P2O8_dissolB_flx=AMAX1(-PrecpB_CaH4P2O8_conc,TPDX*(S0-SQRT(S1)))
+    H2PO4_1e_CaH4P2O8_dissolB_flx=AMAX1(-PrecpB_CaH4P2O8_mole_conc,TPDX*(S0-SQRT(S1)))
   ELSE
     H2PO4_1e_AlPO4_dissolB_flx=0._r8
     H2PO4_1e_FePO4_dissolB_flx=0._r8
@@ -1995,8 +1995,8 @@ module SaltChemEquilibriaMod
     VLWatMicPBK=1._r8
   ENDIF
   IF(VLWatMicPPO.GT.ZEROS2.AND.XAEC.GT.ZEROS)THEN
-    RXOH2=TADAX*(XROH1_conc*H_1p_activity-SXOH2*XROH2_conc)/(XROH1_conc+SXOH2)*VLWatMicPBK
-    RXOH1=TADAX*(XOH_conc*H_1p_activity-SXOH1*XROH1_conc)/(XOH_conc+SXOH1)*VLWatMicPBK
+    RXOH2=TADAX*(XROH1_mole_conc*H_1p_activity-SXOH2*XROH2_mole_conc)/(XROH1_mole_conc+SXOH2)*VLWatMicPBK
+    RXOH1=TADAX*(XOH_mole_conc*H_1p_activity-SXOH1*XROH1_mole_conc)/(XOH_mole_conc+SXOH1)*VLWatMicPBK
 !
 !     H2PO4 EXCHANGE IN NON-BAND SOIL ZONE FROM CONVERGENCE
 !     SOLUTION FOR EQUILIBRIUM AMONG H2PO4-, H+, OH-, X-OH
@@ -2006,8 +2006,8 @@ module SaltChemEquilibriaMod
 !     H2PO4_1e_to_XH2PO4_ROH2_flx,H2PO4_to_XH2PO4_ROH_flx=H2PO4 exchange with R-OH2,R-OH in non-band
 !
     SPH2P=SXH2P*DPH2O
-    H2PO4_1e_to_XH2PO4_ROH2_flx=TADAX*(XROH2_conc*H2PO4_1e_activity-SPH2P*XH2PO4_conc)/(XROH2_conc+SPH2P)*VLWatMicPBK
-    H2PO4_to_XH2PO4_ROH_flx=TADAX*(XROH1_conc*H2PO4_1e_activity-SXH2P*XH2PO4_conc*OH_1e_activity)/(XROH1_conc+SXH2P)*VLWatMicPBK
+    H2PO4_1e_to_XH2PO4_ROH2_flx=TADAX*(XROH2_mole_conc*H2PO4_1e_activity-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
+    H2PO4_to_XH2PO4_ROH_flx=TADAX*(XROH1_mole_conc*H2PO4_1e_activity-SXH2P*XH2PO4_mole_conc*OH_1e_activity)/(XROH1_mole_conc+SXH2P)*VLWatMicPBK
 !
 !     HPO4 EXCHANGE IN NON-BAND SOIL ZONE FROM CONVERGENCE
 !     SOLUTION FOR EQUILIBRIUM AMONG HPO4--, H+, OH-, X-OH
@@ -2017,7 +2017,7 @@ module SaltChemEquilibriaMod
 !     H1PO4_to_XHPO4_ROH_flx=HPO4 exchange with R-OH in non-band
 !
     SPH1P=SXH1P*DPH2O/DPH2P
-    H1PO4_to_XHPO4_ROH_flx=TADAX*(XROH1_conc*H1PO4_2e_activity-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
+    H1PO4_to_XHPO4_ROH_flx=TADAX*(XROH1_mole_conc*H1PO4_2e_activity-SPH1P*XHPO4_mole_conc)/(XROH1_mole_conc+SPH1P)*VLWatMicPBK
   ELSE
     RXOH2=0._r8
     RXOH1=0._r8
@@ -2042,8 +2042,8 @@ module SaltChemEquilibriaMod
 !     RXO2B,RXO1B=OH2,OH exchange with R-OH2,R-OH in band
 !     SXOH2,SXOH1=equilibrium constant for OH2,OH exchange with R-OH2,R-OH
 !
-    RXO2B=TADAX*(XROH_band_conc*H_1p_activity-SXOH2*XROH2_band_conc)/(XROH_band_conc+SXOH2)*VLWatMicPBK
-    RXO1B=TADAX*(XROH1_band_conc*H_1p_activity-SXOH1*XROH_band_conc)/(XROH1_band_conc+SXOH1)*VLWatMicPBK
+    RXO2B=TADAX*(XROH_band_mole_conc*H_1p_activity-SXOH2*XROH2_band_mole_conc)/(XROH_band_mole_conc+SXOH2)*VLWatMicPBK
+    RXO1B=TADAX*(XROH1_band_mole_conc*H_1p_activity-SXOH1*XROH_band_mole_conc)/(XROH1_band_mole_conc+SXOH1)*VLWatMicPBK
 !
 !     H2PO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
 !     SOLUTION FOR EQUILIBRIUM AMONG H2PO4-, H+, OH-, X-OH
@@ -2053,8 +2053,8 @@ module SaltChemEquilibriaMod
 !     H2PO4_1e_to_XH2PO4_ROH2_Bflx,H2PO4_to_XH2PO4_ROH_Bflx=H2PO4 exchange with R-OH2,R-OH in band
 !
     SPH2P=SXH2P*DPH2O
-    H2PO4_1e_to_XH2PO4_ROH2_Bflx=TADAX*(XROH2_band_conc*H2PO4_1e_band_activity-SPH2P*XH2PO4_band_conc)/(XROH2_band_conc+SPH2P)*VLWatMicPBK
-    H2PO4_to_XH2PO4_ROH_Bflx=TADAX*(XROH_band_conc*H2PO4_1e_band_activity-SXH2P*XH2PO4_band_conc*OH_1e_activity)/(XROH_band_conc+SXH2P)*VLWatMicPBK
+    H2PO4_1e_to_XH2PO4_ROH2_Bflx=TADAX*(XROH2_band_mole_conc*H2PO4_1e_band_activity-SPH2P*XH2PO4_band_mole_conc)/(XROH2_band_mole_conc+SPH2P)*VLWatMicPBK
+    H2PO4_to_XH2PO4_ROH_Bflx=TADAX*(XROH_band_mole_conc*H2PO4_1e_band_activity-SXH2P*XH2PO4_band_mole_conc*OH_1e_activity)/(XROH_band_mole_conc+SXH2P)*VLWatMicPBK
 !
 !     HPO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
 !     SOLUTION FOR EQUILIBRIUM AMONG HPO4--, H+, OH-, X-OH
@@ -2064,9 +2064,9 @@ module SaltChemEquilibriaMod
 !     RXH1B=HPO4 exchange with R-OH in band
 !
     SPH1P=SXH1P*DPH2O/DPH2P
-    RXH1B=TADAX*(XROH_band_conc*H1PO4_2e_band_activity-SPH1P*XHPO4_band_conc)/(XROH_band_conc+SPH1P)*VLWatMicPBK
-!     WRITE(*,2226)'RXH1B',I,J,L,M,RXH1B,XROH_band_conc,XROH2_band_conc,H1PO4_2e_band_conc
-!    2,SPH1P,XHPO4_band_conc,H2PO4_to_XH2PO4_ROH_Bflx,H2PO4_1e_band_conc,SXH2P,XH2PO4_band_conc,OH_1e_aqua_mole_conc,H_1p_aqua_mole_conc,ROH
+    RXH1B=TADAX*(XROH_band_mole_conc*H1PO4_2e_band_activity-SPH1P*XHPO4_band_mole_conc)/(XROH_band_mole_conc+SPH1P)*VLWatMicPBK
+!     WRITE(*,2226)'RXH1B',I,J,L,M,RXH1B,XROH_band_mole_conc,XROH2_band_mole_conc,H1PO4_2e_band_mole_conc
+!    2,SPH1P,XHPO4_band_mole_conc,H2PO4_to_XH2PO4_ROH_Bflx,H2PO4_1e_band_mole_conc,SXH2P,XH2PO4_band_mole_conc,OH_1e_aqua_mole_conc,H_1p_aqua_mole_conc,ROH
 !2226  FORMAT(A8,4I4,20E12.4)
   ELSE
     RXO2B=0._r8
@@ -2138,7 +2138,7 @@ module SaltChemEquilibriaMod
 !     TADCX=adsorption rate constant
 !
     RXN4=TADCX*AMAX1(AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_activity/XN4Q,NH4_1p_aqua_mole_conc),-XNH4_mole_conc)
-    RXNB=TADCX*AMAX1(AMIN1((XNBQ-XNH4_band_conc)*NH4_1p_band_activity/XNBQ,NH4_1p_band_conc),-XNH4_band_conc)
+    RXNB=TADCX*AMAX1(AMIN1((XNBQ-XNH4_band_mole_conc)*NH4_1p_band_activity/XNBQ,NH4_1p_band_mole_conc),-XNH4_band_mole_conc)
 !
 !     H,AL,FE,CA,MG,NA,K EXCHANGE
 !
@@ -2553,9 +2553,9 @@ module SaltChemEquilibriaMod
 !     FROM TOTAL ION FLUXES
 !
   NH4_1p_aqua_mole_conc           = NH4_1p_aqua_mole_conc+RN4S
-  NH4_1p_band_conc      = NH4_1p_band_conc+RN4B
+  NH4_1p_band_mole_conc      = NH4_1p_band_mole_conc+RN4B
   NH3_aqua_mole_conc          = NH3_aqua_mole_conc+RN3S
-  NH3_aqu_band_conc     = NH3_aqu_band_conc+RN3B
+  NH3_aqu_band_mole_conc     = NH3_aqu_band_mole_conc+RN3B
   Al_3p_aqua_mole_conc            = Al_3p_aqua_mole_conc+RAL
   Fe_3p_aqua_mole_conc            = Fe_3p_aqua_mole_conc+RFE
   H_1p_aqua_mole_conc             = H_1p_aqua_mole_conc+RHY
@@ -2600,8 +2600,8 @@ module SaltChemEquilibriaMod
   CaH4P2O8_1p_aqua_mole_conc      = CaH4P2O8_1p_aqua_mole_conc+RC2P
   MgHPO4_conc           = MgHPO4_conc+RM1P
   H0PO4_3e_band_conc    = H0PO4_3e_band_conc+RHB0
-  H1PO4_2e_band_conc    = H1PO4_2e_band_conc+RHB1
-  H2PO4_1e_band_conc    = H2PO4_1e_band_conc+RHB2
+  H1PO4_2e_band_mole_conc    = H1PO4_2e_band_mole_conc+RHB1
+  H2PO4_1e_band_mole_conc    = H2PO4_1e_band_mole_conc+RHB2
   H3PO4_band_conc       = H3PO4_band_conc+RHB3
   FeHPO4_1p_band_conc   = FeHPO4_1p_band_conc+RF1B
   FeH2PO4_2p_band_conc  = FeH2PO4_2p_band_conc+RF2B
@@ -2624,7 +2624,7 @@ module SaltChemEquilibriaMod
 !     ITERATION FROM TOTAL ION FLUXES
 !
   XNH4_mole_conc        = XNH4_mole_conc+RXN4
-  XNH4_band_conc   = XNH4_band_conc+RXNB
+  XNH4_band_mole_conc   = XNH4_band_mole_conc+RXNB
   XHY1             = XHY1+RXHY
   XAl_conc         = XAl_conc+RXAL
   XFe_conc         = XFe_conc+RXFE
@@ -2635,16 +2635,16 @@ module SaltChemEquilibriaMod
   XHC1             = XHC1+RXHC
   XAlO2H2_conc     = XAlO2H2_conc+RXALO2
   XFeO2H2_conc     = XFeO2H2_conc+RXFEO2
-  XOH_conc         = XOH_conc+RXH0
-  XROH1_conc       = XROH1_conc+RXH1
-  XROH2_conc       = XROH2_conc+RXH2
-  XHPO4_conc       = XHPO4_conc+RX1P
-  XH2PO4_conc      = XH2PO4_conc+RX2P
-  XROH1_band_conc  = XROH1_band_conc+RBH0
-  XROH_band_conc   = XROH_band_conc+RBH1
-  XROH2_band_conc  = XROH2_band_conc+RBH2
-  XHPO4_band_conc  = XHPO4_band_conc+RB1P
-  XH2PO4_band_conc = XH2PO4_band_conc+RB2P
+  XOH_mole_conc         = XOH_mole_conc+RXH0
+  XROH1_mole_conc       = XROH1_mole_conc+RXH1
+  XROH2_mole_conc       = XROH2_mole_conc+RXH2
+  XHPO4_mole_conc       = XHPO4_mole_conc+RX1P
+  XH2PO4_mole_conc      = XH2PO4_mole_conc+RX2P
+  XROH1_band_mole_conc  = XROH1_band_mole_conc+RBH0
+  XROH_band_mole_conc   = XROH_band_mole_conc+RBH1
+  XROH2_band_mole_conc  = XROH2_band_mole_conc+RBH2
+  XHPO4_band_mole_conc  = XHPO4_band_mole_conc+RB1P
+  XH2PO4_band_mole_conc = XH2PO4_band_mole_conc+RB2P
 !
 !     UPDATE PRECIPITATE CONCENTRATIONS IN CURRENT
 !     ITERATION FROM TOTAL ION FLUXES
@@ -2653,16 +2653,16 @@ module SaltChemEquilibriaMod
   Precp_FeO3H3_conc        = Precp_FeO3H3_conc+RPFEOX       !Fe(OH)3 precipitation
   Precp_CaCO3_conc         = Precp_CaCO3_conc+RPCACX       !Calcite CaCO3 precipitation
   Precp_CaSO4_conc         = Precp_CaSO4_conc+RPCASO       !Gypsum CaSO4 precipitation
-  Precp_AlPO4_conc         = Precp_AlPO4_conc+H2PO4_1e_AlPO4_dissol_flx       !Variscite AlPO4 precipitation non-band
-  Precp_FePO4_conc         = Precp_FePO4_conc+H2PO4_1e_FePO4_dissol_flx       !FePO4 precipitation
-  Precp_CaHPO4_conc        = Precp_CaHPO4_conc+H2PO4_1e_CaHPO4_dissol_flx       !CaHPO4 precpitation
-  Precp_Ca5P3O12O3H3_conc  = Precp_Ca5P3O12O3H3_conc+H2PO4_1e_apatite_dissol_flx       !Ca5(PO4)3OH (hydroxyapatite) precipitation
-  Precp_CaH4P2O8_conc      = Precp_CaH4P2O8_conc+H2PO4_1e_CaH4P2O8_dissol_flx       !Ca(H2PO4)2 precipitation non-band
-  PrecpB_AlPO4_conc        = PrecpB_AlPO4_conc+H2PO4_1e_AlPO4_dissolB_flx       !AlPO4 precpitation band
-  PrecpB_FePO4_con         = PrecpB_FePO4_con+H2PO4_1e_FePO4_dissolB_flx       !FePO4 precpitation band
-  PrecpB_CaHPO4_conc       = PrecpB_CaHPO4_conc+H2PO4_1e_CaHPO4_dissolB_flx       !CaHPO4 precipitation band
-  PrecpB_Ca5P3O12O3H3_conc = PrecpB_Ca5P3O12O3H3_conc+H2PO4_1e_apatite_dissolB_flx       !Ca5(PO4)3OH hydroxyapatite precpitation band
-  PrecpB_CaH4P2O8_conc     = PrecpB_CaH4P2O8_conc+H2PO4_1e_CaH4P2O8_dissolB_flx       !Ca(H2PO4)2 precipitation band
+  Precp_AlPO4_mole_conc         = Precp_AlPO4_mole_conc+H2PO4_1e_AlPO4_dissol_flx       !Variscite AlPO4 precipitation non-band
+  Precp_FePO4_mole_conc         = Precp_FePO4_mole_conc+H2PO4_1e_FePO4_dissol_flx       !FePO4 precipitation
+  Precp_CaHPO4_mole_conc        = Precp_CaHPO4_mole_conc+H2PO4_1e_CaHPO4_dissol_flx       !CaHPO4 precpitation
+  Precp_Ca5P3O12O3H3_mole_conc  = Precp_Ca5P3O12O3H3_mole_conc+H2PO4_1e_apatite_dissol_flx       !Ca5(PO4)3OH (hydroxyapatite) precipitation
+  Precp_CaH4P2O8_mole_conc      = Precp_CaH4P2O8_mole_conc+H2PO4_1e_CaH4P2O8_dissol_flx       !Ca(H2PO4)2 precipitation non-band
+  PrecpB_AlPO4_mole_conc        = PrecpB_AlPO4_mole_conc+H2PO4_1e_AlPO4_dissolB_flx       !AlPO4 precpitation band
+  PrecpB_FePO4_mole_conc         = PrecpB_FePO4_mole_conc+H2PO4_1e_FePO4_dissolB_flx       !FePO4 precpitation band
+  PrecpB_CaHPO4_mole_conc       = PrecpB_CaHPO4_mole_conc+H2PO4_1e_CaHPO4_dissolB_flx       !CaHPO4 precipitation band
+  PrecpB_Ca5P3O12O3H3_mole_conc = PrecpB_Ca5P3O12O3H3_mole_conc+H2PO4_1e_apatite_dissolB_flx       !Ca5(PO4)3OH hydroxyapatite precpitation band
+  PrecpB_CaH4P2O8_mole_conc     = PrecpB_CaH4P2O8_mole_conc+H2PO4_1e_CaH4P2O8_dissolB_flx       !Ca(H2PO4)2 precipitation band
   end subroutine UpdateIonConcCurrentIter
 !------------------------------------------------------------------------------------------
 

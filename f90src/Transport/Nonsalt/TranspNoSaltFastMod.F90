@@ -143,11 +143,11 @@ implicit none
         err=dmass-trcg_netflx2_col(idg,NY,NX)
 
         if(abs(err)>1.e-5_r8)then
-          write(133,*)(I*1000+J)*100+M,trcs_names(idg)
+          write(133,*)(I*1000+J)*100+M,trcs_names(idg),'fast'
           write(133,*)'init/final mass=',trcg_mass_begf(idg,NY,NX),trcg_mass_now(idg),trcg_mass3_fast_col(idg,NY,NX)
           write(133,*)'dmass,         =',dmass,TranspNetSoil_fast_flx_col(idg,NY,NX),trcg_netflx2_col(idg,NY,NX)
           write(133,*)'err            =',err
-          call endrun(trim(mod_filename)//' at line',__LINE__)          
+          if(abs(err)>1.e-5_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
         endif
 
       ENDDO
@@ -240,6 +240,16 @@ implicit none
     DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3      
        trcs_solml_vr(idg,0,NY,NX)=AZERO(trcs_solml2_vr(idg,0,NY,NX))
+
+       DO L=1,JS
+         if(L<=nsnol_col(NY,NX))then
+           trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)
+         else
+           trcg_solsml_snvr(idg,L,NY,NX)=0._r8
+         endif
+       enddo
+       
+
        DO L=NU(NY,NX),NL(NY,NX)
          trcg_gasml_vr(idg,L,NY,NX)=AZERO(trcg_gasml2_vr(idg,L,NY,NX))
        ENDDO

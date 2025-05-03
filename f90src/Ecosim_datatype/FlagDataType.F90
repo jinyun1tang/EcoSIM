@@ -22,7 +22,7 @@ implicit none
   integer,target,allocatable ::  ISOIL(:,:,:,:)                      !flag for calculating FC(1),WP(2),SCNV(3),SCNH(4)
   integer,target,allocatable ::  ISOILR(:,:)                         !natural(0),reconstructed(1) soil profile
 
-  integer,target,allocatable ::  IUTYP(:,:)                          !urea hydrolysis inhibitor type (1=no,2=yes)
+  integer,target,allocatable ::  iUreaHydInhibitorType_col(:,:)                          !urea hydrolysis inhibitor type (1=no,2=yes)
   integer,target,allocatable ::  ITILL1(:,:)                         !soil disturbance type, [-]
   integer,target,allocatable ::  IsPlantActive_pft(:,:,:)                        ! flag for living pft
   integer,target,allocatable ::  doInitPlant_pft(:,:,:)                        !PFT initialization flag:0=no,1=yes
@@ -53,7 +53,7 @@ contains
   allocate(IFPOB(JY,JX));       IFPOB=0
   allocate(ISOIL(4,JZ,JY,JX));  ISOIL=isoi_unset     !soil properties unset by default
   allocate(ISOILR(JY,JX));      ISOILR=0
-  allocate(IUTYP(JY,JX));       IUTYP=0
+  allocate(iUreaHydInhibitorType_col(JY,JX));       iUreaHydInhibitorType_col=0
   allocate(ITILL1(JY,JX));      ITILL1=0
   allocate(IsPlantActive_pft(JP,JY,JX));    IsPlantActive_pft=iDormant
   allocate(doInitPlant_pft(JP,JY,JX));    doInitPlant_pft=ifalse
@@ -84,7 +84,7 @@ contains
   call destroy(IFPOB)
   call destroy(ISOIL)
   call destroy(ISOILR)
-  call destroy(IUTYP)
+  call destroy(iUreaHydInhibitorType_col)
   call destroy(ITILL1)
   call destroy(IsPlantActive_pft)
   call destroy(doInitPlant_pft)

@@ -4458,16 +4458,16 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IUTYP', dim1name='column',&
+    call restartvar(ncid, flag, varname='iUreaHydInhibitorType_col', dim1name='column',&
        long_name='urea hydrolysis inhibitor type (1=no,2=yes)', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,iUreaHydInhibitorType_col,datic_1d)
   else
-    !print*,'IUTYP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)  
+    !print*,'iUreaHydInhibitorType_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,iUreaHydInhibitorType_col,datic_1d)  
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IUTYP', dim1name='column',&
+    call restartvar(ncid, flag, varname='iUreaHydInhibitorType_col', dim1name='column',&
        long_name='urea hydrolysis inhibitor type (1=no,2=yes)', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)

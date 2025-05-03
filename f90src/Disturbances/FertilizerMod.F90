@@ -72,18 +72,18 @@ implicit none
 !
 !     IYTYP=fertilizer release type from fertilizer input file
 !     FERT=fertilizer type from fertilizer input file
-!     IUTYP=urea hydrolysis inhibitor type (1=no,2=yes)
+!     iUreaHydInhibitorType_col=urea hydrolysis inhibitor type (1=no,2=yes)
 !     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
 ! urea application
   IF(FERT(ifert_urea,I,NY,NX).GT.0._r8 .OR. FERT(ifert_urea_band,I,NY,NX).GT.0._r8)THEN  
     IF(IYTYP(0,I,NY,NX).EQ.0)THEN
-      IUTYP(NY,NX)=0
+      iUreaHydInhibitorType_col(NY,NX)=0
     ELSEIF(IYTYP(0,I,NY,NX).EQ.1 .OR. IYTYP(0,I,NY,NX).EQ.3)THEN
-      IUTYP(NY,NX)=1
+      iUreaHydInhibitorType_col(NY,NX)=1
     ELSE
       !urea hydrolysis is on
-      IUTYP(NY,NX)=2
+      iUreaHydInhibitorType_col(NY,NX)=2
     ENDIF
 
     D9964: DO L=0,NL(NY,NX)

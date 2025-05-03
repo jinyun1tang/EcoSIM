@@ -39,33 +39,33 @@ contains
   itemp=0
 
   cid_H1PO4_2e_aqua_mole_conc = addone(itemp)
-  cid_H1PO4_2e_band_conc      = addone(itemp)
+  cid_H1PO4_2e_band_mole_conc      = addone(itemp)
   cid_H2PO4_1e_aqua_mole_conc = addone(itemp)
-  cid_H2PO4_1e_band_conc      = addone(itemp)
+  cid_H2PO4_1e_band_mole_conc      = addone(itemp)
   cid_NH3_aqua_mole_conc      = addone(itemp)
-  cid_NH3_aqu_band_conc       = addone(itemp)
+  cid_NH3_aqu_band_mole_conc       = addone(itemp)
   cid_NH4_1p_aqua_mole_conc   = addone(itemp)
-  cid_NH4_1p_band_conc        = addone(itemp)
+  cid_NH4_1p_band_mole_conc        = addone(itemp)
   cid_XNH4_mole_conc               = addone(itemp)
-  cid_XNH4_band_conc          = addone(itemp)
-  cid_XHPO4_band_conc         = addone(itemp)
-  cid_XH2PO4_band_conc        = addone(itemp)
-  cid_XROH_band_conc          = addone(itemp)
-  cid_XHPO4_conc              = addone(itemp)
-  cid_XROH2_band_conc         = addone(itemp)
-  cid_XH2PO4_conc             = addone(itemp)
-  cid_XROH1_conc               = addone(itemp)
-  cid_XROH2_conc               = addone(itemp)
-  cid_Precp_AlPO4_conc         = addone(itemp)
-  cid_PrecpB_AlPO4_conc        = addone(itemp)
-  cid_Precp_CaHPO4_conc        = addone(itemp)
-  cid_PrecpB_CaHPO4_conc       = addone(itemp)
-  cid_Precp_Ca5P3O12O3H3_conc  = addone(itemp)
-  cid_PrecpB_Ca5P3O12O3H3_conc = addone(itemp)
-  cid_Precp_CaH4P2O8_conc      = addone(itemp)
-  cid_PrecpB_CaH4P2O8_conc     = addone(itemp)
-  cid_Precp_FePO4_conc         = addone(itemp)
-  cid_PrecpB_FePO4_con         = addone(itemp)
+  cid_XNH4_band_mole_conc          = addone(itemp)
+  cid_XHPO4_band_mole_conc         = addone(itemp)
+  cid_XH2PO4_band_mole_conc        = addone(itemp)
+  cid_XROH_band_mole_conc          = addone(itemp)
+  cid_XHPO4_mole_conc              = addone(itemp)
+  cid_XROH2_band_mole_conc         = addone(itemp)
+  cid_XH2PO4_mole_conc             = addone(itemp)
+  cid_XROH1_mole_conc               = addone(itemp)
+  cid_XROH2_mole_conc               = addone(itemp)
+  cid_Precp_AlPO4_mole_conc         = addone(itemp)
+  cid_PrecpB_AlPO4_mole_conc        = addone(itemp)
+  cid_Precp_CaHPO4_mole_conc        = addone(itemp)
+  cid_PrecpB_CaHPO4_mole_conc       = addone(itemp)
+  cid_Precp_Ca5P3O12O3H3_mole_conc  = addone(itemp)
+  cid_PrecpB_Ca5P3O12O3H3_mole_conc = addone(itemp)
+  cid_Precp_CaH4P2O8_mole_conc      = addone(itemp)
+  cid_PrecpB_CaH4P2O8_mole_conc     = addone(itemp)
+  cid_Precp_FePO4_mole_conc         = addone(itemp)
+  cid_PrecpB_FePO4_mole_conc         = addone(itemp)
 
   fid_TRChem_NH4_soil                  = addone(itemp)
   fid_TRChem_NH4_band_soil             = addone(itemp)
@@ -157,35 +157,35 @@ contains
 !  ystatesfl(cid_CO2S)    =2.31E-002
 
   ystatesfl(cid_H1PO4_2e_aqua_mole_conc)   =7.6E-3_r8
-  ystatesfl(cid_H1PO4_2e_band_conc)   =7.6E-3_r8
+  ystatesfl(cid_H1PO4_2e_band_mole_conc)   =7.6E-3_r8
   ystatesfl(cid_H2PO4_1e_aqua_mole_conc)   =0.56_r8
-  ystatesfl(cid_H2PO4_1e_band_conc)   =0.56_r8
+  ystatesfl(cid_H2PO4_1e_band_mole_conc)   =0.56_r8
   ystatesfl(cid_NH3_aqua_mole_conc)    =1.39E-004_r8
-  ystatesfl(cid_NH3_aqu_band_conc)    =1.95E-004_r8
+  ystatesfl(cid_NH3_aqu_band_mole_conc)    =1.95E-004_r8
   ystatesfl(cid_NH4_1p_aqua_mole_conc)    =1.21_r8
-  ystatesfl(cid_NH4_1p_band_conc)    =372.2_r8
+  ystatesfl(cid_NH4_1p_band_mole_conc)    =372.2_r8
   ystatesfl(cid_XNH4_mole_conc)    =0.32_r8
-  ystatesfl(cid_XNH4_band_conc)    =0.32_r8
+  ystatesfl(cid_XNH4_band_mole_conc)    =0.32_r8
 
-  ystatesfl(cid_XHPO4_band_conc)   =0.0_r8
-  ystatesfl(cid_XH2PO4_band_conc)   =0.0_r8
-  ystatesfl(cid_XROH_band_conc)   =0.0_r8
-  ystatesfl(cid_XHPO4_conc)   =0.0_r8
-  ystatesfl(cid_XROH2_band_conc)   =0.0_r8
-  ystatesfl(cid_XH2PO4_conc)   =0.0_r8
-  ystatesfl(cid_XROH1_conc)   =0.0_r8
-  ystatesfl(cid_XROH2_conc)   =0.0_r8
+  ystatesfl(cid_XHPO4_band_mole_conc)   =0.0_r8
+  ystatesfl(cid_XH2PO4_band_mole_conc)   =0.0_r8
+  ystatesfl(cid_XROH_band_mole_conc)   =0.0_r8
+  ystatesfl(cid_XHPO4_mole_conc)   =0.0_r8
+  ystatesfl(cid_XROH2_band_mole_conc)   =0.0_r8
+  ystatesfl(cid_XH2PO4_mole_conc)   =0.0_r8
+  ystatesfl(cid_XROH1_mole_conc)   =0.0_r8
+  ystatesfl(cid_XROH2_mole_conc)   =0.0_r8
 
-  ystatesfl(cid_Precp_AlPO4_conc)  =0.623_r8
-  ystatesfl(cid_PrecpB_AlPO4_conc)  =0.623_r8
-  ystatesfl(cid_Precp_CaHPO4_conc)  =0.0_r8
-  ystatesfl(cid_PrecpB_CaHPO4_conc)  =0.0_r8
-  ystatesfl(cid_Precp_Ca5P3O12O3H3_conc)  =0.0_r8
-  ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)  =0.0_r8
-  ystatesfl(cid_Precp_CaH4P2O8_conc)  =0.0_r8
-  ystatesfl(cid_PrecpB_CaH4P2O8_conc)  =600.89_r8
-  ystatesfl(cid_Precp_FePO4_conc)  =0.0_r8
-  ystatesfl(cid_PrecpB_FePO4_con)  =0.0_r8
+  ystatesfl(cid_Precp_AlPO4_mole_conc)  =0.623_r8
+  ystatesfl(cid_PrecpB_AlPO4_mole_conc)  =0.623_r8
+  ystatesfl(cid_Precp_CaHPO4_mole_conc)  =0.0_r8
+  ystatesfl(cid_PrecpB_CaHPO4_mole_conc)  =0.0_r8
+  ystatesfl(cid_Precp_Ca5P3O12O3H3_mole_conc)  =0.0_r8
+  ystatesfl(cid_PrecpB_Ca5P3O12O3H3_mole_conc)  =0.0_r8
+  ystatesfl(cid_Precp_CaH4P2O8_mole_conc)  =0.0_r8
+  ystatesfl(cid_PrecpB_CaH4P2O8_mole_conc)  =600.89_r8
+  ystatesfl(cid_Precp_FePO4_mole_conc)  =0.0_r8
+  ystatesfl(cid_PrecpB_FePO4_mole_conc)  =0.0_r8
 
   end subroutine initmodel_nosalt
 ! ----------------------------------------------------------------------
@@ -284,34 +284,34 @@ contains
 
 ! those below are variable
 
-  chemvar%XROH1_conc   =ystates0l(cid_XROH1_conc)
+  chemvar%XROH1_mole_conc   =ystates0l(cid_XROH1_mole_conc)
   chemvar%XNH4_mole_conc    =ystates0l(cid_XNH4_mole_conc)
-  chemvar%XNH4_band_conc    =ystates0l(cid_XNH4_band_conc)
-  chemvar%H1PO4_2e_band_conc   =ystates0l(cid_H1PO4_2e_band_conc)
+  chemvar%XNH4_band_mole_conc    =ystates0l(cid_XNH4_band_mole_conc)
+  chemvar%H1PO4_2e_band_mole_conc   =ystates0l(cid_H1PO4_2e_band_mole_conc)
   chemvar%H1PO4_2e_aqua_mole_conc   =ystates0l(cid_H1PO4_2e_aqua_mole_conc)
   chemvar%H2PO4_1e_aqua_mole_conc   =ystates0l(cid_H2PO4_1e_aqua_mole_conc)
-  chemvar%H2PO4_1e_band_conc   =ystates0l(cid_H2PO4_1e_band_conc)
-  chemvar%XHPO4_band_conc   =ystates0l(cid_XHPO4_band_conc)
-  chemvar%XH2PO4_band_conc   =ystates0l(cid_XH2PO4_band_conc)
-  chemvar%XROH_band_conc   =ystates0l(cid_XROH_band_conc)
-  chemvar%XHPO4_conc   =ystates0l(cid_XHPO4_conc)
-  chemvar%XROH2_band_conc   =ystates0l(cid_XROH2_band_conc)
-  chemvar%XH2PO4_conc   =ystates0l(cid_XH2PO4_conc)
-  chemvar%XROH2_conc   =ystates0l(cid_XROH2_conc)
+  chemvar%H2PO4_1e_band_mole_conc   =ystates0l(cid_H2PO4_1e_band_mole_conc)
+  chemvar%XHPO4_band_mole_conc   =ystates0l(cid_XHPO4_band_mole_conc)
+  chemvar%XH2PO4_band_mole_conc   =ystates0l(cid_XH2PO4_band_mole_conc)
+  chemvar%XROH_band_mole_conc   =ystates0l(cid_XROH_band_mole_conc)
+  chemvar%XHPO4_mole_conc   =ystates0l(cid_XHPO4_mole_conc)
+  chemvar%XROH2_band_mole_conc   =ystates0l(cid_XROH2_band_mole_conc)
+  chemvar%XH2PO4_mole_conc   =ystates0l(cid_XH2PO4_mole_conc)
+  chemvar%XROH2_mole_conc   =ystates0l(cid_XROH2_mole_conc)
   chemvar%NH3_aqua_mole_conc    =ystates0l(cid_NH3_aqua_mole_conc)
-  chemvar%NH3_aqu_band_conc    =ystates0l(cid_NH3_aqu_band_conc)
+  chemvar%NH3_aqu_band_mole_conc    =ystates0l(cid_NH3_aqu_band_mole_conc)
   chemvar%NH4_1p_aqua_mole_conc    =ystates0l(cid_NH4_1p_aqua_mole_conc)
-  chemvar%NH4_1p_band_conc    =ystates0l(cid_NH4_1p_band_conc)
-  chemvar%Precp_AlPO4_conc  =ystates0l(cid_Precp_AlPO4_conc)
-  chemvar%PrecpB_AlPO4_conc  =ystates0l(cid_PrecpB_AlPO4_conc)
-  chemvar%Precp_CaHPO4_conc  =ystates0l(cid_Precp_CaHPO4_conc)
-  chemvar%PrecpB_CaHPO4_conc  =ystates0l(cid_PrecpB_CaHPO4_conc)
-  chemvar%Precp_Ca5P3O12O3H3_conc  =ystates0l(cid_Precp_Ca5P3O12O3H3_conc)
-  chemvar%PrecpB_Ca5P3O12O3H3_conc  =ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)
-  chemvar%Precp_CaH4P2O8_conc  =ystates0l(cid_Precp_CaH4P2O8_conc)
-  chemvar%PrecpB_CaH4P2O8_conc  =ystates0l(cid_PrecpB_CaH4P2O8_conc)
-  chemvar%Precp_FePO4_conc  =ystates0l(cid_Precp_FePO4_conc)
-  chemvar%PrecpB_FePO4_con  =ystates0l(cid_PrecpB_FePO4_con)
+  chemvar%NH4_1p_band_mole_conc    =ystates0l(cid_NH4_1p_band_mole_conc)
+  chemvar%Precp_AlPO4_mole_conc  =ystates0l(cid_Precp_AlPO4_mole_conc)
+  chemvar%PrecpB_AlPO4_mole_conc  =ystates0l(cid_PrecpB_AlPO4_mole_conc)
+  chemvar%Precp_CaHPO4_mole_conc  =ystates0l(cid_Precp_CaHPO4_mole_conc)
+  chemvar%PrecpB_CaHPO4_mole_conc  =ystates0l(cid_PrecpB_CaHPO4_mole_conc)
+  chemvar%Precp_Ca5P3O12O3H3_mole_conc  =ystates0l(cid_Precp_Ca5P3O12O3H3_mole_conc)
+  chemvar%PrecpB_Ca5P3O12O3H3_mole_conc  =ystates0l(cid_PrecpB_Ca5P3O12O3H3_mole_conc)
+  chemvar%Precp_CaH4P2O8_mole_conc  =ystates0l(cid_Precp_CaH4P2O8_mole_conc)
+  chemvar%PrecpB_CaH4P2O8_mole_conc  =ystates0l(cid_PrecpB_CaH4P2O8_mole_conc)
+  chemvar%Precp_FePO4_mole_conc  =ystates0l(cid_Precp_FePO4_mole_conc)
+  chemvar%PrecpB_FePO4_mole_conc  =ystates0l(cid_PrecpB_FePO4_mole_conc)
 
   end subroutine SetChemVar
 
@@ -340,15 +340,15 @@ contains
   ystatesfl(fid_TRChem_NH4_sorbed_soil)=solflx%TRChem_NH4_sorbed_soil
 
   !ZNH4B=ZNH4B+TRChem_NH4_band_soil*Natomw
-  ystatesfl(cid_NH4_1p_band_conc)=ystates0l(cid_NH4_1p_band_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
+  ystatesfl(cid_NH4_1p_band_mole_conc)=ystates0l(cid_NH4_1p_band_mole_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
   ystatesfl(fid_TRChem_NH3_band_soil)=solflx%TRChem_NH3_band_soil
 
   !ZNH3B=ZNH3B+TRChem_NH3_band_soil*Natomw
-  ystatesfl(cid_NH3_aqu_band_conc)=ystates0l(cid_NH3_aqu_band_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
+  ystatesfl(cid_NH3_aqu_band_mole_conc)=ystates0l(cid_NH3_aqu_band_mole_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
   ystatesfl(fid_TRChem_NH3_band_soil)=solflx%TRChem_NH3_band_soil
 
   !XNB  = XNB+TRChem_NH4_sorbed_band_soil
-  ystatesfl(cid_XNH4_band_conc)=ystates0l(cid_XNH4_band_conc)+solflx%TRChem_NH4_sorbed_band_soil/chemvar%VLWatMicPNB
+  ystatesfl(cid_XNH4_band_mole_conc)=ystates0l(cid_XNH4_band_mole_conc)+solflx%TRChem_NH4_sorbed_band_soil/chemvar%VLWatMicPNB
   ystatesfl(fid_TRChem_NH4_sorbed_band_soil)=solflx%TRChem_NH4_sorbed_band_soil
 
   !H1PO4=H1PO4+TRChem_H1PO4_soil*Patomw
@@ -360,83 +360,83 @@ contains
   ystatesfl(fid_TRChem_H2PO4_soil)=solflx%TRChem_H2PO4_soil
 
   !XOH1 =XOH1+TRChem_ROH_sorbed_soil
-  ystatesfl(cid_XROH1_conc)=ystates0l(cid_XROH1_conc)+solflx%TRChem_ROH_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XROH1_mole_conc)=ystates0l(cid_XROH1_mole_conc)+solflx%TRChem_ROH_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_ROH_sorbed_soil)=solflx%TRChem_ROH_sorbed_soil
 
   !XOH2 =XOH2+TRChem_ROH2_sorbed_soil
-  ystatesfl(cid_XROH2_conc)=ystates0l(cid_XROH2_conc)+solflx%TRChem_ROH2_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XROH2_mole_conc)=ystates0l(cid_XROH2_mole_conc)+solflx%TRChem_ROH2_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_ROH2_sorbed_soil)=solflx%TRChem_ROH2_sorbed_soil
 
   !XH1P =XH1P+TRChem_RHPO4_sorbed_soil
-  ystatesfl(cid_XHPO4_conc)=ystates0l(cid_XHPO4_conc)+solflx%TRChem_RHPO4_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XHPO4_mole_conc)=ystates0l(cid_XHPO4_mole_conc)+solflx%TRChem_RHPO4_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_RHPO4_sorbed_soil)=solflx%TRChem_RHPO4_sorbed_soil
 
   !XH2P =XH2P+TRChem_RH2PO4_sorbed_soil
-  ystatesfl(cid_XH2PO4_conc)=ystates0l(cid_XH2PO4_conc)+solflx%TRChem_RH2PO4_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XH2PO4_mole_conc)=ystates0l(cid_XH2PO4_mole_conc)+solflx%TRChem_RH2PO4_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_RH2PO4_sorbed_soil)=solflx%TRChem_RH2PO4_sorbed_soil
 
   !PALPO=PALPO+TRChem_AlPO4_precip_soil
-  ystatesfl(cid_Precp_AlPO4_conc)=ystates0l(cid_Precp_AlPO4_conc)+solflx%TRChem_AlPO4_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_AlPO4_mole_conc)=ystates0l(cid_Precp_AlPO4_mole_conc)+solflx%TRChem_AlPO4_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_AlPO4_precip_soil)=solflx%TRChem_AlPO4_precip_soil
 
   !PFEPO=PFEPO+TRChem_FePO4_precip_soil
-  ystatesfl(cid_Precp_FePO4_conc)=ystates0l(cid_Precp_FePO4_conc)+solflx%TRChem_FePO4_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_FePO4_mole_conc)=ystates0l(cid_Precp_FePO4_mole_conc)+solflx%TRChem_FePO4_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_FePO4_precip_soil)=solflx%TRChem_FePO4_precip_soil
 
   !PCAPD=PCAPD+TRChem_CaHPO4_precip_soil
-  ystatesfl(cid_Precp_CaHPO4_conc)=ystates0l(cid_Precp_CaHPO4_conc)+solflx%TRChem_CaHPO4_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_CaHPO4_mole_conc)=ystates0l(cid_Precp_CaHPO4_mole_conc)+solflx%TRChem_CaHPO4_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_CaHPO4_precip_soil)=solflx%TRChem_CaHPO4_precip_soil
 
   !PCAPH=PCAPH+TRChem_apatite_precip_soil
-  ystatesfl(cid_Precp_Ca5P3O12O3H3_conc)=ystates0l(cid_Precp_Ca5P3O12O3H3_conc)+solflx%TRChem_apatite_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_Ca5P3O12O3H3_mole_conc)=ystates0l(cid_Precp_Ca5P3O12O3H3_mole_conc)+solflx%TRChem_apatite_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_apatite_precip_soil)=solflx%TRChem_apatite_precip_soil
 
   !PCAPM=PCAPM+TRChem_CaH4P2O8_precip_soil
-  ystatesfl(cid_Precp_CaH4P2O8_conc)=ystates0l(cid_Precp_CaH4P2O8_conc)+solflx%TRChem_CaH4P2O8_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_CaH4P2O8_mole_conc)=ystates0l(cid_Precp_CaH4P2O8_mole_conc)+solflx%TRChem_CaH4P2O8_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_CaH4P2O8_precip_soil)=solflx%TRChem_CaH4P2O8_precip_soil
 
   !H1POB=H1POB+TRChem_H1PO4_band_soil*Patomw
-  ystatesfl(cid_H1PO4_2e_band_conc)=ystates0l(cid_H1PO4_2e_band_conc)+solflx%TRChem_H1PO4_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_H1PO4_2e_band_mole_conc)=ystates0l(cid_H1PO4_2e_band_mole_conc)+solflx%TRChem_H1PO4_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_H1PO4_band_soil)=solflx%TRChem_H1PO4_band_soil
 
   !H2POB=H2POB+TRChem_H2PO4_band_soil*Patomw
-  ystatesfl(cid_H2PO4_1e_band_conc)=ystates0l(cid_H2PO4_1e_band_conc)+solflx%TRChem_H2PO4_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_H2PO4_1e_band_mole_conc)=ystates0l(cid_H2PO4_1e_band_mole_conc)+solflx%TRChem_H2PO4_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_H2PO4_band_soil)=solflx%TRChem_H2PO4_band_soil
 
   !XOH1B=XOH1B+TRChem_ROH_sorbed_band_soil
-  ystatesfl(cid_XROH_band_conc)=ystates0l(cid_XROH_band_conc)+solflx%TRChem_ROH_sorbed_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_XROH_band_mole_conc)=ystates0l(cid_XROH_band_mole_conc)+solflx%TRChem_ROH_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_ROH_sorbed_band_soil)=solflx%TRChem_ROH_sorbed_band_soil
 
   !XOH2B=XOH2B+TRChem_ROH2_sorbed_band_soil
-  ystatesfl(cid_XROH2_band_conc)=ystates0l(cid_XROH2_band_conc)+solflx%TRChem_ROH2_sorbed_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_XROH2_band_mole_conc)=ystates0l(cid_XROH2_band_mole_conc)+solflx%TRChem_ROH2_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_ROH2_sorbed_band_soil)=solflx%TRChem_ROH2_sorbed_band_soil
 
-  !XHPO4_band_conc=XHPO4_band_conc+TRChem_RHPO4_sorbed_band_soil
-  ystatesfl(cid_XHPO4_band_conc)=ystates0l(cid_XHPO4_band_conc)+solflx%TRChem_RHPO4_sorbed_band_soil/chemvar%VLWatMicPPB
+  !XHPO4_band_mole_conc=XHPO4_band_mole_conc+TRChem_RHPO4_sorbed_band_soil
+  ystatesfl(cid_XHPO4_band_mole_conc)=ystates0l(cid_XHPO4_band_mole_conc)+solflx%TRChem_RHPO4_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_RHPO4_sorbed_band_soil)=solflx%TRChem_RHPO4_sorbed_band_soil
 
   !XH2PB=XH2PB+TRChem_RH2PO4_sorbed_band_soil
-  ystatesfl(cid_XH2PO4_band_conc)=ystates0l(cid_XH2PO4_band_conc)+solflx%TRChem_RH2PO4_sorbed_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_XH2PO4_band_mole_conc)=ystates0l(cid_XH2PO4_band_mole_conc)+solflx%TRChem_RH2PO4_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_RH2PO4_sorbed_band_soil)=solflx%TRChem_RH2PO4_sorbed_band_soil
 
   !PALPB=PALPB+TRChem_AlPO4_precip_band_soil
-  ystatesfl(cid_PrecpB_AlPO4_conc)=ystates0l(cid_PrecpB_AlPO4_conc)+solflx%TRChem_AlPO4_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_AlPO4_mole_conc)=ystates0l(cid_PrecpB_AlPO4_mole_conc)+solflx%TRChem_AlPO4_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_AlPO4_precip_band_soil)=solflx%TRChem_AlPO4_precip_band_soil
 
   !PFEPB=PFEPB+TRChem_FePO4_precip_band_soil
-  ystatesfl(cid_PrecpB_FePO4_con)=ystates0l(cid_PrecpB_FePO4_con)+solflx%TRChem_FePO4_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_FePO4_mole_conc)=ystates0l(cid_PrecpB_FePO4_mole_conc)+solflx%TRChem_FePO4_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_FePO4_precip_band_soil)=solflx%TRChem_FePO4_precip_band_soil
 
   !PCPDB=PCPDB+TRChem_CaHPO4_precip_band_soil
-  ystatesfl(cid_PrecpB_CaHPO4_conc)=ystates0l(cid_PrecpB_CaHPO4_conc)+solflx%TRChem_CaHPO4_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaHPO4_mole_conc)=ystates0l(cid_PrecpB_CaHPO4_mole_conc)+solflx%TRChem_CaHPO4_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_CaHPO4_precip_band_soil)=solflx%TRChem_CaHPO4_precip_band_soil
 
   !PCPHB=PCPHB+TRChem_apatite_precip_band_soil
-  ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)=ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)+solflx%TRChem_apatite_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_Ca5P3O12O3H3_mole_conc)=ystates0l(cid_PrecpB_Ca5P3O12O3H3_mole_conc)+solflx%TRChem_apatite_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_apatite_precip_band_soil)=solflx%TRChem_apatite_precip_band_soil
 
   !PCPMB=PCPMB+TRChem_CaH4P2O8_precip_band_soil
-  ystatesfl(cid_PrecpB_CaH4P2O8_conc)=ystates0l(cid_PrecpB_CaH4P2O8_conc)+solflx%TRChem_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaH4P2O8_mole_conc)=ystates0l(cid_PrecpB_CaH4P2O8_mole_conc)+solflx%TRChem_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_CaH4P2O8_precip_band_soil)=solflx%TRChem_CaH4P2O8_precip_band_soil
   end subroutine RetrieveYstatef
 

@@ -97,25 +97,25 @@ module SoluteChemDataType
     real(r8) :: XAl_conc
     real(r8) :: XFe_conc
     real(r8) :: XCa_conc
-    real(r8) :: Precp_Ca5P3O12O3H3_conc
+    real(r8) :: Precp_Ca5P3O12O3H3_mole_conc
     real(r8) :: XMg_conc
     real(r8) :: XNa_conc
     real(r8) :: XK_conc
     real(r8) :: XHC1
     real(r8) :: XAlO2H2_conc
     real(r8) :: XFeO2H2_conc
-    real(r8) :: XOH_conc
-    real(r8) :: XROH1_conc
-    real(r8) :: XROH2_conc
-    real(r8) :: XHPO4_conc
-    real(r8) :: XH2PO4_conc
+    real(r8) :: XOH_mole_conc
+    real(r8) :: XROH1_mole_conc
+    real(r8) :: XROH2_mole_conc
+    real(r8) :: XHPO4_mole_conc
+    real(r8) :: XH2PO4_mole_conc
     real(r8) :: Precp_AlO3H3_conc
     real(r8) :: Precp_FeO3H3_conc
     real(r8) :: Precp_CaCO3_conc
     real(r8) :: Precp_CaSO4_conc
-    real(r8) :: Precp_AlPO4_conc
-    real(r8) :: Precp_FePO4_conc
-    real(r8) :: Precp_CaHPO4_conc
+    real(r8) :: Precp_AlPO4_mole_conc
+    real(r8) :: Precp_FePO4_mole_conc
+    real(r8) :: Precp_CaHPO4_mole_conc
     real(r8) :: FH2O
     real(r8) :: ATCA
     real(r8) :: XAEC
@@ -238,23 +238,23 @@ module SoluteChemDataType
 
   type, public :: chem_var_type
   real(r8) :: H1PO4_2e_aqua_mole_conc
-  real(r8) :: H1PO4_2e_band_conc
+  real(r8) :: H1PO4_2e_band_mole_conc
   real(r8) :: H2PO4_1e_aqua_mole_conc
-  real(r8) :: H2PO4_1e_band_conc
+  real(r8) :: H2PO4_1e_band_mole_conc
   real(r8) :: NH3_aqua_mole_conc
-  real(r8) :: NH3_aqu_band_conc
+  real(r8) :: NH3_aqu_band_mole_conc
   real(r8) :: NH4_1p_aqua_mole_conc
-  real(r8) :: NH4_1p_band_conc
-  real(r8) :: Precp_AlPO4_conc
-  real(r8) :: PrecpB_AlPO4_conc
-  real(r8) :: Precp_CaHPO4_conc
-  real(r8) :: PrecpB_CaHPO4_conc
-  real(r8) :: Precp_Ca5P3O12O3H3_conc
-  real(r8) :: PrecpB_Ca5P3O12O3H3_conc
-  real(r8) :: Precp_CaH4P2O8_conc
-  real(r8) :: PrecpB_CaH4P2O8_conc
-  real(r8) :: Precp_FePO4_conc
-  real(r8) :: PrecpB_FePO4_con
+  real(r8) :: NH4_1p_band_mole_conc
+  real(r8) :: Precp_AlPO4_mole_conc
+  real(r8) :: PrecpB_AlPO4_mole_conc
+  real(r8) :: Precp_CaHPO4_mole_conc
+  real(r8) :: PrecpB_CaHPO4_mole_conc
+  real(r8) :: Precp_Ca5P3O12O3H3_mole_conc
+  real(r8) :: PrecpB_Ca5P3O12O3H3_mole_conc
+  real(r8) :: Precp_CaH4P2O8_mole_conc
+  real(r8) :: PrecpB_CaH4P2O8_mole_conc
+  real(r8) :: Precp_FePO4_mole_conc
+  real(r8) :: PrecpB_FePO4_mole_conc
   real(r8) :: SoilMicPMassLayerX
   real(r8) :: VLWatMicPNB
   real(r8) :: VLWatMicPNH
@@ -349,18 +349,18 @@ module SoluteChemDataType
   real(r8) :: VLNO3
   real(r8) :: VLNH4
   real(r8) :: VLNHB
-  real(r8) :: XHPO4_band_conc
-  real(r8) :: XH2PO4_band_conc
-  real(r8) :: XROH_band_conc
-  real(r8) :: XHPO4_conc
-  real(r8) :: XROH2_band_conc
-  real(r8) :: XH2PO4_conc
+  real(r8) :: XHPO4_band_mole_conc
+  real(r8) :: XH2PO4_band_mole_conc
+  real(r8) :: XROH_band_mole_conc
+  real(r8) :: XHPO4_mole_conc
+  real(r8) :: XROH2_band_mole_conc
+  real(r8) :: XH2PO4_mole_conc
   real(r8) :: XNH4_mole_conc
-  real(r8) :: XNH4_band_conc
-  real(r8) :: XROH1_conc
-  real(r8) :: XROH2_conc
-  real(r8) :: XROH1_band_conc
-  real(r8) :: XOH_conc
+  real(r8) :: XNH4_band_mole_conc
+  real(r8) :: XROH1_mole_conc
+  real(r8) :: XROH2_mole_conc
+  real(r8) :: XROH1_band_mole_conc
+  real(r8) :: XOH_mole_conc
   real(r8) :: VLWatMicPNZ
   real(r8) :: VLWatMicPNO
   real(r8) :: BKVLNH
@@ -466,25 +466,25 @@ contains
   this%XAl_conc                   = 0._r8
   this%XFe_conc                   = 0._r8
   this%XCa_conc                   = 0._r8
-  this%Precp_Ca5P3O12O3H3_conc    = 0._r8
+  this%Precp_Ca5P3O12O3H3_mole_conc    = 0._r8
   this%XMg_conc                   = 0._r8
   this%XNa_conc                   = 0._r8
   this%XK_conc                    = 0._r8
   this%XHC1                       = 0._r8
   this%XAlO2H2_conc               = 0._r8
   this%XFeO2H2_conc               = 0._r8
-  this%XOH_conc                   = 0._r8
-  this%XROH1_conc                 = 0._r8
-  this%XROH2_conc                 = 0._r8
-  this%XHPO4_conc                 = 0._r8
-  this%XH2PO4_conc                = 0._r8
+  this%XOH_mole_conc                   = 0._r8
+  this%XROH1_mole_conc                 = 0._r8
+  this%XROH2_mole_conc                 = 0._r8
+  this%XHPO4_mole_conc                 = 0._r8
+  this%XH2PO4_mole_conc                = 0._r8
   this%Precp_AlO3H3_conc          = 0._r8
   this%Precp_FeO3H3_conc          = 0._r8
   this%Precp_CaCO3_conc           = 0._r8
   this%Precp_CaSO4_conc           = 0._r8
-  this%Precp_AlPO4_conc           = 0._r8
-  this%Precp_FePO4_conc           = 0._r8
-  this%Precp_CaHPO4_conc          = 0._r8
+  this%Precp_AlPO4_mole_conc           = 0._r8
+  this%Precp_FePO4_mole_conc           = 0._r8
+  this%Precp_CaHPO4_mole_conc          = 0._r8
   this%FH2O                       = 0._r8
   this%ATCA                       = 0._r8
   this%XAEC                       = 0._r8

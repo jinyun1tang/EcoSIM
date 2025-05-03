@@ -74,13 +74,13 @@ module TranspNoSaltMod
         trcs_mass_litr(idg,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
         trcs_mass_snow(idg,NY,NX)=0._r8
         trcs_mass_soil(idg,NY,NX)=0._r8
-
-        trcs_mass_beg(idg,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
-        DO L=1,JS
+        
+        DO L=1,nsnol_col(NY,NX)
           trcs_mass_snow(idg,NY,NX)=trcs_mass_snow(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
-          trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO
 
+        trcs_mass_beg(idg,NY,NX)=trcs_mass_litr(idg,NY,NX)+trcs_mass_snow(idg,NY,NX)
+        
         DO L=NU(NY,NX),NL(NY,NX)
           trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) &
             + trcs_soHml_vr(idg,L,NY,NX)
@@ -124,9 +124,10 @@ module TranspNoSaltMod
 
         mass_litr=trcs_solml_vr(idg,0,NY,NX)
         mass_snow=0._r8
-        DO L=1,JS
+        DO L=1,nsnol_col(NY,NX)
           mass_snow=mass_snow+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO        
+
         mass_soil=0._r8
         DO L=NU(NY,NX),NL(NY,NX)
           mass_soil=mass_soil+trcg_gasml_vr(idg,L,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcs_soHml_vr(idg,L,NY,NX)  
@@ -134,7 +135,7 @@ module TranspNoSaltMod
 
         if(idg==idg_NH3)then
           !also include NH3B
-          mass_litr=mass_litr+trcs_solml_vr(idg,0,NY,NX)
+          mass_litr=mass_litr+trcs_solml_vr(idg_NH3B,0,NY,NX)
           DO L=NU(NY,NX),NL(NY,NX)
             mass_soil=mass_soil+trcs_solml_vr(idg_NH3B,L,NY,NX)+trcs_soHml_vr(idg_NH3B,L,NY,NX)
           ENDDO
@@ -148,16 +149,17 @@ module TranspNoSaltMod
         if(abs(errmass)>1.e-5)then
           write(121,*)('-',L=1,50)
           if(present(M))then
-            write(121,*)'errmass',I,J,M,trcs_names(idg)
+            write(121,*)(I*1000+J)*10+M,trcs_names(idg),'total'
           else
-            write(121,*)'errmass',I,J,trcs_names(idg)
+            write(121,*)(I*1000+J)*10,trcs_names(idg),'total'
           endif
-          write(121,*)errmass
+          write(121,*)'errmass',errmass, 'NY NX=',NY,NX
           write(121,*)'mass beg, end',trcs_mass_beg(idg,NY,NX),trcs_mass_now(idg)
           write(121,*)'beg sno,litr,soil',trcs_mass_snow(idg,NY,NX),trcs_mass_litr(idg,NY,NX),trcs_mass_soil(idg,NY,NX)
           write(121,*)'mass sno,litr,soil',mass_snow,mass_litr,mass_soil
           write(121,*)'Delta mass sno, litr,soil',mass_snow-trcs_mass_snow(idg,NY,NX),mass_litr-trcs_mass_litr(idg,NY,NX), &
             mass_soil-trcs_mass_soil(idg,NY,NX)
+          write(121,*)'mass snow',trcg_solsml_snvr(idg,1:nsnol_col(NY,NX),NY,NX)  
           write(121,*)'dif/wetdepo to litr',GasDiff2Litr_flx_col(idg,NY,NX),Gas_WetDepo2Litr_col(idg,NY,NX)
           write(121,*)'gas litr2soil =',Gas_litr2Soil_flx_col(idg,NY,NX)  
           write(121,*)'snow2litr     =',trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)

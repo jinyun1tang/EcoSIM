@@ -324,7 +324,10 @@ module RedistMod
   enddo
   
   trcx_solml_vr(idx_NH4,0,NY,NX)=trcx_solml_vr(idx_NH4,0,NY,NX)+trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)
-
+  if(trcx_solml_vr(idx_NH4,0,NY,NX)<0._r8)then
+    write(*,*)'trcx_solml_vr(idx_NH4,0,NY,NX)',trcx_solml_vr(idx_NH4,0,NY,NX),trcx_TRSoilChem_vr(idx_NH4,0,NY,NX)
+    stop
+  endif
   DO idx=idx_AEC+1,idx_anion_soil_end
     trcx_solml_vr(idx,0,NY,NX)=trcx_solml_vr(idx,0,NY,NX)+trcx_TRSoilChem_vr(idx,0,NY,NX)
   ENDDO

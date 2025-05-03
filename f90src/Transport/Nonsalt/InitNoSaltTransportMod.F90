@@ -94,9 +94,9 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
-        IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR.   &   !snowfall
+        IF(nsnol_col(NY,NX) > 0 .and. (SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR.   &   !snowfall
           (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. &   !rainfall and significant snowpack
-          VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8))THEN !rainfall with snowpack
+          VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)))THEN !rainfall with snowpack
 
           call TracerFall2Snowpack(I,J,NY,NX)
 
@@ -106,7 +106,7 @@ module InitNoSaltTransportMod
           !     ENTERED IN WEATHER AND IRRIGATION FILES
           !
         ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) & !Irrigation or rainfall
-          .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN     !no snowpack
+          .AND. (nsnol_col(NY,NX)==0 .or. VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX)))THEN     !no snowpack
           !
           !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
           !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
