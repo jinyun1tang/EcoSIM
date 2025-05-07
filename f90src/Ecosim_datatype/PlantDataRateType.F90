@@ -78,7 +78,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake [g d-2]
   real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake [g d-2]
   real(r8),target,allocatable ::  TPlantRootH2OUptake_col(:,:)                   !total root H2O uptake [m3 d-2 h-1]
-  real(r8),target,allocatable ::  TH2OLoss2PlantRoo_vr(:,:,:)                  !total root water uptake, [m3 d-2]
+  real(r8),target,allocatable ::  TWaterPlantRoot2Soil_vr(:,:,:)                 !current step vertical root water uptake profile, [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  TWaterPlantRoot2SoilPrev_vr(:,:,:)             !previous step vertical root water uptake profile, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  THeatLossRoot2Soil_vr(:,:,:)                      !vertically profile of root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  THeatRootRelease_col(:,:)                      !total root heat relase, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcg_air2root_flx_vr(:,:,:,:)                  !total internal root gas flux , [g d-2 h-1]
@@ -216,7 +217,8 @@ module PlantDataRateType
   allocate(PlantExudElm_CumYr_pft(NumPlantChemElms,JP,JY,JX));   PlantExudElm_CumYr_pft=0._r8
   allocate(RootUptk_N_CumYr_pft(JP,JY,JX)); RootUptk_N_CumYr_pft=0._r8
   allocate(RootUptk_P_CumYr_pft(JP,JY,JX)); RootUptk_P_CumYr_pft=0._r8
-  allocate(TH2OLoss2PlantRoo_vr(0:JZ,JY,JX)); TH2OLoss2PlantRoo_vr=0._r8
+  allocate(TWaterPlantRoot2Soil_vr(JZ,JY,JX)); TWaterPlantRoot2Soil_vr=0._r8
+  allocate(TWaterPlantRoot2SoilPrev_vr(JZ,JY,JX)); TWaterPlantRoot2SoilPrev_vr=0._r8  
   allocate(THeatLossRoot2Soil_vr(0:JZ,JY,JX));  THeatLossRoot2Soil_vr=0._r8
   allocate(THeatRootRelease_col(JY,JX)); THeatRootRelease_col=0._r8
   allocate(trcg_air2root_flx_vr(idg_beg:idg_NH3,JZ,JY,JX));   trcg_air2root_flx_vr=0._r8
@@ -341,7 +343,8 @@ module PlantDataRateType
   call destroy(PlantExudElm_CumYr_pft)
   call destroy(RootUptk_N_CumYr_pft)
   call destroy(RootUptk_P_CumYr_pft)
-  call destroy(TH2OLoss2PlantRoo_vr)
+  call destroy(TWaterPlantRoot2Soil_vr)
+  call destroy(TWaterPlantRoot2SoilPrev_vr)  
   call destroy(THeatLossRoot2Soil_vr)
   call destroy(THeatRootRelease_col)
   call destroy(tRootMycoExud2Soil_vr)

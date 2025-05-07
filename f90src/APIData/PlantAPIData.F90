@@ -579,7 +579,7 @@ implicit none
   real(r8), pointer :: PSIRootTurg_vr(:,:,:)           => null()    !root turgor water potential,                                     [Mpa]
   real(r8), pointer :: AllPlantRootH2OLoss_vr(:,:,:) => null()    !root water uptake,                                               [m2 d-2 h-1]
   real(r8), pointer :: THeatLossRoot2Soil_vr(:)           => null()    !total root heat uptake,                                        [MJ d-2]
-  real(r8), pointer :: TH2OLoss2PlantRoo_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
+  real(r8), pointer :: TWaterPlantRoot2Soil_vr(:)       => null()    !total root water uptake,                                       [m3 d-2]
   real(r8), pointer :: WatHeldOnCanopy_pft(:)          => null()    !canopy surface water content,                                   [m3 d-2]
   real(r8), pointer :: CanopyBiomWater_pft(:)              => null()    !canopy water content,                                           [m3 d-2]
   real(r8), pointer :: VHeatCapCanopy_pft(:)           => null()    !canopy heat capacity,                                           [MJ d-2 K-1]
@@ -1112,7 +1112,7 @@ implicit none
   allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1));this%PSIRootOSMO_vr=spval
   allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1));this%PSIRootTurg_vr=spval
   allocate(this%AllPlantRootH2OLoss_vr(jroots,JZ1,JP1));this%AllPlantRootH2OLoss_vr=spval
-  allocate(this%TH2OLoss2PlantRoo_vr(0:JZ1));this%TH2OLoss2PlantRoo_vr=spval
+  allocate(this%TWaterPlantRoot2Soil_vr(0:JZ1));this%TWaterPlantRoot2Soil_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval

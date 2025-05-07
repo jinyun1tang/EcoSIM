@@ -114,7 +114,7 @@ module RootGasMod
     RCO2Emis2Root_pvr           => plt_rbgc%RCO2Emis2Root_pvr,               & !output: total CO2 emitted inside roots
     trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr,         & !output: atmospheric gas flux to root gas concentration
     trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr,      & !output: gaseous to aqueous dissolution inside root
-    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,            &  !out: aqueous tracer uptake from soil into roots
+    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,            & !out: aqueous tracer uptake from soil into roots
     RootCO2AutorX_pvr         => plt_rbgc%RootCO2AutorX_pvr,             & !input: root respiration from previous time step [gC d-2 h-1]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,               &
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,               &
@@ -143,7 +143,7 @@ module RootGasMod
     Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr,             &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
     RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr,            &
-    RootCO2Ar2Root_pvr        => plt_rbgc%RootCO2Ar2Root_pvr,            &
+    RootCO2Ar2Root_pvr        => plt_rbgc%RootCO2Ar2Root_pvr,            & !previous time step root respiration released into roots [gC d-2 h-1]
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft             &
   )
   

@@ -121,7 +121,7 @@ implicit none
     REcoNH4DmndSoil_vr(L,NY,NX)    = plt_bgcr%REcoNH4DmndSoil_vr(L)
     REcoO2DmndResp_vr(L,NY,NX)     = plt_bgcr%REcoO2DmndResp_vr(L)
     THeatLossRoot2Soil_vr(L,NY,NX) = plt_ew%THeatLossRoot2Soil_vr(L)
-    TH2OLoss2PlantRoo_vr(L,NY,NX)  = plt_ew%TH2OLoss2PlantRoo_vr(L)
+
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -132,6 +132,7 @@ implicit none
   ENDDO
 
   DO L=1,NK(NY,NX)
+    TWaterPlantRoot2Soil_vr(L,NY,NX)  = plt_ew%TWaterPlantRoot2Soil_vr(L)  
     DO NE=1,NumPlantChemElms
       RootMassElm_vr(NE,L,NY,NX)=  sum(plt_biom%RootMassElm_pvr(NE,L,1:NP0(NY,NX)))
     ENDDO
@@ -956,6 +957,7 @@ implicit none
     ENDDO
   ENDDO
 
+    
   DO L=0,NL(NY,NX)
     plt_bgcr%REcoH2PO4DmndBand_vr(L) = REcoH2PO4DmndBand_vr(L,NY,NX)
     plt_bgcr%REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L,NY,NX)
@@ -967,7 +969,7 @@ implicit none
     plt_bgcr%REcoNH4DmndSoil_vr(L)   = REcoNH4DmndSoil_vr(L,NY,NX)
     plt_bgcr%REcoO2DmndResp_vr(L)    = REcoO2DmndResp_vr(L,NY,NX)
     plt_ew%THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L,NY,NX)
-    plt_ew%TH2OLoss2PlantRoo_vr(L) = TH2OLoss2PlantRoo_vr(L,NY,NX)
+
     DO  K=1,micpar%NumOfPlantLitrCmplxs
       DO  M=1,jsken
         DO NE=1,NumPlantChemElms        
@@ -978,6 +980,7 @@ implicit none
   ENDDO
 
   DO L=1,NK(NY,NX)
+    plt_ew%TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L,NY,NX)  
     plt_morph%totRootLenDens_vr(L)                   = totRootLenDens_vr(L,NY,NX)
     plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)         = trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)

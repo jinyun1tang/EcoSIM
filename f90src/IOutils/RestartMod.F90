@@ -7047,6 +7047,23 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)                
+    call restartvar(ncid, flag, varname='TWaterPlantRoot2Soil_vr', dim1name='column',dim2name='levsoi',&
+       long_name='water flux from plant roots to soil', units='m3 H2O d-2 h-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)         
+    call cpcol(flag,NHW,NHE,NVN,NVS,TWaterPlantRoot2Soil_vr,datrc_2d)      
+  else
+    !print*,'VLMacP'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TWaterPlantRoot2Soil_vr,datrc_2d)        
+    datpr2 => datrc_2d(1:ncols,1:JZ)                    
+    call restartvar(ncid, flag, varname='TWaterPlantRoot2Soil_vr', dim1name='column',dim2name='levsoi',&
+       long_name='water flux from plant roots to soil', units='m3 H2O d-2 h-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)         
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ)                
     call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &

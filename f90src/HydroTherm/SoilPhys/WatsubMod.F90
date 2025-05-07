@@ -6,12 +6,13 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
-  use data_kind_mod,  only: r8 => DAT_KIND_R8
-  use data_const_mod, only: GravAcceleration=>DAT_CONST_G
-  use abortutils,     only: endrun,   print_info
-  use ElmIDMod,       only: iWestEastDirection,   iNorthSouthDirection, iVerticalDirection
-  use SurfPhysData,   only: InitSurfPhysData, DestructSurfPhysData
-  use PerturbationMod, only : check_Soil_Warming,is_warming_layerL  
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
+  use abortutils,        only: endrun,             print_info
+  use ElmIDMod,          only: iWestEastDirection, iNorthSouthDirection, iVerticalDirection
+  use SurfPhysData,      only: InitSurfPhysData,   DestructSurfPhysData
+  use PerturbationMod,   only: check_Soil_Warming, is_warming_layerL
+  use PlantDataRateType, only: TWaterPlantRoot2SoilPrev_vr
   use DebugToolMod
   use EcoSIMCtrlMod  
   use minimathmod      
@@ -205,7 +206,8 @@ module WatsubMod
       if(fixWaterLevel)then
         dwat=twatmass0(NY,NX)-twatmass1(NY,NX)
       else
-        dwat=twatmass0(NY,NX)-twatmass1(NY,NX)+Qinflx2Soil_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)-QDischar_col(NY,NX)-QDrain_col(NY,NX)
+        dwat=twatmass0(NY,NX)-twatmass1(NY,NX)+Qinflx2Soil_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)-QDischar_col(NY,NX)-QDrain_col(NY,NX) &
+          + TWaterPlantRoot2SoilX_col(NY,NX)
       endif
 !      dwat=twatmass0(NY,NX)-twatmass1(NY,NX)+Qinflx2SoilM_col(NY,NX)-QDischarM_col(NY,NX)-QDrainM_col(NY,NX)+QWatIntLaterFlowM_col(NY,NX)
 !      if(I==141 .and. J>=13)then
@@ -294,6 +296,7 @@ module WatsubMod
   DX995: DO NX=NHW,NHE
     DX990: DO NY=NVN,NVS
       twatmass0(NY,NX)=0._r8
+      TWaterPlantRoot2SoilX_col(NY,NX)=0._r8
     !make a local copy of the upper boundary index
       NUM(NY,NX)=NU(NY,NX)
 
@@ -334,6 +337,7 @@ module WatsubMod
         VLiceMicP1_vr(L,NY,NX)  = AZMAX1(VLiceMicP_vr(L,NY,NX))
         VLWatMacP1_vr(L,NY,NX)  = AZMAX1(VLWatMacP_vr(L,NY,NX))
         VLiceMacP1_vr(L,NY,NX)  = AZMAX1(VLiceMacP_vr(L,NY,NX))
+        TWaterPlantRoot2SoilX_vr(L,NY,NX)=TWaterPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP        
         twatmass0(NY,NX)        = twatmass0(NY,NX)+VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1158,12 +1162,13 @@ module WatsubMod
 
         IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
+          TWaterPlantRoot2SoilX_col(NY,NX) = TWaterPlantRoot2SoilX_col(NY,NX)+TWaterPlantRoot2SoilX_vr(L,NY,NX)
           VLWMicPre              = VLWatMicP1_vr(L,NY,NX)
           VLWatMicP1_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX)+WatNetFlow2MicP_3DM_vr(L,NY,NX)+FWatExMacP2MicPiM_vr(L,NY,NX) &
-            +TMLiceThawedMicP_vr(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)
+            +TMLiceThawedMicP_vr(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)+TWaterPlantRoot2SoilX_vr(L,NY,NX)
 
           VLWatMicPX1_vr(L,NY,NX) = VLWatMicPX1_vr(L,NY,NX)+WatNetFlow2MicptX_3DM_vr(L,NY,NX)+FWatExMacP2MicPiM_vr(L,NY,NX) &
-             +TMLiceThawedMicP_vr(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)
+             +TMLiceThawedMicP_vr(L,NY,NX)+FWatIrrigate2MicP1_vr(L,NY,NX)+TWaterPlantRoot2SoilX_vr(L,NY,NX)
           VLWatMicPX1_vr(L,NY,NX) = AMIN1(VLWatMicP1_vr(L,NY,NX),VLWatMicPX1_vr(L,NY,NX))
           VLiceMicP1_vr(L,NY,NX)  = VLiceMicP1_vr(L,NY,NX)-TMLiceThawedMicP_vr(L,NY,NX)/DENSICE
 

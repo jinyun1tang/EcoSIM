@@ -409,13 +409,13 @@ module Hour1Mod
 !
       trcs_deadroot2soil_col(idg_beg:idg_NH3,NY,NX) = 0._r8
       DO L=1,NL(NY,NX)+1
-        WaterFlowSoiMicP_3D(1:3,L,NY,NX)  = 0._r8
-        WaterFlowSoiMicPX_3D(1:3,L,NY,NX) = 0._r8
-        WaterFlowSoiMacP_3D(1:3,L,NY,NX)  = 0._r8
-        HeatFlow2Soil_3D(1:3,L,NY,NX)     = 0._r8
-        RootCO2Ar2Soil_vr(L,NY,NX)        = 0._r8
-        RootCO2Ar2Root_vr(L,NY,NX)        = 0._r8
-        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX)                 = 0._r8        
+        WaterFlowSoiMicP_3D(1:3,L,NY,NX)               = 0._r8
+        WaterFlowSoiMicPX_3D(1:3,L,NY,NX)              = 0._r8
+        WaterFlowSoiMacP_3D(1:3,L,NY,NX)               = 0._r8
+        HeatFlow2Soil_3D(1:3,L,NY,NX)                  = 0._r8
+        RootCO2Ar2Soil_vr(L,NY,NX)                     = 0._r8
+        RootCO2Ar2Root_vr(L,NY,NX)                     = 0._r8
+        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
       ENDDO
     ENDDO
   ENDDO
@@ -798,8 +798,6 @@ module Hour1Mod
   VapXAir2GSurf_col(NY,NX)                           = 0._r8
   THeatSnowThaw_col(NY,NX)                           = 0._r8
   THeatSoiThaw_col(NY,NX)                            = 0._r8
-  RO2AquaSourcePrev_vr(:,NY,NX)                    = 0._r8
-  RCH4PhysexchPrev_vr(:,NY,NX)                     = 0._r8
   TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
   CanopyWat_col(NY,NX)                             = 0._r8
   WatHeldOnCanopy_col(NY,NX)                       = 0._r8
@@ -855,7 +853,8 @@ module Hour1Mod
   TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)           = 0._r8
-  TH2OLoss2PlantRoo_vr(0:NL(NY,NX),NY,NX)                                     = 0._r8
+  TWaterPlantRoot2SoilPrev_vr(1:NL(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)
+  TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)                                  = 0._r8
   THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
@@ -1641,7 +1640,7 @@ module Hour1Mod
     RootN2Fix_vr(L,NY,NX)                         = 0._r8
     FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
-    RootCO2Emis2Root_vr(L,NY,NX)                 = 0._r8
+    RootCO2Emis2Root_vr(L,NY,NX)                  = 0._r8
     RUptkRootO2_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 

@@ -211,7 +211,7 @@ module TranspSaltMod
     ! SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
     ! placeholder: salt uptake by plant roots can be applied here. 
     !
-    FLWU=TH2OLoss2PlantRoo_vr(L,NY,NX)*dts_HeatWatTP
+    FLWU=TWaterPlantRoot2Soil_vr(L,NY,NX)*dts_HeatWatTP
 
     DO idsalt=idsalt_beg,idsalt_KSO4
       trcSalt_Irrig_vr(idsalt,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)

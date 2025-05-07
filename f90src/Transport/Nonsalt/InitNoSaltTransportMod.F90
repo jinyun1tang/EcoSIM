@@ -76,6 +76,8 @@ module InitNoSaltTransportMod
       trcg_Precip2LitrM_col(idg_beg:idg_NH3,NY,NX)=0._r8
       trcs_Precip2MicpM_col(ids_beg:ids_end,NY,NX)=0._r8
 
+      RO2AquaSourcePrev_vr(:,NY,NX)                    = 0._r8
+      RCH4PhysexchPrev_vr(:,NY,NX)                     = 0._r8
     ENDDO
   ENDDO      
   end subroutine ZeroTracerFluxes  

@@ -834,7 +834,7 @@ module RedistMod
     ENDDO
     !write(*,*)'here'
 !    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
-    
+    TPlantRootH2OUptake_col(NY,NX)=0._r8
     DO L=NUM(NY,NX),NL(NY,NX)
       
       !micropore
@@ -853,9 +853,9 @@ module RedistMod
 
       twatmass1(NY,NX)=twatmass1(NY,NX)+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
 
-      VLWatMicP_vr(L,NY,NX)  = VLWatMicP_vr(L,NY,NX)+TH2OLoss2PlantRoo_vr(L,NY,NX)
-      VLWatMicPX_vr(L,NY,NX) = VLWatMicPX_vr(L,NY,NX)+TH2OLoss2PlantRoo_vr(L,NY,NX)
-      TPlantRootH2OUptake_col(NY,NX) = TPlantRootH2OUptake_col(NY,NX)+TH2OLoss2PlantRoo_vr(L,NY,NX) 
+      VLWatMicP_vr(L,NY,NX)  = VLWatMicP_vr(L,NY,NX)+TWaterPlantRoot2SoilPrev_vr(L,NY,NX)
+      VLWatMicPX_vr(L,NY,NX) = VLWatMicPX_vr(L,NY,NX)+TWaterPlantRoot2SoilPrev_vr(L,NY,NX)
+      TPlantRootH2OUptake_col(NY,NX) = TPlantRootH2OUptake_col(NY,NX)+TWaterPlantRoot2SoilPrev_vr(L,NY,NX) 
 
       TKSX                      = TKS_vr(L,NY,NX)
       VHeatCapacityX            = VHeatCapacity_vr(L,NY,NX)
