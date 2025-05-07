@@ -170,6 +170,12 @@ module WatsubMod
   ENDDO D3320
   call PrintInfo('end watsub')
 
+!  write(444,*)'watsubend',('--',L=1,50)
+!  NY=1;NX=1
+!  write(444,*)(VLWatMicP1_vr(L,NY,NX),L=NUM(NY,NX),NL(NY,NX))
+!  write(444,*)(VLWatMacP1_vr(L,NY,NX),L=NUM(NY,NX),NL(NY,NX))
+!  write(444,*)((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE,L=NUM(NY,NX),NL(NY,NX))
+
   END subroutine watsub
 
 !------------------------------------------------------------------------------------------  
@@ -220,7 +226,7 @@ module WatsubMod
 !       if(I>=156)write(211,*)I*1000+J,NY,NX,M,'wat',NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
 !          QDischar_col(NY,NX),QDrain_col(NY,NX),dwat0
 
-      !if(I==358 .and. J==12)
+!      !if(I==358 .and. J==12)
 !      write(311,*)I+J/24.,NY,NX,M,'wat',NUX0(NY,NX),NUM(NY,NX),dwat,twatmass0(NY,NX),twatmass1(NY,NX),Qinflx2Soil_col(NY,NX),QWatIntLaterFlow_col(NY,NX),&
 !          QDischar_col(NY,NX),QDrain_col(NY,NX)
       if(abs(dwat)>1.e-4_r8)then
@@ -433,6 +439,12 @@ module WatsubMod
           FracLayVolBelowTileWTBL_vr(L,NY,NX)=0.0_r8
         ENDIF
       ENDDO D30
+
+!      write(444,*)'watbeg',('xx',L=1,50)
+!      write(444,*)(VLWatMicP1_vr(L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+!      write(444,*)(VLWatMacP1_vr(L,NY,NX),L=NU(NY,NX),NL(NY,NX))
+!      write(444,*)((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE,L=NU(NY,NX),NL(NY,NX))
+
     ENDDO DX990
   ENDDO DX995
   

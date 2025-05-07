@@ -727,7 +727,7 @@ module Hour1Mod
   trcn_SnowDrift_flx_col(:,NY,NX) = 0._r8
   trcg_SnowDrift_flx_col(:,NY,NX) = 0._r8
   DOM_draing_col(:,:,NY,NX)         = 0._r8
-  trcs_draing_col(:,NY,NX)        = 0._r8
+  trcs_drainage_flx_col(:,NY,NX)        = 0._r8
   DOM_SurfRunoff_flx_col(:,:,NY,NX) =0._r8
 
   trcn_snowMassloss_col(:,NY,NX)             = 0._r8
@@ -782,7 +782,7 @@ module Hour1Mod
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)        = 0._r8
   RootCO2Ar2Soil_col(NY,NX)                  = 0._r8
   RootCO2Ar2Root_col(NY,NX)                  = 0._r8
-  GasHydroLoss_flx_col(idg_beg:idg_end,NY,NX) = 0._r8
+  GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   trcn_SurfRunoff_flx_col(:,NY,NX)               = 0._r8
   SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
   GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
@@ -1634,11 +1634,13 @@ module Hour1Mod
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
   trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)=0._r8
-  trcs_plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
+  trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
+  trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8  
+
   DO L=NUI(NY,NX),NLI(NY,NX)
     RootN2Fix_vr(L,NY,NX)                         = 0._r8
     FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
-    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
+    trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
     RootCO2Emis2Root_vr(L,NY,NX)                 = 0._r8
     RUptkRootO2_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8

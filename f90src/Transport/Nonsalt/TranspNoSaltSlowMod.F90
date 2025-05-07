@@ -2,7 +2,7 @@ module TranspNoSaltSlowMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use abortutils,        only: destroy,  endrun
   use TracerPropMod,     only: MolecularWeight
-  use PlantDataRateType, only: trcs_deadroot2soil_vr
+  use PlantDataRateType
   use minimathmod    
   use IrrigationDataType
   use DebugToolMod
@@ -599,6 +599,7 @@ implicit none
             *trcs_Precip2MicpM_col(idg,NY,NX)
 
           L=NU(NY,NX)
+
           flux=ppscal(idg)*(RGasAtmDisol2SoilM_col(idg,NY,NX) &             
             +trcs_MicpTranspFlxM_3D(idg,3,L,NY,NX) +trcs_MacpTranspFlxM_3D(idg,3,L,NY,NX))
 
@@ -669,7 +670,7 @@ implicit none
           TranspNetSoil_flx_col(idg_NH3,NY,NX)=TranspNetSoil_flx_col(idg_NH3,NY,NX)+ppscal(idg) &
             *(trcs_Transp2Micp_flxM_vr(idg,L,NY,NX)+trcs_Transp2Macp_flxM_vr(idg,L,NY,NX) &
             -RBGCSinkSoluteM_vr(idg,L,NY,NX)) 
-          
+
         ENDDO
 
         TranspNetSoil_flx2_col(idg_NH3,NY,NX)=TranspNetSoil_flx2_col(idg_NH3,NY,NX) + ppscal(idg) &
@@ -759,6 +760,9 @@ implicit none
             flux=ppscal(ids)*(trcsol_Irrig_flxM_vr(ids,L,NY,NX))        
             trcs_NetProd_slow_flx_col(ids,NY,NX)      = trcs_NetProd_slow_flx_col(ids,NY,NX)+flux
             trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)+flux
+            trcs_Soil2plant_uptake_col(ids,NY,NX)     = trcs_Soil2plant_uptake_col(ids,NY,NX)+ ppscal(ids)*&
+              trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP
+
           endif  
         ENDDO      
       ENDDO
@@ -803,9 +807,9 @@ implicit none
           trcs_hydrloss_slow_flx_col(ids,NY,NX)=  trcs_hydrloss_slow_flx_col(ids,NY,NX)+flux
 
           flux=ppscal(ids)*(trcs_MicpTranspFlxM_3D(ids,3,NL(NY,NX)+1,NY,NX)+trcs_MacpTranspFlxM_3D(ids,3,NL(NY,NX)+1,NY,NX))
-          trcs_netflow2soil_slow_flx_col(ids,NY,NX)=trcs_netflow2soil_slow_flx_col(ids,NY,NX)-flux    
-          trcs_draing_col(ids,NY,NX)           = trcs_draing_col(ids,NY,NX) + flux
-          trcs_hydrloss_slow_flx_col(ids,NY,NX)=  trcs_hydrloss_slow_flx_col(ids,NY,NX)-flux
+          trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)-flux
+          trcs_drainage_flx_col(ids,NY,NX)          = trcs_drainage_flx_col(ids,NY,NX) + flux
+          trcs_hydrloss_slow_flx_col(ids,NY,NX)     = trcs_hydrloss_slow_flx_col(ids,NY,NX)-flux
 
         endif  
       ENDDO

@@ -101,7 +101,7 @@ implicit none
 
     call UpdateSnowLayerL(I,J,L,NY,NX,VOLSWI)
 
-    call SoluteTransportThruSnow(I,J,L,NY,NX)
+!    call SoluteTransportThruSnow(I,J,L,NY,NX)
     
   ENDDO D9780
 

@@ -687,7 +687,7 @@ implicit none
   type, public :: plant_rootbgc_type
   real(r8), pointer :: canopy_growth_pft(:)              => null()  !canopy growth flux [g d-2]
   real(r8), pointer :: TRootGasLossDisturb_col(:)        => null()  !total root gas content [g d-2]
-  real(r8), pointer :: trcs_plant_uptake_vr(:,:)         => null()   !total root-soil solute flux non-band,                          [g d-2 h-1]
+  real(r8), pointer :: trcs_Soil2plant_uptake_vr(:,:)         => null()   !total root-soil solute flux non-band,                          [g d-2 h-1]
   real(r8), pointer :: RootMycoExudElms_pft(:,:)         => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pft(:)                  => null()  !total root N2 fixation,                                         [g d-2 h-1]
   real(r8), pointer :: RootNO3Uptake_pft(:)              => null()  !total root uptake of NO3,                                       [g d-2 h-1]
@@ -707,7 +707,7 @@ implicit none
   real(r8), pointer :: CMinNH4Root_pft(:,:)              => null()  !minimum NH4 concentration for root NH4 uptake,                  [g m-3]
   real(r8), pointer :: VmaxNH4Root_pft(:,:)              => null()  !maximum root NH4 uptake rate,                                   [g m-2 h-1]
   real(r8), pointer :: KmNH4Root_pft(:,:)                => null()  !Km for root NH4 uptake,                                         [g m-3]
-  real(r8), pointer :: RootCO2Emis_pvr(:,:,:)            => null()  !aqueous CO2 flux from roots to root water,                      [g d-2 h-1]
+  real(r8), pointer :: RCO2Emis2Root_pvr(:,:,:)            => null()  !aqueous CO2 flux from roots to root water,                      [g d-2 h-1]
   real(r8), pointer :: RootO2Uptk_pvr(:,:,:)             => null()  !aqueous O2 flux from roots to root water,                       [g d-2 h-1]
   real(r8), pointer :: RootUptkSoiSol_pvr(:,:,:,:)             => null()  !aqueous CO2 flux from roots to soil water,                      [g d-2 h-1]
   real(r8), pointer :: trcg_air2root_flx_pvr(:,:,:,:)   => null()  !gaseous tracer flux through roots,                              [g d-2 h-1]
@@ -767,7 +767,7 @@ implicit none
 
   implicit none
   class(plant_rootbgc_type) :: this
-  allocate(this%trcs_plant_uptake_vr(ids_beg:ids_end,JZ1)); this%trcs_plant_uptake_vr=0._r8
+  allocate(this%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,JZ1)); this%trcs_Soil2plant_uptake_vr=0._r8
   allocate(this%trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
   allocate(this%trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
   allocate(this%RootGasConductance_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootGasConductance_pvr=0._r8
@@ -825,7 +825,7 @@ implicit none
   allocate(this%CMinNH4Root_pft(jroots,JP1));this%CMinNH4Root_pft=spval
   allocate(this%VmaxNH4Root_pft(jroots,JP1));this%VmaxNH4Root_pft=spval
   allocate(this%KmNH4Root_pft(jroots,JP1));this%KmNH4Root_pft=spval
-  allocate(this%RootCO2Emis_pvr(jroots,JZ1,JP1));this%RootCO2Emis_pvr=spval
+  allocate(this%RCO2Emis2Root_pvr(jroots,JZ1,JP1));this%RCO2Emis2Root_pvr=spval
   allocate(this%RootO2Uptk_pvr(jroots,JZ1,JP1));this%RootO2Uptk_pvr=spval
   allocate(this%RootUptkSoiSol_pvr(idg_beg:idg_end,jroots,JZ1,JP1));this%RootUptkSoiSol_pvr=0._r8
   end subroutine plt_rootbgc_init

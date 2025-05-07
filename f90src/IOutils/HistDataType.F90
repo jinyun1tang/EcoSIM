@@ -159,6 +159,8 @@ implicit none
   real(r8),pointer   :: h1D_CH4_EBU_flx_col(:)
   real(r8),pointer   :: h1D_Ar_EBU_flx_col(:)
   real(r8),pointer   :: h1D_CO2_TPR_err_col(:)
+  real(r8),pointer   :: h1D_CO2_Drain_flx_col(:)
+  real(r8),pointer   :: h1D_CO2_hydloss_flx_col(:)
   real(r8),pointer   :: h1D_Ar_TPR_err_col(:)
   real(r8),pointer   :: h1D_AR_PLTROOT_flx_col(:)  
   real(r8),pointer   :: h1D_CH4_PLTROOT_flx_col(:)
@@ -626,7 +628,9 @@ implicit none
   allocate(this%h1D_CH4_EBU_flx_col(beg_col:end_col))     ;this%h1D_CH4_EBU_flx_col(:)=spval
   allocate(this%h1D_Ar_EBU_flx_col(beg_col:end_col))      ;this%h1D_Ar_EBU_flx_col(:)=spval
   allocate(this%h1D_CO2_TPR_err_col(beg_col:end_col))    ; this%h1D_CO2_TPR_err_col(:)=spval
-  allocate(this%h1D_Ar_TPR_err_col(beg_col:end_col))     ;this%h1D_CO2_TPR_err_col(:)=spval
+  allocate(this%h1D_Ar_TPR_err_col(beg_col:end_col))     ;this%h1D_Ar_TPR_err_col(:)=spval
+  allocate(this%h1D_CO2_Drain_flx_col(beg_col:end_col))  ; this%h1D_CO2_Drain_flx_col(:)=spval
+  allocate(this%h1D_CO2_hydloss_flx_col(beg_col:end_col));  this%h1D_CO2_hydloss_flx_col(:)=spval
   allocate(this%h1D_CH4_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CH4_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_AR_PLTROOT_flx_col(beg_col:end_col)); this%h1D_AR_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_CO2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CO2_PLTROOT_flx_col(:)=spval
@@ -1417,6 +1421,14 @@ implicit none
   data1d_ptr => this%h1D_CO2_TPR_err_col(beg_col:end_col)
   call hist_addfld1d(fname='CumCO2_Transpt_Residual',units='g C/m2',avgflag='A',&
     long_name='Cumulative difference between soil CO2 production and surface CO2 flux',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_CO2_Drain_flx_col(beg_col:end_col)
+  call hist_addfld1d(fname='CO2_DRAINLOSS',units='g C/m2/hr',avgflag='A',&
+    long_name='CO2 loss flux through subsurface drainage',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_CO2_hydloss_flx_col(beg_col:end_col)
+  call hist_addfld1d(fname='CO2_Cum_Hyd_Loss',units='g C/m2/hr',avgflag='A',&
+    long_name='Cumulative hydrological CO2 loss flux, including subsurface drainage',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Ar_TPR_err_col(beg_col:end_col)
   call hist_addfld1d(fname='CumAr_Transpt_Residual',units='g/m2',avgflag='A',&
@@ -2792,6 +2804,8 @@ implicit none
       this%h1D_NH3_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_NH3)    
       this%h1D_CO2_TPR_err_col(ncol)      = Gas_Prod_TP_cumRes_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Ar_TPR_err_col(ncol)       = Gas_Prod_TP_cumRes_col(idg_Ar,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_CO2_Drain_flx_col(ncol)    = trcs_drainage_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_CO2_hydloss_flx_col(ncol)  = GasHydroLoss_cumflx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CO2_LITR_col(ncol)         = trc_solcl_vr(idg_CO2,0,NY,NX)
       this%h1D_EVAPN_col(ncol)            = VapXAir2GSurf_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_CANET_col(ncol)            = QVegET_col(NY,NX)*m2mm/AREA(3,NU(NY,NX),NY,NX)

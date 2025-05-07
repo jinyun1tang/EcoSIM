@@ -314,7 +314,7 @@ module GeochemAPI
     trcSalt_RGeoChem_flx_vr(idsalt_AlSO4,L,NY,NX)     = solflx%TRChem_AlSO4_soil
     trcSalt_RGeoChem_flx_vr(idsalt_FeOH,L,NY,NX)      = solflx%TRChem_FeOH_soil
     trcSalt_RGeoChem_flx_vr(idsalt_FeOH2,L,NY,NX)     = solflx%TRChem_FeO2H2_soil
-    trcSalt_RGeoChem_flx_vr(idsalt_FeOH3,L,NY,NX)     = solflx%TRChem_FeO3H3_soil_vr
+    trcSalt_RGeoChem_flx_vr(idsalt_FeOH3,L,NY,NX)     = solflx%TRChem_FeO3H3_soil
     trcSalt_RGeoChem_flx_vr(idsalt_FeOH4,L,NY,NX)     = solflx%TRChem_FeO4H4_soil
     trcSalt_RGeoChem_flx_vr(idsalt_FeSO4,L,NY,NX)     = solflx%TRChem_FeSO4_soil
     trcSalt_RGeoChem_flx_vr(idsalt_CaOH,L,NY,NX)      = solflx%TRChem_CaOH_soil
@@ -363,7 +363,7 @@ module GeochemAPI
   trcp_RChem_soil_vr(idsp_CaSO4,L,NY,NX) = solflx%TRChem_CaSO4_precip_soil
   TRChem_H2O_vr(L,NY,NX)                 = solflx%TRH2O_soil
   TBION_vr(L,NY,NX)                      = solflx%TBION_soil
-  Txchem_CO2_vr(L,NY,NX)                 = solflx%Txchem_CO2_soil
+  Txchem_CO2_vr(L,NY,NX)                 = solflx%TRAquaChem_CO2_soil
 
   call PrintInfo('end '//subname)
   end subroutine GeochemAPIRecv

@@ -191,8 +191,6 @@ implicit none
   real(r8) :: SSW,WS
   integer :: L,nsalts
 
-  if(lverb)write(*,*)'DiagSnowChemMass'
-  CALL ChemicalBySnowRedistribution(I,J,NY,NX)
   !
   !     UPDATE STATE VARIABLES WITH TOTAL FLUXES CALCULATED ABOVE
   !

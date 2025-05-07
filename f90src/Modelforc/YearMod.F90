@@ -52,7 +52,8 @@
 
       IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
         !to be revised for GDD 
-        Gas_Prod_TP_cumRes_col(:,NY,NX)     = 0._r8
+        GasHydroLoss_cumflx_col(:,NY,NX)  = 0._r8
+        Gas_Prod_TP_cumRes_col(:,NY,NX)   = 0._r8
         QdewCanopy_CumYr_pft(:,NY,NX)     = 0._r8
         trcg_mass_cumerr_col(:,NY,NX)     = 0._r8
         GDD_col(NY,NX)                    = 0._r8

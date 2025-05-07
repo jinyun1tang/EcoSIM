@@ -7,6 +7,7 @@ module PlantMod
   use PlantMgmtDataType, only: NP
   use MiniMathMod,       only: fixEXConsumpFlux
   use EcoSIMCtrlMod,     only: lverb
+  use PlantDebugMod,     only: PrintRootTracer
   use TracerIDMod
   use GridDataType
   use PlantDataRateType
@@ -43,6 +44,7 @@ implicit none
   plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
+  
 
       call  PlantAPISend(I,J,NY,NX)
 
@@ -54,15 +56,17 @@ implicit none
 
       if(lverb)WRITE(*,333)'HFUNC'
 
-!     DO NZ=1,NP(NY,NX)
+     DO NZ=1,NP(NY,NX)
+        call PrintRootTracer(I,J,NZ,'BEEfhfunc')
 !       call SumPlantBiom(I,J,NZ,'bfHFUNCS')
-!     ENDDO
+     ENDDO
       !Phenological update, determine living/active branches      
       CALL HFUNCs(I,J)
 
-!      DO NZ=1,NP(NY,NX)
+      DO NZ=1,NP(NY,NX)
+        call PrintRootTracer(I,J,NZ,'afhfunc')
 !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
-!      ENDDO
+      ENDDO
 !      if(I==140 .and. J>=20)write(116,*)'bfrootupk',I*1000+J        
 !      call SumPlantRootGas(I,J)
 
@@ -125,15 +129,15 @@ implicit none
 
   DO L=NU(NY,NX),NL(NY,NX)
     do idg=idg_beg,idg_NH3            
-      if (trcs_solml_vr(idg,L,NY,NX)>trcs_plant_uptake_vr(idg,L,NY,NX))then
-        trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_plant_uptake_vr(idg,L,NY,NX)
+      if (trcs_solml_vr(idg,L,NY,NX)>trcs_Soil2plant_uptake_vr(idg,L,NY,NX))then
+        trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_Soil2plant_uptake_vr(idg,L,NY,NX)
       else
-        dmass=trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_solml_vr(idg,L,NY,NX)
+        dmass=trcs_Soil2plant_uptake_vr(idg,L,NY,NX)-trcs_solml_vr(idg,L,NY,NX)
         trcs_solml_vr(idg,L,NY,NX)=0._r8        
         if(dmass > trcg_gasml_vr(idg,L,NY,NX))then
           dmass=dmass-trcg_gasml_vr(idg,L,NY,NX)
           trcg_gasml_vr(idg,L,NY,NX)=0._r8
-          trcs_plant_uptake_vr(idg,L,NY,NX)=trcs_plant_uptake_vr(idg,L,NY,NX)-dmass
+          trcs_Soil2plant_uptake_vr(idg,L,NY,NX)=trcs_Soil2plant_uptake_vr(idg,L,NY,NX)-dmass
         else
           trcg_gasml_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)-dmass
         endif
@@ -141,16 +145,16 @@ implicit none
     enddo
 
     idg=idg_NH3B
-    if (trcs_solml_vr(idg,L,NY,NX)>trcs_plant_uptake_vr(idg,L,NY,NX))then
-      trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_plant_uptake_vr(idg,L,NY,NX)
+    if (trcs_solml_vr(idg,L,NY,NX)>trcs_Soil2plant_uptake_vr(idg,L,NY,NX))then
+      trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_Soil2plant_uptake_vr(idg,L,NY,NX)
     else
-      dmass=trcs_plant_uptake_vr(idg,L,NY,NX)-trcs_solml_vr(idg,L,NY,NX)
+      dmass=trcs_Soil2plant_uptake_vr(idg,L,NY,NX)-trcs_solml_vr(idg,L,NY,NX)
       trcs_solml_vr(idg,L,NY,NX)=0._r8        
       !deficit greater than gas concentration
       if(dmass > trcg_gasml_vr(idg_NH3,L,NY,NX))then
         dmass=dmass-trcg_gasml_vr(idg_NH3,L,NY,NX)
         trcg_gasml_vr(idg_NH3,L,NY,NX)=0._r8
-        trcs_plant_uptake_vr(idg,L,NY,NX)=trcs_plant_uptake_vr(idg,L,NY,NX)-dmass
+        trcs_Soil2plant_uptake_vr(idg,L,NY,NX)=trcs_Soil2plant_uptake_vr(idg,L,NY,NX)-dmass
       else
         trcg_gasml_vr(idg_NH3,L,NY,NX)=trcg_gasml_vr(idg_NH3,L,NY,NX)-dmass
       endif

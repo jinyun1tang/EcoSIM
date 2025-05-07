@@ -275,7 +275,7 @@ module UptakesMod
     DO  L=NU,MaxNumRootLays
       DO  N=1,MY(NZ)
         plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                     = 0.0_r8
-        plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                          = 0.0_r8
+        plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                          = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
         plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8
         plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)    = 0.0_r8
@@ -287,7 +287,7 @@ module UptakesMod
 ! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics 
   D9000: DO L=NU,NK
     !remove elevation dependence
-    plt_rbgc%trcs_plant_uptake_vr(ids_beg:ids_end,L) =0._r8    
+    plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L) =0._r8    
     TotalSoilPSIMPa_vr(L)=ElvAdjstedSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
     IF(SoilBulkDensity_vr(L).GT.ZERO)THEN
       WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)-SoilWatAirDry_vr(L)*VLSoilMicP_vr(L)     !maximum amount of water for uptake

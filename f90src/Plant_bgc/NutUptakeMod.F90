@@ -4,12 +4,14 @@ module NutUptakeMod
   use minimathmod,   only: safe_adb, vapsat, AZMAX1,dssign
   use TracerPropMod, only: gas_solubility
   use DebugToolMod, only : PrintInfo
+  use PlantDebugMod, only : PrintRootTracer
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
   use PlantAPIData
   use PlantMathFuncMod
   use RootGasMod
+
   implicit none
 
   private
@@ -155,7 +157,7 @@ module NutUptakeMod
   real(r8) :: trc_gasml_new(idg_beg:idg_NH3)    !local copy of gaesous phase of the volatile tracers  
   real(r8) :: trc_solml_copy(idg_beg:idg_end)    !local copy of aqueous phase of the volatile tracers
   real(r8) :: trc_gasml_copy(idg_beg:idg_NH3)    !local copy of gaesous phase of the volatile tracers  
-
+  real(r8) :: dmass0
   integer :: N,L,idg
 !     begin_execution
   associate(                                                      &
@@ -192,10 +194,13 @@ module NutUptakeMod
   RootCO2ArB       = 0._r8
   trcs_deadroot2soil_pvr(:,:,NZ) = 0._r8  
 
+!  dmass0=sum(trcs_solml_vr(idg_O2,NU:plt_site%NL))+sum(trcg_gasml_vr(idg_O2,NU:plt_site%NL))
+  call PrintRootTracer(I,J,NZ,'nutB')
+  
   D950: DO L=NU,NK
-    IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO) then
+    IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=MaxSoiL4Root_pft(NZ)) then
       trc_solml_new                   = 0._r8;trc_gasml_new = 0._r8
-      trc_solml_copy(idg_beg:idg_end) = trcs_solml_vr(idg,L);
+      trc_solml_copy(idg_beg:idg_end) = trcs_solml_vr(idg_beg:idg_end,L);
       trc_gasml_copy(idg_beg:idg_NH3) = trcg_gasml_vr(idg_beg:idg_NH3,L)
       
       D955: DO N  = 1, MY(NZ)
@@ -234,8 +239,8 @@ module NutUptakeMod
               trc_gasml_loc(idg)=AZMAX1(trcg_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))     
             endif          
           enddo
-          trc_gasml_loc(idg_O2)  = AMAX1(ZERO4Groth_pft(NZ),trcg_gasml_vr(idg_O2,L)*FOXYX)
-          trc_gasml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))
+          trc_gasml_loc(idg_O2)  = AZMAX1(trcg_gasml_vr(idg_O2,L)*FOXYX)
+          trc_gasml_loc(idg_CO2) = AZMAX1(trc_gasml_loc(idg_CO2))
 
           DO idg=idg_beg,idg_NH3
             trc_gasml_copy(idg)=trc_gasml_copy(idg)-trc_gasml_loc(idg)
@@ -284,13 +289,13 @@ module NutUptakeMod
 !        if(I==140 .and. J<=2)write(116,*)'rootgas',(I*1000+J)*100+N,L,plt_rbgc%trcg_air2root_flx_pvr(idg_CH4,N,L,NZ)
       ENDDO D955      
       !do final update of tracer gases
-      DO idg=idg_beg,idg_end
-        trcs_solml_vr(idg,L)=AZERO(trc_solml_copy(idg))+trc_solml_new(idg)
-      ENDDO        
+!      DO idg=idg_beg,idg_end
+!        trcs_solml_vr(idg,L)=AZERO(trc_solml_copy(idg))+trc_solml_new(idg)
+!      ENDDO        
 
-      DO idg=idg_beg,idg_NH3
-        trcg_gasml_vr(idg,L) =AZERO(trc_gasml_copy(idg))+trc_gasml_new(idg)
-      enddo
+!      DO idg=idg_beg,idg_NH3
+!        trcg_gasml_vr(idg,L) =AZERO(trc_gasml_copy(idg))+trc_gasml_new(idg)
+!      enddo
     ELSE
       D956: DO N  = 1, MY(NZ)    
         RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
@@ -304,7 +309,8 @@ module NutUptakeMod
       ENDDO D956
     ENDIF
   ENDDO D950
-
+  
+  call PrintRootTracer(I,J,NZ,'nute')
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake
@@ -323,7 +329,7 @@ module NutUptakeMod
   plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
   plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8
-  plt_rbgc%RootCO2Emis_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
+  plt_rbgc%RCO2Emis2Root_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
   plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
   plt_rbgc%RAutoRootO2Limter_rpvr(1:NN,L1:L2,NZ)                          = 1.0_r8
   plt_rbgc%RootNH4DmndSoil_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8

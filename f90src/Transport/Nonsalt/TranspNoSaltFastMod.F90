@@ -321,7 +321,7 @@ implicit none
 
           trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)-Gas_AdvDif_FlxMM_3D(idg,3,NL(NY,NX)+1,NY,NX)*ppscal(idg) 
 
-          trcs_draing_col(idg,NY,NX)    = trcs_draing_col(idg,NY,NX) + ppscal(idg)*Gas_AdvDif_FlxMM_3D(idg,3,NL(NY,NX)+1,NY,NX)
+          trcs_drainage_flx_col(idg,NY,NX)    = trcs_drainage_flx_col(idg,NY,NX) + ppscal(idg)*Gas_AdvDif_FlxMM_3D(idg,3,NL(NY,NX)+1,NY,NX)
 
           trc_topsoil_flx_col(idg,NY,NX) =trc_topsoil_flx_col(idg,NY,NX)+ppscal(idg)*Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)
 

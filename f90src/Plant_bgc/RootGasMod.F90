@@ -91,60 +91,60 @@ module RootGasMod
   integer  :: idg
   
 !     begin_execution
-  associate(                                                          &
-    RootStrutElms_pft        => plt_biom%RootStrutElms_pft,           &
-    ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,              &
-    PlantPopulation_pft      => plt_site%PlantPopulation_pft,         &
-    CumSoilThickMidL_vr      => plt_site%CumSoilThickMidL_vr,         &
-    AtmGasc                  => plt_site%AtmGasc,                     &  !in: atmospheric gaseous concentration
-    ZEROS                    => plt_site%ZEROS,                       &
-    ZERO                     => plt_site%ZERO,                        &
-    VLWatMicPM_vr            => plt_site%VLWatMicPM_vr,               &
-    VLsoiAirPM_vr            => plt_site%VLsoiAirPM_vr,               &
-    TortMicPM_vr             => plt_site%TortMicPM_vr,                &
-    FILMM_vr                 => plt_site%FILMM_vr,                    &
-    RGasTranspFlxPrev_vr     => plt_bgcr%RGasTranspFlxPrev_vr,        &
-    RO2AquaSourcePrev_vr     => plt_bgcr%RO2AquaSourcePrev_vr,        &
-    RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,              & !out: O2 uptake from inside root O2
-    RAutoRootO2Limter_rpvr   => plt_rbgc%RAutoRootO2Limter_rpvr,      &
-    ZERO4Uptk_pft            => plt_rbgc%ZERO4Uptk_pft,               &
-    RootRespPotent_pvr       => plt_rbgc%RootRespPotent_pvr,          &
-    RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,         &
-    RO2UptkSoilM_vr          => plt_rbgc%RO2UptkSoilM_vr,             &
-    RootCO2Emis_pvr          => plt_rbgc%RootCO2Emis_pvr,             & !output: total CO2 emitted inside roots
-    trcg_air2root_flx_pvr    => plt_rbgc%trcg_air2root_flx_pvr,       & !output: atmospheric gas flux to root gas concentration
-    trcg_Root_gas2aqu_flx_vr => plt_rbgc%trcg_Root_gas2aqu_flx_vr,    & !output: gaseous to aqueous dissolution inside root
-    RootUptkSoiSol_pvr       => plt_rbgc%RootUptkSoiSol_pvr,          &  !out: aqueous tracer uptake from soil into roots
-    RootCO2AutorX_pvr        => plt_rbgc%RootCO2AutorX_pvr,           & !input: root respiration from previous time step [gC d-2 h-1]
-    trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,             &
-    trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,             &
-    RootGasConductance_pvr   => plt_rbgc%RootGasConductance_pvr,      &
-    TScal4Difsvity_vr        => plt_soilchem%TScal4Difsvity_vr,       &
-    trcs_VLN_vr              => plt_soilchem%trcs_VLN_vr,             &
-    GasDifc_vr               => plt_soilchem%GasDifc_vr,              &  !in: gaseous diffusivity of volatile tracers
-    SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr,       &  !in: aqueous diffusivity of volatile tracers
-    GasSolbility_vr          => plt_soilchem%GasSolbility_vr,         &
-    trc_solcl_vr             => plt_soilchem%trc_solcl_vr,            &
-    SoilWatAirDry_vr         => plt_soilchem%SoilWatAirDry_vr,        &
-    VLSoilMicP_vr            => plt_soilchem%VLSoilMicP_vr,           &
-    FracAirFilledSoilPoreM_vr    => plt_soilchem%FracAirFilledSoilPoreM_vr,   &
-    DiffusivitySolutEffM_vr  => plt_soilchem%DiffusivitySolutEffM_vr, &
-    iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch,        &
-    RootPoreTortu4Gas        => plt_morph%RootPoreTortu4Gas,          &
-    Root1stRadius_pvr        => plt_morph%Root1stRadius_pvr,          &
-    Root2ndAveLen_pvr        => plt_morph%Root2ndAveLen_pvr,          &
-    RootPoreVol_pvr          => plt_morph%RootPoreVol_pvr,            &
-    RootLenPerPlant_pvr      => plt_morph%RootLenPerPlant_pvr,        &
-    Root2ndXNum_pvr          => plt_morph%Root2ndXNum_pvr,            &
-    Root2ndRadius_pvr        => plt_morph%Root2ndRadius_pvr,          &
-    RootRaidus_rpft          => plt_morph%RootRaidus_rpft,            &
-    RootVH2O_pvr             => plt_morph%RootVH2O_pvr,               &
-    RootPorosity_pft         => plt_morph%RootPorosity_pft,           &
-    Root1stXNumL_pvr         => plt_morph%Root1stXNumL_pvr,           &
-    NGTopRootLayer_pft       => plt_morph%NGTopRootLayer_pft,         &
-    RootCO2Ar2Soil_pvr       => plt_rbgc%RootCO2Ar2Soil_pvr,          &
-    RootCO2Ar2Root_pvr       => plt_rbgc%RootCO2Ar2Root_pvr,          &    
-    MainBranchNum_pft        => plt_morph%MainBranchNum_pft           &
+  associate(                                                             &
+    RootStrutElms_pft         => plt_biom%RootStrutElms_pft,             &
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,                &
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft,           &
+    CumSoilThickMidL_vr       => plt_site%CumSoilThickMidL_vr,           &
+    AtmGasc                   => plt_site%AtmGasc,                       &  !in: atmospheric gaseous concentration
+    ZEROS                     => plt_site%ZEROS,                         &
+    ZERO                      => plt_site%ZERO,                          &
+    VLWatMicPM_vr             => plt_site%VLWatMicPM_vr,                 &
+    VLsoiAirPM_vr             => plt_site%VLsoiAirPM_vr,                 &
+    TortMicPM_vr              => plt_site%TortMicPM_vr,                  &
+    FILMM_vr                  => plt_site%FILMM_vr,                      &
+    RGasTranspFlxPrev_vr      => plt_bgcr%RGasTranspFlxPrev_vr,          &
+    RO2AquaSourcePrev_vr      => plt_bgcr%RO2AquaSourcePrev_vr,          &
+    RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,                & !out: O2 uptake from inside root O2
+    RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr,        &
+    ZERO4Uptk_pft             => plt_rbgc%ZERO4Uptk_pft,                 &
+    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,            &
+    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,           &
+    RO2UptkSoilM_vr           => plt_rbgc%RO2UptkSoilM_vr,               &
+    RCO2Emis2Root_pvr           => plt_rbgc%RCO2Emis2Root_pvr,               & !output: total CO2 emitted inside roots
+    trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr,         & !output: atmospheric gas flux to root gas concentration
+    trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr,      & !output: gaseous to aqueous dissolution inside root
+    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,            &  !out: aqueous tracer uptake from soil into roots
+    RootCO2AutorX_pvr         => plt_rbgc%RootCO2AutorX_pvr,             & !input: root respiration from previous time step [gC d-2 h-1]
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,               &
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,               &
+    RootGasConductance_pvr    => plt_rbgc%RootGasConductance_pvr,        &
+    TScal4Difsvity_vr         => plt_soilchem%TScal4Difsvity_vr,         &
+    trcs_VLN_vr               => plt_soilchem%trcs_VLN_vr,               &
+    GasDifc_vr                => plt_soilchem%GasDifc_vr,                &  !in: gaseous diffusivity of volatile tracers
+    SoluteDifusvty_vr         => plt_soilchem%SoluteDifusvty_vr,         &  !in: aqueous diffusivity of volatile tracers
+    GasSolbility_vr           => plt_soilchem%GasSolbility_vr,           &
+    trc_solcl_vr              => plt_soilchem%trc_solcl_vr,              &
+    SoilWatAirDry_vr          => plt_soilchem%SoilWatAirDry_vr,          &
+    VLSoilMicP_vr             => plt_soilchem%VLSoilMicP_vr,             &
+    FracAirFilledSoilPoreM_vr => plt_soilchem%FracAirFilledSoilPoreM_vr, &
+    DiffusivitySolutEffM_vr   => plt_soilchem%DiffusivitySolutEffM_vr,   &
+    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch,          &
+    RootPoreTortu4Gas         => plt_morph%RootPoreTortu4Gas,            &
+    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr,            &
+    Root2ndAveLen_pvr         => plt_morph%Root2ndAveLen_pvr,            &
+    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr,              &
+    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,          &
+    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,              &
+    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr,            &
+    RootRaidus_rpft           => plt_morph%RootRaidus_rpft,              &
+    RootVH2O_pvr              => plt_morph%RootVH2O_pvr,                 &
+    RootPorosity_pft          => plt_morph%RootPorosity_pft,             &
+    Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr,             &
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
+    RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr,            &
+    RootCO2Ar2Root_pvr        => plt_rbgc%RootCO2Ar2Root_pvr,            &
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft             &
   )
   
   call PrintInfo('beg '//subname)
@@ -544,7 +544,7 @@ module RootGasMod
             call fixEXConsumpFlux(trcg_rootml_loc(idg),trcg_air2root_flx_loc(idg),-1)
 
             if(idg==idg_O2)then
-              !oxygen is consumed
+              !oxygen is consumed inside roots
               trcs_rootml_loc(idg) = trcs_rootml_loc(idg)+Root_gas2sol_flx(idg)
               call fixEXConsumpFlux(trcs_rootml_loc(idg),ROxyRoot2Uptk)   
             else
@@ -562,7 +562,8 @@ module RootGasMod
 !
           DO idg=idg_beg,idg_end
             if(idg==idg_O2)then
-              RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+ROxySoil2Uptk     !O2 is consumed, not added to roots
+              !O2 is consumed, not added to roots
+              RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+ROxySoil2Uptk     
             else
               RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+RootUptkSoiSolute(idg)
             endif
@@ -580,9 +581,9 @@ module RootGasMod
           ! RootO2Uptk_pvr=root O2 uptake from root
           ! RO2UptkSoilM_vr=total O2 uptake from soil by all microbial,root popns
           ! Root CO2 emission includes actual CO2 production from respiration and flux exchange with soil
-          RootCO2Emis_pvr(N,L,NZ) = RootCO2Emis_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
-          RootO2Uptk_pvr(N,L,NZ)  = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk    !uptake from O2 inside roots for root respiration
-          RO2UptkSoilM_vr(M,L)    = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
+          RCO2Emis2Root_pvr(N,L,NZ) = RCO2Emis2Root_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
+          RootO2Uptk_pvr(N,L,NZ)    = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk    !uptake from O2 inside roots for root respiration
+          RO2UptkSoilM_vr(M,L)      = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
         ENDDO D90        
       ENDIF
 
@@ -597,14 +598,14 @@ module RootGasMod
       if(idg==idg_O2)then
         dtrc_err(idg)=dtrc_err(idg)-RootO2Uptk_pvr(N,L,NZ)
       elseif(idg==idg_CO2)then
-        dtrc_err(idg)=dtrc_err(idg)+RootCO2Emis_pvr(N,L,NZ)
+        dtrc_err(idg)=dtrc_err(idg)+RCO2Emis2Root_pvr(N,L,NZ)
       else
         dtrc_err(idg)=dtrc_err(idg)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       endif      
     ENDDO
 !    if(I==134 .and. J<=3)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
 !      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
-!      RootCO2Emis_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2Root_pvr(L,NZ)
+!      RCO2Emis2Root_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2Root_pvr(L,NZ)
 !    if(I>=206 .and. L==5)then        
 !      idg=idg_CH4
 !      write(136,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &

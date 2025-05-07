@@ -229,7 +229,7 @@ contains
   allocate(PARGas_CefMM(idg_beg:idg_NH3,JY,JX));      PARGas_CefMM=0._r8
 
   allocate(RBGCSinkGasMM_vr(idg_beg:idg_NH3,0:JZ,JY,JX));RBGCSinkGasMM_vr=0._r8
-  allocate(RBGCSinkSoluteM_vr(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkSoluteM_vr=0._r8
+  allocate(RBGCSinkSoluteM_vr(ids_beg:ids_end,0:JZ,JY,JX));RBGCSinkSoluteM_vr=0._r8
 
   allocate(trcg_Ebu_flxM_vr(idg_beg:idg_end,JZ,JY,JX));   trcg_Ebu_flxM_vr                        = 0._r8
   allocate(trcg_FloXSurRunoff_PotFlxM(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff_PotFlxM           = 0._r8

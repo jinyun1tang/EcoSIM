@@ -73,6 +73,7 @@ implicit none
   !
   !Description:
   !Relayer the soil profiles
+  !litter layer maybe mixed into the soil layers
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: NY,NX

@@ -183,7 +183,7 @@ module SoluteChemDataType
     real(r8) :: TRChem_AlSO4_soil
     real(r8) :: TRChem_FeOH_soil
     real(r8) :: TRChem_FeO2H2_soil
-    real(r8) :: TRChem_FeO3H3_soil_vr
+    real(r8) :: TRChem_FeO3H3_soil
     real(r8) :: TRChem_FeO4H4_soil
     real(r8) :: TRChem_FeSO4_soil
     real(r8) :: TRChem_CaOH_soil
@@ -231,7 +231,7 @@ module SoluteChemDataType
     real(r8) :: TRChem_CaSO4_precip_soil
     real(r8) :: TRH2O_soil
     real(r8) :: TBION_soil
-    real(r8) :: Txchem_CO2_soil
+    real(r8) :: TRAquaChem_CO2_soil
   contains
     procedure, public :: SetZero 
   end type solute_flx_type
@@ -555,7 +555,7 @@ contains
   solflx%TRChem_AlSO4_soil                = 0._r8
   solflx%TRChem_FeOH_soil                 = 0._r8
   solflx%TRChem_FeO2H2_soil               = 0._r8
-  solflx%TRChem_FeO3H3_soil_vr            = 0._r8
+  solflx%TRChem_FeO3H3_soil            = 0._r8
   solflx%TRChem_FeO4H4_soil               = 0._r8
   solflx%TRChem_FeSO4_soil                = 0._r8
   solflx%TRChem_CaOH_soil                 = 0._r8
@@ -603,7 +603,7 @@ contains
   solflx%TRChem_CaSO4_precip_soil         = 0._r8
   solflx%TRH2O_soil                       = 0._r8
   solflx%TBION_soil                       = 0._r8
-  solflx%Txchem_CO2_soil                  = 0._r8
+  solflx%TRAquaChem_CO2_soil                  = 0._r8
 
   end subroutine SetZero
 end module SoluteChemDataType

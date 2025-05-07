@@ -360,7 +360,7 @@ module SoluteMod
 !
   IF(VLWatMicPNH.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX=natomw*VLWatMicPNH
-    REcoReleaz_NH4X       = (RNut_MicbRelease_vr(ids_NH4,L,NY,NX)-trcs_plant_uptake_vr(ids_NH4,L,NY,NX)+natomw*RFertReleaz_NH4)/VLWatMicPNX
+    REcoReleaz_NH4X       = (RNut_MicbRelease_vr(ids_NH4,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_NH4,L,NY,NX)+natomw*RFertReleaz_NH4)/VLWatMicPNX
     REcoReleaz_NH3X       = (natomw*RFertReleaz_Urea2SoilNH3)/VLWatMicPNX
     NH4_1p_aqua_mole_conc = AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)/VLWatMicPNX+REcoReleaz_NH4X)
     NH3_aqua_mole_conc    = AZMAX1(trcs_solml_vr(idg_NH3,L,NY,NX)/VLWatMicPNX+REcoReleaz_NH3X)
@@ -375,7 +375,7 @@ module SoluteMod
   ENDIF
   IF(VLWatMicPNB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX            = natomw*VLWatMicPNB
-    REcoReleaz_NH4BX       = (RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)-trcs_plant_uptake_vr(ids_NH4B,L,NY,NX) &
+    REcoReleaz_NH4BX       = (RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_NH4B,L,NY,NX) &
       +natomw*(RFertReleaz_NH4Soil2Band+RFertReleaz_NH4Band2Band))/VLWatMicPNX
     REcoReleaz_NH3BX       = (natomw*(RFertReleaz_Urea2BandNH3+RFertReleaz_UreaBand2NH3Band))/VLWatMicPNX
     NH4_1p_band_mole_conc  = AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)/VLWatMicPNX+REcoReleaz_NH4BX)
@@ -413,8 +413,8 @@ module SoluteMod
   IF(VLWatMicPPO.GT.ZEROS2(NY,NX))THEN
     VLWatMicPPX             = patomw*VLWatMicPPO
     !compute biochemical release of H1PO4 and H2PO4
-    REcoReleaz_H1PO4X            = (RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4,L,NY,NX))/VLWatMicPPX
-    REcoReleaz_H2PO4X            = (RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4,L,NY,NX))/VLWatMicPPX
+    REcoReleaz_H1PO4X            = (RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_H1PO4,L,NY,NX))/VLWatMicPPX
+    REcoReleaz_H2PO4X            = (RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_H2PO4,L,NY,NX))/VLWatMicPPX
     !update aquoues concentration 
     H1PO4_2e_aqua_mole_conc      = AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)/VLWatMicPPX+REcoReleaz_H1PO4X)
     H2PO4_1e_aqua_mole_conc      = AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)/VLWatMicPPX+REcoReleaz_H2PO4X)
@@ -450,8 +450,8 @@ module SoluteMod
   IF(VLWatMicPPB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPPX              = patomw*VLWatMicPPB
     !biochemical release
-    REcoReleaz_H1PO4BX = (RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX)-trcs_plant_uptake_vr(ids_H1PO4B,L,NY,NX))/VLWatMicPPX
-    REcoReleaz_H2PO4BX = (RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX)-trcs_plant_uptake_vr(ids_H2PO4B,L,NY,NX))/VLWatMicPPX
+    REcoReleaz_H1PO4BX = (RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_H1PO4B,L,NY,NX))/VLWatMicPPX
+    REcoReleaz_H2PO4BX = (RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_H2PO4B,L,NY,NX))/VLWatMicPPX
     !aqueous update
     H1PO4_2e_band_mole_conc       = AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)/VLWatMicPPX+REcoReleaz_H1PO4BX)
     H2PO4_1e_band_mole_conc       = AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)/VLWatMicPPX+REcoReleaz_H2PO4BX)

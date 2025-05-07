@@ -46,8 +46,9 @@ implicit none
   real(r8),target,allocatable ::  GasDiff2Surf_flx_col(:,:,:)           !surface gas flux in advection+diffusion [g d-2 h-1]
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)           !total O2 sink in soil due to plant and microbial respiration, [g d-2]
   real(r8),target,allocatable ::  SurfGasEmiss_flx_col(:,:,:)          !surface gas flux, including diffusion, ebullition, wet deposition and plant transp [g d-2 h-1]
-  real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)         !hydrological loss of volatile tracers [g d-2 h-1]
+  real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)        !hydrological loss of volatile tracers [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]
+  real(r8),target,allocatable ::  GasHydroLoss_cumflx_col(:,:,:)     !cumulative hydrological loss of volatile tracers [g d-2]
   real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)            !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)             !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)            !total surface DOC flux, [g d-2]
@@ -124,7 +125,7 @@ implicit none
   real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production [gN d-2 h-1]
   real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2  [gN d-2 h-1]
   real(r8),target,allocatable :: DOM_draing_col(:,:,:,:)             !DOM loss through subsurface drainage [g d-2 h-1]
-  real(r8),target,allocatable :: trcs_draing_col(:,:,:)              !solute loss through subsurface drainage [g d-2 h-1]
+  real(r8),target,allocatable :: trcs_drainage_flx_col(:,:,:)              !solute loss through subsurface drainage [g d-2 h-1]
   real(r8),target,allocatable :: DOM_SurfRunoff_flx_col(:,:,:,:)     !DOM loss through surface runoff [g d-2 h-1]
   private :: InitAllocate
   contains
@@ -145,7 +146,7 @@ implicit none
 
   allocate(DOM_SurfRunoff_flx_col(idom_beg:idom_end,jcplx,JY,JX)); DOM_SurfRunoff_flx_col=0._r8
   allocate(DOM_draing_col(idom_beg:idom_end,jcplx,JY,JX));DOM_draing_col=0._r8
-  allocate(trcs_draing_col(ids_beg:ids_end,JY,JX));trcs_draing_col=0._r8
+  allocate(trcs_drainage_flx_col(ids_beg:ids_end,JY,JX));trcs_drainage_flx_col=0._r8
   allocate(CNH4_vr(JZ,JY,JX));     CNH4_vr=0._r8
   allocate(CNO3_vr(JZ,JY,JX));     CNO3_vr=0._r8
   allocate(CPO4_vr(JZ,JY,JX));     CPO4_vr=0._r8
@@ -193,7 +194,8 @@ implicit none
   allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
 
   allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
-  allocate(GasHydroLoss_flx_col(idg_beg:idg_end,JY,JX)); GasHydroLoss_flx_col=0._r8
+  allocate(GasHydroLoss_cumflx_col(idg_beg:idg_NH3,JY,JX)); GasHydroLoss_cumflx_col=0._r8
+  allocate(GasHydroLoss_flx_col(idg_beg:idg_NH3,JY,JX)); GasHydroLoss_flx_col=0._r8
   allocate(SurfGasEmiss_flx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmiss_flx_col=0._r8
   allocate(GasDiff2Surf_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_flx_col=0._r8
   allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
@@ -274,7 +276,7 @@ implicit none
 
   call destroy(DOM_SurfRunoff_flx_col)
   call destroy(DOM_draing_col)
-  call destroy(trcs_draing_col)
+  call destroy(trcs_drainage_flx_col)
   call destroy(DOM_transpFlx_2DH)
   call destroy(trcs_SubsurTransp_flx_2DH)
   call destroy(O2_Gas_Frac_vr)
@@ -360,6 +362,7 @@ implicit none
   call destroy(GasDiff2Surf_flx_col)
   call destroy(SurfGasEmiss_flx_col)
   call destroy(GasHydroLoss_flx_col)
+  call destroy(GasHydroLoss_cumflx_col)
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)
   call destroy(trcg_DisolEvap_Atm2Litr_flx)

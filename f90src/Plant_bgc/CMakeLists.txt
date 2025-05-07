@@ -1,5 +1,6 @@
 set(PLANT_BGC_SOURCES
   PlantMathFuncMod.F90
+  PlantDebugMod.F90  
   PlantDisturbByFireMod.F90
   PlantDisturbByTillageMod.F90 
   PlantDisturbByGrazingMod.F90

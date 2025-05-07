@@ -295,15 +295,20 @@ module InitNoSaltTransportMod
         RBGCSinkGasMM_vr(idg_N2,L,NY,NX)     = RBGCSinkGasMM_vr(idg_N2,L,NY,NX)+RootN2Fix_vr(L,NY,NX)*dts_gas
         RBGCSinkGasMM_vr(idg_NH3,L,NY,NX)    = -TRChem_gas_NH3_geochem_vr(L,NY,NX)*dts_gas                    !geochemical NH3 source
 
+
         RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
         RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = (-TRChem_sol_NH3_soil_vr(L,NY,NX)-trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
         DO ids=ids_nut_beg,ids_nuts_end
-          RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_GeoChem_soil_vr(ids,L,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX))*dts_HeatWatTP
+          RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_GeoChem_soil_vr(ids,L,NY,NX))*dts_HeatWatTP
         ENDDO
 
         DO ids=ids_NH4B,ids_nutb_end
-          RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_RChem_band_soil_vr(ids,L,NY,NX)+trcs_plant_uptake_vr(ids,L,NY,NX))*dts_HeatWatTP
+          RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_RChem_band_soil_vr(ids,L,NY,NX))*dts_HeatWatTP
         ENDDO
+
+        DO ids=ids_beg,ids_end
+          RBGCSinkSoluteM_vr(ids,L,NY,NX) = RBGCSinkSoluteM_vr(ids,L,NY,NX) +trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP
+        ENDDO        
         !
         !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
         !
