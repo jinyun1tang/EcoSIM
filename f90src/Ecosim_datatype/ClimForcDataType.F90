@@ -174,7 +174,7 @@ implicit none
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
   real(r8),target,allocatable ::  PrecHeat_col(:,:)    !precipitation heat to surface [MJ/d2/h]
   real(r8),target,allocatable ::  RainLitr_col(:,:)  !water from aboveground falling litter
-  real(r8),target, allocatable :: trcs_solcoef(:,:,:)              !parameter for computing RGasSinkScalar_vr  
+  real(r8),target, allocatable :: trcs_solcoef_col(:,:,:)              !parameter for computing RGasSinkScalar_vr  
   contains
 !----------------------------------------------------------------------
 
@@ -185,7 +185,7 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
-  allocate(trcs_solcoef(idg_beg:idg_NH3,JY,JX));
+  allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX));
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
@@ -364,7 +364,7 @@ implicit none
   call destroy(ZNH3E_col)
   call destroy(CH4E_col)
   call destroy(H2GE_col)
-  call destroy(trcs_solcoef)
+  call destroy(trcs_solcoef_col)
   call destroy(SolarNoonHour_col)
   call destroy(CO2E_col)
   call destroy(RadSWDirect_col)

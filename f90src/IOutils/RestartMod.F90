@@ -7132,15 +7132,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)                        
-    call restartvar(ncid, flag, varname='TAU_DirRadTransm', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectRTransmit', dim1name='column',dim2name='levcan1',&
        long_name='Direct radiation transmission coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirRadTransm,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectRTransmit,datrc_2d)      
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirRadTransm,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectRTransmit,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)    
-    call restartvar(ncid, flag, varname='TAU_DirRadTransm', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectRTransmit', dim1name='column',dim2name='levcan1',&
        long_name='Direct radiation transmission coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         

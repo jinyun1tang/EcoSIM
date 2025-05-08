@@ -140,7 +140,7 @@ module StartsMod
       AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
 
       DO idg=idg_beg,idg_NH3
-        trcs_solcoef(idg,NY,NX)= AMAX1(AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,ATCA(NY,NX))*1.e-2_r8,1.e-10_r8)
+        trcs_solcoef_col(idg,NY,NX)= AMAX1(AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,ATCA(NY,NX))*1.e-2_r8,1.e-10_r8)
       ENDDO  
 
 !

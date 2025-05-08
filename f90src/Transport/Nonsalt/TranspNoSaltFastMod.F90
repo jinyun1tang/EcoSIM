@@ -194,13 +194,13 @@ implicit none
     DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3
         RGasSinkScalar_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)/(trcs_solml2_vr(idg,0,NY,NX) &
-          +trcs_solcoef(idg,NY,NX)*AMAX1(VLWatMicP_vr(0,NY,NX),1.e-5_r8))
+          +trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(0,NY,NX),1.e-5_r8))
       enddo
 
       DO L=NU(NY,NX),NL(NY,NX)
         DO idg=idg_beg,idg_NH3
           RGasSinkScalar_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)/(trcs_solml2_vr(idg,L,NY,NX) &
-            +trcs_solcoef(idg,NY,NX)*AMAX1(VLWatMicP_vr(L,NY,NX),1.E-5_r8))
+            +trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(L,NY,NX),1.E-5_r8))
         enddo
 
         N1=NX;N2=NY;N3=L          

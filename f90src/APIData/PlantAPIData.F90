@@ -166,7 +166,7 @@ implicit none
   real(r8) :: SineSunInclAngle_col      !sine of solar angle, [-]
   real(r8), pointer :: RadSWLeafAlbedo_pft(:)     => null() !canopy shortwave albedo , [-]
   real(r8), pointer :: CanopyPARalbedo_pft(:)     => null() !canopy PAR albedo , [-]
-  real(r8), pointer :: TAU_DirRadTransm(:)     => null() !fraction of radiation intercepted by canopy layer, [-]
+  real(r8), pointer :: TAU_DirectRTransmit(:)     => null() !fraction of radiation intercepted by canopy layer, [-]
   real(r8), pointer :: TAU_RadThru(:)     => null() !fraction of radiation transmitted by canopy layer, [-]
   real(r8), pointer :: LWRadCanopy_pft(:)    => null() !canopy longwave radiation , [MJ d-2 h-1]
   real(r8), pointer :: RadSWbyCanopy_pft(:)     => null() !canopy absorbed shortwave radiation , [MJ d-2 h-1]
@@ -1614,7 +1614,7 @@ implicit none
   allocate(this%RadDifPAR_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuthSects1,NumOfCanopyLayers1,JP1));this%RadDifPAR_zsec=0._r8
   allocate(this%RadSWLeafAlbedo_pft(JP1))
   allocate(this%CanopyPARalbedo_pft(JP1))
-  allocate(this%TAU_DirRadTransm(NumOfCanopyLayers1+1));this%TAU_DirRadTransm=0._r8
+  allocate(this%TAU_DirectRTransmit(NumOfCanopyLayers1+1));this%TAU_DirectRTransmit=0._r8
   allocate(this%TAU_RadThru(NumOfCanopyLayers1+1));this%TAU_RadThru=0._r8
   allocate(this%LWRadCanopy_pft(JP1))
   allocate(this%RadSWbyCanopy_pft(JP1))
