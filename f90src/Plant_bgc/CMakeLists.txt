@@ -21,7 +21,7 @@ set(PLANT_BGC_SOURCES
 	ExtractsMod.F90
 	GrosubsMod.F90
 	StomatesMod.F90
-  CanopyCondsMod.F90
+  SurfaceRadiationMod.F90
   UptakePars.F90
   InitPlantMod.F90
   PlantPhenolMod.F90

@@ -1,4 +1,4 @@
-module CanopyCondsMod
+module SurfaceRadiationMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
@@ -916,18 +916,18 @@ module CanopyCondsMod
     RadPAR_Grnd = RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
   ENDDO D20 
   RadSWGrnd_col=RadSW_Grnd*AREA3(NU)
-!
-      !     RADIATION REFLECTED FROM GROUND SURFACE
-      !
-      !     VHCPW,VLHeatCapSnowMin_col=current,minimum snowpack heat capacity
-      !     SnowpackAlbedo,VcumDrySnoWE_col,VcumWatSnow_col,VcumIceSnow_col=snowpack albedo,snow,water,ice volume
-      !     GrndAlbedo,SoilAlbedo,FracGrndBySnow=ground,soil albedo,snow cover fraction
-      !     THETW1=soil surface water content
-      !     RadSWBakScat2NextL,RadDirPARbyLeaf_pft=SW,PAR backscatter from ground surface
-      !     TRADG,TRAPG=SW,PAR absorbed by ground surface
-!
+  !
+  !     RADIATION REFLECTED FROM GROUND SURFACE
+  !
+  !     VHCPW,VLHeatCapSnowMin_col=current,minimum snowpack heat capacity
+  !     SnowpackAlbedo,VcumDrySnoWE_col,VcumWatSnow_col,VcumIceSnow_col=snowpack albedo,snow,water,ice volume
+  !     GrndAlbedo,SoilAlbedo,FracGrndBySnow=ground,soil albedo,snow cover fraction
+  !     THETW1=soil surface water content
+  !     RadSWBakScat2NextL,RadDirPARbyLeaf_pft=SW,PAR backscatter from ground surface
+  !     TRADG,TRAPG=SW,PAR absorbed by ground surface
+  !
   IF(VLHeatCapSurfSnow_col.GT.VLHeatCapSnowMin_col)THEN
-    SnowpackAlbedo=(0.80_r8*VcumDrySnoWE_col+0.30_r8*VcumIceSnow_col+0.06_r8*VcumWatSnow_col) &
+    SnowpackAlbedo=(0.85_r8*VcumDrySnoWE_col+0.30_r8*VcumIceSnow_col+0.06_r8*VcumWatSnow_col) &
       /(VcumDrySnoWE_col+VcumIceSnow_col+VcumWatSnow_col)
     !the following partition differs from that used in the surface physics module  
     FracGrndBySnow = AMIN1((SnowDepth/0.07_r8)**2._r8,1.0_r8)
@@ -942,15 +942,15 @@ module CanopyCondsMod
   ENDIF
   RadSWBakScat2NextL(0)  = RadSW_Grnd*GrndAlbedo*0.25_r8
   RadPARBakScat2NextL(0) = RadPAR_Grnd*GrndAlbedo*0.25_r8
-!
-      !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
-      !
-      !     RadSWBakScat2NextL,RadPARBakScat2NextL=total backscattered SW,PAR to next layer
-      !     RadSWFwdScat2NextL,RadPARFwdScat2NextL=total fwd scattered SW,PAR to next layer
-      !     diffusSWLeafAbsorptAzclass,diffusSWStalkAbsorptAzclass,diffusPARLeafAbsorptAzclass,diffusPARStalkAbsorptAzclass=leaf,stalk SW,PAR absbd fwd+back flux
-      !     RadDifSWbyLeaf_pft,RadDifSWbyStalk_pft,RadDifPARbyLeaf_pft,RadDifPARbyStalk_pft=total leaf,stalk SW,PAR absbd fwd+back
-      !     RadSWbyCanopy_pft,TRADC,RadPARbyCanopy_pft,TRADP=total SW,PAR absbd by each,all PFT
-!
+  !
+  !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
+  !
+  !     RadSWBakScat2NextL,RadPARBakScat2NextL=total backscattered SW,PAR to next layer
+  !     RadSWFwdScat2NextL,RadPARFwdScat2NextL=total fwd scattered SW,PAR to next layer
+  !     diffusSWLeafAbsorptAzclass,diffusSWStalkAbsorptAzclass,diffusPARLeafAbsorptAzclass,diffusPARStalkAbsorptAzclass=leaf,stalk SW,PAR absbd fwd+back flux
+  !     RadDifSWbyLeaf_pft,RadDifSWbyStalk_pft,RadDifPARbyLeaf_pft,RadDifPARbyStalk_pft=total leaf,stalk SW,PAR absbd fwd+back
+  !     RadSWbyCanopy_pft,TRADC,RadPARbyCanopy_pft,TRADP=total SW,PAR absbd by each,all PFT
+  !
   RadSWDiffusL           = 0.0_r8
   RadPARDiffusL          = 0.0_r8
   TAU_DifuseRTransmit(0)   = 1.0_r8
@@ -1004,4 +1004,4 @@ module CanopyCondsMod
   end associate
   end subroutine MultiCanLayerRadiation
 
-end module CanopyCondsMod
+end module SurfaceRadiationMod
