@@ -45,7 +45,6 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
   
-
       call  PlantAPISend(I,J,NY,NX)
 
       call EnterPlantBalance(I,J,NP(NY,NX))
@@ -67,7 +66,7 @@ implicit none
         call PrintRootTracer(I,J,NZ,'afhfunc')
 !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
       ENDDO
-!      if(I==140 .and. J>=20)write(116,*)'bfrootupk',I*1000+J        
+
 !      call SumPlantRootGas(I,J)
 
       !Predict uptake fluxes of nutrients and O2
@@ -103,16 +102,16 @@ implicit none
   end subroutine PlantModel
 !------------------------------------------------------------------------------------------
 
-  subroutine PlantCanopyRadsModel(I,J,NY,NX,DPTH0)
+  subroutine PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)
   use SurfaceRadiationMod
   use CanopyDataType, only : CanopyLeafArea_lpft
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  real(r8), intent(in) :: DPTH0
+  real(r8), intent(in) :: DepthSurfWatIce
 
   call PlantAPICanMSend(NY,NX)
 
-  call CanopyConditionModel(I,J,DPTH0)
+  call CanopyConditionModel(I,J,DepthSurfWatIce)
 
   call PlantAPICanMRecv(NY,NX)
 

@@ -769,7 +769,9 @@ module WatsubMod
   logical :: DoMicPDischarg2Tile
   real(r8) :: VLWatMicP1X
   real(r8) :: FLWT
-  real(r8) :: RechargSurf,RechargSubSurf,RechargDist2WTBL
+  real(r8) :: RechargSurf
+  real(r8) :: RechargDist2WTBL
+  real(r8) :: Recharg2WTBLScal   !multiplier to water exchange with external water table.
   real(r8) :: DPTHH,CNDL
   real(r8) :: FINHX,THETAX  
   real(r8) :: AirfMicP,VOLPX2,AirfMacP
@@ -824,8 +826,8 @@ module WatsubMod
                   M4 = NX+1;M5 = NY;  M6 = L  !target
                   XN = -1.0_r8                !going out of eastern boundary
                   RechargSurf     = RechargEastSurf(M2,M1)
-                  RechargSubSurf  = RechargEastSubSurf(M2,M1)
-                  RechargDist2WTBL = RechargRateEastWTBL(M2,M1)
+                  RechargDist2WTBL  = RechrgDistEastSubSurf(M2,M1)      !distance to eastern external water table [m]
+                  Recharg2WTBLScal = RechargRateEastWTBL(M2,M1)  
                   str_dir='east'
                   !do nothing if not on the boundary  
                 ELSE
@@ -836,8 +838,8 @@ module WatsubMod
                   M4 = NX; M5 = NY; M6 = L   !target on the boundary
                   XN = 1.0_r8                !coming in from western boundary
                   RechargSurf     = RechargWestSurf(M5,M4)
-                  RechargSubSurf  = RechargWestSubSurf(M5,M4)
-                  RechargDist2WTBL = RechargRateWestWTBL(M5,M4)
+                  RechargDist2WTBL  = RechrgDistWestSubSurf(M5,M4)      !distance to western external water table [m]
+                  Recharg2WTBLScal = RechargRateWestWTBL(M5,M4)
                   str_dir='west'
                 ELSE
                   cycle
@@ -854,8 +856,8 @@ module WatsubMod
                   M4 = NX; M5 = NY+1; M6 = L   !target
                   XN              = -1.0_r8    !going out of south boundary
                   RechargSurf     = RechargSouthSurf(M2,M1)
-                  RechargSubSurf  = RechargSouthSubSurf(M2,M1)
-                  RechargDist2WTBL = RechargRateSouthWTBL(M2,M1)
+                  RechargDist2WTBL  = RechrgDistSouthSubSurf(M2,M1)   !distance to southern external water table [m]
+                  Recharg2WTBLScal = RechargRateSouthWTBL(M2,M1)
                   str_dir='south'
                 ELSE
                   cycle
@@ -864,9 +866,9 @@ module WatsubMod
                 IF(NY.EQ.NVN)THEN            !northern boundary, inflow     ----
                   M4 = NX;M5  = NY; M6   = L !target grid on the boundary
                   XN          = 1.0_r8       !coming in from north boundary
-                  RechargSurf     = RechargNorthSurf(M5,M4)
-                  RechargSubSurf  = RechargNorthSubSurf(M5,M4)
-                  RechargDist2WTBL = RechargRateNorthWTBL(M5,M4)
+                  RechargSurf      = RechargNorthSurf(M5,M4)
+                  RechargDist2WTBL = RechrgDistNorthSubSurf(M5,M4)    !distance to northern external water table [m]
+                  Recharg2WTBLScal = RechargRateNorthWTBL(M5,M4)
                   str_dir='north'
                 ELSE
                   cycle
@@ -880,8 +882,8 @@ module WatsubMod
                   M1 = NX; M2 = NY; M3  = L   !source
                   M4 = NX; M5 = NY; M6 = L+1  !target
                   XN              = -1.0_r8    !going out lower boundary
-                  RechargSubSurf  = RechargBottom_col(M2,M1)
-                  RechargDist2WTBL = 1.0_r8
+                  RechargDist2WTBL  = 1._r8
+                  Recharg2WTBLScal = RechargBottom_col(M2,M1)
                   str_dir='vert'
                 ELSE
                   cycle
@@ -927,9 +929,9 @@ module WatsubMod
 
                 ! IF NO WATER TABLE
 
-                IF(IDWaterTable_col(N2,N1).EQ.0 .OR. N.EQ.iVerticalDirection)THEN    
+                IF((IDWaterTable_col(N2,N1).EQ.0 .OR. N.EQ.iVerticalDirection) .AND. .not.isclose(Recharg2WTBLScal,0.0_r8))THEN    
                   !vertical flow or lateral drainage
-                  call BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargSubSurf,RechargDist2WTBL)
+                  call BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargDist2WTBL,Recharg2WTBLScal)
                   !
                   !lateral flow
                 ELSE
@@ -942,19 +944,19 @@ module WatsubMod
                   if(DoMicPDischarg2ExtWTBL.or.DoMacPDischarg2ExtWTBL)then
                     !discharge to external water table
                     CALL DischargeOverWaterTBL(I,J,N,N1,N2,N3,M4,M5,M6,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL,&
-                      RechargSubSurf,RechargDist2WTBL,DPTHH,XN,ExtWaterTable_col(N2,N1),FracLayVolBelowExtWTBL_vr(N3,N2,N1))
+                      RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,ExtWaterTable_col(N2,N1),FracLayVolBelowExtWTBL_vr(N3,N2,N1))
                   endif
 
                   if(DoMicPDischarg2Tile .or. DoMacPDischarg2Tile)then
                     !tile drainage
                     CALL DischargeOverWaterTBL(I,J,N,N1,N2,N3,M4,M5,M6,DoMicPDischarg2Tile,DoMacPDischarg2Tile,&
-                      RechargSubSurf,RechargDist2WTBL,DPTHH,XN,TileWaterTable_col(N2,N1),FracLayVolBelowTileWTBL_vr(N3,N2,N1))                      
+                      RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,TileWaterTable_col(N2,N1),FracLayVolBelowTileWTBL_vr(N3,N2,N1))                      
                   endif
 !                  write(214,*)I+J/24.,M,N3,N2,N1,M6,M5,M4,'chking str'//trim(str_dir)
 !                  donot_drain=(I==267 .and. J==24 .and. M==1 .and. trim(str_dir)=='south')
 
-                  call RechargeFromExtWaterTBL(I,J,M,N,N1,N2,N3,M4,M5,M6,DPTHH,RechargSubSurf,&
-                    RechargDist2WTBL,XN,AirfMicP,VOLPX2,AirfMacP,str_dir)!,donot_drain)
+                  call RechargeFromExtWaterTBL(I,J,M,N,N1,N2,N3,M4,M5,M6,DPTHH,RechargDist2WTBL,&
+                    Recharg2WTBLScal,XN,AirfMicP,VOLPX2,AirfMacP,str_dir)!,donot_drain)
 
                 ENDIF
 !
@@ -1088,7 +1090,7 @@ module WatsubMod
   end subroutine XBoundaryFlowM
 !------------------------------------------------------------------------------------------
 
-  subroutine BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargSubSurf,RechargDist2WTBL)    
+  subroutine BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargDist2WTBL,Recharg2WTBLScal)    
   !
   !Drainage across the lateral or bottom boundaries.      
   implicit none
@@ -1098,7 +1100,8 @@ module WatsubMod
   integer,  intent(in) :: M4,M5,M6  !dest, when XN=1, N2=M5,N1=M4
   real(r8), intent(in) :: RainEkReducedKsat 
   real(r8), intent(in) :: XN        !direction
-  real(r8), intent(in) :: RechargSubSurf,RechargDist2WTBL
+  real(r8), intent(in) :: RechargDist2WTBL
+  real(r8), intent(in) :: Recharg2WTBLScal
 
   character(len=*), parameter :: subname='BoundaryDrainM'
   real(r8) :: THETA1,HydcondSrc,RechargRate
@@ -1109,7 +1112,7 @@ module WatsubMod
   call PrintInfo('beg '//subname)
 ! IDWaterTable=water table flag
 
-  RechargRate=RechargSubSurf*RechargDist2WTBL*dts_HeatWatTP
+  RechargRate=Recharg2WTBLScal*dts_HeatWatTP/RechargDist2WTBL
   !involve no water table or in vertical direction
   THETA1 = AMAX1(SoilWatAirDry_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
   K1     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-THETA1)/POROS_vr(N3,N2,N1))+1))
@@ -2089,7 +2092,7 @@ module WatsubMod
   end subroutine Solve4HeatByConduction  
 !------------------------------------------------------------------------------------------
   subroutine DischargeOverWaterTBL(I,J,N,N1,N2,N3,M4,M5,M6,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL,&
-    RechargSubSurf,RechargDist2WTBL,DPTHH,XN,TargetWaterTBL,FracVolBelowWTBL)
+    RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,TargetWaterTBL,FracVolBelowWTBL)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: N
@@ -2097,7 +2100,8 @@ module WatsubMod
   integer, intent(in) :: M4,M5,M6  !dest grid
   logical, intent(in) :: DoMicPDischarg2ExtWTBL
   logical, intent(in) :: DoMacPDischarg2ExtWTBL
-  real(r8), intent(in):: RechargSubSurf,RechargDist2WTBL
+  real(r8), intent(in):: RechargDist2WTBL           !distance to external water table [m]
+  real(r8),intent(in) :: Recharg2WTBLScal
   real(r8), intent(in):: XN                         !flow direction, <0 out of source grid
   real(r8), intent(in):: DPTHH                      !depth to layer macropore water 
   real(r8), intent(in):: TargetWaterTBL
@@ -2123,15 +2127,15 @@ module WatsubMod
 !     HydroCond_3D=saturated hydraulic conductivity
 !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
 !
-  IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(RechargDist2WTBL,0._r8)))THEN
+  IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN
     PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
-      +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)) &
-      -mGravAccelerat*AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1)))
+      +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1) &
+      -AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))))
 
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-    FLWT=PSISWT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-FracVolBelowWTBL)/(RechargSubSurf+1.0_r8) &
-      *RechargDist2WTBL*dts_HeatWatTP
+    FLWT=PSISWT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-FracVolBelowWTBL)/AMAX1(RechargDist2WTBL,1.0_r8) &
+      *Recharg2WTBLScal*dts_HeatWatTP
     watflx                          = XN*FLWT
     heatflx                         = cpw*TKSoil1_vr(N3,N2,N1)*watflx
     WaterFlow2Micpt_3D(N,M6,M5,M4)  = WaterFlow2Micpt_3D(N,M6,M5,M4)+watflx
@@ -2161,14 +2165,14 @@ module WatsubMod
 !     HydroCond_3D=saturated hydraulic conductivity
   !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
 !
-  IF(DoMacPDischarg2ExtWTBL .AND. (.not.isclose(RechargDist2WTBL,0._r8)) .AND. VLMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(DoMacPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)) .AND. VLMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD  = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-TargetWaterTBL) &
       -mGravAccelerat*AZMAX1(DPTHH-DepzIntWTBL_col(N2,N1))
 
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
     FLWTH=PSISWTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1) &
-      *(1.0_r8-FracVolBelowWTBL)/(RechargSubSurf+1.0)*RechargDist2WTBL*dts_HeatWatTP
+      *(1.0_r8-FracVolBelowWTBL)/AMAX1(RechargDist2WTBL,1.0_r8)*Recharg2WTBLScal*dts_HeatWatTP
 
     MacPoreDischarg=AMAX1(FLWTH,AZMIN1(-(VLWatMacP1_vr(N3,N2,N1)*dts_wat &
       +WaterFlow2Macpt_3D(3,N3,N2,N1)-WaterFlow2Macpt_3D(3,N3+1,N2,N1))))
@@ -2183,8 +2187,8 @@ module WatsubMod
   end subroutine DischargeOverWaterTBL
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE RechargeFromExtWaterTBL(I,J,M,N,N1,N2,N3,M4,M5,M6,DPTHH,RechargSubSurf,&
-    RechargDist2WTBL,XN,AirfMicP,VOLPX2,AirfMacP,str_dir)!,donot_drain)
+  SUBROUTINE RechargeFromExtWaterTBL(I,J,M,N,N1,N2,N3,M4,M5,M6,DPTHH,RechargDist2WTBL,&
+    Recharg2WTBLScal,XN,AirfMicP,VOLPX2,AirfMacP,str_dir)!,donot_drain)
   !
   !subsurface recharge to soil micropore and macropores from external water table
   !it considers the existence of frozen layers
@@ -2193,7 +2197,9 @@ module WatsubMod
   integer, intent(in) :: N
   integer, intent(in) :: N1,N2,N3   !source grid
   integer, intent(in) :: M4,M5,M6   !dest grid
-  real(r8),intent(in) :: RechargDist2WTBL,DPTHH,RechargSubSurf
+  real(r8),intent(in) :: Recharg2WTBLScal
+  real(r8),intent(in) :: DPTHH
+  real(r8),intent(in) :: RechargDist2WTBL      !distance between in soil water table and external water table [m]
   real(r8),intent(in) :: XN   !flow direction, > 0 (in), < 0 (out)
   real(r8),intent(inout):: AirfMicP   !air-filled space in grid (N3,N2,N1)
   real(r8),intent(inout) :: VOLPX2,AirfMacP
@@ -2213,7 +2219,7 @@ module WatsubMod
     .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1)                 & !inside active layer
     .AND. (AirfMicP.GT.ZEROS2(N2,N1) .OR. SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)    & !able to accept water
     .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                         & !source grid is unsaturated
-    .AND. (.not.isclose(RechargDist2WTBL,0._r8)))THEN                                 !water exchange with watertable enabled
+    .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN                                 !water exchange with watertable enabled
 
     PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
@@ -2223,7 +2229,7 @@ module WatsubMod
     IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
 
     FLWU = PSISUT*HydroCond_3D(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*FracLayVolBelowExtWTBL_vr(N3,N2,N1) &
-      /(RechargSubSurf+1.0)*RechargDist2WTBL*dts_HeatWatTP
+      /AMAX1(RechargDist2WTBL,1.0_r8)*Recharg2WTBLScal*dts_HeatWatTP
 
     !within a time step, the incoming flow cannot exceed avaiable air-filled pores   
     IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO)THEN
@@ -2265,7 +2271,7 @@ module WatsubMod
     .AND. ActiveLayDepZ_col(N2,N1).GT.ExtWaterTable_col(N2,N1)    & !active layer below water table
     .AND. SoilDepthMidLay_vr(N3,N2,N1).LT.ActiveLayDepZ_col(N2,N1) & !midlayer depth above active water layer
     .AND. AirfMacP.GT.ZEROS2(N2,N1)                               & !macropore has air-filled fraction
-    .AND. (.not.isclose(RechargDist2WTBL,0.0_r8)))THEN               !recharge is on
+    .AND. (.not.isclose(Recharg2WTBLScal,0.0_r8)))THEN               !recharge is on
 
     PSISWD  = XN*0.005*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISUTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable_col(N2,N1))
@@ -2273,7 +2279,7 @@ module WatsubMod
     !outflow/drainage
     IF(PSISUTH.GT.0.0_r8)PSISUTH = PSISUTH+PSISWD
     FLWUH  = PSISUTH*HydroCondMacP1_vr(N3,N2,N1)*AREA(N,N3,N2,N1)*FracLayVolBelowExtWTBL_vr(N3,N2,N1) &
-      /(RechargSubSurf+1.0_r8)*RechargDist2WTBL*dts_HeatWatTP
+      /AMAX1(RechargDist2WTBL,1.0_r8)*Recharg2WTBLScal*dts_HeatWatTP
     !is *dts_wat needed below?  
     FLWUHL                         = AMIN1(FLWUH,AirfMacP)
     watflx                         = XN*FLWUHL

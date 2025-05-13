@@ -446,15 +446,6 @@ contains
           ! GATHER WATER, VAPOR AND HEAT FLUXES INTO FLUX ARRAYS
           ! FOR LATER UPDATES TO STATE VARIABLES
           !
-          ! TotWatXFlx2SoiMicP,CumWatFlx2SoiMicP=total,accumulated water flux to soil micropores
-          ! CumWatXFlx2SoiMicP,CumWatFlx2SoiMacP=total,accumd snow-soil micropore,macropore water
-          ! TotHeatFlow2Soi,cumNetHeatFlow2Soil=total,accumulated snow+litter heat flux to soil
-          ! TotSnoWatFlow2Litr,CumSnowWatFLow2LitR=total,accumulated snow+soil water flux to litter
-          ! TotSnoHeatFlow2Litr,CumNetHeatFlow2LitR=total,accumulated snow+soil heat flux to litter
-          ! WatFlowSno2LitRM_col,WatFlowSno2MicPM_col,WatFlowSno2MacPM_col=total water flux to litter,soil micropore,macropore
-          ! WatConvSno2MicP,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
-          ! HeatConvSno2Soi,HeatConvSno2LitR=heat flux from lowest snow layer to soil,litter
-
           TotWatXFlx2SoiMicP = WatFlowSno2MicP+VapFlxSno2Soi1+CumVapFlxLitr2Soi
           CumWatFlx2SoiMicP  = CumWatFlx2SoiMicP+TotWatXFlx2SoiMicP
 
@@ -1132,9 +1123,9 @@ contains
       VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
       VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
       TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
-!      if(I==149 .and. J==10 .and. NX==1)then
-!        write(114,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),tk1pres
-!      endif
+      QSnowH2Oloss_col(NY,NX)    = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      QSnowHeatLoss_col(NY,NX)   = QSnowHeatLoss_col(NY,NX)+HFLWS
+
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else 
@@ -1183,10 +1174,12 @@ contains
 
 !------------------------------------------------------------------------------------------
   subroutine SnowRedistributionM(M,NY,NX,NHE,NHW,NVS,NVN)
-!
-! SNOW redistribution between inside grids
-! currently, it does consider wind effect
-! Some update is needed to make sure it is correct
+
+  !
+  !Description:
+  ! SNOW redistribution between inside grids
+  ! currently, it does consider wind effect
+  ! Some update is needed to make sure it is correct
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
   character(len=*), parameter :: subname='SnowRedistributionM'
@@ -1194,25 +1187,15 @@ contains
 
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALTS1,ALTS2,ALTSB
-  real(r8) :: QSX,SnowDepthLateralGradient
+  real(r8) :: QSX              !later snow flux 
+  real(r8) :: SnowDepthGradH   !lateral snow depth gradient 
 !
 !     SNOW REDISTRIBUTION FROM SNOWPACK
 !
-!     N2,N1=NY,NX of source grid cell
-!     N5,N4=NY,NX of destination grid cell
-!     ALTS1,ALTS2=elevation of source,destination snowpack surfaces
-!     SnowDepthLateralGradient,DIST=slope,distance between source,destination
-!     QSX=transfer fraction
-!     DrySnoFlxBySnowRedistribut,WatFlxBySnowRedistribut,IceFlxBySnowRedistribut=snow,water,ice transfer
-!     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
-!     VOLS0,VOLW0,VOLI0=snow,water,ice volume
-!     MinSnowDepth=minimum snowpack depth for full cover
-!     QS,WatBySnowRedistrib,IceBySnowRedistrib=hourly-accumulated snow,water,ice transfer
-!     HeatSnoByRedist_2DH=hourly-accumd convective heat from snow,water,ice transfer
-!     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
   call PrintInfo('beg '//subname)
   N1=NX;N2=NY
   DO  N=1,2
+    !iFront:=1,iBehind:=2
     DO  NN=1,2
       IF(N.EQ.iWestEastDirection)THEN
         !skip the boundaries        
@@ -1234,17 +1217,18 @@ contains
       ENDIF
       
       ALTS1=Altitude_col(N2,N1)+SnowDepth_col(N2,N1)
-
+      !
       IF(NN.EQ.iFront)THEN               
 
         ALTS2=Altitude_col(N5,N4)+SnowDepth_col(N5,N4)        
-        SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST_3D(N,NU(N5,N4),N5,N4)
+        SnowDepthGradH=(ALTS1-ALTS2)/DIST_3D(N,NU(N5,N4),N5,N4)
 
-        !QSX>0, grid (N2,N1) loses mass
-        QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST_3D(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
+        !QSX>0, grid (N2,N1) loses mass, double check here
+        QSX=SnowDepthGradH/AMAX1(1.0_r8,DIST_3D(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
 
         !using the upstream approach
-        IF(SnowDepthLateralGradient.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+        IF(SnowDepthGradH.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+          QSX=AMIN1(QSX,1._r8)
           DrySnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
           WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
           IceSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
@@ -1268,14 +1252,13 @@ contains
 
         ALTSB=Altitude_col(N5,N4)+SnowDepth_col(N5B,N4B)        
         return
-        !will revise later
-        print*,'there',N,N5B,N4B,NU(N5B,N4B)
-        print*,DIST_3D(N,NU(N5B,N4B),N5B,N4B)
-        print*,ALTS1,ALTSB
-        SnowDepthLateralGradient=(ALTS1-ALTSB)/DIST_3D(N,NU(N5B,N4B),N5B,N4B)
 
-        !MOVE from (N2,N1) to (N5B,N4B)
-        IF(SnowDepthLateralGradient.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+        SnowDepthGradH=(ALTS1-ALTSB)/DIST_3D(N,NU(N5B,N4B),N5B,N4B)
+        QSX=SnowDepthGradH/AMAX1(1.0_r8,DIST_3D(N,NU(N5B,N4B),N5B,N4B))*dts_HeatWatTP
+
+        !MOVE from (N2,N1) to (N5B,N4B), front (N2,N1) to back (N5B,N4B)
+        IF(SnowDepthGradH.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+          QSX=AMIN1(QSX,1._r8)
           DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
           WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
           IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
@@ -1312,26 +1295,42 @@ contains
   integer :: NN
 
   DO NN=1,2
-    cumDrySnoByRedistM_col(N2,N1)    = cumDrySnoByRedistM_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N2,N1)
-    cumWatSnoByRedistM_col(N2,N1) = cumWatSnoByRedistM_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
-    cumIceSnoByRedistM_col(N2,N1)    = cumIceSnoByRedistM_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
-    cumHeatSnoByRedistM_col(N2,N1)   = cumHeatSnoByRedistM_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+
   ENDDO  
 
   if(IFLBSM_2DH(M,N,iBehind,N5,N4).EQ.0)then
     NN                             = iBehind
-    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N5,N4)
-    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
-    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
-    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)    
   ENDIF
 
   if(N4B.GT.0 .and. N5B.GT.0)then
     NN                             = iFront
-    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
-    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
-    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
-    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)    
   ENDIF
 
   END subroutine SumSnowDriftByRunoffM
@@ -1598,15 +1597,19 @@ contains
   integer, intent(in) :: NY,NX,I,J
 
   integer :: L
-! VOLS0,VOLSSL=snowpack snow content (water equivalent)
-! VOLI0,VOLISSL=snowpack ice content
-! VOLW0,VOLWSL=snowpack water content
-! VLSnoDWI1,VLSnoDWIprev_snvr=snowpack volume
-! SnowThickL0_snvr,DLYRS=snowpack depth
-! VLSnowHeatCapM,VHCPW=snowpack heat capacity
-! TK0,TKW=snowpack temperature
-!
-!  print*,'TKS_vr(0,NY,NX)=',TKS_vr(0,NY,NX)
+  ! VOLS0,VOLSSL=snowpack snow content (water equivalent)
+  ! VOLI0,VOLISSL=snowpack ice content
+  ! VOLW0,VOLWSL=snowpack water content
+  ! VLSnoDWI1,VLSnoDWIprev_snvr=snowpack volume
+  ! SnowThickL0_snvr,DLYRS=snowpack depth
+  ! VLSnowHeatCapM,VHCPW=snowpack heat capacity
+  ! TK0,TKW=snowpack temperature
+ 
+  TDrysnoByRedist_col(NY,NX)  = 0._r8
+  TWatSnoByRedist_col(NY,NX)  = 0._r8
+  TIceSnoByRedist_col(NY,NX)  = 0._r8
+  THeatSnoByRedist_col(NY,NX) = 0._r8
+
   D60: DO L=1,JS
     VLDrySnoWE0_snvr(L,NY,NX)      = VLDrySnoWE_snvr(L,NY,NX)
     VLIceSnow0_snvr(L,NY,NX)       = VLIceSnow_snvr(L,NY,NX)

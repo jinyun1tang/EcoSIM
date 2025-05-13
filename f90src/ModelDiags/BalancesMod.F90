@@ -260,7 +260,8 @@ contains
         write(110,*)'SoilWatErr_test  =',SoilWatErr_test
         write(110,*)'col WaterErr_test=',WaterErr_test
         
-        if(abs(SoilWatErr_test)>1.e-4)call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
+        if(abs(SoilWatErr_test)>1.e-4_r8 ) & ! .or. abs(SnowMassErr_test)>1.e-3_r8*SnowMassBeg_col(NY,NX)) &
+          call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
         
       endif
 
@@ -268,7 +269,6 @@ contains
       !grid change. It will be turned on when a safe strategy will be figured out later.
       
       DO idg=idg_beg,idg_NH3        
-
         
         tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX)+SurfGasEmiss_flx_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)&
           +GasHydroLoss_flx_col(idg,NY,NX) -trcg_TotalMass_col(idg,NY,NX)
@@ -289,6 +289,7 @@ contains
           tracer_mass_err = tracer_mass_err +trcs_Soil2plant_uptake_col(idg,NY,NX)        
           tracer_rootmass_err = tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg,NY,NX)
         endif
+
         trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err         
         tracer_snowmass_err=trcg_snowMass_beg_col(idg,NY,NX)-trcg_snowMass_col(idg,NY,NX) + &
           trcg_AquaADV_Snow2Soil_flx(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)-trcg_snowMassloss_col(idg,NY,NX)
@@ -328,7 +329,7 @@ contains
           if(idg==idg_CO2)then
             write(111,*)'ar2soil          =',RootCO2Ar2Soil_col(NY,NX)
           endif    
-          write(111,*)'col loss        =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX) &
+          write(111,*)'col_mass loss      =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX) &
               -trcs_Soil2plant_uptake_col(idg,NY,NX) 
           write(111,*)'=================='
           write(111,*)'root beg_end mass=',trcg_rootMass_beg_col(idg,NY,NX),trcg_rootMass_col(idg,NY,NX),&
@@ -345,7 +346,7 @@ contains
             tracer_mass_err = tracer_mass_err+dCO2err
           else
             dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)
-            write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX),trcs_Soil2plant_uptakep_col(idg,NY,NX)
+            write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX),trcs_Soil2plant_uptakep_col(idg,NY,NX),dgaserr
             tracer_mass_err=tracer_mass_err-dgaserr
           endif
           write(111,*)'deadroot2soil    =',trcs_deadroot2soil_col(idg,NY,NX)

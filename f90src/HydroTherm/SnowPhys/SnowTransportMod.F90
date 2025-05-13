@@ -273,10 +273,6 @@ implicit none
   call PrintInfo('beg '//subname)
 
   DO NN=1,2
-    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)+DrySnoByRedistrib_2DH(N,NN,N2,N1)
-    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)+WatSnoByRedist_2DH(N,NN,N2,N1)
-    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)+IceSnoBySnowRedist_2DH(N,NN,N2,N1)
-    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)+HeatSnoByRedist_2DH(N,NN,N2,N1)
 
     do idg=idg_beg,idg_NH3
       trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,NN,N2,N1)
@@ -298,11 +294,6 @@ implicit none
 
   if(IFLBS_2DH(N,iBehind,N5,N4).EQ.0)then
 
-    TDrysnoByRedist_col(N2,N1)   = TDrysnoByRedist_col(N2,N1)-DrySnoByRedistrib_2DH(N,iBehind,N5,N4)
-    TWatSnoByRedist_col(N2,N1)      = TWatSnoByRedist_col(N2,N1)-WatSnoByRedist_2DH(N,iBehind,N5,N4)
-    TIceSnoByRedist_col(N2,N1)      = TIceSnoByRedist_col(N2,N1)-IceSnoBySnowRedist_2DH(N,iBehind,N5,N4)
-    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoByRedist_2DH(N,iBehind,N5,N4)
-
     do idg=idg_beg,idg_NH3
       trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)-trcg_FloXSnow_2DH(idg,N,iBehind,N5,N4)
     ENDDO
@@ -322,11 +313,6 @@ implicit none
 
   IF(N5B.GT.0 .AND. N4B.GT.0)then
     IF(IFLBS_2DH(N,iFront,N5B,N4B).EQ.1)then
-
-      TDrysnoByRedist_col(N2,N1)   = TDrysnoByRedist_col(N2,N1)-DrySnoByRedistrib_2DH(N,iFront,N5B,N4B)
-      TWatSnoByRedist_col(N2,N1)      = TWatSnoByRedist_col(N2,N1)-WatSnoByRedist_2DH(N,iFront,N5B,N4B)
-      TIceSnoByRedist_col(N2,N1)      = TIceSnoByRedist_col(N2,N1)-IceSnoBySnowRedist_2DH(N,iFront,N5B,N4B)
-      THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoByRedist_2DH(N,iFront,N5B,N4B)
 
       do idg=idg_beg,idg_NH3
         trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)-trcg_FloXSnow_2DH(idg,N,iFront,N5B,N4B)

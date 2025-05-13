@@ -32,7 +32,7 @@ module SurfaceRadiationMod
 
   call DivideCanopyDepthByLAI(I,J,DepthSurfWatIce)
 
-  call SummaryCanopyArea(DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  call SummaryCanopyArea(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
   call SurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
@@ -189,8 +189,9 @@ module SurfaceRadiationMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SummaryCanopyArea(DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  subroutine SummaryCanopyArea(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
   implicit none
+  integer , intent(in) :: I,J
   real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice thickness above soil surface  
   integer :: NZ,NB,L,K,N
   real(r8), intent(out) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
@@ -211,7 +212,9 @@ module SurfaceRadiationMod
   )
   
   LeafStalkArea_col=0.0_r8
+
   D1135: DO NZ=1,NP
+
     LeafStalkArea_pft(NZ)=0.0_r8
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumOfCanopyLayers1    
@@ -222,17 +225,18 @@ module SurfaceRadiationMod
           D1130: DO K=1,MaxNodesPerBranch1
             LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
             LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
-            if(LeafStalkArea_pft(NZ)>1.e10)then                      
-              write(*,*)L,K,NB,NZ,'CanopyLeafArea_lpft(L,K,NB,NZ)',CanopyLeafArea_lpft(1,25,1,1)
-              stop
-            endif
+            
+!            if(LeafStalkArea_pft(NZ)>1.e10)then                      
+!              write(*,*)L,K,NB,NZ,'CanopyLeafArea_lpft(L,K,NB,NZ)',CanopyLeafArea_lpft(1,25,1,1)
+!              stop
+!            endif
           ENDDO D1130
           !add stem/stalk area
           LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
-          if(LeafStalkArea_pft(NZ)>1.e10)then          
-            write(*,*)L,NB,NZ,'CanopyStalkArea_lbrch(L,NB,NZ)',CanopyStalkArea_lbrch(L,NB,NZ)
-            stop
-          endif
+!          if(LeafStalkArea_pft(NZ)>1.e10)then          
+!            write(*,*)L,NB,NZ,'CanopyStalkArea_lbrch(L,NB,NZ)',CanopyStalkArea_lbrch(L,NB,NZ)
+!            stop
+!          endif
           LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
         ENDIF
       enddo
@@ -571,6 +575,7 @@ module SurfaceRadiationMod
       BETA(N,M) = ABS(BETY)
       BETX(N,M) = BETA(N,M)/SineSunInclAngle_col
 
+      !compute incident angle BETZ, eq. (12)/(13)
       IF(CosineLeafAngle(N).GT.SineSunInclAngle_col)THEN
         BETZ=ACOS(BETY)
       ELSE

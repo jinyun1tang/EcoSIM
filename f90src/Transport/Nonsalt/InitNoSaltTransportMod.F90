@@ -245,6 +245,10 @@ module InitNoSaltTransportMod
           DO idom=idom_beg,idom_end
             DOM_MicP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MicP_vr(idom,K,L,NY,NX))
             DOM_MacP2_vr(idom,K,L,NY,NX)    = AZERO(DOM_MacP_vr(idom,K,L,NY,NX))
+            if(DOM_MicP2_vr(idom,K,L,NY,NX)<0._r8 .or. DOM_MacP2_vr(idom,K,L,NY,NX)<0._r8)then
+              write(*,*)'prep',idom,K,L,NY,NX,DOM_MicP2_vr(idom,K,L,NY,NX),DOM_MacP2_vr(idom,K,L,NY,NX)
+              stop
+            endif
           ENDDO
         enddo
 

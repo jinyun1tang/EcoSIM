@@ -1361,7 +1361,8 @@ module NutUptakeMod
       VLWatMicPT=VLWatMicPK+RootVH2O_pvr(N,L,NZ)
       CPOOLX      = AMIN1(1.25E+03_r8*RootVH2O_pvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
       XFRE(ielmc) = (DOM_MicP_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
-      !XFRC, >0 positive into plants, 
+
+      !XFRC >0, plant absorbs dom 
       RootMycoExudEUptk_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
       IF(DOM_MicP_vr(idom_doc,K,L).GT.ZEROS .AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
         CPOOLT                                = DOM_MicP_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
@@ -1378,16 +1379,14 @@ module NutUptakeMod
     ELSE
       RootMycoExudEUptk_pvr(1:NumPlantChemElms,N,K,L,NZ)=0.0_r8
     ENDIF
-
   ENDDO D195
-!  if(I>176)print*,'rootexudd195',L
-  !avoid excessive exudation 
+  
   DO NE=1,NumPlantChemElms
     RootExudE=0._r8
     DO K=1,jcplx
       RootExudE=RootExudE+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
     ENDDO
-
+    !Avoid excessive exudation 
     if(RootExudE<0._r8)then
       if(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootExudE<0._r8)then
         scal=RootMycoNonstElms_rpvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
@@ -1395,10 +1394,9 @@ module NutUptakeMod
           RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ)*scal
         ENDDO
       endif
-    endif
-    
+    endif    
   ENDDO      
-!  if(I>176)print*,'exexud'
+
   end associate
   end subroutine RootExudates
 !------------------------------------------------------------------------

@@ -26,7 +26,8 @@ module minimathmod
   public :: yearday,isletter
   public :: dssign
   public :: flux_mass_limiter
-  public :: AZERO
+  public :: AZERO,AZERO1
+  public :: SubstrateLimit
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -214,6 +215,21 @@ module minimathmod
   endif
 
   end function AZERO
+
+!------------------------------------------------------------------------------------------
+  pure function AZERO1(val,tiny_val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: tiny_val2
+  real(r8) :: ans
+
+  if(abs(val)>=tiny_val2)then
+    ans=val
+  else  
+    ans=0._r8
+  endif
+
+  end function AZERO1
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)
@@ -476,4 +492,29 @@ module minimathmod
   endif
 
   end subroutine get_flux_scalar
+! ----------------------------------------------------------------------
+
+  subroutine SubstrateLimit(n1,n2,demand_flux,y,scal)
+  implicit none
+  integer, intent(in) :: n1,n2
+  real(r8), intent(inout) :: demand_flux(n1:n2)
+  real(r8), intent(inout) :: Y  
+  real(r8), optional, intent(out)   :: scal
+  real(r8) :: tDemand,scal1
+  integer :: N
+
+  tDemand = sum(demand_flux)
+  scal1    = 1._r8
+  
+  if(y>=tDemand)then
+    y=y-tDemand
+  else
+    scal1=y/tDemand
+    DO n=n1,n2
+      demand_flux(n)=demand_flux(n)*scal1
+    enddo
+  endif
+  if(present(scal))scal=scal1
+  end subroutine SubstrateLimit
+
 end module minimathmod

@@ -96,7 +96,7 @@ module Hour1Mod
   character(len=*), parameter :: subname='hour1'
   integer :: L,NX,NY
   real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
-  real(r8) :: DPTH0           !water+ice thickness in litter
+  real(r8) :: DepthSurfWatIce           !water+ice thickness in litter
 
   integer :: NZ,NR,K
   logical :: dosum
@@ -193,13 +193,13 @@ module Hour1Mod
 !     OUTPUT FOR WATER TABLE DEPTH
       call DiagWaterTBLDepz(NY,NX,THETPZ_vr)
 
-      call GetSurfResidualProperties(I,J,NY,NX,DPTH0)
+      call GetSurfResidualProperties(I,J,NY,NX,DepthSurfWatIce)
 
       call SetTracerPropertyInLiterAir(NY,NX)
 
       if(do_instequil)call ForceGasAquaEquil(NY,NX)
 !
-      call PlantCanopyRadsModel(I,J,NY,NX,DPTH0)
+      call PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
@@ -1455,12 +1455,12 @@ module Hour1Mod
   end subroutine Prep4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSurfResidualProperties(I,J,NY,NX,DPTH0)
+  subroutine GetSurfResidualProperties(I,J,NY,NX,DepthSurfWatIce)
 
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  real(r8),intent(out) :: DPTH0    !water+ice thickness in litter layer
+  real(r8),intent(out) :: DepthSurfWatIce    !water+ice thickness in litter layer
   real(r8) :: VxcessWatLitR,TVOLWI,ThetaWLitR
   real(r8) :: VWatLitrZ
   real(r8) :: VOLIRZ
@@ -1481,7 +1481,7 @@ module Hour1Mod
 ! VOLW,VOLI,VOLA,VOLP=litter water,ice,porosity,air volume
 ! THETW,THETI,THETA,THETP=litter water,ice,porosity,air concentration
 ! POROS=litter porosity
-! THETW0,THETI0,DPTH0=litter excess water,ice,water+ice depth
+! THETW0,THETI0,DepthSurfWatIce=litter excess water,ice,water+ice depth
 ! DLYR=litter thickness
 ! PSISM,PSISE=litter matric,saturation water potential
 !
@@ -1514,7 +1514,7 @@ module Hour1Mod
       XVOLW0=0._r8
       XVOLI0=0._r8
     ENDIF
-    DPTH0    = XVOLW0+XVOLI0
+    DepthSurfWatIce    = XVOLW0+XVOLI0
     DLYR_3D(3,0,NY,NX) = VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
 
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN

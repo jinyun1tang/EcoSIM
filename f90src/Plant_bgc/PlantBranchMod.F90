@@ -1886,7 +1886,7 @@ module PlantBranchMod
       D700: DO L=NumOfCanopyLayers1,1,-1
 !       ARLFXL=ARLFXL+CanopyLeafArea_lpft(L,K,NB,NZ)
         D800: DO N=1,NumOfLeafZenithSectors1
-          LeafAreaZsec_brch(N,L,K,NB,NZ)=AZMAX1(CLASS(N,NZ)*0.25_r8*CanopyLeafArea_lpft(L,K,NB,NZ))
+          LeafAreaZsec_brch(N,L,K,NB,NZ)=AZMAX1(CLASS(N,NZ)*CanopyLeafArea_lpft(L,K,NB,NZ))/REAL(NumOfLeafZenithSectors1,R8)
   !       SURFXX=SURFXX+LeafAreaZsec_brch(N,L,K,NB,NZ)
         ENDDO D800
       ENDDO D700

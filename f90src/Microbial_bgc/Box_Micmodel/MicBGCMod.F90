@@ -7,7 +7,7 @@ module MicBGCMod
   use data_kind_mod,        only: r8 => DAT_KIND_R8
   use abortutils,           only: endrun,   destroy
   use EcoSIMCtrlMod,        only: etimer
-  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux
+  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux,SubstrateLimit
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
@@ -1173,7 +1173,7 @@ module MicBGCMod
         IF(BulkSOMC(K).GT.ZEROS.AND.BulkSOMC(KK).GT.ZEROS)THEN
           XFRK=FPRIM*TScal4Difsvity*(ROQC4HeterMicActCmpK(K)*BulkSOMC(KK)-ROQC4HeterMicActCmpK(KK)*BulkSOMC(K))/OSRT
           DO idom=idom_beg,idom_end
-            XFROM(idom)=FPRIM*TScal4Difsvity*(DOM(idom,K)*BulkSOMC(KK)-DOM(idom,KK)*BulkSOMC(K))/OSRT
+            XFROM(idom)=AMAX1(AMIN1(FPRIM*TScal4Difsvity*(DOM(idom,K)*BulkSOMC(KK)-DOM(idom,KK)*BulkSOMC(K))/OSRT,DOM(idom,K)),-DOM(idom,KK))
           ENDDO
           IF(ROQC4HeterMicActCmpK(K)+XferRespHeterK(K)-XFRK.GT.0.0_r8 .AND. ROQC4HeterMicActCmpK(KK)+XferRespHeterK(KK)+XFRK.GT.0.0_r8)THEN
             XferRespHeterK(K)  = XferRespHeterK(K)-XFRK
@@ -1229,7 +1229,7 @@ module MicBGCMod
     ROQC4HeterMicActCmpK(K) = ROQC4HeterMicActCmpK(K)+XferRespHeterK(K)
     TMicHeterActivity       = TMicHeterActivity+ROQC4HeterMicActCmpK(K)
     DO idom=idom_beg,idom_end
-      DOM(idom,K)=DOM(idom,K)+XferDOMK(idom,K)
+      DOM(idom,K)=DOM(idom,K)+AMAX1(XferDOMK(idom,K),-DOM(idom,K))
     ENDDO
     DO  N=1,NumMicbFunGrupsPerCmplx
       DO  M=1,nlbiomcp
@@ -1476,7 +1476,8 @@ module MicBGCMod
 !          endif
 
           DO NE=1,NumPlantChemElms
-            tRHydlySOM(NE)=tRHydlySOM(NE)+RHydlysSolidOM(NE,M,K)
+            RHydlysSolidOM(NE,M,K) = AMIN1(RHydlysSolidOM(NE,M,K),SolidOM(NE,M,K))
+            tRHydlySOM(NE)         = tRHydlySOM(NE)+RHydlysSolidOM(NE,M,K)
           ENDDO
 
         ELSE
@@ -1563,6 +1564,7 @@ module MicBGCMod
           RHydlysBioResduOM(ielmp,M,K) = AZMAX1(AMIN1(OMBioResdu(ielmp,M,K),CPR*RHydlysBioResduOM(ielmc,M,K)))/FCPK(K)
 
           DO NE=1,NumPlantChemElms
+            RHydlysBioResduOM(NE,M,K)=AMIN1(RHydlysBioResduOM(NE,M,K),OMBioResdu(NE,M,K))
             tRHydlyBioReSOM(NE)=tRHydlyBioReSOM(NE)+RHydlysBioResduOM(NE,M,K)
           ENDDO
         ELSE
@@ -1607,7 +1609,8 @@ module MicBGCMod
         RHydlysSorptOM(ielmp,K)        = AZMAX1(AMIN1(SorbedOM(ielmp,K),rCPSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)
 
         DO NE=1,NumPlantChemElms
-          tRHydlySoprtOM(NE)=tRHydlySoprtOM(NE)+RHydlysSorptOM(NE,K)
+          RHydlysSorptOM(NE,K) = AMIN1(SorbedOM(NE,K),RHydlysSorptOM(NE,K))
+          tRHydlySoprtOM(NE)   = tRHydlySoprtOM(NE)+RHydlysSorptOM(NE,K)
         ENDDO
 
       ELSE
@@ -1641,6 +1644,7 @@ module MicBGCMod
   type(OMCplx_State_type), intent(inout):: ncplxs
   integer :: K,M,N,NGL,NE,idom
   real(r8) :: FORC(0:jcplx)
+  real(r8) :: dflux(micpar%NumHetetrMicCmplx),scal
 !     begin_execution
   associate(                                                                    &
     k_POM                            => micpar%k_POM,                           &
@@ -1751,8 +1755,8 @@ module MicBGCMod
 !
     D575: DO M=1,ndbiomcp
       DO NE=1,NumPlantChemElms    
-        OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)-RHydlysBioResduOM(NE,M,K)
-        DOM(NE,K)=DOM(NE,K)+RHydlysBioResduOM(NE,M,K)
+        OMBioResdu(NE,M,K) = OMBioResdu(NE,M,K)-RHydlysBioResduOM(NE,M,K)
+        DOM(NE,K)          = DOM(NE,K)+RHydlysBioResduOM(NE,M,K)
       ENDDO
     ENDDO D575
 
@@ -1767,19 +1771,28 @@ module MicBGCMod
 !     RAcettProdHeter=acetate production from fermentation
 !
     D570: DO N=1,NumMicbFunGrupsPerCmplx
+      
+      call SubstrateLimit(JGnio(N),JGnfo(N),RAnabolDOCUptkHeter(JGnio(N):JGnfo(N),K),DOM(idom_doc,K))
+      
+      call SubstrateLimit(JGnio(N),JGnfo(N),DOMuptk4GrothHeter(ielmn,JGnio(N):JGnfo(N),K),DOM(idom_don,K))
+
+      call SubstrateLimit(JGnio(N),JGnfo(N),DOMuptk4GrothHeter(ielmp,JGnio(N):JGnfo(N),K),DOM(idom_dop,K))
+
       DO NGL=JGnio(N),JGnfo(N)
-        DOM(idom_doc,K)     = DOM(idom_doc,K)-RAnabolDOCUptkHeter(NGL,K)
-        DOM(idom_don,K)     = DOM(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)
-        DOM(idom_dop,K)     = DOM(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)
-        DOM(idom_acetate,K) = DOM(idom_acetate,K)-RAnabolAcetUptkHeter(NGL,K)+RAcettProdHeter(NGL,K)
+        dflux(ngl) = RAnabolAcetUptkHeter(NGL,K)-RAcettProdHeter(NGL,K)
+      ENDDO  
+
+      call SubstrateLimit(JGnio(N),JGnfo(N),dflux,DOM(idom_acetate,K),scal)
+
+      DO NGL=JGnio(N),JGnfo(N)
+        RAnabolAcetUptkHeter(NGL,K) = RAnabolAcetUptkHeter(NGL,K)*scal
+        RAcettProdHeter(NGL,K)      = RAcettProdHeter(NGL,K)*scal
+      ENDDO  
+
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
-!     ORC,ORN,ORP=microbial residue C,N,P
-!     RkillLitrfal2ResduOMHeter,RkillLitrfal2ResduOMHeter,RCOMP=transfer of microbial C,N,P LitrFall to residue
-!     RCCMEheter,RCCMN,RCCMP=transfer of auto LitrFall C,N,P to each hetero K
-!     RMaintDefcitLitrfal2ResduOMHeter,RCMMN,RMaintDefcitLitrfal2ResduOMHeter=transfer of senesence LitrFall C,N,P to residue
-!
+      DO NGL=JGnio(N),JGnfo(N)
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
             OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K) &

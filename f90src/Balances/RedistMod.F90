@@ -177,6 +177,7 @@ module RedistMod
         TKS_vr(L,NY,NX) = TKS_vr(NU(NY,NX),NY,NX)
       ENDIF
       cycle
+      
       DO idg=idg_beg,idg_NH3
         TRootGasLossDisturb_col(idg,NY,NX) = TRootGasLossDisturb_col(idg,NY,NX)-trcg_root_vr(idg,L,NY,NX)
         SurfGasEmiss_flx_col(idg,NY,NX)    = SurfGasEmiss_flx_col(idg,NY,NX)-trcg_gasml_vr(idg,L,NY,NX)&
@@ -833,7 +834,7 @@ module RedistMod
       TCS_vr(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
     !write(*,*)'here'
-!    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
+    if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
     TPlantRootH2OUptake_col(NY,NX)=0._r8
     DO L=NUM(NY,NX),NL(NY,NX)
       

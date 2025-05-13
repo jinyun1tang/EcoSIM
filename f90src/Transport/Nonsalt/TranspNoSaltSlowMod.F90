@@ -262,7 +262,7 @@ implicit none
           err=dmass-DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)
           if(abs(err)>1.e-5)then
             write(201,*)('-',L=1,50)
-            write(201,*)(I*1000+J)*10+M,iterm,'idom=',idom,'K=',K,NY,NX,err
+            write(201,*)(I*1000+J)*10+M,'iterm=',iterm,'idom=',idom,'K=',K,NY,NX,NU(NY,NX),NUM(NY,NX),err
             write(201,*)'dom mass beg/end 0',DOM_mass_begs(idom,K,NY,NX),DOM_mass_now(idom,K)
             write(201,*)'dom mass beg/end 3', DOM_mass3_col(idom,K,NY,NX),DOM_mass4_col(idom,K,NY,NX)
             write(201,*)'dmass=',dmass
@@ -782,9 +782,8 @@ implicit none
             DOM_transpFlx_2DH(idom,K,NY,NX) = DOM_transpFlx_2DH(idom,K,NY,NX)+FLUX
 
             FLUX=ppscal_dom(idom)*(DOM_MicpTranspFlxM_3D(idom,K,3,NL(NY,NX)+1,NY,NX)+DOM_MacpTranspFlxM_3D(idom,K,3,NL(NY,NX)+1,NY,NX))
-
-            DOM_draing_col(idom,K,NY,NX)    = DOM_draing_col(idom,K,NY,NX)+ FLUX
-            DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)  = DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)- FLUX
+            DOM_draing_col(idom,K,NY,NX)             = DOM_draing_col(idom,K,NY,NX)+ FLUX
+            DOM_Hydroloss_slow_flx_col(idom,K,NY,NX) = DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)- FLUX
 
             TranspNetDOM_flx2_col(idom,K,NY,NX)=TranspNetDOM_flx2_col(idom,K,NY,NX)+ &
               (DOM_SurfRunoff_flxM(idom,K,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX))*ppscal_dom(idom) 
@@ -896,11 +895,11 @@ implicit none
 
   call PrintInfo('beg '//subname)
 
-  TranspNetDOM_flxM_col       =0._r8
-  TranspNetSoil_slow_flxM_col  = 0._r8
-  DOM_FloXSurRof_flxM_2DH = 0.0_r8
-  trcg_SurRof_flxM_2DH    = 0.0_r8
-  trcn_SurRof_flxM_2DH    = 0.0_r8
+  TranspNetDOM_flxM_col       = 0._r8
+  TranspNetSoil_slow_flxM_col = 0._r8
+  DOM_FloXSurRof_flxM_2DH     = 0.0_r8
+  trcg_SurRof_flxM_2DH        = 0.0_r8
+  trcn_SurRof_flxM_2DH        = 0.0_r8
 
   trcg_SnowDrift_flxM_2DH = 0.0_r8
   trcn_SnowDrift_flxM_2DH = 0.0_r8
@@ -3262,7 +3261,8 @@ implicit none
               DOM_MicP2_vr(idom,K,0,NY,NX)=DOM_MicP_vr(idom,K,0,NY,NX)
               DOM_mass4_col(idom,K,NY,NX)=DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)              
               TranspNetDOM_flxM_col(idom,K,NY,NX)=TranspNetDOM_flxM_col(idom,K,NY,NX)+ &
-                DOM_SurfRunoff_flxM(idom,K,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)                            
+                DOM_SurfRunoff_flxM(idom,K,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)         
+                
             endif  
           endif
         ENDDO
@@ -3384,11 +3384,12 @@ implicit none
 
               if(lfupdate)then
                 DOM_mass3_col(idom,K,NY,NX)=DOM_mass3_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)
+
                 DOM_MicP2_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)
                 DOM_MacP2_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
                 DOM_mass4_col(idom,K,NY,NX)=DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)                
                 TranspNetDOM_flxM_col(idom,K,NY,NX)=TranspNetDOM_flxM_col(idom,K,NY,NX)+ &
-                  DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX)    
+                  DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX)
               endif
             endif
           ENDDO

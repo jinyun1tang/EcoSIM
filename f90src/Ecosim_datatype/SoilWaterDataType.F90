@@ -49,10 +49,10 @@ module SoilWaterDataType
   integer,target,allocatable ::  IFLBM_2DH(:,:,:,:,:)                       !flag for directional surface runoff
   logical,target,allocatable ::  XGridRunoffFlag_2DH(:,:,:,:)                   !enables or disables boundary water flux depending on aspect, [-]
   integer,target,allocatable ::  IFLB_2DH(:,:,:,:)                             !flag for directional runoff, related to IFLBM_2DH
-  real(r8),target,allocatable ::  RechargNorthSubSurf(:,:)                  !northern subsurface boundary water flux , [-]
-  real(r8),target,allocatable ::  RechargEastSubSurf(:,:)                   !eastern subsurface boundary water flux , [-]
-  real(r8),target,allocatable ::  RechargSouthSubSurf(:,:)                  !southern subsurface boundary water flux , [-]
-  real(r8),target,allocatable ::  RechargWestSubSurf(:,:)                   !western subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RechrgDistNorthSubSurf(:,:)                  !northern subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RechrgDistEastSubSurf(:,:)                   !eastern subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RechrgDistSouthSubSurf(:,:)                  !southern subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RechrgDistWestSubSurf(:,:)                   !western subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  RechargRateNorthWTBL(:,:)                 !northern subsurface boundary water flux rate constant, [h-1]
   real(r8),target,allocatable ::  RechargRateEastWTBL(:,:)                  !eastern subsurface boundary water flux  rate constant, [h-1]
   real(r8),target,allocatable ::  RechargRateSouthWTBL(:,:)                 !southern subsurface boundary water flux  rate constant, [h-1]
@@ -173,10 +173,10 @@ module SoilWaterDataType
   allocate(IFLBM_2DH(60,2,2,JY,JX));IFLBM_2DH=-1
   allocate(XGridRunoffFlag_2DH(2,2,JY,JX));   XGridRunoffFlag_2DH=.false.
   allocate(IFLB_2DH(2,2,JY,JX));   IFLB_2DH=0
-  allocate(RechargNorthSubSurf(JY,JX));      RechargNorthSubSurf=0._r8
-  allocate(RechargEastSubSurf(JY,JX));      RechargEastSubSurf=0._r8
-  allocate(RechargSouthSubSurf(JY,JX));      RechargSouthSubSurf=0._r8
-  allocate(RechargWestSubSurf(JY,JX));      RechargWestSubSurf=0._r8
+  allocate(RechrgDistNorthSubSurf(JY,JX));      RechrgDistNorthSubSurf=0._r8
+  allocate(RechrgDistEastSubSurf(JY,JX));      RechrgDistEastSubSurf=0._r8
+  allocate(RechrgDistSouthSubSurf(JY,JX));      RechrgDistSouthSubSurf=0._r8
+  allocate(RechrgDistWestSubSurf(JY,JX));      RechrgDistWestSubSurf=0._r8
   allocate(RechargRateNorthWTBL(JY,JX));      RechargRateNorthWTBL=0._r8
   allocate(RechargRateEastWTBL(JY,JX));      RechargRateEastWTBL=0._r8
   allocate(RechargRateSouthWTBL(JY,JX));      RechargRateSouthWTBL=0._r8
@@ -275,10 +275,10 @@ module SoilWaterDataType
   call destroy(IFLBM_2DH)
   call destroy(XGridRunoffFlag_2DH)
   call destroy(IFLB_2DH)
-  call destroy(RechargNorthSubSurf)
-  call destroy(RechargEastSubSurf)
-  call destroy(RechargSouthSubSurf)
-  call destroy(RechargWestSubSurf)
+  call destroy(RechrgDistNorthSubSurf)
+  call destroy(RechrgDistEastSubSurf)
+  call destroy(RechrgDistSouthSubSurf)
+  call destroy(RechrgDistWestSubSurf)
   call destroy(RechargRateNorthWTBL)
   call destroy(RechargRateEastWTBL)
   call destroy(RechargRateSouthWTBL)
