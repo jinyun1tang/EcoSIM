@@ -1152,8 +1152,6 @@ contains
     PrecNet2SoiMacP      = Rain2SoiMacP1_col(NY,NX)
     PrecHeat2SoiNet      = RainHeat2SoilP1_col(NY,NX)
   ENDIF
-!  write(211,*)I+J/24.,M,Rain2SoiMicP1_col(NY,NX)+Rain2SoiMacP1_col(NY,NX)+Rain2LitR1_col(NY,NX) &
-!    -RainPrecAir2LitR-PrecNet2SoiMicP-PrecNet2SoiMacP
     
   Rain2LitR_col(NY,NX) = Rain2LitR_col(NY,NX)+RainPrecAir2LitR
   Rain2Soil_col(NY,NX) = Rain2Soil_col(NY,NX)+PrecNet2SoiMicP+PrecNet2SoiMacP
@@ -1396,10 +1394,8 @@ contains
     RainThrufall2SoiMicP = 0._r8
     RainThrufall2SoiMacP = 0._r8
   ENDIF
-  Rain2ExposedSurf_col(NY,NX)=Rain2ExposedSurf
-!  write(211,*)I+J/24.,RainPrecThrufall_col(NY,NX)-Rain2Snow-Rain2ExposedSurf,Rain2ExposedSurf-RainThrufall2LitR-RainThrufall2Soil,&
-!    RainThrufall2Soil-RainThrufall2SoiMicP-RainThrufall2SoiMacP
-  PrecHeat_col(NY,NX)=PrecHeat_col(NY,NX)+(PrecHeat2Sno+RainHeat2Soil)*dts_HeatWatTP
+  Rain2ExposedSurf_col(NY,NX) = Rain2ExposedSurf
+  PrecHeat_col(NY,NX)         = PrecHeat_col(NY,NX)+(PrecHeat2Sno+RainHeat2Soil)*dts_HeatWatTP
 !
 !     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F
 !     FOR SOLUTE FLUX CALCULATIONS

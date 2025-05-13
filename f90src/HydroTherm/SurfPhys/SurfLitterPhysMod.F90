@@ -59,8 +59,6 @@ implicit none
 
   FracSurfByLitR_col(NY,NX)=1.0_r8-FracSurfBareSoil_col(NY,NX)
 
-!  if(I>=66)write(*,*)'FracSurfByLitR_col(NY,NX)',FracSurfByLitR_col(NY,NX),XVLMobileWaterLitR_col(NY,NX),&
-!    VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX)
   end subroutine PartLitSoilFractionM
 
 !------------------------------------------------------------------------------------------

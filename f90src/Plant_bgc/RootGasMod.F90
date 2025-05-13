@@ -143,14 +143,14 @@ module RootGasMod
     Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr,             &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
     RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr,            &
-    RootCO2Ar2Root_pvr        => plt_rbgc%RootCO2Ar2Root_pvr,            & !previous time step root respiration released into roots [gC d-2 h-1]
+    RootCO2Ar2RootX_pvr        => plt_rbgc%RootCO2Ar2RootX_pvr,            & !previous time step root respiration released into roots [gC d-2 h-1]
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft             &
   )
   
   call PrintInfo('beg '//subname)
   IF(RootRespPotent_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ).AND.RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
     .AND.FOXYX.GT.ZERO4Uptk_pft(NZ))THEN
-    RootCO2Ar2Root_pvr(L,NZ)=RootCO2Ar2Root_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
+    RootCO2Ar2RootX_pvr(L,NZ)=RootCO2Ar2RootX_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
 !
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
 !     (CO2, O2, CH4, N2, N2O, NH3, H2, Ar)
@@ -315,16 +315,16 @@ module RootGasMod
           enddo
           RSolUptkTransp(idg_NH3)  = RSolUptkTransp(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
           RSolUptkTransp(idg_NH3B) = RSolUptkTransp(idg_NH3B)*trcs_VLN_vr(ids_NH4B,L)
-!
-!     SOLUTION FOR MASS FLOW + DIFFUSION OF O2 IN AQUEOUS PHASES OF
-!     SOIL AND ROOT = ACTIVE UPTAKE OF O2 BY ROOT
-!     Oxygen is treated in its special way, assuming fluxes from soil and root are supporting uptake directory
-!     
-!     DifAqueVolatile(idg_O2)=O2 
-!     dtPerPlantRootH2OUptake=water uptake
-!     trcaqu_conc_soi_loc(idg_O2),trc_conc_root_loc(idg_O2)=soil,root aqueous O2 concentration
-!     RootOxyDemandPerPlant=O2 demand per plant
-!     RootOxyUptakePerPlant=root O2 uptake per plant
+          !
+          !     SOLUTION FOR MASS FLOW + DIFFUSION OF O2 IN AQUEOUS PHASES OF
+          !     SOIL AND ROOT = ACTIVE UPTAKE OF O2 BY ROOT
+          !     Oxygen is treated in its special way, assuming fluxes from soil and root are supporting uptake directory
+          !     
+          !     DifAqueVolatile(idg_O2)=O2 
+          !     dtPerPlantRootH2OUptake=water uptake
+          !     trcaqu_conc_soi_loc(idg_O2),trc_conc_root_loc(idg_O2)=soil,root aqueous O2 concentration
+          !     RootOxyDemandPerPlant=O2 demand per plant
+          !     RootOxyUptakePerPlant=root O2 uptake per plant
 !
           X=(DifAqueVolatile(idg_O2)+dtPerPlantRootH2OUptake)*trcaqu_conc_soi_loc(idg_O2)+DIFOP*trc_conc_root_loc(idg_O2)
 
@@ -353,23 +353,24 @@ module RootGasMod
               ROxyRoot2UptkPerPlant = 0.0_r8
             ENDIF
           ENDIF
-
-!
-!     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
-!     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
-!     WITH OTHER ROOT AND MICROBIAL POPULATIONS
-!
-          ROxySoil2Uptk       = ROxySoil2UptkPerPlant*PlantPopulation_pft(NZ)
-          ROxyRoot2Uptk       = ROxyRoot2UptkPerPlant*PlantPopulation_pft(NZ)
-          RDFAqueous(idg_CO2) = RSolUptkTransp(idg_CO2)+DifAqueVolatile(idg_CO2)*(trcaqu_conc_soi_loc(idg_CO2)-trc_conc_root_loc(idg_CO2))
-          RDXAqueous(idg_CO2) = (RootVH2O_pvr(N,L,NZ)*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2)) &
+          !
+          !     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
+          !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
+          !     WITH OTHER ROOT AND MICROBIAL POPULATIONS
+          !
+          RootUptkSoiSolute(idg_beg:idg_end)=0.0_r8          
+          ROxySoil2Uptk             = ROxySoil2UptkPerPlant*PlantPopulation_pft(NZ)
+          ROxyRoot2Uptk             = ROxyRoot2UptkPerPlant*PlantPopulation_pft(NZ)
+          RootUptkSoiSolute(idg_O2) = ROxySoil2Uptk
+          RDFAqueous(idg_CO2)       = RSolUptkTransp(idg_CO2)+DifAqueVolatile(idg_CO2)*(trcaqu_conc_soi_loc(idg_CO2)-trc_conc_root_loc(idg_CO2))
+          RDXAqueous(idg_CO2)       = (RootVH2O_pvr(N,L,NZ)*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2)) &
             -VLWatMicPMM*AMAX1(ZERO4Groth_pft(NZ),trcs_rootml_loc(idg_CO2)))/VOLWSP
 
-          !CO2 from soil into roots
           IF(RDFAqueous(idg_CO2).GT.0.0_r8)THEN
+            !CO2 from soil into roots          
             RootUptkSoiSolute(idg_CO2)=AMIN1(AZMAX1(RDXAqueous(idg_CO2)),RDFAqueous(idg_CO2)*PlantPopulation_pft(NZ))
-          !CO2 from roots into soil  
           ELSE
+            !CO2 from roots into soil  
             RootUptkSoiSolute(idg_CO2)=AMAX1(AZMIN1(RDXAqueous(idg_CO2)),RDFAqueous(idg_CO2)*PlantPopulation_pft(NZ))
           ENDIF
 
@@ -410,7 +411,6 @@ module RootGasMod
               RootUptkSoiSolute(idg_NH3)=AMAX1(AZMIN1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopulation_pft(NZ))
             ENDIF
 
-
             RDFAqueous(idg_NH3B)=RSolUptkTransp(idg_NH3B)+DifAqueVolatile(idg_NH3B)*(trcaqu_conc_soi_loc(idg_NH3B)-trc_conc_root_loc(idg_NH3))
             IF(VOLWSB.GT.ZERO4Groth_pft(NZ))THEN
               ZH3PB               = trcs_rootml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
@@ -425,26 +425,23 @@ module RootGasMod
             ELSE
               RootUptkSoiSolute(idg_NH3B)=AMAX1(AZMIN1(RDXAqueous(idg_NH3B)),RDFAqueous(idg_NH3B)*PlantPopulation_pft(NZ))
             ENDIF
-          ELSE
-            RootUptkSoiSolute(idg_beg:idg_end)=0.0_r8
           ENDIF
-!
-!     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN SOIL
-!     DURING ROOT UPTAKE DEPENDING ON CONCENTRATION DIFFERENCES
-!     CALCULATED FROM SOLUBILITIES, AND TRANSFER COEFFICIENTS
-!     FROM 'WATSUB'
-!     RootUptkSoiSolute=root aqueous gas uptake
-!     ROXYLX=soil net O2 aqueous flux
 
-!     VLWatMicPMM,VLsoiAirPMM=soil micropore water,air volume
-!         
+          !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN SOIL
+          !     DURING ROOT UPTAKE DEPENDING ON CONCENTRATION DIFFERENCES
+          !     CALCULATED FROM SOLUBILITIES, AND TRANSFER COEFFICIENTS
+          !     FROM 'WATSUB'
+          !     RootUptkSoiSolute=root aqueous gas uptake
+          !     ROXYLX=soil net O2 aqueous flux
+
+          !gas disolution into soil
           IF(FracAirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min)THEN
-            DiffusivitySolutEffP     = FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
+            DiffusivitySolutEffP         = FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
             RGas_DisolvSoil_flx(idg_CO2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))*VOLWAqueous(idg_CO2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RootUptkSoiSolute(idg_CO2))*VLsoiAirPMM) &
               /(VOLWAqueous(idg_CO2)+VLsoiAirPMM)
 
-            RUPOST                  = ROxySoil2Uptk+ROXYLX
+            RUPOST                      = ROxySoil2Uptk+ROXYLX
             RGas_DisolvSoil_flx(idg_O2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_O2))*VOLWAqueous(idg_O2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_O2))-RUPOST)*VLsoiAirPMM)/(VOLWAqueous(idg_O2)+VLsoiAirPMM)
 
@@ -483,9 +480,9 @@ module RootGasMod
           ELSE
             RGas_DisolvSoil_flx(idg_beg:idg_end)=0.0_r8
           ENDIF
-!
-!     UPDATE GASEOUS, AQUEOUS GAS CONTENTS AND CONCENTRATIONS
-!     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
+          !
+          !     UPDATE GASEOUS, AQUEOUS GAS CONTENTS AND CONCENTRATIONS
+          !     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
           DO idg=idg_beg,idg_NH3
             trc_gasml_loc(idg)  = trc_gasml_loc(idg)-RGas_DisolvSoil_flx(idg)+RGasTranspFlxPrev(idg)
           ENDDO
@@ -495,11 +492,7 @@ module RootGasMod
 
           !aqueous concentrations in soil
           DO idg=idg_beg,idg_end
-            if(idg==idg_O2)then
-              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-ROxySoil2Uptk
-            else
-              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-RootUptkSoiSolute(idg)
-            endif
+            trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-RootUptkSoiSolute(idg)
           enddo
           !
           !     GAS TRANSFER THROUGH ROOTS
@@ -561,12 +554,7 @@ module RootGasMod
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
 !
           DO idg=idg_beg,idg_end
-            if(idg==idg_O2)then
-              !O2 is consumed, not added to roots
-              RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+ROxySoil2Uptk     
-            else
-              RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+RootUptkSoiSolute(idg)
-            endif
+            RootUptkSoiSol_pvr(idg,N,L,NZ)=RootUptkSoiSol_pvr(idg,N,L,NZ)+RootUptkSoiSolute(idg)
           enddo
 !
 !     ACCUMULATE ROOT-ATMOSPHERE GAS EXCHANGE TO HOURLY TIME SCALE'
@@ -605,7 +593,7 @@ module RootGasMod
     ENDDO
 !    if(I==134 .and. J<=3)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
 !      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
-!      RCO2Emis2Root_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2Root_pvr(L,NZ)
+!      RCO2Emis2Root_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2RootX_pvr(L,NZ)
 !    if(I>=206 .and. L==5)then        
 !      idg=idg_CH4
 !      write(136,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &

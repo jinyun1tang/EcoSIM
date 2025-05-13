@@ -741,7 +741,7 @@ implicit none
   real(r8), pointer :: RootUptk_N_CumYr_pft(:)           => null()  !cumulative plant N uptake [gN d-2]
   real(r8), pointer :: RootUptk_P_CumYr_pft(:)           => null()  !cumulative plant P uptake [gP d-2]
   real(r8), pointer :: RootCO2Ar2Soil_pvr(:,:)           => null()  !root respiration released to soil [gC d-2 h-1]
-  real(r8), pointer :: RootCO2Ar2Root_pvr(:,:)           => null()  !root respiration released to root [gC d-2 h-1]
+  real(r8), pointer :: RootCO2Ar2RootX_pvr(:,:)           => null()  !root respiration released to root [gC d-2 h-1]
   real(r8), pointer :: trcs_deadroot2soil_pvr(:,:,:)     => null()  !gases released to soil upong dying roots [g d-2 h-1]
   contains
     procedure, public :: Init => plt_rootbgc_init
@@ -789,10 +789,10 @@ implicit none
   allocate(this%ZERO4Uptk_pft(JP1)); this%ZERO4Uptk_pft=spval
   allocate(this%RootRespPotent_pvr(jroots,JZ1,JP1)); this%RootRespPotent_pvr=spval
   allocate(this%RootCO2EmisPot_pvr(jroots,JZ1,JP1)); this%RootCO2EmisPot_pvr=spval
-  allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=spval
+  allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=0._r8
   allocate(this%trcs_deadroot2soil_pvr(idg_beg:idg_NH3,JZ1,JP1));this%trcs_deadroot2soil_pvr=0._r8
   allocate(this%RootCO2Ar2Soil_pvr(JZ1,JP1)); this%RootCO2Ar2Soil_pvr=0._r8
-  allocate(this%RootCO2Ar2Root_pvr(JZ1,JP1)); this%RootCO2Ar2Root_pvr=0._r8
+  allocate(this%RootCO2Ar2RootX_pvr(JZ1,JP1)); this%RootCO2Ar2RootX_pvr=0._r8
   allocate(this%RootCO2AutorX_pvr(jroots,JZ1,JP1)); this%RootCO2AutorX_pvr=spval
   allocate(this%RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1)); this%RootNutUptake_pvr=0._r8
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval

@@ -179,7 +179,7 @@ module InitNoSaltTransportMod
       enddo
       
       DO idg=idg_beg,idg_NH3-1
-        if(idg/=idg_O2)RBGCSinkGasMM_vr(idg,0,NY,NX) = trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
+        RBGCSinkGasMM_vr(idg,0,NY,NX) = trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
       enddo
 
       RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TRChem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
@@ -289,10 +289,8 @@ module InitNoSaltTransportMod
     DO  NY=NVN,NVS
       DO L=NU(NY,NX),NL(NY,NX)        
 
-        DO idg=idg_beg,idg_NH3-1
-          if(idg/=idg_O2)then      
-            RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
-          endif
+        DO idg=idg_beg,idg_NH3-1          
+          RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas          
         enddo
 
         RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = RBGCSinkGasMM_vr(idg_CO2,L,NY,NX)- &

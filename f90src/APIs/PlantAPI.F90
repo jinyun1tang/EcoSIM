@@ -497,7 +497,7 @@ implicit none
         RootRespPotent_pvr(N,L,NZ,NY,NX)                           = plt_rbgc%RootRespPotent_pvr(N,L,NZ)
         RootCO2EmisPot_pvr(N,L,NZ,NY,NX)                           = plt_rbgc%RootCO2EmisPot_pvr(N,L,NZ)
         RootCO2Autor_pvr(N,L,NZ,NY,NX)                             = plt_rbgc%RootCO2Autor_pvr(N,L,NZ)
-        RCO2Emis2Root_pvr(N,L,NZ,NY,NX)                              = plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)
+        RCO2Emis2Root_pvr(N,L,NZ,NY,NX)                            = plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)
         RootO2Uptk_pvr(N,L,NZ,NY,NX)                               = plt_rbgc%RootO2Uptk_pvr(N,L,NZ)
         RootGasConductance_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX)     = plt_rbgc%RootGasConductance_pvr(idg_beg:idg_NH3,N,L,NZ)
         RootUptkSoiSol_pvr(idg_CO2,N,L,NZ,NY,NX)                    = plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)
@@ -560,7 +560,7 @@ implicit none
         RootCO2Autor_vr(L,NY,NX)                       = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)
       ENDDO
       RootCO2Ar2Soil_vr(L,NY,NX)                       = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)   
-      RootCO2Ar2Root_vr(L,NY,NX)                       = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Root_pvr(L,NZ)
+      RootCO2Ar2Root_vr(L,NY,NX)                       = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2RootX_pvr(L,NZ)
       do idg=idg_beg,idg_NH3
         trcs_deadroot2soil_vr(idg,L,NY,NX)    = trcs_deadroot2soil_vr(idg,L,NY,NX) + plt_rbgc%trcs_deadroot2soil_pvr(idg,L,NZ)
       ENDDO

@@ -297,17 +297,16 @@ implicit none
           GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+(RGas_Disol_FlxMM_vr(idg,0,NY,NX) &
             +Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX))*ppscal(idg)
 
-          flux=RGas_Disol_FlxMM_vr(idg,0,NY,NX)*ppscal(idg)
-          GasDiff2Litr_flx_col(idg,NY,NX)=GasDiff2Litr_flx_col(idg,NY,NX)+flux
-          trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)+flux
+          flux                            = RGas_Disol_FlxMM_vr(idg,0,NY,NX)*ppscal(idg)
+          GasDiff2Litr_flx_col(idg,NY,NX) = GasDiff2Litr_flx_col(idg,NY,NX)+flux
+          trcg_netflx2_col(idg,NY,NX)     = trcg_netflx2_col(idg,NY,NX)+flux
+          trcg_netflx2_col(idg,NY,NX)     = trcg_netflx2_col(idg,NY,NX)-RBGCSinkGasMM_vr(idg,0,NY,NX)*RGasSinkScalar_vr(idg,0,NY,NX)*ppscal(idg)
 
-          trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)-RBGCSinkGasMM_vr(idg,0,NY,NX)*RGasSinkScalar_vr(idg,0,NY,NX)*ppscal(idg)
-
-          flux=Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)*ppscal(idg)
+          flux                            = Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)*ppscal(idg)
           GasDiff2Soil_flx_col(idg,NY,NX) = GasDiff2Soil_flx_col(idg,NY,NX)+flux
-          trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)+flux
+          trcg_netflx2_col(idg,NY,NX)     = trcg_netflx2_col(idg,NY,NX)+flux
 
-          flux=Gas_AdvDif_FlxMM_2DH(idg,NY,NX)*ppscal(idg)  
+          flux                                 = Gas_AdvDif_FlxMM_2DH(idg,NY,NX)*ppscal(idg)
           trcs_SubsurTransp_flx_2DH(idg,NY,NX) = trcs_SubsurTransp_flx_2DH(idg,NY,NX)+flux
           GasHydroLoss_flx_col(idg,NY,NX)      = GasHydroLoss_flx_col(idg,NY,NX)+flux
           trcg_netflx2_col(idg,NY,NX)          = trcg_netflx2_col(idg,NY,NX)+flux
@@ -934,9 +933,9 @@ implicit none
           flux=flux*dpscal(idg)
           call get_flux_scalar(trcg_gasml2_vr(idg,L,NY,NX),flux, trcg_gasml_vr(idg,L,NY,NX),pscal(idg))  
           if(lfupdate)then
-            trcg_mass3_fast_col(idg,NY,NX)=trcg_mass3_fast_col(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)
-            trcg_gasml2_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)
-            TranspNetSoil_fast_flxM_col(idg,NY,NX)=TranspNetSoil_fast_flxM_col(idg,NY,NX) + &
+            trcg_mass3_fast_col(idg,NY,NX)         = trcg_mass3_fast_col(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)
+            trcg_gasml2_vr(idg,L,NY,NX)            = trcg_gasml_vr(idg,L,NY,NX)
+            TranspNetSoil_fast_flxM_col(idg,NY,NX) = TranspNetSoil_fast_flxM_col(idg,NY,NX) + &
               (-RBGCSinkGasMM_vr(idg,L,NY,NX)*RGasSinkScalar_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX))            
           endif  
         endif

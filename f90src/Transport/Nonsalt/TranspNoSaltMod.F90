@@ -144,8 +144,11 @@ module TranspNoSaltMod
         trcs_mass_now(idg)=mass_snow+mass_litr+mass_soil
         errmass=trcs_mass_beg(idg,NY,NX)-trcs_mass_now(idg)  &
           +SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
-          +RGasNetProd_col(idg,NY,NX)
-
+          +RGasNetProd_col(idg,NY,NX)-trcs_Soil2plant_uptake_col(idg,NY,NX)
+          
+        if(idg==idg_NH3)then
+          errmass=errmass-trcs_Soil2plant_uptake_col(idg,NY,NX)
+        endif
         if(abs(errmass)>1.e-5)then
           write(121,*)('-',L=1,50)
           if(present(M))then

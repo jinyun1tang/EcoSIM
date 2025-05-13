@@ -233,7 +233,7 @@ module ExtractsMod
       ENDDO
 
       RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
-      RUptkRootO2_vr(L)       = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+      RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
       !(>0) uptake from soil into roots
       DO idg=idg_beg,idg_end

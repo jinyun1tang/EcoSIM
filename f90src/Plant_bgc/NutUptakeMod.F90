@@ -182,7 +182,7 @@ module NutUptakeMod
     trcs_rootml_pvr         => plt_rbgc%trcs_rootml_pvr,          &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
     RootCO2Ar2Soil_pvr      => plt_rbgc%RootCO2Ar2Soil_pvr,       &
-    RootCO2Ar2Root_pvr      => plt_rbgc%RootCO2Ar2Root_pvr,       &
+    RootCO2Ar2RootX_pvr      => plt_rbgc%RootCO2Ar2RootX_pvr,       &
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
@@ -200,8 +200,8 @@ module NutUptakeMod
   D950: DO L=NU,NK
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=MaxSoiL4Root_pft(NZ)) then
       trc_solml_new                   = 0._r8;trc_gasml_new = 0._r8
-      trc_solml_copy(idg_beg:idg_end) = trcs_solml_vr(idg_beg:idg_end,L);
-      trc_gasml_copy(idg_beg:idg_NH3) = trcg_gasml_vr(idg_beg:idg_NH3,L)
+!      trc_solml_copy(idg_beg:idg_end) = trcs_solml_vr(idg_beg:idg_end,L);
+!      trc_gasml_copy(idg_beg:idg_NH3) = trcg_gasml_vr(idg_beg:idg_NH3,L)
       
       D955: DO N  = 1, MY(NZ)
         if(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
@@ -228,9 +228,10 @@ module NutUptakeMod
           enddo
           trc_solml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2))
           trc_solml_loc(idg_O2)  = trcs_solml_vr(idg_O2,L)*FOXYX
-          DO idg=idg_beg,idg_end
-            trc_solml_copy(idg)=trc_solml_copy(idg)-trc_solml_loc(idg)
-          ENDDO
+
+!          DO idg=idg_beg,idg_end
+!            trc_solml_copy(idg)=trc_solml_copy(idg)-trc_solml_loc(idg)
+!          ENDDO
 
       !  the two lines below may be redundant
 
@@ -242,9 +243,9 @@ module NutUptakeMod
           trc_gasml_loc(idg_O2)  = AZMAX1(trcg_gasml_vr(idg_O2,L)*FOXYX)
           trc_gasml_loc(idg_CO2) = AZMAX1(trc_gasml_loc(idg_CO2))
 
-          DO idg=idg_beg,idg_NH3
-            trc_gasml_copy(idg)=trc_gasml_copy(idg)-trc_gasml_loc(idg)
-          ENDDO
+!          DO idg=idg_beg,idg_NH3
+!            trc_gasml_copy(idg)=trc_gasml_copy(idg)-trc_gasml_loc(idg)
+!          ENDDO
 
           call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
             RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake_vr)
@@ -325,7 +326,7 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%MY(NZ)
   plt_rbgc%RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
-  plt_rbgc%RootCO2Ar2Root_pvr(:,NZ)       = 0._r8
+  plt_rbgc%RootCO2Ar2RootX_pvr(:,NZ)       = 0._r8
   plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
   plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,1:NN,L1:L2,NZ)              = 0.0_r8

@@ -221,6 +221,8 @@ module RedistMod
   ECO_HR_CO2_col(NY,NX)          = sum(ECO_HR_CO2_vr(0:JZ,NY,NX))
   ECO_HR_CH4_col(NY,NX)          = sum(ECO_HR_CH4_vr(0:JZ,NY,NX))
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
+  !NOTE: O2 is different, as O2 consumption is supported partially by uptake from soil 
+  RGasNetProd_col(idg_O2,NY,NX)  = RGasNetProd_col(idg_O2,NY,NX)-RUptkRootO2_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_O2,NY,NX)
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)+RootCO2Ar2Root_col(NY,NX)
 
   DO idg=idg_beg,idg_NH3  
@@ -994,12 +996,10 @@ module RedistMod
       trcs_deadroot2soil_col(idg,NY,NX)=trcs_deadroot2soil_col(idg,NY,NX)+trcs_deadroot2soil_vr(idg,L,NY,NX)
     enddo
 
-    RootN2Fix_col(NY,NX) =RootN2Fix_col(NY,NX)+RootN2Fix_vr(L,NY,NX)
-    
+    RootN2Fix_col(NY,NX)   = RootN2Fix_col(NY,NX)+RootN2Fix_vr(L,NY,NX)
     RUptkRootO2_col(NY,NX) = RUptkRootO2_col(NY,NX)+RUptkRootO2_vr(L,NY,NX)
-    RGasNetProd_col(idg_O2,NY,NX) = RGasNetProd_col(idg_O2,NY,NX)-RUptkRootO2_vr(L,NY,NX)
-    ECO_HR_CO2_vr(L,NY,NX)        = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
-    ECO_HR_CH4_vr(L,NY,NX)        = trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
+    ECO_HR_CO2_vr(L,NY,NX) = trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)
+    ECO_HR_CH4_vr(L,NY,NX) = trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)
 
     !
     !     EXCHANGEABLE CATIONS AND ANIONS FROM EXCHANGE REACTIONS

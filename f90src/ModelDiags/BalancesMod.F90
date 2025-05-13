@@ -197,9 +197,9 @@ contains
         SoilWatErr_test=SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX)+Qinflx2Soil_col(NY,NX) &
           -QDrain_col(NY,NX)-QDischar_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)+QWatIntLaterFlow_col(NY,NX)
       endif
-      precipErr_test = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
-      prec2expSErr_test=Rain2ExposedSurf_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)
-      prec2SnoErr_test= Prec2Snow_col(NY,NX)-RainPrec2Sno_col(NY,NX)-SnoFalPrec_col(NY,NX)  
+      precipErr_test    = RainPrecThrufall_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)-RainPrec2Sno_col(NY,NX)
+      prec2expSErr_test = Rain2ExposedSurf_col(NY,NX)-Rain2LitR_col(NY,NX)-Rain2Soil_col(NY,NX)
+      prec2SnoErr_test  = Prec2Snow_col(NY,NX)-RainPrec2Sno_col(NY,NX)-SnoFalPrec_col(NY,NX)
 
       literH2Oerr_test = LitWatMassBeg_col(NY,NX)-LitWatMassEnd_col(NY,NX)+QRunSurf_col(NY,NX)+WatFLo2LitR_col(NY,NX)
 
@@ -252,7 +252,7 @@ contains
         write(110,*)'Snowxfer         =',QSnoWatXfer2Soil_col(NY,NX)+QSnoIceXfer2Soil_col(NY,NX)*DENSICE
         write(110,*)('-',ii=1,50)
         write(110,*)'precipErr_test   =',precipErr_test,RainPrecThrufall_col(NY,NX),RainPrec2Sno_col(NY,NX)
-        write(110,*)'prec2expSErr_test=',prec2expSErr_test
+        write(110,*)'prec2expSErr_test=',prec2expSErr_test,Rain2ExposedSurf_col(NY,NX),Rain2LitR_col(NY,NX),Rain2Soil_col(NY,NX)
         write(110,*)'prec2SnoErr_test =',prec2SnoErr_test        
         write(110,*)'canopyH2Oerr_test=',canopyH2Oerr_test
         write(110,*)'SnowMassErr_test =',SnowMassErr_test        
@@ -284,9 +284,7 @@ contains
           tracer_rootmass_err = tracer_rootmass_err-RUptkRootO2_col(NY,NX)
         elseif(idg==idg_CO2)then
           tracer_rootmass_err = tracer_rootmass_err+RootCO2Emis2Root_col(NY,NX)
-          tracer_mass_err = tracer_mass_err +trcs_Soil2plant_uptake_col(idg,NY,NX)        
         else 
-          tracer_mass_err = tracer_mass_err +trcs_Soil2plant_uptake_col(idg,NY,NX)        
           tracer_rootmass_err = tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg,NY,NX)
         endif
 
@@ -338,7 +336,7 @@ contains
           write(111,*)'pltair2root      =',trcg_air2root_flx_col(idg,NY,NX)     
 
           if(idg==idg_O2)then
-            write(111,*)'plt_uptake       =',-RUptkRootO2_col(NY,NX)
+            write(111,*)'plt_uptake       =',-RUptkRootO2_col(NY,NX),trcs_Soil2plant_uptake_col(idg,NY,NX)
           elseif(idg==idg_CO2)then
             dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)
             write(111,*)'tplt2root,soi2root =',RootCO2Emis2Root_col(NY,NX),trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)
