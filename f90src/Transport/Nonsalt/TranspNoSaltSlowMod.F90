@@ -1,7 +1,8 @@
 module TranspNoSaltSlowMod
-  use data_kind_mod,     only: r8 => DAT_KIND_R8
-  use abortutils,        only: destroy,  endrun
-  use TracerPropMod,     only: MolecularWeight
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: destroy, endrun
+  use TracerPropMod, only: MolecularWeight
+  use EcoSIMCtrlMod, only: iVerbLevel
   use PlantDataRateType
   use minimathmod    
   use IrrigationDataType
@@ -230,28 +231,30 @@ implicit none
           err=err+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
         endif
         if(abs(err)>1.e-5)then
-          write(201,*)('-',L=1,50)
-          write(201,*)(I*1000+J)*10+M,'iterm=',iterm,trcs_names(idg),NY,NX,'slow'
-          write(201,*)'beg/end total mass',trcg_mass_begs(idg,NY,NX),trcg_mass_now(idg)
-          write(201,*)'err=',err,'nsnol_col=',nsnol_col(NY,NX)
-          write(201,*)'beg/end snow mass=',trcg_mass_snow_begs(idg,NY,NX),trcg_mass_snow_now(idg),trcg_mass_snow_begs(idg,NY,NX)-trcg_mass_snow_now(idg)
-          write(201,*)'beg/end litr mass=',trcg_mass_litr_begs(idg,NY,NX),trcg_mass_litr_now(idg),trcg_mass_litr_begs(idg,NY,NX)-trcg_mass_litr_now(idg)
-          write(201,*)'beg/end soil mass=',trcg_mass_soil_begs(idg,NY,NX),trcg_mass_soil_now(idg),trcg_mass_soil_begs(idg,NY,NX)-trcg_mass_soil_now(idg)
-          write(201,*)'wetdepo=',Gas_WetDeposit_slow_flx_col(idg,NY,NX)
-          write(201,*)'diffus=',GasDiff2Surf_slow_flx_col(idg,NY,NX)
-          write(201,*)'netflx2litr=',trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)
-          write(201,*)'dep2sno =',Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)
-          write(201,*)'snowloss=',-Gas_Snowloss_slow_flx_col(idg,NY,NX)
-          write(201,*)'snowdrift=',trcg_SnowDrift_flx_col(idg,NY,NX)
-          write(201,*)'snow mass=',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
-          if(idg==idg_NH3)then
-            write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
-            write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
-            write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg_NH3,NY,NX)+trcs_netflow2soil_slow_flx_col(idg_NH3B,NY,NX)
-          else
-            write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)
-            write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)            
-            write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg,NY,NX)
+          if(iVerbLevel==1)then
+            write(201,*)('-',L=1,50)
+            write(201,*)(I*1000+J)*10+M,'iterm=',iterm,trcs_names(idg),NY,NX,'slow'
+            write(201,*)'beg/end total mass',trcg_mass_begs(idg,NY,NX),trcg_mass_now(idg)
+            write(201,*)'err=',err,'nsnol_col=',nsnol_col(NY,NX)
+            write(201,*)'beg/end snow mass=',trcg_mass_snow_begs(idg,NY,NX),trcg_mass_snow_now(idg),trcg_mass_snow_begs(idg,NY,NX)-trcg_mass_snow_now(idg)
+            write(201,*)'beg/end litr mass=',trcg_mass_litr_begs(idg,NY,NX),trcg_mass_litr_now(idg),trcg_mass_litr_begs(idg,NY,NX)-trcg_mass_litr_now(idg)
+            write(201,*)'beg/end soil mass=',trcg_mass_soil_begs(idg,NY,NX),trcg_mass_soil_now(idg),trcg_mass_soil_begs(idg,NY,NX)-trcg_mass_soil_now(idg)
+            write(201,*)'wetdepo=',Gas_WetDeposit_slow_flx_col(idg,NY,NX)
+            write(201,*)'diffus=',GasDiff2Surf_slow_flx_col(idg,NY,NX)
+            write(201,*)'netflx2litr=',trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)
+            write(201,*)'dep2sno =',Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)
+            write(201,*)'snowloss=',-Gas_Snowloss_slow_flx_col(idg,NY,NX)
+            write(201,*)'snowdrift=',trcg_SnowDrift_flx_col(idg,NY,NX)
+            write(201,*)'snow mass=',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
+            if(idg==idg_NH3)then
+              write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
+              write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
+              write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg_NH3,NY,NX)+trcs_netflow2soil_slow_flx_col(idg_NH3B,NY,NX)
+            else
+              write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)
+              write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)            
+              write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg,NY,NX)
+            endif
           endif
           if(abs(err)>1.e-5_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
         endif
@@ -616,6 +619,11 @@ implicit none
         RGasNetProd_col(idg,NY,NX)                = RGasNetProd_col(idg,NY,NX)-flux
         trcs_NetProd_slow_flx_col(idg,NY,NX)      = trcs_NetProd_slow_flx_col(idg,NY,NX)-flux
         trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX) = trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)-flux
+
+        DO L=NU(NY,NX),NL(NY,NX)
+          RGasNetProd_col(idg,NY,NX)            = RGasNetProd_col(idg,NY,NX)+&
+            ppscal(idg)*trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_HeatWatTP        
+        ENDDO
       endif  
 
       idg=idg_NH3B

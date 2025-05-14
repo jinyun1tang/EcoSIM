@@ -1526,7 +1526,7 @@ implicit none
     long_name='internal water table depth (<0 below soil surface)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_N2O_SEMIS_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='N2O_SEMIS_FLX',units='gN/m2/hr',&
+  call hist_addfld1d(fname='N2O_SEMIS_FLX_col',units='gN/m2/hr',&
     avgflag='A',long_name='Surface N2O flux (<0 into atmosphere), '// &
     'including wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
 
@@ -1554,17 +1554,17 @@ implicit none
     avgflag='A',long_name='O2 consumption rates in roots',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_N2_SEMIS_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='N2_SEMIS_FLX',units='gN/m2/hr',&
+  call hist_addfld1d(fname='N2_SEMIS_FLX_col',units='gN/m2/hr',&
     avgflag='A',long_name='Surface N2 flux (<0 into atmosphere), '// &
     'including wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_NH3_SEMIS_FLX_col(beg_col:end_col)       
-  call hist_addfld1d(fname='NH3_SEMIS_FLX',units='gN/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='NH3_SEMIS_FLX_col',units='gN/m2/hr',avgflag='A',&
     long_name='Surface NH3 flux (<0 into atmosphere), '// &
     'including wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_H2_SEMIS_FLX_col(beg_col:end_col)       
-  call hist_addfld1d(fname='H2_SEMIS_FLX',units='gH/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='H2_SEMIS_FLX_col',units='gH/m2/hr',avgflag='A',&
     long_name='Surface H2 flux (<0 into atmosphere), '// &
     'including wet deposition from rainfall and irrigation',ptr_col=data1d_ptr)  
 

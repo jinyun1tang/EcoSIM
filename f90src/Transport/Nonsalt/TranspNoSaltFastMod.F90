@@ -1,7 +1,8 @@
 module TranspNoSaltFastMod
 
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,        only: destroy,  endrun  
+  use abortutils,    only: destroy, endrun
+  use EcoSIMCtrlMod, only: iVerbLevel
   use minimathmod
   use DebugToolMod
   use GridDataType  
@@ -144,10 +145,12 @@ implicit none
         err=dmass-trcg_netflx2_col(idg,NY,NX)
 
         if(abs(err)>1.e-5_r8)then
-          write(133,*)(I*1000+J)*100+M,trcs_names(idg),'fast'
-          write(133,*)'init/final mass=',trcg_mass_begf(idg,NY,NX),trcg_mass_now(idg),trcg_mass3_fast_col(idg,NY,NX)
-          write(133,*)'dmass,         =',dmass,TranspNetSoil_fast_flx_col(idg,NY,NX),trcg_netflx2_col(idg,NY,NX)
-          write(133,*)'err            =',err
+          if(iVerbLevel==1)then
+            write(133,*)(I*1000+J)*100+M,trcs_names(idg),'fast'
+            write(133,*)'init/final mass=',trcg_mass_begf(idg,NY,NX),trcg_mass_now(idg),trcg_mass3_fast_col(idg,NY,NX)
+            write(133,*)'dmass,         =',dmass,TranspNetSoil_fast_flx_col(idg,NY,NX),trcg_netflx2_col(idg,NY,NX)
+            write(133,*)'err            =',err
+          endif
           if(abs(err)>1.e-5_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
         endif
 
