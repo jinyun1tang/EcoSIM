@@ -280,12 +280,12 @@ contains
         tracer_rootmass_err = trcg_rootMass_beg_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX) &
           +trcg_air2root_flx_col(idg,NY,NX)-trcs_deadroot2soil_col(idg,NY,NX)+TRootGasLossDisturb_col(idg,NY,NX)
 
+        tracer_rootmass_err = tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg,NY,NX)
+
         if(idg==idg_O2)then
-          tracer_rootmass_err = tracer_rootmass_err-RUptkRootO2_col(NY,NX)
+          tracer_rootmass_err = tracer_rootmass_err-RootO2_Xink_col(NY,NX)
         elseif(idg==idg_CO2)then
-          tracer_rootmass_err = tracer_rootmass_err+RootCO2Emis2Root_col(NY,NX)
-        else 
-          tracer_rootmass_err = tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg,NY,NX)
+          tracer_rootmass_err = tracer_rootmass_err+RootCO2Ar2Root_col(NY,NX)
         endif
 
         trcg_mass_cumerr_col(idg,NY,NX)=trcg_mass_cumerr_col(idg,NY,NX)+ tracer_mass_err         
@@ -336,8 +336,9 @@ contains
           write(111,*)'pltair2root      =',trcg_air2root_flx_col(idg,NY,NX)     
 
           if(idg==idg_O2)then
-            write(111,*)'plt_uptake       =',-RUptkRootO2_col(NY,NX),trcs_Soil2plant_uptake_col(idg,NY,NX)
-          elseif(idg==idg_CO2)then
+            write(111,*)'xsink    =',RootO2_Xink_col(NY,NX)
+          endif  
+          if(idg==idg_CO2)then
             dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)
             write(111,*)'tplt2root,soi2root =',RootCO2Emis2Root_col(NY,NX),trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)
             write(111,*)'ar2root, deltaErr  =',RootCO2Ar2Root_col(NY,NX),dCO2err

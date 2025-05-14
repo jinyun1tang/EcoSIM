@@ -222,7 +222,7 @@ module RedistMod
   ECO_HR_CH4_col(NY,NX)          = sum(ECO_HR_CH4_vr(0:JZ,NY,NX))
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
   !NOTE: O2 is different, as O2 consumption is supported partially by uptake from soil 
-  RGasNetProd_col(idg_O2,NY,NX)  = RGasNetProd_col(idg_O2,NY,NX)-RUptkRootO2_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_O2,NY,NX)
+  RGasNetProd_col(idg_O2,NY,NX)  = RGasNetProd_col(idg_O2,NY,NX)-RootO2_Xink_col(NY,NX)
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)+RootCO2Ar2Root_col(NY,NX)
 
   DO idg=idg_beg,idg_NH3  

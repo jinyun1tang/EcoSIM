@@ -18,7 +18,7 @@ module RootGasMod
 !------------------------------------------------------------------------
 
   subroutine RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
-    RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake_vr)
+    RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake)
   !
   !In the gas exchange between soil and roots, only O2 and CO2 involve active biochemical production/consumption
   !the other gases undergo physical exchange according to different water volumes inside/outside the roots.
@@ -33,7 +33,7 @@ module RootGasMod
   real(r8), intent(in) :: FOXYX
   real(r8), intent(inout) :: trc_solml_loc(idg_beg:idg_end)    !local copy of aqueous phase of the volatile tracers
   real(r8), intent(inout) :: trc_gasml_loc(idg_beg:idg_NH3)    !local copy of gaesous phase of the volatile tracers  
-  real(r8), intent(out):: PopPlantO2Uptake_vr
+  real(r8), intent(out):: PopPlantO2Uptake
 
   character(len=*), parameter :: subname='RootSoilGasExchange'
   !local variables
@@ -78,7 +78,7 @@ module RootGasMod
   real(r8) :: Root_gas2sol_flx(idg_beg:idg_NH3)    !gas dissolution into aqueous phase of the volatile tracers in roots
   real(r8) :: trcg_air2root_flx_loc(idg_beg:idg_NH3)   !diffusion flux of gas from atmosphere to inside roots
   real(r8) :: THETW1,THETM
-  real(r8) :: RootOxyDemandPerPlant
+  real(r8) :: RootOxyDemandPerPlant                    !O2 demand per plant at time step of flux calculation
   real(r8) :: DisolvedGasVolume(idg_beg:idg_NH3),VLWatMicPMO,VLWatMicPMM,VLsoiAirPMM
   real(r8) :: VOLWSP,VLWatMicPMA,VLWatMicPMB,VOLWSA,VOLWSB
   real(r8) :: VOLWAqueous(idg_beg:idg_end)  !solubility scaled aqueous volume 
@@ -105,13 +105,14 @@ module RootGasMod
     FILMM_vr                  => plt_site%FILMM_vr,                      &
     RGasTranspFlxPrev_vr      => plt_bgcr%RGasTranspFlxPrev_vr,          &
     RO2AquaSourcePrev_vr      => plt_bgcr%RO2AquaSourcePrev_vr,          &
+    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr     ,          & !out: O2 consumed for root respiration 
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,                & !out: O2 uptake from inside root O2
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr,        &
     ZERO4Uptk_pft             => plt_rbgc%ZERO4Uptk_pft,                 &
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,            &
-    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,           &
+    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,           & !Input: whole population root O2 demand
     RO2UptkSoilM_vr           => plt_rbgc%RO2UptkSoilM_vr,               &
-    RCO2Emis2Root_pvr           => plt_rbgc%RCO2Emis2Root_pvr,               & !output: total CO2 emitted inside roots
+    RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr,               & !output: total CO2 emitted inside roots
     trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr,         & !output: atmospheric gas flux to root gas concentration
     trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr,      & !output: gaseous to aqueous dissolution inside root
     RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,            & !out: aqueous tracer uptake from soil into roots
@@ -157,7 +158,6 @@ module RootGasMod
 !
 !     RTVLWA,RTVLWB=root aqueous volume in non-band,band
 !     dts_gas=time step of flux calculation (1/(NPH*NPT))
-!     RootOxyDemandPerPlant=O2 demand per plant at time step of flux calculation
 !     RGasTranspFlxPrev(idg_O2)=diagnosed net O2 gas flux at time step of flux calculation
 !     RGasTranspFlxPrev(idg_CO2)=diagnosed net CO2 gas flux at time step of flux calculation
 !     ROXYLX=diagnosed net O2 aqueous flux at time step of flux calculation
@@ -591,32 +591,26 @@ module RootGasMod
         dtrc_err(idg)=dtrc_err(idg)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       endif      
     ENDDO
-!    if(I==134 .and. J<=3)write(116,*)(I*1000+J)*100+N,L,trcs_names(idg_CO2),dtrc_err(idg_CO2), &
-!      trcg_rootml_beg(idg_CO2)+trcs_rootml_beg(idg_CO2),trcg_rootml_loc(idg_CO2)+trcs_rootml_loc(idg_CO2),&
-!      RCO2Emis2Root_pvr(N,L,NZ),trcg_air2root_flx_pvr(idg_CO2,N,L,NZ),RootCO2Ar2RootX_pvr(L,NZ)
-!    if(I>=206 .and. L==5)then        
-!      idg=idg_CH4
-!      write(136,*)(I*1000+J)*100+N,L,trcs_names(idg),dtrc_err(idg), &
-!        trcg_rootml_beg(idg)+trcs_rootml_beg(idg),trcg_rootml_loc(idg)+trcs_rootml_loc(idg),&
-!        trcg_air2root_flx_pvr(idg,N,L,NZ),RootUptkSoiSol_pvr(idg,N,L,NZ)
-!    endif
 
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'
     ! O2 is taken from inside the root and directly from the aqueous soil O2.
 
-    PopPlantO2Uptake_vr            = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_pvr(idg_O2,N,L,NZ)
+    PopPlantO2Uptake        = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_pvr(idg_O2,N,L,NZ)
+    RootO2_Xink_pvr(N,L,NZ) = PopPlantO2Uptake
     !to be used in next iteration
-    RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ)))
+    RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE
-    RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)  
-    PopPlantO2Uptake_vr=0.0_r8
+    RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
+    PopPlantO2Uptake         = 0.0_r8
+    RootO2_Xink_pvr(N,L,NZ)  = 0._r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
       RAutoRootO2Limter_rpvr(N,L,NZ)=RAutoRootO2Limter_rpvr(N,L-1,NZ)
     ELSE
       RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
     ENDIF
+    
   ENDIF
   call PrintInfo('end '//subname)
   end associate

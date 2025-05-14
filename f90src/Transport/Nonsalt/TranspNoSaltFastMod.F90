@@ -19,6 +19,7 @@ module TranspNoSaltFastMod
   use EcoSIMSolverPar
   use LandSurfDataType
   use SurfSoilDataType
+  use PlantDataRateType  
   use SoilPropertyDataType
 implicit none
   private
@@ -341,7 +342,11 @@ implicit none
               *(-RBGCSinkGasMM_vr(idg,L,NY,NX)*RGasSinkScalar_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX))
 
             trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)+ppscal(idg)*(-RBGCSinkGasMM_vr(idg,L,NY,NX)*RGasSinkScalar_vr(idg,L,NY,NX))
-
+            if(idg<idg_NH3)then
+              flux=ppscal(idg)*RGasSinkScalar_vr(idg,L,NY,NX)*trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_gas    
+              trcs_Soil2plant_uptake_col(idg,NY,NX)     = trcs_Soil2plant_uptake_col(idg,NY,NX)+ flux        
+              RGasNetProd_col(idg,NY,NX)=RGasNetProd_col(idg,NY,NX)+flux  
+            endif
           ENDDO
         endif
       ENDDO
@@ -892,8 +897,8 @@ implicit none
             call get_flux_scalar(trcs_solml2_vr(idg,L,NY,NX),flux, trcs_solml_vr(idg,L,NY,NX),pscal(idg))
             
             if(lfupdate)then
-              trcg_mass3_fast_col(idg,NY,NX)=trcg_mass3_fast_col(idg,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
-              trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)
+              trcg_mass3_fast_col(idg,NY,NX) = trcg_mass3_fast_col(idg,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
+              trcs_solml2_vr(idg,L,NY,NX)    = trcs_solml_vr(idg,L,NY,NX)
             endif  
 
             flux=-RGas_Disol_FlxMM_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)
@@ -901,9 +906,9 @@ implicit none
             call get_flux_scalar(trcg_gasml2_vr(idg,L,NY,NX),flux, trcg_gasml_vr(idg,L,NY,NX),pscal(idg))
 
             if(lfupdate)then
-              trcg_mass3_fast_col(idg,NY,NX)=trcg_mass3_fast_col(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)
-              trcg_gasml2_vr(idg,L,NY,NX)=trcg_gasml_vr(idg,L,NY,NX)
-              TranspNetSoil_fast_flxM_col(idg,NY,NX)=TranspNetSoil_fast_flxM_col(idg,NY,NX) + &
+              trcg_mass3_fast_col(idg,NY,NX)         = trcg_mass3_fast_col(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)
+              trcg_gasml2_vr(idg,L,NY,NX)            = trcg_gasml_vr(idg,L,NY,NX)
+              TranspNetSoil_fast_flxM_col(idg,NY,NX) = TranspNetSoil_fast_flxM_col(idg,NY,NX) + &
                 (-RBGCSinkGasMM_vr(idg,L,NY,NX)*RGasSinkScalar_vr(idg,L,NY,NX)+Gas_AdvDif_FlxMM_vr(idg,L,NY,NX))
             endif  
           endif
@@ -916,15 +921,15 @@ implicit none
             flux=flux*dpscal(idg)
             call get_flux_scalar(trcs_solml2_vr(idg,L,NY,NX),flux, trcs_solml_vr(idg,L,NY,NX),pscal(idg))
             if(lfupdate)then
-              trcg_mass3_fast_col(idg_NH3,NY,NX)=trcg_mass3_fast_col(idg_NH3,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
-              trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)
+              trcg_mass3_fast_col(idg_NH3,NY,NX) = trcg_mass3_fast_col(idg_NH3,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
+              trcs_solml2_vr(idg,L,NY,NX)        = trcs_solml_vr(idg,L,NY,NX)
             endif  
           endif
         ENDDO
 
         !gaseous NH3 is consumed through geochemistry
-        idg=idg_NH3        
-        flux=-RGas_Disol_FlxMM_vr(idg,L,NY,NX)- RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX) &
+        idg  = idg_NH3
+        flux = -RGas_Disol_FlxMM_vr(idg,L,NY,NX)- RGas_Disol_FlxMM_vr(idg_NH3B,L,NY,NX) &
           +Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)*RGasSinkScalar_vr(idg,L,NY,NX) 
            
         lflux=.true. .or. .not.isclose(flux,0._r8) 

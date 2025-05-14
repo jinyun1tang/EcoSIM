@@ -145,9 +145,9 @@ module TranspNoSaltMod
         errmass=trcs_mass_beg(idg,NY,NX)-trcs_mass_now(idg)  &
           +SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
           +RGasNetProd_col(idg,NY,NX)-trcs_Soil2plant_uptake_col(idg,NY,NX)
-          
+
         if(idg==idg_NH3)then
-          errmass=errmass-trcs_Soil2plant_uptake_col(idg,NY,NX)
+          errmass=errmass-trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
         if(abs(errmass)>1.e-5)then
           write(121,*)('-',L=1,50)
@@ -215,7 +215,7 @@ module TranspNoSaltMod
             write(121,*)'sol_NH3B            =',trcs_solml_vr(idg_NH3B,NU(NY,NX):NL(NY,NX),NY,NX)
             write(121,*)'Hml_NH3B            =',trcs_soHml_vr(idg_NH3B,NU(NY,NX):NL(NY,NX),NY,NX)  
           endif
-          write(121,*)'transp'
+          write(121,*)'transp',NU(NY,NX),NL(NY,NX)
           write(121,*)transp_diff_slow_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
           if(abs(errmass)>1.e-2) &
           call endrun(trim(mod_filename)//' at line',__LINE__)

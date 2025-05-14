@@ -601,8 +601,7 @@ implicit none
             trc_topsoil_flx_col(idg,NY,NX) =trc_topsoil_flx_col(idg,NY,NX)+flux
 
             flux                                      = ppscal(idg)*RBGCSinkSoluteM_vr(idg,L,NY,NX)
-            RGasNetProd_col(idg,NY,NX)                = RGasNetProd_col(idg,NY,NX)-(flux-&
-              ppscal(idg)*trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_HeatWatTP)
+            RGasNetProd_col(idg,NY,NX)                = RGasNetProd_col(idg,NY,NX)-flux
             RGasNetProdSoil_col(idg,NY,NX)            = RGasNetProdSoil_col(idg,NY,NX)-flux
             TranspNetSoil_flx_col(idg,NY,NX)          = TranspNetSoil_flx_col(idg,NY,NX)-flux
             trcs_netflow2soil_slow_flx_col(idg,NY,NX) = trcs_netflow2soil_slow_flx_col(idg,NY,NX)-flux
@@ -731,9 +730,10 @@ implicit none
             flux=ppscal(ids)*(trcsol_Irrig_flxM_vr(ids,L,NY,NX))        
             trcs_NetProd_slow_flx_col(ids,NY,NX)      = trcs_NetProd_slow_flx_col(ids,NY,NX)+flux
             trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)+flux
-            trcs_Soil2plant_uptake_col(ids,NY,NX)     = trcs_Soil2plant_uptake_col(ids,NY,NX)+ ppscal(ids)*&
-              trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP
-
+            if(ids>=idg_NH3)then 
+              trcs_Soil2plant_uptake_col(ids,NY,NX)     = trcs_Soil2plant_uptake_col(ids,NY,NX)+ ppscal(ids)*&
+                trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP
+            endif    
           endif  
         ENDDO      
       ENDDO

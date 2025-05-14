@@ -173,6 +173,8 @@ module ExtractsMod
     RootNH4DmndBand_pvr       => plt_rbgc%RootNH4DmndBand_pvr,       &
     RootH1PO4DmndSoil_pvr     => plt_rbgc%RootH1PO4DmndSoil_pvr,     &
     trcs_Soil2plant_uptake_vr => plt_rbgc%trcs_Soil2plant_uptake_vr, &
+    RootO2_Xink_vr            => plt_bgcr%RootO2_Xink_vr        ,    &
+    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr       ,    &
     RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
     REcoNO3DmndSoil_vr        => plt_bgcr%REcoNO3DmndSoil_vr,        &
     REcoNH4DmndSoil_vr        => plt_bgcr%REcoNH4DmndSoil_vr,        &
@@ -231,7 +233,7 @@ module ExtractsMod
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
-
+      RootO2_Xink_vr(L)      = RootO2_Xink_vr(L) + RootO2_Xink_pvr(N,L,NZ)
       RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
       RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 

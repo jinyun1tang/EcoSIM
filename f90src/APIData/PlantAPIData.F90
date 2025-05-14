@@ -639,7 +639,9 @@ implicit none
   real(r8), pointer :: NH3Dep2Can_pft(:)               => null()   !canopy NH3 flux,                            [g d-2 h-1]
   real(r8), pointer :: tRootMycoExud2Soil_vr(:,:,:)    => null()  !total root element exchange,                 [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pvr(:,:)              => null()  !root N2 fixation,                            [gN d-2 h-1]
-  real(r8), pointer :: CanopyRespC_CumYr_pft(:)              => null()  !total autotrophic respiration,               [gC d-2 ]
+  real(r8), pointer :: RootO2_Xink_pvr(:,:,:)          => null()  !root O2 sink for autotrophic respiraiton     [gC d-2 h-1]
+  real(r8), pointer :: RootO2_Xink_vr(:)               => null()  !all root O2 sink for autotrophic respiraiton [gC d-2 h-1]
+  real(r8), pointer :: CanopyRespC_CumYr_pft(:)              => null()  !total autotrophic respiration,         [gC d-2 ]
   real(r8), pointer :: LitrfalStrutElms_pvr(:,:,:,:,:) => null()  !plant LitrFall element,                      [g d-2 h-1]
   real(r8), pointer :: REcoO2DmndResp_vr(:)            => null()  !total root + microbial O2 uptake,            [g d-2 h-1]
   real(r8), pointer :: REcoNH4DmndBand_vr(:)           => null()   !total root + microbial NH4 uptake band,     [gN d-2 h-1]
@@ -999,6 +1001,8 @@ implicit none
   allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
   allocate(this%tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ1));this%tRootMycoExud2Soil_vr=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=0._r8
+  allocate(this%RootO2_Xink_pvr(jroots,JZ1,JP1)); this%RootO2_Xink_pvr=0._r8
+  allocate(this%RootO2_Xink_vr(JZ1)); this%RootO2_Xink_vr=0._r8
   allocate(this%CanopyRespC_CumYr_pft(JP1));this%CanopyRespC_CumYr_pft=spval
   allocate(this%REcoH1PO4DmndBand_vr(0:JZ1));this%REcoH1PO4DmndBand_vr=spval
   allocate(this%REcoNO3DmndSoil_vr(0:JZ1));this%REcoNO3DmndSoil_vr=spval

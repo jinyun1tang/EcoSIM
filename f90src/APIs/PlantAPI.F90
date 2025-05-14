@@ -139,9 +139,9 @@ implicit none
     totRootLenDens_vr(L,NY,NX)                    = plt_morph%totRootLenDens_vr(L)
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
-    RootCO2Emis2Root_vr(L,NY,NX)                 = plt_bgcr%RootCO2Emis2Root_vr(L)
-    RUptkRootO2_vr(L,NY,NX)                     = plt_bgcr%RUptkRootO2_vr(L)
-    
+    RootCO2Emis2Root_vr(L,NY,NX)                  = plt_bgcr%RootCO2Emis2Root_vr(L)
+    RUptkRootO2_vr(L,NY,NX)                       = plt_bgcr%RUptkRootO2_vr(L)
+    RootO2_Xink_vr(L,NY,NX)                       = plt_bgcr%RootO2_Xink_vr(L)
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L)
 
     DO  K=1,jcplx
@@ -636,6 +636,7 @@ implicit none
     RootCO2Autor_col(NY,NX)   = RootCO2Autor_col(NY,NX)+RootCO2Autor_vr(L,NY,NX)
     RootCO2Ar2Root_col(NY,NX) = RootCO2Ar2Root_col(NY,NX)+ RootCO2Ar2Root_vr(L,NY,NX)
     RootCO2Ar2Soil_col(NY,NX) = RootCO2Ar2Soil_col(NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)
+    RootO2_Xink_col(NY,NX)    = RootO2_Xink_col(NY,NX) + RootO2_Xink_vr(L,NY,NX)
   ENDDO    
   end subroutine PlantAPIRecv
 
@@ -986,6 +987,7 @@ implicit none
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_bgcr%RootCO2Emis2Root_vr(L)                  = RootCO2Emis2Root_vr(L,NY,NX)
     plt_bgcr%RUptkRootO2_vr(L)                       = RUptkRootO2_vr(L,NY,NX)
+    plt_bgcr%RootO2_Xink_vr(L)                       = RootO2_Xink_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO

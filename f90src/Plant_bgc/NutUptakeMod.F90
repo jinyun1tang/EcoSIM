@@ -326,6 +326,7 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%MY(NZ)
   plt_rbgc%RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
+  plt_bgcr%RootO2_Xink_pvr(:,1:L2,NZ)         = 0._r8
   plt_rbgc%RootCO2Ar2RootX_pvr(:,NZ)       = 0._r8
   plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)        = 0.0_r8
   plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,1:NN,L1:L2,NZ)     = 0.0_r8
