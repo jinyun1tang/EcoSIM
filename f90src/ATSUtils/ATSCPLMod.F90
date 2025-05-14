@@ -145,6 +145,15 @@ contains
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
 
+  call c_f_pointer(props%LAI%data, data, (/num_cols/))
+  a_LAI = data(:)  
+
+  call c_f_pointer(props%SAI%data, data, (/num_cols/))
+  a_SAI = data(:)
+
+  call c_f_pointer(props%vegetation_type%data, data, (/num_cols/))
+  a_VEG = data(:)
+
   !a_MATP(:,:) = -6.9
   !do i = 1, size_col
   !  a_MATP(i, 1) = 100.0

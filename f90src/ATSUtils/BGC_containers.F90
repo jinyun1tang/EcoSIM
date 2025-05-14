@@ -183,6 +183,9 @@ module BGCContainers_module
      type (BGCVectorDouble) :: elevation
      type (BGCVectorDouble) :: aspect
      type (BGCVectorDouble) :: slope
+     type (BGCVectorDouble) :: LAI
+     type (BGCVectorDouble) :: SAI
+     type (BGCVectorDouble) :: vegetation_type
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2
      real (c_double) :: atm_co2

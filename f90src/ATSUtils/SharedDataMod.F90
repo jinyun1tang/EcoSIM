@@ -34,6 +34,9 @@ Module SharedDataMod
 !  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)       !Aspect
   real(r8), allocatable :: a_ALT(:)       !Altitude
+  real(r8), allocatable :: a_LAI(:)       !Leaf Area Index
+  real(r8), allocatable :: a_SAI(:)       !Stem Area Index
+  real(r8), allocatable :: a_VEG(:)       !Vegetation type
   real(r8), allocatable :: a_ATKA(:)
   real(r8), allocatable :: a_WC(:,:)      !Soil water content
   real(r8), allocatable :: a_WC_rev(:,:)  !Soil water content testing
