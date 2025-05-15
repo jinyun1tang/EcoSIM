@@ -209,11 +209,11 @@ contains
   !call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
   !data2D(:,:)=a_TEMP
 
-  !call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_SSWS
+  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
+  data2D(:,:)=a_SSWS
 
-  !call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_SSES
+  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
+  data2D(:,:)=a_SSES
 
   write(*,*) "(In EcoSIM2ATSData) snow_depth, Q_e, Q_w ", surf_snow_depth(1), surf_e_source(1), surf_w_source(1)
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
