@@ -121,6 +121,10 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_SSWS = data2D(:,:)
 
+  data_ptr = state%subsurface_energy_source%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_SSES = data2D(:,:)
+
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   swrad = data(:)
 
