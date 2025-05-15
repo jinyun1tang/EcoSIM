@@ -463,9 +463,9 @@ implicit none
   real(r8), pointer :: CanopyNonstElms_pft(:,:)               => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)          => null()    !canopy nodule nonstructural element,        [g d-2]
   real(r8), pointer :: NoduleNonstructCconc_pft(:)            => null()    !nodule nonstructural C,                     [gC d-2]
-  real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)         => null()    !root layer structural C,                    [g d-2]
-  real(r8), pointer ::  PopuRootMycoC_pvr(:,:,:)              => null()    !root layer C,                               [g d-2]
-  real(r8), pointer :: RootProteinC_pvr(:,:,:)                => null()    !root layer protein C,                       [g d-2]
+  real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)         => null()    !root layer structural C,                    [gC d-2]
+  real(r8), pointer :: PopuRootMycoC_pvr(:,:,:)               => null()    !root layer C,                               [gC d-2]
+  real(r8), pointer :: RootProteinC_pvr(:,:,:)                => null()    !root layer protein C,                       [gC d-2]
   real(r8), pointer :: RootProteinConc_rpvr(:,:,:)             => null()    !root layer protein C concentration,         [g g-1]
   real(r8), pointer :: RootMycoNonstElms_rpvr(:,:,:,:)        => null()    !root  layer nonstructural element,          [g d-2]
   real(r8), pointer :: RootNonstructElmConc_rpvr(:,:,:,:)      => null()    !root  layer nonstructural C concentration,  [g g-1]
@@ -475,7 +475,7 @@ implicit none
   real(r8), pointer :: LeafProteinCNode_brch(:,:,:)           => null()    !layer leaf protein C,                       [g d-2]
   real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)         => null()  !sheath element,                               [g d-2]
   real(r8), pointer :: PetoleProteinCNode_brch(:,:,:)         => null()    !layer sheath protein C,                     [g d-2]
-  real(r8), pointer :: LeafElmsByLayerNode_brch(:,:,:,:,:) => null()    !layer leaf element,                         [g d-2]
+  real(r8), pointer :: LeafElmsByLayerNode_brch(:,:,:,:,:)    => null()    !layer leaf element,                         [g d-2]
   real(r8), pointer :: tCanLeafC_cl(:)                        => null()  !total leaf mass,                              [gC d-2]
   real(r8), pointer :: StandingDeadInitC_pft(:)               => null()  !initial standing dead C,                      [g C m-2]
   real(r8), pointer :: RootNodulElms_pft(:,:)                 => null()
@@ -508,11 +508,11 @@ implicit none
   real(r8), pointer :: LeafChemElmRemob_brch(:,:,:)           => null()   !branch leaf structural element,              [g d-2]
   real(r8), pointer :: PetioleChemElmRemob_brch(:,:,:)        => null()   !branch sheath structural element,            [g d-2]
   real(r8), pointer :: SenecStalkStrutElms_brch(:,:,:)        => null()   !branch stalk structural element,             [g d-2]
-  real(r8), pointer :: StalkLiveBiomassC_brch(:,:)                => null()   !branch active stalk C,                       [g d-2]
+  real(r8), pointer :: StalkLiveBiomassC_brch(:,:)            => null()   !branch active stalk C,                       [gC d-2]
   real(r8), pointer :: StalkStrutElms_pft(:,:)                => null()   !canopy stalk element,                        [g d-2]
-  real(r8), pointer :: ShootElms_pft(:,:)                     => null()
-  real(r8), pointer :: ShootElmsBeg_pft(:,:)                  => null()
-  real(r8), pointer :: CanopyStalkC_pft(:)                    => null()   !canopy active stalk C,                       [g d-2
+  real(r8), pointer :: ShootElms_pft(:,:)                     => null()   !current time whole plant shoot element mass, [g d-2]
+  real(r8), pointer :: ShootElmsBeg_pft(:,:)                  => null()   !previous whole plant shoot element mass,     [g d-2]
+  real(r8), pointer :: CanopyStalkC_pft(:)                    => null()   !canopy active stalk C,                       [g d-2]
   real(r8), pointer :: LeafStrutElms_pft(:,:)   => null()   !canopy leaf elements,   [g d-2]
   real(r8), pointer :: PetoleStrutElms_pft(:,:) => null()   !canopy sheath element,  [g d-2]
   real(r8), pointer :: StalkRsrvElms_pft(:,:)   => null()   !canopy reserve element, [g d-2]

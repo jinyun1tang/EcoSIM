@@ -29,10 +29,10 @@ module GrosubPars
 !     RCCZ,RCCY=min,max fractions for shoot,bacteria C recycling
 !     RCCX,RCCQ=max fractions for shoot,bacteria N,P recycling
 !
-  integer, parameter :: ibackward=1
-  integer, parameter :: iforward=2
-  real(r8) :: PART1X             !modifiers for organ partitioning coefficients
-  real(r8) :: PART2X             !modifiers for organ partitioning coefficients
+  integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
+  integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
+  real(r8) :: PART1X             !minimum fraction of growth allocated to leaf
+  real(r8) :: PART2X             !minimum fraction of growth allocated to petiole
   real(r8) :: VMXC               !rate constant for nonstructural C oxidation in respiration [h-1]
   real(r8) :: FSNR               !rate constant for LitrFall at end of growing season [h-1]
   real(r8) :: Hours4PhyslMature  !number of hours with no grain filling required for physilogical maturity [h]
@@ -135,7 +135,7 @@ module GrosubPars
   integer  :: NumOfCanopyLayers1         !number of canopy layers
   integer  :: JZ1                        !number of soil layers
   integer  :: NumOfLeafZenithSectors1    !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: MaxNodesPerBranch1         !number of canopy nodes
+  integer  :: MaxNodesPerBranch1         !maximum number of canopy nodes, 25
   integer  :: jsken                      !number of kinetic components in litter,PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer  :: NumLitterGroups            !number of litter groups nonstructural(0,*),
                                          !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)

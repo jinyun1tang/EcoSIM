@@ -602,12 +602,12 @@ module PlantBranchMod
     PARTX             = PARTS-PART(ibrch_stalk)-PART(ibrch_resrv)
     PART(ibrch_husk)  = 0.5_r8*PARTX
     PART(ibrch_ear)   = 0.5_r8*PARTX
-!
-!     DURING GRAIN FILLING, DETERMINATE OR INDETERMINATE
-!
-!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
-!
+    !
+    !     DURING GRAIN FILLING, DETERMINATE OR INDETERMINATE
+    !
+    !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
+    !     iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
+    !
   ELSE
     IF(iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
       PART(ibrch_grain)=1.0_r8
@@ -615,6 +615,7 @@ module PlantBranchMod
       PART(ibrch_leaf)   = PART1X
       PART(ibrch_petole) = PART2X
       PARTS              = 1.0_r8-PART(ibrch_leaf)-PART(ibrch_petole)
+
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
         PART(ibrch_stalk) = 0.125_r8*PARTS
         PART(ibrch_husk)  = 0.125_r8*PARTS
@@ -626,12 +627,11 @@ module PlantBranchMod
       ENDIF
     ENDIF
   ENDIF
-!
-!     IF AFTER GRAIN FILLING
-!
-!     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2
-!     iPlantCalendar_brch(ipltcal_EndSeedFill,=physiological maturity date
-!
+  !
+  !     IF AFTER GRAIN FILLING
+  !
+  !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2
+  !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .AND. iPlantCalendar_brch(ipltcal_EndSeedFill,NB,NZ).NE.0)THEN
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
       PART(ibrch_resrv) = 0._r8
@@ -643,12 +643,12 @@ module PlantBranchMod
       PART(ibrch_grain) = 0._r8
     ENDIF
   ENDIF
-!
-!     REDIRECT FROM STALK TO STALK RESERVES IF RESERVES BECOME LOW
-!
-!     WTRSVB,StalkLiveBiomassC_brch=stalk reserve,sapwood mass
-!     XFRX=maximum storage C content for remobiln from stalk,root reserves
-!
+  !
+  !     REDIRECT FROM STALK TO STALK RESERVES IF RESERVES BECOME LOW
+  !
+  !     WTRSVB,StalkLiveBiomassC_brch=stalk reserve,sapwood mass
+  !     XFRX=maximum storage C content for remobiln from stalk,root reserves
+  !
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
     IF(StalkRsrvElms_brch(ielmc,NB,NZ).LT.XFRX*StalkLiveBiomassC_brch(NB,NZ))THEN
       D1020: DO N=1,NumOfPlantMorphUnits
@@ -657,20 +657,20 @@ module PlantBranchMod
           PART(N)           = PART(N)-0.10_r8*PART(N)
         ENDIF
       ENDDO D1020
-!
-!     REDIRECT FROM STALK RESERVES TO STALK IF RESERVES BECOME TOO LARGE
-!
+      !
+      !     REDIRECT FROM STALK RESERVES TO STALK IF RESERVES BECOME TOO LARGE
+      !
     ELSEIF(StalkRsrvElms_brch(ielmc,NB,NZ).GT.1.0_r8*StalkLiveBiomassC_brch(NB,NZ))THEN
       PART(ibrch_stalk) = PART(ibrch_stalk)+PART(ibrch_resrv)+PART(ibrch_grain)
       PART(ibrch_resrv) = 0._r8
       PART(ibrch_grain) = 0._r8
     ENDIF
   ENDIF
-!
-!     REDIRECT FROM LEAVES TO STALK IF LAI BECOMES TOO LARGE
-!
-!     CanopyLeafArea_pft=PFT leaf area
-!
+  !
+  !     REDIRECT FROM LEAVES TO STALK IF LAI BECOMES TOO LARGE
+  !
+  !     CanopyLeafArea_pft=PFT leaf area
+  !
   ARLFI=CanopyLeafArea_pft(NZ)/AREA3(NU)
   IF(ARLFI.GT.5.0_r8)THEN
     FPARTL             = AZMAX1((10.0_r8-ARLFI)/5.0_r8)
@@ -682,18 +682,18 @@ module PlantBranchMod
   IF(NB.EQ.MainBranchNum_pft(NZ))THEN
     PTRT=PART(ibrch_leaf)+PART(ibrch_petole)
   ENDIF
-!
-!     DECIDUOUS LEAF FALL AFTER GRAIN FILL IN DETERMINATES,
-!     AFTER AUTUMNIZATION IN INDETERMINATES, OR AFTER SUSTAINED
-!     WATER STRESS
-!
-!     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-!     FracHour4LeafoffRemob=fraction of hours required for leafoff to initiate remobilization
-!     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
-!     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
-!     LRemob_brch,BegRemoblize=remobilization flags
-!     FLGZ=control rate of remobilization
-!
+  !
+  !     DECIDUOUS LEAF FALL AFTER GRAIN FILL IN DETERMINATES,
+  !     AFTER AUTUMNIZATION IN INDETERMINATES, OR AFTER SUSTAINED
+  !     WATER STRESS
+  !
+  !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
+  !     FracHour4LeafoffRemob=fraction of hours required for leafoff to initiate remobilization
+  !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
+  !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+  !     LRemob_brch,BegRemoblize=remobilization flags
+  !     FLGZ=control rate of remobilization
+  !
   IF((iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. &
      Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)) &
     .OR. (iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0))THEN

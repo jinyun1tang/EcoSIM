@@ -33,8 +33,9 @@ module InitVegBGC
   !
 
   D205: DO L=1,NumOfLeafAzimuthSectors
-    ZAZI(L)=(L-0.5)*PICON/real(NumOfLeafAzimuthSectors,r8)
+    ZAZI(L)=(L-0.5_r8)*PICON/real(NumOfLeafAzimuthSectors,r8)
   ENDDO D205
+
   !NumOfSkyAzimuthSects: number of sky azimuth sectors
   !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
   D230: DO N=1,NumOfSkyAzimuthSects
@@ -43,6 +44,7 @@ module InitVegBGC
     YSIN(N)              = SIN(YAGL)
     YCOS(N)              = COS(YAGL)
     TotSineSkyAngles_grd = TotSineSkyAngles_grd+YSIN(N)
+
     D225: DO L=1,NumOfLeafAzimuthSectors
       DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
       DO  M=1,NumOfLeafZenithSectors

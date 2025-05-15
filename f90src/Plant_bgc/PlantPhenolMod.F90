@@ -761,14 +761,14 @@ module PlantPhenolMod
       doPlantLeaveOff_brch(NB,NZ) = iEnable
     ENDIF
   ENDIF
-!
-!   CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayer_pftSHORTENINGTopRootLayer_pftPHOTOPERIODS
-!
-!   Hours4Leafout_brch,Hours4LeafOff_brch=leafout,leafoff hours
-!   Hours4ShortenPhotoPeriod_brch=hourly counter for shortening photoperiods
-!   doPlantLeafOut_brch=flag for enabling leafout:0=enable,1=disable
-!   ALAT=latitude
-!
+  !
+  !   CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayer_pftSHORTENINGTopRootLayer_pftPHOTOPERIODS
+  !
+  !   Hours4Leafout_brch,Hours4LeafOff_brch=leafout,leafoff hours
+  !   Hours4ShortenPhotoPeriod_brch=hourly counter for shortening photoperiods
+  !   doPlantLeafOut_brch=flag for enabling leafout:0=enable,1=disable
+  !   ALAT=latitude
+  !
   IF(DayLenthCurrent.LT.DayLenthPrev)THEN
     Hours4LeafOff_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)
     IF(Hours4LeafOff_brch(NB,NZ).GE.HourReq4LeafOff_brch(NB,NZ) &
