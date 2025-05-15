@@ -70,8 +70,7 @@ contains
 
   data_ptr = state%water_content%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_WC = data2D(:,:)*2.32e-7
-  a_WC_rev = data2D(:,:)
+  a_WC = data2D(:,:)
 
   data_ptr = props%volume%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -143,8 +142,8 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   p_rain = data(:)
 
-  !call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
-  !p_snow = data(:)
+  call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
+  p_snow = data(:)
 
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
@@ -173,6 +172,18 @@ contains
   heat_capacity = props%heat_capacity
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
+  p_bool = props%p_bool
+
+  if(p_bool)THEN
+    call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+    p_tot = data(:)
+  else
+    call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+    p_rain = data(:)
+
+    call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
+    p_snow = data(:)
+  endif
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   surf_w_source = data(:)

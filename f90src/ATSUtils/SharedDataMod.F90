@@ -52,8 +52,9 @@ Module SharedDataMod
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
-  real(r8), allocatable :: p_rain(:)      !precipitation, mm H2O/hr
-  real(r8), allocatable :: p_snow(:)      !precipitation snow, mm H2O/hr 
+  real(r8), allocatable :: p_rain(:)      !precipitation, m H2O/s
+  real(r8), allocatable :: p_snow(:)      !precipitation snow, m (SWE) /s 
+  real(r8), allocatable :: p_total(:)     !total precipitation m H20/s
   real(r8), allocatable :: sunrad(:)      !solar radiation,
   real(r8), allocatable :: swrad(:)       !shortwave radiation,
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit

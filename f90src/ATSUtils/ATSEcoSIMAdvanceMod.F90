@@ -45,6 +45,7 @@ implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
   integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test 
+  real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
@@ -104,8 +105,6 @@ implicit none
     EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-
-    RainH(NY,NX) = p_rain(NY)*3600.0  !(convert m/s into m/hr
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU(NY,NX),NL(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
@@ -114,7 +113,7 @@ implicit none
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
-      VLWatMicP1_vr(L,NY,NX)       = a_WC_rev(L,NY)/a_LDENS(L,NY)
+      VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)/a_LDENS(L,NY)
       !VLWatMicP1_vr(L,NY,NX)      = a_WC(L,NY)
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
@@ -138,22 +137,31 @@ implicit none
         AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF    
     ENDDO
-    IF(TCA_col(NY,NX).GT.TSNOW)THEN
-      PrecAsRain(NY,NX)=RAINH(NY,NX)
-      PrecAsSnow(NY,NX)=0.0_r8
-    ELSE
-      PrecAsRain(NY,NX)=0.0_r8
-      PrecAsSnow(NY,NX)=RAINH(NY,NX)
-    ENDIF
+
+    !Setting the snow, if passed as total precipitation do full temp calc, else
+    !Just set snow and rain to their given values
+    !RainH(NY,NX) = p_rain(NY)*3600.0  !convert m/s into m/hr
+    !SnowH(NY,NX) = p_snow(NY)*3600.0  !convert to m SWE /s into m SWE /hr
+    if(p_bool)then
+      IF(TCA_col(NY,NX).GT.TSNOW)THEN
+        PrecAsRain(NY,NX)=p_total(NY)*3600.0 !convert from m/s to m/hr
+        PrecAsSnow(NY,NX)=0.0_r8
+      ELSE
+        PrecAsRain(NY,NX)=0.0_r8
+        PrecAsSnow(NY,NX)=p_total(NY)*3600.0*10.0 !convert to m SWE/s to m/hr
+      ENDIF
+    else
+      PrecAsRain(NY,NX)=p_rain(NY)*3600.0      !convert from m/s to m/hr
+      PrecAsSnow(NY,NX)=p_snow(NY)*3600.0*10.0 !convert from m SWE/s to m/hr 
+    endif
     RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
+  write(*,*) "(ATSEcoSIMAdvance) PrecAsRain: ", PrecAsRain(1,1), "m/s, PrecAsSnow: " , PrecAsSnow(1,1), " m/s" 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
-
-  write(*,*) "(ATSEcoSIMAdvance) RAINH  = ", RAINH(1,1), " m/hr,  AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -184,8 +192,6 @@ implicit none
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
- 
-  write(*,*) "(ATSEcoSIMAdvance after surf bal) Q_w = ", Qinfl2MicPM(NY,NX), " m/hr"  
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
@@ -195,8 +201,11 @@ implicit none
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP*3600._r8)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
-
-  write(*,*) "(ATSEcoSIMAdvance post conv) Q_w ", surf_w_source(1), " snow_depth = " , surf_snow_depth(1), " m" 
+ 
+  !Compute potential water loss(or gain) before next EcoSIM run
+  Wat_next = VLWatMicP1_vr(1,1,1) - Qinfl2MicP(NY,1) / (dts_HeatWatTP)
+  write(*,*) "(End EcoSIM Advance) Total Water Volume in top layer: " VLWatMicP1_vr(1,1,1) " m, Q_w: " surf_w_source
+  write(*,*) "After an hour of this flux the water content should be: ", Wat_next
 
   end subroutine RunEcoSIMSurfaceBalance
 
