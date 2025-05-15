@@ -1,6 +1,5 @@
 set(ECOSIM_MOD_SOURCES
     InitAllocMod.F90
-	ExecMod.F90
 	StarteMod.F90
 	StartsMod.F90
 	VisualMod.F90

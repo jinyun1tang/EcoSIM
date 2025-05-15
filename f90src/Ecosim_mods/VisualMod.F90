@@ -133,7 +133,7 @@ module VisualMod
         TTSH=TTSH+Eco_Heat_Sens_col(NY,NX)
         TEco_Heat_GrndSurf_col=TEco_Heat_GrndSurf_col+Eco_Heat_GrndSurf_col(NY,NX)
         TTCO=TTCO+Eco_NEE_col(NY,NX)
-        TTCH=TTCH+SurfGasEmisFlx_col(idg_CH4,NY,NX)
+        TTCH=TTCH+SurfGasEmiss_flx_col(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
             SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP_vr(8,NY,NX) &
@@ -214,8 +214,8 @@ module VisualMod
           OUT(9)=-1.E-3_r8*Eco_AutoR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(10)=-1.E-3_r8*Eco_HR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(11)=1.E-3_r8*Eco_NBP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(12)=-1.E-3_r8*SurfGasEmisFlx_col(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(13)=-1.E-3_r8*SurfGasEmisFlx_col(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(12)=-1.E-3_r8*SurfGasEmiss_flx_col(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(13)=-1.E-3_r8*SurfGasEmiss_flx_col(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           OUT(15)=-Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
@@ -276,7 +276,7 @@ module VisualMod
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
       ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((SurfGasEmisFlx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((SurfGasEmiss_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN

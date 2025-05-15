@@ -105,6 +105,7 @@ implicit none
   real(r8) :: trcg(idg_beg:idg_NH3)
   associate(                                                       &
     NU                       => plt_site%NU,                       &  
+    NK                       => plt_site%NK,                       &      
     trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
@@ -115,8 +116,9 @@ implicit none
 
   trcg(:)=0._r8
   DO NZ=1,plt_site%NP  
-    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle    
-    DO L=NU,MaxSoiL4Root_pft(NZ)
+!    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle    
+
+    DO L=1,MaxSoiL4Root_pft(NZ)
       DO N=1,MY(NZ)  
         DO idg=idg_beg,idg_NH3
           trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
@@ -126,9 +128,9 @@ implicit none
         trcg(idg)=trcg(idg)+trcg_root_vr(idg,L)
       ENDDO
     ENDDO
-!    if(I==140 .and. J<=2)write(116,*)I*1000+J,MaxSoiL4Root_pft(NZ),trcg(idg_CH4)
+
   ENDDO
-!  if(I==140 .and. J>=20)write(116,*)trcg(idg_N2),'N2'
+
   end associate
   end subroutine SumPlantRootGas
 !------------------------------------------------------------------------------------------
@@ -316,7 +318,7 @@ implicit none
     LitrfalStrutElms_pvr  => plt_bgcr%LitrfalStrutElms_pvr   &
   )  
   
-  plt_rbgc%trcs_plant_uptake_vr=0._r8
+  plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP0
     D1: DO L=0,MaxNumRootLays

@@ -630,7 +630,7 @@ implicit none
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
-  call writefixsl(nu_plt,'Plant name: ',pft_lname,40)
+  call writefixsl(nu_plt,'Plant name ',pft_lname,40)
   strval=koppen_clims//','//koppen_climl
   call writefixsl(nu_plt,'Koppen climate info',strval,40)
 
@@ -815,7 +815,7 @@ implicit none
     call writefixl(nu_plt,'fraction of leaf protein in mesophyll chlorophyll(C4) (g Chl /(g protein)) CHL4',&
       LeafC4ChlorofilConc_pft(NZ,NY,NX),90)
   endif
-  call writefixl(nu_plt,'intercellular:atmospheric CO2 concentration ratio FCO2',CanPCi2CaRatio(NZ,NY,NX),90)
+  call writefixl(nu_plt,'intercellular-to-atmospheric CO2 concentration ratio FCO2',CanPCi2CaRatio(NZ,NY,NX),90)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------

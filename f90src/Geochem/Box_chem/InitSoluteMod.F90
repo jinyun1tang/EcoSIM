@@ -112,25 +112,25 @@ module InitSoluteMod
   real(r8), pointer :: XAl_conc
   real(r8), pointer :: XFe_conc
   real(r8), pointer :: XCa_conc
-  real(r8), pointer :: Precp_Ca5P3O12O3H3_conc
+  real(r8), pointer :: Precp_Ca5P3O12O3H3_mole_conc
   real(r8), pointer :: XMg_conc
   real(r8), pointer :: XNa_conc
   real(r8), pointer :: XK_conc
   real(r8), pointer :: XHC1
   real(r8), pointer :: XAlO2H2_conc
   real(r8), pointer :: XFeO2H2_conc
-  real(r8), pointer :: XOH_conc
-  real(r8), pointer :: XROH1_conc
-  real(r8), pointer :: XROH2_conc
-  real(r8), pointer :: XHPO4_conc
-  real(r8), pointer :: XH2PO4_conc
+  real(r8), pointer :: XOH_mole_conc
+  real(r8), pointer :: XROH1_mole_conc
+  real(r8), pointer :: XROH2_mole_conc
+  real(r8), pointer :: XHPO4_mole_conc
+  real(r8), pointer :: XH2PO4_mole_conc
   real(r8), pointer :: Precp_AlO3H3_conc
   real(r8), pointer :: Precp_FeO3H3_conc
   real(r8), pointer :: Precp_CaCO3_conc
   real(r8), pointer :: Precp_CaSO4_conc
-  real(r8), pointer :: Precp_AlPO4_conc
-  real(r8), pointer :: Precp_FePO4_conc
-  real(r8), pointer :: Precp_CaHPO4_conc
+  real(r8), pointer :: Precp_AlPO4_mole_conc
+  real(r8), pointer :: Precp_FePO4_mole_conc
+  real(r8), pointer :: Precp_CaHPO4_mole_conc
   real(r8), pointer :: FH2O
   real(r8), pointer :: ATCA
   real(r8), pointer :: XAEC
@@ -310,25 +310,25 @@ module InitSoluteMod
   XAl_conc                   => solutevar%XAl_conc
   XFe_conc                   => solutevar%XFe_conc
   XCa_conc                   => solutevar%XCa_conc
-  Precp_Ca5P3O12O3H3_conc    => solutevar%Precp_Ca5P3O12O3H3_conc
+  Precp_Ca5P3O12O3H3_mole_conc    => solutevar%Precp_Ca5P3O12O3H3_mole_conc
   XMg_conc                   => solutevar%XMg_conc
   XNa_conc                   => solutevar%XNa_conc
   XK_conc                    => solutevar%XK_conc
   XHC1                       => solutevar%XHC1
   XAlO2H2_conc               => solutevar%XAlO2H2_conc
   XFeO2H2_conc               => solutevar%XFeO2H2_conc
-  XOH_conc                   => solutevar%XOH_conc
-  XROH1_conc                 => solutevar%XROH1_conc
-  XROH2_conc                 => solutevar%XROH2_conc
-  XHPO4_conc                 => solutevar%XHPO4_conc
-  XH2PO4_conc                => solutevar%XH2PO4_conc
+  XOH_mole_conc                   => solutevar%XOH_mole_conc
+  XROH1_mole_conc                 => solutevar%XROH1_mole_conc
+  XROH2_mole_conc                 => solutevar%XROH2_mole_conc
+  XHPO4_mole_conc                 => solutevar%XHPO4_mole_conc
+  XH2PO4_mole_conc                => solutevar%XH2PO4_mole_conc
   Precp_AlO3H3_conc          => solutevar%Precp_AlO3H3_conc
   Precp_FeO3H3_conc          => solutevar%Precp_FeO3H3_conc
   Precp_CaCO3_conc           => solutevar%Precp_CaCO3_conc
   Precp_CaSO4_conc           => solutevar%Precp_CaSO4_conc
-  Precp_AlPO4_conc           => solutevar%Precp_AlPO4_conc
-  Precp_FePO4_conc           => solutevar%Precp_FePO4_conc
-  Precp_CaHPO4_conc          => solutevar%Precp_CaHPO4_conc
+  Precp_AlPO4_mole_conc           => solutevar%Precp_AlPO4_mole_conc
+  Precp_FePO4_mole_conc           => solutevar%Precp_FePO4_mole_conc
+  Precp_CaHPO4_mole_conc          => solutevar%Precp_CaHPO4_mole_conc
   FH2O                       => solutevar%FH2O
   ATCA                       => solutevar%ATCA
   XAEC                       => solutevar%XAEC
@@ -525,11 +525,11 @@ module InitSoluteMod
       *FHPA**2-2.0*XOH*FXH1**2*XHP*FHPA**2+FXH1**2*XHP**2*FHPA**2 &
       +2.0*XOH*FXH1*FHPA*SXH2P*FXP2*OH_1e_aqua_mole_conc+2.0*FXH1*XHP*FHPA*SXH2P &
       *FXP2*OH_1e_aqua_mole_conc+SXH2P**2*FXP2**2*OH_1e_aqua_mole_conc**2)/(FXH1*FHPA))/2.0_r8
-    XROH2_conc=(XOH-XPT)*FXH2
-    XROH1_conc=(XOH-XPT)*FXH1
-    XOH_conc=(XOH-XPT)*FXH0
-    XHPO4_conc=XPT*FXP1
-    XH2PO4_conc=XPT*FXP2
+    XROH2_mole_conc=(XOH-XPT)*FXH2
+    XROH1_mole_conc=(XOH-XPT)*FXH1
+    XOH_mole_conc=(XOH-XPT)*FXH0
+    XHPO4_mole_conc=XPT*FXP1
+    XH2PO4_mole_conc=XPT*FXP2
     H3PO4_conc=(XHP-XPT)*FHP3
     H2PO4_1e_aqua_mole_conc=(XHP-XPT)*FHP2
     H1PO4_2e_aqua_mole_conc=(XHP-XPT)*FHP1
@@ -573,10 +573,10 @@ module InitSoluteMod
     Precp_FeO3H3_conc=CFEOHX
     Precp_CaCO3_conc=CCACOX
     Precp_CaSO4_conc=CCASOX
-    Precp_AlPO4_conc=CALPOX*VLPO4
-    Precp_FePO4_conc=CFEPOX*VLPO4
-    Precp_CaHPO4_conc=CCAPDX*VLPO4
-    Precp_Ca5P3O12O3H3_conc=CCAPHX*VLPO4
+    Precp_AlPO4_mole_conc=CALPOX*VLPO4
+    Precp_FePO4_mole_conc=CFEPOX*VLPO4
+    Precp_CaHPO4_mole_conc=CCAPDX*VLPO4
+    Precp_Ca5P3O12O3H3_mole_conc=CCAPHX*VLPO4
     CEC_conc=AMAX1(ZERO,XCEC/BulkSoilMass)
     CALX=Al_3p_aqua_mole_conc**0.333_r8
     CFEX=Fe_3p_aqua_mole_conc**0.333_r8
@@ -1036,7 +1036,7 @@ module InitSoluteMod
     SPX=SP*R1**NR1/P3**NP3
     S0=P1+P2
     S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
-    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_conc,TPD*(S0-SQRT(S1)))
+    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPD*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
@@ -1143,7 +1143,7 @@ module InitSoluteMod
     SPX=SP*R1**NR1/P3**NP3
     S0=P1+P2
     S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_conc,TPD*(S0-SQRT(S1)))
+    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPD*(S0-SQRT(S1)))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
@@ -1192,7 +1192,7 @@ module InitSoluteMod
     SPX=SP*R1**NR1
     S0=P1+P2
     S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_conc,TPD*(S0-SQRT(S1)))
+    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPD*(S0-SQRT(S1)))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
     ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
@@ -1219,7 +1219,7 @@ module InitSoluteMod
     P1=AMAX1(ZERO,P1)
     P2=AMAX1(ZERO,P2)
     SPX=(SP*R1**NR1/P1**5_r8)**0.333_r8
-    H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(P2-SPX))
+    H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_mole_conc,TPD*(P2-SPX))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RHCAH1=H2PO4_1e_apatite_dissol_flx
     ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
@@ -1229,10 +1229,10 @@ module InitSoluteMod
     Precp_FeO3H3_conc=Precp_FeO3H3_conc+RPFEOX
     Precp_CaCO3_conc=Precp_CaCO3_conc+RPCACX
     Precp_CaSO4_conc=Precp_CaSO4_conc+RPCASO
-    Precp_AlPO4_conc=Precp_AlPO4_conc+H2PO4_1e_AlPO4_dissol_flx
-    Precp_FePO4_conc=Precp_FePO4_conc+H2PO4_1e_FePO4_dissol_flx
-    Precp_CaHPO4_conc=Precp_CaHPO4_conc+H2PO4_1e_CaHPO4_dissol_flx
-    Precp_Ca5P3O12O3H3_conc=Precp_Ca5P3O12O3H3_conc+H2PO4_1e_apatite_dissol_flx
+    Precp_AlPO4_mole_conc=Precp_AlPO4_mole_conc+H2PO4_1e_AlPO4_dissol_flx
+    Precp_FePO4_mole_conc=Precp_FePO4_mole_conc+H2PO4_1e_FePO4_dissol_flx
+    Precp_CaHPO4_mole_conc=Precp_CaHPO4_mole_conc+H2PO4_1e_CaHPO4_dissol_flx
+    Precp_Ca5P3O12O3H3_mole_conc=Precp_Ca5P3O12O3H3_mole_conc+H2PO4_1e_apatite_dissol_flx
 !
 !     ANION EXCHANGE EQILIBRIA
 !
@@ -1242,22 +1242,22 @@ module InitSoluteMod
       VLWatMicPBK=1.0_r8
     ENDIF
     IF(XAEC.GT.ZEROS)THEN
-      RXOH2=TAD*(XROH1_conc*H_1p_activity-SXOH2*XROH2_conc)/(XROH1_conc+SPOH2)*VLWatMicPBK
-      RXOH1=TAD*(XOH_conc*H_1p_activity-SXOH1*XROH1_conc)/(XOH_conc+SPOH1)*VLWatMicPBK
+      RXOH2=TAD*(XROH1_mole_conc*H_1p_activity-SXOH2*XROH2_mole_conc)/(XROH1_mole_conc+SPOH2)*VLWatMicPBK
+      RXOH1=TAD*(XOH_mole_conc*H_1p_activity-SXOH1*XROH1_mole_conc)/(XOH_mole_conc+SPOH1)*VLWatMicPBK
       SPH2P=SXH2P*DPH2O
-      H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_conc*H2PO4_1e_activity-SPH2P*XH2PO4_conc)/(XROH2_conc+SPH2P)*VLWatMicPBK
-      H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_conc*H2PO4_1e_activity-SXH2P*XH2PO4_conc*OH_1e_activity) &
-        /(XROH1_conc+SXH2P*OH_1e_activity)*VLWatMicPBK
+      H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_mole_conc*H2PO4_1e_activity-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
+      H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_mole_conc*H2PO4_1e_activity-SXH2P*XH2PO4_mole_conc*OH_1e_activity) &
+        /(XROH1_mole_conc+SXH2P*OH_1e_activity)*VLWatMicPBK
 !
 !     HPO4 EXCHANGE
 !
       SPH1P=SXH1P*DPH2O/DPH2P
-      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_conc*H2PO4_1e_activity-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
-      XOH_conc=XOH_conc-RXOH1
-      XROH1_conc=XROH1_conc+RXOH1-RXOH2-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx
-      XROH2_conc=XROH2_conc+RXOH2-H2PO4_1e_to_XH2PO4_ROH2_flx
-      XHPO4_conc=XHPO4_conc+H1PO4_to_XHPO4_ROH_flx
-      XH2PO4_conc=XH2PO4_conc+H2PO4_1e_to_XH2PO4_ROH2_flx+H2PO4_to_XH2PO4_ROH_flx
+      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_mole_conc*H2PO4_1e_activity-SPH1P*XHPO4_mole_conc)/(XROH1_mole_conc+SPH1P)*VLWatMicPBK
+      XOH_mole_conc=XOH_mole_conc-RXOH1
+      XROH1_mole_conc=XROH1_mole_conc+RXOH1-RXOH2-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx
+      XROH2_mole_conc=XROH2_mole_conc+RXOH2-H2PO4_1e_to_XH2PO4_ROH2_flx
+      XHPO4_mole_conc=XHPO4_mole_conc+H1PO4_to_XHPO4_ROH_flx
+      XH2PO4_mole_conc=XH2PO4_mole_conc+H2PO4_1e_to_XH2PO4_ROH2_flx+H2PO4_to_XH2PO4_ROH_flx
     ELSE
       RXOH2=0._r8
       RXOH1=0._r8
@@ -1579,21 +1579,21 @@ module InitSoluteMod
 !  IF(K.EQ.micpar%k_POM.AND.(M/1)*1.EQ.M)THEN
 !     WRITE(*,1112)'A1I',I,NX,NY,L,K,M,A1,A2,A3,FSTR2,CSTR1
 !    2,CSTR2,cation_3p_aqua_mole_conc,anion_3e_conc,cation_2p_aqua_mole_conc,anion_2e_aqua_mole_conc,cation_1p_aqua_mole_conc,CA1,VLWatMicP
-!     WRITE(*,1112)'ALPO4I',I,NX,NY,L,K,M,Precp_AlPO4_conc,Al_3p_activity
+!     WRITE(*,1112)'ALPO4I',I,NX,NY,L,K,M,Precp_AlPO4_mole_conc,Al_3p_activity
 !    2,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity
 !    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_AlPO4_dissol_flx,RHA0P1,RHA1P1,RHA2P1,RHA3P1
 !    3,RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,SP,SPX,Al_3p_activity*H0PO4_3e_activity
 !    4,SPALP,H0PO4_3e_conc,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,H3PO4_conc,RHP0,RHP1,RHP2,RHP3
 !    5,RAL,RHAL1,RHA0P1,RHA0P2,RALO1,RALS,RXAL
-!     WRITE(*,1112)'FEPO4I',I,NX,NY,L,K,M,Precp_FePO4_conc,Fe_3p_activity
+!     WRITE(*,1112)'FEPO4I',I,NX,NY,L,K,M,Precp_FePO4_mole_conc,Fe_3p_activity
 !    2,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity
 !    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_FePO4_dissol_flx,RHF0P1,RHF1P1,RHF2P1,RHF3P1
 !    3,RHF4P1,RHF0P2,RHF1P2,RHF2P2,RHF3P2,RHF4P2,SP,SPX,Fe_3p_activity*H0PO4_3e_activity
 !    4,SPFEP
-!     WRITE(*,1112)'APATITEI',I,NX,NY,L,K,M,Precp_Ca5P3O12O3H3_conc,Ca_2p_activity,XCa_conc
+!     WRITE(*,1112)'APATITEI',I,NX,NY,L,K,M,Precp_Ca5P3O12O3H3_mole_conc,Ca_2p_activity,XCa_conc
 !    2,H0PO4_3e_activity,H1PO4_2e_activity,H2PO4_1e_activity,H_1p_activity,OH_1e_activity,H2PO4_1e_apatite_dissol_flx,RHCAH1,RHCAH2
 !    3,SP,SPX,Ca_2p_activity**5*H0PO4_3e_activity**3*OH_1e_activity,SPCAH,SHCAH1,SHCAH2
-!    3,H0PO4_3e_conc,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,XOH_conc,XROH1_conc,XROH2_conc,XHPO4_conc,XH2PO4_conc
+!    3,H0PO4_3e_conc,H1PO4_2e_aqua_mole_conc,H2PO4_1e_aqua_mole_conc,XOH_mole_conc,XROH1_mole_conc,XROH2_mole_conc,XHPO4_mole_conc,XH2PO4_mole_conc
 !    4,RHA0P1,RHA1P1,RHA2P1,RHA3P1
 !    2,RHA4P1,RHF0P1,RHF1P1,RHF2P1
 !    3,RHF3P1,RHF4P1,RPCAD1,3.0*RHCAH1
@@ -1638,17 +1638,17 @@ module InitSoluteMod
 !
   IF(K.EQ.micpar%k_POM)THEN
     H2PO4_1e_AlPO4_eqv=SYA0P2/(Al_3p_aqua_mole_conc*OH_1e_aqua_mole_conc**2)
-    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_AlPO4_eqv))
+    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_AlPO4_eqv))
     H2PO4_1e_FePO4_eqv=SYF0P2/(Fe_3p_aqua_mole_conc*OH_1e_aqua_mole_conc**2._r8)
-    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_FePO4_eqv))
+    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_FePO4_eqv))
     H2PO4_1e_CaHPO4_eqv=SYCAD2/(Ca_2p_aqua_mole_conc*OH_1e_aqua_mole_conc)
-    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_CaHPO4_eqv))
+    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_CaHPO4_eqv))
     H2PO4_1e_apatite_eqv=(SYCAH2/(Ca_2p_aqua_mole_conc**5*OH_1e_aqua_mole_conc**7))**0.333
-    H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_apatite_eqv))
-    Precp_AlPO4_conc=Precp_AlPO4_conc+H2PO4_1e_AlPO4_dissol_flx
-    Precp_FePO4_conc=Precp_FePO4_conc+H2PO4_1e_FePO4_dissol_flx
-    Precp_CaHPO4_conc=Precp_CaHPO4_conc+H2PO4_1e_CaHPO4_dissol_flx
-    Precp_Ca5P3O12O3H3_conc=Precp_Ca5P3O12O3H3_conc+H2PO4_1e_apatite_dissol_flx
+    H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_mole_conc,TPD*(H2PO4_1e_aqua_mole_conc-H2PO4_1e_apatite_eqv))
+    Precp_AlPO4_mole_conc=Precp_AlPO4_mole_conc+H2PO4_1e_AlPO4_dissol_flx
+    Precp_FePO4_mole_conc=Precp_FePO4_mole_conc+H2PO4_1e_FePO4_dissol_flx
+    Precp_CaHPO4_mole_conc=Precp_CaHPO4_mole_conc+H2PO4_1e_CaHPO4_dissol_flx
+    Precp_Ca5P3O12O3H3_mole_conc=Precp_Ca5P3O12O3H3_mole_conc+H2PO4_1e_apatite_dissol_flx
 !
 !     ANION EXCHANGE FLUXES
 !
@@ -1659,15 +1659,15 @@ module InitSoluteMod
     ENDIF
     IF(XAEC.GT.ZEROS)THEN
       SPH2P=SXH2P*DPH2O
-      H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_conc*H2PO4_1e_aqua_mole_conc-SPH2P*XH2PO4_conc)/(XROH2_conc+SPH2P)*VLWatMicPBK
-      H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_conc*H2PO4_1e_aqua_mole_conc-SXH2P*OH_1e_aqua_mole_conc*XH2PO4_conc) &
-        /(XROH1_conc+SXH2P*OH_1e_aqua_mole_conc)*VLWatMicPBK
+      H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_mole_conc*H2PO4_1e_aqua_mole_conc-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
+      H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_mole_conc*H2PO4_1e_aqua_mole_conc-SXH2P*OH_1e_aqua_mole_conc*XH2PO4_mole_conc) &
+        /(XROH1_mole_conc+SXH2P*OH_1e_aqua_mole_conc)*VLWatMicPBK
       SPH1P=SXH1P*DPH2O/DPH2P
-      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_conc*H1PO4_2e_aqua_mole_conc-SPH1P*XHPO4_conc)/(XROH1_conc+SPH1P)*VLWatMicPBK
-      XROH1_conc=XROH1_conc-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx
-      XROH2_conc=XROH2_conc-H2PO4_1e_to_XH2PO4_ROH2_flx
-      XHPO4_conc=XHPO4_conc+H1PO4_to_XHPO4_ROH_flx
-      XH2PO4_conc=XH2PO4_conc+H2PO4_1e_to_XH2PO4_ROH2_flx+H2PO4_to_XH2PO4_ROH_flx
+      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_mole_conc*H1PO4_2e_aqua_mole_conc-SPH1P*XHPO4_mole_conc)/(XROH1_mole_conc+SPH1P)*VLWatMicPBK
+      XROH1_mole_conc=XROH1_mole_conc-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx
+      XROH2_mole_conc=XROH2_mole_conc-H2PO4_1e_to_XH2PO4_ROH2_flx
+      XHPO4_mole_conc=XHPO4_mole_conc+H1PO4_to_XHPO4_ROH_flx
+      XH2PO4_mole_conc=XH2PO4_mole_conc+H2PO4_1e_to_XH2PO4_ROH2_flx+H2PO4_to_XH2PO4_ROH_flx
     ELSE
       H2PO4_1e_to_XH2PO4_ROH2_flx=0._r8
       H2PO4_to_XH2PO4_ROH_flx=0._r8

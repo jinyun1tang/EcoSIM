@@ -1,5 +1,6 @@
 set(PLANT_BGC_SOURCES
   PlantMathFuncMod.F90
+  PlantDebugMod.F90  
   PlantDisturbByFireMod.F90
   PlantDisturbByTillageMod.F90 
   PlantDisturbByGrazingMod.F90
@@ -20,7 +21,7 @@ set(PLANT_BGC_SOURCES
 	ExtractsMod.F90
 	GrosubsMod.F90
 	StomatesMod.F90
-  CanopyCondsMod.F90
+  SurfaceRadiationMod.F90
   UptakePars.F90
   InitPlantMod.F90
   PlantPhenolMod.F90

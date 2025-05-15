@@ -73,6 +73,10 @@ implicit none
       !
   call PrintInfo('beg '//subname)
 
+  QSnowH2Oloss_col(NY,NX) = QSnowH2Oloss_col(NY,NX)-TDrysnoByRedist_col(NY,NX)  &
+    -TIceSnoByRedist_col(NY,NX)*DENSICE-TWatSnoByRedist_col(NY,NX)
+  QSnowHeatLoss_col(NY,NX)= QSnowHeatLoss_col(NY,NX)-THeatSnoByRedist_col(NY,NX)
+
   !update snow layer from top to bottom  
   VOLSWI     = 0.0_r8
   TKSnow_pre = TKSnow_snvr(1,NY,NX)
@@ -101,7 +105,7 @@ implicit none
 
     call UpdateSnowLayerL(I,J,L,NY,NX,VOLSWI)
 
-    call SoluteTransportThruSnow(I,J,L,NY,NX)
+!    call SoluteTransportThruSnow(I,J,L,NY,NX)
     
   ENDDO D9780
 
@@ -111,6 +115,7 @@ implicit none
   VcumSnoDWI_col(NY,NX)   = sum(VLSnoDWIprev_snvr(1:JS,NY,NX))
   SnowDepth_col(NY,NX)    = sum(SnowThickL_snvr(1:JS,NY,NX))
   VcumSnowWE_col(NY,NX)   = VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX)
+
 !
 ! IF SNOWPACK DISAPPEARS
 
@@ -190,9 +195,9 @@ implicit none
       SnoDens_snvr(L,NY,NX)=NewSnowDens_col(NY,NX)
       if(L/=1)TKSnow_snvr(L,NY,NX)=spval
     ENDDO D9770
-
+    
     IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN    
-      write(*,*)I*1000+J,'SnowpackDisapper1'
+      write(110,*)I*1000+J,'SnowpackDisapper1',FLWW+FLWI*DENSICE+FLWS
       ENGY                      = TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
       VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+FLWW
       VLiceMicP_vr(0,NY,NX)     = VLiceMicP_vr(0,NY,NX)+FLWI+FLWS/DENSICE
@@ -200,6 +205,7 @@ implicit none
       IF(abs(HeatFlo2Surface)>ZEROS(NY,NX))THEN
         TKS_vr(0,NY,NX)           = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(0,NY,NX)
       ENDIF
+      
       WatFLo2LitR_col(NY,NX)    = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     else
       if(test_exist)then
@@ -436,24 +442,24 @@ implicit none
       call endrun(trim(mod_filename)//' at line',__LINE__)
     endif
   ENDIF
-!
-! SNOWPACK COMPRESSION
-!
-! DDENS1 = Temperature effect on snow density
-! DDENS2 = Compression effect on snow density
-! DENSS  = Snow density in layer
-! VOLSSL,VOLWSL,VOLISL=snow water equivalent,water,ice volume in snowpack layer
-! VLSnoDWIprev_snvr=snowpack layer volume
-! DLYRS=snowpack layer depth
-! cumSnowDepz_col=cumulative depth to bottom of snowpack layer
-! VHCPW=snowpack layer heat capacity
-! TKW,TCSnow=snowpack layer temperature K,oC
-! CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
-! XPhaseChangeHeatL=latent heat flux from freeze-thaw from watsub.f
-! HEATIN_lnd=cumulative net surface heat transfer
-! VOLSS,VOLWS,VOLIS=total snow water equivalent, water, ice content of snowpack
-! VOLS,SnowDepth=total snowpack volume, depth
-!
+  !
+  ! SNOWPACK COMPRESSION
+  !
+  ! DDENS1 = Temperature effect on snow density
+  ! DDENS2 = Compression effect on snow density
+  ! DENSS  = Snow density in layer
+  ! VOLSSL,VOLWSL,VOLISL=snow water equivalent,water,ice volume in snowpack layer
+  ! VLSnoDWIprev_snvr=snowpack layer volume
+  ! DLYRS=snowpack layer depth
+  ! cumSnowDepz_col=cumulative depth to bottom of snowpack layer
+  ! VHCPW=snowpack layer heat capacity
+  ! TKW,TCSnow=snowpack layer temperature K,oC
+  ! CumHeat2SnowLay=convective heat fluxes of snow,water,ice in snowpack
+  ! XPhaseChangeHeatL=latent heat flux from freeze-thaw from watsub.f
+  ! HEATIN_lnd=cumulative net surface heat transfer
+  ! VOLSS,VOLWS,VOLIS=total snow water equivalent, water, ice content of snowpack
+  ! VOLS,SnowDepth=total snowpack volume, depth
+  !
   if(TKSnow_snvr(L,NY,NX)<0.)call endrun('too low snow temp '//trim(mod_filename)//' at line',__LINE__)   
 
   if(SnoDens_snvr(L,NY,NX)>0._r8)then
@@ -805,11 +811,6 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX
   integer :: L
-
-  TDrysnoBySnowRedist(NY,NX)   = 0.0_r8
-  TWatBySnowRedist(NY,NX)      = 0.0_r8
-  TIceBySnowRedist(NY,NX)      = 0.0_r8
-  THeatBySnowRedist_col(NY,NX) = 0.0_r8
 
   trcg_LossXSnowRedist_col(idg_beg:idg_NH3,NY,NX)          = 0.0_r8
   trcn_LossXSnowRedist_col(ids_nut_beg:ids_nuts_end,NY,NX) = 0.0_r8

@@ -73,6 +73,7 @@ implicit none
   !
   !Description:
   !Relayer the soil profiles
+  !litter layer maybe mixed into the soil layers
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: NY,NX
@@ -1021,7 +1022,7 @@ implicit none
         ENDDO
       ENDDO
       DO idom=idom_beg,idom_end
-        DOM_vr(idom,K,L1,NY,NX)      = DOM_vr(idom,K,L1,NY,NX)+FX*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MicP_vr(idom,K,L1,NY,NX)      = DOM_MicP_vr(idom,K,L1,NY,NX)+FX*DOM_MicP_vr(idom,K,L0,NY,NX)
         DOM_MacP_vr(idom,K,L1,NY,NX) = DOM_MacP_vr(idom,K,L1,NY,NX)+FX*DOM_MacP_vr(idom,K,L0,NY,NX)
         SorbedOM_vr(idom,K,L1,NY,NX) = SorbedOM_vr(idom,K,L1,NY,NX)+FX*SorbedOM_vr(idom,K,L0,NY,NX)
       enddo
@@ -1200,7 +1201,7 @@ implicit none
         ENDDO
       ENDDO
       do idom=idom_beg,idom_end
-        DOM_vr(idom,K,L0,NY,NX)      = FY*DOM_vr(idom,K,L0,NY,NX)
+        DOM_MicP_vr(idom,K,L0,NY,NX)      = FY*DOM_MicP_vr(idom,K,L0,NY,NX)
         DOM_MacP_vr(idom,K,L0,NY,NX) = FY*DOM_MacP_vr(idom,K,L0,NY,NX)
         SorbedOM_vr(idom,K,L0,NY,NX) = FY*SorbedOM_vr(idom,K,L0,NY,NX)
       enddo
@@ -1259,7 +1260,7 @@ implicit none
     ENDDO
   ENDIF
 
-  IF(NN.EQ.iOutflow)THEN
+  IF(NN.EQ.iFront)THEN
     IF(SoilBulkDensity_vr(L0,NY,NX).LE.ZERO .AND. SoilBulkDensity_vr(L1,NY,NX).LE.ZERO &
       .AND. VLWatMicP_vr(L0,NY,NX)+VLiceMicP_vr(L0,NY,NX).LE.ZEROS(NY,NX))THEN
       CumDepz2LayBottom_vr(L1,NY,NX) = CumDepz2LayBottom_vr(L0,NY,NX)
@@ -1339,9 +1340,9 @@ implicit none
       ENDDO
 
       DO idom=idom_beg,idom_end
-        FXOQC                   = FXO*DOM_vr(idom,K,L0,NY,NX)
-        DOM_vr(idom,K,L1,NY,NX) = DOM_vr(idom,K,L1,NY,NX)+FXOQC
-        DOM_vr(idom,K,L0,NY,NX) = DOM_vr(idom,K,L0,NY,NX)-FXOQC
+        FXOQC                   = FXO*DOM_MicP_vr(idom,K,L0,NY,NX)
+        DOM_MicP_vr(idom,K,L1,NY,NX) = DOM_MicP_vr(idom,K,L1,NY,NX)+FXOQC
+        DOM_MicP_vr(idom,K,L0,NY,NX) = DOM_MicP_vr(idom,K,L0,NY,NX)-FXOQC
       enddo
 
       IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN

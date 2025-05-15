@@ -306,14 +306,14 @@ module InitSOMBGCMOD
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
 !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
 !
-    DOM_vr(idom_doc,K,L,NY,NX)               = X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
-    DOM_vr(idom_don,K,L,NY,NX)               = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    DOM_vr(idom_dop,K,L,NY,NX)               = AZMAX1(DOM_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    DOM_vr(idom_acetate,K,L,NY,NX)           = 0.0_r8
+    DOM_MicP_vr(idom_doc,K,L,NY,NX)               = X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
+    DOM_MicP_vr(idom_don,K,L,NY,NX)               = AZMAX1(DOM_MicP_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    DOM_MicP_vr(idom_dop,K,L,NY,NX)               = AZMAX1(DOM_MicP_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    DOM_MicP_vr(idom_acetate,K,L,NY,NX)           = 0.0_r8
     DOM_MacP_vr(idom_beg:idom_end,K,L,NY,NX) = 0.0_r8
-    OSCX(KK)                                 = OSCX(KK)+DOM_vr(idom_doc,K,L,NY,NX)
-    OSNX(KK)                                 = OSNX(KK)+DOM_vr(idom_don,K,L,NY,NX)
-    OSPX(KK)                                 = OSPX(KK)+DOM_vr(idom_dop,K,L,NY,NX)
+    OSCX(KK)                                 = OSCX(KK)+DOM_MicP_vr(idom_doc,K,L,NY,NX)
+    OSNX(KK)                                 = OSNX(KK)+DOM_MicP_vr(idom_don,K,L,NY,NX)
+    OSPX(KK)                                 = OSPX(KK)+DOM_MicP_vr(idom_dop,K,L,NY,NX)
 !
 !     ADSORBED C, N AND P
 !

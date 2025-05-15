@@ -4458,16 +4458,16 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IUTYP', dim1name='column',&
+    call restartvar(ncid, flag, varname='iUreaHydInhibitorType_col', dim1name='column',&
        long_name='urea hydrolysis inhibitor type (1=no,2=yes)', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,iUreaHydInhibitorType_col,datic_1d)
   else
-    !print*,'IUTYP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IUTYP,datic_1d)  
+    !print*,'iUreaHydInhibitorType_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,iUreaHydInhibitorType_col,datic_1d)  
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IUTYP', dim1name='column',&
+    call restartvar(ncid, flag, varname='iUreaHydInhibitorType_col', dim1name='column',&
        long_name='urea hydrolysis inhibitor type (1=no,2=yes)', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
@@ -4543,17 +4543,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='TSED', dim1name='column',&
-       long_name='erosion rate', units='Mg d-2 h-1', &
+    call restartvar(ncid, flag, varname='TSED_col', dim1name='column',&
+       long_name='Erosion rate', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,TSED_col,datrc_1d)
   else
     !print*,'TSED'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TSED,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TSED_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='TSED', dim1name='column',&
-       long_name='erosion rate', units='Mg d-2 h-1', &
+    call restartvar(ncid, flag, varname='TSED_col', dim1name='column',&
+       long_name='Erosion rate', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
   endif  
@@ -4814,16 +4814,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)    
-    call restartvar(ncid, flag, varname='SurfGasEmisFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasEmiss_flx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmisFlx_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmiss_flx_col,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmisFlx_col,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmiss_flx_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
-    call restartvar(ncid, flag, varname='SurfGasEmisFlx_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='SurfGasEmiss_flx_col', dim1name='column',&
        dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
@@ -5598,16 +5598,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='SED', dim1name='column',&
+    call restartvar(ncid, flag, varname='SED_col', dim1name='column',&
        long_name='sediment transport', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,SED_col,datrc_1d) 
   else
     !print*,'SED'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SED,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SED_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='SED', dim1name='column',&
+    call restartvar(ncid, flag, varname='SED_col', dim1name='column',&
        long_name='sediment transport', units='Mg d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -7047,6 +7047,23 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)                
+    call restartvar(ncid, flag, varname='TWaterPlantRoot2Soil_vr', dim1name='column',dim2name='levsoi',&
+       long_name='water flux from plant roots to soil', units='m3 H2O d-2 h-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)         
+    call cpcol(flag,NHW,NHE,NVN,NVS,TWaterPlantRoot2Soil_vr,datrc_2d)      
+  else
+    !print*,'VLMacP'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TWaterPlantRoot2Soil_vr,datrc_2d)        
+    datpr2 => datrc_2d(1:ncols,1:JZ)                    
+    call restartvar(ncid, flag, varname='TWaterPlantRoot2Soil_vr', dim1name='column',dim2name='levsoi',&
+       long_name='water flux from plant roots to soil', units='m3 H2O d-2 h-1', &
+       interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)         
+  endif  
+
+  if(flag=='read')then
+    datpr2 => datrc_2d(1:ncols,1:JZ)                
     call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
@@ -7115,15 +7132,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)                        
-    call restartvar(ncid, flag, varname='TAU_DirRadTransm', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectRTransmit', dim1name='column',dim2name='levcan1',&
        long_name='Direct radiation transmission coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirRadTransm,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectRTransmit,datrc_2d)      
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirRadTransm,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectRTransmit,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumOfCanopyLayers+1)    
-    call restartvar(ncid, flag, varname='TAU_DirRadTransm', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectRTransmit', dim1name='column',dim2name='levcan1',&
        long_name='Direct radiation transmission coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
@@ -7971,15 +7988,15 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)               
-    call restartvar(ncid, flag, varname='DOM_vr', dim1name='column',dim2name='ndoms',&
+    call restartvar(ncid, flag, varname='DOM_MicP_vr', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic C micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
-    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MicP_vr,datrc_4d)     
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_vr,datrc_4d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MicP_vr,datrc_4d)       
     datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
-    call restartvar(ncid, flag, varname='DOM_vr', dim1name='column',dim2name='ndoms',&
+    call restartvar(ncid, flag, varname='DOM_MicP_vr', dim1name='column',dim2name='ndoms',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      

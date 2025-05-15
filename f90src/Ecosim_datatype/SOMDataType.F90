@@ -22,7 +22,7 @@ module SOMDataType
   real(r8),target,allocatable :: tOMActC_vr(:,:,:)                   !active heterotrophic microbial C in layer [gC d-2]
   real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)                     !adsorbed soil C	[g d-2]
   real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
-  real(r8),target,allocatable :: DOM_vr(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
+  real(r8),target,allocatable :: DOM_MicP_vr(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
   real(r8),target,allocatable :: DOM_MacP_vr(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
   real(r8),target,allocatable :: SoilOrgM_vr(:,:,:,:)                        !total soil organic C [g d-2]
   real(r8),target,allocatable :: ORGCX_vr(:,:,:)                       !SOC concentration	[g Mg-1]
@@ -74,7 +74,7 @@ module SOMDataType
   allocate(tOMActC_vr(0:JZ,JY,JX)); tOMActC_vr=0._r8
   allocate(SorbedOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));SorbedOM_vr=0._r8
   allocate(OMBioResdu_vr(1:NumPlantChemElms,ndbiomcp,1:jcplx,0:JZ,JY,JX)); OMBioResdu_vr=0._r8
-  allocate(DOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_vr=0._r8
+  allocate(DOM_MicP_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MicP_vr=0._r8
   allocate(DOM_MacP_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));DOM_MacP_vr=0._r8
   allocate(SoilOrgM_vr(1:NumPlantChemElms,0:JZ,JY,JX));SoilOrgM_vr=0._r8
   allocate(ORGCX_vr(0:JZ,JY,JX)); ORGCX_vr=0._r8
@@ -119,7 +119,7 @@ module SOMDataType
   call destroy(SolidOM_vr)
   call destroy(SorbedOM_vr)
   call destroy(OMBioResdu_vr)
-  call destroy(DOM_vr)
+  call destroy(DOM_MicP_vr)
   call destroy(DOM_MacP_vr)
   call destroy(SoilOrgM_vr)
   call destroy(ORGCX_vr)

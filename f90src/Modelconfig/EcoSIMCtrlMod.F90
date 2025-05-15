@@ -29,8 +29,9 @@ implicit none
   real(r8) :: an2o_ppm  = 0.270_r8
   real(r8) :: ao2_ppm   = 0.209e6_r8
   real(r8) :: arg_ppm   = 0.00934e6_r8
-  real(r8) :: an2_ppm   = 0.78e6_r8
+  real(r8) :: an2_ppm   = 0.78e6_r8  
   real(r8) :: anh3_ppm  = 5.e-3_r8
+  real(r8) :: ah2_ppm   = 0.55_r8
   real(r8) :: atm_co2_fix=-100._r8
   real(r8) :: atm_ch4_fix=-100._r8
   real(r8) :: atm_n2o_fix=-100._r8
@@ -43,6 +44,7 @@ implicit none
   character(len=300) :: soil_mgmt_in     !file for soil management information
   character(len=300) :: clm_factor_in    !file for climate change factors
   character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
+  integer :: iVerbLevel = 0        
   logical :: do_budgets = .false.
   type(file_desc_t)  :: pft_nfid 
   type(ecosim_time_type) :: etimer

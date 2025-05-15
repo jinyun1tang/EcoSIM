@@ -83,8 +83,8 @@ module SoilBGCNLayMod
         DOC_s=0._r8;DOC_u=0._r8
         DO K=1,micpar%NumOfLitrCmplxs
           if(.not.micpar%is_finelitter(K))cycle
-          DOC_s=DOC_s+DOM_vr(idom_doc,K,L,NY,NX)
-          DOC_u=DOC_u+DOM_vr(idom_doc,K,LL,NY,NX)
+          DOC_s=DOC_s+DOM_MicP_vr(idom_doc,K,L,NY,NX)
+          DOC_u=DOC_u+DOM_MicP_vr(idom_doc,K,LL,NY,NX)
         ENDDO
         ActL  = DOC_s
         ActLL = DOC_u
@@ -100,7 +100,7 @@ module SoilBGCNLayMod
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
-!        write(113,*)I+J/24.,ActD,DOM_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
+!        write(113,*)I+J/24.,ActD,DOM_MicP_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
 
       ELSE
         D1100: DO LN=L+1,NL(NY,NX)
@@ -195,15 +195,15 @@ module SoilBGCNLayMod
       !mix dissolved organic matter
 
       DO NE=idom_beg,idom_end
-        OQMXS  = FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
+        OQMXS  = FracLitrMix*AZMAX1(DOM_MicP_vr(NE,K,L1,NY,NX))
         OQMHXS = FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
         OHMXS  = FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
 
-        DOM_vr(NE,K,L,NY,NX)      = DOM_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MicP_vr(NE,K,L,NY,NX)      = DOM_MicP_vr(NE,K,L,NY,NX)-OQMXS
         DOM_MacP_vr(NE,K,L,NY,NX) = DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
         SorbedOM_vr(NE,K,L,NY,NX) = SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
 
-        DOM_vr(NE,K,LL,NY,NX)      = DOM_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MicP_vr(NE,K,LL,NY,NX)      = DOM_MicP_vr(NE,K,LL,NY,NX)+OQMXS
         DOM_MacP_vr(NE,K,LL,NY,NX) = DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
         SorbedOM_vr(NE,K,LL,NY,NX) = SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
       ENDDO
@@ -298,23 +298,23 @@ module SoilBGCNLayMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8    
+      if(abs(DOM_MicP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MicP_vr(idom,K,L,NY,NX)=0._r8    
       if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
       if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
     ENDDO  
 
     DO NE=1,nelms      
-      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+      ORGM(NE)=ORGM(NE)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
         if(ORGM(NE)<0._r8)then
-        print*,'orgm2',NE,ORGM,DOM_vr(NE,K,L,NY,NX),DOM_MacP_vr(NE,K,L,NY,NX),SorbedOM_vr(NE,K,L,NY,NX)
+        print*,'orgm2',NE,ORGM,DOM_MicP_vr(NE,K,L,NY,NX),DOM_MacP_vr(NE,K,L,NY,NX),SorbedOM_vr(NE,K,L,NY,NX)
         stop
         endif
     ENDDO
 
-    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    ORGM(ielmc)=ORGM(ielmc)+DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     if(ORGM(ielmc)<0._r8)then
-    print*,'orgmxxx',ORGM,DOM_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    print*,'orgmxxx',ORGM,DOM_MicP_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
     print*,'L=',L
     if(present(info))print*,info
     stop
@@ -386,7 +386,7 @@ module SoilBGCNLayMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom) + DOM_vr(NE,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(NE,K,L,NY,NX)
       DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
     ENDDO
 
@@ -457,7 +457,7 @@ module SoilBGCNLayMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom) + DOM_vr(NE,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(NE,K,L,NY,NX)
       DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
     ENDDO
     DO NE=1,NumPlantChemElms
@@ -567,10 +567,10 @@ module SoilBGCNLayMod
 
     !add dom
     NE=ielmc
-    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    SOMHeterK(K)=SOMHeterK(K)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
     
     !add acetate
-    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    SOMHeterK(K)=SOMHeterK(K)+DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     DO M=1,jsken
       NE=ielmc
@@ -657,7 +657,7 @@ module SoilBGCNLayMod
   DOM_macp = 0._r8
   DO K = 1, micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom)+DOM_vr(idom,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom)+DOM_MicP_vr(idom,K,L,NY,NX)
       DOM_macp(idom) = DOM_macp(idom)+DOM_MacP_vr(idom,K,L,NY,NX)
     ENDDO
   ENDDO

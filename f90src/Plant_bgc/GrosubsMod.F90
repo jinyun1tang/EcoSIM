@@ -4,23 +4,22 @@ module grosubsMod
 ! module for plant biological transformations
   use minimathmod, only : safe_adb,AZMAX1
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcoSIMCtrlMod, only : lverb
+  use EcoSIMCtrlMod,       only: lverb
+  use EcoSiMParDataMod,    only: pltpar
+  use RootMod,             only: RootBGCModel
+  use PlantNonstElmDynMod, only: PlantNonstElmTransfer
+  use PlantDebugMod,       only: PrintRootTracer
   use EcosimConst
-  use EcoSiMParDataMod, only : pltpar
   use GrosubPars
   use PlantAPIData
   use PhotoSynsMod
   use PlantMathFuncMod
-  use RootMod, only : RootBGCModel
-  use PlantNonstElmDynMod, only :   PlantNonstElmTransfer
   use LitrFallMod
   use PlantBranchMod
   use PlantBalMod
   implicit none
 
   private
-
-! end_include_section
 
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
@@ -104,6 +103,7 @@ module grosubsMod
     if(lverb)write(*,*)'HARVEST STANDING DEAD'
     call RemoveBiomassByDisturbance(I,J,NZ)
 
+    call PrintRootTracer(I,J,NZ,'afdist')
   ENDDO D9985
 !
   if(lverb)write(*,*)'TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS'
@@ -111,6 +111,7 @@ module grosubsMod
   
   DO NZ=1,NP
     call SumPlantBiom(I,J,NZ,'exgrosubs')
+    call PrintRootTracer(I,J,NZ,'afddeadt')    
   ENDDO
   end associate
   END subroutine GrowPlants
@@ -358,10 +359,12 @@ module grosubsMod
         TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 
+    call PrintRootTracer(I,J,NZ,'afgrowbranch')
     if(lverb)write(*,*)'RootBGCModel'
     call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
       RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
+    call PrintRootTracer(I,J,NZ,'afroot')
     if(lverb)write(*,*)'PlantNonstElmTransfer'
     call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 
@@ -371,12 +374,15 @@ module grosubsMod
 !
   if(lverb)write(*,*)'RemoveBiomByMgmt'
   call RemoveBiomByMgmt(I,J,NZ)
+
+  call PrintRootTracer(I,J,NZ,'afbiomrm')
 !
 !     RESET DEAD BRANCHES
   call ResetDeadBranch(I,J,NZ)
 
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
 
+  call PrintRootTracer(I,J,NZ,'afaccum')
   end associate
   end subroutine GrowPlant
 

@@ -62,7 +62,7 @@ implicit none
   RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                  , &
   RadPAR_zsec                   => plt_rad%RadPAR_zsec                     , &
   TAU_RadThru                   => plt_rad%TAU_RadThru                     , &
-  TAU_DirRadTransm              => plt_rad%TAU_DirRadTransm                  &
+  TAU_DirectRTransmit              => plt_rad%TAU_DirectRTransmit                  &
   )
     
   CH2O3K=0._r8
@@ -84,7 +84,7 @@ implicit none
             DO LP=1,2
               if (LP==1)then
                 PAR_zsec=RadPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_DirRadTransm(L+1)
+                Tau_rad=TAU_DirectRTransmit(L+1)
               else
                 PAR_zsec=RadDifPAR_zsec(N,M,L,NZ)
                 Tau_rad=TAU_RadThru(L+1)
@@ -185,12 +185,12 @@ implicit none
 !
 !               CH2O3=total C3 CO2 fixation
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
-!               TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
+!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
                   CH2O3K=CH2O3K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirRadTransm(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1))*0.0432
 
                 ENDIF
               ENDIF
@@ -258,7 +258,7 @@ implicit none
   RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec,                  &
   RadPAR_zsec                   => plt_rad%RadPAR_zsec,                     &
   TAU_RadThru                   => plt_rad%TAU_RadThru,                     &
-  TAU_DirRadTransm              => plt_rad%TAU_DirRadTransm                 &
+  TAU_DirectRTransmit              => plt_rad%TAU_DirectRTransmit                 &
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
@@ -282,7 +282,7 @@ implicit none
             DO LP=1,2
               if(LP==1)then
                 PAR_zsec = RadPAR_zsec(N,M,L,NZ)
-                Tau_rad  = TAU_DirRadTransm(L+1)
+                Tau_rad  = TAU_DirectRTransmit(L+1)
               else
                 PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
                 Tau_rad  = TAU_RadThru(L+1)
@@ -379,12 +379,12 @@ implicit none
 !
 !               CH2O4=total C4 CO2 fixation
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
-!               TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
+!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
                   CH2O4K=CH2O4K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirRadTransm(L+1))*0.0432
+!              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -406,7 +406,7 @@ implicit none
 !
 !               CH2O3=total C3 CO2 fixation
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
-!               TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
+!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
                   CH2O3K=CH2O3K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
                 ENDIF  

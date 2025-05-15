@@ -148,7 +148,7 @@
 !     RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !     CH2O=total rubisco carboxylation rate
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
-!     TAU_DirRadTransm=fraction of direct radiation transmitted from layer above
+!     TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
   VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
   CH2O = CH2O+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
@@ -169,7 +169,7 @@
     LeafAUnshaded_zsec => plt_photo%LeafAUnshaded_zsec, &
     RadPAR_zsec        => plt_rad%RadPAR_zsec,          &
     RadDifPAR_zsec     => plt_rad%RadDifPAR_zsec,       &
-    TAU_DirRadTransm   => plt_rad%TAU_DirRadTransm,     &
+    TAU_DirectRTransmit   => plt_rad%TAU_DirectRTransmit,     &
     TAU_RadThru        => plt_rad%TAU_RadThru           &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
@@ -182,7 +182,7 @@
           IF(LP==1)THEN
 !     SUNLIT LEAVES
             PAR_zsec = RadPAR_zsec(N,M,L,NZ)
-            Tau_rad  = TAU_DirRadTransm(L+1)
+            Tau_rad  = TAU_DirectRTransmit(L+1)
           else
 !     shade          
             PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
@@ -459,7 +459,7 @@
     RadPAR_zsec        => plt_rad%RadPAR_zsec,          &
     RadDifPAR_zsec     => plt_rad%RadDifPAR_zsec,       &
     TAU_RadThru        => plt_rad%TAU_RadThru,          &
-    TAU_DirRadTransm   => plt_rad%TAU_DirRadTransm      &    
+    TAU_DirectRTransmit   => plt_rad%TAU_DirectRTransmit      &    
   )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
@@ -472,7 +472,7 @@
 !     SUNLIT LEAVES
           IF(LP==1)THEN
             PAR_zsec = RadPAR_zsec(N,M,L,NZ)
-            TAU_rad  = TAU_DirRadTransm(L+1)
+            TAU_rad  = TAU_DirectRTransmit(L+1)
           ELSE
 !     SHADED LEAVES
             PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
