@@ -96,7 +96,7 @@ module Hour1Mod
   character(len=*), parameter :: subname='hour1'
   integer :: L,NX,NY
   real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
-  real(r8) :: DPTH0           !water+ice thickness in litter
+  real(r8) :: DepthSurfWatIce           !water+ice thickness in litter
 
   integer :: NZ,NR,K
   logical :: dosum
@@ -193,13 +193,13 @@ module Hour1Mod
 !     OUTPUT FOR WATER TABLE DEPTH
       call DiagWaterTBLDepz(NY,NX,THETPZ_vr)
 
-      call GetSurfResidualProperties(I,J,NY,NX,DPTH0)
+      call GetSurfResidualProperties(I,J,NY,NX,DepthSurfWatIce)
 
       call SetTracerPropertyInLiterAir(NY,NX)
 
       if(do_instequil)call ForceGasAquaEquil(NY,NX)
 !
-      call PlantCanopyRadsModel(I,J,NY,NX,DPTH0)
+      call PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
@@ -325,17 +325,17 @@ module Hour1Mod
     DO NY=NVN,NVS
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      tmp                          = Tref/TairKClimMean(NY,NX)*tPBOT
+      tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
       CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
       
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp !gC/m3
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp !gC/m3
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp !gO/m3
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp !gN/m3
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp !gN/m3 
+      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
+      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
+      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
+      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
+      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3 
       AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
       AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gN/m3
+      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
 
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
@@ -363,7 +363,10 @@ module Hour1Mod
 
   XGridSurfRunoff_2DH(1:2,1:2,:,:)       = 0._r8
   HeatXGridBySurfRunoff_2DH(1:2,1:2,:,:) = 0._r8
-
+  IFLB_2DH                               = -1
+  IFLBM_2DH                              = -1
+  IFLBSM_2DH                             = -1
+  IFLBS_2DH                              = -1
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 !
@@ -380,49 +383,39 @@ module Hour1Mod
       HydroSubsDINFlx_col(NY,NX)             = 0._r8
       HydroSubsDOPFlx_col(NY,NX)             = 0._r8
       HydroSubsDIPFlx_col(NY,NX)             = 0._r8
-      SurfRunoffWatFluxM_2DH(:,NY,NX)        = 0._r8
+      SurfRunoffPotentM_col(:,NY,NX)        = 0._r8
 
-      DOM_FloXSurRunoff_2D(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX)=0._r8
+      DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX) = 0._r8
+      trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)           = 0._r8
+      trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)  = 0._r8
 
-      trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)=0._r8
-      trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0._r8
-
-      DrySnoBySnoRedistrib_2DH(1:2,NY,NX)             = 0._r8
-      WatBySnowRedistrib_2DH(1:2,NY,NX)            = 0._r8
-      IceBySnowRedistrib_2DH(1:2,NY,NX)            = 0._r8
-      HeatBySnowRedistrib_2DH(1:2,NY,NX)           = 0._r8
-      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,NY,NX) = 0._r8
-
-      trcn_FloXSnow_2DH(ids_NH4,1:2,NY,NX)   = 0._r8
-      trcn_FloXSnow_2DH(ids_NO3,1:2,NY,NX)   = 0._r8
-      trcn_FloXSnow_2DH(ids_H1PO4,1:2,NY,NX) = 0._r8
-      trcn_FloXSnow_2DH(ids_H2PO4,1:2,NY,NX) = 0._r8
+      DrySnoByRedistrib_2DH(1:2,1:2,NY,NX)                      = 0._r8
+      WatSnoByRedist_2DH(1:2,1:2,NY,NX)                         = 0._r8
+      IceSnoBySnowRedist_2DH(1:2,1:2,NY,NX)                     = 0._r8
+      HeatSnoByRedist_2DH(1:2,1:2,NY,NX)                        = 0._r8
+      trcg_FloXSnow_2DH(idg_beg:idg_NH3,1:2,1:2,NY,NX)          = 0._r8
+      trcn_FloXSnow_2DH(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX) = 0._r8
 !
 !
 !     GAS AND SOLUTE FLUXES
 !
+      DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,:,NY,NX)=0._r8
+
       DO  L=0,NL(NY,NX)+1
-
-        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)=0._r8
-
-        DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX)=0._r8
+        RGasTranspFlxPrev_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
 !
       trcs_deadroot2soil_col(idg_beg:idg_NH3,NY,NX) = 0._r8
       DO L=1,NL(NY,NX)+1
-        WaterFlowSoiMicP_3D(1:3,L,NY,NX)  = 0._r8
-        WaterFlowSoiMicPX_3D(1:3,L,NY,NX) = 0._r8
-        WaterFlowSoiMacP_3D(1:3,L,NY,NX)  = 0._r8
-        HeatFlow2Soil_3D(1:3,L,NY,NX)     = 0._r8
-        RootCO2Ar2Soil_vr(L,NY,NX)        = 0._r8
-        RootCO2Ar2Root_vr(L,NY,NX)        = 0._r8
-        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX)                 = 0._r8
-        trcs_TransptMicP_3D(ids_beg:ids_end,1:3,L,NY,NX)              = 0._r8
-        Gas_AdvDif_Flx_3D(idg_beg:idg_end,1:3,L,NY,NX)                = 0._r8
-        DOM_Macp_Transp_flx_3D(idom_beg:idom_end,1:jcplx,1:3,L,NY,NX) = 0._r8
-
+        WaterFlowSoiMicP_3D(1:3,L,NY,NX)               = 0._r8
+        WaterFlowSoiMicPX_3D(1:3,L,NY,NX)              = 0._r8
+        WaterFlowSoiMacP_3D(1:3,L,NY,NX)               = 0._r8
+        HeatFlow2Soil_3D(1:3,L,NY,NX)                  = 0._r8
+        RootCO2Ar2Soil_vr(L,NY,NX)                     = 0._r8
+        RootCO2Ar2Root_vr(L,NY,NX)                     = 0._r8
+        trcs_deadroot2soil_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
       ENDDO
     ENDDO
   ENDDO
@@ -468,7 +461,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: N,NX,NY,L,NN,NSA
+  integer :: N,NX,NY,L,NN,idsalt
   integer :: extragrid
 !     begin_execution
 
@@ -478,12 +471,12 @@ module Hour1Mod
     DO  NY=NVN,NVS+extragrid
 
       trcSalt_FloXSurRunoff_2D(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
-      trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,NY,NX)             = 0._r8
+      trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)     = 0._r8
 
-      DO  L=1,NL(NY,NX)+1
-        DO NSA=idsalt_beg,idsaltb_end
-          trcSalt_TransptMicP_3D(NSA,1:3,L,NY,NX) = 0._r8
-          trcSalt_TransptMacP_3D(NSA,1:3,L,NY,NX)      = 0._r8
+      DO L = 1, NL(NY,NX)+1
+        DO idsalt=idsalt_beg,idsaltb_end
+          trcSalt_TransptMicP_3D(idsalt,1:3,L,NY,NX) = 0._r8
+          trcSalt_TransptMacP_3D(idsalt,1:3,L,NY,NX) = 0._r8
         ENDDO
       ENDDO
     ENDDO
@@ -726,14 +719,22 @@ module Hour1Mod
 
   integer :: L
 !     begin_execution
-  RootCO2AutorPrev_col(NY,NX)                = RootCO2Autor_col(NY,NX)
 
-  trcg_snowMassloss_col(:,NY,NX)             = 0._r8
+  RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
+  DOM_transpFlx_2DH(:,:,NY,NX)    = 0._r8
+  trcs_SubsurTransp_flx_2DH(:,NY,NX)     = 0._r8
+  trcg_snowMassloss_col(:,NY,NX)  = 0._r8
+  trcn_SnowDrift_flx_col(:,NY,NX) = 0._r8
+  trcg_SnowDrift_flx_col(:,NY,NX) = 0._r8
+  DOM_draing_col(:,:,NY,NX)         = 0._r8
+  trcs_drainage_flx_col(:,NY,NX)        = 0._r8
+  DOM_SurfRunoff_flx_col(:,:,NY,NX) =0._r8
+
   trcn_snowMassloss_col(:,NY,NX)             = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)              = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
   Soil_Gas_pressure_vr(:,NY,NX)              = 0._r8
-  Gas_WetDeposition_col(:,NY,NX)             = 0._r8
+  Gas_WetDeposit_flx_col(:,NY,NX)             = 0._r8
   RootCO2Autor_col(NY,NX)                    = 0._r8
   QIceInflx_vr(:,NY,NX)                      = 0._r8
   QIceInflx_col(NY,NX)                       = 0._r8
@@ -781,8 +782,9 @@ module Hour1Mod
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)        = 0._r8
   RootCO2Ar2Soil_col(NY,NX)                  = 0._r8
   RootCO2Ar2Root_col(NY,NX)                  = 0._r8
-  GasHydroLossFlx_col(idg_beg:idg_end,NY,NX) = 0._r8
-  SurfGasEmisFlx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
+  GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  trcn_SurfRunoff_flx_col(:,NY,NX)               = 0._r8
+  SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
   GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
   HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8
@@ -796,10 +798,6 @@ module Hour1Mod
   VapXAir2GSurf_col(NY,NX)                           = 0._r8
   THeatSnowThaw_col(NY,NX)                           = 0._r8
   THeatSoiThaw_col(NY,NX)                            = 0._r8
-  trcs_TransptMacP_3D(:,:,:,:,:)                     = 0._r8
-  trcg_DisolEvap_Atm2Soil_flx(idg_beg:idg_end,NY,NX) = 0._r8
-  trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_NH3,NY,NX) = 0._r8
-
   TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
   CanopyWat_col(NY,NX)                             = 0._r8
   WatHeldOnCanopy_col(NY,NX)                       = 0._r8
@@ -835,6 +833,7 @@ module Hour1Mod
     trcSalt_AquaADV_Snow2Litr_flx(:,NY,NX) = 0._r8
     trcSalt_AquaADV_Snow2Soil_flx(:,NY,NX) = 0._r8
     trcSalt_snowMassloss_col(:,NY,NX)      = 0._r8
+    trcSalt_SnowDrift_flx_col(:,NY,NX)     = 0._r8    
   ENDIF
   end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
@@ -854,7 +853,8 @@ module Hour1Mod
   TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)           = 0._r8
-  TPlantRootH2OLoss_vr(0:NL(NY,NX),NY,NX)                                     = 0._r8
+  TWaterPlantRoot2SoilPrev_vr(1:NL(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)
+  TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)                                  = 0._r8
   THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
   Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
@@ -1455,12 +1455,12 @@ module Hour1Mod
   end subroutine Prep4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSurfResidualProperties(I,J,NY,NX,DPTH0)
+  subroutine GetSurfResidualProperties(I,J,NY,NX,DepthSurfWatIce)
 
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  real(r8),intent(out) :: DPTH0    !water+ice thickness in litter layer
+  real(r8),intent(out) :: DepthSurfWatIce    !water+ice thickness in litter layer
   real(r8) :: VxcessWatLitR,TVOLWI,ThetaWLitR
   real(r8) :: VWatLitrZ
   real(r8) :: VOLIRZ
@@ -1481,7 +1481,7 @@ module Hour1Mod
 ! VOLW,VOLI,VOLA,VOLP=litter water,ice,porosity,air volume
 ! THETW,THETI,THETA,THETP=litter water,ice,porosity,air concentration
 ! POROS=litter porosity
-! THETW0,THETI0,DPTH0=litter excess water,ice,water+ice depth
+! THETW0,THETI0,DepthSurfWatIce=litter excess water,ice,water+ice depth
 ! DLYR=litter thickness
 ! PSISM,PSISE=litter matric,saturation water potential
 !
@@ -1514,7 +1514,7 @@ module Hour1Mod
       XVOLW0=0._r8
       XVOLI0=0._r8
     ENDIF
-    DPTH0    = XVOLW0+XVOLI0
+    DepthSurfWatIce    = XVOLW0+XVOLI0
     DLYR_3D(3,0,NY,NX) = VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
 
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1529,7 +1529,7 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
       ENDIF
       PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
-      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
       ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
@@ -1632,13 +1632,17 @@ module Hour1Mod
   RootN2Fix_col(NY,NX)        = 0._r8
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
-  trcs_plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
+  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)=0._r8
+  trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
+  trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8  
+  RootO2_Xink_col(NY,NX)                          = 0._r8
   DO L=NUI(NY,NX),NLI(NY,NX)
     RootN2Fix_vr(L,NY,NX)                         = 0._r8
     FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
-    trcs_plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
-    RootCO2Emis2Root_vr(L,NY,NX)                 = 0._r8
+    trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
+    RootCO2Emis2Root_vr(L,NY,NX)                  = 0._r8
     RUptkRootO2_vr(L,NY,NX)                       = 0._r8
+    RootO2_Xink_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 
     trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8

@@ -9,7 +9,7 @@ module ATSEcoSIMInitMod
   use EcoSIMCtrlMod
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, AirFilledSoilPore_vr!need the only as some vars
+      FracSoiPAsIce_vr, FracAirFilledSoilPore_vr!need the only as some vars
   use CanopyDataType, only: RadSWGrnd_col
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
       VPA_col, WindSpeedAtm_col, RainH, VPK_col
@@ -57,7 +57,7 @@ implicit none
   call InitAlloc(NOMicrobeGuilds=1)
 
   !setting a few variables 
-  FlowDirIndicator = 3 !Basically a switch, setting to 3 removes lateral flow
+  FlowDirIndicator_col = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays   = 1 !Is the number of layers down the roots go
   NX               = 1
 
@@ -75,7 +75,7 @@ implicit none
     !AREA(3,0,NY,NX)         = a_AREA3(0,NY)
     !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
     ASP_col(NY,NX)          = a_ASP(NY)
-    !TairKClimMean(NY,NX)   = a_ATKA(NY)
+    !TairKClimMean_col(NY,NX)   = a_ATKA(NY)
     !CO2E_col(NY,NX)=atm_co2
     !CH4E_col(NY,NX)=atm_ch4
     !OXYE_col(NY,NX)=atm_o2

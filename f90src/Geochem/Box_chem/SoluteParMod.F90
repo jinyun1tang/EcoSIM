@@ -7,7 +7,7 @@ module SoluteParMod
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8), parameter :: RNHUI(0:2)=real((/10.0E-02,1.0E-02,0.5E-02/),r8)
+  real(r8), parameter :: RUreaInhibtorConst(0:2)=real((/10.0E-02,1.0E-02,0.5E-02/),r8)
 
 !
 !     DISSOLUTION AND DISSOCIATION CONSTANTS
@@ -156,19 +156,19 @@ module SoluteParMod
 !     DUKM,DUKI=Km,Ki for urea hydrolysis (SOIL SCI 136:56)
 !     COOH=CEC of SOC
 !     CCAMX=maximum Ca concentration
-!     SPNH4,SPNH3,SPNHU,SPNO3,SPPO4=specific rate constants for
+!     RFertNH4SpecReleaz,RFertNH3SpecReleaz,RFertUreaSpecHydrol,RFertNO3SpecReleaz,SPPO4=specific rate constants for
 !     NH4,NH3,urea,NO3,H2PO4 fertilizer dissolution
-!     RNHUI=rate constants for decline in urea hydrolysis inhibition
+!     RUreaInhibtorConst=rate constants for decline in urea hydrolysis inhibition
 !
   real(r8), PARAMETER :: DUKM=1.0_r8
   real(r8), PARAMETER :: DUKI=2.5_r8
   real(r8), PARAMETER :: A0=1.0_r8
   real(r8), PARAMETER :: COOH=2.5E-04_r8
   real(r8), PARAMETER :: CCAMX=10.0_r8
-  real(r8), PARAMETER :: SPNH4=1.0E-00_r8    ![1/h]
-  real(r8), PARAMETER :: SPNH3=1.0E-00_r8    ![1/h]
-  real(r8), PARAMETER :: SPNHU=1.0E-01_r8    ![1/h]
-  real(r8), PARAMETER :: SPNO3=1.0E-00_r8    ![1/h]
+  real(r8), PARAMETER :: RFertNH4SpecReleaz=1.0E-00_r8    ![1/h]
+  real(r8), PARAMETER :: RFertNH3SpecReleaz=1.0E-00_r8    ![1/h]
+  real(r8), PARAMETER :: RFertUreaSpecHydrol=1.0E-01_r8    ![1/h]
+  real(r8), PARAMETER :: RFertNO3SpecReleaz=1.0E-00_r8    ![1/h]
   real(r8), PARAMETER :: SPPO4=5.0E-02_r8    ![1/h]
 
 end module SoluteParMod

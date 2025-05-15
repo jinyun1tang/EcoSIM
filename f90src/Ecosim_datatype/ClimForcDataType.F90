@@ -85,6 +85,7 @@ implicit none
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
+
   real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)               !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
   real(r8),target,allocatable ::  OXYE_col(:,:)                          !atmospheric O2 concentration, [umol mol-1]
@@ -113,7 +114,7 @@ implicit none
   real(r8),target,allocatable ::  RadPARSolarBeam_col(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
   real(r8),target,allocatable ::  ATCA(:,:)                          !mean annual air temperature, [oC]
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
-  real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
+  real(r8),target,allocatable ::  TairKClimMean_col(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  RainFalPrec_col(:,:)                   !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  SnoFalPrec_col(:,:)                    !snowfall, [m3 d-2 h-1]
@@ -173,6 +174,7 @@ implicit none
   real(r8),target,allocatable ::  GDD_col(:,:)    !growing degree day with base temperature at oC
   real(r8),target,allocatable ::  PrecHeat_col(:,:)    !precipitation heat to surface [MJ/d2/h]
   real(r8),target,allocatable ::  RainLitr_col(:,:)  !water from aboveground falling litter
+  real(r8),target, allocatable :: trcs_solcoef_col(:,:,:)              !parameter for computing RGasSinkScalar_vr  
   contains
 !----------------------------------------------------------------------
 
@@ -183,6 +185,7 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
+  allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX));
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
@@ -250,7 +253,7 @@ implicit none
   allocate(RadPARSolarBeam_col(JY,JX));         RadPARSolarBeam_col=0._r8
   allocate(ATCA(JY,JX));        ATCA=0._r8
   allocate(ATCS(JY,JX));        ATCS=0._r8
-  allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
+  allocate(TairKClimMean_col(JY,JX));        TairKClimMean_col=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(RainFalPrec_col(JY,JX));       RainFalPrec_col=0._r8
   allocate(Irrigation_col(JY,JX));    Irrigation_col=0._r8
@@ -361,7 +364,7 @@ implicit none
   call destroy(ZNH3E_col)
   call destroy(CH4E_col)
   call destroy(H2GE_col)
-
+  call destroy(trcs_solcoef_col)
   call destroy(SolarNoonHour_col)
   call destroy(CO2E_col)
   call destroy(RadSWDirect_col)
@@ -381,7 +384,7 @@ implicit none
   call destroy(RadPARSolarBeam_col)
   call destroy(ATCA)
   call destroy(ATCS)
-  call destroy(TairKClimMean)
+  call destroy(TairKClimMean_col)
   call destroy(ATKS)
   call destroy(RainFalPrec_col)
   call destroy(Irrigation_col)

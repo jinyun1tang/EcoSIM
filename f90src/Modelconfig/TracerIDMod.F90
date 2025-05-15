@@ -2,6 +2,7 @@ module TracerIDMod
 ! !
 ! code to initialize tracers
   use MiniMathMod, only : addone
+  use abortutils, only : destroy
   use data_kind_mod,    only: r8 => DAT_KIND_R8  
   use ElmIDMod
 implicit none
@@ -19,6 +20,7 @@ implicit none
   integer, parameter :: idg_NH3=8
   integer, parameter :: idg_beg = idg_CO2  
   character(len=10), allocatable :: trcs_names(:)
+
   integer  :: idg_NH3B
   integer :: ids_NH4,ids_NH4B
   integer :: ids_NO3,ids_NO3B
@@ -162,6 +164,7 @@ implicit none
   end type trc_def_type
 
   type(trc_def_type), public :: trc_confs
+  public :: CleanUpTracerIDs
   contains
 
   subroutine InitTracerIDs(lsalt_model)
@@ -283,13 +286,13 @@ implicit none
     idsalt_nuts=idsalt_MgHPO4-idsalt_H0PO4
 
     idsalt_H0PO4B    = addone(idsaltb_end)   ! PO4
-    idsalt_H3PO4B    = addone(idsaltb_end)  ! H3PO4
-    idsalt_FeHPO4B   = addone(idsaltb_end)  ! FeHPO4
-    idsalt_FeH2PO4B  = addone(idsaltb_end) ! FeH2PO4
+    idsalt_H3PO4B    = addone(idsaltb_end)   ! H3PO4
+    idsalt_FeHPO4B   = addone(idsaltb_end)   ! FeHPO4
+    idsalt_FeH2PO4B  = addone(idsaltb_end)   ! FeH2PO4
     idsalt_CaPO4B    = addone(idsaltb_end)   ! CaPO4
-    idsalt_CaHPO4B   = addone(idsaltb_end)  ! CaHPO4
-    idsalt_CaH4P2O8B = addone(idsaltb_end) ! CaH4P2O8
-    idsalt_MgHPO4B   = addone(idsaltb_end)! MgHPO4
+    idsalt_CaHPO4B   = addone(idsaltb_end)   ! CaHPO4
+    idsalt_CaH4P2O8B = addone(idsaltb_end)   ! CaH4P2O8
+    idsalt_MgHPO4B   = addone(idsaltb_end)   ! MgHPO4
     idsalt_pband_beg=idsalt_H0PO4B;idsalt_pband_end=idsalt_MgHPO4B
 
     idsaltb_end=idsalt_MgHPO4B
@@ -358,15 +361,15 @@ implicit none
   idx_end            = idx_H2PO4B
   idx_anion_soil_end = idx_H2PO4
 
-   trc_confs%NGasTracers              = idg_end-idg_beg
-   trc_confs%NSolutTracers            = ids_end-ids_beg+1
-   if(lsalt_model)trc_confs%NSaltTracers = idsaltb_end-idsalt_beg+1
-   trc_confs%NPrecipTracers           = idsp_end-idsp_beg+1
-   trc_confs%nxtracers                = idx_end-idx_beg+1
-   trc_confs%NnutrientTracers         = ids_nuts_end-ids_nut_beg+1
-   trc_confs%NFertNitro               = ifertn_end-ifertn_beg+1
-   trc_confs%NFertNitrob              = ifertnb_end-ifertnb_beg+1
-   trc_confs%NDOMS                    = idom_end-idom_beg+1
+  trc_confs%NGasTracers              = idg_end-idg_beg
+  trc_confs%NSolutTracers            = ids_end-ids_beg+1
+  if(lsalt_model)trc_confs%NSaltTracers = idsaltb_end-idsalt_beg+1
+  trc_confs%NPrecipTracers           = idsp_end-idsp_beg+1
+  trc_confs%nxtracers                = idx_end-idx_beg+1
+  trc_confs%NnutrientTracers         = ids_nuts_end-ids_nut_beg+1
+  trc_confs%NFertNitro               = ifertn_end-ifertn_beg+1
+  trc_confs%NFertNitrob              = ifertnb_end-ifertnb_beg+1
+  trc_confs%NDOMS                    = idom_end-idom_beg+1
 
   return
   write(104,*)'ids_beg=',ids_beg,'ids_end=',ids_end
@@ -395,5 +398,11 @@ implicit none
 
   stop
   end subroutine InitTracerIDs
+
+  subroutine CleanUpTracerIDs()
+  implicit none
+
+  call destroy(trcs_names)
+  end subroutine CleanUpTracerIDs
 end module TracerIDMod
 

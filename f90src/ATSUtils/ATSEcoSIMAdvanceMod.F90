@@ -19,7 +19,7 @@ module ATSEcoSIMAdvanceMod
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, AirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
+      FracSoiPAsIce_vr, FracAirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
@@ -82,7 +82,7 @@ implicit none
     !AREA(3,2,NY,NX)         = a_AREA3(0,NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
-    !TairKClimMean(NY,NX) = a_ATKA(NY)
+    !TairKClimMean_col(NY,NX) = a_ATKA(NY)
     !CO2E_col(NY,NX)      = atm_co2
     !CH4E_col(NY,NX)      = atm_ch4
     !OXYE_col(NY,NX)      = atm_o2
@@ -132,11 +132,11 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        FracAirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
+        FracAirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF    
     ENDDO
     IF(TCA_col(NY,NX).GT.TSNOW)THEN
@@ -229,11 +229,11 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        FracAirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
+        FracAirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF
       !write(*,*) "NY, NX ", NY, NX
       !write(*,*) "FracSoiPAsWat_vr(L,NY,NX): ", FracSoiPAsWat_vr(L,NY,NX)

@@ -23,7 +23,7 @@ implicit none
   real(r8),target,allocatable ::  PSD_vr(:,:,:)                              !log (soil porosity /water content at field capacity)
   real(r8),target,allocatable ::  FCD_vr(:,:,:)                                 !log water content at field capacity
   real(r8),target,allocatable ::  SRP_vr(:,:,:)                                 !shape parameter for water desorption
-  real(r8),target,allocatable ::  FSLOPE(:,:,:)                              !fraction of slope in 1 and 2
+  real(r8),target,allocatable ::  FSLOPE_2DH(:,:,:)                              !fraction of slope in 1 and 2
   REAL(R8),target,allocatable ::  VLMicPt0_col(:,:,:)                        !initial total soil micropore porosity	m3 d-2
   REAL(R8),target,allocatable ::  LOGPSIAtSat(:,:)                         !log water potential at saturation	MPa
   REAL(R8),target,allocatable ::  LOGPSIFLD(:,:)                         !log water potential at field capacity	-
@@ -54,7 +54,7 @@ contains
   allocate(PSD_vr(0:JZ,JY,JX));    PSD_vr=0._r8
   allocate(FCD_vr(0:JZ,JY,JX));    FCD_vr=0._r8
   allocate(SRP_vr(0:JZ,JY,JX));    SRP_vr=0._r8
-  allocate(FSLOPE(2,JY,JX));    FSLOPE=0._r8
+  allocate(FSLOPE_2DH(2,JY,JX));    FSLOPE_2DH=0._r8
   allocate(VLMicPt0_col(0:JZ,JY,JX));  VLMicPt0_col=0._r8
   allocate(LOGPSIAtSat(JY,JX));       LOGPSIAtSat=0._r8
   allocate(LOGPSIFLD(JY,JX));       LOGPSIFLD=0._r8
@@ -85,7 +85,7 @@ contains
   call destroy(PSD_vr)
   call destroy(FCD_vr)
   call destroy(SRP_vr)
-  call destroy(FSLOPE)
+  call destroy(FSLOPE_2DH)
   call destroy(VLMicPt0_col)
   call destroy(LOGPSIAtSat)
   call destroy(LOGPSIFLD)

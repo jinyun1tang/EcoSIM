@@ -187,7 +187,7 @@ module WthrMod
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK_col(NY,NX))) &
       VPS(NY,NX)     = vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK_col(NY,NX) = AMIN1(VPS(NY,NX),VPK_col(NY,NX))
-      PBOT_col(NY,NX)=1.01325E+02_r8*exp(-ALT(NY,NX)/hpresc)      
+      PBOT_col(NY,NX)=1.01325E+02_r8*exp(-ALT_col(NY,NX)/hpresc)      
 !
       !     UA=wind speed
 !
@@ -351,13 +351,11 @@ module WthrMod
       !     RadLWClm=longwave radiation
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
-!
-      IF(RadLWClm(J,I).GT.0.0_r8)THEN
-        !     SkyLonwRad_col(NY,NX)=EMM*(stefboltz_const*TairK_col(NY,NX)**4)
-        !     SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
-        SkyLonwRad_col(NY,NX)=RadLWClm(J,I)
-      ELSE
+
         SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8 
+
+      IF(RadLWClm(J,I).GT.0.0_r8)THEN
+        SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
       ENDIF
 !      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK_col(NY,NX),TCA_col(NY,NX)
 !

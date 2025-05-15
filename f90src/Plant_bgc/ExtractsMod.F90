@@ -6,7 +6,8 @@ module ExtractsMod
 !
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: AZMAX1
-  use PlantBalMod, only : SumPlantRootGas
+  use PlantBalMod,   only: SumPlantRootGas
+  use PlantDebugMod, only: PrintRootTracer
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -32,6 +33,8 @@ module ExtractsMod
   call SumPlantRootGas(I,J)
 
   DO NZ=1,plt_site%NP
+
+    call PrintRootTracer(I,J,NZ,'extract')
     IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
 
       call TotalLeafArea(NZ)
@@ -89,7 +92,7 @@ module ExtractsMod
           DO  M=1,pltpar%jsken
             LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+AZMAX1(LitrfalStrutElms_pvr(NE,M,K,L,NZ))
             if(LitrfalStrutElms_vr(NE,M,K,L)<0._r8)then
-            write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+              write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfalStrutElms_pvr(NE,M,K,L,NZ)
             endif
           enddo
         ENDDO
@@ -146,52 +149,54 @@ module ExtractsMod
 
   integer :: N,L,K,idg,NE,ids
  
-  associate(                                                       &
-    NU                       => plt_site%NU,                       &
-    NK                       => plt_site%NK,                       &    
-    MaxNumRootLays           => plt_site%MaxNumRootLays         ,  &
-    AREA3                    => plt_site%AREA3,                    &
-    PlantPopulation_pft      => plt_site%PlantPopulation_pft,      &
-    RootH1PO4DmndBand_pvr    => plt_rbgc%RootH1PO4DmndBand_pvr,    &
-    RootH2PO4DmndBand_pvr    => plt_rbgc%RootH2PO4DmndBand_pvr,    &
-    RootNO3DmndBand_pvr      => plt_rbgc%RootNO3DmndBand_pvr,      &
-    RootO2Uptk_pvr           => plt_rbgc%RootO2Uptk_pvr,           &
-    trcg_Root_gas2aqu_flx_vr => plt_rbgc%trcg_Root_gas2aqu_flx_vr, &
-    trcg_air2root_flx_pvr    => plt_rbgc%trcg_air2root_flx_pvr,    &
-    RootCO2Emis_pvr          => plt_rbgc%RootCO2Emis_pvr,          &
-    RootUptkSoiSol_pvr       => plt_rbgc%RootUptkSoiSol_pvr,       &
-    RootNutUptake_pvr        => plt_rbgc%RootNutUptake_pvr,        &
-    trcg_air2root_flx_vr     => plt_rbgc%trcg_air2root_flx_vr,     &
-    RootO2Dmnd4Resp_pvr      => plt_rbgc%RootO2Dmnd4Resp_pvr,      &
-    RootMycoExudEUptk_pvr    => plt_rbgc%RootMycoExudEUptk_pvr,    &
-    RootNH4DmndSoil_pvr      => plt_rbgc%RootNH4DmndSoil_pvr,      &
-    RootNO3DmndSoil_pvr      => plt_rbgc%RootNO3DmndSoil_pvr,      &
-    RootH2PO4DmndSoil_pvr    => plt_rbgc%RootH2PO4DmndSoil_pvr,    &
-    RootNH4DmndBand_pvr      => plt_rbgc%RootNH4DmndBand_pvr,      &
-    RootH1PO4DmndSoil_pvr    => plt_rbgc%RootH1PO4DmndSoil_pvr,    &
-    trcs_plant_uptake_vr     => plt_rbgc%trcs_plant_uptake_vr,     &
-    RootN2Fix_pvr            => plt_bgcr%RootN2Fix_pvr,            &
-    REcoNO3DmndSoil_vr       => plt_bgcr%REcoNO3DmndSoil_vr,       &
-    REcoNH4DmndSoil_vr       => plt_bgcr%REcoNH4DmndSoil_vr,       &
-    REcoH2PO4DmndSoil_vr     => plt_bgcr%REcoH2PO4DmndSoil_vr,     &
-    REcoNO3DmndBand_vr       => plt_bgcr%REcoNO3DmndBand_vr,       &
-    REcoH1PO4DmndSoil_vr     => plt_bgcr%REcoH1PO4DmndSoil_vr,     &
-    REcoNH4DmndBand_vr       => plt_bgcr%REcoNH4DmndBand_vr,       &
-    REcoO2DmndResp_vr        => plt_bgcr%REcoO2DmndResp_vr,        &
-    tRootMycoExud2Soil_vr    => plt_bgcr%tRootMycoExud2Soil_vr,    &
-    RUptkRootO2_vr           => plt_bgcr%RUptkRootO2_vr,           &
-    RootCO2Emis2Root_vr     => plt_bgcr%RootCO2Emis2Root_vr,     &
-    REcoH2PO4DmndBand_vr     => plt_bgcr%REcoH2PO4DmndBand_vr,     &
-    REcoH1PO4DmndBand_vr     => plt_bgcr%REcoH1PO4DmndBand_vr,     &
-    TKCanopy_pft             => plt_ew%TKCanopy_pft,               &
-    TKS_vr                   => plt_ew%TKS_vr,                     &
-    THeatLossRoot2Soil_vr    => plt_ew%THeatLossRoot2Soil_vr,      &
-    TPlantRootH2OLoss_vr     => plt_ew%TPlantRootH2OLoss_vr,       &
-    AllPlantRootH2OLoss_vr   => plt_ew%AllPlantRootH2OLoss_vr,     &
-    RootLenDensPerPlant_pvr  => plt_morph%RootLenDensPerPlant_pvr, &
-    totRootLenDens_vr        => plt_morph%totRootLenDens_vr,       &
-    MY                       => plt_morph%MY,                      &
-    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
+  associate(                                                         &
+    NU                        => plt_site%NU,                        &
+    NK                        => plt_site%NK,                        &
+    MaxNumRootLays            => plt_site%MaxNumRootLays,            &
+    AREA3                     => plt_site%AREA3,                     &
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft,       &
+    RootH1PO4DmndBand_pvr     => plt_rbgc%RootH1PO4DmndBand_pvr,     &
+    RootH2PO4DmndBand_pvr     => plt_rbgc%RootH2PO4DmndBand_pvr,     &
+    RootNO3DmndBand_pvr       => plt_rbgc%RootNO3DmndBand_pvr,       &
+    RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,            &
+    trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr,  &
+    trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr,     &
+    RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr,         &
+    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,        &
+    RootNutUptake_pvr         => plt_rbgc%RootNutUptake_pvr,         &
+    trcg_air2root_flx_vr      => plt_rbgc%trcg_air2root_flx_vr,      &
+    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,       &
+    RootMycoExudEUptk_pvr     => plt_rbgc%RootMycoExudEUptk_pvr,     &
+    RootNH4DmndSoil_pvr       => plt_rbgc%RootNH4DmndSoil_pvr,       &
+    RootNO3DmndSoil_pvr       => plt_rbgc%RootNO3DmndSoil_pvr,       &
+    RootH2PO4DmndSoil_pvr     => plt_rbgc%RootH2PO4DmndSoil_pvr,     &
+    RootNH4DmndBand_pvr       => plt_rbgc%RootNH4DmndBand_pvr,       &
+    RootH1PO4DmndSoil_pvr     => plt_rbgc%RootH1PO4DmndSoil_pvr,     &
+    trcs_Soil2plant_uptake_vr => plt_rbgc%trcs_Soil2plant_uptake_vr, &
+    RootO2_Xink_vr            => plt_bgcr%RootO2_Xink_vr        ,    &
+    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr       ,    &
+    RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,             &
+    REcoNO3DmndSoil_vr        => plt_bgcr%REcoNO3DmndSoil_vr,        &
+    REcoNH4DmndSoil_vr        => plt_bgcr%REcoNH4DmndSoil_vr,        &
+    REcoH2PO4DmndSoil_vr      => plt_bgcr%REcoH2PO4DmndSoil_vr,      &
+    REcoNO3DmndBand_vr        => plt_bgcr%REcoNO3DmndBand_vr,        &
+    REcoH1PO4DmndSoil_vr      => plt_bgcr%REcoH1PO4DmndSoil_vr,      &
+    REcoNH4DmndBand_vr        => plt_bgcr%REcoNH4DmndBand_vr,        &
+    REcoO2DmndResp_vr         => plt_bgcr%REcoO2DmndResp_vr,         &
+    tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr,     &
+    RUptkRootO2_vr            => plt_bgcr%RUptkRootO2_vr,            &
+    RootCO2Emis2Root_vr       => plt_bgcr%RootCO2Emis2Root_vr,       &
+    REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr,      &
+    REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr,      &
+    TKCanopy_pft              => plt_ew%TKCanopy_pft,                &
+    TKS_vr                    => plt_ew%TKS_vr,                      &
+    THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr,       &
+    TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr,     &
+    AllPlantRootH2OLoss_vr    => plt_ew%AllPlantRootH2OLoss_vr,      &
+    RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr,  &
+    totRootLenDens_vr         => plt_morph%totRootLenDens_vr,        &
+    MY                        => plt_morph%MY,                       &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          &
   )
   
   DO L=NU,MaxNumRootLays
@@ -213,7 +218,7 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TPlantRootH2OLoss_vr(L) = TPlantRootH2OLoss_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
+      TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
 
       !water lose from canopy to soil
       if(AllPlantRootH2OLoss_vr(N,L,NZ)>0._r8)then
@@ -228,17 +233,18 @@ module ExtractsMod
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
+      RootO2_Xink_vr(L)      = RootO2_Xink_vr(L) + RootO2_Xink_pvr(N,L,NZ)
+      RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
+      RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
-      RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RootCO2Emis_pvr(N,L,NZ)
-      RUptkRootO2_vr(L)       = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
-
+      !(>0) uptake from soil into roots
       DO idg=idg_beg,idg_end
-        trcs_plant_uptake_vr(idg,L)=trcs_plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
+        trcs_Soil2plant_uptake_vr(idg,L)=trcs_Soil2plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       ENDDO
 
       !Nutrients are sorted according to band|soil
       do ids=ids_NH4B,ids_nuts_end
-        trcs_plant_uptake_vr(ids,L)=trcs_plant_uptake_vr(ids,L)+RootNutUptake_pvr(ids,N,L,NZ)
+        trcs_Soil2plant_uptake_vr(ids,L)=trcs_Soil2plant_uptake_vr(ids,L)+RootNutUptake_pvr(ids,N,L,NZ)
       ENDDO
 
 !

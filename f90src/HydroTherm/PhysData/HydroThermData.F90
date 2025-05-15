@@ -17,7 +17,7 @@ implicit none
   real(r8),allocatable ::  TKSoil1_vr(:,:,:)                      !  
   real(r8),allocatable ::  DLYRR_COL(:,:)                        !  
   real(r8),allocatable ::  FracSoiPAsIce_vr(:,:,:)               !  
-  real(r8),allocatable ::  AirFilledSoilPore_vr(:,:,:)               !  
+  real(r8),allocatable ::  FracAirFilledSoilPore_vr(:,:,:)               !  
   real(r8),allocatable ::  VHeatCapacity1_vr(:,:,:)              !whole layer heat capacity (not snow)
   real(r8),allocatable ::  FracSoilAsAirt(:,:,:)                 !fraction of soil volume as air, normalized using current pore volume
   real(r8),allocatable ::  VLWatMicP1_vr(:,:,:)                  !    
@@ -43,15 +43,11 @@ implicit none
   real(r8),allocatable ::  VLHeatCapacityB_vr(:,:,:)             !
   real(r8),allocatable ::  ResistAreodynOverSoil_col(:,:)        ! aerodynamic resistance over soil, [m]
   real(r8),allocatable ::  AScaledCdWOverSnow_col(:,:)           ! area scaled latent heat flux conductance over snow, [m^2 h]
-  real(r8),allocatable ::  Altitude_grid(:,:)                    ! grid altitude [m]
+  real(r8),allocatable ::  Altitude_col(:,:)                    ! grid altitude [m]
   real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
   real(r8),allocatable ::  RadSW2Sno_col(:,:)                   !short wave radiation on snow [MJ]  
   real(r8),allocatable ::  WatFlx2LitRByRunoff_2DH(:,:,:,:)      !surface runoff flux  
   real(r8),allocatable ::  HeatFlx2LitRByRunoff_2DH(:,:,:,:)                      !  
-  real(r8),allocatable ::  DrySnoFlxBySnowRedistribut(:,:,:)                         !  
-  real(r8),allocatable ::  WatFlxBySnowRedistribut(:,:,:)                         !
-  real(r8),allocatable ::  IceFlxBySnowRedistribut(:,:,:)                         !  
-  real(r8),allocatable ::  HeatFlxBySnowRedistribut(:,:,:)                        !  
   real(r8),allocatable ::  HeatFlow2Soili_3D(:,:,:,:)                     !  
   real(r8),allocatable ::  WaterFlow2Micpt_3D(:,:,:,:)                      !    
   real(r8),allocatable ::  WaterFlow2Macpt_3D(:,:,:,:)                     !  
@@ -77,7 +73,7 @@ implicit none
   allocate(TKSoil1_vr(0:JZ,JY,JX));    TKSoil1_vr=0._r8    
   allocate(DLYRR_COL(JY,JX));       DLYRR_col=0._r8  
   allocate(FracSoiPAsIce_vr(0:JZ,JY,JX)); FracSoiPAsIce_vr=0._r8 
-  allocate(AirFilledSoilPore_vr(0:JZ,JY,JX)); AirFilledSoilPore_vr=0._r8   
+  allocate(FracAirFilledSoilPore_vr(0:JZ,JY,JX)); FracAirFilledSoilPore_vr=0._r8   
   allocate(VHeatCapacity1_vr(0:JZ,JY,JX));  VHeatCapacity1_vr=0._r8  
   allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
   allocate(VLWatMicP1_vr(0:JZ,JY,JX));  VLWatMicP1_vr=0._r8  
@@ -105,15 +101,12 @@ implicit none
   allocate(VLHeatCapacityB_vr(JZ,JY,JX));   VLHeatCapacityB_vr=0._r8  
   allocate(ResistAreodynOverSoil_col(JY,JX));         ResistAreodynOverSoil_col=0._r8
   allocate(AScaledCdWOverSnow_col(JY,JX));       AScaledCdWOverSnow_col=0._r8
-  allocate(Altitude_grid(JY,JX));        Altitude_grid=0._r8  
+  allocate(Altitude_col(JY,JX));        Altitude_col=0._r8  
   allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8  
   allocate(RadSW2Sno_col(JY,JX));       RadSW2Sno_col=0._r8  
   allocate(WatFlx2LitRByRunoff_2DH(2,2,JV,JH));     WatFlx2LitRByRunoff_2DH=0._r8  
   allocate(HeatFlx2LitRByRunoff_2DH(2,2,JV,JH));    HeatFlx2LitRByRunoff_2DH=0._r8
-  allocate(DrySnoFlxBySnowRedistribut(2,JV,JH));       DrySnoFlxBySnowRedistribut=0._r8
-  allocate(WatFlxBySnowRedistribut(2,JV,JH));       WatFlxBySnowRedistribut=0._r8
-  allocate(IceFlxBySnowRedistribut(2,JV,JH));       IceFlxBySnowRedistribut=0._r8  
-  allocate(HeatFlxBySnowRedistribut(2,JV,JH));      HeatFlxBySnowRedistribut=0._r8
+
   allocate(HeatFlow2Soili_3D(3,JD,JV,JH));  HeatFlow2Soili_3D=0._r8
   allocate(WaterFlow2Micpt_3D(3,JD,JV,JH));   WaterFlow2Micpt_3D=0._r8  
   allocate(WaterFlow2Macpt_3D(3,JD,JV,JH));  WaterFlow2Macpt_3D=0._r8
@@ -144,7 +137,7 @@ implicit none
   call destroy(TKSoil1_vr)  
   call destroy(DLYRR_COL)  
   call destroy(FracSoiPAsIce_vr)  
-  call destroy(AirFilledSoilPore_vr)  
+  call destroy(FracAirFilledSoilPore_vr)  
   call destroy(VHeatCapacity1_vr)  
   call destroy(FracSoilAsAirt)  
   call destroy(VLWatMicP1_vr)  
@@ -172,14 +165,11 @@ implicit none
   call destroy(VLHeatCapacityB_vr)  
   call destroy(ResistAreodynOverSoil_col)
   call destroy(AScaledCdWOverSnow_col)
-  call destroy(Altitude_grid)
+  call destroy(Altitude_col)
   call destroy(VLiceMacP1_vr)
   call destroy(RadSW2Sno_col)
   call destroy(HeatFlx2LitRByRunoff_2DH)    
-  call destroy(DrySnoFlxBySnowRedistribut)  
-  call destroy(WatFlxBySnowRedistribut)
-  call destroy(IceFlxBySnowRedistribut)
-  call destroy(HeatFlxBySnowRedistribut)    
+
   call destroy(HeatFlow2Soili_3D)  
   call destroy(WaterFlow2Micpt_3D)  
   call destroy(WaterFlow2Macpt_3D)

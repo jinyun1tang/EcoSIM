@@ -216,7 +216,7 @@ implicit none
     call ncd_putvar(ncf,'BKVL',VLSoilMicPMass_vr(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS_vr(L,NY,NX))
     call ncd_putvar(ncf,'FC',FieldCapacity_vr(L,NY,NX))
-    call ncd_putvar(ncf,'ATKA',TairKClimMean(NY,NX))
+    call ncd_putvar(ncf,'ATKA',TairKClimMean_col(NY,NX))
     call ncd_putvar(ncf,'WP',WiltPoint_vr(L,NY,NX))
     call ncd_putvar(ncf,'SRP',SRP_vr(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
@@ -254,7 +254,7 @@ implicit none
     call ncd_putvar(ncf,'BKDS',SoilBulkDensity_vr(L,NY,NX))
 
     call ncd_putvar(ncf,'FracBulkSOMC_vr',FracBulkSOMC_vr(:,L,NY,NX))
-    call ncd_putvar(ncf,'OQM',DOM_vr(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OQM',DOM_MicP_vr(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OHM',SorbedOM_vr(:,:,L,NY,NX))
 
     call ncd_putvar(ncf,'CNOSC',CNOSC(:,:,L,NY,NX))

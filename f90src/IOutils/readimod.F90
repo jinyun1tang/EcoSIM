@@ -256,14 +256,17 @@ module readiMod
     write(*,*)'boundary condns for E surface runoff: RCHQEG',RCHQEG
     write(*,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
     write(*,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
-    write(*,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
-    write(*,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
-    write(*,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
-    write(*,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
-    write(*,*)'N distance to water table (m): RCHGNTG',RCHGNTG
-    write(*,*)'E distance to water table (m): RCHGETG',RCHGETG
-    write(*,*)'S distance to water table (m): RCHGSTG',RCHGSTG
-    write(*,*)'W distance to water table (m): RCHGWTG',RCHGWTG
+
+    write(*,*)'bound condns for N subsurf flow: RCHGNTG',RCHGNTG
+    write(*,*)'bound condns for E subsurf flow: RCHGETG',RCHGETG
+    write(*,*)'bound condns for S subsurf flow: RCHGSTG',RCHGSTG
+    write(*,*)'bound condns for W subsurf flow: RCHGWTG',RCHGWTG
+
+    write(*,*)'N distance to water table (m): RCHGNUG',RCHGNUG
+    write(*,*)'E distance to water table (m): RCHGEUG',RCHGEUG
+    write(*,*)'S distance to water table (m): RCHGSUG',RCHGSUG
+    write(*,*)'W distance to water table (m): RCHGWUG',RCHGWUG
+
     write(*,*)'lower boundary conditions for water flow:RCHGDG', RCHGDG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'width of each W-E landscape column: DHI'
@@ -276,7 +279,7 @@ module readiMod
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
       ALAT(NY,NX)               = ALATG
-      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
+      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
       ALTI(NY,NX)               = ALTIG
       ATCAI(NY,NX)              = ATCAG
       IDWaterTable_col(NY,NX)   = iWaterTabelMode
@@ -286,33 +289,33 @@ module readiMod
       CH4E_col(NY,NX)           = ach4_ppm
       Z2OE_col(NY,NX)           = an2o_ppm
       ARGE_col(NY,NX)           = arg_ppm
-      ZNH3E_col(NY,NX)          = ZNH3EG
-      KoppenClimZone_col(NY,NX) = IETYPG
-      FlowDirIndicator(NY,NX)   = grid_mode
-      NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
-      WtblDepzTile_col(NY,NX)   = WTBLDepz_tile
-      WaterTBLSlope_col(NY,NX)  = DTBLGG
+      ZNH3E_col(NY,NX)          = anh3_ppm
+      KoppenClimZone_col(NY,NX)   = IETYPG
+      FlowDirIndicator_col(NY,NX) = grid_mode
+      NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
+      WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
+      WaterTBLSlope_col(NY,NX)    = DTBLGG
 
       RechargNorthSurf(NY,NX) = RCHQNG
       RechargEastSurf(NY,NX)  = RCHQEG
       RechargSouthSurf(NY,NX) = RCHQSG
-      RechargWestSurf(NY,NX)  = RCHQWG
+      RechargWestSurf(NY,NX)  = RCHQWG 
 
-      RechargNorthSubSurf(NY,NX) = RCHGNUG
-      RechargEastSubSurf(NY,NX)  = RCHGEUG
-      RechargSouthSubSurf(NY,NX) = RCHGSUG
-      RechargWestSubSurf(NY,NX)  = RCHGWUG
+      RechrgDistNorthSubSurf(NY,NX) = RCHGNUG
+      RechrgDistEastSubSurf(NY,NX)  = RCHGEUG
+      RechrgDistSouthSubSurf(NY,NX) = RCHGSUG
+      RechrgDistWestSubSurf(NY,NX)  = RCHGWUG
 
       RechargRateNorthWTBL(NY,NX) = RCHGNTG
       RechargRateEastWTBL(NY,NX)  = RCHGETG
       RechargRateSouthWTBL(NY,NX) = RCHGSTG
-      RechargRateWestWTBL(NY,NX)  = RCHGWTG
-      
-      RechargBottom_col(NY,NX)                = RCHGDG
-      DH(NY,NX)                   = DHI(NX)
-      DV(NY,NX)                   = DVI(NY)
-      CO2E_col(NY,NX)             = CO2EI(NY,NX)
-      H2GE_col(NY,NX)                 = 1.0E-03_r8
+      RechargRateWestWTBL(NY,NX)  = RCHGWTG      
+      RechargBottom_col(NY,NX) = RCHGDG
+
+      DH(NY,NX)                = DHI(NX)
+      DV(NY,NX)                = DVI(NY)
+      CO2E_col(NY,NX)          = CO2EI(NY,NX)
+      H2GE_col(NY,NX)          = ah2_ppm
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
@@ -379,7 +382,7 @@ module readiMod
 !     SURFACE SLOPES AND ASPECTS
 !
         ASP_col(NY,NX)       = ASPX
-        SL(NY,NX)            = SL0
+        SL_col(NY,NX)            = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
@@ -412,9 +415,10 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
     
-    NU(NV1,NH1) = NUI(NV1,NH1)
+    NU(NV1,NH1) = NUI(NV1,NH1)    
     NK(NV1,NH1) = MaxNumRootLays(NV1,NH1)+1
     NM(NV1,NH1) = MaxNumRootLays(NV1,NH1)+NL1
+    
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
     NLI(NV1,NH1) = NM(NV1,NH1)+NL2
@@ -809,7 +813,7 @@ module readiMod
   write(*,'(40A)')('-',ll=1,40)
   write(*,*)'NY, NX =',NY,NX
   write(*,*)'Aspect (o): ASPX',ASP_col(NY,NX)
-  write(*,*)'Slope (o): SL0',SL(NY,NX)
+  write(*,*)'Slope (o): SL0',SL_col(NY,NX)
   write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth_col(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 

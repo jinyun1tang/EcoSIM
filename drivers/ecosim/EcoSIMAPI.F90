@@ -144,6 +144,7 @@ contains
   integer              , intent(out) :: LYRG
   integer              , intent(out) :: nmicbguilds
 
+
   logical :: do_regression_test
   integer :: num_of_simdays
   logical :: lverbose
@@ -157,7 +158,7 @@ contains
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
-    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
+    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,ldebug_day
 
@@ -310,7 +311,6 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
 !
   use data_kind_mod,   only: r8 => DAT_KIND_R8
   use DayMod,          only: day
-  use ExecMod,         only: exec
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts

@@ -3,16 +3,17 @@ module EcosimConst
   implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  real(r8), parameter :: secspday=86400._r8
-  real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
-  real(r8), parameter :: cpw=4.186_r8           !volumetric heat capacity for water, J/g/K~MJ/m3/K
-  real(r8), parameter :: cpi=1.9274_r8         !volumetric heat capacity for ice, MJ/m3/K
-  real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter, MJ/K/gC
-  real(r8), parameter :: cps=2.095_r8          !volumetric heat capacity for fresh snow,MJ/m3/K
-  real(r8), parameter :: TFice=273.15_r8       !frozen temperature [K]
-  real(r8), parameter :: TC2K=273.15_r8        !temperature for converting celcius to Kelvin
-  real(r8), parameter :: Tref=273.15_r8        !reference temperature for atmospheric variables [K]
-  real(r8), parameter :: VLHeatCapSnoMin=2.095E-04_r8 !minimum heat capacities for solving
+  real(r8), parameter :: secsphour       = 3600._r8
+  real(r8), parameter :: secspday        = 86400._r8
+  real(r8), parameter :: secspyear       = 86400._r8*365._r8   !seconds in a normal year
+  real(r8), parameter :: cpw             = 4.186_r8            !volumetric heat capacity for water,     J/g/K~MJ/m3/K
+  real(r8), parameter :: cpi             = 1.9274_r8           !volumetric heat capacity for ice,        MJ/m3/K
+  real(r8), parameter :: cpo             = 2.496E-06_r8        !heat capacity for organic matter,        MJ/K/gC
+  real(r8), parameter :: cps             = 2.095_r8            !volumetric heat capacity for fresh snow, MJ/m3/K
+  real(r8), parameter :: TFice           = 273.15_r8           !frozen temperature [K]
+  real(r8), parameter :: TC2K            = 273.15_r8           !temperature for converting celcius to Kelvin
+  real(r8), parameter :: Tref            = 273.15_r8           !reference temperature for atmospheric variables [K]
+  real(r8), parameter :: VLHeatCapSnoMin = 2.095E-04_r8 !minimum heat capacities for solving
                                                !snowpack layered water and heat fluxes, [MJ/K]
   real(r8), parameter :: VLHeatCapLitRMin=4.190E-05_r8 !minimum heat capacities for solving
                                                !surface litter water and heat fluxes, [MJ/K]

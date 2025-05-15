@@ -7,7 +7,7 @@ module MicBGCAPI
   use MicStateTraitTypeMod, only: micsttype
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
-  use minimathmod,          only: AZMAX1,safe_adb
+  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
@@ -276,7 +276,7 @@ implicit none
   endif
   micfor%DiffusivitySolutEff(1:NPH) = DiffusivitySolutEffM_vr(1:NPH,L,NY,NX)
   micfor%FILM(1:NPH)                = FILMM_vr(1:NPH,L,NY,NX)
-  micfor%THETPM(1:NPH)              = AirFilledSoilPoreM_vr(1:NPH,L,NY,NX)
+  micfor%THETPM(1:NPH)              = FracAirFilledSoilPoreM_vr(1:NPH,L,NY,NX)
   micfor%VLWatMicPM(1:NPH)          = VLWatMicPM_vr(1:NPH,L,NY,NX)
   micfor%TortMicPM(1:NPH)           = TortMicPM_vr(1:NPH,L,NY,NX)
   micfor%VLsoiAirPM(1:NPH)          = VLsoiAirPM_vr(1:NPH,L,NY,NX)
@@ -315,7 +315,7 @@ implicit none
   micstt%ZNFNI             = ZNFNI_vr(L,NY,NX)
   DO K=1,jcplx
     DO idom=idom_beg,idom_end  
-      micstt%DOM(idom,K) = AZMAX1(DOM_vr(idom,K,L,NY,NX))
+      micstt%DOM(idom,K) = AZMAX1(DOM_MicP_vr(idom,K,L,NY,NX))
     ENDDO
   ENDDO
 
@@ -487,15 +487,17 @@ implicit none
   TSens4MicbGrwoth_vr(L,NY,NX)                   = micstt%TSens4MicbGrwoth
   VWatMicrobAct_vr(L,NY,NX)                      = micstt%VWatMicrobAct
   TMicHeterActivity_vr(L,NY,NX)                  = micstt%TMicHeterActivity
-  ZNFNI_vr(L,NY,NX)                                 = micstt%ZNFNI
-  FracBulkSOMC_vr(1:jcplx,L,NY,NX)               = micstt%FracBulkSOMC(1:jcplx)
-  DOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX)      = micstt%DOM(idom_beg:idom_end,1:jcplx)
-  SorbedOM_vr(idom_beg:idom_end,1:jcplx,L,NY,NX) = micstt%SorbedOM(idom_beg:idom_end,1:jcplx)
+  ZNFNI_vr(L,NY,NX)                              = micstt%ZNFNI
 
   do k=1,jcplx
+    FracBulkSOMC_vr(K,L,NY,NX)    = micstt%FracBulkSOMC(K)
     DO idom=idom_beg,idom_end
-      if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.E-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
-      if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8
+      DOM_MicP_vr(idom,K,L,NY,NX) = AZERO1(micstt%DOM(idom,K),1.e-11_r8)
+      SorbedOM_vr(idom,K,L,NY,NX) = AZERO1(micstt%SorbedOM(idom,K),1.e-11_r8)
+      IF(DOM_MicP_vr(idom,K,L,NY,NX)<0._R8 .or. SorbedOM_vr(idom,K,L,NY,NX)<0._r8)then
+        write(*,*)'micb',idom,K,L,DOM_MicP_vr(idom,K,L,NY,NX),SorbedOM_vr(idom,K,L,NY,NX)
+        stop
+      endif
     enddo
   enddo
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:jcplx,L,NY,NX)           = micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:jcplx)
