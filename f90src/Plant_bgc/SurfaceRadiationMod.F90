@@ -131,14 +131,14 @@ module SurfaceRadiationMod
   integer :: NZ,L,K,NB,N
   !     begin_execution
   associate(                                                  &
-    NP                    => plt_site%NP,                     &
-    ZEROS                 => plt_site%ZEROS,                  &
-    CanopyHeight_col      => plt_morph%CanopyHeight_col,      &
-    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     &
+    NP                    => plt_site%NP,                     & !Input: Number of pfts [m]
+    ZEROS                 => plt_site%ZEROS,                  & !
+    CanopyHeight_col      => plt_morph%CanopyHeight_col,      & 
+    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     & !Input: pft Canopy height [m]
     CanopyHeight_pft      => plt_morph%CanopyHeight_pft,      &
     CanopyStemAareZ_col   => plt_morph%CanopyStemAareZ_col,   &
-    CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   &
-    StemArea_col          => plt_morph%StemArea_col,          &
+    CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   & !Input: vertically resolved Canopy LAI [m2/m2]
+    StemArea_col          => plt_morph%StemArea_col,          & !Input: vertically resolved stem LAI [m2/m2]
     CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col     &
   )
   !
