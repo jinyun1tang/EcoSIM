@@ -14,7 +14,7 @@ module grosubsMod
   use PlantAPIData
   use PhotoSynsMod
   use PlantMathFuncMod
-  use LitrFallMod
+  use LitterFallMod
   use PlantBranchMod
   use PlantBalMod
   implicit none
@@ -343,7 +343,6 @@ module grosubsMod
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft              &
   )
 
-
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ) = 0._r8
     BegRemoblize        = 0
@@ -378,7 +377,7 @@ module grosubsMod
   call PrintRootTracer(I,J,NZ,'afbiomrm')
 !
 !     RESET DEAD BRANCHES
-  call ResetDeadBranch(I,J,NZ)
+  call ResetDeadPlant(I,J,NZ)
 
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
 

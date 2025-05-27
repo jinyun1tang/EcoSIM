@@ -510,7 +510,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
   call ncd_getvar(pft_nfid, 'WDLF', loc,rLen2WidthLeaf_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstC2InitBranch_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PB', loc,NonstCMinConc2InitBranch_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XTLI', loc,ShootNodeNumAtPlanting_pft(NZ,NY,NX))
@@ -522,7 +522,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC(NZ,NY,NX))
 
 
-  call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumOfLeafZenithSectors,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
@@ -837,7 +837,7 @@ implicit none
   call writefixl(nu_plt,'Hour requirement for spring leafout VRNLI',VRNLI,70)
   call writefixl(nu_plt,'Hour requirement for autumn leafoff VRNXI',VRNXI,70)
   call writefixl(nu_plt,'Leaf length:width ratio WDLF',rLen2WidthLeaf_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',MinNonstC2InitBranch_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',NonstCMinConc2InitBranch_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
   call writefixl(nu_plt,'Node number at planting XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
@@ -859,7 +859,7 @@ implicit none
   call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC(NZ,NY,NX),70)
   call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
-    CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX),70)
+    LeafAngleClass_pft(1:NumOfLeafZenithSectors,NZ,NY,NX),70)
   call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'stem angle from horizontal ANGBR',BranchAngle_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'petiole angle from horizontal ANGSH',PetioleAngle_pft(NZ,NY,NX),70)

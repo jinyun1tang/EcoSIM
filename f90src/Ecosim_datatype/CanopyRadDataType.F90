@@ -13,7 +13,7 @@ module CanopyRadDataType
   integer,target,allocatable :: iScatteringDiffus(:,:,:)            !flag for calculating backscattering of radiation in canopy
   real(r8),target,allocatable :: RadDifPAR_zsec(:,:,:,:,:,:)        !diffuse incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: RadPAR_zsec(:,:,:,:,:,:)           !direct incoming PAR, [umol m-2 s-1]
-  real(r8),target,allocatable :: CLASS(:,:,:,:)                     !fractionction of leaves in different angle classes, [-]
+  real(r8),target,allocatable :: LeafAngleClass_pft(:,:,:,:)        !fractionction of leaves in different angle classes, [-]
   real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)   !leaf surface area, [m2 d-2]
   real(r8),target,allocatable :: LeafAUnshaded_zsec(:,:,:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
   real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)     !stem surface area, [m2 d-2]
@@ -59,7 +59,7 @@ module CanopyRadDataType
   allocate(OMEGA(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGA=0._r8
   allocate(OMEGX(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGX=0._r8
   allocate(iScatteringDiffus(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(CLASS(NumOfLeafZenithSectors,JP,JY,JX));CLASS=0._r8
+  allocate(LeafAngleClass_pft(NumOfLeafZenithSectors,JP,JY,JX));LeafAngleClass_pft=0._r8
   allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaZsec_brch=0._r8
   allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAUnshaded_zsec=0._r8
   allocate(RadPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX));RadPAR_zsec=0._r8
@@ -79,7 +79,7 @@ module CanopyRadDataType
   call destroy(OMEGA)
   call destroy(OMEGX)
   call destroy(iScatteringDiffus)
-  call destroy(CLASS)
+  call destroy(LeafAngleClass_pft)
   call destroy(LeafAreaZsec_brch)
   call destroy(LeafAUnshaded_zsec)
   call destroy(RadPAR_zsec)

@@ -41,7 +41,7 @@ module ExtractsMod
 
       call TotalGasandSoluteUptake(I,J,NZ)
 
-      call CanopyFluxesandFixation(NZ)
+      call ExtractCanopyFluxes(I,J,NZ)
 
     ENDIF
   ENDDO
@@ -99,12 +99,12 @@ module ExtractsMod
       ENDDO
     ENDDO
   ENDDO
-  CanopyLeafArea_col=0._r8
-  StemArea_col=0._r8
-  DO  L=1,NumOfCanopyLayers1
-    CanopyLeafAareZ_col(L)=0._r8
-    tCanLeafC_cl(L)=0._r8
-    CanopyStemAareZ_col(L)=0._r8
+     CanopyLeafArea_col = 0._r8
+     StemArea_col       = 0._r8
+  DO L                  = 1, NumOfCanopyLayers1
+    CanopyLeafAareZ_col(L) = 0._r8
+    tCanLeafC_cl(L)        = 0._r8
+    CanopyStemAareZ_col(L) = 0._r8
   ENDDO
   end associate
   end subroutine TotalLitrFall
@@ -280,7 +280,7 @@ module ExtractsMod
   end subroutine TotalGasandSoluteUptake
 !------------------------------------------------------------------------------------------
 
-  subroutine CanopyFluxesandFixation(NZ)
+  subroutine ExtractCanopyFluxes(I,J,NZ)
 !
 !     TOTAL ROOT N2 FIXATION BY ALL PLANT SPECIES
 !
@@ -289,7 +289,7 @@ module ExtractsMod
 !
 
   implicit none
-  integer, intent(in) :: NZ
+  integer, intent(in) :: I,J,NZ
   integer :: L, NE,NB,idg
   real(r8) :: ENGYC
 
@@ -352,7 +352,7 @@ module ExtractsMod
 !     HeatXAir2PCan_pft=PFT canopy sensible heat flux
 !     Eco_Heat_GrndSurf_col=total canopy storage heat flux
 !     HeatStorCanopy_pft=PFT canopy storage heat flux
-!     Canopy_NEE_col=total net CO2 fixation
+!     Canopy_NEE_col=total net CO2 fixation in the column
 !     CO2NetFix_pft=PFT net CO2 fixation
 !     CanopyWat_col,WatHeldOnCanopy=total water volume in canopy,on canopy surfaces
 !     CanopyBiomWater_pft,WatHeldOnCanopy_pft=PFT water volume in canopy,on canopy surfaces
@@ -404,6 +404,6 @@ module ExtractsMod
   NH3Emis_CumYr_pft(NZ)=NH3Emis_CumYr_pft(NZ)+NH3Dep2Can_pft(NZ)
 
   end associate
-  end subroutine CanopyFluxesandFixation
+  end subroutine ExtractCanopyFluxes
 
   end module ExtractsMod

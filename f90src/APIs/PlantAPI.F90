@@ -430,7 +430,7 @@ implicit none
       ENDDO
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers
-          CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)                         = plt_morph%CanopyLeafArea_lpft(L,K,NB,NZ)
+          CanopyLeafArea_lnode(L,K,NB,NZ,NY,NX)                         = plt_morph%CanopyLeafArea_lnode(L,K,NB,NZ)
           LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX) = plt_biom%LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)
         ENDDO
       ENDDO
@@ -493,7 +493,7 @@ implicit none
         Root1stRadius_pvr(N,L,NZ,NY,NX)                            = plt_morph%Root1stRadius_pvr(N,L,NZ)
         Root2ndRadius_pvr(N,L,NZ,NY,NX)                            = plt_morph%Root2ndRadius_pvr(N,L,NZ)
         RootAreaPerPlant_pvr(N,L,NZ,NY,NX)                         = plt_morph%RootAreaPerPlant_pvr(N,L,NZ)
-        Root2ndAveLen_pvr(N,L,NZ,NY,NX)                            = plt_morph%Root2ndAveLen_pvr(N,L,NZ)
+        Root2ndMeanLens_pvr(N,L,NZ,NY,NX)                            = plt_morph%Root2ndMeanLens_pvr(N,L,NZ)
         RootRespPotent_pvr(N,L,NZ,NY,NX)                           = plt_rbgc%RootRespPotent_pvr(N,L,NZ)
         RootCO2EmisPot_pvr(N,L,NZ,NY,NX)                           = plt_rbgc%RootCO2EmisPot_pvr(N,L,NZ)
         RootCO2Autor_pvr(N,L,NZ,NY,NX)                             = plt_rbgc%RootCO2Autor_pvr(N,L,NZ)
@@ -800,7 +800,7 @@ implicit none
     plt_pheno%RefLeafAppearRate_pft(NZ)      = RefLeafAppearRate_pft(NZ,NY,NX)
     plt_pheno%TCChill4Seed_pft(NZ)           = TCChill4Seed_pft(NZ,NY,NX)
     plt_morph%rLen2WidthLeaf_pft(NZ)         = rLen2WidthLeaf_pft(NZ,NY,NX)
-    plt_pheno%MinNonstC2InitBranch_pft(NZ)   = MinNonstC2InitBranch_pft(NZ,NY,NX)
+    plt_pheno%NonstCMinConc2InitBranch_pft(NZ)   = NonstCMinConc2InitBranch_pft(NZ,NY,NX)
     plt_morph%ShootNodeNumAtPlanting_pft(NZ) = ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     plt_pheno%CriticPhotoPeriod_pft(NZ)      = CriticPhotoPeriod_pft(NZ,NY,NX)
     plt_pheno%PhotoPeriodSens_pft(NZ)        = PhotoPeriodSens_pft(NZ,NY,NX)
@@ -808,7 +808,7 @@ implicit none
     plt_morph%PetoLen2Mass_pft(NZ)           = PetoLen2Mass_pft(NZ,NY,NX)
     plt_morph%NodeLenPergC(NZ)               = NodeLenPergC(NZ,NY,NX)
     DO  N=1,NumOfLeafZenithSectors
-      plt_morph%CLASS(N,NZ)=CLASS(N,NZ,NY,NX)
+      plt_morph%LeafAngleClass_pft(N,NZ)=LeafAngleClass_pft(N,NZ,NY,NX)
     ENDDO
     plt_morph%ClumpFactorInit_pft(NZ)     = ClumpFactorInit_pft(NZ,NY,NX)
     plt_morph%SineBranchAngle_pft(NZ)     = SineBranchAngle_pft(NZ,NY,NX)
@@ -1266,7 +1266,7 @@ implicit none
 
       DO K=0,MaxNodesPerBranch
         DO  L=1,NumOfCanopyLayers                    
-          plt_morph%CanopyLeafArea_lpft(L,K,NB,NZ)                        = CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)
+          plt_morph%CanopyLeafArea_lnode(L,K,NB,NZ)                        = CanopyLeafArea_lnode(L,K,NB,NZ,NY,NX)
           plt_biom%LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) = LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)
         ENDDO
       ENDDO
@@ -1305,7 +1305,7 @@ implicit none
         plt_morph%Root1stRadius_pvr(N,L,NZ)       = Root1stRadius_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndRadius_pvr(N,L,NZ)       = Root2ndRadius_pvr(N,L,NZ,NY,NX)
         plt_morph%RootAreaPerPlant_pvr(N,L,NZ)    = RootAreaPerPlant_pvr(N,L,NZ,NY,NX)
-        plt_morph%Root2ndAveLen_pvr(N,L,NZ)       = Root2ndAveLen_pvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndMeanLens_pvr(N,L,NZ)       = Root2ndMeanLens_pvr(N,L,NZ,NY,NX)
 
         plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)     = RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)     = RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)

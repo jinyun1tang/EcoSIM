@@ -153,7 +153,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)         !sheath element , [g d-2]
   real(r8),target,allocatable ::  InternodeStrutElms_brch(:,:,:,:,:,:)       !internode element, [g d-2]
   real(r8),target,allocatable ::  LeafElmsByLayerNode_brch(:,:,:,:,:,:,:)    !layer leaf element, [g d-2]
-  real(r8),target,allocatable ::  CanopyLeafArea_lpft(:,:,:,:,:,:)           !layer leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLeafArea_lnode(:,:,:,:,:,:)           !layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafProteinCNode_brch(:,:,:,:,:)           !layer leaf protein C, [g d-2]
   real(r8),target,allocatable ::  PetoleProteinCNode_brch(:,:,:,:,:)         !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)            !nodule nonstructural C, [g d-2]
@@ -319,7 +319,7 @@ module CanopyDataType
   allocate(InternodeStrutElms_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeStrutElms_brch=0._r8
   allocate(LeafElmsByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));
   LeafElmsByLayerNode_brch=0._r8
-  allocate(CanopyLeafArea_lpft(NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafArea_lpft=0._r8
+  allocate(CanopyLeafArea_lnode(NumOfCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafArea_lnode=0._r8
   allocate(LeafProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinCNode_brch=0._r8
   allocate(PetoleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleProteinCNode_brch=0._r8
   allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
@@ -481,7 +481,7 @@ module CanopyDataType
   call destroy(PetioleElmntNode_brch)
   call destroy(InternodeStrutElms_brch)
   call destroy(LeafElmsByLayerNode_brch)
-  call destroy(CanopyLeafArea_lpft)
+  call destroy(CanopyLeafArea_lnode)
   call destroy(LeafProteinCNode_brch)
   call destroy(PetoleProteinCNode_brch)
   call destroy(NoduleNonstructCconc_pft)

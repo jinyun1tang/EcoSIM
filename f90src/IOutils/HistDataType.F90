@@ -41,89 +41,90 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   type, public :: histdata_type
-  real(r8),pointer   :: h1D_tFIRE_CO2_col(:)     !CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tFIRE_CH4_col(:)     !CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cNH4_LITR_col(:)     !(trcs_solml_vr(ids_NH4,0,NY,NX)+14.0*trcx_solml_vr(idx_NH4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_cNO3_LITR_col(:)      !(trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)                            
-  real(r8),pointer   :: h1D_ECO_HVST_N_col(:)     !EcoHavstElmnt_CumYr_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NET_N_MIN_col(:)      !-NetNH4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tLITR_P_col(:)    !tLitrOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUMUS_C_col(:)        !tHumOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUMUS_N_col(:)        !tHumOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUMUS_P_col(:)        !tHumOM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_AMENDED_P_col(:)       !FerPFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tLITRf_P_FLX_col(:)   !LiterfalOrgM_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tEXCH_PO4_col(:)       !tHxPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), exchangeable 
-  real(r8),pointer   :: h1D_SUR_DOP_FLX_col(:)    !HydroSufDOPFlx_CumYr_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUB_DOP_FLX_col(:)    !HydroSubsDOPFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)    !HydroSufDIPFlx_CumYr_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)    !HydroSubsDIPFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)   !
-  real(r8),pointer   :: h1D_RadSW_Grnd_col(:)   !RadSWGrnd_col(NY,NX)
-  real(r8),pointer   :: h1D_Qinfl2soi_col(:)      !
-  real(r8),pointer   :: h1D_Qdrain_col(:)          !drainage
-  real(r8),pointer   :: h1D_tPREC_P_col(:)       !tXPO4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tMICRO_P_col(:)        !tMicBiome_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tFIRE_CO2_col(:)    
+  real(r8),pointer   :: h1D_tFIRE_CH4_col(:)    
+  real(r8),pointer   :: h1D_cNH4_LITR_col(:)    
+  real(r8),pointer   :: h1D_cNO3_LITR_col(:)    
+  real(r8),pointer   :: h1D_ECO_HVST_N_col(:)   
+  real(r8),pointer   :: h1D_NET_N_MIN_col(:)    
+  real(r8),pointer   :: h1D_tLITR_P_col(:)   
+  real(r8),pointer   :: h1D_HUMUS_C_col(:)   
+  real(r8),pointer   :: h1D_HUMUS_N_col(:)   
+  real(r8),pointer   :: h1D_HUMUS_P_col(:)   
+  real(r8),pointer   :: h1D_AMENDED_P_col(:)    
+  real(r8),pointer   :: h1D_tLITRf_P_FLX_col(:) 
+  real(r8),pointer   :: h1D_tEXCH_PO4_col(:)    
+  real(r8),pointer   :: h1D_SUR_DOP_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUB_DOP_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)  
+  real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)  
+  real(r8),pointer   :: h1D_RadSW_Grnd_col(:)  
+  real(r8),pointer   :: h1D_Qinfl2soi_col(:)   
+  real(r8),pointer   :: h1D_Qdrain_col(:)      
+  real(r8),pointer   :: h1D_tPREC_P_col(:)     
+  real(r8),pointer   :: h1D_tMICRO_P_col(:)    
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
   real(r8),pointer   :: h1D_tSoilOrgP_col(:)
-  real(r8),pointer   :: h1D_PO4_FIRE_col(:)       !PO4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cPO4_LITR_col(:)      !trcs_solml_vr(ids_H2PO4,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:)     !31.0*(trcx_solml_vr(idx_HPO4,0,NY,NX)+trcx_solml_vr(idx_H2PO4,0,NY,NX))/VLSoilMicPMass_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_ECO_HVST_P_col(:)     !EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NET_P_MIN_col(:)      !-NetPO4Mineralize_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:)    !HydroIonFlx_CumYr_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ELEV_col(:)      !-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
-  real(r8),pointer   :: h1D_tLITR_N_col(:)       !litter N
-  real(r8),pointer   :: h2D_RootAR_vr(:,:)       !Root autotrophic respiraiton profile 
-  real(r8),pointer   :: h1D_RootAR_col(:)        !integrated Root autotrophic respiraiton
+  real(r8),pointer   :: h1D_PO4_FIRE_col(:)    
+  real(r8),pointer   :: h1D_cPO4_LITR_col(:)    
+  real(r8),pointer   :: h1D_cEXCH_P_LITR_col(:) 
+  real(r8),pointer   :: h1D_ECO_HVST_P_col(:)   
+  real(r8),pointer   :: h1D_NET_P_MIN_col(:)    
+  real(r8),pointer   :: h1D_tSALT_DISCHG_FLX_col(:) 
+  real(r8),pointer   :: h1D_PSI_SURF_col(:)     
+  real(r8),pointer   :: h1D_SURF_ELEV_col(:)    
+  real(r8),pointer   :: h1D_tLITR_N_col(:)      
+  real(r8),pointer   :: h2D_RootAR_vr(:,:)      
+  real(r8),pointer   :: h1D_RootAR_col(:)       
   real(r8),pointer   :: h2D_BotDEPZ_vr(:,:)
   real(r8),pointer   :: h1D_tRAD_col(:)
-  real(r8),pointer   :: h1D_AMENDED_N_col(:)       !FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tLITRf_N_FLX_col(:)  !LiterfalOrgM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tLITRf_C_FLX_col(:)  !LiterfalOrgM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tNH4X_col(:)           !tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NH3+NH4 content
-  real(r8),pointer   :: h1D_tNO3_col(:)           !tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total NO3+NO2 content
-  real(r8),pointer   :: h1D_SUR_DON_FLX_col(:)    !HydroSufDONFlx_CumYr_col(NY,NX)/TAREA, daily flux
-  real(r8),pointer   :: h1D_SUB_DON_FLX_col(:)    !HydroSubsDONFlx_col(NY,NX)/TAREA, daily flux
-  real(r8),pointer   :: h1D_SUR_DIN_FLX_col(:)    !HydroSufDINFlx_CumYr_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUB_DIN_FLX_col(:)    !HydroSubsDINFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_tMICRO_N_col(:)        !tMicBiome_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_TEMP_LITR_col(:)      !TCS_vr(0,NY,NX)
+  real(r8),pointer   :: h1D_AMENDED_N_col(:)    
+  real(r8),pointer   :: h1D_tLITRf_N_FLX_col(:) 
+  real(r8),pointer   :: h1D_tLITRf_C_FLX_col(:) 
+  real(r8),pointer   :: h1D_tNH4X_col(:)        
+  real(r8),pointer   :: h1D_tNO3_col(:)         
+  real(r8),pointer   :: h1D_SUR_DON_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUB_DON_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUR_DIN_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUB_DIN_FLX_col(:)  
+  real(r8),pointer   :: h1D_tMICRO_N_col(:)     
+  real(r8),pointer   :: h1D_TEMP_LITR_col(:)    
   real(r8),pointer   :: h1D_TEMP_surf_col(:)
-  real(r8),pointer   :: h1D_TEMP_SNOW_col(:)      !TCSnow_snvr(1,NY,NX)
-  real(r8),pointer   :: h1D_FracBySnow_col(:)    !fraction ground covered by snow
-  real(r8),pointer   :: h1D_FracByLitr_col(:)    !fraction ground covered by litter
-  real(r8),pointer   :: h1D_tLITR_C_col(:)      !tLitrOM_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_AMENDED_C_col(:)      !AmendCFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tMICRO_C_col(:)        !tMicBiome_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_OMC_LITR_col(:)       !SoilOrgM_vr(ielmc,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual C
-  real(r8),pointer   :: h1D_OMN_LITR_col(:)       !SoilOrgM_vr(ielmn,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual N
-  real(r8),pointer   :: h1D_OMP_LITR_col(:)       !SoilOrgM_vr(ielmp,0,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total residual P
-  real(r8),pointer   :: h1D_SUR_DOC_FLX_col(:)    !HydroSufDOCFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUB_DOC_FLX_col(:)    !HydroSubsDOCFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUR_DIC_FLX_col(:)    !HydroSufDICFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_SUB_DIC_FLX_col(:)    !HydroSubsDICFlx_col(NY,NX)/TAREA
-  real(r8),pointer   :: h1D_ATM_CO2_col(:)        !CO2E_col(NY,NX)
-  real(r8),pointer   :: h1D_ATM_CH4_col(:)        !CH4E
-  real(r8),pointer   :: h1D_NBP_col(:)            !Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_HVST_C_col(:)     !EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_LAI_col(:)        !CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Eco_GPP_CumYr_col(:)        !Eco_GPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_RA_col(:)         !Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Eco_NPP_CumYr_col(:)        !Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Eco_HR_CumYr_col(:)         !Eco_HR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_TEMP_SNOW_col(:)    
+  real(r8),pointer   :: h1D_FracBySnow_col(:)   
+  real(r8),pointer   :: h1D_FracByLitr_col(:)   
+  real(r8),pointer   :: h1D_tLITR_C_col(:)      
+  real(r8),pointer   :: h1D_AMENDED_C_col(:)    
+  real(r8),pointer   :: h1D_tMICRO_C_col(:)     
+  real(r8),pointer   :: h1D_OMC_LITR_col(:)     
+  real(r8),pointer   :: h1D_OMN_LITR_col(:)     
+  real(r8),pointer   :: h1D_OMP_LITR_col(:)     
+  real(r8),pointer   :: h1D_SUR_DOC_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUB_DOC_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUR_DIC_FLX_col(:)  
+  real(r8),pointer   :: h1D_SUB_DIC_FLX_col(:)  
+  real(r8),pointer   :: h1D_ATM_CO2_col(:)      
+  real(r8),pointer   :: h1D_ATM_CH4_col(:)      
+  real(r8),pointer   :: h1D_NBP_col(:)          
+  real(r8),pointer   :: h1D_ECO_HVST_C_col(:)  
+  real(r8),pointer   :: h1D_ECO_LAI_col(:)
+  real(r8),pointer   :: h1D_ECO_SAI_col(:)
+  real(r8),pointer   :: h1D_Eco_GPP_CumYr_col(:)   
+  real(r8),pointer   :: h1D_ECO_RA_col(:)        
+  real(r8),pointer   :: h1D_Eco_NPP_CumYr_col(:) 
+  real(r8),pointer   :: h1D_Eco_HR_CumYr_col(:)  
   real(r8),pointer   :: h1D_Eco_HR_CO2_col(:)   
   real(r8),pointer   :: h1D_Eco_HR_CO2_litr_col(:)   
   real(r8),pointer   :: h2D_Eco_HR_CO2_vr(:,:)   
   real(r8),pointer   :: h2D_Gchem_CO2_prod_vr(:,:)
-  real(r8),pointer   :: h1D_tDIC_col(:)        !DIC_mass_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
-  real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)       !StandingDeadStrutElms_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)       !StandingDeadStrutElms_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_tSTANDING_DEAD_P_col(:)       !StandingDeadStrutElms_col(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
-  real(r8),pointer   :: h1D_tPRECIP_col(:)          !1000.0_r8*QRain_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_ET_col(:)             !1000.0_r8*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_tDIC_col(:)       
+  real(r8),pointer   :: h1D_tSTANDING_DEAD_C_col(:)  
+  real(r8),pointer   :: h1D_tSTANDING_DEAD_N_col(:)  
+  real(r8),pointer   :: h1D_tSTANDING_DEAD_P_col(:)  
+  real(r8),pointer   :: h1D_tPRECIP_col(:)        
+  real(r8),pointer   :: h1D_ECO_ET_col(:)         
   real(r8),pointer   :: h1D_trcg_Ar_cumerr_col(:)
   real(r8),pointer   :: h1D_trcg_CO2_cumerr_col(:)
   real(r8),pointer   :: h1D_trcg_CH4_cumerr_col(:)
@@ -133,29 +134,29 @@ implicit none
   real(r8),pointer   :: h1D_trcg_H2_cumerr_col(:)
   real(r8),pointer   :: h1D_ECO_RADSW_col(:)
   real(r8),pointer   :: h1d_CAN_NEE_col(:)
-  real(r8),pointer   :: h1D_N2O_LITR_col(:)       !trc_solcl_vr(idg_N2O,0,NY,NX)
-  real(r8),pointer   :: h1D_NH3_LITR_col(:)       !trc_solcl_vr(idg_NH3,0,NY,NX)
-  real(r8),pointer   :: h1D_SOL_RADN_col(:)       !RAD(NY,NX)*277.8, W m-2
-  real(r8),pointer   :: h1D_AIR_TEMP_col(:)       !TCA_col(NY,NX)
-  real(r8),pointer   :: h1D_PATM_col(:)           !atmospheric pressure
-  real(r8),pointer   :: h1D_HUM_col(:)            !VPK_col(NY,NX)
-  real(r8),pointer   :: h1D_WIND_col(:)           !WindSpeedAtm_col(NY,NX)/secs1hour
+  real(r8),pointer   :: h1D_N2O_LITR_col(:)     
+  real(r8),pointer   :: h1D_NH3_LITR_col(:)     
+  real(r8),pointer   :: h1D_SOL_RADN_col(:)     
+  real(r8),pointer   :: h1D_AIR_TEMP_col(:)     
+  real(r8),pointer   :: h1D_PATM_col(:)         
+  real(r8),pointer   :: h1D_HUM_col(:)          
+  real(r8),pointer   :: h1D_WIND_col(:)         
   real(r8),pointer   :: h1D_Snofall_col(:)
-  real(r8),pointer   :: h1D_PREC_col(:)           !(RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_RN_col(:)        !HeatByRad2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX) 
-  real(r8),pointer   :: h1D_SOIL_LE_col(:)        !HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_H_col(:)         !HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SOIL_G_col(:)         !-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_RN_col(:)         !Eco_NetRad_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_LE_col(:)         !Eco_Heat_Latent_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Eco_HeatSen_col(:)    !Eco_Heat_Sens_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ECO_Heat2G_col(:)     !Eco_Heat_GrndSurf_col(NY,NX)*MJ2W/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_O2_LITR_col(:)       !trc_solcl_vr(idg_O2,0,NY,NX)
-  real(r8),pointer   :: h1D_MIN_LWP_ptc(:)       !PSICanPDailyMin(NZ,NY,NX), minimum daily canopy water potential, [MPa]
-  real(r8),pointer   :: h1D_AR_SEMIS_FLX_col(:)   !
-  real(r8),pointer   :: h1D_CO2_SEMIS_FLX_col(:)  !SurfGasEmiss_flx_col(idg_CO2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
-  real(r8),pointer   :: h1D_ECO_CO2_FLX_col(:)   !Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
-  real(r8),pointer   :: h1D_CH4_SEMIS_FLX_col(:)       !SurfGasEmiss_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815, umol m-2 s-1, 1.e6/(12*3600)=23.14815
+  real(r8),pointer   :: h1D_PREC_col(:)         
+  real(r8),pointer   :: h1D_SOIL_RN_col(:)      
+  real(r8),pointer   :: h1D_SOIL_LE_col(:)      
+  real(r8),pointer   :: h1D_SOIL_H_col(:)       
+  real(r8),pointer   :: h1D_SOIL_G_col(:)       
+  real(r8),pointer   :: h1D_ECO_RN_col(:)       
+  real(r8),pointer   :: h1D_ECO_LE_col(:)       
+  real(r8),pointer   :: h1D_Eco_HeatSen_col(:)  
+  real(r8),pointer   :: h1D_ECO_Heat2G_col(:)   
+  real(r8),pointer   :: h1D_O2_LITR_col(:)      
+  real(r8),pointer   :: h1D_MIN_LWP_ptc(:)      
+  real(r8),pointer   :: h1D_AR_SEMIS_FLX_col(:)   
+  real(r8),pointer   :: h1D_CO2_SEMIS_FLX_col(:)  
+  real(r8),pointer   :: h1D_ECO_CO2_FLX_col(:)  
+  real(r8),pointer   :: h1D_CH4_SEMIS_FLX_col(:)
   real(r8),pointer   :: h1D_CH4_EBU_flx_col(:)
   real(r8),pointer   :: h1D_Ar_EBU_flx_col(:)
   real(r8),pointer   :: h1D_CO2_TPR_err_col(:)
@@ -172,40 +173,40 @@ implicit none
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
   real(r8),pointer   :: h1D_NH3_DIF_flx_col(:)
   real(r8),pointer   :: h1D_Ar_soilMass_col(:)
-  real(r8),pointer   :: h1D_O2_SEMIS_FLX_col(:)     !SurfGasEmiss_flx_col(idg_O2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056,  umol m-2 s-1, 1.e6/(32*3600)=8.68056
-  real(r8),pointer   :: h1D_CO2_LITR_col(:)      !trc_solcl_vr(idg_CO2,0,NY,NX)
-  real(r8),pointer   :: h1D_EVAPN_col(:)          !VapXAir2GSurf_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CANET_col(:)         !canopy evaportranspiration
-  real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)         !-QRunSurf_col(NY,NX)*1000.0/TAREA, 
-  real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)       !SedmErossLoss_CumYr_col(NY,NX)*1000.0/TAREA, soil mass 
-  real(r8),pointer   :: h1D_tSWC_col(:)        !WatMass_col(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
+  real(r8),pointer   :: h1D_O2_SEMIS_FLX_col(:)  
+  real(r8),pointer   :: h1D_CO2_LITR_col(:)      
+  real(r8),pointer   :: h1D_EVAPN_col(:)         
+  real(r8),pointer   :: h1D_CANET_col(:)         
+  real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)    
+  real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)  
+  real(r8),pointer   :: h1D_tSWC_col(:)       
   real(r8),pointer   :: h1D_tHeat_col(:) 
-  real(r8),pointer   :: h1D_QDISCHG_FLX_col(:)         !QDischar_col(NY,NX)*1000.0/TAREA
+  real(r8),pointer   :: h1D_QDISCHG_FLX_col(:)  
   real(r8),pointer   :: h1D_HeatDISCHG_FLX_col(:)
-  real(r8),pointer   :: h1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
-  real(r8),pointer   :: h1D_SURF_WTR_col(:)       !ThetaH2OZ_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_SURF_ICE_col(:)       !ThetaICEZ_vr(0,NY,NX)
-  real(r8),pointer   :: h1D_ACTV_LYR_col(:)       !-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: h1D_WTR_TBL_col(:)        !-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: h1D_SNOWPACK_col(:)     
+  real(r8),pointer   :: h1D_SURF_WTR_col(:)     
+  real(r8),pointer   :: h1D_SURF_ICE_col(:)     
+  real(r8),pointer   :: h1D_ACTV_LYR_col(:)     
+  real(r8),pointer   :: h1D_WTR_TBL_col(:)      
   real(r8),pointer   :: h1D_CO2_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_RootN_Fix_col(:)
   real(r8),pointer   :: h1D_AR_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_RootXO2_flx_col(:)
-  real(r8),pointer   :: h1D_N2O_SEMIS_FLX_col(:)        !SurfGasEmiss_flx_col(idg_N2O,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_N2_SEMIS_FLX_col(:)        !SurfGasEmiss_flx_col(idg_N2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NH3_SEMIS_FLX_col(:)        !SurfGasEmiss_flx_col(idg_NH3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_N2O_SEMIS_FLX_col(:)     
+  real(r8),pointer   :: h1D_N2_SEMIS_FLX_col(:)      
+  real(r8),pointer   :: h1D_NH3_SEMIS_FLX_col(:)     
   real(r8),pointer   :: h1D_H2_SEMIS_FLX_col(:)
-  real(r8),pointer   :: h1D_frcPARabs_ptc(:)      !fraction of PAR absorbed
-  real(r8),pointer   :: h1D_PAR_CAN_ptc(:)        !PAR absorbed by Canopy, umol /m2/s
-  real(r8),pointer   :: h1D_PAR_col(:)            !incoming PAR, umol/s
-  real(r8),pointer   :: h1D_Plant_C_ptc(:)        !whole plant C  
-  real(r8),pointer   :: h1D_Plant_N_ptc(:)        !whole plant N  
-  real(r8),pointer   :: h1D_Plant_P_ptc(:)        !whole plant P  
+  real(r8),pointer   :: h1D_frcPARabs_ptc(:)  
+  real(r8),pointer   :: h1D_PAR_CAN_ptc(:)    
+  real(r8),pointer   :: h1D_PAR_col(:)        
+  real(r8),pointer   :: h1D_Plant_C_ptc(:)    
+  real(r8),pointer   :: h1D_Plant_N_ptc(:)    
+  real(r8),pointer   :: h1D_Plant_P_ptc(:)    
   real(r8),pointer   :: h1D_stomatal_stress_ptc(:)
   real(r8),pointer   :: h1D_CANDew_ptc(:)
   real(r8),pointer   :: h1D_VHeatCap_litr_col(:)
-  real(r8),pointer   :: h1D_LEAF_PC_ptc(:)       !(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
-  real(r8),pointer   :: h2D_tSOC_vr(:,:)        !SoilOrgM_vr(ielmc,1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
+  real(r8),pointer   :: h1D_LEAF_PC_ptc(:)    
+  real(r8),pointer   :: h2D_tSOC_vr(:,:)      
   real(r8),pointer   :: h2D_tSOCL_vr(:,:)
   real(r8),pointer   :: h2D_fTRootGro_pvr(:,:) !
   real(r8),pointer   :: h2D_fRootGrowPSISense_pvr(:,:)  !
@@ -225,142 +226,141 @@ implicit none
   real(r8),pointer   :: h1D_DON_litr_col(:)
   real(r8),pointer   :: h1D_DOP_litr_col(:)
   real(r8),pointer   :: h1D_acetate_litr_col(:)
-  real(r8),pointer   :: h1D_CAN_RN_ptc(:)        !277.8*RadNet2Canopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
-  real(r8),pointer   :: h1D_CAN_LE_ptc(:)        !277.8*EvapTransLHeat_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_H_ptc(:)         !277.8*HeatXAir2PCan_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_G_ptc(:)         !277.8*HeatStorCanopy_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)      !TdegCCanopy_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)       !fTCanopyGroth_pft(NZ,NY,NX), canopy temperature growth function/stress
-  real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:)   !CO2NetFix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148, umol m-2 s-1
-  real(r8),pointer   :: h1D_CAN_GPP_ptc(:)       !GrossCO2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),  gross CO2 fixation, gC m-2/hr
-  real(r8),pointer   :: h1D_CAN_RA_ptc(:)        !CanopyRespC_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total autotrophic respiration
+  real(r8),pointer   :: h1D_CAN_RN_ptc(:)     
+  real(r8),pointer   :: h1D_CAN_LE_ptc(:)     
+  real(r8),pointer   :: h1D_CAN_H_ptc(:)      
+  real(r8),pointer   :: h1D_CAN_G_ptc(:)      
+  real(r8),pointer   :: h1D_CAN_TEMPC_ptc(:)  
+  real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)  
+  real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:) 
+  real(r8),pointer   :: h1D_CAN_GPP_ptc(:)     
+  real(r8),pointer   :: h1D_CAN_RA_ptc(:)      
   real(r8),pointer   :: h1D_CAN_GROWTH_ptc(:)
-  real(r8),pointer   :: h1D_cTNC_ptc(:)          !CanopyNonstElmConc_pft(ielmc,NZ,NY,NX), canopy nonstructural C concentration, 
-  real(r8),pointer   :: h1D_cTNN_ptc(:)          !CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
-  real(r8),pointer   :: h1D_cTNP_ptc(:)          !CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
-  real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) !CanPStomaResistH2O_pft(NZ,NY,NX)*1.56*secs1hour, s m-1, for CO2
-  real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*1.34*secs1hour, s m-1, for CO2
-  real(r8),pointer   :: h1D_CAN_CO2_ptc(:)       !CanopyGasCO2_pft(NZ,NY,NX), umol mol-1
-  real(r8),pointer   :: h1D_LAI_ptc(:)           !LeafStalkArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant leaf area, include stalk
-  real(r8),pointer   :: h1D_PSI_CAN_ptc(:)       !PSICanopy_pft(NZ,NY,NX), canopy total water potential , MPa
-  real(r8),pointer   :: h1D_TURG_CAN_ptc(:)      !PSICanopyTurg_pft(NZ,NY,NX), canopy turgor water potential, MPa
-  real(r8),pointer   :: h1D_STOML_RSC_H2O_ptc(:)  !CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour, s m-1, for H2O
-  real(r8),pointer   :: h1D_BLYR_RSC_H2O_ptc(:)  !CanopyBndlResist_pft(NZ,NY,NX)*secs1hour, s m-1, for H2O
-  real(r8),pointer   :: h1D_TRANSPN_ptc(:)       !Transpiration_pft(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX), canopy transpiration mm H2O/m2/h
-  real(r8),pointer   :: h1D_NH4_UPTK_FLX_ptc(:)      !RootNH4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NO3_UPTK_FLX_ptc(:)      !RootNO3Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_N2_FIXN_FLX_ptc(:)       !RootN2Fix_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_cNH3_FLX_ptc(:)       !NH3Dep2Can_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)      !RootH2PO4Uptake_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_cTNC_ptc(:)        
+  real(r8),pointer   :: h1D_cTNN_ptc(:)       
+  real(r8),pointer   :: h1D_cTNP_ptc(:)       
+  real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) 
+  real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:) 
+  real(r8),pointer   :: h1D_CAN_CO2_ptc(:)      
+  real(r8),pointer   :: h1D_LAI_ptc(:)          
+  real(r8),pointer   :: h1D_PSI_CAN_ptc(:)      
+  real(r8),pointer   :: h1D_TURG_CAN_ptc(:)     
+  real(r8),pointer   :: h1D_STOML_RSC_H2O_ptc(:) 
+  real(r8),pointer   :: h1D_BLYR_RSC_H2O_ptc(:) 
+  real(r8),pointer   :: h1D_TRANSPN_ptc(:)      
+  real(r8),pointer   :: h1D_NH4_UPTK_FLX_ptc(:)  
+  real(r8),pointer   :: h1D_NO3_UPTK_FLX_ptc(:)  
+  real(r8),pointer   :: h1D_N2_FIXN_FLX_ptc(:)   
+  real(r8),pointer   :: h1D_cNH3_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)   
   real(r8),pointer   :: h1D_TC_Groth_ptc(:)
-  real(r8),pointer   :: h2D_Root1stStrutC_pvr(:,:) !primary root structural C biomass
+  real(r8),pointer   :: h2D_Root1stStrutC_pvr(:,:) 
   real(r8),pointer   :: h2D_Root1stStrutN_ptc(:,:)
   real(r8),pointer   :: h2D_Root1stStrutP_ptc(:,:)
   real(r8),pointer   :: h2D_Root2ndStrutC_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndStrutN_ptc(:,:)
   real(r8),pointer   :: h2D_Root2ndStrutP_ptc(:,:)
-  real(r8),pointer   :: h1D_SHOOT_C_ptc(:)       !ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_SHOOT_C_ptc(:)      
   real(r8),pointer   :: h1D_SHOOTST_C_ptc(:)       
   real(r8),pointer   :: h1D_SHOOTST_N_ptc(:)       
   real(r8),pointer   :: h1D_SHOOTST_P_ptc(:)             
-  real(r8),pointer   :: h1D_LEAF_C_ptc(:)        !LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Petole_C_ptc(:)        !PetoleStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), canopy sheath element
-  real(r8),pointer   :: h1D_STALK_C_ptc(:)       !StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_RESERVE_C_ptc(:)     !StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUSK_C_ptc(:)        !(HuskStrutElms_pft(ielmc,NZ,NY,NX)+EarStrutElms_pft(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_GRAIN_C_ptc(:)       !GrainStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_LEAF_C_ptc(:)       
+  real(r8),pointer   :: h1D_Petole_C_ptc(:)     
+  real(r8),pointer   :: h1D_STALK_C_ptc(:)      
+  real(r8),pointer   :: h1D_RESERVE_C_ptc(:)    
+  real(r8),pointer   :: h1D_HUSK_C_ptc(:)       
+  real(r8),pointer   :: h1D_GRAIN_C_ptc(:)      
   real(r8),pointer   :: h1D_ROOT_NONSTC_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTN_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTP_ptc(:)
-  real(r8),pointer   :: h1D_ROOT_C_ptc(:)        !RootElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_ROOT_C_ptc(:)       
   real(r8),pointer   :: h1D_ROOTST_C_ptc(:)     
   real(r8),pointer   :: h1D_ROOTST_N_ptc(:) 
   real(r8),pointer   :: h1D_ROOTST_P_ptc(:)   
-  real(r8),pointer   :: h1D_NODULE_C_ptc(:)      !NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), nodule
-  real(r8),pointer   :: h1D_STORED_C_ptc(:)      !NonStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_GRAIN_NO_ptc(:)      !CanopySeedNum_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LAIb_ptc(:)          !CanopyLeafArea_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
-  real(r8),pointer   :: h1D_EXUD_CumYr_C_FLX_ptc(:)        !PlantExudElm_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LITRf_C_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LITRf_P_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SURF_LITRf_C_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)     !GrossResp_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)        !EcoHavstElmnt_CumYr_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:)     !ElmBalanceCum_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:)    !StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)     !CO2ByFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
-  real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)     !CH4ByFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NPP_ptc(:)           !NetPrimProduct_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_CAN_HT_ptc(:)        !CanopyHeight_pft(NZ,NY,NX), canopy height, m
-  real(r8),pointer   :: h1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
-  real(r8),pointer   :: h1D_tTRANSPN_ptc(:)      !-ETCanopy_CumYr_pft(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
-  real(r8),pointer   :: h1D_WTR_STRESS_ptc(:)    !HoursTooLowPsiCan_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_OXY_STRESS_ptc(:)    !OSTR(NZ,NY,NX)
-  real(r8),pointer   :: h1D_SHOOT_N_ptc(:)       !ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LEAF_N_ptc(:)        !LeafStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Petole_N_ptc(:)        !PetoleStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STALK_N_ptc(:)       !StalkStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_RESERVE_N_ptc(:)     !StalkRsrvElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUSK_N_ptc(:)        !(HuskStrutElms_pft(ielmn,NZ,NY,NX)+EarStrutElms_pft(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_GRAIN_N_ptc(:)       !GrainStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ROOT_N_ptc(:)        !RootElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NODULE_N_ptc(:)         !NodulStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STORED_N_ptc(:)      !NonStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)        !PlantExudElm_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h1D_NODULE_C_ptc(:)     
+  real(r8),pointer   :: h1D_STORED_C_ptc(:)     
+  real(r8),pointer   :: h1D_GRAIN_NO_ptc(:)     
+  real(r8),pointer   :: h1D_LAIb_ptc(:)         
+  real(r8),pointer   :: h1D_EXUD_CumYr_C_FLX_ptc(:)   
+  real(r8),pointer   :: h1D_LITRf_C_FLX_ptc(:)     
+  real(r8),pointer   :: h1D_LITRf_P_FLX_ptc(:)     
+  real(r8),pointer   :: h1D_SURF_LITRf_C_FLX_ptc(:)
+  real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)   
+  real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:) 
+  real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:) 
+  real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)   
+  real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)   
+  real(r8),pointer   :: h1D_NPP_ptc(:)        
+  real(r8),pointer   :: h1D_CAN_HT_ptc(:)     
+  real(r8),pointer   :: h1D_POPN_ptc(:)       
+  real(r8),pointer   :: h1D_tTRANSPN_ptc(:)   
+  real(r8),pointer   :: h1D_WTR_STRESS_ptc(:) 
+  real(r8),pointer   :: h1D_OXY_STRESS_ptc(:) 
+  real(r8),pointer   :: h1D_SHOOT_N_ptc(:)    
+  real(r8),pointer   :: h1D_LEAF_N_ptc(:)     
+  real(r8),pointer   :: h1D_Petole_N_ptc(:)   
+  real(r8),pointer   :: h1D_STALK_N_ptc(:)    
+  real(r8),pointer   :: h1D_RESERVE_N_ptc(:)  
+  real(r8),pointer   :: h1D_HUSK_N_ptc(:)     
+  real(r8),pointer   :: h1D_GRAIN_N_ptc(:)    
+  real(r8),pointer   :: h1D_ROOT_N_ptc(:)     
+  real(r8),pointer   :: h1D_NODULE_N_ptc(:)   
+  real(r8),pointer   :: h1D_STORED_N_ptc(:)   
+  real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)     
   real(r8),pointer   :: h1D_Uptk_N_Flx_ptc(:)
   real(r8),pointer   :: h1D_Uptk_P_Flx_ptc(:)
-  real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)       !LitrfalStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant LitrFall N
-  real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:)    !PlantN2Fix_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
-  real(r8),pointer   :: h1D_HVST_N_FLX_ptc(:)        !EcoHavstElmnt_CumYr_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)    !NH3Emis_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_PLANT_BALANCE_N_ptc(:)     !ElmBalanceCum_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)    !StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)        !NH3byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant N emission from fire
-  real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:)   !SurfLitrfalStrutElms_pft(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), surface litter fall
-  real(r8),pointer   :: h1D_SHOOT_P_ptc(:)       !ShootStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LEAF_P_ptc(:)        !LeafStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_Petole_P_ptc(:)        !PetoleStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STALK_P_ptc(:)       !StalkStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_RESERVE_P_ptc(:)     !StalkRsrvElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HUSK_P_ptc(:)        !(HuskStrutElms_pft(ielmp,NZ,NY,NX)+EarStrutElms_pft(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_GRAIN_P_ptc(:)       !GrainStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_ROOT_P_ptc(:)        !RootElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_NODULE_P_ptc(:)         !NodulStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STORED_P_ptc(:)      !NonStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_EXUD_P_FLX_ptc(:)        !PlantExudElm_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_LITTERf_P_ptc(:)     !LitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_HVST_P_FLX_ptc(:)        !EcoHavstElmnt_CumYr_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_PLANT_BALANCE_P_ptc(:)     !ElmBalanceCum_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_STANDING_DEAD_P_ptc(:)    !StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)        !PO4byFire_CumYr_pft(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:)  !SurfLitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)     !NumOfBranches_pft(NZ,NY,NX)
-  real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:)   !CanopyNonstElms_pft(ielmc,NY,NX)
-  real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)   !
-  real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)   !
+  real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)    
+  real(r8),pointer   :: h1D_TL_N_FIXED_FLX_ptc(:) 
+  real(r8),pointer   :: h1D_HVST_N_FLX_ptc(:)     
+  real(r8),pointer   :: h1D_NH3can_FLX_ptc(:)   
+  real(r8),pointer   :: h1D_PLANT_BALANCE_N_ptc(:)  
+  real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)  
+  real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:) 
+  real(r8),pointer   :: h1D_SHOOT_P_ptc(:)     
+  real(r8),pointer   :: h1D_LEAF_P_ptc(:)      
+  real(r8),pointer   :: h1D_Petole_P_ptc(:)    
+  real(r8),pointer   :: h1D_STALK_P_ptc(:)     
+  real(r8),pointer   :: h1D_RESERVE_P_ptc(:)  
+  real(r8),pointer   :: h1D_HUSK_P_ptc(:)     
+  real(r8),pointer   :: h1D_GRAIN_P_ptc(:)    
+  real(r8),pointer   :: h1D_ROOT_P_ptc(:)     
+  real(r8),pointer   :: h1D_NODULE_P_ptc(:)   
+  real(r8),pointer   :: h1D_STORED_P_ptc(:)    
+  real(r8),pointer   :: h1D_EXUD_P_FLX_ptc(:)  
+  real(r8),pointer   :: h1D_LITTERf_P_ptc(:)   
+  real(r8),pointer   :: h1D_HVST_P_FLX_ptc(:)    
+  real(r8),pointer   :: h1D_PLANT_BALANCE_P_ptc(:)   
+  real(r8),pointer   :: h1D_STANDING_DEAD_P_ptc(:)   
+  real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)       
+  real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:) 
+  real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)    
+  real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:) 
+  real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)  
+  real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)  
   real(r8),pointer   :: h1D_CFIX_lmtf_ptc(:)
   real(r8),pointer   :: h1D_MainBranchNO_ptc(:)
-  real(r8),pointer   :: h1D_Ar_mass_col(:)         !column integrated mass of tracer Ar
+  real(r8),pointer   :: h1D_Ar_mass_col(:)       
   real(r8),pointer   :: h1D_CO2_mass_col(:)
   real(r8),pointer   :: h1D_Gchem_CO2_prod_col(:)
-  real(r8),pointer   :: h1D_LEAF_NC_ptc(:)       !(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX))/(LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
-  real(r8),pointer    :: h1D_Growth_Stage_ptc(:)    !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
-                                      !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
-  real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:)       !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
-  real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)     !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
-  real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)       !
+  real(r8),pointer   :: h1D_LEAF_NC_ptc(:)      
+  real(r8),pointer    :: h1D_Growth_Stage_ptc(:) 
+  real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:) 
+  real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)    
+  real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)      
   real(r8),pointer   :: h2D_Gas_Pressure_vr(:,:)
   real(r8),pointer   :: h2D_CO2_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_CH4_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_Ar_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_O2_Gas_ppmv_vr(:,:)
-  real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)     !aerobic heterotropic bacteria
-  real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   !aerobic heterotropic fungi
-  real(r8),pointer   :: h2D_faculDenitC_vr(:,:)   !facultative denitrifier
-  real(r8),pointer   :: h2D_fermentorC_vr(:,:)  !fermentor
-  real(r8),pointer   :: h2D_acetometgC_vr(:,:)  !acetogenic methanogen
-  real(r8),pointer   :: h2D_aeroN2fixC_vr(:,:)  !aerobic N2 fixer
-  real(r8),pointer   :: h2D_anaeN2FixC_vr(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)   
+  real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   
+  real(r8),pointer   :: h2D_faculDenitC_vr(:,:)  
+  real(r8),pointer   :: h2D_fermentorC_vr(:,:)  
+  real(r8),pointer   :: h2D_acetometgC_vr(:,:)  
+  real(r8),pointer   :: h2D_aeroN2fixC_vr(:,:)  
+  real(r8),pointer   :: h2D_anaeN2FixC_vr(:,:)  
   real(r8),pointer   :: h2D_NH3OxiBactC_vr(:,:)
   real(r8),pointer   :: h2D_NO2OxiBactC_vr(:,:)
   real(r8),pointer   :: h2D_CH4AeroOxiC_vr(:,:)
@@ -391,13 +391,13 @@ implicit none
   real(r8),pointer   :: h1D_RDECOMPC_BReSOM_litr_col(:)
   real(r8),pointer   :: h1D_RDECOMPC_SorpSOM_litr_col(:)
 
-  real(r8),pointer   :: h2D_AeroHrBactN_vr(:,:)     !aerobic heterotropic bacteria
-  real(r8),pointer   :: h2D_AeroHrFungN_vr(:,:)   !aerobic heterotropic fungi
-  real(r8),pointer   :: h2D_faculDenitN_vr(:,:)   !facultative denitrifier
-  real(r8),pointer   :: h2D_fermentorN_vr(:,:)  !fermentor
-  real(r8),pointer   :: h2D_acetometgN_vr(:,:)  !acetogenic methanogen
-  real(r8),pointer   :: h2D_aeroN2fixN_vr(:,:)  !aerobic N2 fixer
-  real(r8),pointer   :: h2D_anaeN2FixN_vr(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_AeroHrBactN_vr(:,:)  
+  real(r8),pointer   :: h2D_AeroHrFungN_vr(:,:)  
+  real(r8),pointer   :: h2D_faculDenitN_vr(:,:)  
+  real(r8),pointer   :: h2D_fermentorN_vr(:,:) 
+  real(r8),pointer   :: h2D_acetometgN_vr(:,:) 
+  real(r8),pointer   :: h2D_aeroN2fixN_vr(:,:) 
+  real(r8),pointer   :: h2D_anaeN2FixN_vr(:,:) 
   real(r8),pointer   :: h2D_NH3OxiBactN_vr(:,:)
   real(r8),pointer   :: h2D_NO2OxiBactN_vr(:,:)
   real(r8),pointer   :: h2D_CH4AeroOxiN_vr(:,:)
@@ -408,25 +408,25 @@ implicit none
   real(r8),pointer   :: h2D_RDECOMPC_SorpSOM_vr(:,:)
   real(r8),pointer   :: h2D_MicrobAct_vr(:,:)
 
-  real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)     !aerobic heterotropic bacteria
-  real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   !aerobic heterotropic fungi
-  real(r8),pointer   :: h2D_faculDenitP_vr(:,:)   !facultative denitrifier
-  real(r8),pointer   :: h2D_fermentorP_vr(:,:)  !fermentor
-  real(r8),pointer   :: h2D_acetometgP_vr(:,:)  !acetogenic methanogen
-  real(r8),pointer   :: h2D_aeroN2fixP_vr(:,:)  !aerobic N2 fixer
-  real(r8),pointer   :: h2D_anaeN2FixP_vr(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)   
+  real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   
+  real(r8),pointer   :: h2D_faculDenitP_vr(:,:)  
+  real(r8),pointer   :: h2D_fermentorP_vr(:,:)  
+  real(r8),pointer   :: h2D_acetometgP_vr(:,:)  
+  real(r8),pointer   :: h2D_aeroN2fixP_vr(:,:)  
+  real(r8),pointer   :: h2D_anaeN2FixP_vr(:,:)  
   real(r8),pointer   :: h2D_NH3OxiBactP_vr(:,:)
   real(r8),pointer   :: h2D_NO2OxiBactP_vr(:,:)
   real(r8),pointer   :: h2D_CH4AeroOxiP_vr(:,:)
   real(r8),pointer   :: h2D_H2MethogenP_vr(:,:)
-  real(r8),pointer   :: h2D_MicroBiomeE_litr_col(:,:)   !total microbial biomass in litr
-  real(r8),pointer   :: h2D_AeroHrBactE_litr_col(:,:)     !aerobic heterotropic bacteria
-  real(r8),pointer   :: h2D_AeroHrFungE_litr_col(:,:)   !aerobic heterotropic fungi
-  real(r8),pointer   :: h2D_faculDenitE_litr_col(:,:)   !facultative denitrifier
-  real(r8),pointer   :: h2D_fermentorE_litr_col(:,:)  !fermentor
-  real(r8),pointer   :: h2D_acetometgE_litr_col(:,:)  !acetogenic methanogen
-  real(r8),pointer   :: h2D_aeroN2fixE_litr_col(:,:)  !aerobic N2 fixer
-  real(r8),pointer   :: h2D_anaeN2FixE_litr_col(:,:)  !anaerobic N2 fixer
+  real(r8),pointer   :: h2D_MicroBiomeE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_AeroHrBactE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_AeroHrFungE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_faculDenitE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_fermentorE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_acetometgE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_aeroN2fixE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_anaeN2FixE_litr_col(:,:)  
   real(r8),pointer   :: h2D_NH3OxiBactE_litr_col(:,:)
   real(r8),pointer   :: h2D_NO2OxiBactE_litr_col(:,:)
   real(r8),pointer   :: h2D_CH4AeroOxiE_litr_col(:,:)
@@ -435,15 +435,15 @@ implicit none
   real(r8),pointer   :: h2D_CO2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_RNITRIF_vr(:,:)
   real(r8),pointer   :: h2D_Root_CO2_vr(:,:)
-  real(r8),pointer   :: h2D_Aqua_CO2_vr(:,:)        !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_Aqua_CH4_vr(:,:)        !trc_solcl_vr(idg_CH4,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_Aqua_O2_vr(:,:)         !trc_solcl_vr(idg_O2,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_Aqua_N2O_vr(:,:)         !trc_solcl_vr(idg_N2O,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_Aqua_NH3_vr(:,:)         !trc_solcl_vr(idg_NH3,1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_RootAR2soil_vr(:,:)     !
+  real(r8),pointer   :: h2D_Aqua_CO2_vr(:,:)     
+  real(r8),pointer   :: h2D_Aqua_CH4_vr(:,:)     
+  real(r8),pointer   :: h2D_Aqua_O2_vr(:,:)      
+  real(r8),pointer   :: h2D_Aqua_N2O_vr(:,:)     
+  real(r8),pointer   :: h2D_Aqua_NH3_vr(:,:)     
+  real(r8),pointer   :: h2D_RootAR2soil_vr(:,:)  
   real(r8),pointer   :: h2D_RootAR2Root_vr(:,:)
-  real(r8),pointer   :: h2D_TEMP_vr(:,:)        !TCS_vr(1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_decomp_OStress_vr(:,:)    !decomposition oxygen stress
+  real(r8),pointer   :: h2D_TEMP_vr(:,:)      
+  real(r8),pointer   :: h2D_decomp_OStress_vr(:,:) 
   real(r8),pointer   :: h2D_RO2Decomp_vr(:,:)
   real(r8),pointer   :: h2D_Decomp_temp_FN_vr(:,:)
   real(r8),pointer   :: h1D_Decomp_temp_FN_litr_col(:)
@@ -453,31 +453,25 @@ implicit none
   real(r8),pointer   :: h1D_Decomp_Moist_FN_litr_col(:)
   real(r8),pointer   :: h1D_decomp_OStress_litr_col(:)
   real(r8),pointer   :: h1D_RO2Decomp_litr_col(:)  
-  real(r8),pointer   :: h2D_HeatUptk_vr(:,:)    !Heat uptake by root  
-  real(r8),pointer   :: h2D_HeatFlow_vr(:,:)    !
+  real(r8),pointer   :: h2D_HeatUptk_vr(:,:)   
+  real(r8),pointer   :: h2D_HeatFlow_vr(:,:)   
   real(r8),pointer   :: h2D_VSPore_vr(:,:)
-  real(r8),pointer   :: h2D_VSM_vr    (:,:)       !ThetaH2OZ_vr(1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_VSICE_vr    (:,:)         !ThetaICEZ_vr(1:JZ,NY,NX)  
-  real(r8),pointer   :: h2D_PSI_vr(:,:)         !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
+  real(r8),pointer   :: h2D_VSM_vr    (:,:)    
+  real(r8),pointer   :: h2D_VSICE_vr    (:,:)   
+  real(r8),pointer   :: h2D_PSI_vr(:,:)        
   real(r8),pointer   :: h2D_PsiO_vr(:,:)
-  real(r8),pointer   :: h2D_cNH4t_vr(:,:)       !(trcs_solml_vr(ids_NH4,1:JZ,NY,NX)+trcs_solml_vr(ids_NH4B,1:JZ,NY,NX) &
-                                                                  !+14.0*(trcx_solml_vr(idx_NH4,1:JZ,NY,NX)+trcx_solml_vr(idx_NH4B,1:JZ,NY,NX)))/VLSoilMicPMass_vr(1:JZ,NY,NX)
-  real(r8),pointer   :: h2D_RootH2OUP_vr(:,:)   !root water uptake flux                                 
-  real(r8),pointer   :: h2D_cNO3t_vr(:,:)       !(trcs_solml_vr(ids_NO3,1:JZ,NY,NX)+trcs_solml_vr(ids_NO3B,1:JZ,NY,NX) &
-                                                                  !+trcs_solml_vr(ids_NO2,1,NY,NX)+trcs_solml_vr(ids_NO2B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
-  real(r8),pointer   :: h2D_cPO4_vr(:,:)        !(trcs_solml_vr(ids_H1PO4,1:JZ,NY,NX)+trcs_solml_vr(ids_H1PO4B,1,NY,NX)+trcs_solml_vr(ids_H2PO4,1,NY,NX)+trcs_solml_vr(ids_H2PO4B,1,NY,NX))/VLWatMicP_vr(1,NY,NX)
-  real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)     !31.0*(trcx_solml_vr(idx_HPO4,1,NY,NX)+trcx_solml_vr(idx_H2PO4,1,NY,NX)+trcx_solml_vr(idx_HPO4B,1,NY,NX)+trcx_solml_vr(idx_H2PO4B,1,NY,NX))/VLSoilMicPMass_vr(1,NY,NX)
-  real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:)         !ElectricConductivity_vr(1:JZ,NY,NX)
-
-  real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     !PSIRoot_pvr(1,1:JZ,NZ,NY,NX), root total water potential , MPa
+  real(r8),pointer   :: h2D_cNH4t_vr(:,:)                                                     
+  real(r8),pointer   :: h2D_RootH2OUP_vr(:,:)  
+  real(r8),pointer   :: h2D_cNO3t_vr(:,:)                                                     
+  real(r8),pointer   :: h2D_cPO4_vr(:,:)       
+  real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)    
+  real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:) 
+  real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
   real(r8),pointer   :: h2D_ROOT_OSTRESS_pvr(:,:)
-  real(r8),pointer   :: h2D_prtUP_NH4_pvr(:,:)     !(RootNutUptake_pvr(ids_NH4,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4,2,1:JZ,NZ,NY,NX) &
-                                                                   !+RootNutUptake_pvr(ids_NH4B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  real(r8),pointer   :: h2D_prtUP_NO3_pvr(:,:)     !(RootNutUptake_pvr(ids_NO3,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NO3,2,1:JZ,NZ,NY,NX) &
-                                                                   !+RootNutUptake_pvr(ids_NO3B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_NO3B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  real(r8),pointer   :: h2D_prtUP_PO4_pvr(:,:)     !(RootNutUptake_pvr(ids_H2PO4,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_H2PO4,2,1:JZ,NZ,NY,NX) &
-                                                                   !+RootNutUptake_pvr(ids_H2PO4B,1,1:JZ,NZ,NY,NX)+RootNutUptake_pvr(ids_H2PO4B,2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  real(r8),pointer   :: h2D_DNS_RT_pvr(:,:)     !RootLenDensPerPlant_pvr(1,1:JZ,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: h2D_prtUP_NH4_pvr(:,:)                                                                     
+  real(r8),pointer   :: h2D_prtUP_NO3_pvr(:,:)  
+  real(r8),pointer   :: h2D_prtUP_PO4_pvr(:,:)                                                  
+  real(r8),pointer   :: h2D_DNS_RT_pvr(:,:)   
   contains
     procedure, public :: Init  => init_hist_data
     procedure, public :: hist_update
@@ -585,6 +579,7 @@ implicit none
   allocate(this%h1D_QDISCHG_FLX_col(beg_col:end_col))      ;this%h1D_QDISCHG_FLX_col(:)=spval
   allocate(this%h1D_HeatDISCHG_FLX_col(beg_col:end_col))  ; this%h1D_HeatDISCHG_FLX_col(:)=spval
   allocate(this%h1D_ECO_LAI_col(beg_col:end_col))         ;this%h1D_ECO_LAI_col(:)=spval
+  allocate(this%h1D_ECO_SAI_col(beg_col:end_col))         ;this%h1D_ECO_SAI_col(:)=spval
   allocate(this%h1D_Eco_GPP_CumYr_col(beg_col:end_col))         ;this%h1D_Eco_GPP_CumYr_col(:)=spval
   allocate(this%h1D_ECO_RA_col(beg_col:end_col))          ;this%h1D_ECO_RA_col(:)=spval
   allocate(this%h1D_Eco_NPP_CumYr_col(beg_col:end_col))         ;this%h1D_Eco_NPP_CumYr_col(:)=spval
@@ -1242,6 +1237,10 @@ implicit none
   call hist_addfld1d(fname='ECO_LAI_col',units='m2/m2',avgflag='A',&
     long_name='ecosystem LAI',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_ECO_SAI_col(beg_col:end_col)       
+  call hist_addfld1d(fname='ECO_SAI_col',units='m2/m2',avgflag='A',&
+    long_name='Ecosystem stem Area index for all live branches',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_Eco_GPP_CumYr_col(beg_col:end_col)       
   call hist_addfld1d(fname='ECO_GPP_col',units='gC/m2',avgflag='A',&
     long_name='cumulative ecosystem GPP',ptr_col=data1d_ptr)      
@@ -1260,7 +1259,7 @@ implicit none
     ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Eco_HR_CO2_col(beg_col:end_col)
-  call hist_addfld1d(fname='ECO_RH_CO2_col',units='gC/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='ECO_HR_CO2_col',units='gC/m2/hr',avgflag='A',&
     long_name='Ecosystem heterotrophic respiration as CO2 (<0 into atmosphere)',&
     ptr_col=data1d_ptr,default='inactive')            
 
@@ -1336,11 +1335,11 @@ implicit none
 
   data1d_ptr => this%h1D_N2O_LITR_col(beg_col:end_col)      
   call hist_addfld1d(fname='N2O_LITR_col',units='g/m3',avgflag='A',&
-    long_name='N2O solute concentration in soil micropores',ptr_col=data1d_ptr)      
+    long_name='N2O solute concentration in soil micropores',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_NH3_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='NH3_LITR_col',units='g/m3',avgflag='A',&
-    long_name='NH3 solute concentration in soil micropores',ptr_col=data1d_ptr)      
+    long_name='NH3 solute concentration in soil micropores',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_SOL_RADN_col(beg_col:end_col)      
   call hist_addfld1d(fname='SOL_RADN_col',units='W/m2',avgflag='A',&
@@ -1411,7 +1410,7 @@ implicit none
 
   data1d_ptr => this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='MIN_LWP_pft',units='MPa',avgflag='A',&
-    long_name='minimum daily canopy water potential',ptr_patch=data1d_ptr)      
+    long_name='minimum daily canopy water potential',ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_CO2_SEMIS_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_SEMIS_FLX_col',units='umol C/m2/s',avgflag='A',&
@@ -2624,8 +2623,7 @@ implicit none
 
   data2d_ptr => this%h2D_VSM_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
   call hist_addfld2d(fname='rWatFLP_vr',units='m3 H2O/m3 soil pore',type2d='levsoi',avgflag='A',&
-    long_name='Fraction of soil porosity filled by water (relative saturation)',ptr_col=data2d_ptr,&
-    default='inactive')       
+    long_name='Fraction of soil porosity filled by water (relative saturation)',ptr_col=data2d_ptr)       
 
   data2d_ptr => this%h2D_VSICE_vr(beg_col:end_col,1:JZ)        
   call hist_addfld2d(fname='rIceFLP_vr',units='m3 ice/m3 soil pore',type2d='levsoi',avgflag='A',&
@@ -2887,6 +2885,7 @@ implicit none
       this%h1D_NBP_col(ncol)              = Eco_NBP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_HVST_C_col(ncol)       = EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_LAI_col(ncol)          = CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_ECO_SAI_col(ncol)          = StemArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Eco_GPP_CumYr_col(ncol)    = Eco_GPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_ECO_RA_col(ncol)           = Eco_AutoR_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_Eco_NPP_CumYr_col(ncol)    = Eco_NPP_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

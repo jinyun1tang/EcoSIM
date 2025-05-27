@@ -52,7 +52,7 @@
     CanopyGasCO2_pft          => plt_photo%CanopyGasCO2_pft,          &
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft,        &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
-    NetCO2Flx2Canopy_col      => plt_bgcr%NetCO2Flx2Canopy_col,       &
+    NetCO2Flx2Canopy_col      => plt_bgcr%NetCO2Flx2Canopy_col,       &  !Input: Canopy NEE from previous time step
     SineSunInclAngle_col      => plt_rad%SineSunInclAngle_col,        &
     AirConc_pft               => plt_photo%AirConc_pft,               &
     MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft, &
@@ -76,23 +76,25 @@
   RI                       = RichardsonNumber(RIB,TairK,TKCanopy_pft(NZ))
   CanopyBndlResist_pft4CO2 = 1.34_r8*AMAX1(5.56E-03_r8,ReistanceCanopy_pft(NZ)/(1.0_r8-10.0_r8*RI))
   AirConc_pft(NZ)          = GetMolAirPerm3(TKCanopy_pft(NZ))    !assuming pressure is one atmosphere
-!
-!     CANOPY CO2 CONCENTRATION FROM CO2 INFLUXES AND EFFLUXES
-!
-!     CanopyGasCO2_pft,CO2E=CO2 concentrations in canopy air,atmosphere, umol mol-1 (ppmv)
-!     NetCO2Flx2Canopy_col=net CO2 flux in canopy air from soil,plants, g d-2 h-1
-! assuming steady state, canopy CO2 concentration is computed with mass balance. 
-! how 8.33E+04 is determined. 
+
+  ! For prescribed phenolgoy, the canopy CO2 concentration should be computed differently
+  !
+  !     CANOPY CO2 CONCENTRATION FROM CO2 INFLUXES AND EFFLUXES 
+  !
+  !     CanopyGasCO2_pft,CO2E=CO2 concentrations in canopy air,atmosphere, umol mol-1 (ppmv)
+  !     NetCO2Flx2Canopy_col=net CO2 flux in canopy air from soil,plants, g d-2 h-1
+  !     assuming steady state, canopy CO2 concentration is computed with mass balance. 
+  !     how 8.33E+04 is determined. 
   CanopyGasCO2_pft(NZ) = CO2E-8.33E+04_r8*NetCO2Flx2Canopy_col*CanopyBndlResist_pft4CO2/AirConc_pft(NZ)
   CanopyGasCO2_pft(NZ) = AMIN1(CO2E+200.0_r8,AZMAX1(CO2E-200.0_r8,CanopyGasCO2_pft(NZ)))
-!
-!     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ'
-!
-!     LeafIntracellularCO2_pft=intercellular CO2 concentration
-!     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
-!     SineSunInclAngle_col=sine of solar angle
-!     CanopyLeafArea_pft=PFT leaf area
-!
+  !
+  !     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ' 
+  !
+  !     LeafIntracellularCO2_pft=intercellular CO2 concentration
+  !     CanPCi2CaRatio=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
+  !     SineSunInclAngle_col=sine of solar angle
+  !     CanopyLeafArea_pft=PFT leaf area 
+  !
   LeafIntracellularCO2_pft(NZ)=CanPCi2CaRatio(NZ)*CanopyGasCO2_pft(NZ)
 
   IF(SineSunInclAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -164,13 +166,13 @@
   integer :: N,M,LP
   real(r8) :: PAR_zsec,Tau_rad
 !     begin_execution
-  associate(                                            &
-    ZERO4Groth_pft     => plt_biom%ZERO4Groth_pft,      &
-    LeafAUnshaded_zsec => plt_photo%LeafAUnshaded_zsec, &
-    RadPAR_zsec        => plt_rad%RadPAR_zsec,          &
-    RadDifPAR_zsec     => plt_rad%RadDifPAR_zsec,       &
-    TAU_DirectRTransmit   => plt_rad%TAU_DirectRTransmit,     &
-    TAU_RadThru        => plt_rad%TAU_RadThru           &
+  associate(                                             &
+    ZERO4Groth_pft      => plt_biom%ZERO4Groth_pft,      &
+    LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec, &
+    RadPAR_zsec         => plt_rad%RadPAR_zsec,          &
+    RadDifPAR_zsec      => plt_rad%RadDifPAR_zsec,       &
+    TAU_DirectRTransmit => plt_rad%TAU_DirectRTransmit,  &
+    TAU_RadThru         => plt_rad%TAU_RadThru           &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
@@ -210,7 +212,7 @@
   real(r8) :: VOGRO
 !     begin_execution
   associate(                                                                  & 
-    CanopyLeafArea_lpft           => plt_morph%CanopyLeafArea_lpft,           &
+    CanopyLeafArea_lnode           => plt_morph%CanopyLeafArea_lnode,           &
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft,                 &
     O2L                           => plt_photo%O2L,                           &
     aquCO2Intraleaf_pft           => plt_photo%aquCO2Intraleaf_pft,           &
@@ -276,12 +278,12 @@
 !
 !     FOR EACH CANOPY LAYER
 !
-!     CanopyLeafArea_lpft=leaf area
+!     CanopyLeafArea_lnode=leaf area
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
   if(lverb)write(*,*)'C3PhotosynsCanopyLayerL'
   DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -305,7 +307,7 @@
   associate(                                                                       &
     LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
     ZERO4Groth_pft                 =>  plt_biom%ZERO4Groth_pft                   , &
-    CanopyLeafArea_lpft            =>  plt_morph%CanopyLeafArea_lpft             , &
+    CanopyLeafArea_lnode            =>  plt_morph%CanopyLeafArea_lnode             , &
     C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch           , &
     LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft         , &
     O2L                            =>  plt_photo%O2L                             , &
@@ -388,11 +390,11 @@
 !
 !     FOR EACH CANOPY LAYER
 !
-!     CanopyLeafArea_lpft=leaf area
+!     CanopyLeafArea_lnode=leaf area
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
   DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C4PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -534,7 +536,7 @@
   end subroutine C4FixCO2
 !------------------------------------------------------------------------------------------
 
-  subroutine PhotosisOnLiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+  subroutine LiveBranchPhotosynthesis(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   implicit none
   integer, intent(in):: I,J,NB,NZ
   real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy  
@@ -561,9 +563,9 @@
     ENDIF
 
     IF(ProteinPerLeafArea.GT.ZERO)THEN
-!
-!     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
-!
+      !
+      !     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
+      !
       IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
         if(lverb)write(*,*)'C4 PHOTOSYNTHESIS'
         call C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
@@ -571,14 +573,14 @@
         if(lverb)write(*,*)' C3 PHOTOSYNTHESIS'
         call C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
       ENDIF
-!
+     !
     ELSE
       Vmax4PEPCarboxy_pft(K,NB,NZ)     = 0.0_r8
       Vmax4RubiscoCarboxy_pft(K,NB,NZ) = 0.0_r8
     ENDIF
   ENDDO
   end associate
-  end subroutine PhotosisOnLiveBranch
+  end subroutine LiveBranchPhotosynthesis
 !------------------------------------------------------------------------------------------
 
   subroutine PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
@@ -653,9 +655,9 @@
 !     LeafNodeArea_brch,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
 !     ProteinPerLeafArea=leaf protein surficial density
 !
-  if(lverb)write(*,*)NB,NZ,'PhotosisOnLiveBranch'
+  if(lverb)write(*,*)NB,NZ,'LiveBranchPhotosynthesis'
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-    call PhotosisOnLiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
+    call LiveBranchPhotosynthesis(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   ENDIF
   end associate
   end subroutine PhenoActiveBranch

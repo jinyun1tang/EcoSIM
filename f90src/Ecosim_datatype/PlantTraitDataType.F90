@@ -129,7 +129,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  doPlantLeafOut_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  doPlantLeaveOff_brch(:,:,:,:)                      !branch phenology flag, [-]
   integer,target,allocatable ::  iPlantBranchState_brch(:,:,:,:)                      !flag to detect branch death , [-]
-  real(r8),target,allocatable ::  MinNonstC2InitBranch_pft(:,:,:)                          !branch nonstructural C content required for new branch, [g g-1]
+  real(r8),target,allocatable ::  NonstCMinConc2InitBranch_pft(:,:,:)                          !branch nonstructural C content required for new branch, [g g-1]
   real(r8),target,allocatable ::  NodeNumNormByMatgrp_brch(:,:,:,:)                     !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)                    !gain in normalized node number during vegetative growth stages , [h-1]
   real(r8),target,allocatable ::  dReproNodeNumNormByMatG_brch(:,:,:,:)                    !gain in normalized node number during reproductive growth stages, [h-1]
@@ -289,7 +289,7 @@ contains
   allocate(doPlantLeafOut_brch(MaxNumBranches,JP,JY,JX)); doPlantLeafOut_brch=0
   allocate(doPlantLeaveOff_brch(MaxNumBranches,JP,JY,JX)); doPlantLeaveOff_brch=0
   allocate(iPlantBranchState_brch(MaxNumBranches,JP,JY,JX)); iPlantBranchState_brch=0
-  allocate(MinNonstC2InitBranch_pft(JP,JY,JX));       MinNonstC2InitBranch_pft=0._r8
+  allocate(NonstCMinConc2InitBranch_pft(JP,JY,JX));       NonstCMinConc2InitBranch_pft=0._r8
   allocate(NodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX)); NodeNumNormByMatgrp_brch=0._r8
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
   allocate(dReproNodeNumNormByMatG_brch(MaxNumBranches,JP,JY,JX));dReproNodeNumNormByMatG_brch=0._r8
@@ -446,7 +446,7 @@ contains
   call destroy(doPlantLeafOut_brch)
   call destroy(doPlantLeaveOff_brch)
   call destroy(iPlantBranchState_brch)
-  call destroy(MinNonstC2InitBranch_pft)
+  call destroy(NonstCMinConc2InitBranch_pft)
   call destroy(NodeNumNormByMatgrp_brch)
   call destroy(HourlyNodeNumNormByMatgrp_brch)
   call destroy(dReproNodeNumNormByMatG_brch)

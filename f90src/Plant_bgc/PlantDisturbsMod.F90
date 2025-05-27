@@ -790,23 +790,23 @@ module PlantDisturbsMod
   integer :: NE,K  
   real(r8) :: FrcLeafMassLeft,FHGT,FHGTK,FHVSETS,FHVSH
 
-  associate(                                                          &
-    FracCanopyHeightCut_pft   => plt_distb%FracCanopyHeightCut_pft,   &
-    THIN_pft                  => plt_distb%THIN_pft,                  &
-    StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch,         &
+  associate(                                                        &
+    FracCanopyHeightCut_pft  => plt_distb%FracCanopyHeightCut_pft,  &
+    THIN_pft                 => plt_distb%THIN_pft,                 &
+    StalkRsrvElms_brch       => plt_biom%StalkRsrvElms_brch,        &
     InternodeHeightDead_brch => plt_morph%InternodeHeightDead_brch, &
-    FracBiomHarvsted          => plt_distb%FracBiomHarvsted,          &
-    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch,         &
-    StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch,        &
-    LiveInterNodeHight_brch   => plt_morph%LiveInterNodeHight_brch,   &
-    StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft,          &
-    SenecStalkStrutElms_brch  => plt_biom%SenecStalkStrutElms_brch,   &
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
-    InternodeStrutElms_brch   => plt_biom%InternodeStrutElms_brch,    &
-    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,           &
-    ZERO                      => plt_site%ZERO,                       &
-    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft,         &
-    iHarvstType_pft           => plt_distb%iHarvstType_pft            &
+    FracBiomHarvsted         => plt_distb%FracBiomHarvsted,         &
+    StalkLiveBiomassC_brch   => plt_biom%StalkLiveBiomassC_brch,    &
+    StalkStrutElms_brch      => plt_biom%StalkStrutElms_brch,       &
+    LiveInterNodeHight_brch  => plt_morph%LiveInterNodeHight_brch,  &
+    StalkRsrvElms_pft        => plt_biom%StalkRsrvElms_pft,         &
+    SenecStalkStrutElms_brch => plt_biom%SenecStalkStrutElms_brch,  &
+    ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,            &
+    InternodeStrutElms_brch  => plt_biom%InternodeStrutElms_brch,   &
+    ZERO4LeafVar_pft         => plt_biom%ZERO4LeafVar_pft,          &
+    ZERO                     => plt_site%ZERO,                      &
+    StalkStrutElms_pft       => plt_biom%StalkStrutElms_pft,        &
+    iHarvstType_pft          => plt_distb%iHarvstType_pft           &
   )
 !
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
@@ -1363,7 +1363,7 @@ module PlantDisturbsMod
     THIN_pft                    => plt_distb%THIN_pft,                    &
     LeafStrutElms_pft           => plt_biom%LeafStrutElms_pft,            &
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft,           &
-    CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft,         &
+    CanopyLeafArea_lnode         => plt_morph%CanopyLeafArea_lnode,         &
     FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft,         &
     iHarvstType_pft             => plt_distb%iHarvstType_pft              &
@@ -1464,7 +1464,7 @@ module PlantDisturbsMod
 !
 !     REMAINING LEAF C,N,P AND AREA
 !
-          CanopyLeafArea_lpft(L,K,NB,NZ)=FrcLeafMassLeft*CanopyLeafArea_lpft(L,K,NB,NZ)
+          CanopyLeafArea_lnode(L,K,NB,NZ)=FrcLeafMassLeft*CanopyLeafArea_lnode(L,K,NB,NZ)
           IF(K.EQ.1)THEN
             CanopyStalkArea_lbrch(L,NB,NZ)=FrcLeafMassLeft*CanopyStalkArea_lbrch(L,NB,NZ)
           ENDIF
@@ -1491,7 +1491,7 @@ module PlantDisturbsMod
   real(r8) :: LeafElmNodeK_brch(NumPlantChemElms)  
 
   associate(                                                       &
-    CanopyLeafArea_lpft      => plt_morph%CanopyLeafArea_lpft,     &
+    CanopyLeafArea_lnode      => plt_morph%CanopyLeafArea_lnode,     &
     LeafElmntNode_brch       => plt_biom%LeafElmntNode_brch,       &
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft,           &
     THIN_pft                 => plt_distb%THIN_pft,                &
@@ -1515,14 +1515,14 @@ module PlantDisturbsMod
 !     ACCUMULATE REMAINING LEAF AREA, C, N, P
 !
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-!     CanopyLeafArea_lpft,CanopyLeafAreaZ_pft=leaf node,total area in canopy layer
+!     CanopyLeafArea_lnode,CanopyLeafAreaZ_pft=leaf node,total area in canopy layer
 !
     D9815: DO L=1,NumOfCanopyLayers1
-      ARLFG=ARLFG+CanopyLeafArea_lpft(L,K,NB,NZ)
+      ARLFG=ARLFG+CanopyLeafArea_lnode(L,K,NB,NZ)
       DO NE=1,NumPlantChemElms
         LeafElmNodeK_brch(NE)=LeafElmNodeK_brch(NE)+LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)
       ENDDO
-      CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
+      CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ)+CanopyLeafArea_lnode(L,K,NB,NZ)
       CanopyLeafCLyr_pft(L,NZ)  = CanopyLeafCLyr_pft(L,NZ)+LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
     ENDDO D9815
 !
@@ -1604,7 +1604,7 @@ module PlantDisturbsMod
   real(r8) :: watflx,VHeatCapCanopyPrev,CanopyMassC
   associate(                                                          &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,     &
-    CanopyBiomWater_pft           => plt_ew%CanopyBiomWater_pft,              &
+    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,          &
     QCanopyWat2Dist_col       => plt_ew%QCanopyWat2Dist_col,          &
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft,           &
     HeatCanopy2Dist_col       => plt_ew%HeatCanopy2Dist_col,          &

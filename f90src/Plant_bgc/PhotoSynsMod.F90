@@ -58,7 +58,7 @@ implicit none
   AirConc_pft                   => plt_photo%AirConc_pft                   , &
   DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft     , &
   ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                 , &
-  CanopyLeafArea_lpft           => plt_morph%CanopyLeafArea_lpft           , &
+  CanopyLeafArea_lnode           => plt_morph%CanopyLeafArea_lnode           , &
   RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                  , &
   RadPAR_zsec                   => plt_rad%RadPAR_zsec                     , &
   TAU_RadThru                   => plt_rad%TAU_RadThru                     , &
@@ -69,7 +69,7 @@ implicit none
 ! FOR EACH CANOPY LAYER
   CO2FCL=0._r8;CO2FLL=0._r8
   D210: DO L=NumOfCanopyLayers1,1,-1
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -253,7 +253,7 @@ implicit none
   LeafIntracellularCO2_pft      => plt_photo%LeafIntracellularCO2_pft,      &
   RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node,        &
   Vmax4PEPCarboxy_pft           => plt_photo%Vmax4PEPCarboxy_pft,           &
-  CanopyLeafArea_lpft           => plt_morph%CanopyLeafArea_lpft,           &
+  CanopyLeafArea_lnode           => plt_morph%CanopyLeafArea_lnode,           &
   ZERO                          => plt_site%ZERO,                           &
   RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec,                  &
   RadPAR_zsec                   => plt_rad%RadPAR_zsec,                     &
@@ -267,7 +267,7 @@ implicit none
 !
   D110: DO L=NumOfCanopyLayers1,1,-1
 
-    IF(CanopyLeafArea_lpft(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -468,7 +468,7 @@ implicit none
 !
 !             C4 PHOTOSYNTHESIS
 !
-!             LeafNodeArea_brch,CanopyLeafArea_lpft=leaf area
+!             LeafNodeArea_brch,CanopyLeafArea_lnode=leaf area
 !             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
 !             Vmax4PEPCarboxy_pft=PEP carboxylation rate unlimited by CO2
 !

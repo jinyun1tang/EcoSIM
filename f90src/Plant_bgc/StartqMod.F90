@@ -575,7 +575,7 @@ module StartqMod
       PetoleProteinCNode_brch(K,NB,NZ,NY,NX)                    = 0._r8
 
       D55: DO L=1,NumOfCanopyLayers
-        CanopyLeafArea_lpft(L,K,NB,NZ,NY,NX)=0._r8
+        CanopyLeafArea_lnode(L,K,NB,NZ,NY,NX)=0._r8
         LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
 
@@ -734,7 +734,7 @@ module StartqMod
   ENDDO  
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
-      AllPlantRootH2OLoss_vr(N,L,NZ,NY,NX)                     = 0._r8
+      AllPlantRootH2OLoss_vr(N,L,NZ,NY,NX)                       = 0._r8
       PSIRoot_pvr(N,L,NZ,NY,NX)                                  = -0.01_r8
       PSIRootOSMO_vr(N,L,NZ,NY,NX)                               = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)                               = AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
@@ -753,7 +753,7 @@ module StartqMod
       Root1stRadius_pvr(N,L,NZ,NY,NX)            = Root1stMaxRadius_pft(N,NZ,NY,NX)
       Root2ndRadius_pvr(N,L,NZ,NY,NX)            = Root2ndMaxRadius_pft(N,NZ,NY,NX)
       RootAreaPerPlant_pvr(N,L,NZ,NY,NX)         = 0._r8
-      Root2ndAveLen_pvr(N,L,NZ,NY,NX)            = 1.0E-03
+      Root2ndMeanLens_pvr(N,L,NZ,NY,NX)            = 1.0E-03
       RootNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_NO3,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_H2PO4,N,L,NZ,NY,NX)  = 0._r8
@@ -847,8 +847,6 @@ module StartqMod
   CanopyLeafShethC_pft(NZ,NY,NX)        = CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)
     
   WatHeldOnCanopy_pft(NZ,NY,NX)          = 0._r8
-
-
   CanopyNonstElms_brch(ielmn,1,NZ,NY,NX) = CNGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   CanopyNonstElms_brch(ielmp,1,NZ,NY,NX) = CPGR(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   

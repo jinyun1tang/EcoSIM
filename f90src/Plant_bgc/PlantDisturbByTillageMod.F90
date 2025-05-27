@@ -87,7 +87,7 @@ contains
     SeedNumSet_brch             => plt_morph%SeedNumSet_brch,             &
     PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch,      &
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch,        &
-    CanopyLeafArea_lpft         => plt_morph%CanopyLeafArea_lpft          &
+    CanopyLeafArea_lnode         => plt_morph%CanopyLeafArea_lnode          &
   )
   call PrintInfo('beg '//subname)
 !     PPX,PP=PFT population per m2,grid cell
@@ -214,7 +214,7 @@ contains
         ENDDO
       ENDDO
       D8965: DO L=1,NumOfCanopyLayers1
-        CanopyLeafArea_lpft(L,K,NB,NZ)=CanopyLeafArea_lpft(L,K,NB,NZ)*XHVST
+        CanopyLeafArea_lnode(L,K,NB,NZ)=CanopyLeafArea_lnode(L,K,NB,NZ)*XHVST
       ENDDO D8965
     ENDDO D8970
   ENDIF

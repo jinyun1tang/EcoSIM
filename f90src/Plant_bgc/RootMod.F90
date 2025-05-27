@@ -189,7 +189,7 @@ implicit none
     Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft,         &
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr,            &
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,          &
-    Root2ndAveLen_pvr         => plt_morph%Root2ndAveLen_pvr,            &
+    Root2ndMeanLens_pvr         => plt_morph%Root2ndMeanLens_pvr,            &
     Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr,            &
     Root2ndXSecArea_pft       => plt_morph%Root2ndXSecArea_pft,          &
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft,         &
@@ -289,7 +289,7 @@ implicit none
 !     TotRootVol,RootVH2O_pvr,RootPoreVol_pvr=root or myco total,aqueous,gaseous volume
 !     RRAD1,Root2ndRadius_pvr=primary,secondary root radius
 !     RootAreaPerPlant_pvr=root surface area per plant
-!     Root2ndAveLen_pvr=average secondary root length
+!     Root2ndMeanLens_pvr=average secondary root length
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=loss of root CO2, O2, CH4, N2O, NH3, H2
 !     CO2A,OXYA,CH4A,Z2OA,ZH3A,H2GA=root gaseous CO2,O2,CH4,N2O,NH3,H2
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
@@ -324,9 +324,9 @@ implicit none
             (1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root2ndMaxRadius_pft(N,NZ))
           TotRootArea=TwoPiCON*(Root1stRadius_pvr(N,L,NZ)*TotPopuRoot1stLen_rpvr+Root2ndRadius_pvr(N,L,NZ)*TotRoot2ndLen)
           IF(Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
-            Root2ndAveLen_pvr(N,L,NZ)=AMAX1(Root2ndAveLenMin,TotRoot2ndLen/Root2ndXNum_pvr(N,L,NZ))
+            Root2ndMeanLens_pvr(N,L,NZ)=AMAX1(Root2ndMeanLensMin,TotRoot2ndLen/Root2ndXNum_pvr(N,L,NZ))
           ELSE
-            Root2ndAveLen_pvr(N,L,NZ)=Root2ndAveLenMin
+            Root2ndMeanLens_pvr(N,L,NZ)=Root2ndMeanLensMin
           ENDIF
           RootAreaPerPlant_pvr(N,L,NZ)=TotRootArea/PlantPopulation_pft(NZ)
         ELSE
@@ -337,7 +337,7 @@ implicit none
           RootAreaPerPlant_pvr(N,L,NZ)    = 0._r8
           Root1stRadius_pvr(N,L,NZ)       = Root1stMaxRadius_pft(N,NZ)
           Root2ndRadius_pvr(N,L,NZ)       = Root2ndMaxRadius_pft(N,NZ)
-          Root2ndAveLen_pvr(N,L,NZ)       = Root2ndAveLenMin
+          Root2ndMeanLens_pvr(N,L,NZ)       = Root2ndMeanLensMin
           DO NTG=idg_beg,idg_NH3
             RootGasLossDisturb_pft(NTG,NZ)=RootGasLossDisturb_pft(NTG,NZ) &
               -(trcg_rootml_pvr(NTG,N,L,NZ)+trcs_rootml_pvr(NTG,N,L,NZ))
@@ -1946,7 +1946,7 @@ implicit none
     HypoctoHeight_pft          => plt_morph%HypoctoHeight_pft,          &
     Root2ndRadius_pvr          => plt_morph%Root2ndRadius_pvr,          &
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr,           &
-    Root2ndAveLen_pvr          => plt_morph%Root2ndAveLen_pvr,          &
+    Root2ndMeanLens_pvr          => plt_morph%Root2ndMeanLens_pvr,          &
     SeedDepth_pft              => plt_morph%SeedDepth_pft,              &
     MaxSoiL4Root_pft           => plt_morph%MaxSoiL4Root_pft,           &
     NumRootAxes_pft            => plt_morph%NumRootAxes_pft             &
@@ -2077,7 +2077,7 @@ implicit none
 !     RTSKP,RTSKS=primary,secondary root sink strength
 !     RTN2=number of secondary root axes
 !     Root2ndSink_pvr=total secondary root sink strength
-!     Root2ndAveLen_pvr=average secondary root length
+!     Root2ndMeanLens_pvr=average secondary root length
 !     RootSinkC,RootSinkC_vr=total root sink strength
 !
             Root1stLocDepz_vr(NR,L) = AZMAX1(Root1stDepz_pft(ipltroot,NR,NZ)-CumSoilThickness_vr(L-1)-RTDPX)
@@ -2087,7 +2087,7 @@ implicit none
 
             IF(RTDPS.GT.ZERO)THEN
               RTSKP = RootPrimeAxsNum*Root1stRadius_pvr(N,L,NZ)**2._r8/RTDPS
-              RTSKS = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_pvr(N,L,NZ)**2._r8,Root2ndAveLen_pvr(N,L,NZ))
+              RTSKS = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_pvr(N,L,NZ)**2._r8,Root2ndMeanLens_pvr(N,L,NZ))
               IF(RTSKP+RTSKS.GT.ZERO4Groth_pft(NZ))THEN
                 Root2ndSink_pvr(N,L,NR)=RTSKP*RTSKS/(RTSKP+RTSKS)
               ELSE
@@ -2098,7 +2098,7 @@ implicit none
             ENDIF
           ELSE
             Root2ndSink_pvr(N,L,NR)=safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)&
-              *Root2ndRadius_pvr(N,L,NZ)**2._r8,Root2ndAveLen_pvr(N,L,NZ))
+              *Root2ndRadius_pvr(N,L,NZ)**2._r8,Root2ndMeanLens_pvr(N,L,NZ))
           ENDIF
 
           RootSinkC(N)      = RootSinkC(N)+Root2ndSink_pvr(N,L,NR)

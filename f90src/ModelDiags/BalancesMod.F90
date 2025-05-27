@@ -423,19 +423,6 @@ contains
       !note NL may change due to soil relayering, which can be tested using
       !by comparing the values of NL and NLI      
 
-      !DO L=NUI(NY,NX),NU(NY,NX)-1
-
-      !  DO idg=idg_beg,idg_NH3
-      !    TRootGasLossDisturb_col(idg,NY,NX) = TRootGasLossDisturb_col(idg,NY,NX)-trcg_root_vr(idg,L,NY,NX)
-      !    SurfGasEmiss_flx_col(idg,NY,NX)    = SurfGasEmiss_flx_col(idg,NY,NX)-trcg_gasml_vr(idg,L,NY,NX)&
-      !      -trcs_solml_vr(idg,L,NY,NX)- trcs_soHml_vr(idg,L,NY,NX)
-      !  ENDDO
-
-      !  idg=idg_NH3
-      !  SurfGasEmiss_flx_col(idg,NY,NX)=SurfGasEmiss_flx_col(idg,NY,NX) &
-      !    - trcs_solml_vr(idg_NH3B,L,NY,NX) - trcs_soHml_vr(idg_NH3B,L,NY,NX)        
-      !ENDDO
-
       DO L=NUI(NY,NX),NL(NY,NX)
         DO idg=idg_beg,idg_NH3
           trcg_soil(idg)=trcg_soil(idg) + trcg_gasml_vr(idg,L,NY,NX)

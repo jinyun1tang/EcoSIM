@@ -251,33 +251,33 @@ module PlantPhenolMod
   integer, intent(in) :: I,J,NZ
   integer :: NB
 ! begin_execution
-  associate(                                                            &
-    CanopyNonstElmConc_pft     => plt_biom%CanopyNonstElmConc_pft,      &
-    SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft,       &
-    MatureGroup_brch           => plt_pheno%MatureGroup_brch,           &
-    iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch,        &
-    doInitPlant_pft            => plt_pheno%doInitPlant_pft,            &
-    iPlantRootState_pft        => plt_pheno%iPlantRootState_pft,        &
-    iPlantPhenolPattern_pft    => plt_pheno%iPlantPhenolPattern_pft,    &
-    iPlantBranchState_brch     => plt_pheno%iPlantBranchState_brch,     &
-    iPlantShootState_pft       => plt_pheno%iPlantShootState_pft,       &
-    iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft,  &
-    MinNonstC2InitRoot_pft     => plt_pheno%MinNonstC2InitRoot_pft,     &
-    MatureGroup_pft            => plt_pheno%MatureGroup_pft,            &
-    MinNonstC2InitBranch_pft   => plt_pheno%MinNonstC2InitBranch_pft,   &
-    PlantPopulation_pft        => plt_site%PlantPopulation_pft,         &
-    Hours4Leafout_brch         => plt_pheno%Hours4Leafout_brch,         &
-    PSIRootTurg_vr             => plt_ew%PSIRootTurg_vr,                &
-    FracGroth2Node_pft         => plt_allom%FracGroth2Node_pft,         &
-    NumRootAxes_pft            => plt_morph%NumRootAxes_pft,            &
-    MainBranchNum_pft          => plt_morph%MainBranchNum_pft,          &
-    NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
-    NumCogrowthNode_pft         => plt_morph%NumCogrowthNode_pft,         &
-    BranchNumber_pft           => plt_morph%BranchNumber_pft,           &
-    BranchNumber_brch          => plt_morph%BranchNumber_brch,          &
-    NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft,         &
-    ShootNodeNumAtPlanting_pft => plt_morph%ShootNodeNumAtPlanting_pft, &
-    ShootNodeNum_brch          => plt_morph%ShootNodeNum_brch           &
+  associate(                                                                &
+    CanopyNonstElmConc_pft       => plt_biom%CanopyNonstElmConc_pft,        &
+    SeasonalNonstElms_pft        => plt_biom%SeasonalNonstElms_pft,         &
+    MatureGroup_brch             => plt_pheno%MatureGroup_brch,             &
+    iPlantCalendar_brch          => plt_pheno%iPlantCalendar_brch,          &
+    doInitPlant_pft              => plt_pheno%doInitPlant_pft,              &
+    iPlantRootState_pft          => plt_pheno%iPlantRootState_pft,          &
+    iPlantPhenolPattern_pft      => plt_pheno%iPlantPhenolPattern_pft,      &
+    iPlantBranchState_brch       => plt_pheno%iPlantBranchState_brch,       &
+    iPlantShootState_pft         => plt_pheno%iPlantShootState_pft,         &
+    iPlantTurnoverPattern_pft    => plt_pheno%iPlantTurnoverPattern_pft,    &
+    MinNonstC2InitRoot_pft       => plt_pheno%MinNonstC2InitRoot_pft,       &
+    MatureGroup_pft              => plt_pheno%MatureGroup_pft,              &
+    NonstCMinConc2InitBranch_pft => plt_pheno%NonstCMinConc2InitBranch_pft, &
+    PlantPopulation_pft          => plt_site%PlantPopulation_pft,           &
+    Hours4Leafout_brch           => plt_pheno%Hours4Leafout_brch,           &
+    PSIRootTurg_vr               => plt_ew%PSIRootTurg_vr,                  &
+    FracGroth2Node_pft           => plt_allom%FracGroth2Node_pft,           &
+    NumRootAxes_pft              => plt_morph%NumRootAxes_pft,              &
+    MainBranchNum_pft            => plt_morph%MainBranchNum_pft,            &
+    NumOfBranches_pft            => plt_morph%NumOfBranches_pft,            &
+    NumCogrowthNode_pft          => plt_morph%NumCogrowthNode_pft,          &
+    BranchNumber_pft             => plt_morph%BranchNumber_pft,             &
+    BranchNumber_brch            => plt_morph%BranchNumber_brch,            &
+    NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft,           &
+    ShootNodeNumAtPlanting_pft   => plt_morph%ShootNodeNumAtPlanting_pft,   &
+    ShootNodeNum_brch            => plt_morph%ShootNodeNum_brch             &
   )
 
 !
@@ -307,8 +307,8 @@ module PlantPhenolMod
           iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
           IF((NumOfBranches_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
-            .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.MinNonstC2InitBranch_pft(NZ) &
-            .AND. MinNonstC2InitBranch_pft(NZ).GT.0.0_r8))THEN
+            .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinConc2InitBranch_pft(NZ) &
+            .AND. NonstCMinConc2InitBranch_pft(NZ).GT.0.0_r8))THEN
 
             D120: DO NB=1,MaxNumBranches
               IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
@@ -525,6 +525,7 @@ module PlantPhenolMod
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk = (HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_pft(ipltroot,1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
+
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanopy_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))

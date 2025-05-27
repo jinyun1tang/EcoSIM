@@ -8,6 +8,7 @@ module PlantMod
   use MiniMathMod,       only: fixEXConsumpFlux
   use EcoSIMCtrlMod,     only: lverb
   use PlantDebugMod,     only: PrintRootTracer
+  use LitterFallMod,     only: ReSeedPlants
   use TracerIDMod
   use GridDataType
   use PlantDataRateType
@@ -89,6 +90,10 @@ implicit none
       CALL EXTRACTs(I,J)
 !      if(I==140 .and. J>=20)write(116,*)'afextract'        
 
+      DO NZ=1,NP(NY,NX)
+        Call ReSeedPlants(I,J,NZ)
+      ENDDO
+
       call ExitPlantBalance(I,J,NP(NY,NX))
 
       call PlantAPIRecv(I,J,NY,NX)
@@ -104,7 +109,7 @@ implicit none
 
   subroutine PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)
   use SurfaceRadiationMod
-  use CanopyDataType, only : CanopyLeafArea_lpft
+  use CanopyDataType, only : CanopyLeafArea_lnode
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: DepthSurfWatIce

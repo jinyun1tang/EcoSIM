@@ -57,4 +57,32 @@ implicit none
 
   end subroutine GetRootProfile
 
+!------------------------------------------------------------------------
+
+  subroutine get_LAI_profile(zc,NZ)
+  !Description:
+  !Distribute leaf area in through the canopy
+  !  
+  implicit none
+  real(r8), intent(in) :: ZC  !plant height
+  integer, intent(in) :: NZ   !plant index
+
+  end subroutine get_LAI_profile
+
+
+!------------------------------------------------------------------------
+
+  subroutine get_StemArea_profile(zc,NZ)
+  !
+  !Description:
+  !Distribute steam area in through the canopy
+  !
+  implicit none
+  real(r8), intent(in) :: ZC  !plant height
+  integer, intent(in) :: NZ   !plant index
+
+
+  end subroutine get_StemArea_profile
+
+
 end module PrescribePhenolMod

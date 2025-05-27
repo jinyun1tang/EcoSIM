@@ -257,15 +257,15 @@ module readiMod
     write(*,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
     write(*,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
 
-    write(*,*)'bound condns for N subsurf flow: RCHGNTG',RCHGNTG
-    write(*,*)'bound condns for E subsurf flow: RCHGETG',RCHGETG
-    write(*,*)'bound condns for S subsurf flow: RCHGSTG',RCHGSTG
-    write(*,*)'bound condns for W subsurf flow: RCHGWTG',RCHGWTG
+    write(*,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
+    write(*,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
+    write(*,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
+    write(*,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
 
-    write(*,*)'N distance to water table (m): RCHGNUG',RCHGNUG
-    write(*,*)'E distance to water table (m): RCHGEUG',RCHGEUG
-    write(*,*)'S distance to water table (m): RCHGSUG',RCHGSUG
-    write(*,*)'W distance to water table (m): RCHGWUG',RCHGWUG
+    write(*,*)'N distance to water table (m): RCHGNTG',RCHGNTG
+    write(*,*)'E distance to water table (m): RCHGETG',RCHGETG
+    write(*,*)'S distance to water table (m): RCHGSTG',RCHGSTG
+    write(*,*)'W distance to water table (m): RCHGWTG',RCHGWTG
 
     write(*,*)'lower boundary conditions for water flow:RCHGDG', RCHGDG
     write(*,'(40A)')('-',ll=1,40)
@@ -301,15 +301,15 @@ module readiMod
       RechargSouthSurf(NY,NX) = RCHQSG
       RechargWestSurf(NY,NX)  = RCHQWG 
 
-      RechrgDistNorthSubSurf(NY,NX) = RCHGNUG
-      RechrgDistEastSubSurf(NY,NX)  = RCHGEUG
-      RechrgDistSouthSubSurf(NY,NX) = RCHGSUG
-      RechrgDistWestSubSurf(NY,NX)  = RCHGWUG
+      RechrgDistNorthSubSurf(NY,NX) = RCHGNTG
+      RechrgDistEastSubSurf(NY,NX)  = RCHGETG
+      RechrgDistSouthSubSurf(NY,NX) = RCHGSTG
+      RechrgDistWestSubSurf(NY,NX)  = RCHGWTG
 
-      RechargRateNorthWTBL(NY,NX) = RCHGNTG
-      RechargRateEastWTBL(NY,NX)  = RCHGETG
-      RechargRateSouthWTBL(NY,NX) = RCHGSTG
-      RechargRateWestWTBL(NY,NX)  = RCHGWTG      
+      RechargRateNorthWTBL(NY,NX) = RCHGNUG
+      RechargRateEastWTBL(NY,NX)  = RCHGEUG
+      RechargRateSouthWTBL(NY,NX) = RCHGSUG
+      RechargRateWestWTBL(NY,NX)  = RCHGWUG      
       RechargBottom_col(NY,NX) = RCHGDG
 
       DH(NY,NX)                = DHI(NX)

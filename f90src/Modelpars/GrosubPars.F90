@@ -48,7 +48,7 @@ module GrosubPars
   real(r8) :: PSIMin4OrganExtens !minimum water potential for organ expansion,extension [MPa]
   real(r8) :: RCMN               !minimum stomatal resistance to CO2 [s m-1]
   real(r8) :: RTDPX              !distance behind growing point for secondary roots [m]
-  real(r8) :: Root2ndAveLenMin   !minimum average secondary root length [m]
+  real(r8) :: Root2ndMeanLensMin   !minimum average secondary root length [m]
   real(r8) :: EMODR              !root modulus of elasticity [MPa]
   real(r8) :: QNTM               !quantum efficiency (umol e- umol-1 PAR)
   real(r8) :: CURV               !shape parameter for e- transport response to PAR
@@ -215,7 +215,7 @@ module GrosubPars
   PSIMin4OrganExtens          = 0.1_r8
   RCMN                        = 1.560E+01_r8
   RTDPX                       = 0.00_r8
-  Root2ndAveLenMin            = 1.0E-03_r8
+  Root2ndMeanLensMin            = 1.0E-03_r8
   EMODR                       = 5.0_r8
   QNTM                        = 0.45_r8
   CURV                        = 0.70_r8

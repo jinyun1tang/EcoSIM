@@ -97,10 +97,11 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SumPlantRootGas(I,J)
+  subroutine SumPlantRootGas(I,J,NZ1)
 
   implicit none
   integer, intent(in) :: I,J
+  INTEGER, optional, INTENT(IN) :: NZ1
   integer :: NZ ,L,N,idg,K
   real(r8) :: trcg(idg_beg:idg_NH3)
   associate(                                                       &
@@ -115,9 +116,8 @@ implicit none
   trcg_root_vr(idg_beg:idg_NH3,:)         = 0._r8
 
   trcg(:)=0._r8
-  DO NZ=1,plt_site%NP  
-!    IF(.not.plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)cycle    
-
+  IF(present(NZ1))THEN
+    NZ=NZ1
     DO L=1,MaxSoiL4Root_pft(NZ)
       DO N=1,MY(NZ)  
         DO idg=idg_beg,idg_NH3
@@ -128,8 +128,21 @@ implicit none
         trcg(idg)=trcg(idg)+trcg_root_vr(idg,L)
       ENDDO
     ENDDO
+  ELSE
+    DO NZ=1,plt_site%NP  
 
-  ENDDO
+      DO L=1,MaxSoiL4Root_pft(NZ)
+        DO N=1,MY(NZ)  
+          DO idg=idg_beg,idg_NH3
+            trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
+          ENDDO        
+        ENDDO  
+        DO idg=idg_beg,idg_NH3
+          trcg(idg)=trcg(idg)+trcg_root_vr(idg,L)
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDIF  
 
   end associate
   end subroutine SumPlantRootGas
