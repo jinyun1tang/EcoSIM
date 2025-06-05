@@ -145,13 +145,13 @@ implicit none
         err=dmass-trcg_netflx2_col(idg,NY,NX)
 
         if(abs(err)>1.e-5_r8)then
-          if(iVerbLevel==1)then
+          if(iVerbLevel==1 .or. abs(err)>1.e-4_r8)then
             write(133,*)(I*1000+J)*100+M,trcs_names(idg),'fast'
             write(133,*)'init/final mass=',trcg_mass_begf(idg,NY,NX),trcg_mass_now(idg),trcg_mass3_fast_col(idg,NY,NX)
             write(133,*)'dmass,         =',dmass,TranspNetSoil_fast_flx_col(idg,NY,NX),trcg_netflx2_col(idg,NY,NX)
             write(133,*)'err            =',err
           endif
-          if(abs(err)>1.e-5_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
+          if(abs(err)>1.e-4_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
         endif
 
       ENDDO

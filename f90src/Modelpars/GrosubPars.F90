@@ -290,18 +290,27 @@ module GrosubPars
 !------------------------------------------------------------------------------------------
 
   function get_pft_loc(koppen_def,pft_name,pft_lname,koppen_climl,koppen_clims)result(loc)
-!
-!!DESCRIPTION
-! return the id of pft to be read
+  !
+  !!DESCRIPTION
+  ! return the id of pft to be read
   implicit none
   integer, intent(in) :: koppen_def
   character(len=*), intent(in) :: pft_name
   character(len=40),intent(out):: pft_lname
   character(len=64),intent(out):: koppen_climl
   character(len=3), intent(out):: koppen_clims
-  integer :: loc,loc1,len
+  integer :: loc,loc1,len,k
 
   len=len_trim(pft_name)
+
+  do 
+    if(ichar(pft_name(len:len))==0 .or. pft_name(len:len)==' ')then
+      len=len-1
+    else
+      exit
+    endif
+  enddo
+
   loc=1
   DO
     if(pftss(loc)(1:len)==pft_name(1:len))exit

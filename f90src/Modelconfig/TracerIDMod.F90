@@ -233,17 +233,19 @@ implicit none
   idom_acetate = addone(idom_end)
 
   idsalt_beg=1;idsalt_end=0  
-  if(lsalt_model)then
-    idsalt_Al     = addone(idsalt_end)
-    idsalt_Fe     = addone(idsalt_end)
-    idsalt_Hp     = addone(idsalt_end)
-    idsalt_Ca     = addone(idsalt_end)
-    idsalt_Mg     = addone(idsalt_end)
-    idsalt_Na     = addone(idsalt_end)
-    idsalt_K      = addone(idsalt_end)
-    idsalt_OH     = addone(idsalt_end)
-    idsalt_SO4    = addone(idsalt_end)
-    idsalt_Cl     = addone(idsalt_end)
+  !tracers involved in irrigation
+  idsalt_Al     = addone(idsalt_end)
+  idsalt_Fe     = addone(idsalt_end)
+  idsalt_Ca     = addone(idsalt_end)
+  idsalt_Mg     = addone(idsalt_end)
+  idsalt_Na     = addone(idsalt_end)
+  idsalt_K      = addone(idsalt_end)
+  idsalt_SO4    = addone(idsalt_end)
+  idsalt_Cl     = addone(idsalt_end)
+  idsaltb_end   = idsalt_end
+  if(lsalt_model)then    
+    idsalt_Hp     = addone(idsalt_end)  
+    idsalt_OH     = addone(idsalt_end)  
     idsalt_CO3    = addone(idsalt_end)
     idsalt_HCO3   = addone(idsalt_end)
     idsalt_mend   = idsalt_end

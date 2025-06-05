@@ -151,7 +151,7 @@ module TranspNoSaltMod
           errmass=errmass-trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
         if(abs(errmass)>1.e-5)then
-          if(iVerbLevel==1)then
+          if(iVerbLevel==1 .or. abs(errmass)>1.e-4)then
             write(121,*)('-',L=1,50)
             if(present(M))then
               write(121,*)(I*1000+J)*10+M,trcs_names(idg),'total'
@@ -220,7 +220,7 @@ module TranspNoSaltMod
             write(121,*)'transp',NU(NY,NX),NL(NY,NX)
             write(121,*)transp_diff_slow_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
           endif
-          if(abs(errmass)>1.e-2) &
+          if(abs(errmass)>1.e-4) &
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDDO

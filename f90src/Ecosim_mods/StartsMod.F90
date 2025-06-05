@@ -795,7 +795,7 @@ module StartsMod
   NH3byFire_CumYr_col(:,:)       = 0.0_r8
   PO4byFire_CumYr_col(:,:)       = 0.0_r8
   AmendCFlx_CumYr_col(:,:)       = 0.0_r8
-  FertNFlx_CumYr_col(:,:)        = 0.0_r8
+  FertN_Flx_CumYr_col(:,:)        = 0.0_r8
   FerPFlx_CumYr_col(:,:)         = 0.0_r8
   H2OLoss_CumYr_col(:,:)         = 0.0_r8
   QEvap_CumYr_col(:,:)           = 0.0_r8

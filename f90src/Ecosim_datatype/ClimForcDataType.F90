@@ -71,9 +71,7 @@ implicit none
   real(r8),target,allocatable ::  DayLenthMax(:,:)                          !maximum daylength, [h]
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
   real(r8),target,allocatable ::  LWRadSky_col(:,:)                  !sky longwave radiation , [MJ/h]
-  real(r8),target,allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
-  real(r8),target,allocatable ::  TAMX(:,:)                          !daily maximum air temperature , [oC]
-  real(r8),target,allocatable ::  TAMN(:,:)                          !daily minimum air temperature , [oC]
+  real(r8),target,allocatable ::  TRAD_col(:,:)                          !total daily solar radiation, [MJ d-1]
   real(r8),target,allocatable ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
   real(r8),target,allocatable ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
   real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
@@ -210,9 +208,7 @@ implicit none
   allocate(DayLenthMax(JY,JX));        DayLenthMax=0._r8
   allocate(OMEGAG(NumOfSkyAzimuthSects,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky_col(JY,JX));         LWRadSky_col=0._r8
-  allocate(TRAD(JY,JX));        TRAD=0._r8
-  allocate(TAMX(JY,JX));        TAMX=0._r8
-  allocate(TAMN(JY,JX));        TAMN=0._r8
+  allocate(TRAD_col(JY,JX));        TRAD_col=0._r8
   allocate(HUDX(JY,JX));        HUDX=0._r8
   allocate(HUDN(JY,JX));        HUDN=0._r8
   allocate(TWIND(JY,JX));       TWIND=0._r8
@@ -339,9 +335,7 @@ implicit none
   call destroy(DayLenthMax)
   call destroy(OMEGAG)
   call destroy(LWRadSky_col)
-  call destroy(TRAD)
-  call destroy(TAMX)
-  call destroy(TAMN)
+  call destroy(TRAD_col)
   call destroy(HUDX)
   call destroy(HUDN)
   call destroy(TWIND)

@@ -343,7 +343,7 @@ implicit none
 !
 !     OSC,OSN,OSP,OSA=SOC,SON,SOP,colonized SOC in litter
 !     VOLT=litter volume
-!     AmendCFlx_CumYr_col,FertNFlx_CumYr_col,FerPFlx_CumYr_col=accumulated litter C,N,P application
+!     AmendCFlx_CumYr_col,FertN_Flx_CumYr_col,FerPFlx_CumYr_col=accumulated litter C,N,P application
 !     Eco_NBP_CumYr_col=accumulated net biome productivity
 !
       OSCX=OSCX+OQC1
@@ -396,7 +396,7 @@ implicit none
       TORGN=TORGN+OSNI
       TORGP=TORGP+OSPI
       AmendCFlx_CumYr_col(NY,NX)=AmendCFlx_CumYr_col(NY,NX)+OSCI
-      FertNFlx_CumYr_col(NY,NX)=FertNFlx_CumYr_col(NY,NX)+OSNI
+      FertN_Flx_CumYr_col(NY,NX)=FertN_Flx_CumYr_col(NY,NX)+OSNI
       FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+OSPI
       IF(IYTYP(2,I,NY,NX).LT.3)THEN
         Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)+OSCI
@@ -751,7 +751,7 @@ implicit none
     TZIN   = TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
     TPIN   = TPIN+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
     TIONIN = TIONIN+2.0_r8*(CACX+CASX)
-    FertNFlx_CumYr_col(NY,NX)=FertNFlx_CumYr_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
+    FertN_Flx_CumYr_col(NY,NX)=FertN_Flx_CumYr_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
     FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
   ENDIF
 

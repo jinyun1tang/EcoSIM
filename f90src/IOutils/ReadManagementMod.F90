@@ -53,7 +53,7 @@ implicit none
   endif
   call check_var(soilmgmt_nfid, FileTillage, vardesc, readvar)
   if(.not. readvar)then
-    call endrun('fail to find '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
+    call endrun('fail to find tillage file '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
   endif
 
   call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf),&
@@ -113,7 +113,8 @@ implicit none
   character(len=128) :: irrigf(24)
   integer :: nirrig
 
-  nirrig=get_dim_len(soilmgmt_nfid,'nirrig')
+  nirrig=get_dim_len(soilmgmt_nfid,'nirri')
+
   if(nirrig>24)then
     call endrun("not enough size for array irrigf in "//trim(mod_filename), __LINE__)
   endif
@@ -121,7 +122,7 @@ implicit none
   call check_var(soilmgmt_nfid, FileIrrig, vardesc, readvar)
 
   if(.not. readvar)then
-    call endrun('fail to find '//trim(FileIrrig)//' in '//trim(mod_filename), __LINE__)
+    call endrun('fail to find irrigation file '//trim(FileIrrig)//' in '//trim(mod_filename), __LINE__)
   endif
 
   IF(FileIrrig(1:4).EQ.'auto')THEN
@@ -208,7 +209,7 @@ implicit none
     ENDDO D7965
   ELSE
 !
-!       SCHEDULED IRRIGATION
+!    print*,'   SCHEDULED IRRIGATION'
 !
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf),&
       trim(mod_filename))
@@ -307,7 +308,7 @@ implicit none
 
   call check_var(soilmgmt_nfid, FertFile, vardesc, readvar)
   if(.not. readvar)then
-    call endrun('fail to find '//trim(FertFile)//' in '//trim(mod_filename), __LINE__)
+    call endrun('fail to find fertilizer '//trim(FertFile)//' in '//trim(mod_filename), __LINE__)
   endif
 
   call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf),&

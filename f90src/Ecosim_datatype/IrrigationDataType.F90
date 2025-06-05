@@ -172,7 +172,7 @@ module IrrigationDataType
   allocate(FWatIrrigate2MicP_vr(JZ,JY,JX));      FWatIrrigate2MicP_vr=0._r8
   allocate(HeatIrrigation_vr(JZ,JY,JX));    HeatIrrigation_vr=0._r8
   allocate(trcs_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Irrig_flx_vr=0._r8
-  allocate(trcsalt_irrig_mole_conc_col(idsalt_beg:idsaltb_end,366,JY,JX))
+  allocate(trcsalt_irrig_mole_conc_col(idsalt_beg:idsaltb_end,366,JY,JX));trcsalt_irrig_mole_conc_col=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -180,6 +180,7 @@ module IrrigationDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(trcsalt_irrig_mole_conc_col)
   call destroy(trcs_irrig_flx_col)
   call destroy(trcn_irrig_vr)
   call destroy(trcs_Irrig_flx_vr)

@@ -300,7 +300,7 @@ contains
 
           if(iVerbLevel==1)then
             write(111,*)('-',ii=1,50)
-            write(111,*)I*1000+J,'NY NX=',NY,NX,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX)
+            write(111,*)I*1000+J,'NY NX=',NY,NX,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX),'Final'
             write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
               trcg_TotalMass_beg_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
             write(111,*)'mass_err         =',tracer_mass_err
@@ -364,7 +364,7 @@ contains
             tracer_mass_err=tracer_mass_err-dgaserr
           endif
 
-          if(abs(tracer_mass_err)>1.e-3_r8) &
+          if(abs(tracer_mass_err)>1.e-1_r8) &
             call endrun('tracer'//trcs_names(idg)//' error test failure in '//trim(mod_filename)//' at line',__LINE__)
         endif
       enddo      

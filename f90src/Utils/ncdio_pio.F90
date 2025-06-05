@@ -294,7 +294,7 @@ module ncdio_pio
 
   if (dimlen /= value) then
     write (iulog,*) 'CHECK_DIM error: mismatch of input dimension ',dimlen, &
-      ' with expected value ',value,' for variable ', trim(dimname)
+      ' with expected value ',value,' for variable ', trim(name),trim(dimname)
 
     call endrun(errMsg(mod_filename,__LINE__))
   end if

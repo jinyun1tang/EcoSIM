@@ -525,10 +525,8 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD(NY,NX)= &
+      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD_col(NY,NX)= &
         RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
-      TAMX(NY,NX)  = AMAX1(TAMX(NY,NX),TCA_col(NY,NX))          !celcius
-      TAMN(NY,NX)  = AMIN1(TAMN(NY,NX),TCA_col(NY,NX))          !celcius
       HUDX(NY,NX)  = AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
       HUDN(NY,NX)  = AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
       TWIND(NY,NX) = TWIND(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]

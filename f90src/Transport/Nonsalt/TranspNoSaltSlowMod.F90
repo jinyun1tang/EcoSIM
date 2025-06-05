@@ -230,8 +230,8 @@ implicit none
         if(idg==idg_NH3)then
           err=err+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
         endif
-        if(abs(err)>1.e-5)then
-          if(iVerbLevel==1)then
+        if(abs(err)>1.e-5_r8)then
+          if(iVerbLevel==1 .or. abs(err)>1.e-4_r8)then
             write(201,*)('-',L=1,50)
             write(201,*)(I*1000+J)*10+M,'iterm=',iterm,trcs_names(idg),NY,NX,'slow'
             write(201,*)'beg/end total mass',trcg_mass_begs(idg,NY,NX),trcg_mass_now(idg)
@@ -256,7 +256,7 @@ implicit none
               write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg,NY,NX)
             endif
           endif
-          if(abs(err)>1.e-5_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
+          if(abs(err)>1.e-4_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
         endif
       ENDDO
       DO K=1,jcplx

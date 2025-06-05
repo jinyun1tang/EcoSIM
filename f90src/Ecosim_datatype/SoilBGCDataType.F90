@@ -49,7 +49,7 @@ implicit none
   real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)        !hydrological loss of volatile tracers [g d-2 h-1]
   real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]
   real(r8),target,allocatable ::  GasHydroLoss_cumflx_col(:,:,:)     !cumulative hydrological loss of volatile tracers [g d-2]
-  real(r8),target,allocatable ::  FertNFlx_CumYr_col(:,:)            !total fertilizer N amendment, [g d-2]
+  real(r8),target,allocatable ::  FertN_Flx_CumYr_col(:,:)            !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)             !total fertilizer P amendment, [g d-2]
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)            !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)           !total subsurface DOC flux, [g d-2]
@@ -199,7 +199,7 @@ implicit none
   allocate(SurfGasEmiss_flx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmiss_flx_col=0._r8
   allocate(GasDiff2Surf_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_flx_col=0._r8
   allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
-  allocate(FertNFlx_CumYr_col(JY,JX));      FertNFlx_CumYr_col=0._r8
+  allocate(FertN_Flx_CumYr_col(JY,JX));      FertN_Flx_CumYr_col=0._r8
   allocate(FerPFlx_CumYr_col(JY,JX));      FerPFlx_CumYr_col=0._r8
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
@@ -324,7 +324,7 @@ implicit none
   call destroy(CPO4S_vr)
   call destroy(RO2UptkSoilM_vr)
   call destroy(AmendCFlx_CumYr_col)
-  call destroy(FertNFlx_CumYr_col)
+  call destroy(FertN_Flx_CumYr_col)
   call destroy(FerPFlx_CumYr_col)
   call destroy(HydroSufDOCFlx_col)
   call destroy(HydroSubsDOCFlx_col)

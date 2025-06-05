@@ -2315,7 +2315,7 @@ implicit none
 
   data2d_ptr =>  this%h2D_acetate_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='acetate_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Acetate profile',ptr_col=data2d_ptr)      
+    long_name='Acetate profile',ptr_col=data2d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_DOC_LITR_col(beg_col:end_col)    
   call hist_addfld1d(fname='DOC_litr_col',units='gC/m2',avgflag='A',&
@@ -2331,7 +2331,7 @@ implicit none
 
   data1d_ptr => this%h1D_acetate_LITR_col(beg_col:end_col)    
   call hist_addfld1d(fname='Acetate_litr_col',units='gC/m2',avgflag='A',&
-    long_name='Acetate in litter',ptr_col=data1d_ptr)      
+    long_name='Acetate in litter',ptr_col=data1d_ptr,default='inactive')      
 
 !------
   data2d_ptr =>  this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)
@@ -2448,7 +2448,7 @@ implicit none
 
   data2d_ptr =>  this%h2D_Eco_HR_CO2_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HR_CO2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Vertically resolved heterotrophic respiration rate',ptr_col=data2d_ptr)      
+    long_name='Vertically resolved heterotrophic respiration rate',ptr_col=data2d_ptr,default='inactive')      
 
   data2d_ptr =>  this%h2D_Gchem_CO2_prod_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Gchem_CO2_Prod_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
@@ -2852,10 +2852,10 @@ implicit none
       this%h1D_PSI_SURF_col(ncol)   = PSISoilMatricP_vr(0,NY,NX)
       this%h1D_SURF_ELEV_col(ncol)  = -CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+DLYR_3D(3,0,NY,NX)
       this%h1D_tLITR_N_col(ncol)    = tLitrOM_col(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_AMENDED_N_col(ncol)  = FertNFlx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_AMENDED_N_col(ncol)  = FertN_Flx_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNH4X_col(ncol)      = tNH4_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_tNO3_col(ncol)       = tNO3_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tRAD_col(ncol)       = TRAD(NY,NX)
+      this%h1D_tRAD_col(ncol)       = TRAD_col(NY,NX)
       if(this%h1D_tNH4X_col(ncol)<0._r8)then
         write(*,*)'negative tNH4X',this%h1D_tNH4X_col(ncol),this%h1D_tNO3_col(ncol)
         stop

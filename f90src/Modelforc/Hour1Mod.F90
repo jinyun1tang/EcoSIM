@@ -1654,18 +1654,18 @@ module Hour1Mod
     TProd_CO2_geochem_soil_vr(L,NY,NX)          = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 
-    trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8
-    trcx_TRSoilChem_vr(idx_OHeB:idx_end,L,NY,NX)=0._r8
+    trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)         = 0._r8
+    trcx_TRSoilChem_vr(idx_OHeB:idx_end,L,NY,NX) = 0._r8
 
-    TRChem_H_p_sorbed_soil_vr(L,NY,NX)       = 0._r8
-    TRChem_Al_sorbed_soil_vr(L,NY,NX)        = 0._r8
+    TRChem_H_p_sorbed_soil_vr(L,NY,NX)    = 0._r8
+    TRChem_Al_sorbed_soil_vr(L,NY,NX)     = 0._r8
     TRChem_Fe_sorbed_soil_vr(L,NY,NX)     = 0._r8
-    TRChem_Ca_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TRChem_Mg_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TRChem_Na_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TRChem_K_sorbed_soil_vr(L,NY,NX)         = 0._r8
-    TRChem_HCO3_sorbed_soil_vr(L,NY,NX)      = 0._r8
-    TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)    = 0._r8
+    TRChem_Ca_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_Mg_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_Na_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_K_sorbed_soil_vr(L,NY,NX)      = 0._r8
+    TRChem_HCO3_sorbed_soil_vr(L,NY,NX)   = 0._r8
+    TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
     TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
 
     trcp_RChem_soil_vr(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0._r8
@@ -1674,23 +1674,24 @@ module Hour1Mod
 
     trcs_Mac2MicPore_flx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 
-    DO NTSA=idsalt_beg,idsaltb_end
-      trcSalt_RGeoChem_flx_vr(NTSA,L,NY,NX)=0._r8
-      trcSalt_Mac2MicPore_flx_vr(NTSA,L,NY,NX)=0._r8
-    ENDDO
-
+    if(salt_model)then
+      DO NTSA=idsalt_beg,idsaltb_end
+        trcSalt_RGeoChem_flx_vr(NTSA,L,NY,NX)=0._r8
+        trcSalt_Mac2MicPore_flx_vr(NTSA,L,NY,NX)=0._r8
+      ENDDO
+    endif
     DO  K=1,jcplx
       DOM_Mac2MicPore_flx_vr(idom_beg:idom_end,K,L,NY,NX)=0._r8
     ENDDO
-    TLIceThawMicP_vr(L,NY,NX)=0._r8
-    TLIceThawMacP_vr(L,NY,NX)=0._r8
-    TLPhaseChangeHeat2Soi_vr(L,NY,NX)=0._r8
-    trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX)=0._r8
-    totRootLenDens_vr(L,NY,NX)=0._r8
+    TLIceThawMicP_vr(L,NY,NX)                = 0._r8
+    TLIceThawMacP_vr(L,NY,NX)                = 0._r8
+    TLPhaseChangeHeat2Soi_vr(L,NY,NX)        = 0._r8
+    totRootLenDens_vr(L,NY,NX)               = 0._r8
+    trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX) = 0._r8
 
   ENDDO
-  trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
-  trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
+  trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)      = 0._r8
+  trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   end subroutine ZeroHourlyArrays
 
 !------------------------------------------------------------------------------------------
