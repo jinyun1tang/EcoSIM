@@ -577,10 +577,6 @@ module StartsMod
   BandThicknessNO3_vr(1:L2,NY,NX) = 0.0_r8
   BandWidthPO4_vr(1:L2,NY,NX)     = 0.0_r8
   BandThicknessPO4_vr(1:L2,NY,NX) = 0.0_r8
-  COCU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
-  CONU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
-  COPU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
-  COAU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
 
   end subroutine initFertArrays
 

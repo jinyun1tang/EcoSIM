@@ -5,6 +5,7 @@ module readsmod
   use fileUtil,      only: open_safe
   use minimathmod,   only: isLeap, AZMAX1
   use EcoSIMCtrlMod, only: lverb,  salt_model, fixClime
+  use FireMod
   use DebugToolMod
   use GridConsts
   use FlagDataType
@@ -83,7 +84,7 @@ module readsmod
 !
 ! THIS SUBROUTINE read ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
-  use ReadManagementMod, only : ReadManagementFiles
+  use ReadManagementMod, only : ReadManagementFiles,ReadFire
   use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   integer, intent(in) :: yearc   !current model year
@@ -97,6 +98,7 @@ module readsmod
   integer :: LPY,IX
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
+  character(len=12) :: fire_entry
   integer :: IDY,IFLG3,I,ICHECK
 
 ! begin_execution
@@ -230,6 +232,9 @@ module readsmod
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
 ! AND FERTILIZER FILES
 !
+  if(use_fire .and. check_fire(yearc,fire_entry))then
+    call ReadFire(fire_entry)
+  endif
   IF(trim(soil_mgmt_in).NE.'NO')THEN
     call ReadManagementFiles(yeari)
   ENDIF

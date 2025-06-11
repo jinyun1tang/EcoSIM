@@ -192,22 +192,22 @@ module ExtractsMod
     TKS_vr                    => plt_ew%TKS_vr,                      &
     THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr,       &
     TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr,     &
-    AllPlantRootH2OLoss_vr    => plt_ew%AllPlantRootH2OLoss_vr,      &
+    AllPlantRootH2OLoss_pvr    => plt_ew%AllPlantRootH2OLoss_pvr,      &
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr,  &
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr,        &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          &
   )
   
   DO L=NU,MaxNumRootLays
-    DO N=1,MY(NZ)  
+    DO N=1,MY_pft(NZ)  
 !
 !     TOTAL ROOT DENSITY
 !
 !     totRootLenDens_vr=total root length density
 !     RootLenDensPerPlant_pvr=PFT root length density per plant
-!     AllPlantRootH2OLoss_vr=total water uptake
-!     AllPlantRootH2OLoss_vr=PFT root water uptake
+!     AllPlantRootH2OLoss_pvr=total water uptake
+!     AllPlantRootH2OLoss_pvr=PFT root water uptake
 !     THeatLossRoot2Soil_vr=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
@@ -218,14 +218,14 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)
+      TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L)+AllPlantRootH2OLoss_pvr(N,L,NZ)
 
       !water lose from canopy to soil
-      if(AllPlantRootH2OLoss_vr(N,L,NZ)>0._r8)then
-        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
+      if(AllPlantRootH2OLoss_pvr(N,L,NZ)>0._r8)then
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_pvr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
       !water lose from soil to canopy  
       else
-        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_vr(N,L,NZ)*cpw*TKS_vr(L)
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_pvr(N,L,NZ)*cpw*TKS_vr(L)
       endif
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES

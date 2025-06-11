@@ -174,7 +174,7 @@ module NutUptakeMod
     RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr,     &
     trcs_solml_vr           => plt_soilchem%trcs_solml_vr,        &
     trcg_gasml_vr           => plt_soilchem%trcg_gasml_vr,        &  !
-    MY                      => plt_morph%MY,                      &
+    MY_pft                  => plt_morph%MY_pft,                  &
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr, &
     PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr,       &
     trcs_deadroot2soil_pvr  => plt_rbgc%trcs_deadroot2soil_pvr,   &
@@ -182,7 +182,7 @@ module NutUptakeMod
     trcs_rootml_pvr         => plt_rbgc%trcs_rootml_pvr,          &
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr,            &
     RootCO2Ar2Soil_pvr      => plt_rbgc%RootCO2Ar2Soil_pvr,       &
-    RootCO2Ar2RootX_pvr      => plt_rbgc%RootCO2Ar2RootX_pvr,       &
+    RootCO2Ar2RootX_pvr     => plt_rbgc%RootCO2Ar2RootX_pvr,      &
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
   )
 
@@ -203,7 +203,7 @@ module NutUptakeMod
 !      trc_solml_copy(idg_beg:idg_end) = trcs_solml_vr(idg_beg:idg_end,L);
 !      trc_gasml_copy(idg_beg:idg_NH3) = trcg_gasml_vr(idg_beg:idg_NH3,L)
       
-      D955: DO N  = 1, MY(NZ)
+      D955: DO N  = 1, MY_pft(NZ)
         if(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
           .AND. PopuRootMycoC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 
@@ -298,7 +298,7 @@ module NutUptakeMod
 !        trcg_gasml_vr(idg,L) =AZERO(trc_gasml_copy(idg))+trc_gasml_new(idg)
 !      enddo
     ELSE
-      D956: DO N  = 1, MY(NZ)    
+      D956: DO N  = 1, MY_pft(NZ)    
         RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         DO idg=idg_beg,idg_NH3
@@ -324,7 +324,7 @@ module NutUptakeMod
   integer :: K, L1,L2,NN
   !     begin_execution
 
-  L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%MY(NZ)
+  L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%MY_pft(NZ)
   plt_rbgc%RootCO2Ar2Soil_pvr(:,NZ)       = 0._r8
   plt_bgcr%RootO2_Xink_pvr(:,1:L2,NZ)         = 0._r8
   plt_rbgc%RootCO2Ar2RootX_pvr(:,NZ)       = 0._r8
@@ -1235,7 +1235,7 @@ module NutUptakeMod
     PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
     ZEROS                     => plt_site%ZEROS,                      &
     ZERO                      => plt_site%ZERO,                       &
-    AllPlantRootH2OLoss_vr    => plt_ew%AllPlantRootH2OLoss_vr,       &
+    AllPlantRootH2OLoss_pvr    => plt_ew%AllPlantRootH2OLoss_pvr,       &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &
     RootProteinConc_rpvr      => plt_biom%RootProteinConc_rpvr,       &
@@ -1295,7 +1295,7 @@ module NutUptakeMod
     FPUP=0.0_r8
   ENDIF
   !NN=0
-  PerPlantRootH2OUptake=AZMAX1(-AllPlantRootH2OLoss_vr(N,L,NZ)/PlantPopulation_pft(NZ))
+  PerPlantRootH2OUptake=AZMAX1(-AllPlantRootH2OLoss_pvr(N,L,NZ)/PlantPopulation_pft(NZ))
   dtPerPlantRootH2OUptake=PerPlantRootH2OUptake*dts_gas
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG
@@ -1426,8 +1426,8 @@ module NutUptakeMod
     RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft,    &
     RootNH4Uptake_pft      => plt_rbgc%RootNH4Uptake_pft,      &
     RootNO3Uptake_pft      => plt_rbgc%RootNO3Uptake_pft,      &
-    DOM_MicP_vr                 => plt_soilchem%DOM_MicP_vr,             &
-    MY                     => plt_morph%MY,                    &
+    DOM_MicP_vr            => plt_soilchem%DOM_MicP_vr,        &
+    MY_pft                 => plt_morph%MY_pft,                &
     RootNutUptake_pvr      => plt_rbgc%RootNutUptake_pvr,      &
     MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft       &
   )
@@ -1444,7 +1444,7 @@ module NutUptakeMod
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO)THEN  
       D295: DO K=1,jcplx
         DOM_uptk=0._r8
-        DO N=1,MY(NZ)
+        DO N=1,MY_pft(NZ)
           !positve means uptake from soil
           DO NE=1,NumPlantChemElms
             DOM_uptk(NE)=DOM_uptk(NE)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
@@ -1454,7 +1454,7 @@ module NutUptakeMod
           DO NE=1,NumPlantChemElms
             if(DOM_uptk(NE)>DOM_MicP_vr(NE,K,L))then
               scal=DOM_uptk(NE)/DOM_MicP_vr(NE,K,L)
-              DO N=1,MY(NZ)
+              DO N=1,MY_pft(NZ)
                 RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ)*scal
               ENDDO
               DOM_uptk(NE)=DOM_uptk(NE)*scal
@@ -1466,7 +1466,7 @@ module NutUptakeMod
             REcoDOMProd_vr(NE,K,L)=REcoDOMProd_vr(NE,K,L)-DOM_uptk(NE)
           ENDDO
 
-          DO N=1,MY(NZ)
+          DO N=1,MY_pft(NZ)
             DO NE=1,NumPlantChemElms
               RootMycoExudElms_pft(NE,NZ)       = RootMycoExudElms_pft(NE,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
               RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
@@ -1475,7 +1475,7 @@ module NutUptakeMod
         endif
       ENDDO D295
       
-      DO N=1,MY(NZ)
+      DO N=1,MY_pft(NZ)
         RootNH4Uptake_pft(NZ)   = RootNH4Uptake_pft(NZ)  +(RootNutUptake_pvr(ids_NH4,N,L,NZ)+RootNutUptake_pvr(ids_NH4B,N,L,NZ))
         RootNO3Uptake_pft(NZ)   = RootNO3Uptake_pft(NZ)  +(RootNutUptake_pvr(ids_NO3,N,L,NZ)+RootNutUptake_pvr(ids_NO3B,N,L,NZ))
         RootH2PO4Uptake_pft(NZ) = RootH2PO4Uptake_pft(NZ) +(RootNutUptake_pvr(ids_H2PO4,N,L,NZ)+RootNutUptake_pvr(ids_H2PO4B,N,L,NZ))

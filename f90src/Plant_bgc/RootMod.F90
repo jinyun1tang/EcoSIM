@@ -199,7 +199,7 @@ implicit none
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,             &
     RootVolPerMassC_pft       => plt_morph%RootVolPerMassC_pft,          &
     SeedMeanLen_pft           => plt_morph%SeedMeanLen_pft,              &
-    MY                        => plt_morph%MY,                           &
+    MY_pft                        => plt_morph%MY_pft,                           &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
     NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft           &
   )
@@ -212,7 +212,7 @@ implicit none
 !
 !  mass_inital(ielmc)=mass_inital(ielmc)+SeasonalNonstElms_pft(ielmc,NZ)
   litrflx=0._r8;RCO2flx=0._r8
-  D5010: DO N=1,MY(NZ)
+  D5010: DO N=1,MY_pft(NZ)
     D5000: DO L=NU,MaxNumRootLays
 !
 !     IDENTIFY NEXT LOWER ROOT LAYER
@@ -1773,9 +1773,9 @@ implicit none
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr,          &
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,        &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft,    &
     CumSoilThickness_vr       => plt_site%CumSoilThickness_vr,       &
     ZEROS2                    => plt_site%ZEROS2,                    &
@@ -1790,7 +1790,7 @@ implicit none
     Root1stDepz_pft           => plt_morph%Root1stDepz_pft,          &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     SeedDepth_pft             => plt_morph%SeedDepth_pft,            &
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft      &
   )
@@ -1821,7 +1821,7 @@ implicit none
         FRTN=1.0_r8
       ENDIF
 !      print*,'begd5110'
-      D5110: DO NN=1,MY(NZ)
+      D5110: DO NN=1,MY_pft(NZ)
         Root1stLen_rpvr(NN,LL-1,NR,NZ)=Root1stLen_rpvr(NN,LL-1,NR,NZ)+Root1stLen_rpvr(NN,LL,NR,NZ)
         Root1stLen_rpvr(NN,LL,NR,NZ)  =0._r8
         DO NE=1,NumPlantChemElms
@@ -1940,13 +1940,13 @@ implicit none
     RootRespPotent_pvr         => plt_rbgc%RootRespPotent_pvr,          &
     RootCO2Autor_pvr           => plt_rbgc%RootCO2Autor_pvr,            &
     CanopyHeight4WatUptake_pft => plt_morph%CanopyHeight4WatUptake_pft, &
-    MY                         => plt_morph%MY,                         &
+    MY_pft                     => plt_morph%MY_pft,                     &
     Root1stRadius_pvr          => plt_morph%Root1stRadius_pvr,          &
     Root1stDepz_pft            => plt_morph%Root1stDepz_pft,            &
     HypoctoHeight_pft          => plt_morph%HypoctoHeight_pft,          &
     Root2ndRadius_pvr          => plt_morph%Root2ndRadius_pvr,          &
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr,           &
-    Root2ndMeanLens_pvr          => plt_morph%Root2ndMeanLens_pvr,          &
+    Root2ndMeanLens_pvr        => plt_morph%Root2ndMeanLens_pvr,        &
     SeedDepth_pft              => plt_morph%SeedDepth_pft,              &
     MaxSoiL4Root_pft           => plt_morph%MaxSoiL4Root_pft,           &
     NumRootAxes_pft            => plt_morph%NumRootAxes_pft             &
@@ -1961,7 +1961,7 @@ implicit none
   RCO2flx         = 0._r8
 !   call SumRootBiome(NZ,mass_inital)
 
-  D4995: DO N=1,MY(NZ)
+  D4995: DO N=1,MY_pft(NZ)
     D4990: DO L=NU,MaxSoiL4Root_pft(NZ)
 !
 !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
@@ -2126,15 +2126,15 @@ implicit none
 
   associate(                                                         &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     NU                        => plt_site%NU,                        &
-    NL                        => plt_site%NL,                        &    
+    NL                        => plt_site%NL,                        &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs,       &
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          &
   )
   DO NR=1,NumRootAxes_pft(NZ)
-    DO N=1,MY(NZ)
+    DO N=1,MY_pft(NZ)
       dRootMyco1stElm_raxs(:)=0._r8
       DO L=NU,NL
         DO NE=1,NumPlantChemElms

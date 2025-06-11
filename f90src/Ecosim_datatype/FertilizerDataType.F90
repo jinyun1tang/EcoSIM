@@ -8,17 +8,17 @@ module FertilizerDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: FertN_mole_soil_vr(:,:,:,:)      !fertilizer in soil [mol d-2]
-  real(r8),target,allocatable :: FertN_mole_Band_vr(:,:,:,:)      !fertilizer in band [mol d-2]
+  real(r8),target,allocatable :: FertN_mole_soil_vr(:,:,:,:)      !fertilizer in soil from broadcast, [mol d-2]
+  real(r8),target,allocatable :: FertN_mole_Band_vr(:,:,:,:)      !fertilizer in band  from side-dressing, [mol d-2]
 
   real(r8),target,allocatable :: DepzCorp_col(:,:,:)         !soil mixing fraction with tillage, [-]
   real(r8),target,allocatable :: FERT(:,:,:,:)               !fertilizer application, [g m-2]
   real(r8),target,allocatable :: FDPTH(:,:,:)                !depth of fertilizer application, [m]
-  real(r8),target,allocatable :: ROWI(:,:,:)                 !row spacing of fertilizer band, [m]
+  real(r8),target,allocatable :: ROWI(:,:,:)                 !row spacing of fertilizer band from side-dressing, [m]
 
-  real(r8),target,allocatable :: ROWSpaceNH4_col(:,:)        !row spacing of NH4 fertilizer band, [m]
-  real(r8),target,allocatable :: ROWSpaceNO3_col(:,:)        !row spacing of NO3 fertilizer band, [m]
-  real(r8),target,allocatable :: ROWSpacePO4_col(:,:)                   !row spacing of PO4 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWSpaceNH4_col(:,:)        !row spacing of NH4 fertilizer band from side-dressing, [m]
+  real(r8),target,allocatable :: ROWSpaceNO3_col(:,:)        !row spacing of NO3 fertilizer band from side-dressing, [m]
+  real(r8),target,allocatable :: ROWSpacePO4_col(:,:)        !row spacing of PO4 fertilizer band from side-dressing, [m]
 
   private :: InitAllocate
 

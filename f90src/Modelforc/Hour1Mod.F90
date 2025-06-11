@@ -441,8 +441,8 @@ module Hour1Mod
         trcx_Eros_2D(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
         trcp_Eros_2D(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
 
-        OMEERhetr(:,:,:,1:2,1:2,NY,NX) = 0._r8
-        OMEERauto(:,:,1:2,1:2,NY,NX)   = 0._r8
+        OMEERhetr_2D(:,:,:,1:2,1:2,NY,NX) = 0._r8
+        OMEERauto_2D(:,:,1:2,1:2,NY,NX)   = 0._r8
 
         OMBioResdu_Eros_2D(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
         SolidOMAct_Eros_2D(:,:,1:2,1:2,NY,NX)                    = 0._r8
@@ -856,7 +856,6 @@ module Hour1Mod
   TWaterPlantRoot2SoilPrev_vr(1:NL(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)
   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)                                  = 0._r8
   THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
-  Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
   RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)                            = 0._r8
   RainLitr_col(NY,NX)                                                         = 0._r8
@@ -998,8 +997,8 @@ module Hour1Mod
       ZD50                    = 0.041*(ppmc*D50)**0.167_r8
       SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
-        CER(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
-        XER(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
+        CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
+        XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
         print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY_vr(NU(NY,NX),NY,NX)+CORGM) &

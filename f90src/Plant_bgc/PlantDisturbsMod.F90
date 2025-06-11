@@ -542,7 +542,7 @@ module PlantDisturbsMod
     k_woody_litr               => pltpar%k_woody_litr,                  &
     LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr,        &
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft,         &
-    MY                         => plt_morph%MY,                         &
+    MY_pft                     => plt_morph%MY_pft,                     &
     CanopyLeafAareZ_col        => plt_morph%CanopyLeafAareZ_col,        &
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col,          &
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft,          &
@@ -656,14 +656,14 @@ module PlantDisturbsMod
       FracLeftThin=1.0_r8-THIN_pft(NZ)
 
       DO NR=1,NumRootAxes_pft(NZ)
-        DO N=1,MY(NZ)
+        DO N=1,MY_pft(NZ)
           DO NE=1,NumPlantChemElms
             RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)*FracLeftThin
           ENDDO
         ENDDO    
       ENDDO
 
-      D3985: DO N=1,MY(NZ)
+      D3985: DO N=1,MY_pft(NZ)
         D3980: DO L=NU,MaxNumRootLays
           CALL RootMaterialRemovalL(I,J,N,L,NZ,FracLeftThin,XHVST1)
           call HarvstUpdateRootStateL(I,J,N,L,NZ,FracLeftThin,XHVST1)
@@ -719,7 +719,6 @@ module PlantDisturbsMod
    ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch,                 &
    TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch,     &
    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch,           &
-   FracHour4LeafoffRemob             => plt_allom%FracHour4LeafoffRemob,             &
    TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
    doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch,                &
    NumOfBranches_pft                 => plt_morph%NumOfBranches_pft,                 &

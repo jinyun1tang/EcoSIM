@@ -527,17 +527,17 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='MY', dim1name='pft',&
+    call restartvar(ncid, flag, varname='MY_pft', dim1name='pft',&
      long_name='mycorrhizal type:0-no,1-yes', units='none', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
      fill_value=ispval,flag_values=(/0,1/))       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,MY,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,MY_pft,datip_1d,NumActivePlants=NumActivePlants,IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'MY'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,MY,datip_1d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,MY_pft,datip_1d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)    
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='MY', dim1name='pft',&
+    call restartvar(ncid, flag, varname='MY_pft', dim1name='pft',&
      long_name='mycorrhizal type:0-no,1-yes', units='none', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
      fill_value=ispval,flag_values=(/0,1/))       
@@ -3344,17 +3344,17 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:pltpar%jroots)
-    call restartvar(ncid, flag, varname='RootPoreTortu4Gas', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootPoreTortu4Gas_pft', dim1name='pft',dim2name='rootyps',&
      long_name='root pore tortuosity for gas transp', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootPoreTortu4Gas,datrp_2d,NumActivePlants=NumActivePlants,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,RootPoreTortu4Gas_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
     !print*,'PSIRoot'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootPoreTortu4Gas,datrp_2d,NumActivePlants=NumActivePlants,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,RootPoreTortu4Gas_pft,datrp_2d,NumActivePlants=NumActivePlants,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr2 => datrp_2d(1:npfts,1:pltpar%jroots)
-    call restartvar(ncid, flag, varname='RootPoreTortu4Gas', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='RootPoreTortu4Gas_pft', dim1name='pft',dim2name='rootyps',&
      long_name='root pore tortuosity for gas transp', units='none', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
@@ -5428,16 +5428,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='CER', dim1name='column',&
+    call restartvar(ncid, flag, varname='CER_col', dim1name='column',&
        long_name='microbial C  erosion', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CER,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CER_col,datrc_1d) 
   else
     !print*,'CER'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CER,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CER_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='CER', dim1name='column',&
+    call restartvar(ncid, flag, varname='CER_col', dim1name='column',&
        long_name='microbial C  erosion', units='g d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5445,16 +5445,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='XER', dim1name='column',&
+    call restartvar(ncid, flag, varname='XER_col', dim1name='column',&
        long_name='soil detachment/deposition', units='none', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,XER,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,XER_col,datrc_1d) 
   else
     !print*,'XER'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,XER,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,XER_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='XER', dim1name='column',&
+    call restartvar(ncid, flag, varname='XER_col', dim1name='column',&
        long_name='soil detachment/deposition', units='none', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -7665,16 +7665,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNH3OxidAutor', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNH3OxidAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 uptake non-band unconstrained by NH4', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor_vr,datrc_3d)      
   else
     !print*,'RNH3OxidAutor'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor,datrc_3d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutor_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNH3OxidAutor', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNH3OxidAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 uptake non-band unconstrained by NH4', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
@@ -7682,16 +7682,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutor', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2OxidAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake non-band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor_vr,datrc_3d)      
   else
     !print*,'RNO2OxidAutor'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor,datrc_3d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutor', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2OxidAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake non-band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
@@ -7716,16 +7716,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNH3OxidAutorBand', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNH3OxidAutorBand_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 uptake non-band unconstrained by NH4', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand_vr,datrc_3d)      
   else
     !print*,'RNH3OxidAutorBand'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand,datrc_3d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH3OxidAutorBand_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNH3OxidAutorBand', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNH3OxidAutorBand_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NH4 uptake non-band unconstrained by NH4', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
@@ -7733,16 +7733,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutorBand', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2OxidAutorBand_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand_vr,datrc_3d)     
   else
     !print*,'RNO2OxidAutorBand'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand,datrc_3d)       
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutorBand', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2OxidAutorBand_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        

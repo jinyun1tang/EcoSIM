@@ -321,7 +321,7 @@ contains
 
   associate(                                                            &
     MaxNumRootLays             => plt_site%MaxNumRootLays,              &
-    MY                         => plt_morph%MY,                         &
+    MY_pft                     => plt_morph%MY_pft,                     &
     ElmAllocmat4Litr           => plt_soilchem%ElmAllocmat4Litr,        &
     trcg_rootml_pvr            => plt_rbgc%trcg_rootml_pvr,             &
     trcs_rootml_pvr            => plt_rbgc%trcs_rootml_pvr,             &
@@ -375,7 +375,7 @@ contains
   XHVST1=1._r8-XHVST
   
   DO NR=1,NumRootAxes_pft(NZ)
-    DO N=1,MY(NZ)
+    DO N=1,MY_pft(NZ)
       DO NE=1,NumPlantChemElms
         RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)*XHVST
       ENDDO
@@ -383,7 +383,7 @@ contains
   ENDDO
 
   D8980: DO L=NU,MaxNumRootLays
-    D8985: DO N=1,MY(NZ)
+    D8985: DO N=1,MY_pft(NZ)
       D6385: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &

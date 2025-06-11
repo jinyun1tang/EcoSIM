@@ -7,6 +7,7 @@ module SoilLayerDynMod
   use minimathmod,       only: AZMAX1
   use UnitMod,           only: units
   use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
+  use PlantTraitDataType, only : MY_pft
   use DebugToolMod
   USE RedistDataMod      
   use RootDataType
@@ -1042,7 +1043,7 @@ implicit none
     DO  NZ=1,NP(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        DO N=1,MY(NZ,NY,NX)
+        DO N=1,MY_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1220,7 +1221,7 @@ implicit none
     DO  NZ=1,NP(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        DO  N=1,MY(NZ,NY,NX)
+        DO  N=1,MY_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1379,7 +1380,7 @@ implicit none
           FRO=AMIN1(0.5,FO*CumSoilThickMidL_vr(L0,NY,NX)/CumSoilThickMidL_vr(L1,NY,NX))
         ENDIF
 
-        DO  N=1,MY(NZ,NY,NX)
+        DO  N=1,MY_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             FXGA                               = FRO*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FXGA

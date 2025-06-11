@@ -22,8 +22,8 @@ module LandSurfDataType
   real(r8),target,allocatable ::  CosineGrndSlope_col(:,:)               !Cosine of slope, [-]
   real(r8),target,allocatable ::  GroundSurfAzimuth_col(:,:)             !Azimuth of slope, [-]
   real(r8),target,allocatable ::  ALTZ_col(:,:)                          !Altitude, [m]
-  real(r8),target,allocatable ::  SL_col(:,:)                            !Slope, [o]
-  real(r8),target,allocatable ::  ASP_col(:,:)                           !Aspect , [o]
+  real(r8),target,allocatable ::  SL_col(:,:)                            !Slope, [degree]
+  real(r8),target,allocatable ::  ASP_col(:,:)                           !Aspect , [degree]
 
 !----------------------------------------------------------------------
 

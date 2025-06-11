@@ -481,7 +481,7 @@ module InitPlantMod
     RootRadialResist_pft => plt_morph%RootRadialResist_pft, &
     Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft,    &
     RootPorosity_pft      => plt_morph%RootPorosity_pft,      &
-    RootPoreTortu4Gas     => plt_morph%RootPoreTortu4Gas,     &
+    RootPoreTortu4Gas_pft     => plt_morph%RootPoreTortu4Gas_pft,     &
     RootRaidus_rpft       => plt_morph%RootRaidus_rpft,       &
     RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft,   &
     RootAxialResist_pft  => plt_morph%RootAxialResist_pft,  &
@@ -538,14 +538,14 @@ module InitPlantMod
   RootRadialResist_pft(2,NZ) = 1.0E+04_r8
   RootAxialResist_pft(2,NZ)  = 1.0E+12_r8
 !
-!     RootPoreTortu4Gas=tortuosity for gas transport
+!     RootPoreTortu4Gas_pft=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
 !     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
 !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
 !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
 !
   D500: DO N=1,2
-    RootPoreTortu4Gas(N,NZ)     = RootPorosity_pft(N,NZ)**1.33_r8
+    RootPoreTortu4Gas_pft(N,NZ)     = RootPorosity_pft(N,NZ)**1.33_r8
     RootRaidus_rpft(N,NZ)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
     RootVolPerMassC_pft(N,NZ)   = ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
     Root1stSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2._r8)
@@ -962,7 +962,7 @@ module InitPlantMod
   ENDDO      
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL
-      plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                        = 0._r8
+      plt_ew%AllPlantRootH2OLoss_pvr(N,L,NZ)                        = 0._r8
       PSIRoot_pvr(N,L,NZ)                                          = -0.01_r8
       PSIRootOSMO_vr(N,L,NZ)                                       = CanOsmoPsi0pt_pft(NZ)+PSIRoot_pvr(N,L,NZ)
       PSIRootTurg_vr(N,L,NZ)                                       = AZMAX1(PSIRoot_pvr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
@@ -1040,8 +1040,8 @@ module InitPlantMod
     PSICanopy_pft             => plt_ew%PSICanopy_pft,                &
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft,          &
     RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    CNGR                      => plt_allom%CNGR,                      &
-    CPGR                      => plt_allom%CPGR,                      &
+    CNGR_pft                  => plt_allom%CNGR_pft,                  &
+    CPGR_pft                  => plt_allom%CPGR_pft,                  &
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs,        &
     SeedCPlanted_pft          => plt_biom%SeedCPlanted_pft,           &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr,  &
@@ -1076,31 +1076,31 @@ module InitPlantMod
 !
   SeedCPlanted_pft(NZ)            = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)
   SeasonalNonstElms_pft(ielmc,NZ) = SeedCPlanted_pft(NZ)
-  SeasonalNonstElms_pft(ielmn,NZ) = CNGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-  SeasonalNonstElms_pft(ielmp,NZ) = CPGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-  LeafStrutElms_brch(ielmn,1,NZ)  = CNGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
-  LeafStrutElms_brch(ielmp,1,NZ)  = CPGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
+  SeasonalNonstElms_pft(ielmn,NZ) = CNGR_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+  SeasonalNonstElms_pft(ielmp,NZ) = CPGR_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+  LeafStrutElms_brch(ielmn,1,NZ)  = CNGR_pft(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
+  LeafStrutElms_brch(ielmp,1,NZ)  = CPGR_pft(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
   LeafPetolBiomassC_brch(1,NZ)    = LeafStrutElms_brch(ielmc,1,NZ)+PetoleStrutElms_brch(ielmc,1,NZ)
   CanopyLeafShethC_pft(NZ)        = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(1,NZ)
 
   WatHeldOnCanopy_pft(NZ)         = 0._r8
-  CanopyNonstElms_brch(ielmn,1,NZ) = CNGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
-  CanopyNonstElms_brch(ielmp,1,NZ) = CPGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
-  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ) = CNGR(NZ) &
+  CanopyNonstElms_brch(ielmn,1,NZ) = CNGR_pft(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
+  CanopyNonstElms_brch(ielmp,1,NZ) = CPGR_pft(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
+  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ) = CNGR_pft(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR(NZ) &
+  RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR_pft(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  RootMyco1stElm_raxs(ielmn,1,1,NZ)=CNGR(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
-  RootMyco1stElm_raxs(ielmp,1,1,NZ)=CPGR(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
+  RootMyco1stElm_raxs(ielmn,1,1,NZ)=CNGR_pft(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
+  RootMyco1stElm_raxs(ielmp,1,1,NZ)=CPGR_pft(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   RootProteinC_pvr(1,NGTopRootLayer_pft(NZ),NZ)=RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)&
     *RootFracRemobilizableBiom(NZ)
-  RootMycoNonstElms_rpvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR(NZ)&
+  RootMycoNonstElms_rpvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR_pft(NZ)&
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
-  RootMycoNonstElms_rpvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=CPGR(NZ) &
+  RootMycoNonstElms_rpvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=CPGR_pft(NZ) &
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
 
   end associate

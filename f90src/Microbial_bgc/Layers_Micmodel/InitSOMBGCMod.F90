@@ -376,8 +376,8 @@ module InitSOMBGCMOD
   ENDIF
 
   RO2DmndAutort_vr(:,L,NY,NX)       = 0.0_r8
-  RNH3OxidAutor(:,L,NY,NX)          = 0.0_r8
-  RNO2OxidAutor(:,L,NY,NX)          = 0.0_r8
+  RNH3OxidAutor_vr(:,L,NY,NX)          = 0.0_r8
+  RNO2OxidAutor_vr(:,L,NY,NX)          = 0.0_r8
   RN2ODmndReduxAutor_vr(:,L,NY,NX)  = 0.0_r8
   RNH4UptkSoilAutor_vr(:,L,NY,NX)   = 0.0_r8
   RNH4UptkBandAutor_vr(:,L,NY,NX)   = 0.0_r8

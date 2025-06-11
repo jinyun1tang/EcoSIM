@@ -232,7 +232,7 @@ implicit none
     MaxNumRootLays              => plt_site%MaxNumRootLays,               &
     NU                          => plt_site%NU,                           &
     ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,         &
-    MY                          => plt_morph%MY,                          &
+    MY_pft                      => plt_morph%MY_pft,                      &
     NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft,          &
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft,           &
     NumRootAxes_pft             => plt_morph%NumRootAxes_pft              &
@@ -307,7 +307,7 @@ implicit none
 !
         
       D6415: DO L=NU,MaxNumRootLays
-        DO N=1,MY(NZ)
+        DO N=1,MY_pft(NZ)
           DO M=1,jsken
             DO NE=1,NumPlantChemElms
               LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
@@ -410,7 +410,7 @@ implicit none
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr,          &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft,      &
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft,     &
     SeedDepth_pft             => plt_morph%SeedDepth_pft,            &
@@ -432,7 +432,7 @@ implicit none
   IF(iPlantRootState_pft(NZ).EQ.iDead)THEN
     !add root to LitrFall
     DO L=NU,MaxNumRootLays        
-      DO N=1,MY(NZ)
+      DO N=1,MY_pft(NZ)
         DO M=1,jsken
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,L,NZ) &
@@ -445,7 +445,7 @@ implicit none
 
     DO  NR=1,NumRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays        
-        DO N=1,MY(NZ)
+        DO N=1,MY_pft(NZ)
           DO M=1,jsken
             DO NE=1,NumPlantChemElms
               LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)&
@@ -465,7 +465,7 @@ implicit none
 
 
     DO L=NU,MaxNumRootLays             
-      DO N=1,MY(NZ)
+      DO N=1,MY_pft(NZ)
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
@@ -483,7 +483,7 @@ implicit none
 !
     D8870: DO NR=1,NumRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays             
-        DO N=1,MY(NZ)        
+        DO N=1,MY_pft(NZ)        
           RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
           Root1stLen_rpvr(N,L,NR,NZ)                              = 0._r8
@@ -491,13 +491,13 @@ implicit none
           Root2ndXNum_rpvr(N,L,NR,NZ)                             = 0._r8
         ENDDO
       ENDDO    
-      DO N=1,MY(NZ)        
+      DO N=1,MY_pft(NZ)        
         RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8      
       ENDDO    
     ENDDO D8870
 
     DO L=NU,MaxNumRootLays             
-      DO N=1,MY(NZ)           
+      DO N=1,MY_pft(NZ)           
         RootMycoNonstElms_rpvr(:,N,L,NZ) = 0._r8
         RootMycoActiveBiomC_pvr(N,L,NZ)  = 0._r8
         PopuRootMycoC_pvr(N,L,NZ)        = 0._r8
@@ -523,7 +523,7 @@ implicit none
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-    DO N=1,MY(NZ)       
+    DO N=1,MY_pft(NZ)       
       IF(is_plant_N2fix(iPlantNfixType_pft(NZ)).AND.N.EQ.ipltroot)THEN
         DO L=NU,MaxNumRootLays
           D6420: DO M=1,jsken
@@ -544,7 +544,7 @@ implicit none
 !   
     D8795: DO NR=1,NumRootAxes_pft(NZ)
       NIXBotRootLayer_rpft(NR,NZ)=NGTopRootLayer_pft(NZ)
-      D8790: DO N=1,MY(NZ)
+      D8790: DO N=1,MY_pft(NZ)
         Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)
       ENDDO D8790
     ENDDO D8795
@@ -739,7 +739,7 @@ implicit none
     HuskStrutElms_brch        => plt_biom%HuskStrutElms_brch,        &
     EarStrutElms_brch         => plt_biom%EarStrutElms_brch,         &
     GrainStrutElms_brch       => plt_biom%GrainStrutElms_brch,       &
-    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch,        &
+    StalkLiveBiomassC_brch    => plt_biom%StalkLiveBiomassC_brch,    &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,    &
     SenecStalkStrutElms_brch  => plt_biom%SenecStalkStrutElms_brch,  &
     LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
@@ -752,10 +752,10 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     NU                        => plt_site%NU,                        &
     iPlantState_pft           => plt_pheno%iPlantState_pft,          &
-    Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr,           &
+    Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr,          &
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr,         &
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr,          &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft           &
   )
@@ -788,13 +788,13 @@ implicit none
 !     RESET ROOT STATE VARIABLES
 !
   DO  NR=1,NumRootAxes_pft(NZ)
-    DO  N=1,MY(NZ)
+    DO  N=1,MY_pft(NZ)
       RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
     ENDDO
   ENDDO
 
   D6416: DO L=NU,MaxNumRootLays
-    DO  N=1,MY(NZ)
+    DO  N=1,MY_pft(NZ)
        RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)=0._r8
       DO  NR=1,NumRootAxes_pft(NZ)
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8

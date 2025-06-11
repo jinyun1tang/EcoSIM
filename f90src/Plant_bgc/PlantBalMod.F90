@@ -49,7 +49,7 @@ implicit none
     LitrfalStrutElms_pft     => plt_bgcr%LitrfalStrutElms_pft,      &
     LitrfalStrutElms_pvr     => plt_bgcr%LitrfalStrutElms_pvr,      &
     RootMycoExudElms_pft     => plt_rbgc%RootMycoExudElms_pft,      &
-    MY                       => plt_morph%MY,                       &
+    MY_pft                   => plt_morph%MY_pft,                   &
     MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft,         &
     NumRootAxes_pft          => plt_morph%NumRootAxes_pft,          &
     MaxNumRootLays           => plt_site%MaxNumRootLays,            &
@@ -84,7 +84,7 @@ implicit none
   ENDDO
 
   RootGrosRCO2_pft(NZ)=0._r8
-  DO N=1,MY(NZ)
+  DO N=1,MY_pft(NZ)
     DO L=NU,MaxSoiL4Root_pft(NZ)
       RootGrosRCO2_pft(NZ)=RootGrosRCO2_pft(NZ)+RootCO2Autor_pvr(N,L,NZ)
     ENDDO     
@@ -110,7 +110,7 @@ implicit none
     trcg_root_vr             => plt_rbgc%trcg_root_vr,             &
     trcg_rootml_pvr          => plt_rbgc%trcg_rootml_pvr,          &
     trcs_rootml_pvr          => plt_rbgc%trcs_rootml_pvr,          &
-    MY                       => plt_morph%MY,                      &
+    MY_pft                   => plt_morph%MY_pft,                  &
     MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft         &
   )
   trcg_root_vr(idg_beg:idg_NH3,:)         = 0._r8
@@ -119,7 +119,7 @@ implicit none
   IF(present(NZ1))THEN
     NZ=NZ1
     DO L=1,MaxSoiL4Root_pft(NZ)
-      DO N=1,MY(NZ)  
+      DO N=1,MY_pft(NZ)  
         DO idg=idg_beg,idg_NH3
           trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
         ENDDO        
@@ -132,7 +132,7 @@ implicit none
     DO NZ=1,plt_site%NP  
 
       DO L=1,MaxSoiL4Root_pft(NZ)
-        DO N=1,MY(NZ)  
+        DO N=1,MY_pft(NZ)  
           DO idg=idg_beg,idg_NH3
             trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
           ENDDO        
@@ -312,7 +312,7 @@ implicit none
 
   associate(                                                 &
     NP0                   => plt_site%NP0,                   &
-    MY                    => plt_morph%MY,                   &
+    MY_pft                => plt_morph%MY_pft,               &
     NU                    => plt_site%NU,                    &
     MaxSoiL4Root_pft      => plt_morph%MaxSoiL4Root_pft,     &
     MaxNumRootLays        => plt_site%MaxNumRootLays,        &
@@ -343,7 +343,7 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
-    RootCO2Autor_pvr(1:MY(NZ),NU:MaxSoiL4Root_pft(NZ),NZ) = 0._r8
+    RootCO2Autor_pvr(1:MY_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ) = 0._r8
     NH3Dep2Can_pft(NZ)                                    = 0._r8
     GrossResp_pft(NZ)                                     = 0._r8
     GrossCO2Fix_pft(NZ)                                   = 0._r8
@@ -376,18 +376,18 @@ implicit none
   real(r8) :: massnonst1(NumPlantChemElms)
   associate(                                                         &
     NU                        => plt_site%NU,                        &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,         &
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
-    RootNodulStrutElms_rpvr    => plt_biom%RootNodulStrutElms_rpvr,    &
-    RootNodulNonstElms_rpvr    => plt_biom%RootNodulNonstElms_rpvr,    &
+    RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr,   &
+    RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr,   &
     RootMycoNonstElms_pft     => plt_biom%RootMycoNonstElms_pft,     &
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr, &
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr, &
     RootStrutElms_pft         => plt_biom%RootStrutElms_pft,         &
-    RootMassElm_pvr           => plt_biom%RootMassElm_pvr ,          &
+    RootMassElm_pvr           => plt_biom%RootMassElm_pvr,           &
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     &
   )
   massr1st1=0._r8;massr2nd1=0._r8;massnodul1=0._r8
@@ -395,17 +395,17 @@ implicit none
 
   DO NE=1,NumPlantChemElms
     DO L=NU,MaxNumRootLays
-      RootMassElm_pvr(NE,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
-        sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
-        sum(RootMycoNonstElms_rpvr(NE,1:MY(NZ),L,NZ))
+      RootMassElm_pvr(NE,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,1:MY_pft(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
+        sum(RootMyco2ndStrutElms_rpvr(NE,1:MY_pft(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
+        sum(RootMycoNonstElms_rpvr(NE,1:MY_pft(NZ),L,NZ))
     ENDDO
-    massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MY_pft(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:MY_pft(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
     RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)
-    DO N=1,MY(NZ)
+    DO N=1,MY_pft(NZ)
       RootMycoNonstElms_pft(NE,N,NZ)=sum(RootMycoNonstElms_rpvr(NE,N,NU:MaxNumRootLays,NZ))
     enddo
-    massnonst1(NE)=sum(RootMycoNonstElms_pft(NE,1:MY(NZ),NZ))
+    massnonst1(NE)=sum(RootMycoNonstElms_pft(NE,1:MY_pft(NZ),NZ))
     mass_roots(NE)=massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     !add reserve to struct
     if(is_plant_N2fix(iPlantNfixType_pft(NZ)) .and. is_root_N2fix(iPlantNfixType_pft(NZ)))THEN

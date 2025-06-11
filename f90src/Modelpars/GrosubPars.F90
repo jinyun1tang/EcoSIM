@@ -31,84 +31,94 @@ module GrosubPars
 !
   integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
   integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
-  real(r8) :: PART1X             !minimum fraction of growth allocated to leaf
-  real(r8) :: PART2X             !minimum fraction of growth allocated to petiole
-  real(r8) :: VMXC               !rate constant for nonstructural C oxidation in respiration [h-1]
-  real(r8) :: FSNR               !rate constant for LitrFall at end of growing season [h-1]
-  real(r8) :: Hours4PhyslMature  !number of hours with no grain filling required for physilogical maturity [h]
-  real(r8) :: Hours4FullSenes    !number of hours until full senescence after physl maturity [h]
-  real(r8) :: XFRX               !maximum storage C content for remobiln from stalk,root reserves [gC]
-  real(r8) :: XFRY               !rate const for remobiln to storage from stalk,root reserves [h-1]
-  real(r8) :: FSNK               !min ratio of branch or mycorrhizae to root for calculating C transfer [-]
-  real(r8) :: FXFS               !rate constant for remobilization of stalk C,N,P [h-1]
-  real(r8) :: FMYC               !rate constant for root-mycorrhizal C,N,P exchange [h-1]
-  real(r8) :: CNKI               !nonstructural N inhibition constant on growth [g N, g-1 C]
-  real(r8) :: CPKI               !nonstructural P inhibition constant on growth [g P g-1 C]
-  real(r8) :: RmSpecPlant        !specific maintenance respiration rate [g C g-1 N h-1]
-  real(r8) :: PSIMin4OrganExtens !minimum water potential for organ expansion,extension [MPa]
-  real(r8) :: RCMN               !minimum stomatal resistance to CO2 [s m-1]
-  real(r8) :: RTDPX              !distance behind growing point for secondary roots [m]
-  real(r8) :: Root2ndMeanLensMin   !minimum average secondary root length [m]
-  real(r8) :: EMODR              !root modulus of elasticity [MPa]
-  real(r8) :: QNTM               !quantum efficiency (umol e- umol-1 PAR)
-  real(r8) :: CURV               !shape parameter for e- transport response to PAR
-  real(r8) :: CURV2
-  real(r8) :: CURV4
-  real(r8) :: ELEC3               !e- requirement for CO2 fixn by rubisco        [umol e- umol CO2]
-  real(r8) :: ELEC4               !e- requirement for CO2 fixn by PEP carboxylase,[umol e- umol CO2]
-  real(r8) :: CO2KI               ! Ki for C3 leakage from bundle sheath to mesophyll in C4 [uM]
-  real(r8) :: FCMassCO2BundleSheath_node   !partition decarboxylation to CO2 in C4
-  real(r8) :: FCMassHCO3BundleSheath_node  !partition leakage to HCO3 in C4
-  real(r8) :: COMP4                         !C4 CO2 compensation point (uM)
-  real(r8) :: FDML                !leaf water content (g H2O g-1 C)
-  real(r8) :: FBS                 !leaf water content in bundle sheath, in C4 CO2 fixn
-  real(r8) :: FMP                 !leaf water content in mesophyll in C4 CO2 fixn
-  real(r8) :: ZPLFM               !min N:C,P:C in leaves relative to max values from PFT file
-  real(r8) :: ZPLFD               
-  real(r8) :: ZPGRM               !min N:C,P:C in grain relative to max values from PFT file
-  real(r8) :: ZPGRD
-  real(r8) :: FSTK                !fraction of stalk area contributing to water,heat flow
-  real(r8) :: ZSTX
-  real(r8) :: StalkMassDensity    !stalk density (MgC m-3)
-  real(r8) :: SpecStalkVolume     !specific volume (m3 gC-1)
-  real(r8) :: FRTX                !Fraction used to calculate woody faction of stalk,root
-  real(r8) :: SETC                !Km for nonstructural C concn on seed set (g g-1)
-  real(r8) :: SETN                !Km for nonstructural N concn on seed set (g g-1)
-  real(r8) :: SETP                !Km for nonstructural P concn on seed set (g g-1)
-  real(r8) :: SLA2
-  real(r8) :: SSL2
-  real(r8) :: SNL2
-  real(r8) :: CNMX
-  real(r8) :: CPMX
-  real(r8) :: CNMN
-  real(r8) :: CPMN
-  real(r8) :: EN2F
-  real(r8) :: VMXO
-  real(r8) :: SPNDLK
-  real(r8) :: SPNDL
-  real(r8) :: CCNGR
-  real(r8) :: CCNGB
-  real(r8) :: NodulBiomCatInfection
-  real(r8) :: CZKM
-  real(r8) :: CPKM
-  real(r8) :: RCCZR
-  real(r8) :: RCCYR
-  real(r8) :: RCCXR
-  real(r8) :: RCCQR
-  real(r8) :: RCCZN
-  real(r8) :: RCCYN
-  real(r8) :: RCCXN
-  real(r8) :: RCCQN
+  
+  real(r8) :: FracHour4LeafoffRemob(0:5)                                     !allocation parameter, [-]  
+  real(r8) :: PART1X                              !minimum fraction of growth allocated to leaf, [-]
+  real(r8) :: PART2X                              !minimum fraction of growth allocated to petiole, [-]
+  real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
+  real(r8) :: FSNR                                !rate constant for LitrFall at end of growing season, [h-1]
+  real(r8) :: Hours4PhyslMature                   !number of hours with no grain filling required for physilogical maturity, [h]
+  real(r8) :: Hours4FullSenes                     !number of hours until full senescence after physl maturity, [h]
+  real(r8) :: XFRX                                !maximum storage C content for remobiln from stalk,root reserves, [gC]
+  real(r8) :: XFRY                                !rate const for remobiln to storage from stalk,root reserves, [h-1]
+  real(r8) :: FSNK                                !min ratio of branch or mycorrhizae to root for calculating C transfer, [-]
+  real(r8) :: FXFS                                !rate constant for remobilization of stalk C,N,P, [h-1]
+  real(r8) :: FMYC                                !rate constant for root-mycorrhizal C,N,P exchange, [h-1]
+  real(r8) :: CNKI                                !nonstructural N inhibition constant on growth, [g N, g-1 C]
+  real(r8) :: CPKI                                !nonstructural P inhibition constant on growth, [g P g-1 C]
+  real(r8) :: RmSpecPlant                         !specific maintenance respiration rate, [g C g-1 N h-1]
+  real(r8) :: PSIMin4OrganExtens                  !minimum water potential for organ expansion,extension, [MPa]
+  real(r8) :: RCMN                                !minimum stomatal resistance to CO2, [s m-1]
+  real(r8) :: RTDPX                               !distance behind growing point for secondary roots, [m]
+  real(r8) :: Root2ndMeanLensMin                  !minimum average secondary root length, [m]
+  real(r8) :: EMODR                               !root modulus of elasticity, [MPa]
+  real(r8) :: QNTM                                !quantum efficiency, [umol e- umol-1 PAR]
+  real(r8) :: CURV                                !shape parameter for e- transport response to PAR,[-]
+  real(r8) :: CURV2                               !2xCURV, [-]
+  real(r8) :: CURV4                               !4XCURV, [-]
+  real(r8) :: ELEC3                               !e- requirement for CO2 fixn by rubisco,        [umol e- umol CO2]
+  real(r8) :: ELEC4                               !e- requirement for CO2 fixn by PEP carboxylase,[umol e- umol CO2]
+  real(r8) :: CO2KI                               ! Ki for C3 leakage from bundle sheath to mesophyll in C4, [uM]
+  real(r8) :: FCMassCO2BundleSheath_node          !partition decarboxylation to CO2 in C4, [-]
+  real(r8) :: FCMassHCO3BundleSheath_node         !partition leakage to HCO3 in C4, [-]
+  real(r8) :: COMP4                               !C4 CO2 compensation point, [uM] 
+  real(r8) :: FDML                                !leaf water content, (g H2O g-1 C)
+  real(r8) :: FBS                                 !leaf water content in bundle sheath, in C4 CO2 fixn, [m3 H2O (gC)-1]
+  real(r8) :: FMP                                 !leaf water content in mesophyll in C4 CO2 fixn, [m3 H2O (gC)-1]
+  real(r8) :: ZPLFM                               !min N:C,P:C in leaves relative to max values from PFT file, [-]
+  real(r8) :: ZPLFD                               !1-ZPLFM, [-]
+  real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
+  real(r8) :: ZPGRD                               !1-ZPGRM, [-]
+  real(r8) :: FSTK                                !fraction of stalk area contributing to water,heat flow
+  real(r8) :: ZSTX                                !maximum stalk inner radius for tranpsiration, [m]
+  real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
+  real(r8) :: SpecStalkVolume                     !specific volume (m3 gC-1)
+  real(r8) :: FRTX                                !Fraction used to calculate woody faction of stalk,root,[-]
+  real(r8) :: SETC                                !Km for nonstructural C concn on seed set, [g g-1]
+  real(r8) :: SETN                                !Km for nonstructural N concn on seed set, [g g-1]
+  real(r8) :: SETP                                !Km for nonstructural P concn on seed set, [g g-1]
+  real(r8) :: SLA2                                !parameter for calculating leaf area expansion, [-]
+  real(r8) :: SSL2                                !parameter for calculating petiole extension,[-]
+  real(r8) :: SNL2                                !parameter for calculating stalk extension, [-]
+  real(r8) :: CNMX                                !maximum C:N ratio for nonstructural N transfer, [-]
+  real(r8) :: CPMX                                !maximum C:P ratio for nonstructural P transfer, [-]
+  real(r8) :: CNMN                                !minimum C:N ratio for nonstructural N transfer, [-]
+  real(r8) :: CPMN                                !minimum C:P ratio for nonstructural P transfer, [-]
+  real(r8) :: EN2F                                !N fixation yield from C oxidation, [g N g-1 C]
+  real(r8) :: VMXO                                !specific respiration rate by bacterial N2 fixers, [g g-1 h-1]
+  real(r8) :: SPNDLK                              !half saturation parameter for nodule maintenance respiration, [gC]
+  real(r8) :: SPNDL                               !specific decomposition rate by bacterial N2 fixers, [h-1]
+  real(r8) :: CCNGR                               !parameter to calculate nonstructural C,N,P exchange,[-]
+  real(r8) :: CCNGB                               !parameter to calculate nonstructural C,N,P exchange, [-]
+  real(r8) :: NodulBiomCAtInfection               !initial bacterial mass at infection, [gC]
+  real(r8) :: CZKM                                !Km for nonstructural Nuptake by bacteria, [gN] 
+  real(r8) :: CPKM                                !Km for nonstructural P uptake by bacteria, [gP]
+  real(r8) :: RCCZR                               !minimum fractions for root C recycling,[-]
+  real(r8) :: RCCYR                               !maximum fractions for root C recycling,[-]
+  real(r8) :: RCCXR                               !maximum fractions for root N recycling,[-]
+  real(r8) :: RCCQR                               !maximum fractions for root P recycling,[-]
+  real(r8) :: RCCZN                               !minimum fractions for bacteria C recycling,[-]
+  real(r8) :: RCCYN                               !maximum fractions for bacteria C recycling,[-]
+  real(r8) :: RCCXN                               !maximum fractions for bacteria N recycling,[-]
+  real(r8) :: RCCQN                               !maximum fractions for bacteria P recycling,[-]
 
-  integer :: HoursReq4LiterfalAftMature    !required hours after physl maturity until start of LitrFall [h]
-  REAL(R8) :: FRSV(0:3),FXFY(0:1),FXFZ(0:1)
-  real(r8) :: RateConst4ShootSeaStoreNonstXfer(0:3),RateConst4RootSeaStorNonstXfer(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
-  REAL(R8) :: RCCX(0:3),RCCQ(0:3)
-  REAL(R8) :: RCCZ(0:3),RCCY(0:3)
-  real(r8) :: Hours4SenesAftMature(0:3)
-  real(r8) :: HourReq2InitSStor4LeafOut(0:1)
-  real(r8) :: GVMX(0:1)
-  real(r8) :: RTSK(0:3)
+  integer :: HoursReq4LiterfalAftMature           !required hours after physl maturity until start of LitrFall, [h]
+  REAL(R8) :: FRSV(0:3)                           !rate constant for remobiln of storage chemical element during leafout, [h-1]
+  real(r8) :: FXFY(0:1)                           !rate constant for leaf-reserve nonstructural C exchange, [h-1]
+  real(r8) :: FXFZ(0:1)                           !rate constant for leaf-reserve nonstructural N,P exchange, [h-1]
+  real(r8) :: RateK4ShootSeaStoreNonstEXfer(0:3)  !rate constant for leaf-storage nonstructural chemical element exchange, [h-1]
+  real(r8) :: RateK4RootSeaStorNonstEXfer(0:3)    !rate constant for root-storage nonstructural chemical element exchange, [h-1]
+  real(r8) :: FXRT(0:1)                           !root partitioning of storage C during leafout,[-]
+  real(r8) :: FXSH(0:1)                           !shoot partitioning of storage C during leafout,[-]
+  real(r8) :: FXRN(6)                             !rate constant for plant-bacteria nonstructl C,N,P exchange,[h-1]
+  REAL(R8) :: RCCX(0:3)                           !maximum fractions for shoot N recycling,[-]
+  real(r8) :: RCCQ(0:3)                           !maximum fractions for shoot P recycling,[-]
+  REAL(R8) :: RCCZ(0:3)                           !minimum fractions for shoot C recycling,[-]
+  real(r8) :: RCCY(0:3)                           !maximum fractions for shoot C recycling,[-]
+  real(r8) :: Hours4SenesAftMature(0:3)           !number of hours after physiol maturity required for senescence,[h]
+  real(r8) :: HourReq2InitSStor4LeafOut(0:1)      !number of hours required to initiate remobilization of storage C for leafout, [h]
+  real(r8) :: GVMX(0:1)                           !specific oxidation rate of nonstructural C during leafout at 25 C, [h]
+  real(r8) :: RTSK(0:3)                           !relative primary root sink strength 0.25=shallow,4.0=deep root profile,[-]
   character(len=10), allocatable :: pftss(:)
   character(len=40),allocatable :: pft_long(:)
   character(len=4), allocatable :: pft_short(:)
@@ -129,7 +139,7 @@ module GrosubPars
   integer :: MaxNumRootAxes              !maximum number of root axes
   integer  :: JP1                        !number of plants
   integer  :: MaxNumBranches             !maximum number of branches
-  integer  :: NumOfSkyAzimuthSects1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer  :: NumOfSkyAzimuthSects1      !number of sectors for the sky azimuth  [0,2*pi]
   integer  :: jcplx                      !number of organo-microbial complexes
   integer  :: NumOfLeafAzimuthSectors    !number of sectors for the leaf azimuth, [0,pi]
   integer  :: NumOfCanopyLayers1         !number of canopy layers
@@ -197,7 +207,7 @@ module GrosubPars
   pltpar%icwood     = 5
 
   pltpar%jroots=2
-
+  FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
   PART1X                      = 0.05_r8
   PART2X                      = 0.02_r8
   VMXC                        = 0.015_r8
@@ -278,8 +288,8 @@ module GrosubPars
 
   RTSK=real((/0.25,1.0,4.0,4.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
-  RateConst4ShootSeaStoreNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
-  RateConst4RootSeaStorNonstXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  RateK4ShootSeaStoreNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  RateK4RootSeaStorNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)

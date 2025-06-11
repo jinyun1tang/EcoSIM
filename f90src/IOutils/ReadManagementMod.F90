@@ -28,6 +28,7 @@ implicit none
   __FILE__
 
   public :: ReadManagementFiles
+  public :: ReadFire
   contains
 
 !------------------------------------------------------------------------------------------
@@ -84,7 +85,7 @@ implicit none
     D8995: DO NX=NH1,NH2
       D8990: DO NY=NV1,NV2
         iSoilDisturbType_col(IDY,NY,NX) = IPLOW
-        DepzCorp_col(IDY,NY,NX)                = DPLOW
+        DepzCorp_col(IDY,NY,NX)         = DPLOW
       ENDDO D8990
     ENDDO D8995
     kk=kk+1
@@ -450,7 +451,7 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf, &
       start = (/1,ntopou,iyear/),count = (/len(fertf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-!!!!
+    !!!!
     call check_var(soilmgmt_nfid, 'tillf', vardesc, readvar)
     if(.not. readvar)then
       call endrun('fail to find tillf in '//trim(mod_filename), __LINE__)
@@ -459,7 +460,7 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf, &
       start = (/1,ntopou,iyear/),count = (/len(tillf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-!!!!
+    !!!!
     call check_var(soilmgmt_nfid, 'irrigf', vardesc, readvar)
     if(.not. readvar)then
       call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
@@ -494,4 +495,17 @@ implicit none
   call ncd_pio_closefile(soilmgmt_nfid)
 
   end subroutine ReadManagementFiles
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ReadFire(fire_entry)
+  implicit none
+  character(len=10), intent(in) :: fire_entry
+
+
+
+!      call ReadTillageFile(soilmgmt_nfid,tillf,NH1,NH2,NV1,NV2)
+    
+  end subroutine ReadFire  
+  
 end module ReadManagementMod

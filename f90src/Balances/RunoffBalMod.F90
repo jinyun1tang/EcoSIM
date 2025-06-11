@@ -305,7 +305,7 @@ implicit none
                 DO NGL=JGnio(NO),JGnfo(NO)
                   MID=micpar%get_micb_id(M,NGL)                
                   DO NE=1,NumPlantChemElms
-                    MOE(NE)=MOE(NE)+XN*OMEERhetr(NE,MID,K,N,NN,N5,N4)
+                    MOE(NE)=MOE(NE)+XN*OMEERhetr_2D(NE,MID,K,N,NN,N5,N4)
                   ENDDO
                 enddo
               enddo
@@ -316,7 +316,7 @@ implicit none
               DO NGL=JGniA(NO),JGnfA(NO)
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  MOE(NE)=MOE(NE)+XN*OMEERauto(NE,MID,N,NN,N5,N4)
+                  MOE(NE)=MOE(NE)+XN*OMEERauto_2D(NE,MID,N,NN,N5,N4)
                 ENDDO
               enddo
             enddo

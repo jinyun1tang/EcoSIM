@@ -138,7 +138,7 @@ module ErosionMod
           IF(SEDX.GT.ZEROS(NY,NX))THEN
             CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
         
-            DEPI=AMAX1(-SEDX,VLS_col(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
+            DEPI=AMAX1(-SEDX,VLS_col(NY,NX)*(0.0_r8-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
               *FracVol4Erosion(NY,NX)*FracSoiAsMicP_vr(NU(NY,NX),NY,NX)*dts_HeatWatTP)
             RDTSED_col(NY,NX)=RDTSED_col(NY,NX)+DEPI
           ENDIF
@@ -150,7 +150,7 @@ module ErosionMod
     !     FROM 'HOUR1'
     !
           STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE(0,NY,NX))
-          CSEDX=PrtcleDensitySurfLay_col(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4_r8)**XER(NY,NX)
+          CSEDX=PrtcleDensitySurfLay_col(NY,NX)*CER_col(NY,NX)*AZMAX1(STPR-0.4_r8)**XER_col(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 
           IF(CSEDX.GT.CSEDD)THEN
@@ -481,7 +481,7 @@ module ErosionMod
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr(NE,MID,K,N,2,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr_2D(NE,MID,K,N,2,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
@@ -493,7 +493,7 @@ module ErosionMod
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms
-                      OMEERauto(NE,MID,N,2,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
+                      OMEERauto_2D(NE,MID,N,2,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
@@ -547,7 +547,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr(NE,MID,K,N,2,N5,N4)=0._r8
+                        OMEERhetr_2D(NE,MID,K,N,2,N5,N4)=0._r8
                       ENDDO
                     enddo
                   ENDDO
@@ -559,7 +559,7 @@ module ErosionMod
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms                    
-                      OMEERauto(NE,MID,N,2,N5,N4)=0._r8
+                      OMEERauto_2D(NE,MID,N,2,N5,N4)=0._r8
                     ENDDO
                   enddo
                 ENDDO
@@ -623,7 +623,7 @@ module ErosionMod
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)      
                         DO NE=1,NumPlantChemElms                                                 
-                          OMEERhetr(NE,MID,K,N,1,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
+                          OMEERhetr_2D(NE,MID,K,N,1,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                         ENDDO
                       enddo
                     enddo
@@ -634,7 +634,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms         
-                        OMEERauto(NE,MID,N,1,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
+                        OMEERauto_2D(NE,MID,N,1,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                       ENDDO
                     enddo
                   enddo
@@ -688,7 +688,7 @@ module ErosionMod
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)
                         DO NE=1,NumPlantChemElms  
-                          OMEERhetr(NE,MID,K,N,1,N5B,N4B)=0._r8
+                          OMEERhetr_2D(NE,MID,K,N,1,N5B,N4B)=0._r8
                         ENDDO  
                       enddo
                     ENDDO
@@ -700,7 +700,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms                        
-                        OMEERauto(NE,MID,N,1,N5B,N4B)=0._r8
+                        OMEERauto_2D(NE,MID,N,1,N5B,N4B)=0._r8
                       ENDDO  
                     enddo
                   ENDDO
@@ -837,7 +837,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr(NE,MID,K,N,NN,M5,M4)=0._r8
+                        OMEERhetr_2D(NE,MID,K,N,NN,M5,M4)=0._r8
                       ENDDO
                     enddo
                   ENDDO
@@ -848,7 +848,7 @@ module ErosionMod
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms       
-                      OMEERauto(NE,MID,N,NN,M5,M4)=0._r8
+                      OMEERauto_2D(NE,MID,N,NN,M5,M4)=0._r8
                     ENDDO  
                   enddo
                 ENDDO
@@ -912,7 +912,7 @@ module ErosionMod
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)                    
                       DO NE=1,NumPlantChemElms                       
-                        OMEERhetr(NE,MID,K,N,NN,M5,M4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
+                        OMEERhetr_2D(NE,MID,K,N,NN,M5,M4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
@@ -923,7 +923,7 @@ module ErosionMod
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms                       
-                      OMEERauto(NE,MID,N,NN,M5,M4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
+                      OMEERauto_2D(NE,MID,N,NN,M5,M4)=FSEDER*mBiomeAutor_vr(NE,MID,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO

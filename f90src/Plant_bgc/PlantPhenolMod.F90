@@ -414,7 +414,7 @@ module PlantPhenolMod
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
     NU                        => plt_site%NU,                        &
     iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch,   &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
     NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft,      &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
@@ -447,7 +447,7 @@ module PlantPhenolMod
 ! CPOOLR,ZPOOLR,PPOOLR=non-structl C,N,P in root(1),myco(2)(g)
 ! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
 !
-  D180: DO N=1,MY(NZ)
+  D180: DO N=1,MY_pft(NZ)
     D160: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms

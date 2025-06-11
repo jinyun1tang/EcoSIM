@@ -466,7 +466,7 @@ module WthrMod
             ELSE
               HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone_pft(NZ,NY,NX)
             ENDIF
-            MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30_r8*DTA
+            MatureGroup_pft(NZ,NY,NX)=GROUPX_pft(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
               MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0_r8
             ENDIF

@@ -7,25 +7,25 @@ implicit none
   __FILE__
 
   real(r8) :: RMAX       !maximum hourly radiation,	[MJ m-2 h-1]
-  real(r8) :: TAVG1      !parameter to calculate hourly  air temperature from daily value	[oC]
-  real(r8) :: TAVG2      !parameter to calculate hourly  air temperature from daily value	[oC]
-  real(r8) :: TAVG3      !parameter to calculate hourly  air temperature from daily value	[oC]
-  real(r8) :: AMP1       !parameter to calculate hourly  air temperature from daily value	[oC]
-  real(r8) :: AMP2       !parameter to calculate hourly  air temperature from daily value	[oC]
-  real(r8) :: AMP3       !parameter to calculate hourly  air temperature from daily value	[oC]
-  real(r8) :: VAVG1      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-  real(r8) :: VAVG2      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-  real(r8) :: VAVG3      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-  real(r8) :: VMP1       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-  real(r8) :: VMP2       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-  real(r8) :: VMP3       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-  real(r8) :: SAZI                              !solar azimuth of solar angle
-  real(r8) :: SCOS                              !cosine of solar angle
-  real(r8) :: DOY                               !day of year
+  real(r8) :: TAVG1      !parameter to calculate hourly  air temperature from daily value,	[oC]
+  real(r8) :: TAVG2      !parameter to calculate hourly  air temperature from daily value,	[oC]
+  real(r8) :: TAVG3      !parameter to calculate hourly  air temperature from daily value,	[oC]
+  real(r8) :: AMP1       !parameter to calculate hourly  air temperature from daily value,	[oC]
+  real(r8) :: AMP2       !parameter to calculate hourly  air temperature from daily value,	[oC]
+  real(r8) :: AMP3       !parameter to calculate hourly  air temperature from daily value,	[oC]
+  real(r8) :: VAVG1      !parameter to calculate hourly  vapor pressure from daily value,	[kPa]
+  real(r8) :: VAVG2      !parameter to calculate hourly  vapor pressure from daily value,	[kPa]
+  real(r8) :: VAVG3      !parameter to calculate hourly  vapor pressure from daily value,	[kPa]
+  real(r8) :: VMP1       !parameter to calculate hourly  vapor pressure from daily value,	[kPa]
+  real(r8) :: VMP2       !parameter to calculate hourly  vapor pressure from daily value,	[kPa]
+  real(r8) :: VMP3       !parameter to calculate hourly  vapor pressure from daily value,	[kPa]
+  real(r8) :: SAZI                              !solar azimuth of solar angle, [-]
+  real(r8) :: SCOS                              !cosine of solar angle, [-]
+  real(r8) :: DOY                               !day of year, [-]
 
-  real(r8) :: atm_co2_mon(12)
-  real(r8) :: atm_ch4_mon(12)
-  real(r8) :: atm_n2o_mon(12)
+  real(r8) :: atm_co2_mon(12)    !monthly atmospheric O2, [ppmv]
+  real(r8) :: atm_ch4_mon(12)    !monthly atmospheric CH4, [ppmv]
+  real(r8) :: atm_n2o_mon(12)    !monthly atmospheric N2O, [ppmv]
   real(r8) :: TMPX(366)                         !maximum daily air temperature, [oC]
   real(r8) :: TMPN(366)                         !minimum daily air temperature, [oC]
   real(r8) :: SRAD(366)                         !daily solar radiation, [MJ m-2 d-1]
@@ -39,7 +39,7 @@ implicit none
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
   real(r8) :: RadLWClm(24,366)                     !longwave radiation (MJ m-2 h-1)
-  real(r8) :: PBOT_hrly(24,366)
+  real(r8) :: PBOT_hrly(24,366)                 !hourly surface atmospheric pressure, [kPa]
   real(r8) :: DRAD(12)                          !change factor for radiation, [-]
   real(r8) :: DTMPX(12)                         !change factor for maximum temperature, [-]
   real(r8) :: DTMPN(12)                         !change factor for minimum temperature, [-]
@@ -51,7 +51,6 @@ implicit none
 
   real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
   real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)      !reference tempeature profile from control run to warming experiment [K]
-  real(r8),target,allocatable ::  WDPTHD(:,:,:)                      !
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
   real(r8),target,allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
   real(r8),target,allocatable ::  TDRAD(:,:,:)                       !accumulated change  for radiation, [-]
@@ -186,7 +185,6 @@ implicit none
   allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX));
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
-  allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
   allocate(TDTPN(12,JY,JX));    TDTPN=0._r8
   allocate(TDRAD(12,JY,JX));    TDRAD=0._r8
@@ -315,7 +313,6 @@ implicit none
   implicit none
   call destroy(PrecHeat_col)
   call destroy(RainLitr_col)
-  call destroy(WDPTHD)
   call destroy(TDTPX)
   call destroy(TDTPN)
   call destroy(TDRAD)
