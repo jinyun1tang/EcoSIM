@@ -131,9 +131,9 @@ module RootGasMod
     FracAirFilledSoilPoreM_vr => plt_soilchem%FracAirFilledSoilPoreM_vr, &
     DiffusivitySolutEffM_vr   => plt_soilchem%DiffusivitySolutEffM_vr,   &
     iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch,          &
-    RootPoreTortu4Gas         => plt_morph%RootPoreTortu4Gas,            &
+    RootPoreTortu4Gas_pft         => plt_morph%RootPoreTortu4Gas_pft,            &
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr,            &
-    Root2ndAveLen_pvr         => plt_morph%Root2ndAveLen_pvr,            &
+    Root2ndMeanLens_pvr         => plt_morph%Root2ndMeanLens_pvr,            &
     RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr,              &
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,          &
     Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,              &
@@ -188,7 +188,7 @@ module RootGasMod
 !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
 !
     do idg=idg_beg,idg_NH3
-      GasDifc_tscaled(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas(N,NZ)
+      GasDifc_tscaled(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas_pft(N,NZ)
       SolDifc_tscaled(idg) = SoluteDifusvty_vr(idg,L)*dts_gas*FOXYX
     enddo
     O2AquaDiffusvityP = SoluteDifusvty_vr(idg_O2,L)*dts_gas
@@ -202,7 +202,7 @@ module RootGasMod
       !primary roots conductance scalar
       RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar
-      RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndAveLen_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+      RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE

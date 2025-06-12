@@ -7,29 +7,29 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: TAREA                                                  !total area of landscape	[m2]
-  real(r8),target,allocatable ::  CumDepz2LayBottom_vr(:,:,:)        !depth to bottom of soil layer [m]
-  real(r8),target,allocatable ::  DLYR_3D(:,:,:,:)                   !thickness of soil layer [m]
-  real(r8),target,allocatable ::  DLYRI_3D(:,:,:,:)                  !thickness of soil layer in 3 directions [m]
-  real(r8),target,allocatable ::  XDPTH_3D(:,:,:,:)                  !cross-sectional area / distance between adjacent grid cells [m]
-  real(r8),target,allocatable ::  SoilDepthMidLay_vr(:,:,:)          !depth to middle of soil layer [m]
-  real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)         !depth to bottom of soil layer from  surface of grid cell [m]
-  real(r8),target,allocatable ::  CumSoilThickMidL_vr(:,:,:)         !depth to middle of soil layer from  surface of grid cell [m]
-  real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
-  real(r8),target,allocatable ::  DIST_3D(:,:,:,:)                   !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
-  integer,target,allocatable ::  NU(:,:)                             !soil surface layer number
-  integer,target,allocatable ::  NUI(:,:)                            !initial soil surface layer number
-  integer,target,allocatable ::  MaxNumRootLays(:,:)                 !maximum root layer number
-  integer,target,allocatable ::  NK(:,:)                             !additional soil lower boundary layers
-  integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
-  integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number
-  integer,target,allocatable ::  NUM(:,:)                            !new surface layer number
-  real(r8),target,allocatable ::  CumLitRDepzInit_col(:,:)           !initial position of the bottom of liter layer [m]
-  REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
+  real(r8) :: TAREA                                                  !total area of landscape,	[m2]
+  real(r8),target,allocatable ::  CumDepz2LayBottom_vr(:,:,:)        !depth to bottom of soil layer, [m]
+  real(r8),target,allocatable ::  DLYR_3D(:,:,:,:)                   !thickness of soil layer, [m]
+  real(r8),target,allocatable ::  DLYRI_3D(:,:,:,:)                  !thickness of soil layer in 3 directions, [m]
+  real(r8),target,allocatable ::  XDPTH_3D(:,:,:,:)                  !cross-sectional area / distance between adjacent grid cells, [m]
+  real(r8),target,allocatable ::  SoilDepthMidLay_vr(:,:,:)          !depth to middle of soil layer, [m]
+  real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)         !depth to bottom of soil layer from  surface of grid cell, [m]
+  real(r8),target,allocatable ::  CumSoilThickMidL_vr(:,:,:)         !depth to middle of soil layer from  surface of grid cell, [m]
+  real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area,  [m2 d-2]
+  real(r8),target,allocatable ::  DIST_3D(:,:,:,:)                   !distance between adjacent layers:1=EW,2=NS,3=vertical, [m]
+  integer,target,allocatable ::  NU(:,:)                             !soil surface layer number,[-]
+  integer,target,allocatable ::  NUI(:,:)                            !initial soil surface layer number,[-]
+  integer,target,allocatable ::  MaxNumRootLays(:,:)                 !maximum root layer number,[-]
+  integer,target,allocatable ::  NK(:,:)                             !additional soil lower boundary layers,[-]
+  integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number,[-]
+  integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number,[-]
+  integer,target,allocatable ::  NUM(:,:)                            !new surface layer number,[-]
+  real(r8),target,allocatable ::  CumLitRDepzInit_col(:,:)           !initial position of the bottom of liter layer, [m]
+  REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude,	[degrees north]
   real(r8),target,allocatable ::  DH(:,:)                            !EW width of the grid cells, [m]
   real(r8),target,allocatable ::  DV(:,:)                            !NS width of the grid cells, [m]
-  integer,target,allocatable ::  FlowDirIndicator_col(:,:)           !dimension of low
-  integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
+  integer,target,allocatable ::  FlowDirIndicator_col(:,:)           !dimension of low,[-]
+  integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios,[-]
 !----------------------------------------------------------------------
 
 contains

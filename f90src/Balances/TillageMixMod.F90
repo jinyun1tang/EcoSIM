@@ -296,10 +296,11 @@ module TillageMixMod
       
 !     SoilFracAsMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
 
-      !SALT
-      DO NTSA=idsalt_beg,idsalt_end
-        trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
-      ENDDO
+      if(salt_model)then
+        DO NTSA=idsalt_beg,idsalt_end
+          trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
+        ENDDO
+      endif
 
       ! solute
       DO NTS=ids_beg,ids_end
@@ -368,9 +369,11 @@ module TillageMixMod
     trcs_soHml_vr(NTS,L,NY,NX)=XTillCorp_col(NY,NX)*trcs_soHml_vr(NTS,L,NY,NX)
   ENDDO
 
-  DO NTSA=idsalt_beg,idsalt_end
-    trcSalt_soHml_vr(ntsa,L,NY,NX)=XTillCorp_col(NY,NX)*trcSalt_soHml_vr(ntsa,L,NY,NX)
-  ENDDO
+  if(salt_model)then
+    DO NTSA=idsalt_beg,idsalt_end
+      trcSalt_soHml_vr(ntsa,L,NY,NX)=XTillCorp_col(NY,NX)*trcSalt_soHml_vr(ntsa,L,NY,NX)
+    ENDDO
+  endif
   end subroutine MixSoluteMacpore
 !--------------------------------------------------------------------------------
 

@@ -30,7 +30,6 @@ implicit none
   __FILE__
 
   public :: SaltPercolThruSnow
-  public :: XGridSnowTracerRunoff
   public :: DiagSnowChemMass
   public :: SoluteTransportThruSnow
 
@@ -252,87 +251,6 @@ implicit none
   ENDIF
 
   end subroutine ChemicalBySnowRedistribution
-
-!------------------------------------------------------------------------------------------
-  subroutine XGridSnowTracerRunoff(N,N1,N2,N4,N5,N4B,N5B)
-  !
-  !Cross-grid tracer runoff in the snow
-  !
-  implicit none
-  integer, intent(in) :: N        !direction indicator, N=3: vertical, otherwise:horizontal
-  integer, intent(in) :: N1,N2    !current grid
-  integer, intent(in) :: N4,N5    !front
-  integer, intent(in) :: N4B,N5B  !back
-  character(len=*), parameter :: subname='XGridSnowTracerRunoff'
-  integer :: NN,idg,idn,idsalt
-
-
-  !
-  !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
-  !
-  call PrintInfo('beg '//subname)
-
-  DO NN=1,2
-
-    do idg=idg_beg,idg_NH3
-      trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)+trcg_FloXSnow_2DH(idg,N,NN,N2,N1)
-    ENDDO
-    
-    DO idn=ids_nut_beg,ids_nuts_end
-      trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1)+trcn_FloXSnow_2DH(idn,N,NN,N2,N1)
-    ENDDO  
-
-    !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
-    !
-    !
-    IF(salt_model)THEN
-      DO idsalt=idsalt_beg,idsalt_end
-        trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1)+trcSalt_FloXSnow_2DH(idsalt,N,NN,N2,N1)
-      ENDDO
-    ENDIF
-  ENDDO
-
-  if(IFLBS_2DH(N,iBehind,N5,N4).EQ.0)then
-
-    do idg=idg_beg,idg_NH3
-      trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)-trcg_FloXSnow_2DH(idg,N,iBehind,N5,N4)
-    ENDDO
-    
-    DO idn=ids_nut_beg,ids_nuts_end
-      trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1)-trcn_FloXSnow_2DH(idn,N,iBehind,N5,N4)
-    ENDDO  
-    !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
-    !
-    IF(salt_model)THEN
-      DO idsalt=idsalt_beg,idsalt_end
-        trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1)-trcSalt_FloXSnow_2DH(idsalt,N,iBehind,N5,N4)
-      ENDDO
-    ENDIF
-
-  endif
-
-  IF(N5B.GT.0 .AND. N4B.GT.0)then
-    IF(IFLBS_2DH(N,iFront,N5B,N4B).EQ.1)then
-
-      do idg=idg_beg,idg_NH3
-        trcg_LossXSnowRedist_col(idg,N2,N1) = trcg_LossXSnowRedist_col(idg,N2,N1)-trcg_FloXSnow_2DH(idg,N,iFront,N5B,N4B)
-      ENDDO
-      
-      DO idn=ids_nut_beg,ids_nuts_end
-        trcn_LossXSnowRedist_col(idn,N2,N1)   = trcn_LossXSnowRedist_col(idn,N2,N1)-trcn_FloXSnow_2DH(idn,N,iFront,N5B,N4B)
-      ENDDO  
-      !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
-      !
-      IF(salt_model)THEN
-        DO idsalt=idsalt_beg,idsalt_end
-          trcSalt_LossXSnowRedist_col(idsalt,N2,N1)=trcSalt_LossXSnowRedist_col(idsalt,N2,N1)-trcSalt_FloXSnow_2DH(idsalt,N,iFront,N5B,N4B)
-        ENDDO
-      ENDIF
-
-    endif
-  endif  
-  call PrintInfo('end '//subname)
-  end subroutine XGridSnowTracerRunoff
 
 !------------------------------------------------------------------------------------------
 

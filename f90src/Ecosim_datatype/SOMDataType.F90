@@ -10,41 +10,41 @@ module SOMDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable :: RSC(:,:,:,:)                       !initial surface litter [C	g m-2]
-  real(r8),target,allocatable :: RSN(:,:,:,:)                       !initial surface litter [N	g m-2]
-  real(r8),target,allocatable :: RSP(:,:,:,:)                       !initial surface litter [P	g m-2]
-  real(r8),target,allocatable :: CFOSC(:,:,:,:,:)                   !fraction of SOC in kinetic components
-  real(r8),target,allocatable :: CNOSC(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components
-  real(r8),target,allocatable :: CPOSC(:,:,:,:,:)                   !P:C ratios of SOC kinetic components
-  real(r8),target,allocatable :: SolidOM_vr(:,:,:,:,:,:)                   !humus soil OM	[g d-2]
-  real(r8),target,allocatable :: TSolidOMActC_vr(:,:,:)              !total active solid organic C [gC d-2]
-  real(r8),target,allocatable :: TSolidOMC_vr(:,:,:)                 !total solid organic C [gC d-2]
-  real(r8),target,allocatable :: tOMActC_vr(:,:,:)                   !active heterotrophic microbial C in layer [gC d-2]
-  real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)                     !adsorbed soil C	[g d-2]
-  real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)                     !microbial residue [C	g d-2]
-  real(r8),target,allocatable :: DOM_MicP_vr(:,:,:,:,:)                       !dissolved organic C micropore	[g d-2]
-  real(r8),target,allocatable :: DOM_MacP_vr(:,:,:,:,:)                      !dissolved organic C macropore	[g d-2]
-  real(r8),target,allocatable :: SoilOrgM_vr(:,:,:,:)                        !total soil organic C [g d-2]
-  real(r8),target,allocatable :: ORGCX_vr(:,:,:)                       !SOC concentration	[g Mg-1]
-  real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
-  real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                        !total particulate organic C [g d-2]
-  real(r8),target,allocatable :: CSoilOrgM_vr(:,:,:,:)                       !soil organic matter content [g kg-1]
-  real(r8),target,allocatable :: COMLitrC_vr(:,:,:)                       !soil particulate C content [g kg-1]
-  real(r8),target,allocatable :: ElmAllocmatMicrblitr2POM_vr(:,:,:,:)                     !allocation coefficient to humus fractions
-  real(r8),target,allocatable :: tMicBiome_col(:,:,:)                         !total micriobial C, [g d-2]
-  real(r8),target,allocatable :: tSoilOrgM_col(:,:,:)                  !total soil organic matter, include everything organic (exclude live roots) [g d-2]
-  real(r8),target,allocatable :: tLitrOM_col(:,:,:)                        !total litter C, [g d-2]
-  real(r8),target,allocatable :: litrOM_vr(:,:,:,:)
-  real(r8),target,allocatable :: tHumOM_col(:,:,:)                        !total humus C, [g d-2]
-  real(r8),target,allocatable :: EPOC(:,:,:)                       !partitioning coefficient between POC and litter, []
-  real(r8),target,allocatable :: EHUM(:,:,:)                       !partitioning coefficient between humus and microbial residue, []
+  real(r8),target,allocatable :: RSC_vr(:,:,:,:)                       !initial surface litter C, [g m-2]
+  real(r8),target,allocatable :: RSN_vr(:,:,:,:)                       !initial surface litter N, [g m-2]
+  real(r8),target,allocatable :: RSP_vr(:,:,:,:)                       !initial surface litter P, [g m-2]
+  real(r8),target,allocatable :: CFOSC_vr(:,:,:,:,:)                   !fraction of SOC in kinetic components,[-]
+  real(r8),target,allocatable :: CNOSC_vr(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components,[-]
+  real(r8),target,allocatable :: CPOSC_vr(:,:,:,:,:)                   !P:C ratios of SOC kinetic components,[-]
+  real(r8),target,allocatable :: SolidOM_vr(:,:,:,:,:,:)            !humus soil OM chemical element,	[g d-2]
+  real(r8),target,allocatable :: TSolidOMActC_vr(:,:,:)              !total active solid organic C, [gC d-2]
+  real(r8),target,allocatable :: TSolidOMC_vr(:,:,:)                 !total solid organic C, [gC d-2]
+  real(r8),target,allocatable :: tOMActC_vr(:,:,:)                   !active heterotrophic microbial C in layer, [gC d-2]
+  real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)              !adsorbed soil OM chemical element,	[g d-2]
+  real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)          !microbial residue chemical element, [C	g d-2]
+  real(r8),target,allocatable :: DOM_MicP_vr(:,:,:,:,:)              !dissolved organic matter in micropore,	[g d-2]
+  real(r8),target,allocatable :: DOM_MacP_vr(:,:,:,:,:)              !dissolved organic matter in macropore,	[g d-2]
+  real(r8),target,allocatable :: SoilOrgM_vr(:,:,:,:)                !total soil organic matter, [g d-2]
+  real(r8),target,allocatable :: ORGCX_vr(:,:,:)                      !SOC concentration,	[g Mg-1]
+  real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)             !colonized humus C in each complex, [g d-2]
+  real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                    !total particulate organic C, [g d-2]
+  real(r8),target,allocatable :: CSoilOrgM_vr(:,:,:,:)                 !soil organic matter content, [g kg-1]
+  real(r8),target,allocatable :: COMLitrC_vr(:,:,:)                    !soil litter particulate C content, [g kg-1]
+  real(r8),target,allocatable :: ElmAllocmatMicrblitr2POM_vr(:,:,:,:)    !allocation coefficient to humus fractions,[-]
+  real(r8),target,allocatable :: tMicBiome_col(:,:,:)                         !total micriobial biomass chemical element, [g d-2]
+  real(r8),target,allocatable :: tSoilOrgM_col(:,:,:)                  !total soil organic matter, include everything organic (exclude live roots), [g d-2]
+  real(r8),target,allocatable :: tLitrOM_col(:,:,:)                        !total litter chemical element, [g d-2]
+  real(r8),target,allocatable :: litrOM_vr(:,:,:,:)                    !vertical layered litter chemical element, [g d-2]
+  real(r8),target,allocatable :: tHumOM_col(:,:,:)                        !total humus chemical element, [g d-2]
+  real(r8),target,allocatable :: EPOC_vr(:,:,:)                         !partitioning coefficient between POC and litter, [-]
+  real(r8),target,allocatable :: EHUM_vr(:,:,:)                         !partitioning coefficient between humus and microbial residue, [-]
   real(r8),target,allocatable :: CDOM_vr(:,:,:,:,:)                     !DOC concentration, [g m-3]
   real(r8),target,allocatable :: FracBulkSOMC_vr(:,:,:,:)                    !fraction of total organic C in complex, [-]
   real(r8),target,allocatable :: DIC_mass_col(:,:)                        !total soil DIC, [g d-2]
   real(r8),target,allocatable :: tNH4_col(:,:)                         !total soil NH4 + NH3 content, [g d-2]
   real(r8),target,allocatable :: tNO3_col(:,:)                         !total soil NO3 + NO2 content, [g d-2]
   real(r8),target,allocatable :: tHxPO4_col(:,:)                         !total soil PO4 content, [g d-2]
-  real(r8),target,allocatable :: FracLitrMix_vr(:,:,:)              !fraction of litter to be mixed downward
+  real(r8),target,allocatable :: FracLitrMix_vr(:,:,:)              !fraction of litter to be mixed downward,[-]
   private :: InitAllocate
   contains
 
@@ -62,12 +62,12 @@ module SOMDataType
   implicit none
   integer, intent(in) :: NumOfLitrCmplxs
 
-  allocate(RSC(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSC=0._r8
-  allocate(RSN(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSN=0._r8
-  allocate(RSP(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSP=0._r8
-  allocate(CFOSC(jsken,1:jcplx,0:JZ,JY,JX)); CFOSC=0._r8
-  allocate(CNOSC(jsken,1:jcplx,0:JZ,JY,JX)); CNOSC=0._r8
-  allocate(CPOSC(jsken,1:jcplx,0:JZ,JY,JX)); CPOSC=0._r8
+  allocate(RSC_vr(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSC_vr=0._r8
+  allocate(RSN_vr(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSN_vr=0._r8
+  allocate(RSP_vr(1:NumOfLitrCmplxs,0:JZ,JY,JX)); RSP_vr=0._r8
+  allocate(CFOSC_vr(jsken,1:jcplx,0:JZ,JY,JX)); CFOSC_vr=0._r8
+  allocate(CNOSC_vr(jsken,1:jcplx,0:JZ,JY,JX)); CNOSC_vr=0._r8
+  allocate(CPOSC_vr(jsken,1:jcplx,0:JZ,JY,JX)); CPOSC_vr=0._r8
   allocate(SolidOM_vr(NumPlantChemElms,jsken,1:jcplx,0:JZ,JY,JX));SolidOM_vr=0._r8
   allocate(TSolidOMActC_vr(0:JZ,JY,JX));TSolidOMActC_vr=0._r8
   allocate(TSolidOMC_vr(0:JZ,JY,JX)); TSolidOMC_vr=0._r8
@@ -88,8 +88,8 @@ module SOMDataType
   allocate(tLitrOM_col(NumPlantChemElms,JY,JX));       tLitrOM_col=0._r8
   allocate(litrOM_vr(NumPlantChemElms,0:JZ,JY,JX)); litrOM_vr=0._r8
   allocate(tHumOM_col(NumPlantChemElms,JY,JX));       tHumOM_col=0._r8
-  allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
-  allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
+  allocate(EPOC_vr(0:JZ,JY,JX));   EPOC_vr=0._r8
+  allocate(EHUM_vr(0:JZ,JY,JX));   EHUM_vr=0._r8
   allocate(CDOM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));CDOM_vr=0._r8
   allocate(FracBulkSOMC_vr(1:jcplx,0:JZ,JY,JX));FracBulkSOMC_vr=0._r8
   allocate(DIC_mass_col(JY,JX));       DIC_mass_col=0._r8
@@ -110,12 +110,12 @@ module SOMDataType
   call destroy(TSolidOMC_vr)
   call destroy(tOMActC_vr)
   call destroy(litrOM_vr)
-  call destroy(RSC)
-  call destroy(RSN)
-  call destroy(RSP)
-  call destroy(CFOSC)
-  call destroy(CNOSC)
-  call destroy(CPOSC)
+  call destroy(RSC_vr)
+  call destroy(RSN_vr)
+  call destroy(RSP_vr)
+  call destroy(CFOSC_vr)
+  call destroy(CNOSC_vr)
+  call destroy(CPOSC_vr)
   call destroy(SolidOM_vr)
   call destroy(SorbedOM_vr)
   call destroy(OMBioResdu_vr)
@@ -132,8 +132,8 @@ module SOMDataType
   call destroy(tSoilOrgM_col)
   call destroy(tLitrOM_col)
   call destroy(tHumOM_col)
-  call destroy(EPOC)
-  call destroy(EHUM)
+  call destroy(EPOC_vr)
+  call destroy(EHUM_vr)
 
   call destroy(CDOM_vr)
   call destroy(FracBulkSOMC_vr)

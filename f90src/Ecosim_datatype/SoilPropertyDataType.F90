@@ -7,34 +7,34 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-   real(r8) ,target,allocatable ::  CORGCI_vr(:,:,:)                    !soil organic C content   [g kg-1]
-   real(r8) ,target,allocatable ::  POROSI_vr(:,:,:)                    !soil porosity            [m3 m-3]
+   real(r8) ,target,allocatable ::  CORGCI_vr(:,:,:)                    !soil organic C content   ,[g kg-1]
+   real(r8) ,target,allocatable ::  POROSI_vr(:,:,:)                    !soil porosity            ,[m3 m-3]
    real(r8) ,target,allocatable ::  SoilFracAsMacPt0_vr(:,:,:)          !soil macropore fraction
-   real(r8) ,target,allocatable ::  CSAND_vr(:,:,:)                     !soil sand content [kg Mg-1]
-   real(r8) ,target,allocatable ::  CSILT(:,:,:)                        !soil silt content [kg Mg-1]
-   real(r8) ,target,allocatable ::  CCLAY_vr(:,:,:)                     !soil clay content [kg Mg-1]
-   real(r8) ,target,allocatable ::  ROCK_vr(:,:,:)                      !Rock fraction, [0-1]
-   real(r8) ,target,allocatable ::  SoiBulkDensityt0_vr(:,:,:)          !initial bulk density [Mg m-3,0=water]
-   real(r8) ,target,allocatable ::  FracSoiAsMicP_vr(:,:,:)             !micropore fraction, [0-1]
-   real(r8) ,target,allocatable ::  SoilFracAsMacP_vr(:,:,:)            !macropore fraction, [0-1]
+   real(r8) ,target,allocatable ::  CSAND_vr(:,:,:)                     !soil sand content ,[kg Mg-1]
+   real(r8) ,target,allocatable ::  CSILT(:,:,:)                        !soil silt content ,[kg Mg-1]
+   real(r8) ,target,allocatable ::  CCLAY_vr(:,:,:)                     !soil clay content ,[kg Mg-1]
+   real(r8) ,target,allocatable ::  ROCK_vr(:,:,:)                      !Rock fraction, ,[0-1]
+   real(r8) ,target,allocatable ::  SoiBulkDensityt0_vr(:,:,:)          !initial bulk density ,[Mg m-3,0=water]
+   real(r8) ,target,allocatable ::  FracSoiAsMicP_vr(:,:,:)             !micropore fraction, ,[0-1]
+   real(r8) ,target,allocatable ::  SoilFracAsMacP_vr(:,:,:)            !macropore fraction, ,[0-1]
    real(r8) ,target,allocatable ::  PathLenMacP(:,:,:)                  !path length between macopores
    real(r8) ,target,allocatable ::  MacPRadius(:,:,:)                   !radius of macropores
-   real(r8) ,target,allocatable ::  SoilBulkDensity_vr(:,:,:)           !soil bulk density, [Mg m-3]
+   real(r8) ,target,allocatable ::  SoilBulkDensity_vr(:,:,:)           !soil bulk density, ,[Mg m-3]
    integer  ,target,allocatable ::  MacPNumLayer(:,:,:)                 !number of macropores
-   real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity [m3 m-3]
-   real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	[m3 d-2]
-   real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                !volume of micropores [m3 d-2]
-   real(r8) ,target,allocatable ::  VLSoilMicPMass_vr(:,:,:)            !mass of soil layer	[Mg d-2]
-   real(r8) ,target,allocatable ::  SoilMicPMassLayerMn(:,:)            !minimum soil layer mass [Mg d-2]
-   real(r8) ,target,allocatable ::  SoilMicPMassLayerMX(:,:)            !maximum soil layer mass [Mg d-2]
-   real(r8) ,target,allocatable ::  SAND(:,:,:)                         !soil sand content	[Mg d-2]
-   real(r8) ,target,allocatable ::  SILT(:,:,:)                         !soil silt content	[Mg d-2]
-   real(r8) ,target,allocatable ::  CLAY(:,:,:)                         !soil clay content	[Mg d-2]
-   real(r8) ,target,allocatable ::  VLMicP_vr(:,:,:)                    !total micropore volume in layer [m3 d-2]
-   real(r8) ,target,allocatable ::  VLMacP_vr(:,:,:)                    !total macropore volume in layer [m3 d-2]
-   real(r8) ,target,allocatable ::  VGeomLayer_vr(:,:,:)                !soil volume including  macropores+rock [m3 d-2]
-   real(r8) ,target,allocatable ::  VGeomLayert0_vr(:,:,:)              !initial soil volume including  macropores+rock [m3 d-2]
-   real(r8) ,target,allocatable ::  VOLTX_vr(:,:,:)                     !maximum soil pore (mac+mic) volume allowed [m3 d-2]  
+   real(r8) ,target,allocatable ::  POROS_vr(:,:,:)                     !soil porosity ,[m3 m-3]
+   real(r8) ,target,allocatable ::  VLSoilPoreMicP_vr(:,:,:)            !Volume of soil occupied by micropores	,[m3 d-2]
+   real(r8) ,target,allocatable ::  VLSoilMicP_vr(:,:,:)                !volume of micropores ,[m3 d-2]
+   real(r8) ,target,allocatable ::  VLSoilMicPMass_vr(:,:,:)            !mass of soil layer	,[Mg d-2]
+   real(r8) ,target,allocatable ::  SoilMicPMassLayerMn(:,:)            !minimum soil layer mass ,[Mg d-2]
+   real(r8) ,target,allocatable ::  SoilMicPMassLayerMX(:,:)            !maximum soil layer mass ,[Mg d-2]
+   real(r8) ,target,allocatable ::  SAND(:,:,:)                         !soil sand content	,[Mg d-2]
+   real(r8) ,target,allocatable ::  SILT(:,:,:)                         !soil silt content	,[Mg d-2]
+   real(r8) ,target,allocatable ::  CLAY(:,:,:)                         !soil clay content	,[Mg d-2]
+   real(r8) ,target,allocatable ::  VLMicP_vr(:,:,:)                    !total micropore volume in layer ,[m3 d-2]
+   real(r8) ,target,allocatable ::  VLMacP_vr(:,:,:)                    !total macropore volume in layer ,[m3 d-2]
+   real(r8) ,target,allocatable ::  VGeomLayer_vr(:,:,:)                !soil volume including  macropores+rock ,[m3 d-2]
+   real(r8) ,target,allocatable ::  VGeomLayert0_vr(:,:,:)              !initial soil volume including  macropores+rock ,[m3 d-2]
+   real(r8) ,target,allocatable ::  VOLTX_vr(:,:,:)                     !maximum soil pore (mac+mic) volume allowed ,[m3 d-2]  
   private :: InitAllocate
 
 contains

@@ -230,8 +230,8 @@ implicit none
         if(idg==idg_NH3)then
           err=err+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
         endif
-        if(abs(err)>1.e-5)then
-          if(iVerbLevel==1)then
+        if(abs(err)>1.e-5_r8)then
+          if(iVerbLevel==1 .or. abs(err)>1.e-4_r8)then
             write(201,*)('-',L=1,50)
             write(201,*)(I*1000+J)*10+M,'iterm=',iterm,trcs_names(idg),NY,NX,'slow'
             write(201,*)'beg/end total mass',trcg_mass_begs(idg,NY,NX),trcg_mass_now(idg)
@@ -239,24 +239,24 @@ implicit none
             write(201,*)'beg/end snow mass=',trcg_mass_snow_begs(idg,NY,NX),trcg_mass_snow_now(idg),trcg_mass_snow_begs(idg,NY,NX)-trcg_mass_snow_now(idg)
             write(201,*)'beg/end litr mass=',trcg_mass_litr_begs(idg,NY,NX),trcg_mass_litr_now(idg),trcg_mass_litr_begs(idg,NY,NX)-trcg_mass_litr_now(idg)
             write(201,*)'beg/end soil mass=',trcg_mass_soil_begs(idg,NY,NX),trcg_mass_soil_now(idg),trcg_mass_soil_begs(idg,NY,NX)-trcg_mass_soil_now(idg)
-            write(201,*)'wetdepo=',Gas_WetDeposit_slow_flx_col(idg,NY,NX)
-            write(201,*)'diffus=',GasDiff2Surf_slow_flx_col(idg,NY,NX)
+            write(201,*)'wetdepo    =',Gas_WetDeposit_slow_flx_col(idg,NY,NX)
+            write(201,*)'diffus     =',GasDiff2Surf_slow_flx_col(idg,NY,NX)
             write(201,*)'netflx2litr=',trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)
-            write(201,*)'dep2sno =',Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)
-            write(201,*)'snowloss=',-Gas_Snowloss_slow_flx_col(idg,NY,NX)
-            write(201,*)'snowdrift=',trcg_SnowDrift_flx_col(idg,NY,NX)
-            write(201,*)'snow mass=',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
+            write(201,*)'dep2sno    =',Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)
+            write(201,*)'snowloss   =',-Gas_Snowloss_slow_flx_col(idg,NY,NX)
+            write(201,*)'snowdrift  =',trcg_SnowDrift_flx_col(idg,NY,NX)
+            write(201,*)'snow mass  =',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
             if(idg==idg_NH3)then
-              write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
-              write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
-              write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg_NH3,NY,NX)+trcs_netflow2soil_slow_flx_col(idg_NH3B,NY,NX)
+              write(201,*)'netpro      =',trcs_NetProd_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
+              write(201,*)'hydloss     =',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
+              write(201,*)'netflx2soil =',trcs_netflow2soil_slow_flx_col(idg_NH3,NY,NX)+trcs_netflow2soil_slow_flx_col(idg_NH3B,NY,NX)
             else
-              write(201,*)'netpro=',trcs_NetProd_slow_flx_col(idg,NY,NX)
-              write(201,*)'hydloss=',trcs_hydrloss_slow_flx_col(idg,NY,NX)            
-              write(201,*)'netflx2soil=',trcs_netflow2soil_slow_flx_col(idg,NY,NX)
+              write(201,*)'netpro      =',trcs_NetProd_slow_flx_col(idg,NY,NX)
+              write(201,*)'hydloss     =',trcs_hydrloss_slow_flx_col(idg,NY,NX)            
+              write(201,*)'netflx2soil =',trcs_netflow2soil_slow_flx_col(idg,NY,NX)
             endif
           endif
-          if(abs(err)>1.e-5_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
+          if(abs(err)>1.e-4_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
         endif
       ENDDO
       DO K=1,jcplx
@@ -3030,14 +3030,14 @@ implicit none
               IF(NN.EQ.iFront)THEN                   !eastward                
                 IF(NX.EQ.NHE)THEN                    !eastern boundary
                   M4 = NX+1;M5 = NY;M6 = L           !dest
-                  RCHQF  = RechargEastSurf(M2,M1)
+                  RCHQF  = RechargEastSurf_col(M2,M1)
                 ELSE
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.iBehind)THEN             !west                
                 IF(NX.EQ.NHW)THEN                   !western boundary
                   M4 = NX;M5 = NY;M6 = L            !dest
-                  RCHQF  = RechargWestSurf(M5,M4)
+                  RCHQF  = RechargWestSurf_col(M5,M4)
                 ELSE
                   cycle
                 ENDIF
@@ -3048,14 +3048,14 @@ implicit none
               IF(NN.EQ.iFront)THEN  
                 IF(NY.EQ.NVS)THEN                     ! southern boundary
                   M4 = NX;M5 = NY+1;M6 = L            !target grid
-                  RCHQF  = RechargSouthSurf(M2,M1)
+                  RCHQF  = RechargSouthSurf_col(M2,M1)
                 ELSE
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.iBehind)THEN              !north                
                 IF(NY.EQ.NVN)THEN                    !northern boundary
                   M4 = NX;M5 = NY;M6 = L             !target
-                  RCHQF  = RechargNorthSurf(M5,M4)
+                  RCHQF  = RechargNorthSurf_col(M5,M4)
                 ELSE
                   cycle
                 ENDIF

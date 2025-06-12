@@ -519,7 +519,7 @@ module StartsMod
   
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
-  call sumSurfOMCK(NY,NX,RC0(:,NY,NX),RC0ff(NY,NX))
+  call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))
 
   !
   !  INITIALIZE FERTILIZER ARRAYS
@@ -577,10 +577,6 @@ module StartsMod
   BandThicknessNO3_vr(1:L2,NY,NX) = 0.0_r8
   BandWidthPO4_vr(1:L2,NY,NX)     = 0.0_r8
   BandThicknessPO4_vr(1:L2,NY,NX) = 0.0_r8
-  COCU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
-  CONU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
-  COPU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
-  COAU(1:jcplx,1:L2,NY,NX)        = 0.0_r8
 
   end subroutine initFertArrays
 
@@ -607,7 +603,7 @@ module StartsMod
 ! ASP_col=aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-   'aspect(o)','slope(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
+   'aspect(o)','SLOPE_col(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
 1112    FORMAT(2A4,4A6,25A12)
   D9985: DO NX=NHW,NHE
@@ -618,9 +614,9 @@ module StartsMod
       GroundSurfAzimuth_col(NY,NX)      = ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)    = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)  = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
-      SLOPE(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
-      SLOPE(iWestEastDirection,NY,NX)   = -SLOPE(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
-      SLOPE(iNorthSouthDirection,NY,NX) = SLOPE(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
+      SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
+      SLOPE_col(iWestEastDirection,NY,NX)   = -SLOPE_col(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
+      SLOPE_col(iNorthSouthDirection,NY,NX) = SLOPE_col(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
 
       !aspect angle 
       IF(ASP_col(NY,NX).GE.0.0_r8 .AND. ASP_col(NY,NX).LT.90.0_r8)THEN
@@ -649,10 +645,10 @@ module StartsMod
         XGridRunoffFlag_2DH(2,2,NY,NX) = .false.
       ENDIF
       !In the vertical direction, for general treatment of flow against slope. 
-      SLOPE(3,NY,NX)=-1.0_r8
+      SLOPE_col(3,NY,NX)=-1.0_r8
 
-      IF(.not.isclose(SLOPE(iWestEastDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
-        FSLOPE_2DH(iWestEastDirection,NY,NX)   = ABS(SLOPE(iWestEastDirection,NY,NX))/(ABS(SLOPE(iWestEastDirection,NY,NX))+ABS(SLOPE(iNorthSouthDirection,NY,NX)))  !
+      IF(.not.isclose(SLOPE_col(iWestEastDirection,NY,NX),0.0_r8) .OR. (.not.isclose(SLOPE_col(iNorthSouthDirection,NY,NX),0.0_r8)))THEN
+        FSLOPE_2DH(iWestEastDirection,NY,NX)   = ABS(SLOPE_col(iWestEastDirection,NY,NX))/(ABS(SLOPE_col(iWestEastDirection,NY,NX))+ABS(SLOPE_col(iNorthSouthDirection,NY,NX)))  !
         FSLOPE_2DH(iNorthSouthDirection,NY,NX) = 1._r8-FSLOPE_2DH(iWestEastDirection,NY,NX)
       ELSE
         FSLOPE_2DH(iWestEastDirection,NY,NX)   = 0.5_r8
@@ -660,7 +656,7 @@ module StartsMod
       ENDIF
 
 !    compute incident sky angle at ground surface
-      SineGrndSlope_col(NY,NX)   = SLOPE(0,NY,NX)    !this is exact
+      SineGrndSlope_col(NY,NX)   = SLOPE_col(0,NY,NX)    !this is exact
       CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
       D240: DO N=1,NumOfSkyAzimuthSects
         DGAZI           = COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
@@ -672,29 +668,29 @@ module StartsMod
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
           !(west, north) corner
-          ALT_col(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
+          ALT_col(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ELSE
           !west boundary
           ALT_col(NY,NX)=ALT_col(NY-1,NX) &
-            +1.0_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX) &
-            +0.5_r8*DV(NY-1,NX)*(SLOPE(iNorthSouthDirection,NY-1,NX)) &
-            +0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
+            +1.0_r8*DH(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
+            +0.5_r8*DV(NY-1,NX)*(SLOPE_col(iNorthSouthDirection,NY-1,NX)) &
+            +0.5_r8*DV(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ENDIF
       ELSE
         IF(NY.EQ.NVN)THEN
           !north boundary
           ALT_col(NY,NX)=ALT_col(NY,NX-1) &
-            +0.5_r8*DH(NY,NX-1)*SLOPE(iWestEastDirection,NY,NX-1) &
-            +0.5_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX) &
-            +0.5_r8*DV(NY,NX-1)*SLOPE(iNorthSouthDirection,NY,NX-1) &
-            +0.5_r8*DV(NY,NX)*SLOPE(iNorthSouthDirection,NY,NX)
+            +0.5_r8*DH(NY,NX-1)*SLOPE_col(iWestEastDirection,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
+            +0.5_r8*DV(NY,NX-1)*SLOPE_col(iNorthSouthDirection,NY,NX-1) &
+            +0.5_r8*DV(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ELSE
           ALT_col(NY,NX)=(ALT_col(NY,NX-1) &
-            +0.5_r8*DH(NY,NX-1)*SLOPE(iWestEastDirection,NY,NX-1) &
-            +0.5_r8*DH(NY,NX)*SLOPE(iWestEastDirection,NY,NX) &
+            +0.5_r8*DH(NY,NX-1)*SLOPE_col(iWestEastDirection,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
             +ALT_col(NY-1,NX) &
-            +0.5_r8*DV(NY-1,NX)*SLOPE(iNorthSouthDirection,NY-1,NX) &
-            +0.5_r8*DV(NY,N)*SLOPE(iNorthSouthDirection,NY,NX))/2.0
+            +0.5_r8*DV(NY-1,NX)*SLOPE_col(iNorthSouthDirection,NY-1,NX) &
+            +0.5_r8*DV(NY,N)*SLOPE_col(iNorthSouthDirection,NY,NX))/2.0
         ENDIF
       ENDIF
 
@@ -706,7 +702,7 @@ module StartsMod
       ENDIF
       WRITE(*,1111)NX,NY,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT_col(NY,NX),DH(NY,NX),DV(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
-        ,SLOPE(0,NY,NX),SLOPE(iWestEastDirection,NY,NX),SLOPE(iNorthSouthDirection,NY,NX) &
+        ,SLOPE_col(0,NY,NX),SLOPE_col(iWestEastDirection,NY,NX),SLOPE_col(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
     ENDDO D9980
@@ -795,7 +791,7 @@ module StartsMod
   NH3byFire_CumYr_col(:,:)       = 0.0_r8
   PO4byFire_CumYr_col(:,:)       = 0.0_r8
   AmendCFlx_CumYr_col(:,:)       = 0.0_r8
-  FertNFlx_CumYr_col(:,:)        = 0.0_r8
+  FertN_Flx_CumYr_col(:,:)        = 0.0_r8
   FerPFlx_CumYr_col(:,:)         = 0.0_r8
   H2OLoss_CumYr_col(:,:)         = 0.0_r8
   QEvap_CumYr_col(:,:)           = 0.0_r8
@@ -895,11 +891,11 @@ module StartsMod
       ! surface litter residue layer
       TAREA                        = TAREA+AREA(3,L,NY,NX)
       CumSoilThickness_vr(L,NY,NX) = 0.0_r8
-      SoilOrgM_vr(ielmc,L,NY,NX)   = SUM(RSC(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
+      SoilOrgM_vr(ielmc,L,NY,NX)   = SUM(RSC_vr(1:NumOfLitrCmplxs,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX_vr(L,NY,NX)            = SoilOrgM_vr(ielmc,L,NY,NX)
       VLitR0                       = 0._r8
       DO K=1,NumOfLitrCmplxs
-        VLitR0=VLitR0+RSC(K,L,NY,NX)/BulkDensLitR(K)
+        VLitR0=VLitR0+RSC_vr(K,L,NY,NX)/BulkDensLitR(K)
       ENDDO
       !volume of litter layer
       VLitR_col(NY,NX)           = VLitR0*ppmc*AREA(3,L,NY,NX)

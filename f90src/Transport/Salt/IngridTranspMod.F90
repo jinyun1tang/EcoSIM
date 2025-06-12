@@ -165,7 +165,7 @@ module IngridTranspMod
               IF(NN.EQ.iFront)THEN
                 IF(NX.EQ.NHE)THEN               !on the eastern boundary
                   M4 = NX+1;M5 = NY;M6 = L
-                  RCHQF  = RechargEastSurf(M2,M1)
+                  RCHQF  = RechargEastSurf_col(M2,M1)
                   !not boundary
                 ELSE
                   cycle
@@ -173,7 +173,7 @@ module IngridTranspMod
               ELSEIF(NN.EQ.iBehind)THEN
                 IF(NX.EQ.NHW)THEN             !on the western boundary
                   M4 = NX;M5 = NY;M6 = L
-                  RCHQF  = RechargWestSurf(M5,M4)
+                  RCHQF  = RechargWestSurf_col(M5,M4)
                 ELSE
                   CYCLE
                 ENDIF
@@ -184,14 +184,14 @@ module IngridTranspMod
               IF(NN.EQ.iFront)THEN          
                 IF(NY.EQ.NVS)THEN             !on the southern boundary
                   M4 = NX;M5 = NY+1;M6 = L
-                  RCHQF  = RechargSouthSurf(M2,M1)
+                  RCHQF  = RechargSouthSurf_col(M2,M1)
                 ELSE
                   CYCLE
                 ENDIF
               ELSEIF(NN.EQ.iBehind)THEN
                 IF(NY.EQ.NVN)THEN      !on the northern boundary
                   M4=NX;M5=NY;M6=L
-                  RCHQF  = RechargNorthSurf(M5,M4)
+                  RCHQF  = RechargNorthSurf_col(M5,M4)
                 ELSE
                   CYCLE
                 ENDIF

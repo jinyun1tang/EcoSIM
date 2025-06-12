@@ -99,8 +99,6 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      TAMX(NY,NX)=-100.0_r8
-      TAMN(NY,NX)=100.0_r8
       HUDX(NY,NX)=0._r8
       HUDN(NY,NX)=100.0_r8
       TWIND(NY,NX)=0._r8

@@ -1,19 +1,19 @@
 module EcoSIMAPI
+  use timings,           only: start_timer,     end_timer
+  use MicBGCAPI,         only: MicrobeModel,   MicAPI_Init,      MicAPI_cleanup
+  use TracerIDMod,       only: ids_NO2B,           ids_NO2,          idg_O2
+  use PerturbationMod,   only: check_Soil_Warming, set_soil_warming, config_soil_warming
+  use ErosionMod,        only: erosion
+  use Hour1Mod,          only: hour1
+  use RedistMod,         only: redist
+  use GeochemAPI,        only: soluteModel
+  use PlantMod,          only: PlantModel
+  use TranspNoSaltMod,   only: TranspNoSalt
+  use TranspSaltMod,     only: TranspSalt
+  use WatsubMod,         only: watsub
+  use PlantMgmtDataType, only: NP
+  use FireMod,           only: config_fire
   USE EcoSIMCtrlDataType
-  use timings,         only: start_timer,        end_timer
-  use ErosionMod,      only: erosion
-  use Hour1Mod,        only: hour1
-  use RedistMod,       only: redist
-  use GeochemAPI,      only: soluteModel
-  use PlantMod,        only: PlantModel
-  use MicBGCAPI,       only: MicrobeModel,       MicAPI_Init,      MicAPI_cleanup
-  use TranspNoSaltMod, only: TranspNoSalt
-  use TranspSaltMod,   only: TranspSalt
-  use SoilBGCDataType, only: trcs_soHml_vr,       trcs_solml_vr
-  use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
-  use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
-  use WatsubMod,       only: watsub
-  use PlantMgmtDataType, only: NP  
   use SoilWaterDataType
   use EcoSIMCtrlMod  
   use BalancesMod  
@@ -151,6 +151,7 @@ contains
   integer :: num_microbial_guilds
   integer :: do_doy,do_year,do_layer
   character(len=64) :: bgc_fname
+  character(len=256):: FireEvents
   real(r8) :: airT_C,Wind_ms,vap_Kpa,Rain_mmhr,SRAD_Wm2,Atm_kPa
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
@@ -160,10 +161,10 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,ldebug_day
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel
 
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -182,7 +183,7 @@ contains
   NPYS         = 20   !number of cycles per NPX for gas flux calculations
 
 
-  ldebug_day  =-1
+  idebug_day  =-1
   NCYC_LITR             = 20
   NCYC_SNOW             = 20
   grid_mode             = 3
@@ -202,6 +203,7 @@ contains
   brnch_retain_casename = .false.
   hist_yrclose          = .false.
   fixWaterLevel         = .false.
+  FireEvents            =''
   forc_periods      = 0
   forc_periods(1:9) = (/1980,1980,1,1981,1988,2,1989,2008,1/)
 
@@ -279,7 +281,7 @@ contains
   endif
 
   call config_soil_warming(warming_exp)
-
+  call config_fire(FireEvents)
   if(fixClime)then
 
     read(nml_buffer, nml=FixClimForc, iostat=nml_error, iomsg=ioerror_msg)
@@ -403,7 +405,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   lverb0 = lverb
   DazCurrYear=etimer%get_days_cur_year()
   DO I=1,DazCurrYear    
-    if(ldebug_day==I)then
+    if(idebug_day==I)then
       lverb=.true.      
     else
       lverb=lverb0

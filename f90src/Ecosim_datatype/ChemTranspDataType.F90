@@ -9,14 +9,13 @@ module ChemTranspDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  real(r8),target,allocatable ::  TScal4Difsvity_vr(:,:,:)                   !temperature effect on diffusivity
-  real(r8),target,allocatable ::  DISP_3D(:,:,:,:)                           !aqueous dispersivity
+  real(r8),target,allocatable ::  TScal4Difsvity_vr(:,:,:)                   !temperature effect on diffusivity [-]
+  real(r8),target,allocatable ::  DISP_3D(:,:,:,:)                           !aqueous dispersivity scalar, [m]
 
-  real(r8),target,allocatable ::  Gas_Disol_Flx_vr(:,:,:,:)                  !Gas dissolution flux
   real(r8),target,allocatable ::  GasDifc_vr(:,:,:,:)                        !gaseous diffusivity [m2 h-1]
   real(r8),target,allocatable ::  SoluteDifusvty_vr(:,:,:,:)                 !solute diffusivity [m2 h-1]
 
-  real(r8),target,allocatable ::  O2AquaDiffusvity(:,:,:)                    !aqueous CO2 diffusivity	m2 h-1
+  real(r8),target,allocatable ::  O2AquaDiffusvity(:,:,:)                    !aqueous CO2 diffusivity	[m2 h-1]
 
   real(r8),target,allocatable ::  DOMdiffusivity_vr(:,:,:,:)                 !aqueous DOC diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WVapDifusvitySoil_vr(:,:,:)                !water vapor diffusivity, [m2 h-1]
@@ -24,9 +23,9 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  VaporDiffusivityLitR_col(:,:)              !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WVapDifusvityAir_col(:,:)                  !water vapor diffusivity, [m2 h-1]
 
-  real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                   !solubility of gases
+  real(r8),target,allocatable ::  GasSolbility_vr(:,:,:,:)                   !solubility of gases [-]
 
-  real(r8),target,allocatable ::  RGasTranspFlxPrev_vr(:,:,:,:)                    !net gaseous flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RGasTranspFlxPrev_vr(:,:,:,:)              !net gaseous flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RCH4PhysexchPrev_vr(:,:,:)                 !net aqueous CH4 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2AquaSourcePrev_vr(:,:,:)                !net aqueous O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  AquaIonDifusivty_vr(:,:,:,:)
@@ -66,8 +65,6 @@ module ChemTranspDataType
   allocate(VaporDiffusivityLitR_col(JY,JX));       VaporDiffusivityLitR_col=0._r8
   allocate(WVapDifusvityAir_col(JY,JX));       WVapDifusvityAir_col=0._r8
   allocate(GasSolbility_vr(idg_beg:idg_end,0:JZ,JY,JX)); GasSolbility_vr=0._r8
-
-  allocate(Gas_Disol_Flx_vr(idg_beg:idg_end,0:JZ,JY,JX)); Gas_Disol_Flx_vr=0._r8
   
   allocate(RCH4PhysexchPrev_vr(0:JZ,JY,JX));  RCH4PhysexchPrev_vr=0._r8
   allocate(RGasTranspFlxPrev_vr(idg_beg:idg_end,0:JZ,JY,JX));  RGasTranspFlxPrev_vr=0._r8

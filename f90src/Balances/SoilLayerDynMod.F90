@@ -7,6 +7,7 @@ module SoilLayerDynMod
   use minimathmod,       only: AZMAX1
   use UnitMod,           only: units
   use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
+  use PlantTraitDataType, only : MY_pft
   use DebugToolMod
   USE RedistDataMod      
   use RootDataType
@@ -1042,7 +1043,7 @@ implicit none
     DO  NZ=1,NP(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        DO N=1,MY(NZ,NY,NX)
+        DO N=1,MY_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1075,7 +1076,7 @@ implicit none
           Root1stRadius_pvr(N,L1,NZ,NY,NX)       = Root1stRadius_pvr(N,L1,NZ,NY,NX)+FX*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_pvr(N,L1,NZ,NY,NX)       = Root2ndRadius_pvr(N,L1,NZ,NY,NX)+FX*Root2ndRadius_pvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)    = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          Root2ndAveLen_pvr(N,L1,NZ,NY,NX)       = Root2ndAveLen_pvr(N,L1,NZ,NY,NX)+FX*Root2ndAveLen_pvr(N,L0,NZ,NY,NX)
+          Root2ndMeanLens_pvr(N,L1,NZ,NY,NX)       = Root2ndMeanLens_pvr(N,L1,NZ,NY,NX)+FX*Root2ndMeanLens_pvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodulStrutElms_rpvr(NE,L1,NZ,NY,NX) = RootNodulStrutElms_rpvr(NE,L1,NZ,NY,NX)+FX*RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)
@@ -1220,7 +1221,7 @@ implicit none
     DO  NZ=1,NP(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        DO  N=1,MY(NZ,NY,NX)
+        DO  N=1,MY_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1249,7 +1250,7 @@ implicit none
           Root1stRadius_pvr(N,L0,NZ,NY,NX)       = FY*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_pvr(N,L0,NZ,NY,NX)       = FY*Root2ndRadius_pvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)    = FY*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          Root2ndAveLen_pvr(N,L0,NZ,NY,NX)       = FY*Root2ndAveLen_pvr(N,L0,NZ,NY,NX)
+          Root2ndMeanLens_pvr(N,L0,NZ,NY,NX)       = FY*Root2ndMeanLens_pvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)=FY*RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)
@@ -1379,7 +1380,7 @@ implicit none
           FRO=AMIN1(0.5,FO*CumSoilThickMidL_vr(L0,NY,NX)/CumSoilThickMidL_vr(L1,NY,NX))
         ENDIF
 
-        DO  N=1,MY(NZ,NY,NX)
+        DO  N=1,MY_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             FXGA                               = FRO*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FXGA
@@ -1466,9 +1467,9 @@ implicit none
           RootAreaPerPlant_pvr(N,L1,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_pvr
           RootAreaPerPlant_pvr(N,L0,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_pvr
 
-          FXRTLGA                          = FRO*Root2ndAveLen_pvr(N,L0,NZ,NY,NX)
-          Root2ndAveLen_pvr(N,L1,NZ,NY,NX) = Root2ndAveLen_pvr(N,L1,NZ,NY,NX)+FXRTLGA
-          Root2ndAveLen_pvr(N,L0,NZ,NY,NX) = Root2ndAveLen_pvr(N,L0,NZ,NY,NX)-FXRTLGA
+          FXRTLGA                          = FRO*Root2ndMeanLens_pvr(N,L0,NZ,NY,NX)
+          Root2ndMeanLens_pvr(N,L1,NZ,NY,NX) = Root2ndMeanLens_pvr(N,L1,NZ,NY,NX)+FXRTLGA
+          Root2ndMeanLens_pvr(N,L0,NZ,NY,NX) = Root2ndMeanLens_pvr(N,L0,NZ,NY,NX)-FXRTLGA
         ENDDO
 !
 !     ROOT NODULES

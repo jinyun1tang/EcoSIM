@@ -14,7 +14,7 @@ module grosubsMod
   use PlantAPIData
   use PhotoSynsMod
   use PlantMathFuncMod
-  use LitrFallMod
+  use LitterFallMod
   use PlantBranchMod
   use PlantBalMod
   implicit none
@@ -27,8 +27,8 @@ module grosubsMod
 !
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
-!     RateConst4ShootSeaStoreNonstXfer=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
-!     RateConst4RootSeaStorNonstXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
+!     RateK4ShootSeaStoreNonstEXfer=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
+!     RateK4RootSeaStorNonstEXfer=rate constant for root-storage nonstructl C,N,P exchange (h-1)
 !     FPART=parameter for allocating nonstructural C to shoot organs
 !     FXSH,FXRT=shoot-root partitioning of storage C during leafout
 !     FRSV=rate constant for remobiln of storage C,N,P during leafout (h-1)
@@ -38,7 +38,6 @@ module grosubsMod
 !     HourFailGrainFill_brchY=number of hours after physiol maturity required for senescence
 !     HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
 !     GVMX=specific oxidation rate of nonstructural C during leafout at 25 C
-!     FracHour4LeafoffRemob=fraction of hours required for leafoff to initiate remobilization
 !
 
   integer  :: curday,curhour
@@ -343,7 +342,6 @@ module grosubsMod
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft              &
   )
 
-
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
     CanopyN2Fix_pft(NZ) = 0._r8
     BegRemoblize        = 0
@@ -378,7 +376,7 @@ module grosubsMod
   call PrintRootTracer(I,J,NZ,'afbiomrm')
 !
 !     RESET DEAD BRANCHES
-  call ResetDeadBranch(I,J,NZ)
+  call ResetDeadPlant(I,J,NZ)
 
   call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
 
@@ -426,15 +424,14 @@ module grosubsMod
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr     ,           &
     RootrNC_pft                 => plt_allom%RootrNC_pft,                 &
     RootrPC_pft                 => plt_allom%RootrPC_pft,                 &
-    FracHour4LeafoffRemob       => plt_allom%FracHour4LeafoffRemob,       &
     FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
     FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr,  &
     FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr,  &
     FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr,       &
-    CNLF                        => plt_allom%CNLF,                        &
-    CPLF                        => plt_allom%CPLF,                        &
-    CNSHE                       => plt_allom%CNSHE,                       &
-    CPSHE                       => plt_allom%CPSHE,                       &
+    CNLF_pft                    => plt_allom%CNLF_pft,                    &
+    CPLF_pft                    => plt_allom%CPLF_pft,                    &
+    CNSHE_pft                   => plt_allom%CNSHE_pft,                   &
+    CPSHE_pft                   => plt_allom%CPSHE_pft,                   &
     rNCStalk_pft                => plt_allom%rNCStalk_pft,                &
     rPCStalk_pft                => plt_allom%rPCStalk_pft,                &
     k_fine_litr                 => pltpar%k_fine_litr,                    &
@@ -442,7 +439,7 @@ module grosubsMod
     RCS                         => plt_photo%RCS,                         &
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr,            &
     Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr,             &
-    MY                          => plt_morph%MY,                          &
+    MY_pft                      => plt_morph%MY_pft,                      &
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft,         &
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft,         &
     NumRootAxes_pft             => plt_morph%NumRootAxes_pft              &
@@ -456,7 +453,7 @@ module grosubsMod
 
 
   D6: DO L=1,NK
-    D9: DO N=1,MY(NZ)    
+    D9: DO N=1,MY_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
       Root1stXNumL_pvr(N,L,NZ)   = 0._r8
       Root2ndXNum_pvr(N,L,NZ)    = 0._r8
@@ -481,24 +478,24 @@ module grosubsMod
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
     .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
-    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
-    FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
-    FracRootElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
+    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
+    FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
+    FracRootElmAlloc2Litr(ielmc,k_fine_litr)      = 1.0_r8
   ELSE
-    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)=1.0_r8
-    FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)=SQRT(CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
-    FracRootElmAlloc2Litr(ielmc,k_fine_litr)=SQRT(FRTX*CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
+    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
+    FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr) = SQRT(CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
+    FracRootElmAlloc2Litr(ielmc,k_fine_litr)      = SQRT(FRTX*CanopyStalkC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))
   ENDIF
 
-  FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)=1.0_r8-FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)
-  FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr)=1.0_r8-FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)
-  FracRootElmAlloc2Litr(ielmc,k_woody_litr)=1.0_r8-FracRootElmAlloc2Litr(ielmc,k_fine_litr)
+  FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr) = 1.0_r8-FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)
+  FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr) = 1.0_r8-FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)
+  FracRootElmAlloc2Litr(ielmc,k_woody_litr)      = 1.0_r8-FracRootElmAlloc2Litr(ielmc,k_fine_litr)
 
-  CNLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CNLF(NZ)
-  CPLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CPLF(NZ)
+  CNLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CNLF_pft(NZ)
+  CPLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CPLF_pft(NZ)
 
-  CNSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CNSHE(NZ)
-  CPSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CPSHE(NZ)
+  CNSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CNSHE_pft(NZ)
+  CPSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*CPSHE_pft(NZ)
 
   CNRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*RootrNC_pft(NZ)
   CPRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*RootrPC_pft(NZ)
@@ -588,7 +585,7 @@ module grosubsMod
 !     begin_execution
   associate(                                                   &
     NU                     => plt_site%NU,                     &
-    MY                     => plt_morph%MY,                    &
+    MY_pft                 => plt_morph%MY_pft,                &
     MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft,      &
     NumRootAxes_pft        => plt_morph%NumRootAxes_pft,       &
     MaxNumRootLays         => plt_site%MaxNumRootLays,         &
@@ -599,7 +596,7 @@ module grosubsMod
   call SumPlantBiom(I,J,NZ,'computotb')
 
   if(lverb)write(*,*)'add the nonstrucal components'
-  D3451: DO N=1,MY(NZ)
+  D3451: DO N=1,MY_pft(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
     enddo
@@ -665,7 +662,7 @@ module grosubsMod
     MaxNumRootLays            => plt_site%MaxNumRootLays,            &
     NU                        => plt_site%NU,                        &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
-    MY                        => plt_morph%MY,                       &
+    MY_pft                    => plt_morph%MY_pft,                   &
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,         &
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft,          &
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch,        &
