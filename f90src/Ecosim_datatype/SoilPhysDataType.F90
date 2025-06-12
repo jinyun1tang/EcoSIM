@@ -7,30 +7,30 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  SLOPE(:,:,:)                              !slope	in four directions [o]
+  real(r8),target,allocatable ::  SLOPE_col(:,:,:)                             !slope	in four directions [o]
   real(r8),target,allocatable ::  FieldCapacity_vr(:,:,:)                      !water contents at field capacity
   real(r8),target,allocatable ::  WiltPoint_vr(:,:,:)                          !water contents at wilting point
   real(r8),target,allocatable ::  SatHydroCondVert_vr(:,:,:)                   !soil vertical saturated hydraulic conductivity [mm h-1]
   real(r8),target,allocatable ::  SatHydroCondHrzn_vr(:,:,:)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
-  real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                      !water potentials at field capacity, [MPa]
-  real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                        !water potentials at wilting point [MPa]
-  real(r8),target,allocatable ::  THW_vr(:,:,:)                              !initial soil water content, [m3 m-3]
-  real(r8),target,allocatable ::  THI_vr(:,:,:)                              !initial ice content, [m3 m-3]
-  REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                        !Surface albedo
-  real(r8),target,allocatable ::  LOGPOROS_vr(:,:,:)                         !log soil porosity	-
-  real(r8),target,allocatable ::  LOGFldCapacity_vr(:,:,:)                   !log water content at field capacity
-  real(r8),target,allocatable ::  LOGWiltPoint_vr(:,:,:)                     !log water content at wilting point
-  real(r8),target,allocatable ::  PSD_vr(:,:,:)                              !log (soil porosity /water content at field capacity)
-  real(r8),target,allocatable ::  FCD_vr(:,:,:)                                 !log water content at field capacity
-  real(r8),target,allocatable ::  SRP_vr(:,:,:)                                 !shape parameter for water desorption
-  real(r8),target,allocatable ::  FSLOPE_2DH(:,:,:)                              !fraction of slope in 1 and 2
-  REAL(R8),target,allocatable ::  VLMicPt0_col(:,:,:)                        !initial total soil micropore porosity	m3 d-2
-  REAL(R8),target,allocatable ::  LOGPSIAtSat(:,:)                         !log water potential at saturation	MPa
-  REAL(R8),target,allocatable ::  LOGPSIFLD(:,:)                         !log water potential at field capacity	-
-  REAL(R8),target,allocatable ::  LOGPSIMN(:,:)                         !log water potential at wilting point
-  REAL(R8),target,allocatable ::  LOGPSIMXD(:,:)                         !log water potential at field capacity 	-
-  REAL(R8),target,allocatable ::  LOGPSIMND(:,:)                         !log water potential at saturation - log water potential at field capacity
-  real(r8),target,allocatable ::  VHeatCapacitySoilM_vr(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
+  real(r8),target,allocatable ::  PSIAtFldCapacity(:,:)                        !water potentials at field capacity, [MPa]
+  real(r8),target,allocatable ::  PSIAtWiltPoint(:,:)                          !water potentials at wilting point [MPa]
+  real(r8),target,allocatable ::  THW_vr(:,:,:)                                !initial soil water content, [m3 m-3]
+  real(r8),target,allocatable ::  THI_vr(:,:,:)                                !initial ice content, [m3 m-3]
+  REAL(R8),target,allocatable ::  SurfAlbedo_col(:,:)                          !Surface albedo,[-]
+  real(r8),target,allocatable ::  LOGPOROS_vr(:,:,:)                          !log soil porosity	[-]
+  real(r8),target,allocatable ::  LOGFldCapacity_vr(:,:,:)                    !log water content at field capacity,[-]
+  real(r8),target,allocatable ::  LOGWiltPoint_vr(:,:,:)                      !log water content at wilting point,[-]
+  real(r8),target,allocatable ::  PSD_vr(:,:,:)                                !log (soil porosity /water content at field capacity),[-]
+  real(r8),target,allocatable ::  FCD_vr(:,:,:)                                 !log water content at field capacity,[-]
+  real(r8),target,allocatable ::  SRP_vr(:,:,:)                                 !shape parameter for water desorption,[-]
+  real(r8),target,allocatable ::  FSLOPE_2DH(:,:,:)                              !fraction of slope in 1 and 2,[-]
+  REAL(R8),target,allocatable ::  VLMicPt0_col(:,:,:)                        !initial total soil micropore porosity,	[m3 d-2]
+  REAL(R8),target,allocatable ::  LOGPSIAtSat(:,:)                         !log water potential at saturation,	[MPa]
+  REAL(R8),target,allocatable ::  LOGPSIFLD(:,:)                         !log water potential at field capacity,	[-]
+  REAL(R8),target,allocatable ::  LOGPSIMN(:,:)                         !log water potential at wilting point,[-]
+  REAL(R8),target,allocatable ::  LOGPSIMXD(:,:)                         !log water potential at field capacity ,[-]
+  REAL(R8),target,allocatable ::  LOGPSIMND(:,:)                         !log water potential at saturation - log water potential at field capacity,[-]
+  real(r8),target,allocatable ::  VHeatCapacitySoilM_vr(:,:,:)                        !soil solid heat capacity, [MPa m-3 K-1]
   real(r8),target,allocatable ::  ActiveLayDepZ_col(:,:)                         !active layer depth, [m]
 !----------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ contains
   subroutine InitSoilPhysData
 
   implicit none
-  allocate(SLOPE(0:3,JY,JX));   SLOPE=0._r8
+  allocate(SLOPE_col(0:3,JY,JX));   SLOPE_col=0._r8
   allocate(FieldCapacity_vr(0:JZ,JY,JX));     FieldCapacity_vr=0._r8
   allocate(WiltPoint_vr(0:JZ,JY,JX));     WiltPoint_vr=0._r8
   allocate(SatHydroCondVert_vr(0:JZ,JY,JX));   SatHydroCondVert_vr=0._r8
@@ -69,7 +69,7 @@ contains
   subroutine DestructSoilPhysData
   use abortutils, only : destroy
   implicit none
-  call destroy(SLOPE)
+  call destroy(SLOPE_col)
   call destroy(FieldCapacity_vr)
   call destroy(WiltPoint_vr)
   call destroy(SatHydroCondVert_vr)

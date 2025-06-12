@@ -57,4 +57,61 @@ implicit none
 
   end subroutine GetRootProfile
 
+!------------------------------------------------------------------------
+
+  subroutine get_LAI_profile(zc,NZ)
+  !Description:
+  !Distribute leaf area in through the canopy
+  !  
+  implicit none
+  real(r8), intent(in) :: ZC  !plant height
+  integer, intent(in) :: NZ   !plant index
+
+  end subroutine get_LAI_profile
+
+
+!------------------------------------------------------------------------
+
+  subroutine get_StemArea_profile(NZ)
+  !
+  !Description:
+  !Distribute steam area in through the canopy
+  !
+  implicit none
+  integer, intent(in) :: NZ   !plant index
+
+
+  end subroutine get_StemArea_profile
+
+!------------------------------------------------------------------------
+
+  function TreeStem_diameter_taperEq(h,p_stump_rate,p_stemp_rate,top_ht_rate,h_dbh,dbh,h_cb,h_top)result(d)
+ 
+  ! Estimate diameter at height h using segment-specific taper rates as in Larsen (2017)
+  implicit none
+ 
+  real(r8), intent(in) :: h             ! - height at which to estimate diameter
+  real(r8), intent(in) :: p_stump_rate  ! - stump taper rate [unitless]
+  real(r8), intent(in) :: p_stemp_rate  ! - stem taper rate  [uitless]
+  real(r8), intent(in) :: top_ht_rate   ! - crown base height/crown length [unitless]
+  real(r8), intent(in) :: h_dbh    ! - breast height [m]
+  real(r8), intent(in) :: dbh      ! - diameter at breast height [m]
+  real(r8), intent(in) :: h_cb     ! - height to crown base [m]
+  real(r8), intent(in) :: h_top    ! - total tree height (real)
+  !Output
+  real(r8) ::   d                  ! - estimated diameter at height h [m]
+  
+  if(h<=h_dbh)then
+    !below breast height
+    d=dbh+p_stump_rate*(h-h_dbh)
+  elseif(h<=h_cb)then
+    !below crown base 
+    d=dbh+p_stemp_rate*(h-h_dbh)  
+  else
+    !above crown base
+    d=(h_top-h)*top_ht_rate
+  endif
+
+  end function TreeStem_diameter_taperEq
+
 end module PrescribePhenolMod

@@ -5,6 +5,7 @@ module readsmod
   use fileUtil,      only: open_safe
   use minimathmod,   only: isLeap, AZMAX1
   use EcoSIMCtrlMod, only: lverb,  salt_model, fixClime
+  use FireMod
   use DebugToolMod
   use GridConsts
   use FlagDataType
@@ -83,7 +84,7 @@ module readsmod
 !
 ! THIS SUBROUTINE read ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
-  use ReadManagementMod, only : ReadManagementFiles
+  use ReadManagementMod, only : ReadManagementFiles,ReadFire
   use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   integer, intent(in) :: yearc   !current model year
@@ -97,6 +98,7 @@ module readsmod
   integer :: LPY,IX
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
+  character(len=12) :: fire_event_entry
   integer :: IDY,IFLG3,I,ICHECK
 
 ! begin_execution
@@ -182,12 +184,12 @@ module readsmod
 !
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
-      ROWSpaceNH4_col(NY,NX)=0.0_r8
-      ROWSpaceNO3_col(NY,NX)=0.0_r8
-      ROWSpacePO4_col(NY,NX)=0.0_r8
+      ROWSpaceNH4_col(NY,NX) = 0.0_r8
+      ROWSpaceNO3_col(NY,NX) = 0.0_r8
+      ROWSpacePO4_col(NY,NX) = 0.0_r8
       D325: DO I=1,366
-        iSoilDisturbType_col(I,NY,NX)=0
-        DepzCorp_col(I,NY,NX)=0.0_r8
+        iSoilDisturbType_col(I,NY,NX) = 0
+        DepzCorp_col(I,NY,NX)         = 0.0_r8
       ENDDO D325
       D40: DO I=1,366
         D45: DO N=1,20
@@ -230,6 +232,9 @@ module readsmod
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
 ! AND FERTILIZER FILES
 !
+  if(use_fire .and. check_fire(yearc,fire_event_entry))then
+    call ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+  endif
   IF(trim(soil_mgmt_in).NE.'NO')THEN
     call ReadManagementFiles(yeari)
   ENDIF

@@ -150,9 +150,8 @@ module AqueChemDatatype
   allocate(TBION_vr(0:JZ,JY,JX));  TBION_vr=0._r8
   allocate(TRChem_gas_NH3_geochem_vr(0:JZ,JY,JX));  TRChem_gas_NH3_geochem_vr=0._r8
   allocate(trcp_RChem_soil_vr(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_RChem_soil_vr=0._r8
-
+  !
   if(salt_model)then
-
     allocate(trcSalt_TransptMicP_3D(idsalt_beg:idsaltb_end,3,0:JD,JV,JH));trcSalt_TransptMicP_3D=0._r8
     allocate(trcSalt_TransptMacP_3D(idsalt_beg:idsaltb_end,3,JD,JV,JH));trcSalt_TransptMacP_3D=0._r8
     allocate(trcSalt_solml_vr(idsalt_beg:idsaltb_end,0:JZ,JY,JX));trcSalt_solml_vr=0._r8
@@ -160,7 +159,7 @@ module AqueChemDatatype
     allocate(trcSaltIonNumber(idsalt_beg:idsaltb_end))
     allocate(trcSalt_soHml_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_soHml_vr=0._r8
     allocate(trcSalt_Mac2MicPore_flx_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));   trcSalt_Mac2MicPore_flx_vr=0._r8
-    allocate(trcSalt_RGeoChem_flx_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_RGeoChem_flx_vr=0._r8
+    allocate(trcSalt_RGeoChem_flx_vr(idsalt_beg:idsaltb_end,JZ,JY,JX));    trcSalt_RGeoChem_flx_vr=0._r8    
   endif
 
   end subroutine InitAllocate

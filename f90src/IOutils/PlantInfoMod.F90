@@ -432,7 +432,7 @@ implicit none
     RadPARLeafTransmis_pft(NZ,NY,NX) = RadPARLeafTransmis_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
     SineBranchAngle_pft(NZ,NY,NX)    = SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
     SinePetioleAngle_pft(NZ,NY,NX)   = SIN(PetioleAngle_pft(NZ,NY,NX)*RadianPerDegree)
-    MatureGroup_pft(NZ,NY,NX)        = GROUPX(NZ,NY,NX)
+    MatureGroup_pft(NZ,NY,NX)        = GROUPX_pft(NZ,NY,NX)
 
     IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
       RefNodeInitRate_pft(NZ,NY,NX)        = RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
@@ -483,7 +483,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'MY', loc, MY(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'MY', loc, MY_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
@@ -510,19 +510,19 @@ implicit none
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
   call ncd_getvar(pft_nfid, 'WDLF', loc,rLen2WidthLeaf_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PB', loc,MinNonstC2InitBranch_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PB', loc,NonstCMinConc2InitBranch_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XTLI', loc,ShootNodeNumAtPlanting_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XDL', loc,CriticPhotoPeriod_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XPPD', loc,PhotoPeriodSens_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SSL1', loc,PetoLen2Mass_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC_pft(NZ,NY,NX))
 
 
-  call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumOfLeafZenithSectors,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
@@ -558,33 +558,33 @@ implicit none
   call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSMX', loc,CuticleResist_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'DMLF', loc,LeafBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMSHE', loc,PetioleBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMSTK', loc,StalkBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMRSV', loc,ReserveBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMHSK', loc,HuskBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMEAR', loc,EarBiomGrowthYield(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'DMGR', loc,GrainBiomGrowthYield(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMLF', loc,LeafBiomGrowthYld_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMSHE', loc,PetioleBiomGrowthYld_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMSTK', loc,StalkBiomGrowthYld_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRSV', loc,ReserveBiomGrowthYld_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMHSK', loc,HuskBiomGrowthYld_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMEAR', loc,EarBiomGrowthYld_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMGR', loc,GrainBiomGrowthYld_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrosYld_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,NoduGrowthYield_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CNSHE', loc,CNSHE(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNSHE', loc,CNSHE_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSTK', loc,rNCStalk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNRSV', loc,rNCReserve_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNHSK', loc,rNCHusk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNEAR', loc,rNCEar_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CNGR', loc,CNGR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNGR', loc,CNGR_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNRT', loc,RootrNC_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNND', loc,NodulerNC_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'CPLF', loc,CPLF(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CPSHE', loc,CPSHE(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPLF', loc,CPLF_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPSHE', loc,CPSHE_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPSTK', loc,rPCStalk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPRSV', loc,rPCReserve_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPHSK', loc,rPCHusk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPEAR', loc,rPCEar_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CPGR', loc,CPGR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPGR', loc,CPGR_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPRT', loc,RootrPC_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPND', loc,NodulerPC_pft(NZ,NY,NX))
 
@@ -757,7 +757,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'Storage organ IRTYP',strval,40)
 
-  select case(MY(NZ,NY,NX))
+  select case(MY_pft(NZ,NY,NX))
   case (1)
     strval='No'
   case (2)
@@ -837,8 +837,8 @@ implicit none
   call writefixl(nu_plt,'Hour requirement for spring leafout VRNLI',VRNLI,70)
   call writefixl(nu_plt,'Hour requirement for autumn leafoff VRNXI',VRNXI,70)
   call writefixl(nu_plt,'Leaf length:width ratio WDLF',rLen2WidthLeaf_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',MinNonstC2InitBranch_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',NonstCMinConc2InitBranch_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Node number at planting XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'Photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
@@ -857,9 +857,9 @@ implicit none
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
   call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC(NZ,NY,NX),70)
+  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC_pft(NZ,NY,NX),70)
   call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
-    CLASS(1:NumOfLeafZenithSectors,NZ,NY,NX),70)
+    LeafAngleClass_pft(1:NumOfLeafZenithSectors,NZ,NY,NX),70)
   call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'stem angle from horizontal ANGBR',BranchAngle_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'petiole angle from horizontal ANGSH',PetioleAngle_pft(NZ,NY,NX),70)
@@ -940,19 +940,19 @@ implicit none
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ORGAN GROWTH YIELDS'
   call writefixl(nu_plt,'leaf dry matter C production vs '// &
-    'nonstructural C consumption (g g-1) DMLF',LeafBiomGrowthYield(NZ,NY,NX),101)
+    'nonstructural C consumption (g g-1) DMLF',LeafBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'petiole dry matter C production vs '// &
-    'nonstructural C consumption (g g-1) DMSHE',PetioleBiomGrowthYield(NZ,NY,NX),101)
+    'nonstructural C consumption (g g-1) DMSHE',PetioleBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'stalk dry matter C production vs '// &
-    'nonstructural C consumption (g g-1) DMSTK',StalkBiomGrowthYield(NZ,NY,NX),101)
+    'nonstructural C consumption (g g-1) DMSTK',StalkBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'stalk reserve C production vs '// &
-    'nonstructural C consumption (g g-1) DMRSV',ReserveBiomGrowthYield(NZ,NY,NX),101)
+    'nonstructural C consumption (g g-1) DMRSV',ReserveBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'husk dry matter C production vs '// &
-    'nonstructural Cconsumption (g g-1) DMHSK',HuskBiomGrowthYield(NZ,NY,NX),101)
+    'nonstructural Cconsumption (g g-1) DMHSK',HuskBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'ear dry matter C production vs '// &
-    'nonstructural Cconsumption (g g-1) DMEAR',EarBiomGrowthYield(NZ,NY,NX),101)
+    'nonstructural Cconsumption (g g-1) DMEAR',EarBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'grain C production vs nonstructural C'// &
-    ' consumption (g g-1) DMGR',GrainBiomGrowthYield(NZ,NY,NX),101)
+    ' consumption (g g-1) DMGR',GrainBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'root dry matter C production vs nonstructural C'// &
     ' consumption (g g-1) DMRT',RootBiomGrosYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'nodule bacteria in root, canopy dry matter '// &
@@ -969,22 +969,22 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
-  call writefixl(nu_plt,'NC ratio in plant leaves (gN/gC) CNLF',CNLF(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant petiole (gN/gC) CNSHE',CNSHE(NZ,NY,NX),70)
+  call writefixl(nu_plt,'NC ratio in plant leaves (gN/gC) CNLF',CNLF_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'NC ratio in plant petiole (gN/gC) CNSHE',CNSHE_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'NC ratio in plant stalk (gN/gC) CNSTK',rNCStalk_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'NC ratio in plant stalk reserve (gN/gC) CNRSV',rNCReserve_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'NC ratio in plant husk (gN/gC) CNHSK',rNCHusk_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'NC ratio in plant ear (gN/gC) CNEAR',rNCEar_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant grain (gN/gC) CNGR',CNGR(NZ,NY,NX),70)
+  call writefixl(nu_plt,'NC ratio in plant grain (gN/gC) CNGR',CNGR_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'NC ratio in plant root (gN/gC) CNRT',RootrNC_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'NC ratio in plant nodule (gN/gC) CNND',NodulerNC_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant leaves (gP/gC) CPLF',CPLF(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant petiole (gP/gC) CPSHE',CPSHE(NZ,NY,NX),70)
+  call writefixl(nu_plt,'PC ratio in plant leaves (gP/gC) CPLF',CPLF_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'PC ratio in plant petiole (gP/gC) CPSHE',CPSHE_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'PC ratio in plant stalk (gP/gC) CPSTK',rPCStalk_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'PC ratio in plant stalk reserve (gP/gC) CPRSV',rPCReserve_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'PC ratio in plant husk (gP/gC) CPHSK',rPCHusk_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'PC ratio in plant ear (gP/gC) CPEAR',rPCEar_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant grain (gP/gC) CPGR',CPGR(NZ,NY,NX),70)
+  call writefixl(nu_plt,'PC ratio in plant grain (gP/gC) CPGR',CPGR_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'PC ratio in plant root (gP/gC) CPRT',RootrPC_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'PC ratio in plant nodule (gP/gC) CPND',NodulerPC_pft(NZ,NY,NX),70)
   end subroutine plant_biomstoich_trait_disp
@@ -1147,7 +1147,7 @@ implicit none
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
-                flag_pft_active(NZ,NY,NX)=.true.
+                flag_active_pft(NZ,NY,NX)=.true.
                 !modify pft name 
                 IF(KoppenClimZone_col(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')KoppenClimZone_col(NY,NX)
@@ -1159,7 +1159,7 @@ implicit none
                 ENDIF
               ENDDO D4965
               if(first_pft)then
-                flag_pft_active(2:NS,NY,NX)=.false.
+                flag_active_pft(2:NS,NY,NX)=.false.
                 NP0(NY,NX)=1
                 NS=1
               endif  

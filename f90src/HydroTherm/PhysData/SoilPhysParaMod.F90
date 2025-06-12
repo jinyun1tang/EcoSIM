@@ -163,15 +163,15 @@ implicit none
     THW_vr(L,NY,NX)           = THW_vr(L-1,NY,NX)
     THI_vr(L,NY,NX)           = THI_vr(L-1,NY,NX)
     ISOIL(1:4,L,NY,NX)        = ISOIL(1:4,L-1,NY,NX)
-    RSC(k_fine_litr,L,NY,NX)  = 0.0_r8
-    RSN(k_fine_litr,L,NY,NX)  = 0.0_r8
-    RSP(k_fine_litr,L,NY,NX)  = 0.0_r8
-    RSC(k_woody_litr,L,NY,NX) = 0.0_r8
-    RSN(k_woody_litr,L,NY,NX) = 0.0_r8
-    RSP(k_woody_litr,L,NY,NX) = 0.0_r8
-    RSC(k_manure,L,NY,NX)     = 0.0_r8
-    RSN(k_manure,L,NY,NX)     = 0.0_r8
-    RSP(k_manure,L,NY,NX)     = 0.0_r8
+    RSC_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
+    RSN_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
+    RSP_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
+    RSC_vr(k_woody_litr,L,NY,NX) = 0.0_r8
+    RSN_vr(k_woody_litr,L,NY,NX) = 0.0_r8
+    RSP_vr(k_woody_litr,L,NY,NX) = 0.0_r8
+    RSC_vr(k_manure,L,NY,NX)     = 0.0_r8
+    RSN_vr(k_manure,L,NY,NX)     = 0.0_r8
+    RSP_vr(k_manure,L,NY,NX)     = 0.0_r8
   ENDDO
   END associate
   end subroutine SetDeepSoil

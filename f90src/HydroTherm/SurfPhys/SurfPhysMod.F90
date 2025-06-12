@@ -999,7 +999,7 @@ contains
     VWatExcess                      = XVLMobileWaterLitR_col(N2,N1)-VWatStoreCapSurf_col(N2,N1)
     WatExcessDetph                  = VWatExcess/AREA(3,0,N2,N1)
     HydraulicRadius                 = WatExcessDetph/2.828_r8
-    CrossSectVelocity               = GaucklerManningVelocity(HydraulicRadius,SLOPE(0,N2,N1))/SoiSurfRoughness(N2,N1)     ![1/s]
+    CrossSectVelocity               = GaucklerManningVelocity(HydraulicRadius,SLOPE_col(0,N2,N1))/SoiSurfRoughness(N2,N1)     ![1/s]
     Q                               = CrossSectVelocity*WatExcessDetph*AREA(3,NUM(N2,N1),N2,N1)*secsphour*dts_HeatWatTP  ![kg/h/d2]
     VLWatMicP1X                     = AZMAX1(VLWatMicP1_vr(0,N2,N1)+LitrIceFlxThaw_col(N2,N1))
     RunoffVelocityM_col(M,N2,N1)    = CrossSectVelocity
@@ -1279,7 +1279,7 @@ contains
 
   ALT1     = Altitude_col(N2,N1)+DPTHW1  
   !linear extrapolation of surface elevation over the grid
-  ALT2     = Altitude_col(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR_3D(N,NUM(N2,N1),N2,N1)
+  ALT2     = Altitude_col(N2,N1)+DPTHW2-XN*SLOPE_col(N,N2,N1)*DLYR_3D(N,NUM(N2,N1),N2,N1)
   PondDepz = CumDepz2LayBottom_vr(NU(N2,N1)-1,N2,N1)-DPTHW1    !can be < 0, if the upper edge of topsoil is at 0 m, 
 
   !write(121,*)'PondDepz=',PondDepz,ExtWaterTable_col(N2,N1)

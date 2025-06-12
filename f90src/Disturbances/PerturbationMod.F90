@@ -7,8 +7,8 @@ module PerturbationMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use MiniMathMod,      only: yearday,             isletter, isLeap
   use ClimForcDataType, only: TKS_ref_vr
-  use GridConsts,       only: JY,                  JX
-  use GridDataType,     only: CumDepz2LayBottom_vr, NU,       NL
+  use GridConsts,       only: JY, JX
+  use GridDataType,     only: CumDepz2LayBottom_vr, NU, NL
   use EcoSimConst  
   implicit none
   private
@@ -55,7 +55,6 @@ module PerturbationMod
   end subroutine destructSoilWarming
 
 !------------------------------------------------------------------------------------------
-
 
   subroutine Extract_year_doy(datestr,year,doy)
   !

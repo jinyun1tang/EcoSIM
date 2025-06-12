@@ -47,7 +47,7 @@ variables:
 		IRTYP:long_name = "storage organ" ;
 		IRTYP:units = "none" ;
 		IRTYP:flags = "0=above ground,1=below ground" ;
-	byte MY(npfts) ;
+	byte MY_pft(npfts) ;
 		MY:long_name = "mycorrhizal" ;
 		MY:units = "none" ;
 		MY:flags = "1=no,2=yes" ;
@@ -125,7 +125,7 @@ variables:
 	float PB(npfts) ;
 		PB:long_name = "nonstructural C concentration needed for branching" ;
 		PB:units = "gC gC-1" ;
-	float GROUPX(npfts) ;
+	float GROUPX_pft(npfts) ;
 		GROUPX:long_name = "initial plant maturity group, aka minimum number of vegetative nodes initiated before floral" ;
 		GROUPX:units = "none" ;
 	float XTLI(npfts) ;
@@ -263,10 +263,10 @@ variables:
 	float DMND(npfts) ;
 		DMND:long_name = "nodule bacteria in root nodule,canopy dry matter C production vs nonstructural C consumption" ;
 		DMND:units = "gC gC-1" ;
-	float CNLF(npfts) ;
+	float CNLF_pft(npfts) ;
 		CNLF:long_name = "NC ratio in plant leaves" ;
 		CNLF:units = "gN gC-1" ;
-	float CNSHE(npfts) ;
+	float CNSHE_pft(npfts) ;
 		CNSHE:long_name = "NC ratio in plant petiole" ;
 		CNSHE:units = "gN gC-1" ;
 	float CNSTK(npfts) ;
@@ -281,7 +281,7 @@ variables:
 	float CNEAR(npfts) ;
 		CNEAR:long_name = "NC ratio in plant ear" ;
 		CNEAR:units = "gN gC-1" ;
-	float CNGR(npfts) ;
+	float CNGR_pft(npfts) ;
 		CNGR:long_name = "NC ratio in plant grain" ;
 		CNGR:units = "gN gC-1" ;
 	float CNRT(npfts) ;
@@ -290,10 +290,10 @@ variables:
 	float CNND(npfts) ;
 		CNND:long_name = "NC ratio in plant nodule" ;
 		CNND:units = "gN gC-1" ;
-	float CPLF(npfts) ;
+	float CPLF_pft(npfts) ;
 		CPLF:long_name = "PC ratio in plant leaves" ;
 		CPLF:units = "gP gC-1" ;
-	float CPSHE(npfts) ;
+	float CPSHE_pft(npfts) ;
 		CPSHE:long_name = "PC ratio in plant petiole" ;
 		CPSHE:units = "gP gC-1" ;
 	float CPSTK(npfts) ;
@@ -308,7 +308,7 @@ variables:
 	float CPEAR(npfts) ;
 		CPEAR:long_name = "PC ratio in plant ear" ;
 		CPEAR:units = "gP gC-1" ;
-	float CPGR(npfts) ;
+	float CPGR_pft(npfts) ;
 		CPGR:long_name = "PC ratio in plant grain" ;
 		CPGR:units = "gP gC-1" ;
 	float CPRT(npfts) ;

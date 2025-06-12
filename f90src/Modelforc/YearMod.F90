@@ -67,7 +67,7 @@
         SedmErossLoss_CumYr_col(NY,NX)    = 0._r8
         H2OLoss_CumYr_col(NY,NX)          = 0._r8
         HydroIonFlx_CumYr_col(NY,NX)      = 0._r8
-        FertNFlx_CumYr_col(NY,NX)         = 0._r8
+        FertN_Flx_CumYr_col(NY,NX)         = 0._r8
         HydroSufDONFlx_CumYr_col(NY,NX)   = 0._r8
         HydroSufDINFlx_CumYr_col(NY,NX)   = 0._r8
         FerPFlx_CumYr_col(NY,NX)          = 0._r8

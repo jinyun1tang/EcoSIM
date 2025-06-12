@@ -366,7 +366,6 @@ module Hour1Mod
   IFLB_2DH                               = -1
   IFLBM_2DH                              = -1
   IFLBSM_2DH                             = -1
-  IFLBS_2DH                              = -1
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 !
@@ -441,8 +440,8 @@ module Hour1Mod
         trcx_Eros_2D(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
         trcp_Eros_2D(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
 
-        OMEERhetr(:,:,:,1:2,1:2,NY,NX) = 0._r8
-        OMEERauto(:,:,1:2,1:2,NY,NX)   = 0._r8
+        OMEERhetr_2D(:,:,:,1:2,1:2,NY,NX) = 0._r8
+        OMEERauto_2D(:,:,1:2,1:2,NY,NX)   = 0._r8
 
         OMBioResdu_Eros_2D(1:NumPlantChemElms,:,:,1:2,1:2,NY,NX) = 0._r8
         SolidOMAct_Eros_2D(:,:,1:2,1:2,NY,NX)                    = 0._r8
@@ -576,8 +575,8 @@ module Hour1Mod
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0._r8
     ENDIF
-    EHUM(L,NY,NX) = 0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(L,NY,NX))
-    EPOC(L,NY,NX) = 1.0_r8
+    EHUM_vr(L,NY,NX) = 0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(L,NY,NX))
+    EPOC_vr(L,NY,NX) = 1.0_r8
 
     call SoilHydroProperty(I,J,L,NY,NX)
 !
@@ -650,7 +649,7 @@ module Hour1Mod
   ENDIF
   VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughnesst0_col(NY,NX)+&
     3.10_r8*SoilSurfRoughnesst0_col(NY,NX)**2._r8 &
-    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
+    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
 
   VWatStoreCapSurf_col(NY,NX)=AMAX1(VLWatHeldCapSurf_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
     CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
@@ -665,8 +664,8 @@ module Hour1Mod
     CSILT(NU(NY,NX),NY,NX)=0._r8
     CSAND_vr(NU(NY,NX),NY,NX)=0._r8
   ENDIF
-  EHUM(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU(NY,NX),NY,NX))
-  EPOC(0,NY,NX)=0.150_r8
+  EHUM_vr(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU(NY,NX),NY,NX))
+  EPOC_vr(0,NY,NX)=0.150_r8
   end subroutine ResetSurfResidualProperty
 !------------------------------------------------------------------------------------------
 
@@ -856,7 +855,6 @@ module Hour1Mod
   TWaterPlantRoot2SoilPrev_vr(1:NL(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)
   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)                                  = 0._r8
   THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
-  Gas_Disol_Flx_vr(idg_beg:idg_end,0:NL(NY,NX),NY,NX)                         = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
   RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)                            = 0._r8
   RainLitr_col(NY,NX)                                                         = 0._r8
@@ -998,8 +996,8 @@ module Hour1Mod
       ZD50                    = 0.041*(ppmc*D50)**0.167_r8
       SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
-        CER(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
-        XER(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
+        CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
+        XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
         print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY_vr(NU(NY,NX),NY,NX)+CORGM) &
@@ -1654,18 +1652,18 @@ module Hour1Mod
     TProd_CO2_geochem_soil_vr(L,NY,NX)          = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 
-    trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)=0._r8
-    trcx_TRSoilChem_vr(idx_OHeB:idx_end,L,NY,NX)=0._r8
+    trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)         = 0._r8
+    trcx_TRSoilChem_vr(idx_OHeB:idx_end,L,NY,NX) = 0._r8
 
-    TRChem_H_p_sorbed_soil_vr(L,NY,NX)       = 0._r8
-    TRChem_Al_sorbed_soil_vr(L,NY,NX)        = 0._r8
+    TRChem_H_p_sorbed_soil_vr(L,NY,NX)    = 0._r8
+    TRChem_Al_sorbed_soil_vr(L,NY,NX)     = 0._r8
     TRChem_Fe_sorbed_soil_vr(L,NY,NX)     = 0._r8
-    TRChem_Ca_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TRChem_Mg_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TRChem_Na_sorbed_soil_vr(L,NY,NX)        = 0._r8
-    TRChem_K_sorbed_soil_vr(L,NY,NX)         = 0._r8
-    TRChem_HCO3_sorbed_soil_vr(L,NY,NX)      = 0._r8
-    TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)    = 0._r8
+    TRChem_Ca_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_Mg_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_Na_sorbed_soil_vr(L,NY,NX)     = 0._r8
+    TRChem_K_sorbed_soil_vr(L,NY,NX)      = 0._r8
+    TRChem_HCO3_sorbed_soil_vr(L,NY,NX)   = 0._r8
+    TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
     TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX) = 0._r8
 
     trcp_RChem_soil_vr(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0._r8
@@ -1674,23 +1672,24 @@ module Hour1Mod
 
     trcs_Mac2MicPore_flx_vr(ids_beg:ids_end,L,NY,NX)=0._r8
 
-    DO NTSA=idsalt_beg,idsaltb_end
-      trcSalt_RGeoChem_flx_vr(NTSA,L,NY,NX)=0._r8
-      trcSalt_Mac2MicPore_flx_vr(NTSA,L,NY,NX)=0._r8
-    ENDDO
-
+    if(salt_model)then
+      DO NTSA=idsalt_beg,idsaltb_end
+        trcSalt_RGeoChem_flx_vr(NTSA,L,NY,NX)=0._r8
+        trcSalt_Mac2MicPore_flx_vr(NTSA,L,NY,NX)=0._r8
+      ENDDO
+    endif
     DO  K=1,jcplx
       DOM_Mac2MicPore_flx_vr(idom_beg:idom_end,K,L,NY,NX)=0._r8
     ENDDO
-    TLIceThawMicP_vr(L,NY,NX)=0._r8
-    TLIceThawMacP_vr(L,NY,NX)=0._r8
-    TLPhaseChangeHeat2Soi_vr(L,NY,NX)=0._r8
-    trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX)=0._r8
-    totRootLenDens_vr(L,NY,NX)=0._r8
+    TLIceThawMicP_vr(L,NY,NX)                = 0._r8
+    TLIceThawMacP_vr(L,NY,NX)                = 0._r8
+    TLPhaseChangeHeat2Soi_vr(L,NY,NX)        = 0._r8
+    totRootLenDens_vr(L,NY,NX)               = 0._r8
+    trcg_ebu_flx_vr(idg_beg:idg_end,L,NY,NX) = 0._r8
 
   ENDDO
-  trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
-  trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
+  trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)      = 0._r8
+  trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   end subroutine ZeroHourlyArrays
 
 !------------------------------------------------------------------------------------------
@@ -1738,8 +1737,8 @@ module Hour1Mod
       VWatLitRHoldCapcity0 = 0._r8
       VLitR0               = 0._r8
       DO K=1, micpar%NumOfLitrCmplxs
-        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0(K,NY,NX)
-        VLitR0               = VLitR0+RC0(K,NY,NX)/BulkDensLitR(K)
+        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0_col(K,NY,NX)
+        VLitR0               = VLitR0+RC0_col(K,NY,NX)/BulkDensLitR(K)
       ENDDO
 
       VWatLitRHoldCapcity_col(NY,NX) = AZMAX1(VWatLitRHoldCapcity0)

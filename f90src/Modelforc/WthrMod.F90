@@ -466,7 +466,7 @@ module WthrMod
             ELSE
               HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone_pft(NZ,NY,NX)
             ENDIF
-            MatureGroup_pft(NZ,NY,NX)=GROUPX(NZ,NY,NX)+0.30_r8*DTA
+            MatureGroup_pft(NZ,NY,NX)=GROUPX_pft(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
               MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)/25.0_r8
             ENDIF
@@ -525,10 +525,8 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD(NY,NX)= &
+      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD_col(NY,NX)= &
         RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
-      TAMX(NY,NX)  = AMAX1(TAMX(NY,NX),TCA_col(NY,NX))          !celcius
-      TAMN(NY,NX)  = AMIN1(TAMN(NY,NX),TCA_col(NY,NX))          !celcius
       HUDX(NY,NX)  = AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
       HUDN(NY,NX)  = AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
       TWIND(NY,NX) = TWIND(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]

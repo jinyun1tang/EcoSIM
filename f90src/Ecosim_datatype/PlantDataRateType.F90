@@ -22,13 +22,12 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootN2Fix_vr(:,:,:)                            !vertical profile of root N2 fixation, [gN d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_col(:,:)                             !root N2 fixation, [gN d-2 h-1]
   real(r8),target,allocatable ::  RootUptkSoiSol_pvr(:,:,:,:,:,:)                 !aqueous H2 flux from roots to soil water, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)               !root uptake of H2PO4 non-band
-  real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)               !root uptake of H2PO4 band
-  real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)               !HPO4 demand in non-band by each root population
-  real(r8),target,allocatable ::  RootH1PO4DmndBand_pvr(:,:,:,:,:)               !HPO4 demand in band by each root population
+  real(r8),target,allocatable ::  RootH2PO4DmndSoil_pvr(:,:,:,:,:)               !root uptake of H2PO4 non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)               !root uptake of H2PO4 band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)               !HPO4 demand in non-band by each root population, [g d-2 h-1]
+  real(r8),target,allocatable ::  RootH1PO4DmndBand_pvr(:,:,:,:,:)               !HPO4 demand in band by each root population, [g d-2 h-1]
   real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)              !element translocated from leaf during senescence, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCZSX(:,:,:,:)                                 !N translocated from sheath during senescence, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCPSX(:,:,:,:)                                 !P translocated from sheath during senescence, [g d-2 h-1]
+
   real(r8),target,allocatable ::  PetioleChemElmRemobFlx_brch(:,:,:,:,:)         !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                         !total gross CO2 fixation, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_CumYr_pft(:,:,:)                   !cumulative total gross CO2 fixation, [g d-2 ]
@@ -40,7 +39,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  LitrfalStrutElms_CumYr_pft(:,:,:,:)            !plant element LitrFall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitrfalStrutElms_pvr(:,:,:,:,:,:,:)            !plant LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !total net primary productivity, [g d-2]
-  real(r8),target,allocatable ::  ETCanopy_CumYr_pft(:,:,:)                      !total transpiration, [m d-2], <0 into atmosphere
+  real(r8),target,allocatable ::  ETCanopy_CumYr_pft(:,:,:)                      !total transpiration  <0 into atmosphere, [m d-2]
   real(r8),target,allocatable ::  CanopyRespC_CumYr_pft(:,:,:)                   !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_pft(:,:,:,:)               !plant element harvest, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmntCum_pft(:,:,:,:)                  !total plant harvest, [g d-2 ]
@@ -75,9 +74,9 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RAutoRootO2Limter_rpvr(:,:,:,:,:)              !O2 constraint to root respiration, []
   real(r8),target,allocatable ::  PlantRootSoilElmNetX_pft(:,:,:,:)              !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  PlantExudElm_CumYr_pft(:,:,:,:)                !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
-  real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake [g d-2]
-  real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake [g d-2]
-  real(r8),target,allocatable ::  TPlantRootH2OUptake_col(:,:)                   !total root H2O uptake [m3 d-2 h-1]
+  real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake, [g d-2]
+  real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake, [g d-2]
+  real(r8),target,allocatable ::  TPlantRootH2OUptake_col(:,:)                   !total root H2O uptake, [m3 d-2 h-1]
   real(r8),target,allocatable ::  TWaterPlantRoot2Soil_vr(:,:,:)                 !current step vertical root water uptake profile, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  TWaterPlantRoot2SoilPrev_vr(:,:,:)             !previous step vertical root water uptake profile, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  THeatLossRoot2Soil_vr(:,:,:)                      !vertically profile of root heat uptake, [MJ d-2]
@@ -120,16 +119,16 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RAcetateEcoDmndK_vr(:,:,:,:)                   !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RAcetateEcoDmndPrev_vr(:,:,:,:)                !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  TRootH2Flx_col(:,:)                            !total root H2 flux, [g d-2]
-  real(r8),target,allocatable ::  RootCO2Autor_vr(:,:,:)                         !root autotrophic respiraiton [gC d-3 hr-1]
-  real(r8),target,allocatable ::  RootCO2Autor_col(:,:)                          !current time step root autotrophic respiraiton [gC d-2 h-1]  
-  real(r8),target,allocatable ::  RootCO2AutorPrev_col(:,:)                      !previous time step root autotrophic respiraiton [gC d-2 h-1]  
-  real(r8),target,allocatable ::  fRootGrowPSISense_pvr(:,:,:,:,:)               !moisture dependence scalar for root growth [none]
-  real(r8),target,allocatable ::  RootCO2Ar2Soil_vr(:,:,:)                       !autotrophic root respiration released to soil [gC d-2 h-1]
-  real(r8),target,allocatable ::  RootCO2Ar2Soil_col(:,:)                        !total autotrophic root respiraiton released to soil [gC d-2 h-1]
-  real(r8),target,allocatable ::  RootCO2Ar2Root_vr(:,:,:)                       !autotrophic root respiration released to root [gC d-2 h-1]
-  real(r8),target,allocatable ::  RootCO2Ar2Root_col(:,:)                        !total autotrophic root respiration released to root [gC d-2 h-1]
-  real(r8),target,allocatable ::  trcs_deadroot2soil_vr(:,:,:,:)                 !gases released to soil due to dying roots ([g d-2 h-1])
-  real(r8),target,allocatable ::  trcs_deadroot2soil_col(:,:,:)                  !gas released to soil due to dying roots [g d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Autor_vr(:,:,:)                         !root autotrophic respiraiton, [gC d-3 hr-1]
+  real(r8),target,allocatable ::  RootCO2Autor_col(:,:)                          !current time step root autotrophic respiraiton, [gC d-2 h-1]  
+  real(r8),target,allocatable ::  RootCO2AutorPrev_col(:,:)                      !previous time step root autotrophic respiraiton, [gC d-2 h-1]  
+  real(r8),target,allocatable ::  fRootGrowPSISense_pvr(:,:,:,:,:)               !moisture dependence scalar for root growth, [-]
+  real(r8),target,allocatable ::  RootCO2Ar2Soil_vr(:,:,:)                       !autotrophic root respiration released to soil, [gC d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Ar2Soil_col(:,:)                        !total autotrophic root respiraiton released to soil, [gC d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Ar2Root_vr(:,:,:)                       !autotrophic root respiration released to root, [gC d-2 h-1]
+  real(r8),target,allocatable ::  RootCO2Ar2Root_col(:,:)                        !total autotrophic root respiration released to root, [gC d-2 h-1]
+  real(r8),target,allocatable ::  trcs_deadroot2soil_vr(:,:,:,:)                 !gases released to soil due to dying roots, ([g d-2 h-1])
+  real(r8),target,allocatable ::  trcs_deadroot2soil_col(:,:,:)                  !gas released to soil due to dying roots, [g d-2 h-1]
   private :: InitAllocate
   contains
 

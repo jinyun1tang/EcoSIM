@@ -13,82 +13,82 @@ module RootDataType
   integer,target,allocatable ::  NumRootAxes_pft(:,:,:)                          !root primary axis number, [-]
   integer,target,allocatable ::  NIXBotRootLayer_rpft(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
-  integer,target,allocatable ::  NIXBotRootLayer_pft(:,:,:)              !maximum soil layer number for all root axes, [-]
-  integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                           !maximum soil layer number for all root axes, [-]
-  real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)            !root biomass per pft
-  real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                        !root growth yield, [g g-1]
-  real(r8),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                          !threshold root nonstructural C content for initiating new root axis, [g g-1]
-  real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)                       !fraction of remobilizable nonstructural biomass in root, [-]
-  real(r8),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                      !root volume:mass ratio, [m3 g-1]
-  real(r8),target,allocatable ::  Root1stMaxRadius1_pft(:,:,:,:)                    !root diameter primary axes, [m]
-  real(r8),target,allocatable ::  Root2ndMaxRadius1_pft(:,:,:,:)                    !root diameter secondary axes, [m]
-  real(r8),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)          !root cross-sectional area primary axes, [m2]
-  real(r8),target,allocatable ::  Root2ndXSecArea_pft(:,:,:,:)                    !root  cross-sectional area  secondary axes, [m2]
-  real(r8),target,allocatable ::  fTgrowRootP_vr(:,:,:,:)                      !root layer temperature growth functiom, [-]
-  real(r8),target,allocatable ::  RootrNC_pft(:,:,:)                        !root N:C ratio, [g g-1]
-  real(r8),target,allocatable ::  RootrPC_pft(:,:,:)                        !root P:C ratio, [g g-1]
+  integer,target,allocatable ::  NIXBotRootLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
+  integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
+  real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
+  real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
+  real(r8),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
+  real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)               !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                   !root volume:mass ratio, [m3 g-1]
+  real(r8),target,allocatable ::  Root1stMaxRadius1_pft(:,:,:,:)                 !root diameter primary axes, [m]
+  real(r8),target,allocatable ::  Root2ndMaxRadius1_pft(:,:,:,:)                 !root diameter secondary axes, [m]
+  real(r8),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)                   !root cross-sectional area primary axes, [m2]
+  real(r8),target,allocatable ::  Root2ndXSecArea_pft(:,:,:,:)                   !root  cross-sectional area  secondary axes, [m2]
+  real(r8),target,allocatable ::  fTgrowRootP_vr(:,:,:,:)                        !root layer temperature growth functiom, [-]
+  real(r8),target,allocatable ::  RootrNC_pft(:,:,:)                             !root N:C ratio, [g g-1]
+  real(r8),target,allocatable ::  RootrPC_pft(:,:,:)                             !root P:C ratio, [g g-1]
   real(r8),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
-  real(r8),target,allocatable ::  RootRadialResist_pft(:,:,:,:)                      !root radial resistivity, [MPa h m-2]
-  real(r8),target,allocatable ::  RootAxialResist_pft(:,:,:,:)                      !root axial resistivity, [MPa h m-4]
-  real(r8),target,allocatable ::  ShutRutNonstElmntConducts_pft(:,:,:)                       !shoot-root rate constant for nonstructural C exchange, [h-1]
-  real(r8),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                    !maximum root NH4 uptake rate, [g m-2 h-1]
-  real(r8),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                    !Km for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  CMinNH4Root_pft(:,:,:,:)                    !minimum NH4 concentration for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  VmaxNO3Root_pft(:,:,:,:)                    !maximum root NO3 uptake rate, [g m-2 h-1]
-  real(r8),target,allocatable ::  KmNO3Root_pft(:,:,:,:)                    !Km for root NO3 uptake, [g m-3]
-  real(r8),target,allocatable ::  CminNO3Root_pft(:,:,:,:)                    !minimum NO3 concentration for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  VmaxPO4Root_pft(:,:,:,:)                    !maximum root PO4 uptake rate, [g m-2 h-1]
-  real(r8),target,allocatable ::  KmPO4Root_pft(:,:,:,:)                    !Km for root PO4 uptake, [g m-3]
-  real(r8),target,allocatable ::  CMinPO4Root_pft(:,:,:,:)                    !minimum PO4 concentration for root NH4 uptake, [g m-3]
-  real(r8),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                     !root internal radius, [m]
-  real(r8),target,allocatable ::  CNRTS_pft(:,:,:)                       !root N:C ratio x root growth yield, [-]
-  real(r8),target,allocatable ::  CPRTS_pft(:,:,:)                       !root P:C ratio x root growth yield, [-]
-  real(r8),target,allocatable ::  RootMycoNonstElms_pft(:,:,:,:,:)
-  real(r8),target,allocatable ::  Root1stMaxRadius_pft(:,:,:,:)                    !maximum radius of primary roots, [m]
-  real(r8),target,allocatable ::  Root2ndMaxRadius_pft(:,:,:,:)                    !maximum radius of secondary roots, [m]
-  real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                        !root brancing frequency, [m-1]
-  real(r8),target,allocatable ::  RootNodulElms_pft(:,:,:,:)            
-  real(r8),target,allocatable ::  RootPoreTortu4Gas(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                   !root layer length per plant, [m p-1]
-  real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
-  real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
-  real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)          !root length density in soil layers, [m m-3]
+  real(r8),target,allocatable ::  RootRadialResist_pft(:,:,:,:)                  !root radial resistivity, [MPa h m-2]
+  real(r8),target,allocatable ::  RootAxialResist_pft(:,:,:,:)                   !root axial resistivity, [MPa h m-4]
+  real(r8),target,allocatable ::  ShutRutNonstElmntConducts_pft(:,:,:)           !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                       !maximum root NH4 uptake rate, [g m-2 h-1]
+  real(r8),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                         !Km for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  CMinNH4Root_pft(:,:,:,:)                       !minimum NH4 concentration for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  VmaxNO3Root_pft(:,:,:,:)                       !maximum root NO3 uptake rate, [g m-2 h-1]
+  real(r8),target,allocatable ::  KmNO3Root_pft(:,:,:,:)                         !Km for root NO3 uptake, [g m-3]
+  real(r8),target,allocatable ::  CminNO3Root_pft(:,:,:,:)                       !minimum NO3 concentration for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  VmaxPO4Root_pft(:,:,:,:)                       !maximum root PO4 uptake rate, [g m-2 h-1]
+  real(r8),target,allocatable ::  KmPO4Root_pft(:,:,:,:)                         !Km for root PO4 uptake, [g m-3]
+  real(r8),target,allocatable ::  CMinPO4Root_pft(:,:,:,:)                       !minimum PO4 concentration for root NH4 uptake, [g m-3]
+  real(r8),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                       !root internal radius, [m]
+  real(r8),target,allocatable ::  CNRTS_pft(:,:,:)                               !root N:C ratio x root growth yield, [-]
+  real(r8),target,allocatable ::  CPRTS_pft(:,:,:)                               !root P:C ratio x root growth yield, [-]
+  real(r8),target,allocatable ::  RootMycoNonstElms_pft(:,:,:,:,:)               !non-structural chemical element in roots,[g d-2]
+  real(r8),target,allocatable ::  Root1stMaxRadius_pft(:,:,:,:)                  !maximum radius of primary roots, [m]
+  real(r8),target,allocatable ::  Root2ndMaxRadius_pft(:,:,:,:)                  !maximum radius of secondary roots, [m]
+  real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                      !root brancing frequency, [m-1]
+  real(r8),target,allocatable ::  RootNodulElms_pft(:,:,:,:)                     !root nodule chemical element, [g d-2]
+  real(r8),target,allocatable ::  RootPoreTortu4Gas_pft(:,:,:,:)                 !root tortuosity to calculate root gaseous diffusivity, [-]
+  real(r8),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)             !root  layer nonstructural element, [g d-2]
+  real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, [m p-1]
+  real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:,:)                   !root layer length primary axes, [m d-2]
+  real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
+  real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
   real(r8),target,allocatable ::  Root1stXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
-  real(r8),target,allocatable ::  Root2ndXNum_pvr(:,:,:,:,:)                    !root layer number axes, [d-2]
+  real(r8),target,allocatable ::  Root2ndXNum_pvr(:,:,:,:,:)                     !root layer number axes, [d-2]
   real(r8),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
-  real(r8),target,allocatable ::  Root2ndAveLen_pvr(:,:,:,:,:)                   !root layer average length, [m]
-  real(r8),target,allocatable ::  RootAreaPerPlant_pvr(:,:,:,:,:)                   !root layer area per plant, [m p-1]
-  real(r8),target,allocatable ::  RootVH2O_pvr(:,:,:,:,:)                   !root layer volume water, [m2 d-2]
+  real(r8),target,allocatable ::  Root2ndMeanLens_pvr(:,:,:,:,:)                 !root layer average length, [m]
+  real(r8),target,allocatable ::  RootAreaPerPlant_pvr(:,:,:,:,:)                !root layer area per plant, [m p-1]
+  real(r8),target,allocatable ::  RootVH2O_pvr(:,:,:,:,:)                        !root layer volume water, [m2 d-2]
   real(r8),target,allocatable ::  Root1stRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
-  real(r8),target,allocatable ::  RootPoreVol_pvr(:,:,:,:,:)                   !root layer volume air, [m2 d-2]
-  real(r8),target,allocatable ::  Root1stDepz_pft(:,:,:,:,:)                   !root layer depth, [m]
+  real(r8),target,allocatable ::  RootPoreVol_pvr(:,:,:,:,:)                     !root layer volume air, [m2 d-2]
+  real(r8),target,allocatable ::  Root1stDepz_pft(:,:,:,:,:)                     !root layer depth, [m]
   real(r8),target,allocatable ::  Root2ndRadius_pvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
-  real(r8),target,allocatable ::  AllPlantRootH2OLoss_vr(:,:,:,:,:)      !root water uptake, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                   !root total water potential , [Mpa]
-  real(r8),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
-  real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                   !root turgor water potential , [Mpa]
-  real(r8),target,allocatable ::  trcg_rootml_pvr(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
-  real(r8),target,allocatable ::  trcs_rootml_pvr(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
+  real(r8),target,allocatable ::  AllPlantRootH2OLoss_pvr(:,:,:,:,:)             !root water uptake, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                         !root total water potential , [Mpa]
+  real(r8),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                      !root osmotic water potential , [Mpa]
+  real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                      !root turgor water potential , [Mpa]
+  real(r8),target,allocatable ::  trcg_rootml_pvr(:,:,:,:,:,:)                   !root gaseous tracer content [g d-2]
+  real(r8),target,allocatable ::  trcs_rootml_pvr(:,:,:,:,:,:)                   !root dissolved gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  TRootGasLossDisturb_col(:,:,:)                 !total root gas content, [g d-2]
-  real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                       !root C per plant, [g p-1]
-  real(r8),target,allocatable ::  RootElms_pft(:,:,:,:)                     !plant root element, [g d-2]
-  real(r8),target,allocatable ::  RootStrutElms_pft(:,:,:,:)                    !plant root structural element, [g d-2]
-  real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                   !root layer protein C, [g d-2]
-  real(r8),target,allocatable ::  RootMyco1stStrutElms_rpvr(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
-  real(r8),target,allocatable ::  RootMyco2ndStrutElms_rpvr(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
-  real(r8),target,allocatable ::   PopuRootMycoC_pvr(:,:,:,:,:)                   !root layer C, [g d-2]
-  real(r8),target,allocatable ::  RootNodulStrutElms_rpvr(:,:,:,:,:)                  !root layer nodule element, [g d-2]
-  real(r8),target,allocatable ::  NodulStrutElms_pft(:,:,:,:)                     !root total nodule mass, [g d-2]
-  real(r8),target,allocatable ::  RootMycoActiveBiomC_pvr(:,:,:,:,:)                   !root layer structural C, [g d-2]
-  real(r8),target,allocatable ::   RootMycoNonstElms_rpvr(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  RootNonstructElmConc_rpvr(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
-  real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
-  real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
-  real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)
-  real(r8),target,allocatable :: RootGasConductance_pvr(:,:,:,:,:,:)       !1/hr
+  real(r8),target,allocatable ::  RootBiomCPerPlant_pft(:,:,:)                   !root C per plant, [g p-1]
+  real(r8),target,allocatable ::  RootElms_pft(:,:,:,:)                          !plant root element, [g d-2]
+  real(r8),target,allocatable ::  RootStrutElms_pft(:,:,:,:)                     !plant root structural element, [g d-2]
+  real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                    !root layer protein C, [g d-2]
+  real(r8),target,allocatable ::  RootMyco1stStrutElms_rpvr(:,:,:,:,:,:,:)       !root layer element primary axes, [g d-2]
+  real(r8),target,allocatable ::  RootMyco2ndStrutElms_rpvr(:,:,:,:,:,:,:)       !root layer element secondary axes, [g d-2]
+  real(r8),target,allocatable ::   PopuRootMycoC_pvr(:,:,:,:,:)                  !root layer C, [g d-2]
+  real(r8),target,allocatable ::  RootNodulStrutElms_rpvr(:,:,:,:,:)             !root layer nodule element, [g d-2]
+  real(r8),target,allocatable ::  NodulStrutElms_pft(:,:,:,:)                    !root total nodule mass, [g d-2]
+  real(r8),target,allocatable ::  RootMycoActiveBiomC_pvr(:,:,:,:,:)             !root layer structural C, [g d-2]
+  real(r8),target,allocatable ::   RootMycoNonstElms_rpvr(:,:,:,:,:,:)           !root  layer nonstructural element, [g d-2]
+  real(r8),target,allocatable ::  RootNonstructElmConc_rpvr(:,:,:,:,:,:)         !root  layer nonstructural element concentration, [g g-1]
+  real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)               !root C primary axes, [g d-2]
+  real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                !root layer protein C concentration, [g g-1]
+  real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)                         !root chemical element mass in soil layer, [g d-2]
+  real(r8),target,allocatable :: RootGasConductance_pvr(:,:,:,:,:,:)             !Root Conductance for gas uptake, [m3 d-2 h-1]
 !----------------------------------------------------------------------
 
 contains
@@ -137,7 +137,7 @@ contains
   allocate(Root1stMaxRadius_pft(jroots,JP,JY,JX)); Root1stMaxRadius_pft=0._r8
   allocate(Root2ndMaxRadius_pft(jroots,JP,JY,JX)); Root2ndMaxRadius_pft=0._r8
   allocate(RootBranchFreq_pft(JP,JY,JX));     RootBranchFreq_pft=0._r8
-  allocate(RootPoreTortu4Gas(jroots,JP,JY,JX));  RootPoreTortu4Gas=0._r8
+  allocate(RootPoreTortu4Gas_pft(jroots,JP,JY,JX));  RootPoreTortu4Gas_pft=0._r8
   allocate(RootNodulNonstElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_rpvr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
   allocate(Root1stLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root1stLen_rpvr=0._r8
@@ -146,7 +146,7 @@ contains
   allocate(Root1stXNumL_pvr(jroots,JZ,JP,JY,JX));Root1stXNumL_pvr=0._r8
   allocate(Root2ndXNum_pvr(jroots,JZ,JP,JY,JX));Root2ndXNum_pvr=0._r8
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._r8
-  allocate(Root2ndAveLen_pvr(jroots,JZ,JP,JY,JX));Root2ndAveLen_pvr=0._r8
+  allocate(Root2ndMeanLens_pvr(jroots,JZ,JP,JY,JX));Root2ndMeanLens_pvr=0._r8
   allocate(RootAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootAreaPerPlant_pvr=0._r8
   allocate(RootVH2O_pvr(jroots,JZ,JP,JY,JX));RootVH2O_pvr=0._r8
   allocate(Root1stRadius_pvr(jroots,JZ,JP,JY,JX));Root1stRadius_pvr=0._r8
@@ -155,7 +155,7 @@ contains
   allocate(Root2ndRadius_pvr(jroots,JZ,JP,JY,JX));Root2ndRadius_pvr=0._r8
   allocate(Root1stSpecLen_pft(jroots,JP,JY,JX)); Root1stSpecLen_pft=0._r8
   allocate(Root2ndSpecLen_pft(jroots,JP,JY,JX)); Root2ndSpecLen_pft=0._r8
-  allocate(AllPlantRootH2OLoss_vr(jroots,JZ,JP,JY,JX));AllPlantRootH2OLoss_vr=0._r8
+  allocate(AllPlantRootH2OLoss_pvr(jroots,JZ,JP,JY,JX));AllPlantRootH2OLoss_pvr=0._r8
   allocate(PSIRoot_pvr(jroots,JZ,JP,JY,JX));PSIRoot_pvr=0._r8
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._r8
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._r8
@@ -222,7 +222,7 @@ contains
   call destroy(Root1stMaxRadius_pft)
   call destroy(Root2ndMaxRadius_pft)
   call destroy(RootBranchFreq_pft)
-  call destroy(RootPoreTortu4Gas)
+  call destroy(RootPoreTortu4Gas_pft)
   call destroy(RootNodulNonstElms_rpvr)
   call destroy(RootLenPerPlant_pvr)
   call destroy(Root1stLen_rpvr)
@@ -231,7 +231,7 @@ contains
   call destroy(Root1stXNumL_pvr)
   call destroy(Root2ndXNum_pvr)
   call destroy(Root2ndXNum_rpvr)
-  call destroy(Root2ndAveLen_pvr)
+  call destroy(Root2ndMeanLens_pvr)
   call destroy(RootAreaPerPlant_pvr)
   call destroy(RootVH2O_pvr)
   call destroy(Root1stRadius_pvr)
@@ -241,7 +241,7 @@ contains
   call destroy(Root1stSpecLen_pft)
   call destroy(Root2ndSpecLen_pft)
   call destroy(RootNodulElms_pft)
-  call destroy(AllPlantRootH2OLoss_vr)
+  call destroy(AllPlantRootH2OLoss_pvr)
   call destroy(PSIRoot_pvr)
   call destroy(PSIRootOSMO_vr)
   call destroy(PSIRootTurg_vr)

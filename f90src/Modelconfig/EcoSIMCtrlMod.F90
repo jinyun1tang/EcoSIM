@@ -8,7 +8,7 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
    __FILE__  
-  integer :: ldebug_day  = -1 
+  integer :: idebug_day  = -1         !specify the day being debugged
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
   logical :: first_topou   = .false.  !only simulate first topo unit
@@ -21,6 +21,7 @@ implicit none
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
   logical :: fixWaterLevel     =.false.
+  logical :: ldo_sp_mode        =.false.  !do satellite phenology mode
   integer :: yearf1       !first year of daily climate forcing
   integer :: yearf2       !first year of hourly climate forcing
   integer :: nyeardal1    !number of daily climate forcing

@@ -192,7 +192,7 @@ implicit none
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)+OMEERhetr(NE,MID,K,N,NN,N2,N1)
+                  TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)+OMEERhetr_2D(NE,MID,K,N,NN,N2,N1)
                 ENDDO  
               enddo
             enddo
@@ -204,7 +204,7 @@ implicit none
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms
-                TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)+OMEERauto(NE,MID,N,NN,N2,N1)
+                TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)+OMEERauto_2D(NE,MID,N,NN,N2,N1)
               ENDDO  
             enddo
           enddo
@@ -256,7 +256,7 @@ implicit none
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
                   DO NE=1,NumPlantChemElms
-                    TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)-OMEERhetr(NE,MID,K,N,NN,N5,N4)
+                    TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)-OMEERhetr_2D(NE,MID,K,N,NN,N5,N4)
                   ENDDO  
                 enddo
               enddo
@@ -268,7 +268,7 @@ implicit none
               DO NGL=JGniA(NO),JGnfA(NO)
                 MID=micpar%get_micb_id(M,NGL)   
                 DO NE=1,NumPlantChemElms         
-                  TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)-OMEERauto(NE,MID,N,NN,N5,N4)
+                  TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)-OMEERauto_2D(NE,MID,N,NN,N5,N4)
                 ENDDO  
               enddo
             enddo
@@ -322,7 +322,7 @@ implicit none
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)    
                   DO NE=1,NumPlantChemElms            
-                    TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)-OMEERhetr(NE,MID,K,N,NN,N5B,N4B)
+                    TOMEERhetr_col(NE,MID,K,N2,N1)=TOMEERhetr_col(NE,MID,K,N2,N1)-OMEERhetr_2D(NE,MID,K,N,NN,N5B,N4B)
                   ENDDO  
                 enddo
               enddo
@@ -334,7 +334,7 @@ implicit none
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)      
                 DO NE=1,NumPlantChemElms        
-                  TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)-OMEERauto(NE,MID,N,NN,N5B,N4B)
+                  TOMEERauto_col(NE,MID,N2,N1)=TOMEERauto_col(NE,MID,N2,N1)-OMEERauto_2D(NE,MID,N,NN,N5B,N4B)
                 ENDDO  
               enddo
             enddo

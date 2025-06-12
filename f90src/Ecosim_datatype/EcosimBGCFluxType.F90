@@ -30,11 +30,11 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                               !total net CO2 fixation
   real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                      !total LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  ECO_ER_col(:,:)                                   !ecosystem respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  Eco_NBP_CumYr_col(:,:)                            !total NBP, [g d-2]
-  real(r8),target,allocatable ::  REcoH1PO4DmndSoil_vr(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                   !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  REcoH1PO4DmndBand_vr(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                   !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  Eco_NBP_CumYr_col(:,:)                            !cumulative NBP, [g d-2]
+  real(r8),target,allocatable ::  REcoH1PO4DmndSoil_vr(:,:,:)                       !Current HPO4 demand in non-band by all microbial,root,myco populations, [gN d-2 h-1]
+  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                   !previous time step HPO4 demand in non-band by all microbial,root,myco populations, [gN d-2 h-1]
+  real(r8),target,allocatable ::  REcoH1PO4DmndBand_vr(:,:,:)                       !Current HPO4 demand in band by all microbial,root,myco populations, [gN d-2 h-1]
+  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                   !Previous time step HPO4 demand in band by all microbial,root,myco populations, [gN d-2 h-1]
 !----------------------------------------------------------------------
 
 contains

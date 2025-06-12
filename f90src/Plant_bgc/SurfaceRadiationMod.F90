@@ -30,7 +30,7 @@ module SurfaceRadiationMod
   real(r8) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
   real(r8) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    
 
-  call DivideCanopyDepthByLAI(I,J,DepthSurfWatIce)
+  call DivideCanopyAIByHeight(I,J,DepthSurfWatIce)
 
   call SummaryCanopyArea(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
@@ -51,7 +51,7 @@ module SurfaceRadiationMod
   REAL(R8) :: ZZ
 !     begin_execution
   associate(                                                     &
-    WindSpeedAtm_col        => plt_site%WindSpeedAtm_col,        & !input:
+    WindSpeedAtm_col        => plt_site%WindSpeedAtm_col,        & !Input:
     WindMesureHeight_col    => plt_site%WindMesureHeight_col,    &  !Input:
     ZERO                    => plt_site%ZERO,                    &
     AREA3                   => plt_site%AREA3,                   &
@@ -119,7 +119,7 @@ module SurfaceRadiationMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DivideCanopyDepthByLAI(I,J,DepthSurfWatIce)
+  subroutine DivideCanopyAIByHeight(I,J,DepthSurfWatIce)
   implicit none
   integer, intent(in) :: I,J
   real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice thickness above soil surface  
@@ -131,14 +131,14 @@ module SurfaceRadiationMod
   integer :: NZ,L,K,NB,N
   !     begin_execution
   associate(                                                  &
-    NP                    => plt_site%NP,                     &
-    ZEROS                 => plt_site%ZEROS,                  &
-    CanopyHeight_col      => plt_morph%CanopyHeight_col,      &
-    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     &
+    NP                    => plt_site%NP,                     & !Input: Number of pfts [m]
+    ZEROS                 => plt_site%ZEROS,                  & !Input: Auxiallary variable for threshold testing.
+    CanopyHeight_col      => plt_morph%CanopyHeight_col,      & 
+    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     & !Input: pft Canopy height [m]
     CanopyHeight_pft      => plt_morph%CanopyHeight_pft,      &
     CanopyStemAareZ_col   => plt_morph%CanopyStemAareZ_col,   &
-    CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   &
-    StemArea_col          => plt_morph%StemArea_col,          &
+    CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   & !Input: vertically resolved Canopy LAI [m2/m2]
+    StemArea_col          => plt_morph%StemArea_col,          & !Input: vertically resolved stem LAI [m2/m2]
     CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col     &
   )
   !
@@ -185,30 +185,33 @@ module SurfaceRadiationMod
 
 
   end associate
-  end subroutine DivideCanopyDepthByLAI
+  end subroutine DivideCanopyAIByHeight
 
 !------------------------------------------------------------------------------------------
 
   subroutine SummaryCanopyArea(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  !
+  !Description:
+  !Summarize canopy leaf and steam area
   implicit none
   integer , intent(in) :: I,J
   real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice thickness above soil surface  
   integer :: NZ,NB,L,K,N
-  real(r8), intent(out) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
-  real(r8), intent(out) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    
+  real(r8), intent(out) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    !leaf area in different angle sector
+  real(r8), intent(out) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    !stem area in different angle sector
 
   associate(                                                  &
     NP                    => plt_site%NP,                     &
-    ZERO                  => plt_site%ZERO,                   &    
-    SnowDepth             => plt_ew%SnowDepth,                &    
+    ZERO                  => plt_site%ZERO,                   &
+    SnowDepth             => plt_ew%SnowDepth,                &
     LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft,     &
-    NumOfBranches_pft     => plt_morph%NumOfBranches_pft,     &        
-    LeafStalkArea_col     => plt_morph%LeafStalkArea_col,     &
-    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch,     &    
-    CanopyLeafArea_lpft   => plt_morph%CanopyLeafArea_lpft,   &
-    StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch,     &    
+    NumOfBranches_pft     => plt_morph%NumOfBranches_pft,     &  !Output: PFT canopy LAI
+    LeafStalkArea_col     => plt_morph%LeafStalkArea_col,     &  !Output: COL canopy LAI
+    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch,     &  !Input:
+    CanopyLeafArea_lnode  => plt_morph%CanopyLeafArea_lnode,  &  !Input:
+    StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch,     &  !Input:
     CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch, &
-    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col      &    
+    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col      &
   )
   
   LeafStalkArea_col=0.0_r8
@@ -223,20 +226,12 @@ module SurfaceRadiationMod
           !above snow depth and above water/ice surface
           !add all nodes over a branch
           D1130: DO K=1,MaxNodesPerBranch1
-            LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lpft(L,K,NB,NZ)
-            LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lpft(L,K,NB,NZ)
+            LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyLeafArea_lnode(L,K,NB,NZ)
+            LeafStalkArea_col     = LeafStalkArea_col+CanopyLeafArea_lnode(L,K,NB,NZ)
             
-!            if(LeafStalkArea_pft(NZ)>1.e10)then                      
-!              write(*,*)L,K,NB,NZ,'CanopyLeafArea_lpft(L,K,NB,NZ)',CanopyLeafArea_lpft(1,25,1,1)
-!              stop
-!            endif
           ENDDO D1130
           !add stem/stalk area
           LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
-!          if(LeafStalkArea_pft(NZ)>1.e10)then          
-!            write(*,*)L,NB,NZ,'CanopyStalkArea_lbrch(L,NB,NZ)',CanopyStalkArea_lbrch(L,NB,NZ)
-!            stop
-!          endif
           LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
         ENDIF
       enddo
@@ -246,7 +241,7 @@ module SurfaceRadiationMod
       stop
     endif  
   ENDDO D1135
-
+  !summarize branches into different angle/depth classes
   D1150: DO NZ=1,NP
     DO  L=1,NumOfCanopyLayers1
       DO  N=1,NumOfLeafZenithSectors1
@@ -300,8 +295,8 @@ module SurfaceRadiationMod
     GroundSurfAzimuth_col  => plt_rad%GroundSurfAzimuth_col,   & !in:   
     TotSineSkyAngles_grd   => plt_rad%TotSineSkyAngles_grd,    & !in:    
     OMEGAG                 => plt_rad%OMEGAG,                  & !in:     
-    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,       &    
-    SolarNoonHour_col      => plt_site%SolarNoonHour_col,      & !input:    
+    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,       & !   
+    SolarNoonHour_col      => plt_site%SolarNoonHour_col,      & !Input:    
     RadSWDirect_col        => plt_rad%RadSWDirect_col,         & !inout: incident direct sw radiation,  MJ/hour/m2  
     RadSWDiffus_col        => plt_rad%RadSWDiffus_col,         & !inout: incident diffuse sw radiation, MJ/hour/m2    
     RadPARDirect_col       => plt_rad%RadPARDirect_col,        & !inout: umol /m2/s    
@@ -309,15 +304,15 @@ module SurfaceRadiationMod
     RadSWSolarBeam_col     => plt_rad%RadSWSolarBeam_col,      & !out  : total shortwave solar radiation,     MJ/hour/m2  
     RadPARSolarBeam_col    => plt_rad%RadPARSolarBeam_col,     &        
     RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,      & !out:     
-    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    & !input: sine of solar incident angle
+    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    & !Input: sine of solar incident angle
     FracPARads2Canopy_pft  => plt_rad%FracPARads2Canopy_pft,   &  
     FracSWRad2Grnd_col     => plt_rad%FracSWRad2Grnd_col,      & !out
     RadSWGrnd_col          => plt_rad%RadSWGrnd_col,           &  !output: total shortwave radiation on ground, MJ/hour/d2    
     ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &        
     CanopyLeafArea_pft     => plt_morph%CanopyLeafArea_pft,    &  !in:     
     LeafStalkArea_pft      => plt_morph%LeafStalkArea_pft,     &  !in:      
-    ClumpFactor_pft        => plt_morph%ClumpFactor_pft  ,     &  !input:       
-    LeafStalkArea_col      => plt_morph%LeafStalkArea_col      &  !input:    
+    ClumpFactor_pft        => plt_morph%ClumpFactor_pft  ,     &  !Input:       
+    LeafStalkArea_col      => plt_morph%LeafStalkArea_col      &  !Input:    
   )
   !     MULTILAYER CANOPY INTERECEPTION OF DIRECT AND DIFFUSE RADIATION
   !     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
@@ -326,7 +321,7 @@ module SurfaceRadiationMod
   !     LeafStalkArea_pft,LeafStalkArea_col=leaf+stalk area of combined,each PFT canopy
   !     ZL=height to bottom of canopy layer
   !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-  !     CanopyLeafArea_lpft,CanopyStalkArea_lbrch=leaf,stalk areas of PFT
+  !     CanopyLeafArea_lnode,CanopyStalkArea_lbrch=leaf,stalk areas of PFT
   !     RAD,RadPARSolarBeam_col=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,RadPARDiffus_col=solar beam direct,diffuse SW,PAR
   !     SineSunInclAngle_col,TotSineSkyAngles_grd=sine of solar,sky angles
@@ -362,10 +357,10 @@ module SurfaceRadiationMod
   !     0.2618=pi/12 (hrs), 4.7124=1.5*pi=270 degree
   IF(SineSunInclAngle_col.GT.ZERO)THEN
     !the solar azimuth angle is computed according to north hemisphere,
-    SolarAzimuthAngle  = PICON*(SolarNoonHour_col-J)/12._r8+1.5_r8*PICON
-    CosineSunInclAngle = SQRT(1.0_r8-SineSunInclAngle_col**2._r8)
-    DGAZI                  = COS(GroundSurfAzimuth_col-SolarAzimuthAngle)
-    GrndIncidSolarAngle    = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col*SineSunInclAngle_col+&
+    SolarAzimuthAngle   = PICON*(SolarNoonHour_col-J)/12._r8+1.5_r8*PICON
+    CosineSunInclAngle  = SQRT(1.0_r8-SineSunInclAngle_col**2._r8)
+    DGAZI               = COS(GroundSurfAzimuth_col-SolarAzimuthAngle)
+    GrndIncidSolarAngle = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col*SineSunInclAngle_col+&
       SineGrndSlope_col*CosineSunInclAngle*DGAZI))
 
     !when there is canopy
@@ -375,8 +370,8 @@ module SurfaceRadiationMod
         SolarAzimuthAngle,CosineSunInclAngle,GrndIncidSolarAngle)
 
       !     RADIATION AT GROUND SURFACE IF NO CANOPY
-
     ELSE
+      !plug in lake radiation below
       RadSW_Grnd=ABS(GrndIncidSolarAngle)*RadSWDirect_col
       D120: DO N=1,NumOfSkyAzimuthSects1
         RadSW_Grnd=RadSW_Grnd+ABS(OMEGAG(N))*RadSWDiffus_col
@@ -387,9 +382,9 @@ module SurfaceRadiationMod
         RadPARbyCanopy_pft(NZ) = 0.0_r8
       ENDDO D135
     ENDIF
-!
+    !
     !     IF NO RADIATION
-!
+    !
   ELSE
     RadSWGrnd_col=0.0_r8
     D125: DO NZ=1,NP
@@ -512,21 +507,21 @@ module SurfaceRadiationMod
     OMEGAG                 => plt_rad%OMEGAG,                  &
     OMEGX                  => plt_rad%OMEGX,                   &
     RadSWGrnd_col          => plt_rad%RadSWGrnd_col,           &  !output: total shortwave radiation on ground, MJ/hour/d2
-    RadSWDirect_col        => plt_rad%RadSWDirect_col,         &  !input: incident direct sw radiation,  MJ/hour/m2
-    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,         &  !input: incident diffuse sw radiation, MJ/hour/m2
+    RadSWDirect_col        => plt_rad%RadSWDirect_col,         &  !Input: incident direct sw radiation,  MJ/hour/m2
+    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,         &  !Input: incident diffuse sw radiation, MJ/hour/m2
     RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,       &
-    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,        & !input: umol /m2/s
-    RadPARDirect_col       => plt_rad%RadPARDirect_col,        & !input: umol /m2/s
-    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    & !input: 
+    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,        & !Input: umol /m2/s
+    RadPARDirect_col       => plt_rad%RadPARDirect_col,        & !Input: umol /m2/s
+    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    & !Input: 
     TAU_RadThru            => plt_rad%TAU_RadThru,             &
     TAU_DirectRTransmit       => plt_rad%TAU_DirectRTransmit,        &
-    SineLeafAngle          => plt_rad%SineLeafAngle,           & !input:
+    SineLeafAngle          => plt_rad%SineLeafAngle,           & !Input:
     LeafPARabsorpty_pft    => plt_rad%LeafPARabsorpty_pft,     & !: PAR absorbed by whole pft
     LeafSWabsorpty_pft     => plt_rad%LeafSWabsorpty_pft,      & !: shortwave radiation intercepted by whole pft
     RadPARLeafTransmis_pft => plt_rad%RadPARLeafTransmis_pft,  &
     RadSWLeafTransmis_pft  => plt_rad%RadSWLeafTransmis_pft,   &
     RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,      &
-    CosineLeafAngle        => plt_rad%CosineLeafAngle,         & !input:
+    CosineLeafAngle        => plt_rad%CosineLeafAngle,         & !Input:
     NU                     => plt_site%NU,                     &
     AREA3                  => plt_site%AREA3,                  &
     NP                     => plt_site%NP,                     &
@@ -539,7 +534,7 @@ module SurfaceRadiationMod
     ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &
     CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,     &
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft,     &
-    CanopyLeafArea_lpft    => plt_morph%CanopyLeafArea_lpft,   &
+    CanopyLeafArea_lnode    => plt_morph%CanopyLeafArea_lnode,   &
     CanopyStalkArea_lbrch  => plt_morph%CanopyStalkArea_lbrch  &
   )
 

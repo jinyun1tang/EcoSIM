@@ -90,6 +90,23 @@ def read_fert_file(ifile,mfname,nc_fid):
             line=infile.readline().strip()
             k1=k1+1
 
+def read_irrig_file(ifile,mfname,nc_fid):
+    """
+    read irrigation file
+    """
+    print('file=%s,mfname=%s\n'%(ifile,mfname))
+    with open(ifile,"r") as infile:
+        line=infile.readline().strip()
+        for k1 in range(24):
+            nc_fid.variables[mfname][k1,:]=' '*128
+        k1=0
+        while line:
+            sarr1=strtool.string2arr(line)
+            len1=len(sarr1)
+            nc_fid.variables[mfname][k1,0:len1]=sarr1
+            line=infile.readline().strip()
+            k1=k1+1
+    
 def read_till_file(ifile,mfname,nc_fid):        
     """
     read tillage file
@@ -132,6 +149,9 @@ def write_soil_mgmt(config_dict):
     nc_fid.createDimension('nchart', 24)
     nc_fid.createDimension('ntill', 12)
     nc_fid.createDimension('nfert', 12)
+    nc_fid.createDimension('nfire', 12)    
+    nc_fid.createDimension('nirri', 24)    
+    nc_fid.createDimension('nchari', 128)
     nc_fid.createDimension('ncharf', 128)
     nc_fid.createDimension('year', None)
 
@@ -162,7 +182,6 @@ def write_soil_mgmt(config_dict):
 
     w_nc_var = nc_fid.createVariable('irrigf', 'S1', ('year','ntopou','nchar1'))
     w_nc_var.long_name='Irrigation info for a topo unit'
-
 
     if case=='dryland':
         w_nc_var=nc_fid.createVariable('me01t', 'S1', ('ntill','nchart'))
@@ -248,27 +267,27 @@ def write_soil_mgmt(config_dict):
             nc_fid.variables['tillf'][jj,:,0:2]=[['N','O'],['N','O']]
             nc_fid.variables['irrigf'][jj,:,0:2]=[['N','O'],['N','O']]
     else:
+
+        if 'NH1' in config_dict:
+            nc_fid.variables['NH1'][:]=config_dict['NH1']
+        if 'NV1' in config_dict:
+            nc_fid.variables['NV1'][:]=config_dict['NV1']
+        if 'NH2' in config_dict:
+            nc_fid.variables['NH2'][:]=config_dict['NH2']
+        if 'NV2' in config_dict:
+            nc_fid.variables['NV2'][:]=config_dict['NV2']
+        
         if 'mefile' in config_dict and 'years' in config_dict:
             yearstr=config_dict['years']
             year1=int(yearstr[0:4])
             year2=int(yearstr[5:])+1
             mefile=config_dict['mefile']
             nc_fid.variables['year'][:]=range(year1,year2)
-            if 'NH1' in config_dict:
-                nc_fid.variables['NH1'][:]=config_dict['NH1']
-            if 'NV1' in config_dict:
-                nc_fid.variables['NV1'][:]=config_dict['NV1']
-            if 'NH2' in config_dict:
-                nc_fid.variables['NH2'][:]=config_dict['NH2']
-            if 'NV2' in config_dict:
-                nc_fid.variables['NV2'][:]=config_dict['NV2']
-
             
             for year in range(year1,year2):
                 jj=year-year1
                 fsmgmt=mdir+mefile.replace('xxxx', str(year))
-                print('read file %s'%fsmgmt)
-                
+                print('read file %s'%fsmgmt)       
                 with open(fsmgmt,"r") as infile:
                     ntopo=0
                     while True:
@@ -311,7 +330,7 @@ def write_soil_mgmt(config_dict):
                                 nc_fid.variables['fertf'][jj,ng,ic]=fnms[1][ic]
                             ifile=mdir+fnms[1]
                             w_nc_var=nc_fid.createVariable(fnms[1], 'S1', ('nfert','ncharf'))
-                            w_nc_var.long_name='fertilization file'                            
+                            w_nc_var.long_name='Fertilization file'                            
                             read_fert_file(ifile,fnms[1],nc_fid)    
                         #irrigation
                         if fnms[2] == 'NO':
@@ -319,10 +338,52 @@ def write_soil_mgmt(config_dict):
                         else:                            
                             for ic in range(len(fnms[2])):                                
                                 nc_fid.variables['irrigf'][jj,ng,ic]=fnms[2][ic]
-                                
-                        
+                            ifile=mdir+fnms[2]
+                            w_nc_var=nc_fid.createVariable(fnms[2], 'S1', ('nirri','nchari'))
+                            w_nc_var.long_name='Irrigation file'                            
+                            read_irrig_file(ifile,fnms[2],nc_fid)                            
+                                                        
                         ntopo=ntopo+1
             
+        if 'firef' in config_dict:
+            #assume firef is given a string splitted by ';'
+            firef=config_dict['firef']
+            #seporate files
+            result = firef.split(';')            
+            for filen in result:
+                w_nc_var = nc_fid.createVariable(filen, 'S1', ('ntopou','nchar1'))
+                w_nc_var.long_name='Fire event info for a topo unit'
+                
+                with open(mdir+filen,"r") as infile:
+                    ntopo=0
+                    while True:
+                        line=infile.readline().strip()                
+                        if not line:
+                            break         
+                        numbers = [int(x) for x in line.split()]
+                        #locate topo unit
+                        for ng in range(ntopu):
+                            if numbers[0] == nc_fid.variables['NH1'][ng] and \
+                                numbers[1] == nc_fid.variables['NV1'][ng] and \
+                                numbers[2] == nc_fid.variables['NH2'][ng] and \
+                                numbers[3] == nc_fid.variables['NV2'][ng]:
+                                break                        
+                        line=infile.readline().strip()   
+                        fnms= line.split()
+                        print(fnms)
+                        nc_fid.variables[filen][ng,:]=' '*10   
+                        if fnms[0] == 'NO':
+                            nc_fid.variables[filen][jj,ng,0:2]=['N','O']
+                        else:                            
+                            for ic in range(len(fnms[0])):                                
+                                nc_fid.variables[filen][ng,ic]=fnms[0][ic]
+                            ifile=mdir+fnms[0]    
+                            w_nc_var=nc_fid.createVariable(fnms[0], 'S1', ('nfire','nchart'))
+                            w_nc_var.long_name='Fire file'                            
+                            read_till_file(ifile,fnms[0],nc_fid)
+                            
+#                        nc_fid.variables['firef'][jj,ng,:]=' '*10            
+                        ntopo=ntopo+1
             
 
     nc_fid.close()  # close the new file

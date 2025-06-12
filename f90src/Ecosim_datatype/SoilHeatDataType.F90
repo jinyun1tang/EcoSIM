@@ -9,28 +9,27 @@ module SoilHeatDatatype
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  TKSZ(:,:,:)                        !
-  real(r8),target,allocatable ::  TKS_vr(:,:,:)                      !
-  real(r8),target,allocatable ::  TLIceThawMicP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in micropores, [MJ/d-2/h]
-  real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi_vr(:,:,:)    !hourly accumulated freeze-thaw latent heat flux
-  real(r8),target,allocatable ::  TLIceThawMacP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in macropores, [MJ/d-2/h]
-  real(r8),target,allocatable ::  XPhaseChangeHeatL_snvr(:,:,:)      !hourly accumulated latent heat flux from freeze-thaw
-  real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)            !soil heat capacity [MJ m-3 K-1]
-  real(r8),target,allocatable ::  TCS_vr(:,:,:)                         !soil temperature [oC]
+  real(r8),target,allocatable ::  TKS_vr(:,:,:)                      !soil temperature, [K]
+  real(r8),target,allocatable ::  TLIceThawMicP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in micropores, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  TLPhaseChangeHeat2Soi_vr(:,:,:)    !hourly accumulated freeze-thaw latent heat flux from soil, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  TLIceThawMacP_vr(:,:,:)            !hourly accumulated freeze-thaw flux in macropores, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  XPhaseChangeHeatL_snvr(:,:,:)      !hourly accumulated freeze-thaw latent heat flux from snow,[MJ d-2 h-1]
+  real(r8),target,allocatable ::  VHeatCapacity_vr(:,:,:)            !soil heat capacity, [MJ m-3 K-1]
+  real(r8),target,allocatable ::  TCS_vr(:,:,:)                      !soil temperature, [oC]
   real(r8),target,allocatable ::  HeatStore_col(:,:)                 !heat stored over the grid, including soil, litter and canopy, [MJ d-2]
-  real(r8),target,allocatable ::  HeatSource_vr(:,:,:)               !heat source for warming
-  real(r8),target,allocatable ::  NumerSolidThermCond_vr(:,:,:)         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
-  real(r8),target,allocatable ::  DenomSolidThermCond_vr(:,:,:)         !denominator for soil solid thermal conductivity
-  real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model, [MJ/d2/h]
-  real(r8),target,allocatable ::  THeatFlowCellSoil_vr(:,:,:)        !hourly heat flux into soil layer  [MJ m-3]
-  real(r8),target,allocatable ::  HeatDrain_col(:,:)                 !heat loss through drainage [MJ/d2/h]
-  real(r8),target,allocatable ::  HeatRunSurf_col(:,:)               !heat loss through surface runoff [MJ/d2/h]
-  real(r8),target,allocatable ::  HeatDischar_col(:,:)               !Heat loss through discharge [MJ/d2/h]
-  real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:)            !Heat flow into colum [MJ/d2/h]
-  real(r8),target,allocatable ::  HeatSource_col(:,:)                !Heat source from heating [MJ/d2/h]
-  real(r8),target,allocatable ::  THeatSoiThaw_col(:,:)              !Heat associated with freeze-thaw [MJ/d2/h]
-  real(r8),target,allocatable ::  QSnoHeatXfer2Soil_col(:,:)         !Heat flux from snow into soil [MJ/d2/h]
-  real(r8),target,allocatable ::  QIceInflx_vr(:,:,:)                !Ice influx to layer [m3 H2O/d2/h], essential for pond/lake
+  real(r8),target,allocatable ::  HeatSource_vr(:,:,:)               !heat source for warming,[MJ d-2 h-1]
+  real(r8),target,allocatable ::  NumerSolidThermCond_vr(:,:,:)      !numerator for soil solid thermal conductivity, [MJ m h-1 K-1]
+  real(r8),target,allocatable ::  DenomSolidThermCond_vr(:,:,:)      !denominator for soil solid thermal conductivity,[MJ K-1]
+  real(r8),target,allocatable ::  HeatFlx2Grnd_col(:,:)              !heat flux into ground, computed from surface energy balance model, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  THeatFlowCellSoil_vr(:,:,:)        !hourly heat flux into soil layer,  [MJ m-3]
+  real(r8),target,allocatable ::  HeatDrain_col(:,:)                 !heat loss through drainage [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatRunSurf_col(:,:)               !heat loss through surface runoff, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatDischar_col(:,:)               !Heat loss through discharge, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  THeatFlow2Soil_col(:,:)            !Heat flow into colum, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatSource_col(:,:)                !Heat source from heating, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  THeatSoiThaw_col(:,:)              !Heat associated with freeze-thaw, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  QSnoHeatXfer2Soil_col(:,:)         !Heat flux from snow into soil, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  QIceInflx_vr(:,:,:)                !Ice influx to layer, essential for pond/lake,  [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  QIceInflx_col(:,:)
 !----------------------------------------------------------------------
 
@@ -43,7 +42,6 @@ contains
   allocate(QIceInflx_col(JY,JX));  QIceInflx_col = 0._r8
   allocate(QSnoHeatXfer2Soil_col(JY,JX)); QSnoHeatXfer2Soil_col = 0._r8
   allocate(HeatSource_col(JY,JX)); HeatSource_col = 0._r8
-  allocate(TKSZ(366,24,JZ));    TKSZ                                   = 0._r8
   allocate(TKS_vr(0:JZ,JY,JX));    TKS_vr                              = 0._r8
   allocate(HeatFlx2Grnd_col(JY,JX));   HeatFlx2Grnd_col                = 0._r8
   allocate(HeatStore_col(JY,JX));  HeatStore_col                       = 0._r8
@@ -74,7 +72,6 @@ contains
   call destroy(QSnoHeatXfer2Soil_col)
   call destroy(THeatSoiThaw_col)
   call destroy(HeatSource_col)
-  call destroy(TKSZ)
   call destroy(TKS_vr)
   call destroy(HeatSource_vr)
   call destroy(TLIceThawMicP_vr)
