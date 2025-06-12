@@ -416,14 +416,19 @@ implicit none
   character(len=10) :: fertf
   character(len=10) :: tillf
   character(len=10) :: irrigf
-  integer :: iyear,year
+  integer :: iyear,year,nyears
 !
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
 
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
-
+  nyears=get_dim_len(soilmgmt_nfid, 'year')
+  if(nyears==0)then
+    !no fertilization, tillage, or irrigation
+    call ncd_pio_closefile(soilmgmt_nfid)
+    return
+  endif
   iyear=1
   DO while(.true.)
     call ncd_getvar(soilmgmt_nfid,'year',iyear,year)
@@ -528,14 +533,14 @@ implicit none
         //' in '//trim(mod_filename), __LINE__)
     endif
 
-    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
-      start = (/1,ntopou/),count = (/len(firef),1/)), &
-      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-
     call check_var(soilmgmt_nfid, fire_event_entry, vardesc, readvar)
     if(.not. readvar)then
       call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
     endif
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
+      start = (/1,ntopou/),count = (/len(firef),1/)), &
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 
     call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2)
   ENDDO  

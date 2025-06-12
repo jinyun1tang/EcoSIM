@@ -184,12 +184,12 @@ module readsmod
 !
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
-      ROWSpaceNH4_col(NY,NX)=0.0_r8
-      ROWSpaceNO3_col(NY,NX)=0.0_r8
-      ROWSpacePO4_col(NY,NX)=0.0_r8
+      ROWSpaceNH4_col(NY,NX) = 0.0_r8
+      ROWSpaceNO3_col(NY,NX) = 0.0_r8
+      ROWSpacePO4_col(NY,NX) = 0.0_r8
       D325: DO I=1,366
-        iSoilDisturbType_col(I,NY,NX)=0
-        DepzCorp_col(I,NY,NX)=0.0_r8
+        iSoilDisturbType_col(I,NY,NX) = 0
+        DepzCorp_col(I,NY,NX)         = 0.0_r8
       ENDDO D325
       D40: DO I=1,366
         D45: DO N=1,20

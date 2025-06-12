@@ -936,11 +936,11 @@ implicit none
   !--------------------------------------------------------------------
   data1d_ptr => this%h1D_cumFIRE_CO2_col(beg_col:end_col) 
   call hist_addfld1d(fname='cumFIRE_CO2_col',units='gC m-2',avgflag='A',&
-    long_name='cumulative CO2 flux from fire',ptr_col=data1d_ptr,default='inactive')        
+    long_name='cumulative CO2 flux from fire, <0 into atmosphere',ptr_col=data1d_ptr,default='inactive')        
 
   data1d_ptr => this%h1D_cumFIRE_CH4_col(beg_col:end_col)  
   call hist_addfld1d(fname='cumFIRE_CH4_col',units='',avgflag='A', &
-    long_name='cumulative CH4 flux from fire', ptr_col=data1d_ptr,default='inactive')      
+    long_name='cumulative CH4 flux from fire, <0 into atmosphere', ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_cNH4_LITR_col(beg_col:end_col) 
   call hist_addfld1d(fname='cNH4_LITR_col',units='gN NH4/g litter',avgflag='A', &

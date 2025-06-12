@@ -1,7 +1,8 @@
 module FireMod
 
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use abortutils , only : endrun  
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use EcoSIMCtrlMod, only: soil_mgmt_in
+  use abortutils,    only: endrun
 implicit none
 
   private
@@ -83,9 +84,14 @@ implicit none
 
     pair_start = pair_end + 2  ! Skip semicolon
 
-  end do
+  end do  
   !the model uses fire
   use_fire=.true.
+  if(use_fire)then
+   if(soil_mgmt_in=='NO')then
+     call endrun('fire mode is on, but soil_mgmt_in is not defined. Stop in file '//trim(mod_filename),__LINE__)     
+   endif
+  endif
   !set current fire event to 1
   fire_event_loc=1
 
