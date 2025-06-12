@@ -825,9 +825,9 @@ module WatsubMod
                   M1 = NX;  M2  = NY; M3 = L  !source
                   M4 = NX+1;M5 = NY;  M6 = L  !target
                   XN = -1.0_r8                !going out of eastern boundary
-                  RechargSurf     = RechargEastSurf(M2,M1)
-                  RechargDist2WTBL  = RechrgDistEastSubSurf(M2,M1)      !distance to eastern external water table [m]
-                  Recharg2WTBLScal = RechargRateEastWTBL(M2,M1)  
+                  RechargSurf     = RechargEastSurf_col(M2,M1)
+                  RechargDist2WTBL  = RechrgDistEastSubSurf_col(M2,M1)      !distance to eastern external water table [m]
+                  Recharg2WTBLScal = RechargRateEastWTBL_col(M2,M1)  
                   str_dir='east'
                   !do nothing if not on the boundary  
                 ELSE
@@ -837,9 +837,9 @@ module WatsubMod
                 IF(NX.EQ.NHW)THEN            !western boundary, inflow   -|-> |               
                   M4 = NX; M5 = NY; M6 = L   !target on the boundary
                   XN = 1.0_r8                !coming in from western boundary
-                  RechargSurf     = RechargWestSurf(M5,M4)
-                  RechargDist2WTBL  = RechrgDistWestSubSurf(M5,M4)      !distance to western external water table [m]
-                  Recharg2WTBLScal = RechargRateWestWTBL(M5,M4)
+                  RechargSurf     = RechargWestSurf_col(M5,M4)
+                  RechargDist2WTBL  = RechrgDistWestSubSurf_col(M5,M4)      !distance to western external water table [m]
+                  Recharg2WTBLScal = RechargRateWestWTBL_col(M5,M4)
                   str_dir='west'
                 ELSE
                   cycle
@@ -855,9 +855,9 @@ module WatsubMod
                   M1 = NX; M2 = NY; M3   = L   !source
                   M4 = NX; M5 = NY+1; M6 = L   !target
                   XN              = -1.0_r8    !going out of south boundary
-                  RechargSurf     = RechargSouthSurf(M2,M1)
-                  RechargDist2WTBL  = RechrgDistSouthSubSurf(M2,M1)   !distance to southern external water table [m]
-                  Recharg2WTBLScal = RechargRateSouthWTBL(M2,M1)
+                  RechargSurf     = RechargSouthSurf_col(M2,M1)
+                  RechargDist2WTBL  = RechrgDistSouthSubSurf_col(M2,M1)   !distance to southern external water table [m]
+                  Recharg2WTBLScal = RechargRateSouthWTBL_col(M2,M1)
                   str_dir='south'
                 ELSE
                   cycle
@@ -866,9 +866,9 @@ module WatsubMod
                 IF(NY.EQ.NVN)THEN            !northern boundary, inflow     ----
                   M4 = NX;M5  = NY; M6   = L !target grid on the boundary
                   XN          = 1.0_r8       !coming in from north boundary
-                  RechargSurf      = RechargNorthSurf(M5,M4)
-                  RechargDist2WTBL = RechrgDistNorthSubSurf(M5,M4)    !distance to northern external water table [m]
-                  Recharg2WTBLScal = RechargRateNorthWTBL(M5,M4)
+                  RechargSurf      = RechargNorthSurf_col(M5,M4)
+                  RechargDist2WTBL = RechrgDistNorthSubSurf_col(M5,M4)    !distance to northern external water table [m]
+                  Recharg2WTBLScal = RechargRateNorthWTBL_col(M5,M4)
                   str_dir='north'
                 ELSE
                   cycle
@@ -1125,7 +1125,7 @@ module WatsubMod
   ENDIF
 
   !x-section area scaled hydraulic gradient, HydGrad > 0, when XN=-1, ES; HydGrad < 0, when XN=1, WN
-  hydGrad=XN*mGravAccelerat*(-ABS(SLOPE(N,N2,N1)))*AREA(3,N3,N2,N1)
+  hydGrad=XN*mGravAccelerat*(-ABS(SLOPE_col(N,N2,N1)))*AREA(3,N3,N2,N1)
 
   WaterFlow2Micpt_3D(N,M6,M5,M4)=AZERO(RechargRate*AMIN1(VLWatMicP1_vr(N3,N2,N1)*dts_wat, HydGrad*HydcondSrc))
 
@@ -2128,7 +2128,7 @@ module WatsubMod
 !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
 !
   IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN
-    PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
+    PSISWD = XN*0.005_r8*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
       +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1) &
       -AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))))
@@ -2166,7 +2166,7 @@ module WatsubMod
   !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
 !
   IF(DoMacPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)) .AND. VLMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-    PSISWD  = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
+    PSISWD  = XN*0.005_r8*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-TargetWaterTBL) &
       -mGravAccelerat*AZMAX1(DPTHH-DepzIntWTBL_col(N2,N1))
 
@@ -2221,7 +2221,7 @@ module WatsubMod
     .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                         & !source grid is unsaturated
     .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN                                 !water exchange with watertable enabled
 
-    PSISWD = XN*0.005_r8*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
+    PSISWD = XN*0.005_r8*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
       mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
 
@@ -2273,7 +2273,7 @@ module WatsubMod
     .AND. AirfMacP.GT.ZEROS2(N2,N1)                               & !macropore has air-filled fraction
     .AND. (.not.isclose(Recharg2WTBLScal,0.0_r8)))THEN               !recharge is on
 
-    PSISWD  = XN*0.005*SLOPE(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
+    PSISWD  = XN*0.005*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISUTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-ExtWaterTable_col(N2,N1))
 
     !outflow/drainage

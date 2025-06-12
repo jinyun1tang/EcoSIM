@@ -13,7 +13,7 @@ implicit none
   real(r8),target,allocatable ::  SoilDetachability4Erosion1(:,:)   !soil detachment, [-]
   real(r8),target,allocatable ::  SoilDetachability4Erosion2(:,:)   !soil detachability
   real(r8),target,allocatable ::  CER_col(:,:)                      !soil detachment/deposition, [h-1]
-  real(r8),target,allocatable ::  XER_col(:,:)                          !soil detachment/deposition shape parameter, [-]
+  real(r8),target,allocatable ::  XER_col(:,:)                      !soil detachment/deposition shape parameter, [-]
   real(r8),target,allocatable ::  PrtcleDensitySurfLay_col(:,:)     !particle density of surface layer,[-]
   real(r8),target,allocatable ::  VLS_col(:,:)                      !hourly sinking rate,[h-1]
   real(r8),target,allocatable ::  SED_col(:,:)                      !sediment transport, [Mg d-2 h-1]

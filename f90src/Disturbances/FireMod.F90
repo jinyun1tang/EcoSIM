@@ -20,14 +20,14 @@ implicit none
   public :: check_fire
   contains
 
-  subroutine config_fire(fire_conf)
+  subroutine config_fire(FireEvents)
   !
   !configure fire set up
-  !fire_conf should be of format: 'year1:file1;year2:file2'
+  !FireEvents should be of format: 'year1:file1;year2:file2'
   !where year1 is a four character string specifies year
   !and file1 specifies the fire specifics
   implicit none
-  character(len=*), intent(in) :: fire_conf
+  character(len=*), intent(in) :: FireEvents
   integer :: pair_start,pair_end,colon_pos,ios
   character(len=128) :: msg
   character(len=4) :: year_str
@@ -35,25 +35,25 @@ implicit none
 
   !initialization
   num_fire_events =0
-  if(fire_conf(5:5)/=':')return
+  if(FireEvents(5:5)/='/')return
    
   pair_start = 1  
   ! Split by semicolons and process each pair
-  do while (pair_start <= len_trim(fire_conf) .and. num_fire_events < max_fire_events)
+  do while (pair_start <= len_trim(FireEvents) .and. num_fire_events < max_fire_events)
     ! Find next semicolon or end of string
-    pair_end = index(fire_conf(pair_start:), ';')
+    pair_end = index(FireEvents(pair_start:), ';')
         
     if (pair_end == 0) then
       ! Last pair
-      fire_event = fire_conf(pair_start:)
+      fire_event = FireEvents(pair_start:)
     else
       ! Extract pair
       pair_end = pair_start + pair_end - 2
-      fire_event = fire_conf(pair_start:pair_end)
+      fire_event = FireEvents(pair_start:pair_end)
     end if
         
     ! Process this pair (year:file)
-    colon_pos = index(fire_event, ':')
+    colon_pos = index(fire_event, '/')
     if (colon_pos == 0 .or. colon_pos <= 4) then
       write(msg,*) 'Error: Invalid specification format for fire event: ', trim(fire_event)
       call endrun(trim(msg)//' in file '//trim(mod_filename),__LINE__)      
@@ -91,10 +91,10 @@ implicit none
 
   end subroutine config_fire
 !------------------------------------------------------------------------------------------
-  function check_fire(year_model,fire_entry)result(fire_yesno)
+  function check_fire(year_model,fire_event_entry)result(fire_yesno)
   implicit none
   integer, intent(in) :: year_model  !current model year
-  character(len=10), intent(out) :: fire_entry
+  character(len=10), intent(out) :: fire_event_entry  !retrieved fire_event
   logical :: fire_yesno
 
   
@@ -103,7 +103,7 @@ implicit none
 
   !move to the next fire event
   if(fire_yesno)then
-    fire_entry=fire_files(fire_event_loc)  
+    fire_event_entry=fire_files(fire_event_loc)  
     fire_event_loc=fire_event_loc+1
   endif  
 

@@ -33,6 +33,8 @@ implicit none
 
 !------------------------------------------------------------------------------------------
   subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2)
+  !
+  !read soil tillage information. It also includes events due to fire and drainage
   implicit none
   character(len=*), intent(in) :: FileTillage
   integer, intent(in) :: NH1,NH2,NV1,NV2
@@ -63,8 +65,8 @@ implicit none
 !
 !     DY=date DDMMYYYY
 !     IPLOW,DPLOW=intensity,depth of disturbance
-!     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
-!     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
+!     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
+!     DepzCorp_col=intensity (fire) or depth (tillage,drainage) of disturbance
 !
   kk=1
   do while(len_trim(tillf(kk))>0)
@@ -498,13 +500,47 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadFire(fire_entry)
+  subroutine ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+  use EcoSIMCtrlMod, only : soil_mgmt_in  
   implicit none
-  character(len=10), intent(in) :: fire_entry
+  character(len=10), intent(in) :: fire_event_entry
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  type(file_desc_t) :: soilmgmt_nfid
+  character(len=10) :: firef
+  integer :: ntopou,ntopo
+  logical :: readvar
+  type(Var_desc_t) :: vardesc
+  integer :: NH1,NH2,NV1,NV2
 
+  call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
 
+  ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
+  if(ntopou==0)return
+  if(first_topou)ntopou=1  
+  DO NTOPO=1,ntopou
+    call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
+    call ncd_getvar(soilmgmt_nfid,'NV1',ntopo,NV1)
+    call ncd_getvar(soilmgmt_nfid,'NH2',ntopo,NH2)
+    call ncd_getvar(soilmgmt_nfid,'NV2',ntopo,NV2)
 
-!      call ReadTillageFile(soilmgmt_nfid,tillf,NH1,NH2,NV1,NV2)
+    if(any((/NH1,NH2,NV1,NV2/)<0))THEN
+      call endrun('something wrong in NHX or NHX indices on file '//trim(soil_mgmt_in)&
+        //' in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
+      start = (/1,ntopou/),count = (/len(firef),1/)), &
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
+
+    call check_var(soilmgmt_nfid, fire_event_entry, vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
+    endif
+
+    call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2)
+  ENDDO  
+  call ncd_pio_closefile(soilmgmt_nfid)
+
     
   end subroutine ReadFire  
   

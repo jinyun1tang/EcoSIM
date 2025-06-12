@@ -149,7 +149,7 @@ module ErosionMod
     !     CONCENTRATION IN SURFACE WATER, MODIFIED BY SOIL COHESION
     !     FROM 'HOUR1'
     !
-          STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE(0,NY,NX))
+          STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE_col(0,NY,NX))
           CSEDX=PrtcleDensitySurfLay_col(NY,NX)*CER_col(NY,NX)*AZMAX1(STPR-0.4_r8)**XER_col(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 
@@ -317,7 +317,7 @@ module ErosionMod
             M1=NX;M2=NY
             M4=NX+1;M5=NY
             XN    = -1.0_r8
-            RCHQF = RechargEastSurf(M2,M1)
+            RCHQF = RechargEastSurf_col(M2,M1)
           ELSE
             cycle
           ENDIF
@@ -326,7 +326,7 @@ module ErosionMod
             M1=NX;M2=NY
             M4=NX;M5=NY
             XN    = 1.0_r8
-            RCHQF = RechargWestSurf(M5,M4)
+            RCHQF = RechargWestSurf_col(M5,M4)
           ELSE
             cycle
           ENDIF
@@ -339,7 +339,7 @@ module ErosionMod
             M1 = NX;M2 = NY
             M4 = NX;M5 = NY+1
             XN = -1.0_r8
-            RCHQF=RechargSouthSurf(M2,M1)
+            RCHQF=RechargSouthSurf_col(M2,M1)
           ELSE
             cycle
           ENDIF
@@ -348,7 +348,7 @@ module ErosionMod
             M1 = NX;M2 = NY
             M4 = NX;M5 = NY
             XN = 1.0_r8
-            RCHQF=RechargNorthSurf(M5,M4)
+            RCHQF=RechargNorthSurf_col(M5,M4)
           ELSE
             cycle
           ENDIF
@@ -761,7 +761,7 @@ module ErosionMod
                   M4    = NX+1
                   M5    = NY
                   XN    = -1.0_r8
-                  RCHQF = RechargEastSurf(M2,M1)
+                  RCHQF = RechargEastSurf_col(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -772,7 +772,7 @@ module ErosionMod
                   M4 = NX
                   M5 = NY
                   XN = 1.0_r8
-                  RCHQF=RechargWestSurf(M5,M4)
+                  RCHQF=RechargWestSurf_col(M5,M4)
                 ELSE
                   cycle
                 ENDIF
@@ -787,7 +787,7 @@ module ErosionMod
                   M4 = NX
                   M5 = NY+1
                   XN = -1.0_r8
-                  RCHQF=RechargSouthSurf(M2,M1)
+                  RCHQF=RechargSouthSurf_col(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -798,7 +798,7 @@ module ErosionMod
                   M4=NX
                   M5=NY
                   XN=1.0_r8
-                  RCHQF=RechargNorthSurf(M5,M4)
+                  RCHQF=RechargNorthSurf_col(M5,M4)
                 ELSE
                   cycle
                 ENDIF

@@ -143,4 +143,8 @@ implicit none
   integer, parameter :: ithermozone_warmtempr = 3
   integer, parameter :: ithermozone_subtropic = 4
   integer, parameter :: ithermozone_tropical  = 5
+
+  integer, parameter :: itill_rmlitr = 21
+  integer, parameter :: itill_fire   = 22
+  
 end module ElmIDMod

@@ -366,7 +366,6 @@ module Hour1Mod
   IFLB_2DH                               = -1
   IFLBM_2DH                              = -1
   IFLBSM_2DH                             = -1
-  IFLBS_2DH                              = -1
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 !
@@ -576,8 +575,8 @@ module Hour1Mod
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0._r8
     ENDIF
-    EHUM(L,NY,NX) = 0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(L,NY,NX))
-    EPOC(L,NY,NX) = 1.0_r8
+    EHUM_vr(L,NY,NX) = 0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(L,NY,NX))
+    EPOC_vr(L,NY,NX) = 1.0_r8
 
     call SoilHydroProperty(I,J,L,NY,NX)
 !
@@ -650,7 +649,7 @@ module Hour1Mod
   ENDIF
   VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughnesst0_col(NY,NX)+&
     3.10_r8*SoilSurfRoughnesst0_col(NY,NX)**2._r8 &
-    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
+    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
 
   VWatStoreCapSurf_col(NY,NX)=AMAX1(VLWatHeldCapSurf_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
     CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
@@ -665,8 +664,8 @@ module Hour1Mod
     CSILT(NU(NY,NX),NY,NX)=0._r8
     CSAND_vr(NU(NY,NX),NY,NX)=0._r8
   ENDIF
-  EHUM(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU(NY,NX),NY,NX))
-  EPOC(0,NY,NX)=0.150_r8
+  EHUM_vr(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU(NY,NX),NY,NX))
+  EPOC_vr(0,NY,NX)=0.150_r8
   end subroutine ResetSurfResidualProperty
 !------------------------------------------------------------------------------------------
 
@@ -1738,8 +1737,8 @@ module Hour1Mod
       VWatLitRHoldCapcity0 = 0._r8
       VLitR0               = 0._r8
       DO K=1, micpar%NumOfLitrCmplxs
-        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0(K,NY,NX)
-        VLitR0               = VLitR0+RC0(K,NY,NX)/BulkDensLitR(K)
+        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0_col(K,NY,NX)
+        VLitR0               = VLitR0+RC0_col(K,NY,NX)/BulkDensLitR(K)
       ENDDO
 
       VWatLitRHoldCapcity_col(NY,NX) = AZMAX1(VWatLitRHoldCapcity0)

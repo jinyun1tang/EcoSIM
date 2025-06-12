@@ -98,7 +98,7 @@ module readsmod
   integer :: LPY,IX
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
-  character(len=12) :: fire_entry
+  character(len=12) :: fire_event_entry
   integer :: IDY,IFLG3,I,ICHECK
 
 ! begin_execution
@@ -232,8 +232,8 @@ module readsmod
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
 ! AND FERTILIZER FILES
 !
-  if(use_fire .and. check_fire(yearc,fire_entry))then
-    call ReadFire(fire_entry)
+  if(use_fire .and. check_fire(yearc,fire_event_entry))then
+    call ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
   endif
   IF(trim(soil_mgmt_in).NE.'NO')THEN
     call ReadManagementFiles(yeari)

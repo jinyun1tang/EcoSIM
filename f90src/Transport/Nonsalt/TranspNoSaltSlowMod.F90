@@ -3030,14 +3030,14 @@ implicit none
               IF(NN.EQ.iFront)THEN                   !eastward                
                 IF(NX.EQ.NHE)THEN                    !eastern boundary
                   M4 = NX+1;M5 = NY;M6 = L           !dest
-                  RCHQF  = RechargEastSurf(M2,M1)
+                  RCHQF  = RechargEastSurf_col(M2,M1)
                 ELSE
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.iBehind)THEN             !west                
                 IF(NX.EQ.NHW)THEN                   !western boundary
                   M4 = NX;M5 = NY;M6 = L            !dest
-                  RCHQF  = RechargWestSurf(M5,M4)
+                  RCHQF  = RechargWestSurf_col(M5,M4)
                 ELSE
                   cycle
                 ENDIF
@@ -3048,14 +3048,14 @@ implicit none
               IF(NN.EQ.iFront)THEN  
                 IF(NY.EQ.NVS)THEN                     ! southern boundary
                   M4 = NX;M5 = NY+1;M6 = L            !target grid
-                  RCHQF  = RechargSouthSurf(M2,M1)
+                  RCHQF  = RechargSouthSurf_col(M2,M1)
                 ELSE
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.iBehind)THEN              !north                
                 IF(NY.EQ.NVN)THEN                    !northern boundary
                   M4 = NX;M5 = NY;M6 = L             !target
-                  RCHQF  = RechargNorthSurf(M5,M4)
+                  RCHQF  = RechargNorthSurf_col(M5,M4)
                 ELSE
                   cycle
                 ENDIF

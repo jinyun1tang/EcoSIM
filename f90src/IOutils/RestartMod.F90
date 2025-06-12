@@ -5789,10 +5789,10 @@ implicit none
        long_name='surface OM in each complex', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,RC0(:,1:JY0,1:JX0),datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,RC0_col(:,1:JY0,1:JX0),datrc_2d) 
   else
     !print*,'RC0',size(RC0,1),size(RC0,2),jcplx
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0(:,1:JY0,1:JX0),datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RC0_col(:,1:JY0,1:JX0),datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:micpar%NumOfLitrCmplxs)    
     call restartvar(ncid, flag, varname='RC0', dim1name='column',dim2name='nlitromcomplx',&
        long_name='surface OM in each complex', units='g d-2', &

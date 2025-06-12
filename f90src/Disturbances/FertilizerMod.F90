@@ -164,71 +164,71 @@ implicit none
 !     MAIZE
 !
     IF(IYTYP(1,I,NY,NX).EQ.1)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.080_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.245_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.613_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.062_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.080_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.245_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.613_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.062_r8
 !
 !     WHEAT
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.171_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.144_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.171_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.144_r8
 !
 !     SOYBEAN
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.138_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.426_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.316_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.120_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.138_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.426_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.316_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.120_r8
 !
 !     OLD STRAW
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
 !
 !     STRAW
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.036_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.044_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.767_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.153_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.036_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.044_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.767_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.153_r8
 !
 !     COMPOST
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.143_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.015_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.640_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.143_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.015_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.640_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
 !
 !     GREEN MANURE
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.013_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.225_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.013_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.225_r8
 !
 !     SIMPLE SUBSTRATE
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=1.000_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=1.000_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
     ELSE
-      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
-      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
-      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
-      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
     ENDIF
 !
 !     ALLOCATION OF ANIMAL MANURE APPLICATION TO
@@ -237,34 +237,34 @@ implicit none
 !     RUMINANT
 !
     IF(IYTYP(2,I,NY,NX).EQ.1)THEN
-      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
-      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
-      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
-      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
 !
 !     NON-RUMINANT
 !
     ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
-      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
-      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
-      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
-      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
 !
 !     GRAZING
 !
     ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
-      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
-      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
-      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
-      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
 !
 !     OTHER
 !
     ELSE
-      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
-      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
-      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
-      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
     ENDIF
 !
 !     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE complex
@@ -355,16 +355,16 @@ implicit none
         RNT=0._r8
         RPT=0._r8
         D965: DO M=1,jsken
-          RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CNOFC(M,K)
-          RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CPOFC(M,K)
+          RNT=RNT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*micpar%CNOFC(M,K)
+          RPT=RPT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*micpar%CPOFC(M,K)
         ENDDO D965
         FRNT=(OSNI-OSNX)/RNT
         FRPT=(OSPI-OSPX)/RPT
         D970: DO M=1,jsken
           CNOF(M)=micpar%CNOFC(M,K)*FRNT
           CPOF(M)=micpar%CPOFC(M,K)*FRPT
-          CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
-          CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
+          CNOFT=CNOFT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOF(M)
+          CPOFT=CPOFT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOF(M)
         ENDDO D970
       ELSE
         D975: DO M=1,jsken
@@ -373,14 +373,14 @@ implicit none
         ENDDO D975
       ENDIF
       D2970: DO M=1,jsken
-        OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
+        OSC1=CFOSC_vr(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
         IF(CNOFT.GT.ZERO)THEN
-          OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
+          OSN1=CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
         ELSE
           OSN1=0._r8
         ENDIF
         IF(CPOFT.GT.ZERO)THEN
-          OSP1=CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
+          OSP1=CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
         ELSE
           OSP1=0._r8
         ENDIF

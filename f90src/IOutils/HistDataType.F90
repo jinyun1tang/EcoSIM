@@ -41,8 +41,8 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   type, public :: histdata_type
-  real(r8),pointer   :: h1D_tFIRE_CO2_col(:)    
-  real(r8),pointer   :: h1D_tFIRE_CH4_col(:)    
+  real(r8),pointer   :: h1D_cumFIRE_CO2_col(:)    
+  real(r8),pointer   :: h1D_cumFIRE_CH4_col(:)    
   real(r8),pointer   :: h1D_cNH4_LITR_col(:)    
   real(r8),pointer   :: h1D_cNO3_LITR_col(:)    
   real(r8),pointer   :: h1D_ECO_HVST_N_col(:)   
@@ -495,8 +495,8 @@ implicit none
 
   beg_col=1;end_col=bounds%ncols
   beg_ptc=1;end_ptc=bounds%npfts
-  allocate(this%h1D_tFIRE_CO2_col(beg_col:end_col)) ;this%h1D_tFIRE_CO2_col(:)=spval    
-  allocate(this%h1D_tFIRE_CH4_col(beg_col:end_col)) ;this%h1D_tFIRE_CH4_col(:)=spval    
+  allocate(this%h1D_cumFIRE_CO2_col(beg_col:end_col)) ;this%h1D_cumFIRE_CO2_col(:)=spval    
+  allocate(this%h1D_cumFIRE_CH4_col(beg_col:end_col)) ;this%h1D_cumFIRE_CH4_col(:)=spval    
   allocate(this%h1D_cNH4_LITR_col(beg_col:end_col)) ;this%h1D_cNH4_LITR_col(:)=spval    
   allocate(this%h1D_cNO3_LITR_col(beg_col:end_col)) ;this%h1D_cNO3_LITR_col(:)=spval    
   allocate(this%h1D_ECO_HVST_C_col(beg_col:end_col));this%h1D_ECO_HVST_C_col(:)=spval   
@@ -934,12 +934,12 @@ implicit none
   !-----------------------------------------------------------------------
   ! initialize history fields 
   !--------------------------------------------------------------------
-  data1d_ptr => this%h1D_tFIRE_CO2_col(beg_col:end_col) 
-  call hist_addfld1d(fname='tFIRE_CO2_col',units='gC m-2',avgflag='A',&
+  data1d_ptr => this%h1D_cumFIRE_CO2_col(beg_col:end_col) 
+  call hist_addfld1d(fname='cumFIRE_CO2_col',units='gC m-2',avgflag='A',&
     long_name='cumulative CO2 flux from fire',ptr_col=data1d_ptr,default='inactive')        
 
-  data1d_ptr => this%h1D_tFIRE_CH4_col(beg_col:end_col)  
-  call hist_addfld1d(fname='tFIRE_CH4_col',units='',avgflag='A', &
+  data1d_ptr => this%h1D_cumFIRE_CH4_col(beg_col:end_col)  
+  call hist_addfld1d(fname='cumFIRE_CH4_col',units='',avgflag='A', &
     long_name='cumulative CH4 flux from fire', ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_cNH4_LITR_col(beg_col:end_col) 
@@ -2804,8 +2804,8 @@ implicit none
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
-      this%h1D_tFIRE_CO2_col(ncol)        =  CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%h1D_tFIRE_CH4_col(ncol)        =  CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_cumFIRE_CO2_col(ncol)        =  CO2byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%h1D_cumFIRE_CH4_col(ncol)        =  CH4byFire_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%h1D_cNH4_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NH4,0,NY,NX)+&
         natomw*trcx_solml_vr(idx_NH4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NO3,0,NY,NX)+&

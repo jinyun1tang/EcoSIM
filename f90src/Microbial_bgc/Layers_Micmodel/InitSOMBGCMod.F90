@@ -115,26 +115,26 @@ module InitSOMBGCMOD
   D975: DO K=1,micpar%NumOfLitrCmplxs
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
-!    write(*,*)'RSC',K,RSC(K,L,NY,NX)
-    IF(RSC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
+!    write(*,*)'RSC',K,RSC_vr(K,L,NY,NX)
+    IF(RSC_vr(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
       RNT=0.0_r8
       RPT=0.0_r8
       D970: DO M=1,jsken
-        RNT = RNT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CNOFC(M,K)
-        RPT = RPT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CPOFC(M,K)
+        RNT = RNT+RSC_vr(K,L,NY,NX)*CFOSC_vr(M,K,L,NY,NX)*CNOFC(M,K)
+        RPT = RPT+RSC_vr(K,L,NY,NX)*CFOSC_vr(M,K,L,NY,NX)*CPOFC(M,K)
       ENDDO D970
-      FRNT=RSN(K,L,NY,NX)/RNT
-      FRPT=RSP(K,L,NY,NX)/RPT
+      FRNT=RSN_vr(K,L,NY,NX)/RNT
+      FRPT=RSP_vr(K,L,NY,NX)/RPT
       D960: DO M=1,jsken
-        CNOSC(M,K,L,NY,NX) = CNOFC(M,K)*FRNT
-        CPOSC(M,K,L,NY,NX) = CPOFC(M,K)*FRPT
-        CNOSCT(K)          = CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
-        CPOSCT(K)          = CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
+        CNOSC_vr(M,K,L,NY,NX) = CNOFC(M,K)*FRNT
+        CPOSC_vr(M,K,L,NY,NX) = CPOFC(M,K)*FRPT
+        CNOSCT(K)          = CNOSCT(K)+CFOSC_vr(M,K,L,NY,NX)*CNOSC_vr(M,K,L,NY,NX)
+        CPOSCT(K)          = CPOSCT(K)+CFOSC_vr(M,K,L,NY,NX)*CPOSC_vr(M,K,L,NY,NX)
       ENDDO D960
     ELSE
       D965: DO M=1,jsken
-        CNOSC(M,K,L,NY,NX)=CNRH(K)
-        CPOSC(M,K,L,NY,NX)=CPRH(K)
+        CNOSC_vr(M,K,L,NY,NX)=CNRH(K)
+        CPOSC_vr(M,K,L,NY,NX)=CPRH(K)
       ENDDO D965
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
@@ -147,15 +147,15 @@ module InitSOMBGCMOD
     CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
       D985: DO M=1,jsken
-        CNOSC(M,K,L,NY,NX) = CORGNX(K)/CORGCX(K)
-        CPOSC(M,K,L,NY,NX) = CORGPX(K)/CORGCX(K)
-        CNOSCT(K)          = CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
-        CPOSCT(K)          = CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
+        CNOSC_vr(M,K,L,NY,NX) = CORGNX(K)/CORGCX(K)
+        CPOSC_vr(M,K,L,NY,NX) = CORGPX(K)/CORGCX(K)
+        CNOSCT(K)          = CNOSCT(K)+CFOSC_vr(M,K,L,NY,NX)*CNOSC_vr(M,K,L,NY,NX)
+        CPOSCT(K)          = CPOSCT(K)+CFOSC_vr(M,K,L,NY,NX)*CPOSC_vr(M,K,L,NY,NX)
       ENDDO D985
     ELSE
       D980: DO M=1,jsken
-        CNOSC(M,K,L,NY,NX)=CNRH(K)
-        CPOSC(M,K,L,NY,NX)=CPRH(K)
+        CNOSC_vr(M,K,L,NY,NX)=CNRH(K)
+        CPOSC_vr(M,K,L,NY,NX)=CPRH(K)
       ENDDO D980
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
@@ -332,15 +332,15 @@ module InitSOMBGCMOD
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
     D8980: DO M=1,jsken
-      SolidOM_vr(ielmc,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
+      SolidOM_vr(ielmc,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
-        SolidOM_vr(ielmn,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
+        SolidOM_vr(ielmn,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*CNOSC_vr(M,K,L,NY,NX) &
           /CNOSCT(K)*(OSNI(K)-OSNX(K)))
       ELSE
         SolidOM_vr(ielmn,M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(CPOSCT(K).GT.ZERO)THEN
-        SolidOM_vr(ielmp,M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
+        SolidOM_vr(ielmp,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*CPOSC_vr(M,K,L,NY,NX) &
           /CPOSCT(K)*(OSPI(K)-OSPX(K)))
       ELSE
         SolidOM_vr(ielmp,M,K,L,NY,NX)=0.0_r8
@@ -424,77 +424,77 @@ module InitSOMBGCMOD
     !
     !     PREVIOUS COARSE WOODY RESIDUE
     !
-    CFOSC(1:jsken,k_woody_litr,L,NY,NX)=real((/0.00,0.045,0.660,0.295/),r8)
+    CFOSC_vr(1:jsken,k_woody_litr,L,NY,NX)=real((/0.00,0.045,0.660,0.295/),r8)
 
     !
     !     MAIZE
     !
     IF(iLitrType_col(1,NY,NX).EQ.1)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.080,0.245,0.613,0.062/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.080,0.245,0.613,0.062/),r8)
       !
       !     WHEAT
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.2)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.125,0.171,0.560,0.144/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.125,0.171,0.560,0.144/),r8)
 !
       !     SOYBEAN
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.3)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.138,0.426,0.316,0.120/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.138,0.426,0.316,0.120/),r8)
 
       !     NEW STRAW
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.4)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.036,0.044,0.767,0.153/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.036,0.044,0.767,0.153/),r8)
 
       !     OLD STRAW
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.5)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
 !
       !     COMPOST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.6)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.143,0.015,0.640,0.202/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.143,0.015,0.640,0.202/),r8)
 !
       !     GREEN MANURE
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.7)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.202,0.013,0.560,0.225/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.202,0.013,0.560,0.225/),r8)
 
       !     NEW DECIDUOUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.8)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.070,0.41,0.36,0.16/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.070,0.41,0.36,0.16/),r8)
 
 !
       !     NEW CONIFEROUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.9)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.07,0.25,0.38,0.30/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.07,0.25,0.38,0.30/),r8)
 
       !     OLD DECIDUOUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.10)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
 !
       !     OLD CONIFEROUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.11)THEN
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
       !     DEFAULT
 !
     ELSE
-      CFOSC(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
+      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
     ENDIF
 !
     !     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
 !
   ELSE
-    CFOSC(1:jsken,k_woody_litr,L,NY,NX) = real((/0.00,0.00,0.20,0.80/),r8)
-    CFOSC(1:jsken,k_fine_litr,L,NY,NX)  = real((/0.02,0.06,0.34,0.58/),r8)
+    CFOSC_vr(1:jsken,k_woody_litr,L,NY,NX) = real((/0.00,0.00,0.20,0.80/),r8)
+    CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)  = real((/0.02,0.06,0.34,0.58/),r8)
   ENDIF
   end associate
   end subroutine InitSurfResiduKinetiComponent
@@ -512,18 +512,18 @@ module InitSOMBGCMOD
   !     RUMINANT
 !
   IF(iLitrType_col(2,NY,NX).EQ.1)THEN
-    CFOSC(1:jsken,k_manure,L,NY,NX)=real((/0.036,0.044,0.630,0.290/),r8)
+    CFOSC_vr(1:jsken,k_manure,L,NY,NX)=real((/0.036,0.044,0.630,0.290/),r8)
 
 !
     !     NON-RUMINANT
 !
   ELSEIF(iLitrType_col(2,NY,NX).EQ.2)THEN
-    CFOSC(1:jsken,k_manure,L,NY,NX)=real((/0.138,0.401,0.316,0.145/),r8)
+    CFOSC_vr(1:jsken,k_manure,L,NY,NX)=real((/0.138,0.401,0.316,0.145/),r8)
 !
 !     OTHER
 !
   ELSE
-    CFOSC(1:jsken,k_manure,L,NY,NX)=real((/0.138,0.401,0.316,0.145/),r8)
+    CFOSC_vr(1:jsken,k_manure,L,NY,NX)=real((/0.138,0.401,0.316,0.145/),r8)
   ENDIF
   end associate
   end subroutine InitManureKinetiComponent
@@ -554,7 +554,7 @@ module InitSOMBGCMOD
 ! CFOSC=siNGLe kinetic fraction in POM
 !
   IF(L.NE.0)THEN
-    CFOSC(1:jsken,k_POM,L,NY,NX)=real((/1.0,0.0,0.0,0.0/),r8)
+    CFOSC_vr(1:jsken,k_POM,L,NY,NX)=real((/1.0,0.0,0.0,0.0/),r8)
 
 !
 !  HUMUS PARTITIONED TO DIFFERENT FRACTIONS
@@ -613,10 +613,10 @@ module InitSOMBGCMOD
 !   CFOSC=fraction of humus in less(1),more(2) resistant component
 !
     FC1=FC0*FCX
-    CFOSC(iprotein,k_humus,L,NY,NX)  = FC1
-    CFOSC(icarbhyro,k_humus,L,NY,NX) = 1.0_r8-FC1
-    CFOSC(icellulos,k_humus,L,NY,NX) = 0.00_r8
-    CFOSC(ilignin,k_humus,L,NY,NX)   = 0.00_r8
+    CFOSC_vr(iprotein,k_humus,L,NY,NX)  = FC1
+    CFOSC_vr(icarbhyro,k_humus,L,NY,NX) = 1.0_r8-FC1
+    CFOSC_vr(icellulos,k_humus,L,NY,NX) = 0.00_r8
+    CFOSC_vr(ilignin,k_humus,L,NY,NX)   = 0.00_r8
 !
 !   MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
 !   HUMUS PARTITIONING TO COMPONENTS
@@ -687,14 +687,14 @@ module InitSOMBGCMOD
 
   IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
     scal                      = AREA(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
-    CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGCX(1:NumOfLitrCmplxs) = RSC_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGNX(1:NumOfLitrCmplxs) = RSN_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGPX(1:NumOfLitrCmplxs) = RSP_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
     scal                      = safe_adb(AREA(3,L,NY,NX),VGeomLayer_vr(L,NY,NX))
-    CORGCX(1:NumOfLitrCmplxs) = RSC(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGNX(1:NumOfLitrCmplxs) = RSN(1:NumOfLitrCmplxs,L,NY,NX)*scal
-    CORGPX(1:NumOfLitrCmplxs) = RSP(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGCX(1:NumOfLitrCmplxs) = RSC_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGNX(1:NumOfLitrCmplxs) = RSN_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    CORGPX(1:NumOfLitrCmplxs) = RSP_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ENDIF
     !
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)

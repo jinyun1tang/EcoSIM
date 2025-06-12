@@ -1239,7 +1239,6 @@ contains
           WatSnoByRedist_2DH(N,iBehind,N5,N4)     = WatSnoByRedist_2DH(N,iBehind,N5,N4)+WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
           IceSnoBySnowRedist_2DH(N,iBehind,N5,N4) = IceSnoBySnowRedist_2DH(N,iBehind,N5,N4)+IceSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
           HeatSnoByRedist_2DH(N,iBehind,N5,N4)    = HeatSnoByRedist_2DH(N,iBehind,N5,N4)+HeatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
-          IFLBS_2DH(N,iBehind,N5,N4)              = 0
         ELSE
           DrySnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = 0._r8
           WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = 0._r8
@@ -1265,7 +1264,6 @@ contains
           HeatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B) = TKSnow0_snvr(1,N2,N1)*(cps*DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B) &
             +cpw*WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)+cpi*IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B))
           IFLBSM_2DH(M,N,iFront,N5B,N4B)           = 1
-          IFLBS_2DH(N,iFront,N5B,N4B)              = 1
           DrySnoByRedistrib_2DH(N,iFront,N5B,N4B)  = DrySnoByRedistrib_2DH(N,iFront,N5B,N4B)+DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)
           WatSnoByRedist_2DH(N,iFront,N5B,N4B)     = WatSnoByRedist_2DH(N,iFront,N5B,N4B)+WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)
           IceSnoBySnowRedist_2DH(N,iFront,N5B,N4B) = IceSnoBySnowRedist_2DH(N,iFront,N5B,N4B)+IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)

@@ -35,14 +35,16 @@ module SoilDisturbMod
 !------------------------------------------------------------------------------------------
 
   subroutine SOMRemovalByDisturbance(I,J,NY,NX)
-!
-!     Description:
-!ITILL,DCORP=disturbance type,intensity
-!ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
+  !
+  !     Description:
+  !ITILL,DCORP=disturbance type,intensity
+  !iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF,MID,ids,NE,idom
+  integer :: L,K,M,N
+  integer :: IFLGJ   !combustion flag, 0=yes, 1=no
+  integer :: NLL,NGL,NTF,MID,ids,NE,idom
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
@@ -52,23 +54,25 @@ module SoilDisturbMod
   real(r8) :: ONL(4,1:jcplx),OPL(4,1:jcplx)
   real(r8) :: rmDOM(idom_beg:idom_end)
   real(r8) :: rmBiom(1:NumPlantChemElms )
-  real(r8) :: OMelm(1:NumPlantChemElms)
-  real(r8) :: dOMelm(1:NumPlantChemElms)
+  real(r8) :: OMelm(1:NumPlantChemElms)    !organic matter 
+  real(r8) :: dOMelm(1:NumPlantChemElms)   !change of organic matter
   real(r8) :: DCORPC1
 
 !     begin_execution
 
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.21 .OR. iSoilDisturbType_col(I,NY,NX).EQ.22))THEN
-    IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
-      iResetSoilProf_col(NY,NX)=itrue
-      IFLGJ=0
-      NLL=-1
-
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr .OR. iSoilDisturbType_col(I,NY,NX).EQ.itill_fire))THEN
+    IF(iSoilDisturbType_col(I,NY,NX).EQ.itill_fire)THEN
+      !fire
+      iResetSoilProf_col(NY,NX) = itrue
+      IFLGJ                     = 0
+      NLL                       = -1
+      !identify burning depth
       D2945: DO L=0,NL(NY,NX)
         IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
           ELSEIF(THETW_vr(L,NY,NX).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC)THEN
+            !combustion criteria not met: too much moisture, or too little organic matter
             IFLGJ=1
           ELSE
             NLL=L
@@ -81,7 +85,8 @@ module SoilDisturbMod
 
     D2950: DO L=0,NLL
       IF(NLL.GE.0)THEN
-        IF(iSoilDisturbType_col(I,NY,NX).EQ.22)THEN
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.itill_fire)THEN
+          !fire
           IF(L.EQ.0)THEN
             FORGCX=0.0_r8
           ELSE
@@ -92,20 +97,20 @@ module SoilDisturbMod
         ELSE
           DCORPC=AMIN1(0.999_r8,DepzCorp_col(I,NY,NX))
         ENDIF
-!     QH2OLoss_lnds=QH2OLoss_lnds+DCORPC*VLWatMicP_vr(L,NY,NX)
-!     HeatOut_lnds=HeatOut_lnds+DCORPC*4.19*TKS_vr(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
-!     VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)-DCORPC*VLWatMicP_vr(L,NY,NX)
-        OMelm=0._r8
-        dOMelm=0._r8
+        !  QH2OLoss_lnds=QH2OLoss_lnds+DCORPC*VLWatMicP_vr(L,NY,NX)
+        !  HeatOut_lnds=HeatOut_lnds+DCORPC*4.19*TKS_vr(L,NY,NX)*VLWatMicP_vr(L,NY,NX)
+        !  VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)-DCORPC*VLWatMicP_vr(L,NY,NX)
+        OMelm  = 0._r8
+        dOMelm = 0._r8
 
         ONL(1:4,1:jcplx)=0._r8
         OPL(1:4,1:jcplx)=0._r8
 
         D2970: DO K=1,jcplx
           IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
-!
-!     REMOVE MICROBIAL BIOMASS
-!
+            !
+            !     REMOVE MICROBIAL BIOMASS
+            !
             D2960: DO N=1,NumMicbFunGrupsPerCmplx
               DO NGL=JGnio(N),JGnfo(N)
                 DO M=1,nlbiomcp
@@ -354,15 +359,15 @@ module SoilDisturbMod
           SurfGas_lnd(idg_O2)=SurfGas_lnd(idg_O2)+2.667_r8*OMelm(ielmc)
           OXYGOU=OXYGOU+2.667_r8*OMelm(ielmc)
 
-          TOMOU_lnds(ielmn)=TOMOU_lnds(ielmn)+OMelm(ielmn)
-          TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)+OMelm(ielmp)
-          CO2byFire_CumYr_col(NY,NX)=CO2byFire_CumYr_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
-          CH4byFire_CumYr_col(NY,NX)=CH4byFire_CumYr_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
-          O2byFire_CumYr_col(NY,NX)=O2byFire_CumYr_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
-          NH3byFire_CumYr_col(NY,NX)=NH3byFire_CumYr_col(NY,NX)-OMelm(ielmn)
-          N2ObyFire_CumYr_col(NY,NX)=N2ObyFire_CumYr_col(NY,NX)-0.0_r8
-          PO4byFire_CumYr_col(NY,NX)=PO4byFire_CumYr_col(NY,NX)-OMelm(ielmp)
-          Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
+          TOMOU_lnds(ielmn)          = TOMOU_lnds(ielmn)+OMelm(ielmn)
+          TOMOU_lnds(ielmp)          = TOMOU_lnds(ielmp)+OMelm(ielmp)
+          CO2byFire_CumYr_col(NY,NX) = CO2byFire_CumYr_col(NY,NX)-(1.0_r8-FrcAsCH4byFire)*OMelm(ielmc)
+          CH4byFire_CumYr_col(NY,NX) = CH4byFire_CumYr_col(NY,NX)-FrcAsCH4byFire*OMelm(ielmc)
+          O2byFire_CumYr_col(NY,NX)  = O2byFire_CumYr_col(NY,NX)+(1.0_r8-FrcAsCH4byFire)*2.667_r8*OMelm(ielmc)
+          NH3byFire_CumYr_col(NY,NX) = NH3byFire_CumYr_col(NY,NX)-OMelm(ielmn)
+          N2ObyFire_CumYr_col(NY,NX) = N2ObyFire_CumYr_col(NY,NX)-0.0_r8
+          PO4byFire_CumYr_col(NY,NX) = PO4byFire_CumYr_col(NY,NX)-OMelm(ielmp)
+          Eco_NBP_CumYr_col(NY,NX)   = Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
         ENDIF
       ENDIF
     ENDDO D2950
