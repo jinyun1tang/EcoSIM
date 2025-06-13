@@ -50,14 +50,14 @@
 !     ALAT=latitude +ve=N,-ve=S
 !
 
-      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
+      IF((ALAT_col(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT_col(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
         !to be revised for GDD 
         GasHydroLoss_cumflx_col(:,NY,NX)  = 0._r8
         Gas_Prod_TP_cumRes_col(:,NY,NX)   = 0._r8
         QdewCanopy_CumYr_pft(:,NY,NX)     = 0._r8
         trcg_mass_cumerr_col(:,NY,NX)     = 0._r8
         GDD_col(NY,NX)                    = 0._r8
-        AmendCFlx_CumYr_col(NY,NX)        = 0._r8
+        AmendC_CumYr_flx_col(NY,NX)        = 0._r8
         LiterfalOrgM_col(:,NY,NX)         = 0._r8
         RootResp_CumYr_col(NY,NX)         = 0._r8
         Eco_NBP_CumYr_col(NY,NX)          = 0._r8
@@ -87,7 +87,7 @@
         NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
         NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
         HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8
-        D960: DO NZ=1,NP0(NY,NX)
+        D960: DO NZ=1,NP0_col(NY,NX)
           !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
           DO NE=1,NumPlantChemElms
             NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &

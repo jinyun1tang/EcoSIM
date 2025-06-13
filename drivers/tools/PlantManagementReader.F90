@@ -51,7 +51,7 @@ program PlantManagementReader
   NVS=1
   call InitPlantMngmtData
 
-  NP(NVN:NVS,NHW:NHE)=NPS
+  NP_col(NVN:NVS,NHW:NHE)=NPS
   read(nml_buffer, nml=pft_mgmnt, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading pft management namelist ",nml_error,ioerror_msg

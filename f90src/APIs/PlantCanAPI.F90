@@ -49,8 +49,8 @@ implicit none
   integer :: L,N,M,NN,NZ,K,NB
 !  Integers
   plt_site%KoppenClimZone        = KoppenClimZone_col(NY,NX)
-  plt_site%NP                    = NP(NY,NX)
-  plt_site%NU                    = NU(NY,NX)
+  plt_site%NP                    = NP_col(NY,NX)
+  plt_site%NU                    =NU_col(NY,NX)
   plt_morph%StemArea_col         = StemArea_col(NY,NX)
   plt_morph%CanopyLeafArea_col   = CanopyLeafArea_col(NY,NX)
   plt_site%ZEROS                 = ZEROS(NY,NX)
@@ -72,8 +72,8 @@ implicit none
   ENDDO
   plt_rad%TAU_DirectRTransmit(NumOfCanopyLayers+1)=TAU_DirectRTransmit(NumOfCanopyLayers+1,NY,NX)
 
-  DO L=0,NL(NY,NX)
-    plt_site%AREA3(L)                 = AREA(3,L,NY,NX)
+  DO L=0,NL_col(NY,NX)
+    plt_site%AREA3(L)                 = AREA_3D(3,L,NY,NX)
     plt_soilchem%VLSoilPoreMicP_vr(L) = VLSoilPoreMicP_vr(L,NY,NX)
     plt_soilchem%VLSoilMicP_vr(L)     = VLSoilMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)      = VLWatMicP_vr(L,NY,NX)
@@ -96,8 +96,8 @@ implicit none
   plt_rad%SoilAlbedo               = SoilAlbedo_col(NY,NX)
   plt_rad%SurfAlbedo_col           = SurfAlbedo_col(NY,NX)
   plt_site%ZEROS2                  = ZEROS2(NY,NX)
-  plt_site%POROS1                  = POROS_vr(NU(NY,NX),NY,NX)
-  DO NZ=1,NP(NY,NX)
+  plt_site%POROS1                  = POROS_vr(NU_col(NY,NX),NY,NX)
+  DO NZ=1,NP_col(NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)   = CanopyLeafArea_pft(NZ,NY,NX)
     plt_morph%CanopyHeight_pft(NZ)     = CanopyHeight_pft(NZ,NY,NX)
     plt_morph%ClumpFactorNow_pft(NZ)   = ClumpFactorNow_pft(NZ,NY,NX)
@@ -184,7 +184,7 @@ implicit none
     TAU_RadThru(L,NY,NX)      = plt_rad%TAU_RadThru(L)
   ENDDO
   LeafStalkArea_col(NY,NX)=plt_morph%LeafStalkArea_col
-  DO NZ=1,NP(NY,NX)
+  DO NZ=1,NP_col(NY,NX)
     LeafStalkArea_pft(NZ,NY,NX)    =plt_morph%LeafStalkArea_pft(NZ)
     RadSWbyCanopy_pft(NZ,NY,NX)    =plt_rad%RadSWbyCanopy_pft(NZ)
     RadPARbyCanopy_pft(NZ,NY,NX)   =plt_rad%RadPARbyCanopy_pft(NZ)

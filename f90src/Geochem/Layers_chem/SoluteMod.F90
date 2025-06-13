@@ -75,7 +75,7 @@ module SoluteMod
 !     FLWD=net vertical flow relative to area
 !
 !     IF(ROWI(I,NY,NX).GT.0.0)THEN
-  FLWD=0.5_r8*(WaterFlowSoiMicP_3D(3,L,NY,NX)+WaterFlowSoiMicP_3D(3,L+1,NY,NX))/AREA(3,L,NY,NX)
+  FLWD=0.5_r8*(WaterFlowSoiMicP_3D(3,L,NY,NX)+WaterFlowSoiMicP_3D(3,L+1,NY,NX))/AREA_3D(3,L,NY,NX)
 !
 !     NH4 FERTILIZER BAND
 !
@@ -516,12 +516,12 @@ module SoluteMod
   real(r8) :: DPFLW,DNH4S,DNH3S
   real(r8) :: FVLNH4
 !     begin_execution
-!     IFNHB=banded NH4 fertilizer flag
+!     IFNHB_col=banded NH4 fertilizer flag
 !     ROWN=NH4 fertilizer band row width
 !     DPNH4=NH4 fertilizer band depth
 !
-  IF(IFNHB(NY,NX).EQ.1.AND.ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
+  IF(IFNHB_col(NY,NX).EQ.1.AND.ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
+    IF(L.EQ.NU_col(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
 !
@@ -621,12 +621,12 @@ module SoluteMod
   real(r8) :: DZC1P,DZC2P,DZM1P,DXOH0,DXOH1,DXOH2,DXH1P,DXH2P
   real(r8) :: DPALP,DPFEP,DPCDP,DPCHP,DPCMP,FVLPO4
 !     begin_execution
-!     IFPOB=banded H2PO4 fertilizer flag
+!     IFPOB_col=banded H2PO4 fertilizer flag
 !     ROWP=H2PO4 fertilizer band row width
 !     DPPO4=H2PO4 fertilizer band depth
 !
-  IF(IFPOB(NY,NX).EQ.1 .AND. ROWSpacePO4_col(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
+  IF(IFPOB_col(NY,NX).EQ.1 .AND. ROWSpacePO4_col(NY,NX).GT.0.0)THEN
+    IF(L.EQ.NU_col(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
 !
 !     PO4 BAND WIDTH
 !     DWPO4=change in H2PO4 fertilizer band width
@@ -848,13 +848,13 @@ module SoluteMod
   real(r8) :: DNO2S,FVLNO3,DPFLW
 
 !     begin_execution
-!     IFNOB=banded NO3 fertilizer flag
+!     IFNOB_col=banded NO3 fertilizer flag
 !     ROWO=NO3 fertilizer band row width
 !     DPNO3=NO3 fertilizer band depth
 !
-  IF(IFNOB(NY,NX).EQ.1.AND.ROWSpaceNO3_col(NY,NX).GT.0.0)THEN
+  IF(IFNOB_col(NY,NX).EQ.1.AND.ROWSpaceNO3_col(NY,NX).GT.0.0)THEN
 
-    IF(L.EQ.NU(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
+    IF(L.EQ.NU_col(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
 !
 !     NO3 BAND WIDTH
 !
@@ -1196,14 +1196,14 @@ module SoluteMod
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
 !     CONCENTRATIONS
 !
-    XCAX=CCEC0/(1.0_r8+GKC4_vr(NU(NY,NX),NY,NX)*NH4_1p_aqua_mole_conc/CaX_conc &
-      +GKCH_vr(NU(NY,NX),NY,NX)*H_1p_aqua_mole_conc/CaX_conc &
-      +GKCA_vr(NU(NY,NX),NY,NX)*CALX/CaX_conc &
-      +GKCA_vr(NU(NY,NX),NY,NX)*CFEX/CaX_conc)
-    XN4Q_mole_conc = XCAX*NH4_1p_aqua_mole_conc*GKC4_vr(NU(NY,NX),NY,NX)
-    XHYQ = XCAX*H_1p_aqua_mole_conc*GKCH_vr(NU(NY,NX),NY,NX)
-    XALQ = XCAX*CALX*GKCA_vr(NU(NY,NX),NY,NX)
-    XFEQ = XCAX*CFEX*GKCA_vr(NU(NY,NX),NY,NX)
+    XCAX=CCEC0/(1.0_r8+GKC4_vr(NU_col(NY,NX),NY,NX)*NH4_1p_aqua_mole_conc/CaX_conc &
+      +GKCH_vr(NU_col(NY,NX),NY,NX)*H_1p_aqua_mole_conc/CaX_conc &
+      +GKCA_vr(NU_col(NY,NX),NY,NX)*CALX/CaX_conc &
+      +GKCA_vr(NU_col(NY,NX),NY,NX)*CFEX/CaX_conc)
+    XN4Q_mole_conc = XCAX*NH4_1p_aqua_mole_conc*GKC4_vr(NU_col(NY,NX),NY,NX)
+    XHYQ = XCAX*H_1p_aqua_mole_conc*GKCH_vr(NU_col(NY,NX),NY,NX)
+    XALQ = XCAX*CALX*GKCA_vr(NU_col(NY,NX),NY,NX)
+    XFEQ = XCAX*CFEX*GKCA_vr(NU_col(NY,NX),NY,NX)
     XCAQ = XCAX*CaX_conc
     XTLQ = XN4Q_mole_conc+XHYQ+XALQ+XFEQ+XCAQ
     IF(XTLQ.GT.ZERO)THEN

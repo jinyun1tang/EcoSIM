@@ -79,7 +79,6 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TBION_vr(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRChem_gas_NH3_geochem_vr(:,:,:)      !total gaseous NH3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcp_RChem_soil_vr(:,:,:,:)           !total precipitated P containing transformation non-band, [mol d-2 h-1]
-
   real(r8),target,allocatable ::  trcg_mass_cumerr_col(:,:,:)           !cumlative volatile tracer error [g/d2]
   private :: InitAllocate
   contains

@@ -8,7 +8,7 @@ module PerturbationMod
   use MiniMathMod,      only: yearday,             isletter, isLeap
   use ClimForcDataType, only: TKS_ref_vr
   use GridConsts,       only: JY, JX
-  use GridDataType,     only: CumDepz2LayBottom_vr, NU, NL
+  use GridDataType,     only: CumDepz2LayBottom_vr, NU_col, NL_col
   use EcoSimConst  
   implicit none
   private
@@ -199,7 +199,7 @@ module PerturbationMod
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         IF(CumDepz2LayBottom_vr(L,NY,NX).LE.warm_depz)THEN
           warm_LL(NY,NX)=L
           TKS_ref_vr(i1:i2,L,NY,NX)=TKS_ref_vr(i1:i2,L,NY,NX)+warm_dTK

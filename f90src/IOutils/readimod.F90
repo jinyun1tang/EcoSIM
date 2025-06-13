@@ -88,12 +88,12 @@ module readiMod
 
   if(.not.column_mode)then
     DO  NX=NHW,NHE
-      NL(NVS+1,NX)=NL(NVS,NX)
+      NL_col(NVS+1,NX)=NL_col(NVS,NX)
     ENDDO
     DO  NY=NVN,NVS
-      NL(NY,NHE+1)=NL(NY,NHE)
+      NL_col(NY,NHE+1)=NL_col(NY,NHE)
     ENDDO
-    NL(NVS+1,NHE+1)=NL(NVS,NHE)
+    NL_col(NVS+1,NHE+1)=NL_col(NVS,NHE)
   endif
   IOLD=0
   call ncd_pio_closefile(grid_nfid)
@@ -278,14 +278,14 @@ module readiMod
 
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
-      ALAT(NY,NX)               = ALATG
+      ALAT_col(NY,NX)               = ALATG
       PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
       ALTI(NY,NX)               = ALTIG
-      ATCAI(NY,NX)              = ATCAG
+      ATCAI_col(NY,NX)              = ATCAG
       IDWaterTable_col(NY,NX)   = iWaterTabelMode
       OXYE_col(NY,NX)           = ao2_ppm
       Z2GE_col(NY,NX)           = an2_ppm
-      CO2EI(NY,NX)              = aco2_ppm
+      CO2EI_col(NY,NX)              = aco2_ppm
       CH4E_col(NY,NX)           = ach4_ppm
       Z2OE_col(NY,NX)           = an2o_ppm
       ARGE_col(NY,NX)           = arg_ppm
@@ -312,21 +312,21 @@ module readiMod
       RechargRateWestWTBL_col(NY,NX)  = RCHGWUG      
       RechargBottom_col(NY,NX) = RCHGDG
 
-      DH(NY,NX)                = DHI(NX)
-      DV(NY,NX)                = DVI(NY)
-      CO2E_col(NY,NX)          = CO2EI(NY,NX)
+      DH_col(NY,NX)                = DHI(NX)
+      DV_col(NY,NX)                = DVI(NY)
+      CO2E_col(NY,NX)          = CO2EI_col(NY,NX)
       H2GE_col(NY,NX)          = ah2_ppm
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
 !     DayLenthMax=maximum daylength (h)
 !
-      IF(ALAT(NY,NX).GT.0.0_r8)THEN
+      IF(ALAT_col(NY,NX).GT.0.0_r8)THEN
         XI=173
       ELSE
         XI=356
       ENDIF
-      DayLenthMax(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
+      DayLenthMax(NY,NX)=GetDayLength(ALAT_col(NY,NX),XI)
 
     ENDDO D9890
   ENDDO D9895
@@ -409,20 +409,20 @@ module readiMod
     call ncd_getvar(grid_nfid, 'RSPm',  ntp,RSP_vr(k_manure,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'IXTYP1',ntp,iLitrType_col(1,NV1,NH1))
     call ncd_getvar(grid_nfid, 'IXTYP2',ntp,iLitrType_col(2,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI_col(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
-    call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'ISOILR_col',ntp,ISOILR_col(NV1,NH1))
     
-    NU(NV1,NH1) = NUI(NV1,NH1)    
-    NK(NV1,NH1) = MaxNumRootLays(NV1,NH1)+1
-    NM(NV1,NH1) = MaxNumRootLays(NV1,NH1)+NL1
+    NU_col(NV1,NH1) = NUI_col(NV1,NH1)    
+    NK_col(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+1
+    NM(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+NL1
     
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
-    NLI(NV1,NH1) = NM(NV1,NH1)+NL2
-    NL(NV1,NH1)  = NLI(NV1,NH1)
+    NLI_col(NV1,NH1) = NM(NV1,NH1)+NL2
+    NL_col(NV1,NH1)  = NLI_col(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayBottom_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
@@ -503,7 +503,7 @@ module readiMod
 !     IXTYP=surface litter type:1=plant,2=manure
 !     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
 !     NL1,NL2=number of additional layers below NJ with,without data in file
-!     ISOILR=natural(0),reconstructed(1) soil profile
+!     ISOILR_col=natural(0),reconstructed(1) soil profile
 !
           PSIAtFldCapacity(NY,NX)   = PSIAtFldCapacity(NV1,NH1)
           PSIAtWiltPoint(NY,NX)     = PSIAtWiltPoint(NV1,NH1)
@@ -520,15 +520,15 @@ module readiMod
           RSP_vr(k_manure,0,NY,NX)     = RSP_vr(k_manure,0,NV1,NH1)
           iLitrType_col(1,NY,NX)            = iLitrType_col(1,NV1,NH1)
           iLitrType_col(2,NY,NX)            = iLitrType_col(2,NV1,NH1)
-          NUI(NY,NX)                = NUI(NV1,NH1)
-          MaxNumRootLays(NY,NX)     = MaxNumRootLays(NV1,NH1)
-          ISOILR(NY,NX)             = ISOILR(NV1,NH1)
-          NU(NY,NX)                 = NU(NV1,NH1)
-          NK(NY,NX)                 = NK(NV1,NH1)
+          NUI_col(NY,NX)                = NUI_col(NV1,NH1)
+          MaxNumRootLays_col(NY,NX)     = MaxNumRootLays_col(NV1,NH1)
+          ISOILR_col(NY,NX)             = ISOILR_col(NV1,NH1)
+          NU_col(NY,NX)                 =NU_col(NV1,NH1)
+          NK_col(NY,NX)                 = NK_col(NV1,NH1)
           NM(NY,NX)                 = NM(NV1,NH1)
 !  the extra soil layer below root zone cannot be greater than what is allowed
-          NLI(NY,NX) = NLI(NV1,NH1)
-          NL(NY,NX)  = NLI(NV1,NH1)
+          NLI_col(NY,NX) = NLI_col(NV1,NH1)
+          NL_col(NY,NX)  = NLI_col(NV1,NH1)
         ENDIF
 
 !
@@ -540,7 +540,7 @@ module readiMod
 !
         iPondFlag_col(NY,NX)=.false.
         IF (NX/=NH1 .OR. NY/=NV1) THEN
-          DO L=NU(NY,NX),NM(NY,NX)
+          DO L=NU_col(NY,NX),NM(NY,NX)
             CumDepz2LayBottom_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NV1,NH1)
             SoiBulkDensityt0_vr(L,NY,NX)  = SoiBulkDensityt0_vr(L,NV1,NH1)
             if(.not.iPondFlag_col(NY,NX))iPondFlag_col(NY,NX)=SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO
@@ -605,7 +605,7 @@ module readiMod
 
           ENDDO
         ENDIF
-        DO L=1,NL(NY,NX)
+        DO L=1,NL_col(NY,NX)
           if(CSoilOrgM_vr(ielmc,L,NY,NX) > 0._r8)then 
             if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
               write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
@@ -618,7 +618,7 @@ module readiMod
           endif  
         ENDDO
         if(lverb)then
-          CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
+          CALL Disp_topo_charc(NY,NX,NU_col(NY,NX),NM(NY,NX))
         endif
 !        RSC_vr(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC_vr(k_fine_litr,0,NY,NX))
 !        RSN_vr(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_litr,0,NY,NX))
@@ -630,15 +630,15 @@ module readiMod
 !
 !     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert_vr(3),SatHydroCondHrzn_vr(4)
 !
-        call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM(NY,NX))
+        call ComputeSoilHydroPars(NY,NX,NU_col(NY,NX),NM(NY,NX))
 
 !
 !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
 !     below is for soil repacking, whence NU>1
 !     root zone from NU to NM, why use 0.025?
 !
-        IF(NU(NY,NX).GT.1)THEN
-          DO  L=NU(NY,NX)-1,0,-1
+        IF(NU_col(NY,NX).GT.1)THEN
+          DO  L=NU_col(NY,NX)-1,0,-1
             IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
               CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.01_r8
             ELSE
@@ -689,7 +689,7 @@ module readiMod
               GKCK_vr(L,NY,NX)             = GKCK_vr(L+1,NY,NX)
               THW_vr(L,NY,NX)              = THW_vr(L+1,NY,NX)
               THI_vr(L,NY,NX)              = THI_vr(L+1,NY,NX)
-              ISOIL(1:4,L,NY,NX)           = ISOIL(1:4,L+1,NY,NX)
+              ISOIL_vr(1:4,L,NY,NX)           = ISOIL_vr(1:4,L+1,NY,NX)
               RSC_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
               RSN_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
               RSP_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
@@ -719,7 +719,7 @@ module readiMod
 !   CNH4...=solute concentrations converted to mol Mg-1
 !   SoiBulkDensityt0_vr: initial bulk density
 
-        DO  L=1,NL(NY,NX)
+        DO  L=1,NL_col(NY,NX)
   !   SoilFracAsMacP: macropore fraction
   !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoilBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
@@ -834,10 +834,10 @@ module readiMod
   write(*,*)'N in surface manure litter (g m-2)',RSN_vr(k_manure,0,NY,NX)
   write(*,*)'P in surface manure litter (g m-2)',RSP_vr(k_manure,0,NY,NX)
   write(*,*)'surface litter type:1=plant,2=manure',iLitrType_col(1,NY,NX),iLitrType_col(2,NY,NX)
-  write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
-  write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays(NY,NX)
-  write(*,*)'number of layers involved in model calculation',NL(NY,NX)
-  write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR(NY,NX)
+  write(*,*)'layer number of soil surface layer NUI',NUI_col(NY,NX)
+  write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays_col(NY,NX)
+  write(*,*)'number of layers involved in model calculation',NL_col(NY,NX)
+  write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR_col(NY,NX)
   write(*,*)
   write(*,'(A,I2,A,I2)')'read data for layers from layer NU ',NU,' to layer NM ',NM
 

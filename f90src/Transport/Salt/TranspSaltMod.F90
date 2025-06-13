@@ -177,10 +177,10 @@ module TranspSaltMod
     ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B  
     !soil 
     trcSalt_Precip2MicpM(idsalt,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU(NY,NX),NY,NX)*dts_HeatWatTP
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*dts_HeatWatTP
     !band   
     trcSalt_Precip2MicpM(ids,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU(NY,NX),NY,NX)*dts_HeatWatTP    
+      +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)*dts_HeatWatTP    
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine AtmosSoluteFluxToTopsoil
@@ -201,7 +201,7 @@ module TranspSaltMod
 !
 !     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 
-  D10: DO L=NU(NY,NX),NL(NY,NX)
+  D10: DO L=NU_col(NY,NX),NL_col(NY,NX)
     DO idsalt=idsalt_beg,idsaltb_end
       trcSalt_RGeoChem_flxM_vr(idsalt,L,NY,NX)=-trcSalt_RGeoChem_flx_vr(idsalt,L,NY,NX)*dts_HeatWatTP
     ENDDO
@@ -257,7 +257,7 @@ module TranspSaltMod
       DO idsalt=idsalt_beg,idsaltb_end
         trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml_vr(idsalt,L,NY,NX)
       ENDDO
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idsalt=idsalt_beg,idsaltb_end
           trcSalt_solml2_vr(idsalt,L,NY,NX)=trcSalt_solml_vr(idsalt,L,NY,NX)
           trcSalt_soHml2_vr(idsalt,L,NY,NX)=trcSalt_soHml_vr(idsalt,L,NY,NX)
@@ -361,7 +361,7 @@ module TranspSaltMod
         call get_flux_scalar(trcSalt_solml2_vr(idsalt,0,NY,NX),flux,trcSalt_solml_vr(idsalt,0,NY,NX),pscal(idsalt))
       ENDDO
 
-      D9685: DO L=NU(NY,NX),NL(NY,NX)
+      D9685: DO L=NU_col(NY,NX),NL_col(NY,NX)
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           DO idsalt=idsalt_beg,idsaltb_end            
             flux=trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX) &
@@ -405,7 +405,7 @@ module TranspSaltMod
 !
 !     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
 !
-      D9885: DO L=NU(NY,NX),NL(NY,NX)
+      D9885: DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idsalt=idsalt_beg,idsalt_end      
           trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)=0.0_r8
           trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)=0.0_r8

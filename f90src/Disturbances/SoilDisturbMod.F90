@@ -71,8 +71,8 @@ module SoilDisturbMod
       IFLGJ                     = 0
       NLL                       = -1
       !identify burning depth
-      D2945: DO L=0,NL(NY,NX)
-        IF(L.EQ.0 .OR. L.GE.NUM(NY,NX))THEN
+      D2945: DO L=0,NL_col(NY,NX)
+        IF(L.EQ.0 .OR. L.GE.NUM_col(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
             exit
           ELSEIF(THETW_vr(L,NY,NX).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC)THEN

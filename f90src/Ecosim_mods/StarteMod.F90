@@ -56,16 +56,16 @@ module StarteMod
 !
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
-      solutevar%CCO2M = CCO2EI(NY,NX)/catomw
+      solutevar%CCO2M = CCO2EI_col(NY,NX)/catomw
       solutevar%CCH4M = AtmGasCgperm3(idg_CH4,NY,NX)/catomw
       solutevar%COXYM = AtmGasCgperm3(idg_O2,NY,NX)/32.0_r8
       solutevar%CZ2GM = AtmGasCgperm3(idg_N2,NY,NX)/natomw
       solutevar%CZ2OM = AtmGasCgperm3(idg_N2O,NY,NX)/natomw
-      solutevar%ATCA  = ATCA(NY,NX)
+      solutevar%ATCA  = ATCA_col(NY,NX)
       solutevar%ZEROS = ZEROS(NY,NX)
 
       DO I=1,366
-        DO  L=NU(NY,NX),NL(NY,NX)
+        DO  L=NU_col(NY,NX),NL_col(NY,NX)
           D2000: DO K=micpar%k_fine_litr,micpar%k_POM
             BulkSoilMass=0._r8
 
@@ -250,7 +250,7 @@ module StarteMod
       trcsalt_rain_mole_conc_col(idsalt_CaH4P2O8,NY,NX) = solutevar%CaH4P2O8_1p_aqua_mole_conc
       trcsalt_rain_mole_conc_col(idsalt_MgHPO4,NY,NX)   = solutevar%MgHPO4_conc
     endif
-    HPO4_rain_mole_conc(NY,NX)      = solutevar%H1PO4_2e_aqua_mole_conc
+    HPO4_rain_mole_conc_col(NY,NX)      = solutevar%H1PO4_2e_aqua_mole_conc
     H2PO4_rain_mole_conc(NY,NX)     = solutevar%H2PO4_1e_aqua_mole_conc
     SurfIrrig_IonStrenth_col(NY,NX) = solutevar%CSTR1
 !
@@ -386,7 +386,7 @@ module StarteMod
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI(NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI_col(NY,NX)*VLsoiAirP_vr(L,NY,NX)
     DO idg=idg_beg,idg_NH3
       trcg_gasml_vr(idg,L,NY,NX) = AtmGasCgperm3(idg,NY,NX)*VLsoiAirP_vr(L,NY,NX)
     ENDDO
@@ -394,7 +394,7 @@ module StarteMod
 !   ExtWaterTablet0_col: external water table depth
     IF(CumDepz2LayBottom_vr(L-1,NY,NX).LT.ExtWaterTablet0_col(NY,NX))THEN
       ! above water table
-      trcs_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
+      trcs_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA_col(NY,NX)) &
         /(EXP(GasSechenovConst(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     ELSE
       !below water table
@@ -403,7 +403,7 @@ module StarteMod
 
     
     DO idg=idg_beg,idg_NH3-1  
-      trcs_solml_vr(idg,L,NY,NX)=AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, ATCA(NY,NX)) &
+      trcs_solml_vr(idg,L,NY,NX)=AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, ATCA_col(NY,NX)) &
         /(EXP(GasSechenovConst(idg)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
     ENDDO  
 !
@@ -546,7 +546,7 @@ module StarteMod
 
         trcn_solsml_snvr(ids_NH4,L,NY,NX)   = VOLWW*NH4_rain_mole_conc(NY,NX)*natomw
         trcn_solsml_snvr(ids_NO3,L,NY,NX)   = VOLWW*NO3_rain_mole_conc(NY,NX)*natomw
-        trcn_solsml_snvr(ids_H1PO4,L,NY,NX) = VOLWW*HPO4_rain_mole_conc(NY,NX)*patomw
+        trcn_solsml_snvr(ids_H1PO4,L,NY,NX) = VOLWW*HPO4_rain_mole_conc_col(NY,NX)*patomw
         trcn_solsml_snvr(ids_H2PO4,L,NY,NX) = VOLWW*H2PO4_rain_mole_conc(NY,NX)*patomw
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK

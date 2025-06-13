@@ -48,10 +48,10 @@ implicit none
 ! FSINK=hourly rate for sediment sinking
 !
   call PrintInfo('beg '//subname)
-  D9885: DO L=NL(NY,NX)-1,1,-1
+  D9885: DO L=NL_col(NY,NX)-1,1,-1
     IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
-      D9880: DO LL=L+1,NL(NY,NX)
+      D9880: DO LL=L+1,NL_col(NY,NX)
         IF(DLYR_3D(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
       ENDDO D9880
 

@@ -70,7 +70,7 @@ contains
   !
   !DESCRIPTION
   !assuming the seed is spherical, compute its volume, diameter(=length), and surface area
-  !     SeedVolumeMean,SeedLengthMean,SeedAreaMean=seed volume(m3),length(m),area(m2)
+  !     SeedVolumeMean,SeedLengthMean,SeedAreaMean=seed volume(m3),length(m),AREA_3D(m2)
   !     SeedCMass=seed C mass (g) from PFT file
   !
 

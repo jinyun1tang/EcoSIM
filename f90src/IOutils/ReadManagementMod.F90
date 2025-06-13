@@ -104,7 +104,7 @@ implicit none
 
   integer :: NY,NX,LPY,J,JEN
   integer :: IDY1,IDY2,IDY3,I,IDY
-  integer :: IDYS,IHRS,IFLGVX,JST,IDYE,IHRE
+  integer :: IDYS,IHRS,IFLGV_colX,JST,IDYE,IHRE
   real(r8):: DY
   real(r8) :: DST,DEN,CIRRX,RR,FIRRX
   real(r8) :: DIRRX,PHQX,CKAQX,RRH,WDPTHI,CCLQX
@@ -133,9 +133,9 @@ implicit none
 !       AUTOMATED IRRIGATION
 !
 !       DST,DEN=start,end dates,hours DDMMHHHH
-!       IFLGVX=flag for irrigation criterion,0=SWC,1=canopy water potl
-!       FIRRX=depletion of SWC from CIRRX to WP(IFLGV=0),or minimum canopy
-!       water potential(IFLGV=1), to trigger irrigation
+!       IFLGV_colX=flag for irrigation criterion,0=SWC,1=canopy water potl
+!       FIRRX=depletion of SWC from CIRRX to WP(IFLGV_col=0),or minimum canopy
+!       water potential(IFLGV_col=1), to trigger irrigation
 !       CIRRX= fraction of FC to which irrigation will raise SWC
 !       DIRRX= depth to which water depletion and rewatering is calculated
 !       WDPTHI=depth at which irrigation is applied
@@ -147,14 +147,14 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf(1)),&
       trim(mod_filename))
 
-    READ(irrigf(1),*)DST,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
+    READ(irrigf(1),*)DST,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
       ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
       ,CSOQX,CCLQX
     READ(irrigf(1),'(I2,I2,I4)')IDY1,IDY2,IDY3
 
     IF(lverb)then
       print*,irrigf(1)
-      print*,IDY1,IDY2,IDY3,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
+      print*,IDY1,IDY2,IDY3,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
         ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
         ,CSOQX,CCLQX
     endif
@@ -185,7 +185,7 @@ implicit none
 !
     D7965: DO NX=NH1,NH2
       D7960: DO NY=NV1,NV2
-        IFLGV(NY,NX)   = IFLGVX
+        IFLGV_col(NY,NX)   = IFLGV_colX
         IIRRA(1,NY,NX) = IDYS
         IIRRA(2,NY,NX) = IDYE
         IIRRA(3,NY,NX) = INT(IHRS/100)

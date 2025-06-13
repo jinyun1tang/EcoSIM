@@ -88,9 +88,9 @@ implicit none
 !       VOLWZ=water volume used to calculate aqueous microbial
 !       concentrations that drive microbial density effects on
 !       decomposition
-      D998: DO L=0,NL(NY,NX)
+      D998: DO L=0,NL_col(NY,NX)
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          IF(L.EQ.0 .OR. L.GE.NU(NY,NX))THEN
+          IF(L.EQ.0 .OR. L.GE.NU_col(NY,NX))THEN
              call sumMicBiomLayL(L,NY,NX,OrGM_beg)
              call MicBGC1Layer(I,J,L,NY,NX)
              call sumMicBiomLayL(L,NY,NX,dOrGM)
@@ -192,9 +192,9 @@ implicit none
   micfor%VLPOB             = trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
 
   if(micfor%litrm)then
-    micfor%TKS            = FracSurfByLitR_col(NY,NX)*TKS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TKS_vr(NU(NY,NX),NY,NX)
+    micfor%TKS            = FracSurfByLitR_col(NY,NX)*TKS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TKS_vr(NU_col(NY,NX),NY,NX)
     micfor%PSISoilMatricP = FracSurfByLitR_col(NY,NX)*PSISoilMatricP_vr(0,NY,NX)+ &
-      (1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+      (1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU_col(NY,NX),NY,NX)
   else
     micfor%TKS            = TKS_vr(L,NY,NX)
     micfor%PSISoilMatricP = PSISoilMatricP_vr(L,NY,NX)
@@ -225,35 +225,35 @@ implicit none
   !is it litter layer?
   micfor%litrm=(L==0)
   !is it surface layer
-  micfor%Lsurf=(L==NU(NY,NX))
+  micfor%Lsurf=(L==NU_col(NY,NX))
 
   !litter layer is modeled
   if(micfor%litrm)then
-    micstt%ZNH4TU = AZMAX1(trcs_solml_vr(ids_NH4,NU(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_NH4B,NU(NY,NX),NY,NX))
-    micstt%ZNO3TU = AZMAX1(trcs_solml_vr(ids_NO3,NU(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_NO3B,NU(NY,NX),NY,NX))
-    micstt%H1P4TU = AZMAX1(trcs_solml_vr(ids_H1PO4,NU(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_H1PO4B,NU(NY,NX),NY,NX))
-    micstt%H2P4TU = AZMAX1(trcs_solml_vr(ids_H2PO4,NU(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_H2PO4B,NU(NY,NX),NY,NX))
+    micstt%ZNH4TU = AZMAX1(trcs_solml_vr(ids_NH4,NU_col(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_NH4B,NU_col(NY,NX),NY,NX))
+    micstt%ZNO3TU = AZMAX1(trcs_solml_vr(ids_NO3,NU_col(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_NO3B,NU_col(NY,NX),NY,NX))
+    micstt%H1P4TU = AZMAX1(trcs_solml_vr(ids_H1PO4,NU_col(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX))
+    micstt%H2P4TU = AZMAX1(trcs_solml_vr(ids_H2PO4,NU_col(NY,NX),NY,NX))+AZMAX1(trcs_solml_vr(ids_H2PO4B,NU_col(NY,NX),NY,NX))
 
-    micstt%CNH4BU  = trc_solcl_vr(ids_NH4B,NU(NY,NX),NY,NX)
-    micstt%CNH4SU  = trc_solcl_vr(ids_NH4,NU(NY,NX),NY,NX)
-    micstt%CH2P4U  = trc_solcl_vr(ids_H2PO4,NU(NY,NX),NY,NX)
-    micstt%CH2P4BU = trc_solcl_vr(ids_H2PO4B,NU(NY,NX),NY,NX)
-    micstt%CH1P4U  = trc_solcl_vr(ids_H1PO4,NU(NY,NX),NY,NX)
-    micstt%CH1P4BU = trc_solcl_vr(ids_H1PO4B,NU(NY,NX),NY,NX)
-    micstt%CNO3SU  = trc_solcl_vr(ids_NO3,NU(NY,NX),NY,NX)
-    micstt%CNO3BU  = trc_solcl_vr(ids_NO3B,NU(NY,NX),NY,NX)
+    micstt%CNH4BU  = trc_solcl_vr(ids_NH4B,NU_col(NY,NX),NY,NX)
+    micstt%CNH4SU  = trc_solcl_vr(ids_NH4,NU_col(NY,NX),NY,NX)
+    micstt%CH2P4U  = trc_solcl_vr(ids_H2PO4,NU_col(NY,NX),NY,NX)
+    micstt%CH2P4BU = trc_solcl_vr(ids_H2PO4B,NU_col(NY,NX),NY,NX)
+    micstt%CH1P4U  = trc_solcl_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)
+    micstt%CH1P4BU = trc_solcl_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)
+    micstt%CNO3SU  = trc_solcl_vr(ids_NO3,NU_col(NY,NX),NY,NX)
+    micstt%CNO3BU  = trc_solcl_vr(ids_NO3B,NU_col(NY,NX),NY,NX)
 
     DO NE=1,NumPlantChemElms
-      micstt%SOMPomProtein(NE)  = SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)
-      micstt%SOMHumProtein(NE)  = SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)
-      micstt%SOMHumCarbohyd(NE) = SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX)
+      micstt%SOMPomProtein(NE)  = SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU_col(NY,NX),NY,NX)
+      micstt%SOMHumProtein(NE)  = SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU_col(NY,NX),NY,NX)
+      micstt%SOMHumCarbohyd(NE) = SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU_col(NY,NX),NY,NX)
     ENDDO
-    micfor%RNH4EcoDmndLitrPrev       = RNH4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
-    micfor%RNO3EcoDmndLitrPrev       = RNO3EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
-    micfor%RH2PO4EcoDmndLitrPrev     = RH2PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
-    micfor%RH1PO4EcoDmndLitrPrev     = RH1PO4EcoDmndSoilPrev_vr(NU(NY,NX),NY,NX)
-    micfor%VOLWU                     = VLWatMicP_vr(NU(NY,NX),NY,NX)
-    micfor%ElmAllocmatMicrblitr2POMU = ElmAllocmatMicrblitr2POM_vr(1:2,NU(NY,NX),NY,NX)
+    micfor%RNH4EcoDmndLitrPrev       = RNH4EcoDmndSoilPrev_vr(NU_col(NY,NX),NY,NX)
+    micfor%RNO3EcoDmndLitrPrev       = RNO3EcoDmndSoilPrev_vr(NU_col(NY,NX),NY,NX)
+    micfor%RH2PO4EcoDmndLitrPrev     = RH2PO4EcoDmndSoilPrev_vr(NU_col(NY,NX),NY,NX)
+    micfor%RH1PO4EcoDmndLitrPrev     = RH1PO4EcoDmndSoilPrev_vr(NU_col(NY,NX),NY,NX)
+    micfor%VOLWU                     = VLWatMicP_vr(NU_col(NY,NX),NY,NX)
+    micfor%ElmAllocmatMicrblitr2POMU = ElmAllocmatMicrblitr2POM_vr(1:2,NU_col(NY,NX),NY,NX)
   else
     micfor%ElmAllocmatMicrblitr2POM =ElmAllocmatMicrblitr2POM_vr(1:2,L,NY,NX)
   endif
@@ -468,9 +468,9 @@ implicit none
     RH1PO4UptkLitrAutor_col(1:NumMicrobAutrophCmplx,NY,NX)     = micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutrophCmplx)
 
     DO NE=1,NumPlantChemElms
-      SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU(NY,NX),NY,NX)    = micstt%SOMPomProtein(NE)
-      SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU(NY,NX),NY,NX)  = micstt%SOMHumProtein(NE)
-      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU(NY,NX),NY,NX) = micstt%SOMHumCarbohyd(NE)
+      SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU_col(NY,NX),NY,NX)    = micstt%SOMPomProtein(NE)
+      SolidOM_vr(NE,micpar%iprotein,micpar%k_humus,NU_col(NY,NX),NY,NX)  = micstt%SOMHumProtein(NE)
+      SolidOM_vr(NE,micpar%icarbhyro,micpar%k_humus,NU_col(NY,NX),NY,NX) = micstt%SOMHumCarbohyd(NE)
     ENDDO
   endif
 

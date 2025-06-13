@@ -562,7 +562,7 @@ module InitSOMBGCMOD
 !
 !  NATURAL SOILS
 !
-    IF(ISOILR(NY,NX).EQ.0)THEN
+    IF(ISOILR_col(NY,NX).EQ.0)THEN
 !
       !     DRYLAND SOIL
       !
@@ -573,7 +573,7 @@ module InitSOMBGCMOD
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
       IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoilDepthMidLay_vr(L,NY,NX).LE.ExtWaterTablet0_col(NY,NX) &
-        +CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
+        +CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
@@ -686,12 +686,12 @@ module InitSOMBGCMOD
   call PrintInfo('beg InitLitterProfile')
 
   IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    scal                      = AREA(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+    scal                      = AREA_3D(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
     CORGCX(1:NumOfLitrCmplxs) = RSC_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGNX(1:NumOfLitrCmplxs) = RSN_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
-    scal                      = safe_adb(AREA(3,L,NY,NX),VGeomLayer_vr(L,NY,NX))
+    scal                      = safe_adb(AREA_3D(3,L,NY,NX),VGeomLayer_vr(L,NY,NX))
     CORGCX(1:NumOfLitrCmplxs) = RSC_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGNX(1:NumOfLitrCmplxs) = RSN_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal

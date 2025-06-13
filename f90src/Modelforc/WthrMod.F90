@@ -6,7 +6,7 @@ module WthrMod
   use MiniMathMod,       only: safe_adb, vapsat0, isclose
   use MiniFuncMod,       only: get_sun_declin
   use EcoSIMCtrlMod,     only: etimer, frectyp,fixClime
-  use PlantMgmtDataType, only: NP
+  use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: AZMAX1
   use UnitMod,           only: units
   use DebugToolMod  
@@ -107,10 +107,10 @@ module WthrMod
   mon=etimer%get_curr_mon()
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      CO2EI(NY,NX)=atm_co2_mon(mon)
+      CO2EI_col(NY,NX)=atm_co2_mon(mon)
       CH4E_col(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
       Z2OE_col(NY,NX) =atm_n2o_mon(mon)*1.e-3_r8  !ppb to ppm
-      CO2E_col(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
+      CO2E_col(NY,NX)=CO2EI_col(NY,NX)   !used in photosynthesis, soil CO2 transport
     ENDDO
   ENDDO
 
@@ -288,8 +288,8 @@ module WthrMod
 !     RADN_col=SW radiation at horizontal surface, MJ/
 !     IETYP: koppen climate zone
       IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
-        AZI=SIN(ALAT(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
-        DEC=COS(ALAT(NY,NX)*RadianPerDegree)*COS(DECLIN*RadianPerDegree)
+        AZI=SIN(ALAT_col(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
+        DEC=COS(ALAT_col(NY,NX)*RadianPerDegree)*COS(DECLIN*RadianPerDegree)
         !check eq.(11.1) in Campbell and Norman, 1998, p168.
         if(fixClime)then
           !always assume the light is from zenith when using fixed climate forcing.
@@ -382,8 +382,8 @@ module WthrMod
       !     PRECII_col,PRECUI=surface,subsurface irrigation
       !     RRIG=irrigation from soil management file in reads.f
       !
-!      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
-!      IF(WDPTHD.LE.CumDepz2LayBottom_vr(NU(NY,NX),NY,NX))THEN
+!      WDPTHD=WDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+!      IF(WDPTHD.LE.CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX))THEN
         PRECII_col(NY,NX) = RRIG(J,I,NY,NX)   !surface irrigation
         PRECUI_col(NY,NX) = 0.0_r8
 !      ELSE
@@ -453,10 +453,10 @@ module WthrMod
 !
         IF(ICLM.EQ.2.AND.J.EQ.1)THEN
           DTS=0.5_r8*DTA
-          ATCA(NY,NX)=ATCAI(NY,NX)+DTA
-          ATCS(NY,NX)=ATCAI(NY,NX)+DTS
-          TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
-          DO NZ=1,NP(NY,NX)
+          ATCA_col(NY,NX)=ATCAI_col(NY,NX)+DTA
+          ATCS_col(NY,NX)=ATCAI_col(NY,NX)+DTS
+          TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS_col(NY,NX))))
+          DO NZ=1,NP_col(NY,NX)
             iPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
             TempOffset_pft(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone_pft(NZ,NY,NX))
             !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
@@ -502,8 +502,8 @@ module WthrMod
       PrecAsSnow_col(NY,NX)   = PrecAsSnow_col(NY,NX)*TDPRC(N,NY,NX)
       PRECII_col(NY,NX)       = PRECII_col(NY,NX)*TDIRI(N,NY,NX)
       PRECUI_col(NY,NX)       = PRECUI_col(NY,NX)*TDIRI(N,NY,NX)
-      NH4_rain_mole_conc(NY,NX)    = CN4RI(NY,NX)*TDCN4(N,NY,NX)
-      NO3_rain_mole_conc(NY,NX)    = CNORI(NY,NX)*TDCNO(N,NY,NX)
+      NH4_rain_mole_conc(NY,NX)    = CN4RI_col(NY,NX)*TDCN4(N,NY,NX)
+      NO3_rain_mole_conc(NY,NX)    = CNORI_col(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
   end subroutine CorrectClimate
@@ -541,14 +541,14 @@ module WthrMod
       !     PRECA,PrecAtm_col=rain+irrigation,rain+snow
       !     THS=sky LW radiation
 !
-      RainFalPrec_col(NY,NX)      = PrecAsRain_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      SnoFalPrec_col(NY,NX)       = PrecAsSnow_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      IrrigSurface_col(NY,NX)     = PRECII_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      IrrigSubsurf_col(NY,NX)     = PRECUI_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      RainFalPrec_col(NY,NX)      = PrecAsRain_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+      SnoFalPrec_col(NY,NX)       = PrecAsSnow_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+      IrrigSurface_col(NY,NX)     = PRECII_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+      IrrigSubsurf_col(NY,NX)     = PRECUI_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
       Irrigation_col(NY,NX)       = IrrigSurface_col(NY,NX)+IrrigSubsurf_col(NY,NX)
       PrecRainAndIrrig_col(NY,NX) = RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)
       PrecAtm_col(NY,NX)          = RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)
-      LWRadSky_col(NY,NX)         = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      LWRadSky_col(NY,NX)         = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
       PrecipAtm2LandSurf_col(NY,NX)=RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)
     ENDDO
   ENDDO

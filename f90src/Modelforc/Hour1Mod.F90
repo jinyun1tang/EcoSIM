@@ -11,7 +11,7 @@ module Hour1Mod
   use EcoSIMConfig     , only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
   use EcoSiMParDataMod,  only : micpar, pltpar
   use SoilBGCNLayMod,    only : sumORGMLayL
-  use PlantMgmtDataType, only : NP
+  use PlantMgmtDataType, only : NP_col
   use BalancesMod,       only : SummarizeTracerMass,BegCheckBalances
   use DebugToolMod
   use ATSUtilsMod
@@ -131,7 +131,7 @@ module Hour1Mod
 
       IF(J.EQ.1)THEN
         NumActivePlants(NY,NX)=0
-        DO  NZ=1,NP(NY,NX)
+        DO  NZ=1,NP_col(NY,NX)
           PSICanPDailyMin(NZ,NY,NX)=0._r8
         ENDDO
       ENDIF
@@ -203,10 +203,10 @@ module Hour1Mod
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
-      LWRadCanGPrev_col(NY,NX)         = LWRadCanG(NY,NX)
+      LWRadCanGPrev_col(NY,NX)         = LWRadCanG_col(NY,NX)
       LWRadGrnd(NY,NX)                 = LWRadBySurf_col(NY,NX)
-      NetCO2Flx2Canopy_col(NY,NX)      = Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      LWRadCanG(NY,NX)                 = 0._r8
+      NetCO2Flx2Canopy_col(NY,NX)      = Eco_NEE_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      LWRadCanG_col(NY,NX)                 = 0._r8
       LWRadBySurf_col(NY,NX)           = 0._r8
       TLEX_col(NY,NX)                  = Air_Heat_Latent_store_col(NY,NX)
       TSHX_col(NY,NX)                  = Air_Heat_Sens_store_col(NY,NX)
@@ -221,17 +221,17 @@ module Hour1Mod
       Eco_NEE_col(NY,NX)               = 0._r8
       ECO_ER_col(NY,NX)                = 0._r8
 
-      DO  NZ=1,NP(NY,NX)
+      DO  NZ=1,NP_col(NY,NX)
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
 !     NG=number of uppermost rooted layer
 !     NIXBotRootLayer_rpft=number of lowest rooted layer
 !
-        NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU(NY,NX))
-        NIXBotRootLayer_pft(NZ,NY,NX) = MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU(NY,NX))
+        NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
+        NIXBotRootLayer_pft(NZ,NY,NX) = MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         DO  NR=1,NumOfCanopyLayers
-          NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU(NY,NX))
+          NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
       ENDDO
 
@@ -272,7 +272,7 @@ module Hour1Mod
 !
 !     Warning: No snofall intercepation is considered at the moment.
 
-  DO  NZ=1,NP(NY,NX)
+  DO  NZ=1,NP_col(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
       *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
       
@@ -326,7 +326,7 @@ module Hour1Mod
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
-      CCO2EI(NY,NX)                = CO2EI(NY,NX)*5.36E-04_r8*tmp
+      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
       
       AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
       AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
@@ -400,14 +400,14 @@ module Hour1Mod
 !
       DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,1:3,:,NY,NX)=0._r8
 
-      DO  L=0,NL(NY,NX)+1
+      DO  L=0,NL_col(NY,NX)+1
         RGasTranspFlxPrev_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
 !
       trcs_deadroot2soil_col(idg_beg:idg_NH3,NY,NX) = 0._r8
-      DO L=1,NL(NY,NX)+1
+      DO L=1,NL_col(NY,NX)+1
         WaterFlowSoiMicP_3D(1:3,L,NY,NX)               = 0._r8
         WaterFlowSoiMicPX_3D(1:3,L,NY,NX)              = 0._r8
         WaterFlowSoiMacP_3D(1:3,L,NY,NX)               = 0._r8
@@ -472,7 +472,7 @@ module Hour1Mod
       trcSalt_FloXSurRunoff_2D(idsalt_beg:idsalt_end,1:2,1:2,NY,NX) = 0._r8
       trcSalt_FloXSnow_2DH(idsalt_beg:idsalt_end,1:2,1:2,NY,NX)     = 0._r8
 
-      DO L = 1, NL(NY,NX)+1
+      DO L = 1, NL_col(NY,NX)+1
         DO idsalt=idsalt_beg,idsaltb_end
           trcSalt_TransptMicP_3D(idsalt,1:3,L,NY,NX) = 0._r8
           trcSalt_TransptMacP_3D(idsalt,1:3,L,NY,NX) = 0._r8
@@ -498,7 +498,7 @@ module Hour1Mod
 
   !     begin_execution
   !write(*,*) "In SetSoilPropertyAftDisturbance: "
-  D9975: DO L=NUI(NY,NX),NLI(NY,NX)
+  D9975: DO L=NUI_col(NY,NX),NLI_col(NY,NX)
     !
     !     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
     !     VOLT,VLSoilPoreMicP_vr,VLSoilMicP=layer volume including,excluding rock,macropores
@@ -507,9 +507,9 @@ module Hour1Mod
       VLWatMicP_vr(L,NY,NX) = 0._r8
       VLiceMicP_vr(L,NY,NX) = 0._r8
     ENDIF
-    AREA(1,L,NY,NX)        = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
-    AREA(2,L,NY,NX)        = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
-    VGeomLayer_vr(L,NY,NX) = AREA(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
+    AREA_3D(1,L,NY,NX)        = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
+    AREA_3D(2,L,NY,NX)        = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
+    VGeomLayer_vr(L,NY,NX) = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
 
     VLSoilPoreMicP_vr(L,NY,NX) = AMAX1(VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX),1.e-8_r8)
     IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO)THEN
@@ -548,7 +548,7 @@ module Hour1Mod
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZERO)THEN
       CORGCM       = AZMAX1(AMIN1(1.0_r8,MWC2Soil*CSoilOrgM_vr(ielmc,L,NY,NX)))
       ParticleDens = 1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
-      IF(L.EQ.NU(NY,NX))THEN
+      IF(L.EQ.NU_col(NY,NX))THEN
 !surface layer
         POROS_vr(L,NY,NX)=AMAX1(POROS_vr(L,NY,NX),1.0_r8-(SoilBulkDensity_vr(L,NY,NX)/ParticleDens))
       ELSE
@@ -635,36 +635,36 @@ module Hour1Mod
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
   !Mobile water table  
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
     TileWaterTable_col(NY,NX)=DTBLD(NY,NX)
   ENDIF
 
-  IF(SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
+  IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.ZERO)THEN
     SoilSurfRoughnesst0_col(NY,NX)=0.020_r8
   ELSE
     SoilSurfRoughnesst0_col(NY,NX)=ZW
   ENDIF
   VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughnesst0_col(NY,NX)+&
     3.10_r8*SoilSurfRoughnesst0_col(NY,NX)**2._r8 &
-    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
+    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX)
 
   VWatStoreCapSurf_col(NY,NX)=AMAX1(VLWatHeldCapSurf_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
-    CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
+    CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX))
 
-  SoilDepthMidLay_vr(NU(NY,NX),NY,NX)=CumDepz2LayBottom_vr(NU(NY,NX),NY,NX)-0.5_r8*DLYR_3D(3,NU(NY,NX),NY,NX)
-  IF(VLSoilMicPMass_vr(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    CCLAY_vr(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
-    CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
-    CSAND_vr(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU(NY,NX),NY,NX)
+  SoilDepthMidLay_vr(NU_col(NY,NX),NY,NX)=CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)-0.5_r8*DLYR_3D(3,NU_col(NY,NX),NY,NX)
+  IF(VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    CCLAY_vr(NU_col(NY,NX),NY,NX)=CLAY(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
+    CSILT(NU_col(NY,NX),NY,NX)=SILT(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
+    CSAND_vr(NU_col(NY,NX),NY,NX)=SAND(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
   ELSE
-    CCLAY_vr(NU(NY,NX),NY,NX)=0._r8
-    CSILT(NU(NY,NX),NY,NX)=0._r8
-    CSAND_vr(NU(NY,NX),NY,NX)=0._r8
+    CCLAY_vr(NU_col(NY,NX),NY,NX)=0._r8
+    CSILT(NU_col(NY,NX),NY,NX)=0._r8
+    CSAND_vr(NU_col(NY,NX),NY,NX)=0._r8
   ENDIF
-  EHUM_vr(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU(NY,NX),NY,NX))
+  EHUM_vr(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU_col(NY,NX),NY,NX))
   EPOC_vr(0,NY,NX)=0.150_r8
   end subroutine ResetSurfResidualProperty
 !------------------------------------------------------------------------------------------
@@ -720,14 +720,14 @@ module Hour1Mod
 !     begin_execution
 
   RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
-  DOM_transpFlx_2DH(:,:,NY,NX)    = 0._r8
-  trcs_SubsurTransp_flx_2DH(:,NY,NX)     = 0._r8
-  trcg_snowMassloss_col(:,NY,NX)  = 0._r8
-  trcn_SnowDrift_flx_col(:,NY,NX) = 0._r8
-  trcg_SnowDrift_flx_col(:,NY,NX) = 0._r8
-  DOM_draing_col(:,:,NY,NX)         = 0._r8
-  trcs_drainage_flx_col(:,NY,NX)        = 0._r8
-  DOM_SurfRunoff_flx_col(:,:,NY,NX) =0._r8
+  DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
+  trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
+  trcg_snowMassloss_col(:,NY,NX)     = 0._r8
+  trcn_SnowDrift_flx_col(:,NY,NX)    = 0._r8
+  trcg_SnowDrift_flx_col(:,NY,NX)    = 0._r8
+  DOM_draing_col(:,:,NY,NX)          = 0._r8
+  trcs_drainage_flx_col(:,NY,NX)     = 0._r8
+  DOM_SurfRunoff_flx_col(:,:,NY,NX)  = 0._r8
 
   trcn_snowMassloss_col(:,NY,NX)             = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)              = 0._r8
@@ -782,8 +782,10 @@ module Hour1Mod
   RootCO2Ar2Soil_col(NY,NX)                  = 0._r8
   RootCO2Ar2Root_col(NY,NX)                  = 0._r8
   GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  GasHydroSubsLoss_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
+  GasHydroSurfLoss_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
   trcn_SurfRunoff_flx_col(:,NY,NX)               = 0._r8
-  SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
+  SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
   GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
   WatFLo2LitR_col(NY,NX)                             = 0._r8
   HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8
@@ -843,20 +845,20 @@ module Hour1Mod
 
 !     begin_execution
 
-  LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL(NY,NX),NY,NX) = 0._r8
+  LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL_col(NY,NX),NY,NX) = 0._r8
   HeatSource_col(NY,NX)                                                       = 0._r8
-  REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL(NY,NX),NY,NX)                 = 0._r8
-  RProd_Hp_vr(0:NL(NY,NX),NY,NX)                                              = 0._r8
-  trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL(NY,NX),NY,NX)            = 0._r8
-  TRChem_sol_NH3_soil_vr(0:NL(NY,NX),NY,NX)                                   = 0._r8
-  TRChem_gas_NH3_geochem_vr(0:NL(NY,NX),NY,NX)                                = 0._r8
-  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL(NY,NX),NY,NX)                       = 0._r8
-  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)           = 0._r8
-  TWaterPlantRoot2SoilPrev_vr(1:NL(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)
-  TWaterPlantRoot2Soil_vr(1:NL(NY,NX),NY,NX)                                  = 0._r8
-  THeatLossRoot2Soil_vr(0:NL(NY,NX),NY,NX)                                    = 0._r8
-  tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX) = 0._r8
-  RO2UptkSoilM_vr(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)                            = 0._r8
+  REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                 = 0._r8
+  RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                              = 0._r8
+  trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)            = 0._r8
+  TRChem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                   = 0._r8
+  TRChem_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                = 0._r8
+  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                       = 0._r8
+  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)           = 0._r8
+  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
+  TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                  = 0._r8
+  THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
+  RO2UptkSoilM_vr(1:NPH,NU_col(NY,NX):NL_col(NY,NX),NY,NX)                            = 0._r8
   RainLitr_col(NY,NX)                                                         = 0._r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
@@ -883,7 +885,7 @@ module Hour1Mod
   THETWP          = 1.0_r8-THETPW
   FoundWaterTable = .false.
 
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
 !     IDWaterTable=water table flag from site file
 !     THETPZ,THETPW=current,minimum air-filled, porosity for water table
 !     DPTH,ExtWaterTable=depth of soil layer midpoint, water table
@@ -894,11 +896,11 @@ module Hour1Mod
     IF(IDWaterTable_col(NY,NX).NE.0)THEN
       IF(FoundWaterTable)exit
 
-      IF(THETPZ_vr(L).LT.THETPW .OR. L.EQ.NL(NY,NX))THEN
+      IF(THETPZ_vr(L).LT.THETPW .OR. L.EQ.NL_col(NY,NX))THEN
         FoundWaterTable=.true.
         IF(SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN   !above external water table
-          D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-            IF(THETPZ_vr(LL).GE.THETPW .AND. LL.NE.NL(NY,NX))THEN
+          D5705: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
+            IF(THETPZ_vr(LL).GE.THETPW .AND. LL.NE.NL_col(NY,NX))THEN
               !air-filled pore greater minimum, i.e. not saturated
               FoundWaterTable=.false.
               exit
@@ -912,7 +914,7 @@ module Hour1Mod
           !THETPW=saturation criterion for water table identification
           IF(FoundWaterTable)THEN
 
-            IF(THETPZ_vr(L).GE.THETPW .AND. L.NE.NL(NY,NX))THEN !saturated and inside the hydrologically active zone
+            IF(THETPZ_vr(L).GE.THETPW .AND. L.NE.NL_col(NY,NX))THEN !saturated and inside the hydrologically active zone
               !not bottom layer, saturated
               !PSIeqv in saturated layer
               PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L+1,NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
@@ -926,7 +928,7 @@ module Hour1Mod
               ELSE
                 DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
               ENDIF
-            ELSEIF(L.GT.NU(NY,NX))THEN
+            ELSEIF(L.GT.NU_col(NY,NX))THEN
               !not bottom layer, and not topsoil layer, partially saturated
               PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-SoilDepthMidLay_vr(L-1,NY,NX))
               THETWM   = THETWP*POROS_vr(L-1,NY,NX)
@@ -974,34 +976,34 @@ module Hour1Mod
       !     ZM=surface roughness used in runoff velocity calculation in watsub.f
       !
       SoilMicPMassLayerMX(NY,NX)=AZMAX1(SoilMicPMassLayerMn(NY,NX)+&
-        MWC2Soil*SoilOrgM_vr(ielmc,NU(NY,NX),NY,NX))
-      BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
-        +CLAY(NU(NY,NX),NY,NX)+1.82E-06*SoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)
+        MWC2Soil*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX))
+      BKVLNX=SAND(NU_col(NY,NX),NY,NX)+SILT(NU_col(NY,NX),NY,NX) &
+        +CLAY(NU_col(NY,NX),NY,NX)+1.82E-06*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)
       IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-        CORGM                               = MWC2Soil*SoilOrgM_vr(ielmc,NU(NY,NX),NY,NX)/BKVLNX
-        CSoilOrgM_vr(ielmc,NU(NY,NX),NY,NX) = orgcden*CORGM
-        CSAND_vr(NU(NY,NX),NY,NX)              = SAND(NU(NY,NX),NY,NX)/BKVLNX
-        CSILT(NU(NY,NX),NY,NX)              = SILT(NU(NY,NX),NY,NX)/BKVLNX
-        CCLAY_vr(NU(NY,NX),NY,NX)              = CLAY(NU(NY,NX),NY,NX)/BKVLNX
+        CORGM                               = MWC2Soil*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)/BKVLNX
+        CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX) = orgcden*CORGM
+        CSAND_vr(NU_col(NY,NX),NY,NX)              = SAND(NU_col(NY,NX),NY,NX)/BKVLNX
+        CSILT(NU_col(NY,NX),NY,NX)              = SILT(NU_col(NY,NX),NY,NX)/BKVLNX
+        CCLAY_vr(NU_col(NY,NX),NY,NX)              = CLAY(NU_col(NY,NX),NY,NX)/BKVLNX
       ELSE
         CORGM                               = 0._r8
-        CSoilOrgM_vr(ielmc,NU(NY,NX),NY,NX) = 0._r8
-        CSAND_vr(NU(NY,NX),NY,NX)              = 0._r8
-        CSILT(NU(NY,NX),NY,NX)              = 1.0
-        CCLAY_vr(NU(NY,NX),NY,NX)              = 0._r8
+        CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX) = 0._r8
+        CSAND_vr(NU_col(NY,NX),NY,NX)              = 0._r8
+        CSILT(NU_col(NY,NX),NY,NX)              = 1.0
+        CCLAY_vr(NU_col(NY,NX),NY,NX)              = 0._r8
       ENDIF
       
-      D50=1.0_r8*CCLAY_vr(NU(NY,NX),NY,NX)+10._r8*CSILT(NU(NY,NX),NY,NX) &
-        +100._r8*CSAND_vr(NU(NY,NX),NY,NX)+100._r8*CORGM
+      D50=1.0_r8*CCLAY_vr(NU_col(NY,NX),NY,NX)+10._r8*CSILT(NU_col(NY,NX),NY,NX) &
+        +100._r8*CSAND_vr(NU_col(NY,NX),NY,NX)+100._r8*CORGM
       ZD50                    = 0.041*(ppmc*D50)**0.167_r8
-      SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA(3,0,NY,NX)
+      SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA_3D(3,0,NY,NX)
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
         CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
         print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
-        SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
-        COHS=2.0_r8+10._r8*(CCLAY_vr(NU(NY,NX),NY,NX)+CORGM) &
-          +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU(NY,NX),NY,NX)))
+        SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU_col(NY,NX),NY,NX)-CORGM))
+        COHS=2.0_r8+10._r8*(CCLAY_vr(NU_col(NY,NX),NY,NX)+CORGM) &
+          +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU_col(NY,NX),NY,NX)))
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
 
         PrtcleDensitySurfLay_col(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
@@ -1023,7 +1025,7 @@ module Hour1Mod
   real(r8) :: orgm(1:NumPlantChemElms)
   !     begin_execution
   !
-  DO L=0,NL(NY,NX)
+  DO L=0,NL_col(NY,NX)
     call sumORGMLayL(L,NY,NX,ORGM,.true.)
     ORGCX_vr(L,NY,NX)=ORGM(ielmc)
   ENDDO
@@ -1042,7 +1044,7 @@ module Hour1Mod
 
 !     begin_execution
   FoundActiveLayer = .false.
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
 !
 !     VOLI,VOLIH=ice volume in micropores,macropores
 !     VOLW,VOLWH=water volume in micropores,macropores
@@ -1057,7 +1059,7 @@ module Hour1Mod
 
     IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
       !significant ice and pore
-      D5700: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+      D5700: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
         VLiceTotL  = VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
         VOLWTL     = VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
         VLPoreTotL = VLMicP_vr(LL,NY,NX)+VLMacP_vr(LL,NY,NX)
@@ -1183,7 +1185,7 @@ module Hour1Mod
   VaporDiffusivityLitR_col(NY,NX) = WGSG*TFACR
   D5060: DO  L=1,JS
     TFACW                   = TEFGASDIF(TKSnow_snvr(L,NY,NX))
-    H2OVapDifscSno(L,NY,NX) = WGSG*TFACW
+    H2OVapDifsc_snvr(L,NY,NX) = WGSG*TFACW
   ENDDO D5060
   end subroutine SetTracerPropertyInLiterAir
 !------------------------------------------------------------------------------------------
@@ -1202,7 +1204,7 @@ module Hour1Mod
 !     Z*P=P ion pair amounts in non-band (see solute.f)
 !     VLNH4,VLNO3,VLPO4=fraction of soil volume in NH4,NO3,PO4 non-band
 !
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
       IF(trcs_VLN_vr(ids_NH4,L,NY,NX).GT.ZERO)THEN
@@ -1297,7 +1299,7 @@ module Hour1Mod
   integer :: K,L
 
 ! begin_execution
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
 !
 ! PREPARE ARRAYS FOR TOTAL O2 UPTAKE AND NH4,NO3.NO2,N2O,HPO4,H2PO4
 ! UPTAKE IN NON-BAND,BAND AND DOC,DON,DOP,ACETATE UPTAKE
@@ -1506,14 +1508,14 @@ module Hour1Mod
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
       VWatLitrZ = VLWatMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)    !water helding capacity by litter
       VOLIRZ    = VLiceMicP_vr(0,NY,NX)/TVOLWI*VWatLitRHoldCapcity_col(NY,NX)    !ice helding capacity by litter
-      XVOLW0    = AZMAX1(VLWatMicP_vr(0,NY,NX)-VWatLitrZ)/AREA(3,NU(NY,NX),NY,NX)
-      XVOLI0    = AZMAX1(VLiceMicP_vr(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
+      XVOLW0    = AZMAX1(VLWatMicP_vr(0,NY,NX)-VWatLitrZ)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      XVOLI0    = AZMAX1(VLiceMicP_vr(0,NY,NX)-VOLIRZ)/AREA_3D(3,NU_col(NY,NX),NY,NX)
     ELSE
       XVOLW0=0._r8
       XVOLI0=0._r8
     ENDIF
     DepthSurfWatIce    = XVOLW0+XVOLI0
-    DLYR_3D(3,0,NY,NX) = VLSoilPoreMicP_vr(0,NY,NX)/AREA(3,0,NY,NX)
+    DLYR_3D(3,0,NY,NX) = VLSoilPoreMicP_vr(0,NY,NX)/AREA_3D(3,0,NY,NX)
 
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
       ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR_col(NY,NX)
@@ -1527,7 +1529,7 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
       ENDIF
       PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
-      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
       ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
@@ -1539,7 +1541,7 @@ module Hour1Mod
       ENDDO
 
     ELSE
-      PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+      PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU_col(NY,NX),NY,NX)
       trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0._r8
     ENDIF
   ELSE
@@ -1553,7 +1555,7 @@ module Hour1Mod
     THETI_vr(0,NY,NX)                              = 0._r8
     ThetaAir_vr(0,NY,NX)                           = 1.0_r8
     VWatLitRHoldCapcity_col(NY,NX)                 = 0._r8
-    PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU(NY,NX),NY,NX)
+    PSISoilMatricP_vr(0,NY,NX)                     = PSISoilMatricP_vr(NU_col(NY,NX),NY,NX)
     trc_solcl_vr(ids_nut_beg:ids_nuts_end,0,NY,NX) = 0._r8
     trc_solcl_vr(idg_beg:idg_NH3,0,NY,NX)        = 0._r8
   ENDIF
@@ -1576,7 +1578,7 @@ module Hour1Mod
 !     THETPZ=soil micropore+macropore air concn for output
 !
 
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
 
     IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
@@ -1634,7 +1636,7 @@ module Hour1Mod
   trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
   trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8  
   RootO2_Xink_col(NY,NX)                          = 0._r8
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
     RootN2Fix_vr(L,NY,NX)                         = 0._r8
     FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
@@ -1707,7 +1709,7 @@ module Hour1Mod
 
   GasSolbility_vr(idg_NH3B,L,NY,NX)=GasSolbility_vr(idg_NH3,L,NY,NX)
  
-  DO  L=1,NL(NY,NX)+1
+  DO  L=1,NL_col(NY,NX)+1
     ! S*L=solubility of gas in water
     ! TCS=soil temperature (oC)
     ! 5.56E+04_r8 := mole H2O / m3

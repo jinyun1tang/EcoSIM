@@ -58,7 +58,7 @@ implicit none
 
   !setting a few variables 
   FlowDirIndicator_col = 3 !Basically a switch, setting to 3 removes lateral flow
-  MaxNumRootLays   = 1 !Is the number of layers down the roots go
+  MaxNumRootLays_col   = 1 !Is the number of layers down the roots go
   NX               = 1
 
   VOLISO = 0.0_r8
@@ -70,10 +70,10 @@ implicit none
     TXCO2(NY,NX)            = 0.0_r8
     DORGE(NY,NX)            = 0.0_r8
     QRunSurf_col(NY,NX)     = 0.0_r8
-    NU(NY,NX)               = a_NU(NY)
-    NL(NY,NX)               = a_NL(NY)
-    !AREA(3,0,NY,NX)         = a_AREA3(0,NY)
-    !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
+    NU_col(NY,NX)               = a_NU(NY)
+    NL_col(NY,NX)               = a_NL(NY)
+    !AREA_3D(3,0,NY,NX)         = a_AREA3(0,NY)
+    !AREA_3D(3,NU_col(NY,NX),NY,NX) = a_AREA3(0,NY)
     ASP_col(NY,NX)          = a_ASP(NY)
     !TairKClimMean_col(NY,NX)   = a_ATKA(NY)
     !CO2E_col(NY,NX)=atm_co2
@@ -101,12 +101,12 @@ implicit none
     POROS0_col(NY,NX) = 0.5
     
 
-    DO L=NU(NY,NX),NL(NY,NX)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
       CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
       POROS_vr(L,NY,NX)=a_PORO(L,NY)
-      AREA(3,L,NY,NX)=a_AREA3(L,NY)
-      !write(*,*) "AREA(3,L,NY,NX) = ", AREA(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
+      AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
+      !write(*,*) "AREA_3D(3,L,NY,NX) = ", AREA_3D(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
       SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)
       SoilFracAsMicP_vr(L,NY,NX) = 1.0
@@ -114,8 +114,8 @@ implicit none
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
       
-      DH(NY,NX) = 1.0
-      DV(NY,NX) = 1.0
+      DH_col(NY,NX) = 1.0
+      DV_col(NY,NX) = 1.0
 
     ENDDO
   ENDDO
@@ -126,8 +126,8 @@ implicit none
   call startsim(NHW,NHE,NVN,NVS)
 
   do NY=1,NYS
-    DO L=NU(NY,NX),NL(NY,NX)
-      AREA(3,L,NY,NX)=a_AREA3(L,NY)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
+      AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
     ENDDO
   ENDDO
 

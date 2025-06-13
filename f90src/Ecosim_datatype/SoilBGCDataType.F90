@@ -45,8 +45,10 @@ implicit none
   real(r8),target,allocatable ::  GasDiff2Surf_flx_col(:,:,:)         !surface gas flux in advection+diffusion [g d-2 h-1]
   real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)            !total O2 sink in soil due to plant and microbial respiration, [g d-2]
   real(r8),target,allocatable ::  SurfGasEmiss_flx_col(:,:,:)         !surface gas flux, including diffusion, ebullition, wet deposition and plant transp, [g d-2 h-1]
-  real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)        !hydrological loss of volatile tracers, [g d-2 h-1]
-  real(r8),target,allocatable ::  AmendCFlx_CumYr_col(:,:)           !total C amendment, [g d-2]
+  real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)         !hydrological loss of volatile tracers, [g d-2 h-1]
+  real(r8),target,allocatable ::  GasHydroSubsLoss_flx_col(:,:,:)     !subsurface hydrological loss of volatile tracers, [g d-2 h-1]
+  real(r8),target,allocatable ::  GasHydroSurfLoss_flx_col(:,:,:)     !surface hydrological loss of volatile tracers, [g d-2 h-1]
+  real(r8),target,allocatable ::  AmendC_CumYr_flx_col(:,:)           !total C amendment, [g d-2]
   real(r8),target,allocatable ::  GasHydroLoss_cumflx_col(:,:,:)     !cumulative hydrological loss of volatile tracers, [g d-2]
   real(r8),target,allocatable ::  FertN_Flx_CumYr_col(:,:)           !total fertilizer N amendment, [g d-2]
   real(r8),target,allocatable ::  FerPFlx_CumYr_col(:,:)             !total fertilizer P amendment, [g d-2]
@@ -197,7 +199,9 @@ implicit none
   allocate(GasHydroLoss_flx_col(idg_beg:idg_NH3,JY,JX)); GasHydroLoss_flx_col=0._r8
   allocate(SurfGasEmiss_flx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmiss_flx_col=0._r8
   allocate(GasDiff2Surf_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_flx_col=0._r8
-  allocate(AmendCFlx_CumYr_col(JY,JX));       AmendCFlx_CumYr_col=0._r8
+  allocate(GasHydroSubsLoss_flx_col(idg_beg:idg_NH3,JY,JX)); GasHydroSubsLoss_flx_col=0._r8
+  allocate(GasHydroSurfLoss_flx_col(idg_beg:idg_NH3,JY,JX)); GasHydroSurfLoss_flx_col=0._r8
+  allocate(AmendC_CumYr_flx_col(JY,JX));       AmendC_CumYr_flx_col=0._r8
   allocate(FertN_Flx_CumYr_col(JY,JX));      FertN_Flx_CumYr_col=0._r8
   allocate(FerPFlx_CumYr_col(JY,JX));      FerPFlx_CumYr_col=0._r8
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
@@ -322,7 +326,7 @@ implicit none
   call destroy(AEC_vr)
   call destroy(CPO4S_vr)
   call destroy(RO2UptkSoilM_vr)
-  call destroy(AmendCFlx_CumYr_col)
+  call destroy(AmendC_CumYr_flx_col)
   call destroy(FertN_Flx_CumYr_col)
   call destroy(FerPFlx_CumYr_col)
   call destroy(HydroSufDOCFlx_col)
@@ -361,6 +365,8 @@ implicit none
   call destroy(GasDiff2Surf_flx_col)
   call destroy(SurfGasEmiss_flx_col)
   call destroy(GasHydroLoss_flx_col)
+  call destroy(GasHydroSubsLoss_flx_col)
+  call destroy(GasHydroSurfLoss_flx_col)
   call destroy(GasHydroLoss_cumflx_col)
   call destroy(trcs_VLN_vr)
   call destroy(trcg_ebu_flx_vr)

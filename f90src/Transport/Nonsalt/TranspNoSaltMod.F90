@@ -82,7 +82,7 @@ module TranspNoSaltMod
 
         trcs_mass_beg(idg,NY,NX)=trcs_mass_litr(idg,NY,NX)+trcs_mass_snow(idg,NY,NX)
         
-        DO L=NU(NY,NX),NL(NY,NX)
+        DO L=NU_col(NY,NX),NL_col(NY,NX)
           trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) &
             + trcs_soHml_vr(idg,L,NY,NX)
           trcs_mass_soil(idg,NY,NX)=trcs_mass_soil(idg,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) &
@@ -93,7 +93,7 @@ module TranspNoSaltMod
       idg=idg_NH3
       trcs_mass_litr(idg,NY,NX)=trcs_mass_litr(idg,NY,NX)+trcs_solml_vr(idg_NH3B,0,NY,NX)
       trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg_NH3B,0,NY,NX)
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg_NH3B,L,NY,NX) &
           + trcs_soHml_vr(idg_NH3B,L,NY,NX)
         trcs_mass_soil(idg,NY,NX)=trcs_mass_soil(idg,NY,NX)+trcs_solml_vr(idg_NH3B,L,NY,NX) &
@@ -130,14 +130,14 @@ module TranspNoSaltMod
         ENDDO        
 
         mass_soil=0._r8
-        DO L=NU(NY,NX),NL(NY,NX)
+        DO L=NU_col(NY,NX),NL_col(NY,NX)
           mass_soil=mass_soil+trcg_gasml_vr(idg,L,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcs_soHml_vr(idg,L,NY,NX)  
         ENDDO
 
         if(idg==idg_NH3)then
           !also include NH3B
           mass_litr=mass_litr+trcs_solml_vr(idg_NH3B,0,NY,NX)
-          DO L=NU(NY,NX),NL(NY,NX)
+          DO L=NU_col(NY,NX),NL_col(NY,NX)
             mass_soil=mass_soil+trcs_solml_vr(idg_NH3B,L,NY,NX)+trcs_soHml_vr(idg_NH3B,L,NY,NX)
           ENDDO
         endif
@@ -210,15 +210,15 @@ module TranspNoSaltMod
             write(121,*)'--------------------------'          
             write(121,*)'latloss             =',trcs_SubsurTransp_flx_2DH(idg,NY,NX)
             write(121,*)'wetdep              =',Gas_WetDeposit_flx_col(idg,NY,NX)          
-            write(121,*)'sol                 =',trcs_solml_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
-            write(121,*)'gas                 =',trcg_gasml_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)          
-            write(121,*)'Hml                 =',trcs_soHml_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)  
+            write(121,*)'sol                 =',trcs_solml_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX)
+            write(121,*)'gas                 =',trcg_gasml_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX)          
+            write(121,*)'Hml                 =',trcs_soHml_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX)  
             if(idg==idg_NH3)then
-              write(121,*)'sol_NH3B            =',trcs_solml_vr(idg_NH3B,NU(NY,NX):NL(NY,NX),NY,NX)
-              write(121,*)'Hml_NH3B            =',trcs_soHml_vr(idg_NH3B,NU(NY,NX):NL(NY,NX),NY,NX)  
+              write(121,*)'sol_NH3B            =',trcs_solml_vr(idg_NH3B,NU_col(NY,NX):NL_col(NY,NX),NY,NX)
+              write(121,*)'Hml_NH3B            =',trcs_soHml_vr(idg_NH3B,NU_col(NY,NX):NL_col(NY,NX),NY,NX)  
             endif
-            write(121,*)'transp',NU(NY,NX),NL(NY,NX)
-            write(121,*)transp_diff_slow_vr(idg,NU(NY,NX):NL(NY,NX),NY,NX)
+            write(121,*)'transp',NU_col(NY,NX),NL_col(NY,NX)
+            write(121,*)transp_diff_slow_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX)
           endif
           if(abs(errmass)>1.e-4) &
           call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -314,7 +314,7 @@ module TranspNoSaltMod
       RBGCSinkGasMM_vr(idg_O2,0,NY,NX) = RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
       VLWatMicPXA_vr(0,NY,NX)          = natomw*VLWatMicPM_vr(M,0,NY,NX)
 
-      L=NU(NY,NX)
+      L=NU_col(NY,NX)
       WaterFlow2SoilMM_3D(3,L,NY,NX)     = (WaterFlow2MicPM_3D(M,3,L,NY,NX)+WaterFlow2MacPM_3D(M,3,L,NY,NX))*dt_GasCyc
       tScalReductVLsoiAirPMM_vr(L,NY,NX) = ReductVLsoiAirPM_vr(M,L,NY,NX)*dt_GasCyc
 
@@ -326,7 +326,7 @@ module TranspNoSaltMod
       VLsoiAirPMB_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
       RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
 
-      DO L=NU(NY,NX)+1,NL(NY,NX)
+      DO L=NU_col(NY,NX)+1,NL_col(NY,NX)
         tScalReductVLsoiAirPMM_vr(L,NY,NX) = ReductVLsoiAirPM_vr(M,L,NY,NX)*dt_GasCyc
         DO N=FlowDirIndicator_col(NY,NX),3
           WaterFlow2SoilMM_3D(N,L,NY,NX)=(WaterFlow2MicPM_3D(M,N,L,NY,NX)+WaterFlow2MacPM_3D(M,N,L,NY,NX))*dt_GasCyc

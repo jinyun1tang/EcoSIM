@@ -162,7 +162,7 @@ implicit none
     GKCK_vr(L,NY,NX)             = GKCK_vr(L-1,NY,NX)
     THW_vr(L,NY,NX)           = THW_vr(L-1,NY,NX)
     THI_vr(L,NY,NX)           = THI_vr(L-1,NY,NX)
-    ISOIL(1:4,L,NY,NX)        = ISOIL(1:4,L-1,NY,NX)
+    ISOIL_vr(1:4,L,NY,NX)        = ISOIL_vr(1:4,L-1,NY,NX)
     RSC_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
     RSN_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
     RSP_vr(k_fine_litr,L,NY,NX)  = 0.0_r8

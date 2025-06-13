@@ -54,7 +54,7 @@ contains
   ! begin_execution
   call PrintInfo('beg '//subname)
 
-  DO L=NUI(NY,NX),NLI(NY,NX)
+  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
   ! WATER POTENTIALS
   !
   ! FC,WP=water contents at field capacity,wilting point,saturation
@@ -165,7 +165,7 @@ contains
 ! double check cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
 
-  IF((ISOIL(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.cold_run()))THEN
+  IF((ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.cold_run()))THEN
   ! read from check point file or if soil properties are set with soil file    
     LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
     LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
@@ -205,7 +205,7 @@ contains
       !
       !     SCNV,SCNH=vertical,lateral saturated hydraulic conductivity
   !
-  IF(ISOIL(isoi_scnv,L,NY,NX).EQ.isoi_unset)THEN
+  IF(ISOIL_vr(isoi_scnv,L,NY,NX).EQ.isoi_unset)THEN
     !computing vertical saturated hydraulic conductivity
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
@@ -217,7 +217,7 @@ contains
     ENDIF
   ENDIF
 
-  IF(ISOIL(isoi_scnh,L,NY,NX).EQ.isoi_unset)THEN
+  IF(ISOIL_vr(isoi_scnh,L,NY,NX).EQ.isoi_unset)THEN
     !computing horizontal saturated hydraulic conductivity
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
@@ -304,7 +304,7 @@ contains
   integer, intent(in) :: I,J,L,NY,NX
   
 ! restart is defined as simulation starting from a previous run
-  IF(ISOIL(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
+  IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
     !calculating FC or WP
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       FieldCapacity_vr(L,NY,NX)=0.2576_r8-0.20_r8*CSAND_vr(L,NY,NX) &
@@ -444,30 +444,30 @@ contains
   DO  L=NU,NM
     IF(FieldCapacity_vr(L,NY,NX).LT.0.0_r8)THEN
       !computing field capacity
-      ISOIL(isoi_fc,L,NY,NX)  = isoi_unset
+      ISOIL_vr(isoi_fc,L,NY,NX)  = isoi_unset
       PSIAtFldCapacity(NY,NX) = -0.033_r8
     ELSE
-      ISOIL(isoi_fc,L,NY,NX)=isoi_set
+      ISOIL_vr(isoi_fc,L,NY,NX)=isoi_set
     ENDIF
 
     IF(WiltPoint_vr(L,NY,NX).LT.0.0_r8)THEN
       !computing wilting point
-      ISOIL(isoi_wp,L,NY,NX) = isoi_unset
+      ISOIL_vr(isoi_wp,L,NY,NX) = isoi_unset
       PSIAtWiltPoint(NY,NX)  = -1.5_r8
     ELSE
-      ISOIL(isoi_wp,L,NY,NX)=isoi_set
+      ISOIL_vr(isoi_wp,L,NY,NX)=isoi_set
     ENDIF
     IF(SatHydroCondVert_vr(L,NY,NX).LT.0.0_r8)THEN
       !soil vertical saturated hydraulic conductivity
-      ISOIL(isoi_scnv,L,NY,NX)=isoi_unset
+      ISOIL_vr(isoi_scnv,L,NY,NX)=isoi_unset
     ELSE
-      ISOIL(isoi_scnv,L,NY,NX)=isoi_set
+      ISOIL_vr(isoi_scnv,L,NY,NX)=isoi_set
     ENDIF
     IF(SatHydroCondHrzn_vr(L,NY,NX).LT.0.0_r8)THEN
       !soil horizontal saturated hydraulic conductivity
-      ISOIL(isoi_scnh,L,NY,NX)=isoi_unset
+      ISOIL_vr(isoi_scnh,L,NY,NX)=isoi_unset
     ELSE
-      ISOIL(isoi_scnh,L,NY,NX)=isoi_set
+      ISOIL_vr(isoi_scnh,L,NY,NX)=isoi_set
     ENDIF
   ENDDO
   END subroutine ComputeSoilHydroPars

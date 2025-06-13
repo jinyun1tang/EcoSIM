@@ -59,8 +59,8 @@ module readsmod
   WindMesureHeight_col(:,:) = 0.5_r8
   SolarNoonHour_col(:,:)    = 12._r8
   pH_rain_col(:,:)          = 7._r8
-  CN4RI(:,:)                = 0._r8
-  CNORI(:,:)                = 0._r8
+  CN4RI_col(:,:)                = 0._r8
+  CNORI_col(:,:)                = 0._r8
   NH4_rain_mole_conc(:,:)   = 0._r8
   NO3_rain_mole_conc(:,:)   = 0._r8
   H2PO4_rain_mole_conc(:,:) = 0._r8
@@ -347,8 +347,8 @@ module readsmod
       WindMesureHeight_col(NY,NX) = Z0G         !windspeed meast height
       SolarNoonHour_col(NY,NX)    = ZNOONG
       pH_rain_col(NY,NX)           = PHRG
-      CN4RI(NY,NX)                = CN4RIG
-      CNORI(NY,NX)                = CNORIG
+      CN4RI_col(NY,NX)                = CN4RIG
+      CNORI_col(NY,NX)                = CNORIG
       NH4_rain_mole_conc(NY,NX)   = CN4RIG
       NO3_rain_mole_conc(NY,NX)   = CNORIG
       H2PO4_rain_mole_conc(NY,NX) = CPORG
