@@ -196,7 +196,7 @@ module BGCContainers_module
      real (c_double) :: heat_capacity
      real (c_double) :: field_capacity
      real (c_double) :: wilting_point
-     real (c_bool) :: p_bool
+     logical (c_bool) :: p_bool
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData

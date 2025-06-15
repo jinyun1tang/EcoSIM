@@ -139,11 +139,11 @@ contains
   call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
   uwind = data(:)
 
-  call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-  p_rain = data(:)
+  !call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+  !p_rain = data(:)
 
-  call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
-  p_snow = data(:)
+  !call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
+  !p_snow = data(:)
 
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
@@ -176,7 +176,7 @@ contains
 
   if(p_bool)THEN
     call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-    p_tot = data(:)
+    p_total = data(:)
   else
     call c_f_pointer(props%precipitation%data, data, (/num_cols/))
     p_rain = data(:)

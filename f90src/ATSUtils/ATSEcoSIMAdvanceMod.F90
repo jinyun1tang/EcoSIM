@@ -113,8 +113,9 @@ implicit none
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
-      VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)/a_LDENS(L,NY)
-      !VLWatMicP1_vr(L,NY,NX)      = a_WC(L,NY)
+      !Convert ATS units (mols) to EcoSIM units (mH2O)
+      VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)/(a_LDENS(L,NY)*AREA(3,NU(NY,NX),NY,NX))
+      !VLWatMicP1_vr(L,NY,NX)      = a_WC(L,NY)/(a_LDENS(L,NY))
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
@@ -140,26 +141,35 @@ implicit none
 
     !Setting the snow, if passed as total precipitation do full temp calc, else
     !Just set snow and rain to their given values
-    !RainH(NY,NX) = p_rain(NY)*3600.0  !convert m/s into m/hr
-    !SnowH(NY,NX) = p_snow(NY)*3600.0  !convert to m SWE /s into m SWE /hr
+    !5/16 - I don't think we need to account for area here at all
+    !       I am switching out PrecAsRain and just directly substituting
+    !       with RainFalPrec
     if(p_bool)then
       IF(TCA_col(NY,NX).GT.TSNOW)THEN
-        PrecAsRain(NY,NX)=p_total(NY)*3600.0 !convert from m/s to m/hr
-        PrecAsSnow(NY,NX)=0.0_r8
+        write(*,*) "Convert Prec to Rain"
+        RainFalPrec_col(NY,NX)=p_total(NY)*3600.0 !convert from m/s to m/hr
+        SnoFalPrec_col(NY,NX)=0.0_r8
       ELSE
-        PrecAsRain(NY,NX)=0.0_r8
-        PrecAsSnow(NY,NX)=p_total(NY)*3600.0*10.0 !convert to m SWE/s to m/hr
+        write(*,*) "Convert Prec to Snow"      
+        RainFalPrec_col(NY,NX)=0.0_r8
+        SnoFalPrec_col(NY,NX)=p_total(NY)*3600.0 !convert to m SWE/s to m SWE/hr
       ENDIF
     else
-      PrecAsRain(NY,NX)=p_rain(NY)*3600.0      !convert from m/s to m/hr
-      PrecAsSnow(NY,NX)=p_snow(NY)*3600.0*10.0 !convert from m SWE/s to m/hr 
+      write(*,*) "Prec given"
+      RainFalPrec_col(NY,NX)=p_rain(NY)*3600.0 !convert from m/s to m/hr
+      SnoFalPrec_col(NY,NX)=p_snow(NY)*3600.0 !convert from m SWE/s to mSWE/hr 
     endif
-    RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    !Set Prec equal to variables for after Irrigation and canopy processing
+    !since that is not included yet
+    PrecRainAndIrrig_col = RainFalPrec_col
+    RainPrecThrufall_col = RainFalPrec_col
+
+    !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
-  write(*,*) "(ATSEcoSIMAdvance) PrecAsRain: ", PrecAsRain(1,1), "m/s, PrecAsSnow: " , PrecAsSnow(1,1), " m/s" 
+  write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s" 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
@@ -170,9 +180,10 @@ implicit none
 
   VHeatCapacity1_vr(0,1,1) = 0.0
 
-  !perhaps doesn't neeed to run NPH times
-  !Setting to 1 without resetting the timescale
-  DO M=1,NPH_Test
+  !This does the subcycling of the land surface model
+  write(*,*) "Starting Subcycling loop: "
+  DO M=1,NPH
+    write(*,*) "subcyle: ", M, " of ", NPH
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
@@ -195,16 +206,16 @@ implicit none
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
-    !Convert heat and water flux from EcoSIM units (flux/ hr)
+    !Convert heat and water flux flux from the subcycled value
     !to ATS units (flux / s)
-    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP*3600._r8)
-    surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP*3600._r8)
+    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP)
+    surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
  
   !Compute potential water loss(or gain) before next EcoSIM run
   Wat_next = VLWatMicP1_vr(1,1,1) - Qinfl2MicP(NY,1) / (dts_HeatWatTP)
-  write(*,*) "(End EcoSIM Advance) Total Water Volume in top layer: " VLWatMicP1_vr(1,1,1) " m, Q_w: " surf_w_source
+  write(*,*) "(End EcoSIM Advance) Total Water Volume in top layer: ", VLWatMicP1_vr(1,1,1), " m, Q_w: ", surf_w_source(1)
   write(*,*) "After an hour of this flux the water content should be: ", Wat_next
 
   end subroutine RunEcoSIMSurfaceBalance

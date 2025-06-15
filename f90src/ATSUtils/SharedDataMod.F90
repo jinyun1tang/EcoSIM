@@ -67,6 +67,7 @@ Module SharedDataMod
   integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays(:)
   integer :: NYS, I                       !total number of columns
+  logical :: p_bool
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
@@ -82,32 +83,43 @@ Module SharedDataMod
     JX=1;JY=ncol
     JZ = ncells_per_col_
    
-    !write(*,*) "In Shared data after setting: "
-    !write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    write(*,*) "In Shared data after setting: "
+    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
 
     allocate(a_csand(ncells_per_col_,ncol))
+    write(*,*) "silt: "
     allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
     !allocate(a_AreaZ(ncells_per_col_,ncol))   !actually need to allocate area
     !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
     !allocate(a_CumDepz2LayBottom_vr(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
     !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
     !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
+    write(*,*) "fhol "
     allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
+    write(*,*) "rock"
     allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
+    write(*,*) "orgc"
     allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
+    write(*,*) "orgN"
     allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
+    write(*,*) "orgp"
     allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
     !allocate(a_PORO(ncells_per_col_,ncol))
     !allocate(a_AREA3(ncells_per_col_))
+
+    write(*,*) "nu: ", ncol
     allocate(a_NU(ncol))
+    write(*,*) "nl: ", ncol
     allocate(a_NL(ncol))
     !allocate(a_ASP(ncells_per_col_))
+    write(*,*) "alt"
     allocate(a_ALT(ncells_per_col_))
     !allocate(tairc(1:ncells_per_col_))
     !allocate(uwind(1:ncells_per_col_))
     !allocate(prec(1:ncells_per_col_))
     !allocate(sunrad(1:ncells_per_col_))
     !allocate(vpair(1:ncells_per_col_))
+    write(*,*) "atka"
     allocate(a_ATKA(1:ncells_per_col_))
  
     !allocate(a_BKDSI(ncells_per_col_, ncol))        ! bulk density
@@ -141,6 +153,7 @@ Module SharedDataMod
     !allocate(surf_e_source(ncells_per_col_))        ! surface energy source
     !allocate(surf_w_source(ncells_per_col_))        ! surface water source
     !allocate(surf_snow_depth(ncells_per_col_))        ! surface snow depth
+    write(*,*) "after allocate vars: "
 
     a_NU=1
     a_NL=ncells_per_col_
