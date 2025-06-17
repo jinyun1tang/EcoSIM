@@ -37,7 +37,7 @@ module ExtractsMod
     call PrintRootTracer(I,J,NZ,'extract')
     IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
 
-      call TotalLeafArea(NZ)
+      call CalcTotalLeafArea(NZ)
 
       call TotalGasandSoluteUptake(I,J,NZ)
 
@@ -110,7 +110,7 @@ module ExtractsMod
   end subroutine TotalLitrFall
 !------------------------------------------------------------------------------------------
 
-  subroutine TotalLeafArea(NZ)
+  subroutine CalcTotalLeafArea(NZ)
 !
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
@@ -136,7 +136,7 @@ module ExtractsMod
     CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)
   ENDDO
   end associate
-  end subroutine TotalLeafArea
+  end subroutine CalcTotalLeafArea
 !------------------------------------------------------------------------------------------
 
   subroutine TotalGasandSoluteUptake(I,J,NZ)

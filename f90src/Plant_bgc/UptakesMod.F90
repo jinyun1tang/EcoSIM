@@ -542,7 +542,7 @@ module UptakesMod
    TKS_vr                    => plt_ew%TKS_vr,                       &
    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft,              &
-   AllPlantRootH2OLoss_pvr    => plt_ew%AllPlantRootH2OLoss_pvr,       &
+   AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr,      &
    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr,               &
    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft,            &
    PSIRoot_pvr               => plt_ew%PSIRoot_pvr,                  &
@@ -561,7 +561,7 @@ module UptakesMod
    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft, &
    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft,    &
    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
-   RCS                       => plt_photo%RCS,                       &
+   RCS_pft                   => plt_photo%RCS_pft,                   &
    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft,       &
    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              &
   )
@@ -590,7 +590,7 @@ module UptakesMod
       CanopyBndlResist_pft(NZ)   = ReistanceCanopy_pft(NZ)
       VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DeltaTKC_pft(NZ)           = 0.0_r8
-      Stomata_Stress             = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+      Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
       CanPStomaResistH2O_pft(NZ) = MinCanPStomaResistH2O_pft(NZ) &
         +(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
 
@@ -670,14 +670,14 @@ module UptakesMod
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
     TKC_pft                   => plt_ew%TKC_pft,                      &
     ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft,          &
-    VPA                       => plt_ew%VPA,                          &  !Input: air vapor pressure 
+    VPA                       => plt_ew%VPA,                          &  !Input: air vapor pressure
     TKS_vr                    => plt_ew%TKS_vr,                       &  !Input: soil temperature profile
     TairK                     => plt_ew%TairK,                        &  !Input: Air temperature
     RIB                       => plt_ew%RIB,                          &
     Transpiration_pft         => plt_ew%Transpiration_pft,            &  !Output: canopy transpiration, ton H2O/d2
     PSICanopy_pft             => plt_ew%PSICanopy_pft,                &  !canopy total water potential [MPa]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,          &  !water held in canopy biomass [m3 d-2]
-    AllPlantRootH2OLoss_pvr    => plt_ew%AllPlantRootH2OLoss_pvr,       &
+    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr,      &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft,           &
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft,          &
@@ -691,7 +691,7 @@ module UptakesMod
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,          &
     MY_pft                    => plt_morph%MY_pft,                    &
     MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft, &
-    RCS                       => plt_photo%RCS,                       &
+    RCS_pft                   => plt_photo%RCS_pft,                   &
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,      &
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft,    &
@@ -770,7 +770,7 @@ module UptakesMod
 !     MinCanPStomaResistH2O_pft=minimum CanPStomaResistH2O_pftat PSICanopy_pft=0 from stomate.f
 !     CuticleResist_pft=cuticular resistance from PFT file
 !
-    Stomata_Stress             = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
     CanPStomaResistH2O_pft(NZ) = MinCanPStomaResistH2O_pft(NZ)+Stomata_Stress &
       *(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))
 !
@@ -1191,7 +1191,7 @@ module UptakesMod
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft,           &
     PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft,            &
     PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr,               &
-    AllPlantRootH2OLoss_pvr    => plt_ew%AllPlantRootH2OLoss_pvr,       &
+    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr,      &
     PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft,            &
     PSICanopy_pft             => plt_ew%PSICanopy_pft,                &
     PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
@@ -1211,7 +1211,7 @@ module UptakesMod
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft,          &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,        &
     MY_pft                    => plt_morph%MY_pft,                    &
-    RCS                       => plt_photo%RCS,                       &
+    RCS_pft                   => plt_photo%RCS_pft,                   &
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft,      &
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft,    &
     MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft, &
@@ -1241,7 +1241,7 @@ module UptakesMod
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
-  Stomata_Stress             = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+  Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
   CanPStomaResistH2O_pft(NZ) = MinCanPStomaResistH2O_pft(NZ) &
     +(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ) = ReistanceCanopy_pft(NZ)
@@ -1374,10 +1374,10 @@ module UptakesMod
     TairK               => plt_ew%TairK,                  &
     TKC_pft             => plt_ew%TKC_pft,                &
     TKS_vr              => plt_ew%TKS_vr,                 &
-    PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
+    PSICanPDailyMin_pft => plt_ew%PSICanPDailyMin_pft,    &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &
-    MaxNumRootLays      => plt_site%MaxNumRootLays ,      &
+    MaxNumRootLays      => plt_site%MaxNumRootLays,       &
     ChillHours_pft      => plt_photo%ChillHours_pft,      &
     TempOffset_pft      => plt_pheno%TempOffset_pft,      &
     TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft,    &
@@ -1423,7 +1423,7 @@ module UptakesMod
     TKSO                 = TKS_vr(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ) = calc_root_grow_tempf(TKSO)
   ENDDO D100
-  PSICanPDailyMin(NZ)=AMIN1(PSICanPDailyMin(NZ),PSICanopy_pft(NZ))
+  PSICanPDailyMin_pft(NZ)=AMIN1(PSICanPDailyMin_pft(NZ),PSICanopy_pft(NZ))
   !
   !     DIURNAL CHILLING
   !

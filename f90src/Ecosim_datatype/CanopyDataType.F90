@@ -11,7 +11,7 @@ module CanopyDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8),target,allocatable ::  canopy_growth_pft(:,:,:)                   !canopy structural growth rate [gC/h]
+  real(r8),target,allocatable ::  canopy_growth_pft(:,:,:)                   !canopy structural growth rate, [gC/h]
   real(r8),target,allocatable ::  StomatalStress_pft(:,:,:)                  !stomatal stress from water/turgor,(0,1), [-]
   real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                 !canopy PAR albedo , [-]
   real(r8),target,allocatable ::  RadPARLeafTransmis_pft(:,:,:)              !canopy PAR transmissivity , [-]
@@ -20,17 +20,17 @@ module CanopyDataType
   real(r8),target,allocatable ::  CuticleResist_pft(:,:,:)                   !maximum stomatal resistance to vapor, [s m-1]
   real(r8),target,allocatable ::  CO2CuticleResist_pft(:,:,:)                !maximum stomatal resistance to CO2, [s h-1]
   real(r8),target,allocatable ::  H2OCuticleResist_pft(:,:,:)                !maximum stomatal resistance to vapor, [s h-1]
-  real(r8),target,allocatable ::  RCS(:,:,:)                                 !shape parameter for calculating stomatal resistance from turgor pressure, [-]
+  real(r8),target,allocatable ::  RCS_pft(:,:,:)                             !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)              !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  MinCanPStomaResistH2O_pft(:,:,:)           !canopy minimum stomatal resistance, [s m-1]
   real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                  !canopy boundary layer resistance, [m h-1]
-  real(r8),target,allocatable ::  O2I(:,:,:)                                 !leaf gaseous O2 concentration, [umol m-3]
+  real(r8),target,allocatable ::  O2I_pft(:,:,:)                                 !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  LeafIntracellularCO2_pft(:,:,:)            !leaf gaseous CO2 concentration, [umol m-3]
   real(r8),target,allocatable ::  AirConc_pft(:,:,:)                         !total gas concentration, [mol m-3]
   real(r8),target,allocatable ::  DiffCO2Atmos2Intracel_pft(:,:,:)           !gaesous CO2 concentration difference across stomates, [umol m-3]
   real(r8),target,allocatable ::  CanopyGasCO2_pft(:,:,:)                    !canopy gaesous CO2 concentration , [umol mol-1]
   real(r8),target,allocatable ::  aquCO2Intraleaf_pft(:,:,:)                 !leaf aqueous CO2 concentration, [uM]
-  real(r8),target,allocatable ::  O2L(:,:,:)                                 !leaf aqueous O2 concentration, [uM]
+  real(r8),target,allocatable ::  O2L_pft(:,:,:)                                 !leaf aqueous O2 concentration, [uM]
   real(r8),target,allocatable ::  CO2Solubility_pft(:,:,:)                   !leaf CO2 solubility, [uM /umol mol-1]
   real(r8),target,allocatable ::  LeafO2Solubility_pft(:,:,:)                !leaf O2 solubility, [uM /umol mol-1]
   real(r8),target,allocatable ::  Km4LeafaqCO2_pft(:,:,:)                    !leaf aqueous CO2 Km no O2, [uM]
@@ -55,8 +55,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  VmaxRubCarboxyRef_pft(:,:,:)               !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
   real(r8),target,allocatable ::  VmaxRubOxyRef_pft(:,:,:)                   !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
   real(r8),target,allocatable ::  VmaxPEPCarboxyRef_pft(:,:,:)               !PEP carboxylase activity, [umol g-1 h-1 at 25 oC]
-  real(r8),target,allocatable ::  XKCO2(:,:,:)                               !Km for rubisco carboxylase activity, [uM]
-  real(r8),target,allocatable ::  XKO2(:,:,:)                                !Km for rubisco oxygenase activity, [uM]
+  real(r8),target,allocatable ::  XKCO2_pft(:,:,:)                               !Km for rubisco carboxylase activity, [uM]
+  real(r8),target,allocatable ::  XKO2_pft(:,:,:)                                !Km for rubisco oxygenase activity, [uM]
   real(r8),target,allocatable ::  Km4PEPCarboxy_pft(:,:,:)                   !Km for PEP carboxylase activity, [uM]
   real(r8),target,allocatable ::  LeafRuBPConc_pft(:,:,:)                    !leaf rubisco content, [g g-1]
   real(r8),target,allocatable ::  FracLeafProtinAsPEPCarboxyl_pft(:,:,:)     !leaf PEP carboxylase content, [g g-1]
@@ -93,13 +93,13 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyWaterMassBeg_col(:,:)                !Canopy water before mass balance check [m3 d-2]
   real(r8),target,allocatable ::  CanopyWaterMassEnd_col(:,:)                !Canopy water at mass balance check [m3 d-2]
   real(r8),target,allocatable ::  HeatCanopy2Dist_col(:,:)                   !Canopy heat content loss to disturbance, [MJ d-2]
-  real(r8),target,allocatable ::  QCanopyWat2Dist_col(:,:)                   !canopy water loss to disturbance
+  real(r8),target,allocatable ::  QCanopyWat2Dist_col(:,:)                   !canopy water loss to disturbance, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QVegET_col(:,:)                            !total canopy evaporation + transpiration, [m3 d-2 h-1]
   real(r8),target,allocatable ::  VapXAir2Canopy_col(:,:)                    !total canopy evaporation, [m3 d-2]
   real(r8),target,allocatable ::  CanopyHeatStor_col(:,:)                    !total canopy heat content, [MJ  d-2]
   real(r8),target,allocatable ::  HeatFlx2Canopy_col(:,:)                    !total canopy heat flux, [MJ  d-2 h-1]
   real(r8),target,allocatable ::  CanopyWat_col(:,:)                         !total canopy water content stored in dry matter, [m3 d-2]
-  real(r8),target,allocatable ::  LWRadCanG(:,:)                             !total canopy LW emission, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  LWRadCanG_col(:,:)                             !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWLeafAlbedo_pft(:,:,:)                 !canopy shortwave albedo , [-]
   real(r8),target,allocatable ::  RadSWLeafTransmis_pft(:,:,:)               !canopy shortwave transmissivity , [-]
   real(r8),target,allocatable ::  PrecIntcptByCanopy_pft(:,:,:)              !water flux into plant canopy, [m3 d-2 h-1]
@@ -113,7 +113,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                        !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)              !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                     !shoot structural chemical element, [g d-2]
-  real(r8),target,allocatable ::  ShootC4NonstC_brch(:,:,:,:)                !Nonstructural shoot C in branch
+  real(r8),target,allocatable ::  C4PhotoShootNonstC_brch(:,:,:,:)           !C4 specific nonstructural shoot C in branch, [gC d-2]
   real(r8),target,allocatable ::  ShootStrutElms_pft(:,:,:,:)                !canopy shoot chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafStrutElms_pft(:,:,:,:)                 !canopy leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  PetoleStrutElms_pft(:,:,:,:)               !canopy sheath chemical element , [g d-2]
@@ -163,9 +163,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)             !plant stored nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                    !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)            !landscape average canopy shoot C, [g d-2]
-  real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate 
-  real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)                         !Light-limited carboxylation rate
-  real(r8),target,allocatable :: CanopyMassC_pft(:,:,:)                      !Canopy biomass [gC d-2]
+  real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate, [gC d2 h-1] 
+  real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)                         !Light-limited carboxylation rate,[gC d2 h-1]
+  real(r8),target,allocatable :: CanopyMassC_pft(:,:,:)                      !Canopy biomass, [gC d-2]
   contains
 !----------------------------------------------------------------------
 
@@ -189,17 +189,17 @@ module CanopyDataType
   allocate(CuticleResist_pft(JP,JY,JX));     CuticleResist_pft=0._r8
   allocate(CO2CuticleResist_pft(JP,JY,JX));     CO2CuticleResist_pft=0._r8
   allocate(H2OCuticleResist_pft(JP,JY,JX));     H2OCuticleResist_pft=0._r8
-  allocate(RCS(JP,JY,JX));      RCS=0._r8
+  allocate(RCS_pft(JP,JY,JX));      RCS_pft=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(MinCanPStomaResistH2O_pft(JP,JY,JX));     MinCanPStomaResistH2O_pft=0._r8
   allocate(CanopyBndlResist_col(JY,JX));         CanopyBndlResist_col=0._r8
-  allocate(O2I(JP,JY,JX));      O2I=0._r8
+  allocate(O2I_pft(JP,JY,JX));      O2I_pft=0._r8
   allocate(LeafIntracellularCO2_pft(JP,JY,JX));     LeafIntracellularCO2_pft=0._r8
   allocate(AirConc_pft(JP,JY,JX));     AirConc_pft=0._r8
   allocate(DiffCO2Atmos2Intracel_pft(JP,JY,JX));     DiffCO2Atmos2Intracel_pft=0._r8
   allocate(CanopyGasCO2_pft(JP,JY,JX));     CanopyGasCO2_pft=0._r8
   allocate(aquCO2Intraleaf_pft(JP,JY,JX));     aquCO2Intraleaf_pft=0._r8
-  allocate(O2L(JP,JY,JX));      O2L=0._r8
+  allocate(O2L_pft(JP,JY,JX));      O2L_pft=0._r8
   allocate(CO2Solubility_pft(JP,JY,JX));     CO2Solubility_pft=0._r8
   allocate(LeafO2Solubility_pft(JP,JY,JX));      LeafO2Solubility_pft=0._r8
   allocate(Km4LeafaqCO2_pft(JP,JY,JX));   Km4LeafaqCO2_pft=0._r8
@@ -224,8 +224,8 @@ module CanopyDataType
   allocate(VmaxRubCarboxyRef_pft(JP,JY,JX));     VmaxRubCarboxyRef_pft=0._r8
   allocate(VmaxRubOxyRef_pft(JP,JY,JX));     VmaxRubOxyRef_pft=0._r8
   allocate(VmaxPEPCarboxyRef_pft(JP,JY,JX));    VmaxPEPCarboxyRef_pft=0._r8
-  allocate(XKCO2(JP,JY,JX));    XKCO2=0._r8
-  allocate(XKO2(JP,JY,JX));     XKO2=0._r8
+  allocate(XKCO2_pft(JP,JY,JX));    XKCO2_pft=0._r8
+  allocate(XKO2_pft(JP,JY,JX));     XKO2_pft=0._r8
   allocate(Km4PEPCarboxy_pft(JP,JY,JX));   Km4PEPCarboxy_pft=0._r8
   allocate(LeafRuBPConc_pft(JP,JY,JX));     LeafRuBPConc_pft=0._r8
   allocate(FracLeafProtinAsPEPCarboxyl_pft(JP,JY,JX));     FracLeafProtinAsPEPCarboxyl_pft=0._r8
@@ -264,7 +264,7 @@ module CanopyDataType
   allocate(CanopyHeatStor_col(JY,JX));      CanopyHeatStor_col=0._r8
   allocate(HeatFlx2Canopy_col(JY,JX));      HeatFlx2Canopy_col=0._r8
   allocate(CanopyWat_col(JY,JX));      CanopyWat_col=0._r8
-  allocate(LWRadCanG(JY,JX));       LWRadCanG=0._r8
+  allocate(LWRadCanG_col(JY,JX));       LWRadCanG_col=0._r8
   allocate(RadSWLeafAlbedo_pft(JP,JY,JX));     RadSWLeafAlbedo_pft=0._r8
   allocate(RadSWLeafTransmis_pft(JP,JY,JX));     RadSWLeafTransmis_pft=0._r8
   allocate(PrecIntcptByCanopy_pft(JP,JY,JX));     PrecIntcptByCanopy_pft=0._r8
@@ -297,7 +297,7 @@ module CanopyDataType
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
   allocate(StalkLiveBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkLiveBiomassC_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
-  allocate(ShootC4NonstC_brch(MaxNumBranches,JP,JY,JX));ShootC4NonstC_brch=0._r8
+  allocate(C4PhotoShootNonstC_brch(MaxNumBranches,JP,JY,JX));C4PhotoShootNonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
   allocate(LeafPetolBiomassC_brch(MaxNumBranches,JP,JY,JX)); LeafPetolBiomassC_brch=0._r8
   allocate(ShootStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ShootStrutElms_brch=0._r8
@@ -352,17 +352,17 @@ module CanopyDataType
   call destroy(CuticleResist_pft)
   call destroy(CO2CuticleResist_pft)
   call destroy(H2OCuticleResist_pft)
-  call destroy(RCS)
+  call destroy(RCS_pft)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(MinCanPStomaResistH2O_pft)
   call destroy(CanopyBndlResist_col)
-  call destroy(O2I)
+  call destroy(O2I_pft)
   call destroy(LeafIntracellularCO2_pft)
   call destroy(AirConc_pft)
   call destroy(DiffCO2Atmos2Intracel_pft)
   call destroy(CanopyGasCO2_pft)
   call destroy(aquCO2Intraleaf_pft)
-  call destroy(O2L)
+  call destroy(O2L_pft)
   call destroy(CO2Solubility_pft)
   call destroy(LeafO2Solubility_pft)
   call destroy(Km4LeafaqCO2_pft)
@@ -387,8 +387,8 @@ module CanopyDataType
   call destroy(VmaxRubCarboxyRef_pft)
   call destroy(VmaxRubOxyRef_pft)
   call destroy(VmaxPEPCarboxyRef_pft)
-  call destroy(XKCO2)
-  call destroy(XKO2)
+  call destroy(XKCO2_pft)
+  call destroy(XKO2_pft)
   call destroy(Km4PEPCarboxy_pft)
   call destroy(LeafRuBPConc_pft)
   call destroy(FracLeafProtinAsPEPCarboxyl_pft)
@@ -427,7 +427,7 @@ module CanopyDataType
   call destroy(CanopyHeatStor_col)
   call destroy(HeatFlx2Canopy_col)
   call destroy(CanopyWat_col)
-  call destroy(LWRadCanG)
+  call destroy(LWRadCanG_col)
   call destroy(RadSWLeafAlbedo_pft)
   call destroy(RadSWLeafTransmis_pft)
   call destroy(PrecIntcptByCanopy_pft)
@@ -461,7 +461,7 @@ module CanopyDataType
   call destroy(CanopyNodulElms_pft)
   call destroy(StalkLiveBiomassC_brch)
   call destroy(CanopyNonstElms_brch)
-  call destroy(ShootC4NonstC_brch)
+  call destroy(C4PhotoShootNonstC_brch)
   call destroy(LeafPetolBiomassC_brch)
   call destroy(ShootStrutElms_brch)
   call destroy(LeafStrutElms_brch)

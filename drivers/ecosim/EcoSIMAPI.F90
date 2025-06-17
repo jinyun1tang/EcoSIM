@@ -11,7 +11,7 @@ module EcoSIMAPI
   use TranspNoSaltMod,   only: TranspNoSalt
   use TranspSaltMod,     only: TranspSalt
   use WatsubMod,         only: watsub
-  use PlantMgmtDataType, only: NP
+  use PlantMgmtDataType, only: NP_col
   use FireMod,           only: config_fire
   USE EcoSIMCtrlDataType
   use SoilWaterDataType
@@ -517,16 +517,16 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     write(*,*)'write regression file'
     call regression%OpenOutput()
 
-    do NZ=1,NP(NY,NX)
+    do NZ=1,NP_col(NY,NX)
       IF(IsPlantActive_pft(NZ,NY,NX).EQ.iActive)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'
         datv=0._r8
         do ll=1,12
-          if(AREA(3,ll,NY,NX)>0._r8)then
+          if(AREA_3D(3,ll,NY,NX)>0._r8)then
             datv(ll)=safe_adb(RootNutUptake_pvr(ids_NH4,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4,2,ll,NZ,NY,NX) &
-              +RootNutUptake_pvr(ids_NH4B,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,ll,NZ,NY,NX),AREA(3,ll,NY,NX))
+              +RootNutUptake_pvr(ids_NH4B,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,ll,NZ,NY,NX),AREA_3D(3,ll,NY,NX))
           endif
         enddo
         call regression%writedata(category,name, datv)

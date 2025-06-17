@@ -1,11 +1,12 @@
-set(MODELPARS_SOURCES
-  NitroPars.F90
-  GrosubPars.F90
-  TracerPropMod.F90
-  MicBGCPars.F90
-  EcoSiMParDataMod.F90
-  ChemTracerParsMod.F90
-)
+file(GLOB MODELPARS_SOURCES "*.F90")
+#set(MODELPARS_SOURCES
+#  NitroPars.F90
+#  GrosubPars.F90
+#  TracerPropMod.F90
+#  MicBGCPars.F90
+#  EcoSiMParDataMod.F90
+#  ChemTracerParsMod.F90
+#)
 include(add_ecosim_library)
 add_ecosim_library(modelpars ${MODELPARS_SOURCES})
 #add_library(modelpars OBJECT ${MODELPARS_SOURCES})

@@ -421,7 +421,7 @@ module grosubsMod
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr,             &
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr,           &
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr,           &
-    RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr     ,           &
+    RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr,                &
     RootrNC_pft                 => plt_allom%RootrNC_pft,                 &
     RootrPC_pft                 => plt_allom%RootrPC_pft,                 &
     FracShootStalkElmAlloc2Litr => plt_allom%FracShootStalkElmAlloc2Litr, &
@@ -436,7 +436,7 @@ module grosubsMod
     rPCStalk_pft                => plt_allom%rPCStalk_pft,                &
     k_fine_litr                 => pltpar%k_fine_litr,                    &
     k_woody_litr                => pltpar%k_woody_litr,                   &
-    RCS                         => plt_photo%RCS,                         &
+    RCS_pft                     => plt_photo%RCS_pft,                     &
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr,            &
     Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr,             &
     MY_pft                      => plt_morph%MY_pft,                      &
@@ -567,10 +567,10 @@ module grosubsMod
     WaterStress4Groth = EXP(0.05_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ELSE
     !others
-    Stomata_Stress    = EXP(RCS(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress    = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
     WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
-!  write(119,*)I*1000+J,Stomata_Stress,RCS(NZ),PSICanopyTurg_pft(NZ),PSICanopy_pft(NZ),plt_ew%PSICanopyOsmo_pft(NZ)
+!  write(119,*)I*1000+J,Stomata_Stress,RCS_pft(NZ),PSICanopyTurg_pft(NZ),PSICanopy_pft(NZ),plt_ew%PSICanopyOsmo_pft(NZ)
   CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
   end associate

@@ -1,7 +1,7 @@
 module SoilDiagsMod
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use CanopyDataType,     only: QVegET_col
-  use GridDataType,       only: NU, NL
+  use GridDataType,       only: NU_col, NL_col
   use EcoSimConst,        only: RGasC
   use abortutils,         only: endrun
   use TracerPropMod,      only: MolecularWeight
@@ -41,7 +41,7 @@ implicit none
   call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         if(VLWatMicP_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. trcs_solml_vr(idg_CO2,L,NY,NX).GT.ZEROS(NY,NX))THEN
           do idg=idg_beg,idg_NH3
             GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,L,NY,NX)*VLWatMicP_vr(L,NY,NX)  !conver into carbon g C/mol

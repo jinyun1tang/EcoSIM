@@ -54,7 +54,7 @@ implicit none
     NumRootAxes_pft          => plt_morph%NumRootAxes_pft,          &
     MaxNumRootLays           => plt_site%MaxNumRootLays,            &
     RootElms_pft             => plt_biom%RootElms_pft,              &
-    ShootC4NonstC_brch       => plt_biom%ShootC4NonstC_brch,        &
+    C4PhotoShootNonstC_brch       => plt_biom%C4PhotoShootNonstC_brch,        &
     RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr,          &
     ShootElms_pft            => plt_biom%ShootElms_pft              &
   )
@@ -272,7 +272,7 @@ implicit none
     EarStrutElms_brch          => plt_biom%EarStrutElms_brch,           &
     GrainStrutElms_brch        => plt_biom%GrainStrutElms_brch,         &
     CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch,        &
-    ShootC4NonstC_brch         => plt_biom%ShootC4NonstC_brch,          &
+    C4PhotoShootNonstC_brch         => plt_biom%C4PhotoShootNonstC_brch,          &
     CPOOL3_node                => plt_photo%CPOOL3_node,                &
     CPOOL4_node                => plt_photo%CPOOL4_node,                &
     iPlantPhotosynthesisType   => plt_photo%iPlantPhotosynthesisType,   &
@@ -291,13 +291,13 @@ implicit none
   CanopyLeafShethC_pft(NZ) = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
 
   !add C4 specific reserve carbon
-  ShootC4NonstC_brch(NB,NZ)=0._r8
+  C4PhotoShootNonstC_brch(NB,NZ)=0._r8
   IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN      
     D3251: DO K=1,MaxNodesPerBranch1
-      ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ)+CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ) &
+      C4PhotoShootNonstC_brch(NB,NZ)=C4PhotoShootNonstC_brch(NB,NZ)+CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ) &
         +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ)
     ENDDO D3251
-    ShootStrutElms_brch(ielmc,NB,NZ)=ShootStrutElms_brch(ielmc,NB,NZ)+ShootC4NonstC_brch(NB,NZ)
+    ShootStrutElms_brch(ielmc,NB,NZ)=ShootStrutElms_brch(ielmc,NB,NZ)+C4PhotoShootNonstC_brch(NB,NZ)
   ENDIF
 
   end associate

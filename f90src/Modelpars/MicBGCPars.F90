@@ -11,6 +11,25 @@ implicit none
   __FILE__
 
   type, public :: MicParType
+  real(r8), pointer :: ORCI(:,:)                   !allocation of residue to kinetic components, [-]
+  real(r8), pointer :: FL(:)                       !allocation to microbial kinetic fractions, [-]
+  real(r8), pointer :: rNCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial P:C,  [gP gC-1]
+  real(r8), pointer :: rNCOMCAutor(:,:)            !maximum/minimum mass based autotrophic microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMCAutor(:,:)            !maximum/minimum mass based autotrophic microbial P:C, [gP gC-1]
+  real(r8), pointer :: rNCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial P:C, [gP gC-1]
+  real(r8), pointer :: rNCOMCAutor_ave(:,:)        !group average maximum/minimum mass based microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMCAutora_ave(:,:)       !group average maximum/minimum mass based microbial P:C, [gP gC-1]
+  real(r8), pointer :: DOSA(:)                     !rate constant for litter colonization by heterotrophs, [h-1]
+  real(r8), pointer :: SPOSC(:,:)                  !specific decomposition rate constant, [h-1]
+  real(r8), pointer :: CNOFC(:,:)                  !fractions to allocate N to kinetic components,[-]
+  real(r8), pointer :: CPOFC(:,:)                  !fractions to allocate P to kinetic components, [-]
+  real(r8), pointer :: CNRH(:)                     !default N:C ratios in SOC complexes,[gN gC-1]
+  real(r8), pointer :: CPRH(:)                     !default P:C ratios in SOC complexes, [gN gC-1]
+  real(r8), pointer :: OMCF(:)                     !heterotrophic microbial biomass composition in SOC, [gC gC-1]
+  real(r8), pointer :: OMCA(:)                     !autotrophic microbial biomass composition in SOC, [gC gC-1]
+  !terminate  [label for variable parsing]
   integer :: jcplx   !# of microbe-substrate complexes
   integer :: jsken   !# of kinetic components of the substrates
   integer :: jguilds !# of guilds
@@ -34,29 +53,11 @@ implicit none
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
-  real(r8), pointer :: OMCI(:,:)             !initializes microbial biomass
-  real(r8), pointer :: OHCK(:)    !fractions of SOC in adsorbed C
-  real(r8), pointer :: OMCK(:)    !fractions of SOC in biomass
-  real(r8), pointer :: ORCK(:)    !fractions of SOC in litter
-  real(r8), pointer :: OQCK(:)    !fractions of SOC in DOC
-  real(r8), pointer :: ORCI(:,:)   !allocation of residue to kinetic components
-  real(r8), pointer :: FL(:)       !allocation to microbial kinetic fractions
-  real(r8), pointer :: rNCOMC(:,:,:)        !maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMC(:,:,:)        !maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCAutor(:,:)        !maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCAutor(:,:)        !maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCa(:,:,:)         !average maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCa(:,:,:)         !average maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCAutora(:,:)         !average maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCAutora(:,:)         !average maximum/minimum mass based microbial P:C
-  real(r8), pointer :: DOSA(:)
-  real(r8), pointer :: SPOSC(:,:)
-  real(r8), pointer :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
-  real(r8), pointer :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
-  real(r8), pointer :: CNRH(:)                            !default N:C ratios in SOC complexes
-  real(r8), pointer :: CPRH(:)                            !default P:C ratios in SOC complexes
-  real(r8), pointer :: OMCF(:)                            !hetero microbial biomass composition in SOC
-  real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
+  real(r8), pointer :: OMCI(:,:)                   !initializes microbial biomass
+  real(r8), pointer :: OHCK(:)                     !fractions of SOC in adsorbed C
+  real(r8), pointer :: OMCK(:)                     !fractions of SOC in biomass
+  real(r8), pointer :: ORCK(:)                     !fractions of SOC in litter
+  real(r8), pointer :: OQCK(:)                     !fractions of SOC in DOC
   logical,  pointer :: is_activeMicrbFungrpAutor(:)
   logical,  pointer :: is_aerobic_hetr(:)
   logical,  pointer :: is_anaerobic_hetr(:)
@@ -288,10 +289,10 @@ contains
           rPCOMC(1,NGL,K)=0.015_r8
           rPCOMC(2,NGL,K)=0.009_r8
         ENDDO
-        this%rNCOMCa(1,N,K)=0.15_r8           !maximum
-        this%rNCOMCa(2,N,K)=0.09_r8           !minimum
-        this%rPCOMCa(1,N,K)=0.015_r8
-        this%rPCOMCa(2,N,K)=0.009_r8
+        this%rNCOMC_ave(1,N,K)=0.15_r8           !maximum
+        this%rNCOMC_ave(2,N,K)=0.09_r8           !minimum
+        this%rPCOMC_ave(1,N,K)=0.015_r8
+        this%rPCOMC_ave(2,N,K)=0.009_r8
       ELSE
         do NGL=this%JGnio(n),this%JGnfo(n)
           rNCOMC(1,NGL,K)=0.225_r8
@@ -299,17 +300,17 @@ contains
           rPCOMC(1,NGL,K)=0.0225_r8
           rPCOMC(2,NGL,K)=0.0135_r8
         enddo
-        this%rNCOMCa(1,N,K)=0.225_r8
-        this%rNCOMCa(2,N,K)=0.135_r8
-        this%rPCOMCa(1,N,K)=0.0225_r8
-        this%rPCOMCa(2,N,K)=0.0135_r8
+        this%rNCOMC_ave(1,N,K)=0.225_r8
+        this%rNCOMC_ave(2,N,K)=0.135_r8
+        this%rPCOMC_ave(1,N,K)=0.0225_r8
+        this%rPCOMC_ave(2,N,K)=0.0135_r8
       ENDIF
       do NGL=this%JGnio(n),this%JGnfo(n)
         rNCOMC(3,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
         rPCOMC(3,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
       enddo
-      this%rNCOMCa(3,N,K)=DOT_PRODUCT(FL,this%rNCOMCa(1:2,N,K))
-      this%rPCOMCa(3,N,K)=DOT_PRODUCT(FL,this%rPCOMCa(1:2,N,K))
+      this%rNCOMC_ave(3,N,K)=DOT_PRODUCT(FL,this%rNCOMC_ave(1:2,N,K))
+      this%rPCOMC_ave(3,N,K)=DOT_PRODUCT(FL,this%rPCOMC_ave(1:2,N,K))
     enddo
   ENDDO D95
   DO  N=1,this%NumMicbFunGrupsPerCmplx
@@ -319,16 +320,16 @@ contains
       rPCOMCAutor(1,NGL)=0.0225_r8
       rPCOMCAutor(2,NGL)=0.0135_r8
     enddo
-    this%rNCOMCAutora(1,N)=0.225_r8
-    this%rNCOMCAutora(2,N)=0.135_r8
-    this%rPCOMCAutora(1,N)=0.0225_r8
-    this%rPCOMCAutora(2,N)=0.0135_r8
+    this%rNCOMCAutor_ave(1,N)=0.225_r8
+    this%rNCOMCAutor_ave(2,N)=0.135_r8
+    this%rPCOMCAutora_ave(1,N)=0.0225_r8
+    this%rPCOMCAutora_ave(2,N)=0.0135_r8
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
       rPCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
     enddo
-    this%rNCOMCAutora(3,N)=DOT_PRODUCT(FL,this%rNCOMCAutora(1:2,N))
-    this%rPCOMCAutora(3,N)=DOT_PRODUCT(FL,this%rPCOMCAutora(1:2,N))
+    this%rNCOMCAutor_ave(3,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
+    this%rPCOMCAutora_ave(3,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
   enddo
 
   end associate
@@ -383,10 +384,10 @@ contains
   allocate(this%rPCOMC(NumLiveMicrbCompts,this%NumHetetrMicCmplx,1:jcplx))
   allocate(this%rNCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
   allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
-  allocate(this%rNCOMCa(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
-  allocate(this%rPCOMCa(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
-  allocate(this%rNCOMCAutora(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
-  allocate(this%rPCOMCAutora(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+  allocate(this%rNCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
+  allocate(this%rPCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
+  allocate(this%rNCOMCAutor_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+  allocate(this%rPCOMCAutora_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
 
   allocate(this%CNOFC(jsken,1:this%NumOfLitrCmplxs))
   allocate(this%CPOFC(jsken,1:this%NumOfLitrCmplxs))

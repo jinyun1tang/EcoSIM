@@ -76,10 +76,10 @@ module SoilBGCNLayMod
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
 !     FracLitrMix=mixing fraction for subsurface litter
 !
-    IF(L.LT.NL(NY,NX))THEN
+    IF(L.LT.NL_col(NY,NX))THEN
 !     get mixing rate
       IF(L.EQ.0)THEN
-        LL=NU(NY,NX)
+        LL=NU_col(NY,NX)
         DOC_s=0._r8;DOC_u=0._r8
         DO K=1,micpar%NumOfLitrCmplxs
           if(.not.micpar%is_finelitter(K))cycle
@@ -103,7 +103,7 @@ module SoilBGCNLayMod
 !        write(113,*)I+J/24.,ActD,DOM_MicP_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
 
       ELSE
-        D1100: DO LN=L+1,NL(NY,NX)
+        D1100: DO LN=L+1,NL_col(NY,NX)
           IF(VLSoilPoreMicP_vr(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
             LL=LN
             exit

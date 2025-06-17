@@ -79,7 +79,7 @@ implicit none
   endif
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
-      D9985: DO NZ=1,NP(NY,NX)
+      D9985: DO NZ=1,NP_col(NY,NX)
 !
 !       OPEN PFT(11), PFT MANAGEMENT(12) FILES FROM
 !       FILE NAMES IN DATA ARRAYS LOADED IN MAIN.F
@@ -117,7 +117,7 @@ implicit none
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      DO NZ=1,NP(NY,NX)
+      DO NZ=1,NP_col(NY,NX)
         PlantinDepz_pft(NZ,NY,NX)=ppmc
       ENDDO
     ENDDO
@@ -142,7 +142,7 @@ implicit none
 
     DO NX=NH1,NH2
       DO NY=NV1,NV2
-        DO NZ=1,MIN(NS,NP(NY,NX))
+        DO NZ=1,MIN(NS,NP_col(NY,NX))
           tstr=trim(pft_pltinfo(NZ))
           if (tstr .EQ. "") then
             cycle
@@ -181,7 +181,7 @@ implicit none
 ! initialize the disturbance arrays
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      DO NZ=1,NP(NY,NX)
+      DO NZ=1,NP_col(NY,NX)
         DO M=1,366
           iHarvstType_pft(NZ,M,NY,NX)                         = -1
           jHarvst_pft(NZ,M,NY,NX)                             = 0
@@ -256,7 +256,7 @@ implicit none
 
     DO NX=NH1,NH2
       DO NY=NV1,NV2
-        DO NZ=1,MIN(NS,NP(NY,NX))
+        DO NZ=1,MIN(NS,NP_col(NY,NX))
           if(pft_nmgnt(NZ)>0)then
             NN=0
             DO nn1=1,pft_nmgnt(NZ)
@@ -390,7 +390,7 @@ implicit none
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      DO NZ=1,NP(NY,NX)
+      DO NZ=1,NP_col(NY,NX)
         iHarvestDay_pft(NZ,NY,NX)  = iDayPlantHarvest_pft(NZ,NY,NX)
         iHarvestYear_pft(NZ,NY,NX) = iYearPlantHarvest_pft(NZ,NY,NX)
       ENDDO
@@ -489,8 +489,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VOMX', loc, VmaxRubOxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VCMX4', loc, VmaxPEPCarboxyRef_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XKO2', loc, XKO2(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XKO2', loc, XKO2_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKCO24', loc, Km4PEPCarboxy_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRuBPConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PEPC', loc, FracLeafProtinAsPEPCarboxyl_pft(NZ,NY,NX))
@@ -555,7 +555,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'UPMNPO', loc,CMinPO4Root_pft(ipltroot,NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'OSMO', loc,CanOsmoPsi0pt_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RCS', loc,RCS_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSMX', loc,CuticleResist_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'DMLF', loc,LeafBiomGrowthYld_pft(NZ,NY,NX))
@@ -799,8 +799,8 @@ implicit none
   call writefixl(nu_plt,'Specific rubisco carboxylase (umol C g-1 s-1) VCMX',VmaxRubCarboxyRef_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Specific rubisco oxygenase (umol O2 g-1 s-1) VOMX',VmaxRubOxyRef_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Specific PEP carboxylase activity (umol g-1 s-1) VCMX4',VmaxPEPCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxRubCarboxyRef_pft(uM) XKCO2',XKCO2(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft (uM) XKO2',XKO2(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Km for VmaxRubCarboxyRef_pft(uM) XKCO2',XKCO2_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft (uM) XKO2',XKO2_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'KM for VmaxPEPCarboxyRef_pft (uM) XKCO24',Km4PEPCarboxy_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in rubisco (g rub/(g protein)) RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)) PEPC',&
@@ -926,7 +926,7 @@ implicit none
   call writefixl(nu_plt,'leaf osmotic potential at zero leaf water '// &
      'potential (MPa) OSMO',CanOsmoPsi0pt_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'shape parameter for stomatal resistance vs '// &
-     'leaf turgor potential RCS',RCS(NZ,NY,NX),70)
+     'leaf turgor potential RCS',RCS_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'H2O cuticular resistance (s m-1) RSMX',CuticleResist_pft(NZ,NY,NX),70)
   end subroutine plant_water_trait_disp
 
@@ -1071,8 +1071,8 @@ implicit none
    !no plant management info to read
     D5995: DO NX=NHW,NHE
       DO  NY=NVN,NVS
-        NP(NY,NX)=0
-        DO NZ=1,NP0(NY,NX)
+        NP_col(NY,NX)=0
+        DO NZ=1,NP0_col(NY,NX)
           DATAP(NZ,NY,NX)='NO'
           DATAM(NZ,NY,NX)='NO'
         enddo
@@ -1095,8 +1095,8 @@ implicit none
       !no pft data
       DO NX=NHW,NHE
         DO  NY=NVN,NVS
-          NP(NY,NX)=0
-          DO NZ=1,NP0(NY,NX)
+          NP_col(NY,NX)=0
+          DO NZ=1,NP0_col(NY,NX)
             DATAP(NZ,NY,NX)='NO'
             DATAM(NZ,NY,NX)='NO'
           enddo
@@ -1127,9 +1127,9 @@ implicit none
         NN=1
         D4995: DO NX=NH1,NH2
           D4990: DO NY=NV1,NV2
-            NP0(NY,NX)=NS
+            NP0_col(NY,NX)=NS
             D4985: DO NZ=1,NS
-              LSG(NZ,NY,NX)=NN
+              LSG_pft(NZ,NY,NX)=NN
             ENDDO D4985
           ENDDO D4990
         ENDDO D4995
@@ -1160,7 +1160,7 @@ implicit none
               ENDDO D4965
               if(first_pft)then
                 flag_active_pft(2:NS,NY,NX)=.false.
-                NP0(NY,NX)=1
+                NP0_col(NY,NX)=1
                 NS=1
               endif  
             ENDDO D4970
@@ -1169,13 +1169,13 @@ implicit none
 
         D8995: DO NX=NH1,NH2
           D8990: DO NY=NV1,NV2
-            NP(NY,NX)=NS
+            NP_col(NY,NX)=NS
             !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
-            D100: DO NZ=1,NP(NY,NX)
+            D100: DO NZ=1,NP_col(NY,NX)
               DATAP(NZ,NY,NX)=DATAX_pft(NZ)
             ENDDO D100
 
-            D101: DO NZ=NP(NY,NX)+1,JP
+            D101: DO NZ=NP_col(NY,NX)+1,JP
               DATAP(NZ,NY,NX)='NO'
             ENDDO D101
           ENDDO D8990
@@ -1230,8 +1230,8 @@ implicit none
 
     D7995: DO NX=NH1,NH2
       D7990: DO NY=NV1,NV2
-        NP(NY,NX)=MAX(NS,NPP(NY,NX))
-        D195: DO NN=1,NP(NY,NX)
+        NP_col(NY,NX)=MAX(NS,NPP(NY,NX))
+        D195: DO NN=1,NP_col(NY,NX)
           DATAP(NN,NY,NX)='NO'
           DATAM(NN,NY,NX)='NO'
         ENDDO D195
@@ -1251,7 +1251,7 @@ implicit none
 !
 !             ADD NEW PLANT SPECIES
 !
-          D250: DO NN=1,NP(NY,NX)
+          D250: DO NN=1,NP_col(NY,NX)
             IF(DATAP(NN,NY,NX).EQ.'NO')THEN
               D255: DO NZ=1,NS
                 IF(DATAA(NZ,NY,NX).NE.'NO')THEN
@@ -1265,7 +1265,7 @@ implicit none
             ENDIF
           ENDDO D250
 
-          D201: DO NZ=NP(NY,NX)+1,JP
+          D201: DO NZ=NP_col(NY,NX)+1,JP
             DATAP(NZ,NY,NX)='NO'
             DATAM(NZ,NY,NX)='NO'
           ENDDO D201
@@ -1292,20 +1292,20 @@ implicit none
             EXIT
           ENDIF
         ENDDO D202
-        NP(NY,NX)=NN
-        NP0(NY,NX)=NN
+        NP_col(NY,NX)=NN
+        NP0_col(NY,NX)=NN
       ENDDO D7990
     ENDDO D7995
   ENDIF
 1002 continue
   D6995: DO NX=NHW,NHE
     D6990: DO NY=NVN,NVS
-      NP(NY,NX)=NS
-      D300: DO NZ=1,NP(NY,NX)
+      NP_col(NY,NX)=NS
+      D300: DO NZ=1,NP_col(NY,NX)
         DATAP(NZ,NY,NX)=DATAX_pft(NZ)
         DATAM(NZ,NY,NX)=DATAY(NZ)
       ENDDO D300
-      D301: DO NZ=NP(NY,NX)+1,JP
+      D301: DO NZ=NP_col(NY,NX)+1,JP
         DATAP(NZ,NY,NX)='NO'
         DATAM(NZ,NY,NX)='NO'
       ENDDO D301

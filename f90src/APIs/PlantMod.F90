@@ -4,7 +4,7 @@ module PlantMod
   use PlantPhenolMod,    only: hfuncs
   use UptakesMod,        only: RootUptakes
   use PlantDisturbMod,   only: PrepLandscapeGrazing
-  use PlantMgmtDataType, only: NP
+  use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: fixEXConsumpFlux
   use EcoSIMCtrlMod,     only: lverb
   use PlantDebugMod,     only: PrintRootTracer
@@ -48,7 +48,7 @@ implicit none
   
       call  PlantAPISend(I,J,NY,NX)
 
-      call EnterPlantBalance(I,J,NP(NY,NX))
+      call EnterPlantBalance(I,J,NP_col(NY,NX))
 
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !     zero out plant hourly fluxes
@@ -56,14 +56,14 @@ implicit none
 
       if(lverb)WRITE(*,333)'HFUNC'
 
-     DO NZ=1,NP(NY,NX)
+     DO NZ=1,NP_col(NY,NX)
         call PrintRootTracer(I,J,NZ,'BEEfhfunc')
 !       call SumPlantBiom(I,J,NZ,'bfHFUNCS')
      ENDDO
       !Phenological update, determine living/active branches      
       CALL HFUNCs(I,J)
 
-      DO NZ=1,NP(NY,NX)
+      DO NZ=1,NP_col(NY,NX)
         call PrintRootTracer(I,J,NZ,'afhfunc')
 !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
       ENDDO
@@ -76,7 +76,7 @@ implicit none
 !      if(I==140 .and. J>=20)write(116,*)'afrootupk',I*1000+J         
 !      call SumPlantRootGas(I,J)
 
-!      DO NZ=1,NP(NY,NX)
+!      DO NZ=1,NP_col(NY,NX)
 !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
 !      ENDDO
 
@@ -90,11 +90,11 @@ implicit none
       CALL EXTRACTs(I,J)
 !      if(I==140 .and. J>=20)write(116,*)'afextract'        
 
-      DO NZ=1,NP(NY,NX)
+      DO NZ=1,NP_col(NY,NX)
         Call ReSeedPlants(I,J,NZ)
       ENDDO
 
-      call ExitPlantBalance(I,J,NP(NY,NX))
+      call ExitPlantBalance(I,J,NP_col(NY,NX))
 
       call PlantAPIRecv(I,J,NY,NX)
 
@@ -131,7 +131,7 @@ implicit none
   integer :: L,idg
   real(r8):: dmass
 
-  DO L=NU(NY,NX),NL(NY,NX)
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
     do idg=idg_beg,idg_NH3            
       if (trcs_solml_vr(idg,L,NY,NX)>trcs_Soil2plant_uptake_vr(idg,L,NY,NX))then
         trcs_solml_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)-trcs_Soil2plant_uptake_vr(idg,L,NY,NX)

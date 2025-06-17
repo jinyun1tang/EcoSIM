@@ -74,12 +74,12 @@ implicit none
   enddo
 
   do NY=1,NYS
-    NU(NY,NX)               = a_NU(NY)
-    NL(NY,NX)               = a_NL(NY)
-    !a_AREA3(0,NY)           = 1.0_r8
-    !AREA(3,0,NY,NX)         = a_AREA3(0,NY)
-    !AREA(3,NU(NY,NX),NY,NX) = a_AREA3(0,NY)
-    !AREA(3,2,NY,NX)         = a_AREA3(0,NY)
+    NU_col(NY,NX)                   = a_NU(NY)
+    NL_col(NY,NX)                   = a_NL(NY)
+    !a_AREA3(0,NY)                  = 1.0_r8
+    !AREA_3D(3,0,NY,NX)             = a_AREA3(0,NY)
+    !AREA_3D(3,NU_col(NY,NX),NY,NX) = a_AREA3(0,NY)
+    !AREA_3D(3,2,NY,NX)             = a_AREA3(0,NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean_col(NY,NX) = a_ATKA(NY)
@@ -94,7 +94,7 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     !VPA(NY,NX) = vpair(NY)/1.0e6_r8
 
-    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
+    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
@@ -106,11 +106,11 @@ implicit none
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
     EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
-    LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
 
     RainH(NY,NX) = p_rain(NY)*3600.0  !(convert m/s into m/hr
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
-    DO L=NU(NY,NX),NL(NY,NX)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
@@ -146,16 +146,16 @@ implicit none
       PrecAsRain(NY,NX)=0.0_r8
       PrecAsSnow(NY,NX)=RAINH(NY,NX)
     ENDIF
-    RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+    SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
 
-  PSIAtFldCapacity = pressure_at_field_capacity
-  PSIAtWiltPoint = pressure_at_wilting_point
+  PSIAtFldCapacity_col = pressure_at_field_capacity
+  PSIAtWiltPoint_col = pressure_at_wilting_point
 
-  write(*,*) "(ATSEcoSIMAdvance) RAINH  = ", RAINH(1,1), " m/hr,  AREA(3,NU(NY,NX),NY,NX) = ", AREA(3,1,1,1)
+  write(*,*) "(ATSEcoSIMAdvance) RAINH  = ", RAINH(1,1), " m/hr,  AREA_3D(3,NU_col(NY,NX),NY,NX) = ", AREA_3D(3,1,1,1)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -220,7 +220,7 @@ implicit none
 
   !Modified to remove all MacP1 as it should all be zero
   DO NY=1,NYS
-    DO L=NU(NY,NX),NL(NY,NX)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
       !VLTSoiPore = VLSoilMicP_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)
       VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
       IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN

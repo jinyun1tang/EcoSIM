@@ -83,7 +83,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)               !initial standing dead C, [g C m-2]
   real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [m-2]
-  integer,target,allocatable ::  NumActivePlants(:,:)                        !number of active PFT
+  integer,target,allocatable ::   NumActivePlants_col(:,:)                        !number of active PFT
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)               !canopy plant water stress indicator, number of hours PSILT < PSILY, []
@@ -141,7 +141,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  NodeLenPergC_pft(:,:,:)                    !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FracGroth2Node_pft(:,:,:)                  !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NumCogrowthNode_pft(:,:,:)                  !number of concurrently growing nodes
-  real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                     !minimum daily canopy water potential, [MPa]
+  real(r8),target,allocatable ::  PSICanPDailyMin_pft(:,:,:)                     !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                  !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                     !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                 !flag to detect canopy death , [-]
@@ -251,7 +251,7 @@ contains
   allocate(PPI_pft(JP,JY,JX));      PPI_pft=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
   allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
-  allocate(NumActivePlants(JY,JX));       NumActivePlants=0
+  allocate(NumActivePlants_col(JY,JX));       NumActivePlants_col=0
   allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
   allocate(PPatSeeding_pft(JP,JY,JX));      PPatSeeding_pft=0._r8
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
@@ -309,7 +309,7 @@ contains
   allocate(NodeLenPergC_pft(JP,JY,JX));     NodeLenPergC_pft=0._r8
   allocate(FracGroth2Node_pft(JP,JY,JX));     FracGroth2Node_pft=0._r8
   allocate(NumCogrowthNode_pft(JP,JY,JX));     NumCogrowthNode_pft=0
-  allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
+  allocate(PSICanPDailyMin_pft(JP,JY,JX));    PSICanPDailyMin_pft=0._r8
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
   allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
@@ -417,7 +417,7 @@ contains
   call destroy(PPI_pft)
   call destroy(StandingDeadInitC_pft)
   call destroy(PPX_pft)
-  call destroy(NumActivePlants)
+  call destroy(NumActivePlants_col)
   call destroy(PlantPopu_col)
   call destroy(PPatSeeding_pft)
   call destroy(HoursTooLowPsiCan_pft)
@@ -475,7 +475,7 @@ contains
   call destroy(NodeLenPergC_pft)
   call destroy(FracGroth2Node_pft)
   call destroy(NumCogrowthNode_pft)
-  call destroy(PSICanPDailyMin)
+  call destroy(PSICanPDailyMin_pft)
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)
   call destroy(iPlantShootState_pft)

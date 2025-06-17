@@ -32,7 +32,7 @@ module SurfaceRadiationMod
 
   call DivideCanopyAIByHeight(I,J,DepthSurfWatIce)
 
-  call SummaryCanopyArea(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  call SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
   call SurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
@@ -189,7 +189,7 @@ module SurfaceRadiationMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SummaryCanopyArea(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  subroutine SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
   !
   !Description:
   !Summarize canopy leaf and steam area

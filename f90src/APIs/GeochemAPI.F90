@@ -94,7 +94,7 @@ module GeochemAPI
   NPI=INT(NPH/2)
   DO   NX=NHW,NHE
     DO   NY=NVN,NVS
-      DO   L=NU(NY,NX),NL(NY,NX)
+      DO   L=NU_col(NY,NX),NL_col(NY,NX)
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM_vr(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
 !
 !     WATER VOLUME IN NON-BAND AND BAND SOIL ZONES

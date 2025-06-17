@@ -214,7 +214,7 @@
   associate(                                                                  & 
     CanopyLeafArea_lnode           => plt_morph%CanopyLeafArea_lnode,           &
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft,                 &
-    O2L                           => plt_photo%O2L,                           &
+    O2L_pft                          => plt_photo%O2L_pft,                           &
     aquCO2Intraleaf_pft           => plt_photo%aquCO2Intraleaf_pft,           &
     LeafC3ChlorofilConc_pft       => plt_photo%LeafC3ChlorofilConc_pft,       &
     Vmax4RubiscoCarboxy_pft       => plt_photo%Vmax4RubiscoCarboxy_pft,       &
@@ -257,7 +257,7 @@
 !
   Vmax4RubiscoCarboxy_pft(K,NB,NZ)       = VmaxRubCarboxyRef_pft(NZ)*TFN_Carboxy*MesophyllRubiscoSurfDensity
   VOGRO                                  = VmaxRubOxyRef_pft(NZ)*TFN_Oxy*MesophyllRubiscoSurfDensity
-  CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
+  CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L_pft(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
   CO2lmtRubiscoCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4RubiscoCarboxy_pft(K,NB,NZ)&
     *(aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ))/(aquCO2Intraleaf_pft(NZ)+Km4RubiscoCarboxy_pft(NZ)))
 !
@@ -305,35 +305,35 @@
   real(r8) :: VOGRO   !vmax 4 oxygenation in mesophyll
 !     begin_execution
   associate(                                                                       &
-    LeafElmntNode_brch             =>  plt_biom%LeafElmntNode_brch               , &
-    ZERO4Groth_pft                 =>  plt_biom%ZERO4Groth_pft                   , &
-    CanopyLeafArea_lnode            =>  plt_morph%CanopyLeafArea_lnode             , &
-    C4PhotosynDowreg_brch          =>  plt_photo%C4PhotosynDowreg_brch           , &
-    LeafC4ChlorofilConc_pft        =>  plt_photo%LeafC4ChlorofilConc_pft         , &
-    O2L                            =>  plt_photo%O2L                             , &
-    aquCO2Intraleaf_pft            =>  plt_photo%aquCO2Intraleaf_pft             , &
-    SpecChloryfilAct_pft           =>  plt_photo%SpecChloryfilAct_pft            , &
-    VmaxPEPCarboxyRef_pft          =>  plt_photo%VmaxPEPCarboxyRef_pft           , &
-    LeafRuBPConc_pft               =>  plt_photo%LeafRuBPConc_pft                , &
-    Km4PEPCarboxy_pft              =>  plt_photo%Km4PEPCarboxy_pft               , &
-    CMassCO2BundleSheath_node      =>  plt_photo%CMassCO2BundleSheath_node       , &
-    CPOOL4_node                    =>  plt_photo%CPOOL4_node                     , &
-    Km4LeafaqCO2_pft               =>  plt_photo%Km4LeafaqCO2_pft                , &
-    NutrientCtrlonC4Carboxy_node   =>  plt_photo%NutrientCtrlonC4Carboxy_node    , &
-    Km4RubiscoCarboxy_pft          =>  plt_photo%Km4RubiscoCarboxy_pft           , &
-    LeafC3ChlorofilConc_pft        =>  plt_photo%LeafC3ChlorofilConc_pft         , &
-    RubiscoCarboxyEff_node         =>  plt_photo%RubiscoCarboxyEff_node          , &
-    VmaxRubCarboxyRef_pft          =>  plt_photo%VmaxRubCarboxyRef_pft           , &
-    LigthSatCarboxyRate_node       =>  plt_photo%LigthSatCarboxyRate_node        , &
-    CO2lmtRubiscoCarboxyRate_node  =>  plt_photo%CO2lmtRubiscoCarboxyRate_node   , &
-    Vmax4RubiscoCarboxy_pft        =>  plt_photo%Vmax4RubiscoCarboxy_pft         , &
-    CO2CompenPoint_node            =>  plt_photo%CO2CompenPoint_node             , &
-    Vmax4PEPCarboxy_pft            =>  plt_photo%Vmax4PEPCarboxy_pft             , &
-    CO2lmtPEPCarboxyRate_node      =>  plt_photo%CO2lmtPEPCarboxyRate_node       , &
-    VmaxRubOxyRef_pft              =>  plt_photo%VmaxRubOxyRef_pft               , &
-    C4CarboxyEff_node              =>  plt_photo%C4CarboxyEff_node               , &
-    LigthSatC4CarboxyRate_node     =>  plt_photo%LigthSatC4CarboxyRate_node      , &
-    FracLeafProtinAsPEPCarboxyl_pft=>  plt_photo%FracLeafProtinAsPEPCarboxyl_pft   &
+    LeafElmntNode_brch              => plt_biom%LeafElmntNode_brch,             &
+    ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft,                 &
+    CanopyLeafArea_lnode            => plt_morph%CanopyLeafArea_lnode,          &
+    C4PhotosynDowreg_brch           => plt_photo%C4PhotosynDowreg_brch,         &
+    LeafC4ChlorofilConc_pft         => plt_photo%LeafC4ChlorofilConc_pft,       &
+    O2L_pft                         => plt_photo%O2L_pft,                       &
+    aquCO2Intraleaf_pft             => plt_photo%aquCO2Intraleaf_pft,           &
+    SpecChloryfilAct_pft            => plt_photo%SpecChloryfilAct_pft,          &
+    VmaxPEPCarboxyRef_pft           => plt_photo%VmaxPEPCarboxyRef_pft,         &
+    LeafRuBPConc_pft                => plt_photo%LeafRuBPConc_pft,              &
+    Km4PEPCarboxy_pft               => plt_photo%Km4PEPCarboxy_pft,             &
+    CMassCO2BundleSheath_node       => plt_photo%CMassCO2BundleSheath_node,     &
+    CPOOL4_node                     => plt_photo%CPOOL4_node,                   &
+    Km4LeafaqCO2_pft                => plt_photo%Km4LeafaqCO2_pft,              &
+    NutrientCtrlonC4Carboxy_node    => plt_photo%NutrientCtrlonC4Carboxy_node,  &
+    Km4RubiscoCarboxy_pft           => plt_photo%Km4RubiscoCarboxy_pft,         &
+    LeafC3ChlorofilConc_pft         => plt_photo%LeafC3ChlorofilConc_pft,       &
+    RubiscoCarboxyEff_node          => plt_photo%RubiscoCarboxyEff_node,        &
+    VmaxRubCarboxyRef_pft           => plt_photo%VmaxRubCarboxyRef_pft,         &
+    LigthSatCarboxyRate_node        => plt_photo%LigthSatCarboxyRate_node,      &
+    CO2lmtRubiscoCarboxyRate_node   => plt_photo%CO2lmtRubiscoCarboxyRate_node, &
+    Vmax4RubiscoCarboxy_pft         => plt_photo%Vmax4RubiscoCarboxy_pft,       &
+    CO2CompenPoint_node             => plt_photo%CO2CompenPoint_node,           &
+    Vmax4PEPCarboxy_pft             => plt_photo%Vmax4PEPCarboxy_pft,           &
+    CO2lmtPEPCarboxyRate_node       => plt_photo%CO2lmtPEPCarboxyRate_node,     &
+    VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft,             &
+    C4CarboxyEff_node               => plt_photo%C4CarboxyEff_node,             &
+    LigthSatC4CarboxyRate_node      => plt_photo%LigthSatC4CarboxyRate_node,    &
+    FracLeafProtinAsPEPCarboxyl_pft => plt_photo%FracLeafProtinAsPEPCarboxyl_pft   &
   )
 !
 !     FEEDBACK ON C4 CARBOXYLATION FROM C4 NON-STRUCTURAL C
@@ -427,7 +427,7 @@
 !
   Vmax4RubiscoCarboxy_pft(K,NB,NZ)       = VmaxRubCarboxyRef_pft(NZ)*TFN_Carboxy*MesophyllRubiscoSurfDensity
   VOGRO                                  = VmaxRubOxyRef_pft(NZ)*TFN_Oxy*MesophyllRubiscoSurfDensity
-  CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
+  CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L_pft(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_pft(K,NB,NZ)*Km4RubOxy)
   CO2lmtRubiscoCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4RubiscoCarboxy_pft(K,NB,NZ)* &
     (CCBS-CO2CompenPoint_node(K,NB,NZ))/(CCBS+Km4RubiscoCarboxy_pft(NZ)))
 !
@@ -676,20 +676,20 @@
     LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch,  &
     TKCanopy_pft              => plt_ew%TKCanopy_pft,                 &
     TempOffset_pft            => plt_pheno%TempOffset_pft,            &
-    XKO2                      => plt_photo%XKO2,                      &
+    XKO2_pft                  => plt_photo%XKO2_pft,                  &
     CO2Solubility_pft         => plt_photo%CO2Solubility_pft,         &
     CanopyGasCO2_pft          => plt_photo%CanopyGasCO2_pft,          &
-    O2L                       => plt_photo%O2L,                       &
+    O2L_pft                   => plt_photo%O2L_pft,                   &
     AirConc_pft               => plt_photo%AirConc_pft,               &
     DiffCO2Atmos2Intracel_pft => plt_photo%DiffCO2Atmos2Intracel_pft, &
     aquCO2Intraleaf_pft       => plt_photo%aquCO2Intraleaf_pft,       &
     LeafO2Solubility_pft      => plt_photo%LeafO2Solubility_pft,      &
     LeafIntracellularCO2_pft  => plt_photo%LeafIntracellularCO2_pft,  &
-    O2I                       => plt_photo%O2I,                       &
+    O2I_pft                   => plt_photo%O2I_pft,                   &
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
     Km4RubiscoCarboxy_pft     => plt_photo%Km4RubiscoCarboxy_pft,     &
     Km4LeafaqCO2_pft          => plt_photo%Km4LeafaqCO2_pft,          &
-    XKCO2                     => plt_photo%XKCO2                      &
+    XKCO2_pft                 => plt_photo%XKCO2_pft                  &
 
   )
 !
@@ -704,7 +704,7 @@
   CO2Solubility_pft(NZ)         = EXP(-2.621_r8-0.0317_r8*TCCZ)
   LeafO2Solubility_pft(NZ)      = EXP(-6.175_r8-0.0211_r8*TCCZ)
   aquCO2Intraleaf_pft(NZ)       = LeafIntracellularCO2_pft(NZ)*CO2Solubility_pft(NZ)
-  O2L(NZ)                       = O2I(NZ)*LeafO2Solubility_pft(NZ)
+  O2L_pft(NZ)                       = O2I_pft(NZ)*LeafO2Solubility_pft(NZ)
   DiffCO2Atmos2Intracel_pft(NZ) = AirConc_pft(NZ)*(CanopyGasCO2_pft(NZ)-LeafIntracellularCO2_pft(NZ))
 !
 !     ARRHENIUS FUNCTIONS FOR CARBOXYLATION AND OXYGENATION
@@ -733,9 +733,9 @@
 !     Km4LeafaqCO2_pft,Km4RubiscoCarboxy_pft=Km for rubisco carboxylation without,with O2
 !     Km4RubOxy=Km for rubisco oxygenation
 !
-  Km4LeafaqCO2_pft(NZ)      = XKCO2(NZ)*EXP(16.136_r8-40000._r8/RTK)
-  Km4RubOxy                 = XKO2(NZ)*EXP(8.067_r8-20000._r8/RTK)
-  Km4RubiscoCarboxy_pft(NZ) = Km4LeafaqCO2_pft(NZ)*(1.0_r8+O2L(NZ)/Km4RubOxy)
+  Km4LeafaqCO2_pft(NZ)      = XKCO2_pft(NZ)*EXP(16.136_r8-40000._r8/RTK)
+  Km4RubOxy                 = XKO2_pft(NZ)*EXP(8.067_r8-20000._r8/RTK)
+  Km4RubiscoCarboxy_pft(NZ) = Km4LeafaqCO2_pft(NZ)*(1.0_r8+O2L_pft(NZ)/Km4RubOxy)
   end associate
   end subroutine PrepPhotosynthesis
 !------------------------------------------------------------------------------------------
