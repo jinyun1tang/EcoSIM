@@ -135,10 +135,10 @@ module VisualMod
         TTCO=TTCO+Eco_NEE_col(NY,NX)
         TTCH=TTCH+SurfGasEmiss_flx_col(idg_CH4,NY,NX)
         IF(J.EQ.24)THEN
-          IF(NU(NY,NX).EQ.7)THEN
+          IF(NU_col(NY,NX).EQ.7)THEN
             SWC(NY,NX)=(VLWatMicP_vr(8,NY,NX)+AMIN1(VLMacP_vr(8,NY,NX) &
               ,VLWatMacP_vr(8,NY,NX)))/VGeomLayer_vr(8,NY,NX)
-          ELSEIF(NU(NY,NX).EQ.4)THEN
+          ELSEIF(NU_col(NY,NX).EQ.4)THEN
             SWC(NY,NX)=(VLWatMicP_vr(5,NY,NX)+AMIN1(VLMacP_vr(5,NY,NX) &
               ,VLWatMacP_vr(5,NY,NX)))/VGeomLayer_vr(5,NY,NX)
           ELSE
@@ -203,22 +203,22 @@ module VisualMod
 !     ICHKM=0
 !     TCSNX=0.0
 !     ENDIF
-          OUT(1)=1.E-3_r8*GrossCO2Fix_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(2)=1.E-3_r8*GrossCO2Fix_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(3)=1.E-3_r8*GrossCO2Fix_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(4)=-1.E-3_r8*GrossResp_pft(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(5)=-1.E-3_r8*GrossResp_pft(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(6)=-1.E-3_r8*GrossResp_pft(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(7)=1.E-3_r8*Eco_GPP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(8)=1.E-3_r8*Eco_NPP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(9)=-1.E-3_r8*Eco_AutoR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(10)=-1.E-3_r8*Eco_HR_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(11)=1.E-3_r8*Eco_NBP_CumYr_col(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(12)=-1.E-3_r8*SurfGasEmiss_flx_col(idg_CO2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(13)=-1.E-3_r8*SurfGasEmiss_flx_col(idg_CH4,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
-          OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-          OUT(15)=-Eco_Heat_Latent_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-          OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+          OUT(1)=1.E-3_r8*GrossCO2Fix_pft(1,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(2)=1.E-3_r8*GrossCO2Fix_pft(3,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(3)=1.E-3_r8*GrossCO2Fix_pft(2,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(4)=-1.E-3_r8*GrossResp_pft(1,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(5)=-1.E-3_r8*GrossResp_pft(3,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(6)=-1.E-3_r8*GrossResp_pft(2,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(7)=1.E-3_r8*Eco_GPP_CumYr_col(NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(8)=1.E-3_r8*Eco_NPP_CumYr_col(NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(9)=-1.E-3_r8*Eco_AutoR_CumYr_col(NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(10)=-1.E-3_r8*Eco_HR_CumYr_col(NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(11)=1.E-3_r8*Eco_NBP_CumYr_col(NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(12)=-1.E-3_r8*SurfGasEmiss_flx_col(idg_CO2,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(13)=-1.E-3_r8*SurfGasEmiss_flx_col(idg_CH4,NY,NX)/(AREA_3D(3,NU_col(NY,NX),NY,NX)*3600._r8)
+          OUT(14)=Eco_NetRad_col(NY,NX)*277.8/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(15)=-Eco_Heat_Latent_col(NY,NX)*277.8/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(16)=-Eco_Heat_Sens_col(NY,NX)*277.8/AREA_3D(3,NU_col(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
             OUT(N)=(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)))/VGeomLayer_vr(L,NY,NX)
@@ -230,28 +230,28 @@ module VisualMod
             OUT(N)=TKS_vr(L,NY,NX)
             L=L+1
           ENDDO D61
-          OUT(39)=-1000.0*ETCanopy_CumYr_pft(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(40)=-1000.0*ETCanopy_CumYr_pft(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(41)=-1000.0*ETCanopy_CumYr_pft(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(42)=1000.0*QEvap_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(39)=-1000.0*ETCanopy_CumYr_pft(1,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(40)=-1000.0*ETCanopy_CumYr_pft(3,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(41)=-1000.0*ETCanopy_CumYr_pft(2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(42)=1000.0*QEvap_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
-          OUT(44)=1000.0*Qrunoff_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(45)=1000.0*H2OLoss_CumYr_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(46)=-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX))
+          OUT(44)=1000.0*Qrunoff_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(45)=1000.0*H2OLoss_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(46)=-(DepzIntWTBL_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth_col(NY,NX)
-          OUT(48)=CanopyLeafArea_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(49)=1.E-3_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(50)=1.E-3_r8*LeafStrutElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(51)=1.E-3_r8*LeafStrutElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(52)=1.E-3_r8*StalkStrutElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(53)=1.E-3_r8*StalkStrutElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(54)=1.E-3_r8*StalkStrutElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(55)=1.E-3_r8*RootElms_pft(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(56)=1.E-3_r8*RootElms_pft(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(57)=1.E-3_r8*RootElms_pft(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(48)=CanopyLeafArea_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(49)=1.E-3_r8*LeafStrutElms_pft(ielmc,1,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(50)=1.E-3_r8*LeafStrutElms_pft(ielmc,3,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(51)=1.E-3_r8*LeafStrutElms_pft(ielmc,2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(52)=1.E-3_r8*StalkStrutElms_pft(ielmc,1,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(53)=1.E-3_r8*StalkStrutElms_pft(ielmc,3,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(54)=1.E-3_r8*StalkStrutElms_pft(ielmc,2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(55)=1.E-3_r8*RootElms_pft(ielmc,1,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(56)=1.E-3_r8*RootElms_pft(ielmc,3,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          OUT(57)=1.E-3_r8*RootElms_pft(ielmc,2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           L=0
           D62: DO N=58,68
-            OUT(N)=1.E-3_r8*SoilOrgM_vr(ielmc,L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+            OUT(N)=1.E-3_r8*SoilOrgM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
             L=L+1
           ENDDO D62
 !
@@ -274,16 +274,16 @@ module VisualMod
     WRITE(19,2025)'FLUXES',iYearCurrent,I,J,TTRN*277.8/TAREA &
       ,TTLE*277.8/TAREA,TTSH*277.8/TAREA,TEco_Heat_GrndSurf_col*277.8/TAREA &
       ,TTCO*23.14815/TAREA,TTCH*23.14815/TAREA &
-      ,((Eco_NEE_col(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((Eco_NEE_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((SurfGasEmiss_flx_col(idg_CH4,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815 &
+      ,((SurfGasEmiss_flx_col(idg_CH4,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*23.14815 &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2025  FORMAT(A16,3I6,100E12.4)
     IF(J.EQ.24)THEN
       WRITE(20,2026)'SWC',iYearCurrent,I,J,((SnowDepth_col(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)) &
+      ,((-(ActiveLayDepZ_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)) &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2026  FORMAT(A8,3I6,100E12.4)
     ENDIF

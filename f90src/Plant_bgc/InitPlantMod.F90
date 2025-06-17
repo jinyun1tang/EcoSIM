@@ -128,7 +128,7 @@ module InitPlantMod
     rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft,         &
     RootrNC_pft               => plt_allom%RootrNC_pft,               &
     RootrPC_pft               => plt_allom%RootrPC_pft,               &
-    O2I                       => plt_photo%O2I,                       &
+    O2I_pft                   => plt_photo%O2I_pft,                   &
     CO2CuticleResist_pft      => plt_photo%CO2CuticleResist_pft,      &
     iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType,  &
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
@@ -151,9 +151,9 @@ module InitPlantMod
   RootFracRemobilizableBiom(NZ) = AMIN1(RootrNC_pft(NZ)*rCNNonstRemob_pft(NZ),&
     RootrPC_pft(NZ)*rCPNonstRemob_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
-    O2I(NZ)=2.10E+05_r8
+    O2I_pft(NZ)=2.10E+05_r8
   ELSE
-    O2I(NZ)=3.96E+05_r8
+    O2I_pft(NZ)=3.96E+05_r8
   ENDIF
   end associate
   end subroutine InitShootGrowth

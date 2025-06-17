@@ -15,21 +15,20 @@ implicit none
   real(r8),target,allocatable ::  SoilDepthMidLay_vr(:,:,:)          !depth to middle of soil layer, [m]
   real(r8),target,allocatable ::  CumSoilThickness_vr(:,:,:)         !depth to bottom of soil layer from  surface of grid cell, [m]
   real(r8),target,allocatable ::  CumSoilThickMidL_vr(:,:,:)         !depth to middle of soil layer from  surface of grid cell, [m]
-  real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area,  [m2 d-2]
+  real(r8),target,allocatable ::  AREA_3D(:,:,:,:)                   !cross-sectional area,  [m2 d-2]
   real(r8),target,allocatable ::  DIST_3D(:,:,:,:)                   !distance between adjacent layers:1=EW,2=NS,3=vertical, [m]
-  integer,target,allocatable ::  NU(:,:)                             !soil surface layer number,[-]
-  integer,target,allocatable ::  NUI(:,:)                            !initial soil surface layer number,[-]
-  integer,target,allocatable ::  MaxNumRootLays(:,:)                 !maximum root layer number,[-]
-  integer,target,allocatable ::  NK(:,:)                             !additional soil lower boundary layers,[-]
-  integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number,[-]
-  integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number,[-]
-  integer,target,allocatable ::  NUM(:,:)                            !new surface layer number,[-]
+  integer,target,allocatable ::  NU_col(:,:)                         !soil surface layer number,[-]
+  integer,target,allocatable ::  NUI_col(:,:)                        !initial soil surface layer number,[-]
+  integer,target,allocatable ::  MaxNumRootLays_col(:,:)             !maximum root layer number,[-]
+  integer,target,allocatable ::  NK_col(:,:)                         !additional soil lower boundary layers,[-]
+  integer,target,allocatable ::  NLI_col(:,:)                        !initial lowest soil layer number,[-]
+  integer,target,allocatable ::  NL_col(:,:)                         !lowest soil layer number,[-]
+  integer,target,allocatable ::  NUM_col(:,:)                        !new surface layer number,[-]
   real(r8),target,allocatable ::  CumLitRDepzInit_col(:,:)           !initial position of the bottom of liter layer, [m]
-  REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude,	[degrees north]
-  real(r8),target,allocatable ::  DH(:,:)                            !EW width of the grid cells, [m]
-  real(r8),target,allocatable ::  DV(:,:)                            !NS width of the grid cells, [m]
+  REAL(R8),target,allocatable ::  ALAT_col(:,:)                      !latitude,	[degrees north]
+  real(r8),target,allocatable ::  DH_col(:,:)                        !Eeast-West width of the grid cells, [m]
+  real(r8),target,allocatable ::  DV_col(:,:)                        !North-South width of the grid cells, [m]
   integer,target,allocatable ::  FlowDirIndicator_col(:,:)           !dimension of low,[-]
-  integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios,[-]
 !----------------------------------------------------------------------
 
 contains
@@ -44,21 +43,20 @@ contains
   allocate(SoilDepthMidLay_vr(JZ,JY,JX));     SoilDepthMidLay_vr=0._r8
   allocate(CumSoilThickness_vr(0:JZ,JY,JX)); CumSoilThickness_vr=0._r8
   allocate(CumSoilThickMidL_vr(JZ,JY,JX));    CumSoilThickMidL_vr=0._r8
-  allocate(AREA(3,0:JZ,JY,JX)); AREA=0._r8
+  allocate(AREA_3D(3,0:JZ,JY,JX)); AREA_3D=0._r8
   allocate(DIST_3D(3,JD,JV,JH));   DIST_3D=0._r8
-  allocate(NU(JY,JX));          NU=0
-  allocate(NUI(JY,JX));         NUI=0
-  allocate(MaxNumRootLays(JY,JX));          MaxNumRootLays=0
-  allocate(NK(JY,JX));          NK=0
-  allocate(NLI(JV,JH));         NLI=0
-  allocate(NL(JV,JH));          NL=0
-  allocate(NUM(JY,JX));         NUM=0
+  allocate(NU_col(JY,JX));          NU_col=0
+  allocate(NUI_col(JY,JX));         NUI_col=0
+  allocate(MaxNumRootLays_col(JY,JX));          MaxNumRootLays_col=0
+  allocate(NK_col(JY,JX));          NK_col=0
+  allocate(NLI_col(JV,JH));         NLI_col=0
+  allocate(NL_col(JV,JH));          NL_col=0
+  allocate(NUM_col(JY,JX));         NUM_col=0
   allocate(CumLitRDepzInit_col(JY,JX));      CumLitRDepzInit_col=0._r8
-  allocate(ALAT(JY,JX));        ALAT=0._r8
-  allocate(DH(JY,JX));          DH=0._r8
-  allocate(DV(JY,JX));          DV=0._r8
+  allocate(ALAT_col(JY,JX));        ALAT_col=0._r8
+  allocate(DH_col(JY,JX));          DH_col=0._r8
+  allocate(DV_col(JY,JX));          DV_col=0._r8
   allocate(FlowDirIndicator_col(JY,JX));         FlowDirIndicator_col=3   !vertical by default
-  allocate(LSG(JZ,JY,JX));      LSG=0
 
   end subroutine InitGridData
 
@@ -74,21 +72,20 @@ contains
   call destroy(SoilDepthMidLay_vr)
   call destroy(CumSoilThickness_vr)
   call destroy(CumSoilThickMidL_vr)
-  call destroy(AREA)
+  call destroy(AREA_3D)
   call destroy(DIST_3D)
-  call destroy(NU)
-  call destroy(NUI)
-  call destroy(MaxNumRootLays)
-  call destroy(NK)
-  call destroy(NLI)
-  call destroy(NL)
-  call destroy(NUM)
+  call destroy(NU_col)
+  call destroy(NUI_col)
+  call destroy(MaxNumRootLays_col)
+  call destroy(NK_col)
+  call destroy(NLI_col)
+  call destroy(NL_col)
+  call destroy(NUM_col)
   call destroy(CumLitRDepzInit_col)
-  call destroy(ALAT)
-  call destroy(DH)
-  call destroy(DV)
+  call destroy(ALAT_col)
+  call destroy(DH_col)
+  call destroy(DV_col)
   call destroy(FlowDirIndicator_col)
-  call destroy(LSG)
   end subroutine DestructGridData
 
 end module GridDataType

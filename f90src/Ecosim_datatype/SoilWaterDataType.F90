@@ -10,7 +10,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TXGridSurfRunoff_2DH(:,:)                 !water flux into the grid due to runoff, [m3 d-2 h-1]
   real(r8),target,allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)           !heat flux into the grid due to runoff,[MJ d-2 h-1]
   logical, target,allocatable ::  iPondFlag_col(:,:)                        !flag for the col if it is a pond,[-]
-  integer, target,allocatable ::  iPondBotLev_col(:,:)                      !Bottom level ID
+  integer, target,allocatable ::  iPondBotLev_col(:,:)                      !Bottom level ID, [-]
   real(r8),target,allocatable ::  ThetaAir_vr(:,:,:)                        !air concentration ,[m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP_vr(:,:,:)                       !soil air content ,[m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                           !volumetric water content ,[m3 m-3]
@@ -32,12 +32,12 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  WaterTBLSlope_col(:,:)                    !slope of water table relative to surface slope, [-]
   real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                     !depth of artificial water table
   real(r8),target,allocatable ::  TileWaterTable_col(:,:)                   !artificial water table depth, [m]
-  real(r8),target,allocatable ::  DTBLD(:,:)                                !depth of artificial water table adjusted for elevation,[m]
+  real(r8),target,allocatable ::  DTBLD_col(:,:)                                !depth of artificial water table adjusted for elevation,[m]
   real(r8),target,allocatable ::  DepzIntWTBL_col(:,:)                      !internal water table depth, [m]
   real(r8),target,allocatable ::  ExtWaterTablet0_col(:,:)                  !initial external water table depth, elevation corrected ,[m]
   real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                    !current external water table depth, elevation corrected (>0 lower than soil surface), [m]
   real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                      !external water table depth, [m]
-  real(r8),target,allocatable ::  EnergyImpact4ErosionM(:,:,:)              !total energy impact for erosion
+  real(r8),target,allocatable ::  EnergyImpact4Erosion_colM(:,:,:)              !total energy impact for erosion
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                !excess water+ice, [m3 d-2]
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                  !excess water,[m3 d-2]
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                        !excess ice, [m3 d-2]
@@ -156,12 +156,12 @@ module SoilWaterDataType
   allocate(WaterTBLSlope_col(JY,JX));       WaterTBLSlope_col=0._r8
   allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
   allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
-  allocate(DTBLD(JY,JX));       DTBLD=0._r8
+  allocate(DTBLD_col(JY,JX));       DTBLD_col=0._r8
   allocate(DepzIntWTBL_col(JY,JX));       DepzIntWTBL_col=0._r8
   allocate(ExtWaterTablet0_col(JY,JX));       ExtWaterTablet0_col=0._r8
   allocate(ExtWaterTable_col(JY,JX));       ExtWaterTable_col=0._r8
   allocate(NatWtblDepz_col(JY,JX));       NatWtblDepz_col=0._r8
-  allocate(EnergyImpact4ErosionM(60,JY,JX));   EnergyImpact4ErosionM=0._r8
+  allocate(EnergyImpact4Erosion_colM(60,JY,JX));   EnergyImpact4Erosion_colM=0._r8
   allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
   allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
@@ -258,12 +258,12 @@ module SoilWaterDataType
   call destroy(WaterTBLSlope_col)
   call destroy(WtblDepzTile_col)
   call destroy(TileWaterTable_col)
-  call destroy(DTBLD)
+  call destroy(DTBLD_col)
   call destroy(DepzIntWTBL_col)
   call destroy(ExtWaterTablet0_col)
   call destroy(ExtWaterTable_col)
   call destroy(NatWtblDepz_col)
-  call destroy(EnergyImpact4ErosionM)
+  call destroy(EnergyImpact4Erosion_colM)
   call destroy(XVLMobileWaterLitRM)
   call destroy(XVLMobileWatMicPM)
   call destroy(XVLiceMicPM)

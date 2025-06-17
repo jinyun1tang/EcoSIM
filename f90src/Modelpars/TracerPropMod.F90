@@ -19,14 +19,14 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   function gas_solubility(gid,tempC)result(coef)
-!
-! DESCRIPTION
-! compute gas solubility
-
+  !
+  ! DESCRIPTION
+  ! compute gas solubility
+  !
   implicit none
   integer :: gid  !gas id
-  real(r8), intent(in) :: tempC   !temperature in celcius degree
-  real(r8) :: coef     !defined based on molar concentration
+  real(r8), intent(in) :: tempC   !temperature, [oC]
+  real(r8) :: coef                !defined based on molar concentration,[mol/mol]
 
   select case (gid)
   case (idg_CO2)
@@ -80,7 +80,23 @@ implicit none
 
   function GasSechenovConst(gid)result(ans)
   !
-  !The temperature dependence of the Sechenov Constants is not considered here
+  !Description:
+  ! return gas Sechenov Constants
+  ! Sechenov Constants (also called Sechenov coefficients) are empirical parameters used to
+  ! quantify how the solubility of a gas in water changes when salts (electrolytes) are 
+  ! dissolved in the solution. This phenomenon is known as "salting out" (decreased solubility)
+  ! or, less commonly, "salting in" (increased solubility).  
+  !
+  ! The temperature dependence of the Sechenov Constants is not considered here
+  ! The values were obtained from below 
+  !  real(r8), parameter :: ACO2X=0.14_r8  !Sechenov Constants for CO2, [-]
+  !  real(r8), parameter :: ACH4X=0.14_r8  !Sechenov Constants for CH4,  [-]
+  !  real(r8), parameter :: AOXYX=0.31_r8  !Sechenov Constants for O2 ,[-]
+  !  real(r8), parameter :: AN2GX=0.23_r8  !Sechenov Constants for N2 ,[-]
+  !  real(r8), parameter :: AN2OX=0.23_r8  !Sechenov Constants for N2O ,[-]
+  !  real(r8), parameter :: AH2GX=0.14_r8  !Sechenov Constants for H2 ,[-]
+  !  real(r8), parameter :: ANH3X=0.07_r8  !Sechenov Constants for NH3 ,[-]
+
   implicit none
   integer, intent(in) :: gid
 

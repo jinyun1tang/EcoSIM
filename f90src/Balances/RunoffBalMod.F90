@@ -44,7 +44,7 @@ implicit none
 
   CXR=0._r8;ZXR=0._r8;PXR=0._r8;ZGR=0._r8
 
-  D9985: DO L=NU(NY,NX),NL(NY,NX)
+  D9985: DO L=NU_col(NY,NX),NL_col(NY,NX)
 !
 !     LOCATE EXTERNAL BOUNDARIES
 !
@@ -90,7 +90,7 @@ implicit none
           ENDIF
         ELSEIF(N.EQ.iVerticalDirection)THEN !vertical direction          
           IF(NN.EQ.iFront)THEN  
-            IF(L.EQ.NL(NY,NX))THEN  !at the bottom
+            IF(L.EQ.NL_col(NY,NX))THEN  !at the bottom
               N4 = NX;N5 = NY;N6 = L+1
               XN = -1.0_r8       !going out from layer L into L+1
             ELSE
@@ -106,7 +106,7 @@ implicit none
         call XBoundarySubSurfRunoffs(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
 
     !     WATER, HEAT, SOLUTES IN SNOW DRIFT
-        IF(N.NE.3 .AND. L.EQ.NU(NY,NX)) &
+        IF(N.NE.3 .AND. L.EQ.NU_col(NY,NX)) &
           call WaterHeatSoluteBySnowDrift(N,NN,N4,N5,NY,NX,CXR,ZXR,PXR,ZGR,XN)
         
       ENDDO D9975
@@ -151,7 +151,7 @@ implicit none
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
 
 ! surface runoff
-  IF(N.NE.iVerticalDirection .AND. L.EQ.NU(NY,NX))THEN
+  IF(N.NE.iVerticalDirection .AND. L.EQ.NU_col(NY,NX))THEN
     !horizontal direction and surface layer
     WQRN                 = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)    
 !    QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
@@ -434,9 +434,6 @@ implicit none
       H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
 !
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
-      if(N.NE.iVerticalDirection)THEN
-
-      endif
 
 !!
       MOD=0.0_r8

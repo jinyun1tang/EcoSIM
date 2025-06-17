@@ -62,7 +62,7 @@ implicit none
 
   call ZeroFluxAccumulators(NY,NX)
 
-  D8575: DO L=NU(NY,NX),NL(NY,NX)
+  D8575: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !
     !
     !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
@@ -86,7 +86,7 @@ implicit none
       ENDIF
 !
       !top soil layer/land surface
-      IF(L.EQ.NUM(N2,N1))THEN
+      IF(L.EQ.NUM_col(N2,N1))THEN
         ! TOTAL FLUXES FROM SEDIMENT TRANSPORT
         call SumSedmentTranspFlux(N,N1,N2,N4,N5,N4B,N5B)
       ENDIF
@@ -131,7 +131,7 @@ implicit none
 !
 !     INITIALIZE WATER AND HEAT NET FLUX ACCUMULATORS WITHIN SOIL
 !
-  DO  L=NU(NY,NX),NL(NY,NX)
+  DO  L=NU_col(NY,NX),NL_col(NY,NX)
     TWatFlowCellMicP_vr(L,NY,NX)  = 0.0_r8
     TWatFlowCellMicPX_vr(L,NY,NX) = 0.0_r8
     TWatFlowCellMacP_vr(L,NY,NX)  = 0.0_r8
@@ -385,7 +385,7 @@ implicit none
   N6=N60
   IF(FlowDirIndicator_col(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     !locate the vertical layer for the dest grid
-    D1200: DO LL=N6,NL(N5,N4)
+    D1200: DO LL=N6,NL_col(N5,N4)
       !modify the dest grid vertical location if needed
       !by matching the vertical layer number between source and dest, if N/=3
       !if N==3, skip insignificant layers
@@ -397,7 +397,7 @@ implicit none
 
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       !vertical direction transport, source is at soil surface
-      IF(N3.EQ.NU(N2,N1) .AND. N.EQ.iVerticalDirection)THEN              
+      IF(N3.EQ.NU_col(N2,N1) .AND. N.EQ.iVerticalDirection)THEN              
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP_col(N5,N4)
         TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX_3D(N,N3,N2,N1)-LakeSurfFlowMicPX_col(N5,N4)
         TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)

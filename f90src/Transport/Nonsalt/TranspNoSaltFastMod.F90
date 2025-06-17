@@ -102,12 +102,12 @@ implicit none
 
       DO idg=idg_beg,idg_NH3
         trcg_mass_begf(idg,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)
-        DO L=NU(NY,NX),NL(NY,NX)
+        DO L=NU_col(NY,NX),NL_col(NY,NX)
           trcg_mass_begf(idg,NY,NX)=trcg_mass_begf(idg,NY,NX)+trcg_gasml2_vr(idg,L,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
         ENDDO 
       ENDDO
       idg=idg_NH3
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         trcg_mass_begf(idg,NY,NX)=trcg_mass_begf(idg,NY,NX)+trcs_solml2_vr(idg_NH3B,L,NY,NX)
       ENDDO       
     ENDDO  
@@ -130,13 +130,13 @@ implicit none
       trcg_mass_now=0._r8
       DO idg=idg_beg,idg_NH3
         trcg_mass_now(idg)=trcs_solml2_vr(idg,0,NY,NX)
-        DO L=NU(NY,NX),NL(NY,NX)
+        DO L=NU_col(NY,NX),NL_col(NY,NX)
           trcg_mass_now(idg)=trcg_mass_now(idg)+trcg_gasml2_vr(idg,L,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)
         ENDDO 
       ENDDO
 
       idg=idg_NH3
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         trcg_mass_now(idg)=trcg_mass_now(idg)+trcs_solml2_vr(idg_NH3B,L,NY,NX)
       ENDDO
 
@@ -169,13 +169,13 @@ implicit none
     DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3      
        trcs_solml2_vr(idg,0,NY,NX) = AZERO(trcs_solml_vr(idg,0,NY,NX))
-       DO L=NU(NY,NX),NL(NY,NX)
+       DO L=NU_col(NY,NX),NL_col(NY,NX)
          trcg_gasml2_vr(idg,L,NY,NX)=AZERO(trcg_gasml_vr(idg,L,NY,NX))
        ENDDO
       enddo
 
       DO idg=idg_beg,idg_end 
-        DO L=NU(NY,NX),NL(NY,NX)    
+        DO L=NU_col(NY,NX),NL_col(NY,NX)    
           trcs_solml2_vr(idg,L,NY,NX) = AZERO(trcs_solml_vr(idg,L,NY,NX))
         ENDDO
       enddo
@@ -201,7 +201,7 @@ implicit none
           +trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(0,NY,NX),1.e-5_r8))
       enddo
 
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           RGasSinkScalar_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)/(trcs_solml2_vr(idg,L,NY,NX) &
             +trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(L,NY,NX),1.E-5_r8))
@@ -219,7 +219,7 @@ implicit none
           ENDIF                      
 
           IF(FlowDirIndicator_col(N2,N1).NE.3 .OR. N.EQ.iVerticalDirection)THEN
-            DO LL=N6,NL(N5,N4)
+            DO LL=N6,NL_col(N5,N4)
               IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
                 N6=LL
                 exit
@@ -254,13 +254,13 @@ implicit none
        enddo
        
 
-       DO L=NU(NY,NX),NL(NY,NX)
+       DO L=NU_col(NY,NX),NL_col(NY,NX)
          trcg_gasml_vr(idg,L,NY,NX)=AZERO(trcg_gasml2_vr(idg,L,NY,NX))
        ENDDO
       enddo
 
       DO idg=idg_beg,idg_end 
-        DO L=NU(NY,NX),NL(NY,NX)    
+        DO L=NU_col(NY,NX),NL_col(NY,NX)    
           trcs_solml_vr(idg,L,NY,NX)=AZERO(trcs_solml2_vr(idg,L,NY,NX))
         ENDDO
       enddo
@@ -299,7 +299,7 @@ implicit none
         if(ppscal(idg)>tiny_p)then     
         
           GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+(RGas_Disol_FlxMM_vr(idg,0,NY,NX) &
-            +Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX))*ppscal(idg)
+            +Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX))*ppscal(idg)
 
           !litter layer
           flux                            = RGas_Disol_FlxMM_vr(idg,0,NY,NX)*ppscal(idg)
@@ -310,28 +310,32 @@ implicit none
           RGasNetProd_col(idg,NY,NX)  = RGasNetProd_col(idg,NY,NX)-flux
           trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)-flux
 
-          flux                            = Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)*ppscal(idg)
+          flux                            = Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)*ppscal(idg)
           GasDiff2Soil_flx_col(idg,NY,NX) = GasDiff2Soil_flx_col(idg,NY,NX)+flux
           trcg_netflx2_col(idg,NY,NX)     = trcg_netflx2_col(idg,NY,NX)+flux
 
           flux                                 = Gas_AdvDif_FlxMM_2DH(idg,NY,NX)*ppscal(idg)
           trcs_SubsurTransp_flx_2DH(idg,NY,NX) = trcs_SubsurTransp_flx_2DH(idg,NY,NX)+flux
           GasHydroLoss_flx_col(idg,NY,NX)      = GasHydroLoss_flx_col(idg,NY,NX)+flux
+          GasHydroSubsLoss_flx_col(idg,NY,NX)  = GasHydroSubsLoss_flx_col(idg,NY,NX)+flux
+
           trcg_netflx2_col(idg,NY,NX)          = trcg_netflx2_col(idg,NY,NX)+flux
 
           RGasTranspFlxPrev_vr(idg,0,NY,NX)=RGasTranspFlxPrev_vr(idg,0,NY,NX)+RGas_Disol_FlxMM_vr(idg,0,NY,NX)*ppscal(idg)
 
           !bottom
-          GasHydroLoss_flx_col(idg,NY,NX)  = GasHydroLoss_flx_col(idg,NY,NX)-Gas_AdvDif_FlxMM_3D(idg,3,NL(NY,NX)+1,NY,NX)*ppscal(idg)
-          trcg_netflx2_col(idg,NY,NX)      = trcg_netflx2_col(idg,NY,NX)-Gas_AdvDif_FlxMM_3D(idg,3,NL(NY,NX)+1,NY,NX)*ppscal(idg)
-          trcs_drainage_flx_col(idg,NY,NX) = trcs_drainage_flx_col(idg,NY,NX) + ppscal(idg)*Gas_AdvDif_FlxMM_3D(idg,3,NL(NY,NX)+1,NY,NX)
+          flux=-Gas_AdvDif_FlxMM_3D(idg,3,NL_col(NY,NX)+1,NY,NX)*ppscal(idg)
+          GasHydroSubsLoss_flx_col(idg,NY,NX) = GasHydroSubsLoss_flx_col(idg,NY,NX)+flux
+          GasHydroLoss_flx_col(idg,NY,NX)     = GasHydroLoss_flx_col(idg,NY,NX)+flux
+          trcg_netflx2_col(idg,NY,NX)         = trcg_netflx2_col(idg,NY,NX)+flux
+          trcs_drainage_flx_col(idg,NY,NX)    = trcs_drainage_flx_col(idg,NY,NX) -flux
 
-          trc_topsoil_flx_col(idg,NY,NX) =trc_topsoil_flx_col(idg,NY,NX)+ppscal(idg)*Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)
+          trc_topsoil_flx_col(idg,NY,NX) =trc_topsoil_flx_col(idg,NY,NX)+ppscal(idg)*Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)
           TranspNetSoil_flx2_col(idg,NY,NX)=TranspNetSoil_flx2_col(idg,NY,NX) + ppscal(idg)*TranspNetSoil_fast_flxM_col(idg,NY,NX)
           TranspNetSoil_fast_flx_col(idg,NY,NX) = TranspNetSoil_fast_flx_col(idg,NY,NX)+ppscal(idg)*TranspNetSoil_fast_flxM_col(idg,NY,NX)
 
           !soil column
-          DO L=NU(NY,NX),NL(NY,NX)
+          DO L=NU_col(NY,NX),NL_col(NY,NX)
             RGas_Disol_FlxM_vr(idg,L,NY,NX) = RGas_Disol_FlxM_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)*ppscal(idg)
 
             RGasTranspFlxPrev_vr(idg,L,NY,NX)  =RGasTranspFlxPrev_vr(idg,L,NY,NX)+ Gas_AdvDif_FlxMM_vr(idg,L,NY,NX)*ppscal(idg)   
@@ -352,7 +356,7 @@ implicit none
       ENDDO
       idg=idg_NH3B
       if(ppscal(idg)>tiny_p)then       
-          DO L=NU(NY,NX),NL(NY,NX)
+          DO L=NU_col(NY,NX),NL_col(NY,NX)
             RGas_Disol_FlxM_vr(idg_NH3,L,NY,NX) = RGas_Disol_FlxM_vr(idg_NH3,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)*ppscal(idg)
           ENDDO   
       endif
@@ -433,8 +437,8 @@ implicit none
     DO  NY=NVN,NVS
       !
       !Only deal with air-filled grids
-      IF(FracAirFilledSoilPoreM_vr(M,NU(NY,NX),NY,NX).GT.AirFillPore_Min &
-        .AND. SoilBulkDensity_vr(NU(NY,NX),NY,NX).GT.ZERO)THEN
+      IF(FracAirFilledSoilPoreM_vr(M,NU_col(NY,NX),NY,NX).GT.AirFillPore_Min &
+        .AND. SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.ZERO)THEN
 
         call TopSoilGasDifussionMM(M,NY,NX)
 
@@ -459,27 +463,27 @@ implicit none
   integer :: idg
 
   !topsoil gains water, so gases are squeezed out, and soil loses tracer
-  IF(WaterFlow2SoilMM_3D(3,NU(NY,NX),NY,NX).GT.0.0_r8)THEN    
-    IF(VLsoiAirPM_vr(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=-AZMAX1(AMIN1(VFLWX,WaterFlow2SoilMM_3D(3,NU(NY,NX),NY,NX)/VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)))
+  IF(WaterFlow2SoilMM_3D(3,NU_col(NY,NX),NY,NX).GT.0.0_r8)THEN    
+    IF(VLsoiAirPM_vr(M,NU_col(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      VFLW=-AZMAX1(AMIN1(VFLWX,WaterFlow2SoilMM_3D(3,NU_col(NY,NX),NY,NX)/VLsoiAirPM_vr(M,NU_col(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF
     
     DO idg=idg_beg,idg_NH3
-      RGas_Adv_flxMM(idg)=VFLW*AZMAX1(trcg_gasml2_vr(idg,NU(NY,NX),NY,NX))
+      RGas_Adv_flxMM(idg)=VFLW*AZMAX1(trcg_gasml2_vr(idg,NU_col(NY,NX),NY,NX))
     ENDDO
     !topsoil gains tracers    
   ELSE
     DO idg=idg_beg,idg_NH3
-      RGas_Adv_flxMM(idg)=-WaterFlow2SoilMM_3D(3,NU(NY,NX),NY,NX)*AtmGasCgperm3(idg,NY,NX)
+      RGas_Adv_flxMM(idg)=-WaterFlow2SoilMM_3D(3,NU_col(NY,NX),NY,NX)*AtmGasCgperm3_col(idg,NY,NX)
     ENDDO
   ENDIF
   !
   !     TOTAL SOIL GAS FLUX + CONVECTIVE FLUX
   !
   DO idg=idg_beg,idg_NH3
-    Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)+RGas_Adv_flxMM(idg)
+    Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)+RGas_Adv_flxMM(idg)
   ENDDO
   end subroutine TopSoilGasAdvectionMM
 
@@ -625,7 +629,7 @@ implicit none
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      D9585: DO L=NU(NY,NX),NL(NY,NX)
+      D9585: DO L=NU_col(NY,NX),NL_col(NY,NX)
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
@@ -663,7 +667,7 @@ implicit none
               ENDIF
             ELSEIF(N.EQ.iVerticalDirection)THEN !vertical
               IF(NN.EQ.iFront)THEN                
-                IF(L.EQ.NL(NY,NX))THEN      !lower boundary
+                IF(L.EQ.NL_col(NY,NX))THEN      !lower boundary
                   M4 = NX;M5 = NY;M6 = L+1  !target grid
                 ELSE
                   cycle
@@ -767,10 +771,10 @@ implicit none
   call PrintInfo('beg '//subname)
 
   DFLG2=2.0_r8*AZMAX1(FracAirFilledSoilPoreM_vr(M,N3,N2,N1))*POROQ*FracAirFilledSoilPoreM_vr(M,N3,N2,N1)/POROS_vr(N3,N2,N1) &
-    *AREA(N,N3,N2,N1)/DLYR_3D(N,N3,N2,N1)
+    *AREA_3D(N,N3,N2,N1)/DLYR_3D(N,N3,N2,N1)
 
   DFLGL=2.0_r8*AZMAX1(FracAirFilledSoilPoreM_vr(M,N6,N5,N4))*POROQ*FracAirFilledSoilPoreM_vr(M,N6,N5,N4)/POROS_vr(N6,N5,N4) &
-    *AREA(N,N6,N5,N4)/DLYR_3D(N,N6,N5,N4)
+    *AREA_3D(N,N6,N5,N4)/DLYR_3D(N,N6,N5,N4)
   !
   DO idg=idg_beg,idg_NH3
     !     GASOUS CONDUCTANCES
@@ -802,16 +806,16 @@ implicit none
 !     GASEOUS DIFFUSIVITIES
 !
   call PrintInfo('beg '//subname)
-  DFLG2=AZMAX1(FracAirFilledSoilPoreM_vr(M,NU(NY,NX),NY,NX))*POROQ &
-    *FracAirFilledSoilPoreM_vr(M,NU(NY,NX),NY,NX)/POROS_vr(NU(NY,NX),NY,NX) &
-    *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR_3D(3,NU(NY,NX),NY,NX))
+  DFLG2=AZMAX1(FracAirFilledSoilPoreM_vr(M,NU_col(NY,NX),NY,NX))*POROQ &
+    *FracAirFilledSoilPoreM_vr(M,NU_col(NY,NX),NY,NX)/POROS_vr(NU_col(NY,NX),NY,NX) &
+    *AREA_3D(3,NU_col(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR_3D(3,NU_col(NY,NX),NY,NX))
 
   DO idg=idg_beg,idg_NH3
-    GasDifuscoefMM_3D=DFLG2*GasDifctScaledMM_vr(idg,NU(NY,NX),NY,NX)
+    GasDifuscoefMM_3D=DFLG2*GasDifctScaledMM_vr(idg,NU_col(NY,NX),NY,NX)
 !
 !     SURFACE GAS CONCENTRATIONS
 !
-    trcg_cl2=AZMAX1(trcg_gasml2_vr(idg,NU(NY,NX),NY,NX))/VLsoiAirPM_vr(M,NU(NY,NX),NY,NX)
+    trcg_cl2=AZMAX1(trcg_gasml2_vr(idg,NU_col(NY,NX),NY,NX))/VLsoiAirPM_vr(M,NU_col(NY,NX),NY,NX)
 !
 !     EQUILIBRIUM CONCENTRATIONS AT SOIL SURFACE AT WHICH
 !     GASEOUS DIFFUSION THROUGH SOIL SURFACE LAYER = GASEOUS
@@ -820,7 +824,7 @@ implicit none
 !
     DGQ_cef=GasDifuscoefMM_3D*PARGas_CefMM(idg,NY,NX)/(GasDifuscoefMM_3D+PARGas_CefMM(idg,NY,NX))
 
-    Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU(NY,NX),NY,NX)+DGQ_cef*(AtmGasCgperm3(idg,NY,NX)-trcg_cl2)
+    Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)+DGQ_cef*(AtmGasCgperm3_col(idg,NY,NX)-trcg_cl2)
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine TopSoilGasDifussionMM
@@ -886,7 +890,7 @@ implicit none
        
       !in the soil      
       !
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         !other gases are taken from aqueous phases
         DO idg=idg_beg,idg_NH3-1          
           flux = -RBGCSinkGasMM_vr(idg,L,NY,NX)*RGasSinkScalar_vr(idg,L,NY,NX)+RGas_Disol_FlxMM_vr(idg,L,NY,NX)
@@ -982,7 +986,7 @@ implicit none
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
       iDisableEbu=ifalse
-      D125: DO L=NU(NY,NX),NL(NY,NX)
+      D125: DO L=NU_col(NY,NX),NL_col(NY,NX)
         !source
         N1=NX;N2=NY;N3=L    
         IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))then
@@ -1006,14 +1010,14 @@ implicit none
               N4 = NX;N5 = NY+1;N6 = L
             ENDIF
           ELSEIF(N.EQ.iVerticalDirection)THEN            
-            IF(L.EQ.NL(NY,NX))THEN  !skip bottom boundary
+            IF(L.EQ.NL_col(NY,NX))THEN  !skip bottom boundary
               cycle
             ELSE
               N4 = NX;N5 = NY;N6 = L+1
             ENDIF
           ENDIF
 
-          DO LL=N6,NL(N5,N4)
+          DO LL=N6,NL_col(N5,N4)
             IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
               N6=LL
               exit
@@ -1024,7 +1028,7 @@ implicit none
           !     WATER CONTEnsolutes AND WATER FLUXES 'WaterFlow2SoilMM_3D' FROM 'WATSUB'
           !
           IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-            IF(N3.GE.NU(N2,N1) .AND. N6.GE.NU(N5,N4) .AND. N3.LE.NL(N2,N1) .AND. N6.LE.NL(N5,N4))THEN               
+            IF(N3.GE.NU_col(N2,N1) .AND. N6.GE.NU_col(N5,N4) .AND. N3.LE.NL_col(N2,N1) .AND. N6.LE.NL_col(N5,N4))THEN               
               call GasTransportMM(M,N,N1,N2,N3,N4,N5,N6)
             ENDIF           
           ENDIF

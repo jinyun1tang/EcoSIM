@@ -1,7 +1,7 @@
 module BalancesMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use CanopyDataType,    only: QVegET_col
-  use GridDataType,      only: NU, NL
+  use GridDataType,      only: NU_col, NL_col
   use EcoSimConst,       only: DENSICE
   use abortutils,        only: endrun
   use EcoSIMCtrlMod,     only: fixWaterLevel
@@ -119,13 +119,13 @@ contains
   WatMass_col(NY,NX)       = CanopyWaterMassEnd_col(NY,NX)+SnowMassEnd_col(NY,NX)+LitWatMassEnd_col(NY,NX)
   SoilWatMassEnd_col(NY,NX)= 0._r8
   !add water in soil 
-  DO L=NU(NY,NX),NL(NY,NX)
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
     SoilWatMassEnd_col(NY,NX) = SoilWatMassEnd_col(NY,NX)+ VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
   ENDDO
 !  write(444,*)'bal',('=x',L=1,50)
-!  write(444,*)(VLWatMicP_vr(L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-!  write(444,*)(VLWatMacP_vr(L,NY,NX),L=NU(NY,NX),NL(NY,NX))
-!  write(444,*)((VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,L=NU(NY,NX),NL(NY,NX))
+!  write(444,*)(VLWatMicP_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
+!  write(444,*)(VLWatMacP_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
+!  write(444,*)((VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,L=NU_col(NY,NX),NL_col(NY,NX))
 
   WatMass_col(NY,NX)=WatMass_col(NY,NX)+SoilWatMassEnd_col(NY,NX)
 
@@ -151,7 +151,7 @@ contains
   HeatStore_col(NY,NX)   = HeatStore_col(NY,NX)+CanopyHeatStor_col(NY,NX) + TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
 
   !add soil
-  DO L=NU(NY,NX),NL(NY,NX)
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
     HeatStore_col(NY,NX) = HeatStore_col(NY,NX)+ VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
   ENDDO
 
@@ -246,7 +246,7 @@ contains
           write(110,*)'WatHeldOnCanopy  =',WatHeldOnCanopy_col(NY,NX)
           write(110,*)'CanopyWat_col    =',CanopyWat_col(NY,NX)
           write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX),&
-            SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX),NU(NY,NX)
+            SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX),NU_col(NY,NX)
           write(110,*)'snofall          =',Prec2Snow_col(NY,NX),SnoFalPrec_col(NY,NX)
           write(110,*)'nsnol_col        =',nsnol_col(NY,NX)
           write(110,*)'snowloss         =',QSnowH2Oloss_col(NY,NX)
@@ -423,7 +423,7 @@ contains
       !note NL may change due to soil relayering, which can be tested using
       !by comparing the values of NL and NLI      
 
-      DO L=NUI(NY,NX),NL(NY,NX)
+      DO L=NUI_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           trcg_soil(idg)=trcg_soil(idg) + trcg_gasml_vr(idg,L,NY,NX)
           trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)                  
@@ -459,9 +459,9 @@ contains
       
       if(.false.)then 
         idg=idg_CO2
-        write(115,*)I*1000+J,NY,NX,'nsnol_col     trcname     snow   litr  root  soil  total',NU(NY,NX),NUI(NY,NX)
+        write(115,*)I*1000+J,NY,NX,'nsnol_col     trcname     snow   litr  root  soil  total',NU_col(NY,NX),NUI_col(NY,NX)
         write(115,*)nsnol_col(NY,NX),trcs_names(idg),trcg_snow(idg),trcg_litr(idg),trcg_root(idg),trcg_soilMass_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX)
-        DO L=NUI(NY,NX),NL(NY,NX)
+        DO L=NUI_col(NY,NX),NL_col(NY,NX)
           write(115,*)L,trcg_gasml_vr(idg,L,NY,NX),trcs_solml_vr(idg,L,NY,NX), trcs_soHml_vr(idg,L,NY,NX)
         ENDDO  
       endif

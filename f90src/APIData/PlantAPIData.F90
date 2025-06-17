@@ -97,22 +97,22 @@ implicit none
   real(r8), pointer :: VmaxPEPCarboxyRef_pft(:)  => null()  !PEP carboxylase activity, [umol g-1 h-1 at 25 oC]
   real(r8), pointer :: VmaxRubOxyRef_pft(:)   => null()  !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
   real(r8), pointer :: VmaxRubCarboxyRef_pft(:)   => null()  !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
-  real(r8), pointer :: XKCO2(:)  => null()  !Km for rubisco carboxylase activity, [uM]
-  real(r8), pointer :: XKO2(:)   => null()  !Km for rubisco oxygenase activity, [uM]
+  real(r8), pointer :: XKCO2_pft(:)  => null()  !Km for rubisco carboxylase activity, [uM]
+  real(r8), pointer :: XKO2_pft(:)   => null()  !Km for rubisco oxygenase activity, [uM]
   real(r8), pointer :: RubiscoActivity_brch(:,:) => null()   !branch down-regulation of CO2 fixation, [-]
   real(r8), pointer :: C4PhotosynDowreg_brch(:,:)=> null()   !down-regulation of C4 photosynthesis, [-]
   real(r8), pointer :: aquCO2Intraleaf_pft(:)   => null()   !leaf aqueous CO2 concentration, [uM]
-  real(r8), pointer :: O2I(:)    => null()   !leaf gaseous O2 concentration, [umol m-3]
+  real(r8), pointer :: O2I_pft(:)    => null()   !leaf gaseous O2 concentration, [umol m-3]
   real(r8), pointer :: LeafIntracellularCO2_pft(:)   => null()   !leaf gaseous CO2 concentration, [umol m-3]
   real(r8), pointer :: Km4RubiscoCarboxy_pft(:) => null()   !leaf aqueous CO2 Km ambient O2, [uM]
   real(r8), pointer :: Km4LeafaqCO2_pft(:) => null()   !leaf aqueous CO2 Km no O2, [uM]
-  real(r8), pointer :: RCS(:)    => null()   !shape parameter for calculating stomatal resistance from turgor pressure, [-]
+  real(r8), pointer :: RCS_pft(:)    => null()   !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8), pointer :: CanPCi2CaRatio(:)   => null()   !Ci:Ca ratio, [-]
   real(r8), pointer :: H2OCuticleResist_pft(:)   => null()   !maximum stomatal resistance to vapor, [s h-1]
   real(r8), pointer :: ChillHours_pft(:)  => null()   !chilling effect on CO2 fixation, [-]
   real(r8), pointer :: CO2Solubility_pft(:)   => null()   !leaf CO2 solubility, [uM /umol mol-1]
   real(r8), pointer :: CanopyGasCO2_pft(:)   => null()   !canopy gaesous CO2 concentration , [umol mol-1]
-  real(r8), pointer :: O2L(:)    => null()   !leaf aqueous O2 concentration, [uM]
+  real(r8), pointer :: O2L_pft(:)    => null()   !leaf aqueous O2 concentration, [uM]
   real(r8), pointer :: Km4PEPCarboxy_pft(:) => null()   !Km for PEP carboxylase activity, [uM]
   integer,  pointer :: iPlantPhotosynthesisType(:)  => null()   !plant photosynthetic type (C3 or C4)
   real(r8), pointer :: MinCanPStomaResistH2O_pft(:)   => null()   !canopy minimum stomatal resistance, [s m-1]
@@ -493,7 +493,7 @@ implicit none
   real(r8), pointer :: StandDeadStrutElms_pft(:,:)            => null()  !standing dead element,                        [g d-2]
   real(r8), pointer :: NodulStrutElms_pft(:,:)                => null()  !root total nodule mass,                       element [g d-2]
   real(r8), pointer :: CanopyNonstElms_brch(:,:,:)            => null()  !branch nonstructural element,                 [g d-2]
-  real(r8), pointer :: ShootC4NonstC_brch(:,:)                => null()  !branch shoot nonstrucal elelment [g d-2]
+  real(r8), pointer :: C4PhotoShootNonstC_brch(:,:)                => null()  !branch shoot nonstrucal elelment [g d-2]
   real(r8), pointer :: CanopyNodulNonstElms_brch(:,:,:)       => null()  !branch nodule nonstructural element,          [g d-2]
   real(r8), pointer :: LeafPetolBiomassC_brch(:,:)            => null()  !plant branch leaf + sheath C,                 [g d-2]
   real(r8), pointer :: StalkRsrvElms_brch(:,:,:)              => null()  !branch reserve element,                       [g d-2]
@@ -565,7 +565,7 @@ implicit none
   real(r8), pointer :: EvapTransLHeat_pft(:)            => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
   real(r8), pointer :: ReistanceCanopy_pft(:)          => null()    !canopy roughness height,                                      [m]
   real(r8), pointer :: TKS_vr(:)                       => null()    !mean annual soil temperature,                                 [K]
-  real(r8), pointer :: PSICanPDailyMin(:)              => null()    !minimum daily canopy water potential,                         [MPa]
+  real(r8), pointer :: PSICanPDailyMin_pft(:)              => null()    !minimum daily canopy water potential,                         [MPa]
   real(r8), pointer :: TdegCCanopy_pft(:)           => null()    !canopy temperature,                                           [oC]
   real(r8), pointer :: DeltaTKC_pft(:)                 => null()    !change in canopy temperature,                                 [K]
   real(r8), pointer :: ENGYX_pft(:)                    => null()    !canopy heat storage from previous time step,                  [MJ d-2]
@@ -1126,7 +1126,7 @@ implicit none
   allocate(this%TKC_pft(JP1));this%TKC_pft=spval
   allocate(this%ENGYX_pft(JP1));this%ENGYX_pft=spval
   allocate(this%TdegCCanopy_pft(JP1));this%TdegCCanopy_pft=spval
-  allocate(this%PSICanPDailyMin(JP1));this%PSICanPDailyMin=spval
+  allocate(this%PSICanPDailyMin_pft(JP1));this%PSICanPDailyMin_pft=spval
 
   end subroutine plt_ew_init
 !----------------------------------------------------------------------
@@ -1135,35 +1135,7 @@ implicit none
   implicit none
   class(plant_ew_type) :: this
 
-!  if(allocated(ETCanopy_CumYr_pft))deallocate(ETCanopy_CumYr_pft)
-!  if(allocated(PSIST))deallocate(PSIST)
-!  if(allocated(THeatLossRoot2Soil_vr))deallocate(THeatLossRoot2Soil_vr)
-!  if(allocated(TKCanopy_pft))deallocate(TKCanopy_pft)
-!  if(allocated(HeatXAir2PCan_pft))deallocate(HeatXAir2PCan_pft)
-!  if(allocated(PrecIntcptByCanopy_pft))deallocate(PrecIntcptByCanopy_pft)
-!  if(allocated(PSICanopyTurg_pft))deallocate(PSICanopyTurg_pft)
-!  if(allocated(PSICanopy_pft))deallocate(PSICanopy_pft)
-!  if(allocated(VapXAir2Canopy_pft))deallocate(VapXAir2Canopy_pft)
-!  if(allocated(HeatStorCanopy_pft))deallocate(HeatStorCanopy_pft)
-!  if(allocated(EvapTransLHeat_pft))deallocate(EvapTransLHeat_pft)
-!  if(allocated(WatHeldOnCanopy_pft))deallocate(WatHeldOnCanopy_pft)
-!  if(allocated(VHeatCapCanopy_pft))deallocate(VHeatCapCanopy_pft)
-!  if(allocated(CanopyBiomWater_pft))deallocate(CanopyBiomWater_pft)
-!  if(allocated(PSIRoot_pvr))deallocate(PSIRoot_pvr)
-!  if(allocated(PSIRootOSMO_vr))deallocate(PSIRootOSMO_vr)
-!  if(allocated(PSIRootTurg_vr))deallocate(PSIRootTurg_vr)
-!  if(allocated(AllPlantRootH2OLoss_pvr))deallocate(AllPlantRootH2OLoss_pvr)
-!  if(allocated(TAllPlantRootH2OLoss_pvr))deallocate(TAllPlantRootH2OLoss_pvr)
-!  if(allocated(Transpiration_pft))deallocate(Transpiration_pft)
-!  if(allocated(PSICanopyOsmo_pft))deallocate(PSICanopyOsmo_pft)
-!  if(allocated(TKS))deallocate(TKS)
-!  if(allocated(PSICanPDailyMin))deallocate(PSICanPDailyMin)
-!  if(allocated(ReistanceCanopy_pft))deallocate(ReistanceCanopy_pft)
-!  if(allocated(CanOsmoPsi0pt_pft))deallocate(CanOsmoPsi0pt_pft)
-!  if(allocated(DeltaTKC_pft))deallocate(DeltaTKC_pft)
-!  if(allocated(TKC))deallocate(TKC)
-!  if(allocated(ENGYX_pft))deallocate(ENGYX_pft)
-!  if(allocated(TdegCCanopy_pft))deallocate(TdegCCanopy_pft)
+
 
   end subroutine plt_ew_destroy
 
@@ -1293,7 +1265,7 @@ implicit none
   allocate(this%RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootMycoNonstElms_rpvr=spval
   allocate(this%RootNonstructElmConc_rpvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootNonstructElmConc_rpvr=spval
   allocate(this%CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNonstElms_brch=spval
-  allocate(this%ShootC4NonstC_brch(MaxNumBranches,JP1));this%ShootC4NonstC_brch=spval
+  allocate(this%C4PhotoShootNonstC_brch(MaxNumBranches,JP1));this%C4PhotoShootNonstC_brch=spval
   allocate(this%CanopyStalkC_pft(JP1));this%CanopyStalkC_pft=spval
   allocate(this%ShootElms_pft(NumPlantChemElms,JP1));this%ShootElms_pft=spval
   allocate(this%ShootElmsBeg_pft(NumPlantChemElms,JP1));this%ShootElmsBeg_pft=spval
@@ -1676,7 +1648,7 @@ implicit none
   allocate(this%CO2lmtPEPCarboxyRate_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CO2lmtPEPCarboxyRate_node=spval
   allocate(this%iPlantPhotosynthesisType(JP1));this%iPlantPhotosynthesisType=0
   allocate(this%Km4PEPCarboxy_pft(JP1));this%Km4PEPCarboxy_pft=spval
-  allocate(this%O2L(JP1));this%O2L=spval
+  allocate(this%O2L_pft(JP1));this%O2L_pft=spval
   allocate(this%CO2Solubility_pft(JP1));this%CO2Solubility_pft=spval
   allocate(this%CanopyGasCO2_pft(JP1));this%CanopyGasCO2_pft=spval
   allocate(this%ChillHours_pft(JP1));this%ChillHours_pft=spval
@@ -1688,16 +1660,16 @@ implicit none
   allocate(this%VmaxPEPCarboxyRef_pft(JP1));this%VmaxPEPCarboxyRef_pft=spval
   allocate(this%VmaxRubOxyRef_pft(JP1));this%VmaxRubOxyRef_pft=spval
   allocate(this%VmaxRubCarboxyRef_pft(JP1));this%VmaxRubCarboxyRef_pft=spval
-  allocate(this%XKCO2(JP1));this%XKCO2=spval
-  allocate(this%XKO2(JP1));this%XKO2=spval
+  allocate(this%XKCO2_pft(JP1));this%XKCO2_pft=spval
+  allocate(this%XKO2_pft(JP1));this%XKO2_pft=spval
   allocate(this%RubiscoActivity_brch(MaxNumBranches,JP1));this%RubiscoActivity_brch=spval
   allocate(this%C4PhotosynDowreg_brch(MaxNumBranches,JP1));this%C4PhotosynDowreg_brch=spval
   allocate(this%aquCO2Intraleaf_pft(JP1));this%aquCO2Intraleaf_pft=spval
   allocate(this%Km4LeafaqCO2_pft(JP1));this%Km4LeafaqCO2_pft=spval
   allocate(this%Km4RubiscoCarboxy_pft(JP1));this%Km4RubiscoCarboxy_pft=spval
   allocate(this%LeafIntracellularCO2_pft(JP1));this%LeafIntracellularCO2_pft=spval
-  allocate(this%O2I(JP1));this%O2I=spval
-  allocate(this%RCS(JP1));this%RCS=spval
+  allocate(this%O2I_pft(JP1));this%O2I_pft=spval
+  allocate(this%RCS_pft(JP1));this%RCS_pft=spval
   allocate(this%CanPCi2CaRatio(JP1));this%CanPCi2CaRatio=spval
   allocate(this%H2OCuticleResist_pft(JP1));this%H2OCuticleResist_pft=spval
 

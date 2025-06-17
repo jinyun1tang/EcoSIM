@@ -55,9 +55,9 @@ implicit none
       !water less than field capacity
       !PSIHY is the minimum water potential allowed, where hygroscopic water is < 0
       !held tightly on the surfaces of soil particles and exists as a thin layer of vapor
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity_vr(N3,N2,N1)-LOG(THETA1))/FCD_vr(N3,N2,N1)*LOGPSIMND(N2,N1))))
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(N2,N1)+((LOGFldCapacity_vr(N3,N2,N1)-LOG(THETA1))/FCD_vr(N3,N2,N1)*LOGPSIMND_col(N2,N1))))
     ELSEIF(THETA1.LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETA1))/PSD_vr(N3,N2,N1))**SRP_vr(N3,N2,N1)*LOGPSIMXD(N2,N1)))
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETA1))/PSD_vr(N3,N2,N1))**SRP_vr(N3,N2,N1)*LOGPSIMXD_col(N2,N1)))
     ELSE
       THETA1        = POROS_vr(N3,N2,N1)
       PSISoilMatric = PSISE_vr(N3,N2,N1)
@@ -77,9 +77,9 @@ implicit none
     PSDX = LOGPOROS_vr(N3,N2,N1)-FCLX
     FCDX = FCLX-WPLX
     IF(FracSoiPAsWat_vr(N3,N2,N1).LT.FCX)THEN
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((FCLX-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(N2,N1)+((FCLX-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/FCDX*LOGPSIMND_col(NY,NX))))
     ELSEIF(FracSoiPAsWat_vr(N3,N2,N1).LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD_col(N2,N1)))
     ELSE
       !saturated
       THETA1        = POROS_vr(N3,N2,N1)
@@ -114,7 +114,7 @@ implicit none
     SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L-1,NY,NX)
     SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L-1,NY,NX)
     CSAND_vr(L,NY,NX)               = CSAND_vr(L-1,NY,NX)
-    CSILT(L,NY,NX)               = CSILT(L-1,NY,NX)
+    CSILT_vr(L,NY,NX)               = CSILT_vr(L-1,NY,NX)
     CCLAY_vr(L,NY,NX)               = CCLAY_vr(L-1,NY,NX)
     SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L-1,NY,NX)
     ROCK_vr(L,NY,NX)             = ROCK_vr(L-1,NY,NX)
@@ -162,7 +162,7 @@ implicit none
     GKCK_vr(L,NY,NX)             = GKCK_vr(L-1,NY,NX)
     THW_vr(L,NY,NX)           = THW_vr(L-1,NY,NX)
     THI_vr(L,NY,NX)           = THI_vr(L-1,NY,NX)
-    ISOIL(1:4,L,NY,NX)        = ISOIL(1:4,L-1,NY,NX)
+    ISOIL_vr(1:4,L,NY,NX)        = ISOIL_vr(1:4,L-1,NY,NX)
     RSC_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
     RSN_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
     RSP_vr(k_fine_litr,L,NY,NX)  = 0.0_r8

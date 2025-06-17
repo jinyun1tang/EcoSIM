@@ -13,11 +13,6 @@ module NitroPars
   save
 ! SUBSTRATE DECOMPOSITION BY MICROBIAL POPULATIONS
 
-!     SORPTION COEFFICIENTS
-!
-!
-!     SPECIFIC DECOMPOSITION RATES
-
   real(r8) :: ORAD         !microbial radius, [m]
   real(r8) :: BIOS         !microbial density, [n m-3]
   real(r8) :: BIOA         !microbial surface area, [m2 m-3]
@@ -85,32 +80,32 @@ module NitroPars
   real(r8) :: EOMF         !energy requirements for microbial growth of fermenters, [kJ g-1 C]
   real(r8) :: EOMH         !energy requirements for microbial growth of methanogens, [kJ g-1 C]
   real(r8) :: EOMN         !energy requirements for microbial growth of diazotrophs, [kJ g-1 C]
-  real(r8) :: GO2X         !free energy yields of redox reactions for DOC-CO2, [kJ g-1 C]
-  real(r8) :: GH4X         !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
-  real(r8) :: GCHX         !free energy yields of redox reactions for DOC-acetate, [kJ g-1 C]
-  real(r8) :: GO2A         !free energy yields of redox reactions for acetate-CO2, [kJ g-1 C]
-  real(r8) :: GC4X         !free energy yields of redox reactions for acetate-CH4, [kJ g-1 C]
-  real(r8) :: GCOX         !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
-  real(r8) :: GNOX         !free energy yields of redox reactions for NO3-NO2, NO2-N2O,N2O-N2, [kJ g-1 N]
-  real(r8) :: GN2X         !free energy yields of redox reactions for N2-NH3, [kJ g-1 N]
-  real(r8) :: EN2X         !growth respiration efficiency for aerobic N2 fixation, [-]
-  real(r8) :: EN2Y         !growth respiration efficiency for anaerobic N2 fixation, [-]
-  real(r8) :: EO2X         !growth respiration efficiency for aerobic bacteria (DOC), [-]
-  real(r8) :: EH4X         !growth respiration efficiency for fermenters, [-]
-  real(r8) :: EO2G         !growth respiration efficiency for fungi, [-]
-  real(r8) :: EO2D         !growth respiration efficiency for denitrifiers (aerobic), [-]
-  real(r8) :: ENFX         !growth respiration efficiency for diazotrophs, [-]
-  real(r8) :: ENOX         !growth respiration efficiency for denitrifiers (anaerobic), [-]
-  real(r8) :: EO2A         !growth respiration efficiency for aerobic bacteria (acetate), [-]
-  real(r8) :: TSORP        !sorption rate constant for OHC, [h-1]
-  real(r8) :: HSORP        !sorption rate coefficient for OHC, [-]
-  real(r8) :: SPOHC        !specific decomposition rate constant for adsorbed SOC, [g subs. C g-1 micr. C]
-  real(r8) :: SPOHA        !specific decomposition rate constant for adsorbed acetate, [g subs. C g-1 micr. C]
-  real(r8) :: RMOM         !specific maintenance respiration, [g C g-1 N h-1]
-  real(r8) :: SPORC(2)     !specific decomposition rate constant microbial residue,  [g C g-1 N h-1]
-  real(r8) :: SPOMC(2)     !specific decomposition rate constant microbial biomass,  [g C g-1 N h-1]
-  real(r8) :: EN2F(7)      !N fixation yield from C oxidation, [g N g-1 C]
-  real(r8) :: EFIRE(2,21:22)
+  real(r8) :: GO2X           !free energy yields of redox reactions for DOC-CO2, [kJ g-1 C]
+  real(r8) :: GH4X           !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
+  real(r8) :: GCHX           !free energy yields of redox reactions for DOC-acetate, [kJ g-1 C]
+  real(r8) :: GO2A           !free energy yields of redox reactions for acetate-CO2, [kJ g-1 C]
+  real(r8) :: GC4X           !free energy yields of redox reactions for acetate-CH4, [kJ g-1 C]
+  real(r8) :: GCOX           !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
+  real(r8) :: GNOX           !free energy yields of redox reactions for NO3-NO2, NO2-N2O,N2O-N2, [kJ g-1 N]
+  real(r8) :: GN2X           !free energy yields of redox reactions for N2-NH3, [kJ g-1 N]
+  real(r8) :: EN2X           !growth respiration efficiency for aerobic N2 fixation, [-]
+  real(r8) :: EN2Y           !growth respiration efficiency for anaerobic N2 fixation, [-]
+  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-]
+  real(r8) :: EH4X           !growth respiration efficiency for fermenters, [-]
+  real(r8) :: EO2G           !growth respiration efficiency for fungi, [-]
+  real(r8) :: EO2D           !growth respiration efficiency for denitrifiers (aerobic), [-]
+  real(r8) :: ENFX           !growth respiration efficiency for diazotrophs, [-]
+  real(r8) :: ENOX           !growth respiration efficiency for denitrifiers (anaerobic), [-]
+  real(r8) :: EO2A           !growth respiration efficiency for aerobic bacteria (acetate), [-]
+  real(r8) :: TSORP          !sorption rate constant for OHC, [h-1]
+  real(r8) :: HSORP          !sorption rate coefficient for OHC, [-]
+  real(r8) :: SPOHC          !specific decomposition rate constant for adsorbed SOC, [g subs. C g-1 micr. C]
+  real(r8) :: SPOHA          !specific decomposition rate constant for adsorbed acetate, [g subs. C g-1 micr. C]
+  real(r8) :: RMOM           !specific maintenance respiration, [g C g-1 N h-1]
+  real(r8) :: SPORC(2)       !specific decomposition rate constant microbial residue,  [g C g-1 N h-1]
+  real(r8) :: SPOMC(2)       !specific decomposition rate constant microbial biomass,  [g C g-1 N h-1]
+  real(r8) :: EN2F(7)        !N fixation yield from C oxidation, [g N g-1 C]
+  real(r8) :: EFIRE(2,21:22) !partition coefficient for N loss as NH3 and P loss as PO4 during combustion, [g gC-1]
   contains
 
   subroutine initNitroPars

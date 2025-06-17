@@ -144,7 +144,7 @@ module PlantDisturbsMod
     ZERO4Uptk_pft       => plt_rbgc%ZERO4Uptk_pft,       &
     ZERO4Groth_pft      => plt_biom%ZERO4Groth_pft,      &
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft,    &
-    ShootC4NonstC_brch  => plt_biom%ShootC4NonstC_brch   &
+    C4PhotoShootNonstC_brch  => plt_biom%C4PhotoShootNonstC_brch   &
   )
 
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
@@ -519,7 +519,7 @@ module PlantDisturbsMod
     ZEROS                      => plt_site%ZEROS,                       &
     AREA3                      => plt_site%AREA3,                       &
     NumRootAxes_pft            => plt_morph%NumRootAxes_pft,            &
-    ShootC4NonstC_brch         => plt_biom%ShootC4NonstC_brch,          &
+    C4PhotoShootNonstC_brch         => plt_biom%C4PhotoShootNonstC_brch,          &
     SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft,       &
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs,         &
     CanopyStalkC_pft           => plt_biom%CanopyStalkC_pft,            &
@@ -1643,7 +1643,7 @@ module PlantDisturbsMod
 !
 !     REMAINING TOTAL BRANCH C,N,P AND LEAF, STALK AREA
 !
-!     ShootC4NonstC_brch=total C4 nonstructural C in branch
+!     C4PhotoShootNonstC_brch=total C4 nonstructural C in branch
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
 !     StalkLiveBiomassC_brch=stalk sapwood mass

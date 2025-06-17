@@ -62,7 +62,7 @@ module TillageMixMod
 !
   iResetSoilProf_col(NY,NX) = itrue
 !   tillage depth cannot exceed whole soil column thickness
-  DCORPZ = AMIN1(DepzCorp_col(I,NY,NX),CumSoilThickness_vr(NL(NY,NX),NY,NX))
+  DCORPZ = AMIN1(DepzCorp_col(I,NY,NX),CumSoilThickness_vr(NL_col(NY,NX),NY,NX))
 
 !
 !     ACCUMULATE STATE VARIABLES IN SURFACE RESIDUE FOR ADDITION
@@ -79,91 +79,91 @@ module TillageMixMod
 
   call DeriveTillageProf(NY,NX,DCORPZ,LL,FI,TI)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,SoiBulkDensityt0_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SoiBulkDensityt0_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FieldCapacity_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FieldCapacity_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,WiltPoint_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,WiltPoint_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,SatHydroCondVert_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondVert_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,SatHydroCondHrzn_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondHrzn_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,SAND(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SAND_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,SILT(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SILT_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,CLAY(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,CLAY_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCA_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCA_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCM_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCM_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCN_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCN_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,trcs_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
 
   if(salt_model)then
-    CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcSalt_solml_vr(idsalt_beg:idsalt_end,0:JZ,NY,NX),XCORP0)
+    CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcSalt_solml_vr(idsalt_beg:idsalt_end,0:JZ,NY,NX),XCORP0)
 
-    CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcSalt_solml_vr(idsalt_pband_beg:idsalt_pband_end,1:JZ,NY,NX))
+    CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcSalt_solml_vr(idsalt_pband_beg:idsalt_pband_end,1:JZ,NY,NX))
   endif
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcp_saltpml_vr(idsp_beg:idsp_CaSO4,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_beg:idsp_CaSO4,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcp_saltpml_vr(idsp_beg_band:idsp_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_beg_band:idsp_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcp_saltpml_vr(idsp_psoi_beg:idsp_psoi_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_psoi_beg:idsp_psoi_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_Hp:idx_cation_end,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_Hp:idx_cation_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_CEC:idx_CEC,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_CEC:idx_CEC,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC:idx_AEC,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC:idx_AEC,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_NH4:idx_NH4,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_NH4:idx_NH4,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
+  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_MicP_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, DOM_MicP_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, DOM_MicP_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, DOM_MicP_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SorbedOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SorbedOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SorbedOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SorbedOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOMAct_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOMAct_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOMAct_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOMAct_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeHeter_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeHeter_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, mBiomeHeter_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeHeter_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, OMBioResdu_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, OMBioResdu_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, OMBioResdu_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, OMBioResdu_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOM_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOM_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL, SolidOM_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOM_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
   !build the energy profile
   !ENGYV: water
@@ -171,7 +171,7 @@ module TillageMixMod
   ENGYM(0) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)*TKS_vr(0,NY,NX)
   ENGYV(0) = (cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX))*TKS_vr(0,NY,NX)
   VHeatCapacitySoilM_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)
-  D3000: DO  L=NU(NY,NX),LL
+  D3000: DO  L=NU_col(NY,NX),LL
     IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       ENGYM(L) = VHeatCapacitySoilM_vr(L,NY,NX)*TKS_vr(L,NY,NX)
       ENGYV(L) = (cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
@@ -181,19 +181,19 @@ module TillageMixMod
   HFLXD=ENGYM(0)+ENGYV(0)
 
   !mix
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLWatMicP_vr(0:JZ,NY,NX),XCORP0)
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMicP_vr(0:JZ,NY,NX),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLiceMicP_vr(0:JZ,NY,NX),XCORP0)
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLiceMicP_vr(0:JZ,NY,NX),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,ENGYV(0:JZ),XCORP0)
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYV(0:JZ),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,ENGYM(0:JZ),XCORP0)
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYM(0:JZ),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VHeatCapacitySoilM_vr(0:JZ,NY,NX),XCORP0)
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VHeatCapacitySoilM_vr(0:JZ,NY,NX),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLWatMacP_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMacP_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU(NY,NX),LL,VLiceMacP_vr(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLiceMacP_vr(1:JZ,NY,NX))
 
   !update 
   call sumLitrOMLayL(0,NY,NX,litrOM)
@@ -208,7 +208,7 @@ module TillageMixMod
   VGeomLayer_vr(0,NY,NX)    = VGeomLayer_vr(0,NY,NX)*XCORP0
   TKS_vr(0,NY,NX)           = (ENGYM(0)+ENGYV(0))/VHeatCapacity_vr(0,NY,NX)
   HFLXD                     = HFLXD-ENGYM(0)-ENGYV(0)
-  DO  L=NU(NY,NX),LL
+  DO  L=NU_col(NY,NX),LL
     IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
       VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
@@ -221,7 +221,7 @@ module TillageMixMod
   HeatStore_lnd = HeatStore_lnd-HFLXD
 
   !reset
-  EnergyImpact4Erosion(NY,NX) = 0.0_r8
+  EnergyImpact4Erosion_col(NY,NX) = 0.0_r8
 !
 !     EXTENT OF MIXING
 
@@ -261,7 +261,7 @@ module TillageMixMod
 !
 !     ACCUMULATE SOIL STATE VARIABLES WITHIN TILLAGE MIXING ZONE
 !
-  D100: DO L=NU(NY,NX),NL(NY,NX)
+  D100: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !if current layer is within the tillage depth
     tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX).LT.DCORPZ .AND. DLYR_3D(3,L,NY,NX).GT.ZERO
     if(.not.tillTestL)exit
@@ -283,7 +283,7 @@ module TillageMixMod
 !   but non-P related precipitated species are not mixed, Jinyun Tang, Nov 30,2022
 !   LL is the last layer tilled. 
 
-  D2000: DO  L=NU(NY,NX),LL
+  D2000: DO  L=NU_col(NY,NX),LL
     IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       !TL: soil thickness in tillage zone
       !TI: fraction of current layer being tilled.
@@ -344,7 +344,7 @@ module TillageMixMod
   TZNFN2         = TZNFN2+TZNFNG
   TZNFNI         = TZNFNI+TZNFNG
 
-  DO  L=NU(NY,NX),LL
+  DO  L=NU_col(NY,NX),LL
     IF(TZNFN2.GT.ZERO)THEN
       ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)*TZNFNI/TZNFN2
       ZNFNI_vr(L,NY,NX) = ZNFNI_vr(L,NY,NX)+0.5_r8*(ZNFN0_vr(L,NY,NX)-ZNFNI_vr(L,NY,NX))
@@ -605,8 +605,8 @@ module TillageMixMod
   logical :: tillTestL
   real(r8) :: TL  !fraction of layer L over the tillage zone
 
-  LL=NU(NY,NX)
-  D100: DO L=NU(NY,NX),NL(NY,NX)
+  LL=NU_col(NY,NX)
+  D100: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !if current layer is within the tillage depth
     tillTestL=CumSoilThickness_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX).LT.DCORPZ .AND. DLYR_3D(3,L,NY,NX).GT.ZERO
     if(.not.tillTestL)exit
