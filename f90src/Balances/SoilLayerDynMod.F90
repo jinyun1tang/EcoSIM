@@ -912,9 +912,9 @@ implicit none
 
   !none-litter layer
   IF(L0.NE.0)THEN
-    SAND(L1,NY,NX)                  = SAND(L1,NY,NX)+FX*SAND(L0,NY,NX)
-    SILT(L1,NY,NX)                  = SILT(L1,NY,NX)+FX*SILT(L0,NY,NX)
-    CLAY(L1,NY,NX)                  = CLAY(L1,NY,NX)+FX*CLAY(L0,NY,NX)
+    SAND_vr(L1,NY,NX)                  = SAND_vr(L1,NY,NX)+FX*SAND_vr(L0,NY,NX)
+    SILT_vr(L1,NY,NX)                  = SILT_vr(L1,NY,NX)+FX*SILT_vr(L0,NY,NX)
+    CLAY_vr(L1,NY,NX)                  = CLAY_vr(L1,NY,NX)+FX*CLAY_vr(L0,NY,NX)
     trcx_solml_vr(idx_CEC,L1,NY,NX) = trcx_solml_vr(idx_CEC,L1,NY,NX)+FX*trcx_solml_vr(idx_CEC,L0,NY,NX)
     trcx_solml_vr(idx_AEC,L1,NY,NX) = trcx_solml_vr(idx_AEC,L1,NY,NX)+FX*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
@@ -1089,9 +1089,9 @@ implicit none
   ! SOURCE POND LAYER
   !===================================================
   IF(L0.NE.0)THEN
-    SAND(L0,NY,NX)                  = FY*SAND(L0,NY,NX)
-    SILT(L0,NY,NX)                  = FY*SILT(L0,NY,NX)
-    CLAY(L0,NY,NX)                  = FY*CLAY(L0,NY,NX)
+    SAND_vr(L0,NY,NX)                  = FY*SAND_vr(L0,NY,NX)
+    SILT_vr(L0,NY,NX)                  = FY*SILT_vr(L0,NY,NX)
+    CLAY_vr(L0,NY,NX)                  = FY*CLAY_vr(L0,NY,NX)
     trcx_solml_vr(idx_CEC,L0,NY,NX) = FY*trcx_solml_vr(idx_CEC,L0,NY,NX)
     trcx_solml_vr(idx_AEC,L0,NY,NX) = FY*trcx_solml_vr(idx_AEC,L0,NY,NX)
   ENDIF
@@ -1772,15 +1772,15 @@ implicit none
   ENDIF
 !     SoilBulkDensity_vr(L1,NY,NX)=(1.0-FO)*SoilBulkDensity_vr(L1,NY,NX)+FO*SoiBulkDensityt0_vr(L0,NY,NX)
   PH_vr(L1,NY,NX)      = (1.0_r8-FO)*PH_vr(L1,NY,NX)+FO*PH_vr(L0,NY,NX)
-  FXSAND            = FBO*SAND(L0,NY,NX)
-  SAND(L1,NY,NX)    = SAND(L1,NY,NX)+FXSAND
-  SAND(L0,NY,NX)    = SAND(L0,NY,NX)-FXSAND
-  FXSILT            = FBO*SILT(L0,NY,NX)
-  SILT(L1,NY,NX)    = SILT(L1,NY,NX)+FXSILT
-  SILT(L0,NY,NX)    = SILT(L0,NY,NX)-FXSILT
-  FXCLAY            = FBO*CLAY(L0,NY,NX)
-  CLAY(L1,NY,NX)    = CLAY(L1,NY,NX)+FXCLAY
-  CLAY(L0,NY,NX)    = CLAY(L0,NY,NX)-FXCLAY
+  FXSAND            = FBO*SAND_vr(L0,NY,NX)
+  SAND_vr(L1,NY,NX)    = SAND_vr(L1,NY,NX)+FXSAND
+  SAND_vr(L0,NY,NX)    = SAND_vr(L0,NY,NX)-FXSAND
+  FXSILT            = FBO*SILT_vr(L0,NY,NX)
+  SILT_vr(L1,NY,NX)    = SILT_vr(L1,NY,NX)+FXSILT
+  SILT_vr(L0,NY,NX)    = SILT_vr(L0,NY,NX)-FXSILT
+  FXCLAY            = FBO*CLAY_vr(L0,NY,NX)
+  CLAY_vr(L1,NY,NX)    = CLAY_vr(L1,NY,NX)+FXCLAY
+  CLAY_vr(L0,NY,NX)    = CLAY_vr(L0,NY,NX)-FXCLAY
   FXROCK            = FBO*ROCK_vr(L0,NY,NX)
   ROCK_vr(L1,NY,NX) = ROCK_vr(L1,NY,NX)+FXROCK
   ROCK_vr(L0,NY,NX) = ROCK_vr(L0,NY,NX)-FXROCK

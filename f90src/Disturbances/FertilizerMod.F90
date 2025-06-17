@@ -295,8 +295,8 @@ implicit none
         tglds=JGnfo(N)-JGnfo(N)+1
         D2961: DO M=1,nlbiomcp
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
-          OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMCa(M,N,K),OSNI-OSNX))
-          OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMCa(M,N,K),OSPI-OSPX))
+          OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMC_ave(M,N,K),OSNI-OSNX))
+          OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMC_ave(M,N,K),OSPI-OSPX))
           DO NGL=JGnio(N),JGnfo(N)
             MID=micpar%get_micb_id(M,NGL)
             OMC1g=OMC1/tglds

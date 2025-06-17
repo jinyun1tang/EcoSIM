@@ -315,7 +315,7 @@ module SoilDisturbMod
         !
         !     REMOVE FERTILIZER IN RESIDUE
         !
-        IF(iSoilDisturbType_col(I,NY,NX).EQ.21)THEN
+        IF(iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr)THEN
           OMelm(ielmn)=OMelm(ielmn)+DCORPC*(trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(idg_NH3,L,NY,NX) &
             +trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO2,L,NY,NX))
           OMelm(ielmp)=OMelm(ielmp)+DCORPC*(trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4,L,NY,NX))

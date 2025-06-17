@@ -302,8 +302,8 @@ module RedistMod
       IDWaterTable_col(NY,NX)=4
     ENDIF
     WtblDepzTile_col(NY,NX)   = DCORPW
-    DTBLD(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
-    TileWaterTable_col(NY,NX) = DTBLD(NY,NX)
+    DTBLD_col(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+    TileWaterTable_col(NY,NX) = DTBLD_col(NY,NX)
   ENDIF
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE
@@ -322,7 +322,7 @@ module RedistMod
   !update mobile tile water table depth due to drainage
   IF(IDWaterTable_col(NY,NX).EQ.4)THEN
     TileWaterTable_col(NY,NX)=TileWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
-      -0.00167_r8*(TileWaterTable_col(NY,NX)-DTBLD(NY,NX))
+      -0.00167_r8*(TileWaterTable_col(NY,NX)-DTBLD_col(NY,NX))
   ENDIF
   call PrintInfo('end '//subname)
   end subroutine ModifyExWTBLByDisturbance
@@ -567,9 +567,9 @@ module RedistMod
     !
     !     SOIL MINERAL FRACTIONS
     !
-    SAND(NU_col(NY,NX),NY,NX) = SAND(NU_col(NY,NX),NY,NX)+TSandEros_col(NY,NX)
-    SILT(NU_col(NY,NX),NY,NX) = SILT(NU_col(NY,NX),NY,NX)+TSiltEros_col(NY,NX)
-    CLAY(NU_col(NY,NX),NY,NX) = CLAY(NU_col(NY,NX),NY,NX)+TCLAYEros_col(NY,NX)
+    SAND_vr(NU_col(NY,NX),NY,NX) = SAND_vr(NU_col(NY,NX),NY,NX)+TSandEros_col(NY,NX)
+    SILT_vr(NU_col(NY,NX),NY,NX) = SILT_vr(NU_col(NY,NX),NY,NX)+TSiltEros_col(NY,NX)
+    CLAY_vr(NU_col(NY,NX),NY,NX) = CLAY_vr(NU_col(NY,NX),NY,NX)+TCLAYEros_col(NY,NX)
     !
     !     FERTILIZER POOLS
 !
@@ -849,7 +849,7 @@ module RedistMod
       !do a numerical correction
       VLWatMicPX_vr(L,NY,NX) = AMIN1(VLWatMicP_vr(L,NY,NX),VLWatMicPX_vr(L,NY,NX)+0.01_r8*(VLWatMicP_vr(L,NY,NX)-VLWatMicPX_vr(L,NY,NX)))
       VLiceMicP_vr(L,NY,NX)  = VLiceMicP_vr(L,NY,NX)-WatIceThawMicP_vr(L,NY,NX)/DENSICE + QIceInflx_vr(L,NY,NX)
-      QIceInflx_col(NY,NX)   = QIceInflx_col(NY,NX) + QIceInflx_vr(L,NY,NX)*DENSICE
+
       !macropore
       VLWatMacP_vr(L,NY,NX) = VLWatMacP_vr(L,NY,NX)+TWatFlowCellMacP_vr(L,NY,NX)-FWatExMacP2MicP_vr(L,NY,NX)+WatIceThawMacP_vr(L,NY,NX)
       VLiceMacP_vr(L,NY,NX) = VLiceMacP_vr(L,NY,NX)-WatIceThawMacP_vr(L,NY,NX)/DENSICE
@@ -1080,7 +1080,7 @@ module RedistMod
     !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS SINCE START OF RUN
     !
     !     IF(J.EQ.24)THEN
-    SD     = SAND(L,NY,NX)+SILT(L,NY,NX)+CLAY(L,NY,NX)
+    SD     = SAND_vr(L,NY,NX)+SILT_vr(L,NY,NX)+CLAY_vr(L,NY,NX)
     TSEDSO = TSEDSO+SD
 
     CS=trcg_gasml_vr(idg_CO2,L,NY,NX)+trcs_solml_vr(idg_CO2,L,NY,NX) &

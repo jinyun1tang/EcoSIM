@@ -130,9 +130,9 @@ module Hour1Mod
     DO  NY=NVN,NVS  
 
       IF(J.EQ.1)THEN
-        NumActivePlants(NY,NX)=0
+        NumActivePlants_col(NY,NX)=0
         DO  NZ=1,NP_col(NY,NX)
-          PSICanPDailyMin(NZ,NY,NX)=0._r8
+          PSICanPDailyMin_pft(NZ,NY,NX)=0._r8
         ENDDO
       ENDIF
     ENDDO  
@@ -328,19 +328,19 @@ module Hour1Mod
       tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
       CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
       
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3 
-      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
+      AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
+      AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
+      AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
+      AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
+      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3 
+      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
+      AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
+      AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
 
       DO idg=idg_beg,idg_NH3
-        trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
+        trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
            /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX))*MolecularWeight(idg))
-        trcg_irrig_mole_conc_col(idg,NY,NX) = AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg, TCA_col(NY,NX)) &
+        trcg_irrig_mole_conc_col(idg,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg, TCA_col(NY,NX)) &
           /(EXP(GasSechenovConst(idg)*CSTRQ(I,NY,NX))*MolecularWeight(idg))
       ENDDO
       GDD_col(NY,NX) = GDD_col(NY,NX)+TCA_col(NY,NX)/24._r8
@@ -536,13 +536,13 @@ module Hour1Mod
 
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
       CSoilOrgM_vr(ielmc,L,NY,NX) = AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX))
-      CSAND_vr(L,NY,NX)              = SAND(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
-      CSILT(L,NY,NX)              = SILT(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
-      CCLAY_vr(L,NY,NX)              = CLAY(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+      CSAND_vr(L,NY,NX)              = SAND_vr(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+      CSILT_vr(L,NY,NX)              = SILT_vr(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
+      CCLAY_vr(L,NY,NX)              = CLAY_vr(L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
     ELSE
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
       CSAND_vr(L,NY,NX) = 0._r8
-      CSILT(L,NY,NX) = 0._r8
+      CSILT_vr(L,NY,NX) = 0._r8
       CCLAY_vr(L,NY,NX) = 0._r8
     ENDIF
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZERO)THEN
@@ -589,7 +589,7 @@ module Hour1Mod
     if(lverb)write(*,*)'setthermcond'
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VORGC                        = CORGCM*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
-      VMINL                        = (CSILT(L,NY,NX)+CCLAY_vr(L,NY,NX))*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
+      VMINL                        = (CSILT_vr(L,NY,NX)+CCLAY_vr(L,NY,NX))*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
       VSAND                        = CSAND_vr(L,NY,NX)*SoilBulkDensity_vr(L,NY,NX)/ParticleDens
       NumerSolidThermCond_vr(L,NY,NX) = (1.253_r8*VORGC*9.050E-04_r8+0.514_r8*VMINL*1.056E-02_r8 &
         +0.386_r8*VSAND*2.112E-02_r8)*FracSoiAsMicP_vr(L,NY,NX) &
@@ -639,7 +639,7 @@ module Hour1Mod
   ENDIF
 
   IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
-    TileWaterTable_col(NY,NX)=DTBLD(NY,NX)
+    TileWaterTable_col(NY,NX)=DTBLD_col(NY,NX)
   ENDIF
 
   IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.ZERO)THEN
@@ -656,12 +656,12 @@ module Hour1Mod
 
   SoilDepthMidLay_vr(NU_col(NY,NX),NY,NX)=CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)-0.5_r8*DLYR_3D(3,NU_col(NY,NX),NY,NX)
   IF(VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    CCLAY_vr(NU_col(NY,NX),NY,NX)=CLAY(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
-    CSILT(NU_col(NY,NX),NY,NX)=SILT(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
-    CSAND_vr(NU_col(NY,NX),NY,NX)=SAND(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
+    CCLAY_vr(NU_col(NY,NX),NY,NX)=CLAY_vr(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
+    CSILT_vr(NU_col(NY,NX),NY,NX)=SILT_vr(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
+    CSAND_vr(NU_col(NY,NX),NY,NX)=SAND_vr(NU_col(NY,NX),NY,NX)/VLSoilMicPMass_vr(NU_col(NY,NX),NY,NX)
   ELSE
     CCLAY_vr(NU_col(NY,NX),NY,NX)=0._r8
-    CSILT(NU_col(NY,NX),NY,NX)=0._r8
+    CSILT_vr(NU_col(NY,NX),NY,NX)=0._r8
     CSAND_vr(NU_col(NY,NX),NY,NX)=0._r8
   ENDIF
   EHUM_vr(0,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY_vr(NU_col(NY,NX),NY,NX))
@@ -736,7 +736,6 @@ module Hour1Mod
   Gas_WetDeposit_flx_col(:,NY,NX)             = 0._r8
   RootCO2Autor_col(NY,NX)                    = 0._r8
   QIceInflx_vr(:,NY,NX)                      = 0._r8
-  QIceInflx_col(NY,NX)                       = 0._r8
   Rain2ExposedSurf_col(NY,NX)                = 0._r8
   Rain2Soil_col(NY,NX)                       = 0._r8
   Rain2LitR_col(NY,NX)                       = 0._r8
@@ -920,7 +919,7 @@ module Hour1Mod
               PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L+1,NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
               THETWM   = THETWP*POROS_vr(L,NY,NX)
               THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-                *PSD_vr(L,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L,NY,NX)))
+                *PSD_vr(L,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L,NY,NX)))
 
               IF(THETWM.GT.THETW1)THEN
                 THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
@@ -933,7 +932,7 @@ module Hour1Mod
               PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-SoilDepthMidLay_vr(L-1,NY,NX))
               THETWM   = THETWP*POROS_vr(L-1,NY,NX)
               THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-                *PSD_vr(L-1,NY,NX)/LOGPSIMXD(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
+                *PSD_vr(L-1,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
                 THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
                 DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
@@ -977,23 +976,23 @@ module Hour1Mod
       !
       SoilMicPMassLayerMX(NY,NX)=AZMAX1(SoilMicPMassLayerMn(NY,NX)+&
         MWC2Soil*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX))
-      BKVLNX=SAND(NU_col(NY,NX),NY,NX)+SILT(NU_col(NY,NX),NY,NX) &
-        +CLAY(NU_col(NY,NX),NY,NX)+1.82E-06*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)
+      BKVLNX=SAND_vr(NU_col(NY,NX),NY,NX)+SILT_vr(NU_col(NY,NX),NY,NX) &
+        +CLAY_vr(NU_col(NY,NX),NY,NX)+1.82E-06*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)
       IF(BKVLNX.GT.ZEROS(NY,NX))THEN
         CORGM                               = MWC2Soil*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)/BKVLNX
         CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX) = orgcden*CORGM
-        CSAND_vr(NU_col(NY,NX),NY,NX)              = SAND(NU_col(NY,NX),NY,NX)/BKVLNX
-        CSILT(NU_col(NY,NX),NY,NX)              = SILT(NU_col(NY,NX),NY,NX)/BKVLNX
-        CCLAY_vr(NU_col(NY,NX),NY,NX)              = CLAY(NU_col(NY,NX),NY,NX)/BKVLNX
+        CSAND_vr(NU_col(NY,NX),NY,NX)              = SAND_vr(NU_col(NY,NX),NY,NX)/BKVLNX
+        CSILT_vr(NU_col(NY,NX),NY,NX)              = SILT_vr(NU_col(NY,NX),NY,NX)/BKVLNX
+        CCLAY_vr(NU_col(NY,NX),NY,NX)              = CLAY_vr(NU_col(NY,NX),NY,NX)/BKVLNX
       ELSE
         CORGM                               = 0._r8
         CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX) = 0._r8
         CSAND_vr(NU_col(NY,NX),NY,NX)              = 0._r8
-        CSILT(NU_col(NY,NX),NY,NX)              = 1.0
+        CSILT_vr(NU_col(NY,NX),NY,NX)              = 1.0
         CCLAY_vr(NU_col(NY,NX),NY,NX)              = 0._r8
       ENDIF
       
-      D50=1.0_r8*CCLAY_vr(NU_col(NY,NX),NY,NX)+10._r8*CSILT(NU_col(NY,NX),NY,NX) &
+      D50=1.0_r8*CCLAY_vr(NU_col(NY,NX),NY,NX)+10._r8*CSILT_vr(NU_col(NY,NX),NY,NX) &
         +100._r8*CSAND_vr(NU_col(NY,NX),NY,NX)+100._r8*CORGM
       ZD50                    = 0.041*(ppmc*D50)**0.167_r8
       SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA_3D(3,0,NY,NX)
@@ -1001,7 +1000,7 @@ module Hour1Mod
         CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
         print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
-        SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU_col(NY,NX),NY,NX)-CORGM))
+        SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT_vr(NU_col(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY_vr(NU_col(NY,NX),NY,NX)+CORGM) &
           +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU_col(NY,NX),NY,NX)))
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
@@ -1520,11 +1519,11 @@ module Hour1Mod
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
       ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP_vr(0,NY,NX))/VLitR_col(NY,NX)
       IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
-        PSISoilMatricP_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR)) &
-          /FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
+        PSISoilMatricP_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR)) &
+          /FCD_vr(0,NY,NX)*LOGPSIMND_col(NY,NX))))
       ELSEIF(ThetaWLitR.LT.POROS_vr(0,NY,NX))THEN
         PSISoilMatricP_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
-          /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
+          /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD_col(NY,NX)))
       ELSE
         PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
       ENDIF

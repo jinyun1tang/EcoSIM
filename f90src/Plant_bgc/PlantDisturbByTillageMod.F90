@@ -64,7 +64,7 @@ contains
     LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,         &
     CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch,    &
     CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch,         &
-    ShootC4NonstC_brch          => plt_biom%ShootC4NonstC_brch,           &
+    C4PhotoShootNonstC_brch          => plt_biom%C4PhotoShootNonstC_brch,           &
     VHeatCapCanopy_pft          => plt_ew%VHeatCapCanopy_pft,             &
     LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch,           &
     GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch,          &
@@ -114,7 +114,7 @@ contains
 !     LitrFall FROM BRANCHES DURING TILLAGE
 !
 !     XHVST=fraction of PFT remaining after disturbance
-!     ShootC4NonstC_brch=total C4 nonstructural C in branch
+!     C4PhotoShootNonstC_brch=total C4 nonstructural C in branch
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
@@ -125,7 +125,7 @@ contains
       LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
         +XHVST1*(ElmAllocmat4Litr(ielmc,inonstruct,M,NZ)*(CanopyNonstElms_brch(ielmc,NB,NZ) &
         +CanopyNodulNonstElms_brch(ielmc,NB,NZ) &
-        +ShootC4NonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)) &
+        +C4PhotoShootNonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)) &
         +ElmAllocmat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracShootStalkElmAlloc2Litr(ielmc,k_fine_litr) &
         +CanopyNodulStrutElms_brch(ielmc,NB,NZ)) &
         +ElmAllocmat4Litr(ielmc,inonfoliar,M,NZ)*(PetoleStrutElms_brch(ielmc,NB,NZ)*FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) &
@@ -166,7 +166,7 @@ contains
   !     PLANT STATE VARIABLES REMAINING AFTER TILLAGE
   !
 
-    ShootC4NonstC_brch(NB,NZ)     = ShootC4NonstC_brch(NB,NZ)*XHVST
+    C4PhotoShootNonstC_brch(NB,NZ)     = C4PhotoShootNonstC_brch(NB,NZ)*XHVST
     StalkLiveBiomassC_brch(NB,NZ) = StalkLiveBiomassC_brch(NB,NZ)*XHVST
     DO NE=1,NumPlantChemElms
       CanopyNonstElms_brch(NE,NB,NZ)      = CanopyNonstElms_brch(NE,NB,NZ)*XHVST

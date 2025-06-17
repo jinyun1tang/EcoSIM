@@ -185,7 +185,7 @@ module WthrMod
           -DayLensCurr_col(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLensCurr_col(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK_col(NY,NX))) &
-      VPS(NY,NX)     = vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      VPS(NY,NX)     = vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
       VPK_col(NY,NX) = AMIN1(VPS(NY,NX),VPK_col(NY,NX))
       PBOT_col(NY,NX)=1.01325E+02_r8*exp(-ALT_col(NY,NX)/hpresc)      
 !
@@ -240,7 +240,7 @@ module WthrMod
       TairK_col(NY,NX) = units%Celcius2Kelvin(TCA_col(NY,NX))
 
       !elevation corrected saturated air vapor pressure, KPa
-      VPS(NY,NX)              = vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      VPS(NY,NX)              = vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
       VPK_col(NY,NX)          = AMIN1(DWPTH(J,I),VPS(NY,NX))
       WindSpeedAtm_col(NY,NX) = AMAX1(3600.0_r8,WINDH(J,I))
       PBOT_col(NY,NX)         = PBOT_hrly(J,I)
@@ -480,7 +480,7 @@ module WthrMod
         IF(isclose(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK_col(NY,NX))) &
-          vps(ny,ny)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
+          vps(ny,ny)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0)
           VPK_col(NY,NX)=VPK_col(NY,NX)*VPS(NY,NX)/VPX
         ENDIF
       ENDIF
@@ -527,9 +527,9 @@ module WthrMod
     DO  NY=NVN,NVS
       IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD_col(NY,NX)= &
         RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
-      HUDX(NY,NX)  = AMAX1(HUDX(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
-      HUDN(NY,NX)  = AMIN1(HUDN(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
-      TWIND(NY,NX) = TWIND(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]
+      HUDX_col(NY,NX)  = AMAX1(HUDX_col(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
+      HUDN_col(NY,NX)  = AMIN1(HUDN_col(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
+      TWIND_col(NY,NX) = TWIND_col(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]
       VPA_col(NY,NX)   = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)    !atmospheric vapor concentration, [m3 m-3],       2.173E-03_r8 = 18g/mol/(8.3142)
 !
       !     WATER AND HEAT INPUTS TO GRID CELLS

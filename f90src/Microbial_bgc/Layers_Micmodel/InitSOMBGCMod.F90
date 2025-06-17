@@ -94,8 +94,8 @@ module InitSOMBGCMOD
   ! begin_execution
 
   associate(                                               &
-    rNCOMCa               => micpar%rNCOMCa,               &
-    rPCOMCa               => micpar%rPCOMCa,               &
+    rNCOMC_ave               => micpar%rNCOMC_ave,               &
+    rPCOMC_ave               => micpar%rPCOMC_ave,               &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
     OHCK                  => micpar%OHCK,                  &
@@ -196,8 +196,8 @@ module InitSOMBGCMOD
     TOSPK(K) = ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
 !   based on aerobic heterotrophs
 
-    TOSNK(K)=TOSNK(K)+OMCI(1,K)*rNCOMCa(1,1,K)+OMCI(2,K)*rNCOMCa(2,1,K)
-    TOSPK(K)=TOSPK(K)+OMCI(1,K)*rPCOMCa(1,1,K)+OMCI(2,K)*rPCOMCa(2,1,K)
+    TOSNK(K)=TOSNK(K)+OMCI(1,K)*rNCOMC_ave(1,1,K)+OMCI(2,K)*rNCOMC_ave(2,1,K)
+    TOSPK(K)=TOSPK(K)+OMCI(1,K)*rPCOMC_ave(1,1,K)+OMCI(2,K)*rPCOMC_ave(2,1,K)
 
     TOSCI   = TOSCI+OSCI(K)*TOSCK(K)
     TOSNI   = TOSNI+OSCI(K)*TOSNK(K)
@@ -258,8 +258,8 @@ module InitSOMBGCMOD
       tglds=JGnfo(N)-JGnio(N)+1._r8
       D8991: DO M=1,nlbiomcp
         OME1(ielmc) = AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
-        OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMCa(M,N,K)*FOSNI)
-        OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMCa(M,N,K)*FOSPI)
+        OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
+        OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
 
         do NGL=JGnio(N),JGnfo(N)
           MID=micpar%get_micb_id(M,NGL)
@@ -294,8 +294,8 @@ module InitSOMBGCMOD
 !  X is an indicator of surface residual layer
     D8985: DO M=1,ndbiomcp
       OMBioResdu_vr(ielmc,M,K,L,NY,NX) = X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
-      OMBioResdu_vr(ielmn,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMCa(M,1,K)*FOSNI)
-      OMBioResdu_vr(ielmp,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMCa(M,1,K)*FOSPI)
+      OMBioResdu_vr(ielmn,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMC_ave(M,1,K)*FOSNI)
+      OMBioResdu_vr(ielmp,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMC_ave(M,1,K)*FOSPI)
       OSCX(KK)                         = OSCX(KK)+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
       OSNX(KK)                         = OSNX(KK)+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
       OSPX(KK)                         = OSPX(KK)+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
@@ -744,8 +744,8 @@ module InitSOMBGCMOD
   real(r8) :: OME1(1:NumPlantChemElms)
   real(r8), parameter :: scal=0.5_r8  
   associate(                                               &
-    rNCOMCa               => micpar%rNCOMCa,               &
-    rPCOMCa               => micpar%rPCOMCa,               &
+    rNCOMC_ave               => micpar%rNCOMC_ave,               &
+    rPCOMC_ave               => micpar%rPCOMC_ave,               &
     nlbiomcp              => micpar%nlbiomcp,              &
     OMCI                  => micpar%OMCI,                  &    
     OMCF                  => micpar%OMCF,                  &
@@ -758,8 +758,8 @@ module InitSOMBGCMOD
     tglds=JGnfo(N)-JGnio(N)+1._r8
     DO M=1,nlbiomcp
       OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
-      OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMCa(M,N,K)*FOSNI)
-      OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMCa(M,N,K)*FOSPI)
+      OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
+      OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
 
       do NGL=JGnio(N),JGnfo(N)
         MID=micpar%get_micb_id(M,NGL)

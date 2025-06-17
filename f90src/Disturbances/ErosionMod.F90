@@ -440,9 +440,9 @@ module ErosionMod
 !
             IF(NN.EQ.iFront)THEN
               FSEDER=AMIN1(1.0,cumSed_Eros_2D(N,2,N5,N4)/SoilMicPMassLayerMX(N2,N1))
-              XSand_Eros_2D(N,2,N5,N4)=FSEDER*SAND(NU_col(N2,N1),N2,N1)
-              XSilt_Eros_2D(N,2,N5,N4)=FSEDER*SILT(NU_col(N2,N1),N2,N1)
-              XClay_Eros_2D(N,2,N5,N4)=FSEDER*CLAY(NU_col(N2,N1),N2,N1)
+              XSand_Eros_2D(N,2,N5,N4)=FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
+              XSilt_Eros_2D(N,2,N5,N4)=FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
+              XClay_Eros_2D(N,2,N5,N4)=FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -585,9 +585,9 @@ module ErosionMod
             IF(NN.EQ.iBehind)THEN
               IF(N4B.GT.0.AND.N5B.GT.0)THEN
                 FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,1,N5B,N4B)/SoilMicPMassLayerMX(N2,N1))
-                XSand_Eros_2D(N,1,N5B,N4B) = FSEDER*SAND(NU_col(N2,N1),N2,N1)
-                XSilt_Eros_2D(N,1,N5B,N4B) = FSEDER*SILT(NU_col(N2,N1),N2,N1)
-                XClay_Eros_2D(N,1,N5B,N4B) = FSEDER*CLAY(NU_col(N2,N1),N2,N1)
+                XSand_Eros_2D(N,1,N5B,N4B) = FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
+                XSilt_Eros_2D(N,1,N5B,N4B) = FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
+                XClay_Eros_2D(N,1,N5B,N4B) = FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -877,9 +877,9 @@ module ErosionMod
 !
 !     SOIL MINERALS
 !
-              XSand_Eros_2D(N,NN,M5,M4)=FSEDER*SAND(NU_col(N2,N1),N2,N1)
-              XSilt_Eros_2D(N,NN,M5,M4)=FSEDER*SILT(NU_col(N2,N1),N2,N1)
-              XClay_Eros_2D(N,NN,M5,M4)=FSEDER*CLAY(NU_col(N2,N1),N2,N1)
+              XSand_Eros_2D(N,NN,M5,M4)=FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
+              XSilt_Eros_2D(N,NN,M5,M4)=FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
+              XClay_Eros_2D(N,NN,M5,M4)=FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !

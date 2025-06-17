@@ -130,17 +130,17 @@ module StartsMod
 !
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
 
       DO idg=idg_beg,idg_NH3
-        trcs_solcoef_col(idg,NY,NX)= AMAX1(AtmGasCgperm3(idg,NY,NX)*gas_solubility(idg,ATCA_col(NY,NX))*1.e-2_r8,1.e-10_r8)
+        trcs_solcoef_col(idg,NY,NX)= AMAX1(AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,ATCA_col(NY,NX))*1.e-2_r8,1.e-10_r8)
       ENDDO  
 
 !
@@ -158,10 +158,10 @@ module StartsMod
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,LOGPSIMN-LOGPSIMX
 !
       LOGPSIAtSat(NY,NX) = LOG(-PSIPS)
-      LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
-      LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
-      LOGPSIMXD(NY,NX)   = LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
-      LOGPSIMND(NY,NX)   = LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
+      LOGPSIFLD_col(NY,NX)   = LOG(-PSIAtFldCapacity_col(NY,NX))
+      LOGPSIMN_col(NY,NX)    = LOG(-PSIAtWiltPoint_col(NY,NX))
+      LOGPSIMXD_col(NY,NX)   = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND_col(NY,NX)   = LOGPSIMN_col(NY,NX)-LOGPSIFLD_col(NY,NX)
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
@@ -259,10 +259,10 @@ module StartsMod
       ALTZ_col(NY,NX)=ALTZG
       IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.0.0_r8)THEN
         ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
-        DTBLD(NY,NX)               = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+        DTBLD_col(NY,NX)               = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
       ELSE
         ExtWaterTablet0_col(NY,NX) = 0.0_r8
-        DTBLD(NY,NX)               = 0.0_r8
+        DTBLD_col(NY,NX)               = 0.0_r8
       ENDIF
       DepzIntWTBL_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
     ENDDO
@@ -323,7 +323,7 @@ module StartsMod
       !
       !     SURFACE LITTER HEAT CAPACITY
       !
-      SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU_col(NY,NX),NY,NX)+SILT(NU_col(NY,NX),NY,NX)+CLAY(NU_col(NY,NX),NY,NX))
+      SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND_vr(NU_col(NY,NX),NY,NX)+SILT_vr(NU_col(NY,NX),NY,NX)+CLAY_vr(NU_col(NY,NX),NY,NX))
     ENDDO
   ENDDO
   call PrintInfo('end InitSoilVars')
@@ -441,14 +441,14 @@ module StartsMod
       !     TKS_vr,TCS=soil temperature (oC,K)
       !     THETW,THETI,THETP=micropore water,ice,air concentration (m3 m-3)
 !
-      SAND(L,NY,NX)=CSAND_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
-      SILT(L,NY,NX)=CSILT(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
-      CLAY(L,NY,NX)=CCLAY_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
+      SAND_vr(L,NY,NX)=CSAND_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
+      SILT_vr(L,NY,NX)=CSILT_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
+      CLAY_vr(L,NY,NX)=CCLAY_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
         VORGC=CORGCM*SoilBulkDensity_vr(L,NY,NX)/PTDS
-        VMINL=(CSILT(L,NY,NX)+CCLAY_vr(L,NY,NX))*SoilBulkDensity_vr(L,NY,NX)/PTDS
+        VMINL=(CSILT_vr(L,NY,NX)+CCLAY_vr(L,NY,NX))*SoilBulkDensity_vr(L,NY,NX)/PTDS
         VSAND=CSAND_vr(L,NY,NX)*SoilBulkDensity_vr(L,NY,NX)/PTDS
         VHeatCapacitySoilM_vr(L,NY,NX)=((cpo*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FracSoiAsMicP_vr(L,NY,NX)+2.128_r8*ROCK_vr(L,NY,NX))*VGeomLayer_vr(L,NY,NX)
@@ -778,7 +778,7 @@ module StartsMod
   IFNOB_col(:,:)                 = 0
   IFPOB_col(:,:)                 = 0
   iResetSoilProf_col(:,:)        = itrue
-  NumActivePlants(:,:)           = 0
+  NumActivePlants_col(:,:)           = 0
   ATCA_col(:,:)               = ATCAI_col(:,:)
   ATCS_col(:,:)               = ATCAI_col(:,:)
   TairKClimMean_col(:,:)      = units%Celcius2Kelvin(ATCA_col)
@@ -1046,13 +1046,13 @@ module StartsMod
 !     tPBOT = # atmosphere
       tPBOT=1._r8   
       CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -1068,10 +1068,10 @@ module StartsMod
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,PSIMN-LOGPSIMX
 !
       LOGPSIAtSat(NY,NX) = LOG(-PSIPS)
-      LOGPSIFLD(NY,NX)   = LOG(-PSIAtFldCapacity(NY,NX))
-      LOGPSIMN(NY,NX)    = LOG(-PSIAtWiltPoint(NY,NX))
-      LOGPSIMXD(NY,NX)   = LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
-      LOGPSIMND(NY,NX)   = LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
+      LOGPSIFLD_col(NY,NX)   = LOG(-PSIAtFldCapacity_col(NY,NX))
+      LOGPSIMN_col(NY,NX)    = LOG(-PSIAtWiltPoint_col(NY,NX))
+      LOGPSIMXD_col(NY,NX)   = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND_col(NY,NX)   = LOGPSIMN_col(NY,NX)-LOGPSIFLD_col(NY,NX)
 
 !     VLSoilMicPMass_vr(0,NY,NX)=0.0_r8
 !

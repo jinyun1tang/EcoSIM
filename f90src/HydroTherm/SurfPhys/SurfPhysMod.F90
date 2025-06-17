@@ -1224,7 +1224,7 @@ contains
   ELSE
     EnergyImpact4Erosion_colM(M,NY,NX)=0.0_r8
   ENDIF
-  RainEkReducedKsat=EXP(-2.0E-03_r8*(CSILT(NUM_col(NY,NX),NY,NX)+CCLAY_vr(NUM_col(NY,NX),NY,NX)) &
+  RainEkReducedKsat=EXP(-2.0E-03_r8*(CSILT_vr(NUM_col(NY,NX),NY,NX)+CCLAY_vr(NUM_col(NY,NX),NY,NX)) &
     *EnergyImpact4Erosion_col(NY,NX))
 
 !

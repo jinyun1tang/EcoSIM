@@ -1057,7 +1057,7 @@ module WatsubMod
           !south-north direction, is it true?
           FINHX = TwoPiCON*HydroCond_3D(2,1,N3,N2,N1)*AREA_3D(3,N3,N2,N1) &
             *(PSISE_vr(N3,N2,N1)-PSISoilMatricPtmp_vr(N3,N2,N1)) &
-            /LOG(PathLenMacP(N3,N2,N1)/MacPRadius(N3,N2,N1))*dts_HeatWatTP
+            /LOG(PathLenMacPore_vr(N3,N2,N1)/MacPoreRadius_vr(N3,N2,N1))*dts_HeatWatTP
           VLWatMicP1X = VLWatMicP1_vr(N3,N2,N1)+WatNetFlow2MicP_3DM_vr(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)
           VOLP1X      = AZMAX1(VLMicP1_vr(N3,N2,N1)-VLWatMicP1X-VLiceMicP1_vr(N3,N2,N1))
           VLWatMacP1X = VLWatMacP1_vr(N3,N2,N1)+WatNetFlow2Macpt_3DM_vr(N3,N2,N1)
@@ -1705,11 +1705,11 @@ module WatsubMod
 !      print*,'dest layer is pore active'
       IF(THETWL.LT.FieldCapacity_vr(N6,N5,N4))THEN
         !less than field capacity
-        PSISM1_vr(N6,N5,N4)=AMAX1(PSIHY,-EXP(LOGPSIFLD(N5,N4)+((LOGFldCapacity_vr(N6,N5,N4)-LOG(THETWL)) &
-          /FCD_vr(N6,N5,N4)*LOGPSIMND(N5,N4))))
+        PSISM1_vr(N6,N5,N4)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(N5,N4)+((LOGFldCapacity_vr(N6,N5,N4)-LOG(THETWL)) &
+          /FCD_vr(N6,N5,N4)*LOGPSIMND_col(N5,N4))))
       ELSEIF(THETWL.LT.POROS_vr(N6,N5,N4)-DTHETW)THEN
         PSISM1_vr(N6,N5,N4)=-EXP(LOGPSIAtSat(N5,N4)+(((LOGPOROS_vr(N6,N5,N4)-LOG(THETWL)) &
-          /PSD_vr(N6,N5,N4))**SRP_vr(N6,N5,N4)*LOGPSIMXD(N5,N4)))
+          /PSD_vr(N6,N5,N4))**SRP_vr(N6,N5,N4)*LOGPSIMXD_col(N5,N4)))
       ELSE
         !saturated
         THETWL              = POROS_vr(N6,N5,N4)
@@ -1731,12 +1731,12 @@ module WatsubMod
 
     IF(VLSoilMicPMass_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
       IF(THETW1.LT.FieldCapacity_vr(N3,N2,N1))THEN
-        PSISTMP             = -EXP(LOGPSIFLD(N2,N1)+(LOGFldCapacity_vr(N3,N2,N1)-LOG(THETW1)) &
-          /FCD_vr(N3,N2,N1)*LOGPSIMND(N2,N1))
+        PSISTMP             = -EXP(LOGPSIFLD_col(N2,N1)+(LOGFldCapacity_vr(N3,N2,N1)-LOG(THETW1)) &
+          /FCD_vr(N3,N2,N1)*LOGPSIMND_col(N2,N1))
         PSISM1_vr(N3,N2,N1) = AMAX1(PSIHY,PSISTMP)
       ELSEIF(THETW1.LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
         PSISM1_vr(N3,N2,N1)=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETW1)) &
-          /PSD_vr(N3,N2,N1))**SRP_vr(N3,N2,N1)*LOGPSIMXD(N2,N1)))
+          /PSD_vr(N3,N2,N1))**SRP_vr(N3,N2,N1)*LOGPSIMXD_col(N2,N1)))
       ELSE
         THETW1              = POROS_vr(N3,N2,N1)
         PSISM1_vr(N3,N2,N1) = PSISE_vr(N3,N2,N1)

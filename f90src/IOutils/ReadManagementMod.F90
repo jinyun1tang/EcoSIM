@@ -190,8 +190,8 @@ implicit none
         IIRRA(2,NY,NX) = IDYE
         IIRRA(3,NY,NX) = INT(IHRS/100)
         IIRRA(4,NY,NX) = INT(IHRE/100)
-        FIRRA(NY,NX)   = FIRRX
-        CIRRA(NY,NX)   = CIRRX
+        FIRRA_col(NY,NX)   = FIRRX
+        CIRRA_col(NY,NX)   = CIRRX
         DIRRA(1,NY,NX) = DIRRX
         DIRRA(2,NY,NX) = WDPTHI
         D220: DO I     = 1, 366

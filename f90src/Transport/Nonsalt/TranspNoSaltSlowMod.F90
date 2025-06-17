@@ -1127,7 +1127,7 @@ implicit none
 !
     DO idg=idg_beg,idg_NH3
       !equilbrium concentration at the air-litter interface
-      trc_gasq(idg)=(PARR_col(NY,NX)*GasSolbility_vr(idg,0,NY,NX)*AtmGasCgperm3(idg,NY,NX) &
+      trc_gasq(idg)=(PARR_col(NY,NX)*GasSolbility_vr(idg,0,NY,NX)*AtmGasCgperm3_col(idg,NY,NX) &
         +DFGcc(idg)*trcs_cl_litr(idg))/(DFGcc(idg)+PARR_col(NY,NX))
 
       !Dissolution into litter water, based on two-point gradient flow
@@ -1231,7 +1231,7 @@ implicit none
 
     DO idg=idg_beg,idg_end
       DiffusivitySolutEff = SoluteDifusivitytscaledM_vr(idg,NU_col(NY,NX),NY,NX)*TORT1
-      trc_gsolc           = (CondGasXSnowM_col(M,NY,NX)*AtmGasCgperm3(idg,NY,NX)*GasSolbility_vr(idg,NU_col(NY,NX),NY,NX) &
+      trc_gsolc           = (CondGasXSnowM_col(M,NY,NX)*AtmGasCgperm3_col(idg,NY,NX)*GasSolbility_vr(idg,NU_col(NY,NX),NY,NX) &
         +DiffusivitySolutEff*trcs_cl_soil(idg))/(DiffusivitySolutEff+CondGasXSnowM_col(M,NY,NX))
 
       RGasAtmDisol2SoilM_col(idg,NY,NX)=(trc_gsolc-trcs_cl_soil(idg)) &

@@ -30,7 +30,7 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  THeatSoiThaw_col(:,:)              !Heat associated with freeze-thaw, [MJ d-2 h-1]
   real(r8),target,allocatable ::  QSnoHeatXfer2Soil_col(:,:)         !Heat flux from snow into soil, [MJ d-2 h-1]
   real(r8),target,allocatable ::  QIceInflx_vr(:,:,:)                !Ice influx to layer, essential for pond/lake,  [m3 H2O d-2 h-1]
-  real(r8),target,allocatable ::  QIceInflx_col(:,:)
+
 !----------------------------------------------------------------------
 
 contains
@@ -39,7 +39,6 @@ contains
   implicit none
 
   allocate(QIceInflx_vr(JZ,JY,JX));  QIceInflx_vr = 0._r8
-  allocate(QIceInflx_col(JY,JX));  QIceInflx_col = 0._r8
   allocate(QSnoHeatXfer2Soil_col(JY,JX)); QSnoHeatXfer2Soil_col = 0._r8
   allocate(HeatSource_col(JY,JX)); HeatSource_col = 0._r8
   allocate(TKS_vr(0:JZ,JY,JX));    TKS_vr                              = 0._r8
@@ -67,7 +66,6 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(QIceInflx_col)
   call destroy(QIceInflx_vr)
   call destroy(QSnoHeatXfer2Soil_col)
   call destroy(THeatSoiThaw_col)

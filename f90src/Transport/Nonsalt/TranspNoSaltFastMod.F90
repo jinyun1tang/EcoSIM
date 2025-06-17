@@ -476,7 +476,7 @@ implicit none
     !topsoil gains tracers    
   ELSE
     DO idg=idg_beg,idg_NH3
-      RGas_Adv_flxMM(idg)=-WaterFlow2SoilMM_3D(3,NU_col(NY,NX),NY,NX)*AtmGasCgperm3(idg,NY,NX)
+      RGas_Adv_flxMM(idg)=-WaterFlow2SoilMM_3D(3,NU_col(NY,NX),NY,NX)*AtmGasCgperm3_col(idg,NY,NX)
     ENDDO
   ENDIF
   !
@@ -824,7 +824,7 @@ implicit none
 !
     DGQ_cef=GasDifuscoefMM_3D*PARGas_CefMM(idg,NY,NX)/(GasDifuscoefMM_3D+PARGas_CefMM(idg,NY,NX))
 
-    Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)+DGQ_cef*(AtmGasCgperm3(idg,NY,NX)-trcg_cl2)
+    Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)=Gas_AdvDif_FlxMM_3D(idg,3,NU_col(NY,NX),NY,NX)+DGQ_cef*(AtmGasCgperm3_col(idg,NY,NX)-trcg_cl2)
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine TopSoilGasDifussionMM

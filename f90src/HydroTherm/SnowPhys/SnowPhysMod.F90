@@ -269,7 +269,7 @@ contains
       SnowThickL0_snvr(L,NY,NX) = VLSnoDWI1_snvr(L,NY,NX)/AREA_3D(3,NUM_col(NY,NX),NY,NX)
       VLairSno1                 = AZMAX1(VLSnoDWI1_snvr(L,NY,NX)-VLDrySnoWE0M_snvr(L,NY,NX)-VLIceSnow0M_snvr(L,NY,NX)-VLWatSnow0M_snvr(L,NY,NX))
       FracAsAirSno1             = AMAX1(THETPI,VLairSno1/VLSnoDWI1_snvr(L,NY,NX))
-      VapCond1                  = FracAsAirSno1**2.0_r8*H2OVapDifsc_snvr(L,NY,NX)
+      VapCond1                  = FracAsAirSno1**2*H2OVapDifsc_snvr(L,NY,NX)
       VapSnoSrc                 = vapsat(TKSnow1_snvr(L,NY,NX))  !*dssign(VLWatSnow0M_snvr(L,NY,NX))
 
       IF(VLSnoDWI1_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -328,7 +328,7 @@ contains
         !
         IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. VLairSno2.GT.ZEROS2(NY,NX))THEN
           !both layer has air-filled pores
-          VapCond2         = FracAsAirInSno**2.0_r8*H2OVapDifsc_snvr(L2,NY,NX)
+          VapCond2         = FracAsAirInSno**2*H2OVapDifsc_snvr(L2,NY,NX)
           VapSnoDest       = vapsat(TKSnow1_snvr(L2,NY,NX))  !*dssign(VLWatSnow0M_snvr(L2,NY,NX))
           VapCondSnoWeited = 2.0_r8*VapCond1*VapCond2/(VapCond1*SnowThickL0_snvr(L2,NY,NX) &
             +VapCond2*SnowThickL0_snvr(L,NY,NX))
@@ -802,7 +802,7 @@ contains
 
   RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSW2Sno_col(NY,NX)
   RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)    !incoming radiation, short + longwave
-  LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4._r8/real(NPS,kind=r8)         !emitting longwave radiation,
+  LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4/real(NPS,kind=r8)         !emitting longwave radiation,
   RadNet2Sno2          = RFLX0-LWRadSno1                            !net radiation
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySnow
 
@@ -1376,7 +1376,7 @@ contains
         RASX         = SnowThickL_snvr(L,NY,NX)/H2OVapDifsc_snvr(L,NY,NX)
         FracAsAirSno = AMAX1(THETPI,1.0_r8-(VLDrySnoWE0_snvr(L,NY,NX)+VLIceSnow0_snvr(L,NY,NX) &
             +VLWatSnow0_snvr(L,NY,NX))/VLSnoDWI1_snvr(L,NY,NX))
-        RASL = RASX/AMAX1(ZERO,FracAsAirSno)**2.0_r8
+        RASL = RASX/AMAX1(ZERO,FracAsAirSno)**2
         RAS  = RAS+RASL
       ENDIF
     ENDDO D9775
@@ -1422,8 +1422,8 @@ contains
   real(r8) :: dLWdTSoil,dLWSoil
 ! begin_execution
 
-  dLWdTLitR = -0._r8*LWEmscefLitR_col(NY,NX)*TKSoil1_vr(0,NY,NX)**3._r8/real(NPS*NPR,kind=r8)
-  dLWdTSoil = -0._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3._r8/real(NPS*NPR,kind=r8)
+  dLWdTLitR = -0._r8*LWEmscefLitR_col(NY,NX)*TKSoil1_vr(0,NY,NX)**3/real(NPS*NPR,kind=r8)
+  dLWdTSoil = -0._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3/real(NPS*NPR,kind=r8)
 
   TK0X              = TKSnow1_snvr(L,NY,NX)
   TKXR              = TKSoil1_vr(0,NY,NX)
@@ -1640,13 +1640,13 @@ contains
     ,safe_adb(VLWatMicP1_vr(NUM_col(NY,NX),NY,NX),VLSoilMicP_vr(NUM_col(NY,NX),NY,NX))))
   IF(VLSoilMicPMass_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     IF(THETW1.LT.FieldCapacity_vr(NUM_col(NY,NX),NY,NX))THEN
-      PSISM1_vr(NUM_col(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX) &
         +((LOGFldCapacity_vr(NUM_col(NY,NX),NY,NX)-LOG(THETW1)) &
-        /FCD_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMND(NY,NX))))
+        /FCD_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMND_col(NY,NX))))
     ELSEIF(THETW1.LT.POROS_vr(NUM_col(NY,NX),NY,NX)-DTHETW)THEN
       PSISM1_vr(NUM_col(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
         +(((LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOG(THETW1)) &
-        /PSD_vr(NUM_col(NY,NX),NY,NX))**SRP_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMXD(NY,NX)))
+        /PSD_vr(NUM_col(NY,NX),NY,NX))**SRP_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMXD_col(NY,NX)))
     ELSE
       THETW1=POROS_vr(NUM_col(NY,NX),NY,NX)
       PSISM1_vr(NUM_col(NY,NX),NY,NX)=PSISE_vr(NUM_col(NY,NX),NY,NX)
@@ -1659,11 +1659,11 @@ contains
     PSDX   = LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOGFCX
     FCDX   = LOGFCX-LOGWPX
     IF(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX).LT.FCX)THEN
-      PSISM1_vr(NUM_col(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-        +((LOGFCX-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX) &
+        +((LOGFCX-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/FCDX*LOGPSIMND_col(NY,NX))))
     ELSEIF(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX).LT.POROS_vr(NUM_col(NY,NX),NY,NX)-DTHETW)THEN
       PSISM1_vr(NUM_col(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
-        +(((LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD(NY,NX)))
+        +(((LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD_col(NY,NX)))
     ELSE
       THETW1                      = POROS_vr(NUM_col(NY,NX),NY,NX)
       PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSISE_vr(NUM_col(NY,NX),NY,NX)
@@ -1706,11 +1706,11 @@ contains
   IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1_vr(0,NY,NX))/VLitR_col(NY,NX)
     IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
-      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX) &
-        *LOGPSIMND(NY,NX))))
+      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX) &
+        *LOGPSIMND_col(NY,NX))))
     ELSEIF(ThetaWLitR.LT.POROS0_col(NY,NX))THEN
       PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR))/PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX) &
-        *LOGPSIMXD(NY,NX)))
+        *LOGPSIMXD_col(NY,NX)))
     ELSE
       ThetaWLitR=POROS0_col(NY,NX)
       PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)

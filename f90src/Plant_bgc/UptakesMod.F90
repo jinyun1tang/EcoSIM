@@ -1374,10 +1374,10 @@ module UptakesMod
     TairK               => plt_ew%TairK,                  &
     TKC_pft             => plt_ew%TKC_pft,                &
     TKS_vr              => plt_ew%TKS_vr,                 &
-    PSICanPDailyMin     => plt_ew%PSICanPDailyMin,        &
+    PSICanPDailyMin_pft => plt_ew%PSICanPDailyMin_pft,    &
     PSICanopy_pft       => plt_ew%PSICanopy_pft,          &
     NU                  => plt_site%NU,                   &
-    MaxNumRootLays      => plt_site%MaxNumRootLays ,      &
+    MaxNumRootLays      => plt_site%MaxNumRootLays,       &
     ChillHours_pft      => plt_photo%ChillHours_pft,      &
     TempOffset_pft      => plt_pheno%TempOffset_pft,      &
     TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft,    &
@@ -1423,7 +1423,7 @@ module UptakesMod
     TKSO                 = TKS_vr(L)+TempOffset_pft(NZ)
     fTgrowRootP_vr(L,NZ) = calc_root_grow_tempf(TKSO)
   ENDDO D100
-  PSICanPDailyMin(NZ)=AMIN1(PSICanPDailyMin(NZ),PSICanopy_pft(NZ))
+  PSICanPDailyMin_pft(NZ)=AMIN1(PSICanPDailyMin_pft(NZ),PSICanopy_pft(NZ))
   !
   !     DIURNAL CHILLING
   !

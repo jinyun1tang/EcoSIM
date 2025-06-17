@@ -280,7 +280,7 @@ module readiMod
     D9890: DO NY=NVN,NVS
       ALAT_col(NY,NX)               = ALATG
       PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
-      ALTI(NY,NX)               = ALTIG
+      ALTI_col(NY,NX)               = ALTIG
       ATCAI_col(NY,NX)              = ATCAG
       IDWaterTable_col(NY,NX)   = iWaterTabelMode
       OXYE_col(NY,NX)           = ao2_ppm
@@ -394,8 +394,8 @@ module readiMod
       ENDDO
     ENDDO
 
-    call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity_col(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'ALBS',  ntp,SoilAlbedo_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PH0',   ntp,PH_vr(0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC_vr(k_fine_litr,0,NV1,NH1))
@@ -433,7 +433,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK_vr(1:JZ,NV1,NH1))
 
@@ -505,8 +505,8 @@ module readiMod
 !     NL1,NL2=number of additional layers below NJ with,without data in file
 !     ISOILR_col=natural(0),reconstructed(1) soil profile
 !
-          PSIAtFldCapacity(NY,NX)   = PSIAtFldCapacity(NV1,NH1)
-          PSIAtWiltPoint(NY,NX)     = PSIAtWiltPoint(NV1,NH1)
+          PSIAtFldCapacity_col(NY,NX)   = PSIAtFldCapacity_col(NV1,NH1)
+          PSIAtWiltPoint_col(NY,NX)     = PSIAtWiltPoint_col(NV1,NH1)
           SoilAlbedo_col(NY,NX)     = SoilAlbedo_col(NV1,NH1)
           PH_vr(0,NY,NX)               = PH_vr(0,NV1,NH1)
           RSC_vr(k_fine_litr,0,NY,NX)  = RSC_vr(k_fine_litr,0,NV1,NH1)
@@ -550,7 +550,7 @@ module readiMod
             SatHydroCondVert_vr(L,NY,NX)  = SatHydroCondVert_vr(L,NV1,NH1)
             SatHydroCondHrzn_vr(L,NY,NX)  = SatHydroCondHrzn_vr(L,NV1,NH1)
             CSAND_vr(L,NY,NX)             = CSAND_vr(L,NV1,NH1)
-            CSILT(L,NY,NX)                = CSILT(L,NV1,NH1)
+            CSILT_vr(L,NY,NX)                = CSILT_vr(L,NV1,NH1)
             SoilFracAsMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK_vr(L,NY,NX)              = ROCK_vr(L,NV1,NH1)
             PH_vr(L,NY,NX)                = PH_vr(L,NV1,NH1)
@@ -651,7 +651,7 @@ module readiMod
               SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L+1,NY,NX)
               SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L+1,NY,NX)
               CSAND_vr(L,NY,NX)            = CSAND_vr(L+1,NY,NX)
-              CSILT(L,NY,NX)               = CSILT(L+1,NY,NX)
+              CSILT_vr(L,NY,NX)               = CSILT_vr(L+1,NY,NX)
               CCLAY_vr(L,NY,NX)            = CCLAY_vr(L+1,NY,NX)
               SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L+1,NY,NX)
               ROCK_vr(L,NY,NX)             = ROCK_vr(L+1,NY,NX)
@@ -733,7 +733,7 @@ module readiMod
   !
           SatHydroCondVert_vr(L,NY,NX)=0.098_r8*SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           SatHydroCondHrzn_vr(L,NY,NX)=0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-          CCLAY_vr(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT(L,NY,NX)))
+          CCLAY_vr(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT_vr(L,NY,NX)))
           CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C (C is input as Kg/Mg soil, N and P are input as g/Mg soil)
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI_vr(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
@@ -741,7 +741,7 @@ module readiMod
   ! soil texture is reported based on mass basis soley for mineral component of the soil
           corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
           CSAND_vr(L,NY,NX)=CSAND_vr(L,NY,NX)*corrector
-          CSILT(L,NY,NX)=CSILT(L,NY,NX)*corrector
+          CSILT_vr(L,NY,NX)=CSILT_vr(L,NY,NX)*corrector
           CCLAY_vr(L,NY,NX)=CCLAY_vr(L,NY,NX)*corrector
           CEC_vr(L,NY,NX)=CEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           AEC_vr(L,NY,NX)=AEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
@@ -780,7 +780,7 @@ module readiMod
           IF(CEC_vr(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
             CEC_vr(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+06_r8 &
-              +80.0_r8*CCLAY_vr(L,NY,NX)+20.0_r8*CSILT(L,NY,NX) &
+              +80.0_r8*CCLAY_vr(L,NY,NX)+20.0_r8*CSILT_vr(L,NY,NX) &
               +5.0_r8*CSAND_vr(L,NY,NX))
           ENDIF
         ENDDO
@@ -819,8 +819,8 @@ module readiMod
 
   write(*,*)''
   write(*,*)'NY,NX=',NY,NX
-  write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity(NY,NX)
-  write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint(NY,NX)
+  write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity_col(NY,NX)
+  write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint_col(NY,NX)
   write(*,*)'Wet soil albedo',SoilAlbedo_col(NY,NX)
 
   write(*,*)'Litter pH',PH_vr(0,NY,NX)
@@ -874,7 +874,7 @@ module readiMod
   write(*,*)'Sand (kg Mg-1): CSAND_vr'
   write(*,*)(CSAND_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Silt (kg Mg-1): CSILT'
-  write(*,*)(CSILT(L,NY,NX),L=NU,NM)
+  write(*,*)(CSILT_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Macropore fraction (0-1): FOHL'
   write(*,*)(SoilFracAsMacP_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Rock fraction (0-1): ROCK'

@@ -79,15 +79,15 @@ implicit none
   real(r8),target,allocatable ::  Micb_N2Fixation_vr(:,:,:)          !net microbial N2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoDOMProd_vr(:,:,:,:,:)          !net plant+microbial DOC flux, >0 into soil [g d-2 h-1]
   real(r8),target,allocatable ::  RDOMMicProd_vr(:,:,:,:,:)          !microbial dom flux, > 0 into soil [g d-2 h-1]
-  real(r8),target,allocatable ::  TMicHeterActivity_vr(:,:,:)        !total respiration of DOC+DOA in soil layer
+  real(r8),target,allocatable ::  TMicHeterActivity_vr(:,:,:)        !total respiration of DOC+DOA in soil layer,[-]
   real(r8),target,allocatable ::  VWatMicrobAct_vr(:,:,:)            !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TSens4MicbGrwoth_vr(:,:,:)         !constraints of temperature and water potential on microbial activity, [-]
   real(r8),target,allocatable ::  LitrfalStrutElms_vr(:,:,:,:,:,:)   !total LitrFall C, [g d-2 h-1]
   real(r8),target,allocatable ::  trcs_VLN_vr(:,:,:,:)               !effective volume fraction of nutrient solutes (0-1), [-]
   real(r8),target,allocatable ::  tRDIM2DOM_col(:,:,:)               !conversion flux from DIM into DOM, [g d-2 h-1]
-  real(r8),target,allocatable ::  RGasNetProd_col(:,:,:)             !net production of gas [g d-2 h-1]
-  real(r8),target,allocatable ::  OxyDecompLimiter_vr(:,:,:)         !decomposer oxygen limitation
-  real(r8),target,allocatable ::  RO2DecompUptk_vr(:,:,:)            !decompoer oxygen uptake rate
+  real(r8),target,allocatable ::  RGasNetProd_col(:,:,:)             !net production of gas, [g d-2 h-1]
+  real(r8),target,allocatable ::  OxyDecompLimiter_vr(:,:,:)         !decomposer oxygen limitation,[-]
+  real(r8),target,allocatable ::  RO2DecompUptk_vr(:,:,:)            !decompoer oxygen uptake rate,[-]
   real(r8),target,allocatable ::  BandWidthNH4_vr(:,:,:)             !width of NH4 band, [m]
   real(r8),target,allocatable ::  BandThicknessNH4_vr(:,:,:)         !depth of NH4 band, [m]
   real(r8),target,allocatable ::  BandWidthNO3_vr(:,:,:)             !width of NO3 band, [m]

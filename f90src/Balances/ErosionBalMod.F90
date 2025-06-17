@@ -62,15 +62,15 @@ implicit none
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
 !
-      FSAN           = FSINK*SAND(L,NY,NX)
-      FSIL           = FSINK*SILT(L,NY,NX)
-      FCLA           = FSINK*CLAY(L,NY,NX)
-      SAND(L,NY,NX)  = SAND(L,NY,NX)-FSAN
-      SILT(L,NY,NX)  = SILT(L,NY,NX)-FSIL
-      CLAY(L,NY,NX)  = CLAY(L,NY,NX)-FCLA
-      SAND(LL,NY,NX) = SAND(LL,NY,NX)+FSAN
-      SILT(LL,NY,NX) = SILT(LL,NY,NX)+FSIL
-      CLAY(LL,NY,NX) = CLAY(LL,NY,NX)+FCLA
+      FSAN           = FSINK*SAND_vr(L,NY,NX)
+      FSIL           = FSINK*SILT_vr(L,NY,NX)
+      FCLA           = FSINK*CLAY_vr(L,NY,NX)
+      SAND_vr(L,NY,NX)  = SAND_vr(L,NY,NX)-FSAN
+      SILT_vr(L,NY,NX)  = SILT_vr(L,NY,NX)-FSIL
+      CLAY_vr(L,NY,NX)  = CLAY_vr(L,NY,NX)-FCLA
+      SAND_vr(LL,NY,NX) = SAND_vr(LL,NY,NX)+FSAN
+      SILT_vr(LL,NY,NX) = SILT_vr(LL,NY,NX)+FSIL
+      CLAY_vr(LL,NY,NX) = CLAY_vr(LL,NY,NX)+FCLA
 !
 !     FERTILIZER POOLS
 !

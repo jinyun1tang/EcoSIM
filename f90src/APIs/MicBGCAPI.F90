@@ -163,8 +163,8 @@ implicit none
 
   micfor%VOLW0               = VLWatMicP_vr(0,NY,NX)
   micfor%ZERO                = ZERO
-  micfor%CCH4E               = AtmGasCgperm3(idg_CH4,NY,NX)
-  micfor%COXYE               = AtmGasCgperm3(idg_O2,NY,NX)
+  micfor%CCH4E               = AtmGasCgperm3_col(idg_CH4,NY,NX)
+  micfor%COXYE               = AtmGasCgperm3_col(idg_O2,NY,NX)
   micfor%O2_irrig_conc       = trcg_irrig_mole_conc_col(idg_O2,NY,NX)
   micfor%O2_rain_conc        = trcg_rain_mole_conc_col(idg_O2,NY,NX)
   micfor%Irrig2LitRSurf_col  = Irrig2LitRSurf_col(NY,NX)

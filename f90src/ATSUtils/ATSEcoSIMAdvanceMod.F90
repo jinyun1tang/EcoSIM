@@ -94,7 +94,7 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     !VPA(NY,NX) = vpair(NY)/1.0e6_r8
 
-    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
+    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
@@ -152,8 +152,8 @@ implicit none
   ENDDO
 
 
-  PSIAtFldCapacity = pressure_at_field_capacity
-  PSIAtWiltPoint = pressure_at_wilting_point
+  PSIAtFldCapacity_col = pressure_at_field_capacity
+  PSIAtWiltPoint_col = pressure_at_wilting_point
 
   write(*,*) "(ATSEcoSIMAdvance) RAINH  = ", RAINH(1,1), " m/hr,  AREA_3D(3,NU_col(NY,NX),NY,NX) = ", AREA_3D(3,1,1,1)
 

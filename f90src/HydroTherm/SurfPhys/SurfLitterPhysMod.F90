@@ -200,8 +200,8 @@ implicit none
   !THETRR=litter in relative volume
   !FracSoilAsAirt=relative volume as air  
   THETRR           = AZMAX1(1.0_r8-FracAirFilledSoilPore_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
-  HeatDiffusByWat0 = AZMAX1(FracSoiPAsWat_vr(0,NY,NX)-TRBW)**3._r8
-  HeatDiffusByAir0 = AZMAX1(FracAirFilledSoilPore_vr(0,NY,NX)-TRBA)**3._r8
+  HeatDiffusByWat0 = AZMAX1(FracSoiPAsWat_vr(0,NY,NX)-TRBW)**3
+  HeatDiffusByAir0 = AZMAX1(FracAirFilledSoilPore_vr(0,NY,NX)-TRBA)**3
   RYLXW0           = DTKX*HeatDiffusByWat0
   RYLXA0           = DTKX*HeatDiffusByAir0
   RYLNW0           = AMIN1(1.0E+04_r8,RYLXW*RYLXW0)
@@ -324,7 +324,7 @@ implicit none
 !     VWatLitRHoldCapcity=maximum water retention by litter
 !     PSISM1=litter matric water potential
 !
-      LWRadLitR2   = LWEmscefLitR_col(NY,NX)*TKR1**4._r8/real(NPR,kind=r8)
+      LWRadLitR2   = LWEmscefLitR_col(NY,NX)*TKR1**4/real(NPR,kind=r8)
       Radnet2LitR2 = Radt2LitR-LWRadLitR2
 
 !      if(I==149 .and. J==10 .and. NX==1)then
@@ -341,11 +341,11 @@ implicit none
       IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX) .AND. VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
         ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VWatLitr2)/VLitR_col(NY,NX)
         IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
-          PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-            +((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX)*LOGPSIMND(NY,NX))))
+          PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX) &
+            +((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX)*LOGPSIMND_col(NY,NX))))
         ELSEIF(ThetaWLitR.LT.POROS0_col(NY,NX))THEN
           PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
-            /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD(NY,NX)))
+            /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD_col(NY,NX)))
         ELSE
           ThetaWLitR         = POROS0_col(NY,NX)
           PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)

@@ -8,31 +8,9 @@ module GrosubPars
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 !
-
 !
-!
-!     SLA2,SSL2,SNL2=parameter for calculating leaf area expansion, petiole
-!     and internode extension vs leaf, petiole, internode growth
-!     CNMX,CPMX,CNMN,CPMN=max,min N:C,P:C for nonstructural C,N,P transfers
-!
-!
-!     EN2F=N fixation yield from C oxidation (g N g-1 C)
-!     VMXO=specific respiration rate by bacterial N2 fixers (g g-1 h-1)
-!     SPNDL=specific decomposition rate by canopy,root bacterial N2 fixers (g g-1 h-1)
-!     CCNGB,CCNGR=parameters to calculate nonstructural C,N,P exchange between bacteria and branch,root
-!     NodulBiomCatInfection=initial bacterial mass at infection (g C m-2)
-!     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria (g N,P g-1 C)
-!     RCCZR,RCCYR=min,max fractions for root C recycling
-!     RCCXR,RCCQR=max fractions for root N,P recycling
-!     RCCZN,RCCYN=min,max fractions for bacteria C recycling
-!     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-!     RCCZ,RCCY=min,max fractions for shoot,bacteria C recycling
-!     RCCX,RCCQ=max fractions for shoot,bacteria N,P recycling
-!
-  integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
-  integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
   
-  real(r8) :: FracHour4LeafoffRemob(0:5)                                     !allocation parameter, [-]  
+  real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]  
   real(r8) :: PART1X                              !minimum fraction of growth allocated to leaf, [-]
   real(r8) :: PART2X                              !minimum fraction of growth allocated to petiole, [-]
   real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
@@ -54,8 +32,7 @@ module GrosubPars
   real(r8) :: EMODR                               !root modulus of elasticity, [MPa]
   real(r8) :: QNTM                                !quantum efficiency, [umol e- umol-1 PAR]
   real(r8) :: CURV                                !shape parameter for e- transport response to PAR,[-]
-  real(r8) :: CURV2                               !2xCURV, [-]
-  real(r8) :: CURV4                               !4XCURV, [-]
+
   real(r8) :: ELEC3                               !e- requirement for CO2 fixn by rubisco,        [umol e- umol CO2]
   real(r8) :: ELEC4                               !e- requirement for CO2 fixn by PEP carboxylase,[umol e- umol CO2]
   real(r8) :: CO2KI                               ! Ki for C3 leakage from bundle sheath to mesophyll in C4, [uM]
@@ -66,9 +43,8 @@ module GrosubPars
   real(r8) :: FBS                                 !leaf water content in bundle sheath, in C4 CO2 fixn, [m3 H2O (gC)-1]
   real(r8) :: FMP                                 !leaf water content in mesophyll in C4 CO2 fixn, [m3 H2O (gC)-1]
   real(r8) :: ZPLFM                               !min N:C,P:C in leaves relative to max values from PFT file, [-]
-  real(r8) :: ZPLFD                               !1-ZPLFM, [-]
+
   real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
-  real(r8) :: ZPGRD                               !1-ZPGRM, [-]
   real(r8) :: FSTK                                !fraction of stalk area contributing to water,heat flow
   real(r8) :: ZSTX                                !maximum stalk inner radius for tranpsiration, [m]
   real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
@@ -119,6 +95,16 @@ module GrosubPars
   real(r8) :: HourReq2InitSStor4LeafOut(0:1)      !number of hours required to initiate remobilization of storage C for leafout, [h]
   real(r8) :: GVMX(0:1)                           !specific oxidation rate of nonstructural C during leafout at 25 C, [h]
   real(r8) :: RTSK(0:3)                           !relative primary root sink strength 0.25=shallow,4.0=deep root profile,[-]
+
+  !terminate [label for varaible parsing]
+  integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
+  integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
+
+  real(r8) :: CURV2                               !2xCURV, [-]
+  real(r8) :: CURV4                               !4XCURV, [-]
+  real(r8) :: ZPLFD                               !1-ZPLFM, [-]
+  real(r8) :: ZPGRD                               !1-ZPGRM, [-]
+
   character(len=10), allocatable :: pftss(:)
   character(len=40),allocatable :: pft_long(:)
   character(len=4), allocatable :: pft_short(:)

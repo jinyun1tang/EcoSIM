@@ -55,7 +55,7 @@ implicit none
   integer :: NB,NR,NZ,K,L,M,N,I1,NE,idg,ids
 
   I1=I+1;if(I1>DazCurrYear)I1=1
-  NumActivePlants(NY,NX)                              = plt_site%NumActivePlants
+  NumActivePlants_col(NY,NX)                              = plt_site%NumActivePlants
   PlantPopu_col(NY,NX)                                = plt_site%PlantPopu_col
   ECO_ER_col(NY,NX)                                   = plt_bgcr%ECO_ER_col
   Eco_NBP_CumYr_col(NY,NX)                            = plt_bgcr%Eco_NBP_CumYr_col
@@ -243,7 +243,7 @@ implicit none
     PSICanopy_pft(NZ,NY,NX)                             = plt_ew%PSICanopy_pft(NZ)
     PSICanopyOsmo_pft(NZ,NY,NX)                         = plt_ew%PSICanopyOsmo_pft(NZ)
     PSICanopyTurg_pft(NZ,NY,NX)                         = plt_ew%PSICanopyTurg_pft(NZ)
-    PSICanPDailyMin(NZ,NY,NX)                           = plt_ew%PSICanPDailyMin(NZ)
+    PSICanPDailyMin_pft(NZ,NY,NX)                           = plt_ew%PSICanPDailyMin_pft(NZ)
     CO2FixCL_pft(NZ,NY,NX)                              = plt_rbgc%CO2FixCL_pft(NZ)
     CO2FixLL_pft(NZ,NY,NX)                              = plt_rbgc%CO2FixLL_pft(NZ)
     RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ,NY,NX)    = plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)
@@ -341,7 +341,7 @@ implicit none
         CanopyNonstElms_brch(NE,NB,NZ,NY,NX) = plt_biom%CanopyNonstElms_brch(NE,NB,NZ)
         EarStrutElms_brch(NE,NB,NZ,NY,NX)    = plt_biom%EarStrutElms_brch(NE,NB,NZ)
       ENDDO
-      ShootC4NonstC_brch(NB,NZ,NY,NX)=plt_biom%ShootC4NonstC_brch(NB,NZ)      
+      C4PhotoShootNonstC_brch(NB,NZ,NY,NX)=plt_biom%C4PhotoShootNonstC_brch(NB,NZ)      
     ENDDO
 
 
@@ -666,7 +666,7 @@ implicit none
   plt_site%CO2EI                      = CO2EI_col(NY,NX)
   plt_bgcr%NetCO2Flx2Canopy_col       = NetCO2Flx2Canopy_col(NY,NX)
   plt_site%CO2E                       = CO2E_col(NY,NX)
-  plt_site%AtmGasc(idg_beg:idg_NH3) = AtmGasCgperm3(idg_beg:idg_NH3,NY,NX)
+  plt_site%AtmGasc(idg_beg:idg_NH3) = AtmGasCgperm3_col(idg_beg:idg_NH3,NY,NX)
   plt_site%DayLenthPrev               = DayLenthPrev_col(NY,NX)
   plt_site%DayLenthCurrent            = DayLensCurr_col(NY,NX)
   plt_ew%SnowDepth                    = SnowDepth_col(NY,NX)
@@ -914,7 +914,7 @@ implicit none
   ENDDO
 
 ! sent variables also modified
-  plt_site%NumActivePlants                               = NumActivePlants(NY,NX)
+  plt_site%NumActivePlants                               = NumActivePlants_col(NY,NX)
   plt_site%QH2OLoss_lnds                                 = QH2OLoss_lnds
   plt_site%PlantPopu_col                                 = PlantPopu_col(NY,NX)
   plt_bgcr%ECO_ER_col                                    = ECO_ER_col(NY,NX)
@@ -1026,7 +1026,7 @@ implicit none
 
     plt_ew%TKCanopy_pft(NZ)            = TKCanopy_pft(NZ,NY,NX)
     plt_photo%LeafO2Solubility_pft(NZ) = LeafO2Solubility_pft(NZ,NY,NX)
-    plt_ew%PSICanPDailyMin(NZ)         = PSICanPDailyMin(NZ,NY,NX)
+    plt_ew%PSICanPDailyMin_pft(NZ)         = PSICanPDailyMin_pft(NZ,NY,NX)
     plt_ew%HeatStorCanopy_pft(NZ)      = HeatStorCanopy_pft(NZ,NY,NX)
     plt_photo%CanopyGasCO2_pft(NZ)     = CanopyGasCO2_pft(NZ,NY,NX)
     plt_photo%O2L_pft(NZ)                  = O2L_pft(NZ,NY,NX)
@@ -1192,7 +1192,7 @@ implicit none
         plt_biom%CanopyNodulStrutElms_brch(NE,NB,NZ) = CanopyNodulStrutElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%PetioleChemElmRemob_brch(NE,NB,NZ)  = PetioleChemElmRemob_brch(NE,NB,NZ,NY,NX)
       ENDDO
-      plt_biom%ShootC4NonstC_brch(NB,NZ)=ShootC4NonstC_brch(NB,NZ,NY,NX)              
+      plt_biom%C4PhotoShootNonstC_brch(NB,NZ)=C4PhotoShootNonstC_brch(NB,NZ,NY,NX)              
     ENDDO
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)

@@ -89,11 +89,11 @@ module TillageMixMod
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondHrzn_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SAND(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SAND_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SILT(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SILT_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,CLAY(1:JZ,NY,NX))
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,CLAY_vr(1:JZ,NY,NX))
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
 

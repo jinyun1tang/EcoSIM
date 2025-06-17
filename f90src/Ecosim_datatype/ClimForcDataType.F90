@@ -71,9 +71,9 @@ implicit none
   real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
   real(r8),target,allocatable ::  LWRadSky_col(:,:)                  !sky longwave radiation , [MJ/h]
   real(r8),target,allocatable ::  TRAD_col(:,:)                          !total daily solar radiation, [MJ d-1]
-  real(r8),target,allocatable ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
-  real(r8),target,allocatable ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
-  real(r8),target,allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
+  real(r8),target,allocatable ::  HUDX_col(:,:)                          !daily maximum vapor pressure , [kPa]
+  real(r8),target,allocatable ::  HUDN_col(:,:)                          !daily minimum vapor pressure , [kPa]
+  real(r8),target,allocatable ::  TWIND_col(:,:)                         !total daily wind travel, [m d-1]
 !  real(r8),target,allocatable ::  PrecDaily_col(:,:)                !total daily precipitation, [m d-1]
   real(r8),target,allocatable ::  SkyLonwRad_col(:,:)                !sky longwave radiation , [MJ m-2 h-1]
   real(r8),target,allocatable ::  TempOffset_col(:,:)                !TempOffset_col for calculating temperature in Arrhenius curves, [oC]
@@ -82,8 +82,8 @@ implicit none
   real(r8),target,allocatable ::  CO2EI_col(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CCO2EI_col(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
-  real(r8),target,allocatable ::  AtmGasCgperm3(:,:,:)               !atmospheric gas concentration, [g m-3]
-  real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration, [umol mol-1]
+  real(r8),target,allocatable ::  AtmGasCgperm3_col(:,:,:)               !atmospheric gas concentration, [g m-3]
+  real(r8),target,allocatable ::  AtmGmms_col(:,:,:)                     !atmospheric gas concentration, [umol mol-1]
   real(r8),target,allocatable ::  OXYE_col(:,:)                          !atmospheric O2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2OE_col(:,:)                          !atmospheric N2O concentration, [umol mol-1]
   real(r8),target,allocatable ::  Z2GE_col(:,:)                      !atmospheric N2 concentration, [umol mol-1]
@@ -165,9 +165,9 @@ implicit none
   allocate(OMEGAG(NumOfSkyAzimuthSects,JY,JX));  OMEGAG=0._r8
   allocate(LWRadSky_col(JY,JX));         LWRadSky_col=0._r8
   allocate(TRAD_col(JY,JX));        TRAD_col=0._r8
-  allocate(HUDX(JY,JX));        HUDX=0._r8
-  allocate(HUDN(JY,JX));        HUDN=0._r8
-  allocate(TWIND(JY,JX));       TWIND=0._r8
+  allocate(HUDX_col(JY,JX));        HUDX_col=0._r8
+  allocate(HUDN_col(JY,JX));        HUDN_col=0._r8
+  allocate(TWIND_col(JY,JX));       TWIND_col=0._r8
 !  allocate(PrecDaily_col(JY,JX));        PrecDaily_col=0._r8
   allocate(SkyLonwRad_col(JY,JX));        SkyLonwRad_col=0._r8
   allocate(TempOffset_col(JY,JX));      TempOffset_col=0._r8
@@ -176,8 +176,8 @@ implicit none
   allocate(CO2EI_col(JY,JX));       CO2EI_col=0._r8
   allocate(CCO2EI_col(JY,JX));      CCO2EI_col=0._r8
 
-  allocate(AtmGasCgperm3(idg_beg:idg_end,JY,JX)); AtmGasCgperm3=0._r8
-  allocate(AtmGmms(idg_beg:idg_end,JY,JX)); AtmGmms=0._r8
+  allocate(AtmGasCgperm3_col(idg_beg:idg_end,JY,JX)); AtmGasCgperm3_col=0._r8
+  allocate(AtmGmms_col(idg_beg:idg_end,JY,JX)); AtmGmms_col=0._r8
 
   allocate(OXYE_col(JY,JX));        OXYE_col=0._r8
   allocate(Z2OE_col(JY,JX));        Z2OE_col=0._r8
@@ -250,9 +250,9 @@ implicit none
   call destroy(OMEGAG)
   call destroy(LWRadSky_col)
   call destroy(TRAD_col)
-  call destroy(HUDX)
-  call destroy(HUDN)
-  call destroy(TWIND)
+  call destroy(HUDX_col)
+  call destroy(HUDN_col)
+  call destroy(TWIND_col)
   call destroy(ARGE_col)
 !  call destroy(PrecDaily_col)
   call destroy(SkyLonwRad_col)
@@ -262,8 +262,8 @@ implicit none
   call destroy(CO2EI_col)
   call destroy(CCO2EI_col)
 
-  call destroy(AtmGasCgperm3)
-  call destroy(AtmGmms)
+  call destroy(AtmGasCgperm3_col)
+  call destroy(AtmGmms_col)
   call destroy(TKS_ref_vr)
   call destroy(Eco_RadSW_col)
   call destroy(OXYE_col)
