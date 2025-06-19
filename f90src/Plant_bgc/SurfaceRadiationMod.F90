@@ -1,11 +1,13 @@
 module SurfaceRadiationMod
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,      only: r8 => DAT_KIND_R8
+  use minimathmod,        only: AZMAX1,   isnan
+  use GrosubPars,         only: iforward, ibackward
+  use PrescribePhenolMod, only: SetCanopyProfile
+  use EcoSIMCtrlMod,      only: ldo_sp_mode
   use EcoSimConst
   use EcoSIMConfig
   use PlantAPIData
-  use minimathmod, only : AZMAX1,isnan
-  use GrosubPars, only : iforward,ibackward
   implicit none
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
@@ -30,10 +32,14 @@ module SurfaceRadiationMod
   real(r8) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)
   real(r8) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    
 
-  call DivideCanopyAIByHeight(I,J,DepthSurfWatIce)
+  if(ldo_sp_mode)then
+    !do prescribed phenolgoy mode
+    call SetCanopyProfile(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  else
+    call DivideCanopyAreaByHeight(I,J,DepthSurfWatIce)
 
-  call SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
-
+    call SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  endif
   call SurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
 
   call CalcBoundaryLayerProperties(DepthSurfWatIce)
@@ -119,7 +125,7 @@ module SurfaceRadiationMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DivideCanopyAIByHeight(I,J,DepthSurfWatIce)
+  subroutine DivideCanopyAreaByHeight(I,J,DepthSurfWatIce)
   implicit none
   integer, intent(in) :: I,J
   real(r8), intent(in) :: DepthSurfWatIce   !surface water/ice thickness above soil surface  
@@ -134,7 +140,7 @@ module SurfaceRadiationMod
     NP                    => plt_site%NP,                     & !Input: Number of pfts [m]
     ZEROS                 => plt_site%ZEROS,                  & !Input: Auxiallary variable for threshold testing.
     CanopyHeight_col      => plt_morph%CanopyHeight_col,      & 
-    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     & !Input: pft Canopy height [m]
+    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     & !Input: pft Canopy height [m], 
     CanopyHeight_pft      => plt_morph%CanopyHeight_pft,      &
     CanopyStemAareZ_col   => plt_morph%CanopyStemAareZ_col,   &
     CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   & !Input: vertically resolved Canopy LAI [m2/m2]
@@ -157,17 +163,20 @@ module SurfaceRadiationMod
   ZL1(NumOfCanopyLayers1)               = CanopyHeightZ_col(NumOfCanopyLayers1)
   ZL1(0)                                = 0.0_r8
 
-  !divide total are into NumOfCanopyLayers1
+  !divide total are into NumOfCanopyLayers1, from top to bottom
   AreaInterval=(CanopyLeafArea_col+StemArea_col)/NumOfCanopyLayers1  
   IF(AreaInterval.GT.ZEROS)THEN
     D2765: DO L=NumOfCanopyLayers1,2,-1
       AreaL=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)
+
+      !greater than the mean leaf area or area-interval
       IF(AreaL.GT.1.01_r8*AreaInterval)THEN
         DZL      = CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)
         ZL1(L-1) = CanopyHeightZ_col(L-1)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
       ELSEIF(AreaL.LT.0.99_r8*AreaInterval)THEN
-        ARX=CanopyLeafAareZ_col(L-1)+CanopyStemAareZ_col(L-1)
-        DZL=CanopyHeightZ_col(L-1)-CanopyHeightZ_col(L-2)
+        ARX = CanopyLeafAareZ_col(L-1)+CanopyStemAareZ_col(L-1)
+        DZL = CanopyHeightZ_col(L-1)-CanopyHeightZ_col(L-2)
+        !layer L-1 has significant leaf+stem (canopy) area
         IF(ARX.GT.ZEROS)THEN
           ZL1(L-1)=CanopyHeightZ_col(L-1)-0.5_r8*AMIN1(1.0_r8,(AreaInterval-AreaL)/ARX)*DZL
         ELSE
@@ -183,9 +192,8 @@ module SurfaceRadiationMod
     ENDDO D2770
   ENDIF
 
-
   end associate
-  end subroutine DivideCanopyAIByHeight
+  end subroutine DivideCanopyAreaByHeight
 
 !------------------------------------------------------------------------------------------
 
@@ -489,52 +497,52 @@ module SurfaceRadiationMod
 
 
   associate(                                                   &
-    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,    &
-    VcumIceSnow_col        => plt_ew%VcumIceSnow_col,          &
-    VcumDrySnoWE_col       => plt_ew%VcumDrySnoWE_col,         &
-    VcumWatSnow_col        => plt_ew%VcumWatSnow_col,          &
-    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col,     &
-    SnowDepth              => plt_ew%SnowDepth,                &
-    RadSWLeafAlbedo_pft    => plt_rad%RadSWLeafAlbedo_pft,     &
-    SoilAlbedo             => plt_rad%SoilAlbedo,              &
-    SurfAlbedo_col         => plt_rad%SurfAlbedo_col,          &
-    CanopyPARalbedo_pft    => plt_rad%CanopyPARalbedo_pft,     &
-    iScatteringDiffus      => plt_rad%iScatteringDiffus,       &
-    OMEGA                  => plt_rad%OMEGA,                   &
-    FracPARads2Canopy_pft  => plt_rad%FracPARads2Canopy_pft,   &
-    RadPAR_zsec            => plt_rad%RadPAR_zsec,             &
-    RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec,          &
-    OMEGAG                 => plt_rad%OMEGAG,                  &
-    OMEGX                  => plt_rad%OMEGX,                   &
-    RadSWGrnd_col          => plt_rad%RadSWGrnd_col,           &  !output: total shortwave radiation on ground, MJ/hour/d2
-    RadSWDirect_col        => plt_rad%RadSWDirect_col,         &  !Input: incident direct sw radiation,  MJ/hour/m2
-    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,         &  !Input: incident diffuse sw radiation, MJ/hour/m2
-    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,       &
-    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,        & !Input: umol /m2/s
-    RadPARDirect_col       => plt_rad%RadPARDirect_col,        & !Input: umol /m2/s
-    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    & !Input: 
-    TAU_RadThru            => plt_rad%TAU_RadThru,             &
-    TAU_DirectRTransmit       => plt_rad%TAU_DirectRTransmit,        &
-    SineLeafAngle          => plt_rad%SineLeafAngle,           & !Input:
-    LeafPARabsorpty_pft    => plt_rad%LeafPARabsorpty_pft,     & !: PAR absorbed by whole pft
-    LeafSWabsorpty_pft     => plt_rad%LeafSWabsorpty_pft,      & !: shortwave radiation intercepted by whole pft
-    RadPARLeafTransmis_pft => plt_rad%RadPARLeafTransmis_pft,  &
-    RadSWLeafTransmis_pft  => plt_rad%RadSWLeafTransmis_pft,   &
-    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,      &
-    CosineLeafAngle        => plt_rad%CosineLeafAngle,         & !Input:
-    NU                     => plt_site%NU,                     &
-    AREA3                  => plt_site%AREA3,                  &
-    NP                     => plt_site%NP,                     &
-    ZERO                   => plt_site%ZERO,                   &
-    ZEROS2                 => plt_site%ZEROS2,                 &
-    POROS1                 => plt_site%POROS1,                 &
-    VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr,  &
-    VLSoilMicP_vr          => plt_soilchem%VLSoilMicP_vr,      &
-    VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,       &
-    ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &
-    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,     &
-    NumOfBranches_pft      => plt_morph%NumOfBranches_pft,     &
-    CanopyLeafArea_lnode    => plt_morph%CanopyLeafArea_lnode,   &
+    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,   &
+    VcumIceSnow_col        => plt_ew%VcumIceSnow_col,         &
+    VcumDrySnoWE_col       => plt_ew%VcumDrySnoWE_col,        &
+    VcumWatSnow_col        => plt_ew%VcumWatSnow_col,         &
+    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col,    &
+    SnowDepth              => plt_ew%SnowDepth,               &
+    RadSWLeafAlbedo_pft    => plt_rad%RadSWLeafAlbedo_pft,    &
+    SoilAlbedo             => plt_rad%SoilAlbedo,             &
+    SurfAlbedo_col         => plt_rad%SurfAlbedo_col,         &
+    CanopyPARalbedo_pft    => plt_rad%CanopyPARalbedo_pft,    &
+    iScatteringDiffus      => plt_rad%iScatteringDiffus,      &
+    OMEGA                  => plt_rad%OMEGA,                  &
+    FracPARads2Canopy_pft  => plt_rad%FracPARads2Canopy_pft,  &
+    RadPAR_zsec            => plt_rad%RadPAR_zsec,            &
+    RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec,         &
+    OMEGAG                 => plt_rad%OMEGAG,                 &
+    OMEGX                  => plt_rad%OMEGX,                  &
+    RadSWGrnd_col          => plt_rad%RadSWGrnd_col,          &  !output: total shortwave radiation on ground, MJ/hour/d2
+    RadSWDirect_col        => plt_rad%RadSWDirect_col,        &  !Input: incident direct sw radiation,         MJ/hour/m2
+    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,        &  !Input: incident diffuse sw radiation,        MJ/hour/m2
+    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,      &
+    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,       & !Input: umol /m2/s
+    RadPARDirect_col       => plt_rad%RadPARDirect_col,       & !Input: umol /m2/s
+    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,   & !Input:
+    TAU_RadThru            => plt_rad%TAU_RadThru,            &
+    TAU_DirectRTransmit    => plt_rad%TAU_DirectRTransmit,    &
+    SineLeafAngle          => plt_rad%SineLeafAngle,          & !Input:
+    LeafPARabsorpty_pft    => plt_rad%LeafPARabsorpty_pft,    & !: PAR absorbed by whole pft
+    LeafSWabsorpty_pft     => plt_rad%LeafSWabsorpty_pft,     & !: shortwave radiation intercepted by whole pft
+    RadPARLeafTransmis_pft => plt_rad%RadPARLeafTransmis_pft, &
+    RadSWLeafTransmis_pft  => plt_rad%RadSWLeafTransmis_pft,  &
+    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,     &
+    CosineLeafAngle        => plt_rad%CosineLeafAngle,        & !Input:
+    NU                     => plt_site%NU,                    &
+    AREA3                  => plt_site%AREA3,                 &
+    NP                     => plt_site%NP,                    &
+    ZERO                   => plt_site%ZERO,                  &
+    ZEROS2                 => plt_site%ZEROS2,                &
+    POROS1                 => plt_site%POROS1,                &
+    VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr, &
+    VLSoilMicP_vr          => plt_soilchem%VLSoilMicP_vr,     &
+    VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,      &
+    ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,   &
+    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,    &
+    NumOfBranches_pft      => plt_morph%NumOfBranches_pft,    &
+    CanopyLeafArea_lnode   => plt_morph%CanopyLeafArea_lnode, &
     CanopyStalkArea_lbrch  => plt_morph%CanopyStalkArea_lbrch  &
   )
 

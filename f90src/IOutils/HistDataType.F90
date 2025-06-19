@@ -419,6 +419,7 @@ implicit none
   real(r8),pointer   :: h2D_NO2OxiBactP_vr(:,:)
   real(r8),pointer   :: h2D_CH4AeroOxiP_vr(:,:)
   real(r8),pointer   :: h2D_H2MethogenP_vr(:,:)
+  real(r8),pointer   :: h2D_CanopyLAIZ_plyr(:,:)
   real(r8),pointer   :: h2D_MicroBiomeE_litr_col(:,:) 
   real(r8),pointer   :: h2D_AeroHrBactE_litr_col(:,:) 
   real(r8),pointer   :: h2D_AeroHrFungE_litr_col(:,:) 
@@ -931,6 +932,7 @@ implicit none
   allocate(this%h2D_fTRootGro_pvr(beg_ptc:end_ptc,1:JZ)) ; this%h2D_fTRootGro_pvr=spval
   allocate(this%h2D_fRootGrowPSISense_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_fRootGrowPSISense_pvr=spval
   allocate(this%h3D_PARTS_ptc(beg_ptc:end_ptc,1:NumOfPlantMorphUnits,1:MaxNumBranches));this%h3D_PARTS_ptc(:,:,:)=spval
+  allocate(this%h2D_CanopyLAIZ_plyr(beg_ptc:end_ptc,1:NumOfCanopyLayers)); this%h2D_CanopyLAIZ_plyr(:,:)=spval
   !-----------------------------------------------------------------------
   ! initialize history fields 
   !--------------------------------------------------------------------
@@ -2766,6 +2768,10 @@ implicit none
   call hist_addfld2d(fname='RootGRO_TEMP_FN_pvr',units='none',type2d='levsoi',avgflag='A',&
     long_name='Root growth temperature dependence function',ptr_patch=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_CanopyLAIZ_plyr(beg_ptc:end_ptc,1:NumOfCanopyLayers)
+  call hist_addfld2d(fname='CanopyLAIZ_plyr',units='m2/m2',type2d='levcan',avgflag='A',&
+    long_name='Vertically distributed leaf area',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_fRootGrowPSISense_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='RootGRO_PSI_FN_pvr',units='none',type2d='levsoi',avgflag='A',&
     long_name='Root growth moisture dependence function',ptr_patch=data2d_ptr,default='inactive')       
@@ -3339,6 +3345,10 @@ implicit none
             this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,NB) = PARTS_brch(1:NumOfPlantMorphUnits,NB,NZ,NY,NX)
           ENDDO
         endif
+        DO L=1,NumOfCanopyLayers
+          this%h2D_CanopyLAIZ_plyr(nptc,L)=CanopyLeafAreaZ_pft(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        ENDDO  
+
         DO L=1,JZ
           this%h2D_O2_rootconduct_pvr(nptc,L)    = RootGasConductance_pvr(idg_O2,ipltroot,L,NZ,NY,NX)
           this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootGasConductance_pvr(idg_CO2,ipltroot,L,NZ,NY,NX)

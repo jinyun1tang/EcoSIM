@@ -7,6 +7,7 @@ module HistFileMod
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
   use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type,NumOfPlantMorphUnits
+  use GridConsts        , only : NumOfCanopyLayers,JP,NumGrowthStages  
   use ElmIDMod          , only : NumPlantChemElms  
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
@@ -185,7 +186,6 @@ implicit none
   !create history file for output
 
   use EcoSIMConfig      , only : case_name
-  use GridConsts        , only : JZ,JS,MaxNumBranches,NumOfCanopyLayers,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
   implicit none
   integer, intent(in) :: t        ! tape index
@@ -564,6 +564,8 @@ implicit none
       num2d=NumOfPlantMorphUnits    
   case ('elements')    
       num2d=NumPlantChemElms
+  case ('levcan')
+      num2d=NumOfCanopyLayers
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &
