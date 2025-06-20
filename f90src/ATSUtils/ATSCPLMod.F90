@@ -13,6 +13,19 @@ module ATSCPLMod
 contains
 !------------------------------------------------------------------------------------------
 
+  ! Function to check for NaN in an array
+  !function is_nan(x) result(mask)
+  !  real(r8), intent(in) :: x(:)
+  !  logical, dimension(size(x)) :: mask
+  !  integer :: i
+
+    !allocate(mask(size(x)))
+  !  do i = 1, size(x)
+  !    mask(i) = (x(i) /= x(i))  ! NaN is the only value that is not equal to itself
+  !  end do
+  !end function is_nan
+
+
   subroutine ATS2EcoSIMData(ncol, state, props, sizes)
   implicit none
 
@@ -194,6 +207,12 @@ contains
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
 
+  !write(*,*) "Data after porting from ATS"
+  ! Check for NaN in surf_w_source
+  !if (any(is_nan(surf_w_source))) then
+  !  write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,num_cols)], is_nan(surf_w_source))
+  !end if
+
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
@@ -230,7 +249,12 @@ contains
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
   data2D(:,:)=a_SSES
 
-  write(*,*) "(In EcoSIM2ATSData) snow_depth, Q_e, Q_w ", surf_snow_depth(1), surf_e_source(1), surf_w_source(1)
+  !write(*,*) "Data before pass back to ATS"
+  !! Check for NaN in surf_w_source
+  !if (any(is_nan(surf_w_source))) then
+  !  write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,num_cols)], is_nan(surf_w_source))
+  !end if
+
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
 

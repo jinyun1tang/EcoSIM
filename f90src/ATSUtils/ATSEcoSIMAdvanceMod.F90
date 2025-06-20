@@ -32,6 +32,18 @@ implicit none
   public :: RunEcoSIMSurfaceBalance
   contains
 
+  ! Function to check for NaN in an array
+  function is_nan(x) result(mask)
+    real(r8), intent(in) :: x(:)
+    logical, dimension(size(x)) :: mask
+    integer :: i
+
+    !allocate(mask(size(x)))
+    do i = 1, size(x)
+      mask(i) = (x(i) /= x(i))  ! NaN is the only value that is not equal to itself
+    end do
+  end function is_nan
+
   subroutine RunEcoSIMSurfaceBalance(NYS)
   !
   use EcoSimConst
@@ -67,6 +79,22 @@ implicit none
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
   NPH_Test=1
+  NX=1
+
+  do NY=1, NYS
+    if (Qinfl2MicPM(NY,NX) /= Qinfl2MicPM(NY,NX)) Qinfl2MicPM(NY,NX)=0.0
+    if (Hinfl2SoilM(NY,NX) /= Hinfl2SoilM(NY,NX)) Hinfl2SoilM(NY,NX)=0.0
+    if (Qinfl2MicP(NY,NX) /= Qinfl2MicP(NY,NX)) Qinfl2MicP(NY,NX)=0.0
+    if (Hinfl2Soil(NY,NX) /= Hinfl2Soil(NY,NX)) Hinfl2Soil(NY,NX)=0.0
+  enddo
+
+  write(*,*) "Surface Balance Beginning: "
+  ! Check for NaN in surf_w_source
+  if (any(is_nan(surf_w_source))) then
+    write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,NYS)], is_nan(surf_w_source))
+  end if
+
+
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
   NX=1
@@ -146,16 +174,13 @@ implicit none
     !       with RainFalPrec
     if(p_bool)then
       IF(TCA_col(NY,NX).GT.TSNOW)THEN
-        write(*,*) "Convert Prec to Rain"
         RainFalPrec_col(NY,NX)=p_total(NY)*3600.0 !convert from m/s to m/hr
         SnoFalPrec_col(NY,NX)=0.0_r8
       ELSE
-        write(*,*) "Convert Prec to Snow"      
         RainFalPrec_col(NY,NX)=0.0_r8
         SnoFalPrec_col(NY,NX)=p_total(NY)*3600.0 !convert to m SWE/s to m SWE/hr
       ENDIF
     else
-      write(*,*) "Prec given"
       RainFalPrec_col(NY,NX)=p_rain(NY)*3600.0 !convert from m/s to m/hr
       SnoFalPrec_col(NY,NX)=p_snow(NY)*3600.0 !convert from m SWE/s to mSWE/hr 
     endif
@@ -169,9 +194,16 @@ implicit none
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
-  write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s" 
+  !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s" 
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
+
+  write(*,*) "Before StageSurfacePhysModel: "
+  ! Check for NaN in surf_w_source
+  if (any(is_nan(Qinfl2MicP(:,1)))) then
+    write(*,*) "NaN found in Qinfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
+  end if
+
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -180,10 +212,16 @@ implicit none
 
   VHeatCapacity1_vr(0,1,1) = 0.0
 
+  write(*,*) "Before computing Qinfl2MicP: "
+  ! Check for NaN in surf_w_source
+  if (any(is_nan(Qinfl2MicP(:,1)))) then
+    write(*,*) "NaN found in Qinfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
+  end if
+
   !This does the subcycling of the land surface model
-  write(*,*) "Starting Subcycling loop: "
+  !write(*,*) "Starting Subcycling loop: "
   DO M=1,NPH
-    write(*,*) "subcyle: ", M, " of ", NPH
+    !write(*,*) "subcyle: ", M, " of ", NPH
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
@@ -199,10 +237,24 @@ implicit none
       !also update state variables for iteration M 
       call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
+  write(*,*) "After RunSurfacePhysModel computation of Qinfl2MicP: "
+  ! Check for NaN in surf_w_source
+  if (any(is_nan(Qinfl2MicP(:,1)))) then
+    write(*,*) "NaN found in Winfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
+  end if
+      
+
   ENDDO
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
+
+  write(*,*) "After SnowMassUpdate computation of Qinfl2MicP: "
+  ! Check for NaN in surf_w_source
+  if (any(is_nan(Qinfl2MicP(:,1)))) then
+    write(*,*) "NaN found in Winfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
+  end if
+
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
@@ -213,10 +265,16 @@ implicit none
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
  
+  write(*,*) "After setting surf_w_source to Qinfl2MicP: "
+  ! Check for NaN in surf_w_source
+  if (any(is_nan(surf_w_source))) then
+    write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,NYS)], is_nan(surf_w_source))
+  end if
+
   !Compute potential water loss(or gain) before next EcoSIM run
-  Wat_next = VLWatMicP1_vr(1,1,1) - Qinfl2MicP(NY,1) / (dts_HeatWatTP)
-  write(*,*) "(End EcoSIM Advance) Total Water Volume in top layer: ", VLWatMicP1_vr(1,1,1), " m, Q_w: ", surf_w_source(1)
-  write(*,*) "After an hour of this flux the water content should be: ", Wat_next
+  !Wat_next = VLWatMicP1_vr(1,1,1) - Qinfl2MicP(NY,1) / (dts_HeatWatTP)
+  !write(*,*) "(End EcoSIM Advance) Total Water Volume in top layer: ", VLWatMicP1_vr(1,1,1), " m, Q_w: ", surf_w_source(1)
+  !write(*,*) "After an hour of this flux the water content should be: ", Wat_next
 
   end subroutine RunEcoSIMSurfaceBalance
 

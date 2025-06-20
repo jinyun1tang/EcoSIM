@@ -10,6 +10,7 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   public :: ForceGasAquaEquil
+  ! Add this interface block
   contains
 
   subroutine PhasePartition(VG,VW,SL,CW,CG)
