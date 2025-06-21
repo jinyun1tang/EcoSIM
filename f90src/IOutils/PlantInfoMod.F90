@@ -442,7 +442,7 @@ implicit none
     ENDIF
     MatureGroup_pft(NZ,NY,NX)=MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
-      CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax(NY,NX)
+      CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax_col(NY,NX)
     ENDIF
     D5: DO NB=1,NumOfCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
@@ -483,7 +483,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'MY', loc, MY_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'MY', loc, Myco_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
@@ -757,7 +757,7 @@ implicit none
   end select
   call writefixsl(nu_plt,'Storage organ IRTYP',strval,40)
 
-  select case(MY_pft(NZ,NY,NX))
+  select case(Myco_pft(NZ,NY,NX))
   case (1)
     strval='No'
   case (2)

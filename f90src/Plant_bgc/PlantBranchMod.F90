@@ -2426,7 +2426,7 @@ module PlantBranchMod
     ElmAllocmat4Litr                  => plt_soilchem%ElmAllocmat4Litr,               &
     iYearCurrent                      => plt_site%iYearCurrent,                       &
     LitrfalStrutElms_pvr              => plt_bgcr%LitrfalStrutElms_pvr,               &
-    MY_pft                            => plt_morph%MY_pft,                            &
+    Myco_pft                            => plt_morph%Myco_pft,                            &
     InternodeHeightDead_brch          => plt_morph%InternodeHeightDead_brch,          &
     LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch,           &
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch,           &

@@ -110,7 +110,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature during canopy energy iteration, [K]
   real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                     !minimum sink strength for nonstructural C transfer, [g d-2]
   real(r8),target,allocatable ::  NetCumElmntFlx2Plant_pft(:,:,:,:)          !effect of canopy chemical element status on seed setting, []
-  real(r8),target,allocatable ::  tCanLeafC_cl(:,:,:)                        !total leaf mass, [g d-2]
+  real(r8),target,allocatable ::  tCanLeafC_clyr(:,:,:)                        !total leaf mass, [g d-2]
   real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)              !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                     !shoot structural chemical element, [g d-2]
   real(r8),target,allocatable ::  C4PhotoShootNonstC_brch(:,:,:,:)           !C4 specific nonstructural shoot C in branch, [gC d-2]
@@ -275,7 +275,7 @@ module CanopyDataType
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
   allocate(CPOOL3_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3_node=0._r8
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
-  allocate(tCanLeafC_cl(NumOfCanopyLayers,JY,JX));    tCanLeafC_cl=0._r8
+  allocate(tCanLeafC_clyr(NumOfCanopyLayers,JY,JX));    tCanLeafC_clyr=0._r8
   allocate(ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));ElmAllocmat4Litr=0._r8
   allocate(ShootStrutElms_pft(NumPlantChemElms,JP,JY,JX)); ShootStrutElms_pft=0._r8
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
@@ -439,7 +439,7 @@ module CanopyDataType
   call destroy(CPOOL3_node)
   call destroy(ShootElms_pft)
   call destroy(NetCumElmntFlx2Plant_pft)
-  call destroy(tCanLeafC_cl)
+  call destroy(tCanLeafC_clyr)
   call destroy(ElmAllocmat4Litr)
   call destroy(ShootStrutElms_pft)
   call destroy(LeafStrutElms_pft)

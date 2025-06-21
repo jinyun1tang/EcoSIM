@@ -129,7 +129,7 @@ module StartsMod
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
@@ -201,7 +201,7 @@ module StartsMod
   CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
   CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
   CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
+  tCanLeafC_clyr(1:NumOfCanopyLayers,:,:)        = 0.0_r8
 !
   
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
@@ -1045,7 +1045,7 @@ module StartsMod
 !     TairKClimMean_col=mean annual air temperature (K)
 !     tPBOT = # atmosphere
       tPBOT=1._r8   
-      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
@@ -1114,7 +1114,7 @@ module StartsMod
   CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
   CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
   CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
+  tCanLeafC_clyr(1:NumOfCanopyLayers,:,:)        = 0.0_r8
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 

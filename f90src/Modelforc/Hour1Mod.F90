@@ -326,7 +326,7 @@ module Hour1Mod
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
-      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
+      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
       
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3

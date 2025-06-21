@@ -414,7 +414,7 @@ module PlantPhenolMod
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft,  &
     NU                        => plt_site%NU,                        &
     iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch,   &
-    MY_pft                    => plt_morph%MY_pft,                   &
+    Myco_pft                    => plt_morph%Myco_pft,                   &
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,       &
     NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft,      &
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft,        &
@@ -447,7 +447,7 @@ module PlantPhenolMod
 ! CPOOLR,ZPOOLR,PPOOLR=non-structl C,N,P in root(1),myco(2)(g)
 ! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
 !
-  D180: DO N=1,MY_pft(NZ)
+  D180: DO N=1,Myco_pft(NZ)
     D160: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms
@@ -667,7 +667,7 @@ module PlantPhenolMod
 
   associate(                                                  &
     DayLenthCurrent       => plt_site%DayLenthCurrent,        &
-    DayLenthMax           => plt_site%DayLenthMax,            &
+    DayLenthMax_col           => plt_site%DayLenthMax_col,            &
     PSICanopyTurg_pft     => plt_ew%PSICanopyTurg_pft,        &
     doPlantLeafOut_brch   => plt_pheno%doPlantLeafOut_brch,   &
     DayLenthPrev          => plt_site%DayLenthPrev,           &
@@ -685,7 +685,7 @@ module PlantPhenolMod
     Hours4Leafout_brch    => plt_pheno%Hours4Leafout_brch     &
   )
 
-  IF((DayLenthCurrent.GE.DayLenthPrev .OR. DayLenthCurrent.GE.DayLenthMax-2.0_r8) &
+  IF((DayLenthCurrent.GE.DayLenthPrev .OR. DayLenthCurrent.GE.DayLenthMax_col-2.0_r8) &
     .AND. doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
     IF(TCGroth_pft(NZ).GE.TC4LeafOut_pft(NZ) .AND. PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN
       Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
@@ -716,7 +716,7 @@ module PlantPhenolMod
 !     ALAT=latitude
 !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
 !
-  IF((DayLenthCurrent.LT.DayLenthPrev .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax+2.0_r8) &
+  IF((DayLenthCurrent.LT.DayLenthPrev .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax_col+2.0_r8) &
     .AND. doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
     IF(TCGroth_pft(NZ).LE.TC4LeafOff_pft(NZ) .OR. &
       PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
