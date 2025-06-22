@@ -119,37 +119,34 @@ module GrosubPars
   character(len=64),allocatable :: koppen_clim_long(:)
 
   type, public :: plant_bgc_par_type
-   !nonstructural(0,*),
-   !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer :: inonstruct
-  integer :: ifoliar
-  integer :: inonfoliar
-  integer :: istalk
-  integer :: iroot
-  integer :: icwood
+  integer :: inonstruct                  !group id of plant nonstructural litter
+  integer :: ifoliar                     !group id of plant foliar litter
+  integer :: inonfoliar                  !group id of plant non-foliar litter group
+  integer :: istalk                      !group id of plant stalk litter group
+  integer :: iroot                       !group id of plant root litter
+  integer :: icwood                      !group id of coarse woody litter
   integer :: NumGrowthStages             !number of growth stages
   integer :: MaxNumRootAxes              !maximum number of root axes
-  integer  :: JP1                        !number of plants
-  integer  :: MaxNumBranches             !maximum number of branches
-  integer  :: NumOfSkyAzimuthSects1      !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx                      !number of organo-microbial complexes
-  integer  :: NumOfLeafAzimuthSectors    !number of sectors for the leaf azimuth, [0,pi]
-  integer  :: NumOfCanopyLayers1         !number of canopy layers
-  integer  :: JZ1                        !number of soil layers
-  integer  :: NumOfLeafZenithSectors1    !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: MaxNodesPerBranch1         !maximum number of canopy nodes, 25
-  integer  :: jsken                      !number of kinetic components in litter,PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
-  integer  :: NumLitterGroups            !number of litter groups nonstructural(0,*),
-                                         !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer  :: NumOfPlantMorphUnits       !number of plant organs
-  integer  :: NumOfPlantLitrCmplxs       !number of plant litter microbial-om complexes
-  integer :: iprotein
-  integer :: icarbhyro
-  integer :: icellulos
-  integer :: ilignin
-  integer :: k_woody_litr
-  integer :: k_fine_litr
-  integer :: jroots
+  integer :: JP1                         !number of plants
+  integer :: MaxNumBranches              !maximum number of branches
+  integer :: NumOfSkyAzimuthSects1       !number of sectors for the sky azimuth  [0,2*pi]
+  integer :: jcplx                       !number of organo-microbial complexes
+  integer :: NumOfLeafAzimuthSectors     !number of sectors for the leaf azimuth, [0,pi]
+  integer :: NumOfCanopyLayers1          !number of canopy layers
+  integer :: JZ1                         !number of soil layers
+  integer :: NumOfLeafZenithSectors1     !number of sectors for the leaf zenith [0,pi/2]
+  integer :: MaxNodesPerBranch1          !maximum number of canopy nodes, 25
+  integer :: jsken                       !number of kinetic components in litter
+  integer :: NumLitterGroups             !number of litter groups nonstructural(0,*)                         
+  integer :: NumOfPlantMorphUnits        !number of plant organs
+  integer :: NumOfPlantLitrCmplxs        !number of plant litter microbial-om complexes
+  integer :: iprotein                    !kinetic id of litter component as protein
+  integer :: icarbhyro                   !kinetic id of litter component as carbonhydrate
+  integer :: icellulos                   !kinetic id of litter component as cellulose
+  integer :: ilignin                     !kinetic id of litter component as lignin
+  integer :: k_woody_litr                !woody litter complex id
+  integer :: k_fine_litr                 !fine litter complex id
+  integer :: jroots                      !number of root groups, plant root + myco types
   end type plant_bgc_par_type
 
   contains
