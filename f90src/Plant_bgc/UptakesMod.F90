@@ -27,6 +27,7 @@ module UptakesMod
 
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000, MPa/m.
   contains
+  ![header]
 
   subroutine InitUptake
 
@@ -1434,4 +1435,5 @@ module UptakesMod
   end associate
   end subroutine SetCanopyGrowthFuncs
 
+  ![tail]
 end module UptakesMod
