@@ -23,7 +23,8 @@ module SurfaceRadiationMod
   real(r8), parameter :: StalkClumpFactor   = 0.5_r8           !stalk clumping factor, FORGW = minimum SOC or organic soil (g Mg-1)
 
   contains
-
+  ![header]
+!----------------------------------------------------------------------------------------------------
   subroutine CanopyConditionModel(I,J,DepthSurfWatIce)
   implicit none
   integer, intent(in) :: I,J
@@ -46,8 +47,8 @@ module SurfaceRadiationMod
 
   end subroutine CanopyConditionModel
 
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine CalcBoundaryLayerProperties(DepthSurfWatIce)
   implicit none
   real(r8), intent(in) :: DepthSurfWatIce
@@ -56,26 +57,26 @@ module SurfaceRadiationMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
-  associate(                                                     &
-    WindSpeedAtm_col        => plt_site%WindSpeedAtm_col,        & !Input:
-    WindMesureHeight_col    => plt_site%WindMesureHeight_col,    &  !Input:
-    ZERO                    => plt_site%ZERO,                    &
-    AREA3                   => plt_site%AREA3,                   &
-    KoppenClimZone          => plt_site%KoppenClimZone,          &
-    SoilSurfRoughnesst0_col => plt_site%SoilSurfRoughnesst0_col, &
-    ZEROS                   => plt_site%ZEROS,                   &
-    NU                      => plt_site%NU,                      &
-    AbvCanopyBndlResist_col => plt_ew%AbvCanopyBndlResist_col,   &
-    ZERO4PlantDisplace_col  => plt_ew%ZERO4PlantDisplace_col,    &
-    RoughHeight             => plt_ew%RoughHeight,               &
-    RIB                     => plt_ew%RIB,                       &
-    TairK                   => plt_ew%TairK,                     & !Input
-    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col,      &
-    SnowDepth               => plt_ew%SnowDepth,                 &
-    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col,     &
-    CanopyHeight_col        => plt_morph%CanopyHeight_col,       &  !Input:
-    StemArea_col            => plt_morph%StemArea_col,           &  !Input:
-    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col      &  !Input:
+  associate(                                                      &
+    WindSpeedAtm_col        => plt_site%WindSpeedAtm_col         ,& !input  :wind speed, [m h-1]
+    WindMesureHeight_col    => plt_site%WindMesureHeight_col     ,& !input  :wind speed measurement height, [m]
+    ZERO                    => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
+    AREA3                   => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    KoppenClimZone          => plt_site%KoppenClimZone           ,& !input  :Koppen climate zone for the grid,[-]
+    SoilSurfRoughnesst0_col => plt_site%SoilSurfRoughnesst0_col  ,& !input  :initial soil surface roughness height, [m]
+    ZEROS                   => plt_site%ZEROS                    ,& !input  :threshold zero for numerical stability,[-]
+    NU                      => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
+    TairK                   => plt_ew%TairK                      ,& !input  :air temperature, [K]
+    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col       ,& !input  :minimum snowpack heat capacity, [MJ d-2 K-1]
+    SnowDepth               => plt_ew%SnowDepth                  ,& !input  :snowpack depth, [m]
+    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col      ,& !input  :snowpack heat capacity, [MJ m-3 K-1]
+    CanopyHeight_col        => plt_morph%CanopyHeight_col        ,& !input  :canopy height , [m]
+    StemArea_col            => plt_morph%StemArea_col            ,& !input  :grid canopy stem area, [m2 d-2]
+    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
+    AbvCanopyBndlResist_col => plt_ew%AbvCanopyBndlResist_col    ,& !output :isothermal boundary layer resistance, [h m-1]
+    ZERO4PlantDisplace_col  => plt_ew%ZERO4PlantDisplace_col     ,& !output :zero plane displacement height, [m]
+    RoughHeight             => plt_ew%RoughHeight                ,& !output :canopy surface roughness height, [m]
+    RIB                     => plt_ew%RIB                         & !output :Richardson number for calculating boundary layer resistance, [-]
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -123,8 +124,7 @@ module SurfaceRadiationMod
   end associate
   end subroutine CalcBoundaryLayerProperties
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine DivideCanopyAreaByHeight(I,J,DepthSurfWatIce)
   implicit none
   integer, intent(in) :: I,J
@@ -136,16 +136,16 @@ module SurfaceRadiationMod
   real(r8) :: DZL  !canopy interval height 
   integer :: NZ,L,K,NB,N
   !     begin_execution
-  associate(                                                  &
-    NP                    => plt_site%NP,                     & !Input: Number of pfts [m]
-    ZEROS                 => plt_site%ZEROS,                  & !Input: Auxiallary variable for threshold testing.
-    CanopyHeight_col      => plt_morph%CanopyHeight_col,      & 
-    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col,     & !Input: pft Canopy height [m], 
-    CanopyHeight_pft      => plt_morph%CanopyHeight_pft,      &
-    CanopyStemAareZ_col   => plt_morph%CanopyStemAareZ_col,   &
-    CanopyLeafAareZ_col   => plt_morph%CanopyLeafAareZ_col,   & !Input: vertically resolved Canopy LAI [m2/m2]
-    StemArea_col          => plt_morph%StemArea_col,          & !Input: vertically resolved stem LAI [m2/m2]
-    CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col     &
+  associate(                                               &
+    NP                  => plt_site%NP                    ,& !input  :current number of plant species,[-]
+    ZEROS               => plt_site%ZEROS                 ,& !input  :threshold zero for numerical stability,[-]
+    CanopyHeight_pft    => plt_morph%CanopyHeight_pft     ,& !input  :canopy height, [m]
+    CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !input  :total stem area, [m2 d-2]
+    CanopyLeafAareZ_col => plt_morph%CanopyLeafAareZ_col  ,& !input  :total leaf area, [m2 d-2]
+    StemArea_col        => plt_morph%StemArea_col         ,& !input  :grid canopy stem area, [m2 d-2]
+    CanopyLeafArea_col  => plt_morph%CanopyLeafArea_col   ,& !input  :grid canopy leaf area, [m2 d-2]
+    CanopyHeight_col    => plt_morph%CanopyHeight_col     ,& !inoput :canopy height , [m]
+    CanopyHeightZ_col   => plt_morph%CanopyHeightZ_col     & !output :canopy layer height, [m]
   )
   !
   !     DIVISION OF CANOPY INTO NumOfCanopyLayers LAYERS WITH EQUAL LAI
@@ -195,8 +195,7 @@ module SurfaceRadiationMod
   end associate
   end subroutine DivideCanopyAreaByHeight
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
   !
   !Description:
@@ -208,18 +207,18 @@ module SurfaceRadiationMod
   real(r8), intent(out) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    !leaf area in different angle sector
   real(r8), intent(out) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    !stem area in different angle sector
 
-  associate(                                                  &
-    NP                    => plt_site%NP,                     &
-    ZERO                  => plt_site%ZERO,                   &
-    SnowDepth             => plt_ew%SnowDepth,                &
-    LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft,     &
-    NumOfBranches_pft     => plt_morph%NumOfBranches_pft,     &  !Output: PFT canopy LAI
-    LeafStalkArea_col     => plt_morph%LeafStalkArea_col,     &  !Output: COL canopy LAI
-    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch,     &  !Input:
-    CanopyLeafArea_lnode  => plt_morph%CanopyLeafArea_lnode,  &  !Input:
-    StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch,     &  !Input:
-    CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch, &
-    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col      &
+  associate(                                                   &
+    NP                    => plt_site%NP                      ,& !input  :current number of plant species,[-]
+    ZERO                  => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
+    SnowDepth             => plt_ew%SnowDepth                 ,& !input  :snowpack depth, [m]
+    NumOfBranches_pft     => plt_morph%NumOfBranches_pft      ,& !input  :number of branches,[-]
+    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch      ,& !input  :leaf surface area, [m2 d-2]
+    CanopyLeafArea_lnode  => plt_morph%CanopyLeafArea_lnode   ,& !input  :layer/node/branch leaf area, [m2 d-2]
+    StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch      ,& !input  :stem surface area, [m2 d-2]
+    CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch  ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+    CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col      ,& !input  :canopy layer height, [m]
+    LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft      ,& !inoput :plant leaf+stem/stalk area, [m2 d-2]
+    LeafStalkArea_col     => plt_morph%LeafStalkArea_col       & !inoput :stalk area of combined, each PFT canopy,[m^2 d-2]
   )
   
   LeafStalkArea_col=0.0_r8
@@ -276,8 +275,7 @@ module SurfaceRadiationMod
   end associate
   end subroutine SummaryCanopyArea
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine SurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
   !
   !
@@ -292,35 +290,35 @@ module SurfaceRadiationMod
   integer  :: NZ,N
   real(r8) :: FRadPARbyLeafT,RadSW_Grnd
   !     begin_execution
-  associate(                                                   &
-    ZEROS                  => plt_site%ZEROS,                  & !in:  
-    ZERO                   => plt_site%ZERO,                   & !in:    
-    NP                     => plt_site%NP,                     & !in:    
-    NU                     => plt_site%NU,                     & !in:    
-    AREA3                  => plt_site%AREA3,                  & !in:    
-    CosineGrndSlope_col    => plt_rad%CosineGrndSlope_col,     & !in:
-    SineGrndSlope_col      => plt_rad%SineGrndSlope_col,       & !in:  
-    GroundSurfAzimuth_col  => plt_rad%GroundSurfAzimuth_col,   & !in:   
-    TotSineSkyAngles_grd   => plt_rad%TotSineSkyAngles_grd,    & !in:    
-    OMEGAG                 => plt_rad%OMEGAG,                  & !in:     
-    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,       & !   
-    SolarNoonHour_col      => plt_site%SolarNoonHour_col,      & !Input:    
-    RadSWDirect_col        => plt_rad%RadSWDirect_col,         & !inout: incident direct sw radiation,  MJ/hour/m2  
-    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,         & !inout: incident diffuse sw radiation, MJ/hour/m2    
-    RadPARDirect_col       => plt_rad%RadPARDirect_col,        & !inout: umol /m2/s    
-    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,        & !inout: umol /m2/s    
-    RadSWSolarBeam_col     => plt_rad%RadSWSolarBeam_col,      & !out  : total shortwave solar radiation,     MJ/hour/m2  
-    RadPARSolarBeam_col    => plt_rad%RadPARSolarBeam_col,     &        
-    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,      & !out:     
-    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,    & !Input: sine of solar incident angle
-    FracPARads2Canopy_pft  => plt_rad%FracPARads2Canopy_pft,   &  
-    FracSWRad2Grnd_col     => plt_rad%FracSWRad2Grnd_col,      & !out
-    RadSWGrnd_col          => plt_rad%RadSWGrnd_col,           &  !output: total shortwave radiation on ground, MJ/hour/d2    
-    ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,    &        
-    CanopyLeafArea_pft     => plt_morph%CanopyLeafArea_pft,    &  !in:     
-    LeafStalkArea_pft      => plt_morph%LeafStalkArea_pft,     &  !in:      
-    ClumpFactor_pft        => plt_morph%ClumpFactor_pft  ,     &  !Input:       
-    LeafStalkArea_col      => plt_morph%LeafStalkArea_col      &  !Input:    
+  associate(                                                 &
+    ZEROS                 => plt_site%ZEROS                 ,& !input  :threshold zero for numerical stability,[-]
+    ZERO                  => plt_site%ZERO                  ,& !input  :threshold zero for numerical stability, [-]
+    NP                    => plt_site%NP                    ,& !input  :current number of plant species,[-]
+    NU                    => plt_site%NU                    ,& !input  :current soil surface layer number, [-]
+    AREA3                 => plt_site%AREA3                 ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    CosineGrndSlope_col   => plt_rad%CosineGrndSlope_col    ,& !input  :cosine of slope, [-]
+    SineGrndSlope_col     => plt_rad%SineGrndSlope_col      ,& !input  :sine of slope, [-]
+    GroundSurfAzimuth_col => plt_rad%GroundSurfAzimuth_col  ,& !input  :azimuth of slope, [-]
+    TotSineSkyAngles_grd  => plt_rad%TotSineSkyAngles_grd   ,& !input  :sine of sky angles,[-]
+    OMEGAG                => plt_rad%OMEGAG                 ,& !input  :sine of solar beam on leaf surface, [-]
+    SolarNoonHour_col     => plt_site%SolarNoonHour_col     ,& !input  :time of solar noon, [h]
+    SineSunInclAngle_col  => plt_rad%SineSunInclAngle_col   ,& !input  :sine of solar angle, [-]
+    CanopyLeafArea_pft    => plt_morph%CanopyLeafArea_pft   ,& !input  :plant canopy leaf area, [m2 d-2]
+    LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft    ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
+    ClumpFactor_pft       => plt_morph%ClumpFactor_pft      ,& !input  :clumping factor for self-shading in canopy layer, [-]
+    LeafStalkArea_col     => plt_morph%LeafStalkArea_col    ,& !input  :stalk area of combined, each PFT canopy,[m^2 d-2]
+    RadSWDirect_col       => plt_rad%RadSWDirect_col        ,& !inoput :direct shortwave radiation, [W m-2]
+    RadSWDiffus_col       => plt_rad%RadSWDiffus_col        ,& !inoput :diffuse shortwave radiation, [W m-2]
+    RadPARDirect_col      => plt_rad%RadPARDirect_col       ,& !inoput :direct PAR, [umol m-2 s-1]
+    RadPARDiffus_col      => plt_rad%RadPARDiffus_col       ,& !inoput :diffuse PAR, [umol m-2 s-1]
+    FracSWRad2Grnd_col    => plt_rad%FracSWRad2Grnd_col     ,& !inoput :fraction of radiation intercepted by ground surface, [-]
+    RadSWbyCanopy_pft     => plt_rad%RadSWbyCanopy_pft      ,& !output :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    RadSWSolarBeam_col    => plt_rad%RadSWSolarBeam_col     ,& !output :shortwave radiation in solar beam, [MJ m-2 h-1]
+    RadPARSolarBeam_col   => plt_rad%RadPARSolarBeam_col    ,& !output :PAR radiation in solar beam, [umol m-2 s-1]
+    RadPARbyCanopy_pft    => plt_rad%RadPARbyCanopy_pft     ,& !output :canopy absorbed PAR, [umol m-2 s-1]
+    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft  ,& !output :fraction of incoming PAR absorbed by canopy, [-]
+    RadSWGrnd_col         => plt_rad%RadSWGrnd_col          ,& !output :radiation intercepted by ground surface, [MJ m-2 h-1]
+    ClumpFactorNow_pft    => plt_morph%ClumpFactorNow_pft    & !output :clumping factor for self-shading in canopy layer at current LAI, [-]
   )
   !     MULTILAYER CANOPY INTERECEPTION OF DIRECT AND DIFFUSE RADIATION
   !     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
@@ -423,8 +421,7 @@ module SurfaceRadiationMod
   end associate
   end subroutine SurfaceRadiation
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine MultiCanLayerRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft,&
     SolarAzimuthAngle,CosineSunInclAngle,GrndIncidSolarAngle)
   !
@@ -496,54 +493,50 @@ module SurfaceRadiationMod
   REAL(R8) :: LeafAzimuthAngle,ZAGL
 
 
-  associate(                                                   &
-    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col,   &
-    VcumIceSnow_col        => plt_ew%VcumIceSnow_col,         &
-    VcumDrySnoWE_col       => plt_ew%VcumDrySnoWE_col,        &
-    VcumWatSnow_col        => plt_ew%VcumWatSnow_col,         &
-    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col,    &
-    SnowDepth              => plt_ew%SnowDepth,               &
-    RadSWLeafAlbedo_pft    => plt_rad%RadSWLeafAlbedo_pft,    &
-    SoilAlbedo             => plt_rad%SoilAlbedo,             &
-    SurfAlbedo_col         => plt_rad%SurfAlbedo_col,         &
-    CanopyPARalbedo_pft    => plt_rad%CanopyPARalbedo_pft,    &
-    iScatteringDiffus      => plt_rad%iScatteringDiffus,      &
-    OMEGA                  => plt_rad%OMEGA,                  &
-    FracPARads2Canopy_pft  => plt_rad%FracPARads2Canopy_pft,  &
-    RadPAR_zsec            => plt_rad%RadPAR_zsec,            &
-    RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec,         &
-    OMEGAG                 => plt_rad%OMEGAG,                 &
-    OMEGX                  => plt_rad%OMEGX,                  &
-    RadSWGrnd_col          => plt_rad%RadSWGrnd_col,          &  !output: total shortwave radiation on ground, MJ/hour/d2
-    RadSWDirect_col        => plt_rad%RadSWDirect_col,        &  !Input: incident direct sw radiation,         MJ/hour/m2
-    RadSWDiffus_col        => plt_rad%RadSWDiffus_col,        &  !Input: incident diffuse sw radiation,        MJ/hour/m2
-    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft,      &
-    RadPARDiffus_col       => plt_rad%RadPARDiffus_col,       & !Input: umol /m2/s
-    RadPARDirect_col       => plt_rad%RadPARDirect_col,       & !Input: umol /m2/s
-    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col,   & !Input:
-    TAU_RadThru            => plt_rad%TAU_RadThru,            &
-    TAU_DirectRTransmit    => plt_rad%TAU_DirectRTransmit,    &
-    SineLeafAngle          => plt_rad%SineLeafAngle,          & !Input:
-    LeafPARabsorpty_pft    => plt_rad%LeafPARabsorpty_pft,    & !: PAR absorbed by whole pft
-    LeafSWabsorpty_pft     => plt_rad%LeafSWabsorpty_pft,     & !: shortwave radiation intercepted by whole pft
-    RadPARLeafTransmis_pft => plt_rad%RadPARLeafTransmis_pft, &
-    RadSWLeafTransmis_pft  => plt_rad%RadSWLeafTransmis_pft,  &
-    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft,     &
-    CosineLeafAngle        => plt_rad%CosineLeafAngle,        & !Input:
-    NU                     => plt_site%NU,                    &
-    AREA3                  => plt_site%AREA3,                 &
-    NP                     => plt_site%NP,                    &
-    ZERO                   => plt_site%ZERO,                  &
-    ZEROS2                 => plt_site%ZEROS2,                &
-    POROS1                 => plt_site%POROS1,                &
-    VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr, &
-    VLSoilMicP_vr          => plt_soilchem%VLSoilMicP_vr,     &
-    VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr,      &
-    ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft,   &
-    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col,    &
-    NumOfBranches_pft      => plt_morph%NumOfBranches_pft,    &
-    CanopyLeafArea_lnode   => plt_morph%CanopyLeafArea_lnode, &
-    CanopyStalkArea_lbrch  => plt_morph%CanopyStalkArea_lbrch  &
+  associate(                                                    &
+    VLHeatCapSurfSnow_col  => plt_ew%VLHeatCapSurfSnow_col     ,& !input  :snowpack heat capacity, [MJ m-3 K-1]
+    VcumIceSnow_col        => plt_ew%VcumIceSnow_col           ,& !input  :ice volume in snowpack, [m3 d-2]
+    VcumDrySnoWE_col       => plt_ew%VcumDrySnoWE_col          ,& !input  :snow volume in snowpack (water equivalent), [m3 d-2]
+    VcumWatSnow_col        => plt_ew%VcumWatSnow_col           ,& !input  :water volume in snowpack, [m3 d-2]
+    VLHeatCapSnowMin_col   => plt_ew%VLHeatCapSnowMin_col      ,& !input  :minimum snowpack heat capacity, [MJ d-2 K-1]
+    SnowDepth              => plt_ew%SnowDepth                 ,& !input  :snowpack depth, [m]
+    RadSWLeafAlbedo_pft    => plt_rad%RadSWLeafAlbedo_pft      ,& !input  :canopy shortwave albedo, [-]
+    SoilAlbedo             => plt_rad%SoilAlbedo               ,& !input  :soil albedo,[-]
+    SurfAlbedo_col         => plt_rad%SurfAlbedo_col           ,& !input  :Surface albedo,[-]
+    CanopyPARalbedo_pft    => plt_rad%CanopyPARalbedo_pft      ,& !input  :canopy PAR albedo, [-]
+    iScatteringDiffus      => plt_rad%iScatteringDiffus        ,& !input  :flag for calculating backscattering of radiation in canopy,[-]
+    OMEGA                  => plt_rad%OMEGA                    ,& !input  :sine of indirect sky radiation on leaf surface,[-]
+    OMEGAG                 => plt_rad%OMEGAG                   ,& !input  :sine of solar beam on leaf surface, [-]
+    OMEGX                  => plt_rad%OMEGX                    ,& !input  :sine of indirect sky radiation on leaf surface/sine of indirect sky radiation,[-]
+    RadSWDirect_col        => plt_rad%RadSWDirect_col          ,& !input  :direct shortwave radiation, [W m-2]
+    RadSWDiffus_col        => plt_rad%RadSWDiffus_col          ,& !input  :diffuse shortwave radiation, [W m-2]
+    RadPARDiffus_col       => plt_rad%RadPARDiffus_col         ,& !input  :diffuse PAR, [umol m-2 s-1]
+    RadPARDirect_col       => plt_rad%RadPARDirect_col         ,& !input  :direct PAR, [umol m-2 s-1]
+    SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col     ,& !input  :sine of solar angle, [-]
+    SineLeafAngle          => plt_rad%SineLeafAngle            ,& !input  :sine of leaf angle,[-]
+    LeafPARabsorpty_pft    => plt_rad%LeafPARabsorpty_pft      ,& !input  :canopy PAR absorptivity,[-]
+    LeafSWabsorpty_pft     => plt_rad%LeafSWabsorpty_pft       ,& !input  :canopy shortwave absorptivity, [-]
+    RadPARLeafTransmis_pft => plt_rad%RadPARLeafTransmis_pft   ,& !input  :canopy PAR transmissivity, [-]
+    RadSWLeafTransmis_pft  => plt_rad%RadSWLeafTransmis_pft    ,& !input  :canopy shortwave transmissivity, [-]
+    CosineLeafAngle        => plt_rad%CosineLeafAngle          ,& !input  :cosine of leaf angle,[-]
+    NU                     => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
+    AREA3                  => plt_site%AREA3                   ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    NP                     => plt_site%NP                      ,& !input  :current number of plant species,[-]
+    ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
+    ZEROS2                 => plt_site%ZEROS2                  ,& !input  :threshold zero for numerical stability,[-]
+    POROS1                 => plt_site%POROS1                  ,& !input  :top layer soil porosity, [m3 m-3]
+    VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr   ,& !input  :volume of soil layer, [m3 d-2]
+    VLSoilMicP_vr          => plt_soilchem%VLSoilMicP_vr       ,& !input  :total micropore volume in layer, [m3 d-2]
+    VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr        ,& !input  :soil micropore water content, [m3 d-2]
+    ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft     ,& !input  :clumping factor for self-shading in canopy layer at current LAI, [-]
+    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col      ,& !input  :canopy layer height, [m]
+    RadPAR_zsec            => plt_rad%RadPAR_zsec              ,& !inoput :direct incoming PAR, [umol m-2 s-1]
+    RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec           ,& !inoput :diffuse incoming PAR, [umol m-2 s-1]
+    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft        ,& !inoput :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    TAU_DirectRTransmit    => plt_rad%TAU_DirectRTransmit      ,& !inoput :fraction of radiation intercepted by canopy layer, [-]
+    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft       ,& !inoput :canopy absorbed PAR, [umol m-2 s-1]
+    RadSWGrnd_col          => plt_rad%RadSWGrnd_col            ,& !output :radiation intercepted by ground surface, [MJ m-2 h-1]
+    TAU_RadThru            => plt_rad%TAU_RadThru               & !output :fraction of radiation transmitted by canopy layer, [-]
   )
 
   SolarAngle=ASIN(SineSunInclAngle_col)
@@ -1011,5 +1004,5 @@ module SurfaceRadiationMod
   ENDDO D2800        
   end associate
   end subroutine MultiCanLayerRadiation
-
+  ![tail]
 end module SurfaceRadiationMod

@@ -18,8 +18,8 @@ module PlantNonstElmDynMod
   public :: StalkRsrvShootNonstTransfer
   public :: StalkRsrvRootNonstTransfer
   contains
-
-
+  ![header]
+!----------------------------------------------------------------------------------------------------
   subroutine WithinBranchElmTransfer(I,J,NZ)
 
   implicit none
@@ -36,18 +36,18 @@ module PlantNonstElmDynMod
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: LeafPetoMassC_brch(NumOfCanopyLayers1)
-  associate(                                                      &
-    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
-    iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch,     &
-    Hours2LeafOut_brch      => plt_pheno%Hours2LeafOut_brch,      &
-    StalkLiveBiomassC_brch      => plt_biom%StalkLiveBiomassC_brch,       &
-    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch,       &
-    LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch,   &
-    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
-    iPlantBranchState_brch  => plt_pheno%iPlantBranchState_brch,  &
-    CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch,     &
-    NumOfBranches_pft       => plt_morph%NumOfBranches_pft        &
-  )  
+  associate(                                                       &
+    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
+    iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch      ,& !input  :plant growth stage, [-]
+    Hours2LeafOut_brch      => plt_pheno%Hours2LeafOut_brch       ,& !input  :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+    StalkLiveBiomassC_brch  => plt_biom%StalkLiveBiomassC_brch    ,& !input  :branch live stalk C, [gC d-2]
+    LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch    ,& !input  :plant branch leaf + sheath C, [g d-2]
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
+    iPlantBranchState_brch  => plt_pheno%iPlantBranchState_brch   ,& !input  :flag to detect branch death, [-]
+    NumOfBranches_pft       => plt_morph%NumOfBranches_pft        ,& !input  :number of branches,[-]
+    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
+    CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch       & !inoput :branch nonstructural element, [g d-2]
+  )
     !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
     !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
     !     WHEN SEASONAL STORAGE C IS NOT BEING MOBILIZED
@@ -155,7 +155,7 @@ module PlantNonstElmDynMod
   end associate   
   end subroutine WithinBranchElmTransfer    
 
-!------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------
   subroutine RootMycoNonstTransfer(I,J,NZ)
   implicit none
   integer, intent(in) :: i,J,nz
@@ -166,14 +166,14 @@ module PlantNonstElmDynMod
   real(r8) :: XFRE(NumPlantChemElms)  
   real(r8) :: WTRTD1,WTRTD2,CPOOLT
   real(r8) :: TwoCompMassC,NonstElmGradt
-  associate(                                                 &
-    NU                     => plt_site%NU,                   &
-    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft,       &
-    NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft, &
-    PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr,   &
-    ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft,     &
-    Myco_pft                 => plt_morph%Myco_pft,              &
-    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr&
+  associate(                                                    &
+    NU                     => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
+    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
+    NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    ,& !input  :maximum soil layer number for all root axes, [-]
+    PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr      ,& !input  :root layer C, [gC d-2]
+    ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft        ,& !input  :threshold zero for leaf calculation, [-]
+    Myco_pft               => plt_morph%Myco_pft               ,& !input  :mycorrhizal type (no or yes),[-]
+    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr   & !inoput :root layer nonstructural element, [g d-2]
   )
 
 !     TRANSFER NON-STRUCTURAL C,N,P BWTWEEN ROOT AND MYCORRHIZAE
@@ -229,7 +229,7 @@ module PlantNonstElmDynMod
   end associate
   end subroutine RootMycoNonstTransfer
 
-!------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------
   subroutine SeasonStoreRootNonstTransfer(I,J,NZ)
 
   !for perennial plants only
@@ -242,15 +242,15 @@ module PlantNonstElmDynMod
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
 
-  associate(                                                          &
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft,          &
-    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &
-    NU                        => plt_site%NU,                         &
-    Myco_pft                    => plt_morph%Myco_pft,                    &
-    ZERO                      => plt_site%ZERO,                       &
-    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
-    RootNonstructElmConc_rpvr  => plt_biom%RootNonstructElmConc_rpvr,   &
-    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr      &
+  associate(                                                           &
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
+    Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
+    ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
+    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft       ,& !inoput :plant stored nonstructural element at current step, [g d-2]
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr       & !inoput :root layer nonstructural element, [g d-2]
   )
     DO NE=1,NumPlantChemElms
       mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ))+SeasonalNonstElms_pft(NE,NZ)
@@ -287,7 +287,7 @@ module PlantNonstElmDynMod
   end associate
   end subroutine SeasonStoreRootNonstTransfer  
 
-!------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------
   subroutine ShootRootElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC)
   implicit none
@@ -321,38 +321,34 @@ module PlantNonstElmDynMod
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
 
-  associate(                                                                  &
-    NU                            => plt_site%NU,                             &
-    Myco_pft                        => plt_morph%Myco_pft,                        &
-    RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr,      &
-    RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr,        &
-    PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr,             &
-    FracShootLeafElmAlloc2Litr    => plt_allom%FracShootLeafElmAlloc2Litr,    &
-    FracRootElmAlloc2Litr         => plt_allom%FracRootElmAlloc2Litr,         &
-    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs,            &
-    RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr,      &
-    RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr,         &
-    LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch,         &
-    CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch,           &
-    CanopyLeafShethC_pft          => plt_biom%CanopyLeafShethC_pft,           &
-    RootElms_pft                  => plt_biom%RootElms_pft,                   &
-    ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft,                 &
-    iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft,         &
-    iPlantBranchState_brch        => plt_pheno%iPlantBranchState_brch,        &
-    iPlantPhenolPattern_pft       => plt_pheno%iPlantPhenolPattern_pft,       &
-    ShutRutNonstElmntConducts_pft => plt_pheno%ShutRutNonstElmntConducts_pft, &
-    RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr,               &
-    ECO_ER_col                    => plt_bgcr%ECO_ER_col,                     &
-    Eco_AutoR_CumYr_col           => plt_bgcr%Eco_AutoR_CumYr_col,            &
-    k_woody_litr                  => pltpar%k_woody_litr,                     &
-    k_fine_litr                   => pltpar%k_fine_litr,                      &
-    NIXBotRootLayer_pft           => plt_morph%NIXBotRootLayer_pft,           &
-    NIXBotRootLayer_rpft          => plt_morph%NIXBotRootLayer_rpft,          &
-    Root2ndRadius_pvr             => plt_morph%Root2ndRadius_pvr,             &
-    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft,              &
-    NumRootAxes_pft               => plt_morph%NumRootAxes_pft,               &
-    NumOfBranches_pft             => plt_morph%NumOfBranches_pft              &
-  )  
+  associate(                                                                   &
+    NU                            => plt_site%NU                              ,& !input  :current soil surface layer number, [-]
+    Myco_pft                      => plt_morph%Myco_pft                       ,& !input  :mycorrhizal type (no or yes),[-]
+    RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr       ,& !input  :root layer element secondary axes, [g d-2]
+    FracShootLeafElmAlloc2Litr    => plt_allom%FracShootLeafElmAlloc2Litr     ,& !input  :woody element allocation, [-]
+    FracRootElmAlloc2Litr         => plt_allom%FracRootElmAlloc2Litr          ,& !input  :C woody fraction in root,[-]
+    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs             ,& !input  :root C primary axes, [g d-2]
+    RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
+    LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch          ,& !input  :plant branch leaf + sheath C, [g d-2]
+    RootElms_pft                  => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
+    ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
+    iPlantBranchState_brch        => plt_pheno%iPlantBranchState_brch         ,& !input  :flag to detect branch death, [-]
+    iPlantPhenolPattern_pft       => plt_pheno%iPlantPhenolPattern_pft        ,& !input  :plant growth habit: annual or perennial,[-]
+    ShutRutNonstElmntConducts_pft => plt_pheno%ShutRutNonstElmntConducts_pft  ,& !input  :shoot-root rate constant for nonstructural C exchange, [h-1]
+    RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr                ,& !input  :root respiration constrained by O2, [g d-2 h-1]
+    k_fine_litr                   => pltpar%k_fine_litr                       ,& !input  :fine litter complex id
+    NIXBotRootLayer_rpft          => plt_morph%NIXBotRootLayer_rpft           ,& !input  :maximum soil layer number for root axes, [-]
+    MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft               ,& !input  :maximum soil layer number for all root axes,[-]
+    NumRootAxes_pft               => plt_morph%NumRootAxes_pft                ,& !input  :root primary axis number,[-]
+    NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
+    RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr         ,& !inoput :root layer structural C, [gC d-2]
+    PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !inoput :root layer C, [gC d-2]
+    RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr          ,& !inoput :root layer nonstructural element, [g d-2]
+    CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch            ,& !inoput :branch nonstructural element, [g d-2]
+    CanopyLeafShethC_pft          => plt_biom%CanopyLeafShethC_pft            ,& !inoput :canopy leaf + sheath C, [g d-2]
+    ECO_ER_col                    => plt_bgcr%ECO_ER_col                      ,& !inoput :ecosystem respiration, [g d-2 h-1]
+    Eco_AutoR_CumYr_col           => plt_bgcr%Eco_AutoR_CumYr_col              & !inoput :ecosystem autotrophic respiration, [g d-2 h-1]
+  )
 !     ROOT AND NODULE TOTALS
 !
 !     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
@@ -501,8 +497,7 @@ module PlantNonstElmDynMod
   end associate
   end subroutine ShootRootElmTransfer  
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC,BegRemoblize)
   !
@@ -519,10 +514,10 @@ module PlantNonstElmDynMod
   real(r8), intent(in) :: RootSinkC(jroots)
 
 !     begin_execution
-  associate(                                                      &
-    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
-    Myco_pft                  => plt_morph%Myco_pft,                  &
-    NumOfBranches_pft       => plt_morph%NumOfBranches_pft        &
+  associate(                                                       &
+    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
+    Myco_pft                => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
+    NumOfBranches_pft       => plt_morph%NumOfBranches_pft         & !input  :number of branches,[-]
   )
 
 
@@ -546,8 +541,8 @@ module PlantNonstElmDynMod
 
   end associate
   end subroutine PlantNonstElmTransfer
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine SeasonStoreShootTransfer(I,J,NB,NZ)
 
   implicit none
@@ -561,14 +556,14 @@ module PlantNonstElmDynMod
   real(r8) :: XFREX(1:NumPlantChemElms)
   real(r8) :: XFRE(1:NumPlantChemElms)
 
-  associate(                                                          &
-    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &  
-    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch,  &    
-    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,       &    
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,             &  
-    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &    
-    StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch,         &    
-    StalkLiveBiomassC_brch        => plt_biom%StalkLiveBiomassC_brch          &
+  associate(                                                           &
+    LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch   ,& !input  :branch nonstructural C concentration, [g d-2]
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
+    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    StalkLiveBiomassC_brch    => plt_biom%StalkLiveBiomassC_brch      ,& !input  :branch live stalk C, [gC d-2]
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft       ,& !inoput :plant stored nonstructural element at current step, [g d-2]
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch        ,& !inoput :branch nonstructural element, [g d-2]
+    StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch           & !inoput :branch reserve element mass, [g d-2]
   )
 
   IF(StalkLiveBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND. StalkRsrvElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -614,8 +609,7 @@ module PlantNonstElmDynMod
   end associate
   end subroutine SeasonStoreShootTransfer
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine StalkRsrvShootNonstTransfer(I,J,NB,NZ)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
@@ -625,14 +619,14 @@ module PlantNonstElmDynMod
   real(r8) :: XFRE(1:NumPlantChemElms)
   integer :: NE
 
-  associate(                                                      &
-    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch,       &
-    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
-    LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch,   &
-    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
-    CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch,     &
-    StalkLiveBiomassC_brch      => plt_biom%StalkLiveBiomassC_brch        &
-  )  
+  associate(                                                       &
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
+    LeafPetolBiomassC_brch  => plt_biom%LeafPetolBiomassC_brch    ,& !input  :plant branch leaf + sheath C, [g d-2]
+    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
+    StalkLiveBiomassC_brch  => plt_biom%StalkLiveBiomassC_brch    ,& !input  :branch live stalk C, [gC d-2]
+    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
+    CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch       & !inoput :branch nonstructural element, [g d-2]
+  )
 
   ShootBiomC_brch=LeafPetolBiomassC_brch(NB,NZ)+StalkLiveBiomassC_brch(NB,NZ)
   CPOOLT=CanopyNonstElms_brch(ielmc,NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
@@ -656,8 +650,7 @@ module PlantNonstElmDynMod
   end associate
   end subroutine StalkRsrvShootNonstTransfer
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine StalkRsrvRootNonstTransfer(I,J,NB,NZ)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
@@ -667,19 +660,19 @@ module PlantNonstElmDynMod
   real(r8) :: XFRE(1:NumPlantChemElms)
   real(r8) :: NonstGradt
 
-  associate(                                                      &
-    NU                      => plt_site%NU,                       &
-    ZEROS2                  => plt_site%ZEROS2,                   &
-    k_woody_litr            => pltpar%k_woody_litr,               &
-    StalkLiveBiomassC_brch  => plt_biom%StalkLiveBiomassC_brch,   &
-    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch,       &
-    VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr,    &
-    RootMycoActiveBiomC_pvr => plt_biom%RootMycoActiveBiomC_pvr,  &
-    FracRootElmAlloc2Litr   => plt_allom%FracRootElmAlloc2Litr,   &
-    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr,   &
-    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,           &
-    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft, &
-    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         &
+  associate(                                                       &
+    NU                      => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
+    ZEROS2                  => plt_site%ZEROS2                    ,& !input  :threshold zero for numerical stability,[-]
+    k_woody_litr            => pltpar%k_woody_litr                ,& !input  :woody litter complex id
+    StalkLiveBiomassC_brch  => plt_biom%StalkLiveBiomassC_brch    ,& !input  :branch live stalk C, [gC d-2]
+    VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr     ,& !input  :volume of soil layer, [m3 d-2]
+    RootMycoActiveBiomC_pvr => plt_biom%RootMycoActiveBiomC_pvr   ,& !input  :root layer structural C, [gC d-2]
+    FracRootElmAlloc2Litr   => plt_allom%FracRootElmAlloc2Litr    ,& !input  :C woody fraction in root,[-]
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
+    iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
+    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
+    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr     & !inoput :root layer nonstructural element, [g d-2]
   )
   D2050: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
@@ -706,4 +699,5 @@ module PlantNonstElmDynMod
   ENDDO D2050
   end associate
   end subroutine StalkRsrvRootNonstTransfer
+  ![tail]
 end module PlantNonstElmDynMod

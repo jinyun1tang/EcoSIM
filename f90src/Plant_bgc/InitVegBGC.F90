@@ -8,7 +8,7 @@ module InitVegBGC
   __FILE__
   public :: InitIrradianceGeometry
   contains
-
+  ![header]
 !------------------------------------------------------------------------------------------
   subroutine InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   use CanopyRadDataType
@@ -70,5 +70,5 @@ module InitVegBGC
     ENDDO D225
   ENDDO D230
   end subroutine InitIrradianceGeometry
-
+  ![tail]
 end module InitVegBGC

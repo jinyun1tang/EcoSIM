@@ -28,7 +28,7 @@ module UptakesMod
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000, MPa/m.
   contains
   ![header]
-
+!----------------------------------------------------------------------------------------------------
   subroutine InitUptake
 
   implicit none
@@ -36,8 +36,9 @@ module UptakesMod
   call InitUptakePars
 
   end subroutine InitUptake
-!------------------------------------------------------------------------------------------
 
+
+!----------------------------------------------------------------------------------------------------
   subroutine RootUptakes(I,J)
 !  
 !  Description: MAIN_CALL
@@ -78,38 +79,38 @@ module UptakesMod
   logical  :: HydroActivePlant
   logical  :: SoiLayerHasRoot_rvr(jroots,JZ1)
 !     begin_execution
-  associate(                                                        &
-    AREA3                     => plt_site%AREA3                   , & !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft       , & !input  :canopy water content, [m3 d-2]
-    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft   , & !input  :canopy boundary layer resistance, [h m-1]
-    CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col     , & !input  :grid canopy leaf area, [m2 d-2]
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft    , & !input  :canopy leaf + sheath C, [g d-2]
-    CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft        , & !input  :canopy active stalk C, [g d-2]
-    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr     , & !input  :depth to bottom of soil layer from surface of grid cell, [m]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft        , & !input  :canopy latent heat flux, [MJ d-2 h-1]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft    , & !input  :fraction of incoming PAR absorbed by canopy, [-]
-    HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft         , & !input  :canopy sensible heat flux, [MJ d-2 h-1]
-    IsPlantActive_pft         => plt_pheno%IsPlantActive_pft      , & !input  :flag for living pft, [-]
-    LeafStalkArea_col         => plt_morph%LeafStalkArea_col      , & !input  :stalk area of combined, each PFT canopy,[m^2 d-2]
-    LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft      , & !input  :plant leaf+stem/stalk area, [m2 d-2]
-    MainBranchNum_pft         => plt_morph%MainBranchNum_pft      , & !input  :number of main branch,[-]
-    NP                        => plt_site%NP                      , & !input  :current number of plant species,[-]
-    NU                        => plt_site%NU                      , & !input  :current soil surface layer number, [-]
-    PlantPopu_col             => plt_site%PlantPopu_col           , & !input  :total plant population, [plants d-2]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft     , & !input  :plant population, [d-2]
-    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft    , & !input  :water flux into canopy, [m3 d-2 h-1]
-    Root1stDepz_pft           => plt_morph%Root1stDepz_pft        , & !input  :root layer depth, [m]
-    SeedDepth_pft             => plt_morph%SeedDepth_pft          , & !input  :seeding depth, [m]
-    TKC_pft                   => plt_ew%TKC_pft                   , & !input  :canopy temperature, [K]
-    TairK                     => plt_ew%TairK                     , & !input  :air temperature, [K]
-    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft       , & !input  :canopy surface water content, [m3 d-2]
-    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft        , & !input  :threshold zero for leaf calculation, [-]
-    ZEROS                     => plt_site%ZEROS                   , & !input  :threshold zero for numerical stability,[-]
-    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch    , & !input  :plant growth stage, [-]
-    Air_Heat_Latent_store_col => plt_ew%Air_Heat_Latent_store_col , & !inoput :total latent heat flux x boundary layer resistance, [MJ m-1]
-    Air_Heat_Sens_store_col   => plt_ew%Air_Heat_Sens_store_col   , & !inoput :total sensible heat flux x boundary layer resistance, [MJ m-1]
-    PSICanopy_pft             => plt_ew%PSICanopy_pft             , & !inoput :canopy total water potential, [Mpa]
-    Transpiration_pft         => plt_ew%Transpiration_pft         , & !output :canopy transpiration, [m2 d-2 h-1]
+  associate(                                                      &
+    AREA3                     => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft        ,& !input  :canopy water content, [m3 d-2]
+    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft    ,& !input  :canopy boundary layer resistance, [h m-1]
+    CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
+    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft     ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft         ,& !input  :canopy active stalk C, [g d-2]
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr      ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
+    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft         ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft     ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft          ,& !input  :canopy sensible heat flux, [MJ d-2 h-1]
+    IsPlantActive_pft         => plt_pheno%IsPlantActive_pft       ,& !input  :flag for living pft, [-]
+    LeafStalkArea_col         => plt_morph%LeafStalkArea_col       ,& !input  :stalk area of combined, each PFT canopy,[m^2 d-2]
+    LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft       ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft       ,& !input  :number of main branch,[-]
+    NP                        => plt_site%NP                       ,& !input  :current number of plant species,[-]
+    NU                        => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
+    PlantPopu_col             => plt_site%PlantPopu_col            ,& !input  :total plant population, [plants d-2]
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
+    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft     ,& !input  :water flux into canopy, [m3 d-2 h-1]
+    Root1stDepz_pft           => plt_morph%Root1stDepz_pft         ,& !input  :root layer depth, [m]
+    SeedDepth_pft             => plt_morph%SeedDepth_pft           ,& !input  :seeding depth, [m]
+    TKC_pft                   => plt_ew%TKC_pft                    ,& !input  :canopy temperature, [K]
+    TairK                     => plt_ew%TairK                      ,& !input  :air temperature, [K]
+    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft        ,& !input  :canopy surface water content, [m3 d-2]
+    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft         ,& !input  :threshold zero for leaf calculation, [-]
+    ZEROS                     => plt_site%ZEROS                    ,& !input  :threshold zero for numerical stability,[-]
+    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch     ,& !input  :plant growth stage, [-]
+    Air_Heat_Latent_store_col => plt_ew%Air_Heat_Latent_store_col  ,& !inoput :total latent heat flux x boundary layer resistance, [MJ m-1]
+    Air_Heat_Sens_store_col   => plt_ew%Air_Heat_Sens_store_col    ,& !inoput :total sensible heat flux x boundary layer resistance, [MJ m-1]
+    PSICanopy_pft             => plt_ew%PSICanopy_pft              ,& !inoput :canopy total water potential, [Mpa]
+    Transpiration_pft         => plt_ew%Transpiration_pft          ,& !output :canopy transpiration, [m2 d-2 h-1]
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft          & !output :canopy evaporation, [m2 d-2 h-1]
   )
 
@@ -206,8 +207,8 @@ module UptakesMod
   RETURN
   end associate
   END subroutine RootUptakes
-!------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine PrepH2ONutrientUptake(TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
 !
 !     prepare for uptake calculation
@@ -221,27 +222,27 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                                                          &
-    ALT                        => plt_site%ALT                      , & !input  :altitude of the grid cell, [m]
-    CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft      , & !input  :plant canopy leaf area, [m2 d-2]
-    CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft      , & !input  :plant stem area, [m2 d-2]
-    ElvAdjstedSoilH2OPSIMPa_vr => plt_ew%ElvAdjstedSoilH2OPSIMPa_vr , & !input  :soil micropore total water potential, [MPa]
-    MaxNumRootLays             => plt_site%MaxNumRootLays           , & !input  :maximum root layer number,[-]
-    Myco_pft                   => plt_morph%Myco_pft                , & !input  :mycorrhizal type (no or yes),[-]
-    NK                         => plt_site%NK                       , & !input  :current hydrologically active layer, [-]
-    NP                         => plt_site%NP                       , & !input  :current number of plant species,[-]
-    NP0                        => plt_site%NP0                      , & !input  :intitial number of plant species,[-]
-    NU                         => plt_site%NU                       , & !input  :current soil surface layer number, [-]
-    PopuRootMycoC_pvr          => plt_biom%PopuRootMycoC_pvr        , & !input  :root layer C, [gC d-2]
-    SoilBulkDensity_vr         => plt_soilchem%SoilBulkDensity_vr   , & !input  :soil bulk density, [Mg m-3]
-    SoilWatAirDry_vr           => plt_soilchem%SoilWatAirDry_vr     , & !input  :air-dry water content, [m3 m-3]
-    VLMicP_vr                  => plt_soilchem%VLMicP_vr            , & !input  :total volume in micropores, [m3 d-2]
-    VLSoilMicP_vr              => plt_soilchem%VLSoilMicP_vr        , & !input  :total micropore volume in layer, [m3 d-2]
-    VLWatMicPM_vr              => plt_site%VLWatMicPM_vr            , & !input  :soil micropore water content, [m3 d-2]
-    VLWatMicP_vr               => plt_soilchem%VLWatMicP_vr         , & !input  :soil micropore water content, [m3 d-2]
-    VLiceMicP_vr               => plt_soilchem%VLiceMicP_vr         , & !input  :soil micropore ice content, [m3 d-2]
-    ZERO                       => plt_site%ZERO                     , & !input  :threshold zero for numerical stability, [-]
-    LWRadCanopy_pft            => plt_rad%LWRadCanopy_pft           , & !output :canopy longwave radiation, [MJ d-2 h-1]
+  associate(                                                      &
+    ALT                        => plt_site%ALT                       ,& !input  :altitude of the grid cell, [m]
+    CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft       ,& !input  :plant canopy leaf area, [m2 d-2]
+    CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft       ,& !input  :plant stem area, [m2 d-2]
+    ElvAdjstedSoilH2OPSIMPa_vr => plt_ew%ElvAdjstedSoilH2OPSIMPa_vr  ,& !input  :soil micropore total water potential, [MPa]
+    MaxNumRootLays             => plt_site%MaxNumRootLays            ,& !input  :maximum root layer number,[-]
+    Myco_pft                   => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
+    NK                         => plt_site%NK                        ,& !input  :current hydrologically active layer, [-]
+    NP                         => plt_site%NP                        ,& !input  :current number of plant species,[-]
+    NP0                        => plt_site%NP0                       ,& !input  :intitial number of plant species,[-]
+    NU                         => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
+    PopuRootMycoC_pvr          => plt_biom%PopuRootMycoC_pvr         ,& !input  :root layer C, [gC d-2]
+    SoilBulkDensity_vr         => plt_soilchem%SoilBulkDensity_vr    ,& !input  :soil bulk density, [Mg m-3]
+    SoilWatAirDry_vr           => plt_soilchem%SoilWatAirDry_vr      ,& !input  :air-dry water content, [m3 m-3]
+    VLMicP_vr                  => plt_soilchem%VLMicP_vr             ,& !input  :total volume in micropores, [m3 d-2]
+    VLSoilMicP_vr              => plt_soilchem%VLSoilMicP_vr         ,& !input  :total micropore volume in layer, [m3 d-2]
+    VLWatMicPM_vr              => plt_site%VLWatMicPM_vr             ,& !input  :soil micropore water content, [m3 d-2]
+    VLWatMicP_vr               => plt_soilchem%VLWatMicP_vr          ,& !input  :soil micropore water content, [m3 d-2]
+    VLiceMicP_vr               => plt_soilchem%VLiceMicP_vr          ,& !input  :soil micropore ice content, [m3 d-2]
+    ZERO                       => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
+    LWRadCanopy_pft            => plt_rad%LWRadCanopy_pft            ,& !output :canopy longwave radiation, [MJ d-2 h-1]
     RadNet2Canopy_pft          => plt_rad%RadNet2Canopy_pft           & !output :canopy net radiation, [MJ d-2 h-1]
   )
 !
@@ -312,7 +313,8 @@ module UptakesMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine PrepH2ONutrientUptake
-!------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------
   subroutine UpdateCanopyProperty(NZ)
   !
   !Description:
@@ -326,28 +328,28 @@ module UptakesMod
   real(r8) :: BndlCanopyReistance_pft(JP1)
   integer :: NB,K,L,N,NZZ
 
-  associate(                                                           &
-    AbvCanopyBndlResist_col   => plt_ew%AbvCanopyBndlResist_col      , & !input  :isothermal boundary layer resistance, [h m-1]
-    CanopyHeight_col          => plt_morph%CanopyHeight_col          , & !input  :canopy height , [m]
-    CanopyHeight_pft          => plt_morph%CanopyHeight_pft          , & !input  :canopy height, [m]
-    ClumpFactorNow_pft        => plt_morph%ClumpFactorNow_pft        , & !input  :clumping factor for self-shading in canopy layer at current LAI, [-]
-    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                 , & !input  :change in canopy temperature, [K]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       , & !input  :fraction of incoming PAR absorbed by canopy, [-]
-    KoppenClimZone            => plt_site%KoppenClimZone             , & !input  :Koppen climate zone for the grid,[-]
-    LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch         , & !input  :leaf surface area, [m2 d-2]
-    LeafNodeArea_brch         => plt_morph%LeafNodeArea_brch         , & !input  :leaf area, [m2 d-2]
-    LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch      , & !input  :layer leaf protein C, [g d-2]
-    LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft         , & !input  :plant leaf+stem/stalk area, [m2 d-2]
-    NP                        => plt_site%NP                         , & !input  :current number of plant species,[-]
-    NumOfBranches_pft         => plt_morph%NumOfBranches_pft         , & !input  :number of branches,[-]
-    RoughHeight               => plt_ew%RoughHeight                  , & !input  :canopy surface roughness height, [m]
-    TairK                     => plt_ew%TairK                        , & !input  :air temperature, [K]
-    ZERO                      => plt_site%ZERO                       , & !input  :threshold zero for numerical stability, [-]
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             , & !input  :threshold zero for plang growth calculation, [-]
-    ZERO4PlantDisplace_col    => plt_ew%ZERO4PlantDisplace_col       , & !input  :zero plane displacement height, [m]
-    KMinNumLeaf4GroAlloc_brch => plt_morph%KMinNumLeaf4GroAlloc_brch , & !output :NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
-    LeafAUnshaded_zsec        => plt_photo%LeafAUnshaded_zsec        , & !output :leaf irradiated surface area, [m2 d-2]
-    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft          , & !output :canopy roughness height, [m]
+  associate(                                                      &
+    AbvCanopyBndlResist_col   => plt_ew%AbvCanopyBndlResist_col       ,& !input  :isothermal boundary layer resistance, [h m-1]
+    CanopyHeight_col          => plt_morph%CanopyHeight_col           ,& !input  :canopy height , [m]
+    CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
+    ClumpFactorNow_pft        => plt_morph%ClumpFactorNow_pft         ,& !input  :clumping factor for self-shading in canopy layer at current LAI, [-]
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !input  :change in canopy temperature, [K]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    KoppenClimZone            => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
+    LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch          ,& !input  :leaf surface area, [m2 d-2]
+    LeafNodeArea_brch         => plt_morph%LeafNodeArea_brch          ,& !input  :leaf area, [m2 d-2]
+    LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       ,& !input  :layer leaf protein C, [g d-2]
+    LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft          ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
+    NP                        => plt_site%NP                          ,& !input  :current number of plant species,[-]
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
+    RoughHeight               => plt_ew%RoughHeight                   ,& !input  :canopy surface roughness height, [m]
+    TairK                     => plt_ew%TairK                         ,& !input  :air temperature, [K]
+    ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
+    ZERO4PlantDisplace_col    => plt_ew%ZERO4PlantDisplace_col        ,& !input  :zero plane displacement height, [m]
+    KMinNumLeaf4GroAlloc_brch => plt_morph%KMinNumLeaf4GroAlloc_brch  ,& !output :NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
+    LeafAUnshaded_zsec        => plt_photo%LeafAUnshaded_zsec         ,& !output :leaf irradiated surface area, [m2 d-2]
+    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft           ,& !output :canopy roughness height, [m]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                   & !output :canopy temperature, [K]
   )
 !
@@ -428,7 +430,8 @@ module UptakesMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine UpdateCanopyProperty
-!------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------
   subroutine UpdateRootProperty(NZ,PathLen_pvr,FineRootRadius_rvr,AllRootC_vr,&
     FracPRoot4Uptake_pvr,MinFracPRoot4Uptake_pvr,FracPrimRootOccupiedLay_pvr,RootArea2RadiusRatio_vr)
   !
@@ -448,26 +451,26 @@ module UptakesMod
   real(r8) :: RTDPX        !Root occupied thickness in current layer
   integer :: N,L,NR
 
-  associate(                                                       &
-    CumSoilThickness_vr     => plt_site%CumSoilThickness_vr      , & !input  :depth to bottom of soil layer from surface of grid cell, [m]
-    DLYR3                   => plt_site%DLYR3                    , & !input  :vertical thickness of soil layer, [m]
-    FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr         , & !input  :micropore fraction, [-]
-    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft       , & !input  :cotyledon height, [m]
-    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft        , & !input  :maximum soil layer number for all root axes,[-]
-    Myco_pft                => plt_morph%Myco_pft                , & !input  :mycorrhizal type (no or yes),[-]
-    NU                      => plt_site%NU                       , & !input  :current soil surface layer number, [-]
-    NumRootAxes_pft         => plt_morph%NumRootAxes_pft         , & !input  :root primary axis number,[-]
-    PlantPopulation_pft     => plt_site%PlantPopulation_pft      , & !input  :plant population, [d-2]
-    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr       , & !input  :root layer C, [gC d-2]
-    Root1stDepz_pft         => plt_morph%Root1stDepz_pft         , & !input  :root layer depth, [m]
-    Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft   , & !input  :root diameter secondary axes, [m]
-    Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft    , & !input  :maximum radius of secondary roots, [m]
-    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr , & !input  :root layer length density, [m m-3]
-    RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr     , & !input  :root layer length per plant, [m p-1]
-    RootPorosity_pft        => plt_morph%RootPorosity_pft        , & !input  :root porosity, [m3 m-3]
-    RootVH2O_pvr            => plt_morph%RootVH2O_pvr            , & !input  :root layer volume water, [m2 d-2]
-    SeedDepth_pft           => plt_morph%SeedDepth_pft           , & !input  :seeding depth, [m]
-    ZERO                    => plt_site%ZERO                     , & !input  :threshold zero for numerical stability, [-]
+  associate(                                                      &
+    CumSoilThickness_vr     => plt_site%CumSoilThickness_vr       ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
+    DLYR3                   => plt_site%DLYR3                     ,& !input  :vertical thickness of soil layer, [m]
+    FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr          ,& !input  :micropore fraction, [-]
+    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft        ,& !input  :cotyledon height, [m]
+    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    Myco_pft                => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
+    NU                      => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
+    NumRootAxes_pft         => plt_morph%NumRootAxes_pft          ,& !input  :root primary axis number,[-]
+    PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
+    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
+    Root1stDepz_pft         => plt_morph%Root1stDepz_pft          ,& !input  :root layer depth, [m]
+    Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
+    Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
+    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
+    RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
+    RootPorosity_pft        => plt_morph%RootPorosity_pft         ,& !input  :root porosity, [m3 m-3]
+    RootVH2O_pvr            => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
+    SeedDepth_pft           => plt_morph%SeedDepth_pft            ,& !input  :seeding depth, [m]
+    ZERO                    => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
     ZEROS                   => plt_site%ZEROS                      & !input  :threshold zero for numerical stability,[-]
   )
   
@@ -516,8 +519,8 @@ module UptakesMod
   ENDDO D2000
   end associate
   end subroutine UpdateRootProperty
-!------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine HandlingDivergence(I,J,NN,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP)
 
   implicit none
@@ -533,37 +536,37 @@ module UptakesMod
 
   integer :: N,L
 ! begin_execution
-  associate(                                                           &
-    AREA3                     => plt_site%AREA3                      , & !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            , & !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft     , & !input  :canopy nonstructural element concentration, [g d-2]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       , & !input  :fraction of incoming PAR absorbed by canopy, [-]
-    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft      , & !input  :maximum stomatal resistance to vapor, [s h-1]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          , & !input  :maximum soil layer number for all root axes,[-]
-    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft , & !input  :canopy minimum stomatal resistance, [s m-1]
-    Myco_pft                  => plt_morph%Myco_pft                  , & !input  :mycorrhizal type (no or yes),[-]
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        , & !input  :soil layer at planting depth, [-]
-    NU                        => plt_site%NU                         , & !input  :current soil surface layer number, [-]
-    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft            , & !input  :canopy osmotic water potential, [Mpa]
-    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft            , & !input  :plant canopy turgor water potential, [MPa]
-    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr               , & !input  :root osmotic water potential, [Mpa]
-    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr               , & !input  :root turgor water potential, [Mpa]
-    RCS_pft                   => plt_photo%RCS_pft                   , & !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
-    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft          , & !input  :canopy roughness height, [m]
-    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr  , & !input  :root layer nonstructural C concentration, [g g-1]
-    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft         , & !input  :canopy shoot structural chemical element mass, [g d-2]
-    TKS_vr                    => plt_ew%TKS_vr                       , & !input  :mean annual soil temperature, [K]
-    TairK                     => plt_ew%TairK                        , & !input  :air temperature, [K]
-    iYearCurrent              => plt_site%iYearCurrent               , & !input  :current year,[-]
-    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                 , & !inoput :change in canopy temperature, [K]
-    PSICanopy_pft             => plt_ew%PSICanopy_pft                , & !inoput :canopy total water potential, [Mpa]
-    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                  , & !inoput :root total water potential, [Mpa]
-    TKC_pft                   => plt_ew%TKC_pft                      , & !inoput :canopy temperature, [K]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr      , & !output :root water uptake, [m2 d-2 h-1]
-    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft    , & !output :canopy stomatal resistance, [h m-1]
-    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft      , & !output :canopy boundary layer resistance, [h m-1]
-    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             , & !output :canopy longwave radiation, [MJ d-2 h-1]
-    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft              , & !output :canopy temperature, [oC]
+  associate(                                                      &
+    AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft      ,& !input  :canopy nonstructural element concentration, [g d-2]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         ,& !input  :soil layer at planting depth, [-]
+    NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
+    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft             ,& !input  :canopy osmotic water potential, [Mpa]
+    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft             ,& !input  :plant canopy turgor water potential, [MPa]
+    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !input  :root osmotic water potential, [Mpa]
+    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !input  :root turgor water potential, [Mpa]
+    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft           ,& !input  :canopy roughness height, [m]
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
+    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    TKS_vr                    => plt_ew%TKS_vr                        ,& !input  :mean annual soil temperature, [K]
+    TairK                     => plt_ew%TairK                         ,& !input  :air temperature, [K]
+    iYearCurrent              => plt_site%iYearCurrent                ,& !input  :current year,[-]
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !inoput :change in canopy temperature, [K]
+    PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !output :canopy total water potential, [Mpa]
+    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
+    TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
+    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr       ,& !output :root water uptake, [m2 d-2 h-1]
+    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
+    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
+    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
+    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft               ,& !output :canopy temperature, [oC]
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft             & !output :canopy heat capacity, [MJ d-2 K-1]
   )
   IF(NN.GE.MaxIterNum)THEN
@@ -609,7 +612,8 @@ module UptakesMod
   ENDIF
   end associate
   end subroutine HandlingDivergence
-!------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------
   function CanopyEnergyH2OIter_func(I,J,NZ,FracGrndByPFT,CanopyMassC,TotalSoilPSIMPa_vr,&
     VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,FDMP,&
     SoilRootResistance_rvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,WatAvail4Uptake_vr,TKCX,CNDT,&
@@ -661,46 +665,46 @@ module UptakesMod
   integer :: N,L
 !     begin_execution
 
-  associate(                                                           &
-    AREA3                     => plt_site%AREA3                      , & !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            , & !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          , & !input  :canopy water content, [m3 d-2]
-    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft     , & !input  :canopy nonstructural element concentration, [g d-2]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       , & !input  :fraction of incoming PAR absorbed by canopy, [-]
-    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft      , & !input  :maximum stomatal resistance to vapor, [s h-1]
-    LWRadGrnd                 => plt_rad%LWRadGrnd                   , & !input  :longwave radiation emitted by ground surface, [MJ m-2 h-1]
-    LWRadSky_col              => plt_rad%LWRadSky_col                , & !input  :sky longwave radiation , [MJ d-2 h-1]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          , & !input  :maximum soil layer number for all root axes,[-]
-    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft , & !input  :canopy minimum stomatal resistance, [s m-1]
-    Myco_pft                  => plt_morph%Myco_pft                  , & !input  :mycorrhizal type (no or yes),[-]
-    NU                        => plt_site%NU                         , & !input  :current soil surface layer number, [-]
-    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft            , & !input  :canopy osmotic water potential, [Mpa]
-    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft            , & !input  :plant canopy turgor water potential, [MPa]
-    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft       , & !input  :water flux into canopy, [m3 d-2 h-1]
-    RCS_pft                   => plt_photo%RCS_pft                   , & !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
-    RIB                       => plt_ew%RIB                          , & !input  :Richardson number for calculating boundary layer resistance, [-]
-    RadSWbyCanopy_pft         => plt_rad%RadSWbyCanopy_pft           , & !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
-    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft          , & !input  :canopy roughness height, [m]
-    TKS_vr                    => plt_ew%TKS_vr                       , & !input  :mean annual soil temperature, [K]
-    TairK                     => plt_ew%TairK                        , & !input  :air temperature, [K]
-    VPA                       => plt_ew%VPA                          , & !input  :vapor concentration, [m3 m-3]
-    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft          , & !input  :canopy surface water content, [m3 d-2]
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             , & !input  :threshold zero for plang growth calculation, [-]
-    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft           , & !input  :threshold zero for leaf calculation, [-]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr      , & !inoput :root water uptake, [m2 d-2 h-1]
-    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft    , & !inoput :canopy stomatal resistance, [h m-1]
-    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft      , & !inoput :canopy boundary layer resistance, [h m-1]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft           , & !inoput :canopy latent heat flux, [MJ d-2 h-1]
-    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             , & !inoput :canopy longwave radiation, [MJ d-2 h-1]
-    PSICanopy_pft             => plt_ew%PSICanopy_pft                , & !inoput :canopy total water potential, [Mpa]
-    RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft           , & !inoput :canopy net radiation, [MJ d-2 h-1]
-    TKC_pft                   => plt_ew%TKC_pft                      , & !inoput :canopy temperature, [K]
-    TKCanopy_pft              => plt_ew%TKCanopy_pft                 , & !inoput :canopy temperature, [K]
-    Transpiration_pft         => plt_ew%Transpiration_pft            , & !inoput :canopy transpiration, [m2 d-2 h-1]
-    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft           , & !inoput :canopy heat capacity, [MJ d-2 K-1]
-    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft           , & !inoput :canopy evaporation, [m2 d-2 h-1]
-    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                 , & !output :change in canopy temperature, [K]
-    QdewCanopy_pft            => plt_ew%QdewCanopy_pft               , & !output :dew fall on to canopy, [m3 H2O d-2 h-1]
+  associate(                                                      &
+    AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft           ,& !input  :canopy water content, [m3 d-2]
+    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft      ,& !input  :canopy nonstructural element concentration, [g d-2]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
+    LWRadGrnd                 => plt_rad%LWRadGrnd                    ,& !input  :longwave radiation emitted by ground surface, [MJ m-2 h-1]
+    LWRadSky_col              => plt_rad%LWRadSky_col                 ,& !input  :sky longwave radiation , [MJ d-2 h-1]
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
+    NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
+    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft             ,& !input  :canopy osmotic water potential, [Mpa]
+    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft             ,& !input  :plant canopy turgor water potential, [MPa]
+    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft        ,& !input  :water flux into canopy, [m3 d-2 h-1]
+    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    RIB                       => plt_ew%RIB                           ,& !input  :Richardson number for calculating boundary layer resistance, [-]
+    RadSWbyCanopy_pft         => plt_rad%RadSWbyCanopy_pft            ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft           ,& !input  :canopy roughness height, [m]
+    TKS_vr                    => plt_ew%TKS_vr                        ,& !input  :mean annual soil temperature, [K]
+    TairK                     => plt_ew%TairK                         ,& !input  :air temperature, [K]
+    VPA                       => plt_ew%VPA                           ,& !input  :vapor concentration, [m3 m-3]
+    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft           ,& !input  :canopy surface water content, [m3 d-2]
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
+    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft            ,& !input  :threshold zero for leaf calculation, [-]
+    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr       ,& !inoput :root water uptake, [m2 d-2 h-1]
+    PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !inoput :canopy total water potential, [Mpa]
+    TKCanopy_pft              => plt_ew%TKCanopy_pft                  ,& !inoput :canopy temperature, [K]
+    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
+    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
+    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft            ,& !output :canopy latent heat flux, [MJ d-2 h-1]
+    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
+    RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft            ,& !output :canopy net radiation, [MJ d-2 h-1]
+    TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
+    Transpiration_pft         => plt_ew%Transpiration_pft             ,& !output :canopy transpiration, [m2 d-2 h-1]
+    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft            ,& !output :canopy heat capacity, [MJ d-2 K-1]
+    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft            ,& !output :canopy evaporation, [m2 d-2 h-1]
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
+    QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
     TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft                & !output :canopy temperature, [oC]
   )
   
@@ -1016,7 +1020,8 @@ module UptakesMod
 
   end associate
   end function CanopyEnergyH2OIter_func
-!------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------
   subroutine CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootArea2RadiusRatio_vr,&
     RootResist_rvr,RootResistSoi_rvr,RootResistPrimary,RootResist2ndary,SoiH2OResist,&
     SoilRootResistance_rvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
@@ -1037,33 +1042,33 @@ module UptakesMod
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,Root2ndSurfArea
   integer :: N, L
-  associate(                                                                 &
-    CanopyHeight_pft            => plt_morph%CanopyHeight_pft               , & !input  :canopy height, [m]
-    CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr             , & !input  :depth to middle of soil layer from surface of grid cell, [m]
-    HydroCondMicP4RootUptake_vr => plt_soilchem%HydroCondMicP4RootUptake_vr , & !input  :soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
-    MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft               , & !input  :maximum soil layer number for all root axes,[-]
-    Myco_pft                    => plt_morph%Myco_pft                       , & !input  :mycorrhizal type (no or yes),[-]
-    NU                          => plt_site%NU                              , & !input  :current soil surface layer number, [-]
-    PSICanopy_pft               => plt_ew%PSICanopy_pft                     , & !input  :canopy total water potential, [Mpa]
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft             , & !input  :plant population, [d-2]
-    Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr              , & !input  :root layer diameter primary axes, [m]
-    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr               , & !input  :root layer number primary axes, [d-2]
-    Root2ndMaxRadius_pft        => plt_morph%Root2ndMaxRadius_pft           , & !input  :maximum radius of secondary roots, [m]
-    Root2ndMeanLens_pvr         => plt_morph%Root2ndMeanLens_pvr            , & !input  :root layer average length, [m]
-    Root2ndRadius_pvr           => plt_morph%Root2ndRadius_pvr              , & !input  :root layer diameter secondary axes, [m]
-    Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr                , & !input  :root layer number axes, [d-2]
-    RootAxialResist_pft         => plt_morph%RootAxialResist_pft            , & !input  :root axial resistivity, [MPa h m-4]
-    RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr        , & !input  :root layer length density, [m m-3]
-    RootLenPerPlant_pvr         => plt_morph%RootLenPerPlant_pvr            , & !input  :root layer length per plant, [m p-1]
-    RootRadialResist_pft        => plt_morph%RootRadialResist_pft           , & !input  :root radial resistivity, [MPa h m-2]
-    THETW_vr                    => plt_soilchem%THETW_vr                    , & !input  :volumetric water content, [m3 m-3]
-    VLMicP_vr                   => plt_soilchem%VLMicP_vr                   , & !input  :total volume in micropores, [m3 d-2]
-    VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr           , & !input  :volume of soil layer, [m3 d-2]
-    VLWatMicPM_vr               => plt_site%VLWatMicPM_vr                   , & !input  :soil micropore water content, [m3 d-2]
-    ZERO                        => plt_site%ZERO                            , & !input  :threshold zero for numerical stability, [-]
-    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                  , & !input  :threshold zero for plang growth calculation, [-]
-    ZEROS2                      => plt_site%ZEROS2                          , & !input  :threshold zero for numerical stability,[-]
-    CanopyHeight4WatUptake_pft  => plt_morph%CanopyHeight4WatUptake_pft       & !inoput :canopy height, [m]
+  associate(                                                      &
+    CanopyHeight_pft            => plt_morph%CanopyHeight_pft                ,& !input  :canopy height, [m]
+    CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr              ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
+    HydroCondMicP4RootUptake_vr => plt_soilchem%HydroCondMicP4RootUptake_vr  ,& !input  :soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
+    MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft                ,& !input  :maximum soil layer number for all root axes,[-]
+    Myco_pft                    => plt_morph%Myco_pft                        ,& !input  :mycorrhizal type (no or yes),[-]
+    NU                          => plt_site%NU                               ,& !input  :current soil surface layer number, [-]
+    PSICanopy_pft               => plt_ew%PSICanopy_pft                      ,& !input  :canopy total water potential, [Mpa]
+    PlantPopulation_pft         => plt_site%PlantPopulation_pft              ,& !input  :plant population, [d-2]
+    Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr               ,& !input  :root layer diameter primary axes, [m]
+    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr                ,& !input  :root layer number primary axes, [d-2]
+    Root2ndMaxRadius_pft        => plt_morph%Root2ndMaxRadius_pft            ,& !input  :maximum radius of secondary roots, [m]
+    Root2ndMeanLens_pvr         => plt_morph%Root2ndMeanLens_pvr             ,& !input  :root layer average length, [m]
+    Root2ndRadius_pvr           => plt_morph%Root2ndRadius_pvr               ,& !input  :root layer diameter secondary axes, [m]
+    Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr                 ,& !input  :root layer number axes, [d-2]
+    RootAxialResist_pft         => plt_morph%RootAxialResist_pft             ,& !input  :root axial resistivity, [MPa h m-4]
+    RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr         ,& !input  :root layer length density, [m m-3]
+    RootLenPerPlant_pvr         => plt_morph%RootLenPerPlant_pvr             ,& !input  :root layer length per plant, [m p-1]
+    RootRadialResist_pft        => plt_morph%RootRadialResist_pft            ,& !input  :root radial resistivity, [MPa h m-2]
+    THETW_vr                    => plt_soilchem%THETW_vr                     ,& !input  :volumetric water content, [m3 m-3]
+    VLMicP_vr                   => plt_soilchem%VLMicP_vr                    ,& !input  :total volume in micropores, [m3 d-2]
+    VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr            ,& !input  :volume of soil layer, [m3 d-2]
+    VLWatMicPM_vr               => plt_site%VLWatMicPM_vr                    ,& !input  :soil micropore water content, [m3 d-2]
+    ZERO                        => plt_site%ZERO                             ,& !input  :threshold zero for numerical stability, [-]
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
+    ZEROS2                      => plt_site%ZEROS2                           ,& !input  :threshold zero for numerical stability,[-]
+    CanopyHeight4WatUptake_pft  => plt_morph%CanopyHeight4WatUptake_pft       & !output :canopy height, [m]
   )
 
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
@@ -1160,8 +1165,8 @@ module UptakesMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine CalcResistance
-!------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine HandleBareSoil(NZ,TotalSoilPSIMPa_vr,FDMP)
   !
   !plant has not emerged yet
@@ -1177,47 +1182,47 @@ module UptakesMod
   real(r8) :: OSWT,Stomata_Stress
 
 ! begin_execution
-  associate(                                                           &
-    AREA3                     => plt_site%AREA3                      , & !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            , & !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyHeight_pft          => plt_morph%CanopyHeight_pft          , & !input  :canopy height, [m]
-    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft     , & !input  :canopy nonstructural element concentration, [g d-2]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       , & !input  :fraction of incoming PAR absorbed by canopy, [-]
-    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft      , & !input  :maximum stomatal resistance to vapor, [s h-1]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          , & !input  :maximum soil layer number for all root axes,[-]
-    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft , & !input  :canopy minimum stomatal resistance, [s m-1]
-    Myco_pft                  => plt_morph%Myco_pft                  , & !input  :mycorrhizal type (no or yes),[-]
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        , & !input  :soil layer at planting depth, [-]
-    NU                        => plt_site%NU                         , & !input  :current soil surface layer number, [-]
-    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft            , & !input  :canopy osmotic water potential, [Mpa]
-    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft            , & !input  :plant canopy turgor water potential, [MPa]
-    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr               , & !input  :root osmotic water potential, [Mpa]
-    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr               , & !input  :root turgor water potential, [Mpa]
-    RCS_pft                   => plt_photo%RCS_pft                   , & !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
-    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft          , & !input  :canopy roughness height, [m]
-    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr  , & !input  :root layer nonstructural C concentration, [g g-1]
-    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft         , & !input  :canopy shoot structural chemical element mass, [g d-2]
-    SnowDepth                 => plt_ew%SnowDepth                    , & !input  :snowpack depth, [m]
-    TKS_vr                    => plt_ew%TKS_vr                       , & !input  :mean annual soil temperature, [K]
-    TKSnow                    => plt_ew%TKSnow                       , & !input  :snow temperature, [K]
-    TairK                     => plt_ew%TairK                        , & !input  :air temperature, [K]
-    ZERO                      => plt_site%ZERO                       , & !input  :threshold zero for numerical stability, [-]
-    PSICanopy_pft             => plt_ew%PSICanopy_pft                , & !inoput :canopy total water potential, [Mpa]
-    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                  , & !inoput :root total water potential, [Mpa]
-    TKC_pft                   => plt_ew%TKC_pft                      , & !inoput :canopy temperature, [K]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr      , & !output :root water uptake, [m2 d-2 h-1]
-    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft    , & !output :canopy stomatal resistance, [h m-1]
-    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft      , & !output :canopy boundary layer resistance, [h m-1]
-    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                 , & !output :change in canopy temperature, [K]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft           , & !output :canopy latent heat flux, [MJ d-2 h-1]
-    HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft           , & !output :canopy storage heat flux, [MJ d-2 h-1]
-    HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft            , & !output :canopy sensible heat flux, [MJ d-2 h-1]
-    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             , & !output :canopy longwave radiation, [MJ d-2 h-1]
-    QdewCanopy_pft            => plt_ew%QdewCanopy_pft               , & !output :dew fall on to canopy, [m3 H2O d-2 h-1]
-    RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft           , & !output :canopy net radiation, [MJ d-2 h-1]
-    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft              , & !output :canopy temperature, [oC]
-    Transpiration_pft         => plt_ew%Transpiration_pft            , & !output :canopy transpiration, [m2 d-2 h-1]
-    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft           , & !output :canopy heat capacity, [MJ d-2 K-1]
+  associate(                                                      &
+    AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
+    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft      ,& !input  :canopy nonstructural element concentration, [g d-2]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         ,& !input  :soil layer at planting depth, [-]
+    NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
+    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft             ,& !input  :canopy osmotic water potential, [Mpa]
+    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft             ,& !input  :plant canopy turgor water potential, [MPa]
+    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !input  :root osmotic water potential, [Mpa]
+    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !input  :root turgor water potential, [Mpa]
+    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    ReistanceCanopy_pft       => plt_ew%ReistanceCanopy_pft           ,& !input  :canopy roughness height, [m]
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
+    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    SnowDepth                 => plt_ew%SnowDepth                     ,& !input  :snowpack depth, [m]
+    TKS_vr                    => plt_ew%TKS_vr                        ,& !input  :mean annual soil temperature, [K]
+    TKSnow                    => plt_ew%TKSnow                        ,& !input  :snow temperature, [K]
+    TairK                     => plt_ew%TairK                         ,& !input  :air temperature, [K]
+    ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
+    PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !output :canopy total water potential, [Mpa]
+    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
+    TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
+    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr       ,& !output :root water uptake, [m2 d-2 h-1]
+    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
+    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
+    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
+    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft            ,& !output :canopy latent heat flux, [MJ d-2 h-1]
+    HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft            ,& !output :canopy storage heat flux, [MJ d-2 h-1]
+    HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft             ,& !output :canopy sensible heat flux, [MJ d-2 h-1]
+    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
+    QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
+    RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft            ,& !output :canopy net radiation, [MJ d-2 h-1]
+    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft               ,& !output :canopy temperature, [oC]
+    Transpiration_pft         => plt_ew%Transpiration_pft             ,& !output :canopy transpiration, [m2 d-2 h-1]
+    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft            ,& !output :canopy heat capacity, [MJ d-2 K-1]
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft             & !output :canopy evaporation, [m2 d-2 h-1]
   )
   RadNet2Canopy_pft(NZ)  = 0.0_r8
@@ -1261,8 +1266,8 @@ module UptakesMod
   ENDDO
   end associate
   end subroutine HandleBareSoil
-!------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,RootResist_rvr,SoiH2OResist,SoilRootResistance_rvr,&
     TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
   !
@@ -1286,28 +1291,28 @@ module UptakesMod
   real(r8) :: CCPOLT,CanopyMassC
   real(r8) :: OSWT
   integer :: N,L
-  associate(                                                          &
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft           , & !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft      , & !input  :canopy leaf + sheath C, [g d-2]
-    CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft          , & !input  :canopy active stalk C, [g d-2]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft         , & !input  :maximum soil layer number for all root axes,[-]
-    Myco_pft                  => plt_morph%Myco_pft                 , & !input  :mycorrhizal type (no or yes),[-]
-    NU                        => plt_site%NU                        , & !input  :current soil surface layer number, [-]
-    PSICanopy_pft             => plt_ew%PSICanopy_pft               , & !input  :canopy total water potential, [Mpa]
-    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr              , & !input  :root osmotic water potential, [Mpa]
-    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr              , & !input  :root turgor water potential, [Mpa]
-    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft      , & !input  :water flux into canopy, [m3 d-2 h-1]
-    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr , & !input  :root layer nonstructural C concentration, [g g-1]
-    TKCanopy_pft              => plt_ew%TKCanopy_pft                , & !input  :canopy temperature, [K]
-    TKS_vr                    => plt_ew%TKS_vr                      , & !input  :mean annual soil temperature, [K]
-    TairK                     => plt_ew%TairK                       , & !input  :air temperature, [K]
-    Transpiration_pft         => plt_ew%Transpiration_pft           , & !input  :canopy transpiration, [m2 d-2 h-1]
-    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft          , & !input  :canopy evaporation, [m2 d-2 h-1]
-    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft         , & !inoput :canopy water content, [m3 d-2]
-    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                 , & !inoput :root total water potential, [Mpa]
-    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft          , & !inoput :canopy heat capacity, [MJ d-2 K-1]
-    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft         , & !inoput :canopy surface water content, [m3 d-2]
-    HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft          , & !output :canopy storage heat flux, [MJ d-2 h-1]
+  associate(                                                      &
+    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft           ,& !input  :canopy active stalk C, [g d-2]
+    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
+    NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
+    PSICanopy_pft             => plt_ew%PSICanopy_pft                ,& !input  :canopy total water potential, [Mpa]
+    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr               ,& !input  :root osmotic water potential, [Mpa]
+    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr               ,& !input  :root turgor water potential, [Mpa]
+    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft       ,& !input  :water flux into canopy, [m3 d-2 h-1]
+    RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr  ,& !input  :root layer nonstructural C concentration, [g g-1]
+    TKCanopy_pft              => plt_ew%TKCanopy_pft                 ,& !input  :canopy temperature, [K]
+    TKS_vr                    => plt_ew%TKS_vr                       ,& !input  :mean annual soil temperature, [K]
+    TairK                     => plt_ew%TairK                        ,& !input  :air temperature, [K]
+    Transpiration_pft         => plt_ew%Transpiration_pft            ,& !input  :canopy transpiration, [m2 d-2 h-1]
+    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft           ,& !input  :canopy evaporation, [m2 d-2 h-1]
+    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !inoput :canopy water content, [m3 d-2]
+    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft          ,& !inoput :canopy surface water content, [m3 d-2]
+    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                  ,& !output :root total water potential, [Mpa]
+    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft           ,& !output :canopy heat capacity, [MJ d-2 K-1]
+    HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft           ,& !output :canopy storage heat flux, [MJ d-2 h-1]
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft             & !output :canopy sensible heat flux, [MJ d-2 h-1]
   )
   !
@@ -1358,8 +1363,8 @@ module UptakesMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine UpdatePlantWaterVars
-!------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine SetCanopyGrowthFuncs(I,J,NZ)
 
   implicit none
@@ -1368,22 +1373,22 @@ module UptakesMod
   character(len=*), parameter :: subname='SetCanopyGrowthFuncs'
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
-  associate(                                               &
-    MainBranchNum_pft   => plt_morph%MainBranchNum_pft   , & !input  :number of main branch,[-]
-    MaxNumRootLays      => plt_site%MaxNumRootLays       , & !input  :maximum root layer number,[-]
-    NU                  => plt_site%NU                   , & !input  :current soil surface layer number, [-]
-    PSICanopy_pft       => plt_ew%PSICanopy_pft          , & !input  :canopy total water potential, [Mpa]
-    TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft    , & !input  :temperature below which seed set is adversely affected, [oC]
-    TKC_pft             => plt_ew%TKC_pft                , & !input  :canopy temperature, [K]
-    TKS_vr              => plt_ew%TKS_vr                 , & !input  :mean annual soil temperature, [K]
-    TdegCCanopy_pft     => plt_ew%TdegCCanopy_pft        , & !input  :canopy temperature, [oC]
-    TempOffset_pft      => plt_pheno%TempOffset_pft      , & !input  :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-    iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch , & !input  :plant growth stage, [-]
-    ChillHours_pft      => plt_photo%ChillHours_pft      , & !inoput :chilling effect on CO2 fixation, [-]
-    PSICanPDailyMin_pft => plt_ew%PSICanPDailyMin_pft    , & !inoput :minimum daily canopy water potential, [MPa]
-    TKGroth_pft         => plt_pheno%TKGroth_pft         , & !inoput :canopy growth temperature, [K]
-    TCGroth_pft         => plt_pheno%TCGroth_pft         , & !output :canopy growth temperature, [oC]
-    fTCanopyGroth_pft   => plt_pheno%fTCanopyGroth_pft   , & !output :canopy temperature growth function, [-]
+  associate(                                                      &
+    MainBranchNum_pft   => plt_morph%MainBranchNum_pft    ,& !input  :number of main branch,[-]
+    MaxNumRootLays      => plt_site%MaxNumRootLays        ,& !input  :maximum root layer number,[-]
+    NU                  => plt_site%NU                    ,& !input  :current soil surface layer number, [-]
+    PSICanopy_pft       => plt_ew%PSICanopy_pft           ,& !input  :canopy total water potential, [Mpa]
+    TCChill4Seed_pft    => plt_pheno%TCChill4Seed_pft     ,& !input  :temperature below which seed set is adversely affected, [oC]
+    TKC_pft             => plt_ew%TKC_pft                 ,& !input  :canopy temperature, [K]
+    TKS_vr              => plt_ew%TKS_vr                  ,& !input  :mean annual soil temperature, [K]
+    TdegCCanopy_pft     => plt_ew%TdegCCanopy_pft         ,& !input  :canopy temperature, [oC]
+    TempOffset_pft      => plt_pheno%TempOffset_pft       ,& !input  :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+    iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch  ,& !input  :plant growth stage, [-]
+    ChillHours_pft      => plt_photo%ChillHours_pft       ,& !inoput :chilling effect on CO2 fixation, [-]
+    PSICanPDailyMin_pft => plt_ew%PSICanPDailyMin_pft     ,& !inoput :minimum daily canopy water potential, [MPa]
+    TKGroth_pft         => plt_pheno%TKGroth_pft          ,& !output :canopy growth temperature, [K]
+    TCGroth_pft         => plt_pheno%TCGroth_pft          ,& !output :canopy growth temperature, [oC]
+    fTCanopyGroth_pft   => plt_pheno%fTCanopyGroth_pft    ,& !output :canopy temperature growth function, [-]
     fTgrowRootP_vr      => plt_pheno%fTgrowRootP_vr        & !output :root layer temperature growth functiom, [-]
   )
   !
@@ -1434,6 +1439,5 @@ module UptakesMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine SetCanopyGrowthFuncs
-
   ![tail]
 end module UptakesMod
