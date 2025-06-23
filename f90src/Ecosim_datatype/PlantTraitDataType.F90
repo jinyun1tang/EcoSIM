@@ -172,7 +172,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)            !photoperiod type (neutral, long day, short day),[-]
   integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)            !phenologically-driven above-ground turnover (all, foliar only, none),[-]
   integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                  !grain type (below or above-ground), e.g. potato and onion are below,[-]
-  integer,target,allocatable ::  MY_pft(:,:,:)                               !mycorrhizal type, 1, 2 ,[-]
+  integer,target,allocatable ::  Myco_pft(:,:,:)                               !mycorrhizal type, 1, 2 ,[-]
 
 !----------------------------------------------------------------------
 
@@ -340,7 +340,7 @@ contains
   allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
   allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
   allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
-  allocate(MY_pft(JP,JY,JX));       MY_pft=0
+  allocate(Myco_pft(JP,JY,JX));       Myco_pft=0
 
   end subroutine InitPlantTraits
 
@@ -506,7 +506,7 @@ contains
   call destroy(iPlantPhotoperiodType_pft)
   call destroy(iPlantTurnoverPattern_pft)
   call destroy(iPlantGrainType_pft)
-  call destroy(MY_pft)
+  call destroy(Myco_pft)
 
   end subroutine DestructPlantTraits
 

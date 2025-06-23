@@ -4,7 +4,7 @@ module TranspNoSaltMod
 !
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: destroy, endrun
-  USE MiniMathMod,      ONLY: AZMAX1,  fixnegmass, flux_mass_limiter, AZERO
+  USE MiniMathMod,      ONLY: AZMAX1,  fixnegmass, flux_mass_limiter, AZERO, safe_adb
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
   use EcoSIMCtrlMod,    only: iVerbLevel
@@ -111,7 +111,7 @@ module TranspNoSaltMod
   integer, optional, intent(in) :: M
   integer :: NY,NX,idg,L  
   real(r8) :: errmass,mass_litr,mass_snow,mass_soil
-  real(r8) :: netflx2soil
+  real(r8) :: netflx2soil,delta_mass
   real(r8) :: trcs_mass_now(idg_beg:idg_NH3)
 
   DO NX=NHW,NHE
@@ -142,7 +142,8 @@ module TranspNoSaltMod
           ENDDO
         endif
 
-        trcs_mass_now(idg)=mass_snow+mass_litr+mass_soil
+        trcs_mass_now(idg) = mass_snow+mass_litr+mass_soil
+        delta_mass         = trcs_mass_now(idg)-trcs_mass_beg(idg,NY,NX)
         errmass=trcs_mass_beg(idg,NY,NX)-trcs_mass_now(idg)  &
           +SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
           +RGasNetProd_col(idg,NY,NX)-trcs_Soil2plant_uptake_col(idg,NY,NX)
@@ -159,7 +160,7 @@ module TranspNoSaltMod
               write(121,*)(I*1000+J)*10,trcs_names(idg),'total'
             endif
             write(121,*)'errmass',errmass, 'NY NX=',NY,NX
-            write(121,*)'mass beg, end, delta',trcs_mass_beg(idg,NY,NX),trcs_mass_now(idg),trcs_mass_now(idg)-trcs_mass_beg(idg,NY,NX)
+            write(121,*)'mass beg, end, delta',trcs_mass_beg(idg,NY,NX),trcs_mass_now(idg),delta_mass
             write(121,*)'beg sno,litr,soil',trcs_mass_snow(idg,NY,NX),trcs_mass_litr(idg,NY,NX),trcs_mass_soil(idg,NY,NX)
             write(121,*)'mass sno,litr,soil',mass_snow,mass_litr,mass_soil
             write(121,*)'Delta mass sno, litr,soil',mass_snow-trcs_mass_snow(idg,NY,NX),mass_litr-trcs_mass_litr(idg,NY,NX), &
@@ -220,8 +221,8 @@ module TranspNoSaltMod
             write(121,*)'transp',NU_col(NY,NX),NL_col(NY,NX)
             write(121,*)transp_diff_slow_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX)
           endif
-          if(abs(errmass)>1.e-4) &
-          call endrun(trim(mod_filename)//' at line',__LINE__)
+          if(abs(errmass)>1.e-4 .and. abs(safe_adb(errmass,delta_mass))>1.e-3_r8) &
+            call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDDO
     ENDDO

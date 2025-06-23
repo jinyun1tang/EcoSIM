@@ -1,6 +1,7 @@
 module PrescribePhenolMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
 
+  use PlantAPIData
 implicit none
 
   !pft information from CLM4.5
@@ -35,6 +36,7 @@ implicit none
   __FILE__
 
   public :: GetRootProfile
+  public :: SetCanopyProfile
   contains
 
   subroutine GetRootProfile(ra,rb,NL,ZH,RootProfl)
@@ -68,7 +70,6 @@ implicit none
   integer, intent(in) :: NZ   !plant index
 
   end subroutine get_LAI_profile
-
 
 !------------------------------------------------------------------------
 
@@ -113,5 +114,22 @@ implicit none
   endif
 
   end function TreeStem_diameter_taperEq
+!------------------------------------------------------------------------
 
+  subroutine SetCanopyProfile(I,J,DepthSurfWatIce,LeafAreaZsec_pft,StemAreaZsec_pft)
+  !
+  !Description:
+  !distribute leaf area and stem area within the crown defined by top and bottom heights.
+  !For simplicity, unifrom distribution is adopted
+  !
+  implicit none
+  integer , intent(in) :: I,J
+  real(r8), intent(in) :: DepthSurfWatIce !water+ice depth at surface
+  real(r8),intent(out) :: LeafAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)  !leaf area in different zenith sectors
+  real(r8),intent(out) :: StemAreaZsec_pft(NumOfLeafZenithSectors1,NumOfCanopyLayers1,JP1)    !stem area in different zenith sectors
+
+  StemAreaZsec_pft=0._r8
+  LeafAreaZsec_pft=0._r8
+
+  end subroutine SetCanopyProfile
 end module PrescribePhenolMod

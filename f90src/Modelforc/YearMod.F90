@@ -94,7 +94,6 @@
               +PlantExudElm_CumYr_pft(NE,NZ,NY,NX)-LitrfalStrutElms_CumYr_pft(NE,NZ,NY,NX)
               
             EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_CumYr_pft(NE,NZ,NY,NX)
-            NodulInfectElmsCum_pft(NE,NZ,NY,NX)=0._r8
           ENDDO
           NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX) &
             +GrossCO2Fix_CumYr_pft(NZ,NY,NX)+GrossRespC_CumYr_pft(NZ,NY,NX) &

@@ -771,7 +771,7 @@ module StartqMod
       RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)        = 0._r8
       RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)        = 0._r8
       RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)        = 0._r8
-      CCO2A                                           = CCO2EI_col(NY,NX)
+      CCO2A                                           = CCO2EI_gperm3_col(NY,NX)
       CCO2P                                           = 0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA_col(NY,NX))*CO2EI_col(NY,NX)
       trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2A*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2P*RootVH2O_pvr(N,L,NZ,NY,NX)

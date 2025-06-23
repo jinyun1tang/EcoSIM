@@ -21,6 +21,7 @@ implicit none
   real(r8),PARAMETER :: GY=1._r8
   real(r8),parameter :: GZ=1._r8-GY
 contains
+![header]
 !------------------------------------------------------------------------------------------
 
   subroutine AbvgBiomRemovalByGrazing(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
@@ -451,4 +452,5 @@ contains
   ENDIF
   end associate
   end subroutine CutBranchNonstalByGrazing
+  ![tail]
 end module PlantDisturbByGrazingMod

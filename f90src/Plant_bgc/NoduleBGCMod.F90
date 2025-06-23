@@ -13,9 +13,8 @@ module NoduleBGCMod
   public :: CanopyNoduleBiochemistry
   public :: RootNodulBiochemistry
   contains
-
-!------------------------------------------------------------------------------------------
-
+  ![header]
+!----------------------------------------------------------------------------------------------------
   subroutine CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WFNG,CanopyN2Fix_pft)
   !
   !Nodule update for branch NB on pft NZ
@@ -54,31 +53,31 @@ module NoduleBGCMod
   REAL(R8) :: RCCC,RCCN,RCCP
   integer :: NE
 !     begin_execution
-  associate(                                                         &
-    NU                        => plt_site%NU,                        &
-    ZERO                      => plt_site%ZERO,                      &
-    AREA3                     => plt_site%AREA3,                     &
-    k_fine_litr               => pltpar%k_fine_litr,                 &
-    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,      &
-    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,       &
-    fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft,        &
-    CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft,        &
-    ECO_ER_col                => plt_bgcr%ECO_ER_col,                &
-    CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft,     &
-    Eco_AutoR_CumYr_col       => plt_bgcr%Eco_AutoR_CumYr_col,       &
-    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft,             &
-    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr,      &
-    NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft,       &
-    ifoliar                   => pltpar%ifoliar,                     &
-    NoduGrowthYield_pft       => plt_allom%NoduGrowthYield_pft,      &
-    NodulerNC_pft             => plt_allom%NodulerNC_pft,            &
-    NodulerPC_pft             => plt_allom%NodulerPC_pft,            &
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
-    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
-    CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
-    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft,          &
-    CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  &
+  associate(                                                          &
+    NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
+    ZERO                      => plt_site%ZERO                       ,& !input  :threshold zero for numerical stability, [-]
+    AREA3                     => plt_site%AREA3                      ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    k_fine_litr               => pltpar%k_fine_litr                  ,& !input  :fine litter complex id
+    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr       ,& !input  :litter kinetic fraction, [-]
+    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
+    fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft         ,& !input  :canopy temperature growth function, [-]
+    ifoliar                   => pltpar%ifoliar                      ,& !input  :group id of plant foliar litter
+    NoduGrowthYield_pft       => plt_allom%NoduGrowthYield_pft       ,& !input  :nodule growth yield, [g g-1]
+    NodulerNC_pft             => plt_allom%NodulerNC_pft             ,& !input  :nodule N:C ratio, [gN gC-1]
+    NodulerPC_pft             => plt_allom%NodulerPC_pft             ,& !input  :nodule P:C ratio, [gP gC-1]
+    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
+    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft           ,& !input  :threshold zero for leaf calculation, [-]
+    CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft         ,& !inoput :canopy plant+nodule autotrophic respiraiton, [gC d-2]
+    ECO_ER_col                => plt_bgcr%ECO_ER_col                 ,& !inoput :ecosystem respiration, [g d-2 h-1]
+    CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft      ,& !inoput :total autotrophic respiration, [gC d-2 ]
+    Eco_AutoR_CumYr_col       => plt_bgcr%Eco_AutoR_CumYr_col        ,& !inoput :ecosystem autotrophic respiration, [g d-2 h-1]
+    CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft              ,& !inoput :canopy net CO2 exchange, [gC d-2 h-1]
+    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft        ,& !inoput :nodule infection chemical element mass, [g d-2]
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !inoput :branch nonstructural element, [g d-2]
+    CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !inoput :branch nodule nonstructural element, [g d-2]
+    CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch   & !inoput :branch nodule structural element, [g d-2]
   )
 !     iPlantNfixType_pft=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
@@ -402,8 +401,7 @@ module NoduleBGCMod
   end associate
   end subroutine CanopyNoduleBiochemistry
 
-!------------------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine RootNodulBiochemistry(I,J,NZ,TFN6_vr)
   implicit none
   integer , intent(in) :: I,J,NZ
@@ -441,34 +439,34 @@ module NoduleBGCMod
   real(r8) :: RCCC,RCCN,RCCP
   integer  :: NE
 !     begin_execution
-  associate(                                                     &
-    NU                      => plt_site%NU,                      &
-    AREA3                   => plt_site%AREA3,                   &
-    ZERO                    => plt_site%ZERO,                    &
-    fTgrowRootP_vr          => plt_pheno%fTgrowRootP_vr,         &
-    NoduGrowthYield_pft     => plt_allom%NoduGrowthYield_pft,    &
-    NodulerNC_pft           => plt_allom%NodulerNC_pft,          &
-    NodulerPC_pft           => plt_allom%NodulerPC_pft,          &
-    k_fine_litr             => pltpar%k_fine_litr,               &
-    iroot                   => pltpar%iroot,                     &
-    fRootGrowPSISense_pvr   => plt_pheno%fRootGrowPSISense_pvr,  &
-    RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr,      &
-    RootCO2EmisPot_pvr      => plt_rbgc%RootCO2EmisPot_pvr,      &
-    RAutoRootO2Limter_rpvr  => plt_rbgc%RAutoRootO2Limter_rpvr,  &
-    RootCO2Autor_pvr        => plt_rbgc%RootCO2Autor_pvr,        &
-    NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft,     &
-    LitrfalStrutElms_pvr    => plt_bgcr%LitrfalStrutElms_pvr,    &
-    RootN2Fix_pft           => plt_rbgc%RootN2Fix_pft,           &
-    RootN2Fix_pvr           => plt_bgcr%RootN2Fix_pvr,           &
-    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr,      &
-    RootNodulStrutElms_rpvr => plt_biom%RootNodulStrutElms_rpvr, &
-    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft,          &
-    RootNodulNonstElms_rpvr => plt_biom%RootNodulNonstElms_rpvr, &
-    ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft,        &
-    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr,  &
-    ElmAllocmat4Litr        => plt_soilchem%ElmAllocmat4Litr,    &
-    iPlantNfixType_pft      => plt_morph%iPlantNfixType_pft,     &
-    NIXBotRootLayer_pft     => plt_morph%NIXBotRootLayer_pft     &
+  associate(                                                      &
+    NU                      => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
+    AREA3                   => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    ZERO                    => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
+    fTgrowRootP_vr          => plt_pheno%fTgrowRootP_vr          ,& !input  :root layer temperature growth functiom, [-]
+    NoduGrowthYield_pft     => plt_allom%NoduGrowthYield_pft     ,& !input  :nodule growth yield, [g g-1]
+    NodulerNC_pft           => plt_allom%NodulerNC_pft           ,& !input  :nodule N:C ratio, [gN gC-1]
+    NodulerPC_pft           => plt_allom%NodulerPC_pft           ,& !input  :nodule P:C ratio, [gP gC-1]
+    k_fine_litr             => pltpar%k_fine_litr                ,& !input  :fine litter complex id
+    iroot                   => pltpar%iroot                      ,& !input  :group id of plant root litter
+    fRootGrowPSISense_pvr   => plt_pheno%fRootGrowPSISense_pvr   ,& !input  :water stress to plant root growth, [-]
+    RAutoRootO2Limter_rpvr  => plt_rbgc%RAutoRootO2Limter_rpvr   ,& !input  :O2 constraint to root respiration (0-1), [-]
+    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr       ,& !input  :root layer C, [gC d-2]
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft           ,& !input  :threshold zero for plang growth calculation, [-]
+    ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft         ,& !input  :threshold zero for leaf calculation, [-]
+    ElmAllocmat4Litr        => plt_soilchem%ElmAllocmat4Litr     ,& !input  :litter kinetic fraction, [-]
+    iPlantNfixType_pft      => plt_morph%iPlantNfixType_pft      ,& !input  :N2 fixation type,[-]
+    NIXBotRootLayer_pft     => plt_morph%NIXBotRootLayer_pft     ,& !input  :maximum soil layer number for all root axes, [-]
+    RootRespPotent_pvr      => plt_rbgc%RootRespPotent_pvr       ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
+    RootCO2EmisPot_pvr      => plt_rbgc%RootCO2EmisPot_pvr       ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
+    RootCO2Autor_pvr        => plt_rbgc%RootCO2Autor_pvr         ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
+    NodulInfectElms_pft     => plt_bgcr%NodulInfectElms_pft      ,& !inoput :nodule infection chemical element mass, [g d-2]
+    LitrfalStrutElms_pvr    => plt_bgcr%LitrfalStrutElms_pvr     ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    RootN2Fix_pft           => plt_rbgc%RootN2Fix_pft            ,& !inoput :total root N2 fixation, [g d-2 h-1]
+    RootNodulStrutElms_rpvr => plt_biom%RootNodulStrutElms_rpvr  ,& !inoput :root layer nodule element, [g d-2]
+    RootNodulNonstElms_rpvr => plt_biom%RootNodulNonstElms_rpvr  ,& !inoput :root layer nonstructural element, [g d-2]
+    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr   ,& !inoput :root layer nonstructural element, [g d-2]
+    RootN2Fix_pvr           => plt_bgcr%RootN2Fix_pvr             & !output :root N2 fixation, [gN d-2 h-1]
   )
 !     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
@@ -783,4 +781,5 @@ module NoduleBGCMod
   ENDIF
   end associate
   end subroutine RootNodulBiochemistry
+  ![tail]
 end module NoduleBGCMod
