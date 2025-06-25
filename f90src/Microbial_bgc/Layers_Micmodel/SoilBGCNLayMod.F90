@@ -489,7 +489,7 @@ module SoilBGCNLayMod
   !sum up litter OM in layer L
   implicit none
   integer, intent(in) :: L, NY,NX
-  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)  !microbial biomass 
   integer :: K,N,NGL,M,MID,NE,jcplx1
 
   ORGM=0._r8
@@ -511,7 +511,7 @@ module SoilBGCNLayMod
       enddo
     enddo
   enddo
-
+  !add heterotrophs
   DO K=1,jcplx1
     !add heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx

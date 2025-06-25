@@ -73,7 +73,7 @@ implicit none
       !Predict uptake fluxes of nutrients and O2
       if(lverb)write(*,*)'uptake'
       CALL ROOTUPTAKES(I,J)
-!      if(I==140 .and. J>=20)write(116,*)'afrootupk',I*1000+J         
+
 !      call SumPlantRootGas(I,J)
 
 !      DO NZ=1,NP_col(NY,NX)

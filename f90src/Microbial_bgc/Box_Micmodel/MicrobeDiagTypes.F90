@@ -14,22 +14,22 @@ module MicrobeDiagTypes
 ! accumulative flux diagnostics
 type, public :: Cumlate_Flux_Diag_type
 ! fraction diagnostics, used for substrate competition/uptake
-    real(r8) :: TFNH4B
-    real(r8) :: TFNO3B
-    real(r8) :: TFNO2B
-    real(r8) :: TFP14B
-    real(r8) :: TFPO4B
+    real(r8) :: TFNH4B           !total releative demand of NH4 in banded soil by microbes
+    real(r8) :: TFNO3B           !total releative demand of NO3 in banded soil by microbes
+    real(r8) :: TFNO2B           !total releative demand of NO2 in banded soil by microbes
+    real(r8) :: TFP14B           !total releative demand of HPO4 in banded soil by microbes
+    real(r8) :: TFPO4B           !total releative demand of H2PO4 in banded soil by microbes
     real(r8) :: tCH4ProdAceto    !acetoclastic CH4 production 
     real(r8) :: tCH4ProdH2       !Hydrogenotrophic methane production
-    real(r8) :: TFOQC
-    real(r8) :: TFOQA
-    real(r8) :: TFOXYX
-    real(r8) :: TFNH4X
-    real(r8) :: TFNO3X
-    real(r8) :: TFNO2X
-    real(r8) :: TFN2OX
-    real(r8) :: TFP14X
-    real(r8) :: TFPO4X
+    real(r8) :: TFOQC            !total relative DOC uptake by microbes
+    real(r8) :: TFOQA            !total releative acetate uptake by microbes
+    real(r8) :: TFOXYX           !total relative O2 demand by microbes
+    real(r8) :: TFNH4X           !total relative demand of NH4 in non-banded soil by Microbes
+    real(r8) :: TFNO3X           !total relative demand of NO3 in non-banded soil by Microbes
+    real(r8) :: TFNO2X           !total relative demand of NO2 in non-banded soil by Microbes
+    real(r8) :: TFN2OX           !total relative demand of N2O in non-banded soil by Microbes
+    real(r8) :: TFP14X           !total relative demand of H1PO4 in non-banded soil by Microbes
+    real(r8) :: TFPO4X           !total relative demand of H2PO4 in non-banded soil by Microbes
 !fluxes
     real(r8) :: tCResp4H2Prod
     real(r8) :: tRNH4MicrbTransfSoil
@@ -356,69 +356,69 @@ type, public :: Cumlate_Flux_Diag_type
   integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
   integer :: ndbiomcp
   integer :: NumMicrobAutrophCmplx
-  integer :: NumHetetrMicCmplx
+  integer :: NumHetetr1MicCmplx
   ndbiomcp=micpar%ndbiomcp
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
+  NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx
 
-  allocate(this%RO2UptkHeter(NumHetetrMicCmplx,1:jcplx));this%RO2UptkHeter=spval
-  allocate(this%RO2UptkHeterG(NumHetetrMicCmplx));this%RO2UptkHeterG=spval
+  allocate(this%RO2UptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2UptkHeter=spval
+  allocate(this%RO2UptkHeterG(NumHetetr1MicCmplx));this%RO2UptkHeterG=spval
 
-  allocate(this%Resp4NFixHeter(NumHetetrMicCmplx,1:jcplx));this%Resp4NFixHeter=spval
-  allocate(this%RespGrossHeter(NumHetetrMicCmplx,1:jcplx));this%RespGrossHeter=spval
-  allocate(this%RO2Dmnd4RespHeter(NumHetetrMicCmplx,1:jcplx));this%RO2Dmnd4RespHeter=spval
-  allocate(this%RO2DmndHeter(NumHetetrMicCmplx,1:jcplx));this%RO2DmndHeter=spval
-  allocate(this%RO2DmndHeterG(NumHetetrMicCmplx));this%RO2DmndHeterG=spval
-  allocate(this%RO2Uptk4RespHeter(NumHetetrMicCmplx,1:jcplx));this%RO2Uptk4RespHeter=spval
-  allocate(this%RNO3ReduxHeterSoil(NumHetetrMicCmplx,1:jcplx));this%RNO3ReduxHeterSoil=spval
-  allocate(this%RNO3ReduxHeterBand(NumHetetrMicCmplx,1:jcplx));this%RNO3ReduxHeterBand=spval
-  allocate(this%RNO2ReduxHeterSoil(NumHetetrMicCmplx,1:jcplx));this%RNO2ReduxHeterSoil=spval
-  allocate(this%RNO2ReduxHeterBand(NumHetetrMicCmplx,1:jcplx));this%RNO2ReduxHeterBand=spval
-  allocate(this%RN2OReduxHeter(NumHetetrMicCmplx,1:jcplx));this%RN2OReduxHeter=spval
-  allocate(this%RNOxReduxRespDenitLim(NumHetetrMicCmplx,1:jcplx));this%RNOxReduxRespDenitLim=spval
-  allocate(this%RMaintDmndHeter(2,NumHetetrMicCmplx,1:jcplx));this%RMaintDmndHeter=spval
-  allocate(this%RNH4TransfSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4TransfSoilHeter=spval
-  allocate(this%RNO3TransfSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3TransfSoilHeter=spval
-  allocate(this%RH2PO4TransfSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4TransfSoilHeter=spval
-  allocate(this%RNH4TransfBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4TransfBandHeter=spval
-  allocate(this%RNO3TransfBandHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3TransfBandHeter=spval
-  allocate(this%RH2PO4TransfBandHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4TransfBandHeter=spval
-  allocate(this%RkillLitfalOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitfalOMHeter=spval
-  allocate(this%RkillLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitrfal2HumOMHeter=spval
-  allocate(this%RkillLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillLitrfal2ResduOMHeter=spval
-  allocate(this%DOMuptk4GrothHeter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%DOMuptk4GrothHeter=spval
-  allocate(this%RH2ProdHeter(NumHetetrMicCmplx,1:jcplx));this%RH2ProdHeter=spval
-  allocate(this%RMaintDefcitLitrfalOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitLitrfalOMHeter=spval
-  allocate(this%RMaintDefcitLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitLitrfal2HumOMHeter=spval
-  allocate(this%RMaintDefcitLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitLitrfal2ResduOMHeter=spval
-  allocate(this%RN2FixHeter(NumHetetrMicCmplx,1:jcplx));this%RN2FixHeter=spval
-  allocate(this%RKillOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RKillOMHeter=spval
-  allocate(this%RkillRecycOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RkillRecycOMHeter=spval
-  allocate(this%RMaintDefcitKillOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitKillOMHeter=spval
-  allocate(this%RMaintDefcitRecycOMHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%RMaintDefcitRecycOMHeter=spval
-  allocate(this%RAnabolDOCUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAnabolDOCUptkHeter=spval
-  allocate(this%RAnabolAcetUptkHeter(NumHetetrMicCmplx,1:jcplx));this%RAnabolAcetUptkHeter=spval
-  allocate(this%RNH4TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNH4TransfLitrHeter=spval
-  allocate(this%RNO3TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RNO3TransfLitrHeter=spval
-  allocate(this%RH2PO4TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH2PO4TransfLitrHeter=spval
-  allocate(this%AttenfNH4Heter(NumHetetrMicCmplx,1:jcplx));this%AttenfNH4Heter=spval
-  allocate(this%AttenfNO3Heter(NumHetetrMicCmplx,1:jcplx));this%AttenfNO3Heter=spval
-  allocate(this%AttenfH2PO4Heter(NumHetetrMicCmplx,1:jcplx));this%AttenfH2PO4Heter=spval
-  allocate(this%RNOxReduxRespDenitUlm(NumHetetrMicCmplx,1:jcplx));this%RNOxReduxRespDenitUlm=spval
-  allocate(this%NonstX2stBiomHeter(NumPlantChemElms,2,NumHetetrMicCmplx,1:jcplx));this%NonstX2stBiomHeter=spval
-  allocate(this%AttenfH1PO4Heter(NumHetetrMicCmplx,1:jcplx));this%AttenfH1PO4Heter=spval
-  allocate(this%RCO2ProdHeter(NumHetetrMicCmplx,1:jcplx));this%RCO2ProdHeter=spval
-  allocate(this%RAcettProdHeter(NumHetetrMicCmplx,1:jcplx));this%RAcettProdHeter=spval
-  allocate(this%RCH4ProdHeter(NumHetetrMicCmplx,1:jcplx));this%RCH4ProdHeter=spval
-  allocate(this%RH1PO4TransfSoilHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4TransfSoilHeter=spval
-  allocate(this%RH1PO4TransfBandHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4TransfBandHeter=spval
-  allocate(this%RH1PO4TransfLitrHeter(NumHetetrMicCmplx,1:jcplx));this%RH1PO4TransfLitrHeter=spval
+  allocate(this%Resp4NFixHeter(NumHetetr1MicCmplx,1:jcplx));this%Resp4NFixHeter=spval
+  allocate(this%RespGrossHeter(NumHetetr1MicCmplx,1:jcplx));this%RespGrossHeter=spval
+  allocate(this%RO2Dmnd4RespHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2Dmnd4RespHeter=spval
+  allocate(this%RO2DmndHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2DmndHeter=spval
+  allocate(this%RO2DmndHeterG(NumHetetr1MicCmplx));this%RO2DmndHeterG=spval
+  allocate(this%RO2Uptk4RespHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2Uptk4RespHeter=spval
+  allocate(this%RNO3ReduxHeterSoil(NumHetetr1MicCmplx,1:jcplx));this%RNO3ReduxHeterSoil=spval
+  allocate(this%RNO3ReduxHeterBand(NumHetetr1MicCmplx,1:jcplx));this%RNO3ReduxHeterBand=spval
+  allocate(this%RNO2ReduxHeterSoil(NumHetetr1MicCmplx,1:jcplx));this%RNO2ReduxHeterSoil=spval
+  allocate(this%RNO2ReduxHeterBand(NumHetetr1MicCmplx,1:jcplx));this%RNO2ReduxHeterBand=spval
+  allocate(this%RN2OReduxHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2OReduxHeter=spval
+  allocate(this%RNOxReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitLim=spval
+  allocate(this%RMaintDmndHeter(2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDmndHeter=spval
+  allocate(this%RNH4TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfSoilHeter=spval
+  allocate(this%RNO3TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfSoilHeter=spval
+  allocate(this%RH2PO4TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfSoilHeter=spval
+  allocate(this%RNH4TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfBandHeter=spval
+  allocate(this%RNO3TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfBandHeter=spval
+  allocate(this%RH2PO4TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfBandHeter=spval
+  allocate(this%RkillLitfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitfalOMHeter=spval
+  allocate(this%RkillLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitrfal2HumOMHeter=spval
+  allocate(this%RkillLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitrfal2ResduOMHeter=spval
+  allocate(this%DOMuptk4GrothHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%DOMuptk4GrothHeter=spval
+  allocate(this%RH2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2ProdHeter=spval
+  allocate(this%RMaintDefcitLitrfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfalOMHeter=spval
+  allocate(this%RMaintDefcitLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfal2HumOMHeter=spval
+  allocate(this%RMaintDefcitLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfal2ResduOMHeter=spval
+  allocate(this%RN2FixHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2FixHeter=spval
+  allocate(this%RKillOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RKillOMHeter=spval
+  allocate(this%RkillRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillRecycOMHeter=spval
+  allocate(this%RMaintDefcitKillOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitKillOMHeter=spval
+  allocate(this%RMaintDefcitRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitRecycOMHeter=spval
+  allocate(this%RAnabolDOCUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RAnabolDOCUptkHeter=spval
+  allocate(this%RAnabolAcetUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RAnabolAcetUptkHeter=spval
+  allocate(this%RNH4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfLitrHeter=spval
+  allocate(this%RNO3TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfLitrHeter=spval
+  allocate(this%RH2PO4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfLitrHeter=spval
+  allocate(this%AttenfNH4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNH4Heter=spval
+  allocate(this%AttenfNO3Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNO3Heter=spval
+  allocate(this%AttenfH2PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH2PO4Heter=spval
+  allocate(this%RNOxReduxRespDenitUlm(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitUlm=spval
+  allocate(this%NonstX2stBiomHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%NonstX2stBiomHeter=spval
+  allocate(this%AttenfH1PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH1PO4Heter=spval
+  allocate(this%RCO2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCO2ProdHeter=spval
+  allocate(this%RAcettProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RAcettProdHeter=spval
+  allocate(this%RCH4ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCH4ProdHeter=spval
+  allocate(this%RH1PO4TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4TransfSoilHeter=spval
+  allocate(this%RH1PO4TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4TransfBandHeter=spval
+  allocate(this%RH1PO4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4TransfLitrHeter=spval
 
   allocate(this%RSOxidSoilAutor(NumMicrobAutrophCmplx));this%RSOxidSoilAutor=spval
   allocate(this%RSOxidBandAutor(NumMicrobAutrophCmplx));this%RSOxidBandAutor=spval
-  allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetrMicCmplx,1:jcplx));this%XferBiomeHeterK=spval
-  allocate(this%ROQC4HeterMicrobAct(NumHetetrMicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
-  allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetrMicCmplx,1:jcplx));this%RCCMEheter=spval
+  allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetr1MicCmplx,1:jcplx));this%XferBiomeHeterK=spval
+  allocate(this%ROQC4HeterMicrobAct(NumHetetr1MicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
+  allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetr1MicCmplx,1:jcplx));this%RCCMEheter=spval
 
   allocate(this%RO2UptkAutor(NumMicrobAutrophCmplx));this%RO2UptkAutor=spval
   allocate(this%Resp4NFixAutor(NumMicrobAutrophCmplx));this%Resp4NFixAutor=spval
@@ -472,24 +472,24 @@ type, public :: Cumlate_Flux_Diag_type
   implicit none
   class(Microbe_State_type) :: this
   integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
-  integer :: NumMicrobAutrophCmplx,NumHetetrMicCmplx
+  integer :: NumMicrobAutrophCmplx,NumHetetr1MicCmplx
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx=micpar%NumHetetrMicCmplx
+  NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx
 
-  allocate(this%rCNBiomeActHeter(NumPlantChemElms,NumHetetrMicCmplx,1:jcplx));this%rCNBiomeActHeter=1._r8
-  allocate(this%OMActHeter(NumHetetrMicCmplx,1:jcplx));this%OMActHeter=spval
-  allocate(this%FracOMActHeter(NumHetetrMicCmplx,1:jcplx));this%FracOMActHeter=spval
-  allocate(this%FracNO2ReduxHeter(NumHetetrMicCmplx,1:jcplx));this%FracNO2ReduxHeter=spval
-  allocate(this%FracHeterBiomOfActK(NumHetetrMicCmplx,1:jcplx));this%FracHeterBiomOfActK=spval
-  allocate(this%OMC2(NumHetetrMicCmplx,1:jcplx));this%OMC2=spval
-  allocate(this%GrowthEnvScalHeter(NumHetetrMicCmplx,1:jcplx));this%GrowthEnvScalHeter=spval
-  allocate(this%TempMaintRHeter(NumHetetrMicCmplx,1:jcplx));this%TempMaintRHeter=spval
-  allocate(this%OMN2(NumHetetrMicCmplx,1:jcplx));this%OMN2=spval
-  allocate(this%FOM2(NumHetetrMicCmplx,1:jcplx));this%FOM2=spval
-  allocate(this%OxyLimterHeter(NumHetetrMicCmplx,1:jcplx));this%OxyLimterHeter=spval
-  allocate(this%FCN(NumHetetrMicCmplx,1:jcplx));this%FCN=spval
-  allocate(this%FCP(NumHetetrMicCmplx,1:jcplx));this%FCP=spval
-  allocate(this%FBiomStoiScalarHeter(NumHetetrMicCmplx,1:jcplx));this%FBiomStoiScalarHeter=spval
+  allocate(this%rCNBiomeActHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%rCNBiomeActHeter=1._r8
+  allocate(this%OMActHeter(NumHetetr1MicCmplx,1:jcplx));this%OMActHeter=spval
+  allocate(this%FracOMActHeter(NumHetetr1MicCmplx,1:jcplx));this%FracOMActHeter=spval
+  allocate(this%FracNO2ReduxHeter(NumHetetr1MicCmplx,1:jcplx));this%FracNO2ReduxHeter=spval
+  allocate(this%FracHeterBiomOfActK(NumHetetr1MicCmplx,1:jcplx));this%FracHeterBiomOfActK=spval
+  allocate(this%OMC2(NumHetetr1MicCmplx,1:jcplx));this%OMC2=spval
+  allocate(this%GrowthEnvScalHeter(NumHetetr1MicCmplx,1:jcplx));this%GrowthEnvScalHeter=spval
+  allocate(this%TempMaintRHeter(NumHetetr1MicCmplx,1:jcplx));this%TempMaintRHeter=spval
+  allocate(this%OMN2(NumHetetr1MicCmplx,1:jcplx));this%OMN2=spval
+  allocate(this%FOM2(NumHetetr1MicCmplx,1:jcplx));this%FOM2=spval
+  allocate(this%OxyLimterHeter(NumHetetr1MicCmplx,1:jcplx));this%OxyLimterHeter=spval
+  allocate(this%FCN(NumHetetr1MicCmplx,1:jcplx));this%FCN=spval
+  allocate(this%FCP(NumHetetr1MicCmplx,1:jcplx));this%FCP=spval
+  allocate(this%FBiomStoiScalarHeter(NumHetetr1MicCmplx,1:jcplx));this%FBiomStoiScalarHeter=spval
 
   allocate(this%rCNBiomeActAutor(NumPlantChemElms,NumMicrobAutrophCmplx));this%rCNBiomeActAutor=1.0_r8
   allocate(this%OMActAutor(NumMicrobAutrophCmplx));this%OMActAutor=spval
@@ -777,7 +777,7 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RHydlysBioResduOM(1:NumPlantChemElms,ndbiomcp,1:ncplx))
   allocate(this%RHydlysSorptOM(idom_beg:idom_end,1:ncplx))
   allocate(this%RDOMSorp(idom_beg:idom_end,1:ncplx))
-  allocate(this%TDOMUptkHeter(idom_beg:idom_end,1:ncplx+1))
+  allocate(this%TDOMUptkHeter(idom_beg:idom_end,1:ncplx))
   allocate(this%ROQC4HeterMicActCmpK(1:ncplx))
   allocate(this%XferRespHeterK(1:ncplx))
   allocate(this%XferDOMK(idom_beg:idom_end,1:ncplx))

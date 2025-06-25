@@ -1642,9 +1642,9 @@ module MicBGCMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout):: ncplxs
-  integer :: K,M,N,NGL,NE,idom
+  integer :: K,M,N,NGL,NE,idom,N1,N2
   real(r8) :: FORC(0:jcplx)
-  real(r8) :: dflux(micpar%NumHetetrMicCmplx),scal
+  real(r8) :: dflux(micpar%NumHetetr1MicCmplx),scal
 !     begin_execution
   associate(                                                                    &
     k_POM                            => micpar%k_POM,                           &
@@ -1673,6 +1673,7 @@ module MicBGCMod
     OMBioResdu                       => micstt%OMBioResdu,                      &
     SorbedOM                         => micstt%SorbedOM,                        &
     ZEROS                            => micfor%ZEROS,                           &
+    NumHetetr1MicCmplx               => micpar%NumHetetr1MicCmplx ,             &
     Litrm                            => micfor%litrm                            &
   )
 !
@@ -1769,29 +1770,30 @@ module MicBGCMod
 !
 !     RAnabolDOCUptkHeter,RAnabolAcetUptkHeter,DOMuptk4GrothHeter,DOMuptk4GrothHeter=DOC,acetate,DON,DOP uptake
 !     RAcettProdHeter=acetate production from fermentation
-!
-    D570: DO N=1,NumMicbFunGrupsPerCmplx
+
+    N1=1; N2=NumHetetr1MicCmplx
       
-      call SubstrateLimit(JGnio(N),JGnfo(N),RAnabolDOCUptkHeter(JGnio(N):JGnfo(N),K),DOM(idom_doc,K))
-      
-      call SubstrateLimit(JGnio(N),JGnfo(N),DOMuptk4GrothHeter(ielmn,JGnio(N):JGnfo(N),K),DOM(idom_don,K))
+    call SubstrateLimit(N1,N2,RAnabolDOCUptkHeter(N1:N2,K),DOM(idom_doc,K))
+    
+    call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmn,N1:N2,K),DOM(idom_don,K))
 
-      call SubstrateLimit(JGnio(N),JGnfo(N),DOMuptk4GrothHeter(ielmp,JGnio(N):JGnfo(N),K),DOM(idom_dop,K))
+    call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmp,N1:N2,K),DOM(idom_dop,K))
 
-      DO NGL=JGnio(N),JGnfo(N)
-        dflux(ngl) = RAnabolAcetUptkHeter(NGL,K)-RAcettProdHeter(NGL,K)
-      ENDDO  
+    DO NGL=N1,N2
+      dflux(ngl) = RAnabolAcetUptkHeter(NGL,K)-RAcettProdHeter(NGL,K)
+    ENDDO  
 
-      call SubstrateLimit(JGnio(N),JGnfo(N),dflux,DOM(idom_acetate,K),scal)
+    call SubstrateLimit(N1,N2,dflux,DOM(idom_acetate,K),scal)
 
-      DO NGL=JGnio(N),JGnfo(N)
-        RAnabolAcetUptkHeter(NGL,K) = RAnabolAcetUptkHeter(NGL,K)*scal
-        RAcettProdHeter(NGL,K)      = RAcettProdHeter(NGL,K)*scal
-      ENDDO  
+    DO NGL=N1,N2
+      RAnabolAcetUptkHeter(NGL,K) = RAnabolAcetUptkHeter(NGL,K)*scal
+      RAcettProdHeter(NGL,K)      = RAcettProdHeter(NGL,K)*scal
+    ENDDO  
 
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
+    D570: DO N=1,NumMicbFunGrupsPerCmplx
       DO NGL=JGnio(N),JGnfo(N)
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms

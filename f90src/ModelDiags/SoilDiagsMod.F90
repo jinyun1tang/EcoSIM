@@ -59,12 +59,14 @@ implicit none
           CH4_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CH4)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
           Ar_Gas_Frac_vr(L,NY,NX)  = GasPres(idg_Ar)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
           O2_Gas_Frac_vr(L,NY,NX)  = GasPres(idg_O2)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
+          H2_Gas_Frac_vr(L,NY,NX)  = GasPres(idg_H2)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
         ELSE
           Soil_Gas_pressure_vr(L,NY,NX) = 0._r8
           CO2_Gas_Frac_vr(L,NY,NX)      = 0._r8
           CH4_Gas_Frac_vr(L,NY,NX)      = 0._r8
           Ar_Gas_Frac_vr(L,NY,NX)       = 0._r8
           O2_Gas_Frac_vr(L,NY,NX)       = 0._r8
+          H2_Gas_Frac_vr(L,NY,NX)       = 0._r8
         ENDIF
       ENDDO
     ENDDO

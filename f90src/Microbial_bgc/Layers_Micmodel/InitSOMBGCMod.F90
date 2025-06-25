@@ -46,7 +46,7 @@ module InitSOMBGCMOD
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx     = micpar%NumHetetrMicCmplx
+  NumHetetr1MicCmplx     = micpar%NumHetetr1MicCmplx
   NumLiveHeterBioms     = micpar%NumLiveHeterBioms
   NumLiveAutoBioms      = micpar%NumLiveAutoBioms
   allocate(CORGCX(1:jcplx))

@@ -497,7 +497,7 @@ module minimathmod
   subroutine SubstrateLimit(n1,n2,demand_flux,y,scal)
   implicit none
   integer, intent(in) :: n1,n2
-  real(r8), intent(inout) :: demand_flux(n1:n2)
+  real(r8), intent(inout) :: demand_flux(n1:n2)  !consumption/demand flux
   real(r8), intent(inout) :: Y  
   real(r8), optional, intent(out)   :: scal
   real(r8) :: tDemand,scal1

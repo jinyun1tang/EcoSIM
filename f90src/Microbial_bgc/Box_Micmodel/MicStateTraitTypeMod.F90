@@ -95,7 +95,7 @@ implicit none
   class(micsttype) :: this
   integer :: jcplx,NumMicbFunGrupsPerCmplx,jsken
   integer, pointer :: ndbiomcp, nlbiomcp
-  integer, pointer :: NumMicrobAutrophCmplx, NumHetetrMicCmplx
+  integer, pointer :: NumMicrobAutrophCmplx, NumHetetr1MicCmplx
   integer, pointer :: NumLiveHeterBioms
   integer, pointer :: NumLiveAutoBioms
 
@@ -107,7 +107,7 @@ implicit none
   ndbiomcp =>micpar%ndbiomcp
   nlbiomcp =>micpar%nlbiomcp
   NumMicrobAutrophCmplx=>micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx=>micpar%NumHetetrMicCmplx
+  NumHetetr1MicCmplx=>micpar%NumHetetr1MicCmplx
   NumLiveHeterBioms => micpar%NumLiveHeterBioms
 
   allocate(this%FracBulkSOMC(1:jcplx));this%FracBulkSOMC=spval

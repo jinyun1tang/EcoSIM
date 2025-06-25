@@ -53,8 +53,8 @@ module UptakesMod
   integer :: NN,N,NZ,K,L
   real(r8) :: FracGrndByPFT
   real(r8) :: VHeatCapCanopyAir
-  real(r8) :: CanopyMassC                !Canopy C mass, g/m2
-  real(r8) :: TotalSoilPSIMPa_vr(JZ1)    !total soil matric pressure, removing elevation adjustment [MPa]
+  real(r8) :: CanopyMassC                 !Canopy C mass, g/m2
+  real(r8) :: TotalSoilPSIMPa_vr(JZ1)     !total soil matric pressure, removing elevation adjustment [MPa]
   real(r8) :: PathLen_pvr(jroots,JZ1)
   real(r8) :: FineRootRadius_rvr(jroots,JZ1)
   real(r8) :: RootResist_rvr(jroots,JZ1)
@@ -62,7 +62,8 @@ module UptakesMod
   real(r8) :: RootResistPrimary(jroots,JZ1)
   real(r8) :: RootResist2ndary(jroots,JZ1)
   real(r8) :: SoiH2OResist(jroots,JZ1)
-  real(r8) :: SoilRootResistance_rvr(jroots,JZ1),AllRootC_vr(JZ1)
+  real(r8) :: SoilRootResistance_rvr(jroots,JZ1)
+  real(r8) :: AllRootC_vr(JZ1)
   real(r8) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
   real(r8) :: FracPrimRootOccupiedLay_pvr(JZ1,JP1)
@@ -79,7 +80,7 @@ module UptakesMod
   logical  :: HydroActivePlant
   logical  :: SoiLayerHasRoot_rvr(jroots,JZ1)
 !     begin_execution
-  associate(                                                      &
+  associate(                                                        &
     AREA3                     => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft        ,& !input  :canopy water content, [m3 d-2]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft    ,& !input  :canopy boundary layer resistance, [h m-1]
@@ -213,8 +214,8 @@ module UptakesMod
 !
 !     prepare for uptake calculation
   implicit none
-  real(r8), intent(out) :: TotalSoilPSIMPa_vr(JZ1)   !total soil matric pressure [MPa]
-  real(r8), intent(out) :: AllRootC_vr(JZ1)
+  real(r8), intent(out) :: TotalSoilPSIMPa_vr(JZ1)   !total soil matric pressure after removing elevation adjustment, [MPa]
+  real(r8), intent(out) :: AllRootC_vr(JZ1)          !total root C profile, [gC d-2]
   real(r8), intent(out) :: AirMicPore4Fill_vr(JZ1)
   real(r8), intent(out) :: WatAvail4Uptake_vr(JZ1)
 
@@ -222,7 +223,7 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                                                      &
+  associate(                                                          &
     ALT                        => plt_site%ALT                       ,& !input  :altitude of the grid cell, [m]
     CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft       ,& !input  :plant canopy leaf area, [m2 d-2]
     CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft       ,& !input  :plant stem area, [m2 d-2]

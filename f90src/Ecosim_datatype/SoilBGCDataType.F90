@@ -113,7 +113,8 @@ implicit none
   real(r8),target,allocatable ::  Gas_WetDeposit_flx_col(:,:,:)       !wet gas deposition due to irrigation and rainfall, [g d-2 h-1]
   real(r8),target,allocatable ::  Soil_Gas_pressure_vr(:,:,:)         !soil gas pressure, [Pa]
   real(r8),target,allocatable ::  CO2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous CO2, [ppmv]
-  real(r8),target,allocatable ::  O2_Gas_Frac_vr(:,:,:)              !volumetric concentation of gaseous O2, [ppmv]
+  real(r8),target,allocatable ::  O2_Gas_Frac_vr(:,:,:)               !volumetric concentation of gaseous O2, [ppmv]
+  real(r8),target,allocatable :: H2_Gas_Frac_vr(:,:,:)                !volumetric concentation of gaseous H2, [ppmv]
   real(r8),target,allocatable ::  Ar_Gas_frac_vr(:,:,:)               !volumetric concentation of Ar gas,  [ppmv]
   real(r8),target,allocatable ::  CH4_gas_frac_vr(:,:,:)              !volumetric concentation of CH4 gas, [ppmv]
   real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)             !Hydrogenotrophic CH4 production rate, [gC d-2 h-1]
@@ -177,6 +178,7 @@ implicit none
   allocate(ZNHU0_vr(0:JZ,JY,JX));  ZNHU0_vr=0._r8
   allocate(CPO4B_vr(0:JZ,JY,JX));CPO4B_vr(0:JZ,JY,JX)=0._r8
   allocate(O2_Gas_Frac_vr(1:JZ,JY,JX)) ; O2_Gas_Frac_vr = 0._r8
+  allocate(H2_Gas_Frac_vr(1:JZ,JY,JX)); H2_Gas_Frac_vr=0._r8
   allocate(CO2_Gas_Frac_vr(1:JZ,JY,JX)) ; CO2_Gas_Frac_vr = 0._r8
   allocate(CH4_Gas_Frac_vr(1:JZ,JY,JX)) ; CH4_Gas_Frac_vr = 0._r8  
   allocate(Ar_Gas_Frac_vr(1:JZ,JY,JX)) ; Ar_Gas_Frac_vr = 0._r8  
@@ -284,6 +286,7 @@ implicit none
   call destroy(trcs_SubsurTransp_flx_2DH)
   call destroy(O2_Gas_Frac_vr)
   call destroy(CO2_Gas_Frac_vr)
+  call destroy(H2_Gas_Frac_vr)
   call destroy(CH4_Gas_Frac_vr)  
   call destroy(Ar_Gas_Frac_vr)
   call destroy(RGasNetProd_col)
