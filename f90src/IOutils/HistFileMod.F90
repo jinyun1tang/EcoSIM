@@ -7,7 +7,7 @@ module HistFileMod
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
   use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type,NumOfPlantMorphUnits
-  use GridConsts        , only : NumOfCanopyLayers,JP,NumGrowthStages  
+  use GridConsts        , only : NumCanopyLayers,JP,NumGrowthStages  
   use ElmIDMod          , only : NumPlantChemElms  
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
@@ -247,7 +247,7 @@ implicit none
   ! "level" dimensions
   call ncd_defdim(lnfid, 'levsoi', JZ, dimid)
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
-  call ncd_defdim(lnfid, 'levcan',NumOfCanopyLayers,dimid)
+  call ncd_defdim(lnfid, 'levcan',NumCanopyLayers,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
@@ -565,7 +565,7 @@ implicit none
   case ('elements')    
       num2d=NumPlantChemElms
   case ('levcan')
-      num2d=NumOfCanopyLayers
+      num2d=NumCanopyLayers
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &

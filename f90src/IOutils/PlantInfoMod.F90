@@ -444,7 +444,7 @@ implicit none
     IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
       CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax_col(NY,NX)
     ENDIF
-    D5: DO NB=1,NumOfCanopyLayers
+    D5: DO NB=1,NumCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
@@ -522,7 +522,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC_pft(NZ,NY,NX))
 
 
-  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumOfLeafZenithSectors,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
@@ -859,7 +859,7 @@ implicit none
   call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC_pft(NZ,NY,NX),70)
   call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
-    LeafAngleClass_pft(1:NumOfLeafZenithSectors,NZ,NY,NX),70)
+    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),70)
   call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'stem angle from horizontal ANGBR',BranchAngle_pft(NZ,NY,NX),70)
   call writefixl(nu_plt,'petiole angle from horizontal ANGSH',PetioleAngle_pft(NZ,NY,NX),70)

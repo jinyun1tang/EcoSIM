@@ -210,11 +210,11 @@ contains
         InternodeStrutElms_brch(NE,K,NB,NZ) = InternodeStrutElms_brch(NE,K,NB,NZ)*XHVST
         LeafElmntNode_brch(NE,K,NB,NZ)      = LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
         PetioleElmntNode_brch(NE,K,NB,NZ)   = PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
-        DO L=1,NumOfCanopyLayers1
+        DO L=1,NumCanopyLayers1
           LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)=LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)*XHVST
         ENDDO
       ENDDO
-      D8965: DO L=1,NumOfCanopyLayers1
+      D8965: DO L=1,NumCanopyLayers1
         CanopyLeafArea_lnode(L,K,NB,NZ)=CanopyLeafArea_lnode(L,K,NB,NZ)*XHVST
       ENDDO D8965
     ENDDO D8970

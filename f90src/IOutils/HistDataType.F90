@@ -9,6 +9,7 @@ module HistDataType
   use MiniMathMod,      only: safe_adb,     AZMAX1
   use EcoSiMParDataMod, only: pltpar,       micpar
   use DebugToolMod,     only: DebugPrint
+  use CanopyRadDataType
   use GridConsts
   use GridMod
   use HistFileMod
@@ -108,6 +109,7 @@ implicit none
   real(r8),pointer   :: h1D_ATM_CO2_col(:)      
   real(r8),pointer   :: h1D_ATM_CH4_col(:)      
   real(r8),pointer   :: h1D_NBP_col(:)          
+  real(r8),pointer   :: h1D_CanSWRad_col(:)
   real(r8),pointer   :: h1D_ECO_HVST_C_col(:)  
   real(r8),pointer   :: h1D_ECO_LAI_col(:)
   real(r8),pointer   :: h1D_ECO_SAI_col(:)
@@ -523,6 +525,7 @@ implicit none
   allocate(this%h1D_SUB_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DIP_FLX_col(:)=spval
   allocate(this%h1D_HeatFlx2Grnd_col(beg_col:end_col))     ;this%h1D_HeatFlx2Grnd_col(:)=spval
   allocate(this%h1D_RadSW_Grnd_col(beg_col:end_col)); this%h1D_RadSW_Grnd_col(:)=spval
+  allocate(this%h1D_CanSWRad_col(beg_col:end_col)); this%h1D_CanSWRad_col(:)=spval
   allocate(this%h1D_Qinfl2soi_col(beg_col:end_col))     ;this%h1D_Qinfl2soi_col(:)=spval
   allocate(this%h1D_Qdrain_col(beg_col:end_col))       ; this%h1D_Qdrain_col(:)=spval
   allocate(this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col)) ;this%h1D_tSALT_DISCHG_FLX_col(:)=spval
@@ -940,7 +943,7 @@ implicit none
   allocate(this%h2D_fTRootGro_pvr(beg_ptc:end_ptc,1:JZ)) ; this%h2D_fTRootGro_pvr=spval
   allocate(this%h2D_fRootGrowPSISense_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_fRootGrowPSISense_pvr=spval
   allocate(this%h3D_PARTS_ptc(beg_ptc:end_ptc,1:NumOfPlantMorphUnits,1:MaxNumBranches));this%h3D_PARTS_ptc(:,:,:)=spval
-  allocate(this%h2D_CanopyLAIZ_plyr(beg_ptc:end_ptc,1:NumOfCanopyLayers)); this%h2D_CanopyLAIZ_plyr(:,:)=spval
+  allocate(this%h2D_CanopyLAIZ_plyr(beg_ptc:end_ptc,1:NumCanopyLayers)); this%h2D_CanopyLAIZ_plyr(:,:)=spval
   !-----------------------------------------------------------------------
   ! initialize history fields 
   !--------------------------------------------------------------------
@@ -1094,6 +1097,10 @@ implicit none
   call hist_addfld1d(fname='RadSW_Grnd_col',units='W/m2',avgflag='A',&
     long_name='Shortwave Radiation onto the ground',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_CanSWRad_col(beg_col:end_col)
+  call hist_addfld1d(fname='RadSW_Canopy_col',units='W/m2',avgflag='A',&
+    long_name='Shortwave Radiation onto the grid canopy',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_Qinfl2soi_col(beg_col:end_col)
   call hist_addfld1d(fname='Qinfl2soi_col',units='mm H2O/hr',avgflag='A',&
     long_name='Water flux into the ground',ptr_col=data1d_ptr)      
@@ -1134,11 +1141,11 @@ implicit none
 
   data1d_ptr => this%h1D_tSoilOrgC_col(beg_col:end_col)    
   call hist_addfld1d(fname='tSoilOrgC_col',units='gC/m2',avgflag='A', &
-    long_name='Column-integrated total soil organic C',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Column-integrated total soil organic C',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_tSoilOrgN_col(beg_col:end_col)    
   call hist_addfld1d(fname='tSoilOrgN_col',units='gN/m2',avgflag='A', &
-    long_name='Column-integrated total soil organic N',ptr_col=data1d_ptr)            
+    long_name='Column-integrated total soil organic N',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_tSoilOrgP_col(beg_col:end_col)    
   call hist_addfld1d(fname='tSoilOrgP_col',units='gP/m2',avgflag='A', &
@@ -1149,11 +1156,11 @@ implicit none
     long_name='Column-integrated micriobial C (include surface litter)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tMICRO_N_col(beg_col:end_col)    
-  call hist_addfld1d(fname='tMICROB_N',units='gN/m2',avgflag='A', &
-    long_name='Column-integrated micriobial N (include surface litter)',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='tMICROB_N_col',units='gN/m2',avgflag='A', &
+    long_name='Column-integrated micriobial N (include surface litter)',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_tMICRO_P_col(beg_col:end_col)    
-  call hist_addfld1d(fname='tMICROB_P',units='gP/m2',avgflag='A', &
+  call hist_addfld1d(fname='tMICROB_P_col',units='gP/m2',avgflag='A', &
     long_name='Column-integrated micriobial P (include surface litter)',ptr_col=data1d_ptr, &
     default='inactive')            
 
@@ -2327,19 +2334,19 @@ implicit none
     long_name='Root P density profile',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_DOC_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='DOC_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='DOC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='DOC profile',ptr_col=data2d_ptr)      
 
   data2d_ptr =>  this%h2D_DON_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='DON_vr',units='gN/m2',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='DON_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
     long_name='DON profile',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_DOP_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='DOP_vr',units='gP/m2',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='DOP_vr',units='gP/m3',type2d='levsoi',avgflag='A',&
     long_name='DOP profile',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_acetate_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='acetate_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='acetate_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Acetate profile',ptr_col=data2d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_DOC_LITR_col(beg_col:end_col)    
@@ -2795,7 +2802,7 @@ implicit none
   call hist_addfld2d(fname='RootGRO_TEMP_FN_pvr',units='none',type2d='levsoi',avgflag='A',&
     long_name='Root growth temperature dependence function',ptr_patch=data2d_ptr,default='inactive')       
 
-  data2d_ptr => this%h2D_CanopyLAIZ_plyr(beg_ptc:end_ptc,1:NumOfCanopyLayers)
+  data2d_ptr => this%h2D_CanopyLAIZ_plyr(beg_ptc:end_ptc,1:NumCanopyLayers)
   call hist_addfld2d(fname='CanopyLAIZ_plyr',units='m2/m2',type2d='levcan',avgflag='A',&
     long_name='Vertically distributed leaf area',ptr_patch=data2d_ptr,default='inactive')       
 
@@ -2861,6 +2868,7 @@ implicit none
       this%h1D_SUB_DIP_FLX_col(ncol)      = HydroSubsDIPFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)  
       this%h1D_HeatFlx2Grnd_col(ncol)     = HeatFlx2Grnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
+      this%h1D_CanSWRad_col(ncol)         = MJ2W*RadSW_Canopy_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RadSW_Grnd_col(ncol)       = MJ2W*RadSWGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qdrain_col(ncol)           = m2mm*QDrain_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3377,7 +3385,7 @@ implicit none
             this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,NB) = PARTS_brch(1:NumOfPlantMorphUnits,NB,NZ,NY,NX)
           ENDDO
         endif
-        DO L=1,NumOfCanopyLayers
+        DO L=1,NumCanopyLayers
           this%h2D_CanopyLAIZ_plyr(nptc,L)=CanopyLeafAreaZ_pft(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         ENDDO  
 

@@ -18,9 +18,9 @@ implicit none
   integer, pointer :: NumOfSkyAzimuthSects1        !number of sectors for the sky azimuth  [0,2*pi]
   integer, pointer :: jcplx                        !number of organo-microbial complexes
   integer, pointer :: NumOfLeafAzimuthSectors1     !number of sectors for the leaf azimuth, [0,pi]
-  integer, pointer :: NumOfCanopyLayers1           !number of canopy layers
+  integer, pointer :: NumCanopyLayers1           !number of canopy layers
   integer, pointer :: JZ1                          !number of soil layers
-  integer, pointer :: NumOfLeafZenithSectors1      !number of sectors for the leaf zenith [0,pi/2]
+  integer, pointer :: NumLeafZenithSectors1      !number of sectors for the leaf zenith [0,pi/2]
   integer, pointer :: MaxNodesPerBranch1           !number of canopy nodes
   integer, pointer :: jsken                        !number of kinetic components in litter, PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer, pointer :: NumLitterGroups              !number of litter groups nonstructural(0,*),foliar(1,*),non-foliar(jroots,*),stalk(3,*),root(4,*), coarse woody (5,*)
@@ -195,7 +195,8 @@ implicit none
   real(r8) :: CanopyLeafArea_col                      !grid canopy leaf area, [m2 d-2]
   real(r8) :: StemArea_col                            !grid canopy stem area, [m2 d-2]
   real(r8) :: CanopyHeight_col                        !canopy height , [m]
-
+  real(r8), pointer :: tlai_day_pft(:)                 => null() !prescribed leaf area, [m2 m-2]
+  real(r8), pointer :: tsai_day_pft(:)                 => null() !prescribed stem area, [m2 m-2]
   real(r8), pointer :: PARTS_brch(:,:,:)               => null() !fraction of C allocated to each morph unit,                                 [-]
   real(r8), pointer :: RootVolPerMassC_pft(:,:)        => null() !root volume:mass ratio,                                                     [m3 g-1]
   real(r8), pointer :: RootPorosity_pft(:,:)           => null() !root porosity,                                                              [m3 m-3]
@@ -1249,7 +1250,7 @@ implicit none
   allocate(this%ZERO4Groth_pft(JP1));this%ZERO4Groth_pft=spval
   allocate(this%StandingDeadStrutElms_col(NumPlantChemElms));this%StandingDeadStrutElms_col=spval
   allocate(this%RootNodulStrutElms_rpvr(NumPlantChemElms,JZ1,JP1));this%RootNodulStrutElms_rpvr=spval
-  allocate(this%CanopyLeafCLyr_pft(NumOfCanopyLayers1,JP1));this%CanopyLeafCLyr_pft=spval
+  allocate(this%CanopyLeafCLyr_pft(NumCanopyLayers1,JP1));this%CanopyLeafCLyr_pft=spval
   allocate(this%RootNodulNonstElms_rpvr(NumPlantChemElms,JZ1,JP1));this%RootNodulNonstElms_rpvr=spval
   allocate(this%StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP1));this%StandDeadKCompElms_pft=0._r8
   allocate(this%RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,MaxNumRootAxes,JP1))
@@ -1282,7 +1283,7 @@ implicit none
   this%LeafElmntNode_brch=spval
   allocate(this%PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%PetioleElmntNode_brch=spval
-  allocate(this%LeafElmsByLayerNode_brch(NumPlantChemElms,NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
+  allocate(this%LeafElmsByLayerNode_brch(NumPlantChemElms,NumCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%LeafElmsByLayerNode_brch=spval
   allocate(this%StalkLiveBiomassC_brch(MaxNumBranches,JP1));this%StalkLiveBiomassC_brch=spval
   allocate(this%CanopyNodulNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNodulNonstElms_brch=spval
@@ -1290,7 +1291,7 @@ implicit none
   allocate(this%RootStrutElms_pft(NumPlantChemElms,JP1));this%RootStrutElms_pft=spval
   allocate(this%CanopyNodulElms_pft(NumPlantChemElms,JP1));this%CanopyNodulElms_pft=spval
   allocate(this%StandDeadStrutElmsBeg_pft(NumPlantChemElms,JP1));this%StandDeadStrutElmsBeg_pft=spval
-  allocate(this%tCanLeafC_clyr(NumOfCanopyLayers1));this%tCanLeafC_clyr=spval
+  allocate(this%tCanLeafC_clyr(NumCanopyLayers1));this%tCanLeafC_clyr=spval
   allocate(this%RootElms_pft(NumPlantChemElms,JP1));this%RootElms_pft=spval
   allocate(this%RootElmsBeg_pft(NumPlantChemElms,JP1));this%RootElmsBeg_pft=spval
   allocate(this%SeedCPlanted_pft(JP1));this%SeedCPlanted_pft=spval
@@ -1502,11 +1503,11 @@ implicit none
   implicit none
 
   JZ1                        => pltpar%JZ1
-  NumOfCanopyLayers1         => pltpar%NumOfCanopyLayers1
+  NumCanopyLayers1         => pltpar%NumCanopyLayers1
   JP1                        => pltpar%JP1
   NumOfLeafAzimuthSectors1   => pltpar%NumOfLeafAzimuthSectors
   NumOfSkyAzimuthSects1        => pltpar%NumOfSkyAzimuthSects1
-  NumOfLeafZenithSectors1    => pltpar%NumOfLeafZenithSectors1
+  NumLeafZenithSectors1    => pltpar%NumLeafZenithSectors1
   MaxNodesPerBranch1         => pltpar%MaxNodesPerBranch1
   !the following variable should be consistent with the soil bgc model
   jcplx => pltpar%jcplx
@@ -1588,20 +1589,20 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
-  allocate(this%RadPAR_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuthSects1,NumOfCanopyLayers1,JP1));this%RadPAR_zsec=0._r8
-  allocate(this%RadDifPAR_zsec(NumOfLeafZenithSectors1,NumOfSkyAzimuthSects1,NumOfCanopyLayers1,JP1));this%RadDifPAR_zsec=0._r8
+  allocate(this%RadPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadPAR_zsec=0._r8
+  allocate(this%RadDifPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadDifPAR_zsec=0._r8
   allocate(this%RadSWLeafAlbedo_pft(JP1))
   allocate(this%CanopyPARalbedo_pft(JP1))
-  allocate(this%TAU_DirectRTransmit(NumOfCanopyLayers1+1));this%TAU_DirectRTransmit=0._r8
-  allocate(this%TAU_RadThru(NumOfCanopyLayers1+1));this%TAU_RadThru=0._r8
+  allocate(this%TAU_DirectRTransmit(NumCanopyLayers1+1));this%TAU_DirectRTransmit=0._r8
+  allocate(this%TAU_RadThru(NumCanopyLayers1+1));this%TAU_RadThru=0._r8
   allocate(this%LWRadCanopy_pft(JP1))
   allocate(this%RadSWbyCanopy_pft(JP1))
-  allocate(this%OMEGX(NumOfSkyAzimuthSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1));this%OMEGX=0._r8
+  allocate(this%OMEGX(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1));this%OMEGX=0._r8
   allocate(this%OMEGAG(NumOfSkyAzimuthSects1));this%OMEGAG=0._r8
-  allocate(this%OMEGA(NumOfSkyAzimuthSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1));this%OMEGA=0._r8
-  allocate(this%SineLeafAngle(NumOfLeafZenithSectors1));this%SineLeafAngle=0._r8
-  allocate(this%CosineLeafAngle(NumOfLeafZenithSectors1));this%CosineLeafAngle=0._r8
-  allocate(this%iScatteringDiffus(NumOfSkyAzimuthSects1,NumOfLeafZenithSectors1,NumOfLeafAzimuthSectors1))
+  allocate(this%OMEGA(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1));this%OMEGA=0._r8
+  allocate(this%SineLeafAngle(NumLeafZenithSectors1));this%SineLeafAngle=0._r8
+  allocate(this%CosineLeafAngle(NumLeafZenithSectors1));this%CosineLeafAngle=0._r8
+  allocate(this%iScatteringDiffus(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%RadNet2Canopy_pft(JP1))
   allocate(this%LeafSWabsorpty_pft(JP1))
   allocate(this%LeafPARabsorpty_pft(JP1))
@@ -1633,7 +1634,7 @@ implicit none
   allocate(this%DiffCO2Atmos2Intracel_pft(JP1));this%DiffCO2Atmos2Intracel_pft=spval
   allocate(this%AirConc_pft(JP1));this%AirConc_pft=spval
   allocate(this%CO2CuticleResist_pft(JP1));this%CO2CuticleResist_pft=spval
-  allocate(this%LeafAUnshaded_zsec(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
+  allocate(this%LeafAUnshaded_zsec(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%LeafAUnshaded_zsec=spval
   allocate(this%CPOOL3_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL3_node=spval
   allocate(this%CPOOL4_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL4_node=spval
@@ -1757,9 +1758,9 @@ implicit none
   allocate(this%Hours4LenthenPhotoPeriod_brch(MaxNumBranches,JP1));this%Hours4LenthenPhotoPeriod_brch=spval
   allocate(this%Hours4ShortenPhotoPeriod_brch(MaxNumBranches,JP1));this%Hours4ShortenPhotoPeriod_brch=spval
   allocate(this%Hours4Leafout_brch(MaxNumBranches,JP1));this%Hours4Leafout_brch=spval
-  allocate(this%HourReq4LeafOut_brch(NumOfCanopyLayers1,JP1));this%HourReq4LeafOut_brch=spval
+  allocate(this%HourReq4LeafOut_brch(NumCanopyLayers1,JP1));this%HourReq4LeafOut_brch=spval
   allocate(this%Hours4LeafOff_brch(MaxNumBranches,JP1));this%Hours4LeafOff_brch=spval
-  allocate(this%HourReq4LeafOff_brch(NumOfCanopyLayers1,JP1));this%HourReq4LeafOff_brch=spval
+  allocate(this%HourReq4LeafOff_brch(NumCanopyLayers1,JP1));this%HourReq4LeafOff_brch=spval
 
   end subroutine plt_pheno_init
 !------------------------------------------------------------------------
@@ -1817,7 +1818,7 @@ implicit none
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
-  allocate(this%CanopyHeightZ_col(0:NumOfCanopyLayers1));this%CanopyHeightZ_col=spval
+  allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
   allocate(this%CanopyStemArea_pft(JP1));this%CanopyStemArea_pft=spval
   allocate(this%CanopyLeafArea_pft(JP1));this%CanopyLeafArea_pft=spval
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
@@ -1828,11 +1829,13 @@ implicit none
   allocate(this%NumOfBranches_pft(JP1));this%NumOfBranches_pft=0
   allocate(this%NIXBotRootLayer_rpft(MaxNumRootAxes,JP1));this%NIXBotRootLayer_rpft=0
   allocate(this%PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP1));this%PARTS_brch=spval
+  allocate(this%tlai_day_pft(JP1)); this%tlai_day_pft=spval
+  allocate(this%tsai_day_pft(JP1)); this%tsai_day_pft=spval
   allocate(this%ShootNodeNum_brch(MaxNumBranches,JP1));this%ShootNodeNum_brch=spval
   allocate(this%NodeNum2InitFloral_brch(MaxNumBranches,JP1));this%NodeNum2InitFloral_brch=spval
   allocate(this%NodeNumberAtAnthesis_brch(MaxNumBranches,JP1));this%NodeNumberAtAnthesis_brch=spval
   allocate(this%SineBranchAngle_pft(JP1));this%SineBranchAngle_pft=spval
-  allocate(this%LeafAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
+  allocate(this%LeafAreaZsec_brch(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%LeafAreaZsec_brch=spval
   allocate(this%KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP1));this%KMinNumLeaf4GroAlloc_brch=0
   allocate(this%BranchNumber_brch(MaxNumBranches,JP1));this%BranchNumber_brch=0
@@ -1841,9 +1844,9 @@ implicit none
   allocate(this%LeafAreaDying_brch(MaxNumBranches,JP1));this%LeafAreaDying_brch=spval
   allocate(this%LeafAreaLive_brch(MaxNumBranches,JP1));this%LeafAreaLive_brch=spval
   allocate(this%SinePetioleAngle_pft(JP1));this%SinePetioleAngle_pft=spval
-  allocate(this%LeafAngleClass_pft(NumOfLeafZenithSectors1,JP1));this%LeafAngleClass_pft=spval
-  allocate(this%CanopyStemAreaZ_pft(NumOfCanopyLayers1,JP1));this%CanopyStemAreaZ_pft=spval
-  allocate(this%CanopyLeafAreaZ_pft(NumOfCanopyLayers1,JP1));this%CanopyLeafAreaZ_pft=spval
+  allocate(this%LeafAngleClass_pft(NumLeafZenithSectors1,JP1));this%LeafAngleClass_pft=spval
+  allocate(this%CanopyStemAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyStemAreaZ_pft=spval
+  allocate(this%CanopyLeafAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyLeafAreaZ_pft=spval
   allocate(this%LeafNodeArea_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafNodeArea_brch=spval
   allocate(this%CanopySeedNum_pft(JP1));this%CanopySeedNum_pft=spval
   allocate(this%SeedDepth_pft(JP1));this%SeedDepth_pft=spval
@@ -1851,18 +1854,18 @@ implicit none
   allocate(this%SeedMeanLen_pft(JP1));this%SeedMeanLen_pft=spval
   allocate(this%SeedVolumeMean_pft(JP1));this%SeedVolumeMean_pft=spval
   allocate(this%SeedAreaMean_pft(JP1));this%SeedAreaMean_pft=spval
-  allocate(this%CanopyStemAareZ_col(NumOfCanopyLayers1));this%CanopyStemAareZ_col=spval
+  allocate(this%CanopyStemAareZ_col(NumCanopyLayers1));this%CanopyStemAareZ_col=spval
   allocate(this%PetoLen2Mass_pft(JP1));this%PetoLen2Mass_pft=spval
   allocate(this%NodeLenPergC_pft(JP1));this%NodeLenPergC_pft=spval
   allocate(this%SLA1_pft(JP1));this%SLA1_pft=spval
-  allocate(this%CanopyLeafAareZ_col(NumOfCanopyLayers1));this%CanopyLeafAareZ_col=spval
+  allocate(this%CanopyLeafAareZ_col(NumCanopyLayers1));this%CanopyLeafAareZ_col=spval
   allocate(this%LeafStalkArea_pft(JP1));this%LeafStalkArea_pft=spval
   allocate(this%InternodeHeightDead_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%InternodeHeightDead_brch=spval
   allocate(this%PetoleLensNode_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetoleLensNode_brch=spval
   allocate(this%LiveInterNodeHight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LiveInterNodeHight_brch=spval
-  allocate(this%StemAreaZsec_brch(NumOfLeafZenithSectors1,NumOfCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
-  allocate(this%CanopyLeafArea_lnode(NumOfCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lnode=0._r8
-  allocate(this%CanopyStalkArea_lbrch(NumOfCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkArea_lbrch=spval
+  allocate(this%StemAreaZsec_brch(NumLeafZenithSectors1,NumCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
+  allocate(this%CanopyLeafArea_lnode(NumCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lnode=0._r8
+  allocate(this%CanopyStalkArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkArea_lbrch=spval
   allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
   allocate(this%SeedNumSet_brch(MaxNumBranches,JP1));this%SeedNumSet_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval

@@ -103,7 +103,7 @@ module ExtractsMod
   ENDDO
      CanopyLeafArea_col = 0._r8
      StemArea_col       = 0._r8
-  DO L                  = 1, NumOfCanopyLayers1
+  DO L                  = 1, NumCanopyLayers1
     CanopyLeafAareZ_col(L) = 0._r8
     tCanLeafC_clyr(L)        = 0._r8
     CanopyStemAareZ_col(L) = 0._r8
@@ -124,7 +124,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: L
-  associate(                                                      &
+  associate(                                               &
     CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft  ,& !input  :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft  => plt_biom%CanopyLeafCLyr_pft    ,& !input  :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft => plt_morph%CanopyStemAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
@@ -132,7 +132,7 @@ module ExtractsMod
     CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !inoput :total stem area, [m2 d-2]
     tCanLeafC_clyr      => plt_biom%tCanLeafC_clyr         & !inoput :total leaf carbon mass in canopy layers, [gC d-2]
   )
-  DO L=1,NumOfCanopyLayers1
+  DO L=1,NumCanopyLayers1
     CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
     tCanLeafC_clyr(L)=tCanLeafC_clyr(L)+CanopyLeafCLyr_pft(L,NZ)
     CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)

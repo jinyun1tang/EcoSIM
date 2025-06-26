@@ -163,7 +163,7 @@
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO N=1,NumOfLeafZenithSectors1
+  DO N=1,NumLeafZenithSectors1
     DO M=1,NumOfSkyAzimuthSects1
       IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
@@ -178,7 +178,7 @@
             Tau_rad  = TAU_RadThru(L+1)
           ENDIF
     !
-          if(lverb)write(*,*)LP,L,N,M,NumOfLeafZenithSectors1,NumOfSkyAzimuthSects1,LeafAUnshaded_zsec(N,L,K,NB,NZ),'C3FixCO2',PAR_zsec     
+          if(lverb)write(*,*)LP,L,N,M,NumLeafZenithSectors1,NumOfSkyAzimuthSects1,LeafAUnshaded_zsec(N,L,K,NB,NZ),'C3FixCO2',PAR_zsec     
 
           if(PAR_zsec>0._r8)call C3FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)          
         ENDDO
@@ -269,7 +269,7 @@
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
   if(lverb)write(*,*)'C3PhotosynsCanopyLayerL'
-  DO L=NumOfCanopyLayers1,1,-1
+  DO L=NumCanopyLayers1,1,-1
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
@@ -380,7 +380,7 @@
 !     CanopyLeafArea_lnode=leaf area
 !     LeafAUnshaded_zsec=unself-shaded leaf surface area
 !
-  DO L=NumOfCanopyLayers1,1,-1
+  DO L=NumCanopyLayers1,1,-1
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C4PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
@@ -453,7 +453,7 @@
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO  N=1,NumOfLeafZenithSectors1
+  DO  N=1,NumLeafZenithSectors1
     DO  M=1,NumOfSkyAzimuthSects1
       IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
         DO LP=1,2

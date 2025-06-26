@@ -25,7 +25,7 @@ module PlantNonstElmDynMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8) :: TotNonstElm_loc(NumPlantChemElms)
-  real(r8) :: NonstElm_loc(NumPlantChemElms,NumOfCanopyLayers1)  
+  real(r8) :: NonstElm_loc(NumPlantChemElms,NumCanopyLayers1)  
   real(r8) :: TwoCompMassC,NonstElmGradt
   real(r8) :: StalkRsrvGradt  
   real(r8) :: TotStalkRsrv_loc(NumPlantChemElms)  
@@ -35,7 +35,7 @@ module PlantNonstElmDynMod
   real(r8) :: XFRE(NumPlantChemElms)
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
-  real(r8) :: LeafPetoMassC_brch(NumOfCanopyLayers1)
+  real(r8) :: LeafPetoMassC_brch(NumCanopyLayers1)
   associate(                                                       &
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch      ,& !input  :plant growth stage, [-]

@@ -66,12 +66,12 @@ implicit none
   CH2O3K=0._r8
 ! FOR EACH CANOPY LAYER
   CO2FCL=0._r8;CO2FLL=0._r8
-  D210: DO L=NumOfCanopyLayers1,1,-1
+  D210: DO L=NumCanopyLayers1,1,-1
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      D215: DO N=1,NumOfLeafZenithSectors1
+      D215: DO N=1,NumLeafZenithSectors1
         D220: DO M=1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
@@ -261,13 +261,13 @@ implicit none
   CO2FCL=0._r8;CO2FLL=0._r8
 ! FOR EACH CANOPY LAYER
 !
-  D110: DO L=NumOfCanopyLayers1,1,-1
+  D110: DO L=NumCanopyLayers1,1,-1
 
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      D115: DO N =1,NumOfLeafZenithSectors1
+      D115: DO N =1,NumLeafZenithSectors1
         D120: DO M =1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES

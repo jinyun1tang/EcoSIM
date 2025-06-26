@@ -394,7 +394,7 @@ implicit none
   tRHydlySoprtOM_vr(1:NumPlantChemElms,L,NY,NX)  = micflx%tRHydlySoprtOM
 
   trcs_RMicbUptake_vr(idg_CO2,L,NY,NX)  = micflx%RCO2NetUptkMicb
-  trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)  = micflx%RCH4UptkAutor
+  trcs_RMicbUptake_vr(idg_CH4,L,NY,NX)  = naqfdiag%tCH4OxiAero-naqfdiag%tCH4ProdAceto-naqfdiag%tCH4ProdH2
   trcs_RMicbUptake_vr(idg_H2,L,NY,NX)   = micflx%RH2NetUptkMicb
   trcs_RMicbUptake_vr(idg_O2,L,NY,NX)   = micflx%RO2UptkMicb
   trcs_RMicbUptake_vr(idg_N2,L,NY,NX)   = micflx%RN2NetUptkMicb+micflx%MicrbN2Fix

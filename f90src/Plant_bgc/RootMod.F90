@@ -1887,11 +1887,11 @@ implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: RootPrimeAxsNum
   real(r8),INTENT(OUT) :: RootSinkC_vr(jroots,JZ1)
-  real(r8),intent(out) :: Root1stSink_pvr(jroots,JZ1,NumOfCanopyLayers1)
-  real(r8),intent(out) :: Root2ndSink_pvr(jroots,JZ1,NumOfCanopyLayers1)
+  real(r8),intent(out) :: Root1stSink_pvr(jroots,JZ1,NumCanopyLayers1)
+  real(r8),intent(out) :: Root2ndSink_pvr(jroots,JZ1,NumCanopyLayers1)
   real(r8),INTENT(OUT) :: RootSinkC(jroots)
   integer :: N,L,K,NR,NE,ntu
-  REAL(R8) :: Root1stLocDepz_vr(NumOfCanopyLayers1,JZ1)
+  REAL(R8) :: Root1stLocDepz_vr(NumCanopyLayers1,JZ1)
   real(r8) :: RecoRootMycoC4Nup,CUPRO,CUPRC
   real(r8) :: RTDPP,RTDPS,RTSKP
   real(r8) :: RTSKS,rscal

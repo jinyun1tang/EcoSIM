@@ -228,7 +228,7 @@ type, public :: Cumlate_Flux_Diag_type
   type, public :: OMCplx_Flux_type
     real(r8),allocatable :: RHydlysSolidOM(:,:,:)
     real(r8),allocatable :: RHumifySolidOM(:,:,:)
-    real(r8),allocatable :: RDcmpProdDOM(:,:,:)
+    real(r8),allocatable :: RDecmpProdDOM(:,:,:)
     real(r8),allocatable :: RHydlysBioResduOM(:,:,:)
     real(r8),allocatable :: RHydlysSorptOM(:,:)
     real(r8),allocatable :: RDOMSorp(:,:)                !rate of DOM adsorption
@@ -773,7 +773,7 @@ type, public :: Cumlate_Flux_Diag_type
   ndbiomcp=micpar%ndbiomcp
   allocate(this%RHydlysSolidOM(NumPlantChemElms,nkinets,1:ncplx))
   allocate(this%RHumifySolidOM(1:NumPlantChemElms,nkinets,1:ncplx))
-  allocate(this%RDcmpProdDOM(1:NumPlantChemElms,nkinets,1:ncplx))
+  allocate(this%RDecmpProdDOM(1:NumPlantChemElms,nkinets,1:ncplx))
   allocate(this%RHydlysBioResduOM(1:NumPlantChemElms,ndbiomcp,1:ncplx))
   allocate(this%RHydlysSorptOM(idom_beg:idom_end,1:ncplx))
   allocate(this%RDOMSorp(idom_beg:idom_end,1:ncplx))
@@ -792,7 +792,7 @@ type, public :: Cumlate_Flux_Diag_type
 
   call destroy(this%RHydlysSolidOM)
   call destroy(this%RHumifySolidOM)
-  call destroy(this%RDcmpProdDOM)
+  call destroy(this%RDecmpProdDOM)
   call destroy(this%RHydlysBioResduOM)
   call destroy(this%RHydlysSorptOM)
   call destroy(this%RDOMSorp)
@@ -809,7 +809,7 @@ type, public :: Cumlate_Flux_Diag_type
 
   this%RHydlysSolidOM       = 0._r8
   this%RHumifySolidOM       = 0._r8
-  this%RDcmpProdDOM         = 0._r8
+  this%RDecmpProdDOM         = 0._r8
   this%RHydlysBioResduOM    = 0._r8
   this%RHydlysSorptOM       = 0._r8
   this%RDOMSorp             = 0._r8

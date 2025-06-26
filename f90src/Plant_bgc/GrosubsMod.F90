@@ -435,7 +435,7 @@ module grosubsMod
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr             & !output :root respiration unconstrained by O2, [g d-2 h-1]
   )
 
-  D2: DO L=1,NumOfCanopyLayers1
+  D2: DO L=1,NumCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)=0._r8
     CanopyLeafCLyr_pft(L,NZ)=0._r8
     CanopyStemAreaZ_pft(L,NZ)=0._r8
@@ -687,11 +687,11 @@ module grosubsMod
   CanopyLeafShethC_pft(NZ) = AZMAX1(sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ)))
   CanopySeedNum_pft(NZ)    = AZMAX1(sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ)))
   CanopyLeafArea_pft(NZ)   = AZMAX1(sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ)))
-  CanopyStemArea_pft(NZ)   = AZMAX1(sum(CanopyStalkArea_lbrch(1:NumOfCanopyLayers1,1:NumOfBranches_pft(NZ),NZ)))
+  CanopyStemArea_pft(NZ)   = AZMAX1(sum(CanopyStalkArea_lbrch(1:NumCanopyLayers1,1:NumOfBranches_pft(NZ),NZ)))
 
   
   DO NB=1,NumOfBranches_pft(NZ)        
-    DO L=1,NumOfCanopyLayers1
+    DO L=1,NumCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
@@ -771,7 +771,7 @@ module grosubsMod
   plt_morph%CanopySeedNum_pft(NZ) =0._r8
   plt_morph%CanopyLeafArea_pft(NZ)=0._r8
   plt_morph%CanopyStemArea_pft(NZ)=0._r8
-  plt_morph%CanopyStemAreaZ_pft(1:NumOfCanopyLayers1,NZ)=0._r8
+  plt_morph%CanopyStemAreaZ_pft(1:NumCanopyLayers1,NZ)=0._r8
 
   end subroutine ZeroPlantStates
 

@@ -79,10 +79,124 @@
   ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
+
+  
+  if(ldo_sp_mode)call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+
   RETURN
 
   END subroutine day
 
+!------------------------------------------------------------------------------------------     
+  subroutine PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+
+  implicit none
+  integer, intent(in) :: I
+  Integer, intent(in) ::  NHW, NHE, NVN, NVS
+  real(r8) :: t
+  integer :: it(2)
+  integer :: months(2)
+  integer :: kmo,dofmon,ndaysmon,NY,NX,NZ,L
+  real(r8) :: timwt(2)
+  real(r8) :: ZL1(0:NumCanopyLayers)
+  real(r8) :: AreaInterval,AreaL
+  real(r8) :: ARX  !interval canopy area: leaf+stem
+  real(r8) :: DZL  !canopy interval height 
+  real(r8) :: lai(12)=(/1.1852, 1.1821, 1.1554, 1.2433, 1.2922, 1.3341, 1.2296, 1.4118, 1.4343, 1.3941, 1.2721, 1.2218/)
+  real(r8) :: sai(12)=(/0.3190, 0.3058, 0.3058, 0.3032, 0.3058, 0.3117, 0.3433, 0.3032, 0.3084, 0.3292, 0.3656, 0.3249/)
+
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      DO NZ=1,NP_col(NY,NX)
+        !FOR test only
+        tlai_mon_pft(:,NZ,NY,NX)       = LAI
+        tsai_mon_pft(:,NZ,NY,NX)       = SAI
+        height_top_mon_pft(:,NZ,NY,NX) = 17._r8
+      ENDDO
+    ENDDO
+  ENDDO    
+
+  ndaysmon = etimer%get_curr_mon_days()
+  dofmon   = etimer%get_curr_dom()
+  kmo      = etimer%get_curr_mon()
+  t = (dofmon-0.5_r8) / ndaysmon
+  it(1) = t + 0.5_r8
+  it(2) = it(1) + 1
+  months(1) = kmo + it(1) - 1
+  months(2) = kmo + it(2) - 1
+  if (months(1) <  1) months(1) = 12
+  if (months(2) > 12) months(2) = 1
+
+  timwt(1) = (it(1)+0.5_r8) - t
+  timwt(2) = 1._r8-timwt(1)
+  
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      CanopyLeafArea_col(NY,NX) = 0._r8
+      StemArea_col(NY,NX)       = 0._r8
+      CanopyHeight_col(NY,NX)   = 0.0_r8
+      NP_col(NY,NX)=1
+      DO NZ=1,NP_col(NY,NX)
+        tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
+        tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
+        CanopyHeight_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
+        CanopyLeafArea_col(NY,NX)  = CanopyLeafArea_col(NY,NX)+tlai_day_pft(NZ,NY,NX)
+        StemArea_col(NY,NX)        = StemArea_col(NY,NX)+tsai_day_pft(NZ,NY,NX)
+        CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeight_pft(NZ,NY,NX))
+        CanopyLeafAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tlai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
+        CanopyStemAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
+
+      ENDDO
+
+      !set vertical desitribution of LAI and             
+      CanopyLeafAareZ_col(1:NumCanopyLayers,NY,NX)=CanopyLeafArea_col(NY,NX)/real(NumCanopyLayers,kind=r8)
+      CanopyStemAareZ_col(1:NumCanopyLayers,NY,NX)=StemArea_col(NY,NX)/real(NumCanopyLayers,kind=r8)
+
+      !divide canopy height      
+      CanopyHeightZ_col(NumCanopyLayers,NY,NX) = CanopyHeight_col(NY,NX)+0.01_r8
+      ZL1(NumCanopyLayers)               = CanopyHeightZ_col(NumCanopyLayers,NY,NX)
+      ZL1(0)                                = 0.0_r8
+      
+      !for simplicity, right now unifrom division is used
+      !divide total are into NumCanopyLayers1, from top to bottom
+      AreaInterval=(CanopyLeafArea_col(NY,NX)+StemArea_col(NY,NX))/NumCanopyLayers  
+      DZL=CanopyHeightZ_col(NumCanopyLayers,NY,NX)/real(NumCanopyLayers,kind=r8)
+
+      IF(AreaInterval.GT.ZEROS(NY,NX))THEN
+         DO L=NumCanopyLayers,1,-1
+           CanopyHeightZ_col(L-1,NY,NX)=CanopyHeightZ_col(L,NY,NX)-DZL
+         ENDDO
+!        DO L=NumCanopyLayers,2,-1
+!          AreaL=CanopyLeafAareZ_col(L,NY,NX)+CanopyStemAareZ_col(L,NY,NX)
+!          print*,'AreaInterval',AreaInterval,AreaL
+!          !greater than the mean leaf area or area-interval
+!          IF(AreaL.GT.1.01_r8*AreaInterval)THEN
+!            DZL      = CanopyHeightZ_col(L,NY,NX)-CanopyHeightZ_col(L-1,NY,NX)
+!            ZL1(L-1) = CanopyHeightZ_col(L-1,NY,NX)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
+!          ELSEIF(AreaL.LT.0.99_r8*AreaInterval)THEN
+!            ARX = CanopyLeafAareZ_col(L-1,NY,NX)+CanopyStemAareZ_col(L-1,NY,NX)
+!            DZL = CanopyHeightZ_col(L-1,NY,NX)-CanopyHeightZ_col(L-2,NY,NX)
+            
+!            !layer L-1 has significant leaf+stem (canopy) area
+!            IF(ARX.GT.ZEROS(NY,NX))THEN
+!              ZL1(L-1)=CanopyHeightZ_col(L-1,NY,NX)-0.5_r8*AMIN1(1.0_r8,(AreaInterval-AreaL)/ARX)*DZL
+!            ELSE
+!              ZL1(L-1)=CanopyHeightZ_col(L-1,NY,NX)
+!            ENDIF
+!          ELSE
+!            ZL1(L-1)=CanopyHeightZ_col(L-1,NY,NX)
+!          ENDIF
+!        ENDDO
+
+!        DO L=NumCanopyLayers,2,-1
+!          CanopyHeightZ_col(L-1,NY,NX)=ZL1(L-1)
+!        ENDDO
+      ENDIF
+
+    ENDDO
+  ENDDO  
+
+  end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------     
   subroutine UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 !     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
@@ -209,8 +323,7 @@
 !-----------------------------------------------------------------------------------------
 
   subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
-!
-  use EcoSIMCtrlMod, only : Lirri_auto
+  !
   implicit none
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS

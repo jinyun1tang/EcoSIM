@@ -230,7 +230,7 @@ module Hour1Mod
 !
         NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         NIXBotRootLayer_pft(NZ,NY,NX) = MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
-        DO  NR=1,NumOfCanopyLayers
+        DO  NR=1,NumCanopyLayers
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
       ENDDO
@@ -751,6 +751,7 @@ module Hour1Mod
   ECO_HR_CO2_col(NY,NX)                      = 0._r8
   ECO_HR_CH4_col(NY,NX)                      = 0._r8
   Eco_RadSW_col(NY,NX)                       = 0._r8
+  RadSW_Canopy_col(NY,NX)                    = 0._R8
   RootCO2Autor_vr(:,NY,NX)                   = 0._r8
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)    = 0._r8
   QRunSurf_col(NY,NX)                        = 0._r8

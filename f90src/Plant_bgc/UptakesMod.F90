@@ -373,8 +373,8 @@ module UptakesMod
         KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
       ENDIF
 
-      D600: DO L=NumOfCanopyLayers1,1,-1
-        D650: DO N=1,NumOfLeafZenithSectors1
+      D600: DO L=NumCanopyLayers1,1,-1
+        D650: DO N=1,NumLeafZenithSectors1
           LeafAUnshaded_zsec(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
         ENDDO D650
       ENDDO D600

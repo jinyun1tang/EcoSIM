@@ -170,6 +170,7 @@ module MicAutoCPLXMod
 
   if (N.eq.mid_AmmoniaOxidBacter .or. N.eq.mid_NitriteOxidBacter .or. N.eq.mid_AerobicMethanotrofBacter)then
     call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx)
+    
   elseif (N.eq.mid_H2GenoMethanogArchea)then
     RespGrossAutor(NGL)    = RGOMP
     RCO2ProdAutor(NGL)     = 0.0_r8

@@ -556,9 +556,9 @@ module StartqMod
     LeafAreaDying_brch(NB,NZ,NY,NX)      = 0._r8
     CanPBranchHeight(NB,NZ,NY,NX)        = 0._r8
     
-    D5: DO L=1,NumOfCanopyLayers
+    D5: DO L=1,NumCanopyLayers
       CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)=0._r8
-      DO N=1,NumOfLeafZenithSectors
+      DO N=1,NumLeafZenithSectors
         StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=0._r8
       enddo
     ENDDO D5
@@ -574,7 +574,7 @@ module StartqMod
       LeafProteinCNode_brch(K,NB,NZ,NY,NX)                      = 0._r8
       PetoleProteinCNode_brch(K,NB,NZ,NY,NX)                    = 0._r8
 
-      D55: DO L=1,NumOfCanopyLayers
+      D55: DO L=1,NumCanopyLayers
         CanopyLeafArea_lnode(L,K,NB,NZ,NY,NX)=0._r8
         LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
@@ -584,15 +584,15 @@ module StartqMod
         CMassCO2BundleSheath_node(K,NB,NZ,NY,NX)  = 0._r8
         CMassHCO3BundleSheath_node(K,NB,NZ,NY,NX) = 0._r8
         CPOOL4_node(K,NB,NZ,NY,NX)                = 0._r8
-        D45: DO L=1,NumOfCanopyLayers
-          DO N=1,NumOfLeafZenithSectors
+        D45: DO L=1,NumCanopyLayers
+          DO N=1,NumLeafZenithSectors
             LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
         ENDDO D45
       ENDIF
     enddo
   ENDDO D25
-  D35: DO L=1,NumOfCanopyLayers
+  D35: DO L=1,NumCanopyLayers
     CanopyLeafAreaZ_pft(L,NZ,NY,NX) = 0._r8
     CanopyLeafCLyr_pft(L,NZ,NY,NX)  = 0._r8
     CanopyStemAreaZ_pft(L,NZ,NY,NX) = 0._r8

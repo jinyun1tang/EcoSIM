@@ -33,12 +33,12 @@ implicit none
   real(r8) :: WIND(366)                         !daily wind travel, [m d-1]
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
 
-  real(r8) :: TMP_hrly(24,366)                      !hourly air temperature, [oC]
+  real(r8) :: TMP_hrly(24,366)                   !hourly air temperature, [oC]
   real(r8) :: SWRad_hrly(24,366)                !hourly solar radiation, [MJ m-2 h-1]
   real(r8) :: RAINH(24,366)                     !hourly precipitation, [mm h-1]
   real(r8) :: WINDH(24,366)                     !hourly wind speed, [m h-1]
   real(r8) :: DWPTH(24,366)                     !hourly dewpoint temperature, [oC]
-  real(r8) :: RadLWClm(24,366)                     !longwave radiation (MJ m-2 h-1)
+  real(r8) :: RadLWClm(24,366)                  !longwave radiation (MJ m-2 h-1)
   real(r8) :: PBOT_hrly(24,366)                 !hourly surface atmospheric pressure, [kPa]
   real(r8) :: DRAD(12)                          !change factor for radiation, [-]
   real(r8) :: DTMPX(12)                         !change factor for maximum temperature, [-]
@@ -130,6 +130,13 @@ implicit none
   real(r8),target,allocatable ::  PrecHeat_col(:,:)                      !precipitation heat to surface, [MJ/d2/h]
   real(r8),target,allocatable ::  RainLitr_col(:,:)                      !water from aboveground falling litter,[m3 d-2]
   real(r8),target, allocatable :: trcs_solcoef_col(:,:,:)                !parameter for computing RGasSinkScalar_vr,[-]  
+  real(r8),target,allocatable ::  tlai_mon_pft(:,:,:,:)                  !monthly lai for different pft used in prescribed phenology, [m2/m2]
+  real(r8),target,allocatable ::  tsai_mon_pft(:,:,:,:)                  !monthly sai for different pft used in prescribed phenology, [m2/m2]
+  real(r8),target,allocatable ::  tlai_day_pft(:,:,:)                    !interpolated daily lai for different pft used in prescribed phenology, [m2/m2]
+  real(r8),target,allocatable ::  tsai_day_pft(:,:,:)                    !interpolated daily sai for different pft used in prescribed phenology, [m2/m2]
+  real(r8),target,allocatable ::  height_top_mon_pft(:,:,:,:)            !monthly canopy top height used in prescribed phenology, [m]
+  real(r8),target,allocatable ::  height_bot_mon_pft(:,:,:,:)            !monthly canopy bottom height used in prescribed phenology, [m]
+
   contains
 !----------------------------------------------------------------------
 
@@ -140,6 +147,13 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
+  allocate(tlai_mon_pft(12,JP,JY,JX));tlai_mon_pft=0._r8
+  allocate(tsai_mon_pft(12,JP,JY,JX));tsai_mon_pft=0._r8
+  allocate(tlai_day_pft(JP,JY,JX));tlai_day_pft=0._r8
+  allocate(tsai_day_pft(JP,JY,JX));tsai_day_pft=0._r8
+  allocate(height_top_mon_pft(12,JP,JY,JX)); height_top_mon_pft=0._r8
+  allocate(height_bot_mon_pft(12,JP,JY,JX)); height_bot_mon_pft=0._r8
+
   allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX));
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
@@ -228,6 +242,13 @@ implicit none
   subroutine DestructClimForcData
   use abortutils, only : destroy
   implicit none
+
+  call destroy(height_bot_mon_pft)  
+  call destroy(height_top_mon_pft)
+  call destroy(tlai_mon_pft)
+  call destroy(tsai_mon_pft)
+  call destroy(tlai_day_pft)
+  call destroy(tsai_day_pft)
   call destroy(PrecHeat_col)
   call destroy(RainLitr_col)
   call destroy(TDTPX)

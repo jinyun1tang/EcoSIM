@@ -186,7 +186,7 @@ implicit none
   use EcoSIMCtrlDataType, only : iYearCurrent
   implicit none
   integer, intent(in) :: I,J,NZ
-  REAL(R8),INTENT(INOUT) :: C4PhotoShootNonstC_brch(NumOfCanopyLayers1,JP1)
+  REAL(R8),INTENT(INOUT) :: C4PhotoShootNonstC_brch(NumCanopyLayers1,JP1)
   integer :: L,M,NR,NB,N,NE
   REAL(R8) :: dRootMyco
 !     begin_execution
@@ -560,7 +560,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NZ
   integer, intent(inout) :: NumDeadBranches
-  real(r8), intent(inout) :: C4PhotoShootNonstC_brch(NumOfCanopyLayers1,JP1)
+  real(r8), intent(inout) :: C4PhotoShootNonstC_brch(NumCanopyLayers1,JP1)
   integer :: M,NE,NB
 !     begin_execution
   associate(                                                      &
@@ -726,7 +726,7 @@ implicit none
   subroutine ResetBranchRootStates(NZ,C4PhotoShootNonstC_brch)
   implicit none
   integer, intent(in) :: NZ
-  real(r8),INTENT(OUT) :: C4PhotoShootNonstC_brch(NumOfCanopyLayers1,JP1)
+  real(r8),INTENT(OUT) :: C4PhotoShootNonstC_brch(NumCanopyLayers1,JP1)
   integer :: L,NR,N,NE,NB
 !     begin_execution
   associate(                                                      &
@@ -815,7 +815,7 @@ implicit none
 !     RESET STATE VARIABLES FROM DEAD BRANCHES
   implicit none
   integer, intent(in) :: NB,NZ
-  real(r8),intent(inout) :: C4PhotoShootNonstC_brch(NumOfCanopyLayers1,JP1)
+  real(r8),intent(inout) :: C4PhotoShootNonstC_brch(NumCanopyLayers1,JP1)
   integer :: L,K,N
 !     begin_execution
   associate(                                                      &
@@ -919,21 +919,21 @@ implicit none
     LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
     PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
     InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
-    D8865: DO L=1,NumOfCanopyLayers1
+    D8865: DO L=1,NumCanopyLayers1
       CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ)-CanopyLeafArea_lnode(L,K,NB,NZ)
       CanopyLeafCLyr_pft(L,NZ)  = CanopyLeafCLyr_pft(L,NZ)-LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
       CanopyLeafArea_lnode(L,K,NB,NZ)                         = 0._r8
       LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ) = 0._r8
       IF(K.NE.0)THEN
-        D8860: DO N=1,NumOfLeafZenithSectors1
+        D8860: DO N=1,NumLeafZenithSectors1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
         ENDDO D8860
       ENDIF
     ENDDO D8865
   ENDDO D8855
-  D8875: DO L=1,NumOfCanopyLayers1
+  D8875: DO L=1,NumCanopyLayers1
     CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
-    DO  N=1,NumOfLeafZenithSectors1
+    DO  N=1,NumLeafZenithSectors1
       StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D8875

@@ -305,6 +305,7 @@ module InitNoSaltTransportMod
 
         RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
         RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = (-TRChem_sol_NH3_soil_vr(L,NY,NX)-trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+        
         DO ids=ids_nut_beg,ids_nuts_end
           RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_GeoChem_soil_vr(ids,L,NY,NX))*dts_HeatWatTP
         ENDDO

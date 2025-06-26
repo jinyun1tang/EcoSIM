@@ -132,8 +132,7 @@ contains
   use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
   use fileUtil       , only : iulog,ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
-  use readsmod       , only : clim_var
-  use EcoSIMCtrlMod
+  use readsmod       , only : clim_var  
   use HistFileMod
   implicit none
   character(len=*), parameter :: mod_filename = &
@@ -161,8 +160,8 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel
-
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel,&
+    ldo_radiation_test
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents
 
@@ -239,7 +238,7 @@ contains
   atm_n2o_fix      = -100._r8
   atm_ch4_fix      = -100._r8
   first_topou      = .false.
-  
+  ldo_radiation_test=.false.
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading ecosim namelist ",nml_error,ioerror_msg
@@ -279,7 +278,14 @@ contains
   if(.not.soichem_model)then
     salt_model=.false.
   endif
-
+  !radiation test can only be on for sp mode
+  if(ldo_radiation_test)ldo_sp_mode=.true.
+  if(ldo_sp_mode)then
+  ! when using prescribed phenolgoy, turnoff plant model, soil chemistry model and microbial bgc
+    plant_model           = .false.
+    soichem_model         = .false.
+    microbial_model       = .false.
+  endif
   call config_soil_warming(warming_exp)
   call config_fire(FireEvents)
   if(fixClime)then

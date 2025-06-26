@@ -991,7 +991,7 @@ module MicBGCMod
     RO2Uptk4RespHeter(NGL,K) = RO2Dmnd4RespHeter(NGL,K)*OxyLimterHeter(NGL,K)
     RH2ProdHeter(NGL,K)      = 0.0_r8
     tRGOMP                   = tRGOMP+RGOMP
-    !anaerboic fertmenting heterotrophs
+    !anaerboic fertmenting heterotrophs, fermenters + anaerboic dizotrophs
   ELSEIF(micpar%is_anaerobic_hetr(N))THEN
     !fermentation  (CH2O)6 -> 2CO2 + 2(CH2O)2  
     RespGrossHeter(NGL,K)    = RGOMP
@@ -1362,7 +1362,7 @@ module MicBGCMod
     tRHydlySoprtOM       => micflx%tRHydlySoprtOM,       &
     RHydlysSolidOM       => ncplxf%RHydlysSolidOM,       &
     RHumifySolidOM       => ncplxf%RHumifySolidOM,       &
-    RDcmpProdDOM         => ncplxf%RDcmpProdDOM,         &
+    RDecmpProdDOM         => ncplxf%RDecmpProdDOM,         &
     RHydlysBioResduOM    => ncplxf%RHydlysBioResduOM,    &
     RHydlysSorptOM       => ncplxf%RHydlysSorptOM,       &
     ROQC4HeterMicActCmpK => ncplxf%ROQC4HeterMicActCmpK, &
@@ -1516,14 +1516,14 @@ module MicBGCMod
           RHumifySolidOM(ielmn,M,K)=AMIN1(RHydlysSolidOM(ielmn,M,K),RHumifySolidOM(ielmc,M,K)*CNRH(k_POM))
           RHumifySolidOM(ielmp,M,K)=AMIN1(RHydlysSolidOM(ielmp,M,K),RHumifySolidOM(ielmc,M,K)*CPRH(k_POM))
           DO NE=1,NumPlantChemElms
-            RDcmpProdDOM(NE,M,K)=RHydlysSolidOM(NE,M,K)-RHumifySolidOM(NE,M,K)
+            RDecmpProdDOM(NE,M,K)=RHydlysSolidOM(NE,M,K)-RHumifySolidOM(NE,M,K)
           ENDDO
         ENDDO D805
       ELSE
         D810: DO M=1,jsken
           DO NE=1,NumPlantChemElms      
             RHumifySolidOM(NE,M,K) = 0.0_r8
-            RDcmpProdDOM(NE,M,K)   = RHydlysSolidOM(NE,M,K)
+            RDecmpProdDOM(NE,M,K)   = RHydlysSolidOM(NE,M,K)
           ENDDO
         ENDDO D810
       ENDIF
@@ -1533,7 +1533,7 @@ module MicBGCMod
         DO NE=1,NumPlantChemElms    
           RHydlysSolidOM(NE,M,K) = 0.0_r8
           RHumifySolidOM(NE,M,K) = 0.0_r8
-          RDcmpProdDOM(NE,M,K)   = 0.0_r8
+          RDecmpProdDOM(NE,M,K)   = 0.0_r8
         ENDDO  
       ENDDO D780
     ENDIF
@@ -1657,7 +1657,7 @@ module MicBGCMod
     RAcettProdHeter                  => nmicf%RAcettProdHeter,                  &
     RHydlysSolidOM                   => ncplxf%RHydlysSolidOM,                  &
     RHumifySolidOM                   => ncplxf%RHumifySolidOM,                  &
-    RDcmpProdDOM                     => ncplxf%RDcmpProdDOM,                    &
+    RDecmpProdDOM                     => ncplxf%RDecmpProdDOM,                    &
     RHydlysBioResduOM                => ncplxf%RHydlysBioResduOM,               &
     RHydlysSorptOM                   => ncplxf%RHydlysSorptOM,                  &
     RDOMSorp                         => ncplxf%RDOMSorp,                        &
@@ -1727,7 +1727,7 @@ module MicBGCMod
 
 !     SolidOMAct(M,K)=SolidOMAct(M,K)-RHydlysSolidOM(ielmc,M,K)
       DO NE=1,NumPlantChemElms
-        DOM(NE,K)=DOM(NE,K)+RDcmpProdDOM(NE,M,K)
+        DOM(NE,K)=DOM(NE,K)+RDecmpProdDOM(NE,M,K)
       ENDDO
 !
 !     LIGNIFICATION PRODUCTS
@@ -1772,23 +1772,19 @@ module MicBGCMod
 !     RAcettProdHeter=acetate production from fermentation
 
     N1=1; N2=NumHetetr1MicCmplx
-      
+
+    DO NGL=N1,N2
+      DOM(idom_acetate,K) = DOM(idom_acetate,K)+RAcettProdHeter(NGL,K)
+    ENDDO  
+
+
     call SubstrateLimit(N1,N2,RAnabolDOCUptkHeter(N1:N2,K),DOM(idom_doc,K))
     
     call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmn,N1:N2,K),DOM(idom_don,K))
 
     call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmp,N1:N2,K),DOM(idom_dop,K))
 
-    DO NGL=N1,N2
-      dflux(ngl) = RAnabolAcetUptkHeter(NGL,K)-RAcettProdHeter(NGL,K)
-    ENDDO  
-
-    call SubstrateLimit(N1,N2,dflux,DOM(idom_acetate,K),scal)
-
-    DO NGL=N1,N2
-      RAnabolAcetUptkHeter(NGL,K) = RAnabolAcetUptkHeter(NGL,K)*scal
-      RAcettProdHeter(NGL,K)      = RAcettProdHeter(NGL,K)*scal
-    ENDDO  
+    call SubstrateLimit(N1,N2,RAnabolAcetUptkHeter(N1:N2,K),DOM(idom_acetate,K))
 
 !
 !     MICROBIAL DECOMPOSITION PRODUCTS
@@ -2075,7 +2071,7 @@ module MicBGCMod
     RH1PO4TransfBandHeter        => nmicf%RH1PO4TransfBandHeter,         &
     RH1PO4TransfLitrHeter        => nmicf%RH1PO4TransfLitrHeter,         &
     RN2FixHeter                  => nmicf%RN2FixHeter,                   &
-    RDcmpProdDOM                 => ncplxf%RDcmpProdDOM,                 &
+    RDecmpProdDOM                 => ncplxf%RDecmpProdDOM,                 &
     RHydlysBioResduOM            => ncplxf%RHydlysBioResduOM,            &
     RHydlysSorptOM               => ncplxf%RHydlysSorptOM,               &
     RDOMSorp                     => ncplxf%RDOMSorp,                     &
@@ -2157,7 +2153,7 @@ module MicBGCMod
             naqfdiag%tRH2PO4MicrbTransfSoil = naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfLitrHeter(NGL,K)
             naqfdiag%tRH1PO4MicrbTransfSoil = naqfdiag%tRH1PO4MicrbTransfSoil+RH1PO4TransfLitrHeter(NGL,K)
           ENDIF
-
+!
           naqfdiag%tRCO2MicrbProd    = naqfdiag%tRCO2MicrbProd+RCO2ProdHeter(NGL,K)
           naqfdiag%tRCH4MicrbProd    = naqfdiag%tRCH4MicrbProd+RCH4ProdHeter(NGL,K)
           naqfdiag%tRNOxMicrbRedux   = naqfdiag%tRNOxMicrbRedux+RNOxReduxRespDenitLim(NGL,K)
@@ -2265,7 +2261,7 @@ module MicBGCMod
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        REcoDOMProd(NE,K)=REcoDOMProd(NE,K)+RDcmpProdDOM(NE,M,K)
+        REcoDOMProd(NE,K)=REcoDOMProd(NE,K)+RDecmpProdDOM(NE,M,K)
       ENDDO
     ENDDO D660
 
@@ -2609,6 +2605,7 @@ module MicBGCMod
   RDOCUptkHeter(NGL,K)       = 0.0_r8
   RAcetateUptkHeter(NGL,K)   = RGOGZ
   ROQC4HeterMicrobAct(NGL,K) = 0.0_r8
+
   !given CH3COOH -> CH4+CO2, 0.5 is into CH4.
   naqfdiag%tCH4ProdAceto=naqfdiag%tCH4ProdAceto+0.5_r8*RGOMP
   end associate
@@ -2835,7 +2832,8 @@ module MicBGCMod
   subroutine AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
     micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
   !
-  !fermentation
+  !Description:
+  !Fermentation
   !(CH2O)6 +2H2O-> 2CO2 + 2(CH2O)2 + 4H2, mole based
   !(CH2O)6 -> 2CO2 + 2/3 (CH2O)2 + 8/(72)H2, mass based
   !fermenters only take up DOC/glucose
@@ -2889,7 +2887,7 @@ module MicBGCMod
   IF(N.EQ.mid_fermentor)THEN
     ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCHX-GHAX))/EOMF)))
   ELSE
-    !denitrifier
+    !dizotrophs, i.e. N2 fixers
     ECHZ=AMAX1(ENFX,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCHX-GHAX))/EOMN)))
   ENDIF
 !

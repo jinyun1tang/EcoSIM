@@ -483,7 +483,7 @@ module PlantDisturbsMod
   integer :: L,K,M,NR,N,NB,NBX,NE
   real(r8) :: FracLeftThin
   real(r8) :: XHVST1
-  REAL(R8) :: LeafC_lbrch(NumOfCanopyLayers1,JP1,JP1)
+  REAL(R8) :: LeafC_lbrch(NumCanopyLayers1,JP1,JP1)
   real(r8) :: ARLFY,ARLFR
   real(r8) :: APSILT
   real(r8) :: FHGT
@@ -575,7 +575,7 @@ module PlantDisturbsMod
       IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv .AND. FracCanopyHeightCut_pft(NZ).LT.0.0_r8)THEN
         ARLFY=(1._r8-ABS(FracCanopyHeightCut_pft(NZ)))*CanopyLeafArea_col
         ARLFR=0._r8
-        D9875: DO L=1,NumOfCanopyLayers1
+        D9875: DO L=1,NumCanopyLayers1
           IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1) &
             .AND. CanopyLeafAareZ_col(L).GT.ZEROS .AND. ARLFR.LT.ARLFY)THEN
             IF(ARLFR+CanopyLeafAareZ_col(L).GT.ARLFY)THEN
@@ -618,7 +618,7 @@ module PlantDisturbsMod
       CanopyLeafShethC_pft(NZ)     = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(NB,NZ)
       StalkStrutElms_pft(ielmc,NZ) = StalkStrutElms_pft(ielmc,NZ)+StalkStrutElms_brch(ielmc,NB,NZ)
       CanopyStalkC_pft(NZ)         = CanopyStalkC_pft(NZ)+StalkLiveBiomassC_brch(NB,NZ)
-      D9830: DO L=1,NumOfCanopyLayers1
+      D9830: DO L=1,NumCanopyLayers1
         CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
       ENDDO D9830
     ENDDO D9840
@@ -1322,7 +1322,7 @@ module PlantDisturbsMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: HvstedLeafC
-  REAL(R8), intent(in) :: LeafC_lbrch(NumOfCanopyLayers1,JP1,JP1)
+  REAL(R8), intent(in) :: LeafC_lbrch(NumCanopyLayers1,JP1,JP1)
   integer :: L,NB,K,NE
   real(r8) :: FHGT,FHVSH,FracHarvested
   real(r8) :: FrcLeafMassLeft
@@ -1359,7 +1359,7 @@ module PlantDisturbsMod
 !     FracBiomHarvsted(1,1,FracBiomHarvsted(1,2,FracBiomHarvsted(1,3,FracBiomHarvsted(1,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from PFT
 !
-  D9865: DO L=NumOfCanopyLayers1,1,-1
+  D9865: DO L=NumCanopyLayers1,1,-1
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
       IF(iHarvstType_pft(NZ).NE.iharvtyp_pruning)THEN
         IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1))THEN
@@ -1497,7 +1497,7 @@ module PlantDisturbsMod
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
 !     CanopyLeafArea_lnode,CanopyLeafAreaZ_pft=leaf node,total area in canopy layer
 !
-    D9815: DO L=1,NumOfCanopyLayers1
+    D9815: DO L=1,NumCanopyLayers1
       ARLFG=ARLFG+CanopyLeafArea_lnode(L,K,NB,NZ)
       DO NE=1,NumPlantChemElms
         LeafElmNodeK_brch(NE)=LeafElmNodeK_brch(NE)+LeafElmsByLayerNode_brch(NE,L,K,NB,NZ)
