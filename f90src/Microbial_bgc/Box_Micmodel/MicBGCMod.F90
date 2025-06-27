@@ -797,7 +797,7 @@ module MicBGCMod
           IF(OMActHeter(NGL,K).GT.0.0_r8)THEN
             call ActiveHeterotrophs(I,J,NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
               OXKX,TotActMicrobiom,TotBiomNO2Consumers,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
-              micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
+              micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx,nmicdiag)
           ENDIF
         ENDDO
       ENDDO
@@ -823,7 +823,7 @@ module MicBGCMod
         IF(OMActAutor(NGL).GT.0.0_r8)THEN
           call ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
             OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
-            micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
+            micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
         ENDIF
       ENDDO
     ENDIF
@@ -834,7 +834,7 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
   subroutine ActiveHeterotrophs(I,J,NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK,RMOMK,&
     OXKX,TotActMicrobiom,TotBiomNO2Consumers, ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,&
-    micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx)
+    micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx,nmicdiag)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NGL,K,N
@@ -855,6 +855,7 @@ module MicBGCMod
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout) :: ncplxs
   type(micfluxtype), intent(inout) :: micflx
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag  
   integer  :: M
   real(r8) :: COMC
   real(r8) :: ECHZ
@@ -943,7 +944,7 @@ module MicBGCMod
 !   (6)N2 FIXERS
 
     call AerobicHeterotrophCatabolism(I,J,NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
-      ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+      ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
 
 !   write(*,*)'AerobicHeterO2Uptake'
     call AerobicHeterO2Uptake(I,J,NGL,N,K,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB, &
@@ -963,7 +964,7 @@ module MicBGCMod
 
 !     write(*,*)'AnaerobAcetogenCatabolism'
     call AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,&
-      FGOAP,RGOMP, micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
+      FGOAP,RGOMP, micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx,nmicdiag)
   ELSEIF(N.EQ.micpar%mid_AcetoMethanogArchea)THEN
 !     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
 !
@@ -971,7 +972,7 @@ module MicBGCMod
 !     ECHZ=growth respiration efficiency of aceto. methanogenesis
 !
     call AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
-      FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+      FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   ENDIF
 !
 !     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
@@ -1460,9 +1461,7 @@ module MicBGCMod
   !     BulkSOMC=total SOC
   !     FCNK,FCPK=N,P limitation to microbial activity in each K
   !
-!      if(etimer%get_curr_yearAD()==1980 .and. litrm)then
-!      write(115,*)I+J/24.,K,ROQC4HeterMicActCmpK(K),VOLWZ,COSC,COQCK,CDOM(idom_doc,K),ZEROS2
-!      endif
+
       D785: DO M=1,jsken
         IF(SolidOM(ielmc,M,K).GT.ZEROS)THEN
           CNS(M,K)                  = AZMAX1(SolidOM(ielmn,M,K)/SolidOM(ielmc,M,K))
@@ -1471,9 +1470,6 @@ module MicBGCMod
             ,SPOSC(M,K)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
           RHydlysSolidOM(ielmn,M,K)=AZMAX1(AMIN1(SolidOM(ielmn,M,K),CNS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCNK(K)
           RHydlysSolidOM(ielmp,M,K)=AZMAX1(AMIN1(SolidOM(ielmp,M,K),CPS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCPK(K)
-!          IF(litrm)THEN
-!            write(113,*)I+J/24.,ROQC4HeterMicActCmpK(K)/TOMK(K),ncplxs%CDOM(idom_doc,K),TOMK(K)
-!          endif
 
           DO NE=1,NumPlantChemElms
             RHydlysSolidOM(NE,M,K) = AMIN1(RHydlysSolidOM(NE,M,K),SolidOM(NE,M,K))
@@ -2534,7 +2530,7 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine AcetoMethanogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQA,ECHZ, &
-    FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+    FGOCP,FGOAP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   implicit none
   integer, intent(in) :: NGL,N,K
   real(r8), intent(in) :: FOQA
@@ -2550,7 +2546,7 @@ module MicBGCMod
   type(Microbe_State_type), intent(inout):: nmics
   type(OMCplx_State_type),intent(in):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
-  real(r8) :: FSBST
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag  
   real(r8) :: GOMX,GOMM
   real(r8) :: RGOGY,RGOGZ
   real(r8) :: RGroMax   !kinetically unlimited acetate uptake
@@ -2559,6 +2555,7 @@ module MicBGCMod
   associate(                                            &
     FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, &
     OMActHeter           => nmics%OMActHeter,           &
+    FSBSTHeter           => nmicdiag%FSBSTHeter       , &        
     RO2DmndHeter         => nmicf%RO2DmndHeter,         &
     RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    &
     ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  &
@@ -2592,9 +2589,9 @@ module MicBGCMod
 !     ROXY*=O2 demand, RDOCUptkHeter,ROQCA=DOC, acetate demand
 !     ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
-  FSBST                      = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
+  FSBSTHeter(NGL,K)          = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKAM)
   RGOGY                      = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXM*WatStressMicb*OMActHeter(NGL,K))
-  RGOGZ                      = RGOGY*FSBST*TSensGrowth
+  RGOGZ                      = RGOGY*FSBSTHeter(NGL,K)*TSensGrowth
   RGroMax                    = AZMAX1(DOM(idom_acetate,K)*FOQA*ECHZ)
   RGOMP                      = AMIN1(RGroMax,RGOGZ)
   FGOCP                      = 0.0_r8
@@ -2613,7 +2610,7 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine AerobicHeterotrophCatabolism(I,J,NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
-    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NGL,N,K
@@ -2631,17 +2628,18 @@ module MicBGCMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(OMCplx_State_type),intent(inout):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
-
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
   real(r8) :: EO2Q
   real(r8) :: FSBSTC,FSBSTA
   real(r8) :: RGOCY,RGOCZ,RGOAZ
   real(r8) :: RGOCX,RGOAX
   real(r8) :: RGOAP
-  real(r8) :: FSBST
+
 !     begin_execution
   associate(                                                 &
     OMActHeter             => nmics%OMActHeter,              &
     FBiomStoiScalarHeter   => nmics%FBiomStoiScalarHeter,    &
+    FSBSTHeter             => nmicdiag%FSBSTHeter          , &    
     RO2Dmnd4RespHeter      => nmicf%RO2Dmnd4RespHeter,       &
     RO2DmndHeter           => nmicf%RO2DmndHeter,            &
     ROQC4HeterMicrobAct    => nmicf%ROQC4HeterMicrobAct,     &
@@ -2665,7 +2663,7 @@ module MicBGCMod
 !
   IF(N.EQ.mid_Aerob_Fungi)THEN
     call AerobicFungiCatabolism(I,J,NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
-    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
     return
   endif
 
@@ -2690,9 +2688,11 @@ module MicBGCMod
 ! RGOMP=O2-unlimited respiration of DOC+DOA
 ! RGOCP,RGOAP,RGOMP=O2-unlimited respiration of DOC, DOA, DOC+DOA
 !
-  FSBSTC = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
-  FSBSTA = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
-  FSBST  = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
+  FSBSTC       = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
+  FSBSTA       = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
+  
+  FSBSTHeter(NGL,K) = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
+
   RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))*TSensGrowth
   RGOCZ  = RGOCY*FSBSTC*FOCA(K)
   RGOAZ  = RGOCY*FSBSTA*FOAA(K)
@@ -2736,7 +2736,7 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine AerobicFungiCatabolism(I,J,NGL,N,K,TSensGrowth,WatStressMicb,FOQC,FOQA, &
-    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
+    ECHZ,FGOCP,FGOAP,RGOCP,RGOMP,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NGL,N,K
@@ -2754,13 +2754,13 @@ module MicBGCMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(OMCplx_State_type),intent(inout):: ncplxs
   type(micfluxtype), intent(inout) :: micflx
-
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
   real(r8) :: EO2Q
   real(r8) :: FSBSTC,FSBSTA
   real(r8) :: RGOCY,RGOCZ,RGOAZ
   real(r8) :: RGOCX,RGOAX
   real(r8) :: RGOAP
-  real(r8) :: FSBST
+
 !     begin_execution
   associate(                                                 &
     OMActHeter             => nmics%OMActHeter,              &
@@ -2770,6 +2770,7 @@ module MicBGCMod
     ROQC4HeterMicrobAct    => nmicf%ROQC4HeterMicrobAct,     &
     ZEROS                  => micfor%ZEROS,                  &
     DOM                    => micstt%DOM,                    &
+    FSBSTHeter             => nmicdiag%FSBSTHeter          , &        
     mid_Aerob_HeteroBacter => micpar%mid_Aerob_HeteroBacter, &
     mid_Facult_DenitBacter => micpar%mid_Facult_DenitBacter, &
     mid_Aerob_Fungi        => micpar%mid_Aerob_Fungi,        &
@@ -2787,7 +2788,7 @@ module MicBGCMod
   EO2Q=EO2G
   FSBSTC = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
   FSBSTA = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
-  FSBST  = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
+  FSBSTHeter(NGL,K)  = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
   RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))*TSensGrowth
   RGOCZ  = RGOCY*FSBSTC*FOCA(K)
   RGOAZ  = RGOCY*FSBSTA*FOAA(K)
@@ -2830,7 +2831,7 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
-    micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx)
+    micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx,nmicdiag)
   !
   !Description:
   !Fermentation
@@ -2854,17 +2855,19 @@ module MicBGCMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_State_type), intent(inout):: nmics
   type(micfluxtype), intent(inout) :: micflx
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag  
   real(r8) :: GH2X,GH2F
   real(r8) :: GOAX,GOAF
   real(r8) :: GHAX
   REAL(R8) :: oxyi
   real(r8) :: RGOFX,RGOFY,RGOFZ
-  real(r8) :: FSBST
+
   real(r8), parameter :: GlucoseC=72._r8
 !     begin_execution
   associate(                                            &
     FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, &
     OMActHeter           => nmics%OMActHeter,           &
+    FSBSTHeter           => nmicdiag%FSBSTHeter       , &        
     RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    &
     RO2DmndHeter         => nmicf%RO2DmndHeter,         &
     ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  &
@@ -2907,9 +2910,9 @@ module MicBGCMod
 !     ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
 !
   OXYI  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*AMAX1(-COXYS+2.5_r8,-50._r8)))
-  FSBST = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
+  FSBSTHeter(NGL,K) = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)*OXYI
   RGOFY = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXF*WatStressMicb*OMActHeter(NGL,K))
-  RGOFZ = RGOFY*FSBST*TSensGrowth
+  RGOFZ = RGOFY*FSBSTHeter(NGL,K)*TSensGrowth
   RGOFX = AZMAX1(DOM(idom_doc,K)*FOQC*ECHZ)
   !potential respiration to expense
   RGOMP                      = AMIN1(RGOFX,RGOFZ)

@@ -212,6 +212,8 @@ implicit none
   real(r8),pointer   :: h2D_microbC_vr(:,:)
   real(r8),pointer   :: h2D_microbN_vr(:,:)
   real(r8),pointer   :: h2D_microbP_vr(:,:)
+  real(r8),pointer   :: h2D_AeroBact_PrimS_lim_vr(:,:)
+  real(r8),pointer   :: h2D_AeroFung_PrimS_lim_vr(:,:)
   real(r8),pointer   :: h2D_tSOCL_vr(:,:)
   real(r8),pointer   :: h2D_fTRootGro_pvr(:,:) !
   real(r8),pointer   :: h2D_fRootGrowPSISense_pvr(:,:)  !
@@ -365,6 +367,9 @@ implicit none
   real(r8),pointer   :: h2D_faculDenitC_vr(:,:)  
   real(r8),pointer   :: h2D_fermentorC_vr(:,:)  
   real(r8),pointer   :: h2D_acetometgC_vr(:,:)  
+  real(r8),pointer   :: h2D_fermentor_frac_vr(:,:)
+  real(r8),pointer   :: h2D_acetometh_frac_vr(:,:)  
+  real(r8),pointer   :: h2D_hydrogMeth_frac_vr(:,:)
   real(r8),pointer   :: h2D_aeroN2fixC_vr(:,:)  
   real(r8),pointer   :: h2D_anaeN2FixC_vr(:,:)  
   real(r8),pointer   :: h2D_NH3OxiBactC_vr(:,:)
@@ -784,6 +789,8 @@ implicit none
   allocate(this%h2D_microbC_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbC_vr(:,:)=spval
   allocate(this%h2D_microbN_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbN_vr(:,:)=spval
   allocate(this%h2D_microbP_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbP_vr(:,:)=spval    
+  allocate(this%h2D_AeroBact_PrimS_lim_vr(beg_col:end_col,1:JZ)); this%h2D_AeroBact_PrimS_lim_vr(:,:)=spval
+  allocate(this%h2D_AeroFung_PrimS_lim_vr(beg_col:end_col,1:JZ)); this%h2D_AeroFung_PrimS_lim_vr(:,:)=spval  
   allocate(this%h2D_tSOCL_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOCL_vr(:,:)=spval
   allocate(this%h2D_tSON_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSON_vr(:,:)=spval
   allocate(this%h2D_tSOP_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOP_vr(:,:)=spval
@@ -836,6 +843,11 @@ implicit none
   allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
   allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
   allocate(this%h2D_fermentorC_vr(beg_col:end_col,1:JZ));  this%h2D_fermentorC_vr(:,:)=spval
+
+  allocate(this%h2D_fermentor_frac_vr(beg_col:end_col,1:JZ)); this%h2D_fermentor_frac_vr(:,:)=spval
+  allocate(this%h2D_acetometh_frac_vr(beg_col:end_col,1:JZ)); this%h2D_acetometh_frac_vr(:,:)=spval  
+  allocate(this%h2D_hydrogMeth_frac_vr(beg_col:end_col,1:JZ)); this%h2D_hydrogMeth_frac_vr(:,:)=spval
+
   allocate(this%h2D_acetometgC_vr(beg_col:end_col,1:JZ));  this%h2D_acetometgC_vr(:,:)=spval
   allocate(this%h2D_aeroN2fixC_vr(beg_col:end_col,1:JZ));  this%h2D_aeroN2fixC_vr(:,:)=spval
   allocate(this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ));  this%h2D_anaeN2FixC_vr(:,:)=spval
@@ -2225,6 +2237,16 @@ implicit none
     long_name='Vertically resolved total live microbial P',&
     ptr_col=data2d_ptr)       
 
+  data2d_ptr => this%h2D_AeroBact_PrimS_lim_vr(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='AeroBact_PrimS_lim_vr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved primary substrate limitation for aerobic heterotrophic bacteria',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_AeroFung_PrimS_lim_vr(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='AeroFung_PrimS_lim_vr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved primary substrate limitation for aerobic heterotrophic fungi',&
+    ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_tSOCL_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='tSOCL_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
     long_name='Layer resolved total soil organic C (everything organic)',ptr_col=data2d_ptr,&
@@ -2378,9 +2400,21 @@ implicit none
   call hist_addfld2d(fname='Facult_denitrifierC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Facultative denitrifier C biomass profile',ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_fermentorN_vr(beg_col:end_col,1:JZ)
+  data2d_ptr =>  this%h2D_fermentorC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='FermentorC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Fermentor C biomass profile',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_fermentor_frac_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Fermentor_frac_vr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Fraction of microbial C in fermentor',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_acetometh_frac_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='AcetoMethgen_frac_vr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Fraction of microbial C in acetoclastic methanogen',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_hydrogMeth_frac_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HydrogMethgen_frac_vr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Fraction of microbial C in hydrogenotrohpic methanogen',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_acetometgC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Acetic_methanogenC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
@@ -3111,7 +3145,8 @@ implicit none
         this%h2D_microbC_vr(ncol,L)         =  micBE(ielmc)/DVOLL
         this%h2D_microbN_vr(ncol,L)         =  micBE(ielmn)/DVOLL
         this%h2D_microbP_vr(ncol,L)         =  micBE(ielmp)/DVOLL
-
+        this%h2D_AeroBact_PrimS_lim_vr(ncol,L)=AeroBact_PrimeS_lim_vr(L,NY,NX)
+        this%h2D_AeroFung_PrimS_lim_vr(ncol,L)=AeroFung_PrimeS_lim_vr(L,NY,NX)
         this%h2D_tSOCL_vr(ncol,L)           = SoilOrgM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_tSON_vr(ncol,L)            = SoilOrgM_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_tSOP_vr(ncol,L)            = SoilOrgM_vr(ielmp,L,NY,NX)/DVOLL
@@ -3176,11 +3211,15 @@ implicit none
         this%h2D_fermentorN_vr(ncol,L) = micBE(ielmn)/DVOLL
         this%h2D_fermentorP_vr(ncol,L) = micBE(ielmp)/DVOLL
 
+          this%h2D_fermentor_frac_vr(ncol,L)=safe_adb(this%h2D_fermentorC_vr(ncol,L),this%h2D_microbC_vr(ncol,L))
+        
         !acetogenic methanogen
         call SumMicbGroup(L,NY,NX,micpar%mid_AcetoMethanogArchea,MicbE)
         this%h2D_acetometgC_vr(ncol,L) = micBE(ielmc)/DVOLL
         this%h2D_acetometgN_vr(ncol,L) = micBE(ielmn)/DVOLL
         this%h2D_acetometgP_vr(ncol,L) = micBE(ielmp)/DVOLL
+        
+        this%h2D_acetometh_frac_vr(ncol,L)=safe_adb(this%h2D_acetometgC_vr(ncol,L),this%h2D_microbC_vr(ncol,L))
 
         !aerobic N2 fixer
         call SumMicbGroup(L,NY,NX,micpar%mid_aerob_N2Fixer,MicbE)
@@ -3188,10 +3227,10 @@ implicit none
         this%h2D_aeroN2fixN_vr(ncol,L) = micBE(ielmn)/DVOLL
         this%h2D_aeroN2fixP_vr(ncol,L) = micBE(ielmp)/DVOLL
 
-        this%h2D_RDECOMPC_SOM_vr(ncol,L)    = tRHydlySOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_RDECOMPC_BReSOM_vr(ncol,L) = tRHydlyBioReSOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_RDECOMPC_SOM_vr(ncol,L)     = tRHydlySOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_RDECOMPC_BReSOM_vr(ncol,L)  = tRHydlyBioReSOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RDECOMPC_SorpSOM_vr(ncol,L) = tRHydlySoprtOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_MicrobAct_vr(ncol,L) = TMicHeterActivity_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_MicrobAct_vr(ncol,L)        = TMicHeterActivity_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
         !anaerobic N2 fixer
         call SumMicbGroup(L,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)
@@ -3217,8 +3256,10 @@ implicit none
         call SumMicbGroup(L,NY,NX,micpar%mid_H2GenoMethanogArchea,MicbE,isauto=.true.)
         this%h2D_H2MethogenC_vr(ncol,L) = micBE(ielmc)/DVOLL
         this%h2D_H2MethogenN_vr(ncol,L) = micBE(ielmn)/DVOLL
-        this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)/DVOLL
+        this%h2D_H2MethogenP_vr(ncol,L) = micBE(ielmp)/DVOLL        
         
+        this%h2D_hydrogMeth_frac_vr(ncol,L)=safe_adb(this%h2D_H2MethogenC_vr(ncol,L),this%h2D_microbC_vr(ncol,L))
+
         this%h2D_TSolidOMActC_vr(ncol,L)     = TSolidOMActC_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_TSolidOMActCDens_vr(ncol,L) = safe_adb(TSolidOMActC_vr(L,NY,NX),TSolidOMC_vr(L,NY,NX))
         this%h2D_tOMActCDens_vr(ncol,L)      = safe_adb(tOMActC_vr(L,NY,NX),(tOMActC_vr(L,NY,NX)+TSolidOMC_vr(L,NY,NX)))

@@ -26,7 +26,7 @@ module MicAutoCPLXMod
 !------------------------------------------------------------------------------------------
   subroutine ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,&
     SPOMK, RMOMK, OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,&
-    ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
+    ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: NGL,N
@@ -45,6 +45,7 @@ module MicAutoCPLXMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout) :: ncplxs
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag
   integer  :: M
   real(r8) :: COMC
   real(r8) :: ECHZ
@@ -131,22 +132,22 @@ module MicAutoCPLXMod
   if (N.eq.mid_AmmoniaOxidBacter)then
     ! NH3 OXIDIZERS
     call NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,&
-      RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
+      RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   elseif (N.eq.mid_NitriteOxidBacter)then
     ! NO2 OXIDIZERS
     call NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
-      micfor,micstt,naqfdiag,nmicf,nmics,micflx)
+      micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   elseif (N.eq.mid_H2GenoMethanogArchea)then
     ! H2TROPHIC METHANOGENS
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
-      naqfdiag,nmicf,nmics,micflx)
+      naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   elseif (N.eq.mid_AerobicMethanotrofBacter)then
     ! METHANOTROPHS
     call MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
-      RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
+      RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
   else
     RGOMP                  = 0.0_r8
     RO2Dmnd4RespAutor(NGL) = 0.0_r8
@@ -907,7 +908,7 @@ module MicAutoCPLXMod
   end subroutine AutotrophDenitrificCatabolism
 !------------------------------------------------------------------------------------------
   subroutine NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,RVOXPA,&
-    RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
+    RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
   implicit none
   integer, intent(in) :: NGL,N
   REAL(R8), INTENT(IN) :: VOLWZ,TSensGrowth
@@ -921,6 +922,7 @@ module MicAutoCPLXMod
   type(Cumlate_Flux_Diag_type),INTENT(INOUT) :: naqfdiag
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag  
   real(r8) :: FNH4S,FNHBS
   real(r8) :: FNH4,FNB4
   real(r8) :: FCN4S,FCN4B
@@ -928,13 +930,13 @@ module MicAutoCPLXMod
   real(r8) :: VMXX,VMX4S
   real(r8) :: VMX4B
   real(r8) :: ZNFN4S,ZNFN4B
-  real(r8) :: FSBST
   real(r8) :: VMXA
 
 !     begin_execution
   associate(                                            &
     GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
     FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    FSBSTAutor           => nmicdiag%FSBSTAutor       , &        
     FracOMActAutor       => nmics%FracOMActAutor,       &
     OMActAutor           => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
@@ -1024,7 +1026,7 @@ module MicAutoCPLXMod
   ENDIF
   FCN4S                  = FNH4S*CNH4S/(CNH4S+ZHKM)
   FCN4B                  = FNHBS*CNH4B/(CNH4B+ZHKM)
-  FSBST                  = FCN4S+FCN4B
+  FSBSTAutor(NGL)        = FCN4S+FCN4B
   VMX4S                  = VMXA*FCN4S
   VMX4B                  = VMXA*FCN4B
   RNNH4                  = AZMAX1(AMIN1(VMX4S,FNH4*ZNH4S))*ZNFN4S
@@ -1051,7 +1053,7 @@ module MicAutoCPLXMod
   end subroutine NH3OxidizerCatabolism
 !------------------------------------------------------------------------------------------
   subroutine NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,&
-    RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
+    RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
   !
   !nitrite oxidation
   !NO2(-) + 0.5O2 -> NO3(-)   
@@ -1066,18 +1068,19 @@ module MicAutoCPLXMod
   type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag  
   real(r8) :: FNH4S,FNHBS
   REAL(R8) :: fno2,FNB2
   real(r8) :: FCN2S,FCN2B
   real(r8) :: RNNO2,RNNOB
   real(r8) :: VMX2S,VMX2B
-  real(r8) :: FSBST
   real(r8) :: VMXA
 
 !     begin_execution
   associate(                                            &
     GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
     FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    FSBSTAutor           => nmicdiag%FSBSTAutor          , &        
     FracNO2ReduxAutor    => nmics%FracNO2ReduxAutor,    &
     OMActAutor           => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
@@ -1141,7 +1144,7 @@ module MicAutoCPLXMod
   VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXN
   FCN2S                  = FNH4S*CNO2S/(CNO2S+ZNKM)
   FCN2B                  = FNHBS*CNO2B/(CNO2B+ZNKM)
-  FSBST                  = FCN2S+FCN2B
+  FSBSTAutor(NGL)        = FCN2S+FCN2B
   VMX2S                  = VMXA*FCN2S
   VMX2B                  = VMXA*FCN2B
   RNNO2                  = AZMAX1(AMIN1(VMX2S,FNO2*ZNO2S))
@@ -1168,7 +1171,7 @@ module MicAutoCPLXMod
 
 
   subroutine H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
-    naqfdiag,nmicf,nmics,micflx)
+    naqfdiag,nmicf,nmics,micflx,nmicdiag)
   !
   !Hydrogenotrophic CH4 production
   !CO2 + 4H2 -> CH4 + 2H2O
@@ -1185,14 +1188,15 @@ module MicAutoCPLXMod
   type(Cumlate_Flux_Diag_type), intent(inout) :: naqfdiag
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag    
   real(r8) :: GH2X,GH2H
   real(r8) :: H2GSX
-  real(r8) :: FSBST
   real(r8) :: VMXA
 
   associate(                                            &
     GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
     FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    FSBSTAutor           => nmicdiag%FSBSTAutor          , &        
     OMActAutor           => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
     RO2DmndAutor         => nmicf%RO2DmndAutor,         &
@@ -1216,17 +1220,17 @@ module MicAutoCPLXMod
 !     and energy yield of hydrogenotrophic
 !     methanogenesis GH2X at ambient H2 concentration CH2GS
 
-  GH2X=RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
-  GH2H=GH2X/12.08_r8
-  ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
-  VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXC
-  H2GSX=H2GS+0.111_r8*naqfdiag%tCResp4H2Prod
-  FSBST=CH2GS/(CH2GS+H2KM)
+  GH2X            = RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
+  GH2H            = GH2X/12.08_r8
+  ECHZ            = AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
+  VMXA            = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXC
+  H2GSX           = H2GS+0.111_r8*naqfdiag%tCResp4H2Prod
+  FSBSTAutor(NGL) = CH2GS/(CH2GS+H2KM)
   !why 1.5? 
-  RGOMP=AZMAX1(AMIN1(1.5_r8*H2GSX,VMXA*FSBST))
-  RO2Dmnd4RespAutor(NGL)=0.0_r8
-  RO2DmndAutor(NGL)=0.0_r8
-  RO2DmndAutort(NGL)=0.0_r8
+  RGOMP                  = AZMAX1(AMIN1(1.5_r8*H2GSX,VMXA*FSBSTAutor(NGL)))
+  RO2Dmnd4RespAutor(NGL) = 0.0_r8
+  RO2DmndAutor(NGL)      = 0.0_r8
+  RO2DmndAutort(NGL)     = 0.0_r8
   naqfdiag%tCH4ProdH2=naqfdiag%tCH4ProdH2+RGOMP
 !
   end associate
@@ -1234,7 +1238,7 @@ module MicAutoCPLXMod
 !------------------------------------------------------------------------------------------
 
   subroutine MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
-    RCH4Oxid,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
+    RCH4Oxid,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   implicit none
   integer, intent(in) :: I,J  
@@ -1250,12 +1254,12 @@ module MicAutoCPLXMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_State_type), intent(inout):: nmics
   type(micfluxtype), intent(inout) :: micflx
+  type(Microbe_Diag_type), intent(inout) :: nmicdiag      
   integer  :: M,MM
   real(r8) :: CH4G1,CH4S1,CCH4S1
   real(r8) :: RCH4L1,RCH4F1,RCH4S1
   real(r8) :: RGOMP1,RCHDF
   real(r8) :: VMXA1,VOLWCH
-  real(r8) :: FSBST
   real(r8) :: RVOXP1
   real(r8) :: VMXA
   real(r8) :: pscal
@@ -1264,6 +1268,7 @@ module MicAutoCPLXMod
   associate(                                            &
     GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
     FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
+    FSBSTAutor           => nmicdiag%FSBSTAutor          , &        
     OMActAutor           => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
     RO2DmndAutor         => nmicf%RO2DmndAutor,         &
@@ -1347,9 +1352,9 @@ module MicAutoCPLXMod
         CH4G1  = CH4G1+RCH4F1
         CH4S1  = CH4S1+RCH4L1+RCH4S1
         CCH4S1 = AZMAX1(safe_adb(CH4S1,VLWatMicPM(M)))
-        FSBST  = CCH4S1/(CCH4S1+CCK4)
+        FSBSTAutor(NGL)  = CCH4S1/(CCH4S1+CCK4)
         !RVOXP1 energy from oxidizing CH4 into CO2
-        RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0_r8+ECHO*ECHZ),VMXA1*FSBST)
+        RVOXP1=AMIN1(AZMAX1(CH4S1)/(1.0_r8+ECHO*ECHZ),VMXA1*FSBSTAutor(NGL))
         !the respiration yield of CH2O, CH4+O2 -> CH2O + H2O (molar basis)
         RGOMP1=RVOXP1*ECHO*ECHZ
         !

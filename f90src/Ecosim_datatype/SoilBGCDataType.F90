@@ -127,8 +127,10 @@ implicit none
   real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production, [gN d-2 h-1]
   real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2,  [gN d-2 h-1]
   real(r8),target,allocatable :: DOM_draing_col(:,:,:,:)             !DOM loss through subsurface drainage, [g d-2 h-1]
-  real(r8),target,allocatable :: trcs_drainage_flx_col(:,:,:)              !solute loss through subsurface drainage, [g d-2 h-1]
+  real(r8),target,allocatable :: trcs_drainage_flx_col(:,:,:)        !solute loss through subsurface drainage, [g d-2 h-1]
   real(r8),target,allocatable :: DOM_SurfRunoff_flx_col(:,:,:,:)     !DOM loss through surface runoff, [g d-2 h-1]
+  real(r8),target,allocatable :: AeroBact_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic bacteria, [-]
+  real(r8),target,allocatable :: AeroFung_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic fungi, [-]
   private :: InitAllocate
   contains
 
@@ -146,6 +148,8 @@ implicit none
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
+  allocate(AeroBact_PrimeS_lim_vr(0:JZ,JY,JX));AeroBact_PrimeS_lim_vr=0._r8
+  allocate(AeroFung_PrimeS_lim_vr(0:JZ,JY,JX));AeroFung_PrimeS_lim_vr=0._r8
   allocate(DOM_SurfRunoff_flx_col(idom_beg:idom_end,jcplx,JY,JX)); DOM_SurfRunoff_flx_col=0._r8
   allocate(DOM_draing_col(idom_beg:idom_end,jcplx,JY,JX));DOM_draing_col=0._r8
   allocate(trcs_drainage_flx_col(ids_beg:ids_end,JY,JX));trcs_drainage_flx_col=0._r8
@@ -278,6 +282,9 @@ implicit none
   use abortutils, only : destroy
 
   implicit none
+
+  call destroy(AeroBact_PrimeS_lim_vr)
+  call destroy(AeroFung_PrimeS_lim_vr)
 
   call destroy(DOM_SurfRunoff_flx_col)
   call destroy(DOM_draing_col)

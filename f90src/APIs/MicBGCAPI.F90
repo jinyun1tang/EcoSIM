@@ -38,6 +38,8 @@ implicit none
   type(micforctype) :: micfor
   type(micsttype) :: micstt
   type(micfluxtype) :: micflx
+  type(Microbe_Diag_type) :: nmicdiag
+
   integer :: curI,curJ
 
 
@@ -55,6 +57,7 @@ implicit none
   call micfor%Init()
   call micstt%Init()
   call micflx%Init()
+  call nmicdiag%Init()
 
   end subroutine MicAPI_Init
 !------------------------------------------------------------------------------------------
@@ -66,6 +69,8 @@ implicit none
   call micfor%destroy()
   call micflx%destroy()
   call micstt%destroy()
+  call nmicdiag%Destroy()
+
   end subroutine MicAPI_cleanup
 !------------------------------------------------------------------------------------------
   subroutine MicrobeModel(I,J,NHW,NHE,NVN,NVS)
@@ -127,16 +132,16 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
   type(Cumlate_Flux_Diag_type) :: naqfdiag
-  type(Microbe_Diag_type) :: nmicdiag
 
   call micflx%ZeroOut()
+  call nmicdiag%ZeroOut()
 
   call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
-  
+  print*,'soil',I,J,L
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
-
+  print*,'soil2',I,J,L
   call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag,nmicdiag)
-
+  
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
 
@@ -483,6 +488,9 @@ implicit none
   RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
   RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
   RO2UptkSoilM_vr(1:NPH,L,NY,NX)                          = micflx%RO2UptkSoilM(1:NPH)
+
+  call nmicdiag%Summary(micpar%mid_Aerob_HeteroBacter,AeroBact_PrimeS_lim_vr(L,NY,NX))
+  call nmicdiag%Summary(micpar%mid_Aerob_Fungi,AeroFung_PrimeS_lim_vr(L,NY,NX))
 
   TSens4MicbGrwoth_vr(L,NY,NX)                   = micstt%TSens4MicbGrwoth
   VWatMicrobAct_vr(L,NY,NX)                      = micstt%VWatMicrobAct

@@ -107,6 +107,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: FCNAutor(:)
   real(r8),allocatable :: FCPAutor(:)
   real(r8),allocatable :: FBiomStoiScalarAutor(:)
+
   contains
    procedure, public :: Init => nit_mics_init
    procedure, public :: Destroy => nit_mics_destroy
@@ -283,9 +284,17 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: ZNH4T
   real(r8) :: ZNO3T
   real(r8) :: ZNO2T
-  end type Microbe_Diag_type
+  real(r8),allocatable :: FSBSTHeter(:,:)                !limitation of primary substrate for heterotrophs, [0->1, less limitation]              
+  real(r8),allocatable :: FSBSTAutor(:)                  !limitation of primary substrate for autotrophs, [0->1, less limitation]              
 
   contains
+    procedure, public :: Init => mic_diag_init
+    procedure, public :: ZeroOut => mic_diag_zero
+    procedure, public :: Destroy => mic_diag_destroy  
+    procedure, public :: Summary => mic_diag_summary
+  end type Microbe_Diag_type
+  contains
+  
 !------------------------------------------------------------------------------------------
 
   subroutine nit_aqmf_diag(this)
@@ -465,6 +474,7 @@ type, public :: Cumlate_Flux_Diag_type
 
   call this%ZeroOut()
   end subroutine nit_micf_init
+
 !------------------------------------------------------------------------------------------
 
   subroutine nit_mics_init(this, jcplx,NumMicbFunGrupsPerCmplx)
@@ -726,6 +736,46 @@ type, public :: Cumlate_Flux_Diag_type
   end subroutine nit_micf_destroy
 !------------------------------------------------------------------------------------------
 
+  subroutine mic_diag_summary(this,groupid,FSubs_limiter)
+  implicit none
+  class(Microbe_Diag_type) :: this
+  integer, intent(in) :: groupid
+  real(r8),intent(out):: FSubs_limiter   !mean substrate limitation
+  integer :: NGL,K
+
+  FSubs_limiter=0._r8
+
+  if(groupid==micpar%mid_Aerob_HeteroBacter)then
+  
+    DO K=1,micpar%jcplx
+      DO NGL=micpar%JGnio(groupid),micpar%JGnfo(groupid)
+        FSubs_limiter=FSubs_limiter+this%FSBSTHeter(NGL,K)
+      ENDDO
+    ENDDO
+    FSubs_limiter=FSubs_limiter/real((micpar%JGnfo(groupid)-micpar%JGnio(groupid)+1)*micpar%jcplx,kind=r8)
+
+  elseif(groupid==micpar%mid_Aerob_Fungi)then
+    DO K=1,micpar%jcplx
+      DO NGL=micpar%JGnio(groupid),micpar%JGnfo(groupid)
+        FSubs_limiter=FSubs_limiter+this%FSBSTHeter(NGL,K)
+      ENDDO
+    ENDDO
+    FSubs_limiter=FSubs_limiter/real((micpar%JGnfo(groupid)-micpar%JGnio(groupid)+1)*micpar%jcplx,kind=r8)
+
+  endif
+
+  end subroutine mic_diag_summary
+
+
+!------------------------------------------------------------------------------------------  
+  subroutine mic_diag_destroy(this)
+  implicit none
+  class(Microbe_Diag_type) :: this
+
+  call destroy(this%FSBSTHeter)
+  call destroy(this%FSBSTAutor)
+  end subroutine mic_diag_destroy
+!------------------------------------------------------------------------------------------  
   subroutine nit_mics_destroy(this)
   implicit none
   class(Microbe_State_type) :: this
@@ -818,7 +868,20 @@ type, public :: Cumlate_Flux_Diag_type
   this%XferDOMK             = 0._r8
   end subroutine nit_omcplxf_zero
 !------------------------------------------------------------------------------------------
+  subroutine mic_diag_init(this)
+  implicit none
+  class(Microbe_Diag_type) :: this
+  integer :: NumMicrobAutrophCmplx,NumHetetr1MicCmplx
 
+  NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
+  NumHetetr1MicCmplx    = micpar%NumHetetr1MicCmplx
+
+  allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:micpar%jcplx));   this%FSBSTHeter=0._r8
+  allocate(this%FSBSTAutor(1:NumMicrobAutrophCmplx)); this%FSBSTAutor=0._r8
+
+  end subroutine mic_diag_init
+
+!------------------------------------------------------------------------------------------
   subroutine nit_omcplxs_init(this)
   implicit none
   class(OMCplx_State_type) :: this
@@ -844,6 +907,30 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%CDOM(idom_beg:idom_end,1:ncplx));this%CDOM=spval
   call this%ZeroOut()
   end subroutine nit_omcplxs_init
+!------------------------------------------------------------------------------------------
+
+  subroutine mic_diag_zero(this)
+  implicit none
+  class(Microbe_Diag_type) :: this
+
+  this%H1P4T               = 0._r8
+  this%H2P4T               = 0._r8
+  this%RH2UptkAutor        = 0._r8
+  this%ThetaLitr           = 0._r8
+  this%ThetaZ              = 0._r8
+  this%TOMBioResdu         = 0._r8
+  this%TotActMicrobiom     = 0._r8
+  this%TotBiomNO2Consumers = 0._r8
+  this%TSensGrowth         = 0._r8
+  this%TSensMaintR         = 0._r8
+  this%VOLWZ               = 0._r8
+  this%WatStressMicb       = 0._r8
+  this%XCO2                = 0._r8
+  this%ZNH4T               = 0._r8
+  this%ZNO3T               = 0._r8
+  this%ZNO2T               = 0._r8
+
+  end subroutine mic_diag_zero
 !------------------------------------------------------------------------------------------
 
   subroutine nit_omcplxs_zero(this)
