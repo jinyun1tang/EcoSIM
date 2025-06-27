@@ -875,7 +875,6 @@ type, public :: Cumlate_Flux_Diag_type
 
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumHetetr1MicCmplx    = micpar%NumHetetr1MicCmplx
-
   allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:micpar%jcplx));   this%FSBSTHeter=0._r8
   allocate(this%FSBSTAutor(1:NumMicrobAutrophCmplx)); this%FSBSTAutor=0._r8
 

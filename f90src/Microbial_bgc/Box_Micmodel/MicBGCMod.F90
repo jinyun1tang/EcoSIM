@@ -71,7 +71,7 @@ module MicBGCMod
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
   type(Cumlate_Flux_Diag_type), intent(out) :: naqfdiag
-  type(Microbe_Diag_type),intent(out) :: nmicdiag
+  type(Microbe_Diag_type),intent(inout) :: nmicdiag
 
 !local variables
   integer :: LL,K,KL,NGL
@@ -2690,7 +2690,6 @@ module MicBGCMod
 !
   FSBSTC       = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
   FSBSTA       = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
-  
   FSBSTHeter(NGL,K) = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
 
   RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*VMXO*WatStressMicb*OMActHeter(NGL,K))*TSensGrowth

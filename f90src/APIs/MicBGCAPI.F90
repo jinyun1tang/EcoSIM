@@ -137,9 +137,9 @@ implicit none
   call nmicdiag%ZeroOut()
 
   call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
-  print*,'soil',I,J,L
+
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
-  print*,'soil2',I,J,L
+
   call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag,nmicdiag)
   
   end subroutine Micbgc1Layer
