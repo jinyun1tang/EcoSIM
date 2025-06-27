@@ -81,20 +81,6 @@ implicit none
   NPH_Test=1
   NX=1
 
-  do NY=1, NYS
-    if (Qinfl2MicPM(NY,NX) /= Qinfl2MicPM(NY,NX)) Qinfl2MicPM(NY,NX)=0.0
-    if (Hinfl2SoilM(NY,NX) /= Hinfl2SoilM(NY,NX)) Hinfl2SoilM(NY,NX)=0.0
-    if (Qinfl2MicP(NY,NX) /= Qinfl2MicP(NY,NX)) Qinfl2MicP(NY,NX)=0.0
-    if (Hinfl2Soil(NY,NX) /= Hinfl2Soil(NY,NX)) Hinfl2Soil(NY,NX)=0.0
-  enddo
-
-  write(*,*) "Surface Balance Beginning: "
-  ! Check for NaN in surf_w_source
-  if (any(is_nan(surf_w_source))) then
-    write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,NYS)], is_nan(surf_w_source))
-  end if
-
-
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
   NX=1
@@ -198,13 +184,6 @@ implicit none
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
-  write(*,*) "Before StageSurfacePhysModel: "
-  ! Check for NaN in surf_w_source
-  if (any(is_nan(Qinfl2MicP(:,1)))) then
-    write(*,*) "NaN found in Qinfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
-  end if
-
-
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   !Actually I update this just in the loop above??
@@ -212,60 +191,49 @@ implicit none
 
   VHeatCapacity1_vr(0,1,1) = 0.0
 
-  write(*,*) "Before computing Qinfl2MicP: "
-  ! Check for NaN in surf_w_source
-  if (any(is_nan(Qinfl2MicP(:,1)))) then
-    write(*,*) "NaN found in Qinfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
-  end if
+  !These arrays sometimes have junk in them when initialized so we have to zero
+  !them out before iteration
+  do NY=1, NYS
+    Qinfl2MicPM(NY,NX)=0.0
+    Hinfl2SoilM(NY,NX)=0.0
+    Qinfl2MicP(NY,NX)=0.0
+    Hinfl2Soil(NY,NX)=0.0
+  enddo
 
   !This does the subcycling of the land surface model
-  !write(*,*) "Starting Subcycling loop: "
   DO M=1,NPH
-    !write(*,*) "subcyle: ", M, " of ", NPH
-    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&    
+
+    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
       KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
-      do NY=1, NYS
-        if (abs(Qinfl2MicPM(NY,NX)) < 1.0e-30) Qinfl2MicPM(NY,NX)=0.0
-        if (abs(Hinfl2SoilM(NY,NX)) < 1.0e-30) Hinfl2SoilM(NY,NX)=0.0
-        if (abs(Qinfl2MicP(NY,NX)) < 1.0e-30) Qinfl2MicP(NY,NX)=0.0
-        if (abs(Hinfl2Soil(NY,NX)) < 1.0e-30) Hinfl2Soil(NY,NX)=0.0
-      enddo
 
-      Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
-      Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
-      !also update state variables for iteration M 
-      call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
-
-  write(*,*) "After RunSurfacePhysModel computation of Qinfl2MicP: "
-  ! Check for NaN in surf_w_source
-  if (any(is_nan(Qinfl2MicP(:,1)))) then
-    write(*,*) "NaN found in Winfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
-  end if
-      
+    Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
+    Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
+    !also update state variables for iteration M 
+    call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
 
-  write(*,*) "After SnowMassUpdate computation of Qinfl2MicP: "
+  !write(*,*) "After SnowMassUpdate computation of Qinfl2MicP: "
   ! Check for NaN in surf_w_source
   if (any(is_nan(Qinfl2MicP(:,1)))) then
     write(*,*) "NaN found in Winfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
   end if
 
-
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !Convert heat and water flux flux from the subcycled value
     !to ATS units (flux / s)
+    write(*,*) "NY: ", NY, " Hinfl2Soil: ", Hinfl2Soil(NY,1), " Qinfl2MicP: ", Qinfl2MicP(NY,1)
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP)
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
  
-  write(*,*) "After setting surf_w_source to Qinfl2MicP: "
+  !write(*,*) "After setting surf_w_source to Qinfl2MicP: "
   ! Check for NaN in surf_w_source
   if (any(is_nan(surf_w_source))) then
     write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,NYS)], is_nan(surf_w_source))
@@ -277,36 +245,5 @@ implicit none
   !write(*,*) "After an hour of this flux the water content should be: ", Wat_next
 
   end subroutine RunEcoSIMSurfaceBalance
-
-  subroutine UpdateSoilMoistureFromATS(I,J,NHW,NHE,NVN,NVS)
-  implicit none
-  
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NHW,NHE,NVN,NVS
-  integer :: NY,NX, L    
-  real(r8) :: VLTSoiPore
-
-  !Modified to remove all MacP1 as it should all be zero
-  DO NY=1,NYS
-    DO L=NU(NY,NX),NL(NY,NX)
-      !VLTSoiPore = VLSoilMicP_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)
-      VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
-      IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN
-        !fraction as water
-        FracSoiPAsWat_vr(L,NY,NX)=AZMAX1t(VLWatMicP1_vr(L,NY,NX)/VLTSoiPore)
-        !fraction as ice
-        FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
-        !fraction as air
-        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
-      ELSE
-        FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
-        FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
-      ENDIF
-      !write(*,*) "NY, NX ", NY, NX
-      !write(*,*) "FracSoiPAsWat_vr(L,NY,NX): ", FracSoiPAsWat_vr(L,NY,NX)
-    ENDDO
-  ENDDO
-  end subroutine UpdateSoilMoistureFromATS
 
 end module ATSEcoSIMAdvanceMod

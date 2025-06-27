@@ -54,9 +54,6 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
-  !write(*,*) "capacity_cells: ", state%temperature%cap_rows
-  !write(*,*) "capacity_columns: ", state%temperature%cap_cols
-
   size_col_pad = size_col+30
 
   allocate(temp_array(size_col, num_cols))
@@ -207,12 +204,6 @@ contains
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
 
-  !write(*,*) "Data after porting from ATS"
-  ! Check for NaN in surf_w_source
-  !if (any(is_nan(surf_w_source))) then
-  !  write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,num_cols)], is_nan(surf_w_source))
-  !end if
-
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
@@ -231,29 +222,11 @@ contains
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
 
-  !call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_BKDSI
-
-  !call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_WC
-
-  !call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_HCOND
-
-  !call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_TEMP
-
   call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
   data2D(:,:)=a_SSWS
 
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
   data2D(:,:)=a_SSES
-
-  !write(*,*) "Data before pass back to ATS"
-  !! Check for NaN in surf_w_source
-  !if (any(is_nan(surf_w_source))) then
-  !  write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,num_cols)], is_nan(surf_w_source))
-  !end if
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
@@ -325,7 +298,6 @@ contains
 
     type (BGCSizes), intent(out) :: sizes
 
-    write(*,*) "(SetBGCSizes): N_cells, N_cols ", sizes%ncells_per_col_, sizes%num_columns
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
     sizes%num_columns = 1

@@ -1379,9 +1379,9 @@ contains
     RainThrufall2SoiMacP = 0._r8
   ENDIF
 
-  write(*,*) "(PartitionPrecip) Rain2snow: ", Rain2Snow, ", Snow2Snow: ", SnoFall, ", Rain2surf: ", Rain2ExposedSurf
-  write(*,*) "(RainSoilPartition) Rain2Soil: ", RainThrufall2Soil, ", Rain2Litr: ", RainThrufall2LitR, ", Rain2MicP: ",&
-   RainThrufall2SoiMicP, ", Rain2MacP: ",  RainThrufall2SoiMacP
+  !write(*,*) "(PartitionPrecip) Rain2snow: ", Rain2Snow, ", Snow2Snow: ", SnoFall, ", Rain2surf: ", Rain2ExposedSurf
+  !write(*,*) "(RainSoilPartition) Rain2Soil: ", RainThrufall2Soil, ", Rain2Litr: ", RainThrufall2LitR, ", Rain2MicP: ",&
+  ! RainThrufall2SoiMicP, ", Rain2MacP: ",  RainThrufall2SoiMacP
 
   Rain2ExposedSurf_col(NY,NX)=Rain2ExposedSurf
 !  write(211,*)I+J/24.,RainPrecThrufall_col(NY,NX)-Rain2Snow-Rain2ExposedSurf,Rain2ExposedSurf-RainThrufall2LitR-RainThrufall2Soil,&
