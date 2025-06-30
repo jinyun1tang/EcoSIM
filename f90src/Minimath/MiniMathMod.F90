@@ -505,9 +505,8 @@ module minimathmod
 
   tDemand = sum(demand_flux)
   scal1    = 1._r8
-  write(*,*)'tDemand=',tDemand
-  if(y>=tDemand .or. tDemand<=0._r8)then
-    y=y-tDemand
+  if(y-tDemand>=tiny_val .or. tDemand<=tiny_val)then
+    y=AZMAX1(y-tDemand)
   else
     scal1=y/tDemand
     DO n=n1,n2
