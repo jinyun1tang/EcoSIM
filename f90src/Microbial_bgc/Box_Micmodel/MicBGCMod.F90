@@ -32,8 +32,8 @@ module MicBGCMod
   integer :: jcplx,NumMicbFunGrupsPerCmplx,jsken,ndbiomcp,nlbiomcp
   integer, pointer :: JGniA(:)
   integer, pointer :: JGnfA(:)
-  integer, pointer :: JGnio(:)
-  integer, pointer :: JGnfo(:)
+  integer, pointer :: JGniH(:)
+  integer, pointer :: JGnfH(:)
 !
   public :: initNitro1Layer, SoilBGCOneLayer
 
@@ -55,8 +55,8 @@ module MicBGCMod
 
   JGniA => micpar%JGniA
   JGnfA => micpar%JGnfA
-  JGnio => micpar%JGnio
-  JGnfo => micpar%JGnfo
+  JGniH => micpar%JGniH
+  JGnfH => micpar%JGnfH
 
   call initNitroPars
 
@@ -102,27 +102,14 @@ module MicBGCMod
 ! write(*,*)'StageBGCEnvironCondition'
   call StageBGCEnvironCondition(I,J,micfor,KL,micstt,naqfdiag,nmicdiag,nmics,ncplxs)
 
-  call SumOneLayer('b',KL,micstt,micfor%litrM,totOMbeg,domsb,somb,sorbomb,biomheterb,biomautob,biomresb)
-  write(149,*)I+J/24.,micfor%L,'b',domsb(ielmc),somb(ielmc),sorbomb(ielmc),biomheterb(ielmc),biomautob(ielmc),biomresb(ielmc)  
+!  call SumOneLayer('b',KL,micstt,micfor%litrM,totOMbeg,domsb,somb,sorbomb,biomheterb,biomautob,biomresb)
 !
-! write(*,*)'ActiveMicrobes'
-  call ActiveMicrobes(I,J,micfor,micstt,micflx,nmicdiag, &
+  ! write(*,*)'ActiveMicrobes'
+  call ActiveMicrobes(I,J,KL,micfor,micstt,micflx,nmicdiag, &
     naqfdiag,nmicf,nmics,ncplxf,ncplxs)
-!
-!write(*,*)'ChemoDenitrification'
+  !
+  !write(*,*)'ChemoDenitrification'
   call ChemoDenitrification(micfor,micstt,nmicdiag,naqfdiag,micflx)
-!
-!     DECOMPOSITION
-!
-!     ROQC4HeterMicActCmpK=total respiration of DOC+DOA used to represent microbial activity
-!
-  DO  K=1,KL
-    DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
-        nmicdiag%ROQC4HeterMicActCmpK(K)=nmicdiag%ROQC4HeterMicActCmpK(K)+nmicf%ROQC4HeterMicrobAct(NGL,K)
-      enddo
-    ENDDO
-  ENDDO
 
         !
         !write(*,*)'PRIMING of DOC,DON,DOP BETWEEN LITTER AND NON-LITTER C'
@@ -138,35 +125,26 @@ module MicBGCMod
 !
     !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
   call SolidOMDecomposition(I,J,KL,micfor,micstt,naqfdiag,nmicdiag,ncplxf,ncplxs,micflx)
-!
-          !write(*,*)'DOC ADSORPTION - DESORPTION'
-!
-  call RDOMSorption(KL,micfor,micstt,nmicf,ncplxf,ncplxs)
 
-        !write(*,*)'RedistDecompProduct'
   call RedistDecompProduct(micfor,KL,nmicdiag,nmicf,ncplxf,ncplxs,micstt)
-!
-        !write(*,*)'MICROBIAL GROWTH FROM RESPIRATION, MINERALIZATION'
+
+  call RDOMSorption(KL,micfor,micstt,nmicf,ncplxf,ncplxs)
 
   call AutotrophAnabolicUpdate(micfor,micstt,nmicf)
 
   call HeterotrophAnabolicUpdate(I,J,micfor,micstt,nmicf,micflx)
-!
-        !write(*,*)'MICROBIAL COLONIZATION OF NEW LITTER'
-!
+  
   call MicrobialLitterColonization(I,J,KL,micfor,micstt,ncplxf,ncplxs,nmicdiag)
-!
-!     AGGREGATE ALL TRANSFOMBioResduATIONS CALCULATED ABOVE FOR EACH N,K
-!
+  
+  !     AGGREGATE ALL TRANSFOMBioResduATIONS CALCULATED ABOVE FOR EACH N,K
+  !
   call AggregateTransfOMBioResdue(micfor,micstt,nmicdiag,naqfdiag,nmicf,ncplxf,micflx)
 
-  call SumOneLayer('e',KL,micstt,micfor%litrM,totOMend,domse,some,sorbome,biomhetere,biomautoe,biomrese)
-  write(146,*)I+J/24._r8,micfor%L,totOMbeg(ielmc),totOMend(ielmc),totOMbeg(ielmc)-totOMend(ielmc),micflx%RCO2NetUptkMicb &
-    + (naqfdiag%tCH4OxiAero-naqfdiag%tCH4ProdAceto-naqfdiag%tCH4ProdH2),totOMbeg(ielmc)-totOMend(ielmc)+micflx%RCO2NetUptkMicb &
-    + (naqfdiag%tCH4OxiAero-naqfdiag%tCH4ProdAceto-naqfdiag%tCH4ProdH2)
-  write(147,*)I+J/24.,'e',micfor%L,micflx%RCO2NetUptkMicb, &
-    naqfdiag%tCH4OxiAero,naqfdiag%tCH4ProdAceto,naqfdiag%tCH4ProdH2
-  write(149,*)I+J/24.,micfor%L,'e',domse(ielmc),some(ielmc),sorbome(ielmc),biomhetere(ielmc),biomautoe(ielmc),biomrese(ielmc)  
+!  call SumOneLayer('e',KL,micstt,micfor%litrM,totOMend,domse,some,sorbome,biomhetere,biomautoe,biomrese)
+!  write(146,*)I+J/24._r8,'e1',micfor%L,totOMbeg(ielmc),totOMend(ielmc),totOMbeg(ielmc)-totOMend(ielmc),micflx%RCO2NetUptkMicb &
+!    + (naqfdiag%tCH4OxiAero-naqfdiag%tCH4ProdAceto-naqfdiag%tCH4ProdH2),totOMbeg(ielmc)-totOMend(ielmc)+micflx%RCO2NetUptkMicb &
+!    + (naqfdiag%tCH4OxiAero-naqfdiag%tCH4ProdAceto-naqfdiag%tCH4ProdH2)
+
 
   micstt%TotActMicrobiom=nmicdiag%TotActMicrobiom
   call nmics%destroy()
@@ -246,7 +224,7 @@ module MicBGCMod
     !add live heterotrophic biomass     
     DO N=1,NumMicbFunGrupsPerCmplx
       if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
-      DO NGL=JGnio(n),JGnfo(n)
+      DO NGL=JGniH(n),JGnfH(n)
         DO nlb=1,micpar%nlbiomcp
           MID=micpar%get_micb_id(nlb,NGL)                
           DO NE=1,NumPlantChemElms
@@ -255,9 +233,10 @@ module MicBGCMod
           ENDDO
         ENDDO  
       ENDDO
-    ENDDO    
-    TOMS(ielmc)=TOMS(ielmc)+DOM(idom_acetate,K)    
+    ENDDO 
+    sorbom(ielmc)=sorbom(ielmc)+SorbedOM(idom_acetate,K)   
     doms(ielmc)=doms(ielmc)+DOM(idom_acetate,K)    
+    TOMS(ielmc)=TOMS(ielmc)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K)           
   ENDDO
 
   !add live autotrophic biomass
@@ -500,7 +479,7 @@ module MicBGCMod
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       ! the omb complexes, three biomass components, labile, recalcitrant and reserve
       D895: DO N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(n),JGnfo(n)
+        DO NGL=JGniH(n),JGnfH(n)
           MID1=micpar%get_micb_id(1,NGL)
           IF(mBiomeHeter(ielmc,MID1,K).GT.ZEROS)THEN
             rCNBiomeActHeter(ielmn,NGL,K)=AZMAX1(mBiomeHeter(ielmn,MID1,K)/mBiomeHeter(ielmc,MID1,K))
@@ -580,7 +559,7 @@ module MicBGCMod
     tMaxNActMicrbK(K) = 0.0_r8
     tMaxPActMicrbK(K) = 0.0_r8
     D685: DO N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         if(OMActHeter(NGL,K)>ZEROS)THEN
           TOMK(K)           = TOMK(K)+OMActHeter(NGL,K)
           TONK(K)           = TONK(K)+OMActHeter(NGL,K)*rCNBiomeActHeter(ielmn,NGL,K)
@@ -677,7 +656,7 @@ module MicBGCMod
   )
 
   TOMCNK(:)=0.0_r8
-  DO NGL=JGnio(N),JGnfo(N)
+  DO NGL=JGniH(N),JGnfH(N)
     DO M=1,2
       MID=micpar%get_micb_id(M,NGL)          
       TOMCNK(M)=TOMCNK(M)+mBiomeHeter(ielmc,MID,K)
@@ -725,7 +704,7 @@ module MicBGCMod
   )
 
   TOMCNK(:)=0.0_r8
-  DO NGL=JGnio(N),JGnfo(N)
+  DO NGL=JGniH(N),JGnfH(N)
     DO M=1,2
       MID=micpar%get_micb_id(M,NGL)          
       TOMCNK(M)=TOMCNK(M)+mBiomeAutor(ielmc,MID)
@@ -755,13 +734,14 @@ module MicBGCMod
   end subroutine GetMicrobDensFactorAutor
 !------------------------------------------------------------------------------------------
 
-  subroutine ActiveMicrobes(I,J,micfor,micstt,micflx,nmicdiag,naqfdiag, &
+  subroutine ActiveMicrobes(I,J,KL,micfor,micstt,micflx,nmicdiag,naqfdiag, &
     nmicf, nmics,ncplxf,ncplxs)
   !
   !  Description:
   !
   implicit none
   integer, intent(in) :: I,J
+  integer, intent(in) :: KL                !number of complexes involved in calculation
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
@@ -820,36 +800,35 @@ module MicBGCMod
   TDOMUptkHeter(:,:) = 0.0_r8
   ORGCL              = AMIN1(1.0E+05_r8*SoilMicPMassLayer,ORGC)
 
-  D760: DO K=1,jcplx
-    IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
-      DO  N=1,NumMicbFunGrupsPerCmplx
-        if(.not.is_activeMicrbFungrpHeter(N))cycle
-        call GetMicrobDensFactorHeter(N,K,micfor, micstt, ORGCL,SPOMK,RMOMK)
+  !heterotrophs
+  D760: DO K=1,KL
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      if(.not.is_activeMicrbFungrpHeter(N))cycle
+      call GetMicrobDensFactorHeter(N,K,micfor, micstt, ORGCL,SPOMK,RMOMK)
 
-        DO NGL=JGnio(N),JGnfo(N)        
-
-!           WatStressMicb=water potential (PSISoilMatricP_vr) effect on microbial respiration
-!           OXKX=Km for O2 uptake
-!           OXKM=Km for heterotrophic O2 uptake set in starts.f
-!           GrowthEnvScalHeter=combined temp and water stress effect on growth respiration
-!           TempMaintRHeter=temperature effect on maintenance respiration
-          IF(N.EQ.mid_Aerob_Fungi)THEN
-            WatStressMicb=EXP(0.1_r8*AMAX1(PSISoilMatricP,-500._r8))
-          ELSE
-            WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
-          ENDIF
-          OXKX                      = OXKM
-          GrowthEnvScalHeter(NGL,K) = TSensGrowth*WatStressMicb
-          TempMaintRHeter(NGL,K)    = TSensMaintR
-          !write(145,*)NGL,K,OMActHeter(NGL,K)
-          IF(OMActHeter(NGL,K).GT.0.0_r8)THEN
-            call ActiveHeterotrophs(I,J,NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
-              OXKX,TotActMicrobiom,TotBiomNO2Consumers,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
-              micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx,nmicdiag)
-          ENDIF
-        ENDDO
+      DO NGL=JGniH(N),JGnfH(N)        
+        ! WatStressMicb=water potential (PSISoilMatricP_vr) effect on microbial respiration
+        ! OXKX=Km for O2 uptake
+        ! OXKM=Km for heterotrophic O2 uptake set in starts.f
+        !  GrowthEnvScalHeter=combined temp and water stress effect on growth respiration
+        !  TempMaintRHeter=temperature effect on maintenance respiration
+        IF(N.EQ.mid_Aerob_Fungi)THEN
+          WatStressMicb=EXP(0.1_r8*AMAX1(PSISoilMatricP,-500._r8))
+        ELSE
+          WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
+        ENDIF
+        OXKX                      = OXKM
+        GrowthEnvScalHeter(NGL,K) = TSensGrowth*WatStressMicb
+        TempMaintRHeter(NGL,K)    = TSensMaintR
+        
+        IF(OMActHeter(NGL,K).GT.0.0_r8)THEN
+          call ActiveHeterotrophs(I,J,NGL,N,K,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
+            OXKX,TotActMicrobiom,TotBiomNO2Consumers,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
+            micfor,micstt,naqfdiag,nmicf,nmics,ncplxf,ncplxs,micflx,nmicdiag)
+        ENDIF
       ENDDO
-    ENDIF
+    ENDDO
+
   ENDDO D760
 
 ! Autotrophic microbes
@@ -875,6 +854,15 @@ module MicBGCMod
         ENDIF
       ENDDO
     ENDIF
+  ENDDO
+
+  !summarize microbial activity as a proxy for hydrolysis
+  DO  K=1,KL
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      DO NGL=JGniH(N),JGnfH(N)
+        nmicdiag%ROQC4HeterMicActCmpK(K)=nmicdiag%ROQC4HeterMicActCmpK(K)+nmicf%ROQC4HeterMicrobAct(NGL,K)
+      enddo
+    ENDDO
   ENDDO
 
   end associate
@@ -1247,7 +1235,7 @@ module MicBGCMod
 !
           D850: DO N=1,NumMicbFunGrupsPerCmplx
             DO  M=1,nlbiomcp
-              DO NGL=JGnio(N),JGnfo(N)
+              DO NGL=JGniH(N),JGnfH(N)
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
                   XFME=FPRIMM*GrowthEnvScalHeter(NGL,K)*(mBiomeHeter(NE,MID,K)*BulkSOMC(KK) &
@@ -1282,7 +1270,7 @@ module MicBGCMod
     ENDDO
     DO  N=1,NumMicbFunGrupsPerCmplx
       DO  M=1,nlbiomcp
-        do NGL=JGnio(N),JGnfo(N)
+        do NGL=JGniH(N),JGnfH(N)
           MID=micpar%get_micb_id(M,NGL)        
           DO NE=1,NumPlantChemElms
             mBiomeHeter(NE,MID,K)=mBiomeHeter(NE,MID,K)+XferBiomeHeterK(NE,M,NGL,K)
@@ -1296,6 +1284,9 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine RDOMSorption(KL,micfor,micstt,nmicf,ncplxf,ncplxs)
+  !
+  ! Description:
+  !DOC ADSORPTION - DESORPTION  
   implicit none
   integer, intent(in) :: KL                 !from 1 to 5
   type(micforctype), intent(in) :: micfor
@@ -1327,7 +1318,7 @@ module MicBGCMod
     SorbedOM             => micstt%SorbedOM,            &
     AEC                  => micfor%AEC                  &
   )
-!  TSORP=0._r8
+  !TSORP=0._r8
 !     VLWatMicPM=soil water content, FracBulkSOMC=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
@@ -1373,6 +1364,10 @@ module MicBGCMod
         RDOMSorp(idom,K)=0.0_r8
       enddo
     ENDIF
+    DO idom=idom_beg,idom_end
+      DOM(idom,K)      = DOM(idom,K)-RDOMSorp(idom,K)
+      SorbedOM(idom,K) = SorbedOM(idom,K)+RDOMSorp(idom,K)
+    ENDDO
   ENDDO
   end associate
   end subroutine RDOMSorption
@@ -1798,43 +1793,46 @@ module MicBGCMod
         DOM(NE,K)          = DOM(NE,K)+RHydlysBioResduOM(NE,M,K)
       ENDDO
     ENDDO D575
-    write(151,*)K,'b',DOM(idom_doc,K)+SorbedOM(idom_doc,K)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K),&
-      DOM(idom_doc,K),SorbedOM(idom_doc,K),DOM(idom_acetate,K),SorbedOM(idom_acetate,K)    
+
+    N1=1; N2=NumHetetr1MicCmplx
+    DO  N=1,NumMicbFunGrupsPerCmplx
+      if(micpar%is_anaerobic_hetr(N))then
+        DO NGL=JGniH(N),JGnfH(N)
+          DOM(idom_acetate,K) = DOM(idom_acetate,K)+RAcettProdHeter(NGL,K)
+        ENDDO
+      endif
+    ENDDO
+
+!    write(151,*)K,'b',DOM(idom_doc,K)+SorbedOM(idom_doc,K)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K),&
+!      DOM(idom_doc,K),SorbedOM(idom_doc,K),DOM(idom_acetate,K),SorbedOM(idom_acetate,K)    
     !update adsorbed OM    
     DO idom=idom_beg,idom_end
-      dflux            = RHydlysSorptOM(idom,K)-RDOMSorp(idom,K)
+      dflux            = RHydlysSorptOM(idom,K)
       DOM(idom,K)      = DOM(idom,K)+dflux
       SorbedOM(idom,K) = SorbedOM(idom,K)-dflux
     ENDDO
-    write(151,*)K,'e',DOM(idom_doc,K)+SorbedOM(idom_doc,K)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K), &
-      DOM(idom_doc,K),SorbedOM(idom_doc,K),DOM(idom_acetate,K),SorbedOM(idom_acetate,K)    
+!    write(151,*)K,'e',DOM(idom_doc,K)+SorbedOM(idom_doc,K)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K), &
+!      DOM(idom_doc,K),SorbedOM(idom_doc,K),DOM(idom_acetate,K),SorbedOM(idom_acetate,K)    
     !
     !     MICROBIAL UPTAKE OF DISSOLVED C, N, P
     !
     !     RMetabDOCUptkHeter,RMetabAcetUptkHeter,DOMuptk4GrothHeter,DOMuptk4GrothHeter=DOC,acetate,DON,DOP uptake
     !     RAcettProdHeter=acetate production from fermentation
-
-    N1=1; N2=NumHetetr1MicCmplx
-
-    DO NGL=N1,N2
-      DOM(idom_acetate,K) = DOM(idom_acetate,K)+RAcettProdHeter(NGL,K)
-    ENDDO
-    write(*,*)'dom ace'  
-    write(*,*)'sc',RMetabDOCUptkHeter(N1:N2,K),DOM(idom_doc,K)
+    
     call SubstrateLimit(N1,N2,RMetabDOCUptkHeter(N1:N2,K),DOM(idom_doc,K),scal)
-    write(*,*)'subsC',K,TDOMUptkHeter(ielmc,K)-sum(RMetabDOCUptkHeter(N1:N2,K)),DOMuptk4GrothHeter(ielmn,N1:N2,K),DOM(idom_don,K)
+
     call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmn,N1:N2,K),DOM(idom_don,K),scal)
-    write(*,*)'subsN'
+
     call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmp,N1:N2,K),DOM(idom_dop,K),scal)
-    write(*,*)'subsP'
+
     call SubstrateLimit(N1,N2,RMetabAcetUptkHeter(N1:N2,K),DOM(idom_acetate,K),scal)
-    write(*,*)'subsA',K,TDOMUptkHeter(idom_acetate,K)-sum(RMetabAcetUptkHeter(N1:N2,K))
+
 !   
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
     D570: DO N=1,NumMicbFunGrupsPerCmplx
       if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
             OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K) &
@@ -1912,7 +1910,7 @@ module MicBGCMod
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       DO  N=1,NumMicbFunGrupsPerCmplx
         if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
-        DO NGL=JGnio(N),JGnfo(N)
+        DO NGL=JGniH(N),JGnfH(N)
           D540: DO M=1,2
             MID=micpar%get_micb_id(M,NGL)     
             DO NE=1,NumPlantChemElms     
@@ -2176,7 +2174,7 @@ module MicBGCMod
   D650: DO K=1,jcplx
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       DO N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(N),JGnfo(N)
+        DO NGL=JGniH(N),JGnfH(N)
           naqfdiag%tRNH4MicrbTransfSoil   = naqfdiag%tRNH4MicrbTransfSoil+RNH4TransfSoilHeter(NGL,K)
           naqfdiag%tRNO3MicrbTransfSoil   = naqfdiag%tRNO3MicrbTransfSoil+RNO3TransfSoilHeter(NGL,K)
           naqfdiag%tRH2PO4MicrbTransfSoil = naqfdiag%tRH2PO4MicrbTransfSoil+RH2PO4TransfSoilHeter(NGL,K)
@@ -2283,7 +2281,7 @@ module MicBGCMod
 !
   RCO2NetUptkMicb = naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
   RCH4UptkAutor   = -naqfdiag%tRCH4MicrbProd
-  write(147,*)'mic',micfor%L,K,naqfdiag%tRCO2GrothAutor,-naqfdiag%tRCO2MicrbProd,-naqfdiag%tRNOxMicrbRedux
+  
   DO NGL=JGniA(mid_AerobicMethanotrofBacter),JGnfA(mid_AerobicMethanotrofBacter)
     RCO2NetUptkMicb         = RCO2NetUptkMicb-RSOxidSoilAutor(NGL)
     RCH4UptkAutor           = RCH4UptkAutor+RSOxidSoilAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
@@ -2313,7 +2311,7 @@ module MicBGCMod
     ENDDO
     REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)+RHydlysSorptOM(idom_acetate,K)
     D670: DO N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         REcoDOMProd(idom_doc,K)     = REcoDOMProd(idom_doc,K)-RMetabDOCUptkHeter(NGL,K)
         REcoDOMProd(idom_don,K)     = REcoDOMProd(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)
         REcoDOMProd(idom_dop,K)     = REcoDOMProd(idom_dop,K)-DOMuptk4GrothHeter(ielmp,NGL,K)

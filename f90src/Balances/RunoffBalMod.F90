@@ -302,7 +302,7 @@ implicit none
           D3580: DO K=1,jcplx
             DO NO=1,NumMicbFunGrupsPerCmplx
               DO M=1,nlbiomcp
-                DO NGL=JGnio(NO),JGnfo(NO)
+                DO NGL=JGniH(NO),JGnfH(NO)
                   MID=micpar%get_micb_id(M,NGL)                
                   DO NE=1,NumPlantChemElms
                     MOE(NE)=MOE(NE)+XN*OMEERhetr_2D(NE,MID,K,N,NN,N5,N4)

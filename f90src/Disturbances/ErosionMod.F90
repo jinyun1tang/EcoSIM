@@ -477,7 +477,7 @@ module ErosionMod
 !
               DO  K=1,jcplx
                 DO NO=1,NumMicbFunGrupsPerCmplx
-                  DO NGL=JGnio(NO),JGnfo(NO)
+                  DO NGL=JGniH(NO),JGnfH(NO)
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
@@ -543,7 +543,7 @@ module ErosionMod
 !
               DO  K=1,jcplx
                 DO  NO=1,NumMicbFunGrupsPerCmplx
-                  DO NGL=JGnio(NO),JGnfo(NO)
+                  DO NGL=JGniH(NO),JGnfH(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
@@ -619,7 +619,7 @@ module ErosionMod
 !
                 DO  K=1,jcplx
                   DO  NO=1,NumMicbFunGrupsPerCmplx
-                    DO NGL=JGnio(NO),JGnfo(NO)
+                    DO NGL=JGniH(NO),JGnfH(NO)
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)      
                         DO NE=1,NumPlantChemElms                                                 
@@ -684,7 +684,7 @@ module ErosionMod
 !
                 DO  K=1,jcplx
                   DO  NO=1,NumMicbFunGrupsPerCmplx
-                    DO NGL=JGnio(NO),JGnfo(NO)
+                    DO NGL=JGniH(NO),JGnfH(NO)
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)
                         DO NE=1,NumPlantChemElms  
@@ -833,7 +833,7 @@ module ErosionMod
 !
               DO  K=1,jcplx
                 DO  NO=1,NumMicbFunGrupsPerCmplx
-                  DO NGL=JGnio(NO),JGnfo(NO)
+                  DO NGL=JGniH(NO),JGnfH(NO)
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
@@ -908,7 +908,7 @@ module ErosionMod
 !
               DO  K=1,jcplx
                 DO NO=1,NumMicbFunGrupsPerCmplx
-                  DO NGL=JGnio(NO),JGnfo(NO)
+                  DO NGL=JGniH(NO),JGnfH(NO)
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)                    
                       DO NE=1,NumPlantChemElms                       
@@ -919,7 +919,7 @@ module ErosionMod
                 ENDDO
               ENDDO
               DO NO=1,NumMicbFunGrupsPerCmplx
-                DO NGL=JGniA(NO),JGnfo(NO)
+                DO NGL=JGniA(NO),JGnfH(NO)
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms                       

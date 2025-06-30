@@ -600,7 +600,7 @@ module RedistMod
     DORGP=0.0_r8
     D9280: DO K=1,jcplx
       DO  NO=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(NO),JGnfo(NO)
+        DO NGL=JGniH(NO),JGnfH(NO)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
@@ -1442,7 +1442,7 @@ module RedistMod
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
       DO  N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(N),JGnfo(N)
+        DO NGL=JGniH(N),JGnfH(N)
           !litter layer
           REcoO2DmndResp_vr(0,NY,NX)            = REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
           REcoNO3DmndSoil_vr(0,NY,NX)           = REcoNO3DmndSoil_vr(0,NY,NX)+RNO3ReduxDmndSoilHeter_vr(NGL,K,0,NY,NX)

@@ -116,7 +116,7 @@ module SoilDisturbMod
             !     REMOVE heterotrophic MICROBIAL BIOMASS
             !
             D2960: DO N=1,NumMicbFunGrupsPerCmplx
-              DO NGL=JGnio(N),JGnfo(N)
+              DO NGL=JGniH(N),JGnfH(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
                   DO NE=1,NumPlantChemElms 

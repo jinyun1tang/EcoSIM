@@ -166,7 +166,7 @@ module SoilBGCNLayMod
     D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
       D7961: DO N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(N),JGnfo(N)
+        DO NGL=JGniH(N),JGnfH(N)
           D7962: DO M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)            
             DO NE=1,NumPlantChemElms            
@@ -272,7 +272,7 @@ module SoilBGCNLayMod
   DK100: DO K=1,jcplx1
     !add heterotrophic microbes
     DC100: DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,nelms
@@ -367,7 +367,7 @@ module SoilBGCNLayMod
   DO K=1,micpar%NumOfLitrCmplxs
     !add live heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -439,7 +439,7 @@ module SoilBGCNLayMod
   DO  K=micpar%NumOfLitrCmplxs+1,jcplx
    !sumup heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -515,7 +515,7 @@ module SoilBGCNLayMod
   DO K=1,jcplx1
     !add heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -551,7 +551,7 @@ module SoilBGCNLayMod
 
   DO K=1,micpar%NumOfLitrCmplxs
     DO  N=1,NumMicbFunGrupsPerCmplx
-      do NGL=JGnio(n),JGnfo(n)
+      do NGL=JGniH(n),JGnfH(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           NE=ielmc
@@ -628,7 +628,7 @@ module SoilBGCNLayMod
     endif
     
     DO K=1,micpar%NumOfLitrCmplxs    
-      do NGL=JGnio(igroup),JGnfo(igroup)
+      do NGL=JGniH(igroup),JGnfH(igroup)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms

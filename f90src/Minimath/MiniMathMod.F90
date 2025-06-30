@@ -508,7 +508,7 @@ module minimathmod
   if(y-tDemand>=tiny_val .or. tDemand<=tiny_val)then
     y=AZMAX1(y-tDemand)
   else
-    scal1=y/tDemand
+    scal1=safe_adb(y,tDemand)
     DO n=n1,n2
       demand_flux(n)=demand_flux(n)*scal1
     enddo

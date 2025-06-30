@@ -747,19 +747,19 @@ type, public :: Cumlate_Flux_Diag_type
   if(groupid==micpar%mid_Aerob_HeteroBacter)then
   
     DO K=1,micpar%jcplx
-      DO NGL=micpar%JGnio(groupid),micpar%JGnfo(groupid)
+      DO NGL=micpar%JGniH(groupid),micpar%JGnfH(groupid)
         FSubs_limiter=FSubs_limiter+this%FSBSTHeter(NGL,K)
       ENDDO
     ENDDO
-    FSubs_limiter=FSubs_limiter/real((micpar%JGnfo(groupid)-micpar%JGnio(groupid)+1)*micpar%jcplx,kind=r8)
+    FSubs_limiter=FSubs_limiter/real((micpar%JGnfH(groupid)-micpar%JGniH(groupid)+1)*micpar%jcplx,kind=r8)
 
   elseif(groupid==micpar%mid_Aerob_Fungi)then
     DO K=1,micpar%jcplx
-      DO NGL=micpar%JGnio(groupid),micpar%JGnfo(groupid)
+      DO NGL=micpar%JGniH(groupid),micpar%JGnfH(groupid)
         FSubs_limiter=FSubs_limiter+this%FSBSTHeter(NGL,K)
       ENDDO
     ENDDO
-    FSubs_limiter=FSubs_limiter/real((micpar%JGnfo(groupid)-micpar%JGnio(groupid)+1)*micpar%jcplx,kind=r8)
+    FSubs_limiter=FSubs_limiter/real((micpar%JGnfH(groupid)-micpar%JGniH(groupid)+1)*micpar%jcplx,kind=r8)
 
   endif
 

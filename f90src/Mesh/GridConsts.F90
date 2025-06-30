@@ -25,8 +25,8 @@ implicit none
   integer, PARAMETER :: NumOfLeafAzimuthSectors=4   !# of sectors for the leaf azimuth, [0,pi]
   integer, PARAMETER :: NumOfSkyAzimuthSects=4   !# of sectors for the sky azimuth  [0,2*pi]
   integer, parameter :: MaxNodesPerBranch=25!# of nodes for plant canopy
-  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGniH(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGnfH(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer  :: NumMicrobAutrophCmplx            !total number of microbial guilds in the autotrophic complex

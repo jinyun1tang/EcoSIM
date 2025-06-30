@@ -615,7 +615,7 @@ contains
   DO K=1,jcplx
     IF(.not.micfor%litrm.or.(micpar%is_litter(K)))THEN
       DO N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+        DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
           ystatesfl(fid_RO2EcoDmndPrev)=ystatesfl(fid_RO2EcoDmndPrev)+micflx%RO2DmndHetert(NGL,K)
           ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RNH4DmndSoilHeter(NGL,K)
           ystatesfl(fid_RNO3EcoDmndSoilPrev)=ystatesfl(fid_RNO3EcoDmndSoilPrev)+micflx%RNO3ReduxDmndSoilHeter(NGL,K)+micflx%RNO3DmndSoilHeter(NGL,K)
@@ -926,7 +926,7 @@ contains
   jj=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
   DO M=1,nlbiomcp
     ll=cid_mBiomeHeter_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMC'//trim(micpar%micbiom(M))//'g',NGL,&
@@ -958,7 +958,7 @@ contains
 
   jj=0
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
   DO M=1,nlbiomcp
     ll=cid_mBiomeAutor_b+jj;jj=jj+1
     write(varl(ll),'(A,I2.2,A)')'OMC'//trim(micpar%micbiom(M))//'g',NGL,&
@@ -1128,7 +1128,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RNH4DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNH4DmndBandHeter',ll
     varlnml(jj)='microbial NH4 immobilization (+ve) - mineralization (-ve) band' &
@@ -1143,7 +1143,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RNO3DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNO3DmndSoilHeter',ll
     varlnml(jj)='microbial NO3 demand in soil'//micpar%cplxname(k)
@@ -1157,7 +1157,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RNO3DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RNO3DmndBandHeter',ll
     varlnml(jj)='microbial NO3 immobilization (+ve) - mineralization (-ve) band' &
@@ -1172,7 +1172,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RH2PO4DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH2PO4DmndSoilHeter',ll
     varlnml(jj)='microbial PO4 demand in soil'//micpar%cplxname(k)
@@ -1186,7 +1186,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RH2PO4DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH2PO4DmndBandHeter',ll
     varlnml(jj)='substrate-unlimited H2PO4 mineralization-immobilization'//micpar%cplxname(k)
@@ -1200,7 +1200,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RH1PO4DmndSoilHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH1PO4DmndSoilHeter',ll
     varlnml(jj)='substrate-unlimited HPO4 immobilization'//micpar%cplxname(k)
@@ -1214,7 +1214,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RH1PO4DmndBandHeter_b+ll
     write(varl(jj),'(A,I2.2)')'RH1PO4DmndBandHeter',ll
     varlnml(jj)='substrate-unlimited HPO4 mineralization-immobilization'//micpar%cplxname(k)
@@ -1228,7 +1228,7 @@ contains
   ll=0
   DO k=1,jcplx
   DO N=1,NumMicbFunGrupsPerCmplx
-  DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+  DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
     jj=fid_RO2DmndHetert_b+ll
     write(varl(jj),'(A,I2.2)')'RO2DmndHetert',ll
     varlnml(jj)='aqueous O2 demand'//micpar%cplxname(k)
@@ -1693,7 +1693,7 @@ contains
   DO K=1,micpar%jcplx
     IF(micpar%is_litter(K))THEN
       DO N=1,micpar%NumMicbFunGrupsPerCmplx
-        DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+        DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
           DO  M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
             DC=DC+micstt%mBiomeHeter(ielmc,MID,K)
@@ -1704,7 +1704,7 @@ contains
       ENDDO
     ELSE
       DO N=1,micpar%NumMicbFunGrupsPerCmplx
-        DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
+        DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
           DO  M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)          
             OC=OC+micstt%mBiomeHeter(ielmc,MID,K)

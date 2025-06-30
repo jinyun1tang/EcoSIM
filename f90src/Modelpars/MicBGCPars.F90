@@ -71,10 +71,10 @@ implicit none
   character(len=16) :: amicname(NumMicbFunGrupsPerCmplx)
   character(len=16) :: micresb(0:NumDeadMicrbCompts-1)      !residual biomass name
   character(len=16) :: micbiom(1:NumLiveMicrbCompts)        !microbial biomass pool name
-  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
-  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
+  integer, pointer :: JGniH(:)   !hetetroph guid indices for organic-microbial complex
+  integer, pointer :: JGnfH(:)   !hetetroph guid indices for organic-microbial complex
+  integer, pointer :: JGniA(:)   !autotroph guid indices for autotrophic-microbial complex
+  integer, pointer :: JGnfA(:)   !autotroph guid indices for autotrophic-microbial complex
   integer :: NumMicrobAutrophCmplx        !total number of microbial guilds in the autotrophic complex
   integer :: NumHetetr1MicCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
@@ -292,7 +292,7 @@ contains
   D95: DO K=1,this%jcplx
     DO  N=1,this%NumMicbFunGrupsPerCmplx
       IF(N.EQ.this%mid_Aerob_Fungi)THEN
-        DO NGL=this%JGnio(n),this%JGnfo(n)
+        DO NGL=this%JGniH(n),this%JGnfH(n)
           rNCOMC(1,NGL,K)=0.15_r8           !maximum
           rNCOMC(2,NGL,K)=0.09_r8           !minimum
           rPCOMC(1,NGL,K)=0.015_r8
@@ -303,7 +303,7 @@ contains
         this%rPCOMC_ave(1,N,K)=0.015_r8
         this%rPCOMC_ave(2,N,K)=0.009_r8
       ELSE
-        do NGL=this%JGnio(n),this%JGnfo(n)
+        do NGL=this%JGniH(n),this%JGnfH(n)
           rNCOMC(1,NGL,K)=0.225_r8
           rNCOMC(2,NGL,K)=0.135_r8
           rPCOMC(1,NGL,K)=0.0225_r8
@@ -314,7 +314,7 @@ contains
         this%rPCOMC_ave(1,N,K)=0.0225_r8
         this%rPCOMC_ave(2,N,K)=0.0135_r8
       ENDIF
-      do NGL=this%JGnio(n),this%JGnfo(n)
+      do NGL=this%JGniH(n),this%JGnfH(n)
         rNCOMC(3,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
         rPCOMC(3,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
       enddo
@@ -359,8 +359,8 @@ contains
   NumMicbFunGrupsPerCmplx  =this%NumMicbFunGrupsPerCmplx
   jcplx =this%jcplx
   jsken =this%jsken
-  allocate(this%JGnio(NumMicbFunGrupsPerCmplx))
-  allocate(this%JGnfo(NumMicbFunGrupsPerCmplx))
+  allocate(this%JGniH(NumMicbFunGrupsPerCmplx))
+  allocate(this%JGnfH(NumMicbFunGrupsPerCmplx))
 
   allocate(this%JGniA(NumMicbFunGrupsPerCmplx))
   allocate(this%JGnfA(NumMicbFunGrupsPerCmplx))
@@ -370,13 +370,13 @@ contains
   this%NumHetetr1MicCmplx=0
   !replace the functional group specification with external input later
   do n=1,NumMicbFunGrupsPerCmplx
-    this%JGnio(n)              = k
+    this%JGniH(n)              = k
     this%JGniA(n)              = k
     k                          = k+jguilds
-    this%JGnfo(n)              = k-1
+    this%JGnfH(n)              = k-1
     this%JGnfA(n)              = k-1
     this%NumMicrobAutrophCmplx = this%NumMicrobAutrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
-    this%NumHetetr1MicCmplx     = this%NumHetetr1MicCmplx+this%JGnfo(n)-this%JGnio(n)+1
+    this%NumHetetr1MicCmplx     = this%NumHetetr1MicCmplx+this%JGnfH(n)-this%JGniH(n)+1
   enddo
   this%NumLiveHeterBioms=this%nlbiomcp*this%NumHetetr1MicCmplx
   this%NumLiveAutoBioms=this%nlbiomcp*this%NumMicrobAutrophCmplx

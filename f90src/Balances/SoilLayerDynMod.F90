@@ -996,7 +996,7 @@ implicit none
     DO  K=1,jcplx
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
               mBiomeHeter_vr(NE,MID,K,L1,NY,NX)=mBiomeHeter_vr(NE,MID,K,L1,NY,NX)+FX*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
@@ -1174,7 +1174,7 @@ implicit none
     DO  K=1,jcplx
        DO N=1,NumMicbFunGrupsPerCmplx
         DO M=1,nlbiomcp
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
               mBiomeHeter_vr(NE,MID,K,L0,NY,NX)=FY*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
@@ -1306,7 +1306,7 @@ implicit none
     DO  K=1,jcplx
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)          
             DO NE=1,NumPlantChemElms
               FXOMC                             = FXO*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
