@@ -110,33 +110,29 @@ module MicAutoCPLXMod
   ELSE
     FracAutorBiomOfActK(NGL)=1.0_r8
   ENDIF
-!
-! FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
-! AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
-            !write(*,*)'SubstrateCompetitionFactors'
-  call SubstrateCompetitionFactorsff(NGL,N,FOXYX,FNH4X,&
-    FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
+  !
+  ! FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
+  ! AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
+  !
+  call SubstrateCompetAuto(NGL,N,FOXYX,FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     micfor,naqfdiag,nmicf,nmics,micflx)
-!
-! HETEROTROPHIC BIOMASS RESPIRATION
-          !
-!
-!     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
-!     OXIDATION RATE, ACTIVE BIOMASS, DOC CONCENTRATION,
-!     MICROBIAL C:N:P FACTOR, AND TEMPERATURE FOLLOWED BY POTENTIAL
-!     RESPIRATION RATES 'RGOMP' WITH UNLIMITED SUBSTRATE USED FOR
-!     MICROBIAL COMPETITION FACTOR. N=(1) NH4 OXIDIZERS (2) NO2
-!     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
-!
-!
+  !
+  !     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
+  !     OXIDATION RATE, ACTIVE BIOMASS, DOC CONCENTRATION,
+  !     MICROBIAL C:N:P FACTOR, AND TEMPERATURE FOLLOWED BY POTENTIAL
+  !     RESPIRATION RATES 'RGOMP' WITH UNLIMITED SUBSTRATE USED FOR
+  !     MICROBIAL COMPETITION FACTOR. N=(1) NH4 OXIDIZERS (2) NO2
+  !     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
+  !
+  !
   if (N.eq.mid_AmmoniaOxidBacter)then
     ! NH3 OXIDIZERS
-    call NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,&
+    call AmmoniaOxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,&
       RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   elseif (N.eq.mid_NitriteOxidBacter)then
     ! NO2 OXIDIZERS
-    call NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+    call NitriteOxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   elseif (N.eq.mid_H2GenoMethanogArchea)then
@@ -210,9 +206,13 @@ module MicAutoCPLXMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SubstrateCompetitionFactorsff(NGL,N,FOXYX,&
+  subroutine SubstrateCompetAuto(NGL,N,FOXYX,&
     FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     micfor,naqfdiag,nmicf,nmics,micflx)
+  !
+  !Description:
+  !Substrate competition for autotrophs
+  !  
   implicit none
   integer, intent(in) :: NGL,N
   real(r8), intent(out):: FOXYX,FNH4X
@@ -321,21 +321,22 @@ module MicAutoCPLXMod
   ELSE
     FP1BX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
-  naqfdiag%TFOXYX=naqfdiag%TFOXYX+FOXYX
-  naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4X
-  naqfdiag%TFNO3X=naqfdiag%TFNO3X+FNO3X
-  naqfdiag%TFPO4X=naqfdiag%TFPO4X+FPO4X
-  naqfdiag%TFP14X=naqfdiag%TFP14X+FP14X
-  naqfdiag%TFNH4B=naqfdiag%TFNH4B+FNB4X
-  naqfdiag%TFNO3B=naqfdiag%TFNO3B+FNB3X
-  naqfdiag%TFPO4B=naqfdiag%TFPO4B+FPOBX
-  naqfdiag%TFP14B=naqfdiag%TFP14B+FP1BX
-!
-! FACTORS CONSTRAINING NH4, NO3, PO4 UPTAKE AMONG COMPETING
-! MICROBIAL POPULATIONS IN SURFACE RESIDUE
-! F*=fraction of substrate uptake relative to total uptake from
-! previous hour in surface litter, labels as for soil layers above
-!
+  naqfdiag%TFOXYX = naqfdiag%TFOXYX+FOXYX
+  naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4X
+  naqfdiag%TFNO3X = naqfdiag%TFNO3X+FNO3X
+  naqfdiag%TFPO4X = naqfdiag%TFPO4X+FPO4X
+  naqfdiag%TFP14X = naqfdiag%TFP14X+FP14X
+  naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4X
+  naqfdiag%TFNO3B = naqfdiag%TFNO3B+FNB3X
+  naqfdiag%TFPO4B = naqfdiag%TFPO4B+FPOBX
+  naqfdiag%TFP14B = naqfdiag%TFP14B+FP1BX
+  !
+  ! FACTORS CONSTRAINING NH4, NO3, PO4 UPTAKE AMONG COMPETING
+  ! MICROBIAL POPULATIONS IN SURFACE RESIDUE
+  ! F*=fraction of substrate uptake relative to total uptake from
+  ! previous hour in surface litter, labels as for soil layers above
+  !
+  !litter layer
   IF(litrm)THEN
     IF(RNH4EcoDmndLitrPrev.GT.ZEROS)THEN
       AttenfNH4Autor(NGL)=AMAX1(FMN,RNH4UptkLitrAutor(NGL)/RNH4EcoDmndLitrPrev)
@@ -358,6 +359,7 @@ module MicAutoCPLXMod
       AttenfH1PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
   ENDIF
+  !top soil layer
   IF(Lsurf.AND.SoilMicPMassLayer0.GT.ZEROS)THEN
     naqfdiag%TFNH4X=naqfdiag%TFNH4X+AttenfNH4Autor(NGL)
     naqfdiag%TFNO3X=naqfdiag%TFNO3X+AttenfNO3Autor(NGL)
@@ -365,7 +367,7 @@ module MicAutoCPLXMod
     naqfdiag%TFP14X=naqfdiag%TFP14X+AttenfH1PO4Autor(NGL)
   ENDIF
   end associate
-  end subroutine SubstrateCompetitionFactorsff
+  end subroutine SubstrateCompetAuto
 !------------------------------------------------------------------------------------------
 
   subroutine GatherAutotrophAnabolicFlux(I,J,NGL,N,ECHZ,FGOCP,FGOAP,&
@@ -423,28 +425,29 @@ module MicAutoCPLXMod
     EHUM                             => micstt%EHUM                             &
   )
 
-!     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
-!     FROM O2, NOX AND C REDUCTION
-!
-!     CGOMX=DOC+acetate uptake from aerobic growth respiration
-!     CGOMD=DOC+acetate uptake from denitrifier growth respiration
-!     RMaintRespAutor=maintenance respiration
-!     RespGrossHeter=total respiration
-!     RNOxReduxRespDenitLim=respiration for denitrifcation
-!     Resp4NFixHeter=respiration for N2 fixation
-!     ECHZ,ENOX=growth respiration efficiencies for CO2, O2, and NOx reduction
-!     CGOMC,CGOQC,CGOAC=total DOC+acetate, DOC, acetate uptake heterotrophs
-!     CGOMC=total CO2,CH4 uptake (autotrophs)
-!     CGOMN,CGOMP=DON, DOP uptake
-!     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
-!     OQN,OPQ=DON,DOP
-!     FOMK=faction of OMA in total OMA
-!     FCN,FCP=limitation from N,P
-!
-
+  !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
+  !     FROM O2, NOX AND C REDUCTION
+  !
+  !     CGOMX=DOC+acetate uptake from aerobic growth respiration
+  !     CGOMD=DOC+acetate uptake from denitrifier growth respiration
+  !     RMaintRespAutor=maintenance respiration
+  !     RespGrossHeter=total respiration
+  !     RNOxReduxRespDenitLim=respiration for denitrifcation
+  !     Resp4NFixHeter=respiration for N2 fixation
+  !     ECHZ,ENOX=growth respiration efficiencies for CO2, O2, and NOx reduction
+  !     CGOMC,CGOQC,CGOAC=total DOC+acetate, DOC, acetate uptake heterotrophs
+  !     CGOMC=total CO2,CH4 uptake (autotrophs)
+  !     CGOMN,CGOMP=DON, DOP uptake
+  !     FGOCP,FGOAP=DOC,acetate/(DOC+acetate)
+  !     OQN,OPQ=DON,DOP
+  !     FOMK=faction of OMA in total OMA
+  !     FCN,FCP=limitation from N,P
+  !
+  !potential growth respiraiton-respiraiton for N2-fixation 
   DOMuptk4GrothAutor(idom_beg:idom_end,NGL)=0._r8
   CGOMX = AMIN1(RMaintRespAutor,RespGrossAutor(NGL))+Resp4NFixAutor(NGL)+(RGrowthRespAutor-Resp4NFixAutor(NGL))/ECHZ  
-  CGOMD = RNOxReduxRespAutorLim(NGL)/ENOX  !for NO2(-) reduction by NH3
+  CGOMD = RNOxReduxRespAutorLim(NGL)/ENOX         !for NO2(-) reduction by NH3
+
   !total C uptake, which could be CO2, or CH4, depending on the type of organism
   !for aerobic methanotrophs, the following equals to CH4 uptake for biomass
   DOMuptk4GrothAutor(ielmc,NGL)=CGOMX+CGOMD
@@ -907,15 +910,21 @@ module MicAutoCPLXMod
   end associate
   end subroutine AutotrophDenitrificCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine NH3OxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,RVOXPA,&
+  subroutine AmmoniaOxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,RVOXPA,&
     RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+  !
+  !Description:
+  ! autotrophic NH3 oxidizer  
   implicit none
-  integer, intent(in) :: NGL,N
-  REAL(R8), INTENT(IN) :: VOLWZ,TSensGrowth
-  REAL(R8), INTENT(IN) :: XCO2
-  real(r8),intent(out) :: ECHZ
-  real(r8),intent(out) :: RGOMP,RVOXP
-  real(r8),intent(out) :: RVOXPA,RVOXPB
+  integer,  intent(in)  :: NGL,N
+  REAL(R8), INTENT(IN)  :: VOLWZ
+  real(r8), intent(in)  :: TSensGrowth   !temperature sensitivity
+  REAL(R8), INTENT(IN)  :: XCO2          !CO2 factor
+  real(r8), intent(out) :: ECHZ
+  real(r8), intent(out) :: RGOMP         !O2-unlimited/potential respiration [gC h-1]
+  real(r8), intent(out) :: RVOXP         !potential NH3 oxidation, [gN h-1 d-2]
+  real(r8), intent(out) :: RVOXPA        !potential oxidation of non-band soil NH3 [gN h-1 d-2]
+  real(r8), intent(out) :: RVOXPB        !potential oxidation of band soil NH3 [gN h-1 d-2]
   type(MicForcType), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
@@ -975,19 +984,19 @@ module MicAutoCPLXMod
   ELSE
     FNB4=AMAX1(FMN,VLNHB*FracOMActAutor(NGL))
   ENDIF
-  naqfdiag%TFNH4X=naqfdiag%TFNH4X+FNH4
-  naqfdiag%TFNH4B=naqfdiag%TFNH4B+FNB4
-!
-!     NITRIFICATION INHIBITION
-!
-!     ZNFN0=inhibition when fertilizer added
-!     ZNFNI=reduction in inhibition since fertilizer added
-!     CNH4S,CNH4B=NH4 concentrations in non-band, band
-!     TSensGrowth=temperature effect
-!     RNFNI=rate constant for inhibition decline
-!     ZHKI=inhibition from high CNH4
-!     ZNFN4S,ZNFN4B=inhibition in non-band, band
-!
+  naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4
+  naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4
+  !
+  !     NITRIFICATION INHIBITION
+  !
+  !     ZNFN0=inhibition when fertilizer added
+  !     ZNFNI=reduction in inhibition since fertilizer added
+  !     CNH4S,CNH4B=NH4 concentrations in non-band, band
+  !     TSensGrowth=temperature effect
+  !     RNFNI=rate constant for inhibition decline
+  !     ZHKI=inhibition from high CNH4
+  !     ZNFN4S,ZNFN4B=inhibition in non-band, band
+  !
   IF(ZNFN0.GT.ZEROS)THEN
     ZNFNI=ZNFNI*(1.0_r8-RNFNI*TSensGrowth)
     ZNFN4S=ZNFN0-ZNFNI/(1.0_r8+CNH4S/ZHKI)
@@ -996,27 +1005,27 @@ module MicAutoCPLXMod
     ZNFN4S=1.0_r8
     ZNFN4B=1.0_r8
   ENDIF
-!
-!     NH3 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
-!     ACTIVE OXIDIZER BIOMASS, TEMPERATURE, AQUEOUS CO2 AND
-!     NH3 CONCENTRATIONS IN BAND AND NON-BAND SOIL ZONES
-!
-!     ECHZ=growth respiration efficiency
-!     VMXX=potential NH3 oxidation, VMXH=specific oxidation
-!     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
-!     XCO2=aqueous CO2 limitation, OMA=active biomass
-!     VMXA= non-substrate limited NH3 oxidation
-!     VHKI=nonlinear increase in VMXA with VMXH
-!     FNH4S,FNHBS=fractions of NH4 in non-band, band
-!     CNH4S,CNH4B=NH4 concentration in non-band, band
-!     ZHKM=Km for NH4 uptake
-!     FNH4,FNB4=fractions of total NH4 demand in non-band, band
-!     ZNH4S,ZNH4B=NH4 amount in non-band, band
-!     RNNH4,RNNHB=NH3 oxidation in non-band, band
-!     RGOMP=O2-unlimited respiration
-!     ECNH=efficiency CO2 conversion to biomass
-!     RVMX4,RVMXB=nitrifier demand for NH4 in non-band, band
-!
+  !
+  !     NH3 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
+  !     ACTIVE OXIDIZER BIOMASS, TEMPERATURE, AQUEOUS CO2 AND
+  !     NH3 CONCENTRATIONS IN BAND AND NON-BAND SOIL ZONES
+  !
+  !     ECHZ=growth respiration efficiency
+  !     VMXX=potential NH3 oxidation, VMXH=specific oxidation
+  !     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
+  !     XCO2=aqueous CO2 limitation, OMA=active biomass
+  !     VMXA= non-substrate limited NH3 oxidation
+  !     VHKI=nonlinear increase in VMXA with VMXH
+  !     FNH4S,FNHBS=fractions of NH4 in non-band, band
+  !     CNH4S,CNH4B=NH4 concentration in non-band, band
+  !     ZHKM=Km for NH4 uptake
+  !     FNH4,FNB4=fractions of total NH4 demand in non-band, band
+  !     ZNH4S,ZNH4B=NH4 amount in non-band, band
+  !     RNNH4,RNNHB=NH3 oxidation in non-band, band
+  !     RGOMP=O2-unlimited respiration
+  !     ECNH=efficiency CO2 conversion to biomass
+  !     RVMX4,RVMXB=nitrifier demand for NH4 in non-band, band
+  !
   ECHZ=EO2X
   VMXX=VMXH*GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)
   IF(VOLWZ.GT.ZEROS2)THEN
@@ -1037,22 +1046,22 @@ module MicAutoCPLXMod
   RGOMP                  = AZMAX1(RVOXP*ECNH*ECHZ)
   RNH3OxidAutor(NGL)     = VMX4S
   RNH3OxidAutorBand(NGL) = VMX4B
-!
-!     O2 DEMAND FROM NH3 OXIDATION
-!
-!     RO2Dmnd4RespHeter=O2 demand from respiration by nitrifiers
-!     ROXYP,RO2Dmnd4RespHeter=O2 demand from respiration + NH3 oxidation
-! C+O2 -> CO2,  respiration, 2.667=32./12.
-! NH3+1.5O2-> NO2(-)+H2O+H(+), 1.5*32/14.=3.249
-
-  RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
-  RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+3.429_r8*RVOXP
-  RO2DmndAutort(NGL)=RO2DmndAutor(NGL)
+  !
+  !     O2 DEMAND FROM NH3 OXIDATION
+  !
+  !     RO2Dmnd4RespHeter=O2 demand from respiration by nitrifiers
+  !     ROXYP,RO2Dmnd4RespHeter=O2 demand from respiration + NH3 oxidation
+  ! C+O2 -> CO2,  respiration for growth and maintenance, 2.667=32./12.
+  ! NH3+1.5O2-> NO2(-)+H2O+H(+), 1.5*32/14.=3.249, energy for CO2 reduction into biomass
+  !
+  RO2Dmnd4RespAutor(NGL) = 2.667_r8*RGOMP
+  RO2DmndAutor(NGL)      = RO2Dmnd4RespAutor(NGL)+3.429_r8*RVOXP
+  RO2DmndAutort(NGL)     = RO2DmndAutor(NGL)
 !
   end associate
-  end subroutine NH3OxidizerCatabolism
+  end subroutine AmmoniaOxidizerCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine NO2OxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,&
+  subroutine NitriteOxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,&
     RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
   !
   !nitrite oxidation
@@ -1080,7 +1089,7 @@ module MicAutoCPLXMod
   associate(                                            &
     GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
     FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
-    FSBSTAutor           => nmicdiag%FSBSTAutor          , &        
+    FSBSTAutor           => nmicdiag%FSBSTAutor       , &        
     FracNO2ReduxAutor    => nmics%FracNO2ReduxAutor,    &
     OMActAutor           => nmics%OMActAutor,           &
     RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
@@ -1119,27 +1128,27 @@ module MicAutoCPLXMod
   ENDIF
   naqfdiag%TFNO2X=naqfdiag%TFNO2X+FNO2
   naqfdiag%TFNO2B=naqfdiag%TFNO2B+FNB2
-!
-!     NO2 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
-!     ACTIVE OXIDIZER BIOMASS, TEMPERATURE, AQUEOUS CO2 AND
-!     NO2 CONCENTRATIONS
-!
-!     ECHZ=growth respiration efficiency
-!     VMXA= non-substrate limited NH3 oxidation
-!     VMXN=specific oxidation
-!     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
-!     XCO2=aqueous CO2 limitation, OMA=active biomass
-!     OMA=active biomass
-!     FNH4S,FNHBS=fractions of NH4 in non-band, band
-!     CNO2S,CNO2B=NO2 concentration in non-band, band
-!     ZNKM=Km for NO2 uptake
-!     FNO2,FNB2=fractions of total NO2 demand in non-band, band
-!     ZNO2S,ZNO2B=NO2 amount in non-band, band
-!     RNNO2,RNNOB=NO2 oxidation in non-band, band
-!     RGOMP=O2-unlimited respiration
-!     ECNO=efficiency CO2 conversion to biomass
-!     RNO2DmndReduxSoilHeter_vr,RNO2DmndReduxBandHeter_vr=nitrifier demand for NO2 in non-band, band
-!
+  !
+  !     NO2 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
+  !     ACTIVE OXIDIZER BIOMASS, TEMPERATURE, AQUEOUS CO2 AND
+  !     NO2 CONCENTRATIONS
+  !
+  !     ECHZ=growth respiration efficiency
+  !     VMXA= non-substrate limited NH3 oxidation
+  !     VMXN=specific oxidation
+  !     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
+  !     XCO2=aqueous CO2 limitation, OMA=active biomass
+  !     OMA=active biomass
+  !     FNH4S,FNHBS=fractions of NH4 in non-band, band
+  !     CNO2S,CNO2B=NO2 concentration in non-band, band
+  !     ZNKM=Km for NO2 uptake
+  !     FNO2,FNB2=fractions of total NO2 demand in non-band, band
+  !     ZNO2S,ZNO2B=NO2 amount in non-band, band
+  !     RNNO2,RNNOB=NO2 oxidation in non-band, band
+  !     RGOMP=O2-unlimited respiration
+  !     ECNO=efficiency CO2 conversion to biomass
+  !     RNO2DmndReduxSoilHeter_vr,RNO2DmndReduxBandHeter_vr=nitrifier demand for NO2 in non-band, band
+  !
   ECHZ=EO2X
   VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXN
   FCN2S                  = FNH4S*CNO2S/(CNO2S+ZNKM)
@@ -1155,18 +1164,18 @@ module MicAutoCPLXMod
   RGOMP                  = AZMAX1(RVOXP*ECNO*ECHZ)
   RNO2OxidAutor(NGL)     = VMX2S
   RNO2OxidAutorBand(NGL) = VMX2B
-!
-!     O2 DEMAND FROM NO2 OXIDATION
-!
-!     RO2Dmnd4RespHeter=O2 demand from respiration by nitrifiers
-!     ROXYP,RO2Dmnd4RespHeter=O2 demand from respiration + NO2 oxidation
-!
-  RO2Dmnd4RespAutor(NGL)=2.667_r8*RGOMP
-  RO2DmndAutor(NGL)=RO2Dmnd4RespAutor(NGL)+1.143_r8*RVOXP
-  RO2DmndAutort(NGL)=RO2DmndAutor(NGL)
+  !
+  !     O2 DEMAND FROM NO2 OXIDATION
+  !
+  !     RO2Dmnd4RespHeter=O2 demand from respiration by nitrifiers
+  !     ROXYP,RO2Dmnd4RespHeter=O2 demand from respiration + NO2 oxidation
+  !
+  RO2Dmnd4RespAutor(NGL) = 2.667_r8*RGOMP
+  RO2DmndAutor(NGL)      = RO2Dmnd4RespAutor(NGL)+1.143_r8*RVOXP
+  RO2DmndAutort(NGL)     = RO2DmndAutor(NGL)
 
   end associate
-  end subroutine NO2OxidizerCatabolism
+  end subroutine NitriteOxidizerCatabolism
 !------------------------------------------------------------------------------------------
 
 

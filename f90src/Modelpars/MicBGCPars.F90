@@ -53,12 +53,13 @@ implicit none
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
-  real(r8), pointer :: OMCI(:,:)                   !initializes microbial biomass
-  real(r8), pointer :: OHCK(:)                     !fractions of SOC in adsorbed C
-  real(r8), pointer :: OMCK(:)                     !fractions of SOC in biomass
-  real(r8), pointer :: ORCK(:)                     !fractions of SOC in litter
-  real(r8), pointer :: OQCK(:)                     !fractions of SOC in DOC
-  logical,  pointer :: is_activeMicrbFungrpAutor(:)
+  real(r8), pointer :: OMCI(:,:)                    !initializes microbial biomass
+  real(r8), pointer :: OHCK(:)                      !fractions of SOC in adsorbed C
+  real(r8), pointer :: OMCK(:)                      !fractions of SOC in biomass
+  real(r8), pointer :: ORCK(:)                      !fractions of SOC in litter
+  real(r8), pointer :: OQCK(:)                      !fractions of SOC in DOC
+  logical,  pointer :: is_activeMicrbFungrpAutor(:) !logical switch for autotrophic group
+  logical,  pointer :: is_activeMicrbFungrpHeter(:) !logical switch for heterotrophic group
   logical,  pointer :: is_aerobic_hetr(:)
   logical,  pointer :: is_anaerobic_hetr(:)
   logical,  pointer :: is_litter(:)
@@ -185,10 +186,18 @@ contains
   this%mid_AerobicMethanotrofBacter = 3
   this%mid_H2GenoMethanogArchea     = 5
 
-  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .True.
-  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .True.
-  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .True.
-  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .True.
+  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .true.
+
+  this%is_activeMicrbFungrpHeter(this%mid_Aerob_HeteroBacter)  = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)  = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Aerob_Fungi)         = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_fermentor)           = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_AcetoMethanogArchea) = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_aerob_N2Fixer)       = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Anaerob_N2Fixer)     = .true.
 
   this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)    = .true.
   this%is_CO2_autotroph(this%mid_NitriteOxidBacter)    = .true.
@@ -397,6 +406,7 @@ contains
   allocate(this%OMCA(NumMicbFunGrupsPerCmplx))
   allocate(this%FL(2))
   allocate(this%is_activeMicrbFungrpAutor(NumMicbFunGrupsPerCmplx)); this%is_activeMicrbFungrpAutor=.false.
+  allocate(this%is_activeMicrbFungrpHeter(NumMicbFunGrupsPerCmplx)); this%is_activeMicrbFungrpHeter=.false.
   allocate(this%is_CO2_autotroph(NumMicbFunGrupsPerCmplx)); this%is_CO2_autotroph=.false.
   allocate(this%is_aerobic_hetr(NumMicbFunGrupsPerCmplx)); this%is_aerobic_hetr=.false.
   allocate(this%is_anaerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anaerobic_hetr=.false.

@@ -505,14 +505,15 @@ module minimathmod
 
   tDemand = sum(demand_flux)
   scal1    = 1._r8
-  
-  if(y>=tDemand)then
+  write(*,*)'tDemand=',tDemand
+  if(y>=tDemand .or. tDemand<=0._r8)then
     y=y-tDemand
   else
     scal1=y/tDemand
     DO n=n1,n2
       demand_flux(n)=demand_flux(n)*scal1
     enddo
+    y=0._r8
   endif
   if(present(scal))scal=scal1
   end subroutine SubstrateLimit

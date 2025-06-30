@@ -31,7 +31,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TFP14X           !total relative demand of H1PO4 in non-banded soil by Microbes
     real(r8) :: TFPO4X           !total relative demand of H2PO4 in non-banded soil by Microbes
 !fluxes
-    real(r8) :: tCResp4H2Prod
+    real(r8) :: tCResp4H2Prod    !total respiration flux to support H2 production, [gC d-2 h-1]  
     real(r8) :: tRNH4MicrbTransfSoil
     real(r8) :: tRH2PO4MicrbTransfSoil
     real(r8) :: tRNO3MicrbTransfSoil
@@ -124,9 +124,9 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: AttenfH1PO4Heter(:,:)
 ! allocatable fluxes
   real(r8),allocatable :: DOMuptk4GrothHeter(:,:,:)
-  real(r8),allocatable :: RAnabolDOCUptkHeter(:,:)
-  real(r8),allocatable :: RAnabolAcetUptkHeter(:,:)
-  real(r8),allocatable :: NonstX2stBiomHeter(:,:,:,:)
+  real(r8),allocatable :: RMetabDOCUptkHeter(:,:)
+  real(r8),allocatable :: RMetabAcetUptkHeter(:,:)
+  real(r8),allocatable :: NonstX2stBiomHeter(:,:,:,:)  !nonstructural biomass export to labile and structural biomass, [g d-2 h-1]
   real(r8),allocatable :: RO2UptkHeter(:,:)
   real(r8),allocatable :: RO2UptkHeterG(:)      !complex summed O2 uptake 
   real(r8),allocatable :: Resp4NFixHeter(:,:)
@@ -234,7 +234,6 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8),allocatable :: RHydlysSorptOM(:,:)
     real(r8),allocatable :: RDOMSorp(:,:)                !rate of DOM adsorption
     real(r8),allocatable :: TDOMUptkHeter(:,:)
-    real(r8),allocatable :: ROQC4HeterMicActCmpK(:)
     real(r8),allocatable :: XferRespHeterK(:)
     real(r8),allocatable :: XferDOMK(:,:)
   contains
@@ -286,11 +285,11 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: ZNO2T
   real(r8),allocatable :: FSBSTHeter(:,:)                !limitation of primary substrate for heterotrophs, [0->1, less limitation]              
   real(r8),allocatable :: FSBSTAutor(:)                  !limitation of primary substrate for autotrophs, [0->1, less limitation]              
-
+  real(r8),allocatable :: ROQC4HeterMicActCmpK(:)
   contains
     procedure, public :: Init => mic_diag_init
     procedure, public :: ZeroOut => mic_diag_zero
-    procedure, public :: Destroy => mic_diag_destroy  
+    procedure, public :: Destroy => mic_diag_destroy
     procedure, public :: Summary => mic_diag_summary
   end type Microbe_Diag_type
   contains
@@ -405,8 +404,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RkillRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillRecycOMHeter=spval
   allocate(this%RMaintDefcitKillOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitKillOMHeter=spval
   allocate(this%RMaintDefcitRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitRecycOMHeter=spval
-  allocate(this%RAnabolDOCUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RAnabolDOCUptkHeter=spval
-  allocate(this%RAnabolAcetUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RAnabolAcetUptkHeter=spval
+  allocate(this%RMetabDOCUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RMetabDOCUptkHeter=spval
+  allocate(this%RMetabAcetUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RMetabAcetUptkHeter=spval
   allocate(this%RNH4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfLitrHeter=spval
   allocate(this%RNO3TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfLitrHeter=spval
   allocate(this%RH2PO4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfLitrHeter=spval
@@ -558,8 +557,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RkillRecycOMHeter        = 0._r8
   this%RMaintDefcitKillOMHeter  = 0._r8
   this%RMaintDefcitRecycOMHeter = 0._r8
-  this%RAnabolDOCUptkHeter      = 0._r8
-  this%RAnabolAcetUptkHeter     = 0._r8
+  this%RMetabDOCUptkHeter      = 0._r8
+  this%RMetabAcetUptkHeter     = 0._r8
   this%RNH4TransfLitrHeter      = 0._r8
   this%RNO3TransfLitrHeter      = 0._r8
   this%RH2PO4TransfLitrHeter    = 0._r8
@@ -668,8 +667,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RkillRecycOMHeter)
   call destroy(this%RMaintDefcitKillOMHeter)
   call destroy(this%RMaintDefcitRecycOMHeter)
-  call destroy(this%RAnabolDOCUptkHeter)
-  call destroy(this%RAnabolAcetUptkHeter)
+  call destroy(this%RMetabDOCUptkHeter)
+  call destroy(this%RMetabAcetUptkHeter)
   call destroy(this%RNH4TransfLitrHeter)
   call destroy(this%RNO3TransfLitrHeter)
   call destroy(this%RH2PO4TransfLitrHeter)
@@ -774,6 +773,7 @@ type, public :: Cumlate_Flux_Diag_type
 
   call destroy(this%FSBSTHeter)
   call destroy(this%FSBSTAutor)
+  call destroy(this%ROQC4HeterMicActCmpK)
   end subroutine mic_diag_destroy
 !------------------------------------------------------------------------------------------  
   subroutine nit_mics_destroy(this)
@@ -828,7 +828,6 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RHydlysSorptOM(idom_beg:idom_end,1:ncplx))
   allocate(this%RDOMSorp(idom_beg:idom_end,1:ncplx))
   allocate(this%TDOMUptkHeter(idom_beg:idom_end,1:ncplx))
-  allocate(this%ROQC4HeterMicActCmpK(1:ncplx))
   allocate(this%XferRespHeterK(1:ncplx))
   allocate(this%XferDOMK(idom_beg:idom_end,1:ncplx))
 
@@ -846,7 +845,6 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RHydlysBioResduOM)
   call destroy(this%RHydlysSorptOM)
   call destroy(this%RDOMSorp)
-  call destroy(this%ROQC4HeterMicActCmpK)
   call destroy(this%XferRespHeterK)
   call destroy(this%XferDOMK)
 
@@ -863,7 +861,6 @@ type, public :: Cumlate_Flux_Diag_type
   this%RHydlysBioResduOM    = 0._r8
   this%RHydlysSorptOM       = 0._r8
   this%RDOMSorp             = 0._r8
-  this%ROQC4HeterMicActCmpK = 0._r8
   this%XferRespHeterK       = 0._r8
   this%XferDOMK             = 0._r8
   end subroutine nit_omcplxf_zero
@@ -872,12 +869,14 @@ type, public :: Cumlate_Flux_Diag_type
   implicit none
   class(Microbe_Diag_type) :: this
   integer :: NumMicrobAutrophCmplx,NumHetetr1MicCmplx
+  integer :: jcplx
 
+  jcplx=micpar%jcplx
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumHetetr1MicCmplx    = micpar%NumHetetr1MicCmplx
-  allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:micpar%jcplx));   this%FSBSTHeter=0._r8
+  allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:jcplx));   this%FSBSTHeter=0._r8
   allocate(this%FSBSTAutor(1:NumMicrobAutrophCmplx)); this%FSBSTAutor=0._r8
-
+  allocate(this%ROQC4HeterMicActCmpK(1:jcplx))
   end subroutine mic_diag_init
 
 !------------------------------------------------------------------------------------------
@@ -901,8 +900,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
   allocate(this%SolidOMCK(1:ncplx));this%SolidOMCK=spval
   allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
-  allocate(this%tMaxNActMicrbK(1:ncplx+1));this%tMaxNActMicrbK=spval
-  allocate(this%tMaxPActMicrbK(1:ncplx+1));this%tMaxPActMicrbK=spval
+  allocate(this%tMaxNActMicrbK(1:ncplx));this%tMaxNActMicrbK=spval
+  allocate(this%tMaxPActMicrbK(1:ncplx));this%tMaxPActMicrbK=spval
   allocate(this%CDOM(idom_beg:idom_end,1:ncplx));this%CDOM=spval
   call this%ZeroOut()
   end subroutine nit_omcplxs_init
@@ -912,6 +911,7 @@ type, public :: Cumlate_Flux_Diag_type
   implicit none
   class(Microbe_Diag_type) :: this
 
+  this%ROQC4HeterMicActCmpK = 0._r8
   this%H1P4T               = 0._r8
   this%H2P4T               = 0._r8
   this%RH2UptkAutor        = 0._r8

@@ -5070,16 +5070,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='HydroSufDONFlx_CumYr_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDONFlx_col', dim1name='column',&
        long_name='total surface DON flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_CumYr_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
   else
-    !print*,'HydroSufDONFlx_CumYr_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_CumYr_col,datrc_1d) 
+    !print*,'HydroSufDONFlx_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDONFlx_col,datrc_1d) 
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='HydroSufDONFlx_CumYr_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDONFlx_col', dim1name='column',&
        long_name='total surface DON flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -5105,16 +5105,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='HydroSufDOPFlx_CumYr_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDOPFlx_col', dim1name='column',&
        long_name='total surface DOP flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_CumYr_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_col,datrc_1d) 
   else
-    !print*,'HydroSufDOPFlx_CumYr_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_CumYr_col,datrc_1d)   
+    !print*,'HydroSufDOPFlx_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroSufDOPFlx_col,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='HydroSufDOPFlx_CumYr_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='HydroSufDOPFlx_col', dim1name='column',&
        long_name='total surface DOP flux', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

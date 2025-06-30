@@ -12,7 +12,7 @@ module MicForcTypeMod
   __FILE__
 
   type, public :: micforctype
-
+  integer  :: L                 !layer number
   real(r8) :: CCH4E
   real(r8) :: COXYE
   real(r8) :: O2_irrig_conc

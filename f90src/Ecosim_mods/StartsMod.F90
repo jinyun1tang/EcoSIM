@@ -801,9 +801,9 @@ module StartsMod
   RootResp_CumYr_col(:,:)        = 0.0_r8
   HydroSufDOCFlx_col(:,:)        = 0.0_r8
   HydroSubsDOCFlx_col(:,:)       = 0.0_r8
-  HydroSufDONFlx_CumYr_col(:,:)  = 0.0_r8
+  HydroSufDONFlx_col(:,:)  = 0.0_r8
   HydroSubsDONFlx_col(:,:)       = 0.0_r8
-  HydroSufDOPFlx_CumYr_col(:,:)  = 0.0_r8
+  HydroSufDOPFlx_col(:,:)  = 0.0_r8
   HydroSubsDOPFlx_col(:,:)       = 0.0_r8
   HydroSufDICFlx_col(:,:)        = 0.0_r8
   HydroSubsDICFlx_col(:,:)       = 0.0_r8

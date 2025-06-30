@@ -418,7 +418,16 @@ implicit none
   real(r8),pointer   :: h2D_RDECOMPC_BReSOM_vr(:,:)
   real(r8),pointer   :: h2D_RDECOMPC_SorpSOM_vr(:,:)
   real(r8),pointer   :: h2D_MicrobAct_vr(:,:)
-
+  real(r8),pointer   :: h2D_MicrobActCp1_vr(:,:)
+  real(r8),pointer   :: h2D_MicrobActCp2_vr(:,:)
+  real(r8),pointer   :: h2D_MicrobActCp3_vr(:,:)
+  real(r8),pointer   :: h2D_MicrobActCp4_vr(:,:)
+  real(r8),pointer   :: h2D_MicrobActCp5_vr(:,:)
+  real(r8),pointer   :: h2D_HydrolCSOMCp1_vr(:,:)
+  real(r8),pointer   :: h2D_HydrolCSOMCp2_vr(:,:)
+  real(r8),pointer   :: h2D_HydrolCSOMCp3_vr(:,:)
+  real(r8),pointer   :: h2D_HydrolCSOMCp4_vr(:,:)
+  real(r8),pointer   :: h2D_HydrolCSOMCp5_vr(:,:)      
   real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)   
   real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   
   real(r8),pointer   :: h2D_faculDenitP_vr(:,:)  
@@ -895,6 +904,18 @@ implicit none
   allocate(this%h2D_RDECOMPC_SorpSOM_vr(beg_col:end_col,1:JZ));this%h2D_RDECOMPC_SorpSOM_vr(:,:)=spval
   allocate(this%h2D_MicrobAct_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobAct_vr(:,:)=spval
 
+  allocate(this%h2D_MicrobActCp1_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp1_vr(:,:)=spval
+  allocate(this%h2D_MicrobActCp2_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp2_vr(:,:)=spval
+  allocate(this%h2D_MicrobActCp3_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp3_vr(:,:)=spval
+  allocate(this%h2D_MicrobActCp4_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp4_vr(:,:)=spval
+  allocate(this%h2D_MicrobActCp5_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp5_vr(:,:)=spval
+
+  allocate(this%h2D_HydrolCSOMCp1_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp1_vr(:,:)=spval
+  allocate(this%h2D_HydrolCSOMCp2_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp2_vr(:,:)=spval
+  allocate(this%h2D_HydrolCSOMCp3_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp3_vr(:,:)=spval
+  allocate(this%h2D_HydrolCSOMCp4_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp4_vr(:,:)=spval
+  allocate(this%h2D_HydrolCSOMCp5_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp5_vr(:,:)=spval
+
   allocate(this%h1D_RDECOMPC_SOM_litr_col(beg_col:end_col)); this%h1D_RDECOMPC_SOM_litr_col(:)=spval
   allocate(this%h1D_RDECOMPC_BReSOM_litr_col(beg_col:end_col));this%h1D_RDECOMPC_BReSOM_litr_col(:)=spval
   allocate(this%h1D_RDECOMPC_SorpSOM_litr_col(beg_col:end_col));this%h1D_RDECOMPC_SorpSOM_litr_col(:)=spval
@@ -1055,15 +1076,15 @@ implicit none
 
   data1d_ptr => this%h1D_SUR_DOC_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='SUR_DOC_FLX_col',units='gC/m2/hr',avgflag='A',&
-    long_name='Column-integrated total surface DOC flux',ptr_col=data1d_ptr)      
+    long_name='Column-integrated surface DOC flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SUR_DON_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='SUR_DON_FLX_col',units='gN/m2',avgflag='A',&
-    long_name='Column-integrated cumulative surface DON flux',ptr_col=data1d_ptr)            
+    long_name='Column-integrated surface DON flux',ptr_col=data1d_ptr)            
 
   data1d_ptr => this%h1D_SUR_DOP_FLX_col(beg_col:end_col) 
   call hist_addfld1d(fname='SUR_DOP_FLX',units='gP/m2',avgflag='A',&
-    long_name='Cumulative surface DOP flux',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Column-integrated surface DOP flux',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_SUB_DOC_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='SUB_DOC_FLX_col',units='gC/m2/hr',avgflag='A',&
@@ -2573,6 +2594,56 @@ implicit none
     long_name='Layer resolved respiration-based microbial acitivity for hydrolysis',&
     ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr =>  this%h2D_HydrolCSOMCp1_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HydrolCSOMCp1_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved carbon hydrolysis in cplx1',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_HydrolCSOMCp2_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HydrolCSOMCp2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved carbon hydrolysis in cplx2',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_HydrolCSOMCp3_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HydrolCSOMCp3_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved carbon hydrolysis in cplx3',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_HydrolCSOMCp4_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HydrolCSOMCp4_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved carbon hydrolysis in cplx4',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_HydrolCSOMCp5_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='HydrolCSOMCp5_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved carbon hydrolysis in cplx5',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_MicrobActCp1_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='MicrobActCp1_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in cplx1',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_MicrobActCp2_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='MicrobActCp2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in cplx2',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_MicrobActCp3_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='MicrobActCp3_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in cplx3',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_MicrobActCp4_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='MicrobActCp4_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in cplx4',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_MicrobActCp5_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='MicrobActCp5_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in cplx5',&
+    ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr =>  this%h2D_RDECOMPC_SOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_SOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Layer resolved Hydrolysis of solid OM C',ptr_col=data2d_ptr,default='inactive')       
@@ -2896,7 +2967,7 @@ implicit none
       this%h1D_tLITRf_N_FLX_col(ncol) = LiterfalOrgM_col(ielmn,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tLITRf_P_FLX_col(ncol) = LiterfalOrgM_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tEXCH_PO4_col(ncol)        = tHxPO4_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_SUR_DOP_FLX_col(ncol)      = HydroSufDOPFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_SUR_DOP_FLX_col(ncol)      = HydroSufDOPFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUB_DOP_FLX_col(ncol)      = HydroSubsDOPFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUB_DIP_FLX_col(ncol)      = HydroSubsDIPFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)  
@@ -2906,7 +2977,7 @@ implicit none
       this%h1D_RadSW_Grnd_col(ncol)       = MJ2W*RadSWGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qdrain_col(ncol)           = m2mm*QDrain_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_SUR_DON_FLX_col(ncol)      = HydroSufDONFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_SUR_DON_FLX_col(ncol)      = HydroSufDONFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUB_DON_FLX_col(ncol)      = HydroSubsDONFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tSALT_DISCHG_FLX_col(ncol) = HydroIonFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUR_DIN_FLX_col(ncol)      = HydroSufDINFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3231,6 +3302,18 @@ implicit none
         this%h2D_RDECOMPC_BReSOM_vr(ncol,L)  = tRHydlyBioReSOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RDECOMPC_SorpSOM_vr(ncol,L) = tRHydlySoprtOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_MicrobAct_vr(ncol,L)        = TMicHeterActivity_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+
+        this%h2D_MicrobActCp1_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_MicrobActCp2_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_MicrobActCp3_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_MicrobActCp4_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_MicrobActCp5_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+
+        this%h2D_HydrolCSOMCp1_vr(ncol,L) = RHydlySOCK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_HydrolCSOMCp2_vr(ncol,L) = RHydlySOCK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_HydrolCSOMCp3_vr(ncol,L) = RHydlySOCK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_HydrolCSOMCp4_vr(ncol,L) = RHydlySOCK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_HydrolCSOMCp5_vr(ncol,L) = RHydlySOCK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
         !anaerobic N2 fixer
         call SumMicbGroup(L,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)

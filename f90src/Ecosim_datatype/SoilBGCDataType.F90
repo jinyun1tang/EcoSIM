@@ -55,9 +55,9 @@ implicit none
   real(r8),target,allocatable ::  HydroSufDOCFlx_col(:,:)            !total surface DOC flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOCFlx_col(:,:)           !total subsurface DOC flux, [g d-2]
   real(r8),target,allocatable ::  LiterfalOrgM_col(:,:,:)            !total LitrFall C, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDONFlx_CumYr_col(:,:)      !total surface DON flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDONFlx_col(:,:)      !total surface DON flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDONFlx_col(:,:)           !total subsurface DON flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDOPFlx_CumYr_col(:,:)      !total surface DOP flux, [g d-2]
+  real(r8),target,allocatable ::  HydroSufDOPFlx_col(:,:)      !total surface DOP flux, [g d-2]
   real(r8),target,allocatable ::  HydroSubsDOPFlx_col(:,:)           !total subsurface DOP flux, [g d-2]
   real(r8),target,allocatable ::  tXPO4_col(:,:)                     !total soil precipited P, [g d-2]
   real(r8),target,allocatable ::  RootResp_CumYr_col(:,:)            !total soil autotrophic respiration, [g d-2]
@@ -131,6 +131,7 @@ implicit none
   real(r8),target,allocatable :: DOM_SurfRunoff_flx_col(:,:,:,:)     !DOM loss through surface runoff, [g d-2 h-1]
   real(r8),target,allocatable :: AeroBact_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic bacteria, [-]
   real(r8),target,allocatable :: AeroFung_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic fungi, [-]
+  real(r8),target,allocatable :: ROQC4HeterMicActCmpK_vr(:,:,:,:)    !vertical resolved microbial activity for each complex, [-]
   private :: InitAllocate
   contains
 
@@ -213,9 +214,9 @@ implicit none
   allocate(HydroSufDOCFlx_col(JY,JX));       HydroSufDOCFlx_col=0._r8
   allocate(HydroSubsDOCFlx_col(JY,JX));       HydroSubsDOCFlx_col=0._r8
   allocate(LiterfalOrgM_col(NumPlantChemElms,JY,JX));       LiterfalOrgM_col=0._r8
-  allocate(HydroSufDONFlx_CumYr_col(JY,JX));       HydroSufDONFlx_CumYr_col=0._r8
+  allocate(HydroSufDONFlx_col(JY,JX));       HydroSufDONFlx_col=0._r8
   allocate(HydroSubsDONFlx_col(JY,JX));       HydroSubsDONFlx_col=0._r8
-  allocate(HydroSufDOPFlx_CumYr_col(JY,JX));       HydroSufDOPFlx_CumYr_col=0._r8
+  allocate(HydroSufDOPFlx_col(JY,JX));       HydroSufDOPFlx_col=0._r8
   allocate(HydroSubsDOPFlx_col(JY,JX));       HydroSubsDOPFlx_col=0._r8
   allocate(tXPO4_col(JY,JX));        tXPO4_col=0._r8
   allocate(RGasNetProd_col(idg_beg:idg_NH3,JY,JX)); RGasNetProd_col=0._r8
@@ -273,7 +274,7 @@ implicit none
   allocate(trcs_TransptMicP_3D(ids_beg:ids_end,3,0:1,JV,JH));trcs_TransptMicP_3D=0._r8
   allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:1,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(CPO4S_vr(JZ,JY,JX));CPO4S_vr(JZ,JY,JX)=0._r8
-
+  allocate(ROQC4HeterMicActCmpK_vr(jcplx,0:JZ,JY,JX)); ROQC4HeterMicActCmpK_vr=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -283,6 +284,7 @@ implicit none
 
   implicit none
 
+  call destroy(ROQC4HeterMicActCmpK_vr)
   call destroy(AeroBact_PrimeS_lim_vr)
   call destroy(AeroFung_PrimeS_lim_vr)
 
@@ -342,9 +344,9 @@ implicit none
   call destroy(HydroSufDOCFlx_col)
   call destroy(HydroSubsDOCFlx_col)
   call destroy(LiterfalOrgM_col)
-  call destroy(HydroSufDONFlx_CumYr_col)
+  call destroy(HydroSufDONFlx_col)
   call destroy(HydroSubsDONFlx_col)
-  call destroy(HydroSufDOPFlx_CumYr_col)
+  call destroy(HydroSufDOPFlx_col)
   call destroy(HydroSubsDOPFlx_col)
   call destroy(tXPO4_col)
   call destroy(RootResp_CumYr_col)

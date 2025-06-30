@@ -371,18 +371,20 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      QWatIntLaterFlow_col(NY,NX)            = 0._r8
-      QCanopyWat2Dist_col(NY,NX)             = 0._r8
-      HeatCanopy2Dist_col(NY,NX)             = 0._r8
-      HydroSufDOCFlx_col(NY,NX)              = 0._r8
-      HydroSubsDOCFlx_col(NY,NX)             = 0._r8
-      HydroSufDICFlx_col(NY,NX)              = 0._r8
-      HydroSubsDICFlx_col(NY,NX)             = 0._r8
-      HydroSubsDONFlx_col(NY,NX)             = 0._r8
-      HydroSubsDINFlx_col(NY,NX)             = 0._r8
-      HydroSubsDOPFlx_col(NY,NX)             = 0._r8
-      HydroSubsDIPFlx_col(NY,NX)             = 0._r8
-      SurfRunoffPotentM_col(:,NY,NX)        = 0._r8
+      QWatIntLaterFlow_col(NY,NX)    = 0._r8
+      QCanopyWat2Dist_col(NY,NX)     = 0._r8
+      HeatCanopy2Dist_col(NY,NX)     = 0._r8
+      HydroSufDOCFlx_col(NY,NX)      = 0._r8
+      HydroSufDONFlx_col(NY,NX)      = 0._r8
+      HydroSufDOPFlx_col(NY,NX)      = 0._r8      
+      HydroSubsDOCFlx_col(NY,NX)     = 0._r8
+      HydroSufDICFlx_col(NY,NX)      = 0._r8
+      HydroSubsDICFlx_col(NY,NX)     = 0._r8
+      HydroSubsDONFlx_col(NY,NX)     = 0._r8
+      HydroSubsDINFlx_col(NY,NX)     = 0._r8
+      HydroSubsDOPFlx_col(NY,NX)     = 0._r8
+      HydroSubsDIPFlx_col(NY,NX)     = 0._r8
+      SurfRunoffPotentM_col(:,NY,NX) = 0._r8
 
       DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX) = 0._r8
       trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)           = 0._r8

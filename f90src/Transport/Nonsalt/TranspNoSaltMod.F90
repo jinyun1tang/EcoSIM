@@ -276,13 +276,41 @@ module TranspNoSaltMod
   ENDDO
 
   call BackCopyStateVars(I,J,NHE,NHW,NVS,NVN)
-      
+
+  call SummaryFluxes(I,J,NHE,NHW,NVS,NVN)
+
   call ExitMassCheck(I,J,NHW,NHE,NVN,NVS)
 
   call PrintInfo('end '//subname)
   
   END subroutine TranspNoSalt
 
+!------------------------------------------------------------------------------------------
+  subroutine SummaryFluxes(I,J,NHE,NHW,NVS,NVN)
+  implicit none
+  integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
+  integer :: NY,NX,K
+  
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+      DO K=1,jcplx
+        HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)+DOM_SurfRunoff_flx_col(idom_don,K,NY,NX)
+        HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)+DOM_SurfRunoff_flx_col(idom_dop,K,NY,NX)
+        HydroSufDOCFlx_col(NY,NX) = HydroSufDOCFlx_col(NY,NX)+DOM_SurfRunoff_flx_col(idom_doc,K,NY,NX) &
+          +DOM_SurfRunoff_flx_col(idom_acetate,K,NY,NX) 
+
+        HydroSubsDONFlx_col(NY,NX)=HydroSubsDONFlx_col(NY,NX)+DOM_Hydroloss_slow_flx_col(idom_don,K,NY,NX)              
+        HydroSubsDOPFlx_col(NY,NX)=HydroSubsDOPFlx_col(NY,NX)+DOM_Hydroloss_slow_flx_col(idom_dop,K,NY,NX)              
+        HydroSubsDOCFlx_col(NY,NX)=HydroSubsDOCFlx_col(NY,NX)+DOM_Hydroloss_slow_flx_col(idom_doc,K,NY,NX) &
+          +DOM_Hydroloss_slow_flx_col(idom_acetate,K,NY,NX)           
+
+      ENDDO
+      HydroSubsDOCFlx_col(NY,NX)=HydroSubsDOCFlx_col(NY,NX)-HydroSufDOCFlx_col(NY,NX)
+      HydroSubsDONFlx_col(NY,NX)=HydroSubsDONFlx_col(NY,NX)-HydroSufDONFlx_col(NY,NX)
+      HydroSubsDOPFlx_col(NY,NX)=HydroSubsDOPFlx_col(NY,NX)-HydroSufDOPFlx_col(NY,NX)
+    ENDDO
+  ENDDO
+  end subroutine SummaryFluxes
 !------------------------------------------------------------------------------------------
   subroutine PassSlow2FastIterationM(I,J,M,NHE,NHW,NVS,NVN)
   implicit none

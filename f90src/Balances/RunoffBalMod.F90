@@ -183,9 +183,9 @@ implicit none
       TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
       HydroSufDOCFlx_col(NY,NX)       = -OMRof(ielmc)-OMRof(idom_acetate)
       HydroSufDICFlx_col(NY,NX)       = -CXR
-      HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
+      HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)-OMRof(ielmn)
       HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
+      HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
       HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXR                             = XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU                          = OXYGOU-OXR
@@ -352,8 +352,8 @@ implicit none
           TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)-PPE
 
           HydroSufDOCFlx_col(NY,NX)       = HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
-          HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
-          HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
+          HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)-MOE(ielmn)
+          HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)-MOE(ielmp)
           HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-MXE(ielmc)
           HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE
           HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE

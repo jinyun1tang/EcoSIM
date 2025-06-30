@@ -33,13 +33,13 @@ implicit none
   real(r8) :: MicrbN2Fix                  !>0 N fixation
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo
-  real(r8) :: CDOMuptk1
+  real(r8) :: CDOMuptk1                   !total DOC+acetate uptake for aerobic growth, [gC d-2 h-1]
   real(r8) :: tROMT
   real(r8) :: tRGOXP
   real(r8) :: tRGOZP
   real(r8) :: tRGOMP
   real(r8) :: tGROMO
-  real(r8) :: CDOMuptk2
+  real(r8) :: CDOMuptk2                   !total DOC+acetate uptake for denitrifcation, [gC d-2 h-1]
   real(r8) :: GrosAssimhr
   real(r8) :: NetCAssimhr                     !>0 uptake/ASSIMILATION
   real(r8) :: NetNH4Mineralize                !>0 uptake/ASSIMILATION
@@ -57,7 +57,7 @@ implicit none
   real(r8), allocatable :: RNO2OxidAutor(:)
   real(r8), allocatable :: RNO2OxidAutorBand(:)
   real(r8), allocatable :: RO2DmndHetert(:,:)
-  real(r8), allocatable :: RDOCUptkHeter(:,:)
+  real(r8), allocatable :: RDOCUptkHeter(:,:)             !potential DOC (unlimited) uptake flux, [gC d-2 h-1]
   real(r8), allocatable :: RAcetateUptkHeter(:,:)
   real(r8), allocatable :: RNO3ReduxDmndSoilHeter(:,:)
   real(r8), allocatable :: RNO3ReduxDmndBandHeter(:,:)
@@ -89,6 +89,7 @@ implicit none
   real(r8), allocatable :: RNO3UptkLitrAutor(:)
   real(r8), allocatable :: RH2PO4UptkLitrAutor(:)
   real(r8), allocatable :: RH1PO4UptkLitrAutor(:)
+  real(r8), allocatable :: RHydlySOCK(:)            !solid organic carbon hydrolysis for each organic matter complex, [gC d-2]
   contains
    procedure, public :: Init
    procedure, public :: Destroy=> Destruct
@@ -110,6 +111,7 @@ implicit none
   NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
+  allocate(this%RHydlySOCK(1:jcplx)); this%RHydlySOCK=0._r8
   allocate(this%RO2UptkSoilM(NPH));this%RO2UptkSoilM = spval
   allocate(this%REcoDOMProd(idom_beg:idom_end,1:jcplx));this%REcoDOMProd=spval
   allocate(this%RO2DmndHetert(NumHetetr1MicCmplx,1:jcplx));this%RO2DmndHetert=spval
@@ -149,7 +151,7 @@ implicit none
   allocate(this%RNH3OxidAutorBand(NumMicrobAutrophCmplx));this%RNH3OxidAutorBand=spval
   allocate(this%RNO2OxidAutor(NumMicrobAutrophCmplx));this%RNO2OxidAutor=spval
   allocate(this%RNO2OxidAutorBand(NumMicrobAutrophCmplx));this%RNO2OxidAutorBand=spval
-
+  
   end subroutine Init
 !------------------------------------------------------------------------------------------
   subroutine ZeroOut(this)
@@ -198,6 +200,23 @@ implicit none
   this%RNH3OxidAutorBand      = 0._r8
   this%RNO2OxidAutor          = 0._r8
   this%RNO2OxidAutorBand      = 0._r8
+  this%tRHydlySOM             = 0._r8
+  this%tRHydlyBioReSOM        = 0._r8
+  this%tRHydlySoprtOM         = 0._r8
+  this%NetCAssimhr            = 0._r8
+  this%NetNH4Mineralize       = 0._r8
+  this%NetPO4Mineralize       = 0._r8
+  this%RPiDemand              = 0._r8
+  this%RNiDemand              = 0._r8
+  this%GrosAssimhr            = 0._r8
+  this%CDOMuptk1              = 0._r8
+  this%CDOMuptk2              = 0._r8
+  this%tROMT                  = 0._r8
+  this%tGROMO                 = 0._r8
+  this%tRGOMP                 = 0._r8
+  this%tRGOXP                 = 0._r8
+  this%tRGOZP                 = 0._r8
+  this%RHydlySOCK             = 0._r8
 
   end subroutine ZeroOut
 !------------------------------------------------------------------------------------------
@@ -205,7 +224,7 @@ implicit none
   use abortutils, only : destroy
   implicit none
   class(micfluxtype) :: this
-
+  call destroy(this%RHydlySOCK)
   call destroy(this%REcoDOMProd)
   call destroy(this%RNH3OxidAutor)
   call destroy(this%RNH3OxidAutorBand)
