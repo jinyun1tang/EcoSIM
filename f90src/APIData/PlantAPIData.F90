@@ -709,7 +709,7 @@ implicit none
   real(r8), pointer :: RootH2PO4Uptake_pft(:)            => null()  !total root uptake of PO4,                                       [g d-2 h-1]
   real(r8), pointer :: RootMycoExudEUptk_pvr(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE,                     [g d-2 h-1]
   real(r8), pointer :: PlantRootSoilElmNetX_pft(:,:)     => null()  !net root element uptake (+ve) - exudation (-ve),                [gC d-2 h-1]
-  real(r8), pointer :: RO2UptkSoilM_vr(:,:)              => null()  !total O2 sink,                                                  [g d-2 t-1]
+  real(r8), pointer :: REcoUptkSoilO2M_vr(:,:)              => null()  !total O2 sink,                                                  [g d-2 t-1]
   real(r8), pointer :: ZERO4Uptk_pft(:)                  => null()  !threshold zero for uptake calculation,                          [-]
   real(r8), pointer :: CMinPO4Root_pft(:,:)              => null()  !minimum PO4 concentration for root NH4 uptake,                  [g m-3]
   real(r8), pointer :: VmaxPO4Root_pft(:,:)              => null()  !maximum root PO4 uptake rate,                                   [g m-2 h-1]
@@ -785,7 +785,7 @@ implicit none
   allocate(this%trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
   allocate(this%RootGasConductance_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootGasConductance_pvr=0._r8
   allocate(this%TRootGasLossDisturb_col(idg_beg:idg_NH3));this%TRootGasLossDisturb_col=spval
-  allocate(this%RO2UptkSoilM_vr(60,0:JZ1)); this%RO2UptkSoilM_vr=spval
+  allocate(this%REcoUptkSoilO2M_vr(60,0:JZ1)); this%REcoUptkSoilO2M_vr=spval
   allocate(this%RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%RootMycoExudEUptk_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
   allocate(this%PlantExudElm_CumYr_pft(NumPlantChemElms,JP1));this%PlantExudElm_CumYr_pft=spval
@@ -858,7 +858,7 @@ implicit none
 !  if(allocated(OXYP))deallocate(OXYP)
 !  if(allocated(OXYA))deallocate(OXYA)
 !  if(allocated(TRootN2Fix_pft))deallocate(TRootN2Fix_pft)
-!  if(allocated(RO2UptkSoilM_vr))deallocate(RO2UptkSoilM_vr)
+!  if(allocated(REcoUptkSoilO2M_vr))deallocate(REcoUptkSoilO2M_vr)
 !  if(allocated(RootMycoExudEUptk_pvr))deallocate(RootMycoExudEUptk_pvr)
 !  if(allocated(PlantRootSoilElmNetX_pft))deallocate(PlantRootSoilElmNetX_pft)
 !  if(allocated(PlantExudElm_CumYr_pft))deallocate(PlantExudElm_CumYr_pft)

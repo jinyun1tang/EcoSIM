@@ -70,18 +70,19 @@ implicit none
   real(r8) :: tOMActC
   integer  :: Lay
   real(r8),allocatable :: FracBulkSOMC(:)
-  real(r8),allocatable :: DOM(:,:)
-  real(r8),allocatable :: SorbedOM(:,:)
-  real(r8),allocatable :: SolidOMAct(:,:)
-  real(r8),allocatable :: SolidOM(:,:,:)
-  real(r8),allocatable :: OMBioResdu(:,:,:)
-  real(r8),allocatable :: CNOSC(:,:)
-  real(r8),allocatable :: CPOSC(:,:)
-  real(r8),allocatable :: mBiomeHeter(:,:,:)
-  real(r8),allocatable :: mBiomeAutor(:,:)
-  real(r8),allocatable :: SOMPomProtein(:)
-  real(r8),allocatable :: SOMHumProtein(:)
-  real(r8),allocatable :: SOMHumCarbohyd(:)
+  real(r8),allocatable :: DOM(:,:)             !DOM mass, [g d-2]
+  real(r8),allocatable :: DOM_MicP_drib(:,:)   !dribbling flux for DOM, [g d-2]
+  real(r8),allocatable :: SorbedOM(:,:)        !adsorbed OM, [g d-2]
+  real(r8),allocatable :: SolidOMAct(:,:)      !solid OM activity, [g d-2]
+  real(r8),allocatable :: SolidOM(:,:,:)       !solid OM mass, [g d-2]
+  real(r8),allocatable :: OMBioResdu(:,:,:)    !microbial residule, [g d-2]
+  real(r8),allocatable :: CNOSC(:,:)           !CN ratio for solid OM, [gN gC-1]
+  real(r8),allocatable :: CPOSC(:,:)           !CP ratio for solid OM, [gP gC-1]
+  real(r8),allocatable :: mBiomeHeter(:,:,:)   !heterotrophic microbial biomass, [g d-2]
+  real(r8),allocatable :: mBiomeAutor(:,:)     !autotrophic microbial biomass, [g d-2]
+  real(r8),allocatable :: SOMPomProtein(:)     !Protein component in POM, [g d-2]
+  real(r8),allocatable :: SOMHumProtein(:)     !Protein component in Humus, [g d-2]
+  real(r8),allocatable :: SOMHumCarbohyd(:)    !carbonhydro component in humus, [g d-2]
 
   contains
   procedure, public :: Init
@@ -112,6 +113,7 @@ implicit none
 
   allocate(this%FracBulkSOMC(1:jcplx));this%FracBulkSOMC=spval
   allocate(this%DOM(idom_beg:idom_end,1:jcplx));this%DOM=spval
+  allocate(this%dom_micp_drib(idom_beg:idom_end,1:jcplx));this%dom_micp_drib=spval
   allocate(this%SorbedOM(idom_beg:idom_end,1:jcplx));this%SorbedOM=spval
   allocate(this%SolidOMAct(jsken,1:jcplx));this%SolidOMAct=spval
   allocate(this%SolidOM(NumPlantChemElms,jsken,1:jcplx));this%SolidOM=spval
@@ -148,5 +150,6 @@ implicit none
   call destroy(this%SOMHumCarbohyd)
   call destroy(this%SOMPomProtein)
   call destroy(this%SOMHumProtein)
+  call destroy(this%dom_micp_drib)
   end subroutine Destruct
 end module MicStateTraitTypeMod

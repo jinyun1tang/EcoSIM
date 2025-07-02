@@ -3,6 +3,7 @@ module TranspNoSaltFastMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: destroy, endrun
   use EcoSIMCtrlMod, only: iVerbLevel
+  use NumericalAuxMod
   use minimathmod
   use DebugToolMod
   use GridDataType  
@@ -143,7 +144,7 @@ implicit none
       DO idg=idg_beg,idg_NH3
         dmass = trcg_mass_now(idg)-trcg_mass_begf(idg,NY,NX)
         err   = dmass-trcg_netflx2_col(idg,NY,NX)
-
+        errmass_fast(idg,NY,NX)=errmass_fast(idg,NY,NX)+err
         if(abs(err)>1.e-5_r8)then
           if(iVerbLevel==1 .or. abs(err)>1.e-4_r8)then
             write(133,*)(I*1000+J)*100+M,trcs_names(idg),'fast'
@@ -197,14 +198,14 @@ implicit none
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3
-        RGasSinkScalar_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)/(trcs_solml2_vr(idg,0,NY,NX) &
-          +trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(0,NY,NX),1.e-5_r8))
+        RGasSinkScalar_vr(idg,0,NY,NX)=1._r8 !trcs_solml2_vr(idg,0,NY,NX)/(trcs_solml2_vr(idg,0,NY,NX) &
+          !+trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(0,NY,NX),1.e-5_r8))
       enddo
 
       DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
-          RGasSinkScalar_vr(idg,L,NY,NX)=trcs_solml2_vr(idg,L,NY,NX)/(trcs_solml2_vr(idg,L,NY,NX) &
-            +trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(L,NY,NX),1.E-5_r8))
+          RGasSinkScalar_vr(idg,L,NY,NX)=1._r8 !trcs_solml2_vr(idg,L,NY,NX)/(trcs_solml2_vr(idg,L,NY,NX) &
+            !+trcs_solcoef_col(idg,NY,NX)*AMAX1(VLWatMicP_vr(L,NY,NX),1.E-5_r8))
         enddo
 
         N1=NX;N2=NY;N3=L          
@@ -347,8 +348,10 @@ implicit none
             trcg_netflx2_col(idg,NY,NX) = trcg_netflx2_col(idg,NY,NX)+flux
 
             if(idg<idg_NH3)then
-              flux                                  = ppscal(idg)*RGasSinkScalar_vr(idg,L,NY,NX)*trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_gas
-              trcs_Soil2plant_uptake_col(idg,NY,NX) = trcs_Soil2plant_uptake_col(idg,NY,NX)+ flux
+              flux                                  = RGasSinkScalar_vr(idg,L,NY,NX)*trcs_Soil2plant_uptkdrb_vr(idg,L,NY,NX)*dts_gas
+              trcs_Soil2plant_uptk_drib_vr(idg,L,NY,NX)=trcs_Soil2plant_uptk_drib_vr(idg,L,NY,NX)+flux*(1._r8-ppscal(idg))
+
+              trcs_Soil2plant_uptake_col(idg,NY,NX) = trcs_Soil2plant_uptake_col(idg,NY,NX)+ flux*ppscal(idg)
               RGasNetProd_col(idg,NY,NX)            = RGasNetProd_col(idg,NY,NX)+flux
             endif
           ENDDO

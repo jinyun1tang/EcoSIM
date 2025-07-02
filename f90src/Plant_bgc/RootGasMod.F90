@@ -134,7 +134,7 @@ module RootGasMod
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr                 ,& !inoput :aqueous O2 flux from roots to root water, [g d-2 h-1]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr         ,& !inoput :O2 constraint to root respiration (0-1), [-]
-    RO2UptkSoilM_vr           => plt_rbgc%RO2UptkSoilM_vr                ,& !inoput :total O2 sink, [g d-2 t-1]
+    REcoUptkSoilO2M_vr           => plt_rbgc%REcoUptkSoilO2M_vr                ,& !inoput :total O2 sink, [g d-2 t-1]
     RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr              ,& !inoput :aqueous CO2 flux from roots to root water, [g d-2 h-1]
     trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr          ,& !inoput :gaseous tracer flux through roots, [g d-2 h-1]
     trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr       ,& !inoput :dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
@@ -566,11 +566,11 @@ module RootGasMod
           ! ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
           !
           ! RootO2Uptk_pvr=root O2 uptake from root
-          ! RO2UptkSoilM_vr=total O2 uptake from soil by all microbial,root popns
+          ! REcoUptkSoilO2M_vr=total O2 uptake from soil by all microbial,root popns
           ! Root CO2 emission includes actual CO2 production from respiration and flux exchange with soil
           RCO2Emis2Root_pvr(N,L,NZ) = RCO2Emis2Root_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
           RootO2Uptk_pvr(N,L,NZ)    = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk    !uptake from O2 inside roots for root respiration
-          RO2UptkSoilM_vr(M,L)      = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
+          REcoUptkSoilO2M_vr(M,L)      = REcoUptkSoilO2M_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
         ENDDO D90        
       ENDIF
 

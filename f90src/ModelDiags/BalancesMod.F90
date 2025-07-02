@@ -358,10 +358,10 @@ contains
 
           if(idg==idg_CO2)then
             dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)          
-            tracer_mass_err = tracer_mass_err+dCO2err
+!            tracer_mass_err = tracer_mass_err+dCO2err
           else
-            dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)          
-            tracer_mass_err=tracer_mass_err-dgaserr
+!            dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)          
+!            tracer_mass_err=tracer_mass_err-dgaserr
           endif
 
           if(abs(tracer_mass_err)>1.e-1_r8) &

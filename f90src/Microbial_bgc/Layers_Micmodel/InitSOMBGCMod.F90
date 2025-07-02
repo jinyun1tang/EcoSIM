@@ -94,8 +94,8 @@ module InitSOMBGCMOD
   ! begin_execution
 
   associate(                                               &
-    rNCOMC_ave               => micpar%rNCOMC_ave,               &
-    rPCOMC_ave               => micpar%rPCOMC_ave,               &
+    rNCOMC_ave            => micpar%rNCOMC_ave,            &
+    rPCOMC_ave            => micpar%rPCOMC_ave,            &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
     OHCK                  => micpar%OHCK,                  &

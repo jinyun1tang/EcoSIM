@@ -860,7 +860,7 @@ module Hour1Mod
   TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                  = 0._r8
   THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
-  RO2UptkSoilM_vr(1:NPH,NU_col(NY,NX):NL_col(NY,NX),NY,NX)                            = 0._r8
+  REcoUptkSoilO2M_vr(1:NPH,0:NL_col(NY,NX),NY,NX)                             = 0._r8
   RainLitr_col(NY,NX)                                                         = 0._r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------

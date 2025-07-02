@@ -3,6 +3,7 @@ module TranspNoSaltSlowMod
   use abortutils,    only: destroy, endrun
   use TracerPropMod, only: MolecularWeight
   use EcoSIMCtrlMod, only: iVerbLevel
+  use NumericalAuxMod
   use PlantDataRateType
   use minimathmod    
   use IrrigationDataType
@@ -230,6 +231,7 @@ implicit none
         if(idg==idg_NH3)then
           err=err+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
         endif
+        errmass_slow(idg,NY,NX)=errmass_slow(idg,NY,NX)+err
         if(abs(err)>1.e-5_r8)then
           if(iVerbLevel==1 .or. abs(err)>1.e-4_r8)then
             write(201,*)('-',L=1,50)
@@ -739,8 +741,9 @@ implicit none
             trcs_NetProd_slow_flx_col(ids,NY,NX)      = trcs_NetProd_slow_flx_col(ids,NY,NX)+flux
             trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)+flux
             if(ids>=idg_NH3)then 
-              trcs_Soil2plant_uptake_col(ids,NY,NX)     = trcs_Soil2plant_uptake_col(ids,NY,NX)+ ppscal(ids)*&
-                trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP
+              flux = trcs_Soil2plant_uptkdrb_vr(ids,L,NY,NX)*dts_HeatWatTP
+              trcs_Soil2plant_uptake_col(ids,NY,NX)     = trcs_Soil2plant_uptake_col(ids,NY,NX)+ ppscal(ids)*flux
+              trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX) = trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX)+flux*(1._r8-ppscal(ids))
             endif    
           endif  
         ENDDO      

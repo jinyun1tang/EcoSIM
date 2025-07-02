@@ -43,7 +43,7 @@ implicit none
   real(r8),target,allocatable ::  TempSensDecomp_vr(:,:,:)            !temperature dependense of microbial activity,[-]
   real(r8),target,allocatable ::  MoistSensDecomp_vr(:,:,:)           !moisture dependence of microbial activity,[-]
   real(r8),target,allocatable ::  GasDiff2Surf_flx_col(:,:,:)         !surface gas flux in advection+diffusion [g d-2 h-1]
-  real(r8),target,allocatable ::  RO2UptkSoilM_vr(:,:,:,:)            !total O2 sink in soil due to plant and microbial respiration, [g d-2]
+  real(r8),target,allocatable ::  REcoUptkSoilO2M_vr(:,:,:,:)            !total O2 sink in soil due to plant and microbial respiration, [g d-2]
   real(r8),target,allocatable ::  SurfGasEmiss_flx_col(:,:,:)         !surface gas flux, including diffusion, ebullition, wet deposition and plant transp, [g d-2 h-1]
   real(r8),target,allocatable ::  GasHydroLoss_flx_col(:,:,:)         !hydrological loss of volatile tracers, [g d-2 h-1]
   real(r8),target,allocatable ::  GasHydroSubsLoss_flx_col(:,:,:)     !subsurface hydrological loss of volatile tracers, [g d-2 h-1]
@@ -201,7 +201,7 @@ implicit none
   allocate(CEC_vr(JZ,JY,JX));CEC_vr(JZ,JY,JX)=0._r8
   allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
 
-  allocate(RO2UptkSoilM_vr(60,0:JZ,JY,JX));RO2UptkSoilM_vr=0._r8
+  allocate(REcoUptkSoilO2M_vr(60,0:JZ,JY,JX));REcoUptkSoilO2M_vr=0._r8
   allocate(GasHydroLoss_cumflx_col(idg_beg:idg_NH3,JY,JX)); GasHydroLoss_cumflx_col=0._r8
   allocate(GasHydroLoss_flx_col(idg_beg:idg_NH3,JY,JX)); GasHydroLoss_flx_col=0._r8
   allocate(SurfGasEmiss_flx_col(idg_beg:idg_NH3,JY,JX));  SurfGasEmiss_flx_col=0._r8
@@ -337,7 +337,7 @@ implicit none
   call destroy(CEC_vr)
   call destroy(AEC_vr)
   call destroy(CPO4S_vr)
-  call destroy(RO2UptkSoilM_vr)
+  call destroy(REcoUptkSoilO2M_vr)
   call destroy(AmendC_CumYr_flx_col)
   call destroy(FertN_Flx_CumYr_col)
   call destroy(FerPFlx_CumYr_col)

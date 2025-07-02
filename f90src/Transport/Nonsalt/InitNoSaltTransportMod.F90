@@ -4,6 +4,7 @@ module InitNoSaltTransportMod
   USE MiniMathMod,      ONLY: AZMAX1, fixnegmass, flux_mass_limiter,AZERO
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
+  use NumericalAuxMod
   use DebugToolMod
   use SOMDataType
   use ChemTranspDataType
@@ -290,7 +291,9 @@ module InitNoSaltTransportMod
       DO L=NU_col(NY,NX),NL_col(NY,NX)        
 
         DO idg=idg_beg,idg_NH3-1          
-          RBGCSinkGasMM_vr(idg,L,NY,NX) = (trcs_RMicbUptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas          
+          RBGCSinkGasMM_vr(idg,L,NY,NX)           = (trcs_RMicbUptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
+          trcs_Soil2plant_uptkdrb_vr(idg,L,NY,NX) = trcs_Soil2plant_uptake_vr(idg,L,NY,NX)+trcs_Soil2plant_uptk_drib_vr(idg,L,NY,NX)
+          RBGCSinkGasMM_vr(idg,L,NY,NX)           = RBGCSinkGasMM_vr(idg,L,NY,NX) +trcs_Soil2plant_uptkdrb_vr(idg,L,NY,NX)*dts_gas
         enddo
 
         RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = RBGCSinkGasMM_vr(idg_CO2,L,NY,NX)- &
@@ -298,10 +301,6 @@ module InitNoSaltTransportMod
 
         RBGCSinkGasMM_vr(idg_N2,L,NY,NX)     = RBGCSinkGasMM_vr(idg_N2,L,NY,NX)+RootN2Fix_vr(L,NY,NX)*dts_gas
         RBGCSinkGasMM_vr(idg_NH3,L,NY,NX)    = -TRChem_gas_NH3_geochem_vr(L,NY,NX)*dts_gas   !geochemical NH3 source, applied to gas phase
-
-        DO idg=idg_beg,idg_NH3-1
-          RBGCSinkGasMM_vr(idg,L,NY,NX) = RBGCSinkGasMM_vr(idg,L,NY,NX) +trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_gas
-        ENDDO
 
         RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
         RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = (-TRChem_sol_NH3_soil_vr(L,NY,NX)-trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
@@ -315,7 +314,8 @@ module InitNoSaltTransportMod
         ENDDO
 
         DO ids=idg_NH3,ids_end
-          RBGCSinkSoluteM_vr(ids,L,NY,NX) = RBGCSinkSoluteM_vr(ids,L,NY,NX) +trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP
+          trcs_Soil2plant_uptkdrb_vr(ids,L,NY,NX)=trcs_Soil2plant_uptake_vr(ids,L,NY,NX)+trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX)        
+          RBGCSinkSoluteM_vr(ids,L,NY,NX) = RBGCSinkSoluteM_vr(ids,L,NY,NX) +trcs_Soil2plant_uptkdrb_vr(ids,L,NY,NX)*dts_HeatWatTP
         ENDDO        
         !
         !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
@@ -339,6 +339,8 @@ module InitNoSaltTransportMod
         !
         DO ids=ids_beg,ids_end
           trcsol_Irrig_flxM_vr(ids,L,NY,NX)=trcs_Irrig_flx_vr(ids,L,NY,NX)*dts_HeatWatTP
+          !reset dribbling flux
+          trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX)=0._r8
         ENDDO
         !
         !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP

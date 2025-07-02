@@ -15,6 +15,7 @@ module RestartMod
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun,destroy
   use HistFileMod       , only : hist_restart_ncd  
+  use NumericalAuxMod
   use EcoSIMCtrlDataType  
   use restUtilMod  
   use ncdio_pio
@@ -8000,7 +8001,22 @@ implicit none
       dim3name='nomcomplx',dim4name='levsoi1',long_name='dissolved organic matter micropore', &
       units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)      
+  endif  
 
+  if(flag=='read')then
+    datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)               
+    call restartvar(ncid, flag, varname='DOM_MicP_drib_vr', dim1name='column',dim2name='ndoms',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='dribbling flux for dissolved organic C micropore', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+      fill_value=spval)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MicP_drib_vr,datrc_4d)     
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DOM_MicP_drib_vr,datrc_4d)       
+    datpr4 => datrc_4d(1:ncols,1:trc_confs%NDOMS,1:jcplx,1:JZ+1)                   
+    call restartvar(ncid, flag, varname='DOM_MicP_drib_vr', dim1name='column',dim2name='ndoms',&
+      dim3name='nomcomplx',dim4name='levsoi1',long_name='dribbling flux for dissolved organic matter micropore', &
+      units='g d-2', interpinic_flag='skip', data=datpr4, missing_value=spval, &
+      fill_value=spval)      
   endif  
 
   if(flag=='read')then

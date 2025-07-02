@@ -12,6 +12,7 @@ module MicBGCAPI
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
   use abortutils,           only: endrun
+  use NumericalAuxMod
   use EcoSIMSolverPar  
   use TracerIDMod
   use SoilBGCDataType
@@ -328,6 +329,7 @@ implicit none
   DO K=1,KL
     DO idom=idom_beg,idom_end  
       micstt%DOM(idom,K) = AZMAX1(DOM_MicP_vr(idom,K,L,NY,NX))
+      micstt%DOM_MicP_drib(idom,K)=DOM_MicP_drib_vr(idom,K,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -381,7 +383,7 @@ implicit none
   type(Microbe_Diag_type), intent(in) :: nmicdiag
 
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutrophCmplx
-  integer :: NE,idom,K,idg,KL
+  integer :: NE,idom,K,idg,KL,NN
   
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
@@ -498,7 +500,9 @@ implicit none
   RH2PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH2PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
   RH1PO4UptkSoilAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH1PO4UptkSoilAutor(1:NumMicrobAutrophCmplx)
   RH1PO4UptkBandAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX) = micflx%RH1PO4UptkBandAutor(1:NumMicrobAutrophCmplx)
-  RO2UptkSoilM_vr(1:NPH,L,NY,NX)                          = micflx%RO2UptkSoilM(1:NPH)
+  DO NN=1,NPH
+    REcoUptkSoilO2M_vr(NN,L,NY,NX)                       = REcoUptkSoilO2M_vr(NN,L,NY,NX)+micflx%REcoUptkSoilO2M(NN)
+  ENDDO
 
   call nmicdiag%Summary(micpar%mid_Aerob_HeteroBacter,AeroBact_PrimeS_lim_vr(L,NY,NX))
   call nmicdiag%Summary(micpar%mid_Aerob_Fungi,AeroFung_PrimeS_lim_vr(L,NY,NX))
@@ -512,7 +516,8 @@ implicit none
     FracBulkSOMC_vr(K,L,NY,NX)    = micstt%FracBulkSOMC(K)
     RHydlySOCK_vr(K,L,NY,NX)      = micflx%RHydlySOCK(K)
     DO idom=idom_beg,idom_end
-      DOM_MicP_vr(idom,K,L,NY,NX) = AZERO1(micstt%DOM(idom,K),1.e-11_r8)
+      DOM_MicP_vr(idom,K,L,NY,NX)      = AZERO1(micstt%DOM(idom,K),1.e-11_r8)
+      DOM_MicP_drib_vr(idom,K,L,NY,NX) = micstt%DOM_MicP_drib(idom,K)
       SorbedOM_vr(idom,K,L,NY,NX) = AZERO1(micstt%SorbedOM(idom,K),1.e-11_r8)
       IF(DOM_MicP_vr(idom,K,L,NY,NX)<0._R8 .or. SorbedOM_vr(idom,K,L,NY,NX)<0._r8)then
         write(*,*)'micb',idom,K,L,DOM_MicP_vr(idom,K,L,NY,NX),SorbedOM_vr(idom,K,L,NY,NX)

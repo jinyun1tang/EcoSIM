@@ -622,6 +622,7 @@ module MicAutoCPLXMod
   real(r8) :: RRADO,RMPOX,ROXDFQ
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
+  real(r8) :: dribbling_flx
   real(r8) :: X,VOLOXM
   real(r8) :: VOLWPM
 
@@ -663,7 +664,7 @@ module MicAutoCPLXMod
     OXYG                  => micstt%OXYG,                  &
     OXYS                  => micstt%OXYS,                  &
     COXYG                 => micstt%COXYG,                 &
-    RO2UptkSoilM          => micflx%RO2UptkSoilM,          &
+    REcoUptkSoilO2M          => micflx%REcoUptkSoilO2M,          &
     RNH3OxidAutor         => micflx%RNH3OxidAutor,         &
     RNH3OxidAutorBand     => micflx%RNH3OxidAutorBand,     &
     RNO2OxidAutor         => micflx%RNO2OxidAutor,         &
@@ -693,6 +694,7 @@ module MicAutoCPLXMod
       !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
 !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
 !
+      dribbling_flx=0._r8
       DO  M=1,NPH
         !
         !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
@@ -708,7 +710,7 @@ module MicAutoCPLXMod
         !     O2GSolubility=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
         !     OXYG,COXYG=gaseous O2 amount, concentration
-        !     RMPOX,RO2UptkSoilM=O2 uptake
+        !     RMPOX,REcoUptkSoilO2M=O2 uptake
         !
         THETW1 = AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO  = ORAD*(FILM(M)+ORAD)/FILM(M)
@@ -731,7 +733,9 @@ module MicAutoCPLXMod
           ENDIF
 
           !apply the uptake flux
-          OXYS1=OXYS1-RMPOX
+          !apply the uptake
+          call SubstrateDribbling(RMPOX,dribbling_flx,OXYS1)
+
           !apply volatilization-dissolution
           IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN
             ROXDFQ=DiffusivitySolutEff(M)*(AMAX1(ZEROS,OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
@@ -743,7 +747,7 @@ module MicAutoCPLXMod
           OXYS1 = OXYS1+ROXDFQ
           !accumulate uptake flux
           RO2UptkAutor(NGL) = RO2UptkAutor(NGL)+RMPOX
-          RO2UptkSoilM(M)   = RO2UptkSoilM(M)+RMPOX
+          REcoUptkSoilO2M(M)   = REcoUptkSoilO2M(M)+RMPOX
         ENDDO
 
       ENDDO

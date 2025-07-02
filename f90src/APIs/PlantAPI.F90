@@ -52,7 +52,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: NB,NR,NZ,K,L,M,N,I1,NE,idg,ids
+  integer :: NB,NR,NZ,K,L,M,N,I1,NE,idg,ids,NN
 
   I1=I+1;if(I1>DazCurrYear)I1=1
   NumActivePlants_col(NY,NX)                              = plt_site%NumActivePlants
@@ -106,8 +106,9 @@ implicit none
         REcoDOMProd_vr(NE,K,L,NY,NX)=plt_bgcr%REcoDOMProd_vr(NE,K,L)
       ENDDO
     ENDDO
-    
-    RO2UptkSoilM_vr(1:NPH,L,NY,NX)=plt_rbgc%RO2UptkSoilM_vr(1:NPH,L)    
+    DO NN=1,NPH
+      REcoUptkSoilO2M_vr(NN,L,NY,NX)=REcoUptkSoilO2M_vr(NN,L,NY,NX)+plt_rbgc%REcoUptkSoilO2M_vr(NN,L)    
+    ENDDO
   ENDDO
 
   DO L=0,NL_col(NY,NX)
@@ -1389,7 +1390,7 @@ implicit none
 
   DO L=1,NK_col(NY,NX)
     DO M=1,NPH
-      plt_rbgc%RO2UptkSoilM_vr(M,L)           = RO2UptkSoilM_vr(M,L,NY,NX)
+      plt_rbgc%REcoUptkSoilO2M_vr(M,L)           = REcoUptkSoilO2M_vr(M,L,NY,NX)
       plt_soilchem%FracAirFilledSoilPoreM_vr(M,L) = FracAirFilledSoilPoreM_vr(M,L,NY,NX)
     ENDDO
   ENDDO

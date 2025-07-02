@@ -9,7 +9,9 @@ implicit none
   real(r8), parameter :: tiny_p=1.e-3_r8
   real(r8), parameter :: XFRS=0.05_r8                             !maximum fraction of total soil volume to act as macropore for exchange with micropore
   real(r8), Parameter :: VFLWX=0.5_r8                             !default outflow in water for micropore-macropore exchange
-
+  real(r8), allocatable :: errmass_fast(:,:,:)                    !fast transport mass error, [g d-2]
+  real(r8), allocatable :: errmass_slow(:,:,:)                    !slow transport mass error, [g d-2]
+  real(r8), allocatable :: trcs_Soil2plant_uptkdrb_vr(:,:,:,:)    !substrate dribble-corrected chemical uptake by plant roots, [g d-2]
   real(r8), allocatable :: trcg_AquaADV_Snow2Soil_flxM(:,:,:)     !gas advection flux from snow to top soil at iteration M [g d-2]
   real(r8), allocatable :: trcn_AquaADV_Snow2Band_flxM(:,:,:)     !nutrient advection flux from snow to top band soil at iteration M [g d-2]
   real(r8), allocatable :: trcn_AquaADV_Snow2Soil_flxM(:,:,:)     !nutrient advection flux from snow to top soil at iteration M [g d-2]
@@ -26,7 +28,6 @@ implicit none
   real(r8), allocatable :: GasDiff2Litr_flx_col(:,:,:)            !diffusive gas flux to litter [g d-2 h-1]
   real(r8), allocatable :: RGasAtmDisol2SoilM_col(:,:,:)          !Gas dissolution from atmosphere into soil at iteration M
   real(r8), allocatable :: RGasAtmDisol2LitrM_col(:,:,:)          !Gas dissolution from atmosphere into litter at iteration M
-
 
   real(r8), allocatable :: DOM_FloXSurRunoff_PotFlxM(:,:,:,:)      !Potential DOM flux through surface runoff at iteration M [g d-2]
   real(r8), allocatable :: RBGCSinkGasMM_vr(:,:,:,:)               !BGC sink for gaseous tracers at gas iteration MM
@@ -141,6 +142,9 @@ contains
   integer :: NumOfLitrCmplxs
 
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
+  allocate(errmass_slow(ids_beg:ids_end,JY,JX)); errmass_slow=0._r8
+  allocate(errmass_fast(idg_beg:idg_NH3,JY,JX)); errmass_fast=0._r8
+  allocate(trcs_Soil2plant_uptkdrb_vr(ids_beg:ids_end,JZ,JY,JX));trcs_Soil2plant_uptkdrb_vr=0._r8
   allocate(trcg_mass3_fast_col(idg_beg:idg_NH3,JY,JX)); trcg_mass3_fast_col=0._r8
   allocate(trcs_netflow2soil_slow_flx_col(ids_beg:ids_end,JY,JX)); trcs_netflow2soil_slow_flx_col=0._r8
   allocate(trcs_NetFlow2Litr_slow_flx_col(idg_beg:idg_NH3,JY,JX)); trcs_NetFlow2Litr_slow_flx_col=0._r8
@@ -280,6 +284,9 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(errmass_fast)
+  call destroy(errmass_slow)
+  call destroy(trcs_Soil2plant_uptkdrb_vr)
   call destroy(trcg_mass3_fast_col)
   call destroy(trcs_netflow2soil_slow_flx_col)
   call destroy(Gas_WetDepo2Snow_slow_flx_col)

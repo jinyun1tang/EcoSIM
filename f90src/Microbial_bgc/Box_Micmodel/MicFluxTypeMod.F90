@@ -64,7 +64,7 @@ implicit none
   real(r8), allocatable :: RNO2DmndReduxSoilHeter(:,:)
   real(r8), allocatable :: RNO2DmndReduxBandHeter(:,:)
   real(r8), allocatable :: RN2ODmndReduxHeter(:,:)
-  real(r8), allocatable :: RO2UptkSoilM(:)
+  real(r8), allocatable :: REcoUptkSoilO2M(:)
   real(r8), allocatable :: RNH4DmndSoilHeter(:,:)
   real(r8), allocatable :: RNH4DmndBandHeter(:,:)
   real(r8), allocatable :: RNO3DmndSoilHeter(:,:)
@@ -112,7 +112,7 @@ implicit none
   NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
 
   allocate(this%RHydlySOCK(1:jcplx)); this%RHydlySOCK=0._r8
-  allocate(this%RO2UptkSoilM(NPH));this%RO2UptkSoilM = spval
+  allocate(this%REcoUptkSoilO2M(NPH));this%REcoUptkSoilO2M = spval
   allocate(this%REcoDOMProd(idom_beg:idom_end,1:jcplx));this%REcoDOMProd=spval
   allocate(this%RO2DmndHetert(NumHetetr1MicCmplx,1:jcplx));this%RO2DmndHetert=spval
   allocate(this%RDOCUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RDOCUptkHeter=spval
@@ -161,7 +161,7 @@ implicit none
   integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
   this%TRDOE2DIE              = 0._r8
-  this%RO2UptkSoilM           = 0._r8
+  this%REcoUptkSoilO2M           = 0._r8
   this%REcoDOMProd            = 0._r8
   this%RO2DmndHetert          = 0._r8
   this%RDOCUptkHeter          = 0._r8
@@ -238,7 +238,7 @@ implicit none
   call destroy(this%RNO2DmndReduxSoilHeter)
   call destroy(this%RNO2DmndReduxBandHeter)
   call destroy(this%RN2ODmndReduxHeter)
-  call destroy(this%RO2UptkSoilM)
+  call destroy(this%REcoUptkSoilO2M)
   call destroy(this%RNH4DmndSoilHeter)
   call destroy(this%RNH4DmndBandHeter)
   call destroy(this%RNO3DmndSoilHeter)

@@ -7,7 +7,7 @@ module MicBGCMod
   use data_kind_mod,        only: r8 => DAT_KIND_R8
   use abortutils,           only: endrun,   destroy
   use EcoSIMCtrlMod,        only: etimer
-  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux,SubstrateLimit
+  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
@@ -19,7 +19,6 @@ module MicBGCMod
   use EcoSIMSolverPar
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod
   use MicrobMathFuncMod
   implicit none
 
@@ -1703,6 +1702,7 @@ module MicBGCMod
     SolidOMAct                       => micstt%SolidOMAct,                      &
     SOMPomProtein                    => micstt%SOMPomProtein,                   &
     DOM                              => micstt%DOM,                             &
+    DOM_MicP_drib                    => micstt%DOM_MicP_drib ,                  &
     OMBioResdu                       => micstt%OMBioResdu,                      &
     SorbedOM                         => micstt%SorbedOM,                        &
     ZEROS                            => micfor%ZEROS,                           &
@@ -1820,13 +1820,13 @@ module MicBGCMod
     !     RMetabDOCUptkHeter,RMetabAcetUptkHeter,DOMuptk4GrothHeter,DOMuptk4GrothHeter=DOC,acetate,DON,DOP uptake
     !     RAcettProdHeter=acetate production from fermentation
     
-    call SubstrateLimit(N1,N2,RMetabDOCUptkHeter(N1:N2,K),DOM(idom_doc,K),scal)
+    call SubstrateDribbling(n1,n2,RMetabDOCUptkHeter(N1:N2,K),DOM_MicP_drib(idom_doc,K),DOM(idom_doc,K))
 
-    call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmn,N1:N2,K),DOM(idom_don,K),scal)
+    call SubstrateDribbling(n1,n2,DOMuptk4GrothHeter(ielmn,N1:N2,K),DOM_MicP_drib(idom_don,K),DOM(idom_don,K))
 
-    call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmp,N1:N2,K),DOM(idom_dop,K),scal)
+    call SubstrateDribbling(n1,n2,DOMuptk4GrothHeter(ielmp,N1:N2,K),DOM_MicP_drib(idom_dop,K),DOM(idom_dop,K))
 
-    call SubstrateLimit(N1,N2,RMetabAcetUptkHeter(N1:N2,K),DOM(idom_acetate,K),scal)
+    call SubstrateDribbling(n1,n2,RMetabAcetUptkHeter(N1:N2,K),DOM_MicP_drib(idom_acetate,K),DOM(idom_acetate,K))
 !   
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
@@ -3299,15 +3299,15 @@ module MicBGCMod
   real(r8) :: B,C,O2AquaDiffusvity1
   real(r8) :: OXYG1,OXYS1
   real(r8) :: RUPMAX
-  real(r8) :: ROXYFX !dissolution flux
-  real(r8) :: ROXYLX
+  real(r8) :: ROXYFX       !gas dissolution flux
+  real(r8) :: ROXYLX       !aqueous flux transport flux
   real(r8) :: RRADO,RMPOX
   real(r8) :: ROXDFQ  !gas dissolution 
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
   real(r8) :: X
   real(r8) :: VOLWPM,VOLOXM
-  real(r8) :: dsignO2
+  real(r8) :: dsignO2,dribbling_flx
   ! begin_execution
   associate(                                                 &
     OxyLimterHeter         => nmics%OxyLimterHeter,          &
@@ -3350,7 +3350,7 @@ module MicBGCMod
     COXYG                  => micstt%COXYG,                  &
     RNO2DmndReduxSoilHeter => micflx%RNO2DmndReduxSoilHeter, &
     RNO2DmndReduxBandHeter => micflx%RNO2DmndReduxBandHeter, &
-    RO2UptkSoilM           => micflx%RO2UptkSoilM            &
+    REcoUptkSoilO2M           => micflx%REcoUptkSoilO2M            &
   )
 
   IF(RO2DmndHeter(NGL,K).GT.ZEROS .AND. FOXYX.GT.ZERO)THEN
@@ -3379,6 +3379,7 @@ module MicBGCMod
       !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
 !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
 !
+      dribbling_flx=0._r8
       D420: DO M=1,NPH
         !
         !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
@@ -3394,7 +3395,7 @@ module MicBGCMod
         !     O2GSolubility=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
         !     OXYG,COXYG=gaseous O2 amount, concentration
-        !     RMPOX,RO2UptkSoilM=O2 uptake
+        !     RMPOX,REcoUptkSoilO2M=O2 uptake
         !
         THETW1 = AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO  = ORAD*(FILM(M)+ORAD)/FILM(M)
@@ -3417,7 +3418,7 @@ module MicBGCMod
           endif  
   
           !apply the uptake
-          call fixEXConsumpFlux(OXYS1,RMPOX)
+          call SubstrateDribbling(RMPOX,dribbling_flx,OXYS1)
 
           !apply dissolution-volatilization
           IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN
@@ -3430,7 +3431,7 @@ module MicBGCMod
           OXYS1 = OXYS1+ROXDFQ
           !accumulate upatke
           RO2UptkHeter(NGL,K) = RO2UptkHeter(NGL,K)+RMPOX
-          RO2UptkSoilM(M)     = RO2UptkSoilM(M)+RMPOX
+          REcoUptkSoilO2M(M)     = REcoUptkSoilO2M(M)+RMPOX
         ENDDO D425
         
       ENDDO D420

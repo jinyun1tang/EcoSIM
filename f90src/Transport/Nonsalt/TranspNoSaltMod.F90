@@ -70,6 +70,8 @@ module TranspNoSaltMod
     DO  NY=NVN,NVS
 
       trcs_mass_beg(:,NY,NX)=0._r8
+      errmass_fast(:,NY,NX)=0._r8
+      errmass_slow(:,NY,NX)=0._r8
       DO idg=idg_beg,idg_NH3
 
         trcs_mass_litr(idg,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
@@ -159,7 +161,7 @@ module TranspNoSaltMod
             else
               write(121,*)(I*1000+J)*10,trcs_names(idg),'total'
             endif
-            write(121,*)'errmass',errmass, 'NY NX=',NY,NX
+            write(121,*)'errmass total, fast, slow',errmass, errmass_fast(idg,NY,NX),errmass_slow(idg,NY,NX),'NY NX=',NY,NX
             write(121,*)'mass beg, end, delta',trcs_mass_beg(idg,NY,NX),trcs_mass_now(idg),delta_mass
             write(121,*)'beg sno,litr,soil',trcs_mass_snow(idg,NY,NX),trcs_mass_litr(idg,NY,NX),trcs_mass_soil(idg,NY,NX)
             write(121,*)'mass sno,litr,soil',mass_snow,mass_litr,mass_soil
@@ -340,7 +342,7 @@ module TranspNoSaltMod
       PARGas_CefMM(idg_H2,NY,NX)  = PARGM*2.08_r8
       PARGas_CefMM(idg_AR,NY,NX)  = PARGM*0.72_r8
 
-      RBGCSinkGasMM_vr(idg_O2,0,NY,NX) = RO2UptkSoilM_vr(M,0,NY,NX)*dt_GasCyc
+!      RBGCSinkGasMM_vr(idg_O2,0,NY,NX) = REcoUptkSoilO2M_vr(M,0,NY,NX)*dt_GasCyc
       VLWatMicPXA_vr(0,NY,NX)          = natomw*VLWatMicPM_vr(M,0,NY,NX)
 
       L=NU_col(NY,NX)
@@ -353,7 +355,7 @@ module TranspNoSaltMod
       VLWatMicPXB_vr(L,NY,NX)          = natomw*VLWatMicPMB_vr(L,NY,NX)
       VLsoiAirPMA_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
       VLsoiAirPMB_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-      RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
+!      RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = REcoUptkSoilO2M_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
 
       DO L=NU_col(NY,NX)+1,NL_col(NY,NX)
         tScalReductVLsoiAirPMM_vr(L,NY,NX) = ReductVLsoiAirPM_vr(M,L,NY,NX)*dt_GasCyc
@@ -368,7 +370,7 @@ module TranspNoSaltMod
 
         VLsoiAirPMA_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
         VLsoiAirPMB_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-        RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = RO2UptkSoilM_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
+!        RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = REcoUptkSoilO2M_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
       ENDDO
     ENDDO
   ENDDO
