@@ -23,6 +23,7 @@ implicit none
   logical :: fixWaterLevel     =.false.
   logical :: ldo_sp_mode        =.false.   !do satellite phenology mode
   logical :: ldo_radiation_test =.false.   !flag to turn on radiation test for prescribed phenolgoy 
+  logical :: ldo_transpt_bubbling=.true.   !flag to turn on/off ebullition during transport
   integer :: yearf1       !first year of daily climate forcing
   integer :: yearf2       !first year of hourly climate forcing
   integer :: nyeardal1    !number of daily climate forcing

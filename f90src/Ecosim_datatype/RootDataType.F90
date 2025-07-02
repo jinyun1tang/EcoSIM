@@ -18,7 +18,7 @@ module RootDataType
   real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
   real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
   real(r8),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
-  real(r8),target,allocatable ::  RootFracRemobilizableBiom(:,:,:)               !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8),target,allocatable ::  RootFracRemobilizableBiom_pft(:,:,:)               !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                   !root volume:mass ratio, [m3 g-1]
   real(r8),target,allocatable ::  Root1stMaxRadius1_pft(:,:,:,:)                 !root diameter primary axes, [m]
   real(r8),target,allocatable ::  Root2ndMaxRadius1_pft(:,:,:,:)                 !root diameter secondary axes, [m]
@@ -89,6 +89,11 @@ module RootDataType
   real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                !root layer protein C concentration, [g g-1]
   real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)                         !root chemical element mass in soil layer, [g d-2]
   real(r8),target,allocatable :: RootGasConductance_pvr(:,:,:,:,:,:)             !Root Conductance for gas uptake, [m3 d-2 h-1]
+  real(r8),target,allocatable :: Nutruptk_fClim_rpvr(:,:,:,:,:)                  !Carbon limitation for root nutrient uptake,(0->1),stronger limitation, [-]
+  real(r8),target,allocatable :: Nutruptk_fNlim_rpvr(:,:,:,:,:)                  !Nitrogen limitation for root nutrient uptake,(0->1),stronger limitation, [-]
+  real(r8),target,allocatable :: Nutruptk_fPlim_rpvr(:,:,:,:,:)                  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
+  real(r8),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-] 
+
 !----------------------------------------------------------------------
 
 contains
@@ -97,6 +102,10 @@ contains
   implicit none
   integer, intent(in) :: jroots
 
+  allocate(Nutruptk_fClim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fClim_rpvr=0._r8
+  allocate(Nutruptk_fNlim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fNlim_rpvr=0._r8
+  allocate(Nutruptk_fPlim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fPlim_rpvr=0._r8
+  allocate(Nutruptk_fProtC_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fProtC_rpvr=0._r8
   allocate(RootMassElm_vr(NumPlantChemElms,JZ,JY,JX)); RootMassElm_vr =0._r8
   allocate(NumRootAxes_pft(JP,JY,JX));      NumRootAxes_pft=0
   allocate(NIXBotRootLayer_rpft(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_rpft=1  !set to one to avoid numerical failure
@@ -106,7 +115,7 @@ contains
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._r8
   allocate(RootBiomGrosYld_pft(JP,JY,JX));     RootBiomGrosYld_pft=0._r8
   allocate(MinNonstC2InitRoot_pft(JP,JY,JX));       MinNonstC2InitRoot_pft=0._r8
-  allocate(RootFracRemobilizableBiom(JP,JY,JX));    RootFracRemobilizableBiom=0._r8
+  allocate(RootFracRemobilizableBiom_pft(JP,JY,JX));    RootFracRemobilizableBiom_pft=0._r8
   allocate(RootVolPerMassC_pft(jroots,JP,JY,JX));   RootVolPerMassC_pft=0._r8
   allocate(Root1stMaxRadius1_pft(jroots,JP,JY,JX)); Root1stMaxRadius1_pft=0._r8
   allocate(Root2ndMaxRadius1_pft(jroots,JP,JY,JX)); Root2ndMaxRadius1_pft=0._r8
@@ -193,7 +202,7 @@ contains
   call destroy(RootElmsbeg_pft)
   call destroy(RootBiomGrosYld_pft)
   call destroy(MinNonstC2InitRoot_pft)
-  call destroy(RootFracRemobilizableBiom)
+  call destroy(RootFracRemobilizableBiom_pft)
   call destroy(RootVolPerMassC_pft)
   call destroy(Root1stMaxRadius1_pft)
   call destroy(Root2ndMaxRadius1_pft)
@@ -262,6 +271,12 @@ contains
   call destroy(RootNonstructElmConc_rpvr)
   call destroy(RootMyco1stElm_raxs)
   call destroy(RootProteinConc_rpvr)
+
+  call destroy(Nutruptk_fClim_rpvr)
+  call destroy(Nutruptk_fNlim_rpvr)
+  call destroy(Nutruptk_fPlim_rpvr)
+  call destroy(Nutruptk_fProtC_rpvr)
+
   end subroutine DestructRootData
 
 end module RootDataType

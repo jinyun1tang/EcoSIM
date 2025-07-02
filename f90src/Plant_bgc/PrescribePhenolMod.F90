@@ -116,7 +116,7 @@ implicit none
   end function TreeStem_diameter_taperEq
 !------------------------------------------------------------------------
 
-  subroutine SetCanopyProfile(I,J,LeafAreaZsec_pft,StemAreaZsec_pft)
+  subroutine SetCanopyProfile(I,J,LeafAreaZsec_lpft,StemAreaZsec_lpft)
   !
   !Description:
   !distribute leaf area and stem area within the crown defined by top and bottom heights.
@@ -124,38 +124,44 @@ implicit none
   !
   implicit none
   integer , intent(in) :: I,J
-  real(r8),intent(out) :: LeafAreaZsec_pft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)    !leaf area in different zenith sectors
-  real(r8),intent(out) :: StemAreaZsec_pft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)    !stem area in different zenith sectors
+  real(r8),intent(out) :: LeafAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)     !leaf area in different zenith sectors in different canopy layers
+  real(r8),intent(out) :: StemAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)     !stem area in different zenith sectors in different canopy layers
   real(r8) :: dangle
-  integer  :: N,L,NZ
+  integer  :: N,L,NZ,NB
 
   associate(                                                 &
-    CanopyStemAreaZ_pft => plt_morph%CanopyStemAreaZ_pft    ,& !input  :plant canopy layer stem area, [m2 d-2]
-    CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft    ,& !inoput :total leaf area, [m2 d-2]
+    CanopyStemAreaZ_pft   => plt_morph%CanopyStemAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
+    CanopyLeafAreaZ_pft   => plt_morph%CanopyLeafAreaZ_pft  ,& !inoput :total leaf area, [m2 d-2]
     LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft    ,& !inoput :plant leaf+stem/stalk area, [m2 d-2]
     LeafStalkArea_col     => plt_morph%LeafStalkArea_col    ,& !inoput :stalk area of combined, each PFT canopy,[m^2 d-2]
     StemArea_col          => plt_morph%StemArea_col         ,& !input  :grid canopy stem area, [m2 d-2]
+    LeafAngleClass_pft    => plt_morph%LeafAngleClass_pft   ,& !input  :fractionction of leaves in different angle classes, [-]    
     CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col   ,& !input  :grid canopy leaf area, [m2 d-2]
-    NP                  => plt_site%NP                       & !input  :current number of plant species,[-]
+    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]    
+    NP                    => plt_site%NP                     & !input  :current number of plant species,[-]
   )
 
   
-  StemAreaZsec_pft  = 0._r8
-  LeafAreaZsec_pft  = 0._r8
+  StemAreaZsec_lpft  = 0._r8
+  LeafAreaZsec_lpft  = 0._r8
   dangle            = PICON2h/real(NumLeafZenithSectors1,r8)         !the angle section width
   LeafStalkArea_col = StemArea_col+CanopyLeafArea_col
   DO NZ=1,NP
     LeafStalkArea_pft(NZ)=0._r8
+    NB=1    
     DO L=1,NumCanopyLayers1
-      N=1
-      LeafAreaZsec_pft(N,L,NZ)=sin(dangle)*CanopyLeafAreaZ_pft(L,NZ)            
-      LeafAreaZsec_pft(N,L,NZ)=(1._r8-sin(PICON2h-dangle))*CanopyLeafAreaZ_pft(L,NZ)
-      DO N=2,NumLeafZenithSectors1
-        LeafAreaZsec_pft(N,L,NZ)=(sin(dangle*N)-sin(dangle*(N-1)))*CanopyLeafAreaZ_pft(L,NZ)        
+      DO N=1,NumLeafZenithSectors1
+        LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)        
       ENDDO      
-      StemAreaZsec_pft(1:NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)      
-      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemAreaZ_pft(L,NZ)            
+      StemAreaZsec_lpft(1:NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)      
+      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemAreaZ_pft(L,NZ)         
+
+      !Assuming uniform azimuth desitribution for leaves  
+      DO N=1,NumLeafZenithSectors1
+        LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsec_lpft(N,L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
+      ENDDO  
     ENDDO
+
   ENDDO
   
   end associate

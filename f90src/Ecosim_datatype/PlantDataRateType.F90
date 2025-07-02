@@ -135,6 +135,7 @@ module PlantDataRateType
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots
+
   call InitAllocate(NumOfPlantLitrCmplxs,jroots)
 
   end subroutine InitPlantRates

@@ -41,14 +41,15 @@ module EcoSIMDesctruct
   use SedimentDataType    , only : DestructSedimentData
   use SoilWaterDataType   , only : DestructSoilWater
   use PlantAPIData        , only : DestructPlantAPIData
-  use PlantMgmtDataType  , only : DestructPlantMngmtData
+  use PlantMgmtDataType   , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
-  use TranspNoSaltMod           , only : DestructTranspNoSalt
+  use TranspNoSaltMod     , only : DestructTranspNoSalt
   use SnowPhysData        , only : DestructSnowPhysData
   use HydroThermData      , only : DestructHydroThermData
   use BalanceCheckDataType, only : DestructBalanceCheckData
   use PerturbationMod     , only : destructSoilWarming
   use TracerIDMod         , only : CleanUpTracerIDs
+  use NumericalAuxMod     , only : DestructNumericAux
   implicit none
 
   call DestructMicrobialData
@@ -123,6 +124,8 @@ module EcoSIMDesctruct
   call DestructBalanceCheckData
 
   call destructSoilWarming()
+
+  call DestructNumericAux()
 
   call CleanUpTracerIDs
   end subroutine DestructEcoSIM

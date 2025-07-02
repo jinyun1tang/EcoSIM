@@ -70,7 +70,7 @@
   !     CANOPY CO2 CONCENTRATION FROM CO2 INFLUXES AND EFFLUXES 
   !
   !     CanopyGasCO2_pft,CO2E=CO2 concentrations in canopy air,atmosphere, umol mol-1 (ppmv)
-  !     NetCO2Flx2Canopy_col=net CO2 flux in canopy air from soil,plants, g d-2 h-1
+  !     NetCO2Flx2Canopy_col=net CO2 flux in canopy air from soil,plants, g d-2 h-1, set to zero for prescribed phenolgoy
   !     assuming steady state, canopy CO2 concentration is computed with mass balance. 
   !     how 8.33E+04 is determined. 
   CanopyGasCO2_pft(NZ) = CO2E-8.33E+04_r8*NetCO2Flx2Canopy_col*CanopyBndlResist_pft4CO2/AirConc_pft(NZ)
@@ -193,7 +193,11 @@
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(inout) :: CH2O
-  real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,ProteinPerLeafArea,Km4RubOxy
+  real(r8), intent(in) :: TFN_Carboxy  !temperature sensitivity of carboyxlase
+  real(r8), intent(in) :: TFN_Oxy      !temperature sensitivity of oxygenase
+  real(r8), intent(in) :: TFN_eTransp  !temperature sensitivity of electron transport
+  real(r8), intent(in) :: ProteinPerLeafArea
+  real(r8), intent(in) :: Km4RubOxy
   integer :: L
   real(r8) :: MesophyllChlDensity,MesophyllRubiscoSurfDensity
   real(r8) :: VOGRO
@@ -280,10 +284,16 @@
 !----------------------------------------------------------------------------------------------------
   subroutine C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy,ProteinPerLeafArea)
   implicit none
-  integer, intent(in) :: I,J,K,NB,NZ
+  integer, intent(in) :: I,J
+  integer, intent(in) :: K       !leaf node id
+  integer, intent(in) :: NB      !branch id
+  integer, intent(in) :: NZ      !pft id
   real(r8), intent(inout) :: CH2O
-  real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy
-  real(r8), intent(in) :: TFN_eTransp,Km4RubOxy,ProteinPerLeafArea
+  real(r8), intent(in) :: TFN_Carboxy
+  real(r8), intent(in) :: TFN_Oxy
+  real(r8), intent(in) :: TFN_eTransp
+  real(r8), intent(in) :: Km4RubOxy
+  real(r8), intent(in) :: ProteinPerLeafArea
   integer :: L
   real(r8) :: CC4M
   real(r8) :: CCBS,MesophyllChlDensity
@@ -437,10 +447,15 @@
 !----------------------------------------------------------------------------------------------------
   subroutine C4PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
   implicit none
-  integer, intent(in) :: I,J,L,K,NB,NZ
+  integer, intent(in) :: I,J
+  integer, intent(in) :: L      !canopy layer id
+  integer, intent(in) :: K      !leaf node id
+  integer, intent(in) :: NB     !branch id
+  integer, intent(in) :: NZ     !pft id
   real(r8), intent(inout) :: CH2O
   integer :: M,N,LP
-  real(r8) :: PAR_zsec,TAU_rad
+  real(r8) :: PAR_zsec   !photosynthetically active radiation
+  real(r8) :: TAU_rad    !PAR transmisivity
 !     begin_execution
   associate(                                              &
     LeafAUnshaded_zsec  => plt_photo%LeafAUnshaded_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
@@ -525,10 +540,13 @@
   subroutine LiveBranchPhotosynthesis(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   implicit none
   integer, intent(in):: I,J,NB,NZ
-  real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy  
+  real(r8), intent(in) :: TFN_Carboxy
+  real(r8), intent(in) :: TFN_Oxy
+  real(r8), intent(in) :: TFN_eTransp
+  real(r8), intent(in) :: Km4RubOxy  
   real(r8),intent(inout) :: CH2O
-  integer :: K
-  real(r8) :: ProteinPerLeafArea   !protein area density, gC/m2 LA
+  integer :: K  !leaf node id
+  real(r8) :: ProteinPerLeafArea   !protein area density, [gC protein m-2 LA]
 !     begin_execution
   associate(                                                         &
     iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType  ,& !input  :plant photosynthetic type (C3 or C4),[-]
@@ -541,8 +559,7 @@
     Vmax4RubiscoCarboxy_pft  => plt_photo%Vmax4RubiscoCarboxy_pft    & !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
   )
   DO K=1,MaxNodesPerBranch1
-    IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ)&
-      .AND.LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       ProteinPerLeafArea=LeafProteinCNode_brch(K,NB,NZ)/LeafNodeArea_brch(K,NB,NZ)
     ELSE
       ProteinPerLeafArea=0.0_r8
@@ -572,7 +589,10 @@
   subroutine PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)
   implicit none
   integer , intent(in) :: I,J,NB,NZ
-  real(r8), intent(in) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
+  real(r8), intent(in) :: TFN_Carboxy
+  real(r8), intent(in) :: TFN_Oxy
+  real(r8), intent(in) :: TFN_eTransp
+  real(r8), intent(in) :: Km4RubOxy
   real(r8), intent(inout) :: CH2O  
   integer :: NE
   real(r8) :: CNS,CPS
@@ -653,7 +673,10 @@
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(out) :: CH2O
-  real(r8), intent(out) :: TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy
+  real(r8), intent(out) :: TFN_Carboxy
+  real(r8), intent(out) :: TFN_Oxy
+  real(r8), intent(out) :: TFN_eTransp
+  real(r8), intent(out) :: Km4RubOxy
   real(r8) :: ACTV,RTK
   real(r8) :: STK,TCCZ
   real(r8) :: TKCO
@@ -768,8 +791,8 @@
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 !
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
-      .OR.Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
-      .OR.Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
+      .OR. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
+      .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
       !there are photosynthetically active leaves 
       if(lverb)write(*,*)'PhenoActiveBranch'
       call PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxy,TFN_eTransp,Km4RubOxy)

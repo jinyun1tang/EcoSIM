@@ -261,7 +261,7 @@ module UptakesMod
 !     TdegCCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
     ARLSC   = ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     RadNet2Canopy_pft(NZ)                                = 0.0_r8
-    plt_ew%EvapTransLHeat_pft(NZ)                         = 0.0_r8
+    plt_ew%EvapTransLHeat_pft(NZ)                        = 0.0_r8
     plt_ew%HeatXAir2PCan_pft(NZ)                         = 0.0_r8
     plt_ew%HeatStorCanopy_pft(NZ)                        = 0.0_r8
     LWRadCanopy_pft(NZ)                                  = 0.0_r8
@@ -278,8 +278,8 @@ module UptakesMod
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,Myco_pft(NZ)
-        plt_ew%AllPlantRootH2OLoss_pvr(N,L,NZ)                     = 0.0_r8
-        plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                          = 0.0_r8
+        plt_ew%AllPlantRootH2OLoss_pvr(N,L,NZ)                    = 0.0_r8
+        plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                        = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
         plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8
         plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)    = 0.0_r8
@@ -300,6 +300,7 @@ module UptakesMod
       WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)
       AirMicPore4Fill_vr(L) = 0.0_r8
     ENDIF
+
     AllRootC_vr(L)=0.0_r8
     D9005: DO NZ=1,NP
       DO  N=1,Myco_pft(NZ)
@@ -512,8 +513,8 @@ module UptakesMod
           ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
         RootArea2RadiusRatio_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ)
       ELSE
-        FineRootRadius_rvr(N,L)   = Root2ndMaxRadius_pft(N,NZ)
-        PathLen_pvr(N,L)          = 1.001_r8*FineRootRadius_rvr(N,L)
+        FineRootRadius_rvr(N,L)      = Root2ndMaxRadius_pft(N,NZ)
+        PathLen_pvr(N,L)             = 1.001_r8*FineRootRadius_rvr(N,L)
         RootArea2RadiusRatio_vr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
       ENDIF
     enddo

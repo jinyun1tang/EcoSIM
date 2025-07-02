@@ -1,9 +1,10 @@
 
   module DayMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcosimConst
   use minimathmod  , only : isLeap,AZMAX1
   use MiniFuncMod  , only : GetDayLength
+  use CanopyRadDataType
+  use EcosimConst  
   use EcoSIMCtrlMod
   use GridConsts
   use SoilPhysDataType
@@ -112,6 +113,7 @@
         tlai_mon_pft(:,NZ,NY,NX)       = LAI
         tsai_mon_pft(:,NZ,NY,NX)       = SAI
         height_top_mon_pft(:,NZ,NY,NX) = 17._r8
+        LeafAngleClass_pft(:,NZ,NY,NX) = 1./real(NumLeafZenithSectors,kind=r8)
       ENDDO
     ENDDO
   ENDDO    

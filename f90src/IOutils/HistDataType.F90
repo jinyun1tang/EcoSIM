@@ -354,7 +354,7 @@ implicit none
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)      
   real(r8),pointer    :: h1D_Growth_Stage_ptc(:) 
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:) 
-  real(r8),pointer   :: h2D_RUB_ACTVN_ptc(:,:)    
+  real(r8),pointer   :: h1D_RUB_ACTVN_ptc(:)    
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)      
   real(r8),pointer   :: h2D_Gas_Pressure_vr(:,:)
   real(r8),pointer   :: h2D_CO2_Gas_ppmv_vr(:,:)
@@ -493,6 +493,11 @@ implicit none
   real(r8),pointer   :: h2D_prtUP_NO3_pvr(:,:)  
   real(r8),pointer   :: h2D_prtUP_PO4_pvr(:,:)                                                  
   real(r8),pointer   :: h2D_DNS_RT_pvr(:,:)   
+  real(r8),pointer   :: h2D_RootNutupk_fClim_pvr(:,:)
+  real(r8),pointer   :: h2D_RootNutupk_fNlim_pvr(:,:)
+  real(r8),pointer   :: h2D_RootNutupk_fPlim_pvr(:,:)
+  real(r8),pointer   :: h2D_RootNutupk_fProtC_pvr(:,:)
+
   contains
     procedure, public :: Init  => init_hist_data
     procedure, public :: hist_update
@@ -808,10 +813,14 @@ implicit none
   allocate(this%h2D_litrP_vr(beg_col:end_col,1:JZ))   ;this%h2D_litrP_vr(:,:)=spval
   allocate(this%h2D_VHeatCap_vr(beg_col:end_col,1:JZ));this%h2D_VHeatCap_vr(:,:)=spval
   allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
-  allocate(this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches));  this%h2D_RUB_ACTVN_ptc(:,:)=spval
+  allocate(this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc));  this%h1D_RUB_ACTVN_ptc(:)=spval
   allocate(this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ))    ;this%h2D_RNITRIF_vr(:,:)=spval
   allocate(this%h2D_Aqua_CO2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_CO2_vr(:,:)=spval
   allocate(this%h2D_Root_CO2_vr(beg_col:end_col,1:JZ))  ; this%h2D_Root_CO2_vr(:,:)=spval
+  allocate(this%h2D_RootNutupk_fClim_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fClim_pvr=spval
+  allocate(this%h2D_RootNutupk_fNlim_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fNlim_pvr=spval
+  allocate(this%h2D_RootNutupk_fPlim_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fPlim_pvr=spval
+  allocate(this%h2D_RootNutupk_fProtC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fProtC_pvr=spval
   allocate(this%h2D_O2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_O2_rootconduct_pvr(:,:)=spval
   allocate(this%h2D_CO2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_CO2_rootconduct_pvr(:,:)=spval
   allocate(this%h2D_Aqua_CH4_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_CH4_vr(:,:)=spval
@@ -2295,9 +2304,9 @@ implicit none
   call hist_addfld2d(fname='LEAF_NODE_NO_pft',units='none',type2d='nbranches',avgflag='I',&
     long_name='Leaf number',ptr_patch=data2d_ptr,default='inactive')       
 
-  data2d_ptr => this%h2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:MaxNumBranches)      !RubiscoActivity_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
-  call hist_addfld2d(fname='RUB_ACTVN_pft',units='none',type2d='nbranches',avgflag='A',&
-    long_name='branch rubisco activity for CO2 fixation, 0-1',ptr_patch=data2d_ptr,default='inactive')       
+  data1d_ptr => this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='RUB_ACTVN_pft',units='none',avgflag='A',&
+    long_name='mean rubisco activity for CO2 fixation across branches, 0-1',ptr_patch=data1d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RNITRIF_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
@@ -2903,6 +2912,22 @@ implicit none
   call hist_addfld2d(fname='RootLDS_pvr',units='m/m3',type2d='levsoi',avgflag='A',&
     long_name='Root layer length density',ptr_patch=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_RootNutupk_fClim_pvr(beg_ptc:end_ptc,1:JZ)       
+  call hist_addfld2d(fname='RootNutUptk_fClim_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='C-availability for root nutrient uptake limitation, 0->1 stronger limitation',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootNutupk_fNlim_pvr(beg_ptc:end_ptc,1:JZ)       
+  call hist_addfld2d(fname='RootNutUptk_fNlim_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='N-limitation for root nutrient uptake limitation, 0->1 stronger limitation',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootNutupk_fPlim_pvr(beg_ptc:end_ptc,1:JZ)       
+  call hist_addfld2d(fname='RootNutUptk_fPlim_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='P-limitation for root nutrient uptake limitation, 0->1 stronger limitation',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootNutupk_fProtC_pvr(beg_ptc:end_ptc,1:JZ)       
+  call hist_addfld2d(fname='RootNutUptk_fProtC_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Protein-limitation for root nutrient uptake capacity, 0->1 weaker limitation',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_fTRootGro_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='RootGRO_TEMP_FN_pvr',units='none',type2d='levsoi',avgflag='A',&
     long_name='Root growth temperature dependence function',ptr_patch=data2d_ptr,default='inactive')       
@@ -2932,7 +2957,7 @@ implicit none
   integer, intent(in) :: I,J
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
-  integer :: L,NZ,NY,NX,KN,NB,NR
+  integer :: L,NZ,NY,NX,KN,NB,NR,NB1
   real(r8) :: micBE(1:NumPlantChemElms)
   real(r8) :: DOM(idom_beg:idom_end)
   real(r8),parameter :: secs1hour=3600._r8
@@ -3502,18 +3527,26 @@ implicit none
               endif  
             ENDIF  
           ENDDO
-
-          DO NB=1,MainBranchNum_pft(NZ,NY,NX)
-            this%h2D_LEAF_NODE_NO_ptc(nptc,NB)                 = NumOfLeaves_brch(NB,NZ,NY,NX)
-            this%h2D_RUB_ACTVN_ptc(nptc,NB)                    = RubiscoActivity_brch(NB,NZ,NY,NX)
+          this%h1D_RUB_ACTVN_ptc(nptc)=0._r8; NB1=0
+          DO NB=1,NumOfBranches_pft(NZ,NY,NX)
+            this%h2D_LEAF_NODE_NO_ptc(nptc,NB)              = NumOfLeaves_brch(NB,NZ,NY,NX)
+            if(RubiscoActivity_brch(NB,NZ,NY,NX)>0._r8)then
+              NB1=NB1+1
+              this%h1D_RUB_ACTVN_ptc(nptc)   = this%h1D_RUB_ACTVN_ptc(nptc)+ RubiscoActivity_brch(NB,NZ,NY,NX)
+            endif
             this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,NB) = PARTS_brch(1:NumOfPlantMorphUnits,NB,NZ,NY,NX)
           ENDDO
+          if(NB1>0)this%h1D_RUB_ACTVN_ptc(nptc)=this%h1D_RUB_ACTVN_ptc(nptc)/real(NB1,kind=r8)
         endif
         DO L=1,NumCanopyLayers
           this%h2D_CanopyLAIZ_plyr(nptc,L)=CanopyLeafAreaZ_pft(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         ENDDO  
 
         DO L=1,JZ
+          this%h2D_RootNutupk_fClim_pvr(nptc,L) = Nutruptk_fClim_rpvr(ipltroot,L,NZ,NY,NX)                      
+          this%h2D_RootNutupk_fNlim_pvr(nptc,L) = Nutruptk_fNlim_rpvr(ipltroot,L,NZ,NY,NX)                      
+          this%h2D_RootNutupk_fPlim_pvr(nptc,L) = Nutruptk_fPlim_rpvr(ipltroot,L,NZ,NY,NX)                      
+          this%h2D_RootNutupk_fProtC_pvr(nptc,L)= Nutruptk_fProtC_rpvr(ipltroot,L,NZ,NY,NX)                     
           this%h2D_O2_rootconduct_pvr(nptc,L)    = RootGasConductance_pvr(idg_O2,ipltroot,L,NZ,NY,NX)
           this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootGasConductance_pvr(idg_CO2,ipltroot,L,NZ,NY,NX)
           this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)

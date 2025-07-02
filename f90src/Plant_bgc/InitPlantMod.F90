@@ -53,7 +53,7 @@ module InitPlantMod
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
 !     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios
-!     RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
+!     RootFracRemobilizableBiom_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
@@ -129,7 +129,7 @@ module InitPlantMod
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !output :maximum stomatal resistance to vapor, [s h-1]
     O2I_pft                   => plt_photo%O2I_pft                    ,& !output :leaf gaseous O2 concentration, [umol m-3]
     PPX_pft                   => plt_site%PPX_pft                     ,& !output :plant population, [plants m-2]
-    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom  ,& !output :fraction of remobilizable nonstructural biomass in root, [-]
+    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !output :fraction of remobilizable nonstructural biomass in root, [-]
     iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft       ,& !output :day of harvest,[-]
     iDayPlanting_pft          => plt_distb%iDayPlanting_pft           ,& !output :day of planting,[-]
     iYearPlantHarvest_pft     => plt_distb%iYearPlantHarvest_pft      ,& !output :year of harvest,[-]
@@ -143,12 +143,11 @@ module InitPlantMod
   PPX_pft(NZ)               = PPI_pft(NZ)
   ClumpFactor_pft(NZ)       = ClumpFactorInit_pft(NZ)
 
-  H2OCuticleResist_pft(NZ)      = CuticleResist_pft(NZ)/3600.0_r8
-  CO2CuticleResist_pft(NZ)      = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
-  rCNNonstRemob_pft(NZ)         = 2.5_r8
-  rCPNonstRemob_pft(NZ)         = 25.0_r8
-  RootFracRemobilizableBiom(NZ) = AMIN1(RootrNC_pft(NZ)*rCNNonstRemob_pft(NZ),&
-    RootrPC_pft(NZ)*rCPNonstRemob_pft(NZ))
+  H2OCuticleResist_pft(NZ)          = CuticleResist_pft(NZ)/3600.0_r8
+  CO2CuticleResist_pft(NZ)          = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
+  rCNNonstRemob_pft(NZ)             = 2.5_r8
+  rCPNonstRemob_pft(NZ)             = 25.0_r8
+  RootFracRemobilizableBiom_pft(NZ) = AMIN1(RootrNC_pft(NZ)*rCNNonstRemob_pft(NZ),RootrPC_pft(NZ)*rCPNonstRemob_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     O2I_pft(NZ)=2.10E+05_r8
   ELSE
@@ -919,7 +918,7 @@ module InitPlantMod
     OXYE                      => plt_site%OXYE                        ,& !input  :atmospheric O2 concentration, [umol mol-1]
     Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft       ,& !input  :maximum radius of primary roots, [m]
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft       ,& !input  :maximum radius of secondary roots, [m]
-    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
+    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
     SeedDepth_pft             => plt_morph%SeedDepth_pft              ,& !input  :seeding depth, [m]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr             ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr             ,& !inoput :root aqueous content, [g d-2]
@@ -962,7 +961,7 @@ module InitPlantMod
       PSIRootTurg_vr(N,L,NZ)                                       = AZMAX1(PSIRoot_pvr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)   = 0._r8
       plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = 0._r8
-      RootProteinConc_rpvr(N,L,NZ)                                  = RootFracRemobilizableBiom(NZ)
+      RootProteinConc_rpvr(N,L,NZ)                                  = RootFracRemobilizableBiom_pft(NZ)
       plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)                     = 0._r8
       plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
@@ -1036,7 +1035,7 @@ module InitPlantMod
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch        ,& !input  :branch sheath structural element, [g d-2]
     PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr          ,& !input  :root layer C, [gC d-2]
-    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
+    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr   ,& !input  :root layer element primary axes, [g d-2]
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr     ,& !input  :root layer structural C, [gC d-2]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr      ,& !input  :root layer nonstructural element, [g d-2]
@@ -1089,7 +1088,7 @@ module InitPlantMod
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   RootProteinC_pvr(1,NGTopRootLayer_pft(NZ),NZ)=RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)&
-    *RootFracRemobilizableBiom(NZ)
+    *RootFracRemobilizableBiom_pft(NZ)
   RootMycoNonstElms_rpvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR_pft(NZ)&
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
   RootMycoNonstElms_rpvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=CPGR_pft(NZ) &

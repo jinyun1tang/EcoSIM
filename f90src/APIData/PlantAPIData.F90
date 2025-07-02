@@ -443,7 +443,7 @@ implicit none
   real(r8), pointer :: CNLF_pft(:)                      => null()  !maximum leaf N:C ratio,                                  [g g-1]
   real(r8), pointer :: GrainSeedBiomCMean_brch(:,:)     => null()  !maximum grain C during grain fill,                       [g d-2]
   real(r8), pointer :: FracGroth2Node_pft(:)            => null()  !parameter for allocation of growth to nodes,             [-]
-  real(r8), pointer ::RootFracRemobilizableBiom(:)      => null()  !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8), pointer ::RootFracRemobilizableBiom_pft(:)      => null()  !fraction of remobilizable nonstructural biomass in root, [-]
 
   contains
     procedure, public :: Init => plt_allom_init
@@ -642,6 +642,10 @@ implicit none
   real(r8) :: TRootH2Flx_col           !total root H2 flux, [g d-2]
   real(r8) :: Canopy_NEE_col           !total net CO2 fixation, [gC d-2]
 
+  real(r8), pointer :: Nutruptk_fClim_rpvr(:,:,:)          => null()  !Carbon limitation for root nutrient uptake,(0->1),stronger limitation, [-]
+  real(r8), pointer :: Nutruptk_fNlim_rpvr(:,:,:)          => null()  !Nitrogen limitation for root nutrient uptake,(0->1),stronger limitation, [-]
+  real(r8), pointer :: Nutruptk_fPlim_rpvr(:,:,:)          => null()  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
+  real(r8), pointer :: Nutruptk_fProtC_rpvr(:,:,:)         => null()  !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-] 
   real(r8), pointer :: LitrFallStrutElms_col(:)            => null()  !total LitrFall structural element mass,     [g d-2 h-1]
   real(r8), pointer :: NetPrimProduct_pft(:)               => null()  !total net primary productivity,             [gC d-2]
   real(r8), pointer :: NH3Dep2Can_pft(:)                   => null()  !canopy NH3 flux,                            [g d-2 h-1]
@@ -1004,6 +1008,10 @@ implicit none
   allocate(this%SurfLitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP1));this%SurfLitrfalStrutElms_CumYr_pft=0._r8
   allocate(this%LitrFallStrutElms_col(NumPlantChemElms));this%LitrFallStrutElms_col=0._r8
   allocate(this%NetPrimProduct_pft(JP1));this%NetPrimProduct_pft=spval
+  allocate(this%Nutruptk_fClim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fClim_rpvr=0._r8
+  allocate(this%Nutruptk_fNlim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fNlim_rpvr=0._r8
+  allocate(this%Nutruptk_fPlim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fPlim_rpvr=0._r8
+  allocate(this%Nutruptk_fProtC_rpvr(jroots,JZ1,JP1));this%Nutruptk_fProtC_rpvr=0._r8
   allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
   allocate(this%tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ1));this%tRootMycoExud2Soil_vr=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=0._r8
@@ -1152,7 +1160,7 @@ implicit none
   class(plant_allometry_type) :: this
 
 
-  allocate(this%RootFracRemobilizableBiom(JP1));this%RootFracRemobilizableBiom=spval
+  allocate(this%RootFracRemobilizableBiom_pft(JP1));this%RootFracRemobilizableBiom_pft=spval
   allocate(this%FracGroth2Node_pft(JP1));this%FracGroth2Node_pft=spval
   allocate(this%GrainSeedBiomCMean_brch(MaxNumBranches,JP1));this%GrainSeedBiomCMean_brch=spval
   allocate(this%NoduGrowthYield_pft(JP1));this%NoduGrowthYield_pft=spval
@@ -1212,7 +1220,7 @@ implicit none
 !  if(allocated(NodulerNC_pft))deallocate(NodulerNC_pft)
 !  if(allocated(NodulerPC_pft))deallocate(NodulerPC_pft)
 !  if(allocated(RootrNC_pft))deallocate(RootrNC_pft)
-!  if(allocated(RootFracRemobilizableBiom))deallocate(RootFracRemobilizableBiom)
+!  if(allocated(RootFracRemobilizableBiom_pft))deallocate(RootFracRemobilizableBiom_pft)
 !  if(allocated(CPLF))deallocate(CPLF)
 !  if(allocated(CPSHE))deallocate(CPSHE)
 !  if(allocated(CNSHE))deallocate(CNSHE)

@@ -49,7 +49,7 @@ module StartqMod
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
 !     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios
-!    RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
+!    RootFracRemobilizableBiom_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
@@ -120,7 +120,7 @@ module StartqMod
   CO2CuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)*1.56_r8
   rCNNonstRemob_pft(NZ,NY,NX)         = 2.5_r8
   rCPNonstRemob_pft(NZ,NY,NX)         = 25.0_r8
-  RootFracRemobilizableBiom(NZ,NY,NX) = AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
+  RootFracRemobilizableBiom_pft(NZ,NY,NX) = AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
     ,RootrPC_pft(NZ,NY,NX)*rCPNonstRemob_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I_pft(NZ,NY,NX)=2.10E+05_r8
@@ -740,7 +740,7 @@ module StartqMod
       PSIRootTurg_vr(N,L,NZ,NY,NX)                               = AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)    = 0._r8
       RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX) = 0._r8
-      RootProteinConc_rpvr(N,L,NZ,NY,NX)                         = RootFracRemobilizableBiom(NZ,NY,NX)
+      RootProteinConc_rpvr(N,L,NZ,NY,NX)                         = RootFracRemobilizableBiom_pft(NZ,NY,NX)
       RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)                      = 0._r8
       PopuRootMycoC_pvr(N,L,NZ,NY,NX)                            = 0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)             = 0._r8
@@ -861,7 +861,7 @@ module StartqMod
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootProteinC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
-    RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom(NZ,NY,NX)
+    RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom_pft(NZ,NY,NX)
   RootMycoNonstElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= CNGR_pft(NZ,NY,NX)&
     *RootMycoNonstElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
   RootMycoNonstElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR_pft(NZ,NY,NX) &

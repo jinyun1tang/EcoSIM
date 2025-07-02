@@ -864,16 +864,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='RootFracRemobilizableBiom', dim1name='pft',&
+    call restartvar(ncid, flag, varname='RootFracRemobilizableBiom_pft', dim1name='pft',&
      long_name='fraction of remobilizable nonstructural biomass in root', units='', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFracRemobilizableBiom,datrp_1d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFracRemobilizableBiom_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFracRemobilizableBiom,datrp_1d,NumActivePlants=NumActivePlants_col,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFracRemobilizableBiom_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='RootFracRemobilizableBiom', dim1name='pft',&
+    call restartvar(ncid, flag, varname='RootFracRemobilizableBiom_pft', dim1name='pft',&
      long_name='fraction of remobilizable nonstructural biomass in root', units='', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
   endif  

@@ -838,22 +838,22 @@ module MicBGCMod
   nmicf%RTotNH3OxidBandAutor = SUM(nmicf%RSOxidBandAutor(JGniA(N):JGnfA(N)))
   
   DO  N=1,NumMicbFunGrupsPerCmplx
-    IF(is_activeMicrbFungrpAutor(N))THEN
+    IF(.not.is_activeMicrbFungrpAutor(N))cycle
 
-      call GetMicrobDensFactorAutor(N,micfor, micstt, ORGCL,SPOMK,RMOMK)
+    call GetMicrobDensFactorAutor(N,micfor, micstt, ORGCL,SPOMK,RMOMK)
 
-      DO NGL=JGniA(N),JGnfA(N)
-        WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
-        OXKX                    = OXKA
-        GrowthEnvScalAutor(NGL) = TSensGrowth*WatStressMicb
-        TSensMaintRAutor(NGL)   = TSensMaintR
-        IF(OMActAutor(NGL).GT.0.0_r8)THEN
-          call ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
-            OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
-            micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
-        ENDIF
-      ENDDO
-    ENDIF
+    DO NGL=JGniA(N),JGnfA(N)
+      WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
+      OXKX                    = OXKA
+      GrowthEnvScalAutor(NGL) = TSensGrowth*WatStressMicb
+      TSensMaintRAutor(NGL)   = TSensMaintR
+      IF(OMActAutor(NGL).GT.0.0_r8)THEN
+        call ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
+          OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
+          micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
+      ENDIF
+    ENDDO
+
   ENDDO
 
   !summarize microbial activity as a proxy for hydrolysis
@@ -1707,6 +1707,7 @@ module MicBGCMod
     SorbedOM                         => micstt%SorbedOM,                        &
     ZEROS                            => micfor%ZEROS,                           &
     NumHetetr1MicCmplx               => micpar%NumHetetr1MicCmplx ,             &
+    is_activeMicrbFungrpHeter        => micpar%is_activeMicrbFungrpHeter,       &
     Litrm                            => micfor%litrm                            &
   )
 !
@@ -1733,8 +1734,8 @@ module MicBGCMod
       if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
-        DO NE=1,NumPlantChemElms
-          RCCMEheter(NE,M,NGL,K)=(RkillLitrfal2ResduOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL))*FORC(K)
+          DO NE=1,NumPlantChemElms
+            RCCMEheter(NE,M,NGL,K)=(RkillLitrfal2ResduOMAutor(NE,M,NGL)+RMaintDefcitLitrfal2ResduOMAutor(NE,M,NGL))*FORC(K)
           ENDDO
         ENDDO
       ENDDO D1680
@@ -1826,13 +1827,17 @@ module MicBGCMod
     call SubstrateLimit(N1,N2,DOMuptk4GrothHeter(ielmp,N1:N2,K),DOM(idom_dop,K),scal)
 
     call SubstrateLimit(N1,N2,RMetabAcetUptkHeter(N1:N2,K),DOM(idom_acetate,K),scal)
-
 !   
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
     D570: DO N=1,NumMicbFunGrupsPerCmplx
-      if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
+      if(.not.is_activeMicrbFungrpHeter(N))cycle
       DO NGL=JGniH(N),JGnfH(N)
+        TDOMUptkHeter(idom_doc,K)     = TDOMUptkHeter(idom_doc,K)+RMetabDOCUptkHeter(NGL,K)
+        TDOMUptkHeter(idom_don,K)     = TDOMUptkHeter(idom_don,K)+DOMuptk4GrothHeter(ielmn,NGL,K)
+        TDOMUptkHeter(idom_dop,K)     = TDOMUptkHeter(idom_dop,K)+DOMuptk4GrothHeter(ielmp,NGL,K)
+        TDOMUptkHeter(idom_acetate,K) = TDOMUptkHeter(idom_acetate,K)+RMetabAcetUptkHeter(NGL,K)
+        
         D565: DO M=1,ndbiomcp
           DO NE=1,NumPlantChemElms
             OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K) &
@@ -4083,11 +4088,6 @@ module MicBGCMod
   !obtain organic nutrient uptake
   DOMuptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCNDOM(K)/FCN(NGL,K)))
   DOMuptk4GrothHeter(ielmp,NGL,K)=AZMAX1(AMIN1(DOM(idom_dop,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCPDOM(K)/FCP(NGL,K)))
-
-  TDOMUptkHeter(idom_doc,K)     = TDOMUptkHeter(idom_doc,K)+RMetabDOCUptkHeter(NGL,K)
-  TDOMUptkHeter(idom_acetate,K) = TDOMUptkHeter(idom_acetate,K)+RMetabAcetUptkHeter(NGL,K)
-  TDOMUptkHeter(idom_don,K)     = TDOMUptkHeter(idom_don,K)+DOMuptk4GrothHeter(ielmn,NGL,K)
-  TDOMUptkHeter(idom_dop,K)     = TDOMUptkHeter(idom_dop,K)+DOMuptk4GrothHeter(ielmp,NGL,K)
 
 !
 !     TRANSFER UPTAKEN C,N,P FROM STORAGE/nonstructural TO ACTIVE BIOMASS

@@ -54,9 +54,10 @@ implicit none
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
   use PerturbationMod     , only : InitSoilWarming
-  use GridConsts
+  use NumericalAuxMod     , only : InitNumericAux
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
+  use GridConsts  
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 ! begin_execution
@@ -134,6 +135,8 @@ implicit none
   call InitSnowPhysData
 
   call InitSoilPhysData
+
+  call InitNumericAux()
 
   if(salt_model)call InitSoluteProperty
 

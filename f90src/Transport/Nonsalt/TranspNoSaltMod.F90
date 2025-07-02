@@ -7,7 +7,7 @@ module TranspNoSaltMod
   USE MiniMathMod,      ONLY: AZMAX1,  fixnegmass, flux_mass_limiter, AZERO, safe_adb
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
-  use EcoSIMCtrlMod,    only: iVerbLevel
+  use EcoSIMCtrlMod,    only: iVerbLevel,ldo_transpt_bubbling
   use TranspNoSaltFastMod
   use InitNoSaltTransportMod
   use TranspNoSaltSlowMod
@@ -271,7 +271,7 @@ module TranspNoSaltMod
     ENDDO
     
     !Do bubbling
-    call BubbleEffluxM(I,J,M,NHE,NHW,NVS,NVN)
+    if(ldo_transpt_bubbling)call BubbleEffluxM(I,J,M,NHE,NHW,NVS,NVN)
 
   ENDDO
 
