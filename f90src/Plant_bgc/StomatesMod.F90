@@ -320,7 +320,7 @@
     LeafC3ChlorofilConc_pft         => plt_photo%LeafC3ChlorofilConc_pft          ,& !input  :leaf C3 chlorophyll content, [gC gC-1]
     VmaxRubCarboxyRef_pft           => plt_photo%VmaxRubCarboxyRef_pft            ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1]
     VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft                ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]
-    FracLeafProtinAsPEPCarboxyl_pft => plt_photo%FracLeafProtinAsPEPCarboxyl_pft  ,& !input  :leaf PEP carboxylase content, [gC gC-1]
+    FracLeafProtAsPEPCarboxyl_pft => plt_photo%FracLeafProtAsPEPCarboxyl_pft  ,& !input  :leaf PEP carboxylase content, [gC gC-1]
     NutrientCtrlonC4Carboxy_node    => plt_photo%NutrientCtrlonC4Carboxy_node     ,& !inoput :down-regulation of C4 photosynthesis, [-]
     RubiscoCarboxyEff_node          => plt_photo%RubiscoCarboxyEff_node           ,& !output :carboxylation efficiency, [umol umol-1]
     LigthSatCarboxyRate_node        => plt_photo%LigthSatCarboxyRate_node         ,& !output :maximum light carboxylation rate under saturating CO2, [umol m-2 s-1]
@@ -346,15 +346,15 @@
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = 1.0_r8/(1.0_r8+CC4M/C4KI_pepcarboxy)
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
 !
-!     SURFICIAL DENSITY OF FracLeafProtinAsPEPCarboxyl_pftAND ITS LeafC3ChlorofilConc_pftOROPHYLL
+!     SURFICIAL DENSITY OF FracLeafProtAsPEPCarboxyl_pftAND ITS LeafC3ChlorofilConc_pftOROPHYLL
 !
 !     MesophyllPEPSurfDensity=surficial density of PEP carboxylase in mesophyll
 !     MesophyllChlDensity=surficial density of chlorophyll in mesophyll
-!     FracLeafProtinAsPEPCarboxyl_pft=fraction of leaf protein in PEP carboxylase
+!     FracLeafProtAsPEPCarboxyl_pft=fraction of leaf protein in PEP carboxylase
 !     LeafC4ChlorofilConc_pft=fraction of leaf protein in mesophyll chlorophyll
 !     ProteinPerLeafArea=leaf protein surficial density, gC/m2 leaf
 !
-  MesophyllPEPSurfDensity = FracLeafProtinAsPEPCarboxyl_pft(NZ)*ProteinPerLeafArea
+  MesophyllPEPSurfDensity = FracLeafProtAsPEPCarboxyl_pft(NZ)*ProteinPerLeafArea
   MesophyllChlDensity     = LeafC4ChlorofilConc_pft(NZ)*ProteinPerLeafArea
 !
 !     CO2-LIMITED C4 CARBOXYLATION RATES

@@ -1,8 +1,9 @@
 module TranspNoSaltSlowMod
-  use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,    only: destroy, endrun
-  use TracerPropMod, only: MolecularWeight
-  use EcoSIMCtrlMod, only: iVerbLevel
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,       only: destroy, endrun
+  use TracerPropMod,    only: MolecularWeight
+  use EcoSIMCtrlMod,    only: iVerbLevel
+  use EcoSiMParDataMod, only: micpar
   use NumericalAuxMod
   use PlantDataRateType
   use minimathmod    
@@ -75,7 +76,7 @@ implicit none
 
     call GatherTranspFluxM(I,J,M,NHW,NHE,NVN,NVS)
 
-    call SlowUpdateStateVars(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom,pscal,pscal1_dom)
+    call SlowUpdateStateVarsM(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom,pscal,pscal1_dom)
 
     call AccumSlowFluxesM(I,J,M,NHE,NHW,NVS,NVN,dpscal,dpscal_dom,pscal,pscal1_dom)
 
@@ -93,14 +94,67 @@ implicit none
       dpscal_dom(idom)=dpscal_dom(idom)*(1._r8-pscal1_dom(idom))
       dpscal_max=AMAX1(dpscal_max,dpscal_dom(idom))
     ENDDO
-
-!    if(iterm>200)stop
   ENDDO
+  call ApplySlowSourceSink(I,J,M,NHE,NHW,NVS,NVN,iterm)
+
   call ExitMassCheck(I,J,M,NHE,NHW,NVS,NVN,iterm)
   call PrintInfo('end '//subname)
   end subroutine TransptSlowNoSaltM
 !------------------------------------------------------------------------------------------
+  subroutine ApplySlowSourceSink(I,J,M,NHE,NHW,NVS,NVN,iterm)
+  implicit none
+  integer, intent(in) :: I,J,M,NHE,NHW,NVS,NVN,iterm
+  integer :: NY,NX,idg,K,L,idom,ids
+  real(r8) :: flux
 
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+
+      idg=idg_NH3
+      trcs_solml2_vr(idg,0,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)+RBGCSrcSoluteM_vr(idg,0,NY,NX)
+      call SubstrateDribbling(RBGCSinkSoluteM_vr(idg,0,NY,NX),trcs_solml_drib_vr(idg,0,NY,NX),trcs_solml2_vr(idg,0,NY,NX))
+
+      flux=RBGCSrcSoluteM_vr(idg,0,NY,NX)-RBGCSinkSoluteM_vr(idg,0,NY,NX)
+      trcs_NetProd_slow_flxM_col(idg,NY,NX)  = trcs_NetProd_slow_flxM_col(idg,NY,NX)+flux
+
+      DO ids=ids_nut_beg,ids_nuts_end    
+        trcs_solml2_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)+RBGCSrcSoluteM_vr(ids,0,NY,NX)
+        call SubstrateDribbling(RBGCSinkSoluteM_vr(ids,0,NY,NX),trcs_solml_drib_vr(ids,0,NY,NX),trcs_solml2_vr(ids,0,NY,NX))
+
+        flux=RBGCSrcSoluteM_vr(ids,0,NY,NX)-RBGCSinkSoluteM_vr(ids,0,NY,NX)
+        trcs_NetProd_slow_flxM_col(ids,NY,NX)  = trcs_NetProd_slow_flxM_col(ids,NY,NX)+flux
+      ENDDO 
+
+      DO K=1,micpar%NumOfLitrCmplxs
+        DO idom=idom_beg,idom_end        
+          call SubstrateDribbling(RBGCSink_DOM_micpM_vr(idom,K,0,NY,NX),DOM_MicP_drib_vr(idom,K,0,NY,NX),DOM_MicP2_vr(idom,K,0,NY,NX))
+          DOM_NetProd_slow_flxM_col(idom,K,NY,NX)=DOM_NetProd_slow_flxM_col(idom,K,NY,NX)-RBGCSink_DOM_micpM_vr(idom,K,0,NY,NX)
+        ENDDO
+      ENDDO  
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)    
+        IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN        
+          DO ids=idg_NH3,ids_end
+            trcs_solml2_vr(ids,L,NY,NX)=trcs_solml2_vr(ids,L,NY,NX)+RBGCSrcSoluteM_vr(ids,L,NY,NX) 
+            call SubstrateDribbling(RBGCSinkSoluteM_vr(ids,L,NY,NX),trcs_solml_drib_vr(ids,L,NY,NX),trcs_solml2_vr(ids,L,NY,NX)) 
+
+            flux=RBGCSrcSoluteM_vr(ids,L,NY,NX)-RBGCSinkSoluteM_vr(ids,L,NY,NX)
+            trcs_NetProd_slow_flxM_col(ids,NY,NX)  = trcs_NetProd_slow_flxM_col(ids,NY,NX)+flux
+          ENDDO
+        ENDIF
+
+        DO K=1,jcplx
+          DO idom=idom_beg,idom_end        
+            call SubstrateDribbling(RBGCSink_DOM_micpM_vr(idom,K,L,NY,NX),DOM_MicP_drib_vr(idom,K,L,NY,NX),DOM_MicP2_vr(idom,K,L,NY,NX))
+            DOM_NetProd_slow_flxM_col(idom,K,NY,NX)=DOM_NetProd_slow_flxM_col(idom,K,NY,NX)-RBGCSink_DOM_micpM_vr(idom,K,L,NY,NX)
+          ENDDO
+        ENDDO  
+      ENDDO
+
+    ENDDO
+  ENDDO  
+  end subroutine ApplySlowSourceSink
+!------------------------------------------------------------------------------------------
   subroutine EnterMassCheck(I,J,NHE,NHW,NVS,NVN)
   !
   !Description:
@@ -109,36 +163,47 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
 
-  integer :: NY,NX,idg,L,K,idom
+  integer :: NY,NX,idg,L,K,idom,ids
+
 !  write(555,*)'enter'
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      trcg_mass_begs(:,NY,NX)               = 0._r8
-      DOM_mass_begs(:,:,NY,NX)              = 0._r8
-      DOM_Hydroloss_slow_flx_col(:,:,NY,NX) = 0._r8
-      TranspNetDOM_flx_col(:,:,NY,NX)       = 0._r8
-      TranspNetDOM_flx2_col(:,:,NY,NX)      = 0._r8
+      trcg_mass_begs(:,NY,NX)                 = 0._r8
+      DOM_mass_begs(:,:,NY,NX)                = 0._r8
+      DOM_Hydroloss_slow_flx_col(:,:,NY,NX)   = 0._r8
+      TranspNetDOM_flx_col(:,:,NY,NX)         = 0._r8
+      TranspNetDOM_flx2_col(:,:,NY,NX)        = 0._r8
       GasDiff2Surf_slow_flx_col(:,NY,NX)      = 0._r8
       Gas_WetDeposit_slow_flx_col(:,NY,NX)    = 0._r8
       Gas_WetDepo2Snow_slow_flx_col(:,NY,NX)  = 0._r8
       Gas_Snowloss_slow_flx_col(:,NY,NX)      = 0._r8
       trcs_NetFlow2Litr_slow_flx_col(:,NY,NX) = 0._r8
       trcs_hydrloss_slow_flx_col(:,NY,NX)     = 0._r8
-      trcs_NetProd_slow_flx_col(:,NY,NX)      = 0._r8
+      trcs_NetProd_slow_flxM_col(:,NY,NX)     = 0._r8
+      DOM_NetProd_slow_flxM_col(:,:,NY,NX)    = 0._r8
       trcg_mass_snow_begs(:,NY,NX)            = 0._r8
       trcg_mass_soil_begs(:,NY,NX)            = 0._r8
       trcs_netflow2soil_slow_flx_col(:,NY,NX) = 0._r8
+      trcs_solml_drib_beg_col(:,NY,NX)        = 0._r8
+
+      do ids=ids_beg,ids_end
+        trcs_solml_drib_beg_col(ids,NY,NX) = trcs_solml_drib_vr(ids,0,NY,NX)
+      enddo
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO ids=ids_beg,ids_end
+          trcs_solml_drib_beg_col(ids,NY,NX) = trcs_solml_drib_beg_col(ids,NY,NX)+trcs_solml_drib_vr(ids,L,NY,NX)
+        ENDDO  
+      ENDDO
 
       DO idg=idg_beg,idg_NH3
         DO L=1,nsnol_col(NY,NX)
           trcg_mass_snow_begs(idg,NY,NX)=trcg_mass_snow_begs(idg,NY,NX)+trcg_solsml2_snvr(idg,L,NY,NX)
         ENDDO
 
-        trcg_mass_litr_begs(idg,NY,NX)=trcs_solml2_vr(idg,0,NY,NX)
+        trcg_mass_litr_begs(idg,NY,NX)     = trcs_solml2_vr(idg,0,NY,NX)
 
         DO L=NU_col(NY,NX),NL_col(NY,NX)
-          trcg_mass_soil_begs(idg,NY,NX)=trcg_mass_soil_begs(idg,NY,NX) &
-            +trcs_solml2_vr(idg,L,NY,NX)+trcs_soHml2_vr(idg,L,NY,NX)
+          trcg_mass_soil_begs(idg,NY,NX)     = trcg_mass_soil_begs(idg,NY,NX)+trcs_solml2_vr(idg,L,NY,NX)+trcs_soHml2_vr(idg,L,NY,NX)
         ENDDO 
       ENDDO
 
@@ -151,7 +216,7 @@ implicit none
         trcg_mass_begs(idg,NY,NX)=trcg_mass_snow_begs(idg,NY,NX)+trcg_mass_litr_begs(idg,NY,NX)+trcg_mass_soil_begs(idg,NY,NX)
       ENDDO
 
-      DO K=1,jcplx
+      DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_mass_begs(idom,K,NY,NX)=DOM_mass_begs(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)            
         ENDDO
@@ -164,7 +229,6 @@ implicit none
           ENDDO
         ENDDO
       ENDDO
-
     ENDDO  
   ENDDO
   end subroutine EnterMassCheck
@@ -172,31 +236,53 @@ implicit none
 
 
   subroutine ExitMassCheck(I,J,M,NHE,NHW,NVS,NVN,iterm)
+  !
+  ! Description:
+  ! Do slow transport mass conservation check.
+  ! fluxes include:
+  ! hydrological loss      : trcs_hydrloss_slow_flx_col(idg,NY,NX)
+  ! net cheimcal production: trcs_NetProd_slow_flxM_col(idg,NY,NX)
+  ! surface diffusion      : GasDiff2Surf_slow_flx_col(idg,NY,NX)
+  ! wet deposition         : Gas_WetDeposit_slow_flx_col(idg,NY,NX)
+  
   implicit none
   integer, intent(in) :: I,J,NHE,NHW,NVS,NVN,M,iterm
 
-  integer :: NY,NX,idg,L,K,idom
+  integer :: NY,NX,idg,L,K,idom,ids
   real(r8) :: trcg_mass_now(idg_beg:idg_NH3)
   real(r8) :: trcg_mass_snow_now(idg_beg:idg_NH3)
   real(r8) :: trcg_mass_litr_now(idg_beg:idg_NH3)
   real(r8) :: trcg_mass_soil_now(idg_beg:idg_NH3)
   real(r8) :: dmass,err
   real(r8) :: DOM_mass_now(idom_beg:idom_end,jcplx)
+  real(r8) :: dom_dribble_col(idom_beg:idom_end,jcplx)
+  real(r8) :: trcs_solml_drib_col(ids_beg:ids_end)
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      trcg_mass_snow_now=0._r8
-      trcg_mass_soil_now=0._r8
+      dom_dribble_col     = 0._r8
+      trcg_mass_snow_now  = 0._r8
+      trcg_mass_soil_now  = 0._r8
+      trcs_solml_drib_col = 0._r8
+      DO ids                 = ids_beg, ids_end
+        trcs_solml_drib_col(ids) = trcs_solml_drib_vr(ids,0,NY,NX)
+      ENDDO
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO ids=ids_beg,ids_end
+          trcs_solml_drib_col(ids) = trcs_solml_drib_col(ids)+trcs_solml_drib_vr(ids,L,NY,NX)
+        ENDDO
+      ENDDO
 
       DO idg=idg_beg,idg_NH3
         DO L=1,nsnol_col(NY,NX)
           trcg_mass_snow_now(idg)=trcg_mass_snow_now(idg)+trcg_solsml2_snvr(idg,L,NY,NX)
         ENDDO
 
-        trcg_mass_litr_now(idg)=trcs_solml2_vr(idg,0,NY,NX)
+        trcg_mass_litr_now(idg)  = trcs_solml2_vr(idg,0,NY,NX)
 
         DO L=NU_col(NY,NX),NL_col(NY,NX)
-          trcg_mass_soil_now(idg)=trcg_mass_soil_now(idg)+trcs_solml2_vr(idg,L,NY,NX)+trcs_soHml2_vr(idg,L,NY,NX)
+          trcg_mass_soil_now(idg)  = trcg_mass_soil_now(idg)+trcs_solml2_vr(idg,L,NY,NX)+trcs_soHml2_vr(idg,L,NY,NX)
         ENDDO 
       ENDDO
      
@@ -209,28 +295,42 @@ implicit none
         trcg_mass_now(idg)=trcg_mass_snow_now(idg)+trcg_mass_litr_now(idg)+trcg_mass_soil_now(idg)
       ENDDO
 
-      DO K=1,jcplx
+      DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_mass_now(idom,K)=DOM_MicP2_vr(idom,K,0,NY,NX)
+          dom_dribble_col(idom,K)=dom_dribble_col(idom,K)+DOM_MicP_drib_vr(idom,K,0,NY,NX)
         ENDDO
       ENDDO
       
       DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO K=1,jcplx
           DO idom=idom_beg,idom_end
-            DOM_mass_now(idom,K)=DOM_mass_now(idom,K)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)
+            DOM_mass_now(idom,K)    = DOM_mass_now(idom,K)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)
+            dom_dribble_col(idom,K) = dom_dribble_col(idom,K)+DOM_MicP_drib_vr(idom,K,L,NY,NX)
           ENDDO
         ENDDO
       ENDDO
  
+
       DO idg=idg_beg,idg_NH3
+        GasDiff2Surf_flx_col(idg,NY,NX)   = GasDiff2Surf_flx_col(idg,NY,NX)+GasDiff2Surf_slow_flx_col(idg,NY,NX)
+        GasHydroLoss_flx_col(idg,NY,NX)   = GasHydroLoss_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg,NY,NX)
+        Gas_WetDeposit_flx_col(idg,NY,NX) = Gas_WetDeposit_flx_col(idg,NY,NX)+Gas_WetDeposit_slow_flx_col(idg,NY,NX)
+        RGasNetProd_col(idg,NY,NX)        = RGasNetProd_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg,NY,NX)
+
         dmass=trcg_mass_begs(idg,NY,NX)-trcg_mass_now(idg)
-        err=dmass+trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg,NY,NX) &
-          +GasDiff2Surf_slow_flx_col(idg,NY,NX)+Gas_WetDeposit_slow_flx_col(idg,NY,NX)
+        err=dmass+trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg,NY,NX) &
+          +GasDiff2Surf_slow_flx_col(idg,NY,NX)+Gas_WetDeposit_slow_flx_col(idg,NY,NX)-trcs_solml_drib_col(idg)+trcs_solml_drib_beg_col(idg,NY,NX)
           
         if(idg==idg_NH3)then
-          err=err+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
+          GasHydroLoss_flx_col(idg,NY,NX) = GasHydroLoss_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
+          RGasNetProd_col(idg,NY,NX)      = RGasNetProd_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg_NH3B,NY,NX)
+
+          err=err+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)+trcs_NetProd_slow_flxM_col(idg_NH3B,NY,NX)
+          err=err-trcs_solml_drib_col(idg_NH3B)+trcs_solml_drib_beg_col(idg_NH3B,NY,NX)
+
         endif
+
         errmass_slow(idg,NY,NX)=errmass_slow(idg,NY,NX)+err
         if(abs(err)>1.e-5_r8)then
           if(iVerbLevel==1 .or. abs(err)>1.e-4_r8)then
@@ -249,11 +349,11 @@ implicit none
             write(201,*)'snowdrift  =',trcg_SnowDrift_flx_col(idg,NY,NX)
             write(201,*)'snow mass  =',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
             if(idg==idg_NH3)then
-              write(201,*)'netpro      =',trcs_NetProd_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flx_col(idg_NH3B,NY,NX)
+              write(201,*)'netpro      =',trcs_NetProd_slow_flxM_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg_NH3B,NY,NX)
               write(201,*)'hydloss     =',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
               write(201,*)'netflx2soil =',trcs_netflow2soil_slow_flx_col(idg_NH3,NY,NX)+trcs_netflow2soil_slow_flx_col(idg_NH3B,NY,NX)
             else
-              write(201,*)'netpro      =',trcs_NetProd_slow_flx_col(idg,NY,NX)
+              write(201,*)'netpro      =',trcs_NetProd_slow_flxM_col(idg,NY,NX)
               write(201,*)'hydloss     =',trcs_hydrloss_slow_flx_col(idg,NY,NX)            
               write(201,*)'netflx2soil =',trcs_netflow2soil_slow_flx_col(idg,NY,NX)
             endif
@@ -288,7 +388,7 @@ implicit none
 
   end  subroutine ExitMassCheck
 !------------------------------------------------------------------------------------------
-  subroutine SlowUpdateStateVars(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom,pscal1,pscal1_dom)
+  subroutine SlowUpdateStateVarsM(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom,pscal1,pscal1_dom)
   implicit none
   integer, intent(in) :: I,J,M,NHW,NHE,NVN,NVS
   real(r8),intent(in) :: dpscal(ids_beg:ids_end)
@@ -316,7 +416,7 @@ implicit none
 
     call UpdateSubSurfTracerM(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom)
   endif
-  end subroutine SlowUpdateStateVars
+  end subroutine SlowUpdateStateVarsM
 !------------------------------------------------------------------------------------------
 
   subroutine copyStateVars(I,J,M,NHE,NHW,NVS,NVN,iterm)
@@ -329,7 +429,7 @@ implicit none
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
       !to litter
-      DO  K=1,jcplx
+      DO  K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_MicP2_vr(idom,K,0,NY,NX)=AZERO(DOM_MicP_vr(idom,K,0,NY,NX))
         ENDDO
@@ -409,8 +509,7 @@ implicit none
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN        
 
           DO idg=idg_beg,idg_end     
-            flux=trcsol_Irrig_flxM_vr(idg,L,NY,NX)+trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + &
-              trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX)-RBGCSinkSoluteM_vr(idg,L,NY,NX)            
+            flux=trcsol_Irrig_flxM_vr(idg,L,NY,NX)+trcs_Transp2Micp_flxM_vr(idg,L,NY,NX)+trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX)
             flux=flux*dpscal(idg)    
             lflux=.true. .or. .not.isclose(flux,0._r8) .and. pscal(idg)>0._r8                 
             if(lflux .and. dpscal(idg)>tiny_p)then          
@@ -424,7 +523,7 @@ implicit none
               if(lfupdate)then
                 TranspNetSoil_slow_flxM_col(idg,NY,NX)=TranspNetSoil_slow_flxM_col(idg,NY,NX)+ &
                   trcsol_Irrig_flxM_vr(idg,L,NY,NX)+trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) +&
-                  trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)-RBGCSinkSoluteM_vr(idg,L,NY,NX)
+                  trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)
                 trcs_solml2_vr(idg,L,NY,NX)=trcs_solml_vr(idg,L,NY,NX)
               endif  
 
@@ -437,7 +536,7 @@ implicit none
 
           DO ids=idg_NH3B+1,ids_end            
             flux=trcsol_Irrig_flxM_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX) + &
-              trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)-RBGCSinkSoluteM_vr(ids,L,NY,NX)
+              trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
             lflux=.true. .or. .not.isclose(flux,0._r8)  
             if(lflux .and. dpscal(ids)>tiny_p)then          
               flux=flux*dpscal(ids)   
@@ -450,7 +549,7 @@ implicit none
 
           DO  K=1,jcplx
             DO idom=idom_beg,idom_end
-              flux=DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX) + DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
+              flux=DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)+DOM_Mac2MicPore_flxM_vr(idom,K,L,NY,NX)
               lflux=.true. .or. .not.isclose(flux,0._r8)
               if(lflux .and. dpscal_dom(idom)>tiny_p)then          
                 flux=flux*dpscal_dom(idom)            
@@ -526,7 +625,7 @@ implicit none
   enddo
 
   if(pscal_max<1.0001_r8)then  
-    call SlowUpdateStateVars(I,J,M,NHW,NHE,NVN,NVS,ppscal,ppscal_dom)  
+    call SlowUpdateStateVarsM(I,J,M,NHW,NHE,NVN,NVS,ppscal,ppscal_dom)  
   endif
 
   DO NX=NHW,NHE
@@ -539,14 +638,10 @@ implicit none
 
           GasDiff2Surf_slow_flx_col(idg,NY,NX) = GasDiff2Surf_slow_flx_col(idg,NY,NX)+flux
 
-          GasDiff2Surf_flx_col(idg,NY,NX) = GasDiff2Surf_flx_col(idg,NY,NX)+flux
-
           flux=ppscal(idg)*(trcg_Precip2LitrM_col(idg,NY,NX) + trcs_Precip2MicpM_col(idg,NY,NX) & 
             +trcg_AquaAdv_flxM_snvr(idg,1,NY,NX))
 
           Gas_WetDeposit_slow_flx_col(idg,NY,NX)= Gas_WetDeposit_slow_flx_col(idg,NY,NX)+flux
-
-          Gas_WetDeposit_flx_col(idg,NY,NX)= Gas_WetDeposit_flx_col(idg,NY,NX)+ flux
 
           flux=ppscal(idg) *trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)
           Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)=Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)+flux
@@ -578,6 +673,7 @@ implicit none
           Gas_WetDepo2Soil_col(idg,NY,NX)  =Gas_WetDepo2Soil_col(idg,NY,NX)+ppscal(idg) &  
             *trcs_Precip2MicpM_col(idg,NY,NX)
 
+          !---------------------------------------------------------------------------
           L=NU_col(NY,NX)
 
           flux=ppscal(idg)*(RGasAtmDisol2SoilM_col(idg,NY,NX) &             
@@ -605,28 +701,9 @@ implicit none
             flux=ppscal(idg)*trcsol_Irrig_flxM_vr(idg,L,NY,NX)  
             trc_topsoil_flx_col(idg,NY,NX) =trc_topsoil_flx_col(idg,NY,NX)+flux
 
-            flux                                      = ppscal(idg)*RBGCSinkSoluteM_vr(idg,L,NY,NX)
-            RGasNetProd_col(idg,NY,NX)                = RGasNetProd_col(idg,NY,NX)-flux
-            RGasNetProdSoil_col(idg,NY,NX)            = RGasNetProdSoil_col(idg,NY,NX)-flux
-            TranspNetSoil_flx_col(idg,NY,NX)          = TranspNetSoil_flx_col(idg,NY,NX)-flux
-            trcs_netflow2soil_slow_flx_col(idg,NY,NX) = trcs_netflow2soil_slow_flx_col(idg,NY,NX)-flux
-
           ENDDO       
         endif
       ENDDO
-
-      idg=idg_NH3
-      if(ppscal(idg)>tiny_p)then
-        flux                                      = ppscal(idg)*RBGCSinkSoluteM_vr(idg,0,NY,NX)
-        RGasNetProd_col(idg,NY,NX)                = RGasNetProd_col(idg,NY,NX)-flux
-        trcs_NetProd_slow_flx_col(idg,NY,NX)      = trcs_NetProd_slow_flx_col(idg,NY,NX)-flux
-        trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX) = trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)-flux
-
-        DO L=NU_col(NY,NX),NL_col(NY,NX)
-          RGasNetProd_col(idg,NY,NX)            = RGasNetProd_col(idg,NY,NX)+&
-            ppscal(idg)*trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_HeatWatTP        
-        ENDDO
-      endif  
 
       idg=idg_NH3B
       if(ppscal(idg)>tiny_p)then     
@@ -639,18 +716,12 @@ implicit none
         Gas_litr2Soil_flx_col(idg_NH3,NY,NX)          = Gas_litr2Soil_flx_col(idg_NH3,NY,NX)+ flux
 
         DO L=NU_col(NY,NX),NL_col(NY,NX)
-          flux                                      = ppscal(idg)*RBGCSinkSoluteM_vr(idg,L,NY,NX)
-          RGasNetProd_col(idg_NH3,NY,NX)            = RGasNetProd_col(idg_NH3,NY,NX)-(flux-&
-              ppscal(idg)*trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_HeatWatTP)
-          RGasNetProdSoil_col(idg_NH3,NY,NX)        = RGasNetProdSoil_col(idg_NH3,NY,NX)-flux
-          trcs_netflow2soil_slow_flx_col(idg,NY,NX) = trcs_netflow2soil_slow_flx_col(idg,NY,NX)-flux
 
           flux=ppscal(idg)*trcsol_Irrig_flxM_vr(idg,L,NY,NX)    
           trc_topsoil_flx_col(idg_NH3,NY,NX) =trc_topsoil_flx_col(idg_NH3,NY,NX)+flux
 
           TranspNetSoil_flx_col(idg_NH3,NY,NX)=TranspNetSoil_flx_col(idg_NH3,NY,NX)+ppscal(idg) &
-            *(trcs_Transp2Micp_flxM_vr(idg,L,NY,NX)+trcs_Transp2Macp_flxM_vr(idg,L,NY,NX) &
-            -RBGCSinkSoluteM_vr(idg,L,NY,NX)) 
+            *(trcs_Transp2Micp_flxM_vr(idg,L,NY,NX)+trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)) 
         ENDDO
 
         TranspNetSoil_flx2_col(idg_NH3,NY,NX)=TranspNetSoil_flx2_col(idg_NH3,NY,NX) + ppscal(idg) &
@@ -660,15 +731,11 @@ implicit none
 
         Gas_WetDeposit_slow_flx_col(idg_NH3,NY,NX)= Gas_WetDeposit_slow_flx_col(idg_NH3,NY,NX)+flux
 
-        Gas_WetDeposit_flx_col(idg_NH3,NY,NX)= Gas_WetDeposit_flx_col(idg_NH3,NY,NX)+ flux
-
         flux=ppscal(idg)*RGasAtmDisol2SoilM_col(idg,NY,NX)
 
         trcs_netflow2soil_slow_flx_col(idg,NY,NX)=trcs_netflow2soil_slow_flx_col(idg,NY,NX)+flux
 
         GasDiff2Surf_slow_flx_col(idg_NH3,NY,NX) = GasDiff2Surf_slow_flx_col(idg_NH3,NY,NX)+flux
-
-        GasDiff2Surf_flx_col(idg_NH3,NY,NX) = GasDiff2Surf_flx_col(idg_NH3,NY,NX)+flux
 
         GasDiff2Soil_flx_col(idg_NH3,NY,NX) = GasDiff2Soil_flx_col(idg_NH3,NY,NX)+flux
 
@@ -731,20 +798,9 @@ implicit none
       DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO ids=ids_beg,ids_end
           if(ppscal(ids)>tiny_p)then
-            trcs_NetProd_slow_flx_col(ids,NY,NX)= trcs_NetProd_slow_flx_col(ids,NY,NX)+ ppscal(ids)*(-RBGCSinkSoluteM_vr(ids,L,NY,NX))
-          endif
-        ENDDO
-
-        DO ids=ids_beg,ids_end
-          if(ppscal(ids)>tiny_p)then
-            flux=ppscal(ids)*(trcsol_Irrig_flxM_vr(ids,L,NY,NX))        
-            trcs_NetProd_slow_flx_col(ids,NY,NX)      = trcs_NetProd_slow_flx_col(ids,NY,NX)+flux
+            flux=ppscal(ids)*trcsol_Irrig_flxM_vr(ids,L,NY,NX)
+            trcs_NetProd_slow_flxM_col(ids,NY,NX)      = trcs_NetProd_slow_flxM_col(ids,NY,NX)+flux
             trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)+flux
-            if(ids>=idg_NH3)then 
-              flux = trcs_Soil2plant_uptkdrb_vr(ids,L,NY,NX)*dts_HeatWatTP
-              trcs_Soil2plant_uptake_col(ids,NY,NX)     = trcs_Soil2plant_uptake_col(ids,NY,NX)+ ppscal(ids)*flux
-              trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX) = trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX)+flux*(1._r8-ppscal(ids))
-            endif    
           endif  
         ENDDO      
       ENDDO
@@ -781,12 +837,13 @@ implicit none
 
       DO ids=ids_beg,ids_end
         if(ppscal(ids)>tiny_p)then
-
+          !lateral loss
           flux                                      = trcs_transpFlxM_2DH(ids,NY,NX)*ppscal(ids)
           trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)+flux
           trcs_SubsurTransp_flx_2DH(ids,NY,NX)      = trcs_SubsurTransp_flx_2DH(ids,NY,NX)+flux
           trcs_hydrloss_slow_flx_col(ids,NY,NX)     = trcs_hydrloss_slow_flx_col(ids,NY,NX)+flux
 
+          !drainage loss
           flux=ppscal(ids)*(trcs_MicpTranspFlxM_3D(ids,3,NL_col(NY,NX)+1,NY,NX)+trcs_MacpTranspFlxM_3D(ids,3,NL_col(NY,NX)+1,NY,NX))
           trcs_netflow2soil_slow_flx_col(ids,NY,NX) = trcs_netflow2soil_slow_flx_col(ids,NY,NX)-flux
           trcs_drainage_flx_col(ids,NY,NX)          = trcs_drainage_flx_col(ids,NY,NX) + flux
@@ -799,35 +856,30 @@ implicit none
         if(ppscal(idg)>tiny_p)then
           trcg_SnowDrift_flx_col(idg,NY,NX)=trcg_SnowDrift_flx_col(idg,NY,NX)+trcg_SnowDrift_flxM(idg,NY,NX)*ppscal(idg)
         
+          !surface loss thru runoff and snowdrift
           flux=ppscal(idg)*(trcg_SurfRunoff_flxM(idg,NY,NX)+trcg_SnowDrift_flxM(idg,NY,NX))
 
-          GasHydroSurfLoss_flx_col(idg,NY,NX)=GasHydroSurfLoss_flx_col(idg,NY,NX)+flux
+          GasHydroSurfLoss_flx_col(idg,NY,NX)   = GasHydroSurfLoss_flx_col(idg,NY,NX)+flux
+          trcs_hydrloss_slow_flx_col(idg,NY,NX) = trcs_hydrloss_slow_flx_col(idg,NY,NX)+flux
 
-          GasHydroLoss_flx_col(idg,NY,NX)=GasHydroLoss_flx_col(idg,NY,NX)+flux
-
+          !lateral plus drainage 
           flux = ppscal(idg)*(trcs_transpFlxM_2DH(idg,NY,NX)  &
             -trcs_MicpTranspFlxM_3D(idg,3,NL_col(NY,NX)+1,NY,NX)-trcs_MacpTranspFlxM_3D(idg,3,NL_col(NY,NX)+1,NY,NX))
 
           GasHydroSubsLoss_flx_col(idg,NY,NX)=GasHydroSubsLoss_flx_col(idg,NY,NX)+flux
 
-          GasHydroLoss_flx_col(idg,NY,NX)=GasHydroLoss_flx_col(idg,NY,NX)+flux
-
           GasHydroLoss_litr_flx_col(idg,NY,NX)=GasHydroLoss_litr_flx_col(idg,NY,NX)+ppscal(idg)  & 
             *trcg_SurfRunoff_flxM(idg,NY,NX)
 
-          trcs_hydrloss_slow_flx_col(idg,NY,NX)=  trcs_hydrloss_slow_flx_col(idg,NY,NX)+ppscal(idg) &  
-            *(trcg_SurfRunoff_flxM(idg,NY,NX)+trcg_SnowDrift_flxM(idg,NY,NX))
         endif  
       ENDDO  
 
       !add NH3B to NH3
       if(ppscal(idg_NH3B)>tiny_p)then        
         flux=ppscal(idg_NH3B)*(trcs_transpFlxM_2DH(idg_NH3B,NY,NX)  &
-          - trcs_MicpTranspFlxM_3D(idg_NH3B,3,NL_col(NY,NX)+1,NY,NX) &
-          -trcs_MacpTranspFlxM_3D(idg_NH3B,3,NL_col(NY,NX)+1,NY,NX))
+          -trcs_MicpTranspFlxM_3D(idg_NH3B,3,NL_col(NY,NX)+1,NY,NX)-trcs_MacpTranspFlxM_3D(idg_NH3B,3,NL_col(NY,NX)+1,NY,NX))
 
-        GasHydroLoss_flx_col(idg_NH3,NY,NX)=GasHydroLoss_flx_col(idg_NH3,NY,NX)+flux
-        GasHydroSubsLoss_flx_col(idg_NH3,NY,NX)=GasHydroSubsLoss_flx_col(idg_NH3,NY,NX)+flux
+        GasHydroSubsLoss_flx_col(idg_NH3,NY,NX) = GasHydroSubsLoss_flx_col(idg_NH3,NY,NX)+flux
 
       endif
 
@@ -1280,7 +1332,7 @@ implicit none
       VFLW=VFLWX
     ENDIF
 
-    DO  K=1,jcplx
+    DO  K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
         DOM_Adv_Litr2Soil_flxM(idom,K)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,0,NY,NX))
       ENDDO
@@ -1360,9 +1412,13 @@ implicit none
   IF((VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX) .AND. VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
     .AND. (VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 !
-    DO  K=1,jcplx
+    DO  K=1,micpar%NumOfLitrCmplxs
       do idom=idom_beg,idom_end
         CDOM_MicP_litr(idom,K)=AZMAX1(DOM_MicP2_vr(idom,K,0,NY,NX)/VLWatMicPM_vr(M,0,NY,NX))
+      enddo
+    ENDDO
+    DO  K=1,jcplx
+      do idom=idom_beg,idom_end
         CDOM_MicP_soil(idom,K)=AZMAX1(DOM_MicP2_vr(idom,K,NU_col(NY,NX),NY,NX)/VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX))
       enddo
     ENDDO
@@ -1414,7 +1470,9 @@ implicit none
 
   subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
     DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM)
-  use EcoSiMParDataMod, only : micpar
+  !
+  !Description:
+  !
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NY, NX
@@ -1501,7 +1559,7 @@ implicit none
           VFLW=VFLWX
         ENDIF
 
-        DO  K=1,jcplx
+        DO  K=1,micpar%NumOfLitrCmplxs
           DO idom=idom_beg,idom_end
             DOM_FloXSurRunoff_PotFlxM(idom,K,N2,N1)=VFLW*AZMAX1(DOM_MicP2_vr(idom,K,0,N2,N1))
           enddo
@@ -2641,9 +2699,7 @@ implicit none
           !
           !     PROPORTIONAL REMOVAL OF EXCESS AQUEOUS GASES
           !
-!          if(I==122 .and. J==5 .or. idg==idg_NH3)then
-!            write(*,*)(I*1000+J)*100+M,N3,'nh3',trcg_gasml2_vr(idg_NH3,N3,N2,N1),AZERO(trcg_gasml_vr(idg_NH3,N3,N2,N1))
-!          endif
+
           IF(VTGAS.GT.VTATM)THEN
             DVTGAS  = 0.5_r8*(VTATM-VTGAS)         !<0, bubbling occurs
             FracEbu = AZMIN1(DVTGAS/VTGAS)
@@ -3240,9 +3296,9 @@ implicit none
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS  
-      !--------------------
+      !-----------------------------------------------------------------------------------------------
       !to litter
-      DO  K=1,jcplx
+      DO  K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           
           flux0=DOM_SurfRunoff_flxM(idom,K,NY,NX)+DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)          
@@ -3252,18 +3308,16 @@ implicit none
             call get_flux_scalar(DOM_MicP2_vr(idom,K,0,NY,NX),flux,DOM_MicP_vr(idom,K,0,NY,NX),pscal_dom(idom))
 
             if(lfupdate)then
-              DOM_mass3_col(idom,K,NY,NX)  = DOM_mass3_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)
-              DOM_MicP2_vr(idom,K,0,NY,NX) = DOM_MicP_vr(idom,K,0,NY,NX)
-              DOM_mass4_col(idom,K,NY,NX)  = DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)
-              TranspNetDOM_flxM_col(idom,K,NY,NX)=TranspNetDOM_flxM_col(idom,K,NY,NX)+flux0
-                                       
+              DOM_mass3_col(idom,K,NY,NX)         = DOM_mass3_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)
+              DOM_MicP2_vr(idom,K,0,NY,NX)        = DOM_MicP_vr(idom,K,0,NY,NX)
+              DOM_mass4_col(idom,K,NY,NX)         = DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)
+              TranspNetDOM_flxM_col(idom,K,NY,NX) = TranspNetDOM_flxM_col(idom,K,NY,NX)+flux0                                       
             endif  
           endif
         ENDDO
       ENDDO
 
      !exclude NH3B
-
       DO idg=idg_beg,idg_NH3-1        
         flux = RGasAtmDisol2LitrM_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)+trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)        
         lflux=.true. .or. .not.isclose(flux,0._r8)
@@ -3281,8 +3335,7 @@ implicit none
       ENDDO
 
       idg=idg_NH3      
-      flux = RGasAtmDisol2LitrM_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)+trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX) &
-        -RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)
+      flux = RGasAtmDisol2LitrM_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX)+trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)         
       lflux=.true. .or. .not.isclose(flux,0._r8)  
       if(lflux .and. dpscal(idg)>tiny_p)then          
         flux=flux*dpscal(idg)
@@ -3293,7 +3346,7 @@ implicit none
       endif
 
       DO ids=ids_nut_beg,ids_nuts_end        
-        flux=trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)+trcn_SurfRunoff_flxM(ids,NY,NX)-RBGCSinkSoluteM_vr(ids,0,NY,NX)        
+        flux=trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)+trcn_SurfRunoff_flxM(ids,NY,NX)
         lflux=.true. .or. .not.isclose(flux,0._r8)
         if(lflux .and. dpscal(ids)>tiny_p)then          
           flux=flux*dpscal(ids)
@@ -3303,15 +3356,15 @@ implicit none
           endif  
         endif
       ENDDO
-
-      !-------------------------
+        
+      !----------------------------------------------------------------------------------------------------
       !topsoil
       L=NU_col(NY,NX)
       IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN            
         DO idg=idg_beg,idg_end
           flux0=RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(idg,L,NY,NX) & 
-            +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX) &
-            -RBGCSinkSoluteM_vr(idg,L,NY,NX)     
+            +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(idg,L,NY,NX)
+               
           lflux=.true. .or. .not.isclose(flux0,0._r8)              
           if(lflux .and. dpscal(idg)>tiny_p)then          
             flux=flux0*dpscal(idg)    
@@ -3325,15 +3378,14 @@ implicit none
               trcs_solml2_vr(idg,L,NY,NX)            = trcs_solml_vr(idg,L,NY,NX)
               TranspNetSoil_slow_flxM_col(idg,NY,NX) = TranspNetSoil_slow_flxM_col(idg,NY,NX)+ &
                 RGasAtmDisol2SoilM_col(idg,NY,NX)+trcsol_Irrig_flxM_vr(idg,L,NY,NX) & 
-                +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)  &
-                -RBGCSinkSoluteM_vr(idg,L,NY,NX)                 
+                +trcs_Transp2Micp_flxM_vr(idg,L,NY,NX) + trcs_Transp2Macp_flxM_vr(idg,L,NY,NX)
             endif  
           endif
         ENDDO
 
         DO ids=ids_NH4B,ids_nuts_end          
-          flux = trcsol_Irrig_flxM_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX) &
-            -RBGCSinkSoluteM_vr(ids,L,NY,NX)
+          flux = trcsol_Irrig_flxM_vr(ids,L,NY,NX)+trcs_Transp2Micp_flxM_vr(ids,L,NY,NX) + trcs_Mac2MicPore_flxM_vr(ids,L,NY,NX)
+            
           lflux=.true. .or. .not.isclose(flux,0._r8)  
           if(lflux .and. dpscal(ids)>tiny_p)then          
             flux=flux*dpscal(ids)     
@@ -3370,7 +3422,6 @@ implicit none
 
               if(lfupdate)then
                 DOM_mass3_col(idom,K,NY,NX)=DOM_mass3_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)
-
                 DOM_MicP2_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)
                 DOM_MacP2_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)
                 DOM_mass4_col(idom,K,NY,NX)=DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)                

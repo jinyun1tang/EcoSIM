@@ -7,7 +7,7 @@ module MicBGCMod
   use data_kind_mod,        only: r8 => DAT_KIND_R8
   use abortutils,           only: endrun,   destroy
   use EcoSIMCtrlMod,        only: etimer
-  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux
+  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux,SubstrateDribbling
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
@@ -233,9 +233,9 @@ module MicBGCMod
         ENDDO  
       ENDDO
     ENDDO 
-    sorbom(ielmc)=sorbom(ielmc)+SorbedOM(idom_acetate,K)   
-    doms(ielmc)=doms(ielmc)+DOM(idom_acetate,K)    
-    TOMS(ielmc)=TOMS(ielmc)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K)           
+    sorbom(ielmc) = sorbom(ielmc)+SorbedOM(idom_acetate,K)
+    doms(ielmc)   = doms(ielmc)+DOM(idom_acetate,K)
+    TOMS(ielmc)   = TOMS(ielmc)+DOM(idom_acetate,K)+SorbedOM(idom_acetate,K)
   ENDDO
 
   !add live autotrophic biomass

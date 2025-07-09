@@ -1,7 +1,7 @@
 module MicAutoCPLXMod
 ! USES:
   use data_kind_mod,        only: r8 => DAT_KIND_R8
-  use minimathmod,          only: safe_adb, AZMAX1, fixEXConsumpFlux
+  use minimathmod,          only: safe_adb, AZMAX1, fixEXConsumpFlux,SubstrateDribbling
   use MicForcTypeMod,       only: micforctype
   use MicFluxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
@@ -883,29 +883,29 @@ module MicAutoCPLXMod
 !     ECHZ=growth respiration efficiency
 !     RSOxidSoilAutor,RSOxidBandAutor=total O2-limited (1)NH4,(2)NO2,(3)CH4 oxidation
 !
-  FNO2S=VLNO3
-  FNO2B=VLNOB
-  ROXYD=AZMAX1(RO2Dmnd4RespAutor(NGL)-RO2Uptk4RespAutor(NGL))
-  VMXD4=0.875_r8*ROXYD*XCO2
-  VMXDXS=FNO2S*VMXD4*CNO2S/(CNO2S+Z2KM)
-  VMXDXB=FNO2B*VMXD4*CNO2B/(CNO2B+Z2KM)
-  VMXDXT=VMXDXS+VMXDXB
+  FNO2S  = VLNO3
+  FNO2B  = VLNOB
+  ROXYD  = AZMAX1(RO2Dmnd4RespAutor(NGL)-RO2Uptk4RespAutor(NGL))
+  VMXD4  = 0.875_r8*ROXYD*XCO2
+  VMXDXS = FNO2S*VMXD4*CNO2S/(CNO2S+Z2KM)
+  VMXDXB = FNO2B*VMXD4*CNO2B/(CNO2B+Z2KM)
+  VMXDXT = VMXDXS+VMXDXB
   IF(VOLWZ.GT.ZEROS2)THEN
     FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ))
   ELSE
     FVMXDX=0.0_r8
   ENDIF
-  VMXD4S=VMXDXS*FVMXDX
-  VMXD4B=VMXDXB*FVMXDX
-  ZNO2SX=ZNO2S+RTotNH3OxidSoilAutor
-  ZNO2BX=ZNO2B+RTotNH3OxidBandAutor
-  RNO2ReduxAutorSoil(NGL)=AZMAX1(AMIN1(VMXD4S,ZNO2SX))
-  RNO2ReduxAutorBand(NGL)=AZMAX1(AMIN1(VMXD4B,ZNO2BX))
-  RDNOT=RNO2ReduxAutorSoil(NGL)+RNO2ReduxAutorBand(NGL)
-  RNOxReduxRespAutorLim(NGL)=RDNOT*ECNO*ENOX
-  RNO3UptkAutor(NGL)=0.0_r8
-  RNO2OxidAutor(NGL)=VMXD4S
-  RNO2OxidAutorBand(NGL)=VMXD4B
+  VMXD4S                     = VMXDXS*FVMXDX
+  VMXD4B                     = VMXDXB*FVMXDX
+  ZNO2SX                     = ZNO2S+RTotNH3OxidSoilAutor
+  ZNO2BX                     = ZNO2B+RTotNH3OxidBandAutor
+  RNO2ReduxAutorSoil(NGL)    = AZMAX1(AMIN1(VMXD4S,ZNO2SX))
+  RNO2ReduxAutorBand(NGL)    = AZMAX1(AMIN1(VMXD4B,ZNO2BX))
+  RDNOT                      = RNO2ReduxAutorSoil(NGL)+RNO2ReduxAutorBand(NGL)
+  RNOxReduxRespAutorLim(NGL) = RDNOT*ECNO*ENOX
+  RNO3UptkAutor(NGL)         = 0.0_r8
+  RNO2OxidAutor(NGL)         = VMXD4S
+  RNO2OxidAutorBand(NGL)     = VMXD4B
   !NH4 oxidation by NO2(-)
   RSOxidSoilAutor(NGL)=RSOxidSoilAutor(NGL)+0.333_r8*RNO2ReduxAutorSoil(NGL)
   RSOxidBandAutor(NGL)=RSOxidBandAutor(NGL)+0.333_r8*RNO2ReduxAutorBand(NGL)

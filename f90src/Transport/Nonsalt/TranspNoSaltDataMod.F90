@@ -11,35 +11,37 @@ implicit none
   real(r8), Parameter :: VFLWX=0.5_r8                             !default outflow in water for micropore-macropore exchange
   real(r8), allocatable :: errmass_fast(:,:,:)                    !fast transport mass error, [g d-2]
   real(r8), allocatable :: errmass_slow(:,:,:)                    !slow transport mass error, [g d-2]
-  real(r8), allocatable :: trcs_Soil2plant_uptkdrb_vr(:,:,:,:)    !substrate dribble-corrected chemical uptake by plant roots, [g d-2]
-  real(r8), allocatable :: trcg_AquaADV_Snow2Soil_flxM(:,:,:)     !gas advection flux from snow to top soil at iteration M [g d-2]
-  real(r8), allocatable :: trcn_AquaADV_Snow2Band_flxM(:,:,:)     !nutrient advection flux from snow to top band soil at iteration M [g d-2]
-  real(r8), allocatable :: trcn_AquaADV_Snow2Soil_flxM(:,:,:)     !nutrient advection flux from snow to top soil at iteration M [g d-2]
-  real(r8), allocatable :: Gas_AdvDif_FlxMM_2DH(:,:,:)            !2D horizontal gas fluxes
-  real(r8), allocatable :: DOM_transpFlxM_2DH(:,:,:,:)            !2D horizontal DOM fluxes [g d-2]
-  real(r8), allocatable :: trcs_transpFlxM_2DH(:,:,:)             !2D horizontal solute fluxes [g d-2]
-  real(r8), allocatable :: DOM_MicP2_vr(:,:,:,:,:)                !copy of DOM in micropore for transport iteration [g d-2]
-  real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:)     !3D DOM transport through micropores at iteration M [g d-2]
-  real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:)     !3D DOM transport through macropores at iteration M [g d-2]
-  real(r8), allocatable :: DOM_Transp2Micp_flxM_vr(:,:,:,:,:)     !DOM transport to micropore at iteration M [g d-2]
-  real(r8), allocatable :: DOM_Transp2Macp_flxM_vr(:,:,:,:,:)     !DOM transport to macropore at iteration M [g d-2]  
+  real(r8), allocatable :: trcg_AquaADV_Snow2Soil_flxM(:,:,:)     !gas advection flux from snow to top soil at iteration M, [g d-2]
+  real(r8), allocatable :: trcn_AquaADV_Snow2Band_flxM(:,:,:)     !nutrient advection flux from snow to top band soil at iteration M, [g d-2]
+  real(r8), allocatable :: trcn_AquaADV_Snow2Soil_flxM(:,:,:)     !nutrient advection flux from snow to top soil at iteration M, [g d-2]
+  real(r8), allocatable :: Gas_AdvDif_FlxMM_2DH(:,:,:)            !2D horizontal gas fluxes, [g d-2]
+  real(r8), allocatable :: DOM_transpFlxM_2DH(:,:,:,:)            !2D horizontal DOM fluxes, [g d-2]
+  real(r8), allocatable :: trcs_transpFlxM_2DH(:,:,:)             !2D horizontal solute fluxes, [g d-2]
+  real(r8), allocatable :: DOM_MicP2_vr(:,:,:,:,:)                !copy of DOM in micropore for transport iteration, [g d-2]
+  real(r8), allocatable :: DOM_MicpTranspFlxM_3D(:,:,:,:,:,:)     !3D DOM transport through micropores at iteration M, [g d-2]
+  real(r8), allocatable :: DOM_MacpTranspFlxM_3D(:,:,:,:,:,:)     !3D DOM transport through macropores at iteration M, [g d-2]
+  real(r8), allocatable :: DOM_Transp2Micp_flxM_vr(:,:,:,:,:)     !DOM transport to micropore at iteration M, [g d-2]
+  real(r8), allocatable :: DOM_Transp2Macp_flxM_vr(:,:,:,:,:)     !DOM transport to macropore at iteration M, [g d-2]  
   real(r8), allocatable :: RDOM_CumEcoProd_vr(:,:,:,:,:)
-  real(r8), allocatable :: WaterFlow2SoilMM_3D(:,:,:,:)           !3D water flow used for fast iteration 
-  real(r8), allocatable :: GasDiff2Litr_flx_col(:,:,:)            !diffusive gas flux to litter [g d-2 h-1]
-  real(r8), allocatable :: RGasAtmDisol2SoilM_col(:,:,:)          !Gas dissolution from atmosphere into soil at iteration M
-  real(r8), allocatable :: RGasAtmDisol2LitrM_col(:,:,:)          !Gas dissolution from atmosphere into litter at iteration M
-
+  real(r8), allocatable :: WaterFlow2SoilMM_3D(:,:,:,:)            !3D water flow used for fast iteration, [m3 H2O d-2]
+  real(r8), allocatable :: GasDiff2Litr_flx_col(:,:,:)             !diffusive gas flux to litter, [g d-2 h-1]
+  real(r8), allocatable :: RGasAtmDisol2SoilM_col(:,:,:)           !Gas dissolution from atmosphere into soil at iteration M,[g d-2]
+  real(r8), allocatable :: RGasAtmDisol2LitrM_col(:,:,:)           !Gas dissolution from atmosphere into litter at iteration M,[g d-2]
+  real(r8), allocatable :: RBGCSink_DOM_micpM_vr(:,:,:,:,:)        !DOM sink during iteration M, [g d-2]
+  real(r8), allocatable :: GasDiff2Surf_fast_flx_col(:,:,:)        !gas diffusion flux in fast transport at iteration M, [g d-2]
   real(r8), allocatable :: DOM_FloXSurRunoff_PotFlxM(:,:,:,:)      !Potential DOM flux through surface runoff at iteration M [g d-2]
-  real(r8), allocatable :: RBGCSinkGasMM_vr(:,:,:,:)               !BGC sink for gaseous tracers at gas iteration MM
-  real(r8), allocatable :: RBGCSinkSoluteM_vr(:,:,:,:)             !BGC sink for solute tracers at heat iteration M
-  real(r8), allocatable :: trcg_AquaAdv_flxM_snvr(:,:,:,:)         !gas advection by water advection in snow at iteration M [g d-2]                   
-  real(r8), allocatable :: trcn_AquaAdv_flxM_snvr(:,:,:,:)         !solute advection by water advection in snow at iteration M [g d-2]
-  real(r8), allocatable :: DOM_Flo2LitrM(:,:,:,:)                  !DOM flow into litter layer at iteration M [gC d-2]
-  real(r8), allocatable :: DOM_Flo2TopSoilM(:,:,:,:)               !DOM flow into topsoil layer at iteration M [gC d-2]
-  real(r8), allocatable :: trcg_Precip2LitrM_col(:,:,:)                !wet precipiation gas flux to litter at iteration M [g d-2]
-  real(r8), allocatable :: trcn_Precip2LitrM_col(:,:,:)                !wet precipiation nutrient flux to litter at iteration M [g d-2]
-  real(r8), allocatable :: trcs_Precip2MicpM_col(:,:,:)                !wet precipiation nutrient flux to soil micropore at iteration M [g d-2]
-  real(r8), allocatable :: DOM_Mac2MicPore_flxM_vr(:,:,:,:,:)      !DOM exchange from macropore and micropore at iteration M [g d-2]
+  real(r8), allocatable :: RBGCSrceGasMM_vr(:,:,:,:)               !BGC source for gaseous tracers at gas iteration MM, [g d-2]
+  real(r8), allocatable :: RBGCSinkGasMM_vr(:,:,:,:)               !BGC sink for gaseous tracers at gas iteration MM, [g d-2]
+  real(r8), allocatable :: RBGCSinkSoluteM_vr(:,:,:,:)             !BGC sink for solute tracers at solute iteration M, [g d-2]
+  real(r8), allocatable :: RBGCSrcSoluteM_vr(:,:,:,:)              !BGC source for solute tracers at solute iteration M, [g d-2]
+  real(r8), allocatable :: trcg_AquaAdv_flxM_snvr(:,:,:,:)         !gas advection by water advection in snow at iteration M, [g d-2]                   
+  real(r8), allocatable :: trcn_AquaAdv_flxM_snvr(:,:,:,:)         !solute advection by water advection in snow at iteration M, [g d-2]
+  real(r8), allocatable :: DOM_Flo2LitrM(:,:,:,:)                  !DOM flow into litter layer at iteration M, [gC d-2]
+  real(r8), allocatable :: DOM_Flo2TopSoilM(:,:,:,:)               !DOM flow into topsoil layer at iteration M, [gC d-2]
+  real(r8), allocatable :: trcg_Precip2LitrM_col(:,:,:)                !wet precipiation gas flux to litter at iteration M, [g d-2]
+  real(r8), allocatable :: trcn_Precip2LitrM_col(:,:,:)                !wet precipiation nutrient flux to litter at iteration M, [g d-2]
+  real(r8), allocatable :: trcs_Precip2MicpM_col(:,:,:)                !wet precipiation nutrient flux to soil micropore at iteration M, [g d-2]
+  real(r8), allocatable :: DOM_Mac2MicPore_flxM_vr(:,:,:,:,:)      !DOM exchange from macropore and micropore at iteration M, [g d-2]
 
   real(r8), allocatable ::  DOM_SurfRunoff_flxM(:,:,:,:)           !DOM incoming flux to grid from surface runoff at iteration M [g d-2]
 
@@ -53,7 +55,7 @@ implicit none
   real(r8), allocatable ::  GasDifctScaledMM_vr(:,:,:,:)           !time scaled gas diffusivity
   real(r8), allocatable ::  SoluteDifusivitytscaledM_vr(:,:,:,:)   !time scaled solute diffusivity
   real(r8), allocatable ::  trcg_VLWatMicP_vr(:,:,:,:)             !solubility-scaled effective volume for dissolved gas species [m3 d-2]
-
+  real(r8), allocatable ::  trcs_solml_drib_beg_col(:,:,:)             !total dribbling tracer mass at the beginning of transport iteration, [g d-2]
   real(r8), allocatable ::  tScalReductVLsoiAirPMM_vr(:,:,:)          !time scaled air-filled reduction volume [m3 h /d2 ]
   real(r8), allocatable ::  VLsoiAirPMA_vr(:,:,:)                      !Effective air-filled soil pore volume occupied by NH4 [m3]
   real(r8), allocatable ::  VLsoiAirPMB_vr(:,:,:)                      !Effective air-filled soil pore volume occupied by band-NH4 [m3]
@@ -81,55 +83,56 @@ implicit none
   real(r8), allocatable :: trcs_soHml2_vr(:,:,:,:)                      !copy of solute tracer in macropore for transport [g d-2]
   real(r8), allocatable ::  trcn_SnowDrift_flxM_2DH(:,:,:,:,:)           !nutrient flux through snow drift at iteration M [g d-2]
   real(r8), allocatable ::  trcg_SnowDrift_flxM_2DH(:,:,:,:,:)           !gas flux through snow drift at iteration M  [g d-2]                  
-  real(r8), allocatable ::  RGas_Disol_FlxMM_vr(:,:,:,:)                !gas dissolution (>0 into aqueous phase) at iteration MM [g d-2]
-  real(r8), allocatable ::  Gas_AdvDif_FlxMM_3D(:,:,:,:,:)              !3D gas flux advection + diffusion at iteration MM [g d-2]
-  real(r8), allocatable ::  Gas_AdvDif_FlxMM_vr(:,:,:,:)                !total 3D gas flux advection + diffusion at iteration MM [g d-2]
-  real(r8), allocatable :: trcs_MacpTranspFlxM_3D(:,:,:,:,:)            !solute 3D macropore flux at iteration M [g d-2]
-  real(r8), allocatable :: trcs_MicpTranspFlxM_3D(:,:,:,:,:)            !solute 3D micropore flux at iteration M [g d-2]
-  real(r8), allocatable :: trcs_Mac2MicPore_flxM_vr(:,:,:,:)            !Mac to micropore nutrient flux at iteration M [g d-2]
-  real(r8), allocatable :: trcg_AquaADV_Snow2Litr_flxM(:,:,:)           !aqueous gas flow from snow to litr [g d-2]
-  real(r8), allocatable :: trcn_AquaADV_Snow2Litr_flxM(:,:,:)           !aqueous nutrient flow from snow to litr [g d-2]
+  real(r8), allocatable ::  RGas_Disol_FlxMM_vr(:,:,:,:)                !gas dissolution (>0 into aqueous phase) at iteration MM, [g d-2]
+  real(r8), allocatable ::  Gas_AdvDif_FlxMM_3D(:,:,:,:,:)              !3D gas flux advection + diffusion at iteration MM, [g d-2]
+  real(r8), allocatable ::  Gas_AdvDif_FlxMM_vr(:,:,:,:)                !total 3D gas flux advection + diffusion at iteration MM, [g d-2]
+  real(r8), allocatable :: trcs_MacpTranspFlxM_3D(:,:,:,:,:)            !solute 3D macropore flux at iteration M, [g d-2]
+  real(r8), allocatable :: trcs_MicpTranspFlxM_3D(:,:,:,:,:)            !solute 3D micropore flux at iteration M, [g d-2]
+  real(r8), allocatable :: trcs_Mac2MicPore_flxM_vr(:,:,:,:)            !Mac to micropore nutrient flux at iteration M, [g d-2]
+  real(r8), allocatable :: trcg_AquaADV_Snow2Litr_flxM(:,:,:)           !aqueous gas flow from snow to litter, [g d-2]
+  real(r8), allocatable :: trcn_AquaADV_Snow2Litr_flxM(:,:,:)           !aqueous nutrient flow from snow to litter, [g d-2]
 
-  real(r8), allocatable :: Gas_litr2Soil_flx_col(:,:,:)                 !gas flux from litter to soil [g d-2 h-1]
-  real(r8), allocatable :: Gas_litr2Soil_flxM_col(:,:,:)                !gas flux from litter to soil at iteration M [g d-2]
-  real(r8), allocatable :: GasHydroLoss_litr_flx_col(:,:,:)             !gas flux loss through surface runoff [g d-2 h-1]
-  real(r8), allocatable :: GasDiff2Soil_flx_col(:,:,:)                  !gas diffusion flux into soil [g d-2 h-1]
-  real(r8), allocatable :: Gas_WetDepo2Soil_col(:,:,:)                  !gas wet deposition flux into soil [g d-2 h-1]
-  real(r8), allocatable :: RGasNetProdSoil_col(:,:,:)                   !gas production in soil [g d-2 h-1]
-  real(r8), allocatable :: trc_topsoil_flx_col(:,:,:)                   !net tracer flux at the top of soil [g d-2 -h1]
-  real(r8), allocatable :: TranspNetSoil_flx_col(:,:,:)                 !total tracer flux due to transport in soil [g d-2 h-1]
-  real(r8), allocatable :: TranspNetSoil_flx2_col(:,:,:)                !total tracer flux due to transport in soil at iteration M [g d-2 h-1]
-  real(r8), allocatable :: TranspNetSoil_fast_flxM_col(:,:,:)           !total tracer flux due to fast transport in soil at iteration M [g d-2 h-1]
-  real(r8), allocatable :: TranspNetSoil_slow_flxM_col(:,:,:)           !total tracer flux due to slow transport in soil at iteration M [g d-2 h-1]
-  real(r8), allocatable :: transp_diff_slow_vr(:,:,:,:)                 !error in computing the transport profile [g d-2 h-1]
-  real(r8), allocatable :: Gas_WetDepo2Snow_col(:,:,:)                  !wet deposition to snow [g d-2 h-1] 
+  real(r8), allocatable :: Gas_litr2Soil_flx_col(:,:,:)                 !gas flux from litter to soil, [g d-2 h-1]
+  real(r8), allocatable :: Gas_litr2Soil_flxM_col(:,:,:)                !gas flux from litter to soil at iteration M, [g d-2]
+  real(r8), allocatable :: GasHydroLoss_litr_flx_col(:,:,:)             !gas flux loss through surface runoff, [g d-2 h-1]
+  real(r8), allocatable :: GasDiff2Soil_flx_col(:,:,:)                  !gas diffusion flux into soil, [g d-2 h-1]
+  real(r8), allocatable :: Gas_WetDepo2Soil_col(:,:,:)                  !gas wet deposition flux into soil, [g d-2 h-1]
+  real(r8), allocatable :: RGasNetProdSoil_col(:,:,:)                   !gas production in soil, [g d-2 h-1]
+  real(r8), allocatable :: trc_topsoil_flx_col(:,:,:)                   !net tracer flux at the top of soil, [g d-2 -h1]
+  real(r8), allocatable :: TranspNetSoil_flx_col(:,:,:)                 !total tracer flux due to transport in soil, [g d-2 h-1]
+  real(r8), allocatable :: TranspNetSoil_flx2_col(:,:,:)                !total tracer flux due to transport in soil at iteration M, [g d-2 h-1]
+  real(r8), allocatable :: TranspNetSoil_fast_flxM_col(:,:,:)           !total tracer flux due to fast transport in soil at iteration M, [g d-2 h-1]
+  real(r8), allocatable :: TranspNetSoil_slow_flxM_col(:,:,:)           !total tracer flux due to slow transport in soil at iteration M, [g d-2 h-1]
+  real(r8), allocatable :: transp_diff_slow_vr(:,:,:,:)                 !error in computing the transport profile, [g d-2 h-1]
+  real(r8), allocatable :: Gas_WetDepo2Snow_col(:,:,:)                  !wet deposition to snow, [g d-2 h-1] 
   real(r8), allocatable :: Gas_Snowloss_flx_col(:,:,:)                      !tracer loss from snow [g d-2 h-1]
   real(r8), allocatable :: trcg_mass_begf(:,:,:)                        !initial tracer mass check in fast transport
   real(r8), allocatable :: trcg_mass_begs(:,:,:)                        !initial tracer mass check in slow transport
   real(r8), allocatable :: trcg_mass_snow_begs(:,:,:)                   !tracer in snow during slow iteration [g d-2]
   real(r8), allocatable :: trcg_mass_litr_begs(:,:,:)                   !tracer in litter during slow iteration [g d-2]
   real(r8), allocatable :: trcg_mass_soil_begs(:,:,:)                   !tracer in soil during slow iteration [g d-2]
-  real(r8), allocatable :: trcg_netflx2_col(:,:,:)                  !net tracer flux into soil during gas transport
-  real(r8), allocatable :: TranspNetSoil_fast_flx_col(:,:,:)            !
-  real(r8), allocatable :: RGas_Disol_FlxM_vr(:,:,:,:)
+  real(r8), allocatable :: trcg_netflx2_col(:,:,:)                      !net tracer flux into soil during gas transport, [g d-2]
+  real(r8), allocatable :: TranspNetSoil_fast_flx_col(:,:,:)            !tracer flux in fast transport iteration, [g d-2]
   real(r8), allocatable :: RGasSinkScalar_vr(:,:,:,:)                   !BGC sink scalar for numerical stability, [none]
-  real(r8), allocatable :: DOM_mass_begs(:,:,:,:)                       !DOM  mass check in slow transport
-  real(r8), allocatable :: trcs_mass_beg(:,:,:)                         !initial tracer mass before doing transport
-  real(r8), allocatable :: trcs_mass_litr(:,:,:)
-  real(r8), allocatable :: trcs_mass_snow(:,:,:)
-  real(r8), allocatable :: trcs_mass_soil(:,:,:)  
-  real(r8), allocatable :: DOM_Hydroloss_slow_flx_col(:,:,:,:)                  !total dom loss through hydrological pathways
-  real(r8), allocatable :: TranspNetDOM_flx_col(:,:,:,:)               !net dom flux during slow transport
-  real(r8), allocatable :: TranspNetDOM_flx2_col(:,:,:,:)              !net dom flux during slow transport  
-  real(r8), allocatable :: TranspNetDOM_flxM_col(:,:,:,:)              !net dom flux during iteration of slow transport
-  real(r8), allocatable :: DOM_mass3_col(:,:,:,:)                      !total dom mass for conservation check
-  real(r8), allocatable :: DOM_mass4_col(:,:,:,:)                      !total dom mass for conservation check  
-  real(r8), allocatable :: Gas_WetDeposit_slow_flx_col(:,:,:)          !wet deposition in one iteration of slow transport [g d-2]
-  real(r8), allocatable :: GasDiff2Surf_slow_flx_col(:,:,:)            !surface diffusion in one iteration of slow transport [g d-2]
-  real(r8), allocatable :: trcs_NetProd_slow_flx_col(:,:,:)            !net tracer production flux during slow transport [g d-2]
-  real(r8), allocatable :: trcs_hydrloss_slow_flx_col(:,:,:)           !tracer loss through snow drift, surf/subsurf runoff, and drainage in slow transport [g d-2]
-  real(r8), allocatable :: Gas_WetDepo2Snow_slow_flx_col(:,:,:)
-  real(r8), allocatable :: Gas_Snowloss_slow_flx_col(:,:,:)
+  real(r8), allocatable :: DOM_mass_begs(:,:,:,:)                       !DOM  mass check in slow transport, [g d-2]
+  real(r8), allocatable :: trcs_mass_beg(:,:,:)                         !initial tracer mass before doing transport, [g d-2]
+  real(r8), allocatable :: trcs_mass_litr(:,:,:)                        !tracer mass in litter, [g d-2]
+  real(r8), allocatable :: trcs_mass_snow(:,:,:)                        !tracer mass in snow, [g d-2]
+  real(r8), allocatable :: trcs_mass_soil(:,:,:)                        !tracer mass in soil, [g d-2]
+  real(r8), allocatable :: DOM_Hydroloss_slow_flx_col(:,:,:,:)          !total dom loss through hydrological pathways, [g d-2]
+  real(r8), allocatable :: TranspNetDOM_flx_col(:,:,:,:)               !net dom flux during slow transport, [g d-2]
+  real(r8), allocatable :: TranspNetDOM_flx2_col(:,:,:,:)              !net dom flux during slow transport, [g d-2]  
+  real(r8), allocatable :: TranspNetDOM_flxM_col(:,:,:,:)              !net dom flux during iteration of slow transport, [g d-2]
+  real(r8), allocatable :: DOM_mass3_col(:,:,:,:)                      !total dom mass for conservation check, [g d-2]
+  real(r8), allocatable :: DOM_mass4_col(:,:,:,:)                      !total dom mass for conservation check, [g d-2]  
+  real(r8), allocatable :: Gas_WetDeposit_slow_flx_col(:,:,:)          !wet deposition in one iteration of slow transport, [g d-2]
+  real(r8), allocatable :: GasDiff2Surf_slow_flx_col(:,:,:)            !surface diffusion in one iteration of slow transport, [g d-2]
+  real(r8), allocatable :: trcs_NetProd_slow_flxM_col(:,:,:)            !net tracer production flux during slow transport, [g d-2]
+  real(r8), allocatable :: DOM_NetProd_slow_flxM_col(:,:,:,:)           !net dom production flux during slow transport, [g d-2]
+  real(r8), allocatable :: trcs_hydrloss_slow_flx_col(:,:,:)           !tracer loss through snow drift, surf/subsurf runoff, and drainage in slow transport, [g d-2]
+  real(r8), allocatable :: trcs_hydrloss_fast_flx_col(:,:,:)           !tracer loss through hydrological pathway in fast transport, [g d-2]
+  real(r8), allocatable :: Gas_WetDepo2Snow_slow_flx_col(:,:,:)        !gas deposition to snow through snowfall, [g d-2]
+  real(r8), allocatable :: Gas_Snowloss_slow_flx_col(:,:,:)            !
   real(r8), allocatable :: trcs_NetFlow2Litr_slow_flx_col(:,:,:)       !total flux into litter layer during one iteration of slow transport [g d-2]
   real(r8), allocatable :: trcs_netflow2soil_slow_flx_col(:,:,:)       !net tracer flow to soil in one iteration of slow transport [g d-2]
   real(r8), allocatable :: trcg_mass3_fast_col(:,:,:)
@@ -142,9 +145,11 @@ contains
   integer :: NumOfLitrCmplxs
 
   NumOfLitrCmplxs=micpar%NumOfLitrCmplxs
+  allocate(trcs_solml_drib_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_drib_beg_col=0._r8
+  allocate(DOM_NetProd_slow_flxM_col(idom_beg:idom_end,1:jcplx,JY,JX)); DOM_NetProd_slow_flxM_col=0._r8
+  allocate(GasDiff2Surf_fast_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_fast_flx_col=0._r8
   allocate(errmass_slow(ids_beg:ids_end,JY,JX)); errmass_slow=0._r8
   allocate(errmass_fast(idg_beg:idg_NH3,JY,JX)); errmass_fast=0._r8
-  allocate(trcs_Soil2plant_uptkdrb_vr(ids_beg:ids_end,JZ,JY,JX));trcs_Soil2plant_uptkdrb_vr=0._r8
   allocate(trcg_mass3_fast_col(idg_beg:idg_NH3,JY,JX)); trcg_mass3_fast_col=0._r8
   allocate(trcs_netflow2soil_slow_flx_col(ids_beg:ids_end,JY,JX)); trcs_netflow2soil_slow_flx_col=0._r8
   allocate(trcs_NetFlow2Litr_slow_flx_col(idg_beg:idg_NH3,JY,JX)); trcs_NetFlow2Litr_slow_flx_col=0._r8
@@ -152,7 +157,7 @@ contains
   allocate(trcg_mass_litr_begs(idg_beg:idg_NH3,JY,JX)); trcg_mass_litr_begs=0._r8
   allocate(trcg_mass_soil_begs(idg_beg:idg_NH3,JY,JX)); trcg_mass_soil_begs=0._r8
   allocate(trcs_hydrloss_slow_flx_col(ids_beg:ids_end,JY,JX)); trcs_hydrloss_slow_flx_col=0._r8
-  allocate(trcs_NetProd_slow_flx_col(ids_beg:ids_end,JY,JX)); trcs_NetProd_slow_flx_col=0._r8
+  allocate(trcs_NetProd_slow_flxM_col(ids_beg:ids_end,JY,JX)); trcs_NetProd_slow_flxM_col=0._r8
   allocate(GasDiff2Surf_slow_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_slow_flx_col=0._r8
   allocate(Gas_WetDeposit_slow_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDeposit_slow_flx_col=0._r8
   allocate(DOM_mass3_col(idom_beg:idom_end,jcplx,JY,JX)); DOM_mass3_col=0._r8
@@ -161,13 +166,12 @@ contains
   allocate(TranspNetDOM_flx2_col(idom_beg:idom_end,jcplx,JY,JX));TranspNetDOM_flx2_col=0._r8
   allocate(Gas_WetDepo2Snow_slow_flx_col(idg_beg:idg_NH3,JY,JX));Gas_WetDepo2Snow_slow_flx_col=0._r8
   allocate(Gas_Snowloss_slow_flx_col(idg_beg:idg_NH3,JY,JX));Gas_Snowloss_slow_flx_col=0._r8
-
+  allocate(trcs_hydrloss_fast_flx_col(ids_beg:ids_end,JY,JX)); trcs_hydrloss_fast_flx_col=0._r8
   allocate(TranspNetDOM_flxM_col(idom_beg:idom_end,jcplx,JY,JX));TranspNetDOM_flxM_col=0._r8
   allocate(DOM_Hydroloss_slow_flx_col(idom_beg:idom_end,jcplx,JY,JX)); DOM_Hydroloss_slow_flx_col=0._r8
   allocate(DOM_mass_begs(idom_beg:idom_end,jcplx,JY,JX));DOM_mass_begs=0._r8
   allocate(trcg_mass_begs(idg_beg:idg_NH3,JY,JX)); trcg_mass_begs=0._r8
   allocate(RGasSinkScalar_vr(idg_beg:idg_NH3,0:JZ,JY,JX));RGasSinkScalar_vr=1._r8
-  allocate(RGas_Disol_FlxM_vr(idg_beg:idg_NH3,JZ,JY,JX));RGas_Disol_FlxM_vr=0._r8
   allocate(TranspNetSoil_flx2_col(idg_beg:idg_NH3,JY,JX)); TranspNetSoil_flx2_col=0._r8
   allocate(trcg_mass_begf(idg_beg:idg_NH3,JY,JX)); trcg_mass_begf=0._r8
   allocate(Gas_WetDepo2Snow_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDepo2Snow_col=0._r8
@@ -232,9 +236,11 @@ contains
   allocate(VLWatMicPXB_vr(JZ,JY,JX));   VLWatMicPXB_vr=0._r8
   allocate(PARGas_CefMM(idg_beg:idg_NH3,JY,JX));      PARGas_CefMM=0._r8
 
+  allocate(RBGCSink_DOM_micpM_vr(idom_beg:idom_end,1:jcplx,0:JZ,JY,JX));RBGCSink_DOM_micpM_vr=0._r8
+  allocate(RBGCSrceGasMM_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); RBGCSrceGasMM_vr=0._r8
   allocate(RBGCSinkGasMM_vr(idg_beg:idg_NH3,0:JZ,JY,JX));RBGCSinkGasMM_vr=0._r8
   allocate(RBGCSinkSoluteM_vr(ids_beg:ids_end,0:JZ,JY,JX));RBGCSinkSoluteM_vr=0._r8
-
+  allocate(RBGCSrcSoluteM_vr(ids_beg:ids_end,0:JZ,JY,JX)); RBGCSrcSoluteM_vr=0._r8
   allocate(trcg_Ebu_flxM_vr(idg_beg:idg_end,JZ,JY,JX));   trcg_Ebu_flxM_vr                        = 0._r8
   allocate(trcg_FloXSurRunoff_PotFlxM(idg_beg:idg_end,JV,JH));     trcg_FloXSurRunoff_PotFlxM           = 0._r8
   allocate(trcn_FloXSurRunoff_PotFlxM(ids_nut_beg:ids_nuts_end,JV,JH));     trcn_FloXSurRunoff_PotFlxM  = 0._r8
@@ -284,9 +290,12 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(trcs_solml_drib_beg_col)
+  call destroy(DOM_NetProd_slow_flxM_col)
+  call destroy(RBGCSink_DOM_micpM_vr)
+  call destroy(GasDiff2Surf_fast_flx_col)
   call destroy(errmass_fast)
   call destroy(errmass_slow)
-  call destroy(trcs_Soil2plant_uptkdrb_vr)
   call destroy(trcg_mass3_fast_col)
   call destroy(trcs_netflow2soil_slow_flx_col)
   call destroy(Gas_WetDepo2Snow_slow_flx_col)
@@ -296,7 +305,8 @@ contains
   call destroy(trcg_mass_litr_begs)
   call destroy(trcg_mass_soil_begs)
   call destroy(trcs_hydrloss_slow_flx_col)
-  call destroy(trcs_NetProd_slow_flx_col)
+  call destroy(trcs_hydrloss_fast_flx_col)
+  call destroy(trcs_NetProd_slow_flxM_col)
   call destroy(GasDiff2Surf_slow_flx_col)
   call destroy(Gas_WetDeposit_slow_flx_col)
   call destroy(DOM_mass3_col)
@@ -308,7 +318,6 @@ contains
   call destroy(DOM_mass_begs)
   call destroy(trcg_mass_begs)
   call destroy(RGasSinkScalar_vr)
-  call destroy(RGas_Disol_FlxM_vr)
   call destroy(TranspNetSoil_flx2_col)
   call destroy(TranspNetSoil_fast_flx_col)  
   call destroy(trcg_netflx2_col)
@@ -344,6 +353,7 @@ contains
   call destroy(DOM_MicpTranspFlxM_3D)
   call destroy(DOM_MacpTranspFlxM_3D)
   call destroy(RBGCSinkSoluteM_vr)
+  call destroy(RBGCSrcSoluteM_vr)
   call destroy(DOM_FloXSurRunoff_PotFlxM)
   call destroy(DOM_FloXSurRof_flxM_2DH)
   call destroy(DOM_Flo2LitrM)
@@ -356,6 +366,7 @@ contains
   call destroy(trcn_AquaAdv_flxM_snvr)
   call destroy(trcg_Ebu_flxM_vr)
   call destroy(RBGCSinkGasMM_vr)
+  call destroy(RBGCSrceGasMM_vr)
   call destroy(trcg_FloXSurRunoff_PotFlxM)
   call destroy(DOM_SurfRunoff_flxM)
   call destroy(trcg_SurfRunoff_flxM)

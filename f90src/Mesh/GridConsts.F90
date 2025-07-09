@@ -21,6 +21,7 @@ implicit none
   integer, PARAMETER :: JP=5    !maximum pft in a given topgraphic column
   integer, PARAMETER :: NumCanopyLayers=10   !# of canopy layers
   integer, PARAMETER :: JS=5
+  integer, parameter :: jroots = 2     
   integer, PARAMETER :: NumLeafZenithSectors=4   !# of sectors for the leaf zenith [0,pi/2]
   integer, PARAMETER :: NumOfLeafAzimuthSectors=4   !# of sectors for the leaf azimuth, [0,pi]
   integer, PARAMETER :: NumOfSkyAzimuthSects=4   !# of sectors for the sky azimuth  [0,2*pi]

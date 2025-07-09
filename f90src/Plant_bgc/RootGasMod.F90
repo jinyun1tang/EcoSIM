@@ -597,7 +597,7 @@ module RootGasMod
     ! O2 is taken from inside the root and directly from the aqueous soil O2.
 
     PopPlantO2Uptake        = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_pvr(idg_O2,N,L,NZ)
-    RootO2_Xink_pvr(N,L,NZ) = PopPlantO2Uptake
+    RootO2_Xink_pvr(N,L,NZ) = PopPlantO2Uptake     !include O2 uptake from soil and from inside the roots
     !to be used in next iteration
     RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE

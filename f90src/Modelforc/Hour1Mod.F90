@@ -848,20 +848,21 @@ module Hour1Mod
 !     begin_execution
 
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL_col(NY,NX),NY,NX) = 0._r8
-  HeatSource_col(NY,NX)                                                       = 0._r8
-  REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                 = 0._r8
-  RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                              = 0._r8
-  trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)            = 0._r8
-  TRChem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                   = 0._r8
-  TRChem_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                = 0._r8
-  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                       = 0._r8
-  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)           = 0._r8
-  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
-  TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                  = 0._r8
-  THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  HeatSource_col(NY,NX)                                                               = 0._r8
+  REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                     = 0._r8
+  RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                                  = 0._r8
+  trcn_RprodChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)                = 0._r8
+  TRProd_chem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                       = 0._r8
+  TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                           = 0._r8
+  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)               = 0._r8
+  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
+  TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                      = 0._r8
+  THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                        = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
-  REcoUptkSoilO2M_vr(1:NPH,0:NL_col(NY,NX),NY,NX)                             = 0._r8
-  RainLitr_col(NY,NX)                                                         = 0._r8
+  REcoUptkSoilO2M_vr(1:NPH,0:NL_col(NY,NX),NY,NX)                                     = 0._r8
+  RainLitr_col(NY,NX)                                                                 = 0._r8
+  trcs_netpro_vr(:,:,NY,NX)                                                           = 0._r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
 
@@ -1647,12 +1648,12 @@ module Hour1Mod
     RootO2_Xink_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 
-    trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
-    trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_NO3B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
     TProd_CO2_geochem_soil_vr(L,NY,NX)          = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 

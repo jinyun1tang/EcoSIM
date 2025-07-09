@@ -120,8 +120,8 @@ module StartqMod
   CO2CuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)*1.56_r8
   rCNNonstRemob_pft(NZ,NY,NX)         = 2.5_r8
   rCPNonstRemob_pft(NZ,NY,NX)         = 25.0_r8
-  RootFracRemobilizableBiom_pft(NZ,NY,NX) = AMIN1(RootrNC_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
-    ,RootrPC_pft(NZ,NY,NX)*rCPNonstRemob_pft(NZ,NY,NX))
+  RootFracRemobilizableBiom_pft(NZ,NY,NX) = AMIN1(rNCRoot_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
+    ,rPCRootr_pft(NZ,NY,NX)*rCPNonstRemob_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I_pft(NZ,NY,NX)=2.10E+05_r8
   ELSE
@@ -431,8 +431,8 @@ module StartqMod
       ENDDO D9790
     ENDIF
   ENDDO D9795  
-  CNRTS_pft(NZ,NY,NX)                      = RootrNC_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
-  CPRTS_pft(NZ,NY,NX)                      = RootrPC_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
+  CNRTS_pft(NZ,NY,NX)                      = rNCRoot_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
+  CPRTS_pft(NZ,NY,NX)                      = rPCRootr_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
   Root1stMaxRadius_pft(imycorrhz,NZ,NY,NX) = 5.0E-06
   Root2ndMaxRadius_pft(imycorrhz,NZ,NY,NX) = 5.0E-06
   RootPorosity_pft(imycorrhz,NZ,NY,NX)     = RootPorosity_pft(1,NZ,NY,NX)
@@ -839,32 +839,32 @@ module StartqMod
 !
   SeedCPlanted_pft(NZ,NY,NX)            = SeedCMass_pft(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
   SeasonalNonstElms_pft(ielmc,NZ,NY,NX) = SeedCPlanted_pft(NZ,NY,NX)
-  SeasonalNonstElms_pft(ielmn,NZ,NY,NX) = CNGR_pft(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
-  SeasonalNonstElms_pft(ielmp,NZ,NY,NX) = CPGR_pft(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
-  LeafStrutElms_brch(ielmn,1,NZ,NY,NX)  = CNGR_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
-  LeafStrutElms_brch(ielmp,1,NZ,NY,NX)  = CPGR_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmn,NZ,NY,NX) = rNCGrain_pft(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
+  SeasonalNonstElms_pft(ielmp,NZ,NY,NX) = rPCGrain_pft(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
+  LeafStrutElms_brch(ielmn,1,NZ,NY,NX)  = rNCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
+  LeafStrutElms_brch(ielmp,1,NZ,NY,NX)  = rPCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   LeafPetolBiomassC_brch(1,NZ,NY,NX)    = LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetoleStrutElms_brch(ielmc,1,NZ,NY,NX)
   CanopyLeafShethC_pft(NZ,NY,NX)        = CanopyLeafShethC_pft(NZ,NY,NX)+LeafPetolBiomassC_brch(1,NZ,NY,NX)
     
   WatHeldOnCanopy_pft(NZ,NY,NX)          = 0._r8
-  CanopyNonstElms_brch(ielmn,1,NZ,NY,NX) = CNGR_pft(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
-  CanopyNonstElms_brch(ielmp,1,NZ,NY,NX) = CPGR_pft(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
+  CanopyNonstElms_brch(ielmn,1,NZ,NY,NX) = rNCGrain_pft(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
+  CanopyNonstElms_brch(ielmp,1,NZ,NY,NX) = rPCGrain_pft(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   
   RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
-    CNGR_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+    rNCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
-    CPGR_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  RootMyco1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=CNGR_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
-  RootMyco1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=CPGR_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+    rPCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=rNCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=rPCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootProteinC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom_pft(NZ,NY,NX)
-  RootMycoNonstElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= CNGR_pft(NZ,NY,NX)&
+  RootMycoNonstElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= rNCGrain_pft(NZ,NY,NX)&
     *RootMycoNonstElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
-  RootMycoNonstElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=CPGR_pft(NZ,NY,NX) &
+  RootMycoNonstElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=rPCGrain_pft(NZ,NY,NX) &
     *RootMycoNonstElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
 
   !shoots

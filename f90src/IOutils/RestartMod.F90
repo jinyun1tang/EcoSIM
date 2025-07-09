@@ -6668,8 +6668,6 @@ implicit none
        fill_value=spval)   
   endif  
 
-
-
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)        
     call restartvar(ncid, flag, varname='trcs_solml_vr', dim1name='column',dim2name='soltrcs',&
@@ -6683,6 +6681,23 @@ implicit none
     datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)            
     call restartvar(ncid, flag, varname='trcs_solml_vr', dim1name='column',dim2name='soltrcs',&
        dim3name='levsoi1',long_name='solute mass in micropore', units='g d-2', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
+       fill_value=spval)   
+  endif  
+
+  if(flag=='read')then
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)        
+    call restartvar(ncid, flag, varname='trcs_solml_drib_vr', dim1name='column',dim2name='soltrcs',&
+       dim3name='levsoi1',long_name='solute dribble mass in micropore', units='g d-2', &
+       interpinic_flag='skip', data=datpr3, missing_value=spval, &
+       fill_value=spval)   
+    call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solml_drib_vr,datrc_3d)     
+  else
+    !print*,'trcs_solml_vr'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcs_solml_drib_vr,datrc_3d)       
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NSolutTracers,1:JZ+1)            
+    call restartvar(ncid, flag, varname='trcs_solml_drib_vr', dim1name='column',dim2name='soltrcs',&
+       dim3name='levsoi1',long_name='solute dribble mass in micropore', units='g d-2', &
        interpinic_flag='skip', data=datpr3, missing_value=spval, &
        fill_value=spval)   
   endif  

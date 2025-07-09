@@ -265,36 +265,36 @@ module GeochemAPI
   character(len=*), parameter :: subname='GeochemAPIRecv'
 
   call PrintInfo('beg '//subname)
-
-  trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)     = trcn_GeoChem_soil_vr(ids_NH4,L,NY,NX)       +solflx%TRChem_NH4_soil_mole
-  trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX) = trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)+solflx%TRChem_NH4_band_soil_mole
-  TRChem_sol_NH3_soil_vr(L,NY,NX)           = TRChem_sol_NH3_soil_vr(L,NY,NX)+solflx%TRChem_NH3_soil_mole
-  trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX) = trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)+solflx%TRChem_NH3_band_soil
-  trcn_GeoChem_soil_vr(ids_H1PO4,L,NY,NX)     = solflx%TRChem_H1PO4_soil
-  trcn_GeoChem_soil_vr(ids_H2PO4,L,NY,NX)     = solflx%TRChem_H2PO4_soil
-  trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = solflx%TRChem_H1PO4_band_soil
-  trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = solflx%TRChem_H2PO4_band_soil
-  trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)         = solflx%TRChem_NH4_sorbed_soil
-  trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)        = solflx%TRChem_NH4_sorbed_band_soil
-  trcx_TRSoilChem_vr(idx_OH,L,NY,NX)          = solflx%TRChem_ROH_sorbed_soil
-  trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)         = solflx%TRChem_ROH2_sorbed_soil
-  trcx_TRSoilChem_vr(idx_HPO4,L,NY,NX)        = solflx%TRChem_RHPO4_sorbed_soil
-  trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)       = solflx%TRChem_RH2PO4_sorbed_soil
-  trcx_TRSoilChem_vr(idx_OHB,L,NY,NX)         = solflx%TRChem_ROH_sorbed_band_soil
-  trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)        = solflx%TRChem_ROH2_sorbed_band_soil
-  trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)       = solflx%TRChem_RHPO4_sorbed_band_soil
-  trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)      = solflx%TRChem_RH2PO4_sorbed_band_soil
-  trcp_RChem_soil_vr(idsp_AlPO4,L,NY,NX)         = solflx%TRChem_AlPO4_precip_soil
-  trcp_RChem_soil_vr(idsp_FePO4,L,NY,NX)         = solflx%TRChem_FePO4_precip_soil
-  trcp_RChem_soil_vr(idsp_CaHPO4,L,NY,NX)        = solflx%TRChem_CaHPO4_precip_soil
-  trcp_RChem_soil_vr(idsp_HA,L,NY,NX)            = solflx%TRChem_apatite_precip_soil
-  trcp_RChem_soil_vr(idsp_CaH4P2O8,L,NY,NX)      = solflx%TRChem_CaH4P2O8_precip_soil
-  trcp_RChem_soil_vr(idsp_AlPO4B,L,NY,NX)        = solflx%TRChem_AlPO4_precip_band_soil
-  trcp_RChem_soil_vr(idsp_FePO4B,L,NY,NX)        = solflx%TRChem_FePO4_precip_band_soil
-  trcp_RChem_soil_vr(idsp_CaHPO4B,L,NY,NX)       = solflx%TRChem_CaHPO4_precip_band_soil
-  trcp_RChem_soil_vr(idsp_HAB,L,NY,NX)           = solflx%TRChem_apatite_precip_band_soil
-  trcp_RChem_soil_vr(idsp_CaH4P2O8B,L,NY,NX)     = solflx%TRChem_CaH4P2O8_precip_band_soil
-  TProd_CO2_geochem_soil_vr(L,NY,NX)          = solflx%TRChem_CO2_gchem_soil*catomw
+  !units are now of [mol d-2], which will be converted into [g d-2] later.
+  trcn_RprodChem_soil_vr(ids_NH4,L,NY,NX)         = trcn_RprodChem_soil_vr(ids_NH4,L,NY,NX)       +solflx%TRChem_NH4_soil_mole
+  trcn_RProdChem_band_soil_vr(ids_NH4B,L,NY,NX)   = trcn_RProdChem_band_soil_vr(ids_NH4B,L,NY,NX)+solflx%TRChem_NH4_band_soil_mole
+  TRProd_chem_sol_NH3_soil_vr(L,NY,NX)            = TRProd_chem_sol_NH3_soil_vr(L,NY,NX)+solflx%TRChem_NH3_soil_mole
+  trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)   = trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)+solflx%TRChem_NH3_band_soil
+  trcn_RprodChem_soil_vr(ids_H1PO4,L,NY,NX)       = solflx%TRChem_H1PO4_soil
+  trcn_RprodChem_soil_vr(ids_H2PO4,L,NY,NX)       = solflx%TRChem_H2PO4_soil
+  trcn_RProdChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = solflx%TRChem_H1PO4_band_soil
+  trcn_RProdChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = solflx%TRChem_H2PO4_band_soil
+  trcx_TRSoilChem_vr(idx_NH4,L,NY,NX)             = solflx%TRChem_NH4_sorbed_soil
+  trcx_TRSoilChem_vr(idx_NH4B,L,NY,NX)            = solflx%TRChem_NH4_sorbed_band_soil
+  trcx_TRSoilChem_vr(idx_OH,L,NY,NX)              = solflx%TRChem_ROH_sorbed_soil
+  trcx_TRSoilChem_vr(idx_OHp,L,NY,NX)             = solflx%TRChem_ROH2_sorbed_soil
+  trcx_TRSoilChem_vr(idx_HPO4,L,NY,NX)            = solflx%TRChem_RHPO4_sorbed_soil
+  trcx_TRSoilChem_vr(idx_H2PO4,L,NY,NX)           = solflx%TRChem_RH2PO4_sorbed_soil
+  trcx_TRSoilChem_vr(idx_OHB,L,NY,NX)             = solflx%TRChem_ROH_sorbed_band_soil
+  trcx_TRSoilChem_vr(idx_OHpB,L,NY,NX)            = solflx%TRChem_ROH2_sorbed_band_soil
+  trcx_TRSoilChem_vr(idx_HPO4B,L,NY,NX)           = solflx%TRChem_RHPO4_sorbed_band_soil
+  trcx_TRSoilChem_vr(idx_H2PO4B,L,NY,NX)          = solflx%TRChem_RH2PO4_sorbed_band_soil
+  trcp_RChem_soil_vr(idsp_AlPO4,L,NY,NX)          = solflx%TRChem_AlPO4_precip_soil
+  trcp_RChem_soil_vr(idsp_FePO4,L,NY,NX)          = solflx%TRChem_FePO4_precip_soil
+  trcp_RChem_soil_vr(idsp_CaHPO4,L,NY,NX)         = solflx%TRChem_CaHPO4_precip_soil
+  trcp_RChem_soil_vr(idsp_HA,L,NY,NX)             = solflx%TRChem_apatite_precip_soil
+  trcp_RChem_soil_vr(idsp_CaH4P2O8,L,NY,NX)       = solflx%TRChem_CaH4P2O8_precip_soil
+  trcp_RChem_soil_vr(idsp_AlPO4B,L,NY,NX)         = solflx%TRChem_AlPO4_precip_band_soil
+  trcp_RChem_soil_vr(idsp_FePO4B,L,NY,NX)         = solflx%TRChem_FePO4_precip_band_soil
+  trcp_RChem_soil_vr(idsp_CaHPO4B,L,NY,NX)        = solflx%TRChem_CaHPO4_precip_band_soil
+  trcp_RChem_soil_vr(idsp_HAB,L,NY,NX)            = solflx%TRChem_apatite_precip_band_soil
+  trcp_RChem_soil_vr(idsp_CaH4P2O8B,L,NY,NX)      = solflx%TRChem_CaH4P2O8_precip_band_soil
+  TProd_CO2_geochem_soil_vr(L,NY,NX)              = solflx%TRChem_CO2_gchem_soil*catomw
   if(salt_model)then
     trcSalt_RGeoChem_flx_vr(idsalt_Al,L,NY,NX)        = solflx%TRChem_Al_3p_soil
     trcSalt_RGeoChem_flx_vr(idsalt_Fe,L,NY,NX)        = solflx%TRChem_Fe_3p_soil

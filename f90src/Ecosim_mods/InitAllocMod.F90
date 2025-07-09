@@ -33,7 +33,6 @@ implicit none
   use ChemTranspDataType  , only : InitChemTranspData
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
-  use GrosubsMod          , only : InitGrosub
   use InitSoluteMod       , only : InitSoluteProperty
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
@@ -57,6 +56,7 @@ implicit none
   use NumericalAuxMod     , only : InitNumericAux
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
+  use GrosubPars          , only : InitPlantTraitTable
   use GridConsts  
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
@@ -66,7 +66,10 @@ implicit none
 
   call InitPlantMorphSize()
 
-  if(plant_model)call InitGrosub(NumGrowthStages,MaxNumRootAxes)
+  if(plant_model)then    
+    !and obtain plant NumGrowthStages and MaxNumRootAxes for output set up
+    call InitPlantTraitTable(pltpar,NumGrowthStages,MaxNumRootAxes)
+  endif  
 
   call InitGridData
 

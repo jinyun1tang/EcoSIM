@@ -30,10 +30,10 @@ implicit none
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: RootPrimeAxsNum
   real(r8), intent(in) :: PTRT      !shoot-root nonstrucal C/N exchange modifier
-  real(r8), intent(out) :: RootSinkC_vr(jroots,JZ1)
-  real(r8), intent(out) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(out) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(out) :: RootSinkC(jroots)
+  real(r8), intent(out) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(out) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(out) :: RootSinkC(pltpar%jroots)
 
   integer, parameter  :: NumRootAxes4DeadPlant =0    !
   real(r8) :: TotRootVol
@@ -120,10 +120,10 @@ implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1),CNRTW,CPRTW
   real(r8), intent(in) :: RootPrimeAxsNum
-  REAL(R8), INTENT(in) :: RootSinkC_vr(jroots,JZ1)
-  real(r8), INTENT(in) :: RootSinkC(jroots)
-  real(r8), INTENT(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  REAL(R8), INTENT(in) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8), INTENT(in) :: RootSinkC(pltpar%jroots)
+  real(r8), INTENT(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
 
   integer :: LL,LZ,L1,L,K,lx,M,NR,N,NTG
   real(r8) :: CCC,CNC,CPC
@@ -142,8 +142,8 @@ implicit none
   real(r8) :: WTRTTT
   real(r8) :: WTRTT
   real(r8) :: XFRC
-  integer :: iRootXsUpdateFlag(jroots,JZ1)  
-  INTEGER :: NRX(jroots,JZ1)
+  integer :: iRootXsUpdateFlag(pltpar%jroots,JZ1)  
+  INTEGER :: NRX(pltpar%jroots,JZ1)
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: masst_inital(NumPlantChemElms)
@@ -363,8 +363,8 @@ implicit none
   real(r8), intent(in) :: fRootGrowPSISense  
   real(r8), intent(in) :: RootPrimeAxsNum
   real(r8), intent(in) :: TFN6_vr(JZ1)  
-  REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)  
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)  
+  REAL(R8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)  
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(out) :: litrflx2(NumPlantChemElms),RCO2flx2
   real(r8), intent(out) :: Root2ndStrutRemob(NumPlantChemElms)    
   real(r8) :: RCCC,RCCN,RCCP,FracRemobl  
@@ -787,14 +787,14 @@ implicit none
   integer , intent(in) :: NZ     !pft id
   real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: RootPrimeAxsNum
-  REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
-  real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  REAL(R8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: fRootGrowPSISense
   real(r8), intent(out) :: TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC
-  integer , intent(inout) :: NRX(jroots,JZ1)  
-  integer , intent(inout) :: iRootXsUpdateFlag(jroots,JZ1)  
+  integer , intent(inout) :: NRX(pltpar%jroots,JZ1)  
+  integer , intent(inout) :: iRootXsUpdateFlag(pltpar%jroots,JZ1)  
   real(r8), intent(out) :: litrflx(NumPlantChemElms)
   real(r8), intent(out) :: RCO2flx
   real(r8) :: Root2ndStrutRemob(NumPlantChemElms)    
@@ -912,16 +912,16 @@ implicit none
   implicit none
   integer,  intent(in) :: I,J,N,NR,L,L1,NZ
   real(r8), intent(in) :: RootPrimeAxsNum
-  REAL(R8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)  
+  REAL(R8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)  
   real(r8), intent(in) :: fRootGrowPSISense
   real(r8), intent(in) :: TFN6_vr(JZ1)  
   real(r8), intent(in) :: Root2ndStrutRemob(NumPlantChemElms)  
-  real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)  
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)  
+  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)  
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(in) :: CNRTW,CPRTW  
   real(r8), intent(in) :: DMRTD  
-  integer,  intent(inout) :: iRootXsUpdateFlag(jroots,JZ1)
-  integer,  intent(inout) :: NRX(jroots,JZ1)  
+  integer,  intent(inout) :: iRootXsUpdateFlag(pltpar%jroots,JZ1)
+  integer,  intent(inout) :: NRX(pltpar%jroots,JZ1)  
   real(r8), intent(inout) :: TotRoot1stLen
   real(r8), intent(inout) :: Root1stC
   real(r8), intent(out) :: litrflxt(NumPlantChemElms)
@@ -1734,9 +1734,9 @@ implicit none
   implicit none
   integer, intent(in) :: L,NR,NZ,N
   real(r8), intent(in):: Root1stDepz2Surf
-  real(r8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
-  real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: RootPrimeAxsNum
   integer :: LL,NN,NE,NTG
   real(r8) :: XFRD,XFRW,FRTN
@@ -1886,10 +1886,10 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: RootPrimeAxsNum
-  real(r8),INTENT(OUT) :: RootSinkC_vr(jroots,JZ1)
-  real(r8),intent(out) :: Root1stSink_pvr(jroots,JZ1,NumCanopyLayers1)
-  real(r8),intent(out) :: Root2ndSink_pvr(jroots,JZ1,NumCanopyLayers1)
-  real(r8),INTENT(OUT) :: RootSinkC(jroots)
+  real(r8),INTENT(OUT) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8),intent(out) :: Root1stSink_pvr(pltpar%jroots,JZ1,NumCanopyLayers1)
+  real(r8),intent(out) :: Root2ndSink_pvr(pltpar%jroots,JZ1,NumCanopyLayers1)
+  real(r8),INTENT(OUT) :: RootSinkC(pltpar%jroots)
   integer :: N,L,K,NR,NE,ntu
   REAL(R8) :: Root1stLocDepz_vr(NumCanopyLayers1,JZ1)
   real(r8) :: RecoRootMycoC4Nup,CUPRO,CUPRC

@@ -1922,8 +1922,8 @@ module PlantBranchMod
     TdegCCanopy_pft              => plt_ew%TdegCCanopy_pft                  ,& !input  :canopy temperature, [oC]
     LeafPetoNonstElmConc_brch    => plt_biom%LeafPetoNonstElmConc_brch      ,& !input  :branch nonstructural C concentration, [g d-2]
     ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                 ,& !input  :threshold zero for plang growth calculation, [-]
-    CNGR_pft                     => plt_allom%CNGR_pft                      ,& !input  :grain N:C ratio, [g g-1]
-    CPGR_pft                     => plt_allom%CPGR_pft                      ,& !input  :grain P:C ratio, [gP gP-1]
+    rNCGrain_pft                     => plt_allom%rNCGrain_pft                      ,& !input  :grain N:C ratio, [g g-1]
+    rPCGrain_pft                     => plt_allom%rPCGrain_pft                      ,& !input  :grain P:C ratio, [gP gP-1]
     fTgrowRootP_vr               => plt_pheno%fTgrowRootP_vr                ,& !input  :root layer temperature growth functiom, [-]
     fTCanopyGroth_pft            => plt_pheno%fTCanopyGroth_pft             ,& !input  :canopy temperature growth function, [-]
     iPlantPhenolType_pft         => plt_pheno%iPlantPhenolType_pft          ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
@@ -1936,7 +1936,7 @@ module PlantBranchMod
     TCChill4Seed_pft             => plt_pheno%TCChill4Seed_pft              ,& !input  :temperature below which seed set is adversely affected, [oC]
     PlantPopulation_pft          => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
     MaxSeedNumPerSite_pft        => plt_morph%MaxSeedNumPerSite_pft         ,& !input  :maximum grain number per node, [-]
-    MaxSeedCMass_pft             => plt_morph%MaxSeedCMass_pft              ,& !input  :maximum grain size, [g]
+    SeedCMassMax_pft             => plt_morph%SeedCMassMax_pft              ,& !input  :maximum grain size, [g]
     MaxPotentSeedNumber_pft      => plt_morph%MaxPotentSeedNumber_pft       ,& !input  :maximum grain node number per branch, [-]
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
     iPlantGrainType_pft          => plt_morph%iPlantGrainType_pft           ,& !input  :grain type (below or above-ground),[-]
@@ -2021,8 +2021,8 @@ module PlantBranchMod
 !
     IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0 &
       .AND.iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
-      GRMXB=MaxSeedCMass_pft(NZ)
-      GrainSeedBiomCMean_brch(NB,NZ)=AMIN1(MaxSeedCMass_pft(NZ),GrainSeedBiomCMean_brch(NB,NZ) &
+      GRMXB=SeedCMassMax_pft(NZ)
+      GrainSeedBiomCMean_brch(NB,NZ)=AMIN1(SeedCMassMax_pft(NZ),GrainSeedBiomCMean_brch(NB,NZ) &
         +GRMXB*AMAX1(0.50_r8,SeedSET**0.25_r8)*dReproNodeNumNormByMatG_brch(NB,NZ))
     ENDIF
   ENDIF
@@ -2057,8 +2057,8 @@ module PlantBranchMod
 !     GROLM,GROLC=maximum,actual grain fill rate
 !     MaxChemElmRsrv2Grain,ChemElmRsrv2Grain(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
-    IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*CNGR_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ) &
-      .OR.GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM*CPGR_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
+    IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*rNCGrain_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ) &
+      .OR.GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM*rPCGrain_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
       GROLC=0._r8
     ELSE
       GROLC=GROLM
@@ -2086,13 +2086,13 @@ module PlantBranchMod
         +SETP*StalkRsrvElms_brch(ielmc,NB,NZ))
       ZPGRN                    = ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGN))
       ZPGRP                    = ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
-      ChemElmRsrv2Grain(ielmn) = AMIN1(MaxChemElmRsrv2Grain*CNGR_pft(NZ) &
+      ChemElmRsrv2Grain(ielmn) = AMIN1(MaxChemElmRsrv2Grain*rNCGrain_pft(NZ) &
         ,AZMAX1(StalkRsrvElms_brch(ielmn,NB,NZ)*ZPGRN) &
-        ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CNGR_pft(NZ) &
+        ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*rNCGrain_pft(NZ) &
         -GrainStrutElms_brch(ielmn,NB,NZ))
-      ChemElmRsrv2Grain(ielmp)=AMIN1(MaxChemElmRsrv2Grain*CPGR_pft(NZ) &
+      ChemElmRsrv2Grain(ielmp)=AMIN1(MaxChemElmRsrv2Grain*rPCGrain_pft(NZ) &
         ,AZMAX1(StalkRsrvElms_brch(ielmp,NB,NZ)*ZPGRP) &
-        ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*CPGR_pft(NZ) &
+        ,(GrainStrutElms_brch(ielmc,NB,NZ)+ChemElmRsrv2Grain(ielmc))*rPCGrain_pft(NZ) &
         -GrainStrutElms_brch(ielmp,NB,NZ))
     ELSE
       ChemElmRsrv2Grain(ielmn)=0._r8

@@ -25,8 +25,8 @@ module RootDataType
   real(r8),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)                   !root cross-sectional area primary axes, [m2]
   real(r8),target,allocatable ::  Root2ndXSecArea_pft(:,:,:,:)                   !root  cross-sectional area  secondary axes, [m2]
   real(r8),target,allocatable ::  fTgrowRootP_vr(:,:,:,:)                        !root layer temperature growth functiom, [-]
-  real(r8),target,allocatable ::  RootrNC_pft(:,:,:)                             !root N:C ratio, [g g-1]
-  real(r8),target,allocatable ::  RootrPC_pft(:,:,:)                             !root P:C ratio, [g g-1]
+  real(r8),target,allocatable ::  rNCRoot_pft(:,:,:)                             !root N:C ratio, [g g-1]
+  real(r8),target,allocatable ::  rPCRootr_pft(:,:,:)                             !root P:C ratio, [g g-1]
   real(r8),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
   real(r8),target,allocatable ::  RootRadialResist_pft(:,:,:,:)                  !root radial resistivity, [MPa h m-2]
   real(r8),target,allocatable ::  RootAxialResist_pft(:,:,:,:)                   !root axial resistivity, [MPa h m-4]
@@ -122,8 +122,8 @@ contains
   allocate(Root1stXSecArea_pft(jroots,JP,JY,JX)); Root1stXSecArea_pft=0._r8
   allocate(Root2ndXSecArea_pft(jroots,JP,JY,JX)); Root2ndXSecArea_pft=0._r8
   allocate(fTgrowRootP_vr(JZ,JP,JY,JX));  fTgrowRootP_vr=0._r8
-  allocate(RootrNC_pft(JP,JY,JX));     RootrNC_pft=0._r8
-  allocate(RootrPC_pft(JP,JY,JX));     RootrPC_pft=0._r8
+  allocate(rNCRoot_pft(JP,JY,JX));     rNCRoot_pft=0._r8
+  allocate(rPCRootr_pft(JP,JY,JX));     rPCRootr_pft=0._r8
   allocate(RootGasConductance_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX));RootGasConductance_pvr=0._r8
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._r8
   allocate(RootRadialResist_pft(jroots,JP,JY,JX));   RootRadialResist_pft=0._r8
@@ -209,8 +209,8 @@ contains
   call destroy(Root1stXSecArea_pft)
   call destroy(Root2ndXSecArea_pft)
   call destroy(fTgrowRootP_vr)
-  call destroy(RootrNC_pft)
-  call destroy(RootrPC_pft)
+  call destroy(rNCRoot_pft)
+  call destroy(rPCRootr_pft)
   call destroy(RootPorosity_pft)
   call destroy(RootRadialResist_pft)
   call destroy(RootAxialResist_pft)

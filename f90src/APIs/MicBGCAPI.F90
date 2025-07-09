@@ -328,8 +328,8 @@ implicit none
 
   DO K=1,KL
     DO idom=idom_beg,idom_end  
-      micstt%DOM(idom,K) = AZMAX1(DOM_MicP_vr(idom,K,L,NY,NX))
-      micstt%DOM_MicP_drib(idom,K)=DOM_MicP_drib_vr(idom,K,L,NY,NX)
+      micstt%DOM(idom,K)           = AZMAX1(DOM_MicP_vr(idom,K,L,NY,NX))
+      micstt%DOM_MicP_drib(idom,K) = DOM_MicP_drib_vr(idom,K,L,NY,NX)
     ENDDO
   ENDDO
 

@@ -50,6 +50,7 @@ module EcoSIMDesctruct
   use PerturbationMod     , only : destructSoilWarming
   use TracerIDMod         , only : CleanUpTracerIDs
   use NumericalAuxMod     , only : DestructNumericAux
+  use PlantTraitTableMod  , only : DestructPlantTraitTable
   implicit none
 
   call DestructMicrobialData
@@ -85,6 +86,9 @@ module EcoSIMDesctruct
   if(.not.salt_model)then
     call DestructTranspNoSalt
   endif
+
+  call DestructPlantTraitTable()
+
   call DestructEcoSIMCtrlData
 
   call DestructCanopyData

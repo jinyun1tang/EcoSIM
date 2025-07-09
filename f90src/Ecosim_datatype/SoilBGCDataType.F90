@@ -20,6 +20,7 @@ implicit none
   real(r8),target,allocatable :: trcs_SubsurTransp_flx_2DH(:,:,:)       !subsurface lateral tracer fluxes, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_soHml_vr(:,:,:,:)                 !solute mass in macropore, [g d-2]
   real(r8),target,allocatable :: trcs_solml_vr(:,:,:,:)                 !solute mass in micropore, [g d-2]
+  real(r8),target,allocatable :: trcs_netpro_vr(:,:,:,:)                !net chemical production for solutes, [g d-2]
   real(r8),target,allocatable :: trc_solcl_vr(:,:,:,:)                  !solute concentration in micropre, [g m-3]
   real(r8),target,allocatable :: trcg_gascl_vr(:,:,:,:)                 !gaseous concentation in micropore, [g m-3]
   real(r8),target,allocatable :: tRHydlySOM_vr(:,:,:,:)                 !solid SOM hydrolysis rate, [g/m2/hr]
@@ -132,6 +133,7 @@ implicit none
   real(r8),target,allocatable :: AeroBact_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic bacteria, [-]
   real(r8),target,allocatable :: AeroFung_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic fungi, [-]
   real(r8),target,allocatable :: ROQC4HeterMicActCmpK_vr(:,:,:,:)    !vertical resolved microbial activity for each complex, [-]
+  real(r8),target,allocatable :: trcs_solml_dribBeg_col(:,:,:)       !total dribbling mass at the begining of time step, [g d-2]
   private :: InitAllocate
   contains
 
@@ -149,6 +151,7 @@ implicit none
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
+  allocate(trcs_solml_dribBeg_col(ids_beg:ids_end,JY,JX)); trcs_solml_dribBeg_col=0._r8
   allocate(AeroBact_PrimeS_lim_vr(0:JZ,JY,JX));AeroBact_PrimeS_lim_vr=0._r8
   allocate(AeroFung_PrimeS_lim_vr(0:JZ,JY,JX));AeroFung_PrimeS_lim_vr=0._r8
   allocate(DOM_SurfRunoff_flx_col(idom_beg:idom_end,jcplx,JY,JX)); DOM_SurfRunoff_flx_col=0._r8
@@ -169,6 +172,7 @@ implicit none
   allocate(trcg_gasml_vr(idg_beg:idg_NH3,JZ,JY,JX)); trcg_gasml_vr=0._r8
   allocate(trcs_soHml_vr(ids_beg:ids_end,JZ,JY,JX)); trcs_soHml_vr=0._r8
   allocate(trcs_solml_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_solml_vr=0._r8
+  allocate(trcs_netpro_vr(ids_beg:ids_end,0:JZ,JY,JX)); trcs_netpro_vr=0._r8
   allocate(trc_solcl_vr(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl_vr=0._r8
   allocate(trcg_gascl_vr(idg_beg:idg_NH3,0:JZ,JY,JX)); trcg_gascl_vr=0._r8
   allocate(tRDIM2DOM_col(1:NumPlantChemElms,JY,JX)); tRDIM2DOM_col=0._r8
@@ -284,10 +288,11 @@ implicit none
 
   implicit none
 
+  call destroy(trcs_solml_dribBeg_col)
   call destroy(ROQC4HeterMicActCmpK_vr)
   call destroy(AeroBact_PrimeS_lim_vr)
   call destroy(AeroFung_PrimeS_lim_vr)
-
+  call destroy(trcs_netpro_vr)
   call destroy(DOM_SurfRunoff_flx_col)
   call destroy(DOM_draing_col)
   call destroy(trcs_drainage_flx_col)

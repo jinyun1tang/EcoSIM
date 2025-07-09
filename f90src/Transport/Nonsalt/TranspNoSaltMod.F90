@@ -8,6 +8,7 @@ module TranspNoSaltMod
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
   use EcoSIMCtrlMod,    only: iVerbLevel,ldo_transpt_bubbling
+  use NumericalAuxMod
   use TranspNoSaltFastMod
   use InitNoSaltTransportMod
   use TranspNoSaltSlowMod
@@ -69,11 +70,11 @@ module TranspNoSaltMod
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      trcs_mass_beg(:,NY,NX)=0._r8
-      errmass_fast(:,NY,NX)=0._r8
-      errmass_slow(:,NY,NX)=0._r8
-      DO idg=idg_beg,idg_NH3
+      trcs_mass_beg(:,NY,NX) = 0._r8
+      errmass_fast(:,NY,NX)  = 0._r8
+      errmass_slow(:,NY,NX)  = 0._r8
 
+      DO idg=idg_beg,idg_NH3
         trcs_mass_litr(idg,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
         trcs_mass_snow(idg,NY,NX)=0._r8
         trcs_mass_soil(idg,NY,NX)=0._r8
@@ -81,45 +82,60 @@ module TranspNoSaltMod
         DO L=1,nsnol_col(NY,NX)
           trcs_mass_snow(idg,NY,NX)=trcs_mass_snow(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO
-
-        trcs_mass_beg(idg,NY,NX)=trcs_mass_litr(idg,NY,NX)+trcs_mass_snow(idg,NY,NX)
         
-        DO L=NU_col(NY,NX),NL_col(NY,NX)
-          trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) &
-            + trcs_soHml_vr(idg,L,NY,NX)
-          trcs_mass_soil(idg,NY,NX)=trcs_mass_soil(idg,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcg_gasml_vr(idg,L,NY,NX) &
-            + trcs_soHml_vr(idg,L,NY,NX)  
-        ENDDO        
+        DO L=NU_col(NY,NX),NL_col(NY,NX)          
+          trcs_mass_soil(idg,NY,NX) = trcs_mass_soil(idg,NY,NX)+trcs_solml_vr(idg,L,NY,NX)+trcg_gasml_vr(idg,L,NY,NX)+ trcs_soHml_vr(idg,L,NY,NX)
+        ENDDO      
       ENDDO
 
       idg=idg_NH3
-      trcs_mass_litr(idg,NY,NX)=trcs_mass_litr(idg,NY,NX)+trcs_solml_vr(idg_NH3B,0,NY,NX)
-      trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg_NH3B,0,NY,NX)
+      trcs_mass_litr(idg,NY,NX) = trcs_mass_litr(idg,NY,NX)+trcs_solml_vr(idg_NH3B,0,NY,NX)
       DO L=NU_col(NY,NX),NL_col(NY,NX)
-        trcs_mass_beg(idg,NY,NX)=trcs_mass_beg(idg,NY,NX)+trcs_solml_vr(idg_NH3B,L,NY,NX) &
-          + trcs_soHml_vr(idg_NH3B,L,NY,NX)
-        trcs_mass_soil(idg,NY,NX)=trcs_mass_soil(idg,NY,NX)+trcs_solml_vr(idg_NH3B,L,NY,NX) &
-          + trcs_soHml_vr(idg_NH3B,L,NY,NX)  
+        trcs_mass_soil(idg,NY,NX) = trcs_mass_soil(idg,NY,NX)+trcs_solml_vr(idg_NH3B,L,NY,NX)+trcs_soHml_vr(idg_NH3B,L,NY,NX)
       ENDDO
 
+      DO idg=idg_beg,idg_NH3
+        trcs_mass_beg(idg,NY,NX)=trcs_mass_litr(idg,NY,NX)+trcs_mass_snow(idg,NY,NX)+trcs_mass_soil(idg,NY,NX) 
+      ENDDO  
     ENDDO
   ENDDO  
-  end subroutine EnterMassCheck  
+  end subroutine EnterMassCheck
 !------------------------------------------------------------------------------------------
 
   subroutine ExitMassCheck(I,J,NHW,NHE,NVN,NVS,M)
+  !
+  !Description: 
+  ! Overall mass conservation check for non-salt chemical transport
+  ! fluxes inlcude:
+  ! surface emission        : SurfGasEmiss_flx_col(idg,NY,NX), ebullition, surface diffusion and wet deposition
+  ! hydrological loss       : GasHydroLoss_flx_col(idg,NY,NX) &
+  ! biogeochemcal production: RGasNetProd_col(idg,NY,NX)
+  ! uptake by plants        : trcs_Soil2plant_uptake_col(idg,NY,NX)
+
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   integer, optional, intent(in) :: M
-  integer :: NY,NX,idg,L  
+
+  integer :: NY,NX,idg,L,ids  
   real(r8) :: errmass,mass_litr,mass_snow,mass_soil
   real(r8) :: netflx2soil,delta_mass
   real(r8) :: trcs_mass_now(idg_beg:idg_NH3)
+  real(r8) :: trcs_solml_drib_col(ids_beg:ids_end)
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
       trcs_mass_now(:)=0._r8
+      DO ids=ids_beg,ids_end
+        trcs_solml_drib_col(ids) = trcs_solml_drib_vr(ids,0,NY,NX)      
+      ENDDO  
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO ids=ids_beg,ids_end
+          trcs_solml_drib_col(ids)=trcs_solml_drib_col(ids)+trcs_solml_drib_vr(ids,L,NY,NX) 
+        ENDDO
+      ENDDO
+
       DO idg=idg_beg,idg_NH3
 
         SurfGasEmiss_flx_col(idg,NY,NX) =  trcg_ebu_flx_col(idg,NY,NX) &
@@ -146,12 +162,14 @@ module TranspNoSaltMod
 
         trcs_mass_now(idg) = mass_snow+mass_litr+mass_soil
         delta_mass         = trcs_mass_now(idg)-trcs_mass_beg(idg,NY,NX)
-        errmass=trcs_mass_beg(idg,NY,NX)-trcs_mass_now(idg)  &
+        errmass            = trcs_mass_beg(idg,NY,NX)-trcs_mass_now(idg)  &
           +SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
-          +RGasNetProd_col(idg,NY,NX)-trcs_Soil2plant_uptake_col(idg,NY,NX)
+          +RGasNetProd_col(idg,NY,NX)
+
+        RGasNetProd_col(idg,NY,NX) = RGasNetProd_col(idg,NY,NX)-trcs_Soil2plant_uptake_col(idg,NY,NX)
 
         if(idg==idg_NH3)then
-          errmass=errmass-trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
+          RGasNetProd_col(idg,NY,NX) = RGasNetProd_col(idg,NY,NX)-trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
         if(abs(errmass)>1.e-5)then
           if(iVerbLevel==1 .or. abs(errmass)>1.e-4)then
@@ -342,7 +360,6 @@ module TranspNoSaltMod
       PARGas_CefMM(idg_H2,NY,NX)  = PARGM*2.08_r8
       PARGas_CefMM(idg_AR,NY,NX)  = PARGM*0.72_r8
 
-!      RBGCSinkGasMM_vr(idg_O2,0,NY,NX) = REcoUptkSoilO2M_vr(M,0,NY,NX)*dt_GasCyc
       VLWatMicPXA_vr(0,NY,NX)          = natomw*VLWatMicPM_vr(M,0,NY,NX)
 
       L=NU_col(NY,NX)
@@ -355,7 +372,7 @@ module TranspNoSaltMod
       VLWatMicPXB_vr(L,NY,NX)          = natomw*VLWatMicPMB_vr(L,NY,NX)
       VLsoiAirPMA_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
       VLsoiAirPMB_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-!      RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = REcoUptkSoilO2M_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
+
 
       DO L=NU_col(NY,NX)+1,NL_col(NY,NX)
         tScalReductVLsoiAirPMM_vr(L,NY,NX) = ReductVLsoiAirPM_vr(M,L,NY,NX)*dt_GasCyc
@@ -370,7 +387,7 @@ module TranspNoSaltMod
 
         VLsoiAirPMA_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
         VLsoiAirPMB_vr(L,NY,NX)          = VLsoiAirPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-!        RBGCSinkGasMM_vr(idg_O2,L,NY,NX) = REcoUptkSoilO2M_vr(M,L,NY,NX)*dt_GasCyc-trcs_deadroot2soil_vr(idg_O2,L,NY,NX)*dts_gas
+
       ENDDO
     ENDDO
   ENDDO

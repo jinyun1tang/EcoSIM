@@ -197,7 +197,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RkillLitfalOMAutor(:,:,:)
   real(r8),allocatable :: RkillLitrfal2HumOMAutor(:,:,:)
   real(r8),allocatable :: RkillLitrfal2ResduOMAutor(:,:,:)
-  real(r8),allocatable :: DOMuptk4GrothAutor(:,:)
+  real(r8),allocatable :: DOMuptk4GrothAutor(:,:)            !C-uptake (CH4 or CO2) flux uptake by autotrophs, [g d-2 h-1]  
   real(r8),allocatable :: RMaintDefcitLitrfalOMAutor(:,:,:)
   real(r8),allocatable :: RMaintDefcitLitrfal2HumOMAutor(:,:,:)
   real(r8),allocatable :: RMaintDefcitLitrfal2ResduOMAutor(:,:,:)

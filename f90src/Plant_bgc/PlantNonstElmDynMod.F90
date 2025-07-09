@@ -293,10 +293,10 @@ module PlantNonstElmDynMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: PTRT
-  real(r8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
-  real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: RootSinkC(jroots)
+  real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: RootSinkC(pltpar%jroots)
 
   integer :: L,NB,N,NR,NE
   real(r8) :: ZPOOLS,ZPOOLT
@@ -508,10 +508,10 @@ module PlantNonstElmDynMod
   integer,  intent(in) :: I,J,NZ
   integer,  intent(in) :: BegRemoblize
   real(r8), intent(in):: PTRT
-  real(r8), INTENT(IN) :: RootSinkC_vr(jroots,JZ1)
-  real(r8), intent(in) :: Root1stSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: RootSinkC(jroots)
+  real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
+  real(r8), intent(in) :: RootSinkC(pltpar%jroots)
 
 !     begin_execution
   associate(                                                       &

@@ -55,19 +55,19 @@ module UptakesMod
   real(r8) :: VHeatCapCanopyAir
   real(r8) :: CanopyMassC                 !Canopy C mass, g/m2
   real(r8) :: TotalSoilPSIMPa_vr(JZ1)     !total soil matric pressure, removing elevation adjustment [MPa]
-  real(r8) :: PathLen_pvr(jroots,JZ1)
-  real(r8) :: FineRootRadius_rvr(jroots,JZ1)
-  real(r8) :: RootResist_rvr(jroots,JZ1)
-  real(r8) :: RootResistSoi_rvr(jroots,JZ1)
-  real(r8) :: RootResistPrimary(jroots,JZ1)
-  real(r8) :: RootResist2ndary(jroots,JZ1)
-  real(r8) :: SoiH2OResist(jroots,JZ1)
-  real(r8) :: SoilRootResistance_rvr(jroots,JZ1)
+  real(r8) :: PathLen_pvr(pltpar%jroots,JZ1)
+  real(r8) :: FineRootRadius_rvr(pltpar%jroots,JZ1)
+  real(r8) :: RootResist_rvr(pltpar%jroots,JZ1)
+  real(r8) :: RootResistSoi_rvr(pltpar%jroots,JZ1)
+  real(r8) :: RootResistPrimary(pltpar%jroots,JZ1)
+  real(r8) :: RootResist2ndary(pltpar%jroots,JZ1)
+  real(r8) :: SoiH2OResist(pltpar%jroots,JZ1)
+  real(r8) :: SoilRootResistance_rvr(pltpar%jroots,JZ1)
   real(r8) :: AllRootC_vr(JZ1)
-  real(r8) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
-  real(r8) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8) :: FracPRoot4Uptake_pvr(pltpar%jroots,JZ1,JP1)
+  real(r8) :: MinFracPRoot4Uptake_pvr(pltpar%jroots,JZ1,JP1)
   real(r8) :: FracPrimRootOccupiedLay_pvr(JZ1,JP1)
-  real(r8) :: RootArea2RadiusRatio_vr(jroots,JZ1)
+  real(r8) :: RootArea2RadiusRatio_vr(pltpar%jroots,JZ1)
   real(r8) :: AirMicPore4Fill_vr(JZ1)  !
   real(r8) :: WatAvail4Uptake_vr(JZ1)
   real(r8) :: TKCX,CNDT,PrecpHeatbyCanopy
@@ -78,7 +78,7 @@ module UptakesMod
   real(r8) :: CumPlantHeatLoss2Soil
   real(r8) :: FDMP
   logical  :: HydroActivePlant
-  logical  :: SoiLayerHasRoot_rvr(jroots,JZ1)
+  logical  :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
 !     begin_execution
   associate(                                                        &
     AREA3                     => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
@@ -443,12 +443,12 @@ module UptakesMod
   implicit none
   integer , intent(in) :: NZ
   real(r8), intent(in) :: AllRootC_vr(JZ1)
-  real(r8), intent(out) :: PathLen_pvr(jroots,JZ1)
-  real(r8), intent(out) :: FineRootRadius_rvr(jroots,JZ1)
-  real(r8), intent(out) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
-  real(r8), intent(out) :: MinFracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8), intent(out) :: PathLen_pvr(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: FineRootRadius_rvr(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: FracPRoot4Uptake_pvr(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(out) :: MinFracPRoot4Uptake_pvr(pltpar%jroots,JZ1,JP1)
   real(r8), intent(out) :: FracPrimRootOccupiedLay_pvr(JZ1,JP1)
-  real(r8), intent(out) :: RootArea2RadiusRatio_vr(jroots,JZ1)
+  real(r8), intent(out) :: RootArea2RadiusRatio_vr(pltpar%jroots,JZ1)
   real(r8) :: RootDepZ     !primary root depth
   real(r8) :: RTDPX        !Root occupied thickness in current layer
   integer :: N,L,NR
@@ -626,15 +626,15 @@ module UptakesMod
   integer  , intent(in) :: NZ
   real(r8) , intent(in) :: FracGrndByPFT,CanopyMassC
   real(r8) , intent(in) :: TotalSoilPSIMPa_vr(JZ1)
-  real(r8) , intent(in) :: SoilRootResistance_rvr(jroots,JZ1)
-  real(r8) , intent(in) :: FracPRoot4Uptake_pvr(jroots,JZ1,JP1)
+  real(r8) , intent(in) :: SoilRootResistance_rvr(pltpar%jroots,JZ1)
+  real(r8) , intent(in) :: FracPRoot4Uptake_pvr(pltpar%jroots,JZ1,JP1)
   real(r8) , intent(in) :: AirMicPore4Fill_vr(JZ1),WatAvail4Uptake_vr(JZ1)
   real(r8) , intent(in) :: TKCX
   real(r8) , intent(in) :: CNDT
   real(r8) , intent(in) :: VHeatCapCanopyPrev_pft    !canopy heat capacity at previous time step, MJ/K
   real(r8) , intent(in) :: PrecpHeatbyCanopy         !heat added to canopy by precipitation [MJ]
   real(r8) , intent(in) :: PSIGravCanopyHeight       !Graviational water potential at effective canopy height [MPa]
-  logical  , intent(in) :: SoiLayerHasRoot_rvr(jroots,JZ1)
+  logical  , intent(in) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
   real(r8) , intent(out):: VHeatCapCanopyAir,DIFF
   real(r8) , intent(out):: cumPRootH2OUptake
   real(r8) , intent(out):: CumPlantHeatLoss2Soil  
@@ -1030,15 +1030,15 @@ module UptakesMod
 
   implicit none
   integer, intent(in)   :: NZ
-  real(r8), intent(in)  :: PathLen_pvr(jroots,JZ1),FineRootRadius_rvr(jroots,JZ1)
-  real(r8), intent(in)  :: RootArea2RadiusRatio_vr(jroots,JZ1)
-  real(r8), intent(out) :: RootResist_rvr(jroots,JZ1),RootResistSoi_rvr(jroots,JZ1)
-  real(r8), intent(out) :: RootResistPrimary(jroots,JZ1),RootResist2ndary(jroots,JZ1)
-  real(r8), intent(out) :: SoiH2OResist(jroots,JZ1)
-  real(r8), intent(out) :: SoilRootResistance_rvr(jroots,JZ1)   !added soil and root resistance
+  real(r8), intent(in)  :: PathLen_pvr(pltpar%jroots,JZ1),FineRootRadius_rvr(pltpar%jroots,JZ1)
+  real(r8), intent(in)  :: RootArea2RadiusRatio_vr(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: RootResist_rvr(pltpar%jroots,JZ1),RootResistSoi_rvr(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: RootResistPrimary(pltpar%jroots,JZ1),RootResist2ndary(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: SoiH2OResist(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: SoilRootResistance_rvr(pltpar%jroots,JZ1)   !added soil and root resistance
   real(r8), intent(out) :: CNDT                   !total root conductance
   real(r8), intent(out) :: PSIGravCanopyHeight    !gravimetric water potential at CanopyHeight4WatUptake_pft, [MPa]
-  logical , intent(out) :: SoiLayerHasRoot_rvr(jroots,JZ1)
+  logical , intent(out) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
 
   character(len=*), parameter :: subname='CalcResistance'
   real(r8) :: FRADW,FRAD1,FRAD2
@@ -1279,15 +1279,15 @@ module UptakesMod
   integer, intent(in) :: NZ
   real(r8), intent(in) :: VHeatCapCanopyAir
   real(r8), intent(in) :: TotalSoilPSIMPa_vr(JZ1)    !Elevation adjusted soil water potential [MPa]
-  real(r8), intent(in) :: RootResist_rvr(jroots,JZ1)
-  real(r8), intent(in) :: SoiH2OResist(jroots,JZ1)
-  real(r8), intent(in) :: SoilRootResistance_rvr(jroots,JZ1)
+  real(r8), intent(in) :: RootResist_rvr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: SoiH2OResist(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: SoilRootResistance_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in) :: TKCX,VHeatCapCanopyPrev_pft
   real(r8), intent(in) :: PrecpHeatbyCanopy
   real(r8), intent(in) :: cumPRootH2OUptake
   real(r8), intent(in) :: HeatEvapSens                     !sensible heat associated with evaporation [MJ/h]
   real(r8), intent(in) :: CumPlantHeatLoss2Soil
-  logical , intent(in) :: SoiLayerHasRoot_rvr(jroots,JZ1)  !indicator of root prescence
+  logical , intent(in) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)  !indicator of root prescence
 
   character(len=*), parameter :: subname='UpdatePlantWaterVars'
   real(r8) :: CCPOLT,CanopyMassC

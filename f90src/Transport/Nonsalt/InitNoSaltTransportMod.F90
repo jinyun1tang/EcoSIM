@@ -35,6 +35,7 @@ module InitNoSaltTransportMod
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
   public :: InitTranspNoSaltModel
+  public :: BackCopyStateVars  
   contains
 !------------------------------------------------------------------------------------------
 
@@ -164,6 +165,21 @@ module InitNoSaltTransportMod
         ENDDO
       enddo
 
+      DO K=1,jcplx
+        DO idom=idom_beg,idom_end
+          RBGCSink_DOM_micpM_vr(idom,K,0,NY,NX) = DOM_MicP_drib_vr(idom,K,0,NY,NX)*dts_HeatWatTP
+          DOM_MicP_drib_vr(idom,K,0,NY,NX)      = 0._r8
+        ENDDO
+      ENDDO    
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO K=1,jcplx
+          DO idom=idom_beg,idom_end
+            RBGCSink_DOM_micpM_vr(idom,K,L,NY,NX) = DOM_MicP_drib_vr(idom,K,L,NY,NX)*dts_HeatWatTP
+            DOM_MicP_drib_vr(idom,K,L,NY,NX)      = 0._r8
+          ENDDO
+        ENDDO    
+      ENDDO 
       !
       !     GAS AND SOLUTE SINKS AND SOURCES IN SOIL LAYERS FROM MICROBIAL
       !     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'
@@ -180,15 +196,31 @@ module InitNoSaltTransportMod
       enddo
       
       DO idg=idg_beg,idg_NH3-1
-        RBGCSinkGasMM_vr(idg,0,NY,NX) = trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
+        if(trcs_RMicbUptake_vr(idg,0,NY,NX)>0._r8)then
+          RBGCSinkGasMM_vr(idg,0,NY,NX) = trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
+        else
+          RBGCSrceGasMM_vr(idg,0,NY,NX) =-trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
+        endif
       enddo
 
-      RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TRChem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
-      RBGCSinkSoluteM_vr(ids_NH4,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NH4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NH4,0,NY,NX))*dts_HeatWatTP
-      RBGCSinkSoluteM_vr(ids_NO3,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NO3,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NO3,0,NY,NX))*dts_HeatWatTP
-      RBGCSinkSoluteM_vr(ids_NO2,0,NY,NX)   = -(RNut_MicbRelease_vr(ids_NO2,0,NY,NX)+trcn_GeoChem_soil_vr(ids_NO2,0,NY,NX))*dts_HeatWatTP
-      RBGCSinkSoluteM_vr(ids_H2PO4,0,NY,NX) = -(RNut_MicbRelease_vr(ids_H2PO4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_H2PO4,0,NY,NX))*dts_HeatWatTP
-      RBGCSinkSoluteM_vr(ids_H1PO4,0,NY,NX) = -(RNut_MicbRelease_vr(ids_H1PO4,0,NY,NX)+trcn_GeoChem_soil_vr(ids_H1PO4,0,NY,NX))*dts_HeatWatTP
+      if(TRProd_chem_sol_NH3_soil_vr(0,NY,NX)>0._r8)then
+        RBGCSrcSoluteM_vr(idg_NH3,0,NY,NX)   = TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP      
+      else      
+        RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
+      endif
+
+      DO ids=ids_nut_beg,ids_nuts_end    
+        if(RNut_MicbRelease_vr(ids,0,NY,NX)>0._r8)then
+          RBGCSrcSoluteM_vr(ids,0,NY,NX)   = -RNut_MicbRelease_vr(ids,0,NY,NX)*dts_HeatWatTP
+        else
+          RBGCSinkSoluteM_vr(ids,0,NY,NX)   = -RNut_MicbRelease_vr(ids,0,NY,NX)*dts_HeatWatTP
+        endif
+        if(trcn_RprodChem_soil_vr(ids,0,NY,NX)>0._r8)then
+          RBGCSrcSoluteM_vr(ids,0,NY,NX) = RBGCSrcSoluteM_vr(ids,0,NY,NX)+trcn_RprodChem_soil_vr(ids,0,NY,NX)*dts_HeatWatTP
+        else
+          RBGCSinkSoluteM_vr(ids,0,NY,NX)=RBGCSinkSoluteM_vr(ids,0,NY,NX)-trcn_RprodChem_soil_vr(ids,0,NY,NX)*dts_HeatWatTP
+        endif
+      ENDDO
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
@@ -221,7 +253,7 @@ module InitNoSaltTransportMod
       ENDDO
 
     !reset DOM to value before the iteration
-      D9979: DO K=1,jcplx
+      D9979: DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_MicP2_vr(idom,K,0,NY,NX)=AZERO(DOM_MicP_vr(idom,K,0,NY,NX))
         ENDDO
@@ -245,7 +277,7 @@ module InitNoSaltTransportMod
         DO  K=1,jcplx
           DO idom=idom_beg,idom_end
             DOM_MicP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MicP_vr(idom,K,L,NY,NX))
-            DOM_MacP2_vr(idom,K,L,NY,NX)    = AZERO(DOM_MacP_vr(idom,K,L,NY,NX))
+            DOM_MacP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MacP_vr(idom,K,L,NY,NX))
             if(DOM_MicP2_vr(idom,K,L,NY,NX)<0._r8 .or. DOM_MacP2_vr(idom,K,L,NY,NX)<0._r8)then
               write(*,*)'prep',idom,K,L,NY,NX,DOM_MicP2_vr(idom,K,L,NY,NX),DOM_MacP2_vr(idom,K,L,NY,NX)
               stop
@@ -271,6 +303,63 @@ module InitNoSaltTransportMod
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine CopyTracerStates
+
+!------------------------------------------------------------------------------------------
+  subroutine BackCopyStateVars(I,J,NHE,NHW,NVS,NVN)
+  implicit none
+  integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
+  integer :: NY,NX,idg,L,ids,idom,K
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+      !volatile tracers in surface litter 
+      DO idg=idg_beg,idg_NH3      
+        trcs_solml_vr(idg,0,NY,NX)=AZERO(trcs_solml2_vr(idg,0,NY,NX))
+      ENDDO
+      !volatile and nutrient tracers in snow
+      DO L=1,JS
+        if(L<=nsnol_col(NY,NX))then
+          DO idg=idg_beg,idg_NH3
+            trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)
+          ENDDO  
+          trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)   =trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
+        else          
+          trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)          = 0._r8
+          trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
+        endif
+      enddo
+      !gas tracers in soil column       
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO idg=idg_beg,idg_NH3
+          trcg_gasml_vr(idg,L,NY,NX)=AZERO(trcg_gasml2_vr(idg,L,NY,NX))
+        ENDDO
+      ENDDO
+      !solute tracers in soil
+      DO L=NU_col(NY,NX),NL_col(NY,NX)    
+        DO ids=ids_beg,ids_end         
+          trcs_solml_vr(ids,L,NY,NX)=AZERO(trcs_solml2_vr(ids,L,NY,NX))
+          trcs_soHml_vr(ids,L,NY,NX)=AZERO(trcs_soHml2_vr(ids,L,NY,NX))
+        ENDDO
+      enddo
+      !dom in surface litter
+      DO K=1,micpar%NumOfLitrCmplxs
+        DO idom=idom_beg,idom_end
+          DOM_MicP_vr(idom,K,0,NY,NX)=AZERO(DOM_MicP2_vr(idom,K,0,NY,NX))
+        ENDDO
+      ENDDO
+      !dom in soil column
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO K=1,jcplx
+          DO idom=idom_beg,idom_end
+            DOM_MicP_vr(idom,K,L,NY,NX)=AZERO(DOM_MicP2_vr(idom,K,L,NY,NX))
+            DOM_MacP_vr(idom,K,L,NY,NX)=AZERO(DOM_MacP2_vr(idom,K,L,NY,NX))
+          ENDDO
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+  end subroutine BackCopyStateVars
+
 !------------------------------------------------------------------------------------------
   subroutine StageSoilFluxes(I,J,NHW,NHE,NVN,NVS)
   implicit none
@@ -289,34 +378,86 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       DO L=NU_col(NY,NX),NL_col(NY,NX)        
-
-        DO idg=idg_beg,idg_NH3-1          
-          RBGCSinkGasMM_vr(idg,L,NY,NX)           = (trcs_RMicbUptake_vr(idg,L,NY,NX)-trcs_deadroot2soil_vr(idg,L,NY,NX))*dts_gas
-          trcs_Soil2plant_uptkdrb_vr(idg,L,NY,NX) = trcs_Soil2plant_uptake_vr(idg,L,NY,NX)+trcs_Soil2plant_uptk_drib_vr(idg,L,NY,NX)
-          RBGCSinkGasMM_vr(idg,L,NY,NX)           = RBGCSinkGasMM_vr(idg,L,NY,NX) +trcs_Soil2plant_uptkdrb_vr(idg,L,NY,NX)*dts_gas
+        !gases
+        DO idg=idg_beg,idg_NH3-1      
+          RBGCSrceGasMM_vr(idg,L,NY,NX) = trcs_deadroot2soil_vr(idg,L,NY,NX)*dts_gas    
+          if(trcs_RMicbUptake_vr(idg,L,NY,NX)>0._r8)then
+            RBGCSinkGasMM_vr(idg,L,NY,NX) = trcs_RMicbUptake_vr(idg,L,NY,NX)*dts_gas          
+          else
+            RBGCSrceGasMM_vr(idg,L,NY,NX) = RBGCSrceGasMM_vr(idg,L,NY,NX)-trcs_RMicbUptake_vr(idg,L,NY,NX)*dts_gas          
+          endif
+          if(trcs_Soil2plant_uptake_vr(idg,L,NY,NX)>0._r8)then
+            RBGCSinkGasMM_vr(idg,L,NY,NX) = RBGCSinkGasMM_vr(idg,L,NY,NX) +trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_gas
+          else
+            RBGCSrceGasMM_vr(idg,L,NY,NX) = RBGCSrceGasMM_vr(idg,L,NY,NX)-trcs_Soil2plant_uptake_vr(idg,L,NY,NX)*dts_gas
+          endif
+          RBGCSinkGasMM_vr(idg,L,NY,NX) = RBGCSinkGasMM_vr(idg,L,NY,NX)+trcs_solml_drib_vr(idg,L,NY,NX)*dts_gas
         enddo
 
-        RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = RBGCSinkGasMM_vr(idg_CO2,L,NY,NX)- &
-          (TProd_CO2_geochem_soil_vr(L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX))*dts_gas
-
+        if(TProd_CO2_geochem_soil_vr(L,NY,NX)>0._r8)then
+          RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+(TProd_CO2_geochem_soil_vr(L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX))*dts_gas
+        else
+          RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = RBGCSinkGasMM_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)*dts_gas
+        endif
+          
         RBGCSinkGasMM_vr(idg_N2,L,NY,NX)     = RBGCSinkGasMM_vr(idg_N2,L,NY,NX)+RootN2Fix_vr(L,NY,NX)*dts_gas
-        RBGCSinkGasMM_vr(idg_NH3,L,NY,NX)    = -TRChem_gas_NH3_geochem_vr(L,NY,NX)*dts_gas   !geochemical NH3 source, applied to gas phase
+        if(TProd_gas_NH3_geochem_vr(L,NY,NX)>0._r8)then
+          RBGCSrceGasMM_vr(idg_NH3,L,NY,NX) = TProd_gas_NH3_geochem_vr(L,NY,NX)*dts_gas
+        else        
+          RBGCSinkGasMM_vr(idg_NH3,L,NY,NX) = -TProd_gas_NH3_geochem_vr(L,NY,NX)*dts_gas   !geochemical NH3 source, applied to gas phase
+        endif
+        !----------------------------------------------------------------------
+        !solutes
+        if(trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)>0._r8)then
+          RBGCSrcSoluteM_vr(idg_NH3B,L,NY,NX) = trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)*dts_HeatWatTP
+        else
+          RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = -trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)*dts_HeatWatTP        
+        endif
 
-        RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = (-trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX))*dts_HeatWatTP
-        RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = (-TRChem_sol_NH3_soil_vr(L,NY,NX)-trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+        if(TRProd_chem_sol_NH3_soil_vr(L,NY,NX)>0._r8)then
+          RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX)  = (TRProd_chem_sol_NH3_soil_vr(L,NY,NX)+trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+        else
+          RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = -TRProd_chem_sol_NH3_soil_vr(L,NY,NX)*dts_HeatWatTP
+        endif
         
         DO ids=ids_nut_beg,ids_nuts_end
-          RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_GeoChem_soil_vr(ids,L,NY,NX))*dts_HeatWatTP
+          if(RNut_MicbRelease_vr(ids,L,NY,NX)>0._r8)then
+            RBGCSrcSoluteM_vr(ids,L,NY,NX)   = RNut_MicbRelease_vr(ids,L,NY,NX)*dts_HeatWatTP 
+          else
+            RBGCSinkSoluteM_vr(ids,L,NY,NX) = -RNut_MicbRelease_vr(ids,L,NY,NX)*dts_HeatWatTP 
+          endif
+          if(trcn_RprodChem_soil_vr(ids,L,NY,NX)>0._r8)then
+            RBGCSrcSoluteM_vr(ids,L,NY,NX)   = RBGCSrcSoluteM_vr(ids,L,NY,NX)+trcn_RprodChem_soil_vr(ids,L,NY,NX)*dts_HeatWatTP
+          else
+            RBGCSinkSoluteM_vr(ids,L,NY,NX) =RBGCSinkSoluteM_vr(ids,L,NY,NX)-trcn_RprodChem_soil_vr(ids,L,NY,NX)*dts_HeatWatTP
+          endif
         ENDDO
 
         DO ids=ids_NH4B,ids_nutb_end
-          RBGCSinkSoluteM_vr(ids,L,NY,NX) = (-RNut_MicbRelease_vr(ids,L,NY,NX)-trcn_RChem_band_soil_vr(ids,L,NY,NX))*dts_HeatWatTP
+          if(RNut_MicbRelease_vr(ids,L,NY,NX)>0._r8)then
+            RBGCSrcSoluteM_vr(ids,L,NY,NX) = RNut_MicbRelease_vr(ids,L,NY,NX)*dts_HeatWatTP
+          else
+            RBGCSinkSoluteM_vr(ids,L,NY,NX) =-RNut_MicbRelease_vr(ids,L,NY,NX)*dts_HeatWatTP  
+          endif
+          if(trcn_RProdChem_band_soil_vr(ids,L,NY,NX)>0._r8)then
+            RBGCSrcSoluteM_vr(ids,L,NY,NX) = RBGCSrcSoluteM_vr(ids,L,NY,NX)+trcn_RProdChem_band_soil_vr(ids,L,NY,NX)*dts_HeatWatTP
+          else          
+            RBGCSinkSoluteM_vr(ids,L,NY,NX) =RBGCSinkSoluteM_vr(ids,L,NY,NX)-trcn_RProdChem_band_soil_vr(ids,L,NY,NX)*dts_HeatWatTP
+          endif
         ENDDO
 
         DO ids=idg_NH3,ids_end
-          trcs_Soil2plant_uptkdrb_vr(ids,L,NY,NX)=trcs_Soil2plant_uptake_vr(ids,L,NY,NX)+trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX)        
-          RBGCSinkSoluteM_vr(ids,L,NY,NX) = RBGCSinkSoluteM_vr(ids,L,NY,NX) +trcs_Soil2plant_uptkdrb_vr(ids,L,NY,NX)*dts_HeatWatTP
+          if(trcs_Soil2plant_uptake_vr(ids,L,NY,NX)>0._r8)then
+            RBGCSinkSoluteM_vr(ids,L,NY,NX) = RBGCSinkSoluteM_vr(ids,L,NY,NX)+trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP  
+          else
+            RBGCSrcSoluteM_vr(ids,L,NY,NX) = RBGCSrcSoluteM_vr(ids,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids,L,NY,NX)*dts_HeatWatTP  
+          endif
+          RBGCSinkSoluteM_vr(ids,L,NY,NX) = RBGCSinkSoluteM_vr(ids,L,NY,NX)+trcs_solml_drib_vr(ids,L,NY,NX)*dts_HeatWatTP
         ENDDO        
+
+        DO ids=ids_beg,ids_end
+          trcs_Soil2plant_uptake_col(ids,NY,NY)=trcs_Soil2plant_uptake_col(ids,NY,NY)+ trcs_Soil2plant_uptake_vr(ids,L,NY,NX)          
+        ENDDO
         !
         !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
         !
@@ -340,7 +481,7 @@ module InitNoSaltTransportMod
         DO ids=ids_beg,ids_end
           trcsol_Irrig_flxM_vr(ids,L,NY,NX)=trcs_Irrig_flx_vr(ids,L,NY,NX)*dts_HeatWatTP
           !reset dribbling flux
-          trcs_Soil2plant_uptk_drib_vr(ids,L,NY,NX)=0._r8
+          trcs_solml_drib_vr(ids,L,NY,NX)=0._r8
         ENDDO
         !
         !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP

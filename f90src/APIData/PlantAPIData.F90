@@ -91,7 +91,7 @@ implicit none
   integer,  pointer :: iPlantPhotosynthesisType(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
   real(r8), pointer :: SpecChloryfilAct_pft(:)              => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
   real(r8), pointer :: LeafC3ChlorofilConc_pft(:)           => null()  !leaf C3 chlorophyll content,                                               [gC gC-1]
-  real(r8), pointer :: FracLeafProtinAsPEPCarboxyl_pft(:)   => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
+  real(r8), pointer :: FracLeafProtAsPEPCarboxyl_pft(:)   => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
   real(r8), pointer :: LeafC4ChlorofilConc_pft(:)           => null()  !leaf C4 chlorophyll content,                                               [gC gC-1]
   real(r8), pointer :: LeafRuBPConc_pft(:)                  => null()  !leaf rubisco content,                                                      [gC gC-1]
   real(r8), pointer :: VmaxPEPCarboxyRef_pft(:)             => null()  !PEP carboxylase activity at 25 oC                                          [umol g-1 h-1]
@@ -279,7 +279,7 @@ implicit none
   real(r8), pointer :: MaxPotentSeedNumber_pft(:)     => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)       => null() !maximum grain number per node,        [-]
   real(r8), pointer :: rLen2WidthLeaf_pft(:)          => null() !leaf length:width ratio,              [-]
-  real(r8), pointer :: MaxSeedCMass_pft(:)            => null() !maximum grain size,                   [g]
+  real(r8), pointer :: SeedCMassMax_pft(:)            => null() !maximum grain size,                   [g]
   real(r8), pointer :: Root1stRadius_pvr(:,:,:)       => null() !root layer diameter primary axes,     [m]
   real(r8), pointer :: Root2ndRadius_pvr(:,:,:)       => null() !root layer diameter secondary axes,   [m]
   real(r8), pointer :: RootRaidus_rpft(:,:)           => null() !root internal radius,                 [m]
@@ -408,10 +408,10 @@ implicit none
   type, public :: plant_allometry_type
   real(r8), pointer :: CPRTS_pft(:)                     => null()  !root P:C ratio x root growth yield,                      [-]
   real(r8), pointer :: CNRTS_pft(:)                     => null()  !root N:C ratio x root growth yield,                      [-]
-  real(r8), pointer :: NodulerNC_pft(:)                 => null()  !nodule N:C ratio,                                        [gN gC-1]
-  real(r8), pointer :: NodulerPC_pft(:)                 => null()  !nodule P:C ratio,                                        [gP gC-1]
-  real(r8), pointer :: RootrNC_pft(:)                   => null()  !root N:C ratio,                                          [gN gC-1]
-  real(r8), pointer :: RootrPC_pft(:)                   => null()  !root P:C ratio,                                          [gP gC-1]
+  real(r8), pointer :: rNCNodule_pft(:)                 => null()  !nodule N:C ratio,                                        [gN gC-1]
+  real(r8), pointer :: rPCNoduler_pft(:)                 => null()  !nodule P:C ratio,                                        [gP gC-1]
+  real(r8), pointer :: rNCRoot_pft(:)                   => null()  !root N:C ratio,                                          [gN gC-1]
+  real(r8), pointer :: rPCRootr_pft(:)                   => null()  !root P:C ratio,                                          [gP gC-1]
   real(r8), pointer :: rCNNonstRemob_pft(:)             => null()  !C:N ratio in remobilizable nonstructural biomass,        [-]
   real(r8), pointer :: rCPNonstRemob_pft(:)             => null()  !C:P ratio in remobilizable nonstructural biomass,        [-]
   real(r8), pointer :: NoduGrowthYield_pft(:)           => null()  !nodule growth yield,                                     [g g-1]
@@ -428,19 +428,19 @@ implicit none
   real(r8), pointer :: rNCReserve_pft(:)                => null()  !reserve N:C ratio,                                       [gN gC-1]
   real(r8), pointer :: rNCEar_pft(:)                    => null()  !ear N:C ratio,                                           [gN gC-1]
   real(r8), pointer :: rPCReserve_pft(:)                => null()  !reserve P:C ratio,                                       [gP gC-1]
-  real(r8), pointer :: CPGR_pft(:)                      => null()  !grain P:C ratio,                                         [gP gP-1]
+  real(r8), pointer :: rPCGrain_pft(:)                      => null()  !grain P:C ratio,                                         [gP gP-1]
   real(r8), pointer :: rNCStalk_pft(:)                  => null()  !stalk N:C ratio,                                         [gN gC-1]
   real(r8), pointer :: FracShootLeafElmAlloc2Litr(:,:)  => null()  !woody element allocation, [-]
   real(r8), pointer :: FracShootStalkElmAlloc2Litr(:,:) => null()  !leaf element allocation,[-]
   real(r8), pointer :: FracRootElmAlloc2Litr(:,:)       => null()  !C woody fraction in root,[-]
   real(r8), pointer :: FracRootStalkElmAlloc2Litr(:,:)  => null()  !woody element allocation,[-]
   real(r8), pointer :: LeafBiomGrowthYld_pft(:)         => null()  !leaf growth yield,                                       [g g-1]
-  real(r8), pointer :: CNGR_pft(:)                      => null()  !grain N:C ratio,                                         [g g-1]
-  real(r8), pointer :: CPLF_pft(:)                      => null()  !maximum leaf P:C ratio,                                  [g g-1]
-  real(r8), pointer :: CPSHE_pft(:)                     => null()  !sheath P:C ratio,                                        [g g-1]
-  real(r8), pointer :: CNSHE_pft(:)                     => null()  !sheath N:C ratio,                                        [g g-1]
+  real(r8), pointer :: rNCGrain_pft(:)                      => null()  !grain N:C ratio,                                         [g g-1]
+  real(r8), pointer :: rPCLeaf_pft(:)                      => null()  !maximum leaf P:C ratio,                                  [g g-1]
+  real(r8), pointer :: rPCSheath_pft(:)                     => null()  !sheath P:C ratio,                                        [g g-1]
+  real(r8), pointer :: rNCSheath_pft(:)                     => null()  !sheath N:C ratio,                                        [g g-1]
   real(r8), pointer :: rPCStalk_pft(:)                  => null()  !stalk P:C ratio,                                         [g g-1]
-  real(r8), pointer :: CNLF_pft(:)                      => null()  !maximum leaf N:C ratio,                                  [g g-1]
+  real(r8), pointer :: rNCLeaf_pft(:)                      => null()  !maximum leaf N:C ratio,                                  [g g-1]
   real(r8), pointer :: GrainSeedBiomCMean_brch(:,:)     => null()  !maximum grain C during grain fill,                       [g d-2]
   real(r8), pointer :: FracGroth2Node_pft(:)            => null()  !parameter for allocation of growth to nodes,             [-]
   real(r8), pointer ::RootFracRemobilizableBiom_pft(:)      => null()  !fraction of remobilizable nonstructural biomass in root, [-]
@@ -1165,22 +1165,22 @@ implicit none
   allocate(this%GrainSeedBiomCMean_brch(MaxNumBranches,JP1));this%GrainSeedBiomCMean_brch=spval
   allocate(this%NoduGrowthYield_pft(JP1));this%NoduGrowthYield_pft=spval
   allocate(this%RootBiomGrosYld_pft(JP1));this%RootBiomGrosYld_pft=spval
-  allocate(this%RootrPC_pft(JP1));this%RootrPC_pft=spval
+  allocate(this%rPCRootr_pft(JP1));this%rPCRootr_pft=spval
   allocate(this%rCNNonstRemob_pft(JP1));this%rCNNonstRemob_pft=spval
   allocate(this%rCPNonstRemob_pft(JP1));this%rCPNonstRemob_pft=spval
   allocate(this%CPRTS_pft(JP1));this%CPRTS_pft=spval
   allocate(this%CNRTS_pft(JP1));this%CNRTS_pft=spval
-  allocate(this%NodulerNC_pft(JP1));this%NodulerNC_pft=spval
-  allocate(this%NodulerPC_pft(JP1));this%NodulerPC_pft=spval
-  allocate(this%RootrNC_pft(JP1));this%RootrNC_pft=spval
-  allocate(this%CPLF_pft(JP1));this%CPLF_pft=spval
-  allocate(this%CPSHE_pft(JP1));this%CPSHE_pft=spval
-  allocate(this%CNLF_pft(JP1));this%CNLF_pft=spval
-  allocate(this%CNSHE_pft(JP1));this%CNSHE_pft=spval
-  allocate(this%CNGR_pft(JP1));this%CNGR_pft=spval
+  allocate(this%rNCNodule_pft(JP1));this%rNCNodule_pft=spval
+  allocate(this%rPCNoduler_pft(JP1));this%rPCNoduler_pft=spval
+  allocate(this%rNCRoot_pft(JP1));this%rNCRoot_pft=spval
+  allocate(this%rPCLeaf_pft(JP1));this%rPCLeaf_pft=spval
+  allocate(this%rPCSheath_pft(JP1));this%rPCSheath_pft=spval
+  allocate(this%rNCLeaf_pft(JP1));this%rNCLeaf_pft=spval
+  allocate(this%rNCSheath_pft(JP1));this%rNCSheath_pft=spval
+  allocate(this%rNCGrain_pft(JP1));this%rNCGrain_pft=spval
   allocate(this%rPCStalk_pft(JP1));this%rPCStalk_pft=spval
   allocate(this%rNCStalk_pft(JP1));this%rNCStalk_pft=spval
-  allocate(this%CPGR_pft(JP1));this%CPGR_pft=spval
+  allocate(this%rPCGrain_pft(JP1));this%rPCGrain_pft=spval
   allocate(this%rPCEar_pft(JP1));this%rPCEar_pft=spval
   allocate(this%rPCReserve_pft(JP1));this%rPCReserve_pft=spval
   allocate(this%rNCReserve_pft(JP1));this%rNCReserve_pft=spval
@@ -1212,14 +1212,14 @@ implicit none
 !  if(allocated(GrainSeedBiomCMean_brch))deallocate(GrainSeedBiomCMean_brch)
 !  if(allocated(NoduGrowthYield_pft))deallocate(NoduGrowthYield_pft)
 !  if(allocated(RootBiomGrosYld_pft))deallocate(RootBiomGrosYld_pft)
-!  if(allocated(RootrPC_pft))deallocate(RootrPC_pft)
+!  if(allocated(rPCRootr_pft))deallocate(rPCRootr_pft)
 !  if(allocated(rCNNonstRemob_pft))deallocate(rCNNonstRemob_pft)
 !  if(allocated(rCPNonstRemob_pft))deallocate(rCPNonstRemob_pft)
 !  if(allocated(CPRTS_pft))deallocate(CPRTS_pft)
 !  if(allocated(CNRTS_pft))deallocate(CNRTS_pft)
-!  if(allocated(NodulerNC_pft))deallocate(NodulerNC_pft)
-!  if(allocated(NodulerPC_pft))deallocate(NodulerPC_pft)
-!  if(allocated(RootrNC_pft))deallocate(RootrNC_pft)
+!  if(allocated(rNCNodule_pft))deallocate(rNCNodule_pft)
+!  if(allocated(rPCNoduler_pft))deallocate(rPCNoduler_pft)
+!  if(allocated(rNCRoot_pft))deallocate(rNCRoot_pft)
 !  if(allocated(RootFracRemobilizableBiom_pft))deallocate(RootFracRemobilizableBiom_pft)
 !  if(allocated(CPLF))deallocate(CPLF)
 !  if(allocated(CPSHE))deallocate(CPSHE)
@@ -1667,7 +1667,7 @@ implicit none
   allocate(this%ChillHours_pft(JP1));this%ChillHours_pft=spval
   allocate(this%SpecChloryfilAct_pft(JP1));this%SpecChloryfilAct_pft=spval
   allocate(this%LeafC3ChlorofilConc_pft(JP1));this%LeafC3ChlorofilConc_pft=spval
-  allocate(this%FracLeafProtinAsPEPCarboxyl_pft(JP1));this%FracLeafProtinAsPEPCarboxyl_pft=spval
+  allocate(this%FracLeafProtAsPEPCarboxyl_pft(JP1));this%FracLeafProtAsPEPCarboxyl_pft=spval
   allocate(this%LeafC4ChlorofilConc_pft(JP1));this%LeafC4ChlorofilConc_pft=spval
   allocate(this%LeafRuBPConc_pft(JP1));this%LeafRuBPConc_pft=spval
   allocate(this%VmaxPEPCarboxyRef_pft(JP1));this%VmaxPEPCarboxyRef_pft=spval
@@ -1801,7 +1801,7 @@ implicit none
   allocate(this%rLen2WidthLeaf_pft(JP1));this%rLen2WidthLeaf_pft=spval
   allocate(this%MaxSeedNumPerSite_pft(JP1));this%MaxSeedNumPerSite_pft=spval
   allocate(this%MaxPotentSeedNumber_pft(JP1));this%MaxPotentSeedNumber_pft=spval
-  allocate(this%MaxSeedCMass_pft(JP1));this%MaxSeedCMass_pft=spval
+  allocate(this%SeedCMassMax_pft(JP1));this%SeedCMassMax_pft=spval
   allocate(this%Root1stMaxRadius1_pft(jroots,JP1));this%Root1stMaxRadius1_pft=spval
   allocate(this%Root2ndMaxRadius1_pft(jroots,JP1));this%Root2ndMaxRadius1_pft=spval
   allocate(this%RootRaidus_rpft(jroots,JP1));this%RootRaidus_rpft=spval

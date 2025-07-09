@@ -21,7 +21,7 @@ implicit none
   integer, parameter :: idg_beg = idg_CO2  
   character(len=10), allocatable :: trcs_names(:)
 
-  integer  :: idg_NH3B
+  integer :: idg_NH3B
   integer :: ids_NH4,ids_NH4B
   integer :: ids_NO3,ids_NO3B
   integer :: ids_NO2,ids_NO2B

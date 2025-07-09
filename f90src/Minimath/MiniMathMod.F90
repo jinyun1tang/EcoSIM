@@ -26,8 +26,13 @@ module minimathmod
   public :: yearday,isletter
   public :: dssign
   public :: flux_mass_limiter
-  public :: AZERO,AZERO1
+  public :: AZERO,AZERO1  
   public :: SubstrateLimit
+  public :: SubstrateDribbling
+  interface SubstrateDribbling
+    module procedure SubstrateDribbling_vec
+    module procedure SubstrateDribbling_scal
+  end interface SubstrateDribbling
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -516,5 +521,47 @@ module minimathmod
   endif
   if(present(scal))scal=scal1
   end subroutine SubstrateLimit
+
+!------------------------------------------------------------------------
+  subroutine SubstrateDribbling_scal(demand_flux,dribbling_flx,y)
+
+  implicit none
+  real(r8), intent(in) :: demand_flux        !consumption/demand flux
+  real(r8), intent(inout) :: dribbling_flx
+  real(r8), intent(inout) :: Y
+  real(r8) :: tDemand
+
+  tDemand = demand_flux + dribbling_flx
+
+  if(y>tDemand)then
+    y=y-tDemand
+    dribbling_flx=0._r8
+  else
+    dribbling_flx=tDemand-y
+    y=0._r8
+  endif
+  
+  end subroutine SubstrateDribbling_scal
+!------------------------------------------------------------------------
+  subroutine SubstrateDribbling_vec(n1,n2,demand_flux,dribbling_flx,y)
+
+  implicit none
+  integer, intent(in) :: n1,n2
+  real(r8), intent(in) :: demand_flux(n1:n2)  !consumption/demand flux
+  real(r8), intent(inout) :: dribbling_flx    !>0
+  real(r8), intent(inout) :: Y
+  real(r8) :: tDemand
+
+  tDemand = sum(demand_flux) + dribbling_flx
+
+  if(y>tDemand)then
+    y=y-tDemand
+    dribbling_flx=0._r8
+  else
+    dribbling_flx=tDemand-y
+    y=0._r8
+  endif
+  
+  end subroutine SubstrateDribbling_vec
 
 end module minimathmod

@@ -59,7 +59,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  XKO2_pft(:,:,:)                            !Km for rubisco oxygenase activity, [uM]
   real(r8),target,allocatable ::  Km4PEPCarboxy_pft(:,:,:)                   !Km for PEP carboxylase activity, [uM]
   real(r8),target,allocatable ::  LeafRuBPConc_pft(:,:,:)                    !leaf rubisco content, [g g-1]
-  real(r8),target,allocatable ::  FracLeafProtinAsPEPCarboxyl_pft(:,:,:)     !leaf PEP carboxylase content, [g g-1]
+  real(r8),target,allocatable ::  FracLeafProtAsPEPCarboxyl_pft(:,:,:)     !leaf PEP carboxylase content, [g g-1]
   real(r8),target,allocatable ::  SpecChloryfilAct_pft(:,:,:)                !cholorophyll activity , [umol g-1 h-1 at 25 oC]
   real(r8),target,allocatable ::  LeafC3ChlorofilConc_pft(:,:,:)             !leaf C3 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  LeafC4ChlorofilConc_pft(:,:,:)             !leaf C4 chlorophyll content, [g g-1]
@@ -228,7 +228,7 @@ module CanopyDataType
   allocate(XKO2_pft(JP,JY,JX));     XKO2_pft=0._r8
   allocate(Km4PEPCarboxy_pft(JP,JY,JX));   Km4PEPCarboxy_pft=0._r8
   allocate(LeafRuBPConc_pft(JP,JY,JX));     LeafRuBPConc_pft=0._r8
-  allocate(FracLeafProtinAsPEPCarboxyl_pft(JP,JY,JX));     FracLeafProtinAsPEPCarboxyl_pft=0._r8
+  allocate(FracLeafProtAsPEPCarboxyl_pft(JP,JY,JX));     FracLeafProtAsPEPCarboxyl_pft=0._r8
   allocate(SpecChloryfilAct_pft(JP,JY,JX));     SpecChloryfilAct_pft=0._r8
   allocate(LeafC3ChlorofilConc_pft(JP,JY,JX));      LeafC3ChlorofilConc_pft=0._r8
   allocate(LeafC4ChlorofilConc_pft(JP,JY,JX));     LeafC4ChlorofilConc_pft=0._r8
@@ -391,7 +391,7 @@ module CanopyDataType
   call destroy(XKO2_pft)
   call destroy(Km4PEPCarboxy_pft)
   call destroy(LeafRuBPConc_pft)
-  call destroy(FracLeafProtinAsPEPCarboxyl_pft)
+  call destroy(FracLeafProtAsPEPCarboxyl_pft)
   call destroy(SpecChloryfilAct_pft)
   call destroy(LeafC3ChlorofilConc_pft)
   call destroy(LeafC4ChlorofilConc_pft)

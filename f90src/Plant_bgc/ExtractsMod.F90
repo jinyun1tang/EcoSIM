@@ -231,7 +231,7 @@ module ExtractsMod
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
-      RootO2_Xink_vr(L)      = RootO2_Xink_vr(L) + RootO2_Xink_pvr(N,L,NZ)
+      RootO2_Xink_vr(L)      = RootO2_Xink_vr(L) + RootO2_Xink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
       RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
       RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 

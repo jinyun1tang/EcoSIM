@@ -8,6 +8,7 @@ module BalancesMod
   use AqueChemDatatype,  only: trcg_mass_cumerr_col
   use PlantMgmtDataType, only: iDayPlanting_pft, iDayPlantHarvest_pft
   use EcoSIMCtrlMod,     only: iVerbLevel
+  use NumericalAuxMod
   use RootDataType
   use SoilBGCDataType
   use GridDataType
@@ -39,7 +40,7 @@ contains
   !Prepare for next mass balance check
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  integer :: NY,NX,idg
+  integer :: NY,NX,idg,ids,L
   
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -50,6 +51,16 @@ contains
       SnowMassBeg_col(NY,NX)        = SnowMassEnd_col(NY,NX)
       LitWatMassBeg_col(NY,NX)      = LitWatMassEnd_col(NY,NX)
       SoilWatMassBeg_col(NY,NX)     = SoilWatMassEnd_col(NY,NX)
+
+      DO ids=ids_beg,ids_end
+        trcs_solml_dribBeg_col(ids,NY,NX)=trcs_solml_drib_vr(ids,0,NY,NX)
+      ENDDO
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO ids=ids_beg,ids_end
+          trcs_solml_dribBeg_col(ids,NY,NX)=trcs_solml_dribBeg_col(ids,NY,NX)+trcs_solml_drib_vr(ids,L,NY,NX)
+        ENDDO        
+      ENDDO
 
       DO idg=idg_beg,idg_end
         trcg_TotalMass_beg_col(idg,NY,NX) = trcg_TotalMass_col(idg,NY,NX)
@@ -183,7 +194,8 @@ contains
   real(r8) :: tracer_snowmass_err
   real(r8) :: dCO2err       !Inconsistency error due to asynchrnous update between soil and wihtin root CO2 [gC d-2]
   real(r8) :: dgaserr       !Inconsistency error due to asynchrnous update between soil and wihtin root gas [g d-2] 
-  integer :: ii,idg
+  integer  :: ii,idg,ids,L
+  real(r8) :: trcs_solml_drib_col(ids_beg:ids_end)
 
   call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 
@@ -266,6 +278,16 @@ contains
         
       endif
 
+      DO ids=ids_beg,ids_end
+        trcs_solml_drib_col(ids)=trcs_solml_drib_vr(ids,0,NY,NX)
+      ENDDO
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        DO ids=ids_beg,ids_end
+          trcs_solml_drib_col(ids)=trcs_solml_drib_col(ids)+trcs_solml_drib_vr(ids,L,NY,NX)
+        ENDDO        
+      ENDDO
+
       !Turn off the tracer mass conservation check momentarily, due to complication of 
       !grid change. It will be turned on when a safe strategy will be figured out later.
       
@@ -281,9 +303,12 @@ contains
 
         tracer_rootmass_err = tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg,NY,NX)
 
+        tracer_mass_err=tracer_mass_err-trcs_solml_dribBeg_col(idg,NY,NX)+trcs_solml_drib_col(idg)
+
         if(idg==idg_NH3)then           
           tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX) &
              +trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)  
+          tracer_mass_err=tracer_mass_err-trcs_solml_dribBeg_col(idg_NH3B,NY,NX)+trcs_solml_drib_col(idg_NH3B)
         endif
 
         if(idg==idg_O2)then
@@ -297,7 +322,6 @@ contains
           trcg_AquaADV_Snow2Soil_flx(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)-trcg_snowMassloss_col(idg,NY,NX)
 
         if(AMAX1(abs(tracer_mass_err),abs(tracer_rootmass_err))>1.e-5_r8)then
-
           if(iVerbLevel==1)then
             write(111,*)('-',ii=1,50)
             write(111,*)I*1000+J,'NY NX=',NY,NX,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX),'Final'
@@ -358,10 +382,10 @@ contains
 
           if(idg==idg_CO2)then
             dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)          
-!            tracer_mass_err = tracer_mass_err+dCO2err
+            ! tracer_mass_err = tracer_mass_err+dCO2err
           else
-!            dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)          
-!            tracer_mass_err=tracer_mass_err-dgaserr
+            ! dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)          
+            ! tracer_mass_err=tracer_mass_err-dgaserr
           endif
 
           if(abs(tracer_mass_err)>1.e-1_r8) &
@@ -369,6 +393,9 @@ contains
         endif
       enddo      
 
+      DO ids=ids_beg,ids_end
+        trcs_solml_dribBeg_col(ids,NY,NX)=trcs_solml_drib_col(ids)
+      ENDDO        
       cycle      
       if(abs(HeatErr_test)>err_engy)then
         write(110,*)('-',ii=1,50)

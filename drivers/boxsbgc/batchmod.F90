@@ -1658,7 +1658,7 @@ contains
 !    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_N2,L,NY,NX)-Micb_N2Fixation_vr(L,NY,NX)
 !    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_N2O,L,NY,NX)
 !    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-trcs_RMicbTransf_vr(idg_H2,L,NY,NX)
-!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TRChem_sol_NH3_soil_vr(L,NY,NX)
+!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TRProd_chem_sol_NH3_soil_vr(L,NY,NX)
 
 !    CO2G(L,NY,NX)=CO2G(L,NY,NX)-XCODFG(L,NY,NX)+XCOFLG
 !    CH4G(L,NY,NX)=CH4G(L,NY,NX)-XCHDFG(L,NY,NX)+XCHFLG
