@@ -1522,7 +1522,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     ZNH4M,ZNHBM=NH4 not available for uptake in non-band, band
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
-!     RNH4TransfSoilHeter,RNH4TransfBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
+!     RNH4imobilSoilHeter,RNH4imobilBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
 !     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   FNH4S=VLNH4
@@ -1561,7 +1561,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
 !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
-!     RNO3TransfSoilHeter,RNO3TransfBandHeter=substrate-limited NO3 immobiln in non-band, band
+!     RNO3imobilSoilHeter,RNO3imobilBandHeter=substrate-limited NO3 immobiln in non-band, band
 !     NetNH4Mineralize=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
   FNO3S=VLNO3
@@ -1604,7 +1604,7 @@ module MicAutoCPLXMod
 !     H2POM,H2PBM=H2PO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
-!     RH2PO4TransfSoilHeter,RH2PO4TransfBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
+!     RH2PO4imobilSoilHeter,RH2PO4imobilBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
 !     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH2PS=VLPO4
@@ -1644,7 +1644,7 @@ module MicAutoCPLXMod
 !     H1POM,H1PBM=HPO4 not available for uptake in non-band, band
 !     VOLW=water content
 !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
-!     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
+!     RH1PO4imobilSoilHeter,RH1PO4imobilBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
 !     NetPO4Mineralize=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
   FH1PS=VLPO4
@@ -1684,7 +1684,7 @@ module MicAutoCPLXMod
 !     VOLW=water content
 !     ZNH4M=NH4 not available for uptake
 !     AttenfNH4Heter=fractions of biological NH4 demand
-!     RNH4TransfLitrHeter=substrate-limited NH4 mineraln-immobiln
+!     RNH4imobilLitrHeter=substrate-limited NH4 mineraln-immobiln
 !     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
   IF(litrm)THEN
@@ -1715,11 +1715,11 @@ module MicAutoCPLXMod
 !     BIOA=microbial surface area, OMA=active biomass
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
-!     RNO3TransfLitrHeter=substrate-unlimited NO3 immobiln
+!     RNO3imobilLitrHeter=substrate-unlimited NO3 immobiln
 !     VLWatMicP=water content
 !     ZNO3M=NO3 not available for uptake
 !     AttenfNO3Heter=fraction of biological NO3 demand
-!     RNO3TransfLitrHeter=substrate-limited NO3 immobiln
+!     RNO3imobilLitrHeter=substrate-limited NO3 immobiln
 !     NetNH4Mineralize=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
     RNetNO3DmndLitr=AZMAX1(RNetNH4MinPotentLitr-RNH4TransfLitrAutor(NGL))
@@ -1753,7 +1753,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     H2P4M=H2PO4 not available for uptake
 !     AttenfH2PO4Heter=fractions of biological H2PO4 demand
-!     RH2PO4TransfLitrHeter=substrate-limited H2PO4 mineraln-immobiln
+!     RH2PO4imobilLitrHeter=substrate-limited H2PO4 mineraln-immobiln
 !     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
     RNetH2PO4MinPotentLitr=RNetH2PO4MinPotent-RH2PO4TransfSoilAutor(NGL)
@@ -1787,7 +1787,7 @@ module MicAutoCPLXMod
 !     VLWatMicP=water content
 !     H1P4M=HPO4 not available for uptake
 !     AttenfH1PO4Heter=fraction of biological HPO4 demand
-!     RH1PO4TransfLitrHeter=substrate-limited HPO4 minereraln-immobiln
+!     RH1PO4imobilLitrHeter=substrate-limited HPO4 minereraln-immobiln
 !     NetPO4Mineralize=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
     FH1PS=VLPO4
@@ -1977,12 +1977,12 @@ module MicAutoCPLXMod
 !     R3OMC,R3OMN,R3OMP=microbial C,N,P recycling
 !     R3MMC,R3MMN,R3MMP=microbial C,N,P recycling from senescence
 !     CGOMN,CGOMP=DON, DOP uptake
-!     RNH4TransfSoilHeter,RNH4TransfBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
-!     RNO3TransfSoilHeter,RNO3TransfBandHeter=substrate-limited NO3 immobiln in non-band, band
-!     RH2PO4TransfSoilHeter,RH2PO4TransfBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     RH1PO4TransfSoilHeter,RH1PO4TransfBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
-!     RNH4TransfLitrHeter,RNO3TransfLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
-!     RH2PO4TransfLitrHeter,RH1PO4TransfLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
+!     RNH4imobilSoilHeter,RNH4imobilBandHeter=substrate-limited NH4 mineraln-immobiln in non-band, band
+!     RNO3imobilSoilHeter,RNO3imobilBandHeter=substrate-limited NO3 immobiln in non-band, band
+!     RH2PO4imobilSoilHeter,RH2PO4imobilBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
+!     RH1PO4imobilSoilHeter,RH1PO4imobilBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band
+!     RNH4imobilLitrHeter,RNO3imobilLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
+!     RH2PO4imobilLitrHeter,RH1PO4imobilLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
 !
         CGROMC             = DOMuptk4GrothAutor(ielmc,NGL)-RespGrossAutor(NGL)-RNOxReduxRespAutorLim(NGL)-Resp4NFixAutor(NGL)
         RCO2ProdAutor(NGL) = RCO2ProdAutor(NGL)+Resp4NFixAutor(NGL)

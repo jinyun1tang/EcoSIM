@@ -143,7 +143,7 @@ module RootGasMod
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr                ,& !inoput :root aqueous content, [g d-2]
     RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr             ,& !inoput :root respiration released to soil, [gC d-2 h-1]
     RootCO2Ar2RootX_pvr       => plt_rbgc%RootCO2Ar2RootX_pvr            ,& !inoput :root respiration released to root, [gC d-2 h-1]
-    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr                ,& !output :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_pvr           => plt_bgcr%RootO2_TotSink_pvr                ,& !output :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     RootGasConductance_pvr    => plt_rbgc%RootGasConductance_pvr          & !output :Conductance for gas diffusion [m3 d-2 h-1]
   )
   
@@ -597,13 +597,13 @@ module RootGasMod
     ! O2 is taken from inside the root and directly from the aqueous soil O2.
 
     PopPlantO2Uptake        = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_pvr(idg_O2,N,L,NZ)
-    RootO2_Xink_pvr(N,L,NZ) = PopPlantO2Uptake     !include O2 uptake from soil and from inside the roots
+    RootO2_TotSink_pvr(N,L,NZ) = PopPlantO2Uptake     !include O2 uptake from soil and from inside the roots
     !to be used in next iteration
     RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE
     RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
     PopPlantO2Uptake         = 0.0_r8
-    RootO2_Xink_pvr(N,L,NZ)  = 0._r8
+    RootO2_TotSink_pvr(N,L,NZ)  = 0._r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
       RAutoRootO2Limter_rpvr(N,L,NZ)=RAutoRootO2Limter_rpvr(N,L-1,NZ)
     ELSE

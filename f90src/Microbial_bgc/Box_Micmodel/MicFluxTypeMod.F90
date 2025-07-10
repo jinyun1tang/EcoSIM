@@ -20,16 +20,16 @@ implicit none
   real(r8) :: RO2UptkMicb
   real(r8) :: RN2NetUptkMicb
   real(r8) :: RN2ONetUptkMicb
-  real(r8) :: RNH4MicbTransfSoil
-  real(r8) :: RNO3MicbTransfSoil
-  real(r8) :: RNO2MicbTransfSoil
-  real(r8) :: RH2PO4MicbTransfSoil
-  real(r8) :: RH1PO4MicbTransfSoil
-  real(r8) :: RNH4MicbTransfBand
-  real(r8) :: RNO3MicbTransfBand
-  real(r8) :: RNO2MicbTransfBand
-  real(r8) :: RH2PO4MicbTransfBand
-  real(r8) :: RH1PO4MicbTransfBand
+  real(r8) :: RNH4MicbReliz2Soil
+  real(r8) :: RNO3MicbReliz2Soil
+  real(r8) :: RNO2MicbReliz2Soil
+  real(r8) :: RH2PO4MicbReliz2Soil
+  real(r8) :: RH1PO4MicbReliz2Soil
+  real(r8) :: RNH4MicbReliz2Band
+  real(r8) :: RNO3MicbReliz2Band
+  real(r8) :: RNO2MicbReliz2Band
+  real(r8) :: RH2PO4MicbReliz2Band
+  real(r8) :: RH1PO4MicbReliz2Band
   real(r8) :: MicrbN2Fix                  !>0 N fixation
   real(r8) :: RNO2DmndSoilChemo
   real(r8) :: RNO2DmndBandChemo

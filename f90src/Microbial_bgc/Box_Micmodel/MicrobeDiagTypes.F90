@@ -32,14 +32,14 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TFPO4X           !total relative demand of H2PO4 in non-banded soil by Microbes
 !fluxes
     real(r8) :: tCResp4H2Prod    !total respiration flux to support H2 production, [gC d-2 h-1]  
-    real(r8) :: tRNH4MicrbTransfSoil
-    real(r8) :: tRH2PO4MicrbTransfSoil
-    real(r8) :: tRNO3MicrbTransfSoil
-    real(r8) :: tRH1PO4MicrbTransfSoil
-    real(r8) :: tRNH4MicrbTransfBand
-    real(r8) :: tRNO3MicrbTransfBand
-    real(r8) :: tRH2PO4MicrbTransfBand
-    real(r8) :: tRH1PO4MicrbTransfBand
+    real(r8) :: tRNH4MicrbImobilSoil
+    real(r8) :: tRH2PO4MicrbImobilSoil
+    real(r8) :: tRNO3MicrbImobilSoil
+    real(r8) :: tRH1PO4MicrbImobilSoil
+    real(r8) :: tRNH4MicrbImobilBand
+    real(r8) :: tRNO3MicrbImobilBand
+    real(r8) :: tRH2PO4MicrbImobilBand
+    real(r8) :: tRH1PO4MicrbImobilBand
 
     real(r8) :: tRO2UptkHeterG   !total oxygen uptake by heterotrophs
     real(r8) :: tRO2DmndHeterG   !total oxygen demand by heterotrophs
@@ -142,12 +142,12 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RN2OReduxHeter(:,:)
   real(r8),allocatable :: RNOxReduxRespDenitLim(:,:)
   real(r8),allocatable :: RMaintDmndHeter(:,:,:)
-  real(r8),allocatable :: RNH4TransfSoilHeter(:,:)
-  real(r8),allocatable :: RNO3TransfSoilHeter(:,:)
-  real(r8),allocatable :: RH2PO4TransfSoilHeter(:,:)
-  real(r8),allocatable :: RNH4TransfBandHeter(:,:)
-  real(r8),allocatable :: RNO3TransfBandHeter(:,:)
-  real(r8),allocatable :: RH2PO4TransfBandHeter(:,:)
+  real(r8),allocatable :: RNH4imobilSoilHeter(:,:)
+  real(r8),allocatable :: RNO3imobilSoilHeter(:,:)
+  real(r8),allocatable :: RH2PO4imobilSoilHeter(:,:)
+  real(r8),allocatable :: RNH4imobilBandHeter(:,:)
+  real(r8),allocatable :: RNO3imobilBandHeter(:,:)
+  real(r8),allocatable :: RH2PO4imobilBandHeter(:,:)
   real(r8),allocatable :: RkillLitfalOMHeter(:,:,:,:)
   real(r8),allocatable :: RkillLitrfal2HumOMHeter(:,:,:,:)
   real(r8),allocatable :: RkillLitrfal2ResduOMHeter(:,:,:,:)
@@ -161,9 +161,9 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RkillRecycOMHeter(:,:,:,:)
   real(r8),allocatable :: RMaintDefcitKillOMHeter(:,:,:,:)
   real(r8),allocatable :: RMaintDefcitRecycOMHeter(:,:,:,:)
-  real(r8),allocatable :: RNH4TransfLitrHeter(:,:)
-  real(r8),allocatable :: RNO3TransfLitrHeter(:,:)
-  real(r8),allocatable :: RH2PO4TransfLitrHeter(:,:)
+  real(r8),allocatable :: RNH4imobilLitrHeter(:,:)
+  real(r8),allocatable :: RNO3imobilLitrHeter(:,:)
+  real(r8),allocatable :: RH2PO4imobilLitrHeter(:,:)
   real(r8),allocatable :: RNOxReduxRespDenitUlm(:,:)
   real(r8),allocatable :: ROQC4HeterMicrobAct(:,:)
   real(r8),allocatable :: RCO2ProdHeter(:,:)
@@ -173,9 +173,9 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RSOxidBandAutor(:)
 
   real(r8),allocatable :: XferBiomeHeterK(:,:,:,:)
-  real(r8),allocatable :: RH1PO4TransfSoilHeter(:,:)
-  real(r8),allocatable :: RH1PO4TransfBandHeter(:,:)
-  real(r8),allocatable :: RH1PO4TransfLitrHeter(:,:)
+  real(r8),allocatable :: RH1PO4imobilSoilHeter(:,:)
+  real(r8),allocatable :: RH1PO4imobilBandHeter(:,:)
+  real(r8),allocatable :: RH1PO4imobilLitrHeter(:,:)
 
   real(r8),allocatable :: RO2UptkAutor(:)
   real(r8),allocatable :: Resp4NFixAutor(:)
@@ -318,14 +318,14 @@ type, public :: Cumlate_Flux_Diag_type
   this%TFPO4X = 0._r8
 
   this%tCResp4H2Prod          = 0._r8
-  this%tRNH4MicrbTransfSoil   = 0._r8
-  this%tRH2PO4MicrbTransfSoil = 0._r8
-  this%tRNO3MicrbTransfSoil   = 0.0_r8
-  this%tRH1PO4MicrbTransfSoil = 0.0_r8
-  this%tRNH4MicrbTransfBand   = 0.0_r8
-  this%tRNO3MicrbTransfBand   = 0.0_r8
-  this%tRH2PO4MicrbTransfBand = 0.0_r8
-  this%tRH1PO4MicrbTransfBand = 0.0_r8
+  this%tRNH4MicrbImobilSoil   = 0._r8
+  this%tRH2PO4MicrbImobilSoil = 0._r8
+  this%tRNO3MicrbImobilSoil   = 0.0_r8
+  this%tRH1PO4MicrbImobilSoil = 0.0_r8
+  this%tRNH4MicrbImobilBand   = 0.0_r8
+  this%tRNO3MicrbImobilBand   = 0.0_r8
+  this%tRH2PO4MicrbImobilBand = 0.0_r8
+  this%tRH1PO4MicrbImobilBand = 0.0_r8
   this%tRCO2MicrbProd         = 0.0_r8
   this%tRCH4MicrbProd         = 0.0_r8
   this%tRNOxMicrbRedux        = 0.0_r8
@@ -385,12 +385,12 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RN2OReduxHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2OReduxHeter=spval
   allocate(this%RNOxReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitLim=spval
   allocate(this%RMaintDmndHeter(2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDmndHeter=spval
-  allocate(this%RNH4TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfSoilHeter=spval
-  allocate(this%RNO3TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfSoilHeter=spval
-  allocate(this%RH2PO4TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfSoilHeter=spval
-  allocate(this%RNH4TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfBandHeter=spval
-  allocate(this%RNO3TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfBandHeter=spval
-  allocate(this%RH2PO4TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfBandHeter=spval
+  allocate(this%RNH4imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilSoilHeter=spval
+  allocate(this%RNO3imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilSoilHeter=spval
+  allocate(this%RH2PO4imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4imobilSoilHeter=spval
+  allocate(this%RNH4imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilBandHeter=spval
+  allocate(this%RNO3imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilBandHeter=spval
+  allocate(this%RH2PO4imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4imobilBandHeter=spval
   allocate(this%RkillLitfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitfalOMHeter=spval
   allocate(this%RkillLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitrfal2HumOMHeter=spval
   allocate(this%RkillLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitrfal2ResduOMHeter=spval
@@ -406,9 +406,9 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RMaintDefcitRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitRecycOMHeter=spval
   allocate(this%RMetabDOCUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RMetabDOCUptkHeter=spval
   allocate(this%RMetabAcetUptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RMetabAcetUptkHeter=spval
-  allocate(this%RNH4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4TransfLitrHeter=spval
-  allocate(this%RNO3TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3TransfLitrHeter=spval
-  allocate(this%RH2PO4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4TransfLitrHeter=spval
+  allocate(this%RNH4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilLitrHeter=spval
+  allocate(this%RNO3imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilLitrHeter=spval
+  allocate(this%RH2PO4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4imobilLitrHeter=spval
   allocate(this%AttenfNH4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNH4Heter=spval
   allocate(this%AttenfNO3Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNO3Heter=spval
   allocate(this%AttenfH2PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH2PO4Heter=spval
@@ -418,9 +418,9 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RCO2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCO2ProdHeter=spval
   allocate(this%RAcettProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RAcettProdHeter=spval
   allocate(this%RCH4ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCH4ProdHeter=spval
-  allocate(this%RH1PO4TransfSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4TransfSoilHeter=spval
-  allocate(this%RH1PO4TransfBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4TransfBandHeter=spval
-  allocate(this%RH1PO4TransfLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4TransfLitrHeter=spval
+  allocate(this%RH1PO4imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilSoilHeter=spval
+  allocate(this%RH1PO4imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilBandHeter=spval
+  allocate(this%RH1PO4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilLitrHeter=spval
 
   allocate(this%RSOxidSoilAutor(NumMicrobAutrophCmplx));this%RSOxidSoilAutor=spval
   allocate(this%RSOxidBandAutor(NumMicrobAutrophCmplx));this%RSOxidBandAutor=spval
@@ -536,12 +536,12 @@ type, public :: Cumlate_Flux_Diag_type
   this%RN2OReduxHeter                   = 0._r8
   this%RNOxReduxRespDenitLim            = 0._r8
   this%RMaintDmndHeter                  = 0._r8
-  this%RNH4TransfSoilHeter              = 0._r8
-  this%RNO3TransfSoilHeter              = 0._r8
-  this%RH2PO4TransfSoilHeter            = 0._r8
-  this%RNH4TransfBandHeter              = 0._r8
-  this%RNO3TransfBandHeter              = 0._r8
-  this%RH2PO4TransfBandHeter            = 0._r8
+  this%RNH4imobilSoilHeter              = 0._r8
+  this%RNO3imobilSoilHeter              = 0._r8
+  this%RH2PO4imobilSoilHeter            = 0._r8
+  this%RNH4imobilBandHeter              = 0._r8
+  this%RNO3imobilBandHeter              = 0._r8
+  this%RH2PO4imobilBandHeter            = 0._r8
   this%RkillLitfalOMHeter               = 0._r8
   this%RkillLitrfal2HumOMHeter          = 0._r8
   this%RkillLitrfal2ResduOMHeter        = 0._r8
@@ -559,9 +559,9 @@ type, public :: Cumlate_Flux_Diag_type
   this%RMaintDefcitRecycOMHeter = 0._r8
   this%RMetabDOCUptkHeter      = 0._r8
   this%RMetabAcetUptkHeter     = 0._r8
-  this%RNH4TransfLitrHeter      = 0._r8
-  this%RNO3TransfLitrHeter      = 0._r8
-  this%RH2PO4TransfLitrHeter    = 0._r8
+  this%RNH4imobilLitrHeter      = 0._r8
+  this%RNO3imobilLitrHeter      = 0._r8
+  this%RH2PO4imobilLitrHeter    = 0._r8
   this%AttenfNH4Heter           = 0._r8
   this%AttenfNO3Heter           = 0._r8
   this%AttenfH2PO4Heter         = 0._r8
@@ -575,9 +575,9 @@ type, public :: Cumlate_Flux_Diag_type
   this%RSOxidSoilAutor          = 0._r8
   this%RSOxidBandAutor          = 0._r8
   this%XferBiomeHeterK          = 0._r8
-  this%RH1PO4TransfSoilHeter    = 0._r8
-  this%RH1PO4TransfBandHeter    = 0._r8
-  this%RH1PO4TransfLitrHeter    = 0._r8
+  this%RH1PO4imobilSoilHeter    = 0._r8
+  this%RH1PO4imobilBandHeter    = 0._r8
+  this%RH1PO4imobilLitrHeter    = 0._r8
 
   this%RO2UptkAutor                     = 0._r8
   this%Resp4NFixAutor                   = 0._r8
@@ -647,12 +647,12 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RN2OReduxHeter)
   call destroy(this%RNOxReduxRespDenitLim)
   call destroy(this%RMaintDmndHeter)
-  call destroy(this%RNH4TransfSoilHeter)
-  call destroy(this%RNO3TransfSoilHeter)
-  call destroy(this%RH2PO4TransfSoilHeter)
-  call destroy(this%RNH4TransfBandHeter)
-  call destroy(this%RNO3TransfBandHeter)
-  call destroy(this%RH2PO4TransfBandHeter)
+  call destroy(this%RNH4imobilSoilHeter)
+  call destroy(this%RNO3imobilSoilHeter)
+  call destroy(this%RH2PO4imobilSoilHeter)
+  call destroy(this%RNH4imobilBandHeter)
+  call destroy(this%RNO3imobilBandHeter)
+  call destroy(this%RH2PO4imobilBandHeter)
   call destroy(this%RkillLitfalOMHeter)
   call destroy(this%RkillLitrfal2HumOMHeter)
   call destroy(this%RkillLitrfal2ResduOMHeter)
@@ -669,9 +669,9 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RMaintDefcitRecycOMHeter)
   call destroy(this%RMetabDOCUptkHeter)
   call destroy(this%RMetabAcetUptkHeter)
-  call destroy(this%RNH4TransfLitrHeter)
-  call destroy(this%RNO3TransfLitrHeter)
-  call destroy(this%RH2PO4TransfLitrHeter)
+  call destroy(this%RNH4imobilLitrHeter)
+  call destroy(this%RNO3imobilLitrHeter)
+  call destroy(this%RH2PO4imobilLitrHeter)
   call destroy(this%AttenfNH4Heter)
   call destroy(this%AttenfNO3Heter)
   call destroy(this%AttenfH2PO4Heter)
@@ -685,9 +685,9 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RSOxidSoilAutor)
   call destroy(this%RSOxidBandAutor)
   call destroy(this%XferBiomeHeterK)
-  call destroy(this%RH1PO4TransfSoilHeter)
-  call destroy(this%RH1PO4TransfBandHeter)
-  call destroy(this%RH1PO4TransfLitrHeter)
+  call destroy(this%RH1PO4imobilSoilHeter)
+  call destroy(this%RH1PO4imobilBandHeter)
+  call destroy(this%RH1PO4imobilLitrHeter)
   call destroy(this%RO2UptkHeterG)
   call destroy(this%RO2UptkAutor)
   call destroy(this%Resp4NFixAutor)

@@ -5,6 +5,7 @@ module PlantAPI
   use EcoSiMParDataMod, only: micpar, pltpar
   use SoilPhysDataType, only: SurfAlbedo_col
   use MiniMathMod,      only: AZMAX1
+  use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
   use SnowDataType
@@ -142,7 +143,7 @@ implicit none
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
     RootCO2Emis2Root_vr(L,NY,NX)                  = plt_bgcr%RootCO2Emis2Root_vr(L)
     RUptkRootO2_vr(L,NY,NX)                       = plt_bgcr%RUptkRootO2_vr(L)
-    RootO2_Xink_vr(L,NY,NX)                       = plt_bgcr%RootO2_Xink_vr(L)
+    RootO2_TotSink_vr(L,NY,NX)                       = plt_bgcr%RootO2_TotSink_vr(L)
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L)
 
     DO  K=1,jcplx
@@ -467,9 +468,6 @@ implicit none
 
     DO  L=NUI_col(NY,NX),NK_col(NY,NX)
 
-      trcs_solml_vr(ids_beg:ids_end,L,NY,NX)=plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)         
-      trcg_gasml_vr(idg_beg:idg_NH3,L,NY,NX)=plt_soilchem%trcg_gasml_vr(idg_beg:idg_NH3,L) 
-
       DO K=1,jcplx      
         DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
       ENDDO
@@ -640,7 +638,7 @@ implicit none
     RootCO2Autor_col(NY,NX)   = RootCO2Autor_col(NY,NX)+RootCO2Autor_vr(L,NY,NX)
     RootCO2Ar2Root_col(NY,NX) = RootCO2Ar2Root_col(NY,NX)+ RootCO2Ar2Root_vr(L,NY,NX)
     RootCO2Ar2Soil_col(NY,NX) = RootCO2Ar2Soil_col(NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)
-    RootO2_Xink_col(NY,NX)    = RootO2_Xink_col(NY,NX) + RootO2_Xink_vr(L,NY,NX)
+    RootO2_TotSink_col(NY,NX)    = RootO2_TotSink_col(NY,NX) + RootO2_TotSink_vr(L,NY,NX)
   ENDDO    
   end subroutine PlantAPIRecv
 
@@ -655,7 +653,7 @@ implicit none
   use EcoSIMConfig, only : jsken=>jskenc,jcplx => jcplxc
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  integer :: K,L,M,N,NB,NZ,NR,I1,NE
+  integer :: K,L,M,N,NB,NZ,NR,I1,NE,ids
 
   plt_site%DazCurrYear=DazCurrYear
   I1=I+1;if(I1>DazCurrYear)I1=1  
@@ -736,7 +734,9 @@ implicit none
     plt_soilchem%trcg_gascl_vr(idg_beg:idg_NH3,L)         = trcg_gascl_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_soilchem%CSoilOrgM_vr(ielmc,L)                    = CSoilOrgM_vr(ielmc,L,NY,NX)
     plt_site%FracSoiAsMicP_vr(L)                          = FracSoiAsMicP_vr(L,NY,NX)
-    plt_soilchem%trcs_solml_vr(ids_beg:ids_end,L)         = trcs_solml_vr(ids_beg:ids_end,L,NY,NX)
+    DO ids=ids_beg,ids_end
+      plt_soilchem%trcs_solml_vr(ids,L)         =AZMAX1(trcs_solml_vr(ids,L,NY,NX)-trcs_solml_drib_vr(ids,L,NY,NX))
+    ENDDO
     plt_soilchem%GasSolbility_vr(idg_beg:idg_NH3,L)       = GasSolbility_vr(idg_beg:idg_NH3,L,NY,NX)
 !    plt_soilchem%trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L) = trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)
     plt_ew%ElvAdjstedSoilH2OPSIMPa_vr(L)                  = ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX)
@@ -990,7 +990,7 @@ implicit none
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_bgcr%RootCO2Emis2Root_vr(L)                  = RootCO2Emis2Root_vr(L,NY,NX)
     plt_bgcr%RUptkRootO2_vr(L)                       = RUptkRootO2_vr(L,NY,NX)
-    plt_bgcr%RootO2_Xink_vr(L)                       = RootO2_Xink_vr(L,NY,NX)
+    plt_bgcr%RootO2_TotSink_vr(L)                       = RootO2_TotSink_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO

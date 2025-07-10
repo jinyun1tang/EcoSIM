@@ -264,6 +264,7 @@ implicit none
   else
     micfor%ElmAllocmatMicrblitr2POM =ElmAllocmatMicrblitr2POM_vr(1:2,L,NY,NX)
   endif
+
   micstt%CNH4B                 = trc_solcl_vr(ids_NH4B,L,NY,NX)
   micstt%CNH4S                 = trc_solcl_vr(ids_NH4,L,NY,NX)
   micstt%CH2P4                 = trc_solcl_vr(ids_H2PO4,L,NY,NX)
@@ -290,26 +291,26 @@ implicit none
   micfor%VLsoiAirP                  = VLsoiAirP_vr(L,NY,NX)
   micstt%EPOC                       = EPOC_vr(L,NY,NX)
   micstt%EHUM                       = EHUM_vr(L,NY,NX)
-  micstt%ZNH4B             = AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX))
-  micstt%ZNH4S             = AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX))
-  micstt%ZNO3B             = AZMAX1(trcs_solml_vr(ids_NO3B,L,NY,NX))
-  micstt%ZNO3S             = AZMAX1(trcs_solml_vr(ids_NO3,L,NY,NX))
-  micstt%H1POB             = AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX))
-  micstt%H1PO4             = AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX))
-  micstt%ZNO2B             = AZMAX1(trcs_solml_vr(ids_NO2B,L,NY,NX))
-  micstt%ZNO2S             = AZMAX1(trcs_solml_vr(ids_NO2,L,NY,NX))
-  micstt%H2POB             = AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX))
-  micstt%H2PO4             = AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX))
-  micstt%Z2OS              = AZMAX1(trcs_solml_vr(idg_N2O,L,NY,NX))  
-  micstt%CH4S              = AZMAX1(trcs_solml_vr(idg_CH4,L,NY,NX))  
-  micstt%OXYS              = AZMAX1(trcs_solml_vr(idg_O2,L,NY,NX))  
-  micstt%H2GS              = AZMAX1(trcs_solml_vr(idg_H2,L,NY,NX))
-  micstt%CCO2S             = AZMAX1(trc_solcl_vr(idg_CO2,L,NY,NX))
-  micstt%CNO2S             = AZMAX1(trc_solcl_vr(ids_NO2,L,NY,NX))
-  micstt%CNO2B             = AZMAX1(trc_solcl_vr(ids_NO2B,L,NY,NX))
-  micstt%CZ2OS             = AZMAX1(trc_solcl_vr(idg_N2O,L,NY,NX))
-  micstt%COXYS             = AZMAX1(trc_solcl_vr(idg_O2,L,NY,NX))
-  micstt%COXYG             = AZMAX1(trcg_gascl_vr(idg_O2,L,NY,NX))
+  micstt%ZNH4B             = AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)-trcs_solml_drib_vr(ids_NH4B,L,NY,NX))
+  micstt%ZNH4S             = AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)-trcs_solml_drib_vr(ids_NH4,L,NY,NX))
+  micstt%ZNO3B             = AZMAX1(trcs_solml_vr(ids_NO3B,L,NY,NX)-trcs_solml_drib_vr(ids_NO3B,L,NY,NX))
+  micstt%ZNO3S             = AZMAX1(trcs_solml_vr(ids_NO3,L,NY,NX)-trcs_solml_drib_vr(ids_NO3,L,NY,NX))
+  micstt%H1POB             = AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)-trcs_solml_drib_vr(ids_H1PO4B,L,NY,NX))
+  micstt%H1PO4             = AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)-trcs_solml_drib_vr(ids_H1PO4,L,NY,NX))
+  micstt%ZNO2B             = AZMAX1(trcs_solml_vr(ids_NO2B,L,NY,NX)-trcs_solml_drib_vr(ids_NO2B,L,NY,NX))
+  micstt%ZNO2S             = AZMAX1(trcs_solml_vr(ids_NO2,L,NY,NX)-trcs_solml_drib_vr(ids_NO2,L,NY,NX))
+  micstt%H2POB             = AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)-trcs_solml_drib_vr(ids_H2PO4B,L,NY,NX))
+  micstt%H2PO4             = AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)-trcs_solml_drib_vr(ids_H2PO4,L,NY,NX))
+  micstt%Z2OS              = AZMAX1(trcs_solml_vr(idg_N2O,L,NY,NX)-trcs_solml_drib_vr(idg_N2O,L,NY,NX))  
+  micstt%CH4S              = AZMAX1(trcs_solml_vr(idg_CH4,L,NY,NX)-trcs_solml_drib_vr(idg_CH4,L,NY,NX))  
+  micstt%OXYS              = AZMAX1(trcs_solml_vr(idg_O2,L,NY,NX)-trcs_solml_drib_vr(idg_O2,L,NY,NX))    
+  micstt%H2GS              = AZMAX1(trcs_solml_vr(idg_H2,L,NY,NX)-trcs_solml_drib_vr(idg_H2,L,NY,NX))  
+  micstt%CCO2S             = AZMAX1(trc_solcl_vr(idg_CO2,L,NY,NX))  
+  micstt%CNO2S             = AZMAX1(trc_solcl_vr(ids_NO2,L,NY,NX))  
+  micstt%CNO2B             = AZMAX1(trc_solcl_vr(ids_NO2B,L,NY,NX))  
+  micstt%CZ2OS             = AZMAX1(trc_solcl_vr(idg_N2O,L,NY,NX))  
+  micstt%COXYS             = AZMAX1(trc_solcl_vr(idg_O2,L,NY,NX))  
+  micstt%COXYG             = AZMAX1(trcg_gascl_vr(idg_O2,L,NY,NX))  
   micstt%CZ2GS             = AZMAX1(trc_solcl_vr(idg_N2,L,NY,NX))
   micstt%CH2GS             = AZMAX1(trc_solcl_vr(idg_H2,L,NY,NX))
   micstt%CCH4G             = AZMAX1(trcg_gascl_vr(idg_CH4,L,NY,NX))
@@ -423,16 +424,16 @@ implicit none
     trcs_RMicbUptake_vr(idg_Ar,L,NY,NX)  = 0._r8
   endif  
 
-  RNut_MicbRelease_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbTransfSoil
-  RNut_MicbRelease_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbTransfSoil
-  RNut_MicbRelease_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbTransfSoil
-  RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)  = micflx%RH2PO4MicbTransfSoil
-  RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)  = micflx%RH1PO4MicbTransfSoil
-  RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)   = micflx%RNH4MicbTransfBand
-  RNut_MicbRelease_vr(ids_NO3B,L,NY,NX)   = micflx%RNO3MicbTransfBand
-  RNut_MicbRelease_vr(ids_NO2B,L,NY,NX)   = micflx%RNO2MicbTransfBand
-  RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbTransfBand
-  RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbTransfBand
+  RNut_MicbRelease_vr(ids_NH4,L,NY,NX)    = micflx%RNH4MicbReliz2Soil
+  RNut_MicbRelease_vr(ids_NO3,L,NY,NX)    = micflx%RNO3MicbReliz2Soil
+  RNut_MicbRelease_vr(ids_NO2,L,NY,NX)    = micflx%RNO2MicbReliz2Soil
+  RNut_MicbRelease_vr(ids_H2PO4,L,NY,NX)  = micflx%RH2PO4MicbReliz2Soil
+  RNut_MicbRelease_vr(ids_H1PO4,L,NY,NX)  = micflx%RH1PO4MicbReliz2Soil
+  RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)   = micflx%RNH4MicbReliz2Band
+  RNut_MicbRelease_vr(ids_NO3B,L,NY,NX)   = micflx%RNO3MicbReliz2Band
+  RNut_MicbRelease_vr(ids_NO2B,L,NY,NX)   = micflx%RNO2MicbReliz2Band
+  RNut_MicbRelease_vr(ids_H2PO4B,L,NY,NX) = micflx%RH2PO4MicbReliz2Band
+  RNut_MicbRelease_vr(ids_H1PO4B,L,NY,NX) = micflx%RH1PO4MicbReliz2Band
   
   TempSensDecomp_vr(L,NY,NX)            = nmicdiag%TSensGrowth
   MoistSensDecomp_vr(L,NY,NX)           = AZMAX1(nmicdiag%WatStressMicb)

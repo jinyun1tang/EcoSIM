@@ -172,7 +172,7 @@ module ExtractsMod
     RootNutUptake_pvr         => plt_rbgc%RootNutUptake_pvr          ,& !input  :root uptake of Nutrient band, [g d-2 h-1]
     RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr        ,& !input  :root O2 demand from respiration, [g d-2 h-1]
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr             ,& !input  :aqueous O2 flux from roots to root water, [g d-2 h-1]
-    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr            ,& !input  :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_pvr           => plt_bgcr%RootO2_TotSink_pvr            ,& !input  :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr         ,& !input  :aqueous CO2 flux from roots to soil water, [g d-2 h-1]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                 ,& !input  :canopy temperature, [K]
     TKS_vr                    => plt_ew%TKS_vr                       ,& !input  :mean annual soil temperature, [K]
@@ -188,7 +188,7 @@ module ExtractsMod
     REcoO2DmndResp_vr         => plt_bgcr%REcoO2DmndResp_vr          ,& !inoput :total root + microbial O2 uptake, [g d-2 h-1]
     RUptkRootO2_vr            => plt_bgcr%RUptkRootO2_vr             ,& !inoput :total root internal O2 flux, [g d-2 h-1]
     RootCO2Emis2Root_vr       => plt_bgcr%RootCO2Emis2Root_vr        ,& !inoput :total root CO2 flux, [gC d-2 h-1]
-    RootO2_Xink_vr            => plt_bgcr%RootO2_Xink_vr             ,& !inoput :all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_vr            => plt_bgcr%RootO2_TotSink_vr             ,& !inoput :all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr        ,& !inoput :total root heat uptake, [MJ d-2]
     TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr      ,& !inoput :total root water uptake, [m3 d-2]
     tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr      ,& !inoput :total root element exchange, [g d-2 h-1]
@@ -231,7 +231,7 @@ module ExtractsMod
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
-      RootO2_Xink_vr(L)      = RootO2_Xink_vr(L) + RootO2_Xink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
+      RootO2_TotSink_vr(L)      = RootO2_TotSink_vr(L) + RootO2_TotSink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
       RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
       RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 

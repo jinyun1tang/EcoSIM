@@ -355,7 +355,7 @@ module SoluteMod
 !     REcoReleaz_NH4BX,REcoReleaz_NH3BX=NH4,NH3 input from uptake, mineraln, dissoln in band
 !     TRootNH4Uptake_pft,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
 !     TUPNHB,TUPN3B=soil-root exchange of NH4,NH3 in band from uptake.f
-!     RNH4MicbTransfSoil_vr,RNH4MicbTransfBand_vr=net change in NH4 in band,non-band from nitro.f
+!     RNH4MicbReliz2Soil_vr,RNH4MicbReliz2Band_vr=net change in NH4 in band,non-band from nitro.f
 !     NH4_1p_aque_mole_conc,NH3_aque_mole_conc,NH4_1p_band_mole_conc,NH3_aqu_band_mole_conc=total NH4,NH3 concentration in non-band,band
 !     XNH4_mole_conc,XNH4_band_mole_conc=adsorbed NH4 concentration in non-band,band
 !
@@ -397,7 +397,7 @@ module SoluteMod
 !     VLWatMicPPO,VLWatMicPPB=water volume in H2PO4 non-band,band
 !     REcoReleaz_H1PO4X,REcoReleaz_H2PO4X=HPO4,H2PO4 inputs from mineraln, uptake in non-band
 !     REcoReleaz_H1PO4BX,REcoReleaz_H2PO4BX=HPO4,H2PO4 inputs from mineraln, uptake in band
-!     RH1PO4MicbTransfSoil_vr,RH1PO4MicbTransfBand_vr=net change in HPO4 in band,non-band from nitro.f
+!     RH1PO4MicbReliz2Soil_vr,RH1PO4MicbReliz2Band_vr=net change in HPO4 in band,non-band from nitro.f
 !     TRootHPO4Uptake_pft,TRootH2PO4Uptake_pft=soil-root exch of HPO4,H2PO4 in non-band from uptake.f
 !     TUPH1B,TUPH2B=soil-root exch of HPO4,H2PO4 in band from uptake.f
 !     H1PO4_2e_aque_mole_conc,H2PO4_1e_aque_mole_conc=HPO4,H2PO4 concentrations in non-band
@@ -1037,7 +1037,7 @@ module SoluteMod
 !
 !     VLWatMicPNH=water volume
 !     REcoReleaz_NH4X,REcoReleaz_NH3X=NH4,NH3 input from uptake, mineraln, dissoln
-!     RNH4MicbTransfSoil_vr=net change in NH4 from nitro.f
+!     RNH4MicbReliz2Soil_vr=net change in NH4 from nitro.f
 !     NH4_1p_aque_mole_conc,NH3_aque_mole_conc=total NH4,NH3 concentration
 !     XNH4_mole_conc=adsorbed NH4 concentration
 !
@@ -1057,7 +1057,7 @@ module SoluteMod
 !
 !     VLWatMicPMP=water volume
 !     REcoReleaz_H1PO4X,REcoReleaz_H2PO4X=HPO4,H2PO4 inputs from mineraln, uptake
-!     RH1PO4MicbTransfSoil_vr=net change in HPO4 from nitro.f
+!     RH1PO4MicbReliz2Soil_vr=net change in HPO4 from nitro.f
 !     H1PO4_2e_aque_mole_conc,H2PO4_1e_aque_mole_conc=HPO4,H2PO4 concentrations
 !
       VLWatMicPMP             = patomw*VLWatMicPM_vr(NPH,0,NY,NX)

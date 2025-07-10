@@ -86,7 +86,7 @@ implicit none
   real(r8) :: SoilLayBotEdgeOld_vr(JZ)     !edge location before mass update
   integer  :: IFLGL(0:JZ,6)                !flag for soil thickness change by different processes
   real(r8) :: DDLYRX(3)
-  integer :: NN,K,M,N,NR,NZ,L
+  integer :: NN,K,M,N,NR,NZ,L,idg
   integer :: L0,L1,NUX,ICHKL,NGL
   real(r8) :: FX,FY
   real(r8) :: FBO
@@ -100,7 +100,13 @@ implicit none
   !     SOIL SUBSIDENCE
   !
   call PrintInfo('beg '//subname)
-
+!  if(I==167 .and. J==16)then
+!    write(193,*)'upggas',trcg_gasml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)
+!    write(193,*)'upgmic',trcs_solml_vr(idg_O2,0:NL_col(NY,NX),NY,NX)
+!    write(193,*)'upgmac',trcs_soHml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)  
+!    idg=idg_O2
+!    write(194,*)'afgmas',sum(trcg_gasml_vr(idg,1:NL_col(NY,NX),NY,NX))+sum(trcs_solml_vr(idg,0:NL_col(NY,NX),NY,NX))+sum(trcs_soHml_vr(idg,1:NL_col(NY,NX),NY,NX))        
+!  endif
   IF(.not. erosion_model)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
 

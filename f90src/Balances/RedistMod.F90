@@ -169,6 +169,17 @@ module RedistMod
   integer  :: L,idg,ids
 
   call PrintInfo('beg '//subname)
+  DO idg=idg_beg,idg_NH3
+    SurfGasEmiss_all_flx_col(idg,NY,NX)=  SurfGasEmiss_flx_col(idg,NY,NX) 
+  enddo
+
+!  if(I==167 .and. J==16)then
+!    write(193,*)'afggas',trcg_gasml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)
+!    write(193,*)'afgmic',trcs_solml_vr(idg_O2,0:NL_col(NY,NX),NY,NX)
+!    write(193,*)'afgmac',trcs_soHml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)  
+!    idg=idg_O2
+!    write(194,*)'afgmas',sum(trcg_gasml_vr(idg,1:NL_col(NY,NX),NY,NX))+sum(trcs_solml_vr(idg,0:NL_col(NY,NX),NY,NX))+sum(trcs_soHml_vr(idg,1:NL_col(NY,NX),NY,NX))    
+!  endif
 
   IF(NU_col(NY,NX).GT.NUI_col(NY,NX))THEN  
     DO L=NUI_col(NY,NX),NU_col(NY,NX)-1
@@ -179,8 +190,8 @@ module RedistMod
       cycle
       
       DO idg=idg_beg,idg_NH3
-        TRootGasLossDisturb_col(idg,NY,NX) = TRootGasLossDisturb_col(idg,NY,NX)-trcg_root_vr(idg,L,NY,NX)
-        SurfGasEmiss_flx_col(idg,NY,NX)    = SurfGasEmiss_flx_col(idg,NY,NX)-trcg_gasml_vr(idg,L,NY,NX)&
+        TRootGasLossDisturb_col(idg,NY,NX)  = TRootGasLossDisturb_col(idg,NY,NX)-trcg_root_vr(idg,L,NY,NX)
+        SurfGasEmiss_all_flx_col(idg,NY,NX) = SurfGasEmiss_all_flx_col(idg,NY,NX)-trcg_gasml_vr(idg,L,NY,NX)&
           -trcs_solml_vr(idg,L,NY,NX)- trcs_soHml_vr(idg,L,NY,NX)
         trcg_root_vr(idg,L,NY,NX)  = 0._r8
         trcg_gasml_vr(idg,L,NY,NX) = 0._r8
@@ -189,7 +200,7 @@ module RedistMod
       ENDDO
 
       idg=idg_NH3
-      SurfGasEmiss_flx_col(idg,NY,NX)=SurfGasEmiss_flx_col(idg,NY,NX) &
+      SurfGasEmiss_all_flx_col(idg,NY,NX)=SurfGasEmiss_all_flx_col(idg,NY,NX) &
         - trcs_solml_vr(idg_NH3B,L,NY,NX) - trcs_soHml_vr(idg_NH3B,L,NY,NX)        
       trcs_solml_vr(idg_NH3B,L,NY,NX) =0._r8
       trcs_soHml_vr(idg_NH3B,L,NY,NX) =0._r8       
@@ -197,10 +208,10 @@ module RedistMod
   ENDIF
 
   DO idg=idg_beg,idg_NH3
-    SurfGasEmiss_flx_col(idg,NY,NX) = SurfGasEmiss_flx_col(idg,NY,NX)     &
+    SurfGasEmiss_all_flx_col(idg,NY,NX) = SurfGasEmiss_all_flx_col(idg,NY,NX)     &
       + TRootGasLossDisturb_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)
 
-    SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmiss_flx_col(idg,NY,NX)
+    SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmiss_all_flx_col(idg,NY,NX)
   ENDDO
 
   Eco_NetRad_col(NY,NX)        = Eco_NetRad_col(NY,NX)+HeatByRad2Surf_col(NY,NX)
@@ -210,11 +221,11 @@ module RedistMod
 
   Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
-  Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_flx_col(idg_CO2,NY,NX)
-  ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_flx_col(idg_CO2,NY,NX)
+  Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
+  ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   Eco_NPP_CumYr_col(NY,NX)         = Eco_GPP_CumYr_col(NY,NX)+Eco_AutoR_CumYr_col(NY,NX)
   Eco_NBP_CumYr_col(NY,NX)         = Eco_NBP_CumYr_col(NY,NX)+Eco_NEE_col(NY,NX) &
-    +SurfGasEmiss_flx_col(idg_CH4,NY,NX) +Txchem_CO2_col(NY,NX) &
+    +SurfGasEmiss_all_flx_col(idg_CH4,NY,NX) +Txchem_CO2_col(NY,NX) &
     -HydroSufDOCFlx_col(NY,NX)-HydroSufDICFlx_col(NY,NX) &
     -HydroSubsDOCFlx_col(NY,NX)-HydroSubsDICFlx_col(NY,NX)
 
@@ -223,11 +234,11 @@ module RedistMod
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
   
   !NOTE: O2 is different, as O2 consumption is supported partially by uptake from soil 
-  RGasNetProd_col(idg_O2,NY,NX)  = RGasNetProd_col(idg_O2,NY,NX)-RootO2_Xink_col(NY,NX)
+  RGasNetProd_col(idg_O2,NY,NX)  = RGasNetProd_col(idg_O2,NY,NX)-RootO2_TotSink_col(NY,NX)
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)+RootCO2Ar2Root_col(NY,NX)
 
   DO idg=idg_beg,idg_NH3  
-    Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmiss_flx_col(idg,NY,NX) &
+    Gas_Prod_TP_cumRes_col(idg,NY,NX) = Gas_Prod_TP_cumRes_col(idg,NY,NX)+SurfGasEmiss_all_flx_col(idg,NY,NX) &
       +RGasNetProd_col(idg,NY,NX)
   ENDDO  
 

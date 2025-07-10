@@ -157,7 +157,10 @@ module InitNoSaltTransportMod
         Gas_Snowloss_flx_col(idg,NY,NX)                        = 0._r8
         transp_diff_slow_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
       ENDDO
-
+      RBGCSinkGasMM_vr(:,:,NY,NX)=0._r8
+      RBGCSrceGasMM_vr(:,:,NY,NX)=0._r8
+      RBGCSrcSoluteM_vr(:,:,NY,NX)=0._r8
+      RBGCSinkSoluteM_vr(:,:,NY,NX)=0._r8
       DO  K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_Flo2LitrM(idom,K,NY,NX)    = 0._r8
@@ -211,7 +214,7 @@ module InitNoSaltTransportMod
 
       DO ids=ids_nut_beg,ids_nuts_end    
         if(RNut_MicbRelease_vr(ids,0,NY,NX)>0._r8)then
-          RBGCSrcSoluteM_vr(ids,0,NY,NX)   = -RNut_MicbRelease_vr(ids,0,NY,NX)*dts_HeatWatTP
+          RBGCSrcSoluteM_vr(ids,0,NY,NX)   = RNut_MicbRelease_vr(ids,0,NY,NX)*dts_HeatWatTP
         else
           RBGCSinkSoluteM_vr(ids,0,NY,NX)   = -RNut_MicbRelease_vr(ids,0,NY,NX)*dts_HeatWatTP
         endif

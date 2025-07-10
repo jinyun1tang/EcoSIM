@@ -123,8 +123,6 @@ module EcoSIMDesctruct
 
   call DestructEcoSimSum
 
-  if(plant_model)call ncd_pio_closefile(pft_nfid)
- 
   call DestructBalanceCheckData
 
   call destructSoilWarming()

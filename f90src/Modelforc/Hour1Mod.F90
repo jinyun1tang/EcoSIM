@@ -9,10 +9,11 @@ module Hour1Mod
   use EcoSIMConfig     , only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig     , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
   use EcoSIMConfig     , only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
-  use EcoSiMParDataMod,  only : micpar, pltpar
-  use SoilBGCNLayMod,    only : sumORGMLayL
-  use PlantMgmtDataType, only : NP_col
-  use BalancesMod,       only : SummarizeTracerMass,BegCheckBalances
+  use EcoSiMParDataMod,  only: micpar, pltpar
+  use SoilBGCNLayMod,    only: sumORGMLayL
+  use PlantMgmtDataType, only: NP_col
+  use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
+  use NumericalAuxMod
   use DebugToolMod
   use ATSUtilsMod
   use TracerPropMod
@@ -1118,7 +1119,7 @@ module Hour1Mod
   IF(VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
 ! exclude NH3B,
     DO idg=idg_beg,idg_NH3
-      trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
+      trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)-trcs_solml_drib_vr(idg,0,NY,NX))/VLWatMicP_vr(0,NY,NX)
     ENDDO
   ELSE
     trc_solcl_vr(idg_beg:idg_NH3,0,NY,NX)=0._r8
@@ -1211,26 +1212,25 @@ module Hour1Mod
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
       IF(trcs_VLN_vr(ids_NH4,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NH4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)))
-        trc_solcl_vr(idg_NH3,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3,L,NY,NX)))
+        trc_solcl_vr(ids_NH4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)-trcs_solml_drib_vr(ids_NH4,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX))
+        trc_solcl_vr(idg_NH3,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3,L,NY,NX)-trcs_solml_drib_vr(idg_NH3,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NH4,L,NY,NX)=0._r8
         trc_solcl_vr(idg_NH3,L,NY,NX)=0._r8
       ENDIF
       IF(trcs_VLN_vr(ids_NO3,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NO3,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)))
-        trc_solcl_vr(ids_NO2,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2,L,NY,NX)))
+        trc_solcl_vr(ids_NO3,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3,L,NY,NX)-trcs_solml_drib_vr(ids_NO3,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX))
+        trc_solcl_vr(ids_NO2,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2,L,NY,NX)-trcs_solml_drib_vr(ids_NO2,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NO3,L,NY,NX)=0._r8
         trc_solcl_vr(ids_NO2,L,NY,NX)=0._r8
       ENDIF
 
       IF(trcs_VLN_vr(ids_H1PO4,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_H1PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)))
-        trc_solcl_vr(ids_H2PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4,L,NY,NX)))
+        trc_solcl_vr(ids_H1PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)-trcs_solml_drib_vr(ids_H1PO4,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX))
+        trc_solcl_vr(ids_H2PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)-trcs_solml_drib_vr(ids_H2PO4,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4,L,NY,NX))
 
         CPO4S_vr(L,NY,NX)=trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4,L,NY,NX)
-
         if(salt_model)then
           CPO4S_vr(L,NY,NX)=CPO4S_vr(L,NY,NX)+(trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,L,NY,NX) &
             +trcSalt_solml_vr(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml_vr(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_CaPO4,L,NY,NX) &
@@ -1251,23 +1251,23 @@ module Hour1Mod
 !     VLNHB,VLNOB,VLPOB=fraction of soil volume in NH4,NO3,PO4 band
 !
       IF(trcs_VLN_vr(ids_NH4B,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NH4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)))
-        trc_solcl_vr(idg_NH3B,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3B,L,NY,NX)))
+        trc_solcl_vr(ids_NH4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)-trcs_solml_drib_vr(ids_NH4B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX))
+        trc_solcl_vr(idg_NH3B,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3B,L,NY,NX)-trcs_solml_drib_vr(idg_NH3B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3B,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NH4B,L,NY,NX)=0._r8
         trc_solcl_vr(idg_NH3B,L,NY,NX)=0._r8
       ENDIF
 
       IF(trcs_VLN_vr(ids_NO3B,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NO3B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)))
-        trc_solcl_vr(ids_NO2B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2B,L,NY,NX)))
+        trc_solcl_vr(ids_NO3B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3B,L,NY,NX)-trcs_solml_drib_vr(ids_NO3B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX))
+        trc_solcl_vr(ids_NO2B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2B,L,NY,NX)-trcs_solml_drib_vr(ids_NO2B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2B,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NO3B,L,NY,NX)=0._r8
         trc_solcl_vr(ids_NO2B,L,NY,NX)=0._r8
       ENDIF
       IF(trcs_VLN_vr(ids_H1PO4B,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)))
-        trc_solcl_vr(ids_H2PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4B,L,NY,NX)))
+        trc_solcl_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)-trcs_solml_drib_vr(ids_H1PO4B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX))
+        trc_solcl_vr(ids_H2PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)-trcs_solml_drib_vr(ids_H2PO4B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4B,L,NY,NX))
 
         CPO4B_vr(L,NY,NX)=trcs_solml_vr(ids_H1PO4B,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX)
         if(salt_model)then
@@ -1540,7 +1540,7 @@ module Hour1Mod
 !     C*=litter solute concentrations
 !
       DO NTN=ids_nut_beg,ids_nuts_end
-        trc_solcl_vr(NTN,0,NY,NX)=AZMAX1(trcs_solml_vr(NTN,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
+        trc_solcl_vr(NTN,0,NY,NX)=AZMAX1(trcs_solml_vr(NTN,0,NY,NX)-trcs_solml_drib_vr(ntn,0,NY,NX))/VLWatMicP_vr(0,NY,NX)
       ENDDO
 
     ELSE
@@ -1606,7 +1606,7 @@ module Hour1Mod
 
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idg=idg_beg,idg_NH3
-        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)/VLWatMicP_vr(L,NY,NX))
+        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)-trcs_solml_drib_vr(idg,L,NY,NX))/VLWatMicP_vr(L,NY,NX)
       ENDDO
     ELSE
       trc_solcl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
@@ -1635,17 +1635,17 @@ module Hour1Mod
   RootN2Fix_col(NY,NX)        = 0._r8
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
-  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)=0._r8
-  trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
-  trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8  
-  RootO2_Xink_col(NY,NX)                          = 0._r8
+  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)          = 0._r8
+  trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX)  = 0._r8
+  trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8
+  RootO2_TotSink_col(NY,NX)                          = 0._r8
   DO L=NUI_col(NY,NX),NLI_col(NY,NX)
     RootN2Fix_vr(L,NY,NX)                         = 0._r8
     FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
     RootCO2Emis2Root_vr(L,NY,NX)                  = 0._r8
     RUptkRootO2_vr(L,NY,NX)                       = 0._r8
-    RootO2_Xink_vr(L,NY,NX)                       = 0._r8
+    RootO2_TotSink_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 
     trcn_RProdChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
