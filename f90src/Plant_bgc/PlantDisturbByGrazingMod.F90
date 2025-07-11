@@ -4,7 +4,7 @@ module PlantDisturbByGrazingMod
   use ElmIDMod
   use EcosimConst
   use PlantAPIData
-  use GrosubPars
+  use PlantBGCPars
 implicit none
   private
   save

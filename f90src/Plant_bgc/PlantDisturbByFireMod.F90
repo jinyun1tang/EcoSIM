@@ -2,7 +2,7 @@ module PlantDisturbByFireMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ElmIDMod
   use PlantAPIData
-  use GrosubPars
+  use PlantBGCPars
   use EcoSimConst
   use PlantMathFuncMod
   implicit none

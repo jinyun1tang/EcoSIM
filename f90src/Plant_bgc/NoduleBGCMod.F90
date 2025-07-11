@@ -5,7 +5,7 @@ module NoduleBGCMod
   use EcosimConst
   use PlantAPIData
   use PlantMathFuncMod
-  use GrosubPars
+  use PlantBGCPars
   implicit none
   private
   character(len=*),private, parameter :: mod_filename = &

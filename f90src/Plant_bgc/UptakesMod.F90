@@ -5,7 +5,7 @@ module UptakesMod
   use EcoSIMCtrlMod , only : etimer, lverb,ldo_sp_mode  
   use UnitMod       , only : units  
   use PlantBalMod   , only : SumPlantRootGas
-  use GrosubPars
+  use PlantBGCPars
   use minimathmod
   use DebugToolMod
   use EcosimConst
@@ -300,7 +300,9 @@ module UptakesMod
       WatAvail4Uptake_vr(L) = VLWatMicPM_vr(NPH,L)
       AirMicPore4Fill_vr(L) = 0.0_r8
     ENDIF
+  ENDDO D9000
 
+  DO L=NU,NK
     AllRootC_vr(L)=0.0_r8
     D9005: DO NZ=1,NP
       DO  N=1,Myco_pft(NZ)
@@ -310,7 +312,7 @@ module UptakesMod
 !     ENDIF
       enddo
     ENDDO D9005
-  ENDDO D9000
+  ENDDO
 
   call PrintInfo('end '//subname)
   end associate
@@ -330,7 +332,7 @@ module UptakesMod
   real(r8) :: BndlCanopyReistance_pft(JP1)
   integer :: NB,K,L,N,NZZ
 
-  associate(                                                      &
+  associate(                                                           &
     AbvCanopyBndlResist_col   => plt_ew%AbvCanopyBndlResist_col       ,& !input  :isothermal boundary layer resistance, [h m-1]
     CanopyHeight_col          => plt_morph%CanopyHeight_col           ,& !input  :canopy height , [m]
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
@@ -453,7 +455,7 @@ module UptakesMod
   real(r8) :: RTDPX        !Root occupied thickness in current layer
   integer :: N,L,NR
 
-  associate(                                                      &
+  associate(                                                       &
     CumSoilThickness_vr     => plt_site%CumSoilThickness_vr       ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     DLYR3                   => plt_site%DLYR3                     ,& !input  :vertical thickness of soil layer, [m]
     FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr          ,& !input  :micropore fraction, [-]
@@ -475,50 +477,53 @@ module UptakesMod
     ZERO                    => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
     ZEROS                   => plt_site%ZEROS                      & !input  :threshold zero for numerical stability,[-]
   )
-  
-  D2000: DO N=1,Myco_pft(NZ)
+  if(ldo_sp_mode)then
+  else
+    D2000: DO N=1,Myco_pft(NZ)
 
-    DO  L=NU,MaxSoiL4Root_pft(NZ)
-      IF(N.EQ.ipltroot)THEN
-        !obtain plant rooting depth
-        RootDepZ=0.0_r8
-        D2005: DO NR=1,NumRootAxes_pft(NZ)
-          RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
-        ENDDO D2005
+      DO  L=NU,MaxSoiL4Root_pft(NZ)
+        IF(N.EQ.ipltroot)THEN
+          !obtain plant rooting depth
+          RootDepZ=0.0_r8
+          D2005: DO NR=1,NumRootAxes_pft(NZ)
+            RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
+          ENDDO D2005
 
-        IF(L.EQ.NU)THEN
-          FracPrimRootOccupiedLay_pvr(L,NZ)=1.0_r8
-        ELSE
-          IF(DLYR3(L).GT.ZERO)THEN
-            RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
-            RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
-            FracPrimRootOccupiedLay_pvr(L,NZ) = RTDPX/DLYR3(L)
+          IF(L.EQ.NU)THEN
+            FracPrimRootOccupiedLay_pvr(L,NZ)=1.0_r8
           ELSE
-            FracPrimRootOccupiedLay_pvr(L,NZ)=0.0_r8
+            IF(DLYR3(L).GT.ZERO)THEN
+              RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
+              RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
+              FracPrimRootOccupiedLay_pvr(L,NZ) = RTDPX/DLYR3(L)
+            ELSE
+              FracPrimRootOccupiedLay_pvr(L,NZ)=0.0_r8
+            ENDIF
           ENDIF
         ENDIF
-      ENDIF
 
-      IF(AllRootC_vr(L).GT.ZEROS)THEN
-        FracPRoot4Uptake_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)/AllRootC_vr(L)
-      ELSE
-        FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
-      ENDIF
-      MinFracPRoot4Uptake_pvr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ))
+        IF(AllRootC_vr(L).GT.ZEROS)THEN
+          FracPRoot4Uptake_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)/AllRootC_vr(L)
+        ELSE
+          FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
+        ENDIF
+        MinFracPRoot4Uptake_pvr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ))
+        
+        IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracPrimRootOccupiedLay_pvr(L,NZ).GT.ZERO)THEN
+          FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
+            /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
 
-      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracPrimRootOccupiedLay_pvr(L,NZ).GT.ZERO)THEN
-        FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
-          /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
-        PathLen_pvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L) &
-          ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
-        RootArea2RadiusRatio_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ)
-      ELSE
-        FineRootRadius_rvr(N,L)      = Root2ndMaxRadius_pft(N,NZ)
-        PathLen_pvr(N,L)             = 1.001_r8*FineRootRadius_rvr(N,L)
-        RootArea2RadiusRatio_vr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
-      ENDIF
-    enddo
-  ENDDO D2000
+          PathLen_pvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L) &
+            ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
+          RootArea2RadiusRatio_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ)
+        ELSE
+          FineRootRadius_rvr(N,L)      = Root2ndMaxRadius_pft(N,NZ)
+          PathLen_pvr(N,L)             = 1.001_r8*FineRootRadius_rvr(N,L)
+          RootArea2RadiusRatio_vr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
+        ENDIF
+      enddo
+    ENDDO D2000
+  ENDIF
   end associate
   end subroutine UpdateRootProperty
 
@@ -538,7 +543,7 @@ module UptakesMod
 
   integer :: N,L
 ! begin_execution
-  associate(                                                      &
+  associate(                                                           &
     AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft      ,& !input  :canopy nonstructural element concentration, [g d-2]
@@ -667,7 +672,7 @@ module UptakesMod
   integer :: N,L
 !     begin_execution
 
-  associate(                                                      &
+  associate(                                                           &
     AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft           ,& !input  :canopy water content, [m3 d-2]
@@ -1044,7 +1049,7 @@ module UptakesMod
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,Root2ndSurfArea
   integer :: N, L
-  associate(                                                      &
+  associate(                                                                  &
     CanopyHeight_pft            => plt_morph%CanopyHeight_pft                ,& !input  :canopy height, [m]
     CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr              ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
     HydroCondMicP4RootUptake_vr => plt_soilchem%HydroCondMicP4RootUptake_vr  ,& !input  :soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
@@ -1130,7 +1135,7 @@ module UptakesMod
         !
         Root2ndSurfArea        = TwoPiCON*Root2ndRadius_pvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
         RootResistSoi_rvr(N,L) = RootRadialResist_pft(N,NZ)/Root2ndSurfArea*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
-!
+        !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
         !

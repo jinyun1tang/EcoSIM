@@ -4,7 +4,6 @@ set(PLANT_BGC_SOURCES
   PlantDisturbByFireMod.F90
   PlantDisturbByTillageMod.F90 
   PlantDisturbByGrazingMod.F90
-  PrescribePhenolMod.F90
   InitVegBGC.F90
   RootGasMod.F90
   PlantBalMod.F90
@@ -38,7 +37,8 @@ target_include_directories(plant_bgc  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/APIData/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
-  ${CMAKE_BINARY_DIR}/f90src/IOutils/)
+  ${CMAKE_BINARY_DIR}/f90src/IOutils/
+  ${CMAKE_BINARY_DIR}/f90src/Prescribed_pheno/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};plant_bgc PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};plant_bgc)

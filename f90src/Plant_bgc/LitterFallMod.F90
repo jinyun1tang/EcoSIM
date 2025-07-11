@@ -2,7 +2,7 @@ module LitterFallMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use PlantAPIData
   use PlantMathFuncMod
 implicit none

@@ -285,7 +285,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: ZNO2T
   real(r8),allocatable :: FSBSTHeter(:,:)                !limitation of primary substrate for heterotrophs, [0->1, less limitation]              
   real(r8),allocatable :: FSBSTAutor(:)                  !limitation of primary substrate for autotrophs, [0->1, less limitation]              
-  real(r8),allocatable :: ROQC4HeterMicActCmpK(:)
+  real(r8),allocatable :: ROQC4HeterMicActCmpK(:)        !microbial activity in hydrolysis of organic complex
+  real(r8),allocatable :: RHydrolysisScalCmpK(:)         !scalar for solid-organic matter hydrolysis, [0->1, faster]
   contains
     procedure, public :: Init => mic_diag_init
     procedure, public :: ZeroOut => mic_diag_zero
@@ -774,6 +775,7 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%FSBSTHeter)
   call destroy(this%FSBSTAutor)
   call destroy(this%ROQC4HeterMicActCmpK)
+  call destroy(this%RHydrolysisScalCmpK)
   end subroutine mic_diag_destroy
 !------------------------------------------------------------------------------------------  
   subroutine nit_mics_destroy(this)
@@ -876,7 +878,8 @@ type, public :: Cumlate_Flux_Diag_type
   NumHetetr1MicCmplx    = micpar%NumHetetr1MicCmplx
   allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:jcplx));   this%FSBSTHeter=0._r8
   allocate(this%FSBSTAutor(1:NumMicrobAutrophCmplx)); this%FSBSTAutor=0._r8
-  allocate(this%ROQC4HeterMicActCmpK(1:jcplx))
+  allocate(this%ROQC4HeterMicActCmpK(1:jcplx));this%ROQC4HeterMicActCmpK=0._r8
+  allocate(this%RHydrolysisScalCmpK(1:jcplx));this%RHydrolysisScalCmpK=0._r8
   end subroutine mic_diag_init
 
 !------------------------------------------------------------------------------------------
@@ -912,6 +915,7 @@ type, public :: Cumlate_Flux_Diag_type
   class(Microbe_Diag_type) :: this
 
   this%ROQC4HeterMicActCmpK = 0._r8
+  this%RHydrolysisScalCmpK =0._r8
   this%H1P4T               = 0._r8
   this%H2P4T               = 0._r8
   this%RH2UptkAutor        = 0._r8

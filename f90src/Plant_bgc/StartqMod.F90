@@ -17,7 +17,7 @@ module StartqMod
   use EcoSIMHistMod
   use GridDataType
   use EcoSIMConfig
-  use GrosubPars
+  use PlantBGCPars
   use UnitMod, only : units
   use EcoSiMParDataMod, only : pltpar
   use PlantMathFuncMod

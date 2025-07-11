@@ -134,6 +134,7 @@ implicit none
   real(r8),target,allocatable :: AeroBact_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic bacteria, [-]
   real(r8),target,allocatable :: AeroFung_PrimeS_lim_vr(:,:,:)       !primary substrate limitation for aerobic heterotrophic fungi, [-]
   real(r8),target,allocatable :: ROQC4HeterMicActCmpK_vr(:,:,:,:)    !vertical resolved microbial activity for each complex, [-]
+  real(r8),target,allocatable :: RHydrolysisScalCmpK_vr(:,:,:,:)     !vertical resolved SOM hydrolysis scalar for each complex, [-]
   real(r8),target,allocatable :: trcs_solml_dribBeg_col(:,:,:)       !total dribbling mass at the begining of time step, [g d-2]
   private :: InitAllocate
   contains
@@ -281,6 +282,7 @@ implicit none
   allocate(DOM_MicpTransp_3D(idom_beg:idom_end,1:jcplx,3,0:1,JV,JH));DOM_MicpTransp_3D=0._r8
   allocate(CPO4S_vr(JZ,JY,JX));CPO4S_vr(JZ,JY,JX)=0._r8
   allocate(ROQC4HeterMicActCmpK_vr(jcplx,0:JZ,JY,JX)); ROQC4HeterMicActCmpK_vr=0._r8
+  allocate(RHydrolysisScalCmpK_vr(jcplx,0:JZ,JY,JX));RHydrolysisScalCmpK_vr=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -292,6 +294,7 @@ implicit none
 
   call destroy(trcs_solml_dribBeg_col)
   call destroy(ROQC4HeterMicActCmpK_vr)
+  call destroy(RHydrolysisScalCmpK_vr)
   call destroy(AeroBact_PrimeS_lim_vr)
   call destroy(AeroFung_PrimeS_lim_vr)
   call destroy(trcs_netpro_vr)

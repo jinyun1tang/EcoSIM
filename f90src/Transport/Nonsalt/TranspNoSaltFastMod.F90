@@ -109,7 +109,7 @@ implicit none
           trcg_netflx2_col(idg,NY,NX)    = trcg_netflx2_col(idg,NY,NX)+RBGCSrceGasMM_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)
           RGasNetProdSoil_col(idg,NY,NX) = RGasNetProdSoil_col(idg,NY,NX)+RBGCSrceGasMM_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)
 
-          if(trcs_solml_drib_vr(idg,L,NY,NX)>1.e-1_r8)then
+          if(trcs_solml_drib_vr(idg,L,NY,NX)>1.e0_r8)then
             write(*,*)(I*1000+J)*100+M,'idg=',trcs_names(idg),L,RBGCSinkGasMM_vr(idg,L,NY,NX),trcs_solml_drib_vr(idg,L,NY,NX),trcs_solml2_vr(idg,L,NY,NX)
           endif
         ENDDO

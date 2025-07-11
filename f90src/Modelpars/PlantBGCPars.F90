@@ -1,4 +1,4 @@
-module GrosubPars
+module PlantBGCPars
 
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
@@ -293,4 +293,4 @@ module GrosubPars
   
   end subroutine InitVegPars
 
-end module GrosubPars
+end module PlantBGCPars

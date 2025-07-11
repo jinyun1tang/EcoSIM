@@ -538,18 +538,18 @@ contains
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
-  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TRChem_NH3_band_soil)+micflx%RNH4MicbTransfBand
-  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TRChem_NH3_soil_vr)+micflx%RNH4MicbTransfSoil
-  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TRChem_NH3_band_soil)+micflx%RNH4MicbTransfBand
-  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TRChem_NH4_soil)+micflx%RNH4MicbTransfSoil
-  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TRChem_H1PO4_band_soil)+micflx%RH1PO4MicbTransfBand
-  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TRChem_H1PO4_soil)+micflx%RH1PO4MicbTransfSoil
-  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TRChem_H2PO4_band_soil)+micflx%RH2PO4MicbTransfBand
-  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TRChem_H2PO4_soil)+micflx%RH2PO4MicbTransfSoil
-  ystatesfl(cid_ZNO3B)=ystates0l(cid_ZNO3B)+micflx%RNO3MicbTransfBand
-  ystatesfl(cid_ZNO3S)=ystates0l(cid_ZNO3S)+micflx%RNO3MicbTransfSoil
-  ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%RNO2MicbTransfBand
-  ystatesfl(cid_ZNO2S)=ystates0l(cid_ZNO2S)+micflx%RNO2MicbTransfSoil
+  ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TRChem_NH3_band_soil)+micflx%RNH4MicbReliz2Band
+  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TRChem_NH3_soil_vr)+micflx%RNH4MicbReliz2Soil
+  ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TRChem_NH3_band_soil)+micflx%RNH4MicbReliz2Band
+  ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TRChem_NH4_soil)+micflx%RNH4MicbReliz2Soil
+  ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TRChem_H1PO4_band_soil)+micflx%RH1PO4MicbReliz2Band
+  ystatesfl(cid_H1PO4)=ystates0l(cid_H1PO4)+ystatesfl(fid_TRChem_H1PO4_soil)+micflx%RH1PO4MicbReliz2Soil
+  ystatesfl(cid_H2POB)=ystates0l(cid_H2POB)+ystatesfl(fid_TRChem_H2PO4_band_soil)+micflx%RH2PO4MicbReliz2Band
+  ystatesfl(cid_H2PO4)=ystates0l(cid_H2PO4)+ystatesfl(fid_TRChem_H2PO4_soil)+micflx%RH2PO4MicbReliz2Soil
+  ystatesfl(cid_ZNO3B)=ystates0l(cid_ZNO3B)+micflx%RNO3MicbReliz2Band
+  ystatesfl(cid_ZNO3S)=ystates0l(cid_ZNO3S)+micflx%RNO3MicbReliz2Soil
+  ystatesfl(cid_ZNO2B)=ystates0l(cid_ZNO2B)+micflx%RNO2MicbReliz2Band
+  ystatesfl(cid_ZNO2S)=ystates0l(cid_ZNO2S)+micflx%RNO2MicbReliz2Soil
 
   ystatesfl(cid_CO2S) =ystates0l(cid_CO2S)-micflx%RCO2NetUptkMicb
   ystatesfl(cid_Z2OS) =ystates0l(cid_Z2OS)-micflx%RN2ONetUptkMicb

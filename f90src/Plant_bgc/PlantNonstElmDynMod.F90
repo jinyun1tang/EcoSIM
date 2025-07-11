@@ -2,7 +2,7 @@ module PlantNonstElmDynMod
   use minimathmod  , only : safe_adb,AZMAX1,AZMIN1
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ElmIDMod
-  use GrosubPars
+  use PlantBGCPars
   use PlantAPIData  
   implicit none
 

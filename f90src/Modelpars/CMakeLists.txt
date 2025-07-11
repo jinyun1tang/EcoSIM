@@ -1,7 +1,7 @@
 file(GLOB MODELPARS_SOURCES "*.F90")
 #set(MODELPARS_SOURCES
 #  NitroPars.F90
-#  GrosubPars.F90
+#  PlantBGCPars.F90
 #  TracerPropMod.F90
 #  MicBGCPars.F90
 #  EcoSiMParDataMod.F90

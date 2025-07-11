@@ -32,7 +32,6 @@ implicit none
   real(r8),target,allocatable :: RH1PO4DmndBandHeter_vr(:,:,:,:,:)    !heterotrophic substrate-unlimited HPO4 mineraln-immobiln in band soil, [g d-2 h-1]
   real(r8),target,allocatable :: RH1PO4DmndLitrHeter_col(:,:,:,:)     !heterotrophic substrate-unlimited HPO4 immobilization in surface litter, [g d-2 h-1]
   real(r8),target,allocatable :: OMEERhetr_2D(:,:,:,:,:,:,:)           !heterotrophic microbial C loss through erosion 	[g d-2 h-1]
-!  real(r8),target,allocatable :: ROQC4HeterMicActCmpK_vr(:,:,:,:)     !microbial activity as measured by respiration, 
   real(r8),target,allocatable :: mBiomeAutor_vr(:,:,:,:,:)            !autotrophic microbial biomass chemical element,[g d-2]
   real(r8),target,allocatable :: RO2DmndAutort_vr(:,:,:,:)            !aqueous O2 demand by autotrophic microbes, [g d-2 h-1]
   real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)        !autotrophic microbial NH4 demand in soil, [g d-2 h-1]
@@ -91,7 +90,6 @@ implicit none
   allocate(RH1PO4DmndBandHeter_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX));RH1PO4DmndBandHeter_vr=0._r8
   allocate(RH1PO4DmndLitrHeter_col(NumHetetr1MicCmplx,1:jcplx,JY,JX));RH1PO4DmndLitrHeter_col=0._r8
   allocate(OMEERhetr_2D(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH));OMEERhetr_2D=0._r8
-!  allocate(ROQC4HeterMicActCmpK_vr(1:jcplx,0:JZ,JY,JX); ROQC4HeterMicActCmpK_vr=0._r8
   allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX));mBiomeAutor_vr=0._r8
   allocate(RO2DmndAutort_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RO2DmndAutort_vr=0._r8
   allocate(RNH4UptkSoilAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RNH4UptkSoilAutor_vr=0._r8
@@ -140,7 +138,6 @@ implicit none
   call destroy(RH1PO4DmndBandHeter_vr)
   call destroy(RH1PO4DmndLitrHeter_col)
   call destroy(OMEERhetr_2D)
-!  call destroy(ROQC4HeterMicActCmpK_vr)
   call destroy(mBiomeAutor_vr)
   call destroy(RO2DmndAutort_vr)
   call destroy(RNH4UptkSoilAutor_vr)

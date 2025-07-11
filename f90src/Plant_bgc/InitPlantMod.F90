@@ -8,7 +8,7 @@ module InitPlantMod
   use PlantAPIData
   use TracerIDMod
   use PlantMathFuncMod
-  use GrosubPars
+  use PlantBGCPars
 
   use PlantMathFuncMod
   implicit none

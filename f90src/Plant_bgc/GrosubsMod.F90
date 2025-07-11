@@ -10,7 +10,7 @@ module grosubsMod
   use PlantNonstElmDynMod, only: PlantNonstElmTransfer
   use PlantDebugMod,       only: PrintRootTracer
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use PlantAPIData
   use PhotoSynsMod
   use PlantMathFuncMod

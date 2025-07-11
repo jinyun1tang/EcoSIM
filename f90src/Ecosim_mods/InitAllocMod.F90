@@ -56,7 +56,7 @@ implicit none
   use NumericalAuxMod     , only : InitNumericAux
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
-  use GrosubPars          , only : InitPlantTraitTable
+  use PlantBGCPars          , only : InitPlantTraitTable
   use GridConsts  
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group

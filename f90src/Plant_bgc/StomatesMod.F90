@@ -3,7 +3,7 @@
   use EcosimConst
   use minimathmod
   use PlantAPIData
-  use GrosubPars
+  use PlantBGCPars
   use EcoSIMCtrlMod , only : etimer,lverb 
   implicit none
 

@@ -1,7 +1,7 @@
 module PhotoSynsMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use minimathmod, only : AZMAX1
   use PlantMathFuncMod
   use PlantAPIData

@@ -9,7 +9,7 @@ module PlantDisturbsMod
   use ElmIDMod
   use EcosimConst
   use PlantAPIData
-  use GrosubPars
+  use PlantBGCPars
   use PlantMathFuncMod
   use PlantDisturbByFireMod
   use PlantDisturbByTillageMod
@@ -33,8 +33,8 @@ module PlantDisturbsMod
   real(r8) :: StandeadElmnt2Litr(NumPlantChemElms)
   real(r8) :: LeafElmntHarv2Litr(NumPlantChemElms)
   real(r8) :: PetioleElmntHarv2Litr(NumPlantChemElms)
-  real(r8) :: WoodyElmntHarv2Litr(NumPlantChemElms)
-  real(r8) :: StandeadElmntHarv2Litr(NumPlantChemElms)
+  real(r8) :: WoodyElmntHarv2Litr(NumPlantChemElms)      !harvested woody element goes to litter
+  real(r8) :: StandeadElmntHarv2Litr(NumPlantChemElms)   !harvested standing dead that turns into litter
   real(r8) :: GrainHarvst(NumPlantChemElms)
 
   public :: RemoveBiomassByDisturbance
@@ -83,8 +83,8 @@ module PlantDisturbsMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NZ
 
-  real(r8) :: FHVSE
-  real(r8) :: FHVSH
+  real(r8) :: FHVSE   !attenuation rate of standing dead due to removal
+  real(r8) :: FHVSH   !fraction of standing dead left after removal
   integer :: M,NE
   associate(                                                    &
     SolarNoonHour_col      => plt_site%SolarNoonHour_col       ,& !input  :time of solar noon, [h]

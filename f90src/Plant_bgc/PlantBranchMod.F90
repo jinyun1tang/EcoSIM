@@ -7,7 +7,7 @@ module PlantBranchMod
   use EcoSIMCtrlMod , only : etimer 
   use DebugToolMod
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use PlantAPIData
   use PhotoSynsMod
   use PlantMathFuncMod

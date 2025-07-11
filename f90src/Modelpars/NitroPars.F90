@@ -128,7 +128,7 @@ module NitroPars
   COMKI  = 1.0E-03_r8
   COMKM  = 1.0E-04_r8
   CKC    = 1.0E-03_r8
-  FOSCZ0 = 2.0E-02_r8
+  FOSCZ0 = 2.0E-02_r8*2._r8
   FOSCZL = 2.0E-06_r8
   FMN    = 1.0E-03_r8
   DCKM0  = 1.0E+03_r8

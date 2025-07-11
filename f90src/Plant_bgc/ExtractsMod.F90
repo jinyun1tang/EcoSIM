@@ -9,7 +9,7 @@ module ExtractsMod
   use PlantBalMod,   only: SumPlantRootGas
   use PlantDebugMod, only: PrintRootTracer
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use PlantAPIData
   implicit none
 

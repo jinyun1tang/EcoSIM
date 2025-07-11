@@ -2,7 +2,7 @@ module InitVegBGC
 
   use EcosimConst
   use GridConsts
-  use GrosubPars, only : ibackward,iforward
+  use PlantBGCPars, only : ibackward,iforward
   implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__

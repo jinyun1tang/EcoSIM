@@ -418,6 +418,11 @@ implicit none
   real(r8),pointer   :: h2D_RDECOMPC_BReSOM_vr(:,:)
   real(r8),pointer   :: h2D_RDECOMPC_SorpSOM_vr(:,:)
   real(r8),pointer   :: h2D_MicrobAct_vr(:,:)
+  real(r8),pointer   :: h2D_SOMHydrylScalCp1_vr(:,:)
+  real(r8),pointer   :: h2D_SOMHydrylScalCp2_vr(:,:)
+  real(r8),pointer   :: h2D_SOMHydrylScalCp3_vr(:,:)
+  real(r8),pointer   :: h2D_SOMHydrylScalCp4_vr(:,:)
+  real(r8),pointer   :: h2D_SOMHydrylScalCp5_vr(:,:)        
   real(r8),pointer   :: h2D_MicrobActCp1_vr(:,:)
   real(r8),pointer   :: h2D_MicrobActCp2_vr(:,:)
   real(r8),pointer   :: h2D_MicrobActCp3_vr(:,:)
@@ -918,6 +923,12 @@ implicit none
   allocate(this%h2D_MicrobActCp3_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp3_vr(:,:)=spval
   allocate(this%h2D_MicrobActCp4_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp4_vr(:,:)=spval
   allocate(this%h2D_MicrobActCp5_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp5_vr(:,:)=spval
+
+  allocate(this%h2D_SOMHydrylScalCp1_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp1_vr(:,:)=spval
+  allocate(this%h2D_SOMHydrylScalCp2_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp2_vr(:,:)=spval
+  allocate(this%h2D_SOMHydrylScalCp3_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp3_vr(:,:)=spval
+  allocate(this%h2D_SOMHydrylScalCp4_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp4_vr(:,:)=spval
+  allocate(this%h2D_SOMHydrylScalCp5_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp5_vr(:,:)=spval
 
   allocate(this%h2D_HydrolCSOMCp1_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp1_vr(:,:)=spval
   allocate(this%h2D_HydrolCSOMCp2_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp2_vr(:,:)=spval
@@ -2628,6 +2639,31 @@ implicit none
     long_name='Layer resolved carbon hydrolysis in cplx5',&
     ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr =>  this%h2D_SOMHydrylScalCp1_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='SOMHydrlScalCp1_vr',units='none',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved SOM hydrolysis scalar in cplx1',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_SOMHydrylScalCp2_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='SOMHydrlScalCp2_vr',units='none',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved SOM hydrolysis scalar in cplx2',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_SOMHydrylScalCp3_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='SOMHydrlScalCp3_vr',units='none',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved SOM hydrolysis scalar in cplx3',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_SOMHydrylScalCp4_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='SOMHydrlScalCp4_vr',units='none',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved SOM hydrolysis scalar in cplx4',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_SOMHydrylScalCp5_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='SOMHydrlScalCp5_vr',units='none',type2d='levsoi',avgflag='A',&
+    long_name='Layer resolved SOM hydrolysis scalar in cplx5',&
+    ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr =>  this%h2D_MicrobActCp1_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='MicrobActCp1_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in cplx1',&
@@ -3333,6 +3369,12 @@ implicit none
         this%h2D_MicrobActCp3_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_MicrobActCp4_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_MicrobActCp5_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+
+        this%h2D_SOMHydrylScalCp1_vr(ncol,L) = RHydrolysisScalCmpK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_SOMHydrylScalCp2_vr(ncol,L) = RHydrolysisScalCmpK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_SOMHydrylScalCp3_vr(ncol,L) = RHydrolysisScalCmpK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_SOMHydrylScalCp4_vr(ncol,L) = RHydrolysisScalCmpK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_SOMHydrylScalCp5_vr(ncol,L) = RHydrolysisScalCmpK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
         this%h2D_HydrolCSOMCp1_vr(ncol,L) = RHydlySOCK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_HydrolCSOMCp2_vr(ncol,L) = RHydlySOCK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)

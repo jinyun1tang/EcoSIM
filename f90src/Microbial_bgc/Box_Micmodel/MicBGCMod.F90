@@ -1417,6 +1417,7 @@ module MicBGCMod
     tMaxPActMicrbK       => ncplxs%tMaxPActMicrbK,         &
     VOLWZ                => nmicdiag%VOLWZ,                &
     TSensGrowth          => nmicdiag%TSensGrowth,          &
+    RHydrolysisScalCmpK    => nmicdiag%RHydrolysisScalCmpK,    &
     iprotein             => micpar%iprotein,               &
     icarbhyro            => micpar%icarbhyro,              &
     icellulos            => micpar%icellulos,              &
@@ -1502,12 +1503,12 @@ module MicBGCMod
   !     BulkSOMC=total SOC
   !     FCNK,FCPK=N,P limitation to microbial activity in each K
   !
-
+      RHydrolysisScalCmpK(K)=ROQC4HeterMicActCmpK(K)*DFNS*OQCI
       D785: DO M=1,jsken
         IF(SolidOM(ielmc,M,K).GT.ZEROS)THEN
           CNS(M,K)                  = AZMAX1(SolidOM(ielmn,M,K)/SolidOM(ielmc,M,K))
           CPS(M,K)                  = AZMAX1(SolidOM(ielmp,M,K)/SolidOM(ielmc,M,K))
-          RHydlysSolidOM(ielmc,M,K) = SolidOMAct(M,K)*AZMAX1(AMIN1(0.5_r8,SPOSC(M,K)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
+          RHydlysSolidOM(ielmc,M,K) = SolidOMAct(M,K)*AZMAX1(AMIN1(0.5_r8,SPOSC(M,K)*RHydrolysisScalCmpK(K)*TSensGrowth/BulkSOMC(K)))
           RHydlysSolidOM(ielmn,M,K) = AZMAX1(AMIN1(SolidOM(ielmn,M,K),CNS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCNK(K)
           RHydlysSolidOM(ielmp,M,K) = AZMAX1(AMIN1(SolidOM(ielmp,M,K),CPS(M,K)*RHydlysSolidOM(ielmc,M,K)))/FCPK(K)
 
@@ -1589,11 +1590,12 @@ module MicBGCMod
   !     FCNK,FCPK=N,P limitation to microbial activity in each K
   !
     IF(BulkSOMC(K).GT.ZEROS)THEN
+      RHydrolysisScalCmpK(K)=ROQC4HeterMicActCmpK(K)*DFNS*OQCI
       D775: DO M=1,ndbiomcp
         IF(OMBioResdu(ielmc,M,K).GT.ZEROS)THEN
           CNR                          = AZMAX1(OMBioResdu(ielmn,M,K)/OMBioResdu(ielmc,M,K))
           CPR                          = AZMAX1(OMBioResdu(ielmp,M,K)/OMBioResdu(ielmc,M,K))
-          RHydlysBioResduOM(ielmc,M,K) = OMBioResdu(ielmc,M,K)*AZMAX1(AMIN1(1._r8,SPORC(M)*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
+          RHydlysBioResduOM(ielmc,M,K) = OMBioResdu(ielmc,M,K)*AZMAX1(AMIN1(1._r8,SPORC(M)*RHydrolysisScalCmpK(K)*TSensGrowth/BulkSOMC(K)))
           RHydlysBioResduOM(ielmn,M,K) = AZMAX1(AMIN1(OMBioResdu(ielmn,M,K),CNR*RHydlysBioResduOM(ielmc,M,K)))/FCNK(K)
           RHydlysBioResduOM(ielmp,M,K) = AZMAX1(AMIN1(OMBioResdu(ielmp,M,K),CPR*RHydlysBioResduOM(ielmc,M,K)))/FCPK(K)
 
@@ -1631,10 +1633,11 @@ module MicBGCMod
   !     FCNK,FCPK=N,P limitation to microbial activity in each K
   !
     IF(BulkSOMC(K).GT.ZEROS)THEN
+      RHydrolysisScalCmpK(K)=ROQC4HeterMicActCmpK(K)*DFNS*OQCI    
       IF(SorbedOM(ielmc,K).GT.ZEROS)THEN
         rCNSorbOM(K)                   = AZMAX1(SorbedOM(ielmn,K)/SorbedOM(ielmc,K))
         rCPSorbOM(K)                   = AZMAX1(SorbedOM(ielmp,K)/SorbedOM(ielmc,K))
-        RHydlysSorptOM(ielmc,K)        = SorbedOM(ielmc,K)*AZMAX1(AMIN1(1._r8, SPOHC*ROQC4HeterMicActCmpK(K)*DFNS*OQCI*TSensGrowth/BulkSOMC(K)))
+        RHydlysSorptOM(ielmc,K)        = SorbedOM(ielmc,K)*AZMAX1(AMIN1(1._r8, SPOHC*RHydrolysisScalCmpK(K)*TSensGrowth/BulkSOMC(K)))
         RHydlysSorptOM(idom_acetate,K) = SorbedOM(idom_acetate,K)*AZMAX1(AMIN1(1._r8, SPOHA*ROQC4HeterMicActCmpK(K)*DFNS*TSensGrowth/BulkSOMC(K)))
         RHydlysSorptOM(ielmn,K)        = AZMAX1(AMIN1(SorbedOM(ielmn,K),rCNSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCNK(K)
         RHydlysSorptOM(ielmp,K)        = AZMAX1(AMIN1(SorbedOM(ielmp,K),rCPSorbOM(K)*RHydlysSorptOM(ielmc,K)))/FCPK(K)

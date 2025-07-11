@@ -3,7 +3,7 @@ module RootMod
   use minimathmod  , only : safe_adb,AZMAX1,AZMIN1
   use EcoSIMCtrlMod, only : lverb  
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use ElmIDMod
   use PlantMathFuncMod
   use PlantAPIData
