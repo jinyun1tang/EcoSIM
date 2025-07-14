@@ -1119,6 +1119,7 @@ contains
   ResistBndlSurf_col(NY,NX)  = 1.0_r8/(FracAsExposedSoil_col(NY,NX)/ResistAreodynOverLitr_col(NY,NX)+FracEffAsLitR_col(NY,NX)/ResistanceLitRLay)
   RAS                        = SnowBNDResistance(NY,NX)
   CondGasXSnowM_col(M,NY,NX) = AREA_3D(3,NUM_col(NY,NX),NY,NX)*dts_HeatWatTP/(ResistBndlSurf_col(NY,NX)+RAS)  !m^2 h/(h/m) = m3
+  CondGasXSurf_col(NY,NX)    = 1._r8/(ResistBndlSurf_col(NY,NX)+RAS)  !m/h 
 
 !
 ! REDISTRIBUTE INCOMING PRECIPITATION

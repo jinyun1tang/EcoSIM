@@ -47,11 +47,11 @@ contains
   !update the osmotic and turgor pressure of a plant organ
   implicit none
   real(r8), intent(in) :: PSICanopy   !plant orgran pressure, MPa
-  real(r8), intent(in) :: CCPOLT !total organ dry mass, C+N+P
-  real(r8), intent(in) :: OSMO   !canopy osmotic potential when canopy water potential = 0 MPa
-  real(r8), intent(in) :: TKP    !organ temperature, Kelvin
-  real(r8), intent(out) :: PSIOsmo  !osmotic pressure of the organ, MPa
-  real(r8), intent(out) :: PSITurg  !turgor pressure of the organ, MPa
+  real(r8), intent(in) :: CCPOLT      !total organ dry mass, C+N+P, g
+  real(r8), intent(in) :: OSMO        !canopy osmotic potential when canopy water potential = 0 MPa
+  real(r8), intent(in) :: TKP         !organ temperature, Kelvin
+  real(r8), intent(out) :: PSIOsmo    !osmotic pressure of the organ, MPa
+  real(r8), intent(out) :: PSITurg    !turgor pressure of the organ, MPa
   real(r8), optional, intent(out) :: FDMP1
 
   real(r8) :: OSWT

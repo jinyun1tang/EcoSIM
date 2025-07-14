@@ -7321,16 +7321,16 @@ implicit none
 
   if(flag=='read')then
     datpr4 => datrc_4d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2DmndHetert', dim1name='column',dim2name='hetrmicb',&
+    call restartvar(ncid, flag, varname='RO2DmndHetert_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
       interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert_vr,datrc_4d)      
   else
     !print*,'RO2DmndHetert'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert,datrc_4d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndHetert_vr,datrc_4d)        
     datpr4 => datrc_4d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx,1:JZ+1)        
-    call restartvar(ncid, flag, varname='RO2DmndHetert', dim1name='column',dim2name='hetrmicb',&
+    call restartvar(ncid, flag, varname='RO2DmndHetert_vr', dim1name='column',dim2name='hetrmicb',&
       dim3name='nomcomplx',dim4name='levsoi1',long_name='microbial aqueous O2 demand', units='g d-2 h-1', &
       interpinic_flag='skip', data=datpr4, missing_value=spval, &
       fill_value=spval)  

@@ -3,6 +3,9 @@ module PrescribePhenolMod
   use EcoSimConst,   only: PICON2h
   use EcoSIMCtrlMod, only: etimer
   use EcoSIMCtrlDataType, only : ZEROS
+  use ElmIDMod
+  use GridDataType
+  use RootDataType
   use PlantAPIData
   use ClimForcDataType
   use PlantTraitDataType
@@ -194,6 +197,9 @@ implicit none
   !example inputs
   real(r8) :: lai(12)=(/1.1852, 1.1821, 1.1554, 1.2433, 1.2922, 1.3341, 1.2296, 1.4118, 1.4343, 1.3941, 1.2721, 1.2218/)
   real(r8) :: sai(12)=(/0.3190, 0.3058, 0.3058, 0.3032, 0.3058, 0.3117, 0.3433, 0.3032, 0.3084, 0.3292, 0.3656, 0.3249/)
+  integer  :: irootType=1
+  REAL(R8) :: PerPlantRootC_vr(1:JZ)
+  REAL(R8) :: PerPlantRootLen_vr(1:JZ)
   !============
 
   DO NX=NHW,NHE
@@ -260,8 +266,20 @@ implicit none
          ENDDO
       ENDIF
 
+      !temporary set TEST values, assuming trees      
+      NZ=1
+      PlantPopulation_pft(NZ,NY,NX)=0.6_r8
+      !
+      call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
+        PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
+      ENDDO
     ENDDO
   ENDDO  
+
+
+
 
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------     
@@ -289,11 +307,18 @@ implicit none
   real(r8), parameter :: frootLen(10)=(/2.6,4.0,8.4,6.1,5.4,112.,3.5,4.1,60.4,7.4/)*1.e3_r8  !total fine root length
   real(r8), parameter :: PltPopDef(10)=(/0.6,1.,1.0,0.6,0.6,40.,0.6,0.6,40.,40./) !default plant population [1/m2]
   integer :: L 
-  real(r8) :: RootFrac_vr(1:NL)  !fraction of root in soil layers 
+  real(r8) :: CumRootFrac_vr(1:NL)  !Cumfraction of root in soil layers 
+  real(r8) :: RootFrac_vr(1:NL)     !fraction of root in soil layers 
 
-  RootFrac_vr(1)=1._r8-beta(irootType)**(cdepthz(1)*100._r8)
+  CumRootFrac_vr(1)=1._r8-beta(irootType)**(cdepthz(1)*100._r8)
+  RootFrac_vr(1)=CumRootFrac_vr(1)
   DO L=2,NL
-    RootFrac_vr(L)=1._r8-beta(irootType)**(cdepthz(L)*100._r8)-RootFrac_vr(L-1)
+    CumRootFrac_vr(L)=1._r8-beta(irootType)**(cdepthz(L)*100._r8)
+!    if(CumRootFrac_vr(L-1)<0.99_r8)
+      RootFrac_vr(L) = CumRootFrac_vr(L)-CumRootFrac_vr(L-1)
+!    else
+!      RootFrac_vr(L) = 1._r8-CumRootFrac_vr(L-1)
+!    endif
   enddo
   
   DO L=1,NL

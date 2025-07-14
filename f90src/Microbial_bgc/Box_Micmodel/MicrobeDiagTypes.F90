@@ -30,6 +30,8 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TFN2OX           !total relative demand of N2O in non-banded soil by Microbes
     real(r8) :: TFP14X           !total relative demand of H1PO4 in non-banded soil by Microbes
     real(r8) :: TFPO4X           !total relative demand of H2PO4 in non-banded soil by Microbes
+    real(r8) :: tRespGrossHeter    !total gross respiration by heterotrophs
+    real(r8) :: tRespGrossHeterUlm !total gross respiration by heterotrophs unlimited by O2
 !fluxes
     real(r8) :: tCResp4H2Prod    !total respiration flux to support H2 production, [gC d-2 h-1]  
     real(r8) :: tRNH4MicrbImobilSoil
@@ -317,7 +319,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%TFN2OX = 0._r8
   this%TFP14X = 0._r8
   this%TFPO4X = 0._r8
-
+  this%tRespGrossHeterUlm     = 0._r8
   this%tCResp4H2Prod          = 0._r8
   this%tRNH4MicrbImobilSoil   = 0._r8
   this%tRH2PO4MicrbImobilSoil = 0._r8

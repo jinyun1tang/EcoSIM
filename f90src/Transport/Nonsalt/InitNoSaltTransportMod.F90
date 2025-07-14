@@ -143,11 +143,11 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3
-        GasDiff2Litr_flx_col(idg,NY,NX)                    = 0._r8
+        AtmGasDiff2Litr_flx_col(idg,NY,NX)                    = 0._r8
         Gas_WetDepo2Litr_col(idg,NY,NX)                    = 0._r8
         Gas_litr2Soil_flx_col(idg,NY,NX)                   = 0._r8
         GasHydroLoss_litr_flx_col(idg,NY,NX)               = 0._r8
-        GasDiff2Soil_flx_col(idg,NY,NX)                    = 0._r8
+        AtmGasDiff2Soil_flx_col(idg,NY,NX)                    = 0._r8
         Gas_WetDepo2Soil_col(idg,NY,NX)                    = 0._r8
         RGasNetProdSoil_col(idg,NY,NX)                     = 0._r8
         trc_topsoil_flx_col(idg,NY,NX)                     = 0._r8
@@ -204,6 +204,8 @@ module InitNoSaltTransportMod
         else
           RBGCSrceGasMM_vr(idg,0,NY,NX) =-trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
         endif
+        RBGCSinkGasMM_vr(idg,0,NY,NX) = RBGCSinkGasMM_vr(idg,0,NY,NX)+trcs_solml_drib_vr(idg,0,NY,NX)*dts_gas        
+        trcs_solml_drib_vr(idg,0,NY,NX)=0._r8
       enddo
 
       if(TRProd_chem_sol_NH3_soil_vr(0,NY,NX)>0._r8)then

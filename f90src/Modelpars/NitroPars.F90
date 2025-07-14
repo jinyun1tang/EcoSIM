@@ -133,7 +133,7 @@ module NitroPars
   FMN    = 1.0E-03_r8
   DCKM0  = 1.0E+03_r8
   DCKML  = 1.0E+03_r8
-  VMXO   = 0.125_r8*2._r8
+  VMXO   = 0.125_r8
   VMXF   = 0.125_r8
   VMXM   = 0.125_r8  !acetoclastic methanogenesis
   VMXH       = 0.375_r8

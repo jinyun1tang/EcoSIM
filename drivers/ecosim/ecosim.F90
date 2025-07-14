@@ -16,7 +16,6 @@ PROGRAM main
   use EcoSIMConfig      , only : case_name,set_sim_type,start_date,is_restart,datestrlen
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
-  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
   use ClimReadMod       , only : get_clm_years
   use PerturbationMod   , only : config_soil_warming
   use EcoSIMCtrlMod
@@ -124,8 +123,6 @@ PROGRAM main
   DO nn1=1,nperiods
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 
-    call MicAPI_Init
-
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
       !determine the step size
@@ -149,7 +146,6 @@ PROGRAM main
       end do
       if(nlend)exit
     end do
-    call MicAPI_cleanup
     if(nlend)exit
   end do
 

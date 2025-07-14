@@ -470,6 +470,7 @@ implicit none
 
       DO K=1,jcplx      
         DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
+        DOM_MicP_drib_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_drib_vr(idom_doc:idom_dop,K,L)
       ENDDO
 
       DO N=1,Myco_pft(NZ,NY,NX)
@@ -770,6 +771,7 @@ implicit none
     DO K=1,jcplx
       plt_soilchem%FracBulkSOMC_vr(K,L)          = FracBulkSOMC_vr(K,L,NY,NX)
       plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L) = DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)
+      plt_soilchem%DOM_MicP_drib_vr(idom_doc:idom_dop,K,L)=DOM_MicP_drib_vr(idom_doc:idom_dop,K,L,NY,NX)
     ENDDO
   ENDDO
 
@@ -1310,14 +1312,14 @@ implicit none
         plt_morph%Root2ndMeanLens_pvr(N,L,NZ)       = Root2ndMeanLens_pvr(N,L,NZ,NY,NX)
 
         plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)     = RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)     = RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNH4DmndBand_pvr(N,L,NZ)     = RootNH4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNO3DmndSoil_pvr(N,L,NZ)     = RootNO3DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootNO3DmndBand_pvr(N,L,NZ)     = RootNO3DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH2PO4DmndSoil_pvr(N,L,NZ)   = RootH2PO4DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)   = RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)   = RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)
-        plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)   = RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNH4DmndSoilPrev_pvr(N,L,NZ)     = RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNH4DmndBandPrev_pvr(N,L,NZ)     = RootNH4DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNO3DmndSoilPrev_pvr(N,L,NZ)     = RootNO3DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootNO3DmndBandPrev_pvr(N,L,NZ)     = RootNO3DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH2PO4DmndSoilPrev_pvr(N,L,NZ)   = RootH2PO4DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH2PO4DmndBandPrev_pvr(N,L,NZ)   = RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH1PO4DmndSoilPrev_pvr(N,L,NZ)   = RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootH1PO4DmndBandPrev_pvr(N,L,NZ)   = RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)
         plt_ew%AllPlantRootH2OLoss_pvr(N,L,NZ)    = AllPlantRootH2OLoss_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)  = RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)
         plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)

@@ -51,7 +51,10 @@ module EcoSIMDesctruct
   use TracerIDMod         , only : CleanUpTracerIDs
   use NumericalAuxMod     , only : DestructNumericAux
   use PlantTraitTableMod  , only : DestructPlantTraitTable
+  use MicBGCAPI           , only : MicAPI_cleanup  
   implicit none
+
+  call MicAPI_cleanup
 
   call DestructMicrobialData
 

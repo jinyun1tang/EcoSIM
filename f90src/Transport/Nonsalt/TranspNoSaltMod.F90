@@ -76,9 +76,9 @@ module TranspNoSaltMod
       trcs_mass_beg(:,NY,NX) = 0._r8
       errmass_fast(:,NY,NX)  = 0._r8
       errmass_slow(:,NY,NX)  = 0._r8
-
-      trcs_solml_drib_beg_col(:,NY,NX)        = 0._r8
-      trcs_solml_drib_soi_beg_col(:,NY,NX)        = 0._r8
+      trcs_solml_drib_beg_col(:,NY,NX)     = 0._r8
+      trcs_solml_drib_soi_beg_col(:,NY,NX) = 0._r8
+      trcs_netProd_lit_col(:,NY,NX)        = 0._r8
 
       do ids=ids_beg,ids_end
         trcs_solml_drib_beg_col(ids,NY,NX) = trcs_solml_drib_vr(ids,0,NY,NX)
@@ -192,14 +192,14 @@ module TranspNoSaltMod
 
         if(idg==idg_NH3)then
           RGasNetProd_col(idg,NY,NX) = RGasNetProd_col(idg,NY,NX)+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
-          errmass=errmass+trcs_solml_drib_col(idg_NH3B) !-trcs_solml_drib_beg_col(idg_NH3B,NY,NX)
+          errmass=errmass+trcs_solml_drib_col(idg_NH3B) 
         endif
 
         if(abs(errmass)>1.e-5)then
           if(iVerbLevel==1 .or. abs(errmass)>1.e-4)then
             write(121,*)('-',L=1,50)
             if(present(M))then
-              write(121,*)(I*1000+J)*10+M,trcs_names(idg),'total'
+              write(121,*)(I*1000+J)*10+M,trcs_names(idg),'total',M
             else
               write(121,*)(I*1000+J)*10,trcs_names(idg),'total'
             endif
@@ -211,31 +211,21 @@ module TranspNoSaltMod
             write(121,*)'Delta mass sno, litr,soil=',mass_snow-trcs_mass_snow_beg(idg,NY,NX),mass_litr-trcs_mass_litr_beg(idg,NY,NX), &
               mass_soil-trcs_mass_soil_beg(idg,NY,NX)
             write(121,*)'mass snow                =',trcg_solsml_snvr(idg,1:nsnol_col(NY,NX),NY,NX)  
-            write(121,*)'dif/wetdepo to litr      =',GasDiff2Litr_flx_col(idg,NY,NX),Gas_WetDepo2Litr_col(idg,NY,NX)
+            write(121,*)'--------------------------'            
+            write(121,*)'dif to litr              =',AtmGasDiff2Litr_flx_col(idg,NY,NX)
+            write(121,*)'wet dep to litr.         =',Gas_WetDepo2Litr_col(idg,NY,NX)
             write(121,*)'gas litr2soil            =',Gas_litr2Soil_flx_col(idg,NY,NX)  
             write(121,*)'snow2litr                =',trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)
-            write(121,*)'netflx2litr              =',trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+GasDiff2Litr_flx_col(idg,NY,NX) &
-              +Gas_WetDepo2Litr_col(idg,NY,NX)-Gas_litr2Soil_flx_col(idg,NY,NX)+GasHydroLoss_litr_flx_col(idg,NY,NX) 
-
-            netflx2soil=GasDiff2Soil_flx_col(idg,NY,NX)+Gas_WetDepo2Soil_col(idg,NY,NX) &
-              +Gas_litr2Soil_flx_col(idg,NY,NX)+trcg_ebu_flx_col(idg,NY,NX) &
-              +trcg_AquaADV_Snow2Soil_flx(idg,NY,NX)+trcs_SubsurTransp_flx_2DH(idg,NY,NX)  &
-              +trcs_irrig_flx_col(idg,NY,NX)-trcs_drainage_flx_col(idg,NY,NX)
-
-            if(idg==idg_NH3)then
-              netflx2soil=netflx2soil+trcn_AquaADV_Snow2Band_flx(idg_NH3B,NY,NX)+trcs_SubsurTransp_flx_2DH(idg_NH3B,NY,NX) &
-                +trcs_irrig_flx_col(idg_NH3B,NY,NX)-trcs_drainage_flx_col(idg_NH3B,NY,NX)
-              write(121,*)'topsoil, irrig flx       = ',trc_topsoil_flx_col(idg,NY,NX),trcs_irrig_flx_col(idg,NY,NX) &
-                +trcs_irrig_flx_col(idg_NH3B,NY,NX) 
-            else 
-              write(121,*)'topsoil, irrig flx       = ',trc_topsoil_flx_col(idg,NY,NX),trcs_irrig_flx_col(idg,NY,NX)               
-            endif    
-            write(121,*)'netflx2soil              =',netflx2soil, TranspNetSoil_flx_col(idg,NY,NX)+trcg_ebu_flx_col(idg,NY,NX)
-              
-            write(121,*)'err in litr               =', trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+GasDiff2Litr_flx_col(idg,NY,NX) &
+            write(121,*)'runoff loss              =',GasHydroLoss_litr_flx_col(idg,NY,NX) 
+            write(121,*)'dribble litr             =',trcs_solml_drib_vr(idg,0,NY,NX)           
+            write(121,*)'net prod litr            =',trcs_netProd_lit_col(idg,NY,NX) 
+            write(121,*)'netflx2litr              =',trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+AtmGasDiff2Litr_flx_col(idg,NY,NX) &
+              +Gas_WetDepo2Litr_col(idg,NY,NX)-Gas_litr2Soil_flx_col(idg,NY,NX)+GasHydroLoss_litr_flx_col(idg,NY,NX)&
+              +trcs_netProd_lit_col(idg,NY,NX) 
+            write(121,*)'err in litr               =', trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+AtmGasDiff2Litr_flx_col(idg,NY,NX) &
               +Gas_WetDepo2Litr_col(idg,NY,NX)-Gas_litr2Soil_flx_col(idg,NY,NX)+GasHydroLoss_litr_flx_col(idg,NY,NX) &
-              -mass_litr+trcs_mass_litr_beg(idg,NY,NX) 
-
+              -mass_litr+trcs_mass_litr_beg(idg,NY,NX)+trcs_solml_drib_vr(idg,0,NY,NX)+trcs_netProd_lit_col(idg,NY,NX) 
+            write(121,*)'--------------------------'
             write(121,*)'nsnol_col                 =',nsnol_col(NY,NX)
             write(121,*)'err in snow               =',Gas_WetDepo2Snow_col(idg,NY,NX)-Gas_Snowloss_flx_col(idg,NY,NX)-mass_snow+trcs_mass_snow_beg(idg,NY,NX)
             write(121,*)'snow depo loss drift      =',Gas_WetDepo2Snow_col(idg,NY,NX),Gas_Snowloss_flx_col(idg,NY,NX),trcg_SnowDrift_flx_col(idg,NY,NX)
@@ -265,12 +255,12 @@ module TranspNoSaltMod
             write(121,*)'transp',NU_col(NY,NX),NL_col(NY,NX)
             write(121,*)transp_diff_slow_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX)
             write(121,*)'--------------------------'          
-            write(121,*)'err in soil               =',GasDiff2Soil_flx_col(idg,NY,NX) &
+            write(121,*)'err in soil               =',AtmGasDiff2Soil_flx_col(idg,NY,NX) &
               +Gas_WetDepo2Soil_col(idg,NY,nX)+Gas_litr2Soil_flx_col(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flx(idg,NY,NX) &
               -trcs_drainage_flx_col(idg,NY,NX)+trcs_SubsurTransp_flx_2DH(idg,NY,NX)+trcg_ebu_flx_col(idg,NY,NX) &
               + trcs_irrig_flx_col(idg,NY,NX)+RGasNetProdSoil_col(idg,NY,NX) &
               - mass_soil+trcs_mass_soil_beg(idg,NY,NX) 
-            write(121,*)'diff2soil                 =',GasDiff2Soil_flx_col(idg,NY,NX)
+            write(121,*)'diff2soil                 =',AtmGasDiff2Soil_flx_col(idg,NY,NX)
             write(121,*)'wetdep2soil               =',Gas_WetDepo2Soil_col(idg,NY,nX)
             write(121,*)'litr2soil                 =',Gas_litr2Soil_flx_col(idg,NY,NX)
             write(121,*)'sno2soil                  =',trcg_AquaADV_Snow2Soil_flx(idg,NY,NX) 
@@ -279,7 +269,11 @@ module TranspNoSaltMod
             write(121,*)'ebu                       =',trcg_ebu_flx_col(idg,NY,NX)
             write(121,*)'irrig.                    =',trcs_irrig_flx_col(idg,NY,NX)
             write(121,*)'netpro(incl uptk2plt)     =',RGasNetProdSoil_col(idg,NY,NX)
-            write(121,*)'drib                      =',trcs_solml_drib_soil_col(idg) !-trcs_solml_drib_soi_beg_col(idg,NY,NX)
+            write(121,*)'drib                      =',trcs_solml_drib_soil_col(idg) 
+            write(121,*)'tflx soil                 =',AtmGasDiff2Soil_flx_col(idg,NY,NX) &
+              +Gas_WetDepo2Soil_col(idg,NY,nX)+Gas_litr2Soil_flx_col(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flx(idg,NY,NX) &
+              -trcs_drainage_flx_col(idg,NY,NX)+trcs_SubsurTransp_flx_2DH(idg,NY,NX)+trcg_ebu_flx_col(idg,NY,NX) &
+              + trcs_irrig_flx_col(idg,NY,NX)+RGasNetProdSoil_col(idg,NY,NX)
             write(121,*)'------------------------'
             write(193,*)'tptgas',trcg_gasml_vr(idg,1:NL_col(NY,NX),NY,NX)
             write(193,*)'tptmic',trcs_solml_vr(idg,0:NL_col(NY,NX),NY,NX)

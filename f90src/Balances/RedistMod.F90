@@ -1456,7 +1456,7 @@ module RedistMod
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO NGL=JGniH(N),JGnfH(N)
           !litter layer
-          REcoO2DmndResp_vr(0,NY,NX)            = REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert(NGL,K,0,NY,NX)
+          REcoO2DmndResp_vr(0,NY,NX)            = REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert_vr(NGL,K,0,NY,NX)
           REcoNO3DmndSoil_vr(0,NY,NX)           = REcoNO3DmndSoil_vr(0,NY,NX)+RNO3ReduxDmndSoilHeter_vr(NGL,K,0,NY,NX)
           RNO2EcoUptkSoil_vr(0,NY,NX)           = RNO2EcoUptkSoil_vr(0,NY,NX)+RNO2DmndReduxSoilHeter_vr(NGL,K,0,NY,NX)
           RN2OEcoUptkSoil_vr(0,NY,NX)           = RN2OEcoUptkSoil_vr(0,NY,NX)+RN2ODmndReduxHeter_vr(NGL,K,0,NY,NX)
@@ -1507,7 +1507,7 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  REcoO2DmndResp_vr(L,NY,NX)  = REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndHetert(1:NumHetetr1MicCmplx,1:jcplx,L,NY,NX))
+  REcoO2DmndResp_vr(L,NY,NX)  = REcoO2DmndResp_vr(L,NY,NX)+SUM(RO2DmndHetert_vr(1:NumHetetr1MicCmplx,1:jcplx,L,NY,NX))
   REcoNH4DmndSoil_vr(L,NY,NX) = REcoNH4DmndSoil_vr(L,NY,NX)+SUM(RNH4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:jcplx,L,NY,NX))
   REcoNO3DmndSoil_vr(L,NY,NX) = REcoNO3DmndSoil_vr(L,NY,NX)+SUM(RNO3ReduxDmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:jcplx,L,NY,NX)) &
     +SUM(RNO3DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:jcplx,L,NY,NX))

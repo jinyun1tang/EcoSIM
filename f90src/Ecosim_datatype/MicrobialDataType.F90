@@ -11,7 +11,7 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable :: mBiomeHeter_vr(:,:,:,:,:,:)        !microbial biomass chemical element,	[g d-2]
-  real(r8),target,allocatable :: RO2DmndHetert(:,:,:,:,:)           !aqueous O2 demand,	[g d-2 h-1]
+  real(r8),target,allocatable :: RO2DmndHetert_vr(:,:,:,:,:)           !aqueous O2 demand,	[g d-2 h-1]
   real(r8),target,allocatable :: RDOCUptkHeter_vr(:,:,:,:,:)        !net microbial DOC flux,	[g d-2 h-1]
   real(r8),target,allocatable :: RAcetateUptkHeter_vr(:,:,:,:,:)    !net microbial acetate flux,	[g d-2 h-1]
   real(r8),target,allocatable :: RNH4DmndSoilHeter_vr(:,:,:,:,:)    !heterotrophic microbial NH4 demand in soil,	[g d-2 h-1]
@@ -52,7 +52,8 @@ implicit none
   real(r8),target,allocatable :: RH1PO4UptkBandAutor_vr(:,:,:,:)    !autotrophic microbial H1PO4 demand in band soil, [g d-2 h-1]
   real(r8),target,allocatable :: RH1PO4UptkLitrAutor_col(:,:,:)     !autotrophic microibal H1pO4 demand in surface litter, [g d-2 h-1]
   real(r8),target,allocatable :: OMEERauto_2D(:,:,:,:,:,:)             !autotrophic microbial biomass loss through erosion, [g d-2 h-1]
-
+  real(r8),target,allocatable :: tRespGrossHeter_vr(:,:,:)          !total gross respiraiton by heterotrophs, [g d-2 h-1]
+  real(r8),target,allocatable :: tRespGrossHeterUlm_vr(:,:,:)          !total oyxgen-unlimited gross respiraiton by heterotrophs, [g d-2 h-1]  
   private :: InitAllocate
 
   contains
@@ -69,7 +70,7 @@ implicit none
 
   implicit none
   allocate(mBiomeHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX));mBiomeHeter_vr=0._r8
-  allocate(RO2DmndHetert(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX)); RO2DmndHetert=0._r8
+  allocate(RO2DmndHetert_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX)); RO2DmndHetert_vr=0._r8
   allocate(RDOCUptkHeter_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX));RDOCUptkHeter_vr=0._r8
   allocate(RAcetateUptkHeter_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX));RAcetateUptkHeter_vr=0._r8
   allocate(RNH4DmndSoilHeter_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX));RNH4DmndSoilHeter_vr=0._r8
@@ -110,14 +111,19 @@ implicit none
   allocate(RH1PO4UptkBandAutor_vr(NumMicrobAutrophCmplx,0:JZ,JY,JX));RH1PO4UptkBandAutor_vr=0._r8
   allocate(RH1PO4UptkLitrAutor_col(NumMicrobAutrophCmplx,JY,JX));RH1PO4UptkLitrAutor_col=0._r8
   allocate(OMEERauto_2D(NumPlantChemElms,NumLiveAutoBioms,2,2,JV,JH));OMEERauto_2D=0._r8
+  allocate(tRespGrossHeterUlm_vr(0:JZ,JY,JX)); tRespGrossHeterUlm_vr=0._r8
+  allocate(tRespGrossHeter_vr(0:JZ,JY,JX)); tRespGrossHeter_vr=0._r8
+
   end subroutine InitAllocate
 !----------------------------------------------------------------------------------------------
 
   subroutine DestructMicrobialData
   implicit none
 
+  call destroy(tRespGrossHeter_vr)
+  call destroy(tRespGrossHeterUlm_vr)
   call destroy(mBiomeHeter_vr)
-  call destroy(RO2DmndHetert)
+  call destroy(RO2DmndHetert_vr)
   call destroy(RDOCUptkHeter_vr)
   call destroy(RAcetateUptkHeter_vr)
   call destroy(RNH4DmndSoilHeter_vr)

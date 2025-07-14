@@ -1095,7 +1095,9 @@ module Hour1Mod
   real(r8) :: TFACR
   real(r8) :: TFACA
   real(r8) :: TFACW
+  real(r8) :: tPBOT,tmp
   integer :: K,L,idg
+
 !     begin_execution
 !
 !     LITTER GAS CONCENTRATIOS
@@ -1106,13 +1108,16 @@ module Hour1Mod
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  trcg_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_O2,0,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_N2,0,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
+  tPBOT                          = PBOT_col(NY,NX)/1.01325E+02_r8
+  tmp = TREF/TKS_vr(0,NY,NX)*tPBOT
+  trcg_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
+  trcg_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
+  trcg_gascl_vr(idg_O2,0,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp
+  trcg_gascl_vr(idg_N2,0,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp
+  trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
+  trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
+  trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
+  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
 
 ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8

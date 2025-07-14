@@ -32,6 +32,7 @@ implicit none
   REAL(R8),target,allocatable ::  LOGPSIMND_col(:,:)                               !log water potential at saturation - log water potential at field capacity,[-]
   real(r8),target,allocatable ::  VHeatCapacitySoilM_vr(:,:,:)                 !soil solid heat capacity, [MPa m-3 K-1]
   real(r8),target,allocatable ::  ActiveLayDepZ_col(:,:)                       !active layer depth of a permafrost soil, [m]
+  real(r8),target,allocatable :: CondGasXSurf_col(:,:)                         !gas conductance for soil-atmosphere exchange, [m/h]
 !----------------------------------------------------------------------
 
 contains
@@ -63,12 +64,14 @@ contains
   allocate(LOGPSIMND_col(JY,JX));       LOGPSIMND_col=0._r8
   allocate(VHeatCapacitySoilM_vr(0:JZ,JY,JX));   VHeatCapacitySoilM_vr=0._r8
   allocate(ActiveLayDepZ_col(JY,JX));       ActiveLayDepZ_col=0._r8
+  allocate(CondGasXSurf_col(JY,JX)); CondGasXSurf_col=0._r8
   end subroutine InitSoilPhysData
 
 !----------------------------------------------------------------------
   subroutine DestructSoilPhysData
   use abortutils, only : destroy
   implicit none
+  call destroy(CondGasXSurf_col)
   call destroy(SLOPE_col)
   call destroy(FieldCapacity_vr)
   call destroy(WiltPoint_vr)

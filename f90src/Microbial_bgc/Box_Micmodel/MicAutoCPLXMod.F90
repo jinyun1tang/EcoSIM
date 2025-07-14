@@ -225,50 +225,50 @@ module MicAutoCPLXMod
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
   associate(                                               &
-    FracOMActAutor        => nmics%FracOMActAutor,         &
-    FracAutorBiomOfActK   => nmics%FracAutorBiomOfActK,    &
-    AttenfNH4Autor        => nmicf%AttenfNH4Autor,         &
-    AttenfNO3Autor        => nmicf%AttenfNO3Autor,         &
-    AttenfH1PO4Autor      => nmicf%AttenfH1PO4Autor,       &
-    AttenfH2PO4Autor      => nmicf%AttenfH2PO4Autor,       &
-    RO2EcoDmndPrev        => micfor%RO2EcoDmndPrev,        &
-    RNH4EcoDmndSoilPrev   => micfor%RNH4EcoDmndSoilPrev,   &
-    RNH4EcoDmndBandPrev   => micfor%RNH4EcoDmndBandPrev,   &
-    RNO3EcoDmndSoilPrev   => micfor%RNO3EcoDmndSoilPrev,   &
-    RNO3EcoDmndBandPrev   => micfor%RNO3EcoDmndBandPrev,   &
-    RH2PO4EcoDmndSoilPrev => micfor%RH2PO4EcoDmndSoilPrev, &
-    RH2PO4EcoDmndBandPrev => micfor%RH2PO4EcoDmndBandPrev, &
-    RH1PO4EcoDmndSoilPrev => micfor%RH1PO4EcoDmndSoilPrev, &
-    RH1PO4EcoDmndBandPrev => micfor%RH1PO4EcoDmndBandPrev, &
-    RNH4EcoDmndLitrPrev   => micfor%RNH4EcoDmndLitrPrev,   &
-    RNO3EcoDmndLitrPrev   => micfor%RNO3EcoDmndLitrPrev,   &
-    RH1PO4EcoDmndLitrPrev => micfor%RH1PO4EcoDmndLitrPrev, &
-    RH2PO4EcoDmndLitrPrev => micfor%RH2PO4EcoDmndLitrPrev, &
-    RDOMEcoDmndPrev       => micfor%RDOMEcoDmndPrev,       &
-    RAcetateEcoDmndPrev   => micfor%RAcetateEcoDmndPrev,   &
-    SoilMicPMassLayer0    => micfor%SoilMicPMassLayer0,    &
-    Lsurf                 => micfor%Lsurf,                 &
-    litrm                 => micfor%litrm,                 &
-    ZEROS                 => micfor%ZEROS,                 &
-    VLNO3                 => micfor%VLNO3,                 &
-    VLNOB                 => micfor%VLNOB,                 &
-    VLPO4                 => micfor%VLPO4,                 &
-    VLPOB                 => micfor%VLPOB,                 &
-    VLNHB                 => micfor%VLNHB,                 &
-    VLNH4                 => micfor%VLNH4,                 &
-    RH1PO4UptkLitrAutor   => micflx%RH1PO4UptkLitrAutor,   &
-    RH2PO4UptkLitrAutor   => micflx%RH2PO4UptkLitrAutor,   &
-    RNO3UptkLitrAutor     => micflx%RNO3UptkLitrAutor,     &
-    RNH4UptkLitrAutor     => micflx%RNH4UptkLitrAutor,     &
-    RH1PO4UptkBandAutor   => micflx%RH1PO4UptkBandAutor,   &
-    RH1PO4UptkSoilAutor   => micflx%RH1PO4UptkSoilAutor,   &
-    RH2PO4UptkBandAutor   => micflx%RH2PO4UptkBandAutor,   &
-    RH2PO4UptkSoilAutor   => micflx%RH2PO4UptkSoilAutor,   &
-    RNO3UptkBandAutor     => micflx%RNO3UptkBandAutor,     &
-    RNO3UptkSoilAutor     => micflx%RNO3UptkSoilAutor,     &
-    RNH4UptkBandAutor     => micflx%RNH4UptkBandAutor,     &
-    RNH4UptkSoilAutor     => micflx%RNH4UptkSoilAutor,     &
-    RO2DmndAutort         => micflx%RO2DmndAutort          &
+    FracOMActAutor          => nmics%FracOMActAutor,           &
+    FracAutorBiomOfActK     => nmics%FracAutorBiomOfActK,      &
+    AttenfNH4Autor          => nmicf%AttenfNH4Autor,           &
+    AttenfNO3Autor          => nmicf%AttenfNO3Autor,           &
+    AttenfH1PO4Autor        => nmicf%AttenfH1PO4Autor,         &
+    AttenfH2PO4Autor        => nmicf%AttenfH2PO4Autor,         &
+    RO2EcoDmndPrev          => micfor%RO2EcoDmndPrev,          &
+    RNH4EcoDmndSoilPrev     => micfor%RNH4EcoDmndSoilPrev,     &
+    RNH4EcoDmndBandPrev     => micfor%RNH4EcoDmndBandPrev,     &
+    RNO3EcoDmndSoilPrev     => micfor%RNO3EcoDmndSoilPrev,     &
+    RNO3EcoDmndBandPrev     => micfor%RNO3EcoDmndBandPrev,     &
+    RH2PO4EcoDmndSoilPrev   => micfor%RH2PO4EcoDmndSoilPrev,   &
+    RH2PO4EcoDmndBandPrev   => micfor%RH2PO4EcoDmndBandPrev,   &
+    RH1PO4EcoDmndSoilPrev   => micfor%RH1PO4EcoDmndSoilPrev,   &
+    RH1PO4EcoDmndBandPrev   => micfor%RH1PO4EcoDmndBandPrev,   &
+    RNH4EcoDmndLitrPrev     => micfor%RNH4EcoDmndLitrPrev,     &
+    RNO3EcoDmndLitrPrev     => micfor%RNO3EcoDmndLitrPrev,     &
+    RH1PO4EcoDmndLitrPrev   => micfor%RH1PO4EcoDmndLitrPrev,   &
+    RH2PO4EcoDmndLitrPrev   => micfor%RH2PO4EcoDmndLitrPrev,   &
+    RDOMEcoDmndPrev         => micfor%RDOMEcoDmndPrev,         &
+    RAcetateEcoDmndPrev     => micfor%RAcetateEcoDmndPrev,     &
+    SoilMicPMassLayer0      => micfor%SoilMicPMassLayer0,      &
+    Lsurf                   => micfor%Lsurf,                   &
+    litrm                   => micfor%litrm,                   &
+    ZEROS                   => micfor%ZEROS,                   &
+    VLNO3                   => micfor%VLNO3,                   &
+    VLNOB                   => micfor%VLNOB,                   &
+    VLPO4                   => micfor%VLPO4,                   &
+    VLPOB                   => micfor%VLPOB,                   &
+    VLNHB                   => micfor%VLNHB,                   &
+    VLNH4                   => micfor%VLNH4,                   &
+    RH1PO4UptkLitrAutorPrev => micflx%RH1PO4UptkLitrAutorPrev, &
+    RH2PO4UptkLitrAutorPrev => micflx%RH2PO4UptkLitrAutorPrev, &
+    RNO3UptkLitrAutorPrev   => micflx%RNO3UptkLitrAutorPrev,   &
+    RNH4UptkLitrAutorPrev   => micflx%RNH4UptkLitrAutorPrev,   &
+    RH1PO4UptkBandAutorPrev => micflx%RH1PO4UptkBandAutorPrev, &
+    RH1PO4UptkSoilAutorPrev => micflx%RH1PO4UptkSoilAutorPrev, &
+    RH2PO4UptkBandAutorPrev => micflx%RH2PO4UptkBandAutorPrev, &
+    RH2PO4UptkSoilAutorPrev => micflx%RH2PO4UptkSoilAutorPrev, &
+    RNO3UptkBandAutorPrev   => micflx%RNO3UptkBandAutorPrev,   &
+    RNO3UptkSoilAutorPrev   => micflx%RNO3UptkSoilAutorPrev,   &
+    RNH4UptkBandAutorPrev   => micflx%RNH4UptkBandAutorPrev,   &
+    RNH4UptkSoilAutorPrev   => micflx%RNH4UptkSoilAutorPrev,   &
+    RO2DmndAutortPrev       => micflx%RO2DmndAutortPrev        &
   )
 ! F*=fraction of substrate uptake relative to total uptake from
 ! previous hour. OXYX=O2, NH4X=NH4 non-band, NB4X=NH4 band
@@ -277,47 +277,47 @@ module MicAutoCPLXMod
 ! oxidation, OQA=acetate oxidation
 !
   IF(RO2EcoDmndPrev.GT.ZEROS)THEN
-    FOXYX=AMAX1(FMN,RO2DmndAutort(NGL)/RO2EcoDmndPrev)
+    FOXYX=AMAX1(FMN,RO2DmndAutortPrev(NGL)/RO2EcoDmndPrev)
   ELSE
     FOXYX=AMAX1(FMN,FracOMActAutor(NGL))
   ENDIF
   IF(RNH4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FNH4X=AMAX1(FMN,RNH4UptkSoilAutor(NGL)/RNH4EcoDmndSoilPrev)
+    FNH4X=AMAX1(FMN,RNH4UptkSoilAutorPrev(NGL)/RNH4EcoDmndSoilPrev)
   ELSE
     FNH4X=AMAX1(FMN,FracOMActAutor(NGL)*VLNH4)
   ENDIF
   IF(RNH4EcoDmndBandPrev.GT.ZEROS)THEN
-    FNB4X=AMAX1(FMN,RNH4UptkBandAutor(NGL)/RNH4EcoDmndBandPrev)
+    FNB4X=AMAX1(FMN,RNH4UptkBandAutorPrev(NGL)/RNH4EcoDmndBandPrev)
   ELSE
     FNB4X=AMAX1(FMN,FracOMActAutor(NGL)*VLNHB)
   ENDIF
   IF(RNO3EcoDmndSoilPrev.GT.ZEROS)THEN
-    FNO3X=AMAX1(FMN,RNO3UptkSoilAutor(NGL)/RNO3EcoDmndSoilPrev)
+    FNO3X=AMAX1(FMN,RNO3UptkSoilAutorPrev(NGL)/RNO3EcoDmndSoilPrev)
   ELSE
     FNO3X=AMAX1(FMN,FracOMActAutor(NGL)*VLNO3)
   ENDIF
   IF(RNO3EcoDmndBandPrev.GT.ZEROS)THEN
-    FNB3X=AMAX1(FMN,RNO3UptkBandAutor(NGL)/RNO3EcoDmndBandPrev)
+    FNB3X=AMAX1(FMN,RNO3UptkBandAutorPrev(NGL)/RNO3EcoDmndBandPrev)
   ELSE
     FNB3X=AMAX1(FMN,FracOMActAutor(NGL)*VLNOB)
   ENDIF
   IF(RH2PO4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FPO4X=AMAX1(FMN,RH2PO4UptkSoilAutor(NGL)/RH2PO4EcoDmndSoilPrev)
+    FPO4X=AMAX1(FMN,RH2PO4UptkSoilAutorPrev(NGL)/RH2PO4EcoDmndSoilPrev)
   ELSE
     FPO4X=AMAX1(FMN,FracOMActAutor(NGL)*VLPO4)
   ENDIF
   IF(RH2PO4EcoDmndBandPrev.GT.ZEROS)THEN
-    FPOBX=AMAX1(FMN,RH2PO4UptkBandAutor(NGL)/RH2PO4EcoDmndBandPrev)
+    FPOBX=AMAX1(FMN,RH2PO4UptkBandAutorPrev(NGL)/RH2PO4EcoDmndBandPrev)
   ELSE
     FPOBX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
   IF(RH1PO4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FP14X=AMAX1(FMN,RH1PO4UptkSoilAutor(NGL)/RH1PO4EcoDmndSoilPrev)
+    FP14X=AMAX1(FMN,RH1PO4UptkSoilAutorPrev(NGL)/RH1PO4EcoDmndSoilPrev)
   ELSE
     FP14X=AMAX1(FMN,FracOMActAutor(NGL)*VLPO4)
   ENDIF
   IF(RH1PO4EcoDmndBandPrev.GT.ZEROS)THEN
-    FP1BX=AMAX1(FMN,RH1PO4UptkBandAutor(NGL)/RH1PO4EcoDmndBandPrev)
+    FP1BX=AMAX1(FMN,RH1PO4UptkBandAutorPrev(NGL)/RH1PO4EcoDmndBandPrev)
   ELSE
     FP1BX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
@@ -339,22 +339,22 @@ module MicAutoCPLXMod
   !litter layer
   IF(litrm)THEN
     IF(RNH4EcoDmndLitrPrev.GT.ZEROS)THEN
-      AttenfNH4Autor(NGL)=AMAX1(FMN,RNH4UptkLitrAutor(NGL)/RNH4EcoDmndLitrPrev)
+      AttenfNH4Autor(NGL)=AMAX1(FMN,RNH4UptkLitrAutorPrev(NGL)/RNH4EcoDmndLitrPrev)
     ELSE
       AttenfNH4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
     IF(RNO3EcoDmndLitrPrev.GT.ZEROS)THEN
-      AttenfNO3Autor(NGL)=AMAX1(FMN,RNO3UptkLitrAutor(NGL)/RNO3EcoDmndLitrPrev)
+      AttenfNO3Autor(NGL)=AMAX1(FMN,RNO3UptkLitrAutorPrev(NGL)/RNO3EcoDmndLitrPrev)
     ELSE
       AttenfNO3Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
     IF(RH2PO4EcoDmndLitrPrev.GT.ZEROS)THEN
-      AttenfH2PO4Autor(NGL)=AMAX1(FMN,RH2PO4UptkLitrAutor(NGL)/RH2PO4EcoDmndLitrPrev)
+      AttenfH2PO4Autor(NGL)=AMAX1(FMN,RH2PO4UptkLitrAutorPrev(NGL)/RH2PO4EcoDmndLitrPrev)
     ELSE
       AttenfH2PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
     IF(RH1PO4EcoDmndLitrPrev.GT.ZEROS)THEN
-      AttenfH1PO4Autor(NGL)=AMAX1(FMN,RH1PO4UptkLitrAutor(NGL)/RH1PO4EcoDmndLitrPrev)
+      AttenfH1PO4Autor(NGL)=AMAX1(FMN,RH1PO4UptkLitrAutorPrev(NGL)/RH1PO4EcoDmndLitrPrev)
     ELSE
       AttenfH1PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
     ENDIF
@@ -820,29 +820,31 @@ module MicAutoCPLXMod
 
 !     begin_execution
   associate(                                              &
-    FracNO2ReduxAutor     => nmics%FracNO2ReduxAutor,     &
-    RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,     &
-    RO2Uptk4RespAutor     => nmicf%RO2Uptk4RespAutor,     &
-    RNO3UptkAutor         => nmicf%RNO3UptkAutor,         &
-    RNO2ReduxAutorSoil    => nmicf%RNO2ReduxAutorSoil,    &
-    RNO2ReduxAutorBand    => nmicf%RNO2ReduxAutorBand,    &
-    RNOxReduxRespAutorLim => nmicf%RNOxReduxRespAutorLim, &
-    RSOxidSoilAutor       => nmicf%RSOxidSoilAutor,       &
-    RSOxidBandAutor       => nmicf%RSOxidBandAutor,       &
-    RTotNH3OxidSoilAutor  => nmicf%RTotNH3OxidSoilAutor,  &
-    RTotNH3OxidBandAutor  => nmicf%RTotNH3OxidBandAutor,  &
-    RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev,  &
-    VLNO3                 => micfor%VLNO3,                &
-    VLNOB                 => micfor%VLNOB,                &
-    RNO2EcoUptkBandPrev   => micfor%RNO2EcoUptkBandPrev,  &
-    ZEROS                 => micfor%ZEROS,                &
-    ZEROS2                => micfor%ZEROS2,               &
-    CNO2B                 => micstt%CNO2B,                &
-    CNO2S                 => micstt%CNO2S,                &
-    ZNO2B                 => micstt%ZNO2B,                &
-    ZNO2S                 => micstt%ZNO2S,                &
-    RNO2OxidAutor         => micflx%RNO2OxidAutor,        &
-    RNO2OxidAutorBand     => micflx%RNO2OxidAutorBand     &
+    FracNO2ReduxAutor     => nmics%FracNO2ReduxAutor,      &
+    RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,      &
+    RO2Uptk4RespAutor     => nmicf%RO2Uptk4RespAutor,      &
+    RNO3UptkAutor         => nmicf%RNO3UptkAutor,          &
+    RNO2ReduxAutorSoil    => nmicf%RNO2ReduxAutorSoil,     &
+    RNO2ReduxAutorBand    => nmicf%RNO2ReduxAutorBand,     &
+    RNOxReduxRespAutorLim => nmicf%RNOxReduxRespAutorLim,  &
+    RSOxidSoilAutor       => nmicf%RSOxidSoilAutor,        &
+    RSOxidBandAutor       => nmicf%RSOxidBandAutor,        &
+    RTotNH3OxidSoilAutor  => nmicf%RTotNH3OxidSoilAutor,   &
+    RTotNH3OxidBandAutor  => nmicf%RTotNH3OxidBandAutor,   &
+    RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev,   &
+    VLNO3                 => micfor%VLNO3,                 &
+    VLNOB                 => micfor%VLNOB,                 &
+    RNO2EcoUptkBandPrev   => micfor%RNO2EcoUptkBandPrev,   &
+    ZEROS                 => micfor%ZEROS,                 &
+    ZEROS2                => micfor%ZEROS2,                &
+    CNO2B                 => micstt%CNO2B,                 &
+    CNO2S                 => micstt%CNO2S,                 &
+    ZNO2B                 => micstt%ZNO2B,                 &
+    ZNO2S                 => micstt%ZNO2S,                 &
+    RNO2OxidAutorPrev     => micflx%RNO2OxidAutorPrev,     &
+    RNO2OxidAutorBandPrev => micflx%RNO2OxidAutorBandPrev, &
+    RNO2OxidAutor         => micflx%RNO2OxidAutor,         &
+    RNO2OxidAutorBand     => micflx%RNO2OxidAutorBand      &
   )
 !
 !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
@@ -851,12 +853,12 @@ module MicAutoCPLXMod
 !     FNO2,FNB2=fraction of total biological demand for NO2
 !
   IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2EcoUptkSoilPrev)
+    FNO2=AMAX1(FMN,RNO2OxidAutorPrev(NGL)/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=AMAX1(FMN,FracNO2ReduxAutor(NGL)*VLNO3)
   ENDIF
   IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RNO2EcoUptkBandPrev)
+    FNB2=AMAX1(FMN,RNO2OxidAutorBandPrev(NGL)/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=AMAX1(FMN,FracNO2ReduxAutor(NGL)*VLNOB)
   ENDIF
@@ -946,29 +948,31 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
 
 !     begin_execution
-  associate(                                            &
-    GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
-    FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
-    FSBSTAutor           => nmicdiag%FSBSTAutor       , &        
-    FracOMActAutor       => nmics%FracOMActAutor,       &
-    OMActAutor           => nmics%OMActAutor,           &
-    RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
-    RO2DmndAutor         => nmicf%RO2DmndAutor,         &
-    VLNH4                => micfor%VLNH4,               &
-    VLNHB                => micfor%VLNHB,               &
-    ZEROS                => micfor%ZEROS,               &
-    ZEROS2               => micfor%ZEROS2,              &
-    RNH4EcoDmndSoilPrev  => micfor%RNH4EcoDmndSoilPrev, &
-    RNH4EcoDmndBandPrev  => micfor%RNH4EcoDmndBandPrev, &
-    ZNFN0                => micstt%ZNFN0,               &
-    ZNFNI                => micstt%ZNFNI,               &
-    CNH4S                => micstt%CNH4S,               &
-    CNH4B                => micstt%CNH4B,               &
-    ZNH4S                => micstt%ZNH4S,               &
-    ZNH4B                => micstt%ZNH4B,               &
-    RNH3OxidAutor        => micflx%RNH3OxidAutor,       &
-    RNH3OxidAutorBand    => micflx%RNH3OxidAutorBand,   &
-    RO2DmndAutort        => micflx%RO2DmndAutort        &
+  associate(                                               &
+    GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &
+    FBiomStoiScalarAutor  => nmics%FBiomStoiScalarAutor,   &
+    FSBSTAutor            => nmicdiag%FSBSTAutor,          &
+    FracOMActAutor        => nmics%FracOMActAutor,         &
+    OMActAutor            => nmics%OMActAutor,             &
+    RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,      &
+    RO2DmndAutor          => nmicf%RO2DmndAutor,           &
+    VLNH4                 => micfor%VLNH4,                 &
+    VLNHB                 => micfor%VLNHB,                 &
+    ZEROS                 => micfor%ZEROS,                 &
+    ZEROS2                => micfor%ZEROS2,                &
+    RNH4EcoDmndSoilPrev   => micfor%RNH4EcoDmndSoilPrev,   &
+    RNH4EcoDmndBandPrev   => micfor%RNH4EcoDmndBandPrev,   &
+    ZNFN0                 => micstt%ZNFN0,                 &
+    ZNFNI                 => micstt%ZNFNI,                 &
+    CNH4S                 => micstt%CNH4S,                 &
+    CNH4B                 => micstt%CNH4B,                 &
+    ZNH4S                 => micstt%ZNH4S,                 &
+    ZNH4B                 => micstt%ZNH4B,                 &
+    RNH3OxidAutorPrev     => micflx%RNH3OxidAutorPrev,     &
+    RNH3OxidAutorBandPrev => micflx%RNH3OxidAutorBandPrev, &
+    RNH3OxidAutor         => micflx%RNH3OxidAutor,         &
+    RNH3OxidAutorBand     => micflx%RNH3OxidAutorBand,     &
+    RO2DmndAutort         => micflx%RO2DmndAutort          &
   )
 !
 !     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
@@ -979,12 +983,12 @@ module MicAutoCPLXMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   IF(RNH4EcoDmndSoilPrev.GT.ZEROS)THEN
-    FNH4=AMAX1(FMN,RNH3OxidAutor(NGL)/RNH4EcoDmndSoilPrev)
+    FNH4=AMAX1(FMN,RNH3OxidAutorPrev(NGL)/RNH4EcoDmndSoilPrev)
   ELSE
     FNH4=AMAX1(FMN,VLNH4*FracOMActAutor(NGL))
   ENDIF
   IF(RNH4EcoDmndBandPrev.GT.ZEROS)THEN
-    FNB4=AMAX1(FMN,RNH3OxidAutorBand(NGL)/RNH4EcoDmndBandPrev)
+    FNB4=AMAX1(FMN,RNH3OxidAutorBandPrev(NGL)/RNH4EcoDmndBandPrev)
   ELSE
     FNB4=AMAX1(FMN,VLNHB*FracOMActAutor(NGL))
   ENDIF
@@ -1090,28 +1094,30 @@ module MicAutoCPLXMod
   real(r8) :: VMXA
 
 !     begin_execution
-  associate(                                            &
-    GrowthEnvScalAutor   => nmics%GrowthEnvScalAutor,   &
-    FBiomStoiScalarAutor => nmics%FBiomStoiScalarAutor, &
-    FSBSTAutor           => nmicdiag%FSBSTAutor       , &        
-    FracNO2ReduxAutor    => nmics%FracNO2ReduxAutor,    &
-    OMActAutor           => nmics%OMActAutor,           &
-    RO2Dmnd4RespAutor    => nmicf%RO2Dmnd4RespAutor,    &
-    RO2DmndAutor         => nmicf%RO2DmndAutor,         &
-    VLNH4                => micfor%VLNH4,               &
-    VLNHB                => micfor%VLNHB,               &
-    VLNO3                => micfor%VLNO3,               &
-    VLNOB                => micfor%VLNOB,               &
-    ZEROS                => micfor%ZEROS,               &
-    RNO2EcoUptkSoilPrev  => micfor%RNO2EcoUptkSoilPrev, &
-    RNO2EcoUptkBandPrev  => micfor%RNO2EcoUptkBandPrev, &
-    CNO2S                => micstt%CNO2S,               &
-    CNO2B                => micstt%CNO2B,               &
-    ZNO2S                => micstt%ZNO2S,               &
-    ZNO2B                => micstt%ZNO2B,               &
-    RNO2OxidAutor        => micflx%RNO2OxidAutor,       &
-    RNO2OxidAutorBand    => micflx%RNO2OxidAutorBand,   &
-    RO2DmndAutort        => micflx%RO2DmndAutort        &
+  associate(                                               &
+    GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &
+    FBiomStoiScalarAutor  => nmics%FBiomStoiScalarAutor,   &
+    FSBSTAutor            => nmicdiag%FSBSTAutor,          &
+    FracNO2ReduxAutor     => nmics%FracNO2ReduxAutor,      &
+    OMActAutor            => nmics%OMActAutor,             &
+    RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,      &
+    RO2DmndAutor          => nmicf%RO2DmndAutor,           &
+    VLNH4                 => micfor%VLNH4,                 &
+    VLNHB                 => micfor%VLNHB,                 &
+    VLNO3                 => micfor%VLNO3,                 &
+    VLNOB                 => micfor%VLNOB,                 &
+    ZEROS                 => micfor%ZEROS,                 &
+    RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev,   &
+    RNO2EcoUptkBandPrev   => micfor%RNO2EcoUptkBandPrev,   &
+    CNO2S                 => micstt%CNO2S,                 &
+    CNO2B                 => micstt%CNO2B,                 &
+    ZNO2S                 => micstt%ZNO2S,                 &
+    ZNO2B                 => micstt%ZNO2B,                 &
+    RNO2OxidAutorPrev     => micflx%RNO2OxidAutorPrev,     &
+    RNO2OxidAutorBandPrev => micflx%RNO2OxidAutorBandPrev, &
+    RNO2OxidAutor         => micflx%RNO2OxidAutor,         &
+    RNO2OxidAutorBand     => micflx%RNO2OxidAutorBand,     &
+    RO2DmndAutort         => micflx%RO2DmndAutort          &
   )
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 !     MICROBIAL POPULATIONS
@@ -1121,12 +1127,12 @@ module MicAutoCPLXMod
   FNH4S=VLNH4
   FNHBS=VLNHB
   IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
-    FNO2=AMAX1(FMN,RNO2OxidAutor(NGL)/RNO2EcoUptkSoilPrev)
+    FNO2=AMAX1(FMN,RNO2OxidAutorPrev(NGL)/RNO2EcoUptkSoilPrev)
   ELSE
     FNO2=AMAX1(FMN,FracNO2ReduxAutor(NGL)*VLNO3)
   ENDIF
   IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
-    FNB2=AMAX1(FMN,RNO2OxidAutorBand(NGL)/RNO2EcoUptkBandPrev)
+    FNB2=AMAX1(FMN,RNO2OxidAutorBandPrev(NGL)/RNO2EcoUptkBandPrev)
   ELSE
     FNB2=AMAX1(FMN,FracNO2ReduxAutor(NGL)*VLNOB)
   ENDIF

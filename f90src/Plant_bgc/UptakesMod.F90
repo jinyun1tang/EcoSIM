@@ -440,7 +440,7 @@ module UptakesMod
     FracPRoot4Uptake_pvr,MinFracPRoot4Uptake_pvr,FracPrimRootOccupiedLay_pvr,RootArea2RadiusRatio_vr)
   !
   ! Description:
-  ! Update root characterization
+  ! Update root characterization for pft NZ
   !
   implicit none
   integer , intent(in) :: NZ
@@ -478,52 +478,59 @@ module UptakesMod
     ZEROS                   => plt_site%ZEROS                      & !input  :threshold zero for numerical stability,[-]
   )
   if(ldo_sp_mode)then
+    !no mycorrhizae considered for prescribed phenology mode
+    N=ipltroot
+    DO  L=NU,MaxSoiL4Root_pft(NZ)
+      FracPrimRootOccupiedLay_pvr(L,NZ)=1.0_r8
+    ENDDO      
   else
-    D2000: DO N=1,Myco_pft(NZ)
+    DO  L=NU,MaxSoiL4Root_pft(NZ)
+      !obtain plant rooting depth
+      RootDepZ=0.0_r8
+      D2005: DO NR=1,NumRootAxes_pft(NZ)
+        RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
+      ENDDO D2005
 
-      DO  L=NU,MaxSoiL4Root_pft(NZ)
-        IF(N.EQ.ipltroot)THEN
-          !obtain plant rooting depth
-          RootDepZ=0.0_r8
-          D2005: DO NR=1,NumRootAxes_pft(NZ)
-            RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
-          ENDDO D2005
-
-          IF(L.EQ.NU)THEN
-            FracPrimRootOccupiedLay_pvr(L,NZ)=1.0_r8
-          ELSE
-            IF(DLYR3(L).GT.ZERO)THEN
-              RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
-              RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
-              FracPrimRootOccupiedLay_pvr(L,NZ) = RTDPX/DLYR3(L)
-            ELSE
-              FracPrimRootOccupiedLay_pvr(L,NZ)=0.0_r8
-            ENDIF
-          ENDIF
-        ENDIF
-
-        IF(AllRootC_vr(L).GT.ZEROS)THEN
-          FracPRoot4Uptake_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)/AllRootC_vr(L)
+      IF(L.EQ.NU)THEN
+        FracPrimRootOccupiedLay_pvr(L,NZ)=1.0_r8
+      ELSE
+        IF(DLYR3(L).GT.ZERO)THEN
+          RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1))
+          RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
+          FracPrimRootOccupiedLay_pvr(L,NZ) = RTDPX/DLYR3(L)
         ELSE
-          FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
+          FracPrimRootOccupiedLay_pvr(L,NZ)=0.0_r8
         ENDIF
-        MinFracPRoot4Uptake_pvr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ))
-        
-        IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracPrimRootOccupiedLay_pvr(L,NZ).GT.ZERO)THEN
-          FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
-            /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
+      ENDIF
+    ENDDO
+  endif
 
-          PathLen_pvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L) &
-            ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
-          RootArea2RadiusRatio_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ)
-        ELSE
-          FineRootRadius_rvr(N,L)      = Root2ndMaxRadius_pft(N,NZ)
-          PathLen_pvr(N,L)             = 1.001_r8*FineRootRadius_rvr(N,L)
-          RootArea2RadiusRatio_vr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
-        ENDIF
-      enddo
-    ENDDO D2000
-  ENDIF
+  D2000: DO N=1,Myco_pft(NZ)
+
+    DO  L=NU,MaxSoiL4Root_pft(NZ)
+
+      IF(AllRootC_vr(L).GT.ZEROS)THEN
+        FracPRoot4Uptake_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)/AllRootC_vr(L)
+      ELSE
+        FracPRoot4Uptake_pvr(N,L,NZ)=1.0_r8
+      ENDIF
+      MinFracPRoot4Uptake_pvr(N,L,NZ)=AMAX1(FMN,FracPRoot4Uptake_pvr(N,L,NZ))
+      
+      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracPrimRootOccupiedLay_pvr(L,NZ).GT.ZERO)THEN
+        FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
+          /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
+
+        PathLen_pvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L) &
+          ,1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
+        RootArea2RadiusRatio_vr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracPrimRootOccupiedLay_pvr(L,NZ)
+      ELSE
+        FineRootRadius_rvr(N,L)      = Root2ndMaxRadius_pft(N,NZ)
+        PathLen_pvr(N,L)             = 1.001_r8*FineRootRadius_rvr(N,L)
+        RootArea2RadiusRatio_vr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
+      ENDIF
+    enddo
+  ENDDO D2000
+
   end associate
   end subroutine UpdateRootProperty
 
@@ -592,7 +599,7 @@ module UptakesMod
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
-      CCPOLT                        = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ)&
+      CCPOLT                        = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
         +CanopyNonstElmConc_pft(ielmp,NZ)
 
       CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ), &
@@ -1298,7 +1305,7 @@ module UptakesMod
   real(r8) :: CCPOLT,CanopyMassC
   real(r8) :: OSWT
   integer :: N,L
-  associate(                                                      &
+  associate(                                                          &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
     CanopyStalkC_pft          => plt_biom%CanopyStalkC_pft           ,& !input  :canopy active stalk C, [g d-2]

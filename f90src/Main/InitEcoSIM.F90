@@ -26,7 +26,9 @@ module InitEcoSIM
   use UnitMod,          only: units
   use TranspNoSaltMod,  only: InitTranspNoSalt
   use PlantInfoMod,     only: ReadPlantTraitTable
+  use MicBGCAPI,        only: MicAPI_Init
   use GridConsts
+
   implicit  none
 
   integer   , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
@@ -53,6 +55,8 @@ module InitEcoSIM
   call InitTranspNoSalt
 
   call hist_ecosim%Init(bounds)
+
+  call MicAPI_Init
 
   end subroutine InitModules
 

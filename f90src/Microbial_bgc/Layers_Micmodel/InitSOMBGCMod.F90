@@ -357,7 +357,7 @@ module InitSOMBGCMOD
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !
 
-  RO2DmndHetert(:,:,L,NY,NX)             = 0.0_r8
+  RO2DmndHetert_vr(:,:,L,NY,NX)             = 0.0_r8
   RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
   RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
   RN2ODmndReduxHeter_vr(:,:,L,NY,NX)     = 0.0_r8

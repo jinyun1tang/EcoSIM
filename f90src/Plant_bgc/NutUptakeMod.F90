@@ -388,19 +388,19 @@ module NutUptakeMod
   real(r8) :: FPO4X,FPOBX
   real(r8) :: POSGX
   real(r8) :: PATHL
-  associate(                                                      &
-    TortMicPM_vr             => plt_site%TortMicPM_vr              ,& !input  :micropore soil tortuosity, [m3 m-3]
-    ZEROS                    => plt_site%ZEROS                     ,& !input  :threshold zero for numerical stability,[-]
-    ZERO2                    => plt_site%ZERO2                     ,& !input  :threshold zero for numerical stability,[-]
-    RootH1PO4DmndBand_pvr    => plt_rbgc%RootH1PO4DmndBand_pvr     ,& !input  :HPO4 demand in band by each root population, [g d-2 h-1]
-    RootH1PO4DmndSoil_pvr    => plt_rbgc%RootH1PO4DmndSoil_pvr     ,& !input  :HPO4 demand in non-band by each root population, [g d-2 h-1]
-    RootH2PO4DmndSoil_pvr    => plt_rbgc%RootH2PO4DmndSoil_pvr     ,& !input  :root uptake of H2PO4 non-band, [g d-2 h-1]
-    RootH2PO4DmndBand_pvr    => plt_rbgc%RootH2PO4DmndBand_pvr     ,& !input  :root uptake of H2PO4 band, [g d-2 h-1]
-    SoluteDifusvty_vr        => plt_soilchem%SoluteDifusvty_vr     ,& !input  :aqueous diffusivity, [m2 h-1]
-    RH1PO4EcoDmndBandPrev_vr => plt_bgcr%RH1PO4EcoDmndBandPrev_vr  ,& !input  :HPO4 demand in band by all microbial, root, myco populations, [gP d-2 h-1]
-    RH2PO4EcoDmndBandPrev_vr => plt_bgcr%RH2PO4EcoDmndBandPrev_vr  ,& !input  :total root + microbial PO4 uptake band, [gP d-2 h-1]
-    RH1PO4EcoDmndSoilPrev_vr => plt_bgcr%RH1PO4EcoDmndSoilPrev_vr  ,& !input  :HPO4 demand in non-band by all microbial, root, myco populations, [gP d-2 h-1]
-    RH2PO4EcoDmndSoilPrev_vr => plt_bgcr%RH2PO4EcoDmndSoilPrev_vr   & !input  :total root + microbial PO4 uptake non-band, [gP d-2 h-1]
+  associate(                                                            &
+    TortMicPM_vr                 => plt_site%TortMicPM_vr              ,& !input  :micropore soil tortuosity, [m3 m-3]
+    ZEROS                        => plt_site%ZEROS                     ,& !input  :threshold zero for numerical stability,[-]
+    ZERO2                        => plt_site%ZERO2                     ,& !input  :threshold zero for numerical stability,[-]
+    RootH1PO4DmndBandPrev_pvr    => plt_rbgc%RootH1PO4DmndBandPrev_pvr ,& !input  :HPO4 demand in band by each root population, [g d-2 h-1]
+    RootH1PO4DmndSoilPrev_pvr    => plt_rbgc%RootH1PO4DmndSoilPrev_pvr ,& !input  :HPO4 demand in non-band by each root population, [g d-2 h-1]
+    RootH2PO4DmndSoilPrev_pvr    => plt_rbgc%RootH2PO4DmndSoilPrev_pvr ,& !input  :root uptake of H2PO4 non-band, [g d-2 h-1]
+    RootH2PO4DmndBandPrev_pvr    => plt_rbgc%RootH2PO4DmndBandPrev_pvr ,& !input  :root uptake of H2PO4 band, [g d-2 h-1]
+    SoluteDifusvty_vr            => plt_soilchem%SoluteDifusvty_vr     ,& !input  :aqueous diffusivity, [m2 h-1]
+    RH1PO4EcoDmndBandPrev_vr     => plt_bgcr%RH1PO4EcoDmndBandPrev_vr  ,& !input  :HPO4 demand in band by all microbial, root, myco populations, [gP d-2 h-1]
+    RH2PO4EcoDmndBandPrev_vr     => plt_bgcr%RH2PO4EcoDmndBandPrev_vr  ,& !input  :total root + microbial PO4 uptake band, [gP d-2 h-1]
+    RH1PO4EcoDmndSoilPrev_vr     => plt_bgcr%RH1PO4EcoDmndSoilPrev_vr  ,& !input  :HPO4 demand in non-band by all microbial, root, myco populations, [gP d-2 h-1]
+    RH2PO4EcoDmndSoilPrev_vr     => plt_bgcr%RH2PO4EcoDmndSoilPrev_vr   & !input  :total root + microbial PO4 uptake non-band, [gP d-2 h-1]
   )
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
@@ -409,22 +409,22 @@ module NutUptakeMod
 
 !     begin_execution
   IF(RH2PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FPO4X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH2PO4DmndSoil_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
+    FPO4X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH2PO4DmndSoilPrev_pvr(N,L,NZ)/RH2PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FPO4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH2PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FPOBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH2PO4DmndBand_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
+    FPOBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH2PO4DmndBandPrev_pvr(N,L,NZ)/RH2PO4EcoDmndBandPrev_vr(L))
   ELSE
     FPOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FP14X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH1PO4DmndSoil_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
+    FP14X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH1PO4DmndSoilPrev_pvr(N,L,NZ)/RH1PO4EcoDmndSoilPrev_vr(L))
   ELSE
     FP14X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RH1PO4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FP1BX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH1PO4DmndBand_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
+    FP1BX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootH1PO4DmndBandPrev_pvr(N,L,NZ)/RH1PO4EcoDmndBandPrev_vr(L))
   ELSE
     FP1BX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1166,17 +1166,17 @@ module NutUptakeMod
   real(r8) :: TFNH4X,TFNO3X,TFNHBX,TFNOBX
 
 !     begin_execution
-  associate(                                                    &
-    ZERO2                  => plt_site%ZERO2                   ,& !input  :threshold zero for numerical stability,[-]
-    ZEROS                  => plt_site%ZEROS                   ,& !input  :threshold zero for numerical stability,[-]
-    RootNO3DmndBand_pvr    => plt_rbgc%RootNO3DmndBand_pvr     ,& !input  :root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
-    RootNH4DmndSoil_pvr    => plt_rbgc%RootNH4DmndSoil_pvr     ,& !input  :root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
-    RootNH4DmndBand_pvr    => plt_rbgc%RootNH4DmndBand_pvr     ,& !input  :root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
-    RootNO3DmndSoil_pvr    => plt_rbgc%RootNO3DmndSoil_pvr     ,& !input  :root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
-    RNO3EcoDmndSoilPrev_vr => plt_bgcr%RNO3EcoDmndSoilPrev_vr  ,& !input  :total root + microbial NO3 uptake non-band, [gN d-2 h-1]
-    RNH4EcoDmndBandPrev_vr => plt_bgcr%RNH4EcoDmndBandPrev_vr  ,& !input  :total root + microbial NH4 uptake band, [gN d-2 h-1]
-    RNH4EcoDmndSoilPrev_vr => plt_bgcr%RNH4EcoDmndSoilPrev_vr  ,& !input  :total root + microbial NH4 uptake non-band, [gN d-2 h-1]
-    RNO3EcoDmndBandPrev_vr => plt_bgcr%RNO3EcoDmndBandPrev_vr   & !input  :total root + microbial NO3 uptake band, [gN d-2 h-1]
+  associate(                                                            &
+    ZERO2                      => plt_site%ZERO2                       ,& !input  :threshold zero for numerical stability,[-]
+    ZEROS                      => plt_site%ZEROS                       ,& !input  :threshold zero for numerical stability,[-]
+    RootNO3DmndBandPrev_pvr    => plt_rbgc%RootNO3DmndBandPrev_pvr     ,& !input  :root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
+    RootNH4DmndSoilPrev_pvr    => plt_rbgc%RootNH4DmndSoilPrev_pvr     ,& !input  :root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
+    RootNH4DmndBandPrev_pvr    => plt_rbgc%RootNH4DmndBandPrev_pvr     ,& !input  :root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
+    RootNO3DmndSoilPrev_pvr    => plt_rbgc%RootNO3DmndSoilPrev_pvr     ,& !input  :root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
+    RNO3EcoDmndSoilPrev_vr     => plt_bgcr%RNO3EcoDmndSoilPrev_vr      ,& !input  :total root + microbial NO3 uptake non-band, [gN d-2 h-1]
+    RNH4EcoDmndBandPrev_vr     => plt_bgcr%RNH4EcoDmndBandPrev_vr      ,& !input  :total root + microbial NH4 uptake band, [gN d-2 h-1]
+    RNH4EcoDmndSoilPrev_vr     => plt_bgcr%RNH4EcoDmndSoilPrev_vr      ,& !input  :total root + microbial NH4 uptake non-band, [gN d-2 h-1]
+    RNO3EcoDmndBandPrev_vr     => plt_bgcr%RNO3EcoDmndBandPrev_vr       & !input  :total root + microbial NO3 uptake band, [gN d-2 h-1]
   )
   TFNH4X=0.0_r8
   TFNHBX=0.0_r8
@@ -1184,23 +1184,23 @@ module NutUptakeMod
   TFNOBX=0.0_r8
 
   IF(RNH4EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNH4X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNH4DmndSoil_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
+    FNH4X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNH4DmndSoilPrev_pvr(N,L,NZ)/RNH4EcoDmndSoilPrev_vr(L))
   ELSE
     FNH4X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNH4EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNHBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNH4DmndBand_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
+    FNHBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNH4DmndBandPrev_pvr(N,L,NZ)/RNH4EcoDmndBandPrev_vr(L))
   ELSE
     FNHBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
 
   IF(RNO3EcoDmndSoilPrev_vr(L).GT.ZEROS)THEN
-    FNO3X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNO3DmndSoil_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
+    FNO3X=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNO3DmndSoilPrev_pvr(N,L,NZ)/RNO3EcoDmndSoilPrev_vr(L))
   ELSE
     FNO3X=FracPRoot4Uptake(N,L,NZ)
   ENDIF
   IF(RNO3EcoDmndBandPrev_vr(L).GT.ZEROS)THEN
-    FNOBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNO3DmndBand_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
+    FNOBX=AMAX1(MinFracPRoot4Uptake_pvr(N,L,NZ),RootNO3DmndBandPrev_pvr(N,L,NZ)/RNO3EcoDmndBandPrev_vr(L))
   ELSE
     FNOBX=FracPRoot4Uptake(N,L,NZ)
   ENDIF
@@ -1452,7 +1452,8 @@ module NutUptakeMod
     RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft     ,& !inoput :total root uptake of PO4, [g d-2 h-1]
     RootNH4Uptake_pft      => plt_rbgc%RootNH4Uptake_pft       ,& !inoput :total root uptake of NH4, [g d-2 h-1]
     RootNO3Uptake_pft      => plt_rbgc%RootNO3Uptake_pft       ,& !inoput :total root uptake of NO3, [g d-2 h-1]
-    DOM_MicP_vr            => plt_soilchem%DOM_MicP_vr          & !inoput :dissolved organic C micropore, [gC d-2]
+    DOM_MicP_vr            => plt_soilchem%DOM_MicP_vr         ,& !inoput :dissolved organic matter in micropore, [g d-2]
+    DOM_MicP_drib_vr       => plt_soilchem%DOM_MicP_drib_vr     & !inoput :dribbling flux for micropore dom,[g d-2]
   )
   !
   !     TOTAL C,N,P EXCHANGE BETWEEN ROOTS AND SOIL
@@ -1475,14 +1476,7 @@ module NutUptakeMod
         ENDDO
         if(any(DOM_uptk/=0._r8))then
           DO NE=1,NumPlantChemElms
-            if(DOM_uptk(NE)>DOM_MicP_vr(NE,K,L))then
-              scal=DOM_uptk(NE)/DOM_MicP_vr(NE,K,L)
-              DO N=1,Myco_pft(NZ)
-                RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ)*scal
-              ENDDO
-              DOM_uptk(NE)=DOM_uptk(NE)*scal
-            endif
-            DOM_MicP_vr(NE,K,L)=DOM_MicP_vr(NE,K,L)-DOM_uptk(NE)
+            call SubstrateDribbling(DOM_uptk(NE),DOM_MicP_drib_vr(NE,K,L),DOM_MicP_vr(NE,K,L))            
           ENDDO
 
           DO NE=1,NumPlantChemElms

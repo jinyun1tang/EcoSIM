@@ -92,11 +92,6 @@ module SoilBGCNLayMod
 
         IF(OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FracLitrMix=FOSCZ0/OMLitrC_vr(L,NY,NX)*TMicHeterActivity_vr(L,NY,NX)
-!          if(ActD>0._r8)then
-!            FracLitrMix=AMIN1(1.0_r8,FracLitrMix*ActD/DOC_s)
-!          elseif(actD<0._r8)then
-!            FracLitrMix=AMIN1(1.0_r8,FracLitrMix*ActD/DOC_u)
-!          endif
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
@@ -199,11 +194,11 @@ module SoilBGCNLayMod
         OQMHXS = FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
         OHMXS  = FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
 
-        DOM_MicP_vr(NE,K,L,NY,NX)      = DOM_MicP_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MicP_vr(NE,K,L,NY,NX) = DOM_MicP_vr(NE,K,L,NY,NX)-OQMXS
         DOM_MacP_vr(NE,K,L,NY,NX) = DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
         SorbedOM_vr(NE,K,L,NY,NX) = SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
 
-        DOM_MicP_vr(NE,K,LL,NY,NX)      = DOM_MicP_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MicP_vr(NE,K,LL,NY,NX) = DOM_MicP_vr(NE,K,LL,NY,NX)+OQMXS
         DOM_MacP_vr(NE,K,LL,NY,NX) = DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
         SorbedOM_vr(NE,K,LL,NY,NX) = SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
       ENDDO
