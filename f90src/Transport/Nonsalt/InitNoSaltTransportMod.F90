@@ -208,11 +208,15 @@ module InitNoSaltTransportMod
         trcs_solml_drib_vr(idg,0,NY,NX)=0._r8
       enddo
 
+      idg=idg_NH3
       if(TRProd_chem_sol_NH3_soil_vr(0,NY,NX)>0._r8)then
-        RBGCSrcSoluteM_vr(idg_NH3,0,NY,NX)   = TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP      
+        RBGCSrcSoluteM_vr(idg,0,NY,NX)   = TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP      
       else      
-        RBGCSinkSoluteM_vr(idg_NH3,0,NY,NX)   = -TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
+        RBGCSinkSoluteM_vr(idg,0,NY,NX)   = -TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
       endif
+      
+      RBGCSinkGasMM_vr(idg,0,NY,NX) = RBGCSinkGasMM_vr(idg,0,NY,NX)+trcs_solml_drib_vr(idg,0,NY,NX)*dts_gas        
+      trcs_solml_drib_vr(idg,0,NY,NX)=0._r8
 
       DO ids=ids_nut_beg,ids_nuts_end    
         if(RNut_MicbRelease_vr(ids,0,NY,NX)>0._r8)then
@@ -461,7 +465,7 @@ module InitNoSaltTransportMod
         ENDDO        
 
         DO ids=ids_beg,ids_end
-          trcs_Soil2plant_uptake_col(ids,NY,NY)=trcs_Soil2plant_uptake_col(ids,NY,NY)+ trcs_Soil2plant_uptake_vr(ids,L,NY,NX)          
+          trcs_Soil2plant_uptake_col(ids,NY,NX)=trcs_Soil2plant_uptake_col(ids,NY,NX)+ trcs_Soil2plant_uptake_vr(ids,L,NY,NX)          
         ENDDO
         !
         !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION

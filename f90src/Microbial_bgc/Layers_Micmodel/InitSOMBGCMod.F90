@@ -250,8 +250,8 @@ module InitSOMBGCMOD
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !     rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-!  The reason that initialization of complex 5 microbes is repated for each
-! complex is because complex 5 is shared by the other complexes
+!     The reason that initialization of complex-5 microbes is repated for each
+!     complex is because complex 5 is shared by all the other complexes
     mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGrupsPerCmplx
@@ -734,6 +734,8 @@ module InitSOMBGCMOD
 !------------------------------------------------------------------------------------------
 
   subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+  !
+  !seeding microbes added through litterfall
   implicit none
   integer, intent(in) :: I,J,K
   integer, intent(in) :: NY,NX
@@ -742,14 +744,14 @@ module InitSOMBGCMOD
   integer :: M,N,NGL,MID,NE,NN
   real(r8) :: FOSCI,FOSNI,FOSPI,tglds
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8), parameter :: scal=0.5_r8  
-  associate(                                               &
-    rNCOMC_ave               => micpar%rNCOMC_ave,               &
-    rPCOMC_ave               => micpar%rPCOMC_ave,               &
-    nlbiomcp              => micpar%nlbiomcp,              &
-    OMCI                  => micpar%OMCI,                  &    
-    OMCF                  => micpar%OMCF,                  &
-    OMCA                  => micpar%OMCA                   &
+  real(r8), parameter :: scal=0.05_r8    !scalar for incoming microbial biomass associated with litterfall.
+  associate(                         &
+    rNCOMC_ave => micpar%rNCOMC_ave, &
+    rPCOMC_ave => micpar%rPCOMC_ave, &
+    nlbiomcp   => micpar%nlbiomcp,   &
+    OMCI       => micpar%OMCI,       &
+    OMCF       => micpar%OMCF,       &
+    OMCA       => micpar%OMCA        &
   )
 
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8

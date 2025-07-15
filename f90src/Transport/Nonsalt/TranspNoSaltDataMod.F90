@@ -111,8 +111,6 @@ implicit none
   real(r8), allocatable :: TranspNetSoil_fast_flxM_col(:,:,:)           !total tracer flux due to fast transport in soil at iteration M, [g d-2 h-1]
   real(r8), allocatable :: TranspNetSoil_slow_flxM_col(:,:,:)           !total tracer flux due to slow transport in soil at iteration M, [g d-2 h-1]
   real(r8), allocatable :: transp_diff_slow_vr(:,:,:,:)                 !error in computing the transport profile, [g d-2 h-1]
-  real(r8), allocatable :: Gas_WetDepo2Snow_col(:,:,:)                  !wet deposition to snow, [g d-2 h-1] 
-  real(r8), allocatable :: Gas_Snowloss_flx_col(:,:,:)                      !tracer loss from snow [g d-2 h-1]
   real(r8), allocatable :: trcg_mass_begf(:,:,:)                        !initial tracer mass check in fast transport
   real(r8), allocatable :: trcg_mass_begs(:,:,:)                        !initial tracer mass check in slow transport
   real(r8), allocatable :: trcg_mass_litr_begf(:,:,:)                   !tracer in litter during fast iteration [g d-2]
@@ -198,8 +196,6 @@ contains
   allocate(RGasSinkScalar_vr(idg_beg:idg_NH3,0:JZ,JY,JX));RGasSinkScalar_vr=1._r8
   allocate(TranspNetSoil_flx2_col(idg_beg:idg_NH3,JY,JX)); TranspNetSoil_flx2_col=0._r8
   allocate(trcg_mass_begf(idg_beg:idg_NH3,JY,JX)); trcg_mass_begf=0._r8
-  allocate(Gas_WetDepo2Snow_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDepo2Snow_col=0._r8
-  allocate(Gas_Snowloss_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_Snowloss_flx_col=0._r8
   allocate(transp_diff_slow_vr(idg_beg:idg_NH3,JZ,JY,JX)); transp_diff_slow_vr=0._r8
   allocate(TranspNetSoil_fast_flx_col(idg_beg:idg_NH3,JY,JX)); TranspNetSoil_fast_flx_col=0._r8
   allocate(trc_topsoil_flx_col(idg_beg:idg_NH3,JY,JX)); trc_topsoil_flx_col=0._r8
@@ -439,8 +435,6 @@ contains
   call destroy(trcg_Precip2LitrM_col)
   call destroy(trcg_SnowDrift_flxM_2DH)
   call destroy(trcs_Transp2Macp_flxM_vr)
-  call destroy(Gas_WetDepo2Snow_col)
-  call destroy(Gas_Snowloss_flx_col)
   call destroy(DOM_MacP2_vr)
   call destroy(Gas_AdvDif_FlxMM_vr)
   call destroy(trcg_gasml2_vr)

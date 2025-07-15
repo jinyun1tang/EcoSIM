@@ -307,7 +307,7 @@ implicit none
       DO idg=idg_beg,idg_NH3
         trcg_mass_now(idg)=trcg_mass_snow_now(idg)+trcg_mass_litr_now(idg)+trcg_mass_soil_now(idg)
       ENDDO
-
+      DOM_mass_now(:,:)=0._r8
       DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_mass_now(idom,K)=DOM_MicP2_vr(idom,K,0,NY,NX)
@@ -398,9 +398,10 @@ implicit none
           err=dmass-DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)-DOM_NetProd_slow_flxM_col(idom,K,NY,NX)-dom_dribble_col(idom,K)
           if(abs(err)>1.e-5)then
             write(201,*)('-',L=1,50)
-            write(201,*)(I*1000+J)*10+M,'iterm=',iterm,'idom=',idom,'K=',K,NY,NX,NU_col(NY,NX),NUM_col(NY,NX),err
+            write(201,*)(I*1000+J)*10+M,'iterm=',iterm,'idom=',idom,'K=',K,NY,NX,NU_col(NY,NX),NUM_col(NY,NX)
             write(201,*)'dom mass beg/end 0',DOM_mass_begs(idom,K,NY,NX),DOM_mass_now(idom,K)
             write(201,*)'dom mass beg/end 3', DOM_mass3_col(idom,K,NY,NX),DOM_mass4_col(idom,K,NY,NX)
+            write(201,*)'err           =',err
             write(201,*)'dmass         =',dmass
             write(201,*)'hydroloss.    =',DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)
             write(201,*)'netflow       =',TranspNetDOM_flx_col(idom,K,NY,NX),TranspNetDOM_flx2_col(idom,K,NY,NX)
@@ -1210,7 +1211,7 @@ implicit none
 
     !temporary solute concentration
     DO ids=ids_beg,ids_end
-      trcs_cl_litr(ids)=(trcs_solml2_vr(ids,0,NY,NX)-trcs_solml_drib_vr(ids,0,NY,NX))/VLWatMicPM_vr(M,0,NY,NX)
+      trcs_cl_litr(ids)=(trcs_solml2_vr(ids,0,NY,NX)-0._r8*trcs_solml_drib_vr(ids,0,NY,NX))/VLWatMicPM_vr(M,0,NY,NX)
     ENDDO
 !
 !     PARR=boundary layer conductance above litter surface from watsub.f
@@ -1263,7 +1264,7 @@ implicit none
 
    !excldue  NH3 and NH3B
     DO idg=idg_beg,idg_NH3-1
-      trcs_cl_soil(idg)=(trcs_solml2_vr(idg,NU_col(NY,NX),NY,NX)-trcs_solml_drib_vr(idg,NU_col(NY,NX),NY,NX))/VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX)
+      trcs_cl_soil(idg)=(trcs_solml2_vr(idg,NU_col(NY,NX),NY,NX)-0._r8*trcs_solml_drib_vr(idg,NU_col(NY,NX),NY,NX))/VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX)
     ENDDO
 
     !deal with inorganic nutrients, including NH3 and NH3B

@@ -63,7 +63,7 @@ implicit none
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)  
   real(r8),pointer   :: h1D_RadSW_Grnd_col(:)  
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)   
-  real(r8),pointer   :: h1D_Qdrain_col(:)      
+  real(r8),pointer   :: h1D_Qdrain_col(:)            
   real(r8),pointer   :: h1D_tPREC_P_col(:)     
   real(r8),pointer   :: h1D_tMICRO_P_col(:)    
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
@@ -275,6 +275,7 @@ implicit none
   real(r8),pointer   :: h2D_Root2ndStrutC_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndStrutN_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndStrutP_pvr(:,:)
+  real(r8),pointer   :: h2D_QDrainloss_vr(:,:)  
   real(r8),pointer   :: h1D_SHOOT_C_ptc(:)      
   real(r8),pointer   :: h1D_SHOOTST_C_ptc(:)       
   real(r8),pointer   :: h1D_SHOOTST_N_ptc(:)       
@@ -511,6 +512,7 @@ implicit none
   real(r8),pointer   :: h2D_cPO4_vr(:,:)       
   real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)    
   real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:) 
+  real(r8),pointer   :: h2D_HydCondSoil_vr(:,:)
   real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
   real(r8),pointer   :: h2D_ROOT_OSTRESS_pvr(:,:)
   real(r8),pointer   :: h2D_prtUP_NH4_pvr(:,:)                                                                     
@@ -571,6 +573,7 @@ implicit none
   allocate(this%h1D_CanSWRad_col(beg_col:end_col)); this%h1D_CanSWRad_col(:)=spval
   allocate(this%h1D_Qinfl2soi_col(beg_col:end_col))     ;this%h1D_Qinfl2soi_col(:)=spval
   allocate(this%h1D_Qdrain_col(beg_col:end_col))       ; this%h1D_Qdrain_col(:)=spval
+  allocate(this%h2D_QDrainloss_vr(beg_col:end_col,1:JZ)); this%h2D_QDrainloss_vr=spval  
   allocate(this%h1D_tSALT_DISCHG_FLX_col(beg_col:end_col)) ;this%h1D_tSALT_DISCHG_FLX_col(:)=spval
   allocate(this%h1D_SUR_DON_FLX_col(beg_col:end_col))    ;this%h1D_SUR_DON_FLX_col(:)=spval
   allocate(this%h1D_SUB_DON_FLX_col(beg_col:end_col))    ;this%h1D_SUB_DON_FLX_col(:)=spval
@@ -902,7 +905,7 @@ implicit none
   allocate(this%h2D_fermentor_frac_vr(beg_col:end_col,1:JZ)); this%h2D_fermentor_frac_vr(:,:)=spval
   allocate(this%h2D_acetometh_frac_vr(beg_col:end_col,1:JZ)); this%h2D_acetometh_frac_vr(:,:)=spval  
   allocate(this%h2D_hydrogMeth_frac_vr(beg_col:end_col,1:JZ)); this%h2D_hydrogMeth_frac_vr(:,:)=spval
-
+  allocate(this%h2D_HydCondSoil_vr(beg_col:end_col,1:JZ)); this%h2D_HydCondSoil_vr=spval
   allocate(this%h2D_acetometgC_vr(beg_col:end_col,1:JZ));  this%h2D_acetometgC_vr(:,:)=spval
   allocate(this%h2D_aeroN2fixC_vr(beg_col:end_col,1:JZ));  this%h2D_aeroN2fixC_vr(:,:)=spval
   allocate(this%h2D_anaeN2FixC_vr(beg_col:end_col,1:JZ));  this%h2D_anaeN2FixC_vr(:,:)=spval
@@ -2301,6 +2304,11 @@ implicit none
   call hist_addfld1d(fname='MainBranchNO_pft',units='-',avgflag='A',&
     long_name='Main branch number',ptr_patch=data1d_ptr,default='inactive')      
 
+  data2d_ptr => this%h2D_QDrainloss_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='QDrainloss_vr',units='mm H2O/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved water drainage',ptr_col=data2d_ptr,default='inactive')       
+
+
   data2d_ptr => this%h2D_litrC_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='litrC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Column-level Vertically resolved litter C',ptr_col=data2d_ptr,default='inactive')       
@@ -2719,27 +2727,27 @@ implicit none
 
   data2d_ptr =>  this%h2D_HydrolCSOMCp1_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HydrolCSOMCp1_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in cplx1',&
+    long_name='Layer resolved carbon hydrolysis in woody cplx',&
     ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_HydrolCSOMCp2_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HydrolCSOMCp2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in cplx2',&
+    long_name='Layer resolved carbon hydrolysis in fine litter cplx',&
     ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_HydrolCSOMCp3_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HydrolCSOMCp3_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in cplx3',&
+    long_name='Layer resolved carbon hydrolysis in manure complex',&
     ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_HydrolCSOMCp4_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HydrolCSOMCp4_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in cplx4',&
+    long_name='Layer resolved carbon hydrolysis in POM complex',&
     ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_HydrolCSOMCp5_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HydrolCSOMCp5_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in cplx5',&
+    long_name='Layer resolved carbon hydrolysis in humus complex',&
     ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_SOMHydrylScalCp1_vr(beg_col:end_col,1:JZ)
@@ -3003,6 +3011,10 @@ implicit none
   call hist_addfld2d(fname='ElectricConductivity_vr',units='dS m-1',type2d='levsoi',avgflag='A',&
     long_name='electrical conductivity',ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_HydCondSoil_vr(beg_col:end_col,1:JZ)     
+  call hist_addfld2d(fname='HydCondSoil_vr',units='m MPa-1 h-1',type2d='levsoi',avgflag='A',&
+    long_name='Vertical hydraulic conductivity',ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='PSI_RT_pvr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='Root total water potential of each pft',ptr_patch=data2d_ptr,default='inactive')       
@@ -3145,6 +3157,7 @@ implicit none
       this%h1D_RadSW_Grnd_col(ncol)       = MJ2W*RadSWGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qdrain_col(ncol)           = m2mm*QDrain_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+
       this%h1D_SUR_DON_FLX_col(ncol)      = HydroSufDONFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUB_DON_FLX_col(ncol)      = HydroSubsDONFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tSALT_DISCHG_FLX_col(ncol) = HydroIonFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3159,7 +3172,7 @@ implicit none
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trcs_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
-      this%h1D_cEXCH_P_LITR_col(ncol)     =  patomw*safe_adb(trcx_solml_vr(idx_HPO4,0,NY,NX)+&
+      this%h1D_cEXCH_P_LITR_col(ncol)     = patomw*safe_adb(trcx_solml_vr(idx_HPO4,0,NY,NX)+&
         trcx_solml_vr(idx_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_ECO_HVST_P_col(ncol) = EcoHavstElmnt_CumYr_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_NET_P_MIN_col(ncol)  = -NetPO4Mineralize_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3268,7 +3281,7 @@ implicit none
       this%h1D_SEDIMENT_FLX_col(ncol)     = SedmErossLoss_CumYr_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tSWC_col(ncol)             = WatMass_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tHeat_col(ncol)            = HeatStore_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_QDISCHG_FLX_col(ncol)      = QDischar_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_QDISCHG_FLX_col(ncol)      = QDischarg2WTBL_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_HeatDISCHG_FLX_col(ncol)   = HeatDischar_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SNOWPACK_col(ncol)         = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX))
       this%h1D_SURF_WTR_col(ncol)         = ThetaH2OZ_vr(0,NY,NX)
@@ -3387,6 +3400,7 @@ implicit none
         this%h1D_tDON_soil_col(ncol)=this%h1D_tDON_soil_col(ncol)+DOM(idom_don)
         this%h1D_tDOP_soil_col(ncol)=this%h1D_tDOP_soil_col(ncol)+DOM(idom_dop)
         this%h1D_tAcetate_soil_col(ncol)=this%h1D_tAcetate_soil_col(ncol)+DOM(idom_acetate)
+        this%h2D_QDrainloss_vr(ncol,L)=QDrainloss_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
         this%h2D_DOC_vr(ncol,L)             = DOM(idom_doc)/DVOLL
         this%h2D_DON_vr(ncol,L)             = DOM(idom_don)/DVOLL
@@ -3446,6 +3460,8 @@ implicit none
                                                VLSoilMicPMass_vr(L,NY,NX))
         this%h2D_ElectricConductivity_vr(ncol,L)     = ElectricConductivity_vr(L,NY,NX)
         
+        this%h2D_HydCondSoil_vr(ncol,L) = HydCondSoil_3D(3,L,NY,NX)
+
         !aerobic heterotropic bacteria
         call SumMicbGroup(L,NY,NX,micpar%mid_Aerob_HeteroBacter,MicbE)
         this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)/DVOLL   

@@ -41,7 +41,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                !excess water+ice, [m3 d-2]
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                  !excess water,[m3 d-2]
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                        !excess ice, [m3 d-2]
-  real(r8),target,allocatable ::  HydroCond_3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels, 
+  real(r8),target,allocatable ::  HydroCond_3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                   !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMicP4RootUptake_vr(:,:,:)        !soil micropore hydraulic conductivity for root water uptake ,[m MPa-1 h-1]
   real(r8),target,allocatable ::  SurfRunoffPotentM_col(:,:,:)              !runoff water flux out of grid (>=0), [m3 d-2 t-1]
@@ -86,11 +86,13 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  Qrunoff_CumYr_col(:,:)                    !total surface runoff, [m3 d-2]
   real(r8),target,allocatable ::  WatMass_col(:,:)                          !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  H2OLoss_CumYr_col(:,:)                    !total subsurface water flux, [m3 d-2]
-  real(r8),target,allocatable ::  QDrain_col(:,:)                           !total water drainage below root zone, [m3 d-2]
+  real(r8),target,allocatable ::  QDrainloss_vr(:,:,:)                      !water drainage from different soil layers, [m3 d-2]
+  real(r8),target,allocatable ::  QDrain_col(:,:)                           !total water drainage from soil, [m3 d-2]
+  real(r8),target,allocatable ::  QDrain_cum_col(:,:)                       !cumulative total water drainage from soil, [m3 d-2]
   real(r8),target,allocatable ::  XGridSurfRunoff_2DH(:,:,:,:)              !soil surface runoff water, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatXGridBySurfRunoff_2DH(:,:,:,:)        !soil surface runoff heat, [MJ d-2 h-1]
   real(r8),target,allocatable ::  QRunSurf_col(:,:)                         !runoff from surface water, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  QDischar_col(:,:)                         !water discharge, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QDischarg2WTBL_col(:,:)                   !water discharge to external water table, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QflxSurfRunoffM_2DH(:,:,:,:,:)            !surface runoff in iteration M,
   real(r8),target,allocatable ::  Qinflx2Soil_col(:,:)                      !infiltration into soil [m3 d-2 h-1]
   real(r8),target,allocatable ::  SoilWatMassBeg_col(:,:)                   !soil water mass at the begnining of time step
@@ -104,7 +106,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RainPrec2Sno_col(:,:)                      !rainfall to snow, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  QWatIntLaterFlow_col(:,:)                  !Internal lateral flow between grids, [m3 H2O d-2 h-1]
-
+  real(r8),target,allocatable ::  HydCondSoil_3D(:,:,:,:)                    !3D micropore hydraulic conductivity, [m MPa-1 h-1]
   private :: InitAllocate
   contains
 
@@ -210,13 +212,16 @@ module SoilWaterDataType
   allocate(WatMass_col(JY,JX));       WatMass_col=0._r8
   allocate(H2OLoss_CumYr_col(JY,JX));       H2OLoss_CumYr_col=0._r8
   allocate(QDrain_col(JY,JX));      QDrain_col=0._r8
+  allocate(QDrainloss_vr(JZ,JY,JX));      QDrainloss_vr=0._r8
   allocate(XGridSurfRunoff_2DH(2,2,JV,JH));      XGridSurfRunoff_2DH=0._r8
   allocate(HeatXGridBySurfRunoff_2DH(2,2,JV,JH));     HeatXGridBySurfRunoff_2DH=0._r8
   allocate(QRunSurf_col(JY,JX));        QRunSurf_col=0._r8
-  allocate(QDischar_col(JY,JX));       QDischar_col=0._r8
+  allocate(QDischarg2WTBL_col(JY,JX));       QDischarg2WTBL_col=0._r8
   allocate(QflxSurfRunoffM_2DH(60,2,2,JV,JH)); QflxSurfRunoffM_2DH=0._r8
   allocate(TXGridSurfRunoff_2DH(JY,JX));         TXGridSurfRunoff_2DH=0._r8
   allocate(THeatXGridBySurfRunoff_2DH(JY,JX));        THeatXGridBySurfRunoff_2DH=0._r8
+  allocate(QDrain_cum_col(JY,JX));      QDrain_cum_col=0._r8  
+  allocate(HydCondSoil_3D(3,JZ,JY,JX)); HydCondSoil_3D=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -313,15 +318,17 @@ module SoilWaterDataType
   call destroy(WatMass_col)
   call destroy(H2OLoss_CumYr_col)
   call destroy(QDrain_col)
+  call destroy(QDrainloss_vr)  
+  call destroy(QDrain_cum_col)  
   call destroy(XGridSurfRunoff_2DH)
   call destroy(HeatXGridBySurfRunoff_2DH)
   call destroy(QRunSurf_col)
-  call destroy(QDischar_col)
+  call destroy(QDischarg2WTBL_col)
   call destroy(QflxSurfRunoffM_2DH)
   call destroy(Qinflx2Soil_col)
   call destroy(TXGridSurfRunoff_2DH)
   call destroy(THeatXGridBySurfRunoff_2DH)
-
+  call destroy(HydCondSoil_3D)
   end subroutine DestructSoilWater
 
 end module SoilWaterDataType

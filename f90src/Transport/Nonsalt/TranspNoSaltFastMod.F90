@@ -115,9 +115,9 @@ implicit none
           trcg_NetPro_fast_col(idg,NY,NX)    = trcg_NetPro_fast_col(idg,NY,NX)+RBGCSrceGasMM_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)
           RGasNetProdSoil_col(idg,NY,NX) = RGasNetProdSoil_col(idg,NY,NX)+RBGCSrceGasMM_vr(idg,L,NY,NX)-RBGCSinkGasMM_vr(idg,L,NY,NX)
 
-          if(trcs_solml_drib_vr(idg,L,NY,NX)>1.e0_r8)then
-            write(*,*)(I*1000+J)*100+M,'idg=',trcs_names(idg),L,RBGCSinkGasMM_vr(idg,L,NY,NX),trcs_solml_drib_vr(idg,L,NY,NX),trcs_solml2_vr(idg,L,NY,NX)
-          endif
+!          if(trcs_solml_drib_vr(idg,L,NY,NX)>1.e0_r8)then
+!            write(*,*)(I*1000+J)*100+M,'idg=',trcs_names(idg),L,RBGCSinkGasMM_vr(idg,L,NY,NX),trcs_solml_drib_vr(idg,L,NY,NX),trcs_solml2_vr(idg,L,NY,NX)
+!          endif
         ENDDO
         idg=idg_NH3
         call SubstrateDribbling(RBGCSinkGasMM_vr(idg,L,NY,NX),trcs_solml_drib_vr(idg,L,NY,NX),trcg_gasml2_vr(idg,L,NY,NX))
@@ -431,7 +431,7 @@ implicit none
           VOLGas                          = trcg_VLWatMicP_vr(idg,0,NY,NX)+VLsoiAirPM_vr(M,0,NY,NX)
           RGas_Disol_FlxMM_vr(idg,0,NY,NX) = DiffusivitySolutEffM_vr(M,0,NY,NX) &
             *(AZMAX1(trc_gascl)*trcg_VLWatMicP_vr(idg,0,NY,NX) &
-            - (trcs_solml2_vr(idg,0,NY,NX)-trcs_solml_drib_vr(idg,0,NY,NX))*VLsoiAirPM_vr(M,0,NY,NX))/VOLGas
+            - (trcs_solml2_vr(idg,0,NY,NX)-0._r8*trcs_solml_drib_vr(idg,0,NY,NX))*VLsoiAirPM_vr(M,0,NY,NX))/VOLGas
         ENDDO
       ENDIF
     ENDDO
@@ -561,21 +561,21 @@ implicit none
       do idg=idg_beg,idg_NH3-1
         RGas_Disol_FlxMM_vr(idg,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
          (AZMAX1(trcg_gasml2_vr(idg,N6,N5,N4))*trcg_VLWatMicP_vr(idg,N6,N5,N4) &
-          -(trcs_solml2_vr(idg,N6,N5,N4)-trcs_solml_drib_vr(idg,N6,N5,N4))*VLsoiAirPM_vr(M,N6,N5,N4)) &
+          -(trcs_solml2_vr(idg,N6,N5,N4)-0._r8*trcs_solml_drib_vr(idg,N6,N5,N4))*VLsoiAirPM_vr(M,N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg,N6,N5,N4)+VLsoiAirPM_vr(M,N6,N5,N4))
       enddo    
 
       IF(VLsoiAirPMA_vr(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXA_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
         RGas_Disol_FlxMM_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
          (AZMAX1(trcg_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
-          -(trcs_solml2_vr(idg_NH3,N6,N5,N4)-trcs_solml_drib_vr(idg_NH3,N6,N5,N4))*VLsoiAirPMA_vr(N6,N5,N4)) &
+          -(trcs_solml2_vr(idg_NH3,N6,N5,N4)-0._r8*trcs_solml_drib_vr(idg_NH3,N6,N5,N4))*VLsoiAirPMA_vr(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4)+VLsoiAirPMA_vr(N6,N5,N4))
       ENDIF
 
       IF(VLsoiAirPMB_vr(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXB_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
         RGas_Disol_FlxMM_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
           (AZMAX1(trcg_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
-          -(trcs_solml2_vr(idg_NH3B,N6,N5,N4)-trcs_solml_drib_vr(idg_NH3B,N6,N5,N4))*VLsoiAirPMB_vr(N6,N5,N4)) &
+          -(trcs_solml2_vr(idg_NH3B,N6,N5,N4)-0._r8*trcs_solml_drib_vr(idg_NH3B,N6,N5,N4))*VLsoiAirPMB_vr(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4)+VLsoiAirPMB_vr(N6,N5,N4))
       ENDIF
 

@@ -599,9 +599,11 @@ module UptakesMod
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
-      CCPOLT                        = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
-        +CanopyNonstElmConc_pft(ielmp,NZ)
-
+      if(ldo_sp_mode)then
+        CCPOLT=0.1_r8
+      else
+        CCPOLT  = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) +CanopyNonstElmConc_pft(ielmp,NZ)
+      endif
       CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ), &
         PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
@@ -615,7 +617,11 @@ module UptakesMod
       D4290: DO N=1,Myco_pft(NZ)
         DO  L=NU,MaxSoiL4Root_pft(NZ)
           PSIRoot_pvr(N,L,NZ) = TotalSoilPSIMPa_vr(L)
-          CCPOLT              = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
+          if(ldo_sp_mode)then
+            CCPOLT=0.4_r8
+          else
+            CCPOLT   = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
+          endif
           CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
@@ -727,8 +733,12 @@ module UptakesMod
   !LWRad2Canopy:long-wave absorbed by canopy
   FTHRM        = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
   LWRad2Canopy = (LWRadSky_col+LWRadGrnd)*FracPARads2Canopy_pft(NZ)
-  CCPOLT       = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
-    +CanopyNonstElmConc_pft(ielmp,NZ)
+  if(ldo_sp_mode)then
+    CCPOLT=0.1_r8
+  else
+    CCPOLT   = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
+      +CanopyNonstElmConc_pft(ielmp,NZ)
+  endif  
 
 
   cumPRootH2OUptake     = 0.0_r8
@@ -906,8 +916,7 @@ module UptakesMod
           IF(SoiLayerHasRoot_rvr(N,L))THEN
             !<0 active uptake
             AllPlantRootH2OLoss_pvr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
-              AMIN1((PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L), &
-              AirMicPore4Fill_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)))
+              AMIN1((PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L), AirMicPore4Fill_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)))
 
             !plant/myco lose water to soil > 0
             IF(AllPlantRootH2OLoss_pvr(N,L,NZ).GT.0.0_r8)THEN              
@@ -1196,7 +1205,7 @@ module UptakesMod
   real(r8) :: OSWT,Stomata_Stress
 
 ! begin_execution
-  associate(                                                      &
+  associate(                                                           &
     AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
@@ -1255,8 +1264,11 @@ module UptakesMod
   FTHRM                  = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
   LWRadCanopy_pft(NZ)    = FTHRM*TKC_pft(NZ)**4._r8
   PSICanopy_pft(NZ)      = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
-  CCPOLT                 = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
-
+  if(ldo_sp_mode)then
+    CCPOLT = 0.1_r8
+  else
+    CCPOLT  = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
+  endif
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
@@ -1270,7 +1282,11 @@ module UptakesMod
   DO N=1,Myco_pft(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       PSIRoot_pvr(N,L,NZ)              = TotalSoilPSIMPa_vr(L)
-      CCPOLT                           = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
+      if(ldo_sp_mode)then
+        CCPOLT =0.4_r8
+      else  
+        CCPOLT = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
+      endif
       AllPlantRootH2OLoss_pvr(N,L,NZ) = 0.0_r8
 
       call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
@@ -1367,7 +1383,11 @@ module UptakesMod
         PSIRoot_pvr(N,L,NZ)=TotalSoilPSIMPa_vr(L)
       ENDIF           
       !obtain total reserve
-      CCPOLT=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
+      if(ldo_sp_mode)then
+        CCPOLT=0.4_r8
+      else  
+        CCPOLT=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
+      endif  
 
       CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
@@ -1387,7 +1407,7 @@ module UptakesMod
   character(len=*), parameter :: subname='SetCanopyGrowthFuncs'
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
-  associate(                                                      &
+  associate(                                               &
     MainBranchNum_pft   => plt_morph%MainBranchNum_pft    ,& !input  :number of main branch,[-]
     MaxNumRootLays      => plt_site%MaxNumRootLays        ,& !input  :maximum root layer number,[-]
     NU                  => plt_site%NU                    ,& !input  :current soil surface layer number, [-]

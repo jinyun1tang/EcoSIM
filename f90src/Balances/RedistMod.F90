@@ -293,7 +293,7 @@ module RedistMod
 !        :0=none
 !        :1,2=natural stationary,mobile
 !        :3,4=artificial stationary,mobile
-!     QDischar_col=hourly water loss through lateral and lower boundaries
+!     QDischarg2WTBL_col=hourly water loss through lateral and lower boundaries
 !
   call PrintInfo('beg '//subname)
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
@@ -319,7 +319,7 @@ module RedistMod
   ENDIF
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE
-! QDischar_col: < 0 out of soil column/grid, 
+! QDischarg2WTBL_col: < 0 out of soil column/grid, 
 ! switched on for change of water table due to discharge/drainage
 ! why 0.00167, time relaxization constant, ?
 ! 4 is mobile tile drainge.
@@ -327,13 +327,13 @@ module RedistMod
   IF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
 
     ExtWaterTable_col(NY,NX) = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
-    ExtWaterTable_col(NY,NX) = ExtWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
+    ExtWaterTable_col(NY,NX) = ExtWaterTable_col(NY,NX)-QDischarg2WTBL_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
       -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTablet0_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX))
   ENDIF
 
   !update mobile tile water table depth due to drainage
   IF(IDWaterTable_col(NY,NX).EQ.4)THEN
-    TileWaterTable_col(NY,NX)=TileWaterTable_col(NY,NX)-QDischar_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
+    TileWaterTable_col(NY,NX)=TileWaterTable_col(NY,NX)-QDischarg2WTBL_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
       -0.00167_r8*(TileWaterTable_col(NY,NX)-DTBLD_col(NY,NX))
   ENDIF
   call PrintInfo('end '//subname)
@@ -400,7 +400,6 @@ module RedistMod
   call UpdateLitRPhys(I,J,NY,NX,dWat,dHeat,HEATIN_lnd)
 
   call UpdateSurfaceTracers(I,J,NY,NX)
-
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
@@ -411,7 +410,7 @@ module RedistMod
   CEVAP                    = CEVAP-WO
   QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
   EvapoTransp_col(NY,NX)   = -WO
-  QDischar_col(NY,NX)      = QDischar_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  QDischarg2WTBL_col(NY,NX)      = QDischarg2WTBL_col(NY,NX)-IrrigSubsurf_col(NY,NX)
   H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)    
   QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   !
@@ -829,10 +828,6 @@ module RedistMod
     ENDDO  
   else
 
-!    write(444,*)'redistbeg',('xx',L=1,50)
-!    write(444,*)(VLWatMicP_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
-!    write(444,*)(VLWatMacP_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
-!    write(444,*)((VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,L=NU_col(NY,NX),NL_col(NY,NX))
 
     dWAT=0._r8
     DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
@@ -850,8 +845,8 @@ module RedistMod
     !write(*,*)'here'
     if(dwat>0)write(211,*)I*1000+J,dwat,NY,NX
     TPlantRootH2OUptake_col(NY,NX)=0._r8
-    DO L=NUM_col(NY,NX),NL_col(NY,NX)
-      
+
+    DO L=NUM_col(NY,NX),NL_col(NY,NX)      
       !micropore
       VLWatMicP_vr(L,NY,NX)=VLWatMicP_vr(L,NY,NX)+TWatFlowCellMicP_vr(L,NY,NX)+FWatExMacP2MicP_vr(L,NY,NX) &
         +WatIceThawMicP_vr(L,NY,NX)+FWatIrrigate2MicP_vr(L,NY,NX)
@@ -941,13 +936,11 @@ module RedistMod
     !    HeatStore_lnd=HeatStore_lnd+HS
     ENDDO
 
-!    write(444,*)'redistend',('x-x',L=1,50)
-!    write(444,*)(VLWatMicP_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
-!    write(444,*)(VLWatMacP_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
-!    write(444,*)((VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,L=NU_col(NY,NX),NL_col(NY,NX))
-
   endif
-  !if(I>=163)write(211,*)I+J/24.,NY,NX,twatmass0(NY,NX),twatmass1(NY,NX)
+
+!  write(1011,*)I*10+J,(VLWatMicP_vr(L,NY,NX)/POROS_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX)),'*'
+!  write(1012,*)I*10+J,(VLWatMacP_vr(L,NY,NX)/POROS_vr(L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX)),'*'
+
   end subroutine UpdateTSoilVSMProfile
 !------------------------------------------------------------------------------------------
   subroutine UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,Txchem_CO2_col,DORGE_col)
@@ -978,7 +971,7 @@ module RedistMod
   
   DORGC                       = 0._r8
   THeatRootRelease_col(NY,NX) = 0._r8
-
+  trcs_Soil2plant_uptakep_col(:,NY,NX)=0._r8
   D125: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !
     !

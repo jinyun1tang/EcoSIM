@@ -773,9 +773,10 @@ module Hour1Mod
   tHxPO4_col(NY,NX)                          = 0._r8
   tXPO4_col(NY,NX)                           = 0._r8
   UION_col(NY,NX)                            = 0._r8
-  QDischar_col(NY,NX)                        = 0._r8
+  QDischarg2WTBL_col(NY,NX)                        = 0._r8
   PrecHeat_col(NY,NX)                        = 0._r8
   QDrain_col(NY,NX)                          = 0._r8
+  QDrainloss_vr(:,NY,NX)   =0._r8
   HeatDrain_col(NY,NX)                       = 0._r8
   trcg_AquaADV_Snow2Litr_flx(:,NY,NX)        = 0._r8
   trcn_AquaADV_Snow2Litr_flx(:,NY,NX)        = 0._r8

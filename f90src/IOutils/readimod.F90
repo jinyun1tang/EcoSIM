@@ -312,6 +312,7 @@ module readiMod
       RechargRateWestWTBL_col(NY,NX)  = RCHGWUG      
       RechargBottom_col(NY,NX) = RCHGDG
 
+
       DH_col(NY,NX)                = DHI(NX)
       DV_col(NY,NX)                = DVI(NY)
       CO2E_col(NY,NX)          = CO2EI_col(NY,NX)
