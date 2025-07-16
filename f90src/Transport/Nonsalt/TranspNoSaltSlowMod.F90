@@ -131,6 +131,7 @@ implicit none
         DO idom=idom_beg,idom_end        
           call SubstrateDribbling(RBGCSink_DOM_micpM_vr(idom,K,0,NY,NX),DOM_MicP_drib_vr(idom,K,0,NY,NX),DOM_MicP2_vr(idom,K,0,NY,NX))
           DOM_NetProd_slow_flxM_col(idom,K,NY,NX)=DOM_NetProd_slow_flxM_col(idom,K,NY,NX)-RBGCSink_DOM_micpM_vr(idom,K,0,NY,NX)
+
         ENDDO
       ENDDO  
 
@@ -150,6 +151,7 @@ implicit none
           DO idom=idom_beg,idom_end        
             call SubstrateDribbling(RBGCSink_DOM_micpM_vr(idom,K,L,NY,NX),DOM_MicP_drib_vr(idom,K,L,NY,NX),DOM_MicP2_vr(idom,K,L,NY,NX))
             DOM_NetProd_slow_flxM_col(idom,K,NY,NX)=DOM_NetProd_slow_flxM_col(idom,K,NY,NX)-RBGCSink_DOM_micpM_vr(idom,K,L,NY,NX)
+    
           ENDDO
         ENDDO  
       ENDDO
@@ -195,6 +197,7 @@ implicit none
       Gas_WetDepo2litr_slow_flx_col(:,NY,NX)  = 0._r8
       Gas_litr2Soil_slow_flx_col(:,NY,NX)     = 0._r8
       trcs_sno2litr_slow_flx_col(:,NY,NX)     = 0._r8
+      dom_dribble_slow_beg_col(:,:,NY,NX)          = 0._r8
       do idg=idg_beg,idg_NH3
         trcs_drib_litr_slow_begf(idg,NY,NX)  = trcs_solml_drib_vr(idg,0,NY,NX)
       enddo
@@ -232,6 +235,7 @@ implicit none
       DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
           DOM_mass_begs(idom,K,NY,NX)=DOM_mass_begs(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)            
+          dom_dribble_slow_beg_col(idom,K,NY,NX)=dom_dribble_slow_beg_col(idom,K,NY,NX)+DOM_MicP_drib_vr(idom,K,0,NY,NX)
         ENDDO
       ENDDO
 
@@ -239,6 +243,7 @@ implicit none
         DO K=1,jcplx
           DO idom=idom_beg,idom_end
             DOM_mass_begs(idom,K,NY,NX)=DOM_mass_begs(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)
+            dom_dribble_slow_beg_col(idom,K,NY,NX)=dom_dribble_slow_beg_col(idom,K,NY,NX)+DOM_MicP_drib_vr(idom,K,L,NY,NX)            
           ENDDO
         ENDDO
       ENDDO
@@ -312,7 +317,7 @@ implicit none
         DO idom=idom_beg,idom_end
           DOM_mass_now(idom,K)=DOM_MicP2_vr(idom,K,0,NY,NX)
           dom_dribble_col(idom,K)=dom_dribble_col(idom,K)+DOM_MicP_drib_vr(idom,K,0,NY,NX)
-        ENDDO
+        ENDDO        
       ENDDO
       
       DO L=NU_col(NY,NX),NL_col(NY,NX)
@@ -323,7 +328,6 @@ implicit none
           ENDDO
         ENDDO
       ENDDO
- 
 
       DO idg=idg_beg,idg_NH3
         GasDiff2Surf_flx_col(idg,NY,NX)    = GasDiff2Surf_flx_col(idg,NY,NX)+AtmGasDiff2Surf_slow_flx_col(idg,NY,NX)
@@ -395,7 +399,8 @@ implicit none
       DO K=1,jcplx
         DO idom=idom_beg,idom_end
           dmass=DOM_mass_now(idom,K)-DOM_mass_begs(idom,K,NY,NX)
-          err=dmass-DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)-DOM_NetProd_slow_flxM_col(idom,K,NY,NX)-dom_dribble_col(idom,K)
+          err=dmass-DOM_Hydroloss_slow_flx_col(idom,K,NY,NX)-DOM_NetProd_slow_flxM_col(idom,K,NY,NX) &
+            -dom_dribble_col(idom,K)+dom_dribble_slow_beg_col(idom,K,NY,NX)
           if(abs(err)>1.e-5)then
             write(201,*)('-',L=1,50)
             write(201,*)(I*1000+J)*10+M,'iterm=',iterm,'idom=',idom,'K=',K,NY,NX,NU_col(NY,NX),NUM_col(NY,NX)
@@ -411,7 +416,7 @@ implicit none
             write(201,*)DOM_MicP2_vr(idom,K,0,NY,NX),(DOM_MicP2_vr(idom,K,L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
             write(201,*)(DOM_MacP2_vr(idom,K,L,NY,NX),L=NU_col(NY,NX),NL_col(NY,NX))
             write(201,*)'netpro        =',DOM_NetProd_slow_flxM_col(idom,K,NY,NX)
-            write(201,*)'dribble       =',dom_dribble_col(idom,K)
+            write(201,*)'dribble,b/e   =',dom_dribble_slow_beg_col(idom,K,NY,NX),dom_dribble_col(idom,K)
 
            if(abs(err)>1.e-8_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
           endif
@@ -600,7 +605,8 @@ implicit none
                   DOM_mass4_col(idom,K,NY,NX) = DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)                  
                   TranspNetDOM_flxM_col(idom,K,NY,NX)=TranspNetDOM_flxM_col(idom,K,NY,NX)+ &
                     DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX)  
-                endif
+
+                endif                  
               endif
             ENDDO
           ENDDO
@@ -3343,6 +3349,7 @@ implicit none
               DOM_mass3_col(idom,K,NY,NX)         = DOM_mass3_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)
               DOM_MicP2_vr(idom,K,0,NY,NX)        = DOM_MicP_vr(idom,K,0,NY,NX)
               DOM_mass4_col(idom,K,NY,NX)         = DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,0,NY,NX)
+
               TranspNetDOM_flxM_col(idom,K,NY,NX) = TranspNetDOM_flxM_col(idom,K,NY,NX)+flux0                                       
             endif  
           endif
@@ -3459,6 +3466,7 @@ implicit none
                 DOM_mass4_col(idom,K,NY,NX)=DOM_mass4_col(idom,K,NY,NX)+DOM_MicP2_vr(idom,K,L,NY,NX)+DOM_MacP2_vr(idom,K,L,NY,NX)                
                 TranspNetDOM_flxM_col(idom,K,NY,NX)=TranspNetDOM_flxM_col(idom,K,NY,NX)+ &
                   DOM_Transp2Micp_flxM_vr(idom,K,L,NY,NX)+DOM_Transp2Macp_flxM_vr(idom,K,L,NY,NX)
+
               endif
             endif
           ENDDO

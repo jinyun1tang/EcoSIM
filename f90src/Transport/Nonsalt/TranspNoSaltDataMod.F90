@@ -59,7 +59,7 @@ implicit none
   real(r8), allocatable ::  trcs_solml_dribM_beg_col(:,:,:)             !total dribbling tracer mass at the beginning of transport iteration, [g d-2]
   real(r8), allocatable ::  trcs_solml_drib_beg_col(:,:,:)             !total dribbling tracer mass at the beginning of transport, [g d-2]  
   real(r8), allocatable ::  trcs_solml_drib_soi_beg_col(:,:,:)           !soil dribbling tracer mass at the beginning of transport, [g d-2]  
-  real(r8), allocatable ::  dom_dribble_beg_col(:,:,:,:)              !dom dribbling mass at the beginning of transport, [g d-2]  
+  real(r8), allocatable ::  dom_dribble_slow_beg_col(:,:,:,:)              !dom dribbling mass at the beginning of transport, [g d-2]  
   real(r8), allocatable ::  tScalReductVLsoiAirPMM_vr(:,:,:)          !time scaled air-filled reduction volume [m3 h /d2 ]
   real(r8), allocatable ::  VLsoiAirPMA_vr(:,:,:)                      !Effective air-filled soil pore volume occupied by NH4 [m3]
   real(r8), allocatable ::  VLsoiAirPMB_vr(:,:,:)                      !Effective air-filled soil pore volume occupied by band-NH4 [m3]
@@ -162,7 +162,7 @@ contains
   allocate(trcs_drib_litr_slow_begf(idg_beg:idg_NH3,JY,JX)); trcs_drib_litr_slow_begf=0._r8
   allocate(trcs_drib_fast_beg_col(idg_beg:idg_NH3,JY,JX)); trcs_drib_fast_beg_col=0._r8
   allocate(trcs_netProd_lit_fast_col(idg_beg:idg_NH3,JY,JX));trcs_netProd_lit_fast_col=0._r8
-  allocate(dom_dribble_beg_col(idom_beg:idom_end,jcplx,JY,JX)); dom_dribble_beg_col=0._r8
+  allocate(dom_dribble_slow_beg_col(idom_beg:idom_end,jcplx,JY,JX)); dom_dribble_slow_beg_col=0._r8
   allocate(trcs_solml_drib_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_drib_beg_col=0._r8
   allocate(trcs_solml_drib_soi_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_drib_soi_beg_col=0._r8  
   allocate(trcs_solml_dribM_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_dribM_beg_col=0._r8
@@ -314,13 +314,14 @@ contains
   subroutine DestructTransfrData
   use abortutils, only : destroy
   implicit none
+
   call destroy(trcs_sno2litr_slow_flx_col)
   call destroy(Gas_litr2Soil_slow_flx_col)
   call destroy(trcs_drib_litr_slow_begf)
   call destroy(trcs_drib_fast_beg_col)
   call destroy(trcs_netProd_lit_fast_col)
   call destroy(trcs_netProd_lit_col)
-  call destroy(dom_dribble_beg_col)
+  call destroy(dom_dribble_slow_beg_col)
   call destroy(trcs_drainage_fast_flx_col)
   call destroy(trcs_drainage_slow_flx_col)  
   call destroy(GasHydroLoss_litr_flx_col)
