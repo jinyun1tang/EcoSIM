@@ -81,11 +81,11 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN            
             DO LP=1,2
               if (LP==1)then
-                PAR_zsec=RadPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_DirectRTransmit(L+1)
+                PAR_zsec = RadPAR_zsec(N,M,L,NZ)
+                Tau_rad  = TAU_DirectRTransmit(L+1)
               else
-                PAR_zsec=RadDifPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_RadThru(L+1)
+                PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
+                Tau_rad  = TAU_RadThru(L+1)
               endif
               
               IF(PAR_zsec.GT.0.0_r8)THEN

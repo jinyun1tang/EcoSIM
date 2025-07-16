@@ -140,12 +140,14 @@ module UptakesMod
 !
       CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopyStalkC_pft(NZ))
       VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*SpecStalkVolume+WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
-
-      HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
-        .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
-        .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
-        .and. CanopyMassC>0._r8
-
+      if(ldo_sp_mode)then
+        HydroActivePlant=.true.
+      else
+        HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
+          .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
+          .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
+          .and. CanopyMassC>0._r8
+      endif
       IF(HydroActivePlant)THEN  
 !
         call CalcResistance(NZ,PathLen_pvr,FineRootRadius_rvr,RootArea2RadiusRatio_vr,RootResist_rvr,RootResistSoi_rvr,&
@@ -278,7 +280,8 @@ module UptakesMod
 !
     DO  L=NU,MaxNumRootLays
       DO  N=1,Myco_pft(NZ)
-        plt_ew%AllPlantRootH2OLoss_pvr(N,L,NZ)                    = 0.0_r8
+        plt_ew%RootH2OUptkStress_pvr(N,L,NZ)                      = 0._r8
+        plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                    = 0.0_r8
         plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                        = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
         plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8
@@ -576,7 +579,8 @@ module UptakesMod
     PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !output :canopy total water potential, [Mpa]
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
     TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr       ,& !output :root water uptake, [m2 d-2 h-1]
+    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !output :root water uptake, [m3 d-2 h-1]
+    RootH2OUptkStress_pvr       => plt_ew%RootH2OUptkStress_pvr           ,& !output :pontential root water uptake rate, [m3 d-2 h-1]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
@@ -625,7 +629,8 @@ module UptakesMod
           CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
-          AllPlantRootH2OLoss_pvr(N,L,NZ)=0.0_r8
+          RPlantRootH2OUptk_pvr(N,L,NZ)=0.0_r8
+          RootH2OUptkStress_pvr(N,L,NZ) =0._r8
       enddo
       ENDDO D4290
     ENDIF
@@ -711,7 +716,7 @@ module UptakesMod
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft           ,& !input  :canopy surface water content, [m3 d-2]
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
     ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft            ,& !input  :threshold zero for leaf calculation, [-]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr       ,& !inoput :root water uptake, [m2 d-2 h-1]
+    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !inoput :root water uptake, [m3 d-2 h-1]
     PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !inoput :canopy total water potential, [Mpa]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                  ,& !inoput :canopy temperature, [K]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
@@ -725,6 +730,7 @@ module UptakesMod
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft            ,& !output :canopy evaporation, [m2 d-2 h-1]
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
     QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
+    RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr         ,& !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
     TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft                & !output :canopy temperature, [oC]
   )
   
@@ -902,7 +908,7 @@ module UptakesMod
 !     SOIL + ROOT HYDRAULIC RESISTANCES
 !
 !     SoiLayerHasRoot_rvr=rooted layer flag
-!     AllPlantRootH2OLoss_pvr=root water uptake from soil layer > 0
+!     RPlantRootH2OUptk_pvr=root water uptake from soil layer > 0
 !     WatAvail4Uptake_vr,AirMicPore4Fill_vr=water volume available for uptake,air volume
 !     FracPRoot4Uptake_pvr=PFT fraction of biome root mass
 !     PSILC=height corrected canopy water potential 
@@ -915,24 +921,26 @@ module UptakesMod
         D4201: DO L=NU,MaxSoiL4Root_pft(NZ)
           IF(SoiLayerHasRoot_rvr(N,L))THEN
             !<0 active uptake
-            AllPlantRootH2OLoss_pvr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
+            RootH2OUptkStress_pvr(N,L,NZ) = AZMAX1(PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L)
+            RPlantRootH2OUptk_pvr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
               AMIN1((PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L), AirMicPore4Fill_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)))
-
+            
             !plant/myco lose water to soil > 0
-            IF(AllPlantRootH2OLoss_pvr(N,L,NZ).GT.0.0_r8)THEN              
-              !why multiply 0.1 here? I don't know
-              AllPlantRootH2OLoss_pvr(N,L,NZ)=0.1_r8*AllPlantRootH2OLoss_pvr(N,L,NZ)
+            IF(RPlantRootH2OUptk_pvr(N,L,NZ).GT.0.0_r8)THEN              
+              !jinyun tang: why multiply 0.1 here? I don't know. Perhaps for numerical purpose.
+              RPlantRootH2OUptk_pvr(N,L,NZ)=0.1_r8*RPlantRootH2OUptk_pvr(N,L,NZ)
 
               !plant moves heat from canopy to soil,
-              CumPlantHeatLoss2Soil=CumPlantHeatLoss2Soil+cpw*AllPlantRootH2OLoss_pvr(N,L,NZ)*TKC1
+              CumPlantHeatLoss2Soil=CumPlantHeatLoss2Soil+cpw*RPlantRootH2OUptk_pvr(N,L,NZ)*TKC1
 
-            !plant/myco gains water from soil < 0
-            else  
-              CumPlantHeatLoss2Soil=CumPlantHeatLoss2Soil+cpw*AllPlantRootH2OLoss_pvr(N,L,NZ)*TKS_vr(L)
+              !plant/myco gains water from soil < 0
+            ELSE
+              CumPlantHeatLoss2Soil=CumPlantHeatLoss2Soil+cpw*RPlantRootH2OUptk_pvr(N,L,NZ)*TKS_vr(L)
             ENDIF
-            cumPRootH2OUptake=cumPRootH2OUptake+AllPlantRootH2OLoss_pvr(N,L,NZ)
+            cumPRootH2OUptake=cumPRootH2OUptake+RPlantRootH2OUptk_pvr(N,L,NZ)
           ELSE
-            AllPlantRootH2OLoss_pvr(N,L,NZ)=0.0_r8
+            RootH2OUptkStress_pvr(N,L,NZ)=0._r8
+            RPlantRootH2OUptk_pvr(N,L,NZ)=0.0_r8
           ENDIF
         enddo D4201
       ENDDO D4200
@@ -1233,7 +1241,8 @@ module UptakesMod
     PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !output :canopy total water potential, [Mpa]
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
     TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr       ,& !output :root water uptake, [m2 d-2 h-1]
+    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !output :root water uptake, [m3 d-2 h-1]
+    RootH2OUptkStress_pvr       => plt_ew%RootH2OUptkStress_pvr           ,& !output :pontential root water uptake rate, [m3 d-2 h-1]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
@@ -1287,8 +1296,8 @@ module UptakesMod
       else  
         CCPOLT = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
       endif
-      AllPlantRootH2OLoss_pvr(N,L,NZ) = 0.0_r8
-
+      RPlantRootH2OUptk_pvr(N,L,NZ) = 0.0_r8
+      RootH2OUptkStress_pvr(N,L,NZ)   = 0._r8
       call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 

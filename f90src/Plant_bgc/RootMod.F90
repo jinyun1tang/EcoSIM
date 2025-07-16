@@ -429,6 +429,7 @@ implicit none
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr         ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr         ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    RootMaintDef_CO2_pvr      => plt_bgcr%RootMaintDef_CO2_pvr       ,& !inoput :plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]
     Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr           ,& !inoput :root layer number axes, [d-2]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !inoput :root layer length secondary axes, [m d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr           & !output :root layer number secondary axes, [d-2]
@@ -504,11 +505,12 @@ implicit none
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration unltd,ltd by O2 and unlimited by N,P
 !     WFNRG=respiration function of root water potential
 !
-  RNonstCO2_Oltd      = RNonstCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
-  RCO2XMaint2nd_OUltd = RNonstCO2_OUltd-Rmaint2nd_CO2
-  RCO2XMaint2nd_Oltd  = RNonstCO2_Oltd-Rmaint2nd_CO2
-  RGrowCO2_OUltd      = AZMAX1(RCO2XMaint2nd_OUltd)*WFNRG
-  RGrowCO2_Oltd       = AZMAX1(RCO2XMaint2nd_Oltd)*WFNRG
+  RNonstCO2_Oltd               = RNonstCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
+  RCO2XMaint2nd_OUltd          = RNonstCO2_OUltd-Rmaint2nd_CO2
+  RCO2XMaint2nd_Oltd           = RNonstCO2_Oltd-Rmaint2nd_CO2
+  RGrowCO2_OUltd               = AZMAX1(RCO2XMaint2nd_OUltd)*WFNRG
+  RGrowCO2_Oltd                = AZMAX1(RCO2XMaint2nd_Oltd)*WFNRG
+  RootMaintDef_CO2_pvr(N,L,NZ) = RootMaintDef_CO2_pvr(N,L,NZ)+AMIN1(RCO2XMaint2nd_Oltd,0._r8)
 !
 !     SECONDARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -968,6 +970,7 @@ implicit none
     SoilBulkDensity_vr        => plt_soilchem%SoilBulkDensity_vr     ,& !input  :soil bulk density, [Mg m-3]
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft     ,& !input  :plant growth type (vascular, non-vascular),[-]
     C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch     ,& !input  :down-regulation of C4 photosynthesis, [-]
+    RootMaintDef_CO2_pvr      => plt_bgcr%RootMaintDef_CO2_pvr       ,& !inoput :plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]    
     RootCO2Autor_pvr          => plt_rbgc%RootCO2Autor_pvr           ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr        => plt_rbgc%RootCO2EmisPot_pvr         ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr         ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
@@ -1073,11 +1076,12 @@ implicit none
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration unltd,ltd by O2 and unlimited by N,P
 !     WFNRG=respiration function of root water potential
 !
-      RNonstCO2_Oltd=RNonstCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
-      RCO2XMaint1st_OUltd=RNonstCO2_OUltd-Rmaint1st_CO2
-      RCO2XMaint1st_Oltd=RNonstCO2_Oltd-Rmaint1st_CO2
-      RGrowCO2_OUltd=AZMAX1(RCO2XMaint1st_OUltd)*WFNRG
-      RGrowCO2_Oltd=AZMAX1(RCO2XMaint1st_Oltd)*WFNRG
+      RNonstCO2_Oltd               = RNonstCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
+      RCO2XMaint1st_OUltd          = RNonstCO2_OUltd-Rmaint1st_CO2
+      RCO2XMaint1st_Oltd           = RNonstCO2_Oltd-Rmaint1st_CO2
+      RGrowCO2_OUltd               = AZMAX1(RCO2XMaint1st_OUltd)*WFNRG
+      RGrowCO2_Oltd                = AZMAX1(RCO2XMaint1st_Oltd)*WFNRG
+      RootMaintDef_CO2_pvr(N,L,NZ) = RootMaintDef_CO2_pvr(N,L,NZ)+AMIN1(RCO2XMaint1st_Oltd,0._r8)
 !
 !     PRIMARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH

@@ -252,7 +252,7 @@ contains
 ! iplt_bryophyte=0
 ! iplt_grasslike=1
 !  iplt_treelike=2
-
+! only bryophyte is considered as shallow roots
   implicit none
   integer, intent(in) :: iPlantRootProfile_pft
   logical :: ans

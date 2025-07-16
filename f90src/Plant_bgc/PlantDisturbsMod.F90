@@ -99,12 +99,12 @@ module PlantDisturbsMod
   IF(J.EQ.INT(SolarNoonHour_col) .AND. iHarvstType_pft(NZ).NE.iharvtyp_grazing &
     .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
     IF(isclose(THIN_pft(NZ),0._r8))THEN
-      FHVSE = AZMAX1(1._r8-FracBiomHarvsted(1,4,NZ))
+      FHVSE = AZMAX1(1._r8-FracBiomHarvsted(1,iplthvst_stdead,NZ))
       FHVSH = FHVSE
     ELSE
       FHVSE=AZMAX1(1._r8-THIN_pft(NZ))
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_none)THEN
-        FHVSH=AZMAX1(1._r8-FracBiomHarvsted(1,4,NZ)*THIN_pft(NZ))
+        FHVSH=AZMAX1(1._r8-FracBiomHarvsted(1,iplthvst_stdead,NZ)*THIN_pft(NZ))
       ELSE
         FHVSH=FHVSE
       ENDIF
@@ -1002,8 +1002,8 @@ module PlantDisturbsMod
         FracShethGrainNotHvsted=1.0_r8-FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)*THIN_pft(NZ)
       ENDIF
     ELSE
-      FracGrainNotHvsted=1.0_r8-THIN_pft(NZ)
-      FracShethGrainNotHvsted=FracGrainNotHvsted
+      FracGrainNotHvsted      = 1.0_r8-THIN_pft(NZ)
+      FracShethGrainNotHvsted = FracGrainNotHvsted
     ENDIF
     FracHuskNotHvsted      = FracGrainNotHvsted
     FracEarNotHvsted       = FracGrainNotHvsted

@@ -290,6 +290,7 @@ implicit none
               FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
               FracBiomHarvsted(1,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT13
               FracBiomHarvsted(1,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
+              
               FracBiomHarvsted(2,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
               FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
               FracBiomHarvsted(2,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23

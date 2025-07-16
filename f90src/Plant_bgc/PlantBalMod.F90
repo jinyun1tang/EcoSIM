@@ -293,6 +293,8 @@ implicit none
     MaxNumRootLays        => plt_site%MaxNumRootLays         ,& !input  :maximum root layer number,[-]
     RootCO2Autor_pvr      => plt_rbgc%RootCO2Autor_pvr       ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     CO2NetFix_pft         => plt_bgcr%CO2NetFix_pft          ,& !output :canopy net CO2 exchange, [gC d-2 h-1]
+    RCanMaintDef_CO2_pft  => plt_bgcr%RCanMaintDef_CO2_pft   ,& !output :canopy maintenance respiraiton deficit as CO2, [gC d-2]    
+    RootMaintDef_CO2_pvr  => plt_bgcr%RootMaintDef_CO2_pvr   ,& !output :plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]        
     NodulInfectElms_pft   => plt_bgcr%NodulInfectElms_pft    ,& !output :nodule infection chemical element mass, [g d-2]
     RootMycoExudElms_pft  => plt_rbgc%RootMycoExudElms_pft   ,& !output :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
     NH3Dep2Can_pft        => plt_bgcr%NH3Dep2Can_pft         ,& !output :canopy NH3 flux, [g d-2 h-1]
@@ -316,16 +318,18 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
+    RootMaintDef_CO2_pvr(:,:,NZ)                                = 0._r8
     RootCO2Autor_pvr(1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ) = 0._r8
-    NH3Dep2Can_pft(NZ)                                    = 0._r8
-    GrossResp_pft(NZ)                                     = 0._r8
-    GrossCO2Fix_pft(NZ)                                   = 0._r8
-    CO2NetFix_pft(NZ)                                     = 0._r8
-    CanopyGrosRCO2_pft(NZ)                                = 0._r8
-    RootMycoExudElms_pft(1:NumPlantChemElms,NZ)           = 0._r8
-    NodulInfectElms_pft(1:NumPlantChemElms,NZ)            = 0._r8
-    CO2FixCL_pft(NZ)                                      = 0._r8
-    CO2FixLL_pft(NZ)                                      = 0._r8
+    NH3Dep2Can_pft(NZ)                                          = 0._r8
+    GrossResp_pft(NZ)                                           = 0._r8
+    GrossCO2Fix_pft(NZ)                                         = 0._r8
+    CO2NetFix_pft(NZ)                                           = 0._r8
+    RCanMaintDef_CO2_pft(NZ)                                    = 0._r8
+    CanopyGrosRCO2_pft(NZ)                                      = 0._r8
+    RootMycoExudElms_pft(1:NumPlantChemElms,NZ)                 = 0._r8
+    NodulInfectElms_pft(1:NumPlantChemElms,NZ)                  = 0._r8
+    CO2FixCL_pft(NZ)                                            = 0._r8
+    CO2FixLL_pft(NZ)                                            = 0._r8
 
   ENDDO D9980
   end associate

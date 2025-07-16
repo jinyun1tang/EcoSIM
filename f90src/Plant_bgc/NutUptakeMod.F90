@@ -1254,7 +1254,7 @@ module NutUptakeMod
     PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
     ZEROS                         => plt_site%ZEROS                           ,& !input  :threshold zero for numerical stability,[-]
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]
-    AllPlantRootH2OLoss_pvr       => plt_ew%AllPlantRootH2OLoss_pvr           ,& !input  :root water uptake, [m2 d-2 h-1]
+    RPlantRootH2OUptk_pvr       => plt_ew%RPlantRootH2OUptk_pvr           ,& !input  :root water uptake, [m2 d-2 h-1]
     RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !input  :root layer protein C, [gC d-2]
@@ -1318,7 +1318,7 @@ module NutUptakeMod
   Nutruptk_fNlim_rpvr(N,L,NZ)=FZUP
   Nutruptk_fPlim_rpvr(N,L,NZ)=FPUP
   !NN=0
-  PerPlantRootH2OUptake   = AZMAX1(-AllPlantRootH2OLoss_pvr(N,L,NZ)/PlantPopulation_pft(NZ))
+  PerPlantRootH2OUptake   = AZMAX1(-RPlantRootH2OUptk_pvr(N,L,NZ)/PlantPopulation_pft(NZ))
   dtPerPlantRootH2OUptake = PerPlantRootH2OUptake*dts_gas
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG
