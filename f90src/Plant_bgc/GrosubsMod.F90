@@ -479,17 +479,17 @@ module grosubsMod
 
   FracShootPetolElmAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)=FracShootLeafElmAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)
 
-  FracShootLeafElmAlloc2Litr(ielmn,k_woody_litr) = FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNLFW
-  FracShootLeafElmAlloc2Litr(ielmp,k_woody_litr) = FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPLFW
+  FracShootLeafElmAlloc2Litr(ielmn,k_woody_litr) = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNLFW,1._r8)
+  FracShootLeafElmAlloc2Litr(ielmp,k_woody_litr) = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPLFW,1._r8)
   
-  FracShootPetolElmAlloc2Litr(ielmn,k_woody_litr)  = FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNSHW
-  FracShootPetolElmAlloc2Litr(ielmp,k_woody_litr)  = FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPSHW
+  FracShootPetolElmAlloc2Litr(ielmn,k_woody_litr)  = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNSHW,1._r8)
+  FracShootPetolElmAlloc2Litr(ielmp,k_woody_litr)  = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPSHW,1._r8)
   
-  FracWoodStalkElmAlloc2Litr(ielmn,k_woody_litr)  = FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNRTW
-  FracWoodStalkElmAlloc2Litr(ielmp,k_woody_litr)  = FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPRTW
+  FracWoodStalkElmAlloc2Litr(ielmn,k_woody_litr)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNRTW,1._r8)
+  FracWoodStalkElmAlloc2Litr(ielmp,k_woody_litr)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPRTW,1._r8)
 
-  FracRootElmAlloc2Litr(ielmn,k_woody_litr)       = FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCRoot_pft(NZ)/CNRTW
-  FracRootElmAlloc2Litr(ielmp,k_woody_litr)       = FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCRootr_pft(NZ)/CPRTW
+  FracRootElmAlloc2Litr(ielmn,k_woody_litr)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCRoot_pft(NZ)/CNRTW,1._r8)
+  FracRootElmAlloc2Litr(ielmp,k_woody_litr)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCRootr_pft(NZ)/CPRTW,1._r8)
 
   DO NE=2,NumPlantChemElms
     FracShootPetolElmAlloc2Litr(NE,k_fine_litr) = AZMAX1(1.0_r8-FracShootPetolElmAlloc2Litr(NE,k_woody_litr))
