@@ -43,7 +43,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                        !excess ice, [m3 d-2]
   real(r8),target,allocatable ::  HydroCond_3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels, [m MPa-1 h-1]
   real(r8),target,allocatable ::  HydroCondMacP_vr(:,:,:)                   !macropore hydraulic conductivity, [m MPa-1 h-1]
-  real(r8),target,allocatable ::  HydroCondMicP4RootUptake_vr(:,:,:)        !soil micropore hydraulic conductivity for root water uptake ,[m MPa-1 h-1]
+  real(r8),target,allocatable ::  HYCDMicP4RootUptake_vr(:,:,:)        !soil micropore hydraulic conductivity for root water uptake ,[m MPa-1 h-1]
   real(r8),target,allocatable ::  SurfRunoffPotentM_col(:,:,:)              !runoff water flux out of grid (>=0), [m3 d-2 t-1]
   real(r8),target,allocatable ::  RunoffVelocityM_col(:,:,:)                !runoff velocity, [m t-1], 1 W/N, 0 E/S, -1 ,[-]
   integer,target,allocatable ::  IFLBM_2DH(:,:,:,:,:)                       !flag for directional surface runoff,[-]
@@ -169,7 +169,7 @@ module SoilWaterDataType
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
   allocate(HydroCond_3D(3,100,0:JZ,JY,JX));HydroCond_3D=0._r8
   allocate(HydroCondMacP_vr(JZ,JY,JX));     HydroCondMacP_vr=0._r8
-  allocate(HydroCondMicP4RootUptake_vr(JZ,JY,JX));     HydroCondMicP4RootUptake_vr=0._r8
+  allocate(HYCDMicP4RootUptake_vr(JZ,JY,JX));     HYCDMicP4RootUptake_vr=0._r8
   allocate(SurfRunoffPotentM_col(60,JV,JH));      SurfRunoffPotentM_col=0._r8
   allocate(RunoffVelocityM_col(60,JY,JX));      RunoffVelocityM_col=0._r8
   allocate(IFLBM_2DH(60,2,2,JY,JX));IFLBM_2DH=-1
@@ -274,7 +274,7 @@ module SoilWaterDataType
   call destroy(XVLiceMicPM)
   call destroy(HydroCond_3D)
   call destroy(HydroCondMacP_vr)
-  call destroy(HydroCondMicP4RootUptake_vr)
+  call destroy(HYCDMicP4RootUptake_vr)
   call destroy(SurfRunoffPotentM_col)
   call destroy(RunoffVelocityM_col)
   call destroy(IFLBM_2DH)

@@ -263,7 +263,7 @@ implicit none
       +CanopyNonstElms_brch(NE,NB,NZ)
     
   ENDDO
-!  CanopyStalkC_pft(NZ)     = sum(StalkLiveBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+!  CanopySapwoodC_pft(NZ)     = sum(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
   CanopyLeafShethC_pft(NZ) = sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
 
   !add C4 specific reserve carbon

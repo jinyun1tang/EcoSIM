@@ -52,7 +52,7 @@ module InitPlantMod
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
-!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios
+!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios
 !     RootFracRemobilizableBiom_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
@@ -122,8 +122,8 @@ module InitPlantMod
     iPlantingDay_pft          => plt_distb%iPlantingDay_pft           ,& !input  :day of planting,[-]
     iPlantingYear_pft         => plt_distb%iPlantingYear_pft          ,& !input  :year of planting,[-]
     PPI_pft                   => plt_site%PPI_pft                     ,& !output :initial plant population, [plants d-2]
-    rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft          ,& !output :C:N ratio in remobilizable nonstructural biomass, [-]
-    rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft          ,& !output :C:P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2N_pft         => plt_allom%rProteinC2N_pft          ,& !output :C:N ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2P_pft         => plt_allom%rProteinC2P_pft          ,& !output :C:P ratio in remobilizable nonstructural biomass, [-]
     CO2CuticleResist_pft      => plt_photo%CO2CuticleResist_pft       ,& !output :maximum stomatal resistance to CO2, [s h-1]
     ClumpFactor_pft           => plt_morph%ClumpFactor_pft            ,& !output :clumping factor for self-shading in canopy layer, [-]
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !output :maximum stomatal resistance to vapor, [s h-1]
@@ -145,9 +145,9 @@ module InitPlantMod
 
   H2OCuticleResist_pft(NZ)          = CuticleResist_pft(NZ)/3600.0_r8
   CO2CuticleResist_pft(NZ)          = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
-  rCNNonstRemob_pft(NZ)             = 2.5_r8
-  rCPNonstRemob_pft(NZ)             = 25.0_r8
-  RootFracRemobilizableBiom_pft(NZ) = AMIN1(rNCRoot_pft(NZ)*rCNNonstRemob_pft(NZ),rPCRootr_pft(NZ)*rCPNonstRemob_pft(NZ))
+  rProteinC2N_pft(NZ)             = 2.5_r8
+  rProteinC2P_pft(NZ)             = 25.0_r8
+  RootFracRemobilizableBiom_pft(NZ) = AMIN1(rNCRoot_pft(NZ)*rProteinC2N_pft(NZ),rPCRootr_pft(NZ)*rProteinC2P_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     O2I_pft(NZ)=2.10E+05_r8
   ELSE
@@ -695,7 +695,7 @@ module InitPlantMod
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)     = 0._r8
 
   D25: DO NB=1,MaxNumBranches
-    plt_biom%StalkLiveBiomassC_brch(NB,NZ)   = 0._r8
+    plt_biom%SapwoodBiomassC_brch(NB,NZ)   = 0._r8
     plt_biom%LeafPetolBiomassC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
     SeedNumSet_brch(NB,NZ)                   = 0._r8
@@ -753,7 +753,7 @@ module InitPlantMod
   plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%PetoleStrutElms_pft(1:NumPlantChemElms,NZ)    = 0._r8
   plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
-  plt_biom%CanopyStalkC_pft(NZ)                          = 0._r8
+  plt_biom%CanopySapwoodC_pft(NZ)                          = 0._r8
   plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%EarStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8

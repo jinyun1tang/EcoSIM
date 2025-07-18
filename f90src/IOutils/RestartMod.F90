@@ -947,17 +947,17 @@ implicit none
 
   if(flag=='read')then  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanopyStalkC_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopySapwoodC_pft', dim1name='pft',&
      long_name='canopy active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)               
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyStalkC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopySapwoodC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'CanopyStalkC_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyStalkC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+    !print*,'CanopySapwoodC_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopySapwoodC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='CanopyStalkC_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopySapwoodC_pft', dim1name='pft',&
      long_name='canopy active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)               
 
@@ -2543,17 +2543,17 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='StalkLiveBiomassC_brch', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='SapwoodBiomassC_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StalkLiveBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SapwoodBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'StalkLiveBiomassC_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StalkLiveBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    !print*,'SapwoodBiomassC_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SapwoodBiomassC_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='StalkLiveBiomassC_brch', dim1name='pft',dim2name='nbranches',&
+    call restartvar(ncid, flag, varname='SapwoodBiomassC_brch', dim1name='pft',dim2name='nbranches',&
      long_name='branch active stalk C', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
   endif  

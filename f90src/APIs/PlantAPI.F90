@@ -88,10 +88,10 @@ implicit none
   FERT(17:19,I1,NY,NX) = plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX)                                                       = plt_distb%FERT(3)
   IYTYP(2,I1,NY,NX)                                                      = plt_distb%IYTYP
-  FracRootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracRootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
+  FracWoodStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracWoodStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)       = plt_allom%FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   FracShootLeafElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracShootLeafElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
-  FracShootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs) = plt_allom%FracShootStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
+  FracShootPetolElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs) = plt_allom%FracShootPetolElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
   QH2OLoss_lnds                                                          = plt_site%QH2OLoss_lnds
 
   DO L=1,NumCanopyLayers
@@ -196,8 +196,8 @@ implicit none
     LeafIntracellularCO2_pft(NZ,NY,NX)  = plt_photo%LeafIntracellularCO2_pft(NZ)
     aquCO2Intraleaf_pft(NZ,NY,NX)       = plt_photo%aquCO2Intraleaf_pft(NZ)
     ClumpFactor_pft(NZ,NY,NX)           = plt_morph%ClumpFactor_pft(NZ)
-    rCNNonstRemob_pft(NZ,NY,NX)         = plt_allom%rCNNonstRemob_pft(NZ)
-    rCPNonstRemob_pft(NZ,NY,NX)         = plt_allom%rCPNonstRemob_pft(NZ)
+    rProteinC2N_pft(NZ,NY,NX)         = plt_allom%rProteinC2N_pft(NZ)
+    rProteinC2P_pft(NZ,NY,NX)         = plt_allom%rProteinC2P_pft(NZ)
     RootFracRemobilizableBiom_pft(NZ,NY,NX) = plt_allom%RootFracRemobilizableBiom_pft(NZ)
     CNRTS_pft(NZ,NY,NX)                 = plt_allom%CNRTS_pft(NZ)
     CPRTS_pft(NZ,NY,NX)                 = plt_allom%CPRTS_pft(NZ)
@@ -300,7 +300,7 @@ implicit none
     VHeatCapCanopy_pft(NZ,NY,NX)               = plt_ew%VHeatCapCanopy_pft(NZ)
     HoursTooLowPsiCan_pft(NZ,NY,NX)            = plt_pheno%HoursTooLowPsiCan_pft(NZ)
     SeedCPlanted_pft(NZ,NY,NX)                 = plt_biom%SeedCPlanted_pft(NZ)
-    CanopyStalkC_pft(NZ,NY,NX)                 = plt_biom%CanopyStalkC_pft(NZ)
+    CanopySapwoodC_pft(NZ,NY,NX)                 = plt_biom%CanopySapwoodC_pft(NZ)
     CanopyLeafShethC_pft(NZ,NY,NX)             = plt_biom%CanopyLeafShethC_pft(NZ)
     RootBiomCPerPlant_pft(NZ,NY,NX)            = plt_biom%RootBiomCPerPlant_pft(NZ)
     Km4LeafaqCO2_pft(NZ,NY,NX)                 = plt_photo%Km4LeafaqCO2_pft(NZ)
@@ -414,7 +414,7 @@ implicit none
       dReproNodeNumNormByMatG_brch(NB,NZ,NY,NX)                = plt_pheno%dReproNodeNumNormByMatG_brch(NB,NZ)
       LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ,NY,NX)    = plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ)
       SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ,NY,NX) = plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)
-      StalkLiveBiomassC_brch(NB,NZ,NY,NX)                          = plt_biom%StalkLiveBiomassC_brch(NB,NZ)
+      SapwoodBiomassC_brch(NB,NZ,NY,NX)                          = plt_biom%SapwoodBiomassC_brch(NB,NZ)
 
       DO K=0,MaxNodesPerBranch
         LeafNodeArea_brch(K,NB,NZ,NY,NX)                          = plt_morph%LeafNodeArea_brch(K,NB,NZ)
@@ -720,7 +720,7 @@ implicit none
   ENDDO
 
   DO L=1,NL_col(NY,NX)
-    plt_soilchem%HydroCondMicP4RootUptake_vr(L) = HydroCondMicP4RootUptake_vr(L,NY,NX)
+    plt_soilchem%HYCDMicP4RootUptake_vr(L) = HYCDMicP4RootUptake_vr(L,NY,NX)
     plt_soilchem%GasDifc_vr(idg_beg:idg_end,L)  = GasDifc_vr(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%SoilResit4RootPentrate_vr(L)   = SoilResit4RootPentrate_vr(L,NY,NX)
     plt_site%CumSoilThickMidL_vr(L)             = CumSoilThickMidL_vr(L,NY,NX)
@@ -1063,7 +1063,7 @@ implicit none
     plt_pheno%HighTempLimitSeed_pft(NZ)     = HighTempLimitSeed_pft(NZ,NY,NX)
     plt_ew%Transpiration_pft(NZ)            = Transpiration_pft(NZ,NY,NX)
 
-    plt_biom%CanopyStalkC_pft(NZ) = CanopyStalkC_pft(NZ,NY,NX)
+    plt_biom%CanopySapwoodC_pft(NZ) = CanopySapwoodC_pft(NZ,NY,NX)
     plt_photo%ChillHours_pft(NZ) = ChillHours_pft(NZ,NY,NX)
     plt_ew%PSICanopyOsmo_pft(NZ) = PSICanopyOsmo_pft(NZ,NY,NX)
 
@@ -1106,8 +1106,8 @@ implicit none
     plt_biom%NoduleNonstructCconc_pft(NZ) = NoduleNonstructCconc_pft(NZ,NY,NX)
     plt_bgcr%CO2NetFix_pft(NZ)            = CO2NetFix_pft(NZ,NY,NX)
 
-    plt_allom%rCNNonstRemob_pft(NZ) = rCNNonstRemob_pft(NZ,NY,NX)
-    plt_allom%rCPNonstRemob_pft(NZ) = rCPNonstRemob_pft(NZ,NY,NX)
+    plt_allom%rProteinC2N_pft(NZ) = rProteinC2N_pft(NZ,NY,NX)
+    plt_allom%rProteinC2P_pft(NZ) = rProteinC2P_pft(NZ,NY,NX)
 
     plt_photo%DiffCO2Atmos2Intracel_pft(NZ) = DiffCO2Atmos2Intracel_pft(NZ,NY,NX)
     plt_photo%AirConc_pft(NZ)               = AirConc_pft(NZ,NY,NX)
@@ -1248,7 +1248,7 @@ implicit none
       plt_biom%LeafPetolBiomassC_brch(NB,NZ)                          = LeafPetolBiomassC_brch(NB,NZ,NY,NX)
       plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ)        = LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
       plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)     = SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
-      plt_biom%StalkLiveBiomassC_brch(NB,NZ)                              = StalkLiveBiomassC_brch(NB,NZ,NY,NX)
+      plt_biom%SapwoodBiomassC_brch(NB,NZ)                              = SapwoodBiomassC_brch(NB,NZ,NY,NX)
       DO M=1,pltpar%NumGrowthStages
         plt_pheno%iPlantCalendar_brch(M,NB,NZ)=iPlantCalendar_brch(M,NB,NZ,NY,NX)
       ENDDO

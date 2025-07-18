@@ -253,9 +253,12 @@ implicit none
   real(r8),pointer   :: h1D_cTNN_ptc(:)       
   real(r8),pointer   :: h1D_cTNP_ptc(:)    
   real(r8),pointer   :: h1D_CanNonstBConc_ptc(:)      
-  real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:) 
+  real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:)
+  real(r8),pointer   :: h1D_Km_CO2_carboxy_ptc(:)
+  real(r8),pointer   :: h1D_Ci_mesophyll_ptc(:)
   real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:) 
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)      
+  real(r8),pointer   :: h1D_O2L_ptc(:)
   real(r8),pointer   :: h1D_LAI_ptc(:)          
   real(r8),pointer   :: h1D_PSI_CAN_ptc(:)      
   real(r8),pointer   :: h1D_TURG_CAN_ptc(:)     
@@ -729,8 +732,11 @@ implicit none
   allocate(this%h1D_cTNP_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNP_ptc(:)=spval
   allocate(this%h1D_CanNonstBConc_ptc(beg_ptc:end_ptc)) ;this%h1D_CanNonstBConc_ptc(:)=spval
   allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))   ;this%h1D_STOML_RSC_CO2_ptc(:)=spval
+  allocate(this%h1D_Km_CO2_carboxy_ptc(beg_ptc:end_ptc)); this%h1D_Km_CO2_carboxy_ptc(:)=spval
+  allocate(this%h1D_Ci_mesophyll_ptc(beg_ptc:end_ptc)); this%h1D_Ci_mesophyll_ptc(:)=spval
   allocate(this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc))         ;this%h1D_CAN_CO2_ptc(:)=spval
+  allocate(this%h1D_O2L_ptc(beg_ptc:end_ptc)); this%h1D_O2L_ptc(:)=spval
   allocate(this%h1D_LAI_ptc(beg_ptc:end_ptc))             ;this%h1D_LAI_ptc(:)=spval
   allocate(this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PSI_CAN_ptc(:)=spval
   allocate(this%h1D_TURG_CAN_ptc(beg_ptc:end_ptc))        ;this%h1D_TURG_CAN_ptc(:)=spval
@@ -1818,6 +1824,15 @@ implicit none
   call hist_addfld1d(fname='STOML_RSC_CO2_pft',units='s/m',avgflag='A',&
     long_name='Canopy stomatal resistance for CO2',ptr_patch=data1d_ptr)      
 
+  data1d_ptr => this%h1D_Km_CO2_carboxy_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Km_CO2_carboxy_pft',units='uM',avgflag='A',&
+    long_name='MM parameter for CO2 carboxylation by Rubisco',ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_Ci_mesophyll_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Ci_mesophyll_pft',units='uM',avgflag='A',&
+    long_name='Intracellular CO2 concentration for photosynthesis',ptr_patch=data1d_ptr,default='inactive')      
+
+
   data1d_ptr => this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='BLYR_RSC_CO2_pft',units='s/m',avgflag='A',&
     long_name='Canopy boundary layer resistance for CO2',ptr_patch=data1d_ptr,&
@@ -1826,6 +1841,11 @@ implicit none
   data1d_ptr => this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='CAN_CO2_pft',units='umol/mol',avgflag='A',&
     long_name='Canopy gaesous CO2 concentration',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
+  data1d_ptr => this%h1D_O2L_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='Leaf_O2_pft',units='umol/mol',avgflag='A',&
+    long_name='Leaf aqueous O2 concentration',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_LAI_ptc(beg_ptc:end_ptc)    
@@ -3626,8 +3646,11 @@ implicit none
         this%h1D_cTNP_ptc(nptc)          = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
         this%h1D_CanNonstBconc_ptc(nptc) = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX))
         this%h1D_STOML_RSC_CO2_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
+        this%h1D_Km_CO2_carboxy_ptc(nptc)= Km4RubiscoCarboxy_pft(NZ,NY,NX)
+        this%h1D_Ci_mesophyll_ptc(nptc)  = LeafIntracellularCO2_pft(NZ,NY,NX)
         this%h1D_BLYR_RSC_CO2_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*secs1hour
         this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
+        this%h1D_O2L_ptc(nptc)           = O2L_pft(NZ,NY,NX)
         this%h1D_LAI_ptc(nptc)           = LeafStalkArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_PSI_CAN_ptc(nptc)       = PSICanopy_pft(NZ,NY,NX)
         this%h1D_TURG_CAN_ptc(nptc)      = PSICanopyTurg_pft(NZ,NY,NX)

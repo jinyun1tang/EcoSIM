@@ -15,9 +15,9 @@ module PlantTraitDataType
 !allocation parameter
 
   REAL(R8),target,allocatable :: FracShootLeafElmAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracShootStalkElmAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracShootPetolElmAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracRootElmAlloc2Litr(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracRootStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
   real(r8),target,allocatable ::  CanopyStalkArea_lbrch(:,:,:,:,:)           !Canopy stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                  !Canopy leaf area, [m2 d-2]
@@ -71,8 +71,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                          !ear P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCGrain_pft(:,:,:)                            !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCNoduler_pft(:,:,:)                       !nodule P:C ratio, [g g-1]
-  real(r8),target,allocatable ::  rCNNonstRemob_pft(:,:,:)                   !C:N ratio in remobilizable nonstructural biomass, [-]
-  real(r8),target,allocatable ::  rCPNonstRemob_pft(:,:,:)                   !C:P ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2N_pft(:,:,:)                   !C:N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2P_pft(:,:,:)                   !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                      !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)            !initial plant thermal adaptation zone, [-]
@@ -182,10 +182,10 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(FracShootStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootStalkElmAlloc2Litr=0._r8
+  allocate(FracShootPetolElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolElmAlloc2Litr=0._r8
   allocate(FracShootLeafElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafElmAlloc2Litr=0._r8
   allocate(FracRootElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAlloc2Litr=0._r8         !
-  allocate(FracRootStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootStalkElmAlloc2Litr=0._r8         !woody element allocation
+  allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
@@ -239,8 +239,8 @@ contains
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
   allocate(rPCGrain_pft(JP,JY,JX));     rPCGrain_pft=0._r8
   allocate(rPCNoduler_pft(JP,JY,JX));     rPCNoduler_pft=0._r8
-  allocate(rCNNonstRemob_pft(JP,JY,JX));     rCNNonstRemob_pft=0._r8
-  allocate(rCPNonstRemob_pft(JP,JY,JX));     rCPNonstRemob_pft=0._r8
+  allocate(rProteinC2N_pft(JP,JY,JX));     rProteinC2N_pft=0._r8
+  allocate(rProteinC2P_pft(JP,JY,JX));     rProteinC2P_pft=0._r8
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
@@ -351,7 +351,7 @@ contains
 
   call destroy(FracShootLeafElmAlloc2Litr)
   call destroy(FracRootElmAlloc2Litr)
-  call destroy(FracRootStalkElmAlloc2Litr)
+  call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
   call destroy(CanopyLeafArea_pft)
   call destroy(LeafStalkArea_pft)
@@ -405,8 +405,8 @@ contains
   call destroy(rPCEar_pft)
   call destroy(rPCGrain_pft)
   call destroy(rPCNoduler_pft)
-  call destroy(rCNNonstRemob_pft)
-  call destroy(rCPNonstRemob_pft)
+  call destroy(rProteinC2N_pft)
+  call destroy(rProteinC2P_pft)
   call destroy(CanOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone)

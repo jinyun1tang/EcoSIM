@@ -48,7 +48,7 @@ module StartqMod
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
-!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios
+!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios
 !    RootFracRemobilizableBiom_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
@@ -118,10 +118,10 @@ module StartqMod
   
   H2OCuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
   CO2CuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)*1.56_r8
-  rCNNonstRemob_pft(NZ,NY,NX)         = 2.5_r8
-  rCPNonstRemob_pft(NZ,NY,NX)         = 25.0_r8
-  RootFracRemobilizableBiom_pft(NZ,NY,NX) = AMIN1(rNCRoot_pft(NZ,NY,NX)*rCNNonstRemob_pft(NZ,NY,NX)&
-    ,rPCRootr_pft(NZ,NY,NX)*rCPNonstRemob_pft(NZ,NY,NX))
+  rProteinC2N_pft(NZ,NY,NX)         = 2.5_r8
+  rProteinC2P_pft(NZ,NY,NX)         = 25.0_r8
+  RootFracRemobilizableBiom_pft(NZ,NY,NX) = AMIN1(rNCRoot_pft(NZ,NY,NX)*rProteinC2N_pft(NZ,NY,NX)&
+    ,rPCRootr_pft(NZ,NY,NX)*rProteinC2P_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I_pft(NZ,NY,NX)=2.10E+05_r8
   ELSE
@@ -546,7 +546,7 @@ module StartqMod
   LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)       = 0._r8
   
   D25: DO NB=1,MaxNumBranches
-    StalkLiveBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
+    SapwoodBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
     LeafPetolBiomassC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
     SeedNumSet_brch(NB,NZ,NY,NX)         = 0._r8
@@ -604,7 +604,7 @@ module StartqMod
   LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
   PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
   StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
-  CanopyStalkC_pft(NZ,NY,NX)                          = 0._r8
+  CanopySapwoodC_pft(NZ,NY,NX)                          = 0._r8
   StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
   HuskStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
   EarStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)       = 0._r8

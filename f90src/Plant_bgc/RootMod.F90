@@ -401,8 +401,8 @@ implicit none
     RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr  ,& !input  :root layer nonstructural C concentration, [g g-1]
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr     ,& !input  :O2 constraint to root respiration (0-1), [-]
-    rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft         ,& !input  :C:N ratio in remobilizable nonstructural biomass, [-]
-    rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft         ,& !input  :C:P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2N_pft         => plt_allom%rProteinC2N_pft         ,& !input  :C:N ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2P_pft         => plt_allom%rProteinC2P_pft         ,& !input  :C:P ratio in remobilizable nonstructural biomass, [-]
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr     ,& !input  :C woody fraction in root,[-]
     CNRTS_pft                 => plt_allom%CNRTS_pft                 ,& !input  :root N:C ratio x root growth yield, [-]
     CPRTS_pft                 => plt_allom%CPRTS_pft                 ,& !input  :root P:C ratio x root growth yield, [-]
@@ -754,7 +754,7 @@ implicit none
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     Root2ndNetGrowthElms(ielmc),Root2ndNetGrowthElms(ielmn),Root2ndNetGrowthElms(ielmp)=net root C,N,P growth
 !     RootProteinC_pvr=total root protein C mass
-!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
+!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios from startq.f
 !     RootBranchFreq_pft=root branching frequency from PFT file
 !     Root2ndXNum_rpvr,Root2ndXNum_pvr=number of secondary root axes
 !
@@ -762,9 +762,9 @@ implicit none
   DO NE=1,NumPlantChemElms
     RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)+Root2ndNetGrowthElms(NE)
   ENDDO
-  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rCNNonstRemob_pft(NZ) &
+  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+AMIN1(rProteinC2N_pft(NZ) &
     *RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ) &
-    ,rCPNonstRemob_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
+    ,rProteinC2P_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
 
   !secondary root axes addition is a quadratic function of branching frequency
   RTN2X                       = RootBranchFreq_pft(NZ)*RootPrimeAxsNum
@@ -1593,8 +1593,8 @@ implicit none
 ! begin_execution
   associate(                                                          &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
-    rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft         ,& !input  :C:N ratio in remobilizable nonstructural biomass, [-]
-    rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft         ,& !input  :C:P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2N_pft         => plt_allom%rProteinC2N_pft         ,& !input  :C:N ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2P_pft         => plt_allom%rProteinC2P_pft         ,& !input  :C:P ratio in remobilizable nonstructural biomass, [-]
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr     ,& !input  :C woody fraction in root,[-]
     CumSoilThickness_vr       => plt_site%CumSoilThickness_vr        ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     DLYR3                     => plt_site%DLYR3                      ,& !input  :vertical thickness of soil layer, [m]
@@ -1673,7 +1673,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     FGROL,FGROZ=fraction of Root1stExtension in current,next lower soil layer
 !     RootProteinC_pvr=total root protein C mass
-!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
+!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios from startq.f
 !     Root1stLen_rpvr=primary root length
 !
   Root1stDepz_pft(N,NR,NZ)=Root1stDepz_pft(N,NR,NZ)+Root1stExtension
@@ -1684,8 +1684,8 @@ implicit none
   ENDDO
 
   RootProteinC_pvr(N,L,NZ) = RootProteinC_pvr(N,L,NZ)+ &
-    AMIN1(rCNNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) &
-         ,rCPNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
+    AMIN1(rProteinC2N_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) &
+         ,rProteinC2P_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
   Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)+Root1stExtension*FGROL
 !
 !     TRANSFER STRUCTURAL, NONSTRUCTURAL C,N,P INTO NEXT SOIL LAYER
@@ -1696,7 +1696,7 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     RootNetGrowthElms(:)=net root C,N,P growth
 !     RootProteinC_pvr=total root protein C mass
-!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios from startq.f
+!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios from startq.f
 !     WTRTD=root C mass
 !     Root1stLen_rpvr=primary root length
 !     Root1stExtension=primary root length extension
@@ -1711,8 +1711,8 @@ implicit none
     ENDDO
 
     RootProteinC_pvr(N,L1,NZ) = RootProteinC_pvr(N,L1,NZ) &
-      +AMIN1(rCNNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L1,NR,NZ) &
-            ,rCPNonstRemob_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L1,NR,NZ))
+      +AMIN1(rProteinC2N_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L1,NR,NZ) &
+            ,rProteinC2P_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L1,NR,NZ))
     PopuRootMycoC_pvr(N,L1,NZ)  = PopuRootMycoC_pvr(N,L1,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L1,NR,NZ)
     Root1stLen_rpvr(N,L1,NR,NZ) = Root1stLen_rpvr(N,L1,NR,NZ)+Root1stExtension*FGROZ
     Root1stRadius_pvr(N,L1,NZ)  = Root1stRadius_pvr(N,L,NZ)

@@ -128,7 +128,7 @@ contains
     k_woody_litr               => pltpar%k_woody_litr                   ,& !input  :woody litter complex id
     ifoliar                    => pltpar%ifoliar                        ,& !input  :group id of plant foliar litter
     inonfoliar                 => pltpar%inonfoliar                     ,& !input  :group id of plant non-foliar litter group
-    FracRootStalkElmAlloc2Litr => plt_allom%FracRootStalkElmAlloc2Litr  ,& !input  :woody element allocation,[-]
+    FracWoodStalkElmAlloc2Litr => plt_allom%FracWoodStalkElmAlloc2Litr  ,& !input  :woody element allocation,[-]
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft   ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft       ,& !input  :plant growth type (vascular, non-vascular),[-]
     LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr         ,& !inoput :plant LitrFall element, [g d-2 h-1]
@@ -180,30 +180,30 @@ contains
         
       LitrfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ) &
         *ElmAllocmat4Litr(ielmc,istalk,M,NZ)&
-        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr)
+        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)
 
       DO NE=2,NumPlantChemElms  
         LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
-          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracWoodStalkElmAlloc2Litr(NE,k_woody_litr)
 
         LitrfalStrutElms_pvr(NE,ilignin,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,ilignin,k_woody_litr,0,NZ) &
           +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)-WoodyElmntOffEcosystem(NE) &
           +StandeadElmnt2Litr(NE)+StandeadElmntHarv2Litr(NE)-StandeadElmntOffEcosystem(NE)) &
-          *FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+          *FracWoodStalkElmAlloc2Litr(NE,k_woody_litr)
       ENDDO    
 
       LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
         +ElmAllocmat4Litr(ielmc,istalk,M,NZ) &
-        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)
+        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr)
 
       DO NE=2,NumPlantChemElms    
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)
         
         LitrfalStrutElms_pvr(NE,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,ilignin,k_fine_litr,0,NZ) &
           +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)-WoodyElmntOffEcosystem(NE) &
           +StandeadElmnt2Litr(NE)+StandeadElmntHarv2Litr(NE)-StandeadElmntOffEcosystem(NE)) &
-          *FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+          *FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)
 
       ENDDO  
     ENDIF

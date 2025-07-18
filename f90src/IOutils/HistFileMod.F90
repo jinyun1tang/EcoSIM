@@ -1663,6 +1663,7 @@ implicit none
     logical, save :: do_3Dtconst = .true. ! true => write out 3D time-constant data
     integer :: hist_ntimes(ntapes)
     integer :: hist_mfilt(ntapes)
+    character(len=14) :: ymdhs    
     character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_wrapup'
     !-----------------------------------------------------------------------
 
@@ -1753,9 +1754,10 @@ implicit none
 !             do_3Dtconst = .false.
 !          end if
 !         if (masterproc) then
+             call etimer%get_ymdhs(ymdhs)
              write(iulog,*)
              write(iulog,*) trim(subname),' : Writing current time sample to local history file ', &
-                  trim(locfnh(t)),' at nstep = ',etimer%get_nstep(), &
+                  trim(locfnh(t)),' at = ',ymdhs, &
                   ' for history time interval beginning at ', tape(t)%begtime, &
                   ' and ending at ',time
              write(iulog,*)

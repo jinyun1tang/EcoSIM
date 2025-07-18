@@ -118,7 +118,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafStrutElms_pft(:,:,:,:)                 !canopy leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  PetoleStrutElms_pft(:,:,:,:)               !canopy sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StalkStrutElms_pft(:,:,:,:)                !canopy stalk chemical element, [g d-2]
-  real(r8),target,allocatable ::  CanopyStalkC_pft(:,:,:)                    !canopy active stalk C, [g d-2]
+  real(r8),target,allocatable ::  CanopySapwoodC_pft(:,:,:)                    !canopy active stalk C, [g d-2]
   real(r8),target,allocatable ::  StalkRsrvElms_pft(:,:,:,:)                 !canopy reserve chemical element, [g d-2]
   real(r8),target,allocatable ::  HuskStrutElms_pft(:,:,:,:)                 !canopy husk chemical element, [g d-2]
   real(r8),target,allocatable ::  EarStrutElms_pft(:,:,:,:)                  !canopy ear chemical element, [g d-2]
@@ -133,7 +133,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyStemAreaZ_pft(:,:,:,:)               !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_pft(:,:,:,:)          !canopy nodule nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulElms_pft(:,:,:,:)               !canopy nodule chemical elemental biomass [g d-2]
-  real(r8),target,allocatable ::  StalkLiveBiomassC_brch(:,:,:,:)            !branch active stalk C, [g d-2]
+  real(r8),target,allocatable ::  SapwoodBiomassC_brch(:,:,:,:)            !branch active stalk C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_brch(:,:,:,:,:)            !branch nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafPetolBiomassC_brch(:,:,:,:)            !plant branch leaf + sheath C, [g d-2]
   real(r8),target,allocatable ::  ShootStrutElms_brch(:,:,:,:,:)             !branch shoot C, [g d-2]
@@ -282,7 +282,7 @@ module CanopyDataType
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
   allocate(PetoleStrutElms_pft(NumPlantChemElms,JP,JY,JX)); PetoleStrutElms_pft=0._r8
   allocate(StalkStrutElms_pft(NumPlantChemElms,JP,JY,JX)); StalkStrutElms_pft=0._r8
-  allocate(CanopyStalkC_pft(JP,JY,JX));    CanopyStalkC_pft=0._r8
+  allocate(CanopySapwoodC_pft(JP,JY,JX));    CanopySapwoodC_pft=0._r8
   allocate(StalkRsrvElms_pft(NumPlantChemElms,JP,JY,JX));    StalkRsrvElms_pft=0._r8
   allocate(HuskStrutElms_pft(NumPlantChemElms,JP,JY,JX));    HuskStrutElms_pft=0._r8
   allocate(EarStrutElms_pft(NumPlantChemElms,JP,JY,JX));    EarStrutElms_pft=0._r8
@@ -297,7 +297,7 @@ module CanopyDataType
   allocate(CanopyStemAreaZ_pft(NumCanopyLayers,JP,JY,JX)); CanopyStemAreaZ_pft=0._r8
   allocate(CanopyNodulElms_pft(NumPlantChemElms,JP,JY,JX));CanopyNodulElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
-  allocate(StalkLiveBiomassC_brch(MaxNumBranches,JP,JY,JX));StalkLiveBiomassC_brch=0._r8
+  allocate(SapwoodBiomassC_brch(MaxNumBranches,JP,JY,JX));SapwoodBiomassC_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
   allocate(C4PhotoShootNonstC_brch(MaxNumBranches,JP,JY,JX));C4PhotoShootNonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
@@ -447,7 +447,7 @@ module CanopyDataType
   call destroy(LeafStrutElms_pft)
   call destroy(PetoleStrutElms_pft)
   call destroy(StalkStrutElms_pft)
-  call destroy(CanopyStalkC_pft)
+  call destroy(CanopySapwoodC_pft)
   call destroy(StalkRsrvElms_pft)
   call destroy(HuskStrutElms_pft)
   call destroy(EarStrutElms_pft)
@@ -462,7 +462,7 @@ module CanopyDataType
   call destroy(CanopyStemAreaZ_pft)
   call destroy(CanopyNodulNonstElms_pft)
   call destroy(CanopyNodulElms_pft)
-  call destroy(StalkLiveBiomassC_brch)
+  call destroy(SapwoodBiomassC_brch)
   call destroy(CanopyNonstElms_brch)
   call destroy(C4PhotoShootNonstC_brch)
   call destroy(LeafPetolBiomassC_brch)

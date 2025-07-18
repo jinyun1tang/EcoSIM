@@ -41,6 +41,7 @@ module SurfaceRadiationMod
 
     call SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft)
   endif
+   
   call SurfaceRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft)
 
   call CalcBoundaryLayerProperties(DepthSurfWatIce)
@@ -154,6 +155,13 @@ module SurfaceRadiationMod
   !     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
   !     CanopyLeafAareZ_col,CanopyStemAareZ_col=leaf,stalk area of combined canopy layer
   !
+  if(I==6.and.J==22.and..false.)then
+    !set up input
+    CanopyHeight_pft(1)=0.2
+    plt_morph%CanopyLeafArea_pft(1)=0.1
+    CanopyLeafAareZ_col(1)=0.1
+    CanopyStemAareZ_col(1)=0.05
+  endif  
   CanopyHeight_col=0.0_r8
   D9685: DO NZ=1,NP
     CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
@@ -190,6 +198,10 @@ module SurfaceRadiationMod
       CanopyHeightZ_col(L-1)=ZL1(L-1)
     ENDDO D2770
   ENDIF
+  if(I==1 .and. J==18 .and. .false.)then  
+    write(456,*)'single',J, plt_rad%SineSunInclAngle_col  
+    write(456,*)(CanopyHeightZ_col(L),L=1,NumCanopyLayers1)
+  endif
 
   end associate
   end subroutine DivideCanopyAreaByHeight
@@ -220,8 +232,13 @@ module SurfaceRadiationMod
     LeafStalkArea_col     => plt_morph%LeafStalkArea_col       & !output :stalk area of combined, each PFT canopy,[m^2 d-2]
   )
   
+  if(I==6.and.J==22.and..false.)then
+  CanopyLeafArea_lnode(1,1,1,1)=0.1
+  CanopyStalkArea_lbrch(1,1,1)=0.05
+  LeafAreaZsec_brch(:,1,1,1,1)=(/0.025,0.025,0.025,0.025/)
+  StemAreaZsec_brch(:,1,1,1)=(/0.0125,0.0125,0.0125,0.0125/)
+  endif
   LeafStalkArea_col=0.0_r8
-
   D1135: DO NZ=1,NP
 
     LeafStalkArea_pft(NZ)=0.0_r8
@@ -346,6 +363,10 @@ module SurfaceRadiationMod
     RadSWSolarBeam_col  = 0.0_r8
     RadPARSolarBeam_col = 0.0_r8
   ENDIF
+  if(I==6.and.J==22.and..false.)then
+  write(456,*)RadSWDirect_col,RadSWDiffus_col,SineSunInclAngle_col,TotSineSkyAngles_grd
+  write(456,*)'sw, par=',RadSWSolarBeam_col,RadPARSolarBeam_col,ClumpFactor_pft(1)
+  endif
   !compute leaf clumping factor
   D1025: DO NZ=1,NP
     RadSWbyCanopy_pft(NZ)  = 0.0_r8
@@ -406,6 +427,9 @@ module SurfaceRadiationMod
       RadPARbyCanopy_pft(NZ) = 0.0_r8
     ENDDO D125
   ENDIF
+  if(I==6.and.J==22.and..false.)then
+  write(456,*)'csw,cpar=',RadSWbyCanopy_pft(1),RadPARbyCanopy_pft(1)
+  endif  
   !
   !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
   !
@@ -427,6 +451,9 @@ module SurfaceRadiationMod
       FracPARads2Canopy_pft(NZ)=0.0_r8
     ENDDO D146
   ENDIF
+  if(I==6.and.J==22.and..false.)then
+  write(456,*)'fpar',FracPARads2Canopy_pft(1)
+  endif
   end associate
   end subroutine SurfaceRadiation
 
@@ -1011,6 +1038,18 @@ module SurfaceRadiationMod
       RadPARBakScat2NextL(L) = RadPARBakScat2NextL(L-1)
     ENDIF
   ENDDO D2800        
+  if(I==6.and.J==22.and..false.)then
+  write(456,*)'swfwd','pafwd','swbak','pabak'
+  write(456,*)(RadSWFwdScat2NextL(L),L=0,NumCanopyLayers1+1)
+  write(456,*)(RadPARFwdScat2NextL(L),L=0,NumCanopyLayers1+1)
+  write(456,*)(RadSWBakScat2NextL(L),L=0,NumCanopyLayers1+1)
+  write(456,*)(RadPARBakScat2NextL(L),L=0,NumCanopyLayers1+1)
+  write(456,*)'parz'
+  DO L=1,NumCanopyLayers1  
+  write(456,*)((RadPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1)
+  write(456,*)((RadDifPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1)
+  ENDDO
+  endif
   end associate
   end subroutine MultiCanLayerRadiation
   ![tail]
