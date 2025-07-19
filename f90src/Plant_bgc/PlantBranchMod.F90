@@ -519,7 +519,7 @@ module PlantBranchMod
   associate(                                                                           &
     TdegCCanopy_pft                   => plt_ew%TdegCCanopy_pft                       ,& !input  :canopy temperature, [oC]
     PSICanopy_pft                     => plt_ew%PSICanopy_pft                         ,& !input  :canopy total water potential, [Mpa]
-    SapwoodBiomassC_brch            => plt_biom%SapwoodBiomassC_brch              ,& !input  :branch live stalk C, [gC d-2]
+    SapwoodBiomassC_brch              => plt_biom%SapwoodBiomassC_brch                ,& !input  :branch live stalk C, [gC d-2]
     StalkRsrvElms_brch                => plt_biom%StalkRsrvElms_brch                  ,& !input  :branch reserve element mass, [g d-2]
     ZERO                              => plt_site%ZERO                                ,& !input  :threshold zero for numerical stability, [-]
     NU                                => plt_site%NU                                  ,& !input  :current soil surface layer number, [-]

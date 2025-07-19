@@ -22,7 +22,7 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: soil
+  public :: AdvanceModelOneYear
   public :: readnamelist
   public :: regressiontest,write_modelconfig
   logical :: do_timing
@@ -63,7 +63,7 @@ contains
   !   UPDATE PLANT biogeochemistry
   !
   if(lverb)WRITE(*,334)'PlantModel'
-  if(plant_model)then
+  if(plant_model .and. (.not.ldo_radiation_test))then
     if(do_timing)call start_timer(t1)  
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('PlantModel',t1)    
@@ -219,26 +219,26 @@ contains
   bgc_fname            = 'bbforc.nc'
   do_instequil         = .false.
 
-  clm_factor_in    = 'NO'
-  pft_file_in      = ''
-  grid_file_in     = ''
-  pft_mgmt_in      = 'NO'
-  clm_hour_file_in = ''
-  clm_day_file_in  = ''
-  soil_mgmt_in     = 'NO'
-  atm_ghg_in       = ''
-  aco2_ppm         = 280._r8
-  ach4_ppm         = 1.144_r8
-  an2o_ppm         = 0.270_r8
-  ao2_ppm          = 0.209e6_r8
-  arg_ppm          = 0.00934e6_r8
-  an2_ppm          = 0.78e6_r8
-  anh3_ppm         = 5.e-3_r8
-  atm_co2_fix      = -100._r8
-  atm_n2o_fix      = -100._r8
-  atm_ch4_fix      = -100._r8
-  first_topou      = .false.
-  ldo_radiation_test=.false.
+  clm_factor_in      = 'NO'
+  pft_file_in        = ''
+  grid_file_in       = ''
+  pft_mgmt_in        = 'NO'
+  clm_hour_file_in   = ''
+  clm_day_file_in    = ''
+  soil_mgmt_in       = 'NO'
+  atm_ghg_in         = ''
+  aco2_ppm           = 280._r8
+  ach4_ppm           = 1.144_r8
+  an2o_ppm           = 0.270_r8
+  ao2_ppm            = 0.209e6_r8
+  arg_ppm            = 0.00934e6_r8
+  an2_ppm            = 0.78e6_r8
+  anh3_ppm           = 5.e-3_r8
+  atm_co2_fix        = -100._r8
+  atm_n2o_fix        = -100._r8
+  atm_ch4_fix        = -100._r8
+  first_topou        = .false.
+  ldo_radiation_test = .false.
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading ecosim namelist ",nml_error,ioerror_msg
@@ -281,8 +281,8 @@ contains
   !radiation test can only be on for sp mode
   if(ldo_radiation_test)ldo_sp_mode=.true.
   if(ldo_sp_mode)then
-  ! when using prescribed phenolgoy, turnoff plant model, soil chemistry model and microbial bgc
-    plant_model           = .false.
+    ! when using prescribed phenolgoy, turn on plant model for memory allocation, turn off soil chemistry model and microbial bgc
+    plant_model           = .true.
     soichem_model         = .false.
     microbial_model       = .false.
   endif
@@ -312,7 +312,7 @@ contains
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
-subroutine soil(NHW,NHE,NVN,NVS,nlend)
+subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
@@ -485,7 +485,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   END DO
   if(lverb)write(*,333)'exit soil'
   RETURN
-END subroutine soil
+END subroutine AdvanceModelOneYear
 ! ----------------------------------------------------------------------
 
 subroutine regressiontest(nmfile,case_name, NX, NY)

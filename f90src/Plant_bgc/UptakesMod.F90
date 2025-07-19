@@ -225,7 +225,6 @@ module UptakesMod
 
   character(len=*), parameter :: subname='PrepH2ONutrientUptake'  
   integer :: NZ, L, N
-  real(r8) :: ARLSC
 
   associate(                                                          &
     ALT                        => plt_site%ALT                       ,& !input  :altitude of the grid cell, [m]
@@ -257,13 +256,12 @@ module UptakesMod
 !
   call PrintInfo('beg '//subname)
 
-  ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
     call ZeroNutrientUptake(NZ)
 
 !     TKC_pft(NZ)=TairK+DeltaTKC_pft(NZ)
 !     TdegCCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
-    ARLSC   = ARLSC+CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
+
     RadNet2Canopy_pft(NZ)                                = 0.0_r8
     plt_ew%EvapTransLHeat_pft(NZ)                        = 0.0_r8
     plt_ew%HeatXAir2PCan_pft(NZ)                         = 0.0_r8

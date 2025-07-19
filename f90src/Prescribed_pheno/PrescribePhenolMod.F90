@@ -193,14 +193,14 @@ implicit none
   real(r8) :: AreaInterval,AreaL
   real(r8) :: ARX  !interval canopy area: leaf+stem
   real(r8) :: DZL  !canopy interval height 
-  !============
+  !==========================================
   !example inputs
   real(r8) :: lai(12)=(/1.1852, 1.1821, 1.1554, 1.2433, 1.2922, 1.3341, 1.2296, 1.4118, 1.4343, 1.3941, 1.2721, 1.2218/)
   real(r8) :: sai(12)=(/0.3190, 0.3058, 0.3058, 0.3032, 0.3058, 0.3117, 0.3433, 0.3032, 0.3084, 0.3292, 0.3656, 0.3249/)
   integer  :: irootType=1
   REAL(R8) :: PerPlantRootC_vr(1:JZ)
   REAL(R8) :: PerPlantRootLen_vr(1:JZ)
-  !============
+  !==========================================
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
@@ -230,6 +230,12 @@ implicit none
   
   DO NX=NHW,NHE
     DO NY=NVN,NVS
+      !==========================================
+      !temporary set TEST values, assuming trees      
+      NZ=1
+      PlantPopulation_pft(NZ,NY,NX)=0.6_r8
+      !==========================================
+
       CanopyLeafArea_col(NY,NX) = 0._r8
       StemArea_col(NY,NX)       = 0._r8
       CanopyHeight_col(NY,NX)   = 0.0_r8
@@ -243,7 +249,6 @@ implicit none
         CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeight_pft(NZ,NY,NX))
         CanopyLeafAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tlai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
         CanopyStemAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
-
       ENDDO
 
       !set vertical desitribution of LAI and             
@@ -266,9 +271,6 @@ implicit none
          ENDDO
       ENDIF
 
-      !temporary set TEST values, assuming trees      
-      NZ=1
-      PlantPopulation_pft(NZ,NY,NX)=0.6_r8
       !
       call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       DO L=NU_col(NY,NX),NL_col(NY,NX)

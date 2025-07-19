@@ -18,6 +18,7 @@ target_include_directories(modelforc  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/CanopyPhys
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys
   ${CMAKE_BINARY_DIR}/f90src/APIs/
   ${CMAKE_BINARY_DIR}/f90src/ModelDiags/

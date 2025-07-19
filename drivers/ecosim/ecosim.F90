@@ -18,10 +18,10 @@ PROGRAM main
   use RestartMod        , only : get_restart_date
   use ClimReadMod       , only : get_clm_years
   use PerturbationMod   , only : config_soil_warming
+  use EcoSIMAPI         , only : AdvanceModelOneYear,readnamelist,regressiontest,write_modelconfig
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
-  use EcoSIMAPI         , only : soil,readnamelist,regressiontest,write_modelconfig
   use EcosimConst
   implicit none
 
@@ -136,7 +136,7 @@ PROGRAM main
         nlend=.false.
         IGO=yeari-year_ini
         if(frectyp%yearcur==yeari)then
-          call soil(NHW,NHE,NVN,NVS,nlend)
+          call AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
         endif
         if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1

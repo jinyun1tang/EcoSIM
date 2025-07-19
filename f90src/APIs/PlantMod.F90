@@ -9,6 +9,7 @@ module PlantMod
   use EcoSIMCtrlMod,     only: lverb,ldo_sp_mode
   use PlantDebugMod,     only: PrintRootTracer
   use LitterFallMod,     only: ReSeedPlants
+  use PlantAPI4Uptake
   use TracerIDMod
   use GridDataType
   use PlantDataRateType
@@ -40,18 +41,22 @@ implicit none
 
 333   FORMAT(A8)
 
-  call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
+  if(.not.ldo_sp_mode)then
+    call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
+    plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
+  endif
 
-  plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
   
-      call  PlantAPISend(I,J,NY,NX)
-
       if(ldo_sp_mode)then
         !do prescribed phenolgoy
+        call PlantUptakeAPISend(I,J,NY,NX)        
         CALL ROOTUPTAKES(I,J)
+        call PlantUPtakeAPIRecv(I,J,NY,NX)
       else
+        call  PlantAPISend(I,J,NY,NX)
+
         call EnterPlantBalance(I,J,NP_col(NY,NX))
 
         !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
@@ -100,8 +105,9 @@ implicit none
         ENDDO
 
         call ExitPlantBalance(I,J,NP_col(NY,NX))
+
+        call PlantAPIRecv(I,J,NY,NX)
       endif
-      call PlantAPIRecv(I,J,NY,NX)
 
     ENDDO
   ENDDO
