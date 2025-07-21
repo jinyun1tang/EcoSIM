@@ -74,7 +74,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                    !fraction of radiation intercepted by ground surface, [-]
   real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                         !shortwave radiation incident on ground surface, [MJ h-1]
   real(r8),target,allocatable ::  LWRadCanGPrev_col(:,:)                     !longwave radiation emitted by canopy, [MJ h-1]
-  real(r8),target,allocatable ::  LWRadGrnd(:,:)                             !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  LWRadGrnd_col(:,:)                             !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8),target,allocatable ::  WatHeldOnCanopy_col(:,:)                   !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                       !net ice transfer to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)               !grid net precipitation water interception to canopy, [MJ d-2 t-1]
@@ -244,7 +244,7 @@ module CanopyDataType
   allocate(FracSWRad2Grnd_col(JY,JX));       FracSWRad2Grnd_col=0._r8
   allocate(RadSWGrnd_col(JY,JX));        RadSWGrnd_col=0._r8
   allocate(LWRadCanGPrev_col(JY,JX));      LWRadCanGPrev_col=0._r8
-  allocate(LWRadGrnd(JY,JX));      LWRadGrnd=0._r8
+  allocate(LWRadGrnd_col(JY,JX));      LWRadGrnd_col=0._r8
   allocate(WatHeldOnCanopy_col(JY,JX));      WatHeldOnCanopy_col=0._r8
   allocate(Prec2Canopy_col(JY,JX));      Prec2Canopy_col=0._r8
   allocate(PrecIntceptByCanopy_col(JY,JX));       PrecIntceptByCanopy_col=0._r8
@@ -408,7 +408,7 @@ module CanopyDataType
   call destroy(FracSWRad2Grnd_col)
   call destroy(RadSWGrnd_col)
   call destroy(LWRadCanGPrev_col)
-  call destroy(LWRadGrnd)
+  call destroy(LWRadGrnd_col)
   call destroy(WatHeldOnCanopy_col)
   call destroy(Prec2Canopy_col)
   call destroy(PrecIntceptByCanopy_col)

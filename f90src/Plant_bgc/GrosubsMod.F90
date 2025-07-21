@@ -414,7 +414,7 @@ module grosubsMod
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr             ,& !output :root layer number primary axes, [d-2]
-    Root2ndXNum_pvr             => plt_morph%Root2ndXNum_pvr              ,& !output :root layer number axes, [d-2]
+    Root2ndXNumL_pvr             => plt_morph%Root2ndXNumL_pvr              ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr                 ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -433,7 +433,7 @@ module grosubsMod
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
       Root1stXNumL_pvr(N,L,NZ)   = 0._r8
-      Root2ndXNum_pvr(N,L,NZ)    = 0._r8
+      Root2ndXNumL_pvr(N,L,NZ)    = 0._r8
       RootRespPotent_pvr(N,L,NZ) = 0._r8
       RootCO2EmisPot_pvr(N,L,NZ) = 0._r8
       RootCO2Autor_pvr(N,L,NZ)   = 0._r8

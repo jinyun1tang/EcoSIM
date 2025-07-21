@@ -154,7 +154,7 @@ module PlantBGCPars
   integer :: npft,nkopenclms,npfts_tab
 
   call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-  write(*,*)'pltpar%jroots',pltpar%jroots
+  
   NumGrowthStages = pltpar%NumGrowthStages
   MaxNumRootAxes  = pltpar%MaxNumRootAxes
 

@@ -492,7 +492,7 @@ implicit none
         PSIRootOSMO_vr(N,L,NZ,NY,NX)                               = plt_ew%PSIRootOSMO_vr(N,L,NZ)
         PSIRootTurg_vr(N,L,NZ,NY,NX)                               = plt_ew%PSIRootTurg_vr(N,L,NZ)
         Root1stXNumL_pvr(N,L,NZ,NY,NX)                             = plt_morph%Root1stXNumL_pvr(N,L,NZ)
-        Root2ndXNum_pvr(N,L,NZ,NY,NX)                              = plt_morph%Root2ndXNum_pvr(N,L,NZ)
+        Root2ndXNumL_pvr(N,L,NZ,NY,NX)                              = plt_morph%Root2ndXNumL_pvr(N,L,NZ)
         RootLenPerPlant_pvr(N,L,NZ,NY,NX)                          = plt_morph%RootLenPerPlant_pvr(N,L,NZ)
         RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)                      = plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)
         RootPoreVol_pvr(N,L,NZ,NY,NX)                              = plt_morph%RootPoreVol_pvr(N,L,NZ)
@@ -694,7 +694,7 @@ implicit none
   plt_rad%SineSunInclAngle_col        = SineSunInclAngle_col(NY,NX)
   plt_ew%TKSnow                       = TKSnow_snvr(1,NY,NX)  !surface layer snow temperature
   plt_ew%TairK                        = TairK_col(NY,NX)
-  plt_rad%LWRadGrnd                   = LWRadGrnd(NY,NX)
+  plt_rad%LWRadGrnd_col               = LWRadGrnd_col(NY,NX)
   plt_rad%LWRadSky_col                = LWRadSky_col(NY,NX)
   plt_ew%VPA                          = VPA_col(NY,NX)
   plt_distb%XCORP                     = XTillCorp_col(NY,NX)
@@ -709,7 +709,7 @@ implicit none
   plt_morph%CanopyHeightZ_col(0)      = CanopyHeightZ_col(0,NY,NX)
   DO  L=1,NumCanopyLayers
     plt_morph%CanopyHeightZ_col(L) = CanopyHeightZ_col(L,NY,NX)
-    plt_rad%TAU_DirectRTransmit(L)    = TAU_DirectRTransmit(L,NY,NX)
+    plt_rad%TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L,NY,NX)
     plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)
   ENDDO
   plt_rad%TAU_DirectRTransmit(NumCanopyLayers+1) = TAU_DirectRTransmit(NumCanopyLayers+1,NY,NX)
@@ -1305,7 +1305,7 @@ implicit none
         plt_rbgc%RootCO2EmisPot_pvr(N,L,NZ)       = RootCO2EmisPot_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ,NY,NX)
         plt_morph%Root1stXNumL_pvr(N,L,NZ)        = Root1stXNumL_pvr(N,L,NZ,NY,NX)
-        plt_morph%Root2ndXNum_pvr(N,L,NZ)         = Root2ndXNum_pvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndXNumL_pvr(N,L,NZ)         = Root2ndXNumL_pvr(N,L,NZ,NY,NX)
         plt_morph%RootLenPerPlant_pvr(N,L,NZ)     = RootLenPerPlant_pvr(N,L,NZ,NY,NX)
         plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)
         plt_morph%RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ,NY,NX)

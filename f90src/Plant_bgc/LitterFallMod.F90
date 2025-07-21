@@ -407,7 +407,7 @@ implicit none
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !output :root layer length secondary axes, [m d-2]
     Root2ndMeanLens_pvr       => plt_morph%Root2ndMeanLens_pvr       ,& !output :root layer average length, [m]
     Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr         ,& !output :root layer diameter secondary axes, [m]
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr           ,& !output :root layer number axes, [d-2]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr           ,& !output :root layer number axes, [d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !output :root layer number secondary axes, [d-2]
     RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr      ,& !output :root layer area per plant, [m p-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !output :root layer length density, [m m-3]
@@ -504,7 +504,7 @@ implicit none
         PopuRootMycoC_pvr(N,L,NZ)        = 0._r8
         RootProteinC_pvr(N,L,NZ)         = 0._r8
         Root1stXNumL_pvr(N,L,NZ)         = 0._r8
-        Root2ndXNum_pvr(N,L,NZ)          = 0._r8
+        Root2ndXNumL_pvr(N,L,NZ)          = 0._r8
         RootLenPerPlant_pvr(N,L,NZ)      = 0._r8
         RootLenDensPerPlant_pvr(N,L,NZ)  = 0._r8
         RootPoreVol_pvr(N,L,NZ)          = 0._r8

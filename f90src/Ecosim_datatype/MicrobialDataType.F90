@@ -54,6 +54,7 @@ implicit none
   real(r8),target,allocatable :: OMEERauto_2D(:,:,:,:,:,:)             !autotrophic microbial biomass loss through erosion, [g d-2 h-1]
   real(r8),target,allocatable :: tRespGrossHeter_vr(:,:,:)          !total gross respiraiton by heterotrophs, [g d-2 h-1]
   real(r8),target,allocatable :: tRespGrossHeterUlm_vr(:,:,:)          !total oyxgen-unlimited gross respiraiton by heterotrophs, [g d-2 h-1]  
+  real(r8),target,allocatable :: FermOXYI_vr(:,:,:)                    !fermentation inhibition factor due to oxygen, [-]
   private :: InitAllocate
 
   contains
@@ -69,6 +70,7 @@ implicit none
   subroutine InitAllocate
 
   implicit none
+  allocate(FermOXYI_vr(0:JZ,JY,JX)); FermOXYI_vr =0._r8
   allocate(mBiomeHeter_vr(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,0:JZ,JY,JX));mBiomeHeter_vr=0._r8
   allocate(RO2DmndHetert_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX)); RO2DmndHetert_vr=0._r8
   allocate(RDOCUptkHeter_vr(NumHetetr1MicCmplx,1:jcplx,0:JZ,JY,JX));RDOCUptkHeter_vr=0._r8
@@ -164,6 +166,7 @@ implicit none
   call destroy(RH1PO4UptkBandAutor_vr)
   call destroy(RH1PO4UptkLitrAutor_col)
   call destroy(OMEERauto_2D)
+  call destroy(FermOXYI_vr)
   end subroutine DestructMicrobialData
 
 end module MicrobialDataType

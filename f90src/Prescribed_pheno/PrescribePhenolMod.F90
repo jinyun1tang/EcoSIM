@@ -204,12 +204,13 @@ implicit none
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
+      NP_col(NY,NX)=1    
       DO NZ=1,NP_col(NY,NX)
         !FOR test only
         tlai_mon_pft(:,NZ,NY,NX)       = LAI
         tsai_mon_pft(:,NZ,NY,NX)       = SAI
         height_top_mon_pft(:,NZ,NY,NX) = 17._r8
-        LeafAngleClass_pft(:,NZ,NY,NX) = 1./real(NumLeafZenithSectors,kind=r8)
+        LeafAngleClass_pft(:,NZ,NY,NX) = 1._r8/real(NumLeafZenithSectors,kind=r8)
       ENDDO
     ENDDO
   ENDDO    
@@ -239,7 +240,7 @@ implicit none
       CanopyLeafArea_col(NY,NX) = 0._r8
       StemArea_col(NY,NX)       = 0._r8
       CanopyHeight_col(NY,NX)   = 0.0_r8
-      NP_col(NY,NX)=1
+
       DO NZ=1,NP_col(NY,NX)
         tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
         tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
@@ -273,15 +274,19 @@ implicit none
 
       !
       call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
-      DO L=NU_col(NY,NX),NL_col(NY,NX)
-        RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
-        PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
+      DO NZ=1,NP_col(NY,NX)      
+        DO L=NU_col(NY,NX),NL_col(NY,NX)        
+          RootLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
+          RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
+          PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
+
+          !the following two are fillers, which will be updated later
+          Root1stXNumL_pvr(ipltroot,L,NZ,NY,NX) = 2._r8
+          Root2ndXNumL_pvr(ipltroot,L,NZ,NY,NX) = 1.e5_r8
+        ENDDO
       ENDDO
     ENDDO
   ENDDO  
-
-
-
 
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------     

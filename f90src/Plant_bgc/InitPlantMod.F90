@@ -967,7 +967,7 @@ module InitPlantMod
       plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
       plt_morph%Root1stXNumL_pvr(N,L,NZ)                       = 0._r8
-      plt_morph%Root2ndXNum_pvr(N,L,NZ)                        = 0._r8
+      plt_morph%Root2ndXNumL_pvr(N,L,NZ)                        = 0._r8
       plt_morph%RootLenPerPlant_pvr(N,L,NZ)                    = 0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)                = 0._r8
       RootPoreVol_pvr(N,L,NZ)                                  = 0._r8

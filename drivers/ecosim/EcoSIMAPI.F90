@@ -421,10 +421,11 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     !
     if(lverb)WRITE(*,333)'DAY'
     CALL DAY(I,NHW,NHE,NVN,NVS)
-    
+
     call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
-    
+
     DO J=1,24
+
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
@@ -433,8 +434,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
 
-          call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
-          
+          call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)          
         endif
       endif
       if(frectyp%lskip_loop)then

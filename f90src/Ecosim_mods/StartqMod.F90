@@ -745,7 +745,7 @@ module StartqMod
       PopuRootMycoC_pvr(N,L,NZ,NY,NX)                            = 0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)             = 0._r8
       Root1stXNumL_pvr(N,L,NZ,NY,NX)             = 0._r8
-      Root2ndXNum_pvr(N,L,NZ,NY,NX)              = 0._r8
+      Root2ndXNumL_pvr(N,L,NZ,NY,NX)              = 0._r8
       RootLenPerPlant_pvr(N,L,NZ,NY,NX)          = 0._r8
       RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)      = 0._r8
       RootPoreVol_pvr(N,L,NZ,NY,NX)              = 0._r8

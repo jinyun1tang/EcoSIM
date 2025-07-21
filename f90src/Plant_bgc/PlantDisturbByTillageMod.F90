@@ -361,7 +361,7 @@ contains
     RootLenPerPlant_pvr        => plt_morph%RootLenPerPlant_pvr         ,& !inoput :root layer length per plant, [m p-1]
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !inoput :root layer number secondary axes, [d-2]
     Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr             ,& !inoput :root layer length secondary axes, [m d-2]
-    Root2ndXNum_pvr            => plt_morph%Root2ndXNum_pvr              & !inoput :root layer number axes, [d-2]
+    Root2ndXNumL_pvr            => plt_morph%Root2ndXNumL_pvr              & !inoput :root layer number axes, [d-2]
   )
 !
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
@@ -428,7 +428,7 @@ contains
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
 !     RootProteinC_pvr=root protein C mass
-!     RTN1,Root2ndXNum_pvr=number of primary,secondary root axes
+!     RTN1,Root2ndXNumL_pvr=number of primary,secondary root axes
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_pvr=root surface area per plant
@@ -451,7 +451,7 @@ contains
       PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)*XHVST
       RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*XHVST
       Root1stXNumL_pvr(N,L,NZ)        = Root1stXNumL_pvr(N,L,NZ)*XHVST
-      Root2ndXNum_pvr(N,L,NZ)         = Root2ndXNum_pvr(N,L,NZ)*XHVST
+      Root2ndXNumL_pvr(N,L,NZ)         = Root2ndXNumL_pvr(N,L,NZ)*XHVST
       RootLenPerPlant_pvr(N,L,NZ)     = RootLenPerPlant_pvr(N,L,NZ)*XHVST
       RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*XHVST
       RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*XHVST

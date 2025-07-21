@@ -177,7 +177,7 @@ implicit none
     Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft          ,& !input  :maximum radius of primary roots, [m]
     Root2ndXSecArea_pft       => plt_morph%Root2ndXSecArea_pft           ,& !input  :root cross-sectional area secondary axes, [m2]
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft          ,& !input  :maximum radius of secondary roots, [m]
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr               ,& !input  :root layer number axes, [d-2]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr               ,& !input  :root layer number axes, [d-2]
     Root1stXSecArea_pft       => plt_morph%Root1stXSecArea_pft           ,& !input  :root cross-sectional area primary axes, [m2]
     RootPorosity_pft          => plt_morph%RootPorosity_pft              ,& !input  :root porosity, [m3 m-3]
     RootVolPerMassC_pft       => plt_morph%RootVolPerMassC_pft           ,& !input  :root volume:mass ratio, [m3 g-1]
@@ -319,8 +319,8 @@ implicit none
           Root2ndRadius_pvr(N,L,NZ)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),&
             (1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root2ndMaxRadius_pft(N,NZ))
           TotRootArea=TwoPiCON*(Root1stRadius_pvr(N,L,NZ)*TotPopuRoot1stLen_rpvr+Root2ndRadius_pvr(N,L,NZ)*TotRoot2ndLen)
-          IF(Root2ndXNum_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
-            Root2ndMeanLens_pvr(N,L,NZ)=AMAX1(Root2ndMeanLensMin,TotRoot2ndLen/Root2ndXNum_pvr(N,L,NZ))
+          IF(Root2ndXNumL_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+            Root2ndMeanLens_pvr(N,L,NZ)=AMAX1(Root2ndMeanLensMin,TotRoot2ndLen/Root2ndXNumL_pvr(N,L,NZ))
           ELSE
             Root2ndMeanLens_pvr(N,L,NZ)=Root2ndMeanLensMin
           ENDIF
@@ -430,7 +430,7 @@ implicit none
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr         ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !inoput :plant LitrFall element, [g d-2 h-1]
     RootMaintDef_CO2_pvr      => plt_bgcr%RootMaintDef_CO2_pvr       ,& !inoput :plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr           ,& !inoput :root layer number axes, [d-2]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr           ,& !inoput :root layer number axes, [d-2]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !inoput :root layer length secondary axes, [m d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr           & !output :root layer number secondary axes, [d-2]
   )
@@ -756,7 +756,7 @@ implicit none
 !     RootProteinC_pvr=total root protein C mass
 !     CNWS,rProteinC2P_pft=protein:N,protein:P ratios from startq.f
 !     RootBranchFreq_pft=root branching frequency from PFT file
-!     Root2ndXNum_rpvr,Root2ndXNum_pvr=number of secondary root axes
+!     Root2ndXNum_rpvr,Root2ndXNumL_pvr=number of secondary root axes
 !
   Root2ndLen_rpvr(N,L,NR,NZ)=Root2ndLen_rpvr(N,L,NR,NZ)+Root2ndExtension
   DO NE=1,NumPlantChemElms
@@ -770,7 +770,7 @@ implicit none
   RTN2X                       = RootBranchFreq_pft(NZ)*RootPrimeAxsNum
   RTN2Y                       = RootBranchFreq_pft(NZ)*RTN2X
   Root2ndXNum_rpvr(N,L,NR,NZ) = (RTN2X+RTN2Y)*DLYR3(L)
-  Root2ndXNum_pvr(N,L,NZ)     = Root2ndXNum_pvr(N,L,NZ)+Root2ndXNum_rpvr(N,L,NR,NZ)
+  Root2ndXNumL_pvr(N,L,NZ)     = Root2ndXNumL_pvr(N,L,NZ)+Root2ndXNum_rpvr(N,L,NR,NZ)
   end associate  
   end subroutine Grow2ndRootAxes  
 
@@ -1770,7 +1770,7 @@ implicit none
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr            ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr            ,& !inoput :root aqueous content, [g d-2]
     Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr          ,& !inoput :root layer number primary axes, [d-2]
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr           ,& !inoput :root layer number axes, [d-2]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr           ,& !inoput :root layer number axes, [d-2]
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr           ,& !inoput :root layer length primary axes, [m d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !inoput :root layer number secondary axes, [d-2]
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft       & !output :maximum soil layer number for root axes, [-]
@@ -1842,14 +1842,14 @@ implicit none
 !
 !     RESET ROOT NUMBER AND PRIMARY ROOT LENGTH
 !
-!     Root2ndXNum_rpvr,Root2ndXNum_pvr=number of secondary root axes
+!     Root2ndXNum_rpvr,Root2ndXNumL_pvr=number of secondary root axes
 !     Root1stXNumL_pvr=number of primary root axes
 !     Root1stLen_rpvr=primary root length
 !     CumSoilThickness_vr=depth from soil surface to layer bottom
 !     SeedDepth_pft=seeding depth
 !
-      Root2ndXNum_pvr(N,LL,NZ)=Root2ndXNum_pvr(N,LL,NZ)-Root2ndXNum_rpvr(N,LL,NR,NZ)
-      Root2ndXNum_pvr(N,LL-1,NZ)=Root2ndXNum_pvr(N,LL-1,NZ)+Root2ndXNum_rpvr(N,LL,NR,NZ)
+      Root2ndXNumL_pvr(N,LL,NZ)=Root2ndXNumL_pvr(N,LL,NZ)-Root2ndXNum_rpvr(N,LL,NR,NZ)
+      Root2ndXNumL_pvr(N,LL-1,NZ)=Root2ndXNumL_pvr(N,LL-1,NZ)+Root2ndXNum_rpvr(N,LL,NR,NZ)
       Root2ndXNum_rpvr(N,LL,NR,NZ)=0._r8
       Root1stXNumL_pvr(N,LL,NZ)=Root1stXNumL_pvr(N,LL,NZ)-RootPrimeAxsNum
       IF(LL-1.GT.NGTopRootLayer_pft(NZ))THEN

@@ -159,7 +159,7 @@ implicit none
   real(r8) :: SineGrndSlope_col              !sine of slope, [-]
   real(r8) :: GroundSurfAzimuth_col          !azimuth of slope, [-]
   real(r8) :: CosineGrndSlope_col            !cosine of slope, [-]
-  real(r8) :: LWRadGrnd                      !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8) :: LWRadGrnd_col                      !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8) :: LWRadSky_col                   !sky longwave radiation , [MJ d-2 h-1]
   real(r8) :: SineSunInclAnglNxtHour_col     !sine of solar angle next hour, [-]
   real(r8) :: SineSunInclAngle_col           !sine of solar angle, [-]
@@ -289,7 +289,7 @@ implicit none
   real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:,:)        => null() !root layer number primary axes,       [d-2]
-  real(r8), pointer :: Root2ndXNum_pvr(:,:,:)         => null() !root layer number axes,               [d-2]
+  real(r8), pointer :: Root2ndXNumL_pvr(:,:,:)         => null() !root layer number axes,               [d-2]
   real(r8), pointer :: RootLenDensPerPlant_pvr(:,:,:) => null() !root layer length density,            [m m-3]
   real(r8), pointer :: RootPoreVol_pvr(:,:,:)         => null() !root layer volume air,                [m2 d-2]
   real(r8), pointer :: RootVH2O_pvr(:,:,:)            => null() !root layer volume water,              [m2 d-2]
@@ -1538,30 +1538,30 @@ implicit none
 
   implicit none
 
-  JZ1                        => pltpar%JZ1
+  JZ1                      => pltpar%JZ1
   NumCanopyLayers1         => pltpar%NumCanopyLayers1
-  JP1                        => pltpar%JP1
-  NumOfLeafAzimuthSectors1   => pltpar%NumOfLeafAzimuthSectors
-  NumOfSkyAzimuthSects1        => pltpar%NumOfSkyAzimuthSects1
+  JP1                      => pltpar%JP1
+  NumOfLeafAzimuthSectors1 => pltpar%NumOfLeafAzimuthSectors
+  NumOfSkyAzimuthSects1    => pltpar%NumOfSkyAzimuthSects1
   NumLeafZenithSectors1    => pltpar%NumLeafZenithSectors1
-  MaxNodesPerBranch1         => pltpar%MaxNodesPerBranch1
+  MaxNodesPerBranch1       => pltpar%MaxNodesPerBranch1
   !the following variable should be consistent with the soil bgc model
-  jcplx => pltpar%jcplx
-  jsken  => pltpar%jsken
-  NumLitterGroups=> pltpar%NumLitterGroups
-  MaxNumBranches    => pltpar%MaxNumBranches
-  MaxNumRootAxes    => pltpar%MaxNumRootAxes
-  NumOfPlantMorphUnits   => pltpar%NumOfPlantMorphUnits
+  jcplx                => pltpar%jcplx
+  jsken                => pltpar%jsken
+  NumLitterGroups      => pltpar%NumLitterGroups
+  MaxNumBranches       => pltpar%MaxNumBranches
+  MaxNumRootAxes       => pltpar%MaxNumRootAxes
+  NumOfPlantMorphUnits => pltpar%NumOfPlantMorphUnits
   NumOfPlantLitrCmplxs => pltpar%NumOfPlantLitrCmplxs
-  NumGrowthStages => pltpar%NumGrowthStages
-  jroots => pltpar%jroots
+  NumGrowthStages      => pltpar%NumGrowthStages
+  jroots               => pltpar%jroots
 
   call plt_site%Init()
 
   call plt_rbgc%Init()
 
   call plt_bgcr%Init()
-
+  
   call plt_pheno%Init()
 
   call plt_ew%Init()
@@ -1818,7 +1818,7 @@ implicit none
   allocate(this%RootPoreVol_pvr(jroots,JZ1,JP1));this%RootPoreVol_pvr=spval
   allocate(this%RootVH2O_pvr(jroots,JZ1,JP1));this%RootVH2O_pvr=spval
   allocate(this%Root1stXNumL_pvr(jroots,JZ1,JP1));this%Root1stXNumL_pvr=spval
-  allocate(this%Root2ndXNum_pvr(jroots,JZ1,JP1));this%Root2ndXNum_pvr=spval
+  allocate(this%Root2ndXNumL_pvr(jroots,JZ1,JP1));this%Root2ndXNumL_pvr=spval
   allocate(this%SeedCMass_pft(JP1));this%SeedCMass_pft=spval
   allocate(this%totRootLenDens_vr(JZ1));this%totRootLenDens_vr=spval
   allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval

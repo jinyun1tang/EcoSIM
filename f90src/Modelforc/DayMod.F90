@@ -4,6 +4,7 @@
   use minimathmod,        only: isLeap, AZMAX1
   use MiniFuncMod,        only: GetDayLength
   use PrescribePhenolMod, only: PrescribePhenologyInterp
+  use SurfLitterDataType, only : XTillCorp_col
   use CanopyRadDataType
   use EcosimConst  
   use EcoSIMCtrlMod
@@ -17,7 +18,7 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XTillCorp_col
+
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -83,7 +84,6 @@
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
 
-  
   if(ldo_sp_mode)call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
   RETURN

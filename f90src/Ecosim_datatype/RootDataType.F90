@@ -55,7 +55,7 @@ module RootDataType
   real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
   real(r8),target,allocatable ::  Root1stXNumL_pvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
-  real(r8),target,allocatable ::  Root2ndXNum_pvr(:,:,:,:,:)                     !root layer number axes, [d-2]
+  real(r8),target,allocatable ::  Root2ndXNumL_pvr(:,:,:,:,:)                     !root layer number axes, [d-2]
   real(r8),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(r8),target,allocatable ::  Root2ndMeanLens_pvr(:,:,:,:,:)                 !root layer average length, [m]
   real(r8),target,allocatable ::  RootAreaPerPlant_pvr(:,:,:,:,:)                !root layer area per plant, [m p-1]
@@ -155,7 +155,7 @@ contains
   allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._r8
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
   allocate(Root1stXNumL_pvr(jroots,JZ,JP,JY,JX));Root1stXNumL_pvr=0._r8
-  allocate(Root2ndXNum_pvr(jroots,JZ,JP,JY,JX));Root2ndXNum_pvr=0._r8
+  allocate(Root2ndXNumL_pvr(jroots,JZ,JP,JY,JX));Root2ndXNumL_pvr=0._r8
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._r8
   allocate(Root2ndMeanLens_pvr(jroots,JZ,JP,JY,JX));Root2ndMeanLens_pvr=0._r8
   allocate(RootAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootAreaPerPlant_pvr=0._r8
@@ -242,7 +242,7 @@ contains
   call destroy(Root2ndLen_rpvr)
   call destroy(RootLenDensPerPlant_pvr)
   call destroy(Root1stXNumL_pvr)
-  call destroy(Root2ndXNum_pvr)
+  call destroy(Root2ndXNumL_pvr)
   call destroy(Root2ndXNum_rpvr)
   call destroy(Root2ndMeanLens_pvr)
   call destroy(RootAreaPerPlant_pvr)

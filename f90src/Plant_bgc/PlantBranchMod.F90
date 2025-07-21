@@ -1580,7 +1580,7 @@ module PlantBranchMod
   integer  :: KMinGroingLeafNodeNum,KLeafNumHighestGrowing
   integer  :: LNumHeightLeafTip,LNumHeightLeafBase
   integer  :: LNumHeightBranchTip,LNumHeightBranchBase,N
-  real(r8) :: RadiusInnerStalk4Transp
+  real(r8) :: DTransportTube        !thicknees of stalk out layer where xylem and pholem are located, [m]
   real(r8) :: YLeafElmntNode_brch(NumPlantChemElms)
   real(r8) :: YLeafArea_node,LeafElevation,LeafLength
   real(r8) :: StalkSurfArea,StalkSectionArea
@@ -1813,15 +1813,11 @@ module PlantBranchMod
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
         SapwoodBiomassC_brch(NB,NZ)=StalkStrutElms_brch(ielmc,NB,NZ)
       ELSE        
-        RadiusInnerStalk4Transp     = AMIN1(ZSTX,FSTK*StalkRadius)
-        !StalkSectionArea            = PICON*(StalkRadius**2-RadiusInnerStalk4Transp**2). !this new approach seems problematic
-        !use the old approach
-        StalkSectionArea=PICON*(2.*StalkRadius*RadiusInnerStalk4Transp-RadiusInnerStalk4Transp**2)
+        DTransportTube     = AMIN1(ZSTX,FSTK*StalkRadius)
+        !the following is based on the observation that xylem and pholem are limited to a thicknees of DTranpTube on the outside of stalk.
+        StalkSectionArea=PICON*(2.*StalkRadius*DTransportTube-DTransportTube**2)
         SapwoodBiomassC_brch(NB,NZ) = StalkSectionArea/SpecStalkVolume*LiveInterNodeHight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
       ENDIF
-!      write(556,*)'area',StalkSectionArea,SpecStalkVolume,LiveInterNodeHight_brch(K1,NB,NZ),StalkRadius,'sap0'
-!      write(556,*)'area2',PICON*(2.*StalkRadius*RadiusInnerStalk4Transp-RadiusInnerStalk4Transp**2)
-!      write(556,*)SapwoodBiomassC_brch(NB,NZ),StalkStrutElms_brch(ielmc,NB,NZ),'sap'
       D445: DO L=LNumHeightBranchBase,LNumHeightBranchTip
         IF(HeightLeafBase.GT.HeightBranchBase)THEN
           IF(HeightLeafBase.GT.CanopyHeightZ_col(L-1))THEN
@@ -2937,7 +2933,9 @@ module PlantBranchMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: DMSHD
-  real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
+  real(r8), intent(in) :: CNLFM,CPLFM
+  real(r8), intent(in) :: CNSHX,CPSHX
+  real(r8), intent(in) :: CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN,CO2F
   real(r8), intent(in) :: CH2O  !total CH2O production
   real(r8), intent(in) :: TFN5  !temperature function for canopy maintenance respiration

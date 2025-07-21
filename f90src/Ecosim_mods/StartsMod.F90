@@ -516,7 +516,7 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     
   ENDDO D1200
-  
+
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))

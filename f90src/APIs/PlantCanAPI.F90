@@ -70,7 +70,11 @@ implicit none
     DO NZ=1,NP_col(NY,NX)
       plt_morph%tlai_day_pft(NZ) = tlai_day_pft(NZ,NY,NX)
       plt_morph%tsai_day_pft(NZ) = tsai_day_pft(NZ,NY,NX)
-    ENDDO  
+
+      DO  N=1,NumLeafZenithSectors
+        plt_morph%LeafAngleClass_pft(N,NZ)=LeafAngleClass_pft(N,NZ,NY,NX)
+      ENDDO
+    ENDDO      
   endif
   DO L=1,NumCanopyLayers
     plt_morph%CanopyStemAareZ_col(L) = CanopyStemAareZ_col(L,NY,NX)

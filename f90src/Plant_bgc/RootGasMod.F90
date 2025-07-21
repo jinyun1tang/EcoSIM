@@ -124,7 +124,7 @@ module RootGasMod
     Root2ndMeanLens_pvr       => plt_morph%Root2ndMeanLens_pvr           ,& !input  :root layer average length, [m]
     RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr               ,& !input  :root layer volume air, [m2 d-2]
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr               ,& !input  :root layer number axes, [d-2]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr               ,& !input  :root layer number axes, [d-2]
     Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr             ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft           => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr                  ,& !input  :root layer volume water, [m2 d-2]
@@ -201,7 +201,7 @@ module RootGasMod
       !primary roots conductance scalar
       RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar
-      RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+      RTCR2 = (Root2ndXNumL_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE

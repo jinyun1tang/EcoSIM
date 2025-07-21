@@ -102,7 +102,7 @@ module SurfaceRadiationMod
   ELSE
     ZZ=AMAX1(WindMesureHeight_col,ZERO4PlantDisplace_col+2.0_r8)
   ENDIF
-
+  
   IF(KoppenClimZone.GE.0)THEN
     IF(VLHeatCapSurfSnow_col.GT.VLHeatCapSnowMin_col)THEN
       RoughHeight=AMAX1(0.001_r8,ZE,ZW)
@@ -118,10 +118,13 @@ module SurfaceRadiationMod
 !   here 0.168 = cvonkarman**2
     AbvCanopyBndlResist_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm_col))
     RIB                     = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2._r8*TairK)
+
   ELSE
     AbvCanopyBndlResist_col = RAM
     RIB                     = 0.0_r8
+    RoughHeight             = 0._r8
   ENDIF
+
   end associate
   end subroutine CalcBoundaryLayerProperties
 
@@ -427,6 +430,7 @@ module SurfaceRadiationMod
       RadPARbyCanopy_pft(NZ) = 0.0_r8
     ENDDO D125
   ENDIF
+  
   if(I==6.and.J==22.and..false.)then
   write(456,*)'csw,cpar=',RadSWbyCanopy_pft(1),RadPARbyCanopy_pft(1)
   endif  
@@ -574,7 +578,7 @@ module SurfaceRadiationMod
     RadSWGrnd_col          => plt_rad%RadSWGrnd_col            ,& !output :radiation intercepted by ground surface, [MJ m-2 h-1]
     TAU_RadThru            => plt_rad%TAU_RadThru               & !output :fraction of radiation transmitted by canopy layer, [-]
   )
-
+  
   SolarAngle=ASIN(SineSunInclAngle_col)
   !
   !     ABSORBED RADIATION FROM OPTICAL PROPERTIES ENTERED IN 'READS'
@@ -640,7 +644,7 @@ module SurfaceRadiationMod
         RadSWbyStalkSurf_zsec(N,M,NZ)   = RadSWbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirLeafSurf_zsec(N,M,NZ)  = RadPARbyLeafSurf_pft(NZ)*ABS(BETA(N,M))
         RadPARDirStalkSurf_zsec(N,M,NZ) = RadPARbyStalkSurf_pft(NZ)*ABS(BETA(N,M))
- 
+
         DO L=1,NumCanopyLayers1
           RadDifPAR_zsec(N,M,L,NZ) = 0.0_r8
           RadPAR_zsec(N,M,L,NZ)    = RadPARDirLeafSurf_zsec(N,M,NZ)
@@ -672,6 +676,7 @@ module SurfaceRadiationMod
   !     DIFFUSE DOWNWARD TOTAL AND VISIBLE RADIATION BY EACH SPECIES
   !     NZ IN EACH LAYER L
   !
+
   D1800: DO L=NumCanopyLayers1,1,-1
     !next layer is above snow, and above water
     IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
@@ -730,7 +735,7 @@ module SurfaceRadiationMod
         !     TSurfStalk=UnselfShadeStalkArea with shading from canopy layers above
         !     StalkIntceptArea=TSurfStalk m-2
         !
-        D1600: DO N=1,NumLeafZenithSectors1
+        D1600: DO N=1,NumLeafZenithSectors1          
           UnselfShadeLeafArea        = LeafAreaZsec_lpft(N,L,NZ)*ClumpFactorNow_pft(NZ)
           UnselfShadeLeafAreaAzclass = UnselfShadeLeafArea*YAREA
           TSurfLeaf                  = UnselfShadeLeafArea*TAU_DirectRTransmit(L+1)
@@ -740,6 +745,7 @@ module SurfaceRadiationMod
           UnselfShadeStalkAreaAzclass = UnselfShadeStalkArea*YAREA
           TSurfStalk                  = UnselfShadeStalkArea*TAU_DirectRTransmit(L+1)
           StalkIntceptArea            = TSurfStalk*XAREA
+
           !
           !     ABSORPTION OF DIRECT RADIATION BY SUNLIT LEAF SURFACES
           !
@@ -828,6 +834,7 @@ module SurfaceRadiationMod
         ENDIF
         TAU_DirectRTransmit(L+1) = TAU_DirectRTransmit(L+1)*XTAUS
         FracDirRadAbsorbt        = FracDirRadAbsorbt*XTAUS
+
         D1510: DO NZ=1,NP
           RadDirSWbyLeaf_pft(NZ)   = RadDirSWbyLeaf_pft(NZ)*XTAUS
           RadDirSWbyStalk_pft(NZ)  = RadDirSWbyStalk_pft(NZ)*XTAUS
@@ -929,7 +936,9 @@ module SurfaceRadiationMod
       TAU_RadThru(L)         = 1.0_r8-TAU_DirectRTransmit(L)
       TAU_DifuseRTransmit(L)   = TAU_DifuseRTransmit(L+1)
     ENDIF
+
   ENDDO D1800
+
   !
   !     DIRECT AND DIFFUSE RADIATION ABSORBED AT GROUND SURFACE
   !
@@ -953,6 +962,7 @@ module SurfaceRadiationMod
     RadPAR_Grnd = RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
   ENDDO D20 
   RadSWGrnd_col=RadSW_Grnd*AREA3(NU)
+
   !
   !     RADIATION REFLECTED FROM GROUND SURFACE
   !

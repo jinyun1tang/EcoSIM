@@ -40,6 +40,7 @@ module SoilBGCNLayMod
   public :: sumHumOMLayL
   public :: SumMicbGroup
   public :: sumDOML
+  public :: SumSolidOML
   contains
 
 !------------------------------------------------------------------------------------------
@@ -330,6 +331,29 @@ module SoilBGCNLayMod
   ENDDO DK200   
 
   end subroutine sumORGMLayL
+!------------------------------------------------------------------------------------------
+  subroutine SumSolidOML(ielm,L,NY,NX,SOMe)
+
+  implicit none
+  integer,intent(in) :: ielm
+  integer,intent(in) :: L,NY,NX
+  real(r8),intent(out) :: SOMe(1:jcplx)
+  integer :: K,M,KL
+
+  SOMe=0._r8
+  if(L==0)then
+    KL=micpar%NumOfLitrCmplxs
+  else
+    KL=jcplx
+  endif  
+  
+  DO K=1,KL
+    DO  M=1,jsken
+      SOMe(K)=SOMe(K)+SolidOM_vr(ielm,M,K,L,NY,NX)
+    ENDDO
+  ENDDO
+  
+  end subroutine SumSolidOML
 !------------------------------------------------------------------------------------------
 
   subroutine sumLitrOMLayL(L,NY,NX,ORGM,I,J)

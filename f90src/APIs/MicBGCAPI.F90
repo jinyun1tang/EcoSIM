@@ -328,6 +328,8 @@ implicit none
   micstt%CCH4G             = AZMAX1(trcg_gascl_vr(idg_CH4,L,NY,NX))
   micstt%Lay               = L
 
+  FermOXYI_vr(L,NY,NX)  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*AMAX1(-micstt%COXYS+2.5_r8,-50._r8)))
+
 !  write(115,*)I+J/24.,L,micstt%COXYG,micstt%COXYS,VLsoiAirPM(1,L,NY,NX)
   micstt%O2GSolubility     = GasSolbility_vr(idg_O2,L,NY,NX)  
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
@@ -372,22 +374,22 @@ implicit none
   micflx%RNH3OxidAutorPrev(1:NumMicrobAutrophCmplx) =RNH3OxidAutor_vr(1:NumMicrobAutrophCmplx,L,NY,NX)       
   micflx%RNH3OxidAutorBandPrev(1:NumMicrobAutrophCmplx)=RNH3OxidAutorBand_vr(1:NumMicrobAutrophCmplx,L,NY,NX)
 
-  micflx%RNH4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)   = RNH4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RNH4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)   = RNH4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RNO3DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)   = RNO3DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RNO3DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)   = RNO3DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RH2PO4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RH2PO4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RH2PO4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RH2PO4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RH1PO4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RH1PO4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RH1PO4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RH1PO4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RO2DmndHetertPrev(1:NumHetetr1MicCmplx,1:KL)       = RO2DmndHetert_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RDOCUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)       = RDOCUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RAcetateUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)   = RAcetateUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RNO3ReduxDmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)=RNO3ReduxDmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX) 
-  micflx%RNO3ReduxDmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)=RNO3ReduxDmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)  
-  micflx%RNO2DmndReduxSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)=RNO2DmndReduxSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)  
-  micflx%RNO2DmndReduxBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)=RNO2DmndReduxBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX) 
-  micflx%RN2ODmndReduxHeterPrev(1:NumHetetr1MicCmplx,1:KL)        =RN2ODmndReduxHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)     
+  micflx%RNH4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RNH4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNH4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RNH4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNO3DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RNO3DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNO3DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RNO3DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RH2PO4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)    = RH2PO4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RH2PO4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)    = RH2PO4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RH1PO4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)    = RH1PO4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RH1PO4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)    = RH1PO4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RO2DmndHetertPrev(1:NumHetetr1MicCmplx,1:KL)          = RO2DmndHetert_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RDOCUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)          = RDOCUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RAcetateUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RAcetateUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNO3ReduxDmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO3ReduxDmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNO3ReduxDmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO3ReduxDmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNO2DmndReduxSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO2DmndReduxSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RNO2DmndReduxBandHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO2DmndReduxBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micflx%RN2ODmndReduxHeterPrev(1:NumHetetr1MicCmplx,1:KL)     = RN2ODmndReduxHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   end subroutine MicAPISend
 
 !------------------------------------------------------------------------------------------
@@ -492,6 +494,7 @@ implicit none
   RH1PO4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)    = micflx%RH1PO4DmndBandHeter(1:NumHetetr1MicCmplx,1:KL)
   
   SolidOM_vr(1:NumPlantChemElms,1:jsken,1:KL,L,NY,NX) = micstt%SolidOM(1:NumPlantChemElms,1:jsken,1:KL)
+
   SolidOMAct_vr(1:jsken,1:KL,L,NY,NX)                 = micstt%SolidOMAct(1:jsken,1:KL)
   TSolidOMActC_vr(L,NY,NX)                            = micstt%TSolidOMActC
   TSolidOMC_vr(L,NY,NX)                               = micstt%TSolidOMC

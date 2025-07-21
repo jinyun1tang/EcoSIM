@@ -1000,8 +1000,8 @@ module MicBGCMod
 !     GOAX=acetate effect on energy yield of fermentation
 !     ECHZ=growth respiration efficiency of fermentation
 
-!     write(*,*)'AnaerobAcetogenCatabolism'
-    call AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,&
+!     write(*,*)'AcetogFermentCatabolism'
+    call AcetogFermentCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,&
       FGOAP,RGOMP, micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx,nmicdiag)
   ELSEIF(N.EQ.micpar%mid_AcetoMethanogArchea)THEN
 !     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
@@ -2889,7 +2889,7 @@ module MicBGCMod
   end subroutine AerobicFungiCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AnaerobAcetogenCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
+  subroutine AcetogFermentCatabolism(NGL,N,K,TSensGrowth,WatStressMicb,FOQC,ECHZ,FGOCP,FGOAP,RGOMP, &
     micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx,nmicdiag)
   !
   !Description:
@@ -2990,7 +2990,7 @@ module MicBGCMod
   naqfdiag%tCResp4H2Prod     = naqfdiag%tCResp4H2Prod+RGOMP
 !
   end associate
-  end subroutine AnaerobAcetogenCatabolism
+  end subroutine AcetogFermentCatabolism
 !------------------------------------------------------------------------------------------
 
   subroutine HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP, &

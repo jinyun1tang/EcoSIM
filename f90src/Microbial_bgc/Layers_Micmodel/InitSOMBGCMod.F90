@@ -332,6 +332,7 @@ module InitSOMBGCMOD
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
     D8980: DO M=1,jsken
+
       SolidOM_vr(ielmc,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
         SolidOM_vr(ielmn,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*CNOSC_vr(M,K,L,NY,NX) &
@@ -353,6 +354,7 @@ module InitSOMBGCMOD
       ENDIF
     ENDDO D8980
   ENDDO D8995
+
 !
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !

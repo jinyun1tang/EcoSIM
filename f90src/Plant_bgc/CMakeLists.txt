@@ -13,7 +13,6 @@ set(PLANT_BGC_SOURCES
   PlantNonstElmDynMod.F90
   PlantBranchMod.F90
   RootMod.F90
-	StartqMod.F90
   PhotoSynsMod.F90
   LitterFallMod.F90
   PlantDisturbsMod.F90

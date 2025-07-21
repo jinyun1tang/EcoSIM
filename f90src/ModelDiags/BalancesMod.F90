@@ -4,7 +4,7 @@ module BalancesMod
   use GridDataType,      only: NU_col, NL_col
   use EcoSimConst,       only: DENSICE
   use abortutils,        only: endrun
-  use EcoSIMCtrlMod,     only: fixWaterLevel
+  use EcoSIMCtrlMod,     only: fixWaterLevel,etimer
   use AqueChemDatatype,  only: trcg_mass_cumerr_col
   use PlantMgmtDataType, only: iDayPlanting_pft, iDayPlantHarvest_pft
   use EcoSIMCtrlMod,     only: iVerbLevel
@@ -233,7 +233,7 @@ contains
         +PrecHeat_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
 
-      if(abs(WaterErr_test)>err_h2o)then
+      if(abs(WaterErr_test)>err_h2o .and. etimer%get_nstep()>1)then
         if(iVerbLevel==1)then
           write(110,*)('=',ii=1,50)
           write(110,*)I*1000+J,'NY,NX ',NY,NX
@@ -318,7 +318,7 @@ contains
         tracer_snowmass_err=trcg_snowMass_beg_col(idg,NY,NX)-trcg_snowMass_col(idg,NY,NX) + &
           Gas_WetDepo2Snow_col(idg,NY,NX)-Gas_Snowloss_flx_col(idg,NY,NX)          
 
-        if(AMAX1(abs(tracer_mass_err),abs(tracer_rootmass_err))>1.e-5_r8)then
+        if(AMAX1(abs(tracer_mass_err),abs(tracer_rootmass_err))>1.e-5_r8 .and. etimer%get_nstep()>1)then
           if(iVerbLevel==1 .or. abs(tracer_mass_err)>1.e-1_r8)then
             write(111,*)('-',ii=1,50)
             write(111,*)'NU   =',NU_col(NY,NX)

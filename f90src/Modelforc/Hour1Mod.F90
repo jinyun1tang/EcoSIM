@@ -204,7 +204,7 @@ module Hour1Mod
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
       LWRadCanGPrev_col(NY,NX)         = LWRadCanG_col(NY,NX)
-      LWRadGrnd(NY,NX)                 = LWRadBySurf_col(NY,NX)
+      LWRadGrnd_col(NY,NX)                 = LWRadBySurf_col(NY,NX)
       NetCO2Flx2Canopy_col(NY,NX)      = Eco_NEE_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       LWRadCanG_col(NY,NX)                 = 0._r8
       LWRadBySurf_col(NY,NX)           = 0._r8
