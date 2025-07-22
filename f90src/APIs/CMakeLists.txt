@@ -3,6 +3,7 @@ set(APIS_SOURCES
   PlantCanAPI.F90
   PlantMod.F90
   MicBGCAPI.F90
+  PlantAPI4Uptake.F90  
   GeochemAPI.F90
   SurfPhysAPI.F90  
 )

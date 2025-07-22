@@ -1,9 +1,12 @@
 
   module DayMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcosimConst
-  use minimathmod  , only : isLeap,AZMAX1
-  use MiniFuncMod  , only : GetDayLength
+  use data_kind_mod,      only: r8 => DAT_KIND_R8
+  use minimathmod,        only: isLeap, AZMAX1
+  use MiniFuncMod,        only: GetDayLength
+  use PrescribePhenolMod, only: PrescribePhenologyInterp
+  use SurfLitterDataType, only : XTillCorp_col
+  use CanopyRadDataType
+  use EcosimConst  
   use EcoSIMCtrlMod
   use GridConsts
   use SoilPhysDataType
@@ -15,7 +18,7 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XTillCorp_col
+
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -28,6 +31,7 @@
   use SedimentDataType
   use GridDataType
   use EcoSIMConfig
+
   implicit none
 
   private
@@ -79,6 +83,9 @@
   ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
+
+  if(ldo_sp_mode)call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+
   RETURN
 
   END subroutine day
@@ -209,8 +216,7 @@
 !-----------------------------------------------------------------------------------------
 
   subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
-!
-  use EcoSIMCtrlMod, only : Lirri_auto
+  !
   implicit none
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS

@@ -424,7 +424,7 @@ contains
 
   !------------------------------------------------------------------------------------------
 
-  subroutine SoilSRFEnerbyBalanceM(M,I,J,NY,NX,PSISV1,LWRadGrnd,ResistanceLitRLay,TopLayWatVol,&
+  subroutine SoilSRFEnerbyBalanceM(M,I,J,NY,NX,PSISV1,LWRadGrnd_col,ResistanceLitRLay,TopLayWatVol,&
     VapXAir2TopLay,HeatFluxAir2Soi)
   !
   !Description
@@ -438,7 +438,7 @@ contains
   implicit none
   integer, intent(in) :: M,I,J,NY,NX
   real(r8), intent(out):: PSISV1      !surface soil suction pressure [MPa]
-  real(r8), intent(out) :: LWRadGrnd  !outgoing long wave radiation from soil surface [MJ]
+  real(r8), intent(out) :: LWRadGrnd_col  !outgoing long wave radiation from soil surface [MJ]
   real(r8), intent(inout) :: ResistanceLitRLay
   real(r8), intent(inout) :: TopLayWatVol
   real(r8), intent(out) :: VapXAir2TopLay
@@ -486,7 +486,7 @@ contains
 ! AlbedoGrnd,SoilAlbedo=albedo of ground surface,soil
 ! BKVL=soil mass
 ! RadSW2Soil_col,LWRad2Soil_col,Radnet2Grnd=incoming shortwave,longwave,net radiation
-! LWRadGrnd,LWEmscefSoil_col=emitted longwave radiation, emissivity
+! LWRadGrnd_col,LWEmscefSoil_col=emitted longwave radiation, emissivity
 ! TK1=soil temperature
 ! albedo of water and ice are set to 0.06, and 0.30 respectively
 
@@ -505,11 +505,11 @@ contains
   ENDIF
   !absorbed radiation
   !Radnet2Grnd=net radiation, after taking out outgoing surface layer radiation  
-  !LWRadGrnd=emitted longwave radiation  
+  !LWRadGrnd_col=emitted longwave radiation  
   RadSWbySoil          = (1.0_r8-AlbedoGrnd)*RadSW2Soil_col(NY,NX)
   tRadIncid            = RadSWbySoil+LWRad2Soil_col(NY,NX)
-  LWRadGrnd            = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**4._r8
-  Radnet2Grnd          = tRadIncid-LWRadGrnd
+  LWRadGrnd_col            = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**4._r8
+  Radnet2Grnd          = tRadIncid-LWRadGrnd_col
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySoil
 !
 ! AERODYNAMIC RESISTANCE ABOVE SOIL SURFACE INCLUDING
@@ -609,21 +609,21 @@ contains
   character(len=*), parameter :: subname='ExposedSoilFluxM'
   real(r8) :: VapXAir2LitR    
   real(r8) :: PSISV1
-  real(r8) :: LWRadGrnd
+  real(r8) :: LWRadGrnd_col
   real(r8) :: HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,EvapLitR2Soi1,HeatFluxAir2LitR
 
 ! begin_execution
   call PrintInfo('beg '//subname)
   
 ! Watch out for L, is its value defined?
-  call SoilSRFEnerbyBalanceM(M,I,J,NY,NX,PSISV1,LWRadGrnd,ResistanceLitRLay,TopLayWatVol,&
+  call SoilSRFEnerbyBalanceM(M,I,J,NY,NX,PSISV1,LWRadGrnd_col,ResistanceLitRLay,TopLayWatVol,&
     VapXAir2TopLay,HeatFluxAir2Soi)
 !
   call SurfLitREnergyBalanceM(I,J,M,NY,NX,PSISV1,Prec2LitR2,RainHeat2LitR2,CumSnowWatFlow2LitR,&
     CumSnoHeatFlow2LitR,CumWatFlx2SoiMicP,CumWatFlx2SoiMacP,cumSnoHeatFlow2Soil,&
     HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,EvapLitR2Soi1,VapXAir2LitR,HeatFluxAir2LitR)
 !
-  call SumAftEnergyBalanceM(I,J,M,NY,NX,LWRadGrnd,VapXAir2TopLay,HeatSensLitR2Soi1,&
+  call SumAftEnergyBalanceM(I,J,M,NY,NX,LWRadGrnd_col,VapXAir2TopLay,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,EvapLitR2Soi1,VapXAir2LitR,HeatFluxAir2LitR,HeatFluxAir2Soi,PrecNet2SoiMicP,&
     PrecNet2SoiMacP,RainPrecHeatAir2LitR,NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
     
@@ -1119,6 +1119,7 @@ contains
   ResistBndlSurf_col(NY,NX)  = 1.0_r8/(FracAsExposedSoil_col(NY,NX)/ResistAreodynOverLitr_col(NY,NX)+FracEffAsLitR_col(NY,NX)/ResistanceLitRLay)
   RAS                        = SnowBNDResistance(NY,NX)
   CondGasXSnowM_col(M,NY,NX) = AREA_3D(3,NUM_col(NY,NX),NY,NX)*dts_HeatWatTP/(ResistBndlSurf_col(NY,NX)+RAS)  !m^2 h/(h/m) = m3
+  CondGasXSurf_col(NY,NX)    = 1._r8/(ResistBndlSurf_col(NY,NX)+RAS)  !m/h 
 
 !
 ! REDISTRIBUTE INCOMING PRECIPITATION
@@ -1478,7 +1479,7 @@ contains
   end subroutine UpdateSurfaceAtM
 !------------------------------------------------------------------------------------------
 
-  subroutine SumAftEnergyBalanceM(I,J,M,NY,NX,LWRadGrnd,VapXAir2TopLay,HeatSensLitR2Soi1,&
+  subroutine SumAftEnergyBalanceM(I,J,M,NY,NX,LWRadGrnd_col,VapXAir2TopLay,HeatSensLitR2Soi1,&
     HeatSensVapLitR2Soi1,EvapLitR2Soi1,VapXAir2LitR,HeatFluxAir2LitR,HeatFluxAir2Soi,PrecNet2SoiMicP,&
     PrecNet2SoiMacP,RainPrecHeatAir2LitR,NetWatFlxAir2SoiMicP,NetWatXFlxAir2SoiMicP,NetWatFlxAir2SoiMacP)
   !
@@ -1486,7 +1487,7 @@ contains
   implicit none
   integer, intent(in)  :: I,J,M
   integer, intent(in)  :: NY,NX
-  real(r8), intent(in) :: LWRadGrnd            !>0 into atmosphere, long wave radiation from ground surface
+  real(r8), intent(in) :: LWRadGrnd_col            !>0 into atmosphere, long wave radiation from ground surface
   real(r8), intent(in) :: VapXAir2TopLay
   real(r8), intent(in) :: HeatSensLitR2Soi1
   real(r8), intent(in) :: HeatSensVapLitR2Soi1
@@ -1561,8 +1562,8 @@ contains
   ENDIF
 
   !LWRadBySurf_col=longwave emission from litter and surface soil into atmosphere
-  LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)+LWRadGrnd
-  
+  LWRadBySurf_col(NY,NX) = LWRadBySurf_col(NY,NX)+LWRadGrnd_col
+
   VapXAir2GSurf_col(NY,NX)                 = VapXAir2GSurf_col(NY,NX) + VapXAir2LitR  
   TEvapXAir2LitR_col(NY,NX)                = TevapXAir2LitR_col(NY,NX)+ VapXAir2LitR  
   end subroutine SumAftEnergyBalanceM
@@ -1616,6 +1617,7 @@ contains
       if(present(Qinfl2MicP))Qinfl2MicP(NY,NX)=WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)
       if(present(HeatInfl2Soil))HeatInfl2Soil(NY,NX)=HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)
       if(present(Qinfl2MacP))Qinfl2MacP(NY,NX)=WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)
+      LWRadGrnd_col(NY,NX)   = LWRadBySurf_col(NY,NX)
     ENDDO D9890
   ENDDO D9895
 

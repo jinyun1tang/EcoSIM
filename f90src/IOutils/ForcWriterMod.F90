@@ -56,7 +56,7 @@ implicit none
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
     call ncd_defdim(ncf,'NumLiveAutoBioms',NumLiveAutoBioms,recordDimID)
     call ncd_defdim(ncf,'NumLiveHeterBioms',NumLiveHeterBioms,recordDimID)
-    call ncd_defdim(ncf,'NumHetetrMicCmplx',NumHetetrMicCmplx,recordDimID)
+    call ncd_defdim(ncf,'NumHetetr1MicCmplx',NumHetetr1MicCmplx,recordDimID)
     call ncd_defdim(ncf,'NumMicrobAutrophCmplx',NumMicrobAutrophCmplx,recordDimID)
     call ncd_defdim(ncf,'element',NumPlantChemElms,recordDimID)
     call ncd_defdim(ncf,'ndoms',trc_confs%NDOMS,recordDimID)

@@ -4,7 +4,7 @@ module PlantDisturbByGrazingMod
   use ElmIDMod
   use EcosimConst
   use PlantAPIData
-  use GrosubPars
+  use PlantBGCPars
 implicit none
   private
   save
@@ -179,7 +179,7 @@ contains
   real(r8), intent(out):: HvstedRsrvC
   real(r8), intent(out) :: WHVSHH
   real(r8), intent(out) :: WHVSNP  
-  REAL(R8), intent(out) :: LeafC_lbrch(NumOfCanopyLayers1,JP1,JP1)  
+  REAL(R8), intent(out) :: LeafC_lbrch(NumCanopyLayers1,JP1,JP1)  
   real(r8) :: totShootC,TotPhytomassRemoval
   real(r8) :: WHVSLX,WHVSLY,WHVSCL,WHVSNL,CGrazedDeficit,WHVSSX
   real(r8) :: WHVSTY  
@@ -372,7 +372,7 @@ contains
 !     LeafC_lbrch=branch leaf C mass in canopy layer
 !
   D9860: DO NB=1,NumOfBranches_pft(NZ)
-    DO  L=1,NumOfCanopyLayers1
+    DO  L=1,NumCanopyLayers1
       DO  K=0,MaxNodesPerBranch1
         LeafC_lbrch(L,NB,NZ)=0._r8
       enddo
@@ -380,7 +380,7 @@ contains
   ENDDO D9860
 
   D9870: DO NB=1,NumOfBranches_pft(NZ)
-    DO  L=1,NumOfCanopyLayers1
+    DO  L=1,NumCanopyLayers1
       DO  K=0,MaxNodesPerBranch1
         LeafC_lbrch(L,NB,NZ)=LeafC_lbrch(L,NB,NZ)+LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
       enddo

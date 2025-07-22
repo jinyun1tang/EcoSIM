@@ -27,16 +27,22 @@ continue_run=.false.
 forc_periods=2013,2013,1,2022,2012,1,2013,2022,2,2012,2022,1
 
 !set up solvers
-NPXS=30,30,30,30,30      !number of cycles per hour for water,heat,solute flux calcns
-NPYS=20,20,20,20,20      !number of cycles per NPX for gas flux calcns
+NPXS=30,30,30      !number of cycles per hour for water,heat,solute flux calcns
+NPYS=10,10,10      !number of cycles per NPX for gas flux calcns
 NCYC_LITR=30
 NCYC_SNOW=20
 !set up output frequency
-hist_mfilt=7665 , 8760
+hist_mfilt=7665  !, 8760
 !hist_fincl2 = 'AIR_TEMP','TEMP_vr','PREC','SOIL_RN','SOIL_LE','SOIL_G','SOIL_H','SOL_RADN','WIND','EVAPN',
 !  'RUNOFF_FLX','rWatFILLP_vr','rIceFILLP_vr','SNOWPACK','SURF_WTR'
-hist_fincl2='TEMP_vr' !,'STOML_RSC_CO2','CAN_GPP','CAN_RA','CAN_GROWTH'  !,'TEMP_LITR'
-hist_nhtfrq=-24, -1
+hist_fincl1='ECO_RA_col','ECO_RH_col','ECO_NPP_col', 'Root_AR_col','ECO_HR_CO2_col','CO2_DIF_FLX_col', 
+  'TEMP_vr','rWatFLP_vr','BOTDEPZ_vr','tSOC_vr','RootC_vr','RootC_2nd_pvr','CanopyLAIZ_plyr','CFIX_rC2L_pft',
+  'RUB_ACTVN_pft','RootNutUptk_fClim_pvr','RootNutUptk_fNlim_pvr','RootNutUptk_fPlim_pvr','RootNutUptk_fProtC_pvr',
+  'HR_CO2_vr','Root_OXYSTRESS_pvr','Decomp_OStress_vr','Decomp_OStress_LITR','SOMHydrlScalCp1_vr','SOMHydrlScalCp2_vr',
+  'SOMHydrlScalCp3_vr','SOMHydrlScalCp4_vr','SOMHydrlScalCp5_vr'
+
+!hist_fincl2='TEMP_vr','CO2_SEMIS_FLX_col','Root_AR_col','ECO_HR_CO2_col','ECO_RADSW_col'
+hist_nhtfrq=-24 !, -1
 /
 
 &bbgcforc

@@ -9,7 +9,7 @@ module ExtractsMod
   use PlantBalMod,   only: SumPlantRootGas
   use PlantDebugMod, only: PrintRootTracer
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use PlantAPIData
   implicit none
 
@@ -103,7 +103,7 @@ module ExtractsMod
   ENDDO
      CanopyLeafArea_col = 0._r8
      StemArea_col       = 0._r8
-  DO L                  = 1, NumOfCanopyLayers1
+  DO L                  = 1, NumCanopyLayers1
     CanopyLeafAareZ_col(L) = 0._r8
     tCanLeafC_clyr(L)        = 0._r8
     CanopyStemAareZ_col(L) = 0._r8
@@ -124,7 +124,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: L
-  associate(                                                      &
+  associate(                                               &
     CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft  ,& !input  :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft  => plt_biom%CanopyLeafCLyr_pft    ,& !input  :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft => plt_morph%CanopyStemAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
@@ -132,7 +132,7 @@ module ExtractsMod
     CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !inoput :total stem area, [m2 d-2]
     tCanLeafC_clyr      => plt_biom%tCanLeafC_clyr         & !inoput :total leaf carbon mass in canopy layers, [gC d-2]
   )
-  DO L=1,NumOfCanopyLayers1
+  DO L=1,NumCanopyLayers1
     CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
     tCanLeafC_clyr(L)=tCanLeafC_clyr(L)+CanopyLeafCLyr_pft(L,NZ)
     CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)
@@ -153,7 +153,7 @@ module ExtractsMod
  
   associate(                                                          &
     AREA3                     => plt_site%AREA3                      ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    AllPlantRootH2OLoss_pvr   => plt_ew%AllPlantRootH2OLoss_pvr      ,& !input  :root water uptake, [m2 d-2 h-1]
+    RPlantRootH2OUptk_pvr   => plt_ew%RPlantRootH2OUptk_pvr      ,& !input  :root water uptake, [m2 d-2 h-1]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
@@ -172,7 +172,7 @@ module ExtractsMod
     RootNutUptake_pvr         => plt_rbgc%RootNutUptake_pvr          ,& !input  :root uptake of Nutrient band, [g d-2 h-1]
     RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr        ,& !input  :root O2 demand from respiration, [g d-2 h-1]
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr             ,& !input  :aqueous O2 flux from roots to root water, [g d-2 h-1]
-    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr            ,& !input  :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_pvr           => plt_bgcr%RootO2_TotSink_pvr            ,& !input  :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr         ,& !input  :aqueous CO2 flux from roots to soil water, [g d-2 h-1]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                 ,& !input  :canopy temperature, [K]
     TKS_vr                    => plt_ew%TKS_vr                       ,& !input  :mean annual soil temperature, [K]
@@ -188,7 +188,7 @@ module ExtractsMod
     REcoO2DmndResp_vr         => plt_bgcr%REcoO2DmndResp_vr          ,& !inoput :total root + microbial O2 uptake, [g d-2 h-1]
     RUptkRootO2_vr            => plt_bgcr%RUptkRootO2_vr             ,& !inoput :total root internal O2 flux, [g d-2 h-1]
     RootCO2Emis2Root_vr       => plt_bgcr%RootCO2Emis2Root_vr        ,& !inoput :total root CO2 flux, [gC d-2 h-1]
-    RootO2_Xink_vr            => plt_bgcr%RootO2_Xink_vr             ,& !inoput :all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_vr         => plt_bgcr%RootO2_TotSink_vr          ,& !inoput :all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr        ,& !inoput :total root heat uptake, [MJ d-2]
     TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr      ,& !inoput :total root water uptake, [m3 d-2]
     tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr      ,& !inoput :total root element exchange, [g d-2 h-1]
@@ -204,8 +204,8 @@ module ExtractsMod
 !
 !     totRootLenDens_vr=total root length density
 !     RootLenDensPerPlant_pvr=PFT root length density per plant
-!     AllPlantRootH2OLoss_pvr=total water uptake
-!     AllPlantRootH2OLoss_pvr=PFT root water uptake
+!     RPlantRootH2OUptk_pvr=total water uptake
+!     RPlantRootH2OUptk_pvr=PFT root water uptake
 !     THeatLossRoot2Soil_vr=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
@@ -216,14 +216,14 @@ module ExtractsMod
 !
 !     TOTAL WATER UPTAKE
 !
-      TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L)+AllPlantRootH2OLoss_pvr(N,L,NZ)
+      TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)
 
       !water lose from canopy to soil
-      if(AllPlantRootH2OLoss_pvr(N,L,NZ)>0._r8)then
-        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_pvr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
+      if(RPlantRootH2OUptk_pvr(N,L,NZ)>0._r8)then
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
       !water lose from soil to canopy  
       else
-        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+AllPlantRootH2OLoss_pvr(N,L,NZ)*cpw*TKS_vr(L)
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)*cpw*TKS_vr(L)
       endif
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
@@ -231,7 +231,7 @@ module ExtractsMod
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
-      RootO2_Xink_vr(L)      = RootO2_Xink_vr(L) + RootO2_Xink_pvr(N,L,NZ)
+      RootO2_TotSink_vr(L)      = RootO2_TotSink_vr(L) + RootO2_TotSink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
       RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
       RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 

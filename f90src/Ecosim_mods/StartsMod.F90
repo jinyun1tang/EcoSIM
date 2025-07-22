@@ -198,10 +198,10 @@ module StartsMod
 !     INITIALIZE COMMUNITY CANOPY
 !
   CanopyHeight_col(:,:)                        = 0.0_r8
-  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
-  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  tCanLeafC_clyr(1:NumOfCanopyLayers,:,:)        = 0.0_r8
+  CanopyHeightZ_col(0:NumCanopyLayers,:,:)   = 0.0_r8
+  CanopyLeafAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  CanopyStemAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  tCanLeafC_clyr(1:NumCanopyLayers,:,:)        = 0.0_r8
 !
   
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
@@ -516,7 +516,7 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     
   ENDDO D1200
-  
+
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))
@@ -612,9 +612,9 @@ module StartsMod
       ZEROS(NY,NX)  = ZERO*GridArea
       ZEROS2(NY,NX) = ZERO2*GridArea
 !     compute slopes
-      GroundSurfAzimuth_col(NY,NX)      = ASP_col(NY,NX)*RadianPerDegree   !radian
-      SineGrndSurfAzimuth_col(NY,NX)    = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
-      CosineGrndSurfAzimuth_col(NY,NX)  = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
+      GroundSurfAzimuth_col(NY,NX)          = ASP_col(NY,NX)*RadianPerDegree   !radian
+      SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
+      CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
       SLOPE_col(iWestEastDirection,NY,NX)   = -SLOPE_col(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
       SLOPE_col(iNorthSouthDirection,NY,NX) = SLOPE_col(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
@@ -801,9 +801,9 @@ module StartsMod
   RootResp_CumYr_col(:,:)        = 0.0_r8
   HydroSufDOCFlx_col(:,:)        = 0.0_r8
   HydroSubsDOCFlx_col(:,:)       = 0.0_r8
-  HydroSufDONFlx_CumYr_col(:,:)  = 0.0_r8
+  HydroSufDONFlx_col(:,:)  = 0.0_r8
   HydroSubsDONFlx_col(:,:)       = 0.0_r8
-  HydroSufDOPFlx_CumYr_col(:,:)  = 0.0_r8
+  HydroSufDOPFlx_col(:,:)  = 0.0_r8
   HydroSubsDOPFlx_col(:,:)       = 0.0_r8
   HydroSufDICFlx_col(:,:)        = 0.0_r8
   HydroSubsDICFlx_col(:,:)       = 0.0_r8
@@ -1111,10 +1111,10 @@ module StartsMod
 !     INITIALIZE COMMUNITY CANOPY
 !
   CanopyHeight_col(:,:)                        = 0.0_r8
-  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
-  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  tCanLeafC_clyr(1:NumOfCanopyLayers,:,:)        = 0.0_r8
+  CanopyHeightZ_col(0:NumCanopyLayers,:,:)   = 0.0_r8
+  CanopyLeafAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  CanopyStemAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  tCanLeafC_clyr(1:NumCanopyLayers,:,:)        = 0.0_r8
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 

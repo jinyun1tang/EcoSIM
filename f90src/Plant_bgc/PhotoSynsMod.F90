@@ -1,7 +1,7 @@
 module PhotoSynsMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
-  use GrosubPars
+  use PlantBGCPars
   use minimathmod, only : AZMAX1
   use PlantMathFuncMod
   use PlantAPIData
@@ -66,12 +66,12 @@ implicit none
   CH2O3K=0._r8
 ! FOR EACH CANOPY LAYER
   CO2FCL=0._r8;CO2FLL=0._r8
-  D210: DO L=NumOfCanopyLayers1,1,-1
+  D210: DO L=NumCanopyLayers1,1,-1
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      D215: DO N=1,NumOfLeafZenithSectors1
+      D215: DO N=1,NumLeafZenithSectors1
         D220: DO M=1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
@@ -81,11 +81,11 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN            
             DO LP=1,2
               if (LP==1)then
-                PAR_zsec=RadPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_DirectRTransmit(L+1)
+                PAR_zsec = RadPAR_zsec(N,M,L,NZ)
+                Tau_rad  = TAU_DirectRTransmit(L+1)
               else
-                PAR_zsec=RadDifPAR_zsec(N,M,L,NZ)
-                Tau_rad=TAU_RadThru(L+1)
+                PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
+                Tau_rad  = TAU_RadThru(L+1)
               endif
               
               IF(PAR_zsec.GT.0.0_r8)THEN
@@ -106,7 +106,6 @@ implicit none
                 PARX = QNTM*PAR_zsec
                 PARJ = PARX+LigthSatCarboxyRate_node(K,NB,NZ)
                 PARJ2= PARJ*PARJ
-!                delta=CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)/PARJ2
                 ETLF = (PARJ-SQRT(PARJ2-CURV4*PARX*LigthSatCarboxyRate_node(K,NB,NZ)))/CURV2
                 EGRO = ETLF*RubiscoCarboxyEff_node(K,NB,NZ)
                 VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
@@ -192,7 +191,18 @@ implicit none
 
                 ENDIF
               ENDIF
+              if(I==6.and.J==22.and.LP==1.and..false.)then
+              write(456,*)'N,M',N,M,'pardir',PAR_zsec
+              write(456,*)'cangas',CanopyGasCO2_pft(NZ),plt_site%CO2E,LeafIntracellularCO2_pft(NZ)
+              write(456,*)VL,LeafAUnshaded_zsec(N,L,K,NB,NZ),TAU_Rad
+              write(456,*)'sco2',AirConc_pft(NZ),CO2Solubility_pft(NZ),Km4RubiscoCarboxy_pft(NZ)
+              stop
+              endif              
             ENDDO
+            if(I==6.and.J==22.and..false.)then
+            write(456,*)'N,M',N,M
+            stop
+            endif
           ENDIF
         ENDDO D220
       ENDDO D215
@@ -261,13 +271,13 @@ implicit none
   CO2FCL=0._r8;CO2FLL=0._r8
 ! FOR EACH CANOPY LAYER
 !
-  D110: DO L=NumOfCanopyLayers1,1,-1
+  D110: DO L=NumCanopyLayers1,1,-1
 
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      D115: DO N =1,NumOfLeafZenithSectors1
+      D115: DO N =1,NumLeafZenithSectors1
         D120: DO M =1,NumOfSkyAzimuthSects1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
@@ -444,7 +454,11 @@ implicit none
     LeafNodeArea_brch        => plt_morph%LeafNodeArea_brch         ,& !input  :leaf area, [m2 d-2]
     RubiscoActivity_brch     => plt_photo%RubiscoActivity_brch       & !input  :branch down-regulation of CO2 fixation, [-]
   )
-
+  if(I==6.and.J==22.and..false.)then
+  write(*,*)'computegpp',NB,NZ
+  write(456,*)'compgpp'
+  write(456,*)RubiscoActivity_brch(NB,NZ),SineSunInclAngle_col,RadPARbyCanopy_pft(NZ),CanopyGasCO2_pft(NZ)
+  endif
   CH2OClm=0._r8;CH2OLlm=0._r8
   IF(abs(RubiscoActivity_brch(NB,NZ)).GT.0._r8)THEN    
     IF(SineSunInclAngle_col.GT.0.0_r8 .AND. RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
@@ -478,6 +492,9 @@ implicit none
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
+              if(I==6.and.J==22.and..false.)then
+              write(456,*)'c3',K,Vmax4RubiscoCarboxy_pft(K,NB,NZ)              
+              endif
               call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
               CO2F    = CO2F+CH2O3(K)
               CH2O    = CH2O+CH2O3(K)

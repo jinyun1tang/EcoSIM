@@ -124,7 +124,7 @@ module RootGasMod
     Root2ndMeanLens_pvr       => plt_morph%Root2ndMeanLens_pvr           ,& !input  :root layer average length, [m]
     RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr               ,& !input  :root layer volume air, [m2 d-2]
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr               ,& !input  :root layer number axes, [d-2]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr               ,& !input  :root layer number axes, [d-2]
     Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr             ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft           => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr                  ,& !input  :root layer volume water, [m2 d-2]
@@ -134,7 +134,7 @@ module RootGasMod
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr                 ,& !inoput :aqueous O2 flux from roots to root water, [g d-2 h-1]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr         ,& !inoput :O2 constraint to root respiration (0-1), [-]
-    RO2UptkSoilM_vr           => plt_rbgc%RO2UptkSoilM_vr                ,& !inoput :total O2 sink, [g d-2 t-1]
+    REcoUptkSoilO2M_vr           => plt_rbgc%REcoUptkSoilO2M_vr                ,& !inoput :total O2 sink, [g d-2 t-1]
     RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr              ,& !inoput :aqueous CO2 flux from roots to root water, [g d-2 h-1]
     trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr          ,& !inoput :gaseous tracer flux through roots, [g d-2 h-1]
     trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr       ,& !inoput :dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
@@ -143,7 +143,7 @@ module RootGasMod
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr                ,& !inoput :root aqueous content, [g d-2]
     RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr             ,& !inoput :root respiration released to soil, [gC d-2 h-1]
     RootCO2Ar2RootX_pvr       => plt_rbgc%RootCO2Ar2RootX_pvr            ,& !inoput :root respiration released to root, [gC d-2 h-1]
-    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr                ,& !output :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_pvr           => plt_bgcr%RootO2_TotSink_pvr                ,& !output :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     RootGasConductance_pvr    => plt_rbgc%RootGasConductance_pvr          & !output :Conductance for gas diffusion [m3 d-2 h-1]
   )
   
@@ -201,7 +201,7 @@ module RootGasMod
       !primary roots conductance scalar
       RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar
-      RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+      RTCR2 = (Root2ndXNumL_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE
@@ -566,11 +566,11 @@ module RootGasMod
           ! ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
           !
           ! RootO2Uptk_pvr=root O2 uptake from root
-          ! RO2UptkSoilM_vr=total O2 uptake from soil by all microbial,root popns
+          ! REcoUptkSoilO2M_vr=total O2 uptake from soil by all microbial,root popns
           ! Root CO2 emission includes actual CO2 production from respiration and flux exchange with soil
           RCO2Emis2Root_pvr(N,L,NZ) = RCO2Emis2Root_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
           RootO2Uptk_pvr(N,L,NZ)    = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk    !uptake from O2 inside roots for root respiration
-          RO2UptkSoilM_vr(M,L)      = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
+          REcoUptkSoilO2M_vr(M,L)      = REcoUptkSoilO2M_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
         ENDDO D90        
       ENDIF
 
@@ -597,13 +597,13 @@ module RootGasMod
     ! O2 is taken from inside the root and directly from the aqueous soil O2.
 
     PopPlantO2Uptake        = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_pvr(idg_O2,N,L,NZ)
-    RootO2_Xink_pvr(N,L,NZ) = PopPlantO2Uptake
+    RootO2_TotSink_pvr(N,L,NZ) = PopPlantO2Uptake     !include O2 uptake from soil and from inside the roots
     !to be used in next iteration
     RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE
     RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
     PopPlantO2Uptake         = 0.0_r8
-    RootO2_Xink_pvr(N,L,NZ)  = 0._r8
+    RootO2_TotSink_pvr(N,L,NZ)  = 0._r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
       RAutoRootO2Limter_rpvr(N,L,NZ)=RAutoRootO2Limter_rpvr(N,L-1,NZ)
     ELSE

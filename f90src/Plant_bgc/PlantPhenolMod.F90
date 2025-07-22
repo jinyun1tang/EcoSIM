@@ -352,7 +352,7 @@ module PlantPhenolMod
           IF((NumRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR.(CanopyNonstElmConc_pft(ielmc,NZ).GT.MinNonstC2InitRoot_pft(NZ) & 
             .AND.MinNonstC2InitRoot_pft(NZ).GT.0.0_r8))THEN
-            NumRootAxes_pft(NZ)=MIN(NumOfCanopyLayers1,NumRootAxes_pft(NZ)+1)
+            NumRootAxes_pft(NZ)=MIN(NumCanopyLayers1,NumRootAxes_pft(NZ)+1)
             iPlantRootState_pft(NZ)=iLive
           ENDIF
         ENDIF

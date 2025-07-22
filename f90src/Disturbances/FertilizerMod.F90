@@ -292,12 +292,12 @@ implicit none
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
       D2960: DO N=1,NumMicbFunGrupsPerCmplx
-        tglds=JGnfo(N)-JGnfo(N)+1
+        tglds=JGnfH(N)-JGnfH(N)+1
         D2961: DO M=1,nlbiomcp
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
           OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMC_ave(M,N,K),OSNI-OSNX))
           OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMC_ave(M,N,K),OSPI-OSPX))
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds

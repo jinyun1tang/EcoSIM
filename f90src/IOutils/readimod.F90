@@ -312,6 +312,7 @@ module readiMod
       RechargRateWestWTBL_col(NY,NX)  = RCHGWUG      
       RechargBottom_col(NY,NX) = RCHGDG
 
+
       DH_col(NY,NX)                = DHI(NX)
       DV_col(NY,NX)                = DVI(NY)
       CO2E_col(NY,NX)          = CO2EI_col(NY,NX)
@@ -413,7 +414,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
-    call ncd_getvar(grid_nfid, 'ISOILR_col',ntp,ISOILR_col(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR_col(NV1,NH1))
     
     NU_col(NV1,NH1) = NUI_col(NV1,NH1)    
     NK_col(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+1
